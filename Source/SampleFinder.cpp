@@ -1,0 +1,354 @@
+//
+//  SampleFinder.cpp
+//  modularSynth
+//
+//  Created by Ryan Challinor on 1/20/13.
+//
+//
+
+#include "SampleFinder.h"
+#include "IAudioReceiver.h"
+#include "Sample.h"
+#include "SynthGlobals.h"
+#include "ModularSynth.h"
+#include "Profiler.h"
+
+SampleFinder::SampleFinder()
+: mVolume(.6f)
+, mVolumeSlider(NULL)
+, mSample(NULL)
+, mPlay(false)
+, mPlayCheckbox(NULL)
+, mLoop(true)
+, mLoopCheckbox(NULL)
+, mMeasureEarly(0)
+, mEditMode(true)
+, mEditCheckbox(NULL)
+, mClipStart(0)
+, mClipStartSlider(NULL)
+, mClipEnd(1)
+, mClipEndSlider(NULL)
+, mZoomStart(0)
+, mZoomEnd(1)
+, mNumBars(1)
+, mNumBarsSlider(NULL)
+, mOffset(0)
+, mOffsetSlider(NULL)
+, mWriteButton(NULL)
+, mPlayhead(0)
+, mWantWrite(false)
+, mDoubleLengthButton(NULL)
+, mHalveLengthButton(NULL)
+, mReverse(false)
+, mReverseCheckbox(NULL)
+{
+   mWriteBuffer = new float[gBufferSize];
+   Clear(mWriteBuffer, gBufferSize);
+   mSample = new Sample();
+   
+   mSampleDrawer.SetSample(mSample);
+   mSampleDrawer.SetPosition(5,80);
+   mSampleDrawer.SetDimensions(200, 40);
+}
+
+void SampleFinder::CreateUIControls()
+{
+   IDrawableModule::CreateUIControls();
+   mVolumeSlider = new FloatSlider(this,"volume",5,20,110,15,&mVolume,0,2);
+   mPlayCheckbox = new Checkbox(this,"play",5,60,&mPlay);
+   mLoopCheckbox = new Checkbox(this,"loop",60,60,&mLoop);
+   mEditCheckbox = new Checkbox(this,"edit",100,2,&mEditMode);
+   mClipStartSlider = new IntSlider(this,"start",5,395,900,15,&mClipStart,0,gSampleRate*200);
+   mClipEndSlider = new IntSlider(this,"end",5,410,900,15,&mClipEnd,0,gSampleRate*200);
+   mNumBarsSlider = new IntSlider(this,"num bars",215,3,220,15,&mNumBars,1,16);
+   mOffsetSlider = new FloatSlider(this,"offset",215,20,110,15,&mOffset,gSampleRate*-.5f,gSampleRate*.5f,4);
+   mWriteButton = new ClickButton(this,"write",600,50);
+   mDoubleLengthButton = new ClickButton(this,"double",600,10);
+   mHalveLengthButton = new ClickButton(this,"halve",600,28);
+   mReverseCheckbox = new Checkbox(this,"reverse",500,10,&mReverse);
+}
+
+SampleFinder::~SampleFinder()
+{
+   delete[] mWriteBuffer;
+   delete mSample;
+}
+
+void SampleFinder::Process(double time)
+{
+   Profiler profiler("SampleFinder");
+
+   if (!mEnabled || GetTarget() == NULL || mSample == NULL || mPlay == false)
+      return;
+   
+   ComputeSliders(0);
+   
+   if (mWantWrite)
+   {
+      DoWrite();
+      mWantWrite = false;
+   }
+   
+   int bufferSize;
+   float* out = GetTarget()->GetBuffer(bufferSize);
+   assert(bufferSize == gBufferSize);
+   
+   float volSq = mVolume * mVolume;
+   
+   float speed = GetSpeed();
+   
+   const float* data = mSample->Data();
+   int numSamples = mSample->LengthInSamples();
+   float sampleRateRatio = mSample->GetSampleRateRatio();
+   
+   mPlayhead = TheTransport->GetMeasurePos() + (TheTransport->GetMeasure() % mNumBars);
+   if (mReverse)
+      mPlayhead = 1 - mPlayhead;
+   mPlayhead /= mNumBars;
+   mPlayhead *= mClipEnd-mClipStart;
+   mPlayhead += mClipStart;
+   mPlayhead += mOffset;
+   
+   for (int i=0; i<bufferSize; ++i)
+   {
+      if (mPlayhead >= mClipEnd)
+         mPlayhead -= (mClipEnd - mClipStart);
+      if (mPlayhead < mClipStart)
+         mPlayhead += (mClipEnd - mClipStart);
+      
+      int pos = int(mPlayhead);
+      int posNext = int(mPlayhead)+1;
+      if (pos < numSamples)
+      {
+         float sample = pos < 0 ? 0 : data[pos];
+         float nextSample = posNext >= numSamples ? 0 : data[posNext];
+         float a = mPlayhead - pos;
+         out[i] += ((1-a)*sample + a*nextSample) * volSq; //interpolate
+      }
+      else
+      {
+         out[i] = 0; //fill the rest with zero
+      }
+      GetVizBuffer()->Write(out[i]);
+      mPlayhead += speed * sampleRateRatio;
+   }
+}
+
+void SampleFinder::DrawModule()
+{
+
+   if (Minimized() || IsVisible() == false)
+      return;
+   
+   mVolumeSlider->Draw();
+   mPlayCheckbox->Draw();
+   mLoopCheckbox->Draw();
+   mEditCheckbox->Draw();
+   
+   if (mSample)
+   {
+      if (!mEditMode)
+      {
+         mSampleDrawer.SetDimensions(200,40);
+         mSampleDrawer.SetRange(mClipStart, mClipEnd);
+         mSampleDrawer.Draw((int)mPlayhead);
+      }
+      else
+      {
+         mSampleDrawer.SetDimensions(900,310);
+         mSampleDrawer.SetRange(mZoomStart, mZoomEnd);
+         mSampleDrawer.Draw((int)mPlayhead);
+         mSampleDrawer.DrawLine(mClipStart, ofColor::red);
+         mSampleDrawer.DrawLine(mClipEnd, ofColor::red);
+         
+         mClipStartSlider->Draw();
+         mClipEndSlider->Draw();
+         mNumBarsSlider->Draw();
+         mOffsetSlider->Draw();
+         mWriteButton->Draw();
+         mDoubleLengthButton->Draw();
+         mHalveLengthButton->Draw();
+         mReverseCheckbox->Draw();
+         DrawText(ofToString(mSample->GetPlayPosition()),335,50);
+         DrawText("speed: "+ofToString(GetSpeed()), 4, 55);
+      }
+   }
+}
+
+bool SampleFinder::MouseScrolled(int x, int y, float scrollX, float scrollY)
+{
+   ofVec2f bufferPos = ofVec2f(ofMap(x, 5, 5+900, 0, 1),
+                               ofMap(y, 80, 80+310, 0, 1));
+   if (IsInUnitBox(bufferPos))
+   {
+      float zoomCenter = ofLerp(mZoomStart, mZoomEnd, bufferPos.x);
+      float distFromStart = zoomCenter - mZoomStart;
+      float distFromEnd = zoomCenter - mZoomEnd;
+      
+      distFromStart *= 1 + scrollY/100;
+      distFromEnd *= 1 + scrollY/100;
+      
+      float slideX = (mZoomEnd - mZoomStart) * -scrollX/300;
+      
+      mZoomStart = ofClamp(zoomCenter - distFromStart + slideX, 0, mSample->LengthInSamples());
+      mZoomEnd = ofClamp(zoomCenter - distFromEnd + slideX, 0, mSample->LengthInSamples());
+      UpdateZoomExtents();
+      return true;
+   }
+   return false;
+}
+
+void SampleFinder::FilesDropped(vector<string> files, int x, int y)
+{
+   mSample->Reset();
+   
+   mSample->Read(files[0].c_str());
+   
+   mClipStart = 0;
+   mClipEnd = mSample->LengthInSamples();
+   mZoomStart = 0;
+   mZoomEnd = mClipEnd;
+   UpdateZoomExtents();
+}
+
+float SampleFinder::GetSpeed()
+{
+   return float(mClipEnd-mClipStart) * gInvSampleRateMs / TheTransport->MsPerBar() / mNumBars * (mReverse ? -1 : 1);
+}
+
+void SampleFinder::DropdownClicked(DropdownList* list)
+{
+}
+
+void SampleFinder::DropdownUpdated(DropdownList* list, int oldVal)
+{
+}
+
+void SampleFinder::UpdateSample()
+{
+}
+
+void SampleFinder::ButtonClicked(ClickButton *button)
+{
+   if (button == mWriteButton)
+   {
+      mWantWrite = true;
+   }
+   if (button == mDoubleLengthButton)
+   {
+      float newEnd = (mClipEnd-mClipStart)*2+mClipStart;
+      if (newEnd < mSample->LengthInSamples())
+      {
+         mClipEnd = newEnd;
+         mNumBars *= 2;
+      }
+   }
+   if (button == mHalveLengthButton)
+   {
+      if (mNumBars % 2 == 0)
+      {
+         float newEnd = (mClipEnd-mClipStart)/2+mClipStart;
+         mClipEnd = newEnd;
+         mNumBars /= 2;
+      }
+   }
+}
+
+void SampleFinder::DoWrite()
+{
+   if (mSample)
+   {
+      mSample->ClipTo(mClipStart, mClipEnd);
+      int shift = mOffset * (mClipEnd-mClipStart);
+      if (shift < 0)
+         shift += mClipEnd-mClipStart;
+      mSample->ShiftWrap(shift);
+      mSample->Write(ofGetTimestampString("loops/sample_%m-%d-%Y_%H-%M.wav").c_str());
+      mClipStart = 0;
+      mClipEnd = mSample->LengthInSamples();
+      mOffset = 0;
+      
+      mZoomStart = 0;
+      mZoomEnd = mClipEnd;
+      UpdateZoomExtents();
+   }
+}
+
+void SampleFinder::UpdateZoomExtents()
+{
+   mClipStartSlider->SetExtents(mZoomStart,mZoomEnd);
+   mClipEndSlider->SetExtents(mZoomStart,mZoomEnd);
+}
+
+void SampleFinder::CheckboxUpdated(Checkbox *checkbox)
+{
+   if (checkbox == mPlayCheckbox)
+   {
+      if (mSample)
+         mSample->Reset();
+   }
+}
+
+void SampleFinder::GetModuleDimensions(int& x, int&y)
+{
+   if (mEditMode)
+   {
+      x = 910;
+      y = 430;
+   }
+   else
+   {
+      x = 210;
+      y = 125;
+   }
+}
+
+void SampleFinder::FloatSliderUpdated(FloatSlider* slider, float oldVal)
+{
+}
+
+void SampleFinder::IntSliderUpdated(IntSlider* slider, int oldVal)
+{
+   if (slider == mClipStartSlider)
+   {
+      if (mSample && mClipStart > mSample->LengthInSamples())
+         mClipStart = mSample->LengthInSamples();
+   }
+   if (slider == mClipEndSlider)
+   {
+      if (mSample && mClipEnd > mSample->LengthInSamples())
+         mClipEnd = mSample->LengthInSamples();
+   }
+}
+
+void SampleFinder::PlayNote(double time, int pitch, int velocity, int voiceIdx /*= -1*/, ModulationChain* pitchBend /*= NULL*/, ModulationChain* modWheel /*= NULL*/, ModulationChain* pressure /*= NULL*/)
+{
+   if (mSample)
+   {
+      mPlay = false;
+      if (pitch == 16)
+      {
+         mSample->Reset();
+      }
+      else if (pitch >= 0 && pitch < 16 && velocity > 0)
+      {
+         int slice = (pitch/8)*8 + 7-(pitch%8);
+         int barLength = (mClipEnd - mClipStart) / mNumBars;
+         int position = -mOffset*barLength + (barLength/4)*slice + mClipStart;
+         mSample->Play(1,position);
+      }
+   }
+}
+
+void SampleFinder::LoadLayout(const ofxJSONElement& moduleInfo)
+{
+   mModuleSaveData.LoadString("target", moduleInfo);
+
+   SetUpFromSaveData();
+}
+
+void SampleFinder::SetUpFromSaveData()
+{
+   SetTarget(TheSynth->FindModule(mModuleSaveData.GetString("target")));
+}
+

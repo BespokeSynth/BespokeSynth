@@ -1,0 +1,451 @@
+//
+//  Producer.cpp
+//  modularSynth
+//
+//  Created by Ryan Challinor on 11/13/13.
+//
+//
+
+#include "Producer.h"
+#include "Producer.h"
+#include "IAudioReceiver.h"
+#include "Sample.h"
+#include "SynthGlobals.h"
+#include "ModularSynth.h"
+#include "Profiler.h"
+
+const float mBufferX = 5;
+const float mBufferY = 80;
+const float mBufferW = 900;
+const float mBufferH = 300;
+
+Producer::Producer()
+: mVolume(.6f)
+, mVolumeSlider(NULL)
+, mSample(NULL)
+, mPlay(false)
+, mPlayCheckbox(NULL)
+, mLoop(false)
+, mLoopCheckbox(NULL)
+, mClipStart(0)
+, mClipStartSlider(NULL)
+, mClipEnd(1)
+, mClipEndSlider(NULL)
+, mZoomStart(0)
+, mZoomStartSlider(NULL)
+, mZoomEnd(1)
+, mZoomEndSlider(NULL)
+, mNumBars(1)
+, mNumBarsSlider(NULL)
+, mOffset(0)
+, mOffsetSlider(NULL)
+, mWriteButton(NULL)
+, mPlayhead(0)
+, mDoubleLengthButton(NULL)
+, mHalveLengthButton(NULL)
+, mTempo(120)
+, mTempoSlider(NULL)
+, mStartOffset(0)
+, mStartOffsetSlider(NULL)
+, mCalcTempoButton(NULL)
+, mRestartButton(NULL)
+{
+   mWriteBuffer = new float[gBufferSize];
+   Clear(mWriteBuffer, gBufferSize);
+   mSample = new Sample();
+   
+   for (int i=0; i<PRODUCER_NUM_BIQUADS; ++i)
+   {
+      AddChild(&mBiquad[i]);
+      mBiquad[i].SetPosition(150+100*i,mBufferY+10);
+      mBiquad[i].SetFilterType(kFilterType_Lowpass);
+      mBiquad[i].SetFilterParams(1600, 1);
+   }
+}
+
+void Producer::CreateUIControls()
+{
+   IDrawableModule::CreateUIControls();
+   mVolumeSlider = new FloatSlider(this,"volume",5,20,110,15,&mVolume,0,2);
+   mPlayCheckbox = new Checkbox(this,"play",5,60,&mPlay);
+   mLoopCheckbox = new Checkbox(this,"loop",55,60,&mLoop);
+   mClipStartSlider = new FloatSlider(this,"start",mBufferX,mBufferY+mBufferH-30,900,15,&mClipStart,0,gSampleRate*200);
+   mClipEndSlider = new FloatSlider(this,"end",mBufferX,mBufferY+mBufferH-15,900,15,&mClipEnd,0,gSampleRate*200);
+   mZoomStartSlider = new FloatSlider(this,"zoomstart",mBufferX,mBufferY+mBufferH+5,900,15,&mZoomStart,0,gSampleRate*200);
+   mZoomEndSlider = new FloatSlider(this,"zoomend",mBufferX,mBufferY+mBufferH+20,900,15,&mZoomEnd,0,gSampleRate*200);
+   mNumBarsSlider = new IntSlider(this,"num bars",215,3,220,15,&mNumBars,1,16);
+   mOffsetSlider = new FloatSlider(this,"off",215,20,110,15,&mOffset,-1,1,4);
+   mWriteButton = new ClickButton(this,"write",600,50);
+   mDoubleLengthButton = new ClickButton(this,"double",600,10);
+   mHalveLengthButton = new ClickButton(this,"halve",600,28);
+   mTempoSlider = new FloatSlider(this, "tempo", 490,10,100,15,&mTempo,30,200);
+   mStartOffsetSlider = new IntSlider(this, "start", 490,28,100,15,&mStartOffset,0,gSampleRate*4);
+   mCalcTempoButton = new ClickButton(this, "calc tempo", 490,46);
+   mRestartButton = new ClickButton(this,"restart",100,60);
+   
+   for (int i=0; i<PRODUCER_NUM_BIQUADS; ++i)
+      mBiquad[i].CreateUIControls();
+}
+
+Producer::~Producer()
+{
+   delete[] mWriteBuffer;
+   delete mSample;
+}
+
+void Producer::Process(double time)
+{
+   Profiler profiler("Producer");
+
+   if (!mEnabled || GetTarget() == NULL || mSample == NULL || mPlay == false)
+      return;
+   
+   ComputeSliders(0);
+   
+   int bufferSize;
+   float* out = GetTarget()->GetBuffer(bufferSize);
+   assert(bufferSize == gBufferSize);
+   
+   float volSq = mVolume * mVolume;
+   
+   const float* data = mSample->Data();
+   int numSamples = mSample->LengthInSamples();
+   
+   for (int i=0; i<bufferSize; ++i)
+   {
+      if (mPlayhead < numSamples)
+      {
+         out[i] += data[mPlayhead] * volSq;
+      }
+      else
+      {
+         mPlay = false;
+         out[i] = 0; //fill the rest with zero
+      }
+      mPlayhead += 1;
+      
+      while (IsSkipMeasure(GetMeasureForSample(mPlayhead)))
+      {
+         mPlayhead += GetSamplesPerMeasure();
+      }
+      
+      if (mLoop && mPlayhead > mClipEnd)
+         mPlayhead = mClipStart;
+   }
+   
+   for (int i=0; i<PRODUCER_NUM_BIQUADS; ++i)
+      mBiquad[i].ProcessAudio(gTime,out,bufferSize);
+   
+   GetVizBuffer()->WriteChunk(out,bufferSize);
+}
+
+void Producer::FilesDropped(vector<string> files, int x, int y)
+{
+   mSample->Reset();
+   
+   mSample->Read(files[0].c_str());
+   
+   mClipStart = 0;
+   mClipEnd = mSample->LengthInSamples();
+   mZoomStart = 0;
+   mZoomEnd = mClipEnd;
+   mZoomStartSlider->SetExtents(0,mClipEnd);
+   mZoomEndSlider->SetExtents(0,mClipEnd);
+   UpdateZoomExtents();
+}
+
+void Producer::DropdownClicked(DropdownList* list)
+{
+}
+
+void Producer::DropdownUpdated(DropdownList* list, int oldVal)
+{
+}
+
+void Producer::UpdateSample()
+{
+}
+
+void Producer::ButtonClicked(ClickButton *button)
+{
+   if (button == mWriteButton)
+   {
+      DoWrite();
+   }
+   if (button == mDoubleLengthButton)
+   {
+      float newEnd = (mClipEnd-mClipStart)*2+mClipStart;
+      if (newEnd < mSample->LengthInSamples())
+      {
+         mClipEnd = newEnd;
+         mNumBars *= 2;
+      }
+   }
+   if (button == mHalveLengthButton)
+   {
+      if (mNumBars % 2 == 0)
+      {
+         float newEnd = (mClipEnd-mClipStart)/2+mClipStart;
+         mClipEnd = newEnd;
+         mNumBars /= 2;
+      }
+   }
+   if (button == mCalcTempoButton)
+   {
+      if (mClipStart < mClipEnd)
+      {
+         float samplesPerMeasure = mClipEnd - mClipStart;
+         float secondsPerMeasure = samplesPerMeasure / gSampleRate;
+         mTempo = 1 / secondsPerMeasure * 4 * 60 * mNumBars;
+         mStartOffset = ((mClipStart / samplesPerMeasure) - int(mClipStart / samplesPerMeasure)) * samplesPerMeasure;
+      }
+   }
+   if (button == mRestartButton)
+      mPlayhead = mClipStart;
+}
+
+void Producer::DoWrite()
+{
+   if (mSample)
+   {
+      for (int i=0; i<PRODUCER_NUM_BIQUADS; ++i)
+         mBiquad[i].ProcessAudio(gTime,mSample->Data(),mSample->LengthInSamples());
+      
+      float* toWrite = new float[mSample->LengthInSamples()];
+      int pos = 0;
+      for (int i=0; i<mSample->LengthInSamples(); ++i)
+      {
+         if (IsSkipMeasure(GetMeasureForSample(i)) == false)
+         {
+            toWrite[pos] = mSample->Data()[i];
+            ++pos;
+         }
+      }
+      
+      Sample::WriteDataToFile(ofGetTimestampString("producer/producer_%m-%d-%Y_%H-%M.wav").c_str(), toWrite, pos);
+      mClipStart = 0;
+      mClipEnd = mSample->LengthInSamples();
+      mOffset = 0;
+      
+      mZoomStart = 0;
+      mZoomEnd = mClipEnd;
+      mZoomStartSlider->SetExtents(0,mClipEnd);
+      mZoomEndSlider->SetExtents(0,mClipEnd);
+      UpdateZoomExtents();
+   }
+}
+
+void Producer::UpdateZoomExtents()
+{
+   mClipStartSlider->SetExtents(mZoomStart,mZoomEnd);
+   mClipEndSlider->SetExtents(mZoomStart,mZoomEnd);
+}
+
+int Producer::GetMeasureSample(int measure)
+{
+   return mStartOffset + measure * GetSamplesPerMeasure();
+}
+
+float Producer::GetBufferPos(int sample)
+{
+   return (sample - mZoomStart) / (mZoomEnd - mZoomStart);
+}
+
+int Producer::GetMeasureForSample(int sample)
+{
+   return (sample - mStartOffset) / GetSamplesPerMeasure();
+}
+
+int Producer::GetSamplesPerMeasure()
+{
+   return gSampleRate / (mTempo / 60 / 4);
+}
+
+bool Producer::IsSkipMeasure(int measure)
+{
+   return ListContains(measure, mSkipMeasures);
+}
+
+void Producer::DrawModule()
+{   
+
+   if (Minimized() || IsVisible() == false)
+      return;
+   
+   mVolumeSlider->Draw();
+   mPlayCheckbox->Draw();
+   mLoopCheckbox->Draw();
+   
+   if (mSample)
+   {
+      ofPushMatrix();
+      ofTranslate(mBufferX,mBufferY);
+      ofPushStyle();
+      
+      mSample->LockDataMutex(true);
+      DrawAudioBuffer(mBufferW, mBufferH, mSample->Data(), mZoomStart, mZoomEnd, (int)mPlayhead);
+      mSample->LockDataMutex(false);
+      
+      ofFill();
+      for (int measure = 0; GetMeasureSample(measure) < mZoomEnd; ++measure)
+      {
+         if (GetMeasureSample(measure) >= mZoomStart)
+         {
+            float pos = GetBufferPos(GetMeasureSample(measure));
+            ofSetColor(0,0,255);
+            ofRect(pos*mBufferW, 0, 1, mBufferH);
+            
+            if (IsSkipMeasure(measure))
+            {
+               ofSetColor(255,0,0,100);
+               ofRect(pos*mBufferW, 0, (GetBufferPos(GetMeasureSample(measure+1))-pos)*mBufferW, mBufferH);
+            }
+         }
+      }
+      
+      /*int start = ofMap(mClipStart, 0, length, 0, width, true);
+       int end = ofMap(mClipEnd, 0, length, 0, width, true);
+       
+       for (int i = 0; i < mNumBars; i++)
+       {
+       float barSpacing = float(end-start)/mNumBars;
+       int x =  barSpacing * i + start;
+       x += barSpacing * -mOffset;
+       ofSetColor(255,255,0);
+       ofLine(x, 0, x, height);
+       }
+       
+       ofSetColor(255,0,0);
+       ofLine(start,0,start,height);
+       ofLine(end,0,end,height);
+       
+       ofSetColor(0,255,0);
+       int position =  ofMap(pos, 0, length, 0, width, true);
+       ofLine(position,0,position,height);*/
+      
+      ofPopStyle();
+      ofPopMatrix();
+      
+      mClipStartSlider->Draw();
+      mClipEndSlider->Draw();
+      mZoomStartSlider->Draw();
+      mZoomEndSlider->Draw();
+      mNumBarsSlider->Draw();
+      mOffsetSlider->Draw();
+      mWriteButton->Draw();
+      mDoubleLengthButton->Draw();
+      mHalveLengthButton->Draw();
+      mTempoSlider->Draw();
+      mStartOffsetSlider->Draw();
+      mCalcTempoButton->Draw();
+      mRestartButton->Draw();
+      if (mSample)
+         DrawText(ofToString(mSample->GetPlayPosition()),335,50);
+   }
+   
+   for (int i=0; i<PRODUCER_NUM_BIQUADS; ++i)
+      mBiquad[i].Draw();
+}
+
+void Producer::OnClicked(int x, int y, bool right)
+{
+   IDrawableModule::OnClicked(x,y,right);
+   
+   if (right)
+      return;
+   
+   if (x >= mBufferX && y >= mBufferY+100 && x < mBufferX+mBufferW && y < mBufferY+mBufferH)
+   {
+      if (IsKeyHeld('x'))
+      {
+         float pos = (x-mBufferX) / mBufferW;
+         float sample = pos * (mZoomEnd - mZoomStart) + mZoomStart;
+         int measure = GetMeasureForSample(sample);
+         if (IsSkipMeasure(measure))
+            mSkipMeasures.remove(measure);
+         else
+            mSkipMeasures.push_back(measure);
+      }
+      else
+      {
+         mPlayhead = ofMap(x,mBufferX,mBufferX+mBufferW,mZoomStart,mZoomEnd,true);
+      }
+   }
+}
+
+void Producer::CheckboxUpdated(Checkbox *checkbox)
+{
+   if (checkbox == mPlayCheckbox)
+   {
+      if (mSample)
+         mSample->Reset();
+   }
+}
+
+void Producer::GetModuleDimensions(int& x, int&y)
+{
+   x = 910;
+   y = 430;
+}
+
+void Producer::FloatSliderUpdated(FloatSlider* slider, float oldVal)
+{
+   if (slider == mClipStartSlider)
+   {
+      if (mSample && mClipStart > mSample->LengthInSamples())
+         mClipStart = mSample->LengthInSamples();
+   }
+   if (slider == mClipEndSlider)
+   {
+      if (mSample && mClipEnd > mSample->LengthInSamples())
+         mClipEnd = mSample->LengthInSamples();
+   }
+   if (slider == mZoomStartSlider)
+   {
+      if (mSample && mZoomStart > mSample->LengthInSamples())
+         mZoomStart = mSample->LengthInSamples();
+      UpdateZoomExtents();
+   }
+   if (slider == mZoomEndSlider)
+   {
+      if (mSample && mZoomEnd > mSample->LengthInSamples())
+         mZoomEnd = mSample->LengthInSamples();
+      UpdateZoomExtents();
+   }
+}
+
+void Producer::IntSliderUpdated(IntSlider* slider, int oldVal)
+{
+}
+
+void Producer::PlayNote(double time, int pitch, int velocity, int voiceIdx /*= -1*/, ModulationChain* pitchBend /*= NULL*/, ModulationChain* modWheel /*= NULL*/, ModulationChain* pressure /*= NULL*/)
+{
+   if (mSample)
+   {
+      mPlay = false;
+      if (pitch == 16)
+      {
+         mSample->Reset();
+      }
+      else if (pitch >= 0 && pitch < 16 && velocity > 0)
+      {
+         int slice = (pitch/8)*8 + 7-(pitch%8);
+         int barLength = (mClipEnd - mClipStart) / mNumBars;
+         int position = -mOffset*barLength + (barLength/4)*slice + mClipStart;
+         mSample->Play(1,position);
+      }
+   }
+}
+
+void Producer::LoadLayout(const ofxJSONElement& moduleInfo)
+{
+   mModuleSaveData.LoadString("target", moduleInfo);
+
+   SetUpFromSaveData();
+}
+
+void Producer::SetUpFromSaveData()
+{
+   SetTarget(TheSynth->FindModule(mModuleSaveData.GetString("target")));
+}
+

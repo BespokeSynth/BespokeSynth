@@ -1,0 +1,93 @@
+//
+//  PitchShiftEffect.cpp
+//  Bespoke
+//
+//  Created by Ryan Challinor on 3/21/15.
+//
+//
+
+#include "PitchShiftEffect.h"
+#include "OpenFrameworksPort.h"
+#include "SynthGlobals.h"
+#include "Profiler.h"
+
+PitchShiftEffect::PitchShiftEffect()
+: mRatio(1)
+, mRatioSlider(NULL)
+, mPitchShifter(1024)
+, mRatioSelector(NULL)
+, mRatioSelection(10)
+{
+   SetEnabled(false);
+}
+
+void PitchShiftEffect::CreateUIControls()
+{
+   IDrawableModule::CreateUIControls();
+   mRatioSlider = new FloatSlider(this,"ratio",5,4,85,15,&mRatio,.5f,2.0f);
+   mRatioSelector = new RadioButton(this,"ratioselector",5,20,&mRatioSelection,kRadioHorizontal);
+   
+   mRatioSelector->AddLabel(".5", 5);
+   mRatioSelector->AddLabel("1", 10);
+   mRatioSelector->AddLabel("1.5", 15);
+   mRatioSelector->AddLabel("2", 20);
+}
+
+void PitchShiftEffect::ProcessAudio(double time, float* audio, int bufferSize)
+{
+   Profiler profiler("PitchShiftEffect");
+   
+   if (!mEnabled)
+      return;
+   
+   ComputeSliders(0);
+   
+   mPitchShifter.SetRatio(mRatio);
+   mPitchShifter.Process(audio, bufferSize);
+}
+
+void PitchShiftEffect::DrawModule()
+{
+   if (!mEnabled)
+      return;
+   
+   mRatioSlider->Draw();
+   mRatioSelector->Draw();
+}
+
+void PitchShiftEffect::GetModuleDimensions(int& width, int& height)
+{
+   if (mEnabled)
+   {
+      width = 105;
+      height = 39;
+   }
+   else
+   {
+      width = 105;
+      height = 0;
+   }
+}
+
+float PitchShiftEffect::GetEffectAmount()
+{
+   if (!mEnabled)
+      return 0;
+   return ofClamp(fabsf((mRatio-1)*10),0,1);
+}
+
+void PitchShiftEffect::IntSliderUpdated(IntSlider* slider, int oldVal)
+{
+}
+
+void PitchShiftEffect::FloatSliderUpdated(FloatSlider* slider, float oldVal)
+{
+   if (slider == mRatioSlider)
+      mRatioSelection = -1;
+}
+
+void PitchShiftEffect::RadioButtonUpdated(RadioButton* radio, int oldVal)
+{
+   if (radio == mRatioSelector)
+      mRatio = mRatioSelection / 10.0f;
+}

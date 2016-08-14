@@ -1,0 +1,383 @@
+//
+//  Stutter.cpp
+//  modularSynth
+//
+//  Created by Ryan Challinor on 12/24/12.
+//
+//
+
+#include "Stutter.h"
+#include "SynthGlobals.h"
+#include "ModularSynth.h"
+#include "Profiler.h"
+#include "FillSaveDropdown.h"
+#include "StutterControl.h"
+#include "PatchCableSource.h"
+
+bool Stutter::sQuantize = true;
+int Stutter::sStutterSubdivide = 1;
+
+Stutter::Stutter()
+: mRecordBuffer(STUTTER_BUFFER_SIZE)
+, mStuttering(false)
+, mAutoStutter(false)
+, mAutoCheckbox(NULL)
+, mFadeCheckbox(NULL)
+, mSubdivideSlider(NULL)
+, mNanopadScene(0)
+, mControl(NULL)
+, mCurrentStutter(kInterval_None, 0)
+, mFadeStutter(false)
+{
+   mStutterBuffer = new float[STUTTER_BUFFER_SIZE];
+   TheTransport->AddListener(this, kInterval_16n);
+   mBlendRamp.SetValue(0);
+}
+
+void Stutter::CreateUIControls()
+{
+   IDrawableModule::CreateUIControls();
+   mAutoCheckbox = new Checkbox(this,"auto",4,25,&mAutoStutter);
+   mFadeCheckbox = new Checkbox(this,"fade",4,4,&mFadeStutter);
+   mSubdivideSlider = new IntSlider(this,"sub",45,25,50,15,&sStutterSubdivide,1,8);
+   
+   mStutterControlCable = new PatchCableSource(this, kConnectionType_Special);
+   mStutterControlCable->SetManualPosition(87, 8);
+   mStutterControlCable->AddTypeFilter("stuttercontrol");
+   AddPatchCableSource(mStutterControlCable);
+}
+
+Stutter::~Stutter()
+{
+   delete[] mStutterBuffer;
+   TheTransport->RemoveListener(this);
+}
+
+void Stutter::ProcessAudio(double time, float* audio, int bufferSize)
+{
+   Profiler profiler("Stutter");
+
+   mRecordBuffer.WriteChunk(audio, bufferSize);
+
+   if (mBlendRamp.Target() > 0 || mBlendRamp.Value(time) > 0)
+   {
+      if (mCurrentStutter.interval == kInterval_None && mControl)
+      {
+         mStutterLengthRamp.Start(mControl->GetFreeLength() * gSampleRate, 20);
+         mStutterSpeed.Start(mControl->GetFreeSpeed(), 20);
+      }
+      
+      for (int i=0; i<bufferSize; ++i)
+      {
+         if (mCurrentStutter.interval != kInterval_None)
+            mStutterLength = int(TheTransport->GetDuration(mCurrentStutter.interval) / 1000 * gSampleRate);
+         else
+            mStutterLength = int(mStutterLengthRamp.Value(time));
+         
+         float offset = mStutterPos;
+         if (offset > mStutterLength)
+            offset -= mStutterLength;
+         int pos = int(offset);
+         int posNext = int(offset+1) % mStutterLength;
+         float a = offset - pos;
+
+         float sample = GetStutterSampleWithWraparoundBlend(pos);
+         float nextSample = GetStutterSampleWithWraparoundBlend(posNext);
+         float stutterOut = (1-a)*sample + a*nextSample; //interpolate
+         
+         float fade = 1;
+         if (mFadeStutter)
+            fade -= (offset/mStutterLength) * (offset/mStutterLength);
+         
+         float blend = mBlendRamp.Value(time);
+         audio[i] = stutterOut * blend * fade+ audio[i] * (1-blend);
+         audio[i] = mJumpBlender.Process(audio[i], i);
+         
+         if (blend == 0 && mBlendRamp.Target() == 0)
+            break;
+
+         mStutterPos += mStutterSpeed.Value(time);
+         if (mStutterPos > mStutterLength)
+            mStutterPos -= mStutterLength;
+         if (mStutterPos < 0)
+            mStutterPos += mStutterLength;
+
+         time += gInvSampleRateMs;
+      }
+   }
+}
+
+float Stutter::GetStutterSampleWithWraparoundBlend(int pos)
+{
+   if (pos > mStutterLength - STUTTER_BLEND_WRAPAROUND_SAMPLES)
+   {
+      float a = float(mStutterLength - pos) / STUTTER_BLEND_WRAPAROUND_SAMPLES;
+      int blendPos = pos - mStutterLength;
+      pos = GetBufferReadPos(pos);
+      blendPos = GetBufferReadPos(blendPos);
+      pos = ofClamp(pos, 0, mCaptureLength);
+      blendPos = ofClamp(blendPos, 0, mCaptureLength);
+      return mStutterBuffer[pos]*a + mStutterBuffer[blendPos]*(1-a);
+   }
+   else
+   {
+      pos = GetBufferReadPos(pos);
+      pos = ofClamp(pos, 0, mCaptureLength);
+      return mStutterBuffer[pos];
+   }
+}
+
+float Stutter::GetBufferReadPos(float stutterPos)
+{
+   return stutterPos;// + mCaptureLength - mStutterLength;
+}
+
+//TODO(Ryan) figure out how to blend out when we hit the rewrite button
+
+void Stutter::StartStutter(StutterParams stutter)
+{
+   if (mAutoStutter || !mEnabled)
+      return;
+   
+   mMutex.lock();
+   mStutterStack.push_front(stutter);
+   mMutex.unlock();
+   
+   bool quantize = sQuantize;
+   if (stutter.interval == kInterval_None)
+      quantize = false; //"free stutter" shouldn't be quantized
+   
+   if (!quantize)
+      DoStutter(stutter);
+}
+
+void Stutter::EndStutter(StutterParams stutter)
+{
+   if (mAutoStutter || !mEnabled)
+      return;
+   
+   mMutex.lock();
+   bool hasNewStutter = false;
+   if (mStutterStack.size() > 1 && *(mStutterStack.begin()) == stutter)
+   {  //if we're removing the current stutter and there are held stutters
+      mStutterStack.remove(stutter);
+      stutter = *(mStutterStack.begin());   //use previously held as stutter
+      hasNewStutter = true;
+   }
+   else
+   {
+      mStutterStack.remove(stutter);
+   }
+   mMutex.unlock();
+   
+   bool quantize = sQuantize;
+   if (stutter.interval == kInterval_None && mStutterStack.empty())
+      quantize = false; //"free stutter" shouldn't be quantized if we're releasing the only stutter
+   
+   if (!quantize)
+   {
+      if (mStutterStack.empty())
+         StopStutter();
+      else if (hasNewStutter)
+         DoStutter(stutter);
+   }
+}
+
+void Stutter::StopStutter()
+{
+   if (mStuttering)
+   {
+      mBlendRamp.Start(0, STUTTER_START_BLEND_MS);
+      mStuttering = false;
+   }
+}
+
+void Stutter::DoStutter(StutterParams stutter)
+{
+   if (mStuttering && stutter == mCurrentStutter)
+      return;
+   
+   mCurrentStutter = stutter;
+   
+   if (!mStuttering ||
+       int(TheTransport->GetDuration(mCurrentStutter.interval) / 1000 * gSampleRate) > mCaptureLength)
+   {
+      DoCapture();
+   }
+   else
+   {
+      //blend from the prior stutter to this new one
+      float jumpBlend[JUMP_BLEND_SAMPLES];
+      for (int i=0; i<JUMP_BLEND_SAMPLES; ++i)
+         jumpBlend[i] = GetStutterSampleWithWraparoundBlend(int(mStutterPos)%mStutterLength+i);
+      mJumpBlender.CaptureForJump(0, jumpBlend, JUMP_BLEND_SAMPLES, 0);
+   }
+      
+   mStutterPos = 0;
+   mStuttering = true;
+   mBlendRamp.Start(1, STUTTER_START_BLEND_MS);
+   if (stutter.interval != kInterval_None)
+      mStutterLength = int(TheTransport->GetDuration(stutter.interval) / 1000 * gSampleRate);
+   else if (mControl)
+      mStutterLength = int(mControl->GetFreeLength() * gSampleRate);
+   if (stutter.speedBlendTime == 0)
+      mStutterSpeed.SetValue(stutter.speedStart);
+   else
+      mStutterSpeed.Start(gTime,stutter.speedStart,stutter.speedEnd,gTime+stutter.speedBlendTime);
+   mStutterLength /= sStutterSubdivide;
+   mStutterLength = MAX(1,mStutterLength); //don't allow it to be zero
+   mStutterLengthRamp.SetValue(mStutterLength);
+}
+
+void Stutter::DrawModule()
+{
+   if (!mEnabled)
+      return;
+   
+   mAutoCheckbox->Draw();
+   mFadeCheckbox->Draw();
+   mSubdivideSlider->Draw();
+
+   if (mStuttering)
+   {
+      static float width = 90;
+      static float height = 35;
+      ofPushMatrix();
+      ofTranslate(4,3);
+      DrawAudioBuffer(width, height, mStutterBuffer, 0, mCaptureLength, GetBufferReadPos(mStutterPos));
+      ofPopMatrix();
+   }
+}
+
+void Stutter::GetModuleDimensions(int& width, int& height)
+{
+   if (mEnabled)
+   {
+      width = 98;
+      height = 40;
+   }
+   else
+   {
+      width = 98;
+      height = 0;
+   }
+}
+
+float Stutter::GetEffectAmount()
+{
+   if ((mAutoStutter && mEnabled) || mStuttering)
+      return 1;
+   return 0;
+}
+
+void Stutter::DoCapture()
+{
+   mCaptureLength = int(TheTransport->GetDuration(mCurrentStutter.interval) / 1000 * gSampleRate);
+   mCaptureLength = ofClamp(mCaptureLength, 0, STUTTER_BUFFER_SIZE-1);
+   mCaptureLength /= sStutterSubdivide;
+   mRecordBuffer.ReadChunk(mStutterBuffer, mCaptureLength);
+}
+
+void Stutter::PostRepatch(PatchCableSource* cableSource)
+{
+   SetController(dynamic_cast<StutterControl*>(mStutterControlCable->GetTarget()));
+}
+
+void Stutter::SetController(StutterControl* controller)
+{
+   if (mControl)
+      mControl->RemoveListener(this);
+   mControl = controller;
+   if (mControl)
+      mControl->AddListener(this);
+}
+
+void Stutter::CheckboxUpdated(Checkbox* checkbox)
+{
+   if (checkbox == mEnabledCheckbox)
+      UpdateEnabled();
+   if (checkbox == mAutoCheckbox)
+   {
+      if (!mAutoStutter)
+      {
+         mMutex.lock();
+         mStutterStack.clear();
+         mMutex.unlock();
+         StopStutter();
+         TheTransport->UpdateListener(this, kInterval_16n);
+      }
+      else
+      {
+         TheTransport->UpdateListener(this, kInterval_8n);
+      }
+   }
+}
+
+void Stutter::IntSliderUpdated(IntSlider* slider, int oldVal)
+{
+}
+
+void Stutter::OnTimeEvent(int samplesTo)
+{
+   if (mEnabled)
+   {
+      if (mAutoStutter && TheTransport->GetMeasurePos() > .001f)  //don't auto-stutter downbeat
+      {
+         if (rand() % 4 == 0)
+         {
+            const StutterParams randomStutters[] = {StutterParams(kInterval_2n, 1),
+                                                    StutterParams(kInterval_4n, 1),
+                                                    StutterParams(kInterval_8n, 1),
+                                                    StutterParams(kInterval_16n, 1),
+                                                    StutterParams(kInterval_32n, 1),
+                                                    StutterParams(kInterval_64n, 1),
+                                                    StutterParams(kInterval_2n, -1),
+                                                    StutterParams(kInterval_8n, .5f),
+                                                    StutterParams(kInterval_8n, 2)};
+            DoStutter(randomStutters[rand() % 9]);
+         }
+         else
+         {
+            StopStutter();
+         }
+      }
+      
+      if (sQuantize && !mAutoStutter)
+      {
+         mMutex.lock();
+         if (mStutterStack.empty())
+            StopStutter();
+         else
+            DoStutter(*mStutterStack.begin());
+         mMutex.unlock();
+      }
+   }
+}
+
+void Stutter::UpdateEnabled()
+{
+   if (!mEnabled)
+   {
+      mMutex.lock();
+      mStutterStack.clear();
+      mMutex.unlock();
+      StopStutter();
+   }
+}
+
+void Stutter::LoadLayout(const ofxJSONElement& info)
+{
+   mModuleSaveData.LoadString("controller", info, "", FillDropdown<StutterControl*>);
+}
+
+void Stutter::SetUpFromSaveData()
+{
+   mStutterControlCable->SetTarget(TheSynth->FindModule(mModuleSaveData.GetString("controller")));
+}
+
+void Stutter::SaveLayout(ofxJSONElement& info)
+{
+   mModuleSaveData.SetString("controller", mControl ? mControl->Path() : "");
+   mModuleSaveData.Save(info);
+}
+

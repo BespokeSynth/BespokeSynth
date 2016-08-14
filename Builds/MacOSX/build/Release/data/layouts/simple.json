@@ -1,0 +1,107 @@
+{
+   "modules" : [
+      {
+         "enabled" : true,
+         "leftchannel" : 1,
+         "name" : "freeverboutput",
+         "position" : [ 27, 572 ],
+         "rightchannel" : 2,
+         "type" : "freeverboutput"
+      },
+      {
+         "effects" : [
+            {
+               "f_max" : 4000.0,
+               "f_min" : 10.0,
+               "q_max" : 10.0,
+               "q_min" : 1.0,
+               "type" : "biquad"
+            },
+            {
+               "type" : "delay"
+            },
+            {
+               "type" : "bitcrush"
+            }
+         ],
+         "name" : "effectchain",
+         "position" : [ 365, 337 ],
+         "showspawnlist" : true,
+         "target" : "stereofier",
+         "type" : "effectchain",
+         "widecount" : 3
+      },
+      {
+         "name" : "fmsynth",
+         "position" : [ 389, 182 ],
+         "target" : "effectchain",
+         "type" : "fmsynth"
+      },
+      {
+         "controller" : "",
+         "name" : "midiinstrument",
+         "noteoffset" : 0,
+         "position" : [ 427, 81 ],
+         "target" : "fmsynth",
+         "type" : "midiinstrument",
+         "usechannelasvoice" : false,
+         "velocitymult" : 1.0
+      },
+      {
+         "grid" : "",
+         "gridheight" : 250,
+         "gridmeasures" : 1,
+         "gridpage" : 0,
+         "gridrows" : 16,
+         "gridwidth" : 250,
+         "name" : "drumsequencer",
+         "position" : [ 920, 73 ],
+         "target" : "drumplayer",
+         "type" : "drumsequencer"
+      },
+      {
+         "name" : "stereofier",
+         "pan" : 0.0,
+         "position" : [ 1086, 595 ],
+         "target" : "output 1",
+         "target2" : "output 2",
+         "type" : "stereofier"
+      },
+      {
+         "channel" : 1,
+         "name" : "output 1",
+         "position" : [ 1125, 674 ],
+         "type" : "output"
+      },
+      {
+         "channel" : 2,
+         "name" : "output 2",
+         "position" : [ 1190, 672 ],
+         "type" : "output"
+      },
+      {
+         "name" : "scale",
+         "position" : [ 148, 53 ],
+         "type" : "scale"
+      },
+      {
+         "name" : "transport",
+         "nanopad" : "",
+         "nanopadscene" : 4,
+         "position" : [ 4, 53 ],
+         "type" : "transport"
+      },
+      {
+         "drumkit" : 0,
+         "grid" : "",
+         "gridpage" : 0,
+         "looperrecorder" : "",
+         "name" : "drumplayer",
+         "position" : [ 1090, 471 ],
+         "target" : "stereofier",
+         "type" : "drumplayer"
+      }
+   ],
+   "zoomlocations" : []
+}
+

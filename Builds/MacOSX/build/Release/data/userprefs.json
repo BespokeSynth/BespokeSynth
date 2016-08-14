@@ -1,0 +1,7 @@
+{
+   "buffersize" : 64,
+   "height" : 800,
+   "layout" : "layouts/blank.json",
+   "samplerate" : 44100,
+   "width" : 1280
+}
