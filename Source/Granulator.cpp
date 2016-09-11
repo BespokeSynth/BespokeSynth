@@ -64,13 +64,13 @@ void Granulator::SpawnGrain(double time, float offset)
    float vol = 1;
    if (mOctaves)
    {
-      int rand = random() % 5;
-      if (rand == 2) //fewer high-pitched ones
+      int random = rand() % 5;
+      if (random == 2) //fewer high-pitched ones
       {
          speed *= 1.5f;
          vol = .5f;
       }
-      else if (rand == 3 || rand == 4)
+      else if (random == 3 || random == 4)
       {
          speed *= .75f;
       }

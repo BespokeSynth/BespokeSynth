@@ -52,9 +52,9 @@ public:
    virtual ~ModularSynth();
    
    void Setup(GlobalManagers* globalManagers, juce::Component* mainComponent);
-   void LoadResources(NVGcontext* nanoVG);
+   void LoadResources(void* nanoVG);
    void Poll();
-   void Draw(NVGcontext* vg);
+   void Draw(void* vg);
    
    void Exit();
    

@@ -1,0 +1,19 @@
+Microsoft Visual Studio Solution File, Format Version 11.00
+# Visual Studio 2015
+Project("{D724DC92-F329-D90B-E9AA-52A6520F5509}") = "BespokeSynth", "BespokeSynth.vcxproj", "{3145296D-10ED-465A-16CD-13DCBE8533F1}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Win32 = Debug|Win32
+		Release|Win32 = Release|Win32
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{3145296D-10ED-465A-16CD-13DCBE8533F1}.Debug|Win32.ActiveCfg = Debug|Win32
+		{3145296D-10ED-465A-16CD-13DCBE8533F1}.Debug|Win32.Build.0 = Debug|Win32
+		{3145296D-10ED-465A-16CD-13DCBE8533F1}.Release|Win32.ActiveCfg = Release|Win32
+		{3145296D-10ED-465A-16CD-13DCBE8533F1}.Release|Win32.Build.0 = Release|Win32
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+EndGlobal

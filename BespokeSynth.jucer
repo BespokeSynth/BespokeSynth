@@ -6,18 +6,6 @@
   <MAINGROUP id="w4HLAu" name="BespokeSynth">
     <GROUP id="{6E8FD6E1-BA74-3B09-455D-05C0CB629767}" name="Source">
       <GROUP id="{E0D1A2A4-1AAE-4BEB-542A-DDE85633AE4D}" name="effects">
-        <FILE id="FRJVfA" name="Compressor.cpp" compile="1" resource="0" file="Source/Compressor.cpp"/>
-        <FILE id="aonCYe" name="Compressor.h" compile="0" resource="0" file="Source/Compressor.h"/>
-        <FILE id="ZUXMCV" name="Pumper.cpp" compile="1" resource="0" file="Source/Pumper.cpp"/>
-        <FILE id="oBeP5o" name="Pumper.h" compile="0" resource="0" file="Source/Pumper.h"/>
-        <FILE id="Hgk6me" name="LiveGranulator.cpp" compile="1" resource="0"
-              file="Source/LiveGranulator.cpp"/>
-        <FILE id="Pfc4Jg" name="LiveGranulator.h" compile="0" resource="0"
-              file="Source/LiveGranulator.h"/>
-        <FILE id="J98veP" name="Muter.cpp" compile="1" resource="0" file="Source/Muter.cpp"/>
-        <FILE id="KQhJxb" name="Muter.h" compile="0" resource="0" file="Source/Muter.h"/>
-        <FILE id="n2qUli" name="Stutter.cpp" compile="1" resource="0" file="Source/Stutter.cpp"/>
-        <FILE id="NC9ftF" name="Stutter.h" compile="0" resource="0" file="Source/Stutter.h"/>
         <FILE id="mLAQVL" name="BitcrushEffect.cpp" compile="1" resource="0"
               file="Source/BitcrushEffect.cpp"/>
         <FILE id="vX3PsA" name="BitcrushEffect.h" compile="0" resource="0"
@@ -26,6 +14,8 @@
               file="Source/ButterworthFilterEffect.cpp"/>
         <FILE id="sCF3F3" name="ButterworthFilterEffect.h" compile="0" resource="0"
               file="Source/ButterworthFilterEffect.h"/>
+        <FILE id="FRJVfA" name="Compressor.cpp" compile="1" resource="0" file="Source/Compressor.cpp"/>
+        <FILE id="aonCYe" name="Compressor.h" compile="0" resource="0" file="Source/Compressor.h"/>
         <FILE id="hwt9c2" name="DCRemoverEffect.cpp" compile="1" resource="0"
               file="Source/DCRemoverEffect.cpp"/>
         <FILE id="eI4wSn" name="DCRemoverEffect.h" compile="0" resource="0"
@@ -48,25 +38,27 @@
               file="Source/FreeverbEffect.h"/>
         <FILE id="dsUdFy" name="GateEffect.cpp" compile="1" resource="0" file="Source/GateEffect.cpp"/>
         <FILE id="z76bqB" name="GateEffect.h" compile="0" resource="0" file="Source/GateEffect.h"/>
+        <FILE id="Hgk6me" name="LiveGranulator.cpp" compile="1" resource="0"
+              file="Source/LiveGranulator.cpp"/>
+        <FILE id="Pfc4Jg" name="LiveGranulator.h" compile="0" resource="0"
+              file="Source/LiveGranulator.h"/>
+        <FILE id="J98veP" name="Muter.cpp" compile="1" resource="0" file="Source/Muter.cpp"/>
+        <FILE id="KQhJxb" name="Muter.h" compile="0" resource="0" file="Source/Muter.h"/>
         <FILE id="Njf6GP" name="NoiseEffect.cpp" compile="1" resource="0" file="Source/NoiseEffect.cpp"/>
         <FILE id="e1bTnC" name="NoiseEffect.h" compile="0" resource="0" file="Source/NoiseEffect.h"/>
         <FILE id="m9h0SD" name="PitchShiftEffect.cpp" compile="1" resource="0"
               file="Source/PitchShiftEffect.cpp"/>
         <FILE id="HphAq2" name="PitchShiftEffect.h" compile="0" resource="0"
               file="Source/PitchShiftEffect.h"/>
+        <FILE id="ZUXMCV" name="Pumper.cpp" compile="1" resource="0" file="Source/Pumper.cpp"/>
+        <FILE id="oBeP5o" name="Pumper.h" compile="0" resource="0" file="Source/Pumper.h"/>
+        <FILE id="n2qUli" name="Stutter.cpp" compile="1" resource="0" file="Source/Stutter.cpp"/>
+        <FILE id="NC9ftF" name="Stutter.h" compile="0" resource="0" file="Source/Stutter.h"/>
         <FILE id="Q25CvM" name="TremoloEffect.cpp" compile="1" resource="0"
               file="Source/TremoloEffect.cpp"/>
         <FILE id="RG4zGd" name="TremoloEffect.h" compile="0" resource="0" file="Source/TremoloEffect.h"/>
       </GROUP>
       <GROUP id="{531CC336-D9CD-1F6E-7272-2D8ADD98F839}" name="libraries">
-        <GROUP id="{F7E2EFA2-0FE7-C7A5-2144-0503CB5A6A4A}" name="psmove">
-          <FILE id="XQF8rk" name="hid.c" compile="1" resource="0" file="Source/psmove/hid.c"/>
-          <FILE id="i0CRzJ" name="hidapi.h" compile="0" resource="0" file="Source/psmove/hidapi.h"/>
-          <FILE id="YxcjlF" name="psmove.c" compile="1" resource="0" file="Source/psmove/psmove.c"/>
-          <FILE id="R5jkmg" name="psmove.h" compile="0" resource="0" file="Source/psmove/psmove.h"/>
-          <FILE id="RR2d8F" name="PSMoveMgr.cpp" compile="1" resource="0" file="Source/psmove/PSMoveMgr.cpp"/>
-          <FILE id="DgQBhl" name="PSMoveMgr.h" compile="0" resource="0" file="Source/psmove/PSMoveMgr.h"/>
-        </GROUP>
         <GROUP id="{44F08E27-A8F5-B33E-CC69-42EBE3B93B39}" name="CFMessaging">
           <FILE id="q2RmKJ" name="KontrolKommunicator.cpp" compile="1" resource="0"
                 file="Source/CFMessaging/KontrolKommunicator.cpp"/>
@@ -79,15 +71,24 @@
           <FILE id="tRWs50" name="SendPort.cpp" compile="1" resource="0" file="Source/CFMessaging/SendPort.cpp"/>
           <FILE id="QnMeob" name="SendPort.h" compile="0" resource="0" file="Source/CFMessaging/SendPort.h"/>
         </GROUP>
-        <GROUP id="{352BA5B3-0006-BBD8-3E19-AE807986DDBB}" name="nanovg">
-          <FILE id="il5Rmq" name="fontstash.h" compile="0" resource="0" file="Source/nanovg/fontstash.h"/>
-          <FILE id="qVHzS3" name="nanovg.c" compile="1" resource="0" file="Source/nanovg/nanovg.c"/>
-          <FILE id="QAMu04" name="nanovg.h" compile="0" resource="0" file="Source/nanovg/nanovg.h"/>
-          <FILE id="ISxVry" name="nanovg_gl.h" compile="0" resource="0" file="Source/nanovg/nanovg_gl.h"/>
-          <FILE id="yH8RBn" name="nanovg_gl_utils.h" compile="0" resource="0"
-                file="Source/nanovg/nanovg_gl_utils.h"/>
-          <FILE id="yRAiYq" name="stb_image.h" compile="0" resource="0" file="Source/nanovg/stb_image.h"/>
-          <FILE id="KXZbBy" name="stb_truetype.h" compile="0" resource="0" file="Source/nanovg/stb_truetype.h"/>
+        <GROUP id="{CD125793-5B1B-A09E-A02B-C794D860CB47}" name="freeverb">
+          <FILE id="AxMzYs" name="allpass.cpp" compile="1" resource="0" file="Source/freeverb/allpass.cpp"/>
+          <FILE id="SMpRw4" name="allpass.hpp" compile="0" resource="0" file="Source/freeverb/allpass.hpp"/>
+          <FILE id="Mrp0dA" name="comb.cpp" compile="1" resource="0" file="Source/freeverb/comb.cpp"/>
+          <FILE id="l0jR4m" name="comb.hpp" compile="0" resource="0" file="Source/freeverb/comb.hpp"/>
+          <FILE id="R7Pmo1" name="denormals.h" compile="0" resource="0" file="Source/freeverb/denormals.h"/>
+          <FILE id="RcBidm" name="revmodel.cpp" compile="1" resource="0" file="Source/freeverb/revmodel.cpp"/>
+          <FILE id="MC3fZ0" name="revmodel.hpp" compile="0" resource="0" file="Source/freeverb/revmodel.hpp"/>
+          <FILE id="QUy4Dx" name="tuning.h" compile="0" resource="0" file="Source/freeverb/tuning.h"/>
+        </GROUP>
+        <GROUP id="{6676D702-1207-FE5C-9EC2-091B8A76E384}" name="glew">
+          <GROUP id="{8A3BA50C-A7D8-CAFD-22A5-FD85A7C7A15B}" name="include">
+            <GROUP id="{EF3C83BF-E0A5-4DFA-DA81-22BB2D864C81}" name="GL">
+              <FILE id="UGe1cR" name="glew.c" compile="1" resource="0" file="Source/glew/include/GL/glew.c"/>
+              <FILE id="IwV2yn" name="glew.h" compile="0" resource="0" file="Source/glew/include/GL/glew.h"/>
+              <FILE id="dldSJy" name="wglew.h" compile="0" resource="0" file="Source/glew/include/GL/wglew.h"/>
+            </GROUP>
+          </GROUP>
         </GROUP>
         <GROUP id="{6B02F4EC-4FE1-B0D3-1ADF-69615860694B}" name="json">
           <GROUP id="{D5AAD910-C7FC-87F2-AF1B-9E729039A8BF}" name="include">
@@ -121,15 +122,23 @@
           <FILE id="uDRsNc" name="README.txt" compile="0" resource="1" file="Source/json/README.txt"/>
           <FILE id="yyddqK" name="version" compile="0" resource="1" file="Source/json/version"/>
         </GROUP>
-        <GROUP id="{CD125793-5B1B-A09E-A02B-C794D860CB47}" name="freeverb">
-          <FILE id="AxMzYs" name="allpass.cpp" compile="1" resource="0" file="Source/freeverb/allpass.cpp"/>
-          <FILE id="SMpRw4" name="allpass.hpp" compile="0" resource="0" file="Source/freeverb/allpass.hpp"/>
-          <FILE id="Mrp0dA" name="comb.cpp" compile="1" resource="0" file="Source/freeverb/comb.cpp"/>
-          <FILE id="l0jR4m" name="comb.hpp" compile="0" resource="0" file="Source/freeverb/comb.hpp"/>
-          <FILE id="R7Pmo1" name="denormals.h" compile="0" resource="0" file="Source/freeverb/denormals.h"/>
-          <FILE id="RcBidm" name="revmodel.cpp" compile="1" resource="0" file="Source/freeverb/revmodel.cpp"/>
-          <FILE id="MC3fZ0" name="revmodel.hpp" compile="0" resource="0" file="Source/freeverb/revmodel.hpp"/>
-          <FILE id="QUy4Dx" name="tuning.h" compile="0" resource="0" file="Source/freeverb/tuning.h"/>
+        <GROUP id="{352BA5B3-0006-BBD8-3E19-AE807986DDBB}" name="nanovg">
+          <FILE id="il5Rmq" name="fontstash.h" compile="0" resource="0" file="Source/nanovg/fontstash.h"/>
+          <FILE id="qVHzS3" name="nanovg.c" compile="1" resource="0" file="Source/nanovg/nanovg.c"/>
+          <FILE id="QAMu04" name="nanovg.h" compile="0" resource="0" file="Source/nanovg/nanovg.h"/>
+          <FILE id="ISxVry" name="nanovg_gl.h" compile="0" resource="0" file="Source/nanovg/nanovg_gl.h"/>
+          <FILE id="yH8RBn" name="nanovg_gl_utils.h" compile="0" resource="0"
+                file="Source/nanovg/nanovg_gl_utils.h"/>
+          <FILE id="yRAiYq" name="stb_image.h" compile="0" resource="0" file="Source/nanovg/stb_image.h"/>
+          <FILE id="KXZbBy" name="stb_truetype.h" compile="0" resource="0" file="Source/nanovg/stb_truetype.h"/>
+        </GROUP>
+        <GROUP id="{F7E2EFA2-0FE7-C7A5-2144-0503CB5A6A4A}" name="psmove">
+          <FILE id="XQF8rk" name="hid.c" compile="1" resource="0" file="Source/psmove/hid.c"/>
+          <FILE id="i0CRzJ" name="hidapi.h" compile="0" resource="0" file="Source/psmove/hidapi.h"/>
+          <FILE id="YxcjlF" name="psmove.c" compile="1" resource="0" file="Source/psmove/psmove.c"/>
+          <FILE id="R5jkmg" name="psmove.h" compile="0" resource="0" file="Source/psmove/psmove.h"/>
+          <FILE id="RR2d8F" name="PSMoveMgr.cpp" compile="1" resource="0" file="Source/psmove/PSMoveMgr.cpp"/>
+          <FILE id="DgQBhl" name="PSMoveMgr.h" compile="0" resource="0" file="Source/psmove/PSMoveMgr.h"/>
         </GROUP>
       </GROUP>
       <GROUP id="{6781AC07-A090-A7AF-8D27-BCB6D9526ABD}" name="modules">
@@ -766,6 +775,33 @@
         <MODULEPATH id="juce_osc" path="../../../Downloads/JUCE/modules"/>
       </MODULEPATHS>
     </XCODE_MAC>
+    <VS2015 targetFolder="Builds/VisualStudio2015" vstFolder="../VST3 SDK"
+            vst3Folder="../VST3 SDK" extraDefs="GLEW_STATIC">
+      <CONFIGURATIONS>
+        <CONFIGURATION name="Debug" winWarningLevel="2" generateManifest="1" winArchitecture="32-bit"
+                       isDebug="1" optimisation="1" targetName="BespokeSynth" headerPath="../../Source/json/include;../../Source/glew/include"
+                       fastMath="0"/>
+        <CONFIGURATION name="Release" winWarningLevel="2" generateManifest="1" winArchitecture="32-bit"
+                       isDebug="0" optimisation="3" targetName="BespokeSynth" headerPath="../../Source/json/include;../../Source/glew/include"/>
+      </CONFIGURATIONS>
+      <MODULEPATHS>
+        <MODULEPATH id="juce_video" path="..\JUCE\modules"/>
+        <MODULEPATH id="juce_osc" path="..\JUCE\modules"/>
+        <MODULEPATH id="juce_opengl" path="..\JUCE\modules"/>
+        <MODULEPATH id="juce_gui_extra" path="..\JUCE\modules"/>
+        <MODULEPATH id="juce_gui_basics" path="..\JUCE\modules"/>
+        <MODULEPATH id="juce_graphics" path="..\JUCE\modules"/>
+        <MODULEPATH id="juce_events" path="..\JUCE\modules"/>
+        <MODULEPATH id="juce_data_structures" path="..\JUCE\modules"/>
+        <MODULEPATH id="juce_cryptography" path="..\JUCE\modules"/>
+        <MODULEPATH id="juce_core" path="..\JUCE\modules"/>
+        <MODULEPATH id="juce_audio_utils" path="..\JUCE\modules"/>
+        <MODULEPATH id="juce_audio_processors" path="..\JUCE\modules"/>
+        <MODULEPATH id="juce_audio_formats" path="..\JUCE\modules"/>
+        <MODULEPATH id="juce_audio_devices" path="..\JUCE\modules"/>
+        <MODULEPATH id="juce_audio_basics" path="..\JUCE\modules"/>
+      </MODULEPATHS>
+    </VS2015>
   </EXPORTFORMATS>
   <MODULES>
     <MODULE id="juce_audio_basics" showAllCode="1" useLocalCopy="0"/>
@@ -788,5 +824,6 @@
                JUCE_PLUGINHOST_VST3="enabled" JUCE_PLUGINHOST_AU="enabled"/>
   <LIVE_SETTINGS>
     <OSX headerPath="" systemHeaderPath=""/>
+    <WINDOWS headerPath="" systemHeaderPath="&#10;"/>
   </LIVE_SETTINGS>
 </JUCERPROJECT>

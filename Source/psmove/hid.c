@@ -22,6 +22,8 @@
 
 /* See Apple Technical Note TN2187 for details on IOHidManager. */
 
+#ifdef JUCE_MAC
+
 #include <IOKit/hid/IOHIDManager.h>
 #include <IOKit/hid/IOHIDKeys.h>
 #include <CoreFoundation/CoreFoundation.h>
@@ -1119,4 +1121,6 @@ int main(void)
 	
 	return 0;
 }
+#endif
+
 #endif

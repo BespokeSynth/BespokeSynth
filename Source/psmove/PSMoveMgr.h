@@ -1,6 +1,8 @@
+#ifdef JUCE_MAC
+
 #pragma once
 
-#include "OpenFrameworksPort.h"
+#include "../OpenFrameworksPort.h"
 #include "psmove.h"
 
 struct _PSMove;
@@ -44,3 +46,4 @@ private:
    PSMoveListener* mListener;
 };
 
+#ifdef JUCE_MAC

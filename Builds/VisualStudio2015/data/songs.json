@@ -1,0 +1,89 @@
+{
+    "songs": [
+        {
+            "name": "Where Is My Mind?",
+            "tempo": 80,
+            "timesig": [4,4],
+            "scaleroot": "E",
+            "scaletype": "ionian",
+            "sections": [
+                {
+                   "name": "intro/verse/chorus",
+                   "chords": [[0,2],[5,2],["G#maj",2],[3,2]]
+                },
+                {
+                   "name": "bridge",
+                   "chords": [[0,2],[2,2],["Amaj",2],["Amin",2],5,4]
+                }
+            ]
+        },
+        {
+            "name": "Rococo",
+            "tempo": 83,
+            "timesig": [2,4],
+            "scaleroot": "C",
+            "scaletype": "ionian",
+            "sections": [
+                {
+                   "name": "all",
+                   "chords": [[7,1],[4,1],["Emaj",2],[5,1],[4,1],[7,2]]
+                }
+            ]
+        },
+        {
+            "name": "Get Lucky",
+            "tempo": 116,
+            "timesig": [4,4],
+            "scaleroot": "B",
+            "scaletype": "dorian",
+            "sections": [
+                {
+                   "name": "all",
+                   "chords": ["Bmin","Dmaj","F#min","Emaj"]
+                }
+            ]
+        },
+        {
+            "name": "12 bar blues",
+            "tempo": 100,
+            "timesig": [4,4],
+            "scaleroot": "G",
+            "scaletype": "ionian",
+            "sections": [
+                {
+                   "name": "all",
+                   "chords": [0,3,0,0,3,3,0,0,4,3,0,4]
+                }
+            ]
+        },
+        {
+            "name": "8 bar blues",
+            "tempo": 100,
+            "timesig": [4,4],
+            "scaleroot": "A",
+            "scaletype": "ionian",
+            "sections": [
+                {
+                   "name": "all",
+                   "chords": [0,4,3,3,0,4,0,0]
+                }
+            ]
+        },
+        {
+            "name": "White Christmas",
+            "tempo": 95,
+            "timesig": [4,4],
+            "scaleroot": "G",
+            "scaletype": "ionian",
+            "sections": [
+                {
+                   "name": "all",
+                   "chords": [["Gmaj",4],["Gmaj",4],["Amin",4],["Dmaj",4,1],
+                              ["Cmaj",4,1],["Amin",4],["Gmaj",4],["Dmaj",4,2],
+                              ["Gmaj",4],["Gmaj",4,1],["Cmaj",4,2],["Amin",4,1],
+                              ["Gmaj",4],["Emin",4,2],["Amin",4],["Dmaj",4,1]]
+                }
+            ]
+        }
+    ]
+}

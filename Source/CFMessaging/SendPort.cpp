@@ -6,6 +6,8 @@
 //
 //
 
+#ifdef JUCE_MAC
+
 #include "SendPort.h"
 
 SendPort::~SendPort()
@@ -34,3 +36,5 @@ void SendPort::SendData(uint32_t messageId, CFDataRef data, CFDataRef& replyData
 void SendPort::Close()
 {
 }
+
+#endif

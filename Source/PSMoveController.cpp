@@ -6,9 +6,11 @@
 //
 //
 
+#ifdef JUCE_MAC
+
 #include "PSMoveController.h"
 #include "SynthGlobals.h"
-#include "psmove.h"
+#include "psmove/psmove.h"
 #include "ModularSynth.h"
 
 PSMoveController::PSMoveController()
@@ -217,4 +219,4 @@ void PSMoveController::SetUpFromSaveData()
    SetEnergyControl(TheSynth->FindUIControl(mModuleSaveData.GetString("energycontrol")));
 }
 
-
+#endif

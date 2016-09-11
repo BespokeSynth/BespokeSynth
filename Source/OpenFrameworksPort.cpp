@@ -8,10 +8,11 @@
  ==============================================================================
  */
 
+#include <GL/glew.h>
 #include "OpenFrameworksPort.h"
-#include "nanovg.h"
+#include "nanovg/nanovg.h"
 #define NANOVG_GL3_IMPLEMENTATION
-#include "nanovg_gl.h"
+#include "nanovg/nanovg_gl.h"
 #include "ModularSynth.h"
 
 ofColor ofColor::black(0,0,0);
@@ -33,10 +34,14 @@ string ofToDataPath(string path, bool makeAbsolute)
       return path;
    if (path.empty() == false && path[0] == '/')
       return path;
-#if DEBUG
-   return "../Release/data/"+path;
+#if JUCE_WINDOWS
+   return File::getCurrentWorkingDirectory().getChildFile(("data/" + path).c_str()).getFullPathName().toStdString();
 #else
-   return "./data/"+path;
+   #if DEBUG
+      return "../Release/data/"+path;
+   #else
+      return "./data/"+path;
+   #endif
 #endif
 }
 

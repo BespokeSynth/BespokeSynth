@@ -6,12 +6,14 @@
 //
 //
 
+#ifdef JUCE_MAC
+
 #ifndef __modularSynth__PSMoveController__
 #define __modularSynth__PSMoveController__
 
 #include <iostream>
 #include "IDrawableModule.h"
-#include "PSMoveMgr.h"
+#include "psmove/PSMoveMgr.h"
 #include "Checkbox.h"
 #include "ClickButton.h"
 #include "Ramp.h"
@@ -86,3 +88,4 @@ private:
 
 #endif /* defined(__modularSynth__PSMoveController__) */
 
+#endif

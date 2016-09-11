@@ -1,3 +1,5 @@
+#ifdef JUCE_MAC
+
 #include "PSMoveMgr.h"
 
 //--------------------------------------------------------------
@@ -40,12 +42,14 @@ _PSMove* PSMoveMgr::SetUpMove(int id)
       }
    }
    
+#ifndef JUCE_WINDOWS
    for (int i=0; i<10; i++) {
       psmove_set_leds(move, 0, 255*(i%3==0), 0);
       //psmove_set_rumble(move, 255*(i%2));
       psmove_update_leds(move);
       usleep(10000*(i%10));
    }
+#endif
    
    for (int i=250; i>=0; i-=5) {
       psmove_set_leds(move, i, i, 0);
@@ -234,3 +238,5 @@ void PSMoveMgr::SetColor(int id, float r, float g, float b)
 
    psmove_set_leds(mMove[id], int(r*255), int(g*255), int(b*255));
 }
+
+#endif

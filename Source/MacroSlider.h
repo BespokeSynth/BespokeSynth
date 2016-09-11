@@ -12,6 +12,7 @@
 #include "IDrawableModule.h"
 #include "Slider.h"
 #include "Transport.h"
+#include <mutex>
 
 class PatchCableSource;
 class IUIControl;

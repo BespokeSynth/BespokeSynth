@@ -6,6 +6,8 @@
 //  Copyright (c) 2014 Ryan Challinor. All rights reserved.
 //
 
+#ifdef JUCE_MAC
+
 #ifndef __NI_SoftwareSide__ListenPort__
 #define __NI_SoftwareSide__ListenPort__
 
@@ -49,3 +51,5 @@ private:
 };
 
 #endif /* defined(__NI_SoftwareSide__ListenPort__) */
+
+#endif

@@ -12,7 +12,7 @@
 #include <iostream>
 #include "IDrawableModule.h"
 #include "Transport.h"
-#include "vinylcontrol.h"
+#include "vinylcontrol/vinylcontrol.h"
 
 class VinylTempoControl;
 

@@ -6,6 +6,8 @@
 //
 //
 
+#ifdef JUCE_MAC
+
 #include "NIMessage.h"
 
 MessageIdToString MessageIdToStringTable[NUM_NI_MESSAGE_IDS] = {
@@ -59,3 +61,5 @@ uint32_t MessageIDForType(string type)
    }
    return 0;
 }
+
+#endif

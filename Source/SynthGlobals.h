@@ -14,6 +14,9 @@
 #include <map>
 #include <list>
 #include <vector>
+#include <math.h>
+#include <cctype>
+#include <random>
 
 //#define BESPOKE_DEBUG_ALLOCATIONS
 
@@ -29,10 +32,16 @@ void* operator new[](std::size_t size, const char *file, int line) throw(std::ba
 #define MAX_BUFFER_SIZE 30*gSampleRate
 #define MAX_TEXTENTRY_LENGTH 128
 
+#define M_PI PI
 #define FPI       3.14159265358979323846f
 #define FTWO_PI   6.28318530717958647693f
 
 #define USE_VECTOR_OPS
+
+#if JUCE_WINDOWS
+#define popen _popen
+#define pclose _pclose
+#endif
 
 //bool labeling technique that I stole from Ableton
 #define K(x) true
@@ -205,6 +214,13 @@ struct Vec2i
    int x;
    int y;
 };
+
+#ifdef JUCE_WINDOWS
+inline void bzero(void* mem, size_t size)
+{
+   memset(mem, 0, size);
+}
+#endif
 
 #define FIX_DENORMAL(p) if(fabsf(p)<1e-9) p = 0
 

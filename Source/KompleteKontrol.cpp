@@ -6,6 +6,8 @@
 //
 //
 
+#ifdef JUCE_MAC
+
 #include "KompleteKontrol.h"
 #include "SynthGlobals.h"
 #include "ModularSynth.h"
@@ -308,3 +310,5 @@ void KompleteKontrol::SetUpFromSaveData()
    SetUpPatchCables(mModuleSaveData.GetString("target"));
    mMidiControllerCable->SetTarget(TheSynth->FindMidiController(mModuleSaveData.GetString("controller")));
 }
+
+#endif

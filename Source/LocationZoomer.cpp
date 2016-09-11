@@ -40,7 +40,7 @@ void LocationZoomer::Update()
 
 void LocationZoomer::OnKeyPressed(char key)
 {
-   if (isnumber(key) && key != '0') //0 is reserved
+   if (isdigit(key) && key != '0') //0 is reserved
    {
       if (GetKeyModifiers() == kModifier_Control)
          WriteCurrentLocation(key);

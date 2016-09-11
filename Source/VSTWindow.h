@@ -36,13 +36,17 @@ public:
    
    void moved() override;
    void closeButtonPressed() override;
-   
+
+#ifdef JUCE_MAC
    juce::NSViewComponent* GetNSViewComponent() { return mNSViewComponent; }
+#endif
    
 private:
    WindowFormatType mType;
    VSTPlugin* mOwner;
+#ifdef JUCE_MAC
    juce::NSViewComponent* mNSViewComponent;
+#endif
    
    float getDesktopScaleFactor() const override     { return 1.0f; }
    

@@ -1,12 +1,17 @@
 #ifndef MAINCOMPONENT_H_INCLUDED
 #define MAINCOMPONENT_H_INCLUDED
 
+#include <GL/glew.h>
 #include "../JuceLibraryCode/JuceHeader.h"
-#include "nanovg.h"
+#include "nanovg/nanovg.h"
 #define NANOVG_GL3_IMPLEMENTATION
-#include "nanovg_gl.h"
+#include "nanovg/nanovg_gl.h"
 #include "ModularSynth.h"
 #include "SynthGlobals.h"
+
+#ifdef JUCE_WINDOWS
+#include <Windows.h>
+#endif
 
 //==============================================================================
 /*
@@ -75,6 +80,8 @@ public:
    
    void initialise() override
    {
+      glewInit();
+
       mVG = nvgCreateGL3(NVG_ANTIALIAS | NVG_STENCIL_STROKES | NVG_DEBUG);
       
       if (mVG == NULL)
@@ -98,6 +105,12 @@ public:
       AudioDeviceManager::AudioDeviceSetup preferredSetupOptions;
       preferredSetupOptions.sampleRate = gSampleRate;
       preferredSetupOptions.bufferSize = gBufferSize;
+
+#ifdef JUCE_WINDOWS
+      HRESULT hr;
+      hr = CoInitializeEx(0, COINIT_MULTITHREADED);
+#endif
+
       String audioError = mGlobalManagers.mDeviceManager.initialise(MAX_INPUT_CHANNELS,
                                                                     MAX_OUTPUT_CHANNELS,
                                                                     nullptr,
@@ -126,6 +139,9 @@ public:
       float width = getWidth();
       float height = getHeight();
       float pixelRatio = 2;
+#ifdef JUCE_WINDOWS
+      pixelRatio = 1;
+#endif
       
       glViewport(0, 0, width*pixelRatio, height*pixelRatio);
       glClearColor(0,0,0,0);

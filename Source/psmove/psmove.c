@@ -27,6 +27,8 @@
  * POSSIBILITY OF SUCH DAMAGE.
  **/
 
+#ifdef JUCE_MAC
+
 #include "psmove.h"
 
 #include "hidapi.h"
@@ -589,3 +591,4 @@ psmove_disconnect(PSMove *move)
 }
 
 
+#endif

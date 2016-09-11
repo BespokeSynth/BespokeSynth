@@ -6,6 +6,8 @@
 //
 //
 
+#ifdef JUCE_MAC
+
 #ifndef __NI_SoftwareSide__SendPort__
 #define __NI_SoftwareSide__SendPort__
 
@@ -28,3 +30,5 @@ private:
 };
 
 #endif /* defined(__NI_SoftwareSide__SendPort__) */
+
+#endif

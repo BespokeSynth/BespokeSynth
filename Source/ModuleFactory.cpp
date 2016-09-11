@@ -26,7 +26,9 @@
 #include "WaveformViewer.h"
 #include "FMSynth.h"
 #include "MidiController.h"
+#ifdef JUCE_MAC
 #include "PSMoveController.h"
+#endif
 #include "SampleBank.h"
 #include "SamplePlayer.h"
 #include "Autotalent.h"
@@ -102,7 +104,9 @@
 #include "ComboGridController.h"
 #include "StutterControl.h"
 #include "CircleSequencer.h"
+#ifdef JUCE_MAC
 #include "KompleteKontrol.h"
+#endif
 #include "MidiOutput.h"
 #include "FloatSliderLFOControl.h"
 #include "NoteDisplayer.h"
@@ -164,7 +168,9 @@ ModuleFactory::ModuleFactory()
    REGISTER(LaunchpadKeyboard, launchpadkeyboard, kModuleType_Instrument);
    REGISTER(FMSynth, fmsynth, kModuleType_Synth);
    REGISTER(MidiController, midicontroller, kModuleType_Other);
+#ifdef JUCE_MAC
    REGISTER(PSMoveController, psmove, kModuleType_Other);
+#endif
    REGISTER(SampleBank, samplebank, kModuleType_Other);
    REGISTER(SamplePlayer, sampleplayer, kModuleType_Synth);
    REGISTER(Autotalent, autotalent, kModuleType_Audio);
@@ -260,7 +266,7 @@ ModuleFactory::ModuleFactory()
    REGISTER(KeyboardDisplay, keyboarddisplay, kModuleType_Instrument);
    REGISTER(Ramper, ramper, kModuleType_Other);
    REGISTER(NoteGate, notegate, kModuleType_Note);
-   
+
    REGISTER_EXPERIMENTAL(VSTPlugin, vstplugin, kModuleType_Synth);
    //REGISTER_EXPERIMENTAL(MidiPlayer, midiplayer, kModuleType_Instrument);
    REGISTER_EXPERIMENTAL(Razor, razor, kModuleType_Synth);
@@ -268,7 +274,7 @@ ModuleFactory::ModuleFactory()
    REGISTER_EXPERIMENTAL(LoopStorer, loopstorer, kModuleType_Other);
    REGISTER_EXPERIMENTAL(ComboGridController, combogrid, kModuleType_Other);
    REGISTER_EXPERIMENTAL(PitchChorus, pitchchorus, kModuleType_Audio);
-   
+
    REGISTER_HIDDEN(SampleFinder, samplefinder, kModuleType_Audio);
    REGISTER_HIDDEN(Producer, producer, kModuleType_Audio);
    REGISTER_HIDDEN(ChaosEngine, chaosengine, kModuleType_Other);
@@ -285,7 +291,9 @@ ModuleFactory::ModuleFactory()
    REGISTER_HIDDEN(FFTtoAdditive, ffttoadditive, kModuleType_Audio);
    REGISTER_HIDDEN(SlowLayers, slowlayers, kModuleType_Audio);
    REGISTER_HIDDEN(ClipLauncher, cliplauncher, kModuleType_Synth);
+#ifdef JUCE_MAC
    REGISTER_HIDDEN(KompleteKontrol, kompletekontrol, kModuleType_Note);
+#endif
    REGISTER_HIDDEN(ControlTactileFeedback, controltactilefeedback, kModuleType_Synth);
    REGISTER_HIDDEN(FloatSliderLFOControl, lfo, kModuleType_Other);
    REGISTER_HIDDEN(NoteLooper, notelooper, kModuleType_Note);
@@ -321,7 +329,7 @@ vector<string> ModuleFactory::GetSpawnableModules(ModuleType moduleType)
    for (auto iter = mFactoryMap.begin(); iter != mFactoryMap.end(); ++iter)
    {
       if (mModuleTypeMap[iter->first] == moduleType &&
-          (mIsHiddenModuleMap[iter->first] == false || gShowDevModules))
+         (mIsHiddenModuleMap[iter->first] == false || gShowDevModules))
          modules.push_back(iter->first);
    }
    sort(modules.begin(), modules.end());

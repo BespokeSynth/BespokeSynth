@@ -6,6 +6,8 @@
 //
 //
 
+#ifdef JUCE_MAC
+
 #ifndef __Bespoke__KompleteKontrol__
 #define __Bespoke__KompleteKontrol__
 
@@ -83,3 +85,5 @@ private:
 };
 
 #endif /* defined(__Bespoke__KompleteKontrol__) */
+
+#endif

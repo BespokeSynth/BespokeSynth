@@ -31,11 +31,11 @@ public:
    
    // static
    static string decodeURL(string& str);
-   static string decodeEntities(string& str) {
+   /*static string decodeEntities(string& str) {
       char dest[ str.length() ];
       decode_html_entities_utf8(dest, str.c_str());
       return string( dest );
-   }
+   }*/
 };
 
 

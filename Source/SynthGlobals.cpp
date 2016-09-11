@@ -18,7 +18,10 @@
 #include "TextEntry.h"
 #include "PatchCable.h"
 #include "PatchCableSource.h"
+
+#ifdef JUCE_MAC
 #import <execinfo.h>
+#endif
 
 int gBufferSize = 64;
 int gSampleRate = 44100;
@@ -471,6 +474,7 @@ float Pow2(float in)
 
 void PrintCallstack()
 {
+#ifdef JUCE_MAC
    void *callstack[128];
    int frameCount = backtrace(callstack, 128);
    char **frameStrings = backtrace_symbols(callstack, frameCount);
@@ -482,6 +486,7 @@ void PrintCallstack()
       }
       free(frameStrings);
    }
+#endif
 }
 
 bool IsInUnitBox(ofVec2f pos)
@@ -492,7 +497,7 @@ bool IsInUnitBox(ofVec2f pos)
 string GetUniqueName(string name, vector<IDrawableModule*> existing)
 {
    string origName = name;
-   while (origName.length() > 1 && isnumber(origName[origName.length()-1]))
+   while (origName.length() > 1 && isdigit(origName[origName.length()-1]))
       origName.resize(origName.length()-1);
    int suffix = 1;
    while (true)

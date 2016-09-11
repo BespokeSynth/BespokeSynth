@@ -99,8 +99,11 @@ void ModularSynth::Setup(GlobalManagers* globalManagers, juce::Component* mainCo
       }
       if (width > 1 && height > 1)
       {
+         //TODO_PORT(Ryan) this locks up in windows
+#ifndef JUCE_WINDOWS
          MessageManagerLock lock;
          mainComponent->setSize(width, height);
+#endif
       }
    }
    else
@@ -127,9 +130,9 @@ void ModularSynth::Setup(GlobalManagers* globalManagers, juce::Component* mainCo
    mConsoleEntry = new TextEntry(mConsoleListener,"console",0,20,50,mConsoleText);
 }
 
-void ModularSynth::LoadResources(NVGcontext* nanoVG)
+void ModularSynth::LoadResources(void* nanoVG)
 {
-   gNanoVG = nanoVG;
+   gNanoVG = (NVGcontext*)nanoVG;
    LoadGlobalResources();
 }
 
@@ -195,9 +198,9 @@ void ModularSynth::ZoomView(float zoomAmount)
    mZoomer.CancelMovement();
 }
 
-void ModularSynth::Draw(NVGcontext* vg)
+void ModularSynth::Draw(void* vg)
 {
-   gNanoVG = vg;
+   gNanoVG = (NVGcontext*)vg;
    
    //DrawText("fps: "+ofToString(ofGetFrameRate(),4)+" "+ofToString(ofGetWidth()*ofGetHeight()), 100, 100,50);
    //return;
@@ -395,7 +398,7 @@ void ModularSynth::KeyPressed(int key)
    if (gHoveredUIControl &&
        TextEntry::GetActiveTextEntry() == NULL &&
        GetKeyModifiers() == kModifier_None &&
-       (isnumber(key) || key == '.' || key == '-'))
+       (isdigit(key) || key == '.' || key == '-'))
    {
       gHoveredUIControl->AttemptTextInput();
    }
@@ -429,7 +432,7 @@ void ModularSynth::KeyPressed(int key)
    
    mZoomer.OnKeyPressed(key);
    
-   if (isnumber(key) && GetKeyModifiers() & kModifier_Command)
+   if (isdigit(key) && GetKeyModifiers() & kModifier_Command)
    {
       int num = key - '0';
       assert(num >= 0 && num <= 9);
@@ -698,50 +701,57 @@ void ModularSynth::MouseScrolled(float x, float y)
    }
    else if (gHoveredUIControl)
    {
-      if (gHoveredUIControl)
+#if JUCE_WINDOWS
+      y *= -1;
+      y -= x / 3; //taking advantage of logitech horizontal scroll wheel
+#endif
+
+      float val = gHoveredUIControl->GetMidiValue();
+      float movementScale = 3;
+      FloatSlider* floatSlider = dynamic_cast<FloatSlider*>(gHoveredUIControl);
+      IntSlider* intSlider = dynamic_cast<IntSlider*>(gHoveredUIControl);
+      if (floatSlider || intSlider)
       {
-         float val = gHoveredUIControl->GetMidiValue();
-         float movementScale = 3;
-         FloatSlider* floatSlider = dynamic_cast<FloatSlider*>(gHoveredUIControl);
-         IntSlider* intSlider = dynamic_cast<IntSlider*>(gHoveredUIControl);
-         if (floatSlider || intSlider)
-         {
-            int w,h;
-            gHoveredUIControl->GetDimensions(w, h);
-            movementScale = 200.0f / w;
+         int w,h;
+         gHoveredUIControl->GetDimensions(w, h);
+         movementScale = 200.0f / w;
             
-            if (GetKeyModifiers() & kModifier_Shift)
-               movementScale *= .01f;
-         }
-         
-         float change = -y/100 * movementScale;
-         
-         if (floatSlider && floatSlider->GetLFO() && floatSlider->GetLFO()->Enabled())
-         {
-            FloatSliderLFOControl* lfo = floatSlider->GetLFO();
-            float min = floatSlider->GetMin();
-            float max = floatSlider->GetMax();
-            float lfoMin = ofMap(lfo->Min(),min,max,0,1);
-            float lfoMax = ofMap(lfo->Max(),min,max,0,1);
-            
-            float changeX = x/100 * movementScale;
-            
-            lfo->SetMin(ofMap(lfoMin + change,0,1,min,max,K(clamp)));
-            lfo->SetMax(ofMap(lfoMax + changeX,0,1,min,max,K(clamp)));
-            
-            return;
-         }
-         
-         if (gHoveredUIControl->InvertScrollDirection())
-            val -= change;
-         else
-            val += change;
-         val = ofClamp(val, 0, 1);
-         gHoveredUIControl->SetFromMidiCC(val);
+         if (GetKeyModifiers() & kModifier_Shift)
+            movementScale *= .01f;
       }
+         
+      float change = -y/100 * movementScale;
+         
+      if (floatSlider && floatSlider->GetLFO() && floatSlider->GetLFO()->Enabled())
+      {
+         FloatSliderLFOControl* lfo = floatSlider->GetLFO();
+         float min = floatSlider->GetMin();
+         float max = floatSlider->GetMax();
+         float lfoMin = ofMap(lfo->Min(),min,max,0,1);
+         float lfoMax = ofMap(lfo->Max(),min,max,0,1);
+            
+         float changeX = x/100 * movementScale;
+            
+         lfo->SetMin(ofMap(lfoMin + change,0,1,min,max,K(clamp)));
+         lfo->SetMax(ofMap(lfoMax + changeX,0,1,min,max,K(clamp)));
+            
+         return;
+      }
+         
+      if (gHoveredUIControl->InvertScrollDirection())
+         val -= change;
+      else
+         val += change;
+      val = ofClamp(val, 0, 1);
+      gHoveredUIControl->SetFromMidiCC(val);
    }
    else
    {
+#if JUCE_WINDOWS
+      y *= -1;
+      y -= x / 3; //taking advantage of logitech horizontal scroll wheel
+#endif
+
       IDrawableModule* module = GetModuleAt(GetMouseX(), GetMouseY());
       if (module)
          module->NotifyMouseScrolled(GetMouseX(), GetMouseY(), x, y);

@@ -16,7 +16,9 @@ VSTWindow::VSTWindow (VSTPlugin* vst,
                   DocumentWindow::minimiseButton | DocumentWindow::closeButton)
 , mType(t)
 , mOwner(vst)
+#ifdef JUCE_MAC
 , mNSViewComponent(NULL)
+#endif
 {
    setSize (400, 300);
    
@@ -27,8 +29,10 @@ VSTWindow::VSTWindow (VSTPlugin* vst,
    
    setVisible (true);
    
+#ifdef JUCE_MAC
    if (pluginEditor->getNumChildComponents() > 0)
       mNSViewComponent = dynamic_cast<juce::NSViewComponent*>(pluginEditor->getChildComponent(0));
+#endif
 
 }
 

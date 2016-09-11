@@ -10,6 +10,7 @@
 #define __modularSynth__Profiler__
 
 #include "OpenFrameworksPort.h"
+#include "SynthGlobals.h"
 
 #define PROFILER_HISTORY_LENGTH 500
 

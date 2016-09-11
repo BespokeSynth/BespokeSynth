@@ -5,6 +5,8 @@
 //
 //
 
+#ifdef JUCE_MAC
+
 #ifndef __NI_FakeDaemon__KontrolKommunicator__
 #define __NI_FakeDaemon__KontrolKommunicator__
 
@@ -116,3 +118,5 @@ private:
 };
 
 #endif /* defined(__NI_FakeDaemon__KontrolKommunicator__) */
+
+#endif

@@ -13,7 +13,7 @@ namespace BinaryData
     const int            sconscriptSize = 154;
 
     extern const char*   README_txt;
-    const int            README_txtSize = 4123;
+    const int            README_txtSize = 4240;
 
     extern const char*   version;
     const int            versionSize = 5;

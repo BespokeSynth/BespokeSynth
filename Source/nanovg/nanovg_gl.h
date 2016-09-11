@@ -371,7 +371,7 @@ static int glnvg__deleteTexture(GLNVGcontext* gl, int id)
 
 static void glnvg__dumpShaderError(GLuint shader, const char* name, const char* type)
 {
-	GLchar str[512+1];
+	char str[512+1];
 	GLsizei len = 0;
 	glGetShaderInfoLog(shader, 512, &len, str);
 	if (len > 512) len = 512;
@@ -381,7 +381,7 @@ static void glnvg__dumpShaderError(GLuint shader, const char* name, const char* 
 
 static void glnvg__dumpProgramError(GLuint prog, const char* name)
 {
-	GLchar str[512+1];
+	char str[512+1];
 	GLsizei len = 0;
 	glGetProgramInfoLog(prog, 512, &len, str);
 	if (len > 512) len = 512;
