@@ -6,7 +6,7 @@
 //
 //
 
-#ifdef JUCE_MAC
+#ifdef BESPOKE_MAC
 
 #ifndef __NI_SoftwareSide__SendPort__
 #define __NI_SoftwareSide__SendPort__

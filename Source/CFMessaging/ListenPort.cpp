@@ -6,7 +6,7 @@
 //  Copyright (c) 2014 Ryan Challinor. All rights reserved.
 //
 
-#ifdef JUCE_MAC
+#ifdef BESPOKE_MAC
 
 #include "ListenPort.h"
 #include <iostream>

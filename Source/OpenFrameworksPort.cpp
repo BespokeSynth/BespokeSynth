@@ -8,7 +8,10 @@
  ==============================================================================
  */
 
+#ifdef JUCE_WINDOWS
 #include <GL/glew.h>
+#endif
+
 #include "OpenFrameworksPort.h"
 #include "nanovg/nanovg.h"
 #define NANOVG_GL3_IMPLEMENTATION

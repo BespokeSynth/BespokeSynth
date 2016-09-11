@@ -6,7 +6,7 @@
 //
 //
 
-#ifdef JUCE_MAC
+#ifdef BESPOKE_MAC
 
 #ifndef CFMessaging_NIMessage_h
 #define CFMessaging_NIMessage_h

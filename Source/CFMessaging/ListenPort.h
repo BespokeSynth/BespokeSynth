@@ -6,7 +6,7 @@
 //  Copyright (c) 2014 Ryan Challinor. All rights reserved.
 //
 
-#ifdef JUCE_MAC
+#ifdef BESPOKE_MAC
 
 #ifndef __NI_SoftwareSide__ListenPort__
 #define __NI_SoftwareSide__ListenPort__

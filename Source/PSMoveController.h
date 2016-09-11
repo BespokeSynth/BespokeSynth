@@ -6,7 +6,7 @@
 //
 //
 
-#ifdef JUCE_MAC
+#ifdef BESPOKE_MAC
 
 #ifndef __modularSynth__PSMoveController__
 #define __modularSynth__PSMoveController__

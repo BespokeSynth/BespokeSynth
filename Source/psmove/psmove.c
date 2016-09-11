@@ -27,7 +27,7 @@
  * POSSIBILITY OF SUCH DAMAGE.
  **/
 
-#ifdef JUCE_MAC
+#ifdef BESPOKE_MAC
 
 #include "psmove.h"
 

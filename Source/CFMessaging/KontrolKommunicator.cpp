@@ -5,7 +5,7 @@
 //
 //
 
-#ifdef JUCE_MAC
+#ifdef BESPOKE_MAC
 
 #include "KontrolKommunicator.h"
 #include <mach/mach.h>

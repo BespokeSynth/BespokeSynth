@@ -1,4 +1,4 @@
-#ifdef JUCE_MAC
+#ifdef BESPOKE_MAC
 
 #pragma once
 
@@ -46,4 +46,4 @@ private:
    PSMoveListener* mListener;
 };
 
-#ifdef JUCE_MAC
+#endif

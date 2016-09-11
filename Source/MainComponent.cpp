@@ -1,7 +1,10 @@
 #ifndef MAINCOMPONENT_H_INCLUDED
 #define MAINCOMPONENT_H_INCLUDED
 
+#ifdef JUCE_WINDOWS
 #include <GL/glew.h>
+#endif
+
 #include "../JuceLibraryCode/JuceHeader.h"
 #include "nanovg/nanovg.h"
 #define NANOVG_GL3_IMPLEMENTATION
@@ -80,7 +83,9 @@ public:
    
    void initialise() override
    {
+#ifdef JUCE_WINDOWS
       glewInit();
+#endif
 
       mVG = nvgCreateGL3(NVG_ANTIALIAS | NVG_STENCIL_STROKES | NVG_DEBUG);
       

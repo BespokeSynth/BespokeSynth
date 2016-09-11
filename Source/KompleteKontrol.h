@@ -6,7 +6,7 @@
 //
 //
 
-#ifdef JUCE_MAC
+#ifdef BESPOKE_MAC
 
 #ifndef __Bespoke__KompleteKontrol__
 #define __Bespoke__KompleteKontrol__

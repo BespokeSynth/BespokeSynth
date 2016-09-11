@@ -750,7 +750,8 @@
     </GROUP>
   </MAINGROUP>
   <EXPORTFORMATS>
-    <XCODE_MAC targetFolder="Builds/MacOSX" vstFolder="~/SDKs/vstsdk2.4" vst3Folder="">
+    <XCODE_MAC targetFolder="Builds/MacOSX" vstFolder="~/SDKs/vstsdk2.4" vst3Folder=""
+               extraDefs="BESPOKE_MAC">
       <CONFIGURATIONS>
         <CONFIGURATION name="Debug" isDebug="1" optimisation="1" targetName="Bespoke"
                        headerPath="../../Source/json/include"/>
@@ -776,7 +777,7 @@
       </MODULEPATHS>
     </XCODE_MAC>
     <VS2015 targetFolder="Builds/VisualStudio2015" vstFolder="../VST3 SDK"
-            vst3Folder="../VST3 SDK" extraDefs="GLEW_STATIC">
+            vst3Folder="../VST3 SDK" extraDefs="GLEW_STATIC;BESPOKE_WINDOWS">
       <CONFIGURATIONS>
         <CONFIGURATION name="Debug" winWarningLevel="2" generateManifest="1" winArchitecture="32-bit"
                        isDebug="1" optimisation="1" targetName="BespokeSynth" headerPath="../../Source/json/include;../../Source/glew/include"

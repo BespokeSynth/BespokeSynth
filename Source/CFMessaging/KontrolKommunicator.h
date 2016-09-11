@@ -5,7 +5,7 @@
 //
 //
 
-#ifdef JUCE_MAC
+#ifdef BESPOKE_MAC
 
 #ifndef __NI_FakeDaemon__KontrolKommunicator__
 #define __NI_FakeDaemon__KontrolKommunicator__

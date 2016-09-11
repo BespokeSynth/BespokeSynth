@@ -20,7 +20,7 @@
         http://github.com/signal11/hidapi .
 ********************************************************/
 
-#ifdef JUCE_MAC
+#ifdef BESPOKE_MAC
 
 /** @file
  * @defgroup API hidapi API

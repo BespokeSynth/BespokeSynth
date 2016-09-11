@@ -6,7 +6,7 @@
 //
 //
 
-#ifdef JUCE_MAC
+#ifdef BESPOKE_MAC
 
 #include "KompleteKontrol.h"
 #include "SynthGlobals.h"
