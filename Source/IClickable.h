@@ -20,10 +20,11 @@ public:
    virtual ~IClickable() {}
    void Draw();
    virtual void Render() {}
-   void SetPosition(int x, int y) { mX = x; mY = y; }
-   void SetX(int x) { mX = x; }
-   void SetY(int y) { mY = y; }
-   void GetPosition(int& x, int& y, bool local = false) const;
+   void SetPosition(float x, float y) { mX = x; mY = y; }
+   void SetX(float x) { mX = x; }
+   void SetY(float y) { mY = y; }
+   void GetPosition(int& x, int& y, bool local = false) const; //TODO(Ryan) deprecated
+   void GetPosition(float& x, float& y, bool local = false) const;
    ofVec2f GetPosition(bool local = false) const;
    virtual bool TestClick(int x, int y, bool right, bool testOnly = false);
    IClickable* GetParent() const { return mParent; }
@@ -50,8 +51,8 @@ protected:
    virtual bool MouseMoved(float x, float y) { return false; }
    virtual bool MouseScrolled(int x, int y, float scrollX, float scrollY) { return false; }
    
-   int mX;
-   int mY;
+   float mX;
+   float mY;
    IClickable* mParent;
    bool mShowing;
    

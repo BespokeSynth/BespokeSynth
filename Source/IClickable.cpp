@@ -64,7 +64,15 @@ bool IClickable::NotifyMouseScrolled(int x, int y, float scrollX, float scrollY)
    return MouseScrolled(x-mX, y-mY, scrollX, scrollY);
 }
 
-void IClickable::GetPosition(int& x, int& y, bool local /*= false*/) const
+void IClickable::GetPosition(int& x, int& y, bool local /*= false*/) const //TODO(Ryan) deprecated
+{
+   float fX, fY;
+   GetPosition(fX, fY, local);
+   x = (int)fX;
+   y = (int)fY;
+}
+
+void IClickable::GetPosition(float& x, float& y, bool local /*= false*/) const
 {
    if (mParent && !local)
    {
