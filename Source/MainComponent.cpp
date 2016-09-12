@@ -1,7 +1,7 @@
 #ifndef MAINCOMPONENT_H_INCLUDED
 #define MAINCOMPONENT_H_INCLUDED
 
-#ifdef JUCE_WINDOWS
+#ifdef BESPOKE_WINDOWS
 #include <GL/glew.h>
 #endif
 

@@ -8,7 +8,7 @@
  ==============================================================================
  */
 
-#ifdef JUCE_WINDOWS
+#ifdef BESPOKE_WINDOWS
 #include <GL/glew.h>
 #endif
 
