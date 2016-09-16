@@ -47,6 +47,9 @@ public:
    
    void timerCallback() override
    {
+      if (!hasKeyboardFocus(true) && isVisible())
+         grabKeyboardFocus();
+      
       mSynth.Poll();
    }
    
@@ -86,7 +89,7 @@ public:
 #ifdef JUCE_WINDOWS
       glewInit();
 #endif
-
+      
       mVG = nvgCreateGL3(NVG_ANTIALIAS | NVG_STENCIL_STROKES | NVG_DEBUG);
       
       if (mVG == NULL)

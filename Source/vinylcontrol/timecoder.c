@@ -21,6 +21,10 @@
 #include <stdlib.h>
 #include <string.h>
 
+#ifndef BESPOKE_WINDOWS
+#include <unistd.h>
+#endif
+
 #include "timecoder.h"
 
 #define ZERO_THRESHOLD 128

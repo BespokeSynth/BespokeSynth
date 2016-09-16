@@ -420,9 +420,6 @@ void ModularSynth::KeyPressed(int key)
    
    if (key == '`')
       ADSRDisplay::ToggleDisplayMode();
-   
-   if (key == ' ')
-      mLastMoveMouseScreenPos = ofVec2f(ofGetMouseX(), ofGetMouseY());
 
    if (key == 9)  //tab
    {
@@ -498,9 +495,10 @@ void ModularSynth::MouseMoved(int intX, int intY )
    if (ofGetKeyPressed(' '))
    {
       mDrawOffset += (ofVec2f(intX,intY) - mLastMoveMouseScreenPos) / gDrawScale;
-      mLastMoveMouseScreenPos = ofVec2f(intX,intY);
       mZoomer.CancelMovement();
    }
+   
+   mLastMoveMouseScreenPos = ofVec2f(intX,intY);
    
    float x = GetMouseX();
    float y = GetMouseY();

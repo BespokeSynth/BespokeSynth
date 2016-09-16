@@ -32,7 +32,10 @@ void* operator new[](std::size_t size, const char *file, int line) throw(std::ba
 #define MAX_BUFFER_SIZE 30*gSampleRate
 #define MAX_TEXTENTRY_LENGTH 128
 
+#ifndef M_PI
 #define M_PI PI
+#endif
+
 #define FPI       3.14159265358979323846f
 #define FTWO_PI   6.28318530717958647693f
 

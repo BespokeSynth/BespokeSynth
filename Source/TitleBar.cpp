@@ -187,7 +187,7 @@ void TitleBar::DrawModule()
       {
          mInstrumentModules.SetPosition(400,2);
          mNoteModules.SetPositionRelativeTo(&mInstrumentModules);
-         mSynthModules.SetPosition(500, 18);
+         mSynthModules.SetPosition(400, 18);
          mAudioModules.SetPositionRelativeTo(&mSynthModules);
          mOtherModules.SetPositionRelativeTo(&mAudioModules);
       }
