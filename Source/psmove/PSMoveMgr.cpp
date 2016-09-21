@@ -1,5 +1,3 @@
-#ifdef BESPOKE_MAC
-
 #include "PSMoveMgr.h"
 
 //--------------------------------------------------------------
@@ -238,5 +236,3 @@ void PSMoveMgr::SetColor(int id, float r, float g, float b)
 
    psmove_set_leds(mMove[id], int(r*255), int(g*255), int(b*255));
 }
-
-#endif

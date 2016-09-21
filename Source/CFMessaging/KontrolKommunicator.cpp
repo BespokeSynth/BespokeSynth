@@ -5,8 +5,6 @@
 //
 //
 
-#ifdef BESPOKE_MAC
-
 #include "KontrolKommunicator.h"
 #include <mach/mach.h>
 #include "NIMessage.h"
@@ -572,5 +570,3 @@ void KontrolKommunicator::SetKeyLights(ofColor keys[61])
    
    SendMessage(mRequestSerialPort, lights);
 }
-
-#endif

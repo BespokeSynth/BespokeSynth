@@ -6,8 +6,6 @@
 //
 //
 
-#ifdef BESPOKE_MAC
-
 #include "PSMoveController.h"
 #include "SynthGlobals.h"
 #include "psmove/psmove.h"
@@ -218,5 +216,3 @@ void PSMoveController::SetUpFromSaveData()
    SetRollControl(TheSynth->FindUIControl(mModuleSaveData.GetString("rollcontrol")));
    SetEnergyControl(TheSynth->FindUIControl(mModuleSaveData.GetString("energycontrol")));
 }
-
-#endif

@@ -6,7 +6,6 @@
 //  Copyright (c) 2014 Ryan Challinor. All rights reserved.
 //
 
-#ifdef BESPOKE_MAC
 
 #include "ListenPort.h"
 #include <iostream>
@@ -91,5 +90,3 @@ CFDataRef ListenPortReceiver::OnMessageReceived(CFMessagePortRef local, SInt32 m
    
    return port->OnMessageReceived(msgid, data);
 }
-
-#endif

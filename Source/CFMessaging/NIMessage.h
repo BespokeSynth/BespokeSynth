@@ -6,8 +6,6 @@
 //
 //
 
-#ifdef BESPOKE_MAC
-
 #ifndef CFMessaging_NIMessage_h
 #define CFMessaging_NIMessage_h
 
@@ -27,7 +25,5 @@ extern MessageIdToString MessageIdToStringTable[NUM_NI_MESSAGE_IDS];
 
 string TypeForMessageID(uint32_t messageId);
 uint32_t MessageIDForType(string type);
-
-#endif
 
 #endif

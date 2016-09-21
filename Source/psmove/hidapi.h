@@ -20,8 +20,6 @@
         http://github.com/signal11/hidapi .
 ********************************************************/
 
-#ifdef BESPOKE_MAC
-
 /** @file
  * @defgroup API hidapi API
  */
@@ -379,8 +377,6 @@ extern "C" {
 
 #ifdef __cplusplus
 }
-#endif
-
 #endif
 
 #endif

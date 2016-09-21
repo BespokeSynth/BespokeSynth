@@ -50,14 +50,14 @@
     <Filter Include="BespokeSynth\Source\libraries\psmove">
       <UniqueIdentifier>{6633B184-AD8D-26C5-CD52-B74587CF064E}</UniqueIdentifier>
     </Filter>
+    <Filter Include="BespokeSynth\Source\libraries\vinylcontrol">
+      <UniqueIdentifier>{B49EF5B4-25CC-98E4-F8C2-2FF232AC7632}</UniqueIdentifier>
+    </Filter>
     <Filter Include="BespokeSynth\Source\modules">
       <UniqueIdentifier>{FDC87D5E-99EF-E44C-759B-303D2AEF9FA8}</UniqueIdentifier>
     </Filter>
     <Filter Include="BespokeSynth\Source\uicontrols">
       <UniqueIdentifier>{D8CD075A-1F00-5EBD-8AD5-D747FBD1510E}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="BespokeSynth\Source\vinylcontrol">
-      <UniqueIdentifier>{DB6E8097-E9E3-3A66-3670-AB7673CF8947}</UniqueIdentifier>
     </Filter>
     <Filter Include="Juce Modules">
       <UniqueIdentifier>{422C46B7-0467-2DB0-BF3C-16DFCAFD69AC}</UniqueIdentifier>
@@ -475,6 +475,9 @@
     <ClCompile Include="..\..\Source\TremoloEffect.cpp">
       <Filter>BespokeSynth\Source\effects</Filter>
     </ClCompile>
+    <ClCompile Include="..\..\Source\CFMessaging\Bespoke_CFMessaging.cpp">
+      <Filter>BespokeSynth\Source\libraries\CFMessaging</Filter>
+    </ClCompile>
     <ClCompile Include="..\..\Source\CFMessaging\KontrolKommunicator.cpp">
       <Filter>BespokeSynth\Source\libraries\CFMessaging</Filter>
     </ClCompile>
@@ -499,6 +502,9 @@
     <ClCompile Include="..\..\Source\glew\include\GL\glew.c">
       <Filter>BespokeSynth\Source\libraries\glew\include\GL</Filter>
     </ClCompile>
+    <ClCompile Include="..\..\Source\glew\Bespoke_glew.c">
+      <Filter>BespokeSynth\Source\libraries\glew</Filter>
+    </ClCompile>
     <ClCompile Include="..\..\Source\json\src\lib_json\json_reader.cpp">
       <Filter>BespokeSynth\Source\libraries\json\src\lib_json</Filter>
     </ClCompile>
@@ -511,6 +517,9 @@
     <ClCompile Include="..\..\Source\nanovg\nanovg.c">
       <Filter>BespokeSynth\Source\libraries\nanovg</Filter>
     </ClCompile>
+    <ClCompile Include="..\..\Source\psmove\Bespoke_PSMove.c">
+      <Filter>BespokeSynth\Source\libraries\psmove</Filter>
+    </ClCompile>
     <ClCompile Include="..\..\Source\psmove\hid.c">
       <Filter>BespokeSynth\Source\libraries\psmove</Filter>
     </ClCompile>
@@ -520,184 +529,25 @@
     <ClCompile Include="..\..\Source\psmove\PSMoveMgr.cpp">
       <Filter>BespokeSynth\Source\libraries\psmove</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\Source\PSMoveController.cpp">
+    <ClCompile Include="..\..\Source\vinylcontrol\timecoder.c">
+      <Filter>BespokeSynth\Source\libraries\vinylcontrol</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\Source\vinylcontrol\vinylcontrol.cpp">
+      <Filter>BespokeSynth\Source\libraries\vinylcontrol</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\Source\ADSRTrigger.cpp">
       <Filter>BespokeSynth\Source\modules</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\Source\KompleteKontrol.cpp">
+    <ClCompile Include="..\..\Source\Amplifier.cpp">
       <Filter>BespokeSynth\Source\modules</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\Source\VSTPlugin.cpp">
+    <ClCompile Include="..\..\Source\Arpeggiator.cpp">
       <Filter>BespokeSynth\Source\modules</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\Source\ClipArranger.cpp">
+    <ClCompile Include="..\..\Source\AudioMeter.cpp">
       <Filter>BespokeSynth\Source\modules</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\Source\WaveformViewer.cpp">
-      <Filter>BespokeSynth\Source\modules</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\Source\VinylTempoControl.cpp">
-      <Filter>BespokeSynth\Source\modules</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\Source\SampleFinder.cpp">
-      <Filter>BespokeSynth\Source\modules</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\Source\MidiOutput.cpp">
-      <Filter>BespokeSynth\Source\modules</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\Source\MultibandCompressor.cpp">
-      <Filter>BespokeSynth\Source\modules</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\Source\MultitrackRecorder.cpp">
-      <Filter>BespokeSynth\Source\modules</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\Source\OneShotLauncher.cpp">
-      <Filter>BespokeSynth\Source\modules</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\Source\Producer.cpp">
-      <Filter>BespokeSynth\Source\modules</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\Source\SamplePlayer.cpp">
-      <Filter>BespokeSynth\Source\modules</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\Source\SamplerGrid.cpp">
-      <Filter>BespokeSynth\Source\modules</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\Source\RingModulator.cpp">
-      <Filter>BespokeSynth\Source\modules</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\Source\SampleCanvas.cpp">
-      <Filter>BespokeSynth\Source\modules</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\Source\RandomNoteGenerator.cpp">
-      <Filter>BespokeSynth\Source\modules</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\Source\Razor.cpp">
-      <Filter>BespokeSynth\Source\modules</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\Source\PanicButton.cpp">
-      <Filter>BespokeSynth\Source\modules</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\Source\PitchChorus.cpp">
-      <Filter>BespokeSynth\Source\modules</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\Source\Polyrhythms.cpp">
-      <Filter>BespokeSynth\Source\modules</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\Source\Ramper.cpp">
-      <Filter>BespokeSynth\Source\modules</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\Source\NoteChainNode.cpp">
-      <Filter>BespokeSynth\Source\modules</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\Source\NoteCreator.cpp">
-      <Filter>BespokeSynth\Source\modules</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\Source\NoteSinger.cpp">
-      <Filter>BespokeSynth\Source\modules</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\Source\NoteToFreq.cpp">
-      <Filter>BespokeSynth\Source\modules</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\Source\NoteToMs.cpp">
-      <Filter>BespokeSynth\Source\modules</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\Source\Lissajous.cpp">
-      <Filter>BespokeSynth\Source\modules</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\Source\MacroSlider.cpp">
-      <Filter>BespokeSynth\Source\modules</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\Source\Metronome.cpp">
-      <Filter>BespokeSynth\Source\modules</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\Source\SeaOfGrain.cpp">
-      <Filter>BespokeSynth\Source\modules</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\Source\Selector.cpp">
-      <Filter>BespokeSynth\Source\modules</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\Source\SliderSequencer.cpp">
-      <Filter>BespokeSynth\Source\modules</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\Source\SlowLayers.cpp">
-      <Filter>BespokeSynth\Source\modules</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\Source\TimelineControl.cpp">
-      <Filter>BespokeSynth\Source\modules</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\Source\TimerDisplay.cpp">
-      <Filter>BespokeSynth\Source\modules</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\Source\ValueSetter.cpp">
-      <Filter>BespokeSynth\Source\modules</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\Source\FFTtoAdditive.cpp">
-      <Filter>BespokeSynth\Source\modules</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\Source\FollowingSong.cpp">
-      <Filter>BespokeSynth\Source\modules</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\Source\FreqDomainBoilerplate.cpp">
-      <Filter>BespokeSynth\Source\modules</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\Source\GridToDrums.cpp">
-      <Filter>BespokeSynth\Source\modules</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\Source\GroupControl.cpp">
-      <Filter>BespokeSynth\Source\modules</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\Source\Kicker.cpp">
-      <Filter>BespokeSynth\Source\modules</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\Source\ControllingSong.cpp">
-      <Filter>BespokeSynth\Source\modules</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\Source\ControlTactileFeedback.cpp">
-      <Filter>BespokeSynth\Source\modules</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\Source\CurveLooper.cpp">
-      <Filter>BespokeSynth\Source\modules</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\Source\DebugAudioSource.cpp">
-      <Filter>BespokeSynth\Source\modules</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\Source\CircleSequencer.cpp">
-      <Filter>BespokeSynth\Source\modules</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\Source\ClipLauncher.cpp">
-      <Filter>BespokeSynth\Source\modules</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\Source\ComboGridController.cpp">
-      <Filter>BespokeSynth\Source\modules</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\Source\CommentDisplay.cpp">
-      <Filter>BespokeSynth\Source\modules</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\Source\LaunchpadKeyboard.cpp">
-      <Filter>BespokeSynth\Source\modules</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\Source\LaunchpadNoteDisplayer.cpp">
-      <Filter>BespokeSynth\Source\modules</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\Source\FeedbackModule.cpp">
-      <Filter>BespokeSynth\Source\modules</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\Source\FourOnTheFloor.cpp">
-      <Filter>BespokeSynth\Source\modules</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\Source\FreqDelay.cpp">
-      <Filter>BespokeSynth\Source\modules</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\Source\EventCanvas.cpp">
-      <Filter>BespokeSynth\Source\modules</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\Source\NoteCanvas.cpp">
-      <Filter>BespokeSynth\Source\modules</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\Source\Vocoder.cpp">
-      <Filter>BespokeSynth\Source\modules</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\Source\VocoderCarrierInput.cpp">
+    <ClCompile Include="..\..\Source\AudioRouter.cpp">
       <Filter>BespokeSynth\Source\modules</Filter>
     </ClCompile>
     <ClCompile Include="..\..\Source\Autotalent.cpp">
@@ -712,22 +562,121 @@
     <ClCompile Include="..\..\Source\Beats.cpp">
       <Filter>BespokeSynth\Source\modules</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\Source\AudioMeter.cpp">
+    <ClCompile Include="..\..\Source\BiquadFilterEffect.cpp">
       <Filter>BespokeSynth\Source\modules</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\Source\Amplifier.cpp">
+    <ClCompile Include="..\..\Source\Capo.cpp">
       <Filter>BespokeSynth\Source\modules</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\Source\StepSequencer.cpp">
+    <ClCompile Include="..\..\Source\ChaosEngine.cpp">
       <Filter>BespokeSynth\Source\modules</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\Source\AudioRouter.cpp">
+    <ClCompile Include="..\..\Source\Chorder.cpp">
       <Filter>BespokeSynth\Source\modules</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\Source\Rewriter.cpp">
+    <ClCompile Include="..\..\Source\CircleSequencer.cpp">
       <Filter>BespokeSynth\Source\modules</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\Source\SampleBank.cpp">
+    <ClCompile Include="..\..\Source\ClipArranger.cpp">
+      <Filter>BespokeSynth\Source\modules</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\Source\ClipLauncher.cpp">
+      <Filter>BespokeSynth\Source\modules</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\Source\ComboGridController.cpp">
+      <Filter>BespokeSynth\Source\modules</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\Source\CommentDisplay.cpp">
+      <Filter>BespokeSynth\Source\modules</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\Source\ControllingSong.cpp">
+      <Filter>BespokeSynth\Source\modules</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\Source\ControlSequencer.cpp">
+      <Filter>BespokeSynth\Source\modules</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\Source\ControlTactileFeedback.cpp">
+      <Filter>BespokeSynth\Source\modules</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\Source\CurveLooper.cpp">
+      <Filter>BespokeSynth\Source\modules</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\Source\DebugAudioSource.cpp">
+      <Filter>BespokeSynth\Source\modules</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\Source\DrumPlayer.cpp">
+      <Filter>BespokeSynth\Source\modules</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\Source\DrumSynth.cpp">
+      <Filter>BespokeSynth\Source\modules</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\Source\EffectChain.cpp">
+      <Filter>BespokeSynth\Source\modules</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\Source\EventCanvas.cpp">
+      <Filter>BespokeSynth\Source\modules</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\Source\FeedbackModule.cpp">
+      <Filter>BespokeSynth\Source\modules</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\Source\FFTtoAdditive.cpp">
+      <Filter>BespokeSynth\Source\modules</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\Source\FMSynth.cpp">
+      <Filter>BespokeSynth\Source\modules</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\Source\FollowingSong.cpp">
+      <Filter>BespokeSynth\Source\modules</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\Source\FourOnTheFloor.cpp">
+      <Filter>BespokeSynth\Source\modules</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\Source\FreeverbOutput.cpp">
+      <Filter>BespokeSynth\Source\modules</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\Source\FreqDelay.cpp">
+      <Filter>BespokeSynth\Source\modules</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\Source\FreqDomainBoilerplate.cpp">
+      <Filter>BespokeSynth\Source\modules</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\Source\GridController.cpp">
+      <Filter>BespokeSynth\Source\modules</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\Source\GridToDrums.cpp">
+      <Filter>BespokeSynth\Source\modules</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\Source\GroupControl.cpp">
+      <Filter>BespokeSynth\Source\modules</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\Source\HelpDisplay.cpp">
+      <Filter>BespokeSynth\Source\modules</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\Source\InputChannel.cpp">
+      <Filter>BespokeSynth\Source\modules</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\Source\KarplusStrong.cpp">
+      <Filter>BespokeSynth\Source\modules</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\Source\KeyboardDisplay.cpp">
+      <Filter>BespokeSynth\Source\modules</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\Source\Kicker.cpp">
+      <Filter>BespokeSynth\Source\modules</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\Source\KompleteKontrol.cpp">
+      <Filter>BespokeSynth\Source\modules</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\Source\LaunchpadKeyboard.cpp">
+      <Filter>BespokeSynth\Source\modules</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\Source\LaunchpadNoteDisplayer.cpp">
+      <Filter>BespokeSynth\Source\modules</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\Source\LFOController.cpp">
+      <Filter>BespokeSynth\Source\modules</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\Source\Lissajous.cpp">
       <Filter>BespokeSynth\Source\modules</Filter>
     </ClCompile>
     <ClCompile Include="..\..\Source\Looper.cpp">
@@ -739,82 +688,25 @@
     <ClCompile Include="..\..\Source\LoopStorer.cpp">
       <Filter>BespokeSynth\Source\modules</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\Source\DrumPlayer.cpp">
+    <ClCompile Include="..\..\Source\MacroSlider.cpp">
       <Filter>BespokeSynth\Source\modules</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\Source\DrumSynth.cpp">
+    <ClCompile Include="..\..\Source\Metronome.cpp">
       <Filter>BespokeSynth\Source\modules</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\Source\ADSRTrigger.cpp">
+    <ClCompile Include="..\..\Source\MidiController.cpp">
       <Filter>BespokeSynth\Source\modules</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\Source\NoteLooper.cpp">
+    <ClCompile Include="..\..\Source\MidiInstrument.cpp">
       <Filter>BespokeSynth\Source\modules</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\Source\NoteOctaver.cpp">
-      <Filter>BespokeSynth\Source\modules</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\Source\NoteRouter.cpp">
-      <Filter>BespokeSynth\Source\modules</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\Source\NoteSustain.cpp">
-      <Filter>BespokeSynth\Source\modules</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\Source\NoteTransformer.cpp">
-      <Filter>BespokeSynth\Source\modules</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\Source\NoteVibrato.cpp">
-      <Filter>BespokeSynth\Source\modules</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\Source\PitchBender.cpp">
-      <Filter>BespokeSynth\Source\modules</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\Source\PitchDive.cpp">
-      <Filter>BespokeSynth\Source\modules</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\Source\PitchSetter.cpp">
-      <Filter>BespokeSynth\Source\modules</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\Source\Pressure.cpp">
-      <Filter>BespokeSynth\Source\modules</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\Source\PressureToModwheel.cpp">
-      <Filter>BespokeSynth\Source\modules</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\Source\PressureToVibrato.cpp">
-      <Filter>BespokeSynth\Source\modules</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\Source\PreviousNote.cpp">
-      <Filter>BespokeSynth\Source\modules</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\Source\ScaleDegree.cpp">
-      <Filter>BespokeSynth\Source\modules</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\Source\ScaleDetect.cpp">
-      <Filter>BespokeSynth\Source\modules</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\Source\SustainPedal.cpp">
-      <Filter>BespokeSynth\Source\modules</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\Source\VelocityScaler.cpp">
-      <Filter>BespokeSynth\Source\modules</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\Source\VelocitySetter.cpp">
-      <Filter>BespokeSynth\Source\modules</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\Source\VelocityStepSequencer.cpp">
-      <Filter>BespokeSynth\Source\modules</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\Source\WhiteKeys.cpp">
-      <Filter>BespokeSynth\Source\modules</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\Source\Capo.cpp">
-      <Filter>BespokeSynth\Source\modules</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\Source\KeyboardDisplay.cpp">
+    <ClCompile Include="..\..\Source\MidiOutput.cpp">
       <Filter>BespokeSynth\Source\modules</Filter>
     </ClCompile>
     <ClCompile Include="..\..\Source\ModulationVisualizer.cpp">
+      <Filter>BespokeSynth\Source\modules</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\Source\ModuleSaveDataPanel.cpp">
       <Filter>BespokeSynth\Source\modules</Filter>
     </ClCompile>
     <ClCompile Include="..\..\Source\ModWheel.cpp">
@@ -829,7 +721,22 @@
     <ClCompile Include="..\..\Source\Monophonify.cpp">
       <Filter>BespokeSynth\Source\modules</Filter>
     </ClCompile>
+    <ClCompile Include="..\..\Source\MultibandCompressor.cpp">
+      <Filter>BespokeSynth\Source\modules</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\Source\MultitrackRecorder.cpp">
+      <Filter>BespokeSynth\Source\modules</Filter>
+    </ClCompile>
     <ClCompile Include="..\..\Source\Neighborhooder.cpp">
+      <Filter>BespokeSynth\Source\modules</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\Source\NoteCanvas.cpp">
+      <Filter>BespokeSynth\Source\modules</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\Source\NoteChainNode.cpp">
+      <Filter>BespokeSynth\Source\modules</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\Source\NoteCreator.cpp">
       <Filter>BespokeSynth\Source\modules</Filter>
     </ClCompile>
     <ClCompile Include="..\..\Source\NoteDelayer.cpp">
@@ -847,88 +754,196 @@
     <ClCompile Include="..\..\Source\NoteGate.cpp">
       <Filter>BespokeSynth\Source\modules</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\Source\Arpeggiator.cpp">
+    <ClCompile Include="..\..\Source\NoteLooper.cpp">
       <Filter>BespokeSynth\Source\modules</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\Source\Chorder.cpp">
+    <ClCompile Include="..\..\Source\NoteOctaver.cpp">
       <Filter>BespokeSynth\Source\modules</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\Source\StutterControl.cpp">
-      <Filter>BespokeSynth\Source\modules</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\Source\EffectChain.cpp">
-      <Filter>BespokeSynth\Source\modules</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\Source\BiquadFilterEffect.cpp">
-      <Filter>BespokeSynth\Source\modules</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\Source\FMSynth.cpp">
-      <Filter>BespokeSynth\Source\modules</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\Source\Sampler.cpp">
-      <Filter>BespokeSynth\Source\modules</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\Source\KarplusStrong.cpp">
-      <Filter>BespokeSynth\Source\modules</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\Source\SingleOscillator.cpp">
+    <ClCompile Include="..\..\Source\NoteRouter.cpp">
       <Filter>BespokeSynth\Source\modules</Filter>
     </ClCompile>
     <ClCompile Include="..\..\Source\NoteSequencerColumn.cpp">
       <Filter>BespokeSynth\Source\modules</Filter>
     </ClCompile>
+    <ClCompile Include="..\..\Source\NoteSinger.cpp">
+      <Filter>BespokeSynth\Source\modules</Filter>
+    </ClCompile>
     <ClCompile Include="..\..\Source\NoteStepSequencer.cpp">
       <Filter>BespokeSynth\Source\modules</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\Source\Stereofier.cpp">
+    <ClCompile Include="..\..\Source\NoteSustain.cpp">
       <Filter>BespokeSynth\Source\modules</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\Source\LFOController.cpp">
+    <ClCompile Include="..\..\Source\NoteToFreq.cpp">
       <Filter>BespokeSynth\Source\modules</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\Source\Scale.cpp">
+    <ClCompile Include="..\..\Source\NoteToMs.cpp">
       <Filter>BespokeSynth\Source\modules</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\Source\Transport.cpp">
+    <ClCompile Include="..\..\Source\NoteTransformer.cpp">
       <Filter>BespokeSynth\Source\modules</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\Source\HelpDisplay.cpp">
+    <ClCompile Include="..\..\Source\NoteVibrato.cpp">
       <Filter>BespokeSynth\Source\modules</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\Source\ModuleSaveDataPanel.cpp">
-      <Filter>BespokeSynth\Source\modules</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\Source\ChaosEngine.cpp">
-      <Filter>BespokeSynth\Source\modules</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\Source\TitleBar.cpp">
-      <Filter>BespokeSynth\Source\modules</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\Source\GridController.cpp">
-      <Filter>BespokeSynth\Source\modules</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\Source\MidiController.cpp">
-      <Filter>BespokeSynth\Source\modules</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\Source\MidiInstrument.cpp">
-      <Filter>BespokeSynth\Source\modules</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\Source\InputChannel.cpp">
+    <ClCompile Include="..\..\Source\OneShotLauncher.cpp">
       <Filter>BespokeSynth\Source\modules</Filter>
     </ClCompile>
     <ClCompile Include="..\..\Source\OutputChannel.cpp">
       <Filter>BespokeSynth\Source\modules</Filter>
     </ClCompile>
+    <ClCompile Include="..\..\Source\PanicButton.cpp">
+      <Filter>BespokeSynth\Source\modules</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\Source\PitchBender.cpp">
+      <Filter>BespokeSynth\Source\modules</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\Source\PitchChorus.cpp">
+      <Filter>BespokeSynth\Source\modules</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\Source\PitchDive.cpp">
+      <Filter>BespokeSynth\Source\modules</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\Source\PitchSetter.cpp">
+      <Filter>BespokeSynth\Source\modules</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\Source\Polyrhythms.cpp">
+      <Filter>BespokeSynth\Source\modules</Filter>
+    </ClCompile>
     <ClCompile Include="..\..\Source\Presets.cpp">
+      <Filter>BespokeSynth\Source\modules</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\Source\Pressure.cpp">
+      <Filter>BespokeSynth\Source\modules</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\Source\PressureToModwheel.cpp">
+      <Filter>BespokeSynth\Source\modules</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\Source\PressureToVibrato.cpp">
+      <Filter>BespokeSynth\Source\modules</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\Source\PreviousNote.cpp">
+      <Filter>BespokeSynth\Source\modules</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\Source\Producer.cpp">
+      <Filter>BespokeSynth\Source\modules</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\Source\PSMoveController.cpp">
+      <Filter>BespokeSynth\Source\modules</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\Source\Ramper.cpp">
+      <Filter>BespokeSynth\Source\modules</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\Source\RandomNoteGenerator.cpp">
+      <Filter>BespokeSynth\Source\modules</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\Source\Razor.cpp">
+      <Filter>BespokeSynth\Source\modules</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\Source\Rewriter.cpp">
+      <Filter>BespokeSynth\Source\modules</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\Source\RingModulator.cpp">
+      <Filter>BespokeSynth\Source\modules</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\Source\SampleBank.cpp">
+      <Filter>BespokeSynth\Source\modules</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\Source\SampleCanvas.cpp">
+      <Filter>BespokeSynth\Source\modules</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\Source\SampleFinder.cpp">
+      <Filter>BespokeSynth\Source\modules</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\Source\SamplePlayer.cpp">
+      <Filter>BespokeSynth\Source\modules</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\Source\Sampler.cpp">
+      <Filter>BespokeSynth\Source\modules</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\Source\SamplerGrid.cpp">
+      <Filter>BespokeSynth\Source\modules</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\Source\Scale.cpp">
+      <Filter>BespokeSynth\Source\modules</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\Source\ScaleDegree.cpp">
+      <Filter>BespokeSynth\Source\modules</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\Source\ScaleDetect.cpp">
+      <Filter>BespokeSynth\Source\modules</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\Source\SeaOfGrain.cpp">
+      <Filter>BespokeSynth\Source\modules</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\Source\Selector.cpp">
       <Filter>BespokeSynth\Source\modules</Filter>
     </ClCompile>
     <ClCompile Include="..\..\Source\SignalGenerator.cpp">
       <Filter>BespokeSynth\Source\modules</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\Source\ControlSequencer.cpp">
+    <ClCompile Include="..\..\Source\SingleOscillator.cpp">
       <Filter>BespokeSynth\Source\modules</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\Source\FreeverbOutput.cpp">
+    <ClCompile Include="..\..\Source\SliderSequencer.cpp">
+      <Filter>BespokeSynth\Source\modules</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\Source\SlowLayers.cpp">
+      <Filter>BespokeSynth\Source\modules</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\Source\StepSequencer.cpp">
+      <Filter>BespokeSynth\Source\modules</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\Source\Stereofier.cpp">
+      <Filter>BespokeSynth\Source\modules</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\Source\StutterControl.cpp">
+      <Filter>BespokeSynth\Source\modules</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\Source\SustainPedal.cpp">
+      <Filter>BespokeSynth\Source\modules</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\Source\TimelineControl.cpp">
+      <Filter>BespokeSynth\Source\modules</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\Source\TimerDisplay.cpp">
+      <Filter>BespokeSynth\Source\modules</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\Source\TitleBar.cpp">
+      <Filter>BespokeSynth\Source\modules</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\Source\Transport.cpp">
+      <Filter>BespokeSynth\Source\modules</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\Source\ValueSetter.cpp">
+      <Filter>BespokeSynth\Source\modules</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\Source\VelocityScaler.cpp">
+      <Filter>BespokeSynth\Source\modules</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\Source\VelocitySetter.cpp">
+      <Filter>BespokeSynth\Source\modules</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\Source\VelocityStepSequencer.cpp">
+      <Filter>BespokeSynth\Source\modules</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\Source\VinylTempoControl.cpp">
+      <Filter>BespokeSynth\Source\modules</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\Source\Vocoder.cpp">
+      <Filter>BespokeSynth\Source\modules</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\Source\VocoderCarrierInput.cpp">
+      <Filter>BespokeSynth\Source\modules</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\Source\VSTPlugin.cpp">
+      <Filter>BespokeSynth\Source\modules</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\Source\WaveformViewer.cpp">
+      <Filter>BespokeSynth\Source\modules</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\Source\WhiteKeys.cpp">
       <Filter>BespokeSynth\Source\modules</Filter>
     </ClCompile>
     <ClCompile Include="..\..\Source\ClickButton.cpp">
@@ -952,12 +967,6 @@
     <ClCompile Include="..\..\Source\IUIControl.cpp">
       <Filter>BespokeSynth\Source\uicontrols</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\Source\vinylcontrol\timecoder.c">
-      <Filter>BespokeSynth\Source\vinylcontrol</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\Source\vinylcontrol\vinylcontrol.cpp">
-      <Filter>BespokeSynth\Source\vinylcontrol</Filter>
-    </ClCompile>
     <ClCompile Include="..\..\Source\AdditiveVoice.cpp">
       <Filter>BespokeSynth\Source</Filter>
     </ClCompile>
@@ -968,6 +977,9 @@
       <Filter>BespokeSynth\Source</Filter>
     </ClCompile>
     <ClCompile Include="..\..\Source\ArrangementMaster.cpp">
+      <Filter>BespokeSynth\Source</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\Source\Bespoke_Platform.cpp">
       <Filter>BespokeSynth\Source</Filter>
     </ClCompile>
     <ClCompile Include="..\..\Source\BiquadFilter.cpp">
@@ -2440,6 +2452,9 @@
     <ClCompile Include="..\..\..\JUCE\modules\juce_gui_basics\layout\juce_ConcertinaPanel.cpp">
       <Filter>Juce Modules\juce_gui_basics\layout</Filter>
     </ClCompile>
+    <ClCompile Include="..\..\..\JUCE\modules\juce_gui_basics\layout\juce_FlexBox.cpp">
+      <Filter>Juce Modules\juce_gui_basics\layout</Filter>
+    </ClCompile>
     <ClCompile Include="..\..\..\JUCE\modules\juce_gui_basics\layout\juce_GroupComponent.cpp">
       <Filter>Juce Modules\juce_gui_basics\layout</Filter>
     </ClCompile>
@@ -3051,184 +3066,25 @@
     <ClInclude Include="..\..\Source\psmove\PSMoveMgr.h">
       <Filter>BespokeSynth\Source\libraries\psmove</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\Source\PSMoveController.h">
+    <ClInclude Include="..\..\Source\vinylcontrol\timecoder.h">
+      <Filter>BespokeSynth\Source\libraries\vinylcontrol</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\Source\vinylcontrol\vinylcontrol.h">
+      <Filter>BespokeSynth\Source\libraries\vinylcontrol</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\Source\ADSRTrigger.h">
       <Filter>BespokeSynth\Source\modules</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\Source\KompleteKontrol.h">
+    <ClInclude Include="..\..\Source\Amplifier.h">
       <Filter>BespokeSynth\Source\modules</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\Source\VSTPlugin.h">
+    <ClInclude Include="..\..\Source\Arpeggiator.h">
       <Filter>BespokeSynth\Source\modules</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\Source\ClipArranger.h">
+    <ClInclude Include="..\..\Source\AudioMeter.h">
       <Filter>BespokeSynth\Source\modules</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\Source\WaveformViewer.h">
-      <Filter>BespokeSynth\Source\modules</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\Source\VinylTempoControl.h">
-      <Filter>BespokeSynth\Source\modules</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\Source\SampleFinder.h">
-      <Filter>BespokeSynth\Source\modules</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\Source\MidiOutput.h">
-      <Filter>BespokeSynth\Source\modules</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\Source\MultibandCompressor.h">
-      <Filter>BespokeSynth\Source\modules</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\Source\MultitrackRecorder.h">
-      <Filter>BespokeSynth\Source\modules</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\Source\OneShotLauncher.h">
-      <Filter>BespokeSynth\Source\modules</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\Source\Producer.h">
-      <Filter>BespokeSynth\Source\modules</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\Source\SamplePlayer.h">
-      <Filter>BespokeSynth\Source\modules</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\Source\SamplerGrid.h">
-      <Filter>BespokeSynth\Source\modules</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\Source\RingModulator.h">
-      <Filter>BespokeSynth\Source\modules</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\Source\SampleCanvas.h">
-      <Filter>BespokeSynth\Source\modules</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\Source\RandomNoteGenerator.h">
-      <Filter>BespokeSynth\Source\modules</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\Source\Razor.h">
-      <Filter>BespokeSynth\Source\modules</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\Source\PanicButton.h">
-      <Filter>BespokeSynth\Source\modules</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\Source\PitchChorus.h">
-      <Filter>BespokeSynth\Source\modules</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\Source\Polyrhythms.h">
-      <Filter>BespokeSynth\Source\modules</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\Source\Ramper.h">
-      <Filter>BespokeSynth\Source\modules</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\Source\NoteChainNode.h">
-      <Filter>BespokeSynth\Source\modules</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\Source\NoteCreator.h">
-      <Filter>BespokeSynth\Source\modules</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\Source\NoteSinger.h">
-      <Filter>BespokeSynth\Source\modules</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\Source\NoteToFreq.h">
-      <Filter>BespokeSynth\Source\modules</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\Source\NoteToMs.h">
-      <Filter>BespokeSynth\Source\modules</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\Source\Lissajous.h">
-      <Filter>BespokeSynth\Source\modules</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\Source\MacroSlider.h">
-      <Filter>BespokeSynth\Source\modules</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\Source\Metronome.h">
-      <Filter>BespokeSynth\Source\modules</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\Source\SeaOfGrain.h">
-      <Filter>BespokeSynth\Source\modules</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\Source\Selector.h">
-      <Filter>BespokeSynth\Source\modules</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\Source\SliderSequencer.h">
-      <Filter>BespokeSynth\Source\modules</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\Source\SlowLayers.h">
-      <Filter>BespokeSynth\Source\modules</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\Source\TimelineControl.h">
-      <Filter>BespokeSynth\Source\modules</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\Source\TimerDisplay.h">
-      <Filter>BespokeSynth\Source\modules</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\Source\ValueSetter.h">
-      <Filter>BespokeSynth\Source\modules</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\Source\FFTtoAdditive.h">
-      <Filter>BespokeSynth\Source\modules</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\Source\FollowingSong.h">
-      <Filter>BespokeSynth\Source\modules</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\Source\FreqDomainBoilerplate.h">
-      <Filter>BespokeSynth\Source\modules</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\Source\GridToDrums.h">
-      <Filter>BespokeSynth\Source\modules</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\Source\GroupControl.h">
-      <Filter>BespokeSynth\Source\modules</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\Source\Kicker.h">
-      <Filter>BespokeSynth\Source\modules</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\Source\ControllingSong.h">
-      <Filter>BespokeSynth\Source\modules</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\Source\ControlTactileFeedback.h">
-      <Filter>BespokeSynth\Source\modules</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\Source\CurveLooper.h">
-      <Filter>BespokeSynth\Source\modules</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\Source\DebugAudioSource.h">
-      <Filter>BespokeSynth\Source\modules</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\Source\CircleSequencer.h">
-      <Filter>BespokeSynth\Source\modules</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\Source\ClipLauncher.h">
-      <Filter>BespokeSynth\Source\modules</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\Source\ComboGridController.h">
-      <Filter>BespokeSynth\Source\modules</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\Source\CommentDisplay.h">
-      <Filter>BespokeSynth\Source\modules</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\Source\LaunchpadKeyboard.h">
-      <Filter>BespokeSynth\Source\modules</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\Source\LaunchpadNoteDisplayer.h">
-      <Filter>BespokeSynth\Source\modules</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\Source\FeedbackModule.h">
-      <Filter>BespokeSynth\Source\modules</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\Source\FourOnTheFloor.h">
-      <Filter>BespokeSynth\Source\modules</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\Source\FreqDelay.h">
-      <Filter>BespokeSynth\Source\modules</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\Source\EventCanvas.h">
-      <Filter>BespokeSynth\Source\modules</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\Source\NoteCanvas.h">
-      <Filter>BespokeSynth\Source\modules</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\Source\Vocoder.h">
-      <Filter>BespokeSynth\Source\modules</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\Source\VocoderCarrierInput.h">
+    <ClInclude Include="..\..\Source\AudioRouter.h">
       <Filter>BespokeSynth\Source\modules</Filter>
     </ClInclude>
     <ClInclude Include="..\..\Source\Autotalent.h">
@@ -3243,22 +3099,121 @@
     <ClInclude Include="..\..\Source\Beats.h">
       <Filter>BespokeSynth\Source\modules</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\Source\AudioMeter.h">
+    <ClInclude Include="..\..\Source\BiquadFilterEffect.h">
       <Filter>BespokeSynth\Source\modules</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\Source\Amplifier.h">
+    <ClInclude Include="..\..\Source\Capo.h">
       <Filter>BespokeSynth\Source\modules</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\Source\StepSequencer.h">
+    <ClInclude Include="..\..\Source\ChaosEngine.h">
       <Filter>BespokeSynth\Source\modules</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\Source\AudioRouter.h">
+    <ClInclude Include="..\..\Source\Chorder.h">
       <Filter>BespokeSynth\Source\modules</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\Source\Rewriter.h">
+    <ClInclude Include="..\..\Source\CircleSequencer.h">
       <Filter>BespokeSynth\Source\modules</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\Source\SampleBank.h">
+    <ClInclude Include="..\..\Source\ClipArranger.h">
+      <Filter>BespokeSynth\Source\modules</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\Source\ClipLauncher.h">
+      <Filter>BespokeSynth\Source\modules</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\Source\ComboGridController.h">
+      <Filter>BespokeSynth\Source\modules</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\Source\CommentDisplay.h">
+      <Filter>BespokeSynth\Source\modules</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\Source\ControllingSong.h">
+      <Filter>BespokeSynth\Source\modules</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\Source\ControlSequencer.h">
+      <Filter>BespokeSynth\Source\modules</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\Source\ControlTactileFeedback.h">
+      <Filter>BespokeSynth\Source\modules</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\Source\CurveLooper.h">
+      <Filter>BespokeSynth\Source\modules</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\Source\DebugAudioSource.h">
+      <Filter>BespokeSynth\Source\modules</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\Source\DrumPlayer.h">
+      <Filter>BespokeSynth\Source\modules</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\Source\DrumSynth.h">
+      <Filter>BespokeSynth\Source\modules</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\Source\EffectChain.h">
+      <Filter>BespokeSynth\Source\modules</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\Source\EventCanvas.h">
+      <Filter>BespokeSynth\Source\modules</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\Source\FeedbackModule.h">
+      <Filter>BespokeSynth\Source\modules</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\Source\FFTtoAdditive.h">
+      <Filter>BespokeSynth\Source\modules</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\Source\FMSynth.h">
+      <Filter>BespokeSynth\Source\modules</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\Source\FollowingSong.h">
+      <Filter>BespokeSynth\Source\modules</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\Source\FourOnTheFloor.h">
+      <Filter>BespokeSynth\Source\modules</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\Source\FreeverbOutput.h">
+      <Filter>BespokeSynth\Source\modules</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\Source\FreqDelay.h">
+      <Filter>BespokeSynth\Source\modules</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\Source\FreqDomainBoilerplate.h">
+      <Filter>BespokeSynth\Source\modules</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\Source\GridController.h">
+      <Filter>BespokeSynth\Source\modules</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\Source\GridToDrums.h">
+      <Filter>BespokeSynth\Source\modules</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\Source\GroupControl.h">
+      <Filter>BespokeSynth\Source\modules</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\Source\HelpDisplay.h">
+      <Filter>BespokeSynth\Source\modules</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\Source\InputChannel.h">
+      <Filter>BespokeSynth\Source\modules</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\Source\KarplusStrong.h">
+      <Filter>BespokeSynth\Source\modules</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\Source\KeyboardDisplay.h">
+      <Filter>BespokeSynth\Source\modules</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\Source\Kicker.h">
+      <Filter>BespokeSynth\Source\modules</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\Source\KompleteKontrol.h">
+      <Filter>BespokeSynth\Source\modules</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\Source\LaunchpadKeyboard.h">
+      <Filter>BespokeSynth\Source\modules</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\Source\LaunchpadNoteDisplayer.h">
+      <Filter>BespokeSynth\Source\modules</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\Source\LFOController.h">
+      <Filter>BespokeSynth\Source\modules</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\Source\Lissajous.h">
       <Filter>BespokeSynth\Source\modules</Filter>
     </ClInclude>
     <ClInclude Include="..\..\Source\Looper.h">
@@ -3270,82 +3225,25 @@
     <ClInclude Include="..\..\Source\LoopStorer.h">
       <Filter>BespokeSynth\Source\modules</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\Source\DrumPlayer.h">
+    <ClInclude Include="..\..\Source\MacroSlider.h">
       <Filter>BespokeSynth\Source\modules</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\Source\DrumSynth.h">
+    <ClInclude Include="..\..\Source\Metronome.h">
       <Filter>BespokeSynth\Source\modules</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\Source\ADSRTrigger.h">
+    <ClInclude Include="..\..\Source\MidiController.h">
       <Filter>BespokeSynth\Source\modules</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\Source\NoteLooper.h">
+    <ClInclude Include="..\..\Source\MidiInstrument.h">
       <Filter>BespokeSynth\Source\modules</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\Source\NoteOctaver.h">
-      <Filter>BespokeSynth\Source\modules</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\Source\NoteRouter.h">
-      <Filter>BespokeSynth\Source\modules</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\Source\NoteSustain.h">
-      <Filter>BespokeSynth\Source\modules</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\Source\NoteTransformer.h">
-      <Filter>BespokeSynth\Source\modules</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\Source\NoteVibrato.h">
-      <Filter>BespokeSynth\Source\modules</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\Source\PitchBender.h">
-      <Filter>BespokeSynth\Source\modules</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\Source\PitchDive.h">
-      <Filter>BespokeSynth\Source\modules</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\Source\PitchSetter.h">
-      <Filter>BespokeSynth\Source\modules</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\Source\Pressure.h">
-      <Filter>BespokeSynth\Source\modules</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\Source\PressureToModwheel.h">
-      <Filter>BespokeSynth\Source\modules</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\Source\PressureToVibrato.h">
-      <Filter>BespokeSynth\Source\modules</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\Source\PreviousNote.h">
-      <Filter>BespokeSynth\Source\modules</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\Source\ScaleDegree.h">
-      <Filter>BespokeSynth\Source\modules</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\Source\ScaleDetect.h">
-      <Filter>BespokeSynth\Source\modules</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\Source\SustainPedal.h">
-      <Filter>BespokeSynth\Source\modules</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\Source\VelocityScaler.h">
-      <Filter>BespokeSynth\Source\modules</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\Source\VelocitySetter.h">
-      <Filter>BespokeSynth\Source\modules</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\Source\VelocityStepSequencer.h">
-      <Filter>BespokeSynth\Source\modules</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\Source\WhiteKeys.h">
-      <Filter>BespokeSynth\Source\modules</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\Source\Capo.h">
-      <Filter>BespokeSynth\Source\modules</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\Source\KeyboardDisplay.h">
+    <ClInclude Include="..\..\Source\MidiOutput.h">
       <Filter>BespokeSynth\Source\modules</Filter>
     </ClInclude>
     <ClInclude Include="..\..\Source\ModulationVisualizer.h">
+      <Filter>BespokeSynth\Source\modules</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\Source\ModuleSaveDataPanel.h">
       <Filter>BespokeSynth\Source\modules</Filter>
     </ClInclude>
     <ClInclude Include="..\..\Source\ModWheel.h">
@@ -3360,7 +3258,22 @@
     <ClInclude Include="..\..\Source\Monophonify.h">
       <Filter>BespokeSynth\Source\modules</Filter>
     </ClInclude>
+    <ClInclude Include="..\..\Source\MultibandCompressor.h">
+      <Filter>BespokeSynth\Source\modules</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\Source\MultitrackRecorder.h">
+      <Filter>BespokeSynth\Source\modules</Filter>
+    </ClInclude>
     <ClInclude Include="..\..\Source\Neighborhooder.h">
+      <Filter>BespokeSynth\Source\modules</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\Source\NoteCanvas.h">
+      <Filter>BespokeSynth\Source\modules</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\Source\NoteChainNode.h">
+      <Filter>BespokeSynth\Source\modules</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\Source\NoteCreator.h">
       <Filter>BespokeSynth\Source\modules</Filter>
     </ClInclude>
     <ClInclude Include="..\..\Source\NoteDelayer.h">
@@ -3378,88 +3291,196 @@
     <ClInclude Include="..\..\Source\NoteGate.h">
       <Filter>BespokeSynth\Source\modules</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\Source\Arpeggiator.h">
+    <ClInclude Include="..\..\Source\NoteLooper.h">
       <Filter>BespokeSynth\Source\modules</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\Source\Chorder.h">
+    <ClInclude Include="..\..\Source\NoteOctaver.h">
       <Filter>BespokeSynth\Source\modules</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\Source\StutterControl.h">
-      <Filter>BespokeSynth\Source\modules</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\Source\EffectChain.h">
-      <Filter>BespokeSynth\Source\modules</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\Source\BiquadFilterEffect.h">
-      <Filter>BespokeSynth\Source\modules</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\Source\FMSynth.h">
-      <Filter>BespokeSynth\Source\modules</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\Source\Sampler.h">
-      <Filter>BespokeSynth\Source\modules</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\Source\KarplusStrong.h">
-      <Filter>BespokeSynth\Source\modules</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\Source\SingleOscillator.h">
+    <ClInclude Include="..\..\Source\NoteRouter.h">
       <Filter>BespokeSynth\Source\modules</Filter>
     </ClInclude>
     <ClInclude Include="..\..\Source\NoteSequencerColumn.h">
       <Filter>BespokeSynth\Source\modules</Filter>
     </ClInclude>
+    <ClInclude Include="..\..\Source\NoteSinger.h">
+      <Filter>BespokeSynth\Source\modules</Filter>
+    </ClInclude>
     <ClInclude Include="..\..\Source\NoteStepSequencer.h">
       <Filter>BespokeSynth\Source\modules</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\Source\Stereofier.h">
+    <ClInclude Include="..\..\Source\NoteSustain.h">
       <Filter>BespokeSynth\Source\modules</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\Source\LFOController.h">
+    <ClInclude Include="..\..\Source\NoteToFreq.h">
       <Filter>BespokeSynth\Source\modules</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\Source\Scale.h">
+    <ClInclude Include="..\..\Source\NoteToMs.h">
       <Filter>BespokeSynth\Source\modules</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\Source\Transport.h">
+    <ClInclude Include="..\..\Source\NoteTransformer.h">
       <Filter>BespokeSynth\Source\modules</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\Source\HelpDisplay.h">
+    <ClInclude Include="..\..\Source\NoteVibrato.h">
       <Filter>BespokeSynth\Source\modules</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\Source\ModuleSaveDataPanel.h">
-      <Filter>BespokeSynth\Source\modules</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\Source\ChaosEngine.h">
-      <Filter>BespokeSynth\Source\modules</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\Source\TitleBar.h">
-      <Filter>BespokeSynth\Source\modules</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\Source\GridController.h">
-      <Filter>BespokeSynth\Source\modules</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\Source\MidiController.h">
-      <Filter>BespokeSynth\Source\modules</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\Source\MidiInstrument.h">
-      <Filter>BespokeSynth\Source\modules</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\Source\InputChannel.h">
+    <ClInclude Include="..\..\Source\OneShotLauncher.h">
       <Filter>BespokeSynth\Source\modules</Filter>
     </ClInclude>
     <ClInclude Include="..\..\Source\OutputChannel.h">
       <Filter>BespokeSynth\Source\modules</Filter>
     </ClInclude>
+    <ClInclude Include="..\..\Source\PanicButton.h">
+      <Filter>BespokeSynth\Source\modules</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\Source\PitchBender.h">
+      <Filter>BespokeSynth\Source\modules</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\Source\PitchChorus.h">
+      <Filter>BespokeSynth\Source\modules</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\Source\PitchDive.h">
+      <Filter>BespokeSynth\Source\modules</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\Source\PitchSetter.h">
+      <Filter>BespokeSynth\Source\modules</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\Source\Polyrhythms.h">
+      <Filter>BespokeSynth\Source\modules</Filter>
+    </ClInclude>
     <ClInclude Include="..\..\Source\Presets.h">
+      <Filter>BespokeSynth\Source\modules</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\Source\Pressure.h">
+      <Filter>BespokeSynth\Source\modules</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\Source\PressureToModwheel.h">
+      <Filter>BespokeSynth\Source\modules</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\Source\PressureToVibrato.h">
+      <Filter>BespokeSynth\Source\modules</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\Source\PreviousNote.h">
+      <Filter>BespokeSynth\Source\modules</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\Source\Producer.h">
+      <Filter>BespokeSynth\Source\modules</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\Source\PSMoveController.h">
+      <Filter>BespokeSynth\Source\modules</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\Source\Ramper.h">
+      <Filter>BespokeSynth\Source\modules</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\Source\RandomNoteGenerator.h">
+      <Filter>BespokeSynth\Source\modules</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\Source\Razor.h">
+      <Filter>BespokeSynth\Source\modules</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\Source\Rewriter.h">
+      <Filter>BespokeSynth\Source\modules</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\Source\RingModulator.h">
+      <Filter>BespokeSynth\Source\modules</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\Source\SampleBank.h">
+      <Filter>BespokeSynth\Source\modules</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\Source\SampleCanvas.h">
+      <Filter>BespokeSynth\Source\modules</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\Source\SampleFinder.h">
+      <Filter>BespokeSynth\Source\modules</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\Source\SamplePlayer.h">
+      <Filter>BespokeSynth\Source\modules</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\Source\Sampler.h">
+      <Filter>BespokeSynth\Source\modules</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\Source\SamplerGrid.h">
+      <Filter>BespokeSynth\Source\modules</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\Source\Scale.h">
+      <Filter>BespokeSynth\Source\modules</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\Source\ScaleDegree.h">
+      <Filter>BespokeSynth\Source\modules</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\Source\ScaleDetect.h">
+      <Filter>BespokeSynth\Source\modules</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\Source\SeaOfGrain.h">
+      <Filter>BespokeSynth\Source\modules</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\Source\Selector.h">
       <Filter>BespokeSynth\Source\modules</Filter>
     </ClInclude>
     <ClInclude Include="..\..\Source\SignalGenerator.h">
       <Filter>BespokeSynth\Source\modules</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\Source\ControlSequencer.h">
+    <ClInclude Include="..\..\Source\SingleOscillator.h">
       <Filter>BespokeSynth\Source\modules</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\Source\FreeverbOutput.h">
+    <ClInclude Include="..\..\Source\SliderSequencer.h">
+      <Filter>BespokeSynth\Source\modules</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\Source\SlowLayers.h">
+      <Filter>BespokeSynth\Source\modules</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\Source\StepSequencer.h">
+      <Filter>BespokeSynth\Source\modules</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\Source\Stereofier.h">
+      <Filter>BespokeSynth\Source\modules</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\Source\StutterControl.h">
+      <Filter>BespokeSynth\Source\modules</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\Source\SustainPedal.h">
+      <Filter>BespokeSynth\Source\modules</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\Source\TimelineControl.h">
+      <Filter>BespokeSynth\Source\modules</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\Source\TimerDisplay.h">
+      <Filter>BespokeSynth\Source\modules</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\Source\TitleBar.h">
+      <Filter>BespokeSynth\Source\modules</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\Source\Transport.h">
+      <Filter>BespokeSynth\Source\modules</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\Source\ValueSetter.h">
+      <Filter>BespokeSynth\Source\modules</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\Source\VelocityScaler.h">
+      <Filter>BespokeSynth\Source\modules</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\Source\VelocitySetter.h">
+      <Filter>BespokeSynth\Source\modules</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\Source\VelocityStepSequencer.h">
+      <Filter>BespokeSynth\Source\modules</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\Source\VinylTempoControl.h">
+      <Filter>BespokeSynth\Source\modules</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\Source\Vocoder.h">
+      <Filter>BespokeSynth\Source\modules</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\Source\VocoderCarrierInput.h">
+      <Filter>BespokeSynth\Source\modules</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\Source\VSTPlugin.h">
+      <Filter>BespokeSynth\Source\modules</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\Source\WaveformViewer.h">
+      <Filter>BespokeSynth\Source\modules</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\Source\WhiteKeys.h">
       <Filter>BespokeSynth\Source\modules</Filter>
     </ClInclude>
     <ClInclude Include="..\..\Source\ClickButton.h">
@@ -3482,12 +3503,6 @@
     </ClInclude>
     <ClInclude Include="..\..\Source\IUIControl.h">
       <Filter>BespokeSynth\Source\uicontrols</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\Source\vinylcontrol\timecoder.h">
-      <Filter>BespokeSynth\Source\vinylcontrol</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\Source\vinylcontrol\vinylcontrol.h">
-      <Filter>BespokeSynth\Source\vinylcontrol</Filter>
     </ClInclude>
     <ClInclude Include="..\..\Source\AdditiveVoice.h">
       <Filter>BespokeSynth\Source</Filter>
@@ -4177,6 +4192,9 @@
       <Filter>Juce Modules\juce_audio_processors\format_types</Filter>
     </ClInclude>
     <ClInclude Include="..\..\..\JUCE\modules\juce_audio_processors\format_types\juce_VST3PluginFormat.h">
+      <Filter>Juce Modules\juce_audio_processors\format_types</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\JUCE\modules\juce_audio_processors\format_types\juce_VSTInterface.h">
       <Filter>Juce Modules\juce_audio_processors\format_types</Filter>
     </ClInclude>
     <ClInclude Include="..\..\..\JUCE\modules\juce_audio_processors\format_types\juce_VSTMidiEventList.h">
@@ -5128,6 +5146,12 @@
       <Filter>Juce Modules\juce_gui_basics\layout</Filter>
     </ClInclude>
     <ClInclude Include="..\..\..\JUCE\modules\juce_gui_basics\layout\juce_ConcertinaPanel.h">
+      <Filter>Juce Modules\juce_gui_basics\layout</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\JUCE\modules\juce_gui_basics\layout\juce_FlexBox.h">
+      <Filter>Juce Modules\juce_gui_basics\layout</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\JUCE\modules\juce_gui_basics\layout\juce_FlexItem.h">
       <Filter>Juce Modules\juce_gui_basics\layout</Filter>
     </ClInclude>
     <ClInclude Include="..\..\..\JUCE\modules\juce_gui_basics\layout\juce_GroupComponent.h">

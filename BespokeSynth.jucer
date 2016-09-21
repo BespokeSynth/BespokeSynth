@@ -2,7 +2,7 @@
 
 <JUCERPROJECT id="vxkFwd" name="BespokeSynth" projectType="guiapp" version="1.0.0"
               bundleIdentifier="com.ryanchallinor.Bespoke" includeBinaryInAppConfig="1"
-              jucerVersion="4.2.3">
+              jucerVersion="4.2.4">
   <MAINGROUP id="w4HLAu" name="BespokeSynth">
     <GROUP id="{6E8FD6E1-BA74-3B09-455D-05C0CB629767}" name="Source">
       <GROUP id="{E0D1A2A4-1AAE-4BEB-542A-DDE85633AE4D}" name="effects">
@@ -60,15 +60,17 @@
       </GROUP>
       <GROUP id="{531CC336-D9CD-1F6E-7272-2D8ADD98F839}" name="libraries">
         <GROUP id="{44F08E27-A8F5-B33E-CC69-42EBE3B93B39}" name="CFMessaging">
-          <FILE id="q2RmKJ" name="KontrolKommunicator.cpp" compile="1" resource="0"
+          <FILE id="B8KK3T" name="Bespoke_CFMessaging.cpp" compile="1" resource="0"
+                file="Source/CFMessaging/Bespoke_CFMessaging.cpp"/>
+          <FILE id="q2RmKJ" name="KontrolKommunicator.cpp" compile="0" resource="0"
                 file="Source/CFMessaging/KontrolKommunicator.cpp"/>
           <FILE id="r0e8Gl" name="KontrolKommunicator.h" compile="0" resource="0"
                 file="Source/CFMessaging/KontrolKommunicator.h"/>
-          <FILE id="tZojHY" name="ListenPort.cpp" compile="1" resource="0" file="Source/CFMessaging/ListenPort.cpp"/>
+          <FILE id="tZojHY" name="ListenPort.cpp" compile="0" resource="0" file="Source/CFMessaging/ListenPort.cpp"/>
           <FILE id="Qq1uHa" name="ListenPort.h" compile="0" resource="0" file="Source/CFMessaging/ListenPort.h"/>
-          <FILE id="jfxXIW" name="NIMessage.cpp" compile="1" resource="0" file="Source/CFMessaging/NIMessage.cpp"/>
+          <FILE id="jfxXIW" name="NIMessage.cpp" compile="0" resource="0" file="Source/CFMessaging/NIMessage.cpp"/>
           <FILE id="UgQaPh" name="NIMessage.h" compile="0" resource="0" file="Source/CFMessaging/NIMessage.h"/>
-          <FILE id="tRWs50" name="SendPort.cpp" compile="1" resource="0" file="Source/CFMessaging/SendPort.cpp"/>
+          <FILE id="tRWs50" name="SendPort.cpp" compile="0" resource="0" file="Source/CFMessaging/SendPort.cpp"/>
           <FILE id="QnMeob" name="SendPort.h" compile="0" resource="0" file="Source/CFMessaging/SendPort.h"/>
         </GROUP>
         <GROUP id="{CD125793-5B1B-A09E-A02B-C794D860CB47}" name="freeverb">
@@ -84,11 +86,12 @@
         <GROUP id="{6676D702-1207-FE5C-9EC2-091B8A76E384}" name="glew">
           <GROUP id="{8A3BA50C-A7D8-CAFD-22A5-FD85A7C7A15B}" name="include">
             <GROUP id="{EF3C83BF-E0A5-4DFA-DA81-22BB2D864C81}" name="GL">
-              <FILE id="UGe1cR" name="glew.c" compile="1" resource="0" file="Source/glew/include/GL/glew.c"/>
+              <FILE id="UGe1cR" name="glew.c" compile="0" resource="0" file="Source/glew/include/GL/glew.c"/>
               <FILE id="IwV2yn" name="glew.h" compile="0" resource="0" file="Source/glew/include/GL/glew.h"/>
               <FILE id="dldSJy" name="wglew.h" compile="0" resource="0" file="Source/glew/include/GL/wglew.h"/>
             </GROUP>
           </GROUP>
+          <FILE id="zuPaHo" name="Bespoke_glew.c" compile="1" resource="0" file="Source/glew/Bespoke_glew.c"/>
         </GROUP>
         <GROUP id="{6B02F4EC-4FE1-B0D3-1ADF-69615860694B}" name="json">
           <GROUP id="{D5AAD910-C7FC-87F2-AF1B-9E729039A8BF}" name="include">
@@ -133,151 +136,59 @@
           <FILE id="KXZbBy" name="stb_truetype.h" compile="0" resource="0" file="Source/nanovg/stb_truetype.h"/>
         </GROUP>
         <GROUP id="{F7E2EFA2-0FE7-C7A5-2144-0503CB5A6A4A}" name="psmove">
-          <FILE id="XQF8rk" name="hid.c" compile="1" resource="0" file="Source/psmove/hid.c"/>
+          <FILE id="bGRQcF" name="Bespoke_PSMove.c" compile="1" resource="0"
+                file="Source/psmove/Bespoke_PSMove.c"/>
+          <FILE id="XQF8rk" name="hid.c" compile="0" resource="0" file="Source/psmove/hid.c"/>
           <FILE id="i0CRzJ" name="hidapi.h" compile="0" resource="0" file="Source/psmove/hidapi.h"/>
-          <FILE id="YxcjlF" name="psmove.c" compile="1" resource="0" file="Source/psmove/psmove.c"/>
+          <FILE id="YxcjlF" name="psmove.c" compile="0" resource="0" file="Source/psmove/psmove.c"/>
           <FILE id="R5jkmg" name="psmove.h" compile="0" resource="0" file="Source/psmove/psmove.h"/>
-          <FILE id="RR2d8F" name="PSMoveMgr.cpp" compile="1" resource="0" file="Source/psmove/PSMoveMgr.cpp"/>
+          <FILE id="RR2d8F" name="PSMoveMgr.cpp" compile="0" resource="0" file="Source/psmove/PSMoveMgr.cpp"/>
           <FILE id="DgQBhl" name="PSMoveMgr.h" compile="0" resource="0" file="Source/psmove/PSMoveMgr.h"/>
+        </GROUP>
+        <GROUP id="{17BD3427-0E14-197E-025B-41C989099F31}" name="vinylcontrol">
+          <FILE id="E50REB" name="timecoder.c" compile="1" resource="0" file="Source/vinylcontrol/timecoder.c"/>
+          <FILE id="oJd6k3" name="timecoder.h" compile="0" resource="0" file="Source/vinylcontrol/timecoder.h"/>
+          <FILE id="QnGD5P" name="vinylcontrol.cpp" compile="1" resource="0"
+                file="Source/vinylcontrol/vinylcontrol.cpp"/>
+          <FILE id="eSxSi9" name="vinylcontrol.h" compile="0" resource="0" file="Source/vinylcontrol/vinylcontrol.h"/>
         </GROUP>
       </GROUP>
       <GROUP id="{6781AC07-A090-A7AF-8D27-BCB6D9526ABD}" name="modules">
-        <FILE id="PLsFnE" name="PSMoveController.cpp" compile="1" resource="0"
-              file="Source/PSMoveController.cpp"/>
-        <FILE id="qiIX0Z" name="PSMoveController.h" compile="0" resource="0"
-              file="Source/PSMoveController.h"/>
-        <FILE id="xkPdry" name="KompleteKontrol.cpp" compile="1" resource="0"
-              file="Source/KompleteKontrol.cpp"/>
-        <FILE id="kpP4T7" name="KompleteKontrol.h" compile="0" resource="0"
-              file="Source/KompleteKontrol.h"/>
-        <FILE id="H3ZWO6" name="VSTPlugin.cpp" compile="1" resource="0" file="Source/VSTPlugin.cpp"/>
-        <FILE id="LJRSZs" name="VSTPlugin.h" compile="0" resource="0" file="Source/VSTPlugin.h"/>
-        <FILE id="lkbPyl" name="ClipArranger.cpp" compile="1" resource="0"
-              file="Source/ClipArranger.cpp"/>
-        <FILE id="RGWGtn" name="ClipArranger.h" compile="0" resource="0" file="Source/ClipArranger.h"/>
-        <FILE id="yvLapl" name="WaveformViewer.cpp" compile="1" resource="0"
-              file="Source/WaveformViewer.cpp"/>
-        <FILE id="XOErNb" name="WaveformViewer.h" compile="0" resource="0"
-              file="Source/WaveformViewer.h"/>
-        <FILE id="A3iWyh" name="VinylTempoControl.cpp" compile="1" resource="0"
-              file="Source/VinylTempoControl.cpp"/>
-        <FILE id="T2Jwjn" name="VinylTempoControl.h" compile="0" resource="0"
-              file="Source/VinylTempoControl.h"/>
-        <FILE id="Yr6QsW" name="SampleFinder.cpp" compile="1" resource="0"
-              file="Source/SampleFinder.cpp"/>
-        <FILE id="oW3Axq" name="SampleFinder.h" compile="0" resource="0" file="Source/SampleFinder.h"/>
-        <FILE id="xjJDtE" name="MidiOutput.cpp" compile="1" resource="0" file="Source/MidiOutput.cpp"/>
-        <FILE id="C85caL" name="MidiOutput.h" compile="0" resource="0" file="Source/MidiOutput.h"/>
-        <FILE id="U4pMmX" name="MultibandCompressor.cpp" compile="1" resource="0"
-              file="Source/MultibandCompressor.cpp"/>
-        <FILE id="vJgslt" name="MultibandCompressor.h" compile="0" resource="0"
-              file="Source/MultibandCompressor.h"/>
-        <FILE id="kxAFKp" name="MultitrackRecorder.cpp" compile="1" resource="0"
-              file="Source/MultitrackRecorder.cpp"/>
-        <FILE id="Z50Hgu" name="MultitrackRecorder.h" compile="0" resource="0"
-              file="Source/MultitrackRecorder.h"/>
-        <FILE id="mKSMoB" name="OneShotLauncher.cpp" compile="1" resource="0"
-              file="Source/OneShotLauncher.cpp"/>
-        <FILE id="yRtCv4" name="OneShotLauncher.h" compile="0" resource="0"
-              file="Source/OneShotLauncher.h"/>
-        <FILE id="oTrI6B" name="Producer.cpp" compile="1" resource="0" file="Source/Producer.cpp"/>
-        <FILE id="FzAJma" name="Producer.h" compile="0" resource="0" file="Source/Producer.h"/>
-        <FILE id="TLm9ej" name="SamplePlayer.cpp" compile="1" resource="0"
-              file="Source/SamplePlayer.cpp"/>
-        <FILE id="QOPRdO" name="SamplePlayer.h" compile="0" resource="0" file="Source/SamplePlayer.h"/>
-        <FILE id="TzcLi2" name="SamplerGrid.cpp" compile="1" resource="0" file="Source/SamplerGrid.cpp"/>
-        <FILE id="xnhs2D" name="SamplerGrid.h" compile="0" resource="0" file="Source/SamplerGrid.h"/>
-        <FILE id="QgGXc9" name="RingModulator.cpp" compile="1" resource="0"
-              file="Source/RingModulator.cpp"/>
-        <FILE id="Dl3D81" name="RingModulator.h" compile="0" resource="0" file="Source/RingModulator.h"/>
-        <FILE id="cI0jsx" name="SampleCanvas.cpp" compile="1" resource="0"
-              file="Source/SampleCanvas.cpp"/>
-        <FILE id="AIUzeX" name="SampleCanvas.h" compile="0" resource="0" file="Source/SampleCanvas.h"/>
-        <FILE id="lp2Icw" name="RandomNoteGenerator.cpp" compile="1" resource="0"
-              file="Source/RandomNoteGenerator.cpp"/>
-        <FILE id="C4WFpF" name="RandomNoteGenerator.h" compile="0" resource="0"
-              file="Source/RandomNoteGenerator.h"/>
-        <FILE id="euyovX" name="Razor.cpp" compile="1" resource="0" file="Source/Razor.cpp"/>
-        <FILE id="eFx1Uv" name="Razor.h" compile="0" resource="0" file="Source/Razor.h"/>
-        <FILE id="chUWZI" name="PanicButton.cpp" compile="1" resource="0" file="Source/PanicButton.cpp"/>
-        <FILE id="rEVLi6" name="PanicButton.h" compile="0" resource="0" file="Source/PanicButton.h"/>
-        <FILE id="xwgj92" name="PitchChorus.cpp" compile="1" resource="0" file="Source/PitchChorus.cpp"/>
-        <FILE id="Y8osY2" name="PitchChorus.h" compile="0" resource="0" file="Source/PitchChorus.h"/>
-        <FILE id="WrfYZh" name="Polyrhythms.cpp" compile="1" resource="0" file="Source/Polyrhythms.cpp"/>
-        <FILE id="Dxf5mJ" name="Polyrhythms.h" compile="0" resource="0" file="Source/Polyrhythms.h"/>
-        <FILE id="AAlplU" name="Ramper.cpp" compile="1" resource="0" file="Source/Ramper.cpp"/>
-        <FILE id="n8x1K2" name="Ramper.h" compile="0" resource="0" file="Source/Ramper.h"/>
-        <FILE id="paBl9j" name="NoteChainNode.cpp" compile="1" resource="0"
-              file="Source/NoteChainNode.cpp"/>
-        <FILE id="DIvcES" name="NoteChainNode.h" compile="0" resource="0" file="Source/NoteChainNode.h"/>
-        <FILE id="OYAkqX" name="NoteCreator.cpp" compile="1" resource="0" file="Source/NoteCreator.cpp"/>
-        <FILE id="GGwQnJ" name="NoteCreator.h" compile="0" resource="0" file="Source/NoteCreator.h"/>
-        <FILE id="IGmN6O" name="NoteSinger.cpp" compile="1" resource="0" file="Source/NoteSinger.cpp"/>
-        <FILE id="uWOTxD" name="NoteSinger.h" compile="0" resource="0" file="Source/NoteSinger.h"/>
-        <FILE id="RockxL" name="NoteToFreq.cpp" compile="1" resource="0" file="Source/NoteToFreq.cpp"/>
-        <FILE id="LKkPBi" name="NoteToFreq.h" compile="0" resource="0" file="Source/NoteToFreq.h"/>
-        <FILE id="XvPbXi" name="NoteToMs.cpp" compile="1" resource="0" file="Source/NoteToMs.cpp"/>
-        <FILE id="OiTWxt" name="NoteToMs.h" compile="0" resource="0" file="Source/NoteToMs.h"/>
-        <FILE id="CwoblA" name="Lissajous.cpp" compile="1" resource="0" file="Source/Lissajous.cpp"/>
-        <FILE id="KrCi0q" name="Lissajous.h" compile="0" resource="0" file="Source/Lissajous.h"/>
-        <FILE id="K5h9MF" name="MacroSlider.cpp" compile="1" resource="0" file="Source/MacroSlider.cpp"/>
-        <FILE id="aNWKT4" name="MacroSlider.h" compile="0" resource="0" file="Source/MacroSlider.h"/>
-        <FILE id="bfCktA" name="Metronome.cpp" compile="1" resource="0" file="Source/Metronome.cpp"/>
-        <FILE id="CMSFmi" name="Metronome.h" compile="0" resource="0" file="Source/Metronome.h"/>
-        <FILE id="iW0T0g" name="SeaOfGrain.cpp" compile="1" resource="0" file="Source/SeaOfGrain.cpp"/>
-        <FILE id="cPB1wW" name="SeaOfGrain.h" compile="0" resource="0" file="Source/SeaOfGrain.h"/>
-        <FILE id="EJvHaK" name="Selector.cpp" compile="1" resource="0" file="Source/Selector.cpp"/>
-        <FILE id="zvWezv" name="Selector.h" compile="0" resource="0" file="Source/Selector.h"/>
-        <FILE id="w7uJ85" name="SliderSequencer.cpp" compile="1" resource="0"
-              file="Source/SliderSequencer.cpp"/>
-        <FILE id="kRGpA9" name="SliderSequencer.h" compile="0" resource="0"
-              file="Source/SliderSequencer.h"/>
-        <FILE id="SgSrx0" name="SlowLayers.cpp" compile="1" resource="0" file="Source/SlowLayers.cpp"/>
-        <FILE id="rCkxj9" name="SlowLayers.h" compile="0" resource="0" file="Source/SlowLayers.h"/>
-        <FILE id="JSxBB7" name="TimelineControl.cpp" compile="1" resource="0"
-              file="Source/TimelineControl.cpp"/>
-        <FILE id="awkUYm" name="TimelineControl.h" compile="0" resource="0"
-              file="Source/TimelineControl.h"/>
-        <FILE id="BGN7oK" name="TimerDisplay.cpp" compile="1" resource="0"
-              file="Source/TimerDisplay.cpp"/>
-        <FILE id="YIlKai" name="TimerDisplay.h" compile="0" resource="0" file="Source/TimerDisplay.h"/>
-        <FILE id="H1uGqz" name="ValueSetter.cpp" compile="1" resource="0" file="Source/ValueSetter.cpp"/>
-        <FILE id="JYb2gh" name="ValueSetter.h" compile="0" resource="0" file="Source/ValueSetter.h"/>
-        <FILE id="n6ZDII" name="FFTtoAdditive.cpp" compile="1" resource="0"
-              file="Source/FFTtoAdditive.cpp"/>
-        <FILE id="YPh4tw" name="FFTtoAdditive.h" compile="0" resource="0" file="Source/FFTtoAdditive.h"/>
-        <FILE id="DDHNGg" name="FollowingSong.cpp" compile="1" resource="0"
-              file="Source/FollowingSong.cpp"/>
-        <FILE id="oJkcl6" name="FollowingSong.h" compile="0" resource="0" file="Source/FollowingSong.h"/>
-        <FILE id="bFJCjN" name="FreqDomainBoilerplate.cpp" compile="1" resource="0"
-              file="Source/FreqDomainBoilerplate.cpp"/>
-        <FILE id="Kx4b6q" name="FreqDomainBoilerplate.h" compile="0" resource="0"
-              file="Source/FreqDomainBoilerplate.h"/>
-        <FILE id="ovUyVK" name="GridToDrums.cpp" compile="1" resource="0" file="Source/GridToDrums.cpp"/>
-        <FILE id="rz4Egs" name="GridToDrums.h" compile="0" resource="0" file="Source/GridToDrums.h"/>
-        <FILE id="UgXfjY" name="GroupControl.cpp" compile="1" resource="0"
-              file="Source/GroupControl.cpp"/>
-        <FILE id="hf7cqG" name="GroupControl.h" compile="0" resource="0" file="Source/GroupControl.h"/>
-        <FILE id="S5YJDk" name="Kicker.cpp" compile="1" resource="0" file="Source/Kicker.cpp"/>
-        <FILE id="M61mnO" name="Kicker.h" compile="0" resource="0" file="Source/Kicker.h"/>
-        <FILE id="hF0WgN" name="ControllingSong.cpp" compile="1" resource="0"
-              file="Source/ControllingSong.cpp"/>
-        <FILE id="rfMiXn" name="ControllingSong.h" compile="0" resource="0"
-              file="Source/ControllingSong.h"/>
-        <FILE id="pRqLzS" name="ControlTactileFeedback.cpp" compile="1" resource="0"
-              file="Source/ControlTactileFeedback.cpp"/>
-        <FILE id="IAYI9G" name="ControlTactileFeedback.h" compile="0" resource="0"
-              file="Source/ControlTactileFeedback.h"/>
-        <FILE id="r7DGR1" name="CurveLooper.cpp" compile="1" resource="0" file="Source/CurveLooper.cpp"/>
-        <FILE id="UltEBY" name="CurveLooper.h" compile="0" resource="0" file="Source/CurveLooper.h"/>
-        <FILE id="jYYH0P" name="DebugAudioSource.cpp" compile="1" resource="0"
-              file="Source/DebugAudioSource.cpp"/>
-        <FILE id="DZjoXj" name="DebugAudioSource.h" compile="0" resource="0"
-              file="Source/DebugAudioSource.h"/>
+        <FILE id="O3zMCr" name="ADSRTrigger.cpp" compile="1" resource="0" file="Source/ADSRTrigger.cpp"/>
+        <FILE id="bxJpDd" name="ADSRTrigger.h" compile="0" resource="0" file="Source/ADSRTrigger.h"/>
+        <FILE id="EugK26" name="Amplifier.cpp" compile="1" resource="0" file="Source/Amplifier.cpp"/>
+        <FILE id="BgLMgo" name="Amplifier.h" compile="0" resource="0" file="Source/Amplifier.h"/>
+        <FILE id="DU9MrN" name="Arpeggiator.cpp" compile="1" resource="0" file="Source/Arpeggiator.cpp"/>
+        <FILE id="XhHWYO" name="Arpeggiator.h" compile="0" resource="0" file="Source/Arpeggiator.h"/>
+        <FILE id="RPjiwy" name="AudioMeter.cpp" compile="1" resource="0" file="Source/AudioMeter.cpp"/>
+        <FILE id="L9o4WQ" name="AudioMeter.h" compile="0" resource="0" file="Source/AudioMeter.h"/>
+        <FILE id="RjMTgF" name="AudioRouter.cpp" compile="1" resource="0" file="Source/AudioRouter.cpp"/>
+        <FILE id="Rcmdag" name="AudioRouter.h" compile="0" resource="0" file="Source/AudioRouter.h"/>
+        <FILE id="dhS4B5" name="Autotalent.cpp" compile="1" resource="0" file="Source/Autotalent.cpp"/>
+        <FILE id="ROyJri" name="Autotalent.h" compile="0" resource="0" file="Source/Autotalent.h"/>
+        <FILE id="i6udMA" name="BandVocoder.cpp" compile="1" resource="0" file="Source/BandVocoder.cpp"/>
+        <FILE id="O6hqFP" name="BandVocoder.h" compile="0" resource="0" file="Source/BandVocoder.h"/>
+        <FILE id="mN5Qob" name="BeatBloks.cpp" compile="1" resource="0" file="Source/BeatBloks.cpp"/>
+        <FILE id="cgjvbw" name="BeatBloks.h" compile="0" resource="0" file="Source/BeatBloks.h"/>
+        <FILE id="xOeo7o" name="Beats.cpp" compile="1" resource="0" file="Source/Beats.cpp"/>
+        <FILE id="wvv5nC" name="Beats.h" compile="0" resource="0" file="Source/Beats.h"/>
+        <FILE id="XKp8QP" name="BiquadFilterEffect.cpp" compile="1" resource="0"
+              file="Source/BiquadFilterEffect.cpp"/>
+        <FILE id="YZmmMg" name="BiquadFilterEffect.h" compile="0" resource="0"
+              file="Source/BiquadFilterEffect.h"/>
+        <FILE id="mEj6vd" name="Capo.cpp" compile="1" resource="0" file="Source/Capo.cpp"/>
+        <FILE id="uSx7kB" name="Capo.h" compile="0" resource="0" file="Source/Capo.h"/>
+        <FILE id="qTg836" name="ChaosEngine.cpp" compile="1" resource="0" file="Source/ChaosEngine.cpp"/>
+        <FILE id="YY2OwK" name="ChaosEngine.h" compile="0" resource="0" file="Source/ChaosEngine.h"/>
+        <FILE id="lhRwIU" name="Chorder.cpp" compile="1" resource="0" file="Source/Chorder.cpp"/>
+        <FILE id="byJnsc" name="Chorder.h" compile="0" resource="0" file="Source/Chorder.h"/>
         <FILE id="ubTlBd" name="CircleSequencer.cpp" compile="1" resource="0"
               file="Source/CircleSequencer.cpp"/>
         <FILE id="ovS48X" name="CircleSequencer.h" compile="0" resource="0"
               file="Source/CircleSequencer.h"/>
+        <FILE id="lkbPyl" name="ClipArranger.cpp" compile="1" resource="0"
+              file="Source/ClipArranger.cpp"/>
+        <FILE id="RGWGtn" name="ClipArranger.h" compile="0" resource="0" file="Source/ClipArranger.h"/>
         <FILE id="ZGhFZ1" name="ClipLauncher.cpp" compile="1" resource="0"
               file="Source/ClipLauncher.cpp"/>
         <FILE id="vDdhyg" name="ClipLauncher.h" compile="0" resource="0" file="Source/ClipLauncher.h"/>
@@ -289,6 +200,85 @@
               file="Source/CommentDisplay.cpp"/>
         <FILE id="YYTNm2" name="CommentDisplay.h" compile="0" resource="0"
               file="Source/CommentDisplay.h"/>
+        <FILE id="hF0WgN" name="ControllingSong.cpp" compile="1" resource="0"
+              file="Source/ControllingSong.cpp"/>
+        <FILE id="rfMiXn" name="ControllingSong.h" compile="0" resource="0"
+              file="Source/ControllingSong.h"/>
+        <FILE id="xd8gU7" name="ControlSequencer.cpp" compile="1" resource="0"
+              file="Source/ControlSequencer.cpp"/>
+        <FILE id="HjdGOp" name="ControlSequencer.h" compile="0" resource="0"
+              file="Source/ControlSequencer.h"/>
+        <FILE id="pRqLzS" name="ControlTactileFeedback.cpp" compile="1" resource="0"
+              file="Source/ControlTactileFeedback.cpp"/>
+        <FILE id="IAYI9G" name="ControlTactileFeedback.h" compile="0" resource="0"
+              file="Source/ControlTactileFeedback.h"/>
+        <FILE id="r7DGR1" name="CurveLooper.cpp" compile="1" resource="0" file="Source/CurveLooper.cpp"/>
+        <FILE id="UltEBY" name="CurveLooper.h" compile="0" resource="0" file="Source/CurveLooper.h"/>
+        <FILE id="jYYH0P" name="DebugAudioSource.cpp" compile="1" resource="0"
+              file="Source/DebugAudioSource.cpp"/>
+        <FILE id="DZjoXj" name="DebugAudioSource.h" compile="0" resource="0"
+              file="Source/DebugAudioSource.h"/>
+        <FILE id="o3f3Es" name="DrumPlayer.cpp" compile="1" resource="0" file="Source/DrumPlayer.cpp"/>
+        <FILE id="H2IdjT" name="DrumPlayer.h" compile="0" resource="0" file="Source/DrumPlayer.h"/>
+        <FILE id="b3GkhQ" name="DrumSynth.cpp" compile="1" resource="0" file="Source/DrumSynth.cpp"/>
+        <FILE id="BpdZ8w" name="DrumSynth.h" compile="0" resource="0" file="Source/DrumSynth.h"/>
+        <FILE id="KhkfQS" name="EffectChain.cpp" compile="1" resource="0" file="Source/EffectChain.cpp"/>
+        <FILE id="hnLO0H" name="EffectChain.h" compile="0" resource="0" file="Source/EffectChain.h"/>
+        <FILE id="Brkjo3" name="EventCanvas.cpp" compile="1" resource="0" file="Source/EventCanvas.cpp"/>
+        <FILE id="KV7yiU" name="EventCanvas.h" compile="0" resource="0" file="Source/EventCanvas.h"/>
+        <FILE id="AE3Jbz" name="FeedbackModule.cpp" compile="1" resource="0"
+              file="Source/FeedbackModule.cpp"/>
+        <FILE id="V6Dwpc" name="FeedbackModule.h" compile="0" resource="0"
+              file="Source/FeedbackModule.h"/>
+        <FILE id="n6ZDII" name="FFTtoAdditive.cpp" compile="1" resource="0"
+              file="Source/FFTtoAdditive.cpp"/>
+        <FILE id="YPh4tw" name="FFTtoAdditive.h" compile="0" resource="0" file="Source/FFTtoAdditive.h"/>
+        <FILE id="ZyraV0" name="FMSynth.cpp" compile="1" resource="0" file="Source/FMSynth.cpp"/>
+        <FILE id="NTlZ0B" name="FMSynth.h" compile="0" resource="0" file="Source/FMSynth.h"/>
+        <FILE id="DDHNGg" name="FollowingSong.cpp" compile="1" resource="0"
+              file="Source/FollowingSong.cpp"/>
+        <FILE id="oJkcl6" name="FollowingSong.h" compile="0" resource="0" file="Source/FollowingSong.h"/>
+        <FILE id="LKfULJ" name="FourOnTheFloor.cpp" compile="1" resource="0"
+              file="Source/FourOnTheFloor.cpp"/>
+        <FILE id="NhOPsY" name="FourOnTheFloor.h" compile="0" resource="0"
+              file="Source/FourOnTheFloor.h"/>
+        <FILE id="QT49Vw" name="FreeverbOutput.cpp" compile="1" resource="0"
+              file="Source/FreeverbOutput.cpp"/>
+        <FILE id="Uj7fLC" name="FreeverbOutput.h" compile="0" resource="0"
+              file="Source/FreeverbOutput.h"/>
+        <FILE id="h7M6HM" name="FreqDelay.cpp" compile="1" resource="0" file="Source/FreqDelay.cpp"/>
+        <FILE id="Onnxb8" name="FreqDelay.h" compile="0" resource="0" file="Source/FreqDelay.h"/>
+        <FILE id="bFJCjN" name="FreqDomainBoilerplate.cpp" compile="1" resource="0"
+              file="Source/FreqDomainBoilerplate.cpp"/>
+        <FILE id="Kx4b6q" name="FreqDomainBoilerplate.h" compile="0" resource="0"
+              file="Source/FreqDomainBoilerplate.h"/>
+        <FILE id="HqwcBo" name="GridController.cpp" compile="1" resource="0"
+              file="Source/GridController.cpp"/>
+        <FILE id="wYDZOt" name="GridController.h" compile="0" resource="0"
+              file="Source/GridController.h"/>
+        <FILE id="ovUyVK" name="GridToDrums.cpp" compile="1" resource="0" file="Source/GridToDrums.cpp"/>
+        <FILE id="rz4Egs" name="GridToDrums.h" compile="0" resource="0" file="Source/GridToDrums.h"/>
+        <FILE id="UgXfjY" name="GroupControl.cpp" compile="1" resource="0"
+              file="Source/GroupControl.cpp"/>
+        <FILE id="hf7cqG" name="GroupControl.h" compile="0" resource="0" file="Source/GroupControl.h"/>
+        <FILE id="vBc7q4" name="HelpDisplay.cpp" compile="1" resource="0" file="Source/HelpDisplay.cpp"/>
+        <FILE id="uZ4x9K" name="HelpDisplay.h" compile="0" resource="0" file="Source/HelpDisplay.h"/>
+        <FILE id="n3PYoO" name="InputChannel.cpp" compile="1" resource="0"
+              file="Source/InputChannel.cpp"/>
+        <FILE id="esA2Ao" name="InputChannel.h" compile="0" resource="0" file="Source/InputChannel.h"/>
+        <FILE id="S0ZOpj" name="KarplusStrong.cpp" compile="1" resource="0"
+              file="Source/KarplusStrong.cpp"/>
+        <FILE id="yjMdCK" name="KarplusStrong.h" compile="0" resource="0" file="Source/KarplusStrong.h"/>
+        <FILE id="kVFec8" name="KeyboardDisplay.cpp" compile="1" resource="0"
+              file="Source/KeyboardDisplay.cpp"/>
+        <FILE id="rJAhFG" name="KeyboardDisplay.h" compile="0" resource="0"
+              file="Source/KeyboardDisplay.h"/>
+        <FILE id="S5YJDk" name="Kicker.cpp" compile="1" resource="0" file="Source/Kicker.cpp"/>
+        <FILE id="M61mnO" name="Kicker.h" compile="0" resource="0" file="Source/Kicker.h"/>
+        <FILE id="xkPdry" name="KompleteKontrol.cpp" compile="0" resource="0"
+              file="Source/KompleteKontrol.cpp"/>
+        <FILE id="kpP4T7" name="KompleteKontrol.h" compile="0" resource="0"
+              file="Source/KompleteKontrol.h"/>
         <FILE id="LOriQl" name="LaunchpadKeyboard.cpp" compile="1" resource="0"
               file="Source/LaunchpadKeyboard.cpp"/>
         <FILE id="jR3mlK" name="LaunchpadKeyboard.h" compile="0" resource="0"
@@ -297,47 +287,11 @@
               file="Source/LaunchpadNoteDisplayer.cpp"/>
         <FILE id="nC7Zue" name="LaunchpadNoteDisplayer.h" compile="0" resource="0"
               file="Source/LaunchpadNoteDisplayer.h"/>
-        <FILE id="AE3Jbz" name="FeedbackModule.cpp" compile="1" resource="0"
-              file="Source/FeedbackModule.cpp"/>
-        <FILE id="V6Dwpc" name="FeedbackModule.h" compile="0" resource="0"
-              file="Source/FeedbackModule.h"/>
-        <FILE id="LKfULJ" name="FourOnTheFloor.cpp" compile="1" resource="0"
-              file="Source/FourOnTheFloor.cpp"/>
-        <FILE id="NhOPsY" name="FourOnTheFloor.h" compile="0" resource="0"
-              file="Source/FourOnTheFloor.h"/>
-        <FILE id="h7M6HM" name="FreqDelay.cpp" compile="1" resource="0" file="Source/FreqDelay.cpp"/>
-        <FILE id="Onnxb8" name="FreqDelay.h" compile="0" resource="0" file="Source/FreqDelay.h"/>
-        <FILE id="Brkjo3" name="EventCanvas.cpp" compile="1" resource="0" file="Source/EventCanvas.cpp"/>
-        <FILE id="KV7yiU" name="EventCanvas.h" compile="0" resource="0" file="Source/EventCanvas.h"/>
-        <FILE id="bMIx2X" name="NoteCanvas.cpp" compile="1" resource="0" file="Source/NoteCanvas.cpp"/>
-        <FILE id="Fq629E" name="NoteCanvas.h" compile="0" resource="0" file="Source/NoteCanvas.h"/>
-        <FILE id="wB4DPg" name="Vocoder.cpp" compile="1" resource="0" file="Source/Vocoder.cpp"/>
-        <FILE id="cqA2QB" name="Vocoder.h" compile="0" resource="0" file="Source/Vocoder.h"/>
-        <FILE id="N4zoFG" name="VocoderCarrierInput.cpp" compile="1" resource="0"
-              file="Source/VocoderCarrierInput.cpp"/>
-        <FILE id="SRGmSo" name="VocoderCarrierInput.h" compile="0" resource="0"
-              file="Source/VocoderCarrierInput.h"/>
-        <FILE id="dhS4B5" name="Autotalent.cpp" compile="1" resource="0" file="Source/Autotalent.cpp"/>
-        <FILE id="ROyJri" name="Autotalent.h" compile="0" resource="0" file="Source/Autotalent.h"/>
-        <FILE id="i6udMA" name="BandVocoder.cpp" compile="1" resource="0" file="Source/BandVocoder.cpp"/>
-        <FILE id="O6hqFP" name="BandVocoder.h" compile="0" resource="0" file="Source/BandVocoder.h"/>
-        <FILE id="mN5Qob" name="BeatBloks.cpp" compile="1" resource="0" file="Source/BeatBloks.cpp"/>
-        <FILE id="cgjvbw" name="BeatBloks.h" compile="0" resource="0" file="Source/BeatBloks.h"/>
-        <FILE id="xOeo7o" name="Beats.cpp" compile="1" resource="0" file="Source/Beats.cpp"/>
-        <FILE id="wvv5nC" name="Beats.h" compile="0" resource="0" file="Source/Beats.h"/>
-        <FILE id="RPjiwy" name="AudioMeter.cpp" compile="1" resource="0" file="Source/AudioMeter.cpp"/>
-        <FILE id="L9o4WQ" name="AudioMeter.h" compile="0" resource="0" file="Source/AudioMeter.h"/>
-        <FILE id="EugK26" name="Amplifier.cpp" compile="1" resource="0" file="Source/Amplifier.cpp"/>
-        <FILE id="BgLMgo" name="Amplifier.h" compile="0" resource="0" file="Source/Amplifier.h"/>
-        <FILE id="YjvMag" name="StepSequencer.cpp" compile="1" resource="0"
-              file="Source/StepSequencer.cpp"/>
-        <FILE id="B3TcmA" name="StepSequencer.h" compile="0" resource="0" file="Source/StepSequencer.h"/>
-        <FILE id="RjMTgF" name="AudioRouter.cpp" compile="1" resource="0" file="Source/AudioRouter.cpp"/>
-        <FILE id="Rcmdag" name="AudioRouter.h" compile="0" resource="0" file="Source/AudioRouter.h"/>
-        <FILE id="maaY64" name="Rewriter.cpp" compile="1" resource="0" file="Source/Rewriter.cpp"/>
-        <FILE id="TsWS4Z" name="Rewriter.h" compile="0" resource="0" file="Source/Rewriter.h"/>
-        <FILE id="bqiQ8T" name="SampleBank.cpp" compile="1" resource="0" file="Source/SampleBank.cpp"/>
-        <FILE id="dGHX74" name="SampleBank.h" compile="0" resource="0" file="Source/SampleBank.h"/>
+        <FILE id="ScxANp" name="LFOController.cpp" compile="1" resource="0"
+              file="Source/LFOController.cpp"/>
+        <FILE id="J4fGNz" name="LFOController.h" compile="0" resource="0" file="Source/LFOController.h"/>
+        <FILE id="CwoblA" name="Lissajous.cpp" compile="1" resource="0" file="Source/Lissajous.cpp"/>
+        <FILE id="KrCi0q" name="Lissajous.h" compile="0" resource="0" file="Source/Lissajous.h"/>
         <FILE id="fc7TjY" name="Looper.cpp" compile="1" resource="0" file="Source/Looper.cpp"/>
         <FILE id="bynCOJ" name="Looper.h" compile="0" resource="0" file="Source/Looper.h"/>
         <FILE id="fXzkYe" name="LooperRecorder.cpp" compile="1" resource="0"
@@ -346,32 +300,119 @@
               file="Source/LooperRecorder.h"/>
         <FILE id="lrczRP" name="LoopStorer.cpp" compile="1" resource="0" file="Source/LoopStorer.cpp"/>
         <FILE id="PfUuZR" name="LoopStorer.h" compile="0" resource="0" file="Source/LoopStorer.h"/>
-        <FILE id="o3f3Es" name="DrumPlayer.cpp" compile="1" resource="0" file="Source/DrumPlayer.cpp"/>
-        <FILE id="H2IdjT" name="DrumPlayer.h" compile="0" resource="0" file="Source/DrumPlayer.h"/>
-        <FILE id="b3GkhQ" name="DrumSynth.cpp" compile="1" resource="0" file="Source/DrumSynth.cpp"/>
-        <FILE id="BpdZ8w" name="DrumSynth.h" compile="0" resource="0" file="Source/DrumSynth.h"/>
-        <FILE id="O3zMCr" name="ADSRTrigger.cpp" compile="1" resource="0" file="Source/ADSRTrigger.cpp"/>
-        <FILE id="bxJpDd" name="ADSRTrigger.h" compile="0" resource="0" file="Source/ADSRTrigger.h"/>
+        <FILE id="K5h9MF" name="MacroSlider.cpp" compile="1" resource="0" file="Source/MacroSlider.cpp"/>
+        <FILE id="aNWKT4" name="MacroSlider.h" compile="0" resource="0" file="Source/MacroSlider.h"/>
+        <FILE id="bfCktA" name="Metronome.cpp" compile="1" resource="0" file="Source/Metronome.cpp"/>
+        <FILE id="CMSFmi" name="Metronome.h" compile="0" resource="0" file="Source/Metronome.h"/>
+        <FILE id="gdpZuQ" name="MidiController.cpp" compile="1" resource="0"
+              file="Source/MidiController.cpp"/>
+        <FILE id="FdjFi9" name="MidiController.h" compile="0" resource="0"
+              file="Source/MidiController.h"/>
+        <FILE id="ld1pwm" name="MidiInstrument.cpp" compile="1" resource="0"
+              file="Source/MidiInstrument.cpp"/>
+        <FILE id="J88YwL" name="MidiInstrument.h" compile="0" resource="0"
+              file="Source/MidiInstrument.h"/>
+        <FILE id="xjJDtE" name="MidiOutput.cpp" compile="1" resource="0" file="Source/MidiOutput.cpp"/>
+        <FILE id="C85caL" name="MidiOutput.h" compile="0" resource="0" file="Source/MidiOutput.h"/>
+        <FILE id="wUCXnT" name="ModulationVisualizer.cpp" compile="1" resource="0"
+              file="Source/ModulationVisualizer.cpp"/>
+        <FILE id="UMwE0t" name="ModulationVisualizer.h" compile="0" resource="0"
+              file="Source/ModulationVisualizer.h"/>
+        <FILE id="rudwi0" name="ModuleSaveDataPanel.cpp" compile="1" resource="0"
+              file="Source/ModuleSaveDataPanel.cpp"/>
+        <FILE id="mOW7vY" name="ModuleSaveDataPanel.h" compile="0" resource="0"
+              file="Source/ModuleSaveDataPanel.h"/>
+        <FILE id="xkPLV1" name="ModWheel.cpp" compile="1" resource="0" file="Source/ModWheel.cpp"/>
+        <FILE id="rS7xp7" name="ModWheel.h" compile="0" resource="0" file="Source/ModWheel.h"/>
+        <FILE id="fIn3Zv" name="ModwheelToPressure.cpp" compile="1" resource="0"
+              file="Source/ModwheelToPressure.cpp"/>
+        <FILE id="HJHlow" name="ModwheelToPressure.h" compile="0" resource="0"
+              file="Source/ModwheelToPressure.h"/>
+        <FILE id="YMWfsB" name="ModwheelToVibrato.cpp" compile="1" resource="0"
+              file="Source/ModwheelToVibrato.cpp"/>
+        <FILE id="Z8ZH30" name="ModwheelToVibrato.h" compile="0" resource="0"
+              file="Source/ModwheelToVibrato.h"/>
+        <FILE id="D0JN9D" name="Monophonify.cpp" compile="1" resource="0" file="Source/Monophonify.cpp"/>
+        <FILE id="rkM42v" name="Monophonify.h" compile="0" resource="0" file="Source/Monophonify.h"/>
+        <FILE id="U4pMmX" name="MultibandCompressor.cpp" compile="1" resource="0"
+              file="Source/MultibandCompressor.cpp"/>
+        <FILE id="vJgslt" name="MultibandCompressor.h" compile="0" resource="0"
+              file="Source/MultibandCompressor.h"/>
+        <FILE id="kxAFKp" name="MultitrackRecorder.cpp" compile="1" resource="0"
+              file="Source/MultitrackRecorder.cpp"/>
+        <FILE id="Z50Hgu" name="MultitrackRecorder.h" compile="0" resource="0"
+              file="Source/MultitrackRecorder.h"/>
+        <FILE id="vLtjL7" name="Neighborhooder.cpp" compile="1" resource="0"
+              file="Source/Neighborhooder.cpp"/>
+        <FILE id="qSuxE3" name="Neighborhooder.h" compile="0" resource="0"
+              file="Source/Neighborhooder.h"/>
+        <FILE id="bMIx2X" name="NoteCanvas.cpp" compile="1" resource="0" file="Source/NoteCanvas.cpp"/>
+        <FILE id="Fq629E" name="NoteCanvas.h" compile="0" resource="0" file="Source/NoteCanvas.h"/>
+        <FILE id="paBl9j" name="NoteChainNode.cpp" compile="1" resource="0"
+              file="Source/NoteChainNode.cpp"/>
+        <FILE id="DIvcES" name="NoteChainNode.h" compile="0" resource="0" file="Source/NoteChainNode.h"/>
+        <FILE id="OYAkqX" name="NoteCreator.cpp" compile="1" resource="0" file="Source/NoteCreator.cpp"/>
+        <FILE id="GGwQnJ" name="NoteCreator.h" compile="0" resource="0" file="Source/NoteCreator.h"/>
+        <FILE id="t6j4be" name="NoteDelayer.cpp" compile="1" resource="0" file="Source/NoteDelayer.cpp"/>
+        <FILE id="e8ysmp" name="NoteDelayer.h" compile="0" resource="0" file="Source/NoteDelayer.h"/>
+        <FILE id="WEyL34" name="NoteDisplayer.cpp" compile="1" resource="0"
+              file="Source/NoteDisplayer.cpp"/>
+        <FILE id="a52HeU" name="NoteDisplayer.h" compile="0" resource="0" file="Source/NoteDisplayer.h"/>
+        <FILE id="rbhtyZ" name="NoteFilter.cpp" compile="1" resource="0" file="Source/NoteFilter.cpp"/>
+        <FILE id="JW2ST3" name="NoteFilter.h" compile="0" resource="0" file="Source/NoteFilter.h"/>
+        <FILE id="Or658D" name="NoteFlusher.cpp" compile="1" resource="0" file="Source/NoteFlusher.cpp"/>
+        <FILE id="jzmZaE" name="NoteFlusher.h" compile="0" resource="0" file="Source/NoteFlusher.h"/>
+        <FILE id="iXHjWM" name="NoteGate.cpp" compile="1" resource="0" file="Source/NoteGate.cpp"/>
+        <FILE id="JbG01f" name="NoteGate.h" compile="0" resource="0" file="Source/NoteGate.h"/>
         <FILE id="dJxv9I" name="NoteLooper.cpp" compile="1" resource="0" file="Source/NoteLooper.cpp"/>
         <FILE id="zo4N2z" name="NoteLooper.h" compile="0" resource="0" file="Source/NoteLooper.h"/>
         <FILE id="RetyTQ" name="NoteOctaver.cpp" compile="1" resource="0" file="Source/NoteOctaver.cpp"/>
         <FILE id="hSygAE" name="NoteOctaver.h" compile="0" resource="0" file="Source/NoteOctaver.h"/>
         <FILE id="xSRCdF" name="NoteRouter.cpp" compile="1" resource="0" file="Source/NoteRouter.cpp"/>
         <FILE id="qQmpNv" name="NoteRouter.h" compile="0" resource="0" file="Source/NoteRouter.h"/>
+        <FILE id="N2IcFH" name="NoteSequencerColumn.cpp" compile="1" resource="0"
+              file="Source/NoteSequencerColumn.cpp"/>
+        <FILE id="v5vJOc" name="NoteSequencerColumn.h" compile="0" resource="0"
+              file="Source/NoteSequencerColumn.h"/>
+        <FILE id="IGmN6O" name="NoteSinger.cpp" compile="1" resource="0" file="Source/NoteSinger.cpp"/>
+        <FILE id="uWOTxD" name="NoteSinger.h" compile="0" resource="0" file="Source/NoteSinger.h"/>
+        <FILE id="xORArp" name="NoteStepSequencer.cpp" compile="1" resource="0"
+              file="Source/NoteStepSequencer.cpp"/>
+        <FILE id="EuZ3UP" name="NoteStepSequencer.h" compile="0" resource="0"
+              file="Source/NoteStepSequencer.h"/>
         <FILE id="fuzJDh" name="NoteSustain.cpp" compile="1" resource="0" file="Source/NoteSustain.cpp"/>
         <FILE id="wdwyFe" name="NoteSustain.h" compile="0" resource="0" file="Source/NoteSustain.h"/>
+        <FILE id="RockxL" name="NoteToFreq.cpp" compile="1" resource="0" file="Source/NoteToFreq.cpp"/>
+        <FILE id="LKkPBi" name="NoteToFreq.h" compile="0" resource="0" file="Source/NoteToFreq.h"/>
+        <FILE id="XvPbXi" name="NoteToMs.cpp" compile="1" resource="0" file="Source/NoteToMs.cpp"/>
+        <FILE id="OiTWxt" name="NoteToMs.h" compile="0" resource="0" file="Source/NoteToMs.h"/>
         <FILE id="N7AI0k" name="NoteTransformer.cpp" compile="1" resource="0"
               file="Source/NoteTransformer.cpp"/>
         <FILE id="Gu2fbN" name="NoteTransformer.h" compile="0" resource="0"
               file="Source/NoteTransformer.h"/>
         <FILE id="XHzTDN" name="NoteVibrato.cpp" compile="1" resource="0" file="Source/NoteVibrato.cpp"/>
         <FILE id="kU7XBx" name="NoteVibrato.h" compile="0" resource="0" file="Source/NoteVibrato.h"/>
+        <FILE id="mKSMoB" name="OneShotLauncher.cpp" compile="1" resource="0"
+              file="Source/OneShotLauncher.cpp"/>
+        <FILE id="yRtCv4" name="OneShotLauncher.h" compile="0" resource="0"
+              file="Source/OneShotLauncher.h"/>
+        <FILE id="i6ONR2" name="OutputChannel.cpp" compile="1" resource="0"
+              file="Source/OutputChannel.cpp"/>
+        <FILE id="et5OpS" name="OutputChannel.h" compile="0" resource="0" file="Source/OutputChannel.h"/>
+        <FILE id="chUWZI" name="PanicButton.cpp" compile="1" resource="0" file="Source/PanicButton.cpp"/>
+        <FILE id="rEVLi6" name="PanicButton.h" compile="0" resource="0" file="Source/PanicButton.h"/>
         <FILE id="y5Oi0e" name="PitchBender.cpp" compile="1" resource="0" file="Source/PitchBender.cpp"/>
         <FILE id="RH0RAN" name="PitchBender.h" compile="0" resource="0" file="Source/PitchBender.h"/>
+        <FILE id="xwgj92" name="PitchChorus.cpp" compile="1" resource="0" file="Source/PitchChorus.cpp"/>
+        <FILE id="Y8osY2" name="PitchChorus.h" compile="0" resource="0" file="Source/PitchChorus.h"/>
         <FILE id="Wf3diN" name="PitchDive.cpp" compile="1" resource="0" file="Source/PitchDive.cpp"/>
         <FILE id="EkwIdT" name="PitchDive.h" compile="0" resource="0" file="Source/PitchDive.h"/>
         <FILE id="iXiwJw" name="PitchSetter.cpp" compile="1" resource="0" file="Source/PitchSetter.cpp"/>
         <FILE id="tGoqwJ" name="PitchSetter.h" compile="0" resource="0" file="Source/PitchSetter.h"/>
+        <FILE id="WrfYZh" name="Polyrhythms.cpp" compile="1" resource="0" file="Source/Polyrhythms.cpp"/>
+        <FILE id="Dxf5mJ" name="Polyrhythms.h" compile="0" resource="0" file="Source/Polyrhythms.h"/>
+        <FILE id="YxJ3n3" name="Presets.cpp" compile="1" resource="0" file="Source/Presets.cpp"/>
+        <FILE id="hqaUZQ" name="Presets.h" compile="0" resource="0" file="Source/Presets.h"/>
         <FILE id="bOg7BS" name="Pressure.cpp" compile="1" resource="0" file="Source/Pressure.cpp"/>
         <FILE id="KVjZzU" name="Pressure.h" compile="0" resource="0" file="Source/Pressure.h"/>
         <FILE id="aLRFhN" name="PressureToModwheel.cpp" compile="1" resource="0"
@@ -385,13 +426,89 @@
         <FILE id="UTTBrH" name="PreviousNote.cpp" compile="1" resource="0"
               file="Source/PreviousNote.cpp"/>
         <FILE id="Sx77mF" name="PreviousNote.h" compile="0" resource="0" file="Source/PreviousNote.h"/>
+        <FILE id="oTrI6B" name="Producer.cpp" compile="1" resource="0" file="Source/Producer.cpp"/>
+        <FILE id="FzAJma" name="Producer.h" compile="0" resource="0" file="Source/Producer.h"/>
+        <FILE id="PLsFnE" name="PSMoveController.cpp" compile="0" resource="0"
+              file="Source/PSMoveController.cpp"/>
+        <FILE id="qiIX0Z" name="PSMoveController.h" compile="0" resource="0"
+              file="Source/PSMoveController.h"/>
+        <FILE id="AAlplU" name="Ramper.cpp" compile="1" resource="0" file="Source/Ramper.cpp"/>
+        <FILE id="n8x1K2" name="Ramper.h" compile="0" resource="0" file="Source/Ramper.h"/>
+        <FILE id="lp2Icw" name="RandomNoteGenerator.cpp" compile="1" resource="0"
+              file="Source/RandomNoteGenerator.cpp"/>
+        <FILE id="C4WFpF" name="RandomNoteGenerator.h" compile="0" resource="0"
+              file="Source/RandomNoteGenerator.h"/>
+        <FILE id="euyovX" name="Razor.cpp" compile="1" resource="0" file="Source/Razor.cpp"/>
+        <FILE id="eFx1Uv" name="Razor.h" compile="0" resource="0" file="Source/Razor.h"/>
+        <FILE id="maaY64" name="Rewriter.cpp" compile="1" resource="0" file="Source/Rewriter.cpp"/>
+        <FILE id="TsWS4Z" name="Rewriter.h" compile="0" resource="0" file="Source/Rewriter.h"/>
+        <FILE id="QgGXc9" name="RingModulator.cpp" compile="1" resource="0"
+              file="Source/RingModulator.cpp"/>
+        <FILE id="Dl3D81" name="RingModulator.h" compile="0" resource="0" file="Source/RingModulator.h"/>
+        <FILE id="bqiQ8T" name="SampleBank.cpp" compile="1" resource="0" file="Source/SampleBank.cpp"/>
+        <FILE id="dGHX74" name="SampleBank.h" compile="0" resource="0" file="Source/SampleBank.h"/>
+        <FILE id="cI0jsx" name="SampleCanvas.cpp" compile="1" resource="0"
+              file="Source/SampleCanvas.cpp"/>
+        <FILE id="AIUzeX" name="SampleCanvas.h" compile="0" resource="0" file="Source/SampleCanvas.h"/>
+        <FILE id="Yr6QsW" name="SampleFinder.cpp" compile="1" resource="0"
+              file="Source/SampleFinder.cpp"/>
+        <FILE id="oW3Axq" name="SampleFinder.h" compile="0" resource="0" file="Source/SampleFinder.h"/>
+        <FILE id="TLm9ej" name="SamplePlayer.cpp" compile="1" resource="0"
+              file="Source/SamplePlayer.cpp"/>
+        <FILE id="QOPRdO" name="SamplePlayer.h" compile="0" resource="0" file="Source/SamplePlayer.h"/>
+        <FILE id="LNhwIq" name="Sampler.cpp" compile="1" resource="0" file="Source/Sampler.cpp"/>
+        <FILE id="zxAEFr" name="Sampler.h" compile="0" resource="0" file="Source/Sampler.h"/>
+        <FILE id="TzcLi2" name="SamplerGrid.cpp" compile="1" resource="0" file="Source/SamplerGrid.cpp"/>
+        <FILE id="xnhs2D" name="SamplerGrid.h" compile="0" resource="0" file="Source/SamplerGrid.h"/>
+        <FILE id="kwG3kJ" name="Scale.cpp" compile="1" resource="0" file="Source/Scale.cpp"/>
+        <FILE id="CIBkCA" name="Scale.h" compile="0" resource="0" file="Source/Scale.h"/>
         <FILE id="Ob9bH3" name="ScaleDegree.cpp" compile="1" resource="0" file="Source/ScaleDegree.cpp"/>
         <FILE id="VcSSXX" name="ScaleDegree.h" compile="0" resource="0" file="Source/ScaleDegree.h"/>
         <FILE id="VKMFJF" name="ScaleDetect.cpp" compile="1" resource="0" file="Source/ScaleDetect.cpp"/>
         <FILE id="QIZ720" name="ScaleDetect.h" compile="0" resource="0" file="Source/ScaleDetect.h"/>
+        <FILE id="iW0T0g" name="SeaOfGrain.cpp" compile="1" resource="0" file="Source/SeaOfGrain.cpp"/>
+        <FILE id="cPB1wW" name="SeaOfGrain.h" compile="0" resource="0" file="Source/SeaOfGrain.h"/>
+        <FILE id="EJvHaK" name="Selector.cpp" compile="1" resource="0" file="Source/Selector.cpp"/>
+        <FILE id="zvWezv" name="Selector.h" compile="0" resource="0" file="Source/Selector.h"/>
+        <FILE id="kZXFDY" name="SignalGenerator.cpp" compile="1" resource="0"
+              file="Source/SignalGenerator.cpp"/>
+        <FILE id="GjQ36S" name="SignalGenerator.h" compile="0" resource="0"
+              file="Source/SignalGenerator.h"/>
+        <FILE id="trDf4L" name="SingleOscillator.cpp" compile="1" resource="0"
+              file="Source/SingleOscillator.cpp"/>
+        <FILE id="C8L3ne" name="SingleOscillator.h" compile="0" resource="0"
+              file="Source/SingleOscillator.h"/>
+        <FILE id="w7uJ85" name="SliderSequencer.cpp" compile="1" resource="0"
+              file="Source/SliderSequencer.cpp"/>
+        <FILE id="kRGpA9" name="SliderSequencer.h" compile="0" resource="0"
+              file="Source/SliderSequencer.h"/>
+        <FILE id="SgSrx0" name="SlowLayers.cpp" compile="1" resource="0" file="Source/SlowLayers.cpp"/>
+        <FILE id="rCkxj9" name="SlowLayers.h" compile="0" resource="0" file="Source/SlowLayers.h"/>
+        <FILE id="YjvMag" name="StepSequencer.cpp" compile="1" resource="0"
+              file="Source/StepSequencer.cpp"/>
+        <FILE id="B3TcmA" name="StepSequencer.h" compile="0" resource="0" file="Source/StepSequencer.h"/>
+        <FILE id="FEm8mg" name="Stereofier.cpp" compile="1" resource="0" file="Source/Stereofier.cpp"/>
+        <FILE id="w59MsB" name="Stereofier.h" compile="0" resource="0" file="Source/Stereofier.h"/>
+        <FILE id="EdZndd" name="StutterControl.cpp" compile="1" resource="0"
+              file="Source/StutterControl.cpp"/>
+        <FILE id="w2XRGW" name="StutterControl.h" compile="0" resource="0"
+              file="Source/StutterControl.h"/>
         <FILE id="Pmu56z" name="SustainPedal.cpp" compile="1" resource="0"
               file="Source/SustainPedal.cpp"/>
         <FILE id="lUlkIm" name="SustainPedal.h" compile="0" resource="0" file="Source/SustainPedal.h"/>
+        <FILE id="JSxBB7" name="TimelineControl.cpp" compile="1" resource="0"
+              file="Source/TimelineControl.cpp"/>
+        <FILE id="awkUYm" name="TimelineControl.h" compile="0" resource="0"
+              file="Source/TimelineControl.h"/>
+        <FILE id="BGN7oK" name="TimerDisplay.cpp" compile="1" resource="0"
+              file="Source/TimerDisplay.cpp"/>
+        <FILE id="YIlKai" name="TimerDisplay.h" compile="0" resource="0" file="Source/TimerDisplay.h"/>
+        <FILE id="ne88Z8" name="TitleBar.cpp" compile="1" resource="0" file="Source/TitleBar.cpp"/>
+        <FILE id="fQnkwG" name="TitleBar.h" compile="0" resource="0" file="Source/TitleBar.h"/>
+        <FILE id="KgrIUI" name="Transport.cpp" compile="1" resource="0" file="Source/Transport.cpp"/>
+        <FILE id="Dk0alc" name="Transport.h" compile="0" resource="0" file="Source/Transport.h"/>
+        <FILE id="H1uGqz" name="ValueSetter.cpp" compile="1" resource="0" file="Source/ValueSetter.cpp"/>
+        <FILE id="JYb2gh" name="ValueSetter.h" compile="0" resource="0" file="Source/ValueSetter.h"/>
         <FILE id="cKFJMb" name="VelocityScaler.cpp" compile="1" resource="0"
               file="Source/VelocityScaler.cpp"/>
         <FILE id="h9RbCL" name="VelocityScaler.h" compile="0" resource="0"
@@ -404,129 +521,24 @@
               file="Source/VelocityStepSequencer.cpp"/>
         <FILE id="Uvw1p6" name="VelocityStepSequencer.h" compile="0" resource="0"
               file="Source/VelocityStepSequencer.h"/>
+        <FILE id="A3iWyh" name="VinylTempoControl.cpp" compile="1" resource="0"
+              file="Source/VinylTempoControl.cpp"/>
+        <FILE id="T2Jwjn" name="VinylTempoControl.h" compile="0" resource="0"
+              file="Source/VinylTempoControl.h"/>
+        <FILE id="wB4DPg" name="Vocoder.cpp" compile="1" resource="0" file="Source/Vocoder.cpp"/>
+        <FILE id="cqA2QB" name="Vocoder.h" compile="0" resource="0" file="Source/Vocoder.h"/>
+        <FILE id="N4zoFG" name="VocoderCarrierInput.cpp" compile="1" resource="0"
+              file="Source/VocoderCarrierInput.cpp"/>
+        <FILE id="SRGmSo" name="VocoderCarrierInput.h" compile="0" resource="0"
+              file="Source/VocoderCarrierInput.h"/>
+        <FILE id="H3ZWO6" name="VSTPlugin.cpp" compile="1" resource="0" file="Source/VSTPlugin.cpp"/>
+        <FILE id="LJRSZs" name="VSTPlugin.h" compile="0" resource="0" file="Source/VSTPlugin.h"/>
+        <FILE id="yvLapl" name="WaveformViewer.cpp" compile="1" resource="0"
+              file="Source/WaveformViewer.cpp"/>
+        <FILE id="XOErNb" name="WaveformViewer.h" compile="0" resource="0"
+              file="Source/WaveformViewer.h"/>
         <FILE id="CboYib" name="WhiteKeys.cpp" compile="1" resource="0" file="Source/WhiteKeys.cpp"/>
         <FILE id="Ws1yIL" name="WhiteKeys.h" compile="0" resource="0" file="Source/WhiteKeys.h"/>
-        <FILE id="mEj6vd" name="Capo.cpp" compile="1" resource="0" file="Source/Capo.cpp"/>
-        <FILE id="uSx7kB" name="Capo.h" compile="0" resource="0" file="Source/Capo.h"/>
-        <FILE id="kVFec8" name="KeyboardDisplay.cpp" compile="1" resource="0"
-              file="Source/KeyboardDisplay.cpp"/>
-        <FILE id="rJAhFG" name="KeyboardDisplay.h" compile="0" resource="0"
-              file="Source/KeyboardDisplay.h"/>
-        <FILE id="wUCXnT" name="ModulationVisualizer.cpp" compile="1" resource="0"
-              file="Source/ModulationVisualizer.cpp"/>
-        <FILE id="UMwE0t" name="ModulationVisualizer.h" compile="0" resource="0"
-              file="Source/ModulationVisualizer.h"/>
-        <FILE id="xkPLV1" name="ModWheel.cpp" compile="1" resource="0" file="Source/ModWheel.cpp"/>
-        <FILE id="rS7xp7" name="ModWheel.h" compile="0" resource="0" file="Source/ModWheel.h"/>
-        <FILE id="fIn3Zv" name="ModwheelToPressure.cpp" compile="1" resource="0"
-              file="Source/ModwheelToPressure.cpp"/>
-        <FILE id="HJHlow" name="ModwheelToPressure.h" compile="0" resource="0"
-              file="Source/ModwheelToPressure.h"/>
-        <FILE id="YMWfsB" name="ModwheelToVibrato.cpp" compile="1" resource="0"
-              file="Source/ModwheelToVibrato.cpp"/>
-        <FILE id="Z8ZH30" name="ModwheelToVibrato.h" compile="0" resource="0"
-              file="Source/ModwheelToVibrato.h"/>
-        <FILE id="D0JN9D" name="Monophonify.cpp" compile="1" resource="0" file="Source/Monophonify.cpp"/>
-        <FILE id="rkM42v" name="Monophonify.h" compile="0" resource="0" file="Source/Monophonify.h"/>
-        <FILE id="vLtjL7" name="Neighborhooder.cpp" compile="1" resource="0"
-              file="Source/Neighborhooder.cpp"/>
-        <FILE id="qSuxE3" name="Neighborhooder.h" compile="0" resource="0"
-              file="Source/Neighborhooder.h"/>
-        <FILE id="t6j4be" name="NoteDelayer.cpp" compile="1" resource="0" file="Source/NoteDelayer.cpp"/>
-        <FILE id="e8ysmp" name="NoteDelayer.h" compile="0" resource="0" file="Source/NoteDelayer.h"/>
-        <FILE id="WEyL34" name="NoteDisplayer.cpp" compile="1" resource="0"
-              file="Source/NoteDisplayer.cpp"/>
-        <FILE id="a52HeU" name="NoteDisplayer.h" compile="0" resource="0" file="Source/NoteDisplayer.h"/>
-        <FILE id="rbhtyZ" name="NoteFilter.cpp" compile="1" resource="0" file="Source/NoteFilter.cpp"/>
-        <FILE id="JW2ST3" name="NoteFilter.h" compile="0" resource="0" file="Source/NoteFilter.h"/>
-        <FILE id="Or658D" name="NoteFlusher.cpp" compile="1" resource="0" file="Source/NoteFlusher.cpp"/>
-        <FILE id="jzmZaE" name="NoteFlusher.h" compile="0" resource="0" file="Source/NoteFlusher.h"/>
-        <FILE id="iXHjWM" name="NoteGate.cpp" compile="1" resource="0" file="Source/NoteGate.cpp"/>
-        <FILE id="JbG01f" name="NoteGate.h" compile="0" resource="0" file="Source/NoteGate.h"/>
-        <FILE id="DU9MrN" name="Arpeggiator.cpp" compile="1" resource="0" file="Source/Arpeggiator.cpp"/>
-        <FILE id="XhHWYO" name="Arpeggiator.h" compile="0" resource="0" file="Source/Arpeggiator.h"/>
-        <FILE id="lhRwIU" name="Chorder.cpp" compile="1" resource="0" file="Source/Chorder.cpp"/>
-        <FILE id="byJnsc" name="Chorder.h" compile="0" resource="0" file="Source/Chorder.h"/>
-        <FILE id="EdZndd" name="StutterControl.cpp" compile="1" resource="0"
-              file="Source/StutterControl.cpp"/>
-        <FILE id="w2XRGW" name="StutterControl.h" compile="0" resource="0"
-              file="Source/StutterControl.h"/>
-        <FILE id="KhkfQS" name="EffectChain.cpp" compile="1" resource="0" file="Source/EffectChain.cpp"/>
-        <FILE id="hnLO0H" name="EffectChain.h" compile="0" resource="0" file="Source/EffectChain.h"/>
-        <FILE id="XKp8QP" name="BiquadFilterEffect.cpp" compile="1" resource="0"
-              file="Source/BiquadFilterEffect.cpp"/>
-        <FILE id="YZmmMg" name="BiquadFilterEffect.h" compile="0" resource="0"
-              file="Source/BiquadFilterEffect.h"/>
-        <FILE id="ZyraV0" name="FMSynth.cpp" compile="1" resource="0" file="Source/FMSynth.cpp"/>
-        <FILE id="NTlZ0B" name="FMSynth.h" compile="0" resource="0" file="Source/FMSynth.h"/>
-        <FILE id="LNhwIq" name="Sampler.cpp" compile="1" resource="0" file="Source/Sampler.cpp"/>
-        <FILE id="zxAEFr" name="Sampler.h" compile="0" resource="0" file="Source/Sampler.h"/>
-        <FILE id="S0ZOpj" name="KarplusStrong.cpp" compile="1" resource="0"
-              file="Source/KarplusStrong.cpp"/>
-        <FILE id="yjMdCK" name="KarplusStrong.h" compile="0" resource="0" file="Source/KarplusStrong.h"/>
-        <FILE id="trDf4L" name="SingleOscillator.cpp" compile="1" resource="0"
-              file="Source/SingleOscillator.cpp"/>
-        <FILE id="C8L3ne" name="SingleOscillator.h" compile="0" resource="0"
-              file="Source/SingleOscillator.h"/>
-        <FILE id="N2IcFH" name="NoteSequencerColumn.cpp" compile="1" resource="0"
-              file="Source/NoteSequencerColumn.cpp"/>
-        <FILE id="v5vJOc" name="NoteSequencerColumn.h" compile="0" resource="0"
-              file="Source/NoteSequencerColumn.h"/>
-        <FILE id="xORArp" name="NoteStepSequencer.cpp" compile="1" resource="0"
-              file="Source/NoteStepSequencer.cpp"/>
-        <FILE id="EuZ3UP" name="NoteStepSequencer.h" compile="0" resource="0"
-              file="Source/NoteStepSequencer.h"/>
-        <FILE id="FEm8mg" name="Stereofier.cpp" compile="1" resource="0" file="Source/Stereofier.cpp"/>
-        <FILE id="w59MsB" name="Stereofier.h" compile="0" resource="0" file="Source/Stereofier.h"/>
-        <FILE id="ScxANp" name="LFOController.cpp" compile="1" resource="0"
-              file="Source/LFOController.cpp"/>
-        <FILE id="J4fGNz" name="LFOController.h" compile="0" resource="0" file="Source/LFOController.h"/>
-        <FILE id="kwG3kJ" name="Scale.cpp" compile="1" resource="0" file="Source/Scale.cpp"/>
-        <FILE id="CIBkCA" name="Scale.h" compile="0" resource="0" file="Source/Scale.h"/>
-        <FILE id="KgrIUI" name="Transport.cpp" compile="1" resource="0" file="Source/Transport.cpp"/>
-        <FILE id="Dk0alc" name="Transport.h" compile="0" resource="0" file="Source/Transport.h"/>
-        <FILE id="vBc7q4" name="HelpDisplay.cpp" compile="1" resource="0" file="Source/HelpDisplay.cpp"/>
-        <FILE id="uZ4x9K" name="HelpDisplay.h" compile="0" resource="0" file="Source/HelpDisplay.h"/>
-        <FILE id="rudwi0" name="ModuleSaveDataPanel.cpp" compile="1" resource="0"
-              file="Source/ModuleSaveDataPanel.cpp"/>
-        <FILE id="mOW7vY" name="ModuleSaveDataPanel.h" compile="0" resource="0"
-              file="Source/ModuleSaveDataPanel.h"/>
-        <FILE id="qTg836" name="ChaosEngine.cpp" compile="1" resource="0" file="Source/ChaosEngine.cpp"/>
-        <FILE id="YY2OwK" name="ChaosEngine.h" compile="0" resource="0" file="Source/ChaosEngine.h"/>
-        <FILE id="ne88Z8" name="TitleBar.cpp" compile="1" resource="0" file="Source/TitleBar.cpp"/>
-        <FILE id="fQnkwG" name="TitleBar.h" compile="0" resource="0" file="Source/TitleBar.h"/>
-        <FILE id="HqwcBo" name="GridController.cpp" compile="1" resource="0"
-              file="Source/GridController.cpp"/>
-        <FILE id="wYDZOt" name="GridController.h" compile="0" resource="0"
-              file="Source/GridController.h"/>
-        <FILE id="gdpZuQ" name="MidiController.cpp" compile="1" resource="0"
-              file="Source/MidiController.cpp"/>
-        <FILE id="FdjFi9" name="MidiController.h" compile="0" resource="0"
-              file="Source/MidiController.h"/>
-        <FILE id="ld1pwm" name="MidiInstrument.cpp" compile="1" resource="0"
-              file="Source/MidiInstrument.cpp"/>
-        <FILE id="J88YwL" name="MidiInstrument.h" compile="0" resource="0"
-              file="Source/MidiInstrument.h"/>
-        <FILE id="n3PYoO" name="InputChannel.cpp" compile="1" resource="0"
-              file="Source/InputChannel.cpp"/>
-        <FILE id="esA2Ao" name="InputChannel.h" compile="0" resource="0" file="Source/InputChannel.h"/>
-        <FILE id="i6ONR2" name="OutputChannel.cpp" compile="1" resource="0"
-              file="Source/OutputChannel.cpp"/>
-        <FILE id="et5OpS" name="OutputChannel.h" compile="0" resource="0" file="Source/OutputChannel.h"/>
-        <FILE id="YxJ3n3" name="Presets.cpp" compile="1" resource="0" file="Source/Presets.cpp"/>
-        <FILE id="hqaUZQ" name="Presets.h" compile="0" resource="0" file="Source/Presets.h"/>
-        <FILE id="kZXFDY" name="SignalGenerator.cpp" compile="1" resource="0"
-              file="Source/SignalGenerator.cpp"/>
-        <FILE id="GjQ36S" name="SignalGenerator.h" compile="0" resource="0"
-              file="Source/SignalGenerator.h"/>
-        <FILE id="xd8gU7" name="ControlSequencer.cpp" compile="1" resource="0"
-              file="Source/ControlSequencer.cpp"/>
-        <FILE id="HjdGOp" name="ControlSequencer.h" compile="0" resource="0"
-              file="Source/ControlSequencer.h"/>
-        <FILE id="QT49Vw" name="FreeverbOutput.cpp" compile="1" resource="0"
-              file="Source/FreeverbOutput.cpp"/>
-        <FILE id="Uj7fLC" name="FreeverbOutput.h" compile="0" resource="0"
-              file="Source/FreeverbOutput.h"/>
       </GROUP>
       <GROUP id="{7A2BD925-14B2-38D6-D71C-56E9018A07FF}" name="uicontrols">
         <FILE id="aFaiaz" name="ClickButton.cpp" compile="1" resource="0" file="Source/ClickButton.cpp"/>
@@ -545,13 +557,6 @@
         <FILE id="QwDpwf" name="IUIControl.cpp" compile="1" resource="0" file="Source/IUIControl.cpp"/>
         <FILE id="BwcDH9" name="IUIControl.h" compile="0" resource="0" file="Source/IUIControl.h"/>
       </GROUP>
-      <GROUP id="{17BD3427-0E14-197E-025B-41C989099F31}" name="vinylcontrol">
-        <FILE id="E50REB" name="timecoder.c" compile="1" resource="0" file="Source/vinylcontrol/timecoder.c"/>
-        <FILE id="oJd6k3" name="timecoder.h" compile="0" resource="0" file="Source/vinylcontrol/timecoder.h"/>
-        <FILE id="QnGD5P" name="vinylcontrol.cpp" compile="1" resource="0"
-              file="Source/vinylcontrol/vinylcontrol.cpp"/>
-        <FILE id="eSxSi9" name="vinylcontrol.h" compile="0" resource="0" file="Source/vinylcontrol/vinylcontrol.h"/>
-      </GROUP>
       <FILE id="hrizr1" name="AdditiveVoice.cpp" compile="1" resource="0"
             file="Source/AdditiveVoice.cpp"/>
       <FILE id="z8Mkh1" name="AdditiveVoice.h" compile="0" resource="0" file="Source/AdditiveVoice.h"/>
@@ -563,6 +568,8 @@
             file="Source/ArrangementMaster.cpp"/>
       <FILE id="SviADL" name="ArrangementMaster.h" compile="0" resource="0"
             file="Source/ArrangementMaster.h"/>
+      <FILE id="ev4J6H" name="Bespoke_Platform.cpp" compile="1" resource="0"
+            file="Source/Bespoke_Platform.cpp"/>
       <FILE id="VZwfve" name="BiquadFilter.cpp" compile="1" resource="0"
             file="Source/BiquadFilter.cpp"/>
       <FILE id="GEN8T2" name="BiquadFilter.h" compile="0" resource="0" file="Source/BiquadFilter.h"/>

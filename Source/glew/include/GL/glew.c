@@ -30,8 +30,6 @@
 ** THE POSSIBILITY OF SUCH DAMAGE.
 */
 
-#ifdef BESPOKE_WINDOWS
-
 #include <GL/glew.h>
 
 #if defined(GLEW_OSMESA)
@@ -23952,5 +23950,3 @@ GLboolean eglewIsSupported (const char* name)
 }
 
 #endif /* _WIN32 */
-
-#endif

@@ -27,8 +27,6 @@
  * POSSIBILITY OF SUCH DAMAGE.
  **/
 
-#ifdef BESPOKE_MAC
-
 #ifndef __PSMOVE_H
 #define __PSMOVE_H
 
@@ -243,8 +241,6 @@ psmove_disconnect(PSMove *move);
 
 #ifdef __cplusplus
 }
-#endif
-
 #endif
 
 #endif

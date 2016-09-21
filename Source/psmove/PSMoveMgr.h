@@ -1,5 +1,3 @@
-#ifdef BESPOKE_MAC
-
 #pragma once
 
 #include "../OpenFrameworksPort.h"
@@ -45,5 +43,3 @@ private:
    
    PSMoveListener* mListener;
 };
-
-#endif

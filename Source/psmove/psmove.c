@@ -27,8 +27,6 @@
  * POSSIBILITY OF SUCH DAMAGE.
  **/
 
-#ifdef BESPOKE_MAC
-
 #include "psmove.h"
 
 #include "hidapi.h"
@@ -590,5 +588,3 @@ psmove_disconnect(PSMove *move)
     free(move);
 }
 
-
-#endif
