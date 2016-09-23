@@ -1620,7 +1620,7 @@ void ModularSynth::LogEvent(string event, LogEventType type)
 IDrawableModule* ModularSynth::DuplicateModule(IDrawableModule* module)
 {
    {
-      FileStreamOut out("./tmp");
+      FileStreamOut out(ofToDataPath("tmp").c_str());
       module->SaveState(out);
    }
    
@@ -1638,7 +1638,7 @@ IDrawableModule* ModularSynth::DuplicateModule(IDrawableModule* module)
    newModule->SetName(module->Name()); //temporarily rename to the same as what we duplicated, so we can load state properly
    
    {
-      FileStreamIn in("./tmp");
+      FileStreamIn in(ofToDataPath("tmp").c_str());
       newModule->LoadState(in);
    }
    
