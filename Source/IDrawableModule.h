@@ -52,6 +52,7 @@ public:
    void Render() override;
    bool CheckNeedsDraw() override;
    virtual bool AlwaysOnTop() { return false; }
+   virtual bool AlwaysOnBottom() { return false; }
    void ToggleMinimized();
    void SetMinimized(bool minimized) { if (HasTitleBar()) mMinimized = minimized; }
    virtual void KeyPressed(int key);

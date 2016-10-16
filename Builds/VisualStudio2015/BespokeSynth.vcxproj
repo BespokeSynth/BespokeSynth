@@ -276,6 +276,7 @@
     <ClCompile Include="..\..\Source\PitchDive.cpp"/>
     <ClCompile Include="..\..\Source\PitchSetter.cpp"/>
     <ClCompile Include="..\..\Source\Polyrhythms.cpp"/>
+    <ClCompile Include="..\..\Source\Prefab.cpp"/>
     <ClCompile Include="..\..\Source\Presets.cpp"/>
     <ClCompile Include="..\..\Source\Pressure.cpp"/>
     <ClCompile Include="..\..\Source\PressureToModwheel.cpp"/>
@@ -2140,6 +2141,7 @@
     <ClInclude Include="..\..\Source\PitchDive.h"/>
     <ClInclude Include="..\..\Source\PitchSetter.h"/>
     <ClInclude Include="..\..\Source\Polyrhythms.h"/>
+    <ClInclude Include="..\..\Source\Prefab.h"/>
     <ClInclude Include="..\..\Source\Presets.h"/>
     <ClInclude Include="..\..\Source\Pressure.h"/>
     <ClInclude Include="..\..\Source\PressureToModwheel.h"/>

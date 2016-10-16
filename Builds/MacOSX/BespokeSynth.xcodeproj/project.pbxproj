@@ -143,6 +143,7 @@
 		779A67DDAADDB9CEA4CD0557 = {isa = PBXBuildFile; fileRef = D6A845BF0AD721DE19F1FC1D; };
 		42FEF2D1E4D4282D09330F78 = {isa = PBXBuildFile; fileRef = 780CE91424C9CC1BBCAC9AA4; };
 		AF93754BB9D2452A95CFEA03 = {isa = PBXBuildFile; fileRef = 9C5B5539C72004898F5C7BD3; };
+		4B5230CE05D3586F67D621E7 = {isa = PBXBuildFile; fileRef = CB58DB3C9824F66A8862EACC; };
 		A6EC1CA0A65EBF4635A80857 = {isa = PBXBuildFile; fileRef = 81D57476649503400553A6F9; };
 		8FB045F58AABCE07CA314BFB = {isa = PBXBuildFile; fileRef = 0931C7BB7F081CC0A74083AE; };
 		637F6556AA21BE0D336944AD = {isa = PBXBuildFile; fileRef = 9DB409C97C663CF901892FE2; };
@@ -1464,6 +1465,7 @@
 		AE606657644B917A95A6FC2A = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; name = FreqDomainBoilerplate.h; path = ../../Source/FreqDomainBoilerplate.h; sourceTree = "SOURCE_ROOT"; };
 		AEA076831E1DC21121E1FCFB = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; name = "setup_11.h"; path = "../../../../../Downloads/JUCE/modules/juce_audio_formats/codecs/oggvorbis/libvorbis-1.3.2/lib/modes/setup_11.h"; sourceTree = "SOURCE_ROOT"; };
 		AEA3D257F627B1C09122F818 = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; name = VocoderCarrierInput.cpp; path = ../../Source/VocoderCarrierInput.cpp; sourceTree = "SOURCE_ROOT"; };
+		AED016827F74562D8ED0E53F = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; name = Prefab.h; path = ../../Source/Prefab.h; sourceTree = "SOURCE_ROOT"; };
 		AEFEB7AE57A5A1EF2F4F6FD2 = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; name = FollowingSong.cpp; path = ../../Source/FollowingSong.cpp; sourceTree = "SOURCE_ROOT"; };
 		AF134B7B16DBA4E8AF5937F9 = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; name = "juce_LookAndFeel_V3.h"; path = "../../../../../Downloads/JUCE/modules/juce_gui_basics/lookandfeel/juce_LookAndFeel_V3.h"; sourceTree = "SOURCE_ROOT"; };
 		AF19130AA052D963BDAF1DB5 = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.c; name = jidctint.c; path = "../../../../../Downloads/JUCE/modules/juce_graphics/image_formats/jpglib/jidctint.c"; sourceTree = "SOURCE_ROOT"; };
@@ -1665,6 +1667,7 @@
 		CA80779265AE2170EF844760 = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; name = NoteGate.cpp; path = ../../Source/NoteGate.cpp; sourceTree = "SOURCE_ROOT"; };
 		CB1E4F24990853A1DB150582 = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; name = "juce_BufferingAudioSource.h"; path = "../../../../../Downloads/JUCE/modules/juce_audio_basics/sources/juce_BufferingAudioSource.h"; sourceTree = "SOURCE_ROOT"; };
 		CB3843CC16083B29419807CB = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; name = endswap.h; path = "../../../../../Downloads/JUCE/modules/juce_audio_formats/codecs/flac/endswap.h"; sourceTree = "SOURCE_ROOT"; };
+		CB58DB3C9824F66A8862EACC = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; name = Prefab.cpp; path = ../../Source/Prefab.cpp; sourceTree = "SOURCE_ROOT"; };
 		CB7A718CB989C2027B914D2A = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; name = "juce_FileBasedDocument.cpp"; path = "../../../../../Downloads/JUCE/modules/juce_gui_extra/documents/juce_FileBasedDocument.cpp"; sourceTree = "SOURCE_ROOT"; };
 		CB7C6EA88E47CE07177B798A = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; name = "juce_AudioFormatReaderSource.cpp"; path = "../../../../../Downloads/JUCE/modules/juce_audio_formats/format/juce_AudioFormatReaderSource.cpp"; sourceTree = "SOURCE_ROOT"; };
 		CB8031F2CD6103BE4B6F12EA = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; name = "juce_FileChooserDialogBox.cpp"; path = "../../../../../Downloads/JUCE/modules/juce_gui_basics/filebrowser/juce_FileChooserDialogBox.cpp"; sourceTree = "SOURCE_ROOT"; };
@@ -2306,6 +2309,8 @@
 					282116A45AB2BDF3E727E3D6,
 					9C5B5539C72004898F5C7BD3,
 					E49D32E4F87BBC56EE2768BB,
+					CB58DB3C9824F66A8862EACC,
+					AED016827F74562D8ED0E53F,
 					81D57476649503400553A6F9,
 					B8D509753E00675F6254A465,
 					0931C7BB7F081CC0A74083AE,
@@ -4240,6 +4245,7 @@
 					779A67DDAADDB9CEA4CD0557,
 					42FEF2D1E4D4282D09330F78,
 					AF93754BB9D2452A95CFEA03,
+					4B5230CE05D3586F67D621E7,
 					A6EC1CA0A65EBF4635A80857,
 					8FB045F58AABCE07CA314BFB,
 					637F6556AA21BE0D336944AD,

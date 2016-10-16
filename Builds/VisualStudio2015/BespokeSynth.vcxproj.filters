@@ -811,6 +811,9 @@
     <ClCompile Include="..\..\Source\Polyrhythms.cpp">
       <Filter>BespokeSynth\Source\modules</Filter>
     </ClCompile>
+    <ClCompile Include="..\..\Source\Prefab.cpp">
+      <Filter>BespokeSynth\Source\modules</Filter>
+    </ClCompile>
     <ClCompile Include="..\..\Source\Presets.cpp">
       <Filter>BespokeSynth\Source\modules</Filter>
     </ClCompile>
@@ -3346,6 +3349,9 @@
       <Filter>BespokeSynth\Source\modules</Filter>
     </ClInclude>
     <ClInclude Include="..\..\Source\Polyrhythms.h">
+      <Filter>BespokeSynth\Source\modules</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\Source\Prefab.h">
       <Filter>BespokeSynth\Source\modules</Filter>
     </ClInclude>
     <ClInclude Include="..\..\Source\Presets.h">

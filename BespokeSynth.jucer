@@ -411,6 +411,8 @@
         <FILE id="tGoqwJ" name="PitchSetter.h" compile="0" resource="0" file="Source/PitchSetter.h"/>
         <FILE id="WrfYZh" name="Polyrhythms.cpp" compile="1" resource="0" file="Source/Polyrhythms.cpp"/>
         <FILE id="Dxf5mJ" name="Polyrhythms.h" compile="0" resource="0" file="Source/Polyrhythms.h"/>
+        <FILE id="cwpyvy" name="Prefab.cpp" compile="1" resource="0" file="Source/Prefab.cpp"/>
+        <FILE id="Jv1aGd" name="Prefab.h" compile="0" resource="0" file="Source/Prefab.h"/>
         <FILE id="YxJ3n3" name="Presets.cpp" compile="1" resource="0" file="Source/Presets.cpp"/>
         <FILE id="hqaUZQ" name="Presets.h" compile="0" resource="0" file="Source/Presets.h"/>
         <FILE id="bOg7BS" name="Pressure.cpp" compile="1" resource="0" file="Source/Pressure.cpp"/>

@@ -655,7 +655,7 @@ void MidiController::DrawModule()
    
    int w,h;
    GetDimensions(w, h);
-   mAddConnectionCheckbox->SetY(h-17);
+   mAddConnectionCheckbox->SetPosition(mAddConnectionCheckbox->GetPosition(true).x, h-17);
    mAddConnectionCheckbox->Draw();
    
    DrawText("last input: "+mLastInput,60,h-5);
@@ -1261,7 +1261,7 @@ void UIControlConnection::Draw(int index)
    
    for (auto iter = mEditorControls.begin(); iter != mEditorControls.end(); ++iter)
    {
-      (*iter)->SetY(y);
+      (*iter)->SetPosition((*iter)->GetPosition(true).x,y);
       (*iter)->Draw();
    }
    

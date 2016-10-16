@@ -239,7 +239,13 @@ void ModularSynth::Draw(void* vg)
    
    for (int i = mModules.size()-1; i >= 0; --i)
    {
-      if (!mModules[i]->AlwaysOnTop())
+      if (mModules[i]->AlwaysOnBottom())
+         mModules[i]->Draw();
+   }
+   
+   for (int i = mModules.size()-1; i >= 0; --i)
+   {
+      if (!mModules[i]->AlwaysOnTop() && !mModules[i]->AlwaysOnBottom())
          mModules[i]->Draw();
    }
    
@@ -508,7 +514,9 @@ void ModularSynth::MouseMoved(int intX, int intY )
 
    if (mMoveModule)
    {
-      mMoveModule->SetPosition(x + mMoveModuleOffsetX, y + mMoveModuleOffsetY);
+      float oldX, oldY;
+      mMoveModule->GetPosition(oldX, oldY);
+      mMoveModule->Move(x + mMoveModuleOffsetX - oldX, y + mMoveModuleOffsetY - oldY);
       return;
    }
 
@@ -582,15 +590,11 @@ void ModularSynth::MouseDragged(int intX, int intY, int button)
    }
    
    for (auto module : mGroupSelectedModules)
-   {
-      int moduleX,moduleY;
-      module->GetPosition(moduleX, moduleY);
-      module->SetPosition(moduleX + drag.x, moduleY + drag.y);
-   }
+      module->Move(drag.x, drag.y);
 
    if (mMoveModule)
    {
-      mMoveModule->SetPosition(x + mMoveModuleOffsetX, y + mMoveModuleOffsetY);
+      mMoveModule->Move(drag.x, drag.y);
       return;
    }
    
@@ -805,7 +809,12 @@ IDrawableModule* ModularSynth::GetModuleAt(int x, int y)
    }
    for (int i=0; i<mModules.size(); ++i)
    {
-      if (mModules[i]->AlwaysOnTop() == false && mModules[i]->TestClick(x,y,false,true))
+      if (!mModules[i]->AlwaysOnTop() && !mModules[i]->AlwaysOnBottom() && mModules[i]->TestClick(x,y,false,true))
+         return mModules[i];
+   }
+   for (int i=0; i<mModules.size(); ++i)
+   {
+      if (mModules[i]->AlwaysOnBottom() && mModules[i]->TestClick(x,y,false,true))
          return mModules[i];
    }
    return NULL;
@@ -1384,17 +1393,11 @@ IDrawableModule* ModularSynth::CreateModule(const ofxJSONElement& moduleInfo)
    try
    {
       if (type == "transport")
-      {
          module = TheTransport;
-      }
       else if (type == "scale")
-      {
          module = TheScale;
-      }
       else
-      {
          module = mModuleFactory.MakeModule(type);
-      }
    
       if (module == NULL)
       {
@@ -1409,9 +1412,7 @@ IDrawableModule* ModularSynth::CreateModule(const ofxJSONElement& moduleInfo)
       
       mModules.resize(mModules.size() + 1);
       for (int i=mModules.size() - 1; i>0; --i)
-      {
          mModules[i] = mModules[i-1];
-      }
       mModules[0] = module;
    }
    catch (UnknownModuleException& e)

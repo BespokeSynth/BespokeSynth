@@ -151,6 +151,12 @@ public:
    void LockRender(bool lock) { if (lock) { mRenderLock.enter(); } else { mRenderLock.exit(); } }
    void UpdateFrameRate(float fps) { mFrameRate = fps; }
    float GetFrameRate() const { return mFrameRate; }
+   CriticalSection* GetRenderLock() { return &mRenderLock; }
+   NamedMutex* GetAudioMutex() { return &mAudioThreadMutex; }
+   
+   IDrawableModule* CreateModule(const ofxJSONElement& moduleInfo);
+   IDrawableModule* SetUpModule(const ofxJSONElement& moduleInfo);
+   void DeleteModule(IDrawableModule* module);
    
    void SaveLayout(string jsonFile = "", bool makeDefaultLayout = true);
    void SaveLayoutAsPopup();
@@ -166,15 +172,11 @@ private:
    void DrawConsole();
    void ZoomView(float zoomAmount);
    void CheckClick(IDrawableModule* clickedModule, int x, int y, bool rightButton);
-   void DeleteModule(IDrawableModule* module);
    void UpdateUserPrefsLayout();
    int GetModuleIndex(IDrawableModule* module);
    void LoadStatePopupImp();
    IDrawableModule* DuplicateModule(IDrawableModule* module);
    void DeleteAllModules();
-   
-   IDrawableModule* CreateModule(const ofxJSONElement& moduleInfo);
-   IDrawableModule* SetUpModule(const ofxJSONElement& moduleInfo);
    
    ofSoundStream mSoundStream;
    int mIOBufferSize;

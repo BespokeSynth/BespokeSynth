@@ -21,11 +21,10 @@ public:
    void Draw();
    virtual void Render() {}
    void SetPosition(float x, float y) { mX = x; mY = y; }
-   void SetX(float x) { mX = x; }
-   void SetY(float y) { mY = y; }
    void GetPosition(int& x, int& y, bool local = false) const; //TODO(Ryan) deprecated
    void GetPosition(float& x, float& y, bool local = false) const;
    ofVec2f GetPosition(bool local = false) const;
+   virtual void Move(float moveX, float moveY) { mX += moveX; mY += moveY; }
    virtual bool TestClick(int x, int y, bool right, bool testOnly = false);
    IClickable* GetParent() const { return mParent; }
    void SetParent(IClickable* parent) { mParent = parent; }
