@@ -19,6 +19,7 @@ public:
    static IDrawableModule* Create() { return new KeyboardDisplay(); }
    
    string GetTitleLabel() override { return "keyboard"; }
+   void CreateUIControls() override;
    
    void SetEnabled(bool enabled) override { mEnabled = enabled; }
    
@@ -26,6 +27,8 @@ public:
    void PlayNote(double time, int pitch, int velocity, int voiceIdx = -1, ModulationChain* pitchBend = NULL, ModulationChain* modWheel = NULL, ModulationChain* pressure = NULL) override;
    
    void MouseReleased() override;
+   void KeyPressed(int key, bool isRepeat) override;
+   void KeyReleased(int key) override;
    
    void LoadLayout(const ofxJSONElement& moduleInfo) override;
    void SetUpFromSaveData() override;
@@ -42,12 +45,16 @@ private:
    
    int RootKey() const;
    int NumKeys() const;
+   int GetPitchForTypingKey(int key) const;
    
    int mWidth;
    int mHeight;
    int mRootOctave;
    int mNumOctaves;
-   int mPlayingPitch;
+   int mPlayingMousePitch;
+   
+   bool mTypingInput;
+   Checkbox* mTypingInputCheckbox;
 };
 
 #endif /* defined(__Bespoke__KeyboardDisplay__) */

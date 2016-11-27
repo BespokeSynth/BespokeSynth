@@ -222,7 +222,7 @@ void Producer::DoWrite()
          }
       }
       
-      Sample::WriteDataToFile(ofGetTimestampString("producer/producer_%m-%d-%Y_%H-%M.wav").c_str(), toWrite, pos);
+      Sample::WriteDataToFile(ofGetTimestampString("producer/producer_%m-%d-%Y_%H-%M.wav").c_str(), &toWrite, pos);
       mClipStart = 0;
       mClipEnd = mSample->LengthInSamples();
       mOffset = 0;

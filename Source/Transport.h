@@ -111,7 +111,7 @@ public:
    
    //IDrawableModule
    void Init() override;
-   void KeyPressed(int key) override;
+   void KeyPressed(int key, bool isRepeat) override;
    bool IsSingleton() const override { return true; }
 
    void ButtonClicked(ClickButton* button) override;

@@ -36,7 +36,7 @@ public:
    TextEntry(ITextEntryListener* owner, const char* name, int x, int y, int charWidth, char* var);
    TextEntry(ITextEntryListener* owner, const char* name, int x, int y, int charWidth, int* var, int min, int max);
    TextEntry(ITextEntryListener* owner, const char* name, int x, int y, int charWidth, float* var, float min, float max);
-   void OnKeyPressed(int key);
+   void OnKeyPressed(int key, bool isRepeat);
    void Render() override;
    
    void MakeActiveTextEntry();

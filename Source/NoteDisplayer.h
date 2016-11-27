@@ -20,8 +20,6 @@ public:
    
    string GetTitleLabel() override { return "notedisplayer"; }
    
-   void SetEnabled(bool enabled) override { mEnabled = enabled; }
-   
    //INoteReceiver
    void PlayNote(double time, int pitch, int velocity, int voiceIdx = -1, ModulationChain* pitchBend = NULL, ModulationChain* modWheel = NULL, ModulationChain* pressure = NULL) override;
    
@@ -32,7 +30,7 @@ private:
    //IDrawableModule
    void DrawModule() override;
    void GetModuleDimensions(int& width, int& height) override { width = 110; height = 22; }
-   bool Enabled() const override { return mEnabled; }
+   bool Enabled() const override { return true; }
    
    int mNote;
    int mVelocity;

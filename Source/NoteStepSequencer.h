@@ -22,7 +22,7 @@
 #include "Grid.h"
 #include "MidiController.h"
 
-#define NSS_MAX_STEPS 64
+#define NSS_MAX_STEPS 128
 
 class NoteStepSequencer : public IDrawableModule, public ITimeListener, public INoteSource, public IButtonListener, public IDropdownListener, public IIntSliderListener, public IFloatSliderListener, public MidiDeviceListener, public GridListener, public IAudioPoller
 {

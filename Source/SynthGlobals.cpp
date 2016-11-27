@@ -331,13 +331,13 @@ void UpdateTarget(IDrawableModule* module)
    {
       IDrawableModule* target = dynamic_cast<IDrawableModule*>(audioSource->GetTarget());
       if (target)
-         targetName = target->Name();
+         targetName = target->Path();
       module->GetSaveData().SetString("target", targetName);
       
       //and the second target for stereofiers
       IDrawableModule* target2 = dynamic_cast<IDrawableModule*>(audioSource->GetTarget2());
       if (target2)
-         module->GetSaveData().SetString("target2", target2->Name());
+         module->GetSaveData().SetString("target2", target2->Path());
    }
    if (noteSource || grid)
    {
@@ -350,7 +350,7 @@ void UpdateTarget(IDrawableModule* module)
             IClickable* target = cable->GetTarget();
             if (target)
             {
-               targetName += target->Name();
+               targetName += target->Path();
                if (i < cables.size()-1)
                   targetName += ",";
             }
@@ -514,7 +514,7 @@ string GetUniqueName(string name, vector<IDrawableModule*> existing)
       bool isNameUnique = true;
       for (int i=0; i<existing.size(); ++i)
       {
-         if (existing[i]->Name() == name)
+         if (existing[i]->Path() == name)
          {
             ++suffix;
             name = origName + ofToString(suffix);

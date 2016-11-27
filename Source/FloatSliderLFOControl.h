@@ -131,9 +131,9 @@ private:
    ADSRDisplay* mADSRDisplay;
    int mADSRIndex;
    RadioButton* mADSRSelector;
-   bool mFlipADSR;
-   Checkbox* mFlipADSRCheckbox;
    bool mPinned;
+   float mADSRLengthMultiplier;
+   FloatSlider* mADSRLengthMultiplierSlider;
 
    LFOControlType mType;
    RadioButton* mTypeSelector;

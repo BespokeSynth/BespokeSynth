@@ -73,10 +73,10 @@ void Grid::Render()
             ofFill();
             if (mGridMode == kNormal)
             {
-               ofSetColor(int(255 * data));
+               ofSetColor(255 * data, 255 * data, 255 * data, gModuleDrawAlpha);
                ofRect(x,y,xsize,ysize);
             }
-            ofSetColor(255,255,255);
+            ofSetColor(255,255,255, gModuleDrawAlpha);
             float fillAmount = MIN(1, data);
             if (mGridMode == kMultislider)
                ofRect(x, y+(ysize*(1-fillAmount)), xsize, ysize*fillAmount);
@@ -85,18 +85,18 @@ void Grid::Render()
          }
 
          if (i == mHighlightCol)
-            ofSetColor(0,255,0);
+            ofSetColor(0,255,0, gModuleDrawAlpha);
          else if (mMajorCol > 0 && i % mMajorCol == 0)
-            ofSetColor(200,200,200);
+            ofSetColor(200,200,200, gModuleDrawAlpha);
          else
-            ofSetColor(100,100,100);
+            ofSetColor(100,100,100, gModuleDrawAlpha);
          ofNoFill();
          ofRect(x, y, xsize, ysize);
       }
    }
    if (mCurrentHover != -1 && mShouldDrawValue)
    {
-      ofSetColor(ofColor::grey);
+      ofSetColor(ofColor::grey, gModuleDrawAlpha);
       DrawText(ofToString(GetVal(mCurrentHover % mCols, mCurrentHover / mCols)), mX, mY+12);
    }
    ofPopStyle();

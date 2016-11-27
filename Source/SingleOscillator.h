@@ -74,6 +74,8 @@ private:
    FloatSlider* mSyncFreqSlider;
    FloatSlider* mDetuneSlider;
    FloatSlider* mShuffleSlider;
+   float mLengthMultiplier;
+   FloatSlider* mLengthMultiplierSlider;
    
    FloatSlider* mFilterCutoffSlider;
    ADSRDisplay* mFilterADSRDisplay;

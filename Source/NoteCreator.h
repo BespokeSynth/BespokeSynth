@@ -30,7 +30,7 @@ public:
    
    void OnTransportAdvanced(float amount) override;
    
-   void KeyPressed(int key) override;
+   void KeyPressed(int key, bool isRepeat) override;
    
    void CheckboxUpdated(Checkbox* checkbox) override;
    void ButtonClicked(ClickButton* button) override;

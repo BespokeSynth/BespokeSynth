@@ -26,7 +26,7 @@ public:
    string GetTitleLabel() override { return "stutter control"; }
    void CreateUIControls() override;
    
-   void KeyPressed(int key) override;
+   void KeyPressed(int key, bool isRepeat) override;
    void KeyReleased(int key) override;
    
    void AddListener(Stutter* stutter);

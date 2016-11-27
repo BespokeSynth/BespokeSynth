@@ -294,7 +294,9 @@ bool PatchCableSource::IsValidTarget(IClickable* target) const
 void PatchCableSource::FindValidTargets()
 {
    mValidTargets.clear();
-   for (auto module : TheSynth->GetModules())
+   vector<IDrawableModule*> allModules;
+   TheSynth->GetAllModules(allModules);
+   for (auto module : allModules)
    {
       if (module == mOwner)
          continue;
@@ -328,7 +330,7 @@ void PatchCableSource::CableGrabbed()
    FindValidTargets();
 }
 
-void PatchCableSource::KeyPressed(int key)
+void PatchCableSource::KeyPressed(int key, bool isRepeat)
 {
    if (key == OF_KEY_BACKSPACE)
    {

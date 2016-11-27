@@ -303,7 +303,7 @@ bool ofIsStringInString(const string& haystack, const string& needle);
 void ofScale(float x, float y, float z);
 void ofExit();
 void ofToggleFullscreen();
-void ofStringReplace(string& str, string from, string to);
+void ofStringReplace(string& str, string from, string to, bool firstOnly = false);
 string ofGetTimestampString(string in);
 void ofTriangle(float x1, float y1, float x2, float y2, float x3, float y3);
 

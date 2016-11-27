@@ -25,10 +25,10 @@ FloatSliderLFOControl::FloatSliderLFOControl()
 , mADSRDisplay(NULL)
 , mADSRIndex(0)
 , mADSRSelector(NULL)
-, mFlipADSR(false)
-, mFlipADSRCheckbox(NULL)
 , mPinned(false)
 , mSliderCable(NULL)
+, mADSRLengthMultiplier(1)
+, mADSRLengthMultiplierSlider(nullptr)
 {
    SetLFOEnabled(false);
    
@@ -52,9 +52,9 @@ void FloatSliderLFOControl::CreateUIControls()
    mTypeSelector = new RadioButton(this,"type",2,16,(int*)(&mType),kRadioHorizontal);
    mADSRDisplay = new ADSRDisplay(this,"adsr",2,40,96,40,&sADSR[0]);
    mADSRSelector = new RadioButton(this,"adsrselector",2,85,&mADSRIndex,kRadioHorizontal);
-   mFlipADSRCheckbox = new Checkbox(this,"flip",2,103,&mFlipADSR);
-   mMinSlider = new FloatSlider(this,"min",-1,-1,90,15,&mLFOSettings.mMin,0,1);
-   mMaxSlider = new FloatSlider(this,"max",-1,-1,90,15,&mLFOSettings.mMax,0,1);
+   mADSRLengthMultiplierSlider = new FloatSlider(this,"length",2,103,90,15,&mADSRLengthMultiplier,.01f,10);
+   mMinSlider = new FloatSlider(this,"low",-1,-1,90,15,&mLFOSettings.mMin,0,1);
+   mMaxSlider = new FloatSlider(this,"high",-1,-1,90,15,&mLFOSettings.mMax,0,1);
    mAddSlider = new FloatSlider(this,"add",-1,-1,90,15,&mLFOSettings.mAdd,-1,1);
    mPinButton = new ClickButton(this,"pin",70,2);
    mEnableLFOCheckbox = new Checkbox(this,"enable",5,2,&mEnabled);
@@ -132,10 +132,10 @@ void FloatSliderLFOControl::DrawModule()
    mBiasSlider->Draw();
    mADSRDisplay->Draw();
    mADSRSelector->Draw();
-   mFlipADSRCheckbox->Draw();
    mMinSlider->Draw();
    mMaxSlider->Draw();
    mAddSlider->Draw();
+   mADSRLengthMultiplierSlider->Draw();
    if (!mPinned)
       mPinButton->Draw();
 }
@@ -181,8 +181,8 @@ void FloatSliderLFOControl::SetOwner(FloatSlider* owner)
    mMinSlider->SetMode(owner->GetMode());
    mMaxSlider->SetMode(owner->GetMode());
    mAddSlider->SetMode(owner->GetMode());
-   mModuleSaveData.SetExtents("min", owner->GetMin(), owner->GetMax());
-   mModuleSaveData.SetExtents("max", owner->GetMin(), owner->GetMax());
+   mModuleSaveData.SetExtents("low", owner->GetMin(), owner->GetMax());
+   mModuleSaveData.SetExtents("high", owner->GetMin(), owner->GetMax());
 }
 
 void FloatSliderLFOControl::PostRepatch(PatchCableSource* cableSource)
@@ -203,7 +203,7 @@ float FloatSliderLFOControl::Value(int samplesIn /*= 0*/)
    if (mType == kLFOControlType_LFO)
       return ofClamp(Interp(mLFO.Value(samplesIn), mLFOSettings.mMin, mLFOSettings.mMax) + mLFOSettings.mAdd, mOwner->GetMin(), mOwner->GetMax());
    if (mType == kLFOControlType_ADSR)
-      return ofClamp(Interp(sADSR[mADSRIndex].Value(gTime + samplesIn * gInvSampleRateMs), mFlipADSR ? mLFOSettings.mMax : mLFOSettings.mMin, mFlipADSR ? mLFOSettings.mMin : mLFOSettings.mMax) + mLFOSettings.mAdd, mOwner->GetMin(), mOwner->GetMax());
+      return ofClamp(Interp(sADSR[mADSRIndex].Value(gTime + samplesIn * gInvSampleRateMs), mLFOSettings.mMin, mLFOSettings.mMax) + mLFOSettings.mAdd, mOwner->GetMin(), mOwner->GetMax());
    return 0;
 }
 
@@ -223,7 +223,7 @@ void FloatSliderLFOControl::UpdateVisibleControls()
    mBiasSlider->SetShowing(mType == kLFOControlType_LFO);
    mADSRDisplay->SetShowing(mType == kLFOControlType_ADSR);
    mADSRSelector->SetShowing(mType == kLFOControlType_ADSR);
-   mFlipADSRCheckbox->SetShowing(mType == kLFOControlType_ADSR);
+   mADSRLengthMultiplierSlider->SetShowing(mType == kLFOControlType_ADSR);
 }
 
 void FloatSliderLFOControl::SetRate(NoteInterval rate)
@@ -254,6 +254,8 @@ void FloatSliderLFOControl::FloatSliderUpdated(FloatSlider* slider, float oldVal
       mLFO.SetOffset(mLFOSettings.mLFOOffset);
    if (slider == mBiasSlider)
       mLFO.SetPulseWidth(1-mLFOSettings.mBias);
+   if (slider == mADSRLengthMultiplierSlider)
+      mADSRDisplay->SetMaxTime(1000 * mADSRLengthMultiplier);
 }
 
 void FloatSliderLFOControl::CheckboxUpdated(Checkbox* checkbox)
@@ -272,7 +274,7 @@ void FloatSliderLFOControl::ButtonClicked(ClickButton* button)
       if (!mPinned)
       {
          mPinned = true;
-         TheSynth->AddModule(this);
+         TheSynth->AddDynamicModule(this);
          TheSynth->PopModalFocusItem();
          
          SetName(GetUniqueName("lfo", TheSynth->GetModuleNames<FloatSliderLFOControl*>()).c_str());
@@ -286,8 +288,8 @@ void FloatSliderLFOControl::ButtonClicked(ClickButton* button)
          mModuleSaveData.SetInt("osc", mLFOSettings.mOscType, 0, 0, false);
          mModuleSaveData.SetFloat("offset", mLFOSettings.mLFOOffset, mOffsetSlider->GetMin(), mOffsetSlider->GetMax(), false);
          mModuleSaveData.SetFloat("bias", mLFOSettings.mBias, mBiasSlider->GetMin(), mBiasSlider->GetMax(), false);
-         mModuleSaveData.SetFloat("min", mLFOSettings.mMin, mOwner->GetMin(), mOwner->GetMax(), false);
-         mModuleSaveData.SetFloat("max", mLFOSettings.mMax, mOwner->GetMin(), mOwner->GetMax(), false);
+         mModuleSaveData.SetFloat("low", mLFOSettings.mMin, mOwner->GetMin(), mOwner->GetMax(), false);
+         mModuleSaveData.SetFloat("high", mLFOSettings.mMax, mOwner->GetMin(), mOwner->GetMax(), false);
          
          if (mSliderCable == NULL)
          {
@@ -315,8 +317,8 @@ void FloatSliderLFOControl::LoadLayout(const ofxJSONElement& moduleInfo)
    mModuleSaveData.LoadEnum<OscillatorType>("osc", moduleInfo, kOsc_Sin, mOscSelector);
    mModuleSaveData.LoadFloat("offset", moduleInfo, 0);
    mModuleSaveData.LoadFloat("bias", moduleInfo, .5f);
-   mModuleSaveData.LoadFloat("min", moduleInfo, 0, mMinSlider);
-   mModuleSaveData.LoadFloat("max", moduleInfo, 1, mMaxSlider);
+   mModuleSaveData.LoadFloat("low", moduleInfo, 0, mMinSlider);
+   mModuleSaveData.LoadFloat("high", moduleInfo, 1, mMaxSlider);
    
    SetUpFromSaveData();
 }
@@ -332,8 +334,8 @@ void FloatSliderLFOControl::SetUpFromSaveData()
    mLFOSettings.mOscType = mModuleSaveData.GetEnum<OscillatorType>("osc");
    mLFOSettings.mLFOOffset = mModuleSaveData.GetFloat("offset");
    mLFOSettings.mBias = mModuleSaveData.GetFloat("bias");
-   mLFOSettings.mMin = mModuleSaveData.GetFloat("min");
-   mLFOSettings.mMax = mModuleSaveData.GetFloat("max");
+   mLFOSettings.mMin = mModuleSaveData.GetFloat("low");
+   mLFOSettings.mMax = mModuleSaveData.GetFloat("high");
    
    UpdateFromSettings();
    

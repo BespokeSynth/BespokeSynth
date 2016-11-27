@@ -83,7 +83,7 @@ void ADSRDisplay::Render()
       mViewAdsr.Set(mAdsr->mA,mAdsr->mD,mAdsr->mS,mAdsr->mR,mAdsr->mMaxSustain);
       mViewAdsr.Clear();
       mViewAdsr.Start(0,1);
-      float releaseTime = mViewAdsr.GetViewTime() - mAdsr->mR;
+      float releaseTime = mAdsr->mA + mAdsr->mD + mMaxTime * .2f;
       ofVertex(0,mHeight);
       for (float i=0; i<mWidth; i+=(.25f/gDrawScale))
       {

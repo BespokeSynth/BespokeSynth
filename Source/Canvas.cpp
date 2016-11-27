@@ -469,7 +469,7 @@ void Canvas::MouseReleased()
    }
 }
 
-void Canvas::KeyPressed(int key)
+void Canvas::KeyPressed(int key, bool isRepeat)
 {
    if (TheSynth->GetLastClickedModule() == GetParent() && gHoveredUIControl == NULL)
    {

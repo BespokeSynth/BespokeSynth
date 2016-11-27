@@ -43,7 +43,7 @@ public:
    void OnScaleChanged() override;
    
    //IDrawableModule
-   void KeyPressed(int key) override;
+   void KeyPressed(int key, bool isRepeat) override;
    void KeyReleased(int key) override;
    void Exit() override;
    void Poll() override;

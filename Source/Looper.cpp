@@ -1055,7 +1055,9 @@ void Looper::ButtonClicked(ClickButton* button)
    if (button == mVolumeBakeButton)
       mWantBakeVolume = true;
    if (button == mSaveButton)
-      Sample::WriteDataToFile(ofGetTimestampString("loops/loop_%m-%d-%Y_%H-%M.wav").c_str(), mBuffer, mLoopLength);
+   {
+      Sample::WriteDataToFile(ofGetTimestampString("loops/loop_%m-%d-%Y_%H-%M.wav").c_str(), &mBuffer, mLoopLength);
+   }
    if (button == mCommitButton && mRecorder)
       mRecorder->Commit(this);
    if (button == mDoubleSpeedButton)

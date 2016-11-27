@@ -365,9 +365,9 @@ void LooperRecorder::SnapToClosestPitch()
    TheTransport->SetTempo(TheTransport->GetTempo() * desiredFreq/currentFreq);
 }
 
-void LooperRecorder::KeyPressed(int key)
+void LooperRecorder::KeyPressed(int key, bool isRepeat)
 {
-   IDrawableModule::KeyPressed(key);
+   IDrawableModule::KeyPressed(key, isRepeat);
    if (GetKeyModifiers() == kModifier_Control)
    {
       if (key >= '1' && key <= '4')

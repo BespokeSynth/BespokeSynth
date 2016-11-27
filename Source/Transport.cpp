@@ -96,9 +96,9 @@ void Transport::Init()
    IDrawableModule::Init();
 }
 
-void Transport::KeyPressed(int key)
+void Transport::KeyPressed(int key, bool isRepeat)
 {
-   IDrawableModule::KeyPressed(key);
+   IDrawableModule::KeyPressed(key, isRepeat);
 }
 
 void Transport::AdjustTempo(float amount)

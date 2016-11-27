@@ -28,6 +28,8 @@ SingleOscillator::SingleOscillator()
 , mADSRMode(0)
 , mShuffleSlider(NULL)
 , mPolyMgr(this)
+, mLengthMultiplier(1)
+, mLengthMultiplierSlider(nullptr)
 {
    mVoiceParams.mAdsr.Set(10,0,1,10);
    mVoiceParams.mVol = .05f;
@@ -51,9 +53,10 @@ void SingleOscillator::CreateUIControls()
 {
    IDrawableModule::CreateUIControls();
    mVolSlider = new FloatSlider(this,"vol",5,73,80,15,&mVoiceParams.mVol,0,1);
+   mLengthMultiplierSlider = new FloatSlider(this,"len",5,56,80,15,&mLengthMultiplier,.01f,10);
    mOscSelector = new DropdownList(this,"osc",70,1,(int*)(&mVoiceParams.mOscType));
    mPulseWidthSlider = new FloatSlider(this,"pw",117,1,60,15,&mVoiceParams.mPulseWidth,0.01f,.99f,2);
-   mMultSelector = new DropdownList(this,"mult",5,56,&mMult);
+   mMultSelector = new DropdownList(this,"mult",48,19,&mMult);
    mADSRDisplay = new ADSRDisplay(this,"adsr",5,19,80,36,&mVoiceParams.mAdsr);
    mSyncCheckbox = new Checkbox(this,"sync",95,38,&mVoiceParams.mSync);
    mSyncFreqSlider = new FloatSlider(this,"syncf",135,38,40,15,&mVoiceParams.mSyncFreq,10,999.9f);
@@ -142,8 +145,8 @@ void SingleOscillator::DrawModule()
       return;
    
    mVolSlider->Draw();
+   mLengthMultiplierSlider->Draw();
    mPulseWidthSlider->Draw();
-   mMultSelector->Draw();
    mSyncCheckbox->Draw();
    mSyncFreqSlider->Draw();
    mOscSelector->Draw();
@@ -161,6 +164,7 @@ void SingleOscillator::DrawModule()
       mADSRDisplay->Draw();
       mADSRModeSelector->Draw();
    }
+   mMultSelector->Draw();
 }
 
 void SingleOscillator::GetModuleDimensions(int& width, int& height)
@@ -214,6 +218,11 @@ void SingleOscillator::FloatSliderUpdated(FloatSlider* slider, float oldVal)
 {
    if (slider == mVolSlider)
       mADSRDisplay->SetVol(mVoiceParams.mVol);
+   if (slider == mLengthMultiplierSlider)
+   {
+      mADSRDisplay->SetMaxTime(1000 * mLengthMultiplier);
+      mFilterADSRDisplay->SetMaxTime(1000 * mLengthMultiplier);
+   }
 }
 
 void SingleOscillator::IntSliderUpdated(IntSlider* slider, int oldVal)

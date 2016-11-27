@@ -67,7 +67,7 @@ public:
    bool MouseMoved(float x, float y) override;
    void MouseReleased() override;
    void GetDimensions(int& width, int& height) override { width = 10; height = 10; }
-   void KeyPressed(int key);
+   void KeyPressed(int key, bool isRepeat);
    
    void SaveState(FileStreamOut& out);
    void LoadState(FileStreamIn& in);

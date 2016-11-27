@@ -10,6 +10,9 @@
 #include "SynthGlobals.h"
 #include "IDrawableModule.h"
 
+string IClickable::sLoadContext = "";
+string IClickable::sSaveContext = "";
+
 IClickable::IClickable()
 : mX(0)
 , mY(0)
@@ -76,7 +79,7 @@ void IClickable::GetPosition(float& x, float& y, bool local /*= false*/) const
 {
    if (mParent && !local)
    {
-      mParent->GetPosition(x,y);
+      mParent->GetPosition(x,y,false);
       x += mX;
       y += mY;
    }
@@ -111,19 +114,44 @@ ofRectangle IClickable::GetRect(bool local /*=false*/)
 
 IClickable* IClickable::GetRootParent()
 {
-   IClickable* parent = GetParent();
-   while (parent && parent->GetParent())  //keep going up until it's an IDrawableModule
+   IClickable* parent = this;
+   while (parent->GetParent())  //keep going up until there are no parents
       parent = parent->GetParent();
-   if (parent == NULL)
-      return this;   //we are the root
    return parent;
 }
 
-string IClickable::Path()
+IDrawableModule* IClickable::GetModuleParent()
 {
-   if (mParent == NULL)
-      return mName;
-   return mParent->Path() + "~" + mName;
+   IClickable* parent = this;
+   while (parent->GetParent())  //keep going up until there are no parents
+   {
+      IDrawableModule* module = dynamic_cast<IDrawableModule*>(parent);
+      if (module && module->CanMinimize())   //"minimizable" modules doesn't include effects in effectchains, which we want to avoid
+         return module;
+      parent = parent->GetParent();
+   }
+   return dynamic_cast<IDrawableModule*>(parent);
+}
+
+string IClickable::Path(bool ignoreContext)
+{
+   string path = mName;
+   if (mParent != NULL)
+      path = mParent->Path(true) + "~" + mName;
+   
+   if (!ignoreContext)
+   {
+      if (sLoadContext != "")
+         path = sLoadContext + path;
+      if (sSaveContext != "")
+      {
+         if (strstr(path.c_str(), sSaveContext.c_str()) == path.c_str())   //path starts with sSaveContext
+            path = path.substr(sSaveContext.length(), path.length() - sSaveContext.length());
+         else
+            path = ""; //path is outside of our context, and therefore invalid
+      }
+   }
+   return path;
 }
 
 bool IClickable::CheckNeedsDraw()

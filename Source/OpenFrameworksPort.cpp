@@ -347,10 +347,13 @@ void ofExit()
 
 void ofToggleFullscreen()
 {
-   assert(false);
+   if (Desktop::getInstance().getKioskModeComponent() == nullptr)
+      Desktop::getInstance().setKioskModeComponent(TheSynth->GetMainComponent()->getTopLevelComponent(), false);
+   else
+      Desktop::getInstance().setKioskModeComponent(nullptr, false);
 }
 
-void ofStringReplace(string& input, string searchStr, string replaceStr)
+void ofStringReplace(string& input, string searchStr, string replaceStr, bool firstOnly /*= false*/)
 {
    size_t uPos = 0;
    size_t uFindLen = searchStr.length();
@@ -363,12 +366,30 @@ void ofStringReplace(string& input, string searchStr, string replaceStr)
    for( ;(uPos = input.find( searchStr, uPos )) != std::string::npos; ){
       input.replace( uPos, uFindLen, replaceStr );
       uPos += uReplaceLen;
+      
+      if (firstOnly)
+         break;
    }
 }
 
+//%Y-%m-%d-%H-%M-%S-%i
 string ofGetTimestampString(string in)
 {
-   assert(false);
+   Time time = Time::getCurrentTime();
+   ofStringReplace(in, "%Y", ofToString(time.getYear()));
+   char buff[5];
+   sprintf(buff ,"%02d", time.getMonth()+1);
+   ofStringReplace(in, "%m", buff);
+   sprintf(buff ,"%02d", time.getDayOfMonth());
+   ofStringReplace(in, "%d", buff);
+   sprintf(buff ,"%02d", time.getHours());
+   ofStringReplace(in, "%H", buff);
+   sprintf(buff ,"%02d", time.getMinutes());
+   ofStringReplace(in, "%M", buff);
+   sprintf(buff ,"%02d", time.getSeconds());
+   ofStringReplace(in, "%S", buff);
+   sprintf(buff ,"%03d", time.getMilliseconds());
+   ofStringReplace(in, "%i", buff);
    return in;
 }
 

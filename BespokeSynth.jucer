@@ -364,6 +364,9 @@
         <FILE id="jzmZaE" name="NoteFlusher.h" compile="0" resource="0" file="Source/NoteFlusher.h"/>
         <FILE id="iXHjWM" name="NoteGate.cpp" compile="1" resource="0" file="Source/NoteGate.cpp"/>
         <FILE id="JbG01f" name="NoteGate.h" compile="0" resource="0" file="Source/NoteGate.h"/>
+        <FILE id="hApnIY" name="NoteHumanizer.cpp" compile="1" resource="0"
+              file="Source/NoteHumanizer.cpp"/>
+        <FILE id="RDOMAK" name="NoteHumanizer.h" compile="0" resource="0" file="Source/NoteHumanizer.h"/>
         <FILE id="dJxv9I" name="NoteLooper.cpp" compile="1" resource="0" file="Source/NoteLooper.cpp"/>
         <FILE id="zo4N2z" name="NoteLooper.h" compile="0" resource="0" file="Source/NoteLooper.h"/>
         <FILE id="RetyTQ" name="NoteOctaver.cpp" compile="1" resource="0" file="Source/NoteOctaver.cpp"/>
@@ -411,6 +414,8 @@
         <FILE id="tGoqwJ" name="PitchSetter.h" compile="0" resource="0" file="Source/PitchSetter.h"/>
         <FILE id="WrfYZh" name="Polyrhythms.cpp" compile="1" resource="0" file="Source/Polyrhythms.cpp"/>
         <FILE id="Dxf5mJ" name="Polyrhythms.h" compile="0" resource="0" file="Source/Polyrhythms.h"/>
+        <FILE id="cwpyvy" name="Prefab.cpp" compile="1" resource="0" file="Source/Prefab.cpp"/>
+        <FILE id="Jv1aGd" name="Prefab.h" compile="0" resource="0" file="Source/Prefab.h"/>
         <FILE id="YxJ3n3" name="Presets.cpp" compile="1" resource="0" file="Source/Presets.cpp"/>
         <FILE id="hqaUZQ" name="Presets.h" compile="0" resource="0" file="Source/Presets.h"/>
         <FILE id="bOg7BS" name="Pressure.cpp" compile="1" resource="0" file="Source/Pressure.cpp"/>
@@ -674,6 +679,10 @@
             file="Source/ModulationChain.cpp"/>
       <FILE id="tH0Ls1" name="ModulationChain.h" compile="0" resource="0"
             file="Source/ModulationChain.h"/>
+      <FILE id="dRRlrd" name="ModuleContainer.cpp" compile="1" resource="0"
+            file="Source/ModuleContainer.cpp"/>
+      <FILE id="Drtn6Z" name="ModuleContainer.h" compile="0" resource="0"
+            file="Source/ModuleContainer.h"/>
       <FILE id="MERTEb" name="ModuleFactory.cpp" compile="1" resource="0"
             file="Source/ModuleFactory.cpp"/>
       <FILE id="TfyXCw" name="ModuleFactory.h" compile="0" resource="0" file="Source/ModuleFactory.h"/>

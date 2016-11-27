@@ -48,7 +48,7 @@ void MidiController::CreateUIControls()
 {
    IDrawableModule::CreateUIControls();
    mBindCheckbox = new Checkbox(this,"bind",5,2,&mBindMode);
-   mPageSelector = new DropdownList(this,"page",48,2,&mControllerPage);
+   mPageSelector = new DropdownList(this,"page",47,2,&mControllerPage);
    mAddConnectionCheckbox = new ClickButton(this,"add",12,300);
    mControllerList = new DropdownList(this,"controller",102,2,&mControllerIndex);
    //mDrawCablesCheckbox = new Checkbox(this,"draw cables",200,26,&UIControlConnection::sDrawCables);
@@ -95,7 +95,7 @@ void MidiController::AddControlConnection(MidiMessageType messageType, int contr
 {
    if (uicontrol)
    {
-      UIControlConnection* connection = new UIControlConnection();
+      UIControlConnection* connection = new UIControlConnection(this);
       connection->mMessageType = messageType;
       connection->mControl = control;
       connection->mUIControl = uicontrol;
@@ -103,7 +103,7 @@ void MidiController::AddControlConnection(MidiMessageType messageType, int contr
       connection->mPage = mControllerPage;
       if (mSlidersDefaultToIncremental)
          connection->mIncrementAmount = 1;
-      connection->CreateUIControls(this, mConnections.size());
+      connection->CreateUIControls(mConnections.size());
       mConnections.push_back(connection);
       uicontrol->AddRemoteController();
    }
@@ -143,7 +143,7 @@ void MidiController::AddControlConnection(const ofxJSONElement& connection)
    if (page == -1)
       pageless = true;
    
-   UIControlConnection* controlConnection = new UIControlConnection();
+   UIControlConnection* controlConnection = new UIControlConnection(this);
    controlConnection->mMessageType = msgType;
    controlConnection->mControl = control;
    controlConnection->SetUIControl(path);
@@ -201,7 +201,7 @@ void MidiController::AddControlConnection(const ofxJSONElement& connection)
             nextPageConnection->mPage += i+1;
             nextPageConnection->mUIControl = uicontrolNextPage;
             nextPageConnection->mEditorControls.clear(); //TODO(Ryan) temp fix
-            nextPageConnection->CreateUIControls(this, mConnections.size());
+            nextPageConnection->CreateUIControls(mConnections.size());
             mConnections.push_back(nextPageConnection);
             uicontrolNextPage->AddRemoteController();
          }
@@ -642,7 +642,7 @@ void MidiController::DrawModule()
       int i=0;
       for (UIControlConnection* connection : mConnections)
       {
-         connection->CreateUIControls(this, i);
+         connection->CreateUIControls(i);
          ++i;
       }
       mHasCreatedConnectionUIControls = true;
@@ -655,7 +655,7 @@ void MidiController::DrawModule()
    
    int w,h;
    GetDimensions(w, h);
-   mAddConnectionCheckbox->SetY(h-17);
+   mAddConnectionCheckbox->SetPosition(mAddConnectionCheckbox->GetPosition(true).x, h-17);
    mAddConnectionCheckbox->Draw();
    
    DrawText("last input: "+mLastInput,60,h-5);
@@ -847,9 +847,9 @@ void MidiController::ButtonClicked(ClickButton* button)
 {
    if (button == mAddConnectionCheckbox)
    {
-      UIControlConnection* connection = new UIControlConnection();
+      UIControlConnection* connection = new UIControlConnection(this);
       connection->mPage = mControllerPage;
-      connection->CreateUIControls(this, mConnections.size());
+      connection->CreateUIControls(mConnections.size());
       mConnections.push_back(connection);
    }
    for (auto iter = mConnections.begin(); iter != mConnections.end(); ++iter)
@@ -864,7 +864,7 @@ void MidiController::ButtonClicked(ClickButton* button)
       if (button == connection->mCopyButton)
       {
          UIControlConnection* copy = connection->MakeCopy();
-         copy->CreateUIControls(this, mConnections.size());
+         copy->CreateUIControls(mConnections.size());
          mConnections.push_back(copy); //make a copy of this one
          break;
       }
@@ -1118,7 +1118,7 @@ void UIControlConnection::SetUIControl(string path)
       mUIControl = NULL;
       try
       {
-         mUIControl = TheSynth->FindUIControl(path);
+         mUIControl = mUIOwner->GetOwningContainer()->FindUIControl(path);
       }
       catch (exception e)
       {
@@ -1130,31 +1130,29 @@ void UIControlConnection::SetUIControl(string path)
    }
 }
 
-void UIControlConnection::CreateUIControls(MidiController* owner, int index)
+void UIControlConnection::CreateUIControls(int index)
 {
    assert(mEditorControls.empty());
-   
-   mUIOwner = owner;
    
    int x = 12;
    int y = 42 + 20 * index;
    static int sControlID = 0;
-   mMessageTypeDropdown = new DropdownList(owner,("messagetype"+ofToString(sControlID)).c_str(),x,y,((int*)&mMessageType));
-   mControlEntry = new TextEntry(owner,("control"+ofToString(sControlID)).c_str(),x+47,y,3,&mControl,0,127);
-   mChannelDropdown = new DropdownList(owner,("channel"+ofToString(sControlID)).c_str(),x+80,y,&mChannel);
-   mUIControlPathEntry = new TextEntry(owner,("path"+ofToString(sControlID)).c_str(),x+120,y,25,mUIControlPathInput);
-   mControlTypeDropdown = new DropdownList(owner,("controltype"+ofToString(sControlID)).c_str(),x+348,y,((int*)&mType));
-   mValueEntry = new TextEntry(owner,("value"+ofToString(sControlID)).c_str(),x+405,y,5,&mValue,-FLT_MAX,FLT_MAX);
-   mIncrementalEntry = new TextEntry(owner,("increment"+ofToString(sControlID)).c_str(),x+457,y,4,&mIncrementAmount,-FLT_MAX,FLT_MAX);
-   mTwoWayCheckbox = new Checkbox(owner,("twoway"+ofToString(sControlID)).c_str(),x+505,y,&mTwoWay);
-   mFeedbackDropdown = new DropdownList(owner,("feedback"+ofToString(sControlID)).c_str(),x+520,y,&mFeedbackControl);
-   mMidiOffEntry = new TextEntry(owner,("midi off"+ofToString(sControlID)).c_str(),x+560,y,3,&mMidiOffValue,0,127);
-   mMidiOnEntry = new TextEntry(owner,("midi on"+ofToString(sControlID)).c_str(),x+590,y,3,&mMidiOnValue,0,127);
-   mBlinkCheckbox = new Checkbox(owner,("blink"+ofToString(sControlID)).c_str(),x+637,y,&mBlink);
-   mPagelessCheckbox = new Checkbox(owner,("pageless"+ofToString(sControlID)).c_str(),x+670,y,&mPageless);
-   mRemoveButton = new ClickButton(owner," x ",x+700,y);
-   mCopyButton = new ClickButton(owner,"copy",x+720,y);
-   mControlCable = new PatchCableSource(owner, kConnectionType_UIControl);
+   mMessageTypeDropdown = new DropdownList(mUIOwner,("messagetype"+ofToString(sControlID)).c_str(),x,y,((int*)&mMessageType));
+   mControlEntry = new TextEntry(mUIOwner,("control"+ofToString(sControlID)).c_str(),x+47,y,3,&mControl,0,127);
+   mChannelDropdown = new DropdownList(mUIOwner,("channel"+ofToString(sControlID)).c_str(),x+80,y,&mChannel);
+   mUIControlPathEntry = new TextEntry(mUIOwner,("path"+ofToString(sControlID)).c_str(),x+120,y,25,mUIControlPathInput);
+   mControlTypeDropdown = new DropdownList(mUIOwner,("controltype"+ofToString(sControlID)).c_str(),x+348,y,((int*)&mType));
+   mValueEntry = new TextEntry(mUIOwner,("value"+ofToString(sControlID)).c_str(),x+405,y,5,&mValue,-FLT_MAX,FLT_MAX);
+   mIncrementalEntry = new TextEntry(mUIOwner,("increment"+ofToString(sControlID)).c_str(),x+457,y,4,&mIncrementAmount,-FLT_MAX,FLT_MAX);
+   mTwoWayCheckbox = new Checkbox(mUIOwner,("twoway"+ofToString(sControlID)).c_str(),x+505,y,&mTwoWay);
+   mFeedbackDropdown = new DropdownList(mUIOwner,("feedback"+ofToString(sControlID)).c_str(),x+520,y,&mFeedbackControl);
+   mMidiOffEntry = new TextEntry(mUIOwner,("midi off"+ofToString(sControlID)).c_str(),x+560,y,3,&mMidiOffValue,0,127);
+   mMidiOnEntry = new TextEntry(mUIOwner,("midi on"+ofToString(sControlID)).c_str(),x+590,y,3,&mMidiOnValue,0,127);
+   mBlinkCheckbox = new Checkbox(mUIOwner,("blink"+ofToString(sControlID)).c_str(),x+637,y,&mBlink);
+   mPagelessCheckbox = new Checkbox(mUIOwner,("pageless"+ofToString(sControlID)).c_str(),x+670,y,&mPageless);
+   mRemoveButton = new ClickButton(mUIOwner," x ",x+700,y);
+   mCopyButton = new ClickButton(mUIOwner,"copy",x+720,y);
+   mControlCable = new PatchCableSource(mUIOwner, kConnectionType_UIControl);
    ++sControlID;
    
    mEditorControls.push_back(mMessageTypeDropdown);
@@ -1215,7 +1213,7 @@ void UIControlConnection::CreateUIControls(MidiController* owner, int index)
    mTwoWayCheckbox->SetDisplayText(false);
    mBlinkCheckbox->SetDisplayText(false);
    
-   owner->AddPatchCableSource(mControlCable);
+   mUIOwner->AddPatchCableSource(mControlCable);
 }
 
 void UIControlConnection::SetShowing(bool enabled)
@@ -1261,7 +1259,7 @@ void UIControlConnection::Draw(int index)
    
    for (auto iter = mEditorControls.begin(); iter != mEditorControls.end(); ++iter)
    {
-      (*iter)->SetY(y);
+      (*iter)->SetPosition((*iter)->GetPosition(true).x,y);
       (*iter)->Draw();
    }
    

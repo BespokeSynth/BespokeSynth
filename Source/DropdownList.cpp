@@ -159,7 +159,6 @@ void DropdownList::OnClicked(int x, int y, bool right)
    int thisx,thisy;
    GetPosition(thisx,thisy);
    mModalList.SetPosition(thisx,thisy+itemSpacing);
-   mModalList.SetParent(this);
    TheSynth->PushModalFocusItem(&mModalList);
 }
 

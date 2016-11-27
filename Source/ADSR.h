@@ -22,7 +22,6 @@ public:
    void Stop(double time);
    float Value(double time);
    void Set(float a, float d, float s, float r, float h = 0);
-   float GetViewTime() { return mA + mD + 200 + mR; }
    void Clear() { mTarget = 0; mOn = false; mStartTime = -10000; mStopTime = -10000;}
    void SetMaxSustain(float max) { mMaxSustain = max; }
    bool IsDone(double time);
