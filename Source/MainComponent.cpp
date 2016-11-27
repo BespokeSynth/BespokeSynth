@@ -127,6 +127,9 @@ public:
                                                                     &preferredSetupOptions);
       jassert (audioError.isEmpty());
       mGlobalManagers.mDeviceManager.addAudioCallback(this);
+
+      SetGlobalBufferSize(mGlobalManagers.mDeviceManager.getCurrentAudioDevice()->getCurrentBufferSizeSamples());
+      SetGlobalSampleRate(mGlobalManagers.mDeviceManager.getCurrentAudioDevice()->getCurrentSampleRate());
       
       startTimerHz(60);
    }
@@ -224,7 +227,7 @@ private:
    bool keyPressed(const KeyPress& key) override
    {
       int keyCode = key.getKeyCode();
-      if (isalpha(keyCode) && !key.getModifiers().isShiftDown())
+      if (CharacterFunctions::isLetter((char)keyCode) && !key.getModifiers().isShiftDown())
          keyCode -= 'A' - 'a';
       if (key.isCurrentlyDown())
          mSynth.KeyPressed(keyCode);

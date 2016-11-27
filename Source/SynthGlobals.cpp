@@ -26,10 +26,10 @@
 int gBufferSize = 64;
 int gSampleRate = 44100;
 float gDefaultTempo = 105;
-const double gTwoPiOverSampleRate = TWO_PI / gSampleRate;
-const double gSampleRateMs = gSampleRate / 1000.0;
-const double gInvSampleRateMs = 1000.0 / gSampleRate;
-const float gNyquistLimit = gSampleRate / 2.0f;
+double gTwoPiOverSampleRate = TWO_PI / gSampleRate;
+double gSampleRateMs = gSampleRate / 1000.0;
+double gInvSampleRateMs = 1000.0 / gSampleRate;
+float gNyquistLimit = gSampleRate / 2.0f;
 bool gPrintMidiInput = false;
 double gTime = 1; //using a double here, so I'm going to lose nanosecond accuracy
                   //if I run for 4 months straight
@@ -78,6 +78,15 @@ void SetGlobalBufferSize(int size)
 {
    assert(size <= kWorkBufferSize);
    gBufferSize = size;
+}
+
+void SetGlobalSampleRate(int rate)
+{
+   gSampleRate = rate;
+   gTwoPiOverSampleRate = TWO_PI / gSampleRate;
+   gSampleRateMs = gSampleRate / 1000.0;
+   gInvSampleRateMs = 1000.0 / gSampleRate;
+   gNyquistLimit = gSampleRate / 2.0f;
 }
 
 void DrawAudioBuffer(float width, float height, const float* buffer, float start, float end, float pos, float vol /*=1*/, ofColor color /*=ofColor::black*/)
@@ -401,7 +410,7 @@ bool IsKeyHeld(int key, int modifiers)
 
 int KeyToLower(int key)
 {
-   if (isalpha(key))
+   if (CharacterFunctions::isLetter((char)key))
       return tolower(key);
    if (key == '!')
       return '1';
@@ -497,7 +506,7 @@ bool IsInUnitBox(ofVec2f pos)
 string GetUniqueName(string name, vector<IDrawableModule*> existing)
 {
    string origName = name;
-   while (origName.length() > 1 && isdigit(origName[origName.length()-1]))
+   while (origName.length() > 1 && CharacterFunctions::isDigit((char)origName[origName.length()-1]))
       origName.resize(origName.length()-1);
    int suffix = 1;
    while (true)

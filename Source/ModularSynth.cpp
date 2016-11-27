@@ -398,7 +398,7 @@ void ModularSynth::KeyPressed(int key)
    if (gHoveredUIControl &&
        TextEntry::GetActiveTextEntry() == NULL &&
        GetKeyModifiers() == kModifier_None &&
-       (isdigit(key) || key == '.' || key == '-'))
+       (CharacterFunctions::isDigit((char)key) || key == '.' || key == '-'))
    {
       gHoveredUIControl->AttemptTextInput();
    }
@@ -429,7 +429,7 @@ void ModularSynth::KeyPressed(int key)
    
    mZoomer.OnKeyPressed(key);
    
-   if (isdigit(key) && GetKeyModifiers() & kModifier_Command)
+   if (CharacterFunctions::isDigit((char)key) && GetKeyModifiers() & kModifier_Command)
    {
       int num = key - '0';
       assert(num >= 0 && num <= 9);

@@ -255,9 +255,9 @@ bool TextEntry::AllowCharacter(char c)
    if (mType == kTextEntry_Text)
       return c >= ' ' && c <= '~';  //these encompass the ASCII range of printable characters
    if (mType == kTextEntry_Int)
-      return isdigit(c) || c == '-';
+      return CharacterFunctions::isDigit((char)c) || c == '-';
    if (mType == kTextEntry_Float)
-      return isdigit(c) || c == '.' || c == '-';
+      return CharacterFunctions::isDigit((char)c) || c == '.' || c == '-';
    return false;
 }
 
