@@ -12,6 +12,7 @@
 #include "ModuleFactory.h"
 #include "LocationZoomer.h"
 #include "EffectFactory.h"
+#include "ModuleContainer.h"
 
 class IAudioSource;
 class MidiInstrument;
@@ -58,7 +59,7 @@ public:
    
    void Exit();
    
-   void KeyPressed(int key);
+   void KeyPressed(int key, bool isRepeat);
    void KeyReleased(int key);
    void MouseMoved(int x, int y );
    void MouseDragged(int x, int y, int button);
@@ -79,7 +80,6 @@ public:
    void ArrangeAudioSourceDependencies();
    IDrawableModule* SpawnModuleOnTheFly(string moduleName, float x, float y);
    void SetMoveModule(IDrawableModule* module, float offsetX, float offsetY);
-   void AddModule(IDrawableModule* module);
    
    bool SetInputChannel(int channel, InputChannel* input);
    bool SetOutputChannel(int channel, OutputChannel* input);
@@ -92,7 +92,7 @@ public:
    void MoveToFront(IDrawableModule* module);
    IDrawableModule* GetModuleAt(int x, int y);
    bool InMidiMapMode();
-   const vector<IDrawableModule*> GetModules() const { return mModules; }
+   void GetAllModules(vector<IDrawableModule*>& out) { mModuleContainer.GetAllModules(out); }
    
    void PushModalFocusItem(IDrawableModule* item);
    void PopModalFocusItem();
@@ -100,7 +100,9 @@ public:
    
    void LogEvent(string event, LogEventType type);
    
-   void LoadLayout(string jsonFile, bool makeDefaultLayout = true);
+   void LoadLayoutFromFile(string jsonFile, bool makeDefaultLayout = true);
+   void LoadLayoutFromString(string jsonString);
+   void LoadLayout(ofxJSONElement json);
    string GetLoadedLayout() const { return mLoadedLayoutPath; }
    
    RollingBuffer* GetOutputLeft() { return &mOutputBufferLeft; }
@@ -137,16 +139,7 @@ public:
    void RegisterPatchCable(PatchCable* cable);
    void UnregisterPatchCable(PatchCable* cable);
    
-   template<class T> vector<string> GetModuleNames()
-   {
-      vector<string> ret;
-      for (int i=0; i<mModules.size(); ++i)
-      {
-         if (dynamic_cast<T>(mModules[i]))
-            ret.push_back(mModules[i]->Name());
-      }
-      return ret;
-   }
+   template<class T> vector<string> GetModuleNames() { return mModuleContainer.GetModuleNames<T>(); }
    
    void LockRender(bool lock) { if (lock) { mRenderLock.enter(); } else { mRenderLock.exit(); } }
    void UpdateFrameRate(float fps) { mFrameRate = fps; }
@@ -155,10 +148,13 @@ public:
    NamedMutex* GetAudioMutex() { return &mAudioThreadMutex; }
    
    IDrawableModule* CreateModule(const ofxJSONElement& moduleInfo);
-   IDrawableModule* SetUpModule(const ofxJSONElement& moduleInfo);
-   void DeleteModule(IDrawableModule* module);
+   void SetUpModule(IDrawableModule* module, const ofxJSONElement& moduleInfo);
+   void OnModuleAdded(IDrawableModule* module);
+   void OnModuleDeleted(IDrawableModule* module);
+   void AddDynamicModule(IDrawableModule* module);
    
    void SaveLayout(string jsonFile = "", bool makeDefaultLayout = true);
+   ofxJSONElement GetLayout();
    void SaveLayoutAsPopup();
    void SaveOutput();
    void SaveState(string file);
@@ -173,7 +169,6 @@ private:
    void ZoomView(float zoomAmount);
    void CheckClick(IDrawableModule* clickedModule, int x, int y, bool rightButton);
    void UpdateUserPrefsLayout();
-   int GetModuleIndex(IDrawableModule* module);
    void LoadStatePopupImp();
    IDrawableModule* DuplicateModule(IDrawableModule* module);
    void DeleteAllModules();
@@ -185,7 +180,6 @@ private:
    vector<IAudioSource*> mSources;
    InputChannel* mInput[MAX_INPUT_CHANNELS];
    OutputChannel* mOutput[MAX_OUTPUT_CHANNELS];
-   vector<IDrawableModule*> mModules;
    vector<IDrawableModule*> mLissajousDrawers;
    vector<IDrawableModule*> mDeletedModules;
    
@@ -230,9 +224,9 @@ private:
    
    Sample* mHeldSample;
    
-   float* mSaveOutputBuffer;
+   float* mSaveOutputBuffer[2];
    
-   bool mLastClickWasOnModule;
+   IDrawableModule* mLastClickedModule;
    
    ofxJSONElement mUserPrefs;
    bool mInitialized;
@@ -258,6 +252,8 @@ private:
    
    CriticalSection mRenderLock;
    float mFrameRate;
+   
+   ModuleContainer mModuleContainer;
 };
 
 extern ModularSynth* TheSynth;

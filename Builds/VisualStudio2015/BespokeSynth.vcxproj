@@ -257,6 +257,7 @@
     <ClCompile Include="..\..\Source\NoteFilter.cpp"/>
     <ClCompile Include="..\..\Source\NoteFlusher.cpp"/>
     <ClCompile Include="..\..\Source\NoteGate.cpp"/>
+    <ClCompile Include="..\..\Source\NoteHumanizer.cpp"/>
     <ClCompile Include="..\..\Source\NoteLooper.cpp"/>
     <ClCompile Include="..\..\Source\NoteOctaver.cpp"/>
     <ClCompile Include="..\..\Source\NoteRouter.cpp"/>
@@ -369,6 +370,7 @@
     <ClCompile Include="..\..\Source\MidiReader.cpp"/>
     <ClCompile Include="..\..\Source\ModularSynth.cpp"/>
     <ClCompile Include="..\..\Source\ModulationChain.cpp"/>
+    <ClCompile Include="..\..\Source\ModuleContainer.cpp"/>
     <ClCompile Include="..\..\Source\ModuleFactory.cpp"/>
     <ClCompile Include="..\..\Source\ModuleSaveData.cpp"/>
     <ClCompile Include="..\..\Source\Monome.cpp"/>
@@ -2122,6 +2124,7 @@
     <ClInclude Include="..\..\Source\NoteFilter.h"/>
     <ClInclude Include="..\..\Source\NoteFlusher.h"/>
     <ClInclude Include="..\..\Source\NoteGate.h"/>
+    <ClInclude Include="..\..\Source\NoteHumanizer.h"/>
     <ClInclude Include="..\..\Source\NoteLooper.h"/>
     <ClInclude Include="..\..\Source\NoteOctaver.h"/>
     <ClInclude Include="..\..\Source\NoteRouter.h"/>
@@ -2238,6 +2241,7 @@
     <ClInclude Include="..\..\Source\MidiReader.h"/>
     <ClInclude Include="..\..\Source\ModularSynth.h"/>
     <ClInclude Include="..\..\Source\ModulationChain.h"/>
+    <ClInclude Include="..\..\Source\ModuleContainer.h"/>
     <ClInclude Include="..\..\Source\ModuleFactory.h"/>
     <ClInclude Include="..\..\Source\ModuleSaveData.h"/>
     <ClInclude Include="..\..\Source\Monome.h"/>

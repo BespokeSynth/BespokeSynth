@@ -13,6 +13,7 @@
 
 #include "IDrawableModule.h"
 #include "ClickButton.h"
+#include "ModuleContainer.h"
 
 class PatchCableSource;
 
@@ -25,8 +26,10 @@ public:
    
    string GetTitleLabel() override { return "prefab"; }
    void CreateUIControls() override;
-   bool AlwaysOnBottom() override { return true; }
-   void Move(float moveX, float moveY) override;
+   
+   ModuleContainer* GetContainer() override { return &mModuleContainer; }
+   
+   void Poll() override;
    
    void ButtonClicked(ClickButton* button) override;
    
@@ -39,7 +42,6 @@ public:
    
 private:
    //IDrawableModule
-   void PreDrawModule() override;
    void DrawModule() override;
    bool Enabled() const override { return mEnabled; }
    void GetModuleDimensions(int& width, int& height) override;
@@ -48,9 +50,9 @@ private:
    void LoadPrefab(string loadPath);
    
    PatchCableSource* mModuleCable;
-   list<IDrawableModule*> mModules;
    ClickButton* mSaveButton;
    ClickButton* mLoadButton;
+   ModuleContainer mModuleContainer;
 };
 
 

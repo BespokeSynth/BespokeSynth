@@ -1,98 +1,67 @@
 {
    "modules" : [
       {
-         "comment" : "there is an oscillator next to this",
-         "name" : "comment",
-         "position" : [ 633, 474 ],
-         "type" : "comment"
-      },
-      {
-         "chorder" : "",
-         "name" : "launchpadkeyboard",
-         "position" : [ 1072, 237 ],
-         "target" : "maxsustain",
-         "type" : "launchpadkeyboard"
-      },
-      {
-         "name" : "maxsustain",
-         "position" : [ 927, 365 ],
-         "sustain" : 100.0,
-         "target" : "notedisplayer",
-         "type" : "maxsustain"
-      },
-      {
          "name" : "notedisplayer",
-         "position" : [ 898, 455 ],
+         "position" : [ 1075.0, 426.0 ],
          "target" : "oscillator",
          "type" : "notedisplayer"
       },
       {
          "controller" : "",
-         "gridheight" : 200,
+         "gridheight" : 80,
          "gridrows" : 15,
          "gridsteps" : 8,
-         "gridwidth" : 400,
+         "gridwidth" : 210,
          "name" : "notesequencer",
-         "position" : [ 413, 130 ],
-         "target" : "maxsustain",
+         "position" : [ 1030.0, 222.0 ],
+         "target" : "notedisplayer",
          "type" : "notesequencer"
       },
       {
-         "a" : 10.0,
-         "d" : 100.0,
          "detune" : 1.0,
          "name" : "oscillator",
          "osc" : 0,
-         "position" : [ 1081, 467 ],
-         "r" : 10.0,
-         "s" : 0.8000000119209290,
-         "target" : "waveform",
+         "position" : [ 1067.0, 488.0 ],
+         "pressure_envelope" : false,
+         "target" : "stereofier",
          "type" : "oscillator",
          "vol" : 1.0
       },
       {
          "channel" : 1,
          "name" : "output 1",
-         "position" : [ 1214, 1055 ],
+         "position" : [ 1087.0, 772.0 ],
          "type" : "output"
       },
       {
          "channel" : 2,
          "name" : "output 2",
-         "position" : [ 1270, 1055 ],
+         "position" : [ 1188.0, 772.0 ],
          "type" : "output"
       },
       {
+         "name" : "prefab",
+         "position" : [ 215.0, 305.0 ],
+         "type" : "prefab"
+      },
+      {
          "name" : "scale",
-         "position" : [ 1120, 82 ],
+         "position" : [ 1120.0, 82.0 ],
          "type" : "scale"
       },
       {
          "name" : "stereofier",
          "pan" : 0.0,
-         "position" : [ 1209, 925 ],
+         "position" : [ 1101.0, 642.0 ],
          "target" : "output 1",
          "target2" : "output 2",
          "type" : "stereofier"
       },
       {
          "name" : "transport",
-         "nanopad" : "nanopad",
-         "nanopadscene" : 4,
-         "position" : [ 958, 75 ],
+         "position" : [ 958.0, 75.0 ],
          "type" : "transport"
-      },
-      {
-         "draw_circle" : false,
-         "draw_waveform" : true,
-         "height" : 100,
-         "name" : "waveform",
-         "position" : [ 919, 665 ],
-         "target" : "stereofier",
-         "type" : "waveform",
-         "width" : 600
       }
    ],
    "zoomlocations" : []
 }
-

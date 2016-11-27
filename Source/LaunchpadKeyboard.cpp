@@ -627,9 +627,9 @@ void LaunchpadKeyboard::OnScaleChanged()
    UpdateLights();
 }
 
-void LaunchpadKeyboard::KeyPressed(int key)
+void LaunchpadKeyboard::KeyPressed(int key, bool isRepeat)
 {
-   IDrawableModule::KeyPressed(key);
+   IDrawableModule::KeyPressed(key, isRepeat);
    if (key == 'e' && !mTestKeyHeld && GetKeyModifiers() == kModifier_None)
    {
       mTestKeyHeld = true;

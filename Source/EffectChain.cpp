@@ -292,11 +292,11 @@ void EffectChain::GetModuleDimensions(int& x, int&y)
    y = maxY + 18;
 }
 
-void EffectChain::KeyPressed(int key)
+void EffectChain::KeyPressed(int key, bool isRepeat)
 {
-   IDrawableModule::KeyPressed(key);
+   IDrawableModule::KeyPressed(key, isRepeat);
    for (int i=0; i<mEffects.size(); ++i)
-      mEffects[i]->KeyPressed(key);
+      mEffects[i]->KeyPressed(key, isRepeat);
 }
 
 void EffectChain::KeyReleased(int key)

@@ -352,12 +352,12 @@ PatchCablePos PatchCable::GetPatchCablePos()
       mTarget->GetDimensions(wThat,hThat);
       mTarget->GetPosition(xThat,yThat);
       
-      IDrawableModule* targetRootParentModule = dynamic_cast<IDrawableModule*>(mTarget->GetRootParent());
-      if (targetRootParentModule && targetRootParentModule->Minimized())
+      IDrawableModule* targetModuleParent = mTarget->GetModuleParent();
+      if (targetModuleParent && targetModuleParent->Minimized())
       {
          wThat = 0;
          hThat = 0;
-         targetRootParentModule->GetPosition(xThat, yThat);
+         targetModuleParent->GetPosition(xThat, yThat);
       }
    }
    else

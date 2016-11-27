@@ -67,11 +67,12 @@ void Checkbox::Render()
    
    ofColor color;
    if (IsPreset())
-      color.set(0,255,0,gModuleDrawAlpha);
+      color.set(0,255,0);
    else if (mUseCircleLook)
       color = mCustomColor;
    else
-      color.set(255,255,255,gModuleDrawAlpha);
+      color.set(255,255,255);
+   color.a = gModuleDrawAlpha;
    
    ofColor darkColor = color;
    darkColor.setBrightness(30);

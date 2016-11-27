@@ -66,7 +66,7 @@ public:
    void SetEnabled(bool enabled) override { mEnabled = enabled; }
    
    //IDrawableModule
-   void KeyPressed(int key) override;
+   void KeyPressed(int key, bool isRepeat) override;
    void Poll() override;
    void PreRepatch(PatchCableSource* cableSource) override;
    void PostRepatch(PatchCableSource* cableSource) override;

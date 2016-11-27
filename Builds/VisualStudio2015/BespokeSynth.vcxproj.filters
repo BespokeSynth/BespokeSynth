@@ -754,6 +754,9 @@
     <ClCompile Include="..\..\Source\NoteGate.cpp">
       <Filter>BespokeSynth\Source\modules</Filter>
     </ClCompile>
+    <ClCompile Include="..\..\Source\NoteHumanizer.cpp">
+      <Filter>BespokeSynth\Source\modules</Filter>
+    </ClCompile>
     <ClCompile Include="..\..\Source\NoteLooper.cpp">
       <Filter>BespokeSynth\Source\modules</Filter>
     </ClCompile>
@@ -1082,6 +1085,9 @@
       <Filter>BespokeSynth\Source</Filter>
     </ClCompile>
     <ClCompile Include="..\..\Source\ModulationChain.cpp">
+      <Filter>BespokeSynth\Source</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\Source\ModuleContainer.cpp">
       <Filter>BespokeSynth\Source</Filter>
     </ClCompile>
     <ClCompile Include="..\..\Source\ModuleFactory.cpp">
@@ -3294,6 +3300,9 @@
     <ClInclude Include="..\..\Source\NoteGate.h">
       <Filter>BespokeSynth\Source\modules</Filter>
     </ClInclude>
+    <ClInclude Include="..\..\Source\NoteHumanizer.h">
+      <Filter>BespokeSynth\Source\modules</Filter>
+    </ClInclude>
     <ClInclude Include="..\..\Source\NoteLooper.h">
       <Filter>BespokeSynth\Source\modules</Filter>
     </ClInclude>
@@ -3640,6 +3649,9 @@
       <Filter>BespokeSynth\Source</Filter>
     </ClInclude>
     <ClInclude Include="..\..\Source\ModulationChain.h">
+      <Filter>BespokeSynth\Source</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\Source\ModuleContainer.h">
       <Filter>BespokeSynth\Source</Filter>
     </ClInclude>
     <ClInclude Include="..\..\Source\ModuleFactory.h">

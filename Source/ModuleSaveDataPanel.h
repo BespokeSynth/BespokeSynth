@@ -33,6 +33,7 @@ public:
    string GetTitleLabel() override { return ""; }
    bool AlwaysOnTop() override { return true; }
    bool CanMinimize() override { return false; }
+   bool IsSingleton() const override { return true; }
    
    void SetModule(IDrawableModule* module);
    IDrawableModule* GetModule() { return mSaveModule; }

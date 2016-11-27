@@ -35,8 +35,8 @@ void LFOController::CreateUIControls()
    IDrawableModule::CreateUIControls();
    mIntervalSelector = new DropdownList(this,"interval",5,40,&dummy);
    mOscSelector = new DropdownList(this,"osc",50,40,&dummy);
-   mMinSlider = new FloatSlider(this,"min",5,4,120,15,&dummy2,0,1);
-   mMaxSlider = new FloatSlider(this,"max",5,22,120,15,&dummy2,0,1);
+   mMinSlider = new FloatSlider(this,"low",5,4,120,15,&dummy2,0,1);
+   mMaxSlider = new FloatSlider(this,"high",5,22,120,15,&dummy2,0,1);
    mBindButton = new ClickButton(this,"bind",5,60);
    
    mIntervalSelector->AddLabel("64", kInterval_64);

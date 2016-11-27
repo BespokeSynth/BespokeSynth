@@ -224,12 +224,32 @@ private:
    bool keyPressed(const KeyPress& key) override
    {
       int keyCode = key.getKeyCode();
+      bool isRepeat = true;
+      if (find(mPressedKeys.begin(), mPressedKeys.end(), keyCode) == mPressedKeys.end())
+      {
+         mPressedKeys.push_back(keyCode);
+         isRepeat = false;
+      }
       if (isalpha(keyCode) && !key.getModifiers().isShiftDown())
          keyCode -= 'A' - 'a';
-      if (key.isCurrentlyDown())
-         mSynth.KeyPressed(keyCode);
-      else
-         mSynth.KeyReleased(keyCode);
+      mSynth.KeyPressed(keyCode, isRepeat);
+      return true;
+   }
+   
+   bool keyStateChanged(bool isKeyDown) override
+   {
+      if (!isKeyDown)
+      {
+         for (int keyCode : mPressedKeys)
+         {
+            if (!KeyPress::isKeyCurrentlyDown(keyCode))
+            {
+               mPressedKeys.remove(keyCode);
+               mSynth.KeyReleased(keyCode);
+               break;
+            }
+         }
+      }
       return true;
    }
    
@@ -254,6 +274,7 @@ private:
    NVGcontext* mVG;
    int64 mLastFpsUpdateTime;
    int mFrameCountAccum;
+   list<int> mPressedKeys;
    
    JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (MainContentComponent)
 };

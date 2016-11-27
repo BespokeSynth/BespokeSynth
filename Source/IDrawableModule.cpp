@@ -45,6 +45,7 @@ IDrawableModule::IDrawableModule()
 , mUIControlsCreated(false)
 , mInitialized(false)
 , mMainPatchCableSource(NULL)
+, mOwningContainer(nullptr)
 {
 }
 
@@ -214,11 +215,6 @@ void IDrawableModule::Render()
    //gModuleShader.end();
    ofNoFill();
 
-   if (Enabled())
-      ofSetColor(color);
-   else
-      ofSetColor(color.r,color.g,color.b,70);
-
    ofPushStyle();
    ofPushMatrix();
    if (Enabled())
@@ -226,12 +222,31 @@ void IDrawableModule::Render()
    else
       gModuleDrawAlpha = 100;
    
+   bool dimModule = false;
+   
+   if (TheSynth->GetGroupSelectedModules().empty() == false)
+   {
+      if (!VectorContains(GetModuleParent(), TheSynth->GetGroupSelectedModules()))
+         dimModule = true;
+   }
+   
+   if (PatchCable::sActivePatchCable &&
+       PatchCable::sActivePatchCable->GetConnectionType() != kConnectionType_UIControl &&
+       !PatchCable::sActivePatchCable->IsValidTarget(this))
+   {
+      dimModule = true;
+   }
+   
+   if (dimModule)
+      gModuleDrawAlpha *= .2f;
+   
+   ofSetColor(color, gModuleDrawAlpha);
    DrawModule();
    
    float enableToggleOffset = 0;
    if (HasTitleBar())
    {
-      ofSetColor(color.r, color.g, color.b, 50);
+      ofSetColor(color, 50);
       ofFill();
       ofRect(0,-titleBarHeight,w,titleBarHeight);
       
@@ -243,7 +258,7 @@ void IDrawableModule::Render()
       
       if (IsSaveable() && !Minimized())
       {
-         ofSetColor(color.r, color.g, color.b, 255);
+         ofSetColor(color.r, color.g, color.b, gModuleDrawAlpha);
          if (TheSaveDataPanel->GetModule() == this)
          {
             ofTriangle(w-9, -titleBarHeight+2,
@@ -258,7 +273,7 @@ void IDrawableModule::Render()
          }
       }
    }
-   ofSetColor(color * (1-GetBeaconAmount()) + ofColor::yellow * GetBeaconAmount());
+   ofSetColor(color * (1-GetBeaconAmount()) + ofColor::yellow * GetBeaconAmount(), gModuleDrawAlpha);
    DrawTextBold(GetTitleLabel(),5+enableToggleOffset,10-titleBarHeight,16);
    
    if (Minimized() || IsVisible() == false)
@@ -266,7 +281,7 @@ void IDrawableModule::Render()
    
    if (IsResizable())
    {
-      ofSetColor(color);
+      ofSetColor(color, gModuleDrawAlpha);
       ofSetLineWidth(2);
       ofLine(w-sResizeCornerSize, h, w, h);
       ofLine(w, h-sResizeCornerSize, w, h);
@@ -275,27 +290,6 @@ void IDrawableModule::Render()
    gModuleDrawAlpha = 255;
    
    ofFill();
-   
-   bool dimModule = false;
-   
-   if (TheSynth->GetGroupSelectedModules().empty() == false)
-   {
-      if (!VectorContains(dynamic_cast<IDrawableModule*>(GetRootParent()), TheSynth->GetGroupSelectedModules()))
-         dimModule = true;
-   }
-   
-   if (PatchCable::sActivePatchCable &&
-       PatchCable::sActivePatchCable->GetConnectionType() != kConnectionType_UIControl &&
-       !PatchCable::sActivePatchCable->IsValidTarget(this))
-   {
-      dimModule = true;
-   }
-   
-   if (dimModule)
-   {
-      ofSetColor(0,0,0,170);
-      ofRect(0,-titleBarHeight,w,h+titleBarHeight);
-   }
    
    if (TheSynth->ShouldAccentuateActiveModules() && GetParent() == NULL)
    {
@@ -548,6 +542,8 @@ IDrawableModule* IDrawableModule::FindChild(const char* name) const
 
 void IDrawableModule::AddChild(IDrawableModule* child)
 {
+   if (dynamic_cast<IDrawableModule*>(child->GetParent()))
+      dynamic_cast<IDrawableModule*>(child->GetParent())->RemoveChild(child);
    child->SetParent(this);
    if (child->Name()[0] == 0)
       child->SetName(("child"+ofToString(mChildren.size())).c_str());
@@ -597,12 +593,12 @@ float IDrawableModule::GetMinimizedWidth()
    return MAX(width, 50);
 }
 
-void IDrawableModule::KeyPressed(int key)
+void IDrawableModule::KeyPressed(int key, bool isRepeat)
 {
    for (auto source : mPatchCableSources)
-      source->KeyPressed(key);
+      source->KeyPressed(key, isRepeat);
    for (auto control : mUIControls)
-      control->KeyPressed(key);
+      control->KeyPressed(key, isRepeat);
 }
 
 void IDrawableModule::KeyReleased(int key)

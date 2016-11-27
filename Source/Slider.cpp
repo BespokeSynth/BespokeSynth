@@ -162,7 +162,6 @@ void FloatSlider::DisplayLFOControl()
       int w,h;
       lfo->GetDimensions(w, h);
       lfo->SetPosition(thisx,thisy+15);
-      //lfo->SetParent(this);
       TheSynth->PushModalFocusItem(lfo);
       
       if (TheLFOController)

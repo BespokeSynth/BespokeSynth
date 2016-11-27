@@ -73,9 +73,9 @@ void NoteCreator::TriggerNote()
    PlayNoteOutput(gTime, mPitch, mVelocity*127);
 }
 
-void NoteCreator::KeyPressed(int key)
+void NoteCreator::KeyPressed(int key, bool isRepeat)
 {
-   IDrawableModule::KeyPressed(key);
+   IDrawableModule::KeyPressed(key, isRepeat);
    if (key == 'e')
       TriggerNote();
 }

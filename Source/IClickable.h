@@ -13,6 +13,8 @@
 
 //TODO(Ryan) factor Transformable stuff out of here
 
+class IDrawableModule;
+
 class IClickable
 {
 public:
@@ -37,7 +39,7 @@ public:
    void SetName(const char* name) { StringCopy(mName, name, MAX_TEXTENTRY_LENGTH); }
    const char* Name() const { return mName; }
    char* NameMutable() { return mName; }
-   string Path();
+   string Path(bool ignoreContext = false);
    virtual bool CheckNeedsDraw();
    void SetShowing(bool showing) { mShowing = showing; }
    bool IsShowing() const { return mShowing; }
@@ -45,6 +47,16 @@ public:
    float GetBeaconAmount() const;
    void DrawBeacon(int x, int y);
    IClickable* GetRootParent();
+   IDrawableModule* GetModuleParent();
+   
+   static void SetLoadContext(IClickable* context) { sLoadContext = context->Path() + "~"; }
+   static void ClearLoadContext() { sLoadContext = ""; }
+   static void SetSaveContext(IClickable* context) { sSaveContext = context->Path() + "~"; }
+   static void ClearSaveContext() { sSaveContext = ""; }
+   
+   static string sLoadContext;
+   static string sSaveContext;
+   
 protected:
    virtual void OnClicked(int x, int y, bool right) {}
    virtual bool MouseMoved(float x, float y) { return false; }

@@ -10,13 +10,27 @@
 #include "SynthGlobals.h"
 #include "Scale.h"
 
+namespace
+{
+   const float kKeyboardYOffset = 15;
+}
+
 KeyboardDisplay::KeyboardDisplay()
 : mWidth(500)
-, mHeight(100)
+, mHeight(110)
 , mRootOctave(3)
 , mNumOctaves(3)
-, mPlayingPitch(-1)
+, mPlayingMousePitch(-1)
+, mTypingInput(false)
+, mTypingInputCheckbox(nullptr)
 {
+}
+
+void KeyboardDisplay::CreateUIControls()
+{
+   IDrawableModule::CreateUIControls();
+   
+   mTypingInputCheckbox = new Checkbox(this, "typing input", 0, 0, &mTypingInput);
 }
 
 void KeyboardDisplay::DrawModule()
@@ -24,7 +38,8 @@ void KeyboardDisplay::DrawModule()
    if (Minimized() || IsVisible() == false)
       return;
    
-   DrawKeyboard(0,0,mWidth,mHeight);
+   DrawKeyboard(0,kKeyboardYOffset,mWidth,mHeight-kKeyboardYOffset);
+   mTypingInputCheckbox->Draw();
 }
 
 void KeyboardDisplay::PlayNote(double time, int pitch, int velocity, int voiceIdx /*= -1*/, ModulationChain* pitchBend /*= NULL*/, ModulationChain* modWheel /*= NULL*/, ModulationChain* pressure /*= NULL*/)
@@ -43,12 +58,12 @@ void KeyboardDisplay::OnClicked(int x, int y, bool right)
          for (int i=0;i<NumKeys();++i)
          {
             bool isBlackKey;
-            if (GetKeyboardKeyRect(i+RootKey(), mWidth, mHeight, isBlackKey).inside(x,y))
+            if (GetKeyboardKeyRect(i+RootKey(), mWidth, mHeight - kKeyboardYOffset, isBlackKey).inside(x,y - kKeyboardYOffset))
             {
                if ((pass == 0 && isBlackKey) || (pass == 1 && !isBlackKey))
                {
-                  mPlayingPitch = i+RootKey();
-                  PlayNote(gTime, mPlayingPitch, 127);
+                  mPlayingMousePitch = i+RootKey();
+                  PlayNote(gTime, mPlayingMousePitch, 127);
                   return;
                }
             }
@@ -60,10 +75,10 @@ void KeyboardDisplay::OnClicked(int x, int y, bool right)
 void KeyboardDisplay::MouseReleased()
 {
    IDrawableModule::MouseReleased();
-   if (mPlayingPitch != -1)
+   if (mPlayingMousePitch != -1)
    {
-      PlayNote(gTime, mPlayingPitch, 0);
-      mPlayingPitch = -1;
+      PlayNote(gTime, mPlayingMousePitch, 0);
+      mPlayingMousePitch = -1;
    }
 }
 
@@ -161,6 +176,70 @@ ofRectangle KeyboardDisplay::GetKeyboardKeyRect(int pitch, int w, int h, bool& i
       int blackKey = pitch/2;
       isBlackKey = true;
       return ofRectangle(offset+blackKey*octaveWidth/7+octaveWidth/16+octaveWidth/7*.1f,0,octaveWidth/7*.8f,h/2);
+   }
+}
+
+int KeyboardDisplay::GetPitchForTypingKey(int key) const
+{
+   int index = -1;
+   
+   if (key == 'a')
+      index = 0;
+   if (key == 'w')
+      index = 1;
+   if (key == 's')
+      index = 2;
+   if (key == 'e')
+      index = 3;
+   if (key == 'd')
+      index = 4;
+   if (key == 'f')
+      index = 5;
+   if (key == 't')
+      index = 6;
+   if (key == 'g')
+      index = 7;
+   if (key == 'y')
+      index = 8;
+   if (key == 'h')
+      index = 9;
+   if (key == 'u')
+      index = 10;
+   if (key == 'j')
+      index = 11;
+   if (key == 'k')
+      index = 12;
+   if (key == 'o')
+      index = 13;
+   if (key == 'l')
+      index = 14;
+   if (key == 'p')
+      index = 15;
+   if (key == ';')
+      index = 16;
+   
+   if (index != -1)
+      return mRootOctave*12+index;
+   return -1;
+}
+
+void KeyboardDisplay::KeyPressed(int key, bool isRepeat)
+{
+   if (mTypingInput && mEnabled && !isRepeat)
+   {
+      int pitch = GetPitchForTypingKey(key);
+      if (pitch != -1)
+         PlayNote(gTime, pitch, 127);
+   }
+}
+
+void KeyboardDisplay::KeyReleased(int key)
+{
+   if (mTypingInput && mEnabled)
+   {
+      int pitch = GetPitchForTypingKey(key);
+      if (pitch != -1)
+         PlayNote(gTime, pitch, 0);
    }
 }
 

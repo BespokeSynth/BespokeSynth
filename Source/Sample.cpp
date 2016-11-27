@@ -91,25 +91,20 @@ void Sample::Create(float* data, int length)
 bool Sample::Write(const char* path /*=NULL*/)
 {
    const char* writeTo = path ? path : mReadPath;
-   WriteDataToFile(writeTo, &mData[0], mNumSamples);
+   WriteDataToFile(writeTo, &mData, mNumSamples);
    return true;
 }
 
 //static
-bool Sample::WriteDataToFile(const char *path, float *data, int numSamples, int channels)
+bool Sample::WriteDataToFile(const char *path, float **data, int numSamples, int channels)
 {
-   /*for (int i=0; i<numSamples; ++i)
-      data[i] = ofClamp(data[i],-1.0f,1.0f);
+   ScopedPointer<WavAudioFormat> wavFormat = new WavAudioFormat();
+   File outputFile(ofToDataPath(path).c_str());
+   FileOutputStream* outputTo = outputFile.createOutputStream();
+    
+   ScopedPointer<AudioFormatWriter> writer = wavFormat->createWriterFor(outputTo, gSampleRate, channels, 16, NULL, 0);
+   writer->writeFromFloatArrays(data, channels, numSamples);
    
-   const int format=SF_FORMAT_WAV | SF_FORMAT_PCM_16;
-   //const int format=SF_FORMAT_WAV | SF_FORMAT_FLOAT;
-   const int sampleRate=gSampleRate;
-   
-   SndfileHandle outfile(ofToDataPath(path).c_str(), SFM_WRITE, format, channels, gSampleRate);
-   if (!outfile)
-      return false;
-   
-   outfile.write(data, numSamples);*/
    return true;
 }
 

@@ -113,7 +113,7 @@ public:
    //IUIControl
    void SetFromMidiCC(float slider) override {}
    void SetValue(float value) override {}
-   void KeyPressed(int key) override;
+   void KeyPressed(int key, bool isRepeat) override;
    void SaveState(FileStreamOut& out) override;
    void LoadState(FileStreamIn& in, bool shouldSetValue = true) override;
    

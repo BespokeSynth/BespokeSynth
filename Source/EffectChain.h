@@ -44,7 +44,7 @@ public:
    //IAudioSource
    void Process(double time) override;
    
-   void KeyPressed(int key) override;
+   void KeyPressed(int key, bool isRepeat) override;
    void KeyReleased(int key) override;
 
    void ButtonClicked(ClickButton* button) override;

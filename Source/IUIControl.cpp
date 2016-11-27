@@ -37,22 +37,19 @@ void IUIControl::CheckHover(int x, int y)
    GetDimensions(w, h);
    if (x>=0 && x<w && y>=0 && y<h) //make sure we're hovered over the control
    {
-      IClickable* rootParent = GetRootParent();
-      if (rootParent)
+      IDrawableModule* moduleParent = GetModuleParent();
+      int thisX,thisY;
+      GetPosition(thisX, thisY);
+      x += thisX;
+      y += thisY;
+      if (TheSynth->GetModuleAt(x,y) == moduleParent)
       {
-         int thisX,thisY;
-         GetPosition(thisX, thisY);
-         x += thisX;
-         y += thisY;
-         if (TheSynth->GetModuleAt(x,y) == rootParent)
-         {
-            int localX,localY;
-            GetPosition(localX, localY, K(localOnly));
-            int parentW,parentH;
-            GetParent()->GetDimensions(parentW, parentH);
-            if (localX < parentW && localY < parentH)
-               gHoveredUIControl = this;
-         }
+         int localX,localY;
+         GetPosition(localX, localY, K(localOnly));
+         int parentW,parentH;
+         GetParent()->GetDimensions(parentW, parentH);
+         if (localX < parentW && localY < parentH)
+            gHoveredUIControl = this;
       }
    }
 }
@@ -111,9 +108,9 @@ void IUIControl::DrawHover()
 void IUIControl::StartBeacon()
 {
    IClickable::StartBeacon();
-   IClickable* rootParent = GetRootParent();
-   if (GetRootParent())
-      rootParent->StartBeacon();
+   IClickable* moduleParent = GetModuleParent();
+   if (moduleParent)
+      moduleParent->StartBeacon();
 }
 
 void IUIControl::PositionTo(IUIControl* anchor, AnchorDirection direction)

@@ -127,9 +127,9 @@ StutterControl::StutterType StutterControl::GetStutterFromKey(int key)
    return kNumStutterTypes;
 }
 
-void StutterControl::KeyPressed(int key)
+void StutterControl::KeyPressed(int key, bool isRepeat)
 {
-   IDrawableModule::KeyPressed(key);
+   IDrawableModule::KeyPressed(key, isRepeat);
    if (GetKeyModifiers() == kModifier_Shift)
    {
       StutterType type = GetStutterFromKey(key);

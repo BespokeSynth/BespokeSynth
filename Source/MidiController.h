@@ -68,7 +68,7 @@ class MidiController;
 
 struct UIControlConnection
 {
-   UIControlConnection()
+   UIControlConnection(MidiController* owner)
    {
       mMessageType = kMidiMessage_Control;
       mControl = -1;
@@ -88,7 +88,7 @@ struct UIControlConnection
       mUIControlPathInput[0] = 0;
       mPage = 0;
       mPageless = false;
-      mUIOwner = NULL;
+      mUIOwner = owner;
    }
    
    ~UIControlConnection();
@@ -106,7 +106,7 @@ struct UIControlConnection
    
    UIControlConnection* MakeCopy()
    {
-      UIControlConnection* connection = new UIControlConnection();
+      UIControlConnection* connection = new UIControlConnection(mUIOwner);
       connection->mMessageType = mMessageType;
       connection->mControl = mControl;
       connection->mUIControl = mUIControl;
@@ -129,7 +129,7 @@ struct UIControlConnection
    void SetNext(UIControlConnection* next);
    
    void SetUIControl(string path);
-   void CreateUIControls(MidiController* owner, int index);
+   void CreateUIControls(int index);
    void Draw(int index);
    void SetShowing(bool enabled);
    void PostRepatch(PatchCableSource* cable);

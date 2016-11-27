@@ -164,7 +164,7 @@ void TextEntry::MakeActiveTextEntry()
    mCaretBlinkTimer = 0;
 }
 
-void TextEntry::OnKeyPressed(int key)
+void TextEntry::OnKeyPressed(int key, bool isRepeat)
 {
    if (key == OF_KEY_RETURN)
    {

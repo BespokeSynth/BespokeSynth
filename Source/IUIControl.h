@@ -40,7 +40,7 @@ public:
    virtual string GetDisplayValue(float val) const { return "unimplemented"; }
    virtual void Init() {}
    virtual void Poll() {}
-   virtual void KeyPressed(int key) {}
+   virtual void KeyPressed(int key, bool isRepeat) {}
    void StartBeacon() override;
    bool IsPreset();
    virtual void GetRange(float& min, float& max) { min = 0; max = 1; }

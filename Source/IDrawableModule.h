@@ -23,6 +23,7 @@ class ofxJSONElement;
 class Sample;
 class PatchCable;
 class PatchCableSource;
+class ModuleContainer;
 
 enum ModuleType
 {
@@ -52,10 +53,9 @@ public:
    void Render() override;
    bool CheckNeedsDraw() override;
    virtual bool AlwaysOnTop() { return false; }
-   virtual bool AlwaysOnBottom() { return false; }
    void ToggleMinimized();
    void SetMinimized(bool minimized) { if (HasTitleBar()) mMinimized = minimized; }
-   virtual void KeyPressed(int key);
+   virtual void KeyPressed(int key, bool isRepeat);
    virtual void KeyReleased(int key);
    void DrawConnection(IClickable* target);
    void AddUIControl(IUIControl* control);
@@ -94,6 +94,9 @@ public:
    string GetTypeName() const { return mTypeName; }
    virtual bool IsSingleton() const { return false; }
    void ComputeSliders(int samplesIn);
+   void SetOwningContainer(ModuleContainer* container) { mOwningContainer = container; }
+   ModuleContainer* GetOwningContainer() const { return mOwningContainer; }
+   virtual ModuleContainer* GetContainer() { return nullptr; }
    
    virtual void CheckboxUpdated(Checkbox* checkbox) {}
    
@@ -149,6 +152,7 @@ private:
    static const int mTitleBarHeight = 12;
    string mTypeName;
    static const int sResizeCornerSize = 8;
+   ModuleContainer* mOwningContainer;
 
    bool mMinimized;
    bool mMinimizeAreaClicked;
