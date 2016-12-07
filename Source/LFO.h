@@ -25,12 +25,13 @@ class LFO : public ITimeListener, public IAudioPoller
 public:
    LFO();
    ~LFO();
-   float Value(int samplesIn = 0) const;
+   float Value(int samplesIn = 0, float forcePhase = -1) const;
    void SetOffset(float offset) { mPhaseOffset = offset; }
    void SetPeriod(NoteInterval interval);
    void SetType(OscillatorType type);
    void SetPulseWidth(float width) { mOsc.SetPulseWidth(width); }
    void SetMode(LFOMode mode) { mMode = mode; }
+   float CalculatePhase(int samplesIn = 0) const;
 
    //ITimeListener
    void OnTimeEvent(int samplesTo) override;

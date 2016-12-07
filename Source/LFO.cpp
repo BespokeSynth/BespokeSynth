@@ -25,17 +25,28 @@ LFO::~LFO()
    TheTransport->RemoveAudioPoller(this);
 }
 
-float LFO::Value(int samplesIn /*= 0*/) const
+float LFO::CalculatePhase(int samplesIn /*= 0*/) const
+{
+   float period = TheTransport->GetDuration(mPeriod) / TheTransport->GetDuration(kInterval_1n);
+   
+   float sampsPerMeasure = TheTransport->MsPerBar() / gInvSampleRateMs;
+   float phase = ((TheTransport->GetMeasurePos()+TheTransport->GetMeasure() + samplesIn/sampsPerMeasure) / period + mPhaseOffset + 1);  //+1 so we can have negative samplesIn
+   
+   phase -= int(phase);
+   
+   return phase;
+}
+
+float LFO::Value(int samplesIn /*= 0*/, float forcePhase /*= -1*/) const
 {
    if (mPeriod == kInterval_None)  //no oscillator
       return mMode == kLFOMode_Envelope ? 1 : 0;
 
-   float period = TheTransport->GetDuration(mPeriod) / TheTransport->GetDuration(kInterval_1n);
-
-   float sampsPerMeasure = TheTransport->MsPerBar() / gInvSampleRateMs;
-   float phase = ((TheTransport->GetMeasurePos()+TheTransport->GetMeasure() + samplesIn/sampsPerMeasure) / period + mPhaseOffset + 1);  //+1 so we can have negative samplesIn
-
-   phase -= int(phase);
+   float phase = CalculatePhase(samplesIn);
+   
+   if (forcePhase != -1)
+      phase = forcePhase;
+   
    phase *= FTWO_PI;
    
    float sample;

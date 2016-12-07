@@ -45,9 +45,9 @@ FloatSliderLFOControl::FloatSliderLFOControl()
 void FloatSliderLFOControl::CreateUIControls()
 {
    IDrawableModule::CreateUIControls();
-   mIntervalSelector = new DropdownList(this,"interval",5,36,(int*)(&mLFOSettings.mInterval));
-   mOscSelector = new DropdownList(this,"osc",5,56,(int*)(&mLFOSettings.mOscType));
-   mOffsetSlider = new FloatSlider(this,"off",4,89,90,15,&mLFOSettings.mLFOOffset,0,1);
+   mIntervalSelector = new DropdownList(this,"interval",4,74,(int*)(&mLFOSettings.mInterval));
+   mOscSelector = new DropdownList(this,"osc",-1,-1,(int*)(&mLFOSettings.mOscType));
+   mOffsetSlider = new FloatSlider(this,"off",-1,-1,90,15,&mLFOSettings.mLFOOffset,0,1);
    mBiasSlider = new FloatSlider(this,"bias",-1,-1,90,15,&mLFOSettings.mBias,0,1);
    mTypeSelector = new RadioButton(this,"type",2,16,(int*)(&mType),kRadioHorizontal);
    mADSRDisplay = new ADSRDisplay(this,"adsr",2,40,96,40,&sADSR[0]);
@@ -91,6 +91,8 @@ void FloatSliderLFOControl::CreateUIControls()
    for (int i=0; i<NUM_GLOBAL_ADSRS; ++i)
       mADSRSelector->AddLabel(ofToString(i).c_str(), i);
    
+   mOscSelector->PositionTo(mIntervalSelector, kAnchorDirection_Right);
+   mOffsetSlider->PositionTo(mIntervalSelector, kAnchorDirection_Below);
    mBiasSlider->PositionTo(mOffsetSlider, kAnchorDirection_Below);
    mMinSlider->PositionTo(mBiasSlider, kAnchorDirection_Below);
    mMaxSlider->PositionTo(mMinSlider, kAnchorDirection_Below);
@@ -138,6 +140,35 @@ void FloatSliderLFOControl::DrawModule()
    mADSRLengthMultiplierSlider->Draw();
    if (!mPinned)
       mPinButton->Draw();
+   
+   if (mType == kLFOControlType_LFO)
+   {
+      int x = 5;
+      int y = 36;
+      int height = 35;
+      int width = 90;
+      
+      ofSetColor(100,100,.8f*gModuleDrawAlpha);
+      ofSetLineWidth(.5f);
+      ofRect(x,y,width,height, 0);
+      
+      ofSetColor(245, 58, 0, gModuleDrawAlpha);
+      ofSetLineWidth(1);
+      
+      ofBeginShape();
+      
+      for (float i=0; i<width; i+=(.25f/gDrawScale))
+      {
+         float phase = i/width;
+         float value = GetLFOValue(0, phase);
+         ofVertex(i + x, ofMap(value,mOwner->GetMax(),mOwner->GetMin(),0,height) + y);
+      }
+      ofEndShape(false);
+      
+      float currentPhase = mLFO.CalculatePhase();
+      ofCircle(currentPhase * width + x,
+               ofMap(GetLFOValue(),mOwner->GetMax(),mOwner->GetMin(),0,height) + y, 2);
+   }
 }
 
 void FloatSliderLFOControl::SetLFOEnabled(bool enabled)
@@ -201,10 +232,15 @@ float FloatSliderLFOControl::Value(int samplesIn /*= 0*/)
 {
    ComputeSliders(samplesIn);
    if (mType == kLFOControlType_LFO)
-      return ofClamp(Interp(mLFO.Value(samplesIn), mLFOSettings.mMin, mLFOSettings.mMax) + mLFOSettings.mAdd, mOwner->GetMin(), mOwner->GetMax());
+      return GetLFOValue(samplesIn);
    if (mType == kLFOControlType_ADSR)
       return ofClamp(Interp(sADSR[mADSRIndex].Value(gTime + samplesIn * gInvSampleRateMs), mLFOSettings.mMin, mLFOSettings.mMax) + mLFOSettings.mAdd, mOwner->GetMin(), mOwner->GetMax());
    return 0;
+}
+
+float FloatSliderLFOControl::GetLFOValue(int samplesIn /*= 0*/, float forcePhase /*= -1*/)
+{
+   return ofClamp(Interp(mLFO.Value(samplesIn, forcePhase), mLFOSettings.mMin, mLFOSettings.mMax) + mLFOSettings.mAdd, mOwner->GetMin(), mOwner->GetMax());
 }
 
 void FloatSliderLFOControl::UpdateFromSettings()
