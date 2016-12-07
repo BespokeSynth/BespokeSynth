@@ -1340,6 +1340,8 @@ void ModularSynth::AddDynamicModule(IDrawableModule* module)
 
 IDrawableModule* ModularSynth::FindModule(string name, bool fail)
 {
+   if (name[0] == '$')
+      return mModuleContainer.FindModule(name.substr(1,name.length()-1), fail);
    return mModuleContainer.FindModule(IClickable::sLoadContext+name, fail);
 }
 

@@ -132,9 +132,25 @@ void Prefab::SavePrefab(string savePath)
    
    root["modules"] = mModuleContainer.WriteModules();
    
+   stringstream ss(root.getRawString(true));
+   string line;
+   string lines;
+   while (getline(ss,line,'\n'))
+   {
+      char* pos = strstr(line.c_str(), " : \"$");
+      if (pos != nullptr)
+      {
+         bool endsWithComma = line[line.length()-1] == ',';
+         ofStringReplace(line, pos, " : \"\"");
+         if (endsWithComma)
+            line += ",";
+      }
+      lines += line + '\n';
+   }
+   
    FileStreamOut out(ofToDataPath(savePath).c_str());
    
-   out << root.getRawString(true);
+   out << lines;
    mModuleContainer.SaveState(out);
 }
 
@@ -167,10 +183,12 @@ void Prefab::LoadPrefab(string loadPath)
 void Prefab::SaveLayout(ofxJSONElement& moduleInfo)
 {
    IDrawableModule::SaveLayout(moduleInfo);
+   moduleInfo["modules"] = mModuleContainer.WriteModules();
 }
 
 void Prefab::LoadLayout(const ofxJSONElement& moduleInfo)
 {
+   mModuleContainer.LoadModules(moduleInfo["modules"]);
    SetUpFromSaveData();
 }
 

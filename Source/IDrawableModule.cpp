@@ -115,7 +115,12 @@ void IDrawableModule::Init()
       mUIControls[i]->Init();
    
    for (int i=0; i<mChildren.size(); ++i)
+   {
+      ModuleContainer* container = GetContainer();
+      if (container != nullptr && VectorContains(mChildren[i], container->GetModules()))
+         continue;   //stuff in module containers was already initialized
       mChildren[i]->Init();
+   }
 }
 
 void IDrawableModule::BasePoll()
@@ -855,6 +860,9 @@ void IDrawableModule::SaveState(FileStreamOut& out)
       }
    }
    
+   if (GetContainer())
+      GetContainer()->SaveState(out);
+   
    out << (int)mChildren.size();
    
    for (auto* child : mChildren)
@@ -940,6 +948,9 @@ void IDrawableModule::LoadState(FileStreamIn& in)
          }
       }
    }
+   
+   if (GetContainer())
+      GetContainer()->LoadState(in);
    
    int numChildren;
    in >> numChildren;

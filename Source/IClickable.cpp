@@ -142,13 +142,18 @@ string IClickable::Path(bool ignoreContext)
    if (!ignoreContext)
    {
       if (sLoadContext != "")
-         path = sLoadContext + path;
+      {
+         if (path[0] == '$')
+            path = path.substr(1, path.length()-1);
+         else
+            path = sLoadContext + path;
+      }
       if (sSaveContext != "")
       {
          if (strstr(path.c_str(), sSaveContext.c_str()) == path.c_str())   //path starts with sSaveContext
             path = path.substr(sSaveContext.length(), path.length() - sSaveContext.length());
          else
-            path = ""; //path is outside of our context, and therefore invalid
+            path = "$"+path; //path is outside of our context, and therefore invalid
       }
    }
    return path;

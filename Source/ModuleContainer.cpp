@@ -70,9 +70,8 @@ void ModuleContainer::Poll()
 void ModuleContainer::Clear()
 {
    vector<IDrawableModule*> modulesToDelete = mModules;
-   for (int i=0; i<modulesToDelete.size(); ++i)
+   for (auto* module : modulesToDelete)
    {
-      IDrawableModule* module = mModules[i];
       if (module->GetContainer())
          module->GetContainer()->Clear();
       if (module->IsSingleton() == false)
