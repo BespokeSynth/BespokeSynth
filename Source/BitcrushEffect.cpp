@@ -26,7 +26,7 @@ void BitcrushEffect::CreateUIControls()
 {
    IDrawableModule::CreateUIControls();
    mCrushSlider = new FloatSlider(this,"crush",5,4,85,15,&mCrush,1,24);
-   mDownsampleSlider = new IntSlider(this,"downsamp",5,21,85,15,&mDownsample,1,40);
+   mDownsampleSlider = new FloatSlider(this,"downsamp",5,21,85,15,&mDownsample,1,40,0);
 }
 
 void BitcrushEffect::ProcessAudio(double time, float* audio, int bufferSize)
@@ -43,7 +43,7 @@ void BitcrushEffect::ProcessAudio(double time, float* audio, int bufferSize)
 
    for (int i=0; i<bufferSize; ++i)
    {
-      if (mSampleCounter < mDownsample - 1)
+      if (mSampleCounter < (int)mDownsample - 1)
       {
          ++mSampleCounter;
       }
@@ -83,7 +83,7 @@ float BitcrushEffect::GetEffectAmount()
 {
    if (!mEnabled)
       return 0;
-   return ofClamp((mCrush-1)/24.0f+(mDownsample-1)/40.0f,0,1);
+   return ofClamp((mCrush-1)/24.0f+((int)mDownsample-1)/40.0f,0,1);
 }
 
 void BitcrushEffect::CheckboxUpdated(Checkbox *checkbox)

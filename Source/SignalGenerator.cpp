@@ -42,6 +42,8 @@ SignalGenerator::SignalGenerator()
 , mFreqRampTimeSlider(NULL)
 , mShuffle(0)
 , mShuffleSlider(NULL)
+, mSoften(0)
+, mSoftenSlider(NULL)
 {
    mWriteBuffer = new float[gBufferSize];
    
@@ -63,8 +65,11 @@ void SignalGenerator::CreateUIControls()
    mFreqModeSelector = new DropdownList(this,"freq mode",5,21,(int*)(&mFreqMode));
    mFreqSliderAmountSlider = new FloatSlider(this,"slider",5,38,80,15,&mFreqSliderAmount,0,1);
    mFreqRampTimeSlider = new FloatSlider(this,"ramp",5,38,80,15,&mFreqRampTime,0,1000);
+   mSoftenSlider = new FloatSlider(this,"soften",-1,-1,40,15,&mSoften,0,1);
    
    mSyncFreqSlider->SetLabel("");
+   mSoftenSlider->SetLabel("");
+   mSoftenSlider->PositionTo(mMultSelector, kAnchorDirection_Right);
    
    SetFreqMode(kFreqMode_Instant);
    
@@ -212,6 +217,7 @@ void SignalGenerator::DrawModule()
    mFreqModeSelector->Draw();
    mFreqSliderAmountSlider->Draw();
    mFreqRampTimeSlider->Draw();
+   mSoftenSlider->Draw();
 }
 
 void SignalGenerator::GetModuleDimensions(int& width, int& height)
@@ -282,6 +288,8 @@ void SignalGenerator::FloatSliderUpdated(FloatSlider* slider, float oldVal)
       if (mFreqMode == kFreqMode_Ramp)
          mFreqRamp.Start(mFreq, mFreqRampTime);
    }
+   if (slider == mSoftenSlider)
+      mOsc.mOsc.SetSoften(mSoften);
 }
 
 void SignalGenerator::IntSliderUpdated(IntSlider* slider, int oldVal)

@@ -87,7 +87,7 @@ void WaveformViewer::Process(double time)
       
    Clear(mInputBuffer, mInputBufferSize);
    
-   float vizPhaseInc = gVizFreq * gTwoPiOverSampleRate;
+   float vizPhaseInc = GetPhaseInc(gVizFreq);
    mVizPhase[!mDoubleBufferFlip] += vizPhaseInc * bufferSize;
    while (mVizPhase[!mDoubleBufferFlip] > FTWO_PI) { mVizPhase[!mDoubleBufferFlip] -= FTWO_PI; }
    
@@ -123,7 +123,7 @@ void WaveformViewer::DrawModule()
 
    if (mPhaseAlign)
    {
-      float vizPhaseInc = gVizFreq * gTwoPiOverSampleRate;
+      float vizPhaseInc = GetPhaseInc(gVizFreq);
       phaseStart = (FTWO_PI - mVizPhase[mDoubleBufferFlip]) / vizPhaseInc;
       end = BUFFER_VIZ_SIZE-(FTWO_PI/vizPhaseInc);
    }

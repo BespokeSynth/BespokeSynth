@@ -13,6 +13,7 @@
 #include "SynthGlobals.h"
 #include "Transport.h"
 #include "Oscillator.h"
+#include "Ramp.h"
 
 enum LFOMode
 {
@@ -32,6 +33,7 @@ public:
    void SetPulseWidth(float width) { mOsc.SetPulseWidth(width); }
    void SetMode(LFOMode mode) { mMode = mode; }
    float CalculatePhase(int samplesIn = 0) const;
+   Oscillator* GetOsc() { return &mOsc; }
 
    //ITimeListener
    void OnTimeEvent(int samplesTo) override;
@@ -42,8 +44,9 @@ private:
    NoteInterval mPeriod;
    float mPhaseOffset;
    Oscillator mOsc;
-   float mRandom;
    LFOMode mMode;
+   Ramp mRandom;
+   float mDrunk;
 };
 
 #endif /* defined(__modularSynth__LFO__) */

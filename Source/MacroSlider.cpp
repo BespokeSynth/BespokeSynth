@@ -164,8 +164,8 @@ MacroSlider::Mapping::~Mapping()
 
 void MacroSlider::Mapping::CreateUIControls()
 {
-   mStartSlider = new FloatSlider(mOwner,"start", 5, 25+mIndex*kMappingSpacing, 100, 15, &mStart, 0, 1);
-   mEndSlider = new FloatSlider(mOwner,"end", 5, 39+mIndex*kMappingSpacing, 100, 15, &mEnd, 0, 1);
+   mStartSlider = new FloatSlider(mOwner,("start"+ofToString(mIndex+1)).c_str(), 5, 25+mIndex*kMappingSpacing, 100, 15, &mStart, 0, 1);
+   mEndSlider = new FloatSlider(mOwner,("end"+ofToString(mIndex+1)).c_str(), 5, 39+mIndex*kMappingSpacing, 100, 15, &mEnd, 0, 1);
    mCableSource = new PatchCableSource(mOwner, kConnectionType_UIControl);
    mCableSource->SetManualPosition(110, 39+mIndex*kMappingSpacing);
    mOwner->AddPatchCableSource(mCableSource);

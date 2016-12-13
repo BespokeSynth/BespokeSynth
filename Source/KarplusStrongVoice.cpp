@@ -66,7 +66,6 @@ void KarplusStrongVoice::Process(double time, float* out, int bufferSize)
          mOsc.SetType(kOsc_Sin);
       }
       mOscPhase += oscPhaseInc;
-      while (mOscPhase > FTWO_PI) { mOscPhase -= FTWO_PI; }
       float sample = 0;
       float sinSample = mOsc.Audio(time, mOscPhase);
       float noiseSample = RandomSample();

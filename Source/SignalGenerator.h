@@ -96,6 +96,8 @@ private:
    Ramp mFreqRamp;
    float mFreqRampTime;
    FloatSlider* mFreqRampTimeSlider;
+   float mSoften;
+   FloatSlider* mSoftenSlider;
    
    float* mWriteBuffer;
 };

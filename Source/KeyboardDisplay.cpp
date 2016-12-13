@@ -24,6 +24,7 @@ KeyboardDisplay::KeyboardDisplay()
 , mTypingInput(false)
 , mTypingInputCheckbox(nullptr)
 {
+   SetIsNoteOrigin(true);
 }
 
 void KeyboardDisplay::CreateUIControls()

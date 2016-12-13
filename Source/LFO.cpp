@@ -13,7 +13,7 @@ LFO::LFO()
 : mPhaseOffset(0)
 , mOsc(kOsc_Sin)
 , mPeriod(kInterval_1n)
-, mRandom(0)
+, mDrunk(0)
 , mMode(kLFOMode_Envelope)
 {
    SetPeriod(kInterval_1n);
@@ -32,7 +32,7 @@ float LFO::CalculatePhase(int samplesIn /*= 0*/) const
    float sampsPerMeasure = TheTransport->MsPerBar() / gInvSampleRateMs;
    float phase = ((TheTransport->GetMeasurePos()+TheTransport->GetMeasure() + samplesIn/sampsPerMeasure) / period + mPhaseOffset + 1);  //+1 so we can have negative samplesIn
    
-   phase -= int(phase);
+   phase -= int(phase) / 2 * 2;  //using 2 allows for shuffle to work
    
    return phase;
 }
@@ -61,13 +61,13 @@ float LFO::Value(int samplesIn /*= 0*/, float forcePhase /*= -1*/) const
          mPeriod == kInterval_32 ||
          mPeriod == kInterval_64))
    {
-      sample = pow(mRandom, powf((1-mOsc.GetPulseWidth())*2, 2));
+      sample = pow(mRandom.Value(gTime + samplesIn * gInvSampleRateMs), powf((1-mOsc.GetPulseWidth())*2, 2));
       if (mMode == kLFOMode_Oscillator)   //rescale to -1 1
          sample = (sample - .5f) * 2;
    }
    else if (mOsc.GetType() == kOsc_Drunk)
    {
-      sample = mRandom;
+      sample = mDrunk;
       if (mMode == kLFOMode_Oscillator)   //rescale to -1 1
          sample = (sample - .5f * 2);
    }
@@ -105,7 +105,10 @@ void LFO::SetType(OscillatorType type)
 
 void LFO::OnTimeEvent(int samplesTo)
 {
-   mRandom = ofRandom(1);
+   if (mOsc.GetSoften() == 0)
+      mRandom.SetValue(ofRandom(1));
+   else
+      mRandom.Start(ofRandom(1), mOsc.GetSoften() * 30);
 }
 
 void LFO::OnTransportAdvanced(float amount)
@@ -114,8 +117,8 @@ void LFO::OnTransportAdvanced(float amount)
    {
       float distance = TheTransport->GetDuration(mPeriod) * .000005f;
       float drunk = ofRandom(-distance, distance);
-      if (mRandom + drunk > 1 || mRandom + drunk < 0)
+      if (mDrunk + drunk > 1 || mDrunk + drunk < 0)
          drunk *= -1;
-      mRandom = ofClamp(mRandom+drunk, 0, 1);
+      mDrunk = ofClamp(mDrunk+drunk, 0, 1);
    }
 }

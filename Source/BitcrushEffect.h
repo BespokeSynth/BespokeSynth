@@ -40,11 +40,11 @@ private:
    bool Enabled() const override { return mEnabled; }
    
    float mCrush;
-   int mDownsample;
+   float mDownsample;
    int mSampleCounter;
    float mHeldDownsample;
    FloatSlider* mCrushSlider;
-   IntSlider* mDownsampleSlider;
+   FloatSlider* mDownsampleSlider;
 };
 
 #endif /* defined(__additiveSynth__BitcrushEffect__) */

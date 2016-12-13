@@ -528,7 +528,7 @@ void DrumSynth::DrumSynthHit::Process(double time, float* out, int bufferSize)
    for (int i=0; i<bufferSize; ++i)
    {
       float freq = mData.mFreqAdsr.Value(time) * mData.mFreq;
-      float phaseInc = freq * gTwoPiOverSampleRate;
+      float phaseInc = GetPhaseInc(freq);
       
       float sample = mData.mTone.Audio(time, mPhase) * mData.mVol * mData.mVol;
       float noise = mData.mNoise.Audio(time, mPhase);
