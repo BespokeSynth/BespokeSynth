@@ -126,6 +126,8 @@ public:
    
    void SetResizeModule(IDrawableModule* module) { mResizeModule = module; }
    
+   void SetGroupSelectContext(ModuleContainer* context) { mGroupSelectContext = context; }
+   
    bool HasNotMovedMouseSinceClick() { return mClickStartX < INT_MAX; }
    IDrawableModule* GetMoveModule() { return mMoveModule; }
    ModuleFactory* GetModuleFactory() { return &mModuleFactory; }
@@ -232,8 +234,9 @@ private:
    bool mInitialized;
    
    ofRectangle mDrawRect;
+   
    vector<IDrawableModule*> mGroupSelectedModules;
-   bool mGroupSelecting;
+   ModuleContainer* mGroupSelectContext;
    bool mHasDuplicatedDuringDrag;
    
    IDrawableModule* mResizeModule;

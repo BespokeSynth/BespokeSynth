@@ -45,6 +45,7 @@ private:
    void DrawModule() override;
    bool Enabled() const override { return mEnabled; }
    void GetModuleDimensions(int& width, int& height) override;
+   void OnClicked(int x, int y, bool right) override;
    
    void SavePrefab(string savePath);
    void LoadPrefab(string loadPath);

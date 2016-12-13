@@ -52,6 +52,12 @@ void Prefab::Poll()
    SetPosition(xMin, yMin);
 }
 
+void Prefab::OnClicked(int x, int y, bool right)
+{
+   if (y > 0)
+      TheSynth->SetGroupSelectContext(&mModuleContainer);
+}
+
 namespace
 {
    const float paddingX = 10;

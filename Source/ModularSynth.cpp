@@ -51,7 +51,7 @@ ModularSynth::ModularSynth()
 , mLastClickedModule(nullptr)
 , mInitialized(false)
 , mRecordingLength(0)
-, mGroupSelecting(false)
+, mGroupSelectContext(nullptr)
 , mResizeModule(NULL)
 , mShowLoadStatePopup(false)
 , mHasDuplicatedDuringDrag(false)
@@ -244,7 +244,7 @@ void ModularSynth::Draw(void* vg)
       DrawLissajous(source->GetVizBuffer(), moduleX, moduleY-240, 240, 240);
    }
    
-   if (mGroupSelecting)
+   if (mGroupSelectContext != nullptr)
    {
       ofPushStyle();
       ofSetColor(255,255,255);
@@ -393,7 +393,7 @@ void ModularSynth::KeyPressed(int key, bool isRepeat)
    if (key == OF_KEY_BACKSPACE)
    {
       for (auto module : mGroupSelectedModules)
-         mModuleContainer.DeleteModule(module);
+         module->GetOwningContainer()->DeleteModule(module);
       mGroupSelectedModules.clear();
    }
    
@@ -587,7 +587,7 @@ void ModularSynth::MousePressed(int intX, int intY, int button)
    float y = GetMouseY();
    
    mLastMouseDragPos = ofVec2f(x,y);
-   mGroupSelecting = false;
+   mGroupSelectContext = nullptr;
    
    bool rightButton = button == 2;
 
@@ -645,7 +645,8 @@ void ModularSynth::MousePressed(int intX, int intY, int button)
    
    mClickStartX = x;
    mClickStartY = y;
-   mGroupSelecting = (clicked == nullptr);
+   if (clicked == nullptr)
+      mGroupSelectContext = &mModuleContainer;
    if (clicked != nullptr && clicked != TheTitleBar)
       mLastClickedModule = clicked;
    else
@@ -892,12 +893,12 @@ void ModularSynth::MouseReleased(int intX, int intY, int button)
       ClearHeldSample();
    }
    
-   if (mGroupSelecting)
+   if (mGroupSelectContext != nullptr)
    {
-      mGroupSelecting = false;
-      mModuleContainer.GetModulesWithinRect(ofRectangle(ofPoint(mClickStartX,mClickStartY),ofPoint(x,y)), mGroupSelectedModules);
+      mGroupSelectContext->GetModulesWithinRect(ofRectangle(ofPoint(mClickStartX,mClickStartY),ofPoint(x,y)), mGroupSelectedModules);
       for (int i=mGroupSelectedModules.size()-1; i>=0; --i) //do this backwards to preserve existing order
          MoveToFront(mGroupSelectedModules[i]);
+      mGroupSelectContext = nullptr;
    }
    
    mClickStartX = INT_MAX;
