@@ -54,6 +54,8 @@ void Prefab::Poll()
 
 void Prefab::OnClicked(int x, int y, bool right)
 {
+   IDrawableModule::OnClicked(x, y, right);
+   
    if (y > 0)
       TheSynth->SetGroupSelectContext(&mModuleContainer);
 }

@@ -325,6 +325,7 @@ vector<int> Scale::GetPitchesForScale(string type)
          return mScales[i].mPitches;
    }
    assert(false);
+   return vector<int>();
 }
 
 void Scale::Poll()

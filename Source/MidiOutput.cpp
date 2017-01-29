@@ -143,7 +143,7 @@ void MidiOutputModule::DropdownClicked(DropdownList* list)
 void MidiOutputModule::LoadLayout(const ofxJSONElement& moduleInfo)
 {
    mModuleSaveData.LoadString("controller",moduleInfo,"",FillDropdown<MidiController*>);
-   mModuleSaveData.LoadInt("channel",moduleInfo,1,0,16);
+   mModuleSaveData.LoadInt("channel",moduleInfo,1,1,16);
    mModuleSaveData.LoadBool("usevoiceaschannel", moduleInfo, false);
    mModuleSaveData.LoadFloat("pitchbendrange",moduleInfo,2,1,24,K(isTextField));
    mModuleSaveData.LoadInt("modwheelcc(1or74)",moduleInfo,1,0,127,K(isTextField));

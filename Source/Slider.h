@@ -50,10 +50,11 @@ public:
    void SetLFO(FloatSliderLFOControl* lfo) { mLFOControl = lfo; }
    void SetShowName(bool show) { mShowName = show; }
    void SetDimensions(int w, int h) { mWidth = w; mHeight = h; }
+   void SetBezierControl(float control) { mBezierControl = control; }
    
    void Init() override;
    
-   enum Mode { kNormal, kLogarithmic, kSquare };
+   enum Mode { kNormal, kLogarithmic, kSquare, kBezier };
    void SetMode(Mode mode) { mMode = mode; }
    Mode GetMode() const { return mMode; }
    
@@ -112,6 +113,7 @@ private:
    string mMinValueDisplay;
    string mMaxValueDisplay;
    bool mShowName;
+   float mBezierControl;
    
    float mLastDisplayedValue;
    

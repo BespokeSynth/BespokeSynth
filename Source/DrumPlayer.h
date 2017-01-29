@@ -21,6 +21,9 @@
 #include "Transport.h"
 #include "MidiDevice.h"
 #include "TextEntry.h"
+#include "ADSR.h"
+#include "BiquadFilter.h"
+#include "ADSRDisplay.h"
 
 class LooperRecorder;
 
@@ -64,13 +67,6 @@ public:
    void LoadState(FileStreamIn& in) override;
    
 private:
-   struct DrumSample
-   {
-      Sample mSample;
-      int mLinkId;
-      float mVol;
-      float mSpeed;
-   };
 
    struct StoredDrumKit
    {
@@ -86,8 +82,8 @@ private:
    void ReadKits();
    void SaveKits();
    void CreateKit();
-   float GetSampleVol(int sampleIdx);
    void ShuffleSpeeds();
+   void UpdateVisibleControls();
    
    //IDrawableModule
    void DrawModule() override;
@@ -95,10 +91,6 @@ private:
    bool Enabled() const override { return mEnabled; }
    void OnClicked(int x, int y, bool right) override;
    
-   DrumSample mSamples[NUM_DRUM_HITS];
-   float mVelocity[NUM_DRUM_HITS];
-   
-   float* mWriteBuffer;
    float* mOutputBuffer;
    float mSpeed;
    float mVolume;
@@ -124,9 +116,53 @@ private:
    ofMutex mLoadSamplesMutex;
    bool mLoadingSamples;
    ClickButton* mShuffleSpeedsButton;
+   int mSelectedHitIdx;
    
-   FloatSlider* mVolSliders[NUM_DRUM_HITS];
-   FloatSlider* mSpeedSliders[NUM_DRUM_HITS];
+   struct DrumHit
+   {
+      DrumHit()
+      : mLinkId(0)
+      , mVol(1)
+      , mSpeed(1)
+      , mVelocity(1)
+      , mUseEnvelope(false)
+      , mUseFilter(false)
+      , mCutoff(10000)
+      , mQ(1)
+      {
+      }
+      
+      void CreateUIControls(DrumPlayer* owner, int index);
+      void Process(double time, float speed, float vol, float* out, int bufferSize);
+      void SetUIControlsShowing(bool showing);
+      void DrawUIControls();
+      
+      Sample mSample;
+      int mLinkId;
+      float mVol;
+      float mSpeed;
+      float mVelocity;
+      
+      bool mUseEnvelope;
+      ADSR mEnvelope;
+      bool mUseFilter;
+      ADSR mFilterADSR;
+      float mCutoff;
+      float mQ;
+      BiquadFilter mFilter;
+      
+      FloatSlider* mVolSlider;
+      FloatSlider* mSpeedSlider;
+      ClickButton* mTestButton;
+      Checkbox* mUseEnvelopeCheckbox;
+      ADSRDisplay* mEnvelopeDisplay;
+      Checkbox* mUseFilterCheckbox;
+      ADSRDisplay* mFilterDisplay;
+      FloatSlider* mCutoffSlider;
+      FloatSlider* mQSlider;
+   };
+   
+   DrumHit mDrumHits[NUM_DRUM_HITS];
 };
 
 #endif /* defined(__modularSynth__DrumPlayer__) */

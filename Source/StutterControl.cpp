@@ -207,6 +207,7 @@ StutterParams StutterControl::GetStutter(StutterControl::StutterType type)
          break;
    }
    assert(false);
+   return StutterParams(kInterval_None, 1);
 }
 
 void StutterControl::CheckboxUpdated(Checkbox* checkbox)

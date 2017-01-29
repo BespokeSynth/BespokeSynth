@@ -629,13 +629,21 @@ float RetinaTrueTypeFont::GetStringWidth(string str, float size)
 {
    assert(mLoaded);
    
-   TheSynth->LockRender(true);
+   float width;
    
-   nvgFontFaceId(gNanoVG, mFontHandle);
-   nvgFontSize(gNanoVG, size);
-   float bounds[4];
-   float width = nvgTextBounds(gNanoVG, 0, 0, str.c_str(), nullptr, bounds);
-   TheSynth->LockRender(false);
+   if (TheSynth->GetRenderLock()->tryEnter())
+   {
+      nvgFontFaceId(gNanoVG, mFontHandle);
+      nvgFontSize(gNanoVG, size);
+      float bounds[4];
+      width = nvgTextBounds(gNanoVG, 0, 0, str.c_str(), nullptr, bounds);
+      TheSynth->LockRender(false);
+   }
+   else
+   {
+      ofLog() << "failed to get accurate string width";
+      width = str.length() * size * .5f;
+   }
    
    return width;
 }

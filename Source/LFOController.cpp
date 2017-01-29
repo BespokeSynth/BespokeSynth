@@ -39,6 +39,7 @@ void LFOController::CreateUIControls()
    mMaxSlider = new FloatSlider(this,"high",5,22,120,15,&dummy2,0,1);
    mBindButton = new ClickButton(this,"bind",5,60);
    
+   mIntervalSelector->AddLabel("free", kInterval_Free);
    mIntervalSelector->AddLabel("64", kInterval_64);
    mIntervalSelector->AddLabel("32", kInterval_32);
    mIntervalSelector->AddLabel("16", kInterval_16);

@@ -57,6 +57,7 @@ enum NoteInterval
    kInterval_Kick,
    kInterval_Snare,
    kInterval_Hat,
+   kInterval_Free,
    kInterval_None
 };
 

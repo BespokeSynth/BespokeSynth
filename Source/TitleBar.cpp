@@ -241,7 +241,7 @@ void TitleBar::DropdownUpdated(DropdownList* list, int oldVal)
    if (list == mLoadLayoutDropdown)
    {
       string layout = mLoadLayoutDropdown->GetLabel(mLoadLayoutIndex);
-      TheSynth->LoadLayout(ofToDataPath("layouts/"+layout+".json"));
+      TheSynth->LoadLayoutFromFile(ofToDataPath("layouts/"+layout+".json"));
       return;
    }
    

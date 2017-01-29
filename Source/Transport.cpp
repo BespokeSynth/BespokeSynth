@@ -314,7 +314,8 @@ void Transport::RemoveListener(ITimeListener* listener)
 
 void Transport::AddAudioPoller(IAudioPoller* poller)
 {
-   mAudioPollers.push_front(poller);
+   if (!ListContains(poller, mAudioPollers))
+      mAudioPollers.push_front(poller);
 }
 
 void Transport::RemoveAudioPoller(IAudioPoller* poller)
@@ -362,6 +363,7 @@ int Transport::GetQuantized(float offsetMs, NoteInterval interval)
          //TODO(Ryan) this doesn't really make sense, does it?
          assert(false);
    }
+   return 0;
 }
 
 int Transport::CountInStandardMeasure(NoteInterval interval)
@@ -400,6 +402,7 @@ int Transport::CountInStandardMeasure(NoteInterval interval)
          //TODO(Ryan) this doesn't really make sense, does it?
          assert(false);
    }
+   return 0;
 }
 
 float Transport::GetDuration(NoteInterval interval)

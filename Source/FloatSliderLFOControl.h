@@ -35,6 +35,7 @@ struct LFOSettings
    , mAdd(0)
    , mSoften(0)
    , mShuffle(0)
+   , mFreeRate(1)
    {
    }
    
@@ -47,6 +48,7 @@ struct LFOSettings
    float mAdd;
    float mSoften;
    float mShuffle;
+   float mFreeRate;
    
    void SaveState(FileStreamOut& out) const;
    void LoadState(FileStreamIn& in);
@@ -131,6 +133,7 @@ private:
    FloatSlider* mAddSlider;
    FloatSlider* mSoftenSlider;
    FloatSlider* mShuffleSlider;
+   FloatSlider* mFreeRateSlider;
    ClickButton* mPinButton;
    Checkbox* mEnableLFOCheckbox;
 

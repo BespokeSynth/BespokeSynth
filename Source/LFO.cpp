@@ -15,6 +15,8 @@ LFO::LFO()
 , mPeriod(kInterval_1n)
 , mDrunk(0)
 , mMode(kLFOMode_Envelope)
+, mFreePhase(0)
+, mFreeRate(1)
 {
    SetPeriod(kInterval_1n);
 }
@@ -27,14 +29,21 @@ LFO::~LFO()
 
 float LFO::CalculatePhase(int samplesIn /*= 0*/) const
 {
-   float period = TheTransport->GetDuration(mPeriod) / TheTransport->GetDuration(kInterval_1n);
-   
-   float sampsPerMeasure = TheTransport->MsPerBar() / gInvSampleRateMs;
-   float phase = ((TheTransport->GetMeasurePos()+TheTransport->GetMeasure() + samplesIn/sampsPerMeasure) / period + mPhaseOffset + 1);  //+1 so we can have negative samplesIn
-   
-   phase -= int(phase) / 2 * 2;  //using 2 allows for shuffle to work
-   
-   return phase;
+   if (mPeriod == kInterval_Free)
+   {
+      return mFreePhase + float(samplesIn) / gSampleRate * mFreeRate;
+   }
+   else
+   {
+      float period = TheTransport->GetDuration(mPeriod) / TheTransport->GetDuration(kInterval_1n);
+      
+      float sampsPerMeasure = TheTransport->MsPerBar() / gInvSampleRateMs;
+      float phase = ((TheTransport->GetMeasurePos()+TheTransport->GetMeasure() + samplesIn/sampsPerMeasure) / period + mPhaseOffset + 1);  //+1 so we can have negative samplesIn
+      
+      phase -= int(phase) / 2 * 2;  //using 2 allows for shuffle to work
+      
+      return phase;
+   }
 }
 
 float LFO::Value(int samplesIn /*= 0*/, float forcePhase /*= -1*/) const
@@ -83,9 +92,17 @@ float LFO::Value(int samplesIn /*= 0*/, float forcePhase /*= -1*/) const
 
 void LFO::SetPeriod(NoteInterval interval)
 {
+   if (interval == kInterval_Free)
+      mFreePhase = CalculatePhase();
+   
    mPeriod = interval;
    if (mOsc.GetType() == kOsc_Random)
       TheTransport->UpdateListener(this, mPeriod);
+   
+   if (mOsc.GetType() == kOsc_Drunk || mPeriod == kInterval_Free)
+      TheTransport->AddAudioPoller(this);
+   else
+      TheTransport->RemoveAudioPoller(this);
 }
 
 void LFO::SetType(OscillatorType type)
@@ -97,7 +114,7 @@ void LFO::SetType(OscillatorType type)
    else
       TheTransport->RemoveListener(this);
    
-   if (type == kOsc_Drunk)
+   if (mOsc.GetType() == kOsc_Drunk || mPeriod == kInterval_Free)
       TheTransport->AddAudioPoller(this);
    else
       TheTransport->RemoveAudioPoller(this);
@@ -120,5 +137,11 @@ void LFO::OnTransportAdvanced(float amount)
       if (mDrunk + drunk > 1 || mDrunk + drunk < 0)
          drunk *= -1;
       mDrunk = ofClamp(mDrunk+drunk, 0, 1);
+   }
+   if (mPeriod == kInterval_Free)
+   {
+      mFreePhase += mFreeRate * amount * TheTransport->MsPerBar() / 1000;
+      if (mFreePhase > 2)
+         mFreePhase -= 2;
    }
 }

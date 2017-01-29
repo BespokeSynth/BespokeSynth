@@ -112,7 +112,7 @@ void SingleOscillator::Process(double time)
 
    if (!mEnabled || GetTarget() == NULL)
       return;
-   
+
    ComputeSliders(0);
    
    int bufferSize;

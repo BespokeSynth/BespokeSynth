@@ -13,6 +13,7 @@
 #include "ModularSynth.h"
 #include "Profiler.h"
 #include "Scale.h"
+#include "FloatSliderLFOControl.h"
 
 SignalGenerator::SignalGenerator()
 : mOsc(kOsc_Sin)
@@ -127,9 +128,17 @@ void SignalGenerator::Process(double time)
    {
       ComputeSliders(pos);
       
-      float smooth = .001f;
-      mSmoothedVol = mSmoothedVol * (1-smooth) + mVol * smooth;
-      float volSq = mSmoothedVol * mSmoothedVol;
+      float volSq;
+      if (mVolSlider->GetLFO() && mVolSlider->GetLFO()->IsEnabled())
+      {
+         volSq = mVol * mVol;
+      }
+      else
+      {
+         float smooth = .001f;
+         mSmoothedVol = mSmoothedVol * (1-smooth) + mVol * smooth;
+         volSq = mSmoothedVol * mSmoothedVol;
+      }
       
       if (mFreqMode == kFreqMode_Root)
          mFreq = TheScale->PitchToFreq(TheScale->ScaleRoot() + 24);

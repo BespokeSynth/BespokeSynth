@@ -37,6 +37,7 @@ FloatSlider::FloatSlider(IFloatSliderListener* owner, const char* label, int x, 
 , mMaxValueDisplay("")
 , mFloatEntry(NULL)
 , mShowName(true)
+, mBezierControl(1)
 {
    assert(owner);
    SetLabel(label);
@@ -289,6 +290,11 @@ float FloatSlider::PosToVal(float pos) const
       return mMin * powf(mMax/mMin, pos);
    if (mMode == kSquare)
       return mMin + pos*pos*(mMax-mMin);
+   if (mMode == kBezier)
+   {
+      float y = pos * (pos * (pos * (mMax-mMin) + 3 * mMin - 3 * mBezierControl) - 3 * mMin + 3 * mBezierControl) + mMin;
+      return y;
+   }
    assert(false);
    return 0;
 }
@@ -301,6 +307,21 @@ float FloatSlider::ValToPos(float val) const
       return log(val/mMin) / log(mMax/mMin);
    if (mMode == kSquare)
       return sqrtf((val - mMin) / (mMax-mMin));
+   if (mMode == kBezier)
+   {
+      float closest = 0;
+      float closestDist = FLT_MAX;
+      for (float pos = 0; pos < 1; pos += .001f)
+      {
+         float dist = fabsf(PosToVal(pos) - val);
+         if (dist < closestDist)
+         {
+            closestDist = dist;
+            closest = pos;
+         }
+      }
+      return closest;
+   }
    return 0;
 }
 

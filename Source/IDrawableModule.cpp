@@ -591,7 +591,7 @@ void IDrawableModule::GetDimensions(int& width, int& height)
 
 float IDrawableModule::GetMinimizedWidth()
 {
-   float width = gFont.GetStringWidth(GetTitleLabel(), 16);
+   float width = GetTitleLabel().length() * 8; /*gFont.GetStringWidth(GetTitleLabel(), 16);*/ //avoid calculating width every time
    width += 10; //padding
    if (mEnabledCheckbox)
       width += TitleBarHeight();

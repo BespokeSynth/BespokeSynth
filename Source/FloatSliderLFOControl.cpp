@@ -43,6 +43,7 @@ FloatSliderLFOControl::FloatSliderLFOControl()
    mLFOSettings.mAdd = 0;
    mLFOSettings.mSoften = 0;
    mLFOSettings.mShuffle = 0;
+   mLFOSettings.mFreeRate = 1;
 
    mLFO.SetPeriod(mLFOSettings.mInterval);
 }
@@ -53,6 +54,7 @@ void FloatSliderLFOControl::CreateUIControls()
    mIntervalSelector = new DropdownList(this,"interval",4,74,(int*)(&mLFOSettings.mInterval));
    mOscSelector = new DropdownList(this,"osc",-1,-1,(int*)(&mLFOSettings.mOscType));
    mOffsetSlider = new FloatSlider(this,"off",-1,-1,90,15,&mLFOSettings.mLFOOffset,0,1);
+   mFreeRateSlider = new FloatSlider(this,"free rate",-1,-1,90,15,&mLFOSettings.mFreeRate,0,50);
    mBiasSlider = new FloatSlider(this,"bias",-1,-1,90,15,&mLFOSettings.mBias,0,1);
    mTypeSelector = new RadioButton(this,"type",2,16,(int*)(&mType),kRadioHorizontal);
    mADSRDisplay = new ADSRDisplay(this,"adsr",2,40,96,40,&sADSR[0]);
@@ -66,6 +68,7 @@ void FloatSliderLFOControl::CreateUIControls()
    mPinButton = new ClickButton(this,"pin",70,2);
    mEnableLFOCheckbox = new Checkbox(this,"enable",5,2,&mEnabled);
    
+   mIntervalSelector->AddLabel("free", kInterval_Free);
    mIntervalSelector->AddLabel("64", kInterval_64);
    mIntervalSelector->AddLabel("32", kInterval_32);
    mIntervalSelector->AddLabel("16", kInterval_16);
@@ -100,12 +103,16 @@ void FloatSliderLFOControl::CreateUIControls()
    
    mOscSelector->PositionTo(mIntervalSelector, kAnchorDirection_Right);
    mOffsetSlider->PositionTo(mIntervalSelector, kAnchorDirection_Below);
+   mFreeRateSlider->PositionTo(mIntervalSelector, kAnchorDirection_Below);
    mBiasSlider->PositionTo(mOffsetSlider, kAnchorDirection_Below);
    mMinSlider->PositionTo(mBiasSlider, kAnchorDirection_Below);
    mMaxSlider->PositionTo(mMinSlider, kAnchorDirection_Below);
    mAddSlider->PositionTo(mMaxSlider, kAnchorDirection_Below);
    mSoftenSlider->PositionTo(mAddSlider, kAnchorDirection_Below);
    mShuffleSlider->PositionTo(mSoftenSlider, kAnchorDirection_Below);
+   
+   mFreeRateSlider->SetMode(FloatSlider::kBezier);
+   mFreeRateSlider->SetBezierControl(1);
    
    UpdateVisibleControls();
 }
@@ -141,6 +148,7 @@ void FloatSliderLFOControl::DrawModule()
    mOscSelector->Draw();
    mOffsetSlider->Draw();
    mBiasSlider->Draw();
+   mFreeRateSlider->Draw();
    mADSRDisplay->Draw();
    mADSRSelector->Draw();
    mMinSlider->Draw();
@@ -234,7 +242,6 @@ void FloatSliderLFOControl::SetOwner(FloatSlider* owner)
    mAddSlider->SetExtents(owner->GetMin() - owner->GetMax(), owner->GetMax() - owner->GetMin());
    mMinSlider->SetMode(owner->GetMode());
    mMaxSlider->SetMode(owner->GetMode());
-   mAddSlider->SetMode(owner->GetMode());
    mModuleSaveData.SetExtents("low", owner->GetMin(), owner->GetMax());
    mModuleSaveData.SetExtents("high", owner->GetMin(), owner->GetMax());
 }
@@ -274,13 +281,15 @@ void FloatSliderLFOControl::UpdateFromSettings()
    mLFO.SetPulseWidth(1-mLFOSettings.mBias);
    mLFO.GetOsc()->SetSoften(mLFOSettings.mSoften);
    mLFO.GetOsc()->SetShuffle(mLFOSettings.mShuffle);
+   mLFO.SetFreeRate(mLFOSettings.mFreeRate);
 }
 
 void FloatSliderLFOControl::UpdateVisibleControls()
 {
    mIntervalSelector->SetShowing(mType == kLFOControlType_LFO);
    mOscSelector->SetShowing(mType == kLFOControlType_LFO);
-   mOffsetSlider->SetShowing(mType == kLFOControlType_LFO);
+   mOffsetSlider->SetShowing(mType == kLFOControlType_LFO && mLFOSettings.mInterval != kInterval_Free);
+   mFreeRateSlider->SetShowing(mType == kLFOControlType_LFO && mLFOSettings.mInterval == kInterval_Free);
    mBiasSlider->SetShowing(mType == kLFOControlType_LFO);
    mSoftenSlider->SetShowing(mType == kLFOControlType_LFO);
    mShuffleSlider->SetShowing(mType == kLFOControlType_LFO);
@@ -306,7 +315,16 @@ void FloatSliderLFOControl::RadioButtonUpdated(RadioButton* radio, int oldVal)
 void FloatSliderLFOControl::DropdownUpdated(DropdownList* list, int oldVal)
 {
    if (list == mIntervalSelector)
+   {
+      if (mLFOSettings.mInterval == kInterval_Free)
+      {
+         NoteInterval oldInterval = (NoteInterval)oldVal;
+         mLFOSettings.mFreeRate = 1000 / TheTransport->GetDuration(oldInterval);
+         mLFO.SetFreeRate(mLFOSettings.mFreeRate);
+      }
       mLFO.SetPeriod(mLFOSettings.mInterval);
+      UpdateVisibleControls();
+   }
    if (list == mOscSelector)
       mLFO.SetType(mLFOSettings.mOscType);
 }
@@ -323,6 +341,8 @@ void FloatSliderLFOControl::FloatSliderUpdated(FloatSlider* slider, float oldVal
       mLFO.GetOsc()->SetSoften(mLFOSettings.mSoften);
    if (slider == mShuffleSlider)
       mLFO.GetOsc()->SetShuffle(mLFOSettings.mShuffle);
+   if (slider == mFreeRateSlider)
+      mLFO.SetFreeRate(mLFOSettings.mFreeRate);
 }
 
 void FloatSliderLFOControl::CheckboxUpdated(Checkbox* checkbox)
@@ -360,6 +380,7 @@ void FloatSliderLFOControl::ButtonClicked(ClickButton* button)
          mModuleSaveData.SetFloat("add", mLFOSettings.mAdd, mOwner->GetMin(), mOwner->GetMax(), false);
          mModuleSaveData.SetFloat("soften", mLFOSettings.mSoften, 0, 1, false);
          mModuleSaveData.SetFloat("soften", mLFOSettings.mShuffle, 0, 1, false);
+         mModuleSaveData.SetFloat("free_rate", mLFOSettings.mFreeRate, 0, 50, false);
          
          if (mSliderCable == NULL)
          {
@@ -409,6 +430,7 @@ void FloatSliderLFOControl::SetUpFromSaveData()
    mLFOSettings.mAdd = mModuleSaveData.GetFloat("add");
    mLFOSettings.mSoften = mModuleSaveData.GetFloat("soften");
    mLFOSettings.mShuffle = mModuleSaveData.GetFloat("shuffle");
+   mLFOSettings.mFreeRate = mModuleSaveData.GetFloat("free_rate");
    
    UpdateFromSettings();
    
@@ -467,7 +489,7 @@ FloatSliderLFOControl* LFOPool::GetLFO(FloatSlider* owner)
 
 namespace
 {
-   const int kSaveStateRev = 2;
+   const int kSaveStateRev = 3;
    const int kFixNonRevvedData = 999;
 }
 
@@ -485,6 +507,7 @@ void LFOSettings::SaveState(FileStreamOut& out) const
    out << mAdd;
    out << mSoften;
    out << mShuffle;
+   out << mFreeRate;
 }
 
 void LFOSettings::LoadState(FileStreamIn& in)
@@ -513,5 +536,7 @@ void LFOSettings::LoadState(FileStreamIn& in)
       in >> mSoften;
       in >> mShuffle;
    }
+   if (rev >= 3)
+      in >> mFreeRate;
 }
 

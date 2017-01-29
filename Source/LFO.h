@@ -34,6 +34,7 @@ public:
    void SetMode(LFOMode mode) { mMode = mode; }
    float CalculatePhase(int samplesIn = 0) const;
    Oscillator* GetOsc() { return &mOsc; }
+   void SetFreeRate(float rate) { mFreeRate = rate; }
 
    //ITimeListener
    void OnTimeEvent(int samplesTo) override;
@@ -47,6 +48,8 @@ private:
    LFOMode mMode;
    Ramp mRandom;
    float mDrunk;
+   double mFreePhase;
+   float mFreeRate;
 };
 
 #endif /* defined(__modularSynth__LFO__) */
