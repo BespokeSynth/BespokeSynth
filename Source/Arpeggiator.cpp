@@ -138,11 +138,7 @@ void Arpeggiator::DrawModule()
       ofSetColor(200,200,200,gModuleDrawAlpha);
       string chord;
       for (int i=0; i<mChord.size(); ++i)
-      {
-         chord += GetArpNoteDisplay(mChord[i].pitch);
-         if (i < mChord.size()-1)
-            chord += "󠀠 ";
-      }
+         chord += GetArpNoteDisplay(mChord[i].pitch) + " ";
       DrawText(chord,5,25);
       ofSetColor(0,255,0,gModuleDrawAlpha);
       string pad;
@@ -155,7 +151,7 @@ void Arpeggiator::DrawModule()
          else
          {
             float w = GetStringWidth(pad);
-            DrawText(GetArpNoteDisplay(mChord[i].pitch),5+w,25);
+            DrawText(GetArpNoteDisplay(mChord[i].pitch),5+w+pad.length()/5.0f,25);
             break;
          }
       }

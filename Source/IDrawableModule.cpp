@@ -46,6 +46,7 @@ IDrawableModule::IDrawableModule()
 , mInitialized(false)
 , mMainPatchCableSource(NULL)
 , mOwningContainer(nullptr)
+, mTitleLabelWidth(0)
 {
 }
 
@@ -284,7 +285,7 @@ void IDrawableModule::Render()
    if (Minimized() || IsVisible() == false)
       DrawBeacon(30,-titleBarHeight/2);
    
-   if (IsResizable())
+   if (IsResizable() && !Minimized())
    {
       ofSetColor(color, gModuleDrawAlpha);
       ofSetLineWidth(2);
@@ -591,7 +592,13 @@ void IDrawableModule::GetDimensions(int& width, int& height)
 
 float IDrawableModule::GetMinimizedWidth()
 {
-   float width = GetTitleLabel().length() * 8; /*gFont.GetStringWidth(GetTitleLabel(), 16);*/ //avoid calculating width every time
+   string titleLabel = GetTitleLabel();
+   if (titleLabel != mLastTitleLabel)
+   {
+      mLastTitleLabel = titleLabel;
+      mTitleLabelWidth = gFont.GetStringWidth(GetTitleLabel(), 16);
+   }
+   float width = mTitleLabelWidth;
    width += 10; //padding
    if (mEnabledCheckbox)
       width += TitleBarHeight();

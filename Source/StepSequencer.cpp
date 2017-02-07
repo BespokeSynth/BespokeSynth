@@ -329,7 +329,7 @@ void StepSequencer::DrawRowLabel(const char* label, int row, int x, int y)
 
 void StepSequencer::GetModuleDimensions(int &width, int &height)
 {
-   width = mGrid->GetWidth() + 50;
+   width = mGrid->GetWidth() + 45;
    if (mAdjustOffsets)
       width += 100;
    height = mGrid->GetHeight() + 50;
@@ -337,11 +337,11 @@ void StepSequencer::GetModuleDimensions(int &width, int &height)
 
 void StepSequencer::Resize(float w, float h)
 {
-   float extraW = 50;
+   float extraW = 45;
    float extraH = 50;
    if (mAdjustOffsets)
       extraW += 100;
-   mGrid->SetDimensions(MAX(w - extraW, 150), MAX(h - extraH, 150));
+   mGrid->SetDimensions(MAX(w - extraW, 185), MAX(h - extraH, 150));
 }
 
 void StepSequencer::OnClicked(int x, int y, bool right)
@@ -674,7 +674,7 @@ void StepSequencerRow::OnTimeEvent(int samplesTo)
    int step = mSeq->GetStep(offsetMs);
    float val = mGrid->GetValRefactor(mRow,step);
    if (val > 0)
-      mSeq->PlayNote(mRow, val);
+      mSeq->PlayNote(mRow, val * val);
 }
 
 void StepSequencerRow::SetOffset(float offset)

@@ -159,6 +159,8 @@ private:
    float mMinimizeAnimation;
    bool mUIControlsCreated;
    bool mInitialized;
+   string mLastTitleLabel;
+   float mTitleLabelWidth;
 
    ofMutex mSliderMutex;
    

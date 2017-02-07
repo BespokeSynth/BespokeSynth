@@ -77,7 +77,7 @@ void Grid::Render()
                ofRect(x,y,xsize,ysize);
             }
             ofSetColor(255,255,255, gModuleDrawAlpha);
-            float fillAmount = MIN(1, data);
+            float fillAmount = ofClamp(ofLerp(.15f, 1, data), 0, 1);
             if (mGridMode == kMultislider)
                ofRect(x, y+(ysize*(1-fillAmount)), xsize, ysize*fillAmount);
             else if (mGridMode == kHorislider)

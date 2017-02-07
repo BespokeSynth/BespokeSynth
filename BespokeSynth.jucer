@@ -536,6 +536,10 @@
               file="Source/VocoderCarrierInput.cpp"/>
         <FILE id="SRGmSo" name="VocoderCarrierInput.h" compile="0" resource="0"
               file="Source/VocoderCarrierInput.h"/>
+        <FILE id="zdYdYV" name="VolcaBeatsControl.cpp" compile="1" resource="0"
+              file="Source/VolcaBeatsControl.cpp"/>
+        <FILE id="ztYYBq" name="VolcaBeatsControl.h" compile="0" resource="0"
+              file="Source/VolcaBeatsControl.h"/>
         <FILE id="H3ZWO6" name="VSTPlugin.cpp" compile="1" resource="0" file="Source/VSTPlugin.cpp"/>
         <FILE id="LJRSZs" name="VSTPlugin.h" compile="0" resource="0" file="Source/VSTPlugin.h"/>
         <FILE id="yvLapl" name="WaveformViewer.cpp" compile="1" resource="0"

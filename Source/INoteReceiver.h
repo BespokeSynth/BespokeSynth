@@ -19,6 +19,7 @@ public:
    virtual ~INoteReceiver() {}
    virtual void PlayNote(double time, int pitch, int velocity, int voiceIdx = -1, ModulationChain* pitchBend = NULL, ModulationChain* modWheel = NULL, ModulationChain* pressure = NULL) = 0;
    virtual void SendPressure(int pitch, int pressure) {}
+   virtual void SendCC(int control, int value, int voiceIdx = -1) = 0;
 };
 
 #endif

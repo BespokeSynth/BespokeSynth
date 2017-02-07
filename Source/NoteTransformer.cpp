@@ -66,7 +66,8 @@ void NoteTransformer::PlayNote(double time, int pitch, int velocity, int voiceId
    
    if (velocity == 0)   //note off the one we played for this pitch, in case the transformer changed it while the note was held
    {
-      PlayNoteOutput(time, mLastNoteOnForPitch[pitch], 0, voiceIdx);
+      if (mLastNoteOnForPitch[pitch] != -1)
+         PlayNoteOutput(time, mLastNoteOnForPitch[pitch], 0, voiceIdx);
       return;
    }
    

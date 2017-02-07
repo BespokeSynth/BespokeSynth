@@ -243,6 +243,7 @@
 		DA8B2540C1D7550F07D0B6C5 /* NoteToFreq.cpp in Sources */ = {isa = PBXBuildFile; fileRef = AAE7EE2CAC86C7C83D49EA32 /* NoteToFreq.cpp */; };
 		DA9912DBA5ADFDE8A67873E3 /* CommentDisplay.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 001CF6F2F4409F8151305615 /* CommentDisplay.cpp */; };
 		DD748F57044A0B42CADDC10E /* JumpBlender.cpp in Sources */ = {isa = PBXBuildFile; fileRef = E36A0DD194F3403E051A7F86 /* JumpBlender.cpp */; };
+		DE604BA5AC9B242599AFD3BD /* VolcaBeatsControl.cpp in Sources */ = {isa = PBXBuildFile; fileRef = F61F5A3352BCF7BC059FB55F /* VolcaBeatsControl.cpp */; };
 		DEB11FA86590FA4CD905059C /* TitleBar.cpp in Sources */ = {isa = PBXBuildFile; fileRef = F5643B23EB123C59FA9942BB /* TitleBar.cpp */; };
 		DF997846A6DEF90D28B5654F /* FreqDomainBoilerplate.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 9AC1F8CAA9284C796F7143DA /* FreqDomainBoilerplate.cpp */; };
 		E06CE0B3F5E5E3A76E048473 /* SampleCanvas.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 17A2364766F223C12B21AE8A /* SampleCanvas.cpp */; };
@@ -1739,6 +1740,7 @@
 		D313D995D395F78BB13253F5 /* DropdownList.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; name = DropdownList.cpp; path = ../../Source/DropdownList.cpp; sourceTree = SOURCE_ROOT; };
 		D392FD42537C77A67BA3AC75 /* VelocitySetter.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; name = VelocitySetter.h; path = ../../Source/VelocitySetter.h; sourceTree = SOURCE_ROOT; };
 		D3D6A3429F26CD730AE456D8 /* juce_TopLevelWindow.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; name = juce_TopLevelWindow.cpp; path = ../../../../../Downloads/JUCE/modules/juce_gui_basics/windows/juce_TopLevelWindow.cpp; sourceTree = SOURCE_ROOT; };
+		D3E6E458F27D89C10372F30F /* VolcaBeatsControl.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; name = VolcaBeatsControl.h; path = ../../Source/VolcaBeatsControl.h; sourceTree = SOURCE_ROOT; };
 		D3E85CFBF22C9E1F318ECAF4 /* juce_HighResolutionTimer.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; name = juce_HighResolutionTimer.cpp; path = ../../../../../Downloads/JUCE/modules/juce_core/threads/juce_HighResolutionTimer.cpp; sourceTree = SOURCE_ROOT; };
 		D46670CFDD258180EB19A0DC /* juce_AudioProcessorValueTreeState.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; name = juce_AudioProcessorValueTreeState.h; path = ../../../../../Downloads/JUCE/modules/juce_audio_processors/utilities/juce_AudioProcessorValueTreeState.h; sourceTree = SOURCE_ROOT; };
 		D46E4D87EA65A6D1E223D324 /* juce_SystemTrayIconComponent.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; name = juce_SystemTrayIconComponent.cpp; path = ../../../../../Downloads/JUCE/modules/juce_gui_extra/misc/juce_SystemTrayIconComponent.cpp; sourceTree = SOURCE_ROOT; };
@@ -1954,6 +1956,7 @@
 		F5FBBDB2CE8BC605BCB6DC53 /* juce_Random.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; name = juce_Random.h; path = ../../../../../Downloads/JUCE/modules/juce_core/maths/juce_Random.h; sourceTree = SOURCE_ROOT; };
 		F60215DEA7C3730036B10C69 /* Vocoder.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; name = Vocoder.h; path = ../../Source/Vocoder.h; sourceTree = SOURCE_ROOT; };
 		F614DCBF0A1599ACD8E9C098 /* juce_TextEditorKeyMapper.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; name = juce_TextEditorKeyMapper.h; path = ../../../../../Downloads/JUCE/modules/juce_gui_basics/keyboard/juce_TextEditorKeyMapper.h; sourceTree = SOURCE_ROOT; };
+		F61F5A3352BCF7BC059FB55F /* VolcaBeatsControl.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; name = VolcaBeatsControl.cpp; path = ../../Source/VolcaBeatsControl.cpp; sourceTree = SOURCE_ROOT; };
 		F66A549AB9EED0695842BE21 /* PeakTracker.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; name = PeakTracker.h; path = ../../Source/PeakTracker.h; sourceTree = SOURCE_ROOT; };
 		F6C7BAEE0D7D34129243D19E /* psy.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; name = psy.h; path = "../../../../../Downloads/JUCE/modules/juce_audio_formats/codecs/oggvorbis/libvorbis-1.3.2/lib/psy.h"; sourceTree = SOURCE_ROOT; };
 		F6C937DA743FF3718F0629AE /* juce_GlyphArrangement.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; name = juce_GlyphArrangement.cpp; path = ../../../../../Downloads/JUCE/modules/juce_graphics/fonts/juce_GlyphArrangement.cpp; sourceTree = SOURCE_ROOT; };
@@ -4348,6 +4351,8 @@
 				F60215DEA7C3730036B10C69 /* Vocoder.h */,
 				AEA3D257F627B1C09122F818 /* VocoderCarrierInput.cpp */,
 				53CD0344E6F5583A916B5866 /* VocoderCarrierInput.h */,
+				F61F5A3352BCF7BC059FB55F /* VolcaBeatsControl.cpp */,
+				D3E6E458F27D89C10372F30F /* VolcaBeatsControl.h */,
 				5B56BF687D3DF4181355C67A /* VSTPlugin.cpp */,
 				D8B73FD940FEF86D4A67B944 /* VSTPlugin.h */,
 				29B6DBF67CBCBADDF338BBD0 /* WaveformViewer.cpp */,
@@ -5161,6 +5166,7 @@
 				861B9E5853AA78C1BA65A36A /* VinylTempoControl.cpp in Sources */,
 				30FE96A4D583382B6628ADC7 /* Vocoder.cpp in Sources */,
 				0B5097A87DD22C44C1CA47D2 /* VocoderCarrierInput.cpp in Sources */,
+				DE604BA5AC9B242599AFD3BD /* VolcaBeatsControl.cpp in Sources */,
 				8164420CFFCF62095F04587B /* VSTPlugin.cpp in Sources */,
 				0120C97B34085967C35CF04B /* WaveformViewer.cpp in Sources */,
 				66160AFEEF6386D6C0AA619F /* WhiteKeys.cpp in Sources */,

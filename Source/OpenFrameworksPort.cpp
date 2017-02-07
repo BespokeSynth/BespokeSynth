@@ -30,6 +30,7 @@ ofColor ofColor::purple(148,0,211);
 ofColor ofColor::lime(0,255,0);
 
 NVGcontext* gNanoVG = nullptr;
+NVGcontext* gFontBoundsNanoVG = nullptr;
 
 string ofToDataPath(string path, bool makeAbsolute)
 {
@@ -342,6 +343,7 @@ void ofScale(float x, float y, float z)
 
 void ofExit()
 {
+   //TODO_PORT(Ryan)
    assert(false);
 }
 
@@ -581,6 +583,7 @@ ofColor ofColor::operator+(const ofColor& other)
 void RetinaTrueTypeFont::LoadFont(string path)
 {
    mFontHandle = nvgCreateFont(gNanoVG, path.c_str(), path.c_str());
+   mFontBoundsHandle = nvgCreateFont(gFontBoundsNanoVG, path.c_str(), path.c_str());
    mLoaded = true;
 }
 
@@ -629,21 +632,10 @@ float RetinaTrueTypeFont::GetStringWidth(string str, float size)
 {
    assert(mLoaded);
    
-   float width;
-   
-   if (TheSynth->GetRenderLock()->tryEnter())
-   {
-      nvgFontFaceId(gNanoVG, mFontHandle);
-      nvgFontSize(gNanoVG, size);
-      float bounds[4];
-      width = nvgTextBounds(gNanoVG, 0, 0, str.c_str(), nullptr, bounds);
-      TheSynth->LockRender(false);
-   }
-   else
-   {
-      ofLog() << "failed to get accurate string width";
-      width = str.length() * size * .5f;
-   }
+   nvgFontFaceId(gFontBoundsNanoVG, mFontBoundsHandle);
+   nvgFontSize(gFontBoundsNanoVG, size);
+   float bounds[4];
+   float width = nvgTextBounds(gFontBoundsNanoVG, 0, 0, str.c_str(), nullptr, bounds);
    
    return width;
 }

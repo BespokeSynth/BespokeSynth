@@ -90,6 +90,7 @@ public:
    //INoteReceiver
    void PlayNote(double time, int pitch, int velocity, int voiceIdx = -1, ModulationChain* pitchBend = NULL, ModulationChain* modWheel = NULL, ModulationChain* pressure = NULL) override;
    void SendPressure(int pitch, int pressure) override;
+   void SendCC(int control, int value, int voiceIdx = -1) override {}
    
    //ITimeListener
    void OnTimeEvent(int samplesTo) override;

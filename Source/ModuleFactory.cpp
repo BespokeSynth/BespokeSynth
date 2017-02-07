@@ -151,6 +151,7 @@
 #include "NoteGate.h"
 #include "Prefab.h"
 #include "NoteHumanizer.h"
+#include "VolcaBeatsControl.h"
 
 #define REGISTER(class,name,type) Register(#name, &(class::Create), &(class::CanCreate), type, false, false);
 #define REGISTER_HIDDEN(class,name,type) Register(#name, &(class::Create), &(class::CanCreate), type, true, false);
@@ -270,6 +271,7 @@ ModuleFactory::ModuleFactory()
    REGISTER(NoteGate, notegate, kModuleType_Note);
    REGISTER(Prefab, prefab, kModuleType_Other);
    REGISTER(NoteHumanizer, notehumanizer, kModuleType_Note);
+   REGISTER(VolcaBeatsControl, volcabeatscontrol, kModuleType_Note);
 
    REGISTER_EXPERIMENTAL(VSTPlugin, vstplugin, kModuleType_Synth);
    //REGISTER_EXPERIMENTAL(MidiPlayer, midiplayer, kModuleType_Instrument);

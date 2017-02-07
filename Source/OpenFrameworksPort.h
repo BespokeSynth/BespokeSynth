@@ -14,6 +14,7 @@ using namespace std;
 class NVGcontext;
 
 extern NVGcontext* gNanoVG;
+extern NVGcontext* gFontBoundsNanoVG;
 
 struct ofColor
 {
@@ -227,6 +228,7 @@ public:
    float GetStringWidth(string str, float size);
 private:
    int mFontHandle;
+   int mFontBoundsHandle;
    bool mLoaded;
 };
 

@@ -101,6 +101,15 @@ void MidiOutputModule::PlayNote(double time, int pitch, int velocity, int voiceI
    mChannelModulations[modIdx].mPressure = pressure;
 }
 
+void MidiOutputModule::SendCC(int control, int value, int voiceIdx /*=-1*/)
+{
+   int channel = voiceIdx + 1;
+   if (voiceIdx == -1)
+      channel = 1;
+   
+   mDevice.SendCC(control, value, mUseVoiceAsChannel ? channel : mChannel);
+}
+
 void MidiOutputModule::OnTransportAdvanced(float amount)
 {
    for (int i=0; i<mChannelModulations.size(); ++i)

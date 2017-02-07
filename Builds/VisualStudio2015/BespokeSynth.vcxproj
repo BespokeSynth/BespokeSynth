@@ -322,6 +322,7 @@
     <ClCompile Include="..\..\Source\VinylTempoControl.cpp"/>
     <ClCompile Include="..\..\Source\Vocoder.cpp"/>
     <ClCompile Include="..\..\Source\VocoderCarrierInput.cpp"/>
+    <ClCompile Include="..\..\Source\VolcaBeatsControl.cpp"/>
     <ClCompile Include="..\..\Source\VSTPlugin.cpp"/>
     <ClCompile Include="..\..\Source\WaveformViewer.cpp"/>
     <ClCompile Include="..\..\Source\WhiteKeys.cpp"/>
@@ -2187,6 +2188,7 @@
     <ClInclude Include="..\..\Source\VinylTempoControl.h"/>
     <ClInclude Include="..\..\Source\Vocoder.h"/>
     <ClInclude Include="..\..\Source\VocoderCarrierInput.h"/>
+    <ClInclude Include="..\..\Source\VolcaBeatsControl.h"/>
     <ClInclude Include="..\..\Source\VSTPlugin.h"/>
     <ClInclude Include="..\..\Source\WaveformViewer.h"/>
     <ClInclude Include="..\..\Source\WhiteKeys.h"/>

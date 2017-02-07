@@ -320,6 +320,23 @@ void VSTPlugin::PlayNote(double time, int pitch, int velocity, int voiceIdx /*= 
    mChannelModulations[modIdx].mPressure = pressure;
 }
 
+void VSTPlugin::SendCC(int control, int value, int voiceIdx /*=-1*/)
+{
+   if (mPlugin == NULL)
+      return;
+   
+   if (control < 0 || control > 127)
+      return;
+   
+   int channel = voiceIdx + 1;
+   if (voiceIdx == -1)
+      channel = 1;
+   
+   const juce::ScopedLock lock(mMidiInputLock);
+   
+   mMidiBuffer.addEvent(juce::MidiMessage::controllerEvent((mUseVoiceAsChannel ? channel : mChannel), control, (uint8)value), 0);
+}
+
 void VSTPlugin::SetEnabled(bool enabled)
 {
    mEnabled = enabled;

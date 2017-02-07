@@ -49,6 +49,7 @@ public:
    
    //INoteReceiver
    void PlayNote(double time, int pitch, int velocity, int voiceIdx = -1, ModulationChain* pitchBend = NULL, ModulationChain* modWheel = NULL, ModulationChain* pressure = NULL) override;
+   void SendCC(int control, int value, int voiceIdx = -1) override {}
    
    void FilesDropped(vector<string> files, int x, int y) override;
    void SampleDropped(int x, int y, Sample* sample) override;

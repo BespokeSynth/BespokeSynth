@@ -91,11 +91,14 @@ public:
 #endif
       
       mVG = nvgCreateGL3(NVG_ANTIALIAS | NVG_STENCIL_STROKES | NVG_DEBUG);
+      mFontBoundsVG = nvgCreateGL3(NVG_ANTIALIAS | NVG_STENCIL_STROKES | NVG_DEBUG);
       
       if (mVG == NULL)
          printf("Could not init nanovg.\n");
+      if (mFontBoundsVG == NULL)
+         printf("Could not init font bounds nanovg.\n");
       
-      mSynth.LoadResources(mVG);
+      mSynth.LoadResources(mVG, mFontBoundsVG);
       
       /*for (auto deviceType : mGlobalManagers.mDeviceManager.getAvailableDeviceTypes())
       {
@@ -137,6 +140,7 @@ public:
    void shutdown() override
    {
       nvgDeleteGL3(mVG);
+      nvgDeleteGL3(mFontBoundsVG);
    }
    
    void render() override
@@ -164,6 +168,7 @@ public:
       nvgLineJoin(mVG, NVG_ROUND);
       static float sSpacing = -.3f;
       nvgTextLetterSpacing(mVG, sSpacing);
+      nvgTextLetterSpacing(mFontBoundsVG, sSpacing);
       
       mSynth.Draw(mVG);
       
@@ -275,6 +280,7 @@ private:
    ModularSynth mSynth;
    
    NVGcontext* mVG;
+   NVGcontext* mFontBoundsVG;
    int64 mLastFpsUpdateTime;
    int mFrameCountAccum;
    list<int> mPressedKeys;

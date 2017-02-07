@@ -943,6 +943,9 @@
     <ClCompile Include="..\..\Source\VocoderCarrierInput.cpp">
       <Filter>BespokeSynth\Source\modules</Filter>
     </ClCompile>
+    <ClCompile Include="..\..\Source\VolcaBeatsControl.cpp">
+      <Filter>BespokeSynth\Source\modules</Filter>
+    </ClCompile>
     <ClCompile Include="..\..\Source\VSTPlugin.cpp">
       <Filter>BespokeSynth\Source\modules</Filter>
     </ClCompile>
@@ -3487,6 +3490,9 @@
       <Filter>BespokeSynth\Source\modules</Filter>
     </ClInclude>
     <ClInclude Include="..\..\Source\VocoderCarrierInput.h">
+      <Filter>BespokeSynth\Source\modules</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\Source\VolcaBeatsControl.h">
       <Filter>BespokeSynth\Source\modules</Filter>
     </ClInclude>
     <ClInclude Include="..\..\Source\VSTPlugin.h">

@@ -82,6 +82,12 @@ void NoteOutput::SendPressure(int pitch, int pressure)
       noteReceiver->SendPressure(pitch, pressure);
 }
 
+void NoteOutput::SendCC(int control, int value, int voiceIdx)
+{
+   for (auto noteReceiver : mNoteSource->GetPatchCableSource()->GetNoteReceivers())
+      noteReceiver->SendCC(control, value, voiceIdx);
+}
+
 void NoteOutput::Flush()
 {
    mNotesMutex.lock();
@@ -130,6 +136,11 @@ void INoteSource::PlayNoteOutput(double time, int pitch, int velocity, int voice
          gVizFreq = MAX(1,TheScale->PitchToFreq(lowestPitch));
       }
    }
+}
+
+void INoteSource::SendCCOutput(int control, int value, int voiceIdx /*=-1*/)
+{
+   mNoteOutput.SendCC(control, value);
 }
 
 void INoteSource::PreRepatch(PatchCableSource* cableSource)

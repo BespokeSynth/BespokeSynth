@@ -53,6 +53,7 @@ public:
    //INoteReceiver
    void PlayNote(double time, int pitch, int velocity, int voiceIdx = -1, ModulationChain* pitchBend = NULL, ModulationChain* modWheel = NULL, ModulationChain* pressure = NULL) override;
    void SendPressure(int pitch, int pressure) override;
+   void SendCC(int control, int value, int voiceIdx = -1) override;
 
    list<int> GetHeldNotes() { Poco::FastMutex::ScopedLock lock(mNotesMutex); return mNotes; }
    NoteHistory& GetNoteHistory() { return mNoteHistory; }
@@ -70,6 +71,7 @@ public:
    virtual ~INoteSource() {}
    NoteOutput* GetNoteOutput() { return &mNoteOutput; }
    void PlayNoteOutput(double time, int pitch, int velocity, int voiceIdx = -1, ModulationChain* pitchBend = NULL, ModulationChain* modWheel = NULL, ModulationChain* pressure = NULL);
+   void SendCCOutput(int control, int value, int voiceIdx = -1);
    void SetIsNoteOrigin(bool origin) { mIsNoteOrigin = origin; }
    void SetTargets(string targets);
    

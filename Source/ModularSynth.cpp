@@ -131,9 +131,10 @@ void ModularSynth::Setup(GlobalManagers* globalManagers, juce::Component* mainCo
    mConsoleEntry = new TextEntry(mConsoleListener,"console",0,20,50,mConsoleText);
 }
 
-void ModularSynth::LoadResources(void* nanoVG)
+void ModularSynth::LoadResources(void* nanoVG, void* fontBoundsNanoVG)
 {
    gNanoVG = (NVGcontext*)nanoVG;
+   gFontBoundsNanoVG = (NVGcontext*)fontBoundsNanoVG;
    LoadGlobalResources();
 }
 
