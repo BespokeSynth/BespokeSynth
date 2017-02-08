@@ -426,7 +426,7 @@ void DrumPlayer::DrawModule()
          mDrumHits[i].DrawUIControls();
       
       ofPushMatrix();
-      ofTranslate(305, 100);
+      ofTranslate(305, 200);
       DrawAudioBuffer(135, 100, mDrumHits[mSelectedHitIdx].mSample.Data(), 0, mDrumHits[mSelectedHitIdx].mSample.LengthInSamples(), mDrumHits[mSelectedHitIdx].mSample.GetPlayPosition());
       ofPopMatrix();
    }

@@ -128,6 +128,12 @@ void ADSRDisplay::Render()
    
    if (mASlider)
    {
+      int sliderHeight = mHeight/4;
+      mASlider->SetPosition(mX,mY);
+      mDSlider->SetPosition(mX,mY+sliderHeight);
+      mSSlider->SetPosition(mX,mY+sliderHeight*2);
+      mRSlider->SetPosition(mX,mY+sliderHeight*3);
+      
       mASlider->Draw();
       mDSlider->Draw();
       mSSlider->Draw();
