@@ -31,8 +31,6 @@ LiveGranulator::LiveGranulator()
 , mAutoCaptureDropdown(NULL)
 , mGranSpacingRandomize(NULL)
 {
-   SetEnabled(false);
-   
    mGranulator.SetLiveMode(true);
    mGranulator.mSpeed = 1;
    mGranulator.mGrainSpacing = .333f;

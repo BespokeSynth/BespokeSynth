@@ -17,7 +17,6 @@ VelocitySetter::VelocitySetter()
 , mRandomness(0)
 , mRandomnessSlider(NULL)
 {
-   SetEnabled(false);
 }
 
 void VelocitySetter::CreateUIControls()

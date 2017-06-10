@@ -13,7 +13,6 @@
 
 WhiteKeys::WhiteKeys()
 {
-   SetEnabled(false);
 }
 
 void WhiteKeys::DrawModule()

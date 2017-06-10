@@ -18,8 +18,6 @@ Metronome::Metronome()
 , mVolume(.5f)
 , mVolumeSlider(NULL)
 {
-   SetEnabled(false);
-   
    TheTransport->AddListener(this, kInterval_4n);
 }
 

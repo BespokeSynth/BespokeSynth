@@ -38,8 +38,6 @@ Vocoder::Vocoder()
 , mCut(1)
 , mCutSlider(NULL)
 {
-   SetEnabled(false);
-   
    mInputBufferSize = gBufferSize;
    mInputBuffer = new float[mInputBufferSize];
    Clear(mInputBuffer, mInputBufferSize);

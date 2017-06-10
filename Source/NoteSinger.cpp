@@ -17,8 +17,6 @@ NoteSinger::NoteSinger()
 , mOctaveSlider(NULL)
 , mNumBuckets(28)
 {
-   SetEnabled(false);
-   
    TheTransport->AddAudioPoller(this);
    TheScale->AddListener(this);
 

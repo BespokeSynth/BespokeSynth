@@ -35,8 +35,6 @@ PSMoveController::PSMoveController()
 , mEnergyUIControl(NULL)
 , mPSButtonDown(false)
 {
-   SetEnabled(false);
-   
    mMoveMgr.Setup();
 
    mVibration.SetValue(0);

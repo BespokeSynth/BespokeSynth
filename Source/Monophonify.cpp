@@ -14,7 +14,6 @@ Monophonify::Monophonify()
 : mGlideTime(0)
 , mGlideSlider(NULL)
 {
-   SetEnabled(false);
 }
 
 void Monophonify::CreateUIControls()

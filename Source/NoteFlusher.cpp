@@ -13,7 +13,6 @@
 NoteFlusher::NoteFlusher()
 : mFlushButton(NULL)
 {
-   SetEnabled(false);
 }
 
 void NoteFlusher::CreateUIControls()

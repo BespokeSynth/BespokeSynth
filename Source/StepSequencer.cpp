@@ -41,8 +41,6 @@ StepSequencer::StepSequencer()
 , mShiftLeftButton(NULL)
 , mShiftRightButton(NULL)
 {
-   SetEnabled(false);
-   
    TheTransport->AddListener(this, mStepInterval);
    mFlusher.SetInterval(mStepInterval);
 }

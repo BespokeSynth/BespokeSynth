@@ -13,7 +13,6 @@
 
 DebugAudioSource::DebugAudioSource()
 {
-   SetEnabled(false);
 }
 
 DebugAudioSource::~DebugAudioSource()

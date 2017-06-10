@@ -18,7 +18,6 @@ PitchShiftEffect::PitchShiftEffect()
 , mRatioSelector(NULL)
 , mRatioSelection(10)
 {
-   SetEnabled(false);
 }
 
 void PitchShiftEffect::CreateUIControls()

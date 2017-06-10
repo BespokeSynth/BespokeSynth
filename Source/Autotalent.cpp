@@ -71,8 +71,6 @@ Autotalent::Autotalent()
 , mPitch(0)
 , mConfidence(0)
 {
-   SetEnabled(false);
-   
    mInputBufferSize = gBufferSize;
    mInputBuffer = new float[mInputBufferSize];
    Clear(mInputBuffer, mInputBufferSize);

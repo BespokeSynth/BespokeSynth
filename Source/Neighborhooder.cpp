@@ -15,7 +15,6 @@ Neighborhooder::Neighborhooder()
 : mOctave(3)
 , mOctaveSlider(NULL)
 {
-   SetEnabled(false);
 }
 
 void Neighborhooder::CreateUIControls()

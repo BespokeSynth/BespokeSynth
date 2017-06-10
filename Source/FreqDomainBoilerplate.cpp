@@ -35,8 +35,6 @@ FreqDomainBoilerplate::FreqDomainBoilerplate()
 , mPhaseOffset(0)
 , mPhaseOffsetSlider(NULL)
 {
-   SetEnabled(false);
-   
    mInputBufferSize = gBufferSize;
    mInputBuffer = new float[mInputBufferSize];
    Clear(mInputBuffer, mInputBufferSize);

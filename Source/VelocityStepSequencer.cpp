@@ -30,8 +30,6 @@ VelocityStepSequencer::VelocityStepSequencer()
 , mCurrentVelocity(80)
 , mController(NULL)
 {
-   SetEnabled(false);
-   
    TheTransport->AddListener(this, mInterval, -.1f);
 }
 

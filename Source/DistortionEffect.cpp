@@ -19,8 +19,6 @@ DistortionEffect::DistortionEffect()
 , mPreampSlider(NULL)
 , mDCAdjust(0)
 {
-   SetEnabled(false);
-   
    SetClip(.5f);
    
    mDCRemover.SetFilterParams(10, 1);

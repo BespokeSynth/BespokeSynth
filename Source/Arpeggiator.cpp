@@ -51,8 +51,6 @@ Arpeggiator::Arpeggiator()
 , mPlayOnlyScaleNotes(false)
 , mPlayOnlyScaleNotesCheckbox(NULL)
 {
-   SetEnabled(false);
-   
    TheTransport->AddListener(this, mInterval);
    TheScale->AddListener(this);
    
