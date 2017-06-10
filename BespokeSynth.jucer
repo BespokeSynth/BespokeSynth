@@ -438,6 +438,10 @@
               file="Source/PSMoveController.cpp"/>
         <FILE id="qiIX0Z" name="PSMoveController.h" compile="0" resource="0"
               file="Source/PSMoveController.h"/>
+        <FILE id="nHYDV9" name="RadioSequencer.cpp" compile="1" resource="0"
+              file="Source/RadioSequencer.cpp"/>
+        <FILE id="wGoVQc" name="RadioSequencer.h" compile="0" resource="0"
+              file="Source/RadioSequencer.h"/>
         <FILE id="AAlplU" name="Ramper.cpp" compile="1" resource="0" file="Source/Ramper.cpp"/>
         <FILE id="n8x1K2" name="Ramper.h" compile="0" resource="0" file="Source/Ramper.h"/>
         <FILE id="lp2Icw" name="RandomNoteGenerator.cpp" compile="1" resource="0"

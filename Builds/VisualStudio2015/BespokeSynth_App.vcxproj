@@ -267,6 +267,7 @@
     <ClCompile Include="..\..\Source\PressureToVibrato.cpp"/>
     <ClCompile Include="..\..\Source\PreviousNote.cpp"/>
     <ClCompile Include="..\..\Source\Producer.cpp"/>
+    <ClCompile Include="..\..\Source\RadioSequencer.cpp"/>
     <ClCompile Include="..\..\Source\Ramper.cpp"/>
     <ClCompile Include="..\..\Source\RandomNoteGenerator.cpp"/>
     <ClCompile Include="..\..\Source\Razor.cpp"/>

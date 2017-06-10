@@ -226,6 +226,7 @@
 		C3BF3D1EC2EB37A4835D0E05 /* SingleOscillatorVoice.cpp in Sources */ = {isa = PBXBuildFile; fileRef = B3AF1F2B09D380AB620E96F7 /* SingleOscillatorVoice.cpp */; };
 		C4157E0BBC4D59DCEF0EA790 /* SignalGenerator.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 91253784D7110231F2A474B4 /* SignalGenerator.cpp */; };
 		C594F19EB8D6E8ADDCCBBFB3 /* include_juce_data_structures.mm in Sources */ = {isa = PBXBuildFile; fileRef = E4356A70E4F098FF7CA1AAFB /* include_juce_data_structures.mm */; };
+		C695C775EF5B75558F1C706D /* RadioSequencer.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 8D2073E80BD91EDADD164FB3 /* RadioSequencer.cpp */; };
 		C79865B793C8B8E29CC5CE81 /* LaunchpadKeyboard.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 2FC726D3AE130A7056E45F0F /* LaunchpadKeyboard.cpp */; };
 		C82ED8F903E3B03EA649957B /* VelocitySetter.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 9756DBA630D8558219FA90D2 /* VelocitySetter.cpp */; };
 		C8B5ADA4EB32DD0540160467 /* PreviousNote.cpp in Sources */ = {isa = PBXBuildFile; fileRef = C6BE766BFA2C688255C4E632 /* PreviousNote.cpp */; };
@@ -341,6 +342,7 @@
 		18512B992E2C49EF0EDEDBEE /* SamplerGrid.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; name = SamplerGrid.h; path = ../../Source/SamplerGrid.h; sourceTree = SOURCE_ROOT; };
 		188D3A5F89E068FB997D4959 /* ModwheelToPressure.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; name = ModwheelToPressure.h; path = ../../Source/ModwheelToPressure.h; sourceTree = SOURCE_ROOT; };
 		18CC08EC5A031E666AA0CD1B /* CanvasControls.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; name = CanvasControls.h; path = ../../Source/CanvasControls.h; sourceTree = SOURCE_ROOT; };
+		18FCC2D52DA0F930DA8B4216 /* RadioSequencer.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; name = RadioSequencer.h; path = ../../Source/RadioSequencer.h; sourceTree = SOURCE_ROOT; };
 		19F34F42A4F003DEE9B93639 /* MidiController.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; name = MidiController.h; path = ../../Source/MidiController.h; sourceTree = SOURCE_ROOT; };
 		1A69EE9BDE891E0EDFC08514 /* GroupControl.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; name = GroupControl.cpp; path = ../../Source/GroupControl.cpp; sourceTree = SOURCE_ROOT; };
 		1ADD58AF8D8799025B52F5B8 /* vinylcontrol.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; name = vinylcontrol.cpp; path = ../../Source/vinylcontrol/vinylcontrol.cpp; sourceTree = SOURCE_ROOT; };
@@ -593,6 +595,7 @@
 		8C9A8C9468B4BA3BB7805AC2 /* Info-App.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = "Info-App.plist"; sourceTree = SOURCE_ROOT; };
 		8CBC583E0D0A42D79D7E9BA8 /* NoteRouter.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; name = NoteRouter.cpp; path = ../../Source/NoteRouter.cpp; sourceTree = SOURCE_ROOT; };
 		8D1F8138241B19D74A7168F7 /* SamplerGrid.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; name = SamplerGrid.cpp; path = ../../Source/SamplerGrid.cpp; sourceTree = SOURCE_ROOT; };
+		8D2073E80BD91EDADD164FB3 /* RadioSequencer.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; name = RadioSequencer.cpp; path = ../../Source/RadioSequencer.cpp; sourceTree = SOURCE_ROOT; };
 		8D4F8B7F7CB5804F847F766E /* SamplePlayer.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; name = SamplePlayer.cpp; path = ../../Source/SamplePlayer.cpp; sourceTree = SOURCE_ROOT; };
 		8D596CBDFEA3707B889DE50C /* FourOnTheFloor.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; name = FourOnTheFloor.h; path = ../../Source/FourOnTheFloor.h; sourceTree = SOURCE_ROOT; };
 		8D8BDB29023020CDC30DAC42 /* DistortionEffect.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; name = DistortionEffect.h; path = ../../Source/DistortionEffect.h; sourceTree = SOURCE_ROOT; };
@@ -1533,6 +1536,8 @@
 				BF8B2592E5EA204469A7C26C /* Producer.h */,
 				FBF8997741A135BCFBC05CF5 /* PSMoveController.cpp */,
 				7F0F785AA9926737C4FAB09E /* PSMoveController.h */,
+				8D2073E80BD91EDADD164FB3 /* RadioSequencer.cpp */,
+				18FCC2D52DA0F930DA8B4216 /* RadioSequencer.h */,
 				FB31E7DA1D9B53E2279D2B1F /* Ramper.cpp */,
 				A4E7370F0B6F25EF29D4DE82 /* Ramper.h */,
 				8907D413592BE9CE11442984 /* RandomNoteGenerator.cpp */,
@@ -1864,6 +1869,7 @@
 				5871E900F81919DF9B286EE7 /* PressureToVibrato.cpp in Sources */,
 				C8B5ADA4EB32DD0540160467 /* PreviousNote.cpp in Sources */,
 				7E64421ED900DBB6AB7BF036 /* Producer.cpp in Sources */,
+				C695C775EF5B75558F1C706D /* RadioSequencer.cpp in Sources */,
 				04A34456991BD8B4BC816F1C /* Ramper.cpp in Sources */,
 				94C2FC3FC5375A0DD7BA2A4F /* RandomNoteGenerator.cpp in Sources */,
 				93B4B2B84C3C861031666DC2 /* Razor.cpp in Sources */,
