@@ -38,6 +38,7 @@ void DistortionEffect::CreateUIControls()
    mTypeDropdown->AddLabel("dirty", kDirty);
    mTypeDropdown->AddLabel("soft", kSoft);
    mTypeDropdown->AddLabel("asym", kAsymmetric);
+   mTypeDropdown->AddLabel("fold", kFold);
 }
 
 void DistortionEffect::ProcessAudio(double time, float* audio, int bufferSize)
@@ -100,6 +101,21 @@ void DistortionEffect::ProcessAudio(double time, float* audio, int bufferSize)
             sample = -.75f*(1-powf(1-(fabsf(sample)-.032847f),12)+.333f*(fabsf(sample)-.032847f))+.01f;
          else
             sample = -.9818f;
+         audio[i] = sample / mGain;
+      }
+   }
+   else if (mType == kFold)
+   {
+      for (int i=0; i<bufferSize; ++i)
+      {
+         float sample = (audio[i]*.5f+mDCAdjust) * mPreamp * mGain;
+         while (sample > 1 || sample < -1)
+         {
+            if (sample > 1)
+               sample = 2 - sample;
+            if (sample < -1)
+               sample = -2 - sample;
+         }
          audio[i] = sample / mGain;
       }
    }
