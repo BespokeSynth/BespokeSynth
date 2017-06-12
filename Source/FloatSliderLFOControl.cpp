@@ -410,6 +410,10 @@ void FloatSliderLFOControl::LoadLayout(const ofxJSONElement& moduleInfo)
    mModuleSaveData.LoadFloat("bias", moduleInfo, .5f);
    mModuleSaveData.LoadFloat("low", moduleInfo, 0, mMinSlider);
    mModuleSaveData.LoadFloat("high", moduleInfo, 1, mMaxSlider);
+   mModuleSaveData.LoadFloat("add", moduleInfo, 0, mAddSlider);
+   mModuleSaveData.LoadFloat("soften", moduleInfo, 0, mSoftenSlider);
+   mModuleSaveData.LoadFloat("shuffle", moduleInfo, 0, mShuffleSlider);
+   mModuleSaveData.LoadFloat("free_rate", moduleInfo, 0, mFreeRateSlider);
    
    SetUpFromSaveData();
 }

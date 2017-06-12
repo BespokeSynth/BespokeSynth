@@ -261,14 +261,20 @@ IDrawableModule* ModuleContainer::FindModule(string name, bool fail)
    {
       if (name == mModules[i]->Name())
          return mModules[i];
+      vector<string> tokens = ofSplitString(name, "~");
       if (mModules[i]->GetContainer())
       {
-         vector<string> tokens = ofSplitString(name, "~");
          if (tokens[0] == mModules[i]->Name())
          {
             ofStringReplace(name, tokens[0]+"~", "", true);
             return mModules[i]->GetContainer()->FindModule(name, fail);
          }
+      }
+      if (tokens.size() == 2 && tokens[0] == mModules[i]->Name())
+      {
+         IDrawableModule* child = mModules[i]->FindChild(tokens[1].c_str());
+         if (child)
+            return child;
       }
    }
    
@@ -292,7 +298,8 @@ IUIControl* ModuleContainer::FindUIControl(string path)
    
    vector<string> tokens = ofSplitString(path,"~");
    string control = tokens[tokens.size()-1];
-   IDrawableModule* module = FindModule(path.substr(0, path.length() - (control.length() + 1)), false);
+   string modulePath = path.substr(0, path.length() - (control.length() + 1));
+   IDrawableModule* module = FindModule(modulePath, false);
    
    if (module)
    {
@@ -307,7 +314,7 @@ IUIControl* ModuleContainer::FindUIControl(string path)
       }
    }
    
-   TheSynth->LogEvent("Couldn't find module in path \""+path+"\"", kLogEventType_Error);
+   TheSynth->LogEvent("Couldn't find module at path \""+modulePath+"\"", kLogEventType_Error);
    return nullptr;
 }
 
