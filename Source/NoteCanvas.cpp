@@ -151,12 +151,15 @@ void NoteCanvas::OnTransportAdvanced(float amount)
       }
    }
    
+   if (!mEnabled || !mPlay)
+   {
+      mCanvas->SetCursorPos(-1);
+      return;
+   }
+
    float curPos = GetCurPos();
    mCanvas->SetCursorPos(curPos);
    
-   if (!mEnabled || !mPlay)
-      return;
-
    Canvas::ElementMask curElements = mCanvas->GetElementMask(curPos);
    
    for (int i=0; i<MAX_CANVAS_MASK_ELEMENTS; ++i)
@@ -272,6 +275,15 @@ void NoteCanvas::DrawModule()
    mFreeRecordCheckbox->Draw();
    mNumMeasuresSlider->Draw();
    mIntervalSelector->Draw();
+   
+   if (mRecord)
+   {
+      ofPushStyle();
+      ofSetColor(205 + 50 * (cosf(TheTransport->GetMeasurePos() * 4 * FTWO_PI)), 0, 0);
+      ofSetLineWidth(4);
+      ofRect(mCanvas->GetPosition(true).x, mCanvas->GetPosition(true).y, mCanvas->GetWidth(), mCanvas->GetHeight());
+      ofPopStyle();
+   }
 }
 
 bool NoteCanvas::MouseScrolled(int x, int y, float scrollX, float scrollY)

@@ -106,6 +106,8 @@ Looper::Looper()
 , mKeepPitchCheckbox(NULL)
 , mWriteInput(false)
 , mWriteInputCheckbox(NULL)
+, mQueueCaptureButton(NULL)
+, mCaptureQueued(false)
 , mWantShiftOffset(false)
 , mWantHalfShift(false)
 , mLastInputSample(0)
@@ -136,8 +138,9 @@ void Looper::CreateUIControls()
    mDecaySlider = new FloatSlider(this,"decay", -1, -1, 65, 15, &mDecay, 0, 1, 2);
    mSaveButton = new ClickButton(this,"save",-1,-1);
    mMuteCheckbox = new Checkbox(this,"mute",-1,-1,&mMute);
-   mCommitButton = new ClickButton(this,"commit",126,5);
-   mWriteInputCheckbox = new Checkbox(this,"write",116,6,&mWriteInput);
+   mCommitButton = new ClickButton(this,"commit",126,3);
+   mQueueCaptureButton = new ClickButton(this,"capture",126,3);
+   mWriteInputCheckbox = new Checkbox(this,"write",130,3,&mWriteInput);
    mSwapButton = new ClickButton(this,"swap",137,81);
    mCopyButton = new ClickButton(this,"copy",140,65);
    mDoubleSpeedButton = new ClickButton(this,"2x",151,28);
@@ -268,7 +271,8 @@ void Looper::Poll()
    mSwapButton->SetShowing(mRecorder != NULL);
    mCopyButton->SetShowing(mRecorder != NULL);
    mMergeButton->SetShowing(mRecorder != NULL);
-   mWriteInputCheckbox->SetShowing(mRecorder == NULL);
+   mWriteInputCheckbox->SetShowing(false);//mRecorder == NULL);
+   mQueueCaptureButton->SetShowing(mRecorder == NULL);
 }
 
 void Looper::Process(double time)
@@ -301,6 +305,18 @@ void Looper::Process(double time)
          mVol *= ofMap(TheTransport->GetTempo(), 80.0f, 160.0f, .95f, .99f, true);*/
       if (mMute == false)
          mVol *= 1 - mDecay;
+      
+      if (mCaptureQueued && !mWriteInput)
+      {
+         mWriteInputRamp.Start(1,10);
+         mWriteInput = true;
+      }
+      else if (mWriteInput && mCaptureQueued)
+      {
+         mCaptureQueued = false;
+         mWriteInputRamp.Start(0,10);
+         mWriteInput = false;
+      }
    }
 
    if (mSpeed == 1)
@@ -680,6 +696,18 @@ void Looper::DrawModule()
    mPitchShiftSlider->Draw();
    mKeepPitchCheckbox->Draw();
    mWriteInputCheckbox->Draw();
+   mQueueCaptureButton->Draw();
+   if (mCaptureQueued)
+   {
+      ofPushStyle();
+      ofFill();
+      if (mWriteInput)
+         ofSetColor(255, 0, 0, 150);
+      else
+         ofSetColor(255, 100, 0, 100 + 50 * (cosf(TheTransport->GetMeasurePos() * 4 * FTWO_PI)));
+      ofRect(mQueueCaptureButton->GetRect(true));
+      ofPopStyle();
+   }
    
    if (mRecorder && mRecorder->GetMergeSource() == this)
    {
@@ -1087,6 +1115,8 @@ void Looper::ButtonClicked(ClickButton* button)
    }
    if (button == mWriteOffsetButton)
       mWantShiftOffset = true;
+   if (button == mQueueCaptureButton)
+      mCaptureQueued = true;
 }
 
 void Looper::FloatSliderUpdated(FloatSlider* slider, float oldVal)
