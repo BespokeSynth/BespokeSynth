@@ -145,7 +145,7 @@ void Prefab::SavePrefab(string savePath)
    string lines;
    while (getline(ss,line,'\n'))
    {
-      char* pos = strstr(line.c_str(), " : \"$");
+      const char* pos = strstr(line.c_str(), " : \"$");
       if (pos != nullptr)
       {
          bool endsWithComma = line[line.length()-1] == ',';
