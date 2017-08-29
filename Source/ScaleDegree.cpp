@@ -15,7 +15,6 @@ ScaleDegree::ScaleDegree()
 : mScaleDegree(0)
 , mScaleDegreeSelector(NULL)
 {
-   SetEnabled(false);
 }
 
 void ScaleDegree::CreateUIControls()

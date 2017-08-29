@@ -20,8 +20,6 @@ Pumper::Pumper()
 , mPumpSlider(NULL)
 , mLastValue(0)
 {
-   SetEnabled(false);
-
    mLFO.SetPeriod(mInterval);
    mLFO.SetType(kOsc_Saw);
 }

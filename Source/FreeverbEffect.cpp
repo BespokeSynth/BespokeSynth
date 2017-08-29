@@ -19,7 +19,6 @@ FreeverbEffect::FreeverbEffect()
 , mWidthSlider(NULL)
 , mNeedUpdate(false)
 {
-   SetEnabled(false);
    mOutputLeftBuffer = new float[gBufferSize];
    mOutputRightBuffer = new float[gBufferSize];
    

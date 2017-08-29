@@ -14,8 +14,6 @@
 
 Polyrhythms::Polyrhythms()
 {
-   SetEnabled(false);
-   
    TheTransport->AddAudioPoller(this);
 
    for (int i=0; i<8; ++i)

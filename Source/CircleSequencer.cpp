@@ -29,8 +29,6 @@ namespace
 
 CircleSequencer::CircleSequencer()
 {
-   SetEnabled(false);
-   
    TheTransport->AddAudioPoller(this);
    
    for (int i=0; i<4; ++i)

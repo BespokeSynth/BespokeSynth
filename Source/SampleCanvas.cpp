@@ -20,7 +20,6 @@ SampleCanvas::SampleCanvas()
 : mCanvas(NULL)
 , mCanvasControls(NULL)
 {
-   SetEnabled(false);
 }
 
 void SampleCanvas::CreateUIControls()

@@ -181,6 +181,7 @@ void FloatSliderLFOControl::DrawModule()
          float phase = i/width;
          if (mLFO.GetOsc()->GetShuffle() > 0)
             phase *= 2;
+         phase += mLFOSettings.mLFOOffset;
          float value = GetLFOValue(0, phase);
          ofVertex(i + x, ofMap(value,mOwner->GetMax(),mOwner->GetMin(),0,height) + y);
       }
@@ -197,6 +198,9 @@ void FloatSliderLFOControl::DrawModule()
       {
          squeeze = 2;
       }
+      currentPhase -= mLFOSettings.mLFOOffset;
+      if (currentPhase < 0)
+         currentPhase += squeeze;
       ofCircle(currentPhase / squeeze * width + x,
                ofMap(GetLFOValue(),mOwner->GetMax(),mOwner->GetMin(),0,height) + y, 2);
    }
@@ -410,6 +414,10 @@ void FloatSliderLFOControl::LoadLayout(const ofxJSONElement& moduleInfo)
    mModuleSaveData.LoadFloat("bias", moduleInfo, .5f);
    mModuleSaveData.LoadFloat("low", moduleInfo, 0, mMinSlider);
    mModuleSaveData.LoadFloat("high", moduleInfo, 1, mMaxSlider);
+   mModuleSaveData.LoadFloat("add", moduleInfo, 0, mAddSlider);
+   mModuleSaveData.LoadFloat("soften", moduleInfo, 0, mSoftenSlider);
+   mModuleSaveData.LoadFloat("shuffle", moduleInfo, 0, mShuffleSlider);
+   mModuleSaveData.LoadFloat("free_rate", moduleInfo, 0, mFreeRateSlider);
    
    SetUpFromSaveData();
 }

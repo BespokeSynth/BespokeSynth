@@ -70,8 +70,6 @@ Razor::Razor()
       mBumps[i].mAmt = 0;
       mBumps[i].mDecay = .005f;
    }
-
-   SetEnabled(false);
 }
 
 void Razor::CreateUIControls()

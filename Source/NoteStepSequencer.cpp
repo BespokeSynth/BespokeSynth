@@ -55,8 +55,6 @@ NoteStepSequencer::NoteStepSequencer()
 , mRandomizeLengthButton(NULL)
 , mRandomizeVelocityButton(NULL)
 {
-   SetEnabled(false);
-   
    TheTransport->AddListener(this, mInterval);
    TheTransport->AddAudioPoller(this);
    

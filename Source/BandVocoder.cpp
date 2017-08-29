@@ -32,8 +32,6 @@ BandVocoder::BandVocoder()
 , mMaxBand(.3f)
 , mMaxBandSlider(NULL)
 {
-   SetEnabled(false);
-   
    mInputBufferSize = gBufferSize;
    mInputBuffer = new float[mInputBufferSize];
    Clear(mInputBuffer, mInputBufferSize);

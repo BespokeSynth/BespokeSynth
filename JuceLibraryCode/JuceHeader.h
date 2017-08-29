@@ -10,8 +10,7 @@
 
 */
 
-#ifndef __APPHEADERFILE_VXKFWD__
-#define __APPHEADERFILE_VXKFWD__
+#pragma once
 
 #include "AppConfig.h"
 
@@ -47,5 +46,3 @@ namespace ProjectInfo
     const int          versionNumber  = 0x10000;
 }
 #endif
-
-#endif   // __APPHEADERFILE_VXKFWD__

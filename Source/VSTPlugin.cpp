@@ -180,8 +180,12 @@ void VSTPlugin::CreateParameterSliders()
       string label(name.getCharPointer());
       try
       {
+         int append = 0;
          while (FindUIControl(label.c_str()))
-            label += ".";
+         {
+            ++append;
+            label = name.toStdString() + ofToString(append);
+         }
       }
       catch(UnknownUIControlException& e)
       {

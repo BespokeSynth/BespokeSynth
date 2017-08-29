@@ -1,0 +1,406 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<Project DefaultTargets="Build"
+         ToolsVersion="14.0"
+         xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup Label="ProjectConfigurations">
+    <ProjectConfiguration Include="Debug|Win32">
+      <Configuration>Debug</Configuration>
+      <Platform>Win32</Platform>
+    </ProjectConfiguration>
+    <ProjectConfiguration Include="Release|Win32">
+      <Configuration>Release</Configuration>
+      <Platform>Win32</Platform>
+    </ProjectConfiguration>
+  </ItemGroup>
+  <PropertyGroup Label="Globals">
+    <ProjectGuid>{9407D100-6E22-A15A-0D3D-F7A28F89B271}</ProjectGuid>
+    <PlatformToolset>v140</PlatformToolset>
+  </PropertyGroup>
+  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.Default.props"/>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'"
+                 Label="Configuration">
+    <ConfigurationType>Application</ConfigurationType>
+    <UseOfMfc>false</UseOfMfc>
+    <PlatformToolset>v140</PlatformToolset>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'"
+                 Label="Configuration">
+    <ConfigurationType>Application</ConfigurationType>
+    <UseOfMfc>false</UseOfMfc>
+    <WholeProgramOptimization>true</WholeProgramOptimization>
+    <PlatformToolset>v140</PlatformToolset>
+  </PropertyGroup>
+  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.props"/>
+  <ImportGroup Label="ExtensionSettings"/>
+  <ImportGroup Label="PropertySheets">
+    <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props"
+            Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')"
+            Label="LocalAppDataPlatform"/>
+  </ImportGroup>
+  <PropertyGroup Label="UserMacros">
+    <PlatformToolset>v140</PlatformToolset>
+  </PropertyGroup>
+  <PropertyGroup>
+    <_ProjectFileVersion>10.0.30319.1</_ProjectFileVersion>
+    <TargetExt>.exe</TargetExt>
+    <OutDir Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">$(SolutionDir)\$(Platform)\$(Configuration)\App\</OutDir>
+    <IntDir Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">$(Platform)\$(Configuration)\App\</IntDir>
+    <TargetName Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">BespokeSynth</TargetName>
+    <GenerateManifest Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">true</GenerateManifest>
+    <OutDir Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">$(SolutionDir)\$(Platform)\$(Configuration)\App\</OutDir>
+    <IntDir Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">$(Platform)\$(Configuration)\App\</IntDir>
+    <TargetName Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">BespokeSynth</TargetName>
+    <GenerateManifest Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">true</GenerateManifest>
+    <PlatformToolset>v140</PlatformToolset>
+  </PropertyGroup>
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
+    <Midl>
+      <PreprocessorDefinitions>_DEBUG;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <MkTypLibCompatible>true</MkTypLibCompatible>
+      <SuppressStartupBanner>true</SuppressStartupBanner>
+      <TargetEnvironment>Win32</TargetEnvironment>
+      <HeaderFileName/>
+    </Midl>
+    <ClCompile>
+      <Optimization>Disabled</Optimization>
+      <DebugInformationFormat>EditAndContinue</DebugInformationFormat>
+      <AdditionalIncludeDirectories>..\..\..\VST3 SDK;..\..\JuceLibraryCode;..\..\..\JUCE\modules;../../Source/json/include;../../Source/glew/include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <PreprocessorDefinitions>_CRT_SECURE_NO_WARNINGS;WIN32;_WINDOWS;DEBUG;_DEBUG;GLEW_STATIC;BESPOKE_WINDOWS;JUCER_VS2015_78A5022=1;JUCE_APP_VERSION=1.0.0;JUCE_APP_VERSION_HEX=0x10000;JucePlugin_Build_VST=0;JucePlugin_Build_VST3=0;JucePlugin_Build_AU=0;JucePlugin_Build_AUv3=0;JucePlugin_Build_RTAS=0;JucePlugin_Build_AAX=0;JucePlugin_Build_Standalone=0;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <RuntimeLibrary>MultiThreadedDebug</RuntimeLibrary>
+      <RuntimeTypeInfo>true</RuntimeTypeInfo>
+      <PrecompiledHeader/>
+      <AssemblerListingLocation>$(IntDir)\</AssemblerListingLocation>
+      <ObjectFileName>$(IntDir)\</ObjectFileName>
+      <ProgramDataBaseFileName>$(IntDir)\</ProgramDataBaseFileName>
+      <WarningLevel>Level2</WarningLevel>
+      <SuppressStartupBanner>true</SuppressStartupBanner>
+      <MultiProcessorCompilation>true</MultiProcessorCompilation>
+    </ClCompile>
+    <ResourceCompile>
+      <PreprocessorDefinitions>_DEBUG;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+    </ResourceCompile>
+    <Link>
+      <OutputFile>$(OutDir)\BespokeSynth.exe</OutputFile>
+      <SuppressStartupBanner>true</SuppressStartupBanner>
+      <IgnoreSpecificDefaultLibraries>libcmt.lib; msvcrt.lib;;%(IgnoreSpecificDefaultLibraries)</IgnoreSpecificDefaultLibraries>
+      <GenerateDebugInformation>true</GenerateDebugInformation>
+      <ProgramDatabaseFile>$(IntDir)\BespokeSynth.pdb</ProgramDatabaseFile>
+      <SubSystem>Windows</SubSystem>
+      <TargetMachine>MachineX86</TargetMachine>
+      <ImageHasSafeExceptionHandlers>false</ImageHasSafeExceptionHandlers>
+      <LargeAddressAware>true</LargeAddressAware>
+    </Link>
+    <Bscmake>
+      <SuppressStartupBanner>true</SuppressStartupBanner>
+      <OutputFile>$(IntDir)\BespokeSynth.bsc</OutputFile>
+    </Bscmake>
+  </ItemDefinitionGroup>
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
+    <Midl>
+      <PreprocessorDefinitions>NDEBUG;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <MkTypLibCompatible>true</MkTypLibCompatible>
+      <SuppressStartupBanner>true</SuppressStartupBanner>
+      <TargetEnvironment>Win32</TargetEnvironment>
+      <HeaderFileName/>
+    </Midl>
+    <ClCompile>
+      <Optimization>Full</Optimization>
+      <AdditionalIncludeDirectories>..\..\..\VST3 SDK;..\..\JuceLibraryCode;..\..\..\JUCE\modules;../../Source/json/include;../../Source/glew/include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <PreprocessorDefinitions>_CRT_SECURE_NO_WARNINGS;WIN32;_WINDOWS;NDEBUG;GLEW_STATIC;BESPOKE_WINDOWS;JUCER_VS2015_78A5022=1;JUCE_APP_VERSION=1.0.0;JUCE_APP_VERSION_HEX=0x10000;JucePlugin_Build_VST=0;JucePlugin_Build_VST3=0;JucePlugin_Build_AU=0;JucePlugin_Build_AUv3=0;JucePlugin_Build_RTAS=0;JucePlugin_Build_AAX=0;JucePlugin_Build_Standalone=0;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <RuntimeLibrary>MultiThreaded</RuntimeLibrary>
+      <RuntimeTypeInfo>true</RuntimeTypeInfo>
+      <PrecompiledHeader/>
+      <AssemblerListingLocation>$(IntDir)\</AssemblerListingLocation>
+      <ObjectFileName>$(IntDir)\</ObjectFileName>
+      <ProgramDataBaseFileName>$(IntDir)\</ProgramDataBaseFileName>
+      <WarningLevel>Level2</WarningLevel>
+      <SuppressStartupBanner>true</SuppressStartupBanner>
+      <MultiProcessorCompilation>true</MultiProcessorCompilation>
+    </ClCompile>
+    <ResourceCompile>
+      <PreprocessorDefinitions>NDEBUG;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+    </ResourceCompile>
+    <Link>
+      <OutputFile>$(OutDir)\BespokeSynth.exe</OutputFile>
+      <SuppressStartupBanner>true</SuppressStartupBanner>
+      <IgnoreSpecificDefaultLibraries>%(IgnoreSpecificDefaultLibraries)</IgnoreSpecificDefaultLibraries>
+      <GenerateDebugInformation>false</GenerateDebugInformation>
+      <ProgramDatabaseFile>$(IntDir)\BespokeSynth.pdb</ProgramDatabaseFile>
+      <SubSystem>Windows</SubSystem>
+      <TargetMachine>MachineX86</TargetMachine>
+      <OptimizeReferences>true</OptimizeReferences>
+      <EnableCOMDATFolding>true</EnableCOMDATFolding>
+      <LargeAddressAware>true</LargeAddressAware>
+    </Link>
+    <Bscmake>
+      <SuppressStartupBanner>true</SuppressStartupBanner>
+      <OutputFile>$(IntDir)\BespokeSynth.bsc</OutputFile>
+    </Bscmake>
+  </ItemDefinitionGroup>
+  <ItemGroup>
+    <ClCompile Include="..\..\Source\BitcrushEffect.cpp"/>
+    <ClCompile Include="..\..\Source\ButterworthFilterEffect.cpp"/>
+    <ClCompile Include="..\..\Source\Compressor.cpp"/>
+    <ClCompile Include="..\..\Source\DCRemoverEffect.cpp"/>
+    <ClCompile Include="..\..\Source\DelayEffect.cpp"/>
+    <ClCompile Include="..\..\Source\DistortionEffect.cpp"/>
+    <ClCompile Include="..\..\Source\EQEffect.cpp"/>
+    <ClCompile Include="..\..\Source\FormantFilterEffect.cpp"/>
+    <ClCompile Include="..\..\Source\FreeverbEffect.cpp"/>
+    <ClCompile Include="..\..\Source\GateEffect.cpp"/>
+    <ClCompile Include="..\..\Source\LiveGranulator.cpp"/>
+    <ClCompile Include="..\..\Source\Muter.cpp"/>
+    <ClCompile Include="..\..\Source\NoiseEffect.cpp"/>
+    <ClCompile Include="..\..\Source\PitchShiftEffect.cpp"/>
+    <ClCompile Include="..\..\Source\Pumper.cpp"/>
+    <ClCompile Include="..\..\Source\Stutter.cpp"/>
+    <ClCompile Include="..\..\Source\TremoloEffect.cpp"/>
+    <ClCompile Include="..\..\Source\CFMessaging\Bespoke_CFMessaging.cpp"/>
+    <ClCompile Include="..\..\Source\freeverb\allpass.cpp"/>
+    <ClCompile Include="..\..\Source\freeverb\comb.cpp"/>
+    <ClCompile Include="..\..\Source\freeverb\revmodel.cpp"/>
+    <ClCompile Include="..\..\Source\glew\Bespoke_glew.c"/>
+    <ClCompile Include="..\..\Source\json\src\lib_json\json_reader.cpp"/>
+    <ClCompile Include="..\..\Source\json\src\lib_json\json_value.cpp"/>
+    <ClCompile Include="..\..\Source\json\src\lib_json\json_writer.cpp"/>
+    <ClCompile Include="..\..\Source\nanovg\nanovg.c"/>
+    <ClCompile Include="..\..\Source\psmove\Bespoke_PSMove.c"/>
+    <ClCompile Include="..\..\Source\vinylcontrol\timecoder.c"/>
+    <ClCompile Include="..\..\Source\vinylcontrol\vinylcontrol.cpp"/>
+    <ClCompile Include="..\..\Source\ADSRTrigger.cpp"/>
+    <ClCompile Include="..\..\Source\Amplifier.cpp"/>
+    <ClCompile Include="..\..\Source\Arpeggiator.cpp"/>
+    <ClCompile Include="..\..\Source\AudioMeter.cpp"/>
+    <ClCompile Include="..\..\Source\AudioRouter.cpp"/>
+    <ClCompile Include="..\..\Source\Autotalent.cpp"/>
+    <ClCompile Include="..\..\Source\BandVocoder.cpp"/>
+    <ClCompile Include="..\..\Source\BeatBloks.cpp"/>
+    <ClCompile Include="..\..\Source\Beats.cpp"/>
+    <ClCompile Include="..\..\Source\BiquadFilterEffect.cpp"/>
+    <ClCompile Include="..\..\Source\Capo.cpp"/>
+    <ClCompile Include="..\..\Source\ChaosEngine.cpp"/>
+    <ClCompile Include="..\..\Source\Chorder.cpp"/>
+    <ClCompile Include="..\..\Source\CircleSequencer.cpp"/>
+    <ClCompile Include="..\..\Source\ClipArranger.cpp"/>
+    <ClCompile Include="..\..\Source\ClipLauncher.cpp"/>
+    <ClCompile Include="..\..\Source\ComboGridController.cpp"/>
+    <ClCompile Include="..\..\Source\CommentDisplay.cpp"/>
+    <ClCompile Include="..\..\Source\ControllingSong.cpp"/>
+    <ClCompile Include="..\..\Source\ControlSequencer.cpp"/>
+    <ClCompile Include="..\..\Source\ControlTactileFeedback.cpp"/>
+    <ClCompile Include="..\..\Source\CurveLooper.cpp"/>
+    <ClCompile Include="..\..\Source\DebugAudioSource.cpp"/>
+    <ClCompile Include="..\..\Source\DrumPlayer.cpp"/>
+    <ClCompile Include="..\..\Source\DrumSynth.cpp"/>
+    <ClCompile Include="..\..\Source\EffectChain.cpp"/>
+    <ClCompile Include="..\..\Source\EventCanvas.cpp"/>
+    <ClCompile Include="..\..\Source\FeedbackModule.cpp"/>
+    <ClCompile Include="..\..\Source\FFTtoAdditive.cpp"/>
+    <ClCompile Include="..\..\Source\FMSynth.cpp"/>
+    <ClCompile Include="..\..\Source\FollowingSong.cpp"/>
+    <ClCompile Include="..\..\Source\FourOnTheFloor.cpp"/>
+    <ClCompile Include="..\..\Source\FreeverbOutput.cpp"/>
+    <ClCompile Include="..\..\Source\FreqDelay.cpp"/>
+    <ClCompile Include="..\..\Source\FreqDomainBoilerplate.cpp"/>
+    <ClCompile Include="..\..\Source\GridController.cpp"/>
+    <ClCompile Include="..\..\Source\GridToDrums.cpp"/>
+    <ClCompile Include="..\..\Source\GroupControl.cpp"/>
+    <ClCompile Include="..\..\Source\HelpDisplay.cpp"/>
+    <ClCompile Include="..\..\Source\InputChannel.cpp"/>
+    <ClCompile Include="..\..\Source\KarplusStrong.cpp"/>
+    <ClCompile Include="..\..\Source\KeyboardDisplay.cpp"/>
+    <ClCompile Include="..\..\Source\Kicker.cpp"/>
+    <ClCompile Include="..\..\Source\LaunchpadKeyboard.cpp"/>
+    <ClCompile Include="..\..\Source\LaunchpadNoteDisplayer.cpp"/>
+    <ClCompile Include="..\..\Source\LFOController.cpp"/>
+    <ClCompile Include="..\..\Source\Lissajous.cpp"/>
+    <ClCompile Include="..\..\Source\Looper.cpp"/>
+    <ClCompile Include="..\..\Source\LooperRecorder.cpp"/>
+    <ClCompile Include="..\..\Source\LoopStorer.cpp"/>
+    <ClCompile Include="..\..\Source\MacroSlider.cpp"/>
+    <ClCompile Include="..\..\Source\Metronome.cpp"/>
+    <ClCompile Include="..\..\Source\MidiController.cpp"/>
+    <ClCompile Include="..\..\Source\MidiInstrument.cpp"/>
+    <ClCompile Include="..\..\Source\MidiOutput.cpp"/>
+    <ClCompile Include="..\..\Source\ModulationVisualizer.cpp"/>
+    <ClCompile Include="..\..\Source\ModuleSaveDataPanel.cpp"/>
+    <ClCompile Include="..\..\Source\ModWheel.cpp"/>
+    <ClCompile Include="..\..\Source\ModwheelToPressure.cpp"/>
+    <ClCompile Include="..\..\Source\ModwheelToVibrato.cpp"/>
+    <ClCompile Include="..\..\Source\Monophonify.cpp"/>
+    <ClCompile Include="..\..\Source\MultibandCompressor.cpp"/>
+    <ClCompile Include="..\..\Source\MultitrackRecorder.cpp"/>
+    <ClCompile Include="..\..\Source\Neighborhooder.cpp"/>
+    <ClCompile Include="..\..\Source\NoteCanvas.cpp"/>
+    <ClCompile Include="..\..\Source\NoteChainNode.cpp"/>
+    <ClCompile Include="..\..\Source\NoteCreator.cpp"/>
+    <ClCompile Include="..\..\Source\NoteDelayer.cpp"/>
+    <ClCompile Include="..\..\Source\NoteDisplayer.cpp"/>
+    <ClCompile Include="..\..\Source\NoteFilter.cpp"/>
+    <ClCompile Include="..\..\Source\NoteFlusher.cpp"/>
+    <ClCompile Include="..\..\Source\NoteGate.cpp"/>
+    <ClCompile Include="..\..\Source\NoteHumanizer.cpp"/>
+    <ClCompile Include="..\..\Source\NoteLooper.cpp"/>
+    <ClCompile Include="..\..\Source\NoteOctaver.cpp"/>
+    <ClCompile Include="..\..\Source\NoteRouter.cpp"/>
+    <ClCompile Include="..\..\Source\NoteSequencerColumn.cpp"/>
+    <ClCompile Include="..\..\Source\NoteSinger.cpp"/>
+    <ClCompile Include="..\..\Source\NoteStepSequencer.cpp"/>
+    <ClCompile Include="..\..\Source\NoteSustain.cpp"/>
+    <ClCompile Include="..\..\Source\NoteToFreq.cpp"/>
+    <ClCompile Include="..\..\Source\NoteToMs.cpp"/>
+    <ClCompile Include="..\..\Source\NoteTransformer.cpp"/>
+    <ClCompile Include="..\..\Source\NoteVibrato.cpp"/>
+    <ClCompile Include="..\..\Source\OneShotLauncher.cpp"/>
+    <ClCompile Include="..\..\Source\OutputChannel.cpp"/>
+    <ClCompile Include="..\..\Source\PanicButton.cpp"/>
+    <ClCompile Include="..\..\Source\PitchBender.cpp"/>
+    <ClCompile Include="..\..\Source\PitchChorus.cpp"/>
+    <ClCompile Include="..\..\Source\PitchDive.cpp"/>
+    <ClCompile Include="..\..\Source\PitchSetter.cpp"/>
+    <ClCompile Include="..\..\Source\Polyrhythms.cpp"/>
+    <ClCompile Include="..\..\Source\Prefab.cpp"/>
+    <ClCompile Include="..\..\Source\Presets.cpp"/>
+    <ClCompile Include="..\..\Source\Pressure.cpp"/>
+    <ClCompile Include="..\..\Source\PressureToModwheel.cpp"/>
+    <ClCompile Include="..\..\Source\PressureToVibrato.cpp"/>
+    <ClCompile Include="..\..\Source\PreviousNote.cpp"/>
+    <ClCompile Include="..\..\Source\Producer.cpp"/>
+    <ClCompile Include="..\..\Source\RadioSequencer.cpp"/>
+    <ClCompile Include="..\..\Source\Ramper.cpp"/>
+    <ClCompile Include="..\..\Source\RandomNoteGenerator.cpp"/>
+    <ClCompile Include="..\..\Source\Razor.cpp"/>
+    <ClCompile Include="..\..\Source\Rewriter.cpp"/>
+    <ClCompile Include="..\..\Source\RingModulator.cpp"/>
+    <ClCompile Include="..\..\Source\SampleBank.cpp"/>
+    <ClCompile Include="..\..\Source\SampleCanvas.cpp"/>
+    <ClCompile Include="..\..\Source\SampleFinder.cpp"/>
+    <ClCompile Include="..\..\Source\SamplePlayer.cpp"/>
+    <ClCompile Include="..\..\Source\Sampler.cpp"/>
+    <ClCompile Include="..\..\Source\SamplerGrid.cpp"/>
+    <ClCompile Include="..\..\Source\Scale.cpp"/>
+    <ClCompile Include="..\..\Source\ScaleDegree.cpp"/>
+    <ClCompile Include="..\..\Source\ScaleDetect.cpp"/>
+    <ClCompile Include="..\..\Source\SeaOfGrain.cpp"/>
+    <ClCompile Include="..\..\Source\Selector.cpp"/>
+    <ClCompile Include="..\..\Source\SignalGenerator.cpp"/>
+    <ClCompile Include="..\..\Source\SingleOscillator.cpp"/>
+    <ClCompile Include="..\..\Source\SliderSequencer.cpp"/>
+    <ClCompile Include="..\..\Source\SlowLayers.cpp"/>
+    <ClCompile Include="..\..\Source\StepSequencer.cpp"/>
+    <ClCompile Include="..\..\Source\Stereofier.cpp"/>
+    <ClCompile Include="..\..\Source\StutterControl.cpp"/>
+    <ClCompile Include="..\..\Source\SustainPedal.cpp"/>
+    <ClCompile Include="..\..\Source\TimelineControl.cpp"/>
+    <ClCompile Include="..\..\Source\TimerDisplay.cpp"/>
+    <ClCompile Include="..\..\Source\TitleBar.cpp"/>
+    <ClCompile Include="..\..\Source\Transport.cpp"/>
+    <ClCompile Include="..\..\Source\ValueSetter.cpp"/>
+    <ClCompile Include="..\..\Source\VelocityScaler.cpp"/>
+    <ClCompile Include="..\..\Source\VelocitySetter.cpp"/>
+    <ClCompile Include="..\..\Source\VelocityStepSequencer.cpp"/>
+    <ClCompile Include="..\..\Source\VinylTempoControl.cpp"/>
+    <ClCompile Include="..\..\Source\Vocoder.cpp"/>
+    <ClCompile Include="..\..\Source\VocoderCarrierInput.cpp"/>
+    <ClCompile Include="..\..\Source\VolcaBeatsControl.cpp"/>
+    <ClCompile Include="..\..\Source\VSTPlugin.cpp"/>
+    <ClCompile Include="..\..\Source\WaveformViewer.cpp"/>
+    <ClCompile Include="..\..\Source\WhiteKeys.cpp"/>
+    <ClCompile Include="..\..\Source\ClickButton.cpp"/>
+    <ClCompile Include="..\..\Source\RadioButton.cpp"/>
+    <ClCompile Include="..\..\Source\DropdownList.cpp"/>
+    <ClCompile Include="..\..\Source\Slider.cpp"/>
+    <ClCompile Include="..\..\Source\Checkbox.cpp"/>
+    <ClCompile Include="..\..\Source\TextEntry.cpp"/>
+    <ClCompile Include="..\..\Source\IUIControl.cpp"/>
+    <ClCompile Include="..\..\Source\AdditiveVoice.cpp"/>
+    <ClCompile Include="..\..\Source\ADSR.cpp"/>
+    <ClCompile Include="..\..\Source\ADSRDisplay.cpp"/>
+    <ClCompile Include="..\..\Source\ArrangementMaster.cpp"/>
+    <ClCompile Include="..\..\Source\Bespoke_Platform.cpp"/>
+    <ClCompile Include="..\..\Source\BiquadFilter.cpp"/>
+    <ClCompile Include="..\..\Source\Canvas.cpp"/>
+    <ClCompile Include="..\..\Source\CanvasControls.cpp"/>
+    <ClCompile Include="..\..\Source\CanvasElement.cpp"/>
+    <ClCompile Include="..\..\Source\Chord.cpp"/>
+    <ClCompile Include="..\..\Source\Curve.cpp"/>
+    <ClCompile Include="..\..\Source\EffectFactory.cpp"/>
+    <ClCompile Include="..\..\Source\EnvOscillator.cpp"/>
+    <ClCompile Include="..\..\Source\FFT.cpp"/>
+    <ClCompile Include="..\..\Source\FileStream.cpp"/>
+    <ClCompile Include="..\..\Source\FilterButterworth24db.cpp"/>
+    <ClCompile Include="..\..\Source\FilterViz.cpp"/>
+    <ClCompile Include="..\..\Source\FloatSliderLFOControl.cpp"/>
+    <ClCompile Include="..\..\Source\FMVoice.cpp"/>
+    <ClCompile Include="..\..\Source\Granulator.cpp"/>
+    <ClCompile Include="..\..\Source\Grid.cpp"/>
+    <ClCompile Include="..\..\Source\IAudioSource.cpp"/>
+    <ClCompile Include="..\..\Source\IClickable.cpp"/>
+    <ClCompile Include="..\..\Source\IDrawableModule.cpp"/>
+    <ClCompile Include="..\..\Source\INoteSource.cpp"/>
+    <ClCompile Include="..\..\Source\JumpBlender.cpp"/>
+    <ClCompile Include="..\..\Source\KarplusRetriggerVoice.cpp"/>
+    <ClCompile Include="..\..\Source\KarplusStrongVoice.cpp"/>
+    <ClCompile Include="..\..\Source\LaunchpadInterpreter.cpp"/>
+    <ClCompile Include="..\..\Source\LFO.cpp"/>
+    <ClCompile Include="..\..\Source\LinkwitzRileyFilter.cpp"/>
+    <ClCompile Include="..\..\Source\LocationZoomer.cpp"/>
+    <ClCompile Include="..\..\Source\Main.cpp"/>
+    <ClCompile Include="..\..\Source\MainComponent.cpp"/>
+    <ClCompile Include="..\..\Source\MidiDevice.cpp"/>
+    <ClCompile Include="..\..\Source\MidiReader.cpp"/>
+    <ClCompile Include="..\..\Source\ModularSynth.cpp"/>
+    <ClCompile Include="..\..\Source\ModulationChain.cpp"/>
+    <ClCompile Include="..\..\Source\ModuleContainer.cpp"/>
+    <ClCompile Include="..\..\Source\ModuleFactory.cpp"/>
+    <ClCompile Include="..\..\Source\ModuleSaveData.cpp"/>
+    <ClCompile Include="..\..\Source\Monome.cpp"/>
+    <ClCompile Include="..\..\Source\MultiBandTracker.cpp"/>
+    <ClCompile Include="..\..\Source\NamedMutex.cpp"/>
+    <ClCompile Include="..\..\Source\ofxJSONElement.cpp"/>
+    <ClCompile Include="..\..\Source\OpenFrameworksPort.cpp"/>
+    <ClCompile Include="..\..\Source\OscController.cpp"/>
+    <ClCompile Include="..\..\Source\Oscillator.cpp"/>
+    <ClCompile Include="..\..\Source\PatchCable.cpp"/>
+    <ClCompile Include="..\..\Source\PatchCableSource.cpp"/>
+    <ClCompile Include="..\..\Source\PeakTracker.cpp"/>
+    <ClCompile Include="..\..\Source\PerformanceTimer.cpp"/>
+    <ClCompile Include="..\..\Source\PitchDetector.cpp"/>
+    <ClCompile Include="..\..\Source\PitchShifter.cpp"/>
+    <ClCompile Include="..\..\Source\PolyphonyMgr.cpp"/>
+    <ClCompile Include="..\..\Source\Profiler.cpp"/>
+    <ClCompile Include="..\..\Source\Ramp.cpp"/>
+    <ClCompile Include="..\..\Source\RollingBuffer.cpp"/>
+    <ClCompile Include="..\..\Source\Sample.cpp"/>
+    <ClCompile Include="..\..\Source\SampleDrawer.cpp"/>
+    <ClCompile Include="..\..\Source\SampleVoice.cpp"/>
+    <ClCompile Include="..\..\Source\SingleOscillatorVoice.cpp"/>
+    <ClCompile Include="..\..\Source\SynthGlobals.cpp"/>
+    <ClCompile Include="..\..\Source\TriggerDetector.cpp"/>
+    <ClCompile Include="..\..\Source\VSTPlayhead.cpp"/>
+    <ClCompile Include="..\..\Source\VSTWindow.cpp"/>
+    <ClCompile Include="..\..\JuceLibraryCode\BinaryData.cpp"/>
+    <ClCompile Include="..\..\JuceLibraryCode\include_juce_audio_basics.cpp"/>
+    <ClCompile Include="..\..\JuceLibraryCode\include_juce_audio_devices.cpp"/>
+    <ClCompile Include="..\..\JuceLibraryCode\include_juce_audio_formats.cpp"/>
+    <ClCompile Include="..\..\JuceLibraryCode\include_juce_audio_processors.cpp"/>
+    <ClCompile Include="..\..\JuceLibraryCode\include_juce_audio_utils.cpp"/>
+    <ClCompile Include="..\..\JuceLibraryCode\include_juce_core.cpp"/>
+    <ClCompile Include="..\..\JuceLibraryCode\include_juce_cryptography.cpp"/>
+    <ClCompile Include="..\..\JuceLibraryCode\include_juce_data_structures.cpp"/>
+    <ClCompile Include="..\..\JuceLibraryCode\include_juce_events.cpp"/>
+    <ClCompile Include="..\..\JuceLibraryCode\include_juce_graphics.cpp"/>
+    <ClCompile Include="..\..\JuceLibraryCode\include_juce_gui_basics.cpp"/>
+    <ClCompile Include="..\..\JuceLibraryCode\include_juce_gui_extra.cpp"/>
+    <ClCompile Include="..\..\JuceLibraryCode\include_juce_opengl.cpp"/>
+    <ClCompile Include="..\..\JuceLibraryCode\include_juce_osc.cpp"/>
+    <ClCompile Include="..\..\JuceLibraryCode\include_juce_video.cpp"/>
+  </ItemGroup>
+  <ItemGroup/>
+  <ItemGroup>
+    <ResourceCompile Include=".\resources.rc"/>
+  </ItemGroup>
+  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets"/>
+  <ImportGroup Label="ExtensionTargets"/>
+</Project>

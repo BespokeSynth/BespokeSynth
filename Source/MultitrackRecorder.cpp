@@ -40,8 +40,6 @@ MultitrackRecorder::MultitrackRecorder()
 , mUndoRecordButton(NULL)
 , mLoadPlayedTrackButton(NULL)
 {
-   SetEnabled(false);
-   
    TheMultitrackRecorder = this;
    
    mMeasurePos = new float[mRecordingLength];

@@ -13,8 +13,6 @@
 
 NoteTransformer::NoteTransformer()
 {
-   SetEnabled(false);
-   
    for (int i=0; i<7; ++i)
    {
       mToneMod[i] = 0;

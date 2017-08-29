@@ -198,6 +198,8 @@ private:
    FloatSlider* mDecaySlider;
    bool mWriteInput;
    Checkbox* mWriteInputCheckbox;
+   ClickButton* mQueueCaptureButton;
+   bool mCaptureQueued;
    Ramp mWriteInputRamp;
    float mLastInputSample;
 

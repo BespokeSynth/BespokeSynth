@@ -14,7 +14,6 @@
 
 Kicker::Kicker()
 {
-   SetEnabled(false);
 }
 
 void Kicker::DrawModule()
