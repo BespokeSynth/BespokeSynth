@@ -506,6 +506,9 @@
         <FILE id="Pmu56z" name="SustainPedal.cpp" compile="1" resource="0"
               file="Source/SustainPedal.cpp"/>
         <FILE id="lUlkIm" name="SustainPedal.h" compile="0" resource="0" file="Source/SustainPedal.h"/>
+        <FILE id="GjQcD6" name="TakeRecorder.cpp" compile="1" resource="0"
+              file="Source/TakeRecorder.cpp"/>
+        <FILE id="NjZv0k" name="TakeRecorder.h" compile="0" resource="0" file="Source/TakeRecorder.h"/>
         <FILE id="JSxBB7" name="TimelineControl.cpp" compile="1" resource="0"
               file="Source/TimelineControl.cpp"/>
         <FILE id="awkUYm" name="TimelineControl.h" compile="0" resource="0"

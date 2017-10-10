@@ -292,6 +292,7 @@
     <ClCompile Include="..\..\Source\Stereofier.cpp"/>
     <ClCompile Include="..\..\Source\StutterControl.cpp"/>
     <ClCompile Include="..\..\Source\SustainPedal.cpp"/>
+    <ClCompile Include="..\..\Source\TakeRecorder.cpp"/>
     <ClCompile Include="..\..\Source\TimelineControl.cpp"/>
     <ClCompile Include="..\..\Source\TimerDisplay.cpp"/>
     <ClCompile Include="..\..\Source\TitleBar.cpp"/>

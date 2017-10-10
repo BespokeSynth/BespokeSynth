@@ -153,6 +153,7 @@
 #include "NoteHumanizer.h"
 #include "VolcaBeatsControl.h"
 #include "RadioSequencer.h"
+#include "TakeRecorder.h"
 
 #define REGISTER(class,name,type) Register(#name, &(class::Create), &(class::CanCreate), type, false, false);
 #define REGISTER_HIDDEN(class,name,type) Register(#name, &(class::Create), &(class::CanCreate), type, true, false);
@@ -274,6 +275,7 @@ ModuleFactory::ModuleFactory()
    REGISTER(NoteHumanizer, notehumanizer, kModuleType_Note);
    REGISTER(VolcaBeatsControl, volcabeatscontrol, kModuleType_Note);
    REGISTER(RadioSequencer, radiosequencer, kModuleType_Other);
+   REGISTER(TakeRecorder, takerecorder, kModuleType_Audio);
 
    REGISTER_EXPERIMENTAL(VSTPlugin, vstplugin, kModuleType_Synth);
    //REGISTER_EXPERIMENTAL(MidiPlayer, midiplayer, kModuleType_Instrument);

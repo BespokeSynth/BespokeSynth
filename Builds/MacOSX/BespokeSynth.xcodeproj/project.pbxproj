@@ -270,6 +270,7 @@
 		F5B23B069ACE8765ADD0F0C5 /* OneShotLauncher.cpp in Sources */ = {isa = PBXBuildFile; fileRef = B1501272F97776BE7FEAF153 /* OneShotLauncher.cpp */; };
 		F6A5AC6D148EAB101D7B6EC5 /* ButterworthFilterEffect.cpp in Sources */ = {isa = PBXBuildFile; fileRef = FE7085EB2E63BFFD08EAFC8A /* ButterworthFilterEffect.cpp */; };
 		F6E15B2070FAE812F0FC82F5 /* MidiController.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 7E67363AA76E3F2B609DC715 /* MidiController.cpp */; };
+		F739A6C6E3A1F21ADDE48EE4 /* TakeRecorder.cpp in Sources */ = {isa = PBXBuildFile; fileRef = E16CDA8C7C3C1F49D2126873 /* TakeRecorder.cpp */; };
 		F87CE5D5541FFA7BA04AAA0A /* TimerDisplay.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 8EC2203A3CF045A25C6B4213 /* TimerDisplay.cpp */; };
 		FA79DC14121FFBD53D0C8321 /* AudioMeter.cpp in Sources */ = {isa = PBXBuildFile; fileRef = BA9A94DC9F72592028EE4C73 /* AudioMeter.cpp */; };
 		FB14CDBF6D2FD1E0FA26ECCB /* NoteHumanizer.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 64465DB75FF61C09C959F0E6 /* NoteHumanizer.cpp */; };
@@ -747,6 +748,7 @@
 		CA80779265AE2170EF844760 /* NoteGate.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; name = NoteGate.cpp; path = ../../Source/NoteGate.cpp; sourceTree = SOURCE_ROOT; };
 		CB58DB3C9824F66A8862EACC /* Prefab.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; name = Prefab.cpp; path = ../../Source/Prefab.cpp; sourceTree = SOURCE_ROOT; };
 		CBBC5E37FB8B65747F55D938 /* AudioRouter.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; name = AudioRouter.h; path = ../../Source/AudioRouter.h; sourceTree = SOURCE_ROOT; };
+		CC371FE7194E7EBFAC83AD4C /* TakeRecorder.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; name = TakeRecorder.h; path = ../../Source/TakeRecorder.h; sourceTree = SOURCE_ROOT; };
 		CC59398A68B015ACEEC997F6 /* PatchCable.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; name = PatchCable.cpp; path = ../../Source/PatchCable.cpp; sourceTree = SOURCE_ROOT; };
 		CC6BFE629656DE2835D3086C /* Curve.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; name = Curve.h; path = ../../Source/Curve.h; sourceTree = SOURCE_ROOT; };
 		CCF9AF000AB48A11C6E09433 /* PitchBender.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; name = PitchBender.cpp; path = ../../Source/PitchBender.cpp; sourceTree = SOURCE_ROOT; };
@@ -794,6 +796,7 @@
 		E018AAE19795D44DFBA43009 /* InputChannel.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; name = InputChannel.h; path = ../../Source/InputChannel.h; sourceTree = SOURCE_ROOT; };
 		E01B1C2B9F0B7689D50BF9FB /* SampleFinder.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; name = SampleFinder.h; path = ../../Source/SampleFinder.h; sourceTree = SOURCE_ROOT; };
 		E0A1B96FBB8DA0A702A6391A /* VSTPlayhead.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; name = VSTPlayhead.h; path = ../../Source/VSTPlayhead.h; sourceTree = SOURCE_ROOT; };
+		E16CDA8C7C3C1F49D2126873 /* TakeRecorder.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; name = TakeRecorder.cpp; path = ../../Source/TakeRecorder.cpp; sourceTree = SOURCE_ROOT; };
 		E18B722879040E5FCC716AA4 /* RadioButton.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; name = RadioButton.cpp; path = ../../Source/RadioButton.cpp; sourceTree = SOURCE_ROOT; };
 		E2853D6DED5EE5B27144F978 /* CircleSequencer.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; name = CircleSequencer.cpp; path = ../../Source/CircleSequencer.cpp; sourceTree = SOURCE_ROOT; };
 		E36A0DD194F3403E051A7F86 /* JumpBlender.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; name = JumpBlender.cpp; path = ../../Source/JumpBlender.cpp; sourceTree = SOURCE_ROOT; };
@@ -1586,6 +1589,8 @@
 				514FCB3E37D10D29E23CFF09 /* StutterControl.h */,
 				435988B5BA6EB68B265A3B6F /* SustainPedal.cpp */,
 				9D09F3FAE2640774915D2F36 /* SustainPedal.h */,
+				E16CDA8C7C3C1F49D2126873 /* TakeRecorder.cpp */,
+				CC371FE7194E7EBFAC83AD4C /* TakeRecorder.h */,
 				C9F6CB196F991E28A5178FA5 /* TimelineControl.cpp */,
 				B88BC6B417BC9188624439CE /* TimelineControl.h */,
 				8EC2203A3CF045A25C6B4213 /* TimerDisplay.cpp */,
@@ -1894,6 +1899,7 @@
 				0FEECC9B2F319AE4E3DC3D23 /* Stereofier.cpp in Sources */,
 				63CE4C6515D5AE7008573746 /* StutterControl.cpp in Sources */,
 				E446D21175392C600AC87A0D /* SustainPedal.cpp in Sources */,
+				F739A6C6E3A1F21ADDE48EE4 /* TakeRecorder.cpp in Sources */,
 				07CF5DD21DBA3AA61BD8F836 /* TimelineControl.cpp in Sources */,
 				F87CE5D5541FFA7BA04AAA0A /* TimerDisplay.cpp in Sources */,
 				DEB11FA86590FA4CD905059C /* TitleBar.cpp in Sources */,
