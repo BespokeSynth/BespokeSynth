@@ -41,6 +41,9 @@ public:
    
    Grid* GetGrid() const { return mGrid; }
    
+   int RowToPitch(int row);
+   int PitchToRow(int pitch);
+   
    //IDrawableModule
    bool IsResizable() const override { return true; }
    void Resize(float w, float h) override;
@@ -82,7 +85,6 @@ private:
    bool Enabled() const override { return mEnabled; }
    void OnClicked(int x, int y, bool right) override;
    
-   int GetPitch(int tone);
    int ButtonToStep(int button);
    int StepToButton(int step);
    void SyncGridToSeq();

@@ -65,6 +65,27 @@ void NoteSequencerColumn::SyncWithCable()
    }
 }
 
+void NoteSequencerColumn::PlayNote(double time, int pitch, int velocity, int voiceIdx /*= -1*/, ModulationChain* pitchBend /*= NULL*/, ModulationChain* modWheel /*= NULL*/, ModulationChain* pressure /*= NULL*/)
+{
+   if (velocity > 0 && mSequencer && mGrid)
+   {
+      int row = mSequencer->PitchToRow(pitch);
+      if (row != -1)
+      {
+         mRow = row;
+         
+         float val = 1;
+         for (int i=0; i<mGrid->GetRows(); ++i)
+         {
+            if (mGrid->GetVal(mColumn, i) != 0)
+               val = mGrid->GetVal(mColumn, i);
+         }
+         
+         mGrid->SetVal(mColumn, mRow, val);
+      }
+   }
+}
+
 void NoteSequencerColumn::IntSliderUpdated(IntSlider* slider, int oldVal)
 {
    if (slider == mRowSlider)

@@ -187,11 +187,11 @@ void NoteStepSequencer::DrawModule()
    mGrid->GetPosition(gridX, gridY);
    for (int i=0;i<mNoteRange;++i)
    {
-      if (GetPitch(i)%TheScale->GetTet() == TheScale->ScaleRoot()%TheScale->GetTet())
+      if (RowToPitch(i)%TheScale->GetTet() == TheScale->ScaleRoot()%TheScale->GetTet())
          ofSetColor(0,255,0,80);
-      else if (GetPitch(i)%TheScale->GetTet() == (TheScale->ScaleRoot()+7)%TheScale->GetTet())
+      else if (RowToPitch(i)%TheScale->GetTet() == (TheScale->ScaleRoot()+7)%TheScale->GetTet())
          ofSetColor(200,150,0,80);
-      else if (mNoteMode == kNoteMode_Chromatic && TheScale->IsInScale(GetPitch(i)))
+      else if (mNoteMode == kNoteMode_Chromatic && TheScale->IsInScale(RowToPitch(i)))
          ofSetColor(100,75,0,80);
       else
          continue;
@@ -281,19 +281,19 @@ void NoteStepSequencer::GridUpdated(Grid* grid, int col, int row, float value, f
    }
 }
 
-int NoteStepSequencer::GetPitch(int tone)
+int NoteStepSequencer::RowToPitch(int row)
 {
    int numPitchesInScale = TheScale->NumPitchesInScale();
    switch (mNoteMode)
    {
       case kNoteMode_Scale:
-         return TheScale->GetPitchFromTone(tone+mOctave*numPitchesInScale+TheScale->GetScaleDegree());
+         return TheScale->GetPitchFromTone(row+mOctave*numPitchesInScale+TheScale->GetScaleDegree());
       case kNoteMode_Chromatic:
-         return tone + mOctave * TheScale->GetTet() + TheScale->ScaleRoot();
+         return row + mOctave * TheScale->GetTet() + TheScale->ScaleRoot();
       case kNoteMode_Fifths:
       {
-         int oct = (tone/2)*numPitchesInScale;
-         bool isFifth = tone%2 == 1;
+         int oct = (row/2)*numPitchesInScale;
+         bool isFifth = row%2 == 1;
          int fifths = oct;
          if (isFifth)
             fifths += 4;
@@ -301,7 +301,17 @@ int NoteStepSequencer::GetPitch(int tone)
 
       }
    }
-   return tone;
+   return row;
+}
+
+int NoteStepSequencer::PitchToRow(int pitch)
+{
+   for (int i=0; i<mGrid->GetRows(); ++i)
+   {
+      if (pitch == RowToPitch(i))
+         return i;
+   }
+   return -1;
 }
 
 void NoteStepSequencer::OnTransportAdvanced(float amount)
@@ -403,7 +413,7 @@ void NoteStepSequencer::OnTimeEvent(int samplesTo)
    }
    else
    {
-      int outPitch = GetPitch(current);
+      int outPitch =RowToPitch(current);
       
       if (mLastPitch == outPitch && mVels[mArpIndex] > 1 && mVels[mArpIndex] <= mLastVel && !mAlreadyDidNoteOff)
       {

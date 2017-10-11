@@ -263,7 +263,7 @@ ModuleFactory::ModuleFactory()
    REGISTER(CurveLooper, curvelooper, kModuleType_Other);
    REGISTER(GridToDrums, gridtodrums, kModuleType_Instrument);
    REGISTER(ScaleDegree, scaledegree, kModuleType_Note);
-   REGISTER(NoteSequencerColumn, notesequencercolumn, kModuleType_Other);
+   REGISTER(NoteSequencerColumn, notesequencercolumn, kModuleType_Note);
    REGISTER(NoteChainNode, notechain, kModuleType_Instrument);
    REGISTER(NoteDelayer, notedelayer, kModuleType_Note);
    REGISTER(TimelineControl, timelinecontrol, kModuleType_Other);

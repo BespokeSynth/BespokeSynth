@@ -11,12 +11,13 @@
 
 #include "IDrawableModule.h"
 #include "Slider.h"
+#include "INoteReceiver.h"
 
 class PatchCableSource;
 class Grid;
 class NoteStepSequencer;
 
-class NoteSequencerColumn : public IDrawableModule, public IIntSliderListener
+class NoteSequencerColumn : public IDrawableModule, public IIntSliderListener, public INoteReceiver
 {
 public:
    NoteSequencerColumn();
@@ -25,6 +26,10 @@ public:
    
    string GetTitleLabel() override { return "grid column"; }
    void CreateUIControls() override;
+   
+   //INoteReceiver
+   void PlayNote(double time, int pitch, int velocity, int voiceIdx = -1, ModulationChain* pitchBend = NULL, ModulationChain* modWheel = NULL, ModulationChain* pressure = NULL) override;
+   void SendCC(int control, int value, int voiceIdx = -1) override {}
    
    void IntSliderUpdated(IntSlider* slider, int oldVal) override;
    
