@@ -24,6 +24,18 @@ ChannelBuffer::ChannelBuffer(int bufferSize)
    Clear();
 }
 
+ChannelBuffer::ChannelBuffer(float* data, int bufferSize)
+{
+   //intended as a temporary holder for passing raw data to methods that want a ChannelBuffer
+   
+   mActiveChannels = 1;
+   mNumChannels = 1;
+   
+   mBuffers = new float*[1];
+   mBuffers[0] = data;
+   mBufferSize = bufferSize;
+}
+
 ChannelBuffer::~ChannelBuffer()
 {
    for (int i=0; i<mNumChannels; ++i)
@@ -71,4 +83,23 @@ void ChannelBuffer::SetMaxAllowedChannels(int channels)
    mNumChannels = channels;
    if (mActiveChannels > channels)
       mActiveChannels = channels;
+}
+
+void ChannelBuffer::CopyFrom(ChannelBuffer* src)
+{
+   assert(mBufferSize == src->mBufferSize);
+   for (int i=0; i<mActiveChannels; ++i)
+   {
+      if (src->mBuffers[i])
+      {
+         if (mBuffers[i] == nullptr)
+            mBuffers[i] = new float[mBufferSize];
+         memcpy(mBuffers[i], src->mBuffers[i], mBufferSize*sizeof(float));
+      }
+      else
+      {
+         delete mBuffers[i];
+         mBuffers[i] = nullptr;
+      }
+   }
 }

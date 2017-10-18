@@ -28,9 +28,6 @@ public:
    
    void PostRepatch(PatchCableSource* cable) override;
    
-   //IAudioReceiver
-   InputMode GetInputMode() override { return kInputMode_Mono; }
-   
    //IAudioSource
    void Process(double time) override;
    void SetEnabled(bool enabled) override { mEnabled = enabled; }

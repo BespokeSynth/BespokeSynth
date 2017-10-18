@@ -27,7 +27,7 @@ public:
    void CreateUIControls() override;
    
    //IAudioEffect
-   void ProcessAudio(double time, float* audio, int bufferSize) override;
+   void ProcessAudio(double time, ChannelBuffer* buffer) override;
    void SetEnabled(bool enabled) override { mEnabled = enabled; }
    float GetEffectAmount() override;
    string GetType() override { return "freeverb"; }

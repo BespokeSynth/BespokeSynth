@@ -133,8 +133,9 @@ void Producer::Process(double time)
          mPlayhead = mClipStart;
    }
    
+   ChannelBuffer buff(out,bufferSize);
    for (int i=0; i<PRODUCER_NUM_BIQUADS; ++i)
-      mBiquad[i].ProcessAudio(gTime,out,bufferSize);
+      mBiquad[i].ProcessAudio(gTime, &buff);
    
    GetVizBuffer()->WriteChunk(out,bufferSize);
 }
@@ -208,8 +209,9 @@ void Producer::DoWrite()
 {
    if (mSample)
    {
+      ChannelBuffer sample(mSample->Data(),mSample->LengthInSamples());
       for (int i=0; i<PRODUCER_NUM_BIQUADS; ++i)
-         mBiquad[i].ProcessAudio(gTime,mSample->Data(),mSample->LengthInSamples());
+         mBiquad[i].ProcessAudio(gTime,&sample);
       
       float* toWrite = new float[mSample->LengthInSamples()];
       int pos = 0;

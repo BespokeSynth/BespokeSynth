@@ -105,8 +105,9 @@ void FilterViz::GraphFilter()
 {
    Clear(mImpulseBuffer, FILTER_VIZ_BINS);
    mImpulseBuffer[0] = 1;
+   ChannelBuffer temp(mImpulseBuffer,FILTER_VIZ_BINS);
    for (int i=0; i<mFilters.size(); ++i)
-      mFilters[i]->ProcessAudio(gTime, mImpulseBuffer, FILTER_VIZ_BINS);
+      mFilters[i]->ProcessAudio(gTime, &temp);
    ::FFT fft(FILTER_VIZ_BINS);
    fft.Forward(mImpulseBuffer, mFFTOutReal, mFFTOutImag);
    

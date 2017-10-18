@@ -22,6 +22,7 @@ KarplusStrong::KarplusStrong()
 , mStretchCheckbox(NULL)
 , mCarrierSlider(NULL)
 , mPolyMgr(this)
+, mWriteBuffer(gBufferSize)
 {
    mVoiceParams.mFilter = .6f;
    mVoiceParams.mVol = 1.0f;
@@ -33,8 +34,6 @@ KarplusStrong::KarplusStrong()
    mVoiceParams.mExcitation = 0;
 
    mPolyMgr.Init(kVoiceType_Karplus, &mVoiceParams);
-
-   mWriteBuffer = new float[gBufferSize];
 
    AddChild(&mBiquad);
    mBiquad.SetPosition(150,15);
@@ -65,7 +64,6 @@ void KarplusStrong::CreateUIControls()
 
 KarplusStrong::~KarplusStrong()
 {
-   delete[] mWriteBuffer;
 }
 
 void KarplusStrong::Process(double time)
@@ -81,14 +79,14 @@ void KarplusStrong::Process(double time)
    float* out = GetTarget()->GetBuffer()->GetChannel(0);
    assert(bufferSize == gBufferSize);
 
-   Clear(mWriteBuffer, gBufferSize);
-   mPolyMgr.Process(time, mWriteBuffer, bufferSize);
+   mWriteBuffer.Clear();
+   mPolyMgr.Process(time, mWriteBuffer.GetChannel(0), bufferSize);
 
-   mBiquad.ProcessAudio(time, mWriteBuffer, bufferSize);
+   mBiquad.ProcessAudio(time, &mWriteBuffer);
 
-   GetVizBuffer()->WriteChunk(mWriteBuffer, bufferSize);
+   GetVizBuffer()->WriteChunk(mWriteBuffer.GetChannel(0), bufferSize);
 
-   Add(out, mWriteBuffer, gBufferSize);
+   Add(out, mWriteBuffer.GetChannel(0), gBufferSize);
 }
 
 void KarplusStrong::PlayNote(double time, int pitch, int velocity, int voiceIdx /*= -1*/, ModulationChain* pitchBend /*= NULL*/, ModulationChain* modWheel /*= NULL*/, ModulationChain* pressure /*= NULL*/)

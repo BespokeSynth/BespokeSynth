@@ -66,26 +66,29 @@ void FormantFilterEffect::Init()
    IDrawableModule::Init();
 }
 
-void FormantFilterEffect::ProcessAudio(double time, float* audio, int bufferSize)
+void FormantFilterEffect::ProcessAudio(double time, ChannelBuffer* buffer)
 {
    Profiler profiler("FormantFilterEffect");
    
    if (!mEnabled)
       return;
    
+   float bufferSize = buffer->BufferSize();
+   
    ComputeSliders(0);
    
    assert(gBufferSize == bufferSize);
    Clear(mOutputBuffer, bufferSize);
    
-   for (int i=0; i<NUM_FORMANT_BANDS; ++i)
+   //TODO(Ryan)
+   /*for (int i=0; i<NUM_FORMANT_BANDS; ++i)
    {
       memcpy(gWorkBuffer, audio, bufferSize*sizeof(float));
       mBiquads[i].Filter(gWorkBuffer, bufferSize);
       Add(mOutputBuffer, gWorkBuffer, bufferSize);
    }
    
-   memcpy(audio, gWorkBuffer, bufferSize*sizeof(float));
+   memcpy(audio, gWorkBuffer, bufferSize*sizeof(float));*/
 }
 
 void FormantFilterEffect::DrawModule()

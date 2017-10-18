@@ -13,23 +13,29 @@ DCRemoverEffect::DCRemoverEffect()
 {
    SetEnabled(true);
    
-   mBiquad.SetFilterParams(10, 1);
-   mBiquad.SetFilterType(kFilterType_Highpass);
-   mBiquad.UpdateFilterCoeff();
+   for (int i=0; i<ChannelBuffer::kMaxNumChannels; ++i)
+   {
+      mBiquad[i].SetFilterParams(10, 1);
+      mBiquad[i].SetFilterType(kFilterType_Highpass);
+      mBiquad[i].UpdateFilterCoeff();
+   }
 }
 
 DCRemoverEffect::~DCRemoverEffect()
 {
 }
 
-void DCRemoverEffect::ProcessAudio(double time, float* audio, int bufferSize)
+void DCRemoverEffect::ProcessAudio(double time, ChannelBuffer* buffer)
 {
    Profiler profiler("DCRemoverEffect");
    
    if (!mEnabled)
       return;
    
-   mBiquad.Filter(audio, bufferSize);
+   float bufferSize = buffer->BufferSize();
+   
+   for (int ch=0; ch<buffer->NumActiveChannels(); ++ch)
+      mBiquad[ch].Filter(buffer->GetChannel(ch), bufferSize);
 }
 
 void DCRemoverEffect::DrawModule()

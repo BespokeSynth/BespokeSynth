@@ -27,12 +27,14 @@ void NoiseEffect::CreateUIControls()
    mWidthSlider = new IntSlider(this,"width",5,37,110,15,&mWidth,1,100);
 }
 
-void NoiseEffect::ProcessAudio(double time, float* audio, int bufferSize)
+void NoiseEffect::ProcessAudio(double time, ChannelBuffer* buffer)
 {
    Profiler profiler("NoiseEffect");
 
    if (!mEnabled)
       return;
+   
+   float bufferSize = buffer->BufferSize();
 
    ComputeSliders(0);
 
@@ -47,7 +49,9 @@ void NoiseEffect::ProcessAudio(double time, float* audio, int bufferSize)
          mRandom = ofRandom(mAmount) + (1-mAmount);
          mSampleCounter = 0;
       }
-      audio[i] = audio[i] * mRandom;
+      
+      for (int ch=0; ch<buffer->NumActiveChannels(); ++ch)
+         buffer->GetChannel(ch)[i] *= mRandom;
    }
 }
 

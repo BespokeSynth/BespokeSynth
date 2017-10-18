@@ -104,7 +104,7 @@ public:
    void CreateUIControls() override;
 
    //IAudioEffect
-   void ProcessAudio(double time, float* audio, int bufferSize) override;
+   void ProcessAudio(double time, ChannelBuffer* buffer) override;
    void SetEnabled(bool enabled) override { mEnabled = enabled; }
    string GetType() override { return "compressor"; }
 
@@ -131,7 +131,7 @@ private:
    
 
    // runtime variables
-   double envdB_;			// over-threshold envelope (dB)
+   double envdB_[ChannelBuffer::kMaxNumChannels];			// over-threshold envelope (dB)
 
    AttRelEnvelope mEnv;
 };

@@ -16,6 +16,7 @@ public:
    ~CFilterButterworth24db(void);
    void SetSampleRate(float fs);
    void Set(float cutoff, float q);
+   void CopyCoeffFrom(CFilterButterworth24db& other);
    float Run(float input);
    void Clear();
    

@@ -25,7 +25,7 @@ public:
    string GetTitleLabel() override { return "dc remover"; }
    
    //IAudioEffect
-   void ProcessAudio(double time, float* audio, int bufferSize) override;
+   void ProcessAudio(double time, ChannelBuffer* buffer) override;
    void SetEnabled(bool enabled) override { mEnabled = enabled; }
    float GetEffectAmount() override;
    string GetType() override { return "dcremover"; }
@@ -36,7 +36,7 @@ private:
    void DrawModule() override;
    bool Enabled() const override { return mEnabled; }
    
-   BiquadFilter mBiquad;
+   BiquadFilter mBiquad[ChannelBuffer::kMaxNumChannels];
 };
 
 #endif /* defined(__Bespoke__DCRemoverEffect__) */

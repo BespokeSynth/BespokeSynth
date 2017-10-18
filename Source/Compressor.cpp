@@ -34,8 +34,9 @@ Compressor::Compressor()
 , mRatioSlider(NULL)
 , mAttackSlider(NULL)
 , mReleaseSlider(NULL)
-, envdB_(DC_OFFSET)
 {
+   for (int i=0; i<ChannelBuffer::kMaxNumChannels; ++i)
+      envdB_[i] = DC_OFFSET;
 }
 
 void Compressor::CreateUIControls()
@@ -47,58 +48,63 @@ void Compressor::CreateUIControls()
    mReleaseSlider = new FloatSlider(this,"release",5,56,110,15,&mRelease,.1f,500);
 }
 
-void Compressor::ProcessAudio(double time, float* audio, int bufferSize)
+void Compressor::ProcessAudio(double time, ChannelBuffer* buffer)
 {
    Profiler profiler("Compressor");
 
    if (!mEnabled)
       return;
+   
+   float bufferSize = buffer->BufferSize();
 
    ComputeSliders(0);
 
-   for (int i=0; i<bufferSize; ++i)
+   for (int ch=0; ch<buffer->NumActiveChannels(); ++ch)
    {
-      // create sidechain
+      for (int i=0; i<bufferSize; ++i)
+      {
+         // create sidechain
 
-      double rect1 = fabs( audio[i] );	// rectify input
-      double rect2 = fabs( audio[i] );
+         double rect1 = fabs( buffer->GetChannel(ch)[i] );	// rectify input
+         double rect2 = fabs( buffer->GetChannel(ch)[i] );
 
-      /* if desired, one could use another EnvelopeDetector to smooth
-       * the rectified signal.
-       */
+         /* if desired, one could use another EnvelopeDetector to smooth
+          * the rectified signal.
+          */
 
-      double link = std::max( rect1, rect2 );	// link channels with greater
+         double link = std::max( rect1, rect2 );	// link channels with greater
 
-      double keyLinked = link;
+         double keyLinked = link;
 
-      // convert key to dB
-      keyLinked += DC_OFFSET;				// add DC offset to avoid log( 0 )
-      double keydB = lin2dB( keyLinked );	// convert linear -> dB
+         // convert key to dB
+         keyLinked += DC_OFFSET;				// add DC offset to avoid log( 0 )
+         double keydB = lin2dB( keyLinked );	// convert linear -> dB
 
-      // threshold
-      double overdB = keydB - mThreshold;	// delta over threshold
-      if ( overdB < 0.0 )
-         overdB = 0.0;
+         // threshold
+         double overdB = keydB - mThreshold;	// delta over threshold
+         if ( overdB < 0.0 )
+            overdB = 0.0;
 
-      // attack/release
+         // attack/release
 
-      overdB += DC_OFFSET;					// add DC offset to avoid denormal
-      mEnv.run( overdB, envdB_ );	// run attack/release envelope
-      overdB = envdB_ - DC_OFFSET;			// subtract DC offset
+         overdB += DC_OFFSET;					// add DC offset to avoid denormal
+         mEnv.run( overdB, envdB_[ch] );	// run attack/release envelope
+         overdB = envdB_[ch] - DC_OFFSET;			// subtract DC offset
 
-      /* REGARDING THE DC OFFSET: In this case, since the offset is added before
-       * the attack/release processes, the envelope will never fall below the offset,
-       * thereby avoiding denormals. However, to prevent the offset from causing
-       * constant gain reduction, we must subtract it from the envelope, yielding
-       * a minimum value of 0dB.
-       */
+         /* REGARDING THE DC OFFSET: In this case, since the offset is added before
+          * the attack/release processes, the envelope will never fall below the offset,
+          * thereby avoiding denormals. However, to prevent the offset from causing
+          * constant gain reduction, we must subtract it from the envelope, yielding
+          * a minimum value of 0dB.
+          */
 
-      // transfer function
-      double gr = overdB * ( mRatio - 1.0 );	// gain reduction (dB)
-      gr = dB2lin( gr );						// convert dB -> linear
+         // transfer function
+         double gr = overdB * ( mRatio - 1.0 );	// gain reduction (dB)
+         gr = dB2lin( gr );						// convert dB -> linear
 
-      // output gain
-      audio[i] *= gr;	// apply gain reduction to input
+         // output gain
+         buffer->GetChannel(ch)[i] *= gr;	// apply gain reduction to input
+      }
    }
 }
 

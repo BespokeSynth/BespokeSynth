@@ -25,7 +25,7 @@ public:
    void CreateUIControls() override;
    
    //IAudioEffect
-   void ProcessAudio(double time, float* audio, int bufferSize) override;
+   void ProcessAudio(double time, ChannelBuffer* buffer) override;
    void SetEnabled(bool enabled) override { mEnabled = enabled; }
    float GetEffectAmount() override;
    string GetType() override { return "bitcrush"; }
@@ -41,8 +41,8 @@ private:
    
    float mCrush;
    float mDownsample;
-   int mSampleCounter;
-   float mHeldDownsample;
+   int mSampleCounter[ChannelBuffer::kMaxNumChannels];
+   float mHeldDownsample[ChannelBuffer::kMaxNumChannels];
    FloatSlider* mCrushSlider;
    FloatSlider* mDownsampleSlider;
 };

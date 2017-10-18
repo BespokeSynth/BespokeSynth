@@ -19,6 +19,7 @@ class PitchShiftEffect : public IAudioEffect, public IIntSliderListener, public 
 {
 public:
    PitchShiftEffect();
+   ~PitchShiftEffect();
    
    static IAudioEffect* Create() { return new PitchShiftEffect(); }
    
@@ -26,7 +27,7 @@ public:
    void CreateUIControls() override;
    
    //IAudioEffect
-   void ProcessAudio(double time, float* audio, int bufferSize) override;
+   void ProcessAudio(double time, ChannelBuffer* buffer) override;
    void SetEnabled(bool enabled) override { mEnabled = enabled; }
    float GetEffectAmount() override;
    string GetType() override { return "pitchshift"; }
@@ -44,7 +45,7 @@ private:
    FloatSlider* mRatioSlider;
    int mRatioSelection;
    RadioButton* mRatioSelector;
-   PitchShifter mPitchShifter;
+   PitchShifter* mPitchShifter[ChannelBuffer::kMaxNumChannels];
 };
 
 

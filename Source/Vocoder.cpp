@@ -110,7 +110,7 @@ void Vocoder::Process(double time)
    if (fricative)
       mFricDetected = true;  //draw that we detected a fricative
 
-   mGate.ProcessAudio(time, GetBuffer()->GetChannel(0), bufferSize);
+   mGate.ProcessAudio(time, GetBuffer());
 
    mRollingInputBuffer.WriteChunk(GetBuffer()->GetChannel(0), bufferSize);
    

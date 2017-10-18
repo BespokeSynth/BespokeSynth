@@ -69,9 +69,12 @@ LiveGranulator::~LiveGranulator()
    TheTransport->RemoveListener(this);
 }
 
-void LiveGranulator::ProcessAudio(double time, float *audio, int bufferSize)
+void LiveGranulator::ProcessAudio(double time, ChannelBuffer* buffer)
 {
    Profiler profiler("LiveGranulator");
+   
+   float bufferSize = buffer->BufferSize();
+   int ch = 0; //TODO(Ryan) stereo granulator
 
    for (int i=0; i<bufferSize; ++i)
    {
@@ -80,26 +83,26 @@ void LiveGranulator::ProcessAudio(double time, float *audio, int bufferSize)
       mGranulator.SetLiveMode(!mFreeze);
       if (!mFreeze)
       {
-         mBuffer.Write(audio[i]);
+         mBuffer.Write(buffer->GetChannel(ch)[i]);
       }
       else if (mFreezeExtraSamples < FREEZE_EXTRA_SAMPLES_COUNT)
       {
          ++mFreezeExtraSamples;
-         mBuffer.Write(audio[i]);
+         mBuffer.Write(buffer->GetChannel(ch)[i]);
       }
       
       if (mEnabled)
       {
-         float sample = mGranulator.Process(time, mBuffer.GetRawBuffer(), mBufferLength, mBuffer.GetRawBufferOffset()-mFreezeExtraSamples-1+mPos);
+         float sample = mGranulator.Process(time, mBuffer.GetRawBuffer(ch), mBufferLength, mBuffer.GetRawBufferOffset()-mFreezeExtraSamples-1+mPos);
          sample -= mDCEstimate;
          if (mAdd)
-            audio[i] += sample;
+            buffer->GetChannel(ch)[i] += sample;
          else
-            audio[i] = sample;
+            buffer->GetChannel(ch)[i] = sample;
       }
       
       time += gInvSampleRateMs;
-      mDCEstimate = .999f*mDCEstimate + .001f*audio[i]; //rolling average
+      mDCEstimate = .999f*mDCEstimate + .001f*buffer->GetChannel(ch)[i]; //rolling average
    }
 }
 
@@ -107,8 +110,6 @@ void LiveGranulator::ProcessAudio(double time, float *audio, int bufferSize)
 
 void LiveGranulator::DrawModule()
 {
-   
-   
    if (!mEnabled)
       return;
    

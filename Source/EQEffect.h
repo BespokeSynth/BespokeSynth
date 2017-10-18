@@ -35,7 +35,7 @@ public:
    void Init() override;
    
    //IAudioEffect
-   void ProcessAudio(double time, float* audio, int bufferSize) override;
+   void ProcessAudio(double time, ChannelBuffer* buffer) override;
    void SetEnabled(bool enabled) override { mEnabled = enabled; }
    float GetEffectAmount() override;
    string GetType() override { return "eq"; }
@@ -53,9 +53,12 @@ private:
    void DrawModule() override;
    bool Enabled() const override { return mEnabled; }
 
-   BiquadFilter mBiquad[NUM_EQ_FILTERS];
-   float* mDryBuffer;
-   int mDryBufferSize;
+   struct FilterBank
+   {
+      BiquadFilter mBiquad[NUM_EQ_FILTERS];
+   };
+   
+   FilterBank mBanks[ChannelBuffer::kMaxNumChannels];
    int mNumFilters;
    
    Grid* mMultiSlider;

@@ -29,10 +29,10 @@ public:
    
    void Init() override;
    
-   void SetFilterParams(float f, float q) { mButterworth.Set(f, q); }
+   void SetFilterParams(float f, float q) { mButterworth[0].Set(f, q); }
    
    //IAudioEffect
-   void ProcessAudio(double time, float* audio, int bufferSize) override;
+   void ProcessAudio(double time, ChannelBuffer* buffer) override;
    void SetEnabled(bool enabled) override { mEnabled = enabled; }
    float GetEffectAmount() override;
    string GetType() override { return "butterworth"; }
@@ -58,9 +58,8 @@ private:
    float mQ;
    FloatSlider* mQSlider;
    
-   CFilterButterworth24db mButterworth;
-   float* mDryBuffer;
-   int mDryBufferSize;
+   CFilterButterworth24db mButterworth[ChannelBuffer::kMaxNumChannels];
+   ChannelBuffer mDryBuffer;
    
    bool mCoefficientsHaveChanged;
 };

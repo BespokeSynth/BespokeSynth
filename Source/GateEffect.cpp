@@ -30,12 +30,14 @@ void GateEffect::CreateUIControls()
    mReleaseSlider = new FloatSlider(this,"release",5,34,110,15,&mReleaseTime,.1f,500);
 }
 
-void GateEffect::ProcessAudio(double time, float* audio, int bufferSize)
+void GateEffect::ProcessAudio(double time, ChannelBuffer* buffer)
 {
    Profiler profiler("GateEffect");
 
    if (!mEnabled)
       return;
+   
+   float bufferSize = buffer->BufferSize();
 
    ComputeSliders(0);
 
@@ -43,7 +45,10 @@ void GateEffect::ProcessAudio(double time, float* audio, int bufferSize)
    {
       const float decayTime = .1f;
       float scalar = powf( 0.5f, 1.0f/(decayTime * gSampleRate));
-      float input = fabsf(audio[i]);
+      float input = 0;
+      for (int ch=0; ch<buffer->NumActiveChannels(); ++ch)
+         input += fabsf(buffer->GetChannel(ch)[i]);
+      input /= buffer->NumActiveChannels();
 
       if ( input >= mPeak )
       {
@@ -64,7 +69,8 @@ void GateEffect::ProcessAudio(double time, float* audio, int bufferSize)
       if (sqrtPeak < mThreshold && mEnvelope > 0)
          mEnvelope = MAX(0, mEnvelope-gInvSampleRateMs/mReleaseTime );
 
-      audio[i] = audio[i] * mEnvelope;
+      for (int ch=0; ch<buffer->NumActiveChannels(); ++ch)
+         buffer->GetChannel(ch)[i] *= mEnvelope;
 
       time += gInvSampleRateMs;
    }

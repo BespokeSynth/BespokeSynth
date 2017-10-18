@@ -24,7 +24,7 @@ public:
    void CreateUIControls() override;
 
    //IAudioEffect
-   void ProcessAudio(double time, float* audio, int bufferSize) override;
+   void ProcessAudio(double time, ChannelBuffer* buffer) override;
    void SetEnabled(bool enabled) override { mEnabled = enabled; }
    string GetType() override { return "gate"; }
 

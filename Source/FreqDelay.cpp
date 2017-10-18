@@ -15,9 +15,8 @@ FreqDelay::FreqDelay()
 : IAudioProcessor(gBufferSize)
 , mDryWet(1)
 , mDryWetSlider(NULL)
+, mDryBuffer(gBufferSize)
 {
-   mDryBuffer = new float[GetBuffer()->BufferSize()];
-
    AddChild(&mDelayEffect);
    mDelayEffect.SetPosition(5,30);
    mDelayEffect.SetEnabled(true);
@@ -34,7 +33,6 @@ void FreqDelay::CreateUIControls()
 
 FreqDelay::~FreqDelay()
 {
-   delete[] mDryBuffer;
 }
 
 void FreqDelay::Process(double time)
@@ -45,19 +43,21 @@ void FreqDelay::Process(double time)
       return;
    
    SyncBuffers();
+   mDryBuffer.SetNumActiveChannels(GetBuffer()->NumActiveChannels());
 
    int bufferSize = GetBuffer()->BufferSize();
 
-   memcpy(mDryBuffer, GetBuffer()->GetChannel(0), sizeof(float)*bufferSize);
-   mDelayEffect.ProcessAudio(time, GetBuffer()->GetChannel(0), bufferSize);
+   mDryBuffer.CopyFrom(GetBuffer());
+   mDelayEffect.ProcessAudio(time, GetBuffer());
    
-   Mult(mDryBuffer, (1-mDryWet), bufferSize);
-   Mult(GetBuffer()->GetChannel(0), mDryWet, bufferSize);
-   Add(GetBuffer()->GetChannel(0), mDryBuffer, bufferSize);
-
-   Add(GetTarget()->GetBuffer()->GetChannel(0), GetBuffer()->GetChannel(0), bufferSize);
-
-   GetVizBuffer()->WriteChunk(GetBuffer()->GetChannel(0),bufferSize);
+   for (int ch=0; ch<GetBuffer()->NumActiveChannels(); ++ch)
+   {
+      Mult(mDryBuffer.GetChannel(ch), (1-mDryWet), bufferSize);
+      Mult(GetBuffer()->GetChannel(ch), mDryWet, bufferSize);
+      Add(GetBuffer()->GetChannel(ch), mDryBuffer.GetChannel(ch), bufferSize);
+      Add(GetTarget()->GetBuffer()->GetChannel(ch), GetBuffer()->GetChannel(ch), bufferSize);
+      GetVizBuffer()->WriteChunk(GetBuffer()->GetChannel(ch),bufferSize, ch);
+   }
 
    GetBuffer()->Clear();
 }

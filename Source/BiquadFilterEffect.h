@@ -31,11 +31,11 @@ public:
    
    void Init() override;
    
-   void SetFilterType(FilterType type) { mBiquad.SetFilterType(type); }
-   void SetFilterParams(float f, float q) { mBiquad.SetFilterParams(f, q); }
+   void SetFilterType(FilterType type) { mBiquad[0].SetFilterType(type); }
+   void SetFilterParams(float f, float q) { mBiquad[0].SetFilterParams(f, q); }
    
    //IAudioEffect
-   void ProcessAudio(double time, float* audio, int bufferSize) override;
+   void ProcessAudio(double time, ChannelBuffer* buffer) override;
    void SetEnabled(bool enabled) override { mEnabled = enabled; }
    float GetEffectAmount() override;
    string GetType() override { return "biquad"; }
@@ -66,9 +66,8 @@ private:
    FloatSlider* mGSlider;
    bool mMouseControl;
    
-   BiquadFilter mBiquad;
-   float* mDryBuffer;
-   int mDryBufferSize;
+   BiquadFilter mBiquad[ChannelBuffer::kMaxNumChannels];
+   ChannelBuffer mDryBuffer;
    
    bool mCoefficientsHaveChanged;
 };

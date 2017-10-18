@@ -51,26 +51,30 @@ void FeedbackModule::Process(double time)
    SyncBuffers();
    
    int bufferSize = GetBuffer()->BufferSize();
-   if (GetTarget())
-      Add(GetTarget()->GetBuffer()->GetChannel(0), GetBuffer()->GetChannel(0), bufferSize);
    
-   GetVizBuffer()->WriteChunk(GetBuffer()->GetChannel(0),bufferSize);
+   for (int ch=0; ch<GetBuffer()->NumActiveChannels(); ++ch)
+   {
+      if (GetTarget())
+         Add(GetTarget()->GetBuffer()->GetChannel(ch), GetBuffer()->GetChannel(ch), bufferSize);
+   
+      GetVizBuffer()->WriteChunk(GetBuffer()->GetChannel(ch),bufferSize,ch);
+   }
    
    if (mFeedbackTarget)
    {
-      float* out = mFeedbackTarget->GetBuffer()->GetChannel(0);
-      assert(bufferSize == gBufferSize);
+      mDelay.ProcessAudio(gTime, GetBuffer());
       
-      mDelay.ProcessAudio(gTime, GetBuffer()->GetChannel(0), bufferSize);
-      
-      if (mDelay.Enabled())
+      for (int ch=0; ch<GetBuffer()->NumActiveChannels(); ++ch)
       {
-         Add(out, GetBuffer()->GetChannel(0), bufferSize);
-         mFeedbackVizBuffer.WriteChunk(GetBuffer()->GetChannel(0), bufferSize);
-      }
-      else
-      {
-         mFeedbackVizBuffer.WriteChunk(gZeroBuffer, gBufferSize);
+         if (mDelay.Enabled())
+         {
+            Add(mFeedbackTarget->GetBuffer()->GetChannel(ch), GetBuffer()->GetChannel(ch), bufferSize);
+            mFeedbackVizBuffer.WriteChunk(GetBuffer()->GetChannel(ch), bufferSize, ch);
+         }
+         else
+         {
+            mFeedbackVizBuffer.WriteChunk(gZeroBuffer, gBufferSize, ch);
+         }
       }
    }
    

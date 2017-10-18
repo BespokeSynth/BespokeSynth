@@ -14,12 +14,16 @@
 BitcrushEffect::BitcrushEffect()
 : mCrush(1)
 , mDownsample(1)
-, mSampleCounter(0)
-, mHeldDownsample(0)
 , mCrushSlider(NULL)
 , mDownsampleSlider(NULL)
 {
    SetEnabled(true);
+   
+   for (int i=0; i<ChannelBuffer::kMaxNumChannels; ++i)
+   {
+      mSampleCounter[i] = 0;
+      mHeldDownsample[i] = 0;
+   }
 }
 
 void BitcrushEffect::CreateUIControls()
@@ -29,30 +33,35 @@ void BitcrushEffect::CreateUIControls()
    mDownsampleSlider = new FloatSlider(this,"downsamp",5,21,85,15,&mDownsample,1,40,0);
 }
 
-void BitcrushEffect::ProcessAudio(double time, float* audio, int bufferSize)
+void BitcrushEffect::ProcessAudio(double time, ChannelBuffer* buffer)
 {
    Profiler profiler("BitcrushEffect");
 
    if (!mEnabled)
       return;
+   
+   float bufferSize = buffer->BufferSize();
 
    ComputeSliders(0);
 
 	float bitDepth = powf(2, 25-mCrush);
 	float invBitDepth = 1.f / bitDepth;
 
-   for (int i=0; i<bufferSize; ++i)
+   for (int ch=0; ch<buffer->NumActiveChannels(); ++ch)
    {
-      if (mSampleCounter < (int)mDownsample - 1)
+      for (int i=0; i<bufferSize; ++i)
       {
-         ++mSampleCounter;
+         if (mSampleCounter[ch] < (int)mDownsample - 1)
+         {
+            ++mSampleCounter[ch];
+         }
+         else
+         {
+            mHeldDownsample[ch] = buffer->GetChannel(ch)[i];
+            mSampleCounter[ch] = 0;
+         }
+         buffer->GetChannel(ch)[i] = ((int)(mHeldDownsample[ch]*bitDepth)) * invBitDepth;
       }
-      else
-      {
-         mHeldDownsample = audio[i];
-         mSampleCounter = 0;
-      }
-      audio[i] = ((int)(mHeldDownsample*bitDepth)) * invBitDepth;
    }
 }
 

@@ -15,6 +15,7 @@ class ChannelBuffer
 {
 public:
    ChannelBuffer(int bufferSize);
+   ChannelBuffer(float* data, int bufferSize);  //intended as a temporary holder for passing raw data to methods that want a ChannelBuffer
    ~ChannelBuffer();
    
    float* GetChannel(int channel);
@@ -26,6 +27,7 @@ public:
    int NumActiveChannels() const { return mActiveChannels; }
    int NumTotalChannels() const { return mNumChannels; }
    int BufferSize() const { return mBufferSize; }
+   void CopyFrom(ChannelBuffer* src);
    
    static const int kMaxNumChannels = 2;
    

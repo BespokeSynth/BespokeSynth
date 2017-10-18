@@ -16,6 +16,7 @@ const double gSwapLength = 150.0;
 
 EffectChain::EffectChain()
 : IAudioProcessor(gBufferSize)
+, mDryBuffer(gBufferSize)
 , mVolume(1)
 , mVolumeSlider(NULL)
 , mNumFXWide(3)
@@ -27,14 +28,12 @@ EffectChain::EffectChain()
 , mShowSpawnList(true)
 , mWantDeleteLastEffect(false)
 {
-   mDryBuffer = new float[GetBuffer()->BufferSize()];
 }
 
 EffectChain::~EffectChain()
 {
    for (int i=0; i<mEffects.size(); ++i)
       delete mEffects[i];
-   delete[] mDryBuffer;
 }
 
 void EffectChain::CreateUIControls()
@@ -104,6 +103,7 @@ void EffectChain::Process(double time)
 
    ComputeSliders(0);
    SyncBuffers();
+   mDryBuffer.SetNumActiveChannels(GetBuffer()->NumActiveChannels());
    
    int bufferSize = GetBuffer()->BufferSize();
    
@@ -111,24 +111,28 @@ void EffectChain::Process(double time)
    
    for (int i=0; i<mEffects.size(); ++i)
    {
-      memcpy(mDryBuffer, GetBuffer()->GetChannel(0), bufferSize*sizeof(float));
+      mDryBuffer.CopyFrom(GetBuffer());
       
-      mEffects[i]->ProcessAudio(time,GetBuffer()->GetChannel(0),bufferSize);
+      mEffects[i]->ProcessAudio(time,GetBuffer());
       
       float dryWet = mDryWetLevels[i];
 
-      Mult(mDryBuffer, (1-dryWet), bufferSize);
-      Mult(GetBuffer()->GetChannel(0), dryWet, bufferSize);
-      Add(GetBuffer()->GetChannel(0), mDryBuffer, bufferSize);
+      for (int ch=0; ch<GetBuffer()->NumActiveChannels(); ++ch)
+      {
+         Mult(mDryBuffer.GetChannel(ch), (1-dryWet), bufferSize);
+         Mult(GetBuffer()->GetChannel(ch), dryWet, bufferSize);
+         Add(GetBuffer()->GetChannel(ch), mDryBuffer.GetChannel(ch), bufferSize);
+      }
    }
    
    mEffectMutex.unlock();
    
-   Mult(GetBuffer()->GetChannel(0), mVolume*mVolume, bufferSize);
-
-   Add(GetTarget()->GetBuffer()->GetChannel(0), GetBuffer()->GetChannel(0), bufferSize);
-   
-   GetVizBuffer()->WriteChunk(GetBuffer()->GetChannel(0), bufferSize);
+   for (int ch=0; ch<GetBuffer()->NumActiveChannels(); ++ch)
+   {
+      Mult(GetBuffer()->GetChannel(ch), mVolume*mVolume, bufferSize);
+      Add(GetTarget()->GetBuffer()->GetChannel(ch), GetBuffer()->GetChannel(ch), bufferSize);
+      GetVizBuffer()->WriteChunk(GetBuffer()->GetChannel(ch), bufferSize, ch);
+   }
    
    GetBuffer()->Clear();
 }

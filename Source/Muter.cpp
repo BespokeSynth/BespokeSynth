@@ -30,13 +30,16 @@ Muter::~Muter()
 {
 }
 
-void Muter::ProcessAudio(double time, float *audio, int bufferSize)
+void Muter::ProcessAudio(double time, ChannelBuffer* buffer)
 {
    Profiler profiler("Muter");
 
+   float bufferSize = buffer->BufferSize();
+   
    for (int i=0; i<bufferSize; ++i)
    {
-      audio[i] *= mRamp.Value(time);
+      for (int ch=0; ch<buffer->NumActiveChannels(); ++ch)
+         buffer->GetChannel(ch)[i] *= mRamp.Value(time);
       time += gInvSampleRateMs;
    }
 }

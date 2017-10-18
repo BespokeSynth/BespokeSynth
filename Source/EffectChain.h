@@ -37,9 +37,6 @@ public:
    void AddEffect(string type, bool onTheFly = false);
    void SetWideCount(int count) { mNumFXWide = count; }
    
-   //IAudioReceiver
-   InputMode GetInputMode() override { return kInputMode_Mono; }
-   
    //IAudioSource
    void Process(double time) override;
    
@@ -67,7 +64,7 @@ private:
    void DeleteLastEffect();
    
    vector<IAudioEffect*> mEffects;
-   float* mDryBuffer;
+   ChannelBuffer mDryBuffer;
    vector<ClickButton*> mMoveButtons;
    vector<FloatSlider*> mDryWetSliders;
    float mDryWetLevels[MAX_EFFECTS_IN_CHAIN];  //implicit max of 100 effects

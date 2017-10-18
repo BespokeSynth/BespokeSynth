@@ -54,14 +54,14 @@ void FreeverbEffect::CreateUIControls()
    mWidthSlider = new FloatSlider(this,"width",5,68,85,15,&mVerbWidth,0,1);
 }
 
-void FreeverbEffect::ProcessAudio(double time, float* audio, int bufferSize)
+void FreeverbEffect::ProcessAudio(double time, ChannelBuffer* buffer)
 {
    Profiler profiler("FreeverbEffect");
    
-   assert(bufferSize == gBufferSize);
-   
    if (!mEnabled)
       return;
+   
+   float bufferSize = buffer->BufferSize();
    
    ComputeSliders(0);
    
@@ -71,10 +71,11 @@ void FreeverbEffect::ProcessAudio(double time, float* audio, int bufferSize)
       mNeedUpdate = false;
    }
    
-   mFreeverb.processreplace(audio, audio, mOutputLeftBuffer, mOutputRightBuffer, bufferSize, 1);
-   Add(mOutputLeftBuffer, mOutputRightBuffer, bufferSize);
-   Mult(mOutputLeftBuffer, .5f, bufferSize);
-   memcpy(audio, mOutputLeftBuffer, bufferSize * sizeof(float));
+   int secondChannel = 1;
+   if (buffer->NumActiveChannels() <= 1)
+      secondChannel = 0;
+   
+   mFreeverb.processreplace(buffer->GetChannel(0), buffer->GetChannel(secondChannel), buffer->GetChannel(0), buffer->GetChannel(secondChannel), bufferSize, 1);
 }
 
 void FreeverbEffect::DrawModule()

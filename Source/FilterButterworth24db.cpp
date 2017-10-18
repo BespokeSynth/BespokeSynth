@@ -111,3 +111,12 @@ float CFilterButterworth24db::Run(float input)
    return output;
 }
 
+void CFilterButterworth24db::CopyCoeffFrom(CFilterButterworth24db& other)
+{
+   coef0 = other.coef0;
+   coef1 = other.coef1;
+   coef2 = other.coef2;
+   coef3 = other.coef3;
+   gain = other.gain;
+}
+

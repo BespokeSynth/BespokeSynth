@@ -62,7 +62,7 @@ public:
    void EndStutter(StutterParams stutter);
    
    //IAudioEffect
-   void ProcessAudio(double time, float* audio, int bufferSize) override;
+   void ProcessAudio(double time, ChannelBuffer* buffer) override;
    void SetEnabled(bool enabled) override { mEnabled = enabled; }
    float GetEffectAmount() override;
    string GetType() override { return "stutter"; }
@@ -81,7 +81,7 @@ public:
 private:
    void DoCapture();
    void UpdateEnabled();
-   float GetStutterSampleWithWraparoundBlend(int pos);
+   float GetStutterSampleWithWraparoundBlend(int pos, int ch);
    void DoStutter(StutterParams stutter);
    void StopStutter();
    void SetController(StutterControl* controller);
@@ -93,7 +93,7 @@ private:
    bool Enabled() const override { return mEnabled; }
    
    RollingBuffer mRecordBuffer;
-   float* mStutterBuffer;
+   ChannelBuffer mStutterBuffer;
    
    bool mStuttering;
    int mCaptureLength;
@@ -108,7 +108,7 @@ private:
    StutterParams mCurrentStutter;
    static int sStutterSubdivide;
    IntSlider* mSubdivideSlider;
-   JumpBlender mJumpBlender;
+   JumpBlender mJumpBlender[ChannelBuffer::kMaxNumChannels];
    int mNanopadScene;
    StutterControl* mControl;
    list<StutterParams> mStutterStack;

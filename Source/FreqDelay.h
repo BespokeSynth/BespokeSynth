@@ -26,9 +26,6 @@ public:
    string GetTitleLabel() override { return "freq delay"; }
    void CreateUIControls() override;
 
-   //IAudioReceiver
-   InputMode GetInputMode() override { return kInputMode_Mono; }
-
    //IAudioSource
    void Process(double time) override;
 
@@ -47,7 +44,7 @@ private:
    void GetModuleDimensions(int& x, int& y) override { x = 130; y = 110; }
    bool Enabled() const override { return true; }
 
-   float* mDryBuffer;
+   ChannelBuffer mDryBuffer;
    float mDryWet;
    FloatSlider* mDryWetSlider;
 

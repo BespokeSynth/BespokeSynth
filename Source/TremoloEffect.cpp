@@ -54,12 +54,14 @@ void TremoloEffect::CreateUIControls()
    mOscSelector->AddLabel("tri",kOsc_Tri);
 }
 
-void TremoloEffect::ProcessAudio(double time, float* audio, int bufferSize)
+void TremoloEffect::ProcessAudio(double time, ChannelBuffer* buffer)
 {
    Profiler profiler("TremoloEffect");
 
    if (!mEnabled)
       return;
+   
+   float bufferSize = buffer->BufferSize();
 
    ComputeSliders(0);
 
@@ -75,7 +77,8 @@ void TremoloEffect::ProcessAudio(double time, float* audio, int bufferSize)
             lfoVal += mWindow[j];
          lfoVal /= kAntiPopWindowSize;
          
-         audio[i] = audio[i] * (1 - (mAmount * (1-lfoVal)));
+         for (int ch=0; ch<buffer->NumActiveChannels(); ++ch)
+            buffer->GetChannel(ch)[i] *= (1 - (mAmount * (1-lfoVal)));
       }
    }
 }

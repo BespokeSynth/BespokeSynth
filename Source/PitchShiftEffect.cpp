@@ -14,10 +14,17 @@
 PitchShiftEffect::PitchShiftEffect()
 : mRatio(1)
 , mRatioSlider(NULL)
-, mPitchShifter(1024)
 , mRatioSelector(NULL)
 , mRatioSelection(10)
 {
+   for (int i=0; i<ChannelBuffer::kMaxNumChannels; ++i)
+      mPitchShifter[i] = new PitchShifter(1024);
+}
+
+PitchShiftEffect::~PitchShiftEffect()
+{
+   for (int i=0; i<ChannelBuffer::kMaxNumChannels; ++i)
+      delete mPitchShifter[i];
 }
 
 void PitchShiftEffect::CreateUIControls()
@@ -32,17 +39,22 @@ void PitchShiftEffect::CreateUIControls()
    mRatioSelector->AddLabel("2", 20);
 }
 
-void PitchShiftEffect::ProcessAudio(double time, float* audio, int bufferSize)
+void PitchShiftEffect::ProcessAudio(double time, ChannelBuffer* buffer)
 {
    Profiler profiler("PitchShiftEffect");
    
    if (!mEnabled)
       return;
    
+   float bufferSize = buffer->BufferSize();
+   
    ComputeSliders(0);
    
-   mPitchShifter.SetRatio(mRatio);
-   mPitchShifter.Process(audio, bufferSize);
+   for (int ch=0; ch<buffer->NumActiveChannels(); ++ch)
+   {
+      mPitchShifter[ch]->SetRatio(mRatio);
+      mPitchShifter[ch]->Process(buffer->GetChannel(ch), bufferSize);
+   }
 }
 
 void PitchShiftEffect::DrawModule()

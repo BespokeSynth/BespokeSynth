@@ -18,20 +18,18 @@ BiquadFilterEffect::BiquadFilterEffect()
 , mGSlider(NULL)
 , mMouseControl(false)
 , mCoefficientsHaveChanged(true)
+, mDryBuffer(gBufferSize)
 {
    SetEnabled(true);
-   
-   mDryBufferSize = gBufferSize;
-   mDryBuffer = new float[mDryBufferSize];
 }
 
 void BiquadFilterEffect::CreateUIControls()
 {
    IDrawableModule::CreateUIControls();
-   mTypeSelector = new RadioButton(this,"type",4,52,(int*)(&mBiquad.mType),kRadioHorizontal);
-   mFSlider = new FloatSlider(this,"F",4,4,80,15,&mBiquad.mF,10,4000);
-   mQSlider = new FloatSlider(this,"Q",4,20,80,15,&mBiquad.mQ,1,10);
-   mGSlider = new FloatSlider(this,"G",4,36,80,15,&mBiquad.mDbGain,-96,96,1);
+   mTypeSelector = new RadioButton(this,"type",4,52,(int*)(&mBiquad[0].mType),kRadioHorizontal);
+   mFSlider = new FloatSlider(this,"F",4,4,80,15,&mBiquad[0].mF,10,4000);
+   mQSlider = new FloatSlider(this,"Q",4,20,80,15,&mBiquad[0].mQ,1,10);
+   mGSlider = new FloatSlider(this,"G",4,36,80,15,&mBiquad[0].mDbGain,-96,96,1);
    
    mTypeSelector->AddLabel("lp", kFilterType_Lowpass);
    mTypeSelector->AddLabel("hp", kFilterType_Highpass);
@@ -40,12 +38,11 @@ void BiquadFilterEffect::CreateUIControls()
    
    mFSlider->SetMaxValueDisplay("inf");
    mFSlider->SetMode(FloatSlider::kSquare);
-   mGSlider->SetShowing(mBiquad.mType == kFilterType_PeakNotch);
+   mGSlider->SetShowing(mBiquad[0].mType == kFilterType_PeakNotch);
 }
 
 BiquadFilterEffect::~BiquadFilterEffect()
 {
-   delete[] mDryBuffer;
 }
 
 void BiquadFilterEffect::Init()
@@ -53,43 +50,45 @@ void BiquadFilterEffect::Init()
    IDrawableModule::Init();
 }
 
-void BiquadFilterEffect::ProcessAudio(double time, float* audio, int bufferSize)
+void BiquadFilterEffect::ProcessAudio(double time, ChannelBuffer* buffer)
 {
    Profiler profiler("BiquadFilterEffect");
 
    if (!mEnabled)
       return;
-
-   if (bufferSize != mDryBufferSize)
-   {
-      delete mDryBuffer;
-      mDryBufferSize = bufferSize;
-      mDryBuffer = new float[mDryBufferSize];
-   }
+   
+   float bufferSize = buffer->BufferSize();
+   mDryBuffer.SetNumActiveChannels(buffer->NumActiveChannels());
    
    const float fadeOutStart = mFSlider->GetMax() * .75f;
    const float fadeOutEnd = mFSlider->GetMax();
-   bool fadeOut = mBiquad.mF > fadeOutStart && mBiquad.mType == kFilterType_Lowpass;
+   bool fadeOut = mBiquad[0].mF > fadeOutStart && mBiquad[0].mType == kFilterType_Lowpass;
    if (fadeOut)
-      memcpy(mDryBuffer, audio, bufferSize*sizeof(float));
+      mDryBuffer.CopyFrom(buffer);
    
    for (int i=0; i<bufferSize; ++i)
    {
       ComputeSliders(i);
       if (mCoefficientsHaveChanged)
       {
-         mBiquad.UpdateFilterCoeff();
+         mBiquad[0].UpdateFilterCoeff();
+         for (int ch=1;ch<buffer->NumActiveChannels(); ++ch)
+            mBiquad[ch].CopyCoeffFrom(mBiquad[0]);
          mCoefficientsHaveChanged = false;
       }
-      audio[i] = mBiquad.Filter(audio[i]);
+      for (int ch=0; ch<buffer->NumActiveChannels(); ++ch)
+         buffer->GetChannel(ch)[i] = mBiquad[ch].Filter(buffer->GetChannel(ch)[i]);
    }
    
    if (fadeOut)
    {
-      float dryness = ofMap(mBiquad.mF,fadeOutStart,fadeOutEnd,0,1);
-      Mult(audio,1-dryness,bufferSize);
-      Mult(mDryBuffer,dryness,bufferSize);
-      Add(audio,mDryBuffer,bufferSize);
+      for (int ch=0; ch<buffer->NumActiveChannels(); ++ch)
+      {
+         float dryness = ofMap(mBiquad[0].mF,fadeOutStart,fadeOutEnd,0,1);
+         Mult(buffer->GetChannel(ch),1-dryness,bufferSize);
+         Mult(mDryBuffer.GetChannel(ch),dryness,bufferSize);
+         Add(buffer->GetChannel(ch),mDryBuffer.GetChannel(ch),bufferSize);
+      }
    }
 }
 
@@ -106,14 +105,14 @@ float BiquadFilterEffect::GetEffectAmount()
 {
    if (!mEnabled)
       return 0;
-   if (mBiquad.mType == kFilterType_Lowpass)
-      return ofClamp(1-(mBiquad.mF/(mFSlider->GetMax() * .75f)),0,1);
-   if (mBiquad.mType == kFilterType_Highpass)
-      return ofClamp(mBiquad.mF/(mFSlider->GetMax() * .75f),0,1);
-   if (mBiquad.mType == kFilterType_Bandpass)
-      return ofClamp(.3f+(mBiquad.mQ/mQSlider->GetMax()),0,1);
-   if (mBiquad.mType == kFilterType_PeakNotch)
-      return ofClamp(fabsf(mBiquad.mDbGain/96),0,1);
+   if (mBiquad[0].mType == kFilterType_Lowpass)
+      return ofClamp(1-(mBiquad[0].mF/(mFSlider->GetMax() * .75f)),0,1);
+   if (mBiquad[0].mType == kFilterType_Highpass)
+      return ofClamp(mBiquad[0].mF/(mFSlider->GetMax() * .75f),0,1);
+   if (mBiquad[0].mType == kFilterType_Bandpass)
+      return ofClamp(.3f+(mBiquad[0].mQ/mQSlider->GetMax()),0,1);
+   if (mBiquad[0].mType == kFilterType_PeakNotch)
+      return ofClamp(fabsf(mBiquad[0].mDbGain/96),0,1);
    return 0;
 }
 
@@ -125,11 +124,13 @@ void BiquadFilterEffect::GetModuleDimensions(int& width, int& height)
 
 void BiquadFilterEffect::ResetFilter()
 {
-   if (mBiquad.mType == kFilterType_Lowpass)
-      mBiquad.SetFilterParams(mFSlider->GetMax(), mQSlider->GetMin());
-   if (mBiquad.mType == kFilterType_Highpass)
-      mBiquad.SetFilterParams(mFSlider->GetMin(), mQSlider->GetMin());
-   mBiquad.Clear();
+   if (mBiquad[0].mType == kFilterType_Lowpass)
+      mBiquad[0].SetFilterParams(mFSlider->GetMax(), mQSlider->GetMin());
+   if (mBiquad[0].mType == kFilterType_Highpass)
+      mBiquad[0].SetFilterParams(mFSlider->GetMin(), mQSlider->GetMin());
+   
+   for (int i=0; i<ChannelBuffer::kMaxNumChannels; ++i)
+      mBiquad[i].Clear();
 }
 
 void BiquadFilterEffect::DropdownUpdated(DropdownList* list, int oldVal)
@@ -140,11 +141,11 @@ void BiquadFilterEffect::RadioButtonUpdated(RadioButton* list, int oldVal)
 {
    if (list == mTypeSelector)
    {
-      if (mBiquad.mType == kFilterType_Lowpass)
-         mBiquad.SetFilterParams(mFSlider->GetMax(), mQSlider->GetMin());
-      if (mBiquad.mType == kFilterType_Highpass)
-         mBiquad.SetFilterParams(mFSlider->GetMin(), mQSlider->GetMin());
-      mGSlider->SetShowing(mBiquad.mType == kFilterType_PeakNotch);
+      if (mBiquad[0].mType == kFilterType_Lowpass)
+         mBiquad[0].SetFilterParams(mFSlider->GetMax(), mQSlider->GetMin());
+      if (mBiquad[0].mType == kFilterType_Highpass)
+         mBiquad[0].SetFilterParams(mFSlider->GetMin(), mQSlider->GetMin());
+      mGSlider->SetShowing(mBiquad[0].mType == kFilterType_PeakNotch);
    }
 }
 

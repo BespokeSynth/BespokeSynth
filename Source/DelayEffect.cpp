@@ -15,7 +15,7 @@ DelayEffect::DelayEffect()
 : mDelay(500)
 , mFeedback(0)
 , mEcho(true)
-, mBuffer(DELAY_BUFFER_SIZE)
+, mDelayBuffer(DELAY_BUFFER_SIZE)
 , mDelaySlider(NULL)
 , mFeedbackSlider(NULL)
 , mEchoCheckbox(NULL)
@@ -52,12 +52,15 @@ void DelayEffect::CreateUIControls()
    mIntervalSelector->AddLabel("32n", kInterval_32n);
 }
 
-void DelayEffect::ProcessAudio(double time, float* audio, int bufferSize)
+void DelayEffect::ProcessAudio(double time, ChannelBuffer* buffer)
 {
    Profiler profiler("DelayEffect");
 
    if (!mEnabled)
       return;
+   
+   float bufferSize = buffer->BufferSize();
+   mDelayBuffer.SetNumChannels(buffer->NumActiveChannels());
 
    if (mInterval != kInterval_None)
    {
@@ -80,29 +83,32 @@ void DelayEffect::ProcessAudio(double time, float* audio, int bufferSize)
       int sampsAgoA = int(delaySamps);
       int sampsAgoB = sampsAgoA+1;
 
-      float sample = mBuffer.GetSample(sampsAgoA);
-      float nextSample = mBuffer.GetSample(sampsAgoB);
-      float a = delaySamps - sampsAgoA;
-      float delayedSample = (1-a)*sample + a*nextSample; //interpolate
-      
-      float in = audio[i];
+      for (int ch=0; ch<buffer->NumActiveChannels(); ++ch)
+      {
+         float sample = mDelayBuffer.GetSample(sampsAgoA, ch);
+         float nextSample = mDelayBuffer.GetSample(sampsAgoB, ch);
+         float a = delaySamps - sampsAgoA;
+         float delayedSample = (1-a)*sample + a*nextSample; //interpolate
+         
+         float in = buffer->GetChannel(ch)[i];
 
-      if (!mEcho && mAcceptInput) //single delay, no continuous feedback so do it pre
-         mBuffer.Write(audio[i]);
+         if (!mEcho && mAcceptInput) //single delay, no continuous feedback so do it pre
+            mDelayBuffer.Write(buffer->GetChannel(ch)[i], ch);
 
-      float delayInput = delayedSample * mAmountRamp.Value(time);
-      FIX_DENORMAL(delayInput);
-      if (delayInput == delayInput) //filter NaNs
-         audio[i] += delayInput;
+         float delayInput = delayedSample * mAmountRamp.Value(time);
+         FIX_DENORMAL(delayInput);
+         if (delayInput == delayInput) //filter NaNs
+            buffer->GetChannel(ch)[i] += delayInput;
 
-      if (mEcho && mAcceptInput) //continuous feedback so do it post
-         mBuffer.Write(audio[i]);
-      
-      if (!mAcceptInput)
-         mBuffer.Write(delayInput);
-      
-      if (!mDry)
-         audio[i] -= in;
+         if (mEcho && mAcceptInput) //continuous feedback so do it post
+            mDelayBuffer.Write(buffer->GetChannel(ch)[i], ch);
+         
+         if (!mAcceptInput)
+            mDelayBuffer.Write(delayInput, ch);
+         
+         if (!mDry)
+            buffer->GetChannel(ch)[i] -= in;
+      }
 
       time += gInvSampleRateMs;
    }
@@ -180,7 +186,7 @@ void DelayEffect::SetEnabled(bool enabled)
 {
    mEnabled = enabled;
    if (!enabled)
-      mBuffer.ClearBuffer();
+      mDelayBuffer.ClearBuffer();
 }
 
 void DelayEffect::CheckboxUpdated(Checkbox* checkbox)
@@ -190,7 +196,7 @@ void DelayEffect::CheckboxUpdated(Checkbox* checkbox)
    if (checkbox == mEnabledCheckbox)
    {
       if (!mEnabled)
-         mBuffer.ClearBuffer();
+         mDelayBuffer.ClearBuffer();
    }
 }
 
@@ -218,7 +224,7 @@ void DelayEffect::SaveState(FileStreamOut& out)
    
    out << kSaveStateRev;
    
-   mBuffer.SaveState(out);
+   mDelayBuffer.SaveState(out);
 }
 
 void DelayEffect::LoadState(FileStreamIn& in)
@@ -229,6 +235,6 @@ void DelayEffect::LoadState(FileStreamIn& in)
    in >> rev;
    LoadStateValidate(rev == kSaveStateRev);
    
-   mBuffer.LoadState(in);
+   mDelayBuffer.LoadState(in);
 }
 

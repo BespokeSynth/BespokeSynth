@@ -18,13 +18,13 @@ EQEffect::EQEffect()
 {
    SetEnabled(true);
    
-   mDryBufferSize = gBufferSize;
-   mDryBuffer = new float[mDryBufferSize];
-   
-   for (int i=0; i<NUM_EQ_FILTERS; ++i)
+   for (int ch=0; ch<ChannelBuffer::kMaxNumChannels; ++ch)
    {
-      mBiquad[i].SetFilterType(kFilterType_PeakNotch);
-      mBiquad[i].SetFilterParams(40 * powf(2.2f,i), .1f);
+      for (int i=0; i<NUM_EQ_FILTERS; ++i)
+      {
+         mBanks[ch].mBiquad[i].SetFilterType(kFilterType_PeakNotch);
+         mBanks[ch].mBiquad[i].SetFilterParams(40 * powf(2.2f,i), .1f);
+      }
    }
 }
 
@@ -51,24 +51,22 @@ void EQEffect::Init()
    IDrawableModule::Init();
 }
 
-void EQEffect::ProcessAudio(double time, float* audio, int bufferSize)
+void EQEffect::ProcessAudio(double time, ChannelBuffer* buffer)
 {
    Profiler profiler("EQEffect");
    
    if (!mEnabled)
       return;
    
-   if (bufferSize != mDryBufferSize)
-   {
-      delete mDryBuffer;
-      mDryBufferSize = bufferSize;
-      mDryBuffer = new float[mDryBufferSize];
-   }
+   float bufferSize = buffer->BufferSize();
    
    ComputeSliders(0);
    
-   for (int i=0; i<mNumFilters; ++i)
-      mBiquad[i].Filter(audio,bufferSize);
+   for (int ch=0; ch<buffer->NumActiveChannels(); ++ch)
+   {
+      for (int i=0; i<mNumFilters; ++i)
+         mBanks[ch].mBiquad[i].Filter(buffer->GetChannel(ch),bufferSize);
+   }
 }
 
 void EQEffect::DrawModule()
@@ -109,8 +107,11 @@ void EQEffect::CheckboxUpdated(Checkbox* checkbox)
 {
    if (checkbox == mEnabledCheckbox)
    {
-      for (int i=0; i<NUM_EQ_FILTERS; ++i)
-         mBiquad[i].Clear();
+      for (int ch=0; ch<ChannelBuffer::kMaxNumChannels; ++ch)
+      {
+         for (int i=0; i<NUM_EQ_FILTERS; ++i)
+            mBanks[ch].mBiquad[i].Clear();
+      }
    }
 }
 
@@ -122,20 +123,32 @@ void EQEffect::ButtonClicked(ClickButton* button)
 {
    if (button == mEvenButton)
    {
-      for (int i=0; i<NUM_EQ_FILTERS; ++i)
+      for (int ch=0; ch<ChannelBuffer::kMaxNumChannels; ++ch)
       {
-         mMultiSlider->SetVal(i, 0, .5f);
-         mBiquad[i].mDbGain = 0;
-         mBiquad[i].UpdateFilterCoeff();
+         for (int i=0; i<NUM_EQ_FILTERS; ++i)
+         {
+            mMultiSlider->SetVal(i, 0, .5f);
+            mBanks[ch].mBiquad[i].mDbGain = 0;
+            if (ch == 0)
+               mBanks[0].mBiquad[i].UpdateFilterCoeff();
+            else
+               mBanks[ch].mBiquad[i].CopyCoeffFrom(mBanks[0].mBiquad[i]);
+         }
       }
    }
 }
 
 void EQEffect::GridUpdated(Grid* grid, int col, int row, float value, float oldValue)
 {
-   for (int i=0; i<mNumFilters; ++i)
+   for (int ch=0; ch<ChannelBuffer::kMaxNumChannels; ++ch)
    {
-      mBiquad[i].mDbGain = ofMap(mMultiSlider->GetVal(i,0),0,1,-12,12);
-      mBiquad[i].UpdateFilterCoeff();
+      for (int i=0; i<mNumFilters; ++i)
+      {
+         mBanks[ch].mBiquad[i].mDbGain = ofMap(mMultiSlider->GetVal(i,0),0,1,-12,12);
+         if (ch == 0)
+            mBanks[0].mBiquad[i].UpdateFilterCoeff();
+         else
+            mBanks[ch].mBiquad[i].CopyCoeffFrom(mBanks[0].mBiquad[i]);
+      }
    }
 }

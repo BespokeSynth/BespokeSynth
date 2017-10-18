@@ -34,12 +34,12 @@ public:
    void SetDelay(float delay);
    void SetShortMode(bool on);
    void SetFeedback(float feedback) { mFeedback = feedback; }
-   void Clear() { mBuffer.ClearBuffer(); }
+   void Clear() { mDelayBuffer.ClearBuffer(); }
    void SetDry(bool dry) { mDry = dry; }
    void SetFeedbackModuleMode(bool feedbackMode);
    
    //IAudioEffect
-   void ProcessAudio(double time, float* audio, int bufferSize) override;
+   void ProcessAudio(double time, ChannelBuffer* buffer) override;
    void SetEnabled(bool enabled) override;
    float GetEffectAmount() override;
    string GetType() override { return "delay"; }
@@ -61,7 +61,7 @@ private:
    float mDelay;
    float mFeedback;
    bool mEcho;
-   RollingBuffer mBuffer;
+   RollingBuffer mDelayBuffer;
    FloatSlider* mFeedbackSlider;
    FloatSlider* mDelaySlider;
    Checkbox* mEchoCheckbox;

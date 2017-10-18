@@ -67,7 +67,7 @@ private:
    Checkbox* mStretchCheckbox;
    FloatSlider* mCarrierSlider;
 
-   float* mWriteBuffer;
+   ChannelBuffer mWriteBuffer;
 };
 
 

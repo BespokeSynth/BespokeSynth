@@ -21,9 +21,12 @@ DistortionEffect::DistortionEffect()
 {
    SetClip(.5f);
    
-   mDCRemover.SetFilterParams(10, 1);
-   mDCRemover.SetFilterType(kFilterType_Highpass);
-   mDCRemover.UpdateFilterCoeff();
+   for (int i=0; i<ChannelBuffer::kMaxNumChannels; ++i)
+   {
+      mDCRemover[i].SetFilterParams(10, 1);
+      mDCRemover[i].SetFilterType(kFilterType_Highpass);
+      mDCRemover[i].UpdateFilterCoeff();
+   }
 }
 
 void DistortionEffect::CreateUIControls()
@@ -41,82 +44,87 @@ void DistortionEffect::CreateUIControls()
    mTypeDropdown->AddLabel("fold", kFold);
 }
 
-void DistortionEffect::ProcessAudio(double time, float* audio, int bufferSize)
+void DistortionEffect::ProcessAudio(double time, ChannelBuffer* buffer)
 {
    Profiler profiler("DistortionEffect");
 
    if (!mEnabled)
       return;
+   
+   float bufferSize = buffer->BufferSize();
 
    ComputeSliders(0);
    
-   mDCRemover.Filter(audio, bufferSize);
-   
-   if (mType == kDirty)
+   for (int ch=0; ch<buffer->NumActiveChannels(); ++ch)
    {
-      for (int i=0; i<bufferSize; ++i)
+      mDCRemover[ch].Filter(buffer->GetChannel(ch), bufferSize);
+      
+      if (mType == kDirty)
       {
-         audio[i] = (ofClamp((audio[i]+mDCAdjust) * mPreamp * mGain, -1, 1)) / mGain;
-      }
-   }
-   else if (mType == kClean)
-   {
-      for (int i=0; i<bufferSize; ++i)
-      {
-         audio[i] = tanh((audio[i]+mDCAdjust) * mPreamp * mGain) / mGain;
-      }
-   }
-   else if (mType == kWarm)
-   {
-      for (int i=0; i<bufferSize; ++i)
-      {
-         audio[i] = sin((audio[i]+mDCAdjust) * mPreamp * mGain) / mGain;
-      }
-   }
-   //soft and asymmetric from http://www.music.mcgill.ca/~gary/courses/projects/618_2009/NickDonaldson/#Distortion
-   else if (mType == kSoft)
-   {
-      for (int i=0; i<bufferSize; ++i)
-      {
-         float sample = (audio[i]+mDCAdjust) * mPreamp * mGain;
-         if (sample > 1)
-            sample = .66666f;
-         else if (sample < -1)
-            sample = -.66666f;
-         else
-            sample = sample - (sample*sample*sample)/3.0f;
-         audio[i] = sample / mGain;
-      }
-   }
-   else if (mType == kAsymmetric)
-   {
-      for (int i=0; i<bufferSize; ++i)
-      {
-         float sample = (audio[i]*.5f+mDCAdjust) * mPreamp * mGain;
-         if (sample >= .320018f)
-            sample = .630035f;
-         else if (sample >= -.08905f)
-            sample = -6.153f*sample*sample + 3.9375f*sample;
-         else if (sample >= -1)
-            sample = -.75f*(1-powf(1-(fabsf(sample)-.032847f),12)+.333f*(fabsf(sample)-.032847f))+.01f;
-         else
-            sample = -.9818f;
-         audio[i] = sample / mGain;
-      }
-   }
-   else if (mType == kFold)
-   {
-      for (int i=0; i<bufferSize; ++i)
-      {
-         float sample = (audio[i]*.5f+mDCAdjust) * mPreamp * mGain;
-         while (sample > 1 || sample < -1)
+         for (int i=0; i<bufferSize; ++i)
          {
-            if (sample > 1)
-               sample = 2 - sample;
-            if (sample < -1)
-               sample = -2 - sample;
+            buffer->GetChannel(ch)[i] = (ofClamp((buffer->GetChannel(ch)[i]+mDCAdjust) * mPreamp * mGain, -1, 1)) / mGain;
          }
-         audio[i] = sample / mGain;
+      }
+      else if (mType == kClean)
+      {
+         for (int i=0; i<bufferSize; ++i)
+         {
+            buffer->GetChannel(ch)[i] = tanh((buffer->GetChannel(ch)[i]+mDCAdjust) * mPreamp * mGain) / mGain;
+         }
+      }
+      else if (mType == kWarm)
+      {
+         for (int i=0; i<bufferSize; ++i)
+         {
+            buffer->GetChannel(ch)[i] = sin((buffer->GetChannel(ch)[i]+mDCAdjust) * mPreamp * mGain) / mGain;
+         }
+      }
+      //soft and asymmetric from http://www.music.mcgill.ca/~gary/courses/projects/618_2009/NickDonaldson/#Distortion
+      else if (mType == kSoft)
+      {
+         for (int i=0; i<bufferSize; ++i)
+         {
+            float sample = (buffer->GetChannel(ch)[i]+mDCAdjust) * mPreamp * mGain;
+            if (sample > 1)
+               sample = .66666f;
+            else if (sample < -1)
+               sample = -.66666f;
+            else
+               sample = sample - (sample*sample*sample)/3.0f;
+            buffer->GetChannel(ch)[i] = sample / mGain;
+         }
+      }
+      else if (mType == kAsymmetric)
+      {
+         for (int i=0; i<bufferSize; ++i)
+         {
+            float sample = (buffer->GetChannel(ch)[i]*.5f+mDCAdjust) * mPreamp * mGain;
+            if (sample >= .320018f)
+               sample = .630035f;
+            else if (sample >= -.08905f)
+               sample = -6.153f*sample*sample + 3.9375f*sample;
+            else if (sample >= -1)
+               sample = -.75f*(1-powf(1-(fabsf(sample)-.032847f),12)+.333f*(fabsf(sample)-.032847f))+.01f;
+            else
+               sample = -.9818f;
+            buffer->GetChannel(ch)[i] = sample / mGain;
+         }
+      }
+      else if (mType == kFold)
+      {
+         for (int i=0; i<bufferSize; ++i)
+         {
+            float sample = (buffer->GetChannel(ch)[i]*.5f+mDCAdjust) * mPreamp * mGain;
+            while (sample > 1 || sample < -1)
+            {
+               if (sample > 1)
+                  sample = 2 - sample;
+               if (sample < -1)
+                  sample = -2 - sample;
+            }
+            buffer->GetChannel(ch)[i] = sample / mGain;
+         }
       }
    }
 }

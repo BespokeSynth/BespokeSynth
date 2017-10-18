@@ -115,3 +115,12 @@ void BiquadFilter::Filter(float* buffer, int bufferSize)
    for (int i=0; i<bufferSize; ++i)
       buffer[i] = Filter(buffer[i]);
 }
+
+void BiquadFilter::CopyCoeffFrom(BiquadFilter& other)
+{
+   mFF0 = other.mFF0;
+   mFF1 = other.mFF1;
+   mFF2 = other.mFF2;
+   mFB1 = other.mFB1;
+   mFB2 = other.mFB2;
+}

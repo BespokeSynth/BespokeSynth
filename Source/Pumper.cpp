@@ -44,13 +44,15 @@ Pumper::~Pumper()
 {
 }
 
-void Pumper::ProcessAudio(double time, float* audio, int bufferSize)
+void Pumper::ProcessAudio(double time, ChannelBuffer* buffer)
 {
    Profiler profiler("Pumper");
 
    if (!mEnabled)
       return;
 
+   float bufferSize = buffer->BufferSize();
+   
    ComputeSliders(0);
 
    const float smoothingTimeMs = 35;
@@ -60,7 +62,8 @@ void Pumper::ProcessAudio(double time, float* audio, int bufferSize)
    for (int i=0; i<bufferSize; ++i)
    {
       float value = mLastValue * .99f + mLFO.Value(i) * .01f;
-      audio[i] = audio[i] * (1 - (mAmount * (1-powf(value,mPump))));
+      for (int ch=0; ch<buffer->NumActiveChannels(); ++ch)
+         buffer->GetChannel(ch)[i] *= (1 - (mAmount * (1-powf(value,mPump))));
       mLastValue = value;
    }
 }
