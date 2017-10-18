@@ -117,7 +117,7 @@ void DrumSynth::Process(double time)
    
    Mult(mOutputBuffer, volSq, bufferSize);
    
-   GetVizBuffer()->WriteChunk(mOutputBuffer, bufferSize);
+   GetVizBuffer()->WriteChunk(mOutputBuffer, bufferSize, 0);
    
    Add(out, mOutputBuffer, bufferSize);
 }

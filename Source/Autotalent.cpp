@@ -907,7 +907,7 @@ void Autotalent::Process(double time)
 
    Add(GetTarget()->GetBuffer()->GetChannel(0), mWorkingBuffer, bufferSize);
 
-   GetVizBuffer()->WriteChunk(mWorkingBuffer, bufferSize);
+   GetVizBuffer()->WriteChunk(mWorkingBuffer, bufferSize, 0);
 
    GetBuffer()->Clear();
    

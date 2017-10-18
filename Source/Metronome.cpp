@@ -47,7 +47,7 @@ void Metronome::Process(double time)
    {
       float sample = mOsc.Audio(time, mPhase) * mVolume / 10;
       out[i] += sample;
-      GetVizBuffer()->Write(sample);
+      GetVizBuffer()->Write(sample, 0);
 
       mPhase += mPhaseInc;
       while (mPhase > FTWO_PI) { mPhase -= FTWO_PI; }

@@ -109,7 +109,7 @@ void MultibandCompressor::Process(double time)
       Add(GetTarget()->GetBuffer()->GetChannel(0), mOutBuffer, bufferSize);
    }
    
-   GetVizBuffer()->WriteChunk(GetBuffer()->GetChannel(0),bufferSize);
+   GetVizBuffer()->WriteChunk(GetBuffer()->GetChannel(0),bufferSize, 0);
    
    GetBuffer()->Clear();
 }

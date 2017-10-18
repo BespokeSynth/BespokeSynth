@@ -92,7 +92,7 @@ void FMSynth::Process(double time)
 
    Clear(mWriteBuffer, gBufferSize);
    mPolyMgr.Process(time, mWriteBuffer, bufferSize);
-   GetVizBuffer()->WriteChunk(mWriteBuffer, bufferSize);
+   GetVizBuffer()->WriteChunk(mWriteBuffer, bufferSize, 0);
 
    Add(out, mWriteBuffer, gBufferSize);
 }

@@ -95,10 +95,10 @@ void FFTtoAdditive::Process(double time)
 
    int bufferSize = GetBuffer()->BufferSize();
 
-   mRollingInputBuffer.WriteChunk(GetBuffer()->GetChannel(0), bufferSize);
+   mRollingInputBuffer.WriteChunk(GetBuffer()->GetChannel(0), bufferSize, 0);
 
    //copy rolling input buffer into working buffer and window it
-   mRollingInputBuffer.ReadChunk(mFFTData.mTimeDomain, fftWindowSize);
+   mRollingInputBuffer.ReadChunk(mFFTData.mTimeDomain, fftWindowSize, 0, 0);
    Mult(mFFTData.mTimeDomain, mWindower, fftWindowSize);
    Mult(mFFTData.mTimeDomain, inputPreampSq, fftWindowSize);
 
@@ -130,7 +130,7 @@ void FFTtoAdditive::Process(double time)
          write += sample;
       }
 
-      GetVizBuffer()->Write(write);
+      GetVizBuffer()->Write(write, 0);
 
       out[i] += write;
 

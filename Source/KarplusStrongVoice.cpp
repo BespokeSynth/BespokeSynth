@@ -93,8 +93,8 @@ void KarplusStrongVoice::Process(double time, float* out, int bufferSize)
          int posNext = int(samplesAgo)+1;
          if (pos < mBuffer.Size())
          {
-            float sample = pos < 0 ? 0 : mBuffer.GetSample(pos);
-            float nextSample = posNext >= mBuffer.Size() ? 0 : mBuffer.GetSample(posNext);
+            float sample = pos < 0 ? 0 : mBuffer.GetSample(pos, 0);
+            float nextSample = posNext >= mBuffer.Size() ? 0 : mBuffer.GetSample(posNext, 0);
             float a = samplesAgo - pos;
             feedbackSample = (1-a)*sample + a*nextSample; //interpolate
             AssertIfDenormal(feedbackSample);
@@ -107,7 +107,7 @@ void KarplusStrongVoice::Process(double time, float* out, int bufferSize)
       sample += feedbackSample * sqrtf(mVoiceParams->mFeedback) * mMuteRamp.Value(time);
       FIX_DENORMAL(sample);
 
-      mBuffer.Write(sample);
+      mBuffer.Write(sample, 0);
 
       float output = sample * mVoiceParams->mVol/10.0f * (1 + GetPressure(pos*renderRatio));
       AssertIfDenormal(output);

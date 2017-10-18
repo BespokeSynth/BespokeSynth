@@ -167,7 +167,7 @@ void SignalGenerator::Process(double time)
       
       time += gInvSampleRateMs;
    }
-   GetVizBuffer()->WriteChunk(mWriteBuffer, bufferSize);
+   GetVizBuffer()->WriteChunk(mWriteBuffer, bufferSize, 0);
    
    Add(out, mWriteBuffer, bufferSize);
 }

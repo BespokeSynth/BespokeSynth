@@ -95,7 +95,7 @@ void PatchCable::Render()
             bool allZero = true;
             for (int i=0; i<numSamples; ++i)
             {
-               if (vizBuff->GetSample(i) != 0)
+               if (vizBuff->GetSample(i, 0) != 0)
                {
                   allZero = false;
                   break;

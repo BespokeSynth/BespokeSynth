@@ -191,19 +191,19 @@ void ControllingSong::Process(double time)
             if (mMute)
                sample = 0;
             out[i] += sample;
-            GetVizBuffer()->Write(sample);
+            GetVizBuffer()->Write(sample, 0);
          }
       }
       else
       {
          //mNeedNewSong = true;
-         GetVizBuffer()->WriteChunk(gZeroBuffer, bufferSize);
+         GetVizBuffer()->WriteChunk(gZeroBuffer, bufferSize, 0);
       }
       mLoadSongMutex.unlock();
    }
    else
    {
-      GetVizBuffer()->WriteChunk(gZeroBuffer, bufferSize);
+      GetVizBuffer()->WriteChunk(gZeroBuffer, bufferSize, 0);
    }
 }
 

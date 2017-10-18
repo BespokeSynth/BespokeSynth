@@ -60,7 +60,7 @@ void PitchShifter::Process(float* buffer, int bufferSize)
    
    mLatency = mFFTBins-stepSize;
    
-   mRollingInputBuffer.WriteChunk(buffer, bufferSize);
+   mRollingInputBuffer.WriteChunk(buffer, bufferSize, 0);
    
    //copy rolling input buffer into working buffer and window it
    mRollingInputBuffer.ReadChunk(mFFTData.mTimeDomain, mFFTBins, latency);

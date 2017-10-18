@@ -69,7 +69,7 @@ void WaveformViewer::Process(double time)
       Add(GetTarget()->GetBuffer()->GetChannel(0), GetBuffer()->GetChannel(0), bufferSize);
    }
    
-   GetVizBuffer()->WriteChunk(GetBuffer()->GetChannel(0),bufferSize);
+   GetVizBuffer()->WriteChunk(GetBuffer()->GetChannel(0),bufferSize, 0);
    
    for (int i=0; i<bufferSize; ++i)
       mAudioView[(i+mBufferVizOffset[!mDoubleBufferFlip]) % BUFFER_VIZ_SIZE][!mDoubleBufferFlip] = GetBuffer()->GetChannel(0)[i];

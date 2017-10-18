@@ -137,7 +137,7 @@ void Producer::Process(double time)
    for (int i=0; i<PRODUCER_NUM_BIQUADS; ++i)
       mBiquad[i].ProcessAudio(gTime, &buff);
    
-   GetVizBuffer()->WriteChunk(out,bufferSize);
+   GetVizBuffer()->WriteChunk(out,bufferSize, 0);
 }
 
 void Producer::FilesDropped(vector<string> files, int x, int y)

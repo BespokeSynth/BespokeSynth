@@ -50,14 +50,14 @@ void Splitter::Process(double time)
    {
       ChannelBuffer* out = GetTarget()->GetBuffer();
       Add(out->GetChannel(0), GetBuffer()->GetChannel(0), GetBuffer()->BufferSize());
-      GetVizBuffer()->WriteChunk(GetBuffer()->GetChannel(0),GetBuffer()->BufferSize());
+      GetVizBuffer()->WriteChunk(GetBuffer()->GetChannel(0), GetBuffer()->BufferSize(), 0);
    }
    
    if (GetTarget2())
    {
       ChannelBuffer* out2 = GetTarget2()->GetBuffer();
       Add(out2->GetChannel(0), GetBuffer()->GetChannel(1), GetBuffer()->BufferSize());
-      mVizBuffer2.WriteChunk(GetBuffer()->GetChannel(1), GetBuffer()->BufferSize());
+      mVizBuffer2.WriteChunk(GetBuffer()->GetChannel(1), GetBuffer()->BufferSize(), 0);
    }
    
    GetBuffer()->Clear();

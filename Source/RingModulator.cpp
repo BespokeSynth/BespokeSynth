@@ -79,7 +79,7 @@ void RingModulator::Process(double time)
 
    Add(out, GetBuffer()->GetChannel(0), GetBuffer()->BufferSize());
 
-   GetVizBuffer()->WriteChunk(GetBuffer()->GetChannel(0), GetBuffer()->BufferSize());
+   GetVizBuffer()->WriteChunk(GetBuffer()->GetChannel(0), GetBuffer()->BufferSize(), 0);
 
    GetBuffer()->Clear();
 }

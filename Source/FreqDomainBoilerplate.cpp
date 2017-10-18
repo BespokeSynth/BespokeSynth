@@ -74,10 +74,10 @@ void FreqDomainBoilerplate::Process(double time)
 
    int bufferSize = GetBuffer()->BufferSize();
 
-   mRollingInputBuffer.WriteChunk(GetBuffer()->GetChannel(0), bufferSize);
+   mRollingInputBuffer.WriteChunk(GetBuffer()->GetChannel(0), bufferSize, 0);
 
    //copy rolling input buffer into working buffer and window it
-   mRollingInputBuffer.ReadChunk(mFFTData.mTimeDomain, fftWindowSize);
+   mRollingInputBuffer.ReadChunk(mFFTData.mTimeDomain, fftWindowSize, 0, 0);
    Mult(mFFTData.mTimeDomain, mWindower, fftWindowSize);
    Mult(mFFTData.mTimeDomain, inputPreampSq, fftWindowSize);
 
@@ -110,20 +110,20 @@ void FreqDomainBoilerplate::Process(double time)
                 mFFTData.mTimeDomain);
 
    for (int i=0; i<bufferSize; ++i)
-      mRollingOutputBuffer.Write(0);
+      mRollingOutputBuffer.Write(0, 0);
 
    //copy rolling input buffer into working buffer and window it
    for (int i=0; i<fftWindowSize; ++i)
-      mRollingOutputBuffer.Accum(fftWindowSize-i-1, mFFTData.mTimeDomain[i] * mWindower[i] * .0001f);
+      mRollingOutputBuffer.Accum(fftWindowSize-i-1, mFFTData.mTimeDomain[i] * mWindower[i] * .0001f, 0);
 
    Mult(GetBuffer()->GetChannel(0), (1-mDryWet)*inputPreampSq, GetBuffer()->BufferSize());
 
    for (int i=0; i<bufferSize; ++i)
-      GetBuffer()->GetChannel(0)[i] += mRollingOutputBuffer.GetSample(fftWindowSize-i-1) * volSq * mDryWet;
+      GetBuffer()->GetChannel(0)[i] += mRollingOutputBuffer.GetSample(fftWindowSize-i-1, 0) * volSq * mDryWet;
 
    Add(GetTarget()->GetBuffer()->GetChannel(0), GetBuffer()->GetChannel(0), bufferSize);
 
-   GetVizBuffer()->WriteChunk(GetBuffer()->GetChannel(0),bufferSize);
+   GetVizBuffer()->WriteChunk(GetBuffer()->GetChannel(0),bufferSize, 0);
 
    GetBuffer()->Clear();
 }

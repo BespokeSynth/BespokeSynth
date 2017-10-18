@@ -83,17 +83,17 @@ void LiveGranulator::ProcessAudio(double time, ChannelBuffer* buffer)
       mGranulator.SetLiveMode(!mFreeze);
       if (!mFreeze)
       {
-         mBuffer.Write(buffer->GetChannel(ch)[i]);
+         mBuffer.Write(buffer->GetChannel(ch)[i], ch);
       }
       else if (mFreezeExtraSamples < FREEZE_EXTRA_SAMPLES_COUNT)
       {
          ++mFreezeExtraSamples;
-         mBuffer.Write(buffer->GetChannel(ch)[i]);
+         mBuffer.Write(buffer->GetChannel(ch)[i], ch);
       }
       
       if (mEnabled)
       {
-         float sample = mGranulator.Process(time, mBuffer.GetRawBuffer(ch), mBufferLength, mBuffer.GetRawBufferOffset()-mFreezeExtraSamples-1+mPos);
+         float sample = mGranulator.Process(time, mBuffer.GetRawBuffer(ch), mBufferLength, mBuffer.GetRawBufferOffset(ch)-mFreezeExtraSamples-1+mPos);
          sample -= mDCEstimate;
          if (mAdd)
             buffer->GetChannel(ch)[i] += sample;

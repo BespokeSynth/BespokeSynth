@@ -111,7 +111,7 @@ void Sampler::Process(double time)
    }
    
    mPolyMgr.Process(time, mWriteBuffer, bufferSize);
-   GetVizBuffer()->WriteChunk(mWriteBuffer, bufferSize);
+   GetVizBuffer()->WriteChunk(mWriteBuffer, bufferSize, 0);
    
    Add(GetTarget()->GetBuffer()->GetChannel(0), mWriteBuffer, bufferSize);
    

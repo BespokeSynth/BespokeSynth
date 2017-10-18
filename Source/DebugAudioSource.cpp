@@ -34,7 +34,7 @@ void DebugAudioSource::Process(double time)
    {
       float sample = 1;
       out[i] += sample;
-      GetVizBuffer()->Write(sample);
+      GetVizBuffer()->Write(sample, 0);
    }
 }
 

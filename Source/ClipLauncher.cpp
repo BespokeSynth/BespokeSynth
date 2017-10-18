@@ -82,7 +82,7 @@ void ClipLauncher::Process(double time)
          samp = mWriteBuffer[i] * volSq;
       samp = mJumpBlender.Process(samp, i);
       out[i] += samp;
-      GetVizBuffer()->Write(samp);
+      GetVizBuffer()->Write(samp, 0);
    }
    
    if (sampleToPlay != -1)

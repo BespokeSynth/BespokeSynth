@@ -37,7 +37,7 @@ void InputChannel::Process(double time)
       Add(out, GetBuffer()->GetChannel(0), bufferSize);
    }
    
-   GetVizBuffer()->WriteChunk(GetBuffer()->GetChannel(0),bufferSize);
+   GetVizBuffer()->WriteChunk(GetBuffer()->GetChannel(0),bufferSize, 0);
    
    //Clear(mInputBuffer, mInputBufferSize);
 }

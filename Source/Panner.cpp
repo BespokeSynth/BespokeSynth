@@ -49,8 +49,8 @@ void Panner::Process(double time)
    
    if (abs(mWiden) > 0)
    {
-      mWidenerBuffer.WriteChunk(GetBuffer()->GetChannel(0), GetBuffer()->BufferSize());
-      mWidenerBuffer.ReadChunk(mPanBuffer, GetBuffer()->BufferSize(), abs(mWiden));
+      mWidenerBuffer.WriteChunk(GetBuffer()->GetChannel(0), GetBuffer()->BufferSize(), 0);
+      mWidenerBuffer.ReadChunk(mPanBuffer, GetBuffer()->BufferSize(), abs(mWiden), 0);
    }
    else
    {

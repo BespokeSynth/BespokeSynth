@@ -61,7 +61,7 @@ void Beats::Process(double time)
       column->Process(mWriteBuffer, bufferSize);
    
    Add(out, mWriteBuffer, bufferSize);
-   GetVizBuffer()->WriteChunk(mWriteBuffer, bufferSize);
+   GetVizBuffer()->WriteChunk(mWriteBuffer, bufferSize, 0);
 }
 
 void Beats::PostRepatch(PatchCableSource* cable)

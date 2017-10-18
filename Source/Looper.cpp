@@ -380,7 +380,7 @@ void Looper::Process(double time)
       
       mWorkBuffer[i] = output * mMuteRamp.Value(time);
 
-      GetVizBuffer()->Write(mWorkBuffer[i] + GetBuffer()->GetChannel(0)[i]);
+      GetVizBuffer()->Write(mWorkBuffer[i] + GetBuffer()->GetChannel(0)[i], 0);
       
       time += gInvSampleRateMs;
    }
@@ -451,7 +451,7 @@ void Looper::DoCommit()
             fade = float(LOOPER_COMMIT_FADE_SAMPLES + idx) / LOOPER_COMMIT_FADE_SAMPLES;
          if (idx >= mLoopLength-LOOPER_COMMIT_FADE_SAMPLES)
             fade = 1 - (float(idx-(mLoopLength-LOOPER_COMMIT_FADE_SAMPLES)) / LOOPER_COMMIT_FADE_SAMPLES);
-         mBuffer[pos] += mCommitBuffer->GetSample(ofClamp(commitLength - i + commitSamplesBack,0,MAX_BUFFER_SIZE-1)) * fade;
+         mBuffer[pos] += mCommitBuffer->GetSample(ofClamp(commitLength - i + commitSamplesBack,0,MAX_BUFFER_SIZE-1), 0) * fade;
       }
    }
 

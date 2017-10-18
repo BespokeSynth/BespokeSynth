@@ -65,11 +65,11 @@ void Rewriter::Process(double time)
 
    int bufferSize = GetBuffer()->BufferSize();
 
-   mRecordBuffer.WriteChunk(GetBuffer()->GetChannel(0), bufferSize);
+   mRecordBuffer.WriteChunk(GetBuffer()->GetChannel(0), bufferSize, 0);
 
    Add(GetTarget()->GetBuffer()->GetChannel(0), GetBuffer()->GetChannel(0), bufferSize);
 
-   GetVizBuffer()->WriteChunk(GetBuffer()->GetChannel(0),bufferSize);
+   GetVizBuffer()->WriteChunk(GetBuffer()->GetChannel(0),bufferSize, 0);
 
    GetBuffer()->Clear();
 }

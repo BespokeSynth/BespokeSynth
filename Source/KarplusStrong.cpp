@@ -84,7 +84,7 @@ void KarplusStrong::Process(double time)
 
    mBiquad.ProcessAudio(time, &mWriteBuffer);
 
-   GetVizBuffer()->WriteChunk(mWriteBuffer.GetChannel(0), bufferSize);
+   GetVizBuffer()->WriteChunk(mWriteBuffer.GetChannel(0), bufferSize, 0);
 
    Add(out, mWriteBuffer.GetChannel(0), gBufferSize);
 }

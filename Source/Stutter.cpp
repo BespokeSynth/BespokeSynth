@@ -289,7 +289,7 @@ void Stutter::DoCapture()
    mCaptureLength = ofClamp(mCaptureLength, 0, STUTTER_BUFFER_SIZE-1);
    mCaptureLength /= sStutterSubdivide;
    for (int ch=0; ch<mStutterBuffer.NumActiveChannels(); ++ch)
-      mRecordBuffer.ReadChunk(mStutterBuffer.GetChannel(ch), mCaptureLength, ch);
+      mRecordBuffer.ReadChunk(mStutterBuffer.GetChannel(ch), mCaptureLength, 0, ch);
 }
 
 void Stutter::PostRepatch(PatchCableSource* cableSource)

@@ -29,20 +29,20 @@ void TriggerDetector::Process(float sample)
       sample -= mAvg; //highpass
    }
    
-   if (sample - mHistory.GetSample(100) > mThreshold && sample > .1f && mWaitingForFall == false)
+   if (sample - mHistory.GetSample(100, 0) > mThreshold && sample > .1f && mWaitingForFall == false)
    {
       mTriggered = true;
       mWaitingForFall = true;
    }
-   if (sample < mHistory.GetSample(100))
+   if (sample < mHistory.GetSample(100, 0))
       mWaitingForFall = false;
    
-   mHistory.Write(sample);
+   mHistory.Write(sample, 0);
 }
 
 float TriggerDetector::GetValue()
 {
-   return mHistory.GetSample(1);
+   return mHistory.GetSample(1, 0);
 }
 
 bool TriggerDetector::CheckTriggered()
@@ -59,7 +59,7 @@ void TriggerDetector::Draw(int x, int y)
    ofSetColor(0,255,0);
    for (int i=1; i<mHistory.Size()-1; ++i)
    {
-      ofRect(x-i/50,y,1,-mHistory.GetSample(i)*300);
+      ofRect(x-i/50,y,1,-mHistory.GetSample(i, 0)*300);
    }
    ofPopStyle();
 }

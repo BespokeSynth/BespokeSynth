@@ -262,7 +262,7 @@ void BeatBloks::Process(double time)
       }
    }
    
-   GetVizBuffer()->WriteChunk(out, bufferSize);
+   GetVizBuffer()->WriteChunk(out, bufferSize, 0);
 }
 
 void BeatBloks::FilesDropped(vector<string> files, int x, int y)

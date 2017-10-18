@@ -77,7 +77,7 @@ void OneShotLauncher::Process(double time)
          {
             float sample = mWriteBuffer[i] * volSq;
             out[i] += sample;
-            GetVizBuffer()->Write(sample);
+            GetVizBuffer()->Write(sample, 0);
          }
       }
    }*/

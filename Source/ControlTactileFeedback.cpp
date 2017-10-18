@@ -46,7 +46,7 @@ void ControlTactileFeedback::Process(double time)
    {
       float sample = sample = (mPhase/FTWO_PI * 2 - 1) * gControlTactileFeedback * mVolume;
       out[i] += sample;
-      GetVizBuffer()->Write(sample);
+      GetVizBuffer()->Write(sample, 0);
       
       mPhase += mPhaseInc;
       while (mPhase > FTWO_PI) { mPhase -= FTWO_PI; }

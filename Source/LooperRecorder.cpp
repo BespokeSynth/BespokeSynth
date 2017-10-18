@@ -177,17 +177,17 @@ void LooperRecorder::Process(double time)
       delaySamps = MIN(delaySamps, MAX_BUFFER_SIZE-1);
       for (int i=0; i<bufferSize; ++i)
       {
-         float sample = mRecordBuffer.GetSample(delaySamps - i);
+         float sample = mRecordBuffer.GetSample(delaySamps - i, 0);
          mWriteBuffer[i] += sample;
          GetBuffer()->GetChannel(0)[i] += sample;
       }
    }
    
-   mRecordBuffer.WriteChunk(mWriteBuffer, bufferSize);
+   mRecordBuffer.WriteChunk(mWriteBuffer, bufferSize, 0);
    
    Add(GetTarget()->GetBuffer()->GetChannel(0), GetBuffer()->GetChannel(0), bufferSize);
    
-   GetVizBuffer()->WriteChunk(GetBuffer()->GetChannel(0),bufferSize);
+   GetVizBuffer()->WriteChunk(GetBuffer()->GetChannel(0),bufferSize, 0);
    
    GetBuffer()->Clear();
 }
@@ -310,7 +310,7 @@ void LooperRecorder::DrawModule()
       DrawText(speed + detune,5,118);
    }
 
-   mRecordBuffer.Draw(3,3,90,50,gSampleRate);
+   mRecordBuffer.Draw(3,3,90,50,gSampleRate,0);
    ofPushStyle();
    ofVec2f center(48,28);
    float radius = 25;
@@ -322,7 +322,7 @@ void LooperRecorder::DrawModule()
    ofPopStyle();
    
    if (mDrawDebug)
-      mRecordBuffer.Draw(0,162,800,100);
+      mRecordBuffer.Draw(0,162,800,100,-1,0);
    
    DrawText("loopers:",125,109);
 }

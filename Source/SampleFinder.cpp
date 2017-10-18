@@ -129,7 +129,7 @@ void SampleFinder::Process(double time)
       {
          out[i] = 0; //fill the rest with zero
       }
-      GetVizBuffer()->Write(out[i]);
+      GetVizBuffer()->Write(out[i], 0);
       mPlayhead += speed * sampleRateRatio;
    }
 }

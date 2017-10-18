@@ -146,7 +146,7 @@ void Razor::Process(double time)
          write += sample;
       }
 
-      GetVizBuffer()->Write(write);
+      GetVizBuffer()->Write(write, 0);
 
       out[i] += write;
       

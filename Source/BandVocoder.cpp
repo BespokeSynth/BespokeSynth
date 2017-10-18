@@ -136,7 +136,7 @@ void BandVocoder::Process(double time)
    Add(GetTarget()->GetBuffer()->GetChannel(0), GetBuffer()->GetChannel(0), bufferSize);
    Add(GetTarget()->GetBuffer()->GetChannel(0), mOutBuffer, bufferSize);
    
-   GetVizBuffer()->WriteChunk(GetTarget()->GetBuffer()->GetChannel(0),bufferSize);
+   GetVizBuffer()->WriteChunk(GetTarget()->GetBuffer()->GetChannel(0),bufferSize,0);
    
    GetBuffer()->Clear();
 }

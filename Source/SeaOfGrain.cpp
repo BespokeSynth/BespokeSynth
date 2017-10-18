@@ -96,7 +96,7 @@ void SeaOfGrain::Process(double time)
    Clear(mWriteBuffer, bufferSize);
    for (int i=0; i<NUM_SEAOFGRAIN_VOICES; ++i)
       mVoices[i].Process(mWriteBuffer, bufferSize, mSample->Data(), mSample->LengthInSamples(), mKeyOffset, GetSlices());
-   GetVizBuffer()->WriteChunk(mWriteBuffer, bufferSize);
+   GetVizBuffer()->WriteChunk(mWriteBuffer, bufferSize, 0);
    
    Add(out, mWriteBuffer, bufferSize);
 }

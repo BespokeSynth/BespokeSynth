@@ -93,7 +93,7 @@ void SampleCanvas::Process(double time)
    }
    
    Add(out, gWorkBuffer, bufferSize);
-   GetVizBuffer()->WriteChunk(gWorkBuffer, bufferSize);
+   GetVizBuffer()->WriteChunk(gWorkBuffer, bufferSize, 0);
 }
 
 void SampleCanvas::OnClicked(int x, int y, bool right)

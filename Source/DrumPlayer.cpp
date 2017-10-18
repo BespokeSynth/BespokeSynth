@@ -191,7 +191,7 @@ void DrumPlayer::Process(double time)
       mLoadSamplesMutex.unlock();
    }
    
-   GetVizBuffer()->WriteChunk(mOutputBuffer, bufferSize);
+   GetVizBuffer()->WriteChunk(mOutputBuffer, bufferSize, 0);
    
    Add(out, mOutputBuffer, bufferSize);
 }

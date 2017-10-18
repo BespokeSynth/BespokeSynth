@@ -127,7 +127,7 @@ void SamplerGrid::Process(double time)
          gWorkBuffer[i] += GetBuffer()->GetChannel(0)[i];
    }
    
-   GetVizBuffer()->WriteChunk(gWorkBuffer, bufferSize);
+   GetVizBuffer()->WriteChunk(gWorkBuffer, bufferSize, 0);
    
    Add(GetTarget()->GetBuffer()->GetChannel(0), gWorkBuffer, bufferSize);
    

@@ -58,8 +58,8 @@ void Stereofier::Process(double time)
    
    if (abs(mWiden) > 0)
    {
-      mWidenerBuffer.WriteChunk(GetBuffer()->GetChannel(0), bufferSize);
-      mWidenerBuffer.ReadChunk(mPanBuffer, bufferSize, abs(mWiden));
+      mWidenerBuffer.WriteChunk(GetBuffer()->GetChannel(0), bufferSize, 0);
+      mWidenerBuffer.ReadChunk(mPanBuffer, bufferSize, abs(mWiden), 0);
    }
    else
    {
@@ -100,8 +100,8 @@ void Stereofier::Process(double time)
       time += gInvSampleRateMs;
    }
 
-   GetVizBuffer()->WriteChunk(input1,bufferSize);
-   mVizBuffer2.WriteChunk(input2, bufferSize);
+   GetVizBuffer()->WriteChunk(input1,bufferSize, 0);
+   mVizBuffer2.WriteChunk(input2, bufferSize, 0);
    
    GetBuffer()->Clear();
 }

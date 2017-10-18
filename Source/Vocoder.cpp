@@ -112,10 +112,10 @@ void Vocoder::Process(double time)
 
    mGate.ProcessAudio(time, GetBuffer());
 
-   mRollingInputBuffer.WriteChunk(GetBuffer()->GetChannel(0), bufferSize);
+   mRollingInputBuffer.WriteChunk(GetBuffer()->GetChannel(0), bufferSize, 0);
    
    //copy rolling input buffer into working buffer and window it
-   mRollingInputBuffer.ReadChunk(mFFTData.mTimeDomain, VOCODER_WINDOW_SIZE);
+   mRollingInputBuffer.ReadChunk(mFFTData.mTimeDomain, VOCODER_WINDOW_SIZE, 0, 0);
    Mult(mFFTData.mTimeDomain, mWindower, VOCODER_WINDOW_SIZE);
    Mult(mFFTData.mTimeDomain, inputPreampSq, VOCODER_WINDOW_SIZE);
 
@@ -125,18 +125,18 @@ void Vocoder::Process(double time)
 
    if (!fricative)
    {
-      mRollingCarrierBuffer.WriteChunk(mCarrierInputBuffer, bufferSize);
+      mRollingCarrierBuffer.WriteChunk(mCarrierInputBuffer, bufferSize, 0);
    }
    else
    {
       //use noise as carrier signal if it's a fricative
       //but make the noise the same-ish volume as input carrier
       for (int i=0; i<bufferSize; ++i)
-         mRollingCarrierBuffer.Write(mCarrierInputBuffer[rand()%bufferSize]*2);
+         mRollingCarrierBuffer.Write(mCarrierInputBuffer[rand()%bufferSize]*2, 0);
    }
 
    //copy rolling carrier buffer into working buffer and window it
-   mRollingCarrierBuffer.ReadChunk(mCarrierFFTData.mTimeDomain, VOCODER_WINDOW_SIZE);
+   mRollingCarrierBuffer.ReadChunk(mCarrierFFTData.mTimeDomain, VOCODER_WINDOW_SIZE, 0, 0);
    Mult(mCarrierFFTData.mTimeDomain, mWindower, VOCODER_WINDOW_SIZE);
    Mult(mCarrierFFTData.mTimeDomain, carrierPreampSq, VOCODER_WINDOW_SIZE);
 
@@ -184,20 +184,20 @@ void Vocoder::Process(double time)
                 mFFTData.mTimeDomain);
 
    for (int i=0; i<bufferSize; ++i)
-      mRollingOutputBuffer.Write(0);
+      mRollingOutputBuffer.Write(0, 0);
 
    //copy rolling input buffer into working buffer and window it
    for (int i=0; i<VOCODER_WINDOW_SIZE; ++i)
-      mRollingOutputBuffer.Accum(VOCODER_WINDOW_SIZE-i-1, mFFTData.mTimeDomain[i] * mWindower[i] * .0001f);
+      mRollingOutputBuffer.Accum(VOCODER_WINDOW_SIZE-i-1, mFFTData.mTimeDomain[i] * mWindower[i] * .0001f, 0);
 
    Mult(GetBuffer()->GetChannel(0), (1-mDryWet)*inputPreampSq, GetBuffer()->BufferSize());
 
    for (int i=0; i<bufferSize; ++i)
-      GetBuffer()->GetChannel(0)[i] += mRollingOutputBuffer.GetSample(VOCODER_WINDOW_SIZE-i-1) * volSq * mDryWet;
+      GetBuffer()->GetChannel(0)[i] += mRollingOutputBuffer.GetSample(VOCODER_WINDOW_SIZE-i-1, 0) * volSq * mDryWet;
 
    Add(GetTarget()->GetBuffer()->GetChannel(0), GetBuffer()->GetChannel(0), bufferSize);
 
-   GetVizBuffer()->WriteChunk(GetBuffer()->GetChannel(0),bufferSize);
+   GetVizBuffer()->WriteChunk(GetBuffer()->GetChannel(0),bufferSize, 0);
 
    GetBuffer()->Clear();
 }

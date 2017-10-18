@@ -48,7 +48,7 @@ void VocoderCarrierInput::Process(double time)
 
    mVocoder->SetCarrierBuffer(GetBuffer()->GetChannel(0), GetBuffer()->BufferSize());
 
-   GetVizBuffer()->WriteChunk(GetBuffer()->GetChannel(0), GetBuffer()->BufferSize());
+   GetVizBuffer()->WriteChunk(GetBuffer()->GetChannel(0), GetBuffer()->BufferSize(), 0);
 
    GetBuffer()->Clear();
 }

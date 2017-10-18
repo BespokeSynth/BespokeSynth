@@ -65,7 +65,7 @@ void PitchChorus::Process(double time)
       Add(GetTarget()->GetBuffer()->GetChannel(0), mOutputBuffer, bufferSize);
    }
    
-   GetVizBuffer()->WriteChunk(mOutputBuffer,bufferSize);
+   GetVizBuffer()->WriteChunk(mOutputBuffer,bufferSize, 0);
    
    GetBuffer()->Clear();
 }

@@ -124,11 +124,11 @@ void SamplePlayer::Process(double time)
       
       Mult(mWriteBuffer, volSq, bufferSize);
       Add(out, mWriteBuffer, bufferSize);
-      GetVizBuffer()->WriteChunk(mWriteBuffer, bufferSize);
+      GetVizBuffer()->WriteChunk(mWriteBuffer, bufferSize, 0);
    }
    else
    {
-      GetVizBuffer()->WriteChunk(gZeroBuffer, bufferSize);
+      GetVizBuffer()->WriteChunk(gZeroBuffer, bufferSize, 0);
    }
 }
 
