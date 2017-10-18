@@ -9,7 +9,7 @@
 #ifndef __Bespoke__VSTPlugin__
 #define __Bespoke__VSTPlugin__
 
-#include "IAudioSource.h"
+#include "IAudioProcessor.h"
 #include "PolyphonyMgr.h"
 #include "INoteReceiver.h"
 #include "IDrawableModule.h"
@@ -22,12 +22,11 @@
 #include "../JuceLibraryCode/JuceHeader.h"
 #include "VSTPlayhead.h"
 #include "VSTWindow.h"
-#include "IAudioReceiver.h"
 
 class ofxJSONElement;
 class NSWindowOverlay;
 
-class VSTPlugin : public IAudioSource, public INoteReceiver, public IDrawableModule, public IDropdownListener, public IFloatSliderListener, public IIntSliderListener, public IButtonListener, public IAudioReceiver
+class VSTPlugin : public IAudioProcessor, public INoteReceiver, public IDrawableModule, public IDropdownListener, public IFloatSliderListener, public IIntSliderListener, public IButtonListener
 {
 public:
    VSTPlugin();
@@ -49,9 +48,6 @@ public:
    //IAudioSource
    void Process(double time) override;
    void SetEnabled(bool enabled) override;
-   
-   //IAudioReceiver
-   float* GetBuffer(int& bufferSize) override;
    
    //INoteReceiver
    void PlayNote(double time, int pitch, int velocity, int voiceIdx = -1, ModulationChain* pitchBend = NULL, ModulationChain* modWheel = NULL, ModulationChain* pressure = NULL) override;
@@ -85,8 +81,6 @@ private:
    ClickButton* mOpenEditorButton;
    int mOverlayWidth;
    int mOverlayHeight;
-   
-   float* mWriteBuffer;
    
    juce::AudioPluginFormatManager mFormatManager;
    juce::ScopedPointer<juce::AudioPluginInstance> mPlugin;
@@ -124,9 +118,6 @@ private:
    
    ofMutex mVSTMutex;
    VSTPlayhead mPlayhead;
-   
-   int mInputBufferSize;
-   float* mInputBuffer;
    
    NSWindowOverlay* mWindowOverlay;
    

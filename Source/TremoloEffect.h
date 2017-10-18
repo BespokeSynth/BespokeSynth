@@ -10,23 +10,23 @@
 #define __modularSynth__TremoloEffect__
 
 #include <iostream>
-#include "IAudioProcessor.h"
+#include "IAudioEffect.h"
 #include "Slider.h"
 #include "Checkbox.h"
 #include "LFO.h"
 #include "DropdownList.h"
 
-class TremoloEffect : public IAudioProcessor, public IDropdownListener, public IFloatSliderListener
+class TremoloEffect : public IAudioEffect, public IDropdownListener, public IFloatSliderListener
 {
 public:
    TremoloEffect();
    
-   static IAudioProcessor* Create() { return new TremoloEffect(); }
+   static IAudioEffect* Create() { return new TremoloEffect(); }
    
    string GetTitleLabel() override { return "tremolo"; }
    void CreateUIControls() override;
 
-   //IAudioProcessor
+   //IAudioEffect
    void ProcessAudio(double time, float* audio, int bufferSize) override;
    void SetEnabled(bool enabled) override { mEnabled = enabled; }
    float GetEffectAmount() override;

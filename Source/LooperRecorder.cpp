@@ -20,7 +20,8 @@
 #include "PatchCableSource.h"
 
 LooperRecorder::LooperRecorder()
-: mRecordBuffer(MAX_BUFFER_SIZE)
+: IAudioProcessor(gBufferSize)
+, mRecordBuffer(MAX_BUFFER_SIZE)
 , mDrawDebug(false)
 , mNumBars(1)
 , mNumBarsSelector(NULL)
@@ -54,11 +55,7 @@ LooperRecorder::LooperRecorder()
 , mRecorderMode(kRecorderMode_Record)
 , mModeSelector(NULL)
 {
-   mInputBufferSize = gBufferSize;
-   mInputBuffer = new float[mInputBufferSize];
-   Clear(mInputBuffer, mInputBufferSize);
-   
-   mWriteBuffer = new float[mInputBufferSize];
+   mWriteBuffer = new float[GetBuffer()->BufferSize()];
 
    mQuietInputRamp.SetValue(1);
 }
@@ -115,14 +112,7 @@ void LooperRecorder::CreateUIControls()
 
 LooperRecorder::~LooperRecorder()
 {
-   delete[] mInputBuffer;
    delete[] mWriteBuffer;
-}
-
-float* LooperRecorder::GetBuffer(int& bufferSize)
-{
-   bufferSize = mInputBufferSize;
-   return mInputBuffer;
 }
 
 void LooperRecorder::Init()
@@ -139,10 +129,9 @@ void LooperRecorder::Process(double time)
       return;
 
    ComputeSliders(0);
+   SyncBuffers();
    
-   int bufferSize;
-   float* out = GetTarget()->GetBuffer(bufferSize);
-   assert(bufferSize == gBufferSize);
+   int bufferSize = GetBuffer()->BufferSize();
 
    if (mCommitToLooper)
    {
@@ -172,9 +161,9 @@ void LooperRecorder::Process(double time)
    {
       if (acceptInput)
       {
-         mInputBuffer[i] *= mQuietInputRamp.Value(time);
+         GetBuffer()->GetChannel(0)[i] *= mQuietInputRamp.Value(time);
          time += gInvSampleRateMs;
-         mWriteBuffer[i] = mInputBuffer[i];
+         mWriteBuffer[i] = GetBuffer()->GetChannel(0)[i];
       }
       else
       {
@@ -190,17 +179,17 @@ void LooperRecorder::Process(double time)
       {
          float sample = mRecordBuffer.GetSample(delaySamps - i);
          mWriteBuffer[i] += sample;
-         mInputBuffer[i] += sample;
+         GetBuffer()->GetChannel(0)[i] += sample;
       }
    }
    
    mRecordBuffer.WriteChunk(mWriteBuffer, bufferSize);
    
-   Add(out, mInputBuffer, bufferSize);
+   Add(GetTarget()->GetBuffer()->GetChannel(0), GetBuffer()->GetChannel(0), bufferSize);
    
-   GetVizBuffer()->WriteChunk(mInputBuffer,bufferSize);
+   GetVizBuffer()->WriteChunk(GetBuffer()->GetChannel(0),bufferSize);
    
-   Clear(mInputBuffer, mInputBufferSize);
+   GetBuffer()->Clear();
 }
 
 void LooperRecorder::DrawCircleHash(ofVec2f center, float progress, float width, float innerRadius, float outerRadius)

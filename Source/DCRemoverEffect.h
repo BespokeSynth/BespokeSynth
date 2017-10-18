@@ -11,20 +11,20 @@
 
 #include <stdio.h>
 #include <iostream>
-#include "IAudioProcessor.h"
+#include "IAudioEffect.h"
 #include "BiquadFilter.h"
 
-class DCRemoverEffect : public IAudioProcessor
+class DCRemoverEffect : public IAudioEffect
 {
 public:
    DCRemoverEffect();
    ~DCRemoverEffect();
    
-   static IAudioProcessor* Create() { return new DCRemoverEffect(); }
+   static IAudioEffect* Create() { return new DCRemoverEffect(); }
    
    string GetTitleLabel() override { return "dc remover"; }
    
-   //IAudioProcessor
+   //IAudioEffect
    void ProcessAudio(double time, float* audio, int bufferSize) override;
    void SetEnabled(bool enabled) override { mEnabled = enabled; }
    float GetEffectAmount() override;

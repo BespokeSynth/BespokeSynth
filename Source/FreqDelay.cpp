@@ -12,13 +12,11 @@
 #include "Scale.h"
 
 FreqDelay::FreqDelay()
-: mDryWet(1)
+: IAudioProcessor(gBufferSize)
+, mDryWet(1)
 , mDryWetSlider(NULL)
 {
-   mInputBufferSize = gBufferSize;
-   mInputBuffer = new float[mInputBufferSize];
-   Clear(mInputBuffer, mInputBufferSize);
-   mDryBuffer = new float[mInputBufferSize];
+   mDryBuffer = new float[GetBuffer()->BufferSize()];
 
    AddChild(&mDelayEffect);
    mDelayEffect.SetPosition(5,30);
@@ -36,14 +34,7 @@ void FreqDelay::CreateUIControls()
 
 FreqDelay::~FreqDelay()
 {
-   delete[] mInputBuffer;
    delete[] mDryBuffer;
-}
-
-float* FreqDelay::GetBuffer(int& bufferSize)
-{
-   bufferSize = mInputBufferSize;
-   return mInputBuffer;
 }
 
 void FreqDelay::Process(double time)
@@ -52,23 +43,23 @@ void FreqDelay::Process(double time)
 
    if (GetTarget() == NULL)
       return;
+   
+   SyncBuffers();
 
-   int bufferSize = gBufferSize;
-   float* out = GetTarget()->GetBuffer(bufferSize);
-   assert(bufferSize == gBufferSize);
+   int bufferSize = GetBuffer()->BufferSize();
 
-   memcpy(mDryBuffer, mInputBuffer, sizeof(float)*bufferSize);
-   mDelayEffect.ProcessAudio(time, mInputBuffer, bufferSize);
+   memcpy(mDryBuffer, GetBuffer()->GetChannel(0), sizeof(float)*bufferSize);
+   mDelayEffect.ProcessAudio(time, GetBuffer()->GetChannel(0), bufferSize);
    
    Mult(mDryBuffer, (1-mDryWet), bufferSize);
-   Mult(mInputBuffer, mDryWet, bufferSize);
-   Add(mInputBuffer, mDryBuffer, bufferSize);
+   Mult(GetBuffer()->GetChannel(0), mDryWet, bufferSize);
+   Add(GetBuffer()->GetChannel(0), mDryBuffer, bufferSize);
 
-   Add(out, mInputBuffer, bufferSize);
+   Add(GetTarget()->GetBuffer()->GetChannel(0), GetBuffer()->GetChannel(0), bufferSize);
 
-   GetVizBuffer()->WriteChunk(mInputBuffer,bufferSize);
+   GetVizBuffer()->WriteChunk(GetBuffer()->GetChannel(0),bufferSize);
 
-   Clear(mInputBuffer, mInputBufferSize);
+   GetBuffer()->Clear();
 }
 
 void FreqDelay::PlayNote(double time, int pitch, int velocity, int voiceIdx /*= -1*/, ModulationChain* pitchBend /*= NULL*/, ModulationChain* modWheel /*= NULL*/, ModulationChain* pressure /*= NULL*/)

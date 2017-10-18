@@ -10,7 +10,7 @@
 #define __modularSynth__LiveGranulator__
 
 #include <iostream>
-#include "IAudioProcessor.h"
+#include "IAudioEffect.h"
 #include "IDrawableModule.h"
 #include "Checkbox.h"
 #include "Granulator.h"
@@ -21,18 +21,18 @@
 
 #define FREEZE_EXTRA_SAMPLES_COUNT 2*gSampleRate
 
-class LiveGranulator : public IAudioProcessor, public IFloatSliderListener, public ITimeListener, public IDropdownListener
+class LiveGranulator : public IAudioEffect, public IFloatSliderListener, public ITimeListener, public IDropdownListener
 {
 public:
    LiveGranulator();
    virtual ~LiveGranulator();
    
-   static IAudioProcessor* Create() { return new LiveGranulator(); }
+   static IAudioEffect* Create() { return new LiveGranulator(); }
    
    string GetTitleLabel() override { return "granulator"; }
    void CreateUIControls() override;
    
-   //IAudioProcessor
+   //IAudioEffect
    void ProcessAudio(double time, float* audio, int bufferSize) override;
    void SetEnabled(bool enabled) override { mEnabled = enabled; }
    float GetEffectAmount() override;

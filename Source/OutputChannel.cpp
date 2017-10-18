@@ -11,26 +11,22 @@
 #include "ModularSynth.h"
 
 OutputChannel::OutputChannel()
+: IAudioReceiver(gBufferSize)
 {
-   mInputBufferSize = gBufferSize;
-   mInputBuffer = new float[mInputBufferSize];
-   ClearBuffer();
 }
 
 OutputChannel::~OutputChannel()
 {
-   delete[] mInputBuffer;
+}
+
+void OutputChannel::Process()
+{
+   SyncInputBuffer();
 }
 
 void OutputChannel::ClearBuffer()
 {
-   Clear(mInputBuffer, mInputBufferSize);
-}
-
-float* OutputChannel::GetBuffer(int& bufferSize)
-{
-   bufferSize = mInputBufferSize;
-   return mInputBuffer;
+   GetBuffer()->Clear();
 }
 
 void OutputChannel::DrawModule()

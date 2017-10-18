@@ -12,12 +12,10 @@
 #include "SynthGlobals.h"
 
 PitchChorus::PitchChorus()
-: mPassthrough(true)
+: IAudioProcessor(gBufferSize)
+, mPassthrough(true)
 , mPassthroughCheckbox(NULL)
 {
-   mInputBufferSize = gBufferSize;
-   mInputBuffer = new float[mInputBufferSize];
-   Clear(mInputBuffer, mInputBufferSize);
    mOutputBuffer = new float[gBufferSize];
    Clear(mOutputBuffer, gBufferSize);
 }
@@ -30,14 +28,7 @@ void PitchChorus::CreateUIControls()
 
 PitchChorus::~PitchChorus()
 {
-   delete[] mInputBuffer;
    delete[] mOutputBuffer;
-}
-
-float* PitchChorus::GetBuffer(int& bufferSize)
-{
-   bufferSize = mInputBufferSize;
-   return mInputBuffer;
 }
 
 void PitchChorus::Process(double time)
@@ -48,19 +39,17 @@ void PitchChorus::Process(double time)
       return;
    
    ComputeSliders(0);
+   SyncBuffers();
    
-   int bufferSize = gBufferSize;
+   int bufferSize = GetBuffer()->BufferSize();
    if (GetTarget())
    {
-      float* out = GetTarget()->GetBuffer(bufferSize);
-      assert(bufferSize == gBufferSize);
-      
       Clear(mOutputBuffer, gBufferSize);
       for (int i=0; i<kNumShifters; ++i)
       {
          if (mShifters[i].mOn || mShifters[i].mRamp.Value(time) > 0)
          {
-            memcpy(gWorkBuffer, mInputBuffer, bufferSize * sizeof(float));
+            memcpy(gWorkBuffer, GetBuffer()->GetChannel(0), bufferSize * sizeof(float));
             mShifters[i].mShifter.Process(gWorkBuffer, bufferSize);
             double timeCopy = time;
             for (int j=0; j<bufferSize; ++j)
@@ -72,13 +61,13 @@ void PitchChorus::Process(double time)
       }
       
       if (mPassthrough)
-         Add(mOutputBuffer, mInputBuffer, bufferSize);
-      Add(out, mOutputBuffer, bufferSize);
+         Add(mOutputBuffer, GetBuffer()->GetChannel(0), bufferSize);
+      Add(GetTarget()->GetBuffer()->GetChannel(0), mOutputBuffer, bufferSize);
    }
    
    GetVizBuffer()->WriteChunk(mOutputBuffer,bufferSize);
    
-   Clear(mInputBuffer, mInputBufferSize);
+   GetBuffer()->Clear();
 }
 
 void PitchChorus::PlayNote(double time, int pitch, int velocity, int voiceIdx /*= -1*/, ModulationChain* pitchBend /*= NULL*/, ModulationChain* modWheel /*= NULL*/, ModulationChain* pressure /*= NULL*/)

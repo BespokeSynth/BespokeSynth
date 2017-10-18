@@ -105,10 +105,6 @@ public:
    void LoadLayout(ofxJSONElement json);
    string GetLoadedLayout() const { return mLoadedLayoutPath; }
    
-   RollingBuffer* GetOutputLeft() { return &mOutputBufferLeft; }
-   RollingBuffer* GetOutputRight() { return &mOutputBufferRight; }
-   RollingBuffer* GetOutputMeasurePos() { return &mOutputBufferMeasurePos; }
-   
    void AddLissajousDrawer(IDrawableModule* module) { mLissajousDrawers.push_back(module); }
    bool IsLissajousDrawer(IDrawableModule* module) { return VectorContains(module, mLissajousDrawers); }
    
@@ -202,9 +198,7 @@ private:
 
    LocationZoomer mZoomer;
 
-   RollingBuffer mOutputBufferLeft;
-   RollingBuffer mOutputBufferRight;
-   RollingBuffer mOutputBufferMeasurePos;
+   RollingBuffer mOutputBuffer;
    long long mRecordingLength;
    
    std::vector< std::pair<string,double> > mEvents;

@@ -9,7 +9,7 @@
 #ifndef __Bespoke__FormantFilter__
 #define __Bespoke__FormantFilter__
 
-#include "IAudioProcessor.h"
+#include "IAudioEffect.h"
 #include "DropdownList.h"
 #include "Checkbox.h"
 #include "Slider.h"
@@ -17,20 +17,20 @@
 #include "BiquadFilter.h"
 #include "RadioButton.h"
 
-class FormantFilterEffect : public IAudioProcessor, public IDropdownListener, public IFloatSliderListener, public IRadioButtonListener
+class FormantFilterEffect : public IAudioEffect, public IDropdownListener, public IFloatSliderListener, public IRadioButtonListener
 {
 public:
    FormantFilterEffect();
    ~FormantFilterEffect();
    
-   static IAudioProcessor* Create() { return new FormantFilterEffect(); }
+   static IAudioEffect* Create() { return new FormantFilterEffect(); }
    
    string GetTitleLabel() override { return "biquad"; }
    void CreateUIControls() override;
    
    void Init() override;
    
-   //IAudioProcessor
+   //IAudioEffect
    void ProcessAudio(double time, float* audio, int bufferSize) override;
    void SetEnabled(bool enabled) override { mEnabled = enabled; }
    float GetEffectAmount() override;

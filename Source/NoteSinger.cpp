@@ -12,20 +12,17 @@
 #include "Profiler.h"
 
 NoteSinger::NoteSinger()
-: mPitch(0)
+: IAudioReceiver(gBufferSize)
+, mPitch(0)
 , mOctave(0)
 , mOctaveSlider(NULL)
 , mNumBuckets(28)
 {
    TheTransport->AddAudioPoller(this);
    TheScale->AddListener(this);
-
-   mInputBufferSize = gBufferSize;
-   mInputBuffer = new float[mInputBufferSize];
-   Clear(mInputBuffer, mInputBufferSize);
    
-   mWorkBuffer = new float[mInputBufferSize];
-   Clear(mWorkBuffer, mInputBufferSize);
+   mWorkBuffer = new float[GetBuffer()->BufferSize()];
+   Clear(mWorkBuffer, GetBuffer()->BufferSize());
    
    OnScaleChanged();
 }
@@ -40,13 +37,6 @@ NoteSinger::~NoteSinger()
 {
    TheTransport->RemoveAudioPoller(this);
    TheScale->RemoveListener(this);
-   delete[] mInputBuffer;
-}
-
-float* NoteSinger::GetBuffer(int& bufferSize)
-{
-   bufferSize = mInputBufferSize;
-   return mInputBuffer;
 }
 
 void NoteSinger::OnTransportAdvanced(float amount)
@@ -57,6 +47,7 @@ void NoteSinger::OnTransportAdvanced(float amount)
       return;
 
    ComputeSliders(0);
+   SyncInputBuffer();
    
    int pitch = -1;
    
@@ -64,9 +55,9 @@ void NoteSinger::OnTransportAdvanced(float amount)
    float bestPeak = -1;
    for (int i=0; i<mNumBuckets; ++i)
    {
-      memcpy(mWorkBuffer,mInputBuffer, mInputBufferSize*sizeof(float));
-      mBands[i].Filter(mWorkBuffer, mInputBufferSize);
-      mPeaks[i].Process(mWorkBuffer, mInputBufferSize);
+      memcpy(mWorkBuffer,GetBuffer()->GetChannel(0), GetBuffer()->BufferSize()*sizeof(float));
+      mBands[i].Filter(mWorkBuffer, GetBuffer()->BufferSize());
+      mPeaks[i].Process(mWorkBuffer, GetBuffer()->BufferSize());
       
       float peak = mPeaks[i].GetPeak();
       if (peak > bestPeak)
@@ -92,7 +83,7 @@ void NoteSinger::OnTransportAdvanced(float amount)
       mPitch = pitch;
    }
 
-   Clear(mInputBuffer, mInputBufferSize);
+   GetBuffer()->Clear();
 }
 
 string NoteSinger::GetTitleLabel()

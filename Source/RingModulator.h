@@ -10,8 +10,7 @@
 #define __modularSynth__RingModulator__
 
 #include <iostream>
-#include "IAudioReceiver.h"
-#include "IAudioSource.h"
+#include "IAudioProcessor.h"
 #include "IDrawableModule.h"
 #include "ClickButton.h"
 #include "Slider.h"
@@ -20,7 +19,7 @@
 #include "Ramp.h"
 #include "INoteReceiver.h"
 
-class RingModulator : public IAudioReceiver, public IAudioSource, public IDrawableModule, public IButtonListener, public IFloatSliderListener, public INoteReceiver
+class RingModulator : public IAudioProcessor, public IDrawableModule, public IButtonListener, public IFloatSliderListener, public INoteReceiver
 {
 public:
    RingModulator();
@@ -33,7 +32,7 @@ public:
    void SetEnabled(bool enabled) override { mEnabled = enabled; }
 
    //IAudioReceiver
-   float* GetBuffer(int& bufferSize) override;
+   InputMode GetInputMode() override { return kInputMode_Mono; }
 
    //IAudioSource
    void Process(double time) override;
@@ -57,15 +56,12 @@ private:
    void GetModuleDimensions(int& x, int& y) override { x = 130; y = 52; }
    bool Enabled() const override { return mEnabled; }
 
-   int mInputBufferSize;
-   float* mInputBuffer;
    float* mDryBuffer;
 
    float mDryWet;
    float mVolume;
    FloatSlider* mDryWetSlider;
    FloatSlider* mVolumeSlider;
-   
    
    EnvOscillator mModOsc;
    float mPhase;

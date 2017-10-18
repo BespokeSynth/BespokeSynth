@@ -11,14 +11,13 @@
 #pragma once
 
 #include <iostream>
-#include "IAudioReceiver.h"
-#include "IAudioSource.h"
+#include "IAudioProcessor.h"
 #include "IDrawableModule.h"
 #include "Slider.h"
 #include "ClickButton.h"
 #include "RollingBuffer.h"
 
-class TakeRecorder : public IAudioReceiver, public IAudioSource, public IDrawableModule, public IFloatSliderListener, public IIntSliderListener
+class TakeRecorder : public IAudioProcessor, public IDrawableModule, public IFloatSliderListener, public IIntSliderListener
 {
 public:
    TakeRecorder();
@@ -28,8 +27,8 @@ public:
    string GetTitleLabel() override { return "take recorder"; }
    void CreateUIControls() override;
    
-   //IAudioReceiver
-   float* GetBuffer(int& bufferSize) override;
+   //IAudioProcessor
+   InputMode GetInputMode() override { return kInputMode_Mono; }
    
    //IAudioSource
    void Process(double time) override;
@@ -47,8 +46,6 @@ private:
    void GetModuleDimensions(int& w, int&h) override { w=120; h=22; }
    bool Enabled() const override { return mEnabled; }
    
-   int mInputBufferSize;
-   float* mInputBuffer;
    float mStartSeconds;
    FloatSlider* mStartSecondsSlider;
    int mNumBars;

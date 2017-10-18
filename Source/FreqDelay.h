@@ -10,14 +10,13 @@
 #define __modularSynth__FreqDelay__
 
 #include <iostream>
-#include "IAudioReceiver.h"
-#include "IAudioSource.h"
+#include "IAudioProcessor.h"
 #include "IDrawableModule.h"
 #include "INoteReceiver.h"
 #include "DelayEffect.h"
 #include "Slider.h"
 
-class FreqDelay : public IAudioReceiver, public IAudioSource, public IDrawableModule, public INoteReceiver, public IFloatSliderListener
+class FreqDelay : public IAudioProcessor, public IDrawableModule, public INoteReceiver, public IFloatSliderListener
 {
 public:
    FreqDelay();
@@ -28,7 +27,7 @@ public:
    void CreateUIControls() override;
 
    //IAudioReceiver
-   float* GetBuffer(int& bufferSize) override;
+   InputMode GetInputMode() override { return kInputMode_Mono; }
 
    //IAudioSource
    void Process(double time) override;
@@ -48,8 +47,6 @@ private:
    void GetModuleDimensions(int& x, int& y) override { x = 130; y = 110; }
    bool Enabled() const override { return true; }
 
-   int mInputBufferSize;
-   float* mInputBuffer;
    float* mDryBuffer;
    float mDryWet;
    FloatSlider* mDryWetSlider;

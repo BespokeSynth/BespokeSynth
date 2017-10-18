@@ -10,8 +10,7 @@
 #define __Bespoke__MultibandCompressor__
 
 #include <iostream>
-#include "IAudioReceiver.h"
-#include "IAudioSource.h"
+#include "IAudioProcessor.h"
 #include "IDrawableModule.h"
 #include "Slider.h"
 #include "ClickButton.h"
@@ -21,7 +20,7 @@
 
 #define COMPRESSOR_MAX_BANDS 10
 
-class MultibandCompressor : public IAudioReceiver, public IAudioSource, public IDrawableModule, public IFloatSliderListener, public IIntSliderListener
+class MultibandCompressor : public IAudioProcessor, public IDrawableModule, public IFloatSliderListener, public IIntSliderListener
 {
 public:
    MultibandCompressor();
@@ -32,7 +31,7 @@ public:
    void CreateUIControls() override;
    
    //IAudioReceiver
-   float* GetBuffer(int& bufferSize) override;
+   InputMode GetInputMode() override { return kInputMode_Mono; }
    
    //IAudioSource
    void Process(double time) override;
@@ -52,9 +51,6 @@ private:
    
    void CalcFilters();
    
-   
-   int mInputBufferSize;
-   float* mInputBuffer;
    float* mWorkBuffer;
    float* mOutBuffer;
    

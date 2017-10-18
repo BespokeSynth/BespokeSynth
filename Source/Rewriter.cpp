@@ -17,15 +17,13 @@
 #include "PatchCableSource.h"
 
 Rewriter::Rewriter()
-: mRewriteButton(NULL)
+: IAudioProcessor(gBufferSize)
+, mRewriteButton(NULL)
 , mConnectedLooper(NULL)
 , mRecordBuffer(MAX_BUFFER_SIZE)
 , mStartRecordTime(-1)
 , mStartRecordTimeButton(NULL)
 {
-   mInputBufferSize = gBufferSize;
-   mInputBuffer = new float[mInputBufferSize];
-   Clear(mInputBuffer, mInputBufferSize);
 }
 
 void Rewriter::CreateUIControls()
@@ -42,13 +40,6 @@ void Rewriter::CreateUIControls()
 
 Rewriter::~Rewriter()
 {
-   delete[] mInputBuffer;
-}
-
-float* Rewriter::GetBuffer(int& bufferSize)
-{
-   bufferSize = mInputBufferSize;
-   return mInputBuffer;
 }
 
 void Rewriter::PostRepatch(PatchCableSource* cable)
@@ -69,18 +60,18 @@ void Rewriter::Process(double time)
 
    if (GetTarget() == NULL)
       return;
+   
+   SyncBuffers();
 
-   int bufferSize = gBufferSize;
-   float* out = GetTarget()->GetBuffer(bufferSize);
-   assert(bufferSize == gBufferSize);
+   int bufferSize = GetBuffer()->BufferSize();
 
-   mRecordBuffer.WriteChunk(mInputBuffer, bufferSize);
+   mRecordBuffer.WriteChunk(GetBuffer()->GetChannel(0), bufferSize);
 
-   Add(out, mInputBuffer, bufferSize);
+   Add(GetTarget()->GetBuffer()->GetChannel(0), GetBuffer()->GetChannel(0), bufferSize);
 
-   GetVizBuffer()->WriteChunk(mInputBuffer,bufferSize);
+   GetVizBuffer()->WriteChunk(GetBuffer()->GetChannel(0),bufferSize);
 
-   Clear(mInputBuffer, mInputBufferSize);
+   GetBuffer()->Clear();
 }
 
 void Rewriter::DrawModule()

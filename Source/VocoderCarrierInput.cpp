@@ -14,16 +14,13 @@
 #include "PatchCableSource.h"
 
 VocoderCarrierInput::VocoderCarrierInput()
-: mVocoder(NULL)
+: IAudioProcessor(gBufferSize)
+, mVocoder(NULL)
 {
-   mInputBufferSize = gBufferSize;
-   mInputBuffer = new float[mInputBufferSize];
-   Clear(mInputBuffer, mInputBufferSize);
 }
 
 VocoderCarrierInput::~VocoderCarrierInput()
 {
-   delete[] mInputBuffer;
 }
 
 void VocoderCarrierInput::CreateUIControls()
@@ -32,12 +29,6 @@ void VocoderCarrierInput::CreateUIControls()
    
    GetPatchCableSource()->AddTypeFilter("vocoder");
    GetPatchCableSource()->AddTypeFilter("bandvocoder");
-}
-
-float* VocoderCarrierInput::GetBuffer(int& bufferSize)
-{
-   bufferSize = mInputBufferSize;
-   return mInputBuffer;
 }
 
 void VocoderCarrierInput::Process(double time)
@@ -52,12 +43,14 @@ void VocoderCarrierInput::Process(double time)
 
    if (mVocoder == NULL)
       return;
+   
+   SyncBuffers();
 
-   mVocoder->SetCarrierBuffer(mInputBuffer, mInputBufferSize);
+   mVocoder->SetCarrierBuffer(GetBuffer()->GetChannel(0), GetBuffer()->BufferSize());
 
-   GetVizBuffer()->WriteChunk(mInputBuffer, mInputBufferSize);
+   GetVizBuffer()->WriteChunk(GetBuffer()->GetChannel(0), GetBuffer()->BufferSize());
 
-   Clear(mInputBuffer, mInputBufferSize);
+   GetBuffer()->Clear();
 }
 
 void VocoderCarrierInput::DrawModule()

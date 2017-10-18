@@ -18,7 +18,8 @@
 #include "MidiController.h"
 
 SamplerGrid::SamplerGrid()
-: mPassthrough(true)
+: IAudioProcessor(gBufferSize)
+, mPassthrough(true)
 , mPassthroughCheckbox(NULL)
 , mRecordingSample(-1)
 , mClearHeld(false)
@@ -41,8 +42,6 @@ SamplerGrid::SamplerGrid()
 , mDuplicate(false)
 , mDuplicateCheckbox(NULL)
 {
-   mRecordBuffer = new float[gBufferSize];
-   Clear(mRecordBuffer, gBufferSize);
 }
 
 void SamplerGrid::CreateUIControls()
@@ -58,7 +57,6 @@ void SamplerGrid::CreateUIControls()
 
 SamplerGrid::~SamplerGrid()
 {
-   delete[] mRecordBuffer;
    delete[] mGridSamples;
 }
 
@@ -81,10 +79,9 @@ void SamplerGrid::Process(double time)
       return;
    
    ComputeSliders(0);
+   SyncBuffers();
    
-   int bufferSize;
-   float* out = GetTarget()->GetBuffer(bufferSize);
-   assert(bufferSize == gBufferSize);
+   int bufferSize = GetBuffer()->BufferSize();
    
    Clear(gWorkBuffer, gBufferSize);
    
@@ -115,7 +112,7 @@ void SamplerGrid::Process(double time)
       {
          if (sample.mPlayhead < MAX_SAMPLER_GRID_LENGTH)
          {
-            sample.mSampleData[sample.mPlayhead] = mRecordBuffer[i];// + gWorkBuffer[i];
+            sample.mSampleData[sample.mPlayhead] = GetBuffer()->GetChannel(0)[i];// + gWorkBuffer[i];
             ++sample.mPlayhead;
             sample.mSampleLength = sample.mPlayhead;
             sample.mSampleStart = 0;
@@ -127,14 +124,14 @@ void SamplerGrid::Process(double time)
    if (mPassthrough)
    {
       for (int i=0; i<gBufferSize; ++i)
-         gWorkBuffer[i] += mRecordBuffer[i];
+         gWorkBuffer[i] += GetBuffer()->GetChannel(0)[i];
    }
    
    GetVizBuffer()->WriteChunk(gWorkBuffer, bufferSize);
    
-   Add(out, gWorkBuffer, bufferSize);
+   Add(GetTarget()->GetBuffer()->GetChannel(0), gWorkBuffer, bufferSize);
    
-   Clear(mRecordBuffer, gBufferSize);
+   GetBuffer()->Clear();
 }
 
 void SamplerGrid::ConnectGridController(IGridController* grid)

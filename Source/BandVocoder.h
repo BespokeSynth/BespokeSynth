@@ -10,8 +10,7 @@
 #define __modularSynth__BandVocoder__
 
 #include <iostream>
-#include "IAudioReceiver.h"
-#include "IAudioSource.h"
+#include "IAudioProcessor.h"
 #include "IDrawableModule.h"
 #include "Checkbox.h"
 #include "RollingBuffer.h"
@@ -22,7 +21,7 @@
 
 #define VOCODER_MAX_BANDS 64
 
-class BandVocoder : public IAudioReceiver, public IAudioSource, public IDrawableModule, public IFloatSliderListener, public VocoderBase, public IIntSliderListener
+class BandVocoder : public IAudioProcessor, public IDrawableModule, public IFloatSliderListener, public VocoderBase, public IIntSliderListener
 {
 public:
    BandVocoder();
@@ -35,7 +34,7 @@ public:
    void SetCarrierBuffer(float* carrier, int bufferSize) override;
    
    //IAudioReceiver
-   float* GetBuffer(int& bufferSize) override;
+   InputMode GetInputMode() override { return kInputMode_Mono; }
    
    //IAudioSource
    void Process(double time) override;
@@ -57,9 +56,6 @@ private:
    bool Enabled() const override { return mEnabled; }
    
    void CalcFilters();
-   
-   int mInputBufferSize;
-   float* mInputBuffer;
    
    float* mCarrierInputBuffer;
    

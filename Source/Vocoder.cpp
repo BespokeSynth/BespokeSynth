@@ -14,7 +14,8 @@
 #define FFT_FREQDOMAIN_SIZE VOCODER_WINDOW_SIZE/2 + 1
 
 Vocoder::Vocoder()
-: mFFT(VOCODER_WINDOW_SIZE)
+: IAudioProcessor(gBufferSize)
+, mFFT(VOCODER_WINDOW_SIZE)
 , mRollingInputBuffer(VOCODER_WINDOW_SIZE)
 , mRollingOutputBuffer(VOCODER_WINDOW_SIZE)
 , mFFTData(VOCODER_WINDOW_SIZE, FFT_FREQDOMAIN_SIZE)
@@ -38,17 +39,13 @@ Vocoder::Vocoder()
 , mCut(1)
 , mCutSlider(NULL)
 {
-   mInputBufferSize = gBufferSize;
-   mInputBuffer = new float[mInputBufferSize];
-   Clear(mInputBuffer, mInputBufferSize);
-
    // Generate a window with a single raised cosine from N/4 to 3N/4
    mWindower = new float[VOCODER_WINDOW_SIZE];
    for (int i=0; i<VOCODER_WINDOW_SIZE; ++i)
       mWindower[i] = -.5*cos(FTWO_PI*i/VOCODER_WINDOW_SIZE)+.5;
 
-   mCarrierInputBuffer = new float[mInputBufferSize];
-   Clear(mCarrierInputBuffer, mInputBufferSize);
+   mCarrierInputBuffer = new float[GetBuffer()->BufferSize()];
+   Clear(mCarrierInputBuffer, GetBuffer()->BufferSize());
 
    AddChild(&mGate);
    mGate.SetPosition(110,5);
@@ -72,21 +69,14 @@ void Vocoder::CreateUIControls()
 
 Vocoder::~Vocoder()
 {
-   delete[] mInputBuffer;
    delete[] mWindower;
    delete[] mCarrierInputBuffer;
 }
 
 void Vocoder::SetCarrierBuffer(float *carrier, int bufferSize)
 {
-   assert(bufferSize == mInputBufferSize);
+   assert(bufferSize == GetBuffer()->BufferSize());
    memcpy(mCarrierInputBuffer, carrier, bufferSize*sizeof(float));
-}
-
-float* Vocoder::GetBuffer(int& bufferSize)
-{
-   bufferSize = mInputBufferSize;
-   return mInputBuffer;
 }
 
 void Vocoder::Process(double time)
@@ -97,21 +87,20 @@ void Vocoder::Process(double time)
       return;
 
    ComputeSliders(0);
+   SyncBuffers();
 
    float inputPreampSq = mInputPreamp * mInputPreamp;
    float carrierPreampSq = mCarrierPreamp * mCarrierPreamp;
    float volSq = mVolume * mVolume;
 
-   int bufferSize = gBufferSize;
-   float* out = GetTarget()->GetBuffer(bufferSize);
-   assert(bufferSize == gBufferSize);
+   int bufferSize = GetBuffer()->BufferSize();
 
    int zerox = 0; //count up zero crossings
    bool positive = true;
    for (int i=0; i<bufferSize; ++i)
    {
-      if ((mInputBuffer[i] < 0 && positive) ||
-          (mInputBuffer[i] > 0 && !positive))
+      if ((GetBuffer()->GetChannel(0)[i] < 0 && positive) ||
+          (GetBuffer()->GetChannel(0)[i] > 0 && !positive))
       {
          ++zerox;
          positive = !positive;
@@ -121,9 +110,9 @@ void Vocoder::Process(double time)
    if (fricative)
       mFricDetected = true;  //draw that we detected a fricative
 
-   mGate.ProcessAudio(time, mInputBuffer, bufferSize);
+   mGate.ProcessAudio(time, GetBuffer()->GetChannel(0), bufferSize);
 
-   mRollingInputBuffer.WriteChunk(mInputBuffer, bufferSize);
+   mRollingInputBuffer.WriteChunk(GetBuffer()->GetChannel(0), bufferSize);
    
    //copy rolling input buffer into working buffer and window it
    mRollingInputBuffer.ReadChunk(mFFTData.mTimeDomain, VOCODER_WINDOW_SIZE);
@@ -201,16 +190,16 @@ void Vocoder::Process(double time)
    for (int i=0; i<VOCODER_WINDOW_SIZE; ++i)
       mRollingOutputBuffer.Accum(VOCODER_WINDOW_SIZE-i-1, mFFTData.mTimeDomain[i] * mWindower[i] * .0001f);
 
-   Mult(mInputBuffer, (1-mDryWet)*inputPreampSq, mInputBufferSize);
+   Mult(GetBuffer()->GetChannel(0), (1-mDryWet)*inputPreampSq, GetBuffer()->BufferSize());
 
    for (int i=0; i<bufferSize; ++i)
-      mInputBuffer[i] += mRollingOutputBuffer.GetSample(VOCODER_WINDOW_SIZE-i-1) * volSq * mDryWet;
+      GetBuffer()->GetChannel(0)[i] += mRollingOutputBuffer.GetSample(VOCODER_WINDOW_SIZE-i-1) * volSq * mDryWet;
 
-   Add(out, mInputBuffer, bufferSize);
+   Add(GetTarget()->GetBuffer()->GetChannel(0), GetBuffer()->GetChannel(0), bufferSize);
 
-   GetVizBuffer()->WriteChunk(mInputBuffer,bufferSize);
+   GetVizBuffer()->WriteChunk(GetBuffer()->GetChannel(0),bufferSize);
 
-   Clear(mInputBuffer, mInputBufferSize);
+   GetBuffer()->Clear();
 }
 
 void Vocoder::DrawModule()

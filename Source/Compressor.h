@@ -10,7 +10,7 @@
 #define __modularSynth__Compressor__
 
 #include <iostream>
-#include "IAudioProcessor.h"
+#include "IAudioEffect.h"
 #include "Slider.h"
 #include "Checkbox.h"
 
@@ -93,17 +93,17 @@ class EnvelopeDetector
 		
 };	// end AttRelEnvelope class
 
-class Compressor : public IAudioProcessor, public IFloatSliderListener
+class Compressor : public IAudioEffect, public IFloatSliderListener
 {
 public:
    Compressor();
    
-   static IAudioProcessor* Create() { return new Compressor(); }
+   static IAudioEffect* Create() { return new Compressor(); }
    
    string GetTitleLabel() override { return "compressor"; }
    void CreateUIControls() override;
 
-   //IAudioProcessor
+   //IAudioEffect
    void ProcessAudio(double time, float* audio, int bufferSize) override;
    void SetEnabled(bool enabled) override { mEnabled = enabled; }
    string GetType() override { return "compressor"; }

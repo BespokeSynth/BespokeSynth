@@ -222,22 +222,28 @@ void PatchCable::Render()
             float dx = (cable.plug.x - cable.start.x) / wireLength;
             float dy = (cable.plug.y - cable.start.y) / wireLength;
             
-            ofSetColor(lineColorAlphaed);
-            ofBeginShape();
-            ofVertex(cable.start.x,cable.start.y);
-            for (int i=1; i<wireLength-1; ++i)
+            for (int ch=0; ch<vizBuff->NumChannels(); ++ch)
             {
-               float x = cable.start.x + i*dx;
-               float y = cable.start.y + i*dy;
-               float sample = vizBuff->GetSample((i/wireLength * numSamples));
-               sample = sqrtf(fabsf(sample)) * (sample < 0 ? -1 : 1);
-               sample = ofClamp(sample, -1.0f, 1.0f);
-               x += 20 * sample * -dy;
-               y += 20 * sample * dx;
-               ofVertex(x,y);
+               ofSetColor(lineColorAlphaed);
+               if (ch != 0)
+                  ofSetColor(lineColorAlphaed.g, lineColorAlphaed.r, lineColorAlphaed.b, lineColorAlphaed.a);
+               ofVec2f offset((ch - (vizBuff->NumChannels()-1)*.5f) * 2 * dy, (ch - (vizBuff->NumChannels()-1) * .5f) * 2 * -dx);
+               ofBeginShape();
+               ofVertex(cable.start.x + offset.x,cable.start.y + offset.y);
+               for (int i=1; i<wireLength-1; ++i)
+               {
+                  float x = cable.start.x + i*dx;
+                  float y = cable.start.y + i*dy;
+                  float sample = vizBuff->GetSample((i/wireLength * numSamples), ch);
+                  sample = sqrtf(fabsf(sample)) * (sample < 0 ? -1 : 1);
+                  sample = ofClamp(sample, -1.0f, 1.0f);
+                  x += 20 * sample * -dy;
+                  y += 20 * sample * dx;
+                  ofVertex(x + offset.x,y + offset.y);
+               }
+               ofVertex(cable.plug.x + offset.x,cable.plug.y + offset.y);
+               ofEndShape();
             }
-            ofVertex(cable.plug.x,cable.plug.y);
-            ofEndShape();
          }
          else
          {

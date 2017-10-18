@@ -23,7 +23,7 @@ FilterViz::FilterViz()
    
    for (int i=0; i<1; ++i)
    {
-      IAudioProcessor* filter = TheSynth->GetEffectFactory()->MakeEffect("eq");
+      IAudioEffect* filter = TheSynth->GetEffectFactory()->MakeEffect("eq");
       AddChild(filter);
       filter->SetPosition(4 + 100*i, 20);
       filter->SetName(("filter "+ofToString(i)).c_str());

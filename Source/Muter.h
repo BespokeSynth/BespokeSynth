@@ -10,24 +10,24 @@
 #define __modularSynth__Muter__
 
 #include <iostream>
-#include "IAudioProcessor.h"
+#include "IAudioEffect.h"
 #include "IDrawableModule.h"
 #include "Checkbox.h"
 #include "Ramp.h"
 #include "Slider.h"
 
-class Muter : public IAudioProcessor, public IFloatSliderListener
+class Muter : public IAudioEffect, public IFloatSliderListener
 {
 public:
    Muter();
    virtual ~Muter();
    
-   static IAudioProcessor* Create() { return new Muter(); }
+   static IAudioEffect* Create() { return new Muter(); }
    
    string GetTitleLabel() override { return "muter"; }
    void CreateUIControls() override;
 
-   //IAudioProcessor
+   //IAudioEffect
    void ProcessAudio(double time, float* audio, int bufferSize) override;
    void SetEnabled(bool enabled) override {}
    string GetType() override { return "muter"; }

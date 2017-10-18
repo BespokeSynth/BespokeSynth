@@ -10,20 +10,20 @@
 #define __modularSynth__GateEffect__
 
 #include <iostream>
-#include "IAudioProcessor.h"
+#include "IAudioEffect.h"
 #include "Slider.h"
 #include "Checkbox.h"
 
-class GateEffect : public IAudioProcessor, public IIntSliderListener, public IFloatSliderListener
+class GateEffect : public IAudioEffect, public IIntSliderListener, public IFloatSliderListener
 {
 public:
    GateEffect();
-   static IAudioProcessor* Create() { return new GateEffect(); }
+   static IAudioEffect* Create() { return new GateEffect(); }
    
    string GetTitleLabel() override { return "gate"; }
    void CreateUIControls() override;
 
-   //IAudioProcessor
+   //IAudioEffect
    void ProcessAudio(double time, float* audio, int bufferSize) override;
    void SetEnabled(bool enabled) override { mEnabled = enabled; }
    string GetType() override { return "gate"; }

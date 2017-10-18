@@ -1,6 +1,6 @@
 #include "ModularSynth.h"
 #include "IAudioSource.h"
-#include "IAudioProcessor.h"
+#include "IAudioEffect.h"
 #include "SynthGlobals.h"
 #include "MidiInstrument.h"
 #include "Scale.h"
@@ -40,9 +40,7 @@ void AtExit()
 
 ModularSynth::ModularSynth()
 : mMoveModule(NULL)
-, mOutputBufferLeft(RECORDING_LENGTH)
-, mOutputBufferRight(RECORDING_LENGTH)
-, mOutputBufferMeasurePos(RECORDING_LENGTH)
+, mOutputBuffer(RECORDING_LENGTH)
 , mAudioPaused(false)
 , mClickStartX(INT_MAX)
 , mClickStartY(INT_MAX)
@@ -63,6 +61,8 @@ ModularSynth::ModularSynth()
    
    mSaveOutputBuffer[0] = new float[RECORDING_LENGTH];
    mSaveOutputBuffer[1] = new float[RECORDING_LENGTH];
+   
+   mOutputBuffer.SetNumChannels(2);
 }
 
 ModularSynth::~ModularSynth()
@@ -202,7 +202,7 @@ void ModularSynth::Draw(void* vg)
    
    mDrawRect.set(-mDrawOffset.x, -mDrawOffset.y, ofGetWidth() / gDrawScale, ofGetHeight() / gDrawScale);
    
-   DrawLissajous(&mOutputBufferLeft, 0, 0, ofGetWidth(), ofGetHeight(), .7f, 0, 0);
+   DrawLissajous(&mOutputBuffer, 0, 0, ofGetWidth(), ofGetHeight(), .7f, 0, 0);
    
    if (gTime == 1)
    {
@@ -924,14 +924,13 @@ void ModularSynth::AudioOut(float** output, int bufferSize, int nChannels)
                                           //if we want these different, need to fix outBuffer here, and also fix audioIn()
    for (int ioOffset = 0; ioOffset < mIOBufferSize; ioOffset += gBufferSize)
    {
-      int blah;
       if (TheVinylTempoControl &&
           mInput[TheVinylTempoControl->GetLeftChannel()-1] &&
           mInput[TheVinylTempoControl->GetRightChannel()-1])
       {
          TheVinylTempoControl->SetVinylControlInput(
-               mInput[TheVinylTempoControl->GetLeftChannel()-1]->GetBuffer(blah),
-               mInput[TheVinylTempoControl->GetRightChannel()-1]->GetBuffer(blah), gBufferSize);
+               mInput[TheVinylTempoControl->GetLeftChannel()-1]->GetBuffer()->GetChannel(0),
+               mInput[TheVinylTempoControl->GetRightChannel()-1]->GetBuffer()->GetChannel(0), gBufferSize);
       }
 
       for (int i=0; i<nChannels; ++i)
@@ -947,23 +946,22 @@ void ModularSynth::AudioOut(float** output, int bufferSize, int nChannels)
       //put it into speakers
       for (int i=0; i<MAX_OUTPUT_CHANNELS; ++i)
          outBuffer[i] = gZeroBuffer;
-      int outBufferSize = gBufferSize;
       for (int i=0; i<nChannels; ++i)
       {
          if (mOutput[i])
          {
-            outBuffer[i] = mOutput[i]->GetBuffer(outBufferSize);
-            assert(outBufferSize == gBufferSize);
+            mOutput[i]->Process();
+            outBuffer[i] = mOutput[i]->GetBuffer()->GetChannel(0);
          }
       }
       
       if (TheFreeverbOutput)
       {
-         TheFreeverbOutput->ProcessAudio(outBuffer[TheFreeverbOutput->GetLeftChannel()-1], outBuffer[TheFreeverbOutput->GetRightChannel()-1], outBufferSize);
+         TheFreeverbOutput->ProcessAudio(outBuffer[TheFreeverbOutput->GetLeftChannel()-1], outBuffer[TheFreeverbOutput->GetRightChannel()-1], gBufferSize);
       }
       
       if (TheMultitrackRecorder)
-         TheMultitrackRecorder->Process(gTime, outBuffer[0], outBuffer[1], outBufferSize);
+         TheMultitrackRecorder->Process(gTime, outBuffer[0], outBuffer[1], gBufferSize);
       
       for (int ch=0; ch<nChannels; ++ch)
          memcpy(output[ch]+ioOffset, outBuffer[ch]+ioOffset, gBufferSize*sizeof(float));
@@ -973,12 +971,9 @@ void ModularSynth::AudioOut(float** output, int bufferSize, int nChannels)
       TheTransport->Advance((float)elapsed);
    }
    /////////// AUDIO PROCESSING ENDS HERE /////////////
-
-   for (int i=0; i<bufferSize; ++i)
-      mOutputBufferMeasurePos.Write(TheTransport->GetMeasurePos(i));
    
-   mOutputBufferLeft.WriteChunk(outBuffer[0], bufferSize);
-   mOutputBufferRight.WriteChunk(outBuffer[1], bufferSize);
+   mOutputBuffer.WriteChunk(outBuffer[0], bufferSize, 0);
+   mOutputBuffer.WriteChunk(outBuffer[1], bufferSize, 1);
    mRecordingLength += bufferSize;
    mRecordingLength = MIN(mRecordingLength, RECORDING_LENGTH);
    
@@ -1000,7 +995,7 @@ void ModularSynth::AudioIn(const float** input, int bufferSize, int nChannels)
    {
       if (mInput[i])
       {
-         memcpy(mInput[i]->GetBuffer(inBufferSize), input[i], sizeof(float)*bufferSize);
+         memcpy(mInput[i]->GetBuffer()->GetChannel(0), input[i], sizeof(float)*bufferSize);
          assert(inBufferSize == gBufferSize);
       }
    }
@@ -1713,6 +1708,9 @@ IDrawableModule* ModularSynth::SpawnModuleOnTheFly(string moduleName, float x, f
    vector<string> tokens = ofSplitString(moduleName," ");
    if (tokens.size() == 0)
       return nullptr;
+   
+   if (tokens[0] == "siggen")
+      tokens[0] = "signalgenerator";
 
    ofxJSONElement dummy;
    dummy["type"] = tokens[0];
@@ -1790,8 +1788,8 @@ void ModularSynth::SaveOutput()
    
    for (int i=0; i<mRecordingLength; ++i)
    {
-      mSaveOutputBuffer[0][i] = mOutputBufferLeft.GetSample(mRecordingLength-i-1);
-      mSaveOutputBuffer[1][i] = mOutputBufferRight.GetSample(mRecordingLength-i-1);
+      mSaveOutputBuffer[0][i] = mOutputBuffer.GetSample(mRecordingLength-i-1, 0);
+      mSaveOutputBuffer[1][i] = mOutputBuffer.GetSample(mRecordingLength-i-1, 1);
    }
 
    Sample::WriteDataToFile(filename.c_str(), mSaveOutputBuffer, mRecordingLength, 2);
@@ -1799,9 +1797,7 @@ void ModularSynth::SaveOutput()
    //mOutputBufferMeasurePos.ReadChunk(mSaveOutputBuffer, mRecordingLength);
    //Sample::WriteDataToFile(filenamePos.c_str(), mSaveOutputBuffer, mRecordingLength, 1);
    
-   mOutputBufferLeft.ClearBuffer();
-   mOutputBufferRight.ClearBuffer();
-   mOutputBufferMeasurePos.ClearBuffer();
+   mOutputBuffer.ClearBuffer();
    mRecordingLength = 0;
 }
 

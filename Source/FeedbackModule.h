@@ -9,15 +9,14 @@
 #ifndef __Bespoke__FeedbackModule__
 #define __Bespoke__FeedbackModule__
 
-#include "IAudioReceiver.h"
-#include "IAudioSource.h"
+#include "IAudioProcessor.h"
 #include "IDrawableModule.h"
 #include "Slider.h"
 #include "DelayEffect.h"
 
 class PatchCableSource;
 
-class FeedbackModule : public IAudioReceiver, public IAudioSource, public IDrawableModule, public IFloatSliderListener
+class FeedbackModule : public IAudioProcessor, public IDrawableModule, public IFloatSliderListener
 {
 public:
    FeedbackModule();
@@ -30,7 +29,7 @@ public:
    void PostRepatch(PatchCableSource* cable) override;
    
    //IAudioReceiver
-   float* GetBuffer(int& bufferSize) override;
+   InputMode GetInputMode() override { return kInputMode_Mono; }
    
    //IAudioSource
    void Process(double time) override;
@@ -49,8 +48,6 @@ private:
    void GetModuleDimensions(int& w, int&h) override { w=120; h=80; }
    bool Enabled() const override { return mEnabled; }
    
-   int mInputBufferSize;
-   float* mInputBuffer;
    DelayEffect mDelay;
    
    IAudioReceiver* mFeedbackTarget;

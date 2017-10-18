@@ -53,8 +53,8 @@ void SampleCanvas::Process(double time)
    
    mCanvas->SetCursorPos(canvasPos);
    
-   int bufferSize;
-   float* out = GetTarget()->GetBuffer(bufferSize);
+   int bufferSize = GetTarget()->GetBuffer()->BufferSize();
+   float* out = GetTarget()->GetBuffer()->GetChannel(0);
    assert(bufferSize == gBufferSize);
    
    Clear(gWorkBuffer, bufferSize);

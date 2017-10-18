@@ -10,8 +10,7 @@
 #define __modularSynth__Rewriter__
 
 #include <iostream>
-#include "IAudioReceiver.h"
-#include "IAudioSource.h"
+#include "IAudioProcessor.h"
 #include "IDrawableModule.h"
 #include "ClickButton.h"
 #include "RollingBuffer.h"
@@ -20,7 +19,7 @@
 
 class Looper;
 
-class Rewriter : public IAudioReceiver, public IAudioSource, public IDrawableModule, public IButtonListener
+class Rewriter : public IAudioProcessor, public IDrawableModule, public IButtonListener
 {
 public:
    Rewriter();
@@ -34,8 +33,8 @@ public:
    
    void PostRepatch(PatchCableSource* cable) override;
    
-   //IAudioReceiver
-   float* GetBuffer(int& bufferSize) override;
+   //IAudioProcessor
+   InputMode GetInputMode() override { return kInputMode_Mono; }
 
    //IAudioSource
    void Process(double time) override;
@@ -58,9 +57,6 @@ private:
    void DrawModule() override;
    void GetModuleDimensions(int& w, int&h) override { w=80; h=20; }
    bool Enabled() const override { return mEnabled; }
-
-   int mInputBufferSize;
-   float* mInputBuffer;
    
    double mStartRecordTime;
 

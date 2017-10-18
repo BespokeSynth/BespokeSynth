@@ -10,8 +10,7 @@
 #define __modularSynth__Autotalent__
 
 #include <iostream>
-#include "IAudioReceiver.h"
-#include "IAudioSource.h"
+#include "IAudioProcessor.h"
 #include "Slider.h"
 #include "Checkbox.h"
 #include "IDrawableModule.h"
@@ -21,7 +20,7 @@
 
 class FFT;
 
-class Autotalent : public IAudioReceiver, public IAudioSource, public IIntSliderListener, public IFloatSliderListener, public IDrawableModule, public IRadioButtonListener, public IButtonListener, public INoteReceiver
+class Autotalent : public IAudioProcessor, public IIntSliderListener, public IFloatSliderListener, public IDrawableModule, public IRadioButtonListener, public IButtonListener, public INoteReceiver
 {
 public:
    Autotalent();
@@ -32,8 +31,8 @@ public:
    void CreateUIControls() override;
 
    //IAudioReceiver
-   float* GetBuffer(int& bufferSize) override;
-
+   InputMode GetInputMode() override { return kInputMode_Mono; }
+   
    //IAudioSource
    void Process(double time) override;
 
@@ -64,11 +63,6 @@ private:
    void GetModuleDimensions(int& x, int& y) override { x=260; y=360; }
    bool Enabled() const override { return mEnabled; }
 
-   
-   
-
-   int mInputBufferSize;
-   float* mInputBuffer;
    float* mWorkingBuffer;
 
    RadioButton* mASelector;

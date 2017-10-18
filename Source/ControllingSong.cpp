@@ -155,8 +155,8 @@ void ControllingSong::Process(double time)
    
    ComputeSliders(0);
    
-   int bufferSize;
-   float* out = GetTarget()->GetBuffer(bufferSize);
+   int bufferSize = GetTarget()->GetBuffer()->BufferSize();
+   float* out = GetTarget()->GetBuffer()->GetChannel(0);
    assert(bufferSize == gBufferSize);
    
    float volSq = mVolume * mVolume * .5f;

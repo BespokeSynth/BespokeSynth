@@ -10,7 +10,7 @@
 #define __Bespoke__FreeverbOutput__
 
 #include <iostream>
-#include "IAudioProcessor.h"
+#include "IAudioEffect.h"
 #include "Slider.h"
 #include "Checkbox.h"
 #include "freeverb/revmodel.hpp"

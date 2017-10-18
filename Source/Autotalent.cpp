@@ -16,7 +16,8 @@
 #define L2SC (float)3.32192809488736218171
 
 Autotalent::Autotalent()
-: mTune(440)
+: IAudioProcessor(gBufferSize)
+, mTune(440)
 , mFixed(0)
 , mPull(0)
 , mAmount(1)
@@ -71,11 +72,8 @@ Autotalent::Autotalent()
 , mPitch(0)
 , mConfidence(0)
 {
-   mInputBufferSize = gBufferSize;
-   mInputBuffer = new float[mInputBufferSize];
-   Clear(mInputBuffer, mInputBufferSize);
-   mWorkingBuffer = new float[mInputBufferSize];
-   Clear(mWorkingBuffer, mInputBufferSize);
+   mWorkingBuffer = new float[GetBuffer()->BufferSize()];
+   Clear(mWorkingBuffer, GetBuffer()->BufferSize());
 
    mfs = gSampleRate;
 
@@ -197,7 +195,7 @@ void Autotalent::CreateUIControls()
    mFSelector = new RadioButton(this,"F",164,40,&mF);
    mGbSelector = new RadioButton(this,"Gb",184,40,&mGb);
    mGSelector = new RadioButton(this,"G",204,40,&mG);
-   mAbSelector = new RadioButton(this,"Gb",224,40,&mAb);
+   mAbSelector = new RadioButton(this,"Ab",224,40,&mAb);
    mAmountSlider = new FloatSlider(this,"amount",4,100,150,15,&mAmount,0,1);
    mSmoothSlider = new FloatSlider(this,"smooth",4,120,150,15,&mSmooth,0,.8f);
    mShiftSlider = new IntSlider(this,"shift",4,140,150,15,&mShift,-6,6);
@@ -263,7 +261,6 @@ void Autotalent::CreateUIControls()
 
 Autotalent::~Autotalent()
 {
-   delete[] mInputBuffer;
    delete mFFT;
    free(mcbi);
    free(mcbf);
@@ -289,11 +286,6 @@ Autotalent::~Autotalent()
    free(mftvec);
 }
 
-float* Autotalent::GetBuffer(int& bufferSize)
-{
-   bufferSize = mInputBufferSize;
-   return mInputBuffer;
-}
 
 void Autotalent::Process(double time)
 {
@@ -303,6 +295,7 @@ void Autotalent::Process(double time)
       return;
 
    ComputeSliders(0);
+   SyncBuffers();
 
    int iNotes[12];
    int iPitch2Note[12];
@@ -351,13 +344,11 @@ void Autotalent::Process(double time)
    float flpa;
    int ford;
 
-   float* pfInput = mInputBuffer;
+   float* pfInput = GetBuffer()->GetChannel(0);
 
-   int bufferSize;
-   float* out = GetTarget()->GetBuffer(bufferSize);
-   assert(bufferSize == gBufferSize);
+   int bufferSize = GetBuffer()->BufferSize();
 
-   Clear(mWorkingBuffer, mInputBufferSize);
+   Clear(mWorkingBuffer, GetBuffer()->BufferSize());
    float* pfOutput = mWorkingBuffer;
 
    iNotes[0] = mA;
@@ -914,11 +905,11 @@ void Autotalent::Process(double time)
       *(pfOutput++) = mMix*tf + (1-mMix)*mcbi[ti4];
    }
 
-   Add(out, mWorkingBuffer, bufferSize);
+   Add(GetTarget()->GetBuffer()->GetChannel(0), mWorkingBuffer, bufferSize);
 
    GetVizBuffer()->WriteChunk(mWorkingBuffer, bufferSize);
 
-   Clear(mInputBuffer, mInputBufferSize);
+   GetBuffer()->Clear();
    
    // Tell the host the algorithm latency
    mLatency = (N-1);
@@ -926,7 +917,7 @@ void Autotalent::Process(double time)
 
 string Autotalent::GetTitleLabel()
 {
-   if (Minimized() || IsVisible() == false)
+   if (Minimized())
       return "autotalent";
    else
       return "autotalent "+ofToString(mPitch,2)+" "+ofToString(mConfidence,2);
@@ -934,7 +925,6 @@ string Autotalent::GetTitleLabel()
 
 void Autotalent::DrawModule()
 {
-
    if (Minimized() || IsVisible() == false)
       return;
    

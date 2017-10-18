@@ -26,8 +26,8 @@ void DebugAudioSource::Process(double time)
    if (!mEnabled || GetTarget() == NULL)
       return;
    
-   int bufferSize;
-   float* out = GetTarget()->GetBuffer(bufferSize);
+   int bufferSize = GetTarget()->GetBuffer()->BufferSize();
+   float* out = GetTarget()->GetBuffer()->GetChannel(0);
    assert(bufferSize == gBufferSize);
    
    for (int i=0; i<bufferSize; ++i)

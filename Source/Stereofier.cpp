@@ -12,17 +12,15 @@
 #include "PatchCableSource.h"
 
 Stereofier::Stereofier()
-: mPan(0)
+: IAudioProcessor(gBufferSize)
+, mPan(0)
 , mPanSlider(NULL)
 , mWiden(0)
 , mWidenSlider(NULL)
 , mVizBuffer2(VIZ_BUFFER_SECONDS*gSampleRate)
 , mWidenerBuffer(2048)
 {
-   mInputBufferSize = gBufferSize;
-   mInputBuffer = new float[mInputBufferSize];
-   mInputBuffer2 = new float[mInputBufferSize];
-   Clear(mInputBuffer, mInputBufferSize);
+   mPanBuffer = new float[gBufferSize];
 }
 
 void Stereofier::CreateUIControls()
@@ -43,13 +41,7 @@ void Stereofier::CreateUIControls()
 
 Stereofier::~Stereofier()
 {
-   delete[] mInputBuffer;
-}
-
-float* Stereofier::GetBuffer(int& bufferSize)
-{
-   bufferSize = mInputBufferSize;
-   return mInputBuffer;
+   delete[] mPanBuffer;
 }
 
 void Stereofier::Process(double time)
@@ -59,33 +51,32 @@ void Stereofier::Process(double time)
    if (!mEnabled || GetTarget() == NULL || GetTarget2() == NULL)
       return;
    
-   int bufferSize;
-   float* out = GetTarget()->GetBuffer(bufferSize);
+   int bufferSize = GetTarget()->GetBuffer()->BufferSize();
+   float* out = GetTarget()->GetBuffer()->GetChannel(0);
    assert(bufferSize == gBufferSize);
-   float* out2 = GetTarget2()->GetBuffer(bufferSize);
-   assert(bufferSize == gBufferSize);
+   float* out2 = GetTarget2()->GetBuffer()->GetChannel(0);
    
    if (abs(mWiden) > 0)
    {
-      mWidenerBuffer.WriteChunk(mInputBuffer, bufferSize);
-      mWidenerBuffer.ReadChunk(mInputBuffer2, bufferSize, abs(mWiden));
+      mWidenerBuffer.WriteChunk(GetBuffer()->GetChannel(0), bufferSize);
+      mWidenerBuffer.ReadChunk(mPanBuffer, bufferSize, abs(mWiden));
    }
    else
    {
-      memcpy(mInputBuffer2, mInputBuffer, sizeof(float)*gBufferSize);
+      memcpy(mPanBuffer, GetBuffer()->GetChannel(0), sizeof(float)*gBufferSize);
    }
    
    float* input1;
    float* input2;
    if (mWiden <= 0)
    {
-      input1 = mInputBuffer;
-      input2 = mInputBuffer2;
+      input1 = GetBuffer()->GetChannel(0);
+      input2 = mPanBuffer;
    }
    else
    {
-      input1 = mInputBuffer2;
-      input2 = mInputBuffer;
+      input1 = mPanBuffer;
+      input2 = GetBuffer()->GetChannel(0);
    }
    
    for (int i=0; i<bufferSize; ++i)
@@ -112,7 +103,7 @@ void Stereofier::Process(double time)
    GetVizBuffer()->WriteChunk(input1,bufferSize);
    mVizBuffer2.WriteChunk(input2, bufferSize);
    
-   Clear(mInputBuffer, mInputBufferSize);
+   GetBuffer()->Clear();
 }
 
 void Stereofier::DrawModule()

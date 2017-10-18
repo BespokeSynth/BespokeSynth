@@ -58,7 +58,7 @@ void EffectFactory::Register(string type, CreateEffectFn creator)
    mFactoryMap[type] = creator;
 }
 
-IAudioProcessor* EffectFactory::MakeEffect(string type)
+IAudioEffect* EffectFactory::MakeEffect(string type)
 {
    auto iter = mFactoryMap.find(type);
    if (iter != mFactoryMap.end())

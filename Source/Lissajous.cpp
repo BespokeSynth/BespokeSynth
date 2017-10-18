@@ -11,30 +11,18 @@
 #include "Profiler.h"
 
 Lissajous::Lissajous()
-: mOffset(0)
+: IAudioProcessor(gBufferSize)
+, mOffset(0)
 , mSingleInputMode(true)
 , mWidth(500)
 , mHeight(500)
 {
-   mInputBufferSize = gBufferSize;
-   mInputBuffer = new float[mInputBufferSize];
-   mInputBuffer2 = new float[mInputBufferSize];
-   Clear(mInputBuffer, mInputBufferSize);
-   Clear(mInputBuffer2, mInputBufferSize);
-   
 	for (int i=0; i<NUM_LISSAJOUS_POINTS; ++i)
       mLissajousPoints[i].set(0, 0);
 }
 
 Lissajous::~Lissajous()
 {
-   delete[] mInputBuffer;
-}
-
-float* Lissajous::GetBuffer(int& bufferSize)
-{
-   bufferSize = mInputBufferSize;
-   return mInputBuffer;
 }
 
 void Lissajous::Process(double time)
@@ -44,24 +32,25 @@ void Lissajous::Process(double time)
    if (!mEnabled)
       return;
    
-   int bufferSize = gBufferSize;
+   SyncBuffers();
+   
+   int bufferSize = GetBuffer()->BufferSize();
    if (GetTarget())
    {
-      float* out = GetTarget()->GetBuffer(bufferSize);
-      assert(bufferSize == gBufferSize);
-      
-      Add(out, mInputBuffer, bufferSize);
-      if (!mSingleInputMode)
-         Add(out, mInputBuffer2, bufferSize);
+      for (int ch=0; ch<GetBuffer()->NumActiveChannels(); ++ch)
+      {
+         Add(GetTarget()->GetBuffer()->GetChannel(ch), GetBuffer()->GetChannel(ch), bufferSize);
+         GetVizBuffer()->WriteChunk(GetBuffer()->GetChannel(ch),GetBuffer()->BufferSize(), ch);
+      }
    }
    
-   GetVizBuffer()->WriteChunk(mInputBuffer,bufferSize);
+   mSingleInputMode = (GetBuffer()->NumActiveChannels() == 1);
+   int secondChannel = mSingleInputMode ? 0 : 1;
    
    for (int i=0; i<bufferSize; ++i)
-      mLissajousPoints[(mOffset+i) % NUM_LISSAJOUS_POINTS].set(mInputBuffer[i],mInputBuffer2[i]);
+      mLissajousPoints[(mOffset+i) % NUM_LISSAJOUS_POINTS].set(GetBuffer()->GetChannel(0)[i],GetBuffer()->GetChannel(secondChannel)[i]);
    
-   Clear(mInputBuffer, mInputBufferSize);
-   Clear(mInputBuffer2, mInputBufferSize);
+   GetBuffer()->Clear();
    
    mOffset += bufferSize;
    mOffset %= NUM_LISSAJOUS_POINTS;
@@ -107,13 +96,6 @@ void Lissajous::Resize(float w, float h)
 {
    mWidth = w;
    mHeight = h;
-}
-
-void Lissajous::SetCarrierBuffer(float* buffer, int bufferSize)
-{
-   mSingleInputMode = false;
-   assert(bufferSize == mInputBufferSize);
-   memcpy(mInputBuffer2, buffer, bufferSize*sizeof(float));
 }
 
 void Lissajous::LoadLayout(const ofxJSONElement& moduleInfo)

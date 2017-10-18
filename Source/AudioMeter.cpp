@@ -11,13 +11,12 @@
 #include "ModularSynth.h"
 
 AudioMeter::AudioMeter()
-: mLevel(0)
+: IAudioProcessor(gBufferSize)
+, mLevel(0)
 , mLevelSlider(NULL)
 , mMaxLevel(1)
 {
-   mInputBufferSize = gBufferSize;
-   mInputBuffer = new float[mInputBufferSize];
-   Clear(mInputBuffer, mInputBufferSize);
+   mAnalysisBuffer = new float[gBufferSize];
 }
 
 void AudioMeter::CreateUIControls()
@@ -28,13 +27,7 @@ void AudioMeter::CreateUIControls()
 
 AudioMeter::~AudioMeter()
 {
-   delete[] mInputBuffer;
-}
-
-float* AudioMeter::GetBuffer(int& bufferSize)
-{
-   bufferSize = mInputBufferSize;
-   return mInputBuffer;
+   delete mAnalysisBuffer;
 }
 
 void AudioMeter::Process(double time)
@@ -45,22 +38,22 @@ void AudioMeter::Process(double time)
       return;
    
    ComputeSliders(0);
+   SyncBuffers();
    
-   int bufferSize = gBufferSize;
-   if (GetTarget())
+   Clear(mAnalysisBuffer, gBufferSize);
+   
+   for (int ch=0; ch<GetBuffer()->NumActiveChannels(); ++ch)
    {
-      float* out = GetTarget()->GetBuffer(bufferSize);
-      assert(bufferSize == gBufferSize);
-      
-      Add(out, mInputBuffer, bufferSize);
+      if (GetTarget())
+         Add(GetTarget()->GetBuffer()->GetChannel(ch), GetBuffer()->GetChannel(ch), GetBuffer()->BufferSize());
+      Add(mAnalysisBuffer, GetBuffer()->GetChannel(ch), GetBuffer()->BufferSize());
+      GetVizBuffer()->WriteChunk(GetBuffer()->GetChannel(ch),GetBuffer()->BufferSize(), ch);
    }
    
-   mPeakTracker.Process(mInputBuffer, mInputBufferSize);
+   mPeakTracker.Process(mAnalysisBuffer, gBufferSize);
    mLevel = sqrtf(mPeakTracker.GetPeak());
    
-   GetVizBuffer()->WriteChunk(mInputBuffer,bufferSize);
-   
-   Clear(mInputBuffer, mInputBufferSize);
+   GetBuffer()->Clear();
 }
 
 void AudioMeter::DrawModule()

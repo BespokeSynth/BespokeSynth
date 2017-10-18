@@ -10,23 +10,23 @@
 #define __Bespoke__FreeverbEffect__
 
 #include <iostream>
-#include "IAudioProcessor.h"
+#include "IAudioEffect.h"
 #include "Slider.h"
 #include "Checkbox.h"
 #include "freeverb/revmodel.hpp"
 
-class FreeverbEffect : public IAudioProcessor, public IFloatSliderListener
+class FreeverbEffect : public IAudioEffect, public IFloatSliderListener
 {
 public:
    FreeverbEffect();
    ~FreeverbEffect();
    
-   static IAudioProcessor* Create() { return new FreeverbEffect(); }
+   static IAudioEffect* Create() { return new FreeverbEffect(); }
    
    string GetTitleLabel() override { return "freeverb"; }
    void CreateUIControls() override;
    
-   //IAudioProcessor
+   //IAudioEffect
    void ProcessAudio(double time, float* audio, int bufferSize) override;
    void SetEnabled(bool enabled) override { mEnabled = enabled; }
    float GetEffectAmount() override;

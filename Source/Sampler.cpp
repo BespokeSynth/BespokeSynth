@@ -18,7 +18,8 @@
 #include "Scale.h"
 
 Sampler::Sampler()
-: mVolSlider(NULL)
+: IAudioProcessor(gBufferSize)
+, mVolSlider(NULL)
 , mADSRDisplay(NULL)
 , mRecordPos(0)
 , mRecording(false)
@@ -44,7 +45,6 @@ Sampler::Sampler()
    mPolyMgr.Init(kVoiceType_Sampler, &mVoiceParams);
    
    mWriteBuffer = new float[gBufferSize];
-   mRecordBuffer = new float[gBufferSize];
 }
 
 void Sampler::CreateUIControls()
@@ -64,7 +64,6 @@ Sampler::~Sampler()
 {
    delete[] mSampleData;
    delete[] mWriteBuffer;
-   delete[] mRecordBuffer;
 }
 
 void Sampler::Poll()
@@ -84,10 +83,9 @@ void Sampler::Process(double time)
       return;
    
    ComputeSliders(0);
+   SyncBuffers();
    
-   int bufferSize;
-   float* out = GetTarget()->GetBuffer(bufferSize);
-   assert(bufferSize == gBufferSize);
+   int bufferSize = GetBuffer()->BufferSize();
    
    Clear(mWriteBuffer, gBufferSize);
    
@@ -96,9 +94,9 @@ void Sampler::Process(double time)
       for (int i=0; i<gBufferSize; ++i)
       {
          //if we've already started recording, or if it's a new recording and there's sound
-         if (mRecordPos > 0 || fabsf(mRecordBuffer[i]) > mThresh )
+         if (mRecordPos > 0 || fabsf(GetBuffer()->GetChannel(0)[i]) > mThresh )
          {
-            mSampleData[mRecordPos] = mRecordBuffer[i];
+            mSampleData[mRecordPos] = GetBuffer()->GetChannel(0)[i];
             if (mPassthrough)
                mWriteBuffer[i] += mSampleData[mRecordPos];
             ++mRecordPos;
@@ -115,9 +113,9 @@ void Sampler::Process(double time)
    mPolyMgr.Process(time, mWriteBuffer, bufferSize);
    GetVizBuffer()->WriteChunk(mWriteBuffer, bufferSize);
    
-   Add(out, mWriteBuffer, bufferSize);
+   Add(GetTarget()->GetBuffer()->GetChannel(0), mWriteBuffer, bufferSize);
    
-   Clear(mRecordBuffer, gBufferSize);
+   GetBuffer()->Clear();
 }
 
 void Sampler::PlayNote(double time, int pitch, int velocity, int voiceIdx /*= -1*/, ModulationChain* pitchBend /*= NULL*/, ModulationChain* modWheel /*= NULL*/, ModulationChain* pressure /*= NULL*/)

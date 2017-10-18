@@ -10,14 +10,12 @@
 #define __modularSynth__Amplifier__
 
 #include <iostream>
-#include "IAudioReceiver.h"
-#include "IAudioSource.h"
+#include "IAudioProcessor.h"
 #include "IDrawableModule.h"
 #include "Slider.h"
 #include "ClickButton.h"
-#include "RollingBuffer.h"
 
-class Amplifier : public IAudioReceiver, public IAudioSource, public IDrawableModule, public IFloatSliderListener
+class Amplifier : public IAudioProcessor, public IDrawableModule, public IFloatSliderListener
 {
 public:
    Amplifier();
@@ -28,9 +26,6 @@ public:
    void CreateUIControls() override;
    
    void SetBoost(float boost) { mBoost = boost; }
-   
-   //IAudioReceiver
-   float* GetBuffer(int& bufferSize) override;
    
    //IAudioSource
    void Process(double time) override;
@@ -48,9 +43,6 @@ private:
    void GetModuleDimensions(int& w, int&h) override { w=120; h=22; }
    bool Enabled() const override { return mEnabled; }
    
-   
-   int mInputBufferSize;
-   float* mInputBuffer;
    float mBoost;
    FloatSlider* mBoostSlider;
 };

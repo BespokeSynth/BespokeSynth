@@ -10,8 +10,7 @@
 #define __modularSynth__EffectChain__
 
 #include <iostream>
-#include "IAudioReceiver.h"
-#include "IAudioSource.h"
+#include "IAudioProcessor.h"
 #include "IDrawableModule.h"
 #include "ClickButton.h"
 #include "Slider.h"
@@ -21,9 +20,9 @@
 #define MAX_EFFECTS_IN_CHAIN 100
 #define MIN_EFFECT_WIDTH 80
 
-class IAudioProcessor;
+class IAudioEffect;
 
-class EffectChain : public IDrawableModule, public IAudioReceiver, public IAudioSource, public IButtonListener, public IFloatSliderListener, public IDropdownListener
+class EffectChain : public IDrawableModule, public IAudioProcessor, public IButtonListener, public IFloatSliderListener, public IDropdownListener
 {
 public:
    EffectChain();
@@ -39,7 +38,7 @@ public:
    void SetWideCount(int count) { mNumFXWide = count; }
    
    //IAudioReceiver
-   float* GetBuffer(int& bufferSize) override;
+   InputMode GetInputMode() override { return kInputMode_Mono; }
    
    //IAudioSource
    void Process(double time) override;
@@ -67,9 +66,7 @@ private:
    int NumRows() const;
    void DeleteLastEffect();
    
-   vector<IAudioProcessor*> mEffects;
-   int mInputBufferSize;
-   float* mInputBuffer;
+   vector<IAudioEffect*> mEffects;
    float* mDryBuffer;
    vector<ClickButton*> mMoveButtons;
    vector<FloatSlider*> mDryWetSliders;

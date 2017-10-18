@@ -10,8 +10,7 @@
 #define __Bespoke__SlowLayers__
 
 #include <iostream>
-#include "IAudioSource.h"
-#include "IAudioReceiver.h"
+#include "IAudioProcessor.h"
 #include "IDrawableModule.h"
 #include "RollingBuffer.h"
 #include "ClickButton.h"
@@ -20,7 +19,7 @@
 #include "DropdownList.h"
 #include "Checkbox.h"
 
-class SlowLayers : public IAudioSource, public IDrawableModule, public IDropdownListener, public IButtonListener, public IFloatSliderListener, public IRadioButtonListener, public IAudioReceiver
+class SlowLayers : public IAudioProcessor, public IDrawableModule, public IDropdownListener, public IButtonListener, public IFloatSliderListener, public IRadioButtonListener
 {
 public:
    SlowLayers();
@@ -38,8 +37,8 @@ public:
    void Process(double time) override;
    void SetEnabled(bool enabled) override { mEnabled = enabled; }
    
-   //IAudioReceiver
-   float* GetBuffer(int& bufferSize) override;
+   //IAudioProcessor
+   InputMode GetInputMode() override { return kInputMode_Mono; }
    
    bool CheckNeedsDraw() override { return true; }
 
@@ -64,8 +63,6 @@ private:
    static const int BUFFER_W = 155;
    static const int BUFFER_H = 93;
 
-   int mInputBufferSize;
-   float* mInputBuffer;
    float* mBuffer;
    float mLoopPos;
    int mNumBars;

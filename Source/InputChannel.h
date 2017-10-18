@@ -10,11 +10,10 @@
 #define __modularSynth__InputChannel__
 
 #include <iostream>
-#include "IAudioReceiver.h"
-#include "IAudioSource.h"
+#include "IAudioProcessor.h"
 #include "IDrawableModule.h"
 
-class InputChannel : public IAudioReceiver, public IAudioSource, public IDrawableModule
+class InputChannel : public IAudioProcessor, public IDrawableModule
 {
 public:
    InputChannel();
@@ -24,7 +23,7 @@ public:
    string GetTitleLabel() override { return "in "+ofToString(mChannel); }
    
    //IAudioReceiver
-   float* GetBuffer(int& bufferSize) override;
+   InputMode GetInputMode() override { return kInputMode_Mono; }
    
    //IAudioSource
    void Process(double time) override;
@@ -40,9 +39,6 @@ private:
    bool Enabled() const override { return mEnabled; }
    
    int mChannel;
-   
-   int mInputBufferSize;
-   float* mInputBuffer;
 };
 
 #endif /* defined(__modularSynth__InputChannel__) */

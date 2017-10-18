@@ -11,21 +11,12 @@
 #include "Profiler.h"
 
 InputChannel::InputChannel()
+: IAudioProcessor(gBufferSize)
 {
-   mInputBufferSize = gBufferSize;
-   mInputBuffer = new float[mInputBufferSize];
-   Clear(mInputBuffer, mInputBufferSize);
 }
 
 InputChannel::~InputChannel()
 {
-   delete[] mInputBuffer;
-}
-
-float* InputChannel::GetBuffer(int& bufferSize)
-{
-   bufferSize = mInputBufferSize;
-   return mInputBuffer;
 }
 
 void InputChannel::Process(double time)
@@ -35,17 +26,18 @@ void InputChannel::Process(double time)
    if (!mEnabled)
       return;
    
-   int bufferSize = gBufferSize;
+   SyncBuffers();
+   
+   int bufferSize = GetBuffer()->BufferSize();
    if (GetTarget())
    {
-      float* out = GetTarget()->GetBuffer(bufferSize);
-      assert(bufferSize == gBufferSize);
+      float* out = GetTarget()->GetBuffer()->GetChannel(0);
 
-      Mult(mInputBuffer, 4, bufferSize);
-      Add(out, mInputBuffer, bufferSize);
+      Mult(GetBuffer()->GetChannel(0), 4, bufferSize);
+      Add(out, GetBuffer()->GetChannel(0), bufferSize);
    }
    
-   GetVizBuffer()->WriteChunk(mInputBuffer,bufferSize);
+   GetVizBuffer()->WriteChunk(GetBuffer()->GetChannel(0),bufferSize);
    
    //Clear(mInputBuffer, mInputBufferSize);
 }

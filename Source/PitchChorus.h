@@ -9,8 +9,7 @@
 #ifndef __Bespoke__PitchChorus__
 #define __Bespoke__PitchChorus__
 
-#include "IAudioReceiver.h"
-#include "IAudioSource.h"
+#include "IAudioProcessor.h"
 #include "IDrawableModule.h"
 #include "Slider.h"
 #include "PitchShifter.h"
@@ -18,7 +17,7 @@
 #include "Ramp.h"
 #include "Checkbox.h"
 
-class PitchChorus : public IAudioReceiver, public IAudioSource, public IDrawableModule, public IFloatSliderListener, public INoteReceiver
+class PitchChorus : public IAudioProcessor, public IDrawableModule, public IFloatSliderListener, public INoteReceiver
 {
 public:
    PitchChorus();
@@ -28,8 +27,8 @@ public:
    string GetTitleLabel() override { return "pitchchorus"; }
    void CreateUIControls() override;
    
-   //IAudioReceiver
-   float* GetBuffer(int& bufferSize) override;
+   //IAudioProcessor
+   InputMode GetInputMode() override { return kInputMode_Mono; }
    
    //IAudioSource
    void Process(double time) override;
@@ -58,8 +57,6 @@ private:
       int mPitch;
    };
    
-   int mInputBufferSize;
-   float* mInputBuffer;
    float* mOutputBuffer;
    PitchShifterVoice mShifters[kNumShifters];
    bool mPassthrough;

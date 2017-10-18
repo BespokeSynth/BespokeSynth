@@ -10,12 +10,11 @@
 #define __modularSynth__AudioRouter__
 
 #include <iostream>
-#include "IAudioReceiver.h"
-#include "IAudioSource.h"
+#include "IAudioProcessor.h"
 #include "IDrawableModule.h"
 #include "RadioButton.h"
 
-class AudioRouter : public IAudioReceiver, public IAudioSource, public IDrawableModule, public IRadioButtonListener
+class AudioRouter : public IAudioProcessor, public IDrawableModule, public IRadioButtonListener
 {
 public:
    AudioRouter();
@@ -27,9 +26,6 @@ public:
 
    void AddReceiver(IAudioReceiver* receiver, const char* name);
    void SetActiveIndex(int index) { mRouteIndex = index; }
-
-   //IAudioReceiver
-   float* GetBuffer(int& bufferSize) override;
 
    //IAudioSource
    void Process(double time) override;
@@ -49,9 +45,6 @@ private:
    void DrawModule() override;
    void GetModuleDimensions(int& w, int& h) override;
    bool Enabled() const override { return true; }
-
-   int mInputBufferSize;
-   float* mInputBuffer;
 
    int mRouteIndex;
    RadioButton* mRouteSelector;

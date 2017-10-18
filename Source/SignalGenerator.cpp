@@ -118,8 +118,8 @@ void SignalGenerator::Process(double time)
    if (!mEnabled || GetTarget() == NULL)
       return;
    
-   int bufferSize;
-   float* out = GetTarget()->GetBuffer(bufferSize);
+   int bufferSize = GetTarget()->GetBuffer()->BufferSize();
+   float* out = GetTarget()->GetBuffer()->GetChannel(0);
    assert(bufferSize == gBufferSize);
    
    Clear(mWriteBuffer, gBufferSize);

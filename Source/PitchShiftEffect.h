@@ -10,22 +10,22 @@
 #define __Bespoke__PitchShiftEffect__
 
 #include <iostream>
-#include "IAudioProcessor.h"
+#include "IAudioEffect.h"
 #include "Slider.h"
 #include "PitchShifter.h"
 #include "RadioButton.h"
 
-class PitchShiftEffect : public IAudioProcessor, public IIntSliderListener, public IFloatSliderListener, public IRadioButtonListener
+class PitchShiftEffect : public IAudioEffect, public IIntSliderListener, public IFloatSliderListener, public IRadioButtonListener
 {
 public:
    PitchShiftEffect();
    
-   static IAudioProcessor* Create() { return new PitchShiftEffect(); }
+   static IAudioEffect* Create() { return new PitchShiftEffect(); }
    
    string GetTitleLabel() override { return "pitchshift"; }
    void CreateUIControls() override;
    
-   //IAudioProcessor
+   //IAudioEffect
    void ProcessAudio(double time, float* audio, int bufferSize) override;
    void SetEnabled(bool enabled) override { mEnabled = enabled; }
    float GetEffectAmount() override;

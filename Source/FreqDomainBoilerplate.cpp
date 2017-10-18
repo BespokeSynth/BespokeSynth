@@ -16,7 +16,8 @@ namespace
 }
 
 FreqDomainBoilerplate::FreqDomainBoilerplate()
-: mFFT(fftWindowSize)
+: IAudioProcessor(gBufferSize)
+, mFFT(fftWindowSize)
 , mRollingInputBuffer(fftWindowSize)
 , mRollingOutputBuffer(fftWindowSize)
 , mFFTData(fftWindowSize, fftFreqDomainSize)
@@ -35,10 +36,6 @@ FreqDomainBoilerplate::FreqDomainBoilerplate()
 , mPhaseOffset(0)
 , mPhaseOffsetSlider(NULL)
 {
-   mInputBufferSize = gBufferSize;
-   mInputBuffer = new float[mInputBufferSize];
-   Clear(mInputBuffer, mInputBufferSize);
-
    // Generate a window with a single raised cosine from N/4 to 3N/4
    mWindower = new float[fftWindowSize];
    for (int i=0; i<fftWindowSize; ++i)
@@ -59,14 +56,7 @@ void FreqDomainBoilerplate::CreateUIControls()
 
 FreqDomainBoilerplate::~FreqDomainBoilerplate()
 {
-   delete[] mInputBuffer;
    delete[] mWindower;
-}
-
-float* FreqDomainBoilerplate::GetBuffer(int& bufferSize)
-{
-   bufferSize = mInputBufferSize;
-   return mInputBuffer;
 }
 
 void FreqDomainBoilerplate::Process(double time)
@@ -77,15 +67,14 @@ void FreqDomainBoilerplate::Process(double time)
       return;
 
    ComputeSliders(0);
+   SyncBuffers();
 
    float inputPreampSq = mInputPreamp * mInputPreamp;
    float volSq = mVolume * mVolume;
 
-   int bufferSize = gBufferSize;
-   float* out = GetTarget()->GetBuffer(bufferSize);
-   assert(bufferSize == gBufferSize);
+   int bufferSize = GetBuffer()->BufferSize();
 
-   mRollingInputBuffer.WriteChunk(mInputBuffer, bufferSize);
+   mRollingInputBuffer.WriteChunk(GetBuffer()->GetChannel(0), bufferSize);
 
    //copy rolling input buffer into working buffer and window it
    mRollingInputBuffer.ReadChunk(mFFTData.mTimeDomain, fftWindowSize);
@@ -127,16 +116,16 @@ void FreqDomainBoilerplate::Process(double time)
    for (int i=0; i<fftWindowSize; ++i)
       mRollingOutputBuffer.Accum(fftWindowSize-i-1, mFFTData.mTimeDomain[i] * mWindower[i] * .0001f);
 
-   Mult(mInputBuffer, (1-mDryWet)*inputPreampSq, mInputBufferSize);
+   Mult(GetBuffer()->GetChannel(0), (1-mDryWet)*inputPreampSq, GetBuffer()->BufferSize());
 
    for (int i=0; i<bufferSize; ++i)
-      mInputBuffer[i] += mRollingOutputBuffer.GetSample(fftWindowSize-i-1) * volSq * mDryWet;
+      GetBuffer()->GetChannel(0)[i] += mRollingOutputBuffer.GetSample(fftWindowSize-i-1) * volSq * mDryWet;
 
-   Add(out, mInputBuffer, bufferSize);
+   Add(GetTarget()->GetBuffer()->GetChannel(0), GetBuffer()->GetChannel(0), bufferSize);
 
-   GetVizBuffer()->WriteChunk(mInputBuffer,bufferSize);
+   GetVizBuffer()->WriteChunk(GetBuffer()->GetChannel(0),bufferSize);
 
-   Clear(mInputBuffer, mInputBufferSize);
+   GetBuffer()->Clear();
 }
 
 void FreqDomainBoilerplate::DrawModule()

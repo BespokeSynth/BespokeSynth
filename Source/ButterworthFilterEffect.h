@@ -9,20 +9,20 @@
 #ifndef __Bespoke__ButterworthFilterEffect__
 #define __Bespoke__ButterworthFilterEffect__
 
-#include "IAudioProcessor.h"
+#include "IAudioEffect.h"
 #include "DropdownList.h"
 #include "Checkbox.h"
 #include "Slider.h"
 #include "Transport.h"
 #include "FilterButterworth24db.h"
 
-class ButterworthFilterEffect : public IAudioProcessor, public IDropdownListener, public IFloatSliderListener
+class ButterworthFilterEffect : public IAudioEffect, public IDropdownListener, public IFloatSliderListener
 {
 public:
    ButterworthFilterEffect();
    ~ButterworthFilterEffect();
    
-   static IAudioProcessor* Create() { return new ButterworthFilterEffect(); }
+   static IAudioEffect* Create() { return new ButterworthFilterEffect(); }
    
    string GetTitleLabel() override { return "butterworth"; }
    void CreateUIControls() override;
@@ -31,7 +31,7 @@ public:
    
    void SetFilterParams(float f, float q) { mButterworth.Set(f, q); }
    
-   //IAudioProcessor
+   //IAudioEffect
    void ProcessAudio(double time, float* audio, int bufferSize) override;
    void SetEnabled(bool enabled) override { mEnabled = enabled; }
    float GetEffectAmount() override;

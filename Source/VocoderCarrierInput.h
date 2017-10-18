@@ -10,8 +10,7 @@
 #define __modularSynth__VocoderCarrierInput__
 
 #include <iostream>
-#include "IAudioReceiver.h"
-#include "IAudioSource.h"
+#include "IAudioProcessor.h"
 #include "IDrawableModule.h"
 
 class VocoderBase
@@ -21,7 +20,7 @@ public:
    virtual void SetCarrierBuffer(float* buffer, int bufferSize) = 0;
 };
 
-class VocoderCarrierInput : public IAudioReceiver, public IAudioSource, public IDrawableModule
+class VocoderCarrierInput : public IAudioProcessor, public IDrawableModule
 {
 public:
    VocoderCarrierInput();
@@ -31,8 +30,8 @@ public:
    string GetTitleLabel() override { return "carrier"; }
    void CreateUIControls() override;
 
-   //IAudioReceiver
-   float* GetBuffer(int& bufferSize) override;
+   //IAudioProcessor
+   InputMode GetInputMode() override { return kInputMode_Mono; }
 
    //IAudioSource
    void Process(double time) override;
@@ -45,9 +44,6 @@ private:
    void DrawModule() override;
    void GetModuleDimensions(int& w, int&h) override { w=60; h=0; }
    bool Enabled() const override { return true; }
-
-   int mInputBufferSize;
-   float* mInputBuffer;
 
    VocoderBase* mVocoder;
 };

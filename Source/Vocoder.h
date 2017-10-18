@@ -10,8 +10,7 @@
 #define __modularSynth__Vocoder__
 
 #include <iostream>
-#include "IAudioReceiver.h"
-#include "IAudioSource.h"
+#include "IAudioProcessor.h"
 #include "IDrawableModule.h"
 #include "Checkbox.h"
 #include "FFT.h"
@@ -21,7 +20,7 @@
 #include "BiquadFilterEffect.h"
 #include "VocoderCarrierInput.h"
 
-class Vocoder : public IAudioReceiver, public IAudioSource, public IDrawableModule, public IFloatSliderListener, public VocoderBase, public IIntSliderListener
+class Vocoder : public IAudioProcessor, public IDrawableModule, public IFloatSliderListener, public VocoderBase, public IIntSliderListener
 {
 public:
    Vocoder();
@@ -35,8 +34,8 @@ public:
 
    void SetCarrierBuffer(float* carrier, int bufferSize) override;
 
-   //IAudioReceiver
-   float* GetBuffer(int& bufferSize) override;
+   //IAudioProcessor
+   InputMode GetInputMode() override { return kInputMode_Mono; }
 
    //IAudioSource
    void Process(double time) override;
@@ -73,8 +72,6 @@ private:
    void GetModuleDimensions(int& w, int&h) override { w=235; h=170; }
    bool Enabled() const override { return mEnabled; }
 
-   int mInputBufferSize;
-   float* mInputBuffer;
    FFTData mFFTData;
    
    float* mWindower;

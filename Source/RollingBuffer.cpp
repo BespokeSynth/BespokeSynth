@@ -10,81 +10,79 @@
 #include "SynthGlobals.h"
 
 RollingBuffer::RollingBuffer(int sizeInSamples)
-   : mOffsetToStart(0)
-   , mBufferSize(sizeInSamples)
+: mBuffer(sizeInSamples)
 {
-   mBuffer = new float[sizeInSamples];
-   Clear(mBuffer,sizeInSamples);
+   for (int i=0; i<ChannelBuffer::kMaxNumChannels; ++i)
+      mOffsetToStart[i] = 0;
 }
 
 RollingBuffer::~RollingBuffer()
 {
-   delete[] mBuffer;
 }
 
-float RollingBuffer::GetSample(int samplesAgo)
+float RollingBuffer::GetSample(int samplesAgo, int channel)
 {
    assert(samplesAgo >= 0);
-   assert(samplesAgo < mBufferSize);
-   return mBuffer[(mBufferSize + mOffsetToStart - samplesAgo) % mBufferSize];
+   assert(samplesAgo < Size());
+   return mBuffer.GetChannel(channel)[(Size() + mOffsetToStart[channel] - samplesAgo) % Size()];
 }
 
-void RollingBuffer::ReadChunk(float* dst, int size, int samplesAgo)
+void RollingBuffer::ReadChunk(float* dst, int size, int samplesAgo, int channel)
 {
-   assert(size <= mBufferSize);
+   assert(size <= Size());
    
-   int offset = mOffsetToStart - samplesAgo;
+   int offset = mOffsetToStart[channel] - samplesAgo;
    if (offset < 0)
-      offset += mBufferSize;
+      offset += Size();
    
    int wrapSamples = size - offset;
    if (wrapSamples <= 0) //no wraparound
    {
-      memcpy(dst, mBuffer+(offset-size), size*sizeof(float));
+      memcpy(dst, mBuffer.GetChannel(channel)+(offset-size), size*sizeof(float));
    }
    else  //wrap around loop point
    {
-      memcpy(dst, mBuffer+(mBufferSize-wrapSamples), wrapSamples*sizeof(float));
-      memcpy(dst+wrapSamples, mBuffer, (size-wrapSamples)*sizeof(float));
+      memcpy(dst, mBuffer.GetChannel(channel)+(Size()-wrapSamples), wrapSamples*sizeof(float));
+      memcpy(dst+wrapSamples, mBuffer.GetChannel(channel), (size-wrapSamples)*sizeof(float));
    }
 }
 
-void RollingBuffer::Accum(int samplesAgo, float sample)
+void RollingBuffer::Accum(int samplesAgo, float sample, int channel)
 {
-   assert(samplesAgo < mBufferSize);
-   mBuffer[(mBufferSize + mOffsetToStart - samplesAgo) % mBufferSize] += sample;
+   assert(samplesAgo < Size());
+   mBuffer.GetChannel(channel)[(Size() + mOffsetToStart[channel] - samplesAgo) % Size()] += sample;
 }
 
-void RollingBuffer::WriteChunk(float* samples, int size)
+void RollingBuffer::WriteChunk(float* samples, int size, int channel)
 {
-   assert(size < mBufferSize);
+   assert(size < Size());
    
-   int wrapSamples = (mOffsetToStart + size) - mBufferSize;
+   int wrapSamples = (mOffsetToStart[channel] + size) - Size();
    if (wrapSamples <= 0) //no wraparound
    {
-      memcpy(mBuffer+mOffsetToStart, samples, size*sizeof(float));
+      memcpy(mBuffer.GetChannel(channel)+mOffsetToStart[channel], samples, size*sizeof(float));
    }
    else  //wrap around loop point
    {
-      memcpy(mBuffer+mOffsetToStart, samples, (size-wrapSamples)*sizeof(float));
-      memcpy(mBuffer, samples+(size-wrapSamples), wrapSamples*sizeof(float));
+      memcpy(mBuffer.GetChannel(channel)+mOffsetToStart[channel], samples, (size-wrapSamples)*sizeof(float));
+      memcpy(mBuffer.GetChannel(channel), samples+(size-wrapSamples), wrapSamples*sizeof(float));
    }
    
-   mOffsetToStart = (mOffsetToStart + size) % mBufferSize;
+   mOffsetToStart[channel] = (mOffsetToStart[channel] + size) % Size();
 }
 
-void RollingBuffer::Write(float sample)
+void RollingBuffer::Write(float sample, int channel)
 {
-   mBuffer[mOffsetToStart] = sample;
-   mOffsetToStart = (mOffsetToStart + 1) % mBufferSize;
+   mBuffer.GetChannel(channel)[mOffsetToStart[channel]] = sample;
+   mOffsetToStart[channel] = (mOffsetToStart[channel] + 1) % Size();
 }
 
 void RollingBuffer::ClearBuffer()
 {
-   Clear(mBuffer, mBufferSize);
+   mBuffer.Clear();
 }
 
-void RollingBuffer::Draw(int x, int y, int width, int height, int samples /*= -1*/)
+void RollingBuffer::Draw(int x, int y, int width, int height, int samples /*= -1*/, int channel)
 {
    ofPushStyle();
    ofPushMatrix();
@@ -93,23 +91,23 @@ void RollingBuffer::Draw(int x, int y, int width, int height, int samples /*= -1
 
    if (samples == -1)
    {
-      DrawAudioBuffer(width, height, mBuffer, 0, mBufferSize, mOffsetToStart);
+      DrawAudioBuffer(width, height, mBuffer.GetChannel(channel), 0, Size(), mOffsetToStart[channel]);
    }
    if (samples != -1)
    {
-      int start = mOffsetToStart - samples;
+      int start = mOffsetToStart[channel] - samples;
       if (start < 0)
       {
          int endSamples = -start;
          int w1 = width * endSamples/samples;
          if (w1>0)
-            DrawAudioBuffer(w1, height, mBuffer, mBufferSize-endSamples, mBufferSize-1, -1);
+            DrawAudioBuffer(w1, height, mBuffer.GetChannel(channel), Size()-endSamples, Size()-1, -1);
          ofTranslate(w1,0);
-         DrawAudioBuffer(width-w1, height, mBuffer, 0, mOffsetToStart, mOffsetToStart);
+         DrawAudioBuffer(width-w1, height, mBuffer.GetChannel(channel), 0, mOffsetToStart[channel], mOffsetToStart[channel]);
       }
       else
       {
-         DrawAudioBuffer(width, height, mBuffer, start, start+samples, mOffsetToStart);
+         DrawAudioBuffer(width, height, mBuffer.GetChannel(channel), start, start+samples, mOffsetToStart[channel]);
       }
    }
    
@@ -119,16 +117,18 @@ void RollingBuffer::Draw(int x, int y, int width, int height, int samples /*= -1
 
 namespace
 {
-   const int kSaveStateRev = 0;
+   const int kSaveStateRev = 1;
 }
 
 void RollingBuffer::SaveState(FileStreamOut& out)
 {
    out << kSaveStateRev;
    
-   out << mOffsetToStart;
-   out << mBufferSize;
-   out.Write(mBuffer, mBufferSize);
+   for (int i=0; i<mBuffer.NumTotalChannels(); ++i)
+   {
+      out << mOffsetToStart[i];
+      out.Write(mBuffer.GetChannel(i), Size());
+   }
 }
 
 void RollingBuffer::LoadState(FileStreamIn& in)
@@ -137,7 +137,9 @@ void RollingBuffer::LoadState(FileStreamIn& in)
    in >> rev;
    LoadStateValidate(rev == kSaveStateRev);
    
-   in >> mOffsetToStart;
-   in >> mBufferSize;
-   in.Read(mBuffer, mBufferSize);
+   for (int i=0; i<mBuffer.NumTotalChannels(); ++i)
+   {
+      in >> mOffsetToStart[i];
+      in.Read(mBuffer.GetChannel(i), Size());
+   }
 }

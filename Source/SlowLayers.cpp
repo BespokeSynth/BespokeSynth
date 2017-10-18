@@ -14,7 +14,8 @@
 #include "Profiler.h"
 
 SlowLayers::SlowLayers()
-: mBuffer(NULL)
+: IAudioProcessor(gBufferSize)
+, mBuffer(NULL)
 , mLoopPos(0)
 , mNumBars(1)
 , mVol(1)
@@ -26,9 +27,6 @@ SlowLayers::SlowLayers()
 {
    //TODO(Ryan) buffer sizes
    mBuffer = new float[MAX_BUFFER_SIZE];
-   mInputBufferSize = gBufferSize;
-   mInputBuffer = new float[mInputBufferSize];
-   ::Clear(mInputBuffer, mInputBufferSize);
    Clear();
 }
 
@@ -51,14 +49,7 @@ void SlowLayers::CreateUIControls()
 
 SlowLayers::~SlowLayers()
 {
-   delete[] mInputBuffer;
    delete[] mBuffer;
-}
-
-float* SlowLayers::GetBuffer(int& bufferSize)
-{
-   bufferSize = mInputBufferSize;
-   return mInputBuffer;
 }
 
 void SlowLayers::Process(double time)
@@ -69,10 +60,10 @@ void SlowLayers::Process(double time)
       return;
    
    ComputeSliders(0);
+   SyncBuffers();
    
-   int bufferSize;
-   float* out = GetTarget()->GetBuffer(bufferSize);
-   assert(bufferSize == gBufferSize);
+   int bufferSize = GetBuffer()->BufferSize();
+   float* out = GetTarget()->GetBuffer()->GetChannel(0);
    
    int loopLengthInSamples = LoopLength();
    
@@ -87,9 +78,9 @@ void SlowLayers::Process(double time)
       FloatWrap(measurePos, 1 << layers * mNumBars);
       int offset = measurePos * loopLengthInSamples;
       
-      mBuffer[offset % loopLengthInSamples] += mInputBuffer[i] * mFeedIn;
+      mBuffer[offset % loopLengthInSamples] += GetBuffer()->GetChannel(0)[i] * mFeedIn;
       
-      float output = (1-mFeedIn)*mInputBuffer[i];
+      float output = (1-mFeedIn)*GetBuffer()->GetChannel(0)[i];
       for (int i=0; i<layers; ++i)
          output += GetInterpolatedSample(offset/float(1<<i), mBuffer, loopLengthInSamples);
       
@@ -98,11 +89,11 @@ void SlowLayers::Process(double time)
       out[i] += output;
    }
    
-   Add(out, mInputBuffer, bufferSize);
+   Add(out, GetBuffer()->GetChannel(0), bufferSize);
    
-   GetVizBuffer()->WriteChunk(mInputBuffer, bufferSize);
+   GetVizBuffer()->WriteChunk(GetBuffer()->GetChannel(0), bufferSize);
    
-   ::Clear(mInputBuffer, mInputBufferSize);
+   GetBuffer()->Clear();
 }
 
 int SlowLayers::LoopLength() const

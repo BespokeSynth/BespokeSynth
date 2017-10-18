@@ -10,21 +10,21 @@
 #define __additiveSynth__BitcrushEffect__
 
 #include <iostream>
-#include "IAudioProcessor.h"
+#include "IAudioEffect.h"
 #include "Slider.h"
 #include "Checkbox.h"
 
-class BitcrushEffect : public IAudioProcessor, public IIntSliderListener, public IFloatSliderListener
+class BitcrushEffect : public IAudioEffect, public IIntSliderListener, public IFloatSliderListener
 {
 public:
    BitcrushEffect();
    
-   static IAudioProcessor* Create() { return new BitcrushEffect(); }
+   static IAudioEffect* Create() { return new BitcrushEffect(); }
    
    string GetTitleLabel() override { return "bitcrush"; }
    void CreateUIControls() override;
    
-   //IAudioProcessor
+   //IAudioEffect
    void ProcessAudio(double time, float* audio, int bufferSize) override;
    void SetEnabled(bool enabled) override { mEnabled = enabled; }
    float GetEffectAmount() override;

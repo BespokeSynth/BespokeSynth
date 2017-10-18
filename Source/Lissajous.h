@@ -10,14 +10,12 @@
 #define __Bespoke__Lissajous__
 
 #include <iostream>
-#include "IAudioReceiver.h"
-#include "IAudioSource.h"
+#include "IAudioProcessor.h"
 #include "IDrawableModule.h"
-#include "VocoderCarrierInput.h"
 
 #define NUM_LISSAJOUS_POINTS 4000
 
-class Lissajous : public IAudioReceiver, public IAudioSource, public IDrawableModule, public VocoderBase
+class Lissajous : public IAudioProcessor, public IDrawableModule
 {
 public:
    Lissajous();
@@ -29,14 +27,9 @@ public:
    bool IsResizable() const override { return true; }
    void Resize(float w, float h) override;
    
-   //IAudioReceiver
-   float* GetBuffer(int& bufferSize) override;
-   
    //IAudioSource
    void Process(double time) override;
    void SetEnabled(bool enabled) override { mEnabled = enabled; }
-   
-   void SetCarrierBuffer(float* buffer, int bufferSize) override;
    
    void LoadLayout(const ofxJSONElement& moduleInfo) override;
    void SaveLayout(ofxJSONElement& moduleInfo) override;
@@ -50,10 +43,6 @@ private:
    
    float mWidth;
    float mHeight;
-   
-   int mInputBufferSize;
-   float* mInputBuffer;
-   float* mInputBuffer2;
    
    ofVec2f mLissajousPoints[NUM_LISSAJOUS_POINTS];
    int mOffset;

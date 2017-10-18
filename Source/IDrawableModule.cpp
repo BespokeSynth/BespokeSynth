@@ -13,7 +13,7 @@
 #include "INoteReceiver.h"
 #include "IAudioReceiver.h"
 #include "IAudioSource.h"
-#include "IAudioProcessor.h"
+#include "IAudioEffect.h"
 #include "IUIControl.h"
 #include "Slider.h"
 #include "ofxJSONElement.h"
@@ -87,7 +87,7 @@ void IDrawableModule::Init()
    mType = TheSynth->GetModuleFactory()->GetModuleType(mTypeName);
    if (mType == kModuleType_Other)
    {
-      if (dynamic_cast<IAudioProcessor*>(this))
+      if (dynamic_cast<IAudioEffect*>(this))
          mType = kModuleType_Processor;
    }
    
@@ -189,12 +189,15 @@ void IDrawableModule::Render()
          int numSamples = min(500,vizBuff->Size());
          float sample;
          float mag = 0;
-         for (int i=0; i<numSamples; ++i)
+         for (int ch=0; ch<vizBuff->NumChannels(); ++ch)
          {
-            sample = vizBuff->GetSample(i);
-            mag += sample*sample;
+            for (int i=0; i<numSamples; ++i)
+            {
+               sample = vizBuff->GetSample(i, ch);
+               mag += sample*sample;
+            }
          }
-         mag /= numSamples;
+         mag /= numSamples * vizBuff->NumChannels();
          mag = sqrtf(mag);
          mag = sqrtf(mag);
          mag *= 3;

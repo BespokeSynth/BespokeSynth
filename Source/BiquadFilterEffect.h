@@ -10,7 +10,7 @@
 #define __modularSynth__BiquadFilterEffect__
 
 #include <iostream>
-#include "IAudioProcessor.h"
+#include "IAudioEffect.h"
 #include "DropdownList.h"
 #include "Checkbox.h"
 #include "Slider.h"
@@ -18,13 +18,13 @@
 #include "BiquadFilter.h"
 #include "RadioButton.h"
 
-class BiquadFilterEffect : public IAudioProcessor, public IDropdownListener, public IFloatSliderListener, public IRadioButtonListener
+class BiquadFilterEffect : public IAudioEffect, public IDropdownListener, public IFloatSliderListener, public IRadioButtonListener
 {
 public:
    BiquadFilterEffect();
    ~BiquadFilterEffect();
    
-   static IAudioProcessor* Create() { return new BiquadFilterEffect(); }
+   static IAudioEffect* Create() { return new BiquadFilterEffect(); }
    
    string GetTitleLabel() override { return "biquad"; }
    void CreateUIControls() override;
@@ -34,7 +34,7 @@ public:
    void SetFilterType(FilterType type) { mBiquad.SetFilterType(type); }
    void SetFilterParams(float f, float q) { mBiquad.SetFilterParams(f, q); }
    
-   //IAudioProcessor
+   //IAudioEffect
    void ProcessAudio(double time, float* audio, int bufferSize) override;
    void SetEnabled(bool enabled) override { mEnabled = enabled; }
    float GetEffectAmount() override;

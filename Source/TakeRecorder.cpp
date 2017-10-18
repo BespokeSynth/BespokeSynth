@@ -13,12 +13,10 @@
 #include "Profiler.h"
 
 TakeRecorder::TakeRecorder()
-: mStartSeconds(0)
+: IAudioProcessor(gBufferSize)
+, mStartSeconds(0)
 , mStartSecondsSlider(NULL)
 {
-   mInputBufferSize = gBufferSize;
-   mInputBuffer = new float[mInputBufferSize];
-   Clear(mInputBuffer, mInputBufferSize);
 }
 
 void TakeRecorder::CreateUIControls()
@@ -29,13 +27,6 @@ void TakeRecorder::CreateUIControls()
 
 TakeRecorder::~TakeRecorder()
 {
-   delete[] mInputBuffer;
-}
-
-float* TakeRecorder::GetBuffer(int& bufferSize)
-{
-   bufferSize = mInputBufferSize;
-   return mInputBuffer;
 }
 
 void TakeRecorder::Process(double time)
@@ -46,19 +37,17 @@ void TakeRecorder::Process(double time)
       return;
    
    ComputeSliders(0);
+   SyncBuffers();
    
-   int bufferSize = gBufferSize;
+   int bufferSize = GetBuffer()->BufferSize();
    if (GetTarget())
    {
-      float* out = GetTarget()->GetBuffer(bufferSize);
-      assert(bufferSize == gBufferSize);
-      
-      Add(out, mInputBuffer, bufferSize);
+      Add(GetTarget()->GetBuffer()->GetChannel(0), GetBuffer()->GetChannel(0), bufferSize);
    }
    
-   GetVizBuffer()->WriteChunk(mInputBuffer,bufferSize);
+   GetVizBuffer()->WriteChunk(GetBuffer()->GetChannel(0),bufferSize);
    
-   Clear(mInputBuffer, mInputBufferSize);
+   GetBuffer()->Clear();
 }
 
 void TakeRecorder::DrawModule()

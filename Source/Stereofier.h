@@ -10,8 +10,7 @@
 #define __modularSynth__Stereofier__
 
 #include <iostream>
-#include "IAudioReceiver.h"
-#include "IAudioSource.h"
+#include "IAudioProcessor.h"
 #include "IDrawableModule.h"
 #include "Slider.h"
 #include "ClickButton.h"
@@ -20,7 +19,7 @@
 #include "Checkbox.h"
 #include "PatchCableSource.h"
 
-class Stereofier : public IAudioReceiver, public IAudioSource, public IDrawableModule, public IFloatSliderListener, public IButtonListener, public IIntSliderListener
+class Stereofier : public IAudioProcessor, public IDrawableModule, public IFloatSliderListener, public IButtonListener, public IIntSliderListener
 {
 public:
    Stereofier();
@@ -32,9 +31,6 @@ public:
 
    void SetPan(float pan) { mPan = pan; }
    IAudioReceiver* GetTarget2() override { return mPatchCableSource2 ? mPatchCableSource2->GetAudioReceiver() : NULL; }
-   
-   //IAudioReceiver
-   float* GetBuffer(int& bufferSize) override;
    
    //IAudioSource
    void Process(double time) override;
@@ -54,9 +50,6 @@ private:
    void GetModuleDimensions(int& w, int&h) override { w=120; h=40; }
    bool Enabled() const override { return mEnabled; }
    
-   int mInputBufferSize;
-   float* mInputBuffer;
-   float* mInputBuffer2;
    RollingBuffer mVizBuffer2;
    PatchCableSource* mPatchCableSource2;
    float mPan;
@@ -65,6 +58,7 @@ private:
    float mWiden;
    FloatSlider* mWidenSlider;
    RollingBuffer mWidenerBuffer;
+   float* mPanBuffer;
 };
 
 #endif /* defined(__modularSynth__Stereofier__) */

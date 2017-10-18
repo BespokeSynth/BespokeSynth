@@ -63,7 +63,8 @@ namespace
 }
 
 VSTPlugin::VSTPlugin()
-: mVol(1)
+: IAudioProcessor(gBufferSize)
+, mVol(1)
 , mVolSlider(NULL)
 , mPlugin(nullptr)
 , mChannel(1)
@@ -76,11 +77,6 @@ VSTPlugin::VSTPlugin()
 , mWindowOverlay(NULL)
 , mDisplayMode(kDisplayMode_PluginOverlay)
 {
-   mWriteBuffer = new float[gBufferSize];
-   mInputBufferSize = gBufferSize;
-   mInputBuffer = new float[mInputBufferSize];
-   Clear(mInputBuffer, mInputBufferSize);
-   
    mFormatManager.addDefaultFormats();
    
    mChannelModulations.resize(kGlobalModulationIdx+1);
@@ -106,14 +102,6 @@ void VSTPlugin::CreateUIControls()
 
 VSTPlugin::~VSTPlugin()
 {
-   delete[] mWriteBuffer;
-   delete[] mInputBuffer;
-}
-
-float* VSTPlugin::GetBuffer(int& bufferSize)
-{
-   bufferSize = mInputBufferSize;
-   return mInputBuffer;
 }
 
 void VSTPlugin::Exit()
@@ -223,17 +211,14 @@ void VSTPlugin::Process(double time)
       return;
    
    ComputeSliders(0);
+   SyncBuffers();
    
-   int bufferSize;
-   float* out = GetTarget()->GetBuffer(bufferSize);
-   assert(bufferSize == gBufferSize);
-   
-   Clear(mWriteBuffer, gBufferSize);
+   int bufferSize = GetBuffer()->BufferSize();
    
    int inputChannels = MAX(2, mNumInputs);
    juce::AudioBuffer<float> buffer(inputChannels, gBufferSize);
    for (int i=0; i<inputChannels; ++i)
-      buffer.copyFrom(i, 0, mInputBuffer, mInputBufferSize);
+      buffer.copyFrom(i, 0, GetBuffer()->GetChannel(MIN(i,GetBuffer()->NumActiveChannels()-1)), GetBuffer()->BufferSize());
    
    mVSTMutex.lock();
    {
@@ -275,19 +260,19 @@ void VSTPlugin::Process(double time)
    }
    mVSTMutex.unlock();
    
-   for (int channel=0; channel < buffer.getNumChannels(); ++channel)
+   GetBuffer()->Clear();
+   for (int ch=0; ch < buffer.getNumChannels(); ++ch)
    {
+      int outputChannel = MIN(ch,GetBuffer()->NumActiveChannels()-1);
       for (int sampleIndex=0; sampleIndex < buffer.getNumSamples(); ++sampleIndex)
       {
-         mWriteBuffer[sampleIndex] += buffer.getSample(channel, sampleIndex) * mVol;
+         GetBuffer()->GetChannel(outputChannel)[sampleIndex] += buffer.getSample(ch, sampleIndex) * mVol;
       }
+      Add(GetTarget()->GetBuffer()->GetChannel(outputChannel), GetBuffer()->GetChannel(outputChannel), bufferSize);
+      GetVizBuffer()->WriteChunk(GetBuffer()->GetChannel(outputChannel), bufferSize, outputChannel);
    }
-   
-   GetVizBuffer()->WriteChunk(mWriteBuffer, bufferSize);
-   
-   Add(out, mWriteBuffer, bufferSize);
-   
-   Clear(mInputBuffer, mInputBufferSize);
+
+   GetBuffer()->Clear();
 }
 
 void VSTPlugin::PlayNote(double time, int pitch, int velocity, int voiceIdx /*= -1*/, ModulationChain* pitchBend /*= NULL*/, ModulationChain* modWheel /*= NULL*/, ModulationChain* pressure /*= NULL*/)

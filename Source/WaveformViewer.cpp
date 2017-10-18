@@ -11,7 +11,8 @@
 #include "Profiler.h"
 
 WaveformViewer::WaveformViewer()
-: mPhaseAlign(true)
+: IAudioProcessor(gBufferSize)
+, mPhaseAlign(true)
 , mDoubleBufferFlip(false)
 , mHueNote(NULL)
 , mHueAudio(NULL)
@@ -24,10 +25,6 @@ WaveformViewer::WaveformViewer()
 , mDrawWaveform(true)
 , mDrawCircle(false)
 {
-   mInputBufferSize = gBufferSize;
-   mInputBuffer = new float[mInputBufferSize];
-   Clear(mInputBuffer, mInputBufferSize);
-   
    mBufferVizOffset[0] = 0;
    mBufferVizOffset[1] = 0;
    mVizPhase[0] = 0;
@@ -53,13 +50,6 @@ void WaveformViewer::CreateUIControls()
 
 WaveformViewer::~WaveformViewer()
 {
-   delete[] mInputBuffer;
-}
-
-float* WaveformViewer::GetBuffer(int& bufferSize)
-{
-   bufferSize = mInputBufferSize;
-   return mInputBuffer;
 }
 
 void WaveformViewer::Process(double time)
@@ -71,21 +61,20 @@ void WaveformViewer::Process(double time)
    if (!mEnabled)
       return;
    
-   int bufferSize = gBufferSize;
+   SyncBuffers();
+   
+   int bufferSize = GetBuffer()->BufferSize();
    if (GetTarget())
    {
-      float* out = GetTarget()->GetBuffer(bufferSize);
-      assert(bufferSize == gBufferSize);
-      
-      Add(out, mInputBuffer, bufferSize);
+      Add(GetTarget()->GetBuffer()->GetChannel(0), GetBuffer()->GetChannel(0), bufferSize);
    }
    
-   GetVizBuffer()->WriteChunk(mInputBuffer,bufferSize);
+   GetVizBuffer()->WriteChunk(GetBuffer()->GetChannel(0),bufferSize);
    
    for (int i=0; i<bufferSize; ++i)
-      mAudioView[(i+mBufferVizOffset[!mDoubleBufferFlip]) % BUFFER_VIZ_SIZE][!mDoubleBufferFlip] = mInputBuffer[i];
+      mAudioView[(i+mBufferVizOffset[!mDoubleBufferFlip]) % BUFFER_VIZ_SIZE][!mDoubleBufferFlip] = GetBuffer()->GetChannel(0)[i];
       
-   Clear(mInputBuffer, mInputBufferSize);
+   GetBuffer()->Clear();
    
    float vizPhaseInc = GetPhaseInc(gVizFreq);
    mVizPhase[!mDoubleBufferFlip] += vizPhaseInc * bufferSize;

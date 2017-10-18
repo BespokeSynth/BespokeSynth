@@ -11,7 +11,8 @@
 #include "Profiler.h"
 
 BandVocoder::BandVocoder()
-: mInputPreamp(1)
+: IAudioProcessor(gBufferSize)
+, mInputPreamp(1)
 , mCarrierPreamp(1)
 , mVolume(1)
 , mInputSlider(NULL)
@@ -32,18 +33,14 @@ BandVocoder::BandVocoder()
 , mMaxBand(.3f)
 , mMaxBandSlider(NULL)
 {
-   mInputBufferSize = gBufferSize;
-   mInputBuffer = new float[mInputBufferSize];
-   Clear(mInputBuffer, mInputBufferSize);
+   mCarrierInputBuffer = new float[GetBuffer()->BufferSize()];
+   Clear(mCarrierInputBuffer, GetBuffer()->BufferSize());
    
-   mCarrierInputBuffer = new float[mInputBufferSize];
-   Clear(mCarrierInputBuffer, mInputBufferSize);
+   mWorkBuffer = new float[GetBuffer()->BufferSize()];
+   Clear(mWorkBuffer, GetBuffer()->BufferSize());
    
-   mWorkBuffer = new float[mInputBufferSize];
-   Clear(mWorkBuffer, mInputBufferSize);
-   
-   mOutBuffer = new float[mInputBufferSize];
-   Clear(mOutBuffer, mInputBufferSize);
+   mOutBuffer = new float[GetBuffer()->BufferSize()];
+   Clear(mOutBuffer, GetBuffer()->BufferSize());
    
    for (int i=0; i<VOCODER_MAX_BANDS; ++i)
    {
@@ -73,21 +70,14 @@ void BandVocoder::CreateUIControls()
 
 BandVocoder::~BandVocoder()
 {
-   delete[] mInputBuffer;
    delete[] mCarrierInputBuffer;
    delete[] mWorkBuffer;
 }
 
 void BandVocoder::SetCarrierBuffer(float *carrier, int bufferSize)
 {
-   assert(bufferSize == mInputBufferSize);
+   assert(bufferSize == GetBuffer()->BufferSize());
    memcpy(mCarrierInputBuffer, carrier, bufferSize*sizeof(float));
-}
-
-float* BandVocoder::GetBuffer(int& bufferSize)
-{
-   bufferSize = mInputBufferSize;
-   return mInputBuffer;
 }
 
 void BandVocoder::Process(double time)
@@ -98,24 +88,23 @@ void BandVocoder::Process(double time)
       return;
    
    ComputeSliders(0);
+   SyncBuffers();
    
    float inputPreampSq = mInputPreamp * mInputPreamp;
    float carrierPreampSq = mCarrierPreamp * mCarrierPreamp;
    float volSq = mVolume * mVolume;
    
-   int bufferSize = gBufferSize;
-   float* out = GetTarget()->GetBuffer(bufferSize);
-   assert(bufferSize == gBufferSize);
+   int bufferSize = GetBuffer()->BufferSize();
    
    Clear(mOutBuffer, bufferSize);
    
-   Mult(mInputBuffer, inputPreampSq, bufferSize);
+   Mult(GetBuffer()->GetChannel(0), inputPreampSq, bufferSize);
    Mult(mCarrierInputBuffer, carrierPreampSq, bufferSize);
    
    for (int i=0; i<mNumBands; ++i)
    {
       //get modulator band
-      memcpy(mWorkBuffer,mInputBuffer, bufferSize*sizeof(float));
+      memcpy(mWorkBuffer,GetBuffer()->GetChannel(0), bufferSize*sizeof(float));
       mBiquadCarrier[i].Filter(mWorkBuffer, bufferSize);
       
       float oldPeak = mPeaks[i].GetPeak();
@@ -141,15 +130,15 @@ void BandVocoder::Process(double time)
       Add(mOutBuffer, mWorkBuffer, bufferSize);
    }
 
-   Mult(mInputBuffer, (1-mDryWet)/inputPreampSq * volSq, bufferSize);
+   Mult(GetBuffer()->GetChannel(0), (1-mDryWet)/inputPreampSq * volSq, bufferSize);
    Mult(mOutBuffer, mDryWet * volSq, bufferSize);
    
-   Add(out, mInputBuffer, bufferSize);
-   Add(out, mOutBuffer, bufferSize);
+   Add(GetTarget()->GetBuffer()->GetChannel(0), GetBuffer()->GetChannel(0), bufferSize);
+   Add(GetTarget()->GetBuffer()->GetChannel(0), mOutBuffer, bufferSize);
    
-   GetVizBuffer()->WriteChunk(out,bufferSize);
+   GetVizBuffer()->WriteChunk(GetTarget()->GetBuffer()->GetChannel(0),bufferSize);
    
-   Clear(mInputBuffer, mInputBufferSize);
+   GetBuffer()->Clear();
 }
 
 void BandVocoder::DrawModule()

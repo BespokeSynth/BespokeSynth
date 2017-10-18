@@ -10,13 +10,12 @@
 #define __Bespoke__SamplerGrid__
 
 #include <iostream>
-#include "IAudioSource.h"
+#include "IAudioProcessor.h"
 #include "INoteReceiver.h"
 #include "IDrawableModule.h"
 #include "Slider.h"
 #include "DropdownList.h"
 #include "Checkbox.h"
-#include "IAudioReceiver.h"
 #include "MidiDevice.h"
 #include "Ramp.h"
 #include "GridController.h"
@@ -26,7 +25,7 @@ class ofxJSONElement;
 #define MAX_SAMPLER_GRID_LENGTH 5*44100
 #define SAMPLE_RAMP_MS 3
 
-class SamplerGrid : public IAudioSource, public IDrawableModule, public IDropdownListener, public IFloatSliderListener, public IIntSliderListener, public IAudioReceiver, public IGridControllerListener
+class SamplerGrid : public IAudioProcessor, public IDrawableModule, public IDropdownListener, public IFloatSliderListener, public IIntSliderListener, public IGridControllerListener
 {
 public:
    SamplerGrid();
@@ -43,8 +42,8 @@ public:
    void Process(double time) override;
    void SetEnabled(bool enabled) override;
    
-   //IAudioReceiver
-   float* GetBuffer(int& bufferSize) override { bufferSize = gBufferSize; return mRecordBuffer; }
+   //IAudioProcessor
+   InputMode GetInputMode() override { return kInputMode_Mono; }
    
    //IGridControllerListener
    void ConnectGridController(IGridController* grid) override;
@@ -96,7 +95,6 @@ private:
    Checkbox* mPassthroughCheckbox;
    
    float* mWriteBuffer;
-   float* mRecordBuffer;
    
    float mVolume;
    FloatSlider* mVolumeSlider;

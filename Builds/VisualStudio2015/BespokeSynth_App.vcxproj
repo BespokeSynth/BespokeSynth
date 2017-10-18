@@ -255,6 +255,7 @@
     <ClCompile Include="..\..\Source\OneShotLauncher.cpp"/>
     <ClCompile Include="..\..\Source\OutputChannel.cpp"/>
     <ClCompile Include="..\..\Source\PanicButton.cpp"/>
+    <ClCompile Include="..\..\Source\Panner.cpp"/>
     <ClCompile Include="..\..\Source\PitchBender.cpp"/>
     <ClCompile Include="..\..\Source\PitchChorus.cpp"/>
     <ClCompile Include="..\..\Source\PitchDive.cpp"/>
@@ -288,6 +289,7 @@
     <ClCompile Include="..\..\Source\SingleOscillator.cpp"/>
     <ClCompile Include="..\..\Source\SliderSequencer.cpp"/>
     <ClCompile Include="..\..\Source\SlowLayers.cpp"/>
+    <ClCompile Include="..\..\Source\Splitter.cpp"/>
     <ClCompile Include="..\..\Source\StepSequencer.cpp"/>
     <ClCompile Include="..\..\Source\Stereofier.cpp"/>
     <ClCompile Include="..\..\Source\StutterControl.cpp"/>
@@ -319,6 +321,7 @@
     <ClCompile Include="..\..\Source\ADSR.cpp"/>
     <ClCompile Include="..\..\Source\ADSRDisplay.cpp"/>
     <ClCompile Include="..\..\Source\ArrangementMaster.cpp"/>
+    <ClCompile Include="..\..\Source\ChannelBuffer.cpp"/>
     <ClCompile Include="..\..\Source\Bespoke_Platform.cpp"/>
     <ClCompile Include="..\..\Source\BiquadFilter.cpp"/>
     <ClCompile Include="..\..\Source\Canvas.cpp"/>
@@ -336,6 +339,8 @@
     <ClCompile Include="..\..\Source\FMVoice.cpp"/>
     <ClCompile Include="..\..\Source\Granulator.cpp"/>
     <ClCompile Include="..\..\Source\Grid.cpp"/>
+    <ClCompile Include="..\..\Source\IAudioProcessor.cpp"/>
+    <ClCompile Include="..\..\Source\IAudioReceiver.cpp"/>
     <ClCompile Include="..\..\Source\IAudioSource.cpp"/>
     <ClCompile Include="..\..\Source\IClickable.cpp"/>
     <ClCompile Include="..\..\Source\IDrawableModule.cpp"/>

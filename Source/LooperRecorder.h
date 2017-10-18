@@ -10,12 +10,11 @@
 #define __modularSynth__LooperRecorder__
 
 #include <iostream>
-#include "IAudioReceiver.h"
+#include "IAudioProcessor.h"
 #include "RollingBuffer.h"
 #include "RadioButton.h"
 #include "ClickButton.h"
 #include "Checkbox.h"
-#include "IAudioSource.h"
 #include "IDrawableModule.h"
 #include "Slider.h"
 #include "Looper.h"
@@ -25,7 +24,7 @@
 class Stutter;
 class PatchCableSource;
 
-class LooperRecorder : public IAudioReceiver, public IAudioSource, public IDrawableModule, public IButtonListener, public IFloatSliderListener, public IRadioButtonListener, public IIntSliderListener, public IDropdownListener
+class LooperRecorder : public IAudioProcessor, public IDrawableModule, public IButtonListener, public IFloatSliderListener, public IRadioButtonListener, public IIntSliderListener, public IDropdownListener
 {
 public:
    LooperRecorder();
@@ -59,7 +58,7 @@ public:
    bool InFreeRecord() { return mFreeRecording; }
    
    //IAudioReceiver
-   float* GetBuffer(int& bufferSize) override;
+   InputMode GetInputMode() override { return kInputMode_Mono; }
    
    //IAudioSource
    void Process(double time) override;
@@ -105,8 +104,6 @@ private:
    int mNumBars;
    DropdownList* mNumBarsSelector;
    Checkbox* mDebugCheckbox;
-   float* mInputBuffer;
-   int mInputBufferSize;
    float mSpeed;
    float mBaseTempo;
    ClickButton* mResampleButton;

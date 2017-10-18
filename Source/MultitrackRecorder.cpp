@@ -38,7 +38,6 @@ MultitrackRecorder::MultitrackRecorder()
 , mCopySelectionToLooperButton(NULL)
 , mUndoBuffer(NULL)
 , mUndoRecordButton(NULL)
-, mLoadPlayedTrackButton(NULL)
 {
    TheMultitrackRecorder = this;
    
@@ -62,7 +61,6 @@ void MultitrackRecorder::CreateUIControls()
    mFixLengthsButton = new ClickButton(this,"fix lengths",270,2);
    mCopySelectionToLooperButton = new ClickButton(this,"copy to looper",350,2);
    mUndoRecordButton = new ClickButton(this,"undo rec",450,2);
-   mLoadPlayedTrackButton = new ClickButton(this,"load played",550,2);
    
    for (int i=0; i<NUM_CLIP_ARRANGERS; ++i)
       mClipArranger[i].CreateUIControls();
@@ -181,7 +179,6 @@ void MultitrackRecorder::DrawModule()
    if (Minimized() || IsVisible() == false)
       return;
    
-   
    mRecordCheckbox->Draw();
    mPlayCheckbox->Draw();
    mAddTrackButton->Draw();
@@ -189,7 +186,6 @@ void MultitrackRecorder::DrawModule()
    mFixLengthsButton->Draw();
    mCopySelectionToLooperButton->Draw();
    mUndoRecordButton->Draw();
-   mLoadPlayedTrackButton->Draw();
    
    ofPushStyle();
    ofPushMatrix();
@@ -617,38 +613,6 @@ void MultitrackRecorder::ButtonClicked(ClickButton* button)
    {
       mRecording = false;
       CopyRecordBufferContents(mRecordBuffers[mRecordIdx], mUndoBuffer);
-   }
-   if (button == mLoadPlayedTrackButton)
-   {
-      mMutex.Lock("main thread");
-      
-      ResetAll();
-      
-      RollingBuffer* left = TheSynth->GetOutputLeft();
-      RollingBuffer* right = TheSynth->GetOutputRight();
-      RollingBuffer* measurePos = TheSynth->GetOutputMeasurePos();
-      
-      int length = left->Size() / 3;
-      RecordBuffer* buffer = new RecordBuffer(length);
-      delete[] mMeasurePos;
-      mMeasurePos = new float[length];
-      left->ReadChunk(buffer->mLeft, length);
-      right->ReadChunk(buffer->mRight, length);
-      measurePos->ReadChunk(mMeasurePos, length);
-      mRecordBuffers.push_back(buffer);
-      mRecordingLength = length;
-      mNumMeasures = 0;
-      
-      for (int i=1; i<length; ++i)
-      {
-         if (mMeasurePos[i-1] > mMeasurePos[i])
-         {
-            mMeasures[mNumMeasures] = i;
-            ++mNumMeasures;
-         }
-      }
-      
-      mMutex.Unlock();
    }
 }
 

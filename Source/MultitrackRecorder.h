@@ -112,7 +112,6 @@ private:
    int mNumMeasures;
    ClickButton* mCopySelectionToLooperButton;
    ClickButton* mUndoRecordButton;
-   ClickButton* mLoadPlayedTrackButton;
    
    vector<RecordBuffer*> mRecordBuffers;
    RecordBuffer* mUndoBuffer;

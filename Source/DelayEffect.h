@@ -10,7 +10,7 @@
 #define __modularSynth__DelayEffect__
 
 #include <iostream>
-#include "IAudioProcessor.h"
+#include "IAudioEffect.h"
 #include "RollingBuffer.h"
 #include "Slider.h"
 #include "Checkbox.h"
@@ -20,12 +20,12 @@
 
 #define DELAY_BUFFER_SIZE 5*gSampleRate
 
-class DelayEffect : public IAudioProcessor, public IFloatSliderListener, public IDropdownListener
+class DelayEffect : public IAudioEffect, public IFloatSliderListener, public IDropdownListener
 {
 public:
    DelayEffect();
    
-   static IAudioProcessor* Create() { return new DelayEffect(); }
+   static IAudioEffect* Create() { return new DelayEffect(); }
    
    string GetTitleLabel() override { return "delay"; }
    void CreateUIControls() override;
@@ -38,7 +38,7 @@ public:
    void SetDry(bool dry) { mDry = dry; }
    void SetFeedbackModuleMode(bool feedbackMode);
    
-   //IAudioProcessor
+   //IAudioEffect
    void ProcessAudio(double time, float* audio, int bufferSize) override;
    void SetEnabled(bool enabled) override;
    float GetEffectAmount() override;

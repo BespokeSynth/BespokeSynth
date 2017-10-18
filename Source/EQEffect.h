@@ -9,7 +9,7 @@
 #ifndef __Bespoke__EQEffect__
 #define __Bespoke__EQEffect__
 
-#include "IAudioProcessor.h"
+#include "IAudioEffect.h"
 #include "DropdownList.h"
 #include "Checkbox.h"
 #include "Slider.h"
@@ -21,20 +21,20 @@
 
 #define NUM_EQ_FILTERS 8
 
-class EQEffect : public IAudioProcessor, public IDropdownListener, public IIntSliderListener, public IRadioButtonListener, public IButtonListener, public GridListener
+class EQEffect : public IAudioEffect, public IDropdownListener, public IIntSliderListener, public IRadioButtonListener, public IButtonListener, public GridListener
 {
 public:
    EQEffect();
    ~EQEffect();
    
-   static IAudioProcessor* Create() { return new EQEffect(); }
+   static IAudioEffect* Create() { return new EQEffect(); }
    
    string GetTitleLabel() override { return "eq"; }
    void CreateUIControls() override;
    
    void Init() override;
    
-   //IAudioProcessor
+   //IAudioEffect
    void ProcessAudio(double time, float* audio, int bufferSize) override;
    void SetEnabled(bool enabled) override { mEnabled = enabled; }
    float GetEffectAmount() override;

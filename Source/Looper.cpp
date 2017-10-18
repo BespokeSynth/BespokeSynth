@@ -25,7 +25,8 @@ float Looper::mBeatwheelDepthLeft = 0;
 bool Looper::mBeatwheelSingleMeasure = 0;
 
 Looper::Looper()
-: mBuffer(NULL)
+: IAudioProcessor(gBufferSize)
+, mBuffer(NULL)
 , mLoopLength(4 * 60.0f / gDefaultTempo * gSampleRate)
 , mLoopPos(0)
 , mNumBars(1)
@@ -112,10 +113,6 @@ Looper::Looper()
 , mWantHalfShift(false)
 , mLastInputSample(0)
 {
-   mInputBufferSize = gBufferSize;
-   mInputBuffer = new float[mInputBufferSize];
-   ::Clear(mInputBuffer, mInputBufferSize);
-   
    //TODO(Ryan) buffer sizes
    mBuffer = new float[MAX_BUFFER_SIZE];
    mWorkBuffer = new float[gBufferSize];
@@ -225,7 +222,6 @@ Looper::~Looper()
 {
    delete[] mBuffer;
    delete[] mUndoBuffer;
-   delete[] mInputBuffer;
 }
 
 void Looper::Exit()
@@ -250,12 +246,6 @@ float* Looper::GetLoopBuffer(int& loopLength)
 void Looper::SetLoopBuffer(float* buffer)
 {
    mQueuedNewBuffer = buffer;
-}
-
-float* Looper::GetBuffer(int& bufferSize)
-{
-   bufferSize = mInputBufferSize;
-   return mInputBuffer;
 }
 
 void Looper::Poll()
@@ -283,15 +273,14 @@ void Looper::Process(double time)
       return;
 
    ComputeSliders(0);
+   SyncBuffers();
 
    if (mWantBakeVolume)
       BakeVolume();
    if (mWantShiftDownbeat)
       DoShiftDownbeat();
 
-   int bufferSize;
-   float* out = GetTarget()->GetBuffer(bufferSize);
-   assert(bufferSize == gBufferSize);
+   int bufferSize = GetBuffer()->BufferSize();
 
    float oldLoopPos = mLoopPos;
    int sampsPerBar = mLoopLength / mNumBars;
@@ -385,13 +374,13 @@ void Looper::Process(double time)
       float writeAmount = mWriteInputRamp.Value(time);
       if (writeAmount > 0)
          WriteInterpolatedSample(offset-1, mBuffer, mLoopLength, mLastInputSample * writeAmount);
-      mLastInputSample = mInputBuffer[i];
+      mLastInputSample = GetBuffer()->GetChannel(0)[i];
 
       output *= volSq;
       
       mWorkBuffer[i] = output * mMuteRamp.Value(time);
 
-      GetVizBuffer()->Write(mWorkBuffer[i] + mInputBuffer[i]);
+      GetVizBuffer()->Write(mWorkBuffer[i] + GetBuffer()->GetChannel(0)[i]);
       
       time += gInvSampleRateMs;
    }
@@ -402,10 +391,10 @@ void Looper::Process(double time)
       mPitchShifter.Process(mWorkBuffer, bufferSize);
    }
    
-   Add(out, mInputBuffer, bufferSize);
-   Add(out, mWorkBuffer, bufferSize);
+   Add(GetTarget()->GetBuffer()->GetChannel(0), GetBuffer()->GetChannel(0), bufferSize);
+   Add(GetTarget()->GetBuffer()->GetChannel(0), mWorkBuffer, bufferSize);
    
-   ::Clear(mInputBuffer, mInputBufferSize);
+   GetBuffer()->Clear();
    
    if (mCommitBuffer && !mClearCommitBuffer && !mWantRewrite)
       DoCommit();

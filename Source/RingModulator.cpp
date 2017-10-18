@@ -13,7 +13,8 @@
 #include "Scale.h"
 
 RingModulator::RingModulator()
-: mDryWet(1)
+: IAudioProcessor(gBufferSize)
+, mDryWet(1)
 , mVolume(1)
 , mDryWetSlider(NULL)
 , mVolumeSlider(NULL)
@@ -22,10 +23,7 @@ RingModulator::RingModulator()
 , mGlideTime(0)
 , mGlideSlider(NULL)
 {
-   mInputBufferSize = gBufferSize;
-   mInputBuffer = new float[mInputBufferSize];
-   Clear(mInputBuffer, mInputBufferSize);
-   mDryBuffer = new float[mInputBufferSize];
+   mDryBuffer = new float[gBufferSize];
 
    mModOsc.Start(gTime, 1);
    mFreq.Start(gTime, 220, gTime + mGlideTime);
@@ -41,14 +39,7 @@ void RingModulator::CreateUIControls()
 
 RingModulator::~RingModulator()
 {
-   delete[] mInputBuffer;
    delete[] mDryBuffer;
-}
-
-float* RingModulator::GetBuffer(int& bufferSize)
-{
-   bufferSize = mInputBufferSize;
-   return mInputBuffer;
 }
 
 void RingModulator::Process(double time)
@@ -57,11 +48,13 @@ void RingModulator::Process(double time)
 
    if (GetTarget() == NULL)
       return;
+   
+   SyncBuffers();
 
-   memcpy(mDryBuffer, mInputBuffer, mInputBufferSize*sizeof(float));
+   memcpy(mDryBuffer, GetBuffer()->GetChannel(0), GetBuffer()->BufferSize()*sizeof(float));
 
-   int bufferSize;
-   float* out = GetTarget()->GetBuffer(bufferSize);
+   int bufferSize = GetTarget()->GetBuffer()->BufferSize();
+   float* out = GetTarget()->GetBuffer()->GetChannel(0);
    assert(bufferSize == gBufferSize);
 
    if (mEnabled)
@@ -70,7 +63,7 @@ void RingModulator::Process(double time)
       {
          ComputeSliders(0);
          
-         mInputBuffer[i] *= mModOsc.Audio(time, mPhase);
+         GetBuffer()->GetChannel(0)[i] *= mModOsc.Audio(time, mPhase);
 
          float phaseInc = GetPhaseInc(mFreq.Value(time));
          mPhase += phaseInc;
@@ -79,16 +72,16 @@ void RingModulator::Process(double time)
          time += gInvSampleRateMs;
       }
 
-      Mult(mDryBuffer, (1-mDryWet)*mVolume*mVolume, mInputBufferSize);
-      Mult(mInputBuffer, mDryWet*mVolume*mVolume, mInputBufferSize);
-      Add(mInputBuffer, mDryBuffer, bufferSize);
+      Mult(mDryBuffer, (1-mDryWet)*mVolume*mVolume, GetBuffer()->BufferSize());
+      Mult(GetBuffer()->GetChannel(0), mDryWet*mVolume*mVolume, GetBuffer()->BufferSize());
+      Add(GetBuffer()->GetChannel(0), mDryBuffer, GetBuffer()->BufferSize());
    }
 
-   Add(out, mInputBuffer, bufferSize);
+   Add(out, GetBuffer()->GetChannel(0), GetBuffer()->BufferSize());
 
-   GetVizBuffer()->WriteChunk(mInputBuffer, bufferSize);
+   GetVizBuffer()->WriteChunk(GetBuffer()->GetChannel(0), GetBuffer()->BufferSize());
 
-   Clear(mInputBuffer, mInputBufferSize);
+   GetBuffer()->Clear();
 }
 
 void RingModulator::DrawModule()

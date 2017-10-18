@@ -10,14 +10,13 @@
 #define __modularSynth__WaveformViewer__
 
 #include <iostream>
-#include "IAudioReceiver.h"
-#include "IAudioSource.h"
+#include "IAudioProcessor.h"
 #include "IDrawableModule.h"
 #include "Slider.h"
 
 #define BUFFER_VIZ_SIZE 2048
 
-class WaveformViewer : public IAudioReceiver, public IAudioSource, public IDrawableModule, public IFloatSliderListener
+class WaveformViewer : public IAudioProcessor, public IDrawableModule, public IFloatSliderListener
 {
 public:
    WaveformViewer();
@@ -27,8 +26,8 @@ public:
    string GetTitleLabel() override { return "waveform"; }
    void CreateUIControls() override;
    
-   //IAudioReceiver
-   float* GetBuffer(int& bufferSize) override;
+   //IAudioProcessor
+   InputMode GetInputMode() override { return kInputMode_Mono; }
    
    //IAudioSource
    void Process(double time) override;
@@ -48,9 +47,6 @@ private:
    void DrawModule() override;
    void GetModuleDimensions(int& w, int&h) override { w=mWidth; h=mHeight; }
    bool Enabled() const override { return mEnabled; }
-   
-   int mInputBufferSize;
-   float* mInputBuffer;
    
    float mAudioView[BUFFER_VIZ_SIZE][2];
    bool mDoubleBufferFlip;

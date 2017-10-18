@@ -12,12 +12,10 @@
 #include "PatchCableSource.h"
 
 AudioRouter::AudioRouter()
-: mRouteIndex(0)
+: IAudioProcessor(gBufferSize)
+, mRouteIndex(0)
 , mRouteSelector(NULL)
 {
-   mInputBufferSize = gBufferSize;
-   mInputBuffer = new float[mInputBufferSize];
-   Clear(mInputBuffer, mInputBufferSize);
 }
 
 void AudioRouter::CreateUIControls()
@@ -28,13 +26,6 @@ void AudioRouter::CreateUIControls()
 
 AudioRouter::~AudioRouter()
 {
-   delete[] mInputBuffer;
-}
-
-float* AudioRouter::GetBuffer(int& bufferSize)
-{
-   bufferSize = mInputBufferSize;
-   return mInputBuffer;
 }
 
 void AudioRouter::AddReceiver(IAudioReceiver* receiver, const char* name)
@@ -54,15 +45,15 @@ void AudioRouter::Process(double time)
    if (GetTarget() == NULL)
       return;
 
-   int bufferSize = gBufferSize;
-   float* out = GetTarget()->GetBuffer(bufferSize);
-   assert(bufferSize == gBufferSize);
+   SyncBuffers();
 
-   Add(out, mInputBuffer, bufferSize);
+   for (int ch=0; ch<GetBuffer()->NumActiveChannels(); ++ch)
+   {
+      Add(GetTarget()->GetBuffer()->GetChannel(ch), GetBuffer()->GetChannel(ch), GetBuffer()->BufferSize());
+      GetVizBuffer()->WriteChunk(GetBuffer()->GetChannel(ch),GetBuffer()->BufferSize(), ch);
+   }
 
-   GetVizBuffer()->WriteChunk(mInputBuffer,bufferSize);
-
-   Clear(mInputBuffer, mInputBufferSize);
+   GetBuffer()->Clear();
 }
 
 void AudioRouter::DrawModule()

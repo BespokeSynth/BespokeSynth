@@ -10,24 +10,24 @@
 #define __modularSynth__Pumper__
 
 #include <iostream>
-#include "IAudioProcessor.h"
+#include "IAudioEffect.h"
 #include "Checkbox.h"
 #include "Slider.h"
 #include "DropdownList.h"
 #include "LFO.h"
 
-class Pumper : public IAudioProcessor, public IDropdownListener, public IFloatSliderListener
+class Pumper : public IAudioEffect, public IDropdownListener, public IFloatSliderListener
 {
 public:
    Pumper();
    virtual ~Pumper();
    
-   static IAudioProcessor* Create() { return new Pumper(); }
+   static IAudioEffect* Create() { return new Pumper(); }
    
    string GetTitleLabel() override { return "pumper"; }
    void CreateUIControls() override;
 
-   //IAudioProcessor
+   //IAudioEffect
    void ProcessAudio(double time, float* audio, int bufferSize) override;
    void SetEnabled(bool enabled) override { mEnabled = enabled; }
    float GetEffectAmount() override;

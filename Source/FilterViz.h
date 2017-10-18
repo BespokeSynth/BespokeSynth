@@ -14,7 +14,7 @@
 #include "DropdownList.h"
 #include "Slider.h"
 #include "ClickButton.h"
-#include "IAudioProcessor.h"
+#include "IAudioEffect.h"
 
 #define FILTER_VIZ_BINS 1024
 
@@ -48,7 +48,7 @@ private:
    float* mFFTOutImag;
    
    bool mNeedUpdate;
-   vector<IAudioProcessor*> mFilters;
+   vector<IAudioEffect*> mFilters;
 };
 
 #endif /* defined(__Bespoke__FilterViz__) */

@@ -23,7 +23,8 @@ namespace
 }
 
 FFTtoAdditive::FFTtoAdditive()
-: mFFT(fftWindowSize)
+: IAudioProcessor(gBufferSize)
+, mFFT(fftWindowSize)
 , mRollingInputBuffer(fftWindowSize)
 , mRollingOutputBuffer(fftWindowSize)
 , mFFTData(fftWindowSize, fftFreqDomainSize)
@@ -43,10 +44,6 @@ FFTtoAdditive::FFTtoAdditive()
 , mPhaseOffsetSlider(NULL)
 , mHistoryPtr(0)
 {
-   mInputBufferSize = gBufferSize;
-   mInputBuffer = new float[mInputBufferSize];
-   Clear(mInputBuffer, mInputBufferSize);
-
    // Generate a window with a single raised cosine from N/4 to 3N/4
    mWindower = new float[fftWindowSize];
    for (int i=0; i<fftWindowSize; ++i)
@@ -80,14 +77,7 @@ void FFTtoAdditive::CreateUIControls()
 
 FFTtoAdditive::~FFTtoAdditive()
 {
-   delete[] mInputBuffer;
    delete[] mWindower;
-}
-
-float* FFTtoAdditive::GetBuffer(int& bufferSize)
-{
-   bufferSize = mInputBufferSize;
-   return mInputBuffer;
 }
 
 void FFTtoAdditive::Process(double time)
@@ -98,15 +88,14 @@ void FFTtoAdditive::Process(double time)
       return;
 
    ComputeSliders(0);
+   SyncBuffers();
 
    float inputPreampSq = mInputPreamp * mInputPreamp;
    float volSq = mVolume * mVolume;
 
-   int bufferSize = gBufferSize;
-   float* out = GetTarget()->GetBuffer(bufferSize);
-   assert(bufferSize == gBufferSize);
+   int bufferSize = GetBuffer()->BufferSize();
 
-   mRollingInputBuffer.WriteChunk(mInputBuffer, bufferSize);
+   mRollingInputBuffer.WriteChunk(GetBuffer()->GetChannel(0), bufferSize);
 
    //copy rolling input buffer into working buffer and window it
    mRollingInputBuffer.ReadChunk(mFFTData.mTimeDomain, fftWindowSize);
@@ -130,6 +119,7 @@ void FFTtoAdditive::Process(double time)
       mFFTData.mImaginaryValues[i] = phase;
    }
 
+   float* out = GetTarget()->GetBuffer()->GetChannel(0);
    for (int i=0; i<bufferSize; ++i)
    {
       float write = 0;
@@ -147,7 +137,7 @@ void FFTtoAdditive::Process(double time)
       time += gInvSampleRateMs;
    }
 
-   Clear(mInputBuffer, mInputBufferSize);
+   GetBuffer()->Clear();
 }
 
 float FFTtoAdditive::SinSample(float phase)

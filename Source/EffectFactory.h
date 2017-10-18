@@ -11,15 +11,15 @@
 
 #include <iostream>
 #include "OpenFrameworksPort.h"
-#include "IAudioProcessor.h"
+#include "IAudioEffect.h"
 
-typedef IAudioProcessor* (*CreateEffectFn)(void);
+typedef IAudioEffect* (*CreateEffectFn)(void);
 
 class EffectFactory
 {
 public:
    EffectFactory();
-   IAudioProcessor* MakeEffect(string type);
+   IAudioEffect* MakeEffect(string type);
    vector<string> GetSpawnableEffects();
 private:
    void Register(string type, CreateEffectFn creator);

@@ -11,7 +11,8 @@
 #include "Profiler.h"
 
 MultibandCompressor::MultibandCompressor()
-: mDryWet(1)
+: IAudioProcessor(gBufferSize)
+, mDryWet(1)
 , mDryWetSlider(NULL)
 , mNumBands(4)
 , mNumBandsSlider(NULL)
@@ -25,15 +26,11 @@ MultibandCompressor::MultibandCompressor()
 , mMaxBandSlider(NULL)
 
 {
-   mInputBufferSize = gBufferSize;
-   mInputBuffer = new float[mInputBufferSize];
-   Clear(mInputBuffer, mInputBufferSize);
+   mWorkBuffer = new float[GetBuffer()->BufferSize()];
+   Clear(mWorkBuffer, GetBuffer()->BufferSize());
    
-   mWorkBuffer = new float[mInputBufferSize];
-   Clear(mWorkBuffer, mInputBufferSize);
-   
-   mOutBuffer = new float[mInputBufferSize];
-   Clear(mOutBuffer, mInputBufferSize);
+   mOutBuffer = new float[GetBuffer()->BufferSize()];
+   Clear(mOutBuffer, GetBuffer()->BufferSize());
    
    CalcFilters();
 }
@@ -51,15 +48,8 @@ void MultibandCompressor::CreateUIControls()
 
 MultibandCompressor::~MultibandCompressor()
 {
-   delete[] mInputBuffer;
    delete[] mOutBuffer;
    delete[] mWorkBuffer;
-}
-
-float* MultibandCompressor::GetBuffer(int& bufferSize)
-{
-   bufferSize = mInputBufferSize;
-   return mInputBuffer;
 }
 
 void MultibandCompressor::Process(double time)
@@ -70,19 +60,17 @@ void MultibandCompressor::Process(double time)
       return;
    
    ComputeSliders(0);
+   SyncBuffers();
    
-   int bufferSize = gBufferSize;
+   int bufferSize = GetBuffer()->BufferSize();
    if (GetTarget())
    {
-      float* out = GetTarget()->GetBuffer(bufferSize);
-      assert(bufferSize == gBufferSize);
-      
       Clear(mOutBuffer, bufferSize);
       
       for (int i=0; i<bufferSize; ++i)
       {
          float lower;
-         float highLeftover = mInputBuffer[i];
+         float highLeftover = GetBuffer()->GetChannel(0)[i];
          for (int j=0; j<mNumBands; ++j)
          {
             mFilters[j].ProcessSample(highLeftover, lower, highLeftover);
@@ -114,22 +102,20 @@ void MultibandCompressor::Process(double time)
          Add(mOutBuffer, mWorkBuffer, bufferSize);
       }*/
       
-      Mult(mInputBuffer, (1-mDryWet), bufferSize);
+      Mult(GetBuffer()->GetChannel(0), (1-mDryWet), bufferSize);
       Mult(mOutBuffer, mDryWet, bufferSize);
       
-      Add(out, mInputBuffer, bufferSize);
-      Add(out, mOutBuffer, bufferSize);
+      Add(GetTarget()->GetBuffer()->GetChannel(0), GetBuffer()->GetChannel(0), bufferSize);
+      Add(GetTarget()->GetBuffer()->GetChannel(0), mOutBuffer, bufferSize);
    }
    
-   GetVizBuffer()->WriteChunk(mInputBuffer,bufferSize);
+   GetVizBuffer()->WriteChunk(GetBuffer()->GetChannel(0),bufferSize);
    
-   Clear(mInputBuffer, mInputBufferSize);
+   GetBuffer()->Clear();
 }
 
 void MultibandCompressor::DrawModule()
 {
-
-   
    if (Minimized() || IsVisible() == false)
       return;
    

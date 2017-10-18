@@ -10,21 +10,21 @@
 #define __modularSynth__NoiseEffect__
 
 #include <iostream>
-#include "IAudioProcessor.h"
+#include "IAudioEffect.h"
 #include "Slider.h"
 #include "Checkbox.h"
 
-class NoiseEffect : public IAudioProcessor, public IIntSliderListener, public IFloatSliderListener
+class NoiseEffect : public IAudioEffect, public IIntSliderListener, public IFloatSliderListener
 {
 public:
    NoiseEffect();
    
-   static IAudioProcessor* Create() { return new NoiseEffect(); }
+   static IAudioEffect* Create() { return new NoiseEffect(); }
    
    string GetTitleLabel() override { return "noisify"; }
    void CreateUIControls() override;
 
-   //IAudioProcessor
+   //IAudioEffect
    void ProcessAudio(double time, float* audio, int bufferSize) override;
    void SetEnabled(bool enabled) override { mEnabled = enabled; }
    float GetEffectAmount() override;

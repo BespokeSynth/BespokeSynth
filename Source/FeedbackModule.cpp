@@ -12,14 +12,11 @@
 #include "ModularSynth.h"
 
 FeedbackModule::FeedbackModule()
-: mFeedbackTarget(NULL)
+: IAudioProcessor(gBufferSize)
+, mFeedbackTarget(NULL)
 , mFeedbackTargetCable(NULL)
 , mFeedbackVizBuffer(VIZ_BUFFER_SECONDS*gSampleRate)
 {
-   mInputBufferSize = gBufferSize;
-   mInputBuffer = new float[mInputBufferSize];
-   Clear(mInputBuffer, mInputBufferSize);
-   
    AddChild(&mDelay);
    mDelay.SetPosition(3,15);
    mDelay.SetEnabled(true);
@@ -41,13 +38,6 @@ void FeedbackModule::CreateUIControls()
 
 FeedbackModule::~FeedbackModule()
 {
-   delete[] mInputBuffer;
-}
-
-float* FeedbackModule::GetBuffer(int& bufferSize)
-{
-   bufferSize = mInputBufferSize;
-   return mInputBuffer;
 }
 
 void FeedbackModule::Process(double time)
@@ -58,29 +48,25 @@ void FeedbackModule::Process(double time)
       return;
    
    ComputeSliders(0);
+   SyncBuffers();
    
-   int bufferSize = gBufferSize;
+   int bufferSize = GetBuffer()->BufferSize();
    if (GetTarget())
-   {
-      float* out = GetTarget()->GetBuffer(bufferSize);
-      assert(bufferSize == gBufferSize);
-      
-      Add(out, mInputBuffer, bufferSize);
-   }
+      Add(GetTarget()->GetBuffer()->GetChannel(0), GetBuffer()->GetChannel(0), bufferSize);
    
-   GetVizBuffer()->WriteChunk(mInputBuffer,bufferSize);
+   GetVizBuffer()->WriteChunk(GetBuffer()->GetChannel(0),bufferSize);
    
    if (mFeedbackTarget)
    {
-      float* out = mFeedbackTarget->GetBuffer(bufferSize);
+      float* out = mFeedbackTarget->GetBuffer()->GetChannel(0);
       assert(bufferSize == gBufferSize);
       
-      mDelay.ProcessAudio(gTime, mInputBuffer, mInputBufferSize);
+      mDelay.ProcessAudio(gTime, GetBuffer()->GetChannel(0), bufferSize);
       
       if (mDelay.Enabled())
       {
-         Add(out, mInputBuffer, bufferSize);
-         mFeedbackVizBuffer.WriteChunk(mInputBuffer, mInputBufferSize);
+         Add(out, GetBuffer()->GetChannel(0), bufferSize);
+         mFeedbackVizBuffer.WriteChunk(GetBuffer()->GetChannel(0), bufferSize);
       }
       else
       {
@@ -88,7 +74,7 @@ void FeedbackModule::Process(double time)
       }
    }
    
-   Clear(mInputBuffer, mInputBufferSize);
+   GetBuffer()->Clear();
 }
 
 void FeedbackModule::DrawModule()

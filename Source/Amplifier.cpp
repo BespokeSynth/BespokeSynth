@@ -11,12 +11,10 @@
 #include "Profiler.h"
 
 Amplifier::Amplifier()
-: mBoost(0)
+: IAudioProcessor(gBufferSize)
+, mBoost(0)
 , mBoostSlider(NULL)
 {
-   mInputBufferSize = gBufferSize;
-   mInputBuffer = new float[mInputBufferSize];
-   Clear(mInputBuffer, mInputBufferSize);
 }
 
 void Amplifier::CreateUIControls()
@@ -27,13 +25,6 @@ void Amplifier::CreateUIControls()
 
 Amplifier::~Amplifier()
 {
-   delete[] mInputBuffer;
-}
-
-float* Amplifier::GetBuffer(int& bufferSize)
-{
-   bufferSize = mInputBufferSize;
-   return mInputBuffer;
 }
 
 void Amplifier::Process(double time)
@@ -44,20 +35,20 @@ void Amplifier::Process(double time)
       return;
    
    ComputeSliders(0);
+   SyncBuffers();
    
-   int bufferSize = gBufferSize;
    if (GetTarget())
    {
-      float* out = GetTarget()->GetBuffer(bufferSize);
-      assert(bufferSize == gBufferSize);
-      
-      Mult(mInputBuffer, mBoost*mBoost, bufferSize);
-      Add(out, mInputBuffer, bufferSize);
+      ChannelBuffer* out = GetTarget()->GetBuffer();
+      for (int ch=0; ch<GetBuffer()->NumActiveChannels(); ++ch)
+      {
+         Mult(GetBuffer()->GetChannel(ch), mBoost*mBoost, out->BufferSize());
+         Add(out->GetChannel(ch), GetBuffer()->GetChannel(ch), out->BufferSize());
+         GetVizBuffer()->WriteChunk(GetBuffer()->GetChannel(ch),GetBuffer()->BufferSize(), ch);
+      }
    }
    
-   GetVizBuffer()->WriteChunk(mInputBuffer,bufferSize);
-   
-   Clear(mInputBuffer, mInputBufferSize);
+   GetBuffer()->Clear();
 }
 
 void Amplifier::DrawModule()

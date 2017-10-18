@@ -10,7 +10,7 @@
 #define __modularSynth__Sampler__
 
 #include <iostream>
-#include "IAudioSource.h"
+#include "IAudioProcessor.h"
 #include "PolyphonyMgr.h"
 #include "SampleVoice.h"
 #include "ADSR.h"
@@ -20,14 +20,13 @@
 #include "DropdownList.h"
 #include "ADSRDisplay.h"
 #include "Checkbox.h"
-#include "IAudioReceiver.h"
 #include "PitchDetector.h"
 
 class ofxJSONElement;
 
 #define MAX_SAMPLER_LENGTH 2*gSampleRate
 
-class Sampler : public IAudioSource, public INoteReceiver, public IDrawableModule, public IDropdownListener, public IFloatSliderListener, public IIntSliderListener, public IAudioReceiver
+class Sampler : public IAudioProcessor, public INoteReceiver, public IDrawableModule, public IDropdownListener, public IFloatSliderListener, public IIntSliderListener
 {
 public:
    Sampler();
@@ -40,12 +39,12 @@ public:
    void SetVol(float vol) { mVoiceParams.mVol = vol; mADSRDisplay->SetVol(vol); }
    void Poll() override;
    
+   //IAudioProcessor
+   InputMode GetInputMode() override { return kInputMode_Mono; }
+   
    //IAudioSource
    void Process(double time) override;
    void SetEnabled(bool enabled) override;
-   
-   //IAudioReceiver
-   float* GetBuffer(int& bufferSize) override { bufferSize = gBufferSize; return mRecordBuffer; }
    
    //INoteReceiver
    void PlayNote(double time, int pitch, int velocity, int voiceIdx = -1, ModulationChain* pitchBend = NULL, ModulationChain* modWheel = NULL, ModulationChain* pressure = NULL) override;
@@ -91,7 +90,6 @@ private:
    Checkbox* mPassthroughCheckbox;
    
    float* mWriteBuffer;
-   float* mRecordBuffer;
    
    PitchDetector mPitchDetector;
    bool mWantDetectPitch;

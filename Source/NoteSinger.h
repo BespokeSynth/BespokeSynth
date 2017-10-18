@@ -36,7 +36,7 @@ public:
    void CreateUIControls() override;
 
    //IAudioReceiver
-   float* GetBuffer(int& bufferSize) override;
+   InputMode GetInputMode() override { return kInputMode_Mono; }
 
    //IAudioPoller
    void OnTransportAdvanced(float amount) override;
@@ -68,15 +68,11 @@ private:
    
    int GetPitchForBucket(int bucket);
 
-   
-   
    int mOctave;
    IntSlider* mOctaveSlider;
 
    int mPitch;
 
-   int mInputBufferSize;
-   float* mInputBuffer;
    float* mWorkBuffer;
 
    int mNumBuckets;

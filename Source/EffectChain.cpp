@@ -7,7 +7,7 @@
 //
 
 #include "EffectChain.h"
-#include "IAudioProcessor.h"
+#include "IAudioEffect.h"
 #include "SynthGlobals.h"
 #include "ModularSynth.h"
 #include "Profiler.h"
@@ -15,7 +15,8 @@
 const double gSwapLength = 150.0;
 
 EffectChain::EffectChain()
-: mVolume(1)
+: IAudioProcessor(gBufferSize)
+, mVolume(1)
 , mVolumeSlider(NULL)
 , mNumFXWide(3)
 , mSpawnIndex(-1)
@@ -26,17 +27,13 @@ EffectChain::EffectChain()
 , mShowSpawnList(true)
 , mWantDeleteLastEffect(false)
 {
-   mInputBufferSize = gBufferSize;
-   mInputBuffer = new float[mInputBufferSize];
-   Clear(mInputBuffer, mInputBufferSize);
-   mDryBuffer = new float[mInputBufferSize];
+   mDryBuffer = new float[GetBuffer()->BufferSize()];
 }
 
 EffectChain::~EffectChain()
 {
    for (int i=0; i<mEffects.size(); ++i)
       delete mEffects[i];
-   delete[] mInputBuffer;
    delete[] mDryBuffer;
 }
 
@@ -47,12 +44,6 @@ void EffectChain::CreateUIControls()
    mVolumeSlider = new FloatSlider(this,"volume", 10, 100, 100, 15, &mVolume, 0, 2);
    mEffectSpawnList = new DropdownList(this,"effect", 10, 100, &mSpawnIndex);
    mDeleteLastEffectButton = new ClickButton(this,"x", 10, 100);
-}
-
-float* EffectChain::GetBuffer(int& bufferSize)
-{
-   bufferSize = mInputBufferSize;
-   return mInputBuffer;
 }
 
 void EffectChain::Init()
@@ -72,7 +63,7 @@ void EffectChain::AddEffect(string type, bool onTheFly /*=false*/)
 {
    assert(mEffects.size() < MAX_EFFECTS_IN_CHAIN - 1);
  
-   IAudioProcessor* effect = TheSynth->GetEffectFactory()->MakeEffect(type);
+   IAudioEffect* effect = TheSynth->GetEffectFactory()->MakeEffect(type);
    if (effect == NULL)
       throw UnknownEffectTypeException();
    assert(effect->GetType() == type);  //make sure things are named the same in code
@@ -112,35 +103,34 @@ void EffectChain::Process(double time)
       return;
 
    ComputeSliders(0);
+   SyncBuffers();
    
-   int bufferSize;
-   float* out = GetTarget()->GetBuffer(bufferSize);
-   assert(bufferSize == gBufferSize);
+   int bufferSize = GetBuffer()->BufferSize();
    
    mEffectMutex.lock();
    
    for (int i=0; i<mEffects.size(); ++i)
    {
-      memcpy(mDryBuffer, mInputBuffer, mInputBufferSize*sizeof(float));
+      memcpy(mDryBuffer, GetBuffer()->GetChannel(0), bufferSize*sizeof(float));
       
-      mEffects[i]->ProcessAudio(time,mInputBuffer,bufferSize);
+      mEffects[i]->ProcessAudio(time,GetBuffer()->GetChannel(0),bufferSize);
       
       float dryWet = mDryWetLevels[i];
 
       Mult(mDryBuffer, (1-dryWet), bufferSize);
-      Mult(mInputBuffer, dryWet, bufferSize);
-      Add(mInputBuffer, mDryBuffer, bufferSize);
+      Mult(GetBuffer()->GetChannel(0), dryWet, bufferSize);
+      Add(GetBuffer()->GetChannel(0), mDryBuffer, bufferSize);
    }
    
    mEffectMutex.unlock();
    
-   Mult(mInputBuffer, mVolume*mVolume, bufferSize);
+   Mult(GetBuffer()->GetChannel(0), mVolume*mVolume, bufferSize);
 
-   Add(out, mInputBuffer, bufferSize);
+   Add(GetTarget()->GetBuffer()->GetChannel(0), GetBuffer()->GetChannel(0), bufferSize);
    
-   GetVizBuffer()->WriteChunk(mInputBuffer, bufferSize);
+   GetVizBuffer()->WriteChunk(GetBuffer()->GetChannel(0), bufferSize);
    
-   Clear(mInputBuffer, mInputBufferSize);
+   GetBuffer()->Clear();
 }
 
 void EffectChain::Poll()
@@ -322,7 +312,7 @@ void EffectChain::DeleteLastEffect()
    mDryWetSliders.resize(mDryWetSliders.size()-1);
    
    mEffectMutex.lock();
-   IAudioProcessor* toRemove = mEffects[mEffects.size()-1];
+   IAudioEffect* toRemove = mEffects[mEffects.size()-1];
    RemoveFromVector(toRemove, mEffects);
    RemoveChild(toRemove);
    //delete toRemove;   TODO(Ryan) can't do this in case stuff is referring to its UI controls
@@ -348,7 +338,7 @@ void EffectChain::ButtonClicked(ClickButton* button)
          mSwapTime = gTime + gSwapLength;
 
          mEffectMutex.lock();
-         IAudioProcessor* swap = mEffects[newIndex];
+         IAudioEffect* swap = mEffects[newIndex];
          mEffects[newIndex] = mEffects[effectIndex];
          mEffects[effectIndex] = swap;
          mEffectMutex.unlock();

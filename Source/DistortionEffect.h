@@ -10,25 +10,25 @@
 #define __modularSynth__DistortionEffect__
 
 #include <iostream>
-#include "IAudioProcessor.h"
+#include "IAudioEffect.h"
 #include "Checkbox.h"
 #include "Slider.h"
 #include "DropdownList.h"
 #include "BiquadFilter.h"
 
-class DistortionEffect : public IAudioProcessor, public IFloatSliderListener, public IDropdownListener
+class DistortionEffect : public IAudioEffect, public IFloatSliderListener, public IDropdownListener
 {
 public:
    DistortionEffect();
    
-   static IAudioProcessor* Create() { return new DistortionEffect(); }
+   static IAudioEffect* Create() { return new DistortionEffect(); }
    
    string GetTitleLabel() override { return "distort"; }
    void CreateUIControls() override;
    
    void SetClip(float amount);
    
-   //IAudioProcessor
+   //IAudioEffect
    void ProcessAudio(double time, float* audio, int bufferSize) override;
    void SetEnabled(bool enabled) override { mEnabled = enabled; }
    float GetEffectAmount() override;

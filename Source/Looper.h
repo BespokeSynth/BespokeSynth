@@ -10,8 +10,7 @@
 #define __modularSynth__Looper__
 
 #include <iostream>
-#include "IAudioSource.h"
-#include "IAudioReceiver.h"
+#include "IAudioProcessor.h"
 #include "IDrawableModule.h"
 #include "RollingBuffer.h"
 #include "ClickButton.h"
@@ -31,7 +30,7 @@ class Sample;
 
 #define LOOPER_COMMIT_FADE_SAMPLES 200
 
-class Looper : public IAudioSource, public IDrawableModule, public IDropdownListener, public IButtonListener, public IFloatSliderListener, public IRadioButtonListener, public IAudioReceiver, public INoteReceiver
+class Looper : public IAudioProcessor, public IDrawableModule, public IDropdownListener, public IButtonListener, public IFloatSliderListener, public IRadioButtonListener, public INoteReceiver
 {
 public:
    Looper();
@@ -70,7 +69,7 @@ public:
    void SetEnabled(bool enabled) override { mEnabled = enabled; }
    
    //IAudioReceiver
-   float* GetBuffer(int& bufferSize) override;
+   InputMode GetInputMode() override { return kInputMode_Mono; }
    
    //INoteReceiver
    void PlayNote(double time, int pitch, int velocity, int voiceIdx = -1, ModulationChain* pitchBend = NULL, ModulationChain* modWheel = NULL, ModulationChain* pressure = NULL) override;
@@ -131,9 +130,6 @@ private:
    static const int BUFFER_Y = 3;
    static const int BUFFER_W = 170;
    static const int BUFFER_H = 93;
-
-   float* mInputBuffer;
-   int mInputBufferSize;
 
    float* mBuffer;
    float* mWorkBuffer;

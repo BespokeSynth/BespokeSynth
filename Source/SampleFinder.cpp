@@ -89,8 +89,8 @@ void SampleFinder::Process(double time)
       mWantWrite = false;
    }
    
-   int bufferSize;
-   float* out = GetTarget()->GetBuffer(bufferSize);
+   int bufferSize = GetTarget()->GetBuffer()->BufferSize();
+   float* out = GetTarget()->GetBuffer()->GetChannel(0);
    assert(bufferSize == gBufferSize);
    
    float volSq = mVolume * mVolume;

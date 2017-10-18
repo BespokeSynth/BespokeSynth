@@ -11,7 +11,7 @@
 
 #include <iostream>
 
-#include "IAudioProcessor.h"
+#include "IAudioEffect.h"
 #include "MidiDevice.h"
 #include "RollingBuffer.h"
 #include "Checkbox.h"
@@ -47,13 +47,13 @@ struct StutterParams
    float speedBlendTime;
 };
 
-class Stutter : public IAudioProcessor, public ITimeListener, public IIntSliderListener
+class Stutter : public IAudioEffect, public ITimeListener, public IIntSliderListener
 {
 public:
    Stutter();
    ~Stutter();
    
-   static IAudioProcessor* Create() { return new Stutter(); }
+   static IAudioEffect* Create() { return new Stutter(); }
    
    string GetTitleLabel() override { return "stutter"; }
    void CreateUIControls() override;
@@ -61,7 +61,7 @@ public:
    void StartStutter(StutterParams stutter);
    void EndStutter(StutterParams stutter);
    
-   //IAudioProcessor
+   //IAudioEffect
    void ProcessAudio(double time, float* audio, int bufferSize) override;
    void SetEnabled(bool enabled) override { mEnabled = enabled; }
    float GetEffectAmount() override;
