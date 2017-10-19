@@ -13,7 +13,6 @@
 #include "Transport.h"
 #include "Scale.h"
 #include "Sample.h"
-#include "Looper.h"
 #include "ArrangementMaster.h"
 
 MultitrackRecorder* TheMultitrackRecorder = NULL;
@@ -35,7 +34,6 @@ MultitrackRecorder::MultitrackRecorder()
 , mSelectedMeasureStart(-1)
 , mSelectedMeasureEnd(-1)
 , mMergeBufferIdx(-1)
-, mCopySelectionToLooperButton(NULL)
 , mUndoBuffer(NULL)
 , mUndoRecordButton(NULL)
 {
@@ -59,7 +57,6 @@ void MultitrackRecorder::CreateUIControls()
    mAddTrackButton = new ClickButton(this,"add",200,2);
    mResetPlayheadButton = new ClickButton(this,"reset",230,2);
    mFixLengthsButton = new ClickButton(this,"fix lengths",270,2);
-   mCopySelectionToLooperButton = new ClickButton(this,"copy to looper",350,2);
    mUndoRecordButton = new ClickButton(this,"undo rec",450,2);
    
    for (int i=0; i<NUM_CLIP_ARRANGERS; ++i)
@@ -99,17 +96,17 @@ void MultitrackRecorder::Poll()
       float* oldRight = mRecordBuffers[mRecordIdx]->mRight;
       float* oldMeasurePos = mMeasurePos;
       
-      memcpy(newLeft, oldLeft, sizeof(float)*(mRecordingLength-reallocDist));
-      memcpy(newRight, oldRight, sizeof(float)*(mRecordingLength-reallocDist));
-      memcpy(newMeasurePos, mMeasurePos, sizeof(float)*(mRecordingLength-reallocDist));
-      bzero(newLeft+mRecordingLength, sizeof(float)*newChunk);
-      bzero(newRight+mRecordingLength, sizeof(float)*newChunk);
-      bzero(newMeasurePos+mRecordingLength, sizeof(float)*newChunk);
+      BufferCopy(newLeft, oldLeft, mRecordingLength-reallocDist);
+      BufferCopy(newRight, oldRight, mRecordingLength-reallocDist);
+      BufferCopy(newMeasurePos, mMeasurePos, mRecordingLength-reallocDist);
+      Clear(newLeft+mRecordingLength, newChunk);
+      Clear(newRight+mRecordingLength, newChunk);
+      Clear(newMeasurePos+mRecordingLength, newChunk);
       
       mMutex.Lock("main thread");
-      memcpy(newLeft+(mRecordingLength-reallocDist), oldLeft+(mRecordingLength-reallocDist), sizeof(float)*reallocDist);
-      memcpy(newRight+(mRecordingLength-reallocDist), oldRight+(mRecordingLength-reallocDist), sizeof(float)*reallocDist);
-      memcpy(newMeasurePos+(mRecordingLength-reallocDist), mMeasurePos+(mRecordingLength-reallocDist), sizeof(float)*reallocDist);
+      BufferCopy(newLeft+(mRecordingLength-reallocDist), oldLeft+(mRecordingLength-reallocDist), reallocDist);
+      BufferCopy(newRight+(mRecordingLength-reallocDist), oldRight+(mRecordingLength-reallocDist), reallocDist);
+      BufferCopy(newMeasurePos+(mRecordingLength-reallocDist), mMeasurePos+(mRecordingLength-reallocDist), reallocDist);
       mRecordBuffers[mRecordIdx]->mLeft = newLeft;
       mRecordBuffers[mRecordIdx]->mRight = newRight;
       mRecordBuffers[mRecordIdx]->mLength = newLength;
@@ -184,7 +181,6 @@ void MultitrackRecorder::DrawModule()
    mAddTrackButton->Draw();
    mResetPlayheadButton->Draw();
    mFixLengthsButton->Draw();
-   mCopySelectionToLooperButton->Draw();
    mUndoRecordButton->Draw();
    
    ofPushStyle();
@@ -393,8 +389,8 @@ void MultitrackRecorder::FilesDropped(vector<string> files, int x, int y)
       mRecordingLength = sample.LengthInSamples();
       RecordBuffer* buffer = new RecordBuffer(mRecordingLength);
       Mult(sample.Data(), .5f, mRecordingLength);
-      memcpy(buffer->mLeft, sample.Data(), sizeof(float)*mRecordingLength);
-      memcpy(buffer->mRight, sample.Data(), sizeof(float)*mRecordingLength);
+      BufferCopy(buffer->mLeft, sample.Data(), mRecordingLength);
+      BufferCopy(buffer->mRight, sample.Data(), mRecordingLength);
       mRecordBuffers.push_back(buffer);
       
       delete[] mMeasurePos;
@@ -531,10 +527,10 @@ void MultitrackRecorder::FixLengths()
          float* oldRight = mRecordBuffers[i]->mRight;
          int oldLength = mRecordBuffers[i]->mLength;
          
-         memcpy(newLeft, oldLeft, sizeof(float)*oldLength);
-         memcpy(newRight, oldRight, sizeof(float)*oldLength);
-         bzero(newLeft+oldLength, sizeof(float)*(mRecordingLength-oldLength));
-         bzero(newRight+oldLength, sizeof(float)*(mRecordingLength-oldLength));
+         BufferCopy(newLeft, oldLeft, oldLength);
+         BufferCopy(newRight, oldRight, oldLength);
+         Clear(newLeft+oldLength, mRecordingLength-oldLength);
+         Clear(newRight+oldLength, mRecordingLength-oldLength);
          
          mRecordBuffers[i]->mLeft = newLeft;
          mRecordBuffers[i]->mRight = newRight;
@@ -558,28 +554,6 @@ void MultitrackRecorder::DeleteBuffer(int idx)
    mMutex.Unlock();
 }
 
-void MultitrackRecorder::CopySelectionToLooper()
-{
-   if (mSelectedMeasureStart != -1)
-   {
-      Looper* looper1 = dynamic_cast<Looper*>(TheSynth->FindModule("looper1"));
-      Looper* looper2 = dynamic_cast<Looper*>(TheSynth->FindModule("looper2"));
-      assert(looper1 && looper2);
-      
-      int offset = mMeasures[mSelectedMeasureStart];
-      int length = mMeasures[mSelectedMeasureEnd] - offset;
-      float* left = mRecordBuffers[mRecordIdx]->mLeft + offset;
-      float* right = mRecordBuffers[mRecordIdx]->mRight + offset;
-      
-      looper1->Clear();
-      looper2->Clear();
-      looper1->SetNumBars(mSelectedMeasureEnd - mSelectedMeasureStart);
-      looper2->SetNumBars(mSelectedMeasureEnd - mSelectedMeasureStart);
-      looper1->Fill(left, length);
-      looper2->Fill(right, length);
-   }
-}
-
 void MultitrackRecorder::CopyRecordBufferContents(RecordBuffer* dst, RecordBuffer* src)
 {
    if (dst->mLength != src->mLength)
@@ -591,8 +565,8 @@ void MultitrackRecorder::CopyRecordBufferContents(RecordBuffer* dst, RecordBuffe
       dst->mLength = src->mLength;
    }
    
-   memcpy(dst->mLeft, src->mLeft, src->mLength * sizeof(float));
-   memcpy(dst->mRight, src->mRight, src->mLength * sizeof(float));
+   BufferCopy(dst->mLeft, src->mLeft, src->mLength);
+   BufferCopy(dst->mRight, src->mRight, src->mLength);
 }
 
 void MultitrackRecorder::FloatSliderUpdated(FloatSlider* slider, float oldVal)
@@ -607,8 +581,6 @@ void MultitrackRecorder::ButtonClicked(ClickButton* button)
       ArrangementMaster::mPlayhead = 0;
    if (button == mFixLengthsButton)
       FixLengths();
-   if (button == mCopySelectionToLooperButton)
-      CopySelectionToLooper();
    if (button == mUndoRecordButton)
    {
       mRecording = false;

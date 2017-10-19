@@ -394,7 +394,7 @@ SeaOfGrain::GrainVoice::GrainVoice()
    mGranulator.mGrainLengthMs = 150;
 }
 
-void SeaOfGrain::GrainVoice::Process(float* out, float outLength, const float* sample, int sampleLength, int keyOffset, const vector<float>& beats)
+void SeaOfGrain::GrainVoice::Process(float* out, float outLength, float* sample, int sampleLength, int keyOffset, const vector<float>& beats)
 {
    if (!mADSR.IsDone(gTime))
    {
@@ -418,10 +418,12 @@ void SeaOfGrain::GrainVoice::Process(float* out, float outLength, const float* s
          float blend = .0005f;
          mGain = mGain * (1-blend) + pressure * blend;
          
-         float outSample = mGranulator.Process(time, sample, sampleLength, beat);
-         outSample *= sqrtf(mGain);
-         outSample *= mADSR.Value(gTime);
-         out[i] += outSample;
+         ChannelBuffer temp(sample, sampleLength);
+         float outSample[1];
+         mGranulator.Process(time, &temp, sampleLength, beat, outSample);
+         outSample[0] *= sqrtf(mGain);
+         outSample[0] *= mADSR.Value(gTime);
+         out[i] += outSample[0];
          time += gInvSampleRateMs;
          mPlay += .001f;
       }

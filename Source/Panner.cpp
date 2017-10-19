@@ -54,7 +54,7 @@ void Panner::Process(double time)
    }
    else
    {
-      memcpy(mPanBuffer, GetBuffer()->GetChannel(0), sizeof(float)*GetBuffer()->BufferSize());
+      BufferCopy(mPanBuffer, GetBuffer()->GetChannel(0), GetBuffer()->BufferSize());
    }
    
    float* input1;

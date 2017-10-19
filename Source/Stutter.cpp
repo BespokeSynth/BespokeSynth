@@ -257,7 +257,7 @@ void Stutter::DrawModule()
       static float height = 35;
       ofPushMatrix();
       ofTranslate(4,3);
-      DrawAudioBuffer(width, height, mStutterBuffer.GetChannel(0), 0, mCaptureLength, GetBufferReadPos(mStutterPos));
+      DrawAudioBuffer(width, height, &mStutterBuffer, 0, mCaptureLength, GetBufferReadPos(mStutterPos));
       ofPopMatrix();
    }
 }

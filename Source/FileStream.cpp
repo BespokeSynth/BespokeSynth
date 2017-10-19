@@ -64,7 +64,7 @@ void FileStreamOut::Write(const float* buffer, int size)
    mStream.write((const void*)buffer, sizeof(float)*size);
 }
 
-void FileStreamOut::Write(const void* buffer, int size)
+void FileStreamOut::WriteGeneric(const void* buffer, int size)
 {
    mStream.write((const void*)buffer, size);
 }
@@ -115,7 +115,7 @@ void FileStreamIn::Read(float* buffer, int size)
    mStream.read((void*)buffer, sizeof(float)*size);
 }
 
-void FileStreamIn::Read(void* buffer, int size)
+void FileStreamIn::ReadGeneric(void* buffer, int size)
 {
    mStream.read((void*)buffer, size);
 }

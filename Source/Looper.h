@@ -43,7 +43,7 @@ public:
    void SetRecorder(LooperRecorder* recorder);
    void Clear();
    void Commit(RollingBuffer* commitBuffer = NULL);
-   void Fill(float* buffer, int length);
+   void Fill(ChannelBuffer* buffer, int length);
    void ResampleForNewSpeed();
    int NumBars() const { return mNumBars; }
    int GetRecorderNumBars() const;
@@ -55,8 +55,8 @@ public:
    void ShiftMeasure() { mWantShiftMeasure = true; }
    void HalfShift() { mWantHalfShift = true; }
    void ShiftDownbeat() { mWantShiftDownbeat = true; }
-   float* GetLoopBuffer(int& loopLength);
-   void SetLoopBuffer(float* buffer);
+   ChannelBuffer* GetLoopBuffer(int& loopLength);
+   void SetLoopBuffer(ChannelBuffer* buffer);
    void LockBufferMutex() { mBufferMutex.lock(); }
    void UnlockBufferMutex() { mBufferMutex.unlock(); }
    void SampleDropped(int x, int y, Sample* sample) override;
@@ -67,9 +67,6 @@ public:
    //IAudioSource
    void Process(double time) override;
    void SetEnabled(bool enabled) override { mEnabled = enabled; }
-   
-   //IAudioReceiver
-   InputMode GetInputMode() override { return kInputMode_Mono; }
    
    //INoteReceiver
    void PlayNote(double time, int pitch, int velocity, int voiceIdx = -1, ModulationChain* pitchBend = NULL, ModulationChain* modWheel = NULL, ModulationChain* pressure = NULL) override;
@@ -113,7 +110,7 @@ private:
    void DoUndo();
    void ProcessFourTet(int sampleIdx);
    void ProcessScratch();
-   float ProcessGranular(double time, float bufferOffset);
+   void ProcessGranular(double time, float bufferOffset, float* output);
    void ProcessBeatwheel(int sampleIdx);
    int GetMeasureSliceIndex(int sampleIdx, int slicesPerBar);
    void DrawBeatwheel();
@@ -131,8 +128,8 @@ private:
    static const int BUFFER_W = 170;
    static const int BUFFER_H = 93;
 
-   float* mBuffer;
-   float* mWorkBuffer;
+   ChannelBuffer* mBuffer;
+   ChannelBuffer mWorkBuffer;
    int mLoopLength;
    float mLoopPos;
    RollingBuffer* mRecordBuffer;
@@ -162,7 +159,7 @@ private:
    ClickButton* mCommitButton;
    ClickButton* mDoubleSpeedButton;
    ClickButton* mHalveSpeedButton;
-   float* mUndoBuffer;
+   ChannelBuffer* mUndoBuffer;
    ClickButton* mUndoButton;
    bool mWantUndo;
    bool mReplaceOnCommit;
@@ -184,12 +181,12 @@ private:
    DropdownList* mFourTetSlicesDropdown;
    ofMutex mBufferMutex;
    Ramp mMuteRamp;
-   JumpBlender mJumpBlender;
+   JumpBlender mJumpBlender[ChannelBuffer::kMaxNumChannels];
    bool mClearCommitBuffer;
    Rewriter* mRewriter;
    bool mWantRewrite;
    int mLoopCount;
-   float* mQueuedNewBuffer;
+   ChannelBuffer* mQueuedNewBuffer;
    float mDecay;
    FloatSlider* mDecaySlider;
    bool mWriteInput;
@@ -197,7 +194,7 @@ private:
    ClickButton* mQueueCaptureButton;
    bool mCaptureQueued;
    Ramp mWriteInputRamp;
-   float mLastInputSample;
+   float mLastInputSample[ChannelBuffer::kMaxNumChannels];
 
    //granular
    bool mShowGranular;
@@ -231,7 +228,7 @@ private:
    Checkbox* mBeatwheelSingleMeasureCheckbox;
 
    //pitch shifter
-   PitchShifter mPitchShifter;
+   PitchShifter* mPitchShifter[ChannelBuffer::kMaxNumChannels];
    float mPitchShift;
    FloatSlider* mPitchShiftSlider;
    bool mKeepPitch;

@@ -23,7 +23,7 @@ public:
    FileStreamOut& operator<<(const string& var);
    FileStreamOut& operator<<(const char& var);
    void Write(const float* buffer, int size);
-   void Write(const void* buffer, int size);
+   void WriteGeneric(const void* buffer, int size);
 private:
    FileOutputStream mStream;
 };
@@ -39,7 +39,7 @@ public:
    FileStreamIn& operator>>(string& var);
    FileStreamIn& operator>>(char& var);
    void Read(float* buffer, int size);
-   void Read(void* buffer, int size);
+   void ReadGeneric(void* buffer, int size);
    int GetFilePosition();
    
    bool Eof();

@@ -171,7 +171,7 @@ void SamplerGrid::OnGridButton(int x, int y, float velocity, IGridController* gr
             mGridSamples[gridSampleIdx].mPlayhead = 0;
             mGridSamples[gridSampleIdx].mSampleStart = mEditSample->mSampleStart;
             mGridSamples[gridSampleIdx].mSampleEnd = mEditSample->mSampleEnd;
-            memcpy(mGridSamples[gridSampleIdx].mSampleData, mEditSample->mSampleData, mEditSample->mSampleLength * sizeof(float));
+            BufferCopy(mGridSamples[gridSampleIdx].mSampleData, mEditSample->mSampleData, mEditSample->mSampleLength);
          }
          mDuplicate = false;
       }

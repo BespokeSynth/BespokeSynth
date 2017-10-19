@@ -167,7 +167,7 @@ void ClipLauncher::CheckboxUpdated(Checkbox* checkbox)
                mSampleMutex.lock();
             
             int bufferSize;
-            mSamples[i].mSample->Create(mLooper->GetLoopBuffer(bufferSize), bufferSize);
+            mSamples[i].mSample->Create(mLooper->GetLoopBuffer(bufferSize)->GetChannel(0), bufferSize);
             mSamples[i].mNumBars = mLooper->NumBars();
             mLooper->Clear();
             

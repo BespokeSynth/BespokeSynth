@@ -22,9 +22,8 @@ RingModulator::RingModulator()
 , mModOsc(kOsc_Sin)
 , mGlideTime(0)
 , mGlideSlider(NULL)
+, mDryBuffer(gBufferSize)
 {
-   mDryBuffer = new float[gBufferSize];
-
    mModOsc.Start(gTime, 1);
    mFreq.Start(gTime, 220, gTime + mGlideTime);
 }
@@ -39,7 +38,6 @@ void RingModulator::CreateUIControls()
 
 RingModulator::~RingModulator()
 {
-   delete[] mDryBuffer;
 }
 
 void RingModulator::Process(double time)
@@ -50,20 +48,20 @@ void RingModulator::Process(double time)
       return;
    
    SyncBuffers();
-
-   memcpy(mDryBuffer, GetBuffer()->GetChannel(0), GetBuffer()->BufferSize()*sizeof(float));
+   mDryBuffer.SetNumActiveChannels(GetBuffer()->NumActiveChannels());
 
    int bufferSize = GetTarget()->GetBuffer()->BufferSize();
-   float* out = GetTarget()->GetBuffer()->GetChannel(0);
-   assert(bufferSize == gBufferSize);
 
    if (mEnabled)
    {
+      mDryBuffer.CopyFrom(GetBuffer());
+      
       for (int i=0; i<bufferSize; ++i)
       {
          ComputeSliders(0);
          
-         GetBuffer()->GetChannel(0)[i] *= mModOsc.Audio(time, mPhase);
+         for (int ch=0; ch<GetBuffer()->NumActiveChannels(); ++ch)
+            GetBuffer()->GetChannel(ch)[i] *= mModOsc.Audio(time, mPhase);
 
          float phaseInc = GetPhaseInc(mFreq.Value(time));
          mPhase += phaseInc;
@@ -71,15 +69,20 @@ void RingModulator::Process(double time)
 
          time += gInvSampleRateMs;
       }
-
-      Mult(mDryBuffer, (1-mDryWet)*mVolume*mVolume, GetBuffer()->BufferSize());
-      Mult(GetBuffer()->GetChannel(0), mDryWet*mVolume*mVolume, GetBuffer()->BufferSize());
-      Add(GetBuffer()->GetChannel(0), mDryBuffer, GetBuffer()->BufferSize());
    }
-
-   Add(out, GetBuffer()->GetChannel(0), GetBuffer()->BufferSize());
-
-   GetVizBuffer()->WriteChunk(GetBuffer()->GetChannel(0), GetBuffer()->BufferSize(), 0);
+   
+   for (int ch=0; ch<GetBuffer()->NumActiveChannels(); ++ch)
+   {
+      if (mEnabled)
+      {
+         Mult(mDryBuffer.GetChannel(ch), (1-mDryWet)*mVolume*mVolume, GetBuffer()->BufferSize());
+         Mult(GetBuffer()->GetChannel(ch), mDryWet*mVolume*mVolume, GetBuffer()->BufferSize());
+         Add(GetBuffer()->GetChannel(ch), mDryBuffer.GetChannel(ch), GetBuffer()->BufferSize());
+      }
+      
+      Add(GetTarget()->GetBuffer()->GetChannel(ch), GetBuffer()->GetChannel(ch), GetBuffer()->BufferSize());
+      GetVizBuffer()->WriteChunk(GetBuffer()->GetChannel(ch), GetBuffer()->BufferSize(), ch);
+   }
 
    GetBuffer()->Clear();
 }

@@ -24,7 +24,6 @@ LiveGranulator::LiveGranulator()
 , mFreezeExtraSamples(0)
 , mPos(0)
 , mPosSlider(NULL)
-, mDCEstimate(0)
 , mAdd(false)
 , mAddCheckbox(NULL)
 , mAutoCaptureInterval(kInterval_None)
@@ -37,6 +36,9 @@ LiveGranulator::LiveGranulator()
    mGranulator.mGrainLengthMs = 100;
    
    TheTransport->AddListener(this, kInterval_None);
+   
+   for (int i=0; i<ChannelBuffer::kMaxNumChannels; ++i)
+      mDCEstimate[i] = 0;
 }
 
 void LiveGranulator::CreateUIControls()
@@ -74,7 +76,6 @@ void LiveGranulator::ProcessAudio(double time, ChannelBuffer* buffer)
    Profiler profiler("LiveGranulator");
    
    float bufferSize = buffer->BufferSize();
-   int ch = 0; //TODO(Ryan) stereo granulator
 
    for (int i=0; i<bufferSize; ++i)
    {
@@ -83,26 +84,35 @@ void LiveGranulator::ProcessAudio(double time, ChannelBuffer* buffer)
       mGranulator.SetLiveMode(!mFreeze);
       if (!mFreeze)
       {
-         mBuffer.Write(buffer->GetChannel(ch)[i], ch);
+         for (int ch=0; ch<buffer->NumActiveChannels(); ++ch)
+            mBuffer.Write(buffer->GetChannel(ch)[i], ch);
       }
       else if (mFreezeExtraSamples < FREEZE_EXTRA_SAMPLES_COUNT)
       {
          ++mFreezeExtraSamples;
-         mBuffer.Write(buffer->GetChannel(ch)[i], ch);
+         for (int ch=0; ch<buffer->NumActiveChannels(); ++ch)
+            mBuffer.Write(buffer->GetChannel(ch)[i], ch);
       }
       
       if (mEnabled)
       {
-         float sample = mGranulator.Process(time, mBuffer.GetRawBuffer(ch), mBufferLength, mBuffer.GetRawBufferOffset(ch)-mFreezeExtraSamples-1+mPos);
-         sample -= mDCEstimate;
-         if (mAdd)
-            buffer->GetChannel(ch)[i] += sample;
-         else
-            buffer->GetChannel(ch)[i] = sample;
+         float sample[ChannelBuffer::kMaxNumChannels];
+         Clear(sample, ChannelBuffer::kMaxNumChannels);
+         mGranulator.Process(time, mBuffer.GetRawBuffer(), mBufferLength, mBuffer.GetRawBufferOffset(0)-mFreezeExtraSamples-1+mPos, sample);
+         for (int ch=0; ch<buffer->NumActiveChannels(); ++ch)
+         {
+            sample[ch] -= mDCEstimate[ch];
+         
+            if (mAdd)
+               buffer->GetChannel(ch)[i] += sample[ch];
+            else
+               buffer->GetChannel(ch)[i] = sample[ch];
+            
+            mDCEstimate[ch] = .999f*mDCEstimate[ch] + .001f*buffer->GetChannel(ch)[i]; //rolling average
+         }
       }
       
       time += gInvSampleRateMs;
-      mDCEstimate = .999f*mDCEstimate + .001f*buffer->GetChannel(ch)[i]; //rolling average
    }
 }
 

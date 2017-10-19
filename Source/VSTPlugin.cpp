@@ -487,7 +487,7 @@ void VSTPlugin::SaveState(FileStreamOut& out)
       juce::MemoryBlock vstState;
       mPlugin->getStateInformation(vstState);
       out << (int)vstState.getSize();
-      out.Write(vstState.getData(), vstState.getSize());
+      out.WriteGeneric(vstState.getData(), vstState.getSize());
    }
    else
    {
@@ -511,7 +511,7 @@ void VSTPlugin::LoadState(FileStreamIn& in)
       int size;
       in >> size;
       char* data = new char[size];
-      in.Read(data, size);
+      in.ReadGeneric(data, size);
       mPlugin->setStateInformation(data, size);
    }
 }

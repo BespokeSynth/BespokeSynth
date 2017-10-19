@@ -63,7 +63,7 @@ void Stereofier::Process(double time)
    }
    else
    {
-      memcpy(mPanBuffer, GetBuffer()->GetChannel(0), sizeof(float)*gBufferSize);
+      BufferCopy(mPanBuffer, GetBuffer()->GetChannel(0), gBufferSize);
    }
    
    float* input1;

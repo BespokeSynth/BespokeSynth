@@ -84,7 +84,7 @@ void MultibandCompressor::Process(double time)
       /*for (int i=0; i<mNumBands; ++i)
       {
          //get carrier band
-         memcpy(mWorkBuffer, mInputBuffer, bufferSize*sizeof(float));
+         BufferCopy(mWorkBuffer, mInputBuffer, bufferSize);
          
          mFilters[i].ProcessSample(const double &sample, double &lowOut, double &highOut)(mWorkBuffer, bufferSize);
          

@@ -14,12 +14,14 @@
 
 #define MAX_GRAINS 16
 
+class ChannelBuffer;
+
 class Grain
 {
 public:
    Grain() : mPos(0), mSpeed(0), mVol(0) {}
    void Spawn(double time, float pos, float speed, float lengthInMs, float vol);
-   float Process(double time, const float* buffer, int bufferLength);
+   void Process(double time, ChannelBuffer* buffer, int bufferLength, float* output);
    void DrawGrain(int idx, float x, float y, float w, float h, int bufferStart, int bufferLength, bool wrapAround);
    void Clear() { mVol = 0; }
 private:
@@ -35,7 +37,7 @@ class Granulator
 {
 public:
    Granulator();
-   float Process(double time, const float* buffer, int bufferLength, float offset);
+   void Process(double time, ChannelBuffer* buffer, int bufferLength, float offset, float* output);
    void Draw(float x, float y, float w, float h, int bufferStart, int bufferLength, bool wrapAround = true);
    void Reset();
    void ClearGrains();

@@ -69,7 +69,7 @@ private:
    int mFreezeExtraSamples;
    float mPos;
    FloatSlider* mPosSlider;
-   float mDCEstimate;   //estimate of DC offset
+   float mDCEstimate[ChannelBuffer::kMaxNumChannels];   //estimate of DC offset
    NoteInterval mAutoCaptureInterval;
    DropdownList* mAutoCaptureDropdown;
 };

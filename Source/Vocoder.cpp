@@ -76,7 +76,7 @@ Vocoder::~Vocoder()
 void Vocoder::SetCarrierBuffer(float *carrier, int bufferSize)
 {
    assert(bufferSize == GetBuffer()->BufferSize());
-   memcpy(mCarrierInputBuffer, carrier, bufferSize*sizeof(float));
+   BufferCopy(mCarrierInputBuffer, carrier, bufferSize);
 }
 
 void Vocoder::Process(double time)

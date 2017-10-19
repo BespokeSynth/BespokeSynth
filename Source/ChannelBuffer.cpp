@@ -85,16 +85,23 @@ void ChannelBuffer::SetMaxAllowedChannels(int channels)
       mActiveChannels = channels;
 }
 
-void ChannelBuffer::CopyFrom(ChannelBuffer* src)
+void ChannelBuffer::CopyFrom(ChannelBuffer* src, int length /*= -1*/)
 {
    assert(mBufferSize == src->mBufferSize);
+   if (length != -1)
+      assert(length <= mBufferSize);
+   else
+      length = mBufferSize;
    for (int i=0; i<mActiveChannels; ++i)
    {
       if (src->mBuffers[i])
       {
          if (mBuffers[i] == nullptr)
+         {
             mBuffers[i] = new float[mBufferSize];
-         memcpy(mBuffers[i], src->mBuffers[i], mBufferSize*sizeof(float));
+            ::Clear(mBuffers[i], mBufferSize);
+         }
+         BufferCopy(mBuffers[i], src->mBuffers[i], length);
       }
       else
       {
@@ -102,4 +109,38 @@ void ChannelBuffer::CopyFrom(ChannelBuffer* src)
          mBuffers[i] = nullptr;
       }
    }
+}
+
+void ChannelBuffer::SetChannelPointer(float* data, int channel, bool deleteOldData)
+{
+   if (deleteOldData)
+      delete[] mBuffers[channel];
+   mBuffers[channel] = data;
+}
+
+namespace
+{
+   const int kSaveStateRev = 0;
+}
+
+void ChannelBuffer::Save(FileStreamOut& out, int writeLength)
+{
+   out << kSaveStateRev;
+   
+   out << writeLength;
+   out << mActiveChannels;
+   for (int i=0; i<mActiveChannels; ++i)
+      out.Write(mBuffers[i], writeLength);
+}
+
+void ChannelBuffer::Load(FileStreamIn& in, int& readLength)
+{
+   int rev;
+   in >> rev;
+   LoadStateValidate(rev == kSaveStateRev);
+   
+   in >> readLength;
+   in >> mActiveChannels;
+   for (int i=0; i<mActiveChannels; ++i)
+      in.Read(GetChannel(i), readLength);
 }

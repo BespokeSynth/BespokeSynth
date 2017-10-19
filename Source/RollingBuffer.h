@@ -25,7 +25,7 @@ public:
    void ClearBuffer();
    void Draw(int x, int y, int width, int height, int samples /*= -1*/, int channel);
    int Size() { return mBuffer.BufferSize(); }
-   float* GetRawBuffer(int channel) { return mBuffer.GetChannel(channel); }
+   ChannelBuffer* GetRawBuffer() { return &mBuffer; }
    int GetRawBufferOffset(int channel) { return mOffsetToStart[channel]; }
    void Accum(int samplesAgo, float sample, int channel);
    void SetNumChannels(int channels) { mBuffer.SetNumActiveChannels(channels); }

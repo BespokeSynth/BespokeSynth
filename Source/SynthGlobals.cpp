@@ -18,6 +18,7 @@
 #include "TextEntry.h"
 #include "PatchCable.h"
 #include "PatchCableSource.h"
+#include "ChannelBuffer.h"
 
 #ifdef JUCE_MAC
 #import <execinfo.h>
@@ -89,6 +90,16 @@ void SetGlobalSampleRate(int rate)
    gNyquistLimit = gSampleRate / 2.0f;
 }
 
+void DrawAudioBuffer(float width, float height, ChannelBuffer* buffer, float start, float end, float pos, float vol /*=1*/, ofColor color /*=ofColor::black*/)
+{
+   int numChannels = buffer->NumActiveChannels();
+   for (int i=0; i<numChannels; ++i)
+   {
+      DrawAudioBuffer(width, height/numChannels, buffer->GetChannel(i), start, end, pos, vol, color);
+      ofTranslate(0, height/numChannels);
+   }
+}
+
 void DrawAudioBuffer(float width, float height, const float* buffer, float start, float end, float pos, float vol /*=1*/, ofColor color /*=ofColor::black*/)
 {
    vol = MAX(.1f,vol); //make sure we at least draw something if there is waveform data
@@ -128,7 +139,7 @@ void DrawAudioBuffer(float width, float height, const float* buffer, float start
             ofSetColor(color);
          }
          if (mag == 0)
-            mag = .5f;
+            mag = .1f;
          ofLine(i, height/2-mag, i, height/2+mag);
       }
       
@@ -185,6 +196,15 @@ void Clear(float* buffer, int bufferSize)
    FloatVectorOperations::clear(buffer, bufferSize);
 #else
    bzero(buffer, bufferSize*sizeof(float));
+#endif
+}
+
+void BufferCopy(float* dst, const float* src, int bufferSize)
+{
+#ifdef USE_VECTOR_OPS
+   FloatVectorOperations::copy(dst, src, bufferSize);
+#else
+   memcpy(dst, src, bufferSize*sizeof(float));
 #endif
 }
 
@@ -292,6 +312,22 @@ float GetInterpolatedSample(float offset, const float* buffer, int bufferSize)
    float output = (1-a)*sample + a*nextSample; //interpolate
    
    return output;
+}
+
+float GetInterpolatedSample(float offset, ChannelBuffer* buffer, int bufferSize, float channelBlend)
+{
+   assert(channelBlend <= buffer->NumActiveChannels());
+   
+   if (buffer->NumActiveChannels() == 1)
+      return GetInterpolatedSample(offset, buffer->GetChannel(0), bufferSize);
+   
+   int channelA = floor(channelBlend);
+   if (channelA == buffer->NumActiveChannels())
+      channelA -= 1;
+   int channelB = channelA + 1;
+   
+   return (1 - (channelBlend - channelA)) * GetInterpolatedSample(offset, buffer->GetChannel(channelA), bufferSize) +
+          (channelBlend - channelA) * GetInterpolatedSample(offset, buffer->GetChannel(channelB), bufferSize);
 }
 
 void WriteInterpolatedSample(float offset, float* buffer, int bufferSize, float sample)

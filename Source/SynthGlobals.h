@@ -55,6 +55,7 @@ using namespace std;
 class IUIControl;
 class IDrawableModule;
 class RollingBuffer;
+class ChannelBuffer;
 
 typedef map<string,int> EnumMap;
 
@@ -133,11 +134,13 @@ void LoadGlobalResources();
 
 void SetGlobalBufferSize(int size);
 void SetGlobalSampleRate(int rate);
+void DrawAudioBuffer(float width, float height, ChannelBuffer* buffer, float start, float end, float pos, float vol=1, ofColor color=ofColor::black);
 void DrawAudioBuffer(float width, float height, const float* buffer, float start, float end, float pos, float vol=1, ofColor color=ofColor::black);
 void Add(float* buff1, const float* buff2, int bufferSize);
 void Mult(float* buff, float val, int bufferSize);
 void Mult(float* buff1, const float* buff2, int bufferSize);
 void Clear(float* buffer, int bufferSize);
+void BufferCopy(float* dst, const float* src, int bufferSize);
 string NoteName(int pitch, bool flat=false);
 int PitchFromNoteName(string noteName);
 float Interp(float a, float start, float end);
@@ -149,6 +152,7 @@ void DrawTextBold(string text, int x, int y, float size = 15);
 float GetStringWidth(string text, float size = 15);
 void AssertIfDenormal(float input);
 float GetInterpolatedSample(float offset, const float* buffer, int bufferSize);
+float GetInterpolatedSample(float offset, ChannelBuffer* buffer, int bufferSize, float channelBlend);
 void WriteInterpolatedSample(float offset, float* buffer, int bufferSize, float sample);
 string GetRomanNumeralForDegree(int degree);
 void UpdateTarget(IDrawableModule* module);

@@ -57,9 +57,6 @@ public:
    void CancelFreeRecord();
    bool InFreeRecord() { return mFreeRecording; }
    
-   //IAudioReceiver
-   InputMode GetInputMode() override { return kInputMode_Mono; }
-   
    //IAudioSource
    void Process(double time) override;
    void SetEnabled(bool enabled) override { mEnabled = enabled; }
@@ -126,7 +123,7 @@ private:
    IAudioReceiver* mOutputTarget;
    float mCommitDelay;
    FloatSlider* mCommitDelaySlider;
-   float* mWriteBuffer;
+   ChannelBuffer mWriteBuffer;
    Looper* mCommitToLooper;
    vector<PatchCableSource*> mLooperPatchCables;
    

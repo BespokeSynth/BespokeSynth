@@ -16,6 +16,7 @@
 #include "Looper.h"
 #include "FillSaveDropdown.h"
 #include "PatchCableSource.h"
+#include "ChannelBuffer.h"
 
 LoopStorer::LoopStorer()
 : mCurrentBufferIdx(0)
@@ -68,7 +69,7 @@ void LoopStorer::Poll()
    if (mIsSwapping)
    {
       int loopLength;
-      float* buffer = mLooper->GetLoopBuffer(loopLength);
+      ChannelBuffer* buffer = mLooper->GetLoopBuffer(loopLength);
       if (buffer == mSamples[mCurrentBufferIdx]->mBuffer) //finished swap
          mIsSwapping = false;
    }
@@ -131,7 +132,8 @@ void LoopStorer::SwapBuffer(int swapToIdx)
    
    mSwapMutex.lock();
    assert(mSamples[0]->mBuffer != mSamples[1]->mBuffer);
-   mLooper->SetLoopBuffer(mSamples[swapToIdx]->mBuffer);
+   //TODO(Ryan) make loopstorer actually use ChannelBuffers
+   //mLooper->SetLoopBuffer(mSamples[swapToIdx]->mBuffer);
    if (mRewriteToSelection)
    {
       mSamples[swapToIdx]->mNumBars = mLooper->GetRecorderNumBars();
@@ -169,7 +171,7 @@ void LoopStorer::ButtonClicked(ClickButton* button)
          mLooper->LockBufferMutex();
       for (int i=0; i<mSamples.size(); ++i)
       {
-         Clear(mSamples[i]->mBuffer,MAX_BUFFER_SIZE);
+         mSamples[i]->mBuffer->Clear();
       }
       if (mLooper)
          mLooper->UnlockBufferMutex();
@@ -257,7 +259,7 @@ void LoopStorer::SaveState(FileStreamOut& out)
          out << sampleData->mNumBars;
          out << sampleData->mBufferLength;
          if (sampleData->mBufferLength != -1)
-            out.Write(sampleData->mBuffer, sampleData->mBufferLength);
+            sampleData->mBuffer->Save(out, sampleData->mBufferLength);
       }
    }
 }
@@ -293,7 +295,11 @@ void LoopStorer::LoadState(FileStreamIn& in)
          in >> sampleData->mNumBars;
          in >> sampleData->mBufferLength;
          if (sampleData->mBufferLength != -1)
-            in.Read(sampleData->mBuffer, sampleData->mBufferLength);
+         {
+            int readLength;
+            sampleData->mBuffer->Load(in, readLength);
+            assert(sampleData->mBufferLength == readLength);
+         }
       }
    }
    mLoadMutex.unlock();
@@ -342,8 +348,7 @@ void LoopStorer::SampleData::Init(LoopStorer* storer, int index)
    }
    else
    {
-      mBuffer = new float[MAX_BUFFER_SIZE];
-      Clear(mBuffer,MAX_BUFFER_SIZE);
+      mBuffer = new ChannelBuffer(MAX_BUFFER_SIZE);
       mNumBars = 1;
       mIsCurrentBuffer = false;
    }
@@ -364,7 +369,7 @@ void LoopStorer::SampleData::Draw()
 {
    ofPushMatrix();
    ofTranslate(5, mLoopStorer->GetRowY(mIndex));
-   float* buffer = mBuffer;
+   ChannelBuffer* buffer = mBuffer;
    int bufferLength = mBufferLength;
    bool useLooper = mIsCurrentBuffer && mLoopStorer && mLoopStorer->GetLooper();
    if (useLooper)

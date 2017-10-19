@@ -21,6 +21,7 @@
 
 class Sample;
 class Looper;
+class ChannelBuffer;
 
 class LoopStorer : public IDrawableModule, public IFloatSliderListener, public IIntSliderListener, public IDropdownListener, public IButtonListener, public ITimeListener
 {
@@ -73,7 +74,7 @@ private:
       void Init(LoopStorer* storer, int index);
       void Draw();
       
-      float* mBuffer;
+      ChannelBuffer* mBuffer;
       int mNumBars;
       Checkbox* mSelectCheckbox;
       LoopStorer* mLoopStorer;

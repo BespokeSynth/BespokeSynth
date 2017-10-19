@@ -38,12 +38,12 @@ void RollingBuffer::ReadChunk(float* dst, int size, int samplesAgo, int channel)
    int wrapSamples = size - offset;
    if (wrapSamples <= 0) //no wraparound
    {
-      memcpy(dst, mBuffer.GetChannel(channel)+(offset-size), size*sizeof(float));
+      BufferCopy(dst, mBuffer.GetChannel(channel)+(offset-size), size);
    }
    else  //wrap around loop point
    {
-      memcpy(dst, mBuffer.GetChannel(channel)+(Size()-wrapSamples), wrapSamples*sizeof(float));
-      memcpy(dst+wrapSamples, mBuffer.GetChannel(channel), (size-wrapSamples)*sizeof(float));
+      BufferCopy(dst, mBuffer.GetChannel(channel)+(Size()-wrapSamples), wrapSamples);
+      BufferCopy(dst+wrapSamples, mBuffer.GetChannel(channel), (size-wrapSamples));
    }
 }
 
@@ -60,12 +60,12 @@ void RollingBuffer::WriteChunk(float* samples, int size, int channel)
    int wrapSamples = (mOffsetToStart[channel] + size) - Size();
    if (wrapSamples <= 0) //no wraparound
    {
-      memcpy(mBuffer.GetChannel(channel)+mOffsetToStart[channel], samples, size*sizeof(float));
+      BufferCopy(mBuffer.GetChannel(channel)+mOffsetToStart[channel], samples, size);
    }
    else  //wrap around loop point
    {
-      memcpy(mBuffer.GetChannel(channel)+mOffsetToStart[channel], samples, (size-wrapSamples)*sizeof(float));
-      memcpy(mBuffer.GetChannel(channel), samples+(size-wrapSamples), wrapSamples*sizeof(float));
+      BufferCopy(mBuffer.GetChannel(channel)+mOffsetToStart[channel], samples, (size-wrapSamples));
+      BufferCopy(mBuffer.GetChannel(channel), samples+(size-wrapSamples), wrapSamples);
    }
    
    mOffsetToStart[channel] = (mOffsetToStart[channel] + size) % Size();

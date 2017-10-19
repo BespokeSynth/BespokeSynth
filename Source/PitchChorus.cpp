@@ -49,7 +49,7 @@ void PitchChorus::Process(double time)
       {
          if (mShifters[i].mOn || mShifters[i].mRamp.Value(time) > 0)
          {
-            memcpy(gWorkBuffer, GetBuffer()->GetChannel(0), bufferSize * sizeof(float));
+            BufferCopy(gWorkBuffer, GetBuffer()->GetChannel(0), bufferSize);
             mShifters[i].mShifter.Process(gWorkBuffer, bufferSize);
             double timeCopy = time;
             for (int j=0; j<bufferSize; ++j)

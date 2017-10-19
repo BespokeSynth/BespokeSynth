@@ -77,7 +77,7 @@ BandVocoder::~BandVocoder()
 void BandVocoder::SetCarrierBuffer(float *carrier, int bufferSize)
 {
    assert(bufferSize == GetBuffer()->BufferSize());
-   memcpy(mCarrierInputBuffer, carrier, bufferSize*sizeof(float));
+   BufferCopy(mCarrierInputBuffer, carrier, bufferSize);
 }
 
 void BandVocoder::Process(double time)
@@ -104,7 +104,7 @@ void BandVocoder::Process(double time)
    for (int i=0; i<mNumBands; ++i)
    {
       //get modulator band
-      memcpy(mWorkBuffer,GetBuffer()->GetChannel(0), bufferSize*sizeof(float));
+      BufferCopy(mWorkBuffer,GetBuffer()->GetChannel(0), bufferSize);
       mBiquadCarrier[i].Filter(mWorkBuffer, bufferSize);
       
       float oldPeak = mPeaks[i].GetPeak();
@@ -113,7 +113,7 @@ void BandVocoder::Process(double time)
       mPeaks[i].Process(mWorkBuffer, bufferSize);
       
       //get carrier band
-      memcpy(mWorkBuffer,mCarrierInputBuffer, bufferSize*sizeof(float));
+      BufferCopy(mWorkBuffer,mCarrierInputBuffer, bufferSize);
       mBiquadOut[i].Filter(mWorkBuffer, bufferSize);
       
       //multiply carrier band by modulator band level

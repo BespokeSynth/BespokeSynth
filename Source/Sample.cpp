@@ -10,6 +10,7 @@
 #include "SynthGlobals.h"
 #include "FileStream.h"
 #include "ModularSynth.h"
+#include "ChannelBuffer.h"
 
 Sample::Sample()
 : mData(NULL)
@@ -76,7 +77,7 @@ void Sample::Create(float* data, int length)
    delete[] mData;
    mData = new float[length];
    if (data)
-      memcpy(mData, data, sizeof(float) * length);
+      BufferCopy(mData, data, length);
    else
       Clear(mData, length);
    mNumSamples = length;
@@ -108,6 +109,18 @@ bool Sample::WriteDataToFile(const char *path, float **data, int numSamples, int
    return true;
 }
 
+//static
+bool Sample::WriteDataToFile(const char *path, ChannelBuffer* data, int numSamples)
+{
+   int numChannels = data->NumActiveChannels();
+   float** channelData = new float*[numChannels];
+   for (int ch=0; ch<numChannels; ++ch)
+      channelData[ch] = data->GetChannel(ch);
+   bool ret = WriteDataToFile(path, channelData, numSamples, numChannels);
+   delete[] channelData;
+   return ret;
+}
+
 void Sample::Play(float rate /*=1*/, int offset /*=0*/, int stopPoint /*=-1*/)
 {
    mPlayMutex.lock();
@@ -126,8 +139,8 @@ void Sample::Play(float rate /*=1*/, int offset /*=0*/, int stopPoint /*=-1*/)
  return false;
  
  int samplesLeft = mNumSamples - mOffset;
- memcpy(data, mData+mOffset, MIN(samplesLeft,size)*sizeof(float));
- bzero(data+mOffset+samplesLeft, size-samplesLeft*sizeof(float)); //fill the rest with zero
+ BufferCopy(data, mData+mOffset, MIN(samplesLeft,size));
+ Clear(data+mOffset+samplesLeft, size-samplesLeft); //fill the rest with zero
  mOffset += size;
  return true;
  }*/
@@ -172,8 +185,8 @@ void Sample::PadBack(int amount)
 {
    int newSamples = mNumSamples + amount;
    float* newData = new float[newSamples];
-   memcpy(newData, mData, sizeof(float) * mNumSamples);
-   bzero(newData+mNumSamples, sizeof(float)*amount);
+   BufferCopy(newData, mData, mNumSamples);
+   Clear(newData+mNumSamples, amount);
    LockDataMutex(true);
    delete[] mData;
    mData = newData;
@@ -187,7 +200,7 @@ void Sample::ClipTo(int start, int end)
    assert(end <= mNumSamples);
    int newSamples = end-start;
    float* newData = new float[newSamples];
-   memcpy(newData, mData+start, sizeof(float) * newSamples);
+   BufferCopy(newData, mData+start, newSamples);
    LockDataMutex(true);
    delete[] mData;
    mData = newData;
@@ -200,8 +213,8 @@ void Sample::ShiftWrap(int numSamplesToShift)
    assert(numSamplesToShift <= mNumSamples);
    float* newData = new float[mNumSamples];
    int chunk = mNumSamples - numSamplesToShift;
-   memcpy(newData, mData+numSamplesToShift, sizeof(float) * chunk);
-   memcpy(newData+chunk, mData, sizeof(float) * numSamplesToShift);
+   BufferCopy(newData, mData+numSamplesToShift, chunk);
+   BufferCopy(newData+chunk, mData, numSamplesToShift);
    LockDataMutex(true);
    delete[] mData;
    mData = newData;

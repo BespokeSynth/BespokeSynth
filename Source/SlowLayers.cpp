@@ -131,7 +131,7 @@ void SlowLayers::DrawModule()
 
 void SlowLayers::Clear()
 {
-   bzero(mBuffer, sizeof(float) * MAX_BUFFER_SIZE);
+   ::Clear(mBuffer, MAX_BUFFER_SIZE);
 }
 
 void SlowLayers::SetNumBars(int numBars)

@@ -13,6 +13,7 @@
 
 class FileStreamOut;
 class FileStreamIn;
+class ChannelBuffer;
 
 #define MAX_SAMPLE_READ_PATH_LENGTH 1024
 
@@ -40,6 +41,7 @@ public:
    void ShiftWrap(int numSamples);
    const char* GetReadPath() const { return mReadPath; }
    static bool WriteDataToFile(const char* path, float** data, int numSamples, int channels = 1);
+   static bool WriteDataToFile(const char* path, ChannelBuffer* data, int numSamples);
    bool IsPlaying() { return mOffset < mNumSamples; }
    void LockDataMutex(bool lock) { lock ? mDataMutex.lock() : mDataMutex.unlock(); }
    void Create(int length);

@@ -88,7 +88,6 @@ private:
    void ResetAll();
    void FixLengths();
    void DeleteBuffer(int idx);
-   void CopySelectionToLooper();
    void CopyRecordBufferContents(RecordBuffer* dst, RecordBuffer* src);
    
    float MeasureToPos(int measure);
@@ -110,7 +109,6 @@ private:
    int mRecordIdx;
    int mMaxRecordedLength;
    int mNumMeasures;
-   ClickButton* mCopySelectionToLooperButton;
    ClickButton* mUndoRecordButton;
    
    vector<RecordBuffer*> mRecordBuffers;

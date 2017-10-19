@@ -94,7 +94,7 @@ private:
    struct GrainVoice
    {
       GrainVoice();
-      void Process(float* out, float outLength, const float* sample, int sampleLength, int keyOffset, const vector<float>& beats);
+      void Process(float* out, float outLength, float* sample, int sampleLength, int keyOffset, const vector<float>& beats);
       void Draw(float w, float h, float offset, float length, int numPitches);
       
       float mPlay;

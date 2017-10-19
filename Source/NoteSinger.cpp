@@ -55,7 +55,7 @@ void NoteSinger::OnTransportAdvanced(float amount)
    float bestPeak = -1;
    for (int i=0; i<mNumBuckets; ++i)
    {
-      memcpy(mWorkBuffer,GetBuffer()->GetChannel(0), GetBuffer()->BufferSize()*sizeof(float));
+      BufferCopy(mWorkBuffer,GetBuffer()->GetChannel(0), GetBuffer()->BufferSize());
       mBands[i].Filter(mWorkBuffer, GetBuffer()->BufferSize());
       mPeaks[i].Process(mWorkBuffer, GetBuffer()->BufferSize());
       

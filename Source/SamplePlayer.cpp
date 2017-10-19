@@ -196,7 +196,7 @@ void SamplePlayer::UpdateSample()
    delete[] mDrawBuffer;
    mDrawBufferLength = mSample->LengthInSamples();
    mDrawBuffer = new float[mDrawBufferLength];
-   memcpy(mDrawBuffer, mSample->Data(), mDrawBufferLength * sizeof(float));
+   BufferCopy(mDrawBuffer, mSample->Data(), mDrawBufferLength);
    mSample->LockDataMutex(false);
    
    UpdateBPM();

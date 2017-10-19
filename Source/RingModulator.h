@@ -31,9 +31,6 @@ public:
 
    void SetEnabled(bool enabled) override { mEnabled = enabled; }
 
-   //IAudioReceiver
-   InputMode GetInputMode() override { return kInputMode_Mono; }
-
    //IAudioSource
    void Process(double time) override;
 
@@ -56,7 +53,7 @@ private:
    void GetModuleDimensions(int& x, int& y) override { x = 130; y = 52; }
    bool Enabled() const override { return mEnabled; }
 
-   float* mDryBuffer;
+   ChannelBuffer mDryBuffer;
 
    float mDryWet;
    float mVolume;

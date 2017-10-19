@@ -10,6 +10,7 @@
 
 #pragma once
 #include "SynthGlobals.h"
+#include "FileStream.h"
 
 class ChannelBuffer
 {
@@ -27,7 +28,11 @@ public:
    int NumActiveChannels() const { return mActiveChannels; }
    int NumTotalChannels() const { return mNumChannels; }
    int BufferSize() const { return mBufferSize; }
-   void CopyFrom(ChannelBuffer* src);
+   void CopyFrom(ChannelBuffer* src, int length = -1);
+   void SetChannelPointer(float* data, int channel, bool deleteOldData);
+   
+   void Save(FileStreamOut& out, int writeLength);
+   void Load(FileStreamIn& in, int &readLength);
    
    static const int kMaxNumChannels = 2;
    

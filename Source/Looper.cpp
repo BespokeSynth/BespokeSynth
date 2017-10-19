@@ -26,7 +26,6 @@ bool Looper::mBeatwheelSingleMeasure = 0;
 
 Looper::Looper()
 : IAudioProcessor(gBufferSize)
-, mBuffer(NULL)
 , mLoopLength(4 * 60.0f / gDefaultTempo * gSampleRate)
 , mLoopPos(0)
 , mNumBars(1)
@@ -97,10 +96,8 @@ Looper::Looper()
 , mRewriter(NULL)
 , mWantRewrite(false)
 , mLoopCount(0)
-, mQueuedNewBuffer(NULL)
 , mDecay(0)
 , mDecaySlider(NULL)
-, mPitchShifter(1024)
 , mPitchShift(1)
 , mPitchShiftSlider(NULL)
 , mKeepPitch(false)
@@ -111,17 +108,21 @@ Looper::Looper()
 , mCaptureQueued(false)
 , mWantShiftOffset(false)
 , mWantHalfShift(false)
-, mLastInputSample(0)
+, mWorkBuffer(gBufferSize)
+, mQueuedNewBuffer(nullptr)
 {
    //TODO(Ryan) buffer sizes
-   mBuffer = new float[MAX_BUFFER_SIZE];
-   mWorkBuffer = new float[gBufferSize];
+   mBuffer = new ChannelBuffer(MAX_BUFFER_SIZE);
+   mUndoBuffer = new ChannelBuffer(MAX_BUFFER_SIZE);
    Clear();
-
-   mUndoBuffer = new float[MAX_BUFFER_SIZE];
-   ::Clear(mUndoBuffer, MAX_BUFFER_SIZE);
    
    mMuteRamp.SetValue(1);
+   
+   for (int i=0; i<ChannelBuffer::kMaxNumChannels; ++i)
+   {
+      mPitchShifter[i] = new PitchShifter(1024);
+      mLastInputSample[i] = 0;
+   }
 }
 
 void Looper::CreateUIControls()
@@ -220,8 +221,10 @@ void Looper::CreateUIControls()
 
 Looper::~Looper()
 {
-   delete[] mBuffer;
-   delete[] mUndoBuffer;
+   delete mBuffer;
+   delete mUndoBuffer;
+   for (int i=0; i<ChannelBuffer::kMaxNumChannels; ++i)
+      delete mPitchShifter[i];
 }
 
 void Looper::Exit()
@@ -237,13 +240,13 @@ void Looper::SetRecorder(LooperRecorder* recorder)
    mRecordBuffer = recorder ? recorder->GetRecordBuffer() : NULL;
 }
 
-float* Looper::GetLoopBuffer(int& loopLength)
+ChannelBuffer* Looper::GetLoopBuffer(int& loopLength)
 {
    loopLength = mLoopLength;
    return mBuffer;
 }
 
-void Looper::SetLoopBuffer(float* buffer)
+void Looper::SetLoopBuffer(ChannelBuffer* buffer)
 {
    mQueuedNewBuffer = buffer;
 }
@@ -273,7 +276,11 @@ void Looper::Process(double time)
       return;
 
    ComputeSliders(0);
+   GetBuffer()->SetNumActiveChannels(MAX(GetBuffer()->NumActiveChannels(), mBuffer->NumActiveChannels()));
    SyncBuffers();
+   mBuffer->SetNumActiveChannels(GetBuffer()->NumActiveChannels());
+   mWorkBuffer.SetNumActiveChannels(GetBuffer()->NumActiveChannels());
+   mUndoBuffer->SetNumActiveChannels(GetBuffer()->NumActiveChannels());
 
    if (mWantBakeVolume)
       BakeVolume();
@@ -321,7 +328,8 @@ void Looper::Process(double time)
    if (mQueuedNewBuffer)
    {
       mBufferMutex.lock();
-      mJumpBlender.CaptureForJump(mLoopPos, mBuffer, mLoopLength, 0);
+      for (int ch=0; ch<mBuffer->NumActiveChannels(); ++ch)
+         mJumpBlender[ch].CaptureForJump(mLoopPos, mBuffer->GetChannel(ch), mLoopLength, 0);
       mBuffer = mQueuedNewBuffer;
       mBufferMutex.unlock();
       mQueuedNewBuffer = NULL;
@@ -331,7 +339,7 @@ void Looper::Process(double time)
       mPitchShift = 1/mSpeed;
    int latencyOffset = 0;
    if (mPitchShift != 1)
-      latencyOffset = mPitchShifter.GetLatency();
+      latencyOffset = mPitchShifter[0]->GetLatency();
 
    for (int i=0; i<bufferSize; ++i)
    {
@@ -351,48 +359,56 @@ void Looper::Process(double time)
          ProcessBeatwheel(i);
       
       float offset = mLoopPos+i*mSpeed+mLoopPosOffset+latencyOffset;
-      float output;
+      float output[ChannelBuffer::kMaxNumChannels];
       
       if (mGranular)
-      {
-         output = ProcessGranular(time, offset);
-      }
-      else
-      {
-         output = GetInterpolatedSample(offset, mBuffer, mLoopLength);
-         output = mJumpBlender.Process(output,i);
-      }
+         ProcessGranular(time, offset, output);
       
-      if (mFourTet > 0 && mFourTet < 1)   //fourtet wet/dry
+      for (int ch=0; ch<mBuffer->NumActiveChannels(); ++ch)
       {
-         output *= mFourTet;
-         float normalOffset = mLoopPos+i*mSpeed;
-         output += GetInterpolatedSample(normalOffset, mBuffer, mLoopLength) * (1-mFourTet);
-      }
-      
-      //write one sample the past so we don't end up feeding into the next output
-      float writeAmount = mWriteInputRamp.Value(time);
-      if (writeAmount > 0)
-         WriteInterpolatedSample(offset-1, mBuffer, mLoopLength, mLastInputSample * writeAmount);
-      mLastInputSample = GetBuffer()->GetChannel(0)[i];
+         if (!mGranular)
+         {
+            output[ch] = GetInterpolatedSample(offset, mBuffer->GetChannel(ch), mLoopLength);
+            output[ch] = mJumpBlender[ch].Process(output[ch],i);
+         }
+         
+         if (mFourTet > 0 && mFourTet < 1)   //fourtet wet/dry
+         {
+            output[ch] *= mFourTet;
+            float normalOffset = mLoopPos+i*mSpeed;
+            output[ch] += GetInterpolatedSample(normalOffset, mBuffer->GetChannel(ch), mLoopLength) * (1-mFourTet);
+         }
+         
+         //write one sample the past so we don't end up feeding into the next output
+         float writeAmount = mWriteInputRamp.Value(time);
+         if (writeAmount > 0)
+            WriteInterpolatedSample(offset-1, mBuffer->GetChannel(ch), mLoopLength, mLastInputSample[ch] * writeAmount);
+         mLastInputSample[ch] = GetBuffer()->GetChannel(ch)[i];
 
-      output *= volSq;
-      
-      mWorkBuffer[i] = output * mMuteRamp.Value(time);
+         output[ch] *= volSq;
+         
+         mWorkBuffer.GetChannel(ch)[i] = output[ch] * mMuteRamp.Value(time);
 
-      GetVizBuffer()->Write(mWorkBuffer[i] + GetBuffer()->GetChannel(0)[i], 0);
+         GetVizBuffer()->Write(mWorkBuffer.GetChannel(ch)[i] + GetBuffer()->GetChannel(ch)[i], ch);
+      }
       
       time += gInvSampleRateMs;
    }
    
    if (mPitchShift != 1)
    {
-      mPitchShifter.SetRatio(mPitchShift);
-      mPitchShifter.Process(mWorkBuffer, bufferSize);
+      for (int ch=0; ch<mBuffer->NumActiveChannels(); ++ch)
+      {
+         mPitchShifter[ch]->SetRatio(mPitchShift);
+         mPitchShifter[ch]->Process(mWorkBuffer.GetChannel(ch), bufferSize);
+      }
    }
    
-   Add(GetTarget()->GetBuffer()->GetChannel(0), GetBuffer()->GetChannel(0), bufferSize);
-   Add(GetTarget()->GetBuffer()->GetChannel(0), mWorkBuffer, bufferSize);
+   for (int ch=0; ch<mBuffer->NumActiveChannels(); ++ch)
+   {
+      Add(GetTarget()->GetBuffer()->GetChannel(ch), GetBuffer()->GetChannel(ch), bufferSize);
+      Add(GetTarget()->GetBuffer()->GetChannel(ch), mWorkBuffer.GetChannel(ch), bufferSize);
+   }
    
    GetBuffer()->Clear();
    
@@ -425,7 +441,7 @@ void Looper::DoCommit()
 
    {
       Profiler profiler("Looper::DoCommit() undo");
-      memcpy(mUndoBuffer, mBuffer, sizeof(float) * mLoopLength);
+      mUndoBuffer->CopyFrom(mBuffer, mLoopLength);
    }
 
    if (mReplaceOnCommit)
@@ -451,21 +467,25 @@ void Looper::DoCommit()
             fade = float(LOOPER_COMMIT_FADE_SAMPLES + idx) / LOOPER_COMMIT_FADE_SAMPLES;
          if (idx >= mLoopLength-LOOPER_COMMIT_FADE_SAMPLES)
             fade = 1 - (float(idx-(mLoopLength-LOOPER_COMMIT_FADE_SAMPLES)) / LOOPER_COMMIT_FADE_SAMPLES);
-         mBuffer[pos] += mCommitBuffer->GetSample(ofClamp(commitLength - i + commitSamplesBack,0,MAX_BUFFER_SIZE-1), 0) * fade;
+         
+         for (int ch=0; ch<mBuffer->NumActiveChannels(); ++ch)
+         {
+            mBuffer->GetChannel(ch)[pos] += mCommitBuffer->GetSample(ofClamp(commitLength - i + commitSamplesBack,0,MAX_BUFFER_SIZE-1), ch) * fade;
+         }
       }
    }
 
    mClearCommitBuffer = true;
 }
 
-void Looper::Fill(float* buffer, int length)
+void Looper::Fill(ChannelBuffer* buffer, int length)
 {
-   memcpy(mBuffer,buffer,length*sizeof(float));
+   mBuffer->CopyFrom(buffer, length);
 }
 
 void Looper::DoUndo()
 {
-   float* swap = mUndoBuffer;
+   ChannelBuffer* swap = mUndoBuffer;
    mUndoBuffer = mBuffer;
    mBuffer = swap;
    mWantUndo = false;
@@ -547,7 +567,8 @@ void Looper::ProcessBeatwheel(int sampleIdx)
    
    if (lastSlice != slice) //on new slices
    {
-      mJumpBlender.CaptureForJump(int(GetActualLoopPos(sampleIdx))%loopLength, mBuffer, loopLength, sampleIdx);
+      for (int ch=0; ch<mBuffer->NumActiveChannels(); ++ch)
+         mJumpBlender[ch].CaptureForJump(int(GetActualLoopPos(sampleIdx))%loopLength, mBuffer->GetChannel(ch), loopLength, sampleIdx);
       
       if (noneHeld)
       {
@@ -598,24 +619,28 @@ int Looper::GetMeasureSliceIndex(int sampleIdx, int slicesPerBar)
    return slice;
 }
 
-float Looper::ProcessGranular(double time, float bufferOffset)
+void Looper::ProcessGranular(double time, float bufferOffset, float* output)
 {
-   return mGranulator.Process(time, mBuffer, mLoopLength, bufferOffset);
+   mGranulator.Process(time, mBuffer, mLoopLength, bufferOffset, output);
 }
 
 void Looper::ResampleForNewSpeed()
 {
    int oldLoopLength = mLoopLength;
-   float* oldBuffer = new float[oldLoopLength];
-   memcpy(oldBuffer, mBuffer, oldLoopLength*sizeof(float));
    SetLoopLength(MIN(int(abs(mLoopLength/mSpeed)), MAX_BUFFER_SIZE-1));
    mLoopPos /= mSpeed;
    while (mLoopPos < 0)
       mLoopPos += mLoopLength;
-   for (int i=0; i<mLoopLength; ++i)
+   for (int ch=0; ch<mBuffer->NumActiveChannels(); ++ch)
    {
-      float offset = i*mSpeed;
-      mBuffer[i] = GetInterpolatedSample(offset, oldBuffer, oldLoopLength);
+      float* oldBuffer = new float[oldLoopLength];
+      BufferCopy(oldBuffer, mBuffer->GetChannel(ch), oldLoopLength);
+      for (int i=0; i<mLoopLength; ++i)
+      {
+         float offset = i*mSpeed;
+         mBuffer->GetChannel(ch)[i] = GetInterpolatedSample(offset, oldBuffer, oldLoopLength);
+      }
+      delete[] oldBuffer;
    }
    
    if (mKeepPitch)
@@ -624,7 +649,6 @@ void Looper::ResampleForNewSpeed()
       mPitchShift = 1/mSpeed;
    }
    
-   delete[] oldBuffer;
    mSpeed = 1;
 }
 
@@ -813,7 +837,10 @@ void Looper::DrawBeatwheel()
       //rms
       int j;
       for (j=0; j<samplesPerPixel && position+j < loopLength-1; ++j)
-         mag += mBuffer[position+j] * mBuffer[position+j];
+      {
+         for (int ch=0; ch<mBuffer->NumActiveChannels(); ++ch)
+            mag += mBuffer->GetChannel(ch)[position+j];
+      }
       mag /= j;
       mag = sqrtf(mag);
       mag = sqrtf(mag);
@@ -869,7 +896,7 @@ void Looper::DrawBeatwheel()
 
 void Looper::Clear()
 {
-   ::Clear(mBuffer, MAX_BUFFER_SIZE);
+   mBuffer->Clear();
    mLastCommitTime = gTime;
    mVol = 1;
    mFourTet = 0;
@@ -885,8 +912,9 @@ void Looper::SetNumBars(int numBars)
 
 void Looper::BakeVolume()
 {
-   memcpy(mUndoBuffer, mBuffer, sizeof(float) * MAX_BUFFER_SIZE);
-   Mult(mBuffer, mVol*mVol, mLoopLength);
+   mUndoBuffer->CopyFrom(mBuffer);
+   for (int ch=0; ch<mBuffer->NumActiveChannels(); ++ch)
+      Mult(mBuffer->GetChannel(ch), mVol*mVol, mLoopLength);
    mVol = 1;
    mSmoothedVol = 1;
    mWantBakeVolume = false;
@@ -905,7 +933,10 @@ void Looper::UpdateNumBars(int oldNumBars)
       int oldLoopLength = abs(int(TheTransport->MsPerBar() * oldNumBars / 1000 * gSampleRate));
       oldLoopLength = MIN(oldLoopLength, MAX_BUFFER_SIZE-1);
       for (int i=1; i<mNumBars/oldNumBars; ++i)
-         memcpy(mBuffer+oldLoopLength*i, mBuffer, sizeof(float)*oldLoopLength);
+      {
+         for (int ch=0; ch<mBuffer->NumActiveChannels(); ++ch)
+            BufferCopy(mBuffer->GetChannel(ch)+oldLoopLength*i, mBuffer->GetChannel(ch), oldLoopLength);
+      }
    }
 }
 
@@ -927,12 +958,15 @@ void Looper::MergeIn(Looper* otherLooper)
 
    if (mVol > 0.01f)
    {
-      Mult(otherLooper->mBuffer, (otherLooper->mVol*otherLooper->mVol) / (mVol*mVol), mLoopLength); //keep other looper at same apparent volume
-      Add(mBuffer, otherLooper->mBuffer, mLoopLength);
+      for (int ch=0; ch<mBuffer->NumActiveChannels(); ++ch)
+      {
+         Mult(otherLooper->mBuffer->GetChannel(ch), (otherLooper->mVol*otherLooper->mVol) / (mVol*mVol), mLoopLength); //keep other looper at same apparent volume
+         Add(mBuffer->GetChannel(ch), otherLooper->mBuffer->GetChannel(ch), mLoopLength);
+      }
    }
    else //ours was silent, just replace it
    {
-      memcpy(mBuffer, otherLooper->mBuffer, mLoopLength*sizeof(float));
+      mBuffer->CopyFrom(otherLooper->mBuffer, mLoopLength);
       mVol = 1;
    }
 
@@ -945,7 +979,7 @@ void Looper::MergeIn(Looper* otherLooper)
 void Looper::SwapBuffers(Looper* otherLooper)
 {
    assert(otherLooper);
-   float* temp = otherLooper->mBuffer;
+   ChannelBuffer* temp = otherLooper->mBuffer;
    int length = otherLooper->mLoopLength;
    int numBars = otherLooper->mNumBars;
    float vol = otherLooper->mVol;
@@ -962,7 +996,7 @@ void Looper::SwapBuffers(Looper* otherLooper)
 void Looper::CopyBuffer(Looper* sourceLooper)
 {
    assert(sourceLooper);
-   memcpy(mBuffer, sourceLooper->mBuffer, sizeof(float) * MAX_BUFFER_SIZE);
+   mBuffer->CopyFrom(sourceLooper->mBuffer);
    SetLoopLength(sourceLooper->mLoopLength);
    mNumBars = sourceLooper->mNumBars;
 }
@@ -1027,7 +1061,8 @@ void Looper::SampleDropped(int x, int y, Sample* sample)
    for (int i=0; i<mLoopLength; ++i)
    {
       float offset = i*lengthRatio;
-      mBuffer[i] = GetInterpolatedSample(offset, data, numSamples);
+      //TODO(Ryan) multichannel
+      mBuffer->GetChannel(0)[i] = GetInterpolatedSample(offset, data, numSamples);
    }
 }
 
@@ -1052,7 +1087,8 @@ void Looper::OnClicked(int x, int y, bool right)
    if (x >= BUFFER_X + BUFFER_W / 3 && x < BUFFER_X + (BUFFER_W * 2) / 3 &&
        y >= BUFFER_Y + BUFFER_H / 3 && y < BUFFER_Y + (BUFFER_H * 2) / 3)
    {
-      TheSynth->GrabSample(mBuffer, mLoopLength, false, mNumBars);
+      //TODO(Ryan) multichannel
+      TheSynth->GrabSample(mBuffer->GetChannel(0), mLoopLength, false, mNumBars);
    }
 }
 
@@ -1060,7 +1096,7 @@ void Looper::ButtonClicked(ClickButton* button)
 {
    if (button == mClearButton)
    {
-      memcpy(mUndoBuffer, mBuffer, sizeof(float) * MAX_BUFFER_SIZE);
+      mUndoBuffer->CopyFrom(mBuffer);
       Clear();
    }
    if (button == mMergeButton && mRecorder)
@@ -1073,7 +1109,7 @@ void Looper::ButtonClicked(ClickButton* button)
       mWantBakeVolume = true;
    if (button == mSaveButton)
    {
-      Sample::WriteDataToFile(ofGetTimestampString("loops/loop_%m-%d-%Y_%H-%M.wav").c_str(), &mBuffer, mLoopLength);
+      Sample::WriteDataToFile(ofGetTimestampString("loops/loop_%m-%d-%Y_%H-%M.wav").c_str(), mBuffer, mLoopLength);
    }
    if (button == mCommitButton && mRecorder)
       mRecorder->Commit(this);
@@ -1105,7 +1141,10 @@ void Looper::ButtonClicked(ClickButton* button)
    if (button == mWriteOffsetButton)
       mWantShiftOffset = true;
    if (button == mQueueCaptureButton)
+   {
       mCaptureQueued = true;
+      mLastCommitTime = gTime;
+   }
 }
 
 void Looper::FloatSliderUpdated(FloatSlider* slider, float oldVal)
@@ -1206,27 +1245,31 @@ void Looper::HalveNumBars()
 
 void Looper::DoShiftMeasure()
 {
-   float* newBuffer = new float[MAX_BUFFER_SIZE];
    int measureSize = int(TheTransport->MsPerBar() * gSampleRate / 1000);
-   memcpy(newBuffer, mBuffer+measureSize, sizeof(float)*(mLoopLength-measureSize));
-   memcpy(newBuffer+mLoopLength-measureSize, mBuffer, sizeof(float)*measureSize);
-   mBufferMutex.lock();
-   delete[] mBuffer;
-   mBuffer = newBuffer;
-   mBufferMutex.unlock();
+   for (int ch=0; ch<mBuffer->NumActiveChannels(); ++ch)
+   {
+      float* newBuffer = new float[MAX_BUFFER_SIZE];
+      BufferCopy(newBuffer, mBuffer->GetChannel(ch)+measureSize, mLoopLength-measureSize);
+      BufferCopy(newBuffer+mLoopLength-measureSize, mBuffer->GetChannel(ch), measureSize);
+      mBufferMutex.lock();
+      mBuffer->SetChannelPointer(newBuffer, ch, true);
+      mBufferMutex.unlock();
+   }
    mWantShiftMeasure = false;
 }
 
 void Looper::DoHalfShift()
 {
-   float* newBuffer = new float[MAX_BUFFER_SIZE];
    int halfMeasureSize = int(TheTransport->MsPerBar() * gSampleRate / 1000 / 2);
-   memcpy(newBuffer, mBuffer+halfMeasureSize, sizeof(float)*(mLoopLength-halfMeasureSize));
-   memcpy(newBuffer+mLoopLength-halfMeasureSize, mBuffer, sizeof(float)*halfMeasureSize);
-   mBufferMutex.lock();
-   delete[] mBuffer;
-   mBuffer = newBuffer;
-   mBufferMutex.unlock();
+   for (int ch=0; ch<mBuffer->NumActiveChannels(); ++ch)
+   {
+      float* newBuffer = new float[MAX_BUFFER_SIZE];
+      BufferCopy(newBuffer, mBuffer->GetChannel(ch)+halfMeasureSize, mLoopLength-halfMeasureSize);
+      BufferCopy(newBuffer+mLoopLength-halfMeasureSize, mBuffer->GetChannel(ch), halfMeasureSize);
+      mBufferMutex.lock();
+      mBuffer->SetChannelPointer(newBuffer, ch, true);
+      mBufferMutex.unlock();
+   }
    mWantHalfShift = false;
 }
 
@@ -1234,12 +1277,14 @@ void Looper::DoShiftDownbeat()
 {
    float* newBuffer = new float[MAX_BUFFER_SIZE];
    int shift = int(mLoopPos);
-   memcpy(newBuffer, mBuffer+shift, sizeof(float)*(mLoopLength-shift));
-   memcpy(newBuffer+mLoopLength-shift, mBuffer, sizeof(float)*shift);
-   mBufferMutex.lock();
-   delete[] mBuffer;
-   mBuffer = newBuffer;
-   mBufferMutex.unlock();
+   for (int ch=0; ch<mBuffer->NumActiveChannels(); ++ch)
+   {
+      BufferCopy(newBuffer, mBuffer->GetChannel(ch)+shift, mLoopLength-shift);
+      BufferCopy(newBuffer+mLoopLength-shift, mBuffer->GetChannel(ch), shift);
+      mBufferMutex.lock();
+      mBuffer->SetChannelPointer(newBuffer, ch, true);
+      mBufferMutex.unlock();
+   }
    mWantShiftDownbeat = false;
 }
 
@@ -1247,12 +1292,14 @@ void Looper::DoShiftOffset()
 {
    float* newBuffer = new float[MAX_BUFFER_SIZE];
    int shift = int(mLoopPosOffset);
-   memcpy(newBuffer, mBuffer+shift, sizeof(float)*(mLoopLength-shift));
-   memcpy(newBuffer+mLoopLength-shift, mBuffer, sizeof(float)*shift);
-   mBufferMutex.lock();
-   delete[] mBuffer;
-   mBuffer = newBuffer;
-   mBufferMutex.unlock();
+   for (int ch=0; ch<mBuffer->NumActiveChannels(); ++ch)
+   {
+      BufferCopy(newBuffer, mBuffer->GetChannel(ch)+shift, mLoopLength-shift);
+      BufferCopy(newBuffer+mLoopLength-shift, mBuffer->GetChannel(ch), shift);
+      mBufferMutex.lock();
+      mBuffer->SetChannelPointer(newBuffer, ch, true);
+      mBufferMutex.unlock();
+   }
    mWantShiftOffset = false;
    mLoopPosOffset = 0;
 }
@@ -1320,7 +1367,7 @@ void Looper::SaveState(FileStreamOut& out)
    out << kSaveStateRev;
    
    out << mLoopLength;
-   out.Write(mBuffer, mLoopLength);
+   mBuffer->Save(out, mLoopLength);
 }
 
 void Looper::LoadState(FileStreamIn& in)
@@ -1332,14 +1379,9 @@ void Looper::LoadState(FileStreamIn& in)
    LoadStateValidate(rev == kSaveStateRev);
    
    in >> mLoopLength;
-   int readAmount = mLoopLength;
-   in.Read(mBuffer, readAmount);
-   int readRest = mLoopLength-readAmount;
-   if (readRest > 0)
-   {
-      float* blah = new float[readRest];
-      in.Read(blah, readRest);
-   }
+   int readLength;
+   mBuffer->Load(in, readLength);
+   assert(mLoopLength == readLength);
 }
 
 

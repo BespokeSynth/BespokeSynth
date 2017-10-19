@@ -32,9 +32,6 @@ public:
    void Go();
    
    void PostRepatch(PatchCableSource* cable) override;
-   
-   //IAudioProcessor
-   InputMode GetInputMode() override { return kInputMode_Mono; }
 
    //IAudioSource
    void Process(double time) override;

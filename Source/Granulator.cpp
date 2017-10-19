@@ -9,6 +9,7 @@
 #include "Granulator.h"
 #include "SynthGlobals.h"
 #include "Profiler.h"
+#include "ChannelBuffer.h"
 
 Granulator::Granulator()
 : mNextGrainIdx(0)
@@ -30,7 +31,7 @@ void Granulator::Reset()
    mOctaves = false;
 }
 
-float Granulator::Process(double time, const float *buffer, int bufferLength, float offset)
+void Granulator::Process(double time, ChannelBuffer* buffer, int bufferLength, float offset, float* output)
 {
    if (time >= mLastGrainSpawnMs+mGrainLengthMs*mGrainSpacing*ofRandom(1-mSpacingRandomize/2,1+mSpacingRandomize/2))
    {
@@ -38,14 +39,14 @@ float Granulator::Process(double time, const float *buffer, int bufferLength, fl
       SpawnGrain(time, offset);
    }
    
-   float sample = 0;
    for (int i=0; i<MAX_GRAINS; ++i)
-      sample += mGrains[i].Process(time, buffer, bufferLength);
+      mGrains[i].Process(time, buffer, bufferLength, output);
+   
    if (mGrainSpacing < .25f)
    {
-      sample *= ofMap(mGrainSpacing,0,.25f,.15f,1);   //lower volume on dense granulation, starting at .25 spacing
+      for (int ch=0; ch<buffer->NumActiveChannels(); ++ch)
+         output[ch] *= ofMap(mGrainSpacing,0,.25f,.15f,1);   //lower volume on dense granulation, starting at .25 spacing
    }
-   return sample;
 }
 
 void Granulator::SpawnGrain(double time, float offset)
@@ -102,11 +103,12 @@ void Grain::Spawn(double time, float pos, float speed, float lengthInMs, float v
    mVol = vol;
 }
 
-float Grain::Process(double time, const float* buffer, int bufferLength)
+void Grain::Process(double time, ChannelBuffer* buffer, int bufferLength, float* output)
 {
-   float sample = GetInterpolatedSample(mPos, buffer, bufferLength);
+   float sample = GetInterpolatedSample(mPos, buffer, bufferLength, .5f);
    mPos += mSpeed;
-   return sample * GetWindow(time) * mVol;
+   for (int ch=0; ch<buffer->NumActiveChannels(); ++ch)
+      output[ch] = sample * GetWindow(time) * mVol;
 }
 
 float Grain::GetWindow(double time)

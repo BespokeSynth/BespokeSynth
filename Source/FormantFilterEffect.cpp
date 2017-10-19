@@ -83,12 +83,12 @@ void FormantFilterEffect::ProcessAudio(double time, ChannelBuffer* buffer)
    //TODO(Ryan)
    /*for (int i=0; i<NUM_FORMANT_BANDS; ++i)
    {
-      memcpy(gWorkBuffer, audio, bufferSize*sizeof(float));
+      BufferCopy(gWorkBuffer, audio, bufferSize);
       mBiquads[i].Filter(gWorkBuffer, bufferSize);
       Add(mOutputBuffer, gWorkBuffer, bufferSize);
    }
    
-   memcpy(audio, gWorkBuffer, bufferSize*sizeof(float));*/
+   BufferCopy(audio, gWorkBuffer, bufferSize);*/
 }
 
 void FormantFilterEffect::DrawModule()

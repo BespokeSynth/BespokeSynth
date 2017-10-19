@@ -24,13 +24,13 @@ void JumpBlender::CaptureForJump(int pos, const float* sampleSource, int sourceL
    mBlendSample = 0;
    if (pos + JUMP_BLEND_SAMPLES <= sourceLength)
    {
-      memcpy(mSamples, sampleSource+pos, JUMP_BLEND_SAMPLES*sizeof(float));
+      BufferCopy((float*)mSamples, sampleSource+pos, JUMP_BLEND_SAMPLES);
    }
    else
    {
       int samplesLeft = sourceLength - pos;
-      memcpy(mSamples, sampleSource+pos, samplesLeft*sizeof(float));
-      memcpy(mSamples+samplesLeft, sampleSource, (JUMP_BLEND_SAMPLES-samplesLeft)*sizeof(float));
+      BufferCopy(mSamples, sampleSource+pos, samplesLeft);
+      BufferCopy(mSamples+samplesLeft, sampleSource, (JUMP_BLEND_SAMPLES-samplesLeft));
    }
    double time = gTime+samplesIn*gInvSampleRateMs;
    mRamp.Start(time, 1, 0, time+JUMP_BLEND_SAMPLES*gInvSampleRateMs);

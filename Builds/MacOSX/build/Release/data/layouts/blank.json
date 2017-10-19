@@ -13,17 +13,23 @@
          "type" : "output"
       },
       {
+         "name" : "panner",
+         "pan" : 0.0,
+         "position" : [ 36.0, 582.0 ],
+         "target" : "splitter",
+         "type" : "panner"
+      },
+      {
          "name" : "scale",
          "position" : [ 148.0, 66.0 ],
          "type" : "scale"
       },
       {
-         "name" : "stereofier",
-         "pan" : 0.0,
-         "position" : [ 28.0, 621.0 ],
+         "name" : "splitter",
+         "position" : [ 55.0, 655.0 ],
          "target" : "output 1",
          "target2" : "output 2",
-         "type" : "stereofier"
+         "type" : "splitter"
       },
       {
          "name" : "transport",

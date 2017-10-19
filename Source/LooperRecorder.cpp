@@ -54,9 +54,8 @@ LooperRecorder::LooperRecorder()
 , mCommitToLooper(NULL)
 , mRecorderMode(kRecorderMode_Record)
 , mModeSelector(NULL)
+, mWriteBuffer(gBufferSize)
 {
-   mWriteBuffer = new float[GetBuffer()->BufferSize()];
-
    mQuietInputRamp.SetValue(1);
 }
 
@@ -112,7 +111,6 @@ void LooperRecorder::CreateUIControls()
 
 LooperRecorder::~LooperRecorder()
 {
-   delete[] mWriteBuffer;
 }
 
 void LooperRecorder::Init()
@@ -161,13 +159,17 @@ void LooperRecorder::Process(double time)
    {
       if (acceptInput)
       {
-         GetBuffer()->GetChannel(0)[i] *= mQuietInputRamp.Value(time);
+         for (int ch=0; ch<GetBuffer()->NumActiveChannels(); ++ch)
+         {
+            GetBuffer()->GetChannel(ch)[i] *= mQuietInputRamp.Value(time);
+            mWriteBuffer.GetChannel(ch)[i] = GetBuffer()->GetChannel(ch)[i];
+         }
          time += gInvSampleRateMs;
-         mWriteBuffer[i] = GetBuffer()->GetChannel(0)[i];
       }
       else
       {
-         mWriteBuffer[i] = 0;
+         for (int ch=0; ch<GetBuffer()->NumActiveChannels(); ++ch)
+            mWriteBuffer.GetChannel(ch)[i] = 0;
       }
    }
 
@@ -177,17 +179,23 @@ void LooperRecorder::Process(double time)
       delaySamps = MIN(delaySamps, MAX_BUFFER_SIZE-1);
       for (int i=0; i<bufferSize; ++i)
       {
-         float sample = mRecordBuffer.GetSample(delaySamps - i, 0);
-         mWriteBuffer[i] += sample;
-         GetBuffer()->GetChannel(0)[i] += sample;
+         for (int ch=0; ch<GetBuffer()->NumActiveChannels(); ++ch)
+         {
+            float sample = mRecordBuffer.GetSample(delaySamps - i, ch);
+            mWriteBuffer.GetChannel(ch)[i] += sample;
+            GetBuffer()->GetChannel(ch)[i] += sample;
+         }
       }
    }
    
-   mRecordBuffer.WriteChunk(mWriteBuffer, bufferSize, 0);
+   for (int ch=0; ch<GetBuffer()->NumActiveChannels(); ++ch)
+   {
+      mRecordBuffer.WriteChunk(mWriteBuffer.GetChannel(ch), bufferSize, ch);
    
-   Add(GetTarget()->GetBuffer()->GetChannel(0), GetBuffer()->GetChannel(0), bufferSize);
+      Add(GetTarget()->GetBuffer()->GetChannel(ch), GetBuffer()->GetChannel(ch), bufferSize);
    
-   GetVizBuffer()->WriteChunk(GetBuffer()->GetChannel(0),bufferSize, 0);
+      GetVizBuffer()->WriteChunk(GetBuffer()->GetChannel(ch),bufferSize, ch);
+   }
    
    GetBuffer()->Clear();
 }

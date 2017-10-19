@@ -964,7 +964,7 @@ void ModularSynth::AudioOut(float** output, int bufferSize, int nChannels)
          TheMultitrackRecorder->Process(gTime, outBuffer[0], outBuffer[1], gBufferSize);
       
       for (int ch=0; ch<nChannels; ++ch)
-         memcpy(output[ch]+ioOffset, outBuffer[ch]+ioOffset, gBufferSize*sizeof(float));
+         BufferCopy(output[ch]+ioOffset, outBuffer[ch]+ioOffset, gBufferSize);
       
       double elapsed = gInvSampleRateMs * gBufferSize;
       gTime += elapsed;
@@ -995,7 +995,7 @@ void ModularSynth::AudioIn(const float** input, int bufferSize, int nChannels)
    {
       if (mInput[i])
       {
-         memcpy(mInput[i]->GetBuffer()->GetChannel(0), input[i], sizeof(float)*bufferSize);
+         BufferCopy(mInput[i]->GetBuffer()->GetChannel(0), input[i], bufferSize);
          assert(inBufferSize == gBufferSize);
       }
    }
