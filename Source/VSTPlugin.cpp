@@ -20,7 +20,10 @@
 namespace
 {
    const int kGlobalModulationIdx = 16;
-   
+}
+
+namespace VSTLookup
+{
    typedef string VstDirExtPair[2];
    const int kNumVstTypes = 1;
    //const VstDirExtPair vstDirs[kNumVstTypes] =
@@ -28,10 +31,8 @@ namespace
    //                                  {"/Library/Audio/Plug-Ins/VST","vst"}};
    const VstDirExtPair vstDirs[kNumVstTypes] = {{"/Library/Audio/Plug-Ins/VST","vst"}};
    
-   void FillVSTList(DropdownList* list)
+   void GetAvailableVSTs(vector<string>& vsts)
    {
-      assert(list);
-      vector<string> vsts;
       for (int i=0; i<kNumVstTypes; ++i)
       {
          const VstDirExtPair& pair = vstDirs[i];
@@ -44,6 +45,13 @@ namespace
             vsts.push_back(file.getRelativePathFrom(File(dirPath)).toStdString());
          }
       }
+   }
+   
+   void FillVSTList(DropdownList* list)
+   {
+      assert(list);
+      vector<string> vsts;
+      GetAvailableVSTs(vsts);
       for (int i=0; i<vsts.size(); ++i)
          list->AddLabel(vsts[i].c_str(), i);
    }
@@ -113,6 +121,13 @@ void VSTPlugin::Exit()
    }
 }
 
+string VSTPlugin::GetTitleLabel()
+{
+   if (mPlugin)
+      return "vst: "+mPlugin->getName().toStdString();
+   return "vst";
+}
+
 void VSTPlugin::SetVST(string path)
 {
    if (mPlugin != nullptr && mPlugin->getPluginDescription().fileOrIdentifier == path)
@@ -163,35 +178,38 @@ void VSTPlugin::CreateParameterSliders()
    }
    mParameterSliders.clear();
    
-   mParameterSliders.resize(mPlugin->getNumParameters());
-   for (int i=0; i<mPlugin->getNumParameters(); ++i)
+   if (mPlugin->getNumParameters() <= 100)
    {
-      mParameterSliders[i].mValue = mPlugin->getParameter(i);
-      juce::String name = mPlugin->getParameterName(i);
-      string label(name.getCharPointer());
-      try
+      mParameterSliders.resize(mPlugin->getNumParameters());
+      for (int i=0; i<mPlugin->getNumParameters(); ++i)
       {
-         int append = 0;
-         while (FindUIControl(label.c_str()))
+         mParameterSliders[i].mValue = mPlugin->getParameter(i);
+         juce::String name = mPlugin->getParameterName(i);
+         string label(name.getCharPointer());
+         try
          {
-            ++append;
-            label = name.toStdString() + ofToString(append);
+            int append = 0;
+            while (FindUIControl(label.c_str()))
+            {
+               ++append;
+               label = name.toStdString() + ofToString(append);
+            }
          }
+         catch(UnknownUIControlException& e)
+         {
+            
+         }
+         mParameterSliders[i].mSlider = new FloatSlider(this, label.c_str(), 3, 35, 200, 15, &mParameterSliders[i].mValue, 0, 1);
+         if (i > 0)
+         {
+            const int kRows = 20;
+            if (i % kRows == 0)
+               mParameterSliders[i].mSlider->PositionTo(mParameterSliders[i-kRows].mSlider, kAnchorDirection_Right);
+            else
+               mParameterSliders[i].mSlider->PositionTo(mParameterSliders[i-1].mSlider, kAnchorDirection_Below);
+         }
+         mParameterSliders[i].mParameterIndex = i;
       }
-      catch(UnknownUIControlException& e)
-      {
-         
-      }
-      mParameterSliders[i].mSlider = new FloatSlider(this, label.c_str(), 3, 35, 200, 15, &mParameterSliders[i].mValue, 0, 1);
-      if (i > 0)
-      {
-         const int kRows = 20;
-         if (i % kRows == 0)
-            mParameterSliders[i].mSlider->PositionTo(mParameterSliders[i-kRows].mSlider, kAnchorDirection_Right);
-         else
-            mParameterSliders[i].mSlider->PositionTo(mParameterSliders[i-1].mSlider, kAnchorDirection_Below);
-      }
-      mParameterSliders[i].mParameterIndex = i;
    }
 }
 
@@ -213,12 +231,14 @@ void VSTPlugin::Process(double time)
    if (!mEnabled || GetTarget() == nullptr || mPlugin == nullptr)
       return;
    
+   int inputChannels = MAX(2, mNumInputs);
+   GetBuffer()->SetNumActiveChannels(inputChannels);
+   
    ComputeSliders(0);
    SyncBuffers();
    
    int bufferSize = GetBuffer()->BufferSize();
    
-   int inputChannels = MAX(2, mNumInputs);
    juce::AudioBuffer<float> buffer(inputChannels, gBufferSize);
    for (int i=0; i<inputChannels; ++i)
       buffer.copyFrom(i, 0, GetBuffer()->GetChannel(MIN(i,GetBuffer()->NumActiveChannels()-1)), GetBuffer()->BufferSize());
@@ -370,7 +390,10 @@ void VSTPlugin::DrawModule()
    if (mDisplayMode == kDisplayMode_Sliders)
    {
       for (auto& slider : mParameterSliders)
-         slider.mSlider->Draw();
+      {
+         if (slider.mSlider)
+            slider.mSlider->Draw();
+      }
    }
 }
 
@@ -395,8 +418,11 @@ void VSTPlugin::GetModuleDimensions(int& width, int& height)
       height = 40;
       for (auto slider : mParameterSliders)
       {
-         width = MAX(width, slider.mSlider->GetRect(true).x + slider.mSlider->GetRect(true).width + 3);
-         height = MAX(height, slider.mSlider->GetRect(true).y + slider.mSlider->GetRect(true).height + 3);
+         if (slider.mSlider)
+         {
+            width = MAX(width, slider.mSlider->GetRect(true).x + slider.mSlider->GetRect(true).width + 3);
+            height = MAX(height, slider.mSlider->GetRect(true).y + slider.mSlider->GetRect(true).height + 3);
+         }
       }
    }
 }
@@ -452,7 +478,7 @@ void VSTPlugin::ButtonClicked(ClickButton* button)
 
 void VSTPlugin::LoadLayout(const ofxJSONElement& moduleInfo)
 {
-   mModuleSaveData.LoadString("vst", moduleInfo, "", FillVSTList);
+   mModuleSaveData.LoadString("vst", moduleInfo, "", VSTLookup::FillVSTList);
    
    mModuleSaveData.LoadString("target", moduleInfo);
    
@@ -468,7 +494,7 @@ void VSTPlugin::SetUpFromSaveData()
 {
    string vstName = mModuleSaveData.GetString("vst");
    if (vstName != "")
-      SetVST(GetVSTPath(vstName));
+      SetVST(VSTLookup::GetVSTPath(vstName));
    
    SetTarget(TheSynth->FindModule(mModuleSaveData.GetString("target")));
    

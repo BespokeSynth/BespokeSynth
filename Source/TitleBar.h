@@ -19,22 +19,25 @@ class ModuleFactory;
 class TitleBar;
 class HelpDisplay;
 
-class ModuleList
+class SpawnList
 {
 public:
-   ModuleList(TitleBar* owner, int x, int y, string label);
-   void SetList(vector<string> modules);
+   SpawnList(TitleBar* owner, int x, int y, string label);
+   void SetList(vector<string> spawnables, bool vstList);
    void OnSelection(DropdownList* list);
    void SetPosition(int x, int y);
-   void SetPositionRelativeTo(ModuleList* module);
+   void SetPositionRelativeTo(SpawnList* list);
    void Draw();
 private:
+   IDrawableModule* Spawn();
+   
    string mLabel;
-   std::vector<string> mModules;
-   int mModuleIndex;
-   DropdownList* mModuleList;
+   std::vector<string> mSpawnables;
+   int mSpawnIndex;
+   DropdownList* mSpawnList;
    TitleBar* mOwner;
    ofVec2f mPos;
+   bool mVstList;
 };
 
 class TitleBar : public IDrawableModule, public IDropdownListener, public IButtonListener, public IFloatSliderListener
@@ -67,11 +70,12 @@ private:
    
    bool HiddenByZoom() const;
    
-   ModuleList mInstrumentModules;
-   ModuleList mNoteModules;
-   ModuleList mSynthModules;
-   ModuleList mAudioModules;
-   ModuleList mOtherModules;
+   SpawnList mInstrumentModules;
+   SpawnList mNoteModules;
+   SpawnList mSynthModules;
+   SpawnList mAudioModules;
+   SpawnList mOtherModules;
+   SpawnList mVstPlugins;
    
    ClickButton* mSaveLayoutButton;
    ClickButton* mSaveStateButton;

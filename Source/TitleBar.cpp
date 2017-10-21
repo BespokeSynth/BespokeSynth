@@ -13,65 +13,90 @@
 #include "ModuleFactory.h"
 #include "ModuleSaveDataPanel.h"
 #include "HelpDisplay.h"
+#include "VSTPlugin.h"
 
 TitleBar* TheTitleBar = nullptr;
 
-ModuleList::ModuleList(TitleBar* owner, int x, int y, string label)
-: mModuleIndex(-1)
-, mModuleList(nullptr)
+SpawnList::SpawnList(TitleBar* owner, int x, int y, string label)
+: mSpawnIndex(-1)
+, mSpawnList(nullptr)
 , mLabel(label)
 , mOwner(owner)
 , mPos(x,y)
+, mVstList(false)
 {
 }
 
-void ModuleList::SetList(vector<string> modules)
+void SpawnList::SetList(vector<string> spawnables, bool vstList)
 {
-   mModuleList = new DropdownList(mOwner,mLabel.c_str(),mPos.x,mPos.y,&mModuleIndex);
-   mModuleList->SetNoHover(true);
+   mVstList = vstList;
+   mSpawnList = new DropdownList(mOwner,mLabel.c_str(),mPos.x,mPos.y,&mSpawnIndex);
+   mSpawnList->SetNoHover(true);
    
-   mModuleList->Clear();
-   mModuleList->SetUnknownItemString(mLabel);
-   mModules = modules;
-   for (int i=0; i<mModules.size(); ++i)
+   mSpawnList->Clear();
+   mSpawnList->SetUnknownItemString(mLabel);
+   mSpawnables = spawnables;
+   for (int i=0; i<mSpawnables.size(); ++i)
    {
-      string name = mModules[i].c_str();
-      if (TheSynth->GetModuleFactory()->IsExperimental(name))
+      string name = mSpawnables[i].c_str();
+      if (!vstList && TheSynth->GetModuleFactory()->IsExperimental(name))
          name += " (exp.)";
-      mModuleList->AddLabel(name,i);
+      mSpawnList->AddLabel(name,i);
    }
 }
 
-void ModuleList::OnSelection(DropdownList* list)
+namespace
 {
-   if (list == mModuleList)
+   ofVec2f moduleGrabOffset(-40,10);
+}
+
+void SpawnList::OnSelection(DropdownList* list)
+{
+   if (list == mSpawnList)
    {
-      ofVec2f grabOffset(-40,10);
-      IDrawableModule* module = TheSynth->SpawnModuleOnTheFly(mModules[mModuleIndex], TheSynth->GetMouseX() + grabOffset.x, TheSynth->GetMouseY() + grabOffset.y);
-      TheSynth->SetMoveModule(module, grabOffset.x, grabOffset.y);
-      mModuleIndex = -1;
+      
+      IDrawableModule* module = Spawn();
+      TheSynth->SetMoveModule(module, moduleGrabOffset.x, moduleGrabOffset.y);
+      mSpawnIndex = -1;
    }
 }
 
-void ModuleList::Draw()
+IDrawableModule* SpawnList::Spawn()
+{
+   string moduleType = mSpawnables[mSpawnIndex];
+   if (mVstList)
+      moduleType = "vstplugin";
+   
+   IDrawableModule* module = TheSynth->SpawnModuleOnTheFly(moduleType, TheSynth->GetMouseX() + moduleGrabOffset.x, TheSynth->GetMouseY() + moduleGrabOffset.y);
+   
+   if (mVstList)
+   {
+      VSTPlugin* plugin = dynamic_cast<VSTPlugin*>(module);
+      plugin->SetVST(VSTLookup::GetVSTPath(mSpawnables[mSpawnIndex]));
+   }
+   
+   return module;
+}
+
+void SpawnList::Draw()
 {
    int x,y;
-   mModuleList->GetPosition(x, y, true);
+   mSpawnList->GetPosition(x, y, true);
    //DrawText(mLabel,x,y-2);
-   mModuleList->Draw();
+   mSpawnList->Draw();
 }
 
-void ModuleList::SetPosition(int x, int y)
+void SpawnList::SetPosition(int x, int y)
 {
-   mModuleList->SetPosition(x, y);
+   mSpawnList->SetPosition(x, y);
 }
 
-void ModuleList::SetPositionRelativeTo(ModuleList* module)
+void SpawnList::SetPositionRelativeTo(SpawnList* list)
 {
    int x,y,w,h;
-   module->mModuleList->GetPosition(x, y, true);
-   module->mModuleList->GetDimensions(w, h);
-   mModuleList->SetPosition(x + w + 5, y);
+   list->mSpawnList->GetPosition(x, y, true);
+   list->mSpawnList->GetDimensions(w, h);
+   mSpawnList->SetPosition(x + w + 5, y);
 }
 
 TitleBar::TitleBar()
@@ -80,6 +105,7 @@ TitleBar::TitleBar()
 , mSynthModules(this,0,0,"synths:")
 , mAudioModules(this,0,0,"audio effects:")
 , mOtherModules(this,0,0,"other:")
+, mVstPlugins(this,0,0,"vst plugins:")
 , mSaveLayoutButton(nullptr)
 , mSaveStateButton(nullptr)
 , mLoadStateButton(nullptr)
@@ -118,11 +144,15 @@ TitleBar::~TitleBar()
 
 void TitleBar::SetModuleFactory(ModuleFactory* factory)
 {
-   mInstrumentModules.SetList(factory->GetSpawnableModules(kModuleType_Instrument));
-   mNoteModules.SetList(factory->GetSpawnableModules(kModuleType_Note));
-   mSynthModules.SetList(factory->GetSpawnableModules(kModuleType_Synth));
-   mAudioModules.SetList(factory->GetSpawnableModules(kModuleType_Audio));
-   mOtherModules.SetList(factory->GetSpawnableModules(kModuleType_Other));
+   mInstrumentModules.SetList(factory->GetSpawnableModules(kModuleType_Instrument), false);
+   mNoteModules.SetList(factory->GetSpawnableModules(kModuleType_Note), false);
+   mSynthModules.SetList(factory->GetSpawnableModules(kModuleType_Synth), false);
+   mAudioModules.SetList(factory->GetSpawnableModules(kModuleType_Audio), false);
+   mOtherModules.SetList(factory->GetSpawnableModules(kModuleType_Other), false);
+   
+   vector<string> vsts;
+   VSTLookup::GetAvailableVSTs(vsts);
+   mVstPlugins.SetList(vsts, true);
 }
 
 void TitleBar::ListLayouts()
@@ -177,25 +207,31 @@ void TitleBar::DrawModule()
    {
       if (ofGetWidth() / gDrawScale >= 1280)
       {
-         mInstrumentModules.SetPosition(400,18);
+         mInstrumentModules.SetPosition(400,2);
          mNoteModules.SetPositionRelativeTo(&mInstrumentModules);
          mSynthModules.SetPositionRelativeTo(&mNoteModules);
          mAudioModules.SetPositionRelativeTo(&mSynthModules);
          mOtherModules.SetPositionRelativeTo(&mAudioModules);
+         if (ofGetWidth() / gDrawScale >= 1400)
+            mVstPlugins.SetPositionRelativeTo(&mOtherModules);
+         else
+            mVstPlugins.SetPosition(400,18);
       }
       else
       {
          mInstrumentModules.SetPosition(400,2);
          mNoteModules.SetPositionRelativeTo(&mInstrumentModules);
-         mSynthModules.SetPosition(400, 18);
-         mAudioModules.SetPositionRelativeTo(&mSynthModules);
+         mSynthModules.SetPositionRelativeTo(&mNoteModules);
+         mAudioModules.SetPosition(400, 18);
          mOtherModules.SetPositionRelativeTo(&mAudioModules);
+         mVstPlugins.SetPositionRelativeTo(&mOtherModules);
       }
       mInstrumentModules.Draw();
       mNoteModules.Draw();
       mSynthModules.Draw();
       mAudioModules.Draw();
       mOtherModules.Draw();
+      mVstPlugins.Draw();
    }
    
    float usage = //Profiler::GetUsage("audioOut() total");
@@ -250,6 +286,7 @@ void TitleBar::DropdownUpdated(DropdownList* list, int oldVal)
    mSynthModules.OnSelection(list);
    mAudioModules.OnSelection(list);
    mOtherModules.OnSelection(list);
+   mVstPlugins.OnSelection(list);
 }
 
 void TitleBar::ButtonClicked(ClickButton* button)

@@ -26,6 +26,13 @@
 class ofxJSONElement;
 class NSWindowOverlay;
 
+namespace VSTLookup
+{
+   void GetAvailableVSTs(vector<string>& vsts);
+   void FillVSTList(DropdownList* list);
+   string GetVSTPath(string vstName);
+}
+
 class VSTPlugin : public IAudioProcessor, public INoteReceiver, public IDrawableModule, public IDropdownListener, public IFloatSliderListener, public IIntSliderListener, public IButtonListener
 {
 public:
@@ -33,7 +40,7 @@ public:
    ~VSTPlugin();
    static IDrawableModule* Create() { return new VSTPlugin(); }
    
-   string GetTitleLabel() override { return "vst"; }
+   string GetTitleLabel() override;
    void CreateUIControls() override;
    
    void SetVol(float vol) { mVol = vol; }
@@ -43,6 +50,7 @@ public:
    
    juce::AudioProcessor* GetAudioProcessor() { return mPlugin; }
    
+   void SetVST(string path);
    void OnVSTWindowClosed();
    
    //IAudioSource
@@ -71,7 +79,6 @@ private:
    void GetModuleDimensions(int& width, int& height) override;
    bool Enabled() const override { return mEnabled; }
    
-   void SetVST(string path);
    void CreateParameterSliders();
    
    float mVol;
