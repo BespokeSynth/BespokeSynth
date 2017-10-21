@@ -9,6 +9,7 @@
 #include "PatchCable.h"
 #include "IDrawableModule.h"
 #include "INoteSource.h"
+#include "IAudioReceiver.h"
 #include "IAudioSource.h"
 #include "GridController.h"
 #include "ModularSynth.h"
@@ -21,6 +22,7 @@ PatchCable::PatchCable(PatchCableSource* owner)
 : mHovered(false)
 , mDragging(false)
 , mTarget(nullptr)
+, mAudioReceiverTarget(nullptr)
 {
    mOwner = owner;
    TheSynth->RegisterPatchCable(this);
@@ -31,6 +33,12 @@ PatchCable::~PatchCable()
    if (sActivePatchCable == this)
       sActivePatchCable = nullptr;
    TheSynth->UnregisterPatchCable(this);
+}
+
+void PatchCable::SetTarget(IClickable* target)
+{
+   mTarget = target;
+   mAudioReceiverTarget = dynamic_cast<IAudioReceiver*>(target);
 }
 
 void PatchCable::Render()
@@ -93,12 +101,12 @@ void PatchCable::Render()
             assert(vizBuff);
             int numSamples = vizBuff->Size();
             bool allZero = true;
-            for (int i=0; i<numSamples; ++i)
+            for (int ch=0; ch<vizBuff->NumChannels(); ++ch)
             {
-               if (vizBuff->GetSample(i, 0) != 0)
+               for (int i=0; i<numSamples && allZero; ++i)
                {
-                  allZero = false;
-                  break;
+                  if (vizBuff->GetSample(i, ch) != 0)
+                     allZero = false;
                }
             }
             
@@ -207,10 +215,6 @@ void PatchCable::Render()
          IAudioSource* audioSource = dynamic_cast<IAudioSource*>(mOwner->GetOwner());
          if (audioSource)
          {
-            ofSetLineWidth(plugWidth);
-            ofSetColor(lineColor);
-            ofLine(cable.plug.x,cable.plug.y,cable.end.x,cable.end.y);
-            
             ofSetLineWidth(lineWidth);
             
             RollingBuffer* vizBuff = mOwner->GetOverrideVizBuffer();
@@ -243,6 +247,20 @@ void PatchCable::Render()
                }
                ofVertex(cable.plug.x + offset.x,cable.plug.y + offset.y);
                ofEndShape();
+            }
+            
+            ofSetLineWidth(plugWidth);
+            ofSetColor(lineColor);
+            ofLine(cable.plug.x,cable.plug.y,cable.end.x,cable.end.y);
+            
+            if (vizBuff->NumChannels() > 1 && mAudioReceiverTarget && mAudioReceiverTarget->GetInputMode() == IAudioReceiver::kInputMode_Mono)
+            {
+               //warn that the multichannel audio is being crunched to mono
+               ofFill();
+               ofSetColor(255, 255, 0);
+               ofCircle(cable.plug.x, cable.plug.y, 6);
+               ofSetColor(0, 0, 0);
+               DrawTextBold("!", cable.plug.x-2, cable.plug.y+5,17);
             }
          }
          else

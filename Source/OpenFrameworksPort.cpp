@@ -250,7 +250,7 @@ float ofMap(float val, float fromStart, float fromEnd, float toStart, float toEn
 {
    float ret = ((val - fromStart) / (fromEnd - fromStart)) * (toEnd - toStart) + toStart;
    if (clamp)
-      ret = ofClamp(ret, toStart, toEnd);
+      ret = ofClamp(ret, MIN(toStart,toEnd), MAX(toStart,toEnd));
    return ret;
 }
 

@@ -32,7 +32,7 @@ public:
    void SetPan(float pan) { mPan = pan; }
    
    //IAudioReceiver
-   InputMode GetInputMode() override { return kInputMode_Mono; }
+   InputMode GetInputMode() override { return mMonoInput ? kInputMode_Mono : kInputMode_Multichannel; }
    
    //IAudioSource
    void Process(double time) override;
@@ -58,6 +58,7 @@ private:
    float mWiden;
    FloatSlider* mWidenSlider;
    RollingBuffer mWidenerBuffer;
-   float* mPanBuffer;
+   Checkbox* mMonoCheckbox;
+   bool mMonoInput;
 };
 

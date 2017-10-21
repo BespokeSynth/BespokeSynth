@@ -20,20 +20,20 @@ Panner::Panner()
 , mWiden(0)
 , mWidenSlider(nullptr)
 , mWidenerBuffer(2048)
+, mMonoInput(true)
 {
-   mPanBuffer = new float[gBufferSize];
 }
 
 void Panner::CreateUIControls()
 {
    IDrawableModule::CreateUIControls();
+   mMonoCheckbox = new Checkbox(this,"mono",5,2,&mMonoInput);
    mPanSlider = new FloatSlider(this,"pan",5,20,110,15,&mPan,-1,1);
-   mWidenSlider = new FloatSlider(this,"widen",50,2,65,15,&mWiden,-150,150,0);
+   mWidenSlider = new FloatSlider(this,"widen",55,2,60,15,&mWiden,-150,150,0);
 }
 
 Panner::~Panner()
 {
-   delete[] mPanBuffer;
 }
 
 void Panner::Process(double time)
@@ -42,32 +42,24 @@ void Panner::Process(double time)
    
    if (!mEnabled || GetTarget() == nullptr)
       return;
-   
+ 
    SyncBuffers(2);
+   GetBuffer()->SetNumActiveChannels(2);
+   mWidenerBuffer.SetNumChannels(2);
+   
+   if (mMonoInput)
+      BufferCopy(GetBuffer()->GetChannel(1), GetBuffer()->GetChannel(0), GetBuffer()->BufferSize());
    
    ChannelBuffer* out = GetTarget()->GetBuffer();
    
    if (abs(mWiden) > 0)
    {
-      mWidenerBuffer.WriteChunk(GetBuffer()->GetChannel(0), GetBuffer()->BufferSize(), 0);
-      mWidenerBuffer.ReadChunk(mPanBuffer, GetBuffer()->BufferSize(), abs(mWiden), 0);
-   }
-   else
-   {
-      BufferCopy(mPanBuffer, GetBuffer()->GetChannel(0), GetBuffer()->BufferSize());
-   }
-   
-   float* input1;
-   float* input2;
-   if (mWiden <= 0)
-   {
-      input1 = GetBuffer()->GetChannel(0);
-      input2 = mPanBuffer;
-   }
-   else
-   {
-      input1 = mPanBuffer;
-      input2 = GetBuffer()->GetChannel(0);
+      for (int ch=0; ch<GetBuffer()->NumActiveChannels(); ++ch)
+         mWidenerBuffer.WriteChunk(GetBuffer()->GetChannel(ch), GetBuffer()->BufferSize(), ch);
+      if (mWiden < 0)
+         mWidenerBuffer.ReadChunk(GetBuffer()->GetChannel(1), GetBuffer()->BufferSize(), abs(mWiden), 1);
+      else
+         mWidenerBuffer.ReadChunk(GetBuffer()->GetChannel(0), GetBuffer()->BufferSize(), abs(mWiden), 0);
    }
    
    for (int i=0; i<GetBuffer()->BufferSize(); ++i)
@@ -76,18 +68,19 @@ void Panner::Process(double time)
       mPanRamp.Start(mPan,2);
       float pan = mPanRamp.Value(time);
       
-      input1[i] *= ofClamp(1-pan,0,1);
-      out->GetChannel(0)[i] += input1[i];
+      float left = GetBuffer()->GetChannel(0)[i];
+      float right = GetBuffer()->GetChannel(1)[i];
+      GetBuffer()->GetChannel(0)[i] = left * ofMap(pan, 0, 1, 1, 0, true) + right * ofMap(pan, -1, 0, 1, 0, true);
+      GetBuffer()->GetChannel(1)[i] = right * ofMap(pan, -1, 0, 0, 1, true) + left * ofMap(pan, 0, 1, 0, 1, true);
       
-      input2[i] *= ofClamp(1+pan,0,1);
-      out->GetChannel(1)[i] += input2[i];
-      
+      out->GetChannel(0)[i] += GetBuffer()->GetChannel(0)[i];
+      out->GetChannel(1)[i] += GetBuffer()->GetChannel(1)[i];
       
       time += gInvSampleRateMs;
    }
    
-   GetVizBuffer()->WriteChunk(input1,GetBuffer()->BufferSize(), 0);
-   GetVizBuffer()->WriteChunk(input2,GetBuffer()->BufferSize(), 1);
+   for (int ch=0; ch<GetBuffer()->NumActiveChannels(); ++ch)
+      GetVizBuffer()->WriteChunk(GetBuffer()->GetChannel(ch),GetBuffer()->BufferSize(), ch);
    
    GetBuffer()->Clear();
 }
@@ -97,6 +90,7 @@ void Panner::DrawModule()
    if (Minimized() || IsVisible() == false)
       return;
    
+   mMonoCheckbox->Draw();
    mPanSlider->Draw();
    mWidenSlider->Draw();
 }

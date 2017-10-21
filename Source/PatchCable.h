@@ -13,6 +13,7 @@
 
 class RollingBuffer;
 class PatchCableSource;
+class IAudioReceiver;
 
 struct PatchCablePos
 {
@@ -56,13 +57,14 @@ public:
 protected:
    void OnClicked(int x, int y, bool right) override;
 private:
-   void SetTarget(IClickable* target) { mTarget = target; }
+   void SetTarget(IClickable* target);
    PatchCablePos GetPatchCablePos();
    bool IsOverStart(int x, int y);
    bool IsOverEnd(int x, int y);
    
    PatchCableSource* mOwner;
    IClickable* mTarget;
+   IAudioReceiver* mAudioReceiverTarget;
 
    bool mHovered;
    bool mDragging;
