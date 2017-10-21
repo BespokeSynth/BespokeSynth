@@ -25,7 +25,7 @@ FloatSlider::FloatSlider(IFloatSliderListener* owner, const char* label, int x, 
 , mRefY(-999)
 , mShowDigits(digits)
 , mOwner(owner)
-, mLFOControl(NULL)
+, mLFOControl(nullptr)
 , mRelative(false)
 , mTouching(false)
 , mRelativeOffset(-999)
@@ -35,7 +35,7 @@ FloatSlider::FloatSlider(IFloatSliderListener* owner, const char* label, int x, 
 , mClampIntMin(-999)
 , mMinValueDisplay("")
 , mMaxValueDisplay("")
-, mFloatEntry(NULL)
+, mFloatEntry(nullptr)
 , mShowName(true)
 , mBezierControl(1)
 {
@@ -58,7 +58,7 @@ void FloatSlider::Init()
 
 FloatSliderLFOControl* FloatSlider::AcquireLFO()
 {
-   if (mLFOControl == NULL)
+   if (mLFOControl == nullptr)
    {
       if (GetParent() != TheSynth->GetTopModalFocusItem()) //popups don't get these
          mLFOControl = LFOPool::GetLFO(this);
@@ -192,7 +192,7 @@ void FloatSlider::MouseReleased()
       mTouching = false;
    mMouseDown = false;
    mRefY = -999;
-   if (mRelative && (mLFOControl == NULL || mLFOControl->Active() == false))
+   if (mRelative && (mLFOControl == nullptr || mLFOControl->Active() == false))
       SetValue(0);
 }
 
@@ -237,7 +237,7 @@ void FloatSlider::SetValueForMouse(int x, int y)
    float oldVal = *var;
    float pos = ofMap(fX+mX,mX+1,mX+mWidth-1,0.0f,1.0f);
    *var = PosToVal(pos);
-   if (mRelative && (mLFOControl == NULL || mLFOControl->Active() == false))
+   if (mRelative && (mLFOControl == nullptr || mLFOControl->Active() == false))
    {
       if (!mTouching || mRelativeOffset == -999)
       {
@@ -360,7 +360,7 @@ void FloatSlider::SetValue(float value)
 
 void FloatSlider::UpdateTouching()
 {
-   if (mRelative && (mLFOControl == NULL || mLFOControl->Active() == false))
+   if (mRelative && (mLFOControl == nullptr || mLFOControl->Active() == false))
    {
       if (!mTouching)
          SetValue(0);
@@ -483,7 +483,7 @@ bool FloatSlider::AttemptTextInput()
 void FloatSlider::TextEntryComplete(TextEntry* entry)
 {
    mFloatEntry->Delete();
-   mFloatEntry = NULL;
+   mFloatEntry = nullptr;
    SetValue(mEntryValue);
 }
 
@@ -540,7 +540,7 @@ IntSlider::IntSlider(IIntSliderListener* owner, const char* label, int x, int y,
 , mOwner(owner)
 , mOriginalValue(0)
 , mSliderVal(0)
-, mIntEntry(NULL)
+, mIntEntry(nullptr)
 , mShowName(true)
 {
    assert(owner);
@@ -745,7 +745,7 @@ bool IntSlider::AttemptTextInput()
 void IntSlider::TextEntryComplete(TextEntry* entry)
 {
    mIntEntry->Delete();
-   mIntEntry = NULL;
+   mIntEntry = nullptr;
    SetValue(mEntryValue);
 }
 

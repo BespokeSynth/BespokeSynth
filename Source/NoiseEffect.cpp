@@ -15,8 +15,8 @@ NoiseEffect::NoiseEffect()
 , mWidth(10)
 , mSampleCounter(0)
 , mRandom(0)
-, mAmountSlider(NULL)
-, mWidthSlider(NULL)
+, mAmountSlider(nullptr)
+, mWidthSlider(nullptr)
 {
 }
 

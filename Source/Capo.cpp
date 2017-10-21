@@ -13,7 +13,7 @@
 
 Capo::Capo()
 : mCapo(0)
-, mCapoSlider(NULL)
+, mCapoSlider(nullptr)
 {
 }
 
@@ -38,7 +38,7 @@ void Capo::CheckboxUpdated(Checkbox *checkbox)
       mNoteOutput.Flush();
 }
 
-void Capo::PlayNote(double time, int pitch, int velocity, int voiceIdx /*= -1*/, ModulationChain* pitchBend /*= NULL*/, ModulationChain* modWheel /*= NULL*/, ModulationChain* pressure /*= NULL*/)
+void Capo::PlayNote(double time, int pitch, int velocity, int voiceIdx /*= -1*/, ModulationChain* pitchBend /*= nullptr*/, ModulationChain* modWheel /*= nullptr*/, ModulationChain* pressure /*= nullptr*/)
 {
    if (!mEnabled)
    {

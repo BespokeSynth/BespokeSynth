@@ -15,7 +15,7 @@
 
 MidiInstrument::MidiInstrument()
 : mControllerIndex(-1)
-, mControllerList(NULL)
+, mControllerList(nullptr)
 , mDevice(this)
 , mVelocityMult(1)
 , mUseChannelAsVoice(false)

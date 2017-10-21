@@ -38,7 +38,7 @@ public:
 class AdditiveVoice : public IMidiVoice
 {
 public:
-   AdditiveVoice(IDrawableModule* owner = NULL);
+   AdditiveVoice(IDrawableModule* owner = nullptr);
    ~AdditiveVoice();
    
    // IMidiVoice

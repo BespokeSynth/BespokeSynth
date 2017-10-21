@@ -20,27 +20,27 @@
 SamplerGrid::SamplerGrid()
 : IAudioProcessor(gBufferSize)
 , mPassthrough(true)
-, mPassthroughCheckbox(NULL)
+, mPassthroughCheckbox(nullptr)
 , mRecordingSample(-1)
 , mClearHeld(false)
 , mVolume(1)
-, mVolumeSlider(NULL)
+, mVolumeSlider(nullptr)
 , mCols(0)
 , mRows(0)
-, mGridSamples(NULL)
-, mGridController(NULL)
+, mGridSamples(nullptr)
+, mGridController(nullptr)
 , mEditMode(false)
-, mEditCheckbox(NULL)
+, mEditCheckbox(nullptr)
 , mEditSampleX(100)
 , mEditSampleY(5)
 , mEditSampleWidth(395)
 , mEditSampleHeight(200)
-, mEditSample(NULL)
-, mEditStartSlider(NULL)
-, mEditEndSlider(NULL)
+, mEditSample(nullptr)
+, mEditStartSlider(nullptr)
+, mEditEndSlider(nullptr)
 , mDummyInt(0)
 , mDuplicate(false)
-, mDuplicateCheckbox(NULL)
+, mDuplicateCheckbox(nullptr)
 {
 }
 
@@ -75,7 +75,7 @@ void SamplerGrid::Process(double time)
 {
    Profiler profiler("SamplerGrid");
    
-   if (!mEnabled || GetTarget() == NULL)
+   if (!mEnabled || GetTarget() == nullptr)
       return;
    
    ComputeSliders(0);
@@ -338,7 +338,7 @@ void SamplerGrid::SampleDropped(int x, int y, Sample* sample)
    if (numSamples <= 0)
       return;
    
-   if (mEditSample == NULL)
+   if (mEditSample == nullptr)
       return;
    
    mEditSample->mPlayhead = 0;

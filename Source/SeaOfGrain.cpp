@@ -21,21 +21,21 @@ const float mBufferH = 200;
 
 SeaOfGrain::SeaOfGrain()
 : mVolume(.6f)
-, mVolumeSlider(NULL)
-, mSample(NULL)
+, mVolumeSlider(nullptr)
+, mSample(nullptr)
 , mLoading(false)
-, mEverythingButton(NULL)
-, mFancyButton(NULL)
-, mStarWarsButton(NULL)
-, mGodOnlyKnowsButton(NULL)
+, mEverythingButton(nullptr)
+, mFancyButton(nullptr)
+, mStarWarsButton(nullptr)
+, mGodOnlyKnowsButton(nullptr)
 , mKeyOffset(40)
-, mKeyOffsetSlider(NULL)
+, mKeyOffsetSlider(nullptr)
 , mDisplayKeys(61)
-, mDisplayKeysSlider(NULL)
+, mDisplayKeysSlider(nullptr)
 , mKeyboardBaseNote(36)
-, mKeyboardBaseNoteSelector(NULL)
+, mKeyboardBaseNoteSelector(nullptr)
 , mSliceMode(1)
-, mSliceModeSelector(NULL)
+, mSliceModeSelector(nullptr)
 {
    mWriteBuffer = new float[gBufferSize];
    Clear(mWriteBuffer, gBufferSize);
@@ -84,7 +84,7 @@ void SeaOfGrain::Process(double time)
 {
    Profiler profiler("SeaOfGrain");
    
-   if (!mEnabled || GetTarget() == NULL || mSample == NULL || mLoading)
+   if (!mEnabled || GetTarget() == nullptr || mSample == nullptr || mLoading)
       return;
    
    ComputeSliders(0);
@@ -356,7 +356,7 @@ void SeaOfGrain::IntSliderUpdated(IntSlider* slider, int oldVal)
 {
 }
 
-void SeaOfGrain::PlayNote(double time, int pitch, int velocity, int voiceIdx /*= -1*/, ModulationChain* pitchBend /*= NULL*/, ModulationChain* modWheel /*= NULL*/, ModulationChain* pressure /*= NULL*/)
+void SeaOfGrain::PlayNote(double time, int pitch, int velocity, int voiceIdx /*= -1*/, ModulationChain* pitchBend /*= nullptr*/, ModulationChain* modWheel /*= nullptr*/, ModulationChain* pressure /*= nullptr*/)
 {
    if (voiceIdx == -1 || voiceIdx >= NUM_SEAOFGRAIN_VOICES)
       return;

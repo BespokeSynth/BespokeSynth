@@ -41,10 +41,10 @@ IDrawableModule::IDrawableModule()
 , mMinimizeAreaClicked(false)
 , mMinimizeAnimation(0)
 , mEnabled(true)
-, mEnabledCheckbox(NULL)
+, mEnabledCheckbox(nullptr)
 , mUIControlsCreated(false)
 , mInitialized(false)
-, mMainPatchCableSource(NULL)
+, mMainPatchCableSource(nullptr)
 , mOwningContainer(nullptr)
 , mTitleLabelWidth(0)
 {
@@ -109,7 +109,7 @@ void IDrawableModule::Init()
    {
       RemoveUIControl(mEnabledCheckbox);
       mEnabledCheckbox->Delete();
-      mEnabledCheckbox = NULL;
+      mEnabledCheckbox = nullptr;
    }
    
    for (int i=0; i<mUIControls.size(); ++i)
@@ -300,7 +300,7 @@ void IDrawableModule::Render()
    
    ofFill();
    
-   if (TheSynth->ShouldAccentuateActiveModules() && GetParent() == NULL)
+   if (TheSynth->ShouldAccentuateActiveModules() && GetParent() == nullptr)
    {
       ofSetColor(0,0,0,ofMap(highlight,0,.1f,200,0,K(clamp)));
       ofRect(0,-titleBarHeight,w,h+titleBarHeight);
@@ -396,7 +396,7 @@ void IDrawableModule::SetTarget(IClickable* target)
 
 void IDrawableModule::SetUpPatchCables(string targets)
 {
-   assert(mMainPatchCableSource != NULL);
+   assert(mMainPatchCableSource != nullptr);
    vector<string> targetVec = ofSplitString(targets, ",");
    if (targetVec.empty() || targets == "")
    {
@@ -466,7 +466,7 @@ void IDrawableModule::OnClicked(int x, int y, bool right)
                x > w - 10)
       {
          if (TheSaveDataPanel->GetModule() == this)
-            TheSaveDataPanel->SetModule(NULL);
+            TheSaveDataPanel->SetModule(nullptr);
          else
             TheSaveDataPanel->SetModule(this);
       }
@@ -535,7 +535,7 @@ IUIControl* IDrawableModule::FindUIControl(const char* name) const
       }
    }
    throw UnknownUIControlException();
-   return NULL;
+   return nullptr;
 }
 
 IDrawableModule* IDrawableModule::FindChild(const char* name) const
@@ -546,7 +546,7 @@ IDrawableModule* IDrawableModule::FindChild(const char* name) const
          return mChildren[i];
    }
    throw UnknownModuleException(name);
-   return NULL;
+   return nullptr;
 }
 
 void IDrawableModule::AddChild(IDrawableModule* child)
@@ -561,7 +561,7 @@ void IDrawableModule::AddChild(IDrawableModule* child)
 
 void IDrawableModule::RemoveChild(IDrawableModule* child)
 {
-   child->SetParent(NULL);
+   child->SetParent(nullptr);
    RemoveFromVector(child, mChildren);
 }
 
@@ -628,9 +628,9 @@ void IDrawableModule::AddUIControl(IUIControl* control)
       if (CanSaveState() && name.empty() == false)
       {
          IUIControl* dupe = FindUIControl(name.c_str());
-         if (dupe != NULL)
+         if (dupe != nullptr)
          {
-            if (dynamic_cast<ClickButton*>(control) != NULL && dynamic_cast<ClickButton*>(dupe) != NULL)
+            if (dynamic_cast<ClickButton*>(control) != nullptr && dynamic_cast<ClickButton*>(dupe) != nullptr)
             {
                //they're both just buttons, this is fine
             }
@@ -787,7 +787,7 @@ void IDrawableModule::ToggleMinimized()
    if (mMinimized)
    {
       if (TheSaveDataPanel->GetModule() == this)
-         TheSaveDataPanel->SetModule(NULL);
+         TheSaveDataPanel->SetModule(nullptr);
    }
 }
 

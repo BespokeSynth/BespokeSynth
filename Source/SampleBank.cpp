@@ -12,7 +12,7 @@
 #include "ModularSynth.h"
 
 SampleBank::SampleBank()
-: mSamplesDropdown(NULL)
+: mSamplesDropdown(nullptr)
 , mSampleIdx(-1)
 {
 }

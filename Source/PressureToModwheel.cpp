@@ -24,11 +24,11 @@ void PressureToModwheel::DrawModule()
       return;
 }
 
-void PressureToModwheel::PlayNote(double time, int pitch, int velocity, int voiceIdx /*= -1*/, ModulationChain* pitchBend /*= NULL*/, ModulationChain* modWheel /*= NULL*/, ModulationChain* pressure /*= NULL*/)
+void PressureToModwheel::PlayNote(double time, int pitch, int velocity, int voiceIdx /*= -1*/, ModulationChain* pitchBend /*= nullptr*/, ModulationChain* modWheel /*= nullptr*/, ModulationChain* pressure /*= nullptr*/)
 {
    if (mEnabled)
    {
-      PlayNoteOutput(time, pitch, velocity, voiceIdx, pitchBend, pressure, NULL);
+      PlayNoteOutput(time, pitch, velocity, voiceIdx, pitchBend, pressure, nullptr);
    }
    else
    {

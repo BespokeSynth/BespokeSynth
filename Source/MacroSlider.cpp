@@ -14,7 +14,7 @@
 #include "Transport.h"
 
 MacroSlider::MacroSlider()
-: mSlider(NULL)
+: mSlider(nullptr)
 , mValue(0)
 {
    TheTransport->AddAudioPoller(this);
@@ -131,7 +131,7 @@ void MacroSlider::SetUpFromSaveData()
    
    for (int i=0; i<mMappings.size(); ++i)
    {
-      if (mMappings[i] == NULL)
+      if (mMappings[i] == nullptr)
       {
          Mapping* mapping = new Mapping(this, i);
          mapping->CreateUIControls();
@@ -150,8 +150,8 @@ void MacroSlider::PostLoadState()
 MacroSlider::Mapping::Mapping(MacroSlider* owner, int index)
 : mStart(0)
 , mEnd(1)
-, mCableSource(NULL)
-, mControl(NULL)
+, mCableSource(nullptr)
+, mControl(nullptr)
 , mOwner(owner)
 , mIndex(index)
 {

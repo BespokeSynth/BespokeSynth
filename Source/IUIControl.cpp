@@ -15,9 +15,9 @@
 IUIControl::~IUIControl()
 {
    if (gHoveredUIControl == this)
-      gHoveredUIControl = NULL;
+      gHoveredUIControl = nullptr;
    if (gBindToUIControl == this)
-      gBindToUIControl = NULL;
+      gBindToUIControl = nullptr;
 }
 
 bool IUIControl::IsPreset()

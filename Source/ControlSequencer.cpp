@@ -13,13 +13,13 @@
 list<ControlSequencer*> ControlSequencer::sControlSequencers;
 
 ControlSequencer::ControlSequencer()
-: mGrid(NULL)
-, mUIControl(NULL)
+: mGrid(nullptr)
+, mUIControl(nullptr)
 , mInterval(kInterval_16n)
-, mIntervalSelector(NULL)
+, mIntervalSelector(nullptr)
 , mLength(4)
-, mLengthSelector(NULL)
-, mControlCable(NULL)
+, mLengthSelector(nullptr)
+, mControlCable(nullptr)
 {
    TheTransport->AddListener(this, mInterval);
    
@@ -189,7 +189,7 @@ void ControlSequencer::PostRepatch(PatchCableSource* cableSource)
    if (mControlCable->GetPatchCables().empty() == false)
       mUIControl = dynamic_cast<IUIControl*>(mControlCable->GetPatchCables()[0]->GetTarget());
    else
-      mUIControl = NULL;
+      mUIControl = nullptr;
    if (mUIControl)
    {
       for (int i=0; i<mGrid->GetCols(); ++i)
@@ -272,7 +272,7 @@ void ControlSequencer::SetUpFromSaveData()
    }
    else
    {
-      mUIControl = NULL;
+      mUIControl = nullptr;
    }
    SetGridSize(mModuleSaveData.GetFloat("gridwidth"), mModuleSaveData.GetFloat("gridheight"));
 }

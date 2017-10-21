@@ -16,12 +16,12 @@ RingModulator::RingModulator()
 : IAudioProcessor(gBufferSize)
 , mDryWet(1)
 , mVolume(1)
-, mDryWetSlider(NULL)
-, mVolumeSlider(NULL)
+, mDryWetSlider(nullptr)
+, mVolumeSlider(nullptr)
 , mPhase(0)
 , mModOsc(kOsc_Sin)
 , mGlideTime(0)
-, mGlideSlider(NULL)
+, mGlideSlider(nullptr)
 , mDryBuffer(gBufferSize)
 {
    mModOsc.Start(gTime, 1);
@@ -44,7 +44,7 @@ void RingModulator::Process(double time)
 {
    Profiler profiler("RingModulator");
 
-   if (GetTarget() == NULL)
+   if (GetTarget() == nullptr)
       return;
    
    SyncBuffers();
@@ -99,7 +99,7 @@ void RingModulator::DrawModule()
    mGlideSlider->Draw();
 }
 
-void RingModulator::PlayNote(double time, int pitch, int velocity, int voiceIdx /*= -1*/, ModulationChain* pitchBend /*= NULL*/, ModulationChain* modWheel /*= NULL*/, ModulationChain* pressure /*= NULL*/)
+void RingModulator::PlayNote(double time, int pitch, int velocity, int voiceIdx /*= -1*/, ModulationChain* pitchBend /*= nullptr*/, ModulationChain* modWheel /*= nullptr*/, ModulationChain* pressure /*= nullptr*/)
 {
    if (velocity > 0)
    {

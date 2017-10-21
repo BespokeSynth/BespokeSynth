@@ -26,7 +26,7 @@ public:
    FreeverbOutput();
    ~FreeverbOutput();
    static IDrawableModule* Create() { return new FreeverbOutput(); }
-   static bool CanCreate() { return TheFreeverbOutput == NULL; }
+   static bool CanCreate() { return TheFreeverbOutput == nullptr; }
    
    string GetTitleLabel() override { return "freeverb output"; }
    void CreateUIControls() override;

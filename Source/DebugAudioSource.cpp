@@ -23,7 +23,7 @@ void DebugAudioSource::Process(double time)
 {
    Profiler profiler("DebugAudioSource");
    
-   if (!mEnabled || GetTarget() == NULL)
+   if (!mEnabled || GetTarget() == nullptr)
       return;
    
    int bufferSize = GetTarget()->GetBuffer()->BufferSize();

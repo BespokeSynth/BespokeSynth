@@ -21,50 +21,50 @@ const float mRemixBufferY = mBufferY+mBufferH+60;
 
 BeatBloks::BeatBloks()
 : mVolume(.6f)
-, mVolumeSlider(NULL)
-, mSample(NULL)
+, mVolumeSlider(nullptr)
+, mSample(nullptr)
 , mPlay(false)
-, mPlayCheckbox(NULL)
+, mPlayCheckbox(nullptr)
 , mLoop(true)
-, mLoopCheckbox(NULL)
+, mLoopCheckbox(nullptr)
 , mMeasureEarly(0)
 , mClipStart(0)
-, mClipStartSlider(NULL)
+, mClipStartSlider(nullptr)
 , mClipEnd(1)
-, mClipEndSlider(NULL)
+, mClipEndSlider(nullptr)
 , mZoomStart(0)
-, mZoomStartSlider(NULL)
+, mZoomStartSlider(nullptr)
 , mZoomEnd(1)
-, mZoomEndSlider(NULL)
+, mZoomEndSlider(nullptr)
 , mNumBars(1)
-, mNumBarsSlider(NULL)
+, mNumBarsSlider(nullptr)
 , mOffset(0)
-, mOffsetSlider(NULL)
-, mWriteButton(NULL)
+, mOffsetSlider(nullptr)
+, mWriteButton(nullptr)
 , mPlayheadRemainder(0)
 , mPlayheadWhole(0)
 , mWantWrite(false)
-, mDoubleLengthButton(NULL)
-, mHalveLengthButton(NULL)
+, mDoubleLengthButton(nullptr)
+, mHalveLengthButton(nullptr)
 , mDrawBlokType(kBlok_Bar)
-, mDrawBlokTypeDropdown(NULL)
+, mDrawBlokTypeDropdown(nullptr)
 , mLoading(false)
-, mHeldBlok(NULL)
+, mHeldBlok(nullptr)
 , mRemixPlayhead(0)
 , mPlayRemix(false)
-, mPlayRemixCheckbox(NULL)
-, mLastPlayedRemixBlok(NULL)
-, mLastLookupPlayhead(NULL)
-, mClearRemixButton(NULL)
+, mPlayRemixCheckbox(nullptr)
+, mLastPlayedRemixBlok(nullptr)
+, mLastLookupPlayhead(0)
+, mClearRemixButton(nullptr)
 , mDrawSources(false)
-, mDrawSourcesCheckbox(NULL)
+, mDrawSourcesCheckbox(nullptr)
 , mRemixZoomStart(0)
-, mRemixZoomStartSlider(NULL)
+, mRemixZoomStartSlider(nullptr)
 , mRemixZoomEnd(gSampleRate*25)
-, mRemixZoomEndSlider(NULL)
+, mRemixZoomEndSlider(nullptr)
 , mBlockMultiPlaceEngaged(false)
-, mGetLuckyButton(NULL)
-, mLoseYourselfButton(NULL)
+, mGetLuckyButton(nullptr)
+, mLoseYourselfButton(nullptr)
 , mLastRemovedRemixBlokIdx(-1)
 {
    mWriteBuffer = new float[gBufferSize];
@@ -117,7 +117,7 @@ void BeatBloks::Poll()
 {
    if (mBlockMultiPlaceEngaged && !IsKeyHeld('z'))
    {
-      mHeldBlok = NULL;
+      mHeldBlok = nullptr;
    }
 }
 
@@ -125,7 +125,7 @@ void BeatBloks::Process(double time)
 {
    Profiler profiler("BeatBloks");
 
-   if (!mEnabled || GetTarget() == NULL || mSample == NULL || mLoading)
+   if (!mEnabled || GetTarget() == nullptr || mSample == nullptr || mLoading)
       return;
    
    ComputeSliders(0);
@@ -223,7 +223,7 @@ void BeatBloks::Process(double time)
       for (int i=0; i<bufferSize; ++i)
       {
          float remixPlayheadLeft = mRemixPlayhead;
-         Blok* currentBlok = NULL;
+         Blok* currentBlok = nullptr;
          for (auto iter=mRemixBloks.begin(); iter!=mRemixBloks.end(); ++iter)
          {
             if (remixPlayheadLeft < (*iter)->mDuration * numSamples)
@@ -235,7 +235,7 @@ void BeatBloks::Process(double time)
             remixPlayheadLeft -= (*iter)->mDuration * numSamples;
          }
          
-         if (currentBlok == NULL)
+         if (currentBlok == nullptr)
          {
             out[i] = 0;
             mPlayRemix = false;
@@ -555,7 +555,7 @@ void BeatBloks::OnClicked(int x, int y, bool right)
          if (IsKeyHeld('s'))
          {
             mRemixBloks.push_back(mHeldBlok);
-            mHeldBlok = NULL;
+            mHeldBlok = nullptr;
          }
          else
          {
@@ -578,7 +578,7 @@ void BeatBloks::OnClicked(int x, int y, bool right)
       {
          PlaceHeldBlok();
          if (!IsKeyHeld('z'))
-            mHeldBlok = NULL;
+            mHeldBlok = nullptr;
       }
       else if (IsKeyHeld('a'))
       {
@@ -601,7 +601,7 @@ void BeatBloks::OnClicked(int x, int y, bool right)
    }
    else
    {
-      mHeldBlok = NULL;
+      mHeldBlok = nullptr;
    }
 }
 
@@ -642,7 +642,7 @@ void BeatBloks::MouseReleased()
    if (IsKeyHeld('z'))
       mBlockMultiPlaceEngaged = true;
    else
-      mHeldBlok = NULL;
+      mHeldBlok = nullptr;
 }
 
 bool BeatBloks::MouseMoved(float x, float y)
@@ -934,7 +934,7 @@ BeatBloks::Blok* BeatBloks::RemoveBlokAt(int x)
       
       pos += width;
    }
-   return NULL;
+   return nullptr;
 }
 
 void BeatBloks::CheckboxUpdated(Checkbox *checkbox)
@@ -992,7 +992,7 @@ void BeatBloks::IntSliderUpdated(IntSlider* slider, int oldVal)
 {
 }
 
-void BeatBloks::PlayNote(double time, int pitch, int velocity, int voiceIdx /*= -1*/, ModulationChain* pitchBend /*= NULL*/, ModulationChain* modWheel /*= NULL*/, ModulationChain* pressure /*= NULL*/)
+void BeatBloks::PlayNote(double time, int pitch, int velocity, int voiceIdx /*= -1*/, ModulationChain* pitchBend /*= nullptr*/, ModulationChain* modWheel /*= nullptr*/, ModulationChain* pressure /*= nullptr*/)
 {
    if (mSample)
    {

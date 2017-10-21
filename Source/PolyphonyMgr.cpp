@@ -79,7 +79,7 @@ void PolyphonyMgr::Init(VoiceType type, IVoiceParams* params)
    }
 }
 
-void PolyphonyMgr::Start(double time, int pitch, float amount, int voiceIdx /*= -1*/, ModulationChain* pitchBend /*= NULL*/, ModulationChain* modWheel /*= NULL*/, ModulationChain* pressure /*= NULL*/)
+void PolyphonyMgr::Start(double time, int pitch, float amount, int voiceIdx /*= -1*/, ModulationChain* pitchBend /*= nullptr*/, ModulationChain* modWheel /*= nullptr*/, ModulationChain* pressure /*= nullptr*/)
 {
    assert(voiceIdx < kNumVoices);
    

@@ -22,8 +22,8 @@ namespace
 
 MidiOutputModule::MidiOutputModule()
 : mControllerIndex(-1)
-, mControllerList(NULL)
-, mDevice(NULL)
+, mControllerList(nullptr)
+, mDevice(nullptr)
 , mChannel(1)
 , mPitchBendRange(2)
 , mModwheelCC(1)  //or 74 in Multidimensional Polyphonic Expression (MPE) spec
@@ -84,7 +84,7 @@ void MidiOutputModule::BuildControllerList()
       mControllerList->AddLabel(devices[i].c_str(), i);
 }
 
-void MidiOutputModule::PlayNote(double time, int pitch, int velocity, int voiceIdx /*= -1*/, ModulationChain* pitchBend /*= NULL*/, ModulationChain* modWheel /*= NULL*/, ModulationChain* pressure /*= NULL*/)
+void MidiOutputModule::PlayNote(double time, int pitch, int velocity, int voiceIdx /*= -1*/, ModulationChain* pitchBend /*= nullptr*/, ModulationChain* modWheel /*= nullptr*/, ModulationChain* pressure /*= nullptr*/)
 {
    int channel = voiceIdx + 1;
    if (voiceIdx == -1)

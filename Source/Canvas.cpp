@@ -19,19 +19,19 @@ Canvas::Canvas(IDrawableModule* parent, int x, int y, int w, int h, float length
 , mLength(length)
 , mNumRows(rows)
 , mNumCols(cols)
-, mListener(NULL)
+, mListener(nullptr)
 , mStart(0)
 , mEnd(length)
 , mCursorPos(-1)
 , mElementCreator(elementCreator)
-, mClickedElement(NULL)
+, mClickedElement(nullptr)
 , mNumVisibleRows(rows)
 , mRowOffset(0)
 , mScrolling(false)
 , mWrap(true)
 , mDragSelecting(false)
 , mHighlightEnd(kHighlightEnd_None)
-, mHighlightEndElement(NULL)
+, mHighlightEndElement(nullptr)
 , mDragEnd(kHighlightEnd_None)
 , mMajorColumnInterval(-1)
 , mHasDuplicatedThisDrag(false)
@@ -168,7 +168,7 @@ void Canvas::SelectElement(CanvasElement* element)
 void Canvas::SelectElements(vector<CanvasElement*> elements)
 {
    bool commandHeld = GetKeyModifiers() == kModifier_Command;
-   mControls->SetElement(elements.empty() ? NULL : elements[0]);
+   mControls->SetElement(elements.empty() ? nullptr : elements[0]);
    
    for (int i=0; i<mElements.size(); ++i)
    {
@@ -279,7 +279,7 @@ void Canvas::OnClicked(int x, int y, bool right)
       }
       if (clickedElement == false)
       {
-         SelectElement(NULL);
+         SelectElement(nullptr);
          
          if (GetKeyModifiers() == kModifier_Shift)
          {
@@ -407,7 +407,7 @@ bool Canvas::MouseMoved(float x, float y)
          }
       }
       mHighlightEnd = kHighlightEnd_None;
-      mHighlightEndElement = NULL;
+      mHighlightEndElement = nullptr;
       for (auto* element : mElements)
       {
          if (element->GetHighlighted())
@@ -449,7 +449,7 @@ bool Canvas::MouseMoved(float x, float y)
 void Canvas::MouseReleased()
 {
    mClick = false;
-   mClickedElement = NULL;
+   mClickedElement = nullptr;
    mScrolling = false;
    mDragEnd = kHighlightEnd_None;
    
@@ -471,11 +471,11 @@ void Canvas::MouseReleased()
 
 void Canvas::KeyPressed(int key, bool isRepeat)
 {
-   if (TheSynth->GetLastClickedModule() == GetParent() && gHoveredUIControl == NULL)
+   if (TheSynth->GetLastClickedModule() == GetParent() && gHoveredUIControl == nullptr)
    {
       if (key == OF_KEY_BACKSPACE)
       {
-         mControls->SetElement(NULL);
+         mControls->SetElement(nullptr);
          
          vector<CanvasElement*> toRemove;
          for (auto element : mElements)
@@ -546,7 +546,7 @@ CanvasElement* Canvas::GetElementAt(float pos, int row)
       else if (mWrap && pos >= mElements[i]->GetStart() - mLength && pos < mElements[i]->GetEnd() - mLength)
          return mElements[i];
    }
-   return NULL;
+   return nullptr;
 }
 
 void Canvas::ElementMask::SetBit(bool on, int bit)

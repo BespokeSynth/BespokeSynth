@@ -30,7 +30,7 @@ public:
    void CreateUIControls() override;
 
    void SetPan(float pan) { mPan = pan; }
-   IAudioReceiver* GetTarget2() override { return mPatchCableSource2 ? mPatchCableSource2->GetAudioReceiver() : NULL; }
+   IAudioReceiver* GetTarget2() override { return mPatchCableSource2 ? mPatchCableSource2->GetAudioReceiver() : nullptr; }
    
    //IAudioSource
    void Process(double time) override;

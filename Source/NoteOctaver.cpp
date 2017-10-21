@@ -13,7 +13,7 @@
 
 NoteOctaver::NoteOctaver()
 : mOctave(0)
-, mOctaveSlider(NULL)
+, mOctaveSlider(nullptr)
 {
 }
 
@@ -38,7 +38,7 @@ void NoteOctaver::CheckboxUpdated(Checkbox *checkbox)
       mNoteOutput.Flush();
 }
 
-void NoteOctaver::PlayNote(double time, int pitch, int velocity, int voiceIdx /*= -1*/, ModulationChain* pitchBend /*= NULL*/, ModulationChain* modWheel /*= NULL*/, ModulationChain* pressure /*= NULL*/)
+void NoteOctaver::PlayNote(double time, int pitch, int velocity, int voiceIdx /*= -1*/, ModulationChain* pitchBend /*= nullptr*/, ModulationChain* modWheel /*= nullptr*/, ModulationChain* pressure /*= nullptr*/)
 {
    if (!mEnabled)
    {

@@ -14,7 +14,7 @@
 
 MidiDevice::MidiDevice(MidiDeviceListener* listener)
    : mListener(listener)
-   , mMidiOut(NULL)
+   , mMidiOut(nullptr)
    , mOutputChannel(1)
 {
    mDeviceNameIn[0] = 0;

@@ -17,12 +17,12 @@
 
 OneShotLauncher::OneShotLauncher()
 : mVolume(1)
-, mVolumeSlider(NULL)
+, mVolumeSlider(nullptr)
 , mSampleIndex(-1)
-, mSampleList(NULL)
-, mBank(NULL)
+, mSampleList(nullptr)
+, mBank(nullptr)
 , mNumActive(0)
-, mAddBeatButton(NULL)
+, mAddBeatButton(nullptr)
 {
    mWriteBuffer = new float[gBufferSize];
    Clear(mWriteBuffer, gBufferSize);
@@ -53,7 +53,7 @@ void OneShotLauncher::Process(double time)
 {
    /*Profiler profiler("OneShotLauncher");
    
-   if (!mEnabled || GetTarget() == NULL)
+   if (!mEnabled || GetTarget() == nullptr)
       return;
    
    ComputeSliders(0);
@@ -92,7 +92,7 @@ void OneShotLauncher::SetSampleBank(SampleBank* bank)
 
 void OneShotLauncher::UpdateSampleList()
 {
-   if (mBank == NULL)
+   if (mBank == nullptr)
       return;
    
    mSampleList->Clear();

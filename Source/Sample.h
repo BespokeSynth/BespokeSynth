@@ -23,7 +23,7 @@ public:
    Sample();
    ~Sample();
    bool Read(const char* path);
-   bool Write(const char* path = NULL);   //no path = use read filename
+   bool Write(const char* path = nullptr);   //no path = use read filename
    bool ConsumeData(float* data, int size, bool replace);
    void Play(float rate = 1, int offset=0, int stopPoint=-1);
    void SetRate(float rate) { mRate = rate; }

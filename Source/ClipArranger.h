@@ -63,7 +63,7 @@ private:
    {
    public:
       Clip()
-      : mSample(NULL)
+      : mSample(nullptr)
       {
       }
       

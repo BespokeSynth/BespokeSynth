@@ -24,36 +24,36 @@ LooperRecorder::LooperRecorder()
 , mRecordBuffer(MAX_BUFFER_SIZE)
 , mDrawDebug(false)
 , mNumBars(1)
-, mNumBarsSelector(NULL)
-, mDebugCheckbox(NULL)
+, mNumBarsSelector(nullptr)
+, mDebugCheckbox(nullptr)
 , mSpeed(1.0f)
 , mBaseTempo(120)
-, mResampAndSetButton(NULL)
-, mResampleButton(NULL)
-, mMergeSource(NULL)
-, mSwapSource(NULL)
-, mCopySource(NULL)
+, mResampAndSetButton(nullptr)
+, mResampleButton(nullptr)
+, mMergeSource(nullptr)
+, mSwapSource(nullptr)
+, mCopySource(nullptr)
 , mCommitCount(0)
-, mDoubleTempoButton(NULL)
-, mHalfTempoButton(NULL)
-, mShiftMeasureButton(NULL)
-, mHalfShiftButton(NULL)
-, mShiftDownbeatButton(NULL)
-, mClearOverdubButton(NULL)
+, mDoubleTempoButton(nullptr)
+, mHalfTempoButton(nullptr)
+, mShiftMeasureButton(nullptr)
+, mHalfShiftButton(nullptr)
+, mShiftDownbeatButton(nullptr)
+, mClearOverdubButton(nullptr)
 , mUnquietInputTime(-1)
-, mOrigSpeedButton(NULL)
-, mSnapPitchButton(NULL)
-, mHeadphonesTarget(NULL)
-, mOutputTarget(NULL)
+, mOrigSpeedButton(nullptr)
+, mSnapPitchButton(nullptr)
+, mHeadphonesTarget(nullptr)
+, mOutputTarget(nullptr)
 , mCommitDelay(0)
-, mCommitDelaySlider(NULL)
+, mCommitDelaySlider(nullptr)
 , mFreeRecording(false)
-, mFreeRecordingCheckbox(NULL)
+, mFreeRecordingCheckbox(nullptr)
 , mStartFreeRecordTime(0)
-, mCancelFreeRecordButton(NULL)
-, mCommitToLooper(NULL)
+, mCancelFreeRecordButton(nullptr)
+, mCommitToLooper(nullptr)
 , mRecorderMode(kRecorderMode_Record)
-, mModeSelector(NULL)
+, mModeSelector(nullptr)
 , mWriteBuffer(gBufferSize)
 {
    mQuietInputRamp.SetValue(1);
@@ -123,7 +123,7 @@ void LooperRecorder::Process(double time)
 {
    Profiler profiler("LooperRecorder");
 
-   if (!mEnabled || GetTarget() == NULL)
+   if (!mEnabled || GetTarget() == nullptr)
       return;
 
    ComputeSliders(0);
@@ -140,7 +140,7 @@ void LooperRecorder::Process(double time)
       mRecorderMode = kRecorderMode_Record;
       mQuietInputRamp.Start(0, 10);
       mUnquietInputTime = gTime + 1000; //no input for 1 second
-      mCommitToLooper = NULL;
+      mCommitToLooper = nullptr;
    }
    
    if (mUnquietInputTime != -1 && time >= mUnquietInputTime)
@@ -213,7 +213,7 @@ void LooperRecorder::SyncCablesToLoopers()
 {
    int numLoopers = MAX(4, mLoopers.size());
    
-   if (!mLoopers.empty() && mLoopers[mLoopers.size()-1] != NULL)
+   if (!mLoopers.empty() && mLoopers[mLoopers.size()-1] != nullptr)
       ++numLoopers; //add an extra cable for an additional looper
    
    numLoopers = MIN(9, numLoopers);
@@ -233,7 +233,7 @@ void LooperRecorder::SyncCablesToLoopers()
       {
          mLooperPatchCables[i] = new PatchCableSource(this, kConnectionType_Special);
          mLooperPatchCables[i]->AddTypeFilter("looper");
-         Looper* looper = NULL;
+         Looper* looper = nullptr;
          if (i < mLoopers.size())
             looper = mLoopers[i];
          mLooperPatchCables[i]->SetTarget(looper);
@@ -255,11 +255,11 @@ void LooperRecorder::PreRepatch(PatchCableSource* cableSource)
    {
       if (cableSource == mLooperPatchCables[i])
       {
-         Looper* looper = NULL;
+         Looper* looper = nullptr;
          if (i < mLoopers.size())
             looper = mLoopers[i];
          if (looper)
-            looper->SetRecorder(NULL);
+            looper->SetRecorder(nullptr);
       }
    }
 }
@@ -340,7 +340,7 @@ void LooperRecorder::RemoveLooper(Looper* looper)
    for (int i=0; i<mLoopers.size(); ++i)
    {
       if (mLoopers[i] == looper)
-         mLoopers[i] = NULL;
+         mLoopers[i] = nullptr;
    }
 }
 
@@ -441,52 +441,52 @@ void LooperRecorder::Commit(Looper* looper)
 
 void LooperRecorder::RequestMerge(Looper* looper)
 {
-   if (mMergeSource == NULL)
+   if (mMergeSource == nullptr)
    {
       mMergeSource = looper;
    }
    else if (mMergeSource == looper)
    {
-      mMergeSource = NULL;
+      mMergeSource = nullptr;
    }
    else
    {
       looper->MergeIn(mMergeSource);
-      mMergeSource = NULL;
+      mMergeSource = nullptr;
    }
 }
 
 void LooperRecorder::RequestSwap(Looper *looper)
 {
-   if (mSwapSource == NULL)
+   if (mSwapSource == nullptr)
    {
       mSwapSource = looper;
    }
    else if (mSwapSource == looper)
    {
-      mSwapSource = NULL;
+      mSwapSource = nullptr;
    }
    else
    {
       looper->SwapBuffers(mSwapSource);
-      mSwapSource = NULL;
+      mSwapSource = nullptr;
    }
 }
 
 void LooperRecorder::RequestCopy(Looper *looper)
 {
-   if (mCopySource == NULL)
+   if (mCopySource == nullptr)
    {
       mCopySource = looper;
    }
    else if (mCopySource == looper)
    {
-      mCopySource = NULL;
+      mCopySource = nullptr;
    }
    else
    {
       looper->CopyBuffer(mCopySource);
-      mCopySource = NULL;
+      mCopySource = nullptr;
    }
 }
 

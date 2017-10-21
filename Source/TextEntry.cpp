@@ -12,29 +12,29 @@
 #include "IDrawableModule.h"
 #include "FileStream.h"
 
-TextEntry* TextEntry::sCurrentTextEntry = NULL;
+TextEntry* TextEntry::sCurrentTextEntry = nullptr;
 
 //static
 void TextEntry::ClearActiveTextEntry(bool acceptEntry)
 {
    if (sCurrentTextEntry && acceptEntry)
       sCurrentTextEntry->AcceptEntry();
-   sCurrentTextEntry = NULL;
+   sCurrentTextEntry = nullptr;
 }
 
 TextEntry::TextEntry(ITextEntryListener* owner, const char* name, int x, int y, int charWidth, char* var)
 : mVarString(var)
-, mVarInt(NULL)
-, mVarFloat(NULL)
+, mVarInt(nullptr)
+, mVarFloat(nullptr)
 , mType(kTextEntry_Text)
 {
    Construct(owner, name, x, y, charWidth);
 }
 
 TextEntry::TextEntry(ITextEntryListener* owner, const char* name, int x, int y, int charWidth, int* var, int min, int max)
-: mVarString(NULL)
+: mVarString(nullptr)
 , mVarInt(var)
-, mVarFloat(NULL)
+, mVarFloat(nullptr)
 , mType(kTextEntry_Int)
 , mIntMin(min)
 , mIntMax(max)
@@ -43,8 +43,8 @@ TextEntry::TextEntry(ITextEntryListener* owner, const char* name, int x, int y, 
 }
 
 TextEntry::TextEntry(ITextEntryListener* owner, const char* name, int x, int y, int charWidth, float* var, float min, float max)
-: mVarString(NULL)
-, mVarInt(NULL)
+: mVarString(nullptr)
+, mVarInt(nullptr)
 , mVarFloat(var)
 , mType(kTextEntry_Float)
 , mFloatMin(min)
@@ -59,8 +59,8 @@ void TextEntry::Construct(ITextEntryListener* owner, const char* name, int x, in
    mListener = owner;
    mCaretBlink = true;
    mCaretBlinkTimer = 0;
-   mNextTextEntry = NULL;
-   mPreviousTextEntry = NULL;
+   mNextTextEntry = nullptr;
+   mPreviousTextEntry = nullptr;
    mInErrorMode = false;
    mFlexibleWidth = false;
    

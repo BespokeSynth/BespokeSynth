@@ -29,7 +29,7 @@
 #include "ADSRDisplay.h"
 #include "../JuceLibraryCode/JuceHeader.h"
 
-ModularSynth* TheSynth = NULL;
+ModularSynth* TheSynth = nullptr;
 
 #define RECORDING_LENGTH (gSampleRate*60*30) //30 minutes of recording
 
@@ -39,24 +39,24 @@ void AtExit()
 }
 
 ModularSynth::ModularSynth()
-: mMoveModule(NULL)
+: mMoveModule(nullptr)
 , mOutputBuffer(RECORDING_LENGTH)
 , mAudioPaused(false)
 , mClickStartX(INT_MAX)
 , mClickStartY(INT_MAX)
-, mHeldSample(NULL)
-, mConsoleListener(NULL)
+, mHeldSample(nullptr)
+, mConsoleListener(nullptr)
 , mLastClickedModule(nullptr)
 , mInitialized(false)
 , mRecordingLength(0)
 , mGroupSelectContext(nullptr)
-, mResizeModule(NULL)
+, mResizeModule(nullptr)
 , mShowLoadStatePopup(false)
 , mHasDuplicatedDuringDrag(false)
 , mFrameRate(0)
 {
    mConsoleText[0] = 0;
-   assert(TheSynth == NULL);
+   assert(TheSynth == nullptr);
    TheSynth = this;
    
    mSaveOutputBuffer[0] = new float[RECORDING_LENGTH];
@@ -72,7 +72,7 @@ ModularSynth::~ModularSynth()
    SetMemoryTrackingEnabled(false); //avoid crashes when the tracking lists themselves are deleted
    
    assert(TheSynth == this);
-   TheSynth = NULL;
+   TheSynth = nullptr;
 }
 
 bool ModularSynth::IsReady()
@@ -168,11 +168,11 @@ void ModularSynth::DeleteAllModules()
    mDeletedModules.clear();
    
    delete TheScale;
-   TheScale = NULL;
+   TheScale = nullptr;
    delete TheTransport;
-   TheTransport = NULL;
+   TheTransport = nullptr;
    delete mConsoleListener;
-   mConsoleListener = NULL;
+   mConsoleListener = nullptr;
 }
 
 bool SortPointsByY(ofVec2f a, ofVec2f b)
@@ -376,7 +376,7 @@ IDrawableModule* ModularSynth::GetLastClickedModule() const
 void ModularSynth::KeyPressed(int key, bool isRepeat)
 {
    if (gHoveredUIControl &&
-       TextEntry::GetActiveTextEntry() == NULL &&
+       TextEntry::GetActiveTextEntry() == nullptr &&
        GetKeyModifiers() == kModifier_None &&
        (CharacterFunctions::isDigit((char)key) || key == '.' || key == '-'))
    {
@@ -502,7 +502,7 @@ void ModularSynth::MouseMoved(int intX, int intY )
       gHoveredUIControl->GetDimensions(w, h);
       
       if (x < uiX - 10 || y < uiY - 10 || x > uiX + w + 10 || y > uiY + h + 10)
-         gHoveredUIControl = NULL;
+         gHoveredUIControl = nullptr;
    }
 }
 
@@ -625,7 +625,7 @@ void ModularSynth::MousePressed(int intX, int intY, int button)
    if (InMidiMapMode())
    {
       if (gBindToUIControl == gHoveredUIControl)   //if it's the same, clear it
-         gBindToUIControl = NULL;
+         gBindToUIControl = nullptr;
       else
          gBindToUIControl = gHoveredUIControl;
       return;
@@ -664,7 +664,7 @@ void ModularSynth::MousePressed(int intX, int intY, int button)
    if (clicked)
       CheckClick(clicked, x, y, rightButton);
    else
-      TheSaveDataPanel->SetModule(NULL);
+      TheSaveDataPanel->SetModule(nullptr);
 }
 
 void ModularSynth::MouseScrolled(float x, float y)
@@ -766,7 +766,7 @@ void ModularSynth::PopModalFocusItem()
 IDrawableModule* ModularSynth::GetTopModalFocusItem() const
 {
    if (mModalFocusItemStack.empty())
-      return NULL;
+      return nullptr;
    return mModalFocusItemStack.back();
 }
 
@@ -834,24 +834,24 @@ void ModularSynth::OnModuleDeleted(IDrawableModule* module)
    //delete module; TODO(Ryan) deleting is hard... need to clear out everything with a reference to this, or switch to smart pointers
    
    if (module == TheChaosEngine)
-      TheChaosEngine = NULL;
+      TheChaosEngine = nullptr;
    if (module == TheFreeverbOutput)
-      TheFreeverbOutput = NULL;
+      TheFreeverbOutput = nullptr;
    if (module == TheLFOController)
-      TheLFOController = NULL;
+      TheLFOController = nullptr;
    if (module == TheVinylTempoControl)
-      TheVinylTempoControl = NULL;
+      TheVinylTempoControl = nullptr;
    
    for (int i=0; i<MAX_INPUT_CHANNELS; ++i)
    {
       if (module == mInput[i])
-         mInput[i] = NULL;
+         mInput[i] = nullptr;
    }
    
    for (int i=0; i<MAX_OUTPUT_CHANNELS; ++i)
    {
       if (module == mOutput[i])
-         mOutput[i] = NULL;
+         mOutput[i] = nullptr;
    }
    
    mAudioThreadMutex.Unlock();
@@ -874,11 +874,11 @@ void ModularSynth::MouseReleased(int intX, int intY, int button)
    {
       int moduleX, moduleY;
       mMoveModule->GetPosition(moduleX, moduleY);
-      mMoveModule = NULL;
+      mMoveModule = nullptr;
    }
    
    if (mResizeModule)
-      mResizeModule = NULL;
+      mResizeModule = nullptr;
 
    mModuleContainer.MouseReleased();
    
@@ -1039,7 +1039,7 @@ void ModularSynth::ArrangeAudioSourceDependencies()
    {
       for (int j=0; j<mSources.size(); ++j)
       {
-         if (mSources[i]->GetTarget() != NULL &&
+         if (mSources[i]->GetTarget() != nullptr &&
              mSources[i]->GetTarget() == dynamic_cast<IAudioReceiver*>(mSources[j]))
          {
             deps[j].mDeps.push_back(mSources[i]);
@@ -1116,15 +1116,15 @@ void ModularSynth::ResetLayout()
       delete mDeletedModules[i];
    
    for (int i=0; i<MAX_INPUT_CHANNELS; ++i)
-      mInput[i] = NULL;
+      mInput[i] = nullptr;
    for (int i=0; i<MAX_OUTPUT_CHANNELS; ++i)
-      mOutput[i] = NULL;
+      mOutput[i] = nullptr;
 
    mDeletedModules.clear();
    mInstruments.clear();
    mSources.clear();
    mLissajousDrawers.clear();
-   mMoveModule = NULL;
+   mMoveModule = nullptr;
    LFOPool::Shutdown();
    TextEntry::ClearActiveTextEntry(!K(acceptEntry));
    
@@ -1136,9 +1136,9 @@ void ModularSynth::ResetLayout()
       delete cable;
    assert(mPatchCables.size() == 0); //everything should have been cleared out by that
    
-   gBindToUIControl = NULL;
+   gBindToUIControl = nullptr;
    mModalFocusItemStack.clear();
-   gHoveredUIControl = NULL;
+   gHoveredUIControl = nullptr;
    mLastClickedModule = nullptr;
 
    LFOPool::Init();
@@ -1176,10 +1176,10 @@ bool ModularSynth::SetInputChannel(int channel, InputChannel* input)
    for (int i=0; i<MAX_INPUT_CHANNELS; ++i)  //remove if we're changing an already assigned channel
    {
       if (mInput[channel-1] == input)
-         mInput[channel-1] = NULL;
+         mInput[channel-1] = nullptr;
    }
    
-   if (mInput[channel-1] == NULL)
+   if (mInput[channel-1] == nullptr)
    {
       mInput[channel-1] = input;
       return true;
@@ -1193,7 +1193,7 @@ bool ModularSynth::SetOutputChannel(int channel, OutputChannel* output)
    assert(channel > 0 && channel <= MAX_OUTPUT_CHANNELS);
    
    //ScopedMutex mutex(&mAudioThreadMutex, "SetOutputChannel()");
-   if (mOutput[channel-1] == NULL)
+   if (mOutput[channel-1] == nullptr)
    {
       mOutput[channel-1] = output;
       return true;
@@ -1262,10 +1262,10 @@ void ModularSynth::UpdateUserPrefsLayout()
 
 IDrawableModule* ModularSynth::CreateModule(const ofxJSONElement& moduleInfo)
 {
-   IDrawableModule* module = NULL;
+   IDrawableModule* module = nullptr;
 
    if (moduleInfo["comment_out"].asBool()) //hack since json doesn't allow comments
-      return NULL;
+      return nullptr;
 
    string type = moduleInfo["type"].asString();
    
@@ -1278,10 +1278,10 @@ IDrawableModule* ModularSynth::CreateModule(const ofxJSONElement& moduleInfo)
       else
          module = mModuleFactory.MakeModule(type);
    
-      if (module == NULL)
+      if (module == nullptr)
       {
          LogEvent("Couldn't create unknown module type \""+type+"\"", kLogEventType_Error);
-         return NULL;
+         return nullptr;
       }
       
       if (module->IsSingleton() == false)
@@ -1345,14 +1345,14 @@ IDrawableModule* ModularSynth::FindModule(string name, bool fail)
 MidiController* ModularSynth::FindMidiController(string name, bool fail)
 {
    if (name == "")
-      return NULL;
+      return nullptr;
    
-   MidiController* m = NULL;
+   MidiController* m = nullptr;
    
    try
    {
       m = dynamic_cast<MidiController*>(FindModule(name, fail));
-      if (m == NULL && fail)
+      if (m == nullptr && fail)
          throw WrongModuleTypeException();
    }
    catch (UnknownModuleException& e)
@@ -1398,7 +1398,7 @@ void ModularSynth::GrabSample(float* data, int length, bool window, int numBars)
 void ModularSynth::ClearHeldSample()
 {
    delete mHeldSample;
-   mHeldSample = NULL;
+   mHeldSample = nullptr;
 }
 
 void ModularSynth::LogEvent(string event, LogEventType type)
@@ -1532,15 +1532,15 @@ void ModularSynth::LoadState(string file)
 
 IAudioReceiver* ModularSynth::FindAudioReceiver(string name, bool fail)
 {
-   IAudioReceiver* a = NULL;
+   IAudioReceiver* a = nullptr;
    
    if (name == "")
-      return NULL;
+      return nullptr;
    
    try
    {
       a = dynamic_cast<IAudioReceiver*>(FindModule(name,fail));
-      if (a == NULL)
+      if (a == nullptr)
          throw WrongModuleTypeException();
    }
    catch (UnknownModuleException& e)
@@ -1557,15 +1557,15 @@ IAudioReceiver* ModularSynth::FindAudioReceiver(string name, bool fail)
 
 INoteReceiver* ModularSynth::FindNoteReceiver(string name, bool fail)
 {
-   INoteReceiver* n = NULL;
+   INoteReceiver* n = nullptr;
    
    if (name == "")
-      return NULL;
+      return nullptr;
    
    try
    {
       n = dynamic_cast<INoteReceiver*>(FindModule(name,fail));
-      if (n == NULL)
+      if (n == nullptr)
          throw WrongModuleTypeException();
    }
    catch (UnknownModuleException& e)
@@ -1734,7 +1734,7 @@ IDrawableModule* ModularSynth::SpawnModuleOnTheFly(string moduleName, float x, f
    dummy["position"][0u] = x;
    dummy["position"][1u] = y;
 
-   IDrawableModule* module = NULL;
+   IDrawableModule* module = nullptr;
    try
    {
       ScopedMutex mutex(&mAudioThreadMutex, "CreateModule");

@@ -17,12 +17,12 @@
 CanvasControls::CanvasControls()
 : mDummyFloat(0)
 , mDummyInt(0)
-, mCanvas(NULL)
-, mSelectedElement(NULL)
-, mAddElementButton(NULL)
-, mRemoveElementButton(NULL)
-, mNumVisibleRowsEntry(NULL)
-, mClearButton(NULL)
+, mCanvas(nullptr)
+, mSelectedElement(nullptr)
+, mAddElementButton(nullptr)
+, mRemoveElementButton(nullptr)
+, mNumVisibleRowsEntry(nullptr)
+, mClearButton(nullptr)
 {
 }
 
@@ -44,7 +44,7 @@ void CanvasControls::CreateUIControls()
    mDragModeSelector->AddLabel("horizontal", Canvas::kDragHorizontal);
    mDragModeSelector->AddLabel("vertical", Canvas::kDragVertical);
    
-   SetElement(NULL);
+   SetElement(nullptr);
 }
 
 void CanvasControls::SetCanvas(Canvas* canvas)
@@ -147,7 +147,7 @@ void CanvasControls::ButtonClicked(ClickButton* button)
    }
    if (button == mRemoveElementButton)
    {
-      mSelectedElement = NULL;
+      mSelectedElement = nullptr;
       vector<CanvasElement*> elementsToDelete;
       for (auto* element : mCanvas->GetElements())
       {

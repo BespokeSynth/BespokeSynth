@@ -15,23 +15,23 @@ BandVocoder::BandVocoder()
 , mInputPreamp(1)
 , mCarrierPreamp(1)
 , mVolume(1)
-, mInputSlider(NULL)
-, mCarrierSlider(NULL)
-, mVolumeSlider(NULL)
+, mInputSlider(nullptr)
+, mCarrierSlider(nullptr)
+, mVolumeSlider(nullptr)
 , mDryWet(1)
-, mDryWetSlider(NULL)
+, mDryWetSlider(nullptr)
 , mNumBands(64)
-, mNumBandsSlider(NULL)
+, mNumBandsSlider(nullptr)
 , mFreqMin(50)
-, mFMinSlider(NULL)
+, mFMinSlider(nullptr)
 , mFreqMax(7500)
-, mFMaxSlider(NULL)
+, mFMaxSlider(nullptr)
 , mQ(25)
-, mQSlider(NULL)
+, mQSlider(nullptr)
 , mRingTime(.01f)
-, mRingTimeSlider(NULL)
+, mRingTimeSlider(nullptr)
 , mMaxBand(.3f)
-, mMaxBandSlider(NULL)
+, mMaxBandSlider(nullptr)
 {
    mCarrierInputBuffer = new float[GetBuffer()->BufferSize()];
    Clear(mCarrierInputBuffer, GetBuffer()->BufferSize());
@@ -84,7 +84,7 @@ void BandVocoder::Process(double time)
 {
    Profiler profiler("BandVocoder");
 
-   if (GetTarget() == NULL || !mEnabled)
+   if (GetTarget() == nullptr || !mEnabled)
       return;
    
    ComputeSliders(0);

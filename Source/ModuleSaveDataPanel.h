@@ -28,7 +28,7 @@ public:
    ModuleSaveDataPanel();
    ~ModuleSaveDataPanel();
    static IDrawableModule* Create() { return new ModuleSaveDataPanel(); }
-   static bool CanCreate() { return TheSaveDataPanel == NULL; }
+   static bool CanCreate() { return TheSaveDataPanel == nullptr; }
    
    string GetTitleLabel() override { return ""; }
    bool AlwaysOnTop() override { return true; }

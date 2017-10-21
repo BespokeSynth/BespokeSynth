@@ -11,13 +11,13 @@
 
 Pumper::Pumper()
 : mAmount(.75f)
-, mAmountSlider(NULL)
+, mAmountSlider(nullptr)
 , mOffset(0)
-, mOffsetSlider(NULL)
+, mOffsetSlider(nullptr)
 , mInterval(kInterval_4n)
-, mIntervalSelector(NULL)
+, mIntervalSelector(nullptr)
 , mPump(.5f)
-, mPumpSlider(NULL)
+, mPumpSlider(nullptr)
 , mLastValue(0)
 {
    mLFO.SetPeriod(mInterval);

@@ -25,17 +25,17 @@ MidiController::MidiController()
 , mUseNegativeEdge(false)
 , mSlidersDefaultToIncremental(false)
 , mBindMode(false)
-, mBindCheckbox(NULL)
+, mBindCheckbox(nullptr)
 , mTwoWay(true)
 , mControllerIndex(-1)
 , mLastActivityTime(-9999)
 , mLastBindControllerTime(-9999)
 , mBlink(false)
 , mControllerPage(0)
-, mPageSelector(NULL)
+, mPageSelector(nullptr)
 , mPrintInput(false)
-, mNonstandardController(NULL)
-, mControllerList(NULL)
+, mNonstandardController(nullptr)
+, mControllerList(nullptr)
 , mIsConnected(false)
 , mHasCreatedConnectionUIControls(false)
 {
@@ -335,7 +335,7 @@ void MidiController::MidiReceived(MidiMessageType messageType, int control, floa
    {
       AddControlConnection(messageType, control, channel, gBindToUIControl);
       mLastBindControllerTime = gTime;
-      gBindToUIControl = NULL;
+      gBindToUIControl = nullptr;
       return;
    }
 
@@ -353,7 +353,7 @@ void MidiController::MidiReceived(MidiMessageType messageType, int control, floa
             connection->mLastActivityTime = gTime;
          
          IUIControl* uicontrol = connection->GetUIControl();
-         if (uicontrol == NULL)
+         if (uicontrol == nullptr)
             continue;
          
          if (connection->mType == kControlType_Slider)
@@ -428,7 +428,7 @@ void MidiController::MidiReceived(MidiMessageType messageType, int control, floa
 
 void MidiController::RemoveConnection(int control, MidiMessageType messageType, int channel, int page)
 {
-   IUIControl* removed = NULL;
+   IUIControl* removed = nullptr;
    
    for (auto i=mConnections.begin(); i != mConnections.end(); ++i)
    {
@@ -497,7 +497,7 @@ void MidiController::Poll()
             continue;
          
          IUIControl* uicontrol = connection->GetUIControl();
-         if (uicontrol == NULL)
+         if (uicontrol == nullptr)
             continue;
          
          if (connection->mPage != -1 && connection->mPage != mControllerPage)
@@ -701,7 +701,7 @@ void MidiController::DrawModule()
    {
       UIControlConnection* connection = *iter;
       ++iter;
-      UIControlConnection* next = NULL;
+      UIControlConnection* next = nullptr;
       if (iter != toDraw.end())
          next = *iter;
       connection->SetNext(next);
@@ -725,7 +725,7 @@ void MidiController::DrawModule()
 
 bool MidiController::IsConnected()
 {
-   if (mNonstandardController != NULL)
+   if (mNonstandardController != nullptr)
       return mNonstandardController->IsConnected();
    return mDevice.IsConnected();
 }
@@ -827,7 +827,7 @@ UIControlConnection* MidiController::GetConnectionForControl(MidiMessageType mes
           (connection->mPageless || connection->mPage == mControllerPage))
          return connection;
    }
-   return NULL;
+   return nullptr;
 }
 
 void MidiController::CheckboxUpdated(Checkbox* checkbox)
@@ -917,7 +917,7 @@ void MidiController::TextEntryActivated(TextEntry* entry)
          {
             connection->mUIControl = gBindToUIControl;
             gBindToUIControl->AddRemoteController();
-            gBindToUIControl = NULL;
+            gBindToUIControl = nullptr;
             TextEntry::ClearActiveTextEntry(!K(acceptEntry));
          }
       }
@@ -1004,7 +1004,7 @@ void MidiController::SetUpFromSaveData()
       mDevice.ConnectInput(mDeviceIn.c_str());
    }
    
-   if (mDeviceOut.length() > 0 && mNonstandardController == NULL)
+   if (mDeviceOut.length() > 0 && mNonstandardController == nullptr)
    {
       mTwoWay = true;
       mDevice.ConnectOutput(mDeviceOut.c_str(), mOutChannel);
@@ -1028,7 +1028,7 @@ void MidiController::SaveLayout(ofxJSONElement& moduleInfo)
 {
    IDrawableModule::SaveLayout(moduleInfo);
    
-   if (dynamic_cast<OscController*>(mNonstandardController) == NULL) //TODO(Ryan)
+   if (dynamic_cast<OscController*>(mNonstandardController) == nullptr) //TODO(Ryan)
    {
       mConnectionsJson.clear();
       mConnectionsJson.resize(mConnections.size());
@@ -1104,18 +1104,18 @@ void UIControlConnection::SetUIControl(string path)
       
    if (path == "hover")
    {
-      mUIControl = NULL;
+      mUIControl = nullptr;
       mSpecialBinding = kSpecialBinding_Hover;
    }
    else if (path.substr(0,7) == "hotbind")
    {
-      mUIControl = NULL;
+      mUIControl = nullptr;
       int index = path[7] - '0';
       mSpecialBinding = SpecialControlBinding(int(kSpecialBinding_HotBind0) + index);
    }
    else
    {
-      mUIControl = NULL;
+      mUIControl = nullptr;
       try
       {
          mUIControl = mUIOwner->GetOwningContainer()->FindUIControl(path);
@@ -1250,7 +1250,7 @@ void UIControlConnection::Draw(int index)
    else
    {
       mUIControlPathEntry->SetInErrorMode(true);
-      if (PatchCable::sActivePatchCable == NULL)
+      if (PatchCable::sActivePatchCable == nullptr)
          mControlCable->ClearPatchCables();
    }
    
@@ -1308,12 +1308,12 @@ void UIControlConnection::Draw(int index)
 
 void UIControlConnection::SetNext(UIControlConnection* next)
 {
-   mControlEntry->SetNextTextEntry(next ? next->mControlEntry : NULL);
-   mUIControlPathEntry->SetNextTextEntry(next ? next->mUIControlPathEntry : NULL);
-   mValueEntry->SetNextTextEntry(next ? next->mValueEntry : NULL);
-   mMidiOffEntry->SetNextTextEntry(next ? next->mMidiOffEntry : NULL);
-   mMidiOnEntry->SetNextTextEntry(next ? next->mMidiOnEntry : NULL);
-   mIncrementalEntry->SetNextTextEntry(next ? next->mIncrementalEntry : NULL);
+   mControlEntry->SetNextTextEntry(next ? next->mControlEntry : nullptr);
+   mUIControlPathEntry->SetNextTextEntry(next ? next->mUIControlPathEntry : nullptr);
+   mValueEntry->SetNextTextEntry(next ? next->mValueEntry : nullptr);
+   mMidiOffEntry->SetNextTextEntry(next ? next->mMidiOffEntry : nullptr);
+   mMidiOnEntry->SetNextTextEntry(next ? next->mMidiOnEntry : nullptr);
+   mIncrementalEntry->SetNextTextEntry(next ? next->mIncrementalEntry : nullptr);
 }
 
 void UIControlConnection::PostRepatch(PatchCableSource* cable)

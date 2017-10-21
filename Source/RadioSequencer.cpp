@@ -13,11 +13,11 @@
 #include "PatchCableSource.h"
 
 RadioSequencer::RadioSequencer()
-: mGrid(NULL)
+: mGrid(nullptr)
 , mInterval(kInterval_1n)
-, mIntervalSelector(NULL)
+, mIntervalSelector(nullptr)
 , mLength(4)
-, mLengthSelector(NULL)
+, mLengthSelector(nullptr)
 {
    TheTransport->AddListener(this, mInterval);
 }
@@ -82,10 +82,10 @@ void RadioSequencer::OnTimeEvent(int samplesTo)
    
    mGrid->SetHighlightCol(step);
    
-   IUIControl* controlToEnable = NULL;
+   IUIControl* controlToEnable = nullptr;
    for (int i=0; i<mControlCables.size(); ++i)
    {
-      IUIControl* uicontrol = NULL;
+      IUIControl* uicontrol = nullptr;
       if (mControlCables[i]->GetTarget())
          uicontrol = dynamic_cast<IUIControl*>(mControlCables[i]->GetTarget());
       if (uicontrol)

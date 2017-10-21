@@ -19,40 +19,40 @@
 
 SampleEditor::SampleEditor()
 : mVolume(1)
-, mVolumeSlider(NULL)
-, mSample(NULL)
+, mVolumeSlider(nullptr)
+, mSample(nullptr)
 , mSampleIndex(-1)
-, mSampleList(NULL)
+, mSampleList(nullptr)
 , mPlay(false)
-, mPlayCheckbox(NULL)
+, mPlayCheckbox(nullptr)
 , mLoop(true)
-, mLoopCheckbox(NULL)
+, mLoopCheckbox(nullptr)
 , mCurrentBar(-1)
 , mMeasureEarly(0)
 , mEditMode(false)
-, mEditCheckbox(NULL)
+, mEditCheckbox(nullptr)
 , mSampleStart(0)
-, mSampleStartSlider(NULL)
+, mSampleStartSlider(nullptr)
 , mSampleEnd(1)
-, mSampleEndSlider(NULL)
+, mSampleEndSlider(nullptr)
 , mNumBars(1)
-, mNumBarsSlider(NULL)
+, mNumBarsSlider(nullptr)
 , mOffset(0)
-, mOffsetSlider(NULL)
-, mEditModeStart(NULL)
-, mPadSampleButton(NULL)
-, mWriteButton(NULL)
+, mOffsetSlider(nullptr)
+, mEditModeStart(nullptr)
+, mPadSampleButton(nullptr)
+, mWriteButton(nullptr)
 , mOriginalBpm(0)
-, mBank(NULL)
+, mBank(nullptr)
 , mKeepPitch(false)
-, mKeepPitchCheckbox(NULL)
+, mKeepPitchCheckbox(nullptr)
 , mPitchShift(1)
-, mPitchShiftSlider(NULL)
+, mPitchShiftSlider(nullptr)
 , mPitchShifter(1024)
-, mSampleBankCable(NULL)
+, mSampleBankCable(nullptr)
 , mReset(false)
 , mTransposition(0)
-, mDrawBuffer(NULL)
+, mDrawBuffer(nullptr)
 {
    mWriteBuffer = new float[gBufferSize];
    Clear(mWriteBuffer, gBufferSize);
@@ -93,7 +93,7 @@ void SampleEditor::Process(double time)
 {
    Profiler profiler("SampleEditor");
 
-   if (!mEnabled || GetTarget() == NULL || mSample == NULL)
+   if (!mEnabled || GetTarget() == nullptr || mSample == nullptr)
       return;
 
    ComputeSliders(0);
@@ -144,7 +144,7 @@ void SampleEditor::PostRepatch(PatchCableSource* cable)
 
 void SampleEditor::UpdateSampleList()
 {
-   if (mBank == NULL)
+   if (mBank == nullptr)
       return;
 
    mSampleList->Clear();
@@ -442,7 +442,7 @@ void SampleEditor::IntSliderUpdated(IntSlider* slider, int oldVal)
    }
 }
 
-void SampleEditor::PlayNote(double time, int pitch, int velocity, int voiceIdx /*= -1*/, ModulationChain* pitchBend /*= NULL*/, ModulationChain* modWheel /*= NULL*/, ModulationChain* pressure /*= NULL*/)
+void SampleEditor::PlayNote(double time, int pitch, int velocity, int voiceIdx /*= -1*/, ModulationChain* pitchBend /*= nullptr*/, ModulationChain* modWheel /*= nullptr*/, ModulationChain* pressure /*= nullptr*/)
 {
    if (mSample)
    {

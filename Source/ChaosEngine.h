@@ -31,7 +31,7 @@ public:
    ChaosEngine();
    ~ChaosEngine();
    static IDrawableModule* Create() { return new ChaosEngine(); }
-   static bool CanCreate() { return TheChaosEngine == NULL; }
+   static bool CanCreate() { return TheChaosEngine == nullptr; }
    
    string GetTitleLabel() override { return "CHAOS ENGINE"; }
    void CreateUIControls() override;

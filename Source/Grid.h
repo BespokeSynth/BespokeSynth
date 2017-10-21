@@ -72,7 +72,7 @@ public:
    };
    void SetGridMode(GridMode mode) { mGridMode = mode; }
    
-   GridCell GetGridCellAt(float x, float y, float* clickHeight = NULL, float* clickWidth = NULL);
+   GridCell GetGridCellAt(float x, float y, float* clickHeight = nullptr, float* clickWidth = nullptr);
    ofVec2f GetCellPosition(int col, int row);
 
    //IUIControl

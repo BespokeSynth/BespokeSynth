@@ -18,22 +18,22 @@
 #include "PolyphonyMgr.h"
 
 NoteCanvas::NoteCanvas()
-: mCanvas(NULL)
-, mCanvasControls(NULL)
-, mNumMeasuresSlider(NULL)
+: mCanvas(nullptr)
+, mCanvasControls(nullptr)
+, mNumMeasuresSlider(nullptr)
 , mNumMeasures(1)
-, mQuantizeButton(NULL)
+, mQuantizeButton(nullptr)
 , mPlay(true)
-, mPlayCheckbox(NULL)
+, mPlayCheckbox(nullptr)
 , mRecord(false)
-, mRecordCheckbox(NULL)
+, mRecordCheckbox(nullptr)
 , mInterval(kInterval_8n)
-, mIntervalSelector(NULL)
+, mIntervalSelector(nullptr)
 , mScrollPartial(0)
-, mFreeRecordCheckbox(NULL)
+, mFreeRecordCheckbox(nullptr)
 , mFreeRecord(false)
 , mFreeRecordStartMeasure(0)
-, mClipButton(NULL)
+, mClipButton(nullptr)
 {
    TheTransport->AddAudioPoller(this);
    SetEnabled(true);
@@ -78,11 +78,11 @@ void NoteCanvas::CreateUIControls()
 
 NoteCanvas::~NoteCanvas()
 {
-   mCanvas->SetListener(NULL);
+   mCanvas->SetListener(nullptr);
    TheTransport->RemoveAudioPoller(this);
 }
 
-void NoteCanvas::PlayNote(double time, int pitch, int velocity, int voiceIdx /*= -1*/, ModulationChain* pitchBend /*= NULL*/, ModulationChain* modWheel /*= NULL*/, ModulationChain* pressure /*= NULL*/)
+void NoteCanvas::PlayNote(double time, int pitch, int velocity, int voiceIdx /*= -1*/, ModulationChain* pitchBend /*= nullptr*/, ModulationChain* modWheel /*= nullptr*/, ModulationChain* pressure /*= nullptr*/)
 {
    mNoteOutput.PlayNote(time, pitch, velocity, voiceIdx, pitchBend, modWheel, pressure);
    
@@ -95,7 +95,7 @@ void NoteCanvas::PlayNote(double time, int pitch, int velocity, int voiceIdx /*=
       if (mInputNotes[pitch]->GetStart() > endPos)
          endPos += 1; //wrap
       mInputNotes[pitch]->SetEnd(endPos);
-      mInputNotes[pitch] = NULL;
+      mInputNotes[pitch] = nullptr;
    }
    
    if (velocity > 0)
@@ -173,7 +173,7 @@ void NoteCanvas::OnTransportAdvanced(float amount)
          if (mCurrentNotes[pitch])
          {
             mNoteOutput.PlayNote(gTime, pitch, 0, mCurrentNotes[pitch]->GetVoiceIdx());
-            mCurrentNotes[pitch] = NULL;
+            mCurrentNotes[pitch] = nullptr;
          }
       }
       if (nowOn && !wasOn)
@@ -366,7 +366,7 @@ void NoteCanvas::SetRecording(bool rec)
       mPlay = true;
    
    for (int pitch=0; pitch<128; ++pitch)
-      mInputNotes[pitch] = NULL;
+      mInputNotes[pitch] = nullptr;
 }
 
 void NoteCanvas::ClipNotes()
@@ -448,7 +448,7 @@ void NoteCanvas::CheckboxUpdated(Checkbox* checkbox)
    {
       mNoteOutput.Flush();
       for (int pitch=0; pitch<128; ++pitch)
-         mInputNotes[pitch] = NULL;
+         mInputNotes[pitch] = nullptr;
    }
    if (checkbox == mPlayCheckbox)
    {

@@ -42,7 +42,7 @@ public:
 
    void SetRecorder(LooperRecorder* recorder);
    void Clear();
-   void Commit(RollingBuffer* commitBuffer = NULL);
+   void Commit(RollingBuffer* commitBuffer = nullptr);
    void Fill(ChannelBuffer* buffer, int length);
    void ResampleForNewSpeed();
    int NumBars() const { return mNumBars; }
@@ -69,7 +69,7 @@ public:
    void SetEnabled(bool enabled) override { mEnabled = enabled; }
    
    //INoteReceiver
-   void PlayNote(double time, int pitch, int velocity, int voiceIdx = -1, ModulationChain* pitchBend = NULL, ModulationChain* modWheel = NULL, ModulationChain* pressure = NULL) override;
+   void PlayNote(double time, int pitch, int velocity, int voiceIdx = -1, ModulationChain* pitchBend = nullptr, ModulationChain* modWheel = nullptr, ModulationChain* pressure = nullptr) override;
    void SendCC(int control, int value, int voiceIdx = -1) override {}
    
    //IDrawableModule

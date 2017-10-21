@@ -15,18 +15,18 @@
 #include "Profiler.h"
 
 SingleOscillator::SingleOscillator()
-: mVolSlider(NULL)
-, mOscSelector(NULL)
-, mPulseWidthSlider(NULL)
+: mVolSlider(nullptr)
+, mOscSelector(nullptr)
+, mPulseWidthSlider(nullptr)
 , mMult(1)
-, mMultSelector(NULL)
-, mADSRDisplay(NULL)
-, mSyncCheckbox(NULL)
-, mSyncFreqSlider(NULL)
-, mDetuneSlider(NULL)
-, mADSRModeSelector(NULL)
+, mMultSelector(nullptr)
+, mADSRDisplay(nullptr)
+, mSyncCheckbox(nullptr)
+, mSyncFreqSlider(nullptr)
+, mDetuneSlider(nullptr)
+, mADSRModeSelector(nullptr)
 , mADSRMode(0)
-, mShuffleSlider(NULL)
+, mShuffleSlider(nullptr)
 , mPolyMgr(this)
 , mLengthMultiplier(1)
 , mLengthMultiplierSlider(nullptr)
@@ -110,7 +110,7 @@ void SingleOscillator::Process(double time)
 {
    Profiler profiler("SingleOscillator");
 
-   if (!mEnabled || GetTarget() == NULL)
+   if (!mEnabled || GetTarget() == nullptr)
       return;
 
    ComputeSliders(0);
@@ -126,7 +126,7 @@ void SingleOscillator::Process(double time)
    Add(out, mWriteBuffer, bufferSize);
 }
 
-void SingleOscillator::PlayNote(double time, int pitch, int velocity, int voiceIdx /*= -1*/, ModulationChain* pitchBend /*= NULL*/, ModulationChain* modWheel /*= NULL*/, ModulationChain* pressure /*= NULL*/)
+void SingleOscillator::PlayNote(double time, int pitch, int velocity, int voiceIdx /*= -1*/, ModulationChain* pitchBend /*= nullptr*/, ModulationChain* modWheel /*= nullptr*/, ModulationChain* pressure /*= nullptr*/)
 {
    if (velocity > 0)
       mPolyMgr.Start(time, pitch, velocity/127.0f, voiceIdx, pitchBend, modWheel, pressure);

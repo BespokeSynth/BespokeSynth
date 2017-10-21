@@ -12,7 +12,7 @@
 #include "ModularSynth.h"
 
 HelpDisplay::HelpDisplay()
-: mHelpPageSelector(NULL)
+: mHelpPageSelector(nullptr)
 , mHelpPage(0)
 , mWidth(700)
 , mHeight(700)

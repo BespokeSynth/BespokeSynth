@@ -15,14 +15,14 @@
 vector<IUIControl*> Presets::sPresetHighlightControls;
 
 Presets::Presets()
-: mGrid(NULL)
-, mSaveButton(NULL)
+: mGrid(nullptr)
+, mSaveButton(nullptr)
 , mDrawSetPresetsCountdown(0)
 , mBlending(false)
 , mBlendTime(0)
-, mBlendTimeSlider(NULL)
+, mBlendTimeSlider(nullptr)
 , mCurrentPreset(-1)
-, mCurrentPresetSelector(NULL)
+, mCurrentPresetSelector(nullptr)
 {
    TheTransport->AddAudioPoller(this);
 }

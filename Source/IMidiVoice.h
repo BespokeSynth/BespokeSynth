@@ -17,7 +17,7 @@ class IVoiceParams;
 class IMidiVoice
 {
 public:
-   IMidiVoice() : mPitch(0), mPitchBend(NULL), mModWheel(NULL), mPressure(NULL) {}
+   IMidiVoice() : mPitch(0), mPitchBend(nullptr), mModWheel(nullptr), mPressure(nullptr) {}
    virtual ~IMidiVoice() {}
    virtual void ClearVoice() = 0;
    void SetPitch(float pitch) { mPitch = pitch; }

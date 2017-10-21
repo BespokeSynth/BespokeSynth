@@ -12,10 +12,10 @@
 #include "Profiler.h"
 
 BiquadFilterEffect::BiquadFilterEffect()
-: mTypeSelector(NULL)
-, mFSlider(NULL)
-, mQSlider(NULL)
-, mGSlider(NULL)
+: mTypeSelector(nullptr)
+, mFSlider(nullptr)
+, mQSlider(nullptr)
+, mGSlider(nullptr)
 , mMouseControl(false)
 , mCoefficientsHaveChanged(true)
 , mDryBuffer(gBufferSize)

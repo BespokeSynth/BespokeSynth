@@ -49,7 +49,7 @@ float Curve::Evaluate(float time)
    if (mPoints.empty() == false)
    {
       const CurvePoint* before = &(*mPoints.begin());
-      const CurvePoint* after = NULL;
+      const CurvePoint* after = nullptr;
       for (const auto& point : mPoints)
       {
          if (point.mTime < time)
@@ -62,7 +62,7 @@ float Curve::Evaluate(float time)
             break;
          }
       }
-      if (after == NULL)
+      if (after == nullptr)
          after = before;
       
       retVal = ofMap(time, before->mTime, after->mTime, before->mValue, after->mValue);

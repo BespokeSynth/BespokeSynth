@@ -13,7 +13,7 @@
 #include "FillSaveDropdown.h"
 
 LaunchpadNoteDisplayer::LaunchpadNoteDisplayer()
-: mLaunchpad(NULL)
+: mLaunchpad(nullptr)
 {
 }
 
@@ -23,7 +23,7 @@ void LaunchpadNoteDisplayer::DrawModule()
    DrawConnection(mLaunchpad);
 }
 
-void LaunchpadNoteDisplayer::PlayNote(double time, int pitch, int velocity, int voiceIdx /*= -1*/, ModulationChain* pitchBend /*= NULL*/, ModulationChain* modWheel /*= NULL*/, ModulationChain* pressure /*= NULL*/)
+void LaunchpadNoteDisplayer::PlayNote(double time, int pitch, int velocity, int voiceIdx /*= -1*/, ModulationChain* pitchBend /*= nullptr*/, ModulationChain* modWheel /*= nullptr*/, ModulationChain* pressure /*= nullptr*/)
 {
    PlayNoteOutput(time, pitch, velocity, voiceIdx, pitchBend, modWheel, pressure);
 

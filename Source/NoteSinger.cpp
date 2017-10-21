@@ -15,7 +15,7 @@ NoteSinger::NoteSinger()
 : IAudioReceiver(gBufferSize)
 , mPitch(0)
 , mOctave(0)
-, mOctaveSlider(NULL)
+, mOctaveSlider(nullptr)
 , mNumBuckets(28)
 {
    TheTransport->AddAudioPoller(this);

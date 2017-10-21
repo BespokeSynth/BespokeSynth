@@ -18,14 +18,14 @@
 DrumSynth::DrumSynth()
 : mVolume(1)
 , mLoadedKit(0)
-, mVolSlider(NULL)
-, mKitSelector(NULL)
+, mVolSlider(nullptr)
+, mKitSelector(nullptr)
 , mEditMode(false)
-, mEditCheckbox(NULL)
-, mSaveButton(NULL)
-, mNewKitButton(NULL)
+, mEditCheckbox(nullptr)
+, mSaveButton(nullptr)
+, mNewKitButton(nullptr)
 , mCurrentEditHit(3)
-, mNewKitNameEntry(NULL)
+, mNewKitNameEntry(nullptr)
 {
    ReadKits();
 
@@ -97,7 +97,7 @@ void DrumSynth::Process(double time)
 {
    Profiler profiler("DrumSynth");
    
-   if (!mEnabled || GetTarget() == NULL)
+   if (!mEnabled || GetTarget() == nullptr)
       return;
    
    ComputeSliders(0);
@@ -122,7 +122,7 @@ void DrumSynth::Process(double time)
    Add(out, mOutputBuffer, bufferSize);
 }
 
-void DrumSynth::PlayNote(double time, int pitch, int velocity, int voiceIdx /*= -1*/, ModulationChain* pitchBend /*= NULL*/, ModulationChain* modWheel /*= NULL*/, ModulationChain* pressure /*= NULL*/)
+void DrumSynth::PlayNote(double time, int pitch, int velocity, int voiceIdx /*= -1*/, ModulationChain* pitchBend /*= nullptr*/, ModulationChain* modWheel /*= nullptr*/, ModulationChain* pressure /*= nullptr*/)
 {
    if (pitch >= 0 && pitch < NUM_DRUM_HITS)
    {
@@ -431,7 +431,7 @@ void DrumSynth::CheckboxUpdated(Checkbox* checkbox)
    if (checkbox == mEditCheckbox)
    {
       TheSynth->MoveToFront(this);
-      if (mEditMode && mTwister != NULL)
+      if (mEditMode && mTwister != nullptr)
          mTwister->SetPage(0);
    }
 }
@@ -473,13 +473,13 @@ void DrumSynth::SetUpFromSaveData()
 
 DrumSynth::DrumSynthHit::DrumSynthHit(DrumSynth* parent, int index, int x, int y)
 : mPhase(0)
-, mVolSlider(NULL)
-, mFreqSlider(NULL)
-, mToneType(NULL)
-, mToneAdsrDisplay(NULL)
-, mFreqAdsrDisplay(NULL)
-, mVolNoiseSlider(NULL)
-, mNoiseAdsrDisplay(NULL)
+, mVolSlider(nullptr)
+, mFreqSlider(nullptr)
+, mToneType(nullptr)
+, mToneAdsrDisplay(nullptr)
+, mFreqAdsrDisplay(nullptr)
+, mVolNoiseSlider(nullptr)
+, mNoiseAdsrDisplay(nullptr)
 , mParent(parent)
 , mIndex(index)
 , mX(x)

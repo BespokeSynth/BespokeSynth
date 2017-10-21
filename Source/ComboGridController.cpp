@@ -196,7 +196,7 @@ void ComboGridController::LoadLayout(const ofxJSONElement& moduleInfo)
    map["horizontal"] = kHorizontal;
    map["vertical"] = kVertical;
    map["square"] = kSquare;
-   mModuleSaveData.LoadEnum<Arrangements>("arrangement", moduleInfo, kHorizontal, NULL, &map);
+   mModuleSaveData.LoadEnum<Arrangements>("arrangement", moduleInfo, kHorizontal, nullptr, &map);
    mModuleSaveData.LoadString("target", moduleInfo);
    
    SetUpFromSaveData();

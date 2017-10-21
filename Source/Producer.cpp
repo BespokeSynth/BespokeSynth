@@ -21,34 +21,34 @@ const float mBufferH = 300;
 
 Producer::Producer()
 : mVolume(.6f)
-, mVolumeSlider(NULL)
-, mSample(NULL)
+, mVolumeSlider(nullptr)
+, mSample(nullptr)
 , mPlay(false)
-, mPlayCheckbox(NULL)
+, mPlayCheckbox(nullptr)
 , mLoop(false)
-, mLoopCheckbox(NULL)
+, mLoopCheckbox(nullptr)
 , mClipStart(0)
-, mClipStartSlider(NULL)
+, mClipStartSlider(nullptr)
 , mClipEnd(1)
-, mClipEndSlider(NULL)
+, mClipEndSlider(nullptr)
 , mZoomStart(0)
-, mZoomStartSlider(NULL)
+, mZoomStartSlider(nullptr)
 , mZoomEnd(1)
-, mZoomEndSlider(NULL)
+, mZoomEndSlider(nullptr)
 , mNumBars(1)
-, mNumBarsSlider(NULL)
+, mNumBarsSlider(nullptr)
 , mOffset(0)
-, mOffsetSlider(NULL)
-, mWriteButton(NULL)
+, mOffsetSlider(nullptr)
+, mWriteButton(nullptr)
 , mPlayhead(0)
-, mDoubleLengthButton(NULL)
-, mHalveLengthButton(NULL)
+, mDoubleLengthButton(nullptr)
+, mHalveLengthButton(nullptr)
 , mTempo(120)
-, mTempoSlider(NULL)
+, mTempoSlider(nullptr)
 , mStartOffset(0)
-, mStartOffsetSlider(NULL)
-, mCalcTempoButton(NULL)
-, mRestartButton(NULL)
+, mStartOffsetSlider(nullptr)
+, mCalcTempoButton(nullptr)
+, mRestartButton(nullptr)
 {
    mWriteBuffer = new float[gBufferSize];
    Clear(mWriteBuffer, gBufferSize);
@@ -97,7 +97,7 @@ void Producer::Process(double time)
 {
    Profiler profiler("Producer");
 
-   if (!mEnabled || GetTarget() == NULL || mSample == NULL || mPlay == false)
+   if (!mEnabled || GetTarget() == nullptr || mSample == nullptr || mPlay == false)
       return;
    
    ComputeSliders(0);
@@ -420,7 +420,7 @@ void Producer::IntSliderUpdated(IntSlider* slider, int oldVal)
 {
 }
 
-void Producer::PlayNote(double time, int pitch, int velocity, int voiceIdx /*= -1*/, ModulationChain* pitchBend /*= NULL*/, ModulationChain* modWheel /*= NULL*/, ModulationChain* pressure /*= NULL*/)
+void Producer::PlayNote(double time, int pitch, int velocity, int voiceIdx /*= -1*/, ModulationChain* pitchBend /*= nullptr*/, ModulationChain* modWheel /*= nullptr*/, ModulationChain* pressure /*= nullptr*/)
 {
    if (mSample)
    {

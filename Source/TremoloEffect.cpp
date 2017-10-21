@@ -12,15 +12,15 @@
 
 TremoloEffect::TremoloEffect()
 : mAmount(0)
-, mAmountSlider(NULL)
+, mAmountSlider(nullptr)
 , mOffset(0)
-, mOffsetSlider(NULL)
+, mOffsetSlider(nullptr)
 , mInterval(kInterval_16n)
-, mIntervalSelector(NULL)
+, mIntervalSelector(nullptr)
 , mOscType(kOsc_Square)
-, mOscSelector(NULL)
+, mOscSelector(nullptr)
 , mDuty(.5f)
-, mDutySlider(NULL)
+, mDutySlider(nullptr)
 , mWindowPos(0)
 {
    mLFO.SetPeriod(mInterval);

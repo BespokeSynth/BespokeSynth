@@ -18,18 +18,18 @@
 #include "PatchCableSource.h"
 
 EventCanvas::EventCanvas()
-: mCanvas(NULL)
-, mCanvasControls(NULL)
-, mNumMeasuresEntry(NULL)
+: mCanvas(nullptr)
+, mCanvasControls(nullptr)
+, mNumMeasuresEntry(nullptr)
 , mNumMeasures(1)
-, mQuantizeButton(NULL)
+, mQuantizeButton(nullptr)
 , mInterval(kInterval_16n)
-, mIntervalSelector(NULL)
+, mIntervalSelector(nullptr)
 , mScrollPartial(0)
 , mPosition(0)
-, mPositionSlider(NULL)
+, mPositionSlider(nullptr)
 , mRecord(false)
-, mRecordCheckbox(NULL)
+, mRecordCheckbox(nullptr)
 , mPreviousPosition(0)
 {
    TheTransport->AddAudioPoller(this);
@@ -91,7 +91,7 @@ void EventCanvas::CreateUIControls()
 
 EventCanvas::~EventCanvas()
 {
-   mCanvas->SetListener(NULL);
+   mCanvas->SetListener(nullptr);
    TheTransport->RemoveAudioPoller(this);
 }
 
@@ -99,7 +99,7 @@ void EventCanvas::OnTransportAdvanced(float amount)
 {
    Profiler profiler("EventCanvas");
    
-   if (mCanvas == NULL)
+   if (mCanvas == nullptr)
       return;
    
    //look ahead one buffer so that we set things slightly early, so we'll do things like catch the downbeat right after enabling a sequencer, etc.

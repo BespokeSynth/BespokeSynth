@@ -12,7 +12,7 @@
 
 Muter::Muter()
 : mPass(false)
-, mPassCheckbox(NULL)
+, mPassCheckbox(nullptr)
 , mRampTimeMs(3)
 {
    mRamp.SetValue(0);

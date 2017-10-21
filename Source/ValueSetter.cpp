@@ -14,9 +14,9 @@
 #include "ModulationChain.h"
 
 ValueSetter::ValueSetter()
-: mControlCable(NULL)
+: mControlCable(nullptr)
 , mValue(0)
-, mValueEntry(NULL)
+, mValueEntry(nullptr)
 {
 }
 
@@ -47,7 +47,7 @@ void ValueSetter::PostRepatch(PatchCableSource* cableSource)
    mTarget = dynamic_cast<IUIControl*>(mControlCable->GetTarget());
 }
 
-void ValueSetter::PlayNote(double time, int pitch, int velocity, int voiceIdx /*= -1*/, ModulationChain* pitchBend /*= NULL*/, ModulationChain* modWheel /*= NULL*/, ModulationChain* pressure /*= NULL*/)
+void ValueSetter::PlayNote(double time, int pitch, int velocity, int voiceIdx /*= -1*/, ModulationChain* pitchBend /*= nullptr*/, ModulationChain* modWheel /*= nullptr*/, ModulationChain* pressure /*= nullptr*/)
 {
    if (velocity > 0 && mEnabled)
    {

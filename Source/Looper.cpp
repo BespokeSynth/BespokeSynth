@@ -29,82 +29,82 @@ Looper::Looper()
 , mLoopLength(4 * 60.0f / gDefaultTempo * gSampleRate)
 , mLoopPos(0)
 , mNumBars(1)
-, mCommitBuffer(NULL)
-, mClearButton(NULL)
-, mNumBarsSelector(NULL)
+, mCommitBuffer(nullptr)
+, mClearButton(nullptr)
+, mNumBarsSelector(nullptr)
 , mDrawDebug(false)
-, mRecordBuffer(NULL)
+, mRecordBuffer(nullptr)
 , mVol(1)
 , mSmoothedVol(1)
-, mVolSlider(NULL)
+, mVolSlider(nullptr)
 , mSpeed(1.0f)
-, mRecorder(NULL)
-, mMergeButton(NULL)
-, mVolumeBakeButton(NULL)
+, mRecorder(nullptr)
+, mMergeButton(nullptr)
+, mVolumeBakeButton(nullptr)
 , mWantBakeVolume(false)
 , mLastCommit(0)
-, mSaveButton(NULL)
+, mSaveButton(nullptr)
 , mMute(false)
-, mMuteCheckbox(NULL)
+, mMuteCheckbox(nullptr)
 , mWantShiftMeasure(false)
 , mWantShiftDownbeat(false)
-, mCommitButton(NULL)
-, mSwapButton(NULL)
-, mCopyButton(NULL)
-, mDoubleSpeedButton(NULL)
-, mHalveSpeedButton(NULL)
-, mUndoButton(NULL)
+, mCommitButton(nullptr)
+, mSwapButton(nullptr)
+, mCopyButton(nullptr)
+, mDoubleSpeedButton(nullptr)
+, mHalveSpeedButton(nullptr)
+, mUndoButton(nullptr)
 , mWantUndo(false)
 , mLoopPosOffset(0)
-, mLoopPosOffsetSlider(NULL)
-, mResetOffsetButton(NULL)
-, mWriteOffsetButton(NULL)
+, mLoopPosOffsetSlider(nullptr)
+, mResetOffsetButton(nullptr)
+, mWriteOffsetButton(nullptr)
 , mAllowChop(false)
-, mAllowChopCheckbox(NULL)
+, mAllowChopCheckbox(nullptr)
 , mChopMeasure(0)
 , mScratchSpeed(1)
 , mAllowScratch(false)
-, mScratchSpeedSlider(NULL)
-, mAllowScratchCheckbox(NULL)
+, mScratchSpeedSlider(nullptr)
+, mAllowScratchCheckbox(nullptr)
 , mLastCommitTime(0)
 , mFourTet(0)
-, mFourTetSlider(NULL)
+, mFourTetSlider(nullptr)
 , mFourTetSlices(4)
-, mFourTetSlicesDropdown(NULL)
+, mFourTetSlicesDropdown(nullptr)
 , mShowGranular(false)
-, mShowGranularCheckbox(NULL)
+, mShowGranularCheckbox(nullptr)
 , mGranular(false)
-, mGranularCheckbox(NULL)
-, mGranSpacing(NULL)
-, mGranSpeed(NULL)
-, mGranLengthMs(NULL)
-, mPosSlider(NULL)
+, mGranularCheckbox(nullptr)
+, mGranSpacing(nullptr)
+, mGranSpeed(nullptr)
+, mGranLengthMs(nullptr)
+, mPosSlider(nullptr)
 , mPausePos(false)
-, mPausePosCheckbox(NULL)
-, mGranPosRandomize(NULL)
-, mGranSpeedRandomize(NULL)
-, mGranOctaveCheckbox(NULL)
+, mPausePosCheckbox(nullptr)
+, mGranPosRandomize(nullptr)
+, mGranSpeedRandomize(nullptr)
+, mGranOctaveCheckbox(nullptr)
 , mBeatwheel(false)
-, mBeatwheelCheckbox(NULL)
-, mBeatwheelPosRightSlider(NULL)
-, mBeatwheelDepthRightSlider(NULL)
-, mBeatwheelPosLeftSlider(NULL)
-, mBeatwheelDepthLeftSlider(NULL)
+, mBeatwheelCheckbox(nullptr)
+, mBeatwheelPosRightSlider(nullptr)
+, mBeatwheelDepthRightSlider(nullptr)
+, mBeatwheelPosLeftSlider(nullptr)
+, mBeatwheelDepthLeftSlider(nullptr)
 , mBeatwheelControlFlip(false)
-, mBeatwheelSingleMeasureCheckbox(NULL)
+, mBeatwheelSingleMeasureCheckbox(nullptr)
 , mClearCommitBuffer(false)
-, mRewriter(NULL)
+, mRewriter(nullptr)
 , mWantRewrite(false)
 , mLoopCount(0)
 , mDecay(0)
-, mDecaySlider(NULL)
+, mDecaySlider(nullptr)
 , mPitchShift(1)
-, mPitchShiftSlider(NULL)
+, mPitchShiftSlider(nullptr)
 , mKeepPitch(false)
-, mKeepPitchCheckbox(NULL)
+, mKeepPitchCheckbox(nullptr)
 , mWriteInput(false)
-, mWriteInputCheckbox(NULL)
-, mQueueCaptureButton(NULL)
+, mWriteInputCheckbox(nullptr)
+, mQueueCaptureButton(nullptr)
 , mCaptureQueued(false)
 , mWantShiftOffset(false)
 , mWantHalfShift(false)
@@ -237,7 +237,7 @@ void Looper::Exit()
 void Looper::SetRecorder(LooperRecorder* recorder)
 {
    mRecorder = recorder;
-   mRecordBuffer = recorder ? recorder->GetRecordBuffer() : NULL;
+   mRecordBuffer = recorder ? recorder->GetRecordBuffer() : nullptr;
 }
 
 ChannelBuffer* Looper::GetLoopBuffer(int& loopLength)
@@ -256,23 +256,23 @@ void Looper::Poll()
    if (mClearCommitBuffer)
    {
       mCommitBuffer->ClearBuffer();
-      mCommitBuffer = NULL;
+      mCommitBuffer = nullptr;
       mClearCommitBuffer = false;
    }
    
-   mCommitButton->SetShowing(mRecorder != NULL);
-   mSwapButton->SetShowing(mRecorder != NULL);
-   mCopyButton->SetShowing(mRecorder != NULL);
-   mMergeButton->SetShowing(mRecorder != NULL);
-   mWriteInputCheckbox->SetShowing(false);//mRecorder == NULL);
-   mQueueCaptureButton->SetShowing(mRecorder == NULL);
+   mCommitButton->SetShowing(mRecorder != nullptr);
+   mSwapButton->SetShowing(mRecorder != nullptr);
+   mCopyButton->SetShowing(mRecorder != nullptr);
+   mMergeButton->SetShowing(mRecorder != nullptr);
+   mWriteInputCheckbox->SetShowing(false);//mRecorder == nullptr);
+   mQueueCaptureButton->SetShowing(mRecorder == nullptr);
 }
 
 void Looper::Process(double time)
 {
    Profiler profiler("Looper");
 
-   if (!mEnabled || GetTarget() == NULL)
+   if (!mEnabled || GetTarget() == nullptr)
       return;
 
    ComputeSliders(0);
@@ -332,7 +332,7 @@ void Looper::Process(double time)
          mJumpBlender[ch].CaptureForJump(mLoopPos, mBuffer->GetChannel(ch), mLoopLength, 0);
       mBuffer = mQueuedNewBuffer;
       mBufferMutex.unlock();
-      mQueuedNewBuffer = NULL;
+      mQueuedNewBuffer = nullptr;
    }
    
    if (mKeepPitch)
@@ -435,7 +435,7 @@ void Looper::DoCommit()
 {
    Profiler profiler("Looper::DoCommit()");
    
-   if (mRecorder == NULL)
+   if (mRecorder == nullptr)
       return;
    
    assert(mCommitBuffer);
@@ -1002,7 +1002,7 @@ void Looper::CopyBuffer(Looper* sourceLooper)
    mNumBars = sourceLooper->mNumBars;
 }
 
-void Looper::Commit(RollingBuffer* commitBuffer /* = NULL */)
+void Looper::Commit(RollingBuffer* commitBuffer /* = nullptr */)
 {
    if (mRecorder)
    {
@@ -1310,7 +1310,7 @@ void Looper::Rewrite()
    mWantRewrite = true;
 }
 
-void Looper::PlayNote(double time, int pitch, int velocity, int voiceIdx /*= -1*/, ModulationChain* pitchBend /*= NULL*/, ModulationChain* modWheel /*= NULL*/, ModulationChain* pressure /*= NULL*/)
+void Looper::PlayNote(double time, int pitch, int velocity, int voiceIdx /*= -1*/, ModulationChain* pitchBend /*= nullptr*/, ModulationChain* modWheel /*= nullptr*/, ModulationChain* pressure /*= nullptr*/)
 {
    //jump around in loop
    if (velocity > 0)

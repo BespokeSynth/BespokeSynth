@@ -14,21 +14,21 @@
 ADSR FloatSliderLFOControl::sADSR[NUM_GLOBAL_ADSRS];
 
 FloatSliderLFOControl::FloatSliderLFOControl()
-: mOwner(NULL)
-, mIntervalSelector(NULL)
-, mOscSelector(NULL)
-, mOffsetSlider(NULL)
-, mBiasSlider(NULL)
-, mAddSlider(NULL)
-, mSoftenSlider(NULL)
-, mShuffleSlider(NULL)
+: mOwner(nullptr)
+, mIntervalSelector(nullptr)
+, mOscSelector(nullptr)
+, mOffsetSlider(nullptr)
+, mBiasSlider(nullptr)
+, mAddSlider(nullptr)
+, mSoftenSlider(nullptr)
+, mShuffleSlider(nullptr)
 , mType(kLFOControlType_LFO)
-, mTypeSelector(NULL)
-, mADSRDisplay(NULL)
+, mTypeSelector(nullptr)
+, mADSRDisplay(nullptr)
 , mADSRIndex(0)
-, mADSRSelector(NULL)
+, mADSRSelector(nullptr)
 , mPinned(false)
-, mSliderCable(NULL)
+, mSliderCable(nullptr)
 , mADSRLengthMultiplier(1)
 , mADSRLengthMultiplierSlider(nullptr)
 {
@@ -225,13 +225,13 @@ void FloatSliderLFOControl::SetOwner(FloatSlider* owner)
       return;
    
    bool hadPriorOwner = false;
-   if (mOwner != NULL)
+   if (mOwner != nullptr)
    {
-      mOwner->SetLFO(NULL);
+      mOwner->SetLFO(nullptr);
       hadPriorOwner = true;
    }
    
-   assert(owner != NULL);
+   assert(owner != nullptr);
    
    owner->SetLFO(this);
       
@@ -386,7 +386,7 @@ void FloatSliderLFOControl::ButtonClicked(ClickButton* button)
          mModuleSaveData.SetFloat("soften", mLFOSettings.mShuffle, 0, 1, false);
          mModuleSaveData.SetFloat("free_rate", mLFOSettings.mFreeRate, 0, 50, false);
          
-         if (mSliderCable == NULL)
+         if (mSliderCable == nullptr)
          {
             mSliderCable = new PatchCableSource(this, kConnectionType_UIControl);
             AddPatchCableSource(mSliderCable);
@@ -444,7 +444,7 @@ void FloatSliderLFOControl::SetUpFromSaveData()
    
    mEnabled = mModuleSaveData.GetBool("enabled");
    
-   if (mSliderCable == NULL)
+   if (mSliderCable == nullptr)
    {
       mSliderCable = new PatchCableSource(this, kConnectionType_UIControl);
       AddPatchCableSource(mSliderCable);

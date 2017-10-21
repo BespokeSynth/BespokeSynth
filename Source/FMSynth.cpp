@@ -15,14 +15,14 @@
 
 FMSynth::FMSynth()
 : mHarmRatioBase(1)
-, mHarmRatioBaseDropdown(NULL)
+, mHarmRatioBaseDropdown(nullptr)
 , mHarmRatioTweak(0)
-, mHarmSlider(NULL)
-, mModSlider(NULL)
-, mVolSlider(NULL)
-, mAdsrDisplayOsc(NULL)
-, mAdsrDisplayHarm(NULL)
-, mAdsrDisplayMod(NULL)
+, mHarmSlider(nullptr)
+, mModSlider(nullptr)
+, mVolSlider(nullptr)
+, mAdsrDisplayOsc(nullptr)
+, mAdsrDisplayHarm(nullptr)
+, mAdsrDisplayMod(nullptr)
 , mPolyMgr(this)
 {
    mVoiceParams.mOscADSRParams.mA = 10;
@@ -81,7 +81,7 @@ void FMSynth::Process(double time)
 {
    Profiler profiler("FMSynth");
 
-   if (!mEnabled || GetTarget() == NULL)
+   if (!mEnabled || GetTarget() == nullptr)
       return;
 
    ComputeSliders(0);
@@ -97,7 +97,7 @@ void FMSynth::Process(double time)
    Add(out, mWriteBuffer, gBufferSize);
 }
 
-void FMSynth::PlayNote(double time, int pitch, int velocity, int voiceIdx /*= -1*/, ModulationChain* pitchBend /*= NULL*/, ModulationChain* modWheel /*= NULL*/, ModulationChain* pressure /*= NULL*/)
+void FMSynth::PlayNote(double time, int pitch, int velocity, int voiceIdx /*= -1*/, ModulationChain* pitchBend /*= nullptr*/, ModulationChain* modWheel /*= nullptr*/, ModulationChain* pressure /*= nullptr*/)
 {
    if (velocity > 0)
       mPolyMgr.Start(time, pitch, velocity/127.0f, voiceIdx, pitchBend, modWheel, pressure);

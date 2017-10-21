@@ -53,7 +53,7 @@ void GroupControl::PostRepatch(PatchCableSource* cableSource)
                mControlCables.push_back(cable);
             }
          }
-         else if (cableSource->GetTarget() == NULL)
+         else if (cableSource->GetTarget() == nullptr)
          {
             RemoveFromVector(cableSource, mControlCables);
          }
@@ -67,7 +67,7 @@ void GroupControl::CheckboxUpdated(Checkbox* checkbox)
 {
    for (int i=0; i<mControlCables.size(); ++i)
    {
-      IUIControl* uicontrol = NULL;
+      IUIControl* uicontrol = nullptr;
       if (mControlCables[i]->GetTarget())
          uicontrol = dynamic_cast<IUIControl*>(mControlCables[i]->GetTarget());
       if (uicontrol)
@@ -107,7 +107,7 @@ void GroupControl::LoadLayout(const ofxJSONElement& moduleInfo)
    for (int i=0; i<controls.size(); ++i)
    {
       string controlPath = controls[i].asString();
-      IUIControl* control = NULL;
+      IUIControl* control = nullptr;
       if (!controlPath.empty())
          control = TheSynth->FindUIControl(controlPath);
       PatchCableSource* cable = new PatchCableSource(this, kConnectionType_UIControl);

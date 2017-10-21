@@ -13,9 +13,9 @@
 
 VelocitySetter::VelocitySetter()
 : mVelocity(.65f)
-, mVelocitySlider(NULL)
+, mVelocitySlider(nullptr)
 , mRandomness(0)
-, mRandomnessSlider(NULL)
+, mRandomnessSlider(nullptr)
 {
 }
 
@@ -39,7 +39,7 @@ void VelocitySetter::CheckboxUpdated(Checkbox *checkbox)
 {
 }
 
-void VelocitySetter::PlayNote(double time, int pitch, int velocity, int voiceIdx /*= -1*/, ModulationChain* pitchBend /*= NULL*/, ModulationChain* modWheel /*= NULL*/, ModulationChain* pressure /*= NULL*/)
+void VelocitySetter::PlayNote(double time, int pitch, int velocity, int voiceIdx /*= -1*/, ModulationChain* pitchBend /*= nullptr*/, ModulationChain* modWheel /*= nullptr*/, ModulationChain* pressure /*= nullptr*/)
 {
    ComputeSliders(0);
    

@@ -19,23 +19,23 @@
 DrumPlayer::DrumPlayer()
 : mSpeed(1)
 , mRecordDrums(false)
-, mRecordDrumsCheckbox(NULL)
+, mRecordDrumsCheckbox(nullptr)
 , mVolume(1)
 , mLoadedKit(0)
-, mVolSlider(NULL)
-, mSpeedSlider(NULL)
-, mKitSelector(NULL)
+, mVolSlider(nullptr)
+, mSpeedSlider(nullptr)
+, mKitSelector(nullptr)
 , mEditMode(false)
-, mEditCheckbox(NULL)
-, mSaveButton(NULL)
-, mNewKitButton(NULL)
+, mEditCheckbox(nullptr)
+, mSaveButton(nullptr)
+, mNewKitButton(nullptr)
 , mAuditionSampleIdx(0)
 , mAuditionInc(0)
-, mAuditionSlider(NULL)
+, mAuditionSlider(nullptr)
 , mAuditionPadIdx(0)
-, mNewKitNameEntry(NULL)
+, mNewKitNameEntry(nullptr)
 , mLoadingSamples(false)
-, mShuffleSpeedsButton(NULL)
+, mShuffleSpeedsButton(nullptr)
 , mSelectedHitIdx(0)
 {
    ReadKits();
@@ -168,7 +168,7 @@ void DrumPlayer::Process(double time)
 {
    Profiler profiler("DrumPlayer");
    
-   if (!mEnabled || GetTarget() == NULL)
+   if (!mEnabled || GetTarget() == nullptr)
       return;
    
    ComputeSliders(0);
@@ -215,7 +215,7 @@ void DrumPlayer::DrumHit::Process(double time, float speed, float vol, float* ou
    }
 }
 
-void DrumPlayer::PlayNote(double time, int pitch, int velocity, int voiceIdx /*= -1*/, ModulationChain* pitchBend /*= NULL*/, ModulationChain* modWheel /*= NULL*/, ModulationChain* pressure /*= NULL*/)
+void DrumPlayer::PlayNote(double time, int pitch, int velocity, int voiceIdx /*= -1*/, ModulationChain* pitchBend /*= nullptr*/, ModulationChain* modWheel /*= nullptr*/, ModulationChain* pressure /*= nullptr*/)
 {
    pitch %= 24;
    if (pitch >= 0 && pitch < NUM_DRUM_HITS)
@@ -394,7 +394,7 @@ void DrumPlayer::DrawModule()
          {
             int sampleIdx = GetAssociatedSampleIndex(i, j);
             ofSetColor(200,100,0,gModuleDrawAlpha);
-            Sample* sample = NULL;
+            Sample* sample = nullptr;
             if (sampleIdx != -1)
                sample = &(mDrumHits[sampleIdx].mSample);
             if (sample &&

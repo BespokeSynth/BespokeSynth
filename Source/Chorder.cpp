@@ -117,7 +117,7 @@ void Chorder::CheckboxUpdated(Checkbox *checkbox)
    }
 }
 
-void Chorder::PlayNote(double time, int pitch, int velocity, int voiceIdx /*= -1*/, ModulationChain* pitchBend /*= NULL*/, ModulationChain* modWheel /*= NULL*/, ModulationChain* pressure /*= NULL*/)
+void Chorder::PlayNote(double time, int pitch, int velocity, int voiceIdx /*= -1*/, ModulationChain* pitchBend /*= nullptr*/, ModulationChain* modWheel /*= nullptr*/, ModulationChain* pressure /*= nullptr*/)
 {
    if (!mEnabled)
    {
@@ -163,7 +163,7 @@ void Chorder::PlayNote(double time, int pitch, int velocity, int voiceIdx /*= -1
    CheckLeftovers();
 }
 
-void Chorder::PlayChorderNote(double time, int pitch, int velocity, int voice /*=-1*/, ModulationChain* pitchBend /*= NULL*/, ModulationChain* modWheel /*= NULL*/, ModulationChain* pressure /*= NULL*/)
+void Chorder::PlayChorderNote(double time, int pitch, int velocity, int voice /*=-1*/, ModulationChain* pitchBend /*= nullptr*/, ModulationChain* modWheel /*= nullptr*/, ModulationChain* pressure /*= nullptr*/)
 {
    assert(velocity >= 0);
    

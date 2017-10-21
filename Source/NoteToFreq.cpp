@@ -14,10 +14,10 @@
 #include "ModulationChain.h"
 
 NoteToFreq::NoteToFreq()
-: mControlCable(NULL)
+: mControlCable(nullptr)
 , mPitch(0)
 , mBend(0)
-, mPitchBend(NULL)
+, mPitchBend(nullptr)
 {
    TheTransport->AddAudioPoller(this);
 }
@@ -45,7 +45,7 @@ void NoteToFreq::PostRepatch(PatchCableSource* cableSource)
    mTarget = dynamic_cast<IUIControl*>(mControlCable->GetTarget());
 }
 
-void NoteToFreq::PlayNote(double time, int pitch, int velocity, int voiceIdx /*= -1*/, ModulationChain* pitchBend /*= NULL*/, ModulationChain* modWheel /*= NULL*/, ModulationChain* pressure /*= NULL*/)
+void NoteToFreq::PlayNote(double time, int pitch, int velocity, int voiceIdx /*= -1*/, ModulationChain* pitchBend /*= nullptr*/, ModulationChain* modWheel /*= nullptr*/, ModulationChain* pressure /*= nullptr*/)
 {
    if (mEnabled && velocity > 0)
    {

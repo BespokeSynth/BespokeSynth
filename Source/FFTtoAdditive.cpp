@@ -31,17 +31,17 @@ FFTtoAdditive::FFTtoAdditive()
 , mInputPreamp(1)
 , mValue1(1)
 , mVolume(1)
-, mInputSlider(NULL)
-, mValue1Slider(NULL)
-, mVolumeSlider(NULL)
+, mInputSlider(nullptr)
+, mValue1Slider(nullptr)
+, mVolumeSlider(nullptr)
 , mDryWet(1)
-, mDryWetSlider(NULL)
+, mDryWetSlider(nullptr)
 , mValue2(1)
-, mValue2Slider(NULL)
+, mValue2Slider(nullptr)
 , mValue3(0)
-, mValue3Slider(NULL)
+, mValue3Slider(nullptr)
 , mPhaseOffset(0)
-, mPhaseOffsetSlider(NULL)
+, mPhaseOffsetSlider(nullptr)
 , mHistoryPtr(0)
 {
    // Generate a window with a single raised cosine from N/4 to 3N/4
@@ -84,7 +84,7 @@ void FFTtoAdditive::Process(double time)
 {
    Profiler profiler("FFTtoAdditive");
 
-   if (GetTarget() == NULL || !mEnabled)
+   if (GetTarget() == nullptr || !mEnabled)
       return;
 
    ComputeSliders(0);

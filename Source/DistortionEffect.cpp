@@ -13,10 +13,10 @@
 
 DistortionEffect::DistortionEffect()
 : mType(kClean)
-, mTypeDropdown(NULL)
-, mClipSlider(NULL)
+, mTypeDropdown(nullptr)
+, mClipSlider(nullptr)
 , mPreamp(1.0f)
-, mPreampSlider(NULL)
+, mPreampSlider(nullptr)
 , mDCAdjust(0)
 {
    SetClip(.5f);

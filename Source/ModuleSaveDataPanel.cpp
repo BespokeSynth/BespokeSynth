@@ -12,24 +12,24 @@
 #include "IAudioReceiver.h"
 #include "INoteReceiver.h"
 
-ModuleSaveDataPanel* TheSaveDataPanel = NULL;
+ModuleSaveDataPanel* TheSaveDataPanel = nullptr;
 
 const float itemSpacing = 20;
 
 ModuleSaveDataPanel::ModuleSaveDataPanel()
-: mSaveModule(NULL)
+: mSaveModule(nullptr)
 , mHeight(100)
 , mAlignmentX(100)
-, mApplyButton(NULL)
+, mApplyButton(nullptr)
 {
-   assert(TheSaveDataPanel == NULL);
+   assert(TheSaveDataPanel == nullptr);
    TheSaveDataPanel = this;
 }
 
 ModuleSaveDataPanel::~ModuleSaveDataPanel()
 {
    assert(TheSaveDataPanel == this);
-   TheSaveDataPanel = NULL;
+   TheSaveDataPanel = nullptr;
 }
 
 void ModuleSaveDataPanel::SetModule(IDrawableModule* module)
@@ -57,7 +57,7 @@ void ModuleSaveDataPanel::ReloadSaveData()
    mLabels.clear();
    mStringDropdowns.clear();
    
-   if (mSaveModule == NULL || mSaveModule->IsSaveable() == false)
+   if (mSaveModule == nullptr || mSaveModule->IsSaveable() == false)
       return;
    
    UpdateTarget(mSaveModule);
@@ -93,7 +93,7 @@ void ModuleSaveDataPanel::ReloadSaveData()
    {
       ModuleSaveData::SaveVal* save = *iter;
       
-      IUIControl* control = NULL;
+      IUIControl* control = nullptr;
       switch (save->mType)
       {
          case ModuleSaveData::kInt:
@@ -201,7 +201,7 @@ void ModuleSaveDataPanel::ApplyChanges()
 {
    if (mSaveModule)
       mSaveModule->SetUpFromSaveData();
-   TheSaveDataPanel->SetModule(NULL);
+   TheSaveDataPanel->SetModule(nullptr);
 }
 
 void ModuleSaveDataPanel::FillDropdownList(DropdownList* list, ModuleSaveData::SaveVal* save)

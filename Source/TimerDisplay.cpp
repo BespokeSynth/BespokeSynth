@@ -11,7 +11,7 @@
 #include "ModularSynth.h"
 
 TimerDisplay::TimerDisplay()
-: mResetButton(NULL)
+: mResetButton(nullptr)
 {
    mStartTime = gTime;
 }

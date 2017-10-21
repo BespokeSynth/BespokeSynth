@@ -36,7 +36,7 @@ public:
 class KarplusRetriggerVoice : public IMidiVoice
 {
 public:
-   KarplusRetriggerVoice(IDrawableModule* owner = NULL);
+   KarplusRetriggerVoice(IDrawableModule* owner = nullptr);
    ~KarplusRetriggerVoice();
    
    // IMidiVoice

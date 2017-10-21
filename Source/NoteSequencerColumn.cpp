@@ -13,13 +13,13 @@
 #include "NoteStepSequencer.h"
 
 NoteSequencerColumn::NoteSequencerColumn()
-: mGrid(NULL)
-, mColumnSlider(NULL)
-, mRowSlider(NULL)
-, mGridCable(NULL)
+: mGrid(nullptr)
+, mColumnSlider(nullptr)
+, mRowSlider(nullptr)
+, mGridCable(nullptr)
 , mRow(0)
 , mColumn(0)
-, mSequencer(NULL)
+, mSequencer(nullptr)
 {
 }
 
@@ -65,7 +65,7 @@ void NoteSequencerColumn::SyncWithCable()
    }
 }
 
-void NoteSequencerColumn::PlayNote(double time, int pitch, int velocity, int voiceIdx /*= -1*/, ModulationChain* pitchBend /*= NULL*/, ModulationChain* modWheel /*= NULL*/, ModulationChain* pressure /*= NULL*/)
+void NoteSequencerColumn::PlayNote(double time, int pitch, int velocity, int voiceIdx /*= -1*/, ModulationChain* pitchBend /*= nullptr*/, ModulationChain* modWheel /*= nullptr*/, ModulationChain* pressure /*= nullptr*/)
 {
    if (velocity > 0 && mSequencer && mGrid)
    {

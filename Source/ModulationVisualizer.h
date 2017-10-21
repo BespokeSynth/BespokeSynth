@@ -23,7 +23,7 @@ public:
    void SetEnabled(bool enabled) override { mEnabled = enabled; }
    
    //INoteReceiver
-   void PlayNote(double time, int pitch, int velocity, int voiceIdx = -1, ModulationChain* pitchBend = NULL, ModulationChain* modWheel = NULL, ModulationChain* pressure = NULL) override;
+   void PlayNote(double time, int pitch, int velocity, int voiceIdx = -1, ModulationChain* pitchBend = nullptr, ModulationChain* modWheel = nullptr, ModulationChain* pressure = nullptr) override;
    
    void LoadLayout(const ofxJSONElement& moduleInfo) override;
    void SetUpFromSaveData() override;
@@ -36,7 +36,7 @@ private:
    
    struct VizVoice
    {
-      VizVoice() : mActive(false), mPitchBend(NULL), mModWheel(NULL), mPressure(NULL) {}
+      VizVoice() : mActive(false), mPitchBend(nullptr), mModWheel(nullptr), mPressure(nullptr) {}
       string GetInfoString();
       bool mActive;
       ModulationChain* mPitchBend;

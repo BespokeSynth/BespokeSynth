@@ -13,17 +13,17 @@
 MultibandCompressor::MultibandCompressor()
 : IAudioProcessor(gBufferSize)
 , mDryWet(1)
-, mDryWetSlider(NULL)
+, mDryWetSlider(nullptr)
 , mNumBands(4)
-, mNumBandsSlider(NULL)
+, mNumBandsSlider(nullptr)
 , mFreqMin(150)
-, mFMinSlider(NULL)
+, mFMinSlider(nullptr)
 , mFreqMax(7500)
-, mFMaxSlider(NULL)
+, mFMaxSlider(nullptr)
 , mRingTime(.01f)
-, mRingTimeSlider(NULL)
+, mRingTimeSlider(nullptr)
 , mMaxBand(.3f)
-, mMaxBandSlider(NULL)
+, mMaxBandSlider(nullptr)
 
 {
    mWorkBuffer = new float[GetBuffer()->BufferSize()];

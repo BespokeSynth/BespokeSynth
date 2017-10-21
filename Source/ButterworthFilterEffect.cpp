@@ -13,9 +13,9 @@
 
 ButterworthFilterEffect::ButterworthFilterEffect()
 : mF(2000)
-, mFSlider(NULL)
+, mFSlider(nullptr)
 , mQ(0)
-, mQSlider(NULL)
+, mQSlider(nullptr)
 , mCoefficientsHaveChanged(true)
 , mDryBuffer(gBufferSize)
 {

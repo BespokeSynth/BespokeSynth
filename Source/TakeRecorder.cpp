@@ -15,7 +15,7 @@
 TakeRecorder::TakeRecorder()
 : IAudioProcessor(gBufferSize)
 , mStartSeconds(0)
-, mStartSecondsSlider(NULL)
+, mStartSecondsSlider(nullptr)
 {
 }
 

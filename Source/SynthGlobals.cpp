@@ -37,14 +37,14 @@ double gTime = 1; //using a double here, so I'm going to lose nanosecond accurac
                   //this means I'll lose 44100 hz sample accuracy in 7100 years of
                   //continuous uptime
 float gVizFreq = 440;
-IUIControl* gBindToUIControl = NULL;
+IUIControl* gBindToUIControl = nullptr;
 RetinaTrueTypeFont gFont;
 RetinaTrueTypeFont gFontBold;
 float gModuleDrawAlpha = 255;
 float gNullBuffer[kWorkBufferSize];
 float gZeroBuffer[kWorkBufferSize];
 float gWorkBuffer[kWorkBufferSize];
-IUIControl* gHoveredUIControl = NULL;
+IUIControl* gHoveredUIControl = nullptr;
 IUIControl* gHotBindUIControl[10];
 float gControlTactileFeedback = 0;
 bool gIsRetina = false;
@@ -54,14 +54,14 @@ float gCornerRoundness = 1;
 
 void SynthInit()
 {
-   srand(time(NULL));
+   srand(time(nullptr));
    
    gDefaultTempo = rand() % 80 + 75;
    
    Clear(gZeroBuffer, kWorkBufferSize);
    
    for (int i=0; i<10; ++i)
-      gHotBindUIControl[i] = NULL;
+      gHotBindUIControl[i] = nullptr;
    
    TheSynth->GetGlobalManagers()->mAudioFormatManager.registerBasicFormats();
    
@@ -445,7 +445,7 @@ int GetKeyModifiers()
 
 bool IsKeyHeld(int key, int modifiers)
 {
-   return TextEntry::GetActiveTextEntry() == NULL &&
+   return TextEntry::GetActiveTextEntry() == nullptr &&
           ofGetKeyPressed(key) &&
           GetKeyModifiers() == modifiers;
 }
@@ -530,7 +530,7 @@ void PrintCallstack()
    int frameCount = backtrace(callstack, 128);
    char **frameStrings = backtrace_symbols(callstack, frameCount);
    
-   if ( frameStrings != NULL ) {
+   if ( frameStrings != nullptr ) {
       // Start with frame 1 because frame 0 is PrintBacktrace()
       for ( int i = 1; i < frameCount; i++ ) {
          printf("%s\n", frameStrings[i]);
@@ -738,7 +738,7 @@ namespace
 
 void SetMemoryTrackingEnabled(bool enabled)
 {
-   if (enabled && logAllocationsFile == NULL)
+   if (enabled && logAllocationsFile == nullptr)
    {
       logAllocationsFile = fopen(ofToDataPath("allocationslog.txt").c_str(), "w");
    }

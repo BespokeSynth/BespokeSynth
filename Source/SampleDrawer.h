@@ -16,7 +16,7 @@ class Sample;
 class SampleDrawer
 {
 public:
-   SampleDrawer() : mSample(NULL), mStartSample(0), mEndSample(0), mX(0), mY(0), mWidth(1), mHeight(1) {}
+   SampleDrawer() : mSample(nullptr), mStartSample(0), mEndSample(0), mX(0), mY(0), mWidth(1), mHeight(1) {}
    void SetSample(Sample* sample) { mSample = sample; }
    void SetPosition(float x, float y) { mX = x; mY = y; }
    void SetDimensions(float w, float h) { mWidth = w; mHeight = h; }

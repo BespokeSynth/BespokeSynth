@@ -336,7 +336,7 @@ IDrawableModule* ModuleFactory::MakeModule(string type)
             return iter->second();
       }
    }
-   return NULL;
+   return nullptr;
 }
 
 vector<string> ModuleFactory::GetSpawnableModules(ModuleType moduleType)

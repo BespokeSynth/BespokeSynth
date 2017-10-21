@@ -11,16 +11,16 @@
 #include "PatchCableSource.h"
 
 Ramper::Ramper()
-: mUIControl(NULL)
+: mUIControl(nullptr)
 , mLength(kInterval_1n)
-, mLengthSelector(NULL)
-, mControlCable(NULL)
-, mTriggerButton(NULL)
+, mLengthSelector(nullptr)
+, mControlCable(nullptr)
+, mTriggerButton(nullptr)
 , mStartMeasure(0)
 , mStartValue(0)
 , mRamping(false)
 , mTargetValue(0)
-, mTargetValueSlider(NULL)
+, mTargetValueSlider(nullptr)
 {
    TheTransport->AddAudioPoller(this);
 }
@@ -115,7 +115,7 @@ void Ramper::PostRepatch(PatchCableSource* cableSource)
    }
    else
    {
-      mUIControl = NULL;
+      mUIControl = nullptr;
    }
 }
 
@@ -163,6 +163,6 @@ void Ramper::SetUpFromSaveData()
    }
    else
    {
-      mUIControl = NULL;
+      mUIControl = nullptr;
    }
 }

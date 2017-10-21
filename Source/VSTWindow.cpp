@@ -17,7 +17,7 @@ VSTWindow::VSTWindow (VSTPlugin* vst,
 , mType(t)
 , mOwner(vst)
 #ifdef JUCE_MAC
-, mNSViewComponent(NULL)
+, mNSViewComponent(nullptr)
 #endif
 {
    setSize (400, 300);

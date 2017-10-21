@@ -42,7 +42,7 @@ public:
 class SingleOscillatorVoice : public IMidiVoice
 {
 public:
-   SingleOscillatorVoice(IDrawableModule* owner = NULL);
+   SingleOscillatorVoice(IDrawableModule* owner = nullptr);
    ~SingleOscillatorVoice();
    
    // IMidiVoice

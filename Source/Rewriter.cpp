@@ -18,11 +18,11 @@
 
 Rewriter::Rewriter()
 : IAudioProcessor(gBufferSize)
-, mRewriteButton(NULL)
-, mConnectedLooper(NULL)
+, mRewriteButton(nullptr)
+, mConnectedLooper(nullptr)
 , mRecordBuffer(MAX_BUFFER_SIZE)
 , mStartRecordTime(-1)
-, mStartRecordTimeButton(NULL)
+, mStartRecordTimeButton(nullptr)
 {
 }
 
@@ -47,7 +47,7 @@ void Rewriter::PostRepatch(PatchCableSource* cable)
    if (cable == mLooperCable)
    {
       if (mConnectedLooper)
-         mConnectedLooper->SetRewriter(NULL);
+         mConnectedLooper->SetRewriter(nullptr);
       mConnectedLooper = dynamic_cast<Looper*>(mLooperCable->GetTarget());
       if (mConnectedLooper)
          mConnectedLooper->SetRewriter(this);
@@ -58,7 +58,7 @@ void Rewriter::Process(double time)
 {
    Profiler profiler("Rewriter");
 
-   if (GetTarget() == NULL)
+   if (GetTarget() == nullptr)
       return;
    
    SyncBuffers();

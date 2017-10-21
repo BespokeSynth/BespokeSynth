@@ -63,7 +63,7 @@ void KompleteKontrol::Poll()
       int control = i-1+100;
       if (i == 0)
          control = 21;
-      UIControlConnection* connection = NULL;
+      UIControlConnection* connection = nullptr;
       if (mController)
          connection = mController->GetConnectionForControl(kMidiMessage_Control, control);
       if (connection)
@@ -113,7 +113,7 @@ void KompleteKontrol::PostRepatch(PatchCableSource* cable)
    }
 }
 
-void KompleteKontrol::PlayNote(double time, int pitch, int velocity, int voiceIdx /*= -1*/, ModulationChain* pitchBend /*= NULL*/, ModulationChain* modWheel /*= NULL*/, ModulationChain* pressure /*= NULL*/)
+void KompleteKontrol::PlayNote(double time, int pitch, int velocity, int voiceIdx /*= -1*/, ModulationChain* pitchBend /*= nullptr*/, ModulationChain* modWheel /*= nullptr*/, ModulationChain* pressure /*= nullptr*/)
 {
    mNoteOutput.PlayNote(time,pitch,velocity,voiceIdx,pitchBend,modWheel,pressure);
    

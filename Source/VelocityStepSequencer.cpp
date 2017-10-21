@@ -22,13 +22,13 @@
 VelocityStepSequencer::VelocityStepSequencer()
 : mInterval(kInterval_16n)
 , mArpIndex(-1)
-, mIntervalSelector(NULL)
+, mIntervalSelector(nullptr)
 , mLength(VSS_MAX_STEPS)
-, mLengthSlider(NULL)
+, mLengthSlider(nullptr)
 , mResetOnDownbeat(true)
-, mResetOnDownbeatCheckbox(NULL)
+, mResetOnDownbeatCheckbox(nullptr)
 , mCurrentVelocity(80)
-, mController(NULL)
+, mController(nullptr)
 {
    TheTransport->AddListener(this, mInterval, -.1f);
 }
@@ -98,7 +98,7 @@ void VelocityStepSequencer::CheckboxUpdated(Checkbox* checkbox)
       mNoteOutput.Flush();
 }
 
-void VelocityStepSequencer::PlayNote(double time, int pitch, int velocity, int voiceIdx /*= -1*/, ModulationChain* pitchBend /*= NULL*/, ModulationChain* modWheel /*= NULL*/, ModulationChain* pressure /*= NULL*/)
+void VelocityStepSequencer::PlayNote(double time, int pitch, int velocity, int voiceIdx /*= -1*/, ModulationChain* pitchBend /*= nullptr*/, ModulationChain* modWheel /*= nullptr*/, ModulationChain* pressure /*= nullptr*/)
 {
    if (!mEnabled)
    {

@@ -65,16 +65,16 @@ namespace
 VSTPlugin::VSTPlugin()
 : IAudioProcessor(gBufferSize)
 , mVol(1)
-, mVolSlider(NULL)
+, mVolSlider(nullptr)
 , mPlugin(nullptr)
 , mChannel(1)
 , mPitchBendRange(2)
 , mModwheelCC(1)  //or 74 in Multidimensional Polyphonic Expression (MPE) spec
 , mUseVoiceAsChannel(false)
-, mProgramChangeSelector(NULL)
+, mProgramChangeSelector(nullptr)
 , mProgramChange(0)
-, mOpenEditorButton(NULL)
-, mWindowOverlay(NULL)
+, mOpenEditorButton(nullptr)
+, mWindowOverlay(nullptr)
 , mDisplayMode(kDisplayMode_Sliders)
 {
    mFormatManager.addDefaultFormats();
@@ -115,15 +115,15 @@ void VSTPlugin::Exit()
 
 void VSTPlugin::SetVST(string path)
 {
-   if (mPlugin != NULL && mPlugin->getPluginDescription().fileOrIdentifier == path)
+   if (mPlugin != nullptr && mPlugin->getPluginDescription().fileOrIdentifier == path)
       return;  //this VST is already loaded! we're all set
    
-   if (mPlugin != NULL && mWindow != NULL)
+   if (mPlugin != nullptr && mWindow != nullptr)
    {
       VSTWindow* window = mWindow.release();
       delete window;
       delete mWindowOverlay;
-      mWindowOverlay = NULL;
+      mWindowOverlay = nullptr;
    }
    
    juce::PluginDescription desc;
@@ -210,7 +210,7 @@ void VSTPlugin::Process(double time)
 {
    Profiler profiler("VSTPlugin");
    
-   if (!mEnabled || GetTarget() == NULL || mPlugin == NULL)
+   if (!mEnabled || GetTarget() == nullptr || mPlugin == nullptr)
       return;
    
    ComputeSliders(0);
@@ -278,9 +278,9 @@ void VSTPlugin::Process(double time)
    GetBuffer()->Clear();
 }
 
-void VSTPlugin::PlayNote(double time, int pitch, int velocity, int voiceIdx /*= -1*/, ModulationChain* pitchBend /*= NULL*/, ModulationChain* modWheel /*= NULL*/, ModulationChain* pressure /*= NULL*/)
+void VSTPlugin::PlayNote(double time, int pitch, int velocity, int voiceIdx /*= -1*/, ModulationChain* pitchBend /*= nullptr*/, ModulationChain* modWheel /*= nullptr*/, ModulationChain* pressure /*= nullptr*/)
 {
-   if (mPlugin == NULL)
+   if (mPlugin == nullptr)
       return;
    
    if (pitch < 0 || pitch > 127)
@@ -314,7 +314,7 @@ void VSTPlugin::PlayNote(double time, int pitch, int velocity, int voiceIdx /*= 
 
 void VSTPlugin::SendCC(int control, int value, int voiceIdx /*=-1*/)
 {
-   if (mPlugin == NULL)
+   if (mPlugin == nullptr)
       return;
    
    if (control < 0 || control > 127)
@@ -440,7 +440,7 @@ void VSTPlugin::ButtonClicked(ClickButton* button)
    {
       if (mPlugin != nullptr)
       {
-         if (mWindow == NULL)
+         if (mWindow == nullptr)
             mWindow = VSTWindow::CreateWindow(this, VSTWindow::Normal);
          mWindow->toFront (true);
       }
@@ -515,7 +515,7 @@ void VSTPlugin::LoadState(FileStreamIn& in)
    in >> hasPlugin;
    if (hasPlugin)
    {
-      assert(mPlugin != NULL);
+      assert(mPlugin != nullptr);
       int size;
       in >> size;
       char* data = new char[size];

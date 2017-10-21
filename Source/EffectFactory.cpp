@@ -63,7 +63,7 @@ IAudioEffect* EffectFactory::MakeEffect(string type)
    auto iter = mFactoryMap.find(type);
    if (iter != mFactoryMap.end())
       return iter->second();
-   return NULL;
+   return nullptr;
 }
 
 vector<string> EffectFactory::GetSpawnableEffects()

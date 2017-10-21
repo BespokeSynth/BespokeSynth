@@ -31,7 +31,7 @@ public:
 class SampleVoice : public IMidiVoice
 {
 public:
-   SampleVoice(IDrawableModule* owner = NULL);
+   SampleVoice(IDrawableModule* owner = nullptr);
    ~SampleVoice();
    
    // IMidiVoice

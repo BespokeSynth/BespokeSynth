@@ -12,7 +12,7 @@
 
 Pressure::Pressure()
 : mPressure(0)
-, mPressureSlider(NULL)
+, mPressureSlider(nullptr)
 , mModulation(true)
 {
    TheTransport->AddAudioPoller(this);
@@ -36,7 +36,7 @@ void Pressure::DrawModule()
    mPressureSlider->Draw();
 }
 
-void Pressure::PlayNote(double time, int pitch, int velocity, int voiceIdx /*= -1*/, ModulationChain* pitchBend /*= NULL*/, ModulationChain* modWheel /*= NULL*/, ModulationChain* pressure /*= NULL*/)
+void Pressure::PlayNote(double time, int pitch, int velocity, int voiceIdx /*= -1*/, ModulationChain* pitchBend /*= nullptr*/, ModulationChain* modWheel /*= nullptr*/, ModulationChain* pressure /*= nullptr*/)
 {
    if (mEnabled)
    {

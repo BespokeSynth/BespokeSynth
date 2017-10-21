@@ -17,9 +17,9 @@
 #include "PatchCableSource.h"
 
 Beats::Beats()
-: mBank(NULL)
+: mBank(nullptr)
 , mRows(4)
-, mSampleBankCable(NULL)
+, mSampleBankCable(nullptr)
 {
    mWriteBuffer = new float[gBufferSize];
    Clear(mWriteBuffer, gBufferSize);
@@ -46,7 +46,7 @@ void Beats::Process(double time)
 {
    Profiler profiler("Beats");
 
-   if (!mEnabled || GetTarget() == NULL)
+   if (!mEnabled || GetTarget() == nullptr)
       return;
    
    ComputeSliders(0);
@@ -138,7 +138,7 @@ const SampleInfo* Beats::GetSampleInfo(int columnIdx, int sampleIdx)
    if (sampleIdx > 0 && lookup < samples.size())
       return &samples[lookup];
    else
-      return NULL;
+      return nullptr;
 }
 
 void Beats::ButtonClicked(ClickButton* button)
@@ -194,7 +194,7 @@ void BeatData::LoadBeat(const SampleInfo* info)
    }
    else
    {
-      mBeat = NULL;
+      mBeat = nullptr;
       mNumBars = 1;
    }
 }

@@ -16,9 +16,9 @@
 Panner::Panner()
 : IAudioProcessor(gBufferSize)
 , mPan(0)
-, mPanSlider(NULL)
+, mPanSlider(nullptr)
 , mWiden(0)
-, mWidenSlider(NULL)
+, mWidenSlider(nullptr)
 , mWidenerBuffer(2048)
 {
    mPanBuffer = new float[gBufferSize];
@@ -40,7 +40,7 @@ void Panner::Process(double time)
 {
    Profiler profiler("Panner");
    
-   if (!mEnabled || GetTarget() == NULL)
+   if (!mEnabled || GetTarget() == nullptr)
       return;
    
    SyncBuffers(2);

@@ -13,7 +13,7 @@
 
 NoteDelayer::NoteDelayer()
 : mDelay(.25f)
-, mDelaySlider(NULL)
+, mDelaySlider(nullptr)
 {
    TheTransport->AddAudioPoller(this);
 }
@@ -66,7 +66,7 @@ void NoteDelayer::OnTransportAdvanced(float amount)
    mNoteMutex.unlock();
 }
 
-void NoteDelayer::PlayNote(double time, int pitch, int velocity, int voiceIdx /*= -1*/, ModulationChain* pitchBend /*= NULL*/, ModulationChain* modWheel /*= NULL*/, ModulationChain* pressure /*= NULL*/)
+void NoteDelayer::PlayNote(double time, int pitch, int velocity, int voiceIdx /*= -1*/, ModulationChain* pitchBend /*= nullptr*/, ModulationChain* modWheel /*= nullptr*/, ModulationChain* pressure /*= nullptr*/)
 {
    if (!mEnabled)
       return;

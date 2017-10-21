@@ -13,8 +13,8 @@
 
 FeedbackModule::FeedbackModule()
 : IAudioProcessor(gBufferSize)
-, mFeedbackTarget(NULL)
-, mFeedbackTargetCable(NULL)
+, mFeedbackTarget(nullptr)
+, mFeedbackTargetCable(nullptr)
 , mFeedbackVizBuffer(VIZ_BUFFER_SECONDS*gSampleRate)
 {
    AddChild(&mDelay);

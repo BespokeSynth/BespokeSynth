@@ -47,7 +47,7 @@ public:
    void Init(VoiceType type,
              IVoiceParams* mVoiceParams);
    
-   void Start(double time, int pitch, float amount, int voiceIdx = -1, ModulationChain* pitchBend = NULL, ModulationChain* modWheel = NULL, ModulationChain* pressure = NULL);
+   void Start(double time, int pitch, float amount, int voiceIdx = -1, ModulationChain* pitchBend = nullptr, ModulationChain* modWheel = nullptr, ModulationChain* pressure = nullptr);
    void Stop(double time, int pitch);
    void Process(double time, float* out, int bufferSize);
    void GetPhaseAndInc(float& phase, float& inc);

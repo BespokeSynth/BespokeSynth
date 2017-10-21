@@ -24,7 +24,7 @@ public:
    VinylTempoControl();
    ~VinylTempoControl();
    static IDrawableModule* Create() { return new VinylTempoControl(); }
-   static bool CanCreate() { return TheVinylTempoControl == NULL; }
+   static bool CanCreate() { return TheVinylTempoControl == nullptr; }
    
    string GetTitleLabel() override { return "vinylcontrol"; }
    

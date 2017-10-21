@@ -14,7 +14,7 @@
 
 NoteRouter::NoteRouter()
 : mRouteMask(0)
-, mRouteSelector(NULL)
+, mRouteSelector(nullptr)
 , mRadioButtonMode(false)
 {
 }

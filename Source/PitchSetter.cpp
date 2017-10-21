@@ -13,7 +13,7 @@
 
 PitchSetter::PitchSetter()
 : mPitch(36)
-, mPitchSlider(NULL)
+, mPitchSlider(nullptr)
 {
    SetEnabled(true);
 }
@@ -45,7 +45,7 @@ void PitchSetter::IntSliderUpdated(IntSlider* slider, int oldVal)
       mNoteOutput.Flush();
 }
 
-void PitchSetter::PlayNote(double time, int pitch, int velocity, int voiceIdx /*= -1*/, ModulationChain* pitchBend /*= NULL*/, ModulationChain* modWheel /*= NULL*/, ModulationChain* pressure /*= NULL*/)
+void PitchSetter::PlayNote(double time, int pitch, int velocity, int voiceIdx /*= -1*/, ModulationChain* pitchBend /*= nullptr*/, ModulationChain* modWheel /*= nullptr*/, ModulationChain* pressure /*= nullptr*/)
 {
    ComputeSliders(0);
    

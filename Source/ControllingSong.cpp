@@ -16,26 +16,26 @@
 
 ControllingSong::ControllingSong()
 : mVolume(.8f)
-, mVolumeSlider(NULL)
+, mVolumeSlider(nullptr)
 , mSongStartTime(0)
 , mNeedNewSong(true)
 , mLoadingSong(true)
 , mCurrentSongIndex(-1)
 , mShuffleIndex(0)
-, mNextSongButton(NULL)
-, mSongSelector(NULL)
+, mNextSongButton(nullptr)
+, mSongSelector(nullptr)
 , mTestBeatOffset(0)
-, mTestBeatOffsetSlider(NULL)
+, mTestBeatOffsetSlider(nullptr)
 , mPlay(false)
-, mPlayCheckbox(NULL)
+, mPlayCheckbox(nullptr)
 , mShuffle(false)
-, mShuffleCheckbox(NULL)
-, mPhraseBackButton(NULL)
-, mPhraseForwardButton(NULL)
+, mShuffleCheckbox(nullptr)
+, mPhraseBackButton(nullptr)
+, mPhraseForwardButton(nullptr)
 , mSpeed(1)
-, mSpeedSlider(NULL)
+, mSpeedSlider(nullptr)
 , mMute(false)
-, mMuteCheckbox(NULL)
+, mMuteCheckbox(nullptr)
 {
    mWriteBuffer = new float[gBufferSize];
    Clear(mWriteBuffer, gBufferSize);
@@ -150,7 +150,7 @@ void ControllingSong::Process(double time)
 {
    Profiler profiler("ControllingSong");
    
-   if (!mEnabled || GetTarget() == NULL)
+   if (!mEnabled || GetTarget() == nullptr)
       return;
    
    ComputeSliders(0);

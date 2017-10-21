@@ -14,32 +14,32 @@
 #include "MidiController.h"
 
 StepSequencer::StepSequencer()
-: mGrid(NULL)
+: mGrid(nullptr)
 , mStrength(1)
-, mStrengthSlider(NULL)
+, mStrengthSlider(nullptr)
 , mStochasticMode(false)
-, mStochasticCheckbox(NULL)
-, mGridController(NULL)
+, mStochasticCheckbox(nullptr)
+, mGridController(nullptr)
 , mPreset(0)
-, mPresetDropdown(NULL)
+, mPresetDropdown(nullptr)
 , mColorOffset(3)
 , mLpYOff(0)
-, mLpYOffDropdown(NULL)
+, mLpYOffDropdown(nullptr)
 , mAdjustOffsets(false)
-, mAdjustOffsetsCheckbox(NULL)
+, mAdjustOffsetsCheckbox(nullptr)
 , mRepeatRate(kInterval_None)
-, mRepeatRateDropdown(NULL)
+, mRepeatRateDropdown(nullptr)
 , mHeldRow(-1)
 , mHeldCol(-1)
 , mStepInterval(kInterval_16n)
-, mStepIntervalDropdown(NULL)
-, mUseStrengthSliderCheckbox(NULL)
+, mStepIntervalDropdown(nullptr)
+, mUseStrengthSliderCheckbox(nullptr)
 , mUseStrengthSlider(false)
 , mCurrentColumn(0)
-, mCurrentColumnSlider(NULL)
+, mCurrentColumnSlider(nullptr)
 , mFlusher(this)
-, mShiftLeftButton(NULL)
-, mShiftRightButton(NULL)
+, mShiftLeftButton(nullptr)
+, mShiftRightButton(nullptr)
 {
    TheTransport->AddListener(this, mStepInterval);
    mFlusher.SetInterval(mStepInterval);
@@ -148,7 +148,7 @@ void StepSequencer::Poll()
 
 void StepSequencer::UpdateLights()
 {
-   if (mGridController == NULL)
+   if (mGridController == nullptr)
       return;
    
    for (int x=0; x<mGridController->NumCols(); ++x)
@@ -185,7 +185,7 @@ void StepSequencer::ConnectGridController(IGridController* grid)
       return;
    
    if (mGridController)
-      mGridController->SetTarget(NULL);
+      mGridController->SetTarget(nullptr);
    
    assert(grid);
    mGridController = grid;
@@ -240,7 +240,7 @@ void StepSequencer::OnGridButton(int x, int y, float velocity, IGridController* 
 
 Vec2i StepSequencer::ControllerToGrid(const Vec2i& controller)
 {
-   if (mGridController == NULL)
+   if (mGridController == nullptr)
       return Vec2i(0,0);
    
    int numChunks = GetNumControllerChunks();
@@ -252,7 +252,7 @@ Vec2i StepSequencer::ControllerToGrid(const Vec2i& controller)
 
 int StepSequencer::GetNumControllerChunks()
 {
-   if (mGridController == NULL)
+   if (mGridController == nullptr)
       return 1;
    
    int numBreaks = int((mGrid->GetCols() / MAX(1.0f,mGridController->NumCols())) + .5f);
@@ -403,7 +403,7 @@ void StepSequencer::PlayNote(int note, float val)
    }
 }
 
-void StepSequencer::PlayNote(double time, int pitch, int velocity, int voiceIdx /*= -1*/, ModulationChain* pitchBend /*= NULL*/, ModulationChain* modWheel /*= NULL*/, ModulationChain* pressure /*= NULL*/)
+void StepSequencer::PlayNote(double time, int pitch, int velocity, int voiceIdx /*= -1*/, ModulationChain* pitchBend /*= nullptr*/, ModulationChain* modWheel /*= nullptr*/, ModulationChain* pressure /*= nullptr*/)
 {
    if (mRepeatRate == kInterval_None)
       PlayNoteOutput(time, pitch, velocity, voiceIdx, pitchBend, modWheel, pressure);

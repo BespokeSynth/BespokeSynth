@@ -13,7 +13,7 @@
 #include "ChannelBuffer.h"
 
 Sample::Sample()
-: mData(NULL)
+: mData(nullptr)
 , mNumSamples(0)
 , mOffset(FLT_MAX)
 , mRate(1)
@@ -69,7 +69,7 @@ bool Sample::Read(const char* path)
 
 void Sample::Create(int length)
 {
-   Create(NULL, length);
+   Create(nullptr, length);
 }
 
 void Sample::Create(float* data, int length)
@@ -89,7 +89,7 @@ void Sample::Create(float* data, int length)
    mReadPath[0] = 0;
 }
 
-bool Sample::Write(const char* path /*=NULL*/)
+bool Sample::Write(const char* path /*=nullptr*/)
 {
    const char* writeTo = path ? path : mReadPath;
    WriteDataToFile(writeTo, &mData, mNumSamples);
@@ -103,7 +103,7 @@ bool Sample::WriteDataToFile(const char *path, float **data, int numSamples, int
    File outputFile(ofToDataPath(path).c_str());
    FileOutputStream* outputTo = outputFile.createOutputStream();
     
-   ScopedPointer<AudioFormatWriter> writer = wavFormat->createWriterFor(outputTo, gSampleRate, channels, 16, NULL, 0);
+   ScopedPointer<AudioFormatWriter> writer = wavFormat->createWriterFor(outputTo, gSampleRate, channels, 16, nullptr, 0);
    writer->writeFromFloatArrays(data, channels, numSamples);
    
    return true;

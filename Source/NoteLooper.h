@@ -35,7 +35,7 @@ public:
    void CreateUIControls() override;
 
    //INoteReceiver
-   void PlayNote(double time, int pitch, int velocity, int voiceIdx = -1, ModulationChain* pitchBend = NULL, ModulationChain* modWheel = NULL, ModulationChain* pressure = NULL) override;
+   void PlayNote(double time, int pitch, int velocity, int voiceIdx = -1, ModulationChain* pitchBend = nullptr, ModulationChain* modWheel = nullptr, ModulationChain* pressure = nullptr) override;
 
    //IAudioPoller
    void OnTransportAdvanced(float amount) override;

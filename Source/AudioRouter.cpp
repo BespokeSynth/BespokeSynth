@@ -14,7 +14,7 @@
 AudioRouter::AudioRouter()
 : IAudioProcessor(gBufferSize)
 , mRouteIndex(0)
-, mRouteSelector(NULL)
+, mRouteSelector(nullptr)
 {
 }
 
@@ -42,7 +42,7 @@ void AudioRouter::Process(double time)
 {
    Profiler profiler("AudioRouter");
 
-   if (GetTarget() == NULL)
+   if (GetTarget() == nullptr)
       return;
 
    SyncBuffers();

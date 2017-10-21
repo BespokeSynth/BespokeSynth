@@ -131,13 +131,13 @@ void CircleSequencer::SetUpFromSaveData()
 
 CircleSequencerRing::CircleSequencerRing(CircleSequencer* owner, int index)
 : mLength(4)
-, mLengthSelector(NULL)
+, mLengthSelector(nullptr)
 , mNote(0)
-, mNoteSelector(NULL)
+, mNoteSelector(nullptr)
 , mOwner(owner)
 , mIndex(index)
 , mOffset(0)
-, mOffsetSlider(NULL)
+, mOffsetSlider(nullptr)
 , mCurrentlyClickedStepIdx(-1)
 {
    bzero(mSteps,sizeof(float)*CIRCLE_SEQUENCER_MAX_STEPS);

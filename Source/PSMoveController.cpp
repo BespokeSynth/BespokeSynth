@@ -12,27 +12,27 @@
 #include "ModularSynth.h"
 
 PSMoveController::PSMoveController()
-: mConnectButton(NULL)
+: mConnectButton(nullptr)
 , mVibronomeOn(false)
-, mVibronomeCheckbox(NULL)
+, mVibronomeCheckbox(nullptr)
 , mMetronomeLagOffset(50)
-, mOffsetSlider(NULL)
+, mOffsetSlider(nullptr)
 , mRoll(.5f)
 , mPitch(.5f)
 , mYaw(0)
 , mEnergy(0)
-, mPitchSlider(NULL)
-, mYawSlider(NULL)
-, mRollSlider(NULL)
-, mEnergySlider(NULL)
-, mBindPitch(NULL)
-, mBindYaw(NULL)
-, mBindRoll(NULL)
-, mBindEnergy(NULL)
-, mPitchUIControl(NULL)
-, mYawUIControl(NULL)
-, mRollUIControl(NULL)
-, mEnergyUIControl(NULL)
+, mPitchSlider(nullptr)
+, mYawSlider(nullptr)
+, mRollSlider(nullptr)
+, mEnergySlider(nullptr)
+, mBindPitch(nullptr)
+, mBindYaw(nullptr)
+, mBindRoll(nullptr)
+, mBindEnergy(nullptr)
+, mPitchUIControl(nullptr)
+, mYawUIControl(nullptr)
+, mRollUIControl(nullptr)
+, mEnergyUIControl(nullptr)
 , mPSButtonDown(false)
 {
    mMoveMgr.Setup();
@@ -158,22 +158,22 @@ void PSMoveController::ButtonClicked(ClickButton* button)
    if (button == mBindPitch)
    {
       mPitchUIControl = gBindToUIControl;
-      gBindToUIControl = NULL;
+      gBindToUIControl = nullptr;
    }
    if (button == mBindYaw)
    {
       mYawUIControl = gBindToUIControl;
-      gBindToUIControl = NULL;
+      gBindToUIControl = nullptr;
    }
    if (button == mBindRoll)
    {
       mRollUIControl = gBindToUIControl;
-      gBindToUIControl = NULL;
+      gBindToUIControl = nullptr;
    }
    if (button == mBindEnergy)
    {
       mEnergyUIControl = gBindToUIControl;
-      gBindToUIControl = NULL;
+      gBindToUIControl = nullptr;
    }
 }
 

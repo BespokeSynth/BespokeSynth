@@ -27,7 +27,7 @@ void SampleVoice::Process(double time, float* out, int bufferSize)
    Profiler profiler("SampleVoice");
 
    if (mAdsr.IsDone(time) ||
-       mVoiceParams->mSampleData == NULL ||
+       mVoiceParams->mSampleData == nullptr ||
        mVoiceParams->mSampleLength == 0)
       return;
    

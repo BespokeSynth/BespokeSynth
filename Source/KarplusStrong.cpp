@@ -14,13 +14,13 @@
 #include "Profiler.h"
 
 KarplusStrong::KarplusStrong()
-: mFilterSlider(NULL)
-, mFeedbackSlider(NULL)
-, mVolSlider(NULL)
-, mSourceDropdown(NULL)
-, mMuteCheckbox(NULL)
-, mStretchCheckbox(NULL)
-, mCarrierSlider(NULL)
+: mFilterSlider(nullptr)
+, mFeedbackSlider(nullptr)
+, mVolSlider(nullptr)
+, mSourceDropdown(nullptr)
+, mMuteCheckbox(nullptr)
+, mStretchCheckbox(nullptr)
+, mCarrierSlider(nullptr)
 , mPolyMgr(this)
 , mWriteBuffer(gBufferSize)
 {
@@ -70,7 +70,7 @@ void KarplusStrong::Process(double time)
 {
    Profiler profiler("KarplusStrong");
 
-   if (!mEnabled || GetTarget() == NULL)
+   if (!mEnabled || GetTarget() == nullptr)
       return;
 
    ComputeSliders(0);
@@ -89,7 +89,7 @@ void KarplusStrong::Process(double time)
    Add(out, mWriteBuffer.GetChannel(0), gBufferSize);
 }
 
-void KarplusStrong::PlayNote(double time, int pitch, int velocity, int voiceIdx /*= -1*/, ModulationChain* pitchBend /*= NULL*/, ModulationChain* modWheel /*= NULL*/, ModulationChain* pressure /*= NULL*/)
+void KarplusStrong::PlayNote(double time, int pitch, int velocity, int voiceIdx /*= -1*/, ModulationChain* pitchBend /*= nullptr*/, ModulationChain* modWheel /*= nullptr*/, ModulationChain* pressure /*= nullptr*/)
 {
    if (velocity > 0)
       mPolyMgr.Start(time, pitch, velocity/127.0f, voiceIdx, pitchBend, modWheel, pressure);

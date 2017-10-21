@@ -234,7 +234,7 @@ bool ADSRDisplay::MouseMoved(float x, float y)
    }
    if (mClick)
    {
-      if (mAdsr == NULL)
+      if (mAdsr == nullptr)
          return false;
       float mousePosSq = (x-mClickStart.x)/mWidth;
       if (mousePosSq > 0)

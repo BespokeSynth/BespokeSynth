@@ -12,7 +12,7 @@
 
 PitchBender::PitchBender()
 : mBend(0)
-, mBendSlider(NULL)
+, mBendSlider(nullptr)
 //, mBendingCheckbox(this,"bending",HIDDEN_UICONTROL,HIDDEN_UICONTROL,mBendSlider->mTouching)
 , mModulation(true)
 {
@@ -38,7 +38,7 @@ void PitchBender::DrawModule()
    mBendSlider->Draw();
 }
 
-void PitchBender::PlayNote(double time, int pitch, int velocity, int voiceIdx /*= -1*/, ModulationChain* pitchBend /*= NULL*/, ModulationChain* modWheel /*= NULL*/, ModulationChain* pressure /*= NULL*/)
+void PitchBender::PlayNote(double time, int pitch, int velocity, int voiceIdx /*= -1*/, ModulationChain* pitchBend /*= nullptr*/, ModulationChain* modWheel /*= nullptr*/, ModulationChain* pressure /*= nullptr*/)
 {
    if (mEnabled)
    {

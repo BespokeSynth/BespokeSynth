@@ -19,18 +19,18 @@
 
 Sampler::Sampler()
 : IAudioProcessor(gBufferSize)
-, mVolSlider(NULL)
-, mADSRDisplay(NULL)
+, mVolSlider(nullptr)
+, mADSRDisplay(nullptr)
 , mRecordPos(0)
 , mRecording(false)
-, mRecordCheckbox(NULL)
+, mRecordCheckbox(nullptr)
 , mThresh(.2f)
-, mThreshSlider(NULL)
+, mThreshSlider(nullptr)
 , mPitchCorrect(false)
-, mPitchCorrectCheckbox(NULL)
+, mPitchCorrectCheckbox(nullptr)
 , mWantDetectPitch(false)
 , mPassthrough(false)
-, mPassthroughCheckbox(NULL)
+, mPassthroughCheckbox(nullptr)
 , mPolyMgr(this)
 {
    mSampleData = new float[MAX_SAMPLER_LENGTH];   //store up to 2 seconds
@@ -79,7 +79,7 @@ void Sampler::Process(double time)
 {
    Profiler profiler("Sampler");
 
-   if (!mEnabled || GetTarget() == NULL)
+   if (!mEnabled || GetTarget() == nullptr)
       return;
    
    ComputeSliders(0);
@@ -118,7 +118,7 @@ void Sampler::Process(double time)
    GetBuffer()->Clear();
 }
 
-void Sampler::PlayNote(double time, int pitch, int velocity, int voiceIdx /*= -1*/, ModulationChain* pitchBend /*= NULL*/, ModulationChain* modWheel /*= NULL*/, ModulationChain* pressure /*= NULL*/)
+void Sampler::PlayNote(double time, int pitch, int velocity, int voiceIdx /*= -1*/, ModulationChain* pitchBend /*= nullptr*/, ModulationChain* modWheel /*= nullptr*/, ModulationChain* pressure /*= nullptr*/)
 {
    if (velocity > 0)
       mPolyMgr.Start(time, pitch, velocity/127.0f, voiceIdx, pitchBend, modWheel, pressure);

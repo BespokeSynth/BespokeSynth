@@ -31,7 +31,7 @@ struct SampleInfo;
 
 struct BeatData
 {
-   BeatData() : mBeat(NULL) {}
+   BeatData() : mBeat(nullptr) {}
    void LoadBeat(const SampleInfo* info);
    void RecalcPos(bool doubleTime);
    

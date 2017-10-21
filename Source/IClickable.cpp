@@ -16,7 +16,7 @@ string IClickable::sSaveContext = "";
 IClickable::IClickable()
 : mX(0)
 , mY(0)
-, mParent(NULL)
+, mParent(nullptr)
 , mShowing(true)
 , mBeaconTime(-999)
 {
@@ -136,7 +136,7 @@ IDrawableModule* IClickable::GetModuleParent()
 string IClickable::Path(bool ignoreContext)
 {
    string path = mName;
-   if (mParent != NULL)
+   if (mParent != nullptr)
       path = mParent->Path(true) + "~" + mName;
    
    if (!ignoreContext)

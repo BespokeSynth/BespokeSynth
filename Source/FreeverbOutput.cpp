@@ -11,17 +11,17 @@
 #include "Profiler.h"
 #include "ModularSynth.h"
 
-FreeverbOutput* TheFreeverbOutput = NULL;
+FreeverbOutput* TheFreeverbOutput = nullptr;
 
 FreeverbOutput::FreeverbOutput()
-: mRoomSizeSlider(NULL)
-, mDampSlider(NULL)
-, mWetSlider(NULL)
-, mDrySlider(NULL)
-, mWidthSlider(NULL)
+: mRoomSizeSlider(nullptr)
+, mDampSlider(nullptr)
+, mWetSlider(nullptr)
+, mDrySlider(nullptr)
+, mWidthSlider(nullptr)
 , mNeedUpdate(false)
 {
-   assert(TheFreeverbOutput == NULL);
+   assert(TheFreeverbOutput == nullptr);
    TheFreeverbOutput = this;
    
    //mFreeverb.setmode(GetParameter(KMode));

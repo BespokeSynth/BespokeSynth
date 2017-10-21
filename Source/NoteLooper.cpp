@@ -16,19 +16,19 @@
 
 NoteLooper::NoteLooper()
 : mPlay(false)
-, mPlayCheckbox(NULL)
+, mPlayCheckbox(nullptr)
 , mRecord(false)
-, mRecordCheckbox(NULL)
+, mRecordCheckbox(nullptr)
 , mNumBars(1)
-, mNumBarsSlider(NULL)
+, mNumBarsSlider(nullptr)
 , mOctave(0)
-, mOctaveSlider(NULL)
-, mClearButton(NULL)
+, mOctaveSlider(nullptr)
+, mClearButton(nullptr)
 , mOverdub(false)
-, mOverdubCheckbox(NULL)
+, mOverdubCheckbox(nullptr)
 , mNumHeldNotes(0)
-, mNumBarsDecrement(NULL)
-, mNumBarsIncrement(NULL)
+, mNumBarsDecrement(nullptr)
+, mNumBarsIncrement(nullptr)
 {
    TheTransport->AddAudioPoller(this);
    
@@ -219,7 +219,7 @@ void NoteLooper::TriggerRecordedNote(int pitch, int velocity)
    }
 }
 
-void NoteLooper::PlayNote(double time, int pitch, int velocity, int voiceIdx /*= -1*/, ModulationChain* pitchBend /*= NULL*/, ModulationChain* modWheel /*= NULL*/, ModulationChain* pressure /*= NULL*/)
+void NoteLooper::PlayNote(double time, int pitch, int velocity, int voiceIdx /*= -1*/, ModulationChain* pitchBend /*= nullptr*/, ModulationChain* modWheel /*= nullptr*/, ModulationChain* pressure /*= nullptr*/)
 {
    if (mRecord)
    {

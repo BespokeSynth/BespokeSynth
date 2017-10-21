@@ -11,24 +11,24 @@
 #include "ModularSynth.h"
 #include "ofxJSONElement.h"
 
-Scale* TheScale = NULL;
+Scale* TheScale = nullptr;
 
 Scale::Scale()
-: mRootSelector(NULL)
-, mScaleSelector(NULL)
+: mRootSelector(nullptr)
+, mScaleSelector(nullptr)
 , mScaleDegree(0)
-, mScaleDegreeSlider(NULL)
+, mScaleDegreeSlider(nullptr)
 , mNumSeptatonicScales(0)
 , mTet(12)
 , mReferenceFreq(440)
 , mReferencePitch(69)
-, mTetEntry(NULL)
-, mReferenceFreqEntry(NULL)
-, mReferencePitchEntry(NULL)
+, mTetEntry(nullptr)
+, mReferenceFreqEntry(nullptr)
+, mReferencePitchEntry(nullptr)
 , mIntonation(kIntonation_Equal)
-, mIntonationSelector(NULL)
+, mIntonationSelector(nullptr)
 {
-   assert(TheScale == NULL);
+   assert(TheScale == nullptr);
    TheScale = this;
    SetName("scale");
 }

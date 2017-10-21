@@ -22,9 +22,9 @@ PatchCableSource::PatchCableSource(IDrawableModule* owner, ConnectionType type)
 : mOwner(owner)
 , mType(type)
 , mHovered(false)
-, mOverrideVizBuffer(NULL)
+, mOverrideVizBuffer(nullptr)
 , mAutomaticPositioning(true)
-, mAudioReceiver(NULL)
+, mAudioReceiver(nullptr)
 , mDefaultPatchBehavior(kDefaultPatchBehavior_Repatch)
 , mPatchCableDrawMode(kPatchCableDrawMode_Normal)
 , mEnabled(true)
@@ -51,7 +51,7 @@ PatchCable* PatchCableSource::AddPatchCable(IClickable* target)
    for (auto cable : mPatchCables)
    {
       if (cable->GetTarget() == target)
-         return NULL;
+         return nullptr;
    }
    
    PatchCable* cable = new PatchCable(this);
@@ -71,7 +71,7 @@ void PatchCableSource::SetPatchCableTarget(PatchCable* cable, IClickable* target
    
    if (cable->GetTarget())
    {
-      mAudioReceiver = NULL;
+      mAudioReceiver = nullptr;
       RemoveFromVector(dynamic_cast<INoteReceiver*>(cable->GetTarget()), mNoteReceivers);
    }
    
@@ -251,7 +251,7 @@ bool PatchCableSource::TestClick(int x, int y, bool right, bool testOnly /* = fa
       {
          if (mPatchCables.empty() || InAddCableMode())
          {
-            PatchCable* newCable = AddPatchCable(NULL);
+            PatchCable* newCable = AddPatchCable(nullptr);
             newCable->Grab();
          }
          else
@@ -314,7 +314,7 @@ void PatchCableSource::FindValidTargets()
       {
          for (auto uicontrol : module->GetUIControls())
          {
-            if (uicontrol->IsShowing() && dynamic_cast<ADSRDisplay*>(uicontrol) == NULL)
+            if (uicontrol->IsShowing() && dynamic_cast<ADSRDisplay*>(uicontrol) == nullptr)
                mValidTargets.push_back(uicontrol);
          }
       }
@@ -348,7 +348,7 @@ void PatchCableSource::KeyPressed(int key, bool isRepeat)
 void PatchCableSource::RemovePatchCable(PatchCable* cable)
 {
    mOwner->PreRepatch(this);
-   mAudioReceiver = NULL;
+   mAudioReceiver = nullptr;
    RemoveFromVector(dynamic_cast<INoteReceiver*>(cable->GetTarget()), mNoteReceivers);
    RemoveFromVector(cable, mPatchCables);
    mOwner->PostRepatch(this);
@@ -363,7 +363,7 @@ void PatchCableSource::ClearPatchCables()
 
 void PatchCableSource::SetTarget(IClickable* target)
 {
-   if (target != NULL)
+   if (target != nullptr)
    {
       if (mPatchCables.empty())
          AddPatchCable(target);
@@ -372,7 +372,7 @@ void PatchCableSource::SetTarget(IClickable* target)
    }
    else
    {
-      mAudioReceiver = NULL;
+      mAudioReceiver = nullptr;
       mNoteReceivers.clear();
    }
 }
@@ -380,7 +380,7 @@ void PatchCableSource::SetTarget(IClickable* target)
 IClickable* PatchCableSource::GetTarget() const
 {
    if (mPatchCables.empty())
-      return NULL;
+      return nullptr;
    else
       return mPatchCables[0]->GetTarget();
 }
@@ -412,7 +412,7 @@ void PatchCableSource::LoadState(FileStreamIn& in)
       string path;
       in >> path;
       IClickable* target = TheSynth->FindModule(path, false);
-      if (target == NULL)
+      if (target == nullptr)
       {
          try
          {

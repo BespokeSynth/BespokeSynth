@@ -14,7 +14,7 @@
 PitchChorus::PitchChorus()
 : IAudioProcessor(gBufferSize)
 , mPassthrough(true)
-, mPassthroughCheckbox(NULL)
+, mPassthroughCheckbox(nullptr)
 {
    mOutputBuffer = new float[gBufferSize];
    Clear(mOutputBuffer, gBufferSize);
@@ -70,7 +70,7 @@ void PitchChorus::Process(double time)
    GetBuffer()->Clear();
 }
 
-void PitchChorus::PlayNote(double time, int pitch, int velocity, int voiceIdx /*= -1*/, ModulationChain* pitchBend /*= NULL*/, ModulationChain* modWheel /*= NULL*/, ModulationChain* pressure /*= NULL*/)
+void PitchChorus::PlayNote(double time, int pitch, int velocity, int voiceIdx /*= -1*/, ModulationChain* pitchBend /*= nullptr*/, ModulationChain* modWheel /*= nullptr*/, ModulationChain* pressure /*= nullptr*/)
 {
    for (int i=0; i<kNumShifters; ++i)
    {

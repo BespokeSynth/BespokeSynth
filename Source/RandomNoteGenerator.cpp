@@ -14,17 +14,17 @@
 
 RandomNoteGenerator::RandomNoteGenerator()
 : mInterval(kInterval_16n)
-, mIntervalSelector(NULL)
+, mIntervalSelector(nullptr)
 , mProbability(.5f)
-, mProbabilitySlider(NULL)
+, mProbabilitySlider(nullptr)
 , mPitch(36)
-, mPitchSlider(NULL)
+, mPitchSlider(nullptr)
 , mVelocity(.8f)
-, mVelocitySlider(NULL)
+, mVelocitySlider(nullptr)
 , mOffset(0)
-, mOffsetSlider(NULL)
+, mOffsetSlider(nullptr)
 , mSkip(1)
-, mSkipSlider(NULL)
+, mSkipSlider(nullptr)
 , mSkipCount(0)
 {
    TheTransport->AddListener(this, mInterval);

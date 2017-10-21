@@ -21,14 +21,14 @@
 LoopStorer::LoopStorer()
 : mCurrentBufferIdx(0)
 , mRewriteToSelection(false)
-, mRewriteToSelectionCheckbox(NULL)
+, mRewriteToSelectionCheckbox(nullptr)
 , mQuantization(kInterval_None)
-, mQuantizationDropdown(NULL)
+, mQuantizationDropdown(nullptr)
 , mQueuedSwapBufferIdx(-1)
 , mIsSwapping(false)
-, mLooper(NULL)
-, mClearButton(NULL)
-, mLooperCable(NULL)
+, mLooper(nullptr)
+, mClearButton(nullptr)
+, mLooperCable(nullptr)
 {
    TheTransport->AddListener(this, kInterval_None);
 }
@@ -58,7 +58,7 @@ LoopStorer::~LoopStorer()
 
 void LoopStorer::Poll()
 {
-   if (mLooper == NULL)
+   if (mLooper == nullptr)
       return;
    
    assert(mSamples[0]->mBuffer != mSamples[1]->mBuffer);
@@ -127,7 +127,7 @@ void LoopStorer::OnTimeEvent(int samplesTo)
 
 void LoopStorer::SwapBuffer(int swapToIdx)
 {
-   if (mLooper == NULL)
+   if (mLooper == nullptr)
       return;
    
    mSwapMutex.lock();
@@ -306,10 +306,10 @@ void LoopStorer::LoadState(FileStreamIn& in)
 }
 
 LoopStorer::SampleData::SampleData()
-: mBuffer(NULL)
+: mBuffer(nullptr)
 , mNumBars(1)
-, mSelectCheckbox(NULL)
-, mLoopStorer(NULL)
+, mSelectCheckbox(nullptr)
+, mLoopStorer(nullptr)
 , mIndex(0)
 , mBufferLength(-1)
 , mIsCurrentBuffer(false)

@@ -41,7 +41,7 @@ public:
    bool MouseMoved(float x, float y) override;
    
    //INoteReceiver
-   void PlayNote(double time, int pitch, int velocity, int voiceIdx = -1, ModulationChain* pitchBend = NULL, ModulationChain* modWheel = NULL, ModulationChain* pressure = NULL) override;
+   void PlayNote(double time, int pitch, int velocity, int voiceIdx = -1, ModulationChain* pitchBend = nullptr, ModulationChain* modWheel = nullptr, ModulationChain* pressure = nullptr) override;
    
    //ITimeListener
    void OnTimeEvent(int samplesTo) override;

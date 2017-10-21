@@ -11,7 +11,7 @@
 
 LaunchpadInterpreter::LaunchpadInterpreter(ILaunchpadListener* listener)
    : mListener(listener)
-   , mController(NULL)
+   , mController(nullptr)
 {
    for (int i= 0; i<64+8+8; ++i)
       mLights[i] = 0;
@@ -49,14 +49,14 @@ void LaunchpadInterpreter::OnMidiControl(MidiControl& control)
 
 bool LaunchpadInterpreter::IsMonome() const
 {
-   if (mController == NULL)
+   if (mController == nullptr)
       return false;
    return strcmp(mController->Name(),"monome") == 0;
 }
 
 void LaunchpadInterpreter::UpdateLights(vector<LightUpdate> lightUpdates, bool force /*=false*/)
 {
-   if (mController == NULL)
+   if (mController == nullptr)
       return;
    
    for (int i=0; i<lightUpdates.size(); ++i)

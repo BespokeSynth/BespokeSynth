@@ -12,7 +12,7 @@
 
 Monophonify::Monophonify()
 : mGlideTime(0)
-, mGlideSlider(NULL)
+, mGlideSlider(nullptr)
 {
 }
 
@@ -33,7 +33,7 @@ void Monophonify::DrawModule()
    mGlideSlider->Draw();
 }
 
-void Monophonify::PlayNote(double time, int pitch, int velocity, int voiceIdx /*= -1*/, ModulationChain* pitchBend /*= NULL*/, ModulationChain* modWheel /*= NULL*/, ModulationChain* pressure /*= NULL*/)
+void Monophonify::PlayNote(double time, int pitch, int velocity, int voiceIdx /*= -1*/, ModulationChain* pitchBend /*= nullptr*/, ModulationChain* modWheel /*= nullptr*/, ModulationChain* pressure /*= nullptr*/)
 {
    if (!mEnabled)
    {

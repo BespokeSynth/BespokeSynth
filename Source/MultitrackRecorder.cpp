@@ -15,16 +15,16 @@
 #include "Sample.h"
 #include "ArrangementMaster.h"
 
-MultitrackRecorder* TheMultitrackRecorder = NULL;
+MultitrackRecorder* TheMultitrackRecorder = nullptr;
 
 MultitrackRecorder::MultitrackRecorder()
 : mRecordingLength(RECORD_CHUNK_SIZE)
 , mRecording(false)
-, mRecordCheckbox(NULL)
-, mPlayCheckbox(NULL)
-, mAddTrackButton(NULL)
-, mResetPlayheadButton(NULL)
-, mFixLengthsButton(NULL)
+, mRecordCheckbox(nullptr)
+, mPlayCheckbox(nullptr)
+, mAddTrackButton(nullptr)
+, mResetPlayheadButton(nullptr)
+, mFixLengthsButton(nullptr)
 , mBufferWidth(800)
 , mBufferHeight(80)
 , mActiveStructureIdx(-1)
@@ -34,8 +34,8 @@ MultitrackRecorder::MultitrackRecorder()
 , mSelectedMeasureStart(-1)
 , mSelectedMeasureEnd(-1)
 , mMergeBufferIdx(-1)
-, mUndoBuffer(NULL)
-, mUndoRecordButton(NULL)
+, mUndoBuffer(nullptr)
+, mUndoRecordButton(nullptr)
 {
    TheMultitrackRecorder = this;
    
@@ -65,7 +65,7 @@ void MultitrackRecorder::CreateUIControls()
 
 MultitrackRecorder::~MultitrackRecorder()
 {
-   TheMultitrackRecorder = NULL;
+   TheMultitrackRecorder = nullptr;
    
    for (int i=0; i<mRecordBuffers.size(); ++i)
       delete mRecordBuffers[i];
@@ -626,9 +626,9 @@ MultitrackRecorder::RecordBuffer::~RecordBuffer()
 
 MultitrackRecorder::BufferControls::BufferControls()
 : mVol(1)
-, mVolSlider(NULL)
+, mVolSlider(nullptr)
 , mMute(false)
-, mMuteCheckbox(NULL)
+, mMuteCheckbox(nullptr)
 {
 }
 

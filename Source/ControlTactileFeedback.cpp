@@ -16,7 +16,7 @@ ControlTactileFeedback::ControlTactileFeedback()
 : mPhase(0)
 , mPhaseInc(0)
 , mVolume(.5f)
-, mVolumeSlider(NULL)
+, mVolumeSlider(nullptr)
 {
    mPhaseInc = GetPhaseInc(50);
 }
@@ -35,7 +35,7 @@ void ControlTactileFeedback::Process(double time)
 {
    Profiler profiler("ControlTactileFeedback");
 
-   if (!mEnabled || GetTarget() == NULL)
+   if (!mEnabled || GetTarget() == nullptr)
       return;
    
    int bufferSize = GetTarget()->GetBuffer()->BufferSize();

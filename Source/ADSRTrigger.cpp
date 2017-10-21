@@ -24,7 +24,7 @@ void ADSRTrigger::DrawModule()
       return;
 }
 
-void ADSRTrigger::PlayNote(double time, int pitch, int velocity, int voiceIdx /*= -1*/, ModulationChain* pitchBend /*= NULL*/, ModulationChain* modWheel /*= NULL*/, ModulationChain* pressure /*= NULL*/)
+void ADSRTrigger::PlayNote(double time, int pitch, int velocity, int voiceIdx /*= -1*/, ModulationChain* pitchBend /*= nullptr*/, ModulationChain* modWheel /*= nullptr*/, ModulationChain* pressure /*= nullptr*/)
 {
    PlayNoteOutput(time, pitch, velocity, voiceIdx, pitchBend, modWheel, pressure);
    

@@ -13,8 +13,8 @@
 
 PitchShiftEffect::PitchShiftEffect()
 : mRatio(1)
-, mRatioSlider(NULL)
-, mRatioSelector(NULL)
+, mRatioSlider(nullptr)
+, mRatioSelector(nullptr)
 , mRatioSelection(10)
 {
    for (int i=0; i<ChannelBuffer::kMaxNumChannels; ++i)

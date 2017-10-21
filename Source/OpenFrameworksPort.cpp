@@ -333,7 +333,7 @@ vector<string> ofSplitString(string str, string splitter, bool ignoreEmpty, bool
 
 bool ofIsStringInString(const string& haystack, const string& needle)
 {
-   return ( strstr(haystack.c_str(), needle.c_str() ) != NULL );
+   return ( strstr(haystack.c_str(), needle.c_str() ) != nullptr );
 }
 
 void ofScale(float x, float y, float z)

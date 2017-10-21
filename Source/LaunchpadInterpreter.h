@@ -42,7 +42,7 @@ public:
    void UpdateLights(vector<LightUpdate> lightUpdates, bool force = false);
    void Draw(ofVec2f vPos);
    void ResetLaunchpad();
-   bool HasLaunchpad() { return mController != NULL; }
+   bool HasLaunchpad() { return mController != nullptr; }
    
    static int LaunchpadColor(int r, int g);
    

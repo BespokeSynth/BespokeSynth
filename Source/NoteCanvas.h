@@ -36,7 +36,7 @@ public:
    void Resize(float w, float h) override;
    bool MouseScrolled(int x, int y, float scrollX, float scrollY) override;
    
-   void PlayNote(double time, int pitch, int velocity, int voiceIdx = -1, ModulationChain* pitchBend = NULL, ModulationChain* modWheel = NULL, ModulationChain* pressure = NULL) override;
+   void PlayNote(double time, int pitch, int velocity, int voiceIdx = -1, ModulationChain* pitchBend = nullptr, ModulationChain* modWheel = nullptr, ModulationChain* pressure = nullptr) override;
    void SendCC(int control, int value, int voiceIdx = -1) override {}
    
    void OnTransportAdvanced(float amount) override;

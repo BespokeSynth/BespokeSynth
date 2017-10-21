@@ -43,7 +43,7 @@ Chord::Chord(string name)
 
 string Chord::Name(bool withDegree, bool withAccidentals, ScalePitches* scale)
 {
-   if (scale == NULL)
+   if (scale == nullptr)
       scale = &TheScale->GetScalePitches();
    
    int degree;

@@ -18,7 +18,7 @@
 
 ClipLauncher::ClipLauncher()
 : mVolume(1)
-, mVolumeSlider(NULL)
+, mVolumeSlider(nullptr)
 {
    mWriteBuffer = new float[gBufferSize];
    Clear(mWriteBuffer, gBufferSize);
@@ -41,7 +41,7 @@ void ClipLauncher::Process(double time)
 {
    Profiler profiler("ClipLauncher");
    
-   if (!mEnabled || GetTarget() == NULL)
+   if (!mEnabled || GetTarget() == nullptr)
       return;
    
    ComputeSliders(0);
@@ -57,7 +57,7 @@ void ClipLauncher::Process(double time)
          sampleToPlay = i;
    }
    
-   Sample* sample = NULL;
+   Sample* sample = nullptr;
    float volSq = 1;
    if (sampleToPlay != -1)
    {

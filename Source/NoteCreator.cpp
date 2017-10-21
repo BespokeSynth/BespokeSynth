@@ -14,15 +14,15 @@
 #include "PolyphonyMgr.h"
 
 NoteCreator::NoteCreator()
-: mTriggerButton(NULL)
+: mTriggerButton(nullptr)
 , mPitch(48)
 , mVelocity(1)
 , mDuration(100)
-, mPitchEntry(NULL)
-, mVelocitySlider(NULL)
+, mPitchEntry(nullptr)
+, mVelocitySlider(nullptr)
 , mNoteOn(false)
 , mStartTime(0)
-, mNoteOnCheckbox(NULL)
+, mNoteOnCheckbox(nullptr)
 , mNoteOnByTrigger(false)
 {
    SetIsNoteOrigin(true);

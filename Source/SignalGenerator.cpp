@@ -19,32 +19,32 @@ SignalGenerator::SignalGenerator()
 : mOsc(kOsc_Sin)
 , mVol(0)
 , mSmoothedVol(0)
-, mVolSlider(NULL)
+, mVolSlider(nullptr)
 , mOscType(kOsc_Sin)
-, mOscSelector(NULL)
+, mOscSelector(nullptr)
 , mPulseWidth(.5f)
-, mPulseWidthSlider(NULL)
+, mPulseWidthSlider(nullptr)
 , mMult(1)
-, mMultSelector(NULL)
+, mMultSelector(nullptr)
 , mSync(false)
-, mSyncCheckbox(NULL)
+, mSyncCheckbox(nullptr)
 , mSyncFreq(200)
-, mSyncFreqSlider(NULL)
+, mSyncFreqSlider(nullptr)
 , mDetune(1)
-, mDetuneSlider(NULL)
+, mDetuneSlider(nullptr)
 , mFreq(220)
-, mFreqSlider(NULL)
+, mFreqSlider(nullptr)
 , mPhase(0)
 , mSyncPhase(0)
 , mFreqMode(kFreqMode_Instant)
-, mFreqModeSelector(NULL)
-, mFreqSliderAmountSlider(NULL)
+, mFreqModeSelector(nullptr)
+, mFreqSliderAmountSlider(nullptr)
 , mFreqRampTime(200)
-, mFreqRampTimeSlider(NULL)
+, mFreqRampTimeSlider(nullptr)
 , mShuffle(0)
-, mShuffleSlider(NULL)
+, mShuffleSlider(nullptr)
 , mSoften(0)
-, mSoftenSlider(NULL)
+, mSoftenSlider(nullptr)
 {
    mWriteBuffer = new float[gBufferSize];
    
@@ -115,7 +115,7 @@ void SignalGenerator::Process(double time)
 {
    Profiler profiler("SignalGenerator");
    
-   if (!mEnabled || GetTarget() == NULL)
+   if (!mEnabled || GetTarget() == nullptr)
       return;
    
    int bufferSize = GetTarget()->GetBuffer()->BufferSize();
@@ -172,7 +172,7 @@ void SignalGenerator::Process(double time)
    Add(out, mWriteBuffer, bufferSize);
 }
 
-void SignalGenerator::PlayNote(double time, int pitch, int velocity, int voiceIdx /*= -1*/, ModulationChain* pitchBend /*= NULL*/, ModulationChain* modWheel /*= NULL*/, ModulationChain* pressure /*= NULL*/)
+void SignalGenerator::PlayNote(double time, int pitch, int velocity, int voiceIdx /*= -1*/, ModulationChain* pitchBend /*= nullptr*/, ModulationChain* modWheel /*= nullptr*/, ModulationChain* pressure /*= nullptr*/)
 {
    if (velocity > 0)
    {

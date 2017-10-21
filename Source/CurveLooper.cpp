@@ -11,12 +11,12 @@
 #include "PatchCableSource.h"
 
 CurveLooper::CurveLooper()
-: mUIControl(NULL)
+: mUIControl(nullptr)
 , mInterval(kInterval_16n)
-, mIntervalSelector(NULL)
+, mIntervalSelector(nullptr)
 , mLength(4)
-, mLengthSelector(NULL)
-, mControlCable(NULL)
+, mLengthSelector(nullptr)
+, mControlCable(nullptr)
 , mWidth(200)
 , mHeight(100)
 , mRecord(false)
@@ -148,7 +148,7 @@ void CurveLooper::PostRepatch(PatchCableSource* cableSource)
    if (mControlCable->GetPatchCables().empty() == false)
       mUIControl = dynamic_cast<IUIControl*>(mControlCable->GetPatchCables()[0]->GetTarget());
    else
-      mUIControl = NULL;
+      mUIControl = nullptr;
 }
 
 void CurveLooper::CheckboxUpdated(Checkbox* checkbox)
@@ -226,7 +226,7 @@ void CurveLooper::SetUpFromSaveData()
    }
    else
    {
-      mUIControl = NULL;
+      mUIControl = nullptr;
    }
    
    mWidth = mModuleSaveData.GetInt("width");

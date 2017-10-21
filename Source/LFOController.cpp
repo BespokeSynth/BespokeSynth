@@ -11,22 +11,22 @@
 #include "SynthGlobals.h"
 #include "FloatSliderLFOControl.h"
 
-LFOController* TheLFOController = NULL;
+LFOController* TheLFOController = nullptr;
 
 LFOController::LFOController()
 : dummy(0)
 , dummy2(0)
-, mIntervalSelector(NULL)
-, mOscSelector(NULL)
-, mMinSlider(NULL)
-, mMaxSlider(NULL)
+, mIntervalSelector(nullptr)
+, mOscSelector(nullptr)
+, mMinSlider(nullptr)
+, mMaxSlider(nullptr)
 , mWantBind(false)
-, mBindButton(NULL)
-, mLFO(NULL)
-, mSlider(NULL)
+, mBindButton(nullptr)
+, mLFO(nullptr)
+, mSlider(nullptr)
 , mStopBindTime(-1)
 {
-   assert(TheLFOController == NULL);
+   assert(TheLFOController == nullptr);
    TheLFOController = this;
 }
 
@@ -84,7 +84,7 @@ void LFOController::SetSlider(FloatSlider* slider)
    mSlider = slider;
    mLFO = slider->AcquireLFO();
    
-   if (mLFO == NULL)
+   if (mLFO == nullptr)
       return;
    
    LFOSettings* lfoSettings = mLFO->GetLFOSettings();
@@ -130,7 +130,7 @@ void LFOController::DrawModule()
 
 void LFOController::DropdownUpdated(DropdownList* list, int oldVal)
 {
-   if (mLFO == NULL)
+   if (mLFO == nullptr)
       return;
    
    mLFO->UpdateFromSettings();
@@ -138,7 +138,7 @@ void LFOController::DropdownUpdated(DropdownList* list, int oldVal)
 
 void LFOController::FloatSliderUpdated(FloatSlider* slider, float oldVal)
 {
-   if (mLFO == NULL)
+   if (mLFO == nullptr)
       return;
    
    LFOSettings* lfoSettings = mLFO->GetLFOSettings();

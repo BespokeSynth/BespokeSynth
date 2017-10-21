@@ -18,7 +18,7 @@ FollowingSong::FollowingSong()
 , mLoadingSong(true)
 , mPlay(false)
 , mMute(false)
-, mMuteCheckbox(NULL)
+, mMuteCheckbox(nullptr)
 {
    mWriteBuffer = new float[gBufferSize];
    Clear(mWriteBuffer, gBufferSize);
@@ -55,7 +55,7 @@ void FollowingSong::Process(double time)
 {
    Profiler profiler("FollowingSong");
    
-   if (!mEnabled || GetTarget() == NULL)
+   if (!mEnabled || GetTarget() == nullptr)
       return;
    
    ComputeSliders(0);

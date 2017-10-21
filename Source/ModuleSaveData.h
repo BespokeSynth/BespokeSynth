@@ -46,8 +46,8 @@ public:
    float LoadFloat(string prop, const ofxJSONElement& moduleInfo, float defaultValue = 0, float min=0, float max=1, bool isTextField = false);
    float LoadFloat(string prop, const ofxJSONElement& moduleInfo, float defaultValue , FloatSlider* slider, bool isTextField = false);
    bool LoadBool(string prop, const ofxJSONElement& moduleInfo, bool defaultValue = false);
-   string LoadString(string prop, const ofxJSONElement& moduleInfo, string defaultValue = "", FillDropdownFn fillFn = NULL);
-   template <class T> T LoadEnum(string prop, const ofxJSONElement& moduleInfo, int defaultValue, IUIControl* list = NULL, EnumMap* map = NULL)
+   string LoadString(string prop, const ofxJSONElement& moduleInfo, string defaultValue = "", FillDropdownFn fillFn = nullptr);
+   template <class T> T LoadEnum(string prop, const ofxJSONElement& moduleInfo, int defaultValue, IUIControl* list = nullptr, EnumMap* map = nullptr)
    {
       if (list)
          SetEnumMapFromList(prop, list);
@@ -68,7 +68,7 @@ public:
    
    struct SaveVal
    {
-      SaveVal(string prop) : mProperty(prop), mMin(0), mMax(10), mIsTextField(false), mFillDropdownFn(NULL) { bzero(mString,MAX_TEXTENTRY_LENGTH); }
+      SaveVal(string prop) : mProperty(prop), mMin(0), mMax(10), mIsTextField(false), mFillDropdownFn(nullptr) { bzero(mString,MAX_TEXTENTRY_LENGTH); }
       
       string mProperty;
       Type mType;

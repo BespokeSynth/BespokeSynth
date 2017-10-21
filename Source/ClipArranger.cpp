@@ -53,7 +53,7 @@ void ClipArranger::DrawModule()
    
    for (int i=0; i<MAX_CLIPS; ++i)
    {
-      if (mClips[i].mSample != NULL)
+      if (mClips[i].mSample != nullptr)
       {
          float xStart = SampleToX(mClips[i].mStartSample);
          float xPos = xStart;
@@ -99,7 +99,7 @@ void ClipArranger::OnClicked(int x, int y, bool right)
       if (IsKeyHeld('x'))
       {
          delete mClips[mHighlightClip].mSample;
-         mClips[mHighlightClip].mSample = NULL;
+         mClips[mHighlightClip].mSample = nullptr;
       }
       else
       {
@@ -146,7 +146,7 @@ bool ClipArranger::MouseMoved(float x, float y)
       {
          for (int i=0; i<MAX_CLIPS; ++i)
          {
-            if (mClips[i].mSample != NULL)
+            if (mClips[i].mSample != nullptr)
             {
                if (mouseSample >= mClips[i].mStartSample && mouseSample < mClips[i].mEndSample)
                {
@@ -214,10 +214,10 @@ ClipArranger::Clip* ClipArranger::GetEmptyClip()
 {
    for (int i=0; i<MAX_CLIPS; ++i)
    {
-      if (mClips[i].mSample == NULL)
+      if (mClips[i].mSample == nullptr)
          return &mClips[i];
    }
-   return NULL;
+   return nullptr;
 }
 
 void ClipArranger::FloatSliderUpdated(FloatSlider* slider, float oldVal)
@@ -247,7 +247,7 @@ void ClipArranger::SetUpFromSaveData()
 
 void ClipArranger::Clip::Process(float* left, float* right, int bufferSize)
 {
-   if (mSample == NULL)
+   if (mSample == nullptr)
       return;
    
    for (int i=0; i<bufferSize; ++i)

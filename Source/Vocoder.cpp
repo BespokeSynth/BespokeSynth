@@ -24,20 +24,20 @@ Vocoder::Vocoder()
 , mInputPreamp(1)
 , mCarrierPreamp(1)
 , mVolume(1)
-, mInputSlider(NULL)
-, mCarrierSlider(NULL)
-, mVolumeSlider(NULL)
+, mInputSlider(nullptr)
+, mCarrierSlider(nullptr)
+, mVolumeSlider(nullptr)
 , mDryWet(1)
-, mDryWetSlider(NULL)
+, mDryWetSlider(nullptr)
 , mFricativeThresh(.07)
-, mFricativeSlider(NULL)
+, mFricativeSlider(nullptr)
 , mFricDetected(false)
 , mWhisper(0)
-, mWhisperSlider(NULL)
+, mWhisperSlider(nullptr)
 , mPhaseOffset(0)
-, mPhaseOffsetSlider(NULL)
+, mPhaseOffsetSlider(nullptr)
 , mCut(1)
-, mCutSlider(NULL)
+, mCutSlider(nullptr)
 {
    // Generate a window with a single raised cosine from N/4 to 3N/4
    mWindower = new float[VOCODER_WINDOW_SIZE];
@@ -83,7 +83,7 @@ void Vocoder::Process(double time)
 {
    Profiler profiler("Vocoder");
 
-   if (GetTarget() == NULL || !mEnabled)
+   if (GetTarget() == nullptr || !mEnabled)
       return;
 
    ComputeSliders(0);

@@ -10,9 +10,9 @@
 
 ModulationChain::ModulationChain()
 : mLFOAmount(0)
-, mPrev(NULL)
-, mSidechain(NULL)
-, mMultiplyIn(NULL)
+, mPrev(nullptr)
+, mSidechain(nullptr)
+, mMultiplyIn(nullptr)
 {
    mLFO.SetMode(kLFOMode_Oscillator);
 }

@@ -13,8 +13,8 @@
 
 EQEffect::EQEffect()
 : mNumFilters(NUM_EQ_FILTERS)
-, mMultiSlider(NULL)
-, mEvenButton(NULL)
+, mMultiSlider(nullptr)
+, mEvenButton(nullptr)
 {
    SetEnabled(true);
    

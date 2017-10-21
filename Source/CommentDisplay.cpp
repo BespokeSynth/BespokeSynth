@@ -11,7 +11,7 @@
 #include "ModularSynth.h"
 
 CommentDisplay::CommentDisplay()
-: mCommentEntry(NULL)
+: mCommentEntry(nullptr)
 {
    mComment[0] = 0;
 }

@@ -9,7 +9,7 @@
 #include "MidiReader.h"
 
 MidiReader::MidiReader()
-: /*mSequencer(NULL)
+: /*mSequencer(nullptr)
 ,*/ mBeatOffset(0)
 {
    

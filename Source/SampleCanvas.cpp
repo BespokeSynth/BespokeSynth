@@ -17,8 +17,8 @@
 #include "Sample.h"
 
 SampleCanvas::SampleCanvas()
-: mCanvas(NULL)
-, mCanvasControls(NULL)
+: mCanvas(nullptr)
+, mCanvasControls(nullptr)
 {
 }
 
@@ -37,14 +37,14 @@ void SampleCanvas::CreateUIControls()
 
 SampleCanvas::~SampleCanvas()
 {
-   mCanvas->SetListener(NULL);
+   mCanvas->SetListener(nullptr);
 }
 
 void SampleCanvas::Process(double time)
 {
    Profiler profiler("SampleCanvas");
    
-   if (!mEnabled || GetTarget() == NULL)
+   if (!mEnabled || GetTarget() == nullptr)
       return;
    
    int numBars = mCanvas->GetNumCols();
@@ -67,7 +67,7 @@ void SampleCanvas::Process(double time)
       int numLoops = element->GetNumLoops();
       float vol = element->GetVolume();
       bool measureSync = element->ShouldMeasureSync();
-      if (clip == NULL)
+      if (clip == nullptr)
          continue;
       
       for (int i=0; i<bufferSize; ++i)

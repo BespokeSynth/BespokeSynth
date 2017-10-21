@@ -15,7 +15,7 @@
 SliderSequencer::SliderSequencer()
 : mLastMeasurePos(0)
 , mDivision(1)
-, mDivisionSlider(NULL)
+, mDivisionSlider(nullptr)
 {
    TheTransport->AddAudioPoller(this);
    
@@ -129,15 +129,15 @@ void SliderSequencer::SetUpFromSaveData()
 
 
 SliderLine::SliderLine(SliderSequencer* owner, int x, int y, int index)
-: mSlider(NULL)
+: mSlider(nullptr)
 , mPoint(0)
 , mVelocity(0)
-, mVelocitySlider(NULL)
+, mVelocitySlider(nullptr)
 , mNote(0)
-, mNoteSelector(NULL)
+, mNoteSelector(nullptr)
 , mPlayTime(0)
 , mPlaying(false)
-, mPlayingCheckbox(NULL)
+, mPlayingCheckbox(nullptr)
 , mX(x)
 , mY(y)
 , mOwner(owner)

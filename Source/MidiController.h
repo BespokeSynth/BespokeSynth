@@ -72,7 +72,7 @@ struct UIControlConnection
    {
       mMessageType = kMidiMessage_Control;
       mControl = -1;
-      mUIControl = NULL;
+      mUIControl = nullptr;
       mType = kControlType_Slider;
       mValue = 0;
       mLastControlValue = -1;

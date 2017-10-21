@@ -53,7 +53,7 @@ void Selector::PostRepatch(PatchCableSource* cableSource)
                mControlCables.push_back(cable);
             }
          }
-         else if (cableSource->GetTarget() == NULL)
+         else if (cableSource->GetTarget() == nullptr)
          {
             RemoveFromVector(cableSource, mControlCables);
          }
@@ -79,10 +79,10 @@ void Selector::SyncList()
 
 void Selector::RadioButtonUpdated(RadioButton* radio, int oldVal)
 {
-   IUIControl* controlToEnable = NULL;
+   IUIControl* controlToEnable = nullptr;
    for (int i=0; i<mControlCables.size(); ++i)
    {
-      IUIControl* uicontrol = NULL;
+      IUIControl* uicontrol = nullptr;
       if (mControlCables[i]->GetTarget())
          uicontrol = dynamic_cast<IUIControl*>(mControlCables[i]->GetTarget());
       if (uicontrol)
@@ -131,7 +131,7 @@ void Selector::LoadLayout(const ofxJSONElement& moduleInfo)
    for (int i=0; i<controls.size(); ++i)
    {
       string controlPath = controls[i].asString();
-      IUIControl* control = NULL;
+      IUIControl* control = nullptr;
       if (!controlPath.empty())
          control = TheSynth->FindUIControl(controlPath);
       PatchCableSource* cable = new PatchCableSource(this, kConnectionType_UIControl);

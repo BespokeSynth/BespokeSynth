@@ -33,7 +33,7 @@ struct Chord
    ChordType mType;
    int mInversion;
    
-   string Name(bool withDegree, bool withAccidentals, ScalePitches* scale = NULL);
+   string Name(bool withDegree, bool withAccidentals, ScalePitches* scale = nullptr);
    void SetFromDegreeAndScale(int degree, const ScalePitches& scale, int inversion = 0);
 };
 

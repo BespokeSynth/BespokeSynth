@@ -15,32 +15,32 @@
 
 SampleFinder::SampleFinder()
 : mVolume(.6f)
-, mVolumeSlider(NULL)
-, mSample(NULL)
+, mVolumeSlider(nullptr)
+, mSample(nullptr)
 , mPlay(false)
-, mPlayCheckbox(NULL)
+, mPlayCheckbox(nullptr)
 , mLoop(true)
-, mLoopCheckbox(NULL)
+, mLoopCheckbox(nullptr)
 , mMeasureEarly(0)
 , mEditMode(true)
-, mEditCheckbox(NULL)
+, mEditCheckbox(nullptr)
 , mClipStart(0)
-, mClipStartSlider(NULL)
+, mClipStartSlider(nullptr)
 , mClipEnd(1)
-, mClipEndSlider(NULL)
+, mClipEndSlider(nullptr)
 , mZoomStart(0)
 , mZoomEnd(1)
 , mNumBars(1)
-, mNumBarsSlider(NULL)
+, mNumBarsSlider(nullptr)
 , mOffset(0)
-, mOffsetSlider(NULL)
-, mWriteButton(NULL)
+, mOffsetSlider(nullptr)
+, mWriteButton(nullptr)
 , mPlayhead(0)
 , mWantWrite(false)
-, mDoubleLengthButton(NULL)
-, mHalveLengthButton(NULL)
+, mDoubleLengthButton(nullptr)
+, mHalveLengthButton(nullptr)
 , mReverse(false)
-, mReverseCheckbox(NULL)
+, mReverseCheckbox(nullptr)
 {
    mWriteBuffer = new float[gBufferSize];
    Clear(mWriteBuffer, gBufferSize);
@@ -78,7 +78,7 @@ void SampleFinder::Process(double time)
 {
    Profiler profiler("SampleFinder");
 
-   if (!mEnabled || GetTarget() == NULL || mSample == NULL || mPlay == false)
+   if (!mEnabled || GetTarget() == nullptr || mSample == nullptr || mPlay == false)
       return;
    
    ComputeSliders(0);
@@ -321,7 +321,7 @@ void SampleFinder::IntSliderUpdated(IntSlider* slider, int oldVal)
    }
 }
 
-void SampleFinder::PlayNote(double time, int pitch, int velocity, int voiceIdx /*= -1*/, ModulationChain* pitchBend /*= NULL*/, ModulationChain* modWheel /*= NULL*/, ModulationChain* pressure /*= NULL*/)
+void SampleFinder::PlayNote(double time, int pitch, int velocity, int voiceIdx /*= -1*/, ModulationChain* pitchBend /*= nullptr*/, ModulationChain* modWheel /*= nullptr*/, ModulationChain* pressure /*= nullptr*/)
 {
    if (mSample)
    {

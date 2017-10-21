@@ -13,40 +13,40 @@
 #include "Transport.h"
 #include "Profiler.h"
 
-ChaosEngine* TheChaosEngine = NULL;
+ChaosEngine* TheChaosEngine = nullptr;
 
 ChaosEngine::ChaosEngine()
-: mChaosButton(NULL)
+: mChaosButton(nullptr)
 , mTotalChaos(false)
-, mTotalChaosCheckbox(NULL)
+, mTotalChaosCheckbox(nullptr)
 , mChaosArrivalTime(-1)
 , mLastAudioUpdateMeasure(-1)
 , mChordProgressionIdx(-1)
 , mSectionIdx(0)
-, mSectionDropdown(NULL)
+, mSectionDropdown(nullptr)
 , mSongIdx(-1)
-, mSongDropdown(NULL)
+, mSongDropdown(nullptr)
 , mBeatsLeftToChordChange(-1)
-, mReadSongsButton(NULL)
+, mReadSongsButton(nullptr)
 , mPlayChord(false)
-, mPlayChordCheckbox(NULL)
+, mPlayChordCheckbox(nullptr)
 , mProgress(true)
-, mProgressCheckbox(NULL)
+, mProgressCheckbox(nullptr)
 , mDegree(0)
-, mDegreeSlider(NULL)
-, mRootNoteList(NULL)
-, mChordTypeList(NULL)
-, mAddChordButton(NULL)
-, mRemoveChordButton(NULL)
-, mSetProgressionButton(NULL)
-, mChordProgressionSlider(NULL)
-, mRandomProgressionButton(NULL)
-, mInversionSlider(NULL)
+, mDegreeSlider(nullptr)
+, mRootNoteList(nullptr)
+, mChordTypeList(nullptr)
+, mAddChordButton(nullptr)
+, mRemoveChordButton(nullptr)
+, mSetProgressionButton(nullptr)
+, mChordProgressionSlider(nullptr)
+, mRandomProgressionButton(nullptr)
+, mInversionSlider(nullptr)
 , mRestarting(false)
 , mHideBeat(false)
-, mHideBeatCheckbox(NULL)
+, mHideBeatCheckbox(nullptr)
 {
-   assert(TheChaosEngine == NULL);
+   assert(TheChaosEngine == nullptr);
    TheChaosEngine = this;
    
    mChordProgression.push_back(ProgressionChord(0));

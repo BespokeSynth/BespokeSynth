@@ -13,11 +13,11 @@
 
 GridController::GridController()
 : mMessageType(kMidiMessage_Note)
-, mController(NULL)
+, mController(nullptr)
 , mControllerPage(0)
 , mRows(0)
 , mCols(0)
-, mGrid(NULL)
+, mGrid(nullptr)
 , mClicked(false)
 , mClickedCell(0,0)
 {

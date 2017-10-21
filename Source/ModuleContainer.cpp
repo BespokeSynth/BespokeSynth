@@ -168,7 +168,7 @@ IDrawableModule* ModuleContainer::GetModuleAt(float x, float y)
          return mModules[i];
       }
    }
-   return NULL;
+   return nullptr;
 }
 
 void ModuleContainer::GetModulesWithinRect(ofRectangle rect, vector<IDrawableModule*>& output)
@@ -250,12 +250,12 @@ IDrawableModule* ModuleContainer::FindModule(string name, bool fail)
    if (mOwner)
       ownerPath = mOwner->Path();
    if (strstr(name.c_str(), ownerPath.c_str()) != name.c_str())  //path doesn't start with ownerPath
-      return NULL;
+      return nullptr;
       
    name = name.substr(ownerPath.length());*/
    
    if (name == "")
-      return NULL;
+      return nullptr;
    
    for (int i=0; i<mModules.size(); ++i)
    {
@@ -280,7 +280,7 @@ IDrawableModule* ModuleContainer::FindModule(string name, bool fail)
    
    if (fail)
       throw UnknownModuleException(name);
-   return NULL;
+   return nullptr;
 }
 
 IUIControl* ModuleContainer::FindUIControl(string path)
@@ -289,7 +289,7 @@ IUIControl* ModuleContainer::FindUIControl(string path)
    if (mOwner)
       ownerPath = mOwner->Path();
    if (strstr(path.c_str(), ownerPath.c_str()) != path.c_str())  //path doesn't start with ownerPath
-      return NULL;
+      return nullptr;
    
    path = path.substr(ownerPath.length());*/
    

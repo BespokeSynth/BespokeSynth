@@ -12,7 +12,7 @@
 #include "ChaosEngine.h"
 #include "FillSaveDropdown.h"
 
-Transport* TheTransport = NULL;
+Transport* TheTransport = nullptr;
 
 Transport::Transport()
 : mTempo(gDefaultTempo)
@@ -25,23 +25,23 @@ Transport::Transport()
 , mMeasurePos(0)
 , mSwingInterval(8)
 , mSwing(.5f)
-, mSwingSlider(NULL)
-, mResetButton(NULL)
-, mTimeSigTopDropdown(NULL)
-, mTimeSigBottomDropdown(NULL)
-, mSwingIntervalDropdown(NULL)
+, mSwingSlider(nullptr)
+, mResetButton(nullptr)
+, mTimeSigTopDropdown(nullptr)
+, mTimeSigBottomDropdown(nullptr)
+, mSwingIntervalDropdown(nullptr)
 , mSetTempoBool(false)
-, mSetTempoCheckbox(NULL)
+, mSetTempoCheckbox(nullptr)
 , mStartRecordTime(-1)
-, mNudgeBackButton(NULL)
-, mNudgeForwardButton(NULL)
-, mIncreaseTempoButton(NULL)
-, mDecreaseTempoButton(NULL)
-, mTempoSlider(NULL)
+, mNudgeBackButton(nullptr)
+, mNudgeForwardButton(nullptr)
+, mIncreaseTempoButton(nullptr)
+, mDecreaseTempoButton(nullptr)
+, mTempoSlider(nullptr)
 , mLoopStartMeasure(-1)
 , mLoopEndMeasure(-1)
 {
-   assert(TheTransport == NULL);
+   assert(TheTransport == nullptr);
    TheTransport = this;
 
    SetName("transport");

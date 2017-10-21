@@ -23,33 +23,33 @@ Arpeggiator::Arpeggiator()
 , mRestartOnPress(true)
 , mUserPitch(-1)
 , mLastPitch(-1)
-, mIntervalSelector(NULL)
-, mUseHeldNotesCheckbox(NULL)
-, mRestartOnPressCheckbox(NULL)
-, mArpEntry(NULL)
-, mEasyButton(NULL)
+, mIntervalSelector(nullptr)
+, mUseHeldNotesCheckbox(nullptr)
+, mRestartOnPressCheckbox(nullptr)
+, mArpEntry(nullptr)
+, mEasyButton(nullptr)
 , mRandomLength(8)
 , mRandomRange(24)
 , mRandomRest(false)
 , mRandomHold(false)
 , mRepeatIsHold(true)
-, mRepeatIsHoldCheckbox(NULL)
-, mRandomLengthSlider(NULL)
-, mRandomRangeSlider(NULL)
-, mRandomRestCheckbox(NULL)
-, mRandomHoldCheckbox(NULL)
+, mRepeatIsHoldCheckbox(nullptr)
+, mRandomLengthSlider(nullptr)
+, mRandomRangeSlider(nullptr)
+, mRandomRestCheckbox(nullptr)
+, mRandomHoldCheckbox(nullptr)
 , mArpStep(1)
 , mArpPingPongDirection(1)
-, mArpStepSlider(NULL)
+, mArpStepSlider(nullptr)
 , mResetOnDownbeat(false)
-, mResetOnDownbeatCheckbox(NULL)
+, mResetOnDownbeatCheckbox(nullptr)
 , mViewGrid(false)
-, mGrid(NULL)
-, mViewGridCheckbox(NULL)
+, mGrid(nullptr)
+, mViewGridCheckbox(nullptr)
 , mUpbeats(false)
-, mUpbeatsCheckbox(NULL)
+, mUpbeatsCheckbox(nullptr)
 , mPlayOnlyScaleNotes(false)
-, mPlayOnlyScaleNotesCheckbox(NULL)
+, mPlayOnlyScaleNotesCheckbox(nullptr)
 {
    TheTransport->AddListener(this, mInterval);
    TheScale->AddListener(this);
@@ -243,7 +243,7 @@ void Arpeggiator::CheckboxUpdated(Checkbox* checkbox)
    }
 }
 
-void Arpeggiator::PlayNote(double time, int pitch, int velocity, int voiceIdx /*= -1*/, ModulationChain* pitchBend /*= NULL*/, ModulationChain* modWheel /*= NULL*/, ModulationChain* pressure /*= NULL*/)
+void Arpeggiator::PlayNote(double time, int pitch, int velocity, int voiceIdx /*= -1*/, ModulationChain* pitchBend /*= nullptr*/, ModulationChain* modWheel /*= nullptr*/, ModulationChain* pressure /*= nullptr*/)
 {
    if (!mEnabled)
    {
@@ -311,7 +311,7 @@ void Arpeggiator::OnTimeEvent(int samplesTo)
                break;
             }
          }
-         mChord.push_back(ArpNote(val,80,-1,NULL,NULL,NULL));
+         mChord.push_back(ArpNote(val,80,-1,nullptr,nullptr,nullptr));
       }
       mChordMutex.unlock();
    }
@@ -426,11 +426,11 @@ void Arpeggiator::TextEntryComplete(TextEntry* entry)
    for (int i=0; i<tokens.size(); ++i)
    {
       if (tokens[i] == "x")
-         mChord.push_back(ArpNote(ARP_REST,0,-1,NULL,NULL,NULL));
+         mChord.push_back(ArpNote(ARP_REST,0,-1,nullptr,nullptr,nullptr));
       else if (tokens[i] == "h")
-         mChord.push_back(ArpNote(ARP_HOLD,0,-1,NULL,NULL,NULL));
+         mChord.push_back(ArpNote(ARP_HOLD,0,-1,nullptr,nullptr,nullptr));
       else
-         mChord.push_back(ArpNote(atoi(tokens[i].c_str()),80,-1,NULL,NULL,NULL));
+         mChord.push_back(ArpNote(atoi(tokens[i].c_str()),80,-1,nullptr,nullptr,nullptr));
    }
    mChordMutex.unlock();
    SyncGridToArp();
@@ -440,16 +440,16 @@ void Arpeggiator::GenerateRandomArpeggio()
 {
    mChordMutex.lock();
    mChord.clear();
-   mChord.push_back(ArpNote(12,80,-1,NULL,NULL,NULL));
+   mChord.push_back(ArpNote(12,80,-1,nullptr,nullptr,nullptr));
    for (int i=1; i<mRandomLength; ++i)
    {
       int choose = rand() % 5;
       if (choose == 0 && mRandomRest)
-         mChord.push_back(ArpNote(ARP_REST,0,-1,NULL,NULL,NULL));
+         mChord.push_back(ArpNote(ARP_REST,0,-1,nullptr,nullptr,nullptr));
       else if (choose == 1 && mRandomHold)
-         mChord.push_back(ArpNote(ARP_HOLD,0,-1,NULL,NULL,NULL));
+         mChord.push_back(ArpNote(ARP_HOLD,0,-1,nullptr,nullptr,nullptr));
       else
-         mChord.push_back(ArpNote(rand()%mRandomRange,rand()%100+27,-1,NULL,NULL,NULL));
+         mChord.push_back(ArpNote(rand()%mRandomRange,rand()%100+27,-1,nullptr,nullptr,nullptr));
    }
    mChordMutex.unlock();
    SyncGridToArp();

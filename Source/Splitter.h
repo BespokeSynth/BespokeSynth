@@ -27,7 +27,7 @@ public:
    string GetTitleLabel() override { return "splitter"; }
    void CreateUIControls() override;
    
-   IAudioReceiver* GetTarget2() override { return mPatchCableSource2 ? mPatchCableSource2->GetAudioReceiver() : NULL; }
+   IAudioReceiver* GetTarget2() override { return mPatchCableSource2 ? mPatchCableSource2->GetAudioReceiver() : nullptr; }
    
    //IAudioSource
    void Process(double time) override;

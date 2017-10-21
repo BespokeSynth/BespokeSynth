@@ -14,7 +14,7 @@
 FreqDelay::FreqDelay()
 : IAudioProcessor(gBufferSize)
 , mDryWet(1)
-, mDryWetSlider(NULL)
+, mDryWetSlider(nullptr)
 , mDryBuffer(gBufferSize)
 {
    AddChild(&mDelayEffect);
@@ -39,7 +39,7 @@ void FreqDelay::Process(double time)
 {
    Profiler profiler("FreqDelay");
 
-   if (GetTarget() == NULL)
+   if (GetTarget() == nullptr)
       return;
    
    SyncBuffers();
@@ -62,7 +62,7 @@ void FreqDelay::Process(double time)
    GetBuffer()->Clear();
 }
 
-void FreqDelay::PlayNote(double time, int pitch, int velocity, int voiceIdx /*= -1*/, ModulationChain* pitchBend /*= NULL*/, ModulationChain* modWheel /*= NULL*/, ModulationChain* pressure /*= NULL*/)
+void FreqDelay::PlayNote(double time, int pitch, int velocity, int voiceIdx /*= -1*/, ModulationChain* pitchBend /*= nullptr*/, ModulationChain* modWheel /*= nullptr*/, ModulationChain* pressure /*= nullptr*/)
 {
    if (velocity > 0)
    {

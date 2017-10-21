@@ -93,9 +93,9 @@ public:
       mVG = nvgCreateGL3(NVG_ANTIALIAS | NVG_STENCIL_STROKES | NVG_DEBUG);
       mFontBoundsVG = nvgCreateGL3(NVG_ANTIALIAS | NVG_STENCIL_STROKES | NVG_DEBUG);
       
-      if (mVG == NULL)
+      if (mVG == nullptr)
          printf("Could not init nanovg.\n");
-      if (mFontBoundsVG == NULL)
+      if (mFontBoundsVG == nullptr)
          printf("Could not init font bounds nanovg.\n");
       
       mSynth.LoadResources(mVG, mFontBoundsVG);

@@ -15,12 +15,12 @@
 #include "SynthGlobals.h"
 #include "PatchCableSource.h"
 
-PatchCable* PatchCable::sActivePatchCable = NULL;
+PatchCable* PatchCable::sActivePatchCable = nullptr;
 
 PatchCable::PatchCable(PatchCableSource* owner)
 : mHovered(false)
 , mDragging(false)
-, mTarget(NULL)
+, mTarget(nullptr)
 {
    mOwner = owner;
    TheSynth->RegisterPatchCable(this);
@@ -29,7 +29,7 @@ PatchCable::PatchCable(PatchCableSource* owner)
 PatchCable::~PatchCable()
 {
    if (sActivePatchCable == this)
-      sActivePatchCable = NULL;
+      sActivePatchCable = nullptr;
    TheSynth->UnregisterPatchCable(this);
 }
 
@@ -88,7 +88,7 @@ void PatchCable::Render()
          if (audioSource)
          {
             RollingBuffer* vizBuff = mOwner->GetOverrideVizBuffer();
-            if (vizBuff == NULL)
+            if (vizBuff == nullptr)
                vizBuff = audioSource->GetVizBuffer();
             assert(vizBuff);
             int numSamples = vizBuff->Size();
@@ -214,7 +214,7 @@ void PatchCable::Render()
             ofSetLineWidth(lineWidth);
             
             RollingBuffer* vizBuff = mOwner->GetOverrideVizBuffer();
-            if (vizBuff == NULL)
+            if (vizBuff == nullptr)
                vizBuff = audioSource->GetVizBuffer();
             assert(vizBuff);
             int numSamples = vizBuff->Size();
@@ -316,9 +316,9 @@ void PatchCable::MouseReleased()
       mDragging = false;
       mHovered = false;
       if (sActivePatchCable == this)
-         sActivePatchCable = NULL;
+         sActivePatchCable = nullptr;
       
-      if (mTarget == NULL)
+      if (mTarget == nullptr)
          Destroy();
    }
 }

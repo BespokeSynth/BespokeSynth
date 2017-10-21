@@ -14,11 +14,11 @@
 #include "ModuleSaveDataPanel.h"
 #include "HelpDisplay.h"
 
-TitleBar* TheTitleBar = NULL;
+TitleBar* TheTitleBar = nullptr;
 
 ModuleList::ModuleList(TitleBar* owner, int x, int y, string label)
 : mModuleIndex(-1)
-, mModuleList(NULL)
+, mModuleList(nullptr)
 , mLabel(label)
 , mOwner(owner)
 , mPos(x,y)
@@ -80,15 +80,15 @@ TitleBar::TitleBar()
 , mSynthModules(this,0,0,"synths:")
 , mAudioModules(this,0,0,"audio effects:")
 , mOtherModules(this,0,0,"other:")
-, mSaveLayoutButton(NULL)
-, mSaveStateButton(NULL)
-, mLoadStateButton(NULL)
-, mWriteAudioButton(NULL)
-, mQuitButton(NULL)
-, mLoadLayoutDropdown(NULL)
+, mSaveLayoutButton(nullptr)
+, mSaveStateButton(nullptr)
+, mLoadStateButton(nullptr)
+, mWriteAudioButton(nullptr)
+, mQuitButton(nullptr)
+, mLoadLayoutDropdown(nullptr)
 , mLoadLayoutIndex(-1)
 {
-   assert(TheTitleBar == NULL);
+   assert(TheTitleBar == nullptr);
    TheTitleBar = this;
    
    mHelpDisplay = dynamic_cast<HelpDisplay*>(HelpDisplay::Create());
@@ -113,7 +113,7 @@ void TitleBar::CreateUIControls()
 TitleBar::~TitleBar()
 {
    assert(TheTitleBar == this);
-   TheTitleBar = NULL;
+   TheTitleBar = nullptr;
 }
 
 void TitleBar::SetModuleFactory(ModuleFactory* factory)

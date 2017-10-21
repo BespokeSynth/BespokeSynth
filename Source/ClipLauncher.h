@@ -63,12 +63,12 @@ private:
    {
    public:
       SampleData()
-      : mSample(NULL)
+      : mSample(nullptr)
       , mNumBars(1)
       , mVolume(1)
-      , mGrabCheckbox(NULL)
-      , mPlayCheckbox(NULL)
-      , mClipLauncher(NULL)
+      , mGrabCheckbox(nullptr)
+      , mPlayCheckbox(nullptr)
+      , mClipLauncher(nullptr)
       , mIndex(0)
       , mPlay(false)
       , mHasSample(false)

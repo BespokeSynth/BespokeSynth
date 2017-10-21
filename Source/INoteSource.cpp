@@ -56,7 +56,7 @@ bool NoteHistory::CurrentlyOn()
    return on;
 }
 
-void NoteOutput::PlayNote(double time, int pitch, int velocity, int voiceIdx /*= -1*/, ModulationChain* pitchBend /*= NULL*/, ModulationChain* modWheel /*= NULL*/, ModulationChain* pressure /*= NULL*/)
+void NoteOutput::PlayNote(double time, int pitch, int velocity, int voiceIdx /*= -1*/, ModulationChain* pitchBend /*= nullptr*/, ModulationChain* modWheel /*= nullptr*/, ModulationChain* pressure /*= nullptr*/)
 {
    for (auto noteReceiver : mNoteSource->GetPatchCableSource()->GetNoteReceivers())
       noteReceiver->PlayNote(time,pitch,velocity,voiceIdx,pitchBend,modWheel,pressure);
@@ -113,7 +113,7 @@ void NoteOutput::FlushTarget(INoteReceiver* target)
    }
 }
 
-void INoteSource::PlayNoteOutput(double time, int pitch, int velocity, int voiceIdx /*= -1*/, ModulationChain* pitchBend /*= NULL*/, ModulationChain* modWheel /*= NULL*/, ModulationChain* pressure /*= NULL*/)
+void INoteSource::PlayNoteOutput(double time, int pitch, int velocity, int voiceIdx /*= -1*/, ModulationChain* pitchBend /*= nullptr*/, ModulationChain* modWheel /*= nullptr*/, ModulationChain* pressure /*= nullptr*/)
 {
    mNoteOutput.PlayNote(time, pitch, velocity, voiceIdx, pitchBend, modWheel, pressure);
    

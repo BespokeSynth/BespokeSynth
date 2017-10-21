@@ -12,20 +12,20 @@
 #include "ModularSynth.h"
 #include "Profiler.h"
 
-VinylTempoControl* TheVinylTempoControl = NULL;
+VinylTempoControl* TheVinylTempoControl = nullptr;
 
 VinylTempoControl::VinylTempoControl()
 : mReferencePitch(1)
 , mReferenceTempo(120)
 , mVinylControl(gSampleRate)
-, mVinylControlInLeft(NULL)
-, mVinylControlInRight(NULL)
+, mVinylControlInLeft(nullptr)
+, mVinylControlInRight(nullptr)
 , mUseVinylControl(false)
-, mUseVinylControlCheckbox(NULL)
+, mUseVinylControlCheckbox(nullptr)
 , mLeftChannel(0)
 , mRightChannel(1)
 {
-   assert(TheVinylTempoControl == NULL);
+   assert(TheVinylTempoControl == nullptr);
    TheVinylTempoControl = this;
    TheTransport->AddAudioPoller(this);
 }

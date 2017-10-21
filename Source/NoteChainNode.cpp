@@ -15,16 +15,16 @@
 #include "PatchCableSource.h"
 
 NoteChainNode::NoteChainNode()
-: mTriggerButton(NULL)
+: mTriggerButton(nullptr)
 , mPitch(48)
 , mVelocity(1)
 , mDuration(100)
-, mPitchEntry(NULL)
-, mVelocitySlider(NULL)
+, mPitchEntry(nullptr)
+, mVelocitySlider(nullptr)
 , mStartTime(0)
 , mNoteOn(false)
 , mWaitingToTrigger(false)
-, mNextSelector(NULL)
+, mNextSelector(nullptr)
 , mNextInterval(kInterval_8n)
 , mQueueTrigger(false)
 {

@@ -23,24 +23,24 @@
 
 LaunchpadKeyboard::LaunchpadKeyboard()
 : mRootNote(4) //4 = E
-, mGridController(NULL)
+, mGridController(nullptr)
 , mTestKeyHeld(false)
 , mLayout(kChromatic)
-, mLayoutDropdown(NULL)
+, mLayoutDropdown(nullptr)
 , mOctave(3)
-, mOctaveSlider(NULL)
+, mOctaveSlider(nullptr)
 , mLatch(false)
-, mLatchCheckbox(NULL)
+, mLatchCheckbox(nullptr)
 , mCurrentChord(0)
 , mHasDisplayer(false)
 , mArrangementMode(kFive)
-, mArrangementModeDropdown(NULL)
-, mChorder(NULL)
+, mArrangementModeDropdown(nullptr)
+, mChorder(nullptr)
 , mLatchChords(false)
-, mLatchChordsCheckbox(NULL)
+, mLatchChordsCheckbox(nullptr)
 , mWasChorderEnabled(false)
 , mPreserveChordRoot(true)
-, mPreserveChordRootCheckbox(NULL)
+, mPreserveChordRootCheckbox(nullptr)
 {
    TheScale->AddListener(this);
 

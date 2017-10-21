@@ -126,11 +126,11 @@ void Polyrhythms::SetUpFromSaveData()
 
 
 RhythmLine::RhythmLine(Polyrhythms* owner, int x, int y)
-: mGrid(NULL)
+: mGrid(nullptr)
 , mLength(4)
-, mLengthSelector(NULL)
+, mLengthSelector(nullptr)
 , mNote(0)
-, mNoteSelector(NULL)
+, mNoteSelector(nullptr)
 , mOwner(owner)
 , mPos(x,y)
 {

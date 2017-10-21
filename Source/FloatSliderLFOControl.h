@@ -78,7 +78,7 @@ public:
    bool IsEnabled() const { return mEnabled; }
    void SetRate(NoteInterval rate);
    void UpdateFromSettings();
-   void Reset() { mOwner = NULL; }
+   void Reset() { mOwner = nullptr; }
    void SetOwner(FloatSlider* owner);
    FloatSlider* GetOwner() { return mOwner; }
    bool Enabled() const override { return mEnabled; }

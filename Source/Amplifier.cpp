@@ -13,7 +13,7 @@
 Amplifier::Amplifier()
 : IAudioProcessor(gBufferSize)
 , mBoost(0)
-, mBoostSlider(NULL)
+, mBoostSlider(nullptr)
 {
 }
 

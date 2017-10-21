@@ -18,13 +18,13 @@ EffectChain::EffectChain()
 : IAudioProcessor(gBufferSize)
 , mDryBuffer(gBufferSize)
 , mVolume(1)
-, mVolumeSlider(NULL)
+, mVolumeSlider(nullptr)
 , mNumFXWide(3)
 , mSpawnIndex(-1)
-, mEffectSpawnList(NULL)
+, mEffectSpawnList(nullptr)
 , mInitialized(false)
 , mSwapTime(-1)
-, mDeleteLastEffectButton(NULL)
+, mDeleteLastEffectButton(nullptr)
 , mShowSpawnList(true)
 , mWantDeleteLastEffect(false)
 {
@@ -63,7 +63,7 @@ void EffectChain::AddEffect(string type, bool onTheFly /*=false*/)
    assert(mEffects.size() < MAX_EFFECTS_IN_CHAIN - 1);
  
    IAudioEffect* effect = TheSynth->GetEffectFactory()->MakeEffect(type);
-   if (effect == NULL)
+   if (effect == nullptr)
       throw UnknownEffectTypeException();
    assert(effect->GetType() == type);  //make sure things are named the same in code
    string name = GetUniqueName(type, vector<IDrawableModule*>(mEffects.begin(), mEffects.end()));
@@ -98,7 +98,7 @@ void EffectChain::AddEffect(string type, bool onTheFly /*=false*/)
 
 void EffectChain::Process(double time)
 {
-   if (GetTarget() == NULL)
+   if (GetTarget() == nullptr)
       return;
 
    ComputeSliders(0);

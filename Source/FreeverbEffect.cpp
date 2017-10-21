@@ -12,11 +12,11 @@
 #include "Profiler.h"
 
 FreeverbEffect::FreeverbEffect()
-: mRoomSizeSlider(NULL)
-, mDampSlider(NULL)
-, mWetSlider(NULL)
-, mDrySlider(NULL)
-, mWidthSlider(NULL)
+: mRoomSizeSlider(nullptr)
+, mDampSlider(nullptr)
+, mWetSlider(nullptr)
+, mDrySlider(nullptr)
+, mWidthSlider(nullptr)
 , mNeedUpdate(false)
 {
    mOutputLeftBuffer = new float[gBufferSize];

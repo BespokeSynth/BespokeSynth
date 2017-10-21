@@ -12,7 +12,7 @@
 
 ModWheel::ModWheel()
 : mModWheel(0)
-, mModWheelSlider(NULL)
+, mModWheelSlider(nullptr)
 , mModulation(true)
 {
    TheTransport->AddAudioPoller(this);
@@ -36,7 +36,7 @@ void ModWheel::DrawModule()
    mModWheelSlider->Draw();
 }
 
-void ModWheel::PlayNote(double time, int pitch, int velocity, int voiceIdx /*= -1*/, ModulationChain* pitchBend /*= NULL*/, ModulationChain* modWheel /*= NULL*/, ModulationChain* pressure /*= NULL*/)
+void ModWheel::PlayNote(double time, int pitch, int velocity, int voiceIdx /*= -1*/, ModulationChain* pitchBend /*= nullptr*/, ModulationChain* modWheel /*= nullptr*/, ModulationChain* pressure /*= nullptr*/)
 {
    if (mEnabled)
    {

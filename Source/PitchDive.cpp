@@ -12,9 +12,9 @@
 
 PitchDive::PitchDive()
 : mStart(0)
-, mStartSlider(NULL)
+, mStartSlider(nullptr)
 , mTime(0)
-, mTimeSlider(NULL)
+, mTimeSlider(nullptr)
 , mModulation(false)
 {
 }
@@ -40,7 +40,7 @@ void PitchDive::DrawModule()
    mTimeSlider->Draw();
 }
 
-void PitchDive::PlayNote(double time, int pitch, int velocity, int voiceIdx /*= -1*/, ModulationChain* pitchBend /*= NULL*/, ModulationChain* modWheel /*= NULL*/, ModulationChain* pressure /*= NULL*/)
+void PitchDive::PlayNote(double time, int pitch, int velocity, int voiceIdx /*= -1*/, ModulationChain* pitchBend /*= nullptr*/, ModulationChain* modWheel /*= nullptr*/, ModulationChain* pressure /*= nullptr*/)
 {
    if (mEnabled && velocity > 0 && mStart != 0 && mTime != 0)
    {

@@ -13,7 +13,7 @@
 
 VelocityScaler::VelocityScaler()
 : mScale(1)
-, mScaleSlider(NULL)
+, mScaleSlider(nullptr)
 {
 }
 
@@ -31,7 +31,7 @@ void VelocityScaler::DrawModule()
    mScaleSlider->Draw();
 }
 
-void VelocityScaler::PlayNote(double time, int pitch, int velocity, int voiceIdx /*= -1*/, ModulationChain* pitchBend /*= NULL*/, ModulationChain* modWheel /*= NULL*/, ModulationChain* pressure /*= NULL*/)
+void VelocityScaler::PlayNote(double time, int pitch, int velocity, int voiceIdx /*= -1*/, ModulationChain* pitchBend /*= nullptr*/, ModulationChain* modWheel /*= nullptr*/, ModulationChain* pressure /*= nullptr*/)
 {
    if (mEnabled)
    {

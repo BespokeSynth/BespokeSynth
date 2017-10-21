@@ -13,7 +13,7 @@
 AudioMeter::AudioMeter()
 : IAudioProcessor(gBufferSize)
 , mLevel(0)
-, mLevelSlider(NULL)
+, mLevelSlider(nullptr)
 , mMaxLevel(1)
 {
    mAnalysisBuffer = new float[gBufferSize];

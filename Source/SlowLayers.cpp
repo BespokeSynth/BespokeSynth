@@ -15,14 +15,14 @@
 
 SlowLayers::SlowLayers()
 : IAudioProcessor(gBufferSize)
-, mBuffer(NULL)
+, mBuffer(nullptr)
 , mLoopPos(0)
 , mNumBars(1)
 , mVol(1)
 , mSmoothedVol(1)
-, mVolSlider(NULL)
-, mNumBarsSelector(NULL)
-, mFeedInSlider(NULL)
+, mVolSlider(nullptr)
+, mNumBarsSelector(nullptr)
+, mFeedInSlider(nullptr)
 , mFeedIn(1)
 {
    //TODO(Ryan) buffer sizes
@@ -56,7 +56,7 @@ void SlowLayers::Process(double time)
 {
    Profiler profiler("SlowLayers");
    
-   if (!mEnabled || GetTarget() == NULL)
+   if (!mEnabled || GetTarget() == nullptr)
       return;
    
    ComputeSliders(0);

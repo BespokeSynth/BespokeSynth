@@ -32,7 +32,7 @@ public:
 class FMVoice : public IMidiVoice
 {
 public:
-   FMVoice(IDrawableModule* owner = NULL);
+   FMVoice(IDrawableModule* owner = nullptr);
    ~FMVoice();
 
    // IMidiVoice

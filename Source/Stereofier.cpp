@@ -14,9 +14,9 @@
 Stereofier::Stereofier()
 : IAudioProcessor(gBufferSize)
 , mPan(0)
-, mPanSlider(NULL)
+, mPanSlider(nullptr)
 , mWiden(0)
-, mWidenSlider(NULL)
+, mWidenSlider(nullptr)
 , mVizBuffer2(VIZ_BUFFER_SECONDS*gSampleRate)
 , mWidenerBuffer(2048)
 {
@@ -48,7 +48,7 @@ void Stereofier::Process(double time)
 {
    Profiler profiler("Stereofier");
 
-   if (!mEnabled || GetTarget() == NULL || GetTarget2() == NULL)
+   if (!mEnabled || GetTarget() == nullptr || GetTarget2() == nullptr)
       return;
    
    int bufferSize = GetTarget()->GetBuffer()->BufferSize();

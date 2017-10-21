@@ -44,7 +44,7 @@ public:
 class KarplusStrongVoice : public IMidiVoice
 {
 public:
-   KarplusStrongVoice(IDrawableModule* owner = NULL);
+   KarplusStrongVoice(IDrawableModule* owner = nullptr);
    ~KarplusStrongVoice();
 
    // IMidiVoice

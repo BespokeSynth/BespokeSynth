@@ -25,7 +25,7 @@ public:
    virtual void Process(double time) = 0;
    //virtual void SetTarget(IAudioReceiver* target) { mTarget = target; }
    IAudioReceiver* GetTarget();
-   virtual IAudioReceiver* GetTarget2() { return NULL; }
+   virtual IAudioReceiver* GetTarget2() { return nullptr; }
    RollingBuffer* GetVizBuffer() { return &mVizBuffer; }
 private:
    RollingBuffer mVizBuffer;

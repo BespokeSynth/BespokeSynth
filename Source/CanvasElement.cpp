@@ -305,7 +305,7 @@ void NoteCanvasElement::LoadState(FileStreamIn& in)
 
 SampleCanvasElement::SampleCanvasElement(Canvas* canvas, int col, int row, float offset, float length)
 : CanvasElement(canvas,col,row,offset,length)
-, mSample(NULL)
+, mSample(nullptr)
 , mNumLoops(1)
 , mNumBars(1)
 , mVolume(1)
@@ -410,7 +410,7 @@ void SampleCanvasElement::SaveState(FileStreamOut& out)
    
    out << kSCESaveStateRev;
    
-   bool hasSample = mSample != NULL;
+   bool hasSample = mSample != nullptr;
    out << hasSample;
    mSample->SaveState(out);
    out << mNumLoops;
@@ -452,7 +452,7 @@ EventCanvasElement::EventCanvasElement(Canvas* canvas, int col, int row, float o
    mEventCanvas = dynamic_cast<EventCanvas*>(canvas->GetControls()->GetParent());
    assert(mEventCanvas);
    mUIControl = mEventCanvas->GetUIControlForRow(row);
-   mIsCheckbox = dynamic_cast<Checkbox*>(mUIControl) != NULL;
+   mIsCheckbox = dynamic_cast<Checkbox*>(mUIControl) != nullptr;
    
    if (mUIControl)
       mValue = mUIControl->GetValue();
@@ -502,9 +502,9 @@ void EventCanvasElement::DrawContents()
 
 void EventCanvasElement::SetUIControl(IUIControl* control)
 {
-   bool hadUIControl = mUIControl != NULL;
+   bool hadUIControl = mUIControl != nullptr;
    mUIControl = dynamic_cast<IUIControl*>(control);
-   mIsCheckbox = dynamic_cast<Checkbox*>(control) != NULL;
+   mIsCheckbox = dynamic_cast<Checkbox*>(control) != nullptr;
    if (mUIControl && !hadUIControl)
       mValue = mUIControl->GetValue();
 }

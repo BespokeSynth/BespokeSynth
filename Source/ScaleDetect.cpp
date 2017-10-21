@@ -11,11 +11,11 @@
 #include "ModularSynth.h"
 
 ScaleDetect::ScaleDetect()
-: mResetButton(NULL)
+: mResetButton(nullptr)
 , mLastNote(0)
 , mDoDetect(true)
 , mSelectedMatch(0)
-, mMatchesDropdown(NULL)
+, mMatchesDropdown(nullptr)
 {
 }
 
@@ -51,7 +51,7 @@ void ScaleDetect::DrawModule()
    }
 }
 
-void ScaleDetect::PlayNote(double time, int pitch, int velocity, int voiceIdx /*= -1*/, ModulationChain* pitchBend /*= NULL*/, ModulationChain* modWheel /*= NULL*/, ModulationChain* pressure /*= NULL*/)
+void ScaleDetect::PlayNote(double time, int pitch, int velocity, int voiceIdx /*= -1*/, ModulationChain* pitchBend /*= nullptr*/, ModulationChain* modWheel /*= nullptr*/, ModulationChain* pressure /*= nullptr*/)
 {
    PlayNoteOutput(time, pitch, velocity, voiceIdx, pitchBend, modWheel, pressure);
 

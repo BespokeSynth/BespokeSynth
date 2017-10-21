@@ -16,7 +16,7 @@ Metronome::Metronome()
 , mPhase(0)
 , mPhaseInc(0)
 , mVolume(.5f)
-, mVolumeSlider(NULL)
+, mVolumeSlider(nullptr)
 {
    TheTransport->AddListener(this, kInterval_4n);
 }
@@ -36,7 +36,7 @@ void Metronome::Process(double time)
 {
    Profiler profiler("Metronome");
 
-   if (!mEnabled || GetTarget() == NULL)
+   if (!mEnabled || GetTarget() == nullptr)
       return;
 
    int bufferSize = GetTarget()->GetBuffer()->BufferSize();

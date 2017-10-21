@@ -12,9 +12,9 @@
 
 ModwheelToVibrato::ModwheelToVibrato()
 : mVibratoInterval(kInterval_16n)
-, mIntervalSelector(NULL)
+, mIntervalSelector(nullptr)
 , mVibratoAmount(1)
-, mVibratoSlider(NULL)
+, mVibratoSlider(nullptr)
 , mModulation(true)
 {
 }
@@ -48,14 +48,14 @@ void ModwheelToVibrato::DrawModule()
    mIntervalSelector->Draw();
 }
 
-void ModwheelToVibrato::PlayNote(double time, int pitch, int velocity, int voiceIdx /*= -1*/, ModulationChain* pitchBend /*= NULL*/, ModulationChain* modWheel /*= NULL*/, ModulationChain* pressure /*= NULL*/)
+void ModwheelToVibrato::PlayNote(double time, int pitch, int velocity, int voiceIdx /*= -1*/, ModulationChain* pitchBend /*= nullptr*/, ModulationChain* modWheel /*= nullptr*/, ModulationChain* pressure /*= nullptr*/)
 {
    if (mEnabled)
    {
       mModulation.GetPitchBend(voiceIdx)->AppendTo(pitchBend);
       mModulation.GetPitchBend(voiceIdx)->SetLFO(mVibratoInterval, mVibratoAmount);
       mModulation.GetPitchBend(voiceIdx)->MultiplyIn(modWheel);
-      PlayNoteOutput(time, pitch, velocity, voiceIdx, mModulation.GetPitchBend(voiceIdx), NULL, pressure);
+      PlayNoteOutput(time, pitch, velocity, voiceIdx, mModulation.GetPitchBend(voiceIdx), nullptr, pressure);
    }
    else
    {

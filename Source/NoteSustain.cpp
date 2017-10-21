@@ -11,7 +11,7 @@
 
 NoteSustain::NoteSustain()
 : mSustain(100)
-, mSustainSlider(NULL)
+, mSustainSlider(nullptr)
 {
    TheTransport->AddAudioPoller(this);
 }
@@ -53,7 +53,7 @@ void NoteSustain::OnTransportAdvanced(float amount)
    }
 }
 
-void NoteSustain::PlayNote(double time, int pitch, int velocity, int voiceIdx /*= -1*/, ModulationChain* pitchBend /*= NULL*/, ModulationChain* modWheel /*= NULL*/, ModulationChain* pressure /*= NULL*/)
+void NoteSustain::PlayNote(double time, int pitch, int velocity, int voiceIdx /*= -1*/, ModulationChain* pitchBend /*= nullptr*/, ModulationChain* modWheel /*= nullptr*/, ModulationChain* pressure /*= nullptr*/)
 {
    if (!mEnabled)
    {

@@ -13,15 +13,15 @@
 
 TimelineControl::TimelineControl()
 : mTime(0)
-, mTimeSlider(NULL)
+, mTimeSlider(nullptr)
 , mWidth(400)
 , mLoop(false)
-, mLoopCheckbox(NULL)
+, mLoopCheckbox(nullptr)
 , mNumMeasures(32)
 , mLoopStart(0)
 , mLoopEnd(8)
-, mLoopStartSlider(NULL)
-, mLoopEndSlider(NULL)
+, mLoopStartSlider(nullptr)
+, mLoopEndSlider(nullptr)
 {
 }
 

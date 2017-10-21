@@ -30,7 +30,7 @@ public:
    void Process(double time) override;
 
    //INoteReceiver
-   void PlayNote(double time, int pitch, int velocity, int voiceIdx = -1, ModulationChain* pitchBend = NULL, ModulationChain* modWheel = NULL, ModulationChain* pressure = NULL) override;
+   void PlayNote(double time, int pitch, int velocity, int voiceIdx = -1, ModulationChain* pitchBend = nullptr, ModulationChain* modWheel = nullptr, ModulationChain* pressure = nullptr) override;
    void SendCC(int control, int value, int voiceIdx = -1) override {}
    
    void FloatSliderUpdated(FloatSlider* slider, float oldVal) override;

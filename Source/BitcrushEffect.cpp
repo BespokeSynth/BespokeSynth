@@ -14,8 +14,8 @@
 BitcrushEffect::BitcrushEffect()
 : mCrush(1)
 , mDownsample(1)
-, mCrushSlider(NULL)
-, mDownsampleSlider(NULL)
+, mCrushSlider(nullptr)
+, mDownsampleSlider(nullptr)
 {
    SetEnabled(true);
    

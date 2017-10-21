@@ -14,7 +14,7 @@
 
 FourOnTheFloor::FourOnTheFloor()
 : mTwoOnTheFloor(false)
-, mTwoOnTheFloorCheckbox(NULL)
+, mTwoOnTheFloorCheckbox(nullptr)
 {
    TheTransport->AddListener(this, kInterval_4n);
 }

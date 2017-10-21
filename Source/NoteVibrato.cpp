@@ -12,9 +12,9 @@
 
 NoteVibrato::NoteVibrato()
 : mVibratoInterval(kInterval_16n)
-, mIntervalSelector(NULL)
+, mIntervalSelector(nullptr)
 , mVibratoAmount(0)
-, mVibratoSlider(NULL)
+, mVibratoSlider(nullptr)
 , mModulation(true)
 {
    TheTransport->AddAudioPoller(this);
@@ -55,7 +55,7 @@ void NoteVibrato::OnTransportAdvanced(float amount)
    ComputeSliders(0);
 }
 
-void NoteVibrato::PlayNote(double time, int pitch, int velocity, int voiceIdx /*= -1*/, ModulationChain* pitchBend /*= NULL*/, ModulationChain* modWheel /*= NULL*/, ModulationChain* pressure /*= NULL*/)
+void NoteVibrato::PlayNote(double time, int pitch, int velocity, int voiceIdx /*= -1*/, ModulationChain* pitchBend /*= nullptr*/, ModulationChain* modWheel /*= nullptr*/, ModulationChain* pressure /*= nullptr*/)
 {
    if (mEnabled)
    {
