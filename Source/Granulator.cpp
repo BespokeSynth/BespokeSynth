@@ -101,14 +101,15 @@ void Grain::Spawn(double time, float pos, float speed, float lengthInMs, float v
    mStartTime = time;
    mEndTime = time + lengthInMs;
    mVol = vol;
+   mStereoPosition = ofRandom(1);
 }
 
 void Grain::Process(double time, ChannelBuffer* buffer, int bufferLength, float* output)
 {
-   float sample = GetInterpolatedSample(mPos, buffer, bufferLength, .5f);
+   float sample = GetInterpolatedSample(mPos, buffer, bufferLength, mStereoPosition);
    mPos += mSpeed;
    for (int ch=0; ch<buffer->NumActiveChannels(); ++ch)
-      output[ch] = sample * GetWindow(time) * mVol;
+      output[ch] += sample * GetWindow(time) * mVol * (ch == 0 ? (1-mStereoPosition) : mStereoPosition);
 }
 
 float Grain::GetWindow(double time)

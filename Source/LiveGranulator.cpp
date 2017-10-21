@@ -76,6 +76,7 @@ void LiveGranulator::ProcessAudio(double time, ChannelBuffer* buffer)
    Profiler profiler("LiveGranulator");
    
    float bufferSize = buffer->BufferSize();
+   mBuffer.SetNumChannels(buffer->NumActiveChannels());
 
    for (int i=0; i<bufferSize; ++i)
    {

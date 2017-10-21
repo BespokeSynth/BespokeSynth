@@ -5,6 +5,111 @@ Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "BespokeSynth - App", "Bespo
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "BespokeSynth", "BespokeSynth", "{71A965BC-5D4A-BC9A-D647-B213C2D1B26F}"
 EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "libraries", "libraries", "{816A38E8-033D-D2DF-45C3-17D8E80B06F5}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "CFMessaging", "CFMessaging", "{8ABE0C65-4BD7-D9E0-931D-C3DA3EEF504F}"
+	ProjectSection(SolutionItems) = preProject
+		..\..\Source\CFMessaging\Bespoke_CFMessaging.cpp = ..\..\Source\CFMessaging\Bespoke_CFMessaging.cpp
+		..\..\Source\CFMessaging\KontrolKommunicator.cpp = ..\..\Source\CFMessaging\KontrolKommunicator.cpp
+		..\..\Source\CFMessaging\KontrolKommunicator.h = ..\..\Source\CFMessaging\KontrolKommunicator.h
+		..\..\Source\CFMessaging\ListenPort.cpp = ..\..\Source\CFMessaging\ListenPort.cpp
+		..\..\Source\CFMessaging\ListenPort.h = ..\..\Source\CFMessaging\ListenPort.h
+		..\..\Source\CFMessaging\NIMessage.cpp = ..\..\Source\CFMessaging\NIMessage.cpp
+		..\..\Source\CFMessaging\NIMessage.h = ..\..\Source\CFMessaging\NIMessage.h
+		..\..\Source\CFMessaging\SendPort.cpp = ..\..\Source\CFMessaging\SendPort.cpp
+		..\..\Source\CFMessaging\SendPort.h = ..\..\Source\CFMessaging\SendPort.h
+	EndProjectSection
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "freeverb", "freeverb", "{CE419E9F-818A-65E3-9242-7E9328ED6370}"
+	ProjectSection(SolutionItems) = preProject
+		..\..\Source\freeverb\allpass.cpp = ..\..\Source\freeverb\allpass.cpp
+		..\..\Source\freeverb\allpass.hpp = ..\..\Source\freeverb\allpass.hpp
+		..\..\Source\freeverb\comb.cpp = ..\..\Source\freeverb\comb.cpp
+		..\..\Source\freeverb\comb.hpp = ..\..\Source\freeverb\comb.hpp
+		..\..\Source\freeverb\denormals.h = ..\..\Source\freeverb\denormals.h
+		..\..\Source\freeverb\revmodel.cpp = ..\..\Source\freeverb\revmodel.cpp
+		..\..\Source\freeverb\revmodel.hpp = ..\..\Source\freeverb\revmodel.hpp
+		..\..\Source\freeverb\tuning.h = ..\..\Source\freeverb\tuning.h
+	EndProjectSection
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "glew", "glew", "{689FB8F2-1F9F-FFD2-28ED-9263C9DCA3DB}"
+	ProjectSection(SolutionItems) = preProject
+		..\..\Source\glew\Bespoke_glew.c = ..\..\Source\glew\Bespoke_glew.c
+	EndProjectSection
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "include", "include", "{3C153B55-8D64-95C6-CB65-6F90AFF731E7}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "GL", "GL", "{1915A5F1-0D82-3FA0-588C-93F4BECB2C36}"
+	ProjectSection(SolutionItems) = preProject
+		..\..\Source\glew\include\GL\glew.c = ..\..\Source\glew\include\GL\glew.c
+		..\..\Source\glew\include\GL\glew.h = ..\..\Source\glew\include\GL\glew.h
+		..\..\Source\glew\include\GL\wglew.h = ..\..\Source\glew\include\GL\wglew.h
+	EndProjectSection
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "json", "json", "{A970763A-AE64-F069-FA1F-3B4F392AE4E4}"
+	ProjectSection(SolutionItems) = preProject
+		..\..\Source\json\README.txt = ..\..\Source\json\README.txt
+		..\..\Source\json\version = ..\..\Source\json\version
+	EndProjectSection
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "include", "include", "{88DDE816-9E05-64BE-BF45-913B36FAD332}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "json", "json", "{BFF3BB8B-B235-1EA7-3E46-D8EF05B9C3D8}"
+	ProjectSection(SolutionItems) = preProject
+		..\..\Source\json\include\json\autolink.h = ..\..\Source\json\include\json\autolink.h
+		..\..\Source\json\include\json\config.h = ..\..\Source\json\include\json\config.h
+		..\..\Source\json\include\json\features.h = ..\..\Source\json\include\json\features.h
+		..\..\Source\json\include\json\forwards.h = ..\..\Source\json\include\json\forwards.h
+		..\..\Source\json\include\json\json.h = ..\..\Source\json\include\json\json.h
+		..\..\Source\json\include\json\reader.h = ..\..\Source\json\include\json\reader.h
+		..\..\Source\json\include\json\value.h = ..\..\Source\json\include\json\value.h
+		..\..\Source\json\include\json\writer.h = ..\..\Source\json\include\json\writer.h
+	EndProjectSection
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "src", "src", "{A75CC0F5-8A7B-4501-BF5D-DF659CC4FCCB}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "lib_json", "lib_json", "{BA1F5425-FF63-9565-86CB-F9E1040EDA11}"
+	ProjectSection(SolutionItems) = preProject
+		..\..\Source\json\src\lib_json\json_batchallocator.h = ..\..\Source\json\src\lib_json\json_batchallocator.h
+		..\..\Source\json\src\lib_json\json_internalarray.inl = ..\..\Source\json\src\lib_json\json_internalarray.inl
+		..\..\Source\json\src\lib_json\json_internalmap.inl = ..\..\Source\json\src\lib_json\json_internalmap.inl
+		..\..\Source\json\src\lib_json\json_reader.cpp = ..\..\Source\json\src\lib_json\json_reader.cpp
+		..\..\Source\json\src\lib_json\json_value.cpp = ..\..\Source\json\src\lib_json\json_value.cpp
+		..\..\Source\json\src\lib_json\json_valueiterator.inl = ..\..\Source\json\src\lib_json\json_valueiterator.inl
+		..\..\Source\json\src\lib_json\json_writer.cpp = ..\..\Source\json\src\lib_json\json_writer.cpp
+		..\..\Source\json\src\lib_json\sconscript = ..\..\Source\json\src\lib_json\sconscript
+	EndProjectSection
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "nanovg", "nanovg", "{68BADBBA-7CB1-22DD-C9E8-82069CF02154}"
+	ProjectSection(SolutionItems) = preProject
+		..\..\Source\nanovg\fontstash.h = ..\..\Source\nanovg\fontstash.h
+		..\..\Source\nanovg\nanovg.c = ..\..\Source\nanovg\nanovg.c
+		..\..\Source\nanovg\nanovg.h = ..\..\Source\nanovg\nanovg.h
+		..\..\Source\nanovg\nanovg_gl.h = ..\..\Source\nanovg\nanovg_gl.h
+		..\..\Source\nanovg\nanovg_gl_utils.h = ..\..\Source\nanovg\nanovg_gl_utils.h
+		..\..\Source\nanovg\stb_image.h = ..\..\Source\nanovg\stb_image.h
+		..\..\Source\nanovg\stb_truetype.h = ..\..\Source\nanovg\stb_truetype.h
+	EndProjectSection
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "psmove", "psmove", "{381F2D01-9A4F-980A-A8D6-2C4A4061EC30}"
+	ProjectSection(SolutionItems) = preProject
+		..\..\Source\psmove\Bespoke_PSMove.c = ..\..\Source\psmove\Bespoke_PSMove.c
+		..\..\Source\psmove\hid.c = ..\..\Source\psmove\hid.c
+		..\..\Source\psmove\hidapi.h = ..\..\Source\psmove\hidapi.h
+		..\..\Source\psmove\psmove.c = ..\..\Source\psmove\psmove.c
+		..\..\Source\psmove\psmove.h = ..\..\Source\psmove\psmove.h
+		..\..\Source\psmove\PSMoveMgr.cpp = ..\..\Source\psmove\PSMoveMgr.cpp
+		..\..\Source\psmove\PSMoveMgr.h = ..\..\Source\psmove\PSMoveMgr.h
+	EndProjectSection
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "vinylcontrol", "vinylcontrol", "{BF88B54A-A16F-BAC5-59A8-7E0947916C05}"
+	ProjectSection(SolutionItems) = preProject
+		..\..\Source\vinylcontrol\timecoder.c = ..\..\Source\vinylcontrol\timecoder.c
+		..\..\Source\vinylcontrol\timecoder.h = ..\..\Source\vinylcontrol\timecoder.h
+		..\..\Source\vinylcontrol\vinylcontrol.cpp = ..\..\Source\vinylcontrol\vinylcontrol.cpp
+		..\..\Source\vinylcontrol\vinylcontrol.h = ..\..\Source\vinylcontrol\vinylcontrol.h
+	EndProjectSection
+EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Source", "Source", "{951CD1D9-48E2-2C41-76A8-44A9F9866A5E}"
 	ProjectSection(SolutionItems) = preProject
 		..\..\Source\AdditiveVoice.cpp = ..\..\Source\AdditiveVoice.cpp
@@ -189,111 +294,6 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "effects", "effects", "{25E8
 		..\..\Source\Stutter.h = ..\..\Source\Stutter.h
 		..\..\Source\TremoloEffect.cpp = ..\..\Source\TremoloEffect.cpp
 		..\..\Source\TremoloEffect.h = ..\..\Source\TremoloEffect.h
-	EndProjectSection
-EndProject
-Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "libraries", "libraries", "{816A38E8-033D-D2DF-45C3-17D8E80B06F5}"
-EndProject
-Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "CFMessaging", "CFMessaging", "{8ABE0C65-4BD7-D9E0-931D-C3DA3EEF504F}"
-	ProjectSection(SolutionItems) = preProject
-		..\..\Source\CFMessaging\Bespoke_CFMessaging.cpp = ..\..\Source\CFMessaging\Bespoke_CFMessaging.cpp
-		..\..\Source\CFMessaging\KontrolKommunicator.cpp = ..\..\Source\CFMessaging\KontrolKommunicator.cpp
-		..\..\Source\CFMessaging\KontrolKommunicator.h = ..\..\Source\CFMessaging\KontrolKommunicator.h
-		..\..\Source\CFMessaging\ListenPort.cpp = ..\..\Source\CFMessaging\ListenPort.cpp
-		..\..\Source\CFMessaging\ListenPort.h = ..\..\Source\CFMessaging\ListenPort.h
-		..\..\Source\CFMessaging\NIMessage.cpp = ..\..\Source\CFMessaging\NIMessage.cpp
-		..\..\Source\CFMessaging\NIMessage.h = ..\..\Source\CFMessaging\NIMessage.h
-		..\..\Source\CFMessaging\SendPort.cpp = ..\..\Source\CFMessaging\SendPort.cpp
-		..\..\Source\CFMessaging\SendPort.h = ..\..\Source\CFMessaging\SendPort.h
-	EndProjectSection
-EndProject
-Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "freeverb", "freeverb", "{CE419E9F-818A-65E3-9242-7E9328ED6370}"
-	ProjectSection(SolutionItems) = preProject
-		..\..\Source\freeverb\allpass.cpp = ..\..\Source\freeverb\allpass.cpp
-		..\..\Source\freeverb\allpass.hpp = ..\..\Source\freeverb\allpass.hpp
-		..\..\Source\freeverb\comb.cpp = ..\..\Source\freeverb\comb.cpp
-		..\..\Source\freeverb\comb.hpp = ..\..\Source\freeverb\comb.hpp
-		..\..\Source\freeverb\denormals.h = ..\..\Source\freeverb\denormals.h
-		..\..\Source\freeverb\revmodel.cpp = ..\..\Source\freeverb\revmodel.cpp
-		..\..\Source\freeverb\revmodel.hpp = ..\..\Source\freeverb\revmodel.hpp
-		..\..\Source\freeverb\tuning.h = ..\..\Source\freeverb\tuning.h
-	EndProjectSection
-EndProject
-Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "glew", "glew", "{689FB8F2-1F9F-FFD2-28ED-9263C9DCA3DB}"
-	ProjectSection(SolutionItems) = preProject
-		..\..\Source\glew\Bespoke_glew.c = ..\..\Source\glew\Bespoke_glew.c
-	EndProjectSection
-EndProject
-Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "include", "include", "{3C153B55-8D64-95C6-CB65-6F90AFF731E7}"
-EndProject
-Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "GL", "GL", "{1915A5F1-0D82-3FA0-588C-93F4BECB2C36}"
-	ProjectSection(SolutionItems) = preProject
-		..\..\Source\glew\include\GL\glew.c = ..\..\Source\glew\include\GL\glew.c
-		..\..\Source\glew\include\GL\glew.h = ..\..\Source\glew\include\GL\glew.h
-		..\..\Source\glew\include\GL\wglew.h = ..\..\Source\glew\include\GL\wglew.h
-	EndProjectSection
-EndProject
-Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "json", "json", "{A970763A-AE64-F069-FA1F-3B4F392AE4E4}"
-	ProjectSection(SolutionItems) = preProject
-		..\..\Source\json\README.txt = ..\..\Source\json\README.txt
-		..\..\Source\json\version = ..\..\Source\json\version
-	EndProjectSection
-EndProject
-Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "include", "include", "{88DDE816-9E05-64BE-BF45-913B36FAD332}"
-EndProject
-Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "json", "json", "{BFF3BB8B-B235-1EA7-3E46-D8EF05B9C3D8}"
-	ProjectSection(SolutionItems) = preProject
-		..\..\Source\json\include\json\autolink.h = ..\..\Source\json\include\json\autolink.h
-		..\..\Source\json\include\json\config.h = ..\..\Source\json\include\json\config.h
-		..\..\Source\json\include\json\features.h = ..\..\Source\json\include\json\features.h
-		..\..\Source\json\include\json\forwards.h = ..\..\Source\json\include\json\forwards.h
-		..\..\Source\json\include\json\json.h = ..\..\Source\json\include\json\json.h
-		..\..\Source\json\include\json\reader.h = ..\..\Source\json\include\json\reader.h
-		..\..\Source\json\include\json\value.h = ..\..\Source\json\include\json\value.h
-		..\..\Source\json\include\json\writer.h = ..\..\Source\json\include\json\writer.h
-	EndProjectSection
-EndProject
-Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "src", "src", "{A75CC0F5-8A7B-4501-BF5D-DF659CC4FCCB}"
-EndProject
-Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "lib_json", "lib_json", "{BA1F5425-FF63-9565-86CB-F9E1040EDA11}"
-	ProjectSection(SolutionItems) = preProject
-		..\..\Source\json\src\lib_json\json_batchallocator.h = ..\..\Source\json\src\lib_json\json_batchallocator.h
-		..\..\Source\json\src\lib_json\json_internalarray.inl = ..\..\Source\json\src\lib_json\json_internalarray.inl
-		..\..\Source\json\src\lib_json\json_internalmap.inl = ..\..\Source\json\src\lib_json\json_internalmap.inl
-		..\..\Source\json\src\lib_json\json_reader.cpp = ..\..\Source\json\src\lib_json\json_reader.cpp
-		..\..\Source\json\src\lib_json\json_value.cpp = ..\..\Source\json\src\lib_json\json_value.cpp
-		..\..\Source\json\src\lib_json\json_valueiterator.inl = ..\..\Source\json\src\lib_json\json_valueiterator.inl
-		..\..\Source\json\src\lib_json\json_writer.cpp = ..\..\Source\json\src\lib_json\json_writer.cpp
-		..\..\Source\json\src\lib_json\sconscript = ..\..\Source\json\src\lib_json\sconscript
-	EndProjectSection
-EndProject
-Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "nanovg", "nanovg", "{68BADBBA-7CB1-22DD-C9E8-82069CF02154}"
-	ProjectSection(SolutionItems) = preProject
-		..\..\Source\nanovg\fontstash.h = ..\..\Source\nanovg\fontstash.h
-		..\..\Source\nanovg\nanovg.c = ..\..\Source\nanovg\nanovg.c
-		..\..\Source\nanovg\nanovg.h = ..\..\Source\nanovg\nanovg.h
-		..\..\Source\nanovg\nanovg_gl.h = ..\..\Source\nanovg\nanovg_gl.h
-		..\..\Source\nanovg\nanovg_gl_utils.h = ..\..\Source\nanovg\nanovg_gl_utils.h
-		..\..\Source\nanovg\stb_image.h = ..\..\Source\nanovg\stb_image.h
-		..\..\Source\nanovg\stb_truetype.h = ..\..\Source\nanovg\stb_truetype.h
-	EndProjectSection
-EndProject
-Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "psmove", "psmove", "{381F2D01-9A4F-980A-A8D6-2C4A4061EC30}"
-	ProjectSection(SolutionItems) = preProject
-		..\..\Source\psmove\Bespoke_PSMove.c = ..\..\Source\psmove\Bespoke_PSMove.c
-		..\..\Source\psmove\hid.c = ..\..\Source\psmove\hid.c
-		..\..\Source\psmove\hidapi.h = ..\..\Source\psmove\hidapi.h
-		..\..\Source\psmove\psmove.c = ..\..\Source\psmove\psmove.c
-		..\..\Source\psmove\psmove.h = ..\..\Source\psmove\psmove.h
-		..\..\Source\psmove\PSMoveMgr.cpp = ..\..\Source\psmove\PSMoveMgr.cpp
-		..\..\Source\psmove\PSMoveMgr.h = ..\..\Source\psmove\PSMoveMgr.h
-	EndProjectSection
-EndProject
-Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "vinylcontrol", "vinylcontrol", "{BF88B54A-A16F-BAC5-59A8-7E0947916C05}"
-	ProjectSection(SolutionItems) = preProject
-		..\..\Source\vinylcontrol\timecoder.c = ..\..\Source\vinylcontrol\timecoder.c
-		..\..\Source\vinylcontrol\timecoder.h = ..\..\Source\vinylcontrol\timecoder.h
-		..\..\Source\vinylcontrol\vinylcontrol.cpp = ..\..\Source\vinylcontrol\vinylcontrol.cpp
-		..\..\Source\vinylcontrol\vinylcontrol.h = ..\..\Source\vinylcontrol\vinylcontrol.h
 	EndProjectSection
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "modules", "modules", "{A66D7D01-E5CF-F192-D441-771648BE550C}"
@@ -518,6 +518,8 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "modules", "modules", "{A66D
 		..\..\Source\SampleBank.h = ..\..\Source\SampleBank.h
 		..\..\Source\SampleCanvas.cpp = ..\..\Source\SampleCanvas.cpp
 		..\..\Source\SampleCanvas.h = ..\..\Source\SampleCanvas.h
+		..\..\Source\SampleEditor.cpp = ..\..\Source\SampleEditor.cpp
+		..\..\Source\SampleEditor.h = ..\..\Source\SampleEditor.h
 		..\..\Source\SampleFinder.cpp = ..\..\Source\SampleFinder.cpp
 		..\..\Source\SampleFinder.h = ..\..\Source\SampleFinder.h
 		..\..\Source\SamplePlayer.cpp = ..\..\Source\SamplePlayer.cpp
@@ -2332,7 +2334,6 @@ Global
 		HideSolutionNode = FALSE
 	EndGlobalSection
 	GlobalSection(NestedProjects) = preSolution
-		{25E85DF9-E152-0039-05A7-64C995667BC3} = {951CD1D9-48E2-2C41-76A8-44A9F9866A5E}
 		{8ABE0C65-4BD7-D9E0-931D-C3DA3EEF504F} = {816A38E8-033D-D2DF-45C3-17D8E80B06F5}
 		{CE419E9F-818A-65E3-9242-7E9328ED6370} = {816A38E8-033D-D2DF-45C3-17D8E80B06F5}
 		{1915A5F1-0D82-3FA0-588C-93F4BECB2C36} = {3C153B55-8D64-95C6-CB65-6F90AFF731E7}
@@ -2346,7 +2347,8 @@ Global
 		{68BADBBA-7CB1-22DD-C9E8-82069CF02154} = {816A38E8-033D-D2DF-45C3-17D8E80B06F5}
 		{381F2D01-9A4F-980A-A8D6-2C4A4061EC30} = {816A38E8-033D-D2DF-45C3-17D8E80B06F5}
 		{BF88B54A-A16F-BAC5-59A8-7E0947916C05} = {816A38E8-033D-D2DF-45C3-17D8E80B06F5}
-		{816A38E8-033D-D2DF-45C3-17D8E80B06F5} = {951CD1D9-48E2-2C41-76A8-44A9F9866A5E}
+		{816A38E8-033D-D2DF-45C3-17D8E80B06F5} = {71A965BC-5D4A-BC9A-D647-B213C2D1B26F}
+		{25E85DF9-E152-0039-05A7-64C995667BC3} = {951CD1D9-48E2-2C41-76A8-44A9F9866A5E}
 		{A66D7D01-E5CF-F192-D441-771648BE550C} = {951CD1D9-48E2-2C41-76A8-44A9F9866A5E}
 		{3B57C412-C636-E8EF-C64E-5BE77FB2F04E} = {951CD1D9-48E2-2C41-76A8-44A9F9866A5E}
 		{951CD1D9-48E2-2C41-76A8-44A9F9866A5E} = {71A965BC-5D4A-BC9A-D647-B213C2D1B26F}

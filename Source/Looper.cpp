@@ -360,6 +360,7 @@ void Looper::Process(double time)
       
       float offset = mLoopPos+i*mSpeed+mLoopPosOffset+latencyOffset;
       float output[ChannelBuffer::kMaxNumChannels];
+      ::Clear(output, ChannelBuffer::kMaxNumChannels);
       
       if (mGranular)
          ProcessGranular(time, offset, output);

@@ -30,7 +30,7 @@
 #include "PSMoveController.h"
 #endif
 #include "SampleBank.h"
-#include "SamplePlayer.h"
+#include "SampleEditor.h"
 #include "Autotalent.h"
 #include "ScaleDetect.h"
 #include "KarplusStrong.h"
@@ -156,6 +156,7 @@
 #include "TakeRecorder.h"
 #include "Splitter.h"
 #include "Panner.h"
+#include "SamplePlayer.h"
 
 #define REGISTER(class,name,type) Register(#name, &(class::Create), &(class::CanCreate), type, false, false);
 #define REGISTER_HIDDEN(class,name,type) Register(#name, &(class::Create), &(class::CanCreate), type, true, false);
@@ -179,7 +180,7 @@ ModuleFactory::ModuleFactory()
    REGISTER(PSMoveController, psmove, kModuleType_Other);
 #endif
    REGISTER(SampleBank, samplebank, kModuleType_Other);
-   REGISTER(SamplePlayer, sampleplayer, kModuleType_Synth);
+   REGISTER(SampleEditor, sampleeditor, kModuleType_Synth);
    REGISTER(Autotalent, autotalent, kModuleType_Audio);
    REGISTER(ScaleDetect, scaledetect, kModuleType_Note);
    REGISTER(KarplusStrong, karplusstrong, kModuleType_Synth);
@@ -280,8 +281,8 @@ ModuleFactory::ModuleFactory()
    REGISTER(TakeRecorder, takerecorder, kModuleType_Audio);
    REGISTER(Splitter, splitter, kModuleType_Audio);
    REGISTER(Panner, panner, kModuleType_Audio);
+   REGISTER(SamplePlayer, sampleplayer, kModuleType_Synth);
 
-   REGISTER_EXPERIMENTAL(VSTPlugin, vstplugin, kModuleType_Synth);
    //REGISTER_EXPERIMENTAL(MidiPlayer, midiplayer, kModuleType_Instrument);
    REGISTER_EXPERIMENTAL(Razor, razor, kModuleType_Synth);
    REGISTER_EXPERIMENTAL(SampleCanvas, samplecanvas, kModuleType_Synth);
@@ -289,6 +290,7 @@ ModuleFactory::ModuleFactory()
    REGISTER_EXPERIMENTAL(ComboGridController, combogrid, kModuleType_Other);
    REGISTER_EXPERIMENTAL(PitchChorus, pitchchorus, kModuleType_Audio);
 
+   REGISTER_HIDDEN(VSTPlugin, vstplugin, kModuleType_Synth);
    REGISTER_HIDDEN(SampleFinder, samplefinder, kModuleType_Audio);
    REGISTER_HIDDEN(Producer, producer, kModuleType_Audio);
    REGISTER_HIDDEN(ChaosEngine, chaosengine, kModuleType_Other);

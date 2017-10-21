@@ -5,6 +5,101 @@
               jucerVersion="5.0.1" displaySplashScreen="1" reportAppUsage="1"
               splashScreenColour="Dark">
   <MAINGROUP id="w4HLAu" name="BespokeSynth">
+    <GROUP id="{531CC336-D9CD-1F6E-7272-2D8ADD98F839}" name="libraries">
+      <GROUP id="{44F08E27-A8F5-B33E-CC69-42EBE3B93B39}" name="CFMessaging">
+        <FILE id="B8KK3T" name="Bespoke_CFMessaging.cpp" compile="1" resource="0"
+              file="Source/CFMessaging/Bespoke_CFMessaging.cpp"/>
+        <FILE id="q2RmKJ" name="KontrolKommunicator.cpp" compile="0" resource="0"
+              file="Source/CFMessaging/KontrolKommunicator.cpp"/>
+        <FILE id="r0e8Gl" name="KontrolKommunicator.h" compile="0" resource="0"
+              file="Source/CFMessaging/KontrolKommunicator.h"/>
+        <FILE id="tZojHY" name="ListenPort.cpp" compile="0" resource="0" file="Source/CFMessaging/ListenPort.cpp"/>
+        <FILE id="Qq1uHa" name="ListenPort.h" compile="0" resource="0" file="Source/CFMessaging/ListenPort.h"/>
+        <FILE id="jfxXIW" name="NIMessage.cpp" compile="0" resource="0" file="Source/CFMessaging/NIMessage.cpp"/>
+        <FILE id="UgQaPh" name="NIMessage.h" compile="0" resource="0" file="Source/CFMessaging/NIMessage.h"/>
+        <FILE id="tRWs50" name="SendPort.cpp" compile="0" resource="0" file="Source/CFMessaging/SendPort.cpp"/>
+        <FILE id="QnMeob" name="SendPort.h" compile="0" resource="0" file="Source/CFMessaging/SendPort.h"/>
+      </GROUP>
+      <GROUP id="{CD125793-5B1B-A09E-A02B-C794D860CB47}" name="freeverb">
+        <FILE id="AxMzYs" name="allpass.cpp" compile="1" resource="0" file="Source/freeverb/allpass.cpp"/>
+        <FILE id="SMpRw4" name="allpass.hpp" compile="0" resource="0" file="Source/freeverb/allpass.hpp"/>
+        <FILE id="Mrp0dA" name="comb.cpp" compile="1" resource="0" file="Source/freeverb/comb.cpp"/>
+        <FILE id="l0jR4m" name="comb.hpp" compile="0" resource="0" file="Source/freeverb/comb.hpp"/>
+        <FILE id="R7Pmo1" name="denormals.h" compile="0" resource="0" file="Source/freeverb/denormals.h"/>
+        <FILE id="RcBidm" name="revmodel.cpp" compile="1" resource="0" file="Source/freeverb/revmodel.cpp"/>
+        <FILE id="MC3fZ0" name="revmodel.hpp" compile="0" resource="0" file="Source/freeverb/revmodel.hpp"/>
+        <FILE id="QUy4Dx" name="tuning.h" compile="0" resource="0" file="Source/freeverb/tuning.h"/>
+      </GROUP>
+      <GROUP id="{6676D702-1207-FE5C-9EC2-091B8A76E384}" name="glew">
+        <GROUP id="{8A3BA50C-A7D8-CAFD-22A5-FD85A7C7A15B}" name="include">
+          <GROUP id="{EF3C83BF-E0A5-4DFA-DA81-22BB2D864C81}" name="GL">
+            <FILE id="UGe1cR" name="glew.c" compile="0" resource="0" file="Source/glew/include/GL/glew.c"/>
+            <FILE id="IwV2yn" name="glew.h" compile="0" resource="0" file="Source/glew/include/GL/glew.h"/>
+            <FILE id="dldSJy" name="wglew.h" compile="0" resource="0" file="Source/glew/include/GL/wglew.h"/>
+          </GROUP>
+        </GROUP>
+        <FILE id="zuPaHo" name="Bespoke_glew.c" compile="1" resource="0" file="Source/glew/Bespoke_glew.c"/>
+      </GROUP>
+      <GROUP id="{6B02F4EC-4FE1-B0D3-1ADF-69615860694B}" name="json">
+        <GROUP id="{D5AAD910-C7FC-87F2-AF1B-9E729039A8BF}" name="include">
+          <GROUP id="{D501071B-7C03-FF21-DD09-E78B9C1873BD}" name="json">
+            <FILE id="NyvZfP" name="autolink.h" compile="0" resource="0" file="Source/json/include/json/autolink.h"/>
+            <FILE id="iG8Y9o" name="config.h" compile="0" resource="0" file="Source/json/include/json/config.h"/>
+            <FILE id="mtkchM" name="features.h" compile="0" resource="0" file="Source/json/include/json/features.h"/>
+            <FILE id="Yhn0yV" name="forwards.h" compile="0" resource="0" file="Source/json/include/json/forwards.h"/>
+            <FILE id="A8o1WW" name="json.h" compile="0" resource="0" file="Source/json/include/json/json.h"/>
+            <FILE id="RiLEPI" name="reader.h" compile="0" resource="0" file="Source/json/include/json/reader.h"/>
+            <FILE id="exbbdc" name="value.h" compile="0" resource="0" file="Source/json/include/json/value.h"/>
+            <FILE id="cIc2gb" name="writer.h" compile="0" resource="0" file="Source/json/include/json/writer.h"/>
+          </GROUP>
+        </GROUP>
+        <GROUP id="{3A203D71-C668-7233-02B6-F8D9DE6E71F1}" name="src">
+          <GROUP id="{AF0D97B8-4C45-534A-F2B5-12F869015BF7}" name="lib_json">
+            <FILE id="IAhpoD" name="json_batchallocator.h" compile="0" resource="0"
+                  file="Source/json/src/lib_json/json_batchallocator.h"/>
+            <FILE id="DrLELQ" name="json_internalarray.inl" compile="0" resource="0"
+                  file="Source/json/src/lib_json/json_internalarray.inl"/>
+            <FILE id="lkzh85" name="json_internalmap.inl" compile="0" resource="0"
+                  file="Source/json/src/lib_json/json_internalmap.inl"/>
+            <FILE id="ma4gN9" name="json_reader.cpp" compile="1" resource="0" file="Source/json/src/lib_json/json_reader.cpp"/>
+            <FILE id="et97vg" name="json_value.cpp" compile="1" resource="0" file="Source/json/src/lib_json/json_value.cpp"/>
+            <FILE id="xxuHea" name="json_valueiterator.inl" compile="0" resource="0"
+                  file="Source/json/src/lib_json/json_valueiterator.inl"/>
+            <FILE id="Pc90MT" name="json_writer.cpp" compile="1" resource="0" file="Source/json/src/lib_json/json_writer.cpp"/>
+            <FILE id="SAdkEZ" name="sconscript" compile="0" resource="1" file="Source/json/src/lib_json/sconscript"/>
+          </GROUP>
+        </GROUP>
+        <FILE id="uDRsNc" name="README.txt" compile="0" resource="1" file="Source/json/README.txt"/>
+        <FILE id="yyddqK" name="version" compile="0" resource="1" file="Source/json/version"/>
+      </GROUP>
+      <GROUP id="{352BA5B3-0006-BBD8-3E19-AE807986DDBB}" name="nanovg">
+        <FILE id="il5Rmq" name="fontstash.h" compile="0" resource="0" file="Source/nanovg/fontstash.h"/>
+        <FILE id="qVHzS3" name="nanovg.c" compile="1" resource="0" file="Source/nanovg/nanovg.c"/>
+        <FILE id="QAMu04" name="nanovg.h" compile="0" resource="0" file="Source/nanovg/nanovg.h"/>
+        <FILE id="ISxVry" name="nanovg_gl.h" compile="0" resource="0" file="Source/nanovg/nanovg_gl.h"/>
+        <FILE id="yH8RBn" name="nanovg_gl_utils.h" compile="0" resource="0"
+              file="Source/nanovg/nanovg_gl_utils.h"/>
+        <FILE id="yRAiYq" name="stb_image.h" compile="0" resource="0" file="Source/nanovg/stb_image.h"/>
+        <FILE id="KXZbBy" name="stb_truetype.h" compile="0" resource="0" file="Source/nanovg/stb_truetype.h"/>
+      </GROUP>
+      <GROUP id="{F7E2EFA2-0FE7-C7A5-2144-0503CB5A6A4A}" name="psmove">
+        <FILE id="bGRQcF" name="Bespoke_PSMove.c" compile="1" resource="0"
+              file="Source/psmove/Bespoke_PSMove.c"/>
+        <FILE id="XQF8rk" name="hid.c" compile="0" resource="0" file="Source/psmove/hid.c"/>
+        <FILE id="i0CRzJ" name="hidapi.h" compile="0" resource="0" file="Source/psmove/hidapi.h"/>
+        <FILE id="YxcjlF" name="psmove.c" compile="0" resource="0" file="Source/psmove/psmove.c"/>
+        <FILE id="R5jkmg" name="psmove.h" compile="0" resource="0" file="Source/psmove/psmove.h"/>
+        <FILE id="RR2d8F" name="PSMoveMgr.cpp" compile="0" resource="0" file="Source/psmove/PSMoveMgr.cpp"/>
+        <FILE id="DgQBhl" name="PSMoveMgr.h" compile="0" resource="0" file="Source/psmove/PSMoveMgr.h"/>
+      </GROUP>
+      <GROUP id="{17BD3427-0E14-197E-025B-41C989099F31}" name="vinylcontrol">
+        <FILE id="E50REB" name="timecoder.c" compile="1" resource="0" file="Source/vinylcontrol/timecoder.c"/>
+        <FILE id="oJd6k3" name="timecoder.h" compile="0" resource="0" file="Source/vinylcontrol/timecoder.h"/>
+        <FILE id="QnGD5P" name="vinylcontrol.cpp" compile="1" resource="0"
+              file="Source/vinylcontrol/vinylcontrol.cpp"/>
+        <FILE id="eSxSi9" name="vinylcontrol.h" compile="0" resource="0" file="Source/vinylcontrol/vinylcontrol.h"/>
+      </GROUP>
+    </GROUP>
     <GROUP id="{6E8FD6E1-BA74-3B09-455D-05C0CB629767}" name="Source">
       <GROUP id="{E0D1A2A4-1AAE-4BEB-542A-DDE85633AE4D}" name="effects">
         <FILE id="mLAQVL" name="BitcrushEffect.cpp" compile="1" resource="0"
@@ -58,101 +153,6 @@
         <FILE id="Q25CvM" name="TremoloEffect.cpp" compile="1" resource="0"
               file="Source/TremoloEffect.cpp"/>
         <FILE id="RG4zGd" name="TremoloEffect.h" compile="0" resource="0" file="Source/TremoloEffect.h"/>
-      </GROUP>
-      <GROUP id="{531CC336-D9CD-1F6E-7272-2D8ADD98F839}" name="libraries">
-        <GROUP id="{44F08E27-A8F5-B33E-CC69-42EBE3B93B39}" name="CFMessaging">
-          <FILE id="B8KK3T" name="Bespoke_CFMessaging.cpp" compile="1" resource="0"
-                file="Source/CFMessaging/Bespoke_CFMessaging.cpp"/>
-          <FILE id="q2RmKJ" name="KontrolKommunicator.cpp" compile="0" resource="0"
-                file="Source/CFMessaging/KontrolKommunicator.cpp"/>
-          <FILE id="r0e8Gl" name="KontrolKommunicator.h" compile="0" resource="0"
-                file="Source/CFMessaging/KontrolKommunicator.h"/>
-          <FILE id="tZojHY" name="ListenPort.cpp" compile="0" resource="0" file="Source/CFMessaging/ListenPort.cpp"/>
-          <FILE id="Qq1uHa" name="ListenPort.h" compile="0" resource="0" file="Source/CFMessaging/ListenPort.h"/>
-          <FILE id="jfxXIW" name="NIMessage.cpp" compile="0" resource="0" file="Source/CFMessaging/NIMessage.cpp"/>
-          <FILE id="UgQaPh" name="NIMessage.h" compile="0" resource="0" file="Source/CFMessaging/NIMessage.h"/>
-          <FILE id="tRWs50" name="SendPort.cpp" compile="0" resource="0" file="Source/CFMessaging/SendPort.cpp"/>
-          <FILE id="QnMeob" name="SendPort.h" compile="0" resource="0" file="Source/CFMessaging/SendPort.h"/>
-        </GROUP>
-        <GROUP id="{CD125793-5B1B-A09E-A02B-C794D860CB47}" name="freeverb">
-          <FILE id="AxMzYs" name="allpass.cpp" compile="1" resource="0" file="Source/freeverb/allpass.cpp"/>
-          <FILE id="SMpRw4" name="allpass.hpp" compile="0" resource="0" file="Source/freeverb/allpass.hpp"/>
-          <FILE id="Mrp0dA" name="comb.cpp" compile="1" resource="0" file="Source/freeverb/comb.cpp"/>
-          <FILE id="l0jR4m" name="comb.hpp" compile="0" resource="0" file="Source/freeverb/comb.hpp"/>
-          <FILE id="R7Pmo1" name="denormals.h" compile="0" resource="0" file="Source/freeverb/denormals.h"/>
-          <FILE id="RcBidm" name="revmodel.cpp" compile="1" resource="0" file="Source/freeverb/revmodel.cpp"/>
-          <FILE id="MC3fZ0" name="revmodel.hpp" compile="0" resource="0" file="Source/freeverb/revmodel.hpp"/>
-          <FILE id="QUy4Dx" name="tuning.h" compile="0" resource="0" file="Source/freeverb/tuning.h"/>
-        </GROUP>
-        <GROUP id="{6676D702-1207-FE5C-9EC2-091B8A76E384}" name="glew">
-          <GROUP id="{8A3BA50C-A7D8-CAFD-22A5-FD85A7C7A15B}" name="include">
-            <GROUP id="{EF3C83BF-E0A5-4DFA-DA81-22BB2D864C81}" name="GL">
-              <FILE id="UGe1cR" name="glew.c" compile="0" resource="0" file="Source/glew/include/GL/glew.c"/>
-              <FILE id="IwV2yn" name="glew.h" compile="0" resource="0" file="Source/glew/include/GL/glew.h"/>
-              <FILE id="dldSJy" name="wglew.h" compile="0" resource="0" file="Source/glew/include/GL/wglew.h"/>
-            </GROUP>
-          </GROUP>
-          <FILE id="zuPaHo" name="Bespoke_glew.c" compile="1" resource="0" file="Source/glew/Bespoke_glew.c"/>
-        </GROUP>
-        <GROUP id="{6B02F4EC-4FE1-B0D3-1ADF-69615860694B}" name="json">
-          <GROUP id="{D5AAD910-C7FC-87F2-AF1B-9E729039A8BF}" name="include">
-            <GROUP id="{D501071B-7C03-FF21-DD09-E78B9C1873BD}" name="json">
-              <FILE id="NyvZfP" name="autolink.h" compile="0" resource="0" file="Source/json/include/json/autolink.h"/>
-              <FILE id="iG8Y9o" name="config.h" compile="0" resource="0" file="Source/json/include/json/config.h"/>
-              <FILE id="mtkchM" name="features.h" compile="0" resource="0" file="Source/json/include/json/features.h"/>
-              <FILE id="Yhn0yV" name="forwards.h" compile="0" resource="0" file="Source/json/include/json/forwards.h"/>
-              <FILE id="A8o1WW" name="json.h" compile="0" resource="0" file="Source/json/include/json/json.h"/>
-              <FILE id="RiLEPI" name="reader.h" compile="0" resource="0" file="Source/json/include/json/reader.h"/>
-              <FILE id="exbbdc" name="value.h" compile="0" resource="0" file="Source/json/include/json/value.h"/>
-              <FILE id="cIc2gb" name="writer.h" compile="0" resource="0" file="Source/json/include/json/writer.h"/>
-            </GROUP>
-          </GROUP>
-          <GROUP id="{3A203D71-C668-7233-02B6-F8D9DE6E71F1}" name="src">
-            <GROUP id="{AF0D97B8-4C45-534A-F2B5-12F869015BF7}" name="lib_json">
-              <FILE id="IAhpoD" name="json_batchallocator.h" compile="0" resource="0"
-                    file="Source/json/src/lib_json/json_batchallocator.h"/>
-              <FILE id="DrLELQ" name="json_internalarray.inl" compile="0" resource="0"
-                    file="Source/json/src/lib_json/json_internalarray.inl"/>
-              <FILE id="lkzh85" name="json_internalmap.inl" compile="0" resource="0"
-                    file="Source/json/src/lib_json/json_internalmap.inl"/>
-              <FILE id="ma4gN9" name="json_reader.cpp" compile="1" resource="0" file="Source/json/src/lib_json/json_reader.cpp"/>
-              <FILE id="et97vg" name="json_value.cpp" compile="1" resource="0" file="Source/json/src/lib_json/json_value.cpp"/>
-              <FILE id="xxuHea" name="json_valueiterator.inl" compile="0" resource="0"
-                    file="Source/json/src/lib_json/json_valueiterator.inl"/>
-              <FILE id="Pc90MT" name="json_writer.cpp" compile="1" resource="0" file="Source/json/src/lib_json/json_writer.cpp"/>
-              <FILE id="SAdkEZ" name="sconscript" compile="0" resource="1" file="Source/json/src/lib_json/sconscript"/>
-            </GROUP>
-          </GROUP>
-          <FILE id="uDRsNc" name="README.txt" compile="0" resource="1" file="Source/json/README.txt"/>
-          <FILE id="yyddqK" name="version" compile="0" resource="1" file="Source/json/version"/>
-        </GROUP>
-        <GROUP id="{352BA5B3-0006-BBD8-3E19-AE807986DDBB}" name="nanovg">
-          <FILE id="il5Rmq" name="fontstash.h" compile="0" resource="0" file="Source/nanovg/fontstash.h"/>
-          <FILE id="qVHzS3" name="nanovg.c" compile="1" resource="0" file="Source/nanovg/nanovg.c"/>
-          <FILE id="QAMu04" name="nanovg.h" compile="0" resource="0" file="Source/nanovg/nanovg.h"/>
-          <FILE id="ISxVry" name="nanovg_gl.h" compile="0" resource="0" file="Source/nanovg/nanovg_gl.h"/>
-          <FILE id="yH8RBn" name="nanovg_gl_utils.h" compile="0" resource="0"
-                file="Source/nanovg/nanovg_gl_utils.h"/>
-          <FILE id="yRAiYq" name="stb_image.h" compile="0" resource="0" file="Source/nanovg/stb_image.h"/>
-          <FILE id="KXZbBy" name="stb_truetype.h" compile="0" resource="0" file="Source/nanovg/stb_truetype.h"/>
-        </GROUP>
-        <GROUP id="{F7E2EFA2-0FE7-C7A5-2144-0503CB5A6A4A}" name="psmove">
-          <FILE id="bGRQcF" name="Bespoke_PSMove.c" compile="1" resource="0"
-                file="Source/psmove/Bespoke_PSMove.c"/>
-          <FILE id="XQF8rk" name="hid.c" compile="0" resource="0" file="Source/psmove/hid.c"/>
-          <FILE id="i0CRzJ" name="hidapi.h" compile="0" resource="0" file="Source/psmove/hidapi.h"/>
-          <FILE id="YxcjlF" name="psmove.c" compile="0" resource="0" file="Source/psmove/psmove.c"/>
-          <FILE id="R5jkmg" name="psmove.h" compile="0" resource="0" file="Source/psmove/psmove.h"/>
-          <FILE id="RR2d8F" name="PSMoveMgr.cpp" compile="0" resource="0" file="Source/psmove/PSMoveMgr.cpp"/>
-          <FILE id="DgQBhl" name="PSMoveMgr.h" compile="0" resource="0" file="Source/psmove/PSMoveMgr.h"/>
-        </GROUP>
-        <GROUP id="{17BD3427-0E14-197E-025B-41C989099F31}" name="vinylcontrol">
-          <FILE id="E50REB" name="timecoder.c" compile="1" resource="0" file="Source/vinylcontrol/timecoder.c"/>
-          <FILE id="oJd6k3" name="timecoder.h" compile="0" resource="0" file="Source/vinylcontrol/timecoder.h"/>
-          <FILE id="QnGD5P" name="vinylcontrol.cpp" compile="1" resource="0"
-                file="Source/vinylcontrol/vinylcontrol.cpp"/>
-          <FILE id="eSxSi9" name="vinylcontrol.h" compile="0" resource="0" file="Source/vinylcontrol/vinylcontrol.h"/>
-        </GROUP>
       </GROUP>
       <GROUP id="{6781AC07-A090-A7AF-8D27-BCB6D9526ABD}" name="modules">
         <FILE id="O3zMCr" name="ADSRTrigger.cpp" compile="1" resource="0" file="Source/ADSRTrigger.cpp"/>
@@ -462,12 +462,15 @@
         <FILE id="cI0jsx" name="SampleCanvas.cpp" compile="1" resource="0"
               file="Source/SampleCanvas.cpp"/>
         <FILE id="AIUzeX" name="SampleCanvas.h" compile="0" resource="0" file="Source/SampleCanvas.h"/>
+        <FILE id="TLm9ej" name="SampleEditor.cpp" compile="1" resource="0"
+              file="Source/SampleEditor.cpp"/>
+        <FILE id="QOPRdO" name="SampleEditor.h" compile="0" resource="0" file="Source/SampleEditor.h"/>
         <FILE id="Yr6QsW" name="SampleFinder.cpp" compile="1" resource="0"
               file="Source/SampleFinder.cpp"/>
         <FILE id="oW3Axq" name="SampleFinder.h" compile="0" resource="0" file="Source/SampleFinder.h"/>
-        <FILE id="TLm9ej" name="SamplePlayer.cpp" compile="1" resource="0"
+        <FILE id="LwHyHg" name="SamplePlayer.cpp" compile="1" resource="0"
               file="Source/SamplePlayer.cpp"/>
-        <FILE id="QOPRdO" name="SamplePlayer.h" compile="0" resource="0" file="Source/SamplePlayer.h"/>
+        <FILE id="a8e6tJ" name="SamplePlayer.h" compile="0" resource="0" file="Source/SamplePlayer.h"/>
         <FILE id="LNhwIq" name="Sampler.cpp" compile="1" resource="0" file="Source/Sampler.cpp"/>
         <FILE id="zxAEFr" name="Sampler.h" compile="0" resource="0" file="Source/Sampler.h"/>
         <FILE id="TzcLi2" name="SamplerGrid.cpp" compile="1" resource="0" file="Source/SamplerGrid.cpp"/>

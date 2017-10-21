@@ -1,13 +1,14 @@
-//
-//  SamplePlayer.h
-//  modularSynth
-//
-//  Created by Ryan Challinor on 1/20/13.
-//
-//
+/*
+  ==============================================================================
 
-#ifndef __modularSynth__SamplePlayer__
-#define __modularSynth__SamplePlayer__
+    SamplePlayer.h
+    Created: 19 Oct 2017 10:10:15pm
+    Author:  Ryan Challinor
+
+  ==============================================================================
+*/
+
+#pragma once
 
 #include <iostream>
 #include "IAudioSource.h"
@@ -17,14 +18,12 @@
 #include "Checkbox.h"
 #include "Slider.h"
 #include "DropdownList.h"
-#include "Transport.h"
 #include "ClickButton.h"
-#include "PitchShifter.h"
 
 class SampleBank;
 class Sample;
 
-class SamplePlayer : public IAudioSource, public IDrawableModule, public IFloatSliderListener, public IIntSliderListener, public IDropdownListener, public ITimeListener, public IButtonListener, public INoteReceiver
+class SamplePlayer : public IAudioSource, public IDrawableModule, public IFloatSliderListener, public IIntSliderListener, public IDropdownListener, public IButtonListener
 {
 public:
    SamplePlayer();
@@ -33,21 +32,14 @@ public:
    
    string GetTitleLabel() override { return "sample"; }
    void CreateUIControls() override;
-
+   
    void PostRepatch(PatchCableSource* cable) override;
-
-   //INoteReceiver
-   void PlayNote(double time, int pitch, int velocity, int voiceIdx = -1, ModulationChain* pitchBend = NULL, ModulationChain* modWheel = NULL, ModulationChain* pressure = NULL) override;
-   void SendCC(int control, int value, int voiceIdx = -1) override {}
-
+   
    //IAudioSource
    void Process(double time) override;
    void SetEnabled(bool enabled) override { mEnabled = enabled; }
    
-   void ResetBar() { mReset = true; mCurrentBar = 0;}
-   void SetTransposition(float transposition) { mTransposition = transposition; }
-   void SetSampleIndex(int index) { mSampleIndex = index; UpdateSample(); }
-   void Play() { mPlay = true; }
+   void FilesDropped(vector<string> files, int x, int y) override;
    
    void CheckboxUpdated(Checkbox* checkbox) override;
    void FloatSliderUpdated(FloatSlider* slider, float oldVal) override;
@@ -55,65 +47,43 @@ public:
    void DropdownClicked(DropdownList* list) override;
    void DropdownUpdated(DropdownList* list, int oldVal) override;
    void ButtonClicked(ClickButton* button) override;
-   void OnTimeEvent(int samplesTo) override;
    
    void LoadLayout(const ofxJSONElement& moduleInfo) override;
    void SaveLayout(ofxJSONElement& moduleInfo) override;
    void SetUpFromSaveData() override;
-
+   
 private:
-   void RecalcPos();
-   void UpdateSample();
+   void UpdateSample(Sample* sample, bool ownsSample);
    void UpdateSampleList();
-   void UpdateBPM();
-
+   float GetPlayPositionForMouse(float mouseX) const;
+   
    //IDrawableModule
    void DrawModule() override;
    bool Enabled() const override { return mEnabled; }
    void GetModuleDimensions(int& x, int& y) override;
    void OnClicked(int x, int y, bool right) override;
-
+   bool MouseMoved(float x, float y) override;
+   void MouseReleased() override;
+   
    SampleBank* mBank;
    Sample* mSample;
+   bool mOwnsSample;
    
    float mVolume;
    FloatSlider* mVolumeSlider;
-   float* mWriteBuffer;
+   float mSpeed;
+   FloatSlider* mSpeedSlider;
    int mSampleIndex;
    DropdownList* mSampleList;
+   ClickButton* mPlayButton;
+   ClickButton* mPauseButton;
+   ClickButton* mStopButton;
    bool mPlay;
-   Checkbox* mPlayCheckbox;
    bool mLoop;
    Checkbox* mLoopCheckbox;
-   int mCurrentBar;
-   int mMeasureEarly;
-   bool mEditMode;
-   Checkbox* mEditCheckbox;
-   float mSampleStart;
-   FloatSlider* mSampleStartSlider;
-   float mSampleEnd;
-   FloatSlider* mSampleEndSlider;
-   float mOffset;
-   FloatSlider* mOffsetSlider;
-   int mNumBars;
-   IntSlider* mNumBarsSlider;
-   ClickButton* mEditModeStart;
-   ClickButton* mPadSampleButton;
-   ClickButton* mWriteButton;
-   float mOriginalBpm;
-   bool mKeepPitch;
-   Checkbox* mKeepPitchCheckbox;
-   float mPitchShift;
-   FloatSlider* mPitchShiftSlider;
-   PitchShifter mPitchShifter;
    PatchCableSource* mSampleBankCable;
-   bool mReset;
-   float mTransposition;
-   float mPlayPosition;
+   bool mScrubbingSample;
    
-   float* mDrawBuffer;
-   int mDrawBufferLength;
+   ChannelBuffer* mDrawBuffer;
 };
-
-#endif /* defined(__modularSynth__SamplePlayer__) */
 

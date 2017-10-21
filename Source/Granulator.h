@@ -19,7 +19,7 @@ class ChannelBuffer;
 class Grain
 {
 public:
-   Grain() : mPos(0), mSpeed(0), mVol(0) {}
+   Grain() : mPos(0), mSpeed(0), mVol(0), mStereoPosition(0) {}
    void Spawn(double time, float pos, float speed, float lengthInMs, float vol);
    void Process(double time, ChannelBuffer* buffer, int bufferLength, float* output);
    void DrawGrain(int idx, float x, float y, float w, float h, int bufferStart, int bufferLength, bool wrapAround);
@@ -31,6 +31,7 @@ private:
    double mStartTime;
    double mEndTime;
    float mVol;
+   float mStereoPosition;
 };
 
 class Granulator

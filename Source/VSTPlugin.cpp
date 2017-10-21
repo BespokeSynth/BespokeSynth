@@ -75,7 +75,7 @@ VSTPlugin::VSTPlugin()
 , mProgramChange(0)
 , mOpenEditorButton(NULL)
 , mWindowOverlay(NULL)
-, mDisplayMode(kDisplayMode_PluginOverlay)
+, mDisplayMode(kDisplayMode_Sliders)
 {
    mFormatManager.addDefaultFormats();
    
@@ -137,15 +137,18 @@ void VSTPlugin::SetVST(string path)
       if (mFormatManager.getFormat(i)->fileMightContainThisPluginType(path))
          mPlugin = mFormatManager.getFormat(i)->createInstanceFromDescription(desc, gSampleRate, gBufferSize);
    }
-   assert(mPlugin != NULL);
-   mPlugin->prepareToPlay(gSampleRate, gBufferSize);
-   mPlugin->setPlayHead(&mPlayhead);
-   mNumInputs = mPlugin->getTotalNumInputChannels();
-   mNumOutputs = mPlugin->getTotalNumOutputChannels();
-   ofLog() << "vst inputs: " << mNumInputs << "  vst outputs: " << mNumOutputs;
+   if (mPlugin != nullptr)
+   {
+      mPlugin->prepareToPlay(gSampleRate, gBufferSize);
+      mPlugin->setPlayHead(&mPlayhead);
+      mNumInputs = mPlugin->getTotalNumInputChannels();
+      mNumOutputs = mPlugin->getTotalNumOutputChannels();
+      ofLog() << "vst inputs: " << mNumInputs << "  vst outputs: " << mNumOutputs;
+   }
    mVSTMutex.unlock();
    
-   CreateParameterSliders();
+   if (mPlugin != nullptr)
+      CreateParameterSliders();
 }
 
 void VSTPlugin::CreateParameterSliders()
@@ -179,7 +182,7 @@ void VSTPlugin::CreateParameterSliders()
       {
          
       }
-      mParameterSliders[i].mSlider = new FloatSlider(this, label.c_str(), 3, 20, 200, 15, &mParameterSliders[i].mValue, 0, 1);
+      mParameterSliders[i].mSlider = new FloatSlider(this, label.c_str(), 3, 35, 200, 15, &mParameterSliders[i].mValue, 0, 1);
       if (i > 0)
       {
          const int kRows = 20;
@@ -356,7 +359,9 @@ void VSTPlugin::DrawModule()
       return;
    
    if (mPlugin)
-      DrawText(mPlugin->getName().toStdString(), 200, 15);
+      DrawText(mPlugin->getName().toStdString(), 3, 32);
+   else
+      DrawText("no plugin loaded", 3, 32);
    
    mVolSlider->Draw();
    mProgramChangeSelector->Draw();
@@ -380,18 +385,18 @@ void VSTPlugin::GetModuleDimensions(int& width, int& height)
       }
       else
       {
-         width = 300;
-         height = 30;
+         width = 206;
+         height = 40;
       }
    }
    else
    {
-      width = 250;
-      height = 350;
-      if (!mParameterSliders.empty())
+      width = 206;
+      height = 40;
+      for (auto slider : mParameterSliders)
       {
-         FloatSlider* slider = mParameterSliders[mParameterSliders.size()-1].mSlider;
-         width = slider->GetRect(true).x + slider->GetRect(true).width + 3;
+         width = MAX(width, slider.mSlider->GetRect(true).x + slider.mSlider->GetRect(true).width + 3);
+         height = MAX(height, slider.mSlider->GetRect(true).y + slider.mSlider->GetRect(true).height + 3);
       }
    }
 }
@@ -433,9 +438,12 @@ void VSTPlugin::ButtonClicked(ClickButton* button)
 {
    if (button == mOpenEditorButton)
    {
-      if (mWindow == NULL)
-         mWindow = VSTWindow::CreateWindow(this, VSTWindow::Normal);
-      mWindow->toFront (true);
+      if (mPlugin != nullptr)
+      {
+         if (mWindow == NULL)
+            mWindow = VSTWindow::CreateWindow(this, VSTWindow::Normal);
+         mWindow->toFront (true);
+      }
       
       //if (mWindow->GetNSViewComponent())
       //   mWindowOverlay = new NSWindowOverlay(mWindow->GetNSViewComponent()->getView());

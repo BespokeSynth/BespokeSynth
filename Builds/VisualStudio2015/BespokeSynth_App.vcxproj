@@ -139,6 +139,18 @@
     </Bscmake>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClCompile Include="..\..\Source\CFMessaging\Bespoke_CFMessaging.cpp"/>
+    <ClCompile Include="..\..\Source\freeverb\allpass.cpp"/>
+    <ClCompile Include="..\..\Source\freeverb\comb.cpp"/>
+    <ClCompile Include="..\..\Source\freeverb\revmodel.cpp"/>
+    <ClCompile Include="..\..\Source\glew\Bespoke_glew.c"/>
+    <ClCompile Include="..\..\Source\json\src\lib_json\json_reader.cpp"/>
+    <ClCompile Include="..\..\Source\json\src\lib_json\json_value.cpp"/>
+    <ClCompile Include="..\..\Source\json\src\lib_json\json_writer.cpp"/>
+    <ClCompile Include="..\..\Source\nanovg\nanovg.c"/>
+    <ClCompile Include="..\..\Source\psmove\Bespoke_PSMove.c"/>
+    <ClCompile Include="..\..\Source\vinylcontrol\timecoder.c"/>
+    <ClCompile Include="..\..\Source\vinylcontrol\vinylcontrol.cpp"/>
     <ClCompile Include="..\..\Source\BitcrushEffect.cpp"/>
     <ClCompile Include="..\..\Source\ButterworthFilterEffect.cpp"/>
     <ClCompile Include="..\..\Source\Compressor.cpp"/>
@@ -156,18 +168,6 @@
     <ClCompile Include="..\..\Source\Pumper.cpp"/>
     <ClCompile Include="..\..\Source\Stutter.cpp"/>
     <ClCompile Include="..\..\Source\TremoloEffect.cpp"/>
-    <ClCompile Include="..\..\Source\CFMessaging\Bespoke_CFMessaging.cpp"/>
-    <ClCompile Include="..\..\Source\freeverb\allpass.cpp"/>
-    <ClCompile Include="..\..\Source\freeverb\comb.cpp"/>
-    <ClCompile Include="..\..\Source\freeverb\revmodel.cpp"/>
-    <ClCompile Include="..\..\Source\glew\Bespoke_glew.c"/>
-    <ClCompile Include="..\..\Source\json\src\lib_json\json_reader.cpp"/>
-    <ClCompile Include="..\..\Source\json\src\lib_json\json_value.cpp"/>
-    <ClCompile Include="..\..\Source\json\src\lib_json\json_writer.cpp"/>
-    <ClCompile Include="..\..\Source\nanovg\nanovg.c"/>
-    <ClCompile Include="..\..\Source\psmove\Bespoke_PSMove.c"/>
-    <ClCompile Include="..\..\Source\vinylcontrol\timecoder.c"/>
-    <ClCompile Include="..\..\Source\vinylcontrol\vinylcontrol.cpp"/>
     <ClCompile Include="..\..\Source\ADSRTrigger.cpp"/>
     <ClCompile Include="..\..\Source\Amplifier.cpp"/>
     <ClCompile Include="..\..\Source\Arpeggiator.cpp"/>
@@ -276,6 +276,7 @@
     <ClCompile Include="..\..\Source\RingModulator.cpp"/>
     <ClCompile Include="..\..\Source\SampleBank.cpp"/>
     <ClCompile Include="..\..\Source\SampleCanvas.cpp"/>
+    <ClCompile Include="..\..\Source\SampleEditor.cpp"/>
     <ClCompile Include="..\..\Source\SampleFinder.cpp"/>
     <ClCompile Include="..\..\Source\SamplePlayer.cpp"/>
     <ClCompile Include="..\..\Source\Sampler.cpp"/>

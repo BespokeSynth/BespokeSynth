@@ -148,6 +148,7 @@
 		7E64421ED900DBB6AB7BF036 /* Producer.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 66548E3C165D17E79A639583 /* Producer.cpp */; };
 		7E6CBEA36DE2CADE2851057A /* FFT.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 00E7DB9EF26FC036EF0BDBE9 /* FFT.cpp */; };
 		7F1CD59387249E1BD19963CE /* Profiler.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 67F297FE76055E7FBE83A6FD /* Profiler.cpp */; };
+		80D9C15D8A644834E79D3599 /* SampleEditor.cpp in Sources */ = {isa = PBXBuildFile; fileRef = CB8345FFD367731EA70CF838 /* SampleEditor.cpp */; };
 		8164420CFFCF62095F04587B /* VSTPlugin.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 5B56BF687D3DF4181355C67A /* VSTPlugin.cpp */; };
 		816D5AB139E7BBACE87464C6 /* Splitter.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 4F8255BDA3AD1AABE5CBF22E /* Splitter.cpp */; };
 		821441031F282D0EFEA8055C /* PitchBender.cpp in Sources */ = {isa = PBXBuildFile; fileRef = CCF9AF000AB48A11C6E09433 /* PitchBender.cpp */; };
@@ -605,6 +606,7 @@
 		8B3F685C1221862D93D5CDB9 /* IAudioEffect.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; name = IAudioEffect.h; path = ../../Source/IAudioEffect.h; sourceTree = SOURCE_ROOT; };
 		8C9A8C9468B4BA3BB7805AC2 /* Info-App.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = "Info-App.plist"; sourceTree = SOURCE_ROOT; };
 		8CBC583E0D0A42D79D7E9BA8 /* NoteRouter.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; name = NoteRouter.cpp; path = ../../Source/NoteRouter.cpp; sourceTree = SOURCE_ROOT; };
+		8CD1835375037D48719AAFB9 /* SampleEditor.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; name = SampleEditor.h; path = ../../Source/SampleEditor.h; sourceTree = SOURCE_ROOT; };
 		8D1F8138241B19D74A7168F7 /* SamplerGrid.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; name = SamplerGrid.cpp; path = ../../Source/SamplerGrid.cpp; sourceTree = SOURCE_ROOT; };
 		8D2073E80BD91EDADD164FB3 /* RadioSequencer.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; name = RadioSequencer.cpp; path = ../../Source/RadioSequencer.cpp; sourceTree = SOURCE_ROOT; };
 		8D4F8B7F7CB5804F847F766E /* SamplePlayer.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; name = SamplePlayer.cpp; path = ../../Source/SamplePlayer.cpp; sourceTree = SOURCE_ROOT; };
@@ -760,6 +762,7 @@
 		C9F6CB196F991E28A5178FA5 /* TimelineControl.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; name = TimelineControl.cpp; path = ../../Source/TimelineControl.cpp; sourceTree = SOURCE_ROOT; };
 		CA80779265AE2170EF844760 /* NoteGate.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; name = NoteGate.cpp; path = ../../Source/NoteGate.cpp; sourceTree = SOURCE_ROOT; };
 		CB58DB3C9824F66A8862EACC /* Prefab.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; name = Prefab.cpp; path = ../../Source/Prefab.cpp; sourceTree = SOURCE_ROOT; };
+		CB8345FFD367731EA70CF838 /* SampleEditor.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; name = SampleEditor.cpp; path = ../../Source/SampleEditor.cpp; sourceTree = SOURCE_ROOT; };
 		CBBC5E37FB8B65747F55D938 /* AudioRouter.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; name = AudioRouter.h; path = ../../Source/AudioRouter.h; sourceTree = SOURCE_ROOT; };
 		CC371FE7194E7EBFAC83AD4C /* TakeRecorder.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; name = TakeRecorder.h; path = ../../Source/TakeRecorder.h; sourceTree = SOURCE_ROOT; };
 		CC59398A68B015ACEEC997F6 /* PatchCable.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; name = PatchCable.cpp; path = ../../Source/PatchCable.cpp; sourceTree = SOURCE_ROOT; };
@@ -1062,7 +1065,6 @@
 			isa = PBXGroup;
 			children = (
 				48A6B1B9D9A47066E40CBB12 /* effects */,
-				5A13D0CA6DCFEF178844C4EC /* libraries */,
 				C91AF721DDC182CE3AC80CF9 /* modules */,
 				C42053F1D9A29D64BA04592F /* uicontrols */,
 				48CE6D6A9E006100A2760A59 /* AdditiveVoice.cpp */,
@@ -1290,6 +1292,7 @@
 		B1062B2099E65E87C9F82938 /* BespokeSynth */ = {
 			isa = PBXGroup;
 			children = (
+				5A13D0CA6DCFEF178844C4EC /* libraries */,
 				77FF62E1B6B7C199CF414B05 /* Source */,
 			);
 			name = BespokeSynth;
@@ -1576,6 +1579,8 @@
 				43E6D4A3FCEECA28CD9D222D /* SampleBank.h */,
 				17A2364766F223C12B21AE8A /* SampleCanvas.cpp */,
 				35C5E62178D36F76348ADCD1 /* SampleCanvas.h */,
+				CB8345FFD367731EA70CF838 /* SampleEditor.cpp */,
+				8CD1835375037D48719AAFB9 /* SampleEditor.h */,
 				0AA0BF808A1F6AA288BD64E8 /* SampleFinder.cpp */,
 				E01B1C2B9F0B7689D50BF9FB /* SampleFinder.h */,
 				8D4F8B7F7CB5804F847F766E /* SamplePlayer.cpp */,
@@ -1769,6 +1774,18 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				8A7DD143953B7F7872F5CD40 /* Bespoke_CFMessaging.cpp in Sources */,
+				229E461FE3F5D79D86077F7A /* allpass.cpp in Sources */,
+				632548C9D6ACDF3ED512B6BC /* comb.cpp in Sources */,
+				75EA195348D014395C9F1E13 /* revmodel.cpp in Sources */,
+				356EE23D3BFCACC056194E8D /* Bespoke_glew.c in Sources */,
+				4722F8F2FB7421D2DDF17D9B /* json_reader.cpp in Sources */,
+				864B3F413403E3258C2F2A5C /* json_value.cpp in Sources */,
+				2DB208CD3C9ADE0480742C1A /* json_writer.cpp in Sources */,
+				25A3FFA8608D8FB377F8139F /* nanovg.c in Sources */,
+				D5395B45F2D527A42F4D4BBF /* Bespoke_PSMove.c in Sources */,
+				A1669F8707FD16051D185D6C /* timecoder.c in Sources */,
+				A4FE1AC1AB92568D4DF96393 /* vinylcontrol.cpp in Sources */,
 				C394B2D329DFCD4868A2E674 /* BitcrushEffect.cpp in Sources */,
 				F6A5AC6D148EAB101D7B6EC5 /* ButterworthFilterEffect.cpp in Sources */,
 				3F43B1210119EB569E3CF33E /* Compressor.cpp in Sources */,
@@ -1786,18 +1803,6 @@
 				69EB47EC9441C3507BEB277D /* Pumper.cpp in Sources */,
 				75837998247B5E99F3F16392 /* Stutter.cpp in Sources */,
 				7B858D802BD0BB608C0F48CF /* TremoloEffect.cpp in Sources */,
-				8A7DD143953B7F7872F5CD40 /* Bespoke_CFMessaging.cpp in Sources */,
-				229E461FE3F5D79D86077F7A /* allpass.cpp in Sources */,
-				632548C9D6ACDF3ED512B6BC /* comb.cpp in Sources */,
-				75EA195348D014395C9F1E13 /* revmodel.cpp in Sources */,
-				356EE23D3BFCACC056194E8D /* Bespoke_glew.c in Sources */,
-				4722F8F2FB7421D2DDF17D9B /* json_reader.cpp in Sources */,
-				864B3F413403E3258C2F2A5C /* json_value.cpp in Sources */,
-				2DB208CD3C9ADE0480742C1A /* json_writer.cpp in Sources */,
-				25A3FFA8608D8FB377F8139F /* nanovg.c in Sources */,
-				D5395B45F2D527A42F4D4BBF /* Bespoke_PSMove.c in Sources */,
-				A1669F8707FD16051D185D6C /* timecoder.c in Sources */,
-				A4FE1AC1AB92568D4DF96393 /* vinylcontrol.cpp in Sources */,
 				E436AB1DE7249EE3CE64C6F8 /* ADSRTrigger.cpp in Sources */,
 				E6B79FEEF03A902FFC517F8B /* Amplifier.cpp in Sources */,
 				8729714646543BBCDC5A3293 /* Arpeggiator.cpp in Sources */,
@@ -1906,6 +1911,7 @@
 				92B45A1A8AAFE4696467BDF4 /* RingModulator.cpp in Sources */,
 				9D104DCC89F71D8FA66C13A3 /* SampleBank.cpp in Sources */,
 				E06CE0B3F5E5E3A76E048473 /* SampleCanvas.cpp in Sources */,
+				80D9C15D8A644834E79D3599 /* SampleEditor.cpp in Sources */,
 				4BCD1A7CF0253D452F42854F /* SampleFinder.cpp in Sources */,
 				BE2F1EA179BAA89EB53C1E55 /* SamplePlayer.cpp in Sources */,
 				0731AF2007C0D8966C046BF5 /* Sampler.cpp in Sources */,
