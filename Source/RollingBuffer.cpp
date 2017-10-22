@@ -117,14 +117,15 @@ void RollingBuffer::Draw(int x, int y, int width, int height, int samples /*= -1
 
 namespace
 {
-   const int kSaveStateRev = 1;
+   const int kSaveStateRev = 2;
 }
 
 void RollingBuffer::SaveState(FileStreamOut& out)
 {
    out << kSaveStateRev;
    
-   for (int i=0; i<mBuffer.NumTotalChannels(); ++i)
+   out << mBuffer.NumActiveChannels();
+   for (int i=0; i<mBuffer.NumActiveChannels(); ++i)
    {
       out << mOffsetToStart[i];
       out.Write(mBuffer.GetChannel(i), Size());
@@ -135,9 +136,12 @@ void RollingBuffer::LoadState(FileStreamIn& in)
 {
    int rev;
    in >> rev;
-   LoadStateValidate(rev == kSaveStateRev);
    
-   for (int i=0; i<mBuffer.NumTotalChannels(); ++i)
+   int channels = ChannelBuffer::kMaxNumChannels;
+   if (rev >= 2)
+      in >> channels;
+   mBuffer.SetNumActiveChannels(channels);
+   for (int i=0; i<channels; ++i)
    {
       in >> mOffsetToStart[i];
       in.Read(mBuffer.GetChannel(i), Size());
