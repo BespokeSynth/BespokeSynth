@@ -26,7 +26,7 @@ void OutputChannel::Process()
 
 void OutputChannel::ClearBuffer()
 {
-   GetBuffer()->Clear();
+   GetBuffer()->Reset();
 }
 
 void OutputChannel::DrawModule()

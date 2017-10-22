@@ -78,7 +78,7 @@ void FeedbackModule::Process(double time)
       }
    }
    
-   GetBuffer()->Clear();
+   GetBuffer()->Reset();
 }
 
 void FeedbackModule::DrawModule()

@@ -115,7 +115,7 @@ void Sampler::Process(double time)
    
    Add(GetTarget()->GetBuffer()->GetChannel(0), mWriteBuffer, bufferSize);
    
-   GetBuffer()->Clear();
+   GetBuffer()->Reset();
 }
 
 void Sampler::PlayNote(double time, int pitch, int velocity, int voiceIdx /*= -1*/, ModulationChain* pitchBend /*= nullptr*/, ModulationChain* modWheel /*= nullptr*/, ModulationChain* pressure /*= nullptr*/)

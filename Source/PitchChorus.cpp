@@ -67,7 +67,7 @@ void PitchChorus::Process(double time)
    
    GetVizBuffer()->WriteChunk(mOutputBuffer,bufferSize, 0);
    
-   GetBuffer()->Clear();
+   GetBuffer()->Reset();
 }
 
 void PitchChorus::PlayNote(double time, int pitch, int velocity, int voiceIdx /*= -1*/, ModulationChain* pitchBend /*= nullptr*/, ModulationChain* modWheel /*= nullptr*/, ModulationChain* pressure /*= nullptr*/)

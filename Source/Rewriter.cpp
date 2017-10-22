@@ -75,7 +75,7 @@ void Rewriter::Process(double time)
       GetVizBuffer()->WriteChunk(GetBuffer()->GetChannel(ch),bufferSize, ch);
    }
 
-   GetBuffer()->Clear();
+   GetBuffer()->Reset();
 }
 
 void Rewriter::DrawModule()

@@ -138,7 +138,7 @@ void BandVocoder::Process(double time)
    
    GetVizBuffer()->WriteChunk(GetTarget()->GetBuffer()->GetChannel(0),bufferSize,0);
    
-   GetBuffer()->Clear();
+   GetBuffer()->Reset();
 }
 
 void BandVocoder::DrawModule()

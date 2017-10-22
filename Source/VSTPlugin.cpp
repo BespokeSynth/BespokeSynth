@@ -235,8 +235,9 @@ void VSTPlugin::Process(double time)
    SyncBuffers();
    
    int bufferSize = GetBuffer()->BufferSize();
+   assert(bufferSize == gBufferSize);
    
-   juce::AudioBuffer<float> buffer(inputChannels, gBufferSize);
+   juce::AudioBuffer<float> buffer(inputChannels, bufferSize);
    for (int i=0; i<inputChannels; ++i)
       buffer.copyFrom(i, 0, GetBuffer()->GetChannel(MIN(i,GetBuffer()->NumActiveChannels()-1)), GetBuffer()->BufferSize());
    
@@ -306,7 +307,7 @@ void VSTPlugin::Process(double time)
       }
    }
 
-   GetBuffer()->Clear();
+   GetBuffer()->Reset();
 }
 
 void VSTPlugin::PlayNote(double time, int pitch, int velocity, int voiceIdx /*= -1*/, ModulationChain* pitchBend /*= nullptr*/, ModulationChain* modWheel /*= nullptr*/, ModulationChain* pressure /*= nullptr*/)

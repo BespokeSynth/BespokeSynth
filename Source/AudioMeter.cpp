@@ -53,7 +53,7 @@ void AudioMeter::Process(double time)
    mPeakTracker.Process(mAnalysisBuffer, gBufferSize);
    mLevel = sqrtf(mPeakTracker.GetPeak());
    
-   GetBuffer()->Clear();
+   GetBuffer()->Reset();
 }
 
 void AudioMeter::DrawModule()

@@ -134,7 +134,7 @@ void EffectChain::Process(double time)
       GetVizBuffer()->WriteChunk(GetBuffer()->GetChannel(ch), bufferSize, ch);
    }
    
-   GetBuffer()->Clear();
+   GetBuffer()->Reset();
 }
 
 void EffectChain::Poll()

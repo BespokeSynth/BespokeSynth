@@ -14,6 +14,7 @@ ChannelBuffer::ChannelBuffer(int bufferSize)
 {
    mActiveChannels = 1;
    mNumChannels = kMaxNumChannels;
+   mRecentActiveChannels = 1;
    
    mBuffers = new float*[mNumChannels];
    mBufferSize = bufferSize;

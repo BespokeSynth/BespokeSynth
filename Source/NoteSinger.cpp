@@ -83,7 +83,7 @@ void NoteSinger::OnTransportAdvanced(float amount)
       mPitch = pitch;
    }
 
-   GetBuffer()->Clear();
+   GetBuffer()->Reset();
 }
 
 string NoteSinger::GetTitleLabel()

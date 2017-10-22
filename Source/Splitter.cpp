@@ -61,7 +61,7 @@ void Splitter::Process(double time)
       mVizBuffer2.WriteChunk(GetBuffer()->GetChannel(secondChannel), GetBuffer()->BufferSize(), 0);
    }
    
-   GetBuffer()->Clear();
+   GetBuffer()->Reset();
 }
 
 void Splitter::DrawModule()

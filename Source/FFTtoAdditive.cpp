@@ -137,7 +137,7 @@ void FFTtoAdditive::Process(double time)
       time += gInvSampleRateMs;
    }
 
-   GetBuffer()->Clear();
+   GetBuffer()->Reset();
 }
 
 float FFTtoAdditive::SinSample(float phase)

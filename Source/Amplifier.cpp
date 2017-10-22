@@ -48,7 +48,7 @@ void Amplifier::Process(double time)
       }
    }
    
-   GetBuffer()->Clear();
+   GetBuffer()->Reset();
 }
 
 void Amplifier::DrawModule()

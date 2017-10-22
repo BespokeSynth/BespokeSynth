@@ -20,14 +20,12 @@ Panner::Panner()
 , mWiden(0)
 , mWidenSlider(nullptr)
 , mWidenerBuffer(2048)
-, mMonoInput(true)
 {
 }
 
 void Panner::CreateUIControls()
 {
    IDrawableModule::CreateUIControls();
-   mMonoCheckbox = new Checkbox(this,"mono",5,2,&mMonoInput);
    mPanSlider = new FloatSlider(this,"pan",5,20,110,15,&mPan,-1,1);
    mWidenSlider = new FloatSlider(this,"widen",55,2,60,15,&mWiden,-150,150,0);
 }
@@ -44,11 +42,18 @@ void Panner::Process(double time)
       return;
  
    SyncBuffers(2);
-   GetBuffer()->SetNumActiveChannels(2);
    mWidenerBuffer.SetNumChannels(2);
    
-   if (mMonoInput)
-      BufferCopy(GetBuffer()->GetChannel(1), GetBuffer()->GetChannel(0), GetBuffer()->BufferSize());
+   float* secondChannel;
+   if (GetBuffer()->NumActiveChannels() == 1)   //panning mono input
+   {
+      BufferCopy(gWorkBuffer, GetBuffer()->GetChannel(0), GetBuffer()->BufferSize());
+      secondChannel = gWorkBuffer;
+   }
+   else
+   {
+      secondChannel = GetBuffer()->GetChannel(1);
+   }
    
    ChannelBuffer* out = GetTarget()->GetBuffer();
    
@@ -57,7 +62,7 @@ void Panner::Process(double time)
       for (int ch=0; ch<GetBuffer()->NumActiveChannels(); ++ch)
          mWidenerBuffer.WriteChunk(GetBuffer()->GetChannel(ch), GetBuffer()->BufferSize(), ch);
       if (mWiden < 0)
-         mWidenerBuffer.ReadChunk(GetBuffer()->GetChannel(1), GetBuffer()->BufferSize(), abs(mWiden), 1);
+         mWidenerBuffer.ReadChunk(secondChannel, GetBuffer()->BufferSize(), abs(mWiden), 1);
       else
          mWidenerBuffer.ReadChunk(GetBuffer()->GetChannel(0), GetBuffer()->BufferSize(), abs(mWiden), 0);
    }
@@ -69,12 +74,12 @@ void Panner::Process(double time)
       float pan = mPanRamp.Value(time);
       
       float left = GetBuffer()->GetChannel(0)[i];
-      float right = GetBuffer()->GetChannel(1)[i];
+      float right = secondChannel[i];
       GetBuffer()->GetChannel(0)[i] = left * ofMap(pan, 0, 1, 1, 0, true) + right * ofMap(pan, -1, 0, 1, 0, true);
-      GetBuffer()->GetChannel(1)[i] = right * ofMap(pan, -1, 0, 0, 1, true) + left * ofMap(pan, 0, 1, 0, 1, true);
+      secondChannel[i] = right * ofMap(pan, -1, 0, 0, 1, true) + left * ofMap(pan, 0, 1, 0, 1, true);
       
       out->GetChannel(0)[i] += GetBuffer()->GetChannel(0)[i];
-      out->GetChannel(1)[i] += GetBuffer()->GetChannel(1)[i];
+      out->GetChannel(1)[i] += secondChannel[i];
       
       time += gInvSampleRateMs;
    }
@@ -82,7 +87,7 @@ void Panner::Process(double time)
    for (int ch=0; ch<GetBuffer()->NumActiveChannels(); ++ch)
       GetVizBuffer()->WriteChunk(GetBuffer()->GetChannel(ch),GetBuffer()->BufferSize(), ch);
    
-   GetBuffer()->Clear();
+   GetBuffer()->Reset();
 }
 
 void Panner::DrawModule()
@@ -90,7 +95,6 @@ void Panner::DrawModule()
    if (Minimized() || IsVisible() == false)
       return;
    
-   mMonoCheckbox->Draw();
    mPanSlider->Draw();
    mWidenSlider->Draw();
 }

@@ -131,7 +131,7 @@ void SamplerGrid::Process(double time)
    
    Add(GetTarget()->GetBuffer()->GetChannel(0), gWorkBuffer, bufferSize);
    
-   GetBuffer()->Clear();
+   GetBuffer()->Reset();
 }
 
 void SamplerGrid::ConnectGridController(IGridController* grid)

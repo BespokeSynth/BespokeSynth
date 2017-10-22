@@ -125,7 +125,7 @@ void FreqDomainBoilerplate::Process(double time)
 
    GetVizBuffer()->WriteChunk(GetBuffer()->GetChannel(0),bufferSize, 0);
 
-   GetBuffer()->Clear();
+   GetBuffer()->Reset();
 }
 
 void FreqDomainBoilerplate::DrawModule()

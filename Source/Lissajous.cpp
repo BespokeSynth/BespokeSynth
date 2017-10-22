@@ -50,7 +50,7 @@ void Lissajous::Process(double time)
    for (int i=0; i<bufferSize; ++i)
       mLissajousPoints[(mOffset+i) % NUM_LISSAJOUS_POINTS].set(GetBuffer()->GetChannel(0)[i],GetBuffer()->GetChannel(secondChannel)[i]);
    
-   GetBuffer()->Clear();
+   GetBuffer()->Reset();
    
    mOffset += bufferSize;
    mOffset %= NUM_LISSAJOUS_POINTS;

@@ -59,7 +59,7 @@ void FreqDelay::Process(double time)
       GetVizBuffer()->WriteChunk(GetBuffer()->GetChannel(ch),bufferSize, ch);
    }
 
-   GetBuffer()->Clear();
+   GetBuffer()->Reset();
 }
 
 void FreqDelay::PlayNote(double time, int pitch, int velocity, int voiceIdx /*= -1*/, ModulationChain* pitchBend /*= nullptr*/, ModulationChain* modWheel /*= nullptr*/, ModulationChain* pressure /*= nullptr*/)

@@ -909,7 +909,7 @@ void Autotalent::Process(double time)
 
    GetVizBuffer()->WriteChunk(mWorkingBuffer, bufferSize, 0);
 
-   GetBuffer()->Clear();
+   GetBuffer()->Reset();
    
    // Tell the host the algorithm latency
    mLatency = (N-1);

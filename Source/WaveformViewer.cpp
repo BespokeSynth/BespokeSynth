@@ -74,7 +74,7 @@ void WaveformViewer::Process(double time)
    for (int i=0; i<bufferSize; ++i)
       mAudioView[(i+mBufferVizOffset[!mDoubleBufferFlip]) % BUFFER_VIZ_SIZE][!mDoubleBufferFlip] = GetBuffer()->GetChannel(0)[i];
       
-   GetBuffer()->Clear();
+   GetBuffer()->Reset();
    
    float vizPhaseInc = GetPhaseInc(gVizFreq);
    mVizPhase[!mDoubleBufferFlip] += vizPhaseInc * bufferSize;

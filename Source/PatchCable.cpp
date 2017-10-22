@@ -253,9 +253,16 @@ void PatchCable::Render()
             ofSetColor(lineColor);
             ofLine(cable.plug.x,cable.plug.y,cable.end.x,cable.end.y);
             
+            bool warn = false;
+            
             if (vizBuff->NumChannels() > 1 && mAudioReceiverTarget && mAudioReceiverTarget->GetInputMode() == IAudioReceiver::kInputMode_Mono)
+               warn = true; //warn that the multichannel audio is being crunched to mono
+            
+            if (vizBuff->NumChannels() == 1 && mAudioReceiverTarget && mAudioReceiverTarget->GetBuffer()->RecentNumActiveChannels() > 1)
+               warn = true; //warn that the target expects multichannel audio but we're not filling all of the channels
+            
+            if (warn)
             {
-               //warn that the multichannel audio is being crunched to mono
                ofFill();
                ofSetColor(255, 255, 0);
                ofCircle(cable.plug.x, cable.plug.y, 6);

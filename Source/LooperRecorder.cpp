@@ -197,7 +197,7 @@ void LooperRecorder::Process(double time)
       GetVizBuffer()->WriteChunk(GetBuffer()->GetChannel(ch),bufferSize, ch);
    }
    
-   GetBuffer()->Clear();
+   GetBuffer()->Reset();
 }
 
 void LooperRecorder::DrawCircleHash(ofVec2f center, float progress, float width, float innerRadius, float outerRadius)

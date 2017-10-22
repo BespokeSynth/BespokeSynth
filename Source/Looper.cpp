@@ -411,7 +411,7 @@ void Looper::Process(double time)
       Add(GetTarget()->GetBuffer()->GetChannel(ch), mWorkBuffer.GetChannel(ch), bufferSize);
    }
    
-   GetBuffer()->Clear();
+   GetBuffer()->Reset();
    
    if (mCommitBuffer && !mClearCommitBuffer && !mWantRewrite)
       DoCommit();
