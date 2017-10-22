@@ -3,21 +3,14 @@
       {
          "channel" : 1,
          "name" : "output 1",
-         "position" : [ 15.0, 692.0 ],
+         "position" : [ 18.0, 763.0 ],
          "type" : "output"
       },
       {
          "channel" : 2,
          "name" : "output 2",
-         "position" : [ 118.0, 691.0 ],
+         "position" : [ 121.0, 762.0 ],
          "type" : "output"
-      },
-      {
-         "name" : "panner",
-         "pan" : 0.0,
-         "position" : [ 36.0, 582.0 ],
-         "target" : "splitter",
-         "type" : "panner"
       },
       {
          "name" : "scale",
@@ -26,7 +19,7 @@
       },
       {
          "name" : "splitter",
-         "position" : [ 55.0, 655.0 ],
+         "position" : [ 58.0, 726.0 ],
          "target" : "output 1",
          "target2" : "output 2",
          "type" : "splitter"

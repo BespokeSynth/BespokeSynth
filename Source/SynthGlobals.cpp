@@ -368,7 +368,7 @@ void UpdateTarget(IDrawableModule* module)
    {
       for (int i=0; i<audioSource->GetNumTargets(); ++i)
       {
-         IDrawableModule* target = dynamic_cast<IDrawableModule*>(audioSource->GetTarget());
+         IDrawableModule* target = dynamic_cast<IDrawableModule*>(audioSource->GetTarget(i));
          if (target)
             targetName = target->Path();
          module->GetSaveData().SetString("target"+(i==0 ? "" : ofToString(i+1)), targetName);
