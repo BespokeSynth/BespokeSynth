@@ -62,7 +62,7 @@ NoteStepSequencer::NoteStepSequencer()
    {
       mTones[i] = 7;
       mVels[i] = 127;
-      mNoteLengths[i] = 1;
+      mNoteLengths[i] = .9f;
    }
    
    SetIsNoteOrigin(true);
@@ -185,6 +185,20 @@ void NoteStepSequencer::DrawModule()
    ofFill();
    int gridX, gridY;
    mGrid->GetPosition(gridX, gridY);
+   
+   for (int i=0; i<mGrid->GetCols()-1; ++i)
+   {
+      if (mNoteLengths[i] == 1 && mTones[i] == mTones[i+1])
+      {
+         ofSetColor(255,255,255,255);
+         ofFill();
+         float boxHeight = (float(mGrid->GetHeight())/mNoteRange);
+         float boxWidth = (float(mGrid->GetWidth())/mGrid->GetCols());
+         float y = gridY + mGrid->GetHeight() - mTones[i]*boxHeight;
+         ofRect(gridX + boxWidth * i+1, y-boxHeight+1, boxWidth*1.5f-2, boxHeight-2);
+      }
+   }
+   
    for (int i=0;i<mNoteRange;++i)
    {
       if (RowToPitch(i)%TheScale->GetTet() == TheScale->ScaleRoot()%TheScale->GetTet())
@@ -413,7 +427,7 @@ void NoteStepSequencer::OnTimeEvent(int samplesTo)
    }
    else
    {
-      int outPitch =RowToPitch(current);
+      int outPitch = RowToPitch(current);
       
       if (mLastPitch == outPitch && mVels[mArpIndex] > 1 && mVels[mArpIndex] <= mLastVel && !mAlreadyDidNoteOff)
       {
