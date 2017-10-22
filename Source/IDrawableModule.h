@@ -115,7 +115,7 @@ public:
    virtual bool CanSaveState() const { return true; }
    
    //IPatchable
-   PatchCableSource* GetPatchCableSource() override { return mMainPatchCableSource; }
+   PatchCableSource* GetPatchCableSource(int index=0) override { if (index == 0) return mMainPatchCableSource; else return mPatchCableSources[index]; }
    vector<PatchCableSource*> GetPatchCableSources() { return mPatchCableSources; }
    
    static void FindClosestSides(int xThis,int yThis,int wThis,int hThis,int xThat,int yThat,int wThat,int hThat, int& startX,int& startY,int& endX,int& endY);

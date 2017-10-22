@@ -22,7 +22,6 @@
 #include "StepSequencer.h"
 #include "InputChannel.h"
 #include "OutputChannel.h"
-#include "Stereofier.h"
 #include "WaveformViewer.h"
 #include "FMSynth.h"
 #include "MidiController.h"
@@ -164,7 +163,6 @@
 
 ModuleFactory::ModuleFactory()
 {
-   REGISTER(Stereofier, stereofier, kModuleType_Audio);
    REGISTER(LooperRecorder, looperrecorder, kModuleType_Audio);
    REGISTER(WaveformViewer, waveform, kModuleType_Audio);
    REGISTER(EffectChain, effectchain, kModuleType_Audio);

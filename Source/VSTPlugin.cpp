@@ -228,9 +228,6 @@ void VSTPlugin::Process(double time)
 {
    Profiler profiler("VSTPlugin");
    
-   if (!mEnabled || GetTarget() == nullptr || mPlugin == nullptr)
-      return;
-   
    int inputChannels = MAX(2, mNumInputs);
    GetBuffer()->SetNumActiveChannels(inputChannels);
    
@@ -243,56 +240,70 @@ void VSTPlugin::Process(double time)
    for (int i=0; i<inputChannels; ++i)
       buffer.copyFrom(i, 0, GetBuffer()->GetChannel(MIN(i,GetBuffer()->NumActiveChannels()-1)), GetBuffer()->BufferSize());
    
-   mVSTMutex.lock();
+   if (mEnabled && mPlugin != nullptr)
    {
-      const juce::ScopedLock lock(mMidiInputLock);
-      
-      for (int i=0; i<mChannelModulations.size(); ++i)
+      mVSTMutex.lock();
       {
-         ChannelModulations& mod = mChannelModulations[i];
-         int channel = i + 1;
-         if (i == kGlobalModulationIdx)
-            channel = 1;
+         const juce::ScopedLock lock(mMidiInputLock);
          
-         if (mUseVoiceAsChannel == false)
-            channel = mChannel;
+         for (int i=0; i<mChannelModulations.size(); ++i)
+         {
+            ChannelModulations& mod = mChannelModulations[i];
+            int channel = i + 1;
+            if (i == kGlobalModulationIdx)
+               channel = 1;
+            
+            if (mUseVoiceAsChannel == false)
+               channel = mChannel;
+            
+            float bend = mod.mPitchBend ? mod.mPitchBend->GetValue(0) : 0;
+            if (bend != mod.mLastPitchBend)
+            {
+               mod.mLastPitchBend = bend;
+               mMidiBuffer.addEvent(juce::MidiMessage::pitchWheel(channel, (int)ofMap(bend,-mPitchBendRange,mPitchBendRange,0,16383,K(clamp))), 0);
+            }
+            float modWheel = mod.mModWheel ? mod.mModWheel->GetValue(0) : 0;
+            if (modWheel != mod.mLastModWheel)
+            {
+               mod.mLastModWheel = modWheel;
+               mMidiBuffer.addEvent(juce::MidiMessage::controllerEvent(channel, mModwheelCC, ofClamp(modWheel * 127,0,127)), 0);
+            }
+            float pressure = mod.mPressure ? mod.mPressure->GetValue(0) : 0;
+            if (pressure != mod.mLastPressure)
+            {
+               mod.mLastPressure = pressure;
+               mMidiBuffer.addEvent(juce::MidiMessage::channelPressureChange(channel, ofClamp(pressure*127,0,127)), 0);
+            }
+         }
          
-         float bend = mod.mPitchBend ? mod.mPitchBend->GetValue(0) : 0;
-         if (bend != mod.mLastPitchBend)
-         {
-            mod.mLastPitchBend = bend;
-            mMidiBuffer.addEvent(juce::MidiMessage::pitchWheel(channel, (int)ofMap(bend,-mPitchBendRange,mPitchBendRange,0,16383,K(clamp))), 0);
-         }
-         float modWheel = mod.mModWheel ? mod.mModWheel->GetValue(0) : 0;
-         if (modWheel != mod.mLastModWheel)
-         {
-            mod.mLastModWheel = modWheel;
-            mMidiBuffer.addEvent(juce::MidiMessage::controllerEvent(channel, mModwheelCC, ofClamp(modWheel * 127,0,127)), 0);
-         }
-         float pressure = mod.mPressure ? mod.mPressure->GetValue(0) : 0;
-         if (pressure != mod.mLastPressure)
-         {
-            mod.mLastPressure = pressure;
-            mMidiBuffer.addEvent(juce::MidiMessage::channelPressureChange(channel, ofClamp(pressure*127,0,127)), 0);
-         }
+         mPlugin->processBlock(buffer, mMidiBuffer);
+         
+         mMidiBuffer.clear();
       }
-      
-      mPlugin->processBlock(buffer, mMidiBuffer);
-      
-      mMidiBuffer.clear();
-   }
-   mVSTMutex.unlock();
+      mVSTMutex.unlock();
    
-   GetBuffer()->Clear();
-   for (int ch=0; ch < buffer.getNumChannels(); ++ch)
-   {
-      int outputChannel = MIN(ch,GetBuffer()->NumActiveChannels()-1);
-      for (int sampleIndex=0; sampleIndex < buffer.getNumSamples(); ++sampleIndex)
+      GetBuffer()->Clear();
+      for (int ch=0; ch < buffer.getNumChannels(); ++ch)
       {
-         GetBuffer()->GetChannel(outputChannel)[sampleIndex] += buffer.getSample(ch, sampleIndex) * mVol;
+         int outputChannel = MIN(ch,GetBuffer()->NumActiveChannels()-1);
+         for (int sampleIndex=0; sampleIndex < buffer.getNumSamples(); ++sampleIndex)
+         {
+            GetBuffer()->GetChannel(outputChannel)[sampleIndex] += buffer.getSample(ch, sampleIndex) * mVol;
+         }
+         if (GetTarget())
+            Add(GetTarget()->GetBuffer()->GetChannel(outputChannel), GetBuffer()->GetChannel(outputChannel), bufferSize);
+         GetVizBuffer()->WriteChunk(GetBuffer()->GetChannel(outputChannel), bufferSize, outputChannel);
       }
-      Add(GetTarget()->GetBuffer()->GetChannel(outputChannel), GetBuffer()->GetChannel(outputChannel), bufferSize);
-      GetVizBuffer()->WriteChunk(GetBuffer()->GetChannel(outputChannel), bufferSize, outputChannel);
+   }
+   else
+   {
+      //bypass
+      for (int ch=0; ch<GetBuffer()->NumActiveChannels(); ++ch)
+      {
+         if (GetTarget())
+            Add(GetTarget()->GetBuffer()->GetChannel(ch), GetBuffer()->GetChannel(ch), GetBuffer()->BufferSize());
+         GetVizBuffer()->WriteChunk(GetBuffer()->GetChannel(ch),GetBuffer()->BufferSize(), ch);
+      }
    }
 
    GetBuffer()->Clear();

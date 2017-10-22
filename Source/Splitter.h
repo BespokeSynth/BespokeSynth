@@ -27,11 +27,10 @@ public:
    string GetTitleLabel() override { return "splitter"; }
    void CreateUIControls() override;
    
-   IAudioReceiver* GetTarget2() override { return mPatchCableSource2 ? mPatchCableSource2->GetAudioReceiver() : nullptr; }
-   
    //IAudioSource
    void Process(double time) override;
    void SetEnabled(bool enabled) override { mEnabled = enabled; }
+   int GetNumTargets() override { return 2; }
    
    virtual void LoadLayout(const ofxJSONElement& moduleInfo) override;
    virtual void SetUpFromSaveData() override;

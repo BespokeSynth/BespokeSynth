@@ -9,7 +9,8 @@
 #include "IAudioSource.h"
 #include "PatchCableSource.h"
 
-IAudioReceiver* IAudioSource::GetTarget()
+IAudioReceiver* IAudioSource::GetTarget(int index)
 {
-   return GetPatchCableSource()->GetAudioReceiver();
+   assert(index < GetNumTargets());
+   return GetPatchCableSource(index)->GetAudioReceiver();
 }

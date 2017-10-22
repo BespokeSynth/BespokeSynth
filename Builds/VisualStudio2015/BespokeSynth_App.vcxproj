@@ -292,7 +292,6 @@
     <ClCompile Include="..\..\Source\SlowLayers.cpp"/>
     <ClCompile Include="..\..\Source\Splitter.cpp"/>
     <ClCompile Include="..\..\Source\StepSequencer.cpp"/>
-    <ClCompile Include="..\..\Source\Stereofier.cpp"/>
     <ClCompile Include="..\..\Source\StutterControl.cpp"/>
     <ClCompile Include="..\..\Source\SustainPedal.cpp"/>
     <ClCompile Include="..\..\Source\TakeRecorder.cpp"/>

@@ -55,7 +55,7 @@ void DrumPlayer::CreateUIControls()
    mEditCheckbox = new Checkbox(this,"edit",73,52,&mEditMode);
    mSaveButton = new ClickButton(this,"save current",200,22);
    mNewKitButton = new ClickButton(this,"new kit", 200, 4);
-   mNewKitNameEntry = new TextEntry(this,"kitname",130,4,7,mNewKitName);
+   mNewKitNameEntry = new TextEntry(this,"kitname",200, 40,7,mNewKitName);
    mAuditionSlider = new FloatSlider(this,"aud",140,50,40,15,&mAuditionInc,-1,1,0);
    mShuffleSpeedsButton = new ClickButton(this,"shuffle",4,34);
    
@@ -74,14 +74,18 @@ void DrumPlayer::DrumHit::CreateUIControls(DrumPlayer* owner, int index)
    mSpeedSlider = new FloatSlider(owner,("speed "+ofToString(index)).c_str(),-1,-1,100,15,&mSpeed,.2f,3,2);
    mUseEnvelopeCheckbox = new Checkbox(owner,("envelope "+ofToString(index)).c_str(),-1,-1,&mUseEnvelope);
    mEnvelopeDisplay = new ADSRDisplay(owner,("envelopedisplay "+ofToString(index)).c_str(),-1,-1,100,40,&mEnvelope);
+   mIndividualOutputCheckbox = new Checkbox(owner,("individual output "+ofToString(index)).c_str(),-1,-1,&mHasIndividualOutput);
    
    mSpeedSlider->PositionTo(mVolSlider, kAnchorDirection_Below);
    mUseEnvelopeCheckbox->PositionTo(mSpeedSlider, kAnchorDirection_Below);
    mEnvelopeDisplay->PositionTo(mUseEnvelopeCheckbox, kAnchorDirection_Below);
+   mIndividualOutputCheckbox->PositionTo(mEnvelopeDisplay, kAnchorDirection_Below);
    
    int x = 5 + (index % 4) * 70;
    int y = 70 + (3-(index / 4)) * 70;
    mTestButton = new ClickButton(owner,("test "+ofToString(index)).c_str(),x+5,y+53);
+   
+   mOwner = owner;
 }
 
 void DrumPlayer::UpdateVisibleControls()
@@ -96,11 +100,14 @@ void DrumPlayer::DrumHit::SetUIControlsShowing(bool showing)
    mSpeedSlider->SetShowing(showing);
    mUseEnvelopeCheckbox->SetShowing(showing);
    mEnvelopeDisplay->SetShowing(showing);
+   mIndividualOutputCheckbox->SetShowing(showing);
 }
 
 DrumPlayer::~DrumPlayer()
 {
    delete[] mOutputBuffer;
+   for (int i=0; i<mIndividualOutputs.size(); ++i)
+      delete mIndividualOutputs[i];
 }
 
 void DrumPlayer::LoadKit(int kit)
@@ -168,14 +175,12 @@ void DrumPlayer::Process(double time)
 {
    Profiler profiler("DrumPlayer");
    
-   if (!mEnabled || GetTarget() == nullptr)
+   if (!mEnabled)
       return;
    
    ComputeSliders(0);
    
-   int bufferSize = GetTarget()->GetBuffer()->BufferSize();
-   float* out = GetTarget()->GetBuffer()->GetChannel(0);
-   assert(bufferSize == gBufferSize);
+   int bufferSize = gBufferSize;
    
    float volSq = mVolume * mVolume;
    
@@ -186,17 +191,39 @@ void DrumPlayer::Process(double time)
       mLoadSamplesMutex.lock();
       mLoadingSamples = true;
       for (int i=0; i<NUM_DRUM_HITS; ++i)
-         mDrumHits[i].Process(time, mSpeed, volSq, mOutputBuffer, bufferSize);
+      {
+         int individualOutputIndex = GetIndividualOutputIndex(i);
+         if (mDrumHits[i].Process(time, mSpeed, volSq, &gWorkChannelBuffer, bufferSize))
+         {
+            if (individualOutputIndex != -1)
+            {
+               int targetIndex = individualOutputIndex + 1;
+               if (GetTarget(targetIndex))
+                  Add(GetTarget(targetIndex)->GetBuffer()->GetChannel(0), gWorkChannelBuffer.GetChannel(0), bufferSize);
+               mIndividualOutputs[individualOutputIndex]->mVizBuffer->WriteChunk(gWorkChannelBuffer.GetChannel(0), bufferSize, 0);
+            }
+            else
+            {
+               Add(mOutputBuffer, gWorkChannelBuffer.GetChannel(0), bufferSize);
+            }
+         }
+         else
+         {
+            if (individualOutputIndex != -1)
+               mIndividualOutputs[individualOutputIndex]->mVizBuffer->WriteChunk(gZeroBuffer, bufferSize, 0);
+         }
+      }
       mLoadingSamples = false;
       mLoadSamplesMutex.unlock();
    }
    
    GetVizBuffer()->WriteChunk(mOutputBuffer, bufferSize, 0);
    
-   Add(out, mOutputBuffer, bufferSize);
+   if (GetTarget())
+      Add(GetTarget()->GetBuffer()->GetChannel(0), mOutputBuffer, bufferSize);
 }
 
-void DrumPlayer::DrumHit::Process(double time, float speed, float vol, float* out, int bufferSize)
+bool DrumPlayer::DrumHit::Process(double time, float speed, float vol, ChannelBuffer* out, int bufferSize)
 {
    mSample.SetRate(speed * mSpeed);
    if (mSample.ConsumeData(gWorkBuffer, bufferSize, true))
@@ -209,10 +236,22 @@ void DrumPlayer::DrumHit::Process(double time, float speed, float vol, float* ou
             sample *= mEnvelope.Value(timeHit);
          if (mUseFilter)
             sample = mFilter.Filter(sample);
-         out[j] += sample;
+         out->GetChannel(0)[j] = sample;
          timeHit += gInvSampleRateMs;
       }
+      return true;
    }
+   return false;
+}
+
+int DrumPlayer::GetIndividualOutputIndex(int hitIndex)
+{
+   for (int i=0; i<mIndividualOutputs.size(); ++i)
+   {
+      if (mIndividualOutputs[i]->mHitIndex == hitIndex)
+         return i;
+   }
+   return -1;
 }
 
 void DrumPlayer::PlayNote(double time, int pitch, int velocity, int voiceIdx /*= -1*/, ModulationChain* pitchBend /*= nullptr*/, ModulationChain* modWheel /*= nullptr*/, ModulationChain* pressure /*= nullptr*/)
@@ -371,6 +410,9 @@ void DrumPlayer::DrawModule()
    mEditCheckbox->Draw();
    mRecordDrumsCheckbox->Draw();
    mShuffleSpeedsButton->Draw();
+   
+   for (int i=0; i<mIndividualOutputs.size(); ++i)
+      DrawText(GetDrumHitName(mIndividualOutputs[i]->mHitIndex), 110, 10 + i*12);
 
    if (mEditMode)
    {
@@ -439,6 +481,7 @@ void DrumPlayer::DrumHit::DrawUIControls()
    mTestButton->Draw();
    mUseEnvelopeCheckbox->Draw();
    mEnvelopeDisplay->Draw();
+   mIndividualOutputCheckbox->Draw();
 }
 
 int DrumPlayer::GetAssociatedSampleIndex(int x, int y)
@@ -548,7 +591,10 @@ void DrumPlayer::GetModuleDimensions(int& width, int& height)
    }
    else
    {
-      width = 110;
+      if (mIndividualOutputs.size() > 0)
+         width = 150;
+      else
+         width = 110;
       height = 70;
    }
 }
@@ -595,6 +641,28 @@ void DrumPlayer::CheckboxUpdated(Checkbox* checkbox)
    {
       if (mRecordDrums == false)
          mLooperRecorder->EndFreeRecord();
+   }
+   
+   for (int i=0; i<NUM_DRUM_HITS; ++i)
+   {
+      if (checkbox == mDrumHits[i].mIndividualOutputCheckbox)
+      {
+         int outputIndex = GetIndividualOutputIndex(i);
+         if (mDrumHits[i].mHasIndividualOutput)
+         {
+            if (outputIndex == -1)
+               mIndividualOutputs.push_back(new IndividualOutput(this, i, mIndividualOutputs.size()));
+         }
+         else
+         {
+            if (outputIndex != -1)
+            {
+               RemovePatchCableSource(mIndividualOutputs[outputIndex]->mPatchCableSource);
+               delete mIndividualOutputs[outputIndex];
+               mIndividualOutputs.erase(mIndividualOutputs.begin() + outputIndex);
+            }
+         }
+      }
    }
 }
 

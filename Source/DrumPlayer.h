@@ -24,6 +24,8 @@
 #include "ADSR.h"
 #include "BiquadFilter.h"
 #include "ADSRDisplay.h"
+#include "PatchCableSource.h"
+#include "RollingBuffer.h"
 
 class LooperRecorder;
 
@@ -46,6 +48,7 @@ public:
    //IAudioSource
    void Process(double time) override;
    void SetEnabled(bool enabled) override { mEnabled = enabled; }
+   int GetNumTargets() override { return 1 + mIndividualOutputs.size(); }
    
    //INoteReceiver
    void PlayNote(double time, int pitch, int velocity, int voiceIdx = -1, ModulationChain* pitchBend = nullptr, ModulationChain* modWheel = nullptr, ModulationChain* pressure = nullptr) override;
@@ -85,6 +88,7 @@ private:
    void CreateKit();
    void ShuffleSpeeds();
    void UpdateVisibleControls();
+   int GetIndividualOutputIndex(int hitIndex);
    
    //IDrawableModule
    void DrawModule() override;
@@ -119,6 +123,31 @@ private:
    ClickButton* mShuffleSpeedsButton;
    int mSelectedHitIdx;
    
+   struct IndividualOutput
+   {
+      IndividualOutput(DrumPlayer* owner, int hitIndex, int outputIndex)
+      : mHitIndex(hitIndex)
+      , mVizBuffer(nullptr)
+      , mPatchCableSource(nullptr)
+      {
+         mVizBuffer = new RollingBuffer(VIZ_BUFFER_SECONDS*gSampleRate);
+         mPatchCableSource = new PatchCableSource(owner, kConnectionType_Audio);
+         
+         mPatchCableSource->SetManualPosition(152, 7 + outputIndex * 12);
+         mPatchCableSource->SetOverrideVizBuffer(mVizBuffer);
+         owner->AddPatchCableSource(mPatchCableSource);
+      }
+      ~IndividualOutput()
+      {
+         delete mVizBuffer;
+      }
+      int mHitIndex;
+      RollingBuffer* mVizBuffer;
+      PatchCableSource* mPatchCableSource;
+   };
+   
+   std::vector<IndividualOutput*> mIndividualOutputs;
+   
    struct DrumHit
    {
       DrumHit()
@@ -130,11 +159,13 @@ private:
       , mUseFilter(false)
       , mCutoff(10000)
       , mQ(1)
+      , mOwner(nullptr)
+      , mHasIndividualOutput(false)
       {
       }
       
       void CreateUIControls(DrumPlayer* owner, int index);
-      void Process(double time, float speed, float vol, float* out, int bufferSize);
+      bool Process(double time, float speed, float vol, ChannelBuffer* out, int bufferSize);
       void SetUIControlsShowing(bool showing);
       void DrawUIControls();
       
@@ -151,7 +182,9 @@ private:
       float mCutoff;
       float mQ;
       BiquadFilter mFilter;
+      bool mHasIndividualOutput;
       
+      DrumPlayer* mOwner;
       FloatSlider* mVolSlider;
       FloatSlider* mSpeedSlider;
       ClickButton* mTestButton;
@@ -161,6 +194,7 @@ private:
       ADSRDisplay* mFilterDisplay;
       FloatSlider* mCutoffSlider;
       FloatSlider* mQSlider;
+      Checkbox* mIndividualOutputCheckbox;
    };
    
    DrumHit mDrumHits[NUM_DRUM_HITS];

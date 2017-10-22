@@ -22,7 +22,6 @@
 		0BCD43EE1F63D93C200F2746 /* Chorder.cpp in Sources */ = {isa = PBXBuildFile; fileRef = A536C81050FC03AED7762C88 /* Chorder.cpp */; };
 		0CF1B2D2D60E7C77D7B1DE95 /* VSTPlayhead.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 6FE203DF36A978B770E305B1 /* VSTPlayhead.cpp */; };
 		0FEA8C0C48EF18DA5FC0EEC3 /* ADSRDisplay.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 403A41882964F33A7E6DEE7F /* ADSRDisplay.cpp */; };
-		0FEECC9B2F319AE4E3DC3D23 /* Stereofier.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 54E635903ED269C22E8DDC0B /* Stereofier.cpp */; };
 		118EDB9F76FBEE093CBAC93A /* ModularSynth.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 389BF165089EFFD7DFE845DC /* ModularSynth.cpp */; };
 		11E9767F17D2E55D9ECDB5D4 /* TriggerDetector.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 08A022340CF03269ABD73DDF /* TriggerDetector.cpp */; };
 		12B821D4794A348F7C1EC457 /* BiquadFilter.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 59EE1CB57F46630EC5EF713A /* BiquadFilter.cpp */; };
@@ -487,7 +486,6 @@
 		53CD0344E6F5583A916B5866 /* VocoderCarrierInput.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; name = VocoderCarrierInput.h; path = ../../Source/VocoderCarrierInput.h; sourceTree = SOURCE_ROOT; };
 		543B4AD8FF21871BF0691CB9 /* Scale.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; name = Scale.cpp; path = ../../Source/Scale.cpp; sourceTree = SOURCE_ROOT; };
 		54C5EB6DC039234ACF0B62A6 /* MacroSlider.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; name = MacroSlider.cpp; path = ../../Source/MacroSlider.cpp; sourceTree = SOURCE_ROOT; };
-		54E635903ED269C22E8DDC0B /* Stereofier.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; name = Stereofier.cpp; path = ../../Source/Stereofier.cpp; sourceTree = SOURCE_ROOT; };
 		576BE0FCFA022D9B358D116B /* IAudioProcessor.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; name = IAudioProcessor.cpp; path = ../../Source/IAudioProcessor.cpp; sourceTree = SOURCE_ROOT; };
 		577BE3187EB8DE4E62A87270 /* NoteLooper.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; name = NoteLooper.cpp; path = ../../Source/NoteLooper.cpp; sourceTree = SOURCE_ROOT; };
 		57A78FB8C09A153346B87EFE /* SingleOscillator.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; name = SingleOscillator.cpp; path = ../../Source/SingleOscillator.cpp; sourceTree = SOURCE_ROOT; };
@@ -850,7 +848,6 @@
 		F2E0DAA158A92D32C20A3340 /* ModulationChain.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; name = ModulationChain.cpp; path = ../../Source/ModulationChain.cpp; sourceTree = SOURCE_ROOT; };
 		F305A0AF9C63BD31BD3208DA /* include_juce_audio_processors.mm */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.objcpp; name = include_juce_audio_processors.mm; path = ../../JuceLibraryCode/include_juce_audio_processors.mm; sourceTree = SOURCE_ROOT; };
 		F35F7E6D425E7B244D5FDDC6 /* SampleDrawer.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; name = SampleDrawer.h; path = ../../Source/SampleDrawer.h; sourceTree = SOURCE_ROOT; };
-		F41B4406EE519599F9DF7C08 /* Stereofier.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; name = Stereofier.h; path = ../../Source/Stereofier.h; sourceTree = SOURCE_ROOT; };
 		F4CBD77AA9449C6153A0FFFF /* Vocoder.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; name = Vocoder.cpp; path = ../../Source/Vocoder.cpp; sourceTree = SOURCE_ROOT; };
 		F5643B23EB123C59FA9942BB /* TitleBar.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; name = TitleBar.cpp; path = ../../Source/TitleBar.cpp; sourceTree = SOURCE_ROOT; };
 		F60215DEA7C3730036B10C69 /* Vocoder.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; name = Vocoder.h; path = ../../Source/Vocoder.h; sourceTree = SOURCE_ROOT; };
@@ -1611,8 +1608,6 @@
 				BE5CDF770F954A91B00D2990 /* Splitter.h */,
 				E9DAF8560F91C45B1E7E561B /* StepSequencer.cpp */,
 				DDD6979FD47594E179EDA450 /* StepSequencer.h */,
-				54E635903ED269C22E8DDC0B /* Stereofier.cpp */,
-				F41B4406EE519599F9DF7C08 /* Stereofier.h */,
 				3D7220F647FAABF60091733C /* StutterControl.cpp */,
 				514FCB3E37D10D29E23CFF09 /* StutterControl.h */,
 				435988B5BA6EB68B265A3B6F /* SustainPedal.cpp */,
@@ -1927,7 +1922,6 @@
 				A271C1AAACB1488CC4B89412 /* SlowLayers.cpp in Sources */,
 				816D5AB139E7BBACE87464C6 /* Splitter.cpp in Sources */,
 				BCF0F6FD14BF168E649D97D4 /* StepSequencer.cpp in Sources */,
-				0FEECC9B2F319AE4E3DC3D23 /* Stereofier.cpp in Sources */,
 				63CE4C6515D5AE7008573746 /* StutterControl.cpp in Sources */,
 				E446D21175392C600AC87A0D /* SustainPedal.cpp in Sources */,
 				F739A6C6E3A1F21ADDE48EE4 /* TakeRecorder.cpp in Sources */,

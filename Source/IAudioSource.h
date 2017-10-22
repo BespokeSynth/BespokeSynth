@@ -23,9 +23,8 @@ public:
    IAudioSource() : mVizBuffer(VIZ_BUFFER_SECONDS*gSampleRate) {}
    virtual ~IAudioSource() {}
    virtual void Process(double time) = 0;
-   //virtual void SetTarget(IAudioReceiver* target) { mTarget = target; }
-   IAudioReceiver* GetTarget();
-   virtual IAudioReceiver* GetTarget2() { return nullptr; }
+   IAudioReceiver* GetTarget(int index=0);
+   virtual int GetNumTargets() { return 1; }
    RollingBuffer* GetVizBuffer() { return &mVizBuffer; }
 private:
    RollingBuffer mVizBuffer;

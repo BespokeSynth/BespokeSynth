@@ -1039,17 +1039,13 @@ void ModularSynth::ArrangeAudioSourceDependencies()
    {
       for (int j=0; j<mSources.size(); ++j)
       {
-         if (mSources[i]->GetTarget() != nullptr &&
-             mSources[i]->GetTarget() == dynamic_cast<IAudioReceiver*>(mSources[j]))
+         for (int k=0; k<mSources[i]->GetNumTargets(); ++k)
          {
-            deps[j].mDeps.push_back(mSources[i]);
-         }
-
-         //second stereo channel
-         if (mSources[i]->GetTarget2() &&
-             mSources[i]->GetTarget2() == dynamic_cast<IAudioReceiver*>(mSources[j]))
-         {
-            deps[j].mDeps.push_back(mSources[i]);
+            if (mSources[i]->GetTarget(k) != nullptr &&
+                mSources[i]->GetTarget(k) == dynamic_cast<IAudioReceiver*>(mSources[j]))
+            {
+               deps[j].mDeps.push_back(mSources[i]);
+            }
          }
       }
    }

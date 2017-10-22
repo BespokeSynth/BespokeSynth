@@ -504,8 +504,6 @@
         <FILE id="YjvMag" name="StepSequencer.cpp" compile="1" resource="0"
               file="Source/StepSequencer.cpp"/>
         <FILE id="B3TcmA" name="StepSequencer.h" compile="0" resource="0" file="Source/StepSequencer.h"/>
-        <FILE id="FEm8mg" name="Stereofier.cpp" compile="1" resource="0" file="Source/Stereofier.cpp"/>
-        <FILE id="w59MsB" name="Stereofier.h" compile="0" resource="0" file="Source/Stereofier.h"/>
         <FILE id="EdZndd" name="StutterControl.cpp" compile="1" resource="0"
               file="Source/StutterControl.cpp"/>
         <FILE id="w2XRGW" name="StutterControl.h" compile="0" resource="0"

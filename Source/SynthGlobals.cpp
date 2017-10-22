@@ -44,6 +44,7 @@ float gModuleDrawAlpha = 255;
 float gNullBuffer[kWorkBufferSize];
 float gZeroBuffer[kWorkBufferSize];
 float gWorkBuffer[kWorkBufferSize];
+ChannelBuffer gWorkChannelBuffer(kWorkBufferSize);
 IUIControl* gHoveredUIControl = nullptr;
 IUIControl* gHotBindUIControl[10];
 float gControlTactileFeedback = 0;
@@ -365,15 +366,13 @@ void UpdateTarget(IDrawableModule* module)
    string targetName = "";
    if (audioSource)
    {
-      IDrawableModule* target = dynamic_cast<IDrawableModule*>(audioSource->GetTarget());
-      if (target)
-         targetName = target->Path();
-      module->GetSaveData().SetString("target", targetName);
-      
-      //and the second target for stereofiers
-      IDrawableModule* target2 = dynamic_cast<IDrawableModule*>(audioSource->GetTarget2());
-      if (target2)
-         module->GetSaveData().SetString("target2", target2->Path());
+      for (int i=0; i<audioSource->GetNumTargets(); ++i)
+      {
+         IDrawableModule* target = dynamic_cast<IDrawableModule*>(audioSource->GetTarget());
+         if (target)
+            targetName = target->Path();
+         module->GetSaveData().SetString("target"+(i==0 ? "" : ofToString(i+1)), targetName);
+      }
    }
    if (noteSource || grid)
    {
