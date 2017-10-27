@@ -90,7 +90,7 @@ void PatchCableSource::SetPatchCableTarget(PatchCable* cable, IClickable* target
    mOwner->PostRepatch(this);
    
    //insert
-   if (ofGetKeyPressed('i'))
+   if (GetKeyModifiers() == kModifier_Alt)
    {
       static bool allowInsert = true;
       if (allowInsert)  //avoid cascade on the next set
@@ -105,7 +105,7 @@ void PatchCableSource::SetPatchCableTarget(PatchCable* cable, IClickable* target
 }
 
 void PatchCableSource::Clear()
-{
+{ 
    for (auto cable : mPatchCables)
       delete cable;
    mPatchCables.clear();

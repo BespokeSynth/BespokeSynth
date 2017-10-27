@@ -131,7 +131,7 @@ private:
    
 
    // runtime variables
-   double envdB_[ChannelBuffer::kMaxNumChannels];			// over-threshold envelope (dB)
+   double envdB_;			// over-threshold envelope (dB)
 
    AttRelEnvelope mEnv;
 };

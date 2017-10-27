@@ -21,6 +21,7 @@ public:
    ModuleFactory();
    IDrawableModule* MakeModule(string type);
    vector<string> GetSpawnableModules(ModuleType moduleType);
+   vector<string> GetSpawnableModules(char c);
    ModuleType GetModuleType(string typeName);
    bool IsExperimental(string typeName);
 private:

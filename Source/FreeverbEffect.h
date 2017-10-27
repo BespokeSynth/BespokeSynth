@@ -42,8 +42,6 @@ private:
    bool Enabled() const override { return mEnabled; }
    
    revmodel mFreeverb;
-   float* mOutputLeftBuffer;
-   float* mOutputRightBuffer;
    bool mNeedUpdate;
    bool mFreeze;
    float mRoomSize;

@@ -445,7 +445,7 @@ int GetKeyModifiers()
 bool IsKeyHeld(int key, int modifiers)
 {
    return TextEntry::GetActiveTextEntry() == nullptr &&
-          ofGetKeyPressed(key) &&
+          KeyPress::isKeyCurrentlyDown(key) &&
           GetKeyModifiers() == modifiers;
 }
 

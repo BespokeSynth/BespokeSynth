@@ -72,7 +72,7 @@ IDrawableModule* SpawnList::Spawn()
    if (mVstList)
    {
       VSTPlugin* plugin = dynamic_cast<VSTPlugin*>(module);
-      plugin->SetVST(VSTLookup::GetVSTPath(mSpawnables[mSpawnIndex]));
+      plugin->SetVST(mSpawnables[mSpawnIndex]);
    }
    
    return module;

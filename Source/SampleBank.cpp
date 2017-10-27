@@ -54,7 +54,7 @@ void SampleBank::OnClicked(int x, int y, bool right)
    {
       if (mSampleIdx >= 0 && mSampleIdx < mSamples.size())
       {
-         TheSynth->GrabSample(mSamples[mSampleIdx].mSample->Data(), mSamples[mSampleIdx].mSample->LengthInSamples(), false, mSamples[mSampleIdx].mSample->GetNumBars());
+         TheSynth->GrabSample(mSamples[mSampleIdx].mSample->Data(), false, mSamples[mSampleIdx].mSample->GetNumBars());
       }
    }
 }

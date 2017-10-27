@@ -84,8 +84,8 @@ void Panner::Process(double time)
       time += gInvSampleRateMs;
    }
    
-   for (int ch=0; ch<GetBuffer()->NumActiveChannels(); ++ch)
-      GetVizBuffer()->WriteChunk(GetBuffer()->GetChannel(ch),GetBuffer()->BufferSize(), ch);
+   GetVizBuffer()->WriteChunk(GetBuffer()->GetChannel(0),GetBuffer()->BufferSize(), 0);
+   GetVizBuffer()->WriteChunk(secondChannel,GetBuffer()->BufferSize(), 1);
    
    GetBuffer()->Reset();
 }

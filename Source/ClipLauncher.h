@@ -93,7 +93,7 @@ private:
    
    float mVolume;
    FloatSlider* mVolumeSlider;
-   float* mWriteBuffer;
+
    vector<SampleData> mSamples;
    JumpBlender mJumpBlender;
    ofMutex mSampleMutex;

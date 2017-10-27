@@ -13,7 +13,7 @@
 #include "ChannelBuffer.h"
 
 Sample::Sample()
-: mData(nullptr)
+: mData(0)
 , mNumSamples(0)
 , mOffset(FLT_MAX)
 , mRate(1)
@@ -27,10 +27,9 @@ Sample::Sample()
 
 Sample::~Sample()
 {
-   delete[] mData;
 }
 
-bool Sample::Read(const char* path)
+bool Sample::Read(const char* path, bool mono)
 {
    StringCopy(mReadPath,path,MAX_SAMPLE_READ_PATH_LENGTH);
    vector<string> tokens = ofSplitString(path,"/");
@@ -45,19 +44,31 @@ bool Sample::Read(const char* path)
       mNumSamples = reader->lengthInSamples;
       mSampleRateRatio = float(reader->sampleRate) / gSampleRate;
       
-      delete[] mData;
-      mData = new float[mNumSamples];
+      mData.Resize(mNumSamples);
       
       AudioSampleBuffer fileBuffer;
       fileBuffer.setSize (reader->numChannels, mNumSamples);
       reader->read(&fileBuffer, 0, mNumSamples, 0, true, true);
       
+      if (mono)
+         mData.SetNumActiveChannels(1);
+      else
+         mData.SetNumActiveChannels(reader->numChannels);
+      
       for (int i=0; i<reader->lengthInSamples; ++i)
       {
-         mData[i] = fileBuffer.getSample(0, i); //put first channel in
-         for (int ch=1; ch<reader->numChannels; ++ch)
-            mData[i] += fileBuffer.getSample(ch, i); //add the other channels
-         mData[i] /= reader->numChannels;   //normalize volume
+         if (mono)
+         {
+            mData.GetChannel(0)[i] = fileBuffer.getSample(0, i); //put first channel in
+            for (int ch=1; ch<reader->numChannels; ++ch)
+               mData.GetChannel(0)[i] += fileBuffer.getSample(ch, i); //add the other channels
+            mData.GetChannel(0)[i] /= reader->numChannels;   //normalize volume
+         }
+         else
+         {
+            for (int ch=0; ch<reader->numChannels; ++ch)
+               mData.GetChannel(ch)[i] = fileBuffer.getSample(ch, i);
+         }
       }
       
       Reset();
@@ -69,17 +80,24 @@ bool Sample::Read(const char* path)
 
 void Sample::Create(int length)
 {
-   Create(nullptr, length);
+   mData.Resize(length);
+   mData.SetNumActiveChannels(1);
+   Setup(length);
 }
 
-void Sample::Create(float* data, int length)
+void Sample::Create(ChannelBuffer* data)
 {
-   delete[] mData;
-   mData = new float[length];
-   if (data)
-      BufferCopy(mData, data, length);
-   else
-      Clear(mData, length);
+   int channels = data->NumActiveChannels();
+   int length = data->BufferSize();
+   mData.Resize(length);
+   mData.SetNumActiveChannels(channels);
+   for (int ch=0; ch<channels; ++ch)
+      BufferCopy(mData.GetChannel(ch), data->GetChannel(ch), length);
+   Setup(length);
+}
+
+void Sample::Setup(int length)
+{
    mNumSamples = length;
    mRate = 1;
    mOffset = length;
@@ -133,20 +151,10 @@ void Sample::Play(float rate /*=1*/, int offset /*=0*/, int stopPoint /*=-1*/)
    mPlayMutex.unlock();
 }
 
-/*bool Sample::ConsumeData(float* data, int size)
- {
- if (mOffset >= mNumSamples)
- return false;
- 
- int samplesLeft = mNumSamples - mOffset;
- BufferCopy(data, mData+mOffset, MIN(samplesLeft,size));
- Clear(data+mOffset+samplesLeft, size-samplesLeft); //fill the rest with zero
- mOffset += size;
- return true;
- }*/
-
-bool Sample::ConsumeData(float* data, int size, bool replace)
+bool Sample::ConsumeData(ChannelBuffer* out, int size, bool replace)
 {
+   assert(size <= out->BufferSize());
+   
    mPlayMutex.lock();
    float end = mNumSamples;
    if (mStopPoint != -1)
@@ -164,14 +172,19 @@ bool Sample::ConsumeData(float* data, int size, bool replace)
    LockDataMutex(true);
    for (int i=0; i<size; ++i)
    {
-      float sample = 0;
-      if (mOffset < end || mLooping)
-         sample = GetInterpolatedSample(mOffset, mData, mNumSamples) * mVolume;
-      
-      if (replace)
-         data[i] = sample;
-      else
-         data[i] += sample;
+      for (int ch=0; ch<out->NumActiveChannels(); ++ch)
+      {
+         int dataChannel = MIN(ch, mData.NumActiveChannels()-1);
+         
+         float sample = 0;
+         if (mOffset < end || mLooping)
+            sample = GetInterpolatedSample(mOffset, mData.GetChannel(dataChannel), mNumSamples) * mVolume;
+         
+         if (replace)
+            out->GetChannel(ch)[i] = sample;
+         else
+            out->GetChannel(ch)[i] += sample;
+      }
       
       mOffset += mRate * mSampleRateRatio;
    }
@@ -183,42 +196,45 @@ bool Sample::ConsumeData(float* data, int size, bool replace)
 
 void Sample::PadBack(int amount)
 {
-   int newSamples = mNumSamples + amount;
+   //TODO(Ryan)
+   /*int newSamples = mNumSamples + amount;
    float* newData = new float[newSamples];
    BufferCopy(newData, mData, mNumSamples);
    Clear(newData+mNumSamples, amount);
    LockDataMutex(true);
-   delete[] mData;
+   delete mData;
    mData = newData;
    LockDataMutex(false);
-   mNumSamples = newSamples;
+   mNumSamples = newSamples;*/
 }
 
 void Sample::ClipTo(int start, int end)
 {
-   assert(start < end);
+   //TODO(Ryan)
+   /*assert(start < end);
    assert(end <= mNumSamples);
    int newSamples = end-start;
    float* newData = new float[newSamples];
    BufferCopy(newData, mData+start, newSamples);
    LockDataMutex(true);
-   delete[] mData;
+   delete mData;
    mData = newData;
    LockDataMutex(false);
-   mNumSamples = newSamples;
+   mNumSamples = newSamples;*/
 }
 
 void Sample::ShiftWrap(int numSamplesToShift)
 {
-   assert(numSamplesToShift <= mNumSamples);
+   //TODO(Ryan)
+   /*assert(numSamplesToShift <= mNumSamples);
    float* newData = new float[mNumSamples];
    int chunk = mNumSamples - numSamplesToShift;
    BufferCopy(newData, mData+numSamplesToShift, chunk);
    BufferCopy(newData+chunk, mData, numSamplesToShift);
    LockDataMutex(true);
-   delete[] mData;
+   delete mData;
    mData = newData;
-   LockDataMutex(false);
+   LockDataMutex(false);*/
 }
 
 namespace
@@ -231,7 +247,8 @@ void Sample::SaveState(FileStreamOut& out)
    out << kSaveStateRev;
    
    out << mNumSamples;
-   out.Write(mData, mNumSamples);
+   if (mNumSamples > 0)
+      mData.Save(out, mNumSamples);
    out << mNumBars;
    out << mLooping;
    out << mRate;
@@ -245,14 +262,26 @@ void Sample::LoadState(FileStreamIn& in)
 {
    int rev;
    in >> rev;
-   LoadStateValidate(rev == kSaveStateRev);
    
    int numSamples;
    in >> numSamples;
-   float* sample = new float[numSamples];
-   in.Read(sample, numSamples);
-   Create(sample, numSamples);
-   delete[] sample;
+   if (rev == 0)
+   {
+      float* sample = new float[numSamples];
+      ChannelBuffer temp(sample, numSamples);
+      in.Read(sample, numSamples);
+      Create(&temp);
+      delete[] sample;
+   }
+   if (rev > 0)
+   {
+      if (numSamples > 0)
+      {
+         int readLength;
+         mData.Load(in, readLength);
+         assert(readLength == mNumSamples);
+      }
+   }
    in >> mNumBars;
    in >> mLooping;
    in >> mRate;

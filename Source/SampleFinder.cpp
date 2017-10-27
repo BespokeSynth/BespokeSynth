@@ -97,7 +97,8 @@ void SampleFinder::Process(double time)
    
    float speed = GetSpeed();
    
-   const float* data = mSample->Data();
+   //TODO(Ryan) multichannel
+   const float* data = mSample->Data()->GetChannel(0);
    int numSamples = mSample->LengthInSamples();
    float sampleRateRatio = mSample->GetSampleRateRatio();
    
@@ -263,7 +264,7 @@ void SampleFinder::DoWrite()
       if (shift < 0)
          shift += mClipEnd-mClipStart;
       mSample->ShiftWrap(shift);
-      mSample->Write(ofGetTimestampString("loops/sample_%m-%d-%Y_%H-%M.wav").c_str());
+      mSample->Write(ofGetTimestampString("loops/sample_%Y-%m-%d_%H-%M.wav").c_str());
       mClipStart = 0;
       mClipEnd = mSample->LengthInSamples();
       mOffset = 0;

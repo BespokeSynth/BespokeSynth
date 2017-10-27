@@ -37,8 +37,6 @@ ControllingSong::ControllingSong()
 , mMute(false)
 , mMuteCheckbox(nullptr)
 {
-   mWriteBuffer = new float[gBufferSize];
-   Clear(mWriteBuffer, gBufferSize);
 }
 
 void ControllingSong::CreateUIControls()
@@ -183,11 +181,12 @@ void ControllingSong::Process(double time)
          TheTransport->SetMeasurePos(measurePos);
       }
       
-      if (mSample.ConsumeData(mWriteBuffer, bufferSize, true))
+      gWorkChannelBuffer.SetNumActiveChannels(1);
+      if (mSample.ConsumeData(&gWorkChannelBuffer, bufferSize, true))
       {
          for (int i=0; i<bufferSize; ++i)
          {
-            float sample = mWriteBuffer[i] * volSq;
+            float sample = gWorkChannelBuffer.GetChannel(0)[i] * volSq;
             if (mMute)
                sample = 0;
             out[i] += sample;

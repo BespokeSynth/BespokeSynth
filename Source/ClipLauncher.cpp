@@ -20,8 +20,6 @@ ClipLauncher::ClipLauncher()
 : mVolume(1)
 , mVolumeSlider(nullptr)
 {
-   mWriteBuffer = new float[gBufferSize];
-   Clear(mWriteBuffer, gBufferSize);
    TheTransport->AddListener(this, kInterval_1n);
 }
 
@@ -33,7 +31,6 @@ void ClipLauncher::CreateUIControls()
 
 ClipLauncher::~ClipLauncher()
 {
-   delete[] mWriteBuffer;
    TheTransport->RemoveListener(this);
 }
 
@@ -73,13 +70,16 @@ void ClipLauncher::Process(double time)
    }
    
    if (sample)
-      sample->ConsumeData(mWriteBuffer, bufferSize, true);
+   {
+      gWorkChannelBuffer.SetNumActiveChannels(1);
+      sample->ConsumeData(&gWorkChannelBuffer, bufferSize, true);
+   }
    
    for (int i=0; i<bufferSize; ++i)
    {
       float samp = 0;
       if (sample)
-         samp = mWriteBuffer[i] * volSq;
+         samp = gWorkChannelBuffer.GetChannel(0)[i] * volSq;
       samp = mJumpBlender.Process(samp, i);
       out[i] += samp;
       GetVizBuffer()->Write(samp, 0);
@@ -152,8 +152,9 @@ void ClipLauncher::CheckboxUpdated(Checkbox* checkbox)
          {
             mSampleMutex.lock();
             float data[JUMP_BLEND_SAMPLES];
+            ChannelBuffer temp(data, JUMP_BLEND_SAMPLES);
             if (currentlyPlaying != -1)
-               mSamples[currentlyPlaying].mSample->ConsumeData(data, JUMP_BLEND_SAMPLES, true);
+               mSamples[currentlyPlaying].mSample->ConsumeData(&temp, JUMP_BLEND_SAMPLES, true);
             mJumpBlender.CaptureForJump(0, data, JUMP_BLEND_SAMPLES, gBufferSize);
             mSampleMutex.unlock();
          }
@@ -167,7 +168,7 @@ void ClipLauncher::CheckboxUpdated(Checkbox* checkbox)
                mSampleMutex.lock();
             
             int bufferSize;
-            mSamples[i].mSample->Create(mLooper->GetLoopBuffer(bufferSize)->GetChannel(0), bufferSize);
+            mSamples[i].mSample->Create(mLooper->GetLoopBuffer(bufferSize));
             mSamples[i].mNumBars = mLooper->NumBars();
             mLooper->Clear();
             
@@ -180,7 +181,7 @@ void ClipLauncher::CheckboxUpdated(Checkbox* checkbox)
          else
          {
             mSamples[i].mPlay = false;
-            mSamples[i].mSample->Create(gZeroBuffer,1);
+            mSamples[i].mSample->Create(1);
          }
       }
    }

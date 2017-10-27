@@ -108,7 +108,7 @@ void Producer::Process(double time)
    
    float volSq = mVolume * mVolume;
    
-   const float* data = mSample->Data();
+   const float* data = mSample->Data()->GetChannel(0);
    int numSamples = mSample->LengthInSamples();
    
    for (int i=0; i<bufferSize; ++i)
@@ -209,7 +209,8 @@ void Producer::DoWrite()
 {
    if (mSample)
    {
-      ChannelBuffer sample(mSample->Data(),mSample->LengthInSamples());
+      ChannelBuffer sample(mSample->LengthInSamples());
+      sample.CopyFrom(mSample->Data());
       for (int i=0; i<PRODUCER_NUM_BIQUADS; ++i)
          mBiquad[i].ProcessAudio(gTime,&sample);
       
@@ -219,12 +220,12 @@ void Producer::DoWrite()
       {
          if (IsSkipMeasure(GetMeasureForSample(i)) == false)
          {
-            toWrite[pos] = mSample->Data()[i];
+            toWrite[pos] = sample.GetChannel(0)[i];
             ++pos;
          }
       }
       
-      Sample::WriteDataToFile(ofGetTimestampString("producer/producer_%m-%d-%Y_%H-%M.wav").c_str(), &toWrite, pos);
+      Sample::WriteDataToFile(ofGetTimestampString("producer/producer_%Y-%m-%d_%H-%M.wav").c_str(), &toWrite, pos);
       mClipStart = 0;
       mClipEnd = mSample->LengthInSamples();
       mOffset = 0;

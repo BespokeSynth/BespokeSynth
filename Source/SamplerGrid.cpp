@@ -317,9 +317,11 @@ void SamplerGrid::OnClicked(int x, int y, bool right)
        y >= mEditSampleY && y < mEditSampleY + mEditSampleHeight)
    {
       if (mEditSample)
-         TheSynth->GrabSample(mEditSample->mSampleData + mEditSample->mSampleStart,
-                              mEditSample->mSampleEnd - mEditSample->mSampleStart,
-                              K(window));
+      {
+         //TODO(Ryan) multichannel
+         ChannelBuffer temp(mEditSample->mSampleData + mEditSample->mSampleStart, mEditSample->mSampleEnd - mEditSample->mSampleStart);
+         TheSynth->GrabSample(&temp, K(window));
+      }
    }
 }
 
@@ -347,8 +349,9 @@ void SamplerGrid::SampleDropped(int x, int y, Sample* sample)
    mEditSample->mSampleStart = 0;
    mEditSample->mSampleEnd = mEditSample->mSampleLength;
    
+   //TODO(Ryan) multichannel
    for (int i=0; i<mEditSample->mSampleLength; ++i)
-      mEditSample->mSampleData[i] = sample->Data()[i];
+      mEditSample->mSampleData[i] = sample->Data()->GetChannel(0)[i];
    
    SetEditSample(mEditSample); //refresh
 }

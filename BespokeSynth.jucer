@@ -165,6 +165,8 @@
         <FILE id="L9o4WQ" name="AudioMeter.h" compile="0" resource="0" file="Source/AudioMeter.h"/>
         <FILE id="RjMTgF" name="AudioRouter.cpp" compile="1" resource="0" file="Source/AudioRouter.cpp"/>
         <FILE id="Rcmdag" name="AudioRouter.h" compile="0" resource="0" file="Source/AudioRouter.h"/>
+        <FILE id="ZzfJHl" name="AudioSend.cpp" compile="1" resource="0" file="Source/AudioSend.cpp"/>
+        <FILE id="OtmbPm" name="AudioSend.h" compile="0" resource="0" file="Source/AudioSend.h"/>
         <FILE id="dhS4B5" name="Autotalent.cpp" compile="1" resource="0" file="Source/Autotalent.cpp"/>
         <FILE id="ROyJri" name="Autotalent.h" compile="0" resource="0" file="Source/Autotalent.h"/>
         <FILE id="i6udMA" name="BandVocoder.cpp" compile="1" resource="0" file="Source/BandVocoder.cpp"/>
@@ -440,6 +442,10 @@
               file="Source/PSMoveController.cpp"/>
         <FILE id="qiIX0Z" name="PSMoveController.h" compile="0" resource="0"
               file="Source/PSMoveController.h"/>
+        <FILE id="NNT5bL" name="QuickSpawnMenu.cpp" compile="1" resource="0"
+              file="Source/QuickSpawnMenu.cpp"/>
+        <FILE id="M6oYS2" name="QuickSpawnMenu.h" compile="0" resource="0"
+              file="Source/QuickSpawnMenu.h"/>
         <FILE id="nHYDV9" name="RadioSequencer.cpp" compile="1" resource="0"
               file="Source/RadioSequencer.cpp"/>
         <FILE id="wGoVQc" name="RadioSequencer.h" compile="0" resource="0"

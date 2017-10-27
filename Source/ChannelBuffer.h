@@ -32,6 +32,7 @@ public:
    void CopyFrom(ChannelBuffer* src, int length = -1);
    void SetChannelPointer(float* data, int channel, bool deleteOldData);
    void Reset() { Clear(); mRecentActiveChannels = mActiveChannels; SetNumActiveChannels(1); }
+   void Resize(int bufferSize);
    
    void Save(FileStreamOut& out, int writeLength);
    void Load(FileStreamIn& in, int &readLength);
@@ -39,9 +40,12 @@ public:
    static const int kMaxNumChannels = 2;
    
 private:
+   void Setup(int bufferSize);
+   
    int mActiveChannels;
    int mNumChannels;
    int mBufferSize;
    float** mBuffers;
    int mRecentActiveChannels;
+   bool mOwnsBuffers;
 };

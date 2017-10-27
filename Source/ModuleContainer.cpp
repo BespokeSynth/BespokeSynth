@@ -16,6 +16,7 @@
 #include "TitleBar.h"
 #include "PerformanceTimer.h"
 #include "SynthGlobals.h"
+#include "QuickSpawnMenu.h"
 
 ModuleContainer::ModuleContainer()
 : mOwner(nullptr)
@@ -176,7 +177,7 @@ void ModuleContainer::GetModulesWithinRect(ofRectangle rect, vector<IDrawableMod
    output.clear();
    for (int i=0; i<mModules.size(); ++i)
    {
-      if (mModules[i]->IsWithinRect(rect))
+      if (mModules[i]->IsWithinRect(rect) && dynamic_cast<QuickSpawnMenu*>(mModules[i]) == nullptr)
          output.push_back(mModules[i]);
    }
 }
@@ -227,6 +228,9 @@ void ModuleContainer::TakeModule(IDrawableModule* module)
 
 void ModuleContainer::DeleteModule(IDrawableModule* module)
 {
+   if (module->IsSingleton())
+      return;
+   
    RemoveFromVector(module, mModules, K(fail));
    for (auto iter : mModules)
    {

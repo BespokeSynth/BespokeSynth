@@ -1046,24 +1046,23 @@ void Looper::FilesDropped(vector<string> files, int x, int y)
 void Looper::SampleDropped(int x, int y, Sample* sample)
 {
    assert(sample);
-   const float* data = sample->Data();
    int numSamples = sample->LengthInSamples();
    
    if (numSamples <= 0)
       return;
    
-   mMute = true;
-   mMuteRamp.Start(0, 1);
+   mVol = 0;
    
    if (sample->GetNumBars() > 0)
       SetNumBars(sample->GetNumBars());
    
    float lengthRatio = float(numSamples) / mLoopLength;
+   mBuffer->SetNumActiveChannels(sample->NumChannels());
    for (int i=0; i<mLoopLength; ++i)
    {
       float offset = i*lengthRatio;
-      //TODO(Ryan) multichannel
-      mBuffer->GetChannel(0)[i] = GetInterpolatedSample(offset, data, numSamples);
+      for (int ch=0; ch<sample->NumChannels(); ++ch)
+         mBuffer->GetChannel(ch)[i] = GetInterpolatedSample(offset, sample->Data()->GetChannel(ch), numSamples);
    }
 }
 
@@ -1088,8 +1087,11 @@ void Looper::OnClicked(int x, int y, bool right)
    if (x >= BUFFER_X + BUFFER_W / 3 && x < BUFFER_X + (BUFFER_W * 2) / 3 &&
        y >= BUFFER_Y + BUFFER_H / 3 && y < BUFFER_Y + (BUFFER_H * 2) / 3)
    {
-      //TODO(Ryan) multichannel
-      TheSynth->GrabSample(mBuffer->GetChannel(0), mLoopLength, false, mNumBars);
+      ChannelBuffer grab(mLoopLength);
+      grab.SetNumActiveChannels(mBuffer->NumActiveChannels());
+      for (int ch=0; ch<grab.NumActiveChannels(); ++ch)
+         BufferCopy(grab.GetChannel(ch), mBuffer->GetChannel(ch), mLoopLength);
+      TheSynth->GrabSample(&grab, false, mNumBars);
    }
 }
 
@@ -1110,7 +1112,7 @@ void Looper::ButtonClicked(ClickButton* button)
       mWantBakeVolume = true;
    if (button == mSaveButton)
    {
-      Sample::WriteDataToFile(ofGetTimestampString("loops/loop_%m-%d-%Y_%H-%M.wav").c_str(), mBuffer, mLoopLength);
+      Sample::WriteDataToFile(ofGetTimestampString("loops/loop_%Y-%m-%d_%H-%M.wav").c_str(), mBuffer, mLoopLength);
    }
    if (button == mCommitButton && mRecorder)
       mRecorder->Commit(this);

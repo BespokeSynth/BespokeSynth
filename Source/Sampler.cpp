@@ -203,7 +203,8 @@ void Sampler::FilesDropped(vector<string> files, int x, int y)
 void Sampler::SampleDropped(int x, int y, Sample* sample)
 {
    assert(sample);
-   const float* data = sample->Data();
+   //TODO(Ryan) multichannel
+   const float* data = sample->Data()->GetChannel(0);
    int numSamples = sample->LengthInSamples();
    
    if (numSamples <= 0)

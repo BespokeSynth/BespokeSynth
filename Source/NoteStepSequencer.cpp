@@ -708,8 +708,8 @@ void NoteStepSequencer::LoadLayout(const ofxJSONElement& moduleInfo)
    mModuleSaveData.LoadString("target", moduleInfo);
 
    mModuleSaveData.LoadString("controller", moduleInfo, "", FillDropdown<MidiController*>);
-   mModuleSaveData.LoadInt("gridwidth", moduleInfo, 400, 210, 2000, true);
-   mModuleSaveData.LoadInt("gridheight", moduleInfo, 200, 80, 2000, true);
+   mModuleSaveData.LoadInt("gridwidth", moduleInfo, 210, 210, 2000, true);
+   mModuleSaveData.LoadInt("gridheight", moduleInfo, 80, 80, 2000, true);
    mModuleSaveData.LoadInt("gridrows", moduleInfo, 15, 1, 127);
    mModuleSaveData.LoadInt("gridsteps", moduleInfo, 8, 1, NSS_MAX_STEPS);
 

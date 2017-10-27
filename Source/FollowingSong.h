@@ -53,8 +53,6 @@ private:
    bool Enabled() const override { return mEnabled; }
    void GetModuleDimensions(int& x, int& y) override { x=560; y=130; }
    
-   float* mWriteBuffer;
-   
    ofMutex mLoadSongMutex;
    bool mLoadingSong;
    

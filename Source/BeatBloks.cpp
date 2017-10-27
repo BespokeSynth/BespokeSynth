@@ -148,7 +148,7 @@ void BeatBloks::Process(double time)
    {
       float speed = float(clipEnd-clipStart) * gInvSampleRateMs / TheTransport->MsPerBar() / mNumBars;
       
-      const float* data = mSample->Data();
+      const float* data = mSample->Data()->GetChannel(0);
       int numSamples = mSample->LengthInSamples();
       float sampleRateRatio = mSample->GetSampleRateRatio();
       
@@ -180,7 +180,7 @@ void BeatBloks::Process(double time)
    {
       float speed = 1;
       
-      const float* data = mSample->Data();
+      const float* data = mSample->Data()->GetChannel(0);
       int numSamples = mSample->LengthInSamples();
       float sampleRateRatio = mSample->GetSampleRateRatio();
       
@@ -216,7 +216,7 @@ void BeatBloks::Process(double time)
    {
       float speed = 1;
       
-      const float* data = mSample->Data();
+      const float* data = mSample->Data()->GetChannel(0);
       int numSamples = mSample->LengthInSamples();
       float sampleRateRatio = mSample->GetSampleRateRatio();
       
@@ -487,7 +487,7 @@ void BeatBloks::DoWrite()
       if (shift < 0)
          shift += mClipEnd-mClipStart;
       mSample->ShiftWrap(shift);
-      mSample->Write(ofGetTimestampString("BeatBloks_%m-%d-%Y_%H-%M.wav").c_str());
+      mSample->Write(ofGetTimestampString("BeatBloks_%Y-%m-%d_%H-%M.wav").c_str());
       mClipStart = 0;
       mClipEnd = mSample->LengthInSamples();
       

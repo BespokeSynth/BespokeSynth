@@ -87,8 +87,9 @@ void SampleCanvas::Process(double time)
          
          sample *= vol;
          
+         //TODO(Ryan) multichannel
          if (sample >= 0 && sample < clip->LengthInSamples() * numLoops)
-            gWorkBuffer[i] += GetInterpolatedSample(sample, clip->Data(), clip->LengthInSamples());
+            gWorkBuffer[i] += GetInterpolatedSample(sample, clip->Data()->GetChannel(0), clip->LengthInSamples());
       }
    }
    
@@ -158,7 +159,7 @@ void SampleCanvas::SampleDropped(int x, int y, Sample* sample)
    coord.row = MAX(0,coord.row);
    SampleCanvasElement* element = static_cast<SampleCanvasElement*>(mCanvas->CreateElement(coord.col,coord.row));
    Sample* newSamp = new Sample();
-   newSamp->Create(sample->Data(), sample->LengthInSamples());
+   newSamp->Create(sample->Data());
    newSamp->SetNumBars(sample->GetNumBars());
    element->SetSample(newSamp);
    mCanvas->AddElement(element);

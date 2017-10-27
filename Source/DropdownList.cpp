@@ -11,7 +11,10 @@
 #include "FileStream.h"
 #include "ModularSynth.h"
 
-const int itemSpacing = 15;
+namespace
+{
+   const int itemSpacing = 15;
+}
 
 DropdownList::DropdownList(IDropdownListener* owner, const char* name, int x, int y, int* var)
 : mWidth(40)

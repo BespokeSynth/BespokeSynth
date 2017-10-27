@@ -46,6 +46,7 @@ private:
    bool Enabled() const override { return mEnabled; }
    void GetModuleDimensions(int& w, int& h) override;
    
+   void AdjustRow(int row);
    void SyncWithCable();
    
    IntSlider* mColumnSlider;

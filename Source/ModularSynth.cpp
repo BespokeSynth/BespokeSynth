@@ -28,6 +28,7 @@
 #include "PatchCable.h"
 #include "ADSRDisplay.h"
 #include "../JuceLibraryCode/JuceHeader.h"
+#include "QuickSpawnMenu.h"
 
 ModularSynth* TheSynth = nullptr;
 
@@ -54,6 +55,7 @@ ModularSynth::ModularSynth()
 , mShowLoadStatePopup(false)
 , mHasDuplicatedDuringDrag(false)
 , mFrameRate(0)
+, mQuickSpawn(nullptr)
 {
    mConsoleText[0] = 0;
    assert(TheSynth == nullptr);
@@ -271,13 +273,13 @@ void ModularSynth::Draw(void* vg)
       ofPopMatrix();
    }
    
-   ofPushStyle();
+   /*ofPushStyle();
    ofNoFill();
    ofSetLineWidth(3);
    ofSetColor(0,255,0,100);
    ofSetCircleResolution(100);
    ofCircle(GetMouseX(), GetMouseY(), 30 + (TheTransport->GetMeasurePos() * 20));
-   ofPopStyle();
+   ofPopStyle();*/
    
    ofPopMatrix();
    
@@ -391,17 +393,17 @@ void ModularSynth::KeyPressed(int key, bool isRepeat)
    
    key = KeyToLower(key);  //now convert to lowercase because everything else just cares about keys as buttons (unmodified by shift)
    
-   if (key == OF_KEY_BACKSPACE)
+   if (key == OF_KEY_BACKSPACE && !isRepeat)
    {
       for (auto module : mGroupSelectedModules)
          module->GetOwningContainer()->DeleteModule(module);
       mGroupSelectedModules.clear();
    }
    
-   if (key == '`')
+   if (key == '`' && !isRepeat)
       ADSRDisplay::ToggleDisplayMode();
 
-   if (key == 9)  //tab
+   if (key == 9 && !isRepeat)  //tab
    {
       bzero(mConsoleText, MAX_TEXTENTRY_LENGTH);
       mConsoleEntry->MakeActiveTextEntry();
@@ -409,7 +411,7 @@ void ModularSynth::KeyPressed(int key, bool isRepeat)
    
    mZoomer.OnKeyPressed(key);
    
-   if (CharacterFunctions::isDigit((char)key) && GetKeyModifiers() & kModifier_Command)
+   if (CharacterFunctions::isDigit((char)key) && (GetKeyModifiers() == kModifier_Alt))
    {
       int num = key - '0';
       assert(num >= 0 && num <= 9);
@@ -418,23 +420,23 @@ void ModularSynth::KeyPressed(int key, bool isRepeat)
    
    mModuleContainer.KeyPressed(key, isRepeat);
 
-   if (key == '/')
+   if (key == '/' && !isRepeat)
       ofToggleFullscreen();
    
-   if (key == 'p' && GetKeyModifiers() == kModifier_Shift)
+   if (key == 'p' && GetKeyModifiers() == kModifier_Shift && !isRepeat)
       mAudioPaused = !mAudioPaused;
    
-   //if (key == 'c')
+   //if (key == 'c' && !isRepeat)
    //   mousePressed(GetMouseX(), GetMouseY(), 0);
    
-   //if (key == '=')
+   //if (key == '=' && !isRepeat)
    //   ZoomView(.1f);
-   //if (key == '-')
+   //if (key == '-' && !isRepeat)
    //   ZoomView(-.1f);
    
    if (gHoveredUIControl)
    {
-      if (key == OF_KEY_DOWN || key == OF_KEY_UP)
+      if ((key == OF_KEY_DOWN || key == OF_KEY_UP) && !isRepeat)
       {
          float inc;
          if ((key == OF_KEY_DOWN && gHoveredUIControl->InvertScrollDirection() == false) ||
@@ -446,11 +448,11 @@ void ModularSynth::KeyPressed(int key, bool isRepeat)
             inc *= .01f;
          gHoveredUIControl->Increment(inc);
       }
-      if (key == '[')
+      if (key == '[' && !isRepeat)
          gHoveredUIControl->Halve();
-      if (key == ']')
+      if (key == ']' && !isRepeat)
          gHoveredUIControl->Double();
-      if (key == '\\')
+      if (key == '\\' && !isRepeat)
          gHoveredUIControl->ResetToOriginal();
    }
 }
@@ -470,7 +472,7 @@ void ModularSynth::MouseMoved(int intX, int intY )
    mMousePos.x = intX;
    mMousePos.y = intY;
    
-   if (ofGetKeyPressed(' '))
+   if (IsKeyHeld(' '))
    {
       mDrawOffset += (ofVec2f(intX,intY) - mLastMoveMouseScreenPos) / gDrawScale;
       mZoomer.CancelMovement();
@@ -669,7 +671,7 @@ void ModularSynth::MousePressed(int intX, int intY, int button)
 
 void ModularSynth::MouseScrolled(float x, float y)
 {
-   if (ofGetKeyPressed(' '))
+   if (IsKeyHeld(' '))
    {
       ZoomView(y/100);
    }
@@ -734,12 +736,12 @@ void ModularSynth::MouseScrolled(float x, float y)
 
 bool ModularSynth::InMidiMapMode()
 {
-   return IsKeyHeld('m');
+   return IsKeyHeld('m', kModifier_Shift);
 }
 
 bool ModularSynth::ShouldAccentuateActiveModules() const
 {
-   return IsKeyHeld('s');
+   return IsKeyHeld('s', kModifier_Shift);
 }
 
 void ModularSynth::RegisterPatchCable(PatchCable* cable)
@@ -1157,6 +1159,12 @@ void ModularSynth::ResetLayout()
    saveDataPanel->Init();
    mModuleContainer.AddModule(saveDataPanel);
    
+   mQuickSpawn = new QuickSpawnMenu();
+   mQuickSpawn->SetName("quickspawn");
+   mQuickSpawn->CreateUIControls();
+   mQuickSpawn->Init();
+   mModuleContainer.AddModule(mQuickSpawn);
+   
    if (gIsRetina)
       gDrawScale = 2.0f;
    mDrawOffset.set(0,0);
@@ -1368,24 +1376,28 @@ IUIControl* ModularSynth::FindUIControl(string path)
    return mModuleContainer.FindUIControl(path);
 }
 
-void ModularSynth::GrabSample(float* data, int length, bool window, int numBars)
+void ModularSynth::GrabSample(ChannelBuffer* data, bool window, int numBars)
 {
    delete mHeldSample;
    mHeldSample = new Sample();
-   mHeldSample->Create(data, length);
+   mHeldSample->Create(data);
    mHeldSample->SetNumBars(numBars);
    
    //window sample to avoid clicks
    if (window)
    {
+      int length = data->BufferSize();
       const int fadeSamples = 15;
       if (length > fadeSamples * 2) //only window if there's enough space
       {
          for (int i=0; i<fadeSamples; ++i)
          {
-            float fade = float(i)/fadeSamples;
-            mHeldSample->Data()[i] *= fade;
-            mHeldSample->Data()[length-1-i] *= fade;
+            for (int ch=0; ch<mHeldSample->NumChannels(); ++ch)
+            {
+               float fade = float(i)/fadeSamples;
+               mHeldSample->Data()->GetChannel(ch)[i] *= fade;
+               mHeldSample->Data()->GetChannel(ch)[length-1-i] *= fade;
+            }
          }
       }
    }
@@ -1480,7 +1492,7 @@ void ModularSynth::SaveLayoutAsPopup()
 
 void ModularSynth::SaveStatePopup()
 {
-   FileChooser chooser("Save current state as...", File(ofToDataPath("savestate/savestate.bsk")));
+   FileChooser chooser("Save current state as...", File(ofToDataPath(ofGetTimestampString("savestate/%Y-%m-%d_%H-%M.bsk"))));
    if (chooser.browseForFileToSave(true))
       SaveState(chooser.getResult().getRelativePathFrom(File(ofToDataPath(""))).toStdString());
 }
@@ -1777,8 +1789,8 @@ void ModularSynth::SaveOutput()
 {
    ScopedMutex mutex(&mAudioThreadMutex, "SaveOutput()");
 
-   string filename = ofGetTimestampString("recordings/recording_%m-%d-%Y_%H-%M.wav");
-   //string filenamePos = ofGetTimestampString("recordings/pos_%m-%d-%Y_%H-%M.wav");
+   string filename = ofGetTimestampString("recordings/recording_%Y-%m-%d_%H-%M.wav");
+   //string filenamePos = ofGetTimestampString("recordings/pos_%Y-%m-%d_%H-%M.wav");
 
    assert(mRecordingLength <= RECORDING_LENGTH);
    

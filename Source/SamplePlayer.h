@@ -23,7 +23,7 @@
 class SampleBank;
 class Sample;
 
-class SamplePlayer : public IAudioSource, public IDrawableModule, public IFloatSliderListener, public IIntSliderListener, public IDropdownListener, public IButtonListener
+class SamplePlayer : public IAudioSource, public IDrawableModule, public IFloatSliderListener, public IIntSliderListener, public IDropdownListener, public IButtonListener, private OSCReceiver, private OSCReceiver::Listener<OSCReceiver::RealtimeCallback>
 {
 public:
    SamplePlayer();
@@ -32,6 +32,8 @@ public:
    
    string GetTitleLabel() override { return "sample"; }
    void CreateUIControls() override;
+   void Init() override;
+   void Poll() override;
    
    void PostRepatch(PatchCableSource* cable) override;
    
@@ -40,6 +42,9 @@ public:
    void SetEnabled(bool enabled) override { mEnabled = enabled; }
    
    void FilesDropped(vector<string> files, int x, int y) override;
+   
+   void oscMessageReceived(const OSCMessage& msg) override;
+   void oscBundleReceived(const OSCBundle& bundle) override;
    
    void CheckboxUpdated(Checkbox* checkbox) override;
    void FloatSliderUpdated(FloatSlider* slider, float oldVal) override;
@@ -72,6 +77,7 @@ private:
    float mVolume;
    FloatSlider* mVolumeSlider;
    float mSpeed;
+   float mPlaySpeed;
    FloatSlider* mSpeedSlider;
    int mSampleIndex;
    DropdownList* mSampleList;
@@ -83,7 +89,13 @@ private:
    Checkbox* mLoopCheckbox;
    PatchCableSource* mSampleBankCable;
    bool mScrubbingSample;
+   string mYoutubeId;
+   ClickButton* mDownloadYoutubeButton;
    
-   ChannelBuffer* mDrawBuffer;
+   bool mOscWheelGrabbed;
+   float mOscWheelPos;
+   float mOscWheelSpeed;
+   
+   ChannelBuffer mDrawBuffer;
 };
 

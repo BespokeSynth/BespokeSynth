@@ -18,12 +18,5 @@ void IAudioProcessor::SyncBuffers(int overrideNumOutputChannels)
    if (overrideNumOutputChannels != -1)
       numOutputChannels = overrideNumOutputChannels;
    
-   if (GetTarget())
-   {
-      ChannelBuffer* out = GetTarget()->GetBuffer();
-      assert(out->BufferSize() == GetBuffer()->BufferSize());
-      out->SetNumActiveChannels(numOutputChannels);
-      
-   }
-   GetVizBuffer()->SetNumChannels(numOutputChannels);
+   SyncOutputBuffer(numOutputChannels);
 }

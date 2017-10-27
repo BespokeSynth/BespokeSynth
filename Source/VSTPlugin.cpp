@@ -1,4 +1,4 @@
-//
+ //
 //  VSTPlugin.cpp
 //  Bespoke
 //
@@ -128,8 +128,11 @@ string VSTPlugin::GetTitleLabel()
    return "vst";
 }
 
-void VSTPlugin::SetVST(string path)
+void VSTPlugin::SetVST(string vstName)
 {
+   mModuleSaveData.SetString("vst", vstName);
+   string path = VSTLookup::GetVSTPath(vstName);
+   
    if (mPlugin != nullptr && mPlugin->getPluginDescription().fileOrIdentifier == path)
       return;  //this VST is already loaded! we're all set
    
@@ -307,7 +310,7 @@ void VSTPlugin::Process(double time)
       }
    }
 
-   GetBuffer()->Reset();
+   GetBuffer()->Clear();
 }
 
 void VSTPlugin::PlayNote(double time, int pitch, int velocity, int voiceIdx /*= -1*/, ModulationChain* pitchBend /*= nullptr*/, ModulationChain* modWheel /*= nullptr*/, ModulationChain* pressure /*= nullptr*/)
@@ -506,7 +509,7 @@ void VSTPlugin::SetUpFromSaveData()
 {
    string vstName = mModuleSaveData.GetString("vst");
    if (vstName != "")
-      SetVST(VSTLookup::GetVSTPath(vstName));
+      SetVST(vstName);
    
    SetTarget(TheSynth->FindModule(mModuleSaveData.GetString("target")));
    

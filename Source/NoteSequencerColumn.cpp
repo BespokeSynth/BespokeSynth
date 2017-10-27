@@ -72,16 +72,7 @@ void NoteSequencerColumn::PlayNote(double time, int pitch, int velocity, int voi
       int row = mSequencer->PitchToRow(pitch);
       if (row != -1)
       {
-         mRow = row;
-         
-         float val = 1;
-         for (int i=0; i<mGrid->GetRows(); ++i)
-         {
-            if (mGrid->GetVal(mColumn, i) != 0)
-               val = mGrid->GetVal(mColumn, i);
-         }
-         
-         mGrid->SetVal(mColumn, mRow, val);
+         AdjustRow(row);
       }
    }
 }
@@ -91,8 +82,22 @@ void NoteSequencerColumn::IntSliderUpdated(IntSlider* slider, int oldVal)
    if (slider == mRowSlider)
    {
       if (mGrid)
-         mGrid->SetVal(mColumn, mRow, 1);
+         AdjustRow(mRow);
    }
+}
+
+void NoteSequencerColumn::AdjustRow(int row)
+{
+   mRow = row;
+   
+   float val = 1;
+   for (int i=0; i<mGrid->GetRows(); ++i)
+   {
+      if (mGrid->GetVal(mColumn, i) != 0)
+         val = mGrid->GetVal(mColumn, i);
+   }
+   
+   mGrid->SetVal(mColumn, mRow, val);
 }
 
 void NoteSequencerColumn::GetModuleDimensions(int &width, int &height)

@@ -10,10 +10,10 @@
 #define __modularSynth__Sample__
 
 #include "OpenFrameworksPort.h"
+#include "ChannelBuffer.h"
 
 class FileStreamOut;
 class FileStreamIn;
-class ChannelBuffer;
 
 #define MAX_SAMPLE_READ_PATH_LENGTH 1024
 
@@ -22,14 +22,15 @@ class Sample
 public:
    Sample();
    ~Sample();
-   bool Read(const char* path);
+   bool Read(const char* path, bool mono = false);
    bool Write(const char* path = nullptr);   //no path = use read filename
-   bool ConsumeData(float* data, int size, bool replace);
+   bool ConsumeData(ChannelBuffer* out, int size, bool replace);
    void Play(float rate = 1, int offset=0, int stopPoint=-1);
    void SetRate(float rate) { mRate = rate; }
    const char* Name() { return mName; }
-   int LengthInSamples() { return mNumSamples; }
-   float* Data() const {return mData; }
+   int LengthInSamples() const { return mNumSamples; }
+   int NumChannels() const { return mData.NumActiveChannels(); }
+   ChannelBuffer* Data() { return &mData; }
    int GetPlayPosition() const { return mOffset; }
    void SetPlayPosition(int sample) { mOffset = sample; }
    float GetSampleRateRatio() const { return mSampleRateRatio; }
@@ -45,7 +46,7 @@ public:
    bool IsPlaying() { return mOffset < mNumSamples; }
    void LockDataMutex(bool lock) { lock ? mDataMutex.lock() : mDataMutex.unlock(); }
    void Create(int length);
-   void Create(float* data, int length);
+   void Create(ChannelBuffer* data);
    void SetLooping(bool looping) { mLooping = looping; }
    void SetNumBars(int numBars) { mNumBars = numBars; }
    int GetNumBars() const { return mNumBars; }
@@ -54,8 +55,9 @@ public:
    void SaveState(FileStreamOut& out);
    void LoadState(FileStreamIn& in);
 private:
+   void Setup(int length);
    
-   float* mData;
+   ChannelBuffer mData;
    int mNumSamples;
    double mOffset;
    float mRate;

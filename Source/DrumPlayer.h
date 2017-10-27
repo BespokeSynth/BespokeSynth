@@ -79,6 +79,7 @@ private:
       int mLinkIds[NUM_DRUM_HITS];
       float mVols[NUM_DRUM_HITS];
       float mSpeeds[NUM_DRUM_HITS];
+      float mPans[NUM_DRUM_HITS];
    };
 
    void LoadKit(int kit);
@@ -96,7 +97,7 @@ private:
    bool Enabled() const override { return mEnabled; }
    void OnClicked(int x, int y, bool right) override;
    
-   float* mOutputBuffer;
+   ChannelBuffer mOutputBuffer;
    float mSpeed;
    float mVolume;
    bool mRecordDrums;
@@ -122,6 +123,8 @@ private:
    bool mLoadingSamples;
    ClickButton* mShuffleSpeedsButton;
    int mSelectedHitIdx;
+   bool mMonoOutput;
+   Checkbox* mMonoCheckbox;
    
    struct IndividualOutput
    {
@@ -156,11 +159,9 @@ private:
       , mSpeed(1)
       , mVelocity(1)
       , mUseEnvelope(false)
-      , mUseFilter(false)
-      , mCutoff(10000)
-      , mQ(1)
-      , mOwner(nullptr)
+      , mPan(0)
       , mHasIndividualOutput(false)
+      , mOwner(nullptr)
       {
       }
       
@@ -177,11 +178,7 @@ private:
       
       bool mUseEnvelope;
       ADSR mEnvelope;
-      bool mUseFilter;
-      ADSR mFilterADSR;
-      float mCutoff;
-      float mQ;
-      BiquadFilter mFilter;
+      float mPan;
       bool mHasIndividualOutput;
       
       DrumPlayer* mOwner;
@@ -190,10 +187,7 @@ private:
       ClickButton* mTestButton;
       Checkbox* mUseEnvelopeCheckbox;
       ADSRDisplay* mEnvelopeDisplay;
-      Checkbox* mUseFilterCheckbox;
-      ADSRDisplay* mFilterDisplay;
-      FloatSlider* mCutoffSlider;
-      FloatSlider* mQSlider;
+      FloatSlider* mPanSlider;
       Checkbox* mIndividualOutputCheckbox;
    };
    

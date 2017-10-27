@@ -126,7 +126,7 @@ void ClipArranger::MouseReleased()
       if (heldSample)
       {
          Sample* sample = new Sample();
-         sample->Create(heldSample->Data(), heldSample->LengthInSamples());
+         sample->Create(heldSample->Data());
          AddSample(sample, mLastMouseX, mLastMouseY);
          TheSynth->ClearHeldSample();
       }
@@ -259,8 +259,8 @@ void ClipArranger::Clip::Process(float* left, float* right, int bufferSize)
       {
          int clipPos = playhead - mStartSample;
          int samplePos = clipPos % mSample->LengthInSamples();
-         left[i] += mSample->Data()[samplePos];
-         right[i] += mSample->Data()[samplePos];
+         left[i] += mSample->Data()->GetChannel(0)[samplePos];
+         right[i] += mSample->Data()->GetChannel(1)[samplePos];
       }
    }
 }

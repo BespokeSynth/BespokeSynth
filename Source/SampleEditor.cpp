@@ -48,15 +48,15 @@ SampleEditor::SampleEditor()
 , mKeepPitchCheckbox(nullptr)
 , mPitchShift(1)
 , mPitchShiftSlider(nullptr)
-, mPitchShifter(1024)
 , mSampleBankCable(nullptr)
 , mReset(false)
 , mTransposition(0)
-, mDrawBuffer(nullptr)
+, mDrawBuffer(0)
 {
-   mWriteBuffer = new float[gBufferSize];
-   Clear(mWriteBuffer, gBufferSize);
    TheTransport->AddListener(this, kInterval_1n);
+   
+   for (int i=0; i<ChannelBuffer::kMaxNumChannels; ++i)
+      mPitchShifter[i] = new PitchShifter(1024);
 }
 
 void SampleEditor::CreateUIControls()
@@ -85,8 +85,10 @@ void SampleEditor::CreateUIControls()
 
 SampleEditor::~SampleEditor()
 {
-   delete[] mWriteBuffer;
    TheTransport->RemoveListener(this);
+   
+   for (int i=0; i<ChannelBuffer::kMaxNumChannels; ++i)
+      delete mPitchShifter[i];
 }
 
 void SampleEditor::Process(double time)
@@ -97,9 +99,9 @@ void SampleEditor::Process(double time)
       return;
 
    ComputeSliders(0);
-
+   SyncOutputBuffer(mSample->NumChannels());
+   
    int bufferSize = GetTarget()->GetBuffer()->BufferSize();
-   float* out = GetTarget()->GetBuffer()->GetChannel(0);
    assert(bufferSize == gBufferSize);
 
    float volSq = mVolume * mVolume * .25f;
@@ -109,26 +111,31 @@ void SampleEditor::Process(double time)
       RecalcPos();
    mSample->SetRate(speed);
 
-   if (mSample->ConsumeData(mWriteBuffer, bufferSize, true))
+   gWorkChannelBuffer.SetNumActiveChannels(mSample->NumChannels());
+   if (mSample->ConsumeData(&gWorkChannelBuffer, bufferSize, true))
    {
-      float pitchShift = mPitchShift;
-      if (mKeepPitch)
-         pitchShift *= mOriginalBpm / TheTransport->GetTempo();
-      if (mTransposition != 0)
-         pitchShift *= TheScale->PitchToFreq(24 + mTransposition) / TheScale->PitchToFreq(24);
-      if (pitchShift != 1)
+      for (int ch=0; ch<gWorkChannelBuffer.NumActiveChannels(); ++ch)
       {
-         mPitchShifter.SetRatio(pitchShift);
-         mPitchShifter.Process(mWriteBuffer, bufferSize);
+         float pitchShift = mPitchShift;
+         if (mKeepPitch)
+            pitchShift *= mOriginalBpm / TheTransport->GetTempo();
+         if (mTransposition != 0)
+            pitchShift *= TheScale->PitchToFreq(24 + mTransposition) / TheScale->PitchToFreq(24);
+         if (pitchShift != 1)
+         {
+            mPitchShifter[ch]->SetRatio(pitchShift);
+            mPitchShifter[ch]->Process(gWorkChannelBuffer.GetChannel(ch), bufferSize);
+         }
+         
+         Mult(gWorkChannelBuffer.GetChannel(ch), volSq, bufferSize);
+         Add(GetTarget()->GetBuffer()->GetChannel(ch), gWorkChannelBuffer.GetChannel(ch), bufferSize);
+         GetVizBuffer()->WriteChunk(gWorkChannelBuffer.GetChannel(ch), bufferSize, ch);
       }
-      
-      Mult(mWriteBuffer, volSq, bufferSize);
-      Add(out, mWriteBuffer, bufferSize);
-      GetVizBuffer()->WriteChunk(mWriteBuffer, bufferSize, 0);
    }
    else
    {
-      GetVizBuffer()->WriteChunk(gZeroBuffer, bufferSize, 0);
+      for (int ch=0; ch<gWorkChannelBuffer.NumActiveChannels(); ++ch)
+         GetVizBuffer()->WriteChunk(gZeroBuffer, bufferSize, ch);
    }
 }
 
@@ -193,10 +200,9 @@ void SampleEditor::UpdateSample()
    mPlay = false;
    
    mSample->LockDataMutex(true);
-   delete[] mDrawBuffer;
    mDrawBufferLength = mSample->LengthInSamples();
-   mDrawBuffer = new float[mDrawBufferLength];
-   BufferCopy(mDrawBuffer, mSample->Data(), mDrawBufferLength);
+   mDrawBuffer.Resize(mDrawBufferLength);
+   mDrawBuffer.CopyFrom(mSample->Data());
    mSample->LockDataMutex(false);
    
    UpdateBPM();
@@ -297,7 +303,7 @@ void SampleEditor::DrawModule()
       {
          ofPushMatrix();
          ofTranslate(5,80);
-         DrawAudioBuffer(200, 40, mDrawBuffer, 0, mDrawBufferLength, mPlayPosition);
+         DrawAudioBuffer(200, 40, &mDrawBuffer, 0, mDrawBufferLength, mPlayPosition);
          ofPopMatrix();
       }
       else
@@ -310,7 +316,8 @@ void SampleEditor::DrawModule()
          int height = 310;
          int length = mSample->LengthInSamples();
          mSample->LockDataMutex(true);
-         const float* buffer = mSample->Data();
+         //TODO(Ryan) multichannel
+         const float* buffer = mSample->Data()->GetChannel(0);
          int pos = mSample->GetPlayPosition();
 
          ofSetLineWidth(1);

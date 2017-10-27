@@ -20,8 +20,6 @@ FollowingSong::FollowingSong()
 , mMute(false)
 , mMuteCheckbox(nullptr)
 {
-   mWriteBuffer = new float[gBufferSize];
-   Clear(mWriteBuffer, gBufferSize);
 }
 
 void FollowingSong::CreateUIControls()
@@ -70,11 +68,12 @@ void FollowingSong::Process(double time)
    {
       mLoadSongMutex.lock();
       
-      if (mSample.ConsumeData(mWriteBuffer, bufferSize, true))
+      gWorkChannelBuffer.SetNumActiveChannels(1);
+      if (mSample.ConsumeData(&gWorkChannelBuffer, bufferSize, true))
       {
          for (int i=0; i<bufferSize; ++i)
          {
-            float sample = mWriteBuffer[i] * volSq;
+            float sample = gWorkChannelBuffer.GetChannel(0)[i] * volSq;
             if (mMute)
                sample = 0;
             out[i] += sample;

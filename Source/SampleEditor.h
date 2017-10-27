@@ -78,7 +78,6 @@ private:
    
    float mVolume;
    FloatSlider* mVolumeSlider;
-   float* mWriteBuffer;
    int mSampleIndex;
    DropdownList* mSampleList;
    bool mPlay;
@@ -105,13 +104,13 @@ private:
    Checkbox* mKeepPitchCheckbox;
    float mPitchShift;
    FloatSlider* mPitchShiftSlider;
-   PitchShifter mPitchShifter;
+   PitchShifter* mPitchShifter[ChannelBuffer::kMaxNumChannels];
    PatchCableSource* mSampleBankCable;
    bool mReset;
    float mTransposition;
    float mPlayPosition;
    
-   float* mDrawBuffer;
+   ChannelBuffer mDrawBuffer;
    int mDrawBufferLength;
 };
 

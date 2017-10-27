@@ -26,6 +26,8 @@ public:
    IAudioReceiver* GetTarget(int index=0);
    virtual int GetNumTargets() { return 1; }
    RollingBuffer* GetVizBuffer() { return &mVizBuffer; }
+protected:
+   void SyncOutputBuffer(int numChannels);
 private:
    RollingBuffer mVizBuffer;
 };

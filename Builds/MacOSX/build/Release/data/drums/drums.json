@@ -510,19 +510,19 @@
          "samples" : [
             {
                "linkid" : 100,
-               "sample" : "drums/dilla/dillakick.wav",
+               "sample" : "drums/dilla stereo/dillakick.wav",
                "speed" : 1.0,
                "vol" : 0.45
             },
             {
                "linkid" : 114,
-               "sample" : "drums/dilla/Snare (13).wav",
+               "sample" : "drums/dilla stereo/Snare (13).wav",
                "speed" : 1.0,
                "vol" : 0.45
             },
             {
                "linkid" : 109,
-               "sample" : "drums/dilla/Hit (1).wav",
+               "sample" : "drums/dilla stereo/Hit (1).wav",
                "speed" : 1.0,
                "vol" : 0.45
             },
@@ -534,55 +534,55 @@
             },
             {
                "linkid" : 113,
-               "sample" : "drums/dilla/Snare (4).wav",
+               "sample" : "drums/dilla stereo/Snare (4).wav",
                "speed" : 1.0,
                "vol" : 0.45
             },
             {
                "linkid" : 110,
-               "sample" : "drums/dilla/Cymbal.wav",
+               "sample" : "drums/dilla stereo/Cymbal.wav",
                "speed" : 1.0,
                "vol" : 0.45
             },
             {
                "linkid" : 99,
-               "sample" : "drums/dilla/Hit (6).wav",
+               "sample" : "drums/dilla stereo/Hit (6).wav",
                "speed" : 1.0,
                "vol" : 0.45
             },
             {
                "linkid" : 107,
-               "sample" : "drums/dilla/Hit 16 001.wav",
+               "sample" : "drums/dilla stereo/Hit 16 001.wav",
                "speed" : 1.0,
                "vol" : 0.45
             },
             {
                "linkid" : 103,
-               "sample" : "drums/dilla/dillatom.wav",
+               "sample" : "drums/dilla stereo/dillatom.wav",
                "speed" : 1.0,
                "vol" : 0.45
             },
             {
                "linkid" : 105,
-               "sample" : "drums/dilla/Perc (1).wav",
+               "sample" : "drums/dilla stereo/Perc (1).wav",
                "speed" : 1.0,
                "vol" : 0.45
             },
             {
                "linkid" : 106,
-               "sample" : "drums/dilla/Shaker (7).wav",
+               "sample" : "drums/dilla stereo/Shaker (7).wav",
                "speed" : 1.0,
                "vol" : 0.45
             },
             {
                "linkid" : 104,
-               "sample" : "drums/dilla/Shaker (4).wav",
+               "sample" : "drums/dilla stereo/Shaker (4).wav",
                "speed" : 1.0,
                "vol" : 0.45
             },
             {
                "linkid" : 109,
-               "sample" : "drums/dilla/Hit (1).wav",
+               "sample" : "drums/dilla stereo/Hit (1).wav",
                "speed" : 1.0,
                "vol" : 0.45
             },
@@ -594,13 +594,13 @@
             },
             {
                "linkid" : 102,
-               "sample" : "drums/dilla/Snare (20).wav",
+               "sample" : "drums/dilla stereo/Snare (20).wav",
                "speed" : 1.0,
                "vol" : 0.45
             },
             {
                "linkid" : 100,
-               "sample" : "drums/dilla/dillakick.wav",
+               "sample" : "drums/dilla stereo/dillakick.wav",
                "speed" : 1.0,
                "vol" : 0.45
             }

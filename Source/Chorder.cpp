@@ -15,8 +15,6 @@
 Chorder::Chorder()
 : mVelocity(0)
 {
-   SetEnabled(false);
-   
    bzero(mHeldCount, TOTAL_NUM_NOTES*sizeof(int));
    bzero(mInputNotes, TOTAL_NUM_NOTES*sizeof(bool));
 }

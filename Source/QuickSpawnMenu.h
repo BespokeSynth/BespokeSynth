@@ -1,0 +1,38 @@
+/*
+  ==============================================================================
+
+    QuickSpawnMenu.h
+    Created: 22 Oct 2017 7:49:16pm
+    Author:  Ryan Challinor
+
+  ==============================================================================
+*/
+
+#pragma once
+
+#include "IDrawableModule.h"
+
+class QuickSpawnMenu : public IDrawableModule
+{
+public:
+   QuickSpawnMenu() {}
+   
+   void Init() override;
+   void DrawModule() override;
+   void SetDimensions(int w, int h) { mWidth = w; mHeight = h; }
+   bool HasTitleBar() const override { return false; }
+   string GetTitleLabel() override { return ""; }
+   
+   void KeyPressed(int key, bool isRepeat) override;
+   void KeyReleased(int key) override;
+   
+   bool IsSingleton() const override { return true; }
+   
+private:
+   void OnClicked(int x, int y, bool right) override;
+   void GetDimensions(int& width, int& height) override { width = mWidth; height = mHeight; }
+   int mWidth;
+   int mHeight;
+   std::vector<string> mElements;
+   char mCurrentMenuChar;
+};

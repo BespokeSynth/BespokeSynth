@@ -19,9 +19,6 @@ FreeverbEffect::FreeverbEffect()
 , mWidthSlider(nullptr)
 , mNeedUpdate(false)
 {
-   mOutputLeftBuffer = new float[gBufferSize];
-   mOutputRightBuffer = new float[gBufferSize];
-   
    //mFreeverb.setmode(GetParameter(KMode));
    //mFreeverb.setroomsize(GetParameter(KRoomSize));
    mFreeverb.setdamp(50);
@@ -40,8 +37,6 @@ FreeverbEffect::FreeverbEffect()
 
 FreeverbEffect::~FreeverbEffect()
 {
-   delete mOutputLeftBuffer;
-   delete mOutputRightBuffer;
 }
 
 void FreeverbEffect::CreateUIControls()

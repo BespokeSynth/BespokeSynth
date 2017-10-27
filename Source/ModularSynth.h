@@ -25,6 +25,7 @@ class Sample;
 class PatchCable;
 class MidiController;
 class NVGcontext;
+class QuickSpawnMenu;
 
 #define MAX_OUTPUT_CHANNELS 8
 #define MAX_INPUT_CHANNELS 8
@@ -108,7 +109,7 @@ public:
    void AddLissajousDrawer(IDrawableModule* module) { mLissajousDrawers.push_back(module); }
    bool IsLissajousDrawer(IDrawableModule* module) { return VectorContains(module, mLissajousDrawers); }
    
-   void GrabSample(float* data, int length, bool window = false, int numBars = -1);
+   void GrabSample(ChannelBuffer* data, bool window = false, int numBars = -1);
    Sample* GetHeldSample() const { return mHeldSample; }
    void ClearHeldSample();
    
@@ -197,6 +198,7 @@ private:
    std::vector<MidiDevice*> mMidiDevices;
 
    LocationZoomer mZoomer;
+   QuickSpawnMenu* mQuickSpawn;
 
    RollingBuffer mOutputBuffer;
    long long mRecordingLength;

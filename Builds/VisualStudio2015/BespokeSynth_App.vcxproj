@@ -173,6 +173,7 @@
     <ClCompile Include="..\..\Source\Arpeggiator.cpp"/>
     <ClCompile Include="..\..\Source\AudioMeter.cpp"/>
     <ClCompile Include="..\..\Source\AudioRouter.cpp"/>
+    <ClCompile Include="..\..\Source\AudioSend.cpp"/>
     <ClCompile Include="..\..\Source\Autotalent.cpp"/>
     <ClCompile Include="..\..\Source\BandVocoder.cpp"/>
     <ClCompile Include="..\..\Source\BeatBloks.cpp"/>
@@ -268,6 +269,7 @@
     <ClCompile Include="..\..\Source\PressureToVibrato.cpp"/>
     <ClCompile Include="..\..\Source\PreviousNote.cpp"/>
     <ClCompile Include="..\..\Source\Producer.cpp"/>
+    <ClCompile Include="..\..\Source\QuickSpawnMenu.cpp"/>
     <ClCompile Include="..\..\Source\RadioSequencer.cpp"/>
     <ClCompile Include="..\..\Source\Ramper.cpp"/>
     <ClCompile Include="..\..\Source\RandomNoteGenerator.cpp"/>

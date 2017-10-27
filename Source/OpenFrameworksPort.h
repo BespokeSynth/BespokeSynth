@@ -299,7 +299,6 @@ float ofGetHeight();
 float ofGetFrameRate();
 float ofLerp(float start, float stop, float amt);
 float ofDistSquared(float x1, float y1, float x2, float y2);
-bool ofGetKeyPressed(char key);
 vector<string> ofSplitString(string str, string splitter, bool ignoreEmpty = false, bool trim = false);
 bool ofIsStringInString(const string& haystack, const string& needle);
 void ofScale(float x, float y, float z);

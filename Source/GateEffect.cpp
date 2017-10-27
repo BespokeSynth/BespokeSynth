@@ -47,8 +47,7 @@ void GateEffect::ProcessAudio(double time, ChannelBuffer* buffer)
       float scalar = powf( 0.5f, 1.0f/(decayTime * gSampleRate));
       float input = 0;
       for (int ch=0; ch<buffer->NumActiveChannels(); ++ch)
-         input += fabsf(buffer->GetChannel(ch)[i]);
-      input /= buffer->NumActiveChannels();
+         input = MAX(input, fabsf(buffer->GetChannel(ch)[i]));
 
       if ( input >= mPeak )
       {

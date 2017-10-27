@@ -388,9 +388,9 @@ void MultitrackRecorder::FilesDropped(vector<string> files, int x, int y)
       
       mRecordingLength = sample.LengthInSamples();
       RecordBuffer* buffer = new RecordBuffer(mRecordingLength);
-      Mult(sample.Data(), .5f, mRecordingLength);
-      BufferCopy(buffer->mLeft, sample.Data(), mRecordingLength);
-      BufferCopy(buffer->mRight, sample.Data(), mRecordingLength);
+      Mult(sample.Data()->GetChannel(0), .5f, mRecordingLength);
+      BufferCopy(buffer->mLeft, sample.Data()->GetChannel(0), mRecordingLength);
+      BufferCopy(buffer->mRight, sample.Data()->GetChannel(0), mRecordingLength);
       mRecordBuffers.push_back(buffer);
       
       delete[] mMeasurePos;

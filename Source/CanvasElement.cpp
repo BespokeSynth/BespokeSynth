@@ -332,7 +332,7 @@ CanvasElement* SampleCanvasElement::CreateDuplicate() const
 {
    SampleCanvasElement* element = new SampleCanvasElement(mCanvas, mCol, mRow, mOffset, mLength);
    element->mSample = new Sample();
-   element->mSample->Create(mSample->Data(), mSample->LengthInSamples());
+   element->mSample->Create(mSample->Data());
    element->mSample->SetNumBars(mSample->GetNumBars());
    element->mNumLoops = mNumLoops;
    element->mNumBars = mNumBars;

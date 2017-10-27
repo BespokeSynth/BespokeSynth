@@ -243,7 +243,9 @@ void BeatColumn::Process(float* buffer, int bufferSize)
       mBeatData.RecalcPos(mDoubleTime);
       beat->SetRate(speed);
       
-      if (beat->ConsumeData(gWorkBuffer, bufferSize, true))
+      //TODO(Ryan) multichannel
+      gWorkChannelBuffer.SetNumActiveChannels(1);
+      if (beat->ConsumeData(&gWorkChannelBuffer, bufferSize, true))
       {
          mFilterRamp.Start(mFilter,10);
          
@@ -260,7 +262,7 @@ void BeatColumn::Process(float* buffer, int bufferSize)
             float lowAmount = ofClamp(-filter/crossfade,0,1);
             float highAmount = ofClamp(filter/crossfade,0,1);
             
-            float normal = gWorkBuffer[i];
+            float normal = gWorkChannelBuffer.GetChannel(0)[i];
             float lowPassed = mLowpass.Filter(normal);
             float highPassed = mHighpass.Filter(normal);
             float sample = normal * normalAmount + lowPassed * lowAmount + highPassed * highAmount;

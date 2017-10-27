@@ -15,7 +15,36 @@ ChannelBuffer::ChannelBuffer(int bufferSize)
    mActiveChannels = 1;
    mNumChannels = kMaxNumChannels;
    mRecentActiveChannels = 1;
+   mOwnsBuffers = true;
    
+   Setup(bufferSize);
+}
+
+ChannelBuffer::ChannelBuffer(float* data, int bufferSize)
+{
+   //intended as a temporary holder for passing raw data to methods that want a ChannelBuffer
+   
+   mActiveChannels = 1;
+   mNumChannels = 1;
+   mOwnsBuffers = false;
+   
+   mBuffers = new float*[1];
+   mBuffers[0] = data;
+   mBufferSize = bufferSize;
+}
+
+ChannelBuffer::~ChannelBuffer()
+{
+   if (mOwnsBuffers)
+   {
+      for (int i=0; i<mNumChannels; ++i)
+         delete[] mBuffers[i];
+   }
+   delete[] mBuffers;
+}
+
+void ChannelBuffer::Setup(int bufferSize)
+{
    mBuffers = new float*[mNumChannels];
    mBufferSize = bufferSize;
    
@@ -25,31 +54,13 @@ ChannelBuffer::ChannelBuffer(int bufferSize)
    Clear();
 }
 
-ChannelBuffer::ChannelBuffer(float* data, int bufferSize)
-{
-   //intended as a temporary holder for passing raw data to methods that want a ChannelBuffer
-   
-   mActiveChannels = 1;
-   mNumChannels = 1;
-   
-   mBuffers = new float*[1];
-   mBuffers[0] = data;
-   mBufferSize = bufferSize;
-}
-
-ChannelBuffer::~ChannelBuffer()
-{
-   for (int i=0; i<mNumChannels; ++i)
-      delete[] mBuffers[i];
-   delete[] mBuffers;
-}
-
 float* ChannelBuffer::GetChannel(int channel)
 {
    assert(channel < mActiveChannels);
    float* ret = mBuffers[MIN(channel, mActiveChannels-1)];
    if (ret == nullptr)
    {
+      assert(mOwnsBuffers);
       ret = mBuffers[MIN(channel, mActiveChannels-1)] = new float[BufferSize()];
       ::Clear(ret, BufferSize());
    }
@@ -88,17 +99,18 @@ void ChannelBuffer::SetMaxAllowedChannels(int channels)
 
 void ChannelBuffer::CopyFrom(ChannelBuffer* src, int length /*= -1*/)
 {
-   assert(mBufferSize == src->mBufferSize);
-   if (length != -1)
-      assert(length <= mBufferSize);
-   else
+   if (length == -1)
       length = mBufferSize;
+   assert(length <= mBufferSize);
+   assert(length <= src->mBufferSize);
+   mActiveChannels = src->mActiveChannels;
    for (int i=0; i<mActiveChannels; ++i)
    {
       if (src->mBuffers[i])
       {
          if (mBuffers[i] == nullptr)
          {
+            assert(mOwnsBuffers);
             mBuffers[i] = new float[mBufferSize];
             ::Clear(mBuffers[i], mBufferSize);
          }
@@ -117,6 +129,16 @@ void ChannelBuffer::SetChannelPointer(float* data, int channel, bool deleteOldDa
    if (deleteOldData)
       delete[] mBuffers[channel];
    mBuffers[channel] = data;
+}
+
+void ChannelBuffer::Resize(int bufferSize)
+{
+   assert(mOwnsBuffers);
+   for (int i=0; i<mNumChannels; ++i)
+      delete[] mBuffers[i];
+   delete[] mBuffers;
+   
+   Setup(bufferSize);
 }
 
 namespace

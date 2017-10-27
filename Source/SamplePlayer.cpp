@@ -32,11 +32,15 @@ SamplePlayer::SamplePlayer()
 , mLoopCheckbox(nullptr)
 , mBank(nullptr)
 , mSampleBankCable(nullptr)
-, mDrawBuffer(nullptr)
+, mDrawBuffer(0)
 , mPlayButton(nullptr)
 , mPauseButton(nullptr)
 , mStopButton(nullptr)
+, mDownloadYoutubeButton(nullptr)
 , mScrubbingSample(false)
+, mOscWheelGrabbed(false)
+, mOscWheelSpeed(0)
+, mPlaySpeed(1)
 {
 }
 
@@ -44,18 +48,20 @@ void SamplePlayer::CreateUIControls()
 {
    IDrawableModule::CreateUIControls();
    mVolumeSlider = new FloatSlider(this,"volume",20,3,90,15,&mVolume,0,2);
-   mSpeedSlider = new FloatSlider(this,"speed",-1,-1,90,15,&mSpeed,0,2);
+   mSpeedSlider = new FloatSlider(this,"speed",-1,-1,90,15,&mSpeed,-2,2);
    mSampleList = new DropdownList(this,"samples",5,20,&mSampleIndex);
 
    mPlayButton = new ClickButton(this,"play",5,40);
    mPauseButton = new ClickButton(this,"pause",-1,-1);
    mStopButton = new ClickButton(this,"stop",-1,-1);
    mLoopCheckbox = new Checkbox(this,"loop",-1,-1,&mLoop);
+   mDownloadYoutubeButton = new ClickButton(this,"youtube",-1,-1);
    
    mSpeedSlider->PositionTo(mVolumeSlider, kAnchorDirection_Right);
    mPauseButton->PositionTo(mPlayButton, kAnchorDirection_Right);
    mStopButton->PositionTo(mPauseButton, kAnchorDirection_Right);
    mLoopCheckbox->PositionTo(mStopButton, kAnchorDirection_Right);
+   mDownloadYoutubeButton->PositionTo(mLoopCheckbox, kAnchorDirection_Right);
    
    mSampleBankCable = new PatchCableSource(this, kConnectionType_Special);
    mSampleBankCable->SetManualPosition(8, 8);
@@ -65,9 +71,34 @@ void SamplePlayer::CreateUIControls()
 
 SamplePlayer::~SamplePlayer()
 {
-   delete mDrawBuffer;
    if (mOwnsSample)
       delete mSample;
+}
+
+void SamplePlayer::Init()
+{
+   IDrawableModule::Init();
+   
+   if (OSCReceiver::connect(12345))
+      OSCReceiver::addListener(this);
+}
+
+void SamplePlayer::Poll()
+{
+   IDrawableModule::Poll();
+   
+   juce::String clipboard = SystemClipboard::getTextFromClipboard();
+   if (clipboard.contains("youtube"))
+   {
+      juce::String clipId = clipboard.substring(clipboard.indexOf("v=")+2, clipboard.length());
+      mYoutubeId = clipId.toStdString();
+      mDownloadYoutubeButton->SetShowing(true);
+   }
+   else
+   {
+      mYoutubeId = "";
+      mDownloadYoutubeButton->SetShowing(false);
+   }
 }
 
 void SamplePlayer::Process(double time)
@@ -78,22 +109,39 @@ void SamplePlayer::Process(double time)
       return;
    
    ComputeSliders(0);
+   SyncOutputBuffer(mSample->NumChannels());
    
    int bufferSize = GetTarget()->GetBuffer()->BufferSize();
-   float* out = GetTarget()->GetBuffer()->GetChannel(0);
    assert(bufferSize == gBufferSize);
    
    float volSq = mVolume * mVolume * .25f;
    
-   if (mPlay && mSample->ConsumeData(gWorkBuffer, bufferSize, true))
+   const float kBlendSpeed = .02f;
+   if (mOscWheelGrabbed)
    {
-      Mult(gWorkBuffer, volSq, bufferSize);
-      Add(out, gWorkBuffer, bufferSize);
-      GetVizBuffer()->WriteChunk(gWorkBuffer, bufferSize, 0);
+      mPlaySpeed = ofLerp(mPlaySpeed, mOscWheelSpeed, kBlendSpeed);
+      mPlaySpeed = ofClamp(mPlaySpeed, -5, 5);
    }
    else
    {
-      GetVizBuffer()->WriteChunk(gZeroBuffer, bufferSize, 0);
+      mPlaySpeed = ofLerp(mPlaySpeed, mSpeed, kBlendSpeed);
+   }
+   mSample->SetRate(mPlaySpeed);
+   
+   gWorkChannelBuffer.SetNumActiveChannels(mSample->NumChannels());
+   if (mPlay && mSample->ConsumeData(&gWorkChannelBuffer, bufferSize, true))
+   {
+      for (int ch=0; ch<gWorkChannelBuffer.NumActiveChannels(); ++ch)
+      {
+         Mult(gWorkChannelBuffer.GetChannel(ch), volSq, bufferSize);
+         Add(GetTarget()->GetBuffer()->GetChannel(ch), gWorkChannelBuffer.GetChannel(ch), bufferSize);
+         GetVizBuffer()->WriteChunk(gWorkChannelBuffer.GetChannel(ch), bufferSize, ch);
+      }
+   }
+   else
+   {
+      for (int ch=0; ch<gWorkChannelBuffer.NumActiveChannels(); ++ch)
+         GetVizBuffer()->WriteChunk(gZeroBuffer, bufferSize, ch);
    }
 }
 
@@ -157,9 +205,8 @@ void SamplePlayer::UpdateSample(Sample* sample, bool ownsSample)
    mOwnsSample = ownsSample;
    
    mSample->LockDataMutex(true);
-   delete mDrawBuffer;
-   mDrawBuffer = new ChannelBuffer(mSample->LengthInSamples());
-   BufferCopy(mDrawBuffer->GetChannel(0), mSample->Data(), mSample->LengthInSamples());
+   mDrawBuffer.Resize(mSample->LengthInSamples());
+   mDrawBuffer.CopyFrom(mSample->Data());
    mSample->LockDataMutex(false);
 }
 
@@ -174,6 +221,25 @@ void SamplePlayer::ButtonClicked(ClickButton *button)
       mPlay = false;
       mSample->SetPlayPosition(0);
    }
+   if (button == mDownloadYoutubeButton)
+   {
+      char command[2048];
+      sprintf(command, "export PATH=/opt/local/bin:$PATH; youtube-dl %s -x --audio-format wav -o %s -w", mYoutubeId.c_str(), ofToDataPath("youtube.m4a").c_str());
+      FILE* output = popen(command, "r");
+      
+      char c;
+      do
+      {
+         c = fgetc(output);
+         printf("%c",c);
+      } while (c != EOF);
+      
+      pclose(output);
+      
+      Sample* sample = new Sample();
+      sample->Read(ofToDataPath("youtube.wav").c_str());
+      UpdateSample(sample, true);
+   }
 }
 
 void SamplePlayer::OnClicked(int x, int y, bool right)
@@ -183,7 +249,7 @@ void SamplePlayer::OnClicked(int x, int y, bool right)
    if (right)
       return;
    
-   if (y > 60)
+   if (y > 60 && mSample != nullptr)
    {
       mSample->SetPlayPosition(int(GetPlayPositionForMouse(x)));
       mScrubbingSample = true;
@@ -193,7 +259,7 @@ void SamplePlayer::OnClicked(int x, int y, bool right)
 bool SamplePlayer::MouseMoved(float x, float y)
 {
    IDrawableModule::MouseMoved(x, y);
-   if (mScrubbingSample)
+   if (mScrubbingSample && mSample != nullptr)
       mSample->SetPlayPosition(int(GetPlayPositionForMouse(x)));
    return true;
 }
@@ -206,12 +272,13 @@ void SamplePlayer::MouseReleased()
 
 float SamplePlayer::GetPlayPositionForMouse(float mouseX) const
 {
-   return ofMap(mouseX, 5, 205 ,0, mSample->LengthInSamples(), true);
+   if (mSample != nullptr)
+      return ofMap(mouseX, 5, 205 ,0, mSample->LengthInSamples(), true);
+   return 0;
 }
 
 void SamplePlayer::DrawModule()
 {
-   
    if (Minimized() || IsVisible() == false)
       return;
    
@@ -222,13 +289,59 @@ void SamplePlayer::DrawModule()
    mPlayButton->Draw();
    mPauseButton->Draw();
    mStopButton->Draw();
+   mDownloadYoutubeButton->Draw();
    
    if (mSample)
    {
       ofPushMatrix();
       ofTranslate(5,60);
-      DrawAudioBuffer(200, 60, mDrawBuffer, 0, mDrawBuffer->BufferSize(), mSample->GetPlayPosition());
+      DrawAudioBuffer(200, 60, &mDrawBuffer, 0, mDrawBuffer.BufferSize(), mSample->GetPlayPosition());
       ofPopMatrix();
+   }
+}
+
+void SamplePlayer::oscMessageReceived(const OSCMessage& msg)
+{
+   if (msg.getAddressPattern().toString() == "/wheel/z")
+   {
+      bool grabbed = msg[0].getFloat32() > 0;
+      if (grabbed)
+      {
+         mOscWheelPos = FLT_MAX;
+         mOscWheelSpeed = 0;
+         mOscWheelGrabbed = true;
+      }
+      else
+      {
+         mOscWheelGrabbed = false;
+      }
+   }
+   else if (msg.getAddressPattern().toString() == "/wheel/x")
+   {
+      float pos = msg[0].getFloat32();
+      if (mOscWheelPos == FLT_MAX)
+      {
+         mOscWheelPos = pos;
+      }
+      
+      mOscWheelSpeed = (pos - mOscWheelPos) * 70;
+      mOscWheelPos = pos;
+   }
+   else if (msg.getAddressPattern().toString() == "/Fader/x")
+   {
+      float pos = msg[0].getFloat32();
+      mSpeed = ofLerp(mSpeedSlider->GetMin(), mSpeedSlider->GetMax(), pos);
+   }
+}
+
+void SamplePlayer::oscBundleReceived(const OSCBundle& bundle)
+{
+   for (OSCBundle::Element* element = bundle.begin(); element != bundle.end(); ++element)
+   {
+      if (element->isMessage())
+         oscMessageReceived(element->getMessage());
+      else if (element->isBundle())
+         oscBundleReceived(element->getBundle());
    }
 }
 
@@ -246,11 +359,6 @@ void SamplePlayer::GetModuleDimensions(int& x, int&y)
 
 void SamplePlayer::FloatSliderUpdated(FloatSlider* slider, float oldVal)
 {
-   if (slider == mSpeedSlider)
-   {
-      if (mSample)
-         mSample->SetRate(mSpeed);
-   }
 }
 
 void SamplePlayer::IntSliderUpdated(IntSlider* slider, int oldVal)

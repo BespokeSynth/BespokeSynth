@@ -58,8 +58,6 @@ private:
    
    void LoadSong(int index);
    
-   float* mWriteBuffer;
-   
    ofMutex mLoadSongMutex;
    bool mLoadingSong;
    

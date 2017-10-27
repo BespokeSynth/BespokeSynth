@@ -156,6 +156,7 @@
 #include "Splitter.h"
 #include "Panner.h"
 #include "SamplePlayer.h"
+#include "AudioSend.h"
 
 #define REGISTER(class,name,type) Register(#name, &(class::Create), &(class::CanCreate), type, false, false);
 #define REGISTER_HIDDEN(class,name,type) Register(#name, &(class::Create), &(class::CanCreate), type, true, false);
@@ -280,6 +281,7 @@ ModuleFactory::ModuleFactory()
    REGISTER(Splitter, splitter, kModuleType_Audio);
    REGISTER(Panner, panner, kModuleType_Audio);
    REGISTER(SamplePlayer, sampleplayer, kModuleType_Synth);
+   REGISTER(AudioSend, send, kModuleType_Audio);
 
    //REGISTER_EXPERIMENTAL(MidiPlayer, midiplayer, kModuleType_Instrument);
    REGISTER_EXPERIMENTAL(Razor, razor, kModuleType_Synth);
@@ -344,6 +346,19 @@ vector<string> ModuleFactory::GetSpawnableModules(ModuleType moduleType)
    {
       if (mModuleTypeMap[iter->first] == moduleType &&
          (mIsHiddenModuleMap[iter->first] == false || gShowDevModules))
+         modules.push_back(iter->first);
+   }
+   sort(modules.begin(), modules.end());
+   return modules;
+}
+
+vector<string> ModuleFactory::GetSpawnableModules(char c)
+{
+   vector<string> modules;
+   for (auto iter = mFactoryMap.begin(); iter != mFactoryMap.end(); ++iter)
+   {
+      if (iter->first[0] == c &&
+          (mIsHiddenModuleMap[iter->first] == false || gShowDevModules))
          modules.push_back(iter->first);
    }
    sort(modules.begin(), modules.end());
