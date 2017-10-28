@@ -117,7 +117,6 @@ void RandomNoteGenerator::DropdownUpdated(DropdownList* list, int oldVal)
 void RandomNoteGenerator::LoadLayout(const ofxJSONElement& moduleInfo)
 {
    mModuleSaveData.LoadString("target", moduleInfo);
-   mModuleSaveData.LoadBool("enabled", moduleInfo, true);
    
    SetUpFromSaveData();
 }
@@ -125,5 +124,4 @@ void RandomNoteGenerator::LoadLayout(const ofxJSONElement& moduleInfo)
 void RandomNoteGenerator::SetUpFromSaveData()
 {
    SetUpPatchCables(mModuleSaveData.GetString("target"));
-   SetEnabled(mModuleSaveData.GetBool("enabled"));
 }

@@ -117,7 +117,6 @@ void SliderSequencer::IntSliderUpdated(IntSlider* slider, int oldVal)
 void SliderSequencer::LoadLayout(const ofxJSONElement& moduleInfo)
 {
    mModuleSaveData.LoadString("target", moduleInfo);
-   mModuleSaveData.LoadBool("enabled", moduleInfo);
    
    SetUpFromSaveData();
 }

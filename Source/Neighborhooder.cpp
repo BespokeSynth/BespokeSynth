@@ -63,7 +63,6 @@ void Neighborhooder::PlayNote(double time, int pitch, int velocity, int voiceIdx
 void Neighborhooder::LoadLayout(const ofxJSONElement& moduleInfo)
 {
    mModuleSaveData.LoadString("target", moduleInfo);
-   mModuleSaveData.LoadBool("enabled", moduleInfo);
 
    SetUpFromSaveData();
 }
@@ -71,7 +70,6 @@ void Neighborhooder::LoadLayout(const ofxJSONElement& moduleInfo)
 void Neighborhooder::SetUpFromSaveData()
 {
    SetUpPatchCables(mModuleSaveData.GetString("target"));
-   SetEnabled(mModuleSaveData.GetBool("enabled"));
 }
 
 

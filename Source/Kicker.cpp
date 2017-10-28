@@ -44,7 +44,6 @@ void Kicker::PlayNote(double time, int pitch, int velocity, int voiceIdx /*= -1*
 void Kicker::LoadLayout(const ofxJSONElement& moduleInfo)
 {
    mModuleSaveData.LoadString("target", moduleInfo);
-   mModuleSaveData.LoadBool("enabled", moduleInfo);
    mModuleSaveData.LoadString("drumplayer", moduleInfo,"",FillDropdown<DrumPlayer*>);
 
    SetUpFromSaveData();
@@ -53,7 +52,6 @@ void Kicker::LoadLayout(const ofxJSONElement& moduleInfo)
 void Kicker::SetUpFromSaveData()
 {
    SetUpPatchCables(mModuleSaveData.GetString("target"));
-   SetEnabled(mModuleSaveData.GetBool("enabled"));
    SetDrumPlayer(dynamic_cast<DrumPlayer*>(TheSynth->FindModule(mModuleSaveData.GetString("drumplayer"),false)));
 }
 

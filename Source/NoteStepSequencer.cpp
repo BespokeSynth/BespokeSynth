@@ -60,9 +60,9 @@ NoteStepSequencer::NoteStepSequencer()
    
    for (int i=0;i<NSS_MAX_STEPS;++i)
    {
-      mTones[i] = 7;
+      mTones[i] = (i % 2 == 0) ? 7 : 4;
       mVels[i] = 127;
-      mNoteLengths[i] = .9f;
+      mNoteLengths[i] = 1;
    }
    
    SetIsNoteOrigin(true);

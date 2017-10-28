@@ -396,7 +396,6 @@ void Razor::ButtonClicked(ClickButton* button)
 void Razor::LoadLayout(const ofxJSONElement& moduleInfo)
 {
    mModuleSaveData.LoadString("target", moduleInfo);
-   mModuleSaveData.LoadBool("enabled", moduleInfo, true);
 
    SetUpFromSaveData();
 }
@@ -404,6 +403,5 @@ void Razor::LoadLayout(const ofxJSONElement& moduleInfo)
 void Razor::SetUpFromSaveData()
 {
    SetTarget(TheSynth->FindModule(mModuleSaveData.GetString("target")));
-   SetEnabled(mModuleSaveData.GetBool("enabled"));
 }
 

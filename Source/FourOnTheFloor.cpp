@@ -61,7 +61,6 @@ void FourOnTheFloor::CheckboxUpdated(Checkbox* checkbox)
 void FourOnTheFloor::LoadLayout(const ofxJSONElement& moduleInfo)
 {
    mModuleSaveData.LoadString("target", moduleInfo);
-   mModuleSaveData.LoadBool("enabled", moduleInfo, false);
 
    SetUpFromSaveData();
 }
@@ -69,6 +68,5 @@ void FourOnTheFloor::LoadLayout(const ofxJSONElement& moduleInfo)
 void FourOnTheFloor::SetUpFromSaveData()
 {
    SetUpPatchCables(mModuleSaveData.GetString("target"));
-   SetEnabled(mModuleSaveData.GetBool("enabled"));
 }
 

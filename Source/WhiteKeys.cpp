@@ -60,7 +60,6 @@ void WhiteKeys::PlayNote(double time, int pitch, int velocity, int voiceIdx /*= 
 void WhiteKeys::LoadLayout(const ofxJSONElement& moduleInfo)
 {
    mModuleSaveData.LoadString("target", moduleInfo);
-   mModuleSaveData.LoadBool("enabled",moduleInfo);
 
    SetUpFromSaveData();
 }
@@ -68,7 +67,6 @@ void WhiteKeys::LoadLayout(const ofxJSONElement& moduleInfo)
 void WhiteKeys::SetUpFromSaveData()
 {
    SetUpPatchCables(mModuleSaveData.GetString("target"));
-   SetEnabled(mModuleSaveData.GetBool("enabled"));
 }
 
 

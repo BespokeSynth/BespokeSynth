@@ -113,7 +113,6 @@ void Polyrhythms::DropdownUpdated(DropdownList* list, int oldVal)
 void Polyrhythms::LoadLayout(const ofxJSONElement& moduleInfo)
 {
    mModuleSaveData.LoadString("target", moduleInfo);
-   mModuleSaveData.LoadBool("enabled", moduleInfo);
 
    SetUpFromSaveData();
 }
@@ -121,7 +120,6 @@ void Polyrhythms::LoadLayout(const ofxJSONElement& moduleInfo)
 void Polyrhythms::SetUpFromSaveData()
 {
    SetUpPatchCables(mModuleSaveData.GetString("target"));
-   SetEnabled(mModuleSaveData.GetBool("enabled"));
 }
 
 

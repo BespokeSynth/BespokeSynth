@@ -107,25 +107,28 @@ void EffectChain::Process(double time)
    
    int bufferSize = GetBuffer()->BufferSize();
    
-   mEffectMutex.lock();
-   
-   for (int i=0; i<mEffects.size(); ++i)
+   if (mEnabled)
    {
-      mDryBuffer.CopyFrom(GetBuffer());
+      mEffectMutex.lock();
       
-      mEffects[i]->ProcessAudio(time,GetBuffer());
-      
-      float dryWet = mDryWetLevels[i];
-
-      for (int ch=0; ch<GetBuffer()->NumActiveChannels(); ++ch)
+      for (int i=0; i<mEffects.size(); ++i)
       {
-         Mult(mDryBuffer.GetChannel(ch), (1-dryWet), bufferSize);
-         Mult(GetBuffer()->GetChannel(ch), dryWet, bufferSize);
-         Add(GetBuffer()->GetChannel(ch), mDryBuffer.GetChannel(ch), bufferSize);
+         mDryBuffer.CopyFrom(GetBuffer());
+         
+         mEffects[i]->ProcessAudio(time,GetBuffer());
+         
+         float dryWet = mDryWetLevels[i];
+
+         for (int ch=0; ch<GetBuffer()->NumActiveChannels(); ++ch)
+         {
+            Mult(mDryBuffer.GetChannel(ch), (1-dryWet), bufferSize);
+            Mult(GetBuffer()->GetChannel(ch), dryWet, bufferSize);
+            Add(GetBuffer()->GetChannel(ch), mDryBuffer.GetChannel(ch), bufferSize);
+         }
       }
+      
+      mEffectMutex.unlock();
    }
-   
-   mEffectMutex.unlock();
    
    for (int ch=0; ch<GetBuffer()->NumActiveChannels(); ++ch)
    {

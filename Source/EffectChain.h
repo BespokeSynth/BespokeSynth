@@ -31,6 +31,7 @@ public:
    
    string GetTitleLabel() override { return "effect chain"; }
    void CreateUIControls() override;
+   void SetEnabled(bool enabled) override { mEnabled = enabled; }
    
    void Init() override;
    void Poll() override;
@@ -57,7 +58,7 @@ private:
    //IDrawableModule
    void DrawModule() override;
    void GetModuleDimensions(int& x, int&y) override;
-   bool Enabled() const override { return true; }
+   bool Enabled() const override { return mEnabled; }
    
    int GetRowHeight(int row);
    int NumRows() const;

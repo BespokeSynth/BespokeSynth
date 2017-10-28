@@ -123,7 +123,6 @@ void RingModulator::FloatSliderUpdated(FloatSlider* slider, float oldVal)
 void RingModulator::LoadLayout(const ofxJSONElement& moduleInfo)
 {
    mModuleSaveData.LoadString("target", moduleInfo);
-   mModuleSaveData.LoadBool("enabled", moduleInfo,true);
 
    SetUpFromSaveData();
 }
@@ -131,7 +130,6 @@ void RingModulator::LoadLayout(const ofxJSONElement& moduleInfo)
 void RingModulator::SetUpFromSaveData()
 {
    SetTarget(TheSynth->FindModule(mModuleSaveData.GetString("target")));
-   SetEnabled(mModuleSaveData.GetBool("enabled"));
 }
 
 

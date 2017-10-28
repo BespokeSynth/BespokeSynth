@@ -105,7 +105,6 @@ void Monophonify::FloatSliderUpdated(FloatSlider* slider, float oldVal)
 void Monophonify::LoadLayout(const ofxJSONElement& moduleInfo)
 {
    mModuleSaveData.LoadString("target", moduleInfo);
-   mModuleSaveData.LoadBool("enabled", moduleInfo);
 
    SetUpFromSaveData();
 }
@@ -113,6 +112,5 @@ void Monophonify::LoadLayout(const ofxJSONElement& moduleInfo)
 void Monophonify::SetUpFromSaveData()
 {
    SetUpPatchCables(mModuleSaveData.GetString("target"));
-   SetEnabled(mModuleSaveData.GetBool("enabled"));
 }
 

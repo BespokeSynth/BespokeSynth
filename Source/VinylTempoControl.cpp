@@ -104,7 +104,6 @@ void VinylTempoControl::CheckboxUpdated(Checkbox* checkbox)
 
 void VinylTempoControl::LoadLayout(const ofxJSONElement& moduleInfo)
 {
-   mModuleSaveData.LoadBool("enabled", moduleInfo, true);
    mModuleSaveData.LoadInt("leftchannel", moduleInfo, 1, 1, MAX_INPUT_CHANNELS);
    mModuleSaveData.LoadInt("rightchannel", moduleInfo, 2, 1, MAX_INPUT_CHANNELS);
    
@@ -113,7 +112,6 @@ void VinylTempoControl::LoadLayout(const ofxJSONElement& moduleInfo)
 
 void VinylTempoControl::SetUpFromSaveData()
 {
-   SetEnabled(mModuleSaveData.GetBool("enabled"));
    mLeftChannel = mModuleSaveData.GetInt("leftchannel");
    mRightChannel = mModuleSaveData.GetInt("rightchannel");
 }

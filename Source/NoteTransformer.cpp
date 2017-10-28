@@ -84,7 +84,6 @@ void NoteTransformer::PlayNote(double time, int pitch, int velocity, int voiceId
 void NoteTransformer::LoadLayout(const ofxJSONElement& moduleInfo)
 {
    mModuleSaveData.LoadString("target", moduleInfo);
-   mModuleSaveData.LoadBool("enabled", moduleInfo);
    
    SetUpFromSaveData();
 }
@@ -92,6 +91,5 @@ void NoteTransformer::LoadLayout(const ofxJSONElement& moduleInfo)
 void NoteTransformer::SetUpFromSaveData()
 {
    SetUpPatchCables(mModuleSaveData.GetString("target"));
-   SetEnabled(mModuleSaveData.GetBool("enabled"));
 }
 

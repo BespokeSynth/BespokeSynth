@@ -93,7 +93,6 @@ void NoteSustain::LoadLayout(const ofxJSONElement& moduleInfo)
 {
    mModuleSaveData.LoadString("target", moduleInfo);
    mModuleSaveData.LoadFloat("sustain", moduleInfo, 100, 1, 1000, K(isTextField));
-   mModuleSaveData.LoadBool("enabled", moduleInfo, false);
    
    SetUpFromSaveData();
 }
@@ -102,5 +101,4 @@ void NoteSustain::SetUpFromSaveData()
 {
    SetUpPatchCables(mModuleSaveData.GetString("target"));
    mSustain = mModuleSaveData.GetFloat("sustain");
-   mEnabled = mModuleSaveData.GetBool("enabled");
 }

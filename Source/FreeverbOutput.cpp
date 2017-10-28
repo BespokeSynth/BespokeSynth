@@ -129,7 +129,6 @@ void FreeverbOutput::FloatSliderUpdated(FloatSlider* slider, float oldVal)
 
 void FreeverbOutput::LoadLayout(const ofxJSONElement& moduleInfo)
 {
-   mModuleSaveData.LoadBool("enabled", moduleInfo, true);
    mModuleSaveData.LoadInt("leftchannel", moduleInfo, 1, 1, MAX_OUTPUT_CHANNELS);
    mModuleSaveData.LoadInt("rightchannel", moduleInfo, 2, 1, MAX_OUTPUT_CHANNELS);
    
@@ -138,7 +137,6 @@ void FreeverbOutput::LoadLayout(const ofxJSONElement& moduleInfo)
 
 void FreeverbOutput::SetUpFromSaveData()
 {
-   SetEnabled(mModuleSaveData.GetBool("enabled"));
    mLeftChannel = mModuleSaveData.GetInt("leftchannel");
    mRightChannel = mModuleSaveData.GetInt("rightchannel");
 }
