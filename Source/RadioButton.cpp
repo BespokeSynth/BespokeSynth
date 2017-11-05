@@ -111,9 +111,13 @@ void RadioButton::Render()
 
    int w,h;
    GetDimensions(w,h);
+   ofFill();
+   ofSetColor(0, 0, 0, gModuleDrawAlpha * .5f);
+   ofRect(mX+1,mY+1,mWidth,mHeight);
    for (int i=0; i<mElements.size(); ++i)
    {
-      ofColor color;
+      ofColor color,textColor;
+      IUIControl::GetColors(color, textColor);
       
       bool active = false;
       if (mVar)
@@ -124,15 +128,18 @@ void RadioButton::Render()
             active = mElements[i].mValue == *mVar;
       }
       
-      if (IsPreset() && !active)
-         color.set(0,255,0,gModuleDrawAlpha);
-      else if (active)
-         color.set(255,255,0,gModuleDrawAlpha);
-      else
-         color.set(255,255,255,gModuleDrawAlpha);
+      if (active)
+      {
+         float h,s,b;
+         color.getHsb(h, s, b);
+         color.setHsb(42, s, b);
+         textColor.set(255,255,0,gModuleDrawAlpha);
+      }
 
       ofFill();
-      ofSetColor(color.r,color.g,color.b,color.a*(active ? .4f : .2f));
+      if (active)
+         color.setBrightness(ofLerp(color.getBrightness(), 255, .3f));
+      ofSetColor(color);
       
       float x,y;
       
@@ -151,7 +158,7 @@ void RadioButton::Render()
       
       ofNoFill();
 
-      ofSetColor(color);
+      ofSetColor(textColor);
       //ofRect(mX,mY+i*radioSpacing,w,15);
       DrawText(mElements[i].mLabel, x+2, y+12);
    }

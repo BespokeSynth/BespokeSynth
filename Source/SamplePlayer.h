@@ -42,6 +42,8 @@ public:
    void SetEnabled(bool enabled) override { mEnabled = enabled; }
    
    void FilesDropped(vector<string> files, int x, int y) override;
+   bool IsResizable() const override { return true; }
+   void Resize(float width, float height) override { mWidth = ofClamp(width, 210, 9999); mHeight = ofClamp(height, 125, 9999); }
    
    void oscMessageReceived(const OSCMessage& msg) override;
    void oscBundleReceived(const OSCBundle& bundle) override;
@@ -69,6 +71,9 @@ private:
    void OnClicked(int x, int y, bool right) override;
    bool MouseMoved(float x, float y) override;
    void MouseReleased() override;
+      
+   float mWidth;
+   float mHeight;
    
    SampleBank* mBank;
    Sample* mSample;

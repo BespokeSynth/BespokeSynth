@@ -35,7 +35,8 @@ void Monome::Connect()
    OSCMessage listMsg("/serialosc/list");
    listMsg.addString("localhost");
    listMsg.addInt32(MONOME_RECEIVE_PORT);
-   mToSerialOsc.send(listMsg);
+   bool written = mToSerialOsc.send(listMsg);
+   assert(written);
 }
 
 void Monome::SetLightInternal(int x, int y, bool on)
@@ -47,7 +48,8 @@ void Monome::SetLightInternal(int x, int y, bool on)
    lightMsg.addInt32(x);
    lightMsg.addInt32(y);
    lightMsg.addInt32(on ? 1 : 0);
-   mToMonome.send(lightMsg);
+   bool written = mToMonome.send(lightMsg);
+   assert(written);
 }
 
 void Monome::SetLight(int x, int y, bool on)
@@ -84,15 +86,18 @@ void Monome::oscMessageReceived(const OSCMessage& msg)
       
       OSCMessage setPortMsg("/sys/port");
       setPortMsg.addInt32(MONOME_RECEIVE_PORT);
-      mToMonome.send(setPortMsg);
+      bool written = mToMonome.send(setPortMsg);
+      assert(written);
       
       OSCMessage setHostMsg("/sys/host");
       setHostMsg.addString(HOST);
-      mToMonome.send(setHostMsg);
+      written = mToMonome.send(setHostMsg);
+      assert(written);
       
       OSCMessage setPrefixMsg("/sys/prefix");
       setPrefixMsg.addString("monome");
-      mToMonome.send(setPrefixMsg);
+      written = mToMonome.send(setPrefixMsg);
+      assert(written);
       
       /*OSCMessage setTiltMsg("/monome/tilt/set");
       setTiltMsg.addInt32(0);

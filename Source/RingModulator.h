@@ -50,19 +50,21 @@ public:
 private:
    //IDrawableModule
    void DrawModule() override;
-   void GetModuleDimensions(int& x, int& y) override { x = 130; y = 52; }
+   void GetModuleDimensions(int& x, int& y) override { x = 130; y = 68; }
    bool Enabled() const override { return mEnabled; }
 
    ChannelBuffer mDryBuffer;
 
+   float mFreq;
    float mDryWet;
    float mVolume;
+   FloatSlider* mFreqSlider;
    FloatSlider* mDryWetSlider;
    FloatSlider* mVolumeSlider;
    
    EnvOscillator mModOsc;
    float mPhase;
-   Ramp mFreq;
+   Ramp mFreqRamp;
    float mGlideTime;
    FloatSlider* mGlideSlider;
 };

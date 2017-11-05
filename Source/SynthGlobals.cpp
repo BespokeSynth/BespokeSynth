@@ -125,8 +125,7 @@ void DrawAudioBuffer(float width, float height, const float* buffer, float start
          int j;
          int inc = 1+samplesPerStep / 100;
          for (j=0; j<samplesPerStep && position+j < end-1; j+=inc)
-            mag += buffer[position+j] * buffer[position+j];
-         mag /= j/inc;
+            mag = MAX(mag,fabsf(buffer[position+j]));
          mag = sqrt(mag);
          mag = sqrt(mag);
          mag *= height/2 * vol;

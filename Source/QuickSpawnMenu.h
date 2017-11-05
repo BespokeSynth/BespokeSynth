@@ -22,6 +22,7 @@ public:
    void SetDimensions(int w, int h) { mWidth = w; mHeight = h; }
    bool HasTitleBar() const override { return false; }
    string GetTitleLabel() override { return ""; }
+   bool IsSaveable() override { return false; }
    
    void KeyPressed(int key, bool isRepeat) override;
    void KeyReleased(int key) override;

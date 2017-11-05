@@ -134,7 +134,7 @@ void NoteRouter::LoadLayout(const ofxJSONElement& moduleInfo)
    }
    
    mModuleSaveData.LoadInt("selectedmask",moduleInfo,1,0,(1 << targets.size())-1);
-   mModuleSaveData.LoadBool("radiobuttonmode", moduleInfo, false);
+   mModuleSaveData.LoadBool("radiobuttonmode", moduleInfo, true);
    
    SetUpFromSaveData();
 }

@@ -15,7 +15,7 @@
 #include "INonstandardController.h"
 #include "Oscillator.h"
 
-#define HOST "localhost"
+#define HOST "127.0.0.1"
 #define SERIAL_OSC_PORT 12002
 #define MONOME_RECEIVE_PORT 13338
 

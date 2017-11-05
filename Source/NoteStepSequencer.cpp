@@ -54,6 +54,8 @@ NoteStepSequencer::NoteStepSequencer()
 , mRandomizePitchButton(nullptr)
 , mRandomizeLengthButton(nullptr)
 , mRandomizeVelocityButton(nullptr)
+, mLoopResetPoint(0)
+, mLoopResetPointSlider(nullptr)
 {
    TheTransport->AddListener(this, mInterval);
    TheTransport->AddAudioPoller(this);
@@ -87,6 +89,7 @@ void NoteStepSequencer::CreateUIControls()
    mRandomizePitchButton = new ClickButton(this,"pitch",140,38);
    mRandomizeLengthButton = new ClickButton(this,"len",-1,-1);
    mRandomizeVelocityButton = new ClickButton(this,"vel",-1,-1);
+   mLoopResetPointSlider = new IntSlider(this,"loop reset",-1,-1,100,15,&mLoopResetPoint,0,mLength);
    
    mIntervalSelector->AddLabel("1n", kInterval_1n);
    mIntervalSelector->AddLabel("2n", kInterval_2n);
@@ -117,6 +120,8 @@ void NoteStepSequencer::CreateUIControls()
    
    mTimeModeSelector->AddLabel("synced", kTimeMode_Synced);
    mTimeModeSelector->AddLabel("downbeat", kTimeMode_Downbeat);
+   mTimeModeSelector->AddLabel("dnbeat2", kTimeMode_Downbeat2);
+   mTimeModeSelector->AddLabel("dnbeat4", kTimeMode_Downbeat4);
    mTimeModeSelector->AddLabel("step", kTimeMode_Step);
    mTimeModeSelector->AddLabel("free", kTimeMode_Free);
    
@@ -124,6 +129,7 @@ void NoteStepSequencer::CreateUIControls()
    
    mArpStepSlider->SetShowing(mTimeMode != kTimeMode_Synced);
    mFreeTimeSlider->SetShowing(mTimeMode == kTimeMode_Free);
+   mLoopResetPointSlider->SetShowing(mTimeMode != kTimeMode_Synced);
    
    mRandomizeLengthButton->PositionTo(mRandomizePitchButton, kAnchorDirection_Right);
    mRandomizeVelocityButton->PositionTo(mRandomizeLengthButton, kAnchorDirection_Right);
@@ -175,6 +181,7 @@ void NoteStepSequencer::DrawModule()
    mRandomizePitchButton->Draw();
    mRandomizeLengthButton->Draw();
    mRandomizeVelocityButton->Draw();
+   mLoopResetPointSlider->Draw();
    
    mGrid->Draw();
    mVelocityGrid->Draw();
@@ -188,7 +195,7 @@ void NoteStepSequencer::DrawModule()
    
    for (int i=0; i<mGrid->GetCols()-1; ++i)
    {
-      if (mNoteLengths[i] == 1 && mTones[i] == mTones[i+1])
+      if (mNoteLengths[i] == 1 && mTones[i] == mTones[i+1] && mVels[i] > mVels[i+1])
       {
          ofSetColor(255,255,255,255);
          ofFill();
@@ -265,7 +272,7 @@ void NoteStepSequencer::CheckboxUpdated(Checkbox* checkbox)
    {
       mNoteOutput.Flush();
       
-      if (mEnabled && mTimeMode == kTimeMode_Downbeat)
+      if (mEnabled && (mTimeMode == kTimeMode_Downbeat || mTimeMode == kTimeMode_Downbeat2 || mTimeMode == kTimeMode_Downbeat4))
          mWaitingForDownbeat = true;
    }
 }
@@ -363,10 +370,10 @@ void NoteStepSequencer::OnTimeEvent(int samplesTo)
    if (mArpStep != 0)
    {
       mArpIndex += mArpStep;
-      while (mArpIndex >= mLength)
-         mArpIndex -= mLength;
-      while (mArpIndex <0)
-         mArpIndex += mLength;
+      if (mArpStep > 0 && mArpIndex >= mLength)
+         mArpIndex -= (mLength - mLoopResetPoint);
+      if (mArpStep < 0 && mArpIndex < mLoopResetPoint)
+         mArpIndex += (mLength - mLoopResetPoint);
    }
    else //pingpong
    {
@@ -374,12 +381,12 @@ void NoteStepSequencer::OnTimeEvent(int samplesTo)
       mArpIndex += mArpPingPongDirection;
       if (mLength >= 2)
       {
-         if (mArpIndex < 0)
+         if (mArpPingPongDirection == -1 && mArpIndex < mLoopResetPoint)
          {
-            mArpIndex = 1;
+            mArpIndex = mLoopResetPoint + 1;
             mArpPingPongDirection = 1;
          }
-         if (mArpIndex > mLength - 1)
+         if (mArpPingPongDirection == 1 && mArpIndex > mLength - 1)
          {
             mArpIndex = mLength - 2;
             mArpPingPongDirection = -1;
@@ -393,15 +400,24 @@ void NoteStepSequencer::OnTimeEvent(int samplesTo)
    
    float offsetMs = (-mOffset/TheTransport->CountInStandardMeasure(mInterval))*TheTransport->MsPerBar();
    
-   bool isDownbeat = TheTransport->GetQuantized(offsetMs, mInterval) == 0;
+   bool shouldResetForDownbeat = false;
+   if (mTimeMode == kTimeMode_Downbeat)
+      shouldResetForDownbeat = TheTransport->GetQuantized(offsetMs, mInterval) == 0;
+   if (mTimeMode == kTimeMode_Downbeat2)
+      shouldResetForDownbeat = TheTransport->GetQuantized(offsetMs, mInterval) == 0 && TheTransport->GetMeasure() % 2 == 0;
+   if (mTimeMode == kTimeMode_Downbeat4)
+      shouldResetForDownbeat = TheTransport->GetQuantized(offsetMs, mInterval) == 0 && TheTransport->GetMeasure() % 4 == 0;
    
-   if (mTimeMode == kTimeMode_Downbeat && isDownbeat)
+   if (shouldResetForDownbeat)
+   {
       mArpIndex = 0;
+      mArpPingPongDirection = 1;
+   }
    
-   if (mWaitingForDownbeat && isDownbeat)
+   if (mWaitingForDownbeat && shouldResetForDownbeat)
       mWaitingForDownbeat = false;
    
-   if (mWaitingForDownbeat && mTimeMode == kTimeMode_Downbeat)
+   if (mWaitingForDownbeat && (mTimeMode == kTimeMode_Downbeat || mTimeMode == kTimeMode_Downbeat2 || mTimeMode == kTimeMode_Downbeat4))
       return;
    
    if (mTimeMode == kTimeMode_Synced)
@@ -429,7 +445,7 @@ void NoteStepSequencer::OnTimeEvent(int samplesTo)
    {
       int outPitch = RowToPitch(current);
       
-      if (mLastPitch == outPitch && mVels[mArpIndex] > 1 && mVels[mArpIndex] <= mLastVel && !mAlreadyDidNoteOff)
+      if (mLastPitch == outPitch && mVels[mArpIndex] > 1 && mVels[mArpIndex] < mLastVel && !mAlreadyDidNoteOff)
       {
          //if it's the same note and repeats are treated as holds, clear note off
          offPitch = -1;
@@ -520,7 +536,7 @@ int NoteStepSequencer::StepToButton(int step)
 namespace
 {
    const float extraW = 10;
-   const float extraH = 75;
+   const float extraH = 90;
 }
 
 void NoteStepSequencer::GetModuleDimensions(int& width, int& height)
@@ -541,6 +557,8 @@ void NoteStepSequencer::UpdateVelocityGridPos()
    int gridX,gridY;
    mGrid->GetPosition(gridX, gridY);
    mVelocityGrid->SetPosition(gridX, gridY + mGrid->GetHeight());
+   mLoopResetPointSlider->PositionTo(mVelocityGrid, kAnchorDirection_Below);
+   mLoopResetPointSlider->SetDimensions(mVelocityGrid->GetWidth(), 15);
 }
 
 void NoteStepSequencer::OnMidiNote(MidiNote& note)
@@ -644,6 +662,7 @@ void NoteStepSequencer::DropdownUpdated(DropdownList* list, int oldVal)
       mFreeTimeSlider->SetShowing(mTimeMode == kTimeMode_Free);
       mShiftBackButton->SetShowing(mTimeMode == kTimeMode_Synced);
       mShiftForwardButton->SetShowing(mTimeMode == kTimeMode_Synced);
+      mLoopResetPointSlider->SetShowing(mTimeMode != kTimeMode_Synced);
       
       if (mTimeMode == kTimeMode_Free && mInterval < kInterval_Kick)
       {
@@ -677,6 +696,8 @@ void NoteStepSequencer::IntSliderUpdated(IntSlider* slider, int oldVal)
       else if (oldVal < 0)
          mArpPingPongDirection = -1;
    }
+   if (slider == mLoopResetPointSlider || slider == mLengthSlider)
+      mLoopResetPoint = MIN(mLoopResetPoint, mLength-1);
 }
 
 void NoteStepSequencer::SyncGridToSeq()
@@ -709,7 +730,7 @@ void NoteStepSequencer::LoadLayout(const ofxJSONElement& moduleInfo)
 
    mModuleSaveData.LoadString("controller", moduleInfo, "", FillDropdown<MidiController*>);
    mModuleSaveData.LoadInt("gridwidth", moduleInfo, 210, 210, 2000, true);
-   mModuleSaveData.LoadInt("gridheight", moduleInfo, 80, 80, 2000, true);
+   mModuleSaveData.LoadInt("gridheight", moduleInfo, 120, 80, 2000, true);
    mModuleSaveData.LoadInt("gridrows", moduleInfo, 15, 1, 127);
    mModuleSaveData.LoadInt("gridsteps", moduleInfo, 8, 1, NSS_MAX_STEPS);
 

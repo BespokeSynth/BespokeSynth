@@ -17,7 +17,7 @@
 #define ARP_HOLD -101
 
 Arpeggiator::Arpeggiator()
-: mUseHeldNotes(true)
+: mUseHeldNotes(false)
 , mInterval(kInterval_16n)
 , mArpIndex(-1)
 , mRestartOnPress(true)
@@ -102,7 +102,7 @@ void Arpeggiator::Init()
 {
    IDrawableModule::Init();
    
-   SyncGridToArp();
+   GenerateRandomArpeggio();
 }
 
 void Arpeggiator::DrawModule()
@@ -157,7 +157,28 @@ void Arpeggiator::DrawModule()
 
    mViewGridCheckbox->Draw();
    if (mViewGrid)
+   {
       mGrid->Draw();
+      
+      ofPushStyle();
+      ofFill();
+      for (int i=0;i<mGrid->GetRows();++i)
+      {
+         if (i%TheScale->GetTet() == 0)
+            ofSetColor(0,255,0,80);
+         else if ((i+7)%TheScale->GetTet() == 0)
+            ofSetColor(200,150,0,80);
+         else
+            continue;
+         
+         int gridX,gridY;
+         mGrid->GetPosition(gridX, gridY);
+         float boxHeight = (float(mGrid->GetHeight())/mGrid->GetRows());
+         float y = gridY + mGrid->GetHeight() - i*boxHeight;
+         ofRect(gridX,y-boxHeight,mGrid->GetWidth(),boxHeight);
+      }
+      ofPopStyle();
+   }
 }
 
 void Arpeggiator::OnScaleChanged()

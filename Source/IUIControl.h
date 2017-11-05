@@ -55,6 +55,7 @@ public:
    void SetNoHover(bool noHover) { mNoHover = noHover; }
    virtual bool AttemptTextInput() { return false; }
    void PositionTo(IUIControl* anchor, AnchorDirection direction);
+   void GetColors(ofColor& color, ofColor& textColor);
    
    virtual void SaveState(FileStreamOut& out) = 0;
    virtual void LoadState(FileStreamIn& in, bool shouldSetValue = true) = 0;

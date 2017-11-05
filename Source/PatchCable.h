@@ -20,6 +20,7 @@ struct PatchCablePos
    ofVec2f start;
    ofVec2f end;
    ofVec2f plug;
+   ofVec2f startDirection;
 };
 
 enum ConnectionType
@@ -47,6 +48,7 @@ public:
    IDrawableModule* GetOwningModule() const;
    IClickable* GetTarget() const { return mTarget; }
    ConnectionType GetConnectionType() const;
+   bool IsDragging() const { return mDragging; }
    
    void Grab();
    bool IsValidTarget(IClickable* target) const;

@@ -25,6 +25,7 @@
 #include "ControlSequencer.h"
 #include "Presets.h"
 #include "PatchCableSource.h"
+#include "nanovg.h"
 
 float IDrawableModule::sHueNote = 27;
 float IDrawableModule::sHueAudio = 135;
@@ -212,6 +213,19 @@ void IDrawableModule::Render()
       IGridController* grid = dynamic_cast<IGridController*>(this);
       if (grid && grid->GetNoteHistory().CurrentlyOn())
          highlight = .1f;
+   }
+   
+   const bool kUseDropshadow = true;
+   if (kUseDropshadow)
+   {
+      NVGpaint shadowPaint;
+      shadowPaint = nvgBoxGradient(gNanoVG, 0,2, w,h, gCornerRoundness*2, 10, nvgRGBA(0,0,0,128), nvgRGBA(0,0,0,0));
+      nvgBeginPath(gNanoVG);
+      nvgRect(gNanoVG, -10,-10, w+20,h+30);
+      nvgRoundedRect(gNanoVG, 0,0, w,h, gCornerRoundness);
+      nvgPathWinding(gNanoVG, NVG_HOLE);
+      nvgFillPaint(gNanoVG, shadowPaint);
+      nvgFill(gNanoVG);
    }
 
    ofFill();
@@ -707,7 +721,7 @@ PatchCableOld IDrawableModule::GetPatchCableOld(IClickable* target)
       hThat += mTitleBarHeight;
    }
    
-   int startX,startY,endX,endY;
+   float startX,startY,endX,endY;
    FindClosestSides(xThis,yThis,wThis,hThis,xThat,yThat,wThat,hThat, startX,startY,endX,endY);
    
    float diffX = endX-startX;
@@ -728,7 +742,7 @@ PatchCableOld IDrawableModule::GetPatchCableOld(IClickable* target)
    return cable;
 }
 
-void IDrawableModule::FindClosestSides(int xThis,int yThis,int wThis,int hThis,int xThat,int yThat,int wThat,int hThat, int& startX,int& startY,int& endX,int& endY)
+void IDrawableModule::FindClosestSides(float xThis,float yThis,float wThis,float hThis,float xThat,float yThat,float wThat,float hThat, float& startX,float& startY,float& endX,float& endY)
 {
    ofVec2f vDirs[4];
    vDirs[0].set(-1,0);

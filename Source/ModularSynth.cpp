@@ -899,8 +899,15 @@ void ModularSynth::MouseReleased(int intX, int intY, int button)
    if (mGroupSelectContext != nullptr)
    {
       mGroupSelectContext->GetModulesWithinRect(ofRectangle(ofPoint(mClickStartX,mClickStartY),ofPoint(x,y)), mGroupSelectedModules);
-      for (int i=mGroupSelectedModules.size()-1; i>=0; --i) //do this backwards to preserve existing order
-         MoveToFront(mGroupSelectedModules[i]);
+      if (mGroupSelectedModules.size() > 1)
+      {
+         for (int i=mGroupSelectedModules.size()-1; i>=0; --i) //do this backwards to preserve existing order
+            MoveToFront(mGroupSelectedModules[i]);
+      }
+      else
+      {
+         mGroupSelectedModules.clear();
+      }
       mGroupSelectContext = nullptr;
    }
    
@@ -992,14 +999,10 @@ void ModularSynth::AudioIn(const float** input, int bufferSize, int nChannels)
    assert(bufferSize == mIOBufferSize);
    assert(nChannels <= MAX_INPUT_CHANNELS);
    
-   int inBufferSize;
    for (int i=0; i<nChannels; ++i)
    {
       if (mInput[i])
-      {
          BufferCopy(mInput[i]->GetBuffer()->GetChannel(0), input[i], bufferSize);
-         assert(inBufferSize == gBufferSize);
-      }
    }
 }
 

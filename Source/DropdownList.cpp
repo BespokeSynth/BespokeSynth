@@ -92,18 +92,17 @@ void DropdownList::Render()
    int w,h;
    GetDimensions(w,h);
 
-   ofColor color;
-   if (IsPreset())
-      color.set(0,255,0,gModuleDrawAlpha);
-   else
-      color.set(255,255,255,gModuleDrawAlpha);
+   ofColor color,textColor;
+   IUIControl::GetColors(color, textColor);
 
    ofFill();
-   ofSetColor(color.r,color.g,color.b,color.a*.2f);
+   ofSetColor(0, 0, 0, gModuleDrawAlpha * .5f);
+   ofRect(mX+1,mY+1,mWidth,mHeight);
+   ofSetColor(color);
    ofRect(mX,mY,w,h);
    ofNoFill();
 
-   ofSetColor(color);
+   ofSetColor(textColor);
    
    DrawText(GetDisplayValue(*mVar), mX+2, mY+12);
    ofTriangle(mX+w-11, mY+4, mX+w-3, mY+4, mX+w-7, mY+11);

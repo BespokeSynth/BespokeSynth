@@ -63,7 +63,7 @@ void IUIControl::DrawHover()
       ofPushStyle();
       ofNoFill();
       ofSetColor(0,255,255);
-      ofRect(mX-1,mY-1,w+2,h+2);
+      ofRect(mX-1,mY-1,w+2,h+2,4);
       ofPopStyle();
    }
    
@@ -125,5 +125,28 @@ void IUIControl::PositionTo(IUIControl* anchor, AnchorDirection direction)
    {
       mX = rect.x + rect.width + 3;
       mY = rect.y;
+   }
+}
+
+void IUIControl::GetColors(ofColor& color, ofColor& textColor)
+{
+   IDrawableModule* module = dynamic_cast<IDrawableModule*>(GetParent());
+   if (module)
+      color = IDrawableModule::GetColor(module->GetModuleType());
+   else
+      color = ofColor::white;
+   float h,s,b;
+   color.getHsb(h, s, b);
+   color.setHsb(h, s * .4f, ofLerp(b,0,.6f));
+   if (IsPreset())
+   {
+      float h,s,b;
+      color.getHsb(h, s, b);
+      color.setHsb(85, s, b);
+      textColor.set(0,255,0,gModuleDrawAlpha);
+   }
+   else
+   {
+      textColor.set(255,255,255,gModuleDrawAlpha);
    }
 }

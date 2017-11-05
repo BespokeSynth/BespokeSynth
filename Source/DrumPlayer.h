@@ -138,6 +138,7 @@ private:
          
          mPatchCableSource->SetManualPosition(152, 7 + outputIndex * 12);
          mPatchCableSource->SetOverrideVizBuffer(mVizBuffer);
+         mPatchCableSource->SetManualSide(PatchCableSource::kRight);
          owner->AddPatchCableSource(mPatchCableSource);
       }
       ~IndividualOutput()

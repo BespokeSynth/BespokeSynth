@@ -16,6 +16,7 @@ RingModulator::RingModulator()
 : IAudioProcessor(gBufferSize)
 , mDryWet(1)
 , mVolume(1)
+, mFreqSlider(nullptr)
 , mDryWetSlider(nullptr)
 , mVolumeSlider(nullptr)
 , mPhase(0)
@@ -23,17 +24,21 @@ RingModulator::RingModulator()
 , mGlideTime(0)
 , mGlideSlider(nullptr)
 , mDryBuffer(gBufferSize)
+, mFreq(220)
 {
    mModOsc.Start(gTime, 1);
-   mFreq.Start(gTime, 220, gTime + mGlideTime);
+   mFreqRamp.Start(gTime, 220, gTime + mGlideTime);
 }
 
 void RingModulator::CreateUIControls()
 {
    IDrawableModule::CreateUIControls();
-   mDryWetSlider = new FloatSlider(this,"dry/wet", 5, 4, 120, 15, &mDryWet, 0, 1);
-   mVolumeSlider = new FloatSlider(this,"volume", 5, 20, 120, 15, &mVolume, 0, 2);
-   mGlideSlider = new FloatSlider(this,"glide",5,36,120,15,&mGlideTime,0,1000);
+   mFreqSlider = new FloatSlider(this,"freq", 5, 4, 120, 15, &mFreq, 20, 2000);
+   mDryWetSlider = new FloatSlider(this,"dry/wet", 5, 20, 120, 15, &mDryWet, 0, 1);
+   mVolumeSlider = new FloatSlider(this,"volume", 5, 36, 120, 15, &mVolume, 0, 2);
+   mGlideSlider = new FloatSlider(this,"glide",5,52,120,15,&mGlideTime,0,1000);
+   
+   mFreqSlider->SetMode(FloatSlider::kLogarithmic);
 }
 
 RingModulator::~RingModulator()
@@ -63,7 +68,7 @@ void RingModulator::Process(double time)
          for (int ch=0; ch<GetBuffer()->NumActiveChannels(); ++ch)
             GetBuffer()->GetChannel(ch)[i] *= mModOsc.Audio(time, mPhase);
 
-         float phaseInc = GetPhaseInc(mFreq.Value(time));
+         float phaseInc = GetPhaseInc(mFreqRamp.Value(time));
          mPhase += phaseInc;
          while (mPhase > FTWO_PI) { mPhase -= FTWO_PI; }
 
@@ -93,6 +98,7 @@ void RingModulator::DrawModule()
    if (Minimized() || IsVisible() == false)
       return;
    
+   mFreqSlider->Draw();
    mVolumeSlider->Draw();
    mDryWetSlider->Draw();
    
@@ -104,7 +110,7 @@ void RingModulator::PlayNote(double time, int pitch, int velocity, int voiceIdx 
    if (velocity > 0)
    {
       float freq = TheScale->PitchToFreq(pitch);
-      mFreq.Start(gTime, freq, gTime + mGlideTime);
+      mFreqRamp.Start(gTime, freq, gTime + mGlideTime);
    }
 }
 
@@ -118,6 +124,10 @@ void RingModulator::CheckboxUpdated(Checkbox* checkbox)
 
 void RingModulator::FloatSliderUpdated(FloatSlider* slider, float oldVal)
 {
+   if (slider == mFreqSlider)
+   {
+      mFreqRamp.SetValue(mFreq);
+   }
 }
 
 void RingModulator::LoadLayout(const ofxJSONElement& moduleInfo)

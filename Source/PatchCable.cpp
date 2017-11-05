@@ -41,6 +41,51 @@ void PatchCable::SetTarget(IClickable* target)
    mAudioReceiverTarget = dynamic_cast<IAudioReceiver*>(target);
 }
 
+namespace
+{
+   inline float Cube(float x)
+   {
+      return x*x*x;
+   }
+
+   inline float Square(float x)
+   {
+      return x*x;
+   }
+
+   float Bezier(float t, float p0, float p1, float p2, float p3)
+   {
+      return Cube(1-t)*p0 + 3*Square(1-t)*t*p1 + 3 * (1-t) * Square(t) * p2 + Cube(t) * p3;
+   }
+   
+   ofVec2f Bezier(float t, ofVec2f p0, ofVec2f p1, ofVec2f p2, ofVec2f p3)
+   {
+      return ofVec2f(Bezier(t, p0.x, p1.x, p2.x, p3.x), Bezier(t, p0.y, p1.y, p2.y, p3.y));
+      /*if (t < .333f)
+         return ofVec2f(ofLerp(p0.x,p1.x, t*3), ofLerp(p0.y,p1.y, t*3));
+      else if (t < .666f)
+         return ofVec2f(ofLerp(p1.x,p2.x,(t-.333f)*3), ofLerp(p1.y,p2.y,(t-.333f)*3));
+      else
+         return ofVec2f(ofLerp(p2.x,p3.x, (t-.666f)*3), ofLerp(p2.y,p3.y, (t-.666f)*3));*/
+   }
+   
+   float BezierDerivative(float t, float p0, float p1, float p2, float p3)
+   {
+      return 3*Square(1-t)*(p1-p0)+6*(1-t)*t*(p2-p1)+3*t*t*(p3-p2);
+   }
+   
+   ofVec2f BezierPerpendicular(float t, ofVec2f p0, ofVec2f p1, ofVec2f p2, ofVec2f p3)
+   {
+      ofVec2f perp(-BezierDerivative(t, p0.y, p1.y, p2.y, p3.y), BezierDerivative(t, p0.x, p1.x, p2.x, p3.x));
+      return perp / sqrt(perp.lengthSquared());
+   }
+   
+   ofVec2f ScaleVec(ofVec2f a, ofVec2f b)
+   {
+      return ofVec2f(a.x * b.x, a.y * b.y);
+   }
+}
+   
 void PatchCable::Render()
 {
    PatchCablePos cable = GetPatchCablePos();
@@ -152,6 +197,15 @@ void PatchCable::Render()
    bool isInsideSelf = cable.end.x >= xThis && cable.end.x <= (xThis + wThis) && cable.end.y >= yThis && cable.end.y <= (yThis + hThis);
    if (!isInsideSelf)
    {
+      IAudioSource* audioSource = nullptr;
+      ofVec2f wireLineMag = cable.plug - cable.start;
+      wireLineMag.x = MAX(50,fabsf(wireLineMag.x));
+      wireLineMag.y = MAX(50,fabsf(wireLineMag.y));
+      ofVec2f endDirection = (cable.plug - cable.end) / sqrtf((cable.plug-cable.end).lengthSquared());
+      ofVec2f bezierControl1 = cable.start + ScaleVec(cable.startDirection, wireLineMag * .5f);
+      ofVec2f bezierControl2 = cable.plug + ScaleVec(endDirection, wireLineMag * .5f);
+      float wireLength = sqrtf((cable.plug - cable.start).lengthSquared());
+      
       if (type == kConnectionType_Note || type == kConnectionType_Grid)
       {
          INoteSource* noteSource = dynamic_cast<INoteSource*>(mOwner->GetOwner());
@@ -159,8 +213,15 @@ void PatchCable::Render()
          
          ofSetLineWidth(lineWidth);
          ofSetColor(lineColorAlphaed);
-         ofLine(cable.start.x,cable.start.y,cable.plug.x,cable.plug.y);
-         ofSetColor(lineColor);
+         ofBeginShape();
+         ofVertex(cable.start.x,cable.start.y);
+         for (int i=1; i<wireLength-1; ++i)
+         {
+            ofVec2f pos = Bezier(i/wireLength, cable.start, bezierControl1, bezierControl2, cable.plug);
+            ofVertex(pos.x,pos.y);
+         }
+         ofVertex(cable.plug.x,cable.plug.y);
+         ofEndShape();
          
          NoteHistoryList hist;
          if (noteSource)
@@ -178,30 +239,29 @@ void PatchCable::Render()
          
          if (!hist.empty())
          {
-            int lastX = cable.start.x;
-            int lastY = cable.start.y;
+            ofSetLineWidth(lineWidth * 4);
+            ofSetColor(lineColor);
+            
+            float lastElapsed = 0;
             for (NoteHistoryList::iterator i = hist.begin(); i != hist.end(); ++i)
             {
                NoteHistoryEvent& note = *i;
                float elapsed = (gTime - note.mTime) / NOTE_HISTORY_LENGTH;
-               float diffPlugX = cable.plug.x-cable.start.x;
-               float diffPlugY = cable.plug.y-cable.start.y;
-               int x = cable.start.x + diffPlugX*elapsed;
-               int y = cable.start.y + diffPlugY*elapsed;
                if (elapsed > 1)
-               {
-                  x = cable.plug.x;
-                  y = cable.plug.y;
-               }
+                  elapsed = 1;
                if (note.mOn)
                {
-                  ofSetLineWidth(lineWidth * 4);
-                  ofLine(lastX, lastY, x, y);
+                  ofBeginShape();
+                  for (int j=lastElapsed*wireLength; j<elapsed*wireLength; ++j)
+                  {
+                     ofVec2f pos = Bezier(j/wireLength, cable.start, bezierControl1, bezierControl2, cable.plug);
+                     ofVertex(pos.x,pos.y);
+                  }
+                  ofEndShape();
                }
-               lastX = x;
-               lastY = y;
+               lastElapsed = elapsed;
                
-               if (elapsed > 1)
+               if (elapsed >= 1)
                   break;
             }
          }
@@ -210,86 +270,79 @@ void PatchCable::Render()
          ofSetColor(lineColor);
          ofLine(cable.plug.x,cable.plug.y,cable.end.x,cable.end.y);
       }
-      else if (type == kConnectionType_Audio)
+      else if (type == kConnectionType_Audio &&
+               (audioSource = dynamic_cast<IAudioSource*>(mOwner->GetOwner())) != nullptr)
       {
-         IAudioSource* audioSource = dynamic_cast<IAudioSource*>(mOwner->GetOwner());
-         if (audioSource)
+         ofSetLineWidth(lineWidth);
+         
+         RollingBuffer* vizBuff = mOwner->GetOverrideVizBuffer();
+         if (vizBuff == nullptr)
+            vizBuff = audioSource->GetVizBuffer();
+         assert(vizBuff);
+         int numSamples = vizBuff->Size();
+         float dx = (cable.plug.x - cable.start.x) / wireLength;
+         float dy = (cable.plug.y - cable.start.y) / wireLength;
+         
+         for (int ch=0; ch<vizBuff->NumChannels(); ++ch)
          {
-            ofSetLineWidth(lineWidth);
-            
-            RollingBuffer* vizBuff = mOwner->GetOverrideVizBuffer();
-            if (vizBuff == nullptr)
-               vizBuff = audioSource->GetVizBuffer();
-            assert(vizBuff);
-            int numSamples = vizBuff->Size();
-            float wireLength = sqrtf((cable.plug.x - cable.start.x)*(cable.plug.x - cable.start.x) + (cable.plug.y - cable.start.y)*(cable.plug.y - cable.start.y));
-            float dx = (cable.plug.x - cable.start.x) / wireLength;
-            float dy = (cable.plug.y - cable.start.y) / wireLength;
-            
-            for (int ch=0; ch<vizBuff->NumChannels(); ++ch)
-            {
-               ofSetColor(lineColorAlphaed);
-               if (ch != 0)
-                  ofSetColor(lineColorAlphaed.g, lineColorAlphaed.r, lineColorAlphaed.b, lineColorAlphaed.a);
-               ofVec2f offset((ch - (vizBuff->NumChannels()-1)*.5f) * 2 * dy, (ch - (vizBuff->NumChannels()-1) * .5f) * 2 * -dx);
-               ofBeginShape();
-               ofVertex(cable.start.x + offset.x,cable.start.y + offset.y);
-               for (int i=1; i<wireLength-1; ++i)
-               {
-                  float x = cable.start.x + i*dx;
-                  float y = cable.start.y + i*dy;
-                  float sample = vizBuff->GetSample((i/wireLength * numSamples), ch);
-                  sample = sqrtf(fabsf(sample)) * (sample < 0 ? -1 : 1);
-                  sample = ofClamp(sample, -1.0f, 1.0f);
-                  x += 20 * sample * -dy;
-                  y += 20 * sample * dx;
-                  ofVertex(x + offset.x,y + offset.y);
-               }
-               ofVertex(cable.plug.x + offset.x,cable.plug.y + offset.y);
-               ofEndShape();
-            }
-            
-            ofSetLineWidth(plugWidth);
-            ofSetColor(lineColor);
-            ofLine(cable.plug.x,cable.plug.y,cable.end.x,cable.end.y);
-            
-            bool warn = false;
-            
-            if (vizBuff->NumChannels() > 1 && mAudioReceiverTarget && mAudioReceiverTarget->GetInputMode() == IAudioReceiver::kInputMode_Mono)
-               warn = true; //warn that the multichannel audio is being crunched to mono
-            
-            if (vizBuff->NumChannels() == 1 && mAudioReceiverTarget && mAudioReceiverTarget->GetBuffer()->RecentNumActiveChannels() > 1)
-               warn = true; //warn that the target expects multichannel audio but we're not filling all of the channels
-            
-            if (warn)
-            {
-               ofFill();
-               ofSetColor(255, 255, 0);
-               ofCircle(cable.plug.x, cable.plug.y, 6);
-               ofSetColor(0, 0, 0);
-               DrawTextBold("!", cable.plug.x-2, cable.plug.y+5,17);
-            }
-         }
-         else
-         {
-            ofSetLineWidth(plugWidth);
-            ofSetColor(lineColor);
-            ofLine(cable.plug.x,cable.plug.y,cable.end.x,cable.end.y);
-            
-            ofSetLineWidth(lineWidth);
             ofSetColor(lineColorAlphaed);
-            ofLine(cable.start.x,cable.start.y,cable.plug.x,cable.plug.y);
+            if (ch != 0)
+               ofSetColor(lineColorAlphaed.g, lineColorAlphaed.r, lineColorAlphaed.b, lineColorAlphaed.a);
+            ofVec2f offset((ch - (vizBuff->NumChannels()-1)*.5f) * 2 * dy, (ch - (vizBuff->NumChannels()-1) * .5f) * 2 * -dx);
+            ofBeginShape();
+            ofVertex(cable.start.x + offset.x,cable.start.y + offset.y);
+            for (int i=1; i<wireLength-1; ++i)
+            {
+               ofVec2f pos = Bezier(i/wireLength, cable.start, bezierControl1, bezierControl2, cable.plug);
+               float sample = vizBuff->GetSample((i/wireLength * numSamples), ch);
+               sample = sqrtf(fabsf(sample)) * (sample < 0 ? -1 : 1);
+               sample = ofClamp(sample, -1.0f, 1.0f);
+               ofVec2f sampleOffsetDir = BezierPerpendicular(i/wireLength, cable.start, bezierControl1, bezierControl2, cable.plug);
+               pos += sampleOffsetDir * 15 * sample;
+               ofVertex(pos.x + offset.x,pos.y + offset.y);
+            }
+            ofVertex(cable.plug.x + offset.x,cable.plug.y + offset.y);
+            ofEndShape();
          }
-      }
-      else
-      {
+         
          ofSetLineWidth(plugWidth);
          ofSetColor(lineColor);
          ofLine(cable.plug.x,cable.plug.y,cable.end.x,cable.end.y);
          
+         bool warn = false;
+         
+         if (vizBuff->NumChannels() > 1 && mAudioReceiverTarget && mAudioReceiverTarget->GetInputMode() == IAudioReceiver::kInputMode_Mono)
+            warn = true; //warn that the multichannel audio is being crunched to mono
+         
+         if (vizBuff->NumChannels() == 1 && mAudioReceiverTarget && mAudioReceiverTarget->GetBuffer()->RecentNumActiveChannels() > 1)
+            warn = true; //warn that the target expects multichannel audio but we're not filling all of the channels
+         
+         if (warn)
+         {
+            ofFill();
+            ofSetColor(255, 255, 0);
+            ofCircle(cable.plug.x, cable.plug.y, 6);
+            ofSetColor(0, 0, 0);
+            DrawTextBold("!", cable.plug.x-2, cable.plug.y+5,17);
+         }
+      }
+      else
+      {
          ofSetLineWidth(lineWidth);
          ofSetColor(lineColorAlphaed);
-         ofLine(cable.start.x,cable.start.y,cable.plug.x,cable.plug.y);
+         ofBeginShape();
+         ofVertex(cable.start.x,cable.start.y);
+         for (int i=1; i<wireLength-1; ++i)
+         {
+            ofVec2f pos = Bezier(i/wireLength, cable.start, bezierControl1, bezierControl2, cable.plug);
+            ofVertex(pos.x,pos.y);
+         }
+         ofVertex(cable.plug.x,cable.plug.y);
+         ofEndShape();
+         
+         ofSetLineWidth(plugWidth);
+         ofSetColor(lineColor);
+         ofLine(cable.plug.x,cable.plug.y,cable.end.x,cable.end.y);
       }
    }
    
@@ -409,25 +462,56 @@ PatchCablePos PatchCable::GetPatchCablePos()
    if (targetModule && targetModule->HasTitleBar() && !mDragging)
       yThatAdjust = IDrawableModule::TitleBarHeight();
    
-   int startX,startY,endX,endY;
-   IDrawableModule::FindClosestSides(xThis,yThis-yThisAdjust,wThis,hThis+yThisAdjust,xThat,yThat-yThatAdjust,wThat,hThat+yThatAdjust, startX,startY,endX,endY);
+   float blah,endX,endY;
+   IDrawableModule::FindClosestSides(xThis,yThis-yThisAdjust,wThis,hThis+yThisAdjust,xThat,yThat-yThatAdjust,wThat,hThat+yThatAdjust, blah,blah,endX,endY);
    
    //use patchcablesource as start position
-   startX = mOwner->GetPosition().x;
-   startY = mOwner->GetPosition().y;
+   float startX = mOwner->GetPosition().x;
+   float startY = mOwner->GetPosition().y;
+   ofVec2f startDirection;
+   switch (mOwner->GetCableSide())
+   {
+      case PatchCableSource::kBottom:
+         startDirection = ofVec2f(0,1);
+         break;
+      case PatchCableSource::kRight:
+         startDirection = ofVec2f(1,0);
+         break;
+      case PatchCableSource::kLeft:
+         startDirection = ofVec2f(-1,0);
+         break;
+      default:
+         startDirection = ofVec2f(0,0);
+         break;
+   }
    
    float diffX = endX-startX;
    float diffY = endY-startY;
    float length = sqrtf(diffX*diffX + diffY*diffY);
    float endCap = MIN(.5f,20/length);
-   if (GetConnectionType() == kConnectionType_UIControl)
-      endCap = MIN(.5f,8/length);
-   int plugX = int((startX-endX)*endCap)+endX;
-   int plugY = int((startY-endY)*endCap)+endY;
+   float plugX,plugY;
+   if (wThat == 0)
+      plugX = (startX-endX) * endCap + endX;
+   else if (endX == xThat)
+      plugX = endX - 10;
+   else if (endX == xThat + wThat)
+      plugX = endX + 10;
+   else
+      plugX = endX;
+   
+   if (hThat+yThatAdjust == 0)
+      plugY = (startY-endY) * endCap + endY;
+   else if (endY == yThat-yThatAdjust)
+      plugY = endY - 10;
+   else if (endY == yThat+hThat)
+      plugY = endY + 10;
+   else
+      plugY = endY;
    
    PatchCablePos cable;
    cable.start.x = startX;
    cable.start.y = startY;
+   cable.startDirection = startDirection;
    cable.end.x = endX;
    cable.end.y = endY;
    cable.plug.x = plugX;

@@ -418,6 +418,7 @@ void FloatSliderLFOControl::LoadLayout(const ofxJSONElement& moduleInfo)
    mModuleSaveData.LoadFloat("soften", moduleInfo, 0, mSoftenSlider);
    mModuleSaveData.LoadFloat("shuffle", moduleInfo, 0, mShuffleSlider);
    mModuleSaveData.LoadFloat("free_rate", moduleInfo, 0, mFreeRateSlider);
+   mModuleSaveData.LoadEnum<LFOControlType>("type", moduleInfo, kLFOControlType_LFO, mTypeSelector);
    
    SetUpFromSaveData();
 }
@@ -439,8 +440,10 @@ void FloatSliderLFOControl::SetUpFromSaveData()
    mLFOSettings.mSoften = mModuleSaveData.GetFloat("soften");
    mLFOSettings.mShuffle = mModuleSaveData.GetFloat("shuffle");
    mLFOSettings.mFreeRate = mModuleSaveData.GetFloat("free_rate");
+   mType = mModuleSaveData.GetEnum<LFOControlType>("type");
    
    UpdateFromSettings();
+   UpdateVisibleControls();
    
    mEnabled = mModuleSaveData.GetBool("enabled");
    

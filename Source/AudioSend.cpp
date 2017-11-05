@@ -34,11 +34,13 @@ void AudioSend::CreateUIControls()
    
    int w,h;
    GetDimensions(w, h);
-   GetPatchCableSource()->SetManualPosition(w/2-10,h+3);
+   GetPatchCableSource()->SetManualPosition(w/2-15,h+3);
+   GetPatchCableSource()->SetManualSide(PatchCableSource::kBottom);
    
    mPatchCableSource2 = new PatchCableSource(this, kConnectionType_Audio);
-   mPatchCableSource2->SetManualPosition(w/2+10,h+3);
+   mPatchCableSource2->SetManualPosition(w/2+15,h+3);
    mPatchCableSource2->SetOverrideVizBuffer(&mVizBuffer2);
+   mPatchCableSource2->SetManualSide(PatchCableSource::kBottom);
    AddPatchCableSource(mPatchCableSource2);
 }
 

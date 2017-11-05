@@ -41,6 +41,8 @@ SamplePlayer::SamplePlayer()
 , mOscWheelGrabbed(false)
 , mOscWheelSpeed(0)
 , mPlaySpeed(1)
+, mWidth(210)
+, mHeight(125)
 {
 }
 
@@ -249,7 +251,7 @@ void SamplePlayer::OnClicked(int x, int y, bool right)
    if (right)
       return;
    
-   if (y > 60 && mSample != nullptr)
+   if (y > 60 && y < mHeight - 20 && mSample != nullptr)
    {
       mSample->SetPlayPosition(int(GetPlayPositionForMouse(x)));
       mScrubbingSample = true;
@@ -273,7 +275,7 @@ void SamplePlayer::MouseReleased()
 float SamplePlayer::GetPlayPositionForMouse(float mouseX) const
 {
    if (mSample != nullptr)
-      return ofMap(mouseX, 5, 205 ,0, mSample->LengthInSamples(), true);
+      return ofMap(mouseX, 5, mWidth-10 ,0, mSample->LengthInSamples(), true);
    return 0;
 }
 
@@ -290,14 +292,22 @@ void SamplePlayer::DrawModule()
    mPauseButton->Draw();
    mStopButton->Draw();
    mDownloadYoutubeButton->Draw();
-   
+
+   ofPushMatrix();
+   ofTranslate(5,60);
    if (mSample)
    {
-      ofPushMatrix();
-      ofTranslate(5,60);
-      DrawAudioBuffer(200, 60, &mDrawBuffer, 0, mDrawBuffer.BufferSize(), mSample->GetPlayPosition());
-      ofPopMatrix();
+      DrawAudioBuffer(mWidth-10, mHeight - 65, &mDrawBuffer, 0, mDrawBuffer.BufferSize(), mSample->GetPlayPosition());
    }
+   else
+   {
+      ofPushStyle();
+      ofFill();
+      ofSetColor(255,255,255,50);
+      ofRect(0, 0, mWidth-10, mHeight - 65);
+      ofPopStyle();
+   }
+   ofPopMatrix();
 }
 
 void SamplePlayer::oscMessageReceived(const OSCMessage& msg)
@@ -353,8 +363,8 @@ void SamplePlayer::CheckboxUpdated(Checkbox* checkbox)
 
 void SamplePlayer::GetModuleDimensions(int& x, int&y)
 {
-   x = 210;
-   y = 125;
+   x = mWidth;
+   y = mHeight;
 }
 
 void SamplePlayer::FloatSliderUpdated(FloatSlider* slider, float oldVal)
@@ -369,6 +379,8 @@ void SamplePlayer::LoadLayout(const ofxJSONElement& moduleInfo)
 {
    mModuleSaveData.LoadString("target", moduleInfo);
    mModuleSaveData.LoadString("samplebank", moduleInfo,"",FillDropdown<SampleBank*>);
+   mModuleSaveData.LoadFloat("width", moduleInfo, 210);
+   mModuleSaveData.LoadFloat("height", moduleInfo, 125);
    
    SetUpFromSaveData();
 }
@@ -377,10 +389,13 @@ void SamplePlayer::SaveLayout(ofxJSONElement& moduleInfo)
 {
    IDrawableModule::SaveLayout(moduleInfo);
    moduleInfo["samplebank"] = mBank ? mBank->Name() : "";
+   moduleInfo["width"] = mWidth;
+   moduleInfo["height"] = mHeight;
 }
 
 void SamplePlayer::SetUpFromSaveData()
 {
    SetTarget(TheSynth->FindModule(mModuleSaveData.GetString("target")));
    mSampleBankCable->SetTarget(TheSynth->FindModule(mModuleSaveData.GetString("samplebank"),false));
+   Resize(mModuleSaveData.GetFloat("width"), mModuleSaveData.GetFloat("height"));
 }

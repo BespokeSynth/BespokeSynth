@@ -3,13 +3,13 @@
       {
          "channel" : 1,
          "name" : "output 1",
-         "position" : [ 18.0, 763.0 ],
+         "position" : [ 40.0, 763.0 ],
          "type" : "output"
       },
       {
          "channel" : 2,
          "name" : "output 2",
-         "position" : [ 121.0, 762.0 ],
+         "position" : [ 109.0, 762.0 ],
          "type" : "output"
       },
       {
@@ -19,7 +19,7 @@
       },
       {
          "name" : "splitter",
-         "position" : [ 58.0, 726.0 ],
+         "position" : [ 64.0, 700.0 ],
          "target" : "output 1",
          "target2" : "output 2",
          "type" : "splitter"

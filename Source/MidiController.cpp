@@ -809,14 +809,6 @@ void MidiController::SendData(int page, unsigned char a, unsigned char b, unsign
    }
 }
 
-void MidiController::BuildControllerList()
-{
-   mControllerList->Clear();
-   const StringArray input = MidiInput::getDevices();
-   for (int i=0; i<input.size(); ++i)
-      mControllerList->AddLabel(input[i].toRawUTF8(), i);
-}
-
 UIControlConnection* MidiController::GetConnectionForControl(MidiMessageType messageType, int control)
 {
    for (auto i=mConnections.begin(); i != mConnections.end(); ++i)
@@ -945,16 +937,32 @@ namespace {
    {
       assert(list);
       const StringArray input = MidiInput::getDevices();
-      for (int i=0; i<input.size(); ++i)
+      int i;
+      for (i=0; i<input.size(); ++i)
          list->AddLabel(input[i].toRawUTF8(), i);
+      list->AddLabel("monome", i);
+      ++i;
+      list->AddLabel("osccontroller", i);
+      ++i;
    }
    void FillMidiOutput(DropdownList* list)
    {
       assert(list);
       const StringArray input = MidiOutput::getDevices();
-      for (int i=0; i<input.size(); ++i)
+      int i;
+      for (i=0; i<input.size(); ++i)
          list->AddLabel(input[i].toRawUTF8(), i);
+      list->AddLabel("monome", i);
+      ++i;
+      list->AddLabel("osccontroller", i);
+      ++i;
    }
+}
+
+void MidiController::BuildControllerList()
+{
+   mControllerList->Clear();
+   FillMidiInput(mControllerList);
 }
 
 void MidiController::LoadLayout(const ofxJSONElement& moduleInfo)

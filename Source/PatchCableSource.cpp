@@ -28,6 +28,8 @@ PatchCableSource::PatchCableSource(IDrawableModule* owner, ConnectionType type)
 , mDefaultPatchBehavior(kDefaultPatchBehavior_Repatch)
 , mPatchCableDrawMode(kPatchCableDrawMode_Normal)
 , mEnabled(true)
+, mSide(kNone)
+, mManualSide(kNone)
 {
    mAllowMultipleTargets = (mType == kConnectionType_Note);
    
@@ -119,39 +121,48 @@ void PatchCableSource::UpdatePosition()
       mOwner->GetPosition(x, y);
       mOwner->GetDimensions(w, h);
       
-      enum Side
+      if (mManualSide == kNone)
       {
-         kBottom,
-         kLeft,
-         kRight
-      };
-      Side mSide = kBottom;
-      
-      ofVec2f centerOfMass;
-      int count = 0;
-      for (auto cable : mPatchCables)
-      {
-         if (cable->GetTarget())
+         ofVec2f centerOfMass;
+         int count = 0;
+         for (auto cable : mPatchCables)
          {
-            int targetX,targetY,targetW,targetH;
-            cable->GetTarget()->GetPosition(targetX, targetY);
-            cable->GetTarget()->GetDimensions(targetW, targetH);
-            centerOfMass.x += targetX + targetW / 2;
-            centerOfMass.y += targetY + targetH / 2;
-            ++count;
+            if (cable->IsDragging())
+            {
+               centerOfMass.x += TheSynth->GetMouseX();
+               centerOfMass.y += TheSynth->GetMouseY();
+               ++count;
+            }
+            else if (cable->GetTarget())
+            {
+               int targetX,targetY,targetW,targetH;
+               cable->GetTarget()->GetPosition(targetX, targetY);
+               cable->GetTarget()->GetDimensions(targetW, targetH);
+               centerOfMass.x += targetX + targetW / 2;
+               centerOfMass.y += targetY + targetH / 2;
+               ++count;
+            }
+         }
+         centerOfMass.x /= count;
+         centerOfMass.y /= count;
+         
+         if (count > 0)
+         {
+            if (centerOfMass.y > y+h)
+               mSide = kBottom;
+            else if (centerOfMass.x < x+w/2)
+               mSide = kLeft;
+            else
+               mSide = kRight;
+         }
+         else
+         {
+            mSide = kBottom;
          }
       }
-      centerOfMass.x /= count;
-      centerOfMass.y /= count;
-      
-      if (count > 0)
+      else
       {
-         if (centerOfMass.y > y+h || (centerOfMass.x > x && centerOfMass.x < x+w))
-            mSide = kBottom;
-         else if (centerOfMass.x < x+w/2)
-            mSide = kLeft;
-         else
-            mSide = kRight;
+         mSide = mManualSide;
       }
       
       if (mSide == kBottom)
@@ -176,6 +187,7 @@ void PatchCableSource::UpdatePosition()
       mOwner->GetPosition(x, y);
       mX = mManualPositionX + x;
       mY = mManualPositionY + y;
+      mSide = mManualSide;
    }
 }
 

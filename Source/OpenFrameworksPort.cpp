@@ -142,8 +142,6 @@ void ofCircle(float x, float y, float radius)
 void ofRect(float x, float y, float width, float height, float cornerRadius /*=3*/)
 {
    nvgBeginPath(gNanoVG);
-   if (sStyleStack.GetStyle().fill == false) //roundness for filled vs unfilled seems to be off
-      cornerRadius += 1;
    nvgRoundedRect(gNanoVG, x, y, width, height, cornerRadius * gCornerRoundness);
    if (sStyleStack.GetStyle().fill)
       nvgFill(gNanoVG);

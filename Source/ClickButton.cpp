@@ -37,25 +37,24 @@ void ClickButton::Render()
 
    int w,h;
    GetDimensions(w,h);
-   
-   DrawBeacon(mX+w/2, mY+h/2);
-   DrawHover();
 
-   ofColor color;
-   if (ButtonLit())
-      color.set(255,255,0,gModuleDrawAlpha);
-   else
-      color.set(255,255,255,gModuleDrawAlpha);
+   ofColor color,textColor;
+   IUIControl::GetColors(color, textColor);
 
    ofFill();
-   ofSetColor(color.r,color.g,color.b,color.a*.2f);
+   ofSetColor(0, 0, 0, gModuleDrawAlpha * .5f);
+   ofRect(mX+1,mY+1,w,h);
+   DrawBeacon(mX+w/2, mY+h/2);
+   ofSetColor(color);
    ofRect(mX,mY,w,h);
    ofNoFill();
 
-   ofSetColor(color);
+   ofSetColor(textColor);
    DrawText(Name(), mX+2, mY+12);
-
+   
    ofPopStyle();
+   
+   DrawHover();
 }
 
 bool ClickButton::ButtonLit()

@@ -92,6 +92,7 @@ public:
    void RemovePatchCableSource(PatchCableSource* source);
    bool TestClick(int x, int y, bool right, bool testOnly = false) override;
    string GetTypeName() const { return mTypeName; }
+   ModuleType GetModuleType() const { return mType; }
    virtual bool IsSingleton() const { return false; }
    void ComputeSliders(int samplesIn);
    void SetOwningContainer(ModuleContainer* container) { mOwningContainer = container; }
@@ -118,7 +119,7 @@ public:
    PatchCableSource* GetPatchCableSource(int index=0) override { if (index == 0) return mMainPatchCableSource; else return mPatchCableSources[index]; }
    vector<PatchCableSource*> GetPatchCableSources() { return mPatchCableSources; }
    
-   static void FindClosestSides(int xThis,int yThis,int wThis,int hThis,int xThat,int yThat,int wThat,int hThat, int& startX,int& startY,int& endX,int& endY);
+   static void FindClosestSides(float xThis,float yThis,float wThis,float hThis,float xThat,float yThat,float wThat,float hThat, float& startX,float& startY,float& endX,float& endY);
    
    static float sHueNote;
    static float sHueAudio;

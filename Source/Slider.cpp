@@ -78,17 +78,15 @@ void FloatSlider::Render()
    ofPushStyle();
 
    ofColor color;
-   if (IsPreset())
-      color.set(0,255,0,gModuleDrawAlpha);
-   else
-      color.set(255,255,255,gModuleDrawAlpha);
+   ofColor textColor;
+   IUIControl::GetColors(color, textColor);
 
    ofFill();
-   ofSetColor(color.r,color.g,color.b,color.a*.2f);
+   ofSetColor(0, 0, 0, gModuleDrawAlpha * .5f);
+   ofRect(mX+1,mY+1,mWidth,mHeight);
+   ofSetColor(color);
    ofRect(mX,mY,mWidth,mHeight);
    ofNoFill();
-
-   ofSetColor(color);
    
    float screenPos;
    if (mLFOControl && mLFOControl->Active())
@@ -145,6 +143,7 @@ void FloatSlider::Render()
    {
       display += GetDisplayValue(*mVar);
    }
+   ofSetColor(textColor);
    DrawText(display, mX+2, mY+5+mHeight/2);
 
    ofPopStyle();
@@ -489,7 +488,7 @@ void FloatSlider::TextEntryComplete(TextEntry* entry)
 
 namespace
 {
-   const int kFloatSliderSaveStateRev = 0;
+   const int kFloatSliderSaveStateRev = 1;
 }
 
 void FloatSlider::SaveState(FileStreamOut& out)
@@ -502,7 +501,7 @@ void FloatSlider::SaveState(FileStreamOut& out)
    out << hasLFO;
    if (hasLFO)
    {
-      mLFOControl->GetSettings().SaveState(out);
+      mLFOControl->SaveState(out);
    }
 }
 
@@ -510,7 +509,6 @@ void FloatSlider::LoadState(FileStreamIn& in, bool shouldSetValue)
 {
    int rev;
    in >> rev;
-   LoadStateValidate(rev == kFloatSliderSaveStateRev);
    
    float var;
    in >> var;
@@ -524,7 +522,15 @@ void FloatSlider::LoadState(FileStreamIn& in, bool shouldSetValue)
       FloatSliderLFOControl* lfo = AcquireLFO();
       if (shouldSetValue)
          lfo->SetLFOEnabled(true);
-      mLFOControl->GetLFOSettings()->LoadState(in);
+      
+      if (rev == 0)
+      {
+         mLFOControl->GetLFOSettings()->LoadState(in);
+      }
+      else if (rev > 0)
+      {
+         mLFOControl->LoadState(in);
+      }
       if (shouldSetValue)
          lfo->UpdateFromSettings();
    }
@@ -578,18 +584,16 @@ void IntSlider::Render()
    
    ofPushStyle();
 
-   ofColor color;
-   if (IsPreset())
-      color.set(0,255,0,gModuleDrawAlpha);
-   else
-      color.set(255,255,255,gModuleDrawAlpha);
+   ofColor color,textColor;
+   IUIControl::GetColors(color, textColor);
 
    ofFill();
-   ofSetColor(color.r,color.g,color.b,color.a*.2f);
+   ofSetColor(0, 0, 0, gModuleDrawAlpha * .5f);
+   ofRect(mX+1,mY+1,mWidth,mHeight);
+   ofSetColor(color);
    ofRect(mX,mY,mWidth,mHeight);
    ofNoFill();
 
-   ofSetColor(color);
    if (mWidth / MAX(1, (mMax - mMin)) > 3)   //hash marks
    {
       ofPushStyle();
@@ -631,6 +635,7 @@ void IntSlider::Render()
    {
       display += GetDisplayValue(*mVar);
    }
+   ofSetColor(textColor);
    DrawText(display, mX+4, mY+5+mHeight/2);
 
    ofPopStyle();

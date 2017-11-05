@@ -32,6 +32,14 @@ enum PatchCableDrawMode
 class PatchCableSource : public IClickable
 {
 public:
+   enum Side
+   {
+      kNone,
+      kBottom,
+      kLeft,
+      kRight
+   };
+   
    PatchCableSource(IDrawableModule* owner, ConnectionType type);
    virtual ~PatchCableSource();
    PatchCable* AddPatchCable(IClickable* target);
@@ -61,6 +69,8 @@ public:
    bool Enabled() const;
    void AddTypeFilter(string type) { mTypeFilter.push_back(type); }
    void ClearTypeFilter() { mTypeFilter.clear(); }
+   Side GetCableSide() const { return mSide; }
+   void SetManualSide(Side side) { mManualSide = side; }
    
    void Render() override;
    bool TestClick(int x, int y, bool right, bool testOnly = false) override;
@@ -91,6 +101,8 @@ private:
    int mManualPositionY;
    ofColor mColor;
    bool mEnabled;
+   Side mSide;
+   Side mManualSide;
    
    vector<INoteReceiver*> mNoteReceivers;
    IAudioReceiver* mAudioReceiver;

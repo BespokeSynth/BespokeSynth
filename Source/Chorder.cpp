@@ -26,7 +26,6 @@ void Chorder::CreateUIControls()
    mChordGrid = new Grid(2,2,130,50,7,3);
    mChordGrid->SetVal(0, 1, 1);
    mChordGrid->SetListener(this);
-   mChordGrid->SetGridMode(Grid::kMultislider);
 }
 
 void Chorder::DrawModule()
@@ -213,7 +212,7 @@ void Chorder::CheckLeftovers()
 void Chorder::LoadLayout(const ofxJSONElement& moduleInfo)
 {
    mModuleSaveData.LoadString("target", moduleInfo);
-   mModuleSaveData.LoadBool("multislider_mode", moduleInfo, false);
+   mModuleSaveData.LoadBool("multislider_mode", moduleInfo, true);
 
    SetUpFromSaveData();
 }
@@ -225,7 +224,7 @@ void Chorder::SetUpFromSaveData()
    bool multisliderMode = mModuleSaveData.GetBool("multislider_mode");
    mChordGrid->SetGridMode(multisliderMode ? Grid::kMultislider : Grid::kNormal);
    mChordGrid->SetRestrictDragToRow(multisliderMode);
-   mChordGrid->SetClickClearsToZero(!multisliderMode);
+   mChordGrid->SetClickClearsToZero(true);//!multisliderMode);
 }
 
 namespace

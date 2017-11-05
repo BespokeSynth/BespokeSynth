@@ -103,6 +103,8 @@ private:
    {
       kTimeMode_Synced,
       kTimeMode_Downbeat,
+      kTimeMode_Downbeat2,
+      kTimeMode_Downbeat4,
       kTimeMode_Step,
       kTimeMode_Free
    };
@@ -137,6 +139,8 @@ private:
    bool mWaitingForDownbeat;
    float mOffset;
    FloatSlider* mOffsetSlider;
+   IntSlider* mLoopResetPointSlider;
+   int mLoopResetPoint;
    
    int mLength;
    IntSlider* mLengthSlider;
