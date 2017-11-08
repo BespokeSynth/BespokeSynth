@@ -21,6 +21,7 @@
 #include "ADSRDisplay.h"
 #include "Checkbox.h"
 #include "RadioButton.h"
+#include "Oscillator.h"
 
 class ofxJSONElement;
 
@@ -85,6 +86,8 @@ private:
    int mADSRMode;
 
    float* mWriteBuffer;
+   
+   Oscillator mDrawOsc;
 };
 
 
