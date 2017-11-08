@@ -84,6 +84,11 @@ namespace
    {
       return ofVec2f(a.x * b.x, a.y * b.y);
    }
+   
+   ofVec2f Normal(ofVec2f v)
+   {
+      return v / sqrtf(v.lengthSquared());
+   }
 }
    
 void PatchCable::Render()
@@ -93,7 +98,7 @@ void PatchCable::Render()
    mY = cable.start.y;
    
    float lineWidth = 1;
-   float plugWidth = 3;
+   float plugWidth = 4;
    int lineAlpha = 100;
    
    bool fatCable = false;
@@ -201,7 +206,7 @@ void PatchCable::Render()
       ofVec2f wireLineMag = cable.plug - cable.start;
       wireLineMag.x = MAX(50,fabsf(wireLineMag.x));
       wireLineMag.y = MAX(50,fabsf(wireLineMag.y));
-      ofVec2f endDirection = (cable.plug - cable.end) / sqrtf((cable.plug-cable.end).lengthSquared());
+      ofVec2f endDirection = Normal(cable.plug - cable.end);
       ofVec2f bezierControl1 = cable.start + ScaleVec(cable.startDirection, wireLineMag * .5f);
       ofVec2f bezierControl2 = cable.plug + ScaleVec(endDirection, wireLineMag * .5f);
       float wireLength = sqrtf((cable.plug - cable.start).lengthSquared());
@@ -419,9 +424,9 @@ void PatchCable::OnClicked(int x, int y, bool right)
 
 PatchCablePos PatchCable::GetPatchCablePos()
 {
-   int wThis,hThis,xThis,yThis,wThat,hThat,xThat,yThat;
-   mOwner->GetDimensions(wThis,hThis);
-   mOwner->GetPosition(xThis,yThis);
+   ofVec2f start = mOwner->GetPosition();
+   
+   int wThat,hThat,xThat,yThat;
    if (mDragging)
    {
       int mouseX = TheSynth->GetMouseX();
@@ -448,26 +453,15 @@ PatchCablePos PatchCable::GetPatchCablePos()
    {
       wThat = 0;
       hThat = 0;
-      xThat = xThis + wThis/2;
-      yThat = yThis + hThis + 20;
-      //xThat += index * 10;
+      xThat = start.x;
+      yThat = start.y;
    }
    
-   int yThisAdjust = 0;
-   IDrawableModule* parentModule = dynamic_cast<IDrawableModule*>(mOwner);
-   if (parentModule && parentModule->HasTitleBar())
-      yThisAdjust = IDrawableModule::TitleBarHeight();
    int yThatAdjust = 0;
    IDrawableModule* targetModule = dynamic_cast<IDrawableModule*>(mTarget);
    if (targetModule && targetModule->HasTitleBar() && !mDragging)
       yThatAdjust = IDrawableModule::TitleBarHeight();
    
-   float blah,endX,endY;
-   IDrawableModule::FindClosestSides(xThis,yThis-yThisAdjust,wThis,hThis+yThisAdjust,xThat,yThat-yThatAdjust,wThat,hThat+yThatAdjust, blah,blah,endX,endY);
-   
-   //use patchcablesource as start position
-   float startX = mOwner->GetPosition().x;
-   float startY = mOwner->GetPosition().y;
    ofVec2f startDirection;
    switch (mOwner->GetCableSide())
    {
@@ -485,39 +479,54 @@ PatchCablePos PatchCable::GetPatchCablePos()
          break;
    }
    
-   float diffX = endX-startX;
-   float diffY = endY-startY;
-   float length = sqrtf(diffX*diffX + diffY*diffY);
-   float endCap = MIN(.5f,20/length);
-   float plugX,plugY;
-   if (wThat == 0)
-      plugX = (startX-endX) * endCap + endX;
-   else if (endX == xThat)
-      plugX = endX - 10;
-   else if (endX == xThat + wThat)
-      plugX = endX + 10;
-   else
-      plugX = endX;
+   ofVec2f endDirection;
+   ofVec2f end = FindClosestSide(xThat,yThat-yThatAdjust,wThat,hThat+yThatAdjust, start, startDirection, endDirection);
    
-   if (hThat+yThatAdjust == 0)
-      plugY = (startY-endY) * endCap + endY;
-   else if (endY == yThat-yThatAdjust)
-      plugY = endY - 10;
-   else if (endY == yThat+hThat)
-      plugY = endY + 10;
-   else
-      plugY = endY;
+   ofVec2f plug = end + endDirection * 12;
    
    PatchCablePos cable;
-   cable.start.x = startX;
-   cable.start.y = startY;
+   cable.start = start;
    cable.startDirection = startDirection;
-   cable.end.x = endX;
-   cable.end.y = endY;
-   cable.plug.x = plugX;
-   cable.plug.y = plugY;
+   cable.end = end;
+   cable.plug = plug;
    
    return cable;
+}
+
+ofVec2f PatchCable::FindClosestSide(int x, int y, int w, int h, ofVec2f start, ofVec2f startDirection, ofVec2f& endDirection)
+{
+   ofVec2f dirs[4];
+   dirs[0].set(-1,0);
+   dirs[1].set(1,0);
+   dirs[2].set(0,-1);
+   dirs[3].set(0,1);
+   
+   ofVec2f sides[4];
+   sides[0].set(x,y+h/2);  //left
+   sides[1].set(x+w,y+h/2);  //right
+   sides[2].set(x+w/2,y);  //top
+   sides[3].set(x+w/2,y+h);  //bottom
+   
+   float best = -FLT_MAX;
+   int bestIndex = 0;
+   for (int i=0; i<4; ++i)
+   {
+      if (i == 3) //skip bottom
+         continue;
+      
+      float score = Normal(start - sides[i]).dot(dirs[i]);
+      if (score > best)
+      {
+         best = score;
+         bestIndex = i;
+      }
+   }
+   
+   if (w == 0 && h == 0)
+      endDirection = Normal(start - ofVec2f(x,y));
+   else
+      endDirection = dirs[bestIndex];
+   return sides[bestIndex];
 }
 
 void PatchCable::Grab()

@@ -51,31 +51,21 @@ void VolcaBeatsControl::CreateUIControls()
    IDrawableModule::CreateUIControls();
    
    mClapSpeedSlider = new FloatSlider(this,"clap speed",5,5,140,15,&mClapSpeed,0,1);
-   mClaveSpeedSlider = new FloatSlider(this,"clave speed",-1,-1,140,15,&mClaveSpeed,0,1);
-   mAgogoSpeedSlider = new FloatSlider(this,"agogo speed",-1,-1,140,15,&mAgogoSpeed,0,1);
-   mCrashSpeedSlider = new FloatSlider(this,"crash speed",-1,-1,140,15,&mCrashSpeed,0,1);
-   mStutterTimeSlider = new FloatSlider(this,"stutter time",-1,-1,140,15,&mStutterTime,0,1);
-   mStutterDepthSlider = new FloatSlider(this,"stutter depth",-1,-1,140,15,&mStutterDepth,0,1);
-   mTomDecaySlider = new FloatSlider(this,"tom decay",-1,-1,140,15,&mTomDecay,0,1);
-   mClosedHatDecaySlider = new FloatSlider(this,"closed hat decay",-1,-1,140,15,&mClosedHatDecay,0,1);
-   mOpenHatDecaySlider = new FloatSlider(this,"open hat decay",-1,-1,140,15,&mOpenHatDecay,0,1);
-   mHatGrainSlider = new FloatSlider(this,"hat grain",-1,-1,140,15,&mHatGrain,0,1);
-   
-   mClaveSpeedSlider->PositionTo(mClapSpeedSlider, kAnchorDirection_Below);
-   mAgogoSpeedSlider->PositionTo(mClaveSpeedSlider, kAnchorDirection_Below);
-   mCrashSpeedSlider->PositionTo(mAgogoSpeedSlider, kAnchorDirection_Below);
-   mStutterTimeSlider->PositionTo(mCrashSpeedSlider, kAnchorDirection_Below);
-   mStutterDepthSlider->PositionTo(mStutterTimeSlider, kAnchorDirection_Below);
-   mTomDecaySlider->PositionTo(mStutterDepthSlider, kAnchorDirection_Below);
-   mClosedHatDecaySlider->PositionTo(mTomDecaySlider, kAnchorDirection_Below);
-   mOpenHatDecaySlider->PositionTo(mClosedHatDecaySlider, kAnchorDirection_Below);
-   mHatGrainSlider->PositionTo(mOpenHatDecaySlider, kAnchorDirection_Below);
+   mClaveSpeedSlider = new FloatSlider(this,"clave speed",mClapSpeedSlider, kAnchor_Below,140,15,&mClaveSpeed,0,1);
+   mAgogoSpeedSlider = new FloatSlider(this,"agogo speed",mClaveSpeedSlider, kAnchor_Below,140,15,&mAgogoSpeed,0,1);
+   mCrashSpeedSlider = new FloatSlider(this,"crash speed",mAgogoSpeedSlider, kAnchor_Below,140,15,&mCrashSpeed,0,1);
+   mStutterTimeSlider = new FloatSlider(this,"stutter time",mCrashSpeedSlider, kAnchor_Below,140,15,&mStutterTime,0,1);
+   mStutterDepthSlider = new FloatSlider(this,"stutter depth",mStutterTimeSlider, kAnchor_Below,140,15,&mStutterDepth,0,1);
+   mTomDecaySlider = new FloatSlider(this,"tom decay",mStutterDepthSlider, kAnchor_Below,140,15,&mTomDecay,0,1);
+   mClosedHatDecaySlider = new FloatSlider(this,"closed hat decay",mTomDecaySlider, kAnchor_Below,140,15,&mClosedHatDecay,0,1);
+   mOpenHatDecaySlider = new FloatSlider(this,"open hat decay",mClosedHatDecaySlider, kAnchor_Below,140,15,&mOpenHatDecay,0,1);
+   mHatGrainSlider = new FloatSlider(this,"hat grain",mOpenHatDecaySlider, kAnchor_Below,140,15,&mHatGrain,0,1);
    
    for (int i=0; i<10; ++i)
    {
       mLevelSliders[i] = new FloatSlider(this,("level "+ofToString(i)).c_str(),155,5,100,15,&mLevels[i],0,1);
       if (i > 0)
-         mLevelSliders[i]->PositionTo(mLevelSliders[i-1], kAnchorDirection_Below);
+         mLevelSliders[i]->PositionTo(mLevelSliders[i-1], kAnchor_Below);
    }
 }
 

@@ -28,9 +28,7 @@ void AudioSend::CreateUIControls()
    IDrawableModule::CreateUIControls();
    
    mAmountSlider = new FloatSlider(this,"amount",3,3,80,15,&mAmount,0,1,2);
-   mCrossfadeCheckbox = new Checkbox(this,"crossfade",-1,-1,&mCrossfade);
-   
-   mCrossfadeCheckbox->PositionTo(mAmountSlider, kAnchorDirection_Below);
+   mCrossfadeCheckbox = new Checkbox(this,"crossfade",mAmountSlider, kAnchor_Below,&mCrossfade);
    
    int w,h;
    GetDimensions(w, h);

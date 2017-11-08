@@ -131,8 +131,8 @@ void NoteStepSequencer::CreateUIControls()
    mFreeTimeSlider->SetShowing(mTimeMode == kTimeMode_Free);
    mLoopResetPointSlider->SetShowing(mTimeMode != kTimeMode_Synced);
    
-   mRandomizeLengthButton->PositionTo(mRandomizePitchButton, kAnchorDirection_Right);
-   mRandomizeVelocityButton->PositionTo(mRandomizeLengthButton, kAnchorDirection_Right);
+   mRandomizeLengthButton->PositionTo(mRandomizePitchButton, kAnchor_Right);
+   mRandomizeVelocityButton->PositionTo(mRandomizeLengthButton, kAnchor_Right);
 }
 
 NoteStepSequencer::~NoteStepSequencer()
@@ -557,7 +557,7 @@ void NoteStepSequencer::UpdateVelocityGridPos()
    int gridX,gridY;
    mGrid->GetPosition(gridX, gridY);
    mVelocityGrid->SetPosition(gridX, gridY + mGrid->GetHeight());
-   mLoopResetPointSlider->PositionTo(mVelocityGrid, kAnchorDirection_Below);
+   mLoopResetPointSlider->PositionTo(mVelocityGrid, kAnchor_Below);
    mLoopResetPointSlider->SetDimensions(mVelocityGrid->GetWidth(), 15);
 }
 

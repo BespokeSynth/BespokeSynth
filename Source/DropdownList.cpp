@@ -35,6 +35,12 @@ DropdownList::DropdownList(IDropdownListener* owner, const char* name, int x, in
    (dynamic_cast<IDrawableModule*>(owner))->AddUIControl(this);
 }
 
+DropdownList::DropdownList(IDropdownListener* owner, const char* name, IUIControl* anchor, AnchorDirection anchorDirection, int* var)
+: DropdownList(owner, name, -1, -1, var)
+{
+   PositionTo(anchor, anchorDirection);
+}
+
 DropdownList::~DropdownList()
 {
 }

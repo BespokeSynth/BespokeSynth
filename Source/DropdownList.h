@@ -50,6 +50,7 @@ class DropdownList : public IUIControl
 {
 public:
    DropdownList(IDropdownListener* owner, const char* name, int x, int y, int* var);
+   DropdownList(IDropdownListener* owner, const char* name, IUIControl* anchor, AnchorDirection anchorDirection, int* var);
    void AddLabel(string label, int value);
    string GetLabel(int val) const;
    void Render() override;

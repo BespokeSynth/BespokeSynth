@@ -116,12 +116,12 @@ void IUIControl::StartBeacon()
 void IUIControl::PositionTo(IUIControl* anchor, AnchorDirection direction)
 {
    ofRectangle rect = anchor->GetRect(true);
-   if (direction == kAnchorDirection_Below)
+   if (direction == kAnchor_Below)
    {
       mX = rect.x;
       mY = rect.y + rect.height + 1;
    }
-   else if (direction == kAnchorDirection_Right)
+   else if (direction == kAnchor_Right)
    {
       mX = rect.x + rect.width + 3;
       mY = rect.y;

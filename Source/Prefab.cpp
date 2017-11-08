@@ -26,8 +26,7 @@ void Prefab::CreateUIControls()
    IDrawableModule::CreateUIControls();
    
    mSaveButton = new ClickButton(this, "save", 95, 2);
-   mLoadButton = new ClickButton(this, "load", -1, -1);
-   mLoadButton->PositionTo(mSaveButton, kAnchorDirection_Right);
+   mLoadButton = new ClickButton(this, "load", mSaveButton, kAnchor_Right);
    
    mModuleCable = new PatchCableSource(this, kConnectionType_Special);
    mModuleCable->SetManualPosition(10, 10);

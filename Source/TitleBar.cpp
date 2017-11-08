@@ -175,7 +175,7 @@ void TitleBar::ListLayouts()
       }
    }
    
-   mSaveLayoutButton->PositionTo(mLoadLayoutDropdown, kAnchorDirection_Right);
+   mSaveLayoutButton->PositionTo(mLoadLayoutDropdown, kAnchor_Right);
 }
 
 void TitleBar::DrawModule()

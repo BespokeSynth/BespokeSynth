@@ -40,6 +40,7 @@ DrumPlayer::DrumPlayer()
 , mOutputBuffer(gBufferSize)
 , mMonoOutput(false)
 , mMonoCheckbox(nullptr)
+, mLooperRecorder(nullptr)
 {
    ReadKits();
    
@@ -68,6 +69,8 @@ void DrumPlayer::CreateUIControls()
       mKitSelector->AddLabel(mKits[i].mName.c_str(), i);
    
    UpdateVisibleControls();
+   
+   GetPatchCableSource()->SetManualSide(PatchCableSource::kBottom);
 }
 
 void DrumPlayer::DrumHit::CreateUIControls(DrumPlayer* owner, int index)
@@ -79,11 +82,11 @@ void DrumPlayer::DrumHit::CreateUIControls(DrumPlayer* owner, int index)
    mPanSlider = new FloatSlider(owner,("pan "+ofToString(index)).c_str(),-1,-1,100,15,&mPan,-1,1);
    mIndividualOutputCheckbox = new Checkbox(owner,("single out "+ofToString(index)).c_str(),-1,-1,&mHasIndividualOutput);
    
-   mSpeedSlider->PositionTo(mVolSlider, kAnchorDirection_Below);
-   mUseEnvelopeCheckbox->PositionTo(mSpeedSlider, kAnchorDirection_Below);
-   mEnvelopeDisplay->PositionTo(mUseEnvelopeCheckbox, kAnchorDirection_Below);
-   mPanSlider->PositionTo(mEnvelopeDisplay, kAnchorDirection_Below);
-   mIndividualOutputCheckbox->PositionTo(mPanSlider, kAnchorDirection_Below);
+   mSpeedSlider->PositionTo(mVolSlider, kAnchor_Below);
+   mUseEnvelopeCheckbox->PositionTo(mSpeedSlider, kAnchor_Below);
+   mEnvelopeDisplay->PositionTo(mUseEnvelopeCheckbox, kAnchor_Below);
+   mPanSlider->PositionTo(mEnvelopeDisplay, kAnchor_Below);
+   mIndividualOutputCheckbox->PositionTo(mPanSlider, kAnchor_Below);
    
    int x = 5 + (index % 4) * 70;
    int y = 70 + (3-(index / 4)) * 70;
@@ -318,7 +321,7 @@ void DrumPlayer::PlayNote(double time, int pitch, int velocity, int voiceIdx /*=
                TheTransport->OnDrumEvent(kInterval_Kick);
          }
          
-         if (mRecordDrums)
+         if (mRecordDrums && mLooperRecorder != nullptr)
          {
             mLooperRecorder->StartFreeRecord();
          }
@@ -683,7 +686,7 @@ void DrumPlayer::CheckboxUpdated(Checkbox* checkbox)
 {
    if (checkbox == mRecordDrumsCheckbox)
    {
-      if (mRecordDrums == false)
+      if (mRecordDrums == false && mLooperRecorder != nullptr)
          mLooperRecorder->EndFreeRecord();
    }
    

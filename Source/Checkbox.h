@@ -18,6 +18,7 @@ class Checkbox : public IUIControl
 {
 public:
    Checkbox(IDrawableModule* owner, const char* label, int x, int y, bool* var);
+   Checkbox(IDrawableModule* owner, const char* label, IUIControl* anchor, AnchorDirection anchorDirection, bool* var);
    void SetLabel(const char* label);
    void Render() override;
    void SetDisplayText(bool display);

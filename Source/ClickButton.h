@@ -24,6 +24,7 @@ class ClickButton : public IUIControl
 {
 public:
    ClickButton(IButtonListener* owner, const char* label, int x, int y);
+   ClickButton(IButtonListener* owner, const char* label, IUIControl* anchor, AnchorDirection anchorDirection);
    void SetLabel(const char* label);
    void Render() override;
    void MouseReleased() override;

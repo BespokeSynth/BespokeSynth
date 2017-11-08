@@ -33,7 +33,7 @@ void NoteHumanizer::CreateUIControls()
    
    mTimeSlider = new FloatSlider(this,"time",4,4,100,15,&mTime,0,100);
    mVelocitySlider = new FloatSlider(this,"velocity",4,4,100,15,&mVelocity,0,1);
-   mVelocitySlider->PositionTo(mTimeSlider, kAnchorDirection_Below);
+   mVelocitySlider->PositionTo(mTimeSlider, kAnchor_Below);
 }
 
 void NoteHumanizer::DrawModule()

@@ -26,6 +26,12 @@ Checkbox::Checkbox(IDrawableModule* owner, const char* label, int x, int y, bool
    CalcSliderVal();
 }
 
+Checkbox::Checkbox(IDrawableModule* owner, const char* label, IUIControl* anchor, AnchorDirection anchorDirection, bool* var)
+: Checkbox(owner, label, -1, -1, var)
+{
+   PositionTo(anchor, anchorDirection);
+}
+
 Checkbox::~Checkbox()
 {
 }

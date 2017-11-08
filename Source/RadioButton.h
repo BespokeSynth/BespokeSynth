@@ -36,6 +36,7 @@ class RadioButton : public IUIControl
 {
 public:
    RadioButton(IRadioButtonListener* owner, const char* name, int x, int y, int* var, RadioDirection direction = kRadioVertical);
+   RadioButton(IRadioButtonListener* owner, const char* name, IUIControl* anchor, AnchorDirection anchorDirection, int* var, RadioDirection direction = kRadioVertical);
    void AddLabel(const char* label, int value);
    void SetLabel(const char* label, int value);
    void Render() override;

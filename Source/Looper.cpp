@@ -192,31 +192,31 @@ void Looper::CreateUIControls()
    
    mDecaySlider->SetMode(FloatSlider::kSquare);
    
-   mClearButton->PositionTo(mNumBarsSelector, kAnchorDirection_Right);
-   mVolumeBakeButton->PositionTo(mVolSlider, kAnchorDirection_Right);
-   mMergeButton->PositionTo(mVolumeBakeButton, kAnchorDirection_Right);
-   mDecaySlider->PositionTo(mNumBarsSelector, kAnchorDirection_Below);
-   mShowGranularCheckbox->PositionTo(mDecaySlider, kAnchorDirection_Right);
-   mFourTetSlicesDropdown->PositionTo(mFourTetSlider, kAnchorDirection_Right);
-   mMuteCheckbox->PositionTo(mFourTetSlider, kAnchorDirection_Below);
-   mSaveButton->PositionTo(mMuteCheckbox, kAnchorDirection_Right);
-   mUndoButton->PositionTo(mSaveButton, kAnchorDirection_Right);
-   mPitchShiftSlider->PositionTo(mVolSlider, kAnchorDirection_Below);
-   mKeepPitchCheckbox->PositionTo(mPitchShiftSlider, kAnchorDirection_Right);
-   mLoopPosOffsetSlider->PositionTo(mPitchShiftSlider, kAnchorDirection_Below);
-   mResetOffsetButton->PositionTo(mLoopPosOffsetSlider, kAnchorDirection_Right);
-   mWriteOffsetButton->PositionTo(mResetOffsetButton, kAnchorDirection_Right);
-   mScratchSpeedSlider->PositionTo(mLoopPosOffsetSlider, kAnchorDirection_Below);
-   mAllowScratchCheckbox->PositionTo(mScratchSpeedSlider, kAnchorDirection_Right);
+   mClearButton->PositionTo(mNumBarsSelector, kAnchor_Right);
+   mVolumeBakeButton->PositionTo(mVolSlider, kAnchor_Right);
+   mMergeButton->PositionTo(mVolumeBakeButton, kAnchor_Right);
+   mDecaySlider->PositionTo(mNumBarsSelector, kAnchor_Below);
+   mShowGranularCheckbox->PositionTo(mDecaySlider, kAnchor_Right);
+   mFourTetSlicesDropdown->PositionTo(mFourTetSlider, kAnchor_Right);
+   mMuteCheckbox->PositionTo(mFourTetSlider, kAnchor_Below);
+   mSaveButton->PositionTo(mMuteCheckbox, kAnchor_Right);
+   mUndoButton->PositionTo(mSaveButton, kAnchor_Right);
+   mPitchShiftSlider->PositionTo(mVolSlider, kAnchor_Below);
+   mKeepPitchCheckbox->PositionTo(mPitchShiftSlider, kAnchor_Right);
+   mLoopPosOffsetSlider->PositionTo(mPitchShiftSlider, kAnchor_Below);
+   mResetOffsetButton->PositionTo(mLoopPosOffsetSlider, kAnchor_Right);
+   mWriteOffsetButton->PositionTo(mResetOffsetButton, kAnchor_Right);
+   mScratchSpeedSlider->PositionTo(mLoopPosOffsetSlider, kAnchor_Below);
+   mAllowScratchCheckbox->PositionTo(mScratchSpeedSlider, kAnchor_Right);
    
-   mGranOctaveCheckbox->PositionTo(mGranularCheckbox, kAnchorDirection_Right);
-   mGranLengthMs->PositionTo(mGranOctaveCheckbox, kAnchorDirection_Right);
-   mGranSpacing->PositionTo(mGranularCheckbox, kAnchorDirection_Below);
-   mGranPosRandomize->PositionTo(mGranSpacing, kAnchorDirection_Right);
-   mGranSpeed->PositionTo(mGranSpacing, kAnchorDirection_Below);
-   mGranSpeedRandomize->PositionTo(mGranSpeed, kAnchorDirection_Right);
-   mPosSlider->PositionTo(mGranSpeed, kAnchorDirection_Below);
-   mPausePosCheckbox->PositionTo(mPosSlider, kAnchorDirection_Right);
+   mGranOctaveCheckbox->PositionTo(mGranularCheckbox, kAnchor_Right);
+   mGranLengthMs->PositionTo(mGranOctaveCheckbox, kAnchor_Right);
+   mGranSpacing->PositionTo(mGranularCheckbox, kAnchor_Below);
+   mGranPosRandomize->PositionTo(mGranSpacing, kAnchor_Right);
+   mGranSpeed->PositionTo(mGranSpacing, kAnchor_Below);
+   mGranSpeedRandomize->PositionTo(mGranSpeed, kAnchor_Right);
+   mPosSlider->PositionTo(mGranSpeed, kAnchor_Below);
+   mPausePosCheckbox->PositionTo(mPosSlider, kAnchor_Right);
 }
 
 Looper::~Looper()

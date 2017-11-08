@@ -19,8 +19,8 @@ class FileStreamOut;
 
 enum AnchorDirection
 {
-   kAnchorDirection_Below,
-   kAnchorDirection_Right
+   kAnchor_Below,
+   kAnchor_Right
 };
 
 class IUIControl : public IClickable

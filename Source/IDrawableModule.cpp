@@ -216,18 +216,17 @@ void IDrawableModule::Render()
    }
    
    const bool kUseDropshadow = true;
-   if (kUseDropshadow)
+   if (kUseDropshadow && GetParent() == nullptr)
    {
-      NVGpaint shadowPaint;
-      shadowPaint = nvgBoxGradient(gNanoVG, 0,2, w,h, gCornerRoundness*2, 10, nvgRGBA(0,0,0,128), nvgRGBA(0,0,0,0));
+      const float shadowSize = 20;
+      float shadowStrength = .2f + highlight;
+      NVGpaint shadowPaint = nvgBoxGradient(gNanoVG, -shadowSize/2,-titleBarHeight-shadowSize/2, w+shadowSize,h+titleBarHeight+shadowSize, gCornerRoundness*shadowSize*.5f, shadowSize, nvgRGBA(color.r*shadowStrength,color.g*shadowStrength,color.b*shadowStrength,128), nvgRGBA(0,0,0,0));
       nvgBeginPath(gNanoVG);
-      nvgRect(gNanoVG, -10,-10, w+20,h+30);
-      nvgRoundedRect(gNanoVG, 0,0, w,h, gCornerRoundness);
-      nvgPathWinding(gNanoVG, NVG_HOLE);
+      nvgRect(gNanoVG, -shadowSize,-shadowSize-titleBarHeight, w+shadowSize*2,h+titleBarHeight+shadowSize*2);
       nvgFillPaint(gNanoVG, shadowPaint);
       nvgFill(gNanoVG);
    }
-
+   
    ofFill();
    if (Enabled())
       ofSetColor(color.r*(.25f+highlight),color.g*(.25f+highlight),color.b*(.25f+highlight),210);

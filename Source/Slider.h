@@ -27,6 +27,7 @@ class FloatSlider : public IUIControl, public ITextEntryListener
 {
 public:
    FloatSlider(IFloatSliderListener* owner, const char* label, int x, int y, int w, int h, float* var, float min, float max, int digits = -1);
+   FloatSlider(IFloatSliderListener* owner, const char* label, IUIControl* anchor, AnchorDirection anchorDir, int w, int h, float* var, float min, float max, int digits = -1);
    void SetLabel(const char* label);
    void SetVar(float* var) { mVar = var; }
    void Render() override;
@@ -134,6 +135,7 @@ class IntSlider : public IUIControl, public ITextEntryListener
 {
 public:
    IntSlider(IIntSliderListener* owner, const char* label, int x, int y, int w, int h, int* var, int min, int max);
+   IntSlider(IIntSliderListener* owner, const char* label, IUIControl* anchor, AnchorDirection anchorDir, int w, int h, int* var, int min, int max);
    void SetLabel(const char* label);
    void SetVar(int* var) { mVar = var; }
    void Render() override;

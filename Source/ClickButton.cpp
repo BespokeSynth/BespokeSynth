@@ -21,6 +21,12 @@ ClickButton::ClickButton(IButtonListener* owner, const char* label, int x, int y
    SetParent(dynamic_cast<IClickable*>(owner));
 }
 
+ClickButton::ClickButton(IButtonListener* owner, const char* label, IUIControl* anchor, AnchorDirection anchorDirection)
+: ClickButton(owner, label, -1, -1)
+{
+   PositionTo(anchor, anchorDirection);
+}
+
 ClickButton::~ClickButton()
 {
 }

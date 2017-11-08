@@ -91,20 +91,20 @@ void LooperRecorder::CreateUIControls()
    mModeSelector->AddLabel("overdub", kRecorderMode_Overdub);
    mModeSelector->AddLabel("loop", kRecorderMode_Loop);
    
-   mDoubleTempoButton->PositionTo(mNumBarsSelector, kAnchorDirection_Below);
-   mHalfTempoButton->PositionTo(mDoubleTempoButton, kAnchorDirection_Below);
-   mShiftMeasureButton->PositionTo(mHalfTempoButton, kAnchorDirection_Below);
-   mHalfShiftButton->PositionTo(mShiftMeasureButton, kAnchorDirection_Right);
-   mShiftDownbeatButton->PositionTo(mShiftMeasureButton, kAnchorDirection_Below);
+   mDoubleTempoButton->PositionTo(mNumBarsSelector, kAnchor_Below);
+   mHalfTempoButton->PositionTo(mDoubleTempoButton, kAnchor_Below);
+   mShiftMeasureButton->PositionTo(mHalfTempoButton, kAnchor_Below);
+   mHalfShiftButton->PositionTo(mShiftMeasureButton, kAnchor_Right);
+   mShiftDownbeatButton->PositionTo(mShiftMeasureButton, kAnchor_Below);
    
-   mCommitDelaySlider->PositionTo(mModeSelector, kAnchorDirection_Below);
-   mClearOverdubButton->PositionTo(mCommitDelaySlider, kAnchorDirection_Below);
+   mCommitDelaySlider->PositionTo(mModeSelector, kAnchor_Below);
+   mClearOverdubButton->PositionTo(mCommitDelaySlider, kAnchor_Below);
    
-   mSnapPitchButton->PositionTo(mOrigSpeedButton, kAnchorDirection_Below);
-   mResampleButton->PositionTo(mSnapPitchButton, kAnchorDirection_Below);
-   mResampAndSetButton->PositionTo(mResampleButton, kAnchorDirection_Below);
+   mSnapPitchButton->PositionTo(mOrigSpeedButton, kAnchor_Below);
+   mResampleButton->PositionTo(mSnapPitchButton, kAnchor_Below);
+   mResampAndSetButton->PositionTo(mResampleButton, kAnchor_Below);
    
-   mCancelFreeRecordButton->PositionTo(mFreeRecordingCheckbox, kAnchorDirection_Right);
+   mCancelFreeRecordButton->PositionTo(mFreeRecordingCheckbox, kAnchor_Right);
    
    SyncCablesToLoopers();
 }

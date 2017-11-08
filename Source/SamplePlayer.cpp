@@ -50,20 +50,14 @@ void SamplePlayer::CreateUIControls()
 {
    IDrawableModule::CreateUIControls();
    mVolumeSlider = new FloatSlider(this,"volume",20,3,90,15,&mVolume,0,2);
-   mSpeedSlider = new FloatSlider(this,"speed",-1,-1,90,15,&mSpeed,-2,2);
+   mSpeedSlider = new FloatSlider(this,"speed",mVolumeSlider, kAnchor_Right,90,15,&mSpeed,-2,2);
    mSampleList = new DropdownList(this,"samples",5,20,&mSampleIndex);
 
    mPlayButton = new ClickButton(this,"play",5,40);
-   mPauseButton = new ClickButton(this,"pause",-1,-1);
-   mStopButton = new ClickButton(this,"stop",-1,-1);
-   mLoopCheckbox = new Checkbox(this,"loop",-1,-1,&mLoop);
-   mDownloadYoutubeButton = new ClickButton(this,"youtube",-1,-1);
-   
-   mSpeedSlider->PositionTo(mVolumeSlider, kAnchorDirection_Right);
-   mPauseButton->PositionTo(mPlayButton, kAnchorDirection_Right);
-   mStopButton->PositionTo(mPauseButton, kAnchorDirection_Right);
-   mLoopCheckbox->PositionTo(mStopButton, kAnchorDirection_Right);
-   mDownloadYoutubeButton->PositionTo(mLoopCheckbox, kAnchorDirection_Right);
+   mPauseButton = new ClickButton(this,"pause",mPlayButton, kAnchor_Right);
+   mStopButton = new ClickButton(this,"stop",mPauseButton, kAnchor_Right);
+   mLoopCheckbox = new Checkbox(this,"loop",mStopButton, kAnchor_Right,&mLoop);
+   mDownloadYoutubeButton = new ClickButton(this,"youtube",mLoopCheckbox, kAnchor_Right);
    
    mSampleBankCable = new PatchCableSource(this, kConnectionType_Special);
    mSampleBankCable->SetManualPosition(8, 8);

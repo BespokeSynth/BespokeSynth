@@ -70,7 +70,7 @@ void SignalGenerator::CreateUIControls()
    
    mSyncFreqSlider->SetLabel("");
    mSoftenSlider->SetLabel("");
-   mSoftenSlider->PositionTo(mMultSelector, kAnchorDirection_Right);
+   mSoftenSlider->PositionTo(mMultSelector, kAnchor_Right);
    
    SetFreqMode(kFreqMode_Instant);
    

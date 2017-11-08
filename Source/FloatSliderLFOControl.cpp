@@ -101,15 +101,15 @@ void FloatSliderLFOControl::CreateUIControls()
    for (int i=0; i<NUM_GLOBAL_ADSRS; ++i)
       mADSRSelector->AddLabel(ofToString(i).c_str(), i);
    
-   mOscSelector->PositionTo(mIntervalSelector, kAnchorDirection_Right);
-   mOffsetSlider->PositionTo(mIntervalSelector, kAnchorDirection_Below);
-   mFreeRateSlider->PositionTo(mIntervalSelector, kAnchorDirection_Below);
-   mBiasSlider->PositionTo(mOffsetSlider, kAnchorDirection_Below);
-   mMinSlider->PositionTo(mBiasSlider, kAnchorDirection_Below);
-   mMaxSlider->PositionTo(mMinSlider, kAnchorDirection_Below);
-   mAddSlider->PositionTo(mMaxSlider, kAnchorDirection_Below);
-   mSoftenSlider->PositionTo(mAddSlider, kAnchorDirection_Below);
-   mShuffleSlider->PositionTo(mSoftenSlider, kAnchorDirection_Below);
+   mOscSelector->PositionTo(mIntervalSelector, kAnchor_Right);
+   mOffsetSlider->PositionTo(mIntervalSelector, kAnchor_Below);
+   mFreeRateSlider->PositionTo(mIntervalSelector, kAnchor_Below);
+   mBiasSlider->PositionTo(mOffsetSlider, kAnchor_Below);
+   mMinSlider->PositionTo(mBiasSlider, kAnchor_Below);
+   mMaxSlider->PositionTo(mMinSlider, kAnchor_Below);
+   mAddSlider->PositionTo(mMaxSlider, kAnchor_Below);
+   mSoftenSlider->PositionTo(mAddSlider, kAnchor_Below);
+   mShuffleSlider->PositionTo(mSoftenSlider, kAnchor_Below);
    
    mFreeRateSlider->SetMode(FloatSlider::kBezier);
    mFreeRateSlider->SetBezierControl(1);

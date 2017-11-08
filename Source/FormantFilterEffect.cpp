@@ -44,11 +44,11 @@ void FormantFilterEffect::CreateUIControls()
    mESlider = new FloatSlider(this,"e",4,4,80,15,&mE,0,1);
    mUSlider = new FloatSlider(this,"u",4,4,80,15,&mU,0,1);
    mASlider = new FloatSlider(this,"a",4,4,80,15,&mA,0,1);
-   mOOSlider->PositionTo(mEESlider, kAnchorDirection_Below);
-   mISlider->PositionTo(mOOSlider, kAnchorDirection_Below);
-   mESlider->PositionTo(mISlider, kAnchorDirection_Below);
-   mUSlider->PositionTo(mESlider, kAnchorDirection_Below);
-   mASlider->PositionTo(mUSlider, kAnchorDirection_Below);
+   mOOSlider->PositionTo(mEESlider, kAnchor_Below);
+   mISlider->PositionTo(mOOSlider, kAnchor_Below);
+   mESlider->PositionTo(mISlider, kAnchor_Below);
+   mUSlider->PositionTo(mESlider, kAnchor_Below);
+   mASlider->PositionTo(mUSlider, kAnchor_Below);
    mSliders.push_back(mEESlider);
    mSliders.push_back(mOOSlider);
    mSliders.push_back(mISlider);

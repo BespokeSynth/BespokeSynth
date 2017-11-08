@@ -46,6 +46,12 @@ FloatSlider::FloatSlider(IFloatSliderListener* owner, const char* label, int x, 
    SetParent(dynamic_cast<IClickable*>(owner));
 }
 
+FloatSlider::FloatSlider(IFloatSliderListener* owner, const char* label, IUIControl* anchor, AnchorDirection anchorDir, int w, int h, float* var, float min, float max, int digits /* = -1 */)
+: FloatSlider(owner,label,-1,-1,w,h,var,min,max,digits)
+{
+   PositionTo(anchor, anchorDir);
+}
+
 FloatSlider::~FloatSlider()
 {
 }
@@ -555,6 +561,12 @@ IntSlider::IntSlider(IIntSliderListener* owner, const char* label, int x, int y,
    (dynamic_cast<IDrawableModule*>(owner))->AddUIControl(this);
    SetParent(dynamic_cast<IClickable*>(owner));
    CalcSliderVal();
+}
+
+IntSlider::IntSlider(IIntSliderListener* owner, const char* label, IUIControl* anchor, AnchorDirection anchorDir, int w, int h, int* var, int min, int max)
+: IntSlider(owner,label,-1,-1,w,h,var,min,max)
+{
+   PositionTo(anchor, anchorDir);
 }
 
 IntSlider::~IntSlider()

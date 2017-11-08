@@ -207,9 +207,9 @@ void VSTPlugin::CreateParameterSliders()
          {
             const int kRows = 20;
             if (i % kRows == 0)
-               mParameterSliders[i].mSlider->PositionTo(mParameterSliders[i-kRows].mSlider, kAnchorDirection_Right);
+               mParameterSliders[i].mSlider->PositionTo(mParameterSliders[i-kRows].mSlider, kAnchor_Right);
             else
-               mParameterSliders[i].mSlider->PositionTo(mParameterSliders[i-1].mSlider, kAnchorDirection_Below);
+               mParameterSliders[i].mSlider->PositionTo(mParameterSliders[i-1].mSlider, kAnchor_Below);
          }
          mParameterSliders[i].mParameterIndex = i;
       }

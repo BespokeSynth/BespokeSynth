@@ -33,9 +33,9 @@ void TimelineControl::CreateUIControls()
    mLoopStartSlider = new IntSlider(this,"loop start",-1,-1,GetSliderWidth(),15,&mLoopStart,0,mNumMeasures);
    mLoopEndSlider = new IntSlider(this,"loop end",-1,-1,GetSliderWidth(),15,&mLoopEnd,0,mNumMeasures);
    
-   mLoopCheckbox->PositionTo(mTimeSlider, kAnchorDirection_Right);
-   mLoopStartSlider->PositionTo(mTimeSlider, kAnchorDirection_Below);
-   mLoopEndSlider->PositionTo(mLoopStartSlider, kAnchorDirection_Below);
+   mLoopCheckbox->PositionTo(mTimeSlider, kAnchor_Right);
+   mLoopStartSlider->PositionTo(mTimeSlider, kAnchor_Below);
+   mLoopEndSlider->PositionTo(mLoopStartSlider, kAnchor_Below);
    
    mLoopStartSlider->SetShowing(mLoop);
    mLoopEndSlider->SetShowing(mLoop);
@@ -70,9 +70,9 @@ void TimelineControl::Resize(float width, float height)
    mTimeSlider->SetDimensions(GetSliderWidth(), 15);
    mLoopStartSlider->SetDimensions(GetSliderWidth(), 15);
    mLoopEndSlider->SetDimensions(GetSliderWidth(), 15);
-   mLoopCheckbox->PositionTo(mTimeSlider, kAnchorDirection_Right);
-   mLoopStartSlider->PositionTo(mTimeSlider, kAnchorDirection_Below);
-   mLoopEndSlider->PositionTo(mLoopStartSlider, kAnchorDirection_Below);
+   mLoopCheckbox->PositionTo(mTimeSlider, kAnchor_Right);
+   mLoopStartSlider->PositionTo(mTimeSlider, kAnchor_Below);
+   mLoopEndSlider->PositionTo(mLoopStartSlider, kAnchor_Below);
 }
 
 void TimelineControl::CheckboxUpdated(Checkbox* checkbox)

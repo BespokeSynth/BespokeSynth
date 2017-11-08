@@ -63,6 +63,7 @@ private:
    PatchCablePos GetPatchCablePos();
    bool IsOverStart(int x, int y);
    bool IsOverEnd(int x, int y);
+   ofVec2f FindClosestSide(int x, int y, int w, int h, ofVec2f start, ofVec2f startDirection, ofVec2f& endDirection);
    
    PatchCableSource* mOwner;
    IClickable* mTarget;
