@@ -22,7 +22,7 @@ public:
    ADSRTrigger();
    static IDrawableModule* Create() { return new ADSRTrigger(); }
    
-   string GetTitleLabel() override { return "ADSR trigger "+ofToString(mADSRIndex); }
+   string GetTitleLabel() override { return "trigger "+ofToString(mADSRIndex); }
    
    //INoteReceiver
    void PlayNote(double time, int pitch, int velocity, int voiceIdx = -1, ModulationChain* pitchBend = nullptr, ModulationChain* modWheel = nullptr, ModulationChain* pressure = nullptr) override;

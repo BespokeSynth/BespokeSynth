@@ -25,18 +25,18 @@ FMSynth::FMSynth()
 , mAdsrDisplayMod(nullptr)
 , mPolyMgr(this)
 {
-   mVoiceParams.mOscADSRParams.mA = 10;
-   mVoiceParams.mOscADSRParams.mD = 0;
-   mVoiceParams.mOscADSRParams.mS = 1;
-   mVoiceParams.mOscADSRParams.mR = 10;
-   mVoiceParams.mHarmRatioADSRParams.mA = 1;
-   mVoiceParams.mHarmRatioADSRParams.mD = 0;
-   mVoiceParams.mHarmRatioADSRParams.mS = 1;
-   mVoiceParams.mHarmRatioADSRParams.mR = 1;
-   mVoiceParams.mModIdxADSRParams.mA = 1;
-   mVoiceParams.mModIdxADSRParams.mD = 0;
-   mVoiceParams.mModIdxADSRParams.mS = 1;
-   mVoiceParams.mModIdxADSRParams.mR = 1;
+   mVoiceParams.mOscADSRParams.GetA() = 10;
+   mVoiceParams.mOscADSRParams.GetD() = 0;
+   mVoiceParams.mOscADSRParams.GetS() = 1;
+   mVoiceParams.mOscADSRParams.GetR() = 10;
+   mVoiceParams.mHarmRatioADSRParams.GetA() = 1;
+   mVoiceParams.mHarmRatioADSRParams.GetD() = 0;
+   mVoiceParams.mHarmRatioADSRParams.GetS() = 1;
+   mVoiceParams.mHarmRatioADSRParams.GetR() = 1;
+   mVoiceParams.mModIdxADSRParams.GetA() = 1;
+   mVoiceParams.mModIdxADSRParams.GetD() = 0;
+   mVoiceParams.mModIdxADSRParams.GetS() = 1;
+   mVoiceParams.mModIdxADSRParams.GetR() = 1;
    mVoiceParams.mHarmRatio = 1;
    mVoiceParams.mModIdx = 0;
    mVoiceParams.mVol = 1.f;
@@ -123,7 +123,7 @@ void FMSynth::DrawModule()
    mVolSlider->Draw();
    mHarmRatioBaseDropdown->Draw();
 
-   DrawText("adsr",8,14);
+   DrawText("env",8,14);
    DrawText("harm",98,14);
    DrawText("mod",188,14);
 }

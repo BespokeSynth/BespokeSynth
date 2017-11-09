@@ -29,22 +29,27 @@ AdditiveVoice::~AdditiveVoice()
       delete mOscs[i];
 }
 
+bool AdditiveVoice::IsDone(double time)
+{
+   for (int i=0; i<mOscs.size(); ++i)
+   {
+      if (mOscs[i]->GetADSR()->IsDone(time) == false)
+         return false;
+   }
+   return true;
+}
+
 void AdditiveVoice::Process(double time, float* out, int bufferSize)
 {
    Profiler profiler("AdditiveVoice");
 
    assert(mOscs.size() == 4);
-
-   bool done = true;
-   for (int i=0; i<mOscs.size(); ++i)
-   {
-      if (mOscs[i]->GetADSR()->IsDone(time) == false)
-         done = false;
-      mOscs[i]->SetPulseWidth(mVoiceParams->mPulseWidth);
-   }
    
-   if (done)
+   if (IsDone(time))
       return;
+   
+   for (int i=0; i<mOscs.size(); ++i)
+      mOscs[i]->SetPulseWidth(mVoiceParams->mPulseWidth);
    
    float syncPhaseInc = GetPhaseInc(mVoiceParams->mSyncFreq);
    for (int pos=0; pos<bufferSize; ++pos)

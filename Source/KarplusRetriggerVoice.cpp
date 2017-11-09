@@ -33,6 +33,11 @@ KarplusRetriggerVoice::~KarplusRetriggerVoice()
 {
 }
 
+bool KarplusRetriggerVoice::IsDone(double time)
+{
+   return true;
+}
+
 void KarplusRetriggerVoice::Process(double time, float* out, int bufferSize)
 {
    Profiler profiler("KarplusRetriggerVoice");

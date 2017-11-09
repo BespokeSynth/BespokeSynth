@@ -23,7 +23,7 @@ public:
    void SetADSR(float a, float d, float s, float r) { mAdsr.Set(a,d,s,r); }
    void Start(double time, float target) { mAdsr.Start(time, target); }
    void Start(double time, float target, float a, float d, float s, float r) { mAdsr.Start(time, target, a, d, s, r); }
-   void Start(double time, float target, ADSR adsr) { mAdsr = adsr; mAdsr.Start(time, target); }
+   void Start(double time, float target, ADSR adsr) { mAdsr.Set(adsr); mAdsr.Start(time, target); }
    void Stop(double time) { mAdsr.Stop(time); }
    float Audio(double time, float phase);
    ADSR* GetADSR() { return &mAdsr; }

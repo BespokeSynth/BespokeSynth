@@ -27,11 +27,16 @@ KarplusStrongVoice::~KarplusStrongVoice()
 {
 }
 
+bool KarplusStrongVoice::IsDone(double time)
+{
+   return !mActive || mMuteRamp.Value(time) == 0;
+}
+
 void KarplusStrongVoice::Process(double time, float* out, int bufferSize)
 {
    Profiler profiler("KarplusStrongVoice");
 
-   if (!mActive || mMuteRamp.Value(time) == 0)
+   if (IsDone(time))
       return;
    
    float renderRatio = 1;

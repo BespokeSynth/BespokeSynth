@@ -83,13 +83,10 @@ void PolyphonyMgr::Start(double time, int pitch, float amount, int voiceIdx /*= 
 {
    assert(voiceIdx < kNumVoices);
    
-   amount = powf(amount, 1.3f); //increase the importance of velocity
-   float pitchScale = 1 / (ofClamp(pitch,1,127)/127.0f); //make lower notes louder
-   amount *= pitchScale;
+   amount = amount * amount; //increase the importance of velocity
    
    bool preserveVoice = voiceIdx != -1 &&  //we specified a voice
-                        mVoices[voiceIdx].mPitch != -1 &&   //there is a note playing from that voice
-                        mVoices[voiceIdx].mPitch != pitch;  //and we're not asking to retrigger the same note
+                        mVoices[voiceIdx].mPitch != -1; //there is a note playing from that voice
 
    if (voiceIdx == -1) //haven't specified a voice
    {
@@ -98,6 +95,7 @@ void PolyphonyMgr::Start(double time, int pitch, float amount, int voiceIdx /*= 
          if (mVoices[i].mPitch == pitch)
          {
             voiceIdx = i;   //reuse existing voice
+            preserveVoice = true;
             break;
          }
       }
@@ -108,7 +106,7 @@ void PolyphonyMgr::Start(double time, int pitch, float amount, int voiceIdx /*= 
       for (int i=0; i<kNumVoices; ++i)
       {
          int check = (i + mLastVoice + 1) % 16;  //try to keep incrementing through list to allow old voices to finish
-         if (mVoices[check].mPitch == -1 || mVoices[check].mPitch == pitch)
+         if (mVoices[check].mPitch == -1)
          {
             voiceIdx = check;
             break;
@@ -154,8 +152,8 @@ void PolyphonyMgr::Start(double time, int pitch, float amount, int voiceIdx /*= 
          mFadeOutBuffer[(i+mFadeOutBufferPos) % kVoiceFadeSamples] += mFadeOutWriteBuffer[i] * fade;
       }
       voice->ClearVoice();
-      voice->Start(time, amount);
    }
+   voice->Start(time, amount);
    mLastVoice = voiceIdx;
 }
 
@@ -164,10 +162,7 @@ void PolyphonyMgr::Stop(double time, int pitch)
    for (int i=0; i<kNumVoices; ++i)
    {
       if (mVoices[i].mPitch == pitch)
-      {
-         mVoices[i].mPitch = -1;
          mVoices[i].mVoice->Stop(time);
-      }
    }
 }
 
@@ -178,6 +173,8 @@ void PolyphonyMgr::Process(double time, float* out, int bufferSize)
    for (int i=0; i<kNumVoices; ++i)
    {
       mVoices[i].mVoice->Process(time, out, bufferSize);
+      if (mVoices[i].mPitch != -1 && mVoices[i].mVoice->IsDone(time))
+         mVoices[i].mPitch = -1;
    }
    
    for (int i=0; i<bufferSize; ++i)

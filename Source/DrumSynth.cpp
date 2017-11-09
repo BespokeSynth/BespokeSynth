@@ -75,20 +75,20 @@ void DrumSynth::LoadKit(int kit)
       {
          mHits[j]->mData.mTone.mOsc.mType = mKits[kit].mHits[j].mTone.mOsc.mType;
          mHits[j]->mData.mVol = mKits[kit].mHits[j].mVol;
-         mHits[j]->mData.mTone.GetADSR()->mA = mKits[kit].mHits[j].mTone.GetADSR()->mA;
-         mHits[j]->mData.mTone.GetADSR()->mD = mKits[kit].mHits[j].mTone.GetADSR()->mD;
-         mHits[j]->mData.mTone.GetADSR()->mS = mKits[kit].mHits[j].mTone.GetADSR()->mS;
-         mHits[j]->mData.mTone.GetADSR()->mR = mKits[kit].mHits[j].mTone.GetADSR()->mR;
+         mHits[j]->mData.mTone.GetADSR()->GetA() = mKits[kit].mHits[j].mTone.GetADSR()->GetA();
+         mHits[j]->mData.mTone.GetADSR()->GetD() = mKits[kit].mHits[j].mTone.GetADSR()->GetD();
+         mHits[j]->mData.mTone.GetADSR()->GetS() = mKits[kit].mHits[j].mTone.GetADSR()->GetS();
+         mHits[j]->mData.mTone.GetADSR()->GetR() = mKits[kit].mHits[j].mTone.GetADSR()->GetR();
          mHits[j]->mData.mVolNoise = mKits[kit].mHits[j].mVolNoise;
-         mHits[j]->mData.mNoise.GetADSR()->mA = mKits[kit].mHits[j].mNoise.GetADSR()->mA;
-         mHits[j]->mData.mNoise.GetADSR()->mD = mKits[kit].mHits[j].mNoise.GetADSR()->mD;
-         mHits[j]->mData.mNoise.GetADSR()->mS = mKits[kit].mHits[j].mNoise.GetADSR()->mS;
-         mHits[j]->mData.mNoise.GetADSR()->mR = mKits[kit].mHits[j].mNoise.GetADSR()->mR;
+         mHits[j]->mData.mNoise.GetADSR()->GetA() = mKits[kit].mHits[j].mNoise.GetADSR()->GetA();
+         mHits[j]->mData.mNoise.GetADSR()->GetD() = mKits[kit].mHits[j].mNoise.GetADSR()->GetD();
+         mHits[j]->mData.mNoise.GetADSR()->GetS() = mKits[kit].mHits[j].mNoise.GetADSR()->GetS();
+         mHits[j]->mData.mNoise.GetADSR()->GetR() = mKits[kit].mHits[j].mNoise.GetADSR()->GetR();
          mHits[j]->mData.mFreq = mKits[kit].mHits[j].mFreq;
-         mHits[j]->mData.mFreqAdsr.mA = mKits[kit].mHits[j].mFreqAdsr.mA;
-         mHits[j]->mData.mFreqAdsr.mD = mKits[kit].mHits[j].mFreqAdsr.mD;
-         mHits[j]->mData.mFreqAdsr.mS = mKits[kit].mHits[j].mFreqAdsr.mS;
-         mHits[j]->mData.mFreqAdsr.mR = mKits[kit].mHits[j].mFreqAdsr.mR;
+         mHits[j]->mData.mFreqAdsr.GetA() = mKits[kit].mHits[j].mFreqAdsr.GetA();
+         mHits[j]->mData.mFreqAdsr.GetD() = mKits[kit].mHits[j].mFreqAdsr.GetD();
+         mHits[j]->mData.mFreqAdsr.GetS() = mKits[kit].mHits[j].mFreqAdsr.GetS();
+         mHits[j]->mData.mFreqAdsr.GetR() = mKits[kit].mHits[j].mFreqAdsr.GetR();
       }
    }
 }
@@ -245,13 +245,13 @@ void DrumSynth::OnMidiControl(MidiControl& control)
                adsr = &mHits[mCurrentEditHit]->mData.mFreqAdsr;
             
             if (col == 0)
-               adsr->mA = value * 300 + 1;
+               adsr->GetA() = value * 300 + 1;
             else if (col == 1)
-               adsr->mD = value * 300;
+               adsr->GetD() = value * 300;
             else if (col == 2)
-               adsr->mS = value;
+               adsr->GetS() = value;
             else
-               adsr->mR = value * 300 + 1;
+               adsr->GetR() = value * 300 + 1;
          }
          
       }
@@ -280,10 +280,10 @@ void DrumSynth::OnMidiControl(MidiControl& control)
                else
                   adsr = &mHits[mCurrentEditHit]->mData.mFreqAdsr;
                
-               mTwister->SendCC(0, 36+i*4, adsr->mA/300*127);
-               mTwister->SendCC(0, 37+i*4, adsr->mD/300*127);
-               mTwister->SendCC(0, 38+i*4, adsr->mS*127);
-               mTwister->SendCC(0, 39+i*4, adsr->mR/300*127);
+               mTwister->SendCC(0, 36+i*4, adsr->GetA()/300*127);
+               mTwister->SendCC(0, 37+i*4, adsr->GetD()/300*127);
+               mTwister->SendCC(0, 38+i*4, adsr->GetS()*127);
+               mTwister->SendCC(0, 39+i*4, adsr->GetR()/300*127);
             }
          }
       }
@@ -313,20 +313,20 @@ void DrumSynth::SaveKits()
          {
             mKits[i].mHits[j].mTone.mOsc.mType = mHits[j]->mData.mTone.mOsc.mType;
             mKits[i].mHits[j].mVol = mHits[j]->mData.mVol;
-            mKits[i].mHits[j].mTone.GetADSR()->mA = mHits[j]->mData.mTone.GetADSR()->mA;
-            mKits[i].mHits[j].mTone.GetADSR()->mD = mHits[j]->mData.mTone.GetADSR()->mD;
-            mKits[i].mHits[j].mTone.GetADSR()->mS = mHits[j]->mData.mTone.GetADSR()->mS;
-            mKits[i].mHits[j].mTone.GetADSR()->mR = mHits[j]->mData.mTone.GetADSR()->mR;
+            mKits[i].mHits[j].mTone.GetADSR()->GetA() = mHits[j]->mData.mTone.GetADSR()->GetA();
+            mKits[i].mHits[j].mTone.GetADSR()->GetD() = mHits[j]->mData.mTone.GetADSR()->GetD();
+            mKits[i].mHits[j].mTone.GetADSR()->GetS() = mHits[j]->mData.mTone.GetADSR()->GetS();
+            mKits[i].mHits[j].mTone.GetADSR()->GetR() = mHits[j]->mData.mTone.GetADSR()->GetR();
             mKits[i].mHits[j].mVolNoise = mHits[j]->mData.mVolNoise;
-            mKits[i].mHits[j].mNoise.GetADSR()->mA = mHits[j]->mData.mNoise.GetADSR()->mA;
-            mKits[i].mHits[j].mNoise.GetADSR()->mD = mHits[j]->mData.mNoise.GetADSR()->mD;
-            mKits[i].mHits[j].mNoise.GetADSR()->mS = mHits[j]->mData.mNoise.GetADSR()->mS;
-            mKits[i].mHits[j].mNoise.GetADSR()->mR = mHits[j]->mData.mNoise.GetADSR()->mR;
+            mKits[i].mHits[j].mNoise.GetADSR()->GetA() = mHits[j]->mData.mNoise.GetADSR()->GetA();
+            mKits[i].mHits[j].mNoise.GetADSR()->GetD() = mHits[j]->mData.mNoise.GetADSR()->GetD();
+            mKits[i].mHits[j].mNoise.GetADSR()->GetS() = mHits[j]->mData.mNoise.GetADSR()->GetS();
+            mKits[i].mHits[j].mNoise.GetADSR()->GetR() = mHits[j]->mData.mNoise.GetADSR()->GetR();
             mKits[i].mHits[j].mFreq = mHits[j]->mData.mFreq;
-            mKits[i].mHits[j].mFreqAdsr.mA = mHits[j]->mData.mFreqAdsr.mA;
-            mKits[i].mHits[j].mFreqAdsr.mD = mHits[j]->mData.mFreqAdsr.mD;
-            mKits[i].mHits[j].mFreqAdsr.mS = mHits[j]->mData.mFreqAdsr.mS;
-            mKits[i].mHits[j].mFreqAdsr.mR = mHits[j]->mData.mFreqAdsr.mR;
+            mKits[i].mHits[j].mFreqAdsr.GetA() = mHits[j]->mData.mFreqAdsr.GetA();
+            mKits[i].mHits[j].mFreqAdsr.GetD() = mHits[j]->mData.mFreqAdsr.GetD();
+            mKits[i].mHits[j].mFreqAdsr.GetS() = mHits[j]->mData.mFreqAdsr.GetS();
+            mKits[i].mHits[j].mFreqAdsr.GetR() = mHits[j]->mData.mFreqAdsr.GetR();
          }
       }
       
@@ -334,20 +334,20 @@ void DrumSynth::SaveKits()
       {
          kit["hits"][j]["tonetype"] = mKits[i].mHits[j].mTone.mOsc.mType;
          kit["hits"][j]["tonevol"] = mKits[i].mHits[j].mVol;
-         kit["hits"][j]["tone_a"] = mKits[i].mHits[j].mTone.GetADSR()->mA;
-         kit["hits"][j]["tone_d"] = mKits[i].mHits[j].mTone.GetADSR()->mD;
-         kit["hits"][j]["tone_s"] = mKits[i].mHits[j].mTone.GetADSR()->mS;
-         kit["hits"][j]["tone_r"] = mKits[i].mHits[j].mTone.GetADSR()->mR;
+         kit["hits"][j]["tone_a"] = mKits[i].mHits[j].mTone.GetADSR()->GetA();
+         kit["hits"][j]["tone_d"] = mKits[i].mHits[j].mTone.GetADSR()->GetD();
+         kit["hits"][j]["tone_s"] = mKits[i].mHits[j].mTone.GetADSR()->GetS();
+         kit["hits"][j]["tone_r"] = mKits[i].mHits[j].mTone.GetADSR()->GetR();
          kit["hits"][j]["noisevol"] = mKits[i].mHits[j].mVolNoise;
-         kit["hits"][j]["noise_a"] = mKits[i].mHits[j].mNoise.GetADSR()->mA;
-         kit["hits"][j]["noise_d"] = mKits[i].mHits[j].mNoise.GetADSR()->mD;
-         kit["hits"][j]["noise_s"] = mKits[i].mHits[j].mNoise.GetADSR()->mS;
-         kit["hits"][j]["noise_r"] = mKits[i].mHits[j].mNoise.GetADSR()->mR;
+         kit["hits"][j]["noise_a"] = mKits[i].mHits[j].mNoise.GetADSR()->GetA();
+         kit["hits"][j]["noise_d"] = mKits[i].mHits[j].mNoise.GetADSR()->GetD();
+         kit["hits"][j]["noise_s"] = mKits[i].mHits[j].mNoise.GetADSR()->GetS();
+         kit["hits"][j]["noise_r"] = mKits[i].mHits[j].mNoise.GetADSR()->GetR();
          kit["hits"][j]["freq"] = mKits[i].mHits[j].mFreq;
-         kit["hits"][j]["freq_a"] = mKits[i].mHits[j].mFreqAdsr.mA;
-         kit["hits"][j]["freq_d"] = mKits[i].mHits[j].mFreqAdsr.mD;
-         kit["hits"][j]["freq_s"] = mKits[i].mHits[j].mFreqAdsr.mS;
-         kit["hits"][j]["freq_r"] = mKits[i].mHits[j].mFreqAdsr.mR;
+         kit["hits"][j]["freq_a"] = mKits[i].mHits[j].mFreqAdsr.GetA();
+         kit["hits"][j]["freq_d"] = mKits[i].mHits[j].mFreqAdsr.GetD();
+         kit["hits"][j]["freq_s"] = mKits[i].mHits[j].mFreqAdsr.GetS();
+         kit["hits"][j]["freq_r"] = mKits[i].mHits[j].mFreqAdsr.GetR();
       }
       kit["name"] = mKits[i].mName;
    }
@@ -369,20 +369,20 @@ void DrumSynth::ReadKits()
       {
          mKits[i].mHits[j].mTone.mOsc.mType = (OscillatorType)kit["hits"][j]["tonetype"].asInt();
          mKits[i].mHits[j].mVol = kit["hits"][j]["tonevol"].asDouble();
-         mKits[i].mHits[j].mTone.GetADSR()->mA = kit["hits"][j]["tone_a"].asDouble();
-         mKits[i].mHits[j].mTone.GetADSR()->mD = kit["hits"][j]["tone_d"].asDouble();
-         mKits[i].mHits[j].mTone.GetADSR()->mS = kit["hits"][j]["tone_s"].asDouble();
-         mKits[i].mHits[j].mTone.GetADSR()->mR = kit["hits"][j]["tone_r"].asDouble();
+         mKits[i].mHits[j].mTone.GetADSR()->GetA() = kit["hits"][j]["tone_a"].asDouble();
+         mKits[i].mHits[j].mTone.GetADSR()->GetD() = kit["hits"][j]["tone_d"].asDouble();
+         mKits[i].mHits[j].mTone.GetADSR()->GetS() = kit["hits"][j]["tone_s"].asDouble();
+         mKits[i].mHits[j].mTone.GetADSR()->GetR() = kit["hits"][j]["tone_r"].asDouble();
          mKits[i].mHits[j].mVolNoise = kit["hits"][j]["noisevol"].asDouble();
-         mKits[i].mHits[j].mNoise.GetADSR()->mA = kit["hits"][j]["noise_a"].asDouble();
-         mKits[i].mHits[j].mNoise.GetADSR()->mD = kit["hits"][j]["noise_d"].asDouble();
-         mKits[i].mHits[j].mNoise.GetADSR()->mS = kit["hits"][j]["noise_s"].asDouble();
-         mKits[i].mHits[j].mNoise.GetADSR()->mR = kit["hits"][j]["noise_r"].asDouble();
+         mKits[i].mHits[j].mNoise.GetADSR()->GetA() = kit["hits"][j]["noise_a"].asDouble();
+         mKits[i].mHits[j].mNoise.GetADSR()->GetD() = kit["hits"][j]["noise_d"].asDouble();
+         mKits[i].mHits[j].mNoise.GetADSR()->GetS() = kit["hits"][j]["noise_s"].asDouble();
+         mKits[i].mHits[j].mNoise.GetADSR()->GetR() = kit["hits"][j]["noise_r"].asDouble();
          mKits[i].mHits[j].mFreq = kit["hits"][j]["freq"].asDouble();
-         mKits[i].mHits[j].mFreqAdsr.mA = kit["hits"][j]["freq_a"].asDouble();
-         mKits[i].mHits[j].mFreqAdsr.mD = kit["hits"][j]["freq_d"].asDouble();
-         mKits[i].mHits[j].mFreqAdsr.mS = kit["hits"][j]["freq_s"].asDouble();
-         mKits[i].mHits[j].mFreqAdsr.mR = kit["hits"][j]["freq_r"].asDouble();
+         mKits[i].mHits[j].mFreqAdsr.GetA() = kit["hits"][j]["freq_a"].asDouble();
+         mKits[i].mHits[j].mFreqAdsr.GetD() = kit["hits"][j]["freq_d"].asDouble();
+         mKits[i].mHits[j].mFreqAdsr.GetS() = kit["hits"][j]["freq_s"].asDouble();
+         mKits[i].mHits[j].mFreqAdsr.GetR() = kit["hits"][j]["freq_r"].asDouble();
       }
       mKits[i].mName = kit["name"].asString();
    }

@@ -899,14 +899,10 @@ void ModularSynth::MouseReleased(int intX, int intY, int button)
    if (mGroupSelectContext != nullptr)
    {
       mGroupSelectContext->GetModulesWithinRect(ofRectangle(ofPoint(mClickStartX,mClickStartY),ofPoint(x,y)), mGroupSelectedModules);
-      if (mGroupSelectedModules.size() > 1)
+      if (mGroupSelectedModules.size() > 0)
       {
          for (int i=mGroupSelectedModules.size()-1; i>=0; --i) //do this backwards to preserve existing order
             MoveToFront(mGroupSelectedModules[i]);
-      }
-      else
-      {
-         mGroupSelectedModules.clear();
       }
       mGroupSelectContext = nullptr;
    }

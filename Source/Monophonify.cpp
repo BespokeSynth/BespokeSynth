@@ -43,8 +43,7 @@ void Monophonify::PlayNote(double time, int pitch, int velocity, int voiceIdx /*
    
    mPitchBend.AppendTo(pitchBend);
 
-   if (mGlideTime > 0) //only preserve voices with glide
-      voiceIdx = 0;
+   voiceIdx = 0;
    
    mHeldNotesMutex.lock();
    if (velocity > 0)

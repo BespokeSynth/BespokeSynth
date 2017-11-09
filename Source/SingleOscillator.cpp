@@ -66,9 +66,9 @@ void SingleOscillator::CreateUIControls()
    mShuffleSlider = new FloatSlider(this,"shuffle",mPulseWidthSlider,kAnchor_Below,80,15,&mVoiceParams.mShuffle, 0, 1);
    mDetuneSlider = new FloatSlider(this,"detune",mShuffleSlider,kAnchor_Below,80,15,&mVoiceParams.mDetune,.98f,1.02f,3);
    
-   mADSRModeSelector = new RadioButton(this,"adsrmode",95,1,&mADSRMode,kRadioHorizontal);
-   mADSRDisplay = new ADSRDisplay(this,"adsr",95,18,80,36,&mVoiceParams.mAdsr);
-   mFilterADSRDisplay = new ADSRDisplay(this,"adsrfilter",95,18,80,36,&mVoiceParams.mFilterAdsr);
+   mADSRModeSelector = new RadioButton(this,"envmode",95,1,&mADSRMode,kRadioHorizontal);
+   mADSRDisplay = new ADSRDisplay(this,"env",95,18,80,36,&mVoiceParams.mAdsr);
+   mFilterADSRDisplay = new ADSRDisplay(this,"envfilter",95,18,80,36,&mVoiceParams.mFilterAdsr);
    mLengthMultiplierSlider = new FloatSlider(this,"len",mADSRDisplay,kAnchor_Below,80,15,&mLengthMultiplier,.01f,10);
    mVolSlider = new FloatSlider(this,"vol",mLengthMultiplierSlider,kAnchor_Below,80,15,&mVoiceParams.mVol,0,1);
    mFilterCutoffSlider = new FloatSlider(this,"cutoff",mVolSlider,kAnchor_Below,80,15,&mVoiceParams.mFilterCutoff,0,SINGLEOSCILLATOR_NO_CUTOFF);

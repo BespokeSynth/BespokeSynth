@@ -25,11 +25,16 @@ FMVoice::~FMVoice()
 {
 }
 
+bool FMVoice::IsDone(double time)
+{
+   return mOsc.GetADSR()->IsDone(time);
+}
+
 void FMVoice::Process(double time, float* out, int bufferSize)
 {
    Profiler profiler("FMVoice");
 
-   if (mOsc.GetADSR()->IsDone(time))
+   if (IsDone(time))
       return;
 
    for (int pos=0; pos<bufferSize; ++pos)
@@ -70,9 +75,9 @@ void FMVoice::Start(double time, float target)
 void FMVoice::Stop(double time)
 {
    mOsc.Stop(time);
-   if (mHarm.GetADSR()->mR > 1)
+   if (mHarm.GetADSR()->GetR() > 1)
       mHarm.Stop(time);
-   if (mModIdx.mR > 1)
+   if (mModIdx.GetR() > 1)
       mModIdx.Stop(time);
 }
 

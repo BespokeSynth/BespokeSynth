@@ -26,11 +26,16 @@ SingleOscillatorVoice::~SingleOscillatorVoice()
 {
 }
 
+bool SingleOscillatorVoice::IsDone(double time)
+{
+   return mOsc.GetADSR()->IsDone(time);
+}
+
 void SingleOscillatorVoice::Process(double time, float* out, int bufferSize)
 {
    Profiler profiler("SingleOscillatorVoice");
 
-   if (mOsc.GetADSR()->IsDone(time))
+   if (IsDone(time))
       return;
    
    mOsc.SetType(mVoiceParams->mOscType);
@@ -92,9 +97,9 @@ void SingleOscillatorVoice::Start(double time, float target)
    mStartTime = time;
    
    if (mVoiceParams->mFilterCutoff != SINGLEOSCILLATOR_NO_CUTOFF ||
-       mVoiceParams->mFilterAdsr.mA > 1 ||
-       mVoiceParams->mFilterAdsr.mS < 1 ||
-       mVoiceParams->mFilterAdsr.mR > 30)
+       mVoiceParams->mFilterAdsr.GetA() > 1 ||
+       mVoiceParams->mFilterAdsr.GetS() < 1 ||
+       mVoiceParams->mFilterAdsr.GetR() > 30)
    {
       mUseFilter = true;
       mFilter.SetFilterType(kFilterType_Lowpass);
@@ -110,13 +115,12 @@ void SingleOscillatorVoice::Start(double time, float target)
 void SingleOscillatorVoice::Stop(double time)
 {
    mOsc.Stop(time);
-   if (mUseFilter)
-      mFilterAdsr.Stop(time);
 }
 
 void SingleOscillatorVoice::ClearVoice()
 {
    mOsc.GetADSR()->Clear();
+   mFilterAdsr.Clear();
 }
 
 void SingleOscillatorVoice::SetVoiceParams(IVoiceParams* params)

@@ -22,11 +22,16 @@ SampleVoice::~SampleVoice()
 {
 }
 
+bool SampleVoice::IsDone(double time)
+{
+   return mAdsr.IsDone(time);
+}
+
 void SampleVoice::Process(double time, float* out, int bufferSize)
 {
    Profiler profiler("SampleVoice");
 
-   if (mAdsr.IsDone(time) ||
+   if (IsDone(time) ||
        mVoiceParams->mSampleData == nullptr ||
        mVoiceParams->mSampleLength == 0)
       return;

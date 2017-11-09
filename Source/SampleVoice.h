@@ -35,11 +35,12 @@ public:
    ~SampleVoice();
    
    // IMidiVoice
-   void Start(double time, float amount);
-   void Stop(double time);
-   void ClearVoice();
-   void Process(double time, float* out, int bufferSize);
-   void SetVoiceParams(IVoiceParams* params);
+   void Start(double time, float amount) override;
+   void Stop(double time) override;
+   void ClearVoice() override;
+   void Process(double time, float* out, int bufferSize) override;
+   void SetVoiceParams(IVoiceParams* params) override;
+   bool IsDone(double time) override;
 private:
    ADSR mAdsr;
    SampleVoiceParams* mVoiceParams;

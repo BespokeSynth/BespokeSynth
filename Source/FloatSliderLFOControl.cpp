@@ -57,8 +57,8 @@ void FloatSliderLFOControl::CreateUIControls()
    mFreeRateSlider = new FloatSlider(this,"free rate",-1,-1,90,15,&mLFOSettings.mFreeRate,0,50);
    mBiasSlider = new FloatSlider(this,"bias",-1,-1,90,15,&mLFOSettings.mBias,0,1);
    mTypeSelector = new RadioButton(this,"type",2,16,(int*)(&mType),kRadioHorizontal);
-   mADSRDisplay = new ADSRDisplay(this,"adsr",2,40,96,40,&sADSR[0]);
-   mADSRSelector = new RadioButton(this,"adsrselector",2,85,&mADSRIndex,kRadioHorizontal);
+   mADSRDisplay = new ADSRDisplay(this,"env",2,40,96,40,&sADSR[0]);
+   mADSRSelector = new RadioButton(this,"envselector",2,85,&mADSRIndex,kRadioHorizontal);
    mADSRLengthMultiplierSlider = new FloatSlider(this,"length",2,103,90,15,&mADSRLengthMultiplier,.01f,10);
    mMinSlider = new FloatSlider(this,"low",-1,-1,90,15,&mLFOSettings.mMin,0,1);
    mMaxSlider = new FloatSlider(this,"high",-1,-1,90,15,&mLFOSettings.mMax,0,1);
@@ -95,7 +95,7 @@ void FloatSliderLFOControl::CreateUIControls()
    mOscSelector->AddLabel("drnk",kOsc_Drunk);
    
    mTypeSelector->AddLabel("lfo", kLFOControlType_LFO);
-   mTypeSelector->AddLabel("adsr", kLFOControlType_ADSR);
+   mTypeSelector->AddLabel("env", kLFOControlType_ADSR);
    //mTypeSelector->AddLabel("draw", kLFOControlType_Drawn);
    
    for (int i=0; i<NUM_GLOBAL_ADSRS; ++i)

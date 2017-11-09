@@ -217,7 +217,7 @@ ModuleFactory::ModuleFactory()
    REGISTER(SliderSequencer, slidersequencer, kModuleType_Instrument);
    REGISTER(VelocityStepSequencer, velocitystepsequencer, kModuleType_Note);
    REGISTER(SustainPedal, sustainpedal, kModuleType_Note);
-   REGISTER(ADSRTrigger, adsrtrigger, kModuleType_Note);
+   REGISTER(ADSRTrigger, trigger, kModuleType_Note);
    REGISTER(SamplerGrid, samplergrid, kModuleType_Audio);
    REGISTER(SignalGenerator, signalgenerator, kModuleType_Synth);
    REGISTER(Lissajous, lissajous, kModuleType_Audio);

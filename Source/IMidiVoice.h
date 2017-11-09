@@ -25,6 +25,7 @@ public:
    virtual void Start(double time, float amount) = 0;
    virtual void Stop(double time) = 0;
    virtual void Process(double time, float* out, int bufferSize) = 0;
+   virtual bool IsDone(double time) = 0;
    virtual void SetVoiceParams(IVoiceParams* params) = 0;
    
    float GetPitch(int samplesIn) { return mPitch + (mPitchBend ? mPitchBend->GetValue(samplesIn) : 0); }

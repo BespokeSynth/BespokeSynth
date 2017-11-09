@@ -34,10 +34,10 @@ ADSRDisplay::ADSRDisplay(IDrawableModule* owner, const char* name, int x, int y,
    if (floatListener)
    {
       int sliderHeight = h/4;
-      mASlider = new FloatSlider(floatListener,(string(name)+"A").c_str(),x,y,w,sliderHeight,&(mAdsr->mA),1,1000);
-      mDSlider = new FloatSlider(floatListener,(string(name)+"D").c_str(),x,y+sliderHeight,w,sliderHeight,&(mAdsr->mD),0,1000);
-      mSSlider = new FloatSlider(floatListener,(string(name)+"S").c_str(),x,y+sliderHeight*2,w,sliderHeight,&(mAdsr->mS),0,1);
-      mRSlider = new FloatSlider(floatListener,(string(name)+"R").c_str(),x,y+sliderHeight*3,w,sliderHeight,&(mAdsr->mR),1,1000);
+      mASlider = new FloatSlider(floatListener,(string(name)+"A").c_str(),x,y,w,sliderHeight,&(mAdsr->GetA()),1,1000);
+      mDSlider = new FloatSlider(floatListener,(string(name)+"D").c_str(),x,y+sliderHeight,w,sliderHeight,&(mAdsr->GetD()),0,1000);
+      mSSlider = new FloatSlider(floatListener,(string(name)+"S").c_str(),x,y+sliderHeight*2,w,sliderHeight,&(mAdsr->GetS()),0,1);
+      mRSlider = new FloatSlider(floatListener,(string(name)+"R").c_str(),x,y+sliderHeight*3,w,sliderHeight,&(mAdsr->GetR()),1,1000);
       
       mASlider->SetMode(FloatSlider::kSquare);
       mDSlider->SetMode(FloatSlider::kSquare);
@@ -58,6 +58,10 @@ ADSRDisplay::~ADSRDisplay()
 
 void ADSRDisplay::Render()
 {
+   static bool sSkipDraw = false;
+   if (sSkipDraw)
+      return;
+   
    UpdateSliderVisibility();
 
    ofPushStyle();
@@ -80,10 +84,10 @@ void ADSRDisplay::Render()
 
       ofBeginShape();
 
-      mViewAdsr.Set(mAdsr->mA,mAdsr->mD,mAdsr->mS,mAdsr->mR,mAdsr->mMaxSustain);
+      mViewAdsr.Set(*mAdsr);
       mViewAdsr.Clear();
       mViewAdsr.Start(0,1);
-      float releaseTime = mAdsr->mA + mAdsr->mD + mMaxTime * .2f;
+      float releaseTime = mAdsr->GetA() + mAdsr->GetD() + mMaxTime * .2f;
       ofVertex(0,mHeight);
       for (float i=0; i<mWidth; i+=(.25f/gDrawScale))
       {
@@ -157,10 +161,10 @@ void ADSRDisplay::SetADSR(ADSR* adsr)
    mAdsr = adsr;
    if (mASlider)
    {
-      mASlider->SetVar(&(mAdsr->mA));
-      mDSlider->SetVar(&(mAdsr->mD));
-      mSSlider->SetVar(&(mAdsr->mS));
-      mRSlider->SetVar(&(mAdsr->mR));
+      mASlider->SetVar(&(mAdsr->GetA()));
+      mDSlider->SetVar(&(mAdsr->GetD()));
+      mSSlider->SetVar(&(mAdsr->GetS()));
+      mRSlider->SetVar(&(mAdsr->GetR()));
    }
 }
 
@@ -171,7 +175,7 @@ void ADSRDisplay::SetActive(bool active)
 
 void ADSRDisplay::UpdateSliderVisibility()
 {
-   bool slidersActive = mActive && (sDisplayMode == kDisplaySliders);
+   bool slidersActive = mActive && (sDisplayMode == kDisplaySliders) && mAdsr != nullptr && mAdsr->IsStandardADSR();
    if (mASlider)
    {
       mASlider->SetShowing(slidersActive);
@@ -194,16 +198,19 @@ void ADSRDisplay::OnClicked(int x, int y, bool right)
    
    if (right)
    {
-      mAdsr->mA = ofMap(pow(ofRandom(1),2),0,1,1,100);
-      mAdsr->mD = ofMap(pow(ofRandom(1),2),0,1,1,100);
-      mAdsr->mS = ofRandom(0,1);
-      mAdsr->mR = ofMap(pow(ofRandom(1),2),0,1,1,100);
+      mAdsr->Set(ofMap(pow(ofRandom(1),2),0,1,1,100),
+                 ofMap(pow(ofRandom(1),2),0,1,1,100),
+                 ofRandom(0,1),
+                 ofMap(pow(ofRandom(1),2),0,1,1,100));
       return;
    }
    
-   mClick = true;
-   mClickStart.set(x,y);
-   mClickAdsr.Set(mViewAdsr.mA, mViewAdsr.mD, mViewAdsr.mS, mViewAdsr.mR);
+   if (mAdsr->IsStandardADSR())
+   {
+      mClick = true;
+      mClickStart.set(x,y);
+      mClickAdsr.Set(mViewAdsr);
+   }
 }
 
 void ADSRDisplay::MouseReleased()
@@ -215,7 +222,11 @@ bool ADSRDisplay::MouseMoved(float x, float y)
 {
    if (!mClick)
    {
-      if (x<0 || y<0 || x>mWidth || y>mHeight)
+      if (!mAdsr->IsStandardADSR())
+      {
+         
+      }
+      else if (x<0 || y<0 || x>mWidth || y>mHeight)
       {
          mAdjustMode = kAdjustNone;
       }
@@ -243,26 +254,26 @@ bool ADSRDisplay::MouseMoved(float x, float y)
       {
          case kAdjustAttack:
          {
-            float a = ofClamp(mClickAdsr.mA + mousePosSq * 100,1,mMaxTime);
-            mViewAdsr.mA = a;
-            mAdsr->mA = a;
+            float a = ofClamp(mClickAdsr.GetA() + mousePosSq * 100,1,mMaxTime);
+            mViewAdsr.GetA() = a;
+            mAdsr->GetA() = a;
             break;
          }
          case kAdjustDecaySustain:
          {
-            float d = ofClamp(mClickAdsr.mD + mousePosSq * 1000,1,mMaxTime);
-            mViewAdsr.mD = d;
-            mAdsr->mD = d;
-            float s = ofClamp(mClickAdsr.mS + (mClickStart.y-y)/mHeight,0,1);
-            mViewAdsr.mS = s;
-            mAdsr->mS = s;
+            float d = ofClamp(mClickAdsr.GetD() + mousePosSq * 1000,1,mMaxTime);
+            mViewAdsr.GetD() = d;
+            mAdsr->GetD() = d;
+            float s = ofClamp(mClickAdsr.GetS() + (mClickStart.y-y)/mHeight,0,1);
+            mViewAdsr.GetS() = s;
+            mAdsr->GetS() = s;
             break;
          }
          case kAdjustRelease:
          {
-            float r = ofClamp(mClickAdsr.mR + mousePosSq * 1000,1,mMaxTime);
-            mViewAdsr.mR = r;
-            mAdsr->mR = r;
+            float r = ofClamp(mClickAdsr.GetR() + mousePosSq * 1000,1,mMaxTime);
+            mViewAdsr.GetR() = r;
+            mAdsr->GetR() = r;
             break;
          }
          default:
@@ -281,10 +292,10 @@ void ADSRDisplay::SaveState(FileStreamOut& out)
 {
    out << kSaveStateRev;
    
-   out << mAdsr->mA;
-   out << mAdsr->mD;
-   out << mAdsr->mS;
-   out << mAdsr->mR;
+   out << mAdsr->GetA();
+   out << mAdsr->GetD();
+   out << mAdsr->GetS();
+   out << mAdsr->GetR();
 }
 
 void ADSRDisplay::LoadState(FileStreamIn& in, bool shouldSetValue)
@@ -293,10 +304,10 @@ void ADSRDisplay::LoadState(FileStreamIn& in, bool shouldSetValue)
    in >> rev;
    LoadStateValidate(rev <= kSaveStateRev);
    
-   in >> mAdsr->mA;
-   in >> mAdsr->mD;
-   in >> mAdsr->mS;
-   in >> mAdsr->mR;
+   in >> mAdsr->GetA();
+   in >> mAdsr->GetD();
+   in >> mAdsr->GetS();
+   in >> mAdsr->GetR();
    if (rev == 0)
    {
       float dummy;

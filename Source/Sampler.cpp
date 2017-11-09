@@ -51,7 +51,7 @@ void Sampler::CreateUIControls()
 {
    IDrawableModule::CreateUIControls();
    mVolSlider = new FloatSlider(this,"vol",5,73,80,15,&mVoiceParams.mVol,0,1);
-   mADSRDisplay = new ADSRDisplay(this,"adsr",5,15,80,40,&mVoiceParams.mAdsr);
+   mADSRDisplay = new ADSRDisplay(this,"env",5,15,80,40,&mVoiceParams.mAdsr);
    mRecordCheckbox = new Checkbox(this,"rec",5,57,&mRecording);
    mThreshSlider = new FloatSlider(this,"thresh",90,73,80,15,&mThresh,0,1);
    mPitchCorrectCheckbox = new Checkbox(this,"pitch",60,57,&mPitchCorrect);

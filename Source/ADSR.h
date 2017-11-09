@@ -10,36 +10,50 @@
 #define __additiveSynth__ADSR__
 
 #include <iostream>
+#include <vector>
+
+#define MAX_ADSR_STAGES 20
 
 class ADSR
 {
 public:
-   ADSR() : mA(1), mD(.0001f), mS(1), mR(1), mOn(false), mStartTime(-10000), mStopTime(-10000), mTarget(0), mMaxSustain(0), mBlendFromValue(0) {}
-   ADSR(float a, float d, float s, float r) : mA(a), mD(d), mS(s), mR(r), mOn(false), mStartTime(-10000), mStopTime(-10000), mMaxSustain(0), mBlendFromValue(0) {}
+   struct Stage
+   {
+      Stage() : target(0), time(1) {}
+      float target;
+      float time;
+   };
+   
+   ADSR(float a, float d, float s, float r) : mOn(false), mEventTime(-10000), mBlendFromValue(0), mMaxSustain(-1) { Set(a,d,s,r); }
+   ADSR() : ADSR(1,1,1,1) {}
    void Start(double time, float target);
    void Start(double time, float target, float a, float d, float s, float r);
-   void Start(double time, float target, ADSR adsr);
+   void Start(double time, float target, const ADSR& adsr);
    void Stop(double time);
-   float Value(double time);
-   void Set(float a, float d, float s, float r, float h = 0);
-   void Clear() { mTarget = 0; mOn = false; mStartTime = -10000; mStopTime = -10000;}
+   float Value(double time) const;
+   void Set(float a, float d, float s, float r, float h = -1);
+   void Set(const ADSR& other);
+   void Clear() { mOn = false; mMult = 0; mEventTime = -10000;}
    void SetMaxSustain(float max) { mMaxSustain = max; }
-   bool IsDone(double time);
+   bool IsDone(double time) const;
+   bool IsStandardADSR() const { return mNumStages == 3 && mSustainStage == 1; }
    
-   float mA;
-   float mD;
-   float mS;
-   float mR;
-   float mMaxSustain;
+   float& GetA() { return mStages[0].time; }
+   float& GetD() { return mStages[1].time; }
+   float& GetS() { return mStages[1].target; }
+   float& GetR() { return mStages[2].time; }
    
 private:
-   bool On() const;
+   int GetStage(double time, double& stageStartTimeOut) const;
    
-   float mBlendFromValue;
-   float mTarget;
    bool mOn;
-   double mStartTime;
-   double mStopTime;
+   float mBlendFromValue;
+   float mMult;
+   double mEventTime;
+   int mSustainStage;
+   float mMaxSustain;
+   Stage mStages[MAX_ADSR_STAGES];
+   int mNumStages;
 };
 
 #endif /* defined(__additiveSynth__ADSR__) */
