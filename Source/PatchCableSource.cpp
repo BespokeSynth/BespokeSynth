@@ -28,6 +28,7 @@ PatchCableSource::PatchCableSource(IDrawableModule* owner, ConnectionType type)
 , mDefaultPatchBehavior(kDefaultPatchBehavior_Repatch)
 , mPatchCableDrawMode(kPatchCableDrawMode_Normal)
 , mEnabled(true)
+, mClickable(true)
 , mSide(kNone)
 , mManualSide(kNone)
 {
@@ -92,7 +93,7 @@ void PatchCableSource::SetPatchCableTarget(PatchCable* cable, IClickable* target
    mOwner->PostRepatch(this);
    
    //insert
-   if (GetKeyModifiers() == kModifier_Alt)
+   if (GetKeyModifiers() == kModifier_Shift)
    {
       static bool allowInsert = true;
       if (allowInsert)  //avoid cascade on the next set
@@ -235,6 +236,9 @@ bool PatchCableSource::MouseMoved(float x, float y)
    if (!Enabled())
       return false;
    
+   if (!mClickable)
+      return false;
+   
    x = TheSynth->GetMouseX();
    y = TheSynth->GetMouseY();
    
@@ -255,6 +259,9 @@ void PatchCableSource::MouseReleased()
 bool PatchCableSource::TestClick(int x, int y, bool right, bool testOnly /* = false */)
 {
    if (!Enabled())
+      return false;
+   
+   if (!mClickable)
       return false;
    
    if (mHovered)

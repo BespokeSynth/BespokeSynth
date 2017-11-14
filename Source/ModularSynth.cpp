@@ -56,6 +56,7 @@ ModularSynth::ModularSynth()
 , mHasDuplicatedDuringDrag(false)
 , mFrameRate(0)
 , mQuickSpawn(nullptr)
+, mScheduledEnvelopeEditorSpawnDisplay(nullptr)
 {
    mConsoleText[0] = 0;
    assert(TheSynth == nullptr);
@@ -156,6 +157,12 @@ void ModularSynth::Poll()
    {
       mShowLoadStatePopup = false;
       LoadStatePopupImp();
+   }
+   
+   if (mScheduledEnvelopeEditorSpawnDisplay != nullptr)
+   {
+      mScheduledEnvelopeEditorSpawnDisplay->SpawnEnvelopeEditor();
+      mScheduledEnvelopeEditorSpawnDisplay = nullptr;
    }
    
    ++sFrameCount;
@@ -528,7 +535,7 @@ void ModularSynth::MouseDragged(int intX, int intY, int button)
    for (auto* modal : mModalFocusItemStack)
       modal->NotifyMouseMoved(x,y);
    
-   if (GetKeyModifiers() == kModifier_Shift && !mHasDuplicatedDuringDrag)
+   if (GetKeyModifiers() == kModifier_Alt && !mHasDuplicatedDuringDrag)
    {
       vector<IDrawableModule*> newGroupSelectedModules;
       map<IDrawableModule*, IDrawableModule*> oldToNewModuleMap;
@@ -1338,6 +1345,11 @@ void ModularSynth::AddDynamicModule(IDrawableModule* module)
    mModuleContainer.AddModule(module);
 }
 
+void ModularSynth::ScheduleEnvelopeEditorSpawn(ADSRDisplay* adsrDisplay)
+{
+   mScheduledEnvelopeEditorSpawnDisplay = adsrDisplay;
+}
+
 IDrawableModule* ModularSynth::FindModule(string name, bool fail)
 {
    if (name[0] == '$')
@@ -1710,7 +1722,7 @@ void ModularSynth::ClearConsoleInput()
    mConsoleEntry->UpdateDisplayString();
 }
 
-IDrawableModule* ModularSynth::SpawnModuleOnTheFly(string moduleName, float x, float y)
+IDrawableModule* ModularSynth::SpawnModuleOnTheFly(string moduleName, float x, float y, bool addToContainer)
 {
    vector<string> tokens = ofSplitString(moduleName," ");
    if (tokens.size() == 0)
@@ -1748,7 +1760,8 @@ IDrawableModule* ModularSynth::SpawnModuleOnTheFly(string moduleName, float x, f
       module = CreateModule(dummy);
       if (module != nullptr)
       {
-         mModuleContainer.AddModule(module);
+         if (addToContainer)
+            mModuleContainer.AddModule(module);
          SetUpModule(module, dummy);
          module->Init();
       }

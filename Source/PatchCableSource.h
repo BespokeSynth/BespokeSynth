@@ -71,6 +71,7 @@ public:
    void ClearTypeFilter() { mTypeFilter.clear(); }
    Side GetCableSide() const { return mSide; }
    void SetManualSide(Side side) { mManualSide = side; }
+   void SetClickable(bool clickable) { mClickable = clickable; }
    
    void Render() override;
    bool TestClick(int x, int y, bool right, bool testOnly = false) override;
@@ -101,6 +102,7 @@ private:
    int mManualPositionY;
    ofColor mColor;
    bool mEnabled;
+   bool mClickable;
    Side mSide;
    Side mManualSide;
    

@@ -8,19 +8,23 @@
 
 #include "ADSR.h"
 #include "OpenFrameworksPort.h"
+#include "MathUtils.h"
 
 void ADSR::Set(float a, float d, float s, float r, float h /*=-1*/)
 {
    mStages[0].target = 1;
    mStages[0].time = MAX(a,1);
-   mStages[1].target = s;
-   mStages[1].time = MAX(d,1);
+   mStages[0].curve = 0;
    mStages[1].target = MAX(s,.0001f);
+   mStages[1].time = MAX(d,1);
+   mStages[0].curve = 0;
    mStages[2].target = 0;
    mStages[2].time = MAX(r,1);
+   mStages[0].curve = 0;
    mNumStages = 3;
    mSustainStage = 1;
    mMaxSustain = h;
+   mHasSustainStage = true;
 }
 
 void ADSR::Set(const ADSR& other)
@@ -29,6 +33,9 @@ void ADSR::Set(const ADSR& other)
       mStages[i] = other.mStages[i];
    mNumStages = other.mNumStages;
    mSustainStage = other.mSustainStage;
+   mMaxSustain = other.mMaxSustain;
+   mHasSustainStage = other.mHasSustainStage;
+   mFreeReleaseLevel = other.mFreeReleaseLevel;
 }
 
 void ADSR::Start(double time, float target, float a, float d, float s, float r)
@@ -45,56 +52,78 @@ void ADSR::Start(double time, float target, const ADSR& adsr)
 
 void ADSR::Start(double time, float target)
 {
-   mBlendFromValue = Value(time);
-   mEventTime = time;
+   mStartBlendFromValue = Value(time);
+   mStartTime = time;
    mMult = target;
-   mOn = true;
+   
+   if (mMaxSustain != -1 && mHasSustainStage)
+   {
+      float stopTime = time;
+      for (int i=0; i<mNumStages; ++i)
+      {
+         stopTime += mStages[i].time;
+         if (i == mSustainStage)
+            break;
+      }
+      stopTime += mMaxSustain;
+      Stop(stopTime);
+   }
 }
 
 void ADSR::Stop(double time)
 {
-   mBlendFromValue = Value(time);
-   mEventTime = time;
-   mOn = false;
+   mStopBlendFromValue = Value(time);
+   mStopTime = time;
 }
 
 float ADSR::Value(double time) const
 {
+   if (mStartTime < 0)
+      return 0;
+   
    float stageStartValue;
    double stageStartTime;
    int stage = GetStage(time, stageStartTime);
    if (stage == mNumStages)  //done
-      return 0;
+      return mStages[stage-1].target;
    
-   if (stage == 0 || stage == mSustainStage + 1)
-      stageStartValue = mBlendFromValue;
+   if (stage == 0)
+      stageStartValue = mStartBlendFromValue;
+   else if (mHasSustainStage && stage == mSustainStage + 1)
+      stageStartValue = mStopBlendFromValue;
    else
       stageStartValue = mStages[stage-1].target * mMult;
    
-   if (stage == mSustainStage && time > stageStartTime + mStages[mSustainStage].time)
+   if (mHasSustainStage && stage == mSustainStage && time > stageStartTime + mStages[mSustainStage].time)
       return mStages[mSustainStage].target * mMult;
-   return ofLerp(stageStartValue, mStages[stage].target * mMult, (time - stageStartTime) / mStages[stage].time);
+   
+   float lerp = (time - stageStartTime) / mStages[stage].time;
+   if (mStages[stage].curve != 0)
+      lerp = MathUtils::Curve(lerp, mStages[stage].curve * ((stageStartValue < mStages[stage].target*mMult) ? 1 : -1));
+   
+   return ofLerp(stageStartValue, mStages[stage].target * mMult, lerp);
 }
 
 int ADSR::GetStage(double time, double& stageStartTimeOut) const
 {
-   int stage;
-   if (mOn)
-      stage = 0;
-   else
+   if (time < mStartTime || mStartTime < 0)
+      return mNumStages;
+   
+   int stage = 0;
+   stageStartTimeOut = mStartTime;
+   
+   if (mHasSustainStage && time >= mStopTime && mStopTime > mStartTime)
+   {
       stage = mSustainStage+1;
-   stageStartTimeOut = mEventTime;
+      stageStartTimeOut = mStopTime;
+   }
+   
    while (time > mStages[stage].time + stageStartTimeOut && stage < mNumStages)
    {
       stageStartTimeOut += mStages[stage].time;
       ++stage;
-      if (stage == mSustainStage)
-      {
-         if (mMaxSustain == -1)
-            break;
-         else
-            stageStartTimeOut += mMaxSustain;
-      }
+      if (mHasSustainStage && stage == mSustainStage)
+         break;
    }
    
    return stage;
@@ -104,4 +133,10 @@ bool ADSR::IsDone(double time) const
 {
    double dummy;
    return GetStage(time, dummy) == mNumStages;
+}
+
+int ADSR::GetStageForTime(double time) const
+{
+   double dummy;
+   return GetStage(time, dummy);
 }

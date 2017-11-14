@@ -9,6 +9,8 @@
 #include "ADSRDisplay.h"
 #include "SynthGlobals.h"
 #include "IDrawableModule.h"
+#include "ModularSynth.h"
+#include "EnvelopeEditor.h"
 
 ADSRDisplay::DisplayMode ADSRDisplay::sDisplayMode = ADSRDisplay::kDisplayEnvelope;
 
@@ -22,6 +24,7 @@ ADSRDisplay::ADSRDisplay(IDrawableModule* owner, const char* name, int x, int y,
 , mAdjustMode(kAdjustNone)
 , mHighlighted(false)
 , mActive(true)
+, mEditor(nullptr)
 {
    assert(owner);
    SetName(name);
@@ -77,23 +80,36 @@ void ADSRDisplay::Render()
    if (mAdsr && (mActive || sDisplayMode == kDisplayEnvelope))
    {
       if (mActive)
+      {
          ofSetColor(245, 58, 0, gModuleDrawAlpha);
+         ofSetLineWidth(1);
+      }
       else
+      {
          ofSetColor(0, 230, 245, .3f*gModuleDrawAlpha);
-      ofSetLineWidth(1);
+         ofSetLineWidth(.5f);
+      }
 
       ofBeginShape();
 
       mViewAdsr.Set(*mAdsr);
       mViewAdsr.Clear();
       mViewAdsr.Start(0,1);
-      float releaseTime = mAdsr->GetA() + mAdsr->GetD() + mMaxTime * .2f;
+      if (mViewAdsr.GetMaxSustain() == -1 && mViewAdsr.GetHasSustainStage())
+      {
+         float releaseTime = mMaxTime * .2f;
+         for (int i=0; i<mViewAdsr.GetNumStages(); ++i)
+         {
+            releaseTime += mViewAdsr.GetStageData(i).time;
+            if (i == mViewAdsr.GetSustainStage())
+               break;
+         }
+         mViewAdsr.Stop(releaseTime);
+      }
       ofVertex(0,mHeight);
       for (float i=0; i<mWidth; i+=(.25f/gDrawScale))
       {
          float time = i/mWidth * mMaxTime;
-         if (time > releaseTime)
-            mViewAdsr.Stop(releaseTime);
          float value = mViewAdsr.Value(time)*mVol;
          ofVertex(i, mHeight * (1 - value));
       }
@@ -121,6 +137,10 @@ void ADSRDisplay::Render()
             break;
          case kAdjustRelease:
             ofRect(mWidth-20,0,20,mHeight);
+            break;
+         case kAdjustEnvelopeEditor:
+            ofSetColor(255,255,255,.2f*gModuleDrawAlpha);
+            ofRect(mWidth-10,0,10,10);
             break;
          default:
             break;
@@ -191,6 +211,20 @@ void ADSRDisplay::ToggleDisplayMode()
    sDisplayMode = (sDisplayMode == kDisplayEnvelope) ? kDisplaySliders : kDisplayEnvelope;
 }
 
+void ADSRDisplay::SpawnEnvelopeEditor()
+{
+   if (mEditor == nullptr)
+   {
+      mEditor = dynamic_cast<EnvelopeEditor*>(TheSynth->SpawnModuleOnTheFly("envelopeeditor", -1, -1, false));
+      mEditor->SetADSRDisplay(this);
+   }
+   if (!mEditor->IsPinned())
+   {
+      mEditor->SetPosition(GetPosition().x+mWidth, GetPosition().y);
+      TheSynth->PushModalFocusItem(mEditor);
+   }
+}
+
 void ADSRDisplay::OnClicked(int x, int y, bool right)
 {
    if (!mShowing || !mActive || sDisplayMode != kDisplayEnvelope)
@@ -205,7 +239,11 @@ void ADSRDisplay::OnClicked(int x, int y, bool right)
       return;
    }
    
-   if (mAdsr->IsStandardADSR())
+   if (mAdjustMode == kAdjustEnvelopeEditor)
+   {
+      TheSynth->ScheduleEnvelopeEditorSpawn(this);
+   }
+   else if (mAdsr->IsStandardADSR())
    {
       mClick = true;
       mClickStart.set(x,y);
@@ -222,7 +260,11 @@ bool ADSRDisplay::MouseMoved(float x, float y)
 {
    if (!mClick)
    {
-      if (!mAdsr->IsStandardADSR())
+      if (x >= mWidth-10 && x <= mWidth && y <=10)
+      {
+         mAdjustMode = kAdjustEnvelopeEditor;
+      }
+      else if (!mAdsr->IsStandardADSR())
       {
          
       }

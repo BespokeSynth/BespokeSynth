@@ -391,6 +391,7 @@ void FloatSliderLFOControl::ButtonClicked(ClickButton* button)
             mSliderCable = new PatchCableSource(this, kConnectionType_UIControl);
             AddPatchCableSource(mSliderCable);
             mSliderCable->SetTarget(mOwner);
+            mSliderCable->SetClickable(false);
          }
       }
    }
@@ -452,6 +453,7 @@ void FloatSliderLFOControl::SetUpFromSaveData()
       mSliderCable = new PatchCableSource(this, kConnectionType_UIControl);
       AddPatchCableSource(mSliderCable);
       mSliderCable->SetTarget(mOwner);
+      mSliderCable->SetClickable(false);
    }
 }
 
@@ -467,8 +469,8 @@ void LFOPool::Init()
       sLFOPool[i]->CreateUIControls();
       sLFOPool[i]->Init();
       sLFOPool[i]->SetType("lfo");
-      sInitialized = true;
    }
+   sInitialized = true;
 }
 
 void LFOPool::Shutdown()

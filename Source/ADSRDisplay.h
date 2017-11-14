@@ -15,6 +15,7 @@
 #include "Slider.h"
 
 class IDrawableModule;
+class EnvelopeEditor;
 
 class ADSRDisplay : public IUIControl
 {
@@ -28,7 +29,9 @@ public:
    void SetHighlighted(bool highlighted) { mHighlighted = highlighted; }
    void SetMaxTime(float maxTime);
    void SetADSR(ADSR* adsr);
+   ADSR* GetADSR() { return mAdsr; }
    void SetActive(bool active);
+   void SpawnEnvelopeEditor();
    
    //IUIControl
    void SetFromMidiCC(float slider) override {}
@@ -52,6 +55,7 @@ private:
       kAdjustAttack,
       kAdjustDecaySustain,
       kAdjustRelease,
+      kAdjustEnvelopeEditor,
       kAdjustNone
    } mAdjustMode;
 
@@ -76,6 +80,7 @@ private:
    FloatSlider* mSSlider;
    FloatSlider* mRSlider;
    static DisplayMode sDisplayMode;
+   EnvelopeEditor* mEditor;
 };
 
 

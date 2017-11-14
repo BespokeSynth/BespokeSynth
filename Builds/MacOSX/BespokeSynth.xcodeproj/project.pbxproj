@@ -163,6 +163,7 @@
 		87BE6E0CE64AAEEA58AE98B0 /* CoreMIDI.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 3622AE414337C4036E1A64FA /* CoreMIDI.framework */; };
 		8A7DD143953B7F7872F5CD40 /* Bespoke_CFMessaging.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 0687B370A7DD65D2D6A950D5 /* Bespoke_CFMessaging.cpp */; };
 		8AC07423AB592C0A26B62EAB /* PanicButton.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 7B8431F6E29D6E7F2D8B2405 /* PanicButton.cpp */; };
+		8C2EBBD80C05B6C85A6ADAA4 /* MathUtils.cpp in Sources */ = {isa = PBXBuildFile; fileRef = BFA1A2C35D44ED2E9723DDD1 /* MathUtils.cpp */; };
 		8DD279CD188F475C6E09FB24 /* include_juce_core.mm in Sources */ = {isa = PBXBuildFile; fileRef = 06CEF14298CC77B2F0A4A51B /* include_juce_core.mm */; };
 		8E1FC381C30A9AF89BDA221D /* IOKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 44A6DBF54067AF35AF4D623A /* IOKit.framework */; };
 		8FB045F58AABCE07CA314BFB /* Pressure.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 0931C7BB7F081CC0A74083AE /* Pressure.cpp */; };
@@ -283,6 +284,7 @@
 		FB14CDBF6D2FD1E0FA26ECCB /* NoteHumanizer.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 64465DB75FF61C09C959F0E6 /* NoteHumanizer.cpp */; };
 		FB16D16B12FCC02B7174380D /* FormantFilterEffect.cpp in Sources */ = {isa = PBXBuildFile; fileRef = EF677351D768912D3777A9C8 /* FormantFilterEffect.cpp */; };
 		FB72E49433F5076A310910A8 /* OpenGL.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 50E7CC09ACCC7A2952504819 /* OpenGL.framework */; };
+		FDCE30573E2D7504B3ED8C8B /* EnvelopeEditor.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 7D68F5692524F311080533FF /* EnvelopeEditor.cpp */; };
 		FDE90566C78E43A39B175216 /* FreeverbEffect.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 33AD1B3D79D8DFF3762BC452 /* FreeverbEffect.cpp */; };
 		FE048350EFDD8BCB80BB79B9 /* CanvasControls.cpp in Sources */ = {isa = PBXBuildFile; fileRef = F0CA6362D8FCDDD97509B1FB /* CanvasControls.cpp */; };
 		FE128A0ABF6D1129C2BFF1F2 /* MidiDevice.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 376A70FAA6100F0A4C5DC0D3 /* MidiDevice.cpp */; };
@@ -573,6 +575,7 @@
 		7C6BAC01C7C987472345DFD0 /* FloatSliderLFOControl.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; name = FloatSliderLFOControl.cpp; path = ../../Source/FloatSliderLFOControl.cpp; sourceTree = SOURCE_ROOT; };
 		7D12D29896D6544A1F770EE4 /* SendPort.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; name = SendPort.cpp; path = ../../Source/CFMessaging/SendPort.cpp; sourceTree = SOURCE_ROOT; };
 		7D1910E5B59B0E328C17A356 /* GridToDrums.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; name = GridToDrums.h; path = ../../Source/GridToDrums.h; sourceTree = SOURCE_ROOT; };
+		7D68F5692524F311080533FF /* EnvelopeEditor.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; name = EnvelopeEditor.cpp; path = ../../Source/EnvelopeEditor.cpp; sourceTree = SOURCE_ROOT; };
 		7E281C5CCB27281CAE4B56C5 /* TremoloEffect.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; name = TremoloEffect.h; path = ../../Source/TremoloEffect.h; sourceTree = SOURCE_ROOT; };
 		7E5B08F27C9E321C71874B68 /* json_writer.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; name = json_writer.cpp; path = ../../Source/json/src/lib_json/json_writer.cpp; sourceTree = SOURCE_ROOT; };
 		7E67363AA76E3F2B609DC715 /* MidiController.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; name = MidiController.cpp; path = ../../Source/MidiController.cpp; sourceTree = SOURCE_ROOT; };
@@ -678,6 +681,7 @@
 		A300ECBED652ADA5AF0F4E52 /* IUIControl.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; name = IUIControl.h; path = ../../Source/IUIControl.h; sourceTree = SOURCE_ROOT; };
 		A34F8B6AD01794F8DE7EC665 /* ADSRDisplay.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; name = ADSRDisplay.h; path = ../../Source/ADSRDisplay.h; sourceTree = SOURCE_ROOT; };
 		A440B6DF6A5A32EB2F994379 /* MidiInstrument.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; name = MidiInstrument.h; path = ../../Source/MidiInstrument.h; sourceTree = SOURCE_ROOT; };
+		A4814580BA4261012B9E91A1 /* MathUtils.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; name = MathUtils.h; path = ../../Source/MathUtils.h; sourceTree = SOURCE_ROOT; };
 		A4E7370F0B6F25EF29D4DE82 /* Ramper.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; name = Ramper.h; path = ../../Source/Ramper.h; sourceTree = SOURCE_ROOT; };
 		A518D4B1B7B1867E83DD3430 /* LiveGranulator.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; name = LiveGranulator.cpp; path = ../../Source/LiveGranulator.cpp; sourceTree = SOURCE_ROOT; };
 		A529966BB2A5D20005A1310B /* WhiteKeys.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; name = WhiteKeys.h; path = ../../Source/WhiteKeys.h; sourceTree = SOURCE_ROOT; };
@@ -737,6 +741,7 @@
 		BF25DB5C165BDE5095AE0066 /* MidiOutput.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; name = MidiOutput.h; path = ../../Source/MidiOutput.h; sourceTree = SOURCE_ROOT; };
 		BF5FF2280952434CEA0890D1 /* NoteSinger.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; name = NoteSinger.cpp; path = ../../Source/NoteSinger.cpp; sourceTree = SOURCE_ROOT; };
 		BF8B2592E5EA204469A7C26C /* Producer.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; name = Producer.h; path = ../../Source/Producer.h; sourceTree = SOURCE_ROOT; };
+		BFA1A2C35D44ED2E9723DDD1 /* MathUtils.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; name = MathUtils.cpp; path = ../../Source/MathUtils.cpp; sourceTree = SOURCE_ROOT; };
 		BFA6582D4C1EE23BD398553D /* LoopStorer.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; name = LoopStorer.cpp; path = ../../Source/LoopStorer.cpp; sourceTree = SOURCE_ROOT; };
 		C064EA3B5667E6D8429EB178 /* Slider.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; name = Slider.cpp; path = ../../Source/Slider.cpp; sourceTree = SOURCE_ROOT; };
 		C08075F211A4C53C09E767D9 /* NoteSinger.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; name = NoteSinger.h; path = ../../Source/NoteSinger.h; sourceTree = SOURCE_ROOT; };
@@ -774,6 +779,7 @@
 		CDFB20B937C4388ED26F2B46 /* ControllingSong.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; name = ControllingSong.cpp; path = ../../Source/ControllingSong.cpp; sourceTree = SOURCE_ROOT; };
 		CE2425D7DBED006EC95F5553 /* ScaleDegree.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; name = ScaleDegree.h; path = ../../Source/ScaleDegree.h; sourceTree = SOURCE_ROOT; };
 		CE6DD925B3D5898C157706CA /* PitchDetector.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; name = PitchDetector.h; path = ../../Source/PitchDetector.h; sourceTree = SOURCE_ROOT; };
+		CE9578865A987B39E9961966 /* EnvelopeEditor.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; name = EnvelopeEditor.h; path = ../../Source/EnvelopeEditor.h; sourceTree = SOURCE_ROOT; };
 		D033D7F772CD35EE2219F068 /* FloatSliderLFOControl.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; name = FloatSliderLFOControl.h; path = ../../Source/FloatSliderLFOControl.h; sourceTree = SOURCE_ROOT; };
 		D08282EF4EA244C3B0EC940F /* FFT.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; name = FFT.h; path = ../../Source/FFT.h; sourceTree = SOURCE_ROOT; };
 		D09C15FCE5E2AE824CFD7978 /* PitchDetector.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; name = PitchDetector.cpp; path = ../../Source/PitchDetector.cpp; sourceTree = SOURCE_ROOT; };
@@ -1095,6 +1101,8 @@
 				CC6BFE629656DE2835D3086C /* Curve.h */,
 				5081A1F6AA6EF48C57386D0E /* EffectFactory.cpp */,
 				96D348959F2ED4DFBA8BE7C7 /* EffectFactory.h */,
+				7D68F5692524F311080533FF /* EnvelopeEditor.cpp */,
+				CE9578865A987B39E9961966 /* EnvelopeEditor.h */,
 				88B1036EE05FD23039A34636 /* EnvOscillator.cpp */,
 				031EDC3E345BBC927D0DDA4D /* EnvOscillator.h */,
 				00E7DB9EF26FC036EF0BDBE9 /* FFT.cpp */,
@@ -1149,6 +1157,8 @@
 				71B2C10EB4F1EF1E330B3A9B /* LocationZoomer.h */,
 				7A8294A95A281320A7B56778 /* Main.cpp */,
 				D7A22ABFE3E5A0B97D14ECB6 /* MainComponent.cpp */,
+				BFA1A2C35D44ED2E9723DDD1 /* MathUtils.cpp */,
+				A4814580BA4261012B9E91A1 /* MathUtils.h */,
 				376A70FAA6100F0A4C5DC0D3 /* MidiDevice.cpp */,
 				B78590C7DFD358507E107576 /* MidiDevice.h */,
 				749CA75AEF9DAE88BAB94884 /* MidiReader.cpp */,
@@ -1972,6 +1982,7 @@
 				DA81302605E8EB89E587613C /* Chord.cpp in Sources */,
 				6D582A3856FE6AD85EB50EA5 /* Curve.cpp in Sources */,
 				7E3EF2CAF179D972A859D7A4 /* EffectFactory.cpp in Sources */,
+				FDCE30573E2D7504B3ED8C8B /* EnvelopeEditor.cpp in Sources */,
 				9181FEA2173DFACAF4FCC022 /* EnvOscillator.cpp in Sources */,
 				7E6CBEA36DE2CADE2851057A /* FFT.cpp in Sources */,
 				1AB589174434AB5F4A83DE94 /* FileStream.cpp in Sources */,
@@ -1996,6 +2007,7 @@
 				AA8D055780BFB76ECA5887E2 /* LocationZoomer.cpp in Sources */,
 				577D465D5E39991987E162FF /* Main.cpp in Sources */,
 				B5C3EDADA441BBCD18050B76 /* MainComponent.cpp in Sources */,
+				8C2EBBD80C05B6C85A6ADAA4 /* MathUtils.cpp in Sources */,
 				FE128A0ABF6D1129C2BFF1F2 /* MidiDevice.cpp in Sources */,
 				579F4FFC62BB6D95F3618851 /* MidiReader.cpp in Sources */,
 				118EDB9F76FBEE093CBAC93A /* ModularSynth.cpp in Sources */,

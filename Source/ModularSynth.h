@@ -26,6 +26,7 @@ class PatchCable;
 class MidiController;
 class NVGcontext;
 class QuickSpawnMenu;
+class ADSRDisplay;
 
 #define MAX_OUTPUT_CHANNELS 8
 #define MAX_INPUT_CHANNELS 8
@@ -79,7 +80,7 @@ public:
    
    void AddMidiDevice(MidiDevice* device);
    void ArrangeAudioSourceDependencies();
-   IDrawableModule* SpawnModuleOnTheFly(string moduleName, float x, float y);
+   IDrawableModule* SpawnModuleOnTheFly(string moduleName, float x, float y, bool addToContainer = true);
    void SetMoveModule(IDrawableModule* module, float offsetX, float offsetY);
    
    bool SetInputChannel(int channel, InputChannel* input);
@@ -151,6 +152,8 @@ public:
    void OnModuleAdded(IDrawableModule* module);
    void OnModuleDeleted(IDrawableModule* module);
    void AddDynamicModule(IDrawableModule* module);
+   
+   void ScheduleEnvelopeEditorSpawn(ADSRDisplay* adsrDisplay);
    
    void SaveLayout(string jsonFile = "", bool makeDefaultLayout = true);
    ofxJSONElement GetLayout();
@@ -253,6 +256,8 @@ private:
    float mFrameRate;
    
    ModuleContainer mModuleContainer;
+   
+   ADSRDisplay* mScheduledEnvelopeEditorSpawnDisplay;
 };
 
 extern ModularSynth* TheSynth;

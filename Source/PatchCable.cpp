@@ -15,6 +15,7 @@
 #include "ModularSynth.h"
 #include "SynthGlobals.h"
 #include "PatchCableSource.h"
+#include "MathUtils.h"
 
 PatchCable* PatchCable::sActivePatchCable = nullptr;
 
@@ -39,56 +40,6 @@ void PatchCable::SetTarget(IClickable* target)
 {
    mTarget = target;
    mAudioReceiverTarget = dynamic_cast<IAudioReceiver*>(target);
-}
-
-namespace
-{
-   inline float Cube(float x)
-   {
-      return x*x*x;
-   }
-
-   inline float Square(float x)
-   {
-      return x*x;
-   }
-
-   float Bezier(float t, float p0, float p1, float p2, float p3)
-   {
-      return Cube(1-t)*p0 + 3*Square(1-t)*t*p1 + 3 * (1-t) * Square(t) * p2 + Cube(t) * p3;
-   }
-   
-   ofVec2f Bezier(float t, ofVec2f p0, ofVec2f p1, ofVec2f p2, ofVec2f p3)
-   {
-      return ofVec2f(Bezier(t, p0.x, p1.x, p2.x, p3.x), Bezier(t, p0.y, p1.y, p2.y, p3.y));
-      /*if (t < .333f)
-         return ofVec2f(ofLerp(p0.x,p1.x, t*3), ofLerp(p0.y,p1.y, t*3));
-      else if (t < .666f)
-         return ofVec2f(ofLerp(p1.x,p2.x,(t-.333f)*3), ofLerp(p1.y,p2.y,(t-.333f)*3));
-      else
-         return ofVec2f(ofLerp(p2.x,p3.x, (t-.666f)*3), ofLerp(p2.y,p3.y, (t-.666f)*3));*/
-   }
-   
-   float BezierDerivative(float t, float p0, float p1, float p2, float p3)
-   {
-      return 3*Square(1-t)*(p1-p0)+6*(1-t)*t*(p2-p1)+3*t*t*(p3-p2);
-   }
-   
-   ofVec2f BezierPerpendicular(float t, ofVec2f p0, ofVec2f p1, ofVec2f p2, ofVec2f p3)
-   {
-      ofVec2f perp(-BezierDerivative(t, p0.y, p1.y, p2.y, p3.y), BezierDerivative(t, p0.x, p1.x, p2.x, p3.x));
-      return perp / sqrt(perp.lengthSquared());
-   }
-   
-   ofVec2f ScaleVec(ofVec2f a, ofVec2f b)
-   {
-      return ofVec2f(a.x * b.x, a.y * b.y);
-   }
-   
-   ofVec2f Normal(ofVec2f v)
-   {
-      return v / sqrtf(v.lengthSquared());
-   }
 }
    
 void PatchCable::Render()
@@ -206,9 +157,9 @@ void PatchCable::Render()
       ofVec2f wireLineMag = cable.plug - cable.start;
       wireLineMag.x = MAX(50,fabsf(wireLineMag.x));
       wireLineMag.y = MAX(50,fabsf(wireLineMag.y));
-      ofVec2f endDirection = Normal(cable.plug - cable.end);
-      ofVec2f bezierControl1 = cable.start + ScaleVec(cable.startDirection, wireLineMag * .5f);
-      ofVec2f bezierControl2 = cable.plug + ScaleVec(endDirection, wireLineMag * .5f);
+      ofVec2f endDirection = MathUtils::Normal(cable.plug - cable.end);
+      ofVec2f bezierControl1 = cable.start + MathUtils::ScaleVec(cable.startDirection, wireLineMag * .5f);
+      ofVec2f bezierControl2 = cable.plug + MathUtils::ScaleVec(endDirection, wireLineMag * .5f);
       float wireLength = sqrtf((cable.plug - cable.start).lengthSquared());
       
       if (type == kConnectionType_Note || type == kConnectionType_Grid)
@@ -222,7 +173,7 @@ void PatchCable::Render()
          ofVertex(cable.start.x,cable.start.y);
          for (int i=1; i<wireLength-1; ++i)
          {
-            ofVec2f pos = Bezier(i/wireLength, cable.start, bezierControl1, bezierControl2, cable.plug);
+            ofVec2f pos = MathUtils::Bezier(i/wireLength, cable.start, bezierControl1, bezierControl2, cable.plug);
             ofVertex(pos.x,pos.y);
          }
          ofVertex(cable.plug.x,cable.plug.y);
@@ -259,7 +210,7 @@ void PatchCable::Render()
                   ofBeginShape();
                   for (int j=lastElapsed*wireLength; j<elapsed*wireLength; ++j)
                   {
-                     ofVec2f pos = Bezier(j/wireLength, cable.start, bezierControl1, bezierControl2, cable.plug);
+                     ofVec2f pos = MathUtils::Bezier(j/wireLength, cable.start, bezierControl1, bezierControl2, cable.plug);
                      ofVertex(pos.x,pos.y);
                   }
                   ofEndShape();
@@ -298,11 +249,11 @@ void PatchCable::Render()
             ofVertex(cable.start.x + offset.x,cable.start.y + offset.y);
             for (int i=1; i<wireLength-1; ++i)
             {
-               ofVec2f pos = Bezier(i/wireLength, cable.start, bezierControl1, bezierControl2, cable.plug);
+               ofVec2f pos = MathUtils::Bezier(i/wireLength, cable.start, bezierControl1, bezierControl2, cable.plug);
                float sample = vizBuff->GetSample((i/wireLength * numSamples), ch);
                sample = sqrtf(fabsf(sample)) * (sample < 0 ? -1 : 1);
                sample = ofClamp(sample, -1.0f, 1.0f);
-               ofVec2f sampleOffsetDir = BezierPerpendicular(i/wireLength, cable.start, bezierControl1, bezierControl2, cable.plug);
+               ofVec2f sampleOffsetDir = MathUtils::BezierPerpendicular(i/wireLength, cable.start, bezierControl1, bezierControl2, cable.plug);
                pos += sampleOffsetDir * 15 * sample;
                ofVertex(pos.x + offset.x,pos.y + offset.y);
             }
@@ -339,7 +290,7 @@ void PatchCable::Render()
          ofVertex(cable.start.x,cable.start.y);
          for (int i=1; i<wireLength-1; ++i)
          {
-            ofVec2f pos = Bezier(i/wireLength, cable.start, bezierControl1, bezierControl2, cable.plug);
+            ofVec2f pos = MathUtils::Bezier(i/wireLength, cable.start, bezierControl1, bezierControl2, cable.plug);
             ofVertex(pos.x,pos.y);
          }
          ofVertex(cable.plug.x,cable.plug.y);
@@ -514,7 +465,7 @@ ofVec2f PatchCable::FindClosestSide(int x, int y, int w, int h, ofVec2f start, o
       if (i == 3) //skip bottom
          continue;
       
-      float score = Normal(start - sides[i]).dot(dirs[i]);
+      float score = MathUtils::Normal(start - sides[i]).dot(dirs[i]);
       if (score > best)
       {
          best = score;
@@ -523,7 +474,7 @@ ofVec2f PatchCable::FindClosestSide(int x, int y, int w, int h, ofVec2f start, o
    }
    
    if (w == 0 && h == 0)
-      endDirection = Normal(start - ofVec2f(x,y));
+      endDirection = MathUtils::Normal(start - ofVec2f(x,y));
    else
       endDirection = dirs[bestIndex];
    return sides[bestIndex];

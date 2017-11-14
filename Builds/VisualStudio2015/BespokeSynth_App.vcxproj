@@ -332,6 +332,7 @@
     <ClCompile Include="..\..\Source\Chord.cpp"/>
     <ClCompile Include="..\..\Source\Curve.cpp"/>
     <ClCompile Include="..\..\Source\EffectFactory.cpp"/>
+    <ClCompile Include="..\..\Source\EnvelopeEditor.cpp"/>
     <ClCompile Include="..\..\Source\EnvOscillator.cpp"/>
     <ClCompile Include="..\..\Source\FFT.cpp"/>
     <ClCompile Include="..\..\Source\FileStream.cpp"/>
@@ -356,6 +357,7 @@
     <ClCompile Include="..\..\Source\LocationZoomer.cpp"/>
     <ClCompile Include="..\..\Source\Main.cpp"/>
     <ClCompile Include="..\..\Source\MainComponent.cpp"/>
+    <ClCompile Include="..\..\Source\MathUtils.cpp"/>
     <ClCompile Include="..\..\Source\MidiDevice.cpp"/>
     <ClCompile Include="..\..\Source\MidiReader.cpp"/>
     <ClCompile Include="..\..\Source\ModularSynth.cpp"/>

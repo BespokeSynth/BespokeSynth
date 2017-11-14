@@ -216,7 +216,7 @@ void IDrawableModule::Render()
    }
    
    const bool kUseDropshadow = true;
-   if (kUseDropshadow && GetParent() == nullptr)
+   if (kUseDropshadow && GetParent() == nullptr && GetModuleType() != kModuleType_Other)
    {
       const float shadowSize = 20;
       float shadowStrength = .2f + highlight;

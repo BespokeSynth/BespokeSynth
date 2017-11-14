@@ -53,8 +53,18 @@ void AudioSend::Process(double time)
    if (!mEnabled)
       return;
    
+   ComputeSliders(0);
    SyncBuffers();
    mVizBuffer2.SetNumChannels(GetBuffer()->NumActiveChannels());
+   
+   float* amountBuffer = gWorkBuffer;
+   float* dryAmountBuffer = gWorkBuffer+gBufferSize;
+   for (int i=0; i<gBufferSize; ++i)
+   {
+      ComputeSliders(i);
+      amountBuffer[i] = mAmount;
+      dryAmountBuffer[i] = 1-mAmount;
+   }
    
    if (GetTarget(0))
    {
@@ -62,10 +72,8 @@ void AudioSend::Process(double time)
       for (int ch=0; ch<GetBuffer()->NumActiveChannels(); ++ch)
       {
          ChannelBuffer* out = GetTarget(0)->GetBuffer();
-         float dryAmount = (1-mAmount);
-         if (!mCrossfade)
-            dryAmount = 1;
-         Mult(gWorkChannelBuffer.GetChannel(ch), dryAmount, GetBuffer()->BufferSize());
+         if (mCrossfade)
+            Mult(gWorkChannelBuffer.GetChannel(ch), dryAmountBuffer, GetBuffer()->BufferSize());
          Add(out->GetChannel(ch), gWorkChannelBuffer.GetChannel(ch), GetBuffer()->BufferSize());
          GetVizBuffer()->WriteChunk(gWorkChannelBuffer.GetChannel(ch), GetBuffer()->BufferSize(), ch);
       }
@@ -76,7 +84,7 @@ void AudioSend::Process(double time)
       for (int ch=0; ch<GetBuffer()->NumActiveChannels(); ++ch)
       {
          ChannelBuffer* out2 = GetTarget(1)->GetBuffer();
-         Mult(GetBuffer()->GetChannel(ch), mAmount, GetBuffer()->BufferSize());
+         Mult(GetBuffer()->GetChannel(ch), amountBuffer, GetBuffer()->BufferSize());
          Add(out2->GetChannel(ch), GetBuffer()->GetChannel(ch), GetBuffer()->BufferSize());
          mVizBuffer2.WriteChunk(GetBuffer()->GetChannel(ch), GetBuffer()->BufferSize(), ch);
       }

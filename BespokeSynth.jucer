@@ -620,6 +620,10 @@
       <FILE id="aTYL9e" name="EffectFactory.cpp" compile="1" resource="0"
             file="Source/EffectFactory.cpp"/>
       <FILE id="gzpG5V" name="EffectFactory.h" compile="0" resource="0" file="Source/EffectFactory.h"/>
+      <FILE id="U0co53" name="EnvelopeEditor.cpp" compile="1" resource="0"
+            file="Source/EnvelopeEditor.cpp"/>
+      <FILE id="NetPDV" name="EnvelopeEditor.h" compile="0" resource="0"
+            file="Source/EnvelopeEditor.h"/>
       <FILE id="MFt7yA" name="EnvOscillator.cpp" compile="1" resource="0"
             file="Source/EnvOscillator.cpp"/>
       <FILE id="D9QRrG" name="EnvOscillator.h" compile="0" resource="0" file="Source/EnvOscillator.h"/>
@@ -699,6 +703,8 @@
       <FILE id="mMQQPx" name="Main.cpp" compile="1" resource="0" file="Source/Main.cpp"/>
       <FILE id="qVhzmD" name="MainComponent.cpp" compile="1" resource="0"
             file="Source/MainComponent.cpp"/>
+      <FILE id="Ko1j5o" name="MathUtils.cpp" compile="1" resource="0" file="Source/MathUtils.cpp"/>
+      <FILE id="Tfu4Qz" name="MathUtils.h" compile="0" resource="0" file="Source/MathUtils.h"/>
       <FILE id="bOIAad" name="MidiDevice.cpp" compile="1" resource="0" file="Source/MidiDevice.cpp"/>
       <FILE id="KrDt1T" name="MidiDevice.h" compile="0" resource="0" file="Source/MidiDevice.h"/>
       <FILE id="NO0BNX" name="MidiReader.cpp" compile="1" resource="0" file="Source/MidiReader.cpp"/>

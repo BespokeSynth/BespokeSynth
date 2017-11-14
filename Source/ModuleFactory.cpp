@@ -157,6 +157,7 @@
 #include "Panner.h"
 #include "SamplePlayer.h"
 #include "AudioSend.h"
+#include "EnvelopeEditor.h"
 
 #define REGISTER(class,name,type) Register(#name, &(class::Create), &(class::CanCreate), type, false, false);
 #define REGISTER_HIDDEN(class,name,type) Register(#name, &(class::Create), &(class::CanCreate), type, true, false);
@@ -313,6 +314,7 @@ ModuleFactory::ModuleFactory()
    REGISTER_HIDDEN(ControlTactileFeedback, controltactilefeedback, kModuleType_Synth);
    REGISTER_HIDDEN(FloatSliderLFOControl, lfo, kModuleType_Other);
    REGISTER_HIDDEN(NoteLooper, notelooper, kModuleType_Note);
+   REGISTER_HIDDEN(EnvelopeEditor, envelopeeditor, kModuleType_Other);
 }
 
 void ModuleFactory::Register(string type, CreateModuleFn creator, CanCreateModuleFn canCreate, ModuleType moduleType, bool hidden, bool experimental)

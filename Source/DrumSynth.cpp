@@ -578,9 +578,25 @@ DrumSynth::DrumSynthHitSerialData::DrumSynthHitSerialData()
 , mVol(0)
 , mVolNoise(0)
 {
-   mTone.GetADSR()->Set(1, 100, 0, 0, 1);
-   mNoise.GetADSR()->Set(1, 40, 0, 0, 1);
-   mFreqAdsr.Set(1, 500, 1, 0, 1);
+   mTone.GetADSR()->SetNumStages(2);
+   mTone.GetADSR()->GetHasSustainStage() = false;
+   mTone.GetADSR()->GetStageData(0).time = 1;
+   mTone.GetADSR()->GetStageData(0).target = 1;
+   mTone.GetADSR()->GetStageData(1).time = 100;
+   mTone.GetADSR()->GetStageData(1).target = 0;
+   mNoise.GetADSR()->SetNumStages(2);
+   mNoise.GetADSR()->GetHasSustainStage() = false;
+   mNoise.GetADSR()->GetStageData(0).time = 1;
+   mNoise.GetADSR()->GetStageData(0).target = 1;
+   mNoise.GetADSR()->GetStageData(1).time = 40;
+   mNoise.GetADSR()->GetStageData(1).target = 0;
+   mFreqAdsr.SetNumStages(2);
+   mFreqAdsr.GetHasSustainStage() = false;
+   mFreqAdsr.GetFreeReleaseLevel() = true;
+   mFreqAdsr.GetStageData(0).time = 1;
+   mFreqAdsr.GetStageData(0).target = 1;
+   mFreqAdsr.GetStageData(1).time = 500;
+   mFreqAdsr.GetStageData(1).target = 0;
 }
 
 
