@@ -45,6 +45,7 @@ public:
    PatchCable* AddPatchCable(IClickable* target);
    const vector<PatchCable*>& GetPatchCables() const { return mPatchCables; }
    void Clear();
+   void FindValidTargets();
    bool IsValidTarget(IClickable* target) const;
    void CableGrabbed();
    ConnectionType GetConnectionType() const { return mType; }
@@ -72,6 +73,7 @@ public:
    Side GetCableSide() const { return mSide; }
    void SetManualSide(Side side) { mManualSide = side; }
    void SetClickable(bool clickable) { mClickable = clickable; }
+   bool TestHover(float x, float y) const;
    
    void Render() override;
    bool TestClick(int x, int y, bool right, bool testOnly = false) override;
@@ -83,10 +85,11 @@ public:
    void SaveState(FileStreamOut& out);
    void LoadState(FileStreamIn& in);
    
+   static bool sAllowInsert;
+   
 protected:
    void OnClicked(int x, int y, bool right) override;
 private:
-   void FindValidTargets();
    bool InAddCableMode() const;
    
    vector<PatchCable*> mPatchCables;

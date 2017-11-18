@@ -498,6 +498,62 @@ void ModularSynth::MouseMoved(int intX, int intY )
       float oldX, oldY;
       mMoveModule->GetPosition(oldX, oldY);
       mMoveModule->Move(x + mMoveModuleOffsetX - oldX, y + mMoveModuleOffsetY - oldY);
+      
+      if (GetKeyModifiers() == kModifier_Shift)
+      {
+         for (auto* module : mModuleContainer.GetModules())
+         {
+            if (module == mMoveModule)
+               continue;
+            for (auto* patchCableSource : module->GetPatchCableSources())
+            {
+               if (patchCableSource->TestHover(x, y))
+               {
+                  patchCableSource->FindValidTargets();
+                  if (!patchCableSource->IsValidTarget(mMoveModule))
+                     continue;
+                  
+                  if (patchCableSource->GetPatchCables().size() == 0)
+                  {
+                     PatchCableSource::sAllowInsert = false;
+                     patchCableSource->SetTarget(mMoveModule);
+                     PatchCableSource::sAllowInsert = true;
+                     break;
+                  }
+                  else if (patchCableSource->GetPatchCables().size() == 1 && patchCableSource->GetTarget() != mMoveModule &&
+                      mMoveModule->GetPatchCableSource()) //insert
+                  {
+                     mMoveModule->GetPatchCableSource()->FindValidTargets();
+                     if (mMoveModule->GetPatchCableSource()->IsValidTarget(patchCableSource->GetTarget()))
+                     {
+                        PatchCableSource::sAllowInsert = false;
+                        mMoveModule->SetTarget(patchCableSource->GetTarget());
+                        patchCableSource->SetTarget(mMoveModule);
+                        PatchCableSource::sAllowInsert = true;
+                     }
+                     break;
+                  }
+               }
+            }
+            
+            if (mMoveModule->GetPatchCableSource() && mMoveModule->GetPatchCableSource()->GetTarget() == nullptr && module->HasTitleBar())
+            {
+               ofRectangle titleBarRect(module->GetPosition().x, module->GetPosition().y - IDrawableModule::TitleBarHeight(), module->IClickable::GetDimensions().x, IDrawableModule::TitleBarHeight());
+               if (titleBarRect.inside(mMoveModule->GetPatchCableSource()->GetPosition().x, mMoveModule->GetPatchCableSource()->GetPosition().y))
+               {
+                  mMoveModule->GetPatchCableSource()->FindValidTargets();
+                  if (mMoveModule->GetPatchCableSource()->IsValidTarget(module))
+                  {
+                     PatchCableSource::sAllowInsert = false;
+                     mMoveModule->SetTarget(module);
+                     PatchCableSource::sAllowInsert = true;
+                     break;
+                  }
+               }
+            }
+         }
+      }
+      
       return;
    }
 

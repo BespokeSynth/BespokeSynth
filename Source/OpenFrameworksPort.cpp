@@ -424,10 +424,10 @@ bool ofRectangle::intersects(const ofRectangle& other) const
            getMinY() < other.getMaxY() && getMaxY() > other.getMinY());
 }
 
-bool ofRectangle::inside(float x, float y) const
+bool ofRectangle::inside(float testX, float testY) const
 {
-   return x > getMinX() && y > getMinY() &&
-          x < getMaxX() && y < getMaxY();
+   return testX > getMinX() && testY > getMinY() &&
+          testX < getMaxX() && testY < getMaxY();
 }
 
 void ofColor::setBrightness(int brightness)

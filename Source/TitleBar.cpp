@@ -54,7 +54,6 @@ void SpawnList::OnSelection(DropdownList* list)
 {
    if (list == mSpawnList)
    {
-      
       IDrawableModule* module = Spawn();
       TheSynth->SetMoveModule(module, moduleGrabOffset.x, moduleGrabOffset.y);
       mSpawnIndex = -1;

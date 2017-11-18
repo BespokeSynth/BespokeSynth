@@ -18,6 +18,8 @@ namespace
    const int patchCableSourceRadius = 5;
 }
 
+bool PatchCableSource::sAllowInsert = true;
+
 PatchCableSource::PatchCableSource(IDrawableModule* owner, ConnectionType type)
 : mOwner(owner)
 , mType(type)
@@ -95,14 +97,17 @@ void PatchCableSource::SetPatchCableTarget(PatchCable* cable, IClickable* target
    //insert
    if (GetKeyModifiers() == kModifier_Shift)
    {
-      static bool allowInsert = true;
-      if (allowInsert)  //avoid cascade on the next set
+      if (sAllowInsert)  //avoid cascade on the next set
       {
-         allowInsert = false;
+         sAllowInsert = false;
          IDrawableModule* targetModule = dynamic_cast<IDrawableModule*>(target);
-         if (targetModule)
-            targetModule->SetTarget(oldTarget);
-         allowInsert = true;
+         if (targetModule && targetModule->GetPatchCableSource())
+         {
+            targetModule->GetPatchCableSource()->FindValidTargets();
+            if (targetModule->GetPatchCableSource()->IsValidTarget(oldTarget))
+               targetModule->SetTarget(oldTarget);
+         }
+         sAllowInsert = true;
       }
    }
 }
@@ -288,6 +293,19 @@ bool PatchCableSource::TestClick(int x, int y, bool right, bool testOnly /* = fa
    //}
    
    return false;
+}
+
+bool PatchCableSource::TestHover(float x, float y) const
+{
+   if (!Enabled())
+      return false;
+   
+   if (!mClickable)
+      return false;
+   
+   ofVec2f myPos = GetPosition();
+   
+   return ofDistSquared(x, y, myPos.x, myPos.y) < patchCableSourceRadius * patchCableSourceRadius;
 }
 
 bool PatchCableSource::Enabled() const
