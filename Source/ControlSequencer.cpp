@@ -20,6 +20,7 @@ ControlSequencer::ControlSequencer()
 , mLength(4)
 , mLengthSelector(nullptr)
 , mControlCable(nullptr)
+, mRandomize(nullptr)
 {
    TheTransport->AddListener(this, mInterval);
    
@@ -38,7 +39,8 @@ void ControlSequencer::CreateUIControls()
    IDrawableModule::CreateUIControls();
    mGrid = new Grid(5,23,130,40,16,1);
    mIntervalSelector = new DropdownList(this,"interval",5,3,(int*)(&mInterval));
-   mLengthSelector = new DropdownList(this,"length",45,3,(int*)(&mLength));
+   mLengthSelector = new DropdownList(this,"length",mIntervalSelector,kAnchor_Right,(int*)(&mLength));
+   mRandomize = new ClickButton(this,"random",mLengthSelector,kAnchor_Right);
    
    mControlCable = new PatchCableSource(this, kConnectionType_UIControl);
    //mControlCable->SetManualPosition(86, 10);
@@ -108,6 +110,7 @@ void ControlSequencer::DrawModule()
    mGrid->Draw();
    mIntervalSelector->Draw();
    mLengthSelector->Draw();
+   mRandomize->Draw();
    
    int currentHover = mGrid->CurrentHover();
    if (currentHover != -1 && mUIControl)
@@ -218,6 +221,15 @@ void ControlSequencer::DropdownUpdated(DropdownList* list, int oldVal)
          SetNumSteps(newSteps, false);
       else
          mLength = oldVal;
+   }
+}
+
+void ControlSequencer::ButtonClicked(ClickButton* button)
+{
+   if (button == mRandomize)
+   {
+      for (int i=0; i<mGrid->GetCols(); ++i)
+         mGrid->SetVal(i, 0, ofRandom(1));
    }
 }
 

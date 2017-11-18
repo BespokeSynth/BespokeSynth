@@ -11,26 +11,17 @@
 #include "SynthGlobals.h"
 #include "ModularSynth.h"
 
-ADSR FloatSliderLFOControl::sADSR[NUM_GLOBAL_ADSRS];
-
 FloatSliderLFOControl::FloatSliderLFOControl()
 : mOwner(nullptr)
 , mIntervalSelector(nullptr)
 , mOscSelector(nullptr)
 , mOffsetSlider(nullptr)
 , mBiasSlider(nullptr)
-, mAddSlider(nullptr)
+, mSpreadSlider(nullptr)
 , mSoftenSlider(nullptr)
 , mShuffleSlider(nullptr)
-, mType(kLFOControlType_LFO)
-, mTypeSelector(nullptr)
-, mADSRDisplay(nullptr)
-, mADSRIndex(0)
-, mADSRSelector(nullptr)
 , mPinned(false)
 , mSliderCable(nullptr)
-, mADSRLengthMultiplier(1)
-, mADSRLengthMultiplierSlider(nullptr)
 {
    SetLFOEnabled(false);
    
@@ -40,7 +31,7 @@ FloatSliderLFOControl::FloatSliderLFOControl()
    mLFOSettings.mMin = 0;
    mLFOSettings.mMax = 1;
    mLFOSettings.mBias = .5f;
-   mLFOSettings.mAdd = 0;
+   mLFOSettings.mSpread = 0;
    mLFOSettings.mSoften = 0;
    mLFOSettings.mShuffle = 0;
    mLFOSettings.mFreeRate = 1;
@@ -51,20 +42,16 @@ FloatSliderLFOControl::FloatSliderLFOControl()
 void FloatSliderLFOControl::CreateUIControls()
 {
    IDrawableModule::CreateUIControls();
-   mIntervalSelector = new DropdownList(this,"interval",4,74,(int*)(&mLFOSettings.mInterval));
+   mIntervalSelector = new DropdownList(this,"interval",4,58,(int*)(&mLFOSettings.mInterval));
    mOscSelector = new DropdownList(this,"osc",-1,-1,(int*)(&mLFOSettings.mOscType));
-   mOffsetSlider = new FloatSlider(this,"off",-1,-1,90,15,&mLFOSettings.mLFOOffset,0,1);
-   mFreeRateSlider = new FloatSlider(this,"free rate",-1,-1,90,15,&mLFOSettings.mFreeRate,0,50);
-   mBiasSlider = new FloatSlider(this,"bias",-1,-1,90,15,&mLFOSettings.mBias,0,1);
-   mTypeSelector = new RadioButton(this,"type",2,16,(int*)(&mType),kRadioHorizontal);
-   mADSRDisplay = new ADSRDisplay(this,"env",2,40,96,40,&sADSR[0]);
-   mADSRSelector = new RadioButton(this,"envselector",2,85,&mADSRIndex,kRadioHorizontal);
-   mADSRLengthMultiplierSlider = new FloatSlider(this,"length",2,103,90,15,&mADSRLengthMultiplier,.01f,10);
-   mMinSlider = new FloatSlider(this,"low",-1,-1,90,15,&mLFOSettings.mMin,0,1);
-   mMaxSlider = new FloatSlider(this,"high",-1,-1,90,15,&mLFOSettings.mMax,0,1);
-   mAddSlider = new FloatSlider(this,"add",-1,-1,90,15,&mLFOSettings.mAdd,-1,1);
-   mSoftenSlider = new FloatSlider(this,"soften",-1,-1,90,15,&mLFOSettings.mSoften,0,1);
-   mShuffleSlider = new FloatSlider(this,"shuffle",-1,-1,90,15,&mLFOSettings.mShuffle,0,1);
+   mOffsetSlider = new FloatSlider(this,"off",mIntervalSelector, kAnchor_Below,90,15,&mLFOSettings.mLFOOffset,0,1);
+   mFreeRateSlider = new FloatSlider(this,"free rate",mIntervalSelector, kAnchor_Below,90,15,&mLFOSettings.mFreeRate,0,50);
+   mBiasSlider = new FloatSlider(this,"bias",mOffsetSlider, kAnchor_Below,90,15,&mLFOSettings.mBias,0,1);
+   mMinSlider = new FloatSlider(this,"low",mBiasSlider, kAnchor_Below,90,15,&mLFOSettings.mMin,0,1);
+   mMaxSlider = new FloatSlider(this,"high",mMinSlider, kAnchor_Below,90,15,&mLFOSettings.mMax,0,1);
+   mSpreadSlider = new FloatSlider(this,"spread",mMaxSlider, kAnchor_Below,90,15,&mLFOSettings.mSpread,0,1);
+   mSoftenSlider = new FloatSlider(this,"soften",mSpreadSlider, kAnchor_Below,90,15,&mLFOSettings.mSoften,0,1);
+   mShuffleSlider = new FloatSlider(this,"shuffle",mSoftenSlider, kAnchor_Below,90,15,&mLFOSettings.mShuffle,0,1);
    mPinButton = new ClickButton(this,"pin",70,2);
    mEnableLFOCheckbox = new Checkbox(this,"enable",5,2,&mEnabled);
    
@@ -94,22 +81,7 @@ void FloatSliderLFOControl::CreateUIControls()
    mOscSelector->AddLabel("rand",kOsc_Random);
    mOscSelector->AddLabel("drnk",kOsc_Drunk);
    
-   mTypeSelector->AddLabel("lfo", kLFOControlType_LFO);
-   mTypeSelector->AddLabel("env", kLFOControlType_ADSR);
-   //mTypeSelector->AddLabel("draw", kLFOControlType_Drawn);
-   
-   for (int i=0; i<NUM_GLOBAL_ADSRS; ++i)
-      mADSRSelector->AddLabel(ofToString(i).c_str(), i);
-   
    mOscSelector->PositionTo(mIntervalSelector, kAnchor_Right);
-   mOffsetSlider->PositionTo(mIntervalSelector, kAnchor_Below);
-   mFreeRateSlider->PositionTo(mIntervalSelector, kAnchor_Below);
-   mBiasSlider->PositionTo(mOffsetSlider, kAnchor_Below);
-   mMinSlider->PositionTo(mBiasSlider, kAnchor_Below);
-   mMaxSlider->PositionTo(mMinSlider, kAnchor_Below);
-   mAddSlider->PositionTo(mMaxSlider, kAnchor_Below);
-   mSoftenSlider->PositionTo(mAddSlider, kAnchor_Below);
-   mShuffleSlider->PositionTo(mSoftenSlider, kAnchor_Below);
    
    mFreeRateSlider->SetMode(FloatSlider::kBezier);
    mFreeRateSlider->SetBezierControl(1);
@@ -143,67 +115,60 @@ void FloatSliderLFOControl::DrawModule()
       return;
    
    mEnableLFOCheckbox->Draw();
-   mTypeSelector->Draw();
    mIntervalSelector->Draw();
    mOscSelector->Draw();
    mOffsetSlider->Draw();
    mBiasSlider->Draw();
    mFreeRateSlider->Draw();
-   mADSRDisplay->Draw();
-   mADSRSelector->Draw();
    mMinSlider->Draw();
    mMaxSlider->Draw();
-   mAddSlider->Draw();
+   mSpreadSlider->Draw();
    mSoftenSlider->Draw();
    mShuffleSlider->Draw();
-   mADSRLengthMultiplierSlider->Draw();
    if (!mPinned)
       mPinButton->Draw();
    
-   if (mType == kLFOControlType_LFO)
+   int x = 5;
+   int y = 20;
+   int height = 35;
+   int width = 90;
+   
+   ofSetColor(100,100,.8f*gModuleDrawAlpha);
+   ofSetLineWidth(.5f);
+   ofRect(x,y,width,height, 0);
+   
+   ofSetColor(245, 58, 0, gModuleDrawAlpha);
+   ofSetLineWidth(1);
+   
+   ofBeginShape();
+   
+   for (float i=0; i<width; i+=(.25f/gDrawScale))
    {
-      int x = 5;
-      int y = 36;
-      int height = 35;
-      int width = 90;
-      
-      ofSetColor(100,100,.8f*gModuleDrawAlpha);
-      ofSetLineWidth(.5f);
-      ofRect(x,y,width,height, 0);
-      
-      ofSetColor(245, 58, 0, gModuleDrawAlpha);
-      ofSetLineWidth(1);
-      
-      ofBeginShape();
-      
-      for (float i=0; i<width; i+=(.25f/gDrawScale))
-      {
-         float phase = i/width;
-         if (mLFO.GetOsc()->GetShuffle() > 0)
-            phase *= 2;
-         phase += mLFOSettings.mLFOOffset;
-         float value = GetLFOValue(0, phase);
-         ofVertex(i + x, ofMap(value,mOwner->GetMax(),mOwner->GetMin(),0,height) + y);
-      }
-      ofEndShape(false);
-      
-      float currentPhase = mLFO.CalculatePhase();
-      float squeeze;
-      if (mLFO.GetOsc()->GetShuffle() == 0)
-      {
-         squeeze = 1;
-         currentPhase -= (int)currentPhase;
-      }
-      else
-      {
-         squeeze = 2;
-      }
-      currentPhase -= mLFOSettings.mLFOOffset;
-      if (currentPhase < 0)
-         currentPhase += squeeze;
-      ofCircle(currentPhase / squeeze * width + x,
-               ofMap(GetLFOValue(),mOwner->GetMax(),mOwner->GetMin(),0,height) + y, 2);
+      float phase = i/width;
+      if (mLFO.GetOsc()->GetShuffle() > 0)
+         phase *= 2;
+      phase += mLFOSettings.mLFOOffset;
+      float value = GetLFOValue(0, phase);
+      ofVertex(i + x, ofMap(value,mOwner->GetMax(),mOwner->GetMin(),0,height) + y);
    }
+   ofEndShape(false);
+   
+   float currentPhase = mLFO.CalculatePhase();
+   float squeeze;
+   if (mLFO.GetOsc()->GetShuffle() == 0)
+   {
+      squeeze = 1;
+      currentPhase -= (int)currentPhase;
+   }
+   else
+   {
+      squeeze = 2;
+   }
+   currentPhase -= mLFOSettings.mLFOOffset;
+   if (currentPhase < 0)
+      currentPhase += squeeze;
+   ofCircle(currentPhase / squeeze * width + x,
+            ofMap(GetLFOValue(),mOwner->GetMax(),mOwner->GetMin(),0,height) + y, 2);
 }
 
 void FloatSliderLFOControl::SetLFOEnabled(bool enabled)
@@ -243,7 +208,6 @@ void FloatSliderLFOControl::SetOwner(FloatSlider* owner)
    }
    mMinSlider->SetExtents(owner->GetMin(), owner->GetMax());
    mMaxSlider->SetExtents(owner->GetMin(), owner->GetMax());
-   mAddSlider->SetExtents(owner->GetMin() - owner->GetMax(), owner->GetMax() - owner->GetMin());
    mMinSlider->SetMode(owner->GetMode());
    mMaxSlider->SetMode(owner->GetMode());
    mModuleSaveData.SetExtents("low", owner->GetMin(), owner->GetMax());
@@ -265,16 +229,15 @@ void FloatSliderLFOControl::Load(LFOSettings settings)
 float FloatSliderLFOControl::Value(int samplesIn /*= 0*/)
 {
    ComputeSliders(samplesIn);
-   if (mType == kLFOControlType_LFO)
-      return GetLFOValue(samplesIn);
-   if (mType == kLFOControlType_ADSR)
-      return ofClamp(Interp(sADSR[mADSRIndex].Value(gTime + samplesIn * gInvSampleRateMs), mLFOSettings.mMin, mLFOSettings.mMax) + mLFOSettings.mAdd, mOwner->GetMin(), mOwner->GetMax());
-   return 0;
+   return GetLFOValue(samplesIn);
 }
 
 float FloatSliderLFOControl::GetLFOValue(int samplesIn /*= 0*/, float forcePhase /*= -1*/)
 {
-   return ofClamp(Interp(mLFO.Value(samplesIn, forcePhase), mLFOSettings.mMin, mLFOSettings.mMax) + mLFOSettings.mAdd, mOwner->GetMin(), mOwner->GetMax());
+   float val = mLFO.Value(samplesIn, forcePhase);
+   if (mLFOSettings.mSpread > 0)
+      val = val * (1-mLFOSettings.mSpread) + (-cosf(val * FPI) + 1) * .5f * mLFOSettings.mSpread;
+   return ofClamp(Interp(val, mLFOSettings.mMin, mLFOSettings.mMax), mOwner->GetMin(), mOwner->GetMax());
 }
 
 void FloatSliderLFOControl::UpdateFromSettings()
@@ -290,16 +253,8 @@ void FloatSliderLFOControl::UpdateFromSettings()
 
 void FloatSliderLFOControl::UpdateVisibleControls()
 {
-   mIntervalSelector->SetShowing(mType == kLFOControlType_LFO);
-   mOscSelector->SetShowing(mType == kLFOControlType_LFO);
-   mOffsetSlider->SetShowing(mType == kLFOControlType_LFO && mLFOSettings.mInterval != kInterval_Free);
-   mFreeRateSlider->SetShowing(mType == kLFOControlType_LFO && mLFOSettings.mInterval == kInterval_Free);
-   mBiasSlider->SetShowing(mType == kLFOControlType_LFO);
-   mSoftenSlider->SetShowing(mType == kLFOControlType_LFO);
-   mShuffleSlider->SetShowing(mType == kLFOControlType_LFO);
-   mADSRDisplay->SetShowing(mType == kLFOControlType_ADSR);
-   mADSRSelector->SetShowing(mType == kLFOControlType_ADSR);
-   mADSRLengthMultiplierSlider->SetShowing(mType == kLFOControlType_ADSR);
+   mOffsetSlider->SetShowing(mLFOSettings.mInterval != kInterval_Free);
+   mFreeRateSlider->SetShowing(mLFOSettings.mInterval == kInterval_Free);
 }
 
 void FloatSliderLFOControl::SetRate(NoteInterval rate)
@@ -310,10 +265,6 @@ void FloatSliderLFOControl::SetRate(NoteInterval rate)
 
 void FloatSliderLFOControl::RadioButtonUpdated(RadioButton* radio, int oldVal)
 {
-   if (radio == mTypeSelector)
-      UpdateVisibleControls();
-   if (radio == mADSRSelector)
-      mADSRDisplay->SetADSR(&sADSR[mADSRIndex]);
 }
 
 void FloatSliderLFOControl::DropdownUpdated(DropdownList* list, int oldVal)
@@ -339,8 +290,6 @@ void FloatSliderLFOControl::FloatSliderUpdated(FloatSlider* slider, float oldVal
       mLFO.SetOffset(mLFOSettings.mLFOOffset);
    if (slider == mBiasSlider)
       mLFO.SetPulseWidth(1-mLFOSettings.mBias);
-   if (slider == mADSRLengthMultiplierSlider)
-      mADSRDisplay->SetMaxTime(1000 * mADSRLengthMultiplier);
    if (slider == mSoftenSlider)
       mLFO.GetOsc()->SetSoften(mLFOSettings.mSoften);
    if (slider == mShuffleSlider)
@@ -381,7 +330,7 @@ void FloatSliderLFOControl::ButtonClicked(ClickButton* button)
          mModuleSaveData.SetFloat("bias", mLFOSettings.mBias, mBiasSlider->GetMin(), mBiasSlider->GetMax(), false);
          mModuleSaveData.SetFloat("low", mLFOSettings.mMin, mOwner->GetMin(), mOwner->GetMax(), false);
          mModuleSaveData.SetFloat("high", mLFOSettings.mMax, mOwner->GetMin(), mOwner->GetMax(), false);
-         mModuleSaveData.SetFloat("add", mLFOSettings.mAdd, mOwner->GetMin(), mOwner->GetMax(), false);
+         mModuleSaveData.SetFloat("spread", mLFOSettings.mSpread, mOwner->GetMin(), mOwner->GetMax(), false);
          mModuleSaveData.SetFloat("soften", mLFOSettings.mSoften, 0, 1, false);
          mModuleSaveData.SetFloat("soften", mLFOSettings.mShuffle, 0, 1, false);
          mModuleSaveData.SetFloat("free_rate", mLFOSettings.mFreeRate, 0, 50, false);
@@ -415,11 +364,10 @@ void FloatSliderLFOControl::LoadLayout(const ofxJSONElement& moduleInfo)
    mModuleSaveData.LoadFloat("bias", moduleInfo, .5f);
    mModuleSaveData.LoadFloat("low", moduleInfo, 0, mMinSlider);
    mModuleSaveData.LoadFloat("high", moduleInfo, 1, mMaxSlider);
-   mModuleSaveData.LoadFloat("add", moduleInfo, 0, mAddSlider);
+   mModuleSaveData.LoadFloat("spread", moduleInfo, 0, mSpreadSlider);
    mModuleSaveData.LoadFloat("soften", moduleInfo, 0, mSoftenSlider);
    mModuleSaveData.LoadFloat("shuffle", moduleInfo, 0, mShuffleSlider);
    mModuleSaveData.LoadFloat("free_rate", moduleInfo, 0, mFreeRateSlider);
-   mModuleSaveData.LoadEnum<LFOControlType>("type", moduleInfo, kLFOControlType_LFO, mTypeSelector);
    
    SetUpFromSaveData();
 }
@@ -437,11 +385,10 @@ void FloatSliderLFOControl::SetUpFromSaveData()
    mLFOSettings.mBias = mModuleSaveData.GetFloat("bias");
    mLFOSettings.mMin = mModuleSaveData.GetFloat("low");
    mLFOSettings.mMax = mModuleSaveData.GetFloat("high");
-   mLFOSettings.mAdd = mModuleSaveData.GetFloat("add");
+   mLFOSettings.mSpread = mModuleSaveData.GetFloat("spread");
    mLFOSettings.mSoften = mModuleSaveData.GetFloat("soften");
    mLFOSettings.mShuffle = mModuleSaveData.GetFloat("shuffle");
    mLFOSettings.mFreeRate = mModuleSaveData.GetFloat("free_rate");
-   mType = mModuleSaveData.GetEnum<LFOControlType>("type");
    
    UpdateFromSettings();
    UpdateVisibleControls();
@@ -517,7 +464,7 @@ void LFOSettings::SaveState(FileStreamOut& out) const
    out << mMin;
    out << mMax;
    out << mBias;
-   out << mAdd;
+   out << mSpread;
    out << mSoften;
    out << mShuffle;
    out << mFreeRate;
@@ -543,7 +490,7 @@ void LFOSettings::LoadState(FileStreamIn& in)
    in >> mMax;
    in >> mBias;
    if (rev >= 1)
-      in >> mAdd;
+      in >> mSpread;
    if (rev >= 2)
    {
       in >> mSoften;

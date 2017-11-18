@@ -78,8 +78,8 @@ void ADSR::Stop(double time)
 
 float ADSR::Value(double time) const
 {
-   if (mStartTime < 0)
-      return 0;
+   //if (mStartTime < 0)
+   //   return 0;
    
    float stageStartValue;
    double stageStartTime;

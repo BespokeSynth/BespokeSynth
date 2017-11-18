@@ -18,6 +18,44 @@
 #include "ADSR.h"
 #include "ADSRDisplay.h"
 
+class EnvelopeControl
+{
+public:
+   EnvelopeControl(ofVec2f position, ofVec2f dimensions);
+   void SetADSR(ADSR* adsr) { mAdsr = adsr; }
+   void OnClicked(int x, int y, bool right);
+   void MouseMoved(float x, float y);
+   void MouseReleased();
+   void Draw();
+   void SetViewLength(float length) { mViewLength = length; }
+   ofVec2f GetPosition() const { return mPosition; }
+   ofVec2f GetDimensions() const { return mDimensions; }
+   void SetPosition(ofVec2f pos) { mPosition = pos; }
+   void SetDimensions(ofVec2f dim) { mDimensions = dim; }
+   void SetFixedLengthMode(bool fixed) { mFixedLengthMode = fixed; }
+private:
+   void AddVertex(float x, float y);
+   float GetPreSustainTime();
+   float GetReleaseTime();
+   float GetTimeForX(float x);
+   float GetValueForY(float y);
+   float GetXForTime(float time);
+   float GetYForValue(float value);
+   
+   ofVec2f mPosition;
+   ofVec2f mDimensions;
+   ADSR* mAdsr;
+   ADSR mViewAdsr;
+   ADSR mClickAdsr;
+   bool mClick;
+   ofVec2f mClickStart;
+   float mViewLength;
+   int mHighlightPoint;
+   int mHighlightCurve;
+   double mLastClickTime;
+   bool mFixedLengthMode;
+};
+
 class EnvelopeEditor : public IDrawableModule, public IRadioButtonListener, public IFloatSliderListener, public IButtonListener, public IDropdownListener, public IIntSliderListener
 {
 public:
@@ -41,7 +79,7 @@ public:
    void CheckboxUpdated(Checkbox* checkbox) override;
    void RadioButtonUpdated(RadioButton* radio, int oldVal) override {}
    void IntSliderUpdated(IntSlider* slider, int oldVal) override {}
-   void FloatSliderUpdated(FloatSlider* slider, float oldVal) override {}
+   void FloatSliderUpdated(FloatSlider* slider, float oldVal) override;
    void ButtonClicked(ClickButton* button) override;
    void DropdownUpdated(DropdownList* list, int oldVal) override {}
    
@@ -55,29 +93,15 @@ protected:
    ~EnvelopeEditor();
    
 private:
-   void AddVertex(float x, float y);
-   
    void OnClicked(int x, int y, bool right) override;
    
-   float GetPreSustainTime();
-   float GetReleaseTime();
-   float GetTimeForX(float x);
-   float GetValueForY(float y);
-   float GetXForTime(float time);
-   float GetYForValue(float value);
+   EnvelopeControl mEnvelopeControl;
    
    ADSRDisplay* mADSRDisplay;
-   ADSR mViewAdsr;
-   ADSR mClickAdsr;
    ClickButton* mPinButton;
    bool mPinned;
-   bool mClick;
-   ofVec2f mClickStart;
    float mADSRViewLength;
    FloatSlider* mADSRViewLengthSlider;
-   int mHighlightPoint;
-   int mHighlightCurve;
-   double mLastClickTime;
    Checkbox* mHasSustainStageCheckbox;
    IntSlider* mSustainStageSlider;
    FloatSlider* mMaxSustainSlider;

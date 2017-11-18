@@ -16,6 +16,7 @@
 #include "DropdownList.h"
 #include "Curve.h"
 #include "Checkbox.h"
+#include "EnvelopeEditor.h"
 
 class PatchCableSource;
 
@@ -31,15 +32,14 @@ public:
    
    IUIControl* GetUIControl() const { return mUIControl; }
    
+   void OnTransportAdvanced(float amount) override;
+   
    //IDrawableModule
    void Init() override;
    void Poll() override;
    bool IsResizable() const override { return true; }
    void Resize(float w, float h) override;
    void SetEnabled(bool enabled) override { mEnabled = enabled; }
-   
-   //IAudioPoller
-   void OnTransportAdvanced(float amount) override;
    
    void CheckboxUpdated(Checkbox* checkbox) override;
    void DropdownUpdated(DropdownList* list, int oldVal) override;
@@ -55,7 +55,6 @@ public:
    void PostRepatch(PatchCableSource* cableSource) override;
    
 private:
-   void SetNumSteps(int numSteps, bool stretch);
    float GetPlaybackPosition();
    
    //IDrawableModule
@@ -66,18 +65,14 @@ private:
    bool MouseMoved(float x, float y) override;
    void MouseReleased() override;
    
-   Curve mCurve;
    IUIControl* mUIControl;
-   NoteInterval mInterval;
-   DropdownList* mIntervalSelector;
    int mLength;
    DropdownList* mLengthSelector;
    PatchCableSource* mControlCable;
    int mWidth;
    int mHeight;
-   bool mRecord;
-   Checkbox* mRecordCheckbox;
-   float mLastRecordPos;
+   EnvelopeControl mEnvelopeControl;
+   ADSR mAdsr;
 };
 
 #endif /* defined(__Bespoke__CurveLooper__) */

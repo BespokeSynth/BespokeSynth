@@ -16,13 +16,10 @@
 #include "LFO.h"
 #include "RadioButton.h"
 #include "Slider.h"
-#include "ADSR.h"
-#include "ADSRDisplay.h"
 #include "ClickButton.h"
 #include "PatchCableSource.h"
 #include "DropdownList.h"
-
-#define NUM_GLOBAL_ADSRS 7
+#include "IModulator.h"
 
 struct LFOSettings
 {
@@ -32,7 +29,7 @@ struct LFOSettings
    , mMin(0)
    , mMax(0)
    , mBias(0)
-   , mAdd(0)
+   , mSpread(0)
    , mSoften(0)
    , mShuffle(0)
    , mFreeRate(1)
@@ -45,7 +42,7 @@ struct LFOSettings
    float mMin;
    float mMax;
    float mBias;
-   float mAdd;
+   float mSpread;
    float mSoften;
    float mShuffle;
    float mFreeRate;
@@ -54,7 +51,7 @@ struct LFOSettings
    void LoadState(FileStreamIn& in);
 };
 
-class FloatSliderLFOControl : public IDrawableModule, public IRadioButtonListener, public IFloatSliderListener, public IButtonListener, public IDropdownListener
+class FloatSliderLFOControl : public IDrawableModule, public IRadioButtonListener, public IFloatSliderListener, public IButtonListener, public IDropdownListener, public IModulator
 {
 public:
    FloatSliderLFOControl();
@@ -64,14 +61,14 @@ public:
 
    const LFOSettings& GetSettings() { return mLFOSettings; }
    void Load(LFOSettings settings);
-   float Value(int samplesIn = 0);
-   bool Active() { return mEnabled; }
+   float Value(int samplesIn = 0) override;
+   bool Active() const override { return mEnabled; }
    float Min() { return mLFOSettings.mMin; }
    float Max() { return mLFOSettings.mMax; }
    void SetMin(float min) { mLFOSettings.mMin = min; }
    void SetMax(float max) { mLFOSettings.mMax = max; }
-   float* MinPtr() { return &mLFOSettings.mMin; }
-   float* MaxPtr() { return &mLFOSettings.mMax; }
+   float& GetMin() override { return mLFOSettings.mMin; }
+   float& GetMax() override { return mLFOSettings.mMax; }
    LFOSettings* GetLFOSettings() { return &mLFOSettings; }
    void SetEnabled(bool enabled) override {} //don't use this one
    void SetLFOEnabled(bool enabled);
@@ -91,15 +88,13 @@ public:
    //IPatchable
    void PostRepatch(PatchCableSource* cableSource) override;
 
-   static ADSR* GetADSRControl(int index) { return &sADSR[index]; }
-
    void CheckboxUpdated(Checkbox* checkbox) override;
    void RadioButtonUpdated(RadioButton* radio, int oldVal) override;
    void FloatSliderUpdated(FloatSlider* slider, float oldVal) override;
    void ButtonClicked(ClickButton* button) override;
    void DropdownUpdated(DropdownList* list, int oldVal) override;
 
-   void GetModuleDimensions(int& width, int& height) override { width = 100; height = 201; }
+   void GetModuleDimensions(int& width, int& height) override { width = 100; height = 185; }
    
    void SaveLayout(ofxJSONElement& moduleInfo) override;
    void LoadLayout(const ofxJSONElement& moduleInfo) override;
@@ -109,13 +104,6 @@ protected:
    ~FloatSliderLFOControl();
 
 private:
-   enum LFOControlType
-   {
-      kLFOControlType_LFO,
-      kLFOControlType_ADSR,
-      kLFOControlType_Drawn
-   };
-
    void UpdateVisibleControls();
    float GetLFOValue(int samplesIn = 0, float forcePhase = -1);
 
@@ -130,23 +118,14 @@ private:
    FloatSlider* mBiasSlider;
    FloatSlider* mMinSlider;
    FloatSlider* mMaxSlider;
-   FloatSlider* mAddSlider;
+   FloatSlider* mSpreadSlider;
    FloatSlider* mSoftenSlider;
    FloatSlider* mShuffleSlider;
    FloatSlider* mFreeRateSlider;
    ClickButton* mPinButton;
    Checkbox* mEnableLFOCheckbox;
 
-   static ADSR sADSR[NUM_GLOBAL_ADSRS];
-   ADSRDisplay* mADSRDisplay;
-   int mADSRIndex;
-   RadioButton* mADSRSelector;
    bool mPinned;
-   float mADSRLengthMultiplier;
-   FloatSlider* mADSRLengthMultiplierSlider;
-
-   LFOControlType mType;
-   RadioButton* mTypeSelector;
    
    PatchCableSource* mSliderCable;
 };

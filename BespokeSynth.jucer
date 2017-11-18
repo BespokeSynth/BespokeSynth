@@ -155,8 +155,6 @@
         <FILE id="RG4zGd" name="TremoloEffect.h" compile="0" resource="0" file="Source/TremoloEffect.h"/>
       </GROUP>
       <GROUP id="{6781AC07-A090-A7AF-8D27-BCB6D9526ABD}" name="modules">
-        <FILE id="O3zMCr" name="ADSRTrigger.cpp" compile="1" resource="0" file="Source/ADSRTrigger.cpp"/>
-        <FILE id="bxJpDd" name="ADSRTrigger.h" compile="0" resource="0" file="Source/ADSRTrigger.h"/>
         <FILE id="EugK26" name="Amplifier.cpp" compile="1" resource="0" file="Source/Amplifier.cpp"/>
         <FILE id="BgLMgo" name="Amplifier.h" compile="0" resource="0" file="Source/Amplifier.h"/>
         <FILE id="DU9MrN" name="Arpeggiator.cpp" compile="1" resource="0" file="Source/Arpeggiator.cpp"/>
@@ -227,6 +225,10 @@
         <FILE id="BpdZ8w" name="DrumSynth.h" compile="0" resource="0" file="Source/DrumSynth.h"/>
         <FILE id="KhkfQS" name="EffectChain.cpp" compile="1" resource="0" file="Source/EffectChain.cpp"/>
         <FILE id="hnLO0H" name="EffectChain.h" compile="0" resource="0" file="Source/EffectChain.h"/>
+        <FILE id="lg7Mno" name="EnvelopeModulator.cpp" compile="1" resource="0"
+              file="Source/EnvelopeModulator.cpp"/>
+        <FILE id="ZSWPbv" name="EnvelopeModulator.h" compile="0" resource="0"
+              file="Source/EnvelopeModulator.h"/>
         <FILE id="Brkjo3" name="EventCanvas.cpp" compile="1" resource="0" file="Source/EventCanvas.cpp"/>
         <FILE id="KV7yiU" name="EventCanvas.h" compile="0" resource="0" file="Source/EventCanvas.h"/>
         <FILE id="AE3Jbz" name="FeedbackModule.cpp" compile="1" resource="0"
@@ -668,6 +670,8 @@
       <FILE id="TOR61G" name="IDrawableModule.h" compile="0" resource="0"
             file="Source/IDrawableModule.h"/>
       <FILE id="BcfvF3" name="IMidiVoice.h" compile="0" resource="0" file="Source/IMidiVoice.h"/>
+      <FILE id="Xl69jb" name="IModulator.cpp" compile="1" resource="0" file="Source/IModulator.cpp"/>
+      <FILE id="X0OndJ" name="IModulator.h" compile="0" resource="0" file="Source/IModulator.h"/>
       <FILE id="zcRBgX" name="INonstandardController.h" compile="0" resource="0"
             file="Source/INonstandardController.h"/>
       <FILE id="JyID8P" name="INoteReceiver.h" compile="0" resource="0" file="Source/INoteReceiver.h"/>

@@ -13,6 +13,7 @@
 #include "LFOController.h"
 #include "FileStream.h"
 #include "ModularSynth.h"
+#include "IModulator.h"
 
 FloatSlider::FloatSlider(IFloatSliderListener* owner, const char* label, int x, int y, int w, int h, float* var, float min, float max, int digits /* = -1 */)
 : mVar(var)
@@ -38,6 +39,7 @@ FloatSlider::FloatSlider(IFloatSliderListener* owner, const char* label, int x, 
 , mFloatEntry(nullptr)
 , mShowName(true)
 , mBezierControl(1)
+, mModulator(nullptr)
 {
    assert(owner);
    SetLabel(label);
@@ -67,7 +69,10 @@ FloatSliderLFOControl* FloatSlider::AcquireLFO()
    if (mLFOControl == nullptr)
    {
       if (GetParent() != TheSynth->GetTopModalFocusItem()) //popups don't get these
+      {
          mLFOControl = LFOPool::GetLFO(this);
+         mModulator = mLFOControl;
+      }
    }
    return mLFOControl;
 }
@@ -95,13 +100,13 @@ void FloatSlider::Render()
    ofNoFill();
    
    float screenPos;
-   if (mLFOControl && mLFOControl->Active())
+   if (mModulator && mModulator->Active())
    {
-      float val = ofClamp(mLFOControl->Value(),mMin,mMax);
+      float val = ofClamp(mModulator->Value(),mMin,mMax);
       screenPos = mX+1+(mWidth-2)*ValToPos(val);
-      float lfomax = ofClamp(mLFOControl->Max(),mMin,mMax);
+      float lfomax = ofClamp(mModulator->GetMax(),mMin,mMax);
       float screenPosMax = mX+1+(mWidth-2)*ValToPos(lfomax);
-      float lfomin = ofClamp(mLFOControl->Min(),mMin,mMax);
+      float lfomin = ofClamp(mModulator->GetMin(),mMin,mMax);
       float screenPosMin = mX+1+(mWidth-2)*ValToPos(lfomin);
       
       ofPushStyle();
@@ -197,7 +202,7 @@ void FloatSlider::MouseReleased()
       mTouching = false;
    mMouseDown = false;
    mRefY = -999;
-   if (mRelative && (mLFOControl == nullptr || mLFOControl->Active() == false))
+   if (mRelative && (mModulator == nullptr || mModulator->Active() == false))
       SetValue(0);
 }
 
@@ -242,7 +247,7 @@ void FloatSlider::SetValueForMouse(int x, int y)
    float oldVal = *var;
    float pos = ofMap(fX+mX,mX+1,mX+mWidth-1,0.0f,1.0f);
    *var = PosToVal(pos);
-   if (mRelative && (mLFOControl == nullptr || mLFOControl->Active() == false))
+   if (mRelative && (mModulator == nullptr || mModulator->Active() == false))
    {
       if (!mTouching || mRelativeOffset == -999)
       {
@@ -263,11 +268,11 @@ void FloatSlider::SetValueForMouse(int x, int y)
       mOwner->FloatSliderUpdated(this, oldVal);
    }
 
-   if (mLFOControl && mLFOControl->Active())
+   if (mModulator && mModulator->Active())
    {
       float move = (y - mRefY) * -.003f;
       float change = move * (mMax - mMin);
-      *mLFOControl->MinPtr() = ofClamp(mLFOControl->Min() + change, mMin, mLFOControl->Max());
+      mModulator->GetMin() = ofClamp(mModulator->GetMin() + change, mMin, mModulator->GetMax());
       mRefY = y;
    }
 }
@@ -365,7 +370,7 @@ void FloatSlider::SetValue(float value)
 
 void FloatSlider::UpdateTouching()
 {
-   if (mRelative && (mLFOControl == nullptr || mLFOControl->Active() == false))
+   if (mRelative && (mModulator == nullptr || mModulator->Active() == false))
    {
       if (!mTouching)
          SetValue(0);
@@ -423,10 +428,10 @@ string FloatSlider::GetDisplayValue(float val) const
 
 void FloatSlider::Compute(int samplesIn /*= 0*/)
 {
-   if (mLFOControl && mLFOControl->Active())
+   if (mModulator && mModulator->Active())
    {
       float oldVal = *mVar;
-      *mVar = mLFOControl->Value(samplesIn);
+      *mVar = mModulator->Value(samplesIn);
       if (oldVal != *mVar)
       {
          mOwner->FloatSliderUpdated(this, oldVal);
@@ -436,8 +441,8 @@ void FloatSlider::Compute(int samplesIn /*= 0*/)
 
 float* FloatSlider::GetModifyValue()
 {
-   if (mLFOControl && mLFOControl->Active())
-      return mLFOControl->MaxPtr();
+   if (mModulator && mModulator->Active())
+      return &mModulator->GetMax();
    return mVar;
 }
 

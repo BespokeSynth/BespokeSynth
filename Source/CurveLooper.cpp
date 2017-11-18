@@ -9,18 +9,28 @@
 #include "CurveLooper.h"
 #include "ModularSynth.h"
 #include "PatchCableSource.h"
+#include "SynthGlobals.h"
 
 CurveLooper::CurveLooper()
 : mUIControl(nullptr)
-, mInterval(kInterval_16n)
-, mIntervalSelector(nullptr)
-, mLength(4)
+, mLength(1)
 , mLengthSelector(nullptr)
 , mControlCable(nullptr)
 , mWidth(200)
-, mHeight(100)
-, mRecord(false)
+, mHeight(120)
+, mEnvelopeControl(ofVec2f(5,25),ofVec2f(mWidth-10,mHeight-30))
 {
+   mEnvelopeControl.SetADSR(&mAdsr);
+   mEnvelopeControl.SetViewLength(10000);
+   mEnvelopeControl.SetFixedLengthMode(true);
+   mAdsr.GetFreeReleaseLevel() = true;
+   mAdsr.SetNumStages(2);
+   mAdsr.GetHasSustainStage() = false;
+   mAdsr.GetStageData(0).target = .5f;
+   mAdsr.GetStageData(0).time = 1000;
+   mAdsr.GetStageData(1).target = .5f;
+   mAdsr.GetStageData(1).time = 8000;
+   
    TheTransport->AddAudioPoller(this);
 }
 
@@ -32,49 +42,29 @@ CurveLooper::~CurveLooper()
 void CurveLooper::CreateUIControls()
 {
    IDrawableModule::CreateUIControls();
-   mIntervalSelector = new DropdownList(this,"interval",5,3,(int*)(&mInterval));
-   mLengthSelector = new DropdownList(this,"length",45,3,(int*)(&mLength));
-   mRecordCheckbox = new Checkbox(this,"rec",90,3,&mRecord);
+   mLengthSelector = new DropdownList(this,"length",5,3,(int*)(&mLength));
    
    mControlCable = new PatchCableSource(this, kConnectionType_UIControl);
    //mControlCable->SetManualPosition(86, 10);
    AddPatchCableSource(mControlCable);
    
-   /*mIntervalSelector->AddLabel("8", kInterval_8);
-    mIntervalSelector->AddLabel("4", kInterval_4);
-    mIntervalSelector->AddLabel("2", kInterval_2);*/
-   mIntervalSelector->AddLabel("1n", kInterval_1n);
-   mIntervalSelector->AddLabel("2n", kInterval_2n);
-   mIntervalSelector->AddLabel("4n", kInterval_4n);
-   mIntervalSelector->AddLabel("4nt", kInterval_4nt);
-   mIntervalSelector->AddLabel("8n", kInterval_8n);
-   mIntervalSelector->AddLabel("8nt", kInterval_8nt);
-   mIntervalSelector->AddLabel("16n", kInterval_16n);
-   mIntervalSelector->AddLabel("16nt", kInterval_16nt);
-   mIntervalSelector->AddLabel("32n", kInterval_32n);
-   mIntervalSelector->AddLabel("64n", kInterval_64n);
-   
-   mLengthSelector->AddLabel("4n", 1);
-   mLengthSelector->AddLabel("2n", 2);
-   mLengthSelector->AddLabel("1", 4);
-   mLengthSelector->AddLabel("2", 8);
-   mLengthSelector->AddLabel("3", 12);
-   mLengthSelector->AddLabel("4", 16);
-   mLengthSelector->AddLabel("6", 24);
-   mLengthSelector->AddLabel("8", 32);
-   mLengthSelector->AddLabel("16", 64);
-   mLengthSelector->AddLabel("32", 128);
-   mLengthSelector->AddLabel("64", 256);
-   mLengthSelector->AddLabel("128", 512);
+   mLengthSelector->AddLabel("4n", -4);
+   mLengthSelector->AddLabel("2n", -2);
+   mLengthSelector->AddLabel("1", 1);
+   mLengthSelector->AddLabel("2", 2);
+   mLengthSelector->AddLabel("3", 3);
+   mLengthSelector->AddLabel("4", 4);
+   mLengthSelector->AddLabel("6", 6);
+   mLengthSelector->AddLabel("8", 8);
+   mLengthSelector->AddLabel("16", 16);
+   mLengthSelector->AddLabel("32", 32);
+   mLengthSelector->AddLabel("64", 64);
+   mLengthSelector->AddLabel("128", 128);
 }
 
 void CurveLooper::Init()
 {
    IDrawableModule::Init();
-   
-   mCurve.AddPoint(CurvePoint(.2f, .4f));
-   mCurve.AddPoint(CurvePoint(.6f, .9f));
-   mCurve.AddPoint(CurvePoint(.7f, .2f));
 }
 
 void CurveLooper::Poll()
@@ -83,25 +73,24 @@ void CurveLooper::Poll()
 
 void CurveLooper::OnTransportAdvanced(float amount)
 {
-   if (mUIControl)
+   if (mUIControl && mEnabled)
    {
-      if (mRecord)
-      {
-         float pos = GetPlaybackPosition();
-         mCurve.DeleteBetween(mLastRecordPos, pos+.01f);
-         mCurve.AddPoint(CurvePoint(pos, mUIControl->GetMidiValue()));
-         mLastRecordPos = pos;
-      }
-      else
-      {
-         mUIControl->SetFromMidiCC(mCurve.Evaluate(GetPlaybackPosition()));
-      }
+      mAdsr.Clear();
+      mAdsr.Start(0,1);
+      mAdsr.Stop(10000);
+      mUIControl->SetFromMidiCC(mAdsr.Value(GetPlaybackPosition() * 10000));
    }
 }
 
 float CurveLooper::GetPlaybackPosition()
 {
-   return TheTransport->GetMeasurePos();
+   if (mLength < 0)
+   {
+      float ret = TheTransport->GetMeasurePos() * (-mLength);
+      FloatWrap(ret, 1);
+      return ret;
+   }
+   return (TheTransport->GetMeasurePos() + TheTransport->GetMeasure() % mLength) / mLength;
 }
 
 void CurveLooper::DrawModule()
@@ -109,38 +98,38 @@ void CurveLooper::DrawModule()
    if (Minimized() || IsVisible() == false)
       return;
    
-   mCurve.SetPosition(5,5);
-   mCurve.SetDimensions(mWidth-10, mHeight-10);
-   mCurve.Render();
-   mIntervalSelector->Draw();
    mLengthSelector->Draw();
-   mRecordCheckbox->Draw();
+   
+   mEnvelopeControl.Draw();
    
    ofPushStyle();
    ofSetColor(ofColor::lime);
-   float x = ofLerp(5, mWidth-10, GetPlaybackPosition());
-   ofLine(x, 5, x, mHeight - 10);
+   float x = ofLerp(mEnvelopeControl.GetPosition().x, mEnvelopeControl.GetPosition().x + mEnvelopeControl.GetDimensions().x, GetPlaybackPosition());
+   ofLine(x, mEnvelopeControl.GetPosition().y, x, mEnvelopeControl.GetPosition().y + mEnvelopeControl.GetDimensions().y);
    ofPopStyle();
 }
 
 void CurveLooper::OnClicked(int x, int y, bool right)
 {
    IDrawableModule::OnClicked(x,y,right);
+   
+   mEnvelopeControl.OnClicked(x, y, right);
 }
 
 void CurveLooper::MouseReleased()
 {
    IDrawableModule::MouseReleased();
+   
+   mEnvelopeControl.MouseReleased();
 }
 
 bool CurveLooper::MouseMoved(float x, float y)
 {
    IDrawableModule::MouseMoved(x,y);
+   
+   mEnvelopeControl.MouseMoved(x, y);
+   
    return false;
-}
-
-void CurveLooper::SetNumSteps(int numSteps, bool stretch)
-{
 }
 
 void CurveLooper::PostRepatch(PatchCableSource* cableSource)
@@ -153,18 +142,11 @@ void CurveLooper::PostRepatch(PatchCableSource* cableSource)
 
 void CurveLooper::CheckboxUpdated(Checkbox* checkbox)
 {
-   if (checkbox == mRecordCheckbox)
-   {
-      if (mRecord)
-      {
-         mLastRecordPos = GetPlaybackPosition();
-      }
-   }
 }
 
 void CurveLooper::DropdownUpdated(DropdownList* list, int oldVal)
 {
-   int newSteps = int(mLength/4.0f * TheTransport->CountInStandardMeasure(mInterval));
+   /*int newSteps = int(mLength/4.0f * TheTransport->CountInStandardMeasure(mInterval));
    if (list == mIntervalSelector)
    {
       if (newSteps > 0)
@@ -182,7 +164,7 @@ void CurveLooper::DropdownUpdated(DropdownList* list, int oldVal)
          SetNumSteps(newSteps, false);
       else
          mLength = oldVal;
-   }
+   }*/
 }
 
 void CurveLooper::GetModuleDimensions(int &width, int &height)
@@ -193,8 +175,9 @@ void CurveLooper::GetModuleDimensions(int &width, int &height)
 
 void CurveLooper::Resize(float w, float h)
 {
-   mWidth = w;
-   mHeight = h;
+   mWidth = MAX(w, 200);
+   mHeight = MAX(h, 120);
+   mEnvelopeControl.SetDimensions(ofVec2f(mWidth - 10, mHeight-30));
 }
 
 void CurveLooper::SaveLayout(ofxJSONElement& moduleInfo)
@@ -210,7 +193,7 @@ void CurveLooper::LoadLayout(const ofxJSONElement& moduleInfo)
 {
    mModuleSaveData.LoadString("uicontrol", moduleInfo);
    mModuleSaveData.LoadInt("width", moduleInfo, 200, 120, 1000);
-   mModuleSaveData.LoadInt("height", moduleInfo, 100, 15, 1000);
+   mModuleSaveData.LoadInt("height", moduleInfo, 120, 15, 1000);
    
    SetUpFromSaveData();
 }
@@ -243,8 +226,6 @@ void CurveLooper::SaveState(FileStreamOut& out)
    IDrawableModule::SaveState(out);
    
    out << kSaveStateRev;
-   
-//   mGrid->SaveState(out);
 }
 
 void CurveLooper::LoadState(FileStreamIn& in)
@@ -254,6 +235,4 @@ void CurveLooper::LoadState(FileStreamIn& in)
    int rev;
    in >> rev;
    LoadStateValidate(rev == kSaveStateRev);
-   
-//   mGrid->LoadState(in);
 }

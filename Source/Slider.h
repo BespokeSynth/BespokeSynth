@@ -15,6 +15,7 @@
 
 class FloatSlider;
 class FloatSliderLFOControl;
+class IModulator;
 
 class IFloatSliderListener
 {
@@ -52,6 +53,7 @@ public:
    void SetShowName(bool show) { mShowName = show; }
    void SetDimensions(int w, int h) { mWidth = w; mHeight = h; }
    void SetBezierControl(float control) { mBezierControl = control; }
+   void SetModulator(IModulator* modulator) { mModulator = modulator; }
    
    void Init() override;
    
@@ -104,6 +106,7 @@ private:
    int mShowDigits;
    IFloatSliderListener* mOwner;
    FloatSliderLFOControl* mLFOControl;
+   IModulator* mModulator;
    float mClampIntMin;
    float mClampIntMax;
    bool mRelative;

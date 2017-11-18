@@ -168,7 +168,6 @@
     <ClCompile Include="..\..\Source\Pumper.cpp"/>
     <ClCompile Include="..\..\Source\Stutter.cpp"/>
     <ClCompile Include="..\..\Source\TremoloEffect.cpp"/>
-    <ClCompile Include="..\..\Source\ADSRTrigger.cpp"/>
     <ClCompile Include="..\..\Source\Amplifier.cpp"/>
     <ClCompile Include="..\..\Source\Arpeggiator.cpp"/>
     <ClCompile Include="..\..\Source\AudioMeter.cpp"/>
@@ -195,6 +194,7 @@
     <ClCompile Include="..\..\Source\DrumPlayer.cpp"/>
     <ClCompile Include="..\..\Source\DrumSynth.cpp"/>
     <ClCompile Include="..\..\Source\EffectChain.cpp"/>
+    <ClCompile Include="..\..\Source\EnvelopeModulator.cpp"/>
     <ClCompile Include="..\..\Source\EventCanvas.cpp"/>
     <ClCompile Include="..\..\Source\FeedbackModule.cpp"/>
     <ClCompile Include="..\..\Source\FFTtoAdditive.cpp"/>
@@ -347,6 +347,7 @@
     <ClCompile Include="..\..\Source\IAudioSource.cpp"/>
     <ClCompile Include="..\..\Source\IClickable.cpp"/>
     <ClCompile Include="..\..\Source\IDrawableModule.cpp"/>
+    <ClCompile Include="..\..\Source\IModulator.cpp"/>
     <ClCompile Include="..\..\Source\INoteSource.cpp"/>
     <ClCompile Include="..\..\Source\JumpBlender.cpp"/>
     <ClCompile Include="..\..\Source\KarplusRetriggerVoice.cpp"/>

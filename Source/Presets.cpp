@@ -271,7 +271,7 @@ void Presets::Save()
             preset["controls"][j]["lfo_min"] = presetData.mLFOSettings.mMin;
             preset["controls"][j]["lfo_max"] = presetData.mLFOSettings.mMax;
             preset["controls"][j]["lfo_bias"] = presetData.mLFOSettings.mBias;
-            preset["controls"][j]["lfo_add"] = presetData.mLFOSettings.mAdd;
+            preset["controls"][j]["lfo_spread"] = presetData.mLFOSettings.mSpread;
             preset["controls"][j]["lfo_soften"] = presetData.mLFOSettings.mSoften;
             preset["controls"][j]["lfo_shuffle"] = presetData.mLFOSettings.mShuffle;
          }
@@ -320,7 +320,7 @@ void Presets::Load()
                presetData.mLFOSettings.mMin = preset["controls"][j]["lfo_min"].asDouble();
                presetData.mLFOSettings.mMax = preset["controls"][j]["lfo_max"].asDouble();
                presetData.mLFOSettings.mBias = preset["controls"][j]["lfo_bias"].asDouble();
-               presetData.mLFOSettings.mAdd = preset["controls"][j]["lfo_add"].asDouble();
+               presetData.mLFOSettings.mSpread = preset["controls"][j]["lfo_spread"].asDouble();
                presetData.mLFOSettings.mSoften = preset["controls"][j]["lfo_soften"].asDouble();
                presetData.mLFOSettings.mShuffle = preset["controls"][j]["lfo_shuffle"].asDouble();
             }  

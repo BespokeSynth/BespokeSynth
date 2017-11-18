@@ -76,7 +76,6 @@
 #include "PanicButton.h"
 #include "VelocityStepSequencer.h"
 #include "SustainPedal.h"
-#include "ADSRTrigger.h"
 #include "MultitrackRecorder.h"
 //#include "MidiPlayer.h"
 #include "SamplerGrid.h"
@@ -158,6 +157,7 @@
 #include "SamplePlayer.h"
 #include "AudioSend.h"
 #include "EnvelopeEditor.h"
+#include "EnvelopeModulator.h"
 
 #define REGISTER(class,name,type) Register(#name, &(class::Create), &(class::CanCreate), type, false, false);
 #define REGISTER_HIDDEN(class,name,type) Register(#name, &(class::Create), &(class::CanCreate), type, true, false);
@@ -218,7 +218,6 @@ ModuleFactory::ModuleFactory()
    REGISTER(SliderSequencer, slidersequencer, kModuleType_Instrument);
    REGISTER(VelocityStepSequencer, velocitystepsequencer, kModuleType_Note);
    REGISTER(SustainPedal, sustainpedal, kModuleType_Note);
-   REGISTER(ADSRTrigger, trigger, kModuleType_Note);
    REGISTER(SamplerGrid, samplergrid, kModuleType_Audio);
    REGISTER(SignalGenerator, signalgenerator, kModuleType_Synth);
    REGISTER(Lissajous, lissajous, kModuleType_Audio);
@@ -283,6 +282,7 @@ ModuleFactory::ModuleFactory()
    REGISTER(Panner, panner, kModuleType_Audio);
    REGISTER(SamplePlayer, sampleplayer, kModuleType_Synth);
    REGISTER(AudioSend, send, kModuleType_Audio);
+   REGISTER(EnvelopeModulator, envelope, kModuleType_Note);
 
    //REGISTER_EXPERIMENTAL(MidiPlayer, midiplayer, kModuleType_Instrument);
    REGISTER_EXPERIMENTAL(Razor, razor, kModuleType_Synth);

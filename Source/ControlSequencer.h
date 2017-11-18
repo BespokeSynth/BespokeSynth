@@ -19,7 +19,7 @@
 
 class PatchCableSource;
 
-class ControlSequencer : public IDrawableModule, public ITimeListener, public IDropdownListener, public GridListener
+class ControlSequencer : public IDrawableModule, public ITimeListener, public IDropdownListener, public GridListener, public IButtonListener
 {
 public:
    ControlSequencer();
@@ -46,6 +46,7 @@ public:
    
    void CheckboxUpdated(Checkbox* checkbox) override {}
    void DropdownUpdated(DropdownList* list, int oldVal) override;
+   void ButtonClicked(ClickButton* button) override;
    
    void LoadLayout(const ofxJSONElement& moduleInfo) override;
    void SaveLayout(ofxJSONElement& moduleInfo) override;
@@ -78,6 +79,7 @@ private:
    int mLength;
    DropdownList* mLengthSelector;
    PatchCableSource* mControlCable;
+   ClickButton* mRandomize;
 };
 
 #endif /* defined(__Bespoke__ControlSequencer__) */
