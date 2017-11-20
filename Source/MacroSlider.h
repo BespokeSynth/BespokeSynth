@@ -11,13 +11,12 @@
 
 #include "IDrawableModule.h"
 #include "Slider.h"
-#include "Transport.h"
-#include <mutex>
+#include "IModulator.h"
 
 class PatchCableSource;
 class IUIControl;
 
-class MacroSlider : public IDrawableModule, public IFloatSliderListener, public IAudioPoller
+class MacroSlider : public IDrawableModule, public IFloatSliderListener
 {
 public:
    MacroSlider();
@@ -31,16 +30,14 @@ public:
    
    void FloatSliderUpdated(FloatSlider* slider, float oldVal) override;
    
-   //IAudioPoller
-   void OnTransportAdvanced(float amount) override;
-   
    //IPatchable
    void PostRepatch(PatchCableSource* cableSource) override;
+   
+   float GetValue() const { return mValue; }
    
    void SaveLayout(ofxJSONElement& moduleInfo) override;
    void LoadLayout(const ofxJSONElement& moduleInfo) override;
    void SetUpFromSaveData() override;
-   void PostLoadState() override;
 private:
    const static int kMappingSpacing = 32;
    
@@ -49,16 +46,20 @@ private:
    void GetModuleDimensions(int& width, int& height) override { width = 110; height = 25+mMappings.size()*kMappingSpacing; }
    bool Enabled() const override { return mEnabled; }
    
-   void UpdateValues();
-   
-   struct Mapping
+   struct Mapping : public IModulator
    {
       Mapping(MacroSlider* owner, int index);
       ~Mapping();
       void CreateUIControls();
       void UpdateControl();
-      void UpdateValue(float value);
       void Draw();
+      PatchCableSource* GetCableSource() const { return mCableSource; }
+      
+      //IModulator
+      virtual float Value(int samplesIn = 0) override;
+      virtual bool Active() const override { return mOwner->Enabled(); }
+      virtual float& GetMin() override { return mStart; }
+      virtual float& GetMax() override { return mEnd; }
       
       FloatSlider* mStartSlider;
       FloatSlider* mEndSlider;
@@ -72,7 +73,6 @@ private:
    
    FloatSlider* mSlider;
    float mValue;
-   recursive_mutex mMappingMutex;
    vector<Mapping*> mMappings;
 };
 

@@ -39,6 +39,8 @@ public:
    void SetSustainStage(int stage) { mSustainStage = stage; }
    bool IsDone(double time) const;
    bool IsStandardADSR() const { return mNumStages == 3 && mSustainStage == 1; }
+   float GetStartTime() const { return mStartTime; }
+   float GetStopTime() const { return mStopTime; }
    
    int GetNumStages() const { return mNumStages; }
    void SetNumStages(int num) { mNumStages = num; }

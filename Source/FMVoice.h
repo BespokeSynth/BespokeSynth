@@ -24,8 +24,12 @@ public:
    ADSR mOscADSRParams;
    ADSR mModIdxADSRParams;
    ADSR mHarmRatioADSRParams;
+   ADSR mModIdxADSRParams2;
+   ADSR mHarmRatioADSRParams2;
    float mModIdx;
    float mHarmRatio;
+   float mModIdx2;
+   float mHarmRatio2;
    float mVol;
 };
 
@@ -44,10 +48,13 @@ public:
    bool IsDone(double time) override;
 private:
    float mOscPhase;
-   float mHarmPhase;
    EnvOscillator mOsc;
+   float mHarmPhase;
    EnvOscillator mHarm;
    ADSR mModIdx;
+   float mHarmPhase2;
+   EnvOscillator mHarm2;
+   ADSR mModIdx2;
    FMVoiceParams* mVoiceParams;
    IDrawableModule* mOwner;
 };

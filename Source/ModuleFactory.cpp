@@ -92,7 +92,6 @@
 #include "VinylTempoControl.h"
 #include "NoteFlusher.h"
 #include "FilterViz.h"
-#include "FreeverbOutput.h"
 #include "NoteCanvas.h"
 #include "SlowLayers.h"
 #include "ClipLauncher.h"
@@ -158,6 +157,8 @@
 #include "AudioSend.h"
 #include "EnvelopeEditor.h"
 #include "EnvelopeModulator.h"
+#include "AudioToCV.h"
+#include "ModulatorAdd.h"
 
 #define REGISTER(class,name,type) Register(#name, &(class::Create), &(class::CanCreate), type, false, false);
 #define REGISTER_HIDDEN(class,name,type) Register(#name, &(class::Create), &(class::CanCreate), type, true, false);
@@ -229,7 +230,6 @@ ModuleFactory::ModuleFactory()
    REGISTER(LFOController, lfocontroller, kModuleType_Other);
    REGISTER(VinylTempoControl, vinylcontrol, kModuleType_Other);
    REGISTER(NoteFlusher, noteflusher, kModuleType_Note);
-   REGISTER(FreeverbOutput, freeverboutput, kModuleType_Other);
    REGISTER(NoteCanvas, notecanvas, kModuleType_Instrument);
    REGISTER(CommentDisplay, comment, kModuleType_Other);
    REGISTER(GridController, gridcontroller, kModuleType_Other);
@@ -239,18 +239,18 @@ ModuleFactory::ModuleFactory()
    REGISTER(NoteDisplayer, notedisplayer, kModuleType_Note);
    REGISTER(AudioMeter, audiometer, kModuleType_Audio);
    REGISTER(NoteSustain, notesustain, kModuleType_Note);
-   REGISTER(ControlSequencer, controlsequencer, kModuleType_Other);
+   REGISTER(ControlSequencer, controlsequencer, kModuleType_Modulator);
    REGISTER(PitchSetter, pitchsetter, kModuleType_Note);
    REGISTER(NoteFilter, notefilter, kModuleType_Note);
    REGISTER(RandomNoteGenerator, randomnote, kModuleType_Instrument);
-   REGISTER(NoteToFreq, notetofreq, kModuleType_Note);
-   REGISTER(MacroSlider, macroslider, kModuleType_Other);
+   REGISTER(NoteToFreq, notetofreq, kModuleType_Modulator);
+   REGISTER(MacroSlider, macroslider, kModuleType_Modulator);
    REGISTER(NoteVibrato, vibrato, kModuleType_Note);
    REGISTER(ModulationVisualizer, modulationvizualizer, kModuleType_Note);
    REGISTER(PitchDive, pitchdive, kModuleType_Note);
    REGISTER(EventCanvas, eventcanvas, kModuleType_Other);
    REGISTER(NoteCreator, notecreator, kModuleType_Instrument);
-   REGISTER(ValueSetter, valuesetter, kModuleType_Note);
+   REGISTER(ValueSetter, valuesetter, kModuleType_Modulator);
    REGISTER(PreviousNote, previousnote, kModuleType_Note);
    REGISTER(PressureToVibrato, pressuretovibrato, kModuleType_Note);
    REGISTER(ModwheelToVibrato, modwheeltovibrato, kModuleType_Note);
@@ -259,10 +259,10 @@ ModuleFactory::ModuleFactory()
    REGISTER(PressureToModwheel, pressuretomodwheel, kModuleType_Note);
    REGISTER(ModwheelToPressure, modwheeltopressure, kModuleType_Note);
    REGISTER(FeedbackModule, feedback, kModuleType_Audio);
-   REGISTER(NoteToMs, notetoms, kModuleType_Note);
+   REGISTER(NoteToMs, notetoms, kModuleType_Modulator);
    REGISTER(Selector, selector, kModuleType_Other);
    REGISTER(GroupControl, groupcontrol, kModuleType_Other);
-   REGISTER(CurveLooper, curvelooper, kModuleType_Other);
+   REGISTER(CurveLooper, curvelooper, kModuleType_Modulator);
    REGISTER(GridToDrums, gridtodrums, kModuleType_Instrument);
    REGISTER(ScaleDegree, scaledegree, kModuleType_Note);
    REGISTER(NoteSequencerColumn, notesequencercolumn, kModuleType_Note);
@@ -271,7 +271,7 @@ ModuleFactory::ModuleFactory()
    REGISTER(TimelineControl, timelinecontrol, kModuleType_Other);
    REGISTER(VelocityScaler, velocityscaler, kModuleType_Note);
    REGISTER(KeyboardDisplay, keyboarddisplay, kModuleType_Instrument);
-   REGISTER(Ramper, ramper, kModuleType_Other);
+   REGISTER(Ramper, ramper, kModuleType_Modulator);
    REGISTER(NoteGate, notegate, kModuleType_Note);
    REGISTER(Prefab, prefab, kModuleType_Other);
    REGISTER(NoteHumanizer, notehumanizer, kModuleType_Note);
@@ -282,7 +282,9 @@ ModuleFactory::ModuleFactory()
    REGISTER(Panner, panner, kModuleType_Audio);
    REGISTER(SamplePlayer, sampleplayer, kModuleType_Synth);
    REGISTER(AudioSend, send, kModuleType_Audio);
-   REGISTER(EnvelopeModulator, envelope, kModuleType_Note);
+   REGISTER(EnvelopeModulator, envelope, kModuleType_Modulator);
+   REGISTER(AudioToCV, audiotocv, kModuleType_Modulator);
+   REGISTER(ModulatorAdd, add, kModuleType_Modulator);
 
    //REGISTER_EXPERIMENTAL(MidiPlayer, midiplayer, kModuleType_Instrument);
    REGISTER_EXPERIMENTAL(Razor, razor, kModuleType_Synth);

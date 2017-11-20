@@ -40,6 +40,8 @@ PatchCableSource::PatchCableSource(IDrawableModule* owner, ConnectionType type)
       mColor = IDrawableModule::GetColor(kModuleType_Note);
    else if (mType == kConnectionType_Audio)
       mColor = IDrawableModule::GetColor(kModuleType_Audio);
+   else if (mType == kConnectionType_UIControl)
+      mColor = IDrawableModule::GetColor(kModuleType_Modulator);
    else
       mColor = IDrawableModule::GetColor(kModuleType_Other);
    mColor.setBrightness(mColor.getBrightness() * .8f);

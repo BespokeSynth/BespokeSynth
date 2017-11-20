@@ -74,6 +74,7 @@ private:
    SpawnList mNoteModules;
    SpawnList mSynthModules;
    SpawnList mAudioModules;
+   SpawnList mModulatorModules;
    SpawnList mOtherModules;
    SpawnList mVstPlugins;
    

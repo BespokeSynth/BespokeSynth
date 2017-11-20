@@ -121,9 +121,15 @@ void Sampler::Process(double time)
 void Sampler::PlayNote(double time, int pitch, int velocity, int voiceIdx /*= -1*/, ModulationChain* pitchBend /*= nullptr*/, ModulationChain* modWheel /*= nullptr*/, ModulationChain* pressure /*= nullptr*/)
 {
    if (velocity > 0)
+   {
       mPolyMgr.Start(time, pitch, velocity/127.0f, voiceIdx, pitchBend, modWheel, pressure);
+      mVoiceParams.mAdsr.Start(time,1);         //for visualization
+   }
    else
+   {
       mPolyMgr.Stop(time, pitch);
+      mVoiceParams.mAdsr.Stop(time);         //for visualization
+   }
 }
 
 void Sampler::SetEnabled(bool enabled)

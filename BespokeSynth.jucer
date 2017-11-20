@@ -165,6 +165,8 @@
         <FILE id="Rcmdag" name="AudioRouter.h" compile="0" resource="0" file="Source/AudioRouter.h"/>
         <FILE id="ZzfJHl" name="AudioSend.cpp" compile="1" resource="0" file="Source/AudioSend.cpp"/>
         <FILE id="OtmbPm" name="AudioSend.h" compile="0" resource="0" file="Source/AudioSend.h"/>
+        <FILE id="edpELk" name="AudioToCV.cpp" compile="1" resource="0" file="Source/AudioToCV.cpp"/>
+        <FILE id="zoKu50" name="AudioToCV.h" compile="0" resource="0" file="Source/AudioToCV.h"/>
         <FILE id="dhS4B5" name="Autotalent.cpp" compile="1" resource="0" file="Source/Autotalent.cpp"/>
         <FILE id="ROyJri" name="Autotalent.h" compile="0" resource="0" file="Source/Autotalent.h"/>
         <FILE id="i6udMA" name="BandVocoder.cpp" compile="1" resource="0" file="Source/BandVocoder.cpp"/>
@@ -247,10 +249,6 @@
               file="Source/FourOnTheFloor.cpp"/>
         <FILE id="NhOPsY" name="FourOnTheFloor.h" compile="0" resource="0"
               file="Source/FourOnTheFloor.h"/>
-        <FILE id="QT49Vw" name="FreeverbOutput.cpp" compile="1" resource="0"
-              file="Source/FreeverbOutput.cpp"/>
-        <FILE id="Uj7fLC" name="FreeverbOutput.h" compile="0" resource="0"
-              file="Source/FreeverbOutput.h"/>
         <FILE id="h7M6HM" name="FreqDelay.cpp" compile="1" resource="0" file="Source/FreqDelay.cpp"/>
         <FILE id="Onnxb8" name="FreqDelay.h" compile="0" resource="0" file="Source/FreqDelay.h"/>
         <FILE id="bFJCjN" name="FreqDomainBoilerplate.cpp" compile="1" resource="0"
@@ -323,6 +321,9 @@
               file="Source/ModulationVisualizer.cpp"/>
         <FILE id="UMwE0t" name="ModulationVisualizer.h" compile="0" resource="0"
               file="Source/ModulationVisualizer.h"/>
+        <FILE id="QKqgG5" name="ModulatorAdd.cpp" compile="1" resource="0"
+              file="Source/ModulatorAdd.cpp"/>
+        <FILE id="w57dZM" name="ModulatorAdd.h" compile="0" resource="0" file="Source/ModulatorAdd.h"/>
         <FILE id="rudwi0" name="ModuleSaveDataPanel.cpp" compile="1" resource="0"
               file="Source/ModuleSaveDataPanel.cpp"/>
         <FILE id="mOW7vY" name="ModuleSaveDataPanel.h" compile="0" resource="0"

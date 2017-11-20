@@ -32,6 +32,7 @@ enum ModuleType
    kModuleType_Audio,
    kModuleType_Instrument,
    kModuleType_Processor,
+   kModuleType_Modulator,
    kModuleType_Other,
    kModuleType_Unknown
 };

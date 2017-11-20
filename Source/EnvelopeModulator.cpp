@@ -13,7 +13,7 @@
 
 EnvelopeModulator::EnvelopeModulator()
 : mWidth(250)
-, mHeight(120)
+, mHeight(102)
 , mEnvelopeControl(ofVec2f(105,5),ofVec2f(mWidth-110,mHeight-10))
 , mADSRViewLength(1000)
 , mADSRViewLengthSlider(nullptr)
@@ -35,11 +35,12 @@ void EnvelopeModulator::CreateUIControls()
 {
    IDrawableModule::CreateUIControls();
    
+   GetPatchCableSource()->SetEnabled(false);
+   
    mTargetCable = new PatchCableSource(this, kConnectionType_UIControl);
-   mTargetCable->SetManualPosition(10, 10);
    AddPatchCableSource(mTargetCable);
    
-   mMinSlider = new FloatSlider(this, "low", 2, 20, 100, 15, &mMin, 0, 1);
+   mMinSlider = new FloatSlider(this, "low", 2, 2, 100, 15, &mMin, 0, 1);
    mMaxSlider = new FloatSlider(this, "high", mMinSlider, kAnchor_Below, 100, 15, &mMax, 0, 1);
    mADSRViewLengthSlider = new FloatSlider(this,"length", mMaxSlider, kAnchor_Below,100,15,&mADSRViewLength,100,10000);
    mHasSustainStageCheckbox = new Checkbox(this, "has sustain", mADSRViewLengthSlider, kAnchor_Below, &mAdsr.GetHasSustainStage());
@@ -61,8 +62,6 @@ void EnvelopeModulator::DrawModule()
 {
    if (Minimized())
       return;
-   
-   DrawText("target", 18, 14);
    
    mSustainStageSlider->SetExtents(1, mAdsr.GetNumStages() - 2);
    
@@ -93,7 +92,7 @@ void EnvelopeModulator::PlayNote(double time, int pitch, int velocity, int voice
 void EnvelopeModulator::Resize(float w, float h)
 {
    mWidth = MAX(w, 250);
-   mHeight = MAX(h, 120);
+   mHeight = MAX(h, 102);
    mEnvelopeControl.SetDimensions(ofVec2f(mWidth - 110, mHeight-10));
 }
 

@@ -103,6 +103,7 @@ TitleBar::TitleBar()
 , mNoteModules(this,0,0,"note effects:")
 , mSynthModules(this,0,0,"synths:")
 , mAudioModules(this,0,0,"audio effects:")
+, mModulatorModules(this,0,0,"modulators:")
 , mOtherModules(this,0,0,"other:")
 , mVstPlugins(this,0,0,"vst plugins:")
 , mSaveLayoutButton(nullptr)
@@ -147,6 +148,7 @@ void TitleBar::SetModuleFactory(ModuleFactory* factory)
    mNoteModules.SetList(factory->GetSpawnableModules(kModuleType_Note), false);
    mSynthModules.SetList(factory->GetSpawnableModules(kModuleType_Synth), false);
    mAudioModules.SetList(factory->GetSpawnableModules(kModuleType_Audio), false);
+   mModulatorModules.SetList(factory->GetSpawnableModules(kModuleType_Modulator), false);
    mOtherModules.SetList(factory->GetSpawnableModules(kModuleType_Other), false);
    
    vector<string> vsts;
@@ -210,7 +212,8 @@ void TitleBar::DrawModule()
          mNoteModules.SetPositionRelativeTo(&mInstrumentModules);
          mSynthModules.SetPositionRelativeTo(&mNoteModules);
          mAudioModules.SetPositionRelativeTo(&mSynthModules);
-         mOtherModules.SetPositionRelativeTo(&mAudioModules);
+         mModulatorModules.SetPositionRelativeTo(&mAudioModules);
+         mOtherModules.SetPositionRelativeTo(&mModulatorModules);
          if (ofGetWidth() / gDrawScale >= 1400)
             mVstPlugins.SetPositionRelativeTo(&mOtherModules);
          else
@@ -222,13 +225,15 @@ void TitleBar::DrawModule()
          mNoteModules.SetPositionRelativeTo(&mInstrumentModules);
          mSynthModules.SetPositionRelativeTo(&mNoteModules);
          mAudioModules.SetPosition(400, 18);
-         mOtherModules.SetPositionRelativeTo(&mAudioModules);
+         mModulatorModules.SetPositionRelativeTo(&mAudioModules);
+         mOtherModules.SetPositionRelativeTo(&mModulatorModules);
          mVstPlugins.SetPositionRelativeTo(&mOtherModules);
       }
       mInstrumentModules.Draw();
       mNoteModules.Draw();
       mSynthModules.Draw();
       mAudioModules.Draw();
+      mModulatorModules.Draw();
       mOtherModules.Draw();
       mVstPlugins.Draw();
    }
@@ -284,6 +289,7 @@ void TitleBar::DropdownUpdated(DropdownList* list, int oldVal)
    mNoteModules.OnSelection(list);
    mSynthModules.OnSelection(list);
    mAudioModules.OnSelection(list);
+   mModulatorModules.OnSelection(list);
    mOtherModules.OnSelection(list);
    mVstPlugins.OnSelection(list);
 }

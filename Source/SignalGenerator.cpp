@@ -62,7 +62,7 @@ void SignalGenerator::CreateUIControls()
    mSyncCheckbox = new Checkbox(this,"sync",95,38,&mSync);
    mSyncFreqSlider = new FloatSlider(this,"syncf",135,38,40,15,&mSyncFreq,10,999.9f);
    mDetuneSlider = new FloatSlider(this,"detune",95,72,80,15,&mDetune,.98f,1.02f,3);
-   mFreqSlider = new FloatSlider(this,"freq",5,2,170,15,&mFreq,30,1000);
+   mFreqSlider = new FloatSlider(this,"freq",5,2,170,15,&mFreq,1,1000);
    mFreqModeSelector = new DropdownList(this,"freq mode",5,21,(int*)(&mFreqMode));
    mFreqSliderAmountSlider = new FloatSlider(this,"slider",5,38,80,15,&mFreqSliderAmount,0,1);
    mFreqRampTimeSlider = new FloatSlider(this,"ramp",5,38,80,15,&mFreqRampTime,0,1000);
@@ -102,7 +102,7 @@ void SignalGenerator::CreateUIControls()
    mFreqModeSelector->AddLabel("ramp", kFreqMode_Ramp);
    mFreqModeSelector->AddLabel("slider", kFreqMode_Slider);
    
-   mFreqSlider->SetMode(FloatSlider::kLogarithmic);
+   mFreqSlider->SetMode(FloatSlider::kSquare);
    mFreqRampTimeSlider->SetMode(FloatSlider::kSquare);
 }
 

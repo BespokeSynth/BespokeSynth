@@ -51,21 +51,30 @@ private:
 
    //IDrawableModule
    void DrawModule() override;
-   void GetModuleDimensions(int& width, int& height) override { width = 270; height = 64; }
+   void GetModuleDimensions(int& width, int& height) override { width = 180; height = 180; }
    bool Enabled() const override { return mEnabled; }
 
    
    PolyphonyMgr mPolyMgr;
    FMVoiceParams mVoiceParams;
    FloatSlider* mVolSlider;
+   ADSRDisplay* mAdsrDisplayVol;
+   
    FloatSlider* mHarmSlider;
+   ADSRDisplay* mAdsrDisplayHarm;
    FloatSlider* mModSlider;
+   ADSRDisplay* mAdsrDisplayMod;
    int mHarmRatioBase;  //negative means 1/val
    float mHarmRatioTweak;
    DropdownList* mHarmRatioBaseDropdown;
-   ADSRDisplay* mAdsrDisplayOsc;
-   ADSRDisplay* mAdsrDisplayHarm;
-   ADSRDisplay* mAdsrDisplayMod;
+   
+   FloatSlider* mHarmSlider2;
+   ADSRDisplay* mAdsrDisplayHarm2;
+   FloatSlider* mModSlider2;
+   ADSRDisplay* mAdsrDisplayMod2;
+   int mHarmRatioBase2;  //negative means 1/val
+   float mHarmRatioTweak2;
+   DropdownList* mHarmRatioBaseDropdown2;
 
    float* mWriteBuffer;
 };

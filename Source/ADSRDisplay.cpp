@@ -95,9 +95,10 @@ void ADSRDisplay::Render()
       mViewAdsr.Set(*mAdsr);
       mViewAdsr.Clear();
       mViewAdsr.Start(0,1);
+      float releaseTime = mMaxTime;
       if (mViewAdsr.GetMaxSustain() == -1 && mViewAdsr.GetHasSustainStage())
       {
-         float releaseTime = mMaxTime * .2f;
+         releaseTime = mMaxTime * .2f;
          for (int i=0; i<mViewAdsr.GetNumStages(); ++i)
          {
             releaseTime += mViewAdsr.GetStageData(i).time;
@@ -114,6 +115,16 @@ void ADSRDisplay::Render()
          ofVertex(i, mHeight * (1 - value));
       }
       ofEndShape(false);
+      
+      ofSetLineWidth(1);
+      ofSetColor(0,255,0,gModuleDrawAlpha);
+      float drawTime = 0;
+      if (mAdsr->GetStartTime() > mAdsr->GetStopTime())
+         drawTime = ofClamp(gTime - mAdsr->GetStartTime(), 0, releaseTime);
+      if (mAdsr->GetStopTime() > mAdsr->GetStartTime())
+         drawTime = releaseTime + (gTime - mAdsr->GetStopTime());
+      if (drawTime > 0 && drawTime < mMaxTime)
+         ofLine(drawTime/mMaxTime*mWidth, 0, drawTime/mMaxTime*mWidth, mHeight);
    }
    
    ofFill();
@@ -260,7 +271,7 @@ bool ADSRDisplay::MouseMoved(float x, float y)
 {
    if (!mClick)
    {
-      if (x >= mWidth-10 && x <= mWidth && y <=10)
+      if (x >= mWidth-10 && x <= mWidth && y >= 0 && y <=10)
       {
          mAdjustMode = kAdjustEnvelopeEditor;
       }

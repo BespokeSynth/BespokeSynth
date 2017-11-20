@@ -17,16 +17,12 @@ MacroSlider::MacroSlider()
 : mSlider(nullptr)
 , mValue(0)
 {
-   TheTransport->AddAudioPoller(this);
 }
 
 MacroSlider::~MacroSlider()
 {
-   mMappingMutex.lock();
    for (auto mapping : mMappings)
       delete mapping;
-   mMappingMutex.unlock();
-   TheTransport->RemoveAudioPoller(this);
 }
 
 void MacroSlider::CreateUIControls()
@@ -42,46 +38,27 @@ void MacroSlider::DrawModule()
    
    mSlider->Draw();
    
-   mMappingMutex.lock();
    for (auto mapping : mMappings)
       mapping->Draw();
-   mMappingMutex.unlock();
-}
-
-void MacroSlider::OnTransportAdvanced(float amount)
-{
-   mSlider->Compute();
 }
 
 void MacroSlider::PostRepatch(PatchCableSource* cableSource)
 {
-   mMappingMutex.lock();
    for (auto mapping : mMappings)
-      mapping->UpdateControl();
-   mMappingMutex.unlock();
+   {
+      if (mapping->GetCableSource() == cableSource)
+         mapping->UpdateControl();
+   }
 }
 
 void MacroSlider::FloatSliderUpdated(FloatSlider* slider, float oldVal)
 {
-   if (slider == mSlider)
-   {
-      UpdateValues();
-   }
-}
-
-void MacroSlider::UpdateValues()
-{
-   mMappingMutex.lock();
-   for (auto mapping : mMappings)
-      mapping->UpdateValue(mValue);
-   mMappingMutex.unlock();
 }
 
 void MacroSlider::SaveLayout(ofxJSONElement& moduleInfo)
 {
    IDrawableModule::SaveLayout(moduleInfo);
    
-   mMappingMutex.lock();
    moduleInfo["num_mappings"] = (int)mMappings.size();
    for (int i=0; i<mMappings.size(); ++i)
    {
@@ -91,14 +68,12 @@ void MacroSlider::SaveLayout(ofxJSONElement& moduleInfo)
       
       moduleInfo["mappings"][i]["target"] = targetPath;
    }
-   mMappingMutex.unlock();
 }
 
 void MacroSlider::LoadLayout(const ofxJSONElement& moduleInfo)
 {
    mModuleSaveData.LoadInt("num_mappings", moduleInfo, 3, 1, 100, K(isTextField));
    
-   mMappingMutex.lock();
    for (auto mapping : mMappings)
       delete mapping;
    mMappings.clear();
@@ -113,14 +88,12 @@ void MacroSlider::LoadLayout(const ofxJSONElement& moduleInfo)
       mapping->UpdateControl();
       mMappings.push_back(mapping);
    }
-   mMappingMutex.unlock();
    
    SetUpFromSaveData();
 }
 
 void MacroSlider::SetUpFromSaveData()
 {
-   mMappingMutex.lock();
    int newNumMappings = mModuleSaveData.GetInt("num_mappings");
    if (mMappings.size() > newNumMappings)
    {
@@ -138,13 +111,6 @@ void MacroSlider::SetUpFromSaveData()
          mMappings[i] = mapping;
       }
    }
-   mMappingMutex.unlock();
-}
-
-void MacroSlider::PostLoadState()
-{
-   IDrawableModule::PostLoadState();
-   UpdateValues();
 }
 
 MacroSlider::Mapping::Mapping(MacroSlider* owner, int index)
@@ -173,6 +139,9 @@ void MacroSlider::Mapping::CreateUIControls()
 
 void MacroSlider::Mapping::UpdateControl()
 {
+   if (mControl != nullptr)
+      mControl->SetModulator(nullptr);
+   
    FloatSlider* control = dynamic_cast<FloatSlider*>(mCableSource->GetTarget());
    if (control && control != mControl)
    {
@@ -181,13 +150,14 @@ void MacroSlider::Mapping::UpdateControl()
       mEndSlider->MatchExtents(mControl);
       mStart = mControl->GetMin();
       mEnd = mControl->GetMax();
+      mControl->SetModulator(this);
    }
 }
 
-void MacroSlider::Mapping::UpdateValue(float value)
+float MacroSlider::Mapping::Value(int samplesIn)
 {
-   if (mControl)
-      mControl->SetValue(ofMap(value,0,1,mStart,mEnd));
+   mOwner->ComputeSliders(samplesIn);
+   return ofMap(mOwner->GetValue(), 0, 1, mStart, mEnd, K(clamp));
 }
 
 void MacroSlider::Mapping::Draw()

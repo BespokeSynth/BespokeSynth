@@ -173,6 +173,7 @@
     <ClCompile Include="..\..\Source\AudioMeter.cpp"/>
     <ClCompile Include="..\..\Source\AudioRouter.cpp"/>
     <ClCompile Include="..\..\Source\AudioSend.cpp"/>
+    <ClCompile Include="..\..\Source\AudioToCV.cpp"/>
     <ClCompile Include="..\..\Source\Autotalent.cpp"/>
     <ClCompile Include="..\..\Source\BandVocoder.cpp"/>
     <ClCompile Include="..\..\Source\BeatBloks.cpp"/>
@@ -201,7 +202,6 @@
     <ClCompile Include="..\..\Source\FMSynth.cpp"/>
     <ClCompile Include="..\..\Source\FollowingSong.cpp"/>
     <ClCompile Include="..\..\Source\FourOnTheFloor.cpp"/>
-    <ClCompile Include="..\..\Source\FreeverbOutput.cpp"/>
     <ClCompile Include="..\..\Source\FreqDelay.cpp"/>
     <ClCompile Include="..\..\Source\FreqDomainBoilerplate.cpp"/>
     <ClCompile Include="..\..\Source\GridController.cpp"/>
@@ -225,6 +225,7 @@
     <ClCompile Include="..\..\Source\MidiInstrument.cpp"/>
     <ClCompile Include="..\..\Source\MidiOutput.cpp"/>
     <ClCompile Include="..\..\Source\ModulationVisualizer.cpp"/>
+    <ClCompile Include="..\..\Source\ModulatorAdd.cpp"/>
     <ClCompile Include="..\..\Source\ModuleSaveDataPanel.cpp"/>
     <ClCompile Include="..\..\Source\ModWheel.cpp"/>
     <ClCompile Include="..\..\Source\ModwheelToPressure.cpp"/>

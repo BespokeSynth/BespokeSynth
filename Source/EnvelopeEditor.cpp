@@ -139,6 +139,16 @@ void EnvelopeControl::Draw()
          ofCircle(x, GetYForValue(value), i == mHighlightPoint ? 8 : pointClickRadius);
    }
    
+   ofSetLineWidth(1);
+   ofSetColor(0,255,0,gModuleDrawAlpha);
+   float drawTime = 0;
+   if (mAdsr->GetStartTime() > mAdsr->GetStopTime())
+      drawTime = ofClamp(gTime - mAdsr->GetStartTime(), 0, GetReleaseTime());
+   if (mAdsr->GetStopTime() > mAdsr->GetStartTime())
+      drawTime = GetReleaseTime() + (gTime - mAdsr->GetStopTime());
+   if (drawTime > 0 && drawTime < mViewLength)
+      ofLine(GetXForTime(drawTime), mPosition.y, GetXForTime(drawTime), mPosition.y + mDimensions.y);
+   
    ofPopStyle();
 }
 

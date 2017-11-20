@@ -18,7 +18,6 @@
 #include "Sample.h"
 #include "FloatSliderLFOControl.h"
 #include "VinylTempoControl.h"
-#include "FreeverbOutput.h"
 //#include <CoreServices/CoreServices.h>
 #include "fenv.h"
 #include <stdlib.h>
@@ -29,6 +28,7 @@
 #include "ADSRDisplay.h"
 #include "../JuceLibraryCode/JuceHeader.h"
 #include "QuickSpawnMenu.h"
+#include "AudioToCV.h"
 
 ModularSynth* TheSynth = nullptr;
 
@@ -900,8 +900,6 @@ void ModularSynth::OnModuleDeleted(IDrawableModule* module)
    
    if (module == TheChaosEngine)
       TheChaosEngine = nullptr;
-   if (module == TheFreeverbOutput)
-      TheFreeverbOutput = nullptr;
    if (module == TheLFOController)
       TheLFOController = nullptr;
    if (module == TheVinylTempoControl)
@@ -1021,11 +1019,6 @@ void ModularSynth::AudioOut(float** output, int bufferSize, int nChannels)
             mOutput[i]->Process();
             outBuffer[i] = mOutput[i]->GetBuffer()->GetChannel(0);
          }
-      }
-      
-      if (TheFreeverbOutput)
-      {
-         TheFreeverbOutput->ProcessAudio(outBuffer[TheFreeverbOutput->GetLeftChannel()-1], outBuffer[TheFreeverbOutput->GetRightChannel()-1], gBufferSize);
       }
       
       if (TheMultitrackRecorder)

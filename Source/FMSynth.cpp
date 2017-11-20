@@ -17,12 +17,19 @@ FMSynth::FMSynth()
 : mHarmRatioBase(1)
 , mHarmRatioBaseDropdown(nullptr)
 , mHarmRatioTweak(0)
+, mHarmRatioBase2(1)
+, mHarmRatioBaseDropdown2(nullptr)
+, mHarmRatioTweak2(0)
 , mHarmSlider(nullptr)
 , mModSlider(nullptr)
+, mHarmSlider2(nullptr)
+, mModSlider2(nullptr)
 , mVolSlider(nullptr)
-, mAdsrDisplayOsc(nullptr)
+, mAdsrDisplayVol(nullptr)
 , mAdsrDisplayHarm(nullptr)
 , mAdsrDisplayMod(nullptr)
+, mAdsrDisplayHarm2(nullptr)
+, mAdsrDisplayMod2(nullptr)
 , mPolyMgr(this)
 {
    mVoiceParams.mOscADSRParams.GetA() = 10;
@@ -39,6 +46,16 @@ FMSynth::FMSynth()
    mVoiceParams.mModIdxADSRParams.GetR() = 1;
    mVoiceParams.mHarmRatio = 1;
    mVoiceParams.mModIdx = 0;
+   mVoiceParams.mHarmRatioADSRParams2.GetA() = 1;
+   mVoiceParams.mHarmRatioADSRParams2.GetD() = 0;
+   mVoiceParams.mHarmRatioADSRParams2.GetS() = 1;
+   mVoiceParams.mHarmRatioADSRParams2.GetR() = 1;
+   mVoiceParams.mModIdxADSRParams2.GetA() = 1;
+   mVoiceParams.mModIdxADSRParams2.GetD() = 0;
+   mVoiceParams.mModIdxADSRParams2.GetS() = 1;
+   mVoiceParams.mModIdxADSRParams2.GetR() = 1;
+   mVoiceParams.mHarmRatio2 = 1;
+   mVoiceParams.mModIdx2 = 0;
    mVoiceParams.mVol = 1.f;
 
    mPolyMgr.Init(kVoiceType_FM, &mVoiceParams);
@@ -49,13 +66,18 @@ FMSynth::FMSynth()
 void FMSynth::CreateUIControls()
 {
    IDrawableModule::CreateUIControls();
-   mHarmRatioBaseDropdown = new DropdownList(this,"harmratio",66,46,&mHarmRatioBase);
-   mHarmSlider = new FloatSlider(this,"tweak",107,46,77,15,&mHarmRatioTweak,-0.01f,0.01f,3);
-   mModSlider = new FloatSlider(this,"mod",186,46,77,15,&mVoiceParams.mModIdx,0,20);
-   mVolSlider = new FloatSlider(this,"vol",4,46,60,15,&mVoiceParams.mVol,0,2);
-   mAdsrDisplayOsc = new ADSRDisplay(this,"adsrosc",4,4,80,40,&mVoiceParams.mOscADSRParams);
-   mAdsrDisplayHarm = new ADSRDisplay(this,"adsrharm",94,4,80,40,&mVoiceParams.mHarmRatioADSRParams);
-   mAdsrDisplayMod = new ADSRDisplay(this,"adsrmod",184,4,80,40,&mVoiceParams.mModIdxADSRParams);
+   mAdsrDisplayVol = new ADSRDisplay(this,"adsrosc",4,4,80,40,&mVoiceParams.mOscADSRParams);
+   mAdsrDisplayHarm = new ADSRDisplay(this,"adsrharm",4,55,80,40,&mVoiceParams.mHarmRatioADSRParams);
+   mAdsrDisplayMod = new ADSRDisplay(this,"adsrmod",94,55,80,40,&mVoiceParams.mModIdxADSRParams);
+   mAdsrDisplayHarm2 = new ADSRDisplay(this,"adsrharm2",4,115,80,40,&mVoiceParams.mHarmRatioADSRParams2);
+   mAdsrDisplayMod2 = new ADSRDisplay(this,"adsrmod2",94,115,80,40,&mVoiceParams.mModIdxADSRParams2);
+   mHarmRatioBaseDropdown = new DropdownList(this,"harmratio",mAdsrDisplayHarm,kAnchor_Below,&mHarmRatioBase);
+   mHarmRatioBaseDropdown2 = new DropdownList(this,"harmratio2",mAdsrDisplayHarm2,kAnchor_Below,&mHarmRatioBase2);
+   mHarmSlider = new FloatSlider(this,"tweak",-1,-1,80,15,&mHarmRatioTweak,-0.01f,0.01f,3);
+   mModSlider = new FloatSlider(this,"mod",mAdsrDisplayMod,kAnchor_Below,80,15,&mVoiceParams.mModIdx,0,20);
+   mHarmSlider2 = new FloatSlider(this,"tweak2",-1,-1,80,15,&mHarmRatioTweak2,-0.01f,0.01f,3);
+   mModSlider2 = new FloatSlider(this,"mod2",mAdsrDisplayMod2,kAnchor_Below,80,15,&mVoiceParams.mModIdx2,0,20);
+   mVolSlider = new FloatSlider(this,"vol",mAdsrDisplayVol,kAnchor_Right,60,15,&mVoiceParams.mVol,0,2);
    
    mHarmRatioBaseDropdown->AddLabel(".125", -8);
    mHarmRatioBaseDropdown->AddLabel(".2", -5);
@@ -69,7 +91,23 @@ void FMSynth::CreateUIControls()
    mHarmRatioBaseDropdown->AddLabel("8", 8);
    mHarmRatioBaseDropdown->AddLabel("16", 16);
    
+   mHarmRatioBaseDropdown2->AddLabel(".125", -8);
+   mHarmRatioBaseDropdown2->AddLabel(".2", -5);
+   mHarmRatioBaseDropdown2->AddLabel(".25", -4);
+   mHarmRatioBaseDropdown2->AddLabel(".333", -3);
+   mHarmRatioBaseDropdown2->AddLabel(".5", -2);
+   mHarmRatioBaseDropdown2->AddLabel("1", 1);
+   mHarmRatioBaseDropdown2->AddLabel("2", 2);
+   mHarmRatioBaseDropdown2->AddLabel("3", 3);
+   mHarmRatioBaseDropdown2->AddLabel("4", 4);
+   mHarmRatioBaseDropdown2->AddLabel("8", 8);
+   mHarmRatioBaseDropdown2->AddLabel("16", 16);
+   
    mModSlider->SetMode(FloatSlider::kSquare);
+   mModSlider2->SetMode(FloatSlider::kSquare);
+   
+   mHarmSlider->PositionTo(mVolSlider, kAnchor_Below);
+   mHarmSlider2->PositionTo(mHarmSlider, kAnchor_Below);
 }
 
 FMSynth::~FMSynth()
@@ -100,9 +138,15 @@ void FMSynth::Process(double time)
 void FMSynth::PlayNote(double time, int pitch, int velocity, int voiceIdx /*= -1*/, ModulationChain* pitchBend /*= nullptr*/, ModulationChain* modWheel /*= nullptr*/, ModulationChain* pressure /*= nullptr*/)
 {
    if (velocity > 0)
+   {
       mPolyMgr.Start(time, pitch, velocity/127.0f, voiceIdx, pitchBend, modWheel, pressure);
+      mVoiceParams.mOscADSRParams.Start(time,1);   //for visualization
+   }
    else
+   {
       mPolyMgr.Stop(time, pitch);
+      mVoiceParams.mOscADSRParams.Stop(time);   //for visualization
+   }
 }
 
 void FMSynth::SetEnabled(bool enabled)
@@ -115,17 +159,24 @@ void FMSynth::DrawModule()
    if (Minimized() || IsVisible() == false)
       return;
 
-   mAdsrDisplayOsc->Draw();
+   mAdsrDisplayVol->Draw();
    mAdsrDisplayHarm->Draw();
    mAdsrDisplayMod->Draw();
    mHarmSlider->Draw();
    mModSlider->Draw();
    mVolSlider->Draw();
    mHarmRatioBaseDropdown->Draw();
+   mAdsrDisplayHarm2->Draw();
+   mAdsrDisplayMod2->Draw();
+   mHarmSlider2->Draw();
+   mModSlider2->Draw();
+   mHarmRatioBaseDropdown2->Draw();
 
-   DrawText("env",8,14);
-   DrawText("harm",98,14);
-   DrawText("mod",188,14);
+   DrawText("env",mAdsrDisplayVol->GetPosition(true).x, mAdsrDisplayVol->GetPosition(true).y+10);
+   DrawText("harm",mAdsrDisplayHarm->GetPosition(true).x, mAdsrDisplayHarm->GetPosition(true).y+10);
+   DrawText("mod",mAdsrDisplayMod->GetPosition(true).x, mAdsrDisplayMod->GetPosition(true).y+10);
+   DrawText("harm2",mAdsrDisplayHarm2->GetPosition(true).x, mAdsrDisplayHarm2->GetPosition(true).y+10);
+   DrawText("mod2",mAdsrDisplayMod2->GetPosition(true).x, mAdsrDisplayMod2->GetPosition(true).y+10);
 }
 
 void FMSynth::UpdateHarmonicRatio()
@@ -136,17 +187,22 @@ void FMSynth::UpdateHarmonicRatio()
       mVoiceParams.mHarmRatio = mHarmRatioBase;
    mVoiceParams.mHarmRatio += mHarmRatioTweak;
    
+   if (mHarmRatioBase2 < 0)
+      mVoiceParams.mHarmRatio2 = 1.0f/(-mHarmRatioBase2);
+   else
+      mVoiceParams.mHarmRatio2 = mHarmRatioBase2;
+   mVoiceParams.mHarmRatio2 += mHarmRatioTweak2;
 }
 
 void FMSynth::DropdownUpdated(DropdownList* list, int oldVal)
 {
-   if (list == mHarmRatioBaseDropdown)
+   if (list == mHarmRatioBaseDropdown || list == mHarmRatioBaseDropdown2)
       UpdateHarmonicRatio();
 }
 
 void FMSynth::FloatSliderUpdated(FloatSlider* slider, float oldVal)
 {
-   if (slider == mHarmSlider)
+   if (slider == mHarmSlider || slider == mHarmSlider2)
       UpdateHarmonicRatio();
 }
 

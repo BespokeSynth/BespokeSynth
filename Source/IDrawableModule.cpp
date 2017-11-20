@@ -352,7 +352,9 @@ ofColor IDrawableModule::GetColor(ModuleType type)
    if (type == kModuleType_Instrument)
       color.setHsb(sHueNoteSource, sSaturation, sBrightness);
    if (type == kModuleType_Processor)
-      color.setHsb(200, sSaturation, sBrightness);
+      color.setHsb(170, sSaturation, sBrightness);
+   if (type == kModuleType_Modulator)
+      color.setHsb(200, 255, 255);
    return color;
 }
 
