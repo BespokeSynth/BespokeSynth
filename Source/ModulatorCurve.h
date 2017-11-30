@@ -1,8 +1,8 @@
 /*
   ==============================================================================
 
-    ModulatorAdd.h
-    Created: 19 Nov 2017 2:04:23pm
+    ModulatorCurve.h
+    Created: 29 Nov 2017 8:56:47pm
     Author:  Ryan Challinor
 
   ==============================================================================
@@ -15,14 +15,14 @@
 
 class PatchCableSource;
 
-class ModulatorAdd : public IDrawableModule, public IFloatSliderListener, public IModulator
+class ModulatorCurve : public IDrawableModule, public IFloatSliderListener, public IModulator
 {
 public:
-   ModulatorAdd();
-   virtual ~ModulatorAdd();
-   static IDrawableModule* Create() { return new ModulatorAdd(); }
+   ModulatorCurve();
+   virtual ~ModulatorCurve();
+   static IDrawableModule* Create() { return new ModulatorCurve(); }
    
-   string GetTitleLabel() override { return "add"; }
+   string GetTitleLabel() override { return "curve"; }
    void CreateUIControls() override;
    
    void SetEnabled(bool enabled) override { mEnabled = enabled; }
@@ -32,7 +32,6 @@ public:
    //IModulator
    float Value(int samplesIn = 0) override;
    bool Active() const override { return mEnabled; }
-   bool CanAdjustRange() const override { return false; }
    
    FloatSlider* GetTarget() { return mTarget; }
    
@@ -48,10 +47,9 @@ private:
    void GetModuleDimensions(int& w, int&h) override { w=106; h=17*2+4; }
    bool Enabled() const override { return mEnabled; }
    
-   float mValue1;
-   float mValue2;
+   float mInput;
+   float mCurve;
    
-   FloatSlider* mValue1Slider;
-   FloatSlider* mValue2Slider;
+   FloatSlider* mInputSlider;
+   FloatSlider* mCurveSlider;
 };
-

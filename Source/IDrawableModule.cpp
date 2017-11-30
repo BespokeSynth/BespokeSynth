@@ -30,7 +30,7 @@
 float IDrawableModule::sHueNote = 27;
 float IDrawableModule::sHueAudio = 135;
 float IDrawableModule::sHueInstrument = 79;
-float IDrawableModule::sHueNoteSource = 236;
+float IDrawableModule::sHueNoteSource = 240;
 float IDrawableModule::sSaturation = 145;
 float IDrawableModule::sBrightness = 220;
 
@@ -339,6 +339,7 @@ void IDrawableModule::Render()
    ofPopMatrix();
 }
 
+//static
 ofColor IDrawableModule::GetColor(ModuleType type)
 {
    ofColor color;
@@ -352,9 +353,9 @@ ofColor IDrawableModule::GetColor(ModuleType type)
    if (type == kModuleType_Instrument)
       color.setHsb(sHueNoteSource, sSaturation, sBrightness);
    if (type == kModuleType_Processor)
-      color.setHsb(170, sSaturation, sBrightness);
+      color.setHsb(170, 100, 255);
    if (type == kModuleType_Modulator)
-      color.setHsb(200, 255, 255);
+      color.setHsb(200, 100, 255);
    return color;
 }
 

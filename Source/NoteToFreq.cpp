@@ -14,24 +14,20 @@
 #include "ModulationChain.h"
 
 NoteToFreq::NoteToFreq()
-: mControlCable(nullptr)
-, mPitch(0)
-, mBend(0)
+: mPitch(0)
 , mPitchBend(nullptr)
 {
-   TheTransport->AddAudioPoller(this);
 }
 
 NoteToFreq::~NoteToFreq()
 {
-   TheTransport->RemoveAudioPoller(this);
 }
 
 void NoteToFreq::CreateUIControls()
 {
    IDrawableModule::CreateUIControls();
-   mControlCable = new PatchCableSource(this, kConnectionType_UIControl);
-   AddPatchCableSource(mControlCable);
+   mTargetCable = new PatchCableSource(this, kConnectionType_UIControl);
+   AddPatchCableSource(mTargetCable);
 }
 
 void NoteToFreq::DrawModule()
@@ -42,7 +38,7 @@ void NoteToFreq::DrawModule()
 
 void NoteToFreq::PostRepatch(PatchCableSource* cableSource)
 {
-   mTarget = dynamic_cast<IUIControl*>(mControlCable->GetTarget());
+   OnModulatorRepatch();
 }
 
 void NoteToFreq::PlayNote(double time, int pitch, int velocity, int voiceIdx /*= -1*/, ModulationChain* pitchBend /*= nullptr*/, ModulationChain* modWheel /*= nullptr*/, ModulationChain* pressure /*= nullptr*/)
@@ -51,20 +47,13 @@ void NoteToFreq::PlayNote(double time, int pitch, int velocity, int voiceIdx /*=
    {
       mPitch = pitch;
       mPitchBend = pitchBend;
-      if (mTarget)
-         mTarget->SetValue(TheScale->PitchToFreq(mPitch+mBend));
    }
 }
 
-void NoteToFreq::OnTransportAdvanced(float amount)
+float NoteToFreq::Value(int samplesIn)
 {
-   float bend = mPitchBend ? mPitchBend->GetValue(0) : 0;
-   if (mEnabled && bend != mBend)
-   {
-      mBend = bend;
-      if (mTarget)
-         mTarget->SetValue(TheScale->PitchToFreq(mPitch+mBend));
-   }
+   float bend = mPitchBend ? mPitchBend->GetValue(samplesIn) : 0;
+   return TheScale->PitchToFreq(mPitch+bend);
 }
 
 void NoteToFreq::SaveLayout(ofxJSONElement& moduleInfo)
@@ -87,6 +76,6 @@ void NoteToFreq::LoadLayout(const ofxJSONElement& moduleInfo)
 
 void NoteToFreq::SetUpFromSaveData()
 {
-   mTarget = TheSynth->FindUIControl(mModuleSaveData.GetString("target"));
-   mControlCable->SetTarget(mTarget);
+   mTarget = dynamic_cast<FloatSlider*>(TheSynth->FindUIControl(mModuleSaveData.GetString("target")));
+   mTargetCable->SetTarget(mTarget);
 }

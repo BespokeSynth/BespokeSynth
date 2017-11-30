@@ -99,6 +99,8 @@ private:
    FloatSlider* mFreqRampTimeSlider;
    float mSoften;
    FloatSlider* mSoftenSlider;
+   float mPhaseOffset;
+   FloatSlider* mPhaseOffsetSlider;
    
    float* mWriteBuffer;
 };

@@ -159,6 +159,14 @@
 #include "EnvelopeModulator.h"
 #include "AudioToCV.h"
 #include "ModulatorAdd.h"
+#include "ModulatorAddCentered.h"
+#include "PitchToCV.h"
+#include "VelocityToCV.h"
+#include "PressureToCV.h"
+#include "ModWheelToCV.h"
+#include "ModulatorMult.h"
+#include "ModulatorCurve.h"
+#include "ModulatorSmoother.h"
 
 #define REGISTER(class,name,type) Register(#name, &(class::Create), &(class::CanCreate), type, false, false);
 #define REGISTER_HIDDEN(class,name,type) Register(#name, &(class::Create), &(class::CanCreate), type, true, false);
@@ -285,6 +293,14 @@ ModuleFactory::ModuleFactory()
    REGISTER(EnvelopeModulator, envelope, kModuleType_Modulator);
    REGISTER(AudioToCV, audiotocv, kModuleType_Modulator);
    REGISTER(ModulatorAdd, add, kModuleType_Modulator);
+   REGISTER(ModulatorAddCentered, addcentered, kModuleType_Modulator);
+   REGISTER(PitchToCV, pitchtocv, kModuleType_Modulator);
+   REGISTER(VelocityToCV, velocitytocv, kModuleType_Modulator);
+   REGISTER(PressureToCV, pressuretocv, kModuleType_Modulator);
+   REGISTER(ModWheelToCV, modwheeltocv, kModuleType_Modulator);
+   REGISTER(ModulatorMult, mult, kModuleType_Modulator);
+   REGISTER(ModulatorCurve, curve, kModuleType_Modulator);
+   REGISTER(ModulatorSmoother, smoother, kModuleType_Modulator);
 
    //REGISTER_EXPERIMENTAL(MidiPlayer, midiplayer, kModuleType_Instrument);
    REGISTER_EXPERIMENTAL(Razor, razor, kModuleType_Synth);

@@ -51,7 +51,7 @@ private:
 
    //IDrawableModule
    void DrawModule() override;
-   void GetModuleDimensions(int& width, int& height) override { width = 180; height = 180; }
+   void GetModuleDimensions(int& width, int& height) override { width = 180; height = 203; }
    bool Enabled() const override { return mEnabled; }
 
    
@@ -67,6 +67,7 @@ private:
    int mHarmRatioBase;  //negative means 1/val
    float mHarmRatioTweak;
    DropdownList* mHarmRatioBaseDropdown;
+   FloatSlider* mPhaseOffsetSlider;
    
    FloatSlider* mHarmSlider2;
    ADSRDisplay* mAdsrDisplayHarm2;
@@ -75,6 +76,7 @@ private:
    int mHarmRatioBase2;  //negative means 1/val
    float mHarmRatioTweak2;
    DropdownList* mHarmRatioBaseDropdown2;
+   FloatSlider* mPhaseOffsetSlider2;
 
    float* mWriteBuffer;
 };

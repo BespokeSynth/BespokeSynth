@@ -116,15 +116,18 @@ void ADSRDisplay::Render()
       }
       ofEndShape(false);
       
-      ofSetLineWidth(1);
-      ofSetColor(0,255,0,gModuleDrawAlpha);
-      float drawTime = 0;
-      if (mAdsr->GetStartTime() > mAdsr->GetStopTime())
-         drawTime = ofClamp(gTime - mAdsr->GetStartTime(), 0, releaseTime);
-      if (mAdsr->GetStopTime() > mAdsr->GetStartTime())
-         drawTime = releaseTime + (gTime - mAdsr->GetStopTime());
-      if (drawTime > 0 && drawTime < mMaxTime)
-         ofLine(drawTime/mMaxTime*mWidth, 0, drawTime/mMaxTime*mWidth, mHeight);
+      if (mActive)
+      {
+         ofSetLineWidth(1);
+         ofSetColor(0,255,0,gModuleDrawAlpha * .5f);
+         float drawTime = 0;
+         if (mAdsr->GetStartTime() > 0 && mAdsr->GetStartTime() >= mAdsr->GetStopTime())
+            drawTime = ofClamp(gTime - mAdsr->GetStartTime(), 0, releaseTime);
+         if (mAdsr->GetStopTime() > mAdsr->GetStartTime())
+            drawTime = releaseTime + (gTime - mAdsr->GetStopTime());
+         if (drawTime > 0 && drawTime < mMaxTime)
+            ofLine(drawTime/mMaxTime*mWidth, 0, drawTime/mMaxTime*mWidth, mHeight);
+      }
    }
    
    ofFill();

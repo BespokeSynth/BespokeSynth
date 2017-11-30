@@ -1,19 +1,19 @@
 /*
   ==============================================================================
 
-    ModulatorAdd.cpp
-    Created: 19 Nov 2017 2:04:24pm
+    ModulatorMult.cpp
+    Created: 29 Nov 2017 8:56:32pm
     Author:  Ryan Challinor
 
   ==============================================================================
 */
 
-#include "ModulatorAdd.h"
+#include "ModulatorMult.h"
 #include "Profiler.h"
 #include "ModularSynth.h"
 #include "PatchCableSource.h"
 
-ModulatorAdd::ModulatorAdd()
+ModulatorMult::ModulatorMult()
 : mValue1(0)
 , mValue2(0)
 , mValue1Slider(nullptr)
@@ -21,7 +21,7 @@ ModulatorAdd::ModulatorAdd()
 {
 }
 
-void ModulatorAdd::CreateUIControls()
+void ModulatorMult::CreateUIControls()
 {
    IDrawableModule::CreateUIControls();
    
@@ -32,11 +32,11 @@ void ModulatorAdd::CreateUIControls()
    AddPatchCableSource(mTargetCable);
 }
 
-ModulatorAdd::~ModulatorAdd()
+ModulatorMult::~ModulatorMult()
 {
 }
 
-void ModulatorAdd::DrawModule()
+void ModulatorMult::DrawModule()
 {
    if (Minimized() || IsVisible() == false)
       return;
@@ -45,7 +45,7 @@ void ModulatorAdd::DrawModule()
    mValue2Slider->Draw();
 }
 
-void ModulatorAdd::PostRepatch(PatchCableSource* cableSource)
+void ModulatorMult::PostRepatch(PatchCableSource* cableSource)
 {
    OnModulatorRepatch();
    
@@ -58,20 +58,20 @@ void ModulatorAdd::PostRepatch(PatchCableSource* cableSource)
    }
 }
 
-float ModulatorAdd::Value(int samplesIn)
+float ModulatorMult::Value(int samplesIn)
 {
    ComputeSliders(samplesIn);
-   return ofClamp(mValue1 + mValue2, mTarget->GetMin(), mTarget->GetMax());
+   return ofClamp(mValue1 * mValue2, mTarget->GetMin(), mTarget->GetMax());
 }
 
-void ModulatorAdd::LoadLayout(const ofxJSONElement& moduleInfo)
+void ModulatorMult::LoadLayout(const ofxJSONElement& moduleInfo)
 {
    mModuleSaveData.LoadString("target", moduleInfo);
    
    SetUpFromSaveData();
 }
 
-void ModulatorAdd::SetUpFromSaveData()
+void ModulatorMult::SetUpFromSaveData()
 {
    mTargetCable->SetTarget(TheSynth->FindUIControl(mModuleSaveData.GetString("target")));
 }

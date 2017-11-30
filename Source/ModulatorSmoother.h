@@ -1,8 +1,8 @@
 /*
   ==============================================================================
 
-    ModulatorAdd.h
-    Created: 19 Nov 2017 2:04:23pm
+    ModulatorSmoother.h
+    Created: 29 Nov 2017 9:35:31pm
     Author:  Ryan Challinor
 
   ==============================================================================
@@ -12,17 +12,19 @@
 #include "IDrawableModule.h"
 #include "Slider.h"
 #include "IModulator.h"
+#include "Transport.h"
+#include "Ramp.h"
 
 class PatchCableSource;
 
-class ModulatorAdd : public IDrawableModule, public IFloatSliderListener, public IModulator
+class ModulatorSmoother : public IDrawableModule, public IFloatSliderListener, public IModulator, public IAudioPoller
 {
 public:
-   ModulatorAdd();
-   virtual ~ModulatorAdd();
-   static IDrawableModule* Create() { return new ModulatorAdd(); }
+   ModulatorSmoother();
+   virtual ~ModulatorSmoother();
+   static IDrawableModule* Create() { return new ModulatorSmoother(); }
    
-   string GetTitleLabel() override { return "add"; }
+   string GetTitleLabel() override { return "smoother"; }
    void CreateUIControls() override;
    
    void SetEnabled(bool enabled) override { mEnabled = enabled; }
@@ -33,6 +35,9 @@ public:
    float Value(int samplesIn = 0) override;
    bool Active() const override { return mEnabled; }
    bool CanAdjustRange() const override { return false; }
+   
+   //IAudioPoller
+   void OnTransportAdvanced(float amount) override;
    
    FloatSlider* GetTarget() { return mTarget; }
    
@@ -48,10 +53,10 @@ private:
    void GetModuleDimensions(int& w, int&h) override { w=106; h=17*2+4; }
    bool Enabled() const override { return mEnabled; }
    
-   float mValue1;
-   float mValue2;
+   float mInput;
+   float mSmooth;
+   Ramp mRamp;
    
-   FloatSlider* mValue1Slider;
-   FloatSlider* mValue2Slider;
+   FloatSlider* mInputSlider;
+   FloatSlider* mSmoothSlider;
 };
-

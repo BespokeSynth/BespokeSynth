@@ -766,13 +766,13 @@ void ModularSynth::MouseScrolled(float x, float y)
          FloatSliderLFOControl* lfo = floatSlider->GetLFO();
          float min = floatSlider->GetMin();
          float max = floatSlider->GetMax();
-         float lfoMin = ofMap(lfo->Min(),min,max,0,1);
-         float lfoMax = ofMap(lfo->Max(),min,max,0,1);
+         float lfoMin = ofMap(lfo->GetMin(),min,max,0,1);
+         float lfoMax = ofMap(lfo->GetMax(),min,max,0,1);
             
          float changeX = x/100 * movementScale;
             
-         lfo->SetMin(ofMap(lfoMin + change,0,1,min,max,K(clamp)));
-         lfo->SetMax(ofMap(lfoMax + changeX,0,1,min,max,K(clamp)));
+         lfo->GetMin() = ofMap(lfoMin + change,0,1,min,max,K(clamp));
+         lfo->GetMax() = ofMap(lfoMax + changeX,0,1,min,max,K(clamp));
             
          return;
       }

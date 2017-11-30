@@ -67,7 +67,7 @@ void SingleOscillatorVoice::Process(double time, float* out, int bufferSize)
       mSyncPhase += syncPhaseInc;
       
       float sample;
-      float vol = mVoiceParams->mVol * .08f;
+      float vol = mVoiceParams->mVol * .1f;
       
       if (mVoiceParams->mPressureEnvelope)
          vol *= GetPressure(pos);
@@ -79,8 +79,8 @@ void SingleOscillatorVoice::Process(double time, float* out, int bufferSize)
       
       if (mUseFilter)
       {
-         float f = mFilterAdsr.Value(time) * mVoiceParams->mFilterCutoff + 10 + GetModWheel(pos) * (mVoiceParams->mFilterCutoff * .3f);
-         float q = 1 + GetModWheel(pos) * 5;
+         float f = mFilterAdsr.Value(time) * mVoiceParams->mFilterCutoff;
+         float q = 1;
          mFilter.SetFilterParams(f, q);
          sample = mFilter.Filter(sample);
       }

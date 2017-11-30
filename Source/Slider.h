@@ -44,12 +44,11 @@ public:
    void MatchExtents(FloatSlider* slider);
    void SetRelative(bool relative) { mRelative = relative; }
    void SetClamped(bool clamped) { mClamped = clamped; }
-   void RevokeLFO() { mLFOControl = nullptr; }
    float GetMin() const { return mMin; }
    float GetMax() const { return mMax; }
    void SetMaxValueDisplay(string display) { mMaxValueDisplay = display; }
    void SetMinValueDisplay(string display) { mMinValueDisplay = display; }
-   void SetLFO(FloatSliderLFOControl* lfo) { mLFOControl = lfo; }
+   void SetLFO(FloatSliderLFOControl* lfo);
    void SetShowName(bool show) { mShowName = show; }
    void SetDimensions(int w, int h) { mWidth = w; mHeight = h; }
    void SetBezierControl(float control) { mBezierControl = control; }

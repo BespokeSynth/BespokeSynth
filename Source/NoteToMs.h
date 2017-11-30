@@ -2,7 +2,7 @@
 //  NoteToMs.h
 //  Bespoke
 //
-//  Created by Ryan Challinor on 2/2/16.
+//  Created by Ryan Challinor on 12/17/15.
 //
 //
 
@@ -11,12 +11,11 @@
 
 #include "IDrawableModule.h"
 #include "INoteReceiver.h"
-#include "Transport.h"
+#include "IModulator.h"
 
 class PatchCableSource;
-class IUIControl;
 
-class NoteToMs : public IDrawableModule, public INoteReceiver, public IAudioPoller
+class NoteToMs : public IDrawableModule, public INoteReceiver, public IModulator
 {
 public:
    NoteToMs();
@@ -32,11 +31,13 @@ public:
    void PlayNote(double time, int pitch, int velocity, int voiceIdx = -1, ModulationChain* pitchBend = nullptr, ModulationChain* modWheel = nullptr, ModulationChain* pressure = nullptr) override;
    void SendCC(int control, int value, int voiceIdx = -1) override {}
    
+   //IModulator
+   float Value(int samplesIn = 0) override;
+   bool Active() const override { return mEnabled; }
+   bool CanAdjustRange() const override { return false; }
+   
    //IPatchable
    void PostRepatch(PatchCableSource* cableSource) override;
-   
-   //IAudioPoller
-   void OnTransportAdvanced(float amount) override;
    
    void SaveLayout(ofxJSONElement& moduleInfo) override;
    void LoadLayout(const ofxJSONElement& moduleInfo) override;
@@ -47,12 +48,8 @@ private:
    void GetModuleDimensions(int& width, int& height) override { width = 110; height = 0; }
    bool Enabled() const override { return mEnabled; }
    
-   PatchCableSource* mControlCable;
-   IUIControl* mTarget;
    float mPitch;
-   float mBend;
    ModulationChain* mPitchBend;
 };
-
 
 #endif /* defined(__Bespoke__NoteToMs__) */

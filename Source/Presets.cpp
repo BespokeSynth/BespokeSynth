@@ -268,8 +268,6 @@ void Presets::Save()
             preset["controls"][j]["lfo_interval"] = presetData.mLFOSettings.mInterval;
             preset["controls"][j]["lfo_osctype"] = presetData.mLFOSettings.mOscType;
             preset["controls"][j]["lfo_offset"] = presetData.mLFOSettings.mLFOOffset;
-            preset["controls"][j]["lfo_min"] = presetData.mLFOSettings.mMin;
-            preset["controls"][j]["lfo_max"] = presetData.mLFOSettings.mMax;
             preset["controls"][j]["lfo_bias"] = presetData.mLFOSettings.mBias;
             preset["controls"][j]["lfo_spread"] = presetData.mLFOSettings.mSpread;
             preset["controls"][j]["lfo_soften"] = presetData.mLFOSettings.mSoften;
@@ -317,8 +315,6 @@ void Presets::Load()
                presetData.mLFOSettings.mInterval = (NoteInterval)preset["controls"][j]["lfo_interval"].asInt();
                presetData.mLFOSettings.mOscType = (OscillatorType)preset["controls"][j]["lfo_osctype"].asInt();
                presetData.mLFOSettings.mLFOOffset = preset["controls"][j]["lfo_offset"].asDouble();
-               presetData.mLFOSettings.mMin = preset["controls"][j]["lfo_min"].asDouble();
-               presetData.mLFOSettings.mMax = preset["controls"][j]["lfo_max"].asDouble();
                presetData.mLFOSettings.mBias = preset["controls"][j]["lfo_bias"].asDouble();
                presetData.mLFOSettings.mSpread = preset["controls"][j]["lfo_spread"].asDouble();
                presetData.mLFOSettings.mSoften = preset["controls"][j]["lfo_soften"].asDouble();

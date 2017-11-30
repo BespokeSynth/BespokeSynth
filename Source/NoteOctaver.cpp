@@ -20,7 +20,7 @@ NoteOctaver::NoteOctaver()
 void NoteOctaver::CreateUIControls()
 {
    IDrawableModule::CreateUIControls();
-   mOctaveSlider = new IntSlider(this,"octave",4,2,100,15,&mOctave,-2,2);
+   mOctaveSlider = new IntSlider(this,"octave",4,2,100,15,&mOctave,-4,4);
 }
 
 void NoteOctaver::DrawModule()

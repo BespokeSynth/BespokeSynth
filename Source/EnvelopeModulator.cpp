@@ -20,10 +20,6 @@ EnvelopeModulator::EnvelopeModulator()
 , mHasSustainStageCheckbox(nullptr)
 , mSustainStageSlider(nullptr)
 , mMaxSustainSlider(nullptr)
-, mMinSlider(nullptr)
-, mMaxSlider(nullptr)
-, mTargetCable(nullptr)
-, mTarget(nullptr)
 {
    mEnvelopeControl.SetViewLength(mADSRViewLength);
    mEnvelopeControl.SetADSR(&mAdsr);
@@ -129,24 +125,7 @@ float EnvelopeModulator::Value(int samplesIn /*= 0*/)
 
 void EnvelopeModulator::PostRepatch(PatchCableSource* cableSource)
 {
-   if (mTarget != nullptr)
-      mTarget->SetModulator(nullptr);
-   
-   if (mTargetCable->GetPatchCables().empty() == false)
-   {
-      mTarget = dynamic_cast<FloatSlider*>(mTargetCable->GetPatchCables()[0]->GetTarget());
-      mTarget->SetModulator(this);
-      mMin = mTarget->GetMin();
-      mMax = mTarget->GetMax();
-      mMinSlider->SetExtents(mTarget->GetMin(), mTarget->GetMax());
-      mMinSlider->SetMode(mTarget->GetMode());
-      mMaxSlider->SetExtents(mTarget->GetMin(), mTarget->GetMax());
-      mMaxSlider->SetMode(mTarget->GetMode());
-   }
-   else
-   {
-      mTarget = nullptr;
-   }
+   OnModulatorRepatch();
 }
 
 void EnvelopeModulator::CheckboxUpdated(Checkbox* checkbox)

@@ -26,8 +26,6 @@ struct LFOSettings
    LFOSettings()
    : mInterval(kInterval_1n)
    , mLFOOffset(0)
-   , mMin(0)
-   , mMax(0)
    , mBias(0)
    , mSpread(0)
    , mSoften(0)
@@ -39,8 +37,6 @@ struct LFOSettings
    NoteInterval mInterval;
    OscillatorType mOscType;
    float mLFOOffset;
-   float mMin;
-   float mMax;
    float mBias;
    float mSpread;
    float mSoften;
@@ -61,29 +57,25 @@ public:
 
    const LFOSettings& GetSettings() { return mLFOSettings; }
    void Load(LFOSettings settings);
-   float Value(int samplesIn = 0) override;
-   bool Active() const override { return mEnabled; }
-   float Min() { return mLFOSettings.mMin; }
-   float Max() { return mLFOSettings.mMax; }
-   void SetMin(float min) { mLFOSettings.mMin = min; }
-   void SetMax(float max) { mLFOSettings.mMax = max; }
-   float& GetMin() override { return mLFOSettings.mMin; }
-   float& GetMax() override { return mLFOSettings.mMax; }
    LFOSettings* GetLFOSettings() { return &mLFOSettings; }
    void SetEnabled(bool enabled) override {} //don't use this one
    void SetLFOEnabled(bool enabled);
    bool IsEnabled() const { return mEnabled; }
    void SetRate(NoteInterval rate);
    void UpdateFromSettings();
-   void Reset() { mOwner = nullptr; }
    void SetOwner(FloatSlider* owner);
-   FloatSlider* GetOwner() { return mOwner; }
+   FloatSlider* GetOwner() { return mTarget; }
    bool Enabled() const override { return mEnabled; }
    bool HasTitleBar() const override { return mPinned; }
    string GetTitleLabel() override { return mPinned ? "lfo" : ""; }
    bool IsSaveable() override { return mPinned; }
    void CreateUIControls() override;
    bool IsPinned() const { return mPinned; }
+   
+   //IModulator
+   float Value(int samplesIn = 0) override;
+   bool Active() const override { return mEnabled; }
+   bool InitializeWithZeroRange() const override { return true; }
    
    //IPatchable
    void PostRepatch(PatchCableSource* cableSource) override;
@@ -106,8 +98,6 @@ protected:
 private:
    void UpdateVisibleControls();
    float GetLFOValue(int samplesIn = 0, float forcePhase = -1);
-
-   FloatSlider* mOwner;
    
    LFOSettings mLFOSettings;
 
@@ -116,8 +106,6 @@ private:
    DropdownList* mOscSelector;
    FloatSlider* mOffsetSlider;
    FloatSlider* mBiasSlider;
-   FloatSlider* mMinSlider;
-   FloatSlider* mMaxSlider;
    FloatSlider* mSpreadSlider;
    FloatSlider* mSoftenSlider;
    FloatSlider* mShuffleSlider;
@@ -126,8 +114,6 @@ private:
    Checkbox* mEnableLFOCheckbox;
 
    bool mPinned;
-   
-   PatchCableSource* mSliderCable;
 };
 
 class LFOPool

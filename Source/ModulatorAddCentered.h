@@ -1,8 +1,8 @@
 /*
   ==============================================================================
 
-    ModulatorAdd.h
-    Created: 19 Nov 2017 2:04:23pm
+    ModulatorAddCentered.h
+    Created: 22 Nov 2017 9:50:16am
     Author:  Ryan Challinor
 
   ==============================================================================
@@ -15,14 +15,14 @@
 
 class PatchCableSource;
 
-class ModulatorAdd : public IDrawableModule, public IFloatSliderListener, public IModulator
+class ModulatorAddCentered : public IDrawableModule, public IFloatSliderListener, public IModulator
 {
 public:
-   ModulatorAdd();
-   virtual ~ModulatorAdd();
-   static IDrawableModule* Create() { return new ModulatorAdd(); }
+   ModulatorAddCentered();
+   virtual ~ModulatorAddCentered();
+   static IDrawableModule* Create() { return new ModulatorAddCentered(); }
    
-   string GetTitleLabel() override { return "add"; }
+   string GetTitleLabel() override { return "add centered"; }
    void CreateUIControls() override;
    
    void SetEnabled(bool enabled) override { mEnabled = enabled; }
@@ -45,13 +45,14 @@ public:
 private:
    //IDrawableModule
    void DrawModule() override;
-   void GetModuleDimensions(int& w, int&h) override { w=106; h=17*2+4; }
+   void GetModuleDimensions(int& w, int&h) override { w=106; h=17*3+4; }
    bool Enabled() const override { return mEnabled; }
    
    float mValue1;
    float mValue2;
+   float mValue2Range;
    
    FloatSlider* mValue1Slider;
    FloatSlider* mValue2Slider;
+   FloatSlider* mValue2RangeSlider;
 };
-

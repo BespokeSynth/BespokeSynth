@@ -640,7 +640,7 @@ void NoteStepSequencer::ButtonClicked(ClickButton* button)
    if (button == mRandomizeLengthButton)
    {
       for (int i=0; i<mNumSteps; ++i)
-         mNoteLengths[i] = ofClamp(ofRandom(1.2f), FLT_EPSILON, 1);
+         mNoteLengths[i] = ofClamp(ofRandom(2), FLT_EPSILON, 1);
       SyncGridToSeq();
    }
    if (button == mRandomizeVelocityButton)
@@ -748,6 +748,7 @@ void NoteStepSequencer::SetUpFromSaveData()
    mGrid->SetGrid(mNumSteps, mNoteRange);
    mVelocityGrid->SetGrid(mNumSteps, 1);
    mLengthSlider->SetExtents(1, mNumSteps);
+   mLoopResetPointSlider->SetExtents(0, mNumSteps);
    UpdateVelocityGridPos();
 }
 

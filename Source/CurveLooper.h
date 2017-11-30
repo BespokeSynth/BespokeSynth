@@ -20,7 +20,7 @@
 
 class PatchCableSource;
 
-class CurveLooper : public IDrawableModule, public IDropdownListener, public IAudioPoller
+class CurveLooper : public IDrawableModule, public IDropdownListener, public IButtonListener, public IAudioPoller
 {
 public:
    CurveLooper();
@@ -43,6 +43,7 @@ public:
    
    void CheckboxUpdated(Checkbox* checkbox) override;
    void DropdownUpdated(DropdownList* list, int oldVal) override;
+   void ButtonClicked(ClickButton* button) override;
    
    void LoadLayout(const ofxJSONElement& moduleInfo) override;
    void SaveLayout(ofxJSONElement& moduleInfo) override;
@@ -73,6 +74,7 @@ private:
    int mHeight;
    EnvelopeControl mEnvelopeControl;
    ADSR mAdsr;
+   ClickButton* mRandomizeButton;
 };
 
 #endif /* defined(__Bespoke__CurveLooper__) */

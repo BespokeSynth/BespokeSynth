@@ -226,8 +226,13 @@
     <ClCompile Include="..\..\Source\MidiOutput.cpp"/>
     <ClCompile Include="..\..\Source\ModulationVisualizer.cpp"/>
     <ClCompile Include="..\..\Source\ModulatorAdd.cpp"/>
+    <ClCompile Include="..\..\Source\ModulatorAddCentered.cpp"/>
+    <ClCompile Include="..\..\Source\ModulatorCurve.cpp"/>
+    <ClCompile Include="..\..\Source\ModulatorMult.cpp"/>
+    <ClCompile Include="..\..\Source\ModulatorSmoother.cpp"/>
     <ClCompile Include="..\..\Source\ModuleSaveDataPanel.cpp"/>
     <ClCompile Include="..\..\Source\ModWheel.cpp"/>
+    <ClCompile Include="..\..\Source\ModWheelToCV.cpp"/>
     <ClCompile Include="..\..\Source\ModwheelToPressure.cpp"/>
     <ClCompile Include="..\..\Source\ModwheelToVibrato.cpp"/>
     <ClCompile Include="..\..\Source\Monophonify.cpp"/>
@@ -262,10 +267,12 @@
     <ClCompile Include="..\..\Source\PitchChorus.cpp"/>
     <ClCompile Include="..\..\Source\PitchDive.cpp"/>
     <ClCompile Include="..\..\Source\PitchSetter.cpp"/>
+    <ClCompile Include="..\..\Source\PitchToCV.cpp"/>
     <ClCompile Include="..\..\Source\Polyrhythms.cpp"/>
     <ClCompile Include="..\..\Source\Prefab.cpp"/>
     <ClCompile Include="..\..\Source\Presets.cpp"/>
     <ClCompile Include="..\..\Source\Pressure.cpp"/>
+    <ClCompile Include="..\..\Source\PressureToCV.cpp"/>
     <ClCompile Include="..\..\Source\PressureToModwheel.cpp"/>
     <ClCompile Include="..\..\Source\PressureToVibrato.cpp"/>
     <ClCompile Include="..\..\Source\PreviousNote.cpp"/>
@@ -306,6 +313,7 @@
     <ClCompile Include="..\..\Source\VelocityScaler.cpp"/>
     <ClCompile Include="..\..\Source\VelocitySetter.cpp"/>
     <ClCompile Include="..\..\Source\VelocityStepSequencer.cpp"/>
+    <ClCompile Include="..\..\Source\VelocityToCV.cpp"/>
     <ClCompile Include="..\..\Source\VinylTempoControl.cpp"/>
     <ClCompile Include="..\..\Source\Vocoder.cpp"/>
     <ClCompile Include="..\..\Source\VocoderCarrierInput.cpp"/>

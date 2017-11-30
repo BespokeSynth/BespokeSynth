@@ -42,8 +42,6 @@ public:
    //IModulator
    float Value(int samplesIn = 0) override;
    bool Active() const override { return mEnabled; }
-   float& GetMin() override { return mMin; }
-   float& GetMax() override { return mMax; }
    
    //IPatchable
    void PostRepatch(PatchCableSource* cableSource) override;
@@ -78,11 +76,4 @@ private:
    Checkbox* mHasSustainStageCheckbox;
    IntSlider* mSustainStageSlider;
    FloatSlider* mMaxSustainSlider;
-   FloatSlider* mMinSlider;
-   FloatSlider* mMaxSlider;
-   PatchCableSource* mTargetCable;
-   
-   float mMin;
-   float mMax;
-   FloatSlider* mTarget;
 };

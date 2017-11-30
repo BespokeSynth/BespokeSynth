@@ -67,7 +67,7 @@ void KarplusStrongVoice::Process(double time, float* out, int bufferSize)
       }
       else
       {
-         oscPhaseInc = GetPhaseInc(mVoiceParams->mCarrier + GetModWheel(pos*renderRatio) * 100);
+         oscPhaseInc = GetPhaseInc(mVoiceParams->mCarrier);
          mOsc.SetType(kOsc_Sin);
       }
       mOscPhase += oscPhaseInc;

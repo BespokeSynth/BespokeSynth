@@ -24,20 +24,22 @@ class Polyrhythms;
 class RhythmLine
 {
 public:
-   RhythmLine(Polyrhythms* owner, int x, int y);
+   RhythmLine(Polyrhythms* owner, int index);
    void Draw();
    void OnClicked(int x, int y, bool right);
    void MouseReleased();
    void MouseMoved(float x, float y);
    void CreateUIControls();
+   void OnResize();
+   void UpdateGrid();
    
+   int mIndex;
    Grid* mGrid;
    int mLength;
    DropdownList* mLengthSelector;
    int mNote;
    DropdownList* mNoteSelector;
    Polyrhythms* mOwner;
-   ofVec2f mPos;
 };
 
 class Polyrhythms : public IDrawableModule, public INoteSource, public IAudioPoller, public IFloatSliderListener, public IDropdownListener
@@ -49,6 +51,8 @@ public:
    
    string GetTitleLabel() override { return "polyrhythms"; }
    void CreateUIControls() override;
+   bool IsResizable() const override { return true; }
+   void Resize(float w, float h) override;
 
    void SetEnabled(bool on) override { mEnabled = on; }
 
@@ -68,9 +72,12 @@ public:
 private:
    //IDrawableModule
    void DrawModule() override;
-   void GetModuleDimensions(int& width, int& height) override { width=350; height=200; }
+   void GetModuleDimensions(int& width, int& height) override { width=mWidth; height=mHeight; }
    void OnClicked(int x, int y, bool right) override;
    
+   int mNumLines;
+   float mWidth;
+   float mHeight;
    std::vector<RhythmLine*> mRhythmLines;
 };
 

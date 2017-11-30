@@ -324,12 +324,30 @@
         <FILE id="QKqgG5" name="ModulatorAdd.cpp" compile="1" resource="0"
               file="Source/ModulatorAdd.cpp"/>
         <FILE id="w57dZM" name="ModulatorAdd.h" compile="0" resource="0" file="Source/ModulatorAdd.h"/>
+        <FILE id="OxqXfX" name="ModulatorAddCentered.cpp" compile="1" resource="0"
+              file="Source/ModulatorAddCentered.cpp"/>
+        <FILE id="vnV9fD" name="ModulatorAddCentered.h" compile="0" resource="0"
+              file="Source/ModulatorAddCentered.h"/>
+        <FILE id="roTtIB" name="ModulatorCurve.cpp" compile="1" resource="0"
+              file="Source/ModulatorCurve.cpp"/>
+        <FILE id="k5icRR" name="ModulatorCurve.h" compile="0" resource="0"
+              file="Source/ModulatorCurve.h"/>
+        <FILE id="bwIgCb" name="ModulatorMult.cpp" compile="1" resource="0"
+              file="Source/ModulatorMult.cpp"/>
+        <FILE id="tKiO5L" name="ModulatorMult.h" compile="0" resource="0" file="Source/ModulatorMult.h"/>
+        <FILE id="QLFSwQ" name="ModulatorSmoother.cpp" compile="1" resource="0"
+              file="Source/ModulatorSmoother.cpp"/>
+        <FILE id="EXbb3b" name="ModulatorSmoother.h" compile="0" resource="0"
+              file="Source/ModulatorSmoother.h"/>
         <FILE id="rudwi0" name="ModuleSaveDataPanel.cpp" compile="1" resource="0"
               file="Source/ModuleSaveDataPanel.cpp"/>
         <FILE id="mOW7vY" name="ModuleSaveDataPanel.h" compile="0" resource="0"
               file="Source/ModuleSaveDataPanel.h"/>
         <FILE id="xkPLV1" name="ModWheel.cpp" compile="1" resource="0" file="Source/ModWheel.cpp"/>
         <FILE id="rS7xp7" name="ModWheel.h" compile="0" resource="0" file="Source/ModWheel.h"/>
+        <FILE id="HROynP" name="ModWheelToCV.cpp" compile="1" resource="0"
+              file="Source/ModWheelToCV.cpp"/>
+        <FILE id="MGk6QL" name="ModWheelToCV.h" compile="0" resource="0" file="Source/ModWheelToCV.h"/>
         <FILE id="fIn3Zv" name="ModwheelToPressure.cpp" compile="1" resource="0"
               file="Source/ModwheelToPressure.cpp"/>
         <FILE id="HJHlow" name="ModwheelToPressure.h" compile="0" resource="0"
@@ -420,6 +438,8 @@
         <FILE id="EkwIdT" name="PitchDive.h" compile="0" resource="0" file="Source/PitchDive.h"/>
         <FILE id="iXiwJw" name="PitchSetter.cpp" compile="1" resource="0" file="Source/PitchSetter.cpp"/>
         <FILE id="tGoqwJ" name="PitchSetter.h" compile="0" resource="0" file="Source/PitchSetter.h"/>
+        <FILE id="f31QHm" name="PitchToCV.cpp" compile="1" resource="0" file="Source/PitchToCV.cpp"/>
+        <FILE id="uSTaMz" name="PitchToCV.h" compile="0" resource="0" file="Source/PitchToCV.h"/>
         <FILE id="WrfYZh" name="Polyrhythms.cpp" compile="1" resource="0" file="Source/Polyrhythms.cpp"/>
         <FILE id="Dxf5mJ" name="Polyrhythms.h" compile="0" resource="0" file="Source/Polyrhythms.h"/>
         <FILE id="cwpyvy" name="Prefab.cpp" compile="1" resource="0" file="Source/Prefab.cpp"/>
@@ -428,6 +448,9 @@
         <FILE id="hqaUZQ" name="Presets.h" compile="0" resource="0" file="Source/Presets.h"/>
         <FILE id="bOg7BS" name="Pressure.cpp" compile="1" resource="0" file="Source/Pressure.cpp"/>
         <FILE id="KVjZzU" name="Pressure.h" compile="0" resource="0" file="Source/Pressure.h"/>
+        <FILE id="eZOKbF" name="PressureToCV.cpp" compile="1" resource="0"
+              file="Source/PressureToCV.cpp"/>
+        <FILE id="NsBzB8" name="PressureToCV.h" compile="0" resource="0" file="Source/PressureToCV.h"/>
         <FILE id="aLRFhN" name="PressureToModwheel.cpp" compile="1" resource="0"
               file="Source/PressureToModwheel.cpp"/>
         <FILE id="h6SNwS" name="PressureToModwheel.h" compile="0" resource="0"
@@ -548,6 +571,9 @@
               file="Source/VelocityStepSequencer.cpp"/>
         <FILE id="Uvw1p6" name="VelocityStepSequencer.h" compile="0" resource="0"
               file="Source/VelocityStepSequencer.h"/>
+        <FILE id="ECtb39" name="VelocityToCV.cpp" compile="1" resource="0"
+              file="Source/VelocityToCV.cpp"/>
+        <FILE id="qHGV0z" name="VelocityToCV.h" compile="0" resource="0" file="Source/VelocityToCV.h"/>
         <FILE id="A3iWyh" name="VinylTempoControl.cpp" compile="1" resource="0"
               file="Source/VinylTempoControl.cpp"/>
         <FILE id="T2Jwjn" name="VinylTempoControl.h" compile="0" resource="0"

@@ -1,8 +1,8 @@
 /*
   ==============================================================================
 
-    ModulatorAdd.h
-    Created: 19 Nov 2017 2:04:23pm
+    ModulatorMult.h
+    Created: 29 Nov 2017 8:56:31pm
     Author:  Ryan Challinor
 
   ==============================================================================
@@ -15,14 +15,14 @@
 
 class PatchCableSource;
 
-class ModulatorAdd : public IDrawableModule, public IFloatSliderListener, public IModulator
+class ModulatorMult : public IDrawableModule, public IFloatSliderListener, public IModulator
 {
 public:
-   ModulatorAdd();
-   virtual ~ModulatorAdd();
-   static IDrawableModule* Create() { return new ModulatorAdd(); }
+   ModulatorMult();
+   virtual ~ModulatorMult();
+   static IDrawableModule* Create() { return new ModulatorMult(); }
    
-   string GetTitleLabel() override { return "add"; }
+   string GetTitleLabel() override { return "mult"; }
    void CreateUIControls() override;
    
    void SetEnabled(bool enabled) override { mEnabled = enabled; }
@@ -54,4 +54,3 @@ private:
    FloatSlider* mValue1Slider;
    FloatSlider* mValue2Slider;
 };
-

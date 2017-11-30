@@ -10,13 +10,27 @@
 
 #pragma once
 
+class PatchCableSource;
+class FloatSlider;
+
 class IModulator
 {
 public:
-   IModulator() {}
+   IModulator();
    virtual ~IModulator() {}
    virtual float Value(int samplesIn = 0) = 0;
    virtual bool Active() const = 0;
-   virtual float& GetMin() = 0;
-   virtual float& GetMax() = 0;
+   virtual bool CanAdjustRange() const { return true; }
+   virtual bool InitializeWithZeroRange() const { return false; }
+   float& GetMin() { return mMin; }
+   float& GetMax() { return mMax; }
+   void OnModulatorRepatch();
+protected:
+   void InitializeRange();
+   float mMin;
+   float mMax;
+   PatchCableSource* mTargetCable;
+   FloatSlider* mMinSlider;
+   FloatSlider* mMaxSlider;
+   FloatSlider* mTarget;
 };

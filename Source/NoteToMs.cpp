@@ -2,7 +2,7 @@
 //  NoteToMs.cpp
 //  Bespoke
 //
-//  Created by Ryan Challinor on 2/2/16.
+//  Created by Ryan Challinor on 12/17/15.
 //
 //
 
@@ -14,24 +14,20 @@
 #include "ModulationChain.h"
 
 NoteToMs::NoteToMs()
-: mControlCable(nullptr)
-, mPitch(0)
-, mBend(0)
+: mPitch(0)
 , mPitchBend(nullptr)
 {
-   TheTransport->AddAudioPoller(this);
 }
 
 NoteToMs::~NoteToMs()
 {
-   TheTransport->RemoveAudioPoller(this);
 }
 
 void NoteToMs::CreateUIControls()
 {
    IDrawableModule::CreateUIControls();
-   mControlCable = new PatchCableSource(this, kConnectionType_UIControl);
-   AddPatchCableSource(mControlCable);
+   mTargetCable = new PatchCableSource(this, kConnectionType_UIControl);
+   AddPatchCableSource(mTargetCable);
 }
 
 void NoteToMs::DrawModule()
@@ -42,7 +38,7 @@ void NoteToMs::DrawModule()
 
 void NoteToMs::PostRepatch(PatchCableSource* cableSource)
 {
-   mTarget = dynamic_cast<IUIControl*>(mControlCable->GetTarget());
+   OnModulatorRepatch();
 }
 
 void NoteToMs::PlayNote(double time, int pitch, int velocity, int voiceIdx /*= -1*/, ModulationChain* pitchBend /*= nullptr*/, ModulationChain* modWheel /*= nullptr*/, ModulationChain* pressure /*= nullptr*/)
@@ -51,20 +47,13 @@ void NoteToMs::PlayNote(double time, int pitch, int velocity, int voiceIdx /*= -
    {
       mPitch = pitch;
       mPitchBend = pitchBend;
-      if (mTarget)
-         mTarget->SetValue(1000/TheScale->PitchToFreq(mPitch+mBend));
    }
 }
 
-void NoteToMs::OnTransportAdvanced(float amount)
+float NoteToMs::Value(int samplesIn)
 {
-   float bend = mPitchBend ? mPitchBend->GetValue(0) : 0;
-   if (mEnabled && bend != mBend)
-   {
-      mBend = bend;
-      if (mTarget)
-         mTarget->SetValue(1000/TheScale->PitchToFreq(mPitch+mBend));
-   }
+   float bend = mPitchBend ? mPitchBend->GetValue(samplesIn) : 0;
+   return 1000/TheScale->PitchToFreq(mPitch+bend);
 }
 
 void NoteToMs::SaveLayout(ofxJSONElement& moduleInfo)
@@ -87,6 +76,6 @@ void NoteToMs::LoadLayout(const ofxJSONElement& moduleInfo)
 
 void NoteToMs::SetUpFromSaveData()
 {
-   mTarget = TheSynth->FindUIControl(mModuleSaveData.GetString("target"));
-   mControlCable->SetTarget(mTarget);
+   mTarget = dynamic_cast<FloatSlider*>(TheSynth->FindUIControl(mModuleSaveData.GetString("target")));
+   mTargetCable->SetTarget(mTarget);
 }

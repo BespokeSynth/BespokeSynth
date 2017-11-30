@@ -69,12 +69,15 @@ FloatSliderLFOControl* FloatSlider::AcquireLFO()
    if (mLFOControl == nullptr)
    {
       if (GetParent() != TheSynth->GetTopModalFocusItem()) //popups don't get these
-      {
-         mLFOControl = LFOPool::GetLFO(this);
-         mModulator = mLFOControl;
-      }
+         SetLFO(LFOPool::GetLFO(this));
    }
    return mLFOControl;
+}
+
+void FloatSlider::SetLFO(FloatSliderLFOControl* lfo)
+{
+   mLFOControl = lfo;
+   mModulator = lfo;
 }
 
 void FloatSlider::SetLabel(const char* label)
@@ -268,7 +271,7 @@ void FloatSlider::SetValueForMouse(int x, int y)
       mOwner->FloatSliderUpdated(this, oldVal);
    }
 
-   if (mModulator && mModulator->Active())
+   if (mModulator && mModulator->Active() && mModulator->CanAdjustRange())
    {
       float move = (y - mRefY) * -.003f;
       float change = move * (mMax - mMin);
@@ -441,7 +444,7 @@ void FloatSlider::Compute(int samplesIn /*= 0*/)
 
 float* FloatSlider::GetModifyValue()
 {
-   if (mModulator && mModulator->Active())
+   if (mModulator && mModulator->Active() && mModulator->CanAdjustRange())
       return &mModulator->GetMax();
    return mVar;
 }

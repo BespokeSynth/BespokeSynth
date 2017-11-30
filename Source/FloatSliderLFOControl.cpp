@@ -12,8 +12,7 @@
 #include "ModularSynth.h"
 
 FloatSliderLFOControl::FloatSliderLFOControl()
-: mOwner(nullptr)
-, mIntervalSelector(nullptr)
+: mIntervalSelector(nullptr)
 , mOscSelector(nullptr)
 , mOffsetSlider(nullptr)
 , mBiasSlider(nullptr)
@@ -21,15 +20,12 @@ FloatSliderLFOControl::FloatSliderLFOControl()
 , mSoftenSlider(nullptr)
 , mShuffleSlider(nullptr)
 , mPinned(false)
-, mSliderCable(nullptr)
 {
    SetLFOEnabled(false);
    
    mLFOSettings.mInterval = kInterval_1n;
    mLFOSettings.mOscType = kOsc_Sin;
    mLFOSettings.mLFOOffset = 0;
-   mLFOSettings.mMin = 0;
-   mLFOSettings.mMax = 1;
    mLFOSettings.mBias = .5f;
    mLFOSettings.mSpread = 0;
    mLFOSettings.mSoften = 0;
@@ -47,8 +43,8 @@ void FloatSliderLFOControl::CreateUIControls()
    mOffsetSlider = new FloatSlider(this,"off",mIntervalSelector, kAnchor_Below,90,15,&mLFOSettings.mLFOOffset,0,1);
    mFreeRateSlider = new FloatSlider(this,"free rate",mIntervalSelector, kAnchor_Below,90,15,&mLFOSettings.mFreeRate,0,50);
    mBiasSlider = new FloatSlider(this,"bias",mOffsetSlider, kAnchor_Below,90,15,&mLFOSettings.mBias,0,1);
-   mMinSlider = new FloatSlider(this,"low",mBiasSlider, kAnchor_Below,90,15,&mLFOSettings.mMin,0,1);
-   mMaxSlider = new FloatSlider(this,"high",mMinSlider, kAnchor_Below,90,15,&mLFOSettings.mMax,0,1);
+   mMinSlider = new FloatSlider(this,"low",mBiasSlider, kAnchor_Below,90,15,&mMin,0,1);
+   mMaxSlider = new FloatSlider(this,"high",mMinSlider, kAnchor_Below,90,15,&mMax,0,1);
    mSpreadSlider = new FloatSlider(this,"spread",mMaxSlider, kAnchor_Below,90,15,&mLFOSettings.mSpread,0,1);
    mSoftenSlider = new FloatSlider(this,"soften",mSpreadSlider, kAnchor_Below,90,15,&mLFOSettings.mSoften,0,1);
    mShuffleSlider = new FloatSlider(this,"shuffle",mSoftenSlider, kAnchor_Below,90,15,&mLFOSettings.mShuffle,0,1);
@@ -149,7 +145,7 @@ void FloatSliderLFOControl::DrawModule()
          phase *= 2;
       phase += mLFOSettings.mLFOOffset;
       float value = GetLFOValue(0, phase);
-      ofVertex(i + x, ofMap(value,mOwner->GetMax(),mOwner->GetMin(),0,height) + y);
+      ofVertex(i + x, ofMap(value,mTarget->GetMax(),mTarget->GetMin(),0,height) + y);
    }
    ofEndShape(false);
    
@@ -168,17 +164,17 @@ void FloatSliderLFOControl::DrawModule()
    if (currentPhase < 0)
       currentPhase += squeeze;
    ofCircle(currentPhase / squeeze * width + x,
-            ofMap(GetLFOValue(),mOwner->GetMax(),mOwner->GetMin(),0,height) + y, 2);
+            ofMap(GetLFOValue(),mTarget->GetMax(),mTarget->GetMin(),0,height) + y, 2);
 }
 
 void FloatSliderLFOControl::SetLFOEnabled(bool enabled)
 {
    if (enabled && !mEnabled)  //if turning on
    {
-      if (mOwner)
+      if (mTarget)
       {
-         mLFOSettings.mMin = mOwner->GetValue();
-         mLFOSettings.mMax = mOwner->GetValue();
+         mMin = mTarget->GetValue();
+         mMax = mTarget->GetValue();
       }
    }
    mEnabled = enabled;
@@ -186,37 +182,26 @@ void FloatSliderLFOControl::SetLFOEnabled(bool enabled)
 
 void FloatSliderLFOControl::SetOwner(FloatSlider* owner)
 {
-   if (mOwner == owner)
+   if (mTarget == owner)
       return;
    
-   bool hadPriorOwner = false;
-   if (mOwner != nullptr)
+   if (mTarget != nullptr)
    {
-      mOwner->SetLFO(nullptr);
-      hadPriorOwner = true;
+      mTarget->SetLFO(nullptr);
    }
    
    assert(owner != nullptr);
    
    owner->SetLFO(this);
-      
-   mOwner = owner;
-   if (!hadPriorOwner)
-   {
-      mLFOSettings.mMin = mOwner->GetValue();
-      mLFOSettings.mMax = mOwner->GetValue();
-   }
-   mMinSlider->SetExtents(owner->GetMin(), owner->GetMax());
-   mMaxSlider->SetExtents(owner->GetMin(), owner->GetMax());
-   mMinSlider->SetMode(owner->GetMode());
-   mMaxSlider->SetMode(owner->GetMode());
-   mModuleSaveData.SetExtents("low", owner->GetMin(), owner->GetMax());
-   mModuleSaveData.SetExtents("high", owner->GetMin(), owner->GetMax());
+   
+   mTarget = owner;
+   InitializeRange();
 }
 
 void FloatSliderLFOControl::PostRepatch(PatchCableSource* cableSource)
 {
-   SetOwner(dynamic_cast<FloatSlider*>(mSliderCable->GetTarget()));
+   SetOwner(dynamic_cast<FloatSlider*>(mTargetCable->GetTarget()));
+   OnModulatorRepatch();
 }
 
 void FloatSliderLFOControl::Load(LFOSettings settings)
@@ -237,7 +222,7 @@ float FloatSliderLFOControl::GetLFOValue(int samplesIn /*= 0*/, float forcePhase
    float val = mLFO.Value(samplesIn, forcePhase);
    if (mLFOSettings.mSpread > 0)
       val = val * (1-mLFOSettings.mSpread) + (-cosf(val * FPI) + 1) * .5f * mLFOSettings.mSpread;
-   return ofClamp(Interp(val, mLFOSettings.mMin, mLFOSettings.mMax), mOwner->GetMin(), mOwner->GetMax());
+   return ofClamp(Interp(val, mMin, mMax), mTarget->GetMin(), mTarget->GetMax());
 }
 
 void FloatSliderLFOControl::UpdateFromSettings()
@@ -319,28 +304,11 @@ void FloatSliderLFOControl::ButtonClicked(ClickButton* button)
          
          SetName(GetUniqueName("lfo", TheSynth->GetModuleNames<FloatSliderLFOControl*>()).c_str());
          
-         //set up save data
-         mModuleSaveData.SetString("target", mOwner->Path());
-         mModuleSaveData.SetBool("enabled", true);
-         mModuleSaveData.SetEnumMapFromList("interval", mIntervalSelector);
-         mModuleSaveData.SetInt("interval", mLFOSettings.mInterval, 0, 0, false);
-         mModuleSaveData.SetEnumMapFromList("osc", mOscSelector);
-         mModuleSaveData.SetInt("osc", mLFOSettings.mOscType, 0, 0, false);
-         mModuleSaveData.SetFloat("offset", mLFOSettings.mLFOOffset, mOffsetSlider->GetMin(), mOffsetSlider->GetMax(), false);
-         mModuleSaveData.SetFloat("bias", mLFOSettings.mBias, mBiasSlider->GetMin(), mBiasSlider->GetMax(), false);
-         mModuleSaveData.SetFloat("low", mLFOSettings.mMin, mOwner->GetMin(), mOwner->GetMax(), false);
-         mModuleSaveData.SetFloat("high", mLFOSettings.mMax, mOwner->GetMin(), mOwner->GetMax(), false);
-         mModuleSaveData.SetFloat("spread", mLFOSettings.mSpread, mOwner->GetMin(), mOwner->GetMax(), false);
-         mModuleSaveData.SetFloat("soften", mLFOSettings.mSoften, 0, 1, false);
-         mModuleSaveData.SetFloat("soften", mLFOSettings.mShuffle, 0, 1, false);
-         mModuleSaveData.SetFloat("free_rate", mLFOSettings.mFreeRate, 0, 50, false);
-         
-         if (mSliderCable == nullptr)
+         if (mTargetCable == nullptr)
          {
-            mSliderCable = new PatchCableSource(this, kConnectionType_UIControl);
-            AddPatchCableSource(mSliderCable);
-            mSliderCable->SetTarget(mOwner);
-            mSliderCable->SetClickable(false);
+            mTargetCable = new PatchCableSource(this, kConnectionType_UIControl);
+            AddPatchCableSource(mTargetCable);
+            mTargetCable->SetTarget(mTarget);
          }
       }
    }
@@ -350,25 +318,12 @@ void FloatSliderLFOControl::SaveLayout(ofxJSONElement& moduleInfo)
 {
    IDrawableModule::SaveLayout(moduleInfo);
    
-   if (mOwner)
-      moduleInfo["target"] = mOwner->Path();
+   if (mTarget)
+      moduleInfo["target"] = mTarget->Path();
 }
 
 void FloatSliderLFOControl::LoadLayout(const ofxJSONElement& moduleInfo)
 {
-   mModuleSaveData.LoadString("target", moduleInfo);
-   mModuleSaveData.LoadBool("enabled", moduleInfo, true);
-   mModuleSaveData.LoadEnum<NoteInterval>("interval", moduleInfo, kInterval_1n, mIntervalSelector);
-   mModuleSaveData.LoadEnum<OscillatorType>("osc", moduleInfo, kOsc_Sin, mOscSelector);
-   mModuleSaveData.LoadFloat("offset", moduleInfo, 0);
-   mModuleSaveData.LoadFloat("bias", moduleInfo, .5f);
-   mModuleSaveData.LoadFloat("low", moduleInfo, 0, mMinSlider);
-   mModuleSaveData.LoadFloat("high", moduleInfo, 1, mMaxSlider);
-   mModuleSaveData.LoadFloat("spread", moduleInfo, 0, mSpreadSlider);
-   mModuleSaveData.LoadFloat("soften", moduleInfo, 0, mSoftenSlider);
-   mModuleSaveData.LoadFloat("shuffle", moduleInfo, 0, mShuffleSlider);
-   mModuleSaveData.LoadFloat("free_rate", moduleInfo, 0, mFreeRateSlider);
-   
    SetUpFromSaveData();
 }
 
@@ -376,31 +331,19 @@ void FloatSliderLFOControl::SetUpFromSaveData()
 {
    mPinned = true; //only pinned sliders get saved
    SetOwner(dynamic_cast<FloatSlider*>(TheSynth->FindUIControl(mModuleSaveData.GetString("target"))));
-   if (mOwner)
-      mOwner->SetLFO(this);
-   
-   mLFOSettings.mInterval = mModuleSaveData.GetEnum<NoteInterval>("interval");
-   mLFOSettings.mOscType = mModuleSaveData.GetEnum<OscillatorType>("osc");
-   mLFOSettings.mLFOOffset = mModuleSaveData.GetFloat("offset");
-   mLFOSettings.mBias = mModuleSaveData.GetFloat("bias");
-   mLFOSettings.mMin = mModuleSaveData.GetFloat("low");
-   mLFOSettings.mMax = mModuleSaveData.GetFloat("high");
-   mLFOSettings.mSpread = mModuleSaveData.GetFloat("spread");
-   mLFOSettings.mSoften = mModuleSaveData.GetFloat("soften");
-   mLFOSettings.mShuffle = mModuleSaveData.GetFloat("shuffle");
-   mLFOSettings.mFreeRate = mModuleSaveData.GetFloat("free_rate");
+   if (mTarget)
+      mTarget->SetLFO(this);
    
    UpdateFromSettings();
    UpdateVisibleControls();
    
    mEnabled = mModuleSaveData.GetBool("enabled");
    
-   if (mSliderCable == nullptr)
+   if (mTargetCable == nullptr)
    {
-      mSliderCable = new PatchCableSource(this, kConnectionType_UIControl);
-      AddPatchCableSource(mSliderCable);
-      mSliderCable->SetTarget(mOwner);
-      mSliderCable->SetClickable(false);
+      mTargetCable = new PatchCableSource(this, kConnectionType_UIControl);
+      AddPatchCableSource(mTargetCable);
+      mTargetCable->SetTarget(mTarget);
    }
 }
 
@@ -441,8 +384,7 @@ FloatSliderLFOControl* LFOPool::GetLFO(FloatSlider* owner)
    }
    sNextLFOIndex = (index+1) % LFO_POOL_SIZE;
    if (sLFOPool[index]->GetOwner())
-      sLFOPool[index]->GetOwner()->RevokeLFO();
-   sLFOPool[index]->Reset();
+      sLFOPool[index]->GetOwner()->SetLFO(nullptr);   //revoke LFO
    sLFOPool[index]->SetOwner(owner);
    return sLFOPool[index];
 }
@@ -461,8 +403,6 @@ void LFOSettings::SaveState(FileStreamOut& out) const
    out << (int)mInterval;
    out << (int)mOscType;
    out << mLFOOffset;
-   out << mMin;
-   out << mMax;
    out << mBias;
    out << mSpread;
    out << mSoften;
@@ -486,8 +426,6 @@ void LFOSettings::LoadState(FileStreamIn& in)
    mInterval = (NoteInterval)temp;
    in >> temp; mOscType = (OscillatorType)temp;
    in >> mLFOOffset;
-   in >> mMin;
-   in >> mMax;
    in >> mBias;
    if (rev >= 1)
       in >> mSpread;

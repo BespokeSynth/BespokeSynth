@@ -16,13 +16,7 @@
 AudioToCV::AudioToCV()
 : IAudioProcessor(gBufferSize)
 , mGain(1)
-, mMin(0)
-, mMax(1)
-, mTargetCable(nullptr)
-, mTarget(nullptr)
 , mGainSlider(nullptr)
-, mMinSlider(nullptr)
-, mMaxSlider(nullptr)
 {
    mModulationBuffer = new float[gBufferSize];
 }
@@ -55,6 +49,8 @@ void AudioToCV::DrawModule()
    mMinSlider->Draw();
    mMaxSlider->Draw();
    
+   ofPushStyle();
+   ofSetColor(0,255,0,gModuleDrawAlpha);
    ofBeginShape();
    float x,y;
    int w,h;
@@ -65,6 +61,7 @@ void AudioToCV::DrawModule()
       ofVertex(ofMap(mModulationBuffer[i], -1, 1, x, x+w, K(clamp)), ofMap(i, 0, gBufferSize, y, y+h), K(clamp));
    }
    ofEndShape();
+   ofPopStyle();
 }
 
 void AudioToCV::Process(double time)
@@ -86,29 +83,23 @@ void AudioToCV::Process(double time)
 
 void AudioToCV::PostRepatch(PatchCableSource* cableSource)
 {
-   if (mTarget != nullptr)
-      mTarget->SetModulator(nullptr);
-   
-   if (mTargetCable->GetPatchCables().empty() == false)
-   {
-      mTarget = dynamic_cast<FloatSlider*>(mTargetCable->GetPatchCables()[0]->GetTarget());
-      mTarget->SetModulator(this);
-      mMin = mTarget->GetMin();
-      mMax = mTarget->GetMax();
-      mMinSlider->SetExtents(mTarget->GetMin(), mTarget->GetMax());
-      mMinSlider->SetMode(mTarget->GetMode());
-      mMaxSlider->SetExtents(mTarget->GetMin(), mTarget->GetMax());
-      mMaxSlider->SetMode(mTarget->GetMode());
-   }
-   else
-   {
-      mTarget = nullptr;
-   }
+   OnModulatorRepatch();
 }
 
 float AudioToCV::Value(int samplesIn)
 {
    return ofMap(mModulationBuffer[samplesIn] / 2 + .5f, 0, 1, mMin, mMax, K(clamp));
+}
+
+void AudioToCV::SaveLayout(ofxJSONElement& moduleInfo)
+{
+   IDrawableModule::SaveLayout(moduleInfo);
+   
+   string targetPath = "";
+   if (mTarget)
+      targetPath = mTarget->Path();
+   
+   moduleInfo["target"] = targetPath;
 }
 
 void AudioToCV::LoadLayout(const ofxJSONElement& moduleInfo)

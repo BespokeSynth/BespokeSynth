@@ -92,8 +92,8 @@ void LFOController::SetSlider(FloatSlider* slider)
    
    mMinSlider->MatchExtents(slider);
    mMaxSlider->MatchExtents(slider);
-   mMinSlider->SetVar(&lfoSettings->mMin);
-   mMaxSlider->SetVar(&lfoSettings->mMax);
+   mMinSlider->SetVar(&mLFO->GetMin());
+   mMaxSlider->SetVar(&mLFO->GetMax());
    mIntervalSelector->SetVar((int*)(&lfoSettings->mInterval));
    mOscSelector->SetVar((int*)(&lfoSettings->mOscType));
    mLFO->SetEnabled(true);
@@ -145,9 +145,9 @@ void LFOController::FloatSliderUpdated(FloatSlider* slider, float oldVal)
    assert(lfoSettings);
    
    if (slider == mMinSlider)
-      lfoSettings->mMax = MAX(lfoSettings->mMax, lfoSettings->mMin);
+      mLFO->GetMax() = MAX(mLFO->GetMax(), mLFO->GetMin());
    if (slider == mMaxSlider)
-      lfoSettings->mMin = MIN(lfoSettings->mMax, lfoSettings->mMin);
+      mLFO->GetMin() = MIN(mLFO->GetMax(), mLFO->GetMin());
 }
 
 void LFOController::ButtonClicked(ClickButton* button)

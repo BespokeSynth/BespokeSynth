@@ -53,20 +53,12 @@ private:
       void CreateUIControls();
       void UpdateControl();
       void Draw();
-      PatchCableSource* GetCableSource() const { return mCableSource; }
+      PatchCableSource* GetCableSource() const { return mTargetCable; }
       
       //IModulator
       virtual float Value(int samplesIn = 0) override;
       virtual bool Active() const override { return mOwner->Enabled(); }
-      virtual float& GetMin() override { return mStart; }
-      virtual float& GetMax() override { return mEnd; }
       
-      FloatSlider* mStartSlider;
-      FloatSlider* mEndSlider;
-      float mStart;
-      float mEnd;
-      PatchCableSource* mCableSource;
-      FloatSlider* mControl;
       MacroSlider* mOwner;
       int mIndex;
    };

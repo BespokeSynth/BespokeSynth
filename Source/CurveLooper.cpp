@@ -10,6 +10,12 @@
 #include "ModularSynth.h"
 #include "PatchCableSource.h"
 #include "SynthGlobals.h"
+#include <algorithm>
+
+namespace
+{
+   const int kAdsrTime = 10000;
+}
 
 CurveLooper::CurveLooper()
 : mUIControl(nullptr)
@@ -19,17 +25,18 @@ CurveLooper::CurveLooper()
 , mWidth(200)
 , mHeight(120)
 , mEnvelopeControl(ofVec2f(5,25),ofVec2f(mWidth-10,mHeight-30))
+, mRandomizeButton(nullptr)
 {
    mEnvelopeControl.SetADSR(&mAdsr);
-   mEnvelopeControl.SetViewLength(10000);
+   mEnvelopeControl.SetViewLength(kAdsrTime);
    mEnvelopeControl.SetFixedLengthMode(true);
    mAdsr.GetFreeReleaseLevel() = true;
    mAdsr.SetNumStages(2);
    mAdsr.GetHasSustainStage() = false;
    mAdsr.GetStageData(0).target = .5f;
-   mAdsr.GetStageData(0).time = 1000;
+   mAdsr.GetStageData(0).time = kAdsrTime*.1f;
    mAdsr.GetStageData(1).target = .5f;
-   mAdsr.GetStageData(1).time = 8000;
+   mAdsr.GetStageData(1).time = kAdsrTime*.8f;
    
    TheTransport->AddAudioPoller(this);
 }
@@ -43,6 +50,7 @@ void CurveLooper::CreateUIControls()
 {
    IDrawableModule::CreateUIControls();
    mLengthSelector = new DropdownList(this,"length",5,3,(int*)(&mLength));
+   mRandomizeButton = new ClickButton(this,"randomize",-1,-1);
    
    mControlCable = new PatchCableSource(this, kConnectionType_UIControl);
    //mControlCable->SetManualPosition(86, 10);
@@ -60,6 +68,8 @@ void CurveLooper::CreateUIControls()
    mLengthSelector->AddLabel("32", 32);
    mLengthSelector->AddLabel("64", 64);
    mLengthSelector->AddLabel("128", 128);
+   
+   mRandomizeButton->PositionTo(mLengthSelector, kAnchor_Right);
 }
 
 void CurveLooper::Init()
@@ -77,8 +87,8 @@ void CurveLooper::OnTransportAdvanced(float amount)
    {
       mAdsr.Clear();
       mAdsr.Start(0,1);
-      mAdsr.Stop(10000);
-      mUIControl->SetFromMidiCC(mAdsr.Value(GetPlaybackPosition() * 10000));
+      mAdsr.Stop(kAdsrTime);
+      mUIControl->SetFromMidiCC(mAdsr.Value(GetPlaybackPosition() * kAdsrTime));
    }
 }
 
@@ -99,6 +109,7 @@ void CurveLooper::DrawModule()
       return;
    
    mLengthSelector->Draw();
+   mRandomizeButton->Draw();
    
    mEnvelopeControl.Draw();
    
@@ -165,6 +176,27 @@ void CurveLooper::DropdownUpdated(DropdownList* list, int oldVal)
       else
          mLength = oldVal;
    }*/
+}
+
+void CurveLooper::ButtonClicked(ClickButton* button)
+{
+   if (button == mRandomizeButton)
+   {
+      mAdsr.SetNumStages(rand() % 6 + 2);
+      std::vector<float> times;
+      for (int i=0; i<mAdsr.GetNumStages(); ++i)
+         times.push_back(ofRandom(1,kAdsrTime-1));
+      std::sort(times.begin(), times.end());
+      float timeElapsed = 0;
+      for (int i=0; i<mAdsr.GetNumStages(); ++i)
+      {
+         mAdsr.GetStageData(i).time = times[i] - timeElapsed;
+         mAdsr.GetStageData(i).target = ofRandom(0,1);
+         float val = ofRandom(-1,1);
+         mAdsr.GetStageData(i).curve = val * val * (val > 0 ? 1 : -1);
+         timeElapsed += mAdsr.GetStageData(i).time;
+      }
+   }
 }
 
 void CurveLooper::GetModuleDimensions(int &width, int &height)

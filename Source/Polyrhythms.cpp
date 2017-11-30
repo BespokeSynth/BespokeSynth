@@ -13,18 +13,21 @@
 #include "DrumPlayer.h"
 
 Polyrhythms::Polyrhythms()
+: mNumLines(4)
+, mWidth(350)
+, mHeight(mNumLines * 17 + 26)
 {
    TheTransport->AddAudioPoller(this);
-
-   for (int i=0; i<8; ++i)
-      mRhythmLines.push_back(new RhythmLine(this,10,40+i*15));
 }
 
 void Polyrhythms::CreateUIControls()
 {
    IDrawableModule::CreateUIControls();
-   for (int i=0; i<mRhythmLines.size(); ++i)
+   for (int i=0; i<mNumLines; ++i)
+   {
+      mRhythmLines.push_back(new RhythmLine(this,i));
       mRhythmLines[i]->CreateUIControls();
+   }
 }
 
 Polyrhythms::~Polyrhythms()
@@ -71,6 +74,14 @@ void Polyrhythms::DrawModule()
       mRhythmLines[i]->Draw();
 }
 
+void Polyrhythms::Resize(float w, float h)
+{
+   mWidth = MAX(150,w);
+   mHeight = mRhythmLines.size() * 17 + 26;
+   for (int i=0; i<mRhythmLines.size(); ++i)
+      mRhythmLines[i]->OnResize();
+}
+
 void Polyrhythms::OnClicked(int x, int y, bool right)
 {
    IDrawableModule::OnClicked(x,y,right);
@@ -106,13 +117,14 @@ void Polyrhythms::DropdownUpdated(DropdownList* list, int oldVal)
    for (int i=0; i<mRhythmLines.size(); ++i)
    {
       if (list == mRhythmLines[i]->mLengthSelector)
-         mRhythmLines[i]->mGrid->SetGrid(mRhythmLines[i]->mLength,1);
+         mRhythmLines[i]->UpdateGrid();
    }
 }
 
 void Polyrhythms::LoadLayout(const ofxJSONElement& moduleInfo)
 {
    mModuleSaveData.LoadString("target", moduleInfo);
+   mModuleSaveData.LoadInt("lines", moduleInfo, 4, 1, 16, K(isTextField));
 
    SetUpFromSaveData();
 }
@@ -120,36 +132,62 @@ void Polyrhythms::LoadLayout(const ofxJSONElement& moduleInfo)
 void Polyrhythms::SetUpFromSaveData()
 {
    SetUpPatchCables(mModuleSaveData.GetString("target"));
+   mNumLines = mModuleSaveData.GetInt("lines");
 }
 
 
-RhythmLine::RhythmLine(Polyrhythms* owner, int x, int y)
-: mGrid(nullptr)
+RhythmLine::RhythmLine(Polyrhythms* owner, int index)
+: mIndex(index)
+, mGrid(nullptr)
 , mLength(4)
 , mLengthSelector(nullptr)
-, mNote(0)
+, mNote(index)
 , mNoteSelector(nullptr)
 , mOwner(owner)
-, mPos(x,y)
 {
 }
 
 void RhythmLine::CreateUIControls()
 {
-   mGrid = new Grid(mPos.x,mPos.y,180,15,4,1);
-   mLengthSelector = new DropdownList(mOwner,"length",mPos.x+190,mPos.y,&mLength);
-   mNoteSelector = new DropdownList(mOwner,"note",mPos.x+250,mPos.y,&mNote);
+   mGrid = new Grid(4,4+mIndex*17,100,15,4,1);
+   mLengthSelector = new DropdownList(mOwner,("length"+ofToString(mIndex)).c_str(),-1,-1,&mLength);
+   mNoteSelector = new DropdownList(mOwner,("note"+ofToString(mIndex)).c_str(),-1,-1,&mNote);
    
-   mLengthSelector->AddLabel("3  ", 3);
+   mLengthSelector->AddLabel("3", 3);
    mLengthSelector->AddLabel("4", 4);
    mLengthSelector->AddLabel("5", 5);
    mLengthSelector->AddLabel("6", 6);
    mLengthSelector->AddLabel("7", 7);
    mLengthSelector->AddLabel("8", 8);
    mLengthSelector->AddLabel("9", 9);
+   mLengthSelector->AddLabel("3x4", 12);
+   mLengthSelector->AddLabel("4x4", 16);
+   mLengthSelector->AddLabel("5x4", 20);
+   mLengthSelector->AddLabel("6x4", 24);
+   mLengthSelector->AddLabel("7x4", 28);
+   mLengthSelector->AddLabel("8x4", 32);
+   mLengthSelector->AddLabel("9x4", 36);
    
    for (int i=0; i<NUM_DRUM_HITS; ++i)
       mNoteSelector->AddLabel(DrumPlayer::GetDrumHitName(i).c_str(), i);
+   
+   OnResize();
+}
+
+void RhythmLine::OnResize()
+{
+   mGrid->SetDimensions(mOwner->IClickable::GetDimensions().x - 100, 15);
+   mLengthSelector->PositionTo(mGrid, kAnchor_Right);
+   mNoteSelector->PositionTo(mLengthSelector, kAnchor_Right);
+}
+
+void RhythmLine::UpdateGrid()
+{
+   mGrid->SetGrid(mLength,1);
+   if (mLength % 4 == 0)
+      mGrid->SetMajorColSize(mLength/4);
+   else
+      mGrid->SetMajorColSize(-1);
 }
 
 void RhythmLine::Draw()

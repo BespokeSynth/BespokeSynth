@@ -31,6 +31,8 @@ public:
    float mModIdx2;
    float mHarmRatio2;
    float mVol;
+   float mPhaseOffset;
+   float mPhaseOffset2;
 };
 
 class FMVoice : public IMidiVoice

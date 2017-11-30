@@ -45,6 +45,8 @@ SignalGenerator::SignalGenerator()
 , mShuffleSlider(nullptr)
 , mSoften(0)
 , mSoftenSlider(nullptr)
+, mPhaseOffset(0)
+, mPhaseOffsetSlider(nullptr)
 {
    mWriteBuffer = new float[gBufferSize];
    
@@ -54,23 +56,22 @@ SignalGenerator::SignalGenerator()
 void SignalGenerator::CreateUIControls()
 {
    IDrawableModule::CreateUIControls();
-   mVolSlider = new FloatSlider(this,"vol",5,72,80,15,&mVol,0,1);
+   mFreqSlider = new FloatSlider(this,"freq",5,2,170,15,&mFreq,1,4000);
+   mFreqModeSelector = new DropdownList(this,"freq mode",5,21,(int*)(&mFreqMode));
    mOscSelector = new DropdownList(this,"osc",60,21,(int*)(&mOscType));
    mPulseWidthSlider = new FloatSlider(this,"pw",107,21,68,15,&mPulseWidth,0.01f,.99f);
-   mShuffleSlider = new FloatSlider(this,"shuffle",95,55,80,15,&mShuffle,0, 1);
-   mMultSelector = new DropdownList(this,"mult",5,55,&mMult);
-   mSyncCheckbox = new Checkbox(this,"sync",95,38,&mSync);
-   mSyncFreqSlider = new FloatSlider(this,"syncf",135,38,40,15,&mSyncFreq,10,999.9f);
-   mDetuneSlider = new FloatSlider(this,"detune",95,72,80,15,&mDetune,.98f,1.02f,3);
-   mFreqSlider = new FloatSlider(this,"freq",5,2,170,15,&mFreq,1,1000);
-   mFreqModeSelector = new DropdownList(this,"freq mode",5,21,(int*)(&mFreqMode));
-   mFreqSliderAmountSlider = new FloatSlider(this,"slider",5,38,80,15,&mFreqSliderAmount,0,1);
-   mFreqRampTimeSlider = new FloatSlider(this,"ramp",5,38,80,15,&mFreqRampTime,0,1000);
-   mSoftenSlider = new FloatSlider(this,"soften",-1,-1,40,15,&mSoften,0,1);
+   mFreqSliderAmountSlider = new FloatSlider(this,"slider",mFreqModeSelector,kAnchor_Below,80,15,&mFreqSliderAmount,0,1);
+   mFreqRampTimeSlider = new FloatSlider(this,"ramp",mFreqModeSelector,kAnchor_Below,80,15,&mFreqRampTime,0,1000);
+   mSyncCheckbox = new Checkbox(this,"sync",mFreqSliderAmountSlider,kAnchor_Right,&mSync);
+   mSyncFreqSlider = new FloatSlider(this,"syncf",mSyncCheckbox,kAnchor_Right,40,15,&mSyncFreq,10,999.9f);
+   mSoftenSlider = new FloatSlider(this,"soften",mFreqSliderAmountSlider,kAnchor_Below,80,15,&mSoften,0,1);
+   mShuffleSlider = new FloatSlider(this,"shuffle",mSyncCheckbox,kAnchor_Below,80,15,&mShuffle,0, 1);
+   mMultSelector = new DropdownList(this,"mult",mSoftenSlider,kAnchor_Below,&mMult);
+   mPhaseOffsetSlider = new FloatSlider(this,"phase",mShuffleSlider,kAnchor_Below,80,15,&mPhaseOffset,0,1,3);
+   mVolSlider = new FloatSlider(this,"vol",mMultSelector,kAnchor_Below,80,15,&mVol,0,1);
+   mDetuneSlider = new FloatSlider(this,"detune",mPhaseOffsetSlider,kAnchor_Below,80,15,&mDetune,.98f,1.02f,3);
    
    mSyncFreqSlider->SetLabel("");
-   mSoftenSlider->SetLabel("");
-   mSoftenSlider->PositionTo(mMultSelector, kAnchor_Right);
    
    SetFreqMode(kFreqMode_Instant);
    
@@ -104,6 +105,8 @@ void SignalGenerator::CreateUIControls()
    
    mFreqSlider->SetMode(FloatSlider::kSquare);
    mFreqRampTimeSlider->SetMode(FloatSlider::kSquare);
+   
+   mSoftenSlider->SetShowing(mOscType == kOsc_Square || mOscType == kOsc_Saw || mOscType == kOsc_NegSaw);
 }
 
 SignalGenerator::~SignalGenerator()
@@ -163,7 +166,7 @@ void SignalGenerator::Process(double time)
       if (mSync)
          mWriteBuffer[pos] += mOsc.Audio(time, mSyncPhase) * volSq;
       else
-         mWriteBuffer[pos] += mOsc.Audio(time, mPhase) * volSq;
+         mWriteBuffer[pos] += mOsc.Audio(time, mPhase + mPhaseOffset*FTWO_PI) * volSq;
       
       time += gInvSampleRateMs;
    }
@@ -227,12 +230,13 @@ void SignalGenerator::DrawModule()
    mFreqSliderAmountSlider->Draw();
    mFreqRampTimeSlider->Draw();
    mSoftenSlider->Draw();
+   mPhaseOffsetSlider->Draw();
 }
 
 void SignalGenerator::GetModuleDimensions(int& width, int& height)
 {
    width = 180;
-   height = 90;
+   height = 108;
 }
 
 void SignalGenerator::SetType(OscillatorType type)
@@ -281,7 +285,10 @@ void SignalGenerator::SetUpFromSaveData()
 void SignalGenerator::DropdownUpdated(DropdownList* list, int oldVal)
 {
    if (list == mOscSelector)
+   {
       mOsc.SetType(mOscType);
+      mSoftenSlider->SetShowing(mOscType == kOsc_Square || mOscType == kOsc_Saw || mOscType == kOsc_NegSaw);
+   }
    if (list == mFreqModeSelector)
       SetFreqMode(mFreqMode);
 }
