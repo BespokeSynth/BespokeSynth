@@ -25,7 +25,7 @@ void AudioToCV::CreateUIControls()
 {
    IDrawableModule::CreateUIControls();
    
-   mGainSlider = new FloatSlider(this, "gain", 3, 2, 100, 15, &mGain, 1, 5);
+   mGainSlider = new FloatSlider(this, "gain", 3, 2, 100, 15, &mGain, 1, 10);
    mMinSlider = new FloatSlider(this, "min", mGainSlider, kAnchor_Below, 100, 15, &mMin, 0, 1);
    mMaxSlider = new FloatSlider(this, "max", mMinSlider, kAnchor_Below, 100, 15, &mMax, 0, 1);
    

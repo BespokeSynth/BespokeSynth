@@ -60,13 +60,13 @@ void FMVoice::Process(double time, float* out, int bufferSize)
       mHarmPhase += harmPhaseInc;
       while (mHarmPhase > FTWO_PI) { mHarmPhase -= FTWO_PI; }
 
-      float modOscFreq = oscFreq + mHarm.Audio(time, mHarmPhase + mVoiceParams->mPhaseOffset) * harmFreq * mModIdx.Value(time) * mVoiceParams->mModIdx;
+      float modOscFreq = oscFreq + mHarm.Audio(time, mHarmPhase + mVoiceParams->mPhaseOffset1) * harmFreq * mModIdx.Value(time) * mVoiceParams->mModIdx;
       float oscPhaseInc = GetPhaseInc(modOscFreq);
 
       mOscPhase += oscPhaseInc;
       while (mOscPhase > FTWO_PI) { mOscPhase -= FTWO_PI; }
 
-      out[pos] += mOsc.Audio(time, mOscPhase) * mVoiceParams->mVol/20.0f;
+      out[pos] += mOsc.Audio(time, mOscPhase + mVoiceParams->mPhaseOffset0) * mVoiceParams->mVol/20.0f;
 
       time += gInvSampleRateMs;
    }
@@ -115,6 +115,9 @@ void FMVoice::ClearVoice()
    mModIdx.Clear();
    mHarm2.GetADSR()->Clear();
    mModIdx2.Clear();
+   mOscPhase = 0;
+   mHarmPhase = 0;
+   mHarmPhase2 = 0;
 }
 
 void FMVoice::SetVoiceParams(IVoiceParams* params)

@@ -29,6 +29,7 @@ void ModulatorSmoother::CreateUIControls()
    
    mInputSlider = new FloatSlider(this, "input", 3, 2, 100, 15, &mInput, 0, 1);
    mSmoothSlider = new FloatSlider(this, "smooth", mInputSlider, kAnchor_Below, 100, 15, &mSmooth, 0, 1);
+   mSmoothSlider->SetMode(FloatSlider::kSquare);
    
    mTargetCable = new PatchCableSource(this, kConnectionType_UIControl);
    AddPatchCableSource(mTargetCable);
@@ -63,7 +64,7 @@ void ModulatorSmoother::PostRepatch(PatchCableSource* cableSource)
 
 void ModulatorSmoother::OnTransportAdvanced(float amount)
 {
-   mRamp.Start(mInput, (amount * TheTransport->MsPerBar() * (1+mSmooth*500)));
+   mRamp.Start(mInput, (amount * TheTransport->MsPerBar() * (mSmooth*300)));
 }
 
 float ModulatorSmoother::Value(int samplesIn)

@@ -31,7 +31,8 @@ public:
    float mModIdx2;
    float mHarmRatio2;
    float mVol;
-   float mPhaseOffset;
+   float mPhaseOffset0;
+   float mPhaseOffset1;
    float mPhaseOffset2;
 };
 

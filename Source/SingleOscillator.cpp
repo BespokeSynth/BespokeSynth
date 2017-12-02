@@ -16,6 +16,7 @@
 
 SingleOscillator::SingleOscillator()
 : mVolSlider(nullptr)
+, mPhaseOffsetSlider(nullptr)
 , mOscSelector(nullptr)
 , mPulseWidthSlider(nullptr)
 , mMult(1)
@@ -44,6 +45,7 @@ SingleOscillator::SingleOscillator()
    mVoiceParams.mFilterCutoff = SINGLEOSCILLATOR_NO_CUTOFF;
    mVoiceParams.mPressureEnvelope = false;
    mVoiceParams.mShuffle = 0;
+   mVoiceParams.mPhaseOffset = 0;
    
    mPolyMgr.Init(kVoiceType_SingleOscillator, &mVoiceParams);
    
@@ -71,6 +73,7 @@ void SingleOscillator::CreateUIControls()
    mFilterADSRDisplay = new ADSRDisplay(this,"envfilter",95,18,80,36,&mVoiceParams.mFilterAdsr);
    mLengthMultiplierSlider = new FloatSlider(this,"len",mADSRDisplay,kAnchor_Below,80,15,&mLengthMultiplier,.01f,10);
    mVolSlider = new FloatSlider(this,"vol",mLengthMultiplierSlider,kAnchor_Below,80,15,&mVoiceParams.mVol,0,1);
+   mPhaseOffsetSlider = new FloatSlider(this,"phase",mDetuneSlider,kAnchor_Below,80,15,&mVoiceParams.mPhaseOffset,0,TWO_PI);
    mFilterCutoffSlider = new FloatSlider(this,"cutoff",mVolSlider,kAnchor_Below,80,15,&mVoiceParams.mFilterCutoff,0,SINGLEOSCILLATOR_NO_CUTOFF);
    mSyncCheckbox = new Checkbox(this,"sync",mFilterCutoffSlider,kAnchor_Below,&mVoiceParams.mSync);
    mSyncFreqSlider = new FloatSlider(this,"syncf",mSyncCheckbox,kAnchor_Right,40,15,&mVoiceParams.mSyncFreq,10,999.9f);
@@ -155,6 +158,7 @@ void SingleOscillator::DrawModule()
       return;
    
    mVolSlider->Draw();
+   mPhaseOffsetSlider->Draw();
    mLengthMultiplierSlider->Draw();
    mPulseWidthSlider->Draw();
    mSyncCheckbox->Draw();

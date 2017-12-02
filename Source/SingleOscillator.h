@@ -67,6 +67,7 @@ private:
    PolyphonyMgr mPolyMgr;
    OscillatorVoiceParams mVoiceParams;
    FloatSlider* mVolSlider;
+   FloatSlider* mPhaseOffsetSlider;
    DropdownList* mOscSelector;
    FloatSlider* mPulseWidthSlider;
    int mMult;

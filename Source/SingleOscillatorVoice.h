@@ -32,6 +32,7 @@ public:
    OscillatorType mOscType;
    float mDetune;
    float mShuffle;
+   float mPhaseOffset;
    
    float mFilterCutoff;
    ADSR mFilterAdsr;

@@ -62,7 +62,24 @@ NoteStepSequencer::NoteStepSequencer()
    
    for (int i=0;i<NSS_MAX_STEPS;++i)
    {
-      mTones[i] = (i % 2 == 0) ? 7 : 4;
+      switch (rand() % 5)
+      {
+         case 0:
+            mTones[i] = 0;
+            break;
+         case 1:
+            mTones[i] = 4;
+            break;
+         case 2:
+            mTones[i] = 7;
+            break;
+         case 3:
+            mTones[i] = 11;
+            break;
+         case 4:
+            mTones[i] = 14;
+            break;
+      }
       mVels[i] = 127;
       mNoteLengths[i] = 1;
    }

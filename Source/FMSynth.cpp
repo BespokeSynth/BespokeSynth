@@ -30,7 +30,8 @@ FMSynth::FMSynth()
 , mAdsrDisplayMod(nullptr)
 , mAdsrDisplayHarm2(nullptr)
 , mAdsrDisplayMod2(nullptr)
-, mPhaseOffsetSlider(nullptr)
+, mPhaseOffsetSlider0(nullptr)
+, mPhaseOffsetSlider1(nullptr)
 , mPhaseOffsetSlider2(nullptr)
 , mPolyMgr(this)
 {
@@ -46,9 +47,10 @@ FMSynth::FMSynth()
    mVoiceParams.mModIdxADSRParams.GetD() = 0;
    mVoiceParams.mModIdxADSRParams.GetS() = 1;
    mVoiceParams.mModIdxADSRParams.GetR() = 1;
+   mVoiceParams.mPhaseOffset0 = 0;
    mVoiceParams.mHarmRatio = 1;
    mVoiceParams.mModIdx = 0;
-   mVoiceParams.mPhaseOffset = 0;
+   mVoiceParams.mPhaseOffset1 = 0;
    mVoiceParams.mHarmRatioADSRParams2.GetA() = 1;
    mVoiceParams.mHarmRatioADSRParams2.GetD() = 0;
    mVoiceParams.mHarmRatioADSRParams2.GetS() = 1;
@@ -82,7 +84,8 @@ void FMSynth::CreateUIControls()
    mHarmSlider2 = new FloatSlider(this,"tweak2",mHarmRatioBaseDropdown2,kAnchor_Below,80,15,&mHarmRatioTweak2,.5f,2,3);
    mModSlider2 = new FloatSlider(this,"mod2",mAdsrDisplayMod2,kAnchor_Below,80,15,&mVoiceParams.mModIdx2,0,20);
    mVolSlider = new FloatSlider(this,"vol",94,4,80,15,&mVoiceParams.mVol,0,2);
-   mPhaseOffsetSlider = new FloatSlider(this,"phase",mModSlider,kAnchor_Below,80,15,&mVoiceParams.mPhaseOffset,0,FTWO_PI);
+   mPhaseOffsetSlider0 = new FloatSlider(this,"phase0",mVolSlider,kAnchor_Below,80,15,&mVoiceParams.mPhaseOffset0,0,FTWO_PI);
+   mPhaseOffsetSlider1 = new FloatSlider(this,"phase1",mModSlider,kAnchor_Below,80,15,&mVoiceParams.mPhaseOffset1,0,FTWO_PI);
    mPhaseOffsetSlider2 = new FloatSlider(this,"phase2",mModSlider2,kAnchor_Below,80,15,&mVoiceParams.mPhaseOffset2,0,FTWO_PI);
    
    mHarmRatioBaseDropdown->AddLabel(".125", -8);
@@ -168,8 +171,9 @@ void FMSynth::DrawModule()
    mHarmSlider->Draw();
    mModSlider->Draw();
    mVolSlider->Draw();
+   mPhaseOffsetSlider0->Draw();
    mHarmRatioBaseDropdown->Draw();
-   mPhaseOffsetSlider->Draw();
+   mPhaseOffsetSlider1->Draw();
    mAdsrDisplayHarm2->Draw();
    mAdsrDisplayMod2->Draw();
    mHarmSlider2->Draw();

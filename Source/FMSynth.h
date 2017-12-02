@@ -59,6 +59,7 @@ private:
    FMVoiceParams mVoiceParams;
    FloatSlider* mVolSlider;
    ADSRDisplay* mAdsrDisplayVol;
+   FloatSlider* mPhaseOffsetSlider0;
    
    FloatSlider* mHarmSlider;
    ADSRDisplay* mAdsrDisplayHarm;
@@ -67,7 +68,7 @@ private:
    int mHarmRatioBase;  //negative means 1/val
    float mHarmRatioTweak;
    DropdownList* mHarmRatioBaseDropdown;
-   FloatSlider* mPhaseOffsetSlider;
+   FloatSlider* mPhaseOffsetSlider1;
    
    FloatSlider* mHarmSlider2;
    ADSRDisplay* mAdsrDisplayHarm2;

@@ -75,7 +75,7 @@ void SingleOscillatorVoice::Process(double time, float* out, int bufferSize)
       if (mVoiceParams->mSync)
          sample = mOsc.Audio(time, mSyncPhase) * vol;
       else
-         sample = mOsc.Audio(time, mPhase) * vol;
+         sample = mOsc.Audio(time, mPhase + mVoiceParams->mPhaseOffset) * vol;
       
       if (mUseFilter)
       {
@@ -121,6 +121,8 @@ void SingleOscillatorVoice::ClearVoice()
 {
    mOsc.GetADSR()->Clear();
    mFilterAdsr.Clear();
+   mPhase = 0;
+   mSyncPhase = 0;
 }
 
 void SingleOscillatorVoice::SetVoiceParams(IVoiceParams* params)

@@ -73,13 +73,6 @@ void NoteCreator::TriggerNote()
    PlayNoteOutput(gTime, mPitch, mVelocity*127);
 }
 
-void NoteCreator::KeyPressed(int key, bool isRepeat)
-{
-   IDrawableModule::KeyPressed(key, isRepeat);
-   if (key == 'e')
-      TriggerNote();
-}
-
 void NoteCreator::CheckboxUpdated(Checkbox* checkbox)
 {
    if (checkbox == mEnabledCheckbox)

@@ -54,18 +54,12 @@ void Grid::Render()
    GetDimensions(w,h);
    float xsize = float(mWidth) / mCols;
    float ysize = float(mHeight) / mRows;
-   float x;
-   float y;
-   for (int i=0; i<mCols; ++i)
+   for (int j=0; j<mRows; ++j)
    {
-      for (int j=0; j<mRows; ++j)
+      for (int i=0; i<mCols; ++i)
       {
-         x = mX+(i+mDrawOffset[j])*xsize;
-         
-         if (mFlip)
-            y = mHeight+mY-(j+1)*ysize;
-         else
-            y = mY+j*ysize;
+         float x = GetX(i,j);
+         float y = GetY(j);
 
          float data = mData[j][i];
          if (data)
@@ -76,23 +70,47 @@ void Grid::Render()
                ofSetColor(255 * data, 255 * data, 255 * data, gModuleDrawAlpha);
                ofRect(x,y,xsize,ysize);
             }
-            ofSetColor(255,255,255, gModuleDrawAlpha);
             float fillAmount = ofClamp(ofLerp(.15f, 1, data), 0, 1);
             if (mGridMode == kMultislider)
-               ofRect(x, y+(ysize*(1-fillAmount)), xsize, ysize*fillAmount);
+            {
+               float fadeAmount = ofClamp(ofLerp(.5f, 1, data), 0, 1);
+               ofSetColor(255 * fadeAmount, 255 * fadeAmount, 255 * fadeAmount, gModuleDrawAlpha);
+               ofRect(x+.5f, y+.5f+(ysize*(1-fillAmount)), xsize-1, ysize*fillAmount-1, 0);
+               /*ofSetColor(255, 255, 255, gModuleDrawAlpha);
+               ofNoFill();
+               ofRect(x+1,y+1,xsize-2,ysize-2, gCornerRoundness*.99f);*/
+            }
             else if (mGridMode == kHorislider)
+            {
+               ofSetColor(255,255,255, gModuleDrawAlpha);
                ofRect(x, y, xsize*fillAmount, ysize);
+            }
          }
-
-         if (i == mHighlightCol)
-            ofSetColor(0,255,0, gModuleDrawAlpha);
-         else if (mMajorCol > 0 && i % mMajorCol == 0)
-            ofSetColor(200,200,200, gModuleDrawAlpha);
-         else
-            ofSetColor(100,100,100, gModuleDrawAlpha);
-         ofNoFill();
-         ofRect(x, y, xsize, ysize);
       }
+   }
+   ofNoFill();
+   ofSetColor(100,100,100, gModuleDrawAlpha);
+   for (int j=0; j<mRows; ++j)
+   {
+      for (int i=0; i<mCols; ++i)
+         ofRect(GetX(i,j), GetY(j), xsize, ysize);
+   }
+   ofNoFill();
+   ofSetColor(255, 200, 100, gModuleDrawAlpha);
+   for (int j=0; j<mRows; ++j)
+   {
+      for (int i=0; i<mCols; ++i)
+      {
+         if (mMajorCol > 0 && i % mMajorCol == 0)
+            ofRect(GetX(i,j), GetY(j), xsize, ysize);
+      }
+   }
+   if (mHighlightCol != -1)
+   {
+      ofNoFill();
+      ofSetColor(0,255,0, gModuleDrawAlpha);
+      for (int j=0; j<mRows; ++j)
+         ofRect(GetX(mHighlightCol,j), GetY(j), xsize, ysize);
    }
    if (mCurrentHover != -1 && mShouldDrawValue)
    {
@@ -100,6 +118,21 @@ void Grid::Render()
       DrawText(ofToString(GetVal(mCurrentHover % mCols, mCurrentHover / mCols)), mX, mY+12);
    }
    ofPopStyle();
+}
+
+float Grid::GetX(int col, int row) const
+{
+   float xsize = float(mWidth) / mCols;
+   return mX+(col+mDrawOffset[row])*xsize;
+}
+
+float Grid::GetY(int row) const
+{
+   float ysize = float(mHeight) / mRows;
+   if (mFlip)
+      return mHeight+mY-(row+1)*ysize;
+   else
+      return mY+row*ysize;
 }
 
 GridCell Grid::GetGridCellAt(float x, float y, float* clickHeight, float* clickWidth)

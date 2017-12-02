@@ -23,7 +23,6 @@ void NoteFlusher::CreateUIControls()
 
 void NoteFlusher::DrawModule()
 {
-
    if (Minimized() || IsVisible() == false)
       return;
    mFlushButton->Draw();
@@ -32,7 +31,11 @@ void NoteFlusher::DrawModule()
 void NoteFlusher::ButtonClicked(ClickButton* button)
 {
    if (button == mFlushButton)
+   {
       mNoteOutput.Flush();
+      for (int i=0; i<127; ++i)
+         mNoteOutput.PlayNote(gTime, i, 0);
+   }
 }
 
 void NoteFlusher::LoadLayout(const ofxJSONElement& moduleInfo)
