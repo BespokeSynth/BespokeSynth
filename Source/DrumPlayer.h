@@ -160,10 +160,16 @@ private:
       , mSpeed(1)
       , mVelocity(1)
       , mUseEnvelope(false)
+      , mEnvelopeLength(200)
       , mPan(0)
       , mHasIndividualOutput(false)
       , mOwner(nullptr)
       {
+         mEnvelope.GetHasSustainStage() = false;
+         mEnvelope.GetA() = 1;
+         mEnvelope.GetD() = 1;
+         mEnvelope.GetS() = 1;
+         mEnvelope.GetR() = 100;
       }
       
       void CreateUIControls(DrumPlayer* owner, int index);
@@ -179,6 +185,7 @@ private:
       
       bool mUseEnvelope;
       ADSR mEnvelope;
+      float mEnvelopeLength;
       float mPan;
       bool mHasIndividualOutput;
       
@@ -190,6 +197,7 @@ private:
       ADSRDisplay* mEnvelopeDisplay;
       FloatSlider* mPanSlider;
       Checkbox* mIndividualOutputCheckbox;
+      FloatSlider* mEnvelopeLengthSlider;
    };
    
    DrumHit mDrumHits[NUM_DRUM_HITS];

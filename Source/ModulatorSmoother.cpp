@@ -73,6 +73,17 @@ float ModulatorSmoother::Value(int samplesIn)
    return ofClamp(mRamp.Value(gTime + samplesIn * gInvSampleRateMs), mMin, mMax);
 }
 
+void ModulatorSmoother::SaveLayout(ofxJSONElement& moduleInfo)
+{
+   IDrawableModule::SaveLayout(moduleInfo);
+   
+   string targetPath = "";
+   if (mTarget)
+      targetPath = mTarget->Path();
+   
+   moduleInfo["target"] = targetPath;
+}
+
 void ModulatorSmoother::LoadLayout(const ofxJSONElement& moduleInfo)
 {
    mModuleSaveData.LoadString("target", moduleInfo);

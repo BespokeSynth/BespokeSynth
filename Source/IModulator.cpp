@@ -11,6 +11,7 @@
 #include "IModulator.h"
 #include "Slider.h"
 #include "PatchCableSource.h"
+#include "ModularSynth.h"
 
 IModulator::IModulator()
 : mMin(0)
@@ -50,15 +51,18 @@ void IModulator::InitializeRange()
 {
    assert(mTarget != nullptr);
    
-   if (InitializeWithZeroRange())
+   if (!TheSynth->IsLoadingModule())
    {
-      mMin = mTarget->GetValue();
-      mMax = mTarget->GetValue();
-   }
-   else
-   {
-      mMin = mTarget->GetMin();
-      mMax = mTarget->GetMax();
+      if (InitializeWithZeroRange())
+      {
+         mMin = mTarget->GetValue();
+         mMax = mTarget->GetValue();
+      }
+      else
+      {
+         mMin = mTarget->GetMin();
+         mMax = mTarget->GetMax();
+      }
    }
    
    if (mMinSlider)

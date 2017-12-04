@@ -162,3 +162,29 @@ void EnvelopeModulator::LoadLayout(const ofxJSONElement& moduleInfo)
 void EnvelopeModulator::SetUpFromSaveData()
 {
 }
+
+namespace
+{
+   const int kSaveStateRev = 0;
+}
+
+void EnvelopeModulator::SaveState(FileStreamOut& out)
+{
+   IDrawableModule::SaveState(out);
+   
+   out << kSaveStateRev;
+   
+   mAdsr.SaveState(out);
+}
+
+void EnvelopeModulator::LoadState(FileStreamIn& in)
+{
+   IDrawableModule::LoadState(in);
+   
+   int rev;
+   in >> rev;
+   LoadStateValidate(rev == kSaveStateRev);
+   
+   mAdsr.LoadState(in);
+}
+

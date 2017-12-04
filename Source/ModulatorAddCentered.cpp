@@ -69,6 +69,17 @@ float ModulatorAddCentered::Value(int samplesIn)
    return ofClamp(mValue1 + mValue2 * mValue2Range, mTarget->GetMin(), mTarget->GetMax());
 }
 
+void ModulatorAddCentered::SaveLayout(ofxJSONElement& moduleInfo)
+{
+   IDrawableModule::SaveLayout(moduleInfo);
+   
+   string targetPath = "";
+   if (mTarget)
+      targetPath = mTarget->Path();
+   
+   moduleInfo["target"] = targetPath;
+}
+
 void ModulatorAddCentered::LoadLayout(const ofxJSONElement& moduleInfo)
 {
    mModuleSaveData.LoadString("target", moduleInfo);

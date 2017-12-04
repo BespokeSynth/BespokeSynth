@@ -9,6 +9,8 @@
 #include "ADSR.h"
 #include "OpenFrameworksPort.h"
 #include "MathUtils.h"
+#include "FileStream.h"
+#include "SynthGlobals.h"
 
 void ADSR::Set(float a, float d, float s, float r, float h /*=-1*/)
 {
@@ -139,4 +141,51 @@ int ADSR::GetStageForTime(double time) const
 {
    double dummy;
    return GetStage(time, dummy);
+}
+
+namespace
+{
+   const int kSaveStateRev = 0;
+}
+
+void ADSR::SaveState(FileStreamOut& out)
+{
+   out << kSaveStateRev;
+   
+   out << mMult;
+   out << mSustainStage;
+   out << mMaxSustain;
+   out << mNumStages;
+   out << mHasSustainStage;
+   out << mFreeReleaseLevel;
+   out << MAX_ADSR_STAGES;
+   for (int i=0; i<MAX_ADSR_STAGES; ++i)
+   {
+      out << mStages[i].curve;
+      out << mStages[i].target;
+      out << mStages[i].time;
+   }
+}
+
+void ADSR::LoadState(FileStreamIn& in)
+{
+   int rev;
+   in >> rev;
+   LoadStateValidate(rev <= kSaveStateRev);
+   
+   in >> mMult;
+   in >> mSustainStage;
+   in >> mMaxSustain;
+   in >> mNumStages;
+   in >> mHasSustainStage;
+   in >> mFreeReleaseLevel;
+   int maxNumStages;
+   in >> maxNumStages;
+   assert(maxNumStages == MAX_ADSR_STAGES);
+   for (int i=0; i<maxNumStages; ++i)
+   {
+      in >> mStages[i].curve;
+      in >> mStages[i].target;
+      in >> mStages[i].time;
+   }
 }

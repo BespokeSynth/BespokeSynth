@@ -348,10 +348,7 @@ void ADSRDisplay::SaveState(FileStreamOut& out)
 {
    out << kSaveStateRev;
    
-   out << mAdsr->GetA();
-   out << mAdsr->GetD();
-   out << mAdsr->GetS();
-   out << mAdsr->GetR();
+   mAdsr->SaveState(out);
 }
 
 void ADSRDisplay::LoadState(FileStreamIn& in, bool shouldSetValue)
@@ -360,13 +357,5 @@ void ADSRDisplay::LoadState(FileStreamIn& in, bool shouldSetValue)
    in >> rev;
    LoadStateValidate(rev <= kSaveStateRev);
    
-   in >> mAdsr->GetA();
-   in >> mAdsr->GetD();
-   in >> mAdsr->GetS();
-   in >> mAdsr->GetR();
-   if (rev == 0)
-   {
-      float dummy;
-      in >> dummy;
-   }
+   mAdsr->LoadState(in);
 }

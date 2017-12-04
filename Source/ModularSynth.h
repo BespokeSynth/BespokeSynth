@@ -155,6 +155,8 @@ public:
    
    void ScheduleEnvelopeEditorSpawn(ADSRDisplay* adsrDisplay);
    
+   bool IsLoadingModule() const { return mIsLoadingModule; }
+   
    void SaveLayout(string jsonFile = "", bool makeDefaultLayout = true);
    ofxJSONElement GetLayout();
    void SaveLayoutAsPopup();
@@ -258,6 +260,8 @@ private:
    ModuleContainer mModuleContainer;
    
    ADSRDisplay* mScheduledEnvelopeEditorSpawnDisplay;
+   
+   bool mIsLoadingModule;
 };
 
 extern ModularSynth* TheSynth;

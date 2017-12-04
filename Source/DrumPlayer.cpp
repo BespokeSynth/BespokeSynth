@@ -77,16 +77,17 @@ void DrumPlayer::DrumHit::CreateUIControls(DrumPlayer* owner, int index)
 {
    mVolSlider = new FloatSlider(owner,("vol "+ofToString(index)).c_str(),310,37,100,15,&mVol,0,1,2);
    mSpeedSlider = new FloatSlider(owner,("speed "+ofToString(index)).c_str(),-1,-1,100,15,&mSpeed,.2f,3,2);
-   mUseEnvelopeCheckbox = new Checkbox(owner,("envelope "+ofToString(index)).c_str(),-1,-1,&mUseEnvelope);
-   mEnvelopeDisplay = new ADSRDisplay(owner,("envelopedisplay "+ofToString(index)).c_str(),-1,-1,100,40,&mEnvelope);
    mPanSlider = new FloatSlider(owner,("pan "+ofToString(index)).c_str(),-1,-1,100,15,&mPan,-1,1);
    mIndividualOutputCheckbox = new Checkbox(owner,("single out "+ofToString(index)).c_str(),-1,-1,&mHasIndividualOutput);
+   mUseEnvelopeCheckbox = new Checkbox(owner,("envelope "+ofToString(index)).c_str(),-1,-1,&mUseEnvelope);
+   mEnvelopeLengthSlider = new FloatSlider(owner,("view ms "+ofToString(index)).c_str(),-1,-1,100,15,&mEnvelopeLength,-1,1);
+   mEnvelopeDisplay = new ADSRDisplay(owner,("envelopedisplay "+ofToString(index)).c_str(),305, 200,135, 100,&mEnvelope);
    
    mSpeedSlider->PositionTo(mVolSlider, kAnchor_Below);
-   mUseEnvelopeCheckbox->PositionTo(mSpeedSlider, kAnchor_Below);
-   mEnvelopeDisplay->PositionTo(mUseEnvelopeCheckbox, kAnchor_Below);
-   mPanSlider->PositionTo(mEnvelopeDisplay, kAnchor_Below);
+   mPanSlider->PositionTo(mSpeedSlider, kAnchor_Below);
    mIndividualOutputCheckbox->PositionTo(mPanSlider, kAnchor_Below);
+   mUseEnvelopeCheckbox->PositionTo(mIndividualOutputCheckbox, kAnchor_Below);
+   mEnvelopeLengthSlider->PositionTo(mUseEnvelopeCheckbox, kAnchor_Below);
    
    int x = 5 + (index % 4) * 70;
    int y = 70 + (3-(index / 4)) * 70;
@@ -503,25 +504,34 @@ void DrumPlayer::DrawModule()
       ofPopStyle();
       ofPopMatrix();
       
-      for (int i=0; i<NUM_DRUM_HITS; ++i)
-         mDrumHits[i].DrawUIControls();
-      
-      ofPushMatrix();
-      ofTranslate(305, 200);
-      DrawAudioBuffer(135, 100, mDrumHits[mSelectedHitIdx].mSample.Data(), 0, mDrumHits[mSelectedHitIdx].mSample.LengthInSamples(), mDrumHits[mSelectedHitIdx].mSample.GetPlayPosition());
-      ofPopMatrix();
+      if (mSelectedHitIdx != -1)
+         mDrumHits[mSelectedHitIdx].DrawUIControls();
    }
 }
 
 void DrumPlayer::DrumHit::DrawUIControls()
 {
+   float displayLength = mSample.LengthInSamples();
+   if (mUseEnvelope)
+      displayLength = mEnvelopeLength * gSampleRateMs;
+   ofPushMatrix();
+   ofTranslate(305, 200);
+   DrawAudioBuffer(135, 100, mSample.Data(), 0, displayLength, mSample.GetPlayPosition());
+   ofPopMatrix();
+   
    mVolSlider->Draw();
    mSpeedSlider->Draw();
    mTestButton->Draw();
-   mUseEnvelopeCheckbox->Draw();
-   mEnvelopeDisplay->Draw();
    mPanSlider->Draw();
    mIndividualOutputCheckbox->Draw();
+   mUseEnvelopeCheckbox->Draw();
+   if (mUseEnvelope)
+   {
+      mEnvelopeLengthSlider->SetExtents(10, mSample.LengthInSamples() * gInvSampleRateMs);
+      mEnvelopeLengthSlider->Draw();
+      mEnvelopeDisplay->SetMaxTime(mEnvelopeLength);
+      mEnvelopeDisplay->Draw();
+   }
 }
 
 int DrumPlayer::GetAssociatedSampleIndex(int x, int y)

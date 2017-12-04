@@ -495,20 +495,25 @@ void EnvelopeEditor::ButtonClicked(ClickButton* button)
    {
       if (!mPinned)
       {
-         mPinned = true;
          TheSynth->AddDynamicModule(this);
          TheSynth->PopModalFocusItem();
          
          SetName(GetUniqueName("envelopeeditor", TheSynth->GetModuleNames<EnvelopeEditor*>()).c_str());
          
-         if (mTargetCable == nullptr)
-         {
-            mTargetCable = new PatchCableSource(this, kConnectionType_UIControl);
-            AddPatchCableSource(mTargetCable);
-            mTargetCable->SetTarget(mADSRDisplay);
-            mTargetCable->SetClickable(false);
-         }
+         Pin();
       }
+   }
+}
+
+void EnvelopeEditor::Pin()
+{
+   mPinned = true;
+   if (mTargetCable == nullptr)
+   {
+      mTargetCable = new PatchCableSource(this, kConnectionType_UIControl);
+      AddPatchCableSource(mTargetCable);
+      mTargetCable->SetTarget(mADSRDisplay);
+      mTargetCable->SetClickable(false);
    }
 }
 
@@ -524,16 +529,22 @@ void EnvelopeEditor::SaveLayout(ofxJSONElement& moduleInfo)
    
    if (mADSRDisplay != nullptr)
       moduleInfo["target"] = mADSRDisplay->Path();
+   
+   moduleInfo["onthefly"] = false;
 }
 
 void EnvelopeEditor::LoadLayout(const ofxJSONElement& moduleInfo)
 {
    mModuleSaveData.LoadString("target", moduleInfo);
    
-   SetUpFromSaveData();
+   if (moduleInfo["onthefly"] == false)
+   {
+      SetUpFromSaveData();
+      Pin();
+   }
 }
 
 void EnvelopeEditor::SetUpFromSaveData()
 {
-   mADSRDisplay = dynamic_cast<ADSRDisplay*>(TheSynth->FindUIControl(mModuleSaveData.GetString("target")));
+   SetADSRDisplay(dynamic_cast<ADSRDisplay*>(TheSynth->FindUIControl(mModuleSaveData.GetString("target"))));
 }

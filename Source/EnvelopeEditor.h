@@ -94,6 +94,7 @@ protected:
    
 private:
    void OnClicked(int x, int y, bool right) override;
+   void Pin();
    
    EnvelopeControl mEnvelopeControl;
    

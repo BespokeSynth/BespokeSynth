@@ -57,6 +57,7 @@ ModularSynth::ModularSynth()
 , mFrameRate(0)
 , mQuickSpawn(nullptr)
 , mScheduledEnvelopeEditorSpawnDisplay(nullptr)
+, mIsLoadingModule(false)
 {
    mConsoleText[0] = 0;
    assert(TheSynth == nullptr);
@@ -1362,7 +1363,9 @@ void ModularSynth::SetUpModule(IDrawableModule* module, const ofxJSONElement& mo
 
    try
    {
+      mIsLoadingModule = true;
       module->LoadLayout(moduleInfo);
+      mIsLoadingModule = false;
       
       /*IAudioSource* source = dynamic_cast<IAudioSource*>(module);
       if (source)
@@ -1510,7 +1513,9 @@ IDrawableModule* ModularSynth::DuplicateModule(IDrawableModule* module)
    
    {
       FileStreamIn in(ofToDataPath("tmp").c_str());
+      mIsLoadingModule = true;
       newModule->LoadState(in);
+      mIsLoadingModule = false;
    }
    
    newModule->SetName(newName.c_str());
@@ -1591,7 +1596,9 @@ void ModularSynth::LoadState(string file)
    in >> jsonString;
    LoadLayoutFromString(jsonString);
    
+   mIsLoadingModule = true;
    mModuleContainer.LoadState(in);
+   mIsLoadingModule = false;
    
    TheTransport->Reset();
    
@@ -1785,6 +1792,7 @@ IDrawableModule* ModularSynth::SpawnModuleOnTheFly(string moduleName, float x, f
    vector<IDrawableModule*> allModules;
    mModuleContainer.GetAllModules(allModules);
    dummy["name"] = GetUniqueName(tokens[0], allModules);
+   dummy["onthefly"] = true;
 
    if (tokens[0] == "effectchain")
    {

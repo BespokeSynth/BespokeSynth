@@ -444,7 +444,7 @@ void FloatSlider::Compute(int samplesIn /*= 0*/)
 
 float* FloatSlider::GetModifyValue()
 {
-   if (mModulator && mModulator->Active() && mModulator->CanAdjustRange())
+   if (!TheSynth->IsLoadingModule() && mModulator && mModulator->Active() && mModulator->CanAdjustRange())
       return &mModulator->GetMax();
    return mVar;
 }

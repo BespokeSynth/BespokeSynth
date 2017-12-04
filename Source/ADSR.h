@@ -14,6 +14,9 @@
 
 #define MAX_ADSR_STAGES 20
 
+class FileStreamOut;
+class FileStreamIn;
+
 class ADSR
 {
 public:
@@ -56,6 +59,9 @@ public:
    int& GetSustainStage() { return mSustainStage; }
    bool& GetHasSustainStage() { return mHasSustainStage; }
    bool& GetFreeReleaseLevel() { return mFreeReleaseLevel; }
+   
+   void SaveState(FileStreamOut& out);
+   void LoadState(FileStreamIn& in);
    
 private:
    float mStartBlendFromValue;

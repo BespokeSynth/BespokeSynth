@@ -63,6 +63,17 @@ float ModulatorCurve::Value(int samplesIn)
    return ofMap(MathUtils::Curve(mInput, mCurve), 0, 1, mMin, mMax, K(clamp));
 }
 
+void ModulatorCurve::SaveLayout(ofxJSONElement& moduleInfo)
+{
+   IDrawableModule::SaveLayout(moduleInfo);
+   
+   string targetPath = "";
+   if (mTarget)
+      targetPath = mTarget->Path();
+   
+   moduleInfo["target"] = targetPath;
+}
+
 void ModulatorCurve::LoadLayout(const ofxJSONElement& moduleInfo)
 {
    mModuleSaveData.LoadString("target", moduleInfo);
