@@ -53,6 +53,8 @@ public:
    void SetDimensions(int w, int h) { mWidth = w; mHeight = h; }
    void SetBezierControl(float control) { mBezierControl = control; }
    void SetModulator(IModulator* modulator) { mModulator = modulator; }
+   float& GetModulatorMin() { return mModulatorMin; }
+   float& GetModulatorMax() { return mModulatorMax; }
    
    void Init() override;
    
@@ -99,6 +101,8 @@ private:
    float* mVar;
    float mMin;
    float mMax;
+   float mModulatorMin;
+   float mModulatorMax;
    bool mMouseDown;
    int mFineRefX;
    int mRefY;

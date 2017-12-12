@@ -65,7 +65,9 @@ private:
    BiquadFilterEffect mBiquad;
    
    Checkbox* mStretchCheckbox;
-   FloatSlider* mCarrierSlider;
+   FloatSlider* mExciterFreqSlider;
+   FloatSlider* mExciterAttackSlider;
+   FloatSlider* mExciterDecaySlider;
 
    ChannelBuffer mWriteBuffer;
 };

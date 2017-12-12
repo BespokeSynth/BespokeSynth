@@ -8,7 +8,6 @@
 
 #include "ModuleFactory.h"
 
-#include "MidiInstrument.h"
 #include "LaunchpadKeyboard.h"
 #include "Scale.h"
 #include "DrumPlayer.h"
@@ -167,6 +166,7 @@
 #include "ModulatorMult.h"
 #include "ModulatorCurve.h"
 #include "ModulatorSmoother.h"
+#include "NoteToSpeed.h"
 
 #define REGISTER(class,name,type) Register(#name, &(class::Create), &(class::CanCreate), type, false, false);
 #define REGISTER_HIDDEN(class,name,type) Register(#name, &(class::Create), &(class::CanCreate), type, true, false);
@@ -184,7 +184,7 @@ ModuleFactory::ModuleFactory()
    REGISTER(StepSequencer, drumsequencer, kModuleType_Instrument);
    REGISTER(LaunchpadKeyboard, launchpadkeyboard, kModuleType_Instrument);
    REGISTER(FMSynth, fmsynth, kModuleType_Synth);
-   REGISTER(MidiController, midicontroller, kModuleType_Other);
+   REGISTER(MidiController, midicontroller, kModuleType_Instrument);
 #ifdef BESPOKE_MAC
    REGISTER(PSMoveController, psmove, kModuleType_Other);
 #endif
@@ -193,7 +193,6 @@ ModuleFactory::ModuleFactory()
    REGISTER(Autotalent, autotalent, kModuleType_Audio);
    REGISTER(ScaleDetect, scaledetect, kModuleType_Note);
    REGISTER(KarplusStrong, karplusstrong, kModuleType_Synth);
-   REGISTER(MidiInstrument, midiinstrument, kModuleType_Instrument);
    REGISTER(WhiteKeys, whitekeys, kModuleType_Note);
    REGISTER(Kicker, kicker, kModuleType_Note);
    REGISTER(RingModulator, ringmodulator, kModuleType_Audio);
@@ -301,6 +300,7 @@ ModuleFactory::ModuleFactory()
    REGISTER(ModulatorMult, mult, kModuleType_Modulator);
    REGISTER(ModulatorCurve, curve, kModuleType_Modulator);
    REGISTER(ModulatorSmoother, smoother, kModuleType_Modulator);
+   REGISTER(NoteToSpeed, notetospeed, kModuleType_Modulator);
 
    //REGISTER_EXPERIMENTAL(MidiPlayer, midiplayer, kModuleType_Instrument);
    REGISTER_EXPERIMENTAL(Razor, razor, kModuleType_Synth);

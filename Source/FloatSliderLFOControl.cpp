@@ -43,8 +43,8 @@ void FloatSliderLFOControl::CreateUIControls()
    mOffsetSlider = new FloatSlider(this,"off",mIntervalSelector, kAnchor_Below,90,15,&mLFOSettings.mLFOOffset,0,1);
    mFreeRateSlider = new FloatSlider(this,"free rate",mIntervalSelector, kAnchor_Below,90,15,&mLFOSettings.mFreeRate,0,50);
    mBiasSlider = new FloatSlider(this,"bias",mOffsetSlider, kAnchor_Below,90,15,&mLFOSettings.mBias,0,1);
-   mMinSlider = new FloatSlider(this,"low",mBiasSlider, kAnchor_Below,90,15,&mMin,0,1);
-   mMaxSlider = new FloatSlider(this,"high",mMinSlider, kAnchor_Below,90,15,&mMax,0,1);
+   mMinSlider = new FloatSlider(this,"low",mBiasSlider, kAnchor_Below,90,15,&mDummyMin,0,1);
+   mMaxSlider = new FloatSlider(this,"high",mMinSlider, kAnchor_Below,90,15,&mDummyMax,0,1);
    mSpreadSlider = new FloatSlider(this,"spread",mMaxSlider, kAnchor_Below,90,15,&mLFOSettings.mSpread,0,1);
    mSoftenSlider = new FloatSlider(this,"soften",mSpreadSlider, kAnchor_Below,90,15,&mLFOSettings.mSoften,0,1);
    mShuffleSlider = new FloatSlider(this,"shuffle",mSoftenSlider, kAnchor_Below,90,15,&mLFOSettings.mShuffle,0,1);
@@ -173,8 +173,8 @@ void FloatSliderLFOControl::SetLFOEnabled(bool enabled)
    {
       if (mTarget)
       {
-         mMin = mTarget->GetValue();
-         mMax = mTarget->GetValue();
+         GetMin() = mTarget->GetValue();
+         GetMax() = mTarget->GetValue();
       }
    }
    mEnabled = enabled;
@@ -222,7 +222,7 @@ float FloatSliderLFOControl::GetLFOValue(int samplesIn /*= 0*/, float forcePhase
    float val = mLFO.Value(samplesIn, forcePhase);
    if (mLFOSettings.mSpread > 0)
       val = val * (1-mLFOSettings.mSpread) + (-cosf(val * FPI) + 1) * .5f * mLFOSettings.mSpread;
-   return ofClamp(Interp(val, mMin, mMax), mTarget->GetMin(), mTarget->GetMax());
+   return ofClamp(Interp(val, GetMin(), GetMax()), mTarget->GetMin(), mTarget->GetMax());
 }
 
 void FloatSliderLFOControl::UpdateFromSettings()

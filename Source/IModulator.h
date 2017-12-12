@@ -10,8 +10,9 @@
 
 #pragma once
 
+#include "Slider.h"
+
 class PatchCableSource;
-class FloatSlider;
 
 class IModulator
 {
@@ -22,13 +23,15 @@ public:
    virtual bool Active() const = 0;
    virtual bool CanAdjustRange() const { return true; }
    virtual bool InitializeWithZeroRange() const { return false; }
-   float& GetMin() { return mMin; }
-   float& GetMax() { return mMax; }
+   float& GetMin() { return mTarget->GetModulatorMin(); }
+   float& GetMax() { return mTarget->GetModulatorMax(); }
    void OnModulatorRepatch();
 protected:
    void InitializeRange();
-   float mMin;
-   float mMax;
+   
+   float mDummyMin;
+   float mDummyMax;
+   
    PatchCableSource* mTargetCable;
    FloatSlider* mMinSlider;
    FloatSlider* mMaxSlider;

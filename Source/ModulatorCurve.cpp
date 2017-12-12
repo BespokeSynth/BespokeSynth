@@ -60,7 +60,7 @@ void ModulatorCurve::PostRepatch(PatchCableSource* cableSource)
 float ModulatorCurve::Value(int samplesIn)
 {
    ComputeSliders(samplesIn);
-   return ofMap(MathUtils::Curve(mInput, mCurve), 0, 1, mMin, mMax, K(clamp));
+   return ofMap(MathUtils::Curve(mInput, mCurve), 0, 1, GetMin(), GetMax(), K(clamp));
 }
 
 void ModulatorCurve::SaveLayout(ofxJSONElement& moduleInfo)

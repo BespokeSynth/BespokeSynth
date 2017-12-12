@@ -14,8 +14,8 @@
 #include "ModularSynth.h"
 
 IModulator::IModulator()
-: mMin(0)
-, mMax(1)
+: mDummyMin(0)
+, mDummyMax(1)
 , mTargetCable(nullptr)
 , mMinSlider(nullptr)
 , mMaxSlider(nullptr)
@@ -55,13 +55,13 @@ void IModulator::InitializeRange()
    {
       if (InitializeWithZeroRange())
       {
-         mMin = mTarget->GetValue();
-         mMax = mTarget->GetValue();
+         GetMin() = mTarget->GetValue();
+         GetMax() = mTarget->GetValue();
       }
       else
       {
-         mMin = mTarget->GetMin();
-         mMax = mTarget->GetMax();
+         GetMin() = mTarget->GetMin();
+         GetMax() = mTarget->GetMax();
       }
    }
    
@@ -69,10 +69,12 @@ void IModulator::InitializeRange()
    {
       mMinSlider->SetExtents(mTarget->GetMin(), mTarget->GetMax());
       mMinSlider->SetMode(mTarget->GetMode());
+      mMinSlider->SetVar(&GetMin());
    }
    if (mMaxSlider)
    {
       mMaxSlider->SetExtents(mTarget->GetMin(), mTarget->GetMax());
       mMaxSlider->SetMode(mTarget->GetMode());
+      mMaxSlider->SetVar(&GetMax());
    }
 }

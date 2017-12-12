@@ -21,6 +21,8 @@ FloatSlider::FloatSlider(IFloatSliderListener* owner, const char* label, int x, 
 , mHeight(h)
 , mMin(min)
 , mMax(max)
+, mModulatorMin(min)
+, mModulatorMax(max)
 , mMouseDown(false)
 , mFineRefX(-999)
 , mRefY(-999)
@@ -502,7 +504,7 @@ void FloatSlider::TextEntryComplete(TextEntry* entry)
 
 namespace
 {
-   const int kFloatSliderSaveStateRev = 1;
+   const int kFloatSliderSaveStateRev = 2;
 }
 
 void FloatSlider::SaveState(FileStreamOut& out)
@@ -517,6 +519,9 @@ void FloatSlider::SaveState(FileStreamOut& out)
    {
       mLFOControl->SaveState(out);
    }
+   
+   out << mModulatorMin;
+   out << mModulatorMax;
 }
 
 void FloatSlider::LoadState(FileStreamIn& in, bool shouldSetValue)
@@ -547,6 +552,12 @@ void FloatSlider::LoadState(FileStreamIn& in, bool shouldSetValue)
       }
       if (shouldSetValue)
          lfo->UpdateFromSettings();
+   }
+   
+   if (rev >= 2)
+   {
+      in >> mModulatorMin;
+      in >> mModulatorMax;
    }
 }
 

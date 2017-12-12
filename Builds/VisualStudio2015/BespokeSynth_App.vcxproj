@@ -222,7 +222,6 @@
     <ClCompile Include="..\..\Source\MacroSlider.cpp"/>
     <ClCompile Include="..\..\Source\Metronome.cpp"/>
     <ClCompile Include="..\..\Source\MidiController.cpp"/>
-    <ClCompile Include="..\..\Source\MidiInstrument.cpp"/>
     <ClCompile Include="..\..\Source\MidiOutput.cpp"/>
     <ClCompile Include="..\..\Source\ModulationVisualizer.cpp"/>
     <ClCompile Include="..\..\Source\ModulatorAdd.cpp"/>
@@ -257,6 +256,7 @@
     <ClCompile Include="..\..\Source\NoteSustain.cpp"/>
     <ClCompile Include="..\..\Source\NoteToFreq.cpp"/>
     <ClCompile Include="..\..\Source\NoteToMs.cpp"/>
+    <ClCompile Include="..\..\Source\NoteToSpeed.cpp"/>
     <ClCompile Include="..\..\Source\NoteTransformer.cpp"/>
     <ClCompile Include="..\..\Source\NoteVibrato.cpp"/>
     <ClCompile Include="..\..\Source\OneShotLauncher.cpp"/>

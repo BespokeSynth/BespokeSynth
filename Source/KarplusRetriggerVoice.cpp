@@ -23,7 +23,7 @@ KarplusRetriggerVoice::KarplusRetriggerVoice(IDrawableModule* owner)
    mKarplusVoiceParams.mSourceType = kSourceTypeNoise;
    mKarplusVoiceParams.mMute = true;
    mKarplusVoiceParams.mStretch = false;
-   mKarplusVoiceParams.mCarrier = 100;
+   mKarplusVoiceParams.mExciterFreq = 100;
    mKarplusVoiceParams.mExcitation = 0;
    
    mKarplusVoice.SetVoiceParams(&mKarplusVoiceParams);

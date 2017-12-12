@@ -65,7 +65,6 @@
 		362702F638CD8ED3389B4C7B /* ScaleDegree.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 1B0FF1BE972923F406F860BB /* ScaleDegree.cpp */; };
 		37B7BDACE59F4586DEA3A142 /* Sample.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 7FA8A476786A4B1458902D74 /* Sample.cpp */; };
 		37E285697A7A58C4ADFC615F /* CircleSequencer.cpp in Sources */ = {isa = PBXBuildFile; fileRef = E2853D6DED5EE5B27144F978 /* CircleSequencer.cpp */; };
-		3851D9528FE80D3A0AAC45ED /* MidiInstrument.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 28F5486AB841E73FB54F18A0 /* MidiInstrument.cpp */; };
 		3917819C66A73166D1ABB3DD /* INoteSource.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 6DACD506E4EC1311F1EDC9EE /* INoteSource.cpp */; };
 		395D7AE87502A0F0CC8A3CFF /* include_juce_video.mm in Sources */ = {isa = PBXBuildFile; fileRef = 5A0557B800F1C797E7A0D454 /* include_juce_video.mm */; };
 		39912A89015019B30532F41D /* ModulatorAddCentered.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 5E5D925E220F71ED37556185 /* ModulatorAddCentered.cpp */; };
@@ -286,6 +285,7 @@
 		F0491DC7A14256EC4C2C5075 /* NoteChainNode.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 69F1E38149A263F1895C791A /* NoteChainNode.cpp */; };
 		F0B978A862482E31A1CD21DC /* ModwheelToPressure.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 5085B828AC0F47F43C4A86BA /* ModwheelToPressure.cpp */; };
 		F5B23B069ACE8765ADD0F0C5 /* OneShotLauncher.cpp in Sources */ = {isa = PBXBuildFile; fileRef = B1501272F97776BE7FEAF153 /* OneShotLauncher.cpp */; };
+		F6A3F423439EB74E5155D45A /* NoteToSpeed.cpp in Sources */ = {isa = PBXBuildFile; fileRef = D8DA6CE8ED5D34DA04F6F0E6 /* NoteToSpeed.cpp */; };
 		F6A5AC6D148EAB101D7B6EC5 /* ButterworthFilterEffect.cpp in Sources */ = {isa = PBXBuildFile; fileRef = FE7085EB2E63BFFD08EAFC8A /* ButterworthFilterEffect.cpp */; };
 		F6E15B2070FAE812F0FC82F5 /* MidiController.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 7E67363AA76E3F2B609DC715 /* MidiController.cpp */; };
 		F739A6C6E3A1F21ADDE48EE4 /* TakeRecorder.cpp in Sources */ = {isa = PBXBuildFile; fileRef = E16CDA8C7C3C1F49D2126873 /* TakeRecorder.cpp */; };
@@ -383,6 +383,7 @@
 		1F88FA74E70311546BF39674 /* allpass.hpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; name = allpass.hpp; path = ../../Source/freeverb/allpass.hpp; sourceTree = SOURCE_ROOT; };
 		2116980ADE29959B585A4ADF /* CoreAudioKit.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = CoreAudioKit.framework; path = System/Library/Frameworks/CoreAudioKit.framework; sourceTree = SDKROOT; };
 		214A994C0AB42D29967A1819 /* FeedbackModule.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; name = FeedbackModule.h; path = ../../Source/FeedbackModule.h; sourceTree = SOURCE_ROOT; };
+		21BCC224E8BF7500881D69F5 /* NoteToSpeed.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; name = NoteToSpeed.h; path = ../../Source/NoteToSpeed.h; sourceTree = SOURCE_ROOT; };
 		22E3EABECEDC11B6D4957ACC /* Capo.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; name = Capo.cpp; path = ../../Source/Capo.cpp; sourceTree = SOURCE_ROOT; };
 		23044B68BD985F731FE07D1E /* AdditiveVoice.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; name = AdditiveVoice.h; path = ../../Source/AdditiveVoice.h; sourceTree = SOURCE_ROOT; };
 		231777BFF3570721FB61C94D /* allpass.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; name = allpass.cpp; path = ../../Source/freeverb/allpass.cpp; sourceTree = SOURCE_ROOT; };
@@ -399,7 +400,6 @@
 		282116A45AB2BDF3E727E3D6 /* PitchSetter.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; name = PitchSetter.h; path = ../../Source/PitchSetter.h; sourceTree = SOURCE_ROOT; };
 		2850F6339D6A0E2D29D43160 /* Metronome.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; name = Metronome.cpp; path = ../../Source/Metronome.cpp; sourceTree = SOURCE_ROOT; };
 		288350102DE7709A149A8588 /* ClipLauncher.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; name = ClipLauncher.cpp; path = ../../Source/ClipLauncher.cpp; sourceTree = SOURCE_ROOT; };
-		28F5486AB841E73FB54F18A0 /* MidiInstrument.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; name = MidiInstrument.cpp; path = ../../Source/MidiInstrument.cpp; sourceTree = SOURCE_ROOT; };
 		28F957FC1CAE4D53C4EFCFB6 /* NoteVibrato.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; name = NoteVibrato.cpp; path = ../../Source/NoteVibrato.cpp; sourceTree = SOURCE_ROOT; };
 		29B6DBF67CBCBADDF338BBD0 /* WaveformViewer.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; name = WaveformViewer.cpp; path = ../../Source/WaveformViewer.cpp; sourceTree = SOURCE_ROOT; };
 		29F693E4726D77AB580372FB /* PressureToModwheel.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; name = PressureToModwheel.h; path = ../../Source/PressureToModwheel.h; sourceTree = SOURCE_ROOT; };
@@ -703,7 +703,6 @@
 		A2DE6CF0BB00ADCAAAE11948 /* PressureToCV.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; name = PressureToCV.cpp; path = ../../Source/PressureToCV.cpp; sourceTree = SOURCE_ROOT; };
 		A300ECBED652ADA5AF0F4E52 /* IUIControl.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; name = IUIControl.h; path = ../../Source/IUIControl.h; sourceTree = SOURCE_ROOT; };
 		A34F8B6AD01794F8DE7EC665 /* ADSRDisplay.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; name = ADSRDisplay.h; path = ../../Source/ADSRDisplay.h; sourceTree = SOURCE_ROOT; };
-		A440B6DF6A5A32EB2F994379 /* MidiInstrument.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; name = MidiInstrument.h; path = ../../Source/MidiInstrument.h; sourceTree = SOURCE_ROOT; };
 		A4814580BA4261012B9E91A1 /* MathUtils.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; name = MathUtils.h; path = ../../Source/MathUtils.h; sourceTree = SOURCE_ROOT; };
 		A4A7CD16F2255291CACAB99D /* ModulatorAdd.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; name = ModulatorAdd.cpp; path = ../../Source/ModulatorAdd.cpp; sourceTree = SOURCE_ROOT; };
 		A4E7370F0B6F25EF29D4DE82 /* Ramper.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; name = Ramper.h; path = ../../Source/Ramper.h; sourceTree = SOURCE_ROOT; };
@@ -826,6 +825,7 @@
 		D6A845BF0AD721DE19F1FC1D /* PitchDive.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; name = PitchDive.cpp; path = ../../Source/PitchDive.cpp; sourceTree = SOURCE_ROOT; };
 		D7A22ABFE3E5A0B97D14ECB6 /* MainComponent.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; name = MainComponent.cpp; path = ../../Source/MainComponent.cpp; sourceTree = SOURCE_ROOT; };
 		D8B73FD940FEF86D4A67B944 /* VSTPlugin.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; name = VSTPlugin.h; path = ../../Source/VSTPlugin.h; sourceTree = SOURCE_ROOT; };
+		D8DA6CE8ED5D34DA04F6F0E6 /* NoteToSpeed.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; name = NoteToSpeed.cpp; path = ../../Source/NoteToSpeed.cpp; sourceTree = SOURCE_ROOT; };
 		D911AD185D2CEE360E22B542 /* include_juce_events.mm */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.objcpp; name = include_juce_events.mm; path = ../../JuceLibraryCode/include_juce_events.mm; sourceTree = SOURCE_ROOT; };
 		D934AE99E8501F44BAC1D0BC /* NoteDisplayer.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; name = NoteDisplayer.h; path = ../../Source/NoteDisplayer.h; sourceTree = SOURCE_ROOT; };
 		D938C9827BA767B2862CDED6 /* Kicker.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; name = Kicker.h; path = ../../Source/Kicker.h; sourceTree = SOURCE_ROOT; };
@@ -1514,8 +1514,6 @@
 				49C0E0D44FDC6818B745B227 /* Metronome.h */,
 				7E67363AA76E3F2B609DC715 /* MidiController.cpp */,
 				19F34F42A4F003DEE9B93639 /* MidiController.h */,
-				28F5486AB841E73FB54F18A0 /* MidiInstrument.cpp */,
-				A440B6DF6A5A32EB2F994379 /* MidiInstrument.h */,
 				5E80AD318ADC5C9BB33E66E7 /* MidiOutput.cpp */,
 				BF25DB5C165BDE5095AE0066 /* MidiOutput.h */,
 				2FE07A2E2330F67A659C7433 /* ModulationVisualizer.cpp */,
@@ -1584,6 +1582,8 @@
 				FAEF7F3654208084A0A8CE42 /* NoteToFreq.h */,
 				10B41247FD9505F9F80A01BA /* NoteToMs.cpp */,
 				6EB41B951021918F37A3D2DC /* NoteToMs.h */,
+				D8DA6CE8ED5D34DA04F6F0E6 /* NoteToSpeed.cpp */,
+				21BCC224E8BF7500881D69F5 /* NoteToSpeed.h */,
 				3B69CEE688792119EC52F6BC /* NoteTransformer.cpp */,
 				DB51382FF1869F374C851353 /* NoteTransformer.h */,
 				28F957FC1CAE4D53C4EFCFB6 /* NoteVibrato.cpp */,
@@ -1809,7 +1809,7 @@
 			};
 			buildConfigurationList = 7FCFF517466C63AAB04E33BA /* Build configuration list for PBXProject "BespokeSynth" */;
 			compatibilityVersion = "Xcode 3.2";
-			developmentRegion = English;
+			developmentRegion = en;
 			hasScannedForEncodings = 0;
 			knownRegions = (
 				en,
@@ -1922,7 +1922,6 @@
 				A04C1DF3AC5698E3179548A9 /* MacroSlider.cpp in Sources */,
 				401C1C9D7A2917F0AAE9A164 /* Metronome.cpp in Sources */,
 				F6E15B2070FAE812F0FC82F5 /* MidiController.cpp in Sources */,
-				3851D9528FE80D3A0AAC45ED /* MidiInstrument.cpp in Sources */,
 				5A7C1973E2EB82713C4C648F /* MidiOutput.cpp in Sources */,
 				792526F82A871976C33D8A92 /* ModulationVisualizer.cpp in Sources */,
 				65D44EF6D2DF0BBCB7A2493B /* ModulatorAdd.cpp in Sources */,
@@ -1957,6 +1956,7 @@
 				9CAA3A3C6EC50A369C16746F /* NoteSustain.cpp in Sources */,
 				DA8B2540C1D7550F07D0B6C5 /* NoteToFreq.cpp in Sources */,
 				931AF57FAF594688A0C2CE6E /* NoteToMs.cpp in Sources */,
+				F6A3F423439EB74E5155D45A /* NoteToSpeed.cpp in Sources */,
 				5DFC354EFDA6BE2A5BE6F134 /* NoteTransformer.cpp in Sources */,
 				B20047EED297197F657E7377 /* NoteVibrato.cpp in Sources */,
 				F5B23B069ACE8765ADD0F0C5 /* OneShotLauncher.cpp in Sources */,

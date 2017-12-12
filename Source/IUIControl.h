@@ -26,7 +26,7 @@ enum AnchorDirection
 class IUIControl : public IClickable
 {
 public:
-   IUIControl() : mRemoteControlCount(0), mNoHover(false) {}
+   IUIControl() : mRemoteControlCount(0), mNoHover(false), mShouldSaveState(true) {}
    void Delete() { delete this; }
    void AddRemoteController() { ++mRemoteControlCount; }
    void RemoveRemoteController() { ++mRemoteControlCount; }
@@ -56,6 +56,8 @@ public:
    virtual bool AttemptTextInput() { return false; }
    void PositionTo(IUIControl* anchor, AnchorDirection direction);
    void GetColors(ofColor& color, ofColor& textColor);
+   bool GetShouldSaveState() const { return mShouldSaveState; }
+   void SetShouldSaveState(bool save) { mShouldSaveState = save; }
    
    virtual void SaveState(FileStreamOut& out) = 0;
    virtual void LoadState(FileStreamIn& in, bool shouldSetValue = true) = 0;
@@ -64,6 +66,7 @@ protected:
    
    int mRemoteControlCount;
    bool mNoHover;
+   bool mShouldSaveState;
 };
 
 #endif

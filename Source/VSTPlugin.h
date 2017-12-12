@@ -24,7 +24,7 @@
 #include "VSTWindow.h"
 
 class ofxJSONElement;
-class NSWindowOverlay;
+//class NSWindowOverlay;
 
 namespace VSTLookup
 {
@@ -126,7 +126,7 @@ private:
    ofMutex mVSTMutex;
    VSTPlayhead mPlayhead;
    
-   NSWindowOverlay* mWindowOverlay;
+   //NSWindowOverlay* mWindowOverlay;
    
    enum DisplayMode
    {

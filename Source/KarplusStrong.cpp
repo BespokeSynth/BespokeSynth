@@ -20,19 +20,12 @@ KarplusStrong::KarplusStrong()
 , mSourceDropdown(nullptr)
 , mMuteCheckbox(nullptr)
 , mStretchCheckbox(nullptr)
-, mCarrierSlider(nullptr)
+, mExciterFreqSlider(nullptr)
+, mExciterAttackSlider(nullptr)
+, mExciterDecaySlider(nullptr)
 , mPolyMgr(this)
 , mWriteBuffer(gBufferSize)
 {
-   mVoiceParams.mFilter = .6f;
-   mVoiceParams.mVol = 1.0f;
-   mVoiceParams.mFeedback = .998f;
-   mVoiceParams.mSourceType = kSourceTypeMix;
-   mVoiceParams.mMute = true;
-   mVoiceParams.mStretch = false;
-   mVoiceParams.mCarrier = 100;
-   mVoiceParams.mExcitation = 0;
-
    mPolyMgr.Init(kVoiceType_Karplus, &mVoiceParams);
 
    AddChild(&mBiquad);
@@ -46,18 +39,24 @@ KarplusStrong::KarplusStrong()
 void KarplusStrong::CreateUIControls()
 {
    IDrawableModule::CreateUIControls();
-   mFilterSlider = new FloatSlider(this,"filter",4,38,140,15,&mVoiceParams.mFilter,0,1.2f);
-   mFeedbackSlider = new FloatSlider(this,"feedback",4,54,140,15,&mVoiceParams.mFeedback,.9f,.9999f,4);
-   mVolSlider = new FloatSlider(this,"vol",4,22,80,15,&mVoiceParams.mVol,0,2);
-   mSourceDropdown = new DropdownList(this,"source type",48,70,(int*)&mVoiceParams.mSourceType);
-   mMuteCheckbox = new Checkbox(this,"mute",4,70,&mVoiceParams.mMute);
-   mStretchCheckbox = new Checkbox(this,"stretch",100,22,&mVoiceParams.mStretch);
-   mCarrierSlider = new FloatSlider(this,"c",95,70,50,15,&mVoiceParams.mCarrier,10,400);
+   mVolSlider = new FloatSlider(this,"vol",3,2,80,15,&mVoiceParams.mVol,0,2);
+   mMuteCheckbox = new Checkbox(this,"mute",mVolSlider,kAnchor_Right,&mVoiceParams.mMute);
+   mFilterSlider = new FloatSlider(this,"filter",mVolSlider,kAnchor_Below,140,15,&mVoiceParams.mFilter,0,1.2f);
+   mFeedbackSlider = new FloatSlider(this,"feedback",mFilterSlider,kAnchor_Below,140,15,&mVoiceParams.mFeedback,.9f,.9999f,4);
+   mSourceDropdown = new DropdownList(this,"source type",mFeedbackSlider,kAnchor_Below,(int*)&mVoiceParams.mSourceType,45);
+   mExciterFreqSlider = new FloatSlider(this,"x freq",mSourceDropdown,kAnchor_Right,92,15,&mVoiceParams.mExciterFreq,10,4000);
+   mExciterAttackSlider = new FloatSlider(this,"x att",mSourceDropdown,kAnchor_Below,69,15,&mVoiceParams.mExciterAttack,1,40);
+   mExciterDecaySlider = new FloatSlider(this,"x dec",mExciterAttackSlider,kAnchor_Right,68,15,&mVoiceParams.mExciterDecay,1,40);
+   //mStretchCheckbox = new Checkbox(this,"stretch",mVolSlider,kAnchor_Right,&mVoiceParams.mStretch);
    
    mSourceDropdown->AddLabel("sin", kSourceTypeSin);
    mSourceDropdown->AddLabel("white", kSourceTypeNoise);
    mSourceDropdown->AddLabel("mix", kSourceTypeMix);
    mSourceDropdown->AddLabel("saw", kSourceTypeSaw);
+   
+   mExciterFreqSlider->SetMode(FloatSlider::kSquare);
+   mExciterAttackSlider->SetMode(FloatSlider::kSquare);
+   mExciterDecaySlider->SetMode(FloatSlider::kSquare);
    
    mBiquad.CreateUIControls();
 }
@@ -114,8 +113,10 @@ void KarplusStrong::DrawModule()
    mSourceDropdown->Draw();
    mMuteCheckbox->Draw();
    
-   mStretchCheckbox->Draw();
-   mCarrierSlider->Draw();
+   //mStretchCheckbox->Draw();
+   mExciterFreqSlider->Draw();
+   mExciterAttackSlider->Draw();
+   mExciterDecaySlider->Draw();
 
    mBiquad.Draw();
 }

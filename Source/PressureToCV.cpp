@@ -30,8 +30,8 @@ void PressureToCV::CreateUIControls()
    mTargetCable = new PatchCableSource(this, kConnectionType_UIControl);
    AddPatchCableSource(mTargetCable);
    
-   mMinSlider = new FloatSlider(this, "min", 3, 2, 100, 15, &mMin, 0, 1);
-   mMaxSlider = new FloatSlider(this, "max", mMinSlider, kAnchor_Below, 100, 15, &mMax, 0, 1);
+   mMinSlider = new FloatSlider(this, "min", 3, 2, 100, 15, &mDummyMin, 0, 1);
+   mMaxSlider = new FloatSlider(this, "max", mMinSlider, kAnchor_Below, 100, 15, &mDummyMax, 0, 1);
 }
 
 void PressureToCV::DrawModule()
@@ -59,7 +59,7 @@ void PressureToCV::PlayNote(double time, int pitch, int velocity, int voiceIdx /
 float PressureToCV::Value(int samplesIn)
 {
    float pressure = mPressure ? mPressure->GetValue(samplesIn) : 0;
-   return ofMap(pressure,0,1,mMin,mMax,K(clamped));
+   return ofMap(pressure,0,1,GetMin(),GetMax(),K(clamped));
 }
 
 void PressureToCV::SaveLayout(ofxJSONElement& moduleInfo)
@@ -82,6 +82,5 @@ void PressureToCV::LoadLayout(const ofxJSONElement& moduleInfo)
 
 void PressureToCV::SetUpFromSaveData()
 {
-   mTarget = dynamic_cast<FloatSlider*>(TheSynth->FindUIControl(mModuleSaveData.GetString("target")));
-   mTargetCable->SetTarget(mTarget);
+   mTargetCable->SetTarget(TheSynth->FindUIControl(mModuleSaveData.GetString("target")));
 }

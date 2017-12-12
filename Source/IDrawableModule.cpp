@@ -324,19 +324,15 @@ void IDrawableModule::Render()
    
    ofPopMatrix();
 	ofPopStyle();
-   
-   ofPushMatrix();
-   
-   if (GetParent())
-      ofTranslate(-GetParent()->GetPosition().x, -GetParent()->GetPosition().y);
-   
+}
+
+void IDrawableModule::DrawPatchCables()
+{
    for (auto source : mPatchCableSources)
    {
       source->UpdatePosition();
       source->Draw();
    }
-   
-   ofPopMatrix();
 }
 
 //static
@@ -650,6 +646,10 @@ void IDrawableModule::AddUIControl(IUIControl* control)
             {
                //they're both just buttons, this is fine
             }
+            else if (!dupe->GetShouldSaveState())
+            {
+               //we're duplicating the name of a non-saving ui control, assume that we are also not saving (hopefully that's true), and this is fine
+            }
             else
             {
                assert(false); //can't have multiple ui controls with the same name!
@@ -873,17 +873,21 @@ void IDrawableModule::SaveState(FileStreamOut& out)
    
    out << kSaveStateRev;
    
-   out << int(mUIControls.size() - ControlsToIgnoreInSaveState().size());
+   vector<IUIControl*> controlsToSave;
    for (auto* control : mUIControls)
    {
+      if (!VectorContains(control, ControlsToIgnoreInSaveState()) && control->GetShouldSaveState())
+         controlsToSave.push_back(control);
+   }
+   
+   out << (int)controlsToSave.size();
+   for (auto* control : controlsToSave)
+   {
       //ofLog() << "Saving control " << control->Name();
-      if (!VectorContains(control, ControlsToIgnoreInSaveState()))
-      {
-         out << string(control->Name());
-         control->SaveState(out);
-         for (int i=0; i<kControlSeparatorLength; ++i)
-            out << kControlSeparator[i];
-      }
+      out << string(control->Name());
+      control->SaveState(out);
+      for (int i=0; i<kControlSeparatorLength; ++i)
+         out << kControlSeparator[i];
    }
    
    if (GetContainer())

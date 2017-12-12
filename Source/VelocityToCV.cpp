@@ -30,8 +30,8 @@ void VelocityToCV::CreateUIControls()
    mTargetCable = new PatchCableSource(this, kConnectionType_UIControl);
    AddPatchCableSource(mTargetCable);
    
-   mMinSlider = new FloatSlider(this, "min", 3, 2, 100, 15, &mMin, 0, 1);
-   mMaxSlider = new FloatSlider(this, "max", mMinSlider, kAnchor_Below, 100, 15, &mMax, 0, 1);
+   mMinSlider = new FloatSlider(this, "min", 3, 2, 100, 15, &mDummyMin, 0, 1);
+   mMaxSlider = new FloatSlider(this, "max", mMinSlider, kAnchor_Below, 100, 15, &mDummyMax, 0, 1);
 }
 
 void VelocityToCV::DrawModule()
@@ -58,7 +58,7 @@ void VelocityToCV::PlayNote(double time, int pitch, int velocity, int voiceIdx /
 
 float VelocityToCV::Value(int samplesIn)
 {
-   return ofMap(mVelocity,0,127,mMin,mMax,K(clamped));
+   return ofMap(mVelocity,0,127,GetMin(),GetMax(),K(clamped));
 }
 
 void VelocityToCV::SaveLayout(ofxJSONElement& moduleInfo)
@@ -81,6 +81,5 @@ void VelocityToCV::LoadLayout(const ofxJSONElement& moduleInfo)
 
 void VelocityToCV::SetUpFromSaveData()
 {
-   mTarget = dynamic_cast<FloatSlider*>(TheSynth->FindUIControl(mModuleSaveData.GetString("target")));
-   mTargetCable->SetTarget(mTarget);
+   mTargetCable->SetTarget(TheSynth->FindUIControl(mModuleSaveData.GetString("target")));
 }

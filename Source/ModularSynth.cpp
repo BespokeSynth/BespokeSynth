@@ -2,7 +2,6 @@
 #include "IAudioSource.h"
 #include "IAudioEffect.h"
 #include "SynthGlobals.h"
-#include "MidiInstrument.h"
 #include "Scale.h"
 #include "Transport.h"
 #include "TextEntry.h"
@@ -243,6 +242,7 @@ void ModularSynth::Draw(void* vg)
    TheSaveDataPanel->UpdatePosition();
    
    mModuleContainer.Draw();
+   mModuleContainer.DrawPatchCables();
    
    for (auto* modal : mModalFocusItemStack)
       modal->Draw();
@@ -893,7 +893,6 @@ void ModularSynth::OnModuleDeleted(IDrawableModule* module)
    for (auto* cable : cablesToRemove)
       RemoveFromVector(cable, mPatchCables);
    
-   RemoveFromVector(dynamic_cast<MidiInstrument*>(module),mInstruments);
    RemoveFromVector(dynamic_cast<IAudioSource*>(module),mSources);
    RemoveFromVector(module,mLissajousDrawers);
    TheTransport->RemoveAudioPoller(dynamic_cast<IAudioPoller*>(module));
@@ -1175,7 +1174,6 @@ void ModularSynth::ResetLayout()
       mOutput[i] = nullptr;
 
    mDeletedModules.clear();
-   mInstruments.clear();
    mSources.clear();
    mLissajousDrawers.clear();
    mMoveModule = nullptr;
@@ -1366,14 +1364,6 @@ void ModularSynth::SetUpModule(IDrawableModule* module, const ofxJSONElement& mo
       mIsLoadingModule = true;
       module->LoadLayout(moduleInfo);
       mIsLoadingModule = false;
-      
-      /*IAudioSource* source = dynamic_cast<IAudioSource*>(module);
-      if (source)
-         mSources.push_back(source);
-      
-      MidiInstrument* inst = dynamic_cast<MidiInstrument*>(module);
-      if (inst)
-         mInstruments.push_back(inst);*/
    }
    catch (UnknownModuleException& e)
    {
@@ -1386,10 +1376,6 @@ void ModularSynth::OnModuleAdded(IDrawableModule* module)
    IAudioSource* source = dynamic_cast<IAudioSource*>(module);
    if (source)
       mSources.push_back(source);
-   
-   MidiInstrument* inst = dynamic_cast<MidiInstrument*>(module);
-   if (inst)
-      mInstruments.push_back(inst);
 }
 
 void ModularSynth::AddDynamicModule(IDrawableModule* module)

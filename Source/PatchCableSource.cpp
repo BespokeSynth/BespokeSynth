@@ -337,6 +337,14 @@ void PatchCableSource::FindValidTargets()
    TheSynth->GetAllModules(allModules);
    for (auto module : allModules)
    {
+      if (mType == kConnectionType_UIControl && module != TheTitleBar)
+      {
+         for (auto uicontrol : module->GetUIControls())
+         {
+            if (uicontrol->IsShowing() && dynamic_cast<ADSRDisplay*>(uicontrol) == nullptr)
+               mValidTargets.push_back(uicontrol);
+         }
+      }
       if (module == mOwner)
          continue;
       if (module == mOwner->GetParent())
@@ -349,14 +357,6 @@ void PatchCableSource::FindValidTargets()
          mValidTargets.push_back(module);
       if (mType == kConnectionType_Grid && dynamic_cast<IGridControllerListener*>(module))
          mValidTargets.push_back(module);
-      if (mType == kConnectionType_UIControl && module != TheTitleBar)
-      {
-         for (auto uicontrol : module->GetUIControls())
-         {
-            if (uicontrol->IsShowing() && dynamic_cast<ADSRDisplay*>(uicontrol) == nullptr)
-               mValidTargets.push_back(uicontrol);
-         }
-      }
       if (mType == kConnectionType_Special)
       {
          mValidTargets.push_back(module);
@@ -406,7 +406,7 @@ void PatchCableSource::SetTarget(IClickable* target)
    {
       if (mPatchCables.empty())
          AddPatchCable(target);
-      else
+      else if (mPatchCables[0]->GetTarget() != target)
          SetPatchCableTarget(mPatchCables[0], target);
    }
    else

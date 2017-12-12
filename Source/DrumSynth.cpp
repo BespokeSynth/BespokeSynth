@@ -431,8 +431,6 @@ void DrumSynth::CheckboxUpdated(Checkbox* checkbox)
    if (checkbox == mEditCheckbox)
    {
       TheSynth->MoveToFront(this);
-      if (mEditMode && mTwister != nullptr)
-         mTwister->SetPage(0);
    }
 }
 

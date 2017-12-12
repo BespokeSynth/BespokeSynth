@@ -265,22 +265,11 @@ void Sample::LoadState(FileStreamIn& in)
    
    int numSamples;
    in >> numSamples;
-   if (rev == 0)
+   if (numSamples > 0)
    {
-      float* sample = new float[numSamples];
-      ChannelBuffer temp(sample, numSamples);
-      in.Read(sample, numSamples);
-      Create(&temp);
-      delete[] sample;
-   }
-   if (rev > 0)
-   {
-      if (numSamples > 0)
-      {
-         int readLength;
-         mData.Load(in, readLength);
-         assert(readLength == mNumSamples);
-      }
+      int readLength;
+      mData.Load(in, readLength);
+      assert(readLength == mNumSamples);
    }
    in >> mNumBars;
    in >> mLooping;

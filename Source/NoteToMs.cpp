@@ -76,6 +76,5 @@ void NoteToMs::LoadLayout(const ofxJSONElement& moduleInfo)
 
 void NoteToMs::SetUpFromSaveData()
 {
-   mTarget = dynamic_cast<FloatSlider*>(TheSynth->FindUIControl(mModuleSaveData.GetString("target")));
-   mTargetCable->SetTarget(mTarget);
+   mTargetCable->SetTarget(TheSynth->FindUIControl(mModuleSaveData.GetString("target")));
 }

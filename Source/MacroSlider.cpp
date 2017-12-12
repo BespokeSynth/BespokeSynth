@@ -126,8 +126,8 @@ MacroSlider::Mapping::~Mapping()
 
 void MacroSlider::Mapping::CreateUIControls()
 {
-   mMinSlider = new FloatSlider(mOwner,("start"+ofToString(mIndex+1)).c_str(), 5, 25+mIndex*kMappingSpacing, 100, 15, &mMin, 0, 1);
-   mMaxSlider = new FloatSlider(mOwner,("end"+ofToString(mIndex+1)).c_str(), 5, 39+mIndex*kMappingSpacing, 100, 15, &mMax, 0, 1);
+   mMinSlider = new FloatSlider(mOwner,("start"+ofToString(mIndex+1)).c_str(), 5, 25+mIndex*kMappingSpacing, 100, 15, &mDummyMin, 0, 1);
+   mMaxSlider = new FloatSlider(mOwner,("end"+ofToString(mIndex+1)).c_str(), 5, 39+mIndex*kMappingSpacing, 100, 15, &mDummyMax, 0, 1);
    mTargetCable = new PatchCableSource(mOwner, kConnectionType_UIControl);
    mTargetCable->SetManualPosition(110, 39+mIndex*kMappingSpacing);
    mOwner->AddPatchCableSource(mTargetCable);
@@ -141,7 +141,7 @@ void MacroSlider::Mapping::UpdateControl()
 float MacroSlider::Mapping::Value(int samplesIn)
 {
    mOwner->ComputeSliders(samplesIn);
-   return ofMap(mOwner->GetValue(), 0, 1, mMin, mMax, K(clamp));
+   return ofMap(mOwner->GetValue(), 0, 1, GetMin(), GetMax(), K(clamp));
 }
 
 void MacroSlider::Mapping::Draw()

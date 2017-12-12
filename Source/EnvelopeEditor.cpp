@@ -192,7 +192,7 @@ void EnvelopeControl::OnClicked(int x, int y, bool right)
             }
          }
       }
-      else if (gTime < mLastClickTime + 1000 &&
+      else if (gTime < mLastClickTime + 500 &&
                mHighlightCurve != -1 &&
                (mClickStart - ofVec2f(x,y)).lengthSquared() < pointClickRadius*pointClickRadius)
       {
@@ -270,8 +270,6 @@ void EnvelopeControl::MouseMoved(float x, float y)
          if (abs(mViewAdsr.Value(time) - valueForY) < .1f)
          {
             mHighlightCurve = mViewAdsr.GetStageForTime(time);
-            if (mHighlightCurve == mViewAdsr.GetNumStages())
-               mHighlightCurve = -1;
             if (mViewAdsr.GetHasSustainStage() && mHighlightCurve == mViewAdsr.GetSustainStage() && time > GetPreSustainTime())
                mHighlightCurve = -1;
          }

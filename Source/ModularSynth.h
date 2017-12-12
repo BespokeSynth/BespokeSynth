@@ -15,7 +15,6 @@
 #include "ModuleContainer.h"
 
 class IAudioSource;
-class MidiInstrument;
 class InputChannel;
 class OutputChannel;
 class IAudioReceiver;
@@ -180,7 +179,6 @@ private:
    ofSoundStream mSoundStream;
    int mIOBufferSize;
    
-   vector<MidiInstrument*> mInstruments;
    vector<IAudioSource*> mSources;
    InputChannel* mInput[MAX_INPUT_CHANNELS];
    OutputChannel* mOutput[MAX_OUTPUT_CHANNELS];

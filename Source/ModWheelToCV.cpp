@@ -30,8 +30,8 @@ void ModWheelToCV::CreateUIControls()
    mTargetCable = new PatchCableSource(this, kConnectionType_UIControl);
    AddPatchCableSource(mTargetCable);
    
-   mMinSlider = new FloatSlider(this, "min", 3, 2, 100, 15, &mMin, 0, 1);
-   mMaxSlider = new FloatSlider(this, "max", mMinSlider, kAnchor_Below, 100, 15, &mMax, 0, 1);
+   mMinSlider = new FloatSlider(this, "min", 3, 2, 100, 15, &mDummyMin, 0, 1);
+   mMaxSlider = new FloatSlider(this, "max", mMinSlider, kAnchor_Below, 100, 15, &mDummyMax, 0, 1);
 }
 
 void ModWheelToCV::DrawModule()
@@ -59,7 +59,7 @@ void ModWheelToCV::PlayNote(double time, int pitch, int velocity, int voiceIdx /
 float ModWheelToCV::Value(int samplesIn)
 {
    float modWheel = mModWheel ? mModWheel->GetValue(samplesIn) : 0;
-   return ofMap(modWheel,0,1,mMin,mMax,K(clamped));
+   return ofMap(modWheel,0,1,GetMin(),GetMax(),K(clamped));
 }
 
 void ModWheelToCV::SaveLayout(ofxJSONElement& moduleInfo)
@@ -82,6 +82,5 @@ void ModWheelToCV::LoadLayout(const ofxJSONElement& moduleInfo)
 
 void ModWheelToCV::SetUpFromSaveData()
 {
-   mTarget = dynamic_cast<FloatSlider*>(TheSynth->FindUIControl(mModuleSaveData.GetString("target")));
-   mTargetCable->SetTarget(mTarget);
+   mTargetCable->SetTarget(TheSynth->FindUIControl(mModuleSaveData.GetString("target")));
 }

@@ -26,8 +26,8 @@ void AudioToCV::CreateUIControls()
    IDrawableModule::CreateUIControls();
    
    mGainSlider = new FloatSlider(this, "gain", 3, 2, 100, 15, &mGain, 1, 10);
-   mMinSlider = new FloatSlider(this, "min", mGainSlider, kAnchor_Below, 100, 15, &mMin, 0, 1);
-   mMaxSlider = new FloatSlider(this, "max", mMinSlider, kAnchor_Below, 100, 15, &mMax, 0, 1);
+   mMinSlider = new FloatSlider(this, "min", mGainSlider, kAnchor_Below, 100, 15, &mDummyMin, 0, 1);
+   mMaxSlider = new FloatSlider(this, "max", mMinSlider, kAnchor_Below, 100, 15, &mDummyMax, 0, 1);
    
    GetPatchCableSource()->SetEnabled(false);
    
@@ -88,7 +88,7 @@ void AudioToCV::PostRepatch(PatchCableSource* cableSource)
 
 float AudioToCV::Value(int samplesIn)
 {
-   return ofMap(mModulationBuffer[samplesIn] / 2 + .5f, 0, 1, mMin, mMax, K(clamp));
+   return ofMap(mModulationBuffer[samplesIn] / 2 + .5f, 0, 1, GetMin(), GetMax(), K(clamp));
 }
 
 void AudioToCV::SaveLayout(ofxJSONElement& moduleInfo)

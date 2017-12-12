@@ -36,8 +36,8 @@ void EnvelopeModulator::CreateUIControls()
    mTargetCable = new PatchCableSource(this, kConnectionType_UIControl);
    AddPatchCableSource(mTargetCable);
    
-   mMinSlider = new FloatSlider(this, "low", 2, 2, 100, 15, &mMin, 0, 1);
-   mMaxSlider = new FloatSlider(this, "high", mMinSlider, kAnchor_Below, 100, 15, &mMax, 0, 1);
+   mMinSlider = new FloatSlider(this, "low", 2, 2, 100, 15, &mDummyMin, 0, 1);
+   mMaxSlider = new FloatSlider(this, "high", mMinSlider, kAnchor_Below, 100, 15, &mDummyMax, 0, 1);
    mADSRViewLengthSlider = new FloatSlider(this,"length", mMaxSlider, kAnchor_Below,100,15,&mADSRViewLength,100,10000);
    mHasSustainStageCheckbox = new Checkbox(this, "has sustain", mADSRViewLengthSlider, kAnchor_Below, &mAdsr.GetHasSustainStage());
    mSustainStageSlider = new IntSlider(this, "sustain stage", mHasSustainStageCheckbox, kAnchor_Below, 100, 15, &mAdsr.GetSustainStage(), 1, MAX_ADSR_STAGES-1);
@@ -119,7 +119,7 @@ float EnvelopeModulator::Value(int samplesIn /*= 0*/)
 {
    ComputeSliders(samplesIn);
    if (mTarget)
-      return ofClamp(Interp(mAdsr.Value(gTime + samplesIn * gInvSampleRateMs), mMin, mMax), mTarget->GetMin(), mTarget->GetMax());
+      return ofClamp(Interp(mAdsr.Value(gTime + samplesIn * gInvSampleRateMs), GetMin(), GetMax()), mTarget->GetMin(), mTarget->GetMax());
    return 0;
 }
 

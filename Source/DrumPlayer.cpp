@@ -99,7 +99,7 @@ void DrumPlayer::DrumHit::CreateUIControls(DrumPlayer* owner, int index)
 void DrumPlayer::UpdateVisibleControls()
 {
    for (int i=0; i<NUM_DRUM_HITS; ++i)
-      mDrumHits[i].SetUIControlsShowing(i == mSelectedHitIdx);
+      mDrumHits[i].SetUIControlsShowing(i == mSelectedHitIdx && mEditMode);
 }
 
 void DrumPlayer::DrumHit::SetUIControlsShowing(bool showing)
@@ -699,6 +699,9 @@ void DrumPlayer::CheckboxUpdated(Checkbox* checkbox)
       if (mRecordDrums == false && mLooperRecorder != nullptr)
          mLooperRecorder->EndFreeRecord();
    }
+   
+   if (checkbox == mEditCheckbox)
+      UpdateVisibleControls();
    
    for (int i=0; i<NUM_DRUM_HITS; ++i)
    {

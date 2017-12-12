@@ -378,6 +378,12 @@ PatchCablePos PatchCable::GetPatchCablePos()
    ofVec2f start = mOwner->GetPosition();
    
    int wThat,hThat,xThat,yThat;
+   
+   int yThatAdjust = 0;
+   IDrawableModule* targetModule = dynamic_cast<IDrawableModule*>(mTarget);
+   if (targetModule && targetModule->HasTitleBar() && !mDragging)
+      yThatAdjust = IDrawableModule::TitleBarHeight();
+   
    if (mDragging)
    {
       int mouseX = TheSynth->GetMouseX();
@@ -393,11 +399,12 @@ PatchCablePos PatchCable::GetPatchCablePos()
       mTarget->GetPosition(xThat,yThat);
       
       IDrawableModule* targetModuleParent = mTarget->GetModuleParent();
-      if (targetModuleParent && targetModuleParent->Minimized())
+      if (targetModuleParent && (targetModuleParent->Minimized() || mTarget->IsShowing() == false))
       {
-         wThat = 0;
-         hThat = 0;
          targetModuleParent->GetPosition(xThat, yThat);
+         targetModuleParent->GetDimensions(wThat, hThat);
+         if (targetModuleParent->HasTitleBar() && !mDragging)
+            yThatAdjust = IDrawableModule::TitleBarHeight();
       }
    }
    else
@@ -407,11 +414,6 @@ PatchCablePos PatchCable::GetPatchCablePos()
       xThat = start.x;
       yThat = start.y;
    }
-   
-   int yThatAdjust = 0;
-   IDrawableModule* targetModule = dynamic_cast<IDrawableModule*>(mTarget);
-   if (targetModule && targetModule->HasTitleBar() && !mDragging)
-      yThatAdjust = IDrawableModule::TitleBarHeight();
    
    ofVec2f startDirection;
    switch (mOwner->GetCableSide())

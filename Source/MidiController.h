@@ -20,6 +20,8 @@
 #include "Transport.h"
 #include "INonstandardController.h"
 #include "TextEntry.h"
+#include "ModulationChain.h"
+#include "INoteSource.h"
 
 #define MIDI_PITCH_BEND_CONTROL_NUM 999
 #define MIDI_PAGE_WIDTH 1000
@@ -130,9 +132,11 @@ struct UIControlConnection
    
    void SetUIControl(string path);
    void CreateUIControls(int index);
-   void Draw(int index);
+   void PreDraw();
+   void DrawList(int index);
+   void DrawLayout();
    void SetShowing(bool enabled);
-   void PostRepatch(PatchCableSource* cable);
+   bool PostRepatch(PatchCableSource* cable);
    
    int mControl;
    IUIControl* mUIControl;
@@ -174,11 +178,37 @@ struct UIControlConnection
    Checkbox* mPagelessCheckbox;
    ClickButton* mRemoveButton;
    ClickButton* mCopyButton;
-   PatchCableSource* mControlCable;
    list<IUIControl*> mEditorControls;
 };
 
-class MidiController : public MidiDeviceListener, public IDrawableModule, public IButtonListener, public IDropdownListener, public IRadioButtonListener, public IAudioPoller, public ITextEntryListener
+enum ControlDrawType
+{
+   kDrawType_Button,
+   kDrawType_Knob,
+   kDrawType_Slider
+};
+
+struct ControlLayoutElement
+{
+   ControlLayoutElement() : mActive(false), mControlCable(nullptr) {}
+   void Setup(MidiController* owner, MidiMessageType type, int control, ControlDrawType drawType, float x, float y, float w, float h);
+   
+   bool mActive;
+   MidiMessageType mType;
+   int mControl;
+   ofVec2f mPosition;
+   ofVec2f mDimensions;
+   ControlDrawType mDrawType;
+   
+   PatchCableSource* mControlCable;
+   
+   float mLastValue;
+   float mLastActivityTime;
+};
+
+#define NUM_LAYOUT_CONTROLS 128*2+2
+
+class MidiController : public MidiDeviceListener, public IDrawableModule, public IButtonListener, public IDropdownListener, public IRadioButtonListener, public IAudioPoller, public ITextEntryListener, public INoteSource
 {
 public:
    MidiController();
@@ -195,11 +225,16 @@ public:
    void UseNegativeEdge(bool use) { mUseNegativeEdge = use; }
    void AddListener(MidiDeviceListener* listener, int page);
    void RemoveListener(MidiDeviceListener* listener);
-   void SetPage(int page);
+   int GetPage() const { return mControllerPage; }
    bool IsConnected();
    string GetDeviceIn() const { return mDeviceIn; }
    string GetDeviceOut() const { return mDeviceOut; }
    UIControlConnection* GetConnectionForControl(MidiMessageType messageType, int control);
+   
+   void SetVelocityMult(float mult) { mVelocityMult = mult; }
+   void SetUseChannelAsVoice(bool use) { mUseChannelAsVoice = use; }
+   void SetNoteOffset(int offset) { mNoteOffset = offset; }
+   void SetPitchBendRange(float range) { mPitchBendRange = range; }
    
    void SendNote(int page, int pitch, int velocity, bool forceNoteOn = false, int channel = -1);
    void SendCC(int page, int ctl, int value, int channel = -1);
@@ -213,6 +248,7 @@ public:
    //MidiDeviceListener
    void OnMidiNote(MidiNote& note) override;
    void OnMidiControl(MidiControl& control) override;
+   void OnMidiPressure(MidiPressure& pressure) override;
    void OnMidiProgramChange(MidiProgramChange& program) override;
    void OnMidiPitchBend(MidiPitchBend& pitchBend) override;
    
@@ -227,11 +263,20 @@ public:
    void TextEntryComplete(TextEntry* entry) override;
    void PostRepatch(PatchCableSource* cable) override;
    
+   ControlLayoutElement& GetLayoutControl(int control, MidiMessageType type);
+   
    virtual void LoadLayout(const ofxJSONElement& moduleInfo) override;
    virtual void SetUpFromSaveData() override;
    virtual void SaveLayout(ofxJSONElement& moduleInfo) override;
    
 private:
+   enum MappingDisplayMode
+   {
+      kHide,
+      kList,
+      kLayout
+   };
+   
    //IDrawableModule
    void DrawModule() override;
    void GetModuleDimensions(int& width, int& height) override;
@@ -244,6 +289,18 @@ private:
    void SetEntirePageToZero(int page);
    void BuildControllerList();
    void HighlightPageControls(int page);
+   void OnConnected();
+   UIControlConnection* AddUIControlConnection();
+   const ControlLayoutElement* GetLayoutControlForCable(PatchCableSource* cable) const;
+   
+   float mVelocityMult;
+   bool mUseChannelAsVoice;
+   float mCurrentPitchBend;
+   int mNoteOffset;
+   float mPitchBendRange;
+   int mModwheelCC;
+
+   Modulations mModulation;
 
    string mDeviceIn;
    string mDeviceOut;
@@ -256,13 +313,15 @@ private:
    bool mBindMode;
    Checkbox* mBindCheckbox;
    bool mTwoWay;
-   ClickButton* mAddConnectionCheckbox;
+   ClickButton* mAddConnectionButton;
    std::list<MidiNote> mQueuedNotes;
    std::list<MidiControl> mQueuedControls;
    std::list<MidiProgramChange> mQueuedProgramChanges;
    std::list<MidiPitchBend> mQueuedPitchBends;
    DropdownList* mControllerList;
    Checkbox* mDrawCablesCheckbox;
+   MappingDisplayMode mMappingDisplayMode;
+   RadioButton* mMappingDisplayModeSelector;
 
    int mControllerIndex;
    double mLastActivityTime;
@@ -278,7 +337,9 @@ private:
    bool mIsConnected;
    bool mHasCreatedConnectionUIControls;
    
-   ofMutex mMutex;
+   ControlLayoutElement mLayoutControls[NUM_LAYOUT_CONTROLS];
+   
+   ofMutex mQueuedMessageMutex;
 };
 
 #endif /* defined(__modularSynth__MidiController__) */

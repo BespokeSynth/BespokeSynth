@@ -20,6 +20,12 @@ KarplusStrongVoice::KarplusStrongVoice(IDrawableModule* owner)
 , mOwner(owner)
 {
    mOsc.Start(0, 1);
+   mEnv.SetNumStages(2);
+   mEnv.GetHasSustainStage() = false;
+   mEnv.GetStageData(0).target = 1;
+   mEnv.GetStageData(0).time = 3;
+   mEnv.GetStageData(1).target = 0;
+   mEnv.GetStageData(1).time = 3;
    ClearVoice();
 }
 
@@ -67,7 +73,7 @@ void KarplusStrongVoice::Process(double time, float* out, int bufferSize)
       }
       else
       {
-         oscPhaseInc = GetPhaseInc(mVoiceParams->mCarrier);
+         oscPhaseInc = GetPhaseInc(mVoiceParams->mExciterFreq);
          mOsc.SetType(kOsc_Sin);
       }
       mOscPhase += oscPhaseInc;
@@ -144,7 +150,9 @@ void KarplusStrongVoice::Start(double time, float target)
 {
    mOscPhase = FPI/2;   //magic number that seems to keep things DC centered ok
    mEnv.Clear();
-   mEnv.Start(time, target, 3, 0, 1, 3);
+   mEnv.GetStageData(0).time = mVoiceParams->mExciterAttack;
+   mEnv.GetStageData(1).time = mVoiceParams->mExciterDecay;
+   mEnv.Start(time, target);
    mEnv.SetMaxSustain(10);
    mMuteRamp.SetValue(1);
    mLastBufferSample = 0;

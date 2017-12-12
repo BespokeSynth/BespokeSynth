@@ -52,6 +52,7 @@ public:
    static bool CanCreate() { return true; }
    
    void Render() override;
+   void DrawPatchCables();
    bool CheckNeedsDraw() override;
    virtual bool AlwaysOnTop() { return false; }
    void ToggleMinimized();

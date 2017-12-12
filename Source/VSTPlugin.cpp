@@ -82,7 +82,7 @@ VSTPlugin::VSTPlugin()
 , mProgramChangeSelector(nullptr)
 , mProgramChange(0)
 , mOpenEditorButton(nullptr)
-, mWindowOverlay(nullptr)
+//, mWindowOverlay(nullptr)
 , mDisplayMode(kDisplayMode_Sliders)
 {
    mFormatManager.addDefaultFormats();
@@ -140,8 +140,8 @@ void VSTPlugin::SetVST(string vstName)
    {
       VSTWindow* window = mWindow.release();
       delete window;
-      delete mWindowOverlay;
-      mWindowOverlay = nullptr;
+      //delete mWindowOverlay;
+      //mWindowOverlay = nullptr;
    }
    
    juce::PluginDescription desc;
@@ -371,10 +371,10 @@ void VSTPlugin::SetEnabled(bool enabled)
 
 void VSTPlugin::PreDrawModule()
 {
-   if (mDisplayMode == kDisplayMode_PluginOverlay && mWindowOverlay)
+   /*if (mDisplayMode == kDisplayMode_PluginOverlay && mWindowOverlay)
    {
-      //mWindowOverlay->GetDimensions(mOverlayWidth, mOverlayHeight);
-      /*if (mWindow)
+      mWindowOverlay->GetDimensions(mOverlayWidth, mOverlayHeight);
+      if (mWindow)
       {
          mOverlayWidth = 500;
          mOverlayHeight = 500;
@@ -383,9 +383,9 @@ void VSTPlugin::PreDrawModule()
          float width = mOverlayWidth * contentMult;
          float height = mOverlayHeight * contentMult;
          mWindow->setSize(width, height);
-      }*/
-      //mWindowOverlay->UpdatePosition(this);
-   }
+      }
+      mWindowOverlay->UpdatePosition(this);
+   }*/
 }
 
 void VSTPlugin::DrawModule()
@@ -416,16 +416,16 @@ void VSTPlugin::GetModuleDimensions(int& width, int& height)
 {
    if (mDisplayMode == kDisplayMode_PluginOverlay)
    {
-      if (mWindowOverlay)
+      /*if (mWindowOverlay)
       {
          width = mOverlayWidth;
          height = mOverlayHeight+20;
       }
       else
-      {
+      {*/
          width = 206;
          height = 40;
-      }
+      //}
    }
    else
    {

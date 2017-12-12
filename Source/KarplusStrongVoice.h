@@ -31,13 +31,27 @@ enum KarplusStrongSourceType
 class KarplusStrongVoiceParams : public IVoiceParams
 {
 public:
+   KarplusStrongVoiceParams()
+   : mFilter(.6f)
+   , mVol(1.0f)
+   , mFeedback(.998f)
+   , mSourceType(kSourceTypeMix)
+   , mMute(true)
+   , mStretch(false)
+   , mExciterFreq(100)
+   , mExciterAttack(3)
+   , mExciterDecay(3)
+   , mExcitation(0)
+   {}
    float mFilter;
    float mVol;
    float mFeedback;
    KarplusStrongSourceType mSourceType;
    bool mMute;
    bool mStretch;
-   float mCarrier;
+   float mExciterFreq;
+   float mExciterAttack;
+   float mExciterDecay;
    float mExcitation;
 };
 

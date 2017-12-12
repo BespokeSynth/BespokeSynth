@@ -310,14 +310,14 @@ bool ADSRDisplay::MouseMoved(float x, float y)
       {
          case kAdjustAttack:
          {
-            float a = ofClamp(mClickAdsr.GetA() + mousePosSq * 100,1,mMaxTime);
+            float a = ofClamp(mClickAdsr.GetA() + mousePosSq * mMaxTime * .1f,1,mMaxTime);
             mViewAdsr.GetA() = a;
             mAdsr->GetA() = a;
             break;
          }
          case kAdjustDecaySustain:
          {
-            float d = ofClamp(mClickAdsr.GetD() + mousePosSq * 1000,1,mMaxTime);
+            float d = ofClamp(mClickAdsr.GetD() + mousePosSq * mMaxTime,1,mMaxTime);
             mViewAdsr.GetD() = d;
             mAdsr->GetD() = d;
             float s = ofClamp(mClickAdsr.GetS() + (mClickStart.y-y)/mHeight,0,1);
@@ -327,7 +327,7 @@ bool ADSRDisplay::MouseMoved(float x, float y)
          }
          case kAdjustRelease:
          {
-            float r = ofClamp(mClickAdsr.GetR() + mousePosSq * 1000,1,mMaxTime);
+            float r = ofClamp(mClickAdsr.GetR() + mousePosSq * mMaxTime,1,mMaxTime);
             mViewAdsr.GetR() = r;
             mAdsr->GetR() = r;
             break;

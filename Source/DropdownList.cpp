@@ -16,7 +16,7 @@ namespace
    const int itemSpacing = 15;
 }
 
-DropdownList::DropdownList(IDropdownListener* owner, const char* name, int x, int y, int* var)
+DropdownList::DropdownList(IDropdownListener* owner, const char* name, int x, int y, int* var, float width)
 : mWidth(40)
 , mHeight(itemSpacing)
 , mColumns(1)
@@ -27,16 +27,22 @@ DropdownList::DropdownList(IDropdownListener* owner, const char* name, int x, in
 , mModalWidth(20)
 , mUnknownItemString("???")
 , mSliderVal(0)
+, mAutoCalculateWidth(false)
 {
    assert(owner);
    SetName(name);
    SetPosition(x,y);
    SetParent(dynamic_cast<IClickable*>(owner));
    (dynamic_cast<IDrawableModule*>(owner))->AddUIControl(this);
+   
+   if (width == -1)
+      mAutoCalculateWidth = true;
+   else
+      mWidth = width;
 }
 
-DropdownList::DropdownList(IDropdownListener* owner, const char* name, IUIControl* anchor, AnchorDirection anchorDirection, int* var)
-: DropdownList(owner, name, -1, -1, var)
+DropdownList::DropdownList(IDropdownListener* owner, const char* name, IUIControl* anchor, AnchorDirection anchorDirection, int* var, float width)
+: DropdownList(owner, name, -1, -1, var, width)
 {
    PositionTo(anchor, anchorDirection);
 }
@@ -63,14 +69,16 @@ void DropdownList::AddLabel(string label, int value)
 
 void DropdownList::CalculateWidth()
 {
-   mModalWidth = GetStringWidth(mUnknownItemString) + 15;
+   mModalWidth = mWidth;
    for (int i=0; i<mElements.size(); ++i)
    {
       int width = GetStringWidth(mElements[i].mLabel) + 15;
       if (width > mModalWidth)
          mModalWidth = width;
    }
-   mWidth = MIN(mModalWidth, 180);
+   
+   if (mAutoCalculateWidth)
+      mWidth = MIN(mModalWidth, 180);
 }
 
 string DropdownList::GetLabel(int val) const
@@ -183,7 +191,8 @@ void DropdownList::MouseReleased()
 void DropdownList::Clear()
 {
    mElements.clear();
-   mWidth = 40;
+   if (mAutoCalculateWidth)
+      mWidth = 40;
    mHeight = itemSpacing;
 }
 

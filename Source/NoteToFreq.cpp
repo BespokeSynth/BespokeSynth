@@ -76,6 +76,5 @@ void NoteToFreq::LoadLayout(const ofxJSONElement& moduleInfo)
 
 void NoteToFreq::SetUpFromSaveData()
 {
-   mTarget = dynamic_cast<FloatSlider*>(TheSynth->FindUIControl(mModuleSaveData.GetString("target")));
-   mTargetCable->SetTarget(mTarget);
+   mTargetCable->SetTarget(TheSynth->FindUIControl(mModuleSaveData.GetString("target")));
 }

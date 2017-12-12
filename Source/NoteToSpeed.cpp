@@ -1,55 +1,55 @@
 /*
   ==============================================================================
 
-    PitchToCV.cpp
-    Created: 28 Nov 2017 9:44:15pm
+    NoteToSpeed.cpp
+    Created: 3 Dec 2017 11:14:11pm
     Author:  Ryan Challinor
 
   ==============================================================================
 */
 
-#include "PitchToCV.h"
+#include "NoteToSpeed.h"
 #include "OpenFrameworksPort.h"
 #include "Scale.h"
 #include "ModularSynth.h"
 #include "PatchCableSource.h"
 #include "ModulationChain.h"
 
-PitchToCV::PitchToCV()
+NoteToSpeed::NoteToSpeed()
 : mPitch(0)
 , mPitchBend(nullptr)
+, mBasePitch(48)
 {
 }
 
-PitchToCV::~PitchToCV()
+NoteToSpeed::~NoteToSpeed()
 {
 }
 
-void PitchToCV::CreateUIControls()
+void NoteToSpeed::CreateUIControls()
 {
    IDrawableModule::CreateUIControls();
+   
+   mBasePitchEntry = new TextEntry(this,"base pitch",5,3,3,&mBasePitch,0,127);
+   
    mTargetCable = new PatchCableSource(this, kConnectionType_UIControl);
    AddPatchCableSource(mTargetCable);
-   
-   mMinSlider = new FloatSlider(this, "min", 3, 2, 100, 15, &mDummyMin, 0, 1);
-   mMaxSlider = new FloatSlider(this, "max", mMinSlider, kAnchor_Below, 100, 15, &mDummyMax, 0, 1);
 }
 
-void PitchToCV::DrawModule()
+void NoteToSpeed::DrawModule()
 {
    if (Minimized() || IsVisible() == false)
       return;
    
-   mMinSlider->Draw();
-   mMaxSlider->Draw();
+   mBasePitchEntry->Draw();
 }
 
-void PitchToCV::PostRepatch(PatchCableSource* cableSource)
+void NoteToSpeed::PostRepatch(PatchCableSource* cableSource)
 {
    OnModulatorRepatch();
 }
 
-void PitchToCV::PlayNote(double time, int pitch, int velocity, int voiceIdx /*= -1*/, ModulationChain* pitchBend /*= nullptr*/, ModulationChain* modWheel /*= nullptr*/, ModulationChain* pressure /*= nullptr*/)
+void NoteToSpeed::PlayNote(double time, int pitch, int velocity, int voiceIdx /*= -1*/, ModulationChain* pitchBend /*= nullptr*/, ModulationChain* modWheel /*= nullptr*/, ModulationChain* pressure /*= nullptr*/)
 {
    if (mEnabled && velocity > 0)
    {
@@ -58,13 +58,13 @@ void PitchToCV::PlayNote(double time, int pitch, int velocity, int voiceIdx /*= 
    }
 }
 
-float PitchToCV::Value(int samplesIn)
+float NoteToSpeed::Value(int samplesIn)
 {
    float bend = mPitchBend ? mPitchBend->GetValue(samplesIn) : 0;
-   return ofMap(mPitch+bend,0,127,GetMin(),GetMax(),K(clamped));
+   return TheScale->PitchToFreq(mPitch+bend) / TheScale->PitchToFreq(mBasePitch);
 }
 
-void PitchToCV::SaveLayout(ofxJSONElement& moduleInfo)
+void NoteToSpeed::SaveLayout(ofxJSONElement& moduleInfo)
 {
    IDrawableModule::SaveLayout(moduleInfo);
    
@@ -75,14 +75,14 @@ void PitchToCV::SaveLayout(ofxJSONElement& moduleInfo)
    moduleInfo["target"] = targetPath;
 }
 
-void PitchToCV::LoadLayout(const ofxJSONElement& moduleInfo)
+void NoteToSpeed::LoadLayout(const ofxJSONElement& moduleInfo)
 {
    mModuleSaveData.LoadString("target", moduleInfo);
    
    SetUpFromSaveData();
 }
 
-void PitchToCV::SetUpFromSaveData()
+void NoteToSpeed::SetUpFromSaveData()
 {
-   mTargetCable->SetTarget(TheSynth->FindUIControl(mModuleSaveData.GetString("target")));
+   mTargetCable->SetTarget(dynamic_cast<FloatSlider*>(TheSynth->FindUIControl(mModuleSaveData.GetString("target"))));
 }

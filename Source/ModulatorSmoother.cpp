@@ -16,7 +16,7 @@
 
 ModulatorSmoother::ModulatorSmoother()
 : mInput(0)
-, mSmooth(0)
+, mSmooth(.1f)
 , mInputSlider(nullptr)
 , mSmoothSlider(nullptr)
 {
@@ -56,7 +56,6 @@ void ModulatorSmoother::PostRepatch(PatchCableSource* cableSource)
    if (mTarget)
    {
       mInput = mTarget->GetValue();
-      mSmooth = 0;
       mInputSlider->SetExtents(mTarget->GetMin(), mTarget->GetMax());
       mInputSlider->SetMode(mTarget->GetMode());
    }
@@ -70,7 +69,7 @@ void ModulatorSmoother::OnTransportAdvanced(float amount)
 float ModulatorSmoother::Value(int samplesIn)
 {
    ComputeSliders(samplesIn);
-   return ofClamp(mRamp.Value(gTime + samplesIn * gInvSampleRateMs), mMin, mMax);
+   return ofClamp(mRamp.Value(gTime + samplesIn * gInvSampleRateMs), GetMin(), GetMax());
 }
 
 void ModulatorSmoother::SaveLayout(ofxJSONElement& moduleInfo)

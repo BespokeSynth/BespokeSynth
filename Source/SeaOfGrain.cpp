@@ -403,7 +403,7 @@ void SeaOfGrain::GrainVoice::Process(float* out, float outLength, float* sample,
       {
          float pitchBend = mPitchBend ? mPitchBend->GetValue(i) : 0;
          float pressure = mPressure ? mPressure->GetValue(i) : 0;
-         if (mPressure > 0)
+         if (pressure > 0)
          {
             mGranulator.mGrainSpacing = ofMap(pressure * pressure, 0, 1, .3f, 1.0f / MAX_GRAINS);
             mGranulator.mPosRandomizeMs = ofMap(pressure * pressure, 0, 1, 100, .03f);

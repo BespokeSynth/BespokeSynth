@@ -311,10 +311,6 @@
               file="Source/MidiController.cpp"/>
         <FILE id="FdjFi9" name="MidiController.h" compile="0" resource="0"
               file="Source/MidiController.h"/>
-        <FILE id="ld1pwm" name="MidiInstrument.cpp" compile="1" resource="0"
-              file="Source/MidiInstrument.cpp"/>
-        <FILE id="J88YwL" name="MidiInstrument.h" compile="0" resource="0"
-              file="Source/MidiInstrument.h"/>
         <FILE id="xjJDtE" name="MidiOutput.cpp" compile="1" resource="0" file="Source/MidiOutput.cpp"/>
         <FILE id="C85caL" name="MidiOutput.h" compile="0" resource="0" file="Source/MidiOutput.h"/>
         <FILE id="wUCXnT" name="ModulationVisualizer.cpp" compile="1" resource="0"
@@ -413,6 +409,8 @@
         <FILE id="LKkPBi" name="NoteToFreq.h" compile="0" resource="0" file="Source/NoteToFreq.h"/>
         <FILE id="XvPbXi" name="NoteToMs.cpp" compile="1" resource="0" file="Source/NoteToMs.cpp"/>
         <FILE id="OiTWxt" name="NoteToMs.h" compile="0" resource="0" file="Source/NoteToMs.h"/>
+        <FILE id="ltKqzK" name="NoteToSpeed.cpp" compile="1" resource="0" file="Source/NoteToSpeed.cpp"/>
+        <FILE id="Ct3mxR" name="NoteToSpeed.h" compile="0" resource="0" file="Source/NoteToSpeed.h"/>
         <FILE id="N7AI0k" name="NoteTransformer.cpp" compile="1" resource="0"
               file="Source/NoteTransformer.cpp"/>
         <FILE id="Gu2fbN" name="NoteTransformer.h" compile="0" resource="0"
