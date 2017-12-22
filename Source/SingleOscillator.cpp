@@ -211,7 +211,7 @@ void SingleOscillator::DrawModule()
 void SingleOscillator::GetModuleDimensions(int& width, int& height)
 {
    width = 180;
-   height = 120;
+   height = 125;
 }
 
 void SingleOscillator::UpdateADSRDisplays()

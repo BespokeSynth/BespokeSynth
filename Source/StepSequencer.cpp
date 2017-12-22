@@ -48,7 +48,7 @@ StepSequencer::StepSequencer()
 void StepSequencer::CreateUIControls()
 {
    IDrawableModule::CreateUIControls();
-   mGrid = new Grid(40,45,180,150,16,NUM_STEPSEQ_ROWS);
+   mGrid = new UIGrid(40,45,180,150,16,NUM_STEPSEQ_ROWS);
    mStrengthSlider = new FloatSlider(this,"str",75,22,50,15,&mStrength,0,1,2);
    mUseStrengthSliderCheckbox = new Checkbox(this,"use str",128,22,&mUseStrengthSlider);
    mStochasticCheckbox = new Checkbox(this,"stch",145,22,&mStochasticMode);
@@ -566,7 +566,7 @@ void StepSequencer::DropdownUpdated(DropdownList* list, int oldVal)
    }
    if (list == mStepIntervalDropdown)
    {
-      Grid* oldGrid = new Grid(*mGrid);
+      UIGrid* oldGrid = new UIGrid(*mGrid);
       int oldNumSteps = GetNumSteps((NoteInterval)oldVal);
       int newNumSteps = GetNumSteps(mStepInterval);
       for (int i=0; i<mGrid->GetRows(); ++i)
@@ -619,7 +619,7 @@ void StepSequencer::SetUpFromSaveData()
    mGrid->SetGrid(mNumRows, GetNumSteps(mStepInterval));
    
    bool multisliderMode = mModuleSaveData.GetBool("multislider_mode");
-   mGrid->SetGridMode(multisliderMode ? Grid::kMultislider : Grid::kNormal);
+   mGrid->SetGridMode(multisliderMode ? UIGrid::kMultislider : UIGrid::kNormal);
    mGrid->SetRestrictDragToRow(multisliderMode);
    mGrid->SetClickClearsToZero(!multisliderMode);
 }
@@ -649,7 +649,7 @@ void StepSequencer::LoadState(FileStreamIn& in)
    mGrid->LoadState(in);
 }
 
-StepSequencerRow::StepSequencerRow(StepSequencer* seq, Grid* grid, int row)
+StepSequencerRow::StepSequencerRow(StepSequencer* seq, UIGrid* grid, int row)
 : mSeq(seq)
 , mGrid(grid)
 , mRow(row)

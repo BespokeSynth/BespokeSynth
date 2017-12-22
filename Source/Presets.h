@@ -11,7 +11,7 @@
 
 #include <iostream>
 #include "IDrawableModule.h"
-#include "Grid.h"
+#include "UIGrid.h"
 #include "ClickButton.h"
 #include "Checkbox.h"
 #include "FloatSliderLFOControl.h"
@@ -93,7 +93,7 @@ private:
       Ramp mRamp;
    };
    
-   Grid* mGrid;
+   UIGrid* mGrid;
    std::vector<PresetCollection> mPresetCollection;
    ClickButton* mSaveButton;
    int mDrawSetPresetsCountdown;

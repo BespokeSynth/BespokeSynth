@@ -11,9 +11,9 @@
 
 #include <iostream>
 #include "Transport.h"
-#include "Grid.h"
+#include "UIGrid.h"
 #include "Checkbox.h"
-#include "Grid.h"
+#include "UIGrid.h"
 #include "Slider.h"
 #include "DropdownList.h"
 #include "IDrawableModule.h"

@@ -2,8 +2,8 @@
 
 <JUCERPROJECT id="vxkFwd" name="BespokeSynth" projectType="guiapp" version="1.0.0"
               bundleIdentifier="com.ryanchallinor.Bespoke" includeBinaryInAppConfig="1"
-              jucerVersion="5.0.1" displaySplashScreen="1" reportAppUsage="1"
-              splashScreenColour="Dark">
+              jucerVersion="5.2.0" displaySplashScreen="1" reportAppUsage="1"
+              splashScreenColour="Dark" cppLanguageStandard="11" companyCopyright="">
   <MAINGROUP id="w4HLAu" name="BespokeSynth">
     <GROUP id="{531CC336-D9CD-1F6E-7272-2D8ADD98F839}" name="libraries">
       <GROUP id="{44F08E27-A8F5-B33E-CC69-42EBE3B93B39}" name="CFMessaging">
@@ -836,9 +836,9 @@
                extraDefs="BESPOKE_MAC">
       <CONFIGURATIONS>
         <CONFIGURATION name="Debug" isDebug="1" optimisation="1" targetName="Bespoke"
-                       headerPath="../../Source/json/include"/>
+                       headerPath="../../Source/json/include" enablePluginBinaryCopyStep="1"/>
         <CONFIGURATION name="Release" isDebug="0" optimisation="3" targetName="Bespoke"
-                       headerPath="../../Source/json/include"/>
+                       headerPath="../../Source/json/include" enablePluginBinaryCopyStep="1"/>
       </CONFIGURATIONS>
       <MODULEPATHS>
         <MODULEPATH id="juce_core" path="../../../Downloads/JUCE/modules"/>
@@ -863,9 +863,11 @@
       <CONFIGURATIONS>
         <CONFIGURATION name="Debug" winWarningLevel="2" generateManifest="1" winArchitecture="32-bit"
                        isDebug="1" optimisation="1" targetName="BespokeSynth" headerPath="../../Source/json/include;../../Source/glew/include"
-                       fastMath="0"/>
+                       fastMath="0" debugInformationFormat="ProgramDatabase" enablePluginBinaryCopyStep="0"/>
         <CONFIGURATION name="Release" winWarningLevel="2" generateManifest="1" winArchitecture="32-bit"
-                       isDebug="0" optimisation="3" targetName="BespokeSynth" headerPath="../../Source/json/include;../../Source/glew/include"/>
+                       isDebug="0" optimisation="3" targetName="BespokeSynth" headerPath="../../Source/json/include;../../Source/glew/include"
+                       debugInformationFormat="ProgramDatabase" enablePluginBinaryCopyStep="0"
+                       linkTimeOptimisation="1"/>
       </CONFIGURATIONS>
       <MODULEPATHS>
         <MODULEPATH id="juce_video" path="..\JUCE\modules"/>

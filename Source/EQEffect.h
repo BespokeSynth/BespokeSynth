@@ -16,12 +16,12 @@
 #include "Transport.h"
 #include "BiquadFilter.h"
 #include "RadioButton.h"
-#include "Grid.h"
+#include "UIGrid.h"
 #include "ClickButton.h"
 
 #define NUM_EQ_FILTERS 8
 
-class EQEffect : public IAudioEffect, public IDropdownListener, public IIntSliderListener, public IRadioButtonListener, public IButtonListener, public GridListener
+class EQEffect : public IAudioEffect, public IDropdownListener, public IIntSliderListener, public IRadioButtonListener, public IButtonListener, public UIGridListener
 {
 public:
    EQEffect();
@@ -45,7 +45,7 @@ public:
    void IntSliderUpdated(IntSlider* slider, int oldVal) override;
    void RadioButtonUpdated(RadioButton* list, int oldVal) override;
    void ButtonClicked(ClickButton* button) override;
-   void GridUpdated(Grid* grid, int col, int row, float value, float oldValue) override;
+   void GridUpdated(UIGrid* grid, int col, int row, float value, float oldValue) override;
    
 private:
    //IDrawableModule
@@ -61,7 +61,7 @@ private:
    FilterBank mBanks[ChannelBuffer::kMaxNumChannels];
    int mNumFilters;
    
-   Grid* mMultiSlider;
+   UIGrid* mMultiSlider;
    ClickButton* mEvenButton;
 };
 

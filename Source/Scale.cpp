@@ -40,13 +40,13 @@ void Scale::CreateUIControls()
    mScaleSelector = new DropdownList(this,"scale",58,5,&mScaleIndex);
    mScaleDegreeSlider = new IntSlider(this,"degree",HIDDEN_UICONTROL,HIDDEN_UICONTROL,115,15,&mScaleDegree,-7,7);
    mIntonationSelector = new DropdownList(this,"intonation",58,24,(int*)(&mIntonation));
-   mTetEntry = new TextEntry(this,"tet",25,24,2,&mTet,0,99);
-   mReferenceFreqEntry = new TextEntry(this,"ref freq",44,43,3,&mReferenceFreq,1,999);
-   mReferencePitchEntry = new TextEntry(this,"ref pitch",110,43,3,&mReferencePitch,0,127);
+   mTetEntry = new TextEntry(this,"tet",4,24,2,&mTet,0,99);
+   mReferenceFreqEntry = new TextEntry(this,"tuning",4,43,3,&mReferenceFreq,1,999);
+   mReferencePitchEntry = new TextEntry(this,"note",72,43,3,&mReferencePitch,0,127);
    
-   mTetEntry->SetDescription("tet");
-   mReferenceFreqEntry->SetDescription("tuning");
-   mReferencePitchEntry->SetDescription("note");
+   mTetEntry->DrawLabel(true);
+   mReferenceFreqEntry->DrawLabel(true);
+   mReferencePitchEntry->DrawLabel(true);
    
    mRootSelector->AddLabel("A",9);
    mRootSelector->AddLabel("A#/Bb",10);

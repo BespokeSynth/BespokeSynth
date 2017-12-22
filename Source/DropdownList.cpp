@@ -26,11 +26,13 @@ DropdownList::DropdownList(IDropdownListener* owner, const char* name, int x, in
 , mMaxPerColumn(40)
 , mModalWidth(20)
 , mUnknownItemString("???")
+, mDrawLabel(false)
 , mSliderVal(0)
 , mAutoCalculateWidth(false)
 {
    assert(owner);
    SetName(name);
+   mLabelSize = GetStringWidth(name) + 3;
    SetPosition(x,y);
    SetParent(dynamic_cast<IClickable*>(owner));
    (dynamic_cast<IDrawableModule*>(owner))->AddUIControl(this);
@@ -101,7 +103,14 @@ void DropdownList::Render()
 {
    ofPushStyle();
    
-   DrawBeacon(mX+mWidth/2, mY+mHeight/2);
+   float xOffset = 0;
+   if (mDrawLabel)
+   {
+      DrawText(Name(), mX, mY+12);
+      xOffset = mLabelSize;
+   }
+   
+   DrawBeacon(mX+mWidth/2+xOffset, mY+mHeight/2);
 
    int w,h;
    GetDimensions(w,h);
@@ -111,18 +120,15 @@ void DropdownList::Render()
 
    ofFill();
    ofSetColor(0, 0, 0, gModuleDrawAlpha * .5f);
-   ofRect(mX+1,mY+1,mWidth,mHeight);
+   ofRect(mX+1+xOffset,mY+1,w-xOffset,h);
    ofSetColor(color);
-   ofRect(mX,mY,w,h);
+   ofRect(mX+xOffset,mY,w-xOffset,h);
    ofNoFill();
 
    ofSetColor(textColor);
    
-   DrawText(GetDisplayValue(*mVar), mX+2, mY+12);
+   DrawText(GetDisplayValue(*mVar), mX+2+xOffset, mY+12);
    ofTriangle(mX+w-11, mY+4, mX+w-3, mY+4, mX+w-7, mY+11);
-   
-   if (mDescription != "")
-      DrawText(mDescription, mX - 3 - GetStringWidth(mDescription), mY+12);
 
    ofPopStyle();
    
@@ -155,6 +161,14 @@ void DropdownList::DrawDropdown(int w, int h)
    ofPopStyle();
 }
 
+void DropdownList::GetDimensions(int& width, int& height)
+{
+   width = mWidth;
+   if (mDrawLabel)
+      width += mLabelSize;
+   height = mHeight;
+}
+
 void DropdownList::DropdownClicked(int x, int y)
 {
    int index = y/itemSpacing + x/mModalWidth * mMaxPerColumn;
@@ -174,6 +188,8 @@ void DropdownList::OnClicked(int x, int y, bool right)
 
    int thisx,thisy;
    GetPosition(thisx,thisy);
+   if (mDrawLabel)
+      thisx += mLabelSize;
    mModalList.SetPosition(thisx,thisy+itemSpacing);
    TheSynth->PushModalFocusItem(&mModalList);
 }

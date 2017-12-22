@@ -14,7 +14,7 @@
 #include "INoteReceiver.h"
 
 class PatchCableSource;
-class Grid;
+class UIGrid;
 class NoteStepSequencer;
 
 class NoteSequencerColumn : public IDrawableModule, public IIntSliderListener, public INoteReceiver
@@ -55,7 +55,7 @@ private:
    int mRow;
    
    NoteStepSequencer* mSequencer;
-   Grid* mGrid;
+   UIGrid* mGrid;
    PatchCableSource* mGridCable;
 };
 

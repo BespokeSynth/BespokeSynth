@@ -31,11 +31,11 @@ EQEffect::EQEffect()
 void EQEffect::CreateUIControls()
 {
    IDrawableModule::CreateUIControls();
-   mMultiSlider = new Grid(5,25,80,50,NUM_EQ_FILTERS,1);
+   mMultiSlider = new UIGrid(5,25,80,50,NUM_EQ_FILTERS,1);
    AddUIControl(mMultiSlider);
    mEvenButton = new ClickButton(this,"even",5,5);
    
-   mMultiSlider->SetGridMode(Grid::kMultislider);
+   mMultiSlider->SetGridMode(UIGrid::kMultislider);
    mMultiSlider->SetClickClearsToZero(false);
    for (int i=0; i<NUM_EQ_FILTERS; ++i)
       mMultiSlider->SetValRefactor(0, i, .5f);
@@ -138,7 +138,7 @@ void EQEffect::ButtonClicked(ClickButton* button)
    }
 }
 
-void EQEffect::GridUpdated(Grid* grid, int col, int row, float value, float oldValue)
+void EQEffect::GridUpdated(UIGrid* grid, int col, int row, float value, float oldValue)
 {
    for (int ch=0; ch<ChannelBuffer::kMaxNumChannels; ++ch)
    {

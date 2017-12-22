@@ -62,11 +62,14 @@ void TextEntry::Construct(ITextEntryListener* owner, const char* name, int x, in
    mNextTextEntry = nullptr;
    mPreviousTextEntry = nullptr;
    mInErrorMode = false;
+   mDrawLabel = false;
    mFlexibleWidth = false;
+   mHovered = false;
    
    UpdateDisplayString();
    
    SetName(name);
+   mLabelSize = GetStringWidth(name) + 3;
    SetPosition(x,y);
    assert(owner);
    IDrawableModule* module = dynamic_cast<IDrawableModule*>(owner);
@@ -85,8 +88,12 @@ void TextEntry::Render()
    
    ofSetLineWidth(.5f);
    
-   if (mDescription != "")
-      DrawText(mDescription, mX - 3 - GetStringWidth(mDescription), mY+12);
+   float xOffset = 0;
+   if (mDrawLabel)
+   {
+      DrawText(Name(), mX, mY+12);
+      xOffset = mLabelSize;
+   }
    
    bool isCurrent = sCurrentTextEntry == this;
    
@@ -103,18 +110,18 @@ void TextEntry::Render()
    {
       ofSetColor(color,gModuleDrawAlpha * .1f);
       ofFill();
-      ofRect(mX,mY,w,h);
+      ofRect(mX + xOffset,mY,w - xOffset,h);
    }
    ofSetColor(color,gModuleDrawAlpha);
    ofNoFill();
-   ofRect(mX,mY,w,h);
-   DrawText(mString, mX+2, mY+12);
+   ofRect(mX + xOffset,mY,w - xOffset,h);
+   DrawText(mString, mX+2+xOffset, mY+12);
    
    if (sCurrentTextEntry == this)
    {
       if (mCaretBlink)
       {
-         int caretX = mX+2;
+         int caretX = mX+2+xOffset;
          int caretY = mY+1;
          if (mCaretPosition > 0)
          {
@@ -133,6 +140,15 @@ void TextEntry::Render()
          mCaretBlink = !mCaretBlink;
       }
    }
+   
+   /*if (mHovered)
+   {
+      ofSetColor(100, 100, 100, .8f*gModuleDrawAlpha);
+      ofFill();
+      ofRect(mX+xOffset,mY-12,GetStringWidth(Name()),12);
+      ofSetColor(255, 255, 255, gModuleDrawAlpha);
+      DrawText(Name(), mX+xOffset, mY);
+   }*/
 
    ofPopStyle();
 }
@@ -143,6 +159,10 @@ void TextEntry::GetDimensions(int& width, int& height)
       width = MAX(30,GetStringWidth(mString) + 4);
    else
       width = mCharWidth * 9;
+   
+   if (mDrawLabel)
+      width += mLabelSize;
+   
    height = 15;
 }
 
@@ -266,6 +286,12 @@ void TextEntry::SetNextTextEntry(TextEntry* entry)
    mNextTextEntry = entry;
    if (entry)
       entry->mPreviousTextEntry = this;
+}
+
+bool TextEntry::MouseMoved(float x, float y)
+{
+   mHovered = TestHover(x, y);
+   return false;
 }
 
 namespace

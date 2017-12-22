@@ -341,7 +341,9 @@ void PatchCableSource::FindValidTargets()
       {
          for (auto uicontrol : module->GetUIControls())
          {
-            if (uicontrol->IsShowing() && dynamic_cast<ADSRDisplay*>(uicontrol) == nullptr)
+            if (uicontrol->IsShowing() &&
+                uicontrol->GetShouldSaveState() &&
+                dynamic_cast<ADSRDisplay*>(uicontrol) == nullptr)
                mValidTargets.push_back(uicontrol);
          }
       }
@@ -367,6 +369,8 @@ void PatchCableSource::FindValidTargets()
 void PatchCableSource::CableGrabbed()
 {
    FindValidTargets();
+   
+   mOwner->OnCableGrabbed(this);
 }
 
 void PatchCableSource::KeyPressed(int key, bool isRepeat)

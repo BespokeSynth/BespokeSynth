@@ -37,7 +37,7 @@ ControlSequencer::~ControlSequencer()
 void ControlSequencer::CreateUIControls()
 {
    IDrawableModule::CreateUIControls();
-   mGrid = new Grid(5,23,130,40,16,1);
+   mGrid = new UIGrid(5,23,130,40,16,1);
    mIntervalSelector = new DropdownList(this,"interval",5,3,(int*)(&mInterval));
    mLengthSelector = new DropdownList(this,"length",mIntervalSelector,kAnchor_Right,(int*)(&mLength));
    mRandomize = new ClickButton(this,"random",mLengthSelector,kAnchor_Right);
@@ -46,7 +46,7 @@ void ControlSequencer::CreateUIControls()
    //mControlCable->SetManualPosition(86, 10);
    AddPatchCableSource(mControlCable);
    
-   mGrid->SetGridMode(Grid::kMultislider);
+   mGrid->SetGridMode(UIGrid::kMultislider);
    mGrid->SetHighlightCol(-1);
    mGrid->SetClickClearsToZero(false);
    mGrid->SetMajorColSize(4);
@@ -170,7 +170,7 @@ void ControlSequencer::SetNumSteps(int numSteps, bool stretch)
    mGrid->SetGrid(numSteps,1);
 }
 
-void ControlSequencer::GridUpdated(Grid* grid, int col, int row, float value, float oldValue)
+void ControlSequencer::GridUpdated(UIGrid* grid, int col, int row, float value, float oldValue)
 {
    if (grid == mGrid)
    {

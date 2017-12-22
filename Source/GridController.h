@@ -11,7 +11,7 @@
 
 #include "IDrawableModule.h"
 #include "MidiController.h"
-#include "Grid.h"
+#include "UIGrid.h"
 #include "INoteSource.h"
 
 #define MAX_GRIDCONTROLLER_ROWS 512
@@ -108,7 +108,7 @@ private:
    MidiMessageType mMessageType;
    MidiController* mController;
    int mControllerPage;
-   Grid* mGrid;
+   UIGrid* mGrid;
    bool mClicked;
    GridCell mClickedCell;
 };

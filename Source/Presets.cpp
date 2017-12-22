@@ -35,7 +35,7 @@ Presets::~Presets()
 void Presets::CreateUIControls()
 {
    IDrawableModule::CreateUIControls();
-   mGrid = new Grid(5,38,120,50,8,3);
+   mGrid = new UIGrid(5,38,120,50,8,3);
    mSaveButton = new ClickButton(this,"save",50,3);
    mBlendTimeSlider = new FloatSlider(this,"blend ms",5,20,120,15,&mBlendTime,0,5000);
    mCurrentPresetSelector = new DropdownList(this,"preset",85,3,&mCurrentPreset);

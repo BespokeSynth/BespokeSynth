@@ -25,13 +25,13 @@ bool IUIControl::IsPreset()
    return VectorContains(this, Presets::sPresetHighlightControls);
 }
 
-void IUIControl::CheckHover(int x, int y)
+bool IUIControl::TestHover(int x, int y)
 {
    if (mNoHover)
-      return;
+      return false;
    
    if (!mShowing)
-      return;
+      return false;
    
    int w,h;
    GetDimensions(w, h);
@@ -49,9 +49,17 @@ void IUIControl::CheckHover(int x, int y)
          int parentW,parentH;
          GetParent()->GetDimensions(parentW, parentH);
          if (localX < parentW && localY < parentH)
-            gHoveredUIControl = this;
+            return true;
       }
    }
+   
+   return false;
+}
+
+void IUIControl::CheckHover(int x, int y)
+{
+   if (TestHover(x, y))
+      gHoveredUIControl = this;
 }
 
 void IUIControl::DrawHover()
@@ -119,11 +127,16 @@ void IUIControl::PositionTo(IUIControl* anchor, AnchorDirection direction)
    if (direction == kAnchor_Below)
    {
       mX = rect.x;
-      mY = rect.y + rect.height + 1;
+      mY = rect.y + rect.height + 2;
    }
    else if (direction == kAnchor_Right)
    {
       mX = rect.x + rect.width + 3;
+      mY = rect.y;
+   }
+   else if (direction == kAnchor_Right_Padded)
+   {
+      mX = rect.x + rect.width + 10;
       mY = rect.y;
    }
 }

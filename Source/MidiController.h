@@ -191,7 +191,7 @@ enum ControlDrawType
 struct ControlLayoutElement
 {
    ControlLayoutElement() : mActive(false), mControlCable(nullptr) {}
-   void Setup(MidiController* owner, MidiMessageType type, int control, ControlDrawType drawType, float x, float y, float w, float h);
+   void Setup(MidiController* owner, MidiMessageType type, int control, ControlDrawType drawType, bool incremental, float x, float y, float w, float h);
    
    bool mActive;
    MidiMessageType mType;
@@ -199,11 +199,24 @@ struct ControlLayoutElement
    ofVec2f mPosition;
    ofVec2f mDimensions;
    ControlDrawType mDrawType;
+   bool mIncremental;
    
    PatchCableSource* mControlCable;
    
    float mLastValue;
    float mLastActivityTime;
+};
+
+struct GridLayout
+{
+   int mRows;
+   int mCols;
+   ofVec2f mPosition;
+   ofVec2f mDimensions;
+   MidiMessageType mType;
+   vector<int> mControls;
+   
+   PatchCableSource* mGridCable;
 };
 
 #define NUM_LAYOUT_CONTROLS 128*2+2
@@ -262,6 +275,7 @@ public:
    void TextEntryActivated(TextEntry* entry) override;
    void TextEntryComplete(TextEntry* entry) override;
    void PostRepatch(PatchCableSource* cable) override;
+   void OnCableGrabbed(PatchCableSource* cable) override;
    
    ControlLayoutElement& GetLayoutControl(int control, MidiMessageType type);
    
@@ -281,6 +295,7 @@ private:
    void DrawModule() override;
    void GetModuleDimensions(int& width, int& height) override;
    bool Enabled() const override { return mEnabled; }
+   void OnClicked(int x, int y, bool right) override;
 
    void MidiReceived(MidiMessageType messageType, int control, float value, int channel = -1);
    void RemoveConnection(int control, MidiMessageType messageType, int channel, int page);
@@ -289,9 +304,9 @@ private:
    void SetEntirePageToZero(int page);
    void BuildControllerList();
    void HighlightPageControls(int page);
-   void OnConnected();
+   void OnDeviceChanged();
    UIControlConnection* AddUIControlConnection();
-   const ControlLayoutElement* GetLayoutControlForCable(PatchCableSource* cable) const;
+   int GetLayoutControlIndexForCable(PatchCableSource* cable) const;
    
    float mVelocityMult;
    bool mUseChannelAsVoice;
@@ -338,6 +353,10 @@ private:
    bool mHasCreatedConnectionUIControls;
    
    ControlLayoutElement mLayoutControls[NUM_LAYOUT_CONTROLS];
+   int mHighlightedLayoutElement;
+   int mLayoutWidth;
+   int mLayoutHeight;
+   list<GridLayout*> mGrids;
    
    ofMutex mQueuedMessageMutex;
 };

@@ -18,7 +18,7 @@
 #include "TextEntry.h"
 #include "ClickButton.h"
 #include "Slider.h"
-#include "Grid.h"
+#include "UIGrid.h"
 #include "Scale.h"
 #include "ModulationChain.h"
 
@@ -114,7 +114,7 @@ private:
    bool mResetOnDownbeat;
    Checkbox* mResetOnDownbeatCheckbox;
    bool mViewGrid;
-   Grid* mGrid;
+   UIGrid* mGrid;
    Checkbox* mViewGridCheckbox;
    
    int mRandomLength;

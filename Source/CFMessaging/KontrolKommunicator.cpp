@@ -38,7 +38,7 @@ void KontrolKommunicator::CreateListener(const char* portName)
    mListenPorts[portName].CreateListener(portName, this);
 }
 
-void KontrolKommunicator::OutputRawData2(const uint8_t* data, int length)
+void KontrolKommunicator::OutputRawData2(const uint8_t* data, size_t length)
 {
    for (int i=0; i<length; ++i)
    {
@@ -521,7 +521,7 @@ void KontrolKommunicator::OutputData(const KDataArray& a)
    Output("\n");
 }
 
-void KontrolKommunicator::OutputRawData(const uint8_t* data, int length)
+void KontrolKommunicator::OutputRawData(const uint8_t* data, size_t length)
 {
    for (int i=0; i<length; ++i)
    {

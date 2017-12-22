@@ -28,7 +28,7 @@ void ValueSetter::CreateUIControls()
 {
    IDrawableModule::CreateUIControls();
    mValueEntry = new TextEntry(this,"value",40,2,7,&mValue,-99999,99999);
-   mValueEntry->SetDescription("value");
+   mValueEntry->DrawLabel(true);
    
    mControlCable = new PatchCableSource(this, kConnectionType_UIControl);
    AddPatchCableSource(mControlCable);

@@ -30,7 +30,7 @@ RadioSequencer::~RadioSequencer()
 void RadioSequencer::CreateUIControls()
 {
    IDrawableModule::CreateUIControls();
-   mGrid = new Grid(5,23,200,170,mLength,8);
+   mGrid = new UIGrid(5,23,200,170,mLength,8);
    mIntervalSelector = new DropdownList(this,"interval",5,3,(int*)(&mInterval));
    mLengthSelector = new DropdownList(this,"length",45,3,(int*)(&mLength));
    
@@ -163,7 +163,7 @@ void RadioSequencer::SetNumSteps(int numSteps, bool stretch)
    mGrid->SetGrid(numSteps,mGrid->GetRows());
 }
 
-void RadioSequencer::GridUpdated(Grid* grid, int col, int row, float value, float oldValue)
+void RadioSequencer::GridUpdated(UIGrid* grid, int col, int row, float value, float oldValue)
 {
    if (grid == mGrid)
    {

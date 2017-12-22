@@ -25,7 +25,7 @@
 #include "ControlSequencer.h"
 #include "Presets.h"
 #include "PatchCableSource.h"
-#include "nanovg.h"
+#include "nanovg/nanovg.h"
 
 float IDrawableModule::sHueNote = 27;
 float IDrawableModule::sHueAudio = 135;

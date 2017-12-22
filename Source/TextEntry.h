@@ -46,7 +46,7 @@ public:
    void SetNextTextEntry(TextEntry* entry);
    void UpdateDisplayString();
    void SetInErrorMode(bool error) { mInErrorMode = error; }
-   void SetDescription(string desc) { mDescription = desc; }
+   void DrawLabel(bool draw) { mDrawLabel = draw; }
    void SetFlexibleWidth(bool flex) { mFlexibleWidth = flex; }
    void ClearInput() { bzero(mString, MAX_TEXTENTRY_LENGTH); mCaretPosition = 0; }
    const char* GetText() const { return mString; }
@@ -69,6 +69,7 @@ private:
    void AcceptEntry();
    
    void OnClicked(int x, int y, bool right) override;
+   bool MouseMoved(float x, float y) override;
    
    int mCharWidth;
    ITextEntryListener* mListener;
@@ -87,8 +88,10 @@ private:
    TextEntry* mNextTextEntry;
    TextEntry* mPreviousTextEntry;
    bool mInErrorMode;
-   string mDescription;
+   bool mDrawLabel;
+   float mLabelSize;
    bool mFlexibleWidth;
+   bool mHovered;
    
    static TextEntry* sCurrentTextEntry;
 };

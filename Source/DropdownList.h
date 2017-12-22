@@ -63,7 +63,7 @@ public:
    void SetVar(int* var) { mVar = var; }
    EnumMap GetEnumMap();
    void SetUnknownItemString(string str) { mUnknownItemString = str; CalculateWidth(); }
-   void SetDescription(string desc) { mDescription = desc; }
+   void DrawLabel(bool draw) { mDrawLabel = draw; }
 
    //IUIControl
    void SetFromMidiCC(float slider) override;
@@ -79,7 +79,7 @@ public:
    void SaveState(FileStreamOut& out) override;
    void LoadState(FileStreamIn& in, bool shouldSetValue = true) override;
    
-   void GetDimensions(int& width, int& height) override { width = mWidth; height = mHeight; }
+   void GetDimensions(int& width, int& height) override;
    
 protected:
    ~DropdownList();   //protected so that it can't be created on the stack
@@ -100,7 +100,8 @@ private:
    DropdownListModal mModalList;
    IDropdownListener* mOwner;
    string mUnknownItemString;
-   string mDescription;
+   bool mDrawLabel;
+   float mLabelSize;
    float mSliderVal;
    int mLastSetValue;
    bool mAutoCalculateWidth;

@@ -13,11 +13,11 @@
 #include "NoteEffectBase.h"
 #include "IDrawableModule.h"
 #include "Checkbox.h"
-#include "Grid.h"
+#include "UIGrid.h"
 
 #define TOTAL_NUM_NOTES 128
 
-class Chorder : public NoteEffectBase, public IDrawableModule, public GridListener
+class Chorder : public NoteEffectBase, public IDrawableModule, public UIGridListener
 {
 public:
    Chorder();
@@ -32,7 +32,7 @@ public:
    //INoteReceiver
    void PlayNote(double time, int pitch, int velocity, int voiceIdx = -1, ModulationChain* pitchBend = nullptr, ModulationChain* modWheel = nullptr, ModulationChain* pressure = nullptr) override;
    
-   void GridUpdated(Grid* grid, int col, int row, float value, float oldValue) override;
+   void GridUpdated(UIGrid* grid, int col, int row, float value, float oldValue) override;
    
    void CheckboxUpdated(Checkbox* checkbox) override;
 
@@ -56,7 +56,7 @@ private:
    void CheckLeftovers();
    void SyncChord();
    
-   Grid* mChordGrid;
+   UIGrid* mChordGrid;
    int mVelocity;
    bool mInputNotes[TOTAL_NUM_NOTES];
    int mHeldCount[TOTAL_NUM_NOTES];

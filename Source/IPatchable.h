@@ -18,6 +18,7 @@ public:
    virtual PatchCableSource* GetPatchCableSource(int index=0) = 0;
    virtual void PreRepatch(PatchCableSource* cableSource) {}
    virtual void PostRepatch(PatchCableSource* cableSource) {}
+   virtual void OnCableGrabbed(PatchCableSource* cableSource) {}
 };
 
 #endif

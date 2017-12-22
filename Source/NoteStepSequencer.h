@@ -19,12 +19,12 @@
 #include "ClickButton.h"
 #include "INoteSource.h"
 #include "Slider.h"
-#include "Grid.h"
+#include "UIGrid.h"
 #include "MidiController.h"
 
 #define NSS_MAX_STEPS 128
 
-class NoteStepSequencer : public IDrawableModule, public ITimeListener, public INoteSource, public IButtonListener, public IDropdownListener, public IIntSliderListener, public IFloatSliderListener, public MidiDeviceListener, public GridListener, public IAudioPoller
+class NoteStepSequencer : public IDrawableModule, public ITimeListener, public INoteSource, public IButtonListener, public IDropdownListener, public IIntSliderListener, public IFloatSliderListener, public MidiDeviceListener, public UIGridListener, public IAudioPoller
 {
 public:
    NoteStepSequencer();
@@ -39,7 +39,7 @@ public:
    
    void SetMidiController(string name);
    
-   Grid* GetGrid() const { return mGrid; }
+   UIGrid* GetGrid() const { return mGrid; }
    
    int RowToPitch(int row);
    int PitchToRow(int pitch);
@@ -63,8 +63,8 @@ public:
    void OnMidiNote(MidiNote& note) override;
    void OnMidiControl(MidiControl& control) override;
    
-   //GridListener
-   void GridUpdated(Grid* grid, int col, int row, float value, float oldValue) override;
+   //UIGridListener
+   void GridUpdated(UIGrid* grid, int col, int row, float value, float oldValue) override;
    
    void ButtonClicked(ClickButton* button) override;
    void CheckboxUpdated(Checkbox* checkbox) override;
@@ -123,8 +123,8 @@ private:
    IntSlider* mArpStepSlider;
    TimeMode mTimeMode;
    DropdownList* mTimeModeSelector;
-   Grid* mGrid;
-   Grid* mVelocityGrid;
+   UIGrid* mGrid;
+   UIGrid* mVelocityGrid;
    int mLastPitch;
    int mLastVel;
    float mLastNoteLength;

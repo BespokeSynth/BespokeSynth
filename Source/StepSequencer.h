@@ -12,7 +12,7 @@
 #include <iostream>
 #include "Transport.h"
 #include "Checkbox.h"
-#include "Grid.h"
+#include "UIGrid.h"
 #include "Slider.h"
 #include "GridController.h"
 #include "ClickButton.h"
@@ -29,13 +29,13 @@ class StepSequencer;
 class StepSequencerRow : public ITimeListener
 {
 public:
-   StepSequencerRow(StepSequencer* seq, Grid* grid, int row);
+   StepSequencerRow(StepSequencer* seq, UIGrid* grid, int row);
    ~StepSequencerRow();
    void OnTimeEvent(int samplesTo) override;
    void SetOffset(float offset);
    void UpdateTimeListener();
 private:
-   Grid* mGrid;
+   UIGrid* mGrid;
    int mRow;
    StepSequencer* mSeq;
    float mOffset;
@@ -135,7 +135,7 @@ private:
    Vec2i ControllerToGrid(const Vec2i& controller);
    int GetNumControllerChunks(); //how many vertical chunks of the sequence are there to fit multi-rowed on the controller?
    
-   Grid* mGrid;
+   UIGrid* mGrid;
    float mStrength;
    FloatSlider* mStrengthSlider;
    bool mUseStrengthSlider;

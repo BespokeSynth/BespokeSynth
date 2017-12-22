@@ -9,7 +9,7 @@
 #include "NoteSequencerColumn.h"
 #include "ModularSynth.h"
 #include "PatchCableSource.h"
-#include "Grid.h"
+#include "UIGrid.h"
 #include "NoteStepSequencer.h"
 
 NoteSequencerColumn::NoteSequencerColumn()

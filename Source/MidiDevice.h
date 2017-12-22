@@ -70,7 +70,7 @@ public:
    
    bool ConnectInput(const char* name);
    void ConnectInput(int index);
-   void ConnectOutput(const char* name, int channel = 1);
+   bool ConnectOutput(const char* name, int channel = 1);
    void ConnectOutput(int index, int channel = 1);
    bool Reconnect();
    bool IsConnected();

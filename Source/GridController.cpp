@@ -30,7 +30,7 @@ void GridController::CreateUIControls()
 {
    IDrawableModule::CreateUIControls();
    
-   mGrid = new Grid(0,0,100,100,1,1);
+   mGrid = new UIGrid(0,0,100,100,1,1);
 }
 
 string GridController::GetTitleLabel()

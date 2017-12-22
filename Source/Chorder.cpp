@@ -23,7 +23,7 @@ void Chorder::CreateUIControls()
 {
    IDrawableModule::CreateUIControls();
    
-   mChordGrid = new Grid(2,2,130,50,7,3);
+   mChordGrid = new UIGrid(2,2,130,50,7,3);
    mChordGrid->SetVal(0, 1, 1);
    mChordGrid->SetListener(this);
 }
@@ -36,7 +36,7 @@ void Chorder::DrawModule()
    mChordGrid->Draw();
 }
 
-void Chorder::GridUpdated(Grid* grid, int col, int row, float value, float oldValue)
+void Chorder::GridUpdated(UIGrid* grid, int col, int row, float value, float oldValue)
 {
    int tone = col + (mChordGrid->GetRows()/2-row)*mChordGrid->GetCols();
    if (value > 0 && oldValue == 0)
@@ -222,7 +222,7 @@ void Chorder::SetUpFromSaveData()
    SetUpPatchCables(mModuleSaveData.GetString("target"));
    
    bool multisliderMode = mModuleSaveData.GetBool("multislider_mode");
-   mChordGrid->SetGridMode(multisliderMode ? Grid::kMultislider : Grid::kNormal);
+   mChordGrid->SetGridMode(multisliderMode ? UIGrid::kMultislider : UIGrid::kNormal);
    mChordGrid->SetRestrictDragToRow(multisliderMode);
    mChordGrid->SetClickClearsToZero(true);//!multisliderMode);
 }

@@ -20,7 +20,8 @@ class FileStreamOut;
 enum AnchorDirection
 {
    kAnchor_Below,
-   kAnchor_Right
+   kAnchor_Right,
+   kAnchor_Right_Padded
 };
 
 class IUIControl : public IClickable
@@ -45,6 +46,7 @@ public:
    bool IsPreset();
    virtual void GetRange(float& min, float& max) { min = 0; max = 1; }
    virtual bool IsBitmask() { return false; }
+   bool TestHover(int x, int y);
    void CheckHover(int x, int y);
    void DrawHover();
    virtual bool InvertScrollDirection() { return false; }

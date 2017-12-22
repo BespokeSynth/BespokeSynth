@@ -13,7 +13,7 @@
 #include "ListenPort.h"
 #include "SendPort.h"
 #include <CoreFoundation/CoreFoundation.h>
-#include "OpenFrameworksPort.h"
+#include "../OpenFrameworksPort.h"
 
 using namespace std;
 
@@ -91,8 +91,8 @@ private:
    void FollowUpToReply(string messageType, uint8_t* reply);
    bool DataEquals(const KDataArray& a, const KDataArray& b);
    void OutputData(const KDataArray& a);
-   void OutputRawData(const uint8_t* data, int length);
-   void OutputRawData2(const uint8_t* data, int length); //circumvents Output() being disabled
+   void OutputRawData(const uint8_t* data, size_t length);
+   void OutputRawData2(const uint8_t* data, size_t length); //circumvents Output() being disabled
    
    enum State
    {

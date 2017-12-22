@@ -11,9 +11,9 @@
 
 #include <iostream>
 #include "Transport.h"
-#include "Grid.h"
+#include "UIGrid.h"
 #include "Checkbox.h"
-#include "Grid.h"
+#include "UIGrid.h"
 #include "Slider.h"
 #include "DropdownList.h"
 #include "IDrawableModule.h"
@@ -34,7 +34,7 @@ public:
    void UpdateGrid();
    
    int mIndex;
-   Grid* mGrid;
+   UIGrid* mGrid;
    int mLength;
    DropdownList* mLengthSelector;
    int mNote;

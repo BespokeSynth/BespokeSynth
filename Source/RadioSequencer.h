@@ -12,7 +12,7 @@
 
 #include <iostream>
 #include "IDrawableModule.h"
-#include "Grid.h"
+#include "UIGrid.h"
 #include "ClickButton.h"
 #include "Checkbox.h"
 #include "Transport.h"
@@ -20,7 +20,7 @@
 
 class PatchCableSource;
 
-class RadioSequencer : public IDrawableModule, public ITimeListener, public IDropdownListener, public GridListener
+class RadioSequencer : public IDrawableModule, public ITimeListener, public IDropdownListener, public UIGridListener
 {
 public:
    RadioSequencer();
@@ -31,7 +31,7 @@ public:
    void CreateUIControls() override;
    
    //IGridListener
-   void GridUpdated(Grid* grid, int col, int row, float value, float oldValue) override;
+   void GridUpdated(UIGrid* grid, int col, int row, float value, float oldValue) override;
    
    //IDrawableModule
    void Init() override;
@@ -69,7 +69,7 @@ private:
    bool MouseMoved(float x, float y) override;
    void MouseReleased() override;
    
-   Grid* mGrid;
+   UIGrid* mGrid;
    NoteInterval mInterval;
    DropdownList* mIntervalSelector;
    int mLength;

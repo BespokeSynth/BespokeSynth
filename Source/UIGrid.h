@@ -1,5 +1,5 @@
 //
-//  Grid.h
+//  UIGrid.h
 //  modularSynth
 //
 //  Created by Ryan Challinor on 1/1/13.
@@ -15,13 +15,13 @@
 
 #define MAX_GRID_SIZE 128
 
-class Grid;
+class UIGrid;
 
-class GridListener
+class UIGridListener
 {
 public:
-   virtual ~GridListener() {}
-   virtual void GridUpdated(Grid* grid, int col, int row, float value, float oldValue) = 0;
+   virtual ~UIGridListener() {}
+   virtual void GridUpdated(UIGrid* grid, int col, int row, float value, float oldValue) = 0;
 };
 
 struct GridCell
@@ -31,10 +31,10 @@ struct GridCell
    int mRow;
 };
 
-class Grid : public IUIControl
+class UIGrid : public IUIControl
 {
 public:
-   Grid(int x, int y, int w, int h, int cols, int rows);
+   UIGrid(int x, int y, int w, int h, int cols, int rows);
    void Init(int x, int y, int w, int h, int cols, int rows);
    void SetGrid(int cols, int rows);
    int GetRows() { return mRows; }
@@ -55,7 +55,7 @@ public:
    void SetFlip(bool flip) { mFlip = flip; }
    void SetStrength(float strength) { mStrength = strength; }
    int CurrentHover() { return mCurrentHover; }
-   void SetListener(GridListener* listener) { mListener = listener; }
+   void SetListener(UIGridListener* listener) { mListener = listener; }
    void SetDrawOffset(int row, float amount) { mDrawOffset[row] = amount; }
    void SetDimensions(int width, int height) { mWidth = width; mHeight = height; }
    int GetWidth() const { return mWidth; }
@@ -83,7 +83,7 @@ public:
    void LoadState(FileStreamIn& in, bool shouldSetValue = true) override;
    
 protected:
-   ~Grid();   //protected so that it can't be created on the stack
+   ~UIGrid();   //protected so that it can't be created on the stack
    
 private:
    void OnClicked(int x, int y, bool right) override;
@@ -106,7 +106,7 @@ private:
    bool mFlip;
    float mStrength;
    int mCurrentHover;
-   GridListener* mListener;
+   UIGridListener* mListener;
    float mDrawOffset[MAX_GRID_SIZE];
    GridMode mGridMode;
    bool mRestrictDragToRow;

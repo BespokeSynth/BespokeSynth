@@ -61,7 +61,7 @@ void EventCanvas::CreateUIControls()
    mPositionSlider = new FloatSlider(this,"position",5,31,390,15,&mPosition,0,1);
    mRecordCheckbox = new Checkbox(this,"record",220,5,&mRecord);
    
-   mNumMeasuresEntry->SetDescription("measures");
+   mNumMeasuresEntry->DrawLabel(true);
    
    mIntervalSelector->AddLabel("4", kInterval_4);
    mIntervalSelector->AddLabel("1n", kInterval_1n);

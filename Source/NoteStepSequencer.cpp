@@ -94,8 +94,8 @@ void NoteStepSequencer::CreateUIControls()
    mLengthSlider = new IntSlider(this,"length",77,20,98,15,&mLength,1,mNumSteps);
    mArpStepSlider = new IntSlider(this,"step",121,2,40,15,&mArpStep,-3,3);
    mTimeModeSelector = new DropdownList(this,"timemode",5,2,(int*)(&mTimeMode));
-   mGrid = new Grid(5,55,200,80,8,24);
-   mVelocityGrid = new Grid(5,117,200,15,8,1);
+   mGrid = new UIGrid(5,55,200,80,8,24);
+   mVelocityGrid = new UIGrid(5,117,200,15,8,1);
    mOctaveSlider = new IntSlider(this,"octave",166,2,53,15,&mOctave,0,6);
    mHoldCheckbox = new Checkbox(this,"hold",180,20,&mHold);
    mNoteModeSelector = new DropdownList(this,"notemode",5,20,(int*)(&mNoteMode));
@@ -129,9 +129,9 @@ void NoteStepSequencer::CreateUIControls()
    mGrid->SetSingleColumnMode(true);
    mGrid->SetFlip(true);
    mGrid->SetListener(this);
-   mGrid->SetGridMode(Grid::kHorislider);
+   mGrid->SetGridMode(UIGrid::kHorislider);
    mGrid->SetClickClearsToZero(false);
-   mVelocityGrid->SetGridMode(Grid::kMultislider);
+   mVelocityGrid->SetGridMode(UIGrid::kMultislider);
    mVelocityGrid->SetClickClearsToZero(false);
    mVelocityGrid->SetListener(this);
    
@@ -294,7 +294,7 @@ void NoteStepSequencer::CheckboxUpdated(Checkbox* checkbox)
    }
 }
 
-void NoteStepSequencer::GridUpdated(Grid* grid, int col, int row, float value, float oldValue)
+void NoteStepSequencer::GridUpdated(UIGrid* grid, int col, int row, float value, float oldValue)
 {
    if (grid == mGrid)
    {

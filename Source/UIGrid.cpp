@@ -1,16 +1,16 @@
 //
-//  Grid.cpp
+//  UIGrid.cpp
 //  modularSynth
 //
 //  Created by Ryan Challinor on 1/1/13.
 //
 //
 
-#include "Grid.h"
+#include "UIGrid.h"
 #include "SynthGlobals.h"
 #include "FileStream.h"
 
-Grid::Grid(int x, int y, int w, int h, int cols, int rows)
+UIGrid::UIGrid(int x, int y, int w, int h, int cols, int rows)
 : mClick(false)
 , mWidth(w)
 , mHeight(h)
@@ -34,11 +34,11 @@ Grid::Grid(int x, int y, int w, int h, int cols, int rows)
    bzero(mDrawOffset, MAX_GRID_SIZE*sizeof(float));
 }
 
-Grid::~Grid()
+UIGrid::~UIGrid()
 {
 }
 
-void Grid::Init(int x, int y, int w, int h, int cols, int rows)
+void UIGrid::Init(int x, int y, int w, int h, int cols, int rows)
 {
    mWidth = w;
    mHeight = h;
@@ -47,7 +47,7 @@ void Grid::Init(int x, int y, int w, int h, int cols, int rows)
    Clear();
 }
 
-void Grid::Render()
+void UIGrid::Render()
 {
    ofPushStyle();
    int w,h;
@@ -120,13 +120,13 @@ void Grid::Render()
    ofPopStyle();
 }
 
-float Grid::GetX(int col, int row) const
+float UIGrid::GetX(int col, int row) const
 {
    float xsize = float(mWidth) / mCols;
    return mX+(col+mDrawOffset[row])*xsize;
 }
 
-float Grid::GetY(int row) const
+float UIGrid::GetY(int row) const
 {
    float ysize = float(mHeight) / mRows;
    if (mFlip)
@@ -135,7 +135,7 @@ float Grid::GetY(int row) const
       return mY+row*ysize;
 }
 
-GridCell Grid::GetGridCellAt(float x, float y, float* clickHeight, float* clickWidth)
+GridCell UIGrid::GetGridCellAt(float x, float y, float* clickHeight, float* clickWidth)
 {
    if (mFlip)
       y = (mHeight-1) - y;
@@ -161,7 +161,7 @@ GridCell Grid::GetGridCellAt(float x, float y, float* clickHeight, float* clickW
    return GridCell(col,row);
 }
 
-ofVec2f Grid::GetCellPosition(int col, int row)
+ofVec2f UIGrid::GetCellPosition(int col, int row)
 {
    ofVec2f ret;
    
@@ -177,7 +177,7 @@ ofVec2f Grid::GetCellPosition(int col, int row)
    return ret;
 }
 
-void Grid::OnClicked(int x, int y, bool right)
+void UIGrid::OnClicked(int x, int y, bool right)
 {
    if (right)
       return;
@@ -229,12 +229,12 @@ void Grid::OnClicked(int x, int y, bool right)
    mHoldRow = cell.mRow;
 }
 
-void Grid::MouseReleased()
+void UIGrid::MouseReleased()
 {
    mClick = false;
 }
 
-bool Grid::MouseMoved(float x, float y)
+bool UIGrid::MouseMoved(float x, float y)
 {
    bool isMouseOver = (x >= 0 && x < mWidth && y >= 0 && y < mHeight);
    
@@ -294,7 +294,7 @@ bool Grid::MouseMoved(float x, float y)
    return false;
 }
 
-bool Grid::MouseScrolled(int x, int y, float scrollX, float scrollY)
+bool UIGrid::MouseScrolled(int x, int y, float scrollX, float scrollY)
 {
    if (mGridMode == kMultislider || mGridMode == kHorislider)
    {
@@ -318,7 +318,7 @@ bool Grid::MouseScrolled(int x, int y, float scrollX, float scrollY)
    return false;
 }
 
-void Grid::SetGrid(int cols, int rows)
+void UIGrid::SetGrid(int cols, int rows)
 {
    cols = ofClamp(cols, 0, MAX_GRID_SIZE);
    rows = ofClamp(rows, 0, MAX_GRID_SIZE);
@@ -326,19 +326,19 @@ void Grid::SetGrid(int cols, int rows)
    mCols = cols;
 }
 
-void Grid::Clear()
+void UIGrid::Clear()
 {
    bzero(mData, MAX_GRID_SIZE*MAX_GRID_SIZE*sizeof(int));
 }
 
-float Grid::GetVal(int col, int row)
+float UIGrid::GetVal(int col, int row)
 {
    col = ofClamp(col, 0, MAX_GRID_SIZE-1);
    row = ofClamp(row, 0, MAX_GRID_SIZE-1);
    return mData[row][col];
 }
 
-void Grid::SetVal(int col, int row, float val, bool notifyListener)
+void UIGrid::SetVal(int col, int row, float val, bool notifyListener)
 {
    col = ofClamp(col, 0, MAX_GRID_SIZE-1);
    row = ofClamp(row, 0, MAX_GRID_SIZE-1);
@@ -361,12 +361,12 @@ void Grid::SetVal(int col, int row, float val, bool notifyListener)
    }
 }
 
-float Grid::GetValRefactor(int row, int col)
+float UIGrid::GetValRefactor(int row, int col)
 {
    return GetVal(col,row);
 }
 
-void Grid::SetValRefactor(int row, int col, float val)
+void UIGrid::SetValRefactor(int row, int col, float val)
 {
    SetVal(col, row, val);
 }
@@ -376,7 +376,7 @@ namespace
    const int kSaveStateRev = 1;
 }
 
-void Grid::SaveState(FileStreamOut& out)
+void UIGrid::SaveState(FileStreamOut& out)
 {
    out << kSaveStateRev;
    
@@ -389,7 +389,7 @@ void Grid::SaveState(FileStreamOut& out)
    }
 }
 
-void Grid::LoadState(FileStreamIn& in, bool shouldSetValue)
+void UIGrid::LoadState(FileStreamIn& in, bool shouldSetValue)
 {
    int rev;
    in >> rev;

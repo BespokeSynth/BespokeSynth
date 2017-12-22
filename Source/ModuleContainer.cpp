@@ -61,7 +61,7 @@ void ModuleContainer::DrawPatchCables()
    if (mOwner != nullptr && mOwner->Minimized())
       return;
    
-   for (int i = mModules.size()-1; i >= 0; --i)
+   for (int i = (int)mModules.size()-1; i >= 0; --i)
    {
       mModules[i]->DrawPatchCables();
       if (mModules[i]->GetContainer())

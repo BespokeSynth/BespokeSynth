@@ -62,6 +62,7 @@
 		34F8FF37FB6D5B05C8BA70E6 /* Kicker.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 4067AA6EE2564168BBFDA6EC /* Kicker.cpp */; };
 		353D59177BFD42E1BAA555B2 /* SliderSequencer.cpp in Sources */ = {isa = PBXBuildFile; fileRef = EAFAC5783C9D84B07CD443CF /* SliderSequencer.cpp */; };
 		356EE23D3BFCACC056194E8D /* Bespoke_glew.c in Sources */ = {isa = PBXBuildFile; fileRef = B5F7F4CF5F4C6C54E1897D88 /* Bespoke_glew.c */; };
+		35C7A33561E91D256ECA7C73 /* AVKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 9D41EBBBAD1E4CCEECFE0A73 /* AVKit.framework */; };
 		362702F638CD8ED3389B4C7B /* ScaleDegree.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 1B0FF1BE972923F406F860BB /* ScaleDegree.cpp */; };
 		37B7BDACE59F4586DEA3A142 /* Sample.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 7FA8A476786A4B1458902D74 /* Sample.cpp */; };
 		37E285697A7A58C4ADFC615F /* CircleSequencer.cpp in Sources */ = {isa = PBXBuildFile; fileRef = E2853D6DED5EE5B27144F978 /* CircleSequencer.cpp */; };
@@ -210,7 +211,7 @@
 		AC5C7011C096B60EF4A683E6 /* RollingBuffer.cpp in Sources */ = {isa = PBXBuildFile; fileRef = DF29E1F216522DF88605C922 /* RollingBuffer.cpp */; };
 		AD0306BCDEE312ECDB90F89A /* DebugAudioSource.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 2B8D71C1FE265CE2E8A28C65 /* DebugAudioSource.cpp */; };
 		AD4C59194337441DB99D7519 /* Neighborhooder.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 81F4EE02E3CDB9F8178EED9D /* Neighborhooder.cpp */; };
-		AF2E9EF789086B680EB1BBEA /* Grid.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 80B803FF208BE30580C68EDC /* Grid.cpp */; };
+		AF2E9EF789086B680EB1BBEA /* UIGrid.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 80B803FF208BE30580C68EDC /* UIGrid.cpp */; };
 		AF4429A566282F4D131F8268 /* ComboGridController.cpp in Sources */ = {isa = PBXBuildFile; fileRef = C7656597DE3584DD1776B837 /* ComboGridController.cpp */; };
 		AF93754BB9D2452A95CFEA03 /* Polyrhythms.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 9C5B5539C72004898F5C7BD3 /* Polyrhythms.cpp */; };
 		B0967923A27978CB07A33035 /* LiveGranulator.cpp in Sources */ = {isa = PBXBuildFile; fileRef = A518D4B1B7B1867E83DD3430 /* LiveGranulator.cpp */; };
@@ -605,7 +606,7 @@
 		7FC0C45B2A5D515CB253B244 /* juce_gui_extra */ = {isa = PBXFileReference; lastKnownFileType = folder; name = juce_gui_extra; path = ../../../../../Downloads/JUCE/modules/juce_gui_extra; sourceTree = SOURCE_ROOT; };
 		7FF9566592A317DE85FCB7BF /* hid.c */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.c; name = hid.c; path = ../../Source/psmove/hid.c; sourceTree = SOURCE_ROOT; };
 		801231F51F1071D93FB98EA2 /* PolyphonyMgr.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; name = PolyphonyMgr.h; path = ../../Source/PolyphonyMgr.h; sourceTree = SOURCE_ROOT; };
-		80B803FF208BE30580C68EDC /* Grid.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; name = Grid.cpp; path = ../../Source/Grid.cpp; sourceTree = SOURCE_ROOT; };
+		80B803FF208BE30580C68EDC /* UIGrid.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; name = UIGrid.cpp; path = ../../Source/UIGrid.cpp; sourceTree = SOURCE_ROOT; };
 		81D57476649503400553A6F9 /* Presets.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; name = Presets.cpp; path = ../../Source/Presets.cpp; sourceTree = SOURCE_ROOT; };
 		81F4EE02E3CDB9F8178EED9D /* Neighborhooder.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; name = Neighborhooder.cpp; path = ../../Source/Neighborhooder.cpp; sourceTree = SOURCE_ROOT; };
 		829AEE5C8092C112440C3F1F /* ControlTactileFeedback.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; name = ControlTactileFeedback.cpp; path = ../../Source/ControlTactileFeedback.cpp; sourceTree = SOURCE_ROOT; };
@@ -686,6 +687,7 @@
 		9C5B5539C72004898F5C7BD3 /* Polyrhythms.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; name = Polyrhythms.cpp; path = ../../Source/Polyrhythms.cpp; sourceTree = SOURCE_ROOT; };
 		9CADCE4C3052D0FE5D8DCD8F /* PitchToCV.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; name = PitchToCV.h; path = ../../Source/PitchToCV.h; sourceTree = SOURCE_ROOT; };
 		9D09F3FAE2640774915D2F36 /* SustainPedal.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; name = SustainPedal.h; path = ../../Source/SustainPedal.h; sourceTree = SOURCE_ROOT; };
+		9D41EBBBAD1E4CCEECFE0A73 /* AVKit.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = AVKit.framework; path = System/Library/Frameworks/AVKit.framework; sourceTree = SDKROOT; };
 		9DB409C97C663CF901892FE2 /* PressureToModwheel.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; name = PressureToModwheel.cpp; path = ../../Source/PressureToModwheel.cpp; sourceTree = SOURCE_ROOT; };
 		9E17D23194F78FFF977E9153 /* EQEffect.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; name = EQEffect.h; path = ../../Source/EQEffect.h; sourceTree = SOURCE_ROOT; };
 		9E82CC39A1A0DC244DA11CF0 /* BiquadFilter.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; name = BiquadFilter.h; path = ../../Source/BiquadFilter.h; sourceTree = SOURCE_ROOT; };
@@ -770,7 +772,7 @@
 		BFB4931691FB00B1B87279CC /* ModWheelToCV.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; name = ModWheelToCV.h; path = ../../Source/ModWheelToCV.h; sourceTree = SOURCE_ROOT; };
 		C064EA3B5667E6D8429EB178 /* Slider.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; name = Slider.cpp; path = ../../Source/Slider.cpp; sourceTree = SOURCE_ROOT; };
 		C08075F211A4C53C09E767D9 /* NoteSinger.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; name = NoteSinger.h; path = ../../Source/NoteSinger.h; sourceTree = SOURCE_ROOT; };
-		C08531DD19A571096F975AF2 /* Grid.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; name = Grid.h; path = ../../Source/Grid.h; sourceTree = SOURCE_ROOT; };
+		C08531DD19A571096F975AF2 /* UIGrid.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; name = UIGrid.h; path = ../../Source/UIGrid.h; sourceTree = SOURCE_ROOT; };
 		C1437AC4288E03F315E80162 /* Sample.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; name = Sample.h; path = ../../Source/Sample.h; sourceTree = SOURCE_ROOT; };
 		C14DA7106542FDDF5FD40447 /* CircleSequencer.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; name = CircleSequencer.h; path = ../../Source/CircleSequencer.h; sourceTree = SOURCE_ROOT; };
 		C1516A4C5DD98EB0A7A06D9D /* SampleVoice.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; name = SampleVoice.h; path = ../../Source/SampleVoice.h; sourceTree = SOURCE_ROOT; };
@@ -931,6 +933,7 @@
 				B0B4238CA2957B58C0EB9A9F /* AudioToolbox.framework in Frameworks */,
 				3CF6775E1520668187FB6F2E /* AudioUnit.framework in Frameworks */,
 				04805908F671A938F143527A /* AVFoundation.framework in Frameworks */,
+				35C7A33561E91D256ECA7C73 /* AVKit.framework in Frameworks */,
 				184F76968B4037C28959233C /* Carbon.framework in Frameworks */,
 				61345E907F5D8C848712E2CD /* Cocoa.framework in Frameworks */,
 				ABC9D6755FD6C687026F7F41 /* CoreAudio.framework in Frameworks */,
@@ -1150,8 +1153,8 @@
 				29FC38B1B182E59C07D55CBD /* FMVoice.h */,
 				E7E3414F0FF857A6BB3A61A0 /* Granulator.cpp */,
 				96B9DBC7B8C6B9B56F5BE462 /* Granulator.h */,
-				80B803FF208BE30580C68EDC /* Grid.cpp */,
-				C08531DD19A571096F975AF2 /* Grid.h */,
+				80B803FF208BE30580C68EDC /* UIGrid.cpp */,
+				C08531DD19A571096F975AF2 /* UIGrid.h */,
 				8B3F685C1221862D93D5CDB9 /* IAudioEffect.h */,
 				576BE0FCFA022D9B358D116B /* IAudioProcessor.cpp */,
 				977BBCF7588949CAC7B5DF58 /* IAudioProcessor.h */,
@@ -1267,6 +1270,7 @@
 				A0D711828181ADA5A52508FF /* AudioToolbox.framework */,
 				C49C3C1C8F0B30541BCEFE0F /* AudioUnit.framework */,
 				1064FD7BE6554F769648FC07 /* AVFoundation.framework */,
+				9D41EBBBAD1E4CCEECFE0A73 /* AVKit.framework */,
 				EDE4165C88619B99B29BA45D /* Carbon.framework */,
 				355018DFD1C3C7FB82AFAA9B /* Cocoa.framework */,
 				69BDCB4FEE35D5186FCB5085 /* CoreAudio.framework */,
@@ -1794,10 +1798,16 @@
 				TargetAttributes = {
 					DAAB28E086014C75EC54A378 = {
 						SystemCapabilities = {
+							com.apple.ApplicationGroups.iOS = {
+								enabled = 0;
+							};
 							com.apple.InAppPurchase = {
 								enabled = 0;
 							};
 							com.apple.InterAppAudio = {
+								enabled = 0;
+							};
+							com.apple.Push = {
 								enabled = 0;
 							};
 							com.apple.Sandbox = {
@@ -2050,7 +2060,7 @@
 				3F8916E2EBC8F54E634B5467 /* FloatSliderLFOControl.cpp in Sources */,
 				3C32997BC9E592C90404F332 /* FMVoice.cpp in Sources */,
 				D47D13E323A5A27448A7F851 /* Granulator.cpp in Sources */,
-				AF2E9EF789086B680EB1BBEA /* Grid.cpp in Sources */,
+				AF2E9EF789086B680EB1BBEA /* UIGrid.cpp in Sources */,
 				C05573B05280D1CF1F60D31E /* IAudioProcessor.cpp in Sources */,
 				59B64D7612088861AD577F42 /* IAudioReceiver.cpp in Sources */,
 				025BF43F7A90363FF82DE7CF /* IAudioSource.cpp in Sources */,
@@ -2126,18 +2136,38 @@
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				ALWAYS_SEARCH_USER_PATHS = NO;
+				CLANG_WARN_BLOCK_CAPTURE_AUTORELEASING = YES;
+				CLANG_WARN_BOOL_CONVERSION = YES;
+				CLANG_WARN_COMMA = YES;
+				CLANG_WARN_CONSTANT_CONVERSION = YES;
+				CLANG_WARN_EMPTY_BODY = YES;
+				CLANG_WARN_ENUM_CONVERSION = YES;
+				CLANG_WARN_INFINITE_RECURSION = YES;
+				CLANG_WARN_INT_CONVERSION = YES;
+				CLANG_WARN_NON_LITERAL_NULL_CONVERSION = YES;
+				CLANG_WARN_OBJC_LITERAL_CONVERSION = YES;
+				CLANG_WARN_RANGE_LOOP_ANALYSIS = YES;
+				CLANG_WARN_STRICT_PROTOTYPES = YES;
+				CLANG_WARN_SUSPICIOUS_MOVE = YES;
+				CLANG_WARN_UNREACHABLE_CODE = YES;
+				CLANG_WARN__DUPLICATE_METHOD_MATCH = YES;
 				DEBUG_INFORMATION_FORMAT = dwarf;
+				ENABLE_STRICT_OBJC_MSGSEND = YES;
 				GCC_C_LANGUAGE_STANDARD = c11;
 				GCC_INLINES_ARE_PRIVATE_EXTERN = YES;
 				GCC_MODEL_TUNING = G5;
+				GCC_NO_COMMON_BLOCKS = YES;
+				GCC_WARN_64_TO_32_BIT_CONVERSION = YES;
 				GCC_WARN_ABOUT_RETURN_TYPE = YES;
 				GCC_WARN_CHECK_SWITCH_STATEMENTS = YES;
 				GCC_WARN_MISSING_PARENTHESES = YES;
 				GCC_WARN_NON_VIRTUAL_DESTRUCTOR = YES;
 				GCC_WARN_TYPECHECK_CALLS_TO_PRINTF = YES;
+				GCC_WARN_UNDECLARED_SELECTOR = YES;
+				GCC_WARN_UNINITIALIZED_AUTOS = YES;
+				GCC_WARN_UNUSED_FUNCTION = YES;
 				GCC_WARN_UNUSED_VARIABLE = YES;
 				PRODUCT_NAME = Bespoke;
-				WARNING_CFLAGS = "-Wreorder";
 				ZERO_LINK = NO;
 			};
 			name = Release;
@@ -2146,20 +2176,40 @@
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				ALWAYS_SEARCH_USER_PATHS = NO;
+				CLANG_WARN_BLOCK_CAPTURE_AUTORELEASING = YES;
+				CLANG_WARN_BOOL_CONVERSION = YES;
+				CLANG_WARN_COMMA = YES;
+				CLANG_WARN_CONSTANT_CONVERSION = YES;
+				CLANG_WARN_EMPTY_BODY = YES;
+				CLANG_WARN_ENUM_CONVERSION = YES;
+				CLANG_WARN_INFINITE_RECURSION = YES;
+				CLANG_WARN_INT_CONVERSION = YES;
+				CLANG_WARN_NON_LITERAL_NULL_CONVERSION = YES;
+				CLANG_WARN_OBJC_LITERAL_CONVERSION = YES;
+				CLANG_WARN_RANGE_LOOP_ANALYSIS = YES;
+				CLANG_WARN_STRICT_PROTOTYPES = YES;
+				CLANG_WARN_SUSPICIOUS_MOVE = YES;
+				CLANG_WARN_UNREACHABLE_CODE = YES;
+				CLANG_WARN__DUPLICATE_METHOD_MATCH = YES;
 				DEBUG_INFORMATION_FORMAT = dwarf;
+				ENABLE_STRICT_OBJC_MSGSEND = YES;
 				ENABLE_TESTABILITY = YES;
 				GCC_C_LANGUAGE_STANDARD = c11;
 				GCC_INLINES_ARE_PRIVATE_EXTERN = YES;
 				GCC_MODEL_TUNING = G5;
+				GCC_NO_COMMON_BLOCKS = YES;
+				GCC_WARN_64_TO_32_BIT_CONVERSION = YES;
 				GCC_WARN_ABOUT_RETURN_TYPE = YES;
 				GCC_WARN_CHECK_SWITCH_STATEMENTS = YES;
 				GCC_WARN_MISSING_PARENTHESES = YES;
 				GCC_WARN_NON_VIRTUAL_DESTRUCTOR = YES;
 				GCC_WARN_TYPECHECK_CALLS_TO_PRINTF = YES;
+				GCC_WARN_UNDECLARED_SELECTOR = YES;
+				GCC_WARN_UNINITIALIZED_AUTOS = YES;
+				GCC_WARN_UNUSED_FUNCTION = YES;
 				GCC_WARN_UNUSED_VARIABLE = YES;
 				ONLY_ACTIVE_ARCH = YES;
 				PRODUCT_NAME = Bespoke;
-				WARNING_CFLAGS = "-Wreorder";
 				ZERO_LINK = NO;
 			};
 			name = Debug;
@@ -2167,7 +2217,7 @@
 		FD882A4ECFA866B46211D289 /* Debug */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
-				CLANG_CXX_LANGUAGE_STANDARD = "c++0x";
+				CLANG_CXX_LANGUAGE_STANDARD = "c++11";
 				CLANG_LINK_OBJC_RUNTIME = NO;
 				COMBINE_HIDPI_IMAGES = YES;
 				CONFIGURATION_BUILD_DIR = "$(PROJECT_DIR)/build/$(CONFIGURATION)";
@@ -2195,23 +2245,23 @@
 					../../JuceLibraryCode,
 					../../../../../Downloads/JUCE/modules,
 					../../Source/json/include,
-					/juce_audio_plugin_client,
 					"$(inherited)",
 				);
 				INFOPLIST_FILE = "Info-App.plist";
+				INFOPLIST_PREPROCESS = NO;
 				INSTALL_PATH = "$(HOME)/Applications";
 				MACOSX_DEPLOYMENT_TARGET = 10.11;
 				MACOSX_DEPLOYMENT_TARGET_ppc = 10.4;
 				PRODUCT_BUNDLE_IDENTIFIER = com.ryanchallinor.Bespoke;
 				SDKROOT_ppc = macosx10.5;
-				WARNING_CFLAGS = "";
+				USE_HEADERMAP = NO;
 			};
 			name = Debug;
 		};
 		FE9B06F318B612A5A368FE11 /* Release */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
-				CLANG_CXX_LANGUAGE_STANDARD = "c++0x";
+				CLANG_CXX_LANGUAGE_STANDARD = "c++11";
 				CLANG_LINK_OBJC_RUNTIME = NO;
 				COMBINE_HIDPI_IMAGES = YES;
 				CONFIGURATION_BUILD_DIR = "$(PROJECT_DIR)/build/$(CONFIGURATION)";
@@ -2240,16 +2290,16 @@
 					../../JuceLibraryCode,
 					../../../../../Downloads/JUCE/modules,
 					../../Source/json/include,
-					/juce_audio_plugin_client,
 					"$(inherited)",
 				);
 				INFOPLIST_FILE = "Info-App.plist";
+				INFOPLIST_PREPROCESS = NO;
 				INSTALL_PATH = "$(HOME)/Applications";
 				MACOSX_DEPLOYMENT_TARGET = 10.11;
 				MACOSX_DEPLOYMENT_TARGET_ppc = 10.4;
 				PRODUCT_BUNDLE_IDENTIFIER = com.ryanchallinor.Bespoke;
 				SDKROOT_ppc = macosx10.5;
-				WARNING_CFLAGS = "";
+				USE_HEADERMAP = NO;
 			};
 			name = Release;
 		};

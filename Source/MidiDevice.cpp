@@ -49,17 +49,28 @@ void MidiDevice::ConnectInput(int index)
    ConnectInput(MidiInput::getDevices()[index].toRawUTF8());
 }
 
-void MidiDevice::ConnectOutput(const char* name, int channel /*= 1*/)
+bool MidiDevice::ConnectOutput(const char* name, int channel /*= 1*/)
 {
+   bool found = false;
    StringArray devices = MidiOutput::getDevices();
    for (int i=0; i<devices.size(); ++i)
    {
       if (devices[i] == name)
       {
          ConnectOutput(i, channel);
+         found = true;
          break;
       }
    }
+   
+   if (!found)
+   {
+      delete mMidiOut;
+      mMidiOut = nullptr;
+      mDeviceNameOut[0] = 0;
+   }
+   
+   return found;
 }
 
 void MidiDevice::ConnectOutput(int index, int channel /*= 1*/)
