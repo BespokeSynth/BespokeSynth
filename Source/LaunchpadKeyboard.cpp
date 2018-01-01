@@ -241,7 +241,7 @@ void LaunchpadKeyboard::OnGridButton(int x, int y, float velocity, IGridControll
          PressedNoteFor(x, y, x+y*8);
          mNoteOutput.Flush();
          for (int i=0; i<mChords[x].size(); ++i)
-            PlayNoteOutput(gTime, TheScale->MakeDiatonic(pitch+mChords[x][i]), 80, -1);
+            PlayNoteOutput(gTime, TheScale->MakeDiatonic(pitch+mChords[x][i]), 127*velocity, -1);
       }
       else if (x+y*8 == mHeld.begin()->mPitch)
       {
@@ -253,7 +253,7 @@ void LaunchpadKeyboard::OnGridButton(int x, int y, float velocity, IGridControll
    {
       if (bOn)
       {
-         PlayNoteOutput(gTime, pitch, 80, -1);
+         PlayNoteOutput(gTime, pitch, 127*velocity, -1);
          PressedNoteFor(x,y,pitch);
       }
       else

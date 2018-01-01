@@ -21,14 +21,15 @@
 #include "Slider.h"
 #include "UIGrid.h"
 #include "MidiController.h"
+#include "Scale.h"
 
-#define NSS_MAX_STEPS 128
+#define NSS_MAX_STEPS 16
 
-class NoteStepSequencer : public IDrawableModule, public ITimeListener, public INoteSource, public IButtonListener, public IDropdownListener, public IIntSliderListener, public IFloatSliderListener, public MidiDeviceListener, public UIGridListener, public IAudioPoller
+class NoteStepSequencer : public IDrawableModule, public ITimeListener, public INoteSource, public IButtonListener, public IDropdownListener, public IIntSliderListener, public IFloatSliderListener, public MidiDeviceListener, public UIGridListener, public IAudioPoller, public IScaleListener
 {
 public:
    NoteStepSequencer();
-   ~NoteStepSequencer();
+   virtual ~NoteStepSequencer();
    static IDrawableModule* Create() { return new NoteStepSequencer(); }
    
    string GetTitleLabel() override { return "note sequencer"; }
@@ -58,6 +59,9 @@ public:
    
    //ITimeListener
    void OnTimeEvent(int samplesTo) override;
+   
+   //IScaleListener
+   void OnScaleChanged() override;
    
    //MidiDeviceListener
    void OnMidiNote(MidiNote& note) override;
@@ -91,6 +95,9 @@ private:
    void UpdateLights();
    void ShiftSteps(int amount);
    void UpdateVelocityGridPos();
+   void SetUpStepControls();
+   float ExtraWidth() const;
+   float ExtraHeight() const;
    
    enum NoteMode
    {
@@ -150,6 +157,7 @@ private:
    FloatSlider* mFreeTimeSlider;
    float mFreeTimeStep;
    float mFreeTimeCounter;
+   bool mShowStepControls;
    
    MidiController* mController;
 
@@ -159,6 +167,10 @@ private:
    ClickButton* mRandomizePitchButton;
    ClickButton* mRandomizeLengthButton;
    ClickButton* mRandomizeVelocityButton;
+   
+   DropdownList* mToneDropdowns[NSS_MAX_STEPS];
+   IntSlider* mVelocitySliders[NSS_MAX_STEPS];
+   FloatSlider* mLengthSliders[NSS_MAX_STEPS];
 };
 
 

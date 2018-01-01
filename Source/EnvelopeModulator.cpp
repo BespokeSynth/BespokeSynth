@@ -10,6 +10,7 @@
 
 #include "EnvelopeModulator.h"
 #include "PatchCableSource.h"
+#include "ModularSynth.h"
 
 EnvelopeModulator::EnvelopeModulator()
 : mWidth(250)
@@ -150,6 +151,12 @@ void EnvelopeModulator::FloatSliderUpdated(FloatSlider* slider, float oldVal)
 void EnvelopeModulator::SaveLayout(ofxJSONElement& moduleInfo)
 {
    IDrawableModule::SaveLayout(moduleInfo);
+   
+   string targetPath = "";
+   if (mTarget)
+      targetPath = mTarget->Path();
+   
+   moduleInfo["target"] = targetPath;
 }
 
 void EnvelopeModulator::LoadLayout(const ofxJSONElement& moduleInfo)
@@ -161,6 +168,7 @@ void EnvelopeModulator::LoadLayout(const ofxJSONElement& moduleInfo)
 
 void EnvelopeModulator::SetUpFromSaveData()
 {
+   mTargetCable->SetTarget(TheSynth->FindUIControl(mModuleSaveData.GetString("target")));
 }
 
 namespace

@@ -58,7 +58,7 @@ protected:
    NoteHistory mHistory;
 };
 
-class GridController : public IDrawableModule, public MidiDeviceListener, public IGridController
+class GridController : public IDrawableModule, public IGridController
 {
 public:
    GridController();
@@ -72,6 +72,7 @@ public:
    
    void SetTarget(IClickable* target) override;
    
+   void SetUp(GridLayout* layout, MidiController* controller);
    void SetLight(int x, int y, GridColor color, bool force = false) override;
    void SetLightDirect(int x, int y, int color, bool force = false) override;
    void ResetLights() override;
@@ -80,9 +81,8 @@ public:
    bool HasInput() const override;
    bool IsMultisliderGrid() const override { return mColors.empty(); }
 
-   void ControllerPageSelected() override;
-   void OnMidiNote(MidiNote& note) override;
-   void OnMidiControl(MidiControl& control) override;
+   void OnControllerPageSelected();
+   void OnInput(int control, float velocity);
    
    void PostRepatch(PatchCableSource* cable) override;
    
@@ -90,8 +90,6 @@ public:
    void SetUpFromSaveData() override;
    
 private:
-   void OnInput(int control, float velocity);
-   
    //IDrawableModule
    void DrawModule() override;
    bool Enabled() const override { return true; }

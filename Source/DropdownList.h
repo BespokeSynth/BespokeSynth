@@ -64,6 +64,8 @@ public:
    EnumMap GetEnumMap();
    void SetUnknownItemString(string str) { mUnknownItemString = str; CalculateWidth(); }
    void DrawLabel(bool draw) { mDrawLabel = draw; }
+   void SetWidth(int width) { mWidth = width; }
+   void SetDrawTriangle(bool draw) { mDrawTriangle = draw; }
 
    //IUIControl
    void SetFromMidiCC(float slider) override;
@@ -71,7 +73,7 @@ public:
    void SetValue(float value) override;
    float GetValue() const override;
    float GetMidiValue() override;
-   int GetNumValues() override { return mElements.size(); }
+   int GetNumValues() override { return (int)mElements.size(); }
    string GetDisplayValue(float val) const override;
    bool InvertScrollDirection() override { return true; }
    void Increment(float amount) override;
@@ -105,6 +107,7 @@ private:
    float mSliderVal;
    int mLastSetValue;
    bool mAutoCalculateWidth;
+   bool mDrawTriangle;
 };
 
 #endif /* defined(__modularSynth__DropdownList__) */

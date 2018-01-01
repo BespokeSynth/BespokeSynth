@@ -105,7 +105,7 @@ void GridController::DrawGrid()
    }
 }
 
-void GridController::ControllerPageSelected()
+void GridController::OnControllerPageSelected()
 {
    for (int i=0; i<mCols; ++i)
    {
@@ -113,22 +113,6 @@ void GridController::ControllerPageSelected()
       {
          SetLightDirect(i, j, mLights[i][j], K(force));
       }
-   }
-}
-
-void GridController::OnMidiNote(MidiNote& note)
-{
-   if (mMessageType == kMidiMessage_Note)
-   {
-      OnInput(note.mPitch, note.mVelocity/127.0f);
-   }
-}
-
-void GridController::OnMidiControl(MidiControl& control)
-{
-   if (mMessageType == kMidiMessage_Control)
-   {
-      OnInput(control.mControl, control.mValue/127.0f);
    }
 }
 
@@ -279,11 +263,35 @@ void GridController::GetModuleDimensions(int& w, int& h)
    h = mRows * 20;
 }
 
+void GridController::SetUp(GridLayout* layout, MidiController* controller)
+{
+   mRows = layout->mRows;
+   mCols = layout->mCols;
+   for (unsigned int row=0; row<mRows; ++row)
+   {
+      for (unsigned int col=0; col<mCols; ++col)
+      {  
+         int index = col + row * mCols;
+         mControls[col][row] = layout->mControls[index];
+      }
+   }
+   
+   mColors.clear();
+   unsigned int numColors = 2;
+   for (unsigned int i=0; i<numColors; ++i)
+   {
+      mColors.push_back(i * 127);
+   }
+   
+   mMessageType = layout->mType;
+   
+   mGrid->SetGrid(mCols,mRows);
+   
+   mController = controller;
+}
+
 void GridController::LoadLayout(const ofxJSONElement& moduleInfo)
 {
-   mModuleSaveData.LoadString("gridfile", moduleInfo);
-   mModuleSaveData.LoadString("controller", moduleInfo, "", FillDropdown<MidiController*>);
-   mModuleSaveData.LoadInt("controller_page", moduleInfo,0,0,MAX_MIDI_PAGES,K(textEntry));
    mModuleSaveData.LoadString("target", moduleInfo);
    
    SetUpFromSaveData();
@@ -291,40 +299,5 @@ void GridController::LoadLayout(const ofxJSONElement& moduleInfo)
 
 void GridController::SetUpFromSaveData()
 {
-   ofxJSONElement root;
-   root.open(ofToDataPath(mModuleSaveData.GetString("gridfile")));
-   
-   mRows = root["grid"].size();
-   mCols = root["grid"][0u].size();
-   for (unsigned int row=0; row<mRows; ++row)
-   {
-      for (unsigned int col=0; col<mCols; ++col)
-      {
-         mControls[col][row] = root["grid"][row][col].asInt();
-      }
-   }
-   
-   mColors.clear();
-   unsigned int numColors = root["colors"].size();
-   for (unsigned int i=0; i<numColors; ++i)
-   {
-      mColors.push_back(root["colors"][i].asInt());
-   }
-   
-   string str = root["message_type"].asString();
-   if (root["message_type"].asString() == "control")
-      mMessageType = kMidiMessage_Control;
-   else
-      mMessageType = kMidiMessage_Note;
-   
-   if (mController)
-      mController->RemoveListener(this);
-   mController = TheSynth->FindMidiController(mModuleSaveData.GetString("controller"));
-   mControllerPage = mModuleSaveData.GetInt("controller_page");
-   if (mController)
-      mController->AddListener(this, mControllerPage);
-   
-   mGrid->SetGrid(mCols,mRows);
-   
    SetUpPatchCables(mModuleSaveData.GetString("target"));
 }

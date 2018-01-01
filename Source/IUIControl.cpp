@@ -71,7 +71,7 @@ void IUIControl::DrawHover()
       ofPushStyle();
       ofNoFill();
       ofSetColor(0,255,255);
-      ofRect(mX-1,mY-1,w+2,h+2,4);
+      ofRect(mX,mY,w,h,4);
       ofPopStyle();
    }
    
@@ -82,7 +82,7 @@ void IUIControl::DrawHover()
       ofPushStyle();
       ofFill();
       ofSetColor(255,0,255,100);
-      ofRect(mX-1,mY-1,w+2,h+2);
+      ofRect(mX,mY,w,h);
       ofPopStyle();
    }
    
@@ -94,7 +94,7 @@ void IUIControl::DrawHover()
       ofNoFill();
       ofSetLineWidth(5);
       ofSetColor(255,0,255,200);
-      ofRect(mX-1,mY-1,w+2,h+2);
+      ofRect(mX,mY,w,h);
       ofPopStyle();
    }
    
@@ -108,7 +108,7 @@ void IUIControl::DrawHover()
       ofNoFill();
       ofSetLineWidth(5);
       ofSetColor(255,0,255,200);
-      ofRect(mX-1,mY-1,w+2,h+2);
+      ofRect(mX,mY,w,h);
       ofPopStyle();
    }
 }

@@ -494,6 +494,21 @@ void MidiController::MidiReceived(MidiMessageType messageType, int control, floa
       }
    }
    
+   for (auto* grid : mGrids)
+   {
+      if (grid->mType == messageType && grid->mGridController[mControllerPage] != nullptr)
+      {
+         for (int i=0; i<grid->mControls.size(); ++i)
+         {
+            if (grid->mControls[i] == control)
+            {
+               grid->mGridController[mControllerPage]->OnInput(control, value);
+               break;
+            }
+         }
+      }
+   }
+   
    /*if (mLastActivityBound == false && mTwoWay) //if this didn't affect anything, give that feedback on the controller by keeping it at zero
    {
       //if (messageType == kMidiMessage_Note)
@@ -610,6 +625,8 @@ void MidiController::Poll()
                   SendNote(mControllerPage, control, outVal, true, connection->mChannel);
                else if (connection->mMessageType == kMidiMessage_Control)
                   SendCC(mControllerPage, control, outVal, connection->mChannel);
+               else if (connection->mMessageType == kMidiMessage_PitchBend)
+                  SendPitchBend(mControllerPage, outVal, connection->mChannel);
             }
             else if (connection->mType == kControlType_Slider)
             {
@@ -623,6 +640,8 @@ void MidiController::Poll()
                   SendNote(mControllerPage, control, outVal, true, connection->mChannel);
                else if (connection->mMessageType == kMidiMessage_Control)
                   SendCC(mControllerPage, control, outVal, connection->mChannel);
+               else if (connection->mMessageType == kMidiMessage_PitchBend)
+                  SendPitchBend(mControllerPage, outVal, connection->mChannel);
             }
             else if (connection->mType == kControlType_SetValue)
             {
@@ -645,6 +664,8 @@ void MidiController::Poll()
                   SendNote(mControllerPage, control, outVal, true, connection->mChannel);
                else if (connection->mMessageType == kMidiMessage_Control)
                   SendCC(mControllerPage, control, outVal, connection->mChannel);
+               else if (connection->mMessageType == kMidiMessage_PitchBend)
+                  SendPitchBend(mControllerPage, outVal, connection->mChannel);
             }
             else if (connection->mType == kControlType_Direct)
             {
@@ -653,6 +674,8 @@ void MidiController::Poll()
                   SendNote(mControllerPage, control, uicontrol->GetValue(), true, connection->mChannel);
                else if (connection->mMessageType == kMidiMessage_Control)
                   SendCC(mControllerPage, control, uicontrol->GetValue(), connection->mChannel);
+               else if (connection->mMessageType == kMidiMessage_PitchBend)
+                  SendPitchBend(mControllerPage, uicontrol->GetValue(), connection->mChannel);
             }
             connection->mLastControlValue = curValue;
          }
@@ -1083,6 +1106,12 @@ void MidiController::SendCC(int page, int ctl, int value, int channel /*= -1*/)
       mDevice.SendCC(ctl,value, channel);
 }
 
+void MidiController::SendPitchBend(int page, int bend, int channel /*= -1*/)
+{
+   if (page == mControllerPage)
+      mDevice.SendPitchBend(bend, channel);
+}
+
 void MidiController::SendData(int page, unsigned char a, unsigned char b, unsigned char c)
 {
    if (page == mControllerPage)
@@ -1292,6 +1321,18 @@ void MidiController::DropdownUpdated(DropdownList* list, int oldVal)
                mLayoutControls[i].mControlCable->SetTarget(connection->mUIControl);
          }
       }
+      for (auto* grid : mGrids)
+      {
+         if (grid->mGridController[mControllerPage] != nullptr)
+         {
+            grid->mGridController[mControllerPage]->OnControllerPageSelected();
+            grid->mGridCable->SetTarget(grid->mGridController[mControllerPage]);
+         }
+         else
+         {
+            grid->mGridCable->ClearPatchCables();
+         }
+      }
       HighlightPageControls(mControllerPage);
       ResyncTwoWay();
    }
@@ -1361,8 +1402,9 @@ void MidiController::PostRepatch(PatchCableSource* cable)
    {
       if (cable == grid->mGridCable)
       {
-         GridController* gridController = dynamic_cast<GridController*>(cable->GetTarget());
-         //gridController->SetUp(grid);
+         grid->mGridController[mControllerPage] = dynamic_cast<GridController*>(cable->GetTarget());
+         if (grid->mGridController[mControllerPage])
+            grid->mGridController[mControllerPage]->SetUp(grid, this);
          return;
       }
    }
@@ -1449,7 +1491,7 @@ void MidiController::LoadLayout(const ofxJSONElement& moduleInfo)
    mModuleSaveData.LoadFloat("velocitymult",moduleInfo,1,0,10,K(isTextField));
    mModuleSaveData.LoadBool("usechannelasvoice",moduleInfo,false);
    mModuleSaveData.LoadInt("noteoffset",moduleInfo,0,-999,999,K(isTextField));
-   mModuleSaveData.LoadFloat("pitchbendrange",moduleInfo,2,1,24,K(isTextField));
+   mModuleSaveData.LoadFloat("pitchbendrange",moduleInfo,2,1,96,K(isTextField));
    mModuleSaveData.LoadInt("modwheelcc(1or74)",moduleInfo,1,0,127,K(isTextField));
    
    mModuleSaveData.LoadInt("outchannel", moduleInfo, 1, 0, 15);
@@ -1467,6 +1509,14 @@ void MidiController::LoadLayout(const ofxJSONElement& moduleInfo)
 
 void MidiController::SetUpFromSaveData()
 {
+   SetUpPatchCables(mModuleSaveData.GetString("target"));
+   SetVelocityMult(mModuleSaveData.GetFloat("velocitymult"));
+   SetUseChannelAsVoice(mModuleSaveData.GetBool("usechannelasvoice"));
+   SetNoteOffset(mModuleSaveData.GetInt("noteoffset"));
+   SetPitchBendRange(mModuleSaveData.GetFloat("pitchbendrange"));
+   
+   mModwheelCC = mModuleSaveData.GetInt("modwheelcc(1or74)");
+   
    mDeviceIn = mModuleSaveData.GetString("devicein");
    mDeviceOut = mModuleSaveData.GetString("deviceout");
    mOutChannel = mModuleSaveData.GetInt("outchannel");
@@ -1518,14 +1568,6 @@ void MidiController::SetUpFromSaveData()
 void MidiController::SaveLayout(ofxJSONElement& moduleInfo)
 {
    IDrawableModule::SaveLayout(moduleInfo);
-   
-   SetUpPatchCables(mModuleSaveData.GetString("target"));
-   SetVelocityMult(mModuleSaveData.GetFloat("velocitymult"));
-   SetUseChannelAsVoice(mModuleSaveData.GetBool("usechannelasvoice"));
-   SetNoteOffset(mModuleSaveData.GetInt("noteoffset"));
-   SetPitchBendRange(mModuleSaveData.GetFloat("pitchbendrange"));
-   
-   mModwheelCC = mModuleSaveData.GetInt("modwheelcc(1or74)");
    
    if (dynamic_cast<OscController*>(mNonstandardController) == nullptr) //TODO(Ryan)
    {

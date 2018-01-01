@@ -250,7 +250,7 @@ void CurveLooper::SetUpFromSaveData()
 
 namespace
 {
-   const int kSaveStateRev = 0;
+   const int kSaveStateRev = 1;
 }
 
 void CurveLooper::SaveState(FileStreamOut& out)
@@ -258,6 +258,8 @@ void CurveLooper::SaveState(FileStreamOut& out)
    IDrawableModule::SaveState(out);
    
    out << kSaveStateRev;
+   
+   mAdsr.SaveState(out);
 }
 
 void CurveLooper::LoadState(FileStreamIn& in)
@@ -266,5 +268,8 @@ void CurveLooper::LoadState(FileStreamIn& in)
    
    int rev;
    in >> rev;
-   LoadStateValidate(rev == kSaveStateRev);
+   LoadStateValidate(rev <= kSaveStateRev);
+   
+   if (rev >= 1)
+      mAdsr.LoadState(in);
 }

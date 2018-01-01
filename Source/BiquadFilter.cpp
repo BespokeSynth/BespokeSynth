@@ -30,7 +30,14 @@ void BiquadFilter::Clear()
 void BiquadFilter::UpdateFilterCoeff()
 {
    if (mF<=0)
+   {
+      mFF0 = 0;
+      mFF1 = 0;
+      mFF2 = 0;
+      mFB1 = 0;
+      mFB2 = 0;
       return;
+   }
    
    float w0 = gTwoPiOverSampleRate*mF;
    float cosw0 = cos(w0);

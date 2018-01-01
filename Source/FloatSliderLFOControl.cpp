@@ -324,6 +324,9 @@ void FloatSliderLFOControl::SaveLayout(ofxJSONElement& moduleInfo)
 
 void FloatSliderLFOControl::LoadLayout(const ofxJSONElement& moduleInfo)
 {
+   mModuleSaveData.LoadString("target", moduleInfo);
+   mModuleSaveData.LoadBool("enabled", moduleInfo);
+   
    SetUpFromSaveData();
 }
 

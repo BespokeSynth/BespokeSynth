@@ -26,7 +26,7 @@ public:
    BiquadFilter();
    
    void Clear();
-   void SetFilterType(FilterType type) { mType = type; Clear(); }
+   void SetFilterType(FilterType type) { if (type != mType) { mType = type; Clear(); } }
    void SetFilterParams(float f, float q) { mF = f; mQ = q; UpdateFilterCoeff(); }
    void UpdateFilterCoeff();
    void CopyCoeffFrom(BiquadFilter& other);

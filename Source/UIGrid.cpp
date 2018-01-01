@@ -331,7 +331,7 @@ void UIGrid::Clear()
    bzero(mData, MAX_GRID_SIZE*MAX_GRID_SIZE*sizeof(int));
 }
 
-float UIGrid::GetVal(int col, int row)
+float& UIGrid::GetVal(int col, int row)
 {
    col = ofClamp(col, 0, MAX_GRID_SIZE-1);
    row = ofClamp(row, 0, MAX_GRID_SIZE-1);

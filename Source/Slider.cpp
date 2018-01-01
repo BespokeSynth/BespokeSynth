@@ -667,7 +667,7 @@ void IntSlider::Render()
       display += GetDisplayValue(*mVar);
    }
    ofSetColor(textColor);
-   DrawText(display, mX+4, mY+5+mHeight/2);
+   DrawText(display, mX+2, mY+5+mHeight/2);
 
    ofPopStyle();
 }

@@ -29,6 +29,7 @@ DropdownList::DropdownList(IDropdownListener* owner, const char* name, int x, in
 , mDrawLabel(false)
 , mSliderVal(0)
 , mAutoCalculateWidth(false)
+, mDrawTriangle(true)
 {
    assert(owner);
    SetName(name);
@@ -128,7 +129,8 @@ void DropdownList::Render()
    ofSetColor(textColor);
    
    DrawText(GetDisplayValue(*mVar), mX+2+xOffset, mY+12);
-   ofTriangle(mX+w-11, mY+4, mX+w-3, mY+4, mX+w-7, mY+11);
+   if (mDrawTriangle)
+      ofTriangle(mX+w-11, mY+4, mX+w-3, mY+4, mX+w-7, mY+11);
 
    ofPopStyle();
    

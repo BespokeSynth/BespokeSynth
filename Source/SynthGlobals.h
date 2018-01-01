@@ -142,7 +142,7 @@ void Mult(float* buff, float val, int bufferSize);
 void Mult(float* buff1, const float* buff2, int bufferSize);
 void Clear(float* buffer, int bufferSize);
 void BufferCopy(float* dst, const float* src, int bufferSize);
-string NoteName(int pitch, bool flat=false);
+string NoteName(int pitch, bool flat=false, bool includeOctave = false);
 int PitchFromNoteName(string noteName);
 float Interp(float a, float start, float end);
 double GetPhaseInc(float freq);

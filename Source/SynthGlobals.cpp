@@ -208,42 +208,60 @@ void BufferCopy(float* dst, const float* src, int bufferSize)
 #endif
 }
 
-string NoteName(int pitch, bool flat)
+string NoteName(int pitch, bool flat, bool includeOctave)
 {
+   int octave = pitch / 12;
    pitch %= 12;
+   string ret = "x";
    switch (pitch)
    {
       case 0:
-         return "C";
+         ret = "C";
+         break;
       case 1:
-         //return "C#/Db";
-         return flat ? "Db" : "C#";
+         //ret = "C#/Db";
+         ret = flat ? "Db" : "C#";
+         break;
       case 2:
-         return "D";
+         ret = "D";
+         break;
       case 3:
-         //return "D#/Eb";
-         return flat ? "Eb" : "D#";
+         //ret = "D#/Eb";
+         ret = flat ? "Eb" : "D#";
+         break;
       case 4:
-         return "E";
+         ret = "E";
+         break;
       case 5:
-         return "F";
+         ret = "F";
+         break;
       case 6:
-         //return "F#/Gb";
-         return flat ? "Gb" : "F#";
+         //ret = "F#/Gb";
+         ret = flat ? "Gb" : "F#";
+         break;
       case 7:
-         return "G";
+         ret = "G";
+         break;
       case 8:
-         //return "G#/Ab";
-         return flat ? "Ab" : "G#";
+         //ret = "G#/Ab";
+         ret = flat ? "Ab" : "G#";
+         break;
       case 9:
-         return "A";
+         ret = "A";
+         break;
       case 10:
-         //return "A#/Bb";
-         return flat ? "Bb" : "A#";
+         //ret = "A#/Bb";
+         ret = flat ? "Bb" : "A#";
+         break;
       case 11:
-         return "B";
+         ret = "B";
+         break;
    }
-   return "x";
+   
+   if (includeOctave)
+      ret += ofToString(octave - 2);
+   
+   return ret;
 }
 
 int PitchFromNoteName(string noteName)

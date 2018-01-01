@@ -67,6 +67,7 @@ namespace Json
 
 class Monome;
 class MidiController;
+class GridController;
 
 struct UIControlConnection
 {
@@ -209,6 +210,8 @@ struct ControlLayoutElement
 
 struct GridLayout
 {
+   GridLayout() : mGridCable(nullptr) { for (int i=0; i<MAX_MIDI_PAGES; ++i) { mGridController[i] = nullptr; } }
+   
    int mRows;
    int mCols;
    ofVec2f mPosition;
@@ -217,6 +220,7 @@ struct GridLayout
    vector<int> mControls;
    
    PatchCableSource* mGridCable;
+   GridController* mGridController[MAX_MIDI_PAGES];
 };
 
 #define NUM_LAYOUT_CONTROLS 128*2+2
@@ -251,6 +255,7 @@ public:
    
    void SendNote(int page, int pitch, int velocity, bool forceNoteOn = false, int channel = -1);
    void SendCC(int page, int ctl, int value, int channel = -1);
+   void SendPitchBend(int page, int bend, int channel = -1);
    void SendData(int page, unsigned char a, unsigned char b, unsigned char c);
 
    //IDrawableModule

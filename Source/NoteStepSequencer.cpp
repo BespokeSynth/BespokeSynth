@@ -8,7 +8,6 @@
 
 #include "NoteStepSequencer.h"
 #include "OpenFrameworksPort.h"
-#include "Scale.h"
 #include "SynthGlobals.h"
 #include "ModularSynth.h"
 #include "NoteStepSequencer.h"
@@ -42,6 +41,7 @@ NoteStepSequencer::NoteStepSequencer()
 , mFreeTimeStep(30)
 , mFreeTimeSlider(nullptr)
 , mFreeTimeCounter(0)
+, mShowStepControls(false)
 , mSetLength(false)
 , mController(nullptr)
 , mShiftBackButton(nullptr)
@@ -85,6 +85,8 @@ NoteStepSequencer::NoteStepSequencer()
    }
    
    SetIsNoteOrigin(true);
+   
+   TheScale->AddListener(this);
 }
 
 void NoteStepSequencer::CreateUIControls()
@@ -107,6 +109,17 @@ void NoteStepSequencer::CreateUIControls()
    mRandomizeLengthButton = new ClickButton(this,"len",-1,-1);
    mRandomizeVelocityButton = new ClickButton(this,"vel",-1,-1);
    mLoopResetPointSlider = new IntSlider(this,"loop reset",-1,-1,100,15,&mLoopResetPoint,0,mLength);
+   
+   for (int i=0; i<NSS_MAX_STEPS; ++i)
+   {
+      mToneDropdowns[i] = new DropdownList(this,("tone"+ofToString(i)).c_str(),-1,-1,&(mTones[i]),40);
+      mToneDropdowns[i]->SetDrawTriangle(false);
+      mVelocitySliders[i] = new IntSlider(this,("vel"+ofToString(i)).c_str(),-1,-1,30,15,&mVels[i],0,127);
+      mVelocitySliders[i]->SetShowName(false);
+      mLengthSliders[i] = new FloatSlider(this,("len"+ofToString(i)).c_str(),-1,-1,30,15,&mNoteLengths[i],0.01f,1,1);
+      mLengthSliders[i]->SetShowName(false);
+   }
+   SetUpStepControls();
    
    mIntervalSelector->AddLabel("1n", kInterval_1n);
    mIntervalSelector->AddLabel("2n", kInterval_2n);
@@ -156,6 +169,7 @@ NoteStepSequencer::~NoteStepSequencer()
 {
    TheTransport->RemoveListener(this);
    TheTransport->RemoveAudioPoller(this);
+   TheScale->RemoveListener(this);
 }
 
 void NoteStepSequencer::SetMidiController(string name)
@@ -207,8 +221,12 @@ void NoteStepSequencer::DrawModule()
    
    ofPushStyle();
    ofFill();
-   int gridX, gridY;
+   int gridX, gridY, gridW, gridH;
    mGrid->GetPosition(gridX, gridY);
+   gridW = mGrid->GetWidth();
+   gridH = mGrid->GetHeight();
+   float boxHeight = (float(gridH)/mNoteRange);
+   float boxWidth = (float(gridW)/mGrid->GetCols());
    
    for (int i=0; i<mGrid->GetCols()-1; ++i)
    {
@@ -216,9 +234,7 @@ void NoteStepSequencer::DrawModule()
       {
          ofSetColor(255,255,255,255);
          ofFill();
-         float boxHeight = (float(mGrid->GetHeight())/mNoteRange);
-         float boxWidth = (float(mGrid->GetWidth())/mGrid->GetCols());
-         float y = gridY + mGrid->GetHeight() - mTones[i]*boxHeight;
+         float y = gridY + gridH - mTones[i]*boxHeight;
          ofRect(gridX + boxWidth * i+1, y-boxHeight+1, boxWidth*1.5f-2, boxHeight-2);
       }
    }
@@ -234,9 +250,8 @@ void NoteStepSequencer::DrawModule()
       else
          continue;
       
-      float boxHeight = (float(mGrid->GetHeight())/mNoteRange);
-      float y = gridY + mGrid->GetHeight() - i*boxHeight;
-      ofRect(gridX,y-boxHeight,mGrid->GetWidth(),boxHeight);
+      float y = gridY + gridH - i*boxHeight;
+      ofRect(gridX,y-boxHeight,gridW,boxHeight);
    }
    
    for (int i=0; i<mGrid->GetCols(); ++i)
@@ -245,8 +260,40 @@ void NoteStepSequencer::DrawModule()
       {
          ofSetColor(0,0,0,100);
          ofFill();
-         float boxWidth = (float(mGrid->GetWidth())/mGrid->GetCols());
-         ofRect(gridX + boxWidth * i, gridY, boxWidth, mGrid->GetHeight());
+         ofRect(gridX + boxWidth * i, gridY, boxWidth, gridH);
+      }
+   }
+   
+   if (mShowStepControls)
+   {
+      float controlYPos = gridY+gridH+mVelocityGrid->GetHeight();
+      if (mLoopResetPointSlider->IsShowing())
+         controlYPos += 19;
+      for (int i=0; i<NSS_MAX_STEPS; ++i)
+      {
+         if (i < mLength)
+         {
+            mToneDropdowns[i]->SetShowing(mShowStepControls);
+            mToneDropdowns[i]->SetPosition(gridX+boxWidth*i, controlYPos);
+            mToneDropdowns[i]->SetWidth(boxWidth);
+            mToneDropdowns[i]->Draw();
+            
+            mVelocitySliders[i]->SetShowing(mShowStepControls);
+            mVelocitySliders[i]->SetPosition(gridX+boxWidth*i, controlYPos+17);
+            mVelocitySliders[i]->SetDimensions(boxWidth, 15);
+            mVelocitySliders[i]->Draw();
+            
+            mLengthSliders[i]->SetShowing(mShowStepControls);
+            mLengthSliders[i]->SetPosition(gridX+boxWidth*i, controlYPos+32);
+            mLengthSliders[i]->SetDimensions(boxWidth, 15);
+            mLengthSliders[i]->Draw();
+         }
+         else
+         {
+            mToneDropdowns[i]->SetShowing(false);
+            mVelocitySliders[i]->SetShowing(false);
+            mLengthSliders[i]->SetShowing(false);
+         }
       }
    }
    
@@ -550,21 +597,30 @@ int NoteStepSequencer::StepToButton(int step)
    return step < 4 ? (step + 9) : (step + 21);
 }
 
-namespace
+float NoteStepSequencer::ExtraWidth() const
 {
-   const float extraW = 10;
-   const float extraH = 90;
+   return 10;
+}
+
+float NoteStepSequencer::ExtraHeight() const
+{
+   float height = 73;
+   if (mLoopResetPointSlider->IsShowing())
+      height += 17;
+   if (mShowStepControls)
+      height += 17 * 3;
+   return height;
 }
 
 void NoteStepSequencer::GetModuleDimensions(int& width, int& height)
 {
-   width = mGrid->GetWidth() + extraW;
-   height = mGrid->GetHeight() + extraH;
+   width = mGrid->GetWidth() + ExtraWidth();
+   height = mGrid->GetHeight() + ExtraHeight();
 }
 
 void NoteStepSequencer::Resize(float w, float h)
 {
-   mGrid->SetDimensions(MAX(w - extraW, 210), MAX(h - extraH, 80));
+   mGrid->SetDimensions(MAX(w - ExtraWidth(), 210), MAX(h - ExtraHeight(), 80));
    UpdateVelocityGridPos();
 }
 
@@ -691,6 +747,15 @@ void NoteStepSequencer::DropdownUpdated(DropdownList* list, int oldVal)
          TheTransport->UpdateListener(this, mInterval, (-mOffset/TheTransport->CountInStandardMeasure(mInterval)), false);
       }
    }
+   if (list == mNoteModeSelector)
+   {
+      SetUpStepControls();
+   }
+   for (int i=0; i<NSS_MAX_STEPS; ++i)
+   {
+      if (list == mToneDropdowns[i])
+         SyncGridToSeq();
+   }
 }
 
 void NoteStepSequencer::FloatSliderUpdated(FloatSlider* slider, float oldVal)
@@ -701,6 +766,11 @@ void NoteStepSequencer::FloatSliderUpdated(FloatSlider* slider, float oldVal)
       {
          TheTransport->UpdateListener(this, mInterval, (-mOffset/TheTransport->CountInStandardMeasure(mInterval)), false);
       }
+   }
+   for (int i=0; i<NSS_MAX_STEPS; ++i)
+   {
+      if (slider == mLengthSliders[i])
+         SyncGridToSeq();
    }
 }
 
@@ -715,6 +785,13 @@ void NoteStepSequencer::IntSliderUpdated(IntSlider* slider, int oldVal)
    }
    if (slider == mLoopResetPointSlider || slider == mLengthSlider)
       mLoopResetPoint = MIN(mLoopResetPoint, mLength-1);
+   if (slider == mOctaveSlider)
+      SetUpStepControls();
+   for (int i=0; i<NSS_MAX_STEPS; ++i)
+   {
+      if (slider == mVelocitySliders[i])
+         SyncGridToSeq();
+   }
 }
 
 void NoteStepSequencer::SyncGridToSeq()
@@ -731,6 +808,24 @@ void NoteStepSequencer::SyncGridToSeq()
    }
    mGrid->SetGrid(mNumSteps, mNoteRange);
    mVelocityGrid->SetGrid(mNumSteps, 1);
+}
+
+void NoteStepSequencer::OnScaleChanged()
+{
+   SetUpStepControls();
+}
+
+void NoteStepSequencer::SetUpStepControls()
+{
+   if (TheSynth->IsLoadingModule())
+      return;
+   
+   for (int i=0; i<NSS_MAX_STEPS; ++i)
+   {
+      mToneDropdowns[i]->Clear();
+      for (int j=14; j>=0; --j)
+         mToneDropdowns[i]->AddLabel(NoteName(RowToPitch(j), false, true), j);
+   }
 }
 
 void NoteStepSequencer::SaveLayout(ofxJSONElement& moduleInfo)
@@ -750,6 +845,7 @@ void NoteStepSequencer::LoadLayout(const ofxJSONElement& moduleInfo)
    mModuleSaveData.LoadInt("gridheight", moduleInfo, 120, 80, 2000, true);
    mModuleSaveData.LoadInt("gridrows", moduleInfo, 15, 1, 127);
    mModuleSaveData.LoadInt("gridsteps", moduleInfo, 8, 1, NSS_MAX_STEPS);
+   mModuleSaveData.LoadBool("stepcontrols", moduleInfo, false);
 
    SetUpFromSaveData();
 }
@@ -761,6 +857,7 @@ void NoteStepSequencer::SetUpFromSaveData()
    mGrid->SetDimensions(mModuleSaveData.GetInt("gridwidth"), mModuleSaveData.GetInt("gridheight"));
    mNoteRange = mModuleSaveData.GetInt("gridrows");
    mNumSteps = mModuleSaveData.GetInt("gridsteps");
+   mShowStepControls = mModuleSaveData.GetBool("stepcontrols");
    mLength = MIN(mLength, mNumSteps);
    mGrid->SetGrid(mNumSteps, mNoteRange);
    mVelocityGrid->SetGrid(mNumSteps, 1);
