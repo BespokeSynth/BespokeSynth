@@ -68,19 +68,19 @@ CFDataRef KontrolKommunicator::OnMessageReceived(string portname, SInt32 msgid, 
    {
       switch (msgid)
       {
-         case 0x02734e00: //NIButtonPressedMessage
+         case 0x03734e00: //NIButtonPressedMessage
          {
             mListener->OnKontrolButton((int)(((uint8_t*)dataBuffer)[16]), (bool)(((uint8_t*)dataBuffer)[20]));
          }break;
-         case 0x02654e00: //NIWheelsChangedMessage
+         case 0x03654e00: //NIWheelsChangedMessage
          {
             mListener->OnKontrolEncoder((int)(((uint8_t*)dataBuffer)[16]), (float)((((int32_t*)dataBuffer)[5])/1000000000.0f));
          }break;
-         case 0x02774e00: //NIBrowseWheelMessage
+         case 0x03774e00: //NIBrowseWheelMessage
          {
             mListener->OnKontrolEncoder(8, (float)(((int8_t*)dataBuffer)[20]));
          }break;
-         case 0x02564e66: //NIOctaveChangedMessage
+         case 0x03564e66: //NIOctaveChangedMessage
          {
             mListener->OnKontrolOctave((int)(((uint8_t*)dataBuffer)[8]));
          }break;
@@ -387,7 +387,7 @@ void KontrolKommunicator::FollowUpToReply(string messageType, uint8_t* reply)
    if (messageType == "NIHWSDeviceConnectMessage")
    {
       mRequestPort = (char*)(reply + 8);
-      mNotificationPort = (char*)(reply + 8 + WordAlign(mRequestPort.length()) + 4);
+      mNotificationPort = (char*)(reply + 8 + WordAlign(mRequestPort.length()) + /*4*/5); // TODO(Ryan) plus 5??? it used to be plus 4.
       Output("REQUEST PORT:" + mRequestPort + " NOTIFICATION PORT:" + mNotificationPort + "\n");
       
       CreateListener(mNotificationPort.c_str());
@@ -519,6 +519,18 @@ void KontrolKommunicator::OutputData(const KDataArray& a)
          Output(" ");
    }
    Output("\n");
+   for (int i=0; i<a.size(); ++i)
+   {
+      char c;
+      if (a[i] > 32 && a[i] < 127)
+         c = a[i];
+      else
+         c = '#';
+      Output(FormatString("%c ", c));
+      if (i%4 == 3)
+         Output(" ");
+   }
+   Output("\n");
 }
 
 void KontrolKommunicator::OutputRawData(const uint8_t* data, size_t length)
@@ -533,6 +545,18 @@ void KontrolKommunicator::OutputRawData(const uint8_t* data, size_t length)
    for (int i=0; i<length; ++i)
    {
       Output(FormatString("%02x ", data[i]));
+      if (i%4 == 3)
+         Output(" ");
+   }
+   Output("\n");
+   for (int i=0; i<length; ++i)
+   {
+      char c;
+      if (data[i] > 32 && data[i] < 127)
+         c = data[i];
+      else
+         c = '#';
+      Output(FormatString("%c ", c));
       if (i%4 == 3)
          Output(" ");
    }
