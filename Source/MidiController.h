@@ -247,6 +247,7 @@ public:
    string GetDeviceIn() const { return mDeviceIn; }
    string GetDeviceOut() const { return mDeviceOut; }
    UIControlConnection* GetConnectionForControl(MidiMessageType messageType, int control);
+   void ConnectDevice();
    
    void SetVelocityMult(float mult) { mVelocityMult = mult; }
    void SetUseChannelAsVoice(bool use) { mUseChannelAsVoice = use; }

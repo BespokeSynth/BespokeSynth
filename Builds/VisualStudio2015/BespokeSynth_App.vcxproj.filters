@@ -1093,9 +1093,6 @@
     <ClCompile Include="..\..\Source\Granulator.cpp">
       <Filter>BespokeSynth\Source</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\Source\Grid.cpp">
-      <Filter>BespokeSynth\Source</Filter>
-    </ClCompile>
     <ClCompile Include="..\..\Source\IAudioProcessor.cpp">
       <Filter>BespokeSynth\Source</Filter>
     </ClCompile>
@@ -1235,6 +1232,9 @@
       <Filter>BespokeSynth\Source</Filter>
     </ClCompile>
     <ClCompile Include="..\..\Source\TriggerDetector.cpp">
+      <Filter>BespokeSynth\Source</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\Source\UIGrid.cpp">
       <Filter>BespokeSynth\Source</Filter>
     </ClCompile>
     <ClCompile Include="..\..\Source\VSTPlayhead.cpp">
@@ -3342,6 +3342,9 @@
     <ClInclude Include="..\..\Source\Lissajous.h">
       <Filter>BespokeSynth\Source\modules</Filter>
     </ClInclude>
+    <ClInclude Include="..\..\Source\LockFreeQueue.h">
+      <Filter>BespokeSynth\Source\modules</Filter>
+    </ClInclude>
     <ClInclude Include="..\..\Source\Looper.h">
       <Filter>BespokeSynth\Source\modules</Filter>
     </ClInclude>
@@ -3747,9 +3750,6 @@
     <ClInclude Include="..\..\Source\Granulator.h">
       <Filter>BespokeSynth\Source</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\Source\Grid.h">
-      <Filter>BespokeSynth\Source</Filter>
-    </ClInclude>
     <ClInclude Include="..\..\Source\IAudioEffect.h">
       <Filter>BespokeSynth\Source</Filter>
     </ClInclude>
@@ -3907,6 +3907,9 @@
       <Filter>BespokeSynth\Source</Filter>
     </ClInclude>
     <ClInclude Include="..\..\Source\TriggerDetector.h">
+      <Filter>BespokeSynth\Source</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\Source\UIGrid.h">
       <Filter>BespokeSynth\Source</Filter>
     </ClInclude>
     <ClInclude Include="..\..\Source\VSTPlayhead.h">

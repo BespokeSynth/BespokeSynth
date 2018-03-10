@@ -29,11 +29,10 @@ public:
 private:
    //IDrawableModule
    void DrawModule() override;
-   void GetModuleDimensions(int& width, int& height) override { width = 110; height = 22; }
+   void GetModuleDimensions(int& width, int& height) override { width = 110; height = 60; }
    bool Enabled() const override { return true; }
    
-   int mNote;
-   int mVelocity;
+   void DrawNoteName(int pitch, float y) const;
 };
 
 #endif /* defined(__Bespoke__NoteDisplayer__) */

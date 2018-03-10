@@ -238,6 +238,13 @@ void MidiController::OnTransportAdvanced(float amount)
    
    for (auto note = mQueuedNotes.begin(); note != mQueuedNotes.end(); ++note)
    {
+      int voiceIdx = -1;
+      
+      if (mUseChannelAsVoice)
+         voiceIdx = note->mChannel - 1;
+      
+      PlayNoteOutput(gTime, note->mPitch + mNoteOffset, MIN(127,note->mVelocity*mVelocityMult), voiceIdx, mModulation.GetPitchBend(voiceIdx), mModulation.GetModWheel(voiceIdx), mModulation.GetPressure(voiceIdx));
+      
       for (auto i = mListeners[mControllerPage].begin(); i != mListeners[mControllerPage].end(); ++i)
          (*i)->OnMidiNote(*note);
    }
@@ -271,13 +278,6 @@ void MidiController::OnMidiNote(MidiNote& note)
 {
    if (!mEnabled)
       return;
-   
-   int voiceIdx = -1;
-   
-   if (mUseChannelAsVoice)
-      voiceIdx = note.mChannel - 1;
-   
-   PlayNoteOutput(gTime, note.mPitch + mNoteOffset, MIN(127,note.mVelocity*mVelocityMult), voiceIdx, mModulation.GetPitchBend(voiceIdx), mModulation.GetModWheel(voiceIdx), mModulation.GetPressure(voiceIdx));
    
    MidiReceived(kMidiMessage_Note, note.mPitch, note.mVelocity/127.0f, note.mChannel);
    
@@ -409,9 +409,8 @@ void MidiController::MidiReceived(MidiMessageType messageType, int control, floa
    for (auto i=mConnections.begin(); i != mConnections.end(); ++i)
    {
       UIControlConnection* connection = *i;
-      int testControl = control;
       if (connection->mMessageType == messageType &&
-          (connection->mControl == testControl || messageType == kMidiMessage_PitchBend) &&
+          (connection->mControl == control || messageType == kMidiMessage_PitchBend) &&
           (connection->mPageless || connection->mPage == mControllerPage) &&
           (connection->mChannel == -1 || connection->mChannel == channel))
       {
@@ -427,25 +426,15 @@ void MidiController::MidiReceived(MidiMessageType messageType, int control, floa
          {
             if (connection->mIncrementAmount != 0)
             {
-               if (uicontrol->GetNumValues() == 0) //continuous control, like float slider
-               {
-                  float curValue = uicontrol->GetMidiValue();
-                  float increment = connection->mIncrementAmount / 100;
-                  if (GetKeyModifiers() & kModifier_Shift)
-                     increment /= 50;
-                  if (value > .5f)
-                     curValue += increment;
-                  else
-                     curValue -= increment;
-                  uicontrol->SetFromMidiCC(curValue);
-               }
+               float curValue = uicontrol->GetMidiValue();
+               float increment = connection->mIncrementAmount / 100;
+               if (GetKeyModifiers() & kModifier_Shift)
+                  increment /= 50;
+               if (value > .5f)
+                  curValue += increment;
                else
-               {
-                  if (value > .5f)
-                     uicontrol->Increment(connection->mIncrementAmount);
-                  else
-                     uicontrol->Increment(-connection->mIncrementAmount);
-               }
+                  curValue -= increment;
+               uicontrol->SetFromMidiCC(curValue);
             }
             else
             {
@@ -752,6 +741,11 @@ void MidiController::DrawModule()
    {
       if (mLayoutControls[i].mControlCable)
          mLayoutControls[i].mControlCable->SetEnabled(false);
+   }
+   for (auto* grid : mGrids)
+   {
+      if (grid->mGridCable)
+         grid->mGridCable->SetEnabled(mMappingDisplayMode == kLayout);
    }
    
    if (mMappingDisplayMode == kHide)
@@ -1338,13 +1332,13 @@ void MidiController::DropdownUpdated(DropdownList* list, int oldVal)
    }
    if (list == mControllerList)
    {
-      mDevice.ConnectInput(mControllerIndex);
-      bool outputConnected = mDevice.ConnectOutput(mControllerList->GetLabel(mControllerIndex).c_str());
       string deviceName = mControllerList->GetLabel(mControllerIndex);
+      bool hasOutput = MidiOutput::getDevices().contains(String(deviceName));
       mDeviceIn = deviceName;
-      mDeviceOut = outputConnected ? deviceName : "";
+      mDeviceOut = hasOutput ? deviceName : "";
       mModuleSaveData.SetString("devicein", mDeviceIn);
       mModuleSaveData.SetString("deviceout", mDeviceOut);
+      ConnectDevice();
       OnDeviceChanged();
    }
 }
@@ -1483,6 +1477,37 @@ void MidiController::BuildControllerList()
    FillMidiInput(mControllerList);
 }
 
+void MidiController::ConnectDevice()
+{
+   if (mDeviceIn == "xboxcontroller")
+   {
+      //TODO_PORT(Ryan)
+      
+      //Xbox360Controller* xbox = new Xbox360Controller(this);
+      //mNonstandardController = xbox;
+   }
+   else if (mDeviceIn == "monome")
+   {
+      Monome* monome = new Monome(this);
+      mNonstandardController = monome;
+   }
+   else if (mDeviceIn == "osccontroller")
+   {
+      OscController* osc = new OscController(this,"192.168.1.128",9000,8000);
+      mNonstandardController = osc;
+   }
+   else
+   {
+      mDevice.ConnectInput(mDeviceIn.c_str());
+   }
+   
+   if (mDeviceOut.length() > 0 && mNonstandardController == nullptr)
+   {
+      mTwoWay = true;
+      mDevice.ConnectOutput(mDeviceOut.c_str(), mOutChannel);
+   }
+}
+
 void MidiController::LoadLayout(const ofxJSONElement& moduleInfo)
 {
    mModuleSaveData.LoadString("devicein", moduleInfo, "", FillMidiInput);
@@ -1522,33 +1547,7 @@ void MidiController::SetUpFromSaveData()
    mOutChannel = mModuleSaveData.GetInt("outchannel");
    assert(mOutChannel > 0 && mOutChannel <= 16);
    
-   if (mDeviceIn == "xboxcontroller")
-   {
-      //TODO_PORT(Ryan)
-      
-      //Xbox360Controller* xbox = new Xbox360Controller(this);
-      //mNonstandardController = xbox;
-   }
-   else if (mDeviceIn == "monome")
-   {
-      Monome* monome = new Monome(this);
-      mNonstandardController = monome;
-   }
-   else if (mDeviceIn == "osccontroller")
-   {
-      OscController* osc = new OscController(this,"192.168.1.128",9000,8000);
-      mNonstandardController = osc;
-   }
-   else
-   {
-      mDevice.ConnectInput(mDeviceIn.c_str());
-   }
-   
-   if (mDeviceOut.length() > 0 && mNonstandardController == nullptr)
-   {
-      mTwoWay = true;
-      mDevice.ConnectOutput(mDeviceOut.c_str(), mOutChannel);
-   }
+   ConnectDevice();
    
    UseNegativeEdge(mModuleSaveData.GetBool("negativeedge"));
    mSlidersDefaultToIncremental = mModuleSaveData.GetBool("incrementalsliders");
@@ -1743,7 +1742,6 @@ void UIControlConnection::CreateUIControls(int index)
    mChannelDropdown->AddLabel("13", 13);
    mChannelDropdown->AddLabel("14", 14);
    mChannelDropdown->AddLabel("15", 15);
-   mChannelDropdown->AddLabel("16", 16);
    
    mControlTypeDropdown->AddLabel("slider", kControlType_Slider);
    mControlTypeDropdown->AddLabel("set", kControlType_SetValue);

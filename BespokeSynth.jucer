@@ -295,6 +295,7 @@
         <FILE id="J4fGNz" name="LFOController.h" compile="0" resource="0" file="Source/LFOController.h"/>
         <FILE id="CwoblA" name="Lissajous.cpp" compile="1" resource="0" file="Source/Lissajous.cpp"/>
         <FILE id="KrCi0q" name="Lissajous.h" compile="0" resource="0" file="Source/Lissajous.h"/>
+        <FILE id="Kt5oWb" name="LockFreeQueue.h" compile="0" resource="0" file="Source/LockFreeQueue.h"/>
         <FILE id="fc7TjY" name="Looper.cpp" compile="1" resource="0" file="Source/Looper.cpp"/>
         <FILE id="bynCOJ" name="Looper.h" compile="0" resource="0" file="Source/Looper.h"/>
         <FILE id="fXzkYe" name="LooperRecorder.cpp" compile="1" resource="0"
@@ -674,8 +675,6 @@
       <FILE id="GHGo9k" name="FMVoice.h" compile="0" resource="0" file="Source/FMVoice.h"/>
       <FILE id="RXLeAN" name="Granulator.cpp" compile="1" resource="0" file="Source/Granulator.cpp"/>
       <FILE id="wcBjVT" name="Granulator.h" compile="0" resource="0" file="Source/Granulator.h"/>
-      <FILE id="ac6IgF" name="Grid.cpp" compile="1" resource="0" file="Source/Grid.cpp"/>
-      <FILE id="XcTPkp" name="Grid.h" compile="0" resource="0" file="Source/Grid.h"/>
       <FILE id="wLsYNi" name="IAudioEffect.h" compile="0" resource="0" file="Source/IAudioEffect.h"/>
       <FILE id="yp4Ioj" name="IAudioProcessor.cpp" compile="1" resource="0"
             file="Source/IAudioProcessor.cpp"/>
@@ -825,6 +824,8 @@
             file="Source/TriggerDetector.cpp"/>
       <FILE id="EghI3J" name="TriggerDetector.h" compile="0" resource="0"
             file="Source/TriggerDetector.h"/>
+      <FILE id="SabGSz" name="UIGrid.cpp" compile="1" resource="0" file="Source/UIGrid.cpp"/>
+      <FILE id="zlGPeN" name="UIGrid.h" compile="0" resource="0" file="Source/UIGrid.h"/>
       <FILE id="SFkRyV" name="VSTPlayhead.cpp" compile="1" resource="0" file="Source/VSTPlayhead.cpp"/>
       <FILE id="TMPyxQ" name="VSTPlayhead.h" compile="0" resource="0" file="Source/VSTPlayhead.h"/>
       <FILE id="IaJePG" name="VSTWindow.cpp" compile="1" resource="0" file="Source/VSTWindow.cpp"/>

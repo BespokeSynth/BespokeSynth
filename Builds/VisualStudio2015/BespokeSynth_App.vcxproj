@@ -388,7 +388,6 @@
     <ClCompile Include="..\..\Source\FloatSliderLFOControl.cpp"/>
     <ClCompile Include="..\..\Source\FMVoice.cpp"/>
     <ClCompile Include="..\..\Source\Granulator.cpp"/>
-    <ClCompile Include="..\..\Source\Grid.cpp"/>
     <ClCompile Include="..\..\Source\IAudioProcessor.cpp"/>
     <ClCompile Include="..\..\Source\IAudioReceiver.cpp"/>
     <ClCompile Include="..\..\Source\IAudioSource.cpp"/>
@@ -436,6 +435,7 @@
     <ClCompile Include="..\..\Source\SingleOscillatorVoice.cpp"/>
     <ClCompile Include="..\..\Source\SynthGlobals.cpp"/>
     <ClCompile Include="..\..\Source\TriggerDetector.cpp"/>
+    <ClCompile Include="..\..\Source\UIGrid.cpp"/>
     <ClCompile Include="..\..\Source\VSTPlayhead.cpp"/>
     <ClCompile Include="..\..\Source\VSTWindow.cpp"/>
     <ClCompile Include="..\..\..\JUCE\modules\juce_audio_basics\buffers\juce_AudioChannelSet.cpp">
@@ -2188,6 +2188,7 @@
     <ClInclude Include="..\..\Source\LaunchpadNoteDisplayer.h"/>
     <ClInclude Include="..\..\Source\LFOController.h"/>
     <ClInclude Include="..\..\Source\Lissajous.h"/>
+    <ClInclude Include="..\..\Source\LockFreeQueue.h"/>
     <ClInclude Include="..\..\Source\Looper.h"/>
     <ClInclude Include="..\..\Source\LooperRecorder.h"/>
     <ClInclude Include="..\..\Source\LoopStorer.h"/>
@@ -2323,7 +2324,6 @@
     <ClInclude Include="..\..\Source\FloatSliderLFOControl.h"/>
     <ClInclude Include="..\..\Source\FMVoice.h"/>
     <ClInclude Include="..\..\Source\Granulator.h"/>
-    <ClInclude Include="..\..\Source\Grid.h"/>
     <ClInclude Include="..\..\Source\IAudioEffect.h"/>
     <ClInclude Include="..\..\Source\IAudioProcessor.h"/>
     <ClInclude Include="..\..\Source\IAudioReceiver.h"/>
@@ -2377,6 +2377,7 @@
     <ClInclude Include="..\..\Source\SingleOscillatorVoice.h"/>
     <ClInclude Include="..\..\Source\SynthGlobals.h"/>
     <ClInclude Include="..\..\Source\TriggerDetector.h"/>
+    <ClInclude Include="..\..\Source\UIGrid.h"/>
     <ClInclude Include="..\..\Source\VSTPlayhead.h"/>
     <ClInclude Include="..\..\Source\VSTWindow.h"/>
     <ClInclude Include="..\..\..\JUCE\modules\juce_audio_basics\audio_play_head\juce_AudioPlayHead.h"/>

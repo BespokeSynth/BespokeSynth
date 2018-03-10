@@ -11,7 +11,7 @@
 
 Monome::Monome(MidiDeviceListener* listener)
 : mHasMonome(false)
-, mMaxColumns(32)
+, mMaxColumns(8)
 , mListener(listener)
 {
    bool connected = OSCReceiver::connect(MONOME_RECEIVE_PORT);

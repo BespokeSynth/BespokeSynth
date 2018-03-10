@@ -74,6 +74,8 @@ void ADSR::Start(double time, float target)
 
 void ADSR::Stop(double time)
 {
+   if (mStopTime > mStartTime) //already stopped
+      return;
    mStopBlendFromValue = Value(time);
    mStopTime = time;
 }
