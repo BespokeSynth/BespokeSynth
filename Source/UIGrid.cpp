@@ -21,11 +21,13 @@ UIGrid::UIGrid(int x, int y, int w, int h, int cols, int rows)
 , mCurrentHover(-1)
 , mListener(nullptr)
 , mGridMode(kNormal)
+, mHoldCol(0)
 , mHoldRow(0)
 , mRestrictDragToRow(false)
 , mClickClearsToZero(true)
 , mHighlightCol(-1)
 , mShouldDrawValue(false)
+, mMomentary(false)
 {
    SetName("grid");
    SetPosition(x,y);
@@ -226,11 +228,19 @@ void UIGrid::OnClicked(int x, int y, bool right)
       mListener->GridUpdated(this, cell.mCol, cell.mRow, mData[cell.mRow][cell.mCol], oldValue);
 
    mHoldVal = mData[cell.mRow][cell.mCol];
+   mHoldCol = cell.mCol;
    mHoldRow = cell.mRow;
 }
 
 void UIGrid::MouseReleased()
 {
+   if (mClick && mMomentary)
+   {
+      float oldValue = mData[mHoldRow][mHoldCol];
+      mData[mHoldRow][mHoldCol] = 0;
+      mListener->GridUpdated(this, mHoldCol, mHoldRow, 0, oldValue);
+   }
+   
    mClick = false;
 }
 
@@ -245,7 +255,7 @@ bool UIGrid::MouseMoved(float x, float y)
    else
       mCurrentHover = -1;
 
-   if (mClick)
+   if (mClick && !mMomentary)
    {
       if (mRestrictDragToRow)
       {

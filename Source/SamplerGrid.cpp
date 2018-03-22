@@ -22,17 +22,18 @@ SamplerGrid::SamplerGrid()
 , mPassthrough(true)
 , mPassthroughCheckbox(nullptr)
 , mRecordingSample(-1)
-, mClearHeld(false)
+, mClearCheckbox(nullptr)
+, mClear(false)
 , mVolume(1)
 , mVolumeSlider(nullptr)
-, mCols(0)
-, mRows(0)
+, mCols(8)
+, mRows(8)
 , mGridSamples(nullptr)
 , mGridController(nullptr)
 , mEditMode(false)
 , mEditCheckbox(nullptr)
-, mEditSampleX(100)
-, mEditSampleY(5)
+, mEditSampleX(2)
+, mEditSampleY(95)
 , mEditSampleWidth(395)
 , mEditSampleHeight(200)
 , mEditSample(nullptr)
@@ -41,18 +42,25 @@ SamplerGrid::SamplerGrid()
 , mDummyInt(0)
 , mDuplicate(false)
 , mDuplicateCheckbox(nullptr)
+, mGrid(nullptr)
 {
 }
 
 void SamplerGrid::CreateUIControls()
 {
    IDrawableModule::CreateUIControls();
-   mPassthroughCheckbox = new Checkbox(this,"passthrough",4,4,&mPassthrough);
-   mVolumeSlider = new FloatSlider(this,"vol",4,20,90,15,&mVolume,0,2);
-   mEditCheckbox = new Checkbox(this,"edit",4,36,&mEditMode);
-   mDuplicateCheckbox = new Checkbox(this,"duplicate",4,56,&mDuplicate);
-   mEditStartSlider = new IntSlider(this,"start",mEditSampleX,mEditSampleY+mEditSampleHeight,mEditSampleWidth,15,&mDummyInt,0,1);
-   mEditEndSlider = new IntSlider(this,"end",mEditSampleX,mEditSampleY+mEditSampleHeight+14,mEditSampleWidth,15,&mDummyInt,0,1);
+   mGrid = new UIGrid(2, 2, 90, 90, mCols, mRows);
+   mGrid->SetListener(this);
+   mGrid->SetMomentary(true);
+   mPassthroughCheckbox = new Checkbox(this,"passthrough",mGrid,kAnchor_Right,&mPassthrough);
+   mVolumeSlider = new FloatSlider(this,"vol",mPassthroughCheckbox, kAnchor_Below,90,15,&mVolume,0,2);
+   mClearCheckbox = new Checkbox(this,"clear",mVolumeSlider, kAnchor_Below,&mDuplicate);
+   mEditCheckbox = new Checkbox(this,"edit",mClearCheckbox, kAnchor_Below,&mEditMode);
+   mDuplicateCheckbox = new Checkbox(this,"duplicate",mEditCheckbox, kAnchor_Below,&mDuplicate);
+   mEditStartSlider = new IntSlider(this,"start",mEditSampleX,mEditSampleY+mEditSampleHeight+1,mEditSampleWidth,15,&mDummyInt,0,1);
+   mEditEndSlider = new IntSlider(this,"end",mEditStartSlider,kAnchor_Below,mEditSampleWidth,15,&mDummyInt,0,1);
+   
+   InitGrid();
 }
 
 SamplerGrid::~SamplerGrid()
@@ -110,7 +118,9 @@ void SamplerGrid::Process(double time)
       GridSample& sample = mGridSamples[mRecordingSample];
       for (int i=0; i<gBufferSize; ++i)
       {
-         if (sample.mPlayhead < MAX_SAMPLER_GRID_LENGTH)
+         if (GetBuffer()->GetChannel(0)[i] != 0)
+            sample.mHasSample = true;
+         if (sample.mPlayhead < MAX_SAMPLER_GRID_LENGTH && sample.mHasSample)
          {
             sample.mSampleData[sample.mPlayhead] = GetBuffer()->GetChannel(0)[i];// + gWorkBuffer[i];
             ++sample.mPlayhead;
@@ -143,8 +153,16 @@ void SamplerGrid::ConnectGridController(IGridController* grid)
    mCols = grid->NumCols();
    if (mLastColumnIsGroup)
       mCols -= 1;
-   mRows = grid->NumRows()-1;
+   mRows = grid->NumRows();
    
+   InitGrid();
+   
+   UpdateLights();
+}
+
+void SamplerGrid::InitGrid()
+{
+   delete[] mGridSamples;
    mGridSamples = new GridSample[mRows*mCols];
    for (int i=0; i<mRows*mCols; ++i)
    {
@@ -153,7 +171,12 @@ void SamplerGrid::ConnectGridController(IGridController* grid)
       mGridSamples[i].mSampleLength = 0;
    }
    
-   UpdateLights();
+   mGrid->SetGrid(mCols, mRows);
+}
+
+void SamplerGrid::GridUpdated(UIGrid* grid, int col, int row, float value, float oldValue)
+{
+   OnGridButton(col, row, value, nullptr);
 }
 
 void SamplerGrid::OnGridButton(int x, int y, float velocity, IGridController* grid)
@@ -175,7 +198,7 @@ void SamplerGrid::OnGridButton(int x, int y, float velocity, IGridController* gr
          }
          mDuplicate = false;
       }
-      else if (mClearHeld && bOn)
+      else if (mClear && bOn)
       {
          mGridSamples[gridSampleIdx].mHasSample = false;
          mGridSamples[gridSampleIdx].mSampleLength = 0;
@@ -189,7 +212,9 @@ void SamplerGrid::OnGridButton(int x, int y, float velocity, IGridController* gr
       }
       else if (bOn)
       {
-         mGridSamples[gridSampleIdx].mHasSample = true;
+         if (mRecordingSample != -1)
+            mGridSamples[mRecordingSample].mRecordingArmed = false;
+         mGridSamples[gridSampleIdx].mRecordingArmed = true;
          mRecordingSample = gridSampleIdx;
       }
       
@@ -199,16 +224,12 @@ void SamplerGrid::OnGridButton(int x, int y, float velocity, IGridController* gr
       if (!bOn && mRecordingSample == gridSampleIdx)
          mRecordingSample = -1;
    }
-   else if (y == mRows)
-   {
-      mClearHeld = bOn;
-   }
-   else if (x == mCols)
+   /*else if (x == mCols)
    {
       for (int i=0; i<mCols; ++i)
       {
          int gridSampleIdx = GridToIdx(i, y);
-         if (mClearHeld && bOn)
+         if (mClear && bOn)
          {
             mGridSamples[gridSampleIdx].mHasSample = false;
             mGridSamples[gridSampleIdx].mSampleLength = 0;
@@ -221,9 +242,14 @@ void SamplerGrid::OnGridButton(int x, int y, float velocity, IGridController* gr
             mGridSamples[gridSampleIdx].mRamp.Start(bOn ? 1 : 0, SAMPLE_RAMP_MS);
          }
       }
-   }
+   }*/
    
    UpdateLights();
+}
+
+void SamplerGrid::PlayNote(double time, int pitch, int velocity, int voiceIdx /*= -1*/, ModulationChain* pitchBend /*= nullptr*/, ModulationChain* modWheel /*= nullptr*/, ModulationChain* pressure /*= nullptr*/)
+{
+   OnGridButton(pitch % mCols, (pitch / mCols) % mRows, velocity / 127, nullptr);
 }
 
 void SamplerGrid::SetEditSample(SamplerGrid::GridSample* sample)
@@ -243,7 +269,7 @@ void SamplerGrid::UpdateLights()
    //clear lights
    for (int x=0; x<mCols; ++x)
    {
-      mGridController->SetLight(x,mRows,mClearHeld?kGridColor1Bright:kGridColorOff);
+      mGridController->SetLight(x,mRows,mClear?kGridColor1Bright:kGridColorOff);
       for (int y=0; y<mRows; ++y)
       {
          int idx = GridToIdx(x, y);
@@ -254,7 +280,7 @@ void SamplerGrid::UpdateLights()
    {
       mGridController->SetLight(mCols,y,kGridColor1Bright);
    }
-   mGridController->SetLight(mCols,mRows,mClearHeld?kGridColor1Bright:kGridColorOff);
+   mGridController->SetLight(mCols,mRows,mClear?kGridColor1Bright:kGridColorOff);
 }
 
 void SamplerGrid::SetEnabled(bool enabled)
@@ -271,6 +297,27 @@ void SamplerGrid::DrawModule()
    mPassthroughCheckbox->Draw();
    mVolumeSlider->Draw();
    mEditCheckbox->Draw();
+   mClearCheckbox->Draw();
+   mGrid->Draw();
+   
+   ofPushStyle();
+   ofSetColor(255, 255, 255, 100);
+   ofFill();
+   for (int x=0; x<mCols; ++x)
+   {
+      for (int y=0; y<mRows; ++y)
+      {
+         int idx = GridToIdx(x, y);
+         if (mGridSamples[idx].mHasSample)
+         {
+            ofVec2f cellPos = mGrid->GetCellPosition(x, y);
+            ofVec2f gridSize = mGrid->IClickable::GetDimensions();
+            ofVec2f gridPos = mGrid->IClickable::GetPosition();
+            ofRect(gridPos.x + cellPos.x, gridPos.y + cellPos.y, gridSize.x / mCols, gridSize.y / mCols);
+         }
+      }
+   }
+   ofPopStyle();
    
    if (mEditMode)
    {
@@ -299,19 +346,21 @@ void SamplerGrid::GetModuleDimensions(int& width, int& height)
 {
    if (mEditMode)
    {
-      width = 500;
-      height = 240;
+      width = mEditSampleWidth;
+      height = mEditSampleY + mEditSampleHeight + 17 * 2;
    }
    else
    {
-      width = 100;
-      height = 54;
+      width = 188;
+      height = mEditSampleY;
    }
 }
 
 void SamplerGrid::OnClicked(int x, int y, bool right)
 {
    IDrawableModule::OnClicked(x, y, right);
+   
+   mGrid->TestClick(x, y, right);
    
    if (x >= mEditSampleX && x < mEditSampleX + mEditSampleWidth &&
        y >= mEditSampleY && y < mEditSampleY + mEditSampleHeight)
@@ -323,6 +372,13 @@ void SamplerGrid::OnClicked(int x, int y, bool right)
          TheSynth->GrabSample(&temp, K(window));
       }
    }
+}
+
+void SamplerGrid::MouseReleased()
+{
+   IDrawableModule::MouseReleased();
+   
+   mGrid->MouseReleased();
 }
 
 void SamplerGrid::FilesDropped(vector<string> files, int x, int y)

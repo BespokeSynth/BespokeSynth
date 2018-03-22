@@ -19,13 +19,14 @@
 #include "MidiDevice.h"
 #include "Ramp.h"
 #include "GridController.h"
+#include "UIGrid.h"
 
 class ofxJSONElement;
 
 #define MAX_SAMPLER_GRID_LENGTH 5*44100
 #define SAMPLE_RAMP_MS 3
 
-class SamplerGrid : public IAudioProcessor, public IDrawableModule, public IDropdownListener, public IFloatSliderListener, public IIntSliderListener, public IGridControllerListener
+class SamplerGrid : public IAudioProcessor, public IDrawableModule, public IDropdownListener, public IFloatSliderListener, public IIntSliderListener, public IGridControllerListener, public UIGridListener, public INoteReceiver
 {
 public:
    SamplerGrid();
@@ -49,6 +50,13 @@ public:
    void ConnectGridController(IGridController* grid) override;
    void OnGridButton(int x, int y, float velocity, IGridController* grid) override;
    
+   //INoteReceiver
+   void PlayNote(double time, int pitch, int velocity, int voiceIdx = -1, ModulationChain* pitchBend = nullptr, ModulationChain* modWheel = nullptr, ModulationChain* pressure = nullptr) override;
+   void SendCC(int control, int value, int voiceIdx = -1) override {}
+   
+   //UIGridListener
+   void GridUpdated(UIGrid* grid, int col, int row, float value, float oldValue) override;
+   
    void FilesDropped(vector<string> files, int x, int y) override;
    void SampleDropped(int x, int y, Sample* sample) override;
    
@@ -68,18 +76,22 @@ private:
    void GetModuleDimensions(int& width, int& height) override;
    bool Enabled() const override { return mEnabled; }
    void OnClicked(int x, int y, bool right) override;
+   void MouseReleased() override;
    
+   void InitGrid();
    void UpdateLights();
    
    int GridToIdx(int x, int y) { return x+y*mCols; }
    
-   bool mClearHeld;
+   Checkbox* mClearCheckbox;
+   bool mClear;
    
    struct GridSample
    {
       float mSampleData[MAX_SAMPLER_GRID_LENGTH];
       int mPlayhead;
       bool mHasSample;
+      bool mRecordingArmed;
       int mSampleLength;
       Ramp mRamp;
       int mSampleStart;
@@ -116,6 +128,8 @@ private:
    IntSlider* mEditStartSlider;
    IntSlider* mEditEndSlider;
    int mDummyInt;
+   
+   UIGrid* mGrid;
 };
 
 #endif /* defined(__Bespoke__SamplerGrid__) */

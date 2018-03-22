@@ -63,6 +63,7 @@ public:
    void SetRestrictDragToRow(bool set) { mRestrictDragToRow = set; }
    void SetClickClearsToZero(bool set) { mClickClearsToZero = set; }
    void SetShouldDrawValue(bool draw) { mShouldDrawValue = draw; }
+   void SetMomentary(bool momentary) { mMomentary = momentary; }
    
    enum GridMode
    {
@@ -98,7 +99,8 @@ private:
    int mCols;
    bool mClick;
    float mHoldVal;
-   float mHoldRow;
+   int mHoldCol;
+   int mHoldRow;
    float mData[MAX_GRID_SIZE][MAX_GRID_SIZE];
    int mHighlightCol;
    int mMajorCol;
@@ -112,6 +114,7 @@ private:
    bool mRestrictDragToRow;
    bool mClickClearsToZero;
    bool mShouldDrawValue;
+   bool mMomentary;
 };
 
 #endif /* defined(__modularSynth__Grid__) */
