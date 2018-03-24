@@ -40,6 +40,17 @@ struct ModulationCollection
    ModulationChain mPressure;
 };
 
+struct ModulationParameters
+{
+   ModulationParameters() {}
+   ModulationParameters(ModulationChain* _pitchBend,
+                        ModulationChain* _modWheel,
+                        ModulationChain* _pressure) : pitchBend(_pitchBend), modWheel(_modWheel), pressure(_pressure) {}
+   ModulationChain* pitchBend = nullptr;
+   ModulationChain* modWheel = nullptr;
+   ModulationChain* pressure = nullptr;
+};
+
 class Modulations
 {
 public:

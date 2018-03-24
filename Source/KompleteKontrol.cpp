@@ -113,9 +113,9 @@ void KompleteKontrol::PostRepatch(PatchCableSource* cable)
    }
 }
 
-void KompleteKontrol::PlayNote(double time, int pitch, int velocity, int voiceIdx /*= -1*/, ModulationChain* pitchBend /*= nullptr*/, ModulationChain* modWheel /*= nullptr*/, ModulationChain* pressure /*= nullptr*/)
+void KompleteKontrol::PlayNote(double time, int pitch, int velocity, int voiceIdx, ModulationParameters modulation)
 {
-   mNoteOutput.PlayNote(time,pitch,velocity,voiceIdx,pitchBend,modWheel,pressure);
+   mNoteOutput.PlayNote(time,pitch,velocity,voiceIdx,modulation);
    
    mNeedKeysUpdate = true;
 }

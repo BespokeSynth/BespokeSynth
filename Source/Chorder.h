@@ -30,7 +30,7 @@ public:
    void RemoveTone(int tone);
    
    //INoteReceiver
-   void PlayNote(double time, int pitch, int velocity, int voiceIdx = -1, ModulationChain* pitchBend = nullptr, ModulationChain* modWheel = nullptr, ModulationChain* pressure = nullptr) override;
+   void PlayNote(double time, int pitch, int velocity, int voiceIdx = -1, ModulationParameters modulation = ModulationParameters()) override;
    
    void GridUpdated(UIGrid* grid, int col, int row, float value, float oldValue) override;
    
@@ -52,7 +52,7 @@ private:
    void MouseReleased() override;
    bool MouseMoved(float x, float y) override;
    
-   void PlayChorderNote(double time, int pitch, int velocity, int voice = -1, ModulationChain* pitchBend = nullptr, ModulationChain* modWheel = nullptr, ModulationChain* pressure = nullptr);
+   void PlayChorderNote(double time, int pitch, int velocity, int voiceIdx, ModulationParameters modulation);
    void CheckLeftovers();
    void SyncChord();
    

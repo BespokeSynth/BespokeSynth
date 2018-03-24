@@ -84,7 +84,7 @@ void MidiOutputModule::BuildControllerList()
       mControllerList->AddLabel(devices[i].c_str(), i);
 }
 
-void MidiOutputModule::PlayNote(double time, int pitch, int velocity, int voiceIdx /*= -1*/, ModulationChain* pitchBend /*= nullptr*/, ModulationChain* modWheel /*= nullptr*/, ModulationChain* pressure /*= nullptr*/)
+void MidiOutputModule::PlayNote(double time, int pitch, int velocity, int voiceIdx, ModulationParameters modulation)
 {
    int channel = voiceIdx + 1;
    if (voiceIdx == -1)
@@ -96,9 +96,7 @@ void MidiOutputModule::PlayNote(double time, int pitch, int velocity, int voiceI
    if (voiceIdx == -1)
       modIdx = kGlobalModulationIdx;
    
-   mChannelModulations[modIdx].mPitchBend = pitchBend;
-   mChannelModulations[modIdx].mModWheel = modWheel;
-   mChannelModulations[modIdx].mPressure = pressure;
+   mChannelModulations[modIdx].mModulation = modulation;
 }
 
 void MidiOutputModule::SendCC(int control, int value, int voiceIdx /*=-1*/)
@@ -118,19 +116,19 @@ void MidiOutputModule::OnTransportAdvanced(float amount)
       int channel = i + 1;
       if (i == kGlobalModulationIdx)
          channel = 1;
-      float bend = mod.mPitchBend ? mod.mPitchBend->GetValue(0) : 0;
+      float bend = mod.mModulation.pitchBend ? mod.mModulation.pitchBend->GetValue(0) : 0;
       if (bend != mod.mLastPitchBend)
       {
          mod.mLastPitchBend = bend;
          mDevice.SendPitchBend((int)ofMap(bend,-mPitchBendRange,mPitchBendRange,0,16383,K(clamp)), channel);
       }
-      float modWheel = mod.mModWheel ? mod.mModWheel->GetValue(0) : 0;
+      float modWheel = mod.mModulation.modWheel ? mod.mModulation.modWheel->GetValue(0) : 0;
       if (modWheel != mod.mLastModWheel)
       {
          mod.mLastModWheel = modWheel;
          mDevice.SendCC(mModwheelCC, modWheel * 127, channel);
       }
-      float pressure = mod.mPressure ? mod.mPressure->GetValue(0) : 0;
+      float pressure = mod.mModulation.pressure ? mod.mModulation.pressure->GetValue(0) : 0;
       if (pressure != mod.mLastPressure)
       {
          mod.mLastPressure = pressure;

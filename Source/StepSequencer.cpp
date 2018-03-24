@@ -403,10 +403,10 @@ void StepSequencer::PlayNote(int note, float val)
    }
 }
 
-void StepSequencer::PlayNote(double time, int pitch, int velocity, int voiceIdx /*= -1*/, ModulationChain* pitchBend /*= nullptr*/, ModulationChain* modWheel /*= nullptr*/, ModulationChain* pressure /*= nullptr*/)
+void StepSequencer::PlayNote(double time, int pitch, int velocity, int voiceIdx, ModulationParameters modulation)
 {
    if (mRepeatRate == kInterval_None)
-      PlayNoteOutput(time, pitch, velocity, voiceIdx, pitchBend, modWheel, pressure);
+      PlayNoteOutput(time, pitch, velocity, voiceIdx, modulation);
 }
 
 void StepSequencer::SendPressure(int pitch, int pressure)

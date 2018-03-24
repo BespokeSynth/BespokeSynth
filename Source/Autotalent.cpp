@@ -982,7 +982,7 @@ void Autotalent::ButtonClicked(ClickButton* button)
    }
 }
 
-void Autotalent::PlayNote(double time, int pitch, int velocity, int voiceIdx /*= -1*/, ModulationChain* pitchBend /*= nullptr*/, ModulationChain* modWheel /*= nullptr*/, ModulationChain* pressure /*= nullptr*/)
+void Autotalent::PlayNote(double time, int pitch, int velocity, int voiceIdx, ModulationParameters modulation)
 {
    if (velocity > 0)
    {

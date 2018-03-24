@@ -47,7 +47,7 @@ void ValueSetter::PostRepatch(PatchCableSource* cableSource)
    mTarget = dynamic_cast<IUIControl*>(mControlCable->GetTarget());
 }
 
-void ValueSetter::PlayNote(double time, int pitch, int velocity, int voiceIdx /*= -1*/, ModulationChain* pitchBend /*= nullptr*/, ModulationChain* modWheel /*= nullptr*/, ModulationChain* pressure /*= nullptr*/)
+void ValueSetter::PlayNote(double time, int pitch, int velocity, int voiceIdx, ModulationParameters modulation)
 {
    if (velocity > 0 && mEnabled)
    {

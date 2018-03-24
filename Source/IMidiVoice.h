@@ -17,25 +17,23 @@ class IVoiceParams;
 class IMidiVoice
 {
 public:
-   IMidiVoice() : mPitch(0), mPitchBend(nullptr), mModWheel(nullptr), mPressure(nullptr) {}
+   IMidiVoice() : mPitch(0) {}
    virtual ~IMidiVoice() {}
    virtual void ClearVoice() = 0;
    void SetPitch(float pitch) { mPitch = pitch; }
-   void SetModulators(ModulationChain* pitchBend, ModulationChain* modWheel, ModulationChain* pressure) { mPitchBend = pitchBend; mModWheel = modWheel; mPressure = pressure; }
+   void SetModulators(ModulationParameters modulators) { mModulators = modulators; }
    virtual void Start(double time, float amount) = 0;
    virtual void Stop(double time) = 0;
    virtual void Process(double time, float* out, int bufferSize) = 0;
    virtual bool IsDone(double time) = 0;
    virtual void SetVoiceParams(IVoiceParams* params) = 0;
    
-   float GetPitch(int samplesIn) { return mPitch + (mPitchBend ? mPitchBend->GetValue(samplesIn) : 0); }
-   float GetModWheel(int samplesIn) { return mModWheel ? mModWheel->GetValue(samplesIn) : 0; }
-   float GetPressure(int samplesIn) { return mPressure ? mPressure->GetValue(samplesIn) : 0; }
+   float GetPitch(int samplesIn) { return mPitch + (mModulators.pitchBend ? mModulators.pitchBend->GetValue(samplesIn) : 0); }
+   float GetModWheel(int samplesIn) { return mModulators.modWheel ? mModulators.modWheel->GetValue(samplesIn) : 0; }
+   float GetPressure(int samplesIn) { return mModulators.pressure ? mModulators.pressure->GetValue(samplesIn) : 0; }
 private:
    float mPitch;
-   ModulationChain* mPitchBend;
-   ModulationChain* mModWheel;
-   ModulationChain* mPressure;
+   ModulationParameters mModulators;
 };
 
 #endif

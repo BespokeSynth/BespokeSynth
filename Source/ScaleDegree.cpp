@@ -53,11 +53,11 @@ void ScaleDegree::CheckboxUpdated(Checkbox *checkbox)
       mNoteOutput.Flush();
 }
 
-void ScaleDegree::PlayNote(double time, int pitch, int velocity, int voiceIdx /*= -1*/, ModulationChain* pitchBend /*= nullptr*/, ModulationChain* modWheel /*= nullptr*/, ModulationChain* pressure /*= nullptr*/)
+void ScaleDegree::PlayNote(double time, int pitch, int velocity, int voiceIdx, ModulationParameters modulation)
 {
    if (!mEnabled)
    {
-      PlayNoteOutput(time, pitch, velocity, voiceIdx, pitchBend, modWheel, pressure);
+      PlayNoteOutput(time, pitch, velocity, voiceIdx, modulation);
       return;
    }
    
@@ -100,7 +100,7 @@ void ScaleDegree::PlayNote(double time, int pitch, int velocity, int voiceIdx /*
    }
    
    pitch = TransformPitch(pitch);
-   PlayNoteOutput(time, pitch, velocity, voiceIdx, pitchBend, modWheel, pressure);
+   PlayNoteOutput(time, pitch, velocity, voiceIdx, modulation);
 }
 
 int ScaleDegree::TransformPitch(int pitch)

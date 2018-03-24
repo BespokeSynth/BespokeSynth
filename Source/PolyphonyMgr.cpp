@@ -79,7 +79,7 @@ void PolyphonyMgr::Init(VoiceType type, IVoiceParams* params)
    }
 }
 
-void PolyphonyMgr::Start(double time, int pitch, float amount, int voiceIdx /*= -1*/, ModulationChain* pitchBend /*= nullptr*/, ModulationChain* modWheel /*= nullptr*/, ModulationChain* pressure /*= nullptr*/)
+void PolyphonyMgr::Start(double time, int pitch, float amount, int voiceIdx, ModulationParameters modulation)
 {
    assert(voiceIdx < kNumVoices);
    
@@ -141,7 +141,7 @@ void PolyphonyMgr::Start(double time, int pitch, float amount, int voiceIdx /*= 
    IMidiVoice* voice = mVoices[voiceIdx].mVoice;
    assert(voice);
    voice->SetPitch(pitch);
-   voice->SetModulators(pitchBend, modWheel, pressure);
+   voice->SetModulators(modulation);
    if (!preserveVoice)
    {
       Clear(mFadeOutWriteBuffer, kVoiceFadeSamples);

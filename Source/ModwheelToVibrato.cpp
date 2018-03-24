@@ -48,19 +48,18 @@ void ModwheelToVibrato::DrawModule()
    mIntervalSelector->Draw();
 }
 
-void ModwheelToVibrato::PlayNote(double time, int pitch, int velocity, int voiceIdx /*= -1*/, ModulationChain* pitchBend /*= nullptr*/, ModulationChain* modWheel /*= nullptr*/, ModulationChain* pressure /*= nullptr*/)
+void ModwheelToVibrato::PlayNote(double time, int pitch, int velocity, int voiceIdx, ModulationParameters modulation)
 {
    if (mEnabled)
    {
-      mModulation.GetPitchBend(voiceIdx)->AppendTo(pitchBend);
+      mModulation.GetPitchBend(voiceIdx)->AppendTo(modulation.pitchBend);
       mModulation.GetPitchBend(voiceIdx)->SetLFO(mVibratoInterval, mVibratoAmount);
-      mModulation.GetPitchBend(voiceIdx)->MultiplyIn(modWheel);
-      PlayNoteOutput(time, pitch, velocity, voiceIdx, mModulation.GetPitchBend(voiceIdx), nullptr, pressure);
+      mModulation.GetPitchBend(voiceIdx)->MultiplyIn(modulation.modWheel);
+      modulation.pitchBend = mModulation.GetPitchBend(voiceIdx);
+      modulation.modWheel = nullptr;
    }
-   else
-   {
-      PlayNoteOutput(time, pitch, velocity, voiceIdx, pitchBend, modWheel, pressure);
-   }
+   
+   PlayNoteOutput(time, pitch, velocity, voiceIdx, modulation);
 }
 
 void ModwheelToVibrato::FloatSliderUpdated(FloatSlider* slider, float oldVal)

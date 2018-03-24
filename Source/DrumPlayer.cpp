@@ -291,7 +291,7 @@ int DrumPlayer::GetIndividualOutputIndex(int hitIndex)
    return -1;
 }
 
-void DrumPlayer::PlayNote(double time, int pitch, int velocity, int voiceIdx /*= -1*/, ModulationChain* pitchBend /*= nullptr*/, ModulationChain* modWheel /*= nullptr*/, ModulationChain* pressure /*= nullptr*/)
+void DrumPlayer::PlayNote(double time, int pitch, int velocity, int voiceIdx, ModulationParameters modulation)
 {
    pitch %= 24;
    if (pitch >= 0 && pitch < NUM_DRUM_HITS)

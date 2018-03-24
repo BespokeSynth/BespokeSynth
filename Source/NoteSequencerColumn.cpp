@@ -65,7 +65,7 @@ void NoteSequencerColumn::SyncWithCable()
    }
 }
 
-void NoteSequencerColumn::PlayNote(double time, int pitch, int velocity, int voiceIdx /*= -1*/, ModulationChain* pitchBend /*= nullptr*/, ModulationChain* modWheel /*= nullptr*/, ModulationChain* pressure /*= nullptr*/)
+void NoteSequencerColumn::PlayNote(double time, int pitch, int velocity, int voiceIdx, ModulationParameters modulation)
 {
    if (velocity > 0 && mSequencer && mGrid)
    {

@@ -60,7 +60,7 @@ void Chorder::AddTone(int tone, float velocity)
       {
          int chordtone = tone + TheScale->GetToneFromPitch(i);
          int outPitch = TheScale->MakeDiatonic(TheScale->GetPitchFromTone(chordtone));
-         PlayChorderNote(gTime, outPitch, mVelocity * velocity);
+         PlayChorderNote(gTime, outPitch, mVelocity * velocity, -1, ModulationParameters());
       }
    }
 }
@@ -76,7 +76,7 @@ void Chorder::RemoveTone(int tone)
       {
          int chordtone = tone + TheScale->GetToneFromPitch(i);
          int outPitch = TheScale->MakeDiatonic(TheScale->GetPitchFromTone(chordtone));
-         PlayChorderNote(gTime, outPitch, 0);
+         PlayChorderNote(gTime, outPitch, 0, -1, ModulationParameters());
       }
    }
 }
@@ -114,11 +114,11 @@ void Chorder::CheckboxUpdated(Checkbox *checkbox)
    }
 }
 
-void Chorder::PlayNote(double time, int pitch, int velocity, int voiceIdx /*= -1*/, ModulationChain* pitchBend /*= nullptr*/, ModulationChain* modWheel /*= nullptr*/, ModulationChain* pressure /*= nullptr*/)
+void Chorder::PlayNote(double time, int pitch, int velocity, int voiceIdx, ModulationParameters modulation)
 {
    if (!mEnabled)
    {
-      PlayNoteOutput(time, pitch, velocity, voiceIdx, pitchBend, modWheel, pressure);
+      PlayNoteOutput(time, pitch, velocity, voiceIdx, modulation);
       return;
    }
 
@@ -151,7 +151,7 @@ void Chorder::PlayNote(double time, int pitch, int velocity, int voiceIdx /*= -1
                outPitch = TheScale->MakeDiatonic(TheScale->GetPitchFromTone(tone));
             }
             
-            PlayChorderNote(time, outPitch, velocity*val*val, voice, pitchBend, modWheel, pressure);
+            PlayChorderNote(time, outPitch, velocity*val*val, voice, modulation);
             
             ++idx;
          }
@@ -160,7 +160,7 @@ void Chorder::PlayNote(double time, int pitch, int velocity, int voiceIdx /*= -1
    CheckLeftovers();
 }
 
-void Chorder::PlayChorderNote(double time, int pitch, int velocity, int voice /*=-1*/, ModulationChain* pitchBend /*= nullptr*/, ModulationChain* modWheel /*= nullptr*/, ModulationChain* pressure /*= nullptr*/)
+void Chorder::PlayChorderNote(double time, int pitch, int velocity, int voice /*=-1*/, ModulationParameters modulation)
 {
    assert(velocity >= 0);
    
@@ -176,9 +176,9 @@ void Chorder::PlayChorderNote(double time, int pitch, int velocity, int voice /*
       --mHeldCount[pitch];
    
    if (mHeldCount[pitch] > 0 && !wasOn)
-      PlayNoteOutput(time, pitch, velocity, voice, pitchBend, modWheel, pressure);
+      PlayNoteOutput(time, pitch, velocity, voice, modulation);
    if (mHeldCount[pitch] == 0 && wasOn)
-      PlayNoteOutput(time, pitch, 0, voice, pitchBend, modWheel, pressure);
+      PlayNoteOutput(time, pitch, 0, voice, modulation);
    
    //ofLog() << ofToString(pitch) + " " + ofToString(velocity) + ": " + ofToString(mHeldCount[pitch]) + " " + ofToString(voice);
 }

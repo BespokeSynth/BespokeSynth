@@ -51,7 +51,7 @@ public:
    void FlushTarget(INoteReceiver* target);
    
    //INoteReceiver
-   void PlayNote(double time, int pitch, int velocity, int voiceIdx = -1, ModulationChain* pitchBend = nullptr, ModulationChain* modWheel = nullptr, ModulationChain* pressure = nullptr) override;
+   void PlayNote(double time, int pitch, int velocity, int voiceIdx = -1, ModulationParameters modulation = ModulationParameters()) override;
    void SendPressure(int pitch, int pressure) override;
    void SendCC(int control, int value, int voiceIdx = -1) override;
 
@@ -70,7 +70,7 @@ public:
    INoteSource() : mIsNoteOrigin(false), mNoteOutput(this) {}
    virtual ~INoteSource() {}
    NoteOutput* GetNoteOutput() { return &mNoteOutput; }
-   void PlayNoteOutput(double time, int pitch, int velocity, int voiceIdx = -1, ModulationChain* pitchBend = nullptr, ModulationChain* modWheel = nullptr, ModulationChain* pressure = nullptr);
+   void PlayNoteOutput(double time, int pitch, int velocity, int voiceIdx = -1, ModulationParameters modulation = ModulationParameters());
    void SendCCOutput(int control, int value, int voiceIdx = -1);
    void SetIsNoteOrigin(bool origin) { mIsNoteOrigin = origin; }
    void SetTargets(string targets);

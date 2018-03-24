@@ -17,8 +17,8 @@ const int kVoiceFadeSamples = 50;
 
 class IMidiVoice;
 class IVoiceParams;
-class ModulationChain;
 class IDrawableModule;
+struct ModulationParameters;
 
 enum VoiceType
 {
@@ -47,7 +47,7 @@ public:
    void Init(VoiceType type,
              IVoiceParams* mVoiceParams);
    
-   void Start(double time, int pitch, float amount, int voiceIdx = -1, ModulationChain* pitchBend = nullptr, ModulationChain* modWheel = nullptr, ModulationChain* pressure = nullptr);
+   void Start(double time, int pitch, float amount, int voiceIdx, ModulationParameters modulation);
    void Stop(double time, int pitch);
    void Process(double time, float* out, int bufferSize);
    void GetPhaseAndInc(float& phase, float& inc);

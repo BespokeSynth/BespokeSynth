@@ -31,7 +31,7 @@ void VelocityScaler::DrawModule()
    mScaleSlider->Draw();
 }
 
-void VelocityScaler::PlayNote(double time, int pitch, int velocity, int voiceIdx /*= -1*/, ModulationChain* pitchBend /*= nullptr*/, ModulationChain* modWheel /*= nullptr*/, ModulationChain* pressure /*= nullptr*/)
+void VelocityScaler::PlayNote(double time, int pitch, int velocity, int voiceIdx, ModulationParameters modulation)
 {
    if (mEnabled)
    {
@@ -40,7 +40,7 @@ void VelocityScaler::PlayNote(double time, int pitch, int velocity, int voiceIdx
          velocity = MAX(1,velocity*mScale);
    }
    
-   PlayNoteOutput(time, pitch, velocity, voiceIdx, pitchBend, modWheel, pressure);
+   PlayNoteOutput(time, pitch, velocity, voiceIdx, modulation);
 }
 
 void VelocityScaler::LoadLayout(const ofxJSONElement& moduleInfo)

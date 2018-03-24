@@ -37,7 +37,7 @@ public:
    bool IsResizable() const override { return true; }
    void Resize(float w, float h) override;
    
-   void PlayNote(double time, int pitch, int velocity, int voiceIdx = -1, ModulationChain* pitchBend = nullptr, ModulationChain* modWheel = nullptr, ModulationChain* pressure = nullptr) override;
+   void PlayNote(double time, int pitch, int velocity, int voiceIdx = -1, ModulationParameters modulation = ModulationParameters()) override;
    
    //IModulator
    float Value(int samplesIn = 0) override;

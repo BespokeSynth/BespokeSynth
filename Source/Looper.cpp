@@ -1312,7 +1312,7 @@ void Looper::Rewrite()
    mWantRewrite = true;
 }
 
-void Looper::PlayNote(double time, int pitch, int velocity, int voiceIdx /*= -1*/, ModulationChain* pitchBend /*= nullptr*/, ModulationChain* modWheel /*= nullptr*/, ModulationChain* pressure /*= nullptr*/)
+void Looper::PlayNote(double time, int pitch, int velocity, int voiceIdx, ModulationParameters modulation)
 {
    //jump around in loop
    if (velocity > 0)

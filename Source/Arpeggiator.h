@@ -41,7 +41,7 @@ public:
    bool MouseMoved(float x, float y) override;
    
    //INoteReceiver
-   void PlayNote(double time, int pitch, int velocity, int voiceIdx = -1, ModulationChain* pitchBend = nullptr, ModulationChain* modWheel = nullptr, ModulationChain* pressure = nullptr) override;
+   void PlayNote(double time, int pitch, int velocity, int voiceIdx = -1, ModulationParameters modulation = ModulationParameters()) override;
    
    //ITimeListener
    void OnTimeEvent(int samplesTo) override;
@@ -81,13 +81,11 @@ private:
    
    struct ArpNote
    {
-      ArpNote(int _pitch, int _vel, int _voiceIdx, ModulationChain* _pitchBend, ModulationChain* _modWheel, ModulationChain* _pressure) : pitch(_pitch), vel(_vel), voiceIdx(_voiceIdx), pitchBend(_pitchBend), modWheel(_modWheel), pressure(_pressure) {}
+      ArpNote(int _pitch, int _vel, int _voiceIdx, ModulationParameters _modulation) : pitch(_pitch), vel(_vel), voiceIdx(_voiceIdx), modulation(_modulation) {}
       int pitch;
       int vel;
       int voiceIdx;
-      ModulationChain* pitchBend;
-      ModulationChain* modWheel;
-      ModulationChain* pressure;
+      ModulationParameters modulation;
    };
    vector<ArpNote> mChord;
    

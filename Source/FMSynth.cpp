@@ -141,11 +141,11 @@ void FMSynth::Process(double time)
    Add(out, mWriteBuffer, gBufferSize);
 }
 
-void FMSynth::PlayNote(double time, int pitch, int velocity, int voiceIdx /*= -1*/, ModulationChain* pitchBend /*= nullptr*/, ModulationChain* modWheel /*= nullptr*/, ModulationChain* pressure /*= nullptr*/)
+void FMSynth::PlayNote(double time, int pitch, int velocity, int voiceIdx, ModulationParameters modulation)
 {
    if (velocity > 0)
    {
-      mPolyMgr.Start(time, pitch, velocity/127.0f, voiceIdx, pitchBend, modWheel, pressure);
+      mPolyMgr.Start(time, pitch, velocity/127.0f, voiceIdx, modulation);
       mVoiceParams.mOscADSRParams.Start(time,1);   //for visualization
    }
    else

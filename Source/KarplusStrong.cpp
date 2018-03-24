@@ -88,10 +88,10 @@ void KarplusStrong::Process(double time)
    Add(out, mWriteBuffer.GetChannel(0), gBufferSize);
 }
 
-void KarplusStrong::PlayNote(double time, int pitch, int velocity, int voiceIdx /*= -1*/, ModulationChain* pitchBend /*= nullptr*/, ModulationChain* modWheel /*= nullptr*/, ModulationChain* pressure /*= nullptr*/)
+void KarplusStrong::PlayNote(double time, int pitch, int velocity, int voiceIdx, ModulationParameters modulation)
 {
    if (velocity > 0)
-      mPolyMgr.Start(time, pitch, velocity/127.0f, voiceIdx, pitchBend, modWheel, pressure);
+      mPolyMgr.Start(time, pitch, velocity/127.0f, voiceIdx, modulation);
    else
       mPolyMgr.Stop(time, pitch);
 }

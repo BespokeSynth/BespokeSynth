@@ -38,7 +38,7 @@ void SustainPedal::CheckboxUpdated(Checkbox *checkbox)
    }
 }
 
-void SustainPedal::PlayNote(double time, int pitch, int velocity, int voiceIdx /*= -1*/, ModulationChain* pitchBend /*= nullptr*/, ModulationChain* modWheel /*= nullptr*/, ModulationChain* pressure /*= nullptr*/)
+void SustainPedal::PlayNote(double time, int pitch, int velocity, int voiceIdx, ModulationParameters modulation)
 {
    if (mEnabled)
    {
@@ -46,7 +46,7 @@ void SustainPedal::PlayNote(double time, int pitch, int velocity, int voiceIdx /
       if (velocity > 0)
       {
          if (!ListContains(pitch, mSustainedNotes)) //don't replay already-sustained notes
-            PlayNoteOutput(time, pitch, velocity, voiceIdx, pitchBend, modWheel, pressure);
+            PlayNoteOutput(time, pitch, velocity, voiceIdx, modulation);
          mSustainedNotes.remove(pitch);   //not sustaining it if it's held down
       }
       else
@@ -58,7 +58,7 @@ void SustainPedal::PlayNote(double time, int pitch, int velocity, int voiceIdx /
    }
    else
    {
-      PlayNoteOutput(time, pitch, velocity, voiceIdx, pitchBend, modWheel, pressure);
+      PlayNoteOutput(time, pitch, velocity, voiceIdx, modulation);
    }
 }
 

@@ -54,11 +54,11 @@ void NoteTransformer::CheckboxUpdated(Checkbox *checkbox)
       mNoteOutput.Flush();
 }
 
-void NoteTransformer::PlayNote(double time, int pitch, int velocity, int voiceIdx /*= -1*/, ModulationChain* pitchBend /*= nullptr*/, ModulationChain* modWheel /*= nullptr*/, ModulationChain* pressure /*= nullptr*/)
+void NoteTransformer::PlayNote(double time, int pitch, int velocity, int voiceIdx, ModulationParameters modulation)
 {
    if (!mEnabled)
    {
-      PlayNoteOutput(time, pitch, velocity, voiceIdx, pitchBend, modWheel, pressure);
+      PlayNoteOutput(time, pitch, velocity, voiceIdx, modulation);
       return;
    }
    
@@ -77,7 +77,7 @@ void NoteTransformer::PlayNote(double time, int pitch, int velocity, int voiceId
    tone += mToneMod[tone % TheScale->NumPitchesInScale()];
    
    int outPitch = TheScale->GetPitchFromTone(tone) + pitchOffset;
-   PlayNoteOutput(time, outPitch, velocity, voiceIdx, pitchBend, modWheel, pressure);
+   PlayNoteOutput(time, outPitch, velocity, voiceIdx, modulation);
    mLastNoteOnForPitch[pitch] = outPitch;
 }
 

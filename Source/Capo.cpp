@@ -38,11 +38,11 @@ void Capo::CheckboxUpdated(Checkbox *checkbox)
       mNoteOutput.Flush();
 }
 
-void Capo::PlayNote(double time, int pitch, int velocity, int voiceIdx /*= -1*/, ModulationChain* pitchBend /*= nullptr*/, ModulationChain* modWheel /*= nullptr*/, ModulationChain* pressure /*= nullptr*/)
+void Capo::PlayNote(double time, int pitch, int velocity, int voiceIdx, ModulationParameters modulation)
 {
    if (!mEnabled)
    {
-      PlayNoteOutput(time, pitch, velocity, voiceIdx, pitchBend, modWheel, pressure);
+      PlayNoteOutput(time, pitch, velocity, voiceIdx, modulation);
       return;
    }
    
@@ -85,7 +85,7 @@ void Capo::PlayNote(double time, int pitch, int velocity, int voiceIdx /*= -1*/,
    }
    
    pitch += mCapo;
-   PlayNoteOutput(time, pitch, velocity, voiceIdx, pitchBend, modWheel, pressure);
+   PlayNoteOutput(time, pitch, velocity, voiceIdx, modulation);
 }
 
 void Capo::IntSliderUpdated(IntSlider* slider, int oldVal)
@@ -100,13 +100,13 @@ void Capo::IntSliderUpdated(IntSlider* slider, int oldVal)
          const NoteInfo& note = *iter;
          int pitch = note.mPitch + mCapo;
          //PlayNoteOutput fix
-         PlayNoteOutput(gTime, pitch, note.mVelocity, note.mVoiceIdx);
+         PlayNoteOutput(gTime, pitch, note.mVelocity, note.mVoiceIdx, ModulationParameters());
          heldNotes.remove(pitch);
       }
       mNotesMutex.unlock();
       
       for (list<int>::iterator iter = heldNotes.begin(); iter != heldNotes.end(); ++iter)
-         PlayNoteOutput(gTime,*iter,0,-1);
+         PlayNoteOutput(gTime,*iter,0,-1,ModulationParameters());
    }
 }
 

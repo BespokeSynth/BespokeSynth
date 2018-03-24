@@ -98,15 +98,15 @@ void VelocityStepSequencer::CheckboxUpdated(Checkbox* checkbox)
       mNoteOutput.Flush();
 }
 
-void VelocityStepSequencer::PlayNote(double time, int pitch, int velocity, int voiceIdx /*= -1*/, ModulationChain* pitchBend /*= nullptr*/, ModulationChain* modWheel /*= nullptr*/, ModulationChain* pressure /*= nullptr*/)
+void VelocityStepSequencer::PlayNote(double time, int pitch, int velocity, int voiceIdx, ModulationParameters modulation)
 {
    if (!mEnabled)
    {
-      PlayNoteOutput(time, pitch, velocity, voiceIdx, pitchBend, modWheel, pressure);
+      PlayNoteOutput(time, pitch, velocity, voiceIdx, modulation);
       return;
    }
    
-   PlayNoteOutput(time, pitch, velocity > 0 ? mCurrentVelocity : 0, voiceIdx, pitchBend, modWheel, pressure);
+   PlayNoteOutput(time, pitch, velocity > 0 ? mCurrentVelocity : 0, voiceIdx, modulation);
 }
 
 void VelocityStepSequencer::OnTimeEvent(int samplesTo)

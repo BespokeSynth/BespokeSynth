@@ -260,19 +260,19 @@ void VSTPlugin::Process(double time)
             if (mUseVoiceAsChannel == false)
                channel = mChannel;
             
-            float bend = mod.mPitchBend ? mod.mPitchBend->GetValue(0) : 0;
+            float bend = mod.mModulation.pitchBend ? mod.mModulation.pitchBend->GetValue(0) : 0;
             if (bend != mod.mLastPitchBend)
             {
                mod.mLastPitchBend = bend;
                mMidiBuffer.addEvent(juce::MidiMessage::pitchWheel(channel, (int)ofMap(bend,-mPitchBendRange,mPitchBendRange,0,16383,K(clamp))), 0);
             }
-            float modWheel = mod.mModWheel ? mod.mModWheel->GetValue(0) : 0;
+            float modWheel = mod.mModulation.modWheel ? mod.mModulation.modWheel->GetValue(0) : 0;
             if (modWheel != mod.mLastModWheel)
             {
                mod.mLastModWheel = modWheel;
                mMidiBuffer.addEvent(juce::MidiMessage::controllerEvent(channel, mModwheelCC, ofClamp(modWheel * 127,0,127)), 0);
             }
-            float pressure = mod.mPressure ? mod.mPressure->GetValue(0) : 0;
+            float pressure = mod.mModulation.pressure ? mod.mModulation.pressure->GetValue(0) : 0;
             if (pressure != mod.mLastPressure)
             {
                mod.mLastPressure = pressure;
@@ -313,7 +313,7 @@ void VSTPlugin::Process(double time)
    GetBuffer()->Clear();
 }
 
-void VSTPlugin::PlayNote(double time, int pitch, int velocity, int voiceIdx /*= -1*/, ModulationChain* pitchBend /*= nullptr*/, ModulationChain* modWheel /*= nullptr*/, ModulationChain* pressure /*= nullptr*/)
+void VSTPlugin::PlayNote(double time, int pitch, int velocity, int voiceIdx, ModulationParameters modulation)
 {
    if (mPlugin == nullptr)
       return;
@@ -342,9 +342,7 @@ void VSTPlugin::PlayNote(double time, int pitch, int velocity, int voiceIdx /*= 
    if (voiceIdx == -1)
       modIdx = kGlobalModulationIdx;
    
-   mChannelModulations[modIdx].mPitchBend = pitchBend;
-   mChannelModulations[modIdx].mModWheel = modWheel;
-   mChannelModulations[modIdx].mPressure = pressure;
+   mChannelModulations[modIdx].mModulation = modulation;
 }
 
 void VSTPlugin::SendCC(int control, int value, int voiceIdx /*=-1*/)

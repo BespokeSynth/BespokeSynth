@@ -70,7 +70,7 @@ void PitchChorus::Process(double time)
    GetBuffer()->Reset();
 }
 
-void PitchChorus::PlayNote(double time, int pitch, int velocity, int voiceIdx /*= -1*/, ModulationChain* pitchBend /*= nullptr*/, ModulationChain* modWheel /*= nullptr*/, ModulationChain* pressure /*= nullptr*/)
+void PitchChorus::PlayNote(double time, int pitch, int velocity, int voiceIdx, ModulationParameters modulation)
 {
    for (int i=0; i<kNumShifters; ++i)
    {

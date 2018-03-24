@@ -31,9 +31,9 @@ void Kicker::CheckboxUpdated(Checkbox *checkbox)
       mNoteOutput.Flush();
 }
 
-void Kicker::PlayNote(double time, int pitch, int velocity, int voiceIdx /*= -1*/, ModulationChain* pitchBend /*= nullptr*/, ModulationChain* modWheel /*= nullptr*/, ModulationChain* pressure /*= nullptr*/)
+void Kicker::PlayNote(double time, int pitch, int velocity, int voiceIdx, ModulationParameters modulation)
 {
-   PlayNoteOutput(time, pitch, velocity, voiceIdx, pitchBend, modWheel, pressure);
+   PlayNoteOutput(time, pitch, velocity, voiceIdx, modulation);
 
    if (mEnabled && mDrumPlayer)
    {

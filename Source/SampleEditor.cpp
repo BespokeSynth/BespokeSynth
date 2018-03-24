@@ -449,7 +449,7 @@ void SampleEditor::IntSliderUpdated(IntSlider* slider, int oldVal)
    }
 }
 
-void SampleEditor::PlayNote(double time, int pitch, int velocity, int voiceIdx /*= -1*/, ModulationChain* pitchBend /*= nullptr*/, ModulationChain* modWheel /*= nullptr*/, ModulationChain* pressure /*= nullptr*/)
+void SampleEditor::PlayNote(double time, int pitch, int velocity, int voiceIdx, ModulationParameters modulation)
 {
    if (mSample)
    {

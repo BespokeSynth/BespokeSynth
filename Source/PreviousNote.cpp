@@ -21,11 +21,11 @@ void PreviousNote::DrawModule()
       return;
 }
 
-void PreviousNote::PlayNote(double time, int pitch, int velocity, int voiceIdx /*= -1*/, ModulationChain* pitchBend /*= nullptr*/, ModulationChain* modWheel /*= nullptr*/, ModulationChain* pressure /*= nullptr*/)
+void PreviousNote::PlayNote(double time, int pitch, int velocity, int voiceIdx, ModulationParameters modulation)
 {
    if (!mEnabled)
    {
-      PlayNoteOutput(time, pitch, velocity, voiceIdx, pitchBend, modWheel, pressure);
+      PlayNoteOutput(time, pitch, velocity, voiceIdx, modulation);
       return;
    }
    
@@ -33,7 +33,7 @@ void PreviousNote::PlayNote(double time, int pitch, int velocity, int voiceIdx /
    {
       if (mNote != -1)
       {
-         PlayNoteOutput(time, mNote, mVelocity, voiceIdx, pitchBend, modWheel, pressure);
+         PlayNoteOutput(time, mNote, mVelocity, voiceIdx, modulation);
       }
       
       mNote = pitch;

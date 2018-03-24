@@ -45,14 +45,14 @@ void PitchSetter::IntSliderUpdated(IntSlider* slider, int oldVal)
       mNoteOutput.Flush();
 }
 
-void PitchSetter::PlayNote(double time, int pitch, int velocity, int voiceIdx /*= -1*/, ModulationChain* pitchBend /*= nullptr*/, ModulationChain* modWheel /*= nullptr*/, ModulationChain* pressure /*= nullptr*/)
+void PitchSetter::PlayNote(double time, int pitch, int velocity, int voiceIdx, ModulationParameters modulation)
 {
    ComputeSliders(0);
    
    if (mEnabled)
-      PlayNoteOutput(time, mPitch, velocity, voiceIdx, pitchBend, modWheel, pressure);
+      PlayNoteOutput(time, mPitch, velocity, voiceIdx, modulation);
    else
-      PlayNoteOutput(time, pitch, velocity, voiceIdx, pitchBend, modWheel, pressure);
+      PlayNoteOutput(time, pitch, velocity, voiceIdx, modulation);
 }
 
 void PitchSetter::LoadLayout(const ofxJSONElement& moduleInfo)

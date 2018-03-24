@@ -82,9 +82,9 @@ NoteCanvas::~NoteCanvas()
    TheTransport->RemoveAudioPoller(this);
 }
 
-void NoteCanvas::PlayNote(double time, int pitch, int velocity, int voiceIdx /*= -1*/, ModulationChain* pitchBend /*= nullptr*/, ModulationChain* modWheel /*= nullptr*/, ModulationChain* pressure /*= nullptr*/)
+void NoteCanvas::PlayNote(double time, int pitch, int velocity, int voiceIdx, ModulationParameters modulation)
 {
-   mNoteOutput.PlayNote(time, pitch, velocity, voiceIdx, pitchBend, modWheel, pressure);
+   mNoteOutput.PlayNote(time, pitch, velocity, voiceIdx, modulation);
    
    if (!mEnabled || !mRecord)
       return;
@@ -115,9 +115,7 @@ void NoteCanvas::PlayNote(double time, int pitch, int velocity, int voiceIdx /*=
       int modIdx = voiceIdx;
       if (modIdx == -1)
          modIdx = kNumVoices;
-      mVoiceModulations[modIdx].mPitchBend = pitchBend;
-      mVoiceModulations[modIdx].mModWheel = modWheel;
-      mVoiceModulations[modIdx].mPressure = pressure;
+      mVoiceModulations[modIdx] = modulation;
       mCanvas->AddElement(element);
       
       mCanvas->SetRowOffset(element->mRow - mCanvas->GetNumVisibleRows()/2);
@@ -182,7 +180,7 @@ void NoteCanvas::OnTransportAdvanced(float amount)
          NoteCanvasElement* note = ((NoteCanvasElement*)mCanvas->GetElementAt(curPos, i));
          assert(note);
          mCurrentNotes[pitch] = note;
-         mNoteOutput.PlayNote(gTime, pitch, note->GetVelocity()*127, note->GetVoiceIdx(), note->GetPitchBend(), note->GetModWheel(), note->GetPressure());
+         mNoteOutput.PlayNote(gTime, pitch, note->GetVelocity()*127, note->GetVoiceIdx(), ModulationParameters(note->GetPitchBend(), note->GetModWheel(), note->GetPressure()));
       }
    }
    
@@ -201,12 +199,12 @@ void NoteCanvas::OnTransportAdvanced(float amount)
          float bend = 0;
          float mod = 0;
          float pressure = 0;
-         if (mVoiceModulations[modIdx].mPitchBend)
-            bend = mVoiceModulations[modIdx].mPitchBend->GetValue(0);
-         if (mVoiceModulations[modIdx].mModWheel)
-            mod = mVoiceModulations[modIdx].mModWheel->GetValue(0);
-         if (mVoiceModulations[modIdx].mPressure)
-            pressure = mVoiceModulations[modIdx].mPressure->GetValue(0);
+         if (mVoiceModulations[modIdx].pitchBend)
+            bend = mVoiceModulations[modIdx].pitchBend->GetValue(0);
+         if (mVoiceModulations[modIdx].modWheel)
+            mod = mVoiceModulations[modIdx].modWheel->GetValue(0);
+         if (mVoiceModulations[modIdx].pressure)
+            pressure = mVoiceModulations[modIdx].pressure->GetValue(0);
          mInputNotes[pitch]->WriteModulation(curPos, bend, mod, pressure);
       }
       else if (mCurrentNotes[pitch])

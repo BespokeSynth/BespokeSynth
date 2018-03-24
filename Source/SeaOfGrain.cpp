@@ -356,7 +356,7 @@ void SeaOfGrain::IntSliderUpdated(IntSlider* slider, int oldVal)
 {
 }
 
-void SeaOfGrain::PlayNote(double time, int pitch, int velocity, int voiceIdx /*= -1*/, ModulationChain* pitchBend /*= nullptr*/, ModulationChain* modWheel /*= nullptr*/, ModulationChain* pressure /*= nullptr*/)
+void SeaOfGrain::PlayNote(double time, int pitch, int velocity, int voiceIdx, ModulationParameters modulation)
 {
    if (voiceIdx == -1 || voiceIdx >= NUM_SEAOFGRAIN_VOICES)
       return;
@@ -368,8 +368,8 @@ void SeaOfGrain::PlayNote(double time, int pitch, int velocity, int voiceIdx /*=
       mVoices[voiceIdx].mADSR.Stop(time);
    mVoices[voiceIdx].mPitch = pitch;
    mVoices[voiceIdx].mPlay = 0;
-   mVoices[voiceIdx].mPitchBend = pitchBend;
-   mVoices[voiceIdx].mPressure = pressure;
+   mVoices[voiceIdx].mPitchBend = modulation.pitchBend;
+   mVoices[voiceIdx].mPressure = modulation.pressure;
 }
 
 void SeaOfGrain::LoadLayout(const ofxJSONElement& moduleInfo)

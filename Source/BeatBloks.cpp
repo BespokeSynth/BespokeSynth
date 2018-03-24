@@ -992,7 +992,7 @@ void BeatBloks::IntSliderUpdated(IntSlider* slider, int oldVal)
 {
 }
 
-void BeatBloks::PlayNote(double time, int pitch, int velocity, int voiceIdx /*= -1*/, ModulationChain* pitchBend /*= nullptr*/, ModulationChain* modWheel /*= nullptr*/, ModulationChain* pressure /*= nullptr*/)
+void BeatBloks::PlayNote(double time, int pitch, int velocity, int voiceIdx, ModulationParameters modulation)
 {
    if (mSample)
    {

@@ -131,11 +131,11 @@ void SingleOscillator::Process(double time)
    Add(out, mWriteBuffer, bufferSize);
 }
 
-void SingleOscillator::PlayNote(double time, int pitch, int velocity, int voiceIdx /*= -1*/, ModulationChain* pitchBend /*= nullptr*/, ModulationChain* modWheel /*= nullptr*/, ModulationChain* pressure /*= nullptr*/)
+void SingleOscillator::PlayNote(double time, int pitch, int velocity, int voiceIdx, ModulationParameters modulation)
 {
    if (velocity > 0)
    {
-      mPolyMgr.Start(time, pitch, velocity/127.0f, voiceIdx, pitchBend, modWheel, pressure);
+      mPolyMgr.Start(time, pitch, velocity/127.0f, voiceIdx, modulation);
       mVoiceParams.mAdsr.Start(time,1);         //for visualization
       mVoiceParams.mFilterAdsr.Start(time,1);   //for visualization
    }

@@ -88,11 +88,11 @@ void VolcaBeatsControl::DrawModule()
       mLevelSliders[i]->Draw();
 }
 
-void VolcaBeatsControl::PlayNote(double time, int pitch, int velocity, int voiceIdx /*= -1*/, ModulationChain* pitchBend /*= nullptr*/, ModulationChain* modWheel /*= nullptr*/, ModulationChain* pressure /*= nullptr*/)
+void VolcaBeatsControl::PlayNote(double time, int pitch, int velocity, int voiceIdx, ModulationParameters modulation)
 {
    if (!mEnabled)
    {
-      PlayNoteOutput(time, pitch, velocity, voiceIdx, pitchBend, modWheel, pressure);
+      PlayNoteOutput(time, pitch, velocity, voiceIdx, modulation);
       return;
    }
    
@@ -188,7 +188,7 @@ void VolcaBeatsControl::PlayNote(double time, int pitch, int velocity, int voice
    mStutterDepthSlider->Compute();
    
    if (pitch != -1)
-      PlayNoteOutput(time, pitch, velocity, voiceIdx, pitchBend, modWheel, pressure);
+      PlayNoteOutput(time, pitch, velocity, voiceIdx, modulation);
 }
 
 void VolcaBeatsControl::FloatSliderUpdated(FloatSlider* slider, float oldVal)

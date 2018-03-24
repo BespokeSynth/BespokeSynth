@@ -36,7 +36,7 @@ public:
    void Resize(float w, float h) override;
    bool MouseScrolled(int x, int y, float scrollX, float scrollY) override;
    
-   void PlayNote(double time, int pitch, int velocity, int voiceIdx = -1, ModulationChain* pitchBend = nullptr, ModulationChain* modWheel = nullptr, ModulationChain* pressure = nullptr) override;
+   void PlayNote(double time, int pitch, int velocity, int voiceIdx = -1, ModulationParameters modulation = ModulationParameters()) override;
    void SendCC(int control, int value, int voiceIdx = -1) override {}
    
    void OnTransportAdvanced(float amount) override;
@@ -89,13 +89,7 @@ private:
    Checkbox* mFreeRecordCheckbox;
    int mFreeRecordStartMeasure;
    
-   struct VoiceModulations
-   {
-      ModulationChain* mPitchBend;
-      ModulationChain* mModWheel;
-      ModulationChain* mPressure;
-   };
-   vector<VoiceModulations> mVoiceModulations;
+   vector<ModulationParameters> mVoiceModulations;
 };
 
 #endif /* defined(__Bespoke__NoteCanvas__) */

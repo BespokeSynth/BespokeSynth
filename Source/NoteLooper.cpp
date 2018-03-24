@@ -219,7 +219,7 @@ void NoteLooper::TriggerRecordedNote(int pitch, int velocity)
    }
 }
 
-void NoteLooper::PlayNote(double time, int pitch, int velocity, int voiceIdx /*= -1*/, ModulationChain* pitchBend /*= nullptr*/, ModulationChain* modWheel /*= nullptr*/, ModulationChain* pressure /*= nullptr*/)
+void NoteLooper::PlayNote(double time, int pitch, int velocity, int voiceIdx, ModulationParameters modulation)
 {
    if (mRecord)
    {
@@ -239,7 +239,7 @@ void NoteLooper::PlayNote(double time, int pitch, int velocity, int voiceIdx /*=
       mNumHeldNotes = numHeldNotes;
    }
    
-   PlayNoteOutput(time, pitch, velocity, voiceIdx, pitchBend, modWheel, pressure);
+   PlayNoteOutput(time, pitch, velocity, voiceIdx, modulation);
 }
 
 void NoteLooper::RecordNote(int pitch, int velocity)

@@ -247,7 +247,7 @@ void SamplerGrid::OnGridButton(int x, int y, float velocity, IGridController* gr
    UpdateLights();
 }
 
-void SamplerGrid::PlayNote(double time, int pitch, int velocity, int voiceIdx /*= -1*/, ModulationChain* pitchBend /*= nullptr*/, ModulationChain* modWheel /*= nullptr*/, ModulationChain* pressure /*= nullptr*/)
+void SamplerGrid::PlayNote(double time, int pitch, int velocity, int voiceIdx, ModulationParameters modulation)
 {
    OnGridButton(pitch % mCols, (pitch / mCols) % mRows, velocity / 127, nullptr);
 }

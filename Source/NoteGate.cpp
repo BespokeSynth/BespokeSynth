@@ -47,7 +47,7 @@ void NoteGate::DrawModule()
    }
 }
 
-void NoteGate::PlayNote(double time, int pitch, int velocity, int voiceIdx /*= -1*/, ModulationChain* pitchBend /*= nullptr*/, ModulationChain* modWheel /*= nullptr*/, ModulationChain* pressure /*= nullptr*/)
+void NoteGate::PlayNote(double time, int pitch, int velocity, int voiceIdx, ModulationParameters modulation)
 {
    if (mEnabled)
    {
@@ -55,12 +55,12 @@ void NoteGate::PlayNote(double time, int pitch, int velocity, int voiceIdx /*= -
       {
          mLastPlayTime[pitch] = time;
          if (mGate[pitch])
-            PlayNoteOutput(time, pitch, velocity, voiceIdx, pitchBend, modWheel, pressure);
+            PlayNoteOutput(time, pitch, velocity, voiceIdx, modulation);
       }
    }
    else
    {
-      PlayNoteOutput(time, pitch, velocity, voiceIdx, pitchBend, modWheel, pressure);
+      PlayNoteOutput(time, pitch, velocity, voiceIdx, modulation);
    }
 }
 

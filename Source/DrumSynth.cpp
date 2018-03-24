@@ -122,7 +122,7 @@ void DrumSynth::Process(double time)
    Add(out, mOutputBuffer, bufferSize);
 }
 
-void DrumSynth::PlayNote(double time, int pitch, int velocity, int voiceIdx /*= -1*/, ModulationChain* pitchBend /*= nullptr*/, ModulationChain* modWheel /*= nullptr*/, ModulationChain* pressure /*= nullptr*/)
+void DrumSynth::PlayNote(double time, int pitch, int velocity, int voiceIdx, ModulationParameters modulation)
 {
    if (pitch >= 0 && pitch < NUM_DRUM_HITS)
    {

@@ -43,11 +43,11 @@ void Neighborhooder::IntSliderUpdated(IntSlider* slider, int oldVal)
       mNoteOutput.Flush();
 }
 
-void Neighborhooder::PlayNote(double time, int pitch, int velocity, int voiceIdx /*= -1*/, ModulationChain* pitchBend /*= nullptr*/, ModulationChain* modWheel /*= nullptr*/, ModulationChain* pressure /*= nullptr*/)
+void Neighborhooder::PlayNote(double time, int pitch, int velocity, int voiceIdx, ModulationParameters modulation)
 {
    if (!mEnabled)
    {
-      PlayNoteOutput(time, pitch, velocity, voiceIdx, pitchBend, modWheel, pressure);
+      PlayNoteOutput(time, pitch, velocity, voiceIdx, modulation);
       return;
    }
    
@@ -57,7 +57,7 @@ void Neighborhooder::PlayNote(double time, int pitch, int velocity, int voiceIdx
    pitch %= TheScale->GetTet();
    pitch += TheScale->ScaleRoot();
    pitch += mOctave * 12;
-   PlayNoteOutput(time, pitch, velocity, voiceIdx, pitchBend, modWheel, pressure);
+   PlayNoteOutput(time, pitch, velocity, voiceIdx, modulation);
 }
 
 void Neighborhooder::LoadLayout(const ofxJSONElement& moduleInfo)

@@ -12,6 +12,8 @@
 #include "IDrawableModule.h"
 #include "NoteEffectBase.h"
 
+struct ModulationParameters;
+
 class ModulationVisualizer : public NoteEffectBase, public IDrawableModule
 {
 public:
@@ -23,7 +25,7 @@ public:
    void SetEnabled(bool enabled) override { mEnabled = enabled; }
    
    //INoteReceiver
-   void PlayNote(double time, int pitch, int velocity, int voiceIdx = -1, ModulationChain* pitchBend = nullptr, ModulationChain* modWheel = nullptr, ModulationChain* pressure = nullptr) override;
+   void PlayNote(double time, int pitch, int velocity, int voiceIdx = -1, ModulationParameters modulation = ModulationParameters()) override;
    
    void LoadLayout(const ofxJSONElement& moduleInfo) override;
    void SetUpFromSaveData() override;
@@ -36,12 +38,10 @@ private:
    
    struct VizVoice
    {
-      VizVoice() : mActive(false), mPitchBend(nullptr), mModWheel(nullptr), mPressure(nullptr) {}
+      VizVoice() : mActive(false) {}
       string GetInfoString();
       bool mActive;
-      ModulationChain* mPitchBend;
-      ModulationChain* mModWheel;
-      ModulationChain* mPressure;
+      ModulationParameters mModulators;
    };
    
    VizVoice mGlobalModulation;

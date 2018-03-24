@@ -24,16 +24,14 @@ void ModwheelToPressure::DrawModule()
       return;
 }
 
-void ModwheelToPressure::PlayNote(double time, int pitch, int velocity, int voiceIdx /*= -1*/, ModulationChain* pitchBend /*= nullptr*/, ModulationChain* modWheel /*= nullptr*/, ModulationChain* pressure /*= nullptr*/)
+void ModwheelToPressure::PlayNote(double time, int pitch, int velocity, int voiceIdx, ModulationParameters modulation)
 {
    if (mEnabled)
    {
-      PlayNoteOutput(time, pitch, velocity, voiceIdx, pitchBend, nullptr, modWheel);
+      modulation.pressure = modulation.modWheel;
+      modulation.modWheel = nullptr;
    }
-   else
-   {
-      PlayNoteOutput(time, pitch, velocity, voiceIdx, pitchBend, modWheel, pressure);
-   }
+   PlayNoteOutput(time, pitch, velocity, voiceIdx, modulation);
 }
 
 void ModwheelToPressure::LoadLayout(const ofxJSONElement& moduleInfo)

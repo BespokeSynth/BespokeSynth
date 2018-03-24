@@ -49,12 +49,12 @@ void NoteToSpeed::PostRepatch(PatchCableSource* cableSource)
    OnModulatorRepatch();
 }
 
-void NoteToSpeed::PlayNote(double time, int pitch, int velocity, int voiceIdx /*= -1*/, ModulationChain* pitchBend /*= nullptr*/, ModulationChain* modWheel /*= nullptr*/, ModulationChain* pressure /*= nullptr*/)
+void NoteToSpeed::PlayNote(double time, int pitch, int velocity, int voiceIdx, ModulationParameters modulation)
 {
    if (mEnabled && velocity > 0)
    {
       mPitch = pitch;
-      mPitchBend = pitchBend;
+      mPitchBend = modulation.pitchBend;
    }
 }
 

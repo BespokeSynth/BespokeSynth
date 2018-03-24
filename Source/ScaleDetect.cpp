@@ -51,9 +51,9 @@ void ScaleDetect::DrawModule()
    }
 }
 
-void ScaleDetect::PlayNote(double time, int pitch, int velocity, int voiceIdx /*= -1*/, ModulationChain* pitchBend /*= nullptr*/, ModulationChain* modWheel /*= nullptr*/, ModulationChain* pressure /*= nullptr*/)
+void ScaleDetect::PlayNote(double time, int pitch, int velocity, int voiceIdx, ModulationParameters modulation)
 {
-   PlayNoteOutput(time, pitch, velocity, voiceIdx, pitchBend, modWheel, pressure);
+   PlayNoteOutput(time, pitch, velocity, voiceIdx, modulation);
 
    //TODO_PORT(Ryan) threads get fucked up here, adding a label causes text width to be calculated, which locks a mutex
    /*if (velocity > 0)

@@ -37,7 +37,7 @@ public:
    void FloatSliderUpdated(FloatSlider* slider, float oldVal) override {}
    void CheckboxUpdated(Checkbox* checkbox) override {}
    
-   void PlayNote(double time, int pitch, int velocity, int voiceIdx = -1, ModulationChain* pitchBend = nullptr, ModulationChain* modWheel = nullptr, ModulationChain* pressure = nullptr) override;
+   void PlayNote(double time, int pitch, int velocity, int voiceIdx = -1, ModulationParameters modulation = ModulationParameters()) override;
    void SendCC(int control, int value, int voiceIdx = -1) override {}
    
 private:

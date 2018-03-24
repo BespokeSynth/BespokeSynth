@@ -264,11 +264,11 @@ void Arpeggiator::CheckboxUpdated(Checkbox* checkbox)
    }
 }
 
-void Arpeggiator::PlayNote(double time, int pitch, int velocity, int voiceIdx /*= -1*/, ModulationChain* pitchBend /*= nullptr*/, ModulationChain* modWheel /*= nullptr*/, ModulationChain* pressure /*= nullptr*/)
+void Arpeggiator::PlayNote(double time, int pitch, int velocity, int voiceIdx, ModulationParameters modulation)
 {
    if (!mEnabled)
    {
-      PlayNoteOutput(time, pitch, velocity, voiceIdx, pitchBend, modWheel, pressure);
+      PlayNoteOutput(time, pitch, velocity, voiceIdx, modulation);
       return;
    }
    
@@ -285,7 +285,7 @@ void Arpeggiator::PlayNote(double time, int pitch, int velocity, int voiceIdx /*
       {
          mUserPitch = 0;
          mChordMutex.lock();
-         mChord.push_back(ArpNote(pitch,velocity, voiceIdx, pitchBend, modWheel, pressure));
+         mChord.push_back(ArpNote(pitch,velocity, voiceIdx, modulation));
          mChordMutex.unlock();
       }
    }
@@ -332,7 +332,7 @@ void Arpeggiator::OnTimeEvent(int samplesTo)
                break;
             }
          }
-         mChord.push_back(ArpNote(val,80,-1,nullptr,nullptr,nullptr));
+         mChord.push_back(ArpNote(val,80,-1,ModulationParameters()));
       }
       mChordMutex.unlock();
    }
@@ -423,8 +423,8 @@ void Arpeggiator::OnTimeEvent(int samplesTo)
                PlayNoteOutput(gTime, mLastPitch, 0, -1);
                offPitch = -1;
             }
-            float pressure = current.pressure ? current.pressure->GetValue(0) : 0;
-            PlayNoteOutput(gTime, outPitch, ofClamp(current.vel+127*pressure,0,127), current.voiceIdx, current.pitchBend, current.modWheel, current.pressure);
+            float pressure = current.modulation.pressure ? current.modulation.pressure->GetValue(0) : 0;
+            PlayNoteOutput(gTime, outPitch, ofClamp(current.vel+127*pressure,0,127), current.voiceIdx, current.modulation);
             mLastPitch = outPitch;
          }
       }
@@ -447,11 +447,11 @@ void Arpeggiator::TextEntryComplete(TextEntry* entry)
    for (int i=0; i<tokens.size(); ++i)
    {
       if (tokens[i] == "x")
-         mChord.push_back(ArpNote(ARP_REST,0,-1,nullptr,nullptr,nullptr));
+         mChord.push_back(ArpNote(ARP_REST,0,-1,ModulationParameters()));
       else if (tokens[i] == "h")
-         mChord.push_back(ArpNote(ARP_HOLD,0,-1,nullptr,nullptr,nullptr));
+         mChord.push_back(ArpNote(ARP_HOLD,0,-1,ModulationParameters()));
       else
-         mChord.push_back(ArpNote(atoi(tokens[i].c_str()),80,-1,nullptr,nullptr,nullptr));
+         mChord.push_back(ArpNote(atoi(tokens[i].c_str()),80,-1,ModulationParameters()));
    }
    mChordMutex.unlock();
    SyncGridToArp();
@@ -461,16 +461,16 @@ void Arpeggiator::GenerateRandomArpeggio()
 {
    mChordMutex.lock();
    mChord.clear();
-   mChord.push_back(ArpNote(12,80,-1,nullptr,nullptr,nullptr));
+   mChord.push_back(ArpNote(12,80,-1,ModulationParameters()));
    for (int i=1; i<mRandomLength; ++i)
    {
       int choose = rand() % 5;
       if (choose == 0 && mRandomRest)
-         mChord.push_back(ArpNote(ARP_REST,0,-1,nullptr,nullptr,nullptr));
+         mChord.push_back(ArpNote(ARP_REST,0,-1,ModulationParameters()));
       else if (choose == 1 && mRandomHold)
-         mChord.push_back(ArpNote(ARP_HOLD,0,-1,nullptr,nullptr,nullptr));
+         mChord.push_back(ArpNote(ARP_HOLD,0,-1,ModulationParameters()));
       else
-         mChord.push_back(ArpNote(rand()%mRandomRange,rand()%100+27,-1,nullptr,nullptr,nullptr));
+         mChord.push_back(ArpNote(rand()%mRandomRange,rand()%100+27,-1,ModulationParameters()));
    }
    mChordMutex.unlock();
    SyncGridToArp();

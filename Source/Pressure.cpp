@@ -36,17 +36,15 @@ void Pressure::DrawModule()
    mPressureSlider->Draw();
 }
 
-void Pressure::PlayNote(double time, int pitch, int velocity, int voiceIdx /*= -1*/, ModulationChain* pitchBend /*= nullptr*/, ModulationChain* modWheel /*= nullptr*/, ModulationChain* pressure /*= nullptr*/)
+void Pressure::PlayNote(double time, int pitch, int velocity, int voiceIdx, ModulationParameters modulation)
 {
    if (mEnabled)
    {
-      mModulation.GetPressure(voiceIdx)->AppendTo(pressure);
-      PlayNoteOutput(time, pitch, velocity, voiceIdx, pitchBend, modWheel, mModulation.GetPressure(voiceIdx));
+      mModulation.GetPressure(voiceIdx)->AppendTo(modulation.pressure);
+      modulation.pressure = mModulation.GetPressure(voiceIdx);
    }
-   else
-   {
-      PlayNoteOutput(time, pitch, velocity, voiceIdx, pitchBend, modWheel, pressure);
-   }
+   
+   PlayNoteOutput(time, pitch, velocity, voiceIdx, modulation);
 }
 
 void Pressure::OnTransportAdvanced(float amount)

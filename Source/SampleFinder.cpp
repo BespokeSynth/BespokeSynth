@@ -322,7 +322,7 @@ void SampleFinder::IntSliderUpdated(IntSlider* slider, int oldVal)
    }
 }
 
-void SampleFinder::PlayNote(double time, int pitch, int velocity, int voiceIdx /*= -1*/, ModulationChain* pitchBend /*= nullptr*/, ModulationChain* modWheel /*= nullptr*/, ModulationChain* pressure /*= nullptr*/)
+void SampleFinder::PlayNote(double time, int pitch, int velocity, int voiceIdx, ModulationParameters modulation)
 {
    if (mSample)
    {

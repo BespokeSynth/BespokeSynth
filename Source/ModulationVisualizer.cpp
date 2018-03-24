@@ -35,23 +35,19 @@ void ModulationVisualizer::DrawModule()
    }
 }
 
-void ModulationVisualizer::PlayNote(double time, int pitch, int velocity, int voiceIdx /*= -1*/, ModulationChain* pitchBend /*= nullptr*/, ModulationChain* modWheel /*= nullptr*/, ModulationChain* pressure /*= nullptr*/)
+void ModulationVisualizer::PlayNote(double time, int pitch, int velocity, int voiceIdx, ModulationParameters modulation)
 {
-   PlayNoteOutput(time, pitch, velocity, voiceIdx, pitchBend, modWheel, pressure);
+   PlayNoteOutput(time, pitch, velocity, voiceIdx, modulation);
    
    if (voiceIdx == -1)
    {
       mGlobalModulation.mActive = velocity > 0;
-      mGlobalModulation.mPitchBend = pitchBend;
-      mGlobalModulation.mModWheel = modWheel;
-      mGlobalModulation.mPressure = pressure;
+      mGlobalModulation.mModulators = modulation;
    }
    else
    {
       mVoices[voiceIdx].mActive = velocity > 0;
-      mVoices[voiceIdx].mPitchBend = pitchBend;
-      mVoices[voiceIdx].mModWheel = modWheel;
-      mVoices[voiceIdx].mPressure = pressure;
+      mVoices[voiceIdx].mModulators = modulation;
    }
 }
 
@@ -70,11 +66,11 @@ void ModulationVisualizer::SetUpFromSaveData()
 string ModulationVisualizer::VizVoice::GetInfoString()
 {
    string info;
-   if (mPitchBend)
-      info += "bend:"+ofToString(mPitchBend->GetValue(0),2)+"  ";
-   if (mModWheel)
-      info += "mod:"+ofToString(mModWheel->GetValue(0),2)+"  ";
-   if (mPressure)
-      info += "pressure:"+ofToString(mPressure->GetValue(0),2)+"  ";
+   if (mModulators.pitchBend)
+      info += "bend:"+ofToString(mModulators.pitchBend->GetValue(0),2)+"  ";
+   if (mModulators.modWheel)
+      info += "mod:"+ofToString(mModulators.modWheel->GetValue(0),2)+"  ";
+   if (mModulators.pressure)
+      info += "pressure:"+ofToString(mModulators.pressure->GetValue(0),2)+"  ";
    return info;
 }

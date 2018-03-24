@@ -154,7 +154,7 @@ void Razor::Process(double time)
    }
 }
 
-void Razor::PlayNote(double time, int pitch, int velocity, int voiceIdx /*= -1*/, ModulationChain* pitchBend /*= nullptr*/, ModulationChain* modWheel /*= nullptr*/, ModulationChain* pressure /*= nullptr*/)
+void Razor::PlayNote(double time, int pitch, int velocity, int voiceIdx, ModulationParameters modulation)
 {
    if (!mEnabled)
       return;
@@ -173,9 +173,9 @@ void Razor::PlayNote(double time, int pitch, int velocity, int voiceIdx /*= -1*/
                           mR);
       }
       
-      mPitchBend = pitchBend;
-      mModWheel = modWheel;
-      mPressure = pressure;
+      mPitchBend = modulation.pitchBend;
+      mModWheel = modulation.modWheel;
+      mPressure = modulation.pressure;
    }
    else if (mPitch == pitch)
    {

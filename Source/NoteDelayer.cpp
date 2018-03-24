@@ -54,7 +54,7 @@ void NoteDelayer::OnTransportAdvanced(float amount)
       const NoteInfo& info = *iter;
       if (gTime > info.mTriggerTime)
       {
-         PlayNoteOutput(info.mTriggerTime, info.mPitch, info.mVelocity, -1, info.mPitchBend, info.mModWheel, info.mPressure);
+         PlayNoteOutput(info.mTriggerTime, info.mPitch, info.mVelocity, -1, info.mModulation);
       
          iter = mInputNotes.erase(iter);
       }
@@ -66,7 +66,7 @@ void NoteDelayer::OnTransportAdvanced(float amount)
    mNoteMutex.unlock();
 }
 
-void NoteDelayer::PlayNote(double time, int pitch, int velocity, int voiceIdx /*= -1*/, ModulationChain* pitchBend /*= nullptr*/, ModulationChain* modWheel /*= nullptr*/, ModulationChain* pressure /*= nullptr*/)
+void NoteDelayer::PlayNote(double time, int pitch, int velocity, int voiceIdx, ModulationParameters modulation)
 {
    if (!mEnabled)
       return;
@@ -75,9 +75,7 @@ void NoteDelayer::PlayNote(double time, int pitch, int velocity, int voiceIdx /*
    info.mPitch = pitch;
    info.mVelocity = velocity;
    info.mTriggerTime = time + mDelay * TheTransport->GetDuration(kInterval_1n);
-   info.mPitchBend = pitchBend;
-   info.mModWheel = modWheel;
-   info.mPressure = pressure;
+   info.mModulation = modulation;
 
    mNoteMutex.lock();
    mInputNotes.push_back(info);

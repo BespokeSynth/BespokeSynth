@@ -32,9 +32,9 @@ void NoteDisplayer::DrawNoteName(int pitch, float y) const
    DrawText(NoteName(pitch) + ofToString(pitch/12 - 2) + " (" + ofToString(pitch) + ")", 4, y);
 }
 
-void NoteDisplayer::PlayNote(double time, int pitch, int velocity, int voiceIdx /*= -1*/, ModulationChain* pitchBend /*= nullptr*/, ModulationChain* modWheel /*= nullptr*/, ModulationChain* pressure /*= nullptr*/)
+void NoteDisplayer::PlayNote(double time, int pitch, int velocity, int voiceIdx, ModulationParameters modulation)
 {
-   PlayNoteOutput(time, pitch, velocity, voiceIdx, pitchBend, modWheel, pressure);
+   PlayNoteOutput(time, pitch, velocity, voiceIdx, modulation);
 }
 
 void NoteDisplayer::LoadLayout(const ofxJSONElement& moduleInfo)

@@ -38,11 +38,11 @@ void NoteOctaver::CheckboxUpdated(Checkbox *checkbox)
       mNoteOutput.Flush();
 }
 
-void NoteOctaver::PlayNote(double time, int pitch, int velocity, int voiceIdx /*= -1*/, ModulationChain* pitchBend /*= nullptr*/, ModulationChain* modWheel /*= nullptr*/, ModulationChain* pressure /*= nullptr*/)
+void NoteOctaver::PlayNote(double time, int pitch, int velocity, int voiceIdx, ModulationParameters modulation)
 {
    if (!mEnabled)
    {
-      PlayNoteOutput(time, pitch, velocity, voiceIdx, pitchBend, modWheel, pressure);
+      PlayNoteOutput(time, pitch, velocity, voiceIdx, modulation);
       return;
    }
 
@@ -85,7 +85,7 @@ void NoteOctaver::PlayNote(double time, int pitch, int velocity, int voiceIdx /*
    }
 
    pitch += mOctave * 12;
-   PlayNoteOutput(time, pitch, velocity, voiceIdx, pitchBend, modWheel, pressure);
+   PlayNoteOutput(time, pitch, velocity, voiceIdx, modulation);
 }
 
 void NoteOctaver::IntSliderUpdated(IntSlider* slider, int oldVal)

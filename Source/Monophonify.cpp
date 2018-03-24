@@ -33,15 +33,16 @@ void Monophonify::DrawModule()
    mGlideSlider->Draw();
 }
 
-void Monophonify::PlayNote(double time, int pitch, int velocity, int voiceIdx /*= -1*/, ModulationChain* pitchBend /*= nullptr*/, ModulationChain* modWheel /*= nullptr*/, ModulationChain* pressure /*= nullptr*/)
+void Monophonify::PlayNote(double time, int pitch, int velocity, int voiceIdx, ModulationParameters modulation)
 {
    if (!mEnabled)
    {
-      PlayNoteOutput(time, pitch, velocity, voiceIdx, pitchBend, modWheel, pressure);
+      PlayNoteOutput(time, pitch, velocity, voiceIdx, modulation);
       return;
    }
    
-   mPitchBend.AppendTo(pitchBend);
+   mPitchBend.AppendTo(modulation.pitchBend);
+   modulation.pitchBend = &mPitchBend;
 
    voiceIdx = 0;
    
@@ -51,14 +52,14 @@ void Monophonify::PlayNote(double time, int pitch, int velocity, int voiceIdx /*
       if (mHeldNotes.size())
       {
          mPitchBend.RampValue(mHeldNotes.rbegin()->mPitch - pitch + mPitchBend.GetIndividualValue(0), 0, mGlideTime);
-         PlayNoteOutput(time, pitch, velocity, voiceIdx, &mPitchBend, modWheel, pressure);
+         PlayNoteOutput(time, pitch, velocity, voiceIdx, modulation);
          for (list<HeldNote>::iterator iter = mHeldNotes.begin(); iter != mHeldNotes.end(); ++iter)
-            PlayNoteOutput(gTime,(*iter).mPitch,0,-1, &mPitchBend, modWheel, pressure);
+            PlayNoteOutput(gTime,(*iter).mPitch,0,-1, modulation);
       }
       else
       {
          mNoteOutput.Flush();
-         PlayNoteOutput(time, pitch, velocity, voiceIdx, &mPitchBend, modWheel, pressure);
+         PlayNoteOutput(time, pitch, velocity, voiceIdx, modulation);
          mPitchBend.SetValue(0);
       }
       mHeldNotes.push_back(HeldNote(pitch, velocity));
@@ -78,10 +79,10 @@ void Monophonify::PlayNote(double time, int pitch, int velocity, int voiceIdx /*
          HeldNote heldNote = *(mHeldNotes.rbegin());
 
          mPitchBend.RampValue(pitch - heldNote.mPitch + mPitchBend.GetIndividualValue(0), 0, mGlideTime);
-         PlayNoteOutput(time, heldNote.mPitch, heldNote.mVelocity, voiceIdx, &mPitchBend, modWheel, pressure);
+         PlayNoteOutput(time, heldNote.mPitch, heldNote.mVelocity, voiceIdx, modulation);
       }
 
-      PlayNoteOutput(time, pitch, 0, voiceIdx, &mPitchBend, modWheel, pressure);
+      PlayNoteOutput(time, pitch, 0, voiceIdx, modulation);
    }
    mHeldNotesMutex.unlock();
 }

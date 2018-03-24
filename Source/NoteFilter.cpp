@@ -53,13 +53,13 @@ void NoteFilter::IntSliderUpdated(IntSlider* slider, int oldVal)
       mNoteOutput.Flush();
 }
 
-void NoteFilter::PlayNote(double time, int pitch, int velocity, int voiceIdx /*= -1*/, ModulationChain* pitchBend /*= nullptr*/, ModulationChain* modWheel /*= nullptr*/, ModulationChain* pressure /*= nullptr*/)
+void NoteFilter::PlayNote(double time, int pitch, int velocity, int voiceIdx, ModulationParameters modulation)
 {
    ComputeSliders(0);
    
    if (!mEnabled || (pitch >= mMinPitch && pitch <= mMaxPitch))
    {
-      PlayNoteOutput(time, pitch, velocity, voiceIdx, pitchBend, modWheel, pressure);
+      PlayNoteOutput(time, pitch, velocity, voiceIdx, modulation);
    }
 }
 

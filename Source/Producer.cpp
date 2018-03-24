@@ -421,7 +421,7 @@ void Producer::IntSliderUpdated(IntSlider* slider, int oldVal)
 {
 }
 
-void Producer::PlayNote(double time, int pitch, int velocity, int voiceIdx /*= -1*/, ModulationChain* pitchBend /*= nullptr*/, ModulationChain* modWheel /*= nullptr*/, ModulationChain* pressure /*= nullptr*/)
+void Producer::PlayNote(double time, int pitch, int velocity, int voiceIdx, ModulationParameters modulation)
 {
    if (mSample)
    {

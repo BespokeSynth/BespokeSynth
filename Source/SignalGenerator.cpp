@@ -175,7 +175,7 @@ void SignalGenerator::Process(double time)
    Add(out, mWriteBuffer, bufferSize);
 }
 
-void SignalGenerator::PlayNote(double time, int pitch, int velocity, int voiceIdx /*= -1*/, ModulationChain* pitchBend /*= nullptr*/, ModulationChain* modWheel /*= nullptr*/, ModulationChain* pressure /*= nullptr*/)
+void SignalGenerator::PlayNote(double time, int pitch, int velocity, int voiceIdx, ModulationParameters modulation)
 {
    if (velocity > 0)
    {

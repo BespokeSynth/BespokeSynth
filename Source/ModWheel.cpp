@@ -36,17 +36,15 @@ void ModWheel::DrawModule()
    mModWheelSlider->Draw();
 }
 
-void ModWheel::PlayNote(double time, int pitch, int velocity, int voiceIdx /*= -1*/, ModulationChain* pitchBend /*= nullptr*/, ModulationChain* modWheel /*= nullptr*/, ModulationChain* pressure /*= nullptr*/)
+void ModWheel::PlayNote(double time, int pitch, int velocity, int voiceIdx, ModulationParameters modulation)
 {
    if (mEnabled)
    {
-      mModulation.GetModWheel(voiceIdx)->AppendTo(pressure);
-      PlayNoteOutput(time, pitch, velocity, voiceIdx, pitchBend, mModulation.GetModWheel(voiceIdx), pressure);
+      mModulation.GetModWheel(voiceIdx)->AppendTo(modulation.pressure);
+      modulation.modWheel = mModulation.GetModWheel(voiceIdx);
    }
-   else
-   {
-      PlayNoteOutput(time, pitch, velocity, voiceIdx, pitchBend, modWheel, pressure);
-   }
+   
+   PlayNoteOutput(time, pitch, velocity, voiceIdx, modulation);
 }
 
 void ModWheel::OnTransportAdvanced(float amount)
