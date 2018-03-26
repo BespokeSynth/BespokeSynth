@@ -787,6 +787,9 @@
     <ClCompile Include="..\..\Source\NoteOctaver.cpp">
       <Filter>BespokeSynth\Source\modules</Filter>
     </ClCompile>
+    <ClCompile Include="..\..\Source\NotePanner.cpp">
+      <Filter>BespokeSynth\Source\modules</Filter>
+    </ClCompile>
     <ClCompile Include="..\..\Source\NoteRouter.cpp">
       <Filter>BespokeSynth\Source\modules</Filter>
     </ClCompile>
@@ -823,6 +826,9 @@
     <ClCompile Include="..\..\Source\OutputChannel.cpp">
       <Filter>BespokeSynth\Source\modules</Filter>
     </ClCompile>
+    <ClCompile Include="..\..\Source\NotePanAlternator.cpp">
+      <Filter>BespokeSynth\Source\modules</Filter>
+    </ClCompile>
     <ClCompile Include="..\..\Source\PanicButton.cpp">
       <Filter>BespokeSynth\Source\modules</Filter>
     </ClCompile>
@@ -836,6 +842,9 @@
       <Filter>BespokeSynth\Source\modules</Filter>
     </ClCompile>
     <ClCompile Include="..\..\Source\PitchDive.cpp">
+      <Filter>BespokeSynth\Source\modules</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\Source\PitchPanner.cpp">
       <Filter>BespokeSynth\Source\modules</Filter>
     </ClCompile>
     <ClCompile Include="..\..\Source\PitchSetter.cpp">
@@ -3444,6 +3453,9 @@
     <ClInclude Include="..\..\Source\NoteOctaver.h">
       <Filter>BespokeSynth\Source\modules</Filter>
     </ClInclude>
+    <ClInclude Include="..\..\Source\NotePanner.h">
+      <Filter>BespokeSynth\Source\modules</Filter>
+    </ClInclude>
     <ClInclude Include="..\..\Source\NoteRouter.h">
       <Filter>BespokeSynth\Source\modules</Filter>
     </ClInclude>
@@ -3480,6 +3492,9 @@
     <ClInclude Include="..\..\Source\OutputChannel.h">
       <Filter>BespokeSynth\Source\modules</Filter>
     </ClInclude>
+    <ClInclude Include="..\..\Source\NotePanAlternator.h">
+      <Filter>BespokeSynth\Source\modules</Filter>
+    </ClInclude>
     <ClInclude Include="..\..\Source\PanicButton.h">
       <Filter>BespokeSynth\Source\modules</Filter>
     </ClInclude>
@@ -3493,6 +3508,9 @@
       <Filter>BespokeSynth\Source\modules</Filter>
     </ClInclude>
     <ClInclude Include="..\..\Source\PitchDive.h">
+      <Filter>BespokeSynth\Source\modules</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\Source\PitchPanner.h">
       <Filter>BespokeSynth\Source\modules</Filter>
     </ClInclude>
     <ClInclude Include="..\..\Source\PitchSetter.h">

@@ -32,6 +32,7 @@ SingleOscillator::SingleOscillator()
 , mLengthMultiplier(1)
 , mLengthMultiplierSlider(nullptr)
 , mDrawOsc(kOsc_Sin)
+, mWriteBuffer(gBufferSize)
 {
    mVoiceParams.mAdsr.Set(10,0,1,10);
    mVoiceParams.mVol = .05f;
@@ -48,8 +49,6 @@ SingleOscillator::SingleOscillator()
    mVoiceParams.mPhaseOffset = 0;
    
    mPolyMgr.Init(kVoiceType_SingleOscillator, &mVoiceParams);
-   
-   mWriteBuffer = new float[gBufferSize];
 }
 
 void SingleOscillator::CreateUIControls()
@@ -104,11 +103,12 @@ void SingleOscillator::CreateUIControls()
    mADSRModeSelector->AddLabel("filter",1);
    
    UpdateADSRDisplays();
+   
+   mWriteBuffer.SetNumActiveChannels(2);
 }
 
 SingleOscillator::~SingleOscillator()
 {
-   delete[] mWriteBuffer;
 }
 
 void SingleOscillator::Process(double time)
@@ -117,18 +117,21 @@ void SingleOscillator::Process(double time)
 
    if (!mEnabled || GetTarget() == nullptr)
       return;
-
+   
    ComputeSliders(0);
    
    int bufferSize = GetTarget()->GetBuffer()->BufferSize();
-   float* out = GetTarget()->GetBuffer()->GetChannel(0);
    assert(bufferSize == gBufferSize);
    
-   Clear(mWriteBuffer, gBufferSize);
-   mPolyMgr.Process(time, mWriteBuffer, bufferSize);
-   GetVizBuffer()->WriteChunk(mWriteBuffer, bufferSize, 0);
+   mWriteBuffer.Clear();
+   mPolyMgr.Process(time, &mWriteBuffer, bufferSize);
    
-   Add(out, mWriteBuffer, bufferSize);
+   SyncOutputBuffer(mWriteBuffer.NumActiveChannels());
+   for (int ch=0; ch<mWriteBuffer.NumActiveChannels(); ++ch)
+   {
+      GetVizBuffer()->WriteChunk(mWriteBuffer.GetChannel(ch),mWriteBuffer.BufferSize(), ch);
+      Add(GetTarget()->GetBuffer()->GetChannel(ch), mWriteBuffer.GetChannel(ch), gBufferSize);
+   }
 }
 
 void SingleOscillator::PlayNote(double time, int pitch, int velocity, int voiceIdx, ModulationParameters modulation)

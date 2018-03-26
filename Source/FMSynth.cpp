@@ -34,6 +34,7 @@ FMSynth::FMSynth()
 , mPhaseOffsetSlider1(nullptr)
 , mPhaseOffsetSlider2(nullptr)
 , mPolyMgr(this)
+, mWriteBuffer(gBufferSize)
 {
    mVoiceParams.mOscADSRParams.GetA() = 10;
    mVoiceParams.mOscADSRParams.GetD() = 0;
@@ -65,8 +66,6 @@ FMSynth::FMSynth()
    mVoiceParams.mVol = 1.f;
 
    mPolyMgr.Init(kVoiceType_FM, &mVoiceParams);
-
-   mWriteBuffer = new float[gBufferSize];
 }
 
 void FMSynth::CreateUIControls()
@@ -114,11 +113,12 @@ void FMSynth::CreateUIControls()
    
    mModSlider->SetMode(FloatSlider::kSquare);
    mModSlider2->SetMode(FloatSlider::kSquare);
+   
+   mWriteBuffer.SetNumActiveChannels(2);
 }
 
 FMSynth::~FMSynth()
 {
-   delete[] mWriteBuffer;
 }
 
 void FMSynth::Process(double time)
@@ -127,18 +127,21 @@ void FMSynth::Process(double time)
 
    if (!mEnabled || GetTarget() == nullptr)
       return;
-
+   
    ComputeSliders(0);
-
+   
    int bufferSize = GetTarget()->GetBuffer()->BufferSize();
-   float* out = GetTarget()->GetBuffer()->GetChannel(0);
    assert(bufferSize == gBufferSize);
-
-   Clear(mWriteBuffer, gBufferSize);
-   mPolyMgr.Process(time, mWriteBuffer, bufferSize);
-   GetVizBuffer()->WriteChunk(mWriteBuffer, bufferSize, 0);
-
-   Add(out, mWriteBuffer, gBufferSize);
+   
+   mWriteBuffer.Clear();
+   mPolyMgr.Process(time, &mWriteBuffer, bufferSize);
+   
+   SyncOutputBuffer(mWriteBuffer.NumActiveChannels());
+   for (int ch=0; ch<mWriteBuffer.NumActiveChannels(); ++ch)
+   {
+      GetVizBuffer()->WriteChunk(mWriteBuffer.GetChannel(ch),mWriteBuffer.BufferSize(), ch);
+      Add(GetTarget()->GetBuffer()->GetChannel(ch), mWriteBuffer.GetChannel(ch), gBufferSize);
+   }
 }
 
 void FMSynth::PlayNote(double time, int pitch, int velocity, int voiceIdx, ModulationParameters modulation)

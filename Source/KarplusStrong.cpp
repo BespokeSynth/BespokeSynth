@@ -59,6 +59,8 @@ void KarplusStrong::CreateUIControls()
    mExciterDecaySlider->SetMode(FloatSlider::kSquare);
    
    mBiquad.CreateUIControls();
+   
+   mWriteBuffer.SetNumActiveChannels(2);
 }
 
 KarplusStrong::~KarplusStrong()
@@ -75,17 +77,19 @@ void KarplusStrong::Process(double time)
    ComputeSliders(0);
 
    int bufferSize = GetTarget()->GetBuffer()->BufferSize();
-   float* out = GetTarget()->GetBuffer()->GetChannel(0);
    assert(bufferSize == gBufferSize);
 
    mWriteBuffer.Clear();
-   mPolyMgr.Process(time, mWriteBuffer.GetChannel(0), bufferSize);
+   mPolyMgr.Process(time, &mWriteBuffer, bufferSize);
 
    mBiquad.ProcessAudio(time, &mWriteBuffer);
 
-   GetVizBuffer()->WriteChunk(mWriteBuffer.GetChannel(0), bufferSize, 0);
-
-   Add(out, mWriteBuffer.GetChannel(0), gBufferSize);
+   SyncOutputBuffer(mWriteBuffer.NumActiveChannels());
+   for (int ch=0; ch<mWriteBuffer.NumActiveChannels(); ++ch)
+   {
+      GetVizBuffer()->WriteChunk(mWriteBuffer.GetChannel(ch),mWriteBuffer.BufferSize(), ch);
+      Add(GetTarget()->GetBuffer()->GetChannel(ch), mWriteBuffer.GetChannel(ch), gBufferSize);
+   }
 }
 
 void KarplusStrong::PlayNote(double time, int pitch, int velocity, int voiceIdx, ModulationParameters modulation)

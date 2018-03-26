@@ -45,7 +45,7 @@ public:
    void Start(double time, float amount) override;
    void Stop(double time) override;
    void ClearVoice() override;
-   void Process(double time, float* out, int bufferSize) override;
+   bool Process(double time, float* out, int bufferSize) override;
    void SetVoiceParams(IVoiceParams* params) override;
    bool IsDone(double time) override;
 private:

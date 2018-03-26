@@ -39,14 +39,14 @@ bool AdditiveVoice::IsDone(double time)
    return true;
 }
 
-void AdditiveVoice::Process(double time, float* out, int bufferSize)
+bool AdditiveVoice::Process(double time, float* out, int bufferSize)
 {
    Profiler profiler("AdditiveVoice");
 
    assert(mOscs.size() == 4);
    
    if (IsDone(time))
-      return;
+      return false;
    
    for (int i=0; i<mOscs.size(); ++i)
       mOscs[i]->SetPulseWidth(mVoiceParams->mPulseWidth);
@@ -82,6 +82,8 @@ void AdditiveVoice::Process(double time, float* out, int bufferSize)
       out[pos] += RandomSample() * mVoiceParams->mData[4].mVol * mNoiseAdsr.Value(time) * mVoiceParams->mVol;
       time += gInvSampleRateMs;
    }
+   
+   return true;
 }
 
 void AdditiveVoice::Start(double time, float target)

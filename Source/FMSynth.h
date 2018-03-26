@@ -79,7 +79,7 @@ private:
    DropdownList* mHarmRatioBaseDropdown2;
    FloatSlider* mPhaseOffsetSlider2;
 
-   float* mWriteBuffer;
+   ChannelBuffer mWriteBuffer;
 };
 
 #endif /* defined(__modularSynth__FMSynth__) */

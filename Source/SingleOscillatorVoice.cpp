@@ -31,12 +31,12 @@ bool SingleOscillatorVoice::IsDone(double time)
    return mOsc.GetADSR()->IsDone(time);
 }
 
-void SingleOscillatorVoice::Process(double time, float* out, int bufferSize)
+bool SingleOscillatorVoice::Process(double time, float* out, int bufferSize)
 {
    Profiler profiler("SingleOscillatorVoice");
 
    if (IsDone(time))
-      return;
+      return false;
    
    mOsc.SetType(mVoiceParams->mOscType);
    
@@ -89,6 +89,8 @@ void SingleOscillatorVoice::Process(double time, float* out, int bufferSize)
       
       time += gInvSampleRateMs;
    }
+   
+   return true;
 }
 
 void SingleOscillatorVoice::Start(double time, float target)

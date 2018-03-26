@@ -167,6 +167,9 @@
 #include "ModulatorCurve.h"
 #include "ModulatorSmoother.h"
 #include "NoteToSpeed.h"
+#include "NotePanner.h"
+#include "PitchPanner.h"
+#include "NotePanAlternator.h"
 
 #define REGISTER(class,name,type) Register(#name, &(class::Create), &(class::CanCreate), type, false, false);
 #define REGISTER_HIDDEN(class,name,type) Register(#name, &(class::Create), &(class::CanCreate), type, true, false);
@@ -301,6 +304,9 @@ ModuleFactory::ModuleFactory()
    REGISTER(ModulatorCurve, curve, kModuleType_Modulator);
    REGISTER(ModulatorSmoother, smoother, kModuleType_Modulator);
    REGISTER(NoteToSpeed, notetospeed, kModuleType_Modulator);
+   REGISTER(NotePanner, notepanner, kModuleType_Note);
+   REGISTER(PitchPanner, pitchpanner, kModuleType_Note);
+   REGISTER(NotePanAlternator, notepanalternator, kModuleType_Note);
 
    //REGISTER_EXPERIMENTAL(MidiPlayer, midiplayer, kModuleType_Instrument);
    REGISTER_EXPERIMENTAL(Razor, razor, kModuleType_Synth);

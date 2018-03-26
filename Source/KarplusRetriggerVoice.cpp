@@ -38,12 +38,12 @@ bool KarplusRetriggerVoice::IsDone(double time)
    return true;
 }
 
-void KarplusRetriggerVoice::Process(double time, float* out, int bufferSize)
+bool KarplusRetriggerVoice::Process(double time, float* out, int bufferSize)
 {
    Profiler profiler("KarplusRetriggerVoice");
 
    if (mStartTime == -1)
-      return;
+      return false;
    
    mKarplusVoice.SetPitch(GetPitch(0));
    
@@ -59,6 +59,8 @@ void KarplusRetriggerVoice::Process(double time, float* out, int bufferSize)
    mKarplusVoiceParams.mFeedback = mVoiceParams->mFeedback;
    
    mKarplusVoice.Process(time, out, bufferSize);
+   
+   return true;
 }
 
 void KarplusRetriggerVoice::Start(double time, float target)

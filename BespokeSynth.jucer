@@ -392,6 +392,8 @@
         <FILE id="zo4N2z" name="NoteLooper.h" compile="0" resource="0" file="Source/NoteLooper.h"/>
         <FILE id="RetyTQ" name="NoteOctaver.cpp" compile="1" resource="0" file="Source/NoteOctaver.cpp"/>
         <FILE id="hSygAE" name="NoteOctaver.h" compile="0" resource="0" file="Source/NoteOctaver.h"/>
+        <FILE id="VzQfdr" name="NotePanner.cpp" compile="1" resource="0" file="Source/NotePanner.cpp"/>
+        <FILE id="EuVKjW" name="NotePanner.h" compile="0" resource="0" file="Source/NotePanner.h"/>
         <FILE id="xSRCdF" name="NoteRouter.cpp" compile="1" resource="0" file="Source/NoteRouter.cpp"/>
         <FILE id="qQmpNv" name="NoteRouter.h" compile="0" resource="0" file="Source/NoteRouter.h"/>
         <FILE id="N2IcFH" name="NoteSequencerColumn.cpp" compile="1" resource="0"
@@ -425,6 +427,10 @@
         <FILE id="i6ONR2" name="OutputChannel.cpp" compile="1" resource="0"
               file="Source/OutputChannel.cpp"/>
         <FILE id="et5OpS" name="OutputChannel.h" compile="0" resource="0" file="Source/OutputChannel.h"/>
+        <FILE id="zPsjnT" name="NotePanAlternator.cpp" compile="1" resource="0"
+              file="Source/NotePanAlternator.cpp"/>
+        <FILE id="aNaf0s" name="NotePanAlternator.h" compile="0" resource="0"
+              file="Source/NotePanAlternator.h"/>
         <FILE id="chUWZI" name="PanicButton.cpp" compile="1" resource="0" file="Source/PanicButton.cpp"/>
         <FILE id="rEVLi6" name="PanicButton.h" compile="0" resource="0" file="Source/PanicButton.h"/>
         <FILE id="IJrVrl" name="Panner.cpp" compile="1" resource="0" file="Source/Panner.cpp"/>
@@ -435,6 +441,8 @@
         <FILE id="Y8osY2" name="PitchChorus.h" compile="0" resource="0" file="Source/PitchChorus.h"/>
         <FILE id="Wf3diN" name="PitchDive.cpp" compile="1" resource="0" file="Source/PitchDive.cpp"/>
         <FILE id="EkwIdT" name="PitchDive.h" compile="0" resource="0" file="Source/PitchDive.h"/>
+        <FILE id="l8IC95" name="PitchPanner.cpp" compile="1" resource="0" file="Source/PitchPanner.cpp"/>
+        <FILE id="rJ71EF" name="PitchPanner.h" compile="0" resource="0" file="Source/PitchPanner.h"/>
         <FILE id="iXiwJw" name="PitchSetter.cpp" compile="1" resource="0" file="Source/PitchSetter.cpp"/>
         <FILE id="tGoqwJ" name="PitchSetter.h" compile="0" resource="0" file="Source/PitchSetter.h"/>
         <FILE id="f31QHm" name="PitchToCV.cpp" compile="1" resource="0" file="Source/PitchToCV.cpp"/>

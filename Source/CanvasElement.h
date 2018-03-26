@@ -77,8 +77,9 @@ public:
    ModulationChain* GetPitchBend() { return &mPitchBend; }
    ModulationChain* GetModWheel() { return &mModWheel; }
    ModulationChain* GetPressure() { return &mPressure; }
+   float GetPan() { return mPan; }
    void UpdateModulation(float pos);
-   void WriteModulation(float pos, float pitchBend, float modWheel, float pressure);
+   void WriteModulation(float pos, float pitchBend, float modWheel, float pressure, float pan);
    
    CanvasElement* CreateDuplicate() const override;
    
@@ -98,9 +99,11 @@ private:
    ModulationChain mPitchBend;
    ModulationChain mModWheel;
    ModulationChain mPressure;
+   float mPan;
    Curve mPitchBendCurve;
    Curve mModWheelCurve;
    Curve mPressureCurve;
+   Curve mPanCurve;
 };
 
 class SampleCanvasElement : public CanvasElement

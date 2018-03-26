@@ -21,8 +21,8 @@ PolyphonyMgr::PolyphonyMgr(IDrawableModule* owner)
    , mLastVoice(-1)
    , mFadeOutBufferPos(0)
    , mOwner(owner)
+   , mFadeOutBuffer(kVoiceFadeSamples)
 {
-   Clear(mFadeOutBuffer, kVoiceFadeSamples);
 }
 
 PolyphonyMgr::~PolyphonyMgr()
@@ -136,25 +136,35 @@ void PolyphonyMgr::Start(double time, int pitch, float amount, int voiceIdx, Mod
       }
    }
    
-   mVoices[voiceIdx].mPitch = pitch;
-   mVoices[voiceIdx].mTime = time;
    IMidiVoice* voice = mVoices[voiceIdx].mVoice;
    assert(voice);
    voice->SetPitch(pitch);
    voice->SetModulators(modulation);
-   if (!preserveVoice)
+   if (!preserveVoice || modulation.pan != mVoices[voiceIdx].mPan)
    {
-      Clear(mFadeOutWriteBuffer, kVoiceFadeSamples);
-      voice->Process(time, mFadeOutWriteBuffer, kVoiceFadeSamples);
+      Clear(mWorkBuffer, kVoiceFadeSamples);
+      voice->Process(time, mWorkBuffer, kVoiceFadeSamples);
       for (int i=0; i<kVoiceFadeSamples; ++i)
       {
          float fade = 1 - (float(i) / kVoiceFadeSamples);
-         mFadeOutBuffer[(i+mFadeOutBufferPos) % kVoiceFadeSamples] += mFadeOutWriteBuffer[i] * fade;
+         if (mFadeOutBuffer.NumActiveChannels() == 2)
+         {
+            mFadeOutBuffer.GetChannel(0)[(i+mFadeOutBufferPos) % kVoiceFadeSamples] += mWorkBuffer[i] * fade * GetLeftPanGain(mVoices[voiceIdx].mPan);
+            mFadeOutBuffer.GetChannel(1)[(i+mFadeOutBufferPos) % kVoiceFadeSamples] += mWorkBuffer[i] * fade * GetRightPanGain(mVoices[voiceIdx].mPan);
+         }
+         else
+         {
+            mFadeOutBuffer.GetChannel(0)[(i+mFadeOutBufferPos) % kVoiceFadeSamples] += mWorkBuffer[i] * fade;
+         }
       }
       voice->ClearVoice();
    }
    voice->Start(time, amount);
    mLastVoice = voiceIdx;
+   
+   mVoices[voiceIdx].mPitch = pitch;
+   mVoices[voiceIdx].mTime = time;
+   mVoices[voiceIdx].mPan = modulation.pan;
 }
 
 void PolyphonyMgr::Stop(double time, int pitch)
@@ -166,22 +176,58 @@ void PolyphonyMgr::Stop(double time, int pitch)
    }
 }
 
-void PolyphonyMgr::Process(double time, float* out, int bufferSize)
+void PolyphonyMgr::Process(double time, ChannelBuffer* out, int bufferSize)
 {
    Profiler profiler("PolyphonyMgr");
+   
+   mFadeOutBuffer.SetNumActiveChannels(out->NumActiveChannels());
 
    for (int i=0; i<kNumVoices; ++i)
    {
-      mVoices[i].mVoice->Process(time, out, bufferSize);
+      Clear(mWorkBuffer, bufferSize);
+      if (mVoices[i].mVoice->Process(time, mWorkBuffer, bufferSize))
+      {
+         if (out->NumActiveChannels() == 2)
+         {
+            //left
+            BufferCopy(gWorkBuffer, mWorkBuffer, bufferSize);
+            Mult(gWorkBuffer, GetLeftPanGain(mVoices[i].mPan), bufferSize);
+            Add(out->GetChannel(0), gWorkBuffer, bufferSize);
+            
+            //right
+            BufferCopy(gWorkBuffer, mWorkBuffer, bufferSize);
+            Mult(gWorkBuffer, GetRightPanGain(mVoices[i].mPan), bufferSize);
+            Add(out->GetChannel(1), gWorkBuffer, bufferSize);
+         }
+         else
+         {
+            Add(out->GetChannel(0), mWorkBuffer, bufferSize);
+         }
+      }
+      
       if (mVoices[i].mPitch != -1 && mVoices[i].mVoice->IsDone(time))
          mVoices[i].mPitch = -1;
    }
    
-   for (int i=0; i<bufferSize; ++i)
+   for (int ch=0; ch<out->NumActiveChannels(); ++ch)
    {
-      int fadeOutIdx = (i+mFadeOutBufferPos) % kVoiceFadeSamples;
-      out[i] += mFadeOutBuffer[fadeOutIdx];
-      mFadeOutBuffer[fadeOutIdx] = 0;
+      for (int i=0; i<bufferSize; ++i)
+      {
+         int fadeOutIdx = (i+mFadeOutBufferPos) % kVoiceFadeSamples;
+         out->GetChannel(ch)[i] += mFadeOutBuffer.GetChannel(ch)[fadeOutIdx];
+         mFadeOutBuffer.GetChannel(ch)[fadeOutIdx] = 0;
+      }
    }
+   
    mFadeOutBufferPos += bufferSize;
+}
+
+float PolyphonyMgr::GetLeftPanGain(float pan)
+{
+   return ofMap(pan, 0, 1, 1, 0, true) + ofMap(pan, -1, 0, 1, 0, true);
+}
+
+float PolyphonyMgr::GetRightPanGain(float pan)
+{
+   return ofMap(pan, -1, 0, 0, 1, true) + ofMap(pan, 0, 1, 0, 1, true);
 }

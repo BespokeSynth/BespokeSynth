@@ -32,6 +32,7 @@ Sampler::Sampler()
 , mPassthrough(false)
 , mPassthroughCheckbox(nullptr)
 , mPolyMgr(this)
+, mWriteBuffer(gBufferSize)
 {
    mSampleData = new float[MAX_SAMPLER_LENGTH];   //store up to 2 seconds
    Clear(mSampleData, MAX_SAMPLER_LENGTH);
@@ -44,7 +45,7 @@ Sampler::Sampler()
    
    mPolyMgr.Init(kVoiceType_Sampler, &mVoiceParams);
    
-   mWriteBuffer = new float[gBufferSize];
+   mWriteBuffer.SetNumActiveChannels(2);
 }
 
 void Sampler::CreateUIControls()
@@ -63,7 +64,6 @@ void Sampler::CreateUIControls()
 Sampler::~Sampler()
 {
    delete[] mSampleData;
-   delete[] mWriteBuffer;
 }
 
 void Sampler::Poll()
@@ -87,7 +87,7 @@ void Sampler::Process(double time)
    
    int bufferSize = GetBuffer()->BufferSize();
    
-   Clear(mWriteBuffer, gBufferSize);
+   mWriteBuffer.Clear();
    
    if (mRecording)
    {
@@ -98,7 +98,10 @@ void Sampler::Process(double time)
          {
             mSampleData[mRecordPos] = GetBuffer()->GetChannel(0)[i];
             if (mPassthrough)
-               mWriteBuffer[i] += mSampleData[mRecordPos];
+            {
+               for (int ch=0; ch<mWriteBuffer.NumActiveChannels(); ++ch)
+                  mWriteBuffer.GetChannel(ch)[i] += mSampleData[mRecordPos];
+            }
             ++mRecordPos;
          }
          
@@ -110,10 +113,14 @@ void Sampler::Process(double time)
       }
    }
    
-   mPolyMgr.Process(time, mWriteBuffer, bufferSize);
-   GetVizBuffer()->WriteChunk(mWriteBuffer, bufferSize, 0);
+   mPolyMgr.Process(time, &mWriteBuffer, bufferSize);
    
-   Add(GetTarget()->GetBuffer()->GetChannel(0), mWriteBuffer, bufferSize);
+   SyncOutputBuffer(mWriteBuffer.NumActiveChannels());
+   for (int ch=0; ch<mWriteBuffer.NumActiveChannels(); ++ch)
+   {
+      GetVizBuffer()->WriteChunk(mWriteBuffer.GetChannel(ch),mWriteBuffer.BufferSize(), ch);
+      Add(GetTarget()->GetBuffer()->GetChannel(ch), mWriteBuffer.GetChannel(ch), gBufferSize);
+   }
    
    GetBuffer()->Reset();
 }
@@ -139,7 +146,6 @@ void Sampler::SetEnabled(bool enabled)
 
 void Sampler::DrawModule()
 {
-
    if (Minimized() || IsVisible() == false)
       return;
    

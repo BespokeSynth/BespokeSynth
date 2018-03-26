@@ -284,6 +284,7 @@
     <ClCompile Include="..\..\Source\NoteHumanizer.cpp"/>
     <ClCompile Include="..\..\Source\NoteLooper.cpp"/>
     <ClCompile Include="..\..\Source\NoteOctaver.cpp"/>
+    <ClCompile Include="..\..\Source\NotePanner.cpp"/>
     <ClCompile Include="..\..\Source\NoteRouter.cpp"/>
     <ClCompile Include="..\..\Source\NoteSequencerColumn.cpp"/>
     <ClCompile Include="..\..\Source\NoteSinger.cpp"/>
@@ -296,11 +297,13 @@
     <ClCompile Include="..\..\Source\NoteVibrato.cpp"/>
     <ClCompile Include="..\..\Source\OneShotLauncher.cpp"/>
     <ClCompile Include="..\..\Source\OutputChannel.cpp"/>
+    <ClCompile Include="..\..\Source\NotePanAlternator.cpp"/>
     <ClCompile Include="..\..\Source\PanicButton.cpp"/>
     <ClCompile Include="..\..\Source\Panner.cpp"/>
     <ClCompile Include="..\..\Source\PitchBender.cpp"/>
     <ClCompile Include="..\..\Source\PitchChorus.cpp"/>
     <ClCompile Include="..\..\Source\PitchDive.cpp"/>
+    <ClCompile Include="..\..\Source\PitchPanner.cpp"/>
     <ClCompile Include="..\..\Source\PitchSetter.cpp"/>
     <ClCompile Include="..\..\Source\PitchToCV.cpp"/>
     <ClCompile Include="..\..\Source\Polyrhythms.cpp"/>
@@ -2222,6 +2225,7 @@
     <ClInclude Include="..\..\Source\NoteHumanizer.h"/>
     <ClInclude Include="..\..\Source\NoteLooper.h"/>
     <ClInclude Include="..\..\Source\NoteOctaver.h"/>
+    <ClInclude Include="..\..\Source\NotePanner.h"/>
     <ClInclude Include="..\..\Source\NoteRouter.h"/>
     <ClInclude Include="..\..\Source\NoteSequencerColumn.h"/>
     <ClInclude Include="..\..\Source\NoteSinger.h"/>
@@ -2234,11 +2238,13 @@
     <ClInclude Include="..\..\Source\NoteVibrato.h"/>
     <ClInclude Include="..\..\Source\OneShotLauncher.h"/>
     <ClInclude Include="..\..\Source\OutputChannel.h"/>
+    <ClInclude Include="..\..\Source\NotePanAlternator.h"/>
     <ClInclude Include="..\..\Source\PanicButton.h"/>
     <ClInclude Include="..\..\Source\Panner.h"/>
     <ClInclude Include="..\..\Source\PitchBender.h"/>
     <ClInclude Include="..\..\Source\PitchChorus.h"/>
     <ClInclude Include="..\..\Source\PitchDive.h"/>
+    <ClInclude Include="..\..\Source\PitchPanner.h"/>
     <ClInclude Include="..\..\Source\PitchSetter.h"/>
     <ClInclude Include="..\..\Source\PitchToCV.h"/>
     <ClInclude Include="..\..\Source\Polyrhythms.h"/>

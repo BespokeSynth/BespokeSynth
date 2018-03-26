@@ -38,12 +38,12 @@ bool KarplusStrongVoice::IsDone(double time)
    return !mActive || mMuteRamp.Value(time) == 0;
 }
 
-void KarplusStrongVoice::Process(double time, float* out, int bufferSize)
+bool KarplusStrongVoice::Process(double time, float* out, int bufferSize)
 {
    Profiler profiler("KarplusStrongVoice");
 
    if (IsDone(time))
-      return;
+      return false;
    
    float renderRatio = 1;
    int pitchAdjust = 0;
@@ -144,6 +144,8 @@ void KarplusStrongVoice::Process(double time, float* out, int bufferSize)
    }
       
    mLastBufferSample = gWorkBuffer[renderSize-1];
+   
+   return true;
 }
 
 void KarplusStrongVoice::Start(double time, float target)

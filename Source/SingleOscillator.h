@@ -86,7 +86,7 @@ private:
    RadioButton* mADSRModeSelector;
    int mADSRMode;
 
-   float* mWriteBuffer;
+   ChannelBuffer mWriteBuffer;
    
    Oscillator mDrawOsc;
 };

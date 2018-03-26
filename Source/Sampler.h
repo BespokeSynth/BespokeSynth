@@ -89,7 +89,7 @@ private:
    bool mPassthrough;
    Checkbox* mPassthroughCheckbox;
    
-   float* mWriteBuffer;
+   ChannelBuffer mWriteBuffer;
    
    PitchDetector mPitchDetector;
    bool mWantDetectPitch;

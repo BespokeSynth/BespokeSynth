@@ -32,12 +32,12 @@ bool FMVoice::IsDone(double time)
    return mOsc.GetADSR()->IsDone(time);
 }
 
-void FMVoice::Process(double time, float* out, int bufferSize)
+bool FMVoice::Process(double time, float* out, int bufferSize)
 {
    Profiler profiler("FMVoice");
 
    if (IsDone(time))
-      return;
+      return false;
 
    for (int pos=0; pos<bufferSize; ++pos)
    {
@@ -70,6 +70,8 @@ void FMVoice::Process(double time, float* out, int bufferSize)
 
       time += gInvSampleRateMs;
    }
+   
+   return true;
 }
 
 void FMVoice::Start(double time, float target)

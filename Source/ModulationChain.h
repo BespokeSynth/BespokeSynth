@@ -45,10 +45,12 @@ struct ModulationParameters
    ModulationParameters() {}
    ModulationParameters(ModulationChain* _pitchBend,
                         ModulationChain* _modWheel,
-                        ModulationChain* _pressure) : pitchBend(_pitchBend), modWheel(_modWheel), pressure(_pressure) {}
+                        ModulationChain* _pressure,
+                        float _pan) : pitchBend(_pitchBend), modWheel(_modWheel), pressure(_pressure), pan(_pan) {}
    ModulationChain* pitchBend = nullptr;
    ModulationChain* modWheel = nullptr;
    ModulationChain* pressure = nullptr;
+   float pan = 0;
 };
 
 class Modulations

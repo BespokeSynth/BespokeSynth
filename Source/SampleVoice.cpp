@@ -27,14 +27,14 @@ bool SampleVoice::IsDone(double time)
    return mAdsr.IsDone(time);
 }
 
-void SampleVoice::Process(double time, float* out, int bufferSize)
+bool SampleVoice::Process(double time, float* out, int bufferSize)
 {
    Profiler profiler("SampleVoice");
 
    if (IsDone(time) ||
        mVoiceParams->mSampleData == nullptr ||
        mVoiceParams->mSampleLength == 0)
-      return;
+      return false;
    
    float volSq = mVoiceParams->mVol * mVoiceParams->mVol;
    
@@ -56,6 +56,8 @@ void SampleVoice::Process(double time, float* out, int bufferSize)
       
       time += gInvSampleRateMs;
    }
+   
+   return true;
 }
 
 void SampleVoice::Start(double time, float target)

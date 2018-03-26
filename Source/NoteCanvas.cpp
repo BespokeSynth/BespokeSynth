@@ -180,7 +180,7 @@ void NoteCanvas::OnTransportAdvanced(float amount)
          NoteCanvasElement* note = ((NoteCanvasElement*)mCanvas->GetElementAt(curPos, i));
          assert(note);
          mCurrentNotes[pitch] = note;
-         mNoteOutput.PlayNote(gTime, pitch, note->GetVelocity()*127, note->GetVoiceIdx(), ModulationParameters(note->GetPitchBend(), note->GetModWheel(), note->GetPressure()));
+         mNoteOutput.PlayNote(gTime, pitch, note->GetVelocity()*127, note->GetVoiceIdx(), ModulationParameters(note->GetPitchBend(), note->GetModWheel(), note->GetPressure(), note->GetPan()));
       }
    }
    
@@ -205,7 +205,7 @@ void NoteCanvas::OnTransportAdvanced(float amount)
             mod = mVoiceModulations[modIdx].modWheel->GetValue(0);
          if (mVoiceModulations[modIdx].pressure)
             pressure = mVoiceModulations[modIdx].pressure->GetValue(0);
-         mInputNotes[pitch]->WriteModulation(curPos, bend, mod, pressure);
+         mInputNotes[pitch]->WriteModulation(curPos, bend, mod, pressure, mVoiceModulations[modIdx].pan);
       }
       else if (mCurrentNotes[pitch])
       {

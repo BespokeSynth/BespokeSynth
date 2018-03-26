@@ -12,6 +12,7 @@
 #include <iostream>
 #include "OpenFrameworksPort.h"
 #include "SynthGlobals.h"
+#include "ChannelBuffer.h"
 
 const int kVoiceFadeSamples = 50;
 
@@ -35,6 +36,7 @@ struct PitchAndVoice
    
    float mPitch;
    IMidiVoice* mVoice;
+   float mPan;
    double mTime;
 };
 
@@ -49,16 +51,18 @@ public:
    
    void Start(double time, int pitch, float amount, int voiceIdx, ModulationParameters modulation);
    void Stop(double time, int pitch);
-   void Process(double time, float* out, int bufferSize);
+   void Process(double time, ChannelBuffer* out, int bufferSize);
    void GetPhaseAndInc(float& phase, float& inc);
 private:
    void Prune(double time);
+   float GetLeftPanGain(float pan);
+   float GetRightPanGain(float pan);
    
    PitchAndVoice mVoices[kNumVoices];
    bool mAllowStealing;
    int mLastVoice;
-   float mFadeOutWriteBuffer[kVoiceFadeSamples];
-   float mFadeOutBuffer[kVoiceFadeSamples];
+   ChannelBuffer mFadeOutBuffer;
+   float mWorkBuffer[2048];
    int mFadeOutBufferPos;
    IDrawableModule* mOwner;
 };
