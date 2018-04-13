@@ -42,6 +42,9 @@ FloatSlider::FloatSlider(IFloatSliderListener* owner, const char* label, int x, 
 , mShowName(true)
 , mBezierControl(1)
 , mModulator(nullptr)
+, mSmooth(0)
+, mIsSmoothing(false)
+, mComputeHasBeenCalledOnce(false)
 {
    assert(owner);
    SetLabel(label);
@@ -105,14 +108,13 @@ void FloatSlider::Render()
    ofNoFill();
    
    float screenPos;
-   if (mModulator && mModulator->Active())
+   if (mModulator && mModulator->Active() && !AdjustSmooth())
    {
-      float val = ofClamp(mModulator->Value(),mMin,mMax);
-      screenPos = mX+1+(mWidth-2)*ValToPos(val);
+      screenPos = mX+1+(mWidth-2)*ValToPos(*mVar, true);
       float lfomax = ofClamp(mModulator->GetMax(),mMin,mMax);
-      float screenPosMax = mX+1+(mWidth-2)*ValToPos(lfomax);
+      float screenPosMax = mX+1+(mWidth-2)*ValToPos(lfomax, true);
       float lfomin = ofClamp(mModulator->GetMin(),mMin,mMax);
-      float screenPosMin = mX+1+(mWidth-2)*ValToPos(lfomin);
+      float screenPosMin = mX+1+(mWidth-2)*ValToPos(lfomin, true);
       
       ofPushStyle();
       ofSetColor(0,200,0,gModuleDrawAlpha);
@@ -135,7 +137,7 @@ void FloatSlider::Render()
       else
          ofSetColor(30,30,30,gModuleDrawAlpha);
       float val = ofClamp(*mVar,mMin,mMax);
-      screenPos = mX+1+(mWidth-2)*ValToPos(val);
+      screenPos = mX+1+(mWidth-2)*ValToPos(val, false);
       ofSetLineWidth(2);
       ofLine(screenPos,mY+1,screenPos,mY+mHeight-1);  //value bar
       ofPopStyle();
@@ -146,18 +148,25 @@ void FloatSlider::Render()
    DrawHover();
 
    string display;
-   if (mShowName)
-      display = string(Name());
-   if (display.length() > 0) //only show a colon if there's a label
-      display += ":";
-   if (mFloatEntry)
+   if (AdjustSmooth())
    {
-      ofSetColor(255, 255, 100);
-      display += mFloatEntry->GetText();
+      display = "s:"+ofToString(mSmooth, 3);
    }
    else
    {
-      display += GetDisplayValue(*mVar);
+      if (mShowName)
+         display = string(Name());
+      if (display.length() > 0) //only show a colon if there's a label
+         display += ":";
+      if (mFloatEntry)
+      {
+         ofSetColor(255, 255, 100);
+         display += mFloatEntry->GetText();
+      }
+      else
+      {
+         display += GetDisplayValue(*mVar);
+      }
    }
    ofSetColor(textColor);
    DrawText(display, mX+2, mY+5+mHeight/2);
@@ -193,7 +202,7 @@ void FloatSlider::OnClicked(int x, int y, bool right)
       return;
    }
 
-   mFineRefX = ofMap(ValToPos(*GetModifyValue()),0.0f,1.0f,mX+1,mX+mWidth-1,true)-mX;
+   mFineRefX = ofMap(ValToPos(*GetModifyValue(), false),0.0f,1.0f,mX+1,mX+mWidth-1,true)-mX;
    mRefY = y;
    SetValueForMouse(x,y);
    mMouseDown = true;
@@ -251,7 +260,15 @@ void FloatSlider::SetValueForMouse(int x, int y)
    }
    float oldVal = *var;
    float pos = ofMap(fX+mX,mX+1,mX+mWidth-1,0.0f,1.0f);
-   *var = PosToVal(pos);
+   
+   if (AdjustSmooth())
+   {
+      mSmooth = PosToVal(pos, false);
+      SmoothUpdated();
+      return;
+   }
+   
+   *var = PosToVal(pos, false);
    if (mRelative && (mModulator == nullptr || mModulator->Active() == false))
    {
       if (!mTouching || mRelativeOffset == -999)
@@ -282,6 +299,24 @@ void FloatSlider::SetValueForMouse(int x, int y)
    }
 }
 
+bool FloatSlider::AdjustSmooth() const
+{
+   return (GetKeyModifiers() & kModifier_Alt) &&
+          mComputeHasBeenCalledOnce;   //no smoothing if we're not calling Compute()
+}
+
+void FloatSlider::SmoothUpdated()
+{
+   if (mSmooth > 0 && !mIsSmoothing)
+   {
+      TheTransport->AddAudioPoller(this);
+      mSmoothTarget = *mVar;
+   }
+   if (mSmooth <= 0 && mIsSmoothing)
+      TheTransport->RemoveAudioPoller(this);
+   mIsSmoothing = mSmooth > 0;
+}
+
 void FloatSlider::SetFromMidiCC(float slider)
 {
    SetValue(GetValueForMidiCC(slider));
@@ -290,11 +325,19 @@ void FloatSlider::SetFromMidiCC(float slider)
 float FloatSlider::GetValueForMidiCC(float slider) const
 {
    slider = ofClamp(slider,0,1);
-   return PosToVal(slider);
+   return PosToVal(slider, true);
 }
 
-float FloatSlider::PosToVal(float pos) const
+float FloatSlider::PosToVal(float pos, bool ignoreSmooth) const
 {
+   if (AdjustSmooth() && !ignoreSmooth)
+   {
+      if (pos < 0)
+         return 0;
+      if (pos > 1)
+         return 1;
+      return pos*pos;
+   }
    if (pos < 0)
       return mMin;
    if (pos > 1)
@@ -314,8 +357,10 @@ float FloatSlider::PosToVal(float pos) const
    return 0;
 }
 
-float FloatSlider::ValToPos(float val) const
+float FloatSlider::ValToPos(float val, bool ignoreSmooth) const
 {
+   if (AdjustSmooth() && !ignoreSmooth)
+      return sqrtf(mSmooth);
    if (mMode == kNormal)
       return (val - mMin) / (mMax-mMin);
    if (mMode == kLogarithmic)
@@ -328,7 +373,7 @@ float FloatSlider::ValToPos(float val) const
       float closestDist = FLT_MAX;
       for (float pos = 0; pos < 1; pos += .001f)
       {
-         float dist = fabsf(PosToVal(pos) - val);
+         float dist = fabsf(PosToVal(pos, true) - val);
          if (dist < closestDist)
          {
             closestDist = dist;
@@ -405,7 +450,7 @@ float FloatSlider::GetMidiValue()
    if (mMin == mMax)
       return 0;
    
-   return ValToPos(*mVar);
+   return ValToPos(*mVar, true);
 }
 
 string FloatSlider::GetDisplayValue(float val) const
@@ -433,10 +478,22 @@ string FloatSlider::GetDisplayValue(float val) const
 
 void FloatSlider::Compute(int samplesIn /*= 0*/)
 {
+   mComputeHasBeenCalledOnce = true;
+   
    if (mModulator && mModulator->Active())
    {
+      float* var = mIsSmoothing ? &mSmoothTarget : mVar;
+      float oldVal = *var;
+      *var = mModulator->Value(samplesIn);
+      if (oldVal != *var && !mIsSmoothing)
+      {
+         mOwner->FloatSliderUpdated(this, oldVal);
+      }
+   }
+   if (mIsSmoothing)
+   {
       float oldVal = *mVar;
-      *mVar = mModulator->Value(samplesIn);
+      *mVar = ofClamp(mRamp.Value(gTime + samplesIn * gInvSampleRateMs), mMin, mMax);
       if (oldVal != *mVar)
       {
          mOwner->FloatSliderUpdated(this, oldVal);
@@ -448,6 +505,8 @@ float* FloatSlider::GetModifyValue()
 {
    if (!TheSynth->IsLoadingModule() && mModulator && mModulator->Active() && mModulator->CanAdjustRange())
       return &mModulator->GetMax();
+   if (mIsSmoothing)
+      return &mSmoothTarget;
    return mVar;
 }
 
@@ -502,9 +561,14 @@ void FloatSlider::TextEntryComplete(TextEntry* entry)
    SetValue(mEntryValue);
 }
 
+void FloatSlider::OnTransportAdvanced(float amount)
+{
+   mRamp.Start(mSmoothTarget, (amount * TheTransport->MsPerBar() * (mSmooth*300)));
+}
+
 namespace
 {
-   const int kFloatSliderSaveStateRev = 2;
+   const int kFloatSliderSaveStateRev = 3;
 }
 
 void FloatSlider::SaveState(FileStreamOut& out)
@@ -522,6 +586,10 @@ void FloatSlider::SaveState(FileStreamOut& out)
    
    out << mModulatorMin;
    out << mModulatorMax;
+   
+   out << mSmooth;
+   out << mSmoothTarget;
+   out << mIsSmoothing;
 }
 
 void FloatSlider::LoadState(FileStreamIn& in, bool shouldSetValue)
@@ -558,6 +626,16 @@ void FloatSlider::LoadState(FileStreamIn& in, bool shouldSetValue)
    {
       in >> mModulatorMin;
       in >> mModulatorMax;
+   }
+   
+   if (rev >= 3)
+   {
+      in >> mSmooth;
+      in >> mSmoothTarget;
+      in >> mIsSmoothing;
+      
+      if (mIsSmoothing)
+         TheTransport->AddAudioPoller(this);
    }
 }
 

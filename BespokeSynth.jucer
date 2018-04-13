@@ -155,6 +155,9 @@
         <FILE id="RG4zGd" name="TremoloEffect.h" compile="0" resource="0" file="Source/TremoloEffect.h"/>
       </GROUP>
       <GROUP id="{6781AC07-A090-A7AF-8D27-BCB6D9526ABD}" name="modules">
+        <FILE id="ypzKC1" name="NoteStrummer.cpp" compile="1" resource="0"
+              file="Source/NoteStrummer.cpp"/>
+        <FILE id="htGfPr" name="NoteStrummer.h" compile="0" resource="0" file="Source/NoteStrummer.h"/>
         <FILE id="EugK26" name="Amplifier.cpp" compile="1" resource="0" file="Source/Amplifier.cpp"/>
         <FILE id="BgLMgo" name="Amplifier.h" compile="0" resource="0" file="Source/Amplifier.h"/>
         <FILE id="DU9MrN" name="Arpeggiator.cpp" compile="1" resource="0" file="Source/Arpeggiator.cpp"/>
@@ -185,6 +188,10 @@
         <FILE id="YY2OwK" name="ChaosEngine.h" compile="0" resource="0" file="Source/ChaosEngine.h"/>
         <FILE id="lhRwIU" name="Chorder.cpp" compile="1" resource="0" file="Source/Chorder.cpp"/>
         <FILE id="byJnsc" name="Chorder.h" compile="0" resource="0" file="Source/Chorder.h"/>
+        <FILE id="K5w9nB" name="ChordDisplayer.cpp" compile="1" resource="0"
+              file="Source/ChordDisplayer.cpp"/>
+        <FILE id="HmwilQ" name="ChordDisplayer.h" compile="0" resource="0"
+              file="Source/ChordDisplayer.h"/>
         <FILE id="ubTlBd" name="CircleSequencer.cpp" compile="1" resource="0"
               file="Source/CircleSequencer.cpp"/>
         <FILE id="ovS48X" name="CircleSequencer.h" compile="0" resource="0"
@@ -651,6 +658,9 @@
       <FILE id="nIZqdU" name="CanvasElement.h" compile="0" resource="0" file="Source/CanvasElement.h"/>
       <FILE id="irjm4P" name="Chord.cpp" compile="1" resource="0" file="Source/Chord.cpp"/>
       <FILE id="ROjCRz" name="Chord.h" compile="0" resource="0" file="Source/Chord.h"/>
+      <FILE id="oMAiEw" name="ChordDatabase.cpp" compile="1" resource="0"
+            file="Source/ChordDatabase.cpp"/>
+      <FILE id="e8AFk5" name="ChordDatabase.h" compile="0" resource="0" file="Source/ChordDatabase.h"/>
       <FILE id="J2dgf3" name="Curve.cpp" compile="1" resource="0" file="Source/Curve.cpp"/>
       <FILE id="QwFoys" name="Curve.h" compile="0" resource="0" file="Source/Curve.h"/>
       <FILE id="aTYL9e" name="EffectFactory.cpp" compile="1" resource="0"
@@ -684,6 +694,7 @@
       <FILE id="RXLeAN" name="Granulator.cpp" compile="1" resource="0" file="Source/Granulator.cpp"/>
       <FILE id="wcBjVT" name="Granulator.h" compile="0" resource="0" file="Source/Granulator.h"/>
       <FILE id="wLsYNi" name="IAudioEffect.h" compile="0" resource="0" file="Source/IAudioEffect.h"/>
+      <FILE id="CRt93Y" name="IAudioPoller.h" compile="0" resource="0" file="Source/IAudioPoller.h"/>
       <FILE id="yp4Ioj" name="IAudioProcessor.cpp" compile="1" resource="0"
             file="Source/IAudioProcessor.cpp"/>
       <FILE id="UVbSz1" name="IAudioProcessor.h" compile="0" resource="0"

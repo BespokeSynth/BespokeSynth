@@ -16,6 +16,7 @@
 #include "Checkbox.h"
 #include "Chord.h"
 #include "TextEntry.h"
+#include "ChordDatabase.h"
 
 class IScaleListener
 {
@@ -100,6 +101,8 @@ public:
    
    float PitchToFreq(float pitch);
    float FreqToPitch(float freq);
+   
+   const ChordDatabase& GetChordDatabase() const { return mChordDatabase; }
 
    void DropdownUpdated(DropdownList* list, int oldVal) override;
    void FloatSliderUpdated(FloatSlider* slider, float oldVal) override;
@@ -155,6 +158,8 @@ private:
    DropdownList* mIntonationSelector;
    
    float mTuningTable[256];
+   
+   ChordDatabase mChordDatabase;
 };
 
 extern Scale* TheScale;

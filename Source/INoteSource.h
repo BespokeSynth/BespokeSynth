@@ -56,6 +56,7 @@ public:
    void SendCC(int control, int value, int voiceIdx = -1) override;
 
    list<int> GetHeldNotes() { Poco::FastMutex::ScopedLock lock(mNotesMutex); return mNotes; }
+   list<int> GetHeldNotesAudioThread() { return mNotes; }
    NoteHistory& GetNoteHistory() { return mNoteHistory; }
 private:
    list<int> mNotes;

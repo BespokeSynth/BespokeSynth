@@ -541,6 +541,9 @@
     <ClCompile Include="..\..\Source\TremoloEffect.cpp">
       <Filter>BespokeSynth\Source\effects</Filter>
     </ClCompile>
+    <ClCompile Include="..\..\Source\NoteStrummer.cpp">
+      <Filter>BespokeSynth\Source\modules</Filter>
+    </ClCompile>
     <ClCompile Include="..\..\Source\Amplifier.cpp">
       <Filter>BespokeSynth\Source\modules</Filter>
     </ClCompile>
@@ -581,6 +584,9 @@
       <Filter>BespokeSynth\Source\modules</Filter>
     </ClCompile>
     <ClCompile Include="..\..\Source\Chorder.cpp">
+      <Filter>BespokeSynth\Source\modules</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\Source\ChordDisplayer.cpp">
       <Filter>BespokeSynth\Source\modules</Filter>
     </ClCompile>
     <ClCompile Include="..\..\Source\CircleSequencer.cpp">
@@ -1067,6 +1073,9 @@
       <Filter>BespokeSynth\Source</Filter>
     </ClCompile>
     <ClCompile Include="..\..\Source\Chord.cpp">
+      <Filter>BespokeSynth\Source</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\Source\ChordDatabase.cpp">
       <Filter>BespokeSynth\Source</Filter>
     </ClCompile>
     <ClCompile Include="..\..\Source\Curve.cpp">
@@ -3204,6 +3213,9 @@
     <ClInclude Include="..\..\Source\TremoloEffect.h">
       <Filter>BespokeSynth\Source\effects</Filter>
     </ClInclude>
+    <ClInclude Include="..\..\Source\NoteStrummer.h">
+      <Filter>BespokeSynth\Source\modules</Filter>
+    </ClInclude>
     <ClInclude Include="..\..\Source\Amplifier.h">
       <Filter>BespokeSynth\Source\modules</Filter>
     </ClInclude>
@@ -3244,6 +3256,9 @@
       <Filter>BespokeSynth\Source\modules</Filter>
     </ClInclude>
     <ClInclude Include="..\..\Source\Chorder.h">
+      <Filter>BespokeSynth\Source\modules</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\Source\ChordDisplayer.h">
       <Filter>BespokeSynth\Source\modules</Filter>
     </ClInclude>
     <ClInclude Include="..\..\Source\CircleSequencer.h">
@@ -3732,6 +3747,9 @@
     <ClInclude Include="..\..\Source\Chord.h">
       <Filter>BespokeSynth\Source</Filter>
     </ClInclude>
+    <ClInclude Include="..\..\Source\ChordDatabase.h">
+      <Filter>BespokeSynth\Source</Filter>
+    </ClInclude>
     <ClInclude Include="..\..\Source\Curve.h">
       <Filter>BespokeSynth\Source</Filter>
     </ClInclude>
@@ -3769,6 +3787,9 @@
       <Filter>BespokeSynth\Source</Filter>
     </ClInclude>
     <ClInclude Include="..\..\Source\IAudioEffect.h">
+      <Filter>BespokeSynth\Source</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\Source\IAudioPoller.h">
       <Filter>BespokeSynth\Source</Filter>
     </ClInclude>
     <ClInclude Include="..\..\Source\IAudioProcessor.h">

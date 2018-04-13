@@ -15,19 +15,13 @@
 #include "ClickButton.h"
 #include "DropdownList.h"
 #include "Checkbox.h"
+#include "IAudioPoller.h"
 
 class ITimeListener
 {
 public:
    virtual ~ITimeListener() {}
    virtual void OnTimeEvent(int samplesTo) = 0;
-};
-
-class IAudioPoller
-{
-public:
-   virtual ~IAudioPoller() {}
-   virtual void OnTransportAdvanced(float amount) = 0;
 };
 
 enum NoteInterval

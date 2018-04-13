@@ -200,6 +200,7 @@
     <ClCompile Include="..\..\Source\Pumper.cpp"/>
     <ClCompile Include="..\..\Source\Stutter.cpp"/>
     <ClCompile Include="..\..\Source\TremoloEffect.cpp"/>
+    <ClCompile Include="..\..\Source\NoteStrummer.cpp"/>
     <ClCompile Include="..\..\Source\Amplifier.cpp"/>
     <ClCompile Include="..\..\Source\Arpeggiator.cpp"/>
     <ClCompile Include="..\..\Source\AudioMeter.cpp"/>
@@ -214,6 +215,7 @@
     <ClCompile Include="..\..\Source\Capo.cpp"/>
     <ClCompile Include="..\..\Source\ChaosEngine.cpp"/>
     <ClCompile Include="..\..\Source\Chorder.cpp"/>
+    <ClCompile Include="..\..\Source\ChordDisplayer.cpp"/>
     <ClCompile Include="..\..\Source\CircleSequencer.cpp"/>
     <ClCompile Include="..\..\Source\ClipArranger.cpp"/>
     <ClCompile Include="..\..\Source\ClipLauncher.cpp"/>
@@ -380,6 +382,7 @@
     <ClCompile Include="..\..\Source\CanvasControls.cpp"/>
     <ClCompile Include="..\..\Source\CanvasElement.cpp"/>
     <ClCompile Include="..\..\Source\Chord.cpp"/>
+    <ClCompile Include="..\..\Source\ChordDatabase.cpp"/>
     <ClCompile Include="..\..\Source\Curve.cpp"/>
     <ClCompile Include="..\..\Source\EffectFactory.cpp"/>
     <ClCompile Include="..\..\Source\EnvelopeEditor.cpp"/>
@@ -2142,6 +2145,7 @@
     <ClInclude Include="..\..\Source\Pumper.h"/>
     <ClInclude Include="..\..\Source\Stutter.h"/>
     <ClInclude Include="..\..\Source\TremoloEffect.h"/>
+    <ClInclude Include="..\..\Source\NoteStrummer.h"/>
     <ClInclude Include="..\..\Source\Amplifier.h"/>
     <ClInclude Include="..\..\Source\Arpeggiator.h"/>
     <ClInclude Include="..\..\Source\AudioMeter.h"/>
@@ -2156,6 +2160,7 @@
     <ClInclude Include="..\..\Source\Capo.h"/>
     <ClInclude Include="..\..\Source\ChaosEngine.h"/>
     <ClInclude Include="..\..\Source\Chorder.h"/>
+    <ClInclude Include="..\..\Source\ChordDisplayer.h"/>
     <ClInclude Include="..\..\Source\CircleSequencer.h"/>
     <ClInclude Include="..\..\Source\ClipArranger.h"/>
     <ClInclude Include="..\..\Source\ClipLauncher.h"/>
@@ -2318,6 +2323,7 @@
     <ClInclude Include="..\..\Source\CanvasControls.h"/>
     <ClInclude Include="..\..\Source\CanvasElement.h"/>
     <ClInclude Include="..\..\Source\Chord.h"/>
+    <ClInclude Include="..\..\Source\ChordDatabase.h"/>
     <ClInclude Include="..\..\Source\Curve.h"/>
     <ClInclude Include="..\..\Source\EffectFactory.h"/>
     <ClInclude Include="..\..\Source\EnvelopeEditor.h"/>
@@ -2331,6 +2337,7 @@
     <ClInclude Include="..\..\Source\FMVoice.h"/>
     <ClInclude Include="..\..\Source\Granulator.h"/>
     <ClInclude Include="..\..\Source\IAudioEffect.h"/>
+    <ClInclude Include="..\..\Source\IAudioPoller.h"/>
     <ClInclude Include="..\..\Source\IAudioProcessor.h"/>
     <ClInclude Include="..\..\Source\IAudioReceiver.h"/>
     <ClInclude Include="..\..\Source\IAudioSource.h"/>

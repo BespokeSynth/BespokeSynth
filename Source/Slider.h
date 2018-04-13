@@ -12,6 +12,8 @@
 #include <iostream>
 #include "IUIControl.h"
 #include "TextEntry.h"
+#include "Ramp.h"
+#include "IAudioPoller.h"
 
 class FloatSlider;
 class FloatSliderLFOControl;
@@ -24,7 +26,7 @@ public:
    virtual void FloatSliderUpdated(FloatSlider* slider, float oldVal) = 0;
 };
 
-class FloatSlider : public IUIControl, public ITextEntryListener
+class FloatSlider : public IUIControl, public ITextEntryListener, public IAudioPoller
 {
 public:
    FloatSlider(IFloatSliderListener* owner, const char* label, int x, int y, int w, int h, float* var, float min, float max, int digits = -1);
@@ -55,6 +57,7 @@ public:
    void SetModulator(IModulator* modulator) { mModulator = modulator; }
    float& GetModulatorMin() { return mModulatorMin; }
    float& GetModulatorMax() { return mModulatorMax; }
+   void OnTransportAdvanced(float amount) override;
    
    void Init() override;
    
@@ -93,8 +96,10 @@ private:
    void OnClicked(int x, int y, bool right) override;
    void SetValueForMouse(int x, int y);
    float* GetModifyValue();
-   float PosToVal(float pos) const;
-   float ValToPos(float val) const;
+   float PosToVal(float pos, bool ignoreSmooth) const;
+   float ValToPos(float val, bool ignoreSmooth) const;
+   bool AdjustSmooth() const;
+   void SmoothUpdated();
    
    int mWidth;
    int mHeight;
@@ -121,6 +126,11 @@ private:
    string mMaxValueDisplay;
    bool mShowName;
    float mBezierControl;
+   float mSmooth;
+   float mSmoothTarget;
+   Ramp mRamp;
+   bool mIsSmoothing;
+   bool mComputeHasBeenCalledOnce;
    
    float mLastDisplayedValue;
    

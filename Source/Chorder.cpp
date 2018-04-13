@@ -11,9 +11,16 @@
 #include "Scale.h"
 #include "ModularSynth.h"
 #include "PolyphonyMgr.h"
+#include "ChordDatabase.h"
 
 Chorder::Chorder()
 : mVelocity(0)
+, mDiatonic(false)
+, mDiatonicCheckbox(nullptr)
+, mChordDropdown(nullptr)
+, mInversionDropdown(nullptr)
+, mChordIndex(0)
+, mInversion(0)
 {
    bzero(mHeldCount, TOTAL_NUM_NOTES*sizeof(int));
    bzero(mInputNotes, TOTAL_NUM_NOTES*sizeof(bool));
@@ -23,9 +30,21 @@ void Chorder::CreateUIControls()
 {
    IDrawableModule::CreateUIControls();
    
-   mChordGrid = new UIGrid(2,2,130,50,7,3);
+   mChordGrid = new UIGrid(2,2,130,50,mDiatonic ? 7 : 12,3);
    mChordGrid->SetVal(0, 1, 1);
    mChordGrid->SetListener(this);
+   
+   mDiatonicCheckbox = new Checkbox(this, "diatonic", mChordGrid, kAnchor_Below, &mDiatonic);
+   mChordDropdown = new DropdownList(this, "chord", mDiatonicCheckbox, kAnchor_Right, &mChordIndex, 40);
+   mInversionDropdown = new DropdownList(this, "inversion", mChordDropdown, kAnchor_Right, &mInversion, 30);
+   
+   for (auto name : TheScale->GetChordDatabase().GetChordNames())
+      mChordDropdown->AddLabel(name, mChordDropdown->GetNumValues());
+   
+   mInversionDropdown->AddLabel("0", 0);
+   mInversionDropdown->AddLabel("1", 1);
+   mInversionDropdown->AddLabel("2", 2);
+   mInversionDropdown->AddLabel("3", 3);
 }
 
 void Chorder::DrawModule()
@@ -34,10 +53,16 @@ void Chorder::DrawModule()
       return;
    
    mChordGrid->Draw();
+   mDiatonicCheckbox->Draw();
+   mChordDropdown->Draw();
+   mInversionDropdown->Draw();
 }
 
 void Chorder::GridUpdated(UIGrid* grid, int col, int row, float value, float oldValue)
 {
+   if (!mDiatonic)
+      return; //TODO(Ryan)
+   
    int tone = col + (mChordGrid->GetRows()/2-row)*mChordGrid->GetCols();
    if (value > 0 && oldValue == 0)
    {
@@ -112,6 +137,28 @@ void Chorder::CheckboxUpdated(Checkbox *checkbox)
       bzero(mHeldCount,TOTAL_NUM_NOTES*sizeof(int));
       bzero(mInputNotes, TOTAL_NUM_NOTES*sizeof(bool));
    }
+   
+   if (checkbox == mDiatonicCheckbox)
+   {
+      mChordDropdown->SetShowing(!mDiatonic);
+      mInversionDropdown->SetShowing(!mDiatonic);
+      mChordGrid->SetGrid(mDiatonic ? 7 : 12, 3);
+   }
+}
+
+void Chorder::DropdownUpdated(DropdownList* dropdown, int oldVal)
+{
+   if (dropdown == mChordDropdown || dropdown == mInversionDropdown)
+   {
+      vector<int> chord = TheScale->GetChordDatabase().GetChord(mChordDropdown->GetLabel(mChordIndex), mInversion);
+      mChordGrid->Clear();
+      for (int val : chord)
+      {
+         int row = 2 - ((val + 12) / 12);
+         int col = (val + 12) % 12;
+         mChordGrid->SetVal(col, row, 1);
+      }
+   }
 }
 
 void Chorder::PlayNote(double time, int pitch, int velocity, int voiceIdx, ModulationParameters modulation)
@@ -135,19 +182,23 @@ void Chorder::PlayNote(double time, int pitch, int velocity, int voiceIdx, Modul
          float val = mChordGrid->GetVal(col, row);
          if (val > 0)
          {
-            int chordTone = col + (mChordGrid->GetRows()/2-row)*mChordGrid->GetCols();
+            int gridPosition = col + (mChordGrid->GetRows()/2-row)*mChordGrid->GetCols();
             int voice = (voiceIdx == -1) ? -1 : (voiceIdx + idx) % 16;
             int outPitch;
             
-            if (chordTone%TheScale->NumPitchesInScale() == 0) //if this is the pressed note or an octave of it
+            if (!mDiatonic)
+            {
+               outPitch = pitch + gridPosition;
+            }
+            else if (gridPosition%TheScale->NumPitchesInScale() == 0) //if this is the pressed note or an octave of it
             {
                //play the pressed note (might not be in scale, so play it directly)
-               int octave = chordTone/TheScale->NumPitchesInScale();
+               int octave = gridPosition/TheScale->NumPitchesInScale();
                outPitch = pitch+TheScale->GetTet()*octave;
             }
             else
             {
-               int tone = chordTone + TheScale->GetToneFromPitch(pitch);
+               int tone = gridPosition + TheScale->GetToneFromPitch(pitch);
                outPitch = TheScale->MakeDiatonic(TheScale->GetPitchFromTone(tone));
             }
             

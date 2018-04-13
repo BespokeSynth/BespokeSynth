@@ -88,6 +88,7 @@ void SingleOscillator::CreateUIControls()
    mMultSelector->AddLabel("4", 4);
    mMultSelector->AddLabel("3", 3);
    mMultSelector->AddLabel("2", 2);
+   mMultSelector->AddLabel("1.5", -1);
    mMultSelector->AddLabel("1", 1);
    mMultSelector->AddLabel("1/2", -2);
    mMultSelector->AddLabel("1/3", -3);
@@ -247,7 +248,14 @@ void SingleOscillator::SetUpFromSaveData()
 void SingleOscillator::DropdownUpdated(DropdownList* list, int oldVal)
 {
    if (list == mMultSelector)
-      mVoiceParams.mMult = mMult >= 0 ? mMult : -1.0f/mMult;
+   {
+      if (mMult > 0)
+         mVoiceParams.mMult = mMult;
+      else if (mMult == -1)   //-1 is special case for 1.5
+         mVoiceParams.mMult = 1.5f;
+      else                    //other negative numbers mean 1/-x
+         mVoiceParams.mMult = -1.0f/mMult;
+   }
    if (list == mOscSelector)
       mDrawOsc.SetType(mVoiceParams.mOscType);
 }

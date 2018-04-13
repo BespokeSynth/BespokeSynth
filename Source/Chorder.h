@@ -14,10 +14,11 @@
 #include "IDrawableModule.h"
 #include "Checkbox.h"
 #include "UIGrid.h"
+#include "DropdownList.h"
 
 #define TOTAL_NUM_NOTES 128
 
-class Chorder : public NoteEffectBase, public IDrawableModule, public UIGridListener
+class Chorder : public NoteEffectBase, public IDrawableModule, public UIGridListener, public IDropdownListener
 {
 public:
    Chorder();
@@ -35,6 +36,7 @@ public:
    void GridUpdated(UIGrid* grid, int col, int row, float value, float oldValue) override;
    
    void CheckboxUpdated(Checkbox* checkbox) override;
+   void DropdownUpdated(DropdownList* dropdown, int oldVal) override;
 
    void SetEnabled(bool enabled) override { mEnabled = enabled; }
    virtual bool Enabled() const override { return mEnabled; }
@@ -47,7 +49,7 @@ public:
 private:
    //IDrawableModule
    void DrawModule() override;
-   void GetModuleDimensions(int& width, int& height) override { width = 135; height = 55; }
+   void GetModuleDimensions(int& width, int& height) override { width = 135; height = 75; }
    void OnClicked(int x, int y, bool right) override;
    void MouseReleased() override;
    bool MouseMoved(float x, float y) override;
@@ -60,6 +62,13 @@ private:
    int mVelocity;
    bool mInputNotes[TOTAL_NUM_NOTES];
    int mHeldCount[TOTAL_NUM_NOTES];
+   
+   bool mDiatonic;
+   int mChordIndex;
+   int mInversion;
+   Checkbox* mDiatonicCheckbox;
+   DropdownList* mChordDropdown;
+   DropdownList* mInversionDropdown;
 };
 
 #endif /* defined(__modularSynth__Chorder__) */
