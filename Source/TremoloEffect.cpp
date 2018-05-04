@@ -87,18 +87,18 @@ void TremoloEffect::DrawModule()
 {
    if (!mEnabled)
       return;
-
-   ofPushStyle();
-   ofSetColor(0,200,0);
-   ofFill();
-   ofRect(5, 4, mLFO.Value() * 85 * mAmount, 14);
-   ofPopStyle();
    
    mAmountSlider->Draw();
    mIntervalSelector->Draw();
    mOffsetSlider->Draw();
    mOscSelector->Draw();
    mDutySlider->Draw();
+   
+   ofPushStyle();
+   ofSetColor(0,200,0,gModuleDrawAlpha*.3f);
+   ofFill();
+   ofRect(5, 4, mLFO.Value() * 85 * mAmount, 14);
+   ofPopStyle();
 }
 
 void TremoloEffect::GetModuleDimensions(int& width, int& height)

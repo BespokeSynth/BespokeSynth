@@ -93,12 +93,14 @@ void SetGlobalSampleRate(int rate)
 
 void DrawAudioBuffer(float width, float height, ChannelBuffer* buffer, float start, float end, float pos, float vol /*=1*/, ofColor color /*=ofColor::black*/)
 {
+   ofPushMatrix();
    int numChannels = buffer->NumActiveChannels();
    for (int i=0; i<numChannels; ++i)
    {
       DrawAudioBuffer(width, height/numChannels, buffer->GetChannel(i), start, end, pos, vol, color);
       ofTranslate(0, height/numChannels);
    }
+   ofPopMatrix();
 }
 
 void DrawAudioBuffer(float width, float height, const float* buffer, float start, float end, float pos, float vol /*=1*/, ofColor color /*=ofColor::black*/)
@@ -293,6 +295,13 @@ void FloatWrap(float& num, float space)
    num -= space * floor(num/space);
 }
 
+void FloatWrap(double& num, float space)
+{
+   if (space == 0)
+      num = 0;
+   num -= space * floor(num/space);
+}
+
 void DrawText(string text, int x, int y, float size)
 {
    gFont.DrawString(text, size, x, y);
@@ -318,7 +327,7 @@ void AssertIfDenormal(float input)
    assert(input == 0 || fabsf(input) > numeric_limits<float>::min());
 }
 
-float GetInterpolatedSample(float offset, const float* buffer, int bufferSize)
+float GetInterpolatedSample(double offset, const float* buffer, int bufferSize)
 {
    FloatWrap(offset, bufferSize);
    int pos = int(offset);
@@ -332,7 +341,7 @@ float GetInterpolatedSample(float offset, const float* buffer, int bufferSize)
    return output;
 }
 
-float GetInterpolatedSample(float offset, ChannelBuffer* buffer, int bufferSize, float channelBlend)
+float GetInterpolatedSample(double offset, ChannelBuffer* buffer, int bufferSize, float channelBlend)
 {
    assert(channelBlend <= buffer->NumActiveChannels());
    
@@ -348,7 +357,7 @@ float GetInterpolatedSample(float offset, ChannelBuffer* buffer, int bufferSize,
           (channelBlend - channelA) * GetInterpolatedSample(offset, buffer->GetChannel(channelB), bufferSize);
 }
 
-void WriteInterpolatedSample(float offset, float* buffer, int bufferSize, float sample)
+void WriteInterpolatedSample(double offset, float* buffer, int bufferSize, float sample)
 {
    FloatWrap(offset, bufferSize);
    int pos = int(offset);

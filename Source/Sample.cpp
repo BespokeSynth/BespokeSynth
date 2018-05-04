@@ -263,9 +263,8 @@ void Sample::LoadState(FileStreamIn& in)
    int rev;
    in >> rev;
    
-   int numSamples;
-   in >> numSamples;
-   if (numSamples > 0)
+   in >> mNumSamples;
+   if (mNumSamples > 0)
    {
       int readLength;
       mData.Load(in, readLength);

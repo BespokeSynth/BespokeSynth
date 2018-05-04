@@ -467,7 +467,8 @@ void Transport::UpdateListeners(float jumpMs)
       if (info.mInterval != kInterval_None &&
           info.mInterval != kInterval_Kick &&
           info.mInterval != kInterval_Snare &&
-          info.mInterval != kInterval_Hat)
+          info.mInterval != kInterval_Hat &&
+          info.mInterval != kInterval_Free)
       {
          if (info.mOffsetIsInMs)
          {

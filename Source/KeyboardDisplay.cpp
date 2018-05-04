@@ -226,6 +226,8 @@ int KeyboardDisplay::GetPitchForTypingKey(int key) const
 
 void KeyboardDisplay::KeyPressed(int key, bool isRepeat)
 {
+   IDrawableModule::KeyPressed(key, isRepeat);
+   
    if (mTypingInput && mEnabled && !isRepeat)
    {
       int pitch = GetPitchForTypingKey(key);

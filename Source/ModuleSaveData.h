@@ -27,7 +27,9 @@ public:
    
    void Save(ofxJSONElement& moduleInfo);
    
+   void SetInt(string prop, int val);
    void SetInt(string prop, int val, int min, int max, bool isTextField);
+   void SetFloat(string prop, float val);
    void SetFloat(string prop, float val, float min, float max, bool isTextField);
    void SetBool(string prop, bool val);
    void SetString(string prop, string val);

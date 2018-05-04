@@ -24,6 +24,7 @@ NoteCreator::NoteCreator()
 , mStartTime(0)
 , mNoteOnCheckbox(nullptr)
 , mNoteOnByTrigger(false)
+, mVoiceIndex(-1)
 {
    SetIsNoteOrigin(true);
    TheTransport->AddAudioPoller(this);
@@ -82,7 +83,7 @@ void NoteCreator::CheckboxUpdated(Checkbox* checkbox)
       if (mNoteOn)
       {
          mNoteOnByTrigger = false;
-         PlayNoteOutput(gTime, mPitch, mVelocity*127);
+         PlayNoteOutput(gTime, mPitch, mVelocity*127, mVoiceIndex);
       }
       else
       {
@@ -109,6 +110,7 @@ void NoteCreator::TextEntryComplete(TextEntry* entry)
 void NoteCreator::LoadLayout(const ofxJSONElement& moduleInfo)
 {
    mModuleSaveData.LoadString("target", moduleInfo);
+   mModuleSaveData.LoadInt("voice index", moduleInfo, -1, -1, kNumVoices);
    
    SetUpFromSaveData();
 }
@@ -116,4 +118,5 @@ void NoteCreator::LoadLayout(const ofxJSONElement& moduleInfo)
 void NoteCreator::SetUpFromSaveData()
 {
    SetUpPatchCables(mModuleSaveData.GetString("target"));
+   mVoiceIndex = mModuleSaveData.GetInt("voice index");
 }

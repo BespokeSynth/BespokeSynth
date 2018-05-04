@@ -311,6 +311,7 @@ ModuleFactory::ModuleFactory()
    REGISTER(NotePanAlternator, notepanalternator, kModuleType_Note);
    REGISTER(ChordDisplayer, chorddisplayer, kModuleType_Note);
    REGISTER(NoteStrummer, notestrummer, kModuleType_Note);
+   REGISTER(SeaOfGrain, seaofgrain, kModuleType_Synth);
 
    //REGISTER_EXPERIMENTAL(MidiPlayer, midiplayer, kModuleType_Instrument);
    REGISTER_EXPERIMENTAL(Razor, razor, kModuleType_Synth);
@@ -329,7 +330,6 @@ ModuleFactory::ModuleFactory()
    REGISTER_HIDDEN(MultitrackRecorder, multitrackrecorder, kModuleType_Audio);
    REGISTER_HIDDEN(DebugAudioSource, debugaudiosource, kModuleType_Synth);
    REGISTER_HIDDEN(FollowingSong, followingsong, kModuleType_Synth);
-   REGISTER_HIDDEN(SeaOfGrain, seaofgrain, kModuleType_Synth);
    REGISTER_HIDDEN(BeatBloks, beatbloks, kModuleType_Synth);
    REGISTER_HIDDEN(FilterViz, filterviz, kModuleType_Other);
    REGISTER_HIDDEN(FreqDomainBoilerplate, freqdomainboilerplate, kModuleType_Audio);

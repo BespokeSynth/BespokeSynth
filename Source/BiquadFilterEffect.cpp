@@ -168,10 +168,6 @@ bool BiquadFilterEffect::MouseMoved(float x, float y)
 
 void BiquadFilterEffect::CheckboxUpdated(Checkbox* checkbox)
 {
-   if (checkbox == mEnabledCheckbox)
-   {
-      ResetFilter();
-   }
 }
 
 void BiquadFilterEffect::FloatSliderUpdated(FloatSlider* slider, float oldVal)

@@ -352,7 +352,10 @@ void SamplePlayer::oscBundleReceived(const OSCBundle& bundle)
 void SamplePlayer::CheckboxUpdated(Checkbox* checkbox)
 {
    if (checkbox == mLoopCheckbox)
-      mSample->SetLooping(mLoop);
+   {
+      if (mSample != nullptr)
+         mSample->SetLooping(mLoop);
+   }
 }
 
 void SamplePlayer::GetModuleDimensions(int& x, int&y)
@@ -392,4 +395,39 @@ void SamplePlayer::SetUpFromSaveData()
    SetTarget(TheSynth->FindModule(mModuleSaveData.GetString("target")));
    mSampleBankCable->SetTarget(TheSynth->FindModule(mModuleSaveData.GetString("samplebank"),false));
    Resize(mModuleSaveData.GetFloat("width"), mModuleSaveData.GetFloat("height"));
+}
+
+namespace
+{
+   const int kSaveStateRev = 0;
+}
+
+void SamplePlayer::SaveState(FileStreamOut& out)
+{
+   IDrawableModule::SaveState(out);
+   
+   out << kSaveStateRev;
+   
+   bool hasSample = (mSample != nullptr);
+   out << hasSample;
+   if (hasSample)
+      mSample->SaveState(out);
+}
+
+void SamplePlayer::LoadState(FileStreamIn& in)
+{
+   IDrawableModule::LoadState(in);
+   
+   int rev;
+   in >> rev;
+   LoadStateValidate(rev <= kSaveStateRev);
+   
+   bool hasSample;
+   in >> hasSample;
+   if (hasSample)
+   {
+      Sample* sample = new Sample();
+      sample->LoadState(in);
+      UpdateSample(sample, true);
+   }
 }

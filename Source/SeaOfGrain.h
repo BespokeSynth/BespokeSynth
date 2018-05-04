@@ -32,7 +32,7 @@ public:
    ~SeaOfGrain();
    static IDrawableModule* Create() { return new SeaOfGrain(); }
    
-   string GetTitleLabel() override { return "Sea of Grain by @awwbees"; }
+   string GetTitleLabel() override { return "sea of grain"; }
    void CreateUIControls() override;
    
    //INoteReceiver
@@ -66,21 +66,12 @@ public:
    virtual void LoadLayout(const ofxJSONElement& moduleInfo) override;
    virtual void SetUpFromSaveData() override;
    
-private:
-   enum ReadState
-   {
-      kReadState_Start,
-      kReadState_Bars,
-      kReadState_Beats,
-      kReadState_Tatums,
-      kReadState_Sections,
-      kReadState_Segments
-   } mReadState;
+   void SaveState(FileStreamOut& out) override;
+   void LoadState(FileStreamIn& in) override;
    
+private:
    void UpdateSample();
-   void ResetRead();
-   void ReadEchonestLine(const char* line);
-   vector<float>& GetSlices() { return mSliceMode ? mTatums : mBeats; };
+   int GetSampleLength() const;
 
    //IDrawableModule
    void DrawModule() override;
@@ -88,19 +79,17 @@ private:
    void GetModuleDimensions(int& x, int& y) override;
    void OnClicked(int x, int y, bool right) override;
    
-   vector<float> mTatums;
-   vector<float> mBeats;
-   
    struct GrainVoice
    {
       GrainVoice();
-      void Process(float* out, float outLength, float* sample, int sampleLength, int keyOffset, const vector<float>& beats);
+      void Process(float* out, int outLength, float* sample, int sampleLength, int keyOffset, const vector<float>& slices);
       void Draw(float w, float h, float offset, float length, int numPitches);
       
       float mPlay;
       float mPitch;
       ModulationChain* mPitchBend;
       ModulationChain* mPressure;
+      ModulationChain* mModWheel;
       
       float mGain;
       
@@ -116,18 +105,13 @@ private:
    FloatSlider* mVolumeSlider;
    float* mWriteBuffer;
    bool mLoading;
-   ClickButton* mEverythingButton;
-   ClickButton* mFancyButton;
-   ClickButton* mStarWarsButton;
-   ClickButton* mGodOnlyKnowsButton;
    IntSlider* mKeyOffsetSlider;
    int mKeyOffset;
    IntSlider* mDisplayKeysSlider;
    int mDisplayKeys;
    DropdownList* mKeyboardBaseNoteSelector;
    int mKeyboardBaseNote;
-   int mSliceMode;
-   DropdownList* mSliceModeSelector;
+   vector<float> mSlices;
 };
 
 #endif /* defined(__Bespoke__SeaOfGrain__) */

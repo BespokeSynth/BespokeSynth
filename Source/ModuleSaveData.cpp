@@ -62,6 +62,13 @@ void ModuleSaveData::Save(ofxJSONElement& moduleInfo)
    }
 }
 
+void ModuleSaveData::SetInt(string prop, int val)
+{
+   SaveVal* save = GetVal(prop);
+   assert(save && save->mType == kInt);
+   save->mInt = val;
+}
+
 void ModuleSaveData::SetInt(string prop, int val, int min, int max, bool isTextField)
 {
    SaveVal* save = GetVal(prop);
@@ -71,6 +78,13 @@ void ModuleSaveData::SetInt(string prop, int val, int min, int max, bool isTextF
    save->mMin = min;
    save->mMax = max;
    save->mIsTextField = isTextField;
+}
+
+void ModuleSaveData::SetFloat(string prop, float val)
+{
+   SaveVal* save = GetVal(prop);
+   assert(save && save->mType == kFloat);
+   save->mFloat = val;
 }
 
 void ModuleSaveData::SetFloat(string prop, float val, float min, float max, bool isTextField)

@@ -46,6 +46,7 @@ private:
    
    float mBend;
    FloatSlider* mBendSlider;
+   float mRange;
    //Checkbox mBendingCheckbox;
    
    Modulations mModulation;

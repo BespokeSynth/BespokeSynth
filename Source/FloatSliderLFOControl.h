@@ -71,6 +71,7 @@ public:
    bool IsSaveable() override { return mPinned; }
    void CreateUIControls() override;
    bool IsPinned() const { return mPinned; }
+   void RandomizeSettings();
    
    //IModulator
    float Value(int samplesIn = 0) override;

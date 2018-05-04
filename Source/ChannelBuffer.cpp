@@ -163,7 +163,8 @@ void ChannelBuffer::Load(FileStreamIn& in, int& readLength)
    LoadStateValidate(rev == kSaveStateRev);
    
    in >> readLength;
+   mBufferSize = readLength;
    in >> mActiveChannels;
    for (int i=0; i<mActiveChannels; ++i)
-      in.Read(GetChannel(i), readLength);
+      in.Read(GetChannel(i), mBufferSize);
 }

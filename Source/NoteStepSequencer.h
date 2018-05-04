@@ -25,7 +25,7 @@
 
 #define NSS_MAX_STEPS 16
 
-class NoteStepSequencer : public IDrawableModule, public ITimeListener, public INoteSource, public IButtonListener, public IDropdownListener, public IIntSliderListener, public IFloatSliderListener, public MidiDeviceListener, public UIGridListener, public IAudioPoller, public IScaleListener
+class NoteStepSequencer : public IDrawableModule, public ITimeListener, public INoteSource, public IButtonListener, public IDropdownListener, public IIntSliderListener, public IFloatSliderListener, public MidiDeviceListener, public UIGridListener, public IAudioPoller, public IScaleListener, public INoteReceiver
 {
 public:
    NoteStepSequencer();
@@ -69,6 +69,10 @@ public:
    
    //UIGridListener
    void GridUpdated(UIGrid* grid, int col, int row, float value, float oldValue) override;
+   
+   //INoteReceiver
+   void PlayNote(double time, int pitch, int velocity, int voiceIdx = -1, ModulationParameters modulation = ModulationParameters()) override;
+   void SendCC(int control, int value, int voiceIdx = -1) override {}
    
    void ButtonClicked(ClickButton* button) override;
    void CheckboxUpdated(Checkbox* checkbox) override;
@@ -158,6 +162,7 @@ private:
    float mFreeTimeStep;
    float mFreeTimeCounter;
    bool mShowStepControls;
+   int mRowOffset;
    
    MidiController* mController;
 

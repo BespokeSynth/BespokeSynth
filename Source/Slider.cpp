@@ -107,6 +107,18 @@ void FloatSlider::Render()
    ofRect(mX,mY,mWidth,mHeight);
    ofNoFill();
    
+   if (mIsSmoothing && !AdjustSmooth())
+   {
+      ofPushStyle();
+      ofSetColor(255,255,0,gModuleDrawAlpha);
+      float val = ofClamp(mSmoothTarget,mMin,mMax);
+      float screenPos = mX+1+(mWidth-2)*ValToPos(val, false);
+      ofSetLineWidth(1);
+      ofFill();
+      ofCircle(screenPos,mY+mHeight/2,3);
+      ofPopStyle();
+   }
+   
    float screenPos;
    if (mModulator && mModulator->Active() && !AdjustSmooth())
    {
@@ -117,7 +129,7 @@ void FloatSlider::Render()
       float screenPosMin = mX+1+(mWidth-2)*ValToPos(lfomin, true);
       
       ofPushStyle();
-      ofSetColor(0,200,0,gModuleDrawAlpha);
+      ofSetColor(0,200,0,gModuleDrawAlpha*.5f);
       ofFill();
       ofRect(screenPosMin,mY,screenPos-screenPosMin,mHeight, 1); //lfo bar
       ofPopStyle();
@@ -136,6 +148,8 @@ void FloatSlider::Render()
          ofSetColor(255,0,0,gModuleDrawAlpha);
       else
          ofSetColor(30,30,30,gModuleDrawAlpha);
+      if (AdjustSmooth())
+         ofSetColor(255,255, 0, gModuleDrawAlpha);
       float val = ofClamp(*mVar,mMin,mMax);
       screenPos = mX+1+(mWidth-2)*ValToPos(val, false);
       ofSetLineWidth(2);

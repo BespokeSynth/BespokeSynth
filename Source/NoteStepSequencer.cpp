@@ -30,7 +30,7 @@ NoteStepSequencer::NoteStepSequencer()
 , mGrid(nullptr)
 , mLastPitch(-1)
 , mLastVel(0)
-, mOctave(3)
+, mOctave(1)
 , mOctaveSlider(nullptr)
 , mHold(false)
 , mHoldCheckbox(nullptr)
@@ -42,6 +42,7 @@ NoteStepSequencer::NoteStepSequencer()
 , mFreeTimeSlider(nullptr)
 , mFreeTimeCounter(0)
 , mShowStepControls(false)
+, mRowOffset(0)
 , mSetLength(false)
 , mController(nullptr)
 , mShiftBackButton(nullptr)
@@ -80,7 +81,7 @@ NoteStepSequencer::NoteStepSequencer()
             mTones[i] = 14;
             break;
       }
-      mVels[i] = 127;
+      mVels[i] = 80;
       mNoteLengths[i] = 1;
    }
    
@@ -98,7 +99,7 @@ void NoteStepSequencer::CreateUIControls()
    mTimeModeSelector = new DropdownList(this,"timemode",5,2,(int*)(&mTimeMode));
    mGrid = new UIGrid(5,55,200,80,8,24);
    mVelocityGrid = new UIGrid(5,117,200,15,8,1);
-   mOctaveSlider = new IntSlider(this,"octave",166,2,53,15,&mOctave,0,6);
+   mOctaveSlider = new IntSlider(this,"octave",166,2,53,15,&mOctave,-2,4);
    mHoldCheckbox = new Checkbox(this,"hold",180,20,&mHold);
    mNoteModeSelector = new DropdownList(this,"notemode",5,20,(int*)(&mNoteMode));
    mFreeTimeSlider = new FloatSlider(this,"t",75,2,44,15,&mFreeTimeStep,0,1000,0);
@@ -114,10 +115,13 @@ void NoteStepSequencer::CreateUIControls()
    {
       mToneDropdowns[i] = new DropdownList(this,("tone"+ofToString(i)).c_str(),-1,-1,&(mTones[i]),40);
       mToneDropdowns[i]->SetDrawTriangle(false);
+      mToneDropdowns[i]->SetShowing(false);
       mVelocitySliders[i] = new IntSlider(this,("vel"+ofToString(i)).c_str(),-1,-1,30,15,&mVels[i],0,127);
       mVelocitySliders[i]->SetShowName(false);
+      mVelocitySliders[i]->SetShowing(false);
       mLengthSliders[i] = new FloatSlider(this,("len"+ofToString(i)).c_str(),-1,-1,30,15,&mNoteLengths[i],0.01f,1,1);
       mLengthSliders[i]->SetShowName(false);
+      mLengthSliders[i]->SetShowing(false);
    }
    SetUpStepControls();
    
@@ -264,36 +268,33 @@ void NoteStepSequencer::DrawModule()
       }
    }
    
-   if (mShowStepControls)
+   float controlYPos = gridY+gridH+mVelocityGrid->GetHeight();
+   if (mLoopResetPointSlider->IsShowing())
+      controlYPos += 19;
+   for (int i=0; i<NSS_MAX_STEPS; ++i)
    {
-      float controlYPos = gridY+gridH+mVelocityGrid->GetHeight();
-      if (mLoopResetPointSlider->IsShowing())
-         controlYPos += 19;
-      for (int i=0; i<NSS_MAX_STEPS; ++i)
+      if (i < mLength)
       {
-         if (i < mLength)
-         {
-            mToneDropdowns[i]->SetShowing(mShowStepControls);
-            mToneDropdowns[i]->SetPosition(gridX+boxWidth*i, controlYPos);
-            mToneDropdowns[i]->SetWidth(boxWidth);
-            mToneDropdowns[i]->Draw();
-            
-            mVelocitySliders[i]->SetShowing(mShowStepControls);
-            mVelocitySliders[i]->SetPosition(gridX+boxWidth*i, controlYPos+17);
-            mVelocitySliders[i]->SetDimensions(boxWidth, 15);
-            mVelocitySliders[i]->Draw();
-            
-            mLengthSliders[i]->SetShowing(mShowStepControls);
-            mLengthSliders[i]->SetPosition(gridX+boxWidth*i, controlYPos+32);
-            mLengthSliders[i]->SetDimensions(boxWidth, 15);
-            mLengthSliders[i]->Draw();
-         }
-         else
-         {
-            mToneDropdowns[i]->SetShowing(false);
-            mVelocitySliders[i]->SetShowing(false);
-            mLengthSliders[i]->SetShowing(false);
-         }
+         mToneDropdowns[i]->SetShowing(mShowStepControls);
+         mToneDropdowns[i]->SetPosition(gridX+boxWidth*i, controlYPos);
+         mToneDropdowns[i]->SetWidth(boxWidth);
+         mToneDropdowns[i]->Draw();
+         
+         mVelocitySliders[i]->SetShowing(mShowStepControls);
+         mVelocitySliders[i]->SetPosition(gridX+boxWidth*i, controlYPos+17);
+         mVelocitySliders[i]->SetDimensions(boxWidth, 15);
+         mVelocitySliders[i]->Draw();
+         
+         mLengthSliders[i]->SetShowing(mShowStepControls);
+         mLengthSliders[i]->SetPosition(gridX+boxWidth*i, controlYPos+32);
+         mLengthSliders[i]->SetDimensions(boxWidth, 15);
+         mLengthSliders[i]->Draw();
+      }
+      else
+      {
+         mToneDropdowns[i]->SetShowing(false);
+         mVelocitySliders[i]->SetShowing(false);
+         mLengthSliders[i]->SetShowing(false);
       }
    }
    
@@ -345,9 +346,9 @@ void NoteStepSequencer::GridUpdated(UIGrid* grid, int col, int row, float value,
 {
    if (grid == mGrid)
    {
-      for (int i=0; i<mLength; ++i)
+      for (int i=0; i<mGrid->GetCols(); ++i)
       {
-         for (int j=0; j<mNoteRange; ++j)
+         for (int j=0; j<mGrid->GetRows(); ++j)
          {
             float val = mGrid->GetVal(i,j);
             if (val > 0)
@@ -361,20 +362,23 @@ void NoteStepSequencer::GridUpdated(UIGrid* grid, int col, int row, float value,
    }
    if (grid == mVelocityGrid)
    {
-      for (int i=0; i<mLength; ++i)
+      for (int i=0; i<mVelocityGrid->GetCols(); ++i)
          mVels[i] = mVelocityGrid->GetVal(i,0) * 127;
    }
 }
 
 int NoteStepSequencer::RowToPitch(int row)
 {
+   row += mRowOffset;
+   row -= mNoteRange / 2;
+   
    int numPitchesInScale = TheScale->NumPitchesInScale();
    switch (mNoteMode)
    {
       case kNoteMode_Scale:
-         return TheScale->GetPitchFromTone(row+mOctave*numPitchesInScale+TheScale->GetScaleDegree());
+         return TheScale->GetPitchFromTone(row+(mOctave+3)*numPitchesInScale+TheScale->GetScaleDegree());
       case kNoteMode_Chromatic:
-         return row + mOctave * TheScale->GetTet() + TheScale->ScaleRoot();
+         return row + (mOctave+3) * TheScale->GetTet() + TheScale->ScaleRoot();
       case kNoteMode_Fifths:
       {
          int oct = (row/2)*numPitchesInScale;
@@ -382,7 +386,7 @@ int NoteStepSequencer::RowToPitch(int row)
          int fifths = oct;
          if (isFifth)
             fifths += 4;
-         return TheScale->GetPitchFromTone(fifths+mOctave*numPitchesInScale+TheScale->GetScaleDegree());
+         return TheScale->GetPitchFromTone(fifths+(mOctave+3)*numPitchesInScale+TheScale->GetScaleDegree());
 
       }
    }
@@ -677,6 +681,22 @@ void NoteStepSequencer::OnMidiControl(MidiControl& control)
    }
 }
 
+void NoteStepSequencer::PlayNote(double time, int pitch, int velocity, int voiceIdx, ModulationParameters modulation)
+{
+   if (velocity > 0)
+   {
+      int tet = TheScale->GetTet();
+      mOctave = (pitch - TheScale->ScaleRoot()) / tet - 3;
+      
+      if (mNoteMode == kNoteMode_Scale)
+         mRowOffset = TheScale->GetToneFromPitch(pitch) % TheScale->NumPitchesInScale();
+      else if (mNoteMode == kNoteMode_Chromatic)
+         mRowOffset = ((pitch % tet) - (TheScale->ScaleRoot() % tet) + tet) % tet;
+      else if (mNoteMode == kNoteMode_Fifths)
+         mRowOffset = 0;
+   }
+}
+
 void NoteStepSequencer::ShiftSteps(int amount)
 {
    int newTones[NSS_MAX_STEPS];
@@ -719,7 +739,21 @@ void NoteStepSequencer::ButtonClicked(ClickButton* button)
    if (button == mRandomizeVelocityButton)
    {
       for (int i=0; i<mNumSteps; ++i)
-         mVels[i] = rand() % 128;
+      {
+         switch (rand() % 4)
+         {
+            case 0:
+               mVels[i] = 0;
+               break;
+            case 1:
+            case 2:
+               mVels[i] = 80;
+               break;
+            case 3:
+               mVels[i] = 127;
+               break;
+         }
+      }
       SyncGridToSeq();
    }
 }
@@ -749,6 +783,8 @@ void NoteStepSequencer::DropdownUpdated(DropdownList* list, int oldVal)
    }
    if (list == mNoteModeSelector)
    {
+      if (mNoteMode != oldVal)
+         mRowOffset = 0;
       SetUpStepControls();
    }
    for (int i=0; i<NSS_MAX_STEPS; ++i)

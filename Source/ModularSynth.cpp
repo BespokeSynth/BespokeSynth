@@ -1575,6 +1575,7 @@ void ModularSynth::SaveState(string file)
 void ModularSynth::LoadState(string file)
 {
    mAudioThreadMutex.Lock("LoadState()");
+   LockRender(true);
    
    FileStreamIn in(ofToDataPath(file).c_str());
    
@@ -1588,6 +1589,7 @@ void ModularSynth::LoadState(string file)
    
    TheTransport->Reset();
    
+   LockRender(false);
    mAudioThreadMutex.Unlock();
 }
 

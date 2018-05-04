@@ -26,6 +26,7 @@ void QuickSpawnMenu::Init()
 
 void QuickSpawnMenu::KeyPressed(int key, bool isRepeat)
 {
+   IDrawableModule::KeyPressed(key, isRepeat);
    if (key >= 'a' && key <= 'z' && !isRepeat && GetKeyModifiers() == kModifier_None)
    {
       mElements = TheSynth->GetModuleFactory()->GetSpawnableModules((char)key);

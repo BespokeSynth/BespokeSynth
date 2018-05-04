@@ -301,7 +301,10 @@ void MidiController::OnMidiControl(MidiControl& control)
    
    if (control.mControl == mModwheelCC)
    {
-      mModulation.GetModWheel(voiceIdx)->SetValue(control.mValue / 127.0f);
+      if (mModwheelCC == 74) //MPE
+         mModulation.GetModWheel(voiceIdx)->SetValue((control.mValue-63) / 127.0f * 2);
+      else
+         mModulation.GetModWheel(voiceIdx)->SetValue(control.mValue / 127.0f);
    }
    
    MidiReceived(kMidiMessage_Control, control.mControl, control.mValue/127.0f, control.mChannel);
@@ -1338,6 +1341,20 @@ void MidiController::DropdownUpdated(DropdownList* list, int oldVal)
       mDeviceOut = hasOutput ? deviceName : "";
       mModuleSaveData.SetString("devicein", mDeviceIn);
       mModuleSaveData.SetString("deviceout", mDeviceOut);
+      
+      if (strstr(deviceName.c_str(), "Seaboard") != nullptr ||
+          strstr(deviceName.c_str(), "Lightpad BLOCK") != nullptr ||
+          strstr(deviceName.c_str(), "Linnstrument") != nullptr)
+      {
+         SetUseChannelAsVoice(true);
+         SetPitchBendRange(48);
+         mModwheelCC = 74;
+         
+         mModuleSaveData.SetBool("usechannelasvoice", mUseChannelAsVoice);
+         mModuleSaveData.SetFloat("pitchbendrange", mPitchBendRange);
+         mModuleSaveData.SetInt("modwheelcc(1or74)", mModwheelCC);
+      }
+      
       ConnectDevice();
       OnDeviceChanged();
    }

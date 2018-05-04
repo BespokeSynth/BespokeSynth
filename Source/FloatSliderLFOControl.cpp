@@ -198,6 +198,26 @@ void FloatSliderLFOControl::SetOwner(FloatSlider* owner)
    InitializeRange();
 }
 
+void FloatSliderLFOControl::RandomizeSettings()
+{
+   switch (rand() % 8)
+   {
+      case 0: mLFOSettings.mInterval = kInterval_2; break;
+      case 1: mLFOSettings.mInterval = kInterval_1n; break;
+      case 2: mLFOSettings.mInterval = kInterval_2n; break;
+      case 3: mLFOSettings.mInterval = kInterval_4n; break;
+      case 4: mLFOSettings.mInterval = kInterval_4nt; break;
+      case 5: mLFOSettings.mInterval = kInterval_8n; break;
+      case 6: mLFOSettings.mInterval = kInterval_8nt; break;
+      case 7:
+         mLFOSettings.mInterval = kInterval_Free;
+         mLFOSettings.mFreeRate = ofRandom(.1f, 20);
+         break;
+   }
+   UpdateFromSettings();
+   UpdateVisibleControls();
+}
+
 void FloatSliderLFOControl::PostRepatch(PatchCableSource* cableSource)
 {
    SetOwner(dynamic_cast<FloatSlider*>(mTargetCable->GetTarget()));
@@ -388,6 +408,7 @@ FloatSliderLFOControl* LFOPool::GetLFO(FloatSlider* owner)
    sNextLFOIndex = (index+1) % LFO_POOL_SIZE;
    if (sLFOPool[index]->GetOwner())
       sLFOPool[index]->GetOwner()->SetLFO(nullptr);   //revoke LFO
+   sLFOPool[index]->RandomizeSettings();
    sLFOPool[index]->SetOwner(owner);
    return sLFOPool[index];
 }

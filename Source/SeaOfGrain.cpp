@@ -16,7 +16,7 @@
 
 const float mBufferX = 5;
 const float mBufferY = 100;
-const float mBufferW = 1600;
+const float mBufferW = 800;
 const float mBufferH = 200;
 
 SeaOfGrain::SeaOfGrain()
@@ -24,40 +24,28 @@ SeaOfGrain::SeaOfGrain()
 , mVolumeSlider(nullptr)
 , mSample(nullptr)
 , mLoading(false)
-, mEverythingButton(nullptr)
-, mFancyButton(nullptr)
-, mStarWarsButton(nullptr)
-, mGodOnlyKnowsButton(nullptr)
-, mKeyOffset(40)
+, mKeyOffset(0)
 , mKeyOffsetSlider(nullptr)
 , mDisplayKeys(61)
 , mDisplayKeysSlider(nullptr)
 , mKeyboardBaseNote(36)
 , mKeyboardBaseNoteSelector(nullptr)
-, mSliceMode(1)
-, mSliceModeSelector(nullptr)
 {
    mWriteBuffer = new float[gBufferSize];
    Clear(mWriteBuffer, gBufferSize);
    mSample = new Sample();
    
-   vector<string> fake;
-   fake.push_back(ofToDataPath("01 - Reflektor.mp3",true));
-   FilesDropped(fake, 0, 0);
+   for (float i=0; i<1; i += .01f)
+      mSlices.push_back(i);
 }
 
 void SeaOfGrain::CreateUIControls()
 {
    IDrawableModule::CreateUIControls();
    mVolumeSlider = new FloatSlider(this,"volume",5,20,150,15,&mVolume,0,2);
-   mEverythingButton = new ClickButton(this,"everything",300,10);
-   mFancyButton = new ClickButton(this,"fancy",300,30);
-   mStarWarsButton = new ClickButton(this,"star wars",300,50);
-   mGodOnlyKnowsButton = new ClickButton(this,"god only knows",300,70);
    mKeyOffsetSlider = new IntSlider(this,"key offset", 5,40,150,15,&mKeyOffset,0,1000);
    mDisplayKeysSlider = new IntSlider(this,"num display keys", 5,60,150,15,&mDisplayKeys,0,200);
    mKeyboardBaseNoteSelector = new DropdownList(this,"keyboard base note", 5, 80, &mKeyboardBaseNote);
-   mSliceModeSelector = new DropdownList(this,"slice mode",200,80,&mSliceMode);
    
    mKeyboardBaseNoteSelector->AddLabel("0", 0);
    mKeyboardBaseNoteSelector->AddLabel("12", 12);
@@ -65,9 +53,6 @@ void SeaOfGrain::CreateUIControls()
    mKeyboardBaseNoteSelector->AddLabel("36", 36);
    mKeyboardBaseNoteSelector->AddLabel("48", 48);
    mKeyboardBaseNoteSelector->AddLabel("60", 60);
-   
-   mSliceModeSelector->AddLabel("beats",0);
-   mSliceModeSelector->AddLabel("tatums",1);
 }
 
 SeaOfGrain::~SeaOfGrain()
@@ -95,27 +80,22 @@ void SeaOfGrain::Process(double time)
    
    Clear(mWriteBuffer, bufferSize);
    for (int i=0; i<NUM_SEAOFGRAIN_VOICES; ++i)
-      mVoices[i].Process(mWriteBuffer, bufferSize, mSample->Data()->GetChannel(0), mSample->LengthInSamples(), mKeyOffset, GetSlices());
+      mVoices[i].Process(mWriteBuffer, bufferSize, mSample->Data()->GetChannel(0), GetSampleLength(), mKeyOffset, mSlices);
+   Mult(mWriteBuffer, mVolume, bufferSize);
    GetVizBuffer()->WriteChunk(mWriteBuffer, bufferSize, 0);
    
    Add(out, mWriteBuffer, bufferSize);
 }
 
 void SeaOfGrain::DrawModule()
-{  
-
+{
    if (Minimized() || IsVisible() == false)
       return;
    
    mVolumeSlider->Draw();
-   mEverythingButton->Draw();
-   mFancyButton->Draw();
-   mStarWarsButton->Draw();
-   mGodOnlyKnowsButton->Draw();
    mKeyOffsetSlider->Draw();
    mDisplayKeysSlider->Draw();
    mKeyboardBaseNoteSelector->Draw();
-   mSliceModeSelector->Draw();
    
    if (mSample)
    {
@@ -123,9 +103,9 @@ void SeaOfGrain::DrawModule()
       ofTranslate(mBufferX,mBufferY);
       ofPushStyle();
       
-      int length = mSample->LengthInSamples();
-      int sampleStart = GetSlices()[mKeyOffset] * length;
-      int sampleLength = (GetSlices()[mKeyOffset + mDisplayKeys] - GetSlices()[mKeyOffset]) * length;
+      int length = GetSampleLength();
+      int sampleStart = mSlices[mKeyOffset] * length;
+      int sampleLength = (mSlices[mKeyOffset + mDisplayKeys] - mSlices[mKeyOffset]) * length;
       sampleLength = MAX(1, sampleLength);
       
       mSample->LockDataMutex(true);
@@ -149,6 +129,13 @@ void SeaOfGrain::DrawModule()
    }
 }
 
+int SeaOfGrain::GetSampleLength() const
+{
+   if (mSample == nullptr)
+      return 0;
+   return MIN(mSample->LengthInSamples(), gSampleRate * 10);
+}
+
 void SeaOfGrain::FilesDropped(vector<string> files, int x, int y)
 {
    mLoading = true;
@@ -157,122 +144,7 @@ void SeaOfGrain::FilesDropped(vector<string> files, int x, int y)
    
    mSample->Read(files[0].c_str());
    
-   ResetRead();
-   
-   vector<string> tokens = ofSplitString(files[0].c_str(),"/");
-   string cachedFilename = tokens[tokens.size()-1].c_str();
-   tokens = ofSplitString(cachedFilename, ".");
-   cachedFilename = tokens[0]+".cached";
-   bool hasCached = File(ofToDataPath(cachedFilename)).existsAsFile();
-   
-   ofLog() << cachedFilename << " exists: " << (hasCached ? "true" : "false");
-   
-   FILE* output;
-   FILE* cachedFile;
-   if (!hasCached)   //have to look it up with echonest
-   {
-      char command[2048];
-      sprintf(command,"export ECHO_NEST_API_KEY=SUZ3W7PAIVQQXZCAW; export PATH=/usr/local/bin:$PATH; python \"%s\" \"%s\"", ofToDataPath("get_echonest_remix_data.py",true).c_str(), files[0].c_str());
-      output = popen(command, "r");
-      cachedFile = fopen(ofToDataPath(cachedFilename).c_str(), "w");
-   }
-   else
-   {
-      output = fopen(ofToDataPath(cachedFilename).c_str(),"r");
-   }
-   
-   char c;
-   char line[512];
-   bzero(line,512);
-   int linepos = 0;
-   do
-   {
-      c = fgetc(output);
-      if (!hasCached)
-         fputc(c,cachedFile);
-      //printf("%c",c);
-      if (c == '\n' || c == EOF)
-      {
-         ReadEchonestLine(line);
-         
-         linepos = 0;
-         bzero(line,512);
-      }
-      else
-      {
-         line[linepos++] = c;
-      }
-   } while (c != EOF);
-   
-   if (hasCached)
-   {
-      fclose(output);
-   }
-   else
-   {
-      pclose(output);
-      fclose(cachedFile);
-   }
-   
    mLoading = false;
-}
-
-void SeaOfGrain::ResetRead()
-{
-   mReadState = kReadState_Start;
-   mBeats.clear();
-   mTatums.clear();
-}
-
-void SeaOfGrain::ReadEchonestLine(const char* line)
-{
-   vector<string> tokens = ofSplitString(line," ");
-   if (tokens.size() == 1)
-   {
-      if (tokens[0] == "bars")
-         mReadState = kReadState_Bars;
-      if (tokens[0] == "beats")
-         mReadState = kReadState_Beats;
-      if (tokens[0] == "tatums")
-         mReadState = kReadState_Tatums;
-      if (tokens[0] == "sections")
-         mReadState = kReadState_Sections;
-      if (tokens[0] == "segments")
-         mReadState = kReadState_Segments;
-   }
-   else
-   {
-      float lengthInSeconds = mSample->LengthInSamples() / gSampleRate;
-      
-      if (mReadState == kReadState_Bars || mReadState == kReadState_Beats || mReadState == kReadState_Tatums)
-         assert(tokens.size() == 3);
-      if (mReadState == kReadState_Sections || mReadState == kReadState_Segments)
-         assert(tokens.size() == 2);
-      
-      float adjustSeconds = -.062f;
-      float start = (ofToFloat(tokens[0]) + adjustSeconds) / lengthInSeconds;
-      //float duration = ofToFloat(tokens[1]) / lengthInSeconds;
-      //float confidence = tokens.size() == 3 ? ofToFloat(tokens[2]) : 1;
-      
-      if (mReadState == kReadState_Bars)
-      {
-      }
-      if (mReadState == kReadState_Beats)
-      {
-         ofLog() << "beat " << start;
-         mBeats.push_back(start);
-      }
-      if (mReadState == kReadState_Tatums)
-      {
-         mTatums.push_back(start);
-      }
-      if (mReadState == kReadState_Sections)
-      {
-      }
-      if (mReadState == kReadState_Segments)
-      {
-      }
-   }
 }
 
 void SeaOfGrain::DropdownClicked(DropdownList* list)
@@ -289,38 +161,6 @@ void SeaOfGrain::UpdateSample()
 
 void SeaOfGrain::ButtonClicked(ClickButton *button)
 {
-   if (button == mEverythingButton)
-   {
-      mKeyOffset = 172;
-      mSliceMode = 1;
-      vector<string> fake;
-      fake.push_back(ofToDataPath("1. Everything In Its Right Place.mp3",true));
-      FilesDropped(fake, 0, 0);
-   }
-   if (button == mFancyButton)
-   {
-      mKeyOffset = 1;
-      mSliceMode = 1;
-      vector<string> fake;
-      fake.push_back(ofToDataPath("Iggy Azalea - Fancy ft. Charli XCX.mp3",true));
-      FilesDropped(fake, 0, 0);
-   }
-   if (button == mStarWarsButton)
-   {
-      mKeyOffset = 0;
-      mSliceMode = 1;
-      vector<string> fake;
-      fake.push_back(ofToDataPath("John Williams - Star Wars Main Theme (FULL).mp3",true));
-      FilesDropped(fake, 0, 0);
-   }
-   if (button == mGodOnlyKnowsButton)
-   {
-      mKeyOffset = 41;
-      mSliceMode = 1;
-      vector<string> fake;
-      fake.push_back(ofToDataPath("God Only Knows - The Beach Boys, a cappella.mp3",true));
-      FilesDropped(fake, 0, 0);
-   }
 }
 
 void SeaOfGrain::OnClicked(int x, int y, bool right)
@@ -370,6 +210,7 @@ void SeaOfGrain::PlayNote(double time, int pitch, int velocity, int voiceIdx, Mo
    mVoices[voiceIdx].mPlay = 0;
    mVoices[voiceIdx].mPitchBend = modulation.pitchBend;
    mVoices[voiceIdx].mPressure = modulation.pressure;
+   mVoices[voiceIdx].mModWheel = modulation.modWheel;
 }
 
 void SeaOfGrain::LoadLayout(const ofxJSONElement& moduleInfo)
@@ -384,45 +225,75 @@ void SeaOfGrain::SetUpFromSaveData()
    SetTarget(TheSynth->FindModule(mModuleSaveData.GetString("target")));
 }
 
+namespace
+{
+   const int kSaveStateRev = 0;
+}
+
+void SeaOfGrain::SaveState(FileStreamOut& out)
+{
+   IDrawableModule::SaveState(out);
+   
+   out << kSaveStateRev;
+   
+   mSample->SaveState(out);
+}
+
+void SeaOfGrain::LoadState(FileStreamIn& in)
+{
+   IDrawableModule::LoadState(in);
+   
+   int rev;
+   in >> rev;
+   LoadStateValidate(rev <= kSaveStateRev);
+   
+   mSample->LoadState(in);
+}
+
+
 SeaOfGrain::GrainVoice::GrainVoice()
 : mADSR(100,0,1,100)
 , mPitch(0)
-, mPitchBend(0)
-, mPressure(0)
+, mPitchBend(nullptr)
+, mPressure(nullptr)
+, mModWheel(nullptr)
 , mGain(0)
 {
    mGranulator.mGrainLengthMs = 150;
 }
 
-void SeaOfGrain::GrainVoice::Process(float* out, float outLength, float* sample, int sampleLength, int keyOffset, const vector<float>& beats)
+void SeaOfGrain::GrainVoice::Process(float* out, int outLength, float* sample, int sampleLength, int keyOffset, const vector<float>& slices)
 {
-   if (!mADSR.IsDone(gTime))
+   if (!mADSR.IsDone(gTime) && sampleLength > 0)
    {
       double time = gTime;
       for (int i=0; i<outLength; ++i)
       {
          float pitchBend = mPitchBend ? mPitchBend->GetValue(i) : 0;
          float pressure = mPressure ? mPressure->GetValue(i) : 0;
+         float modwheel = mModWheel ? mModWheel->GetValue(i) : 0;
          if (pressure > 0)
          {
             mGranulator.mGrainSpacing = ofMap(pressure * pressure, 0, 1, .3f, 1.0f / MAX_GRAINS);
             mGranulator.mPosRandomizeMs = ofMap(pressure * pressure, 0, 1, 100, .03f);
          }
+         mGranulator.mGrainLengthMs = ofMap(modwheel, -1, 1, 150-140, 150+140);
          
-         float position = keyOffset + mPitch + pitchBend + MIN(.125f, mPlay);
+         double position = keyOffset + mPitch + pitchBend + MIN(.125f, mPlay);
          int intPosition = position;
-         float positionPart = position - intPosition;
+         double positionPart = position - intPosition;
          
-         float beat = ofMap(positionPart, 0, 1, beats[intPosition] * sampleLength, beats[intPosition+1] * sampleLength);
+         float slice = ofMap(positionPart, 0, 1, slices[intPosition] * sampleLength, slices[intPosition+1] * sampleLength);
          
          float blend = .0005f;
          mGain = mGain * (1-blend) + pressure * blend;
          
          ChannelBuffer temp(sample, sampleLength);
          float outSample[1];
-         mGranulator.Process(time, &temp, sampleLength, beat, outSample);
+         outSample[0] = 0;
+         mGranulator.Process(time, &temp, sampleLength, slice, outSample);
          outSample[0] *= sqrtf(mGain);
-         outSample[0] *= mADSR.Value(gTime);
+         outSample[0] *= mADSR.Value(time);
          out[i] += outSample[0];
          time += gInvSampleRateMs;
          mPlay += .001f;
@@ -442,6 +313,7 @@ void SeaOfGrain::GrainVoice::Draw(float w, float h, float offset, float length, 
       {
          float pitchBend = mPitchBend ? mPitchBend->GetValue(0) : 0;
          float pressure = mPressure ? mPressure->GetValue(0) : 0;
+         float modWheel = mModWheel ? mModWheel->GetValue(0) : 0;
          
          ofPushStyle();
          ofFill();

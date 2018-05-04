@@ -57,6 +57,7 @@ protected:
    double mStartTime;
    bool mNoteOn;
    bool mNoteOnByTrigger;
+   int mVoiceIndex;
 };
 
 #endif /* defined(__Bespoke__NoteCreator__) */

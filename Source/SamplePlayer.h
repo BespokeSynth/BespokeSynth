@@ -58,6 +58,8 @@ public:
    void LoadLayout(const ofxJSONElement& moduleInfo) override;
    void SaveLayout(ofxJSONElement& moduleInfo) override;
    void SetUpFromSaveData() override;
+   void SaveState(FileStreamOut& out) override;
+   void LoadState(FileStreamIn& in) override;
    
 private:
    void UpdateSample(Sample* sample, bool ownsSample);

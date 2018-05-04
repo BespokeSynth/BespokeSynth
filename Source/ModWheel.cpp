@@ -40,7 +40,7 @@ void ModWheel::PlayNote(double time, int pitch, int velocity, int voiceIdx, Modu
 {
    if (mEnabled)
    {
-      mModulation.GetModWheel(voiceIdx)->AppendTo(modulation.pressure);
+      mModulation.GetModWheel(voiceIdx)->AppendTo(modulation.modWheel);
       modulation.modWheel = mModulation.GetModWheel(voiceIdx);
    }
    
