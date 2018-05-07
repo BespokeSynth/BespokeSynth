@@ -33,11 +33,10 @@ public:
    float mDetune;
    float mShuffle;
    float mPhaseOffset;
+   int mUnison;
    
    float mFilterCutoff;
    ADSR mFilterAdsr;
-   
-   bool mPressureEnvelope;
 };
 
 class SingleOscillatorVoice : public IMidiVoice
@@ -53,10 +52,19 @@ public:
    bool Process(double time, float* out, int bufferSize) override;
    void SetVoiceParams(IVoiceParams* params) override;
    bool IsDone(double time) override;
+   
+   static const int kMaxUnison = 8;
 private:
-   float mPhase;
-   float mSyncPhase;
-   EnvOscillator mOsc;
+   struct OscData
+   {
+      OscData() : mPhase(0), mSyncPhase(0), mOsc(kOsc_Square), mDetuneFactor(0) {}
+      float mPhase;
+      float mSyncPhase;
+      Oscillator mOsc;
+      float mDetuneFactor;
+   };
+   OscData mOscData[kMaxUnison];
+   ADSR mAdsr;
    OscillatorVoiceParams* mVoiceParams;
    double mStartTime;
    

@@ -76,6 +76,7 @@ private:
    Checkbox* mSyncCheckbox;
    FloatSlider* mSyncFreqSlider;
    FloatSlider* mDetuneSlider;
+   IntSlider* mUnisonSlider;
    FloatSlider* mShuffleSlider;
    float mLengthMultiplier;
    FloatSlider* mLengthMultiplierSlider;
