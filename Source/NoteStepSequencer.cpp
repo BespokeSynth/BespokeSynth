@@ -63,27 +63,11 @@ NoteStepSequencer::NoteStepSequencer()
    
    for (int i=0;i<NSS_MAX_STEPS;++i)
    {
-      switch (rand() % 5)
-      {
-         case 0:
-            mTones[i] = 0;
-            break;
-         case 1:
-            mTones[i] = 4;
-            break;
-         case 2:
-            mTones[i] = 7;
-            break;
-         case 3:
-            mTones[i] = 11;
-            break;
-         case 4:
-            mTones[i] = 14;
-            break;
-      }
       mVels[i] = 80;
       mNoteLengths[i] = 1;
    }
+   
+   RandomizePitches(true);
    
    SetIsNoteOrigin(true);
    
@@ -726,8 +710,7 @@ void NoteStepSequencer::ButtonClicked(ClickButton* button)
       ShiftSteps(1);
    if (button == mRandomizePitchButton)
    {
-      for (int i=0; i<mNumSteps; ++i)
-         mTones[i] = rand() % mNoteRange;
+      RandomizePitches(GetKeyModifiers() & kModifier_Shift);
       SyncGridToSeq();
    }
    if (button == mRandomizeLengthButton)
@@ -755,6 +738,39 @@ void NoteStepSequencer::ButtonClicked(ClickButton* button)
          }
       }
       SyncGridToSeq();
+   }
+}
+
+void NoteStepSequencer::RandomizePitches(bool fifths)
+{
+   if (fifths)
+   {
+      for (int i=0; i<mNumSteps; ++i)
+      {
+         switch (rand() % 5)
+         {
+            case 0:
+               mTones[i] = 0;
+               break;
+            case 1:
+               mTones[i] = 4;
+               break;
+            case 2:
+               mTones[i] = 7;
+               break;
+            case 3:
+               mTones[i] = 11;
+               break;
+            case 4:
+               mTones[i] = 14;
+               break;
+         }
+      }
+   }
+   else
+   {
+      for (int i=0; i<mNumSteps; ++i)
+         mTones[i] = rand() % mNoteRange;
    }
 }
 

@@ -102,6 +102,7 @@ private:
    void SetUpStepControls();
    float ExtraWidth() const;
    float ExtraHeight() const;
+   void RandomizePitches(bool fifths);
    
    enum NoteMode
    {
