@@ -52,9 +52,8 @@ private:
    int mRootOctave;
    int mNumOctaves;
    int mPlayingMousePitch;
-   
    bool mTypingInput;
-   Checkbox* mTypingInputCheckbox;
+   bool mLatch;
 };
 
 #endif /* defined(__Bespoke__KeyboardDisplay__) */

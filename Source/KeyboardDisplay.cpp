@@ -12,7 +12,7 @@
 
 namespace
 {
-   const float kKeyboardYOffset = 15;
+   const float kKeyboardYOffset = 0;
 }
 
 KeyboardDisplay::KeyboardDisplay()
@@ -22,7 +22,6 @@ KeyboardDisplay::KeyboardDisplay()
 , mNumOctaves(3)
 , mPlayingMousePitch(-1)
 , mTypingInput(false)
-, mTypingInputCheckbox(nullptr)
 {
    SetIsNoteOrigin(true);
 }
@@ -30,8 +29,6 @@ KeyboardDisplay::KeyboardDisplay()
 void KeyboardDisplay::CreateUIControls()
 {
    IDrawableModule::CreateUIControls();
-   
-   mTypingInputCheckbox = new Checkbox(this, "typing input", 0, 0, &mTypingInput);
 }
 
 void KeyboardDisplay::DrawModule()
@@ -40,7 +37,6 @@ void KeyboardDisplay::DrawModule()
       return;
    
    DrawKeyboard(0,kKeyboardYOffset,mWidth,mHeight-kKeyboardYOffset);
-   mTypingInputCheckbox->Draw();
 }
 
 void KeyboardDisplay::PlayNote(double time, int pitch, int velocity, int voiceIdx, ModulationParameters modulation)
@@ -63,8 +59,20 @@ void KeyboardDisplay::OnClicked(int x, int y, bool right)
             {
                if ((pass == 0 && isBlackKey) || (pass == 1 && !isBlackKey))
                {
-                  mPlayingMousePitch = i+RootKey();
-                  PlayNote(gTime, mPlayingMousePitch, 127);
+                  int pitch = i+RootKey();
+                  if (mPlayingMousePitch == -1 || !mLatch)
+                  {
+                     PlayNote(gTime, pitch, 127);
+                     mPlayingMousePitch = pitch;
+                  }
+                  else
+                  {
+                     bool newNote = (mPlayingMousePitch != pitch);
+                     if (newNote)
+                        PlayNote(gTime, pitch, 127);
+                     PlayNote(gTime, mPlayingMousePitch, 0);
+                     mPlayingMousePitch = newNote ? pitch : -1;
+                  }
                   return;
                }
             }
@@ -76,7 +84,7 @@ void KeyboardDisplay::OnClicked(int x, int y, bool right)
 void KeyboardDisplay::MouseReleased()
 {
    IDrawableModule::MouseReleased();
-   if (mPlayingMousePitch != -1)
+   if (mPlayingMousePitch != -1 && !mLatch)
    {
       PlayNote(gTime, mPlayingMousePitch, 0);
       mPlayingMousePitch = -1;
@@ -251,6 +259,8 @@ void KeyboardDisplay::LoadLayout(const ofxJSONElement& moduleInfo)
    mModuleSaveData.LoadString("target", moduleInfo);
    mModuleSaveData.LoadInt("root_octave", moduleInfo, 3, 0, 10, K(isTextField));
    mModuleSaveData.LoadInt("num_octaves", moduleInfo, 3, 0, 10, K(isTextField));
+   mModuleSaveData.LoadBool("typing_control", moduleInfo, false);
+   mModuleSaveData.LoadBool("latch", moduleInfo, false);
    
    SetUpFromSaveData();
 }
@@ -260,5 +270,7 @@ void KeyboardDisplay::SetUpFromSaveData()
    SetUpPatchCables(mModuleSaveData.GetString("target"));
    mRootOctave = mModuleSaveData.GetInt("root_octave");
    mNumOctaves = mModuleSaveData.GetInt("num_octaves");
+   mTypingInput = mModuleSaveData.GetBool("typing_control");
+   mLatch = mModuleSaveData.GetBool("latch");
 }
 
