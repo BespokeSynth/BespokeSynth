@@ -77,6 +77,7 @@ private:
    FloatSlider* mSyncFreqSlider;
    FloatSlider* mDetuneSlider;
    IntSlider* mUnisonSlider;
+   FloatSlider* mUnisonWidthSlider;
    FloatSlider* mShuffleSlider;
    float mLengthMultiplier;
    FloatSlider* mLengthMultiplierSlider;

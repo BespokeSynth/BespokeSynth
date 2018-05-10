@@ -8,7 +8,6 @@
 
 #include "PolyphonyMgr.h"
 #include "IMidiVoice.h"
-#include "AdditiveVoice.h"
 #include "FMVoice.h"
 #include "KarplusStrongVoice.h"
 #include "SingleOscillatorVoice.h"
@@ -22,6 +21,7 @@ PolyphonyMgr::PolyphonyMgr(IDrawableModule* owner)
    , mFadeOutBufferPos(0)
    , mOwner(owner)
    , mFadeOutBuffer(kVoiceFadeSamples)
+   , mFadeOutWorkBuffer(kVoiceFadeSamples)
 {
 }
 
@@ -33,15 +33,7 @@ PolyphonyMgr::~PolyphonyMgr()
 
 void PolyphonyMgr::Init(VoiceType type, IVoiceParams* params)
 {
-   if (type == kVoiceType_Additive)
-   {
-      for (int i=0; i<kNumVoices; ++i)
-      {
-         mVoices[i].mVoice = new AdditiveVoice(mOwner);
-         mVoices[i].mVoice->SetVoiceParams(params);
-      }
-   }
-   else if (type == kVoiceType_FM)
+   if (type == kVoiceType_FM)
    {
       for (int i=0; i<kNumVoices; ++i)
       {
@@ -140,31 +132,26 @@ void PolyphonyMgr::Start(double time, int pitch, float amount, int voiceIdx, Mod
    assert(voice);
    voice->SetPitch(pitch);
    voice->SetModulators(modulation);
-   if (!preserveVoice || modulation.pan != mVoices[voiceIdx].mPan)
+   if (!preserveVoice || modulation.pan != voice->GetPan())
    {
       Clear(mWorkBuffer, kVoiceFadeSamples);
-      voice->Process(time, mWorkBuffer, kVoiceFadeSamples);
+      voice->Process(time, &mFadeOutWorkBuffer);
       for (int i=0; i<kVoiceFadeSamples; ++i)
       {
          float fade = 1 - (float(i) / kVoiceFadeSamples);
-         if (mFadeOutBuffer.NumActiveChannels() == 2)
+         for (int ch=0; ch<mFadeOutBuffer.NumActiveChannels(); ++ch)
          {
-            mFadeOutBuffer.GetChannel(0)[(i+mFadeOutBufferPos) % kVoiceFadeSamples] += mWorkBuffer[i] * fade * GetLeftPanGain(mVoices[voiceIdx].mPan);
-            mFadeOutBuffer.GetChannel(1)[(i+mFadeOutBufferPos) % kVoiceFadeSamples] += mWorkBuffer[i] * fade * GetRightPanGain(mVoices[voiceIdx].mPan);
-         }
-         else
-         {
-            mFadeOutBuffer.GetChannel(0)[(i+mFadeOutBufferPos) % kVoiceFadeSamples] += mWorkBuffer[i] * fade;
+            mFadeOutBuffer.GetChannel(ch)[(i+mFadeOutBufferPos) % kVoiceFadeSamples] += mFadeOutWorkBuffer.GetChannel(ch)[i] * fade;
          }
       }
       voice->ClearVoice();
    }
    voice->Start(time, amount);
+   voice->SetPan(modulation.pan);
    mLastVoice = voiceIdx;
    
    mVoices[voiceIdx].mPitch = pitch;
    mVoices[voiceIdx].mTime = time;
-   mVoices[voiceIdx].mPan = modulation.pan;
 }
 
 void PolyphonyMgr::Stop(double time, int pitch)
@@ -181,29 +168,12 @@ void PolyphonyMgr::Process(double time, ChannelBuffer* out, int bufferSize)
    Profiler profiler("PolyphonyMgr");
    
    mFadeOutBuffer.SetNumActiveChannels(out->NumActiveChannels());
+   mFadeOutWorkBuffer.SetNumActiveChannels(out->NumActiveChannels());
 
    for (int i=0; i<kNumVoices; ++i)
    {
       Clear(mWorkBuffer, bufferSize);
-      if (mVoices[i].mVoice->Process(time, mWorkBuffer, bufferSize))
-      {
-         if (out->NumActiveChannels() == 2)
-         {
-            //left
-            BufferCopy(gWorkBuffer, mWorkBuffer, bufferSize);
-            Mult(gWorkBuffer, GetLeftPanGain(mVoices[i].mPan), bufferSize);
-            Add(out->GetChannel(0), gWorkBuffer, bufferSize);
-            
-            //right
-            BufferCopy(gWorkBuffer, mWorkBuffer, bufferSize);
-            Mult(gWorkBuffer, GetRightPanGain(mVoices[i].mPan), bufferSize);
-            Add(out->GetChannel(1), gWorkBuffer, bufferSize);
-         }
-         else
-         {
-            Add(out->GetChannel(0), mWorkBuffer, bufferSize);
-         }
-      }
+      mVoices[i].mVoice->Process(time, out);
       
       if (mVoices[i].mPitch != -1 && mVoices[i].mVoice->IsDone(time))
          mVoices[i].mPitch = -1;
@@ -220,14 +190,4 @@ void PolyphonyMgr::Process(double time, ChannelBuffer* out, int bufferSize)
    }
    
    mFadeOutBufferPos += bufferSize;
-}
-
-float PolyphonyMgr::GetLeftPanGain(float pan)
-{
-   return ofMap(pan, 0, 1, 1, 0, true) + ofMap(pan, -1, 0, 1, 0, true);
-}
-
-float PolyphonyMgr::GetRightPanGain(float pan)
-{
-   return ofMap(pan, -1, 0, 0, 1, true) + ofMap(pan, 0, 1, 0, 1, true);
 }

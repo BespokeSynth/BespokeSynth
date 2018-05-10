@@ -371,7 +371,6 @@
     <ClCompile Include="..\..\Source\Checkbox.cpp"/>
     <ClCompile Include="..\..\Source\TextEntry.cpp"/>
     <ClCompile Include="..\..\Source\IUIControl.cpp"/>
-    <ClCompile Include="..\..\Source\AdditiveVoice.cpp"/>
     <ClCompile Include="..\..\Source\ADSR.cpp"/>
     <ClCompile Include="..\..\Source\ADSRDisplay.cpp"/>
     <ClCompile Include="..\..\Source\ArrangementMaster.cpp"/>
@@ -402,7 +401,6 @@
     <ClCompile Include="..\..\Source\IModulator.cpp"/>
     <ClCompile Include="..\..\Source\INoteSource.cpp"/>
     <ClCompile Include="..\..\Source\JumpBlender.cpp"/>
-    <ClCompile Include="..\..\Source\KarplusRetriggerVoice.cpp"/>
     <ClCompile Include="..\..\Source\KarplusStrongVoice.cpp"/>
     <ClCompile Include="..\..\Source\LaunchpadInterpreter.cpp"/>
     <ClCompile Include="..\..\Source\LFO.cpp"/>
@@ -2313,7 +2311,6 @@
     <ClInclude Include="..\..\Source\Checkbox.h"/>
     <ClInclude Include="..\..\Source\TextEntry.h"/>
     <ClInclude Include="..\..\Source\IUIControl.h"/>
-    <ClInclude Include="..\..\Source\AdditiveVoice.h"/>
     <ClInclude Include="..\..\Source\ADSR.h"/>
     <ClInclude Include="..\..\Source\ADSRDisplay.h"/>
     <ClInclude Include="..\..\Source\ArrangementMaster.h"/>
@@ -2352,7 +2349,6 @@
     <ClInclude Include="..\..\Source\IPollable.h"/>
     <ClInclude Include="..\..\Source\IVoiceParams.h"/>
     <ClInclude Include="..\..\Source\JumpBlender.h"/>
-    <ClInclude Include="..\..\Source\KarplusRetriggerVoice.h"/>
     <ClInclude Include="..\..\Source\KarplusStrongVoice.h"/>
     <ClInclude Include="..\..\Source\LaunchpadInterpreter.h"/>
     <ClInclude Include="..\..\Source\LFO.h"/>

@@ -11,6 +11,7 @@
 #include "SynthGlobals.h"
 #include "Scale.h"
 #include "Profiler.h"
+#include "ChannelBuffer.h"
 
 SampleVoice::SampleVoice(IDrawableModule* owner)
 : mPos(0)
@@ -27,7 +28,7 @@ bool SampleVoice::IsDone(double time)
    return mAdsr.IsDone(time);
 }
 
-bool SampleVoice::Process(double time, float* out, int bufferSize)
+bool SampleVoice::Process(double time, ChannelBuffer* out)
 {
    Profiler profiler("SampleVoice");
 
@@ -38,7 +39,7 @@ bool SampleVoice::Process(double time, float* out, int bufferSize)
    
    float volSq = mVoiceParams->mVol * mVoiceParams->mVol;
    
-   for (int pos=0; pos<bufferSize; ++pos)
+   for (int pos=0; pos<out->BufferSize(); ++pos)
    {
       if (mOwner)
          mOwner->ComputeSliders(pos);
@@ -50,7 +51,16 @@ bool SampleVoice::Process(double time, float* out, int bufferSize)
       else
          speed = freq/TheScale->PitchToFreq(TheScale->ScaleRoot()+48);
       
-      out[pos] += GetInterpolatedSample(mPos, mVoiceParams->mSampleData, mVoiceParams->mSampleLength) * mAdsr.Value(time) * volSq;
+      float sample = GetInterpolatedSample(mPos, mVoiceParams->mSampleData, mVoiceParams->mSampleLength) * mAdsr.Value(time) * volSq;
+      if (out->NumActiveChannels() == 1)
+      {
+         out->GetChannel(0)[pos] += sample;
+      }
+      else
+      {
+         out->GetChannel(0)[pos] += sample * GetLeftPanGain(GetPan());
+         out->GetChannel(1)[pos] += sample * GetRightPanGain(GetPan());
+      }
       
       mPos += speed;
       

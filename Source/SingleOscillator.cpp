@@ -26,6 +26,7 @@ SingleOscillator::SingleOscillator()
 , mSyncFreqSlider(nullptr)
 , mDetuneSlider(nullptr)
 , mUnisonSlider(nullptr)
+, mUnisonWidthSlider(nullptr)
 , mADSRModeSelector(nullptr)
 , mADSRMode(0)
 , mShuffleSlider(nullptr)
@@ -48,6 +49,7 @@ SingleOscillator::SingleOscillator()
    mVoiceParams.mShuffle = 0;
    mVoiceParams.mPhaseOffset = 0;
    mVoiceParams.mUnison = 1;
+   mVoiceParams.mUnisonWidth = 0;
    
    mPolyMgr.Init(kVoiceType_SingleOscillator, &mVoiceParams);
 }
@@ -67,14 +69,15 @@ void SingleOscillator::CreateUIControls()
    mPulseWidthSlider = new FloatSlider(this,"pw",5,55,80,15,&mVoiceParams.mPulseWidth,0.01f,.99f,2);
    mShuffleSlider = new FloatSlider(this,"shuffle",mPulseWidthSlider,kAnchor_Below,80,15,&mVoiceParams.mShuffle, 0, 1);
    mDetuneSlider = new FloatSlider(this,"detune",mShuffleSlider,kAnchor_Below,80,15,&mVoiceParams.mDetune,.95f,1.05f,3);
-   mUnisonSlider = new IntSlider(this,"unison",mDetuneSlider,kAnchor_Below,80,15,&mVoiceParams.mUnison,1,SingleOscillatorVoice::kMaxUnison);
+   mPhaseOffsetSlider = new FloatSlider(this,"phase",mDetuneSlider,kAnchor_Below,80,15,&mVoiceParams.mPhaseOffset,0,TWO_PI);
+   mUnisonSlider = new IntSlider(this,"unison",mPhaseOffsetSlider,kAnchor_Below,80,15,&mVoiceParams.mUnison,1,SingleOscillatorVoice::kMaxUnison);
+   mUnisonWidthSlider = new FloatSlider(this,"width",mUnisonSlider,kAnchor_Right,80,15,&mVoiceParams.mUnisonWidth,0,1);
    
    mADSRModeSelector = new RadioButton(this,"envmode",95,1,&mADSRMode,kRadioHorizontal);
    mADSRDisplay = new ADSRDisplay(this,"env",95,18,80,36,&mVoiceParams.mAdsr);
    mFilterADSRDisplay = new ADSRDisplay(this,"envfilter",95,18,80,36,&mVoiceParams.mFilterAdsr);
    mLengthMultiplierSlider = new FloatSlider(this,"len",mADSRDisplay,kAnchor_Below,80,15,&mLengthMultiplier,.01f,10);
    mVolSlider = new FloatSlider(this,"vol",mLengthMultiplierSlider,kAnchor_Below,80,15,&mVoiceParams.mVol,0,1);
-   mPhaseOffsetSlider = new FloatSlider(this,"phase",mUnisonSlider,kAnchor_Below,80,15,&mVoiceParams.mPhaseOffset,0,TWO_PI);
    mFilterCutoffSlider = new FloatSlider(this,"cutoff",mVolSlider,kAnchor_Below,80,15,&mVoiceParams.mFilterCutoff,0,SINGLEOSCILLATOR_NO_CUTOFF);
    mSyncCheckbox = new Checkbox(this,"sync",mFilterCutoffSlider,kAnchor_Below,&mVoiceParams.mSync);
    mSyncFreqSlider = new FloatSlider(this,"syncf",mSyncCheckbox,kAnchor_Right,40,15,&mVoiceParams.mSyncFreq,10,999.9f);
@@ -172,6 +175,7 @@ void SingleOscillator::DrawModule()
    mOscSelector->Draw();
    mDetuneSlider->Draw();
    mUnisonSlider->Draw();
+   mUnisonWidthSlider->Draw();
    mShuffleSlider->Draw();
    mFilterADSRDisplay->Draw();
    mFilterCutoffSlider->Draw();

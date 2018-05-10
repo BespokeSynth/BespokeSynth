@@ -176,6 +176,8 @@ void DumpUnfreedMemory();
 float DistSqToLine(ofVec2f point, ofVec2f a, ofVec2f b);
 uint32_t JenkinsHash(const char* key);
 void LoadStateValidate(bool assertion);
+float GetLeftPanGain(float pan);
+float GetRightPanGain(float pan);
 
 inline static float RandomSample()
 {

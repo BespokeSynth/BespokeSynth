@@ -24,15 +24,18 @@ public:
    void SetModulators(ModulationParameters modulators) { mModulators = modulators; }
    virtual void Start(double time, float amount) = 0;
    virtual void Stop(double time) = 0;
-   virtual bool Process(double time, float* out, int bufferSize) = 0;
+   virtual bool Process(double time, ChannelBuffer* out) = 0;
    virtual bool IsDone(double time) = 0;
    virtual void SetVoiceParams(IVoiceParams* params) = 0;
+   void SetPan(float pan) { mPan = pan; }
+   float GetPan() const { return mPan; }
    
    float GetPitch(int samplesIn) { return mPitch + (mModulators.pitchBend ? mModulators.pitchBend->GetValue(samplesIn) : 0); }
    float GetModWheel(int samplesIn) { return mModulators.modWheel ? mModulators.modWheel->GetValue(samplesIn) : 0; }
    float GetPressure(int samplesIn) { return mModulators.pressure ? mModulators.pressure->GetValue(samplesIn) : 0; }
 private:
    float mPitch;
+   float mPan;
    ModulationParameters mModulators;
 };
 

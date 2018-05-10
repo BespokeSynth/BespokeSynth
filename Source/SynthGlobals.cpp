@@ -656,6 +656,16 @@ void LoadStateValidate(bool assertion)
       throw LoadStateException();
 }
 
+float GetLeftPanGain(float pan)
+{
+   return ofMap(pan, 0, 1, 1, 0, true) + ofMap(pan, -1, 0, 1, 0, true);
+}
+
+float GetRightPanGain(float pan)
+{
+   return ofMap(pan, -1, 0, 0, 1, true) + ofMap(pan, 0, 1, 0, 1, true);
+}
+
 #ifdef BESPOKE_DEBUG_ALLOCATIONS
 FILE* logAllocationsFile;
 

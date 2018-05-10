@@ -34,6 +34,7 @@ public:
    float mShuffle;
    float mPhaseOffset;
    int mUnison;
+   float mUnisonWidth;
    
    float mFilterCutoff;
    ADSR mFilterAdsr;
@@ -49,7 +50,7 @@ public:
    void Start(double time, float amount) override;
    void Stop(double time) override;
    void ClearVoice() override;
-   bool Process(double time, float* out, int bufferSize) override;
+   bool Process(double time, ChannelBuffer* out) override;
    void SetVoiceParams(IVoiceParams* params) override;
    bool IsDone(double time) override;
    
@@ -69,7 +70,8 @@ private:
    double mStartTime;
    
    ADSR mFilterAdsr;
-   BiquadFilter mFilter;
+   BiquadFilter mFilterLeft;
+   BiquadFilter mFilterRight;
    bool mUseFilter;
    
    IDrawableModule* mOwner;

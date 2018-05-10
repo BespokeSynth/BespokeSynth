@@ -1042,9 +1042,6 @@
     <ClCompile Include="..\..\Source\IUIControl.cpp">
       <Filter>BespokeSynth\Source\uicontrols</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\Source\AdditiveVoice.cpp">
-      <Filter>BespokeSynth\Source</Filter>
-    </ClCompile>
     <ClCompile Include="..\..\Source\ADSR.cpp">
       <Filter>BespokeSynth\Source</Filter>
     </ClCompile>
@@ -1133,9 +1130,6 @@
       <Filter>BespokeSynth\Source</Filter>
     </ClCompile>
     <ClCompile Include="..\..\Source\JumpBlender.cpp">
-      <Filter>BespokeSynth\Source</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\Source\KarplusRetriggerVoice.cpp">
       <Filter>BespokeSynth\Source</Filter>
     </ClCompile>
     <ClCompile Include="..\..\Source\KarplusStrongVoice.cpp">
@@ -3717,9 +3711,6 @@
     <ClInclude Include="..\..\Source\IUIControl.h">
       <Filter>BespokeSynth\Source\uicontrols</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\Source\AdditiveVoice.h">
-      <Filter>BespokeSynth\Source</Filter>
-    </ClInclude>
     <ClInclude Include="..\..\Source\ADSR.h">
       <Filter>BespokeSynth\Source</Filter>
     </ClInclude>
@@ -3832,9 +3823,6 @@
       <Filter>BespokeSynth\Source</Filter>
     </ClInclude>
     <ClInclude Include="..\..\Source\JumpBlender.h">
-      <Filter>BespokeSynth\Source</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\Source\KarplusRetriggerVoice.h">
       <Filter>BespokeSynth\Source</Filter>
     </ClInclude>
     <ClInclude Include="..\..\Source\KarplusStrongVoice.h">

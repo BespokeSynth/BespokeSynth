@@ -628,9 +628,6 @@
         <FILE id="QwDpwf" name="IUIControl.cpp" compile="1" resource="0" file="Source/IUIControl.cpp"/>
         <FILE id="BwcDH9" name="IUIControl.h" compile="0" resource="0" file="Source/IUIControl.h"/>
       </GROUP>
-      <FILE id="hrizr1" name="AdditiveVoice.cpp" compile="1" resource="0"
-            file="Source/AdditiveVoice.cpp"/>
-      <FILE id="z8Mkh1" name="AdditiveVoice.h" compile="0" resource="0" file="Source/AdditiveVoice.h"/>
       <FILE id="tXwRv8" name="ADSR.cpp" compile="1" resource="0" file="Source/ADSR.cpp"/>
       <FILE id="mTZDPv" name="ADSR.h" compile="0" resource="0" file="Source/ADSR.h"/>
       <FILE id="ARwlVx" name="ADSRDisplay.cpp" compile="1" resource="0" file="Source/ADSRDisplay.cpp"/>
@@ -725,10 +722,6 @@
       <FILE id="barbP0" name="IVoiceParams.h" compile="0" resource="0" file="Source/IVoiceParams.h"/>
       <FILE id="jS72vN" name="JumpBlender.cpp" compile="1" resource="0" file="Source/JumpBlender.cpp"/>
       <FILE id="AadSA9" name="JumpBlender.h" compile="0" resource="0" file="Source/JumpBlender.h"/>
-      <FILE id="uNNHdQ" name="KarplusRetriggerVoice.cpp" compile="1" resource="0"
-            file="Source/KarplusRetriggerVoice.cpp"/>
-      <FILE id="JtokuD" name="KarplusRetriggerVoice.h" compile="0" resource="0"
-            file="Source/KarplusRetriggerVoice.h"/>
       <FILE id="a4npov" name="KarplusStrongVoice.cpp" compile="1" resource="0"
             file="Source/KarplusStrongVoice.cpp"/>
       <FILE id="Nnoh0w" name="KarplusStrongVoice.h" compile="0" resource="0"

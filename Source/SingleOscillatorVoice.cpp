@@ -11,6 +11,7 @@
 #include "SynthGlobals.h"
 #include "Scale.h"
 #include "Profiler.h"
+#include "ChannelBuffer.h"
 
 SingleOscillatorVoice::SingleOscillatorVoice(IDrawableModule* owner)
 : mStartTime(-1)
@@ -28,7 +29,7 @@ bool SingleOscillatorVoice::IsDone(double time)
    return mAdsr.IsDone(time);
 }
 
-bool SingleOscillatorVoice::Process(double time, float* out, int bufferSize)
+bool SingleOscillatorVoice::Process(double time, ChannelBuffer* out)
 {
    Profiler profiler("SingleOscillatorVoice");
 
@@ -37,16 +38,19 @@ bool SingleOscillatorVoice::Process(double time, float* out, int bufferSize)
    
    for (int u=0; u<mVoiceParams->mUnison && u<kMaxUnison; ++u)
       mOscData[u].mOsc.SetType(mVoiceParams->mOscType);
+   
+   bool mono = (out->NumActiveChannels() == 1);
       
    float syncPhaseInc = GetPhaseInc(mVoiceParams->mSyncFreq);
-   for (int pos=0; pos<bufferSize; ++pos)
+   for (int pos=0; pos<out->BufferSize(); ++pos)
    {
       if (mOwner)
          mOwner->ComputeSliders(pos);
       
       float adsrVal = mAdsr.Value(time);
       
-      float summed = 0;
+      float summedLeft = 0;
+      float summedRight = 0;
       for (int u=0; u<mVoiceParams->mUnison && u<kMaxUnison; ++u)
       {
          mOscData[u].mOsc.SetPulseWidth(mVoiceParams->mPulseWidth);
@@ -81,18 +85,49 @@ bool SingleOscillatorVoice::Process(double time, float* out, int bufferSize)
          if (u >= 2)
             sample *= 1 - (mOscData[u].mDetuneFactor * .5f);
          
-         summed += sample;
+         if (mono)
+         {
+            summedLeft += sample;
+         }
+         else
+         {
+            float unisonPan;
+            if (mVoiceParams->mUnison == 1)
+               unisonPan = 0;
+            else if (u == 0)
+               unisonPan = -1;
+            else if (u == 1)
+               unisonPan = 1;
+            else
+               unisonPan = mOscData[u].mDetuneFactor;
+            float pan = GetPan() + unisonPan * mVoiceParams->mUnisonWidth;
+            summedLeft += sample * GetLeftPanGain(pan);
+            summedRight += sample * GetRightPanGain(pan);
+         }
       }
       
       if (mUseFilter)
       {
          float f = mFilterAdsr.Value(time) * mVoiceParams->mFilterCutoff;
          float q = 1;
-         mFilter.SetFilterParams(f, q);
-         summed = mFilter.Filter(summed);
+         mFilterLeft.SetFilterParams(f, q);
+         summedLeft = mFilterLeft.Filter(summedLeft);
+         if (!mono)
+         {
+            mFilterRight.SetFilterParams(f, q);
+            summedRight = mFilterRight.Filter(summedRight);
+         }
       }
       
-      out[pos] += summed;
+      if (mono)
+      {
+         out->GetChannel(0)[pos] += summedLeft;
+      }
+      else
+      {
+         out->GetChannel(0)[pos] += summedLeft;
+         out->GetChannel(1)[pos] += summedRight;
+      }
       time += gInvSampleRateMs;
    }
    
@@ -110,7 +145,8 @@ void SingleOscillatorVoice::Start(double time, float target)
        mVoiceParams->mFilterAdsr.GetR() > 30)
    {
       mUseFilter = true;
-      mFilter.SetFilterType(kFilterType_Lowpass);
+      mFilterLeft.SetFilterType(kFilterType_Lowpass);
+      mFilterRight.SetFilterType(kFilterType_Lowpass);
       mFilterAdsr = mVoiceParams->mFilterAdsr;
       mFilterAdsr.Start(time,1);
    }

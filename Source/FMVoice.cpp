@@ -11,6 +11,7 @@
 #include "SynthGlobals.h"
 #include "Scale.h"
 #include "Profiler.h"
+#include "ChannelBuffer.h"
 
 FMVoice::FMVoice(IDrawableModule* owner)
 : mOscPhase(0)
@@ -32,14 +33,14 @@ bool FMVoice::IsDone(double time)
    return mOsc.GetADSR()->IsDone(time);
 }
 
-bool FMVoice::Process(double time, float* out, int bufferSize)
+bool FMVoice::Process(double time, ChannelBuffer* out)
 {
    Profiler profiler("FMVoice");
 
    if (IsDone(time))
       return false;
 
-   for (int pos=0; pos<bufferSize; ++pos)
+   for (int pos=0; pos<out->BufferSize(); ++pos)
    {
       if (mOwner)
          mOwner->ComputeSliders(pos);
@@ -66,7 +67,16 @@ bool FMVoice::Process(double time, float* out, int bufferSize)
       mOscPhase += oscPhaseInc;
       while (mOscPhase > FTWO_PI) { mOscPhase -= FTWO_PI; }
 
-      out[pos] += mOsc.Audio(time, mOscPhase + mVoiceParams->mPhaseOffset0) * mVoiceParams->mVol/20.0f;
+      float sample = mOsc.Audio(time, mOscPhase + mVoiceParams->mPhaseOffset0) * mVoiceParams->mVol/20.0f;
+      if (out->NumActiveChannels() == 1)
+      {
+         out->GetChannel(0)[pos] += sample;
+      }
+      else
+      {
+         out->GetChannel(0)[pos] += sample * GetLeftPanGain(GetPan());
+         out->GetChannel(1)[pos] += sample * GetRightPanGain(GetPan());
+      }
 
       time += gInvSampleRateMs;
    }

@@ -23,20 +23,18 @@ struct ModulationParameters;
 
 enum VoiceType
 {
-   kVoiceType_Additive,
    kVoiceType_Karplus,
    kVoiceType_FM,
    kVoiceType_SingleOscillator,
    kVoiceType_Sampler
 };
 
-struct PitchAndVoice
+struct VoiceInfo
 {
-   PitchAndVoice() : mPitch(-1) {}
+   VoiceInfo() : mPitch(-1) {}
    
    float mPitch;
    IMidiVoice* mVoice;
-   float mPan;
    double mTime;
 };
 
@@ -55,13 +53,12 @@ public:
    void GetPhaseAndInc(float& phase, float& inc);
 private:
    void Prune(double time);
-   float GetLeftPanGain(float pan);
-   float GetRightPanGain(float pan);
    
-   PitchAndVoice mVoices[kNumVoices];
+   VoiceInfo mVoices[kNumVoices];
    bool mAllowStealing;
    int mLastVoice;
    ChannelBuffer mFadeOutBuffer;
+   ChannelBuffer mFadeOutWorkBuffer;
    float mWorkBuffer[2048];
    int mFadeOutBufferPos;
    IDrawableModule* mOwner;

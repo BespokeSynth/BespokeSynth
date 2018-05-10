@@ -11,6 +11,7 @@
 #include "SynthGlobals.h"
 #include "Scale.h"
 #include "Profiler.h"
+#include "ChannelBuffer.h"
 
 KarplusStrongVoice::KarplusStrongVoice(IDrawableModule* owner)
 : mOscPhase(0)
@@ -38,13 +39,14 @@ bool KarplusStrongVoice::IsDone(double time)
    return !mActive || mMuteRamp.Value(time) == 0;
 }
 
-bool KarplusStrongVoice::Process(double time, float* out, int bufferSize)
+bool KarplusStrongVoice::Process(double time, ChannelBuffer* out)
 {
    Profiler profiler("KarplusStrongVoice");
 
    if (IsDone(time))
       return false;
    
+   int bufferSize = out->BufferSize();
    float renderRatio = 1;
    int pitchAdjust = 0;
    if (mVoiceParams->mStretch)
@@ -129,18 +131,29 @@ bool KarplusStrongVoice::Process(double time, float* out, int bufferSize)
    
    for (int i=0; i<bufferSize; ++i) //stretch half buffer to fill output
    {
+      float sample;
       /*if (i==0)
       {
-         out[i] += mLastBufferSample*.5f + mHalfBuffer[0];
+         sample = mLastBufferSample*.5f + mHalfBuffer[0];
       }
       else if (i%2 == 1)*/
       {
-         out[i] += gWorkBuffer[int(i/renderRatio)];
+         sample = gWorkBuffer[int(i/renderRatio)];
       }
       /*else
       {
-         out[i] += mHalfBuffer[i/2]*.5f + mHalfBuffer[i/2+1]*.5f;
+         sample = mHalfBuffer[i/2]*.5f + mHalfBuffer[i/2+1]*.5f;
       }*/
+      
+      if (out->NumActiveChannels() == 1)
+      {
+         out->GetChannel(0)[i] += sample;
+      }
+      else
+      {
+         out->GetChannel(0)[i] += sample * GetLeftPanGain(GetPan());
+         out->GetChannel(1)[i] += sample * GetRightPanGain(GetPan());
+      }
    }
       
    mLastBufferSample = gWorkBuffer[renderSize-1];
