@@ -185,7 +185,7 @@ ModuleFactory::ModuleFactory()
    REGISTER(DrumPlayer, drumplayer, kModuleType_Synth);
    REGISTER(Chorder, chorder, kModuleType_Note);
    REGISTER(Arpeggiator, arpeggiator, kModuleType_Note);
-   REGISTER(Monophonify, monophonify, kModuleType_Note);
+   REGISTER(Monophonify, portamento, kModuleType_Note);
    REGISTER(StepSequencer, drumsequencer, kModuleType_Instrument);
    REGISTER(LaunchpadKeyboard, launchpadkeyboard, kModuleType_Instrument);
    REGISTER(FMSynth, fmsynth, kModuleType_Synth);

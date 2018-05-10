@@ -11,6 +11,7 @@
 
 NoteDisplayer::NoteDisplayer()
 {
+   bzero(mVelocities, 127 * sizeof(int));
 }
 
 void NoteDisplayer::DrawModule()
@@ -29,12 +30,13 @@ void NoteDisplayer::DrawModule()
 
 void NoteDisplayer::DrawNoteName(int pitch, float y) const
 {
-   DrawText(NoteName(pitch) + ofToString(pitch/12 - 2) + " (" + ofToString(pitch) + ")", 4, y);
+   DrawText(NoteName(pitch) + ofToString(pitch/12 - 2) + " (" + ofToString(pitch) + ")" + " vel:"+ofToString(mVelocities[pitch]), 4, y);
 }
 
 void NoteDisplayer::PlayNote(double time, int pitch, int velocity, int voiceIdx, ModulationParameters modulation)
 {
    PlayNoteOutput(time, pitch, velocity, voiceIdx, modulation);
+   mVelocities[pitch] = velocity;
 }
 
 void NoteDisplayer::LoadLayout(const ofxJSONElement& moduleInfo)

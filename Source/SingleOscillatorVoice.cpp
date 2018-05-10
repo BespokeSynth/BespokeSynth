@@ -118,11 +118,6 @@ void SingleOscillatorVoice::Start(double time, float target)
    {
       mUseFilter = false;
    }
-   
-   mOscData[0].mDetuneFactor = 1;
-   mOscData[1].mDetuneFactor = 0;
-   for (int u=2; u<kMaxUnison; ++u)
-      mOscData[u].mDetuneFactor = ofRandom(-1,1);
 }
 
 void SingleOscillatorVoice::Stop(double time)
@@ -139,6 +134,12 @@ void SingleOscillatorVoice::ClearVoice()
       mOscData[u].mPhase = 0;
       mOscData[u].mSyncPhase = 0;
    }
+   
+   //set this up so it's different with each fresh voice, but doesn't reset when voice is retriggered
+   mOscData[0].mDetuneFactor = 1;
+   mOscData[1].mDetuneFactor = 0;
+   for (int u=2; u<kMaxUnison; ++u)
+      mOscData[u].mDetuneFactor = ofRandom(-1,1);
 }
 
 void SingleOscillatorVoice::SetVoiceParams(IVoiceParams* params)

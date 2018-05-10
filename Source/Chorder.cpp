@@ -169,7 +169,10 @@ void Chorder::PlayNote(double time, int pitch, int velocity, int voiceIdx, Modul
       return;
    }
 
-   mInputNotes[pitch] = velocity > 0;
+   bool noteOn = velocity > 0;
+   if (mInputNotes[pitch] == noteOn)
+      return;
+   mInputNotes[pitch] = noteOn;
    
    if (velocity > 0)
       mVelocity = velocity;

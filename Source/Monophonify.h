@@ -30,7 +30,7 @@ public:
    Monophonify();
    static IDrawableModule* Create() { return new Monophonify(); }
    
-   string GetTitleLabel() override { return "monophonify"; }
+   string GetTitleLabel() override { return "portamento"; }
    void CreateUIControls() override;
    
    void SetEnabled(bool enabled) override { mEnabled = enabled; }

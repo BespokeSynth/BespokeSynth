@@ -33,6 +33,8 @@ private:
    bool Enabled() const override { return true; }
    
    void DrawNoteName(int pitch, float y) const;
+   
+   int mVelocities[127];
 };
 
 #endif /* defined(__Bespoke__NoteDisplayer__) */

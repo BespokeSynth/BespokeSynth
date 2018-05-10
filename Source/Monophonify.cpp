@@ -52,9 +52,9 @@ void Monophonify::PlayNote(double time, int pitch, int velocity, int voiceIdx, M
       if (mHeldNotes.size())
       {
          mPitchBend.RampValue(mHeldNotes.rbegin()->mPitch - pitch + mPitchBend.GetIndividualValue(0), 0, mGlideTime);
-         PlayNoteOutput(time, pitch, velocity, voiceIdx, modulation);
          for (list<HeldNote>::iterator iter = mHeldNotes.begin(); iter != mHeldNotes.end(); ++iter)
             PlayNoteOutput(gTime,(*iter).mPitch,0,-1, modulation);
+         PlayNoteOutput(time, pitch, velocity, voiceIdx, modulation);
       }
       else
       {
