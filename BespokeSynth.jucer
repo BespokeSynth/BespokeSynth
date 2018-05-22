@@ -155,6 +155,9 @@
         <FILE id="RG4zGd" name="TremoloEffect.h" compile="0" resource="0" file="Source/TremoloEffect.h"/>
       </GROUP>
       <GROUP id="{6781AC07-A090-A7AF-8D27-BCB6D9526ABD}" name="modules">
+        <FILE id="KQt6SG" name="PitchToSpeed.cpp" compile="1" resource="0"
+              file="Source/PitchToSpeed.cpp"/>
+        <FILE id="aShOLe" name="PitchToSpeed.h" compile="0" resource="0" file="Source/PitchToSpeed.h"/>
         <FILE id="ypzKC1" name="NoteStrummer.cpp" compile="1" resource="0"
               file="Source/NoteStrummer.cpp"/>
         <FILE id="htGfPr" name="NoteStrummer.h" compile="0" resource="0" file="Source/NoteStrummer.h"/>

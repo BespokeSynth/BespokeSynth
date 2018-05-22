@@ -23,8 +23,6 @@
 
 class Sample;
 
-#define NUM_SEAOFGRAIN_VOICES 16
-
 class SeaOfGrain : public IAudioSource, public IDrawableModule, public IFloatSliderListener, public IIntSliderListener, public IDropdownListener, public IButtonListener, public INoteReceiver
 {
 public:
@@ -45,6 +43,7 @@ public:
    
    //IDrawableModule
    void FilesDropped(vector<string> files, int x, int y) override;
+   void SampleDropped(int x, int y, Sample* sample) override;
    void Poll() override;
    
    //IClickable
@@ -71,7 +70,7 @@ public:
    
 private:
    void UpdateSample();
-   int GetSampleLength() const;
+   void UpdateDisplaySamples();
 
    //IDrawableModule
    void DrawModule() override;
@@ -79,11 +78,11 @@ private:
    void GetModuleDimensions(int& x, int& y) override;
    void OnClicked(int x, int y, bool right) override;
    
-   struct GrainVoice
+   struct GrainMPEVoice
    {
-      GrainVoice();
-      void Process(float* out, int outLength, float* sample, int sampleLength, int keyOffset, const vector<float>& slices);
-      void Draw(float w, float h, float offset, float length, int numPitches);
+      GrainMPEVoice();
+      void Process(float* out, int outLength, float* sample, int sampleLength);
+      void Draw(float w, float h);
       
       float mPlay;
       float mPitch;
@@ -95,9 +94,34 @@ private:
       
       ADSR mADSR;
       Granulator mGranulator;
+      SeaOfGrain* mOwner;
    };
    
-   GrainVoice mVoices[NUM_SEAOFGRAIN_VOICES];
+   struct GrainManualVoice
+   {
+      GrainManualVoice();
+      void Process(float* out, int outLength, float* sample, int sampleLength);
+      void Draw(float w, float h);
+      
+      float mGain;
+      float mPosition;
+      
+      Granulator mGranulator;
+      SeaOfGrain* mOwner;
+      
+      FloatSlider* mGainSlider;
+      FloatSlider* mPositionSlider;
+      FloatSlider* mSpacingSlider;
+      FloatSlider* mSpeedSlider;
+      FloatSlider* mLengthMsSlider;
+      FloatSlider* mPosRandomizeSlider;
+      FloatSlider* mSpeedRandomizeSlider;
+   };
+   
+   static const int kNumMPEVoices = 16;
+   GrainMPEVoice mMPEVoices[kNumMPEVoices];
+   static const int kNumManualVoices = 4;
+   GrainManualVoice mManualVoices[kNumManualVoices];
    
    Sample* mSample;
    
@@ -105,13 +129,16 @@ private:
    FloatSlider* mVolumeSlider;
    float* mWriteBuffer;
    bool mLoading;
-   IntSlider* mKeyOffsetSlider;
-   int mKeyOffset;
-   IntSlider* mDisplayKeysSlider;
-   int mDisplayKeys;
-   DropdownList* mKeyboardBaseNoteSelector;
-   int mKeyboardBaseNote;
-   vector<float> mSlices;
+   FloatSlider* mDisplayOffsetSlider;
+   float mDisplayOffset;
+   FloatSlider* mDisplayLengthSlider;
+   float mDisplayLength;
+   int mDisplayStartSamples;
+   int mDisplayEndSamples;
+   DropdownList* mKeyboardBasePitchSelector;
+   int mKeyboardBasePitch;
+   DropdownList* mKeyboardNumPitchesSelector;
+   int mKeyboardNumPitches;
 };
 
 #endif /* defined(__Bespoke__SeaOfGrain__) */

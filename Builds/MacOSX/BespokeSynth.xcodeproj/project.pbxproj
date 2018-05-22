@@ -53,6 +53,7 @@
 		69EB47EC9441C3507BEB277D = {isa = PBXBuildFile; fileRef = 63FA2E62502B218836A89E97; };
 		75837998247B5E99F3F16392 = {isa = PBXBuildFile; fileRef = 742F28BA27F066767E3A20E1; };
 		7B858D802BD0BB608C0F48CF = {isa = PBXBuildFile; fileRef = 49AB76428A044DEDF45FFAFE; };
+		6B52D2A4C9E43FC2353805C6 = {isa = PBXBuildFile; fileRef = 7D81A7A75DDC2FEB3CDEC5BC; };
 		EF2A915BFE000AB87B0CE2FD = {isa = PBXBuildFile; fileRef = E387D56DA836E21051B7D9AF; };
 		E6B79FEEF03A902FFC517F8B = {isa = PBXBuildFile; fileRef = B217F5EDC72085AA8AA21B04; };
 		8729714646543BBCDC5A3293 = {isa = PBXBuildFile; fileRef = 17A57282C769BDCB0A39B94B; };
@@ -442,6 +443,7 @@
 		3BB28F27E8B4229C4C7CDC5D = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; name = FilterViz.cpp; path = ../../Source/FilterViz.cpp; sourceTree = "SOURCE_ROOT"; };
 		3BC778778B414A5291A46D89 = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; name = VelocityScaler.h; path = ../../Source/VelocityScaler.h; sourceTree = "SOURCE_ROOT"; };
 		3BF6C995D08B9CA17C306D15 = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; name = Slider.h; path = ../../Source/Slider.h; sourceTree = "SOURCE_ROOT"; };
+		3D45A916D6D4657B0EAA2F55 = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; name = PitchToSpeed.h; path = ../../Source/PitchToSpeed.h; sourceTree = "SOURCE_ROOT"; };
 		3D7220F647FAABF60091733C = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; name = StutterControl.cpp; path = ../../Source/StutterControl.cpp; sourceTree = "SOURCE_ROOT"; };
 		3DEFCCB7492937302BA76EDF = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; name = DrumSynth.cpp; path = ../../Source/DrumSynth.cpp; sourceTree = "SOURCE_ROOT"; };
 		3E1DBA24D218C99698FF0365 = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; name = Sampler.h; path = ../../Source/Sampler.h; sourceTree = "SOURCE_ROOT"; };
@@ -601,6 +603,7 @@
 		7D12D29896D6544A1F770EE4 = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; name = SendPort.cpp; path = ../../Source/CFMessaging/SendPort.cpp; sourceTree = "SOURCE_ROOT"; };
 		7D1910E5B59B0E328C17A356 = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; name = GridToDrums.h; path = ../../Source/GridToDrums.h; sourceTree = "SOURCE_ROOT"; };
 		7D68F5692524F311080533FF = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; name = EnvelopeEditor.cpp; path = ../../Source/EnvelopeEditor.cpp; sourceTree = "SOURCE_ROOT"; };
+		7D81A7A75DDC2FEB3CDEC5BC = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; name = PitchToSpeed.cpp; path = ../../Source/PitchToSpeed.cpp; sourceTree = "SOURCE_ROOT"; };
 		7E281C5CCB27281CAE4B56C5 = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; name = TremoloEffect.h; path = ../../Source/TremoloEffect.h; sourceTree = "SOURCE_ROOT"; };
 		7E5B08F27C9E321C71874B68 = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; name = "json_writer.cpp"; path = "../../Source/json/src/lib_json/json_writer.cpp"; sourceTree = "SOURCE_ROOT"; };
 		7E67363AA76E3F2B609DC715 = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; name = MidiController.cpp; path = ../../Source/MidiController.cpp; sourceTree = "SOURCE_ROOT"; };
@@ -1053,6 +1056,8 @@
 					49AB76428A044DEDF45FFAFE,
 					7E281C5CCB27281CAE4B56C5, ); name = effects; sourceTree = "<group>"; };
 		C91AF721DDC182CE3AC80CF9 = {isa = PBXGroup; children = (
+					7D81A7A75DDC2FEB3CDEC5BC,
+					3D45A916D6D4657B0EAA2F55,
 					E387D56DA836E21051B7D9AF,
 					D81368B614B4853A7843BE4D,
 					B217F5EDC72085AA8AA21B04,
@@ -1786,6 +1791,7 @@
 					69EB47EC9441C3507BEB277D,
 					75837998247B5E99F3F16392,
 					7B858D802BD0BB608C0F48CF,
+					6B52D2A4C9E43FC2353805C6,
 					EF2A915BFE000AB87B0CE2FD,
 					E6B79FEEF03A902FFC517F8B,
 					8729714646543BBCDC5A3293,

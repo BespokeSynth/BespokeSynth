@@ -87,6 +87,7 @@ void NoteCreator::CheckboxUpdated(Checkbox* checkbox)
       }
       else
       {
+         PlayNoteOutput(gTime, mPitch, 0, mVoiceIndex);
          mNoteOutput.Flush();
       }
    }

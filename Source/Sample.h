@@ -51,6 +51,7 @@ public:
    void SetNumBars(int numBars) { mNumBars = numBars; }
    int GetNumBars() const { return mNumBars; }
    void SetVolume(float vol) { mVolume = vol; }
+   void CopyFrom(Sample* sample);
    
    void SaveState(FileStreamOut& out);
    void LoadState(FileStreamIn& in);

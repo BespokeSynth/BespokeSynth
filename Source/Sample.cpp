@@ -237,6 +237,19 @@ void Sample::ShiftWrap(int numSamplesToShift)
    LockDataMutex(false);*/
 }
 
+void Sample::CopyFrom(Sample* sample)
+{
+   mNumSamples = sample->mNumSamples;
+   mData.CopyFrom(&sample->mData);
+   mNumBars = sample->mNumBars;
+   mLooping = sample->mLooping;
+   mRate = sample->mRate;
+   mSampleRateRatio = sample->mSampleRateRatio;
+   mStopPoint = sample->mStopPoint;
+   strcpy(mName, sample->mName);
+   strcpy(mReadPath, sample->mReadPath);
+}
+
 namespace
 {
    const int kSaveStateRev = 0;
