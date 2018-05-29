@@ -337,13 +337,13 @@ void PatchCableSource::FindValidTargets()
    TheSynth->GetAllModules(allModules);
    for (auto module : allModules)
    {
-      if (mType == kConnectionType_UIControl && module != TheTitleBar)
+      if ((mType == kConnectionType_UIControl || mType == kConnectionType_Grid) && module != TheTitleBar)
       {
          for (auto uicontrol : module->GetUIControls())
          {
             if (uicontrol->IsShowing() &&
                 uicontrol->GetShouldSaveState() &&
-                dynamic_cast<ADSRDisplay*>(uicontrol) == nullptr)
+                uicontrol->CanBeTargetedBy(this))
                mValidTargets.push_back(uicontrol);
          }
       }
@@ -356,8 +356,6 @@ void PatchCableSource::FindValidTargets()
       if (mType == kConnectionType_Audio && dynamic_cast<IAudioReceiver*>(module))
          mValidTargets.push_back(module);
       if (mType == kConnectionType_Note && dynamic_cast<INoteReceiver*>(module))
-         mValidTargets.push_back(module);
-      if (mType == kConnectionType_Grid && dynamic_cast<IGridControllerListener*>(module))
          mValidTargets.push_back(module);
       if (mType == kConnectionType_Special)
       {

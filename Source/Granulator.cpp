@@ -24,7 +24,7 @@ void Granulator::Reset()
 {
    mSpeed = 1;
    mGrainLengthMs = 60;
-   mGrainSpacing = .1f;
+   mGrainOverlap = 10;
    mPosRandomizeMs = 5;
    mSpeedRandomize = 0;
    mSpacingRandomize = 0;
@@ -33,7 +33,7 @@ void Granulator::Reset()
 
 void Granulator::Process(double time, ChannelBuffer* buffer, int bufferLength, double offset, float* output)
 {
-   if (time >= mLastGrainSpawnMs+mGrainLengthMs*mGrainSpacing*ofRandom(1-mSpacingRandomize/2,1+mSpacingRandomize/2))
+   if (time >= mLastGrainSpawnMs+mGrainLengthMs*1/mGrainOverlap*ofRandom(1-mSpacingRandomize/2,1+mSpacingRandomize/2))
    {
       mLastGrainSpawnMs = time;
       SpawnGrain(time, offset, buffer->NumActiveChannels() == 2);
@@ -42,10 +42,10 @@ void Granulator::Process(double time, ChannelBuffer* buffer, int bufferLength, d
    for (int i=0; i<MAX_GRAINS; ++i)
       mGrains[i].Process(time, buffer, bufferLength, output);
    
-   if (mGrainSpacing < .25f)
+   if (mGrainOverlap > 4)
    {
       for (int ch=0; ch<buffer->NumActiveChannels(); ++ch)
-         output[ch] *= ofMap(mGrainSpacing,0,.25f,.15f,1);   //lower volume on dense granulation, starting at .25 spacing
+         output[ch] *= ofMap(mGrainOverlap,MAX_GRAINS,4,.5f,1);   //lower volume on dense granulation, starting at 4 overlap
    }
 }
 

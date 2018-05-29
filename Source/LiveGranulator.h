@@ -55,7 +55,7 @@ private:
    float mBufferLength;
    RollingBuffer mBuffer;
    Granulator mGranulator;
-   FloatSlider* mGranSpacing;
+   FloatSlider* mGranOverlap;
    FloatSlider* mGranSpeed;
    FloatSlider* mGranLengthMs;
    FloatSlider* mGranPosRandomize;

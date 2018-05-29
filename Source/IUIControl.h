@@ -14,6 +14,7 @@
 
 class FileStreamIn;
 class FileStreamOut;
+class PatchCableSource;
 
 #define HIDDEN_UICONTROL 9999
 
@@ -49,6 +50,8 @@ public:
    bool TestHover(int x, int y);
    void CheckHover(int x, int y);
    void DrawHover();
+   void DrawPatchCableHover();
+   virtual bool CanBeTargetedBy(PatchCableSource* source) const;
    virtual bool InvertScrollDirection() { return false; }
    virtual void Double() {}
    virtual void Halve() {}

@@ -14,6 +14,7 @@ ComboGridController::ComboGridController()
 : mRows(0)
 , mCols(0)
 {
+   assert(false);
 }
 
 void ComboGridController::CreateUIControls()
@@ -42,8 +43,8 @@ void ComboGridController::Init()
 
 void ComboGridController::InitializeCombo()
 {
-   for (int i=0; i<mGrids.size(); ++i)
-      mGrids[i]->SetTarget(this);
+   //for (int i=0; i<mGrids.size(); ++i)
+   //   mGrids[i]->SetTarget(this);
    
    mCols = 0;
    mRows = 0;
@@ -74,15 +75,6 @@ void ComboGridController::DrawModule()
 {
    if (Minimized() || IsVisible() == false)
       return;
-}
-
-void ComboGridController::ConnectGridController(IGridController* grid)
-{
-   if (!VectorContains(grid, mGrids))
-   {
-      mGrids.push_back(grid);
-      InitializeCombo();
-   }
 }
 
 void ComboGridController::OnGridButton(int x, int y, float velocity, IGridController* grid)
@@ -230,8 +222,8 @@ void ComboGridController::SetUpFromSaveData()
          mGrids.push_back(dynamic_cast<IGridController*>(TheSynth->FindModule(gridVec[i])));
    }
    
-   for (int i=0; i<mGrids.size(); ++i)
-      mGrids[i]->SetTarget(this);
+   //for (int i=0; i<mGrids.size(); ++i)
+   //   mGrids[i]->SetTarget(this);
    
    SetUpPatchCables(mModuleSaveData.GetString("target"));
    

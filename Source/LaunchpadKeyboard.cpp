@@ -33,7 +33,7 @@ LaunchpadKeyboard::LaunchpadKeyboard()
 , mLatchCheckbox(nullptr)
 , mCurrentChord(0)
 , mHasDisplayer(false)
-, mArrangementMode(kFive)
+, mArrangementMode(kFull)
 , mArrangementModeDropdown(nullptr)
 , mChorder(nullptr)
 , mLatchChords(false)
@@ -134,6 +134,7 @@ void LaunchpadKeyboard::CreateUIControls()
    mArrangementModeDropdown = new DropdownList(this,"arrangement",6,4,((int*)(&mArrangementMode)));
    mLatchChordsCheckbox = new Checkbox(this,"ch.latch",55,59,&mLatchChords);
    mPreserveChordRootCheckbox = new Checkbox(this,"p.root",70,4,&mPreserveChordRoot);
+   mGridController = new GridController(this, 90, 22);
    
    mLayoutDropdown->AddLabel("chromatic", kChromatic);
    mLayoutDropdown->AddLabel("diatonic", kDiatonic);
@@ -151,12 +152,6 @@ LaunchpadKeyboard::~LaunchpadKeyboard()
 {
    TheScale->RemoveListener(this);
    TheTransport->RemoveListener(this);
-}
-
-void LaunchpadKeyboard::ConnectGridController(IGridController* grid)
-{
-   mGridController = grid;
-   UpdateLights();
 }
 
 void LaunchpadKeyboard::OnGridButton(int x, int y, float velocity, IGridController* grid)
@@ -370,7 +365,6 @@ void LaunchpadKeyboard::DisplayNote(int pitch, int velocity)
 
 void LaunchpadKeyboard::DrawModule()
 {
-
    if (mChorder)
       DrawConnection(mChorder);
    if (Minimized() || IsVisible() == false)
@@ -381,6 +375,7 @@ void LaunchpadKeyboard::DrawModule()
    mLatchChordsCheckbox->Draw();
    mArrangementModeDropdown->Draw();
    mPreserveChordRootCheckbox->Draw();
+   mGridController->Draw();
 }
 
 int LaunchpadKeyboard::GridToPitch(int x, int y)
@@ -622,6 +617,11 @@ void LaunchpadKeyboard::UpdateLights(bool force)
    }
 }
 
+void LaunchpadKeyboard::OnControllerPageSelected()
+{
+   UpdateLights();
+}
+
 void LaunchpadKeyboard::OnScaleChanged()
 {
    UpdateLights();
@@ -705,7 +705,7 @@ void LaunchpadKeyboard::LoadLayout(const ofxJSONElement& moduleInfo)
 {
    mModuleSaveData.LoadString("target", moduleInfo);
    mModuleSaveData.LoadString("chorder",moduleInfo,"",FillDropdown<Chorder*>);
-   mModuleSaveData.LoadEnum<ArrangementMode>("arrangement", moduleInfo, kFive, mArrangementModeDropdown);
+   mModuleSaveData.LoadEnum<ArrangementMode>("arrangement", moduleInfo, kFull, mArrangementModeDropdown);
    mModuleSaveData.LoadEnum<LaunchpadLayout>("layout", moduleInfo, kChromatic, mLayoutDropdown);
 
    SetUpFromSaveData();

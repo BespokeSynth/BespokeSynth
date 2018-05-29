@@ -59,6 +59,8 @@ void SamplerGrid::CreateUIControls()
    mDuplicateCheckbox = new Checkbox(this,"duplicate",mEditCheckbox, kAnchor_Below,&mDuplicate);
    mEditStartSlider = new IntSlider(this,"start",mEditSampleX,mEditSampleY+mEditSampleHeight+1,mEditSampleWidth,15,&mDummyInt,0,1);
    mEditEndSlider = new IntSlider(this,"end",mEditStartSlider,kAnchor_Below,mEditSampleWidth,15,&mDummyInt,0,1);
+   mGridController = new GridController(this, 4, 4);
+   mGridController->PositionTo(mClearCheckbox, kAnchor_Right);
    
    InitGrid();
 }
@@ -144,18 +146,18 @@ void SamplerGrid::Process(double time)
    GetBuffer()->Reset();
 }
 
-void SamplerGrid::ConnectGridController(IGridController* grid)
+void SamplerGrid::OnControllerPageSelected()
 {
-   mGridController = grid;
+   mGridController->ResetLights();
    
-   delete[] mGridSamples;
+   /*delete[] mGridSamples;
    
    mCols = grid->NumCols();
    if (mLastColumnIsGroup)
       mCols -= 1;
    mRows = grid->NumRows();
    
-   InitGrid();
+   InitGrid();*/
    
    UpdateLights();
 }
@@ -299,6 +301,7 @@ void SamplerGrid::DrawModule()
    mEditCheckbox->Draw();
    mClearCheckbox->Draw();
    mGrid->Draw();
+   mGridController->Draw();
    
    ofPushStyle();
    ofSetColor(255, 255, 255, 100);

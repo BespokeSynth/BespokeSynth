@@ -10,7 +10,6 @@
 #include "OpenFrameworksPort.h"
 #include "SynthGlobals.h"
 #include "Transport.h"
-#include "LooperRecorder.h"
 #include "ModularSynth.h"
 #include "MidiController.h"
 #include "Profiler.h"
@@ -18,8 +17,6 @@
 
 DrumPlayer::DrumPlayer()
 : mSpeed(1)
-, mRecordDrums(false)
-, mRecordDrumsCheckbox(nullptr)
 , mVolume(1)
 , mLoadedKit(0)
 , mVolSlider(nullptr)
@@ -40,7 +37,7 @@ DrumPlayer::DrumPlayer()
 , mOutputBuffer(gBufferSize)
 , mMonoOutput(false)
 , mMonoCheckbox(nullptr)
-, mLooperRecorder(nullptr)
+, mGridController(nullptr)
 {
    ReadKits();
    
@@ -50,7 +47,6 @@ DrumPlayer::DrumPlayer()
 void DrumPlayer::CreateUIControls()
 {
    IDrawableModule::CreateUIControls();
-   mRecordDrumsCheckbox = new Checkbox(this,"rec",70,34,&mRecordDrums);
    mVolSlider = new FloatSlider(this,"vol",4,2,100,15,&mVolume,0,2);
    mSpeedSlider = new FloatSlider(this,"speed",4,18,100,15,&mSpeed,0.2f,3);
    mKitSelector = new DropdownList(this,"kit",4,50,&mLoadedKit);
@@ -61,6 +57,7 @@ void DrumPlayer::CreateUIControls()
    mAuditionSlider = new FloatSlider(this,"aud",140,50,40,15,&mAuditionInc,-1,1,0);
    mMonoCheckbox = new Checkbox(this,"mono",4,34,&mMonoOutput);
    mShuffleSpeedsButton = new ClickButton(this,"shuffle",140,34);
+   mGridController = new GridController(this, 60, 34);
    
    for (int i=0; i<NUM_DRUM_HITS; ++i)
       mDrumHits[i].CreateUIControls(this, i);
@@ -94,6 +91,11 @@ void DrumPlayer::DrumHit::CreateUIControls(DrumPlayer* owner, int index)
    mTestButton = new ClickButton(owner,("test "+ofToString(index)).c_str(),x+5,y+53);
    
    mOwner = owner;
+}
+
+void DrumPlayer::Poll()
+{
+   UpdateLights();
 }
 
 void DrumPlayer::UpdateVisibleControls()
@@ -321,11 +323,6 @@ void DrumPlayer::PlayNote(double time, int pitch, int velocity, int voiceIdx, Mo
             if (pitch == 0)
                TheTransport->OnDrumEvent(kInterval_Kick);
          }
-         
-         if (mRecordDrums && mLooperRecorder != nullptr)
-         {
-            mLooperRecorder->StartFreeRecord();
-         }
       }
    }
 }
@@ -438,6 +435,15 @@ void DrumPlayer::OnClicked(int x, int y, bool right)
    }
 }
 
+void DrumPlayer::OnGridButton(int x, int y, float velocity, IGridController* grid)
+{
+   int sampleIdx = GetAssociatedSampleIndex(x, y);
+   if (sampleIdx != -1)
+   {
+      PlayNote(gTime, sampleIdx, velocity*127);
+   }
+}
+
 void DrumPlayer::DrawModule()
 {
    if (Minimized() || IsVisible() == false)
@@ -447,8 +453,8 @@ void DrumPlayer::DrawModule()
    mSpeedSlider->Draw();
    mKitSelector->Draw();
    mEditCheckbox->Draw();
-   mRecordDrumsCheckbox->Draw();
    mMonoCheckbox->Draw();
+   mGridController->Draw();
    
    for (int i=0; i<mIndividualOutputs.size(); ++i)
       DrawText(GetDrumHitName(mIndividualOutputs[i]->mHitIndex), 110, 10 + i*12);
@@ -507,6 +513,35 @@ void DrumPlayer::DrawModule()
       if (mSelectedHitIdx != -1)
          mDrumHits[mSelectedHitIdx].DrawUIControls();
    }
+}
+
+void DrumPlayer::UpdateLights()
+{
+   const int kCols = 4;
+   const int kRows = 4;
+   for (int x=0; x<kCols; ++x)
+   {
+      for (int y=0; y<kRows; ++y)
+      {
+         int sampleIdx = GetAssociatedSampleIndex(x, y);
+         Sample* sample = nullptr;
+         if (sampleIdx != -1)
+            sample = &(mDrumHits[sampleIdx].mSample);
+         if (sample &&
+             sample->IsPlaying() &&
+             sample->GetPlayPosition() < gSampleRate * .25f)
+            mGridController->SetLight(x,y,kGridColor3Bright);
+         else if (sample)
+            mGridController->SetLight(x,y,kGridColor3Dim);
+         else
+            mGridController->SetLight(x,y,kGridColorOff);
+      }
+   }
+}
+
+void DrumPlayer::OnControllerPageSelected()
+{
+   UpdateLights();
 }
 
 void DrumPlayer::DrumHit::DrawUIControls()
@@ -694,12 +729,6 @@ void DrumPlayer::DropdownUpdated(DropdownList* list, int oldVal)
 
 void DrumPlayer::CheckboxUpdated(Checkbox* checkbox)
 {
-   if (checkbox == mRecordDrumsCheckbox)
-   {
-      if (mRecordDrums == false && mLooperRecorder != nullptr)
-         mLooperRecorder->EndFreeRecord();
-   }
-   
    if (checkbox == mEditCheckbox)
       UpdateVisibleControls();
    
@@ -749,7 +778,6 @@ void DrumPlayer::TextEntryComplete(TextEntry* entry)
 void DrumPlayer::LoadLayout(const ofxJSONElement& moduleInfo)
 {
    mModuleSaveData.LoadString("target", moduleInfo);
-   mModuleSaveData.LoadString("looperrecorder",moduleInfo,"",FillDropdown<LooperRecorder*>);
 
    SetUpFromSaveData();
 }
@@ -757,7 +785,6 @@ void DrumPlayer::LoadLayout(const ofxJSONElement& moduleInfo)
 void DrumPlayer::SetUpFromSaveData()
 {
    SetTarget(TheSynth->FindModule(mModuleSaveData.GetString("target")));
-   SetLooperRecorder(dynamic_cast<LooperRecorder*>(TheSynth->FindModule(mModuleSaveData.GetString("looperrecorder"),false)));
    LoadKit(0);
 }
 

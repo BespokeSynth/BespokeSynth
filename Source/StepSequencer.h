@@ -96,7 +96,7 @@ public:
    void OnTimeEvent(int samplesTo) override;
    
    //IGridControllerListener
-   void ConnectGridController(IGridController* grid) override;
+   void OnControllerPageSelected() override;
    void OnGridButton(int x, int y, float velocity, IGridController* grid) override;
    
    //IDrawableModule
@@ -162,7 +162,7 @@ private:
    int mNumMeasures;
    NoteInterval mStepInterval;
    DropdownList* mStepIntervalDropdown;
-   IGridController* mGridController;
+   GridController* mGridController;
    int mCurrentColumn;
    IntSlider* mCurrentColumnSlider;
    StepSequencerNoteFlusher mFlusher;

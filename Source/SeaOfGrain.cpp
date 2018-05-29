@@ -73,13 +73,11 @@ void SeaOfGrain::CreateUIControls()
       float x = 10 + i * 100;
       mManualVoices[i].mGainSlider = new FloatSlider(this,("gain "+ofToString(i+1)).c_str(),x,mBufferY+mBufferH+10,90,15,&mManualVoices[i].mGain,0,1);
       mManualVoices[i].mPositionSlider = new FloatSlider(this,("pos "+ofToString(i+1)).c_str(),mManualVoices[i].mGainSlider,kAnchor_Below,90,15,&mManualVoices[i].mPosition,0,1);
-      mManualVoices[i].mSpacingSlider = new FloatSlider(this,("spacing "+ofToString(i+1)).c_str(),mManualVoices[i].mPositionSlider,kAnchor_Below,90,15,&mManualVoices[i].mGranulator.mGrainSpacing,1.0f/MAX_GRAINS,3,2);
-      mManualVoices[i].mSpeedSlider = new FloatSlider(this,("speed "+ofToString(i+1)).c_str(),mManualVoices[i].mSpacingSlider,kAnchor_Below,90,15,&mManualVoices[i].mGranulator.mSpeed,-3,3);
+      mManualVoices[i].mOverlapSlider = new FloatSlider(this,("overlap "+ofToString(i+1)).c_str(),mManualVoices[i].mPositionSlider,kAnchor_Below,90,15,&mManualVoices[i].mGranulator.mGrainOverlap,.25,MAX_GRAINS);
+      mManualVoices[i].mSpeedSlider = new FloatSlider(this,("speed "+ofToString(i+1)).c_str(),mManualVoices[i].mOverlapSlider,kAnchor_Below,90,15,&mManualVoices[i].mGranulator.mSpeed,-3,3);
       mManualVoices[i].mLengthMsSlider = new FloatSlider(this,("len ms "+ofToString(i+1)).c_str(),mManualVoices[i].mSpeedSlider,kAnchor_Below,90,15,&mManualVoices[i].mGranulator.mGrainLengthMs,1,500);
       mManualVoices[i].mPosRandomizeSlider = new FloatSlider(this,("pos r "+ofToString(i+1)).c_str(),mManualVoices[i].mLengthMsSlider,kAnchor_Below,90,15,&mManualVoices[i].mGranulator.mPosRandomizeMs,0,200);
       mManualVoices[i].mSpeedRandomizeSlider = new FloatSlider(this,("speed r "+ofToString(i+1)).c_str(),mManualVoices[i].mPosRandomizeSlider,kAnchor_Below,90,15,&mManualVoices[i].mGranulator.mSpeedRandomize,0,.3f);
-      
-      mManualVoices[i].mSpacingSlider->SetMode(FloatSlider::kSquare);
    }
 }
 
@@ -132,7 +130,7 @@ void SeaOfGrain::DrawModule()
    {
       mManualVoices[i].mGainSlider->Draw();
       mManualVoices[i].mPositionSlider->Draw();
-      mManualVoices[i].mSpacingSlider->Draw();
+      mManualVoices[i].mOverlapSlider->Draw();
       mManualVoices[i].mSpeedSlider->Draw();
       mManualVoices[i].mLengthMsSlider->Draw();
       mManualVoices[i].mPosRandomizeSlider->Draw();
@@ -330,7 +328,7 @@ void SeaOfGrain::GrainMPEVoice::Process(float* out, int outLength, float* sample
          float modwheel = mModWheel ? mModWheel->GetValue(i) : 0;
          if (pressure > 0)
          {
-            mGranulator.mGrainSpacing = ofMap(pressure * pressure, 0, 1, .3f, 1.0f / MAX_GRAINS);
+            mGranulator.mGrainOverlap = ofMap(pressure * pressure, 0, 1, 3, MAX_GRAINS);
             mGranulator.mPosRandomizeMs = ofMap(pressure * pressure, 0, 1, 100, .03f);
          }
          mGranulator.mGrainLengthMs = ofMap(modwheel, -1, 1, 150-140, 150+140);

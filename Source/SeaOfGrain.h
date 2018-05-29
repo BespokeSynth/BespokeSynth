@@ -111,7 +111,7 @@ private:
       
       FloatSlider* mGainSlider;
       FloatSlider* mPositionSlider;
-      FloatSlider* mSpacingSlider;
+      FloatSlider* mOverlapSlider;
       FloatSlider* mSpeedSlider;
       FloatSlider* mLengthMsSlider;
       FloatSlider* mPosRandomizeSlider;

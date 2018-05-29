@@ -47,7 +47,7 @@ public:
    InputMode GetInputMode() override { return kInputMode_Mono; }
    
    //IGridControllerListener
-   void ConnectGridController(IGridController* grid) override;
+   void OnControllerPageSelected() override;
    void OnGridButton(int x, int y, float velocity, IGridController* grid) override;
    
    //INoteReceiver
@@ -115,7 +115,7 @@ private:
    bool mDuplicate;
    Checkbox* mDuplicateCheckbox;
    
-   IGridController* mGridController;
+   GridController* mGridController;
    int mCols;
    int mRows;
    bool mLastColumnIsGroup;

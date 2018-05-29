@@ -541,12 +541,6 @@
     <ClCompile Include="..\..\Source\TremoloEffect.cpp">
       <Filter>BespokeSynth\Source\effects</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\Source\PitchToSpeed.cpp">
-      <Filter>BespokeSynth\Source\modules</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\Source\NoteStrummer.cpp">
-      <Filter>BespokeSynth\Source\modules</Filter>
-    </ClCompile>
     <ClCompile Include="..\..\Source\Amplifier.cpp">
       <Filter>BespokeSynth\Source\modules</Filter>
     </ClCompile>
@@ -586,10 +580,10 @@
     <ClCompile Include="..\..\Source\ChaosEngine.cpp">
       <Filter>BespokeSynth\Source\modules</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\Source\Chorder.cpp">
+    <ClCompile Include="..\..\Source\ChordDisplayer.cpp">
       <Filter>BespokeSynth\Source\modules</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\Source\ChordDisplayer.cpp">
+    <ClCompile Include="..\..\Source\Chorder.cpp">
       <Filter>BespokeSynth\Source\modules</Filter>
     </ClCompile>
     <ClCompile Include="..\..\Source\CircleSequencer.cpp">
@@ -659,9 +653,6 @@
       <Filter>BespokeSynth\Source\modules</Filter>
     </ClCompile>
     <ClCompile Include="..\..\Source\GridController.cpp">
-      <Filter>BespokeSynth\Source\modules</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\Source\GridToDrums.cpp">
       <Filter>BespokeSynth\Source\modules</Filter>
     </ClCompile>
     <ClCompile Include="..\..\Source\GroupControl.cpp">
@@ -796,19 +787,22 @@
     <ClCompile Include="..\..\Source\NoteOctaver.cpp">
       <Filter>BespokeSynth\Source\modules</Filter>
     </ClCompile>
+    <ClCompile Include="..\..\Source\NotePanAlternator.cpp">
+      <Filter>BespokeSynth\Source\modules</Filter>
+    </ClCompile>
     <ClCompile Include="..\..\Source\NotePanner.cpp">
       <Filter>BespokeSynth\Source\modules</Filter>
     </ClCompile>
     <ClCompile Include="..\..\Source\NoteRouter.cpp">
       <Filter>BespokeSynth\Source\modules</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\Source\NoteSequencerColumn.cpp">
-      <Filter>BespokeSynth\Source\modules</Filter>
-    </ClCompile>
     <ClCompile Include="..\..\Source\NoteSinger.cpp">
       <Filter>BespokeSynth\Source\modules</Filter>
     </ClCompile>
     <ClCompile Include="..\..\Source\NoteStepSequencer.cpp">
+      <Filter>BespokeSynth\Source\modules</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\Source\NoteStrummer.cpp">
       <Filter>BespokeSynth\Source\modules</Filter>
     </ClCompile>
     <ClCompile Include="..\..\Source\NoteSustain.cpp">
@@ -818,9 +812,6 @@
       <Filter>BespokeSynth\Source\modules</Filter>
     </ClCompile>
     <ClCompile Include="..\..\Source\NoteToMs.cpp">
-      <Filter>BespokeSynth\Source\modules</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\Source\NoteToSpeed.cpp">
       <Filter>BespokeSynth\Source\modules</Filter>
     </ClCompile>
     <ClCompile Include="..\..\Source\NoteTransformer.cpp">
@@ -833,9 +824,6 @@
       <Filter>BespokeSynth\Source\modules</Filter>
     </ClCompile>
     <ClCompile Include="..\..\Source\OutputChannel.cpp">
-      <Filter>BespokeSynth\Source\modules</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\Source\NotePanAlternator.cpp">
       <Filter>BespokeSynth\Source\modules</Filter>
     </ClCompile>
     <ClCompile Include="..\..\Source\PanicButton.cpp">
@@ -860,6 +848,9 @@
       <Filter>BespokeSynth\Source\modules</Filter>
     </ClCompile>
     <ClCompile Include="..\..\Source\PitchToCV.cpp">
+      <Filter>BespokeSynth\Source\modules</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\Source\PitchToSpeed.cpp">
       <Filter>BespokeSynth\Source\modules</Filter>
     </ClCompile>
     <ClCompile Include="..\..\Source\Polyrhythms.cpp">
@@ -3210,12 +3201,6 @@
     <ClInclude Include="..\..\Source\TremoloEffect.h">
       <Filter>BespokeSynth\Source\effects</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\Source\PitchToSpeed.h">
-      <Filter>BespokeSynth\Source\modules</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\Source\NoteStrummer.h">
-      <Filter>BespokeSynth\Source\modules</Filter>
-    </ClInclude>
     <ClInclude Include="..\..\Source\Amplifier.h">
       <Filter>BespokeSynth\Source\modules</Filter>
     </ClInclude>
@@ -3255,10 +3240,10 @@
     <ClInclude Include="..\..\Source\ChaosEngine.h">
       <Filter>BespokeSynth\Source\modules</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\Source\Chorder.h">
+    <ClInclude Include="..\..\Source\ChordDisplayer.h">
       <Filter>BespokeSynth\Source\modules</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\Source\ChordDisplayer.h">
+    <ClInclude Include="..\..\Source\Chorder.h">
       <Filter>BespokeSynth\Source\modules</Filter>
     </ClInclude>
     <ClInclude Include="..\..\Source\CircleSequencer.h">
@@ -3328,9 +3313,6 @@
       <Filter>BespokeSynth\Source\modules</Filter>
     </ClInclude>
     <ClInclude Include="..\..\Source\GridController.h">
-      <Filter>BespokeSynth\Source\modules</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\Source\GridToDrums.h">
       <Filter>BespokeSynth\Source\modules</Filter>
     </ClInclude>
     <ClInclude Include="..\..\Source\GroupControl.h">
@@ -3468,19 +3450,22 @@
     <ClInclude Include="..\..\Source\NoteOctaver.h">
       <Filter>BespokeSynth\Source\modules</Filter>
     </ClInclude>
+    <ClInclude Include="..\..\Source\NotePanAlternator.h">
+      <Filter>BespokeSynth\Source\modules</Filter>
+    </ClInclude>
     <ClInclude Include="..\..\Source\NotePanner.h">
       <Filter>BespokeSynth\Source\modules</Filter>
     </ClInclude>
     <ClInclude Include="..\..\Source\NoteRouter.h">
       <Filter>BespokeSynth\Source\modules</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\Source\NoteSequencerColumn.h">
-      <Filter>BespokeSynth\Source\modules</Filter>
-    </ClInclude>
     <ClInclude Include="..\..\Source\NoteSinger.h">
       <Filter>BespokeSynth\Source\modules</Filter>
     </ClInclude>
     <ClInclude Include="..\..\Source\NoteStepSequencer.h">
+      <Filter>BespokeSynth\Source\modules</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\Source\NoteStrummer.h">
       <Filter>BespokeSynth\Source\modules</Filter>
     </ClInclude>
     <ClInclude Include="..\..\Source\NoteSustain.h">
@@ -3490,9 +3475,6 @@
       <Filter>BespokeSynth\Source\modules</Filter>
     </ClInclude>
     <ClInclude Include="..\..\Source\NoteToMs.h">
-      <Filter>BespokeSynth\Source\modules</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\Source\NoteToSpeed.h">
       <Filter>BespokeSynth\Source\modules</Filter>
     </ClInclude>
     <ClInclude Include="..\..\Source\NoteTransformer.h">
@@ -3505,9 +3487,6 @@
       <Filter>BespokeSynth\Source\modules</Filter>
     </ClInclude>
     <ClInclude Include="..\..\Source\OutputChannel.h">
-      <Filter>BespokeSynth\Source\modules</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\Source\NotePanAlternator.h">
       <Filter>BespokeSynth\Source\modules</Filter>
     </ClInclude>
     <ClInclude Include="..\..\Source\PanicButton.h">
@@ -3532,6 +3511,9 @@
       <Filter>BespokeSynth\Source\modules</Filter>
     </ClInclude>
     <ClInclude Include="..\..\Source\PitchToCV.h">
+      <Filter>BespokeSynth\Source\modules</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\Source\PitchToSpeed.h">
       <Filter>BespokeSynth\Source\modules</Filter>
     </ClInclude>
     <ClInclude Include="..\..\Source\Polyrhythms.h">

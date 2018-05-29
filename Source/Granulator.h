@@ -12,7 +12,7 @@
 #include <iostream>
 #include "Ramp.h"
 
-#define MAX_GRAINS 16
+#define MAX_GRAINS 32
 
 class ChannelBuffer;
 
@@ -47,7 +47,7 @@ public:
    
    float mSpeed;
    float mGrainLengthMs;
-   float mGrainSpacing;
+   float mGrainOverlap;
    float mPosRandomizeMs;
    float mSpeedRandomize;
    float mSpacingRandomize;

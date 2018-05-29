@@ -30,9 +30,9 @@ public:
    int NumRows() override { return mRows; }
    bool HasInput() const override;
    
-   void SetTarget(IClickable* target) override;
+   void SetTarget(IClickable* target);
 
-   void ConnectGridController(IGridController* grid) override;
+   void OnControllerPageSelected() override {}
    void OnGridButton(int x, int y, float velocity, IGridController* grid) override;
 
    void LoadLayout(const ofxJSONElement& moduleInfo) override;

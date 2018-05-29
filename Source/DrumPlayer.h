@@ -26,12 +26,11 @@
 #include "ADSRDisplay.h"
 #include "PatchCableSource.h"
 #include "RollingBuffer.h"
-
-class LooperRecorder;
+#include "GridController.h"
 
 #define NUM_DRUM_HITS 16
 
-class DrumPlayer : public IAudioSource, public INoteReceiver, public IDrawableModule, public IFloatSliderListener, public IDropdownListener, public IButtonListener, public IIntSliderListener, public ITextEntryListener
+class DrumPlayer : public IAudioSource, public INoteReceiver, public IDrawableModule, public IFloatSliderListener, public IDropdownListener, public IButtonListener, public IIntSliderListener, public ITextEntryListener, public IGridControllerListener
 {
 public:
    DrumPlayer();
@@ -41,9 +40,9 @@ public:
    string GetTitleLabel() override { return "drumplayer"; }
    void CreateUIControls() override;
    
-   static string GetDrumHitName(int index);
+   void Poll() override;
    
-   void SetLooperRecorder(LooperRecorder* recorder) { mLooperRecorder = recorder; }
+   static string GetDrumHitName(int index);
    
    //IAudioSource
    void Process(double time) override;
@@ -57,6 +56,10 @@ public:
    //IDrawableModule
    void FilesDropped(vector<string> files, int x, int y) override;
    void SampleDropped(int x, int y, Sample* sample) override;
+   
+   //IGridControllerListener
+   void OnControllerPageSelected() override;
+   void OnGridButton(int x, int y, float velocity, IGridController* grid) override;
 
    void FloatSliderUpdated(FloatSlider* slider, float oldVal) override;
    void IntSliderUpdated(IntSlider* slider, int oldVal) override;
@@ -90,6 +93,7 @@ private:
    void ShuffleSpeeds();
    void UpdateVisibleControls();
    int GetIndividualOutputIndex(int hitIndex);
+   void UpdateLights();
    
    //IDrawableModule
    void DrawModule() override;
@@ -100,10 +104,7 @@ private:
    ChannelBuffer mOutputBuffer;
    float mSpeed;
    float mVolume;
-   bool mRecordDrums;
-   Checkbox* mRecordDrumsCheckbox;
    int mLoadedKit;
-   LooperRecorder* mLooperRecorder;
    FloatSlider* mVolSlider;
    FloatSlider* mSpeedSlider;
    DropdownList* mKitSelector;
@@ -125,6 +126,7 @@ private:
    int mSelectedHitIdx;
    bool mMonoOutput;
    Checkbox* mMonoCheckbox;
+   GridController* mGridController;
    
    struct IndividualOutput
    {

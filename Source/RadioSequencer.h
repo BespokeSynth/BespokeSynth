@@ -17,10 +17,11 @@
 #include "Checkbox.h"
 #include "Transport.h"
 #include "DropdownList.h"
+#include "GridController.h"
 
 class PatchCableSource;
 
-class RadioSequencer : public IDrawableModule, public ITimeListener, public IDropdownListener, public UIGridListener
+class RadioSequencer : public IDrawableModule, public ITimeListener, public IDropdownListener, public UIGridListener, public IGridControllerListener
 {
 public:
    RadioSequencer();
@@ -43,6 +44,10 @@ public:
    //ITimeListener
    void OnTimeEvent(int samplesTo) override;
    
+   //IGridControllerListener
+   void OnControllerPageSelected() override;
+   void OnGridButton(int x, int y, float velocity, IGridController* grid) override;
+   
    void CheckboxUpdated(Checkbox* checkbox) override {}
    void DropdownUpdated(DropdownList* list, int oldVal) override;
    
@@ -60,6 +65,7 @@ private:
    void SetGridSize(float w, float h);
    void SetNumSteps(int numSteps, bool stretch);
    void SyncControlCablesToGrid();
+   void UpdateGridLights();
    
    //IDrawableModule
    void DrawModule() override;
@@ -75,4 +81,5 @@ private:
    int mLength;
    DropdownList* mLengthSelector;
    vector<PatchCableSource*> mControlCables;
+   GridController* mGridController;
 };

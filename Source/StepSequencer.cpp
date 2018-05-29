@@ -60,6 +60,7 @@ void StepSequencer::CreateUIControls()
    mCurrentColumnSlider = new IntSlider(this,"column",HIDDEN_UICONTROL,HIDDEN_UICONTROL,100,15,&mCurrentColumn,0,15);
    mShiftLeftButton = new ClickButton(this,"<",80,4);
    mShiftRightButton = new ClickButton(this,">",100,4);
+   mGridController = new GridController(this,240,4);
    
    mGrid->SetMajorColSize(4);
    mGrid->SetFlip(true);
@@ -146,6 +147,11 @@ void StepSequencer::Poll()
    }
 }
 
+namespace
+{
+   const float kMidwayVelocity = .5f;
+}
+
 void StepSequencer::UpdateLights()
 {
    if (mGridController == nullptr)
@@ -157,8 +163,8 @@ void StepSequencer::UpdateLights()
       {
          Vec2i gridPos = ControllerToGrid(Vec2i(x,y));
          
-         GridColor color = kGridColorOff;
          bool cellOn = mGrid->GetVal(gridPos.x,gridPos.y) > 0;
+         bool cellBright = mGrid->GetVal(gridPos.x,gridPos.y) > kMidwayVelocity;
          bool colOn = (mGrid->GetHighlightCol() == gridPos.x) && mEnabled;
          if (mGridController->IsMultisliderGrid())
          {
@@ -166,12 +172,25 @@ void StepSequencer::UpdateLights()
          }
          else
          {
-            if (cellOn)
-               color = kGridColor1Bright;
+            GridColor color;
             if (colOn)
-               color = kGridColor2Dim;
-            if (colOn && cellOn)
-               color = kGridColor3Bright;
+            {
+               if (cellBright)
+                  color = kGridColor3Bright;
+               else if (cellOn)
+                  color = kGridColor3Dim;
+               else
+                  color = kGridColor2Dim;
+            }
+            else
+            {
+               if (cellBright)
+                  color = kGridColor1Bright;
+               else if (cellOn)
+                  color = kGridColor1Dim;
+               else
+                  color = kGridColorOff;
+            }
             
             mGridController->SetLight(x, y, color);
          }
@@ -179,17 +198,9 @@ void StepSequencer::UpdateLights()
    }
 }
 
-void StepSequencer::ConnectGridController(IGridController* grid)
+void StepSequencer::OnControllerPageSelected()
 {
-   if (mGridController == grid)
-      return;
-   
-   if (mGridController)
-      mGridController->SetTarget(nullptr);
-   
-   assert(grid);
-   mGridController = grid;
-   mGridController->ResetLights();
+   UpdateLights();
 }
 
 void StepSequencer::OnGridButton(int x, int y, float velocity, IGridController* grid)
@@ -214,11 +225,13 @@ void StepSequencer::OnGridButton(int x, int y, float velocity, IGridController* 
             }
             else
             {
-               bool wasOn = mGrid->GetVal(gridPos.x,gridPos.y) > 0;
-               if (!wasOn)
-                  mGrid->SetVal(gridPos.x,gridPos.y,.5f);
-               else if (wasOn)
+               float val = mGrid->GetVal(gridPos.x,gridPos.y);
+               if (val > kMidwayVelocity)
                   mGrid->SetVal(gridPos.x,gridPos.y,0);
+               else if (val > 0)
+                  mGrid->SetVal(gridPos.x,gridPos.y,1);
+               else
+                  mGrid->SetVal(gridPos.x,gridPos.y,kMidwayVelocity);
             }
          }
       }
@@ -277,6 +290,7 @@ void StepSequencer::DrawModule()
    mStepIntervalDropdown->Draw();
    mShiftLeftButton->Draw();
    mShiftRightButton->Draw();
+   mGridController->Draw();
    
    int gridX, gridY;
    mGrid->GetPosition(gridX, gridY);

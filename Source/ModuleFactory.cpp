@@ -96,7 +96,6 @@
 #include "ClipLauncher.h"
 #include "LoopStorer.h"
 #include "CommentDisplay.h"
-#include "GridController.h"
 #include "ComboGridController.h"
 #include "StutterControl.h"
 #include "CircleSequencer.h"
@@ -135,9 +134,7 @@
 #include "Selector.h"
 #include "GroupControl.h"
 #include "CurveLooper.h"
-#include "GridToDrums.h"
 #include "ScaleDegree.h"
-#include "NoteSequencerColumn.h"
 #include "NoteChainNode.h"
 #include "NoteDelayer.h"
 #include "TimelineControl.h"
@@ -166,7 +163,6 @@
 #include "ModulatorMult.h"
 #include "ModulatorCurve.h"
 #include "ModulatorSmoother.h"
-#include "NoteToSpeed.h"
 #include "NotePanner.h"
 #include "PitchPanner.h"
 #include "NotePanAlternator.h"
@@ -188,7 +184,7 @@ ModuleFactory::ModuleFactory()
    REGISTER(Arpeggiator, arpeggiator, kModuleType_Note);
    REGISTER(Monophonify, portamento, kModuleType_Note);
    REGISTER(StepSequencer, drumsequencer, kModuleType_Instrument);
-   REGISTER(LaunchpadKeyboard, launchpadkeyboard, kModuleType_Instrument);
+   REGISTER(LaunchpadKeyboard, gridkeyboard, kModuleType_Instrument);
    REGISTER(FMSynth, fmsynth, kModuleType_Synth);
    REGISTER(MidiController, midicontroller, kModuleType_Instrument);
 #ifdef BESPOKE_MAC
@@ -209,7 +205,7 @@ ModuleFactory::ModuleFactory()
    REGISTER(Metronome, metronome, kModuleType_Synth);
    REGISTER(NoteRouter, noterouter, kModuleType_Note);
    REGISTER(AudioRouter, audiorouter, kModuleType_Audio);
-   REGISTER(LaunchpadNoteDisplayer, launchpadnotedisplayer, kModuleType_Note);
+   REGISTER(LaunchpadNoteDisplayer, gridnotedisplayer, kModuleType_Note);
    REGISTER(Vocoder, vocoder, kModuleType_Audio);
    REGISTER(FreqDelay, freqdelay, kModuleType_Audio);
    REGISTER(VelocitySetter, velocitysetter, kModuleType_Note);
@@ -245,7 +241,6 @@ ModuleFactory::ModuleFactory()
    REGISTER(NoteFlusher, noteflusher, kModuleType_Note);
    REGISTER(NoteCanvas, notecanvas, kModuleType_Instrument);
    REGISTER(CommentDisplay, comment, kModuleType_Other);
-   REGISTER(GridController, gridcontroller, kModuleType_Other);
    REGISTER(StutterControl, stuttercontrol, kModuleType_Other);
    REGISTER(CircleSequencer, circlesequencer, kModuleType_Instrument);
    REGISTER(MidiOutputModule, midioutput, kModuleType_Note);
@@ -276,9 +271,7 @@ ModuleFactory::ModuleFactory()
    REGISTER(Selector, selector, kModuleType_Other);
    REGISTER(GroupControl, groupcontrol, kModuleType_Other);
    REGISTER(CurveLooper, curvelooper, kModuleType_Modulator);
-   REGISTER(GridToDrums, gridtodrums, kModuleType_Instrument);
    REGISTER(ScaleDegree, scaledegree, kModuleType_Note);
-   REGISTER(NoteSequencerColumn, notesequencercolumn, kModuleType_Note);
    REGISTER(NoteChainNode, notechain, kModuleType_Instrument);
    REGISTER(NoteDelayer, notedelayer, kModuleType_Note);
    REGISTER(TimelineControl, timelinecontrol, kModuleType_Other);
@@ -306,14 +299,13 @@ ModuleFactory::ModuleFactory()
    REGISTER(ModulatorMult, mult, kModuleType_Modulator);
    REGISTER(ModulatorCurve, curve, kModuleType_Modulator);
    REGISTER(ModulatorSmoother, smoother, kModuleType_Modulator);
-   REGISTER(NoteToSpeed, notetospeed, kModuleType_Modulator);
    REGISTER(NotePanner, notepanner, kModuleType_Note);
    REGISTER(PitchPanner, pitchpanner, kModuleType_Note);
    REGISTER(NotePanAlternator, notepanalternator, kModuleType_Note);
    REGISTER(ChordDisplayer, chorddisplayer, kModuleType_Note);
    REGISTER(NoteStrummer, notestrummer, kModuleType_Note);
    REGISTER(SeaOfGrain, seaofgrain, kModuleType_Synth);
-   REGISTER(PitchToSpeed, pitchtospeed, kModuleType_Note);
+   REGISTER(PitchToSpeed, pitchtospeed, kModuleType_Modulator);
 
    //REGISTER_EXPERIMENTAL(MidiPlayer, midiplayer, kModuleType_Instrument);
    REGISTER_EXPERIMENTAL(Razor, razor, kModuleType_Synth);

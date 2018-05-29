@@ -218,6 +218,7 @@ struct GridLayout
    ofVec2f mDimensions;
    MidiMessageType mType;
    vector<int> mControls;
+   vector<int> mColors;
    
    PatchCableSource* mGridCable;
    GridController* mGridController[MAX_MIDI_PAGES];
@@ -280,6 +281,7 @@ public:
    void RadioButtonUpdated(RadioButton* radio, int oldVal) override;
    void TextEntryActivated(TextEntry* entry) override;
    void TextEntryComplete(TextEntry* entry) override;
+   void PreRepatch(PatchCableSource* cable) override;
    void PostRepatch(PatchCableSource* cable) override;
    void OnCableGrabbed(PatchCableSource* cable) override;
    

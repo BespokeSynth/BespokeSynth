@@ -13,7 +13,7 @@
 LiveGranulator::LiveGranulator()
 : mBufferLength(gSampleRate*5)
 , mBuffer(mBufferLength)
-, mGranSpacing(nullptr)
+, mGranOverlap(nullptr)
 , mGranPosRandomize(nullptr)
 , mGranSpeed(nullptr)
 , mGranSpeedRandomize(nullptr)
@@ -32,7 +32,7 @@ LiveGranulator::LiveGranulator()
 {
    mGranulator.SetLiveMode(true);
    mGranulator.mSpeed = 1;
-   mGranulator.mGrainSpacing = .333f;
+   mGranulator.mGrainOverlap = 3;
    mGranulator.mGrainLengthMs = 100;
    
    TheTransport->AddListener(this, kInterval_None);
@@ -44,7 +44,7 @@ LiveGranulator::LiveGranulator()
 void LiveGranulator::CreateUIControls()
 {
    IDrawableModule::CreateUIControls();
-   mGranSpacing = new FloatSlider(this,"spacing",4,2,80,15,&mGranulator.mGrainSpacing,1.0f/MAX_GRAINS,1.5f);
+   mGranOverlap = new FloatSlider(this,"overlap",4,2,80,15,&mGranulator.mGrainOverlap,.5f,MAX_GRAINS);
    mGranPosRandomize = new FloatSlider(this,"pos r",90,2,70,15,&mGranulator.mPosRandomizeMs,0,200);
    mGranSpeed = new FloatSlider(this,"speed",4,18,80,15,&mGranulator.mSpeed,-3,3);
    mGranSpeedRandomize = new FloatSlider(this,"spd r",90,18,70,15,&mGranulator.mSpeedRandomize,0,.3f);
@@ -124,7 +124,7 @@ void LiveGranulator::DrawModule()
    if (!mEnabled)
       return;
    
-   mGranSpacing->Draw();
+   mGranOverlap->Draw();
    mGranSpeed->Draw();
    mGranLengthMs->Draw();
    mGranPosRandomize->Draw();

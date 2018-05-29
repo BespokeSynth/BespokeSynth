@@ -12,6 +12,11 @@
 #include "ModularSynth.h"
 #include "PatchCableSource.h"
 
+namespace
+{
+   const float kEarlyOffsetMs = 10;
+}
+
 RadioSequencer::RadioSequencer()
 : mGrid(nullptr)
 , mInterval(kInterval_1n)
@@ -19,7 +24,7 @@ RadioSequencer::RadioSequencer()
 , mLength(4)
 , mLengthSelector(nullptr)
 {
-   TheTransport->AddListener(this, mInterval);
+   TheTransport->AddListener(this, mInterval, kEarlyOffsetMs);
 }
 
 RadioSequencer::~RadioSequencer()
@@ -32,7 +37,8 @@ void RadioSequencer::CreateUIControls()
    IDrawableModule::CreateUIControls();
    mGrid = new UIGrid(5,23,200,170,mLength,8);
    mIntervalSelector = new DropdownList(this,"interval",5,3,(int*)(&mInterval));
-   mLengthSelector = new DropdownList(this,"length",45,3,(int*)(&mLength));
+   mLengthSelector = new DropdownList(this,"length",-1,-1,(int*)(&mLength));
+   mGridController = new GridController(this, -1, -1);
    
    mGrid->SetHighlightCol(-1);
    mGrid->SetSingleColumnMode(true);
@@ -61,6 +67,9 @@ void RadioSequencer::CreateUIControls()
    mLengthSelector->AddLabel("64", 64);
    mLengthSelector->AddLabel("128", 128);
    
+   mLengthSelector->PositionTo(mIntervalSelector, kAnchor_Right);
+   mGridController->PositionTo(mLengthSelector, kAnchor_Right);
+   
    SyncControlCablesToGrid();
 }
 
@@ -71,6 +80,34 @@ void RadioSequencer::Init()
 
 void RadioSequencer::Poll()
 {
+}
+
+void RadioSequencer::OnControllerPageSelected()
+{
+   UpdateGridLights();
+}
+
+void RadioSequencer::OnGridButton(int x, int y, float velocity, IGridController* grid)
+{
+   if (velocity > 0)
+      mGrid->SetVal(x, y, 1);
+   UpdateGridLights();
+}
+
+void RadioSequencer::UpdateGridLights()
+{
+   for (int row=0; row<mGrid->GetRows(); ++row)
+   {
+      for (int col=0; col<mGrid->GetCols(); ++col)
+      {
+         if (mGrid->GetVal(col, row) == 1)
+            mGridController->SetLight(col, row, GridColor::kGridColor1Bright);
+         else if (col == mGrid->GetHighlightCol())
+            mGridController->SetLight(col, row, GridColor::kGridColor1Dim);
+         else
+            mGridController->SetLight(col, row, GridColor::kGridColorOff);
+      }
+   }
 }
 
 void RadioSequencer::OnTimeEvent(int samplesTo)
@@ -99,6 +136,8 @@ void RadioSequencer::OnTimeEvent(int samplesTo)
    
    if (controlToEnable)
       controlToEnable->SetValue(1);
+   
+   UpdateGridLights();
 }
 
 void RadioSequencer::DrawModule()
@@ -109,6 +148,7 @@ void RadioSequencer::DrawModule()
    mGrid->Draw();
    mIntervalSelector->Draw();
    mLengthSelector->Draw();
+   mGridController->Draw();
    
    for (int i=0; i<mControlCables.size(); ++i)
    {
@@ -205,7 +245,7 @@ void RadioSequencer::DropdownUpdated(DropdownList* list, int oldVal)
    {
       if (newSteps > 0)
       {
-         TheTransport->UpdateListener(this, mInterval);
+         TheTransport->UpdateListener(this, mInterval, kEarlyOffsetMs);
          SetNumSteps(newSteps, true);
       }
       else

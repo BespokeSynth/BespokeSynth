@@ -75,7 +75,7 @@ Looper::Looper()
 , mShowGranularCheckbox(nullptr)
 , mGranular(false)
 , mGranularCheckbox(nullptr)
-, mGranSpacing(nullptr)
+, mGranOverlap(nullptr)
 , mGranSpeed(nullptr)
 , mGranLengthMs(nullptr)
 , mPosSlider(nullptr)
@@ -153,7 +153,7 @@ void Looper::CreateUIControls()
    mFourTetSlicesDropdown = new DropdownList(this,"fourtetslices",-1,-1,&mFourTetSlices);
    mShowGranularCheckbox = new Checkbox(this,"granular",-1,-1,&mShowGranular);
    mGranularCheckbox = new Checkbox(this,"g on",3,168,&mGranular);
-   mGranSpacing = new FloatSlider(this,"g spacing",-1,-1,84,15,&mGranulator.mGrainSpacing,1.0f/MAX_GRAINS,1.5f,2);
+   mGranOverlap = new FloatSlider(this,"g overlap",-1,-1,84,15,&mGranulator.mGrainOverlap,.5f,MAX_GRAINS);
    mGranSpeed = new FloatSlider(this,"g speed",-1,-1,84,15,&mGranulator.mSpeed,-3,3);
    mGranLengthMs = new FloatSlider(this,"g len ms",-1,-1,84,15,&mGranulator.mGrainLengthMs,1,200);
    mPosSlider = new FloatSlider(this,"pos",-1,-1,140,15,&mLoopPos,0,mLoopLength);
@@ -211,9 +211,9 @@ void Looper::CreateUIControls()
    
    mGranOctaveCheckbox->PositionTo(mGranularCheckbox, kAnchor_Right);
    mGranLengthMs->PositionTo(mGranOctaveCheckbox, kAnchor_Right);
-   mGranSpacing->PositionTo(mGranularCheckbox, kAnchor_Below);
-   mGranPosRandomize->PositionTo(mGranSpacing, kAnchor_Right);
-   mGranSpeed->PositionTo(mGranSpacing, kAnchor_Below);
+   mGranOverlap->PositionTo(mGranularCheckbox, kAnchor_Below);
+   mGranPosRandomize->PositionTo(mGranOverlap, kAnchor_Right);
+   mGranSpeed->PositionTo(mGranOverlap, kAnchor_Below);
    mGranSpeedRandomize->PositionTo(mGranSpeed, kAnchor_Right);
    mPosSlider->PositionTo(mGranSpeed, kAnchor_Below);
    mPausePosCheckbox->PositionTo(mPosSlider, kAnchor_Right);
@@ -765,7 +765,7 @@ void Looper::DrawModule()
       ofRect(0,165,GetRect().width,73);
       ofPopStyle();
       mGranularCheckbox->Draw();
-      mGranSpacing->Draw();
+      mGranOverlap->Draw();
       mGranSpeed->Draw();
       mGranLengthMs->Draw();
       mPosSlider->Draw();

@@ -9,7 +9,7 @@
 #ifndef __Bespoke__GridController__
 #define __Bespoke__GridController__
 
-#include "IDrawableModule.h"
+#include "IUIControl.h"
 #include "MidiController.h"
 #include "UIGrid.h"
 #include "INoteSource.h"
@@ -35,7 +35,7 @@ class IGridControllerListener
 {
 public:
    virtual ~IGridControllerListener() {}
-   virtual void ConnectGridController(IGridController* grid) = 0;
+   virtual void OnControllerPageSelected() = 0;
    virtual void OnGridButton(int x, int y, float velocity, IGridController* grid) = 0;
 };
 
@@ -51,28 +51,21 @@ public:
    virtual bool HasInput() const = 0;
    virtual bool IsMultisliderGrid() const { return false; }
    
-   virtual void SetTarget(IClickable* target) = 0;
-   
    NoteHistory& GetNoteHistory() { return mHistory; }
 protected:
    NoteHistory mHistory;
 };
 
-class GridController : public IDrawableModule, public IGridController
+class GridController : public IUIControl, public IGridController
 {
 public:
-   GridController();
+   GridController(IGridControllerListener* owner, int x, int y);
    ~GridController() {}
-   static IDrawableModule* Create() { return new GridController(); }
    
-   string GetTitleLabel() override;
-   void CreateUIControls() override;
+   void Render() override;
    
-   void DrawGrid();
-   
-   void SetTarget(IClickable* target) override;
-   
-   void SetUp(GridLayout* layout, MidiController* controller);
+   void SetUp(GridLayout* layout, int page, MidiController* controller);
+   void UnhookController();
    void SetLight(int x, int y, GridColor color, bool force = false) override;
    void SetLightDirect(int x, int y, int color, bool force = false) override;
    void ResetLights() override;
@@ -80,23 +73,20 @@ public:
    int NumRows() override { return mRows; }
    bool HasInput() const override;
    bool IsMultisliderGrid() const override { return mColors.empty(); }
+   
+   //IUIControl
+   void SetFromMidiCC(float slider) override {}
+   void SetValue(float value) override {}
+   bool CanBeTargetedBy(PatchCableSource* source) const override;
+   void SaveState(FileStreamOut& out) override;
+   void LoadState(FileStreamIn& in, bool shouldSetValue = true) override;
 
    void OnControllerPageSelected();
    void OnInput(int control, float velocity);
    
-   void PostRepatch(PatchCableSource* cable) override;
-   
-   void LoadLayout(const ofxJSONElement& moduleInfo) override;
-   void SetUpFromSaveData() override;
-   
 private:
-   //IDrawableModule
-   void DrawModule() override;
-   bool Enabled() const override { return true; }
-   void GetModuleDimensions(int& x, int&y) override;
-   void OnClicked(int x, int y, bool right) override;
-   void MouseReleased() override;
-
+   void GetDimensions(int& width, int& height) override { width = 30; height = 15; }
+   
    unsigned int mRows;
    unsigned int mCols;
    int mControls[MAX_GRIDCONTROLLER_COLS][MAX_GRIDCONTROLLER_ROWS];
@@ -106,9 +96,7 @@ private:
    MidiMessageType mMessageType;
    MidiController* mController;
    int mControllerPage;
-   UIGrid* mGrid;
-   bool mClicked;
-   GridCell mClickedCell;
+   IGridControllerListener* mOwner;
 };
 
 #endif /* defined(__Bespoke__GridController__) */

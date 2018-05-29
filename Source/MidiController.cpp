@@ -21,6 +21,14 @@
 
 bool UIControlConnection::sDrawCables = true;
 
+namespace
+{
+   const int kLayoutControlsX = 5;
+   const int kLayoutControlsY = 100;
+   const int kLayoutButtonsX = 250;
+   const int kLayoutButtonsY = 10;
+}
+
 MidiController::MidiController()
 : mDevice(this)
 , mUseNegativeEdge(false)
@@ -914,7 +922,7 @@ void MidiController::DrawModule()
       ofPushStyle();
       ofFill();
       ofSetColor(50,50,50,gModuleDrawAlpha*.5f);
-      ofRect(170,2,235,140);
+      ofRect(kLayoutControlsX,kLayoutControlsY,235,140);
       ofPopStyle();
       
       if (mHighlightedLayoutElement != -1)
@@ -1195,7 +1203,7 @@ void MidiController::OnDeviceChanged()
             {
                int index = col + row * cols;
                int control = layout["groups"][group]["controls"][index].asInt();
-               GetLayoutControl(control, messageType).Setup(this, messageType, control, drawType, incremental, pos.x+5+spacing.x*col, pos.y+150+spacing.y*row, dim.x, dim.y);
+               GetLayoutControl(control, messageType).Setup(this, messageType, control, drawType, incremental, pos.x+kLayoutButtonsX+spacing.x*col, pos.y+kLayoutButtonsY+spacing.y*row, dim.x, dim.y);
             }
          }
          
@@ -1204,11 +1212,11 @@ void MidiController::OnDeviceChanged()
             GridLayout* grid = new GridLayout();
             grid->mRows = rows;
             grid->mCols = cols;
-            grid->mPosition.set(pos.x + 5 - 2, pos.y + 150 - 2);
+            grid->mPosition.set(pos.x + kLayoutButtonsX - 2, pos.y + kLayoutButtonsY - 2);
             grid->mDimensions.set(spacing.x*cols + 2, spacing.y*rows + 2);
             grid->mType = messageType;
-            grid->mGridCable = new PatchCableSource(this, kConnectionType_Special);
-            grid->mGridCable->SetManualPosition(pos.x+5-2, pos.y+150-2);
+            grid->mGridCable = new PatchCableSource(this, kConnectionType_Grid);
+            grid->mGridCable->SetManualPosition(pos.x+kLayoutButtonsX-2, pos.y+kLayoutButtonsY-2);
             grid->mGridCable->AddTypeFilter("gridcontroller");
             AddPatchCableSource(grid->mGridCable);
             
@@ -1222,6 +1230,18 @@ void MidiController::OnDeviceChanged()
                }
             }
             
+            if (!layout["groups"][group]["colors"].isNull() &&
+               layout["groups"][group]["colors"].size() > 0)
+            {
+               for (int i=0; i<layout["groups"][group]["colors"].size(); ++i)
+                  grid->mColors.push_back(layout["groups"][group]["colors"][i].asInt());
+            }
+            else
+            {
+               grid->mColors.push_back(0);
+               grid->mColors.push_back(127);
+            }
+            
             mGrids.push_back(grid);
          }
       }
@@ -1231,13 +1251,13 @@ void MidiController::OnDeviceChanged()
       for (int i=0; i<128; ++i)
       {
          GetLayoutControl(i, kMidiMessage_Control).
-            Setup(this, kMidiMessage_Control, i, kDrawType_Slider, false, i%8 * 30 + 14, i/8 * 30 + 150, 20, 28);
+            Setup(this, kMidiMessage_Control, i, kDrawType_Slider, false, i%8 * 30 + kLayoutButtonsX + 9, i/8 * 30 + kLayoutButtonsY, 20, 28);
          GetLayoutControl(i, kMidiMessage_Note).
-            Setup(this, kMidiMessage_Note, i, kDrawType_Button, false, i%8 * 30 + 8 * 30 + 20, i/8 * 30 + 150, 28, 28);
+            Setup(this, kMidiMessage_Note, i, kDrawType_Button, false, i%8 * 30 + 8 * 30 + kLayoutButtonsX + 15, i/8 * 30 + kLayoutButtonsY, 28, 28);
       }
       
       GetLayoutControl(0, kMidiMessage_PitchBend).
-         Setup(this, kMidiMessage_PitchBend, 0, kDrawType_Slider, false, 520, 150, 30, 100);
+         Setup(this, kMidiMessage_PitchBend, 0, kDrawType_Slider, false, kLayoutButtonsX + 515, kLayoutButtonsY, 30, 100);
    }
    
    mLayoutWidth = 0;
@@ -1407,6 +1427,20 @@ void MidiController::TextEntryComplete(TextEntry* entry)
    }
 }
 
+void MidiController::PreRepatch(PatchCableSource* cable)
+{
+   for (auto* grid : mGrids)
+   {
+      if (cable == grid->mGridCable)
+      {
+         grid->mGridController[mControllerPage] = dynamic_cast<GridController*>(cable->GetTarget());
+         if (grid->mGridController[mControllerPage])
+            grid->mGridController[mControllerPage]->UnhookController();
+         return;
+      }
+   }
+}
+
 void MidiController::PostRepatch(PatchCableSource* cable)
 {
    for (auto* grid : mGrids)
@@ -1415,7 +1449,7 @@ void MidiController::PostRepatch(PatchCableSource* cable)
       {
          grid->mGridController[mControllerPage] = dynamic_cast<GridController*>(cable->GetTarget());
          if (grid->mGridController[mControllerPage])
-            grid->mGridController[mControllerPage]->SetUp(grid, this);
+            grid->mGridController[mControllerPage]->SetUp(grid, mControllerPage, this);
          return;
       }
    }
@@ -1900,7 +1934,7 @@ void UIControlConnection::DrawLayout()
    mIncrementalEntry->DrawLabel(true);
    mFeedbackDropdown->DrawLabel(true);
    
-   mMessageTypeDropdown->SetPosition(175, 5);
+   mMessageTypeDropdown->SetPosition(kLayoutControlsX+5, kLayoutControlsY+3);
    mControlEntry->PositionTo(mMessageTypeDropdown, kAnchor_Right_Padded);
    mChannelDropdown->PositionTo(mControlEntry, kAnchor_Right_Padded);
    mUIControlPathEntry->PositionTo(mMessageTypeDropdown, kAnchor_Below);

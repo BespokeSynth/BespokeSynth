@@ -155,12 +155,6 @@
         <FILE id="RG4zGd" name="TremoloEffect.h" compile="0" resource="0" file="Source/TremoloEffect.h"/>
       </GROUP>
       <GROUP id="{6781AC07-A090-A7AF-8D27-BCB6D9526ABD}" name="modules">
-        <FILE id="KQt6SG" name="PitchToSpeed.cpp" compile="1" resource="0"
-              file="Source/PitchToSpeed.cpp"/>
-        <FILE id="aShOLe" name="PitchToSpeed.h" compile="0" resource="0" file="Source/PitchToSpeed.h"/>
-        <FILE id="ypzKC1" name="NoteStrummer.cpp" compile="1" resource="0"
-              file="Source/NoteStrummer.cpp"/>
-        <FILE id="htGfPr" name="NoteStrummer.h" compile="0" resource="0" file="Source/NoteStrummer.h"/>
         <FILE id="EugK26" name="Amplifier.cpp" compile="1" resource="0" file="Source/Amplifier.cpp"/>
         <FILE id="BgLMgo" name="Amplifier.h" compile="0" resource="0" file="Source/Amplifier.h"/>
         <FILE id="DU9MrN" name="Arpeggiator.cpp" compile="1" resource="0" file="Source/Arpeggiator.cpp"/>
@@ -189,12 +183,12 @@
         <FILE id="uSx7kB" name="Capo.h" compile="0" resource="0" file="Source/Capo.h"/>
         <FILE id="qTg836" name="ChaosEngine.cpp" compile="1" resource="0" file="Source/ChaosEngine.cpp"/>
         <FILE id="YY2OwK" name="ChaosEngine.h" compile="0" resource="0" file="Source/ChaosEngine.h"/>
-        <FILE id="lhRwIU" name="Chorder.cpp" compile="1" resource="0" file="Source/Chorder.cpp"/>
-        <FILE id="byJnsc" name="Chorder.h" compile="0" resource="0" file="Source/Chorder.h"/>
         <FILE id="K5w9nB" name="ChordDisplayer.cpp" compile="1" resource="0"
               file="Source/ChordDisplayer.cpp"/>
         <FILE id="HmwilQ" name="ChordDisplayer.h" compile="0" resource="0"
               file="Source/ChordDisplayer.h"/>
+        <FILE id="lhRwIU" name="Chorder.cpp" compile="1" resource="0" file="Source/Chorder.cpp"/>
+        <FILE id="byJnsc" name="Chorder.h" compile="0" resource="0" file="Source/Chorder.h"/>
         <FILE id="ubTlBd" name="CircleSequencer.cpp" compile="1" resource="0"
               file="Source/CircleSequencer.cpp"/>
         <FILE id="ovS48X" name="CircleSequencer.h" compile="0" resource="0"
@@ -269,8 +263,6 @@
               file="Source/GridController.cpp"/>
         <FILE id="wYDZOt" name="GridController.h" compile="0" resource="0"
               file="Source/GridController.h"/>
-        <FILE id="ovUyVK" name="GridToDrums.cpp" compile="1" resource="0" file="Source/GridToDrums.cpp"/>
-        <FILE id="rz4Egs" name="GridToDrums.h" compile="0" resource="0" file="Source/GridToDrums.h"/>
         <FILE id="UgXfjY" name="GroupControl.cpp" compile="1" resource="0"
               file="Source/GroupControl.cpp"/>
         <FILE id="hf7cqG" name="GroupControl.h" compile="0" resource="0" file="Source/GroupControl.h"/>
@@ -402,28 +394,29 @@
         <FILE id="zo4N2z" name="NoteLooper.h" compile="0" resource="0" file="Source/NoteLooper.h"/>
         <FILE id="RetyTQ" name="NoteOctaver.cpp" compile="1" resource="0" file="Source/NoteOctaver.cpp"/>
         <FILE id="hSygAE" name="NoteOctaver.h" compile="0" resource="0" file="Source/NoteOctaver.h"/>
+        <FILE id="zPsjnT" name="NotePanAlternator.cpp" compile="1" resource="0"
+              file="Source/NotePanAlternator.cpp"/>
+        <FILE id="aNaf0s" name="NotePanAlternator.h" compile="0" resource="0"
+              file="Source/NotePanAlternator.h"/>
         <FILE id="VzQfdr" name="NotePanner.cpp" compile="1" resource="0" file="Source/NotePanner.cpp"/>
         <FILE id="EuVKjW" name="NotePanner.h" compile="0" resource="0" file="Source/NotePanner.h"/>
         <FILE id="xSRCdF" name="NoteRouter.cpp" compile="1" resource="0" file="Source/NoteRouter.cpp"/>
         <FILE id="qQmpNv" name="NoteRouter.h" compile="0" resource="0" file="Source/NoteRouter.h"/>
-        <FILE id="N2IcFH" name="NoteSequencerColumn.cpp" compile="1" resource="0"
-              file="Source/NoteSequencerColumn.cpp"/>
-        <FILE id="v5vJOc" name="NoteSequencerColumn.h" compile="0" resource="0"
-              file="Source/NoteSequencerColumn.h"/>
         <FILE id="IGmN6O" name="NoteSinger.cpp" compile="1" resource="0" file="Source/NoteSinger.cpp"/>
         <FILE id="uWOTxD" name="NoteSinger.h" compile="0" resource="0" file="Source/NoteSinger.h"/>
         <FILE id="xORArp" name="NoteStepSequencer.cpp" compile="1" resource="0"
               file="Source/NoteStepSequencer.cpp"/>
         <FILE id="EuZ3UP" name="NoteStepSequencer.h" compile="0" resource="0"
               file="Source/NoteStepSequencer.h"/>
+        <FILE id="ypzKC1" name="NoteStrummer.cpp" compile="1" resource="0"
+              file="Source/NoteStrummer.cpp"/>
+        <FILE id="htGfPr" name="NoteStrummer.h" compile="0" resource="0" file="Source/NoteStrummer.h"/>
         <FILE id="fuzJDh" name="NoteSustain.cpp" compile="1" resource="0" file="Source/NoteSustain.cpp"/>
         <FILE id="wdwyFe" name="NoteSustain.h" compile="0" resource="0" file="Source/NoteSustain.h"/>
         <FILE id="RockxL" name="NoteToFreq.cpp" compile="1" resource="0" file="Source/NoteToFreq.cpp"/>
         <FILE id="LKkPBi" name="NoteToFreq.h" compile="0" resource="0" file="Source/NoteToFreq.h"/>
         <FILE id="XvPbXi" name="NoteToMs.cpp" compile="1" resource="0" file="Source/NoteToMs.cpp"/>
         <FILE id="OiTWxt" name="NoteToMs.h" compile="0" resource="0" file="Source/NoteToMs.h"/>
-        <FILE id="ltKqzK" name="NoteToSpeed.cpp" compile="1" resource="0" file="Source/NoteToSpeed.cpp"/>
-        <FILE id="Ct3mxR" name="NoteToSpeed.h" compile="0" resource="0" file="Source/NoteToSpeed.h"/>
         <FILE id="N7AI0k" name="NoteTransformer.cpp" compile="1" resource="0"
               file="Source/NoteTransformer.cpp"/>
         <FILE id="Gu2fbN" name="NoteTransformer.h" compile="0" resource="0"
@@ -437,10 +430,6 @@
         <FILE id="i6ONR2" name="OutputChannel.cpp" compile="1" resource="0"
               file="Source/OutputChannel.cpp"/>
         <FILE id="et5OpS" name="OutputChannel.h" compile="0" resource="0" file="Source/OutputChannel.h"/>
-        <FILE id="zPsjnT" name="NotePanAlternator.cpp" compile="1" resource="0"
-              file="Source/NotePanAlternator.cpp"/>
-        <FILE id="aNaf0s" name="NotePanAlternator.h" compile="0" resource="0"
-              file="Source/NotePanAlternator.h"/>
         <FILE id="chUWZI" name="PanicButton.cpp" compile="1" resource="0" file="Source/PanicButton.cpp"/>
         <FILE id="rEVLi6" name="PanicButton.h" compile="0" resource="0" file="Source/PanicButton.h"/>
         <FILE id="IJrVrl" name="Panner.cpp" compile="1" resource="0" file="Source/Panner.cpp"/>
@@ -457,6 +446,9 @@
         <FILE id="tGoqwJ" name="PitchSetter.h" compile="0" resource="0" file="Source/PitchSetter.h"/>
         <FILE id="f31QHm" name="PitchToCV.cpp" compile="1" resource="0" file="Source/PitchToCV.cpp"/>
         <FILE id="uSTaMz" name="PitchToCV.h" compile="0" resource="0" file="Source/PitchToCV.h"/>
+        <FILE id="KQt6SG" name="PitchToSpeed.cpp" compile="1" resource="0"
+              file="Source/PitchToSpeed.cpp"/>
+        <FILE id="aShOLe" name="PitchToSpeed.h" compile="0" resource="0" file="Source/PitchToSpeed.h"/>
         <FILE id="WrfYZh" name="Polyrhythms.cpp" compile="1" resource="0" file="Source/Polyrhythms.cpp"/>
         <FILE id="Dxf5mJ" name="Polyrhythms.h" compile="0" resource="0" file="Source/Polyrhythms.h"/>
         <FILE id="cwpyvy" name="Prefab.cpp" compile="1" resource="0" file="Source/Prefab.cpp"/>

@@ -202,7 +202,7 @@ private:
    bool mGranular;
    Checkbox* mGranularCheckbox;
    Granulator mGranulator;
-   FloatSlider* mGranSpacing;
+   FloatSlider* mGranOverlap;
    FloatSlider* mGranSpeed;
    FloatSlider* mGranLengthMs;
    FloatSlider* mPosSlider;

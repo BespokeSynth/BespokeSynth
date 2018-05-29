@@ -22,7 +22,7 @@ public:
    LaunchpadNoteDisplayer();
    static IDrawableModule* Create() { return new LaunchpadNoteDisplayer(); }
    
-   string GetTitleLabel() override { return "LP display"; }
+   string GetTitleLabel() override { return "grid display"; }
 
    void SetLaunchpad(LaunchpadKeyboard* launchpad) { mLaunchpad = launchpad; }
 

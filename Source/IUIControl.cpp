@@ -98,8 +98,14 @@ void IUIControl::DrawHover()
       ofPopStyle();
    }
    
+   DrawPatchCableHover();
+}
+
+void IUIControl::DrawPatchCableHover()
+{
    if (PatchCable::sActivePatchCable &&
-       PatchCable::sActivePatchCable->GetConnectionType() == kConnectionType_UIControl &&
+       (PatchCable::sActivePatchCable->GetConnectionType() == kConnectionType_UIControl ||
+        PatchCable::sActivePatchCable->GetConnectionType() == kConnectionType_Grid) &&
        PatchCable::sActivePatchCable->IsValidTarget(this))
    {
       int w,h;
@@ -111,6 +117,11 @@ void IUIControl::DrawHover()
       ofRect(mX,mY,w,h);
       ofPopStyle();
    }
+}
+
+bool IUIControl::CanBeTargetedBy(PatchCableSource* source) const
+{
+   return source->GetConnectionType() == kConnectionType_UIControl;
 }
 
 void IUIControl::StartBeacon()

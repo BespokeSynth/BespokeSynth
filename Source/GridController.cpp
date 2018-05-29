@@ -11,102 +11,49 @@
 #include "FillSaveDropdown.h"
 #include "PatchCableSource.h"
 
-GridController::GridController()
+GridController::GridController(IGridControllerListener* owner, int x, int y)
 : mMessageType(kMidiMessage_Note)
 , mController(nullptr)
 , mControllerPage(0)
 , mRows(0)
 , mCols(0)
-, mGrid(nullptr)
-, mClicked(false)
-, mClickedCell(0,0)
+, mOwner(owner)
 {
+   SetPosition(x,y);
+   dynamic_cast<IDrawableModule*>(owner)->AddUIControl(this);
+   SetParent(dynamic_cast<IClickable*>(owner));
+   
    bzero(mControls, sizeof(int)*MAX_GRIDCONTROLLER_ROWS*MAX_GRIDCONTROLLER_COLS);
    bzero(mInput, sizeof(float)*MAX_GRIDCONTROLLER_ROWS*MAX_GRIDCONTROLLER_COLS);
    bzero(mLights, sizeof(int)*MAX_GRIDCONTROLLER_ROWS*MAX_GRIDCONTROLLER_COLS);
 }
 
-void GridController::CreateUIControls()
+void GridController::Render()
 {
-   IDrawableModule::CreateUIControls();
+   ofPushStyle();
    
-   mGrid = new UIGrid(0,0,100,100,1,1);
-}
-
-string GridController::GetTitleLabel()
-{
-   return string("grid:")+Name();
-}
-
-void GridController::DrawModule()
-{
-   if (Minimized() || IsVisible() == false)
-      return;
+   ofNoFill();
+   ofSetLineWidth(3);
+   ofSetColor(200,200,200,gModuleDrawAlpha);
+   ofCircle(mX+6,mY+8,5);
    
-   DrawGrid();
-}
-
-void GridController::DrawGrid()
-{
-   int w,h;
-   GetDimensions(w,h);
-   mGrid->SetDimensions(w, h);
+   ofSetLineWidth(1);
+   float gridOffsetX = 15;
+   float gridOffsetY = 2;
+   float gridSize = 12;
+   ofRect(mX+gridOffsetX, mY+gridOffsetY, gridSize, gridSize, 0);
+   ofRect(mX+gridOffsetX+gridSize/3, mY+gridOffsetY, gridSize/3, 12, 0);
+   ofRect(mX+gridOffsetX, mY+gridOffsetY+gridSize/3, 12, gridSize/3, 0);
    
-   if (IsMultisliderGrid())
-   {
-      mGrid->Draw();
-   }
-   else //color mode
-   {
-      for (int col=0; col < mCols; ++col)
-      {
-         for (int row=0; row < mRows; ++row)
-         {
-            ofVec2f pos = mGrid->GetCellPosition(col, row);
-            ofPushStyle();
-            ofFill();
-            
-            switch (mLights[col][row])
-            {
-               case kGridColorOff:
-                  ofSetColor(100,100,100,255*gModuleDrawAlpha);
-                  break;
-               case kGridColor1Dim:
-                  ofSetColor(160,100,100,255*gModuleDrawAlpha);
-                  break;
-               case kGridColor1Bright:
-                  ofSetColor(255,100,100,255*gModuleDrawAlpha);
-                  break;
-               case kGridColor2Dim:
-                  ofSetColor(100,160,100,255*gModuleDrawAlpha);
-                  break;
-               case kGridColor2Bright:
-                  ofSetColor(100,255,100,255*gModuleDrawAlpha);
-                  break;
-               case kGridColor3Dim:
-                  ofSetColor(160,160,100,255*gModuleDrawAlpha);
-                  break;
-               case kGridColor3Bright:
-                  ofSetColor(255,200,100,255*gModuleDrawAlpha);
-                  break;
-            }
-            ofRect(pos.x+1,pos.y+1,w/mCols-2,h/mRows-2);
-            
-            if (mInput[col][row] > 0)
-            {
-               ofNoFill();
-               ofSetColor(ofColor::yellow);
-               ofRect(pos.x,pos.y,w/mCols,h/mRows);
-            }
-            
-            ofPopStyle();
-         }
-      }
-   }
+   DrawPatchCableHover();
+   
+   ofPopStyle();
 }
 
 void GridController::OnControllerPageSelected()
 {
+   mOwner->OnControllerPageSelected();
+   
    for (int i=0; i<mCols; ++i)
    {
       for (int j=0; j<mRows; ++j)
@@ -139,12 +86,8 @@ void GridController::OnInput(int control, float velocity)
    {
       mInput[x][y] = velocity;
       
-      for (auto cable : GetPatchCableSource()->GetPatchCables())
-      {
-         auto* listener = dynamic_cast<IGridControllerListener*>(cable->GetTarget());
-         if (listener)
-            listener->OnGridButton(x, y, velocity, this);
-      }
+      if (mOwner)
+         mOwner->OnGridButton(x, y, velocity, this);
       
       mHistory.AddEvent(gTime, HasInput());
    }
@@ -164,30 +107,6 @@ bool GridController::HasInput() const
    }
    
    return false;
-}
-
-void GridController::OnClicked(int x, int y, bool right)
-{
-   IDrawableModule::OnClicked(x, y, right);
-   
-   if (y>0)
-   {
-      GridCell cell = mGrid->GetGridCellAt(x, y);
-      OnInput(mControls[cell.mCol][cell.mRow], 1);
-      mClicked = true;
-      mClickedCell = cell;
-   }
-}
-
-void GridController::MouseReleased()
-{
-   IDrawableModule::MouseReleased();
-   
-   if (mClicked)
-   {
-      OnInput(mControls[mClickedCell.mCol][mClickedCell.mRow], 0);
-   }
-   mClicked = false;
 }
 
 void GridController::SetLight(int x, int y, GridColor color, bool force)
@@ -224,10 +143,6 @@ void GridController::SetLightDirect(int x, int y, int color, bool force)
             mController->SendCC(mControllerPage, mControls[x][y], color);
       }
       mLights[x][y] = color;
-      if (IsMultisliderGrid())
-         mGrid->SetVal(x,y,color/127.0f);
-      else
-         mGrid->SetVal(x,y,color==kGridColorOff ? 0 : 1);
    }
 }
 
@@ -242,28 +157,7 @@ void GridController::ResetLights()
    }
 }
 
-void GridController::SetTarget(IClickable* target)
-{
-   if (target)
-      GetPatchCableSource()->SetTarget(target);
-   else
-      GetPatchCableSource()->ClearPatchCables();
-}
-
-void GridController::PostRepatch(PatchCableSource* cable)
-{
-   auto* listener = dynamic_cast<IGridControllerListener*>(cable->GetTarget());
-   if (listener)
-      listener->ConnectGridController(this);
-}
-
-void GridController::GetModuleDimensions(int& w, int& h)
-{
-   w = mCols * 20;
-   h = mRows * 20;
-}
-
-void GridController::SetUp(GridLayout* layout, MidiController* controller)
+void GridController::SetUp(GridLayout* layout, int page, MidiController* controller)
 {
    mRows = layout->mRows;
    mCols = layout->mCols;
@@ -276,28 +170,39 @@ void GridController::SetUp(GridLayout* layout, MidiController* controller)
       }
    }
    
-   mColors.clear();
-   unsigned int numColors = 2;
-   for (unsigned int i=0; i<numColors; ++i)
-   {
-      mColors.push_back(i * 127);
-   }
+   mColors = layout->mColors;
    
    mMessageType = layout->mType;
    
-   mGrid->SetGrid(mCols,mRows);
-   
    mController = controller;
-}
-
-void GridController::LoadLayout(const ofxJSONElement& moduleInfo)
-{
-   mModuleSaveData.LoadString("target", moduleInfo);
+   mControllerPage = page;
    
-   SetUpFromSaveData();
+   OnControllerPageSelected();
 }
 
-void GridController::SetUpFromSaveData()
+void GridController::UnhookController()
 {
-   SetUpPatchCables(mModuleSaveData.GetString("target"));
+   mController = nullptr;
+}
+
+bool GridController::CanBeTargetedBy(PatchCableSource* source) const
+{
+   return source->GetConnectionType() == kConnectionType_Grid;
+}
+
+namespace
+{
+   const int kSaveStateRev = 1;
+}
+
+void GridController::SaveState(FileStreamOut& out)
+{
+   out << kSaveStateRev;
+}
+
+void GridController::LoadState(FileStreamIn& in, bool shouldSetValue)
+{
+   int rev;
+   in >> rev;
+   LoadStateValidate(rev <= kSaveStateRev);
 }

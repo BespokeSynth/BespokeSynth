@@ -113,6 +113,7 @@ void Monome::oscMessageReceived(const OSCMessage& msg)
       MidiNote note;
       note.mPitch = row + col*mMaxColumns;
       note.mVelocity = val * 127;
+      note.mChannel = 0;
       note.mDeviceName = "monome";
       mListener->OnMidiNote(note);
    }

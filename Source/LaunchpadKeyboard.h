@@ -28,7 +28,7 @@ public:
    ~LaunchpadKeyboard();
    static IDrawableModule* Create() { return new LaunchpadKeyboard(); }
    
-   string GetTitleLabel() override { return "launchpad"; }
+   string GetTitleLabel() override { return "gridkeyboard"; }
    void CreateUIControls() override;
 
    void SetHasDisplayer() { mHasDisplayer = true; }
@@ -36,7 +36,7 @@ public:
    void SetChorder(Chorder* chorder) { mChorder = chorder; }
    
    //IGridControllerListener
-   void ConnectGridController(IGridController* grid) override;
+   void OnControllerPageSelected() override;
    void OnGridButton(int x, int y, float velocity, IGridController* grid) override;
    
    //IScaleListener
@@ -119,7 +119,7 @@ private:
    bool mWasChorderEnabled;
    bool mPreserveChordRoot;
    Checkbox* mPreserveChordRootCheckbox;
-   IGridController* mGridController;
+   GridController* mGridController;
 };
 
 #endif /* defined(__modularSynth__LaunchpadKeyboard__) */

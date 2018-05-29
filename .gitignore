@@ -1,3 +1,12 @@
+# Bespoke stuff
+Release/Bespoke.app/*
+**/data/savestate/*
+**/data/loops/*
+**/data/samples/*
+**/data/.userprefs*
+**/data/tmp
+**/data/youtube.wav
+
 # Compiled Object files
 *.slo
 *.lo
@@ -90,7 +99,7 @@ Temporary Items
 # Build results
 [Dd]ebug/
 [Dd]ebugPublic/
-[Rr]elease/
+#[Rr]elease/
 [Rr]eleases/
 x64/
 x86/
