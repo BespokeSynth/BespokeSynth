@@ -9,10 +9,11 @@
 #include "StutterControl.h"
 #include "SynthGlobals.h"
 #include "ModularSynth.h"
+#include "Profiler.h"
 
 StutterControl::StutterControl()
-: mFreeLength(.1f)
-, mFreeSpeed(1)
+: IAudioProcessor(gBufferSize)
+, mGridController(nullptr)
 {
    for (int i=0; i<kNumStutterTypes; ++i)
       mStutter[i] = false;
@@ -22,8 +23,10 @@ void StutterControl::CreateUIControls()
 {
    IDrawableModule::CreateUIControls();
    
+   mGridController = new GridController(this, 80, 40);
+   
    int x = 4;
-   int y = 4;
+   int y = 40;
    mStutterCheckboxes[kHalf] = new Checkbox(this,"half note",x,y,&mStutter[kHalf]);
    y += 18;
    mStutterCheckboxes[kQuarter] = new Checkbox(this,"quarter",x,y,&mStutter[kQuarter]);
@@ -56,13 +59,38 @@ void StutterControl::CreateUIControls()
    y += 18;
    mStutterCheckboxes[kFree] = new Checkbox(this,"free",x,y,&mStutter[kFree]);
    y += 18;
-   mFreeLengthSlider = new FloatSlider(this,"free length",x,y,100,15,&mFreeLength,.005f,.25f);
+   mFreeLengthSlider = new FloatSlider(this,"free length",x,y,102,15,&mStutterProcessor.mFreeStutterLength,.005f,.25f);
    y += 18;
-   mFreeSpeedSlider = new FloatSlider(this,"free speed",x,y,100,15,&mFreeSpeed,0,2);
+   mFreeSpeedSlider = new FloatSlider(this,"free speed",x,y,102,15,&mStutterProcessor.mFreeStutterSpeed,0,2);
 }
 
 StutterControl::~StutterControl()
 {
+}
+
+void StutterControl::Process(double time)
+{
+   Profiler profiler("StutterControl");
+   
+   if (!mEnabled)
+      return;
+   
+   ComputeSliders(0);
+   SyncBuffers();
+   
+   if (GetTarget())
+   {
+      mStutterProcessor.ProcessAudio(time, GetBuffer());
+      
+      ChannelBuffer* out = GetTarget()->GetBuffer();
+      for (int ch=0; ch<GetBuffer()->NumActiveChannels(); ++ch)
+      {
+         Add(out->GetChannel(ch), GetBuffer()->GetChannel(ch), out->BufferSize());
+         GetVizBuffer()->WriteChunk(GetBuffer()->GetChannel(ch),GetBuffer()->BufferSize(), ch);
+      }
+   }
+   
+   GetBuffer()->Reset();
 }
 
 void StutterControl::DrawModule()
@@ -70,24 +98,22 @@ void StutterControl::DrawModule()
    if (Minimized() || IsVisible() == false)
       return;
    
+   mStutterProcessor.DrawStutterBuffer(4, 3, 90, 35);
+   
    for (int i=0; i<kNumStutterTypes; ++i)
       mStutterCheckboxes[i]->Draw();
    mFreeLengthSlider->Draw();
    mFreeSpeedSlider->Draw();
+   mGridController->Draw();
 }
 
 void StutterControl::SendStutter(StutterParams stutter, bool on)
 {
    if (on)
-   {
-      for (auto listener : mListeners)
-         listener->StartStutter(stutter);
-   }
+      mStutterProcessor.StartStutter(stutter);
    else
-   {
-      for (auto listener : mListeners)
-         listener->EndStutter(stutter);
-   }
+      mStutterProcessor.EndStutter(stutter);
+   UpdateGridLights();
 }
 
 StutterControl::StutterType StutterControl::GetStutterFromKey(int key)
@@ -127,44 +153,10 @@ StutterControl::StutterType StutterControl::GetStutterFromKey(int key)
    return kNumStutterTypes;
 }
 
-void StutterControl::KeyPressed(int key, bool isRepeat)
-{
-   IDrawableModule::KeyPressed(key, isRepeat);
-   if (GetKeyModifiers() == kModifier_Shift)
-   {
-      StutterType type = GetStutterFromKey(key);
-      if (type != kNumStutterTypes)
-      {
-         mStutter[type] = true;
-         SendStutter(GetStutter(type), true);
-      }
-   }
-}
-
-void StutterControl::KeyReleased(int key)
-{
-   StutterType type = GetStutterFromKey(key);
-   if (type != kNumStutterTypes)
-   {
-      mStutter[type] = false;
-      SendStutter(GetStutter(type), false);
-   }
-}
-
 void StutterControl::GetModuleDimensions(int& x, int& y)
 {
-   x= 75;
-   y= 44 + kNumStutterTypes*18;
-}
-
-void StutterControl::AddListener(Stutter* stutter)
-{
-   mListeners.push_back(stutter);
-}
-
-void StutterControl::RemoveListener(Stutter* stutter)
-{
-   mListeners.remove(stutter);
+   x = 110;
+   y = 80 + kNumStutterTypes*18;
 }
 
 StutterParams StutterControl::GetStutter(StutterControl::StutterType type)
@@ -223,4 +215,42 @@ void StutterControl::CheckboxUpdated(Checkbox* checkbox)
 
 void StutterControl::FloatSliderUpdated(FloatSlider* slider, float oldVal)
 {
+}
+
+void StutterControl::OnControllerPageSelected()
+{
+   UpdateGridLights();
+}
+
+void StutterControl::OnGridButton(int x, int y, float velocity, IGridController* grid)
+{
+   int index = x + y * grid->NumCols();
+   if (index < kNumStutterTypes)
+   {
+      mStutter[index] = velocity > 0;
+      SendStutter(GetStutter((StutterType)index), mStutter[index]);
+   }
+}
+
+void StutterControl::UpdateGridLights()
+{
+   if (mGridController == nullptr)
+      return;
+   
+   for (int i=0; i<kNumStutterTypes; ++i)
+   {
+      mGridController->SetLight(i % mGridController->NumCols(), i / mGridController->NumCols(), mStutter[i] ? kGridColor1Bright : kGridColor1Dim);
+   }
+}
+
+void StutterControl::LoadLayout(const ofxJSONElement& moduleInfo)
+{
+   mModuleSaveData.LoadString("target", moduleInfo);
+   
+   SetUpFromSaveData();
+}
+
+void StutterControl::SetUpFromSaveData()
+{
+   SetTarget(TheSynth->FindModule(mModuleSaveData.GetString("target")));
 }

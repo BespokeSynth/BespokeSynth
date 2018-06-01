@@ -11,7 +11,6 @@
 #include "ModularSynth.h"
 #include "Profiler.h"
 #include "FillSaveDropdown.h"
-#include "StutterControl.h"
 #include "PatchCableSource.h"
 
 bool Stutter::sQuantize = true;
@@ -26,9 +25,10 @@ Stutter::Stutter()
 , mFadeCheckbox(nullptr)
 , mSubdivideSlider(nullptr)
 , mNanopadScene(0)
-, mControl(nullptr)
 , mCurrentStutter(kInterval_None, 0)
 , mFadeStutter(false)
+, mFreeStutterLength(.1f)
+, mFreeStutterSpeed(1)
 {
    TheTransport->AddListener(this, kInterval_16n);
    mBlendRamp.SetValue(0);
@@ -40,11 +40,6 @@ void Stutter::CreateUIControls()
    mAutoCheckbox = new Checkbox(this,"auto",4,25,&mAutoStutter);
    mFadeCheckbox = new Checkbox(this,"fade",4,4,&mFadeStutter);
    mSubdivideSlider = new IntSlider(this,"sub",45,25,50,15,&sStutterSubdivide,1,8);
-   
-   mStutterControlCable = new PatchCableSource(this, kConnectionType_Special);
-   mStutterControlCable->SetManualPosition(87, 8);
-   mStutterControlCable->AddTypeFilter("stuttercontrol");
-   AddPatchCableSource(mStutterControlCable);
 }
 
 Stutter::~Stutter()
@@ -66,10 +61,10 @@ void Stutter::ProcessAudio(double time, ChannelBuffer* buffer)
 
    if (mBlendRamp.Target() > 0 || mBlendRamp.Value(time) > 0)
    {
-      if (mCurrentStutter.interval == kInterval_None && mControl)
+      if (mCurrentStutter.interval == kInterval_None)
       {
-         mStutterLengthRamp.Start(mControl->GetFreeLength() * gSampleRate, 20);
-         mStutterSpeed.Start(mControl->GetFreeSpeed(), 20);
+         mStutterLengthRamp.Start(mFreeStutterLength * gSampleRate, 20);
+         mStutterSpeed.Start(mFreeStutterSpeed, 20);
       }
       
       for (int i=0; i<bufferSize; ++i)
@@ -231,8 +226,8 @@ void Stutter::DoStutter(StutterParams stutter)
    mBlendRamp.Start(1, STUTTER_START_BLEND_MS);
    if (stutter.interval != kInterval_None)
       mStutterLength = int(TheTransport->GetDuration(stutter.interval) / 1000 * gSampleRate);
-   else if (mControl)
-      mStutterLength = int(mControl->GetFreeLength() * gSampleRate);
+   else
+      mStutterLength = mFreeStutterLength;
    if (stutter.speedBlendTime == 0)
       mStutterSpeed.SetValue(stutter.speedStart);
    else
@@ -251,15 +246,16 @@ void Stutter::DrawModule()
    mFadeCheckbox->Draw();
    mSubdivideSlider->Draw();
 
+   DrawStutterBuffer(4, 3, 90, 35);
+}
+
+void Stutter::DrawStutterBuffer(float x, float y, float width, float height)
+{
+   ofPushMatrix();
+   ofTranslate(x,y);
    if (mStuttering)
-   {
-      static float width = 90;
-      static float height = 35;
-      ofPushMatrix();
-      ofTranslate(4,3);
       DrawAudioBuffer(width, height, &mStutterBuffer, 0, mCaptureLength, GetBufferReadPos(mStutterPos));
-      ofPopMatrix();
-   }
+   ofPopMatrix();
 }
 
 void Stutter::GetModuleDimensions(int& width, int& height)
@@ -290,20 +286,6 @@ void Stutter::DoCapture()
    mCaptureLength /= sStutterSubdivide;
    for (int ch=0; ch<mStutterBuffer.NumActiveChannels(); ++ch)
       mRecordBuffer.ReadChunk(mStutterBuffer.GetChannel(ch), mCaptureLength, 0, ch);
-}
-
-void Stutter::PostRepatch(PatchCableSource* cableSource)
-{
-   SetController(dynamic_cast<StutterControl*>(mStutterControlCable->GetTarget()));
-}
-
-void Stutter::SetController(StutterControl* controller)
-{
-   if (mControl)
-      mControl->RemoveListener(this);
-   mControl = controller;
-   if (mControl)
-      mControl->AddListener(this);
 }
 
 void Stutter::CheckboxUpdated(Checkbox* checkbox)
@@ -381,17 +363,14 @@ void Stutter::UpdateEnabled()
 
 void Stutter::LoadLayout(const ofxJSONElement& info)
 {
-   mModuleSaveData.LoadString("controller", info, "", FillDropdown<StutterControl*>);
 }
 
 void Stutter::SetUpFromSaveData()
 {
-   mStutterControlCable->SetTarget(TheSynth->FindModule(mModuleSaveData.GetString("controller")));
 }
 
 void Stutter::SaveLayout(ofxJSONElement& info)
 {
-   mModuleSaveData.SetString("controller", mControl ? mControl->Path() : "");
    mModuleSaveData.Save(info);
 }
 

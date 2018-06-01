@@ -12,7 +12,7 @@
 #include "DelayEffect.h"
 #include "BiquadFilterEffect.h"
 #include "DistortionEffect.h"
-#include "Stutter.h"
+//#include "Stutter.h"
 #include "TremoloEffect.h"
 #include "Compressor.h"
 #include "NoiseEffect.h"
@@ -35,7 +35,7 @@ EffectFactory::EffectFactory()
    Register("delay", &(DelayEffect::Create));
    Register("biquad", &(BiquadFilterEffect::Create));
    Register("distortion", &(DistortionEffect::Create));
-   Register("stutter", &(Stutter::Create));
+   //Register("stutter", &(Stutter::Create));   stutter is now a standalone module as StutterControl
    Register("tremolo", &(TremoloEffect::Create));
    Register("compressor", &(Compressor::Create));
    Register("noisify", &(NoiseEffect::Create));

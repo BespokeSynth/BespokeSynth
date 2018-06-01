@@ -15,8 +15,8 @@ GridController::GridController(IGridControllerListener* owner, int x, int y)
 : mMessageType(kMidiMessage_Note)
 , mController(nullptr)
 , mControllerPage(0)
-, mRows(0)
-, mCols(0)
+, mRows(8)
+, mCols(8)
 , mOwner(owner)
 {
    SetPosition(x,y);

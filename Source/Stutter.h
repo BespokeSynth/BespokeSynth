@@ -26,7 +26,6 @@
 #define STUTTER_BUFFER_SIZE 5*gSampleRate
 
 class Looper;
-class StutterControl;
 class PatchCableSource;
 
 struct StutterParams
@@ -58,6 +57,7 @@ public:
    string GetTitleLabel() override { return "stutter"; }
    void CreateUIControls() override;
    
+   void DrawStutterBuffer(float x, float y, float width, float height);
    void StartStutter(StutterParams stutter);
    void EndStutter(StutterParams stutter);
    
@@ -69,8 +69,6 @@ public:
    
    //ITimeListener
    void OnTimeEvent(int samplesTo) override;
-   
-   void PostRepatch(PatchCableSource* cableSource) override;
 
    void CheckboxUpdated(Checkbox* checkbox) override;
    void IntSliderUpdated(IntSlider* slider, int oldVal) override;
@@ -78,13 +76,16 @@ public:
    void LoadLayout(const ofxJSONElement& info) override;
    void SetUpFromSaveData() override;
    void SaveLayout(ofxJSONElement& info) override;
+   
+   float mFreeStutterLength;
+   float mFreeStutterSpeed;
+   
 private:
    void DoCapture();
    void UpdateEnabled();
    float GetStutterSampleWithWraparoundBlend(int pos, int ch);
    void DoStutter(StutterParams stutter);
    void StopStutter();
-   void SetController(StutterControl* controller);
    float GetBufferReadPos(float stutterPos);
 
    //IDrawableModule
@@ -110,13 +111,10 @@ private:
    IntSlider* mSubdivideSlider;
    JumpBlender mJumpBlender[ChannelBuffer::kMaxNumChannels];
    int mNanopadScene;
-   StutterControl* mControl;
    list<StutterParams> mStutterStack;
    Ramp mStutterLengthRamp;
    bool mFadeStutter;
    Checkbox* mFadeCheckbox;
-   
-   PatchCableSource* mStutterControlCable;
 };
 
 

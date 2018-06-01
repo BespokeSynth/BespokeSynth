@@ -241,7 +241,7 @@ ModuleFactory::ModuleFactory()
    REGISTER(NoteFlusher, noteflusher, kModuleType_Note);
    REGISTER(NoteCanvas, notecanvas, kModuleType_Instrument);
    REGISTER(CommentDisplay, comment, kModuleType_Other);
-   REGISTER(StutterControl, stuttercontrol, kModuleType_Other);
+   REGISTER(StutterControl, stutter, kModuleType_Audio);
    REGISTER(CircleSequencer, circlesequencer, kModuleType_Instrument);
    REGISTER(MidiOutputModule, midioutput, kModuleType_Note);
    REGISTER(NoteDisplayer, notedisplayer, kModuleType_Note);

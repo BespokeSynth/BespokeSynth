@@ -15,27 +15,31 @@
 #include "Checkbox.h"
 #include "Stutter.h"
 #include "Slider.h"
+#include "IAudioProcessor.h"
+#include "GridController.h"
 
-class StutterControl : public IDrawableModule, public IFloatSliderListener
+class StutterControl : public IAudioProcessor, public IDrawableModule, public IFloatSliderListener, public IGridControllerListener
 {
 public:
    StutterControl();
    ~StutterControl();
    static IDrawableModule* Create() { return new StutterControl(); }
    
-   string GetTitleLabel() override { return "stutter control"; }
+   string GetTitleLabel() override { return "stutter"; }
    void CreateUIControls() override;
    
-   void KeyPressed(int key, bool isRepeat) override;
-   void KeyReleased(int key) override;
+   //IAudioSource
+   void Process(double time) override;
    
-   void AddListener(Stutter* stutter);
-   void RemoveListener(Stutter* stutter);
-   float GetFreeLength() const { return mFreeLength; }
-   float GetFreeSpeed() const { return mFreeSpeed; }
+   //IGridControllerListener
+   void OnControllerPageSelected() override;
+   void OnGridButton(int x, int y, float velocity, IGridController* grid) override;
    
    void CheckboxUpdated(Checkbox* checkbox) override;
    void FloatSliderUpdated(FloatSlider* slider, float oldVal) override;
+   
+   virtual void LoadLayout(const ofxJSONElement& moduleInfo) override;
+   virtual void SetUpFromSaveData() override;
    
 private:
    enum StutterType
@@ -67,14 +71,14 @@ private:
    void DrawModule() override;
    bool Enabled() const override { return true; }
    void GetModuleDimensions(int& x, int& y) override;
+   void UpdateGridLights();
    
-   list<Stutter*> mListeners;
+   Stutter mStutterProcessor;
    Checkbox* mStutterCheckboxes[kNumStutterTypes];
    bool mStutter[kNumStutterTypes];
-   float mFreeLength;
    FloatSlider* mFreeLengthSlider;
-   float mFreeSpeed;
    FloatSlider* mFreeSpeedSlider;
+   GridController* mGridController;
 };
 
 #endif /* defined(__Bespoke__StutterControl__) */

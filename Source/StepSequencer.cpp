@@ -149,7 +149,7 @@ void StepSequencer::Poll()
 
 namespace
 {
-   const float kMidwayVelocity = .5f;
+   const float kMidwayVelocity = .75f;
 }
 
 void StepSequencer::UpdateLights()
