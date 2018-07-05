@@ -83,6 +83,7 @@ private:
    FloatSlider* mLengthMultiplierSlider;
    
    FloatSlider* mFilterCutoffSlider;
+   FloatSlider* mFilterQSlider;
    ADSRDisplay* mFilterADSRDisplay;
    
    RadioButton* mADSRModeSelector;

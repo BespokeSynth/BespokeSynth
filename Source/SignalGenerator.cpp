@@ -82,21 +82,21 @@ void SignalGenerator::CreateUIControls()
    mOscSelector->AddLabel("-saw",kOsc_NegSaw);
    mOscSelector->AddLabel("noise",kOsc_Random);
    
-   mMultSelector->AddLabel("8", 8);
-   mMultSelector->AddLabel("7", 7);
-   mMultSelector->AddLabel("6", 6);
-   mMultSelector->AddLabel("5", 5);
-   mMultSelector->AddLabel("4", 4);
-   mMultSelector->AddLabel("3", 3);
-   mMultSelector->AddLabel("2", 2);
-   mMultSelector->AddLabel("1", 1);
-   mMultSelector->AddLabel("1/2", -2);
-   mMultSelector->AddLabel("1/3", -3);
-   mMultSelector->AddLabel("1/4", -4);
-   mMultSelector->AddLabel("1/5", -5);
-   mMultSelector->AddLabel("1/6", -6);
-   mMultSelector->AddLabel("1/7", -7);
    mMultSelector->AddLabel("1/8", -8);
+   mMultSelector->AddLabel("1/7", -7);
+   mMultSelector->AddLabel("1/6", -6);
+   mMultSelector->AddLabel("1/5", -5);
+   mMultSelector->AddLabel("1/4", -4);
+   mMultSelector->AddLabel("1/3", -3);
+   mMultSelector->AddLabel("1/2", -2);
+   mMultSelector->AddLabel("1", 1);
+   mMultSelector->AddLabel("2", 2);
+   mMultSelector->AddLabel("3", 3);
+   mMultSelector->AddLabel("4", 4);
+   mMultSelector->AddLabel("5", 5);
+   mMultSelector->AddLabel("6", 6);
+   mMultSelector->AddLabel("7", 7);
+   mMultSelector->AddLabel("8", 8);
    
    mFreqModeSelector->AddLabel("instant", kFreqMode_Instant);
    mFreqModeSelector->AddLabel("root", kFreqMode_Root);

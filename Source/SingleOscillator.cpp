@@ -46,6 +46,7 @@ SingleOscillator::SingleOscillator()
    mVoiceParams.mDetune = 1;
    mVoiceParams.mFilterAdsr.Set(1,0,1,30);
    mVoiceParams.mFilterCutoff = SINGLEOSCILLATOR_NO_CUTOFF;
+   mVoiceParams.mFilterQ = 1;
    mVoiceParams.mShuffle = 0;
    mVoiceParams.mPhaseOffset = 0;
    mVoiceParams.mUnison = 1;
@@ -78,7 +79,8 @@ void SingleOscillator::CreateUIControls()
    mFilterADSRDisplay = new ADSRDisplay(this,"envfilter",95,18,80,36,&mVoiceParams.mFilterAdsr);
    mLengthMultiplierSlider = new FloatSlider(this,"len",mADSRDisplay,kAnchor_Below,80,15,&mLengthMultiplier,.01f,10);
    mVolSlider = new FloatSlider(this,"vol",mLengthMultiplierSlider,kAnchor_Below,80,15,&mVoiceParams.mVol,0,1);
-   mFilterCutoffSlider = new FloatSlider(this,"cutoff",mVolSlider,kAnchor_Below,80,15,&mVoiceParams.mFilterCutoff,0,SINGLEOSCILLATOR_NO_CUTOFF);
+   mFilterCutoffSlider = new FloatSlider(this,"f",mVolSlider,kAnchor_Below,40,15,&mVoiceParams.mFilterCutoff,0,SINGLEOSCILLATOR_NO_CUTOFF);
+   mFilterQSlider = new FloatSlider(this,"q",mFilterCutoffSlider,kAnchor_Right,40,15,&mVoiceParams.mFilterQ,.1,9.99f,2);
    mSyncCheckbox = new Checkbox(this,"sync",mFilterCutoffSlider,kAnchor_Below,&mVoiceParams.mSync);
    mSyncFreqSlider = new FloatSlider(this,"syncf",mSyncCheckbox,kAnchor_Right,40,15,&mVoiceParams.mSyncFreq,10,999.9f);
 
@@ -86,22 +88,22 @@ void SingleOscillator::CreateUIControls()
    
    mFilterCutoffSlider->SetMaxValueDisplay("none");
    
-   mMultSelector->AddLabel("8", 8);
-   mMultSelector->AddLabel("7", 7);
-   mMultSelector->AddLabel("6", 6);
-   mMultSelector->AddLabel("5", 5);
-   mMultSelector->AddLabel("4", 4);
-   mMultSelector->AddLabel("3", 3);
-   mMultSelector->AddLabel("2", 2);
-   mMultSelector->AddLabel("1.5", -1);
-   mMultSelector->AddLabel("1", 1);
-   mMultSelector->AddLabel("1/2", -2);
-   mMultSelector->AddLabel("1/3", -3);
-   mMultSelector->AddLabel("1/4", -4);
-   mMultSelector->AddLabel("1/5", -5);
-   mMultSelector->AddLabel("1/6", -6);
-   mMultSelector->AddLabel("1/7", -7);
    mMultSelector->AddLabel("1/8", -8);
+   mMultSelector->AddLabel("1/7", -7);
+   mMultSelector->AddLabel("1/6", -6);
+   mMultSelector->AddLabel("1/5", -5);
+   mMultSelector->AddLabel("1/4", -4);
+   mMultSelector->AddLabel("1/3", -3);
+   mMultSelector->AddLabel("1/2", -2);
+   mMultSelector->AddLabel("1", 1);
+   mMultSelector->AddLabel("1.5", -1);
+   mMultSelector->AddLabel("2", 2);
+   mMultSelector->AddLabel("3", 3);
+   mMultSelector->AddLabel("4", 4);
+   mMultSelector->AddLabel("5", 5);
+   mMultSelector->AddLabel("6", 6);
+   mMultSelector->AddLabel("7", 7);
+   mMultSelector->AddLabel("8", 8);
    
    mADSRDisplay->SetVol(mVoiceParams.mVol);
    
@@ -179,6 +181,7 @@ void SingleOscillator::DrawModule()
    mShuffleSlider->Draw();
    mFilterADSRDisplay->Draw();
    mFilterCutoffSlider->Draw();
+   mFilterQSlider->Draw();
    if (mADSRMode == 0)  //draw order
    {
       mADSRModeSelector->Draw();

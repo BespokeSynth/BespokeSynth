@@ -37,6 +37,7 @@ public:
    float mUnisonWidth;
    
    float mFilterCutoff;
+   float mFilterQ;
    ADSR mFilterAdsr;
 };
 
