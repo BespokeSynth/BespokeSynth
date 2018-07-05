@@ -592,7 +592,7 @@ void MidiController::Poll()
          if (uicontrol == nullptr)
             continue;
          
-         if (connection->mPage != -1 && connection->mPage != mControllerPage)
+         if (!connection->mPageless && connection->mPage != mControllerPage)
             continue;
          
          int control = connection->mControl;
@@ -1261,7 +1261,7 @@ void MidiController::OnDeviceChanged()
    }
    
    mLayoutWidth = 0;
-   mLayoutHeight = 0;
+   mLayoutHeight = 300;
    for (int i=0; i<NUM_LAYOUT_CONTROLS; ++i)
    {
       if (mLayoutControls[i].mActive)
@@ -1355,16 +1355,17 @@ void MidiController::DropdownUpdated(DropdownList* list, int oldVal)
    }
    if (list == mControllerList)
    {
-      string deviceName = mControllerList->GetLabel(mControllerIndex);
-      bool hasOutput = MidiOutput::getDevices().contains(String(deviceName));
-      mDeviceIn = deviceName;
-      mDeviceOut = hasOutput ? deviceName : "";
+      string deviceInName = mControllerList->GetLabel(mControllerIndex);
+      string deviceOutName = String(deviceInName).replace("Input", "Output").replace("input","output").toStdString();
+      bool hasOutput = MidiOutput::getDevices().contains(String(deviceOutName));
+      mDeviceIn = deviceInName;
+      mDeviceOut = hasOutput ? deviceOutName : "";
       mModuleSaveData.SetString("devicein", mDeviceIn);
       mModuleSaveData.SetString("deviceout", mDeviceOut);
       
-      if (strstr(deviceName.c_str(), "Seaboard") != nullptr ||
-          strstr(deviceName.c_str(), "Lightpad BLOCK") != nullptr ||
-          strstr(deviceName.c_str(), "Linnstrument") != nullptr)
+      if (strstr(deviceInName.c_str(), "Seaboard") != nullptr ||
+          strstr(deviceInName.c_str(), "Lightpad BLOCK") != nullptr ||
+          strstr(deviceInName.c_str(), "Linnstrument") != nullptr)
       {
          SetUseChannelAsVoice(true);
          SetPitchBendRange(48);
@@ -1849,7 +1850,7 @@ void UIControlConnection::PreDraw()
       mUIOwner->GetLayoutControl(mControl, mMessageType).mControlCable->SetEnabled(sDrawCables);
    
    mControlEntry->SetShowing(mMessageType != kMidiMessage_PitchBend);
-   mValueEntry->SetShowing(mType == kControlType_SetValue || mType == kControlType_SetValueOnRelease);
+   mValueEntry->SetShowing((mType == kControlType_SetValue|| mType == kControlType_SetValueOnRelease) && mIncrementAmount == 0);
    mIncrementalEntry->SetShowing(mType == kControlType_Slider || mType == kControlType_SetValue || mType == kControlType_SetValueOnRelease);
 }
 
