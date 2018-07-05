@@ -61,6 +61,8 @@ FloatSlider::FloatSlider(IFloatSliderListener* owner, const char* label, IUICont
 
 FloatSlider::~FloatSlider()
 {
+   if (mIsSmoothing)
+      TheTransport->RemoveAudioPoller(this);
 }
 
 void FloatSlider::Init()
