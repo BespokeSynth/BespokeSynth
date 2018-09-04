@@ -62,6 +62,8 @@ void FeedbackModule::Process(double time)
    
    if (mFeedbackTarget)
    {
+      mFeedbackTarget->GetBuffer()->SetNumActiveChannels(GetBuffer()->NumActiveChannels());
+      mFeedbackVizBuffer.SetNumChannels(GetBuffer()->NumActiveChannels());
       mDelay.ProcessAudio(gTime, GetBuffer());
       
       for (int ch=0; ch<GetBuffer()->NumActiveChannels(); ++ch)
