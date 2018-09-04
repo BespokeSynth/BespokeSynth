@@ -119,7 +119,9 @@ bool Sample::WriteDataToFile(const char *path, float **data, int numSamples, int
 {
    ScopedPointer<WavAudioFormat> wavFormat = new WavAudioFormat();
    File outputFile(ofToDataPath(path).c_str());
+   outputFile.create();
    FileOutputStream* outputTo = outputFile.createOutputStream();
+   assert(outputTo != nullptr);
     
    ScopedPointer<AudioFormatWriter> writer = wavFormat->createWriterFor(outputTo, gSampleRate, channels, 16, nullptr, 0);
    writer->writeFromFloatArrays(data, channels, numSamples);
