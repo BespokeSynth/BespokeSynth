@@ -1051,8 +1051,6 @@ void Looper::SampleDropped(int x, int y, Sample* sample)
    if (numSamples <= 0)
       return;
    
-   mVol = 0;
-   
    if (sample->GetNumBars() > 0)
       SetNumBars(sample->GetNumBars());
    

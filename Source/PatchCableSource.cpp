@@ -12,6 +12,7 @@
 #include "ADSRDisplay.h"
 #include "INoteReceiver.h"
 #include "GridController.h"
+#include "IPulseReceiver.h"
 
 namespace
 {
@@ -34,7 +35,7 @@ PatchCableSource::PatchCableSource(IDrawableModule* owner, ConnectionType type)
 , mSide(kNone)
 , mManualSide(kNone)
 {
-   mAllowMultipleTargets = (mType == kConnectionType_Note);
+   mAllowMultipleTargets = (mType == kConnectionType_Note || mType == kConnectionType_Pulse);
    
    if (mType == kConnectionType_Note)
       mColor = IDrawableModule::GetColor(kModuleType_Note);
@@ -42,6 +43,8 @@ PatchCableSource::PatchCableSource(IDrawableModule* owner, ConnectionType type)
       mColor = IDrawableModule::GetColor(kModuleType_Audio);
    else if (mType == kConnectionType_UIControl)
       mColor = IDrawableModule::GetColor(kModuleType_Modulator);
+   else if (mType == kConnectionType_Pulse)
+      mColor = ofColor::white;
    else
       mColor = IDrawableModule::GetColor(kModuleType_Other);
    mColor.setBrightness(mColor.getBrightness() * .8f);
@@ -80,6 +83,7 @@ void PatchCableSource::SetPatchCableTarget(PatchCable* cable, IClickable* target
    {
       mAudioReceiver = nullptr;
       RemoveFromVector(dynamic_cast<INoteReceiver*>(cable->GetTarget()), mNoteReceivers);
+      RemoveFromVector(dynamic_cast<IPulseReceiver*>(cable->GetTarget()), mPulseReceivers);
    }
    
    cable->SetTarget(target);
@@ -87,6 +91,9 @@ void PatchCableSource::SetPatchCableTarget(PatchCable* cable, IClickable* target
    INoteReceiver* noteReceiver = dynamic_cast<INoteReceiver*>(target);
    if (noteReceiver)
       mNoteReceivers.push_back(noteReceiver);
+   IPulseReceiver* pulseReceiver = dynamic_cast<IPulseReceiver*>(target);
+   if (pulseReceiver)
+      mPulseReceivers.push_back(pulseReceiver);
    IAudioReceiver* audioReceiver = dynamic_cast<IAudioReceiver*>(target);
    if (audioReceiver)
    {
@@ -357,6 +364,8 @@ void PatchCableSource::FindValidTargets()
          mValidTargets.push_back(module);
       if (mType == kConnectionType_Note && dynamic_cast<INoteReceiver*>(module))
          mValidTargets.push_back(module);
+      if (mType == kConnectionType_Pulse && dynamic_cast<IPulseReceiver*>(module))
+         mValidTargets.push_back(module);
       if (mType == kConnectionType_Special)
       {
          mValidTargets.push_back(module);
@@ -391,6 +400,7 @@ void PatchCableSource::RemovePatchCable(PatchCable* cable)
    mOwner->PreRepatch(this);
    mAudioReceiver = nullptr;
    RemoveFromVector(dynamic_cast<INoteReceiver*>(cable->GetTarget()), mNoteReceivers);
+   RemoveFromVector(dynamic_cast<IPulseReceiver*>(cable->GetTarget()), mPulseReceivers);
    RemoveFromVector(cable, mPatchCables);
    mOwner->PostRepatch(this);
    delete cable;
@@ -415,6 +425,7 @@ void PatchCableSource::SetTarget(IClickable* target)
    {
       mAudioReceiver = nullptr;
       mNoteReceivers.clear();
+      mPulseReceivers.clear();
    }
 }
 

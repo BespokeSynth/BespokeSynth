@@ -36,7 +36,6 @@ public:
    string GetTitleLabel() override { return "sampler"; }
    void CreateUIControls() override;
    
-   void SetVol(float vol) { mVoiceParams.mVol = vol; mADSRDisplay->SetVol(vol); }
    void Poll() override;
    
    //IAudioProcessor

@@ -48,9 +48,6 @@ enum NoteInterval
    kInterval_16,
    kInterval_32,
    kInterval_64,
-   kInterval_Kick,
-   kInterval_Snare,
-   kInterval_Hat,
    kInterval_Free,
    kInterval_None
 };
@@ -133,9 +130,6 @@ private:
    float mTempo;
    int mTimeSigTop;
    int mTimeSigBottom;
-   int mQueuedTimeSigTop;
-   int mQueuedTimeSigBottom;
-   bool mTimeSigChangeQueued;
    unsigned int mMeasureCount;
    float mMeasurePos;
    int mSwingInterval;

@@ -119,9 +119,7 @@ void NoteStepSequencer::CreateUIControls()
    mIntervalSelector->AddLabel("16nt", kInterval_16nt);
    mIntervalSelector->AddLabel("32n", kInterval_32n);
    mIntervalSelector->AddLabel("64n", kInterval_64n);
-   mIntervalSelector->AddLabel("kick", kInterval_Kick);
-   mIntervalSelector->AddLabel("snare", kInterval_Snare);
-   mIntervalSelector->AddLabel("hat", kInterval_Hat);
+   mIntervalSelector->AddLabel("none", kInterval_None);
    
    mNoteModeSelector->AddLabel("scale", kNoteMode_Scale);
    mNoteModeSelector->AddLabel("chromatic", kNoteMode_Chromatic);
@@ -414,7 +412,17 @@ void NoteStepSequencer::OnTransportAdvanced(float amount)
    }
 }
 
+void NoteStepSequencer::OnPulse(int samplesTo, int flags)
+{
+   Step(samplesTo, flags & kPulseFlag_Reset);
+}
+
 void NoteStepSequencer::OnTimeEvent(int samplesTo)
+{
+   Step(samplesTo, false);
+}
+
+void NoteStepSequencer::Step(int samplesTo, bool reset)
 {
    if (!mEnabled || mHold)
       return;
@@ -450,7 +458,7 @@ void NoteStepSequencer::OnTimeEvent(int samplesTo)
       }
    }
    
-   float offsetMs = (-mOffset/TheTransport->CountInStandardMeasure(mInterval))*TheTransport->MsPerBar();
+   float offsetMs = GetOffset()*TheTransport->MsPerBar();
    
    bool shouldResetForDownbeat = false;
    if (mTimeMode == kTimeMode_Downbeat)
@@ -460,7 +468,7 @@ void NoteStepSequencer::OnTimeEvent(int samplesTo)
    if (mTimeMode == kTimeMode_Downbeat4)
       shouldResetForDownbeat = TheTransport->GetQuantized(offsetMs, mInterval) == 0 && TheTransport->GetMeasure() % 4 == 0;
    
-   if (shouldResetForDownbeat)
+   if (reset || shouldResetForDownbeat)
    {
       mArpIndex = 0;
       mArpPingPongDirection = 1;
@@ -527,7 +535,7 @@ void NoteStepSequencer::OnTimeEvent(int samplesTo)
    
    if (offPitch != -1)
    {
-      PlayNoteOutput(gTime, offPitch, 0, -1);
+      PlayNoteOutput(gTime + samplesTo * gInvSampleRateMs, offPitch, 0, -1);
       if (offPitch == mLastPitch)
       {
          mLastPitch = -1;
@@ -774,10 +782,17 @@ void NoteStepSequencer::RandomizePitches(bool fifths)
    }
 }
 
+float NoteStepSequencer::GetOffset()
+{
+   if (mInterval == kInterval_None)
+      return 0;
+   return (-mOffset/TheTransport->CountInStandardMeasure(mInterval));
+}
+
 void NoteStepSequencer::DropdownUpdated(DropdownList* list, int oldVal)
 {
    if (list == mIntervalSelector)
-      TheTransport->UpdateListener(this, mInterval, (-mOffset/TheTransport->CountInStandardMeasure(mInterval)), false);
+      TheTransport->UpdateListener(this, mInterval, GetOffset(), false);
    if (list == mTimeModeSelector)
    {
       mArpStepSlider->SetShowing(mTimeMode != kTimeMode_Synced);
@@ -787,14 +802,14 @@ void NoteStepSequencer::DropdownUpdated(DropdownList* list, int oldVal)
       mShiftForwardButton->SetShowing(mTimeMode == kTimeMode_Synced);
       mLoopResetPointSlider->SetShowing(mTimeMode != kTimeMode_Synced);
       
-      if (mTimeMode == kTimeMode_Free && mInterval < kInterval_Kick)
+      if (mTimeMode == kTimeMode_Free && mInterval < kInterval_None)
       {
          mFreeTimeStep = TheTransport->GetDuration(mInterval);
          TheTransport->UpdateListener(this, kInterval_None);
       }
       else if (oldVal == kTimeMode_Free)
       {
-         TheTransport->UpdateListener(this, mInterval, (-mOffset/TheTransport->CountInStandardMeasure(mInterval)), false);
+         TheTransport->UpdateListener(this, mInterval, GetOffset(), false);
       }
    }
    if (list == mNoteModeSelector)
@@ -816,7 +831,7 @@ void NoteStepSequencer::FloatSliderUpdated(FloatSlider* slider, float oldVal)
    {
       if (mTimeMode != kTimeMode_Free)
       {
-         TheTransport->UpdateListener(this, mInterval, (-mOffset/TheTransport->CountInStandardMeasure(mInterval)), false);
+         TheTransport->UpdateListener(this, mInterval, GetOffset(), false);
       }
    }
    for (int i=0; i<NSS_MAX_STEPS; ++i)

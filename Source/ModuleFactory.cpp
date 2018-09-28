@@ -169,6 +169,8 @@
 #include "ChordDisplayer.h"
 #include "NoteStrummer.h"
 #include "PitchToSpeed.h"
+#include "NoteToPulse.h"
+#include "OSCOutput.h"
 
 #define REGISTER(class,name,type) Register(#name, &(class::Create), &(class::CanCreate), type, false, false);
 #define REGISTER_HIDDEN(class,name,type) Register(#name, &(class::Create), &(class::CanCreate), type, true, false);
@@ -306,6 +308,8 @@ ModuleFactory::ModuleFactory()
    REGISTER(NoteStrummer, notestrummer, kModuleType_Note);
    REGISTER(SeaOfGrain, seaofgrain, kModuleType_Synth);
    REGISTER(PitchToSpeed, pitchtospeed, kModuleType_Modulator);
+   REGISTER(NoteToPulse, notetopulse, kModuleType_Other);
+   REGISTER(OSCOutput, oscoutput, kModuleType_Other);
 
    //REGISTER_EXPERIMENTAL(MidiPlayer, midiplayer, kModuleType_Instrument);
    REGISTER_EXPERIMENTAL(Razor, razor, kModuleType_Synth);

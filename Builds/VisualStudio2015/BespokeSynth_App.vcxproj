@@ -293,9 +293,11 @@
     <ClCompile Include="..\..\Source\NoteSustain.cpp"/>
     <ClCompile Include="..\..\Source\NoteToFreq.cpp"/>
     <ClCompile Include="..\..\Source\NoteToMs.cpp"/>
+    <ClCompile Include="..\..\Source\NoteToPulse.cpp"/>
     <ClCompile Include="..\..\Source\NoteTransformer.cpp"/>
     <ClCompile Include="..\..\Source\NoteVibrato.cpp"/>
     <ClCompile Include="..\..\Source\OneShotLauncher.cpp"/>
+    <ClCompile Include="..\..\Source\OSCOutput.cpp"/>
     <ClCompile Include="..\..\Source\OutputChannel.cpp"/>
     <ClCompile Include="..\..\Source\PanicButton.cpp"/>
     <ClCompile Include="..\..\Source\Panner.cpp"/>
@@ -398,6 +400,7 @@
     <ClCompile Include="..\..\Source\IDrawableModule.cpp"/>
     <ClCompile Include="..\..\Source\IModulator.cpp"/>
     <ClCompile Include="..\..\Source\INoteSource.cpp"/>
+    <ClCompile Include="..\..\Source\IPulseReceiver.cpp"/>
     <ClCompile Include="..\..\Source\JumpBlender.cpp"/>
     <ClCompile Include="..\..\Source\KarplusStrongVoice.cpp"/>
     <ClCompile Include="..\..\Source\LaunchpadInterpreter.cpp"/>
@@ -2233,9 +2236,11 @@
     <ClInclude Include="..\..\Source\NoteSustain.h"/>
     <ClInclude Include="..\..\Source\NoteToFreq.h"/>
     <ClInclude Include="..\..\Source\NoteToMs.h"/>
+    <ClInclude Include="..\..\Source\NoteToPulse.h"/>
     <ClInclude Include="..\..\Source\NoteTransformer.h"/>
     <ClInclude Include="..\..\Source\NoteVibrato.h"/>
     <ClInclude Include="..\..\Source\OneShotLauncher.h"/>
+    <ClInclude Include="..\..\Source\OSCOutput.h"/>
     <ClInclude Include="..\..\Source\OutputChannel.h"/>
     <ClInclude Include="..\..\Source\PanicButton.h"/>
     <ClInclude Include="..\..\Source\Panner.h"/>
@@ -2343,6 +2348,7 @@
     <ClInclude Include="..\..\Source\INoteSource.h"/>
     <ClInclude Include="..\..\Source\IPatchable.h"/>
     <ClInclude Include="..\..\Source\IPollable.h"/>
+    <ClInclude Include="..\..\Source\IPulseReceiver.h"/>
     <ClInclude Include="..\..\Source\IVoiceParams.h"/>
     <ClInclude Include="..\..\Source\JumpBlender.h"/>
     <ClInclude Include="..\..\Source\KarplusStrongVoice.h"/>

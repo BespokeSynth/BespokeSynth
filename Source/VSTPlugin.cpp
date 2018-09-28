@@ -159,8 +159,8 @@ void VSTPlugin::SetVST(string vstName)
    {
       mPlugin->prepareToPlay(gSampleRate, gBufferSize);
       mPlugin->setPlayHead(&mPlayhead);
-      mNumInputs = mPlugin->getTotalNumInputChannels();
-      mNumOutputs = mPlugin->getTotalNumOutputChannels();
+      mNumInputs = CLAMP(mPlugin->getTotalNumInputChannels(), 1, 4);
+      mNumOutputs = CLAMP(mPlugin->getTotalNumOutputChannels(), 1, 4);
       ofLog() << "vst inputs: " << mNumInputs << "  vst outputs: " << mNumOutputs;
    }
    mVSTMutex.unlock();
@@ -376,8 +376,7 @@ void VSTPlugin::PreDrawModule()
       {
          mOverlayWidth = 500;
          mOverlayHeight = 500;
-         float retinaFactor = gIsRetina ? 2 : 1;
-         float contentMult = gDrawScale/retinaFactor;
+         float contentMult = gDrawScale;
          float width = mOverlayWidth * contentMult;
          float height = mOverlayHeight * contentMult;
          mWindow->setSize(width, height);

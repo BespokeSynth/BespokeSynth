@@ -26,7 +26,6 @@ public:
 private:
    void WriteCurrentLocation(char key);
    void MoveToLocation(char key);
-   float RetinaFactor();
    
    struct Location
    {

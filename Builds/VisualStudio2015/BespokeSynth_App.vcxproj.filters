@@ -814,6 +814,9 @@
     <ClCompile Include="..\..\Source\NoteToMs.cpp">
       <Filter>BespokeSynth\Source\modules</Filter>
     </ClCompile>
+    <ClCompile Include="..\..\Source\NoteToPulse.cpp">
+      <Filter>BespokeSynth\Source\modules</Filter>
+    </ClCompile>
     <ClCompile Include="..\..\Source\NoteTransformer.cpp">
       <Filter>BespokeSynth\Source\modules</Filter>
     </ClCompile>
@@ -821,6 +824,9 @@
       <Filter>BespokeSynth\Source\modules</Filter>
     </ClCompile>
     <ClCompile Include="..\..\Source\OneShotLauncher.cpp">
+      <Filter>BespokeSynth\Source\modules</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\Source\OSCOutput.cpp">
       <Filter>BespokeSynth\Source\modules</Filter>
     </ClCompile>
     <ClCompile Include="..\..\Source\OutputChannel.cpp">
@@ -1121,6 +1127,9 @@
       <Filter>BespokeSynth\Source</Filter>
     </ClCompile>
     <ClCompile Include="..\..\Source\INoteSource.cpp">
+      <Filter>BespokeSynth\Source</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\Source\IPulseReceiver.cpp">
       <Filter>BespokeSynth\Source</Filter>
     </ClCompile>
     <ClCompile Include="..\..\Source\JumpBlender.cpp">
@@ -3477,6 +3486,9 @@
     <ClInclude Include="..\..\Source\NoteToMs.h">
       <Filter>BespokeSynth\Source\modules</Filter>
     </ClInclude>
+    <ClInclude Include="..\..\Source\NoteToPulse.h">
+      <Filter>BespokeSynth\Source\modules</Filter>
+    </ClInclude>
     <ClInclude Include="..\..\Source\NoteTransformer.h">
       <Filter>BespokeSynth\Source\modules</Filter>
     </ClInclude>
@@ -3484,6 +3496,9 @@
       <Filter>BespokeSynth\Source\modules</Filter>
     </ClInclude>
     <ClInclude Include="..\..\Source\OneShotLauncher.h">
+      <Filter>BespokeSynth\Source\modules</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\Source\OSCOutput.h">
       <Filter>BespokeSynth\Source\modules</Filter>
     </ClInclude>
     <ClInclude Include="..\..\Source\OutputChannel.h">
@@ -3805,6 +3820,9 @@
       <Filter>BespokeSynth\Source</Filter>
     </ClInclude>
     <ClInclude Include="..\..\Source\IPollable.h">
+      <Filter>BespokeSynth\Source</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\Source\IPulseReceiver.h">
       <Filter>BespokeSynth\Source</Filter>
     </ClInclude>
     <ClInclude Include="..\..\Source\IVoiceParams.h">

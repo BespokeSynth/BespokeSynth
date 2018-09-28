@@ -96,16 +96,11 @@ void ModularSynth::Setup(GlobalManagers* globalManagers, juce::Component* mainCo
       gSampleRate = mUserPrefs["samplerate"].asInt();
       int width = mUserPrefs["width"].asInt();
       int height = mUserPrefs["height"].asInt();
-      if (gIsRetina)
-      {
-         width *= 2;
-         height *= 2;
-      }
       if (width > 1 && height > 1)
       {
          //TODO_PORT(Ryan) this locks up in windows
 #ifndef JUCE_WINDOWS
-         MessageManagerLock lock;
+         const MessageManagerLock lock;
          mainComponent->setSize(width, height);
 #endif
       }
@@ -1219,8 +1214,6 @@ void ModularSynth::ResetLayout()
    mQuickSpawn->Init();
    mModuleContainer.AddModule(mQuickSpawn);
    
-   if (gIsRetina)
-      gDrawScale = 2.0f;
    mDrawOffset.set(0,0);
    mZoomer.Init();
 }

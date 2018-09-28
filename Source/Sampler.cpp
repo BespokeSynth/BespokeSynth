@@ -42,10 +42,11 @@ Sampler::Sampler()
    mVoiceParams.mSampleData = mSampleData;
    mVoiceParams.mSampleLength = 0;
    mVoiceParams.mDetectedFreq = -1;
+   mVoiceParams.mLoop = false;
    
    mPolyMgr.Init(kVoiceType_Sampler, &mVoiceParams);
    
-   mWriteBuffer.SetNumActiveChannels(2);
+   //mWriteBuffer.SetNumActiveChannels(2);
 }
 
 void Sampler::CreateUIControls()
@@ -232,7 +233,7 @@ void Sampler::SampleDropped(int x, int y, Sample* sample)
 void Sampler::LoadLayout(const ofxJSONElement& moduleInfo)
 {
    mModuleSaveData.LoadString("target", moduleInfo);
-   mModuleSaveData.LoadFloat("vol", moduleInfo, .6f, mVolSlider);
+   mModuleSaveData.LoadBool("loop", moduleInfo, false);
    
    SetUpFromSaveData();
 }
@@ -240,7 +241,7 @@ void Sampler::LoadLayout(const ofxJSONElement& moduleInfo)
 void Sampler::SetUpFromSaveData()
 {
    SetTarget(TheSynth->FindModule(mModuleSaveData.GetString("target")));
-   SetVol(mModuleSaveData.GetFloat("vol"));
+   mVoiceParams.mLoop = mModuleSaveData.GetBool("loop");
 }
 
 
@@ -285,7 +286,7 @@ void Sampler::CheckboxUpdated(Checkbox* checkbox)
 
 namespace
 {
-   const int kSaveStateRev = 0;
+   const int kSaveStateRev = 1;
 }
 
 void Sampler::SaveState(FileStreamOut& out)
@@ -295,6 +296,7 @@ void Sampler::SaveState(FileStreamOut& out)
    out << kSaveStateRev;
    
    out.Write(mSampleData, MAX_SAMPLER_LENGTH);
+   out << mVoiceParams.mSampleLength;
 }
 
 void Sampler::LoadState(FileStreamIn& in)
@@ -306,5 +308,11 @@ void Sampler::LoadState(FileStreamIn& in)
    LoadStateValidate(rev == kSaveStateRev);
    
    in.Read(mSampleData, MAX_SAMPLER_LENGTH);
+   
+   if (rev >= 1)
+      in >> mVoiceParams.mSampleLength;
+   
+   if (mPitchCorrect)
+      mWantDetectPitch = true;
 }
 

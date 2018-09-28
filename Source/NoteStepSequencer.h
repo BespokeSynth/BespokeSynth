@@ -22,10 +22,11 @@
 #include "UIGrid.h"
 #include "MidiController.h"
 #include "Scale.h"
+#include "IPulseReceiver.h"
 
 #define NSS_MAX_STEPS 16
 
-class NoteStepSequencer : public IDrawableModule, public ITimeListener, public INoteSource, public IButtonListener, public IDropdownListener, public IIntSliderListener, public IFloatSliderListener, public MidiDeviceListener, public UIGridListener, public IAudioPoller, public IScaleListener, public INoteReceiver
+class NoteStepSequencer : public IDrawableModule, public ITimeListener, public INoteSource, public IButtonListener, public IDropdownListener, public IIntSliderListener, public IFloatSliderListener, public MidiDeviceListener, public UIGridListener, public IAudioPoller, public IScaleListener, public INoteReceiver, public IPulseReceiver
 {
 public:
    NoteStepSequencer();
@@ -59,6 +60,9 @@ public:
    
    //ITimeListener
    void OnTimeEvent(int samplesTo) override;
+   
+   //IPulseReceiver
+   void OnPulse(int samplesTo, int flags) override;
    
    //IScaleListener
    void OnScaleChanged() override;
@@ -103,6 +107,8 @@ private:
    float ExtraWidth() const;
    float ExtraHeight() const;
    void RandomizePitches(bool fifths);
+   void Step(int samplesTo, bool reset);
+   float GetOffset();
    
    enum NoteMode
    {

@@ -16,6 +16,7 @@
 #include "SynthGlobals.h"
 #include "PatchCableSource.h"
 #include "MathUtils.h"
+#include "IPulseReceiver.h"
 
 PatchCable* PatchCable::sActivePatchCable = nullptr;
 
@@ -60,10 +61,11 @@ void PatchCable::Render()
    
    if (TheSynth->ShouldAccentuateActiveModules())  //only draw if we're making noise
    {
-      if (GetConnectionType() == kConnectionType_Note || GetConnectionType() == kConnectionType_Grid)
+      if (GetConnectionType() == kConnectionType_Note || GetConnectionType() == kConnectionType_Grid || GetConnectionType() == kConnectionType_Pulse)
       {
          INoteSource* noteSource = dynamic_cast<INoteSource*>(GetOwningModule());
          IGridController* grid = dynamic_cast<IGridController*>(GetOwningModule());
+         IPulseSource* pulseSource = dynamic_cast<IPulseSource*>(GetOwningModule());
          
          NoteHistoryList hist;
          if (noteSource)
@@ -77,6 +79,12 @@ void PatchCable::Render()
             grid->GetNoteHistory().Lock("draw lines");
             hist = grid->GetNoteHistory().GetHistory();
             grid->GetNoteHistory().Unlock();
+         }
+         if (pulseSource)
+         {
+            pulseSource->GetPulseHistory().Lock("draw lines");
+            hist = pulseSource->GetPulseHistory().GetHistory();
+            pulseSource->GetPulseHistory().Unlock();
          }
          
          bool hasNote = false;
@@ -162,10 +170,11 @@ void PatchCable::Render()
       ofVec2f bezierControl2 = cable.plug + MathUtils::ScaleVec(endDirection, wireLineMag * .5f);
       float wireLength = sqrtf((cable.plug - cable.start).lengthSquared());
       
-      if (type == kConnectionType_Note || type == kConnectionType_Grid)
+      if (type == kConnectionType_Note || type == kConnectionType_Grid || type == kConnectionType_Pulse)
       {
          INoteSource* noteSource = dynamic_cast<INoteSource*>(mOwner->GetOwner());
          IGridController* grid = dynamic_cast<IGridController*>(mOwner->GetOwner());
+         IPulseSource* pulseSource = dynamic_cast<IPulseSource*>(mOwner->GetOwner());
          
          ofSetLineWidth(lineWidth);
          ofSetColor(lineColorAlphaed);
@@ -191,6 +200,12 @@ void PatchCable::Render()
             grid->GetNoteHistory().Lock("draw lines");
             hist = grid->GetNoteHistory().GetHistory();
             grid->GetNoteHistory().Unlock();
+         }
+         if (pulseSource)
+         {
+            pulseSource->GetPulseHistory().Lock("draw lines");
+            hist = pulseSource->GetPulseHistory().GetHistory();
+            pulseSource->GetPulseHistory().Unlock();
          }
          
          if (!hist.empty())

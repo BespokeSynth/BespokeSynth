@@ -16,6 +16,7 @@
 
 class IAudioReceiver;
 class INoteReceiver;
+class IPulseReceiver;
 
 enum DefaultPatchBehavior
 {
@@ -58,6 +59,7 @@ public:
    void ClearPatchCables();
    void SetPatchCableTarget(PatchCable* cable, IClickable* target);
    const vector<INoteReceiver*>& GetNoteReceivers() const { return mNoteReceivers; }
+   const vector<IPulseReceiver*>& GetPulseReceivers() const { return mPulseReceivers; }
    IAudioReceiver* GetAudioReceiver() const { return mAudioReceiver; }
    IClickable* GetTarget() const;
    void SetTarget(IClickable* target);
@@ -110,6 +112,7 @@ private:
    Side mManualSide;
    
    vector<INoteReceiver*> mNoteReceivers;
+   vector<IPulseReceiver*> mPulseReceivers;
    IAudioReceiver* mAudioReceiver;
    
    vector<string> mTypeFilter;

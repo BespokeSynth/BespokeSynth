@@ -48,7 +48,6 @@ ChannelBuffer gWorkChannelBuffer(kWorkBufferSize);
 IUIControl* gHoveredUIControl = nullptr;
 IUIControl* gHotBindUIControl[10];
 float gControlTactileFeedback = 0;
-bool gIsRetina = false;
 float gDrawScale = 1;
 bool gShowDevModules = false;
 float gCornerRoundness = 1;

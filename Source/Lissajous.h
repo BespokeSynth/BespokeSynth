@@ -12,10 +12,11 @@
 #include <iostream>
 #include "IAudioProcessor.h"
 #include "IDrawableModule.h"
+#include "Slider.h"
 
-#define NUM_LISSAJOUS_POINTS 4000
+#define NUM_LISSAJOUS_POINTS 3000
 
-class Lissajous : public IAudioProcessor, public IDrawableModule
+class Lissajous : public IAudioProcessor, public IDrawableModule, public IFloatSliderListener
 {
 public:
    Lissajous();
@@ -23,6 +24,7 @@ public:
    static IDrawableModule* Create() { return new Lissajous(); }
    
    string GetTitleLabel() override { return "lissajous"; }
+   void CreateUIControls() override;
    
    bool IsResizable() const override { return true; }
    void Resize(float w, float h) override;
@@ -30,6 +32,8 @@ public:
    //IAudioSource
    void Process(double time) override;
    void SetEnabled(bool enabled) override { mEnabled = enabled; }
+   
+   void FloatSliderUpdated(FloatSlider* slider, float oldVal) override {}
    
    void LoadLayout(const ofxJSONElement& moduleInfo) override;
    void SaveLayout(ofxJSONElement& moduleInfo) override;
@@ -43,10 +47,13 @@ private:
    
    float mWidth;
    float mHeight;
+   float mScale;
+   FloatSlider* mScaleSlider;
    
    ofVec2f mLissajousPoints[NUM_LISSAJOUS_POINTS];
    int mOffset;
-   bool mSingleInputMode;
+   bool mAutocorrelationMode;
+   bool mOnlyHasOneChannel;
 };
 
 

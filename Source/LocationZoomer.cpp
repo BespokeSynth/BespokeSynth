@@ -30,7 +30,7 @@ void LocationZoomer::Update()
    {
       mCurrentProgress = ofClamp(mCurrentProgress + ofGetLastFrameTime() * 2, 0, 1);
       float easeOut = -1 * mCurrentProgress*(mCurrentProgress-2);
-      gDrawScale = ofLerp(mStart.mZoomLevel, mDestination.mZoomLevel, easeOut) * RetinaFactor();
+      gDrawScale = ofLerp(mStart.mZoomLevel, mDestination.mZoomLevel, easeOut);
       ofVec2f offset;
       offset.x = ofLerp(mStart.mOffset.x, mDestination.mOffset.x, easeOut);
       offset.y = ofLerp(mStart.mOffset.y, mDestination.mOffset.y, easeOut);
@@ -51,7 +51,7 @@ void LocationZoomer::OnKeyPressed(char key)
 
 void LocationZoomer::WriteCurrentLocation(char key)
 {
-   mLocations[key].mZoomLevel = gDrawScale / RetinaFactor();
+   mLocations[key].mZoomLevel = gDrawScale;
    mLocations[key].mOffset = TheSynth->GetDrawOffset();
 }
 
@@ -59,7 +59,7 @@ void LocationZoomer::MoveToLocation(char key)
 {
    if (mLocations.count(key) > 0)
    {
-      mStart.mZoomLevel = gDrawScale / RetinaFactor();
+      mStart.mZoomLevel = gDrawScale;
       mStart.mOffset = TheSynth->GetDrawOffset();
       mDestination = mLocations[key];
       mCurrentProgress = 0;
@@ -68,17 +68,10 @@ void LocationZoomer::MoveToLocation(char key)
 
 void LocationZoomer::GoHome()
 {
-   mStart.mZoomLevel = gDrawScale / RetinaFactor();
+   mStart.mZoomLevel = gDrawScale;
    mStart.mOffset = TheSynth->GetDrawOffset();
    mDestination = mHome;
    mCurrentProgress = 0;
-}
-
-float LocationZoomer::RetinaFactor()
-{
-   if (gIsRetina)
-      return 2;
-   return 1;
 }
 
 ofxJSONElement LocationZoomer::GetSaveData()

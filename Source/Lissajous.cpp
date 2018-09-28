@@ -13,9 +13,12 @@
 Lissajous::Lissajous()
 : IAudioProcessor(gBufferSize)
 , mOffset(0)
-, mSingleInputMode(true)
+, mAutocorrelationMode(true)
 , mWidth(500)
 , mHeight(500)
+, mOnlyHasOneChannel(true)
+, mScaleSlider(nullptr)
+, mScale(1)
 {
 	for (int i=0; i<NUM_LISSAJOUS_POINTS; ++i)
       mLissajousPoints[i].set(0, 0);
@@ -23,6 +26,13 @@ Lissajous::Lissajous()
 
 Lissajous::~Lissajous()
 {
+}
+
+void Lissajous::CreateUIControls()
+{
+   IDrawableModule::CreateUIControls();
+   
+   mScaleSlider = new FloatSlider(this, "scale", 0, 0, 100, 15, &mScale, .5f, 4);
 }
 
 void Lissajous::Process(double time)
@@ -44,8 +54,8 @@ void Lissajous::Process(double time)
       }
    }
    
-   mSingleInputMode = (GetBuffer()->NumActiveChannels() == 1);
-   int secondChannel = mSingleInputMode ? 0 : 1;
+   mOnlyHasOneChannel = (GetBuffer()->NumActiveChannels() == 1);
+   int secondChannel = mOnlyHasOneChannel ? 0 : 1;
    
    for (int i=0; i<bufferSize; ++i)
       mLissajousPoints[(mOffset+i) % NUM_LISSAJOUS_POINTS].set(GetBuffer()->GetChannel(0)[i],GetBuffer()->GetChannel(secondChannel)[i]);
@@ -61,6 +71,8 @@ void Lissajous::DrawModule()
    if (Minimized() || IsVisible() == false)
       return;
    
+   mScaleSlider->Draw();
+   
    ofPushStyle();
    ofPushMatrix();
    
@@ -71,18 +83,18 @@ void Lissajous::DrawModule()
    
    ofBeginShape();
    
-   const int singleInputModeDelay = 90;
-   const float scale = 1.0f;
+   const int autocorrelationDelay = 90;
    
-   for (int i=mOffset;i < NUM_LISSAJOUS_POINTS+mOffset-singleInputModeDelay; ++i)
+   ofSetColor(0,255,0, 30);
+   for (int i=mOffset;i < NUM_LISSAJOUS_POINTS+mOffset-autocorrelationDelay; ++i)
    {
-      float x = w/2 + mLissajousPoints[i%NUM_LISSAJOUS_POINTS].x * w * scale;
+      float x = w/2 + mLissajousPoints[i%NUM_LISSAJOUS_POINTS].x * w * mScale;
       float y;
-      if (mSingleInputMode)
-         y = h/2 + mLissajousPoints[(i+singleInputModeDelay)%NUM_LISSAJOUS_POINTS].x * h * scale;
+      if (mAutocorrelationMode || mOnlyHasOneChannel)
+         y = h/2 + mLissajousPoints[(i+autocorrelationDelay)%NUM_LISSAJOUS_POINTS].x * h * mScale;
       else
-         y = h/2 + mLissajousPoints[i%NUM_LISSAJOUS_POINTS].y * h * scale;
-      //float alpha = (i-mOffset)/float(NUM_LISSAJOUS_POINTS-singleInputModeDelay);
+         y = h/2 + mLissajousPoints[i%NUM_LISSAJOUS_POINTS].y * h * mScale;
+      //float alpha = (i-mOffset)/float(NUM_LISSAJOUS_POINTS-autocorrelationDelay);
       ofVertex(x,y);
    }
    
@@ -103,6 +115,7 @@ void Lissajous::LoadLayout(const ofxJSONElement& moduleInfo)
    mModuleSaveData.LoadString("target", moduleInfo);
    mModuleSaveData.LoadFloat("width", moduleInfo, 500);
    mModuleSaveData.LoadFloat("height", moduleInfo, 500);
+   mModuleSaveData.LoadBool("autocorrelation", moduleInfo, true);
    
    SetUpFromSaveData();
 }
@@ -112,6 +125,7 @@ void Lissajous::SaveLayout(ofxJSONElement& moduleInfo)
    IDrawableModule::SaveLayout(moduleInfo);
    moduleInfo["width"] = mWidth;
    moduleInfo["height"] = mHeight;
+   moduleInfo["autocorrelation"] = mAutocorrelationMode;
 }
 
 void Lissajous::SetUpFromSaveData()
@@ -119,4 +133,5 @@ void Lissajous::SetUpFromSaveData()
    SetTarget(TheSynth->FindModule(mModuleSaveData.GetString("target")));
    mWidth = mModuleSaveData.GetFloat("width");
    mHeight = mModuleSaveData.GetFloat("height");
+   mAutocorrelationMode = mModuleSaveData.GetBool("autocorrelation");
 }

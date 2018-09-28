@@ -26,6 +26,7 @@ public:
    float* mSampleData;
    int mSampleLength;
    float mDetectedFreq;
+   bool mLoop;
 };
 
 class SampleVoice : public IMidiVoice

@@ -18,9 +18,6 @@ Transport::Transport()
 : mTempo(gDefaultTempo)
 , mTimeSigTop(4)
 , mTimeSigBottom(4)
-, mQueuedTimeSigTop(4)
-, mQueuedTimeSigBottom(4)
-, mTimeSigChangeQueued(false)
 , mMeasureCount(0)
 , mMeasurePos(0)
 , mSwingInterval(8)
@@ -55,8 +52,8 @@ void Transport::CreateUIControls()
    mDecreaseTempoButton = new ClickButton(this," - ",101,4);
    mSwingSlider = new FloatSlider(this,"swing",5,22,93,15,&mSwing,.5f,.7f);
    mSwingIntervalDropdown = new DropdownList(this,"swing interval",101,22,&mSwingInterval);
-   mTimeSigTopDropdown = new DropdownList(this,"timesigtop",101,42,&mQueuedTimeSigTop);
-   mTimeSigBottomDropdown = new DropdownList(this,"timesigbottom",101,60,&mQueuedTimeSigBottom);
+   mTimeSigTopDropdown = new DropdownList(this,"timesigtop",101,42,&mTimeSigTop);
+   mTimeSigBottomDropdown = new DropdownList(this,"timesigbottom",101,60,&mTimeSigBottom);
    mResetButton = new ClickButton(this, "reset",5,78);
    mNudgeBackButton = new ClickButton(this," < ",80,78);
    mNudgeForwardButton = new ClickButton(this," > ",110,78);
@@ -126,20 +123,6 @@ void Transport::Advance(float ms)
       ++mMeasureCount;
       if (mLoopStartMeasure != -1 && (mMeasureCount < mLoopStartMeasure || mMeasureCount >= mLoopEndMeasure))
          mMeasureCount = mLoopStartMeasure;
-   }
-   
-   if (oldMeasureCount != mMeasureCount)  //downbeat
-   {
-      if (mTimeSigChangeQueued)
-      {
-         float oldTimeSigRatio = float(mTimeSigTop) / mTimeSigBottom;
-         float newTimeSigRatio = float(mQueuedTimeSigTop) / mQueuedTimeSigBottom;
-         float tempoRatio = newTimeSigRatio / oldTimeSigRatio;
-         mTempo *= tempoRatio;
-         mTimeSigTop = mQueuedTimeSigTop;
-         mTimeSigBottom = mQueuedTimeSigBottom;
-         mTimeSigChangeQueued = false;
-      }
    }
    
    if (TheChaosEngine)
@@ -355,10 +338,8 @@ int Transport::GetQuantized(float offsetMs, NoteInterval interval)
       case kInterval_32nt:
       case kInterval_64n:
          return int(pos * CountInStandardMeasure(interval));
-      case kInterval_Kick:
-      case kInterval_Snare:
-      case kInterval_Hat:
-         return int(pos * CountInStandardMeasure(kInterval_16n));
+      case kInterval_None:
+         return int(pos * CountInStandardMeasure(kInterval_16n)); //TODO(Ryan) whatever
       default:
          //TODO(Ryan) this doesn't really make sense, does it?
          assert(false);
@@ -394,10 +375,8 @@ int Transport::CountInStandardMeasure(NoteInterval interval)
          return 48;
       case kInterval_64n:
          return 64;
-      case kInterval_Kick:
-      case kInterval_Snare:
-      case kInterval_Hat:
-         return 16;  //TODO(Ryan) maybe?
+      case kInterval_None:
+         return 16;  //TODO(Ryan) whatever
       default:
          //TODO(Ryan) this doesn't really make sense, does it?
          assert(false);
@@ -465,9 +444,6 @@ void Transport::UpdateListeners(float jumpMs)
    {
       const TransportListenerInfo& info = *i;
       if (info.mInterval != kInterval_None &&
-          info.mInterval != kInterval_Kick &&
-          info.mInterval != kInterval_Snare &&
-          info.mInterval != kInterval_Hat &&
           info.mInterval != kInterval_Free)
       {
          if (info.mOffsetIsInMs)
@@ -534,10 +510,6 @@ void Transport::CheckboxUpdated(Checkbox* checkbox)
 
 void Transport::DropdownUpdated(DropdownList* list, int oldVal)
 {
-   if (list == mTimeSigTopDropdown || list == mTimeSigBottomDropdown)
-   {
-      mTimeSigChangeQueued = true;
-   }
 }
 
 void Transport::LoadLayout(const ofxJSONElement& moduleInfo)

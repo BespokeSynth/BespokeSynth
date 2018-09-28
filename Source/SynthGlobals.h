@@ -84,7 +84,6 @@ extern ChannelBuffer gWorkChannelBuffer;
 extern IUIControl* gHoveredUIControl;
 extern IUIControl* gHotBindUIControl[10];
 extern float gControlTactileFeedback;
-extern bool gIsRetina;
 extern float gDrawScale;
 extern bool gShowDevModules;
 extern float gCornerRoundness;

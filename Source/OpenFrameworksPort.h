@@ -241,7 +241,7 @@ public:
    template <class T>
    ofLog& operator<<(const T& value)
    {
-      mMessage += value;
+      mMessage += ofToString(value);
       return *this;
    }
 private:

@@ -315,13 +315,6 @@ void DrumPlayer::PlayNote(double time, int pitch, int velocity, int voiceIdx, Mo
             mDrumHits[pitch].mSample.Play(mSpeed * ofRandom(.99f,1.01f));
             mDrumHits[pitch].mVelocity = velocity / 127.0f;
             mDrumHits[pitch].mEnvelope.Start(time, 1);
-            
-            if (pitch == 2)
-               TheTransport->OnDrumEvent(kInterval_Hat);
-            if (pitch == 1)
-               TheTransport->OnDrumEvent(kInterval_Snare);
-            if (pitch == 0)
-               TheTransport->OnDrumEvent(kInterval_Kick);
          }
       }
    }

@@ -42,6 +42,7 @@ void DelayEffect::CreateUIControls()
    mDryCheckbox = new Checkbox(this,"dry",28,49,&mDry);
    mAcceptInputCheckbox = new Checkbox(this,"in",3,49,&mAcceptInput);
    
+   mIntervalSelector->AddLabel("2", kInterval_2);
    mIntervalSelector->AddLabel("1n", kInterval_1n);
    mIntervalSelector->AddLabel("2n", kInterval_2n);
    mIntervalSelector->AddLabel("4n", kInterval_4n);

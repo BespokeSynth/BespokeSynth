@@ -31,6 +31,7 @@ public:
    MainContentComponent()
    : mLastFpsUpdateTime(0)
    , mFrameCountAccum(0)
+   , mIsRetina(false)
    {
       openGLContext.setOpenGLVersionRequired(juce::OpenGLContext::openGL3_2);
       
@@ -134,6 +135,11 @@ public:
       SetGlobalBufferSize(mGlobalManagers.mDeviceManager.getCurrentAudioDevice()->getCurrentBufferSizeSamples());
       SetGlobalSampleRate(mGlobalManagers.mDeviceManager.getCurrentAudioDevice()->getCurrentSampleRate());
       
+      {
+         const MessageManagerLock lock;
+         mIsRetina =  (Desktop::getInstance().getDisplays().getMainDisplay().dpi == 144);
+      }
+      
       startTimerHz(60);
    }
    
@@ -153,10 +159,7 @@ public:
       
       float width = getWidth();
       float height = getHeight();
-      float pixelRatio = 2;
-#ifdef JUCE_WINDOWS
-      pixelRatio = 1;
-#endif
+      float pixelRatio = mIsRetina ? 2 : 1;
       
       glViewport(0, 0, width*pixelRatio, height*pixelRatio);
       glClearColor(0,0,0,0);
@@ -284,6 +287,7 @@ private:
    int64 mLastFpsUpdateTime;
    int mFrameCountAccum;
    list<int> mPressedKeys;
+   bool mIsRetina;
    
    JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (MainContentComponent)
 };

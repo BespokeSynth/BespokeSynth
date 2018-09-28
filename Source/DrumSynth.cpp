@@ -127,16 +127,7 @@ void DrumSynth::PlayNote(double time, int pitch, int velocity, int voiceIdx, Mod
    if (pitch >= 0 && pitch < NUM_DRUM_HITS)
    {
       if (velocity > 0)
-      {
          mHits[pitch]->Play(time, velocity/127.0f);
-         
-         if (pitch == 1)
-            TheTransport->OnDrumEvent(kInterval_Hat);
-         if (pitch == 2)
-            TheTransport->OnDrumEvent(kInterval_Snare);
-         if (pitch == 3)
-            TheTransport->OnDrumEvent(kInterval_Kick);
-      }
    }
 }
 

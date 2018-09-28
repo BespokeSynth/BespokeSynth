@@ -417,6 +417,8 @@
         <FILE id="LKkPBi" name="NoteToFreq.h" compile="0" resource="0" file="Source/NoteToFreq.h"/>
         <FILE id="XvPbXi" name="NoteToMs.cpp" compile="1" resource="0" file="Source/NoteToMs.cpp"/>
         <FILE id="OiTWxt" name="NoteToMs.h" compile="0" resource="0" file="Source/NoteToMs.h"/>
+        <FILE id="FtJQMy" name="NoteToPulse.cpp" compile="1" resource="0" file="Source/NoteToPulse.cpp"/>
+        <FILE id="V8HmRu" name="NoteToPulse.h" compile="0" resource="0" file="Source/NoteToPulse.h"/>
         <FILE id="N7AI0k" name="NoteTransformer.cpp" compile="1" resource="0"
               file="Source/NoteTransformer.cpp"/>
         <FILE id="Gu2fbN" name="NoteTransformer.h" compile="0" resource="0"
@@ -427,6 +429,8 @@
               file="Source/OneShotLauncher.cpp"/>
         <FILE id="yRtCv4" name="OneShotLauncher.h" compile="0" resource="0"
               file="Source/OneShotLauncher.h"/>
+        <FILE id="jIqz03" name="OSCOutput.cpp" compile="1" resource="0" file="Source/OSCOutput.cpp"/>
+        <FILE id="djmOEW" name="OSCOutput.h" compile="0" resource="0" file="Source/OSCOutput.h"/>
         <FILE id="i6ONR2" name="OutputChannel.cpp" compile="1" resource="0"
               file="Source/OutputChannel.cpp"/>
         <FILE id="et5OpS" name="OutputChannel.h" compile="0" resource="0" file="Source/OutputChannel.h"/>
@@ -714,6 +718,10 @@
       <FILE id="ytSCWW" name="INoteSource.h" compile="0" resource="0" file="Source/INoteSource.h"/>
       <FILE id="goCkD5" name="IPatchable.h" compile="0" resource="0" file="Source/IPatchable.h"/>
       <FILE id="Za53CF" name="IPollable.h" compile="0" resource="0" file="Source/IPollable.h"/>
+      <FILE id="pkq62Y" name="IPulseReceiver.cpp" compile="1" resource="0"
+            file="Source/IPulseReceiver.cpp"/>
+      <FILE id="rVULMw" name="IPulseReceiver.h" compile="0" resource="0"
+            file="Source/IPulseReceiver.h"/>
       <FILE id="barbP0" name="IVoiceParams.h" compile="0" resource="0" file="Source/IVoiceParams.h"/>
       <FILE id="jS72vN" name="JumpBlender.cpp" compile="1" resource="0" file="Source/JumpBlender.cpp"/>
       <FILE id="AadSA9" name="JumpBlender.h" compile="0" resource="0" file="Source/JumpBlender.h"/>

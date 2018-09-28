@@ -44,25 +44,29 @@ bool SampleVoice::Process(double time, ChannelBuffer* out)
       if (mOwner)
          mOwner->ComputeSliders(pos);
       
-      float freq = TheScale->PitchToFreq(GetPitch(pos));
-      float speed;
-      if (mVoiceParams->mDetectedFreq != -1)
-         speed = freq/mVoiceParams->mDetectedFreq;
-      else
-         speed = freq/TheScale->PitchToFreq(TheScale->ScaleRoot()+48);
-      
-      float sample = GetInterpolatedSample(mPos, mVoiceParams->mSampleData, mVoiceParams->mSampleLength) * mAdsr.Value(time) * volSq;
-      if (out->NumActiveChannels() == 1)
+      if (mPos <= mVoiceParams->mSampleLength || mVoiceParams->mLoop)
       {
-         out->GetChannel(0)[pos] += sample;
+         float freq = TheScale->PitchToFreq(GetPitch(pos));
+         float speed;
+         if (mVoiceParams->mDetectedFreq != -1)
+            speed = freq/mVoiceParams->mDetectedFreq;
+         else
+            speed = freq/TheScale->PitchToFreq(TheScale->ScaleRoot()+48);
+         
+         float sample = GetInterpolatedSample(mPos, mVoiceParams->mSampleData, mVoiceParams->mSampleLength) * mAdsr.Value(time) * volSq;
+         
+         if (out->NumActiveChannels() == 1)
+         {
+            out->GetChannel(0)[pos] += sample;
+         }
+         else
+         {
+            out->GetChannel(0)[pos] += sample * GetLeftPanGain(GetPan());
+            out->GetChannel(1)[pos] += sample * GetRightPanGain(GetPan());
+         }
+         
+         mPos += speed;
       }
-      else
-      {
-         out->GetChannel(0)[pos] += sample * GetLeftPanGain(GetPan());
-         out->GetChannel(1)[pos] += sample * GetRightPanGain(GetPan());
-      }
-      
-      mPos += speed;
       
       time += gInvSampleRateMs;
    }
