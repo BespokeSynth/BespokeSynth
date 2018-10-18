@@ -88,7 +88,8 @@ void DrumPlayer::DrumHit::CreateUIControls(DrumPlayer* owner, int index)
    
    int x = 5 + (index % 4) * 70;
    int y = 70 + (3-(index / 4)) * 70;
-   mTestButton = new ClickButton(owner,("test "+ofToString(index)).c_str(),x+5,y+53);
+   mTestButton = new ClickButton(owner,("test "+ofToString(index)).c_str(),x+5,y+40);
+   mRandomButton = new ClickButton(owner,("random "+ofToString(index)).c_str(),x+5,y+53);
    
    mOwner = owner;
 }
@@ -127,8 +128,7 @@ void DrumPlayer::LoadKit(int kit)
       // Maschine samples are in /Users/Shared/Maschine Library/Samples
       mLoadedKit = kit;
 
-      mLoadSamplesMutex.lock();
-      mLoadingSamples = true;
+      LoadSampleLock();
       for (int i=0; i<NUM_DRUM_HITS; ++i)
       {
          mDrumHits[i].mSample.Read(mKits[kit].mSampleFiles[i].c_str());
@@ -137,9 +137,22 @@ void DrumPlayer::LoadKit(int kit)
          mDrumHits[i].mSpeed = mKits[kit].mSpeeds[i];
          mDrumHits[i].mPan = mKits[kit].mPans[i];
       }
-      mLoadingSamples = false;
-      mLoadSamplesMutex.unlock();
+      LoadSampleUnlock();
    }
+}
+
+void DrumPlayer::LoadSampleLock()
+{
+   mLoadSamplesAudioMutex.lock();
+   mLoadSamplesDrawMutex.lock();
+   mLoadingSamples = true;
+}
+
+void DrumPlayer::LoadSampleUnlock()
+{
+   mLoadingSamples = false;
+   mLoadSamplesDrawMutex.unlock();
+   mLoadSamplesAudioMutex.unlock();
 }
 
 string DrumPlayer::GetDrumHitName(int index)
@@ -205,7 +218,7 @@ void DrumPlayer::Process(double time)
    
    if (!mLoadingSamples)
    {
-      mLoadSamplesMutex.lock();
+      mLoadSamplesAudioMutex.lock();
       mLoadingSamples = true;
       for (int i=0; i<NUM_DRUM_HITS; ++i)
       {
@@ -238,7 +251,7 @@ void DrumPlayer::Process(double time)
          }
       }
       mLoadingSamples = false;
-      mLoadSamplesMutex.unlock();
+      mLoadSamplesAudioMutex.unlock();
    }
    
    for (int ch=0; ch<numChannels; ++ch)
@@ -349,11 +362,9 @@ void DrumPlayer::FilesDropped(vector<string> files, int x, int y)
             int sampleIdx = GetAssociatedSampleIndex(x+i%4, y+i/4);
             if (sampleIdx != -1)
             {
-               mLoadSamplesMutex.lock();
-               mLoadingSamples = true;
+               LoadSampleLock();
                mDrumHits[sampleIdx].mSample.Read(files[i].c_str());
-               mLoadingSamples = false;
-               mLoadSamplesMutex.unlock();
+               LoadSampleUnlock();
                mDrumHits[sampleIdx].mLinkId = sLoadId;
                mDrumHits[sampleIdx].mVol = 1;
                mDrumHits[sampleIdx].mSpeed = 1;
@@ -387,11 +398,9 @@ void DrumPlayer::SampleDropped(int x, int y, Sample* sample)
       int sampleIdx = GetAssociatedSampleIndex(x,y);
       if (sampleIdx != -1)
       {
-         mLoadSamplesMutex.lock();
-         mLoadingSamples = true;
+         LoadSampleLock();
          mDrumHits[sampleIdx].mSample.Create(sample->Data());
-         mLoadingSamples = false;
-         mLoadSamplesMutex.unlock();
+         LoadSampleUnlock();
          mDrumHits[sampleIdx].mLinkId = sLoadId;
          mDrumHits[sampleIdx].mVol = 1;
          mDrumHits[sampleIdx].mSpeed = 1;
@@ -544,12 +553,15 @@ void DrumPlayer::DrumHit::DrawUIControls()
       displayLength = mEnvelopeLength * gSampleRateMs;
    ofPushMatrix();
    ofTranslate(305, 200);
+   mOwner->mLoadSamplesDrawMutex.lock();
    DrawAudioBuffer(135, 100, mSample.Data(), 0, displayLength, mSample.GetPlayPosition());
+   mOwner->mLoadSamplesDrawMutex.unlock();
    ofPopMatrix();
    
    mVolSlider->Draw();
    mSpeedSlider->Draw();
    mTestButton->Draw();
+   mRandomButton->Draw();
    mPanSlider->Draw();
    mIndividualOutputCheckbox->Draw();
    mUseEnvelopeCheckbox->Draw();
@@ -690,23 +702,23 @@ void DrumPlayer::FloatSliderUpdated(FloatSlider* slider, float oldVal)
    {
       mAuditionSampleIdx += mAuditionInc>0?-1:1;
       mAuditionInc = 0;
-      DirectoryIterator dir(File(mAuditionDir), false);
-      //TODO_PORT(Ryan)
-      /*if (mAuditionDir.numFiles() > 0)
+      File dir(mAuditionDir);
+      Array<File> files;
+      dir.findChildFiles(files, File::findFiles, false);
+      if (files.size() > 0)
       {
-         mAuditionSampleIdx = ofClamp(mAuditionSampleIdx,0,mAuditionDir.numFiles()-1);
-         string file = mAuditionDir.getFile(mAuditionSampleIdx).path();
+         mAuditionSampleIdx = ofClamp(mAuditionSampleIdx,0,files.size()-1);
+         
+         string file = files[mAuditionSampleIdx].getFullPathName().toStdString();
          if (mAuditionPadIdx >= 0 && mAuditionPadIdx < NUM_DRUM_HITS)
          {
-            mLoadSamplesMutex.lock();
-            mLoadingSamples = true;
-            mSamples[mAuditionPadIdx].Read(file.c_str());
-            mLoadingSamples = false;
-            mLoadSamplesMutex.unlock();
-            mSamples[mAuditionPadIdx].Play(mSpeed);
-            mVelocity[mAuditionPadIdx] = .5f;
+            LoadSampleLock();
+            mDrumHits[mAuditionPadIdx].mSample.Read(file.c_str());
+            LoadSampleUnlock();
+            mDrumHits[mAuditionPadIdx].mSample.Play(mSpeed);
+            mDrumHits[mAuditionPadIdx].mVelocity = .5f;
          }
-      }*/
+      }
    }
 }
 
@@ -761,6 +773,39 @@ void DrumPlayer::ButtonClicked(ClickButton *button)
    {
       if (button == mDrumHits[i].mTestButton)
          PlayNote(gTime, i, 127);
+      if (button == mDrumHits[i].mRandomButton)
+      {
+         string hitCategory = "Percussion";
+         if (i == 0)
+            hitCategory = "Kick";
+         if (i == 1)
+            hitCategory = "Snare";
+         if (i == 2 || i == 6)
+            hitCategory = "Hihat";
+         if (i == 3)
+            hitCategory = "Ride";
+         if (i == 4)
+            hitCategory = "Shaker";
+         if (i == 5)
+            hitCategory = "Crash";
+         if (i == 6)
+            hitCategory = "Percussion";
+         if (i == 7)
+            hitCategory = "Clap";
+         File dir(ofToDataPath("drums/hits/"+hitCategory));
+         Array<File> files;
+         dir.findChildFiles(files, File::findFiles, false);
+         if (files.size() > 0)
+         {
+            string file = files[rand() % files.size()].getFullPathName().toStdString();
+            
+            LoadSampleLock();
+            mDrumHits[i].mSample.Read(file.c_str());
+            LoadSampleUnlock();
+            mDrumHits[i].mSample.Play(mSpeed);
+            mDrumHits[i].mVelocity = .5f;
+         }
+      }
    }
 }
 

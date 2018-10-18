@@ -43,7 +43,7 @@ void GateEffect::ProcessAudio(double time, ChannelBuffer* buffer)
 
    for (int i=0; i<bufferSize; ++i)
    {
-      const float decayTime = .1f;
+      const float decayTime = .01f;
       float scalar = powf( 0.5f, 1.0f/(decayTime * gSampleRate));
       float input = 0;
       for (int ch=0; ch<buffer->NumActiveChannels(); ++ch)

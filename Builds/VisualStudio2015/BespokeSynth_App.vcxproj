@@ -202,6 +202,7 @@
     <ClCompile Include="..\..\Source\TremoloEffect.cpp"/>
     <ClCompile Include="..\..\Source\Amplifier.cpp"/>
     <ClCompile Include="..\..\Source\Arpeggiator.cpp"/>
+    <ClCompile Include="..\..\Source\AudioLevelToCV.cpp"/>
     <ClCompile Include="..\..\Source\AudioMeter.cpp"/>
     <ClCompile Include="..\..\Source\AudioRouter.cpp"/>
     <ClCompile Include="..\..\Source\AudioSend.cpp"/>
@@ -2146,6 +2147,7 @@
     <ClInclude Include="..\..\Source\TremoloEffect.h"/>
     <ClInclude Include="..\..\Source\Amplifier.h"/>
     <ClInclude Include="..\..\Source\Arpeggiator.h"/>
+    <ClInclude Include="..\..\Source\AudioLevelToCV.h"/>
     <ClInclude Include="..\..\Source\AudioMeter.h"/>
     <ClInclude Include="..\..\Source\AudioRouter.h"/>
     <ClInclude Include="..\..\Source\AudioSend.h"/>

@@ -159,6 +159,10 @@
         <FILE id="BgLMgo" name="Amplifier.h" compile="0" resource="0" file="Source/Amplifier.h"/>
         <FILE id="DU9MrN" name="Arpeggiator.cpp" compile="1" resource="0" file="Source/Arpeggiator.cpp"/>
         <FILE id="XhHWYO" name="Arpeggiator.h" compile="0" resource="0" file="Source/Arpeggiator.h"/>
+        <FILE id="SdPUW1" name="AudioLevelToCV.cpp" compile="1" resource="0"
+              file="Source/AudioLevelToCV.cpp"/>
+        <FILE id="nBLC0U" name="AudioLevelToCV.h" compile="0" resource="0"
+              file="Source/AudioLevelToCV.h"/>
         <FILE id="RPjiwy" name="AudioMeter.cpp" compile="1" resource="0" file="Source/AudioMeter.cpp"/>
         <FILE id="L9o4WQ" name="AudioMeter.h" compile="0" resource="0" file="Source/AudioMeter.h"/>
         <FILE id="RjMTgF" name="AudioRouter.cpp" compile="1" resource="0" file="Source/AudioRouter.cpp"/>

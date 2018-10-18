@@ -120,13 +120,17 @@ private:
    int mAuditionPadIdx;
    char mNewKitName[MAX_TEXTENTRY_LENGTH];
    TextEntry* mNewKitNameEntry;
-   ofMutex mLoadSamplesMutex;
+   ofMutex mLoadSamplesAudioMutex;
+   ofMutex mLoadSamplesDrawMutex;
    bool mLoadingSamples;
    ClickButton* mShuffleSpeedsButton;
    int mSelectedHitIdx;
    bool mMonoOutput;
    Checkbox* mMonoCheckbox;
    GridController* mGridController;
+   
+   void LoadSampleLock();
+   void LoadSampleUnlock();
    
    struct IndividualOutput
    {
@@ -190,11 +194,13 @@ private:
       float mEnvelopeLength;
       float mPan;
       bool mHasIndividualOutput;
+      string mHitDirectory;
       
       DrumPlayer* mOwner;
       FloatSlider* mVolSlider;
       FloatSlider* mSpeedSlider;
       ClickButton* mTestButton;
+      ClickButton* mRandomButton;
       Checkbox* mUseEnvelopeCheckbox;
       ADSRDisplay* mEnvelopeDisplay;
       FloatSlider* mPanSlider;

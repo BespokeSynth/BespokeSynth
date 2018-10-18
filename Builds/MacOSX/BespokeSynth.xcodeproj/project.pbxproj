@@ -55,6 +55,7 @@
 		7B858D802BD0BB608C0F48CF = {isa = PBXBuildFile; fileRef = 49AB76428A044DEDF45FFAFE; };
 		E6B79FEEF03A902FFC517F8B = {isa = PBXBuildFile; fileRef = B217F5EDC72085AA8AA21B04; };
 		8729714646543BBCDC5A3293 = {isa = PBXBuildFile; fileRef = 17A57282C769BDCB0A39B94B; };
+		83883C7C0CE7EFCB1B7D45BF = {isa = PBXBuildFile; fileRef = 1389F77B5EE958F8D36F2CCD; };
 		FA79DC14121FFBD53D0C8321 = {isa = PBXBuildFile; fileRef = BA9A94DC9F72592028EE4C73; };
 		5CF3E4DFF8C7B06EE40B5939 = {isa = PBXBuildFile; fileRef = 94096B850B721EEFDBB28F26; };
 		A6D99A4D6BE6D79C4FF92757 = {isa = PBXBuildFile; fileRef = EBAF5AF54980ABF81D4C6FAE; };
@@ -357,6 +358,7 @@
 		12AFEE7E530C5A0E35F87DD8 = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; name = ControlSequencer.cpp; path = ../../Source/ControlSequencer.cpp; sourceTree = "SOURCE_ROOT"; };
 		1310EE14452A96B7210DB04C = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; name = LaunchpadNoteDisplayer.h; path = ../../Source/LaunchpadNoteDisplayer.h; sourceTree = "SOURCE_ROOT"; };
 		13539F79BCFC671C601AE489 = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; name = ModwheelToVibrato.h; path = ../../Source/ModwheelToVibrato.h; sourceTree = "SOURCE_ROOT"; };
+		1389F77B5EE958F8D36F2CCD = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; name = AudioLevelToCV.cpp; path = ../../Source/AudioLevelToCV.cpp; sourceTree = "SOURCE_ROOT"; };
 		13C2B7D1CC1FF3B11E6B778E = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; name = MacroSlider.h; path = ../../Source/MacroSlider.h; sourceTree = "SOURCE_ROOT"; };
 		13EA67C2D3E6678CA4E2C81D = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; name = ChaosEngine.h; path = ../../Source/ChaosEngine.h; sourceTree = "SOURCE_ROOT"; };
 		1442F9D13B268AE3894D77D8 = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; name = NoteFlusher.h; path = ../../Source/NoteFlusher.h; sourceTree = "SOURCE_ROOT"; };
@@ -881,6 +883,7 @@
 		E7E3414F0FF857A6BB3A61A0 = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; name = Granulator.cpp; path = ../../Source/Granulator.cpp; sourceTree = "SOURCE_ROOT"; };
 		E84C3C1327350BC09D14B767 = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; name = BinaryData.h; path = ../../JuceLibraryCode/BinaryData.h; sourceTree = "SOURCE_ROOT"; };
 		E8958A2E0F527CB980502125 = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; name = FeedbackModule.cpp; path = ../../Source/FeedbackModule.cpp; sourceTree = "SOURCE_ROOT"; };
+		E93503D879D7E27D6DC8F96B = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; name = AudioLevelToCV.h; path = ../../Source/AudioLevelToCV.h; sourceTree = "SOURCE_ROOT"; };
 		E93F50C8635CEBA42B4126DA = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; name = KontrolKommunicator.cpp; path = ../../Source/CFMessaging/KontrolKommunicator.cpp; sourceTree = "SOURCE_ROOT"; };
 		E9DAF8560F91C45B1E7E561B = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; name = StepSequencer.cpp; path = ../../Source/StepSequencer.cpp; sourceTree = "SOURCE_ROOT"; };
 		EA4ED74D766EADEABFC2FE65 = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; name = LinkwitzRileyFilter.cpp; path = ../../Source/LinkwitzRileyFilter.cpp; sourceTree = "SOURCE_ROOT"; };
@@ -1060,6 +1063,8 @@
 					96C5B8268617BECEE6562060,
 					17A57282C769BDCB0A39B94B,
 					C9AA051AD70DA9E3760887F1,
+					1389F77B5EE958F8D36F2CCD,
+					E93503D879D7E27D6DC8F96B,
 					BA9A94DC9F72592028EE4C73,
 					2C683B7B296ECFA42592ED1F,
 					94096B850B721EEFDBB28F26,
@@ -1793,6 +1798,7 @@
 					7B858D802BD0BB608C0F48CF,
 					E6B79FEEF03A902FFC517F8B,
 					8729714646543BBCDC5A3293,
+					83883C7C0CE7EFCB1B7D45BF,
 					FA79DC14121FFBD53D0C8321,
 					5CF3E4DFF8C7B06EE40B5939,
 					A6D99A4D6BE6D79C4FF92757,

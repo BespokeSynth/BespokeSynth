@@ -171,6 +171,7 @@
 #include "PitchToSpeed.h"
 #include "NoteToPulse.h"
 #include "OSCOutput.h"
+#include "AudioLevelToCV.h"
 
 #define REGISTER(class,name,type) Register(#name, &(class::Create), &(class::CanCreate), type, false, false);
 #define REGISTER_HIDDEN(class,name,type) Register(#name, &(class::Create), &(class::CanCreate), type, true, false);
@@ -310,6 +311,7 @@ ModuleFactory::ModuleFactory()
    REGISTER(PitchToSpeed, pitchtospeed, kModuleType_Modulator);
    REGISTER(NoteToPulse, notetopulse, kModuleType_Other);
    REGISTER(OSCOutput, oscoutput, kModuleType_Other);
+   REGISTER(AudioLevelToCV, leveltocv, kModuleType_Modulator);
 
    //REGISTER_EXPERIMENTAL(MidiPlayer, midiplayer, kModuleType_Instrument);
    REGISTER_EXPERIMENTAL(Razor, razor, kModuleType_Synth);

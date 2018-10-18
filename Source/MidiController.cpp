@@ -1365,7 +1365,7 @@ void MidiController::DropdownUpdated(DropdownList* list, int oldVal)
       
       if (strstr(deviceInName.c_str(), "Seaboard") != nullptr ||
           strstr(deviceInName.c_str(), "Lightpad BLOCK") != nullptr ||
-          strstr(deviceInName.c_str(), "Linnstrument") != nullptr)
+          strstr(deviceInName.c_str(), "LinnStrument") != nullptr)
       {
          SetUseChannelAsVoice(true);
          SetPitchBendRange(48);
