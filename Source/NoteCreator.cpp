@@ -66,12 +66,17 @@ void NoteCreator::OnTransportAdvanced(float amount)
    }
 }
 
-void NoteCreator::TriggerNote()
+void NoteCreator::OnPulse(float amount, int samplesTo, int flags)
+{
+   TriggerNote(gTime + samplesTo * gInvSampleRateMs, amount * mVelocity);
+}
+
+void NoteCreator::TriggerNote(double time, float velocity)
 {
    mNoteOn = true;
    mNoteOnByTrigger = true;
-   mStartTime = gTime;
-   PlayNoteOutput(gTime, mPitch, mVelocity*127);
+   mStartTime = time;
+   PlayNoteOutput(mStartTime, mPitch, velocity*127);
 }
 
 void NoteCreator::CheckboxUpdated(Checkbox* checkbox)
@@ -96,7 +101,7 @@ void NoteCreator::CheckboxUpdated(Checkbox* checkbox)
 void NoteCreator::ButtonClicked(ClickButton* button)
 {
    if (button == mTriggerButton)
-      TriggerNote();
+      TriggerNote(gTime, mVelocity);
 }
 
 void NoteCreator::TextEntryComplete(TextEntry* entry)

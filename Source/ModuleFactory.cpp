@@ -172,6 +172,8 @@
 #include "NoteToPulse.h"
 #include "OSCOutput.h"
 #include "AudioLevelToCV.h"
+#include "Pulser.h"
+#include "PulseSequence.h"
 
 #define REGISTER(class,name,type) Register(#name, &(class::Create), &(class::CanCreate), type, false, false);
 #define REGISTER_HIDDEN(class,name,type) Register(#name, &(class::Create), &(class::CanCreate), type, true, false);
@@ -215,7 +217,7 @@ ModuleFactory::ModuleFactory()
    REGISTER(NoteSinger, notesinger, kModuleType_Synth);
    REGISTER(NoteOctaver, noteoctaver, kModuleType_Note);
    REGISTER(FourOnTheFloor, fouronthefloor, kModuleType_Instrument);
-   REGISTER(Amplifier, amplifier, kModuleType_Audio);
+   REGISTER(Amplifier, gain, kModuleType_Audio);
    REGISTER(Presets, presets, kModuleType_Other);
    REGISTER(NoteStepSequencer, notesequencer, kModuleType_Instrument);
    REGISTER(SingleOscillator, oscillator, kModuleType_Synth);
@@ -312,6 +314,8 @@ ModuleFactory::ModuleFactory()
    REGISTER(NoteToPulse, notetopulse, kModuleType_Other);
    REGISTER(OSCOutput, oscoutput, kModuleType_Other);
    REGISTER(AudioLevelToCV, leveltocv, kModuleType_Modulator);
+   REGISTER(Pulser, pulser, kModuleType_Other);
+   REGISTER(PulseSequence, pulsesequence, kModuleType_Other);
 
    //REGISTER_EXPERIMENTAL(MidiPlayer, midiplayer, kModuleType_Instrument);
    REGISTER_EXPERIMENTAL(Razor, razor, kModuleType_Synth);

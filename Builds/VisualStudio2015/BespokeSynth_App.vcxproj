@@ -200,6 +200,7 @@
     <ClCompile Include="..\..\Source\Pumper.cpp"/>
     <ClCompile Include="..\..\Source\Stutter.cpp"/>
     <ClCompile Include="..\..\Source\TremoloEffect.cpp"/>
+    <ClCompile Include="..\..\Source\PulseSequence.cpp"/>
     <ClCompile Include="..\..\Source\Amplifier.cpp"/>
     <ClCompile Include="..\..\Source\Arpeggiator.cpp"/>
     <ClCompile Include="..\..\Source\AudioLevelToCV.cpp"/>
@@ -340,6 +341,7 @@
     <ClCompile Include="..\..\Source\ScaleDetect.cpp"/>
     <ClCompile Include="..\..\Source\SeaOfGrain.cpp"/>
     <ClCompile Include="..\..\Source\Selector.cpp"/>
+    <ClCompile Include="..\..\Source\Pulser.cpp"/>
     <ClCompile Include="..\..\Source\SignalGenerator.cpp"/>
     <ClCompile Include="..\..\Source\SingleOscillator.cpp"/>
     <ClCompile Include="..\..\Source\SliderSequencer.cpp"/>
@@ -2145,6 +2147,7 @@
     <ClInclude Include="..\..\Source\Pumper.h"/>
     <ClInclude Include="..\..\Source\Stutter.h"/>
     <ClInclude Include="..\..\Source\TremoloEffect.h"/>
+    <ClInclude Include="..\..\Source\PulseSequence.h"/>
     <ClInclude Include="..\..\Source\Amplifier.h"/>
     <ClInclude Include="..\..\Source\Arpeggiator.h"/>
     <ClInclude Include="..\..\Source\AudioLevelToCV.h"/>
@@ -2282,6 +2285,7 @@
     <ClInclude Include="..\..\Source\ScaleDetect.h"/>
     <ClInclude Include="..\..\Source\SeaOfGrain.h"/>
     <ClInclude Include="..\..\Source\Selector.h"/>
+    <ClInclude Include="..\..\Source\Pulser.h"/>
     <ClInclude Include="..\..\Source\SignalGenerator.h"/>
     <ClInclude Include="..\..\Source\SingleOscillator.h"/>
     <ClInclude Include="..\..\Source\SliderSequencer.h"/>

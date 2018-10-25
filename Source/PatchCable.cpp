@@ -63,29 +63,9 @@ void PatchCable::Render()
    {
       if (GetConnectionType() == kConnectionType_Note || GetConnectionType() == kConnectionType_Grid || GetConnectionType() == kConnectionType_Pulse)
       {
-         INoteSource* noteSource = dynamic_cast<INoteSource*>(GetOwningModule());
-         IGridController* grid = dynamic_cast<IGridController*>(GetOwningModule());
-         IPulseSource* pulseSource = dynamic_cast<IPulseSource*>(GetOwningModule());
-         
-         NoteHistoryList hist;
-         if (noteSource)
-         {
-            noteSource->GetNoteOutput()->GetNoteHistory().Lock("draw lines");
-            hist = noteSource->GetNoteOutput()->GetNoteHistory().GetHistory();
-            noteSource->GetNoteOutput()->GetNoteHistory().Unlock();
-         }
-         if (grid)
-         {
-            grid->GetNoteHistory().Lock("draw lines");
-            hist = grid->GetNoteHistory().GetHistory();
-            grid->GetNoteHistory().Unlock();
-         }
-         if (pulseSource)
-         {
-            pulseSource->GetPulseHistory().Lock("draw lines");
-            hist = pulseSource->GetPulseHistory().GetHistory();
-            pulseSource->GetPulseHistory().Unlock();
-         }
+         mOwner->GetHistory().Lock("draw lines");
+         NoteHistoryList hist = mOwner->GetHistory().GetHistory();
+         mOwner->GetHistory().Unlock();
          
          bool hasNote = false;
          if (!hist.empty())
@@ -172,10 +152,6 @@ void PatchCable::Render()
       
       if (type == kConnectionType_Note || type == kConnectionType_Grid || type == kConnectionType_Pulse)
       {
-         INoteSource* noteSource = dynamic_cast<INoteSource*>(mOwner->GetOwner());
-         IGridController* grid = dynamic_cast<IGridController*>(mOwner->GetOwner());
-         IPulseSource* pulseSource = dynamic_cast<IPulseSource*>(mOwner->GetOwner());
-         
          ofSetLineWidth(lineWidth);
          ofSetColor(lineColorAlphaed);
          ofBeginShape();
@@ -188,25 +164,9 @@ void PatchCable::Render()
          ofVertex(cable.plug.x,cable.plug.y);
          ofEndShape();
          
-         NoteHistoryList hist;
-         if (noteSource)
-         {
-            noteSource->GetNoteOutput()->GetNoteHistory().Lock("draw lines");
-            hist = noteSource->GetNoteOutput()->GetNoteHistory().GetHistory();
-            noteSource->GetNoteOutput()->GetNoteHistory().Unlock();
-         }
-         if (grid)
-         {
-            grid->GetNoteHistory().Lock("draw lines");
-            hist = grid->GetNoteHistory().GetHistory();
-            grid->GetNoteHistory().Unlock();
-         }
-         if (pulseSource)
-         {
-            pulseSource->GetPulseHistory().Lock("draw lines");
-            hist = pulseSource->GetPulseHistory().GetHistory();
-            pulseSource->GetPulseHistory().Unlock();
-         }
+         mOwner->GetHistory().Lock("draw lines");
+         NoteHistoryList hist = mOwner->GetHistory().GetHistory();
+         mOwner->GetHistory().Unlock();
          
          if (!hist.empty())
          {

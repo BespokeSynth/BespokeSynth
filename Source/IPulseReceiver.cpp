@@ -9,11 +9,13 @@
 */
 
 #include "IPulseReceiver.h"
+#include "PatchCableSource.h"
 
-void IPulseSource::DispatchPulse(const vector<IPulseReceiver*>& receivers, int samplesTo, int flags)
+void IPulseSource::DispatchPulse(PatchCableSource* destination, float velocity, int samplesTo, int flags)
 {
-   mHistory.AddEvent(gTime, true);
-   mHistory.AddEvent(gTime+15, false);
+   const vector<IPulseReceiver*>& receivers = destination->GetPulseReceivers();
+   destination->AddHistoryEvent(gTime, true);
+   destination->AddHistoryEvent(gTime + 15, false);
    for (auto* receiver : receivers)
-      receiver->OnPulse(samplesTo, flags);
+      receiver->OnPulse(velocity, samplesTo, flags);
 }

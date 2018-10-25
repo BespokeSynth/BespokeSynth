@@ -22,33 +22,20 @@ NoteStepSequencer::NoteStepSequencer()
 , mNumSteps(8)
 , mLength(8)
 , mLengthSlider(nullptr)
-, mArpStep(1)
-, mArpPingPongDirection(1)
-, mArpStepSlider(nullptr)
-, mTimeMode(kTimeMode_Synced)
-, mTimeModeSelector(nullptr)
 , mGrid(nullptr)
 , mLastPitch(-1)
 , mLastVel(0)
 , mOctave(1)
 , mOctaveSlider(nullptr)
-, mHold(false)
-, mHoldCheckbox(nullptr)
 , mNoteMode(kNoteMode_Scale)
 , mNoteModeSelector(nullptr)
-, mWaitingForDownbeat(false)
 , mNoteRange(15)
-, mFreeTimeStep(30)
-, mFreeTimeSlider(nullptr)
-, mFreeTimeCounter(0)
 , mShowStepControls(false)
 , mRowOffset(0)
 , mSetLength(false)
 , mController(nullptr)
 , mShiftBackButton(nullptr)
 , mShiftForwardButton(nullptr)
-, mOffset(0)
-, mOffsetSlider(nullptr)
 , mLastNoteLength(1)
 , mLastNoteStartTime(0)
 , mAlreadyDidNoteOff(false)
@@ -57,13 +44,14 @@ NoteStepSequencer::NoteStepSequencer()
 , mRandomizeVelocityButton(nullptr)
 , mLoopResetPoint(0)
 , mLoopResetPointSlider(nullptr)
+, mHasExternalPulseSource(false)
 {
    TheTransport->AddListener(this, mInterval);
    TheTransport->AddAudioPoller(this);
    
    for (int i=0;i<NSS_MAX_STEPS;++i)
    {
-      mVels[i] = 80;
+      mVels[i] = 127;
       mNoteLengths[i] = 1;
    }
    
@@ -79,17 +67,12 @@ void NoteStepSequencer::CreateUIControls()
    IDrawableModule::CreateUIControls();
    mIntervalSelector = new DropdownList(this,"interval",75,2,(int*)(&mInterval));
    mLengthSlider = new IntSlider(this,"length",77,20,98,15,&mLength,1,mNumSteps);
-   mArpStepSlider = new IntSlider(this,"step",121,2,40,15,&mArpStep,-3,3);
-   mTimeModeSelector = new DropdownList(this,"timemode",5,2,(int*)(&mTimeMode));
    mGrid = new UIGrid(5,55,200,80,8,24);
    mVelocityGrid = new UIGrid(5,117,200,15,8,1);
    mOctaveSlider = new IntSlider(this,"octave",166,2,53,15,&mOctave,-2,4);
-   mHoldCheckbox = new Checkbox(this,"hold",180,20,&mHold);
    mNoteModeSelector = new DropdownList(this,"notemode",5,20,(int*)(&mNoteMode));
-   mFreeTimeSlider = new FloatSlider(this,"t",75,2,44,15,&mFreeTimeStep,0,1000,0);
    mShiftBackButton = new ClickButton(this,"<",130,2);
    mShiftForwardButton = new ClickButton(this,">",145,2);
-   mOffsetSlider = new FloatSlider(this,"offset",5,38,80,15,&mOffset,-1,1);
    mRandomizePitchButton = new ClickButton(this,"pitch",140,38);
    mRandomizeLengthButton = new ClickButton(this,"len",-1,-1);
    mRandomizeVelocityButton = new ClickButton(this,"vel",-1,-1);
@@ -134,18 +117,7 @@ void NoteStepSequencer::CreateUIControls()
    mVelocityGrid->SetClickClearsToZero(false);
    mVelocityGrid->SetListener(this);
    
-   mTimeModeSelector->AddLabel("synced", kTimeMode_Synced);
-   mTimeModeSelector->AddLabel("downbeat", kTimeMode_Downbeat);
-   mTimeModeSelector->AddLabel("dnbeat2", kTimeMode_Downbeat2);
-   mTimeModeSelector->AddLabel("dnbeat4", kTimeMode_Downbeat4);
-   mTimeModeSelector->AddLabel("step", kTimeMode_Step);
-   mTimeModeSelector->AddLabel("free", kTimeMode_Free);
-   
-   mFreeTimeSlider->SetMode(FloatSlider::kSquare);
-   
-   mArpStepSlider->SetShowing(mTimeMode != kTimeMode_Synced);
-   mFreeTimeSlider->SetShowing(mTimeMode == kTimeMode_Free);
-   mLoopResetPointSlider->SetShowing(mTimeMode != kTimeMode_Synced);
+   mLoopResetPointSlider->SetShowing(mHasExternalPulseSource);
    
    mRandomizeLengthButton->PositionTo(mRandomizePitchButton, kAnchor_Right);
    mRandomizeVelocityButton->PositionTo(mRandomizeLengthButton, kAnchor_Right);
@@ -184,17 +156,14 @@ void NoteStepSequencer::DrawModule()
    
    ofSetColor(255,255,255,gModuleDrawAlpha);
    
+   mLoopResetPointSlider->SetShowing(mHasExternalPulseSource);
+   
    mIntervalSelector->Draw();
    mLengthSlider->Draw();
-   mArpStepSlider->Draw();
-   mTimeModeSelector->Draw();
    mOctaveSlider->Draw();
-   mHoldCheckbox->Draw();
    mNoteModeSelector->Draw();
-   mFreeTimeSlider->Draw();
    mShiftBackButton->Draw();
    mShiftForwardButton->Draw();
-   mOffsetSlider->Draw();
    mRandomizePitchButton->Draw();
    mRandomizeLengthButton->Draw();
    mRandomizeVelocityButton->Draw();
@@ -316,12 +285,7 @@ bool NoteStepSequencer::MouseScrolled(int x, int y, float scrollX, float scrollY
 void NoteStepSequencer::CheckboxUpdated(Checkbox* checkbox)
 {
    if (checkbox == mEnabledCheckbox)
-   {
       mNoteOutput.Flush();
-      
-      if (mEnabled && (mTimeMode == kTimeMode_Downbeat || mTimeMode == kTimeMode_Downbeat2 || mTimeMode == kTimeMode_Downbeat4))
-         mWaitingForDownbeat = true;
-   }
 }
 
 void NoteStepSequencer::GridUpdated(UIGrid* grid, int col, int row, float value, float oldValue)
@@ -399,93 +363,47 @@ void NoteStepSequencer::OnTransportAdvanced(float amount)
          mAlreadyDidNoteOff = true;
       }
    }
-   
-   if (mTimeMode == kTimeMode_Free)
-   {
-      float ms = amount * TheTransport->MsPerBar();
-      mFreeTimeCounter += ms;
-      if (mFreeTimeCounter > mFreeTimeStep)
-      {
-         mFreeTimeCounter -= mFreeTimeStep;
-         OnTimeEvent(0);
-      }
-   }
 }
 
-void NoteStepSequencer::OnPulse(int samplesTo, int flags)
+void NoteStepSequencer::OnPulse(float velocity, int samplesTo, int flags)
 {
-   Step(samplesTo, flags & kPulseFlag_Reset);
+   mHasExternalPulseSource = true;
+   
+   Step(velocity, samplesTo, flags);
 }
 
 void NoteStepSequencer::OnTimeEvent(int samplesTo)
 {
-   Step(samplesTo, false);
+   if (!mHasExternalPulseSource)
+      Step(1, samplesTo, 0);
 }
 
-void NoteStepSequencer::Step(int samplesTo, bool reset)
+void NoteStepSequencer::Step(float velocity, int samplesTo, int pulseFlags)
 {
-   if (!mEnabled || mHold)
+   if (!mEnabled)
       return;
    
-   if (mArpStep != 0)
-   {
-      mArpIndex += mArpStep;
-      if (mArpStep > 0 && mArpIndex >= mLength)
-         mArpIndex -= (mLength - mLoopResetPoint);
-      if (mArpStep < 0 && mArpIndex < mLoopResetPoint)
-         mArpIndex += (mLength - mLoopResetPoint);
-   }
-   else //pingpong
-   {
-      assert (mArpPingPongDirection == 1 || mArpPingPongDirection == -1);
-      mArpIndex += mArpPingPongDirection;
-      if (mLength >= 2)
-      {
-         if (mArpPingPongDirection == -1 && mArpIndex < mLoopResetPoint)
-         {
-            mArpIndex = mLoopResetPoint + 1;
-            mArpPingPongDirection = 1;
-         }
-         if (mArpPingPongDirection == 1 && mArpIndex > mLength - 1)
-         {
-            mArpIndex = mLength - 2;
-            mArpPingPongDirection = -1;
-         }
-      }
-      else
-      {
-         mArpIndex = ofClamp(mArpIndex,0,mLength-1);
-      }
-   }
+   int direction = 1;
+   if (pulseFlags & kPulseFlag_Backward)
+      direction = -1;
    
-   float offsetMs = GetOffset()*TheTransport->MsPerBar();
+   mArpIndex += direction;
+   if (direction > 0 && mArpIndex >= mLength)
+      mArpIndex -= (mLength - mLoopResetPoint);
+   if (direction < 0 && mArpIndex < mLoopResetPoint)
+      mArpIndex += (mLength - mLoopResetPoint);
    
-   bool shouldResetForDownbeat = false;
-   if (mTimeMode == kTimeMode_Downbeat)
-      shouldResetForDownbeat = TheTransport->GetQuantized(offsetMs, mInterval) == 0;
-   if (mTimeMode == kTimeMode_Downbeat2)
-      shouldResetForDownbeat = TheTransport->GetQuantized(offsetMs, mInterval) == 0 && TheTransport->GetMeasure() % 2 == 0;
-   if (mTimeMode == kTimeMode_Downbeat4)
-      shouldResetForDownbeat = TheTransport->GetQuantized(offsetMs, mInterval) == 0 && TheTransport->GetMeasure() % 4 == 0;
-   
-   if (reset || shouldResetForDownbeat)
-   {
+   if (pulseFlags & kPulseFlag_Reset)
       mArpIndex = 0;
-      mArpPingPongDirection = 1;
-   }
+   else if (pulseFlags & kPulseFlag_Random)
+      mArpIndex = rand() % mLength;
    
-   if (mWaitingForDownbeat && shouldResetForDownbeat)
-      mWaitingForDownbeat = false;
-   
-   if (mWaitingForDownbeat && (mTimeMode == kTimeMode_Downbeat || mTimeMode == kTimeMode_Downbeat2 || mTimeMode == kTimeMode_Downbeat4))
-      return;
-   
-   if (mTimeMode == kTimeMode_Synced)
+   if (!mHasExternalPulseSource || (pulseFlags & kPulseFlag_SyncToTransport))
    {
       int stepsPerMeasure = TheTransport->CountInStandardMeasure(mInterval) * TheTransport->GetTimeSigTop()/TheTransport->GetTimeSigBottom();
       int numMeasures = ceil(float(mLength) / stepsPerMeasure);
       int measure = TheTransport->GetMeasure() % numMeasures;
-      int step = (TheTransport->GetQuantized(offsetMs, mInterval) + measure * stepsPerMeasure) % mLength;
+      int step = (TheTransport->GetQuantized(0, mInterval) + measure * stepsPerMeasure) % mLength;
       mArpIndex = step;
    }
    
@@ -523,7 +441,7 @@ void NoteStepSequencer::Step(int samplesTo, bool reset)
          }
          if (mVels[mArpIndex] > 1)
          {
-            PlayNoteOutput(gTime, outPitch, mVels[mArpIndex], -1);
+            PlayNoteOutput(gTime, outPitch, mVels[mArpIndex] * velocity, -1);
             mLastPitch = outPitch;
             mLastVel = mVels[mArpIndex];
             mLastNoteLength = mNoteLengths[mArpIndex];
@@ -782,36 +700,10 @@ void NoteStepSequencer::RandomizePitches(bool fifths)
    }
 }
 
-float NoteStepSequencer::GetOffset()
-{
-   if (mInterval == kInterval_None)
-      return 0;
-   return (-mOffset/TheTransport->CountInStandardMeasure(mInterval));
-}
-
 void NoteStepSequencer::DropdownUpdated(DropdownList* list, int oldVal)
 {
    if (list == mIntervalSelector)
-      TheTransport->UpdateListener(this, mInterval, GetOffset(), false);
-   if (list == mTimeModeSelector)
-   {
-      mArpStepSlider->SetShowing(mTimeMode != kTimeMode_Synced);
-      mIntervalSelector->SetShowing(mTimeMode != kTimeMode_Free);
-      mFreeTimeSlider->SetShowing(mTimeMode == kTimeMode_Free);
-      mShiftBackButton->SetShowing(mTimeMode == kTimeMode_Synced);
-      mShiftForwardButton->SetShowing(mTimeMode == kTimeMode_Synced);
-      mLoopResetPointSlider->SetShowing(mTimeMode != kTimeMode_Synced);
-      
-      if (mTimeMode == kTimeMode_Free && mInterval < kInterval_None)
-      {
-         mFreeTimeStep = TheTransport->GetDuration(mInterval);
-         TheTransport->UpdateListener(this, kInterval_None);
-      }
-      else if (oldVal == kTimeMode_Free)
-      {
-         TheTransport->UpdateListener(this, mInterval, GetOffset(), false);
-      }
-   }
+      TheTransport->UpdateListener(this, mInterval, 0, false);
    if (list == mNoteModeSelector)
    {
       if (mNoteMode != oldVal)
@@ -827,13 +719,6 @@ void NoteStepSequencer::DropdownUpdated(DropdownList* list, int oldVal)
 
 void NoteStepSequencer::FloatSliderUpdated(FloatSlider* slider, float oldVal)
 {
-   if (slider == mOffsetSlider)
-   {
-      if (mTimeMode != kTimeMode_Free)
-      {
-         TheTransport->UpdateListener(this, mInterval, GetOffset(), false);
-      }
-   }
    for (int i=0; i<NSS_MAX_STEPS; ++i)
    {
       if (slider == mLengthSliders[i])
@@ -843,15 +728,10 @@ void NoteStepSequencer::FloatSliderUpdated(FloatSlider* slider, float oldVal)
 
 void NoteStepSequencer::IntSliderUpdated(IntSlider* slider, int oldVal)
 {
-   if (slider == mArpStepSlider)
-   {
-      if (oldVal > 0)
-         mArpPingPongDirection = 1;
-      else if (oldVal < 0)
-         mArpPingPongDirection = -1;
-   }
    if (slider == mLoopResetPointSlider || slider == mLengthSlider)
       mLoopResetPoint = MIN(mLoopResetPoint, mLength-1);
+   if (slider == mLengthSlider)
+      SyncGridToSeq();
    if (slider == mOctaveSlider)
       SetUpStepControls();
    for (int i=0; i<NSS_MAX_STEPS; ++i)

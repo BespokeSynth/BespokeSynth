@@ -109,7 +109,7 @@ void ComboGridController::OnGridButton(int x, int y, float velocity, IGridContro
          listener->OnGridButton(x, y, velocity, this);
    }
 
-   mHistory.AddEvent(gTime, HasInput());
+   GetPatchCableSource()->AddHistoryEvent(gTime, HasInput());
 }
 
 bool ComboGridController::HasInput() const

@@ -453,7 +453,7 @@ void PatchCableSource::SaveState(FileStreamOut& out)
 
 void PatchCableSource::LoadState(FileStreamIn& in)
 {
-   assert(mPatchCables.size() == 0);
+   ClearPatchCables();
    
    int size;
    in >> size;
@@ -476,6 +476,51 @@ void PatchCableSource::LoadState(FileStreamIn& in)
          }
       }
       mPatchCables[i] = new PatchCable(this);
-      mPatchCables[i]->SetTarget(target);
+      SetPatchCableTarget(mPatchCables[i], target);
    }
+   
+   mOwner->PostRepatch(this);
+}
+
+void NoteHistory::AddEvent(double time, bool on)
+{
+   Lock("AddEvent");
+   
+   NoteHistoryEvent hist;
+   hist.mTime = time;
+   hist.mOn = on;
+   mHistory.push_front(hist);
+   
+   bool deleteRest = false;
+   for (NoteHistoryList::iterator i = mHistory.begin(); i != mHistory.end();)
+   {
+      if (deleteRest)
+      {
+         i = mHistory.erase(i);
+      }
+      else if ((*i).mTime < gTime - 5000)
+      {
+         deleteRest = true;
+         ++i;
+      }
+      else
+      {
+         ++i;
+      }
+   }
+   
+   Unlock();
+}
+
+bool NoteHistory::CurrentlyOn()
+{
+   bool on = false;
+   Lock("CurrentlyOn");
+   if (!mHistory.empty())
+   {
+      const NoteHistoryEvent& note = *(mHistory.begin());
+      on = note.mOn;
+   }
+   Unlock();
+   return on;
 }

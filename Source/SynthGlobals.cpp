@@ -19,6 +19,7 @@
 #include "PatchCable.h"
 #include "PatchCableSource.h"
 #include "ChannelBuffer.h"
+#include "IPulseReceiver.h"
 
 #ifdef JUCE_MAC
 #import <execinfo.h>
@@ -388,6 +389,7 @@ void UpdateTarget(IDrawableModule* module)
    IAudioSource* audioSource = dynamic_cast<IAudioSource*>(module);
    INoteSource* noteSource = dynamic_cast<INoteSource*>(module);
    IGridController* grid = dynamic_cast<IGridController*>(module);
+   IPulseSource* pulseSource = dynamic_cast<IPulseSource*>(module);
    string targetName = "";
    if (audioSource)
    {
@@ -399,7 +401,7 @@ void UpdateTarget(IDrawableModule* module)
          module->GetSaveData().SetString("target"+(i==0 ? "" : ofToString(i+1)), targetName);
       }
    }
-   if (noteSource || grid)
+   if (noteSource || grid || pulseSource)
    {
       if (module->GetPatchCableSource())
       {

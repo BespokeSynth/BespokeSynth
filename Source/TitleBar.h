@@ -79,6 +79,7 @@ private:
    SpawnList mVstPlugins;
    
    ClickButton* mSaveLayoutButton;
+   ClickButton* mResetLayoutButton;
    ClickButton* mSaveStateButton;
    ClickButton* mLoadStateButton;
    ClickButton* mWriteAudioButton;

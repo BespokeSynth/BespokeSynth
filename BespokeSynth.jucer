@@ -155,6 +155,9 @@
         <FILE id="RG4zGd" name="TremoloEffect.h" compile="0" resource="0" file="Source/TremoloEffect.h"/>
       </GROUP>
       <GROUP id="{6781AC07-A090-A7AF-8D27-BCB6D9526ABD}" name="modules">
+        <FILE id="ZauNFO" name="PulseSequence.cpp" compile="1" resource="0"
+              file="Source/PulseSequence.cpp"/>
+        <FILE id="szkkgw" name="PulseSequence.h" compile="0" resource="0" file="Source/PulseSequence.h"/>
         <FILE id="EugK26" name="Amplifier.cpp" compile="1" resource="0" file="Source/Amplifier.cpp"/>
         <FILE id="BgLMgo" name="Amplifier.h" compile="0" resource="0" file="Source/Amplifier.h"/>
         <FILE id="DU9MrN" name="Arpeggiator.cpp" compile="1" resource="0" file="Source/Arpeggiator.cpp"/>
@@ -534,6 +537,8 @@
         <FILE id="cPB1wW" name="SeaOfGrain.h" compile="0" resource="0" file="Source/SeaOfGrain.h"/>
         <FILE id="EJvHaK" name="Selector.cpp" compile="1" resource="0" file="Source/Selector.cpp"/>
         <FILE id="zvWezv" name="Selector.h" compile="0" resource="0" file="Source/Selector.h"/>
+        <FILE id="XA0iAo" name="Pulser.cpp" compile="1" resource="0" file="Source/Pulser.cpp"/>
+        <FILE id="M5VHcU" name="Pulser.h" compile="0" resource="0" file="Source/Pulser.h"/>
         <FILE id="kZXFDY" name="SignalGenerator.cpp" compile="1" resource="0"
               file="Source/SignalGenerator.cpp"/>
         <FILE id="GjQ36S" name="SignalGenerator.h" compile="0" resource="0"

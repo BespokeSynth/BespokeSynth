@@ -553,9 +553,12 @@ void DrumPlayer::DrumHit::DrawUIControls()
       displayLength = mEnvelopeLength * gSampleRateMs;
    ofPushMatrix();
    ofTranslate(305, 200);
-   mOwner->mLoadSamplesDrawMutex.lock();
-   DrawAudioBuffer(135, 100, mSample.Data(), 0, displayLength, mSample.GetPlayPosition());
-   mOwner->mLoadSamplesDrawMutex.unlock();
+   if (!mOwner->mLoadingSamples)
+   {
+      mOwner->mLoadSamplesDrawMutex.lock();
+      DrawAudioBuffer(135, 100, mSample.Data(), 0, displayLength, mSample.GetPlayPosition());
+      mOwner->mLoadSamplesDrawMutex.unlock();
+   }
    ofPopMatrix();
    
    mVolSlider->Draw();

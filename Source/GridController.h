@@ -50,10 +50,6 @@ public:
    virtual int NumRows() = 0;
    virtual bool HasInput() const = 0;
    virtual bool IsMultisliderGrid() const { return false; }
-   
-   NoteHistory& GetNoteHistory() { return mHistory; }
-protected:
-   NoteHistory mHistory;
 };
 
 class GridController : public IUIControl, public IGridController

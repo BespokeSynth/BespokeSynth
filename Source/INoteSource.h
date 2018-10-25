@@ -11,33 +11,9 @@
 
 #include "OpenFrameworksPort.h"
 #include "INoteReceiver.h"
-#include "NamedMutex.h"
 #include "IPatchable.h"
 
 class IDrawableModule;
-
-#define NOTE_HISTORY_LENGTH 250
-
-struct NoteHistoryEvent
-{
-   bool mOn;
-   double mTime;
-};
-
-typedef list<NoteHistoryEvent> NoteHistoryList;
-
-class NoteHistory
-{
-public:
-   void AddEvent(double time, bool on);
-   void Lock(string name) { mHistoryMutex.Lock(name); }
-   void Unlock() { mHistoryMutex.Unlock(); }
-   NoteHistoryList& GetHistory() { return mHistory; }
-   bool CurrentlyOn();
-private:
-   NoteHistoryList mHistory;
-   NamedMutex mHistoryMutex;
-};
 
 class INoteSource;
 
@@ -57,11 +33,9 @@ public:
 
    list<int> GetHeldNotes() { Poco::FastMutex::ScopedLock lock(mNotesMutex); return mNotes; }
    list<int> GetHeldNotesAudioThread() { return mNotes; }
-   NoteHistory& GetNoteHistory() { return mNoteHistory; }
 private:
    list<int> mNotes;
    ofMutex mNotesMutex;
-   NoteHistory mNoteHistory;
    INoteSource* mNoteSource;
 };
 

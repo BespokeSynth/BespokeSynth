@@ -22,10 +22,8 @@ public:
    virtual ~Amplifier();
    static IDrawableModule* Create() { return new Amplifier(); }
    
-   string GetTitleLabel() override { return "amplifier"; }
+   string GetTitleLabel() override { return "gain"; }
    void CreateUIControls() override;
-   
-   void SetBoost(float boost) { mBoost = boost; }
    
    //IAudioSource
    void Process(double time) override;
@@ -43,8 +41,8 @@ private:
    void GetModuleDimensions(int& w, int&h) override { w=120; h=22; }
    bool Enabled() const override { return mEnabled; }
    
-   float mBoost;
-   FloatSlider* mBoostSlider;
+   float mGain;
+   FloatSlider* mGainSlider;
 };
 
 

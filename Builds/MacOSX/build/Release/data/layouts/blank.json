@@ -1,6 +1,12 @@
 {
    "modules" : [
       {
+         "name" : "gain",
+         "position" : [ 44.0, 626.0 ],
+         "target" : "splitter",
+         "type" : "gain"
+      },
+      {
          "channel" : 1,
          "name" : "output 1",
          "position" : [ 40.0, 763.0 ],

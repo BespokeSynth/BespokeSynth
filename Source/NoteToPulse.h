@@ -40,6 +40,4 @@ private:
    void DrawModule() override;
    void GetModuleDimensions(int& width, int& height) override { width = 110; height = 0; }
    bool Enabled() const override { return mEnabled; }
-   
-   PatchCableSource* mTargetCable;
 };

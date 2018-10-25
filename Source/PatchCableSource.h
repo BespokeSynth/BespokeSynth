@@ -13,6 +13,7 @@
 #include "IClickable.h"
 #include "SynthGlobals.h"
 #include "IDrawableModule.h"
+#include "NamedMutex.h"
 
 class IAudioReceiver;
 class INoteReceiver;
@@ -28,6 +29,29 @@ enum PatchCableDrawMode
 {
    kPatchCableDrawMode_Normal,
    kPatchCableDrawMode_HoverOnly
+};
+
+#define NOTE_HISTORY_LENGTH 250
+
+struct NoteHistoryEvent
+{
+   bool mOn;
+   double mTime;
+};
+
+typedef list<NoteHistoryEvent> NoteHistoryList;
+
+class NoteHistory
+{
+public:
+   void AddEvent(double time, bool on);
+   void Lock(string name) { mHistoryMutex.Lock(name); }
+   void Unlock() { mHistoryMutex.Unlock(); }
+   NoteHistoryList& GetHistory() { return mHistory; }
+   bool CurrentlyOn();
+private:
+   NoteHistoryList mHistory;
+   NamedMutex mHistoryMutex;
 };
 
 class PatchCableSource : public IClickable
@@ -77,6 +101,9 @@ public:
    void SetClickable(bool clickable) { mClickable = clickable; }
    bool TestHover(float x, float y) const;
    
+   void AddHistoryEvent(double time, bool on) { mNoteHistory.AddEvent(time, on); }
+   NoteHistory& GetHistory() { return mNoteHistory; }
+   
    void Render() override;
    bool TestClick(int x, int y, bool right, bool testOnly = false) override;
    bool MouseMoved(float x, float y) override;
@@ -117,6 +144,8 @@ private:
    
    vector<string> mTypeFilter;
    vector<IClickable*> mValidTargets;
+   
+   NoteHistory mNoteHistory;
 };
 
 #endif /* defined(__Bespoke__PatchCableSource__) */

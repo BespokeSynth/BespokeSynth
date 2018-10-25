@@ -88,8 +88,6 @@ void GridController::OnInput(int control, float velocity)
       
       if (mOwner)
          mOwner->OnGridButton(x, y, velocity, this);
-      
-      mHistory.AddEvent(gTime, HasInput());
    }
 }
 

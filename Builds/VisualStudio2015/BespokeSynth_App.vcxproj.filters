@@ -541,6 +541,9 @@
     <ClCompile Include="..\..\Source\TremoloEffect.cpp">
       <Filter>BespokeSynth\Source\effects</Filter>
     </ClCompile>
+    <ClCompile Include="..\..\Source\PulseSequence.cpp">
+      <Filter>BespokeSynth\Source\modules</Filter>
+    </ClCompile>
     <ClCompile Include="..\..\Source\Amplifier.cpp">
       <Filter>BespokeSynth\Source\modules</Filter>
     </ClCompile>
@@ -947,6 +950,9 @@
       <Filter>BespokeSynth\Source\modules</Filter>
     </ClCompile>
     <ClCompile Include="..\..\Source\Selector.cpp">
+      <Filter>BespokeSynth\Source\modules</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\Source\Pulser.cpp">
       <Filter>BespokeSynth\Source\modules</Filter>
     </ClCompile>
     <ClCompile Include="..\..\Source\SignalGenerator.cpp">
@@ -3213,6 +3219,9 @@
     <ClInclude Include="..\..\Source\TremoloEffect.h">
       <Filter>BespokeSynth\Source\effects</Filter>
     </ClInclude>
+    <ClInclude Include="..\..\Source\PulseSequence.h">
+      <Filter>BespokeSynth\Source\modules</Filter>
+    </ClInclude>
     <ClInclude Include="..\..\Source\Amplifier.h">
       <Filter>BespokeSynth\Source\modules</Filter>
     </ClInclude>
@@ -3622,6 +3631,9 @@
       <Filter>BespokeSynth\Source\modules</Filter>
     </ClInclude>
     <ClInclude Include="..\..\Source\Selector.h">
+      <Filter>BespokeSynth\Source\modules</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\Source\Pulser.h">
       <Filter>BespokeSynth\Source\modules</Filter>
     </ClInclude>
     <ClInclude Include="..\..\Source\SignalGenerator.h">

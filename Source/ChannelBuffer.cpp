@@ -56,7 +56,8 @@ void ChannelBuffer::Setup(int bufferSize)
 
 float* ChannelBuffer::GetChannel(int channel)
 {
-   assert(channel < mActiveChannels);
+   if (channel >= mActiveChannels)
+      ofLog() << "error: requesting a higher channel index than we have active";
    float* ret = mBuffers[MIN(channel, mActiveChannels-1)];
    if (ret == nullptr)
    {

@@ -15,8 +15,9 @@
 #include "TextEntry.h"
 #include "Slider.h"
 #include "Transport.h"
+#include "IPulseReceiver.h"
 
-class NoteCreator : public IDrawableModule, public INoteSource, public IButtonListener, public ITextEntryListener, public IFloatSliderListener, public IAudioPoller
+class NoteCreator : public IDrawableModule, public INoteSource, public IButtonListener, public ITextEntryListener, public IFloatSliderListener, public IAudioPoller, public IPulseReceiver
 {
 public:
    NoteCreator();
@@ -30,6 +31,8 @@ public:
    
    void OnTransportAdvanced(float amount) override;
    
+   void OnPulse(float amount, int samplesTo, int flags) override;
+   
    void CheckboxUpdated(Checkbox* checkbox) override;
    void ButtonClicked(ClickButton* button) override;
    void TextEntryComplete(TextEntry* entry) override;
@@ -39,7 +42,7 @@ public:
    void SetUpFromSaveData() override;
    
 protected:
-   void TriggerNote();
+   void TriggerNote(double time, float velocity);
    
    //IDrawableModule
    void DrawModule() override;

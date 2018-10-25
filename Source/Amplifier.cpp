@@ -12,15 +12,15 @@
 
 Amplifier::Amplifier()
 : IAudioProcessor(gBufferSize)
-, mBoost(0)
-, mBoostSlider(nullptr)
+, mGain(1)
+, mGainSlider(nullptr)
 {
 }
 
 void Amplifier::CreateUIControls()
 {
    IDrawableModule::CreateUIControls();
-   mBoostSlider = new FloatSlider(this,"boost",5,2,110,15,&mBoost,1,4);
+   mGainSlider = new FloatSlider(this,"gain",5,2,110,15,&mGain,0,4);
 }
 
 Amplifier::~Amplifier()
@@ -42,7 +42,7 @@ void Amplifier::Process(double time)
       ChannelBuffer* out = GetTarget()->GetBuffer();
       for (int ch=0; ch<GetBuffer()->NumActiveChannels(); ++ch)
       {
-         Mult(GetBuffer()->GetChannel(ch), mBoost*mBoost, out->BufferSize());
+         Mult(GetBuffer()->GetChannel(ch), mGain*mGain, out->BufferSize());
          Add(out->GetChannel(ch), GetBuffer()->GetChannel(ch), out->BufferSize());
          GetVizBuffer()->WriteChunk(GetBuffer()->GetChannel(ch),GetBuffer()->BufferSize(), ch);
       }
@@ -53,18 +53,15 @@ void Amplifier::Process(double time)
 
 void Amplifier::DrawModule()
 {
-
-   
    if (Minimized() || IsVisible() == false)
       return;
    
-   mBoostSlider->Draw();
+   mGainSlider->Draw();
 }
 
 void Amplifier::LoadLayout(const ofxJSONElement& moduleInfo)
 {
    mModuleSaveData.LoadString("target", moduleInfo);
-   mModuleSaveData.LoadFloat("boost", moduleInfo, 1, mBoostSlider);
 
    SetUpFromSaveData();
 }
@@ -72,7 +69,6 @@ void Amplifier::LoadLayout(const ofxJSONElement& moduleInfo)
 void Amplifier::SetUpFromSaveData()
 {
    SetTarget(TheSynth->FindModule(mModuleSaveData.GetString("target")));
-   SetBoost(mModuleSaveData.GetFloat("boost"));
 }
 
 

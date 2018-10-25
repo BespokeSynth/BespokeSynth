@@ -237,7 +237,7 @@ void SingleOscillator::UpdateADSRDisplays()
 void SingleOscillator::LoadLayout(const ofxJSONElement& moduleInfo)
 {
    mModuleSaveData.LoadString("target", moduleInfo);
-   mModuleSaveData.LoadFloat("vol", moduleInfo, 1, mVolSlider);
+   mModuleSaveData.LoadFloat("vol", moduleInfo, .5, mVolSlider);
    mModuleSaveData.LoadEnum<OscillatorType>("osc", moduleInfo, kOsc_Sin, mOscSelector);
    mModuleSaveData.LoadFloat("detune", moduleInfo, 1, mDetuneSlider);
    mModuleSaveData.LoadBool("pressure_envelope", moduleInfo);

@@ -107,6 +107,7 @@ TitleBar::TitleBar()
 , mOtherModules(this,0,0,"other:")
 , mVstPlugins(this,0,0,"vst plugins:")
 , mSaveLayoutButton(nullptr)
+, mResetLayoutButton(nullptr)
 , mSaveStateButton(nullptr)
 , mLoadStateButton(nullptr)
 , mWriteAudioButton(nullptr)
@@ -123,13 +124,17 @@ TitleBar::TitleBar()
 void TitleBar::CreateUIControls()
 {
    IDrawableModule::CreateUIControls();
-   mSaveLayoutButton = new ClickButton(this,"save layout",280,1);
-   mSaveStateButton = new ClickButton(this,"save state",140,19);
-   mLoadStateButton = new ClickButton(this,"load state",205,19);
-   mWriteAudioButton = new ClickButton(this,"write audio",280,19);
-   mQuitButton = new ClickButton(this,"quit",400,19);
-   mDisplayHelpButton = new ClickButton(this," ? ",380,19);
-   mLoadLayoutDropdown = new DropdownList(this, "load layout", 140, 2, &mLoadLayoutIndex);
+   mSaveLayoutButton = new ClickButton(this,"save layout",280,19);
+   mLoadStateButton = new ClickButton(this,"load state",140,1);
+   mSaveStateButton = new ClickButton(this,"save state",205,1);
+   mResetLayoutButton = new ClickButton(this,"reset layout",140,19);
+   mWriteAudioButton = new ClickButton(this,"write audio",280,1);
+   mQuitButton = new ClickButton(this,"quit",400,1);
+   mDisplayHelpButton = new ClickButton(this," ? ",380,1);
+   mLoadLayoutDropdown = new DropdownList(this, "load layout", 140, 20, &mLoadLayoutIndex);
+   
+   mLoadLayoutDropdown->SetShowing(false);
+   mSaveLayoutButton->SetShowing(false);
    
    mHelpDisplay->CreateUIControls();
    
@@ -202,6 +207,7 @@ void TitleBar::DrawModule()
       mLoadStateButton->Draw();
       mWriteAudioButton->Draw();
       mLoadLayoutDropdown->Draw();
+      mResetLayoutButton->Draw();
    }
    
    if (ofGetWidth() / gDrawScale >= 920)
@@ -320,6 +326,8 @@ void TitleBar::ButtonClicked(ClickButton* button)
       mHelpDisplay->SetPosition(x-w+butW,y+butH);
       TheSynth->PushModalFocusItem(mHelpDisplay);
    }
+   if (button == mResetLayoutButton)
+      TheSynth->LoadLayoutFromFile(ofToDataPath("layouts/blank.json"));
 }
 
 

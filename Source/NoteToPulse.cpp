@@ -26,8 +26,6 @@ NoteToPulse::~NoteToPulse()
 void NoteToPulse::CreateUIControls()
 {
    IDrawableModule::CreateUIControls();
-   mTargetCable = new PatchCableSource(this, kConnectionType_Pulse);
-   AddPatchCableSource(mTargetCable);
 }
 
 void NoteToPulse::DrawModule()
@@ -39,28 +37,22 @@ void NoteToPulse::DrawModule()
 void NoteToPulse::PlayNote(double time, int pitch, int velocity, int voiceIdx, ModulationParameters modulation)
 {
    if (mEnabled && velocity > 0)
-      DispatchPulse(mTargetCable->GetPulseReceivers(), (time - gTime) / gSampleRateMs, 0);
+      DispatchPulse(GetPatchCableSource(), velocity/127.0f, (time - gTime) / gSampleRateMs, 0);
 }
 
 void NoteToPulse::SaveLayout(ofxJSONElement& moduleInfo)
 {
    IDrawableModule::SaveLayout(moduleInfo);
-   
-   /*string targetPath = "";
-   if (mTarget)
-      targetPath = mTarget->Path();
-   
-   moduleInfo["target"] = targetPath;*/
 }
 
 void NoteToPulse::LoadLayout(const ofxJSONElement& moduleInfo)
 {
-   //mModuleSaveData.LoadString("target", moduleInfo);
+   mModuleSaveData.LoadString("target", moduleInfo);
    
    SetUpFromSaveData();
 }
 
 void NoteToPulse::SetUpFromSaveData()
 {
-   //mTargetCable->SetTarget(TheSynth->FindUIControl(mModuleSaveData.GetString("target")));
+   SetUpPatchCables(mModuleSaveData.GetString("target"));
 }

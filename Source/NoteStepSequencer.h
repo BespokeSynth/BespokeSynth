@@ -62,7 +62,7 @@ public:
    void OnTimeEvent(int samplesTo) override;
    
    //IPulseReceiver
-   void OnPulse(int samplesTo, int flags) override;
+   void OnPulse(float velocity, int samplesTo, int flags) override;
    
    //IScaleListener
    void OnScaleChanged() override;
@@ -107,24 +107,13 @@ private:
    float ExtraWidth() const;
    float ExtraHeight() const;
    void RandomizePitches(bool fifths);
-   void Step(int samplesTo, bool reset);
-   float GetOffset();
+   void Step(float velocity, int samplesTo, int pulseFlags);
    
    enum NoteMode
    {
       kNoteMode_Scale,
       kNoteMode_Chromatic,
       kNoteMode_Fifths
-   };
-   
-   enum TimeMode
-   {
-      kTimeMode_Synced,
-      kTimeMode_Downbeat,
-      kTimeMode_Downbeat2,
-      kTimeMode_Downbeat4,
-      kTimeMode_Step,
-      kTimeMode_Free
    };
    
    int mTones[NSS_MAX_STEPS];
@@ -136,11 +125,6 @@ private:
    
    DropdownList* mIntervalSelector;
    Checkbox* mRepeatIsHoldCheckbox;
-   int mArpStep;
-   int mArpPingPongDirection;
-   IntSlider* mArpStepSlider;
-   TimeMode mTimeMode;
-   DropdownList* mTimeModeSelector;
    UIGrid* mGrid;
    UIGrid* mVelocityGrid;
    int mLastPitch;
@@ -150,13 +134,8 @@ private:
    bool mAlreadyDidNoteOff;
    int mOctave;
    IntSlider* mOctaveSlider;
-   bool mHold;
-   Checkbox* mHoldCheckbox;
    NoteMode mNoteMode;
    DropdownList* mNoteModeSelector;
-   bool mWaitingForDownbeat;
-   float mOffset;
-   FloatSlider* mOffsetSlider;
    IntSlider* mLoopResetPointSlider;
    int mLoopResetPoint;
    
@@ -165,9 +144,6 @@ private:
    bool mSetLength;
    int mNoteRange;
    int mNumSteps;
-   FloatSlider* mFreeTimeSlider;
-   float mFreeTimeStep;
-   float mFreeTimeCounter;
    bool mShowStepControls;
    int mRowOffset;
    
@@ -183,6 +159,8 @@ private:
    DropdownList* mToneDropdowns[NSS_MAX_STEPS];
    IntSlider* mVelocitySliders[NSS_MAX_STEPS];
    FloatSlider* mLengthSliders[NSS_MAX_STEPS];
+   
+   bool mHasExternalPulseSource;
 };
 
 

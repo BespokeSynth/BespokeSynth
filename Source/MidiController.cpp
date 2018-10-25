@@ -503,6 +503,7 @@ void MidiController::MidiReceived(MidiMessageType messageType, int control, floa
             if (grid->mControls[i] == control)
             {
                grid->mGridController[mControllerPage]->OnInput(control, value);
+               grid->mGridCable->AddHistoryEvent(gTime, grid->mGridController[mControllerPage]->HasInput());
                break;
             }
          }

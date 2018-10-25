@@ -26,6 +26,7 @@
 #include "Presets.h"
 #include "PatchCableSource.h"
 #include "nanovg/nanovg.h"
+#include "IPulseReceiver.h"
 
 float IDrawableModule::sHueNote = 27;
 float IDrawableModule::sHueAudio = 135;
@@ -72,6 +73,8 @@ void IDrawableModule::CreateUIControls()
       type = kConnectionType_Note;
    if (dynamic_cast<IGridController*>(this))
       type = kConnectionType_Grid;
+   if (dynamic_cast<IPulseSource*>(this))
+      type = kConnectionType_Pulse;
    if (type != kConnectionType_Special)
    {
       mMainPatchCableSource = new PatchCableSource(this, type);
@@ -207,11 +210,7 @@ void IDrawableModule::Render()
          highlight = mag*.15f;
       }
       
-      INoteSource* noteSource = dynamic_cast<INoteSource*>(this);
-      if (noteSource && noteSource->GetNoteOutput()->GetNoteHistory().CurrentlyOn())
-         highlight = .1f;
-      IGridController* grid = dynamic_cast<IGridController*>(this);
-      if (grid && grid->GetNoteHistory().CurrentlyOn())
+      if (GetPatchCableSource() != nullptr && GetPatchCableSource()->GetHistory().CurrentlyOn())
          highlight = .1f;
    }
    
@@ -861,7 +860,7 @@ void IDrawableModule::SaveLayout(ofxJSONElement& moduleInfo)
 
 namespace
 {
-   const int kSaveStateRev = 0;
+   const int kSaveStateRev = 1;
    const int kControlSeparatorLength = 16;
    const char kControlSeparator[kControlSeparatorLength+1] = "controlseparator";
 }
@@ -900,6 +899,10 @@ void IDrawableModule::SaveState(FileStreamOut& out)
       out << string(child->Name());
       child->SaveState(out);
    }
+   
+   out << (int)mPatchCableSources.size();
+   for (auto* cable : mPatchCableSources)
+      cable->SaveState(out);
 }
 
 void IDrawableModule::LoadState(FileStreamIn& in)
@@ -994,6 +997,22 @@ void IDrawableModule::LoadState(FileStreamIn& in)
       IDrawableModule* child = FindChild(childName.c_str());
       LoadStateValidate(child);
       child->LoadState(in);
+   }
+   
+   if (rev >= 1)
+   {
+      int numPatchCableSources;
+      in >> numPatchCableSources;
+      PatchCableSource* dummy = new PatchCableSource(this, kConnectionType_Special);
+      for (int i=0; i<numPatchCableSources; ++i)
+      {
+         PatchCableSource* readIn;
+         if (i < mPatchCableSources.size())
+            readIn = mPatchCableSources[i];
+         else
+            readIn = dummy;
+         readIn->LoadState(in);
+      }
    }
 }
 
