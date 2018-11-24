@@ -97,7 +97,7 @@ void Pulser::CheckboxUpdated(Checkbox* checkbox)
 
 void Pulser::OnTransportAdvanced(float amount)
 {
-   Profiler profiler("Pulser");
+   PROFILER(Pulser);
    
    ComputeSliders(0);
    

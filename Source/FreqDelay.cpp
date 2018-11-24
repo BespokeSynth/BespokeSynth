@@ -37,7 +37,7 @@ FreqDelay::~FreqDelay()
 
 void FreqDelay::Process(double time)
 {
-   Profiler profiler("FreqDelay");
+   PROFILER(FreqDelay);
 
    if (GetTarget() == nullptr)
       return;

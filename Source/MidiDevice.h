@@ -73,11 +73,11 @@ public:
    bool ConnectOutput(const char* name, int channel = 1);
    void ConnectOutput(int index, int channel = 1);
    bool Reconnect();
-   bool IsConnected();
+   bool IsInputConnected();
 
    const char* Name() { return TheSynth->GetGlobalManagers()->mDeviceManager.isMidiInputEnabled(mDeviceNameIn) ? mDeviceNameIn : mDeviceNameOut; }
    
-   vector<string> GetPortList();
+   vector<string> GetPortList(bool forInput);
    
    void SendNote(int pitch, int velocity, bool forceNoteOn = false, int channel = -1);
    void SendCC(int ctl, int value, int channel = -1);

@@ -97,7 +97,7 @@ EventCanvas::~EventCanvas()
 
 void EventCanvas::OnTransportAdvanced(float amount)
 {
-   Profiler profiler("EventCanvas");
+   PROFILER(EventCanvas);
    
    if (mCanvas == nullptr)
       return;

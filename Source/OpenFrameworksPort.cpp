@@ -12,6 +12,9 @@
 #include <GL/glew.h>
 #endif
 
+//#include <chrono>
+#include <time.h>
+
 #include "OpenFrameworksPort.h"
 #include "nanovg/nanovg.h"
 #define NANOVG_GL3_IMPLEMENTATION
@@ -275,9 +278,13 @@ void ofSetCircleResolution(float res)
    
 }
 
-long ofGetSystemTimeMicros()
+unsigned long long ofGetSystemTimeNanos()
 {
-   return 0;
+   //auto now = std::chrono::high_resolution_clock::now();
+   //return std::chrono::duration_cast<std::chrono:nanoseconds>(now.time_since_epoch()).count();
+   struct timespec t;
+   clock_gettime(CLOCK_MONOTONIC, &t);
+   return t.tv_sec * 1000000000 + t.tv_nsec;
 }
 
 float ofGetWidth()

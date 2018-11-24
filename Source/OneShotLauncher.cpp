@@ -51,7 +51,7 @@ OneShotLauncher::~OneShotLauncher()
 
 void OneShotLauncher::Process(double time)
 {
-   /*Profiler profiler("OneShotLauncher");
+   /*PROFILER(OneShotLauncher);
    
    if (!mEnabled || GetTarget() == nullptr)
       return;

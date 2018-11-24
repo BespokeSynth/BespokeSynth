@@ -59,7 +59,7 @@ struct ScalePitches
    bool IsInScale(int pitch) const;
    int GetPitchFromTone(int n) const;
    int GetToneFromPitch(int pitch) const;
-   int NumPitchesInScale() const { return mScalePitches.size(); }
+   int NumPitchesInScale() const { return (int)mScalePitches.size(); }
 };
 
 class Scale : public IDrawableModule, public IDropdownListener, public IFloatSliderListener, public IIntSliderListener, public ITextEntryListener

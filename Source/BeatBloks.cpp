@@ -123,7 +123,7 @@ void BeatBloks::Poll()
 
 void BeatBloks::Process(double time)
 {
-   Profiler profiler("BeatBloks");
+   PROFILER(BeatBloks);
 
    if (!mEnabled || GetTarget() == nullptr || mSample == nullptr || mLoading)
       return;

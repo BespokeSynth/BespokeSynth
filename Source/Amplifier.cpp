@@ -29,7 +29,7 @@ Amplifier::~Amplifier()
 
 void Amplifier::Process(double time)
 {
-   Profiler profiler("Amplifier");
+   PROFILER(Amplifier);
 
    if (!mEnabled)
       return;

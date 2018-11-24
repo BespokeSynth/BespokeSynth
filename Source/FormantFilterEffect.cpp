@@ -68,7 +68,7 @@ void FormantFilterEffect::Init()
 
 void FormantFilterEffect::ProcessAudio(double time, ChannelBuffer* buffer)
 {
-   Profiler profiler("FormantFilterEffect");
+   PROFILER(FormantFilterEffect);
    
    if (!mEnabled)
       return;

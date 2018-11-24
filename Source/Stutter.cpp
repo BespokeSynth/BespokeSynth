@@ -49,7 +49,7 @@ Stutter::~Stutter()
 
 void Stutter::ProcessAudio(double time, ChannelBuffer* buffer)
 {
-   Profiler profiler("Stutter");
+   PROFILER(Stutter);
    
    float bufferSize = buffer->BufferSize();
    

@@ -54,7 +54,7 @@ SlowLayers::~SlowLayers()
 
 void SlowLayers::Process(double time)
 {
-   Profiler profiler("SlowLayers");
+   PROFILER(SlowLayers);
    
    if (!mEnabled || GetTarget() == nullptr)
       return;

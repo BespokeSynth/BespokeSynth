@@ -957,7 +957,7 @@ void ModularSynth::MouseReleased(int intX, int intY, int button)
       mGroupSelectContext->GetModulesWithinRect(ofRectangle(ofPoint(mClickStartX,mClickStartY),ofPoint(x,y)), mGroupSelectedModules);
       if (mGroupSelectedModules.size() > 0)
       {
-         for (int i=mGroupSelectedModules.size()-1; i>=0; --i) //do this backwards to preserve existing order
+         for (int i=(int)mGroupSelectedModules.size()-1; i>=0; --i) //do this backwards to preserve existing order
             MoveToFront(mGroupSelectedModules[i]);
       }
       mGroupSelectContext = nullptr;
@@ -969,7 +969,7 @@ void ModularSynth::MouseReleased(int intX, int intY, int button)
 
 void ModularSynth::AudioOut(float** output, int bufferSize, int nChannels)
 {
-   Profiler profiler("audioOut() total", true);
+   PROFILER(audioOut_total);
    
    if (mAudioPaused)
       return;

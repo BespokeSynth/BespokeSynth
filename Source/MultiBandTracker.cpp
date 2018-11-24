@@ -46,7 +46,7 @@ void MultiBandTracker::SetNumBands(int numBands)
 
 void MultiBandTracker::Process(float* buffer, int bufferSize)
 {
-   Profiler profiler("MultiBandTracker");
+   PROFILER(MultiBandTracker);
 
    mMutex.lock();
    

@@ -111,7 +111,7 @@ void PulseSequence::CheckboxUpdated(Checkbox* checkbox)
 
 void PulseSequence::OnTransportAdvanced(float amount)
 {
-   Profiler profiler("PulseSequence");
+   PROFILER(PulseSequence);
    
    ComputeSliders(0);
 }

@@ -34,7 +34,7 @@ Metronome::~Metronome()
 
 void Metronome::Process(double time)
 {
-   Profiler profiler("Metronome");
+   PROFILER(Metronome);
 
    if (!mEnabled || GetTarget() == nullptr)
       return;

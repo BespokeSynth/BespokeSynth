@@ -99,7 +99,7 @@ void SamplePlayer::Poll()
 
 void SamplePlayer::Process(double time)
 {
-   Profiler profiler("SamplePlayer");
+   PROFILER(SamplePlayer);
    
    if (!mEnabled || GetTarget() == nullptr || mSample == nullptr)
       return;

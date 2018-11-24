@@ -126,7 +126,7 @@ void ChaosEngine::Poll()
 
 void ChaosEngine::AudioUpdate()
 {
-   Profiler profiler("ChaosEngine");
+   PROFILER(ChaosEngine);
    
    int measure = TheTransport->GetMeasure();
    int beat = int(TheTransport->GetMeasurePos() * TheTransport->GetTimeSigTop());

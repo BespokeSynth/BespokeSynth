@@ -165,7 +165,7 @@ void PolyphonyMgr::Stop(double time, int pitch)
 
 void PolyphonyMgr::Process(double time, ChannelBuffer* out, int bufferSize)
 {
-   Profiler profiler("PolyphonyMgr");
+   PROFILER(PolyphonyMgr);
    
    mFadeOutBuffer.SetNumActiveChannels(out->NumActiveChannels());
    mFadeOutWorkBuffer.SetNumActiveChannels(out->NumActiveChannels());

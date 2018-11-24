@@ -122,7 +122,7 @@ void MultitrackRecorder::Poll()
 
 void MultitrackRecorder::Process(double time, float* left, float* right, int bufferSize)
 {
-   Profiler profiler("MultitrackRecorder");
+   PROFILER(MultitrackRecorder);
    
    if (!mEnabled)
       return;

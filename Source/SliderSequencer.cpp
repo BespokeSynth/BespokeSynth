@@ -51,7 +51,7 @@ float SliderSequencer::MeasurePos()
 
 void SliderSequencer::OnTransportAdvanced(float amount)
 {
-   Profiler profiler("SliderSequencer");
+   PROFILER(SliderSequencer);
    
    if (!mEnabled)
       return;

@@ -81,7 +81,7 @@ void Vocoder::SetCarrierBuffer(float *carrier, int bufferSize)
 
 void Vocoder::Process(double time)
 {
-   Profiler profiler("Vocoder");
+   PROFILER(Vocoder);
 
    if (GetTarget() == nullptr || !mEnabled)
       return;

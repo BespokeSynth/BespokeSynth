@@ -53,7 +53,7 @@ void EQEffect::Init()
 
 void EQEffect::ProcessAudio(double time, ChannelBuffer* buffer)
 {
-   Profiler profiler("EQEffect");
+   PROFILER(EQEffect);
    
    if (!mEnabled)
       return;

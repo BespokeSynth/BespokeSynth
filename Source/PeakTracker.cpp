@@ -12,7 +12,7 @@
 
 void PeakTracker::Process(float* buffer, int bufferSize)
 {
-   Profiler profiler("PeakTracker");
+   PROFILER(PeakTracker);
 
    for (int j=0; j<bufferSize; ++j)
    {

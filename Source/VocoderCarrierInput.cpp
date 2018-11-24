@@ -33,7 +33,7 @@ void VocoderCarrierInput::CreateUIControls()
 
 void VocoderCarrierInput::Process(double time)
 {
-   Profiler profiler("VocoderCarrierInput");
+   PROFILER(VocoderCarrierInput);
 
    if (GetTarget() == nullptr)
       return;

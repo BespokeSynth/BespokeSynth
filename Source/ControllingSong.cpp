@@ -146,7 +146,7 @@ void ControllingSong::LoadSong(int index)
 
 void ControllingSong::Process(double time)
 {
-   Profiler profiler("ControllingSong");
+   PROFILER(ControllingSong);
    
    if (!mEnabled || GetTarget() == nullptr)
       return;

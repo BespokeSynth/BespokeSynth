@@ -54,7 +54,7 @@ MultibandCompressor::~MultibandCompressor()
 
 void MultibandCompressor::Process(double time)
 {
-   Profiler profiler("multiband");
+   PROFILER(multiband);
    
    if (!mEnabled)
       return;

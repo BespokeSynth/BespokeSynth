@@ -54,7 +54,7 @@ WaveformViewer::~WaveformViewer()
 
 void WaveformViewer::Process(double time)
 {
-   Profiler profiler("WaveformViewer");
+   PROFILER(WaveformViewer);
    
    ComputeSliders(0);
 

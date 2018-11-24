@@ -289,7 +289,7 @@ Autotalent::~Autotalent()
 
 void Autotalent::Process(double time)
 {
-   Profiler profiler("Autotalent");
+   PROFILER(Autotalent);
 
    if (!mEnabled || GetTarget() == nullptr)
       return;

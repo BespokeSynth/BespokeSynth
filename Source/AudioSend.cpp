@@ -48,7 +48,7 @@ AudioSend::~AudioSend()
 
 void AudioSend::Process(double time)
 {
-   Profiler profiler("AudioSend");
+   PROFILER(AudioSend);
    
    if (!mEnabled)
       return;

@@ -82,7 +82,7 @@ void BandVocoder::SetCarrierBuffer(float *carrier, int bufferSize)
 
 void BandVocoder::Process(double time)
 {
-   Profiler profiler("BandVocoder");
+   PROFILER(BandVocoder);
 
    if (GetTarget() == nullptr || !mEnabled)
       return;

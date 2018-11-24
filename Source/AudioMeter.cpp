@@ -32,7 +32,7 @@ AudioMeter::~AudioMeter()
 
 void AudioMeter::Process(double time)
 {
-   Profiler profiler("AudioMeter");
+   PROFILER(AudioMeter);
    
    if (!mEnabled)
       return;

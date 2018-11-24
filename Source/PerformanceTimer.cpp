@@ -12,12 +12,12 @@ TimerInstance::TimerInstance(string name, PerformanceTimer& manager)
 : mName(name)
 , mManager(manager)
 {
-   mTimerStart = ofGetSystemTimeMicros();
+   mTimerStart = ofGetSystemTimeNanos();
 }
 
 TimerInstance::~TimerInstance()
 {
-   mManager.RecordCost(mName, ofGetSystemTimeMicros() - mTimerStart);
+   mManager.RecordCost(mName, ofGetSystemTimeNanos() - mTimerStart);
 }
 
 void PerformanceTimer::RecordCost(string name, long cost)

@@ -35,7 +35,7 @@ bool FMVoice::IsDone(double time)
 
 bool FMVoice::Process(double time, ChannelBuffer* out)
 {
-   Profiler profiler("FMVoice");
+   PROFILER(FMVoice);
 
    if (IsDone(time))
       return false;

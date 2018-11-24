@@ -51,7 +51,7 @@ void FollowingSong::SetPlaybackInfo(bool play, int position, float speed, float 
 
 void FollowingSong::Process(double time)
 {
-   Profiler profiler("FollowingSong");
+   PROFILER(FollowingSong);
    
    if (!mEnabled || GetTarget() == nullptr)
       return;

@@ -31,7 +31,7 @@ TakeRecorder::~TakeRecorder()
 
 void TakeRecorder::Process(double time)
 {
-   Profiler profiler("TakeRecorder");
+   PROFILER(TakeRecorder);
    
    if (!mEnabled)
       return;

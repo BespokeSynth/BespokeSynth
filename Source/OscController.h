@@ -37,7 +37,7 @@ public:
    
    void LoadInfo(const ofxJSONElement& moduleInfo) override;
    
-   bool IsConnected() override { return mConnected; }
+   bool IsInputConnected() override { return mConnected; }
    bool Reconnect() override { Connect(); return mConnected; }
 
 private:

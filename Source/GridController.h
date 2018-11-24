@@ -55,7 +55,7 @@ public:
 class GridController : public IUIControl, public IGridController
 {
 public:
-   GridController(IGridControllerListener* owner, int x, int y);
+   GridController(IGridControllerListener* owner, const char* name, int x, int y);
    ~GridController() {}
    
    void Render() override;

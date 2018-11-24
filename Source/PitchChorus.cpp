@@ -33,7 +33,7 @@ PitchChorus::~PitchChorus()
 
 void PitchChorus::Process(double time)
 {
-   Profiler profiler("PitchChorus");
+   PROFILER(PitchChorus);
    
    if (!mEnabled)
       return;

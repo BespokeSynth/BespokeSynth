@@ -57,7 +57,7 @@ void DrumPlayer::CreateUIControls()
    mAuditionSlider = new FloatSlider(this,"aud",140,50,40,15,&mAuditionInc,-1,1,0);
    mMonoCheckbox = new Checkbox(this,"mono",4,34,&mMonoOutput);
    mShuffleSpeedsButton = new ClickButton(this,"shuffle",140,34);
-   mGridController = new GridController(this, 60, 34);
+   mGridController = new GridController(this, "grid", 60, 34);
    
    for (int i=0; i<NUM_DRUM_HITS; ++i)
       mDrumHits[i].CreateUIControls(this, i);
@@ -197,7 +197,7 @@ string DrumPlayer::GetDrumHitName(int index)
 
 void DrumPlayer::Process(double time)
 {
-   Profiler profiler("DrumPlayer");
+   PROFILER(DrumPlayer);
    
    if (!mEnabled)
       return;

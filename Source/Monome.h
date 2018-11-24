@@ -37,7 +37,7 @@ public:
    
    void SendValue(int page, int control, float value, bool forceNoteOn = false, int channel = -1)override;
    
-   bool IsConnected() override { return mHasMonome; }
+   bool IsInputConnected() override { return mHasMonome; }
    bool Reconnect() override { Connect(); return mHasMonome; }
 
 private:

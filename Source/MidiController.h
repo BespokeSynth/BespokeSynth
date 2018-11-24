@@ -244,7 +244,7 @@ public:
    void AddListener(MidiDeviceListener* listener, int page);
    void RemoveListener(MidiDeviceListener* listener);
    int GetPage() const { return mControllerPage; }
-   bool IsConnected();
+   bool IsInputConnected();
    string GetDeviceIn() const { return mDeviceIn; }
    string GetDeviceOut() const { return mDeviceOut; }
    UIControlConnection* GetConnectionForControl(MidiMessageType messageType, int control);

@@ -121,13 +121,15 @@ void LooperRecorder::Init()
 
 void LooperRecorder::Process(double time)
 {
-   Profiler profiler("LooperRecorder");
+   PROFILER(LooperRecorder);
 
    if (!mEnabled || GetTarget() == nullptr)
       return;
 
    ComputeSliders(0);
    SyncBuffers();
+   mWriteBuffer.SetNumActiveChannels(GetBuffer()->NumActiveChannels());
+   mRecordBuffer.SetNumChannels(GetBuffer()->NumActiveChannels());
    
    int bufferSize = GetBuffer()->BufferSize();
 

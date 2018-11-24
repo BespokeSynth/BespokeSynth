@@ -114,7 +114,7 @@ Razor::~Razor()
 
 void Razor::Process(double time)
 {
-   Profiler profiler("Razor");
+   PROFILER(Razor);
 
    if (!mEnabled || GetTarget() == nullptr)
       return;

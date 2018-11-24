@@ -33,7 +33,7 @@ SingleOscillator::SingleOscillator()
 , mPolyMgr(this)
 , mLengthMultiplier(1)
 , mLengthMultiplierSlider(nullptr)
-, mDrawOsc(kOsc_Sin)
+, mDrawOsc(kOsc_Square)
 , mWriteBuffer(gBufferSize)
 {
    mVoiceParams.mAdsr.Set(10,0,1,10);
@@ -105,8 +105,6 @@ void SingleOscillator::CreateUIControls()
    mMultSelector->AddLabel("7", 7);
    mMultSelector->AddLabel("8", 8);
    
-   mADSRDisplay->SetVol(mVoiceParams.mVol);
-   
    mADSRModeSelector->AddLabel("vol",0);
    mADSRModeSelector->AddLabel("filter",1);
    
@@ -121,7 +119,7 @@ SingleOscillator::~SingleOscillator()
 
 void SingleOscillator::Process(double time)
 {
-   Profiler profiler("SingleOscillator");
+   PROFILER(SingleOscillator);
 
    if (!mEnabled || GetTarget() == nullptr)
       return;
@@ -248,9 +246,6 @@ void SingleOscillator::LoadLayout(const ofxJSONElement& moduleInfo)
 void SingleOscillator::SetUpFromSaveData()
 {
    SetTarget(TheSynth->FindModule(mModuleSaveData.GetString("target")));
-   SetVol(mModuleSaveData.GetFloat("vol"));
-   SetType(mModuleSaveData.GetEnum<OscillatorType>("osc"));
-   SetDetune(mModuleSaveData.GetFloat("detune"));
 }
 
 
@@ -279,10 +274,6 @@ void SingleOscillator::RadioButtonUpdated(RadioButton* list, int oldVal)
 
 void SingleOscillator::FloatSliderUpdated(FloatSlider* slider, float oldVal)
 {
-   if (slider == mVolSlider)
-      mADSRDisplay->SetVol(mVoiceParams.mVol);
-   if (slider == mFilterCutoffSlider)
-      mFilterADSRDisplay->SetVol(mVoiceParams.mFilterCutoff / SINGLEOSCILLATOR_NO_CUTOFF);
    if (slider == mLengthMultiplierSlider)
    {
       mADSRDisplay->SetMaxTime(1000 * mLengthMultiplier);

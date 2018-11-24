@@ -95,7 +95,7 @@ Producer::~Producer()
 
 void Producer::Process(double time)
 {
-   Profiler profiler("Producer");
+   PROFILER(Producer);
 
    if (!mEnabled || GetTarget() == nullptr || mSample == nullptr || mPlay == false)
       return;

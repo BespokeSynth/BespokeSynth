@@ -82,7 +82,7 @@ FFTtoAdditive::~FFTtoAdditive()
 
 void FFTtoAdditive::Process(double time)
 {
-   Profiler profiler("FFTtoAdditive");
+   PROFILER(FFTtoAdditive);
 
    if (GetTarget() == nullptr || !mEnabled)
       return;

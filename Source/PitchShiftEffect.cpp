@@ -41,7 +41,7 @@ void PitchShiftEffect::CreateUIControls()
 
 void PitchShiftEffect::ProcessAudio(double time, ChannelBuffer* buffer)
 {
-   Profiler profiler("PitchShiftEffect");
+   PROFILER(PitchShiftEffect);
    
    if (!mEnabled)
       return;

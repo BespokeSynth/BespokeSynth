@@ -116,7 +116,7 @@ SignalGenerator::~SignalGenerator()
 
 void SignalGenerator::Process(double time)
 {
-   Profiler profiler("SignalGenerator");
+   PROFILER(SignalGenerator);
    
    if (!mEnabled || GetTarget() == nullptr)
       return;

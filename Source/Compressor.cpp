@@ -49,7 +49,7 @@ void Compressor::CreateUIControls()
 
 void Compressor::ProcessAudio(double time, ChannelBuffer* buffer)
 {
-   Profiler profiler("Compressor");
+   PROFILER(Compressor);
 
    if (!mEnabled)
       return;

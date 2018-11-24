@@ -29,7 +29,7 @@ void NoiseEffect::CreateUIControls()
 
 void NoiseEffect::ProcessAudio(double time, ChannelBuffer* buffer)
 {
-   Profiler profiler("NoiseEffect");
+   PROFILER(NoiseEffect);
 
    if (!mEnabled)
       return;

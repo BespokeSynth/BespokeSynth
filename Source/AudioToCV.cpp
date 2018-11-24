@@ -66,7 +66,7 @@ void AudioToCV::DrawModule()
 
 void AudioToCV::Process(double time)
 {
-   Profiler profiler("AudioToCV");
+   PROFILER(AudioToCV);
    
    if (!mEnabled)
       return;

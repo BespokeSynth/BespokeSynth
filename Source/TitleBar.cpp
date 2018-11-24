@@ -244,8 +244,7 @@ void TitleBar::DrawModule()
       mVstPlugins.Draw();
    }
    
-   float usage = //Profiler::GetUsage("audioOut() total");
-      TheSynth->GetGlobalManagers()->mDeviceManager.getCpuUsage();
+   float usage = TheSynth->GetGlobalManagers()->mDeviceManager.getCpuUsage();
    string stats;
    stats += "fps:" + ofToString(ofGetFrameRate(),0);
    stats += "  audio cpu:" + ofToString(usage * 100,1);

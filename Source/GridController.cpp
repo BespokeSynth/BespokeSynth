@@ -11,7 +11,7 @@
 #include "FillSaveDropdown.h"
 #include "PatchCableSource.h"
 
-GridController::GridController(IGridControllerListener* owner, int x, int y)
+GridController::GridController(IGridControllerListener* owner, const char* name, int x, int y)
 : mMessageType(kMidiMessage_Note)
 , mController(nullptr)
 , mControllerPage(0)
@@ -19,6 +19,7 @@ GridController::GridController(IGridControllerListener* owner, int x, int y)
 , mCols(8)
 , mOwner(owner)
 {
+   SetName(name);
    SetPosition(x,y);
    dynamic_cast<IDrawableModule*>(owner)->AddUIControl(this);
    SetParent(dynamic_cast<IClickable*>(owner));

@@ -60,7 +60,7 @@ void StepSequencer::CreateUIControls()
    mCurrentColumnSlider = new IntSlider(this,"column",HIDDEN_UICONTROL,HIDDEN_UICONTROL,100,15,&mCurrentColumn,0,15);
    mShiftLeftButton = new ClickButton(this,"<",80,4);
    mShiftRightButton = new ClickButton(this,">",100,4);
-   mGridController = new GridController(this,240,4);
+   mGridController = new GridController(this,"grid",240,4);
    
    mGrid->SetMajorColSize(4);
    mGrid->SetFlip(true);

@@ -38,7 +38,7 @@ void RadioSequencer::CreateUIControls()
    mGrid = new UIGrid(5,23,200,170,mLength,8);
    mIntervalSelector = new DropdownList(this,"interval",5,3,(int*)(&mInterval));
    mLengthSelector = new DropdownList(this,"length",-1,-1,(int*)(&mLength));
-   mGridController = new GridController(this, -1, -1);
+   mGridController = new GridController(this, "grid", -1, -1);
    
    mGrid->SetHighlightCol(-1);
    mGrid->SetSingleColumnMode(true);

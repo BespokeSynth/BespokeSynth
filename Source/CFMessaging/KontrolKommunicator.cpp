@@ -287,7 +287,7 @@ void KontrolKommunicator::SendMessage(string portName, KDataArray data)
       vm_address_t vmData;
       vm_allocate(mach_task_self(),  &vmData, (vm_size_t)vm_page_size, TRUE);
       char* dataBuffer = (char*)vmData;
-      int replyLength = CFDataGetLength(reply);
+      int replyLength = (int)CFDataGetLength(reply);
       CFDataGetBytes(reply, CFRangeMake(0, replyLength), (uint8_t*)dataBuffer);
       
       OutputRawData((uint8_t*)vmData, replyLength);
@@ -387,7 +387,7 @@ void KontrolKommunicator::FollowUpToReply(string messageType, uint8_t* reply)
    if (messageType == "NIHWSDeviceConnectMessage")
    {
       mRequestPort = (char*)(reply + 8);
-      mNotificationPort = (char*)(reply + 8 + WordAlign(mRequestPort.length()) + /*4*/5); // TODO(Ryan) plus 5??? it used to be plus 4.
+      mNotificationPort = (char*)(reply + 8 + WordAlign((int)mRequestPort.length()) + /*4*/5); // TODO(Ryan) plus 5??? it used to be plus 4.
       Output("REQUEST PORT:" + mRequestPort + " NOTIFICATION PORT:" + mNotificationPort + "\n");
       
       CreateListener(mNotificationPort.c_str());
@@ -406,7 +406,7 @@ void KontrolKommunicator::FollowUpToReply(string messageType, uint8_t* reply)
    if (messageType == "NIHWSDeviceConnectSerialMessage")
    {
       mRequestSerialPort = (char*)(reply + 8);
-      mNotificationSerialPort = (char*)(reply + 8 + WordAlign(mRequestSerialPort.length()) + 4);
+      mNotificationSerialPort = (char*)(reply + 8 + WordAlign((int)mRequestSerialPort.length()) + 4);
       Output("REQUEST SERIAL PORT:" + mRequestSerialPort + " NOTIFICATION SERIAL PORT:" + mNotificationSerialPort + "\n");
       
       CreateListener(mNotificationSerialPort.c_str());
@@ -483,7 +483,7 @@ string KontrolKommunicator::FormatString(string format, int number)
 KDataArray KontrolKommunicator::StringToData(string input)
 {
    vector<string> tokens = ofSplitString(input, " ", true);
-   int length = tokens.size();
+   size_t length = tokens.size();
    KDataArray data;
    data.resize(length);
    for (int i=0; i<length; ++i)

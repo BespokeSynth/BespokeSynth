@@ -46,7 +46,7 @@ void DistortionEffect::CreateUIControls()
 
 void DistortionEffect::ProcessAudio(double time, ChannelBuffer* buffer)
 {
-   Profiler profiler("DistortionEffect");
+   PROFILER(DistortionEffect);
 
    if (!mEnabled)
       return;

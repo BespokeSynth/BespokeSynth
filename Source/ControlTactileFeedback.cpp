@@ -33,7 +33,7 @@ ControlTactileFeedback::~ControlTactileFeedback()
 
 void ControlTactileFeedback::Process(double time)
 {
-   Profiler profiler("ControlTactileFeedback");
+   PROFILER(ControlTactileFeedback);
 
    if (!mEnabled || GetTarget() == nullptr)
       return;

@@ -94,18 +94,27 @@ bool MidiDevice::Reconnect()
    return ret;
 }
 
-bool MidiDevice::IsConnected()
+bool MidiDevice::IsInputConnected()
 {
    return TheSynth->GetGlobalManagers()->mDeviceManager.isMidiInputEnabled(mDeviceNameIn);
 }
 
-vector<string> MidiDevice::GetPortList()
+vector<string> MidiDevice::GetPortList(bool forInput)
 {
    vector<string> portList;
    
-   const StringArray input = MidiInput::getDevices();
-   for (int i=0; i<input.size(); ++i)
-      portList.push_back(input[i].toStdString());
+   if (forInput)
+   {
+      const StringArray input = MidiInput::getDevices();
+      for (int i=0; i<input.size(); ++i)
+         portList.push_back(input[i].toStdString());
+   }
+   else
+   {
+      const StringArray output = MidiOutput::getDevices();
+      for (int i=0; i<output.size(); ++i)
+         portList.push_back(output[i].toStdString());
+   }
    
    return portList;
 }

@@ -32,7 +32,7 @@ void GateEffect::CreateUIControls()
 
 void GateEffect::ProcessAudio(double time, ChannelBuffer* buffer)
 {
-   Profiler profiler("GateEffect");
+   PROFILER(GateEffect);
 
    if (!mEnabled)
       return;

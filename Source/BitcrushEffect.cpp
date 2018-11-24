@@ -35,7 +35,7 @@ void BitcrushEffect::CreateUIControls()
 
 void BitcrushEffect::ProcessAudio(double time, ChannelBuffer* buffer)
 {
-   Profiler profiler("BitcrushEffect");
+   PROFILER(BitcrushEffect);
 
    if (!mEnabled)
       return;

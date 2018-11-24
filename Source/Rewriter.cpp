@@ -56,7 +56,7 @@ void Rewriter::PostRepatch(PatchCableSource* cable)
 
 void Rewriter::Process(double time)
 {
-   Profiler profiler("Rewriter");
+   PROFILER(Rewriter);
 
    if (GetTarget() == nullptr)
       return;

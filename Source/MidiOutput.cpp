@@ -60,7 +60,7 @@ void MidiOutputModule::InitController()
    
    BuildControllerList();
    
-   const std::vector<string>& devices = mDevice.GetPortList();
+   const std::vector<string>& devices = mDevice.GetPortList(false);
    for (int i=0; i<devices.size(); ++i)
    {
       if (strcmp(devices[i].c_str(),mDevice.Name()) == 0)
@@ -79,7 +79,7 @@ void MidiOutputModule::DrawModule()
 void MidiOutputModule::BuildControllerList()
 {
    mControllerList->Clear();
-   const std::vector<string>& devices = mDevice.GetPortList();
+   const std::vector<string>& devices = mDevice.GetPortList(false);
    for (int i=0; i<devices.size(); ++i)
       mControllerList->AddLabel(devices[i].c_str(), i);
 }
@@ -152,7 +152,7 @@ void MidiOutputModule::LoadLayout(const ofxJSONElement& moduleInfo)
    mModuleSaveData.LoadString("controller",moduleInfo,"",FillDropdown<MidiController*>);
    mModuleSaveData.LoadInt("channel",moduleInfo,1,1,16);
    mModuleSaveData.LoadBool("usevoiceaschannel", moduleInfo, false);
-   mModuleSaveData.LoadFloat("pitchbendrange",moduleInfo,2,1,24,K(isTextField));
+   mModuleSaveData.LoadFloat("pitchbendrange",moduleInfo,2,1,96,K(isTextField));
    mModuleSaveData.LoadInt("modwheelcc(1or74)",moduleInfo,1,0,127,K(isTextField));
    
    SetUpFromSaveData();

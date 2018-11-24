@@ -36,7 +36,7 @@ ClipLauncher::~ClipLauncher()
 
 void ClipLauncher::Process(double time)
 {
-   Profiler profiler("ClipLauncher");
+   PROFILER(ClipLauncher);
    
    if (!mEnabled || GetTarget() == nullptr)
       return;

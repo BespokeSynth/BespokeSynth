@@ -131,7 +131,7 @@ bool NoteCanvas::FreeRecordParityMatched()
 
 void NoteCanvas::OnTransportAdvanced(float amount)
 {
-   Profiler profiler("NoteCanvas");
+   PROFILER(NoteCanvas);
    
    if (mFreeRecord && mFreeRecordStartMeasure != -1)
    {

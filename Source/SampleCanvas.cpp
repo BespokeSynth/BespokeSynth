@@ -42,7 +42,7 @@ SampleCanvas::~SampleCanvas()
 
 void SampleCanvas::Process(double time)
 {
-   Profiler profiler("SampleCanvas");
+   PROFILER(SampleCanvas);
    
    if (!mEnabled || GetTarget() == nullptr)
       return;

@@ -35,7 +35,6 @@ public:
    string GetTitleLabel() override { return "osc"; }
    void CreateUIControls() override;
    
-   void SetVol(float vol) { mVoiceParams.mVol = vol; mADSRDisplay->SetVol(vol); }
    void SetType(OscillatorType type) { mVoiceParams.mOscType = type; }
    void SetDetune(float detune) { mVoiceParams.mDetune = detune; }
    

@@ -93,7 +93,7 @@ void SeaOfGrain::Poll()
 
 void SeaOfGrain::Process(double time)
 {
-   Profiler profiler("SeaOfGrain");
+   PROFILER(SeaOfGrain);
    
    if (!mEnabled || GetTarget() == nullptr || mSample == nullptr || mLoading)
       return;

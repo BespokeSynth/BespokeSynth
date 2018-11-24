@@ -541,6 +541,9 @@
     <ClCompile Include="..\..\Source\TremoloEffect.cpp">
       <Filter>BespokeSynth\Source\effects</Filter>
     </ClCompile>
+    <ClCompile Include="..\..\Source\LinnstrumentControl.cpp">
+      <Filter>BespokeSynth\Source\modules</Filter>
+    </ClCompile>
     <ClCompile Include="..\..\Source\PulseSequence.cpp">
       <Filter>BespokeSynth\Source\modules</Filter>
     </ClCompile>
@@ -3218,6 +3221,9 @@
     </ClInclude>
     <ClInclude Include="..\..\Source\TremoloEffect.h">
       <Filter>BespokeSynth\Source\effects</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\Source\LinnstrumentControl.h">
+      <Filter>BespokeSynth\Source\modules</Filter>
     </ClInclude>
     <ClInclude Include="..\..\Source\PulseSequence.h">
       <Filter>BespokeSynth\Source\modules</Filter>

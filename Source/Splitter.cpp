@@ -41,7 +41,7 @@ Splitter::~Splitter()
 
 void Splitter::Process(double time)
 {
-   Profiler profiler("Splitter");
+   PROFILER(Splitter);
    
    if (!mEnabled)
       return;

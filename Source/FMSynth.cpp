@@ -123,7 +123,7 @@ FMSynth::~FMSynth()
 
 void FMSynth::Process(double time)
 {
-   Profiler profiler("FMSynth");
+   PROFILER(FMSynth);
 
    if (!mEnabled || GetTarget() == nullptr)
       return;

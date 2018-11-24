@@ -659,12 +659,12 @@ void LoadStateValidate(bool assertion)
 
 float GetLeftPanGain(float pan)
 {
-   return ofMap(pan, 0, 1, 1, 0, true) + ofMap(pan, -1, 0, 1, 0, true);
+   return 1 - pan;
 }
 
 float GetRightPanGain(float pan)
 {
-   return ofMap(pan, -1, 0, 0, 1, true) + ofMap(pan, 0, 1, 0, 1, true);
+   return pan + 1;
 }
 
 #ifdef BESPOKE_DEBUG_ALLOCATIONS

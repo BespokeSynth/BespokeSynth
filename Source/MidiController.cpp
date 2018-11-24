@@ -240,7 +240,7 @@ void MidiController::AddControlConnection(const ofxJSONElement& connection)
 
 void MidiController::OnTransportAdvanced(float amount)
 {
-   Profiler profiler("MidiController");
+   PROFILER(MidiController);
    
    mQueuedMessageMutex.lock();
    
@@ -556,7 +556,7 @@ void MidiController::Poll()
    bool lastBlink = mBlink;
    mBlink = int(TheTransport->GetMeasurePos() * TheTransport->GetTimeSigTop() * 2) % 2 == 0;
    
-   if (IsConnected())
+   if (IsInputConnected())
    {
       if (!mIsConnected)
       {
@@ -1022,11 +1022,11 @@ void MidiController::OnClicked(int x, int y, bool right)
    }
 }
 
-bool MidiController::IsConnected()
+bool MidiController::IsInputConnected()
 {
    if (mNonstandardController != nullptr)
-      return mNonstandardController->IsConnected();
-   return mDevice.IsConnected();
+      return mNonstandardController->IsInputConnected();
+   return mDevice.IsInputConnected();
 }
 
 int MidiController::GetNumConnectionsOnPage(int page)
@@ -1364,12 +1364,13 @@ void MidiController::DropdownUpdated(DropdownList* list, int oldVal)
       mModuleSaveData.SetString("devicein", mDeviceIn);
       mModuleSaveData.SetString("deviceout", mDeviceOut);
       
-      if (strstr(deviceInName.c_str(), "Seaboard") != nullptr ||
-          strstr(deviceInName.c_str(), "Lightpad BLOCK") != nullptr ||
-          strstr(deviceInName.c_str(), "LinnStrument") != nullptr)
+      bool isRoli = strstr(deviceInName.c_str(), "Seaboard") != nullptr ||
+                    strstr(deviceInName.c_str(), "Lightpad BLOCK") != nullptr;
+      bool isLinnstrument = strstr(deviceInName.c_str(), "LinnStrument") != nullptr;
+      if (isRoli || isLinnstrument)
       {
          SetUseChannelAsVoice(true);
-         SetPitchBendRange(48);
+         SetPitchBendRange(isRoli ? 48 : 24);
          mModwheelCC = 74;
          
          mModuleSaveData.SetBool("usechannelasvoice", mUseChannelAsVoice);
@@ -1607,7 +1608,7 @@ void MidiController::SetUpFromSaveData()
    
    BuildControllerList();
    
-   const std::vector<string>& devices = mDevice.GetPortList();
+   const std::vector<string>& devices = mDevice.GetPortList(true);
    for (int i=0; i<devices.size(); ++i)
    {
       if (devices[i].c_str() == mDeviceIn)
@@ -1725,7 +1726,11 @@ void UIControlConnection::SetUIControl(string path)
 
 void UIControlConnection::CreateUIControls(int index)
 {
-   assert(mEditorControls.empty());
+   if (!mEditorControls.empty())
+   {
+      TheSynth->LogEvent("Error setting up UIControlConnection", kLogEventType_Error);
+      return;
+   }
    
    static int sControlID = 0;
    mMessageTypeDropdown = new DropdownList(mUIOwner,"messagetype",12,-1,((int*)&mMessageType), 50);

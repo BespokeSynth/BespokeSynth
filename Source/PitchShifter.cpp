@@ -51,7 +51,7 @@ PitchShifter::~PitchShifter()
 
 void PitchShifter::Process(float* buffer, int bufferSize)
 {
-   Profiler profiler("PitchShifter");
+   PROFILER(PitchShifter);
    
    const int osamp = mOversampling;
    const int stepSize = mFFTBins/osamp;
@@ -260,7 +260,7 @@ void smbFft(float *fftBuffer, long fftFrameSize, long sign)
 
 void PitchShifter::Process(float* buffer, int bufferSize)
 {
-   Profiler profiler("PitchShifter");
+   PROFILER(PitchShifter);
    
    const int fftFrameSize = mFFTBins;
    const int sampleRate = gSampleRate;

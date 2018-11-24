@@ -308,7 +308,7 @@ static int get_string_property_utf8(IOHIDDeviceRef device, CFStringRef prop, cha
 			len,
 			&used_buf_len);
 		buf[len-1] = 0x00000000;
-		return used_buf_len;
+		return (int)used_buf_len;
 	}
 	else
 		return 0;
@@ -815,7 +815,7 @@ static int return_data(hid_device *dev, unsigned char *data, size_t length)
 	dev->input_reports = rpt->next;
 	free(rpt->data);
 	free(rpt);
-	return len;
+	return (int)len;
 }
 
 static int cond_wait(const hid_device *dev, pthread_cond_t *cond, pthread_mutex_t *mutex)
@@ -965,7 +965,7 @@ int HID_API_EXPORT hid_get_feature_report(hid_device *dev, unsigned char *data, 
 	                           data[0], /* Report ID */
 	                           data, &len);
 	if (res == kIOReturnSuccess)
-		return len;
+		return (int)len;
 	else
 		return -1;
 }

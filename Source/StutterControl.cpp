@@ -23,7 +23,7 @@ void StutterControl::CreateUIControls()
 {
    IDrawableModule::CreateUIControls();
    
-   mGridController = new GridController(this, 80, 40);
+   mGridController = new GridController(this, "grid", 80, 40);
    
    int x = 4;
    int y = 40;
@@ -70,7 +70,7 @@ StutterControl::~StutterControl()
 
 void StutterControl::Process(double time)
 {
-   Profiler profiler("StutterControl");
+   PROFILER(StutterControl);
    
    if (!mEnabled)
       return;

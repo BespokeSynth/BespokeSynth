@@ -69,7 +69,7 @@ KarplusStrong::~KarplusStrong()
 
 void KarplusStrong::Process(double time)
 {
-   Profiler profiler("KarplusStrong");
+   PROFILER(KarplusStrong);
 
    if (!mEnabled || GetTarget() == nullptr)
       return;

@@ -52,7 +52,7 @@ void BiquadFilterEffect::Init()
 
 void BiquadFilterEffect::ProcessAudio(double time, ChannelBuffer* buffer)
 {
-   Profiler profiler("BiquadFilterEffect");
+   PROFILER(BiquadFilterEffect);
 
    if (!mEnabled)
       return;

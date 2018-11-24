@@ -13,40 +13,41 @@
 #include "SynthGlobals.h"
 
 #define PROFILER_HISTORY_LENGTH 500
+#define PROFILER_MAX_TRACK 100
+
+#define PROFILER(profile_id) static uint32_t profile_id ## _hash = JenkinsHash(#profile_id); Profiler profilerScopeHolder(#profile_id, profile_id ## _hash)
 
 class Profiler
 {
 public:
-   Profiler(const char* name, bool master = false);
+   Profiler(const char* name, uint32_t hash);
    ~Profiler();
    
    static void PrintCounters();
    static void Draw();
    
-   static float GetUsage(const char* counter);
-   
-   static void ToggleProfiler() { sEnableProfiler = !sEnableProfiler; sCosts.clear(); }
+   static void ToggleProfiler();
    
 private:
-   static long GetSafeFrameLengthMicroseconds();
+   static long GetSafeFrameLengthNanoseconds();
    
    struct Cost
    {
       Cost() : mFrameCost(0), mHistoryIdx(0) { bzero(mHistory, sizeof(long)); }
       void EndFrame();
-      long MaxCost() const;
+      unsigned long long MaxCost() const;
       
-      long mFrameCost;
-      long mHistory[PROFILER_HISTORY_LENGTH];
+      string mName;
+      uint32_t mHash;
+      unsigned long long mFrameCost;
+      unsigned long long mHistory[PROFILER_HISTORY_LENGTH];
       int mHistoryIdx;
    };
    
-   long mTimerStart;
-   uint32_t mName;
-   bool mMaster;
+   unsigned long long mTimerStart;
+   int mIndex;
    
-   static map<uint32_t, string> sNameLookup;
-   static map<uint32_t, Cost> sCosts;
+   static Cost sCosts[PROFILER_MAX_TRACK];
    static bool sEnableProfiler;
 };
 

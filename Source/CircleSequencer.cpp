@@ -52,7 +52,7 @@ CircleSequencer::~CircleSequencer()
 
 void CircleSequencer::OnTransportAdvanced(float amount)
 {
-   Profiler profiler("CircleSequencer");
+   PROFILER(CircleSequencer);
    
    if (!mEnabled)
       return;
@@ -221,7 +221,7 @@ void CircleSequencerRing::MouseMoved(float x, float y)
 
 void CircleSequencerRing::OnTransportAdvanced(float amount)
 {
-   Profiler profiler("CircleSequencerRing");
+   PROFILER(CircleSequencerRing);
    
    float pos = TheTransport->GetMeasurePos() - mOffset;
    FloatWrap(pos,1);

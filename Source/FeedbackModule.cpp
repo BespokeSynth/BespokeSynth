@@ -42,7 +42,7 @@ FeedbackModule::~FeedbackModule()
 
 void FeedbackModule::Process(double time)
 {
-   Profiler profiler("FeedbackModule");
+   PROFILER(FeedbackModule);
    
    if (!mEnabled)
       return;

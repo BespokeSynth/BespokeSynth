@@ -134,7 +134,7 @@ void LaunchpadKeyboard::CreateUIControls()
    mArrangementModeDropdown = new DropdownList(this,"arrangement",6,4,((int*)(&mArrangementMode)));
    mLatchChordsCheckbox = new Checkbox(this,"ch.latch",55,59,&mLatchChords);
    mPreserveChordRootCheckbox = new Checkbox(this,"p.root",70,4,&mPreserveChordRoot);
-   mGridController = new GridController(this, 90, 22);
+   mGridController = new GridController(this, "grid", 90, 22);
    
    mLayoutDropdown->AddLabel("chromatic", kChromatic);
    mLayoutDropdown->AddLabel("diatonic", kDiatonic);

@@ -21,7 +21,7 @@ DebugAudioSource::~DebugAudioSource()
 
 void DebugAudioSource::Process(double time)
 {
-   Profiler profiler("DebugAudioSource");
+   PROFILER(DebugAudioSource);
    
    if (!mEnabled || GetTarget() == nullptr)
       return;

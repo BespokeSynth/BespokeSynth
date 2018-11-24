@@ -32,7 +32,7 @@ Muter::~Muter()
 
 void Muter::ProcessAudio(double time, ChannelBuffer* buffer)
 {
-   Profiler profiler("Muter");
+   PROFILER(Muter);
 
    float bufferSize = buffer->BufferSize();
    

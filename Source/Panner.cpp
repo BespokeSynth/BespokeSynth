@@ -36,7 +36,7 @@ Panner::~Panner()
 
 void Panner::Process(double time)
 {
-   Profiler profiler("Panner");
+   PROFILER(Panner);
    
    if (!mEnabled || GetTarget() == nullptr)
       return;
@@ -97,6 +97,9 @@ void Panner::DrawModule()
    
    mPanSlider->Draw();
    mWidenSlider->Draw();
+   
+   GetLeftPanGain(mPan);
+   GetRightPanGain(mPan);
 }
 
 void Panner::FloatSliderUpdated(FloatSlider* slider, float oldVal)

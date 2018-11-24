@@ -57,7 +57,7 @@ void VinylTempoControl::DrawModule()
 
 void VinylTempoControl::OnTransportAdvanced(float amount)
 {
-   Profiler profiler("VinylTempoControl");
+   PROFILER(VinylTempoControl);
    
    if (!mEnabled)
       return;

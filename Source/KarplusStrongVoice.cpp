@@ -41,7 +41,7 @@ bool KarplusStrongVoice::IsDone(double time)
 
 bool KarplusStrongVoice::Process(double time, ChannelBuffer* out)
 {
-   Profiler profiler("KarplusStrongVoice");
+   PROFILER(KarplusStrongVoice);
 
    if (IsDone(time))
       return false;

@@ -51,7 +51,7 @@ void FreeverbEffect::CreateUIControls()
 
 void FreeverbEffect::ProcessAudio(double time, ChannelBuffer* buffer)
 {
-   Profiler profiler("FreeverbEffect");
+   PROFILER(FreeverbEffect);
    
    if (!mEnabled)
       return;

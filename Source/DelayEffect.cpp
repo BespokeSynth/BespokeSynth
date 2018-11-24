@@ -55,7 +55,7 @@ void DelayEffect::CreateUIControls()
 
 void DelayEffect::ProcessAudio(double time, ChannelBuffer* buffer)
 {
-   Profiler profiler("DelayEffect");
+   PROFILER(DelayEffect);
 
    if (!mEnabled)
       return;

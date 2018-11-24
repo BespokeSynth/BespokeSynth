@@ -21,7 +21,7 @@ InputChannel::~InputChannel()
 
 void InputChannel::Process(double time)
 {
-   Profiler profiler("InputChannel");
+   PROFILER(InputChannel);
 
    if (!mEnabled)
       return;

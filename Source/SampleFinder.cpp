@@ -76,7 +76,7 @@ SampleFinder::~SampleFinder()
 
 void SampleFinder::Process(double time)
 {
-   Profiler profiler("SampleFinder");
+   PROFILER(SampleFinder);
 
    if (!mEnabled || GetTarget() == nullptr || mSample == nullptr || mPlay == false)
       return;

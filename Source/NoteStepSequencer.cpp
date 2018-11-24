@@ -351,7 +351,7 @@ int NoteStepSequencer::PitchToRow(int pitch)
 
 void NoteStepSequencer::OnTransportAdvanced(float amount)
 {
-   Profiler profiler("NoteStepSequencer");
+   PROFILER(NoteStepSequencer);
    
    ComputeSliders(0);
    

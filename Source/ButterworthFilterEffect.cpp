@@ -43,7 +43,7 @@ void ButterworthFilterEffect::Init()
 
 void ButterworthFilterEffect::ProcessAudio(double time, ChannelBuffer* buffer)
 {
-   Profiler profiler("ButterworthFilterEffect");
+   PROFILER(ButterworthFilterEffect);
    
    if (!mEnabled)
       return;

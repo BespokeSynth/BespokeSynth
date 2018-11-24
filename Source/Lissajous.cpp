@@ -37,7 +37,7 @@ void Lissajous::CreateUIControls()
 
 void Lissajous::Process(double time)
 {
-   Profiler profiler("Lissajous");
+   PROFILER(Lissajous);
    
    if (!mEnabled)
       return;

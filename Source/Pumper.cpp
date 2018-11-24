@@ -46,7 +46,7 @@ Pumper::~Pumper()
 
 void Pumper::ProcessAudio(double time, ChannelBuffer* buffer)
 {
-   Profiler profiler("Pumper");
+   PROFILER(Pumper);
 
    if (!mEnabled)
       return;

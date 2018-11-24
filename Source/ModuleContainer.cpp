@@ -289,7 +289,14 @@ IDrawableModule* ModuleContainer::FindModule(string name, bool fail)
       }
       if (tokens.size() == 2 && tokens[0] == mModules[i]->Name())
       {
-         IDrawableModule* child = mModules[i]->FindChild(tokens[1].c_str());
+         IDrawableModule* child = nullptr;
+         try
+         {
+            mModules[i]->FindChild(tokens[1].c_str());
+         }
+         catch (UnknownModuleException& e)
+         {
+         }
          if (child)
             return child;
       }

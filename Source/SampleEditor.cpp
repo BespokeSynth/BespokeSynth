@@ -93,7 +93,7 @@ SampleEditor::~SampleEditor()
 
 void SampleEditor::Process(double time)
 {
-   Profiler profiler("SampleEditor");
+   PROFILER(SampleEditor);
 
    if (!mEnabled || GetTarget() == nullptr || mSample == nullptr)
       return;

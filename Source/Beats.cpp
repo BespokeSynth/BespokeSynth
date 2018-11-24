@@ -44,7 +44,7 @@ Beats::~Beats()
 
 void Beats::Process(double time)
 {
-   Profiler profiler("Beats");
+   PROFILER(Beats);
 
    if (!mEnabled || GetTarget() == nullptr)
       return;

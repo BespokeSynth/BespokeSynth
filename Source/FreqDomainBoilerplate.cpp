@@ -61,7 +61,7 @@ FreqDomainBoilerplate::~FreqDomainBoilerplate()
 
 void FreqDomainBoilerplate::Process(double time)
 {
-   Profiler profiler("FreqDomainBoilerplate");
+   PROFILER(FreqDomainBoilerplate);
 
    if (GetTarget() == nullptr || !mEnabled)
       return;

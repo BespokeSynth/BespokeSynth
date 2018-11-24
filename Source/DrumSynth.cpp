@@ -95,7 +95,7 @@ void DrumSynth::LoadKit(int kit)
 
 void DrumSynth::Process(double time)
 {
-   Profiler profiler("DrumSynth");
+   PROFILER(DrumSynth);
    
    if (!mEnabled || GetTarget() == nullptr)
       return;

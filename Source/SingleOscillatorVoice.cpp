@@ -31,7 +31,7 @@ bool SingleOscillatorVoice::IsDone(double time)
 
 bool SingleOscillatorVoice::Process(double time, ChannelBuffer* out)
 {
-   Profiler profiler("SingleOscillatorVoice");
+   PROFILER(SingleOscillatorVoice);
 
    if (IsDone(time))
       return false;
@@ -44,10 +44,16 @@ bool SingleOscillatorVoice::Process(double time, ChannelBuffer* out)
    float syncPhaseInc = GetPhaseInc(mVoiceParams->mSyncFreq);
    for (int pos=0; pos<out->BufferSize(); ++pos)
    {
-      if (mOwner)
-         mOwner->ComputeSliders(pos);
+      {
+         //PROFILER(SingleOscillatorVoice_ComputeSliders);
+         if (mOwner)
+            mOwner->ComputeSliders(pos);
+      }
       
       float adsrVal = mAdsr.Value(time);
+      float pitch = GetPitch(pos);
+      float freq = TheScale->PitchToFreq(pitch) * mVoiceParams->mMult;
+      float vol = mVoiceParams->mVol * .4f / mVoiceParams->mUnison;
       
       float summedLeft = 0;
       float summedRight = 0;
@@ -56,31 +62,33 @@ bool SingleOscillatorVoice::Process(double time, ChannelBuffer* out)
          mOscData[u].mOsc.SetPulseWidth(mVoiceParams->mPulseWidth);
          mOscData[u].mOsc.SetShuffle(mVoiceParams->mShuffle);
          
-         float pitch = GetPitch(pos);
-         float freq = TheScale->PitchToFreq(pitch) * mVoiceParams->mMult;
-         
          float detune = ((mVoiceParams->mDetune - 1) * mOscData[u].mDetuneFactor) + 1;
          float phaseInc = GetPhaseInc(freq * detune);
          
-         mOscData[u].mPhase += phaseInc;
-         if (mOscData[u].mPhase == INFINITY)
          {
-            ofLog() << "Infinite phase. phaseInc:" + ofToString(phaseInc) + " detune:" + ofToString(mVoiceParams->mDetune) + " freq:" + ofToString(freq) + " pitch:" + ofToString(pitch) + " getpitch:" + ofToString(GetPitch(pos));
+            //PROFILER(SingleOscillatorVoice_UpdatePhase);
+            mOscData[u].mPhase += phaseInc;
+            if (mOscData[u].mPhase == INFINITY)
+            {
+               ofLog() << "Infinite phase. phaseInc:" + ofToString(phaseInc) + " detune:" + ofToString(mVoiceParams->mDetune) + " freq:" + ofToString(freq) + " pitch:" + ofToString(pitch) + " getpitch:" + ofToString(GetPitch(pos));
+            }
+            while (mOscData[u].mPhase > FTWO_PI*2)
+            {
+               mOscData[u].mPhase -= FTWO_PI*2;
+               mOscData[u].mSyncPhase = 0;
+            }
+            mOscData[u].mSyncPhase += syncPhaseInc;
          }
-         while (mOscData[u].mPhase > FTWO_PI*2)
-         {
-            mOscData[u].mPhase -= FTWO_PI*2;
-            mOscData[u].mSyncPhase = 0;
-         }
-         mOscData[u].mSyncPhase += syncPhaseInc;
          
          float sample;
-         float vol = mVoiceParams->mVol * .4f / mVoiceParams->mUnison;
          
-         if (mVoiceParams->mSync)
-            sample = mOscData[u].mOsc.Value(mOscData[u].mSyncPhase) * adsrVal * vol;
-         else
-            sample = mOscData[u].mOsc.Value(mOscData[u].mPhase + mVoiceParams->mPhaseOffset) * adsrVal * vol;
+         {
+            //PROFILER(SingleOscillatorVoice_GetOscValue);
+            if (mVoiceParams->mSync)
+               sample = mOscData[u].mOsc.Value(mOscData[u].mSyncPhase) * adsrVal * vol;
+            else
+               sample = mOscData[u].mOsc.Value(mOscData[u].mPhase + mVoiceParams->mPhaseOffset) * adsrVal * vol;
+         }
          
          if (u >= 2)
             sample *= 1 - (mOscData[u].mDetuneFactor * .5f);
@@ -91,6 +99,7 @@ bool SingleOscillatorVoice::Process(double time, ChannelBuffer* out)
          }
          else
          {
+            //PROFILER(SingleOscillatorVoice_pan);
             float unisonPan;
             if (mVoiceParams->mUnison == 1)
                unisonPan = 0;
@@ -108,6 +117,7 @@ bool SingleOscillatorVoice::Process(double time, ChannelBuffer* out)
       
       if (mUseFilter)
       {
+         PROFILER(SingleOscillatorVoice_filter);
          float f = mFilterAdsr.Value(time) * mVoiceParams->mFilterCutoff;
          float q = mVoiceParams->mFilterQ;
          mFilterLeft.SetFilterParams(f, q);

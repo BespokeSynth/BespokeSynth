@@ -293,7 +293,7 @@ float ofMap(float val, float fromStart, float fromEnd, float toStart, float toEn
 float ofRandom(float max);
 float ofRandom(float x, float y);
 void ofSetCircleResolution(float res);
-long ofGetSystemTimeMicros();
+unsigned long long ofGetSystemTimeNanos();
 float ofGetWidth();
 float ofGetHeight();
 float ofGetFrameRate();

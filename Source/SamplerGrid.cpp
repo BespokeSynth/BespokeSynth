@@ -59,7 +59,7 @@ void SamplerGrid::CreateUIControls()
    mDuplicateCheckbox = new Checkbox(this,"duplicate",mEditCheckbox, kAnchor_Below,&mDuplicate);
    mEditStartSlider = new IntSlider(this,"start",mEditSampleX,mEditSampleY+mEditSampleHeight+1,mEditSampleWidth,15,&mDummyInt,0,1);
    mEditEndSlider = new IntSlider(this,"end",mEditStartSlider,kAnchor_Below,mEditSampleWidth,15,&mDummyInt,0,1);
-   mGridController = new GridController(this, 4, 4);
+   mGridController = new GridController(this, "grid", 4, 4);
    mGridController->PositionTo(mClearCheckbox, kAnchor_Right);
    
    InitGrid();
@@ -83,7 +83,7 @@ void SamplerGrid::Poll()
 
 void SamplerGrid::Process(double time)
 {
-   Profiler profiler("SamplerGrid");
+   PROFILER(SamplerGrid);
    
    if (!mEnabled || GetTarget() == nullptr)
       return;

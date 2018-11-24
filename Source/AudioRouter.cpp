@@ -40,7 +40,7 @@ void AudioRouter::AddReceiver(IAudioReceiver* receiver, const char* name)
 
 void AudioRouter::Process(double time)
 {
-   Profiler profiler("AudioRouter");
+   PROFILER(AudioRouter);
 
    if (GetTarget() == nullptr)
       return;

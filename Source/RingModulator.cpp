@@ -47,7 +47,7 @@ RingModulator::~RingModulator()
 
 void RingModulator::Process(double time)
 {
-   Profiler profiler("RingModulator");
+   PROFILER(RingModulator);
 
    if (GetTarget() == nullptr)
       return;

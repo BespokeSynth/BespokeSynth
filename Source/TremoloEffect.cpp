@@ -56,7 +56,7 @@ void TremoloEffect::CreateUIControls()
 
 void TremoloEffect::ProcessAudio(double time, ChannelBuffer* buffer)
 {
-   Profiler profiler("TremoloEffect");
+   PROFILER(TremoloEffect);
 
    if (!mEnabled)
       return;

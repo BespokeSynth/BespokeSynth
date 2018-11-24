@@ -155,6 +155,10 @@
         <FILE id="RG4zGd" name="TremoloEffect.h" compile="0" resource="0" file="Source/TremoloEffect.h"/>
       </GROUP>
       <GROUP id="{6781AC07-A090-A7AF-8D27-BCB6D9526ABD}" name="modules">
+        <FILE id="kl2NLF" name="LinnstrumentControl.cpp" compile="1" resource="0"
+              file="Source/LinnstrumentControl.cpp"/>
+        <FILE id="ZMUbj4" name="LinnstrumentControl.h" compile="0" resource="0"
+              file="Source/LinnstrumentControl.h"/>
         <FILE id="ZauNFO" name="PulseSequence.cpp" compile="1" resource="0"
               file="Source/PulseSequence.cpp"/>
         <FILE id="szkkgw" name="PulseSequence.h" compile="0" resource="0" file="Source/PulseSequence.h"/>

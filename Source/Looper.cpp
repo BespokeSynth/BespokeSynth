@@ -237,7 +237,16 @@ void Looper::Exit()
 void Looper::SetRecorder(LooperRecorder* recorder)
 {
    mRecorder = recorder;
-   mRecordBuffer = recorder ? recorder->GetRecordBuffer() : nullptr;
+   if (recorder)
+   {
+      SetTarget(dynamic_cast<IDrawableModule*>(recorder->GetTarget()));
+      mRecordBuffer = recorder->GetRecordBuffer();
+      GetBuffer()->SetNumActiveChannels(mRecordBuffer->NumChannels());
+   }
+   else
+   {
+      mRecordBuffer = nullptr;
+   }
 }
 
 ChannelBuffer* Looper::GetLoopBuffer(int& loopLength)
@@ -270,7 +279,7 @@ void Looper::Poll()
 
 void Looper::Process(double time)
 {
-   Profiler profiler("Looper");
+   PROFILER(Looper);
 
    if (!mEnabled || GetTarget() == nullptr)
       return;
@@ -433,7 +442,7 @@ void Looper::Process(double time)
 
 void Looper::DoCommit()
 {
-   Profiler profiler("Looper::DoCommit()");
+   PROFILER(LooperDoCommit);
    
    if (mRecorder == nullptr)
       return;
@@ -441,7 +450,7 @@ void Looper::DoCommit()
    assert(mCommitBuffer);
 
    {
-      Profiler profiler("Looper::DoCommit() undo");
+      PROFILER(Looper_DoCommit_undo);
       mUndoBuffer->CopyFrom(mBuffer, mLoopLength);
    }
 
@@ -456,7 +465,7 @@ void Looper::DoCommit()
    }
 
    {
-      Profiler profiler("Looper::DoCommit() commit");
+      PROFILER(LooperDoCommit_commit);
       int commitSamplesBack = mRecorder->GetCommitDelay() * TheTransport->MsPerBar() / gInvSampleRateMs;
       int commitLength = mLoopLength+LOOPER_COMMIT_FADE_SAMPLES;
       for (int i=0; i<commitLength; ++i)

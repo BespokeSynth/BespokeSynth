@@ -40,7 +40,7 @@ Polyrhythms::~Polyrhythms()
 
 void Polyrhythms::OnTransportAdvanced(float amount)
 {
-   Profiler profiler("Polyrhythms");
+   PROFILER(Polyrhythms);
    
    if (!mEnabled)
       return;

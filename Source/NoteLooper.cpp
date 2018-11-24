@@ -148,7 +148,7 @@ void NoteLooper::DrawModule()
 
 void NoteLooper::OnTransportAdvanced(float amount)
 {
-   Profiler profiler("NoteLooper");
+   PROFILER(NoteLooper);
    
    float pos = TheTransport->GetMeasurePos();
    pos += TheTransport->GetMeasure() % mNumBars;

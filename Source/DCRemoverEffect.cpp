@@ -27,7 +27,7 @@ DCRemoverEffect::~DCRemoverEffect()
 
 void DCRemoverEffect::ProcessAudio(double time, ChannelBuffer* buffer)
 {
-   Profiler profiler("DCRemoverEffect");
+   PROFILER(DCRemoverEffect);
    
    if (!mEnabled)
       return;

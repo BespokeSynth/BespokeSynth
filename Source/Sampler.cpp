@@ -78,7 +78,7 @@ void Sampler::Poll()
 
 void Sampler::Process(double time)
 {
-   Profiler profiler("Sampler");
+   PROFILER(Sampler);
 
    if (!mEnabled || GetTarget() == nullptr)
       return;

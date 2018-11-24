@@ -30,7 +30,7 @@ bool SampleVoice::IsDone(double time)
 
 bool SampleVoice::Process(double time, ChannelBuffer* out)
 {
-   Profiler profiler("SampleVoice");
+   PROFILER(SampleVoice);
 
    if (IsDone(time) ||
        mVoiceParams->mSampleData == nullptr ||

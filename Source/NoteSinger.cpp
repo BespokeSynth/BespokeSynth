@@ -41,7 +41,7 @@ NoteSinger::~NoteSinger()
 
 void NoteSinger::OnTransportAdvanced(float amount)
 {
-   Profiler profiler("NoteSinger");
+   PROFILER(NoteSinger);
    
    if (!mEnabled)
       return;

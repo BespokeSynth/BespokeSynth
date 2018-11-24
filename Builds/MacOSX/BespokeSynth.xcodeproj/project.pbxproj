@@ -53,6 +53,7 @@
 		69EB47EC9441C3507BEB277D = {isa = PBXBuildFile; fileRef = 63FA2E62502B218836A89E97; };
 		75837998247B5E99F3F16392 = {isa = PBXBuildFile; fileRef = 742F28BA27F066767E3A20E1; };
 		7B858D802BD0BB608C0F48CF = {isa = PBXBuildFile; fileRef = 49AB76428A044DEDF45FFAFE; };
+		2ECFB503F4B9EB2A09C5CCAD = {isa = PBXBuildFile; fileRef = 28BC664556C0CED86425FBEC; };
 		BE14405922D363B2236B96C5 = {isa = PBXBuildFile; fileRef = 8A0E7DCC32377C56FA69F3C0; };
 		E6B79FEEF03A902FFC517F8B = {isa = PBXBuildFile; fileRef = B217F5EDC72085AA8AA21B04; };
 		8729714646543BBCDC5A3293 = {isa = PBXBuildFile; fileRef = 17A57282C769BDCB0A39B94B; };
@@ -388,6 +389,7 @@
 		1D60B337D08B0AAA02678B3E = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = Bespoke.app; sourceTree = "BUILT_PRODUCTS_DIR"; };
 		1D8B27357DCC833A5D9C6ADB = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; name = BitcrushEffect.h; path = ../../Source/BitcrushEffect.h; sourceTree = "SOURCE_ROOT"; };
 		1E84FCB793BDD7F528928222 = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.c; name = glew.c; path = ../../Source/glew/include/GL/glew.c; sourceTree = "SOURCE_ROOT"; };
+		1E9B670CDB5C9E7C6753AAE5 = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; name = LinnstrumentControl.h; path = ../../Source/LinnstrumentControl.h; sourceTree = "SOURCE_ROOT"; };
 		1EFA803F927F122B5F8C28DB = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; name = revmodel.hpp; path = ../../Source/freeverb/revmodel.hpp; sourceTree = "SOURCE_ROOT"; };
 		1F15FF6985AB6092C23841BF = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.objcpp; name = "include_juce_graphics.mm"; path = "../../JuceLibraryCode/include_juce_graphics.mm"; sourceTree = "SOURCE_ROOT"; };
 		1F88FA74E70311546BF39674 = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; name = allpass.hpp; path = ../../Source/freeverb/allpass.hpp; sourceTree = "SOURCE_ROOT"; };
@@ -409,6 +411,7 @@
 		282116A45AB2BDF3E727E3D6 = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; name = PitchSetter.h; path = ../../Source/PitchSetter.h; sourceTree = "SOURCE_ROOT"; };
 		2850F6339D6A0E2D29D43160 = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; name = Metronome.cpp; path = ../../Source/Metronome.cpp; sourceTree = "SOURCE_ROOT"; };
 		288350102DE7709A149A8588 = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; name = ClipLauncher.cpp; path = ../../Source/ClipLauncher.cpp; sourceTree = "SOURCE_ROOT"; };
+		28BC664556C0CED86425FBEC = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; name = LinnstrumentControl.cpp; path = ../../Source/LinnstrumentControl.cpp; sourceTree = "SOURCE_ROOT"; };
 		28F957FC1CAE4D53C4EFCFB6 = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; name = NoteVibrato.cpp; path = ../../Source/NoteVibrato.cpp; sourceTree = "SOURCE_ROOT"; };
 		29B6DBF67CBCBADDF338BBD0 = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; name = WaveformViewer.cpp; path = ../../Source/WaveformViewer.cpp; sourceTree = "SOURCE_ROOT"; };
 		29F693E4726D77AB580372FB = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; name = PressureToModwheel.h; path = ../../Source/PressureToModwheel.h; sourceTree = "SOURCE_ROOT"; };
@@ -1065,6 +1068,8 @@
 					49AB76428A044DEDF45FFAFE,
 					7E281C5CCB27281CAE4B56C5, ); name = effects; sourceTree = "<group>"; };
 		C91AF721DDC182CE3AC80CF9 = {isa = PBXGroup; children = (
+					28BC664556C0CED86425FBEC,
+					1E9B670CDB5C9E7C6753AAE5,
 					8A0E7DCC32377C56FA69F3C0,
 					0E6D406637C2E1A83ED852EA,
 					B217F5EDC72085AA8AA21B04,
@@ -1731,6 +1736,7 @@
 				GCC_WARN_UNUSED_VARIABLE = YES;
 				ONLY_ACTIVE_ARCH = YES;
 				PRODUCT_NAME = "Bespoke";
+				WARNING_CFLAGS = -Wreorder;
 				ZERO_LINK = NO; }; name = Debug; };
 		3AC8477BF768E3BD0D267A52 = {isa = XCBuildConfiguration; buildSettings = {
 				ALWAYS_SEARCH_USER_PATHS = NO;
@@ -1766,6 +1772,7 @@
 				GCC_WARN_UNUSED_FUNCTION = YES;
 				GCC_WARN_UNUSED_VARIABLE = YES;
 				PRODUCT_NAME = "Bespoke";
+				WARNING_CFLAGS = -Wreorder;
 				ZERO_LINK = NO; }; name = Release; };
 		6A9CDECF19A7B7604E2C5806 = {isa = PBXTargetDependency; target = DAAB28E086014C75EC54A378; };
 		7FCFF517466C63AAB04E33BA = {isa = XCConfigurationList; buildConfigurations = (
@@ -1806,6 +1813,7 @@
 					69EB47EC9441C3507BEB277D,
 					75837998247B5E99F3F16392,
 					7B858D802BD0BB608C0F48CF,
+					2ECFB503F4B9EB2A09C5CCAD,
 					BE14405922D363B2236B96C5,
 					E6B79FEEF03A902FFC517F8B,
 					8729714646543BBCDC5A3293,
