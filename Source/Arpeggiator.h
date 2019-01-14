@@ -123,6 +123,9 @@ private:
    Checkbox* mRandomRestCheckbox;
    bool mRandomHold;
    Checkbox* mRandomHoldCheckbox;
+   int mCurrentOctaveOffset;
+   int mOctaveRepeats;
+   IntSlider* mOctaveRepeatsSlider;
    
    bool mUpbeats;
    Checkbox* mUpbeatsCheckbox;

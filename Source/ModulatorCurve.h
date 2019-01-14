@@ -12,6 +12,7 @@
 #include "IDrawableModule.h"
 #include "Slider.h"
 #include "IModulator.h"
+#include "EnvelopeEditor.h"
 
 class PatchCableSource;
 
@@ -27,13 +28,16 @@ public:
    
    void SetEnabled(bool enabled) override { mEnabled = enabled; }
    
-   void PostRepatch(PatchCableSource* cableSource) override;
+   void PostRepatch(PatchCableSource* cableSource, bool fromUserClick) override;
    
    //IModulator
    float Value(int samplesIn = 0) override;
    bool Active() const override { return mEnabled; }
    
    FloatSlider* GetTarget() { return mTarget; }
+   
+   void MouseReleased() override;
+   bool MouseMoved(float x, float y) override;
    
    //IFloatSliderListener
    void FloatSliderUpdated(FloatSlider* slider, float oldVal) override {}
@@ -42,15 +46,20 @@ public:
    void LoadLayout(const ofxJSONElement& moduleInfo) override;
    void SetUpFromSaveData() override;
    
+   void SaveState(FileStreamOut& out) override;
+   void LoadState(FileStreamIn& in) override;
+   
 private:
    //IDrawableModule
    void DrawModule() override;
-   void GetModuleDimensions(int& w, int&h) override { w=106; h=17*2+4; }
+   void GetModuleDimensions(int& w, int&h) override { w=106; h=121; }
    bool Enabled() const override { return mEnabled; }
    
+   void OnClicked(int x, int y, bool right) override;
+   
    float mInput;
-   float mCurve;
+   EnvelopeControl mEnvelopeControl;
+   ADSR mAdsr;
    
    FloatSlider* mInputSlider;
-   FloatSlider* mCurveSlider;
 };

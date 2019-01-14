@@ -36,7 +36,7 @@ void NoteToMs::DrawModule()
       return;
 }
 
-void NoteToMs::PostRepatch(PatchCableSource* cableSource)
+void NoteToMs::PostRepatch(PatchCableSource* cableSource, bool fromUserClick)
 {
    OnModulatorRepatch();
 }

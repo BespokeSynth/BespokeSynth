@@ -31,7 +31,7 @@ public:
    void SetUpFromSaveData() override;
    
    //IPatchable
-   void PostRepatch(PatchCableSource* cableSource) override;
+   void PostRepatch(PatchCableSource* cableSource, bool fromUserClick) override;
    
 private:
    //IDrawableModule

@@ -141,9 +141,9 @@ void SamplePlayer::Process(double time)
    }
 }
 
-void SamplePlayer::PostRepatch(PatchCableSource* cable)
+void SamplePlayer::PostRepatch(PatchCableSource* cableSource, bool fromUserClick)
 {
-   if (cable == mSampleBankCable)
+   if (cableSource == mSampleBankCable)
    {
       mBank = dynamic_cast<SampleBank*>(mSampleBankCable->GetTarget());
       

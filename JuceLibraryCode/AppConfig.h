@@ -29,6 +29,7 @@
    under the GPL v3 license.
 
    End User License Agreement: www.juce.com/juce-5-licence
+
   ==============================================================================
 */
 
@@ -41,7 +42,6 @@
 #ifndef JUCE_REPORT_APP_USAGE
  #define JUCE_REPORT_APP_USAGE 1
 #endif
-
 
 // END SECTION A
 
@@ -69,8 +69,12 @@
 //==============================================================================
 // juce_audio_devices flags:
 
+#ifndef    JUCE_USE_WINRT_MIDI
+ //#define JUCE_USE_WINRT_MIDI 0
+#endif
+
 #ifndef    JUCE_ASIO
- //#define JUCE_ASIO 1
+ //#define JUCE_ASIO 0
 #endif
 
 #ifndef    JUCE_WASAPI
@@ -78,7 +82,7 @@
 #endif
 
 #ifndef    JUCE_WASAPI_EXCLUSIVE
- //#define JUCE_WASAPI_EXCLUSIVE 1
+ //#define JUCE_WASAPI_EXCLUSIVE 0
 #endif
 
 #ifndef    JUCE_DIRECTSOUND
@@ -90,15 +94,23 @@
 #endif
 
 #ifndef    JUCE_JACK
- //#define JUCE_JACK 1
+ //#define JUCE_JACK 0
+#endif
+
+#ifndef    JUCE_BELA
+ //#define JUCE_BELA 0
+#endif
+
+#ifndef    JUCE_USE_ANDROID_OBOE
+ //#define JUCE_USE_ANDROID_OBOE 0
 #endif
 
 #ifndef    JUCE_USE_ANDROID_OPENSLES
- //#define JUCE_USE_ANDROID_OPENSLES 1
+ //#define JUCE_USE_ANDROID_OPENSLES 0
 #endif
 
-#ifndef    JUCE_USE_WINRT_MIDI
- //#define JUCE_USE_WINRT_MIDI 1
+#ifndef    JUCE_DISABLE_AUDIO_MIXING_WITH_OTHER_APPS
+ //#define JUCE_DISABLE_AUDIO_MIXING_WITH_OTHER_APPS 0
 #endif
 
 //==============================================================================
@@ -117,7 +129,7 @@
 #endif
 
 #ifndef    JUCE_USE_LAME_AUDIO_FORMAT
- //#define JUCE_USE_LAME_AUDIO_FORMAT 1
+ //#define JUCE_USE_LAME_AUDIO_FORMAT 0
 #endif
 
 #ifndef    JUCE_USE_WINDOWS_MEDIA_FORMAT
@@ -139,26 +151,30 @@
  #define   JUCE_PLUGINHOST_AU 1
 #endif
 
+#ifndef    JUCE_PLUGINHOST_LADSPA
+ //#define JUCE_PLUGINHOST_LADSPA 0
+#endif
+
 //==============================================================================
 // juce_audio_utils flags:
 
 #ifndef    JUCE_USE_CDREADER
- //#define JUCE_USE_CDREADER 1
+ //#define JUCE_USE_CDREADER 0
 #endif
 
 #ifndef    JUCE_USE_CDBURNER
- //#define JUCE_USE_CDBURNER 1
+ //#define JUCE_USE_CDBURNER 0
 #endif
 
 //==============================================================================
 // juce_core flags:
 
 #ifndef    JUCE_FORCE_DEBUG
- //#define JUCE_FORCE_DEBUG 1
+ //#define JUCE_FORCE_DEBUG 0
 #endif
 
 #ifndef    JUCE_LOG_ASSERTIONS
- //#define JUCE_LOG_ASSERTIONS 1
+ //#define JUCE_LOG_ASSERTIONS 0
 #endif
 
 #ifndef    JUCE_CHECK_MEMORY_LEAKS
@@ -166,7 +182,7 @@
 #endif
 
 #ifndef    JUCE_DONT_AUTOLINK_TO_WIN32_LIBRARIES
- //#define JUCE_DONT_AUTOLINK_TO_WIN32_LIBRARIES 1
+ //#define JUCE_DONT_AUTOLINK_TO_WIN32_LIBRARIES 0
 #endif
 
 #ifndef    JUCE_INCLUDE_ZLIB_CODE
@@ -174,7 +190,11 @@
 #endif
 
 #ifndef    JUCE_USE_CURL
- //#define JUCE_USE_CURL 1
+ //#define JUCE_USE_CURL 0
+#endif
+
+#ifndef    JUCE_LOAD_CURL_SYMBOLS_LAZILY
+ //#define JUCE_LOAD_CURL_SYMBOLS_LAZILY 0
 #endif
 
 #ifndef    JUCE_CATCH_UNHANDLED_EXCEPTIONS
@@ -185,11 +205,15 @@
  //#define JUCE_ALLOW_STATIC_NULL_VARIABLES 1
 #endif
 
+#ifndef    JUCE_STRICT_REFCOUNTEDPOINTER
+ //#define JUCE_STRICT_REFCOUNTEDPOINTER 0
+#endif
+
 //==============================================================================
 // juce_events flags:
 
 #ifndef    JUCE_EXECUTE_APP_SUSPEND_ON_IOS_BACKGROUND_TASK
- //#define JUCE_EXECUTE_APP_SUSPEND_ON_IOS_BACKGROUND_TASK 1
+ //#define JUCE_EXECUTE_APP_SUSPEND_ON_IOS_BACKGROUND_TASK 0
 #endif
 
 //==============================================================================
@@ -203,11 +227,23 @@
  //#define JUCE_USE_DIRECTWRITE 1
 #endif
 
+#ifndef    JUCE_DISABLE_COREGRAPHICS_FONT_SMOOTHING
+ //#define JUCE_DISABLE_COREGRAPHICS_FONT_SMOOTHING 0
+#endif
+
 //==============================================================================
 // juce_gui_basics flags:
 
 #ifndef    JUCE_ENABLE_REPAINT_DEBUGGING
- //#define JUCE_ENABLE_REPAINT_DEBUGGING 1
+ //#define JUCE_ENABLE_REPAINT_DEBUGGING 0
+#endif
+
+#ifndef    JUCE_USE_XRANDR
+ //#define JUCE_USE_XRANDR 1
+#endif
+
+#ifndef    JUCE_USE_XINERAMA
+ //#define JUCE_USE_XINERAMA 1
 #endif
 
 #ifndef    JUCE_USE_XSHM
@@ -215,11 +251,15 @@
 #endif
 
 #ifndef    JUCE_USE_XRENDER
- //#define JUCE_USE_XRENDER 1
+ //#define JUCE_USE_XRENDER 0
 #endif
 
 #ifndef    JUCE_USE_XCURSOR
  //#define JUCE_USE_XCURSOR 1
+#endif
+
+#ifndef    JUCE_WIN_PER_MONITOR_DPI_AWARE
+ //#define JUCE_WIN_PER_MONITOR_DPI_AWARE 1
 #endif
 
 //==============================================================================
@@ -230,15 +270,20 @@
 #endif
 
 #ifndef    JUCE_ENABLE_LIVE_CONSTANT_EDITOR
- //#define JUCE_ENABLE_LIVE_CONSTANT_EDITOR 1
+ //#define JUCE_ENABLE_LIVE_CONSTANT_EDITOR 0
 #endif
 
 //==============================================================================
 // juce_video flags:
 
 #ifndef    JUCE_USE_CAMERA
- //#define JUCE_USE_CAMERA 1
+ //#define JUCE_USE_CAMERA 0
 #endif
+
+#ifndef    JUCE_SYNC_VIDEO_VOLUME_WITH_OS_MEDIA_VOLUME
+ //#define JUCE_SYNC_VIDEO_VOLUME_WITH_OS_MEDIA_VOLUME 1
+#endif
+
 //==============================================================================
 #ifndef    JUCE_STANDALONE_APPLICATION
  #if defined(JucePlugin_Name) && defined(JucePlugin_Build_Standalone)

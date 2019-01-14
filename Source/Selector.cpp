@@ -38,7 +38,7 @@ void Selector::DrawModule()
    mSelector->Draw();
 }
 
-void Selector::PostRepatch(PatchCableSource* cableSource)
+void Selector::PostRepatch(PatchCableSource* cableSource, bool fromUserClick)
 {
    for (int i=0; i<mControlCables.size(); ++i)
    {

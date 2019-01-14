@@ -217,7 +217,7 @@ void Presets::OnTransportAdvanced(float amount)
    }
 }
 
-void Presets::PostRepatch(PatchCableSource* cableSource)
+void Presets::PostRepatch(PatchCableSource* cableSource, bool fromUserClick)
 {
    mPresetModules.clear();
    for (auto cable : mModuleCable->GetPatchCables())

@@ -81,7 +81,7 @@ void AudioToCV::Process(double time)
    GetBuffer()->Reset();
 }
 
-void AudioToCV::PostRepatch(PatchCableSource* cableSource)
+void AudioToCV::PostRepatch(PatchCableSource* cableSource, bool fromUserClick)
 {
    OnModulatorRepatch();
 }

@@ -26,7 +26,7 @@ public:
    string GetTitleLabel() override { return "feedback"; }
    void CreateUIControls() override;
    
-   void PostRepatch(PatchCableSource* cable) override;
+   void PostRepatch(PatchCableSource* cableSource, bool fromUserClick) override;
    
    //IAudioSource
    void Process(double time) override;

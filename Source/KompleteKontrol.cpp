@@ -105,9 +105,9 @@ void KompleteKontrol::DrawModule()
    DrawText("midicontroller:",5,13);
 }
 
-void KompleteKontrol::PostRepatch(PatchCableSource* cable)
+void KompleteKontrol::PostRepatch(PatchCableSource* cableSource, bool fromUserClick)
 {
-   if (cable == mMidiControllerCable)
+   if (cableSource == mMidiControllerCable)
    {
       mController = dynamic_cast<MidiController*>(mMidiControllerCable->GetTarget());
    }

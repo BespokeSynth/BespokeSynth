@@ -49,7 +49,7 @@ void ModulatorAddCentered::DrawModule()
    mValue2RangeSlider->Draw();
 }
 
-void ModulatorAddCentered::PostRepatch(PatchCableSource* cableSource)
+void ModulatorAddCentered::PostRepatch(PatchCableSource* cableSource, bool fromUserClick)
 {
    OnModulatorRepatch();
    

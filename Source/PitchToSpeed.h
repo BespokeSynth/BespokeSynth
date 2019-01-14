@@ -38,7 +38,7 @@ public:
    virtual bool CanAdjustRange() const override { return false; }
    
    //IPatchable
-   void PostRepatch(PatchCableSource* cableSource) override;
+   void PostRepatch(PatchCableSource* cableSource, bool fromUserClick) override;
    
    void FloatSliderUpdated(FloatSlider* slider, float oldVal) override {}
    

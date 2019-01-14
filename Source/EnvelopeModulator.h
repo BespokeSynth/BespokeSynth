@@ -44,7 +44,7 @@ public:
    bool Active() const override { return mEnabled; }
    
    //IPatchable
-   void PostRepatch(PatchCableSource* cableSource) override;
+   void PostRepatch(PatchCableSource* cableSource, bool fromUserClick) override;
    
    void CheckboxUpdated(Checkbox* checkbox) override;
    void RadioButtonUpdated(RadioButton* radio, int oldVal) override {}

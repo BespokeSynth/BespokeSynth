@@ -43,7 +43,7 @@ public:
    
    void CanvasUpdated(Canvas* canvas) override;
    
-   void PostRepatch(PatchCableSource* cableSource) override;
+   void PostRepatch(PatchCableSource* cableSource, bool fromUserClick) override;
    
    vector<IUIControl*> ControlsToIgnoreInSaveState() const override;
    

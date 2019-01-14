@@ -82,7 +82,7 @@ void EnvelopeModulator::PlayNote(double time, int pitch, int velocity, int voice
    }
    else if (velocity > 0)
    {
-      mAdsr.Start(time,1);
+      mAdsr.Start(time,velocity/127.0f);
    }
 }
 
@@ -124,7 +124,7 @@ float EnvelopeModulator::Value(int samplesIn /*= 0*/)
    return 0;
 }
 
-void EnvelopeModulator::PostRepatch(PatchCableSource* cableSource)
+void EnvelopeModulator::PostRepatch(PatchCableSource* cableSource, bool fromUserClick)
 {
    OnModulatorRepatch();
 }

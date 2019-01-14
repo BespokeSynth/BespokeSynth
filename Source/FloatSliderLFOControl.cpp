@@ -218,7 +218,7 @@ void FloatSliderLFOControl::RandomizeSettings()
    UpdateVisibleControls();
 }
 
-void FloatSliderLFOControl::PostRepatch(PatchCableSource* cableSource)
+void FloatSliderLFOControl::PostRepatch(PatchCableSource* cableSource, bool fromUserClick)
 {
    SetOwner(dynamic_cast<FloatSlider*>(mTargetCable->GetTarget()));
    OnModulatorRepatch();

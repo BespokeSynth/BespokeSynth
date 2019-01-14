@@ -14,6 +14,8 @@
 class RollingBuffer;
 class PatchCableSource;
 class IAudioReceiver;
+class RadioButton;
+class UIControlConnection;
 
 struct PatchCablePos
 {
@@ -55,6 +57,8 @@ public:
    bool IsValidTarget(IClickable* target) const;
    void Destroy();
    
+   void SetUIControlConnection(UIControlConnection* conn) { mUIControlConnection = conn; }
+   
    static PatchCable* sActivePatchCable;
    
 protected:
@@ -68,10 +72,13 @@ private:
    
    PatchCableSource* mOwner;
    IClickable* mTarget;
+   RadioButton* mTargetRadioButton;
+   UIControlConnection* mUIControlConnection;
    IAudioReceiver* mAudioReceiverTarget;
 
    bool mHovered;
    bool mDragging;
+   ofVec2f mGrabPos;
 };
 
 #endif /* defined(__Bespoke__PatchCable__) */

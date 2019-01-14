@@ -54,7 +54,7 @@ void SamplerGrid::CreateUIControls()
    mGrid->SetMomentary(true);
    mPassthroughCheckbox = new Checkbox(this,"passthrough",mGrid,kAnchor_Right,&mPassthrough);
    mVolumeSlider = new FloatSlider(this,"vol",mPassthroughCheckbox, kAnchor_Below,90,15,&mVolume,0,2);
-   mClearCheckbox = new Checkbox(this,"clear",mVolumeSlider, kAnchor_Below,&mDuplicate);
+   mClearCheckbox = new Checkbox(this,"clear",mVolumeSlider, kAnchor_Below,&mClear);
    mEditCheckbox = new Checkbox(this,"edit",mClearCheckbox, kAnchor_Below,&mEditMode);
    mDuplicateCheckbox = new Checkbox(this,"duplicate",mEditCheckbox, kAnchor_Below,&mDuplicate);
    mEditStartSlider = new IntSlider(this,"start",mEditSampleX,mEditSampleY+mEditSampleHeight+1,mEditSampleWidth,15,&mDummyInt,0,1);

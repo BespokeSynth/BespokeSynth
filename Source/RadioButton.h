@@ -66,6 +66,8 @@ public:
 
    void GetDimensions(int& width, int& height) override { width = mWidth; height = mHeight; }
    
+   ofVec2f GetOptionPosition(int optionIndex);
+   
 protected:
    ~RadioButton();   //protected so that it can't be created on the stack
 

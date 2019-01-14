@@ -156,6 +156,8 @@ public:
    
    bool IsLoadingModule() const { return mIsLoadingModule; }
    
+   static string GetUserPrefsPath() { return ofToDataPath("userprefs.json"); }
+   
    void SaveLayout(string jsonFile = "", bool makeDefaultLayout = true);
    ofxJSONElement GetLayout();
    void SaveLayoutAsPopup();

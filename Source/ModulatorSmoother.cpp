@@ -49,7 +49,7 @@ void ModulatorSmoother::DrawModule()
    mSmoothSlider->Draw();
 }
 
-void ModulatorSmoother::PostRepatch(PatchCableSource* cableSource)
+void ModulatorSmoother::PostRepatch(PatchCableSource* cableSource, bool fromUserClick)
 {
    OnModulatorRepatch();
    

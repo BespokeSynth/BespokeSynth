@@ -77,7 +77,7 @@ void OscController::oscMessageReceived(const OSCMessage& msg)
    {
       for (int i=0; i<mOscMap.size(); ++i)
       {
-         if (mOscMap[i].mIndex == j && msg.getAddressPattern().toString() == mOscMap[i].mAddress)
+         if (mOscMap[i].mIndex == j && msg.getAddressPattern().toString().toStdString() == mOscMap[i].mAddress)
          {
             mOscMap[i].mLastChangedTime = gTime;
             mOscMap[i].mValue = msg[j].getFloat32();

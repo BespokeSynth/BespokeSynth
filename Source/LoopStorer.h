@@ -34,7 +34,7 @@ public:
    void CreateUIControls() override;
    
    void Poll() override;
-   void PostRepatch(PatchCableSource* cable) override;
+   void PostRepatch(PatchCableSource* cableSource, bool fromUserClick) override;
    
    int GetRowY(int idx);
    Looper* GetLooper() { return mLooper; }

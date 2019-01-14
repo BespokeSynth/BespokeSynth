@@ -53,7 +53,7 @@ public:
    static vector<IUIControl*> sPresetHighlightControls;
    
    //IPatchable
-   void PostRepatch(PatchCableSource* cableSource) override;
+   void PostRepatch(PatchCableSource* cableSource, bool fromUserClick) override;
    
 private:
    void SetPreset(int idx);

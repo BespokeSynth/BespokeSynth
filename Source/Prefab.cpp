@@ -77,7 +77,7 @@ void Prefab::DrawModule()
    mModuleContainer.Draw();
 }
 
-void Prefab::PostRepatch(PatchCableSource* cableSource)
+void Prefab::PostRepatch(PatchCableSource* cableSource, bool fromUserClick)
 {
    IDrawableModule* module = dynamic_cast<IDrawableModule*>(cableSource->GetTarget());
    if (module)

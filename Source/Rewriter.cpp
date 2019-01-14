@@ -42,9 +42,9 @@ Rewriter::~Rewriter()
 {
 }
 
-void Rewriter::PostRepatch(PatchCableSource* cable)
+void Rewriter::PostRepatch(PatchCableSource* cableSource, bool fromUserClick)
 {
-   if (cable == mLooperCable)
+   if (cableSource == mLooperCable)
    {
       if (mConnectedLooper)
          mConnectedLooper->SetRewriter(nullptr);

@@ -187,8 +187,18 @@ void RadioButton::OnClicked(int x, int y, bool right)
    
    if (mDirection == kRadioVertical)
       SetIndex(y/radioSpacing);
-   else
+   else  //kRadioHorizontal
       SetIndex(int(x/mElementWidth));
+}
+
+ofVec2f RadioButton::GetOptionPosition(int optionIndex)
+{
+   int x,y;
+   GetPosition(x, y, false);
+   if (mDirection == kRadioVertical)
+      return ofVec2f(x + mWidth, y + float(mHeight)/GetNumValues() * (optionIndex + .5f));
+   else  //kRadioHorizontal
+      return ofVec2f(x + float(mWidth)/GetNumValues() * (optionIndex + .5f), y + mHeight);
 }
 
 void RadioButton::SetIndex(int i)

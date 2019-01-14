@@ -33,7 +33,7 @@ public:
    void SendCC(int control, int value, int voiceIdx = -1) override {}
    
    //IPatchable
-   void PostRepatch(PatchCableSource* cableSource) override;
+   void PostRepatch(PatchCableSource* cableSource, bool fromUserClick) override;
    
    void TextEntryComplete(TextEntry* entry) override {}
    

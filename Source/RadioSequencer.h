@@ -59,7 +59,7 @@ public:
    void LoadState(FileStreamIn& in) override;
    
    //IPatchable
-   void PostRepatch(PatchCableSource* cableSource) override;
+   void PostRepatch(PatchCableSource* cableSource, bool fromUserClick) override;
    
 private:
    void SetGridSize(float w, float h);

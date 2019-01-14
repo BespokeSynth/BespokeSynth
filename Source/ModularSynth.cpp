@@ -88,22 +88,12 @@ void ModularSynth::Setup(GlobalManagers* globalManagers, juce::Component* mainCo
    mGlobalManagers = globalManagers;
    mMainComponent = mainComponent;
    
-   bool loaded = mUserPrefs.open(ofToDataPath("userprefs.json"));
+   bool loaded = mUserPrefs.open(GetUserPrefsPath());
    if (loaded)
    {
       SetGlobalBufferSize(mUserPrefs["buffersize"].asInt());
       mIOBufferSize = gBufferSize;
       gSampleRate = mUserPrefs["samplerate"].asInt();
-      int width = mUserPrefs["width"].asInt();
-      int height = mUserPrefs["height"].asInt();
-      if (width > 1 && height > 1)
-      {
-         //TODO_PORT(Ryan) this locks up in windows
-#ifndef JUCE_WINDOWS
-         const MessageManagerLock lock;
-         mainComponent->setSize(width, height);
-#endif
-      }
    }
    else
    {
@@ -608,7 +598,7 @@ void ModularSynth::MouseDragged(int intX, int intY, int button)
             {
                if (VectorContains(dynamic_cast<IDrawableModule*>(cable->GetTarget()), mGroupSelectedModules))
                {
-                  cableSource->SetPatchCableTarget(cable, oldToNewModuleMap[dynamic_cast<IDrawableModule*>(cable->GetTarget())]);
+                  cableSource->SetPatchCableTarget(cable, oldToNewModuleMap[dynamic_cast<IDrawableModule*>(cable->GetTarget())], false);
                }
             }
          }

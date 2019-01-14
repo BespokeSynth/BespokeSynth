@@ -133,7 +133,7 @@ void VSTPlugin::SetVST(string vstName)
    mModuleSaveData.SetString("vst", vstName);
    string path = VSTLookup::GetVSTPath(vstName);
    
-   if (mPlugin != nullptr && mPlugin->getPluginDescription().fileOrIdentifier == path)
+   if (mPlugin != nullptr && mPlugin->getPluginDescription().fileOrIdentifier.toStdString() == path)
       return;  //this VST is already loaded! we're all set
    
    if (mPlugin != nullptr && mWindow != nullptr)
@@ -181,6 +181,7 @@ void VSTPlugin::CreateParameterSliders()
    }
    mParameterSliders.clear();
    
+   /*
    if (mPlugin->getNumParameters() <= 100)
    {
       mParameterSliders.resize(mPlugin->getNumParameters());
@@ -213,7 +214,7 @@ void VSTPlugin::CreateParameterSliders()
          }
          mParameterSliders[i].mParameterIndex = i;
       }
-   }
+   }*/
 }
 
 void VSTPlugin::Poll()

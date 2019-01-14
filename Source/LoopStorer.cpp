@@ -106,9 +106,9 @@ void LoopStorer::DrawModule()
    mSwapMutex.unlock();
 }
 
-void LoopStorer::PostRepatch(PatchCableSource* cable)
+void LoopStorer::PostRepatch(PatchCableSource* cableSource, bool fromUserClick)
 {
-   mLooper = dynamic_cast<Looper*>(cable->GetTarget());
+   mLooper = dynamic_cast<Looper*>(cableSource->GetTarget());
 }
 
 int LoopStorer::GetRowY(int idx)
@@ -297,8 +297,8 @@ void LoopStorer::LoadState(FileStreamIn& in)
          if (sampleData->mBufferLength != -1)
          {
             int readLength;
-            sampleData->mBuffer->Load(in, readLength);
-            assert(sampleData->mBufferLength == readLength);
+            sampleData->mBuffer->Load(in, readLength, false);
+            assert(sampleData->mBufferLength == sampleData->mBuffer->BufferSize());
          }
       }
    }

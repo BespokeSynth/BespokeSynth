@@ -42,7 +42,7 @@ void MacroSlider::DrawModule()
       mapping->Draw();
 }
 
-void MacroSlider::PostRepatch(PatchCableSource* cableSource)
+void MacroSlider::PostRepatch(PatchCableSource* cableSource, bool fromUserClick)
 {
    for (auto mapping : mMappings)
    {

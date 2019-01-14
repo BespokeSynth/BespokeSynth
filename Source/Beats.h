@@ -89,7 +89,7 @@ public:
    void Process(double time) override;
    void SetEnabled(bool enabled) override { mEnabled = enabled; }
    
-   void PostRepatch(PatchCableSource* cable) override;
+   void PostRepatch(PatchCableSource* cableSource, bool fromUserClick) override;
    
    void CheckboxUpdated(Checkbox* checkbox) override;
    void FloatSliderUpdated(FloatSlider* slider, float oldVal) override;

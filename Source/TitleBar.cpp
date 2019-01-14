@@ -14,22 +14,22 @@
 #include "ModuleSaveDataPanel.h"
 #include "HelpDisplay.h"
 #include "VSTPlugin.h"
+#include "Prefab.h"
 
 TitleBar* TheTitleBar = nullptr;
 
 SpawnList::SpawnList(TitleBar* owner, int x, int y, string label)
-: mSpawnIndex(-1)
+: mLabel(label)
+, mSpawnIndex(-1)
 , mSpawnList(nullptr)
-, mLabel(label)
 , mOwner(owner)
 , mPos(x,y)
-, mVstList(false)
 {
 }
 
-void SpawnList::SetList(vector<string> spawnables, bool vstList)
+void SpawnList::SetList(vector<string> spawnables, string overrideModuleType)
 {
-   mVstList = vstList;
+   mOverrideModuleType = overrideModuleType;
    mSpawnList = new DropdownList(mOwner,mLabel.c_str(),mPos.x,mPos.y,&mSpawnIndex);
    mSpawnList->SetNoHover(true);
    
@@ -39,7 +39,7 @@ void SpawnList::SetList(vector<string> spawnables, bool vstList)
    for (int i=0; i<mSpawnables.size(); ++i)
    {
       string name = mSpawnables[i].c_str();
-      if (!vstList && TheSynth->GetModuleFactory()->IsExperimental(name))
+      if (mOverrideModuleType == "" && TheSynth->GetModuleFactory()->IsExperimental(name))
          name += " (exp.)";
       mSpawnList->AddLabel(name,i);
    }
@@ -63,15 +63,21 @@ void SpawnList::OnSelection(DropdownList* list)
 IDrawableModule* SpawnList::Spawn()
 {
    string moduleType = mSpawnables[mSpawnIndex];
-   if (mVstList)
-      moduleType = "vstplugin";
+   if (mOverrideModuleType != "")
+      moduleType = mOverrideModuleType;
    
    IDrawableModule* module = TheSynth->SpawnModuleOnTheFly(moduleType, TheSynth->GetMouseX() + moduleGrabOffset.x, TheSynth->GetMouseY() + moduleGrabOffset.y);
    
-   if (mVstList)
+   if (mOverrideModuleType == "vstplugin")
    {
       VSTPlugin* plugin = dynamic_cast<VSTPlugin*>(module);
       plugin->SetVST(mSpawnables[mSpawnIndex]);
+   }
+   
+   if (mOverrideModuleType == "prefab")
+   {
+      Prefab* prefab = dynamic_cast<Prefab*>(module);
+      prefab->LoadPrefab("prefabs/"+mSpawnables[mSpawnIndex]);
    }
    
    return module;
@@ -106,6 +112,7 @@ TitleBar::TitleBar()
 , mModulatorModules(this,0,0,"modulators:")
 , mOtherModules(this,0,0,"other:")
 , mVstPlugins(this,0,0,"vst plugins:")
+, mPrefabs(this,0,0,"prefabs:")
 , mSaveLayoutButton(nullptr)
 , mResetLayoutButton(nullptr)
 , mSaveStateButton(nullptr)
@@ -149,16 +156,27 @@ TitleBar::~TitleBar()
 
 void TitleBar::SetModuleFactory(ModuleFactory* factory)
 {
-   mInstrumentModules.SetList(factory->GetSpawnableModules(kModuleType_Instrument), false);
-   mNoteModules.SetList(factory->GetSpawnableModules(kModuleType_Note), false);
-   mSynthModules.SetList(factory->GetSpawnableModules(kModuleType_Synth), false);
-   mAudioModules.SetList(factory->GetSpawnableModules(kModuleType_Audio), false);
-   mModulatorModules.SetList(factory->GetSpawnableModules(kModuleType_Modulator), false);
-   mOtherModules.SetList(factory->GetSpawnableModules(kModuleType_Other), false);
+   mInstrumentModules.SetList(factory->GetSpawnableModules(kModuleType_Instrument), "");
+   mNoteModules.SetList(factory->GetSpawnableModules(kModuleType_Note), "");
+   mSynthModules.SetList(factory->GetSpawnableModules(kModuleType_Synth), "");
+   mAudioModules.SetList(factory->GetSpawnableModules(kModuleType_Audio), "");
+   mModulatorModules.SetList(factory->GetSpawnableModules(kModuleType_Modulator), "");
+   mOtherModules.SetList(factory->GetSpawnableModules(kModuleType_Other), "");
    
    vector<string> vsts;
    VSTLookup::GetAvailableVSTs(vsts);
-   mVstPlugins.SetList(vsts, true);
+   mVstPlugins.SetList(vsts, "vstplugin");
+   
+   File dir(ofToDataPath("prefabs"));
+   Array<File> files;
+   dir.findChildFiles(files, File::findFiles, false);
+   vector<string> prefabs;
+   for (auto file : files)
+   {
+      if (file.getFileExtension() == ".pfb")
+         prefabs.push_back(file.getFileName().toStdString());
+   }
+   mPrefabs.SetList(prefabs, "prefab");
 }
 
 void TitleBar::ListLayouts()
@@ -174,7 +192,7 @@ void TitleBar::ListLayouts()
       {
          mLoadLayoutDropdown->AddLabel(file.getFileNameWithoutExtension().toRawUTF8(), layoutIdx);
          
-         if (file.getRelativePathFrom(File(ofToDataPath(""))) == TheSynth->GetLoadedLayout())
+         if (file.getRelativePathFrom(File(ofToDataPath(""))).toStdString() == TheSynth->GetLoadedLayout())
             mLoadLayoutIndex = layoutIdx;
          
          ++layoutIdx;
@@ -224,6 +242,7 @@ void TitleBar::DrawModule()
             mVstPlugins.SetPositionRelativeTo(&mOtherModules);
          else
             mVstPlugins.SetPosition(400,18);
+         mPrefabs.SetPositionRelativeTo(&mVstPlugins);
       }
       else
       {
@@ -234,6 +253,7 @@ void TitleBar::DrawModule()
          mModulatorModules.SetPositionRelativeTo(&mAudioModules);
          mOtherModules.SetPositionRelativeTo(&mModulatorModules);
          mVstPlugins.SetPositionRelativeTo(&mOtherModules);
+         mPrefabs.SetPositionRelativeTo(&mVstPlugins);
       }
       mInstrumentModules.Draw();
       mNoteModules.Draw();
@@ -242,6 +262,7 @@ void TitleBar::DrawModule()
       mModulatorModules.Draw();
       mOtherModules.Draw();
       mVstPlugins.Draw();
+      mPrefabs.Draw();
    }
    
    float usage = TheSynth->GetGlobalManagers()->mDeviceManager.getCpuUsage();
@@ -297,6 +318,7 @@ void TitleBar::DropdownUpdated(DropdownList* list, int oldVal)
    mModulatorModules.OnSelection(list);
    mOtherModules.OnSelection(list);
    mVstPlugins.OnSelection(list);
+   mPrefabs.OnSelection(list);
 }
 
 void TitleBar::ButtonClicked(ClickButton* button)

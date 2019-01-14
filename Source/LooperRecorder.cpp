@@ -55,6 +55,8 @@ LooperRecorder::LooperRecorder()
 , mRecorderMode(kRecorderMode_Record)
 , mModeSelector(nullptr)
 , mWriteBuffer(gBufferSize)
+, mBarRecordTime(0)
+, mBarRecordButton(nullptr)
 {
    mQuietInputRamp.SetValue(1);
 }
@@ -76,8 +78,9 @@ void LooperRecorder::CreateUIControls()
    mClearOverdubButton = new ClickButton(this,"clear",-1,-1);
    mSnapPitchButton = new ClickButton(this,"snap to pitch",-1,-1);
    mCommitDelaySlider = new FloatSlider(this,"delay",-1,-1,70,15,&mCommitDelay,0,1);
-   mFreeRecordingCheckbox = new Checkbox(this,"free rec",97,84,&mFreeRecording);
-   mCancelFreeRecordButton = new ClickButton(this,"cancel",-1,-1);
+   mFreeRecordingCheckbox = new Checkbox(this,"free rec",97,86,&mFreeRecording);
+   mCancelFreeRecordButton = new ClickButton(this,"cancel",mFreeRecordingCheckbox,kAnchor_Right);
+   mBarRecordButton = new ClickButton(this,"bar rec",mCancelFreeRecordButton,kAnchor_Right);
    
    mNumBarsSelector->AddLabel(" 1 ",1);
    mNumBarsSelector->AddLabel(" 2 ",2);
@@ -103,8 +106,6 @@ void LooperRecorder::CreateUIControls()
    mSnapPitchButton->PositionTo(mOrigSpeedButton, kAnchor_Below);
    mResampleButton->PositionTo(mSnapPitchButton, kAnchor_Below);
    mResampAndSetButton->PositionTo(mResampleButton, kAnchor_Below);
-   
-   mCancelFreeRecordButton->PositionTo(mFreeRecordingCheckbox, kAnchor_Right);
    
    SyncCablesToLoopers();
 }
@@ -266,7 +267,7 @@ void LooperRecorder::PreRepatch(PatchCableSource* cableSource)
    }
 }
 
-void LooperRecorder::PostRepatch(PatchCableSource* cableSource)
+void LooperRecorder::PostRepatch(PatchCableSource* cableSource, bool fromUserClick)
 {
    mLoopers.resize(mLooperPatchCables.size());
    for (int i=0; i<mLooperPatchCables.size(); ++i)
@@ -302,6 +303,7 @@ void LooperRecorder::DrawModule()
    mCommitDelaySlider->Draw();
    mFreeRecordingCheckbox->Draw();
    mCancelFreeRecordButton->Draw();
+   mBarRecordButton->Draw();
 
    if (mSpeed != 1)
    {
@@ -330,6 +332,15 @@ void LooperRecorder::DrawModule()
    for (int i=0; i<mNumBars; ++i)
       DrawCircleHash(center, float(i)/mNumBars, 1, radius * .8f, radius);
    ofPopStyle();
+   
+   if (mBarRecordTime > 0)
+   {
+      ofPushStyle();
+      ofSetColor(255, 0, 0, 50);
+      ofFill();
+      ofRect(mBarRecordButton->GetRect(true));
+      ofPopStyle();
+   }
    
    if (mDrawDebug)
       mRecordBuffer.Draw(0,162,800,100,-1,0);
@@ -438,6 +449,14 @@ void LooperRecorder::SyncLoopLengths()
 
 void LooperRecorder::Commit(Looper* looper)
 {
+   if (mBarRecordTime > 0)
+   {
+      double time = gTime - mBarRecordTime;
+      float bars = time / TheTransport->MsPerBar();
+      mNumBars = ofClamp(powf(2, ceilf(log2f(bars - .5f))), 1, 16);
+      mBarRecordTime = 0;  //reset
+   }
+   
    mCommitToLooper = looper;
 }
 
@@ -527,6 +546,7 @@ void LooperRecorder::CancelFreeRecord()
 {
    mFreeRecording = false;
    mStartFreeRecordTime = 0;
+   mBarRecordTime = 0;
 }
 
 void LooperRecorder::ButtonClicked(ClickButton* button)
@@ -632,6 +652,9 @@ void LooperRecorder::ButtonClicked(ClickButton* button)
    
    if (button == mCancelFreeRecordButton)
       CancelFreeRecord();
+   
+   if (button == mBarRecordButton)
+      mBarRecordTime = gTime;
 }
 
 void LooperRecorder::CheckboxUpdated(Checkbox* checkbox)

@@ -282,7 +282,7 @@ void Sample::LoadState(FileStreamIn& in)
    if (mNumSamples > 0)
    {
       int readLength;
-      mData.Load(in, readLength);
+      mData.Load(in, readLength, true);
       assert(readLength == mNumSamples);
    }
    in >> mNumBars;

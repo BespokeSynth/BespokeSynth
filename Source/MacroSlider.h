@@ -31,7 +31,7 @@ public:
    void FloatSliderUpdated(FloatSlider* slider, float oldVal) override;
    
    //IPatchable
-   void PostRepatch(PatchCableSource* cableSource) override;
+   void PostRepatch(PatchCableSource* cableSource, bool fromUserClick) override;
    
    float GetValue() const { return mValue; }
    

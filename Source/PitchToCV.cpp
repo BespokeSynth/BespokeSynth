@@ -44,7 +44,7 @@ void PitchToCV::DrawModule()
    mMaxSlider->Draw();
 }
 
-void PitchToCV::PostRepatch(PatchCableSource* cableSource)
+void PitchToCV::PostRepatch(PatchCableSource* cableSource, bool fromUserClick)
 {
    OnModulatorRepatch();
 }

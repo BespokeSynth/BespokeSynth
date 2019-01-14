@@ -64,9 +64,9 @@ void Beats::Process(double time)
    GetVizBuffer()->WriteChunk(mWriteBuffer, bufferSize, 0);
 }
 
-void Beats::PostRepatch(PatchCableSource* cable)
+void Beats::PostRepatch(PatchCableSource* cableSource, bool fromUserClick)
 {
-   if (cable == mSampleBankCable)
+   if (cableSource == mSampleBankCable)
    {
       if (mBank)
          mBank->RemoveListener(this);

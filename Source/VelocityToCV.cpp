@@ -43,7 +43,7 @@ void VelocityToCV::DrawModule()
    mMaxSlider->Draw();
 }
 
-void VelocityToCV::PostRepatch(PatchCableSource* cableSource)
+void VelocityToCV::PostRepatch(PatchCableSource* cableSource, bool fromUserClick)
 {
    OnModulatorRepatch();
 }

@@ -24,7 +24,7 @@ public:
    string GetTitleLabel() override { return "router"; }
    void CreateUIControls() override;
 
-   void PostRepatch(PatchCableSource* cableSource) override;
+   void PostRepatch(PatchCableSource* cableSource, bool fromUserClick) override;
    
    void AddReceiver(INoteReceiver* receiver, const char* name);
    void SetActiveIndex(int index) { mRouteMask = 1 << index; }

@@ -58,7 +58,7 @@ public:
    static list<ControlSequencer*> sControlSequencers;
    
    //IPatchable
-   void PostRepatch(PatchCableSource* cableSource) override;
+   void PostRepatch(PatchCableSource* cableSource, bool fromUserClick) override;
    
 private:
    void SetGridSize(float w, float h);

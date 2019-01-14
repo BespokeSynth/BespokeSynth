@@ -1390,7 +1390,7 @@ void Looper::LoadState(FileStreamIn& in)
    
    in >> mLoopLength;
    int readLength;
-   mBuffer->Load(in, readLength);
+   mBuffer->Load(in, readLength, false);
    assert(mLoopLength == readLength);
 }
 

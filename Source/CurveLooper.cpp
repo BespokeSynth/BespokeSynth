@@ -143,7 +143,7 @@ bool CurveLooper::MouseMoved(float x, float y)
    return false;
 }
 
-void CurveLooper::PostRepatch(PatchCableSource* cableSource)
+void CurveLooper::PostRepatch(PatchCableSource* cableSource, bool fromUserClick)
 {
    if (mControlCable->GetPatchCables().empty() == false)
       mUIControl = dynamic_cast<IUIControl*>(mControlCable->GetPatchCables()[0]->GetTarget());

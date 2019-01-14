@@ -309,10 +309,10 @@ void MidiController::OnMidiControl(MidiControl& control)
    
    if (control.mControl == mModwheelCC)
    {
-      if (mModwheelCC == 74) //MPE
-         mModulation.GetModWheel(voiceIdx)->SetValue((control.mValue-63) / 127.0f * 2);
-      else
-         mModulation.GetModWheel(voiceIdx)->SetValue(control.mValue / 127.0f);
+      //if (mModwheelCC == 74) //MPE
+      //   mModulation.GetModWheel(voiceIdx)->SetValue((control.mValue-63) / 127.0f * 2);
+      //else
+      mModulation.GetModWheel(voiceIdx)->SetValue(control.mValue / 127.0f);
    }
    
    MidiReceived(kMidiMessage_Control, control.mControl, control.mValue/127.0f, control.mChannel);
@@ -828,7 +828,10 @@ void MidiController::DrawModule()
                {
                   control.mControlCable->SetTarget(connection->mUIControl);
                   if (connection->mUIControl)
+                  {
                      uiControlValue = connection->mUIControl->GetMidiValue();
+                     control.mControlCable->GetPatchCables()[0]->SetUIControlConnection(connection);
+                  }
                }
                else
                {
@@ -1430,13 +1433,13 @@ void MidiController::TextEntryComplete(TextEntry* entry)
    }
 }
 
-void MidiController::PreRepatch(PatchCableSource* cable)
+void MidiController::PreRepatch(PatchCableSource* cableSource)
 {
    for (auto* grid : mGrids)
    {
-      if (cable == grid->mGridCable)
+      if (cableSource == grid->mGridCable)
       {
-         grid->mGridController[mControllerPage] = dynamic_cast<GridController*>(cable->GetTarget());
+         grid->mGridController[mControllerPage] = dynamic_cast<GridController*>(cableSource->GetTarget());
          if (grid->mGridController[mControllerPage])
             grid->mGridController[mControllerPage]->UnhookController();
          return;
@@ -1444,13 +1447,13 @@ void MidiController::PreRepatch(PatchCableSource* cable)
    }
 }
 
-void MidiController::PostRepatch(PatchCableSource* cable)
+void MidiController::PostRepatch(PatchCableSource* cableSource, bool fromUserClick)
 {
    for (auto* grid : mGrids)
    {
-      if (cable == grid->mGridCable)
+      if (cableSource == grid->mGridCable)
       {
-         grid->mGridController[mControllerPage] = dynamic_cast<GridController*>(cable->GetTarget());
+         grid->mGridController[mControllerPage] = dynamic_cast<GridController*>(cableSource->GetTarget());
          if (grid->mGridController[mControllerPage])
             grid->mGridController[mControllerPage]->SetUp(grid, mControllerPage, this);
          return;
@@ -1460,28 +1463,47 @@ void MidiController::PostRepatch(PatchCableSource* cable)
    bool repatched = false;
    for (auto* connection : mConnections)
    {
-      repatched = connection->PostRepatch(cable);
+      repatched = connection->PostRepatch(cableSource, fromUserClick);
       if (repatched)
          break;
    }
    
-   if (!repatched && cable->GetTarget())   //need to make connection
+   if (!repatched && cableSource->GetTarget())   //need to make connection
    {
-      int layoutControl = GetLayoutControlIndexForCable(cable);
+      int layoutControl = GetLayoutControlIndexForCable(cableSource);
       if (layoutControl != -1)
       {
          UIControlConnection* connection = AddUIControlConnection();
          connection->mControl = mLayoutControls[layoutControl].mControl;
          connection->mMessageType = mLayoutControls[layoutControl].mType;
-         connection->mUIControl = dynamic_cast<IUIControl*>(cable->GetTarget());
+         connection->mUIControl = dynamic_cast<IUIControl*>(cableSource->GetTarget());
          connection->mIncrementAmount = mLayoutControls[layoutControl].mIncremental ? 1 : 0;
+         
+         RadioButton* radioButton = dynamic_cast<RadioButton*>(cableSource->GetTarget());
+         if (radioButton)
+         {
+            connection->mType = kControlType_SetValue;
+            float closestSq = FLT_MAX;
+            int closestIdx = 0;
+            ofVec2f mousePos(ofGetMouseX(), ofGetMouseY());
+            for (int i=0; i<radioButton->GetNumValues(); ++i)
+            {
+               float distSq = (mousePos - radioButton->GetOptionPosition(i)).distanceSquared();
+               if (distSq < closestSq)
+               {
+                  closestSq = distSq;
+                  closestIdx = i;
+               }
+            }
+            connection->mValue = closestIdx;
+         }
       }
    }
 }
 
-void MidiController::OnCableGrabbed(PatchCableSource* cable)
+void MidiController::OnCableGrabbed(PatchCableSource* cableSource)
 {
-   int layoutControl = GetLayoutControlIndexForCable(cable);
+   int layoutControl = GetLayoutControlIndexForCable(cableSource);
    if (layoutControl != -1)
    {
       mHighlightedLayoutElement = layoutControl;
@@ -1971,12 +1993,12 @@ void UIControlConnection::SetNext(UIControlConnection* next)
    mIncrementalEntry->SetNextTextEntry(next ? next->mIncrementalEntry : nullptr);
 }
 
-bool UIControlConnection::PostRepatch(PatchCableSource* cable)
+bool UIControlConnection::PostRepatch(PatchCableSource* cableSource, bool fromUserClick)
 {
-   if (cable == mUIOwner->GetLayoutControl(mControl, mMessageType).mControlCable &&
+   if (cableSource == mUIOwner->GetLayoutControl(mControl, mMessageType).mControlCable &&
        (mPage == mUIOwner->GetPage() || mPageless))
    {
-      mUIControl = dynamic_cast<IUIControl*>(cable->GetTarget());
+      mUIControl = dynamic_cast<IUIControl*>(cableSource->GetTarget());
       return true;
    }
    return false;

@@ -68,12 +68,12 @@ PatchCable* PatchCableSource::AddPatchCable(IClickable* target)
    mPatchCables.push_back(cable);
    
    if (target)
-      SetPatchCableTarget(cable, target);
+      SetPatchCableTarget(cable, target, false);
    
    return cable;
 }
 
-void PatchCableSource::SetPatchCableTarget(PatchCable* cable, IClickable* target)
+void PatchCableSource::SetPatchCableTarget(PatchCable* cable, IClickable* target, bool fromUserClick)
 {
    IClickable* oldTarget = cable->GetTarget();
    
@@ -101,7 +101,7 @@ void PatchCableSource::SetPatchCableTarget(PatchCable* cable, IClickable* target
       TheSynth->ArrangeAudioSourceDependencies();
    }
    
-   mOwner->PostRepatch(this);
+   mOwner->PostRepatch(this, fromUserClick);
    
    //insert
    if (GetKeyModifiers() == kModifier_Shift)
@@ -402,7 +402,7 @@ void PatchCableSource::RemovePatchCable(PatchCable* cable)
    RemoveFromVector(dynamic_cast<INoteReceiver*>(cable->GetTarget()), mNoteReceivers);
    RemoveFromVector(dynamic_cast<IPulseReceiver*>(cable->GetTarget()), mPulseReceivers);
    RemoveFromVector(cable, mPatchCables);
-   mOwner->PostRepatch(this);
+   mOwner->PostRepatch(this, false);
    delete cable;
 }
 
@@ -419,7 +419,7 @@ void PatchCableSource::SetTarget(IClickable* target)
       if (mPatchCables.empty())
          AddPatchCable(target);
       else if (mPatchCables[0]->GetTarget() != target)
-         SetPatchCableTarget(mPatchCables[0], target);
+         SetPatchCableTarget(mPatchCables[0], target, false);
    }
    else
    {
@@ -476,10 +476,10 @@ void PatchCableSource::LoadState(FileStreamIn& in)
          }
       }
       mPatchCables[i] = new PatchCable(this);
-      SetPatchCableTarget(mPatchCables[i], target);
+      SetPatchCableTarget(mPatchCables[i], target, false);
    }
    
-   mOwner->PostRepatch(this);
+   mOwner->PostRepatch(this, false);
 }
 
 void NoteHistory::AddEvent(double time, bool on)

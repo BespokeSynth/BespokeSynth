@@ -43,7 +43,7 @@ void PressureToCV::DrawModule()
    mMaxSlider->Draw();
 }
 
-void PressureToCV::PostRepatch(PatchCableSource* cableSource)
+void PressureToCV::PostRepatch(PatchCableSource* cableSource, bool fromUserClick)
 {
    OnModulatorRepatch();
 }

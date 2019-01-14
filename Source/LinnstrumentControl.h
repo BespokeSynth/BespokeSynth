@@ -52,25 +52,6 @@ public:
    virtual void SetUpFromSaveData() override;
    
 private:
-   void InitController();
-   void BuildControllerList();
-   
-   void UpdateScaleDisplay();
-   void SendScaleInfo();
-   void SetGridColor(int x, int y, int color);
-   int GetGridColor(int x, int y);
-   int GridToPitch(int x, int y);
-   void SetPitchColor(int pitch, int color);
-   void SendNRPN(int param, int value);
-   
-   //IDrawableModule
-   void DrawModule() override;
-   bool Enabled() const override { return true; }
-   void GetModuleDimensions(int& w, int& h) override { w=190; h=58; }
-   
-   int mControllerIndex;
-   DropdownList* mControllerList;
-   
    enum LinnstrumentColor
    {
       kLinnColor_Off,
@@ -87,6 +68,25 @@ private:
       kLinnColor_Pink
    };
    
+   void InitController();
+   void BuildControllerList();
+   
+   void UpdateScaleDisplay();
+   void SendScaleInfo();
+   void SetGridColor(int x, int y, LinnstrumentColor color);
+   LinnstrumentColor GetGridColor(int x, int y);
+   int GridToPitch(int x, int y);
+   void SetPitchColor(int pitch, LinnstrumentColor color);
+   void SendNRPN(int param, int value);
+   
+   //IDrawableModule
+   void DrawModule() override;
+   bool Enabled() const override { return true; }
+   void GetModuleDimensions(int& w, int& h) override { w=190; h=7+17*4; }
+   
+   int mControllerIndex;
+   DropdownList* mControllerList;
+   
    struct NoteAge
    {
       NoteAge() { mTime = 0; mColor = 0; mVoiceIndex = -1; }
@@ -102,7 +102,11 @@ private:
    FloatSlider* mDecaySlider;
    bool mBlackout;
    Checkbox* mBlackoutCheckbox;
+   bool mLightOctaves;
+   Checkbox* mLightOctavesCheckbox;
    int mLinnstrumentOctave;
+   bool mGuitarLines;
+   Checkbox* mGuitarLinesCheckbox;
    
    int mLastReceivedNRPNParamMSB;
    int mLastReceivedNRPNParamLSB;

@@ -201,7 +201,7 @@ void EventCanvas::CanvasUpdated(Canvas* canvas)
       
    }
 }
-void EventCanvas::PostRepatch(PatchCableSource* cableSource)
+void EventCanvas::PostRepatch(PatchCableSource* cableSource, bool fromUserClick)
 {
    for (int i=0; i<mControlCables.size(); ++i)
    {

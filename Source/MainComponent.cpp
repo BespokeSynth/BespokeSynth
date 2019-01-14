@@ -35,7 +35,17 @@ public:
    {
       openGLContext.setOpenGLVersionRequired(juce::OpenGLContext::openGL3_2);
       
-      setSize(1280, 1024);
+      int width = 1280;
+      int height = 1024;
+      ofxJSONElement userPrefs;
+      bool loaded = userPrefs.open(ModularSynth::GetUserPrefsPath());
+      if (loaded)
+      {
+         width = userPrefs["width"].asInt();
+         height = userPrefs["height"].asInt();
+      }
+      
+      setSize(width, height);
       setWantsKeyboardFocus(true);
       Desktop::setScreenSaverEnabled(false);
    }

@@ -104,9 +104,9 @@ void NoteRouter::RadioButtonUpdated(RadioButton* radio, int oldVal)
    }
 }
 
-void NoteRouter::PostRepatch(PatchCableSource* cableSource)
+void NoteRouter::PostRepatch(PatchCableSource* cableSource, bool fromUserClick)
 {
-   INoteSource::PostRepatch(cableSource);
+   INoteSource::PostRepatch(cableSource, fromUserClick);
    for (auto cable : GetPatchCableSource()->GetPatchCables())
    {
       INoteReceiver* target = dynamic_cast<INoteReceiver*>(cable->GetTarget());

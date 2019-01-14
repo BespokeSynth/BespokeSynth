@@ -44,7 +44,7 @@ void PitchToSpeed::DrawModule()
    mReferenceFreqSlider->Draw();
 }
 
-void PitchToSpeed::PostRepatch(PatchCableSource* cableSource)
+void PitchToSpeed::PostRepatch(PatchCableSource* cableSource, bool fromUserClick)
 {
    OnModulatorRepatch();
 }

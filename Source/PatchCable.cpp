@@ -17,6 +17,8 @@
 #include "PatchCableSource.h"
 #include "MathUtils.h"
 #include "IPulseReceiver.h"
+#include "RadioButton.h"
+#include "MidiController.h"
 
 PatchCable* PatchCable::sActivePatchCable = nullptr;
 
@@ -24,6 +26,8 @@ PatchCable::PatchCable(PatchCableSource* owner)
 : mHovered(false)
 , mDragging(false)
 , mTarget(nullptr)
+, mTargetRadioButton(nullptr)
+, mUIControlConnection(nullptr)
 , mAudioReceiverTarget(nullptr)
 {
    mOwner = owner;
@@ -40,6 +44,7 @@ PatchCable::~PatchCable()
 void PatchCable::SetTarget(IClickable* target)
 {
    mTarget = target;
+   mTargetRadioButton = dynamic_cast<RadioButton*>(target);
    mAudioReceiverTarget = dynamic_cast<IAudioReceiver*>(target);
 }
    
@@ -299,36 +304,40 @@ void PatchCable::MouseReleased()
 {
    if (mDragging)
    {
-      PatchCablePos cable = GetPatchCablePos();
-      IClickable* potentialTarget = TheSynth->GetModuleAt(cable.end.x, cable.end.y);
-      if (potentialTarget && (GetConnectionType() == kConnectionType_UIControl || GetConnectionType() == kConnectionType_Grid))
+      ofVec2f mousePos(ofGetMouseX(), ofGetMouseY());
+      if ((mousePos - mGrabPos).distanceSquared() > 3)
       {
-         const auto& uicontrols = ((IDrawableModule*)potentialTarget)->GetUIControls();
-         for (auto uicontrol : uicontrols)
+         PatchCablePos cable = GetPatchCablePos();
+         IClickable* potentialTarget = TheSynth->GetModuleAt(cable.end.x, cable.end.y);
+         if (potentialTarget && (GetConnectionType() == kConnectionType_UIControl || GetConnectionType() == kConnectionType_Grid))
          {
-            if (uicontrol->IsShowing() == false || !IsValidTarget(uicontrol))
-               continue;
-            
-            int x,y,w,h;
-            uicontrol->GetPosition(x, y);
-            uicontrol->GetDimensions(w, h);
-            if (cable.end.x >= x && cable.end.y >= y && cable.end.x < x+w && cable.end.y < y+h)
+            const auto& uicontrols = ((IDrawableModule*)potentialTarget)->GetUIControls();
+            for (auto uicontrol : uicontrols)
             {
-               potentialTarget = uicontrol;
-               break;
+               if (uicontrol->IsShowing() == false || !IsValidTarget(uicontrol))
+                  continue;
+               
+               int x,y,w,h;
+               uicontrol->GetPosition(x, y);
+               uicontrol->GetDimensions(w, h);
+               if (cable.end.x >= x && cable.end.y >= y && cable.end.x < x+w && cable.end.y < y+h)
+               {
+                  potentialTarget = uicontrol;
+                  break;
+               }
             }
          }
+         if (mOwner->IsValidTarget(potentialTarget))
+            mOwner->SetPatchCableTarget(this, potentialTarget, true);
+         
+         mDragging = false;
+         mHovered = false;
+         if (sActivePatchCable == this)
+            sActivePatchCable = nullptr;
+         
+         if (mTarget == nullptr)
+            Destroy();
       }
-      if (mOwner->IsValidTarget(potentialTarget))
-         mOwner->SetPatchCableTarget(this, potentialTarget);
-      
-      mDragging = false;
-      mHovered = false;
-      if (sActivePatchCable == this)
-         sActivePatchCable = nullptr;
-      
-      if (mTarget == nullptr)
-         Destroy();
    }
 }
 
@@ -410,6 +419,13 @@ PatchCablePos PatchCable::GetPatchCablePos()
    ofVec2f endDirection;
    ofVec2f end = FindClosestSide(xThat,yThat-yThatAdjust,wThat,hThat+yThatAdjust, start, startDirection, endDirection);
    
+   if (mTargetRadioButton && mUIControlConnection && !mDragging)
+   {
+      mTarget->GetDimensions(wThat,hThat);
+      mTarget->GetPosition(xThat,yThat);
+      end = mTargetRadioButton->GetOptionPosition(mUIControlConnection->mValue);
+   }
+   
    ofVec2f plug = end + endDirection * 12;
    
    PatchCablePos cable;
@@ -459,9 +475,13 @@ ofVec2f PatchCable::FindClosestSide(int x, int y, int w, int h, ofVec2f start, o
 
 void PatchCable::Grab()
 {
-   mDragging = true;
-   sActivePatchCable = this;
-   mOwner->CableGrabbed();
+   if (!mDragging)
+   {
+      mDragging = true;
+      sActivePatchCable = this;
+      mGrabPos.set(ofGetMouseX(), ofGetMouseY());
+      mOwner->CableGrabbed();
+   }
 }
 
 IDrawableModule* PatchCable::GetOwningModule() const

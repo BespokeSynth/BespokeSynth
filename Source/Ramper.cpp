@@ -104,7 +104,7 @@ bool Ramper::MouseMoved(float x, float y)
    return false;
 }
 
-void Ramper::PostRepatch(PatchCableSource* cableSource)
+void Ramper::PostRepatch(PatchCableSource* cableSource, bool fromUserClick)
 {
    if (mControlCable->GetPatchCables().empty() == false)
    {

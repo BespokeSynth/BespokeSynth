@@ -36,7 +36,7 @@ void NoteToFreq::DrawModule()
       return;
 }
 
-void NoteToFreq::PostRepatch(PatchCableSource* cableSource)
+void NoteToFreq::PostRepatch(PatchCableSource* cableSource, bool fromUserClick)
 {
    OnModulatorRepatch();
 }

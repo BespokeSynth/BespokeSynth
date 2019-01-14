@@ -157,15 +157,16 @@ void ChannelBuffer::Save(FileStreamOut& out, int writeLength)
       out.Write(mBuffers[i], writeLength);
 }
 
-void ChannelBuffer::Load(FileStreamIn& in, int& readLength)
+void ChannelBuffer::Load(FileStreamIn& in, int& readLength, bool setBufferSize)
 {
    int rev;
    in >> rev;
    LoadStateValidate(rev == kSaveStateRev);
    
    in >> readLength;
-   mBufferSize = readLength;
+   if (setBufferSize)
+      mBufferSize = readLength;
    in >> mActiveChannels;
    for (int i=0; i<mActiveChannels; ++i)
-      in.Read(GetChannel(i), mBufferSize);
+      in.Read(GetChannel(i), readLength);
 }

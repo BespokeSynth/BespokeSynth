@@ -31,7 +31,7 @@ public:
    void Process(double time) override;
    
    //IPatchable
-   void PostRepatch(PatchCableSource* cableSource) override;
+   void PostRepatch(PatchCableSource* cableSource, bool fromUserClick) override;
 
    //IRadioButtonListener
    void RadioButtonUpdated(RadioButton* button, int oldVal) override;

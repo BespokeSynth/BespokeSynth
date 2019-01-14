@@ -300,7 +300,7 @@ void EnvelopeControl::MouseMoved(float x, float y)
             }
          }
          
-         stage.time = ofClamp(originalStage.time + (x - mClickStart.x)/mDimensions.x * mViewLength, 1, maxLength);
+         stage.time = ofClamp(originalStage.time + (x - mClickStart.x)/mDimensions.x * mViewLength, 0.001f, maxLength);
          
          if (mFixedLengthMode && mHighlightPoint < mAdsr->GetNumStages() - 1)
          {

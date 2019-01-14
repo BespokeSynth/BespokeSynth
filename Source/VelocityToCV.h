@@ -37,7 +37,7 @@ public:
    virtual bool Active() const override { return mEnabled; }
    
    //IPatchable
-   void PostRepatch(PatchCableSource* cableSource) override;
+   void PostRepatch(PatchCableSource* cableSource, bool fromUserClick) override;
    
    void FloatSliderUpdated(FloatSlider* slider, float oldVal) override {}
    

@@ -38,7 +38,9 @@ public:
    void SetUpFromSaveData() override;
    
    //IPatchable
-   void PostRepatch(PatchCableSource* cableSource) override;
+   void PostRepatch(PatchCableSource* cableSource, bool fromUserClick) override;
+   
+   void LoadPrefab(string loadPath);
    
 private:
    //IDrawableModule
@@ -48,7 +50,6 @@ private:
    void OnClicked(int x, int y, bool right) override;
    
    void SavePrefab(string savePath);
-   void LoadPrefab(string loadPath);
    
    PatchCableSource* mModuleCable;
    ClickButton* mSaveButton;

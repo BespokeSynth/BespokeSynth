@@ -91,9 +91,9 @@ void FeedbackModule::DrawModule()
    mDelay.Draw();
 }
 
-void FeedbackModule::PostRepatch(PatchCableSource* cable)
+void FeedbackModule::PostRepatch(PatchCableSource* cableSource, bool fromUserClick)
 {
-   if (cable == mFeedbackTargetCable)
+   if (cableSource == mFeedbackTargetCable)
    {
       mFeedbackTarget = mFeedbackTargetCable->GetAudioReceiver();
    }

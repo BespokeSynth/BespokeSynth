@@ -31,7 +31,7 @@ public:
    InputMode GetInputMode() override { return kInputMode_Mono; }
    void Process(double time) override;
    
-   void PostRepatch(PatchCableSource* cableSource) override;
+   void PostRepatch(PatchCableSource* cableSource, bool fromUserClick) override;
    
    //IModulator
    float Value(int samplesIn = 0) override;

@@ -42,7 +42,7 @@ void ValueSetter::DrawModule()
    mValueEntry->Draw();
 }
 
-void ValueSetter::PostRepatch(PatchCableSource* cableSource)
+void ValueSetter::PostRepatch(PatchCableSource* cableSource, bool fromUserClick)
 {
    mTarget = dynamic_cast<IUIControl*>(mControlCable->GetTarget());
 }

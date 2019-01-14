@@ -106,7 +106,7 @@ void NoteChainNode::OnTransportAdvanced(float amount)
    }
 }
 
-void NoteChainNode::PostRepatch(PatchCableSource* cable)
+void NoteChainNode::PostRepatch(PatchCableSource* cableSource, bool fromUserClick)
 {
 }
 

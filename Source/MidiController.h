@@ -137,7 +137,7 @@ struct UIControlConnection
    void DrawList(int index);
    void DrawLayout();
    void SetShowing(bool enabled);
-   bool PostRepatch(PatchCableSource* cable);
+   bool PostRepatch(PatchCableSource* cableSource, bool fromUserClick);
    
    int mControl;
    IUIControl* mUIControl;
@@ -281,9 +281,9 @@ public:
    void RadioButtonUpdated(RadioButton* radio, int oldVal) override;
    void TextEntryActivated(TextEntry* entry) override;
    void TextEntryComplete(TextEntry* entry) override;
-   void PreRepatch(PatchCableSource* cable) override;
-   void PostRepatch(PatchCableSource* cable) override;
-   void OnCableGrabbed(PatchCableSource* cable) override;
+   void PreRepatch(PatchCableSource* cableSource) override;
+   void PostRepatch(PatchCableSource* cableSource, bool fromUserClick) override;
+   void OnCableGrabbed(PatchCableSource* cableSource) override;
    
    ControlLayoutElement& GetLayoutControl(int control, MidiMessageType type);
    

@@ -35,7 +35,7 @@ public:
    void Resize(int bufferSize);
    
    void Save(FileStreamOut& out, int writeLength);
-   void Load(FileStreamIn& in, int &readLength);
+   void Load(FileStreamIn& in, int &readLength, bool setBufferSize);
    
    static const int kMaxNumChannels = 2;
    

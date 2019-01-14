@@ -34,7 +34,7 @@ public:
    void OnTimeEvent(int samplesTo) override;
    void OnTransportAdvanced(float amount) override;
    
-   void PostRepatch(PatchCableSource* cable) override;
+   void PostRepatch(PatchCableSource* cableSource, bool fromUserClick) override;
    
    void CheckboxUpdated(Checkbox* checkbox) override;
    void ButtonClicked(ClickButton* button) override;

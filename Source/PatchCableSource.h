@@ -81,7 +81,7 @@ public:
    void SetManualPosition(int x, int y) { mManualPositionX = x; mManualPositionY = y; mAutomaticPositioning = false; }
    void RemovePatchCable(PatchCable* cable);
    void ClearPatchCables();
-   void SetPatchCableTarget(PatchCable* cable, IClickable* target);
+   void SetPatchCableTarget(PatchCable* cable, IClickable* target, bool fromUserClick);
    const vector<INoteReceiver*>& GetNoteReceivers() const { return mNoteReceivers; }
    const vector<IPulseReceiver*>& GetPulseReceivers() const { return mPulseReceivers; }
    IAudioReceiver* GetAudioReceiver() const { return mAudioReceiver; }

@@ -27,7 +27,7 @@ public:
    
    void SetEnabled(bool enabled) override { mEnabled = enabled; }
    
-   void PostRepatch(PatchCableSource* cableSource) override;
+   void PostRepatch(PatchCableSource* cableSource, bool fromUserClick) override;
    
    //IModulator
    float Value(int samplesIn = 0) override;

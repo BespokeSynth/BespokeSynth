@@ -43,7 +43,7 @@ void ModWheelToCV::DrawModule()
    mMaxSlider->Draw();
 }
 
-void ModWheelToCV::PostRepatch(PatchCableSource* cableSource)
+void ModWheelToCV::PostRepatch(PatchCableSource* cableSource, bool fromUserClick)
 {
    OnModulatorRepatch();
 }

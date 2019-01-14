@@ -210,7 +210,7 @@ void RadioSequencer::GridUpdated(UIGrid* grid, int col, int row, float value, fl
    }
 }
 
-void RadioSequencer::PostRepatch(PatchCableSource* cableSource)
+void RadioSequencer::PostRepatch(PatchCableSource* cableSource, bool fromUserClick)
 {
 }
 

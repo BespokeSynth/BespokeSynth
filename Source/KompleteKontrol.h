@@ -34,7 +34,7 @@ public:
    
    void Poll() override;
    void Exit() override;
-   void PostRepatch(PatchCableSource* cable) override;
+   void PostRepatch(PatchCableSource* cableSource, bool fromUserClick) override;
    
    //INoteReceiver
    void PlayNote(double time, int pitch, int velocity, int voiceIdx = -1, ModulationParameters modulation = ModulationParameters()) override;

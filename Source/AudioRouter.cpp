@@ -65,7 +65,7 @@ void AudioRouter::DrawModule()
    mRouteSelector->Draw();
 }
 
-void AudioRouter::PostRepatch(PatchCableSource* cableSource)
+void AudioRouter::PostRepatch(PatchCableSource* cableSource, bool fromUserClick)
 {
    IAudioReceiver* target = GetPatchCableSource()->GetAudioReceiver();
    if (target && !VectorContains(target, mReceivers))

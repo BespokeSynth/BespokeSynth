@@ -45,7 +45,7 @@ void ModulatorMult::DrawModule()
    mValue2Slider->Draw();
 }
 
-void ModulatorMult::PostRepatch(PatchCableSource* cableSource)
+void ModulatorMult::PostRepatch(PatchCableSource* cableSource, bool fromUserClick)
 {
    OnModulatorRepatch();
    

@@ -65,7 +65,7 @@ public:
    void KeyPressed(int key, bool isRepeat) override;
    void Poll() override;
    void PreRepatch(PatchCableSource* cableSource) override;
-   void PostRepatch(PatchCableSource* cableSource) override;
+   void PostRepatch(PatchCableSource* cableSource, bool fromUserClick) override;
 
    void ButtonClicked(ClickButton* button) override;
    void CheckboxUpdated(Checkbox* checkbox) override;
@@ -126,6 +126,8 @@ private:
    ChannelBuffer mWriteBuffer;
    Looper* mCommitToLooper;
    vector<PatchCableSource*> mLooperPatchCables;
+   double mBarRecordTime;
+   ClickButton* mBarRecordButton;
    
    bool mFreeRecording;
    Checkbox* mFreeRecordingCheckbox;

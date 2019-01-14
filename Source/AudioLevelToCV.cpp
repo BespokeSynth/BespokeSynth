@@ -106,7 +106,7 @@ void AudioLevelToCV::Process(double time)
    GetBuffer()->Reset();
 }
 
-void AudioLevelToCV::PostRepatch(PatchCableSource* cableSource)
+void AudioLevelToCV::PostRepatch(PatchCableSource* cableSource, bool fromUserClick)
 {
    OnModulatorRepatch();
 }

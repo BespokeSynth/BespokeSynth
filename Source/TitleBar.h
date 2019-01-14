@@ -23,7 +23,7 @@ class SpawnList
 {
 public:
    SpawnList(TitleBar* owner, int x, int y, string label);
-   void SetList(vector<string> spawnables, bool vstList);
+   void SetList(vector<string> spawnables, string overrideModuleType);
    void OnSelection(DropdownList* list);
    void SetPosition(int x, int y);
    void SetPositionRelativeTo(SpawnList* list);
@@ -37,7 +37,7 @@ private:
    DropdownList* mSpawnList;
    TitleBar* mOwner;
    ofVec2f mPos;
-   bool mVstList;
+   string mOverrideModuleType;
 };
 
 class TitleBar : public IDrawableModule, public IDropdownListener, public IButtonListener, public IFloatSliderListener
@@ -77,6 +77,7 @@ private:
    SpawnList mModulatorModules;
    SpawnList mOtherModules;
    SpawnList mVstPlugins;
+   SpawnList mPrefabs;
    
    ClickButton* mSaveLayoutButton;
    ClickButton* mResetLayoutButton;

@@ -38,7 +38,7 @@ void GroupControl::DrawModule()
    mGroupCheckbox->Draw();
 }
 
-void GroupControl::PostRepatch(PatchCableSource* cableSource)
+void GroupControl::PostRepatch(PatchCableSource* cableSource, bool fromUserClick)
 {
    for (int i=0; i<mControlCables.size(); ++i)
    {

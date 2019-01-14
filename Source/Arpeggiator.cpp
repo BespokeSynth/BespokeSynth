@@ -17,7 +17,7 @@
 #define ARP_HOLD -101
 
 Arpeggiator::Arpeggiator()
-: mUseHeldNotes(false)
+: mUseHeldNotes(true)
 , mInterval(kInterval_16n)
 , mArpIndex(-1)
 , mRestartOnPress(true)
@@ -50,6 +50,9 @@ Arpeggiator::Arpeggiator()
 , mUpbeatsCheckbox(nullptr)
 , mPlayOnlyScaleNotes(false)
 , mPlayOnlyScaleNotesCheckbox(nullptr)
+, mCurrentOctaveOffset(0)
+, mOctaveRepeats(1)
+, mOctaveRepeatsSlider(nullptr)
 {
    TheTransport->AddListener(this, mInterval);
    TheScale->AddListener(this);
@@ -71,6 +74,7 @@ void Arpeggiator::CreateUIControls()
    mRandomRestCheckbox = new Checkbox(this,"r rests",130,66,&mRandomRest);
    mRandomHoldCheckbox = new Checkbox(this,"r holds",130,84,&mRandomHold);
    mArpStepSlider = new IntSlider(this,"step",140,2,60,12,&mArpStep,-3,3);
+   mOctaveRepeatsSlider = new IntSlider(this,"octaves",mArpStepSlider,kAnchor_Below,60,12,&mOctaveRepeats,1,4);
    mResetOnDownbeatCheckbox = new Checkbox(this,"downbeat",5,100,&mResetOnDownbeat);
    mGrid = new UIGrid(5,120,230,100,8,24);
    mViewGridCheckbox = new Checkbox(this,"view grid",90,102,&mViewGrid);
@@ -123,6 +127,7 @@ void Arpeggiator::DrawModule()
    mRandomHoldCheckbox->Draw();
    mRestartOnPressCheckbox->Draw();
    mArpStepSlider->Draw();
+   mOctaveRepeatsSlider->Draw();
    mResetOnDownbeatCheckbox->Draw();
    mUpbeatsCheckbox->Draw();
    mPlayOnlyScaleNotesCheckbox->Draw();
@@ -351,7 +356,10 @@ void Arpeggiator::OnTimeEvent(int samplesTo)
       if (mChord.size() > 0)
       {
          while (mArpIndex >= (int)mChord.size())
+         {
             mArpIndex -= mChord.size();
+            mCurrentOctaveOffset = (mCurrentOctaveOffset + 1) % mOctaveRepeats;
+         }
          while (mArpIndex <0)
             mArpIndex += mChord.size();
       }
@@ -405,6 +413,8 @@ void Arpeggiator::OnTimeEvent(int samplesTo)
          
          if (mUseHeldNotes && !mPlayOnlyScaleNotes)
             outPitch = nonDiatonicPitch;
+         
+         outPitch += mCurrentOctaveOffset * TheScale->GetTet();
 
          if (mLastPitch == outPitch && mRepeatIsHold)
          {
@@ -459,6 +469,9 @@ void Arpeggiator::TextEntryComplete(TextEntry* entry)
 
 void Arpeggiator::GenerateRandomArpeggio()
 {
+   if (mUseHeldNotes)
+      return;
+   
    mChordMutex.lock();
    mChord.clear();
    mChord.push_back(ArpNote(12,80,-1,ModulationParameters()));
