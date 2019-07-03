@@ -149,11 +149,11 @@ static const unsigned char temp_binary_data_2[] =
 const char* version = (const char*) temp_binary_data_2;
 
 
-const char* getNamedResource (const char* resourceNameUTF8, int& numBytes)
+const char* getNamedResource (const char*, int&) throw();
+const char* getNamedResource (const char* resourceNameUTF8, int& numBytes) throw()
 {
     unsigned int hash = 0;
-
-    if (resourceNameUTF8 != nullptr)
+    if (resourceNameUTF8 != 0)
         while (*resourceNameUTF8 != 0)
             hash = 31 * hash + (unsigned int) *resourceNameUTF8++;
 
@@ -166,7 +166,7 @@ const char* getNamedResource (const char* resourceNameUTF8, int& numBytes)
     }
 
     numBytes = 0;
-    return nullptr;
+    return 0;
 }
 
 const char* namedResourceList[] =
@@ -175,23 +175,5 @@ const char* namedResourceList[] =
     "README_txt",
     "version"
 };
-
-const char* originalFilenames[] =
-{
-    "sconscript",
-    "README.txt",
-    "version"
-};
-
-const char* getNamedResourceOriginalFilename (const char* resourceNameUTF8)
-{
-    for (unsigned int i = 0; i < (sizeof (namedResourceList) / sizeof (namedResourceList[0])); ++i)
-    {
-        if (namedResourceList[i] == resourceNameUTF8)
-            return originalFilenames[i];
-    }
-
-    return nullptr;
-}
 
 }

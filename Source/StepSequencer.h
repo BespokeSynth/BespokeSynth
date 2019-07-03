@@ -23,6 +23,7 @@
 #include "SynthGlobals.h"
 
 #define NUM_STEPSEQ_ROWS 16
+#define META_STEP_MAX 64
 
 class StepSequencer;
 
@@ -106,6 +107,8 @@ public:
    //IClickable
    void MouseReleased() override;
    bool MouseMoved(float x, float y) override;
+   
+   bool IsMetaStepActive(int col, int row);
 
    void CheckboxUpdated(Checkbox* checkbox) override;
    void FloatSliderUpdated(FloatSlider* slider, float oldVal) override;
@@ -126,14 +129,27 @@ private:
    void GetModuleDimensions(int& width, int& height) override;
    void OnClicked(int x, int y, bool right) override;
    void Exit() override;
+   void KeyPressed(int key, bool isRepeat) override;
    
    void UpdateLights();
+   void UpdateVelocityLights();
+   void UpdateMetaLights();
    
    void DrawRowLabel(const char* label, int row, int x, int y);
    void SetPreset(int preset);
    int GetNumSteps(NoteInterval interval) const;
    Vec2i ControllerToGrid(const Vec2i& controller);
    int GetNumControllerChunks(); //how many vertical chunks of the sequence are there to fit multi-rowed on the controller?
+   int GetMetaStep();
+   int GetMetaStepMaskIndex(int col, int row) { return MIN(col, META_STEP_MAX-1) + row * META_STEP_MAX; }
+   
+   struct HeldButton
+   {
+      HeldButton(int col, int row) { mCol = col; mRow = row; mTime = gTime; }
+      int mCol;
+      int mRow;
+      double mTime;
+   };
    
    UIGrid* mGrid;
    float mStrength;
@@ -156,18 +172,20 @@ private:
    NoteInterval mRepeatRate;
    DropdownList* mRepeatRateDropdown;
    NoteRepeat* mNoteRepeats[NUM_STEPSEQ_ROWS];
-   int mHeldRow;
-   int mHeldCol;
    int mNumRows;
    int mNumMeasures;
    NoteInterval mStepInterval;
    DropdownList* mStepIntervalDropdown;
    GridController* mGridController;
+   GridController* mVelocityGridController;
+   GridController* mMetaStepGridController;
    int mCurrentColumn;
    IntSlider* mCurrentColumnSlider;
    StepSequencerNoteFlusher mFlusher;
    ClickButton* mShiftLeftButton;
    ClickButton* mShiftRightButton;
+   std::list<HeldButton> mHeldButtons;
+   uint32* mMetaStepMasks;
 };
 
 

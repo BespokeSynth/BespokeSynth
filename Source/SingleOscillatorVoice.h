@@ -23,7 +23,7 @@
 class OscillatorVoiceParams : public IVoiceParams
 {
 public:
-   ADSR mAdsr;
+   ::ADSR mAdsr;
    float mVol;
    float mPulseWidth;
    bool mSync;
@@ -38,7 +38,7 @@ public:
    
    float mFilterCutoff;
    float mFilterQ;
-   ADSR mFilterAdsr;
+   ::ADSR mFilterAdsr;
 };
 
 class SingleOscillatorVoice : public IMidiVoice
@@ -66,11 +66,11 @@ private:
       float mDetuneFactor;
    };
    OscData mOscData[kMaxUnison];
-   ADSR mAdsr;
+   ::ADSR mAdsr;
    OscillatorVoiceParams* mVoiceParams;
    double mStartTime;
    
-   ADSR mFilterAdsr;
+   ::ADSR mFilterAdsr;
    BiquadFilter mFilterLeft;
    BiquadFilter mFilterRight;
    bool mUseFilter;

@@ -283,8 +283,8 @@ void EnvelopeControl::MouseMoved(float x, float y)
    {
       if (mHighlightPoint != -1)
       {
-         ADSR::Stage& stage = mAdsr->GetStageData(mHighlightPoint);
-         ADSR::Stage& originalStage = mClickAdsr.GetStageData(mHighlightPoint);
+         ::ADSR::Stage& stage = mAdsr->GetStageData(mHighlightPoint);
+         ::ADSR::Stage& originalStage = mClickAdsr.GetStageData(mHighlightPoint);
          
          float maxLength = 10000;
          if (mFixedLengthMode)
@@ -316,8 +316,8 @@ void EnvelopeControl::MouseMoved(float x, float y)
       
       if (mHighlightCurve != -1)
       {
-         ADSR::Stage& stage = mAdsr->GetStageData(mHighlightCurve);
-         ADSR::Stage& originalStage = mClickAdsr.GetStageData(mHighlightCurve);
+         ::ADSR::Stage& stage = mAdsr->GetStageData(mHighlightCurve);
+         ::ADSR::Stage& originalStage = mClickAdsr.GetStageData(mHighlightCurve);
          
          stage.curve = ofClamp(originalStage.curve + ((mClickStart.y - y) / mDimensions.y), -1, 1);
       }

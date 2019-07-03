@@ -525,7 +525,7 @@ void ModularSynth::MouseMoved(int intX, int intY )
             if (mMoveModule->GetPatchCableSource() && mMoveModule->GetPatchCableSource()->GetTarget() == nullptr && module->HasTitleBar())
             {
                ofRectangle titleBarRect(module->GetPosition().x, module->GetPosition().y - IDrawableModule::TitleBarHeight(), module->IClickable::GetDimensions().x, IDrawableModule::TitleBarHeight());
-               if (titleBarRect.inside(mMoveModule->GetPatchCableSource()->GetPosition().x, mMoveModule->GetPatchCableSource()->GetPosition().y))
+               if (titleBarRect.contains(mMoveModule->GetPatchCableSource()->GetPosition().x, mMoveModule->GetPatchCableSource()->GetPosition().y))
                {
                   mMoveModule->GetPatchCableSource()->FindValidTargets();
                   if (mMoveModule->GetPatchCableSource()->IsValidTarget(module))

@@ -2,7 +2,7 @@
 
 <JUCERPROJECT id="vxkFwd" name="BespokeSynth" projectType="guiapp" version="1.0.0"
               bundleIdentifier="com.ryanchallinor.Bespoke" includeBinaryInAppConfig="1"
-              jucerVersion="5.4.1" displaySplashScreen="1" reportAppUsage="1"
+              jucerVersion="5.2.0" displaySplashScreen="1" reportAppUsage="1"
               splashScreenColour="Dark" cppLanguageStandard="11" companyCopyright="">
   <MAINGROUP id="w4HLAu" name="BespokeSynth">
     <GROUP id="{531CC336-D9CD-1F6E-7272-2D8ADD98F839}" name="libraries">
@@ -155,6 +155,12 @@
         <FILE id="RG4zGd" name="TremoloEffect.h" compile="0" resource="0" file="Source/TremoloEffect.h"/>
       </GROUP>
       <GROUP id="{6781AC07-A090-A7AF-8D27-BCB6D9526ABD}" name="modules">
+        <FILE id="DJDuWF" name="SampleLayerer.cpp" compile="1" resource="0"
+              file="Source/SampleLayerer.cpp"/>
+        <FILE id="IPXlNa" name="SampleLayerer.h" compile="0" resource="0" file="Source/SampleLayerer.h"/>
+        <FILE id="JzszH3" name="MidiCapturer.cpp" compile="1" resource="0"
+              file="Source/MidiCapturer.cpp"/>
+        <FILE id="F6XNXz" name="MidiCapturer.h" compile="0" resource="0" file="Source/MidiCapturer.h"/>
         <FILE id="F2adWe" name="MultitapDelay.cpp" compile="1" resource="0"
               file="Source/MultitapDelay.cpp"/>
         <FILE id="ToonTS" name="MultitapDelay.h" compile="0" resource="0" file="Source/MultitapDelay.h"/>
@@ -865,7 +871,7 @@
   </MAINGROUP>
   <EXPORTFORMATS>
     <XCODE_MAC targetFolder="Builds/MacOSX" vstFolder="~/SDKs/vstsdk2.4" extraDefs="BESPOKE_MAC"
-               microphonePermissionNeeded="1">
+               microphonePermissionNeeded="1" vstLegacyFolder="~/SDKs/VST_SDK/VST2_SDK">
       <CONFIGURATIONS>
         <CONFIGURATION name="Debug" isDebug="1" optimisation="1" targetName="Bespoke"
                        headerPath="../../Source/json/include" enablePluginBinaryCopyStep="1"/>
@@ -937,8 +943,7 @@
     <MODULE id="juce_osc" showAllCode="1" useLocalCopy="0"/>
     <MODULE id="juce_video" showAllCode="1" useLocalCopy="0"/>
   </MODULES>
-  <JUCEOPTIONS JUCE_USE_MP3AUDIOFORMAT="1" JUCE_PLUGINHOST_VST="1" JUCE_PLUGINHOST_VST3="1"
-               JUCE_PLUGINHOST_AU="1"/>
+  <JUCEOPTIONS/>
   <LIVE_SETTINGS>
     <OSX headerPath="" systemHeaderPath=""/>
     <WINDOWS headerPath="" systemHeaderPath="&#10;"/>

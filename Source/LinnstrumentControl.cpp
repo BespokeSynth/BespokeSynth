@@ -31,6 +31,7 @@ LinnstrumentControl::LinnstrumentControl()
 , mLinnstrumentOctave(5)
 , mGuitarLines(false)
 , mGuitarLinesCheckbox(nullptr)
+, mControlPlayedLights(false)
 {
    TheScale->AddListener(this);
 }
@@ -293,7 +294,8 @@ void LinnstrumentControl::PlayNote(double time, int pitch, int velocity, int voi
 
 void LinnstrumentControl::OnMidiNote(MidiNote& note)
 {
-   mDevice.SendNote(note.mPitch, 0, false, note.mChannel); //don't allow linnstrument to light played notes
+   if (mControlPlayedLights)
+      mDevice.SendNote(note.mPitch, 0, false, note.mChannel); //don't allow linnstrument to light played notes
 }
 
 void LinnstrumentControl::OnMidiControl(MidiControl& control)
@@ -359,6 +361,9 @@ void LinnstrumentControl::SetUpFromSaveData()
 
 void LinnstrumentControl::NoteAge::Update(int pitch, LinnstrumentControl* linnstrument)
 {
+   if (!linnstrument->mControlPlayedLights)
+      return;
+   
    float age = gTime - mTime;
    LinnstrumentColor newColor;
    if (mTime < 0 || age < 0)

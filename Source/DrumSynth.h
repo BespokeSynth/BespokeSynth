@@ -73,7 +73,7 @@ private:
       
       EnvOscillator mTone;
       EnvOscillator mNoise;
-      ADSR mFreqAdsr;
+      ::ADSR mFreqAdsr;
       float mFreq;
       float mVol;
       float mVolNoise;

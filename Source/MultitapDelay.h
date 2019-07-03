@@ -100,7 +100,7 @@ private:
       ModulationChain* mPressure;
       ModulationChain* mModWheel;
       
-      ADSR mADSR;
+      ::ADSR mADSR;
    
       MultitapDelay* mOwner;
    };

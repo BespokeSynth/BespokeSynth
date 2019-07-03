@@ -30,7 +30,7 @@ void Chorder::CreateUIControls()
 {
    IDrawableModule::CreateUIControls();
    
-   mChordGrid = new UIGrid(2,2,130,50,mDiatonic ? 7 : 12,3);
+   mChordGrid = new UIGrid(2,2,130,50,mDiatonic ? 7 : 12,3, this);
    mChordGrid->SetVal(0, 1, 1);
    mChordGrid->SetListener(this);
    

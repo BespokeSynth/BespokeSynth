@@ -55,7 +55,7 @@ void KeyboardDisplay::OnClicked(int x, int y, bool right)
          for (int i=0;i<NumKeys();++i)
          {
             bool isBlackKey;
-            if (GetKeyboardKeyRect(i+RootKey(), mWidth, mHeight - kKeyboardYOffset, isBlackKey).inside(x,y - kKeyboardYOffset))
+            if (GetKeyboardKeyRect(i+RootKey(), mWidth, mHeight - kKeyboardYOffset, isBlackKey).contains(x,y - kKeyboardYOffset))
             {
                if ((pass == 0 && isBlackKey) || (pass == 1 && !isBlackKey))
                {

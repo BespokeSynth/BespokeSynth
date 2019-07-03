@@ -71,7 +71,7 @@ public:
 private:
    float mOscPhase;
    EnvOscillator mOsc;
-   ADSR mEnv;
+   ::ADSR mEnv;
    KarplusStrongVoiceParams* mVoiceParams;
    RollingBuffer mBuffer;
    float mFilterSample;

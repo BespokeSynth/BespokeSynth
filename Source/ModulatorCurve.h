@@ -59,7 +59,7 @@ private:
    
    float mInput;
    EnvelopeControl mEnvelopeControl;
-   ADSR mAdsr;
+   ::ADSR mAdsr;
    
    FloatSlider* mInputSlider;
 };

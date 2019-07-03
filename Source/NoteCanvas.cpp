@@ -47,7 +47,7 @@ void NoteCanvas::CreateUIControls()
    IDrawableModule::CreateUIControls();
    
    mQuantizeButton = new ClickButton(this,"quantize",160,5);
-   mClipButton = new ClickButton(this,"clip",220,5);
+   //mClipButton = new ClickButton(this,"clip",220,5);
    mPlayCheckbox = new Checkbox(this,"play",5,5,&mPlay);
    mRecordCheckbox = new Checkbox(this,"rec",50,5,&mRecord);
    mFreeRecordCheckbox = new Checkbox(this,"free rec",90,5,&mFreeRecord);
@@ -119,6 +119,35 @@ void NoteCanvas::PlayNote(double time, int pitch, int velocity, int voiceIdx, Mo
       mCanvas->AddElement(element);
       
       mCanvas->SetRowOffset(element->mRow - mCanvas->GetNumVisibleRows()/2);
+   }
+}
+
+void NoteCanvas::KeyPressed(int key, bool isRepeat)
+{
+   if (TheSynth->GetLastClickedModule() == this)
+   {
+      if (key == OF_KEY_UP || key == OF_KEY_DOWN || key == OF_KEY_RIGHT || key == OF_KEY_LEFT)
+      {
+         int directionUpDown = 0;
+         int directionLeftRight = 0;
+         if (key == OF_KEY_UP)
+            directionUpDown = -1;
+         if (key == OF_KEY_DOWN)
+            directionUpDown = 1;
+         if (key == OF_KEY_LEFT)
+            directionLeftRight = -1;
+         if (key == OF_KEY_RIGHT)
+            directionLeftRight = 1;
+         
+         for (auto element : mCanvas->GetElements())
+         {
+            if (element->GetHighlighted())
+            {
+               element->mRow = ofClamp(element->mRow + directionUpDown, 0, 127);
+               element->mCol = ofClamp(element->mCol + directionLeftRight, 0, mCanvas->GetNumCols()-1);
+            }
+         }
+      }
    }
 }
 
@@ -240,7 +269,6 @@ void NoteCanvas::CanvasUpdated(Canvas* canvas)
 
 void NoteCanvas::DrawModule()
 {
-
    if (Minimized() || IsVisible() == false)
       return;
    
@@ -267,7 +295,7 @@ void NoteCanvas::DrawModule()
    mCanvas->Draw();
    mCanvasControls->Draw();
    mQuantizeButton->Draw();
-   mClipButton->Draw();
+   //mClipButton->Draw();
    mPlayCheckbox->Draw();
    mRecordCheckbox->Draw();
    mFreeRecordCheckbox->Draw();

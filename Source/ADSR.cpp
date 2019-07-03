@@ -12,7 +12,7 @@
 #include "FileStream.h"
 #include "SynthGlobals.h"
 
-void ADSR::Set(float a, float d, float s, float r, float h /*=-1*/)
+void ::ADSR::Set(float a, float d, float s, float r, float h /*=-1*/)
 {
    mStages[0].target = 1;
    mStages[0].time = MAX(a,1);
@@ -29,7 +29,7 @@ void ADSR::Set(float a, float d, float s, float r, float h /*=-1*/)
    mHasSustainStage = true;
 }
 
-void ADSR::Set(const ADSR& other)
+void ::ADSR::Set(const ADSR& other)
 {
    for (int i=0; i<other.mNumStages; ++i)
       mStages[i] = other.mStages[i];
@@ -40,19 +40,19 @@ void ADSR::Set(const ADSR& other)
    mFreeReleaseLevel = other.mFreeReleaseLevel;
 }
 
-void ADSR::Start(double time, float target, float a, float d, float s, float r)
+void ::ADSR::Start(double time, float target, float a, float d, float s, float r)
 {
    Set(a,d,s,r);
    Start(time, target);
 }
 
-void ADSR::Start(double time, float target, const ADSR& adsr)
+void ::ADSR::Start(double time, float target, const ADSR& adsr)
 {
    Set(adsr);
    Start(time, target);
 }
 
-void ADSR::Start(double time, float target)
+void ::ADSR::Start(double time, float target)
 {
    mStartBlendFromValue = Value(time);
    mStartTime = time;
@@ -72,7 +72,7 @@ void ADSR::Start(double time, float target)
    }
 }
 
-void ADSR::Stop(double time)
+void ::ADSR::Stop(double time)
 {
    if (mStopTime > mStartTime) //already stopped
       return;
@@ -80,7 +80,7 @@ void ADSR::Stop(double time)
    mStopTime = time;
 }
 
-float ADSR::Value(double time) const
+float ::ADSR::Value(double time) const
 {
    //if (mStartTime < 0)
    //   return 0;
@@ -108,7 +108,7 @@ float ADSR::Value(double time) const
    return ofLerp(stageStartValue, mStages[stage].target * mMult, lerp);
 }
 
-int ADSR::GetStage(double time, double& stageStartTimeOut) const
+int ::ADSR::GetStage(double time, double& stageStartTimeOut) const
 {
    if (time < mStartTime || mStartTime < 0)
       return mNumStages;
@@ -133,13 +133,13 @@ int ADSR::GetStage(double time, double& stageStartTimeOut) const
    return stage;
 }
 
-bool ADSR::IsDone(double time) const
+bool ::ADSR::IsDone(double time) const
 {
    double dummy;
    return GetStage(time, dummy) == mNumStages;
 }
 
-int ADSR::GetStageForTime(double time) const
+int ::ADSR::GetStageForTime(double time) const
 {
    double dummy;
    return GetStage(time, dummy);
@@ -150,7 +150,7 @@ namespace
    const int kSaveStateRev = 0;
 }
 
-void ADSR::SaveState(FileStreamOut& out)
+void ::ADSR::SaveState(FileStreamOut& out)
 {
    out << kSaveStateRev;
    
@@ -169,7 +169,7 @@ void ADSR::SaveState(FileStreamOut& out)
    }
 }
 
-void ADSR::LoadState(FileStreamIn& in)
+void ::ADSR::LoadState(FileStreamIn& in)
 {
    int rev;
    in >> rev;

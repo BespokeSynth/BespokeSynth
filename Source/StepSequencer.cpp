@@ -13,6 +13,11 @@
 #include "ModularSynth.h"
 #include "MidiController.h"
 
+namespace
+{
+   const int kMetaStepLoop = 8;
+}
+
 StepSequencer::StepSequencer()
 : mGrid(nullptr)
 , mStrength(1)
@@ -29,8 +34,6 @@ StepSequencer::StepSequencer()
 , mAdjustOffsetsCheckbox(nullptr)
 , mRepeatRate(kInterval_None)
 , mRepeatRateDropdown(nullptr)
-, mHeldRow(-1)
-, mHeldCol(-1)
 , mStepInterval(kInterval_16n)
 , mStepIntervalDropdown(nullptr)
 , mUseStrengthSliderCheckbox(nullptr)
@@ -43,12 +46,16 @@ StepSequencer::StepSequencer()
 {
    TheTransport->AddListener(this, mStepInterval);
    mFlusher.SetInterval(mStepInterval);
+   
+   mMetaStepMasks = new uint32[META_STEP_MAX * NUM_STEPSEQ_ROWS];
+   for (int i=0; i<META_STEP_MAX * NUM_STEPSEQ_ROWS; ++i)
+      mMetaStepMasks[i] = 0xff;
 }
 
 void StepSequencer::CreateUIControls()
 {
    IDrawableModule::CreateUIControls();
-   mGrid = new UIGrid(40,45,180,150,16,NUM_STEPSEQ_ROWS);
+   mGrid = new UIGrid(40,45,180,150,16,NUM_STEPSEQ_ROWS, this);
    mStrengthSlider = new FloatSlider(this,"str",75,22,50,15,&mStrength,0,1,2);
    mUseStrengthSliderCheckbox = new Checkbox(this,"use str",128,22,&mUseStrengthSlider);
    mStochasticCheckbox = new Checkbox(this,"stch",145,22,&mStochasticMode);
@@ -61,6 +68,8 @@ void StepSequencer::CreateUIControls()
    mShiftLeftButton = new ClickButton(this,"<",80,4);
    mShiftRightButton = new ClickButton(this,">",100,4);
    mGridController = new GridController(this,"grid",240,4);
+   mVelocityGridController = new GridController(this,"velocity",240,16);
+   mMetaStepGridController = new GridController(this,"metastep",240,28);
    
    mGrid->SetMajorColSize(4);
    mGrid->SetFlip(true);
@@ -120,6 +129,8 @@ StepSequencer::~StepSequencer()
       delete mRows[i];
       delete mNoteRepeats[i];
    }
+   
+   delete[] mMetaStepMasks;
 }
 
 void StepSequencer::Init()
@@ -198,6 +209,57 @@ void StepSequencer::UpdateLights()
    }
 }
 
+void StepSequencer::UpdateVelocityLights()
+{
+   if (mVelocityGridController == nullptr)
+      return;
+   
+   float stepVelocity = 0;
+   if (mHeldButtons.size() > 0)
+      stepVelocity = mGrid->GetVal(mHeldButtons.begin()->mCol, mHeldButtons.begin()->mRow);
+   
+   for (int x=0; x<mVelocityGridController->NumCols(); ++x)
+   {
+      for (int y=0; y<mVelocityGridController->NumRows(); ++y)
+      {
+         GridColor color;
+         if (stepVelocity >= (8 - y) / 8.0f)
+            color = kGridColor2Bright;
+         else
+            color = kGridColorOff;
+         
+         mVelocityGridController->SetLight(x, y, color);
+      }
+   }
+}
+
+void StepSequencer::UpdateMetaLights()
+{
+   if (mMetaStepGridController == nullptr)
+      return;
+   
+   bool hasHeldButtons = mHeldButtons.size() > 0;
+   uint32 metaStepMask = 0;
+   if (hasHeldButtons)
+      metaStepMask = mMetaStepMasks[GetMetaStepMaskIndex(mHeldButtons.begin()->mCol, mHeldButtons.begin()->mRow)];
+   
+   for (int x=0; x<mMetaStepGridController->NumCols(); ++x)
+   {
+      for (int y=0; y<mMetaStepGridController->NumRows(); ++y)
+      {
+         GridColor color;
+         if (hasHeldButtons && (metaStepMask & (1 << x)))
+            color = kGridColor1Bright;
+         else if (!hasHeldButtons && x == GetMetaStep())
+            color = kGridColor3Bright;
+         else
+            color = kGridColorOff;
+         
+         mMetaStepGridController->SetLight(x, y, color);
+      }
+   }
+}
+
 void StepSequencer::OnControllerPageSelected()
 {
    UpdateLights();
@@ -205,49 +267,94 @@ void StepSequencer::OnControllerPageSelected()
 
 void StepSequencer::OnGridButton(int x, int y, float velocity, IGridController* grid)
 {
-   bool press = velocity > 0;
-   if (x>=0 && y>=0)
+   if (grid == mGridController)
    {
-      Vec2i gridPos = ControllerToGrid(Vec2i(x,y));
-      
-      if (mGridController &&
-          mGridController->IsMultisliderGrid())
+      bool press = velocity > 0;
+      if (x>=0 && y>=0)
       {
-         mGrid->SetVal(gridPos.x, gridPos.y, velocity);
-      }
-      else
-      {
-         if (press)
+         Vec2i gridPos = ControllerToGrid(Vec2i(x,y));
+         
+         if (mGridController &&
+             mGridController->IsMultisliderGrid())
          {
-            if (mUseStrengthSlider)
+            mGrid->SetVal(gridPos.x, gridPos.y, velocity);
+         }
+         else
+         {
+            if (press)
             {
-               mGrid->SetVal(gridPos.x,gridPos.y,mStrength);
+               mHeldButtons.push_back(HeldButton(gridPos.x, gridPos.y));
+               float val = mGrid->GetVal(gridPos.x,gridPos.y);
+               if (val == 0)
+               {
+                  mGrid->SetVal(gridPos.x, gridPos.y, 1);
+                  mHeldButtons.rbegin()->mTime = 0;
+               }
             }
             else
             {
-               float val = mGrid->GetVal(gridPos.x,gridPos.y);
-               if (val > kMidwayVelocity)
-                  mGrid->SetVal(gridPos.x,gridPos.y,0);
-               else if (val > 0)
-                  mGrid->SetVal(gridPos.x,gridPos.y,1);
-               else
-                  mGrid->SetVal(gridPos.x,gridPos.y,kMidwayVelocity);
+               double holdTime = 0;
+               for (auto iter = mHeldButtons.begin(); iter != mHeldButtons.end(); ++iter)
+               {
+                  if (iter->mCol == gridPos.x && iter->mRow == gridPos.y)
+                  {
+                     holdTime = gTime - iter->mTime;
+                     mHeldButtons.erase(iter);
+                     break;
+                  }
+               }
+               
+               if (holdTime < 500)
+               {
+                  if (mUseStrengthSlider)
+                  {
+                     mGrid->SetVal(gridPos.x,gridPos.y,mStrength);
+                  }
+                  else
+                  {
+                     float val = mGrid->GetVal(gridPos.x,gridPos.y);
+                     /*if (val > kMidwayVelocity)
+                        mGrid->SetVal(gridPos.x,gridPos.y,0);
+                     else if (val > 0)
+                        mGrid->SetVal(gridPos.x,gridPos.y,1);
+                     else
+                        mGrid->SetVal(gridPos.x,gridPos.y,kMidwayVelocity);*/
+                     mGrid->SetVal(gridPos.x, gridPos.y, val > 0 ? 0 : 1);
+                  }
+               }
             }
          }
+         
+         UpdateLights();
+         UpdateVelocityLights();
+         UpdateMetaLights();
       }
-      
-      if (press)
+   }
+   
+   if (grid == mVelocityGridController)
+   {
+      if (velocity > 0)
       {
-         mHeldCol = gridPos.x;
-         mHeldRow = gridPos.y;
+         for (auto iter : mHeldButtons)
+         {
+            mGrid->SetVal(iter.mCol, iter.mRow, (8 - y) / 8.0f);
+            iter.mTime = 0;
+         }
+         UpdateVelocityLights();
       }
-      else
+   }
+   
+   if (grid == mMetaStepGridController)
+   {
+      if (velocity > 0)
       {
-         mHeldCol = -1;
-         mHeldRow = -1;
+         for (auto iter : mHeldButtons)
+         {
+            mMetaStepMasks[GetMetaStepMaskIndex(iter.mCol,iter.mRow)] ^= 1 << x;
+            iter.mTime = 0;
+         }
+         UpdateMetaLights();
       }
-      
-      UpdateLights();
    }
 }
 
@@ -275,7 +382,6 @@ int StepSequencer::GetNumControllerChunks()
 
 void StepSequencer::DrawModule()
 {
-
    if (Minimized() || IsVisible() == false)
       return;
    
@@ -291,9 +397,11 @@ void StepSequencer::DrawModule()
    mShiftLeftButton->Draw();
    mShiftRightButton->Draw();
    mGridController->Draw();
+   mVelocityGridController->Draw();
+   mMetaStepGridController->Draw();
    
    int gridX, gridY;
-   mGrid->GetPosition(gridX, gridY);
+   mGrid->GetPosition(gridX, gridY, true);
    for (int i=0; i<NUM_STEPSEQ_ROWS; ++i)
    {
       if (i < mNumRows)
@@ -332,6 +440,42 @@ void StepSequencer::DrawModule()
       ofRect(gridX,gridY+squareh*(mNumRows-chunkSize)-squareh*mLpYOff*chunkSize,width,squareh*chunkSize);
       ofPopStyle();
    }
+   
+   ofPushStyle();
+   ofFill();
+   for (int col = 0; col < mGrid->GetCols(); ++col)
+   {
+      for (int row = 0; row < mGrid->GetRows(); ++row)
+      {
+         uint32 mask = mMetaStepMasks[GetMetaStepMaskIndex(col, row)];
+         ofVec2f pos = mGrid->GetCellPosition(col, row) + mGrid->GetPosition(true);
+         float cellWidth = (float)mGrid->GetWidth() / mGrid->GetCols();
+         float cellHeight = (float)mGrid->GetHeight() / mGrid->GetRows();
+         for (int i=0; i<kMetaStepLoop; ++i)
+         {
+            if (mask != 0xff)
+            {
+               float x = pos.x + ((i % 4) + 1.5f) * (cellWidth / 6);
+               float y = pos.y + ((i / 4 + 1.5f) * (cellHeight / 4)) - cellHeight;
+               float radius = cellHeight * .08f;
+               
+               if (i == GetMetaStep())
+               {
+                  ofSetColor(255, 220, 0);
+                  ofCircle(x, y, radius * 1.5f);
+               }
+               
+               if ((mask & (1 << i)) == 0)
+                  ofSetColor(0, 0, 0);
+               else
+                  ofSetColor(255, 0, 0);
+               
+               ofCircle(x, y, radius);
+            }
+         }
+      }
+   }
+   ofPopStyle();
 }
 
 void StepSequencer::DrawRowLabel(const char* label, int row, int x, int y)
@@ -402,6 +546,7 @@ void StepSequencer::OnTimeEvent(int samplesTo)
    mCurrentColumn = GetStep(0);
    mGrid->SetHighlightCol(mCurrentColumn);
    UpdateLights();
+   UpdateMetaLights();
 }
 
 void StepSequencer::PlayNote(int note, float val)
@@ -514,6 +659,16 @@ void StepSequencer::SetPreset(int preset)
    }
 }
 
+int StepSequencer::GetMetaStep()
+{
+   return TheTransport->GetMeasure() % kMetaStepLoop;
+}
+
+bool StepSequencer::IsMetaStepActive(int col, int row)
+{
+   return mMetaStepMasks[GetMetaStepMaskIndex(col, row)] & (1 << GetMetaStep());
+}
+
 void StepSequencer::CheckboxUpdated(Checkbox* checkbox)
 {
    if (checkbox == mEnabledCheckbox)
@@ -525,11 +680,11 @@ void StepSequencer::FloatSliderUpdated(FloatSlider* slider, float oldVal)
    if (slider == mStrengthSlider)
    {
       mGrid->SetStrength(mStrength);
-      if (mHeldRow != -1)
-      {
-         mGrid->SetValRefactor(mHeldRow, mHeldCol, mStrength);
+      for (auto iter : mHeldButtons)
+         mGrid->SetVal(iter.mCol, iter.mRow, mStrength);
+      
+      if (mHeldButtons.size() > 0)
          UpdateLights();
-      }
    }
    for (int i=0; i<NUM_STEPSEQ_ROWS; ++i)
    {
@@ -604,6 +759,19 @@ void StepSequencer::DropdownUpdated(DropdownList* list, int oldVal)
    }
 }
 
+void StepSequencer::KeyPressed(int key, bool isRepeat)
+{
+   IDrawableModule::KeyPressed(key, isRepeat);
+   
+   ofVec2f mousePos(TheSynth->GetMouseX(), TheSynth->GetMouseY());
+   if (key >= '1' && key <= '8' && mGrid->GetRect().contains(mousePos.x, mousePos.y))
+   {
+      int metaStep = key - '1';
+      auto cell = mGrid->GetGridCellAt(mousePos.x - mGrid->GetPosition().x, mousePos.y - mGrid->GetPosition().y);
+      mMetaStepMasks[GetMetaStepMaskIndex(cell.mCol, cell.mRow)] ^= (1 << metaStep);
+   }
+}
+
 void StepSequencer::SaveLayout(ofxJSONElement& moduleInfo)
 {
    IDrawableModule::SaveLayout(moduleInfo);
@@ -640,7 +808,7 @@ void StepSequencer::SetUpFromSaveData()
 
 namespace
 {
-   const int kSaveStateRev = 0;
+   const int kSaveStateRev = 1;
 }
 
 void StepSequencer::SaveState(FileStreamOut& out)
@@ -650,6 +818,11 @@ void StepSequencer::SaveState(FileStreamOut& out)
    out << kSaveStateRev;
    
    mGrid->SaveState(out);
+   
+   int numMetaStepMasks = META_STEP_MAX * NUM_STEPSEQ_ROWS;
+   out << numMetaStepMasks;
+   for (int i=0; i<numMetaStepMasks; ++i)
+      out << mMetaStepMasks[i];
 }
 
 void StepSequencer::LoadState(FileStreamIn& in)
@@ -658,9 +831,17 @@ void StepSequencer::LoadState(FileStreamIn& in)
    
    int rev;
    in >> rev;
-   LoadStateValidate(rev == kSaveStateRev);
+   LoadStateValidate(rev <= kSaveStateRev);
    
    mGrid->LoadState(in);
+   
+   if (rev >= 1)
+   {
+      int numMetaStepMasks;
+      in >> numMetaStepMasks;
+      for (int i=0; i<numMetaStepMasks; ++i)
+         in >> mMetaStepMasks[i];
+   }
 }
 
 StepSequencerRow::StepSequencerRow(StepSequencer* seq, UIGrid* grid, int row)
@@ -684,8 +865,8 @@ void StepSequencerRow::OnTimeEvent(int samplesTo)
    
    float offsetMs = mOffset*TheTransport->MsPerBar();
    int step = mSeq->GetStep(offsetMs);
-   float val = mGrid->GetValRefactor(mRow,step);
-   if (val > 0)
+   float val = mGrid->GetVal(step,mRow);
+   if (val > 0 && mSeq->IsMetaStepActive(step,mRow))
       mSeq->PlayNote(mRow, val * val);
 }
 

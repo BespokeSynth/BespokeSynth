@@ -35,7 +35,7 @@ RadioSequencer::~RadioSequencer()
 void RadioSequencer::CreateUIControls()
 {
    IDrawableModule::CreateUIControls();
-   mGrid = new UIGrid(5,23,200,170,mLength,8);
+   mGrid = new UIGrid(5,23,200,170,mLength,8, this);
    mIntervalSelector = new DropdownList(this,"interval",5,3,(int*)(&mInterval));
    mLengthSelector = new DropdownList(this,"length",-1,-1,(int*)(&mLength));
    mGridController = new GridController(this, "grid", -1, -1);

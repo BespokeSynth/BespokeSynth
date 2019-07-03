@@ -1356,22 +1356,22 @@ static unsigned char *stbi__convert_format(unsigned char *data, int img_n, int r
       unsigned char *dest = good + j * x * req_comp;
 
       #define COMBO(a,b)  ((a)*8+(b))
-      #define CASE(a,b)   case COMBO(a,b): for(i=x-1; i >= 0; --i, src += a, dest += b)
+      #define CASE(a,b)   case COMBO(a,b): for(i=x-1; i >= 0; --i, src += a, dest += b) {
       // convert source image with img_n components to one with req_comp components;
       // avoid switch per pixel, so use switch per scanline and massive macros
       switch (COMBO(img_n, req_comp)) {
-         CASE(1,2) dest[0]=src[0], dest[1]=255; break;
-         CASE(1,3) dest[0]=dest[1]=dest[2]=src[0]; break;
-         CASE(1,4) dest[0]=dest[1]=dest[2]=src[0], dest[3]=255; break;
-         CASE(2,1) dest[0]=src[0]; break;
-         CASE(2,3) dest[0]=dest[1]=dest[2]=src[0]; break;
-         CASE(2,4) dest[0]=dest[1]=dest[2]=src[0], dest[3]=src[1]; break;
-         CASE(3,4) dest[0]=src[0],dest[1]=src[1],dest[2]=src[2],dest[3]=255; break;
-         CASE(3,1) dest[0]=stbi__compute_y(src[0],src[1],src[2]); break;
-         CASE(3,2) dest[0]=stbi__compute_y(src[0],src[1],src[2]), dest[1] = 255; break;
-         CASE(4,1) dest[0]=stbi__compute_y(src[0],src[1],src[2]); break;
-         CASE(4,2) dest[0]=stbi__compute_y(src[0],src[1],src[2]), dest[1] = src[3]; break;
-         CASE(4,3) dest[0]=src[0],dest[1]=src[1],dest[2]=src[2]; break;
+         CASE(1,2) dest[0]=src[0]; dest[1]=255; } break;
+         CASE(1,3) dest[0]=dest[1]=dest[2]=src[0]; } break;
+   CASE(1,4) dest[0]=dest[1]=dest[2]=src[0]; dest[3]=255; } break;
+         CASE(2,1) dest[0]=src[0]; } break;
+         CASE(2,3) dest[0]=dest[1]=dest[2]=src[0]; } break;
+CASE(2,4) dest[0]=dest[1]=dest[2]=src[0]; dest[3]=src[1]; } break;
+CASE(3,4) dest[0]=src[0];dest[1]=src[1];dest[2]=src[2];dest[3]=255; } break;
+         CASE(3,1) dest[0]=stbi__compute_y(src[0],src[1],src[2]); } break;
+CASE(3,2) dest[0]=stbi__compute_y(src[0],src[1],src[2]); dest[1] = 255; } break;
+         CASE(4,1) dest[0]=stbi__compute_y(src[0],src[1],src[2]); } break;
+CASE(4,2) dest[0]=stbi__compute_y(src[0],src[1],src[2]); dest[1] = src[3]; } break;
+CASE(4,3) dest[0]=src[0];dest[1]=src[1];dest[2]=src[2]; } break;
          default: STBI_ASSERT(0);
       }
       #undef CASE
@@ -3395,7 +3395,7 @@ static stbi_uc *load_jpeg_image(stbi__jpeg *z, int *out_x, int *out_y, int *comp
             if (n == 1)
                for (i=0; i < z->s->img_x; ++i) out[i] = y[i];
             else
-               for (i=0; i < z->s->img_x; ++i) *out++ = y[i], *out++ = 255;
+               for (i=0; i < z->s->img_x; ++i) {*out++ = y[i]; *out++ = 255;}
          }
       }
       stbi__cleanup_jpeg(z);
@@ -4826,7 +4826,7 @@ static stbi_uc *stbi__bmp_load(stbi__context *s, int *x, int *y, int *comp, int 
          stbi_uc *p1 = out +      j     *s->img_x*target;
          stbi_uc *p2 = out + (s->img_y-1-j)*s->img_x*target;
          for (i=0; i < (int) s->img_x*target; ++i) {
-            t = p1[i], p1[i] = p2[i], p2[i] = t;
+            t = p1[i]; p1[i] = p2[i]; p2[i] = t;
          }
       }
    }

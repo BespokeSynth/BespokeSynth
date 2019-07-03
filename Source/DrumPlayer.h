@@ -190,7 +190,7 @@ private:
       float mVelocity;
       
       bool mUseEnvelope;
-      ADSR mEnvelope;
+      ::ADSR mEnvelope;
       float mEnvelopeLength;
       float mPan;
       bool mHasIndividualOutput;

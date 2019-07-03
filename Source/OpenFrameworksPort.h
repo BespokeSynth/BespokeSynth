@@ -117,7 +117,7 @@ struct ofRectangle
    }
    void set(float _x, float _y, float _w, float _h) { x = _x; y = _y; width = _w; height = _h; }
    bool intersects(const ofRectangle& other) const;
-   bool inside(float x, float y) const;
+   bool contains(float x, float y) const;
    float getMinX() const;
    float getMaxX() const;
    float getMinY() const;
@@ -158,16 +158,19 @@ public:
 #define OF_KEY_DOWN KeyPress::downKey
 
 template <class T>
-inline string ofToString(const T& value)
+inline std::string ofToString(const T& value)
 {
-   String str(value);
-   return str.toStdString();
+   std::ostringstream out;
+   out << value;
+   return out.str();
 }
 
-inline string ofToString(const float value, int precision)
+template <class T>
+inline std::string ofToString(const T& value, int precision)
 {
-   String str(value, precision);
-   return str.toStdString();
+   std::ostringstream out;
+   out << std::fixed << std::setprecision(precision) << value;
+   return out.str();
 }
 
 namespace Poco

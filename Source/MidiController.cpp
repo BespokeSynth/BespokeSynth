@@ -18,6 +18,7 @@
 #include "OscController.h"
 #include "PatchCableSource.h"
 #include "GridController.h"
+#include "MidiCapturer.h"
 
 bool UIControlConnection::sDrawCables = true;
 
@@ -379,6 +380,11 @@ void MidiController::OnMidiPitchBend(MidiPitchBend& pitchBend)
    
    if (mPrintInput)
       ofLog() << Name() << " pitch bend: " << pitchBend.mValue;
+}
+
+void MidiController::OnMidi(const MidiMessage& message)
+{
+   mNoteOutput.SendMidi(message);
 }
 
 void MidiController::MidiReceived(MidiMessageType messageType, int control, float value, int channel)
@@ -1012,7 +1018,7 @@ void MidiController::OnClicked(int x, int y, bool right)
          if (control.mActive)
          {
             ofRectangle controlRect(control.mPosition.x, control.mPosition.y, control.mDimensions.x, control.mDimensions.y);
-            if (controlRect.inside(x, y))
+            if (controlRect.contains(x, y))
             {
                mHighlightedLayoutElement = i;
                selected = true;
@@ -1532,6 +1538,8 @@ namespace {
       ++i;
       list->AddLabel("osccontroller", i);
       ++i;
+      list->AddLabel("midicapturer", i);
+      ++i;
    }
    void FillMidiOutput(DropdownList* list)
    {
@@ -1572,7 +1580,12 @@ void MidiController::ConnectDevice()
       OscController* osc = new OscController(this,"192.168.1.128",9000,8000);
       mNonstandardController = osc;
    }
-   else
+   else if (mDeviceIn == "midicapturer")
+   {
+      MidiCapturerDummyController* cap = new MidiCapturerDummyController(this);
+      mNonstandardController = cap;
+   }
+   else if (mDeviceIn.length() > 0)
    {
       mDevice.ConnectInput(mDeviceIn.c_str());
    }

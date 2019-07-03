@@ -37,7 +37,7 @@ ControlSequencer::~ControlSequencer()
 void ControlSequencer::CreateUIControls()
 {
    IDrawableModule::CreateUIControls();
-   mGrid = new UIGrid(5,23,130,40,16,1);
+   mGrid = new UIGrid(5,23,130,40,16,1, this);
    mIntervalSelector = new DropdownList(this,"interval",5,3,(int*)(&mInterval));
    mLengthSelector = new DropdownList(this,"length",mIntervalSelector,kAnchor_Right,(int*)(&mLength));
    mRandomize = new ClickButton(this,"random",mLengthSelector,kAnchor_Right);

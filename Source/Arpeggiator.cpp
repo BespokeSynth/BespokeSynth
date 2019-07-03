@@ -76,7 +76,7 @@ void Arpeggiator::CreateUIControls()
    mArpStepSlider = new IntSlider(this,"step",140,2,60,12,&mArpStep,-3,3);
    mOctaveRepeatsSlider = new IntSlider(this,"octaves",mArpStepSlider,kAnchor_Below,60,12,&mOctaveRepeats,1,4);
    mResetOnDownbeatCheckbox = new Checkbox(this,"downbeat",5,100,&mResetOnDownbeat);
-   mGrid = new UIGrid(5,120,230,100,8,24);
+   mGrid = new UIGrid(5,120,230,100,8,24, this);
    mViewGridCheckbox = new Checkbox(this,"view grid",90,102,&mViewGrid);
    mUpbeatsCheckbox = new Checkbox(this,"upbeats",180,102,&mUpbeats);
    mPlayOnlyScaleNotesCheckbox = new Checkbox(this,"scale",90,60,&mPlayOnlyScaleNotes);

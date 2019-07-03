@@ -92,7 +92,7 @@ private:
       
       float mGain;
       
-      ADSR mADSR;
+      ::ADSR mADSR;
       Granulator mGranulator;
       SeaOfGrain* mOwner;
    };

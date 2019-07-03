@@ -45,6 +45,12 @@ void NoteOutput::SendCC(int control, int value, int voiceIdx)
       noteReceiver->SendCC(control, value, voiceIdx);
 }
 
+void NoteOutput::SendMidi(const MidiMessage& message)
+{
+   for (auto noteReceiver : mNoteSource->GetPatchCableSource()->GetNoteReceivers())
+      noteReceiver->SendMidi(message);
+}
+
 void NoteOutput::Flush()
 {
    mNotesMutex.lock();

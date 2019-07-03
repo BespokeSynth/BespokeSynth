@@ -21,11 +21,11 @@ class IDrawableModule;
 class FMVoiceParams : public IVoiceParams
 {
 public:
-   ADSR mOscADSRParams;
-   ADSR mModIdxADSRParams;
-   ADSR mHarmRatioADSRParams;
-   ADSR mModIdxADSRParams2;
-   ADSR mHarmRatioADSRParams2;
+   ::ADSR mOscADSRParams;
+   ::ADSR mModIdxADSRParams;
+   ::ADSR mHarmRatioADSRParams;
+   ::ADSR mModIdxADSRParams2;
+   ::ADSR mHarmRatioADSRParams2;
    float mModIdx;
    float mHarmRatio;
    float mModIdx2;
@@ -54,10 +54,10 @@ private:
    EnvOscillator mOsc;
    float mHarmPhase;
    EnvOscillator mHarm;
-   ADSR mModIdx;
+   ::ADSR mModIdx;
    float mHarmPhase2;
    EnvOscillator mHarm2;
-   ADSR mModIdx2;
+   ::ADSR mModIdx2;
    FMVoiceParams* mVoiceParams;
    IDrawableModule* mOwner;
 };

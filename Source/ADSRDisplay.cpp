@@ -14,7 +14,7 @@
 
 ADSRDisplay::DisplayMode ADSRDisplay::sDisplayMode = ADSRDisplay::kDisplayEnvelope;
 
-ADSRDisplay::ADSRDisplay(IDrawableModule* owner, const char* name, int x, int y, int w, int h, ADSR* adsr)
+ADSRDisplay::ADSRDisplay(IDrawableModule* owner, const char* name, int x, int y, int w, int h, ::ADSR* adsr)
 : mClick(false)
 , mWidth(w)
 , mHeight(h)
@@ -190,7 +190,7 @@ void ADSRDisplay::SetMaxTime(float maxTime)
    }
 }
 
-void ADSRDisplay::SetADSR(ADSR* adsr)
+void ADSRDisplay::SetADSR(::ADSR* adsr)
 {
    mAdsr = adsr;
    if (mASlider)

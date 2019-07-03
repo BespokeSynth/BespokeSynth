@@ -60,6 +60,7 @@ public:
    virtual void OnMidiProgramChange(MidiProgramChange& program) {}
    virtual void OnMidiPitchBend(MidiPitchBend& pitchBend) {}
    virtual void OnMidiPressure(MidiPressure& pressure) {}
+   virtual void OnMidi(const MidiMessage& message) {}
 };
 
 class MidiDevice : public MidiInputCallback
@@ -85,8 +86,10 @@ public:
    void SendPitchBend(int bend, int channel = -1);
    void SendData(unsigned char a, unsigned char b, unsigned char c);
    
+   static void SendMidiMessage(MidiDeviceListener* listener, const char* deviceName, const MidiMessage& message);
+   
 private:
-   void handleIncomingMidiMessage (MidiInput* source, const MidiMessage& message) override;
+   void handleIncomingMidiMessage(MidiInput* source, const MidiMessage& message) override;
    
    char mDeviceNameIn[64];
    char mDeviceNameOut[64];

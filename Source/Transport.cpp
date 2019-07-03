@@ -114,8 +114,6 @@ void Transport::Advance(float ms)
    
    assert(amount > 0);
    
-   int oldMeasureCount = mMeasureCount;
-   
    mMeasurePos += amount;
    while (mMeasurePos>1)
    {

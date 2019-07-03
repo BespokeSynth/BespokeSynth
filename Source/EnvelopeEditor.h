@@ -22,7 +22,7 @@ class EnvelopeControl
 {
 public:
    EnvelopeControl(ofVec2f position, ofVec2f dimensions);
-   void SetADSR(ADSR* adsr) { mAdsr = adsr; }
+   void SetADSR(::ADSR* adsr) { mAdsr = adsr; }
    void OnClicked(int x, int y, bool right);
    void MouseMoved(float x, float y);
    void MouseReleased();
@@ -44,9 +44,9 @@ private:
    
    ofVec2f mPosition;
    ofVec2f mDimensions;
-   ADSR* mAdsr;
-   ADSR mViewAdsr;
-   ADSR mClickAdsr;
+   ::ADSR* mAdsr;
+   ::ADSR mViewAdsr;
+   ::ADSR mClickAdsr;
    bool mClick;
    ofVec2f mClickStart;
    float mViewLength;

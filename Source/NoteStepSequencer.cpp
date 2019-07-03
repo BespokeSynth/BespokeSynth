@@ -67,8 +67,8 @@ void NoteStepSequencer::CreateUIControls()
    IDrawableModule::CreateUIControls();
    mIntervalSelector = new DropdownList(this,"interval",75,2,(int*)(&mInterval));
    mLengthSlider = new IntSlider(this,"length",77,20,98,15,&mLength,1,mNumSteps);
-   mGrid = new UIGrid(5,55,200,80,8,24);
-   mVelocityGrid = new UIGrid(5,117,200,15,8,1);
+   mGrid = new UIGrid(5,55,200,80,8,24, this);
+   mVelocityGrid = new UIGrid(5,117,200,15,8,1, this);
    mOctaveSlider = new IntSlider(this,"octave",166,2,53,15,&mOctave,-2,4);
    mNoteModeSelector = new DropdownList(this,"notemode",5,20,(int*)(&mNoteMode));
    mShiftBackButton = new ClickButton(this,"<",130,2);

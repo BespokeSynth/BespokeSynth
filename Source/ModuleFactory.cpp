@@ -176,6 +176,7 @@
 #include "PulseSequence.h"
 #include "LinnstrumentControl.h"
 #include "MultitapDelay.h"
+#include "MidiCapturer.h"
 
 #define REGISTER(class,name,type) Register(#name, &(class::Create), &(class::CanCreate), type, false, false);
 #define REGISTER_HIDDEN(class,name,type) Register(#name, &(class::Create), &(class::CanCreate), type, true, false);
@@ -320,6 +321,7 @@ ModuleFactory::ModuleFactory()
    REGISTER(PulseSequence, pulsesequence, kModuleType_Other);
    REGISTER(LinnstrumentControl, linnstrumentcontrol, kModuleType_Note);
    REGISTER(MultitapDelay, multitapdelay, kModuleType_Audio);
+   REGISTER(MidiCapturer, midicapturer, kModuleType_Note);
 
    //REGISTER_EXPERIMENTAL(MidiPlayer, midiplayer, kModuleType_Instrument);
    REGISTER_EXPERIMENTAL(Razor, razor, kModuleType_Synth);

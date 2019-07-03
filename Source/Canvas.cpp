@@ -229,7 +229,7 @@ float Canvas::GetScrollBarBottom() const
 
 bool Canvas::IsOnElement(CanvasElement* element, float x, float y) const
 {
-   return element->GetRect(true, false).inside(x,y) || (mWrap && element->GetRect(true, true).inside(x,y));
+   return element->GetRect(true, false).contains(x,y) || (mWrap && element->GetRect(true, true).contains(x,y));
 }
 
 bool Canvas::IsRowVisible(int row) const

@@ -226,7 +226,7 @@ void DrumSynth::OnMidiControl(MidiControl& control)
             int row = (c - 32) / 4;
             int col = (c - 32) % 4;
             
-            ADSR* adsr;
+            ::ADSR* adsr;
             
             if (row == 1)
                adsr = mHits[mCurrentEditHit]->mData.mTone.GetADSR();
@@ -263,7 +263,7 @@ void DrumSynth::OnMidiControl(MidiControl& control)
             mTwister->SendCC(0, 35, mHits[mCurrentEditHit]->mFreqSlider->GetMidiValue()*127);
             for (int i=0; i<3; ++i)
             {
-               ADSR* adsr;
+               ::ADSR* adsr;
                if (i == 0)
                   adsr = mHits[mCurrentEditHit]->mData.mTone.GetADSR();
                else if (i == 1)

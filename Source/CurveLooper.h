@@ -73,7 +73,7 @@ private:
    int mWidth;
    int mHeight;
    EnvelopeControl mEnvelopeControl;
-   ADSR mAdsr;
+   ::ADSR mAdsr;
    ClickButton* mRandomizeButton;
 };
 

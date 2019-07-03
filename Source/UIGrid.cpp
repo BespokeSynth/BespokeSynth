@@ -10,7 +10,7 @@
 #include "SynthGlobals.h"
 #include "FileStream.h"
 
-UIGrid::UIGrid(int x, int y, int w, int h, int cols, int rows)
+UIGrid::UIGrid(int x, int y, int w, int h, int cols, int rows, IClickable* parent)
 : mClick(false)
 , mWidth(w)
 , mHeight(h)
@@ -33,6 +33,7 @@ UIGrid::UIGrid(int x, int y, int w, int h, int cols, int rows)
    SetPosition(x,y);
    SetGrid(cols,rows);
    Clear();
+   SetParent(parent);
    bzero(mDrawOffset, MAX_GRID_SIZE*sizeof(float));
 }
 
@@ -40,13 +41,15 @@ UIGrid::~UIGrid()
 {
 }
 
-void UIGrid::Init(int x, int y, int w, int h, int cols, int rows)
+void UIGrid::Init(int x, int y, int w, int h, int cols, int rows, IClickable* parent)
 {
    mWidth = w;
    mHeight = h;
    SetPosition(x,y);
    SetGrid(cols,rows);
    Clear();
+   SetParent(parent);
+   bzero(mDrawOffset, MAX_GRID_SIZE*sizeof(float));
 }
 
 void UIGrid::Render()

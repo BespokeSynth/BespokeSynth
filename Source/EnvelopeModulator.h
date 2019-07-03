@@ -71,7 +71,7 @@ private:
    float mHeight;
    
    EnvelopeControl mEnvelopeControl;
-   ADSR mAdsr;
+   ::ADSR mAdsr;
    
    float mADSRViewLength;
    FloatSlider* mADSRViewLengthSlider;

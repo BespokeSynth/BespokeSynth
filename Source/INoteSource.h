@@ -30,6 +30,7 @@ public:
    void PlayNote(double time, int pitch, int velocity, int voiceIdx = -1, ModulationParameters modulation = ModulationParameters()) override;
    void SendPressure(int pitch, int pressure) override;
    void SendCC(int control, int value, int voiceIdx = -1) override;
+   void SendMidi(const MidiMessage& message) override;
 
    list<int> GetHeldNotes() { Poco::FastMutex::ScopedLock lock(mNotesMutex); return mNotes; }
    list<int> GetHeldNotesAudioThread() { return mNotes; }

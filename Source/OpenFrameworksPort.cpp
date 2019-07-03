@@ -431,7 +431,7 @@ bool ofRectangle::intersects(const ofRectangle& other) const
            getMinY() < other.getMaxY() && getMaxY() > other.getMinY());
 }
 
-bool ofRectangle::inside(float testX, float testY) const
+bool ofRectangle::contains(float testX, float testY) const
 {
    return testX > getMinX() && testY > getMinY() &&
           testX < getMaxX() && testY < getMaxY();

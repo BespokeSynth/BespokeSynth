@@ -175,86 +175,79 @@ void MidiDevice::SendData(unsigned char a, unsigned char b, unsigned char c)
    }
 }
 
-void MidiDevice::handleIncomingMidiMessage (MidiInput* source, const MidiMessage& message)
+void MidiDevice::handleIncomingMidiMessage(MidiInput* source, const MidiMessage& message)
 {
    if (TheSynth->IsReady() == false)
       return;
    
    if (mListener)
    {
-      if (message.isNoteOnOrOff())
-      {
-         MidiNote note;
-         note.mDeviceName = mDeviceNameIn;
-         note.mPitch = message.getNoteNumber();
-         if (message.isNoteOn())
-            note.mVelocity = message.getVelocity();
-         else
-            note.mVelocity = 0;
-         note.mChannel = message.getChannel();
-         mListener->OnMidiNote(note);
-         
-         if (gPrintMidiInput)
-            ofLog() << mDeviceNameIn << " - Midi note: " << note.mPitch << " " << note.mVelocity;
-      }
-      if (message.isController())
-      {
-         MidiControl control;
-         control.mDeviceName = mDeviceNameIn;
-         control.mControl = message.getControllerNumber();
-         control.mValue = message.getControllerValue();
-         control.mChannel = message.getChannel();
-         mListener->OnMidiControl(control);
-         
-         if (gPrintMidiInput)
-            ofLog() << mDeviceNameIn << " - Midi CC: " << control.mControl << " " << control.mValue;
-      }
-      if (message.isProgramChange())
-      {
-         MidiProgramChange program;
-         program.mDeviceName = mDeviceNameIn;
-         program.mProgram = message.getProgramChangeNumber();
-         program.mChannel = message.getChannel();
-         mListener->OnMidiProgramChange(program);
-         
-         if (gPrintMidiInput)
-            ofLog() << mDeviceNameIn << " - Midi Program Change: " << program.mProgram;
-      }
-      if (message.isPitchWheel())
-      {
-         MidiPitchBend pitchBend;
-         pitchBend.mDeviceName = mDeviceNameIn;
-         pitchBend.mValue = message.getPitchWheelValue();
-         pitchBend.mChannel = message.getChannel();
-         mListener->OnMidiPitchBend(pitchBend);
-         
-         if (gPrintMidiInput)
-            ofLog() << mDeviceNameIn << " - Midi Pitch Bend: " << pitchBend.mValue;
-      }
-      if (message.isChannelPressure())
-      {
-         MidiPressure pressure;
-         pressure.mDeviceName = mDeviceNameIn;
-         //TODO_PORT(Ryan) - is this correct for the pitch? does pitch have meaning for channel pressure messages?
-         pressure.mPitch = message.getNoteNumber();
-         pressure.mPressure = message.getChannelPressureValue();
-         pressure.mChannel = message.getChannel();
-         mListener->OnMidiPressure(pressure);
-         
-         if (gPrintMidiInput)
-            ofLog() << mDeviceNameIn << " - Midi Pressure: " << pressure.mPitch << " " << pressure.mPressure;
-      }
-      if (message.isAftertouch())
-      {
-         MidiPressure pressure;
-         pressure.mDeviceName = mDeviceNameIn;
-         pressure.mPitch = -1;
-         pressure.mPressure = message.getAfterTouchValue();
-         pressure.mChannel = message.getChannel();
-         mListener->OnMidiPressure(pressure);
-         
-         if (gPrintMidiInput)
-            ofLog() << mDeviceNameIn << " - Midi Aftertouch: " << pressure.mPressure;
-      }
+      MidiDevice::SendMidiMessage(mListener, mDeviceNameIn, message);
+      
+      if (gPrintMidiInput)
+         ofLog() << mDeviceNameIn << " " << message.getDescription();
+   }
+}
+
+//static
+void MidiDevice::SendMidiMessage(MidiDeviceListener* listener, const char* deviceName, const MidiMessage& message)
+{
+   listener->OnMidi(message);
+   
+   if (message.isNoteOnOrOff())
+   {
+      MidiNote note;
+      note.mDeviceName = deviceName;
+      note.mPitch = message.getNoteNumber();
+      if (message.isNoteOn())
+         note.mVelocity = message.getVelocity();
+      else
+         note.mVelocity = 0;
+      note.mChannel = message.getChannel();
+      listener->OnMidiNote(note);
+   }
+   if (message.isController())
+   {
+      MidiControl control;
+      control.mDeviceName = deviceName;
+      control.mControl = message.getControllerNumber();
+      control.mValue = message.getControllerValue();
+      control.mChannel = message.getChannel();
+      listener->OnMidiControl(control);
+   }
+   if (message.isProgramChange())
+   {
+      MidiProgramChange program;
+      program.mDeviceName = deviceName;
+      program.mProgram = message.getProgramChangeNumber();
+      program.mChannel = message.getChannel();
+      listener->OnMidiProgramChange(program);
+   }
+   if (message.isPitchWheel())
+   {
+      MidiPitchBend pitchBend;
+      pitchBend.mDeviceName = deviceName;
+      pitchBend.mValue = message.getPitchWheelValue();
+      pitchBend.mChannel = message.getChannel();
+      listener->OnMidiPitchBend(pitchBend);
+   }
+   if (message.isChannelPressure())
+   {
+      MidiPressure pressure;
+      pressure.mDeviceName = deviceName;
+      //TODO_PORT(Ryan) - is this correct for the pitch? does pitch have meaning for channel pressure messages?
+      pressure.mPitch = message.getNoteNumber();
+      pressure.mPressure = message.getChannelPressureValue();
+      pressure.mChannel = message.getChannel();
+      listener->OnMidiPressure(pressure);
+   }
+   if (message.isAftertouch())
+   {
+      MidiPressure pressure;
+      pressure.mDeviceName = deviceName;
+      pressure.mPitch = -1;
+      pressure.mPressure = message.getAfterTouchValue();
+      pressure.mChannel = message.getChannel();
+      listener->OnMidiPressure(pressure);
    }
 }

@@ -62,8 +62,9 @@ float* ChannelBuffer::GetChannel(int channel)
    if (ret == nullptr)
    {
       assert(mOwnsBuffers);
-      ret = mBuffers[MIN(channel, mActiveChannels-1)] = new float[BufferSize()];
+      ret = new float[BufferSize()];
       ::Clear(ret, BufferSize());
+      mBuffers[MIN(channel, mActiveChannels-1)] = ret;
    }
    return ret;
 }

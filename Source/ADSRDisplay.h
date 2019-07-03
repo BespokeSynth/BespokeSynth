@@ -20,7 +20,7 @@ class EnvelopeEditor;
 class ADSRDisplay : public IUIControl
 {
 public:
-   ADSRDisplay(IDrawableModule* owner, const char* name, int x, int y, int w, int h, ADSR* adsr);
+   ADSRDisplay(IDrawableModule* owner, const char* name, int x, int y, int w, int h, ::ADSR* adsr);
    void Render() override;
    void MouseReleased() override;
    bool MouseMoved(float x, float y) override;
@@ -28,8 +28,8 @@ public:
    void SetVol(float vol) { mVol = vol; }
    void SetHighlighted(bool highlighted) { mHighlighted = highlighted; }
    void SetMaxTime(float maxTime);
-   void SetADSR(ADSR* adsr);
-   ADSR* GetADSR() { return mAdsr; }
+   void SetADSR(::ADSR* adsr);
+   ::ADSR* GetADSR() { return mAdsr; }
    void SetActive(bool active);
    void SpawnEnvelopeEditor();
    
@@ -70,10 +70,10 @@ private:
    float mVol;
    float mMaxTime;
    bool mClick;
-   ADSR* mAdsr;
-   ADSR mViewAdsr;   //for ADSR simulation in drawing
+   ::ADSR* mAdsr;
+   ::ADSR mViewAdsr;   //for ADSR simulation in drawing
    ofVec2f mClickStart;
-   ADSR mClickAdsr;
+   ::ADSR mClickAdsr;
    bool mHighlighted;
    bool mActive;
    FloatSlider* mASlider;

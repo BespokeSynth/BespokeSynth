@@ -107,6 +107,7 @@ private:
    int mLinnstrumentOctave;
    bool mGuitarLines;
    Checkbox* mGuitarLinesCheckbox;
+   bool mControlPlayedLights;
    
    int mLastReceivedNRPNParamMSB;
    int mLastReceivedNRPNParamLSB;

@@ -21,7 +21,7 @@ class IDrawableModule;
 class SampleVoiceParams : public IVoiceParams
 {
 public:
-   ADSR mAdsr;
+   ::ADSR mAdsr;
    float mVol;
    float* mSampleData;
    int mSampleLength;
@@ -43,7 +43,7 @@ public:
    void SetVoiceParams(IVoiceParams* params) override;
    bool IsDone(double time) override;
 private:
-   ADSR mAdsr;
+   ::ADSR mAdsr;
    SampleVoiceParams* mVoiceParams;
    float mPos;
    IDrawableModule* mOwner;
