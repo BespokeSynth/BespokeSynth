@@ -66,13 +66,20 @@ void WaveformViewer::Process(double time)
    int bufferSize = GetBuffer()->BufferSize();
    if (GetTarget())
    {
-      Add(GetTarget()->GetBuffer()->GetChannel(0), GetBuffer()->GetChannel(0), bufferSize);
+      ChannelBuffer* out = GetTarget()->GetBuffer();
+      for (int ch=0; ch<GetBuffer()->NumActiveChannels(); ++ch)
+      {
+         if (ch == 0)
+            BufferCopy(gWorkBuffer, GetBuffer()->GetChannel(ch), GetBuffer()->BufferSize());
+         else
+            Add(gWorkBuffer, GetBuffer()->GetChannel(ch), GetBuffer()->BufferSize());
+         Add(out->GetChannel(ch), GetBuffer()->GetChannel(ch), out->BufferSize());
+         GetVizBuffer()->WriteChunk(GetBuffer()->GetChannel(ch),GetBuffer()->BufferSize(), ch);
+      }
    }
    
-   GetVizBuffer()->WriteChunk(GetBuffer()->GetChannel(0),bufferSize, 0);
-   
    for (int i=0; i<bufferSize; ++i)
-      mAudioView[(i+mBufferVizOffset[!mDoubleBufferFlip]) % BUFFER_VIZ_SIZE][!mDoubleBufferFlip] = GetBuffer()->GetChannel(0)[i];
+      mAudioView[(i+mBufferVizOffset[!mDoubleBufferFlip]) % BUFFER_VIZ_SIZE][!mDoubleBufferFlip] = gWorkBuffer[i];
       
    GetBuffer()->Reset();
    
@@ -85,7 +92,6 @@ void WaveformViewer::Process(double time)
 
 void WaveformViewer::DrawModule()
 {
-
    if (Minimized() || IsVisible() == false)
       return;
    
@@ -100,7 +106,7 @@ void WaveformViewer::DrawModule()
    ofPushMatrix();
    
    ofSetColor(245, 58, 135);
-   ofSetLineWidth(3);
+   ofSetLineWidth(2);
    
    int w,h;
    GetDimensions(w,h);

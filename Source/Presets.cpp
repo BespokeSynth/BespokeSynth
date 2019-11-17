@@ -124,7 +124,7 @@ void Presets::OnClicked(int x, int y, bool right)
    if (mGrid->TestClick(x, y, right, true))
    {
       int gridX,gridY;
-      mGrid->GetPosition(gridX, gridY);
+      mGrid->GetPosition(gridX, gridY, true);
       GridCell cell = mGrid->GetGridCellAt(x-gridX,y-gridY);
       
       mCurrentPreset = cell.mCol + cell.mRow * mGrid->GetCols();

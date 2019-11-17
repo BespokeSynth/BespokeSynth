@@ -152,7 +152,7 @@ void RadioSequencer::DrawModule()
    
    for (int i=0; i<mControlCables.size(); ++i)
    {
-      mControlCables[i]->SetManualPosition(GetRect(true).width, mGrid->GetPosition().y+(mGrid->GetHeight()/mGrid->GetRows())*(i+.5f));
+      mControlCables[i]->SetManualPosition(GetRect(true).width, mGrid->GetPosition(true).y+(mGrid->GetHeight()/mGrid->GetRows())*(i+.5f));
    }
 }
 

@@ -27,25 +27,6 @@ public:
    int GetLatency() const { return mLatency; }
    
 private:
-   struct FFTData
-   {
-      FFTData(int bins)
-      {
-         mRealValues = new float[bins/2+1];
-         mImaginaryValues = new float[bins/2+1];
-         mTimeDomain = new float[bins];
-      }
-      ~FFTData()
-      {
-         delete[] mRealValues;
-         delete[] mImaginaryValues;
-         delete[] mTimeDomain;
-      }
-      float* mRealValues;
-      float* mImaginaryValues;
-      float* mTimeDomain;
-   };
-
    int mFFTBins;
    
    FFTData mFFTData;

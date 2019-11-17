@@ -34,6 +34,7 @@ public:
    , mIsRetina(false)
    {
       openGLContext.setOpenGLVersionRequired(juce::OpenGLContext::openGL3_2);
+      openGLContext.setContinuousRepainting(false);
       
       int width = 1280;
       int height = 1024;
@@ -62,6 +63,8 @@ public:
          grabKeyboardFocus();
       
       mSynth.Poll();
+      
+      openGLContext.triggerRepaint();
    }
    
    //==============================================================================

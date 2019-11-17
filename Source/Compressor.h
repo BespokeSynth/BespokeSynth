@@ -114,21 +114,23 @@ public:
 private:
    //IDrawableModule
    void DrawModule() override;
-   void GetModuleDimensions(int& x, int&y) override { x=120; y=73; }
+   void GetModuleDimensions(int& x, int&y) override { x=120; y=91; }
    bool Enabled() const override { return mEnabled; }
 
    
    float mThreshold;
    float mRatio;
-   float mLookahead;
-   float mWindow;
    float mAttack;
    float mRelease;
+   float mOutputAdjust;
    FloatSlider* mThresholdSlider;
    FloatSlider* mRatioSlider;
    FloatSlider* mAttackSlider;
    FloatSlider* mReleaseSlider;
+   FloatSlider* mOutputAdjustSlider;
    
+   double mCurrentInputDb;
+   double mOutputGain;
 
    // runtime variables
    double envdB_;			// over-threshold envelope (dB)

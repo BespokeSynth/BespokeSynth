@@ -92,7 +92,7 @@ void PulseSequence::DrawModule()
    {
       if (i < mLength)
       {
-         ofVec2f pos = mVelocityGrid->GetCellPosition(i, 0) + mVelocityGrid->GetPosition();
+         ofVec2f pos = mVelocityGrid->GetCellPosition(i, 0) + mVelocityGrid->GetPosition(true);
          pos.x += mVelocityGrid->GetWidth() / float(mLength) * .5f;
          pos.y += mVelocityGrid->GetHeight() + 8;
          mStepCables[i]->SetManualPosition(pos.x, pos.y);

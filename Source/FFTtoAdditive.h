@@ -48,24 +48,6 @@ public:
    
    
 private:
-   struct FFTData
-   {
-      FFTData(int windowSize, int freqDomainSize)
-      {
-         mRealValues = new float[freqDomainSize];
-         mImaginaryValues = new float[freqDomainSize];
-         mTimeDomain = new float[windowSize];
-      }
-      ~FFTData()
-      {
-         delete[] mRealValues;
-         delete[] mImaginaryValues;
-         delete[] mTimeDomain;
-      }
-      float* mRealValues;
-      float* mImaginaryValues;
-      float* mTimeDomain;
-   };
 
    void DrawViz();
    float SinSample(float phase);

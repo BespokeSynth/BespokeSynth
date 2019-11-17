@@ -25,6 +25,24 @@ private:
    float* mFft_data; // array for writing/reading to/from FFT function
 };
 
+struct FFTData
+{
+   FFTData(int windowSize, int freqDomainSize)
+   {
+      mRealValues = new float[freqDomainSize];
+      mImaginaryValues = new float[freqDomainSize];
+      mTimeDomain = new float[windowSize];
+   }
+   ~FFTData()
+   {
+      delete[] mRealValues;
+      delete[] mImaginaryValues;
+      delete[] mTimeDomain;
+   }
+   float* mRealValues;
+   float* mImaginaryValues;
+   float* mTimeDomain;
+};
 
 
 #ifndef MAYER_H

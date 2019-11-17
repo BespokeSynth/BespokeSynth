@@ -177,7 +177,7 @@ void NoteStepSequencer::DrawModule()
    ofPushStyle();
    ofFill();
    int gridX, gridY, gridW, gridH;
-   mGrid->GetPosition(gridX, gridY);
+   mGrid->GetPosition(gridX, gridY, true);
    gridW = mGrid->GetWidth();
    gridH = mGrid->GetHeight();
    float boxHeight = (float(gridH)/mNoteRange);
@@ -542,7 +542,7 @@ void NoteStepSequencer::UpdateVelocityGridPos()
 {
    mVelocityGrid->SetDimensions(mGrid->GetWidth(), 15);
    int gridX,gridY;
-   mGrid->GetPosition(gridX, gridY);
+   mGrid->GetPosition(gridX, gridY, true);
    mVelocityGrid->SetPosition(gridX, gridY + mGrid->GetHeight());
    mLoopResetPointSlider->PositionTo(mVelocityGrid, kAnchor_Below);
    mLoopResetPointSlider->SetDimensions(mVelocityGrid->GetWidth(), 15);

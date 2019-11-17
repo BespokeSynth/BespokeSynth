@@ -130,6 +130,8 @@ string VSTPlugin::GetTitleLabel()
 
 void VSTPlugin::SetVST(string vstName)
 {
+   ofLog() << "loading VST: " << vstName;
+   
    mModuleSaveData.SetString("vst", vstName);
    string path = VSTLookup::GetVSTPath(vstName);
    

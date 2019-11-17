@@ -24,16 +24,17 @@ static double dB2lin( double dB )
 }
 
 Compressor::Compressor()
-: mThreshold(.5f)
-, mRatio(.5f)
-, mLookahead(3)
-, mWindow(1)
+: mThreshold(-24)
+, mRatio(4)
 , mAttack(.1f)
-, mRelease(300)
+, mRelease(200)
+, mOutputAdjust(1)
 , mThresholdSlider(nullptr)
 , mRatioSlider(nullptr)
 , mAttackSlider(nullptr)
 , mReleaseSlider(nullptr)
+, mCurrentInputDb(0)
+, mOutputGain(1)
 {
    envdB_ = DC_OFFSET;
 }
@@ -41,10 +42,16 @@ Compressor::Compressor()
 void Compressor::CreateUIControls()
 {
    IDrawableModule::CreateUIControls();
-   mThresholdSlider = new FloatSlider(this,"threshold",5,8,110,15,&mThreshold,-40,0);
-   mRatioSlider = new FloatSlider(this,"ratio",5,24,110,15,&mRatio,-1,1);
-   mAttackSlider = new FloatSlider(this,"attack",5,40,110,15,&mAttack,.1f,50);
-   mReleaseSlider = new FloatSlider(this,"release",5,56,110,15,&mRelease,.1f,500);
+   mThresholdSlider = new FloatSlider(this,"threshold",5,8,110,15,&mThreshold,-70,0);
+   mRatioSlider = new FloatSlider(this,"ratio",mThresholdSlider,kAnchor_Below,110,15,&mRatio,1,20);
+   mRatioSlider->SetMode(FloatSlider::kSquare);
+   mAttackSlider = new FloatSlider(this,"attack",mRatioSlider,kAnchor_Below,110,15,&mAttack,.1f,50);
+   mReleaseSlider = new FloatSlider(this,"release",mAttackSlider,kAnchor_Below,110,15,&mRelease,.1f,500);
+   mOutputAdjustSlider = new FloatSlider(this,"output",mReleaseSlider,kAnchor_Below,110,15,&mOutputAdjust,0,2);
+   mOutputAdjustSlider->SetMode(FloatSlider::kSquare);
+   
+   mEnv.setAttack(mAttack);
+   mEnv.setRelease(mRelease);
 }
 
 void Compressor::ProcessAudio(double time, ChannelBuffer* buffer)
@@ -72,10 +79,10 @@ void Compressor::ProcessAudio(double time, ChannelBuffer* buffer)
 
       // convert key to dB
       input += DC_OFFSET;				// add DC offset to avoid log( 0 )
-      double keydB = lin2dB( input );	// convert linear -> dB
+      mCurrentInputDb = lin2dB( input );	// convert linear -> dB
 
       // threshold
-      double overdB = keydB - mThreshold;	// delta over threshold
+      double overdB = mCurrentInputDb - mThreshold;	// delta over threshold
       if ( overdB < 0.0 )
          overdB = 0.0;
 
@@ -91,24 +98,45 @@ void Compressor::ProcessAudio(double time, ChannelBuffer* buffer)
        * constant gain reduction, we must subtract it from the envelope, yielding
        * a minimum value of 0dB.
        */
+      
+      double invRatio = 1 / mRatio;
 
       // transfer function
-      double gr = overdB * ( mRatio - 1.0 );	// gain reduction (dB)
-      gr = dB2lin( gr );						// convert dB -> linear
+      double reduction = overdB * ( invRatio - 1.0 );	// gain reduction (dB)
+      double makeup = (-mThreshold * .5) * (1.0 - invRatio);
+      mOutputGain = dB2lin( reduction + makeup ) * mOutputAdjust;
 
       // output gain
       for (int ch=0; ch<buffer->NumActiveChannels(); ++ch)
-         buffer->GetChannel(ch)[i] *= gr;	// apply gain reduction to input
+         buffer->GetChannel(ch)[i] *= mOutputGain;	// apply gain reduction to input
    }
 }
 
 void Compressor::DrawModule()
 {
-   
    mThresholdSlider->Draw();
    mRatioSlider->Draw();
    mAttackSlider->Draw();
    mReleaseSlider->Draw();
+   mOutputAdjustSlider->Draw();
+   
+   ofPushStyle();
+   ofSetColor(0,255,0,gModuleDrawAlpha);
+   float x,y;
+   int w,h;
+   
+   mThresholdSlider->GetPosition(x, y, K(local));
+   mThresholdSlider->GetDimensions(w, h);
+   float currentInputX = ofMap(mCurrentInputDb, mThresholdSlider->GetMin(), mThresholdSlider->GetMax(), x, x+w, K(clamp));
+   ofLine(currentInputX, y, currentInputX, y+h);
+   
+   mRatioSlider->GetPosition(x, y, K(local));
+   mRatioSlider->GetDimensions(w, h);
+   float outputNormalized = ofClamp(mOutputGain / 10, 0, 1);
+   float currentOutputX = ofLerp(x, x+w, sqrtf(outputNormalized));
+   ofLine(currentOutputX, y, currentOutputX, y+h);
+   
+   ofPopStyle();
 }
 
 void Compressor::CheckboxUpdated(Checkbox *checkbox)

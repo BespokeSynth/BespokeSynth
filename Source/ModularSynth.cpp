@@ -1557,6 +1557,8 @@ void ModularSynth::SaveState(string file)
 
 void ModularSynth::LoadState(string file)
 {
+   ofLog() << "LoadState() " << ofToDataPath(file);
+   
    mAudioThreadMutex.Lock("LoadState()");
    LockRender(true);
    

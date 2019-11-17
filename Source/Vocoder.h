@@ -48,24 +48,6 @@ public:
    virtual void SetUpFromSaveData() override;
    
 private:
-   struct FFTData
-   {
-      FFTData(int windowSize, int freqDomainSize)
-      {
-         mRealValues = new float[freqDomainSize];
-         mImaginaryValues = new float[freqDomainSize];
-         mTimeDomain = new float[windowSize];
-      }
-      ~FFTData()
-      {
-         delete[] mRealValues;
-         delete[] mImaginaryValues;
-         delete[] mTimeDomain;
-      }
-      float* mRealValues;
-      float* mImaginaryValues;
-      float* mTimeDomain;
-   };
 
    //IDrawableModule
    void DrawModule() override;
