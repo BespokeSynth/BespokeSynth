@@ -41,7 +41,7 @@ void FloatSliderLFOControl::CreateUIControls()
    mIntervalSelector = new DropdownList(this,"interval",4,58,(int*)(&mLFOSettings.mInterval));
    mOscSelector = new DropdownList(this,"osc",-1,-1,(int*)(&mLFOSettings.mOscType));
    mOffsetSlider = new FloatSlider(this,"off",mIntervalSelector, kAnchor_Below,90,15,&mLFOSettings.mLFOOffset,0,1);
-   mFreeRateSlider = new FloatSlider(this,"free rate",mIntervalSelector, kAnchor_Below,90,15,&mLFOSettings.mFreeRate,0,50);
+   mFreeRateSlider = new FloatSlider(this,"free rate",mIntervalSelector, kAnchor_Below,90,15,&mLFOSettings.mFreeRate,0,20);
    mBiasSlider = new FloatSlider(this,"bias",mOffsetSlider, kAnchor_Below,90,15,&mLFOSettings.mBias,0,1);
    mMinSlider = new FloatSlider(this,"low",mBiasSlider, kAnchor_Below,90,15,&mDummyMin,0,1);
    mMaxSlider = new FloatSlider(this,"high",mMinSlider, kAnchor_Below,90,15,&mDummyMax,0,1);

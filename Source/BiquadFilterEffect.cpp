@@ -58,6 +58,8 @@ void BiquadFilterEffect::ProcessAudio(double time, ChannelBuffer* buffer)
       return;
    
    float bufferSize = buffer->BufferSize();
+   if (buffer->NumActiveChannels() != mDryBuffer.NumActiveChannels())
+      mCoefficientsHaveChanged = true; //force filters for other channels to get updated
    mDryBuffer.SetNumActiveChannels(buffer->NumActiveChannels());
    
    const float fadeOutStart = mFSlider->GetMax() * .75f;
@@ -146,6 +148,7 @@ void BiquadFilterEffect::RadioButtonUpdated(RadioButton* list, int oldVal)
       if (mBiquad[0].mType == kFilterType_Highpass)
          mBiquad[0].SetFilterParams(mFSlider->GetMin(), mQSlider->GetMin());
       mGSlider->SetShowing(mBiquad[0].mType == kFilterType_PeakNotch);
+      mCoefficientsHaveChanged = true;
    }
 }
 

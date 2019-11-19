@@ -567,6 +567,16 @@ void IDrawableModule::AddChild(IDrawableModule* child)
    child->SetParent(this);
    if (child->Name()[0] == 0)
       child->SetName(("child"+ofToString(mChildren.size())).c_str());
+   
+   for (int i=0; i<mChildren.size(); ++i)
+   {
+      if (strcmp(mChildren[i]->Name(), child->Name()) == 0)
+      {
+         child->SetName(GetUniqueName(child->Name(), mChildren).c_str());
+         break;
+      }
+   }
+   
    mChildren.push_back(child);
 }
 

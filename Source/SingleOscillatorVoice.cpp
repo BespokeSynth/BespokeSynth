@@ -72,10 +72,13 @@ bool SingleOscillatorVoice::Process(double time, ChannelBuffer* out)
             {
                ofLog() << "Infinite phase. phaseInc:" + ofToString(phaseInc) + " detune:" + ofToString(mVoiceParams->mDetune) + " freq:" + ofToString(freq) + " pitch:" + ofToString(pitch) + " getpitch:" + ofToString(GetPitch(pos));
             }
-            while (mOscData[u].mPhase > FTWO_PI*2)
+            else
             {
-               mOscData[u].mPhase -= FTWO_PI*2;
-               mOscData[u].mSyncPhase = 0;
+               while (mOscData[u].mPhase > FTWO_PI*2)
+               {
+                  mOscData[u].mPhase -= FTWO_PI*2;
+                  mOscData[u].mSyncPhase = 0;
+               }
             }
             mOscData[u].mSyncPhase += syncPhaseInc;
          }

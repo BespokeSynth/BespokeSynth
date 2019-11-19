@@ -20,7 +20,7 @@ public:
    IMidiVoice() : mPitch(0) {}
    virtual ~IMidiVoice() {}
    virtual void ClearVoice() = 0;
-   void SetPitch(float pitch) { mPitch = pitch; }
+   void SetPitch(float pitch) { mPitch = ofClamp(pitch, 0, 127); }
    void SetModulators(ModulationParameters modulators) { mModulators = modulators; }
    virtual void Start(double time, float amount) = 0;
    virtual void Stop(double time) = 0;

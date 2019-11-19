@@ -375,7 +375,10 @@ void ModuleContainer::LoadModules(const ofxJSONElement& modules)
                TimerInstance t("create "+modules[i]["name"].asString(), timer);
                IDrawableModule* module = TheSynth->CreateModule(modules[i]);
                if (module != nullptr)
+               {
+                  //ofLog() << "create " << module->Name();
                   AddModule(module);
+               }
             }
             catch (LoadingJSONException& e)
             {
@@ -393,7 +396,10 @@ void ModuleContainer::LoadModules(const ofxJSONElement& modules)
                TimerInstance t("setup "+modules[i]["name"].asString(), timer);
                IDrawableModule* module = FindModule(modules[i]["name"].asString(), true);
                if (module != nullptr)
+               {
+                  //ofLog() << "setup " << module->Name();
                   TheSynth->SetUpModule(module, modules[i]);
+               }
             }
             catch (LoadingJSONException& e)
             {

@@ -156,10 +156,17 @@ void SignalGenerator::Process(double time)
       float phaseInc = GetPhaseInc(mFreq * mDetune * mult);
       
       mPhase += phaseInc;
-      while (mPhase > FTWO_PI*2)
+      if (mPhase == INFINITY)
       {
-         mPhase -= FTWO_PI*2;
-         mSyncPhase = 0;
+         ofLog() << "Infinite phase.";
+      }
+      else
+      {
+         while (mPhase > FTWO_PI*2)
+         {
+            mPhase -= FTWO_PI*2;
+            mSyncPhase = 0;
+         }
       }
       mSyncPhase += syncPhaseInc;
       

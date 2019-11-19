@@ -15,6 +15,7 @@
 Prefab::Prefab()
 {
    mModuleContainer.SetOwner(this);
+   mPrefabName = "";
 }
 
 Prefab::~Prefab()
@@ -31,6 +32,13 @@ void Prefab::CreateUIControls()
    mModuleCable = new PatchCableSource(this, kConnectionType_Special);
    mModuleCable->SetManualPosition(10, 10);
    AddPatchCableSource(mModuleCable);
+}
+
+string Prefab::GetTitleLabel()
+{
+   if (mPrefabName != "")
+      return "prefab: "+mPrefabName;
+   return "prefab";
 }
 
 void Prefab::Poll()
@@ -155,6 +163,8 @@ void Prefab::SavePrefab(string savePath)
       lines += line + '\n';
    }
    
+   UpdatePrefabName(savePath);
+   
    FileStreamOut out(ofToDataPath(savePath).c_str());
    
    out << lines;
@@ -182,9 +192,18 @@ void Prefab::LoadPrefab(string loadPath)
       return;
    }
    
+   UpdatePrefabName(loadPath);
+   
    mModuleContainer.LoadModules(root["modules"]);
    
    mModuleContainer.LoadState(in);
+}
+
+void Prefab::UpdatePrefabName(string path)
+{
+   vector<string> tokens = ofSplitString(path, "/");
+   mPrefabName = tokens[tokens.size() - 1];
+   ofStringReplace(mPrefabName, ".pfb", "");
 }
 
 void Prefab::SaveLayout(ofxJSONElement& moduleInfo)

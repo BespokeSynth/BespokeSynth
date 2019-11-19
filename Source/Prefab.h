@@ -24,7 +24,7 @@ public:
    ~Prefab();
    static IDrawableModule* Create() { return new Prefab(); }
    
-   string GetTitleLabel() override { return "prefab"; }
+   string GetTitleLabel() override;
    void CreateUIControls() override;
    
    ModuleContainer* GetContainer() override { return &mModuleContainer; }
@@ -50,11 +50,13 @@ private:
    void OnClicked(int x, int y, bool right) override;
    
    void SavePrefab(string savePath);
+   void UpdatePrefabName(string path);
    
    PatchCableSource* mModuleCable;
    ClickButton* mSaveButton;
    ClickButton* mLoadButton;
    ModuleContainer mModuleContainer;
+   string mPrefabName;
 };
 
 
