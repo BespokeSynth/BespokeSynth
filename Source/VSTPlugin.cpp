@@ -29,7 +29,11 @@ namespace VSTLookup
    //const VstDirExtPair vstDirs[kNumVstTypes] =
    //                                 {{"/Library/Audio/Plug-Ins/VST3","vst3"},
    //                                  {"/Library/Audio/Plug-Ins/VST","vst"}};
+#if BESPOKE_WINDOWS
+   const VstDirExtPair vstDirs[kNumVstTypes] = { { "C:/Library/Audio/Plug-Ins/VST","vst" } };
+#else
    const VstDirExtPair vstDirs[kNumVstTypes] = {{"/Library/Audio/Plug-Ins/VST","vst"}};
+#endif
    
    void GetAvailableVSTs(vector<string>& vsts)
    {
@@ -155,7 +159,7 @@ void VSTPlugin::SetVST(string vstName)
    for (int i=0; i<mFormatManager.getNumFormats(); ++i)
    {
       if (mFormatManager.getFormat(i)->fileMightContainThisPluginType(path))
-         mPlugin = mFormatManager.getFormat(i)->createInstanceFromDescription(desc, gSampleRate, gBufferSize);
+         mPlugin = mFormatManager.getFormat(i)->createInstanceFromDescription(desc, gSampleRate, gBufferSize).get();
    }
    if (mPlugin != nullptr)
    {

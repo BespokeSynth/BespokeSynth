@@ -76,7 +76,7 @@ bool MidiDevice::ConnectOutput(const char* name, int channel /*= 1*/)
 void MidiDevice::ConnectOutput(int index, int channel /*= 1*/)
 {
    delete mMidiOut;
-   mMidiOut = MidiOutput::openDevice(index);
+   mMidiOut = MidiOutput::openDevice(index).get();
 
    StringCopy(mDeviceNameOut, mMidiOut->getName().toRawUTF8(), 64);
 

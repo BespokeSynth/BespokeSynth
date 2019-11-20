@@ -10,6 +10,7 @@
 
 #ifdef BESPOKE_WINDOWS
 #include <GL/glew.h>
+#include <Windows.h>
 #endif
 
 //#include <chrono>
@@ -41,8 +42,11 @@ string ofToDataPath(string path, bool makeAbsolute)
       return path;
    if (path.empty() == false && path[0] == '/')
       return path;
+   if (path.empty() == false && path[1] == ':')
+      return path;
 #if JUCE_WINDOWS
-   return File::getCurrentWorkingDirectory().getChildFile(("data/" + path).c_str()).getFullPathName().toStdString();
+   //return File::getCurrentWorkingDirectory().getChildFile(("data/" + path).c_str()).getFullPathName().toStdString();
+   return File::getCurrentWorkingDirectory().getChildFile(("../MacOSX/build/Release/data/" + path).c_str()).getFullPathName().toStdString();
 #else
    #if DEBUG
       return "../Release/data/"+path;
@@ -278,6 +282,29 @@ void ofSetCircleResolution(float res)
    
 }
 
+#if BESPOKE_WINDOWS
+namespace windowsport
+{
+   struct timespec { long tv_sec; long tv_nsec; };    //header part
+   int clock_gettime(int, struct timespec *spec)      //C-file part
+   {
+      __int64 wintime; GetSystemTimeAsFileTime((FILETIME*)&wintime);
+      wintime -= 116444736000000000i64;  //1jan1601 to 1jan1970
+      spec->tv_sec = wintime / 10000000i64;           //seconds
+      spec->tv_nsec = wintime % 10000000i64 * 100;      //nano-seconds
+      return 0;
+   }
+}
+
+unsigned long long ofGetSystemTimeNanos()
+{
+   //auto now = std::chrono::high_resolution_clock::now();
+   //return std::chrono::duration_cast<std::chrono:nanoseconds>(now.time_since_epoch()).count();
+   struct windowsport::timespec t;
+   windowsport::clock_gettime(0, &t);
+   return t.tv_sec * 1000000000 + t.tv_nsec;
+}
+#else
 unsigned long long ofGetSystemTimeNanos()
 {
    //auto now = std::chrono::high_resolution_clock::now();
@@ -286,6 +313,7 @@ unsigned long long ofGetSystemTimeNanos()
    clock_gettime(CLOCK_MONOTONIC, &t);
    return t.tv_sec * 1000000000 + t.tv_nsec;
 }
+#endif
 
 float ofGetWidth()
 {

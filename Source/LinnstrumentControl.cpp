@@ -257,13 +257,21 @@ void LinnstrumentControl::SendScaleInfo()
          int number = setMainNoteBase + pitch;
          SendNRPN(number, TheScale->IsInScale(pitch));
          
+#if BESPOKE_WINDOWS
+         _sleep(10);
+#else
          usleep(10000);
+#endif
          
          //set accent note
          number = setAccentNoteBase + pitch;
          SendNRPN(number, TheScale->IsRoot(pitch));
          
-         usleep(10000);
+#if BESPOKE_WINDOWS
+         _sleep(10);
+#else
+         usleep(10000);         
+#endif
       }
    }
 }

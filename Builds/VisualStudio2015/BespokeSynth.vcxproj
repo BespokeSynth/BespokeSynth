@@ -55,7 +55,7 @@
     <ClCompile>
       <Optimization>Disabled</Optimization>
       <DebugInformationFormat>EditAndContinue</DebugInformationFormat>
-      <AdditionalIncludeDirectories>..\..\..\VST3 SDK;..\..\JuceLibraryCode;..\..\..\JUCE\modules;../../Source/json/include;../../Source/glew/include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>..\..\JuceLibraryCode;..\..\..\JUCE\modules;../../Source/json/include;../../Source/glew/include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <PreprocessorDefinitions>_CRT_SECURE_NO_WARNINGS;WIN32;_WINDOWS;DEBUG;_DEBUG;GLEW_STATIC;BESPOKE_WINDOWS;JUCER_VS2015_78A5022=1;JUCE_APP_VERSION=1.0.0;JUCE_APP_VERSION_HEX=0x10000;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <RuntimeLibrary>MultiThreadedDebug</RuntimeLibrary>
       <RuntimeTypeInfo>true</RuntimeTypeInfo>
@@ -96,7 +96,7 @@
     </Midl>
     <ClCompile>
       <Optimization>Full</Optimization>
-      <AdditionalIncludeDirectories>..\..\..\VST3 SDK;..\..\JuceLibraryCode;..\..\..\JUCE\modules;../../Source/json/include;../../Source/glew/include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>..\..\JuceLibraryCode;..\..\..\JUCE\modules;../../Source/json/include;../../Source/glew/include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <PreprocessorDefinitions>_CRT_SECURE_NO_WARNINGS;WIN32;_WINDOWS;NDEBUG;GLEW_STATIC;BESPOKE_WINDOWS;JUCER_VS2015_78A5022=1;JUCE_APP_VERSION=1.0.0;JUCE_APP_VERSION_HEX=0x10000;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <RuntimeLibrary>MultiThreaded</RuntimeLibrary>
       <RuntimeTypeInfo>true</RuntimeTypeInfo>
@@ -129,23 +129,6 @@
     </Bscmake>
   </ItemDefinitionGroup>
   <ItemGroup>
-    <ClCompile Include="..\..\Source\BitcrushEffect.cpp"/>
-    <ClCompile Include="..\..\Source\ButterworthFilterEffect.cpp"/>
-    <ClCompile Include="..\..\Source\Compressor.cpp"/>
-    <ClCompile Include="..\..\Source\DCRemoverEffect.cpp"/>
-    <ClCompile Include="..\..\Source\DelayEffect.cpp"/>
-    <ClCompile Include="..\..\Source\DistortionEffect.cpp"/>
-    <ClCompile Include="..\..\Source\EQEffect.cpp"/>
-    <ClCompile Include="..\..\Source\FormantFilterEffect.cpp"/>
-    <ClCompile Include="..\..\Source\FreeverbEffect.cpp"/>
-    <ClCompile Include="..\..\Source\GateEffect.cpp"/>
-    <ClCompile Include="..\..\Source\LiveGranulator.cpp"/>
-    <ClCompile Include="..\..\Source\Muter.cpp"/>
-    <ClCompile Include="..\..\Source\NoiseEffect.cpp"/>
-    <ClCompile Include="..\..\Source\PitchShiftEffect.cpp"/>
-    <ClCompile Include="..\..\Source\Pumper.cpp"/>
-    <ClCompile Include="..\..\Source\Stutter.cpp"/>
-    <ClCompile Include="..\..\Source\TremoloEffect.cpp"/>
     <ClCompile Include="..\..\Source\CFMessaging\Bespoke_CFMessaging.cpp"/>
     <ClCompile Include="..\..\Source\CFMessaging\KontrolKommunicator.cpp">
       <ExcludedFromBuild>true</ExcludedFromBuild>
@@ -182,11 +165,37 @@
     </ClCompile>
     <ClCompile Include="..\..\Source\vinylcontrol\timecoder.c"/>
     <ClCompile Include="..\..\Source\vinylcontrol\vinylcontrol.cpp"/>
-    <ClCompile Include="..\..\Source\ADSRTrigger.cpp"/>
+    <ClCompile Include="..\..\Source\BitcrushEffect.cpp"/>
+    <ClCompile Include="..\..\Source\ButterworthFilterEffect.cpp"/>
+    <ClCompile Include="..\..\Source\Compressor.cpp"/>
+    <ClCompile Include="..\..\Source\DCRemoverEffect.cpp"/>
+    <ClCompile Include="..\..\Source\DelayEffect.cpp"/>
+    <ClCompile Include="..\..\Source\DistortionEffect.cpp"/>
+    <ClCompile Include="..\..\Source\EQEffect.cpp"/>
+    <ClCompile Include="..\..\Source\FormantFilterEffect.cpp"/>
+    <ClCompile Include="..\..\Source\FreeverbEffect.cpp"/>
+    <ClCompile Include="..\..\Source\GateEffect.cpp"/>
+    <ClCompile Include="..\..\Source\LiveGranulator.cpp"/>
+    <ClCompile Include="..\..\Source\Muter.cpp"/>
+    <ClCompile Include="..\..\Source\NoiseEffect.cpp"/>
+    <ClCompile Include="..\..\Source\PitchShiftEffect.cpp"/>
+    <ClCompile Include="..\..\Source\Pumper.cpp"/>
+    <ClCompile Include="..\..\Source\Stutter.cpp"/>
+    <ClCompile Include="..\..\Source\TremoloEffect.cpp"/>
+    <ClCompile Include="..\..\Source\SpectralDisplay.cpp"/>
+    <ClCompile Include="..\..\Source\Inverter.cpp"/>
+    <ClCompile Include="..\..\Source\SampleLayerer.cpp"/>
+    <ClCompile Include="..\..\Source\MidiCapturer.cpp"/>
+    <ClCompile Include="..\..\Source\MultitapDelay.cpp"/>
+    <ClCompile Include="..\..\Source\LinnstrumentControl.cpp"/>
+    <ClCompile Include="..\..\Source\PulseSequence.cpp"/>
     <ClCompile Include="..\..\Source\Amplifier.cpp"/>
     <ClCompile Include="..\..\Source\Arpeggiator.cpp"/>
+    <ClCompile Include="..\..\Source\AudioLevelToCV.cpp"/>
     <ClCompile Include="..\..\Source\AudioMeter.cpp"/>
     <ClCompile Include="..\..\Source\AudioRouter.cpp"/>
+    <ClCompile Include="..\..\Source\AudioSend.cpp"/>
+    <ClCompile Include="..\..\Source\AudioToCV.cpp"/>
     <ClCompile Include="..\..\Source\Autotalent.cpp"/>
     <ClCompile Include="..\..\Source\BandVocoder.cpp"/>
     <ClCompile Include="..\..\Source\BeatBloks.cpp"/>
@@ -194,6 +203,7 @@
     <ClCompile Include="..\..\Source\BiquadFilterEffect.cpp"/>
     <ClCompile Include="..\..\Source\Capo.cpp"/>
     <ClCompile Include="..\..\Source\ChaosEngine.cpp"/>
+    <ClCompile Include="..\..\Source\ChordDisplayer.cpp"/>
     <ClCompile Include="..\..\Source\Chorder.cpp"/>
     <ClCompile Include="..\..\Source\CircleSequencer.cpp"/>
     <ClCompile Include="..\..\Source\ClipArranger.cpp"/>
@@ -208,17 +218,16 @@
     <ClCompile Include="..\..\Source\DrumPlayer.cpp"/>
     <ClCompile Include="..\..\Source\DrumSynth.cpp"/>
     <ClCompile Include="..\..\Source\EffectChain.cpp"/>
+    <ClCompile Include="..\..\Source\EnvelopeModulator.cpp"/>
     <ClCompile Include="..\..\Source\EventCanvas.cpp"/>
     <ClCompile Include="..\..\Source\FeedbackModule.cpp"/>
     <ClCompile Include="..\..\Source\FFTtoAdditive.cpp"/>
     <ClCompile Include="..\..\Source\FMSynth.cpp"/>
     <ClCompile Include="..\..\Source\FollowingSong.cpp"/>
     <ClCompile Include="..\..\Source\FourOnTheFloor.cpp"/>
-    <ClCompile Include="..\..\Source\FreeverbOutput.cpp"/>
     <ClCompile Include="..\..\Source\FreqDelay.cpp"/>
     <ClCompile Include="..\..\Source\FreqDomainBoilerplate.cpp"/>
     <ClCompile Include="..\..\Source\GridController.cpp"/>
-    <ClCompile Include="..\..\Source\GridToDrums.cpp"/>
     <ClCompile Include="..\..\Source\GroupControl.cpp"/>
     <ClCompile Include="..\..\Source\HelpDisplay.cpp"/>
     <ClCompile Include="..\..\Source\InputChannel.cpp"/>
@@ -238,11 +247,16 @@
     <ClCompile Include="..\..\Source\MacroSlider.cpp"/>
     <ClCompile Include="..\..\Source\Metronome.cpp"/>
     <ClCompile Include="..\..\Source\MidiController.cpp"/>
-    <ClCompile Include="..\..\Source\MidiInstrument.cpp"/>
     <ClCompile Include="..\..\Source\MidiOutput.cpp"/>
     <ClCompile Include="..\..\Source\ModulationVisualizer.cpp"/>
+    <ClCompile Include="..\..\Source\ModulatorAdd.cpp"/>
+    <ClCompile Include="..\..\Source\ModulatorAddCentered.cpp"/>
+    <ClCompile Include="..\..\Source\ModulatorCurve.cpp"/>
+    <ClCompile Include="..\..\Source\ModulatorMult.cpp"/>
+    <ClCompile Include="..\..\Source\ModulatorSmoother.cpp"/>
     <ClCompile Include="..\..\Source\ModuleSaveDataPanel.cpp"/>
     <ClCompile Include="..\..\Source\ModWheel.cpp"/>
+    <ClCompile Include="..\..\Source\ModWheelToCV.cpp"/>
     <ClCompile Include="..\..\Source\ModwheelToPressure.cpp"/>
     <ClCompile Include="..\..\Source\ModwheelToVibrato.cpp"/>
     <ClCompile Include="..\..\Source\Monophonify.cpp"/>
@@ -260,26 +274,35 @@
     <ClCompile Include="..\..\Source\NoteHumanizer.cpp"/>
     <ClCompile Include="..\..\Source\NoteLooper.cpp"/>
     <ClCompile Include="..\..\Source\NoteOctaver.cpp"/>
+    <ClCompile Include="..\..\Source\NotePanAlternator.cpp"/>
+    <ClCompile Include="..\..\Source\NotePanner.cpp"/>
     <ClCompile Include="..\..\Source\NoteRouter.cpp"/>
-    <ClCompile Include="..\..\Source\NoteSequencerColumn.cpp"/>
     <ClCompile Include="..\..\Source\NoteSinger.cpp"/>
     <ClCompile Include="..\..\Source\NoteStepSequencer.cpp"/>
+    <ClCompile Include="..\..\Source\NoteStrummer.cpp"/>
     <ClCompile Include="..\..\Source\NoteSustain.cpp"/>
     <ClCompile Include="..\..\Source\NoteToFreq.cpp"/>
     <ClCompile Include="..\..\Source\NoteToMs.cpp"/>
+    <ClCompile Include="..\..\Source\NoteToPulse.cpp"/>
     <ClCompile Include="..\..\Source\NoteTransformer.cpp"/>
     <ClCompile Include="..\..\Source\NoteVibrato.cpp"/>
     <ClCompile Include="..\..\Source\OneShotLauncher.cpp"/>
+    <ClCompile Include="..\..\Source\OSCOutput.cpp"/>
     <ClCompile Include="..\..\Source\OutputChannel.cpp"/>
     <ClCompile Include="..\..\Source\PanicButton.cpp"/>
+    <ClCompile Include="..\..\Source\Panner.cpp"/>
     <ClCompile Include="..\..\Source\PitchBender.cpp"/>
     <ClCompile Include="..\..\Source\PitchChorus.cpp"/>
     <ClCompile Include="..\..\Source\PitchDive.cpp"/>
+    <ClCompile Include="..\..\Source\PitchPanner.cpp"/>
     <ClCompile Include="..\..\Source\PitchSetter.cpp"/>
+    <ClCompile Include="..\..\Source\PitchToCV.cpp"/>
+    <ClCompile Include="..\..\Source\PitchToSpeed.cpp"/>
     <ClCompile Include="..\..\Source\Polyrhythms.cpp"/>
     <ClCompile Include="..\..\Source\Prefab.cpp"/>
     <ClCompile Include="..\..\Source\Presets.cpp"/>
     <ClCompile Include="..\..\Source\Pressure.cpp"/>
+    <ClCompile Include="..\..\Source\PressureToCV.cpp"/>
     <ClCompile Include="..\..\Source\PressureToModwheel.cpp"/>
     <ClCompile Include="..\..\Source\PressureToVibrato.cpp"/>
     <ClCompile Include="..\..\Source\PreviousNote.cpp"/>
@@ -287,6 +310,8 @@
     <ClCompile Include="..\..\Source\PSMoveController.cpp">
       <ExcludedFromBuild>true</ExcludedFromBuild>
     </ClCompile>
+    <ClCompile Include="..\..\Source\QuickSpawnMenu.cpp"/>
+    <ClCompile Include="..\..\Source\RadioSequencer.cpp"/>
     <ClCompile Include="..\..\Source\Ramper.cpp"/>
     <ClCompile Include="..\..\Source\RandomNoteGenerator.cpp"/>
     <ClCompile Include="..\..\Source\Razor.cpp"/>
@@ -294,6 +319,7 @@
     <ClCompile Include="..\..\Source\RingModulator.cpp"/>
     <ClCompile Include="..\..\Source\SampleBank.cpp"/>
     <ClCompile Include="..\..\Source\SampleCanvas.cpp"/>
+    <ClCompile Include="..\..\Source\SampleEditor.cpp"/>
     <ClCompile Include="..\..\Source\SampleFinder.cpp"/>
     <ClCompile Include="..\..\Source\SamplePlayer.cpp"/>
     <ClCompile Include="..\..\Source\Sampler.cpp"/>
@@ -303,14 +329,16 @@
     <ClCompile Include="..\..\Source\ScaleDetect.cpp"/>
     <ClCompile Include="..\..\Source\SeaOfGrain.cpp"/>
     <ClCompile Include="..\..\Source\Selector.cpp"/>
+    <ClCompile Include="..\..\Source\Pulser.cpp"/>
     <ClCompile Include="..\..\Source\SignalGenerator.cpp"/>
     <ClCompile Include="..\..\Source\SingleOscillator.cpp"/>
     <ClCompile Include="..\..\Source\SliderSequencer.cpp"/>
     <ClCompile Include="..\..\Source\SlowLayers.cpp"/>
+    <ClCompile Include="..\..\Source\Splitter.cpp"/>
     <ClCompile Include="..\..\Source\StepSequencer.cpp"/>
-    <ClCompile Include="..\..\Source\Stereofier.cpp"/>
     <ClCompile Include="..\..\Source\StutterControl.cpp"/>
     <ClCompile Include="..\..\Source\SustainPedal.cpp"/>
+    <ClCompile Include="..\..\Source\TakeRecorder.cpp"/>
     <ClCompile Include="..\..\Source\TimelineControl.cpp"/>
     <ClCompile Include="..\..\Source\TimerDisplay.cpp"/>
     <ClCompile Include="..\..\Source\TitleBar.cpp"/>
@@ -319,6 +347,7 @@
     <ClCompile Include="..\..\Source\VelocityScaler.cpp"/>
     <ClCompile Include="..\..\Source\VelocitySetter.cpp"/>
     <ClCompile Include="..\..\Source\VelocityStepSequencer.cpp"/>
+    <ClCompile Include="..\..\Source\VelocityToCV.cpp"/>
     <ClCompile Include="..\..\Source\VinylTempoControl.cpp"/>
     <ClCompile Include="..\..\Source\Vocoder.cpp"/>
     <ClCompile Include="..\..\Source\VocoderCarrierInput.cpp"/>
@@ -333,18 +362,20 @@
     <ClCompile Include="..\..\Source\Checkbox.cpp"/>
     <ClCompile Include="..\..\Source\TextEntry.cpp"/>
     <ClCompile Include="..\..\Source\IUIControl.cpp"/>
-    <ClCompile Include="..\..\Source\AdditiveVoice.cpp"/>
     <ClCompile Include="..\..\Source\ADSR.cpp"/>
     <ClCompile Include="..\..\Source\ADSRDisplay.cpp"/>
     <ClCompile Include="..\..\Source\ArrangementMaster.cpp"/>
+    <ClCompile Include="..\..\Source\ChannelBuffer.cpp"/>
     <ClCompile Include="..\..\Source\Bespoke_Platform.cpp"/>
     <ClCompile Include="..\..\Source\BiquadFilter.cpp"/>
     <ClCompile Include="..\..\Source\Canvas.cpp"/>
     <ClCompile Include="..\..\Source\CanvasControls.cpp"/>
     <ClCompile Include="..\..\Source\CanvasElement.cpp"/>
     <ClCompile Include="..\..\Source\Chord.cpp"/>
+    <ClCompile Include="..\..\Source\ChordDatabase.cpp"/>
     <ClCompile Include="..\..\Source\Curve.cpp"/>
     <ClCompile Include="..\..\Source\EffectFactory.cpp"/>
+    <ClCompile Include="..\..\Source\EnvelopeEditor.cpp"/>
     <ClCompile Include="..\..\Source\EnvOscillator.cpp"/>
     <ClCompile Include="..\..\Source\FFT.cpp"/>
     <ClCompile Include="..\..\Source\FileStream.cpp"/>
@@ -353,13 +384,15 @@
     <ClCompile Include="..\..\Source\FloatSliderLFOControl.cpp"/>
     <ClCompile Include="..\..\Source\FMVoice.cpp"/>
     <ClCompile Include="..\..\Source\Granulator.cpp"/>
-    <ClCompile Include="..\..\Source\Grid.cpp"/>
+    <ClCompile Include="..\..\Source\IAudioProcessor.cpp"/>
+    <ClCompile Include="..\..\Source\IAudioReceiver.cpp"/>
     <ClCompile Include="..\..\Source\IAudioSource.cpp"/>
     <ClCompile Include="..\..\Source\IClickable.cpp"/>
     <ClCompile Include="..\..\Source\IDrawableModule.cpp"/>
+    <ClCompile Include="..\..\Source\IModulator.cpp"/>
     <ClCompile Include="..\..\Source\INoteSource.cpp"/>
+    <ClCompile Include="..\..\Source\IPulseReceiver.cpp"/>
     <ClCompile Include="..\..\Source\JumpBlender.cpp"/>
-    <ClCompile Include="..\..\Source\KarplusRetriggerVoice.cpp"/>
     <ClCompile Include="..\..\Source\KarplusStrongVoice.cpp"/>
     <ClCompile Include="..\..\Source\LaunchpadInterpreter.cpp"/>
     <ClCompile Include="..\..\Source\LFO.cpp"/>
@@ -367,6 +400,7 @@
     <ClCompile Include="..\..\Source\LocationZoomer.cpp"/>
     <ClCompile Include="..\..\Source\Main.cpp"/>
     <ClCompile Include="..\..\Source\MainComponent.cpp"/>
+    <ClCompile Include="..\..\Source\MathUtils.cpp"/>
     <ClCompile Include="..\..\Source\MidiDevice.cpp"/>
     <ClCompile Include="..\..\Source\MidiReader.cpp"/>
     <ClCompile Include="..\..\Source\ModularSynth.cpp"/>
@@ -397,6 +431,7 @@
     <ClCompile Include="..\..\Source\SingleOscillatorVoice.cpp"/>
     <ClCompile Include="..\..\Source\SynthGlobals.cpp"/>
     <ClCompile Include="..\..\Source\TriggerDetector.cpp"/>
+    <ClCompile Include="..\..\Source\UIGrid.cpp"/>
     <ClCompile Include="..\..\Source\VSTPlayhead.cpp"/>
     <ClCompile Include="..\..\Source\VSTWindow.cpp"/>
     <ClCompile Include="..\..\..\JUCE\modules\juce_audio_basics\buffers\juce_AudioDataConverters.cpp">
@@ -1617,9 +1652,6 @@
     <ClCompile Include="..\..\..\JUCE\modules\juce_gui_basics\layout\juce_ConcertinaPanel.cpp">
       <ExcludedFromBuild>true</ExcludedFromBuild>
     </ClCompile>
-    <ClCompile Include="..\..\..\JUCE\modules\juce_gui_basics\layout\juce_FlexBox.cpp">
-      <ExcludedFromBuild>true</ExcludedFromBuild>
-    </ClCompile>
     <ClCompile Include="..\..\..\JUCE\modules\juce_gui_basics\layout\juce_GroupComponent.cpp">
       <ExcludedFromBuild>true</ExcludedFromBuild>
     </ClCompile>
@@ -2001,23 +2033,6 @@
     <ClCompile Include="..\..\JuceLibraryCode\juce_video.cpp"/>
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="..\..\Source\BitcrushEffect.h"/>
-    <ClInclude Include="..\..\Source\ButterworthFilterEffect.h"/>
-    <ClInclude Include="..\..\Source\Compressor.h"/>
-    <ClInclude Include="..\..\Source\DCRemoverEffect.h"/>
-    <ClInclude Include="..\..\Source\DelayEffect.h"/>
-    <ClInclude Include="..\..\Source\DistortionEffect.h"/>
-    <ClInclude Include="..\..\Source\EQEffect.h"/>
-    <ClInclude Include="..\..\Source\FormantFilterEffect.h"/>
-    <ClInclude Include="..\..\Source\FreeverbEffect.h"/>
-    <ClInclude Include="..\..\Source\GateEffect.h"/>
-    <ClInclude Include="..\..\Source\LiveGranulator.h"/>
-    <ClInclude Include="..\..\Source\Muter.h"/>
-    <ClInclude Include="..\..\Source\NoiseEffect.h"/>
-    <ClInclude Include="..\..\Source\PitchShiftEffect.h"/>
-    <ClInclude Include="..\..\Source\Pumper.h"/>
-    <ClInclude Include="..\..\Source\Stutter.h"/>
-    <ClInclude Include="..\..\Source\TremoloEffect.h"/>
     <ClInclude Include="..\..\Source\CFMessaging\KontrolKommunicator.h"/>
     <ClInclude Include="..\..\Source\CFMessaging\ListenPort.h"/>
     <ClInclude Include="..\..\Source\CFMessaging\NIMessage.h"/>
@@ -2052,11 +2067,37 @@
     <ClInclude Include="..\..\Source\psmove\PSMoveMgr.h"/>
     <ClInclude Include="..\..\Source\vinylcontrol\timecoder.h"/>
     <ClInclude Include="..\..\Source\vinylcontrol\vinylcontrol.h"/>
-    <ClInclude Include="..\..\Source\ADSRTrigger.h"/>
+    <ClInclude Include="..\..\Source\BitcrushEffect.h"/>
+    <ClInclude Include="..\..\Source\ButterworthFilterEffect.h"/>
+    <ClInclude Include="..\..\Source\Compressor.h"/>
+    <ClInclude Include="..\..\Source\DCRemoverEffect.h"/>
+    <ClInclude Include="..\..\Source\DelayEffect.h"/>
+    <ClInclude Include="..\..\Source\DistortionEffect.h"/>
+    <ClInclude Include="..\..\Source\EQEffect.h"/>
+    <ClInclude Include="..\..\Source\FormantFilterEffect.h"/>
+    <ClInclude Include="..\..\Source\FreeverbEffect.h"/>
+    <ClInclude Include="..\..\Source\GateEffect.h"/>
+    <ClInclude Include="..\..\Source\LiveGranulator.h"/>
+    <ClInclude Include="..\..\Source\Muter.h"/>
+    <ClInclude Include="..\..\Source\NoiseEffect.h"/>
+    <ClInclude Include="..\..\Source\PitchShiftEffect.h"/>
+    <ClInclude Include="..\..\Source\Pumper.h"/>
+    <ClInclude Include="..\..\Source\Stutter.h"/>
+    <ClInclude Include="..\..\Source\TremoloEffect.h"/>
+    <ClInclude Include="..\..\Source\SpectralDisplay.h"/>
+    <ClInclude Include="..\..\Source\Inverter.h"/>
+    <ClInclude Include="..\..\Source\SampleLayerer.h"/>
+    <ClInclude Include="..\..\Source\MidiCapturer.h"/>
+    <ClInclude Include="..\..\Source\MultitapDelay.h"/>
+    <ClInclude Include="..\..\Source\LinnstrumentControl.h"/>
+    <ClInclude Include="..\..\Source\PulseSequence.h"/>
     <ClInclude Include="..\..\Source\Amplifier.h"/>
     <ClInclude Include="..\..\Source\Arpeggiator.h"/>
+    <ClInclude Include="..\..\Source\AudioLevelToCV.h"/>
     <ClInclude Include="..\..\Source\AudioMeter.h"/>
     <ClInclude Include="..\..\Source\AudioRouter.h"/>
+    <ClInclude Include="..\..\Source\AudioSend.h"/>
+    <ClInclude Include="..\..\Source\AudioToCV.h"/>
     <ClInclude Include="..\..\Source\Autotalent.h"/>
     <ClInclude Include="..\..\Source\BandVocoder.h"/>
     <ClInclude Include="..\..\Source\BeatBloks.h"/>
@@ -2064,6 +2105,7 @@
     <ClInclude Include="..\..\Source\BiquadFilterEffect.h"/>
     <ClInclude Include="..\..\Source\Capo.h"/>
     <ClInclude Include="..\..\Source\ChaosEngine.h"/>
+    <ClInclude Include="..\..\Source\ChordDisplayer.h"/>
     <ClInclude Include="..\..\Source\Chorder.h"/>
     <ClInclude Include="..\..\Source\CircleSequencer.h"/>
     <ClInclude Include="..\..\Source\ClipArranger.h"/>
@@ -2078,17 +2120,16 @@
     <ClInclude Include="..\..\Source\DrumPlayer.h"/>
     <ClInclude Include="..\..\Source\DrumSynth.h"/>
     <ClInclude Include="..\..\Source\EffectChain.h"/>
+    <ClInclude Include="..\..\Source\EnvelopeModulator.h"/>
     <ClInclude Include="..\..\Source\EventCanvas.h"/>
     <ClInclude Include="..\..\Source\FeedbackModule.h"/>
     <ClInclude Include="..\..\Source\FFTtoAdditive.h"/>
     <ClInclude Include="..\..\Source\FMSynth.h"/>
     <ClInclude Include="..\..\Source\FollowingSong.h"/>
     <ClInclude Include="..\..\Source\FourOnTheFloor.h"/>
-    <ClInclude Include="..\..\Source\FreeverbOutput.h"/>
     <ClInclude Include="..\..\Source\FreqDelay.h"/>
     <ClInclude Include="..\..\Source\FreqDomainBoilerplate.h"/>
     <ClInclude Include="..\..\Source\GridController.h"/>
-    <ClInclude Include="..\..\Source\GridToDrums.h"/>
     <ClInclude Include="..\..\Source\GroupControl.h"/>
     <ClInclude Include="..\..\Source\HelpDisplay.h"/>
     <ClInclude Include="..\..\Source\InputChannel.h"/>
@@ -2100,17 +2141,23 @@
     <ClInclude Include="..\..\Source\LaunchpadNoteDisplayer.h"/>
     <ClInclude Include="..\..\Source\LFOController.h"/>
     <ClInclude Include="..\..\Source\Lissajous.h"/>
+    <ClInclude Include="..\..\Source\LockFreeQueue.h"/>
     <ClInclude Include="..\..\Source\Looper.h"/>
     <ClInclude Include="..\..\Source\LooperRecorder.h"/>
     <ClInclude Include="..\..\Source\LoopStorer.h"/>
     <ClInclude Include="..\..\Source\MacroSlider.h"/>
     <ClInclude Include="..\..\Source\Metronome.h"/>
     <ClInclude Include="..\..\Source\MidiController.h"/>
-    <ClInclude Include="..\..\Source\MidiInstrument.h"/>
     <ClInclude Include="..\..\Source\MidiOutput.h"/>
     <ClInclude Include="..\..\Source\ModulationVisualizer.h"/>
+    <ClInclude Include="..\..\Source\ModulatorAdd.h"/>
+    <ClInclude Include="..\..\Source\ModulatorAddCentered.h"/>
+    <ClInclude Include="..\..\Source\ModulatorCurve.h"/>
+    <ClInclude Include="..\..\Source\ModulatorMult.h"/>
+    <ClInclude Include="..\..\Source\ModulatorSmoother.h"/>
     <ClInclude Include="..\..\Source\ModuleSaveDataPanel.h"/>
     <ClInclude Include="..\..\Source\ModWheel.h"/>
+    <ClInclude Include="..\..\Source\ModWheelToCV.h"/>
     <ClInclude Include="..\..\Source\ModwheelToPressure.h"/>
     <ClInclude Include="..\..\Source\ModwheelToVibrato.h"/>
     <ClInclude Include="..\..\Source\Monophonify.h"/>
@@ -2128,31 +2175,42 @@
     <ClInclude Include="..\..\Source\NoteHumanizer.h"/>
     <ClInclude Include="..\..\Source\NoteLooper.h"/>
     <ClInclude Include="..\..\Source\NoteOctaver.h"/>
+    <ClInclude Include="..\..\Source\NotePanAlternator.h"/>
+    <ClInclude Include="..\..\Source\NotePanner.h"/>
     <ClInclude Include="..\..\Source\NoteRouter.h"/>
-    <ClInclude Include="..\..\Source\NoteSequencerColumn.h"/>
     <ClInclude Include="..\..\Source\NoteSinger.h"/>
     <ClInclude Include="..\..\Source\NoteStepSequencer.h"/>
+    <ClInclude Include="..\..\Source\NoteStrummer.h"/>
     <ClInclude Include="..\..\Source\NoteSustain.h"/>
     <ClInclude Include="..\..\Source\NoteToFreq.h"/>
     <ClInclude Include="..\..\Source\NoteToMs.h"/>
+    <ClInclude Include="..\..\Source\NoteToPulse.h"/>
     <ClInclude Include="..\..\Source\NoteTransformer.h"/>
     <ClInclude Include="..\..\Source\NoteVibrato.h"/>
     <ClInclude Include="..\..\Source\OneShotLauncher.h"/>
+    <ClInclude Include="..\..\Source\OSCOutput.h"/>
     <ClInclude Include="..\..\Source\OutputChannel.h"/>
     <ClInclude Include="..\..\Source\PanicButton.h"/>
+    <ClInclude Include="..\..\Source\Panner.h"/>
     <ClInclude Include="..\..\Source\PitchBender.h"/>
     <ClInclude Include="..\..\Source\PitchChorus.h"/>
     <ClInclude Include="..\..\Source\PitchDive.h"/>
+    <ClInclude Include="..\..\Source\PitchPanner.h"/>
     <ClInclude Include="..\..\Source\PitchSetter.h"/>
+    <ClInclude Include="..\..\Source\PitchToCV.h"/>
+    <ClInclude Include="..\..\Source\PitchToSpeed.h"/>
     <ClInclude Include="..\..\Source\Polyrhythms.h"/>
     <ClInclude Include="..\..\Source\Prefab.h"/>
     <ClInclude Include="..\..\Source\Presets.h"/>
     <ClInclude Include="..\..\Source\Pressure.h"/>
+    <ClInclude Include="..\..\Source\PressureToCV.h"/>
     <ClInclude Include="..\..\Source\PressureToModwheel.h"/>
     <ClInclude Include="..\..\Source\PressureToVibrato.h"/>
     <ClInclude Include="..\..\Source\PreviousNote.h"/>
     <ClInclude Include="..\..\Source\Producer.h"/>
     <ClInclude Include="..\..\Source\PSMoveController.h"/>
+    <ClInclude Include="..\..\Source\QuickSpawnMenu.h"/>
+    <ClInclude Include="..\..\Source\RadioSequencer.h"/>
     <ClInclude Include="..\..\Source\Ramper.h"/>
     <ClInclude Include="..\..\Source\RandomNoteGenerator.h"/>
     <ClInclude Include="..\..\Source\Razor.h"/>
@@ -2160,6 +2218,7 @@
     <ClInclude Include="..\..\Source\RingModulator.h"/>
     <ClInclude Include="..\..\Source\SampleBank.h"/>
     <ClInclude Include="..\..\Source\SampleCanvas.h"/>
+    <ClInclude Include="..\..\Source\SampleEditor.h"/>
     <ClInclude Include="..\..\Source\SampleFinder.h"/>
     <ClInclude Include="..\..\Source\SamplePlayer.h"/>
     <ClInclude Include="..\..\Source\Sampler.h"/>
@@ -2169,14 +2228,16 @@
     <ClInclude Include="..\..\Source\ScaleDetect.h"/>
     <ClInclude Include="..\..\Source\SeaOfGrain.h"/>
     <ClInclude Include="..\..\Source\Selector.h"/>
+    <ClInclude Include="..\..\Source\Pulser.h"/>
     <ClInclude Include="..\..\Source\SignalGenerator.h"/>
     <ClInclude Include="..\..\Source\SingleOscillator.h"/>
     <ClInclude Include="..\..\Source\SliderSequencer.h"/>
     <ClInclude Include="..\..\Source\SlowLayers.h"/>
+    <ClInclude Include="..\..\Source\Splitter.h"/>
     <ClInclude Include="..\..\Source\StepSequencer.h"/>
-    <ClInclude Include="..\..\Source\Stereofier.h"/>
     <ClInclude Include="..\..\Source\StutterControl.h"/>
     <ClInclude Include="..\..\Source\SustainPedal.h"/>
+    <ClInclude Include="..\..\Source\TakeRecorder.h"/>
     <ClInclude Include="..\..\Source\TimelineControl.h"/>
     <ClInclude Include="..\..\Source\TimerDisplay.h"/>
     <ClInclude Include="..\..\Source\TitleBar.h"/>
@@ -2185,6 +2246,7 @@
     <ClInclude Include="..\..\Source\VelocityScaler.h"/>
     <ClInclude Include="..\..\Source\VelocitySetter.h"/>
     <ClInclude Include="..\..\Source\VelocityStepSequencer.h"/>
+    <ClInclude Include="..\..\Source\VelocityToCV.h"/>
     <ClInclude Include="..\..\Source\VinylTempoControl.h"/>
     <ClInclude Include="..\..\Source\Vocoder.h"/>
     <ClInclude Include="..\..\Source\VocoderCarrierInput.h"/>
@@ -2199,17 +2261,19 @@
     <ClInclude Include="..\..\Source\Checkbox.h"/>
     <ClInclude Include="..\..\Source\TextEntry.h"/>
     <ClInclude Include="..\..\Source\IUIControl.h"/>
-    <ClInclude Include="..\..\Source\AdditiveVoice.h"/>
     <ClInclude Include="..\..\Source\ADSR.h"/>
     <ClInclude Include="..\..\Source\ADSRDisplay.h"/>
     <ClInclude Include="..\..\Source\ArrangementMaster.h"/>
+    <ClInclude Include="..\..\Source\ChannelBuffer.h"/>
     <ClInclude Include="..\..\Source\BiquadFilter.h"/>
     <ClInclude Include="..\..\Source\Canvas.h"/>
     <ClInclude Include="..\..\Source\CanvasControls.h"/>
     <ClInclude Include="..\..\Source\CanvasElement.h"/>
     <ClInclude Include="..\..\Source\Chord.h"/>
+    <ClInclude Include="..\..\Source\ChordDatabase.h"/>
     <ClInclude Include="..\..\Source\Curve.h"/>
     <ClInclude Include="..\..\Source\EffectFactory.h"/>
+    <ClInclude Include="..\..\Source\EnvelopeEditor.h"/>
     <ClInclude Include="..\..\Source\EnvOscillator.h"/>
     <ClInclude Include="..\..\Source\FFT.h"/>
     <ClInclude Include="..\..\Source\FileStream.h"/>
@@ -2219,26 +2283,29 @@
     <ClInclude Include="..\..\Source\FloatSliderLFOControl.h"/>
     <ClInclude Include="..\..\Source\FMVoice.h"/>
     <ClInclude Include="..\..\Source\Granulator.h"/>
-    <ClInclude Include="..\..\Source\Grid.h"/>
+    <ClInclude Include="..\..\Source\IAudioEffect.h"/>
+    <ClInclude Include="..\..\Source\IAudioPoller.h"/>
     <ClInclude Include="..\..\Source\IAudioProcessor.h"/>
     <ClInclude Include="..\..\Source\IAudioReceiver.h"/>
     <ClInclude Include="..\..\Source\IAudioSource.h"/>
     <ClInclude Include="..\..\Source\IClickable.h"/>
     <ClInclude Include="..\..\Source\IDrawableModule.h"/>
     <ClInclude Include="..\..\Source\IMidiVoice.h"/>
+    <ClInclude Include="..\..\Source\IModulator.h"/>
     <ClInclude Include="..\..\Source\INonstandardController.h"/>
     <ClInclude Include="..\..\Source\INoteReceiver.h"/>
     <ClInclude Include="..\..\Source\INoteSource.h"/>
     <ClInclude Include="..\..\Source\IPatchable.h"/>
     <ClInclude Include="..\..\Source\IPollable.h"/>
+    <ClInclude Include="..\..\Source\IPulseReceiver.h"/>
     <ClInclude Include="..\..\Source\IVoiceParams.h"/>
     <ClInclude Include="..\..\Source\JumpBlender.h"/>
-    <ClInclude Include="..\..\Source\KarplusRetriggerVoice.h"/>
     <ClInclude Include="..\..\Source\KarplusStrongVoice.h"/>
     <ClInclude Include="..\..\Source\LaunchpadInterpreter.h"/>
     <ClInclude Include="..\..\Source\LFO.h"/>
     <ClInclude Include="..\..\Source\LinkwitzRileyFilter.h"/>
     <ClInclude Include="..\..\Source\LocationZoomer.h"/>
+    <ClInclude Include="..\..\Source\MathUtils.h"/>
     <ClInclude Include="..\..\Source\MidiDevice.h"/>
     <ClInclude Include="..\..\Source\MidiReader.h"/>
     <ClInclude Include="..\..\Source\ModularSynth.h"/>
@@ -2270,6 +2337,7 @@
     <ClInclude Include="..\..\Source\SingleOscillatorVoice.h"/>
     <ClInclude Include="..\..\Source\SynthGlobals.h"/>
     <ClInclude Include="..\..\Source\TriggerDetector.h"/>
+    <ClInclude Include="..\..\Source\UIGrid.h"/>
     <ClInclude Include="..\..\Source\VSTPlayhead.h"/>
     <ClInclude Include="..\..\Source\VSTWindow.h"/>
     <ClInclude Include="..\..\..\JUCE\modules\juce_audio_basics\buffers\juce_AudioDataConverters.h"/>
@@ -2308,7 +2376,7 @@
     <ClInclude Include="..\..\..\JUCE\modules\juce_audio_basics\sources\juce_ToneGeneratorAudioSource.h"/>
     <ClInclude Include="..\..\..\JUCE\modules\juce_audio_basics\synthesisers\juce_Synthesiser.h"/>
     <ClInclude Include="..\..\..\JUCE\modules\juce_audio_basics\juce_audio_basics.h"/>
-    <ClInclude Include="..\..\..\..\..\Downloads\JUCE\modules\juce_audio_basics\juce_audio_basics.h"/>
+    <ClInclude Include="..\..\..\JUCE\modules\juce_audio_basics\juce_audio_basics.h"/>
     <ClInclude Include="..\..\..\JUCE\modules\juce_audio_devices\audio_cd\juce_AudioCDBurner.h"/>
     <ClInclude Include="..\..\..\JUCE\modules\juce_audio_devices\audio_cd\juce_AudioCDReader.h"/>
     <ClInclude Include="..\..\..\JUCE\modules\juce_audio_devices\audio_io\juce_AudioDeviceManager.h"/>
@@ -2322,7 +2390,7 @@
     <ClInclude Include="..\..\..\JUCE\modules\juce_audio_devices\sources\juce_AudioSourcePlayer.h"/>
     <ClInclude Include="..\..\..\JUCE\modules\juce_audio_devices\sources\juce_AudioTransportSource.h"/>
     <ClInclude Include="..\..\..\JUCE\modules\juce_audio_devices\juce_audio_devices.h"/>
-    <ClInclude Include="..\..\..\..\..\Downloads\JUCE\modules\juce_audio_devices\juce_audio_devices.h"/>
+    <ClInclude Include="..\..\..\JUCE\modules\juce_audio_devices\juce_audio_devices.h"/>
     <ClInclude Include="..\..\..\JUCE\modules\juce_audio_formats\codecs\flac\libFLAC\include\private\all.h"/>
     <ClInclude Include="..\..\..\JUCE\modules\juce_audio_formats\codecs\flac\libFLAC\include\private\bitmath.h"/>
     <ClInclude Include="..\..\..\JUCE\modules\juce_audio_formats\codecs\flac\libFLAC\include\private\bitreader.h"/>
@@ -2422,7 +2490,7 @@
     <ClInclude Include="..\..\..\JUCE\modules\juce_audio_formats\format\juce_MemoryMappedAudioFormatReader.h"/>
     <ClInclude Include="..\..\..\JUCE\modules\juce_audio_formats\sampler\juce_Sampler.h"/>
     <ClInclude Include="..\..\..\JUCE\modules\juce_audio_formats\juce_audio_formats.h"/>
-    <ClInclude Include="..\..\..\..\..\Downloads\JUCE\modules\juce_audio_formats\juce_audio_formats.h"/>
+    <ClInclude Include="..\..\..\JUCE\modules\juce_audio_formats\juce_audio_formats.h"/>
     <ClInclude Include="..\..\..\JUCE\modules\juce_audio_processors\format\juce_AudioPluginFormat.h"/>
     <ClInclude Include="..\..\..\JUCE\modules\juce_audio_processors\format\juce_AudioPluginFormatManager.h"/>
     <ClInclude Include="..\..\..\JUCE\modules\juce_audio_processors\format_types\juce_AudioUnitPluginFormat.h"/>
@@ -2430,7 +2498,6 @@
     <ClInclude Include="..\..\..\JUCE\modules\juce_audio_processors\format_types\juce_VST3Common.h"/>
     <ClInclude Include="..\..\..\JUCE\modules\juce_audio_processors\format_types\juce_VST3Headers.h"/>
     <ClInclude Include="..\..\..\JUCE\modules\juce_audio_processors\format_types\juce_VST3PluginFormat.h"/>
-    <ClInclude Include="..\..\..\JUCE\modules\juce_audio_processors\format_types\juce_VSTInterface.h"/>
     <ClInclude Include="..\..\..\JUCE\modules\juce_audio_processors\format_types\juce_VSTMidiEventList.h"/>
     <ClInclude Include="..\..\..\JUCE\modules\juce_audio_processors\format_types\juce_VSTPluginFormat.h"/>
     <ClInclude Include="..\..\..\JUCE\modules\juce_audio_processors\processors\juce_AudioChannelSet.h"/>
@@ -2453,7 +2520,7 @@
     <ClInclude Include="..\..\..\JUCE\modules\juce_audio_processors\utilities\juce_AudioProcessorParameterWithID.h"/>
     <ClInclude Include="..\..\..\JUCE\modules\juce_audio_processors\utilities\juce_AudioProcessorValueTreeState.h"/>
     <ClInclude Include="..\..\..\JUCE\modules\juce_audio_processors\juce_audio_processors.h"/>
-    <ClInclude Include="..\..\..\..\..\Downloads\JUCE\modules\juce_audio_processors\juce_audio_processors.h"/>
+    <ClInclude Include="..\..\..\JUCE\modules\juce_audio_processors\juce_audio_processors.h"/>
     <ClInclude Include="..\..\..\JUCE\modules\juce_audio_utils\gui\juce_AudioAppComponent.h"/>
     <ClInclude Include="..\..\..\JUCE\modules\juce_audio_utils\gui\juce_AudioDeviceSelectorComponent.h"/>
     <ClInclude Include="..\..\..\JUCE\modules\juce_audio_utils\gui\juce_AudioThumbnail.h"/>
@@ -2464,7 +2531,7 @@
     <ClInclude Include="..\..\..\JUCE\modules\juce_audio_utils\gui\juce_MidiKeyboardComponent.h"/>
     <ClInclude Include="..\..\..\JUCE\modules\juce_audio_utils\players\juce_AudioProcessorPlayer.h"/>
     <ClInclude Include="..\..\..\JUCE\modules\juce_audio_utils\juce_audio_utils.h"/>
-    <ClInclude Include="..\..\..\..\..\Downloads\JUCE\modules\juce_audio_utils\juce_audio_utils.h"/>
+    <ClInclude Include="..\..\..\JUCE\modules\juce_audio_utils\juce_audio_utils.h"/>
     <ClInclude Include="..\..\..\JUCE\modules\juce_core\containers\juce_AbstractFifo.h"/>
     <ClInclude Include="..\..\..\JUCE\modules\juce_core\containers\juce_Array.h"/>
     <ClInclude Include="..\..\..\JUCE\modules\juce_core\containers\juce_ArrayAllocationBase.h"/>
@@ -2594,7 +2661,7 @@
     <ClInclude Include="..\..\..\JUCE\modules\juce_core\zip\juce_GZIPDecompressorInputStream.h"/>
     <ClInclude Include="..\..\..\JUCE\modules\juce_core\zip\juce_ZipFile.h"/>
     <ClInclude Include="..\..\..\JUCE\modules\juce_core\juce_core.h"/>
-    <ClInclude Include="..\..\..\..\..\Downloads\JUCE\modules\juce_core\juce_core.h"/>
+    <ClInclude Include="..\..\..\JUCE\modules\juce_core\juce_core.h"/>
     <ClInclude Include="..\..\..\JUCE\modules\juce_cryptography\encryption\juce_BlowFish.h"/>
     <ClInclude Include="..\..\..\JUCE\modules\juce_cryptography\encryption\juce_Primes.h"/>
     <ClInclude Include="..\..\..\JUCE\modules\juce_cryptography\encryption\juce_RSAKey.h"/>
@@ -2602,7 +2669,7 @@
     <ClInclude Include="..\..\..\JUCE\modules\juce_cryptography\hashing\juce_SHA256.h"/>
     <ClInclude Include="..\..\..\JUCE\modules\juce_cryptography\hashing\juce_Whirlpool.h"/>
     <ClInclude Include="..\..\..\JUCE\modules\juce_cryptography\juce_cryptography.h"/>
-    <ClInclude Include="..\..\..\..\..\Downloads\JUCE\modules\juce_cryptography\juce_cryptography.h"/>
+    <ClInclude Include="..\..\..\JUCE\modules\juce_cryptography\juce_cryptography.h"/>
     <ClInclude Include="..\..\..\JUCE\modules\juce_data_structures\app_properties\juce_ApplicationProperties.h"/>
     <ClInclude Include="..\..\..\JUCE\modules\juce_data_structures\app_properties\juce_PropertiesFile.h"/>
     <ClInclude Include="..\..\..\JUCE\modules\juce_data_structures\undomanager\juce_UndoableAction.h"/>
@@ -2612,7 +2679,7 @@
     <ClInclude Include="..\..\..\JUCE\modules\juce_data_structures\values\juce_ValueTree.h"/>
     <ClInclude Include="..\..\..\JUCE\modules\juce_data_structures\values\juce_ValueTreeSynchroniser.h"/>
     <ClInclude Include="..\..\..\JUCE\modules\juce_data_structures\juce_data_structures.h"/>
-    <ClInclude Include="..\..\..\..\..\Downloads\JUCE\modules\juce_data_structures\juce_data_structures.h"/>
+    <ClInclude Include="..\..\..\JUCE\modules\juce_data_structures\juce_data_structures.h"/>
     <ClInclude Include="..\..\..\JUCE\modules\juce_events\broadcasters\juce_ActionBroadcaster.h"/>
     <ClInclude Include="..\..\..\JUCE\modules\juce_events\broadcasters\juce_ActionListener.h"/>
     <ClInclude Include="..\..\..\JUCE\modules\juce_events\broadcasters\juce_AsyncUpdater.h"/>
@@ -2636,7 +2703,7 @@
     <ClInclude Include="..\..\..\JUCE\modules\juce_events\timers\juce_MultiTimer.h"/>
     <ClInclude Include="..\..\..\JUCE\modules\juce_events\timers\juce_Timer.h"/>
     <ClInclude Include="..\..\..\JUCE\modules\juce_events\juce_events.h"/>
-    <ClInclude Include="..\..\..\..\..\Downloads\JUCE\modules\juce_events\juce_events.h"/>
+    <ClInclude Include="..\..\..\JUCE\modules\juce_events\juce_events.h"/>
     <ClInclude Include="..\..\..\JUCE\modules\juce_graphics\colour\juce_Colour.h"/>
     <ClInclude Include="..\..\..\JUCE\modules\juce_graphics\colour\juce_ColourGradient.h"/>
     <ClInclude Include="..\..\..\JUCE\modules\juce_graphics\colour\juce_Colours.h"/>
@@ -2693,7 +2760,7 @@
     <ClInclude Include="..\..\..\JUCE\modules\juce_graphics\placement\juce_Justification.h"/>
     <ClInclude Include="..\..\..\JUCE\modules\juce_graphics\placement\juce_RectanglePlacement.h"/>
     <ClInclude Include="..\..\..\JUCE\modules\juce_graphics\juce_graphics.h"/>
-    <ClInclude Include="..\..\..\..\..\Downloads\JUCE\modules\juce_graphics\juce_graphics.h"/>
+    <ClInclude Include="..\..\..\JUCE\modules\juce_graphics\juce_graphics.h"/>
     <ClInclude Include="..\..\..\JUCE\modules\juce_gui_basics\application\juce_Application.h"/>
     <ClInclude Include="..\..\..\JUCE\modules\juce_gui_basics\buttons\juce_ArrowButton.h"/>
     <ClInclude Include="..\..\..\JUCE\modules\juce_gui_basics\buttons\juce_Button.h"/>
@@ -2748,8 +2815,6 @@
     <ClInclude Include="..\..\..\JUCE\modules\juce_gui_basics\layout\juce_ComponentBuilder.h"/>
     <ClInclude Include="..\..\..\JUCE\modules\juce_gui_basics\layout\juce_ComponentMovementWatcher.h"/>
     <ClInclude Include="..\..\..\JUCE\modules\juce_gui_basics\layout\juce_ConcertinaPanel.h"/>
-    <ClInclude Include="..\..\..\JUCE\modules\juce_gui_basics\layout\juce_FlexBox.h"/>
-    <ClInclude Include="..\..\..\JUCE\modules\juce_gui_basics\layout\juce_FlexItem.h"/>
     <ClInclude Include="..\..\..\JUCE\modules\juce_gui_basics\layout\juce_GroupComponent.h"/>
     <ClInclude Include="..\..\..\JUCE\modules\juce_gui_basics\layout\juce_MultiDocumentPanel.h"/>
     <ClInclude Include="..\..\..\JUCE\modules\juce_gui_basics\layout\juce_ResizableBorderComponent.h"/>
@@ -2824,7 +2889,7 @@
     <ClInclude Include="..\..\..\JUCE\modules\juce_gui_basics\windows\juce_TooltipWindow.h"/>
     <ClInclude Include="..\..\..\JUCE\modules\juce_gui_basics\windows\juce_TopLevelWindow.h"/>
     <ClInclude Include="..\..\..\JUCE\modules\juce_gui_basics\juce_gui_basics.h"/>
-    <ClInclude Include="..\..\..\..\..\Downloads\JUCE\modules\juce_gui_basics\juce_gui_basics.h"/>
+    <ClInclude Include="..\..\..\JUCE\modules\juce_gui_basics\juce_gui_basics.h"/>
     <ClInclude Include="..\..\..\JUCE\modules\juce_gui_extra\code_editor\juce_CodeDocument.h"/>
     <ClInclude Include="..\..\..\JUCE\modules\juce_gui_extra\code_editor\juce_CodeEditorComponent.h"/>
     <ClInclude Include="..\..\..\JUCE\modules\juce_gui_extra\code_editor\juce_CodeTokeniser.h"/>
@@ -2849,7 +2914,7 @@
     <ClInclude Include="..\..\..\JUCE\modules\juce_gui_extra\misc\juce_WebBrowserComponent.h"/>
     <ClInclude Include="..\..\..\JUCE\modules\juce_gui_extra\native\juce_mac_CarbonViewWrapperComponent.h"/>
     <ClInclude Include="..\..\..\JUCE\modules\juce_gui_extra\juce_gui_extra.h"/>
-    <ClInclude Include="..\..\..\..\..\Downloads\JUCE\modules\juce_gui_extra\juce_gui_extra.h"/>
+    <ClInclude Include="..\..\..\JUCE\modules\juce_gui_extra\juce_gui_extra.h"/>
     <ClInclude Include="..\..\..\JUCE\modules\juce_opengl\geometry\juce_Draggable3DOrientation.h"/>
     <ClInclude Include="..\..\..\JUCE\modules\juce_opengl\geometry\juce_Matrix3D.h"/>
     <ClInclude Include="..\..\..\JUCE\modules\juce_opengl\geometry\juce_Quaternion.h"/>
@@ -2872,7 +2937,7 @@
     <ClInclude Include="..\..\..\JUCE\modules\juce_opengl\opengl\juce_OpenGLTexture.h"/>
     <ClInclude Include="..\..\..\JUCE\modules\juce_opengl\utils\juce_OpenGLAppComponent.h"/>
     <ClInclude Include="..\..\..\JUCE\modules\juce_opengl\juce_opengl.h"/>
-    <ClInclude Include="..\..\..\..\..\Downloads\JUCE\modules\juce_opengl\juce_opengl.h"/>
+    <ClInclude Include="..\..\..\JUCE\modules\juce_opengl\juce_opengl.h"/>
     <ClInclude Include="..\..\..\JUCE\modules\juce_osc\osc\juce_OSCAddress.h"/>
     <ClInclude Include="..\..\..\JUCE\modules\juce_osc\osc\juce_OSCArgument.h"/>
     <ClInclude Include="..\..\..\JUCE\modules\juce_osc\osc\juce_OSCBundle.h"/>
@@ -2882,12 +2947,12 @@
     <ClInclude Include="..\..\..\JUCE\modules\juce_osc\osc\juce_OSCTimeTag.h"/>
     <ClInclude Include="..\..\..\JUCE\modules\juce_osc\osc\juce_OSCTypes.h"/>
     <ClInclude Include="..\..\..\JUCE\modules\juce_osc\juce_osc.h"/>
-    <ClInclude Include="..\..\..\..\..\Downloads\JUCE\modules\juce_osc\juce_osc.h"/>
+    <ClInclude Include="..\..\..\JUCE\modules\juce_osc\juce_osc.h"/>
     <ClInclude Include="..\..\..\JUCE\modules\juce_video\capture\juce_CameraDevice.h"/>
     <ClInclude Include="..\..\..\JUCE\modules\juce_video\playback\juce_DirectShowComponent.h"/>
     <ClInclude Include="..\..\..\JUCE\modules\juce_video\playback\juce_QuickTimeMovieComponent.h"/>
     <ClInclude Include="..\..\..\JUCE\modules\juce_video\juce_video.h"/>
-    <ClInclude Include="..\..\..\..\..\Downloads\JUCE\modules\juce_video\juce_video.h"/>
+    <ClInclude Include="..\..\..\JUCE\modules\juce_video\juce_video.h"/>
     <ClInclude Include="..\..\JuceLibraryCode\AppConfig.h"/>
     <ClInclude Include="..\..\JuceLibraryCode\BinaryData.h"/>
     <ClInclude Include="..\..\JuceLibraryCode\JuceHeader.h"/>

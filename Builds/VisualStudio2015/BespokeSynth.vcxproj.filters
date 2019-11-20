@@ -5,53 +5,53 @@
     <Filter Include="BespokeSynth">
       <UniqueIdentifier>{304F9E7D-6C9D-CBAC-7AC0-211DB21A6A97}</UniqueIdentifier>
     </Filter>
+    <Filter Include="BespokeSynth\libraries">
+      <UniqueIdentifier>{1499B9C5-04B2-171C-57E6-999CE523E226}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="BespokeSynth\libraries\CFMessaging">
+      <UniqueIdentifier>{440C99BA-1A9C-0666-B527-3B6C0C29835A}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="BespokeSynth\libraries\freeverb">
+      <UniqueIdentifier>{407042AA-D50B-0860-215D-72A5594DCAD8}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="BespokeSynth\libraries\glew">
+      <UniqueIdentifier>{87C4AB3C-1542-A3FC-0BDA-247DB6605711}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="BespokeSynth\libraries\glew\include">
+      <UniqueIdentifier>{5F0D05B3-3851-EB81-3D25-6C4EDF953226}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="BespokeSynth\libraries\glew\include\GL">
+      <UniqueIdentifier>{C1A5BD5A-E318-1AB3-F3F8-32EA646D29BD}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="BespokeSynth\libraries\json">
+      <UniqueIdentifier>{9E2E7B57-3D8D-2884-A161-107EBB643DBC}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="BespokeSynth\libraries\json\include">
+      <UniqueIdentifier>{727859E6-93CB-4493-6B57-1DA28C32AA7E}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="BespokeSynth\libraries\json\include\json">
+      <UniqueIdentifier>{A66F1186-5357-1D50-4C89-B431EE3475AF}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="BespokeSynth\libraries\json\src">
+      <UniqueIdentifier>{5D8979CC-5234-78F3-63E8-99C47DCB9CD7}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="BespokeSynth\libraries\json\src\lib_json">
+      <UniqueIdentifier>{F020D88E-BF1F-D510-355A-17232F54AF9D}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="BespokeSynth\libraries\nanovg">
+      <UniqueIdentifier>{A12A6A1A-7B9E-0E6A-7FEF-F718785BB9D6}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="BespokeSynth\libraries\psmove">
+      <UniqueIdentifier>{94A3AB64-03F1-615C-1F12-323639776527}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="BespokeSynth\libraries\vinylcontrol">
+      <UniqueIdentifier>{A373A4D3-F4DE-E655-56E9-4FA62670522B}</UniqueIdentifier>
+    </Filter>
     <Filter Include="BespokeSynth\Source">
       <UniqueIdentifier>{01C82188-6B69-B9A7-B93B-C0DAAA696101}</UniqueIdentifier>
     </Filter>
     <Filter Include="BespokeSynth\Source\effects">
       <UniqueIdentifier>{4E0988AD-F30D-2EE4-49FC-8F77F2F66396}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="BespokeSynth\Source\libraries">
-      <UniqueIdentifier>{EE1F8805-F96F-8B6C-ED6A-07EBC829C474}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="BespokeSynth\Source\libraries\CFMessaging">
-      <UniqueIdentifier>{5029725A-76A7-EC25-85EF-32D67E68BB38}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="BespokeSynth\Source\libraries\freeverb">
-      <UniqueIdentifier>{D50097BA-BBA0-69DE-2888-35A426160A74}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="BespokeSynth\Source\libraries\glew">
-      <UniqueIdentifier>{5E470814-8269-DFEB-7C14-DB71681C9858}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="BespokeSynth\Source\libraries\glew\include">
-      <UniqueIdentifier>{2537AE52-A443-1529-3E72-75B867FEA121}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="BespokeSynth\Source\libraries\glew\include\GL">
-      <UniqueIdentifier>{1CA6E9E7-80A2-034D-E44F-9296EA2EE2CC}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="BespokeSynth\Source\libraries\json">
-      <UniqueIdentifier>{89BDDC95-1D9C-E904-1FC5-47D7684896EB}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="BespokeSynth\Source\libraries\json\include">
-      <UniqueIdentifier>{8EC587CD-63F6-E43E-9BB0-A7BDE2F2053A}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="BespokeSynth\Source\libraries\json\include\json">
-      <UniqueIdentifier>{11BE2A66-BB73-5BFD-3054-20B430E121F4}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="BespokeSynth\Source\libraries\json\src">
-      <UniqueIdentifier>{A385B960-3AC1-7E6A-80E2-85A7F9B88015}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="BespokeSynth\Source\libraries\json\src\lib_json">
-      <UniqueIdentifier>{3AD6F829-6CF5-69A0-9498-B1B6B7325325}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="BespokeSynth\Source\libraries\nanovg">
-      <UniqueIdentifier>{307976F8-254B-B2BF-98A1-208CE792B3C3}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="BespokeSynth\Source\libraries\psmove">
-      <UniqueIdentifier>{6633B184-AD8D-26C5-CD52-B74587CF064E}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="BespokeSynth\Source\libraries\vinylcontrol">
-      <UniqueIdentifier>{B49EF5B4-25CC-98E4-F8C2-2FF232AC7632}</UniqueIdentifier>
     </Filter>
     <Filter Include="BespokeSynth\Source\modules">
       <UniqueIdentifier>{FDC87D5E-99EF-E44C-759B-303D2AEF9FA8}</UniqueIdentifier>
@@ -424,6 +424,66 @@
     </Filter>
   </ItemGroup>
   <ItemGroup>
+    <ClCompile Include="..\..\Source\CFMessaging\Bespoke_CFMessaging.cpp">
+      <Filter>BespokeSynth\libraries\CFMessaging</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\Source\CFMessaging\KontrolKommunicator.cpp">
+      <Filter>BespokeSynth\libraries\CFMessaging</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\Source\CFMessaging\ListenPort.cpp">
+      <Filter>BespokeSynth\libraries\CFMessaging</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\Source\CFMessaging\NIMessage.cpp">
+      <Filter>BespokeSynth\libraries\CFMessaging</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\Source\CFMessaging\SendPort.cpp">
+      <Filter>BespokeSynth\libraries\CFMessaging</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\Source\freeverb\allpass.cpp">
+      <Filter>BespokeSynth\libraries\freeverb</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\Source\freeverb\comb.cpp">
+      <Filter>BespokeSynth\libraries\freeverb</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\Source\freeverb\revmodel.cpp">
+      <Filter>BespokeSynth\libraries\freeverb</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\Source\glew\include\GL\glew.c">
+      <Filter>BespokeSynth\libraries\glew\include\GL</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\Source\glew\Bespoke_glew.c">
+      <Filter>BespokeSynth\libraries\glew</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\Source\json\src\lib_json\json_reader.cpp">
+      <Filter>BespokeSynth\libraries\json\src\lib_json</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\Source\json\src\lib_json\json_value.cpp">
+      <Filter>BespokeSynth\libraries\json\src\lib_json</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\Source\json\src\lib_json\json_writer.cpp">
+      <Filter>BespokeSynth\libraries\json\src\lib_json</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\Source\nanovg\nanovg.c">
+      <Filter>BespokeSynth\libraries\nanovg</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\Source\psmove\Bespoke_PSMove.c">
+      <Filter>BespokeSynth\libraries\psmove</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\Source\psmove\hid.c">
+      <Filter>BespokeSynth\libraries\psmove</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\Source\psmove\psmove.c">
+      <Filter>BespokeSynth\libraries\psmove</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\Source\psmove\PSMoveMgr.cpp">
+      <Filter>BespokeSynth\libraries\psmove</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\Source\vinylcontrol\timecoder.c">
+      <Filter>BespokeSynth\libraries\vinylcontrol</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\Source\vinylcontrol\vinylcontrol.cpp">
+      <Filter>BespokeSynth\libraries\vinylcontrol</Filter>
+    </ClCompile>
     <ClCompile Include="..\..\Source\BitcrushEffect.cpp">
       <Filter>BespokeSynth\Source\effects</Filter>
     </ClCompile>
@@ -475,67 +535,25 @@
     <ClCompile Include="..\..\Source\TremoloEffect.cpp">
       <Filter>BespokeSynth\Source\effects</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\Source\CFMessaging\Bespoke_CFMessaging.cpp">
-      <Filter>BespokeSynth\Source\libraries\CFMessaging</Filter>
+    <ClCompile Include="..\..\Source\SpectralDisplay.cpp">
+      <Filter>BespokeSynth\Source\modules</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\Source\CFMessaging\KontrolKommunicator.cpp">
-      <Filter>BespokeSynth\Source\libraries\CFMessaging</Filter>
+    <ClCompile Include="..\..\Source\Inverter.cpp">
+      <Filter>BespokeSynth\Source\modules</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\Source\CFMessaging\ListenPort.cpp">
-      <Filter>BespokeSynth\Source\libraries\CFMessaging</Filter>
+    <ClCompile Include="..\..\Source\SampleLayerer.cpp">
+      <Filter>BespokeSynth\Source\modules</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\Source\CFMessaging\NIMessage.cpp">
-      <Filter>BespokeSynth\Source\libraries\CFMessaging</Filter>
+    <ClCompile Include="..\..\Source\MidiCapturer.cpp">
+      <Filter>BespokeSynth\Source\modules</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\Source\CFMessaging\SendPort.cpp">
-      <Filter>BespokeSynth\Source\libraries\CFMessaging</Filter>
+    <ClCompile Include="..\..\Source\MultitapDelay.cpp">
+      <Filter>BespokeSynth\Source\modules</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\Source\freeverb\allpass.cpp">
-      <Filter>BespokeSynth\Source\libraries\freeverb</Filter>
+    <ClCompile Include="..\..\Source\LinnstrumentControl.cpp">
+      <Filter>BespokeSynth\Source\modules</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\Source\freeverb\comb.cpp">
-      <Filter>BespokeSynth\Source\libraries\freeverb</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\Source\freeverb\revmodel.cpp">
-      <Filter>BespokeSynth\Source\libraries\freeverb</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\Source\glew\include\GL\glew.c">
-      <Filter>BespokeSynth\Source\libraries\glew\include\GL</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\Source\glew\Bespoke_glew.c">
-      <Filter>BespokeSynth\Source\libraries\glew</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\Source\json\src\lib_json\json_reader.cpp">
-      <Filter>BespokeSynth\Source\libraries\json\src\lib_json</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\Source\json\src\lib_json\json_value.cpp">
-      <Filter>BespokeSynth\Source\libraries\json\src\lib_json</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\Source\json\src\lib_json\json_writer.cpp">
-      <Filter>BespokeSynth\Source\libraries\json\src\lib_json</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\Source\nanovg\nanovg.c">
-      <Filter>BespokeSynth\Source\libraries\nanovg</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\Source\psmove\Bespoke_PSMove.c">
-      <Filter>BespokeSynth\Source\libraries\psmove</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\Source\psmove\hid.c">
-      <Filter>BespokeSynth\Source\libraries\psmove</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\Source\psmove\psmove.c">
-      <Filter>BespokeSynth\Source\libraries\psmove</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\Source\psmove\PSMoveMgr.cpp">
-      <Filter>BespokeSynth\Source\libraries\psmove</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\Source\vinylcontrol\timecoder.c">
-      <Filter>BespokeSynth\Source\libraries\vinylcontrol</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\Source\vinylcontrol\vinylcontrol.cpp">
-      <Filter>BespokeSynth\Source\libraries\vinylcontrol</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\Source\ADSRTrigger.cpp">
+    <ClCompile Include="..\..\Source\PulseSequence.cpp">
       <Filter>BespokeSynth\Source\modules</Filter>
     </ClCompile>
     <ClCompile Include="..\..\Source\Amplifier.cpp">
@@ -544,10 +562,19 @@
     <ClCompile Include="..\..\Source\Arpeggiator.cpp">
       <Filter>BespokeSynth\Source\modules</Filter>
     </ClCompile>
+    <ClCompile Include="..\..\Source\AudioLevelToCV.cpp">
+      <Filter>BespokeSynth\Source\modules</Filter>
+    </ClCompile>
     <ClCompile Include="..\..\Source\AudioMeter.cpp">
       <Filter>BespokeSynth\Source\modules</Filter>
     </ClCompile>
     <ClCompile Include="..\..\Source\AudioRouter.cpp">
+      <Filter>BespokeSynth\Source\modules</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\Source\AudioSend.cpp">
+      <Filter>BespokeSynth\Source\modules</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\Source\AudioToCV.cpp">
       <Filter>BespokeSynth\Source\modules</Filter>
     </ClCompile>
     <ClCompile Include="..\..\Source\Autotalent.cpp">
@@ -569,6 +596,9 @@
       <Filter>BespokeSynth\Source\modules</Filter>
     </ClCompile>
     <ClCompile Include="..\..\Source\ChaosEngine.cpp">
+      <Filter>BespokeSynth\Source\modules</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\Source\ChordDisplayer.cpp">
       <Filter>BespokeSynth\Source\modules</Filter>
     </ClCompile>
     <ClCompile Include="..\..\Source\Chorder.cpp">
@@ -613,6 +643,9 @@
     <ClCompile Include="..\..\Source\EffectChain.cpp">
       <Filter>BespokeSynth\Source\modules</Filter>
     </ClCompile>
+    <ClCompile Include="..\..\Source\EnvelopeModulator.cpp">
+      <Filter>BespokeSynth\Source\modules</Filter>
+    </ClCompile>
     <ClCompile Include="..\..\Source\EventCanvas.cpp">
       <Filter>BespokeSynth\Source\modules</Filter>
     </ClCompile>
@@ -631,9 +664,6 @@
     <ClCompile Include="..\..\Source\FourOnTheFloor.cpp">
       <Filter>BespokeSynth\Source\modules</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\Source\FreeverbOutput.cpp">
-      <Filter>BespokeSynth\Source\modules</Filter>
-    </ClCompile>
     <ClCompile Include="..\..\Source\FreqDelay.cpp">
       <Filter>BespokeSynth\Source\modules</Filter>
     </ClCompile>
@@ -641,9 +671,6 @@
       <Filter>BespokeSynth\Source\modules</Filter>
     </ClCompile>
     <ClCompile Include="..\..\Source\GridController.cpp">
-      <Filter>BespokeSynth\Source\modules</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\Source\GridToDrums.cpp">
       <Filter>BespokeSynth\Source\modules</Filter>
     </ClCompile>
     <ClCompile Include="..\..\Source\GroupControl.cpp">
@@ -697,19 +724,34 @@
     <ClCompile Include="..\..\Source\MidiController.cpp">
       <Filter>BespokeSynth\Source\modules</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\Source\MidiInstrument.cpp">
-      <Filter>BespokeSynth\Source\modules</Filter>
-    </ClCompile>
     <ClCompile Include="..\..\Source\MidiOutput.cpp">
       <Filter>BespokeSynth\Source\modules</Filter>
     </ClCompile>
     <ClCompile Include="..\..\Source\ModulationVisualizer.cpp">
       <Filter>BespokeSynth\Source\modules</Filter>
     </ClCompile>
+    <ClCompile Include="..\..\Source\ModulatorAdd.cpp">
+      <Filter>BespokeSynth\Source\modules</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\Source\ModulatorAddCentered.cpp">
+      <Filter>BespokeSynth\Source\modules</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\Source\ModulatorCurve.cpp">
+      <Filter>BespokeSynth\Source\modules</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\Source\ModulatorMult.cpp">
+      <Filter>BespokeSynth\Source\modules</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\Source\ModulatorSmoother.cpp">
+      <Filter>BespokeSynth\Source\modules</Filter>
+    </ClCompile>
     <ClCompile Include="..\..\Source\ModuleSaveDataPanel.cpp">
       <Filter>BespokeSynth\Source\modules</Filter>
     </ClCompile>
     <ClCompile Include="..\..\Source\ModWheel.cpp">
+      <Filter>BespokeSynth\Source\modules</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\Source\ModWheelToCV.cpp">
       <Filter>BespokeSynth\Source\modules</Filter>
     </ClCompile>
     <ClCompile Include="..\..\Source\ModwheelToPressure.cpp">
@@ -763,16 +805,22 @@
     <ClCompile Include="..\..\Source\NoteOctaver.cpp">
       <Filter>BespokeSynth\Source\modules</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\Source\NoteRouter.cpp">
+    <ClCompile Include="..\..\Source\NotePanAlternator.cpp">
       <Filter>BespokeSynth\Source\modules</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\Source\NoteSequencerColumn.cpp">
+    <ClCompile Include="..\..\Source\NotePanner.cpp">
+      <Filter>BespokeSynth\Source\modules</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\Source\NoteRouter.cpp">
       <Filter>BespokeSynth\Source\modules</Filter>
     </ClCompile>
     <ClCompile Include="..\..\Source\NoteSinger.cpp">
       <Filter>BespokeSynth\Source\modules</Filter>
     </ClCompile>
     <ClCompile Include="..\..\Source\NoteStepSequencer.cpp">
+      <Filter>BespokeSynth\Source\modules</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\Source\NoteStrummer.cpp">
       <Filter>BespokeSynth\Source\modules</Filter>
     </ClCompile>
     <ClCompile Include="..\..\Source\NoteSustain.cpp">
@@ -784,6 +832,9 @@
     <ClCompile Include="..\..\Source\NoteToMs.cpp">
       <Filter>BespokeSynth\Source\modules</Filter>
     </ClCompile>
+    <ClCompile Include="..\..\Source\NoteToPulse.cpp">
+      <Filter>BespokeSynth\Source\modules</Filter>
+    </ClCompile>
     <ClCompile Include="..\..\Source\NoteTransformer.cpp">
       <Filter>BespokeSynth\Source\modules</Filter>
     </ClCompile>
@@ -793,10 +844,16 @@
     <ClCompile Include="..\..\Source\OneShotLauncher.cpp">
       <Filter>BespokeSynth\Source\modules</Filter>
     </ClCompile>
+    <ClCompile Include="..\..\Source\OSCOutput.cpp">
+      <Filter>BespokeSynth\Source\modules</Filter>
+    </ClCompile>
     <ClCompile Include="..\..\Source\OutputChannel.cpp">
       <Filter>BespokeSynth\Source\modules</Filter>
     </ClCompile>
     <ClCompile Include="..\..\Source\PanicButton.cpp">
+      <Filter>BespokeSynth\Source\modules</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\Source\Panner.cpp">
       <Filter>BespokeSynth\Source\modules</Filter>
     </ClCompile>
     <ClCompile Include="..\..\Source\PitchBender.cpp">
@@ -808,7 +865,16 @@
     <ClCompile Include="..\..\Source\PitchDive.cpp">
       <Filter>BespokeSynth\Source\modules</Filter>
     </ClCompile>
+    <ClCompile Include="..\..\Source\PitchPanner.cpp">
+      <Filter>BespokeSynth\Source\modules</Filter>
+    </ClCompile>
     <ClCompile Include="..\..\Source\PitchSetter.cpp">
+      <Filter>BespokeSynth\Source\modules</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\Source\PitchToCV.cpp">
+      <Filter>BespokeSynth\Source\modules</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\Source\PitchToSpeed.cpp">
       <Filter>BespokeSynth\Source\modules</Filter>
     </ClCompile>
     <ClCompile Include="..\..\Source\Polyrhythms.cpp">
@@ -821,6 +887,9 @@
       <Filter>BespokeSynth\Source\modules</Filter>
     </ClCompile>
     <ClCompile Include="..\..\Source\Pressure.cpp">
+      <Filter>BespokeSynth\Source\modules</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\Source\PressureToCV.cpp">
       <Filter>BespokeSynth\Source\modules</Filter>
     </ClCompile>
     <ClCompile Include="..\..\Source\PressureToModwheel.cpp">
@@ -836,6 +905,12 @@
       <Filter>BespokeSynth\Source\modules</Filter>
     </ClCompile>
     <ClCompile Include="..\..\Source\PSMoveController.cpp">
+      <Filter>BespokeSynth\Source\modules</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\Source\QuickSpawnMenu.cpp">
+      <Filter>BespokeSynth\Source\modules</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\Source\RadioSequencer.cpp">
       <Filter>BespokeSynth\Source\modules</Filter>
     </ClCompile>
     <ClCompile Include="..\..\Source\Ramper.cpp">
@@ -857,6 +932,9 @@
       <Filter>BespokeSynth\Source\modules</Filter>
     </ClCompile>
     <ClCompile Include="..\..\Source\SampleCanvas.cpp">
+      <Filter>BespokeSynth\Source\modules</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\Source\SampleEditor.cpp">
       <Filter>BespokeSynth\Source\modules</Filter>
     </ClCompile>
     <ClCompile Include="..\..\Source\SampleFinder.cpp">
@@ -886,6 +964,9 @@
     <ClCompile Include="..\..\Source\Selector.cpp">
       <Filter>BespokeSynth\Source\modules</Filter>
     </ClCompile>
+    <ClCompile Include="..\..\Source\Pulser.cpp">
+      <Filter>BespokeSynth\Source\modules</Filter>
+    </ClCompile>
     <ClCompile Include="..\..\Source\SignalGenerator.cpp">
       <Filter>BespokeSynth\Source\modules</Filter>
     </ClCompile>
@@ -898,16 +979,19 @@
     <ClCompile Include="..\..\Source\SlowLayers.cpp">
       <Filter>BespokeSynth\Source\modules</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\Source\StepSequencer.cpp">
+    <ClCompile Include="..\..\Source\Splitter.cpp">
       <Filter>BespokeSynth\Source\modules</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\Source\Stereofier.cpp">
+    <ClCompile Include="..\..\Source\StepSequencer.cpp">
       <Filter>BespokeSynth\Source\modules</Filter>
     </ClCompile>
     <ClCompile Include="..\..\Source\StutterControl.cpp">
       <Filter>BespokeSynth\Source\modules</Filter>
     </ClCompile>
     <ClCompile Include="..\..\Source\SustainPedal.cpp">
+      <Filter>BespokeSynth\Source\modules</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\Source\TakeRecorder.cpp">
       <Filter>BespokeSynth\Source\modules</Filter>
     </ClCompile>
     <ClCompile Include="..\..\Source\TimelineControl.cpp">
@@ -932,6 +1016,9 @@
       <Filter>BespokeSynth\Source\modules</Filter>
     </ClCompile>
     <ClCompile Include="..\..\Source\VelocityStepSequencer.cpp">
+      <Filter>BespokeSynth\Source\modules</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\Source\VelocityToCV.cpp">
       <Filter>BespokeSynth\Source\modules</Filter>
     </ClCompile>
     <ClCompile Include="..\..\Source\VinylTempoControl.cpp">
@@ -976,9 +1063,6 @@
     <ClCompile Include="..\..\Source\IUIControl.cpp">
       <Filter>BespokeSynth\Source\uicontrols</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\Source\AdditiveVoice.cpp">
-      <Filter>BespokeSynth\Source</Filter>
-    </ClCompile>
     <ClCompile Include="..\..\Source\ADSR.cpp">
       <Filter>BespokeSynth\Source</Filter>
     </ClCompile>
@@ -986,6 +1070,9 @@
       <Filter>BespokeSynth\Source</Filter>
     </ClCompile>
     <ClCompile Include="..\..\Source\ArrangementMaster.cpp">
+      <Filter>BespokeSynth\Source</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\Source\ChannelBuffer.cpp">
       <Filter>BespokeSynth\Source</Filter>
     </ClCompile>
     <ClCompile Include="..\..\Source\Bespoke_Platform.cpp">
@@ -1006,10 +1093,16 @@
     <ClCompile Include="..\..\Source\Chord.cpp">
       <Filter>BespokeSynth\Source</Filter>
     </ClCompile>
+    <ClCompile Include="..\..\Source\ChordDatabase.cpp">
+      <Filter>BespokeSynth\Source</Filter>
+    </ClCompile>
     <ClCompile Include="..\..\Source\Curve.cpp">
       <Filter>BespokeSynth\Source</Filter>
     </ClCompile>
     <ClCompile Include="..\..\Source\EffectFactory.cpp">
+      <Filter>BespokeSynth\Source</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\Source\EnvelopeEditor.cpp">
       <Filter>BespokeSynth\Source</Filter>
     </ClCompile>
     <ClCompile Include="..\..\Source\EnvOscillator.cpp">
@@ -1036,7 +1129,10 @@
     <ClCompile Include="..\..\Source\Granulator.cpp">
       <Filter>BespokeSynth\Source</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\Source\Grid.cpp">
+    <ClCompile Include="..\..\Source\IAudioProcessor.cpp">
+      <Filter>BespokeSynth\Source</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\Source\IAudioReceiver.cpp">
       <Filter>BespokeSynth\Source</Filter>
     </ClCompile>
     <ClCompile Include="..\..\Source\IAudioSource.cpp">
@@ -1048,13 +1144,16 @@
     <ClCompile Include="..\..\Source\IDrawableModule.cpp">
       <Filter>BespokeSynth\Source</Filter>
     </ClCompile>
+    <ClCompile Include="..\..\Source\IModulator.cpp">
+      <Filter>BespokeSynth\Source</Filter>
+    </ClCompile>
     <ClCompile Include="..\..\Source\INoteSource.cpp">
       <Filter>BespokeSynth\Source</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\Source\JumpBlender.cpp">
+    <ClCompile Include="..\..\Source\IPulseReceiver.cpp">
       <Filter>BespokeSynth\Source</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\Source\KarplusRetriggerVoice.cpp">
+    <ClCompile Include="..\..\Source\JumpBlender.cpp">
       <Filter>BespokeSynth\Source</Filter>
     </ClCompile>
     <ClCompile Include="..\..\Source\KarplusStrongVoice.cpp">
@@ -1076,6 +1175,9 @@
       <Filter>BespokeSynth\Source</Filter>
     </ClCompile>
     <ClCompile Include="..\..\Source\MainComponent.cpp">
+      <Filter>BespokeSynth\Source</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\Source\MathUtils.cpp">
       <Filter>BespokeSynth\Source</Filter>
     </ClCompile>
     <ClCompile Include="..\..\Source\MidiDevice.cpp">
@@ -1166,6 +1268,9 @@
       <Filter>BespokeSynth\Source</Filter>
     </ClCompile>
     <ClCompile Include="..\..\Source\TriggerDetector.cpp">
+      <Filter>BespokeSynth\Source</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\Source\UIGrid.cpp">
       <Filter>BespokeSynth\Source</Filter>
     </ClCompile>
     <ClCompile Include="..\..\Source\VSTPlayhead.cpp">
@@ -2464,9 +2569,6 @@
     <ClCompile Include="..\..\..\JUCE\modules\juce_gui_basics\layout\juce_ConcertinaPanel.cpp">
       <Filter>Juce Modules\juce_gui_basics\layout</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\..\JUCE\modules\juce_gui_basics\layout\juce_FlexBox.cpp">
-      <Filter>Juce Modules\juce_gui_basics\layout</Filter>
-    </ClCompile>
     <ClCompile Include="..\..\..\JUCE\modules\juce_gui_basics\layout\juce_GroupComponent.cpp">
       <Filter>Juce Modules\juce_gui_basics\layout</Filter>
     </ClCompile>
@@ -2931,6 +3033,108 @@
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="..\..\Source\CFMessaging\KontrolKommunicator.h">
+      <Filter>BespokeSynth\libraries\CFMessaging</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\Source\CFMessaging\ListenPort.h">
+      <Filter>BespokeSynth\libraries\CFMessaging</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\Source\CFMessaging\NIMessage.h">
+      <Filter>BespokeSynth\libraries\CFMessaging</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\Source\CFMessaging\SendPort.h">
+      <Filter>BespokeSynth\libraries\CFMessaging</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\Source\freeverb\allpass.hpp">
+      <Filter>BespokeSynth\libraries\freeverb</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\Source\freeverb\comb.hpp">
+      <Filter>BespokeSynth\libraries\freeverb</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\Source\freeverb\denormals.h">
+      <Filter>BespokeSynth\libraries\freeverb</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\Source\freeverb\revmodel.hpp">
+      <Filter>BespokeSynth\libraries\freeverb</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\Source\freeverb\tuning.h">
+      <Filter>BespokeSynth\libraries\freeverb</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\Source\glew\include\GL\glew.h">
+      <Filter>BespokeSynth\libraries\glew\include\GL</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\Source\glew\include\GL\wglew.h">
+      <Filter>BespokeSynth\libraries\glew\include\GL</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\Source\json\include\json\autolink.h">
+      <Filter>BespokeSynth\libraries\json\include\json</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\Source\json\include\json\config.h">
+      <Filter>BespokeSynth\libraries\json\include\json</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\Source\json\include\json\features.h">
+      <Filter>BespokeSynth\libraries\json\include\json</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\Source\json\include\json\forwards.h">
+      <Filter>BespokeSynth\libraries\json\include\json</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\Source\json\include\json\json.h">
+      <Filter>BespokeSynth\libraries\json\include\json</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\Source\json\include\json\reader.h">
+      <Filter>BespokeSynth\libraries\json\include\json</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\Source\json\include\json\value.h">
+      <Filter>BespokeSynth\libraries\json\include\json</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\Source\json\include\json\writer.h">
+      <Filter>BespokeSynth\libraries\json\include\json</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\Source\json\src\lib_json\json_batchallocator.h">
+      <Filter>BespokeSynth\libraries\json\src\lib_json</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\Source\json\src\lib_json\json_internalarray.inl">
+      <Filter>BespokeSynth\libraries\json\src\lib_json</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\Source\json\src\lib_json\json_internalmap.inl">
+      <Filter>BespokeSynth\libraries\json\src\lib_json</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\Source\json\src\lib_json\json_valueiterator.inl">
+      <Filter>BespokeSynth\libraries\json\src\lib_json</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\Source\nanovg\fontstash.h">
+      <Filter>BespokeSynth\libraries\nanovg</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\Source\nanovg\nanovg.h">
+      <Filter>BespokeSynth\libraries\nanovg</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\Source\nanovg\nanovg_gl.h">
+      <Filter>BespokeSynth\libraries\nanovg</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\Source\nanovg\nanovg_gl_utils.h">
+      <Filter>BespokeSynth\libraries\nanovg</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\Source\nanovg\stb_image.h">
+      <Filter>BespokeSynth\libraries\nanovg</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\Source\nanovg\stb_truetype.h">
+      <Filter>BespokeSynth\libraries\nanovg</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\Source\psmove\hidapi.h">
+      <Filter>BespokeSynth\libraries\psmove</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\Source\psmove\psmove.h">
+      <Filter>BespokeSynth\libraries\psmove</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\Source\psmove\PSMoveMgr.h">
+      <Filter>BespokeSynth\libraries\psmove</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\Source\vinylcontrol\timecoder.h">
+      <Filter>BespokeSynth\libraries\vinylcontrol</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\Source\vinylcontrol\vinylcontrol.h">
+      <Filter>BespokeSynth\libraries\vinylcontrol</Filter>
+    </ClInclude>
     <ClInclude Include="..\..\Source\BitcrushEffect.h">
       <Filter>BespokeSynth\Source\effects</Filter>
     </ClInclude>
@@ -2982,109 +3186,25 @@
     <ClInclude Include="..\..\Source\TremoloEffect.h">
       <Filter>BespokeSynth\Source\effects</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\Source\CFMessaging\KontrolKommunicator.h">
-      <Filter>BespokeSynth\Source\libraries\CFMessaging</Filter>
+    <ClInclude Include="..\..\Source\SpectralDisplay.h">
+      <Filter>BespokeSynth\Source\modules</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\Source\CFMessaging\ListenPort.h">
-      <Filter>BespokeSynth\Source\libraries\CFMessaging</Filter>
+    <ClInclude Include="..\..\Source\Inverter.h">
+      <Filter>BespokeSynth\Source\modules</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\Source\CFMessaging\NIMessage.h">
-      <Filter>BespokeSynth\Source\libraries\CFMessaging</Filter>
+    <ClInclude Include="..\..\Source\SampleLayerer.h">
+      <Filter>BespokeSynth\Source\modules</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\Source\CFMessaging\SendPort.h">
-      <Filter>BespokeSynth\Source\libraries\CFMessaging</Filter>
+    <ClInclude Include="..\..\Source\MidiCapturer.h">
+      <Filter>BespokeSynth\Source\modules</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\Source\freeverb\allpass.hpp">
-      <Filter>BespokeSynth\Source\libraries\freeverb</Filter>
+    <ClInclude Include="..\..\Source\MultitapDelay.h">
+      <Filter>BespokeSynth\Source\modules</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\Source\freeverb\comb.hpp">
-      <Filter>BespokeSynth\Source\libraries\freeverb</Filter>
+    <ClInclude Include="..\..\Source\LinnstrumentControl.h">
+      <Filter>BespokeSynth\Source\modules</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\Source\freeverb\denormals.h">
-      <Filter>BespokeSynth\Source\libraries\freeverb</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\Source\freeverb\revmodel.hpp">
-      <Filter>BespokeSynth\Source\libraries\freeverb</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\Source\freeverb\tuning.h">
-      <Filter>BespokeSynth\Source\libraries\freeverb</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\Source\glew\include\GL\glew.h">
-      <Filter>BespokeSynth\Source\libraries\glew\include\GL</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\Source\glew\include\GL\wglew.h">
-      <Filter>BespokeSynth\Source\libraries\glew\include\GL</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\Source\json\include\json\autolink.h">
-      <Filter>BespokeSynth\Source\libraries\json\include\json</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\Source\json\include\json\config.h">
-      <Filter>BespokeSynth\Source\libraries\json\include\json</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\Source\json\include\json\features.h">
-      <Filter>BespokeSynth\Source\libraries\json\include\json</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\Source\json\include\json\forwards.h">
-      <Filter>BespokeSynth\Source\libraries\json\include\json</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\Source\json\include\json\json.h">
-      <Filter>BespokeSynth\Source\libraries\json\include\json</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\Source\json\include\json\reader.h">
-      <Filter>BespokeSynth\Source\libraries\json\include\json</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\Source\json\include\json\value.h">
-      <Filter>BespokeSynth\Source\libraries\json\include\json</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\Source\json\include\json\writer.h">
-      <Filter>BespokeSynth\Source\libraries\json\include\json</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\Source\json\src\lib_json\json_batchallocator.h">
-      <Filter>BespokeSynth\Source\libraries\json\src\lib_json</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\Source\json\src\lib_json\json_internalarray.inl">
-      <Filter>BespokeSynth\Source\libraries\json\src\lib_json</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\Source\json\src\lib_json\json_internalmap.inl">
-      <Filter>BespokeSynth\Source\libraries\json\src\lib_json</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\Source\json\src\lib_json\json_valueiterator.inl">
-      <Filter>BespokeSynth\Source\libraries\json\src\lib_json</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\Source\nanovg\fontstash.h">
-      <Filter>BespokeSynth\Source\libraries\nanovg</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\Source\nanovg\nanovg.h">
-      <Filter>BespokeSynth\Source\libraries\nanovg</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\Source\nanovg\nanovg_gl.h">
-      <Filter>BespokeSynth\Source\libraries\nanovg</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\Source\nanovg\nanovg_gl_utils.h">
-      <Filter>BespokeSynth\Source\libraries\nanovg</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\Source\nanovg\stb_image.h">
-      <Filter>BespokeSynth\Source\libraries\nanovg</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\Source\nanovg\stb_truetype.h">
-      <Filter>BespokeSynth\Source\libraries\nanovg</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\Source\psmove\hidapi.h">
-      <Filter>BespokeSynth\Source\libraries\psmove</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\Source\psmove\psmove.h">
-      <Filter>BespokeSynth\Source\libraries\psmove</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\Source\psmove\PSMoveMgr.h">
-      <Filter>BespokeSynth\Source\libraries\psmove</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\Source\vinylcontrol\timecoder.h">
-      <Filter>BespokeSynth\Source\libraries\vinylcontrol</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\Source\vinylcontrol\vinylcontrol.h">
-      <Filter>BespokeSynth\Source\libraries\vinylcontrol</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\Source\ADSRTrigger.h">
+    <ClInclude Include="..\..\Source\PulseSequence.h">
       <Filter>BespokeSynth\Source\modules</Filter>
     </ClInclude>
     <ClInclude Include="..\..\Source\Amplifier.h">
@@ -3093,10 +3213,19 @@
     <ClInclude Include="..\..\Source\Arpeggiator.h">
       <Filter>BespokeSynth\Source\modules</Filter>
     </ClInclude>
+    <ClInclude Include="..\..\Source\AudioLevelToCV.h">
+      <Filter>BespokeSynth\Source\modules</Filter>
+    </ClInclude>
     <ClInclude Include="..\..\Source\AudioMeter.h">
       <Filter>BespokeSynth\Source\modules</Filter>
     </ClInclude>
     <ClInclude Include="..\..\Source\AudioRouter.h">
+      <Filter>BespokeSynth\Source\modules</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\Source\AudioSend.h">
+      <Filter>BespokeSynth\Source\modules</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\Source\AudioToCV.h">
       <Filter>BespokeSynth\Source\modules</Filter>
     </ClInclude>
     <ClInclude Include="..\..\Source\Autotalent.h">
@@ -3118,6 +3247,9 @@
       <Filter>BespokeSynth\Source\modules</Filter>
     </ClInclude>
     <ClInclude Include="..\..\Source\ChaosEngine.h">
+      <Filter>BespokeSynth\Source\modules</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\Source\ChordDisplayer.h">
       <Filter>BespokeSynth\Source\modules</Filter>
     </ClInclude>
     <ClInclude Include="..\..\Source\Chorder.h">
@@ -3162,6 +3294,9 @@
     <ClInclude Include="..\..\Source\EffectChain.h">
       <Filter>BespokeSynth\Source\modules</Filter>
     </ClInclude>
+    <ClInclude Include="..\..\Source\EnvelopeModulator.h">
+      <Filter>BespokeSynth\Source\modules</Filter>
+    </ClInclude>
     <ClInclude Include="..\..\Source\EventCanvas.h">
       <Filter>BespokeSynth\Source\modules</Filter>
     </ClInclude>
@@ -3180,9 +3315,6 @@
     <ClInclude Include="..\..\Source\FourOnTheFloor.h">
       <Filter>BespokeSynth\Source\modules</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\Source\FreeverbOutput.h">
-      <Filter>BespokeSynth\Source\modules</Filter>
-    </ClInclude>
     <ClInclude Include="..\..\Source\FreqDelay.h">
       <Filter>BespokeSynth\Source\modules</Filter>
     </ClInclude>
@@ -3190,9 +3322,6 @@
       <Filter>BespokeSynth\Source\modules</Filter>
     </ClInclude>
     <ClInclude Include="..\..\Source\GridController.h">
-      <Filter>BespokeSynth\Source\modules</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\Source\GridToDrums.h">
       <Filter>BespokeSynth\Source\modules</Filter>
     </ClInclude>
     <ClInclude Include="..\..\Source\GroupControl.h">
@@ -3228,6 +3357,9 @@
     <ClInclude Include="..\..\Source\Lissajous.h">
       <Filter>BespokeSynth\Source\modules</Filter>
     </ClInclude>
+    <ClInclude Include="..\..\Source\LockFreeQueue.h">
+      <Filter>BespokeSynth\Source\modules</Filter>
+    </ClInclude>
     <ClInclude Include="..\..\Source\Looper.h">
       <Filter>BespokeSynth\Source\modules</Filter>
     </ClInclude>
@@ -3246,19 +3378,34 @@
     <ClInclude Include="..\..\Source\MidiController.h">
       <Filter>BespokeSynth\Source\modules</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\Source\MidiInstrument.h">
-      <Filter>BespokeSynth\Source\modules</Filter>
-    </ClInclude>
     <ClInclude Include="..\..\Source\MidiOutput.h">
       <Filter>BespokeSynth\Source\modules</Filter>
     </ClInclude>
     <ClInclude Include="..\..\Source\ModulationVisualizer.h">
       <Filter>BespokeSynth\Source\modules</Filter>
     </ClInclude>
+    <ClInclude Include="..\..\Source\ModulatorAdd.h">
+      <Filter>BespokeSynth\Source\modules</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\Source\ModulatorAddCentered.h">
+      <Filter>BespokeSynth\Source\modules</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\Source\ModulatorCurve.h">
+      <Filter>BespokeSynth\Source\modules</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\Source\ModulatorMult.h">
+      <Filter>BespokeSynth\Source\modules</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\Source\ModulatorSmoother.h">
+      <Filter>BespokeSynth\Source\modules</Filter>
+    </ClInclude>
     <ClInclude Include="..\..\Source\ModuleSaveDataPanel.h">
       <Filter>BespokeSynth\Source\modules</Filter>
     </ClInclude>
     <ClInclude Include="..\..\Source\ModWheel.h">
+      <Filter>BespokeSynth\Source\modules</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\Source\ModWheelToCV.h">
       <Filter>BespokeSynth\Source\modules</Filter>
     </ClInclude>
     <ClInclude Include="..\..\Source\ModwheelToPressure.h">
@@ -3312,16 +3459,22 @@
     <ClInclude Include="..\..\Source\NoteOctaver.h">
       <Filter>BespokeSynth\Source\modules</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\Source\NoteRouter.h">
+    <ClInclude Include="..\..\Source\NotePanAlternator.h">
       <Filter>BespokeSynth\Source\modules</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\Source\NoteSequencerColumn.h">
+    <ClInclude Include="..\..\Source\NotePanner.h">
+      <Filter>BespokeSynth\Source\modules</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\Source\NoteRouter.h">
       <Filter>BespokeSynth\Source\modules</Filter>
     </ClInclude>
     <ClInclude Include="..\..\Source\NoteSinger.h">
       <Filter>BespokeSynth\Source\modules</Filter>
     </ClInclude>
     <ClInclude Include="..\..\Source\NoteStepSequencer.h">
+      <Filter>BespokeSynth\Source\modules</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\Source\NoteStrummer.h">
       <Filter>BespokeSynth\Source\modules</Filter>
     </ClInclude>
     <ClInclude Include="..\..\Source\NoteSustain.h">
@@ -3333,6 +3486,9 @@
     <ClInclude Include="..\..\Source\NoteToMs.h">
       <Filter>BespokeSynth\Source\modules</Filter>
     </ClInclude>
+    <ClInclude Include="..\..\Source\NoteToPulse.h">
+      <Filter>BespokeSynth\Source\modules</Filter>
+    </ClInclude>
     <ClInclude Include="..\..\Source\NoteTransformer.h">
       <Filter>BespokeSynth\Source\modules</Filter>
     </ClInclude>
@@ -3342,10 +3498,16 @@
     <ClInclude Include="..\..\Source\OneShotLauncher.h">
       <Filter>BespokeSynth\Source\modules</Filter>
     </ClInclude>
+    <ClInclude Include="..\..\Source\OSCOutput.h">
+      <Filter>BespokeSynth\Source\modules</Filter>
+    </ClInclude>
     <ClInclude Include="..\..\Source\OutputChannel.h">
       <Filter>BespokeSynth\Source\modules</Filter>
     </ClInclude>
     <ClInclude Include="..\..\Source\PanicButton.h">
+      <Filter>BespokeSynth\Source\modules</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\Source\Panner.h">
       <Filter>BespokeSynth\Source\modules</Filter>
     </ClInclude>
     <ClInclude Include="..\..\Source\PitchBender.h">
@@ -3357,7 +3519,16 @@
     <ClInclude Include="..\..\Source\PitchDive.h">
       <Filter>BespokeSynth\Source\modules</Filter>
     </ClInclude>
+    <ClInclude Include="..\..\Source\PitchPanner.h">
+      <Filter>BespokeSynth\Source\modules</Filter>
+    </ClInclude>
     <ClInclude Include="..\..\Source\PitchSetter.h">
+      <Filter>BespokeSynth\Source\modules</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\Source\PitchToCV.h">
+      <Filter>BespokeSynth\Source\modules</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\Source\PitchToSpeed.h">
       <Filter>BespokeSynth\Source\modules</Filter>
     </ClInclude>
     <ClInclude Include="..\..\Source\Polyrhythms.h">
@@ -3370,6 +3541,9 @@
       <Filter>BespokeSynth\Source\modules</Filter>
     </ClInclude>
     <ClInclude Include="..\..\Source\Pressure.h">
+      <Filter>BespokeSynth\Source\modules</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\Source\PressureToCV.h">
       <Filter>BespokeSynth\Source\modules</Filter>
     </ClInclude>
     <ClInclude Include="..\..\Source\PressureToModwheel.h">
@@ -3385,6 +3559,12 @@
       <Filter>BespokeSynth\Source\modules</Filter>
     </ClInclude>
     <ClInclude Include="..\..\Source\PSMoveController.h">
+      <Filter>BespokeSynth\Source\modules</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\Source\QuickSpawnMenu.h">
+      <Filter>BespokeSynth\Source\modules</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\Source\RadioSequencer.h">
       <Filter>BespokeSynth\Source\modules</Filter>
     </ClInclude>
     <ClInclude Include="..\..\Source\Ramper.h">
@@ -3406,6 +3586,9 @@
       <Filter>BespokeSynth\Source\modules</Filter>
     </ClInclude>
     <ClInclude Include="..\..\Source\SampleCanvas.h">
+      <Filter>BespokeSynth\Source\modules</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\Source\SampleEditor.h">
       <Filter>BespokeSynth\Source\modules</Filter>
     </ClInclude>
     <ClInclude Include="..\..\Source\SampleFinder.h">
@@ -3435,6 +3618,9 @@
     <ClInclude Include="..\..\Source\Selector.h">
       <Filter>BespokeSynth\Source\modules</Filter>
     </ClInclude>
+    <ClInclude Include="..\..\Source\Pulser.h">
+      <Filter>BespokeSynth\Source\modules</Filter>
+    </ClInclude>
     <ClInclude Include="..\..\Source\SignalGenerator.h">
       <Filter>BespokeSynth\Source\modules</Filter>
     </ClInclude>
@@ -3447,16 +3633,19 @@
     <ClInclude Include="..\..\Source\SlowLayers.h">
       <Filter>BespokeSynth\Source\modules</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\Source\StepSequencer.h">
+    <ClInclude Include="..\..\Source\Splitter.h">
       <Filter>BespokeSynth\Source\modules</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\Source\Stereofier.h">
+    <ClInclude Include="..\..\Source\StepSequencer.h">
       <Filter>BespokeSynth\Source\modules</Filter>
     </ClInclude>
     <ClInclude Include="..\..\Source\StutterControl.h">
       <Filter>BespokeSynth\Source\modules</Filter>
     </ClInclude>
     <ClInclude Include="..\..\Source\SustainPedal.h">
+      <Filter>BespokeSynth\Source\modules</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\Source\TakeRecorder.h">
       <Filter>BespokeSynth\Source\modules</Filter>
     </ClInclude>
     <ClInclude Include="..\..\Source\TimelineControl.h">
@@ -3481,6 +3670,9 @@
       <Filter>BespokeSynth\Source\modules</Filter>
     </ClInclude>
     <ClInclude Include="..\..\Source\VelocityStepSequencer.h">
+      <Filter>BespokeSynth\Source\modules</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\Source\VelocityToCV.h">
       <Filter>BespokeSynth\Source\modules</Filter>
     </ClInclude>
     <ClInclude Include="..\..\Source\VinylTempoControl.h">
@@ -3525,9 +3717,6 @@
     <ClInclude Include="..\..\Source\IUIControl.h">
       <Filter>BespokeSynth\Source\uicontrols</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\Source\AdditiveVoice.h">
-      <Filter>BespokeSynth\Source</Filter>
-    </ClInclude>
     <ClInclude Include="..\..\Source\ADSR.h">
       <Filter>BespokeSynth\Source</Filter>
     </ClInclude>
@@ -3535,6 +3724,9 @@
       <Filter>BespokeSynth\Source</Filter>
     </ClInclude>
     <ClInclude Include="..\..\Source\ArrangementMaster.h">
+      <Filter>BespokeSynth\Source</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\Source\ChannelBuffer.h">
       <Filter>BespokeSynth\Source</Filter>
     </ClInclude>
     <ClInclude Include="..\..\Source\BiquadFilter.h">
@@ -3552,10 +3744,16 @@
     <ClInclude Include="..\..\Source\Chord.h">
       <Filter>BespokeSynth\Source</Filter>
     </ClInclude>
+    <ClInclude Include="..\..\Source\ChordDatabase.h">
+      <Filter>BespokeSynth\Source</Filter>
+    </ClInclude>
     <ClInclude Include="..\..\Source\Curve.h">
       <Filter>BespokeSynth\Source</Filter>
     </ClInclude>
     <ClInclude Include="..\..\Source\EffectFactory.h">
+      <Filter>BespokeSynth\Source</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\Source\EnvelopeEditor.h">
       <Filter>BespokeSynth\Source</Filter>
     </ClInclude>
     <ClInclude Include="..\..\Source\EnvOscillator.h">
@@ -3585,7 +3783,10 @@
     <ClInclude Include="..\..\Source\Granulator.h">
       <Filter>BespokeSynth\Source</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\Source\Grid.h">
+    <ClInclude Include="..\..\Source\IAudioEffect.h">
+      <Filter>BespokeSynth\Source</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\Source\IAudioPoller.h">
       <Filter>BespokeSynth\Source</Filter>
     </ClInclude>
     <ClInclude Include="..\..\Source\IAudioProcessor.h">
@@ -3606,6 +3807,9 @@
     <ClInclude Include="..\..\Source\IMidiVoice.h">
       <Filter>BespokeSynth\Source</Filter>
     </ClInclude>
+    <ClInclude Include="..\..\Source\IModulator.h">
+      <Filter>BespokeSynth\Source</Filter>
+    </ClInclude>
     <ClInclude Include="..\..\Source\INonstandardController.h">
       <Filter>BespokeSynth\Source</Filter>
     </ClInclude>
@@ -3621,13 +3825,13 @@
     <ClInclude Include="..\..\Source\IPollable.h">
       <Filter>BespokeSynth\Source</Filter>
     </ClInclude>
+    <ClInclude Include="..\..\Source\IPulseReceiver.h">
+      <Filter>BespokeSynth\Source</Filter>
+    </ClInclude>
     <ClInclude Include="..\..\Source\IVoiceParams.h">
       <Filter>BespokeSynth\Source</Filter>
     </ClInclude>
     <ClInclude Include="..\..\Source\JumpBlender.h">
-      <Filter>BespokeSynth\Source</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\Source\KarplusRetriggerVoice.h">
       <Filter>BespokeSynth\Source</Filter>
     </ClInclude>
     <ClInclude Include="..\..\Source\KarplusStrongVoice.h">
@@ -3643,6 +3847,9 @@
       <Filter>BespokeSynth\Source</Filter>
     </ClInclude>
     <ClInclude Include="..\..\Source\LocationZoomer.h">
+      <Filter>BespokeSynth\Source</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\Source\MathUtils.h">
       <Filter>BespokeSynth\Source</Filter>
     </ClInclude>
     <ClInclude Include="..\..\Source\MidiDevice.h">
@@ -3736,6 +3943,9 @@
       <Filter>BespokeSynth\Source</Filter>
     </ClInclude>
     <ClInclude Include="..\..\Source\TriggerDetector.h">
+      <Filter>BespokeSynth\Source</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\Source\UIGrid.h">
       <Filter>BespokeSynth\Source</Filter>
     </ClInclude>
     <ClInclude Include="..\..\Source\VSTPlayhead.h">
@@ -3852,7 +4062,7 @@
     <ClInclude Include="..\..\..\JUCE\modules\juce_audio_basics\juce_audio_basics.h">
       <Filter>Juce Modules\juce_audio_basics</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\..\..\..\Downloads\JUCE\modules\juce_audio_basics\juce_audio_basics.h">
+    <ClInclude Include="..\..\..\JUCE\modules\juce_audio_basics\juce_audio_basics.h">
       <Filter>Juce Modules\juce_audio_basics</Filter>
     </ClInclude>
     <ClInclude Include="..\..\..\JUCE\modules\juce_audio_devices\audio_cd\juce_AudioCDBurner.h">
@@ -3894,7 +4104,7 @@
     <ClInclude Include="..\..\..\JUCE\modules\juce_audio_devices\juce_audio_devices.h">
       <Filter>Juce Modules\juce_audio_devices</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\..\..\..\Downloads\JUCE\modules\juce_audio_devices\juce_audio_devices.h">
+    <ClInclude Include="..\..\..\JUCE\modules\juce_audio_devices\juce_audio_devices.h">
       <Filter>Juce Modules\juce_audio_devices</Filter>
     </ClInclude>
     <ClInclude Include="..\..\..\JUCE\modules\juce_audio_formats\codecs\flac\libFLAC\include\private\all.h">
@@ -4194,7 +4404,7 @@
     <ClInclude Include="..\..\..\JUCE\modules\juce_audio_formats\juce_audio_formats.h">
       <Filter>Juce Modules\juce_audio_formats</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\..\..\..\Downloads\JUCE\modules\juce_audio_formats\juce_audio_formats.h">
+    <ClInclude Include="..\..\..\JUCE\modules\juce_audio_formats\juce_audio_formats.h">
       <Filter>Juce Modules\juce_audio_formats</Filter>
     </ClInclude>
     <ClInclude Include="..\..\..\JUCE\modules\juce_audio_processors\format\juce_AudioPluginFormat.h">
@@ -4216,9 +4426,6 @@
       <Filter>Juce Modules\juce_audio_processors\format_types</Filter>
     </ClInclude>
     <ClInclude Include="..\..\..\JUCE\modules\juce_audio_processors\format_types\juce_VST3PluginFormat.h">
-      <Filter>Juce Modules\juce_audio_processors\format_types</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\..\JUCE\modules\juce_audio_processors\format_types\juce_VSTInterface.h">
       <Filter>Juce Modules\juce_audio_processors\format_types</Filter>
     </ClInclude>
     <ClInclude Include="..\..\..\JUCE\modules\juce_audio_processors\format_types\juce_VSTMidiEventList.h">
@@ -4287,7 +4494,7 @@
     <ClInclude Include="..\..\..\JUCE\modules\juce_audio_processors\juce_audio_processors.h">
       <Filter>Juce Modules\juce_audio_processors</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\..\..\..\Downloads\JUCE\modules\juce_audio_processors\juce_audio_processors.h">
+    <ClInclude Include="..\..\..\JUCE\modules\juce_audio_processors\juce_audio_processors.h">
       <Filter>Juce Modules\juce_audio_processors</Filter>
     </ClInclude>
     <ClInclude Include="..\..\..\JUCE\modules\juce_audio_utils\gui\juce_AudioAppComponent.h">
@@ -4320,7 +4527,7 @@
     <ClInclude Include="..\..\..\JUCE\modules\juce_audio_utils\juce_audio_utils.h">
       <Filter>Juce Modules\juce_audio_utils</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\..\..\..\Downloads\JUCE\modules\juce_audio_utils\juce_audio_utils.h">
+    <ClInclude Include="..\..\..\JUCE\modules\juce_audio_utils\juce_audio_utils.h">
       <Filter>Juce Modules\juce_audio_utils</Filter>
     </ClInclude>
     <ClInclude Include="..\..\..\JUCE\modules\juce_core\containers\juce_AbstractFifo.h">
@@ -4710,7 +4917,7 @@
     <ClInclude Include="..\..\..\JUCE\modules\juce_core\juce_core.h">
       <Filter>Juce Modules\juce_core</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\..\..\..\Downloads\JUCE\modules\juce_core\juce_core.h">
+    <ClInclude Include="..\..\..\JUCE\modules\juce_core\juce_core.h">
       <Filter>Juce Modules\juce_core</Filter>
     </ClInclude>
     <ClInclude Include="..\..\..\JUCE\modules\juce_cryptography\encryption\juce_BlowFish.h">
@@ -4734,7 +4941,7 @@
     <ClInclude Include="..\..\..\JUCE\modules\juce_cryptography\juce_cryptography.h">
       <Filter>Juce Modules\juce_cryptography</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\..\..\..\Downloads\JUCE\modules\juce_cryptography\juce_cryptography.h">
+    <ClInclude Include="..\..\..\JUCE\modules\juce_cryptography\juce_cryptography.h">
       <Filter>Juce Modules\juce_cryptography</Filter>
     </ClInclude>
     <ClInclude Include="..\..\..\JUCE\modules\juce_data_structures\app_properties\juce_ApplicationProperties.h">
@@ -4764,7 +4971,7 @@
     <ClInclude Include="..\..\..\JUCE\modules\juce_data_structures\juce_data_structures.h">
       <Filter>Juce Modules\juce_data_structures</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\..\..\..\Downloads\JUCE\modules\juce_data_structures\juce_data_structures.h">
+    <ClInclude Include="..\..\..\JUCE\modules\juce_data_structures\juce_data_structures.h">
       <Filter>Juce Modules\juce_data_structures</Filter>
     </ClInclude>
     <ClInclude Include="..\..\..\JUCE\modules\juce_events\broadcasters\juce_ActionBroadcaster.h">
@@ -4836,7 +5043,7 @@
     <ClInclude Include="..\..\..\JUCE\modules\juce_events\juce_events.h">
       <Filter>Juce Modules\juce_events</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\..\..\..\Downloads\JUCE\modules\juce_events\juce_events.h">
+    <ClInclude Include="..\..\..\JUCE\modules\juce_events\juce_events.h">
       <Filter>Juce Modules\juce_events</Filter>
     </ClInclude>
     <ClInclude Include="..\..\..\JUCE\modules\juce_graphics\colour\juce_Colour.h">
@@ -5007,7 +5214,7 @@
     <ClInclude Include="..\..\..\JUCE\modules\juce_graphics\juce_graphics.h">
       <Filter>Juce Modules\juce_graphics</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\..\..\..\Downloads\JUCE\modules\juce_graphics\juce_graphics.h">
+    <ClInclude Include="..\..\..\JUCE\modules\juce_graphics\juce_graphics.h">
       <Filter>Juce Modules\juce_graphics</Filter>
     </ClInclude>
     <ClInclude Include="..\..\..\JUCE\modules\juce_gui_basics\application\juce_Application.h">
@@ -5170,12 +5377,6 @@
       <Filter>Juce Modules\juce_gui_basics\layout</Filter>
     </ClInclude>
     <ClInclude Include="..\..\..\JUCE\modules\juce_gui_basics\layout\juce_ConcertinaPanel.h">
-      <Filter>Juce Modules\juce_gui_basics\layout</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\..\JUCE\modules\juce_gui_basics\layout\juce_FlexBox.h">
-      <Filter>Juce Modules\juce_gui_basics\layout</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\..\JUCE\modules\juce_gui_basics\layout\juce_FlexItem.h">
       <Filter>Juce Modules\juce_gui_basics\layout</Filter>
     </ClInclude>
     <ClInclude Include="..\..\..\JUCE\modules\juce_gui_basics\layout\juce_GroupComponent.h">
@@ -5400,7 +5601,7 @@
     <ClInclude Include="..\..\..\JUCE\modules\juce_gui_basics\juce_gui_basics.h">
       <Filter>Juce Modules\juce_gui_basics</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\..\..\..\Downloads\JUCE\modules\juce_gui_basics\juce_gui_basics.h">
+    <ClInclude Include="..\..\..\JUCE\modules\juce_gui_basics\juce_gui_basics.h">
       <Filter>Juce Modules\juce_gui_basics</Filter>
     </ClInclude>
     <ClInclude Include="..\..\..\JUCE\modules\juce_gui_extra\code_editor\juce_CodeDocument.h">
@@ -5475,7 +5676,7 @@
     <ClInclude Include="..\..\..\JUCE\modules\juce_gui_extra\juce_gui_extra.h">
       <Filter>Juce Modules\juce_gui_extra</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\..\..\..\Downloads\JUCE\modules\juce_gui_extra\juce_gui_extra.h">
+    <ClInclude Include="..\..\..\JUCE\modules\juce_gui_extra\juce_gui_extra.h">
       <Filter>Juce Modules\juce_gui_extra</Filter>
     </ClInclude>
     <ClInclude Include="..\..\..\JUCE\modules\juce_opengl\geometry\juce_Draggable3DOrientation.h">
@@ -5544,7 +5745,7 @@
     <ClInclude Include="..\..\..\JUCE\modules\juce_opengl\juce_opengl.h">
       <Filter>Juce Modules\juce_opengl</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\..\..\..\Downloads\JUCE\modules\juce_opengl\juce_opengl.h">
+    <ClInclude Include="..\..\..\JUCE\modules\juce_opengl\juce_opengl.h">
       <Filter>Juce Modules\juce_opengl</Filter>
     </ClInclude>
     <ClInclude Include="..\..\..\JUCE\modules\juce_osc\osc\juce_OSCAddress.h">
@@ -5574,7 +5775,7 @@
     <ClInclude Include="..\..\..\JUCE\modules\juce_osc\juce_osc.h">
       <Filter>Juce Modules\juce_osc</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\..\..\..\Downloads\JUCE\modules\juce_osc\juce_osc.h">
+    <ClInclude Include="..\..\..\JUCE\modules\juce_osc\juce_osc.h">
       <Filter>Juce Modules\juce_osc</Filter>
     </ClInclude>
     <ClInclude Include="..\..\..\JUCE\modules\juce_video\capture\juce_CameraDevice.h">
@@ -5589,7 +5790,7 @@
     <ClInclude Include="..\..\..\JUCE\modules\juce_video\juce_video.h">
       <Filter>Juce Modules\juce_video</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\..\..\..\Downloads\JUCE\modules\juce_video\juce_video.h">
+    <ClInclude Include="..\..\..\JUCE\modules\juce_video\juce_video.h">
       <Filter>Juce Modules\juce_video</Filter>
     </ClInclude>
     <ClInclude Include="..\..\JuceLibraryCode\AppConfig.h">
@@ -5604,13 +5805,13 @@
   </ItemGroup>
   <ItemGroup>
     <None Include="..\..\Source\json\src\lib_json\sconscript">
-      <Filter>BespokeSynth\Source\libraries\json\src\lib_json</Filter>
+      <Filter>BespokeSynth\libraries\json\src\lib_json</Filter>
     </None>
     <None Include="..\..\Source\json\README.txt">
-      <Filter>BespokeSynth\Source\libraries\json</Filter>
+      <Filter>BespokeSynth\libraries\json</Filter>
     </None>
     <None Include="..\..\Source\json\version">
-      <Filter>BespokeSynth\Source\libraries\json</Filter>
+      <Filter>BespokeSynth\libraries\json</Filter>
     </None>
     <None Include="..\..\..\JUCE\modules\juce_audio_formats\codecs\flac\Flac Licence.txt">
       <Filter>Juce Modules\juce_audio_formats\codecs\flac</Filter>

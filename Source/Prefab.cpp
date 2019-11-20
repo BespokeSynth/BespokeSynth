@@ -179,6 +179,8 @@ void Prefab::LoadPrefab(string loadPath)
    mModuleContainer.Clear();
    
    FileStreamIn in(ofToDataPath(loadPath).c_str());
+
+   assert(in.OpenedOk());
    
    string jsonString;
    in >> jsonString;

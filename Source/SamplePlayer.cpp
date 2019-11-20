@@ -340,7 +340,7 @@ void SamplePlayer::oscMessageReceived(const OSCMessage& msg)
 
 void SamplePlayer::oscBundleReceived(const OSCBundle& bundle)
 {
-   for (OSCBundle::Element* element = bundle.begin(); element != bundle.end(); ++element)
+   for (const OSCBundle::Element* element = bundle.begin(); element != bundle.end(); ++element)
    {
       if (element->isMessage())
          oscMessageReceived(element->getMessage());

@@ -16,9 +16,13 @@ bool Profiler::sEnableProfiler = false;
 namespace {
    static inline uint64_t rdtscp( uint32_t & aux )
    {
+#if BESPOKE_WINDOWS
+      return 0;   //TODO(Ryan)
+#else
       uint64_t rax,rdx;
       asm volatile ( "rdtscp\n" : "=a" (rax), "=d" (rdx), "=c" (aux) : : );
       return (rdx << 32) + rax;
+#endif
    }
 }
 
