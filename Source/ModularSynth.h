@@ -3,6 +3,7 @@
 
 #include "../JuceLibraryCode/JuceHeader.h"
 
+#include "SynthGlobals.h"
 #include "IAudioReceiver.h"
 #include "IDrawableModule.h"
 #include "TextEntry.h"

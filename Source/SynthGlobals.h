@@ -17,6 +17,7 @@
 #include <math.h>
 #include <cctype>
 #include <random>
+#include <float.h>
 
 //#define BESPOKE_DEBUG_ALLOCATIONS
 

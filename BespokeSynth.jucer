@@ -2,7 +2,7 @@
 
 <JUCERPROJECT id="vxkFwd" name="BespokeSynth" projectType="guiapp" version="1.0.0"
               bundleIdentifier="com.ryanchallinor.Bespoke" includeBinaryInAppConfig="1"
-              jucerVersion="5.4.3" displaySplashScreen="1" reportAppUsage="1"
+              jucerVersion="5.4.5" displaySplashScreen="1" reportAppUsage="1"
               splashScreenColour="Dark" cppLanguageStandard="11" companyCopyright="">
   <MAINGROUP id="w4HLAu" name="BespokeSynth">
     <GROUP id="{531CC336-D9CD-1F6E-7272-2D8ADD98F839}" name="libraries">
