@@ -6,6 +6,9 @@
               splashScreenColour="Dark" cppLanguageStandard="11" companyCopyright="">
   <MAINGROUP id="w4HLAu" name="BespokeSynth">
     <GROUP id="{531CC336-D9CD-1F6E-7272-2D8ADD98F839}" name="libraries">
+      <GROUP id="{AC29B64C-682F-59BE-B76A-7CFE20311257}" name="exprtk">
+        <FILE id="XbwZ8O" name="exprtk.hpp" compile="0" resource="0" file="Source/exprtk/exprtk.hpp"/>
+      </GROUP>
       <GROUP id="{44F08E27-A8F5-B33E-CC69-42EBE3B93B39}" name="CFMessaging">
         <FILE id="B8KK3T" name="Bespoke_CFMessaging.cpp" compile="1" resource="0"
               file="Source/CFMessaging/Bespoke_CFMessaging.cpp"/>
@@ -155,6 +158,12 @@
         <FILE id="RG4zGd" name="TremoloEffect.h" compile="0" resource="0" file="Source/TremoloEffect.h"/>
       </GROUP>
       <GROUP id="{6781AC07-A090-A7AF-8D27-BCB6D9526ABD}" name="modules">
+        <FILE id="RQjd1X" name="Waveshaper.cpp" compile="1" resource="0" file="Source/Waveshaper.cpp"/>
+        <FILE id="EoZx9E" name="Waveshaper.h" compile="0" resource="0" file="Source/Waveshaper.h"/>
+        <FILE id="aPngKN" name="SignalClamp.cpp" compile="1" resource="0" file="Source/SignalClamp.cpp"/>
+        <FILE id="hrUlfh" name="SignalClamp.h" compile="0" resource="0" file="Source/SignalClamp.h"/>
+        <FILE id="fe8QPl" name="DCOffset.cpp" compile="1" resource="0" file="Source/DCOffset.cpp"/>
+        <FILE id="tb7Rmz" name="DCOffset.h" compile="0" resource="0" file="Source/DCOffset.h"/>
         <FILE id="oqvwkI" name="SpectralDisplay.cpp" compile="1" resource="0"
               file="Source/SpectralDisplay.cpp"/>
         <FILE id="H2Et2Q" name="SpectralDisplay.h" compile="0" resource="0"

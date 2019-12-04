@@ -65,6 +65,7 @@ protected:
 private:
    void Construct(ITextEntryListener* owner, const char* name, int x, int y, int charWidth);  //shared constructor
    
+   void AddCharacter(char c);
    bool AllowCharacter(char c);
    void AcceptEntry();
    

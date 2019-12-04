@@ -189,6 +189,18 @@
 			isa = PBXBuildFile;
 			fileRef = 49AB76428A044DEDF45FFAFE;
 		};
+		A8C9FC1F1F5E4D9B97EF9B54 = {
+			isa = PBXBuildFile;
+			fileRef = 59C16BAA467EEF199D6E6E7E;
+		};
+		498451F0988ABC1AD0D84716 = {
+			isa = PBXBuildFile;
+			fileRef = B267BD1520582D7985D1B255;
+		};
+		6EABE3594F4B54617EC5644B = {
+			isa = PBXBuildFile;
+			fileRef = F7B3E126FD9CF944AF384F2C;
+		};
 		BE6AE59E6AF0B25CE6993E9E = {
 			isa = PBXBuildFile;
 			fileRef = D534A6CFFB03628598D4A129;
@@ -1713,6 +1725,13 @@
 			path = ../../Source/RadioSequencer.h;
 			sourceTree = "SOURCE_ROOT";
 		};
+		1957F4D91F0E656ECFFA4976 = {
+			isa = PBXFileReference;
+			lastKnownFileType = sourcecode.c.h;
+			name = DCOffset.h;
+			path = ../../Source/DCOffset.h;
+			sourceTree = "SOURCE_ROOT";
+		};
 		19F34F42A4F003DEE9B93639 = {
 			isa = PBXFileReference;
 			lastKnownFileType = sourcecode.c.h;
@@ -1886,6 +1905,13 @@
 			lastKnownFileType = sourcecode.cpp.objcpp;
 			name = "include_juce_gui_extra.mm";
 			path = "../../JuceLibraryCode/include_juce_gui_extra.mm";
+			sourceTree = "SOURCE_ROOT";
+		};
+		24617DB6E11712B80C74402E = {
+			isa = PBXFileReference;
+			lastKnownFileType = sourcecode.c.h;
+			name = Waveshaper.h;
+			path = ../../Source/Waveshaper.h;
 			sourceTree = "SOURCE_ROOT";
 		};
 		24DFCE205CF28D75D9EBFE04 = {
@@ -2139,6 +2165,13 @@
 			name = DiscRecording.framework;
 			path = System/Library/Frameworks/DiscRecording.framework;
 			sourceTree = SDKROOT;
+		};
+		361A6A239B2B35A208AD7CF8 = {
+			isa = PBXFileReference;
+			lastKnownFileType = sourcecode.c.h;
+			name = SignalClamp.h;
+			path = ../../Source/SignalClamp.h;
+			sourceTree = "SOURCE_ROOT";
 		};
 		3622AE414337C4036E1A64FA = {
 			isa = PBXFileReference;
@@ -2740,6 +2773,13 @@
 			lastKnownFileType = sourcecode.c.h;
 			name = IModulator.h;
 			path = ../../Source/IModulator.h;
+			sourceTree = "SOURCE_ROOT";
+		};
+		59C16BAA467EEF199D6E6E7E = {
+			isa = PBXFileReference;
+			lastKnownFileType = sourcecode.cpp.cpp;
+			name = Waveshaper.cpp;
+			path = ../../Source/Waveshaper.cpp;
 			sourceTree = "SOURCE_ROOT";
 		};
 		59EE1CB57F46630EC5EF713A = {
@@ -4303,6 +4343,13 @@
 			path = ../../Source/LaunchpadInterpreter.cpp;
 			sourceTree = "SOURCE_ROOT";
 		};
+		ACDB22D73728DCD62B06E69B = {
+			isa = PBXFileReference;
+			lastKnownFileType = sourcecode.c.h;
+			name = exprtk.hpp;
+			path = ../../Source/exprtk/exprtk.hpp;
+			sourceTree = "SOURCE_ROOT";
+		};
 		ACE856B559261B904AFB2831 = {
 			isa = PBXFileReference;
 			lastKnownFileType = sourcecode.cpp.cpp;
@@ -4378,6 +4425,13 @@
 			lastKnownFileType = sourcecode.cpp.cpp;
 			name = Amplifier.cpp;
 			path = ../../Source/Amplifier.cpp;
+			sourceTree = "SOURCE_ROOT";
+		};
+		B267BD1520582D7985D1B255 = {
+			isa = PBXFileReference;
+			lastKnownFileType = sourcecode.cpp.cpp;
+			name = SignalClamp.cpp;
+			path = ../../Source/SignalClamp.cpp;
 			sourceTree = "SOURCE_ROOT";
 		};
 		B37068F59A7DC1B3D0E3C686 = {
@@ -5591,6 +5645,13 @@
 			path = ../../Source/OscController.cpp;
 			sourceTree = "SOURCE_ROOT";
 		};
+		F7B3E126FD9CF944AF384F2C = {
+			isa = PBXFileReference;
+			lastKnownFileType = sourcecode.cpp.cpp;
+			name = DCOffset.cpp;
+			path = ../../Source/DCOffset.cpp;
+			sourceTree = "SOURCE_ROOT";
+		};
 		F7BF4C6BB0F3F90592CAEDBC = {
 			isa = PBXFileReference;
 			lastKnownFileType = sourcecode.cpp.cpp;
@@ -5773,6 +5834,14 @@
 			path = ../../Source/RingModulator.h;
 			sourceTree = "SOURCE_ROOT";
 		};
+		E052C73364792FC8F77F9BAF = {
+			isa = PBXGroup;
+			children = (
+				ACDB22D73728DCD62B06E69B,
+			);
+			name = exprtk;
+			sourceTree = "<group>";
+		};
 		E773DD247550A2F3CF88686D = {
 			isa = PBXGroup;
 			children = (
@@ -5930,6 +5999,7 @@
 		5A13D0CA6DCFEF178844C4EC = {
 			isa = PBXGroup;
 			children = (
+				E052C73364792FC8F77F9BAF,
 				E773DD247550A2F3CF88686D,
 				55A3AD4A7C7A4B1AD8A7E9D3,
 				E6842991D79AC4E827F1911F,
@@ -5985,6 +6055,12 @@
 		C91AF721DDC182CE3AC80CF9 = {
 			isa = PBXGroup;
 			children = (
+				59C16BAA467EEF199D6E6E7E,
+				24617DB6E11712B80C74402E,
+				B267BD1520582D7985D1B255,
+				361A6A239B2B35A208AD7CF8,
+				F7B3E126FD9CF944AF384F2C,
+				1957F4D91F0E656ECFFA4976,
 				D534A6CFFB03628598D4A129,
 				3C355E8DDF367150789F118E,
 				544E1E40ADE705A741B533B7,
@@ -6870,6 +6946,9 @@
 				69EB47EC9441C3507BEB277D,
 				75837998247B5E99F3F16392,
 				7B858D802BD0BB608C0F48CF,
+				A8C9FC1F1F5E4D9B97EF9B54,
+				498451F0988ABC1AD0D84716,
+				6EABE3594F4B54617EC5644B,
 				BE6AE59E6AF0B25CE6993E9E,
 				FC14EDFBA17013B7E86E9890,
 				2D9D82B49E9D37AE7D00BD1C,

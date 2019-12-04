@@ -270,6 +270,7 @@ void ofPopStyle();
 void ofPushMatrix();
 void ofPopMatrix();
 void ofTranslate(float x, float y, float z=0);
+void ofClipWindow(float x, float y, float width, float height);
 void ofSetColor(float r, float g, float b, float a=255);
 void ofSetColor(float grey);
 void ofSetColor(const ofColor& color);

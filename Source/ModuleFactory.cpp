@@ -179,6 +179,9 @@
 #include "MidiCapturer.h"
 #include "Inverter.h"
 #include "SpectralDisplay.h"
+#include "DCOffset.h"
+#include "SignalClamp.h"
+#include "Waveshaper.h"
 
 #define REGISTER(class,name,type) Register(#name, &(class::Create), &(class::CanCreate), type, false, false);
 #define REGISTER_HIDDEN(class,name,type) Register(#name, &(class::Create), &(class::CanCreate), type, true, false);
@@ -326,6 +329,9 @@ ModuleFactory::ModuleFactory()
    REGISTER(MidiCapturer, midicapturer, kModuleType_Note);
    REGISTER(Inverter, inverter, kModuleType_Audio);
    REGISTER(SpectralDisplay, spectrum, kModuleType_Audio);
+   REGISTER(DCOffset, dcoffset, kModuleType_Audio);
+   REGISTER(SignalClamp, signalclamp, kModuleType_Audio);
+   REGISTER(Waveshaper, waveshaper, kModuleType_Audio);
 
    //REGISTER_EXPERIMENTAL(MidiPlayer, midiplayer, kModuleType_Instrument);
    REGISTER_EXPERIMENTAL(Razor, razor, kModuleType_Synth);

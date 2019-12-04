@@ -228,14 +228,28 @@ void TextEntry::OnKeyPressed(int key, bool isRepeat)
       if (mCaretPosition < strlen(mString))
          ++mCaretPosition;
    }
-   else if (AllowCharacter(key))
+   else if (key == 'v' && GetKeyModifiers() == kModifier_Command)
+   {
+      juce::String clipboard = SystemClipboard::getTextFromClipboard();
+      for (int i=0; i<clipboard.length(); ++i)
+         AddCharacter(clipboard[i]);
+   }
+   else
+   {
+      AddCharacter((char)key);
+   }
+}
+
+void TextEntry::AddCharacter(char c)
+{
+   if (AllowCharacter(c))
    {
       int len = strlen(mString);
       if (/*len < mCharWidth && */len < MAX_TEXTENTRY_LENGTH-1)
       {
          for (int i=len; i>mCaretPosition; --i)
             mString[i] = mString[i-1];
-         mString[mCaretPosition] = (char)key;
+         mString[mCaretPosition] = c;
          ++mCaretPosition;
       }
    }

@@ -104,6 +104,11 @@ void ofTranslate(float x, float y, float z)
    nvgTranslate(gNanoVG, x, y);
 }
 
+void ofClipWindow(float x, float y, float width, float height)
+{
+   nvgScissor(gNanoVG, x, y, width, height);
+}
+
 void ofSetColor(float r, float g, float b, float a)
 {
    sStyleStack.GetStyle().color = ofColor(r,g,b,a);

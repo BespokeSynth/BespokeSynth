@@ -37,7 +37,7 @@ double gTime = 1; //using a double here, so I'm going to lose nanosecond accurac
                   //if I run for 4 months straight
                   //this means I'll lose 44100 hz sample accuracy in 7100 years of
                   //continuous uptime
-float gVizFreq = 440;
+float gVizFreq = 220;
 IUIControl* gBindToUIControl = nullptr;
 RetinaTrueTypeFont gFont;
 RetinaTrueTypeFont gFontBold;
