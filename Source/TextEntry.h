@@ -39,7 +39,7 @@ public:
    void OnKeyPressed(int key, bool isRepeat);
    void Render() override;
    
-   void MakeActiveTextEntry();
+   void MakeActiveTextEntry(bool setCaretToEnd);
    static void ClearActiveTextEntry(bool acceptEntry);
    static TextEntry* GetActiveTextEntry() { return sCurrentTextEntry; }
    

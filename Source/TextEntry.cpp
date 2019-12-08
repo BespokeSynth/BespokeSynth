@@ -121,7 +121,7 @@ void TextEntry::Render()
    {
       if (mCaretBlink)
       {
-         int caretX = mX+2+xOffset;
+         int caretX = mX+2+xOffset-1;
          int caretY = mY+1;
          if (mCaretPosition > 0)
          {
@@ -171,15 +171,41 @@ void TextEntry::OnClicked(int x, int y, bool right)
    if (right)
       return;
    
-   MakeActiveTextEntry();
+   float xOffset = 2;
+   if (mDrawLabel)
+      xOffset += mLabelSize;
+   
+   mCaretPosition = 0;
+   
+   char caretCheck[MAX_TEXTENTRY_LENGTH];
+   size_t checkLength = strnlen(mString, MAX_TEXTENTRY_LENGTH);
+   strncpy(caretCheck, mString, checkLength);
+   int lastSubstrWidth = GetStringWidth(caretCheck);
+   for (int i=checkLength-1; i >= 0; --i)
+   {
+      caretCheck[i] = 0;   //shorten string by one
+      
+      int substrWidth = GetStringWidth(caretCheck);
+      //ofLog() << x << " " << i << " " << (xOffset + substrWidth);
+      if (x > xOffset + ((substrWidth + lastSubstrWidth) * .5f))
+      {
+         mCaretPosition = i + 1;
+         break;
+      }
+      
+      lastSubstrWidth = substrWidth;
+   }
+   
+   MakeActiveTextEntry(false);
 }
 
-void TextEntry::MakeActiveTextEntry()
+void TextEntry::MakeActiveTextEntry(bool setCaretToEnd)
 {
    sCurrentTextEntry = this;
    if (mListener)
       mListener->TextEntryActivated(this);
-   mCaretPosition = strlen(mString);
+   if (setCaretToEnd)
+      mCaretPosition = strlen(mString);
    mCaretBlink = true;
    mCaretBlinkTimer = 0;
 }
@@ -196,12 +222,12 @@ void TextEntry::OnKeyPressed(int key, bool isRepeat)
       if (GetKeyModifiers() == kModifier_Shift)
       {
          if (mPreviousTextEntry)
-            mPreviousTextEntry->MakeActiveTextEntry();
+            mPreviousTextEntry->MakeActiveTextEntry(true);
       }
       else
       {
          if (mNextTextEntry)
-            mNextTextEntry->MakeActiveTextEntry();
+            mNextTextEntry->MakeActiveTextEntry(true);
       }
    }
    else if (key == OF_KEY_BACKSPACE)

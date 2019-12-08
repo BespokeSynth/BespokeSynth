@@ -371,11 +371,31 @@ IDrawableModule* ModularSynth::GetLastClickedModule() const
 void ModularSynth::KeyPressed(int key, bool isRepeat)
 {
    if (gHoveredUIControl &&
-       TextEntry::GetActiveTextEntry() == nullptr &&
-       GetKeyModifiers() == kModifier_None &&
-       (CharacterFunctions::isDigit((char)key) || key == '.' || key == '-'))
+       TextEntry::GetActiveTextEntry() == nullptr)
    {
-      gHoveredUIControl->AttemptTextInput();
+      bool grabEntry = false;
+      if (GetKeyModifiers() == kModifier_None &&
+          (CharacterFunctions::isDigit((char)key) || key == '.' || key == '-'))
+         grabEntry = true;
+      if (key == 'v' && GetKeyModifiers() == kModifier_Command)
+      {
+         juce::String clipboard = SystemClipboard::getTextFromClipboard();
+         bool notNumber = false;
+         for (int i=0; i<clipboard.length(); ++i)
+         {
+            if (!CharacterFunctions::isDigit((char)clipboard[i]) && clipboard[i] != '.' && clipboard[i] != '-')
+            {
+               notNumber = true;
+               break;
+            }
+         }
+         
+         if (!notNumber)
+            grabEntry = true;
+      }
+      
+      if (grabEntry)
+         gHoveredUIControl->AttemptTextInput();
    }
    
    if (TextEntry::GetActiveTextEntry())  //active text entry captures all input
@@ -399,7 +419,7 @@ void ModularSynth::KeyPressed(int key, bool isRepeat)
    if (key == 9 && !isRepeat)  //tab
    {
       bzero(mConsoleText, MAX_TEXTENTRY_LENGTH);
-      mConsoleEntry->MakeActiveTextEntry();
+      mConsoleEntry->MakeActiveTextEntry(true);
    }
    
    mZoomer.OnKeyPressed(key);

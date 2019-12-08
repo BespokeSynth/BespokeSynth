@@ -565,7 +565,7 @@ bool FloatSlider::AttemptTextInput()
    if (mFloatEntry)
       mFloatEntry->Delete();
    mFloatEntry = new TextEntry(this, "", HIDDEN_UICONTROL, HIDDEN_UICONTROL, 10, &mEntryValue, mMin, mMax);
-   mFloatEntry->MakeActiveTextEntry();
+   mFloatEntry->MakeActiveTextEntry(true);
    mFloatEntry->ClearInput();
    return true;
 }
@@ -867,7 +867,7 @@ bool IntSlider::AttemptTextInput()
    if (mIntEntry)
       mIntEntry->Delete();
    mIntEntry = new TextEntry(this, "", HIDDEN_UICONTROL, HIDDEN_UICONTROL, 10, &mEntryValue, mMin, mMax);
-   mIntEntry->MakeActiveTextEntry();
+   mIntEntry->MakeActiveTextEntry(true);
    mIntEntry->ClearInput();
    return true;
 }
