@@ -189,6 +189,10 @@
 			isa = PBXBuildFile;
 			fileRef = 49AB76428A044DEDF45FFAFE;
 		};
+		C5964B10056A9FFC4A398B8A = {
+			isa = PBXBuildFile;
+			fileRef = 1FB4885EA00B04064BF7B653;
+		};
 		A8C9FC1F1F5E4D9B97EF9B54 = {
 			isa = PBXBuildFile;
 			fileRef = 59C16BAA467EEF199D6E6E7E;
@@ -1844,6 +1848,13 @@
 			path = ../../Source/freeverb/allpass.hpp;
 			sourceTree = "SOURCE_ROOT";
 		};
+		1FB4885EA00B04064BF7B653 = {
+			isa = PBXFileReference;
+			lastKnownFileType = sourcecode.cpp.cpp;
+			name = ModulatorSubtract.cpp;
+			path = ../../Source/ModulatorSubtract.cpp;
+			sourceTree = "SOURCE_ROOT";
+		};
 		2116980ADE29959B585A4ADF = {
 			isa = PBXFileReference;
 			lastKnownFileType = wrapper.framework;
@@ -2059,6 +2070,13 @@
 			lastKnownFileType = sourcecode.cpp.cpp;
 			name = OSCOutput.cpp;
 			path = ../../Source/OSCOutput.cpp;
+			sourceTree = "SOURCE_ROOT";
+		};
+		2CF23FDA72DF218A1F9FB719 = {
+			isa = PBXFileReference;
+			lastKnownFileType = sourcecode.c.h;
+			name = ModulatorSubtract.h;
+			path = ../../Source/ModulatorSubtract.h;
 			sourceTree = "SOURCE_ROOT";
 		};
 		2E8C2E9A5A4D2664525DCC0E = {
@@ -6055,6 +6073,8 @@
 		C91AF721DDC182CE3AC80CF9 = {
 			isa = PBXGroup;
 			children = (
+				1FB4885EA00B04064BF7B653,
+				2CF23FDA72DF218A1F9FB719,
 				59C16BAA467EEF199D6E6E7E,
 				24617DB6E11712B80C74402E,
 				B267BD1520582D7985D1B255,
@@ -6946,6 +6966,7 @@
 				69EB47EC9441C3507BEB277D,
 				75837998247B5E99F3F16392,
 				7B858D802BD0BB608C0F48CF,
+				C5964B10056A9FFC4A398B8A,
 				A8C9FC1F1F5E4D9B97EF9B54,
 				498451F0988ABC1AD0D84716,
 				6EABE3594F4B54617EC5644B,

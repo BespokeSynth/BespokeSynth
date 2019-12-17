@@ -1,19 +1,19 @@
 /*
   ==============================================================================
 
-    ModulatorAdd.cpp
-    Created: 19 Nov 2017 2:04:24pm
+    ModulatorSubtract.cpp
+    Created: 9 Dec 2019 10:11:32pm
     Author:  Ryan Challinor
 
   ==============================================================================
 */
 
-#include "ModulatorAdd.h"
+#include "ModulatorSubtract.h"
 #include "Profiler.h"
 #include "ModularSynth.h"
 #include "PatchCableSource.h"
 
-ModulatorAdd::ModulatorAdd()
+ModulatorSubtract::ModulatorSubtract()
 : mValue1(0)
 , mValue2(0)
 , mValue1Slider(nullptr)
@@ -21,7 +21,7 @@ ModulatorAdd::ModulatorAdd()
 {
 }
 
-void ModulatorAdd::CreateUIControls()
+void ModulatorSubtract::CreateUIControls()
 {
    IDrawableModule::CreateUIControls();
    
@@ -32,11 +32,11 @@ void ModulatorAdd::CreateUIControls()
    AddPatchCableSource(mTargetCable);
 }
 
-ModulatorAdd::~ModulatorAdd()
+ModulatorSubtract::~ModulatorSubtract()
 {
 }
 
-void ModulatorAdd::DrawModule()
+void ModulatorSubtract::DrawModule()
 {
    if (Minimized() || IsVisible() == false)
       return;
@@ -45,7 +45,7 @@ void ModulatorAdd::DrawModule()
    mValue2Slider->Draw();
 }
 
-void ModulatorAdd::PostRepatch(PatchCableSource* cableSource, bool fromUserClick)
+void ModulatorSubtract::PostRepatch(PatchCableSource* cableSource, bool fromUserClick)
 {
    OnModulatorRepatch();
    
@@ -58,13 +58,13 @@ void ModulatorAdd::PostRepatch(PatchCableSource* cableSource, bool fromUserClick
    }
 }
 
-float ModulatorAdd::Value(int samplesIn)
+float ModulatorSubtract::Value(int samplesIn)
 {
    ComputeSliders(samplesIn);
-   return ofClamp(mValue1 + mValue2, mTarget->GetMin(), mTarget->GetMax());
+   return ofClamp(mValue1 - mValue2, mTarget->GetMin(), mTarget->GetMax());
 }
 
-void ModulatorAdd::SaveLayout(ofxJSONElement& moduleInfo)
+void ModulatorSubtract::SaveLayout(ofxJSONElement& moduleInfo)
 {
    IDrawableModule::SaveLayout(moduleInfo);
    
@@ -75,14 +75,14 @@ void ModulatorAdd::SaveLayout(ofxJSONElement& moduleInfo)
    moduleInfo["target"] = targetPath;
 }
 
-void ModulatorAdd::LoadLayout(const ofxJSONElement& moduleInfo)
+void ModulatorSubtract::LoadLayout(const ofxJSONElement& moduleInfo)
 {
    mModuleSaveData.LoadString("target", moduleInfo);
    
    SetUpFromSaveData();
 }
 
-void ModulatorAdd::SetUpFromSaveData()
+void ModulatorSubtract::SetUpFromSaveData()
 {
    mTargetCable->SetTarget(TheSynth->FindUIControl(mModuleSaveData.GetString("target")));
 }

@@ -36,6 +36,18 @@ void NoteDelayer::DrawModule()
       return;
    
    mDelaySlider->Draw();
+   
+   float t = (gTime - mLastNoteOnTime) / (mDelay * TheTransport->GetDuration(kInterval_1n));
+   if (t > 0 && t < 1)
+   {
+      ofPushStyle();
+      ofNoFill();
+      ofCircle(54, 11, 10);
+      ofFill();
+      ofSetColor(255,255,255,gModuleDrawAlpha);
+      ofCircle(54 + sin(t * TWO_PI) * 10, 11 - cos(t * TWO_PI) * 10, 2);
+      ofPopStyle();
+   }
 }
 
 void NoteDelayer::CheckboxUpdated(Checkbox *checkbox)
@@ -70,6 +82,9 @@ void NoteDelayer::PlayNote(double time, int pitch, int velocity, int voiceIdx, M
 {
    if (!mEnabled)
       return;
+   
+   if (velocity > 0)
+      mLastNoteOnTime = time;
    
    NoteInfo info;
    info.mPitch = pitch;

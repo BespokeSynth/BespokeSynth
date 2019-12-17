@@ -295,12 +295,12 @@ void TextEntry::AcceptEntry()
 {
    if (mVarString)
       StringCopy(mVarString, mString, MAX_TEXTENTRY_LENGTH);
-   if (mVarInt)
+   if (mVarInt && mString[0] != 0)
    {
       *mVarInt = ofClamp(ofToInt(mString), mIntMin, mIntMax);
       StringCopy(mString, ofToString(*mVarInt).c_str(), MAX_TEXTENTRY_LENGTH);
    }
-   if (mVarFloat)
+   if (mVarFloat && mString[0] != 0)
    {
       *mVarFloat = ofClamp(ofToFloat(mString), mFloatMin, mFloatMax);
       StringCopy(mString, ofToString(*mVarFloat).c_str(), MAX_TEXTENTRY_LENGTH);

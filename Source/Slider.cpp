@@ -38,13 +38,16 @@ FloatSlider::FloatSlider(IFloatSliderListener* owner, const char* label, int x, 
 , mClampIntMin(-999)
 , mMinValueDisplay("")
 , mMaxValueDisplay("")
-, mFloatEntry(nullptr)
 , mShowName(true)
 , mBezierControl(1)
 , mModulator(nullptr)
 , mSmooth(0)
 , mIsSmoothing(false)
 , mComputeHasBeenCalledOnce(false)
+, mFloatEntry(nullptr)
+, mAllowMinMaxAdjustment(true)
+, mMinEntry(nullptr)
+, mMaxEntry(nullptr)
 {
    assert(owner);
    SetLabel(label);
@@ -184,10 +187,21 @@ void FloatSlider::Render()
          display += GetDisplayValue(*mVar);
       }
    }
+   
+   if (mMaxEntry)
+      display = "set max:";
+   if (mMinEntry)
+      display = "set min:";
+   
    ofSetColor(textColor);
    DrawText(display, mX+2, mY+5+mHeight/2);
 
    ofPopStyle();
+   
+   if (mMaxEntry)
+      mMaxEntry->Draw();
+   if (mMinEntry)
+      mMinEntry->Draw();
 }
 
 void FloatSlider::DisplayLFOControl()
@@ -215,6 +229,29 @@ void FloatSlider::OnClicked(int x, int y, bool right)
    if (right)
    {
       DisplayLFOControl();
+      return;
+   }
+   
+   if ((GetKeyModifiers() & kModifier_Command) && mAllowMinMaxAdjustment)
+   {
+      bool adjustMax;
+      if (x > mX + mWidth/2)
+         adjustMax = true;
+      else
+         adjustMax = false;
+      
+      if (adjustMax)
+      {
+         mMaxEntry = new TextEntry(this, "", mX+mWidth-5*9, mY, 5, &mMax, -FLT_MAX, FLT_MAX);
+         mMaxEntry->MakeActiveTextEntry(true);
+      }
+      else
+      {
+         //mMinEntry = new TextEntry(this, "", mX, mY, 5, &mMin, -FLT_MAX, FLT_MAX);
+         mMinEntry = new TextEntry(this, "", mX+mWidth-5*9, mY, 5, &mMin, -FLT_MAX, FLT_MAX);
+         mMinEntry->MakeActiveTextEntry(true);
+      }
+      
       return;
    }
 
@@ -257,17 +294,6 @@ void FloatSlider::SetValueForMouse(int x, int y)
       }
       float precision = mShowDigits != -1 ? 100 : 10;
       fX = mFineRefX + (fX-mFineRefX)/precision;
-   }
-   else if (GetKeyModifiers() & kModifier_Command)
-   {
-      clampInt = true;
-      if (mClampIntMin == -999)
-      {
-         mClampIntMin = floor(*var);
-         mClampIntMax = ceil(*var);
-         if (mClampIntMin == mClampIntMax)
-            ++mClampIntMax;
-      }
    }
    else
    {
@@ -572,9 +598,22 @@ bool FloatSlider::AttemptTextInput()
 
 void FloatSlider::TextEntryComplete(TextEntry* entry)
 {
-   mFloatEntry->Delete();
-   mFloatEntry = nullptr;
-   SetValue(mEntryValue);
+   if (entry == mFloatEntry)
+   {
+      mFloatEntry->Delete();
+      mFloatEntry = nullptr;
+      SetValue(mEntryValue);
+   }
+   if (entry == mMaxEntry)
+   {
+      mMaxEntry->Delete();
+      mMaxEntry = nullptr;
+   }
+   if (entry == mMinEntry)
+   {
+      mMinEntry->Delete();
+      mMinEntry = nullptr;
+   }
 }
 
 void FloatSlider::OnTransportAdvanced(float amount)
@@ -665,8 +704,11 @@ IntSlider::IntSlider(IIntSliderListener* owner, const char* label, int x, int y,
 , mOwner(owner)
 , mOriginalValue(0)
 , mSliderVal(0)
-, mIntEntry(nullptr)
 , mShowName(true)
+, mIntEntry(nullptr)
+, mAllowMinMaxAdjustment(true)
+, mMinEntry(nullptr)
+, mMaxEntry(nullptr)
 {
    assert(owner);
    SetLabel(label);
@@ -764,6 +806,11 @@ void IntSlider::Render()
    DrawText(display, mX+2, mY+5+mHeight/2);
 
    ofPopStyle();
+   
+   if (mMaxEntry)
+      mMaxEntry->Draw();
+   if (mMinEntry)
+      mMinEntry->Draw();
 }
 
 void IntSlider::CalcSliderVal()
@@ -874,9 +921,22 @@ bool IntSlider::AttemptTextInput()
 
 void IntSlider::TextEntryComplete(TextEntry* entry)
 {
-   mIntEntry->Delete();
-   mIntEntry = nullptr;
-   SetValue(mEntryValue);
+   if (entry == mIntEntry)
+   {
+      mIntEntry->Delete();
+      mIntEntry = nullptr;
+      SetValue(mEntryValue);
+   }
+   if (entry == mMaxEntry)
+   {
+      mMaxEntry->Delete();
+      mMaxEntry = nullptr;
+   }
+   if (entry == mMinEntry)
+   {
+      mMinEntry->Delete();
+      mMinEntry = nullptr;
+   }
 }
 
 namespace

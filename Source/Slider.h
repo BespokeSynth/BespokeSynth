@@ -136,6 +136,10 @@ private:
    
    TextEntry* mFloatEntry;
    float mEntryValue;
+   
+   bool mAllowMinMaxAdjustment;
+   TextEntry* mMinEntry;
+   TextEntry* mMaxEntry;
 };
 
 class IntSlider;
@@ -209,6 +213,10 @@ private:
    
    TextEntry* mIntEntry;
    int mEntryValue;
+   
+   bool mAllowMinMaxAdjustment;
+   TextEntry* mMinEntry;
+   TextEntry* mMaxEntry;
 };
 
 #endif /* defined(__modularSynth__Slider__) */

@@ -182,6 +182,7 @@
 #include "DCOffset.h"
 #include "SignalClamp.h"
 #include "Waveshaper.h"
+#include "ModulatorSubtract.h"
 
 #define REGISTER(class,name,type) Register(#name, &(class::Create), &(class::CanCreate), type, false, false);
 #define REGISTER_HIDDEN(class,name,type) Register(#name, &(class::Create), &(class::CanCreate), type, true, false);
@@ -305,6 +306,7 @@ ModuleFactory::ModuleFactory()
    REGISTER(AudioToCV, audiotocv, kModuleType_Modulator);
    REGISTER(ModulatorAdd, add, kModuleType_Modulator);
    REGISTER(ModulatorAddCentered, addcentered, kModuleType_Modulator);
+   REGISTER(ModulatorSubtract, subtract, kModuleType_Modulator);
    REGISTER(PitchToCV, pitchtocv, kModuleType_Modulator);
    REGISTER(VelocityToCV, velocitytocv, kModuleType_Modulator);
    REGISTER(PressureToCV, pressuretocv, kModuleType_Modulator);

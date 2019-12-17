@@ -57,6 +57,8 @@ private:
    float mDelay;
    FloatSlider* mDelaySlider;
    
+   float mLastNoteOnTime;
+   
    ofMutex mNoteMutex;
    vector<NoteInfo> mInputNotes;
 };
