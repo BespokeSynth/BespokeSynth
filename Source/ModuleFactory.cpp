@@ -183,6 +183,7 @@
 #include "SignalClamp.h"
 #include "Waveshaper.h"
 #include "ModulatorSubtract.h"
+#include "NoteHocket.h"
 
 #define REGISTER(class,name,type) Register(#name, &(class::Create), &(class::CanCreate), type, false, false);
 #define REGISTER_HIDDEN(class,name,type) Register(#name, &(class::Create), &(class::CanCreate), type, true, false);
@@ -334,6 +335,7 @@ ModuleFactory::ModuleFactory()
    REGISTER(DCOffset, dcoffset, kModuleType_Audio);
    REGISTER(SignalClamp, signalclamp, kModuleType_Audio);
    REGISTER(Waveshaper, waveshaper, kModuleType_Audio);
+   REGISTER(NoteHocket, notehocket, kModuleType_Note);
 
    //REGISTER_EXPERIMENTAL(MidiPlayer, midiplayer, kModuleType_Instrument);
    REGISTER_EXPERIMENTAL(Razor, razor, kModuleType_Synth);

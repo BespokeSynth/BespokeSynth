@@ -145,7 +145,7 @@ void KeyboardDisplay::DrawKeyboard(int x, int y, int w, int h)
    ofFill();
    ofSetColor(255,255,255);
    ofSetLineWidth(2);
-   list<int> heldNotes = mNoteOutput.GetHeldNotes();
+   list<int> heldNotes = mNoteOutput.GetHeldNotesList();
    for (int pitch : heldNotes)
    {
       bool isBlackKey;

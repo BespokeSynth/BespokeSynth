@@ -21,7 +21,7 @@ public:
    }
    void SendCC(int control, int value, int voiceIdx = -1) override
    {
-      SendCCOutput(control, value);
+      SendCCOutput(control, value, voiceIdx);
    }
 };
 

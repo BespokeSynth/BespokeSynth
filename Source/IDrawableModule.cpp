@@ -49,6 +49,7 @@ IDrawableModule::IDrawableModule()
 , mMainPatchCableSource(nullptr)
 , mOwningContainer(nullptr)
 , mTitleLabelWidth(0)
+, mShouldDrawOutline(true)
 {
 }
 
@@ -214,7 +215,7 @@ void IDrawableModule::Render()
          highlight = .1f;
    }
    
-   const bool kUseDropshadow = true;
+   const bool kUseDropshadow = false;
    if (kUseDropshadow && GetParent() == nullptr && GetModuleType() != kModuleType_Other)
    {
       const float shadowSize = 20;
@@ -262,14 +263,20 @@ void IDrawableModule::Render()
       gModuleDrawAlpha *= .2f;
    
    ofSetColor(color, gModuleDrawAlpha);
+   ofPushMatrix();
+   ofClipWindow(0, 0, w, h);
    DrawModule();
+   ofPopMatrix();
    
    float enableToggleOffset = 0;
    if (HasTitleBar())
    {
       ofSetColor(color, 50);
       ofFill();
-      ofRect(0,-titleBarHeight,w,titleBarHeight);
+      ofPushMatrix();
+      ofClipWindow(0, -titleBarHeight, w, titleBarHeight);
+      ofRect(0,-titleBarHeight,w,titleBarHeight*2);
+      ofPopMatrix();
       
       if (mEnabledCheckbox)
       {
@@ -297,12 +304,22 @@ void IDrawableModule::Render()
    ofSetColor(color * (1-GetBeaconAmount()) + ofColor::yellow * GetBeaconAmount(), gModuleDrawAlpha);
    DrawTextBold(GetTitleLabel(),5+enableToggleOffset,10-titleBarHeight,16);
    
+   if (Enabled() && mShouldDrawOutline)
+   {
+      ofPushStyle();
+      ofNoFill();
+      ofSetColor(color.r*(.5f+highlight),color.g*(.5f+highlight),color.b*(.5f+highlight),255);
+      ofSetLineWidth(1);
+      ofRect(-.5f, -titleBarHeight-.5f, w+1, h+titleBarHeight+1, 4);
+      ofPopStyle();
+   }
+   
    if (Minimized() || IsVisible() == false)
       DrawBeacon(30,-titleBarHeight/2);
    
    if (IsResizable() && !Minimized())
    {
-      ofSetColor(color, gModuleDrawAlpha);
+      ofSetColor(color, 255);
       ofSetLineWidth(2);
       ofLine(w-sResizeCornerSize, h, w, h);
       ofLine(w, h-sResizeCornerSize, w, h);

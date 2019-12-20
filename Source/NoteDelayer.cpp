@@ -61,13 +61,13 @@ void NoteDelayer::OnTransportAdvanced(float amount)
    ComputeSliders(0);
    
    mNoteMutex.lock();
+   vector<NoteInfo> notesToPlay;
    for (auto iter = mInputNotes.begin(); iter != mInputNotes.end(); )
    {
       const NoteInfo& info = *iter;
       if (gTime > info.mTriggerTime)
       {
-         PlayNoteOutput(info.mTriggerTime, info.mPitch, info.mVelocity, -1, info.mModulation);
-      
+         notesToPlay.push_back(info);
          iter = mInputNotes.erase(iter);
       }
       else
@@ -75,6 +75,8 @@ void NoteDelayer::OnTransportAdvanced(float amount)
          ++iter;
       }
    }
+   for (auto info : notesToPlay)
+      PlayNoteOutput(info.mTriggerTime, info.mPitch, info.mVelocity, -1, info.mModulation);
    mNoteMutex.unlock();
 }
 

@@ -114,7 +114,7 @@ void ScaleDegree::DropdownUpdated(DropdownList* slider, int oldVal)
 {
    if (slider == mScaleDegreeSelector && mEnabled)
    {
-      list<int> heldNotes = mNoteOutput.GetHeldNotes();
+      list<int> heldNotes = mNoteOutput.GetHeldNotesList();
       
       mNotesMutex.lock();
       for (list<NoteInfo>::iterator iter = mInputNotes.begin(); iter != mInputNotes.end(); ++iter)

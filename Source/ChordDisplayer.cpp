@@ -21,7 +21,7 @@ void ChordDisplayer::DrawModule()
    if (Minimized() || IsVisible() == false)
       return;
    
-   list<int> notes = mNoteOutput.GetHeldNotes();
+   list<int> notes = mNoteOutput.GetHeldNotesList();
    
    if (notes.size() > 2)
    {

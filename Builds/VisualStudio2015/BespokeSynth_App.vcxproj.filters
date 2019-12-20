@@ -595,6 +595,9 @@
     <ClCompile Include="..\..\Source\TremoloEffect.cpp">
       <Filter>BespokeSynth\Source\effects</Filter>
     </ClCompile>
+    <ClCompile Include="..\..\Source\NoteHocket.cpp">
+      <Filter>BespokeSynth\Source\modules</Filter>
+    </ClCompile>
     <ClCompile Include="..\..\Source\ModulatorSubtract.cpp">
       <Filter>BespokeSynth\Source\modules</Filter>
     </ClCompile>
@@ -3464,6 +3467,9 @@
     </ClInclude>
     <ClInclude Include="..\..\Source\TremoloEffect.h">
       <Filter>BespokeSynth\Source\effects</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\Source\NoteHocket.h">
+      <Filter>BespokeSynth\Source\modules</Filter>
     </ClInclude>
     <ClInclude Include="..\..\Source\ModulatorSubtract.h">
       <Filter>BespokeSynth\Source\modules</Filter>

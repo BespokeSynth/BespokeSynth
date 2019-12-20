@@ -100,6 +100,7 @@ public:
    void SetOwningContainer(ModuleContainer* container) { mOwningContainer = container; }
    ModuleContainer* GetOwningContainer() const { return mOwningContainer; }
    virtual ModuleContainer* GetContainer() { return nullptr; }
+   void SetShouldDrawOutline(bool should) { mShouldDrawOutline = should; }
    
    virtual void CheckboxUpdated(Checkbox* checkbox) {}
    
@@ -164,6 +165,7 @@ private:
    bool mInitialized;
    string mLastTitleLabel;
    float mTitleLabelWidth;
+   bool mShouldDrawOutline;
 
    ofMutex mSliderMutex;
    

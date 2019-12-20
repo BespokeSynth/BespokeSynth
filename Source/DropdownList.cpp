@@ -17,7 +17,7 @@ namespace
 }
 
 DropdownList::DropdownList(IDropdownListener* owner, const char* name, int x, int y, int* var, float width)
-: mWidth(40)
+: mWidth(35)
 , mHeight(itemSpacing)
 , mColumns(1)
 , mVar(var)
@@ -210,7 +210,7 @@ void DropdownList::Clear()
 {
    mElements.clear();
    if (mAutoCalculateWidth)
-      mWidth = 40;
+      mWidth = 35;
    mHeight = itemSpacing;
 }
 

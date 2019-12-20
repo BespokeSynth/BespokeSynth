@@ -126,6 +126,8 @@ TitleBar::TitleBar()
    TheTitleBar = this;
    
    mHelpDisplay = dynamic_cast<HelpDisplay*>(HelpDisplay::Create());
+   
+   SetShouldDrawOutline(false);
 }
 
 void TitleBar::CreateUIControls()

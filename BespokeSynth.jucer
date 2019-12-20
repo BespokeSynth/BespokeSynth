@@ -158,6 +158,8 @@
         <FILE id="RG4zGd" name="TremoloEffect.h" compile="0" resource="0" file="Source/TremoloEffect.h"/>
       </GROUP>
       <GROUP id="{6781AC07-A090-A7AF-8D27-BCB6D9526ABD}" name="modules">
+        <FILE id="GcGaCz" name="NoteHocket.cpp" compile="1" resource="0" file="Source/NoteHocket.cpp"/>
+        <FILE id="aK3P80" name="NoteHocket.h" compile="0" resource="0" file="Source/NoteHocket.h"/>
         <FILE id="g89HKP" name="ModulatorSubtract.cpp" compile="1" resource="0"
               file="Source/ModulatorSubtract.cpp"/>
         <FILE id="ypolZa" name="ModulatorSubtract.h" compile="0" resource="0"

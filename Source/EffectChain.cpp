@@ -289,7 +289,7 @@ void EffectChain::GetModuleDimensions(int& x, int&y)
       maxY = MAX(maxY,y+h);
    }
    x = maxX + 10;
-   y = maxY + 18;
+   y = maxY + 20;
 }
 
 void EffectChain::KeyPressed(int key, bool isRepeat)

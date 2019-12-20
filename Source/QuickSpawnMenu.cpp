@@ -21,6 +21,7 @@ namespace
 void QuickSpawnMenu::Init()
 {
    IDrawableModule::Init();
+   SetShouldDrawOutline(false);
    SetShowing(false);
 }
 

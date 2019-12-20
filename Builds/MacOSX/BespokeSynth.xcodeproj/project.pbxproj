@@ -189,6 +189,10 @@
 			isa = PBXBuildFile;
 			fileRef = 49AB76428A044DEDF45FFAFE;
 		};
+		619C85099C88F52975E2648B = {
+			isa = PBXBuildFile;
+			fileRef = 5DEF0BF6E71349D0223E6991;
+		};
 		C5964B10056A9FFC4A398B8A = {
 			isa = PBXBuildFile;
 			fileRef = 1FB4885EA00B04064BF7B653;
@@ -2891,6 +2895,13 @@
 			path = ../../Source/IMidiVoice.h;
 			sourceTree = "SOURCE_ROOT";
 		};
+		5DEF0BF6E71349D0223E6991 = {
+			isa = PBXFileReference;
+			lastKnownFileType = sourcecode.cpp.cpp;
+			name = NoteHocket.cpp;
+			path = ../../Source/NoteHocket.cpp;
+			sourceTree = "SOURCE_ROOT";
+		};
 		5DF3FD4837E79A45338C2E3E = {
 			isa = PBXFileReference;
 			lastKnownFileType = sourcecode.c.h;
@@ -4436,6 +4447,13 @@
 			lastKnownFileType = sourcecode.c.h;
 			name = LinkwitzRileyFilter.h;
 			path = ../../Source/LinkwitzRileyFilter.h;
+			sourceTree = "SOURCE_ROOT";
+		};
+		B2137BD3C75D5B3559F5C670 = {
+			isa = PBXFileReference;
+			lastKnownFileType = sourcecode.c.h;
+			name = NoteHocket.h;
+			path = ../../Source/NoteHocket.h;
 			sourceTree = "SOURCE_ROOT";
 		};
 		B217F5EDC72085AA8AA21B04 = {
@@ -6073,6 +6091,8 @@
 		C91AF721DDC182CE3AC80CF9 = {
 			isa = PBXGroup;
 			children = (
+				5DEF0BF6E71349D0223E6991,
+				B2137BD3C75D5B3559F5C670,
 				1FB4885EA00B04064BF7B653,
 				2CF23FDA72DF218A1F9FB719,
 				59C16BAA467EEF199D6E6E7E,
@@ -6966,6 +6986,7 @@
 				69EB47EC9441C3507BEB277D,
 				75837998247B5E99F3F16392,
 				7B858D802BD0BB608C0F48CF,
+				619C85099C88F52975E2648B,
 				C5964B10056A9FFC4A398B8A,
 				A8C9FC1F1F5E4D9B97EF9B54,
 				498451F0988ABC1AD0D84716,

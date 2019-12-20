@@ -15,22 +15,28 @@
 
 void NoteOutput::PlayNote(double time, int pitch, int velocity, int voiceIdx, ModulationParameters modulation)
 {
-   for (auto noteReceiver : mNoteSource->GetPatchCableSource()->GetNoteReceivers())
-      noteReceiver->PlayNote(time,pitch,velocity,voiceIdx,modulation);
+   if (pitch >= 0 && pitch <= 127)
+   {
+      for (auto noteReceiver : mNoteSource->GetPatchCableSource()->GetNoteReceivers())
+         noteReceiver->PlayNote(time,pitch,velocity,voiceIdx,modulation);
 
-   mNotesMutex.lock();
-   if (velocity>0)
-   {
-      if (!ListContains(pitch, mNotes))
-         mNotes.push_front(pitch);
+      if (velocity>0)
+         mNotes[pitch] = true;
+      else
+         mNotes[pitch] = false;
+      
+      bool hasNotes = false;
+      for (int i=0; i<128; ++i)
+      {
+         if (mNotes[i])
+         {
+            hasNotes = true;
+            break;
+         }
+      }
+      
+      mNoteSource->GetPatchCableSource()->AddHistoryEvent(time, hasNotes);
    }
-   else
-   {
-      mNotes.remove(pitch);
-   }
-   
-   mNoteSource->GetPatchCableSource()->AddHistoryEvent(time, mNotes.size() > 0);
-   mNotesMutex.unlock();
 }
 
 void NoteOutput::SendPressure(int pitch, int pressure)
@@ -51,28 +57,55 @@ void NoteOutput::SendMidi(const MidiMessage& message)
       noteReceiver->SendMidi(message);
 }
 
+bool NoteOutput::HasHeldNotes()
+{
+   for (int i=0; i<128; ++i)
+   {
+      if (mNotes[i])
+         return true;
+   }
+   return false;
+}
+
+list<int> NoteOutput::GetHeldNotesList()
+{
+   list<int> notes;
+   for (int i=0; i<128; ++i)
+   {
+      if (mNotes[i])
+         notes.push_back(i);
+   }
+   return notes;
+}
+
 void NoteOutput::Flush()
 {
-   mNotesMutex.lock();
-   for (auto noteReceiver : mNoteSource->GetPatchCableSource()->GetNoteReceivers())
-   {
-      for (list<int>::iterator iter = mNotes.begin(); iter != mNotes.end(); ++iter)
-         noteReceiver->PlayNote(gTime,*iter,0);
-   }
-   mNotes.clear();
+   bool flushed = false;
    
-   mNoteSource->GetPatchCableSource()->AddHistoryEvent(gTime, false);
-   mNotesMutex.unlock();
+   for (int i=0; i<128; ++i)
+   {
+      if (mNotes[i])
+      {
+         for (auto noteReceiver : mNoteSource->GetPatchCableSource()->GetNoteReceivers())
+            noteReceiver->PlayNote(gTime,i,0);
+         flushed = true;
+         mNotes[i] = false;
+      }
+   }
+   
+   if (flushed)
+      mNoteSource->GetPatchCableSource()->AddHistoryEvent(gTime, false);
 }
 
 void NoteOutput::FlushTarget(INoteReceiver* target)
 {
    if (target)
    {
-      mNotesMutex.lock();
-      for (list<int>::iterator iter = mNotes.begin(); iter != mNotes.end(); ++iter)
-         target->PlayNote(gTime,*iter,0);
-      mNotesMutex.unlock();
+      for (int i=0; i<128; ++i)
+      {
+         if (mNotes[i])
+            target->PlayNote(gTime,i,0);
+      }
    }
 }
 
@@ -83,27 +116,21 @@ void INoteSource::PlayNoteOutput(double time, int pitch, int velocity, int voice
    if (mIsNoteOrigin)
    {
       //update visual info for waveform display
-      list<int> heldNotes = mNoteOutput.GetHeldNotes();
-      if (heldNotes.size() > 0)
+      bool* heldNotes = mNoteOutput.GetNotes();
+      for (int i=0; i<128; ++i)
       {
-         int lowestPitch = 999;
-         for (list<int>::iterator iter = heldNotes.begin();
-              iter != heldNotes.end();
-              ++iter)
+         if (heldNotes[i])
          {
-            if (*iter < lowestPitch)
-               lowestPitch = *iter;
+            gVizFreq = MAX(1,TheScale->PitchToFreq(i-12));
+            break;
          }
-         lowestPitch -= 12;
-         
-         gVizFreq = MAX(1,TheScale->PitchToFreq(lowestPitch));
       }
    }
 }
 
 void INoteSource::SendCCOutput(int control, int value, int voiceIdx /*=-1*/)
 {
-   mNoteOutput.SendCC(control, value);
+   mNoteOutput.SendCC(control, value, voiceIdx);
 }
 
 void INoteSource::PreRepatch(PatchCableSource* cableSource)

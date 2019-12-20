@@ -19,12 +19,15 @@ void NoteDisplayer::DrawModule()
    if (Minimized() || IsVisible() == false)
       return;
    
-   list<int> notes = mNoteOutput.GetHeldNotes();
+   bool* notes = mNoteOutput.GetNotes();
    float y = 14;
-   for (var note : notes)
+   for (int i=0; i<128; ++i)
    {
-      DrawNoteName(note, y);
-      y += 13;
+      if (notes[i])
+      {
+         DrawNoteName(i, y);
+         y += 13;
+      }
    }
 }
 

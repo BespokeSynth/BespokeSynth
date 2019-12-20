@@ -207,7 +207,7 @@ void Transport::DrawModule()
    ofFill();
    ofSetColor(255,255,255,50);
    float beatWidth = w/mTimeSigTop;
-   ofRect((count-1)*beatWidth,0,beatWidth,h);
+   ofRect((count-1)*beatWidth,0,beatWidth,h,0);
    if (count % 2)
       ofSetColor(255,0,255);
    else
@@ -228,11 +228,11 @@ void Transport::DrawModule()
    mTempoSlider->Draw();
    
    ofBeginShape();
-   for (int i=0;i<w;++i)
+   for (int i=0;i<w-1;++i)
    {
-      float pos = i/float(w);
+      float pos = i/float(w-1);
       float swung = Swing(pos);
-      ofVertex(i,h-swung*h);
+      ofVertex(i+1,h-1-swung*(h-1));
    }
    ofEndShape();
    ofRect(0,h-Swing(mMeasurePos)*h,4,1);

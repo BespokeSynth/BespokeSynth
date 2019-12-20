@@ -21,7 +21,7 @@ class INoteSource;
 class NoteOutput : public INoteReceiver
 {
 public:
-   NoteOutput(INoteSource* source) : mNoteSource(source) {}
+   NoteOutput(INoteSource* source) : mNoteSource(source) { bzero(mNotes, 128*sizeof(bool)); }
    
    void Flush();
    void FlushTarget(INoteReceiver* target);
@@ -32,11 +32,11 @@ public:
    void SendCC(int control, int value, int voiceIdx = -1) override;
    void SendMidi(const MidiMessage& message) override;
 
-   list<int> GetHeldNotes() { Poco::FastMutex::ScopedLock lock(mNotesMutex); return mNotes; }
-   list<int> GetHeldNotesAudioThread() { return mNotes; }
+   bool* GetNotes() { return mNotes; }
+   bool HasHeldNotes();
+   list<int> GetHeldNotesList();
 private:
-   list<int> mNotes;
-   ofMutex mNotesMutex;
+   bool mNotes[128];
    INoteSource* mNoteSource;
 };
 

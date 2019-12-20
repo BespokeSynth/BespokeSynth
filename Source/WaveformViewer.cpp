@@ -105,8 +105,6 @@ void WaveformViewer::DrawModule()
    ofPushStyle();
    ofPushMatrix();
    
-   ofClipWindow(0, 0, mWidth, mHeight);
-   
    ofSetColor(245, 58, 135);
    ofSetLineWidth(2);
    

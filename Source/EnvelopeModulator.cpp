@@ -76,7 +76,7 @@ void EnvelopeModulator::PlayNote(double time, int pitch, int velocity, int voice
 {
    PlayNoteOutput(time, pitch, velocity, voiceIdx, modulation);
    
-   if (mNoteOutput.GetHeldNotes().empty())
+   if (mNoteOutput.HasHeldNotes() == false)
    {
       mAdsr.Stop(time);
    }

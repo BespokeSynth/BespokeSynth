@@ -140,7 +140,7 @@ void KompleteKontrol::UpdateKeys()
       bool isHeld = false;
       bool isInPentatonic = pitch >= 0 && TheScale->IsInPentatonic(pitch);
       
-      list<int> heldNotes = mNoteOutput.GetHeldNotes();
+      list<int> heldNotes = mNoteOutput.GetHeldNotesList();
       for (int iter : heldNotes)
       {
          if (iter == pitch)

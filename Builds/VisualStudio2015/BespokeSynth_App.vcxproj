@@ -193,6 +193,7 @@
     <ClCompile Include="..\..\Source\Pumper.cpp"/>
     <ClCompile Include="..\..\Source\Stutter.cpp"/>
     <ClCompile Include="..\..\Source\TremoloEffect.cpp"/>
+    <ClCompile Include="..\..\Source\NoteHocket.cpp"/>
     <ClCompile Include="..\..\Source\ModulatorSubtract.cpp"/>
     <ClCompile Include="..\..\Source\Waveshaper.cpp"/>
     <ClCompile Include="..\..\Source\SignalClamp.cpp"/>
@@ -2307,6 +2308,7 @@
     <ClInclude Include="..\..\Source\Pumper.h"/>
     <ClInclude Include="..\..\Source\Stutter.h"/>
     <ClInclude Include="..\..\Source\TremoloEffect.h"/>
+    <ClInclude Include="..\..\Source\NoteHocket.h"/>
     <ClInclude Include="..\..\Source\ModulatorSubtract.h"/>
     <ClInclude Include="..\..\Source\Waveshaper.h"/>
     <ClInclude Include="..\..\Source\SignalClamp.h"/>
