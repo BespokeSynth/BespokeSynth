@@ -37,7 +37,7 @@ class VSTPlugin : public IAudioProcessor, public INoteReceiver, public IDrawable
 {
 public:
    VSTPlugin();
-   ~VSTPlugin();
+   virtual ~VSTPlugin() override;
    static IDrawableModule* Create() { return new VSTPlugin(); }
    
    string GetTitleLabel() override;
@@ -48,7 +48,7 @@ public:
    void Poll() override;
    void Exit() override;
    
-   juce::AudioProcessor* GetAudioProcessor() { return mPlugin; }
+   juce::AudioProcessor* GetAudioProcessor() { return mPlugin.get(); }
    
    void SetVST(string vstName);
    void OnVSTWindowClosed();
@@ -79,6 +79,7 @@ private:
    void GetModuleDimensions(int& width, int& height) override;
    bool Enabled() const override { return mEnabled; }
    
+   string GetPluginName();
    void CreateParameterSliders();
    
    float mVol;
@@ -90,7 +91,7 @@ private:
    int mOverlayHeight;
    
    juce::AudioPluginFormatManager mFormatManager;
-   juce::ScopedPointer<juce::AudioPluginInstance> mPlugin;
+   std::unique_ptr<AudioProcessor> mPlugin;
    juce::ScopedPointer<VSTWindow> mWindow;
    juce::MidiBuffer mMidiBuffer;
    juce::CriticalSection mMidiInputLock;

@@ -211,8 +211,11 @@ void IDrawableModule::Render()
          highlight = mag*.15f;
       }
       
-      if (GetPatchCableSource() != nullptr && GetPatchCableSource()->GetHistory().CurrentlyOn())
-         highlight = .1f;
+      if (GetPatchCableSource() != nullptr)
+      {
+         float elapsed = float(gTime - GetPatchCableSource()->GetHistory().GetLastOnEventTime()) / NOTE_HISTORY_LENGTH;
+         highlight = MAX(highlight, .15f * ofClamp(1 - elapsed, 0, 1));
+      }
    }
    
    const bool kUseDropshadow = false;

@@ -190,12 +190,13 @@ void FloatSliderLFOControl::SetOwner(FloatSlider* owner)
       mTarget->SetLFO(nullptr);
    }
    
-   assert(owner != nullptr);
-   
-   owner->SetLFO(this);
+   if (owner != nullptr)
+      owner->SetLFO(this);
    
    mTarget = owner;
-   InitializeRange();
+   
+   if (mTarget != nullptr)
+      InitializeRange();
 }
 
 void FloatSliderLFOControl::RandomizeSettings()

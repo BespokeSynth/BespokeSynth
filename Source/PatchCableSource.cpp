@@ -484,6 +484,9 @@ void PatchCableSource::LoadState(FileStreamIn& in)
 
 void NoteHistory::AddEvent(double time, bool on)
 {
+   if (on)
+      mLastOnEventTime = time;
+   
    Lock("AddEvent");
    
    NoteHistoryEvent hist;

@@ -44,14 +44,17 @@ typedef list<NoteHistoryEvent> NoteHistoryList;
 class NoteHistory
 {
 public:
+   NoteHistory() { mLastOnEventTime = -999; }
    void AddEvent(double time, bool on);
    void Lock(string name) { mHistoryMutex.Lock(name); }
    void Unlock() { mHistoryMutex.Unlock(); }
    NoteHistoryList& GetHistory() { return mHistory; }
    bool CurrentlyOn();
+   double GetLastOnEventTime() { return mLastOnEventTime; }
 private:
    NoteHistoryList mHistory;
    NamedMutex mHistoryMutex;
+   double mLastOnEventTime;
 };
 
 class PatchCableSource : public IClickable

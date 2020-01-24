@@ -76,7 +76,7 @@ void PatchCable::Render()
          if (!hist.empty())
          {
             NoteHistoryEvent& note = *hist.begin();
-            float elapsed = (gTime - note.mTime) / NOTE_HISTORY_LENGTH;
+            float elapsed = float(gTime - note.mTime) / NOTE_HISTORY_LENGTH;
             if (note.mOn || elapsed <= 1)
                hasNote = true;
          }
@@ -175,25 +175,35 @@ void PatchCable::Render()
          
          if (!hist.empty())
          {
-            ofSetLineWidth(lineWidth * 4);
             ofSetColor(lineColor);
             
             float lastElapsed = 0;
             for (NoteHistoryList::iterator i = hist.begin(); i != hist.end(); ++i)
             {
                NoteHistoryEvent& note = *i;
-               float elapsed = (gTime - note.mTime) / NOTE_HISTORY_LENGTH;
+               float elapsed = float(gTime - note.mTime) / NOTE_HISTORY_LENGTH;
+               ofSetLineWidth(lineWidth * (4 + ofClamp(1 - elapsed * .7f, 0, 1) * 5 + cos((gTime - note.mTime) * PI * 8 / TheTransport->MsPerBar()) * .3f));
                if (elapsed > 1)
                   elapsed = 1;
                if (note.mOn)
                {
                   ofBeginShape();
+                  ofVec2f pos;
                   for (int j=lastElapsed*wireLength; j<elapsed*wireLength; ++j)
                   {
-                     ofVec2f pos = MathUtils::Bezier(j/wireLength, cable.start, bezierControl1, bezierControl2, cable.plug);
+                     pos = MathUtils::Bezier(j/wireLength, cable.start, bezierControl1, bezierControl2, cable.plug);
                      ofVertex(pos.x,pos.y);
                   }
                   ofEndShape();
+                  
+                  /*if (elapsed < 1)
+                  {
+                     ofPushStyle();
+                     ofFill();
+                     ofSetLineWidth(1);
+                     ofCircle(pos.x, pos.y, 4);
+                     ofPopStyle();
+                  }*/
                }
                lastElapsed = elapsed;
                

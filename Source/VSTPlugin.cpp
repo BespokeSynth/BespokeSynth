@@ -25,18 +25,19 @@ namespace
 namespace VSTLookup
 {
    typedef string VstDirExtPair[2];
-   const int kNumVstTypes = 1;
+   const int kNumVstTypes = 2;
    //const VstDirExtPair vstDirs[kNumVstTypes] =
    //                                 {{"/Library/Audio/Plug-Ins/VST3","vst3"},
    //                                  {"/Library/Audio/Plug-Ins/VST","vst"}};
 #if BESPOKE_WINDOWS
-   const VstDirExtPair vstDirs[kNumVstTypes] = { { "C:/Library/Audio/Plug-Ins/VST","vst" } };
+   const VstDirExtPair vstDirs[kNumVstTypes] = { { "C:/Library/Audio/Plug-Ins/VST3","vst3" }, { "C:/Library/Audio/Plug-Ins/VST","vst" } };
 #else
-   const VstDirExtPair vstDirs[kNumVstTypes] = {{"/Library/Audio/Plug-Ins/VST","vst"}};
+   const VstDirExtPair vstDirs[kNumVstTypes] = { {"/Library/Audio/Plug-Ins/VST3","vst3"}, {"/Library/Audio/Plug-Ins/VST","vst"}};
 #endif
    
    void GetAvailableVSTs(vector<string>& vsts)
    {
+      //juce::KnownPluginList.
       for (int i=0; i<kNumVstTypes; ++i)
       {
          const VstDirExtPair& pair = vstDirs[i];
@@ -128,8 +129,15 @@ void VSTPlugin::Exit()
 string VSTPlugin::GetTitleLabel()
 {
    if (mPlugin)
-      return "vst: "+mPlugin->getName().toStdString();
+      return "vst: "+GetPluginName();
    return "vst";
+}
+
+string VSTPlugin::GetPluginName()
+{
+   if (mPlugin)
+      return mPlugin->getName().toStdString();
+   return "no plugin loaded";
 }
 
 void VSTPlugin::SetVST(string vstName)
@@ -139,7 +147,7 @@ void VSTPlugin::SetVST(string vstName)
    mModuleSaveData.SetString("vst", vstName);
    string path = VSTLookup::GetVSTPath(vstName);
    
-   if (mPlugin != nullptr && mPlugin->getPluginDescription().fileOrIdentifier.toStdString() == path)
+   if (mPlugin != nullptr && dynamic_cast<juce::AudioPluginInstance*>(mPlugin.get())->getPluginDescription().fileOrIdentifier.toStdString() == path)
       return;  //this VST is already loaded! we're all set
    
    if (mPlugin != nullptr && mWindow != nullptr)
@@ -150,29 +158,67 @@ void VSTPlugin::SetVST(string vstName)
       //mWindowOverlay = nullptr;
    }
    
-   juce::PluginDescription desc;
-   desc.fileOrIdentifier = path;
-   desc.uid = 0;
-   
    juce::String errorMessage;
-   mVSTMutex.lock();
    for (int i=0; i<mFormatManager.getNumFormats(); ++i)
    {
       if (mFormatManager.getFormat(i)->fileMightContainThisPluginType(path))
-         mPlugin = mFormatManager.getFormat(i)->createInstanceFromDescription(desc, gSampleRate, gBufferSize).get();
+      {
+         OwnedArray<PluginDescription> descriptions;
+         mFormatManager.getFormat(i)->findAllTypesForFile(descriptions, path);
+         PluginDescription desc;
+         if (descriptions.size() == 0)
+         {
+            desc.fileOrIdentifier = path;
+            desc.uid = 0;
+         }
+         else
+         {
+            desc = *descriptions[0];
+         }
+         
+         /*auto completionCallback = [this, &callbackDone] (std::unique_ptr<juce::AudioPluginInstance> instance, const String& error)
+         {
+            if (instance == nullptr)
+            {
+               ofLog() << error;
+            }
+            else
+            {
+               mVSTMutex.lock();
+               //instance->enableAllBuses();
+               instance->prepareToPlay(gSampleRate, gBufferSize);
+               instance->setPlayHead(&mPlayhead);
+               mNumInputs = CLAMP(instance->getTotalNumInputChannels(), 1, 4);
+               mNumOutputs = CLAMP(instance->getTotalNumOutputChannels(), 1, 4);
+               ofLog() << "vst inputs: " << mNumInputs << "  vst outputs: " << mNumOutputs;
+               mPlugin = std::move(instance);
+               mVSTMutex.unlock();
+            }
+            if (mPlugin != nullptr)
+               CreateParameterSliders();
+            callbackDone = true;
+         };
+         
+         mFormatManager.getFormat(i)->createPluginInstanceAsync(desc, gSampleRate, gBufferSize, completionCallback);*/
+         
+         mVSTMutex.lock();
+         mPlugin = mFormatManager.getFormat(i)->createInstanceFromDescription(desc, gSampleRate, gBufferSize);
+         if (mPlugin != nullptr)
+         {
+            mPlugin->prepareToPlay(gSampleRate, gBufferSize);
+            mPlugin->setPlayHead(&mPlayhead);
+            mNumInputs = CLAMP(mPlugin->getTotalNumInputChannels(), 1, 4);
+            mNumOutputs = CLAMP(mPlugin->getTotalNumOutputChannels(), 1, 4);
+            ofLog() << "vst inputs: " << mNumInputs << "  vst outputs: " << mNumOutputs;
+         }
+         mVSTMutex.unlock();
+         
+         if (mPlugin != nullptr)
+            CreateParameterSliders();
+
+         break;
+      }
    }
-   if (mPlugin != nullptr)
-   {
-      mPlugin->prepareToPlay(gSampleRate, gBufferSize);
-      mPlugin->setPlayHead(&mPlayhead);
-      mNumInputs = CLAMP(mPlugin->getTotalNumInputChannels(), 1, 4);
-      mNumOutputs = CLAMP(mPlugin->getTotalNumOutputChannels(), 1, 4);
-      ofLog() << "vst inputs: " << mNumInputs << "  vst outputs: " << mNumOutputs;
-   }
-   mVSTMutex.unlock();
-   
-   if (mPlugin != nullptr)
-      CreateParameterSliders();
 }
 
 void VSTPlugin::CreateParameterSliders()
@@ -397,10 +443,7 @@ void VSTPlugin::DrawModule()
    if (Minimized() || IsVisible() == false)
       return;
    
-   if (mPlugin)
-      DrawText(mPlugin->getName().toStdString(), 3, 32);
-   else
-      DrawText("no plugin loaded", 3, 32);
+   DrawText(GetPluginName(), 3, 32);
    
    mVolSlider->Draw();
    mProgramChangeSelector->Draw();

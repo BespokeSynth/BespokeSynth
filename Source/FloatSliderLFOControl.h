@@ -94,7 +94,7 @@ public:
    void SetUpFromSaveData() override;
 
 protected:
-   ~FloatSliderLFOControl();
+   virtual ~FloatSliderLFOControl();
 
 private:
    void UpdateVisibleControls();
