@@ -21,7 +21,7 @@ public:
    Neighborhooder();
    static IDrawableModule* Create() { return new Neighborhooder(); }
    
-   string GetTitleLabel() override { return "neighborhooder"; }
+   string GetTitleLabel() override { return "notewrap"; }
    void CreateUIControls() override;
 
    void SetEnabled(bool enabled) override { mEnabled = enabled; }
@@ -37,11 +37,13 @@ public:
 private:
    //IDrawableModule
    void DrawModule() override;
-   void GetModuleDimensions(int& width, int& height) override { width = 120; height = 20; }
+   void GetModuleDimensions(int& width, int& height) override { width = 120; height = 38; }
    bool Enabled() const override { return mEnabled; }
 
-   int mOctave;
-   IntSlider* mOctaveSlider;
+   int mMinPitch;
+   int mPitchRange;
+   IntSlider* mMinSlider;
+   IntSlider* mRangeSlider;
 };
 
 #endif /* defined(__modularSynth__Neighborhooder__) */

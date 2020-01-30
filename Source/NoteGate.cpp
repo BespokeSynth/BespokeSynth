@@ -10,14 +10,8 @@
 #include "SynthGlobals.h"
 
 NoteGate::NoteGate()
-: mMinPitch(0)
-, mMaxPitch(7)
+: mGate(true)
 {
-   for (int i=0; i<128; ++i)
-   {
-      mGate[i] = true;
-      mLastPlayTime[i] = -999;
-   }
 }
 
 NoteGate::~NoteGate()
@@ -27,6 +21,8 @@ NoteGate::~NoteGate()
 void NoteGate::CreateUIControls()
 {
    IDrawableModule::CreateUIControls();
+   
+   mGateCheckbox = new Checkbox(this, "gate", 3, 4, &mGate);
 }
 
 void NoteGate::DrawModule()
@@ -34,47 +30,24 @@ void NoteGate::DrawModule()
    if (Minimized() || IsVisible() == false)
       return;
    
-   int pitch = mMinPitch;
-   for (auto* checkbox : mGateCheckboxes)
-   {
-      checkbox->Draw();
-      ofPushStyle();
-      ofFill();
-      ofSetColor(0,255,0,(1 - ofClamp((gTime - mLastPlayTime[pitch])/250,0,1))*255);
-      ofRect(75,checkbox->GetPosition(true).y+4,8,8);
-      ofPopStyle();
-      ++pitch;
-   }
+   mGateCheckbox->Draw();
 }
 
 void NoteGate::PlayNote(double time, int pitch, int velocity, int voiceIdx, ModulationParameters modulation)
 {
-   if (mEnabled)
-   {
-      if (pitch >= 0 && pitch < 128)
-      {
-         mLastPlayTime[pitch] = time;
-         if (mGate[pitch])
-            PlayNoteOutput(time, pitch, velocity, voiceIdx, modulation);
-      }
-   }
-   else
-   {
+   if (mGate || velocity == 0 || !mEnabled)
       PlayNoteOutput(time, pitch, velocity, voiceIdx, modulation);
-   }
 }
 
 void NoteGate::GetModuleDimensions(int& width, int& height)
 {
    width = 80;
-   height = 3 + (mMaxPitch - mMinPitch + 1) * 18;
+   height = 20;
 }
 
 void NoteGate::LoadLayout(const ofxJSONElement& moduleInfo)
 {
    mModuleSaveData.LoadString("target", moduleInfo);
-   mModuleSaveData.LoadInt("min pitch", moduleInfo, 0, 0, 127, K(isTextField));
-   mModuleSaveData.LoadInt("max pitch", moduleInfo, 7, 0, 127, K(isTextField));
    
    SetUpFromSaveData();
 }
@@ -82,20 +55,5 @@ void NoteGate::LoadLayout(const ofxJSONElement& moduleInfo)
 void NoteGate::SetUpFromSaveData()
 {
    SetUpPatchCables(mModuleSaveData.GetString("target"));
-   
-   mMinPitch = mModuleSaveData.GetInt("min pitch");
-   mMaxPitch = mModuleSaveData.GetInt("max pitch");
-   
-   for (auto* checkbox : mGateCheckboxes)
-      RemoveUIControl(checkbox);
-   mGateCheckboxes.clear();
-   
-   int numCheckboxes = (mMaxPitch - mMinPitch + 1);
-   for (int i=0; i<numCheckboxes; ++i)
-   {
-      int pitch = i+mMinPitch;
-      Checkbox* checkbox = new Checkbox(this,(NoteName(pitch) + ofToString(pitch/12 - 2) + " (" + ofToString(pitch) + ")").c_str(),3,3+i*18,&mGate[pitch]);
-      mGateCheckboxes.push_back(checkbox);
-   }
 }
 

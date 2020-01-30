@@ -184,6 +184,8 @@
 #include "Waveshaper.h"
 #include "ModulatorSubtract.h"
 #include "NoteHocket.h"
+#include "NoteRangeFilter.h"
+#include "NoteChance.h"
 
 #define REGISTER(class,name,type) Register(#name, &(class::Create), &(class::CanCreate), type, false, false);
 #define REGISTER_HIDDEN(class,name,type) Register(#name, &(class::Create), &(class::CanCreate), type, true, false);
@@ -213,7 +215,7 @@ ModuleFactory::ModuleFactory()
    REGISTER(WhiteKeys, whitekeys, kModuleType_Note);
    REGISTER(Kicker, kicker, kModuleType_Note);
    REGISTER(RingModulator, ringmodulator, kModuleType_Audio);
-   REGISTER(Neighborhooder, neighborhooder, kModuleType_Note);
+   REGISTER(Neighborhooder, notewrap, kModuleType_Note);
    REGISTER(Polyrhythms, polyrhythms, kModuleType_Instrument);
    REGISTER(Looper, looper, kModuleType_Audio);
    REGISTER(Rewriter, rewriter, kModuleType_Audio);
@@ -336,6 +338,8 @@ ModuleFactory::ModuleFactory()
    REGISTER(SignalClamp, signalclamp, kModuleType_Audio);
    REGISTER(Waveshaper, waveshaper, kModuleType_Audio);
    REGISTER(NoteHocket, notehocket, kModuleType_Note);
+   REGISTER(NoteRangeFilter, noterangefilter, kModuleType_Note);
+   REGISTER(NoteChance, notechance, kModuleType_Note);
 
    //REGISTER_EXPERIMENTAL(MidiPlayer, midiplayer, kModuleType_Instrument);
    REGISTER_EXPERIMENTAL(Razor, razor, kModuleType_Synth);
