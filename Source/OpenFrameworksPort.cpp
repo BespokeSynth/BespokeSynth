@@ -615,14 +615,23 @@ ofColor ofColor::operator+(const ofColor& other)
 
 void RetinaTrueTypeFont::LoadFont(string path)
 {
-   mFontHandle = nvgCreateFont(gNanoVG, path.c_str(), path.c_str());
-   mFontBoundsHandle = nvgCreateFont(gFontBoundsNanoVG, path.c_str(), path.c_str());
-   mLoaded = true;
+   File file(ofToDataPath(path).c_str());
+   if (file.existsAsFile())
+   {
+      mFontHandle = nvgCreateFont(gNanoVG, path.c_str(), path.c_str());
+      mFontBoundsHandle = nvgCreateFont(gFontBoundsNanoVG, path.c_str(), path.c_str());
+      mLoaded = true;
+   }
+   else
+   {
+      mLoaded = false;
+   }
 }
 
 void RetinaTrueTypeFont::DrawString(string str, float size, float x, float y)
 {
-   assert(mLoaded);
+   if (!mLoaded)
+      return;
    
    nvgFontFaceId(gNanoVG, mFontHandle);
    nvgFontSize(gNanoVG, size);
@@ -648,7 +657,8 @@ void RetinaTrueTypeFont::DrawString(string str, float size, float x, float y)
 
 ofRectangle RetinaTrueTypeFont::DrawStringWrap(string str, float size, float x, float y, float width)
 {
-   assert(mLoaded);
+   if (!mLoaded)
+      return ofRectangle();
    
    TheSynth->LockRender(true);
    nvgFontFaceId(gNanoVG, mFontHandle);
@@ -663,8 +673,9 @@ ofRectangle RetinaTrueTypeFont::DrawStringWrap(string str, float size, float x, 
 
 float RetinaTrueTypeFont::GetStringWidth(string str, float size)
 {
-   assert(mLoaded);
-   
+   if (!mLoaded)
+      return str.size() * 12;
+      
    nvgFontFaceId(gFontBoundsNanoVG, mFontBoundsHandle);
    nvgFontSize(gFontBoundsNanoVG, size);
    float bounds[4];

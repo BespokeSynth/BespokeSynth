@@ -229,6 +229,7 @@ public:
    void DrawString(string str, float size, float x, float y);
    ofRectangle DrawStringWrap(string str, float size, float x, float y, float width);
    float GetStringWidth(string str, float size);
+   bool IsLoaded() { return mLoaded; }
 private:
    int mFontHandle;
    int mFontBoundsHandle;

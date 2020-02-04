@@ -40,4 +40,6 @@ private:
    
    float mChance;
    FloatSlider* mChanceSlider;
+   float mLastRejectTime;
+   float mLastAcceptTime;
 };

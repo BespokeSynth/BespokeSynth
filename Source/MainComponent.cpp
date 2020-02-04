@@ -36,8 +36,8 @@ public:
       openGLContext.setOpenGLVersionRequired(juce::OpenGLContext::openGL3_2);
       openGLContext.setContinuousRepainting(false);
       
-      int width = 1280;
-      int height = 1024;
+      int width = 600;
+      int height = 400;
       ofxJSONElement userPrefs;
       bool loaded = userPrefs.open(ModularSynth::GetUserPrefsPath());
       if (loaded)
@@ -59,8 +59,12 @@ public:
    
    void timerCallback() override
    {
-      if (!hasKeyboardFocus(true) && isVisible())
+      static bool sHasGrabbedFocus = false;
+      if (!sHasGrabbedFocus && !hasKeyboardFocus(true) && isVisible())
+      {
          grabKeyboardFocus();
+         sHasGrabbedFocus = true;
+      }
       
       mSynth.Poll();
       

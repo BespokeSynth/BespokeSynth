@@ -240,7 +240,7 @@ void TitleBar::DrawModule()
          mAudioModules.SetPositionRelativeTo(&mSynthModules);
          mModulatorModules.SetPositionRelativeTo(&mAudioModules);
          mOtherModules.SetPositionRelativeTo(&mModulatorModules);
-         if (ofGetWidth() / gDrawScale >= 1400)
+         if (ofGetWidth() / gDrawScale >= 1550)
             mVstPlugins.SetPositionRelativeTo(&mOtherModules);
          else
             mVstPlugins.SetPosition(400,18);

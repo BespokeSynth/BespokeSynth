@@ -36,18 +36,17 @@ HelpDisplay::~HelpDisplay()
 
 void HelpDisplay::LoadHelp()
 {
-   //TODO_PORT(Ryan)
-   return;
-   
    File file(ofToDataPath("help.txt").c_str());
-   FileInputStream fin(file);
-   
-   if (fin.openedOk())
+   if (file.existsAsFile())
    {
-      //getline (fin,mOverviewText,'#');
-      //getline (fin,mModuleReference,'#');
-      //getline (fin,mEffectsReference,'#');
-      //fin.close();
+      juce::String contents = file.loadFileAsString();
+      vector<string> tokens = ofSplitString(contents.toStdString(), "#");
+      if (tokens.size() == 3)
+      {
+         mOverviewText = tokens[0];
+         mModuleReference = tokens[1];
+         mEffectsReference = tokens[2];
+      }
    }
 }
 

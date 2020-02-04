@@ -178,6 +178,7 @@ uint32_t JenkinsHash(const char* key);
 void LoadStateValidate(bool assertion);
 float GetLeftPanGain(float pan);
 float GetRightPanGain(float pan);
+void DrawFallbackText(const char* text, float posX, float posY);
 
 inline static float RandomSample()
 {

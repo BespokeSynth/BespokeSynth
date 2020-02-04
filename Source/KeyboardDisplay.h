@@ -54,6 +54,7 @@ private:
    int mPlayingMousePitch;
    bool mTypingInput;
    bool mLatch;
+   float mLastPlayedTime[128];
 };
 
 #endif /* defined(__Bespoke__KeyboardDisplay__) */
