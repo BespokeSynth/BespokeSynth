@@ -55,6 +55,15 @@ void QuickSpawnMenu::KeyReleased(int key)
    }
 }
 
+void QuickSpawnMenu::MouseReleased()
+{
+   if (TheSynth->GetTopModalFocusItem() != this)
+   {
+      TheSynth->PopModalFocusItem();
+      SetShowing(false);
+   }
+}
+
 void QuickSpawnMenu::DrawModule()
 {
    ofPushStyle();
