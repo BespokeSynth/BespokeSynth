@@ -134,7 +134,7 @@ void PolyphonyMgr::Start(double time, int pitch, float amount, int voiceIdx, Mod
    voice->SetModulators(modulation);
    if (!preserveVoice || modulation.pan != voice->GetPan())
    {
-      Clear(mWorkBuffer, kVoiceFadeSamples);
+      mFadeOutWorkBuffer.Clear();
       voice->Process(time, &mFadeOutWorkBuffer);
       for (int i=0; i<kVoiceFadeSamples; ++i)
       {
