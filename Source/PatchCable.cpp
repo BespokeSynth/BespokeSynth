@@ -422,7 +422,9 @@ PatchCablePos PatchCable::GetPatchCablePos()
       end = mTargetRadioButton->GetOptionPosition(mUIControlConnection->mValue);
    }
    
-   ofVec2f plug = end + endDirection * 12;
+   float plugDirDistanceToStart = endDirection.dot(start-end);
+   float plugLength = ofClamp(plugDirDistanceToStart - 20, 5, 14);
+   ofVec2f plug = end + endDirection * plugLength;
    
    PatchCablePos cable;
    cable.start = start;
