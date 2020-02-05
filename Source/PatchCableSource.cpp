@@ -487,43 +487,19 @@ void NoteHistory::AddEvent(double time, bool on)
    if (on)
       mLastOnEventTime = time;
    
-   Lock("AddEvent");
-   
-   NoteHistoryEvent hist;
-   hist.mTime = time;
-   hist.mOn = on;
-   mHistory.push_front(hist);
-   
-   bool deleteRest = false;
-   for (NoteHistoryList::iterator i = mHistory.begin(); i != mHistory.end();)
-   {
-      if (deleteRest)
-      {
-         i = mHistory.erase(i);
-      }
-      else if ((*i).mTime < gTime - 5000)
-      {
-         deleteRest = true;
-         ++i;
-      }
-      else
-      {
-         ++i;
-      }
-   }
-   
-   Unlock();
+   mHistoryPos = (mHistoryPos + 1) % kHistorySize;
+   mHistory[mHistoryPos].mTime = time;
+   mHistory[mHistoryPos].mOn = on;
 }
 
 bool NoteHistory::CurrentlyOn()
 {
-   bool on = false;
-   Lock("CurrentlyOn");
-   if (!mHistory.empty())
-   {
-      const NoteHistoryEvent& note = *(mHistory.begin());
-      on = note.mOn;
-   }
-   Unlock();
-   return on;
+   return mHistory[mHistoryPos].mOn;
+}
+
+const NoteHistoryEvent& NoteHistory::GetHistoryEvent(int ago) const
+{
+   assert(ago < kHistorySize);
+   int index = (mHistoryPos + kHistorySize - ago) % kHistorySize;
+   return mHistory[index];
 }

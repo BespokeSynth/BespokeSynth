@@ -13,7 +13,6 @@
 #include "IClickable.h"
 #include "SynthGlobals.h"
 #include "IDrawableModule.h"
-#include "NamedMutex.h"
 
 class IAudioReceiver;
 class INoteReceiver;
@@ -35,25 +34,23 @@ enum PatchCableDrawMode
 
 struct NoteHistoryEvent
 {
+   NoteHistoryEvent() : mOn(false), mTime(0) {}
    bool mOn;
    double mTime;
 };
 
-typedef list<NoteHistoryEvent> NoteHistoryList;
-
 class NoteHistory
 {
 public:
-   NoteHistory() { mLastOnEventTime = -999; }
+   NoteHistory() { mHistoryPos = 0; mLastOnEventTime = -999; }
    void AddEvent(double time, bool on);
-   void Lock(string name) { mHistoryMutex.Lock(name); }
-   void Unlock() { mHistoryMutex.Unlock(); }
-   NoteHistoryList& GetHistory() { return mHistory; }
    bool CurrentlyOn();
    double GetLastOnEventTime() { return mLastOnEventTime; }
+   const NoteHistoryEvent& GetHistoryEvent(int ago) const;
+   static const int kHistorySize = 20;
 private:
-   NoteHistoryList mHistory;
-   NamedMutex mHistoryMutex;
+   NoteHistoryEvent mHistory[kHistorySize];
+   int mHistoryPos;
    double mLastOnEventTime;
 };
 

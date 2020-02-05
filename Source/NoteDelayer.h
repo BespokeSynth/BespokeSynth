@@ -59,8 +59,10 @@ private:
    
    float mLastNoteOnTime;
    
-   ofMutex mNoteMutex;
-   vector<NoteInfo> mInputNotes;
+   static const int kQueueSize = 50;
+   NoteInfo mInputNotes[kQueueSize];
+   int mConsumeIndex;
+   int mAppendIndex;
 };
 
 #endif /* defined(__Bespoke__NoteDelayer__) */

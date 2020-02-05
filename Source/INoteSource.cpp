@@ -12,6 +12,7 @@
 #include "ModularSynth.h"
 #include "Scale.h"
 #include "PatchCableSource.h"
+#include "Profiler.h"
 
 void NoteOutput::PlayNote(double time, int pitch, int velocity, int voiceIdx, ModulationParameters modulation)
 {
@@ -111,6 +112,7 @@ void NoteOutput::FlushTarget(INoteReceiver* target)
 
 void INoteSource::PlayNoteOutput(double time, int pitch, int velocity, int voiceIdx, ModulationParameters modulation)
 {
+   PROFILER(INoteSourcePlayOutput);
    mNoteOutput.PlayNote(time, pitch, velocity, voiceIdx, modulation);
    
    if (mIsNoteOrigin)

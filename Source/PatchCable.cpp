@@ -68,18 +68,11 @@ void PatchCable::Render()
    {
       if (GetConnectionType() == kConnectionType_Note || GetConnectionType() == kConnectionType_Grid || GetConnectionType() == kConnectionType_Pulse)
       {
-         mOwner->GetHistory().Lock("draw lines");
-         NoteHistoryList hist = mOwner->GetHistory().GetHistory();
-         mOwner->GetHistory().Unlock();
-         
          bool hasNote = false;
-         if (!hist.empty())
-         {
-            NoteHistoryEvent& note = *hist.begin();
-            float elapsed = float(gTime - note.mTime) / NOTE_HISTORY_LENGTH;
-            if (note.mOn || elapsed <= 1)
-               hasNote = true;
-         }
+         const NoteHistoryEvent& event = mOwner->GetHistory().GetHistoryEvent(0);
+         float elapsed = float(gTime - event.mTime) / NOTE_HISTORY_LENGTH;
+         if (event.mOn || elapsed <= 1)
+            hasNote = true;
          
          if (!hasNote)
             return;
@@ -169,47 +162,40 @@ void PatchCable::Render()
          ofVertex(cable.plug.x,cable.plug.y);
          ofEndShape();
          
-         mOwner->GetHistory().Lock("draw lines");
-         NoteHistoryList hist = mOwner->GetHistory().GetHistory();
-         mOwner->GetHistory().Unlock();
+         ofSetColor(lineColor);
          
-         if (!hist.empty())
+         float lastElapsed = 0;
+         for (int i=0; i<NoteHistory::kHistorySize; ++i)
          {
-            ofSetColor(lineColor);
-            
-            float lastElapsed = 0;
-            for (NoteHistoryList::iterator i = hist.begin(); i != hist.end(); ++i)
+            const NoteHistoryEvent& event = mOwner->GetHistory().GetHistoryEvent(i);
+            float elapsed = float(gTime - event.mTime) / NOTE_HISTORY_LENGTH;
+            ofSetLineWidth(lineWidth * (4 + ofClamp(1 - elapsed * .7f, 0, 1) * 5 + cos((gTime - event.mTime) * PI * 8 / TheTransport->MsPerBar()) * .3f));
+            if (elapsed > 1)
+               elapsed = 1;
+            if (event.mOn)
             {
-               NoteHistoryEvent& note = *i;
-               float elapsed = float(gTime - note.mTime) / NOTE_HISTORY_LENGTH;
-               ofSetLineWidth(lineWidth * (4 + ofClamp(1 - elapsed * .7f, 0, 1) * 5 + cos((gTime - note.mTime) * PI * 8 / TheTransport->MsPerBar()) * .3f));
-               if (elapsed > 1)
-                  elapsed = 1;
-               if (note.mOn)
+               ofBeginShape();
+               ofVec2f pos;
+               for (int j=lastElapsed*wireLength; j<elapsed*wireLength; ++j)
                {
-                  ofBeginShape();
-                  ofVec2f pos;
-                  for (int j=lastElapsed*wireLength; j<elapsed*wireLength; ++j)
-                  {
-                     pos = MathUtils::Bezier(j/wireLength, cable.start, bezierControl1, bezierControl2, cable.plug);
-                     ofVertex(pos.x,pos.y);
-                  }
-                  ofEndShape();
-                  
-                  /*if (elapsed < 1)
-                  {
-                     ofPushStyle();
-                     ofFill();
-                     ofSetLineWidth(1);
-                     ofCircle(pos.x, pos.y, 4);
-                     ofPopStyle();
-                  }*/
+                  pos = MathUtils::Bezier(j/wireLength, cable.start, bezierControl1, bezierControl2, cable.plug);
+                  ofVertex(pos.x,pos.y);
                }
-               lastElapsed = elapsed;
+               ofEndShape();
                
-               if (elapsed >= 1)
-                  break;
+               /*if (elapsed < 1)
+               {
+                  ofPushStyle();
+                  ofFill();
+                  ofSetLineWidth(1);
+                  ofCircle(pos.x, pos.y, 4);
+                  ofPopStyle();
+               }*/
             }
+            lastElapsed = elapsed;
+            
+            if (elapsed >= 1)
+               break;
          }
          
          ofSetLineWidth(plugWidth);

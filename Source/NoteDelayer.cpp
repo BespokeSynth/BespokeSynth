@@ -10,10 +10,13 @@
 #include "OpenFrameworksPort.h"
 #include "Scale.h"
 #include "ModularSynth.h"
+#include "Profiler.h"
 
 NoteDelayer::NoteDelayer()
 : mDelay(.25f)
 , mDelaySlider(nullptr)
+, mConsumeIndex(0)
+, mAppendIndex(0)
 {
    TheTransport->AddAudioPoller(this);
 }
@@ -58,26 +61,22 @@ void NoteDelayer::CheckboxUpdated(Checkbox *checkbox)
 
 void NoteDelayer::OnTransportAdvanced(float amount)
 {
+   PROFILER(NoteDelayer);
+   
    ComputeSliders(0);
    
-   mNoteMutex.lock();
-   vector<NoteInfo> notesToPlay;
-   for (auto iter = mInputNotes.begin(); iter != mInputNotes.end(); )
+   int end = mAppendIndex;
+   if (mAppendIndex < mConsumeIndex)
+      end += kQueueSize;
+   for (int i=mConsumeIndex; i<end; ++i)
    {
-      const NoteInfo& info = *iter;
+      const NoteInfo& info = mInputNotes[i % kQueueSize];
       if (gTime > info.mTriggerTime)
       {
-         notesToPlay.push_back(info);
-         iter = mInputNotes.erase(iter);
-      }
-      else
-      {
-         ++iter;
+         PlayNoteOutput(info.mTriggerTime, info.mPitch, info.mVelocity, -1, info.mModulation);
+         mConsumeIndex = (mConsumeIndex + 1) % kQueueSize;
       }
    }
-   for (auto info : notesToPlay)
-      PlayNoteOutput(info.mTriggerTime, info.mPitch, info.mVelocity, -1, info.mModulation);
-   mNoteMutex.unlock();
 }
 
 void NoteDelayer::PlayNote(double time, int pitch, int velocity, int voiceIdx, ModulationParameters modulation)
@@ -88,15 +87,16 @@ void NoteDelayer::PlayNote(double time, int pitch, int velocity, int voiceIdx, M
    if (velocity > 0)
       mLastNoteOnTime = time;
    
-   NoteInfo info;
-   info.mPitch = pitch;
-   info.mVelocity = velocity;
-   info.mTriggerTime = time + mDelay * TheTransport->GetDuration(kInterval_1n);
-   info.mModulation = modulation;
-
-   mNoteMutex.lock();
-   mInputNotes.push_back(info);
-   mNoteMutex.unlock();
+   if ((mAppendIndex + 1) % kQueueSize != mConsumeIndex)
+   {
+      NoteInfo info;
+      info.mPitch = pitch;
+      info.mVelocity = velocity;
+      info.mTriggerTime = time + mDelay * TheTransport->GetDuration(kInterval_1n);
+      info.mModulation = modulation;
+      mInputNotes[mAppendIndex] = info;
+      mAppendIndex = (mAppendIndex + 1) % kQueueSize;
+   }
 }
 
 void NoteDelayer::FloatSliderUpdated(FloatSlider* slider, float oldVal)
