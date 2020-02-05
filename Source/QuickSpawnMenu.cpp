@@ -57,7 +57,7 @@ void QuickSpawnMenu::KeyReleased(int key)
 
 void QuickSpawnMenu::MouseReleased()
 {
-   if (TheSynth->GetTopModalFocusItem() != this)
+   if (TheSynth->GetTopModalFocusItem() != this && IsShowing())
    {
       TheSynth->PopModalFocusItem();
       SetShowing(false);
