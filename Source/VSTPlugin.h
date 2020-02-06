@@ -28,7 +28,7 @@ class ofxJSONElement;
 
 namespace VSTLookup
 {
-   void GetAvailableVSTs(vector<string>& vsts);
+   void GetAvailableVSTs(vector<string>& vsts, bool rescan);
    void FillVSTList(DropdownList* list);
    string GetVSTPath(string vstName);
 }
@@ -90,7 +90,6 @@ private:
    int mOverlayWidth;
    int mOverlayHeight;
    
-   juce::AudioPluginFormatManager mFormatManager;
    std::unique_ptr<AudioProcessor> mPlugin;
    juce::ScopedPointer<VSTWindow> mWindow;
    juce::MidiBuffer mMidiBuffer;

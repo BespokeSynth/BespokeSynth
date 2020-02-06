@@ -167,6 +167,8 @@ public:
    void LoadState(string file);
    void SaveStatePopup();
    void LoadStatePopup();
+
+   ofxJSONElement GetUserPrefs() { return mUserPrefs; }
    
 private:
    void ResetLayout();

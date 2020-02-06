@@ -3,5 +3,6 @@
    "height" : 1100,
    "layout" : "layouts/blank.json",
    "samplerate" : 44100,
+   "vstsearchdirs" : [ "/Library/Audio/Plug-Ins/VST3", "/Library/Audio/Plug-Ins/VST" ],
    "width" : 1700
 }

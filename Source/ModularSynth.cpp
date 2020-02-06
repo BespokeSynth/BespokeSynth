@@ -102,6 +102,10 @@ void ModularSynth::Setup(GlobalManagers* globalManagers, juce::Component* mainCo
       mIOBufferSize = gBufferSize;
       gSampleRate = 44100;
    }
+
+   juce::File(ofToDataPath("savestates")).createDirectory();
+   juce::File(ofToDataPath("recordings")).createDirectory();
+   juce::File(ofToDataPath("internal")).createDirectory();
    
    SynthInit();
 

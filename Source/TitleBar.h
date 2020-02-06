@@ -54,6 +54,7 @@ public:
    
    void SetModuleFactory(ModuleFactory* factory);
    void ListLayouts();
+   void SetUpVstDropdown(bool rescan);
    
    bool IsSaveable() override { return false; }
    

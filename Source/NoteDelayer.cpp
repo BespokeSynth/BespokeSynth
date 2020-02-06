@@ -30,7 +30,7 @@ void NoteDelayer::CreateUIControls()
 {
    IDrawableModule::CreateUIControls();
    
-   mDelaySlider = new FloatSlider(this,"delay",4,4,100,15,&mDelay,0,1);
+   mDelaySlider = new FloatSlider(this,"delay",4,4,100,15,&mDelay,0,1,4);
 }
 
 void NoteDelayer::DrawModule()

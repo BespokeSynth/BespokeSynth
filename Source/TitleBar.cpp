@@ -18,6 +18,11 @@
 
 TitleBar* TheTitleBar = nullptr;
 
+namespace
+{
+   const string kRescanPluginsLabel = "rescan VSTs...";
+}
+
 SpawnList::SpawnList(TitleBar* owner, int x, int y, string label)
 : mLabel(label)
 , mSpawnIndex(-1)
@@ -30,7 +35,8 @@ SpawnList::SpawnList(TitleBar* owner, int x, int y, string label)
 void SpawnList::SetList(vector<string> spawnables, string overrideModuleType)
 {
    mOverrideModuleType = overrideModuleType;
-   mSpawnList = new DropdownList(mOwner,mLabel.c_str(),mPos.x,mPos.y,&mSpawnIndex);
+   if (mSpawnList == nullptr)
+      mSpawnList = new DropdownList(mOwner,mLabel.c_str(),mPos.x,mPos.y,&mSpawnIndex);
    mSpawnList->SetNoHover(true);
    
    mSpawnList->Clear();
@@ -41,6 +47,8 @@ void SpawnList::SetList(vector<string> spawnables, string overrideModuleType)
       string name = mSpawnables[i].c_str();
       if (mOverrideModuleType == "" && TheSynth->GetModuleFactory()->IsExperimental(name))
          name += " (exp.)";
+      if (mOverrideModuleType == "vstplugin" && name != kRescanPluginsLabel)
+         name = juce::File(name).getFileName().toStdString();
       mSpawnList->AddLabel(name,i);
    }
 }
@@ -55,7 +63,8 @@ void SpawnList::OnSelection(DropdownList* list)
    if (list == mSpawnList)
    {
       IDrawableModule* module = Spawn();
-      TheSynth->SetMoveModule(module, moduleGrabOffset.x, moduleGrabOffset.y);
+      if (module != nullptr)
+         TheSynth->SetMoveModule(module, moduleGrabOffset.x, moduleGrabOffset.y);
       mSpawnIndex = -1;
    }
 }
@@ -65,6 +74,15 @@ IDrawableModule* SpawnList::Spawn()
    string moduleType = mSpawnables[mSpawnIndex];
    if (mOverrideModuleType != "")
       moduleType = mOverrideModuleType;
+
+   if (mOverrideModuleType == "vstplugin")
+   {
+      if (mSpawnables[mSpawnIndex] == kRescanPluginsLabel)
+      {
+         mOwner->SetUpVstDropdown(true);
+         return nullptr;
+      }
+   }
    
    IDrawableModule* module = TheSynth->SpawnModuleOnTheFly(moduleType, TheSynth->GetMouseX() + moduleGrabOffset.x, TheSynth->GetMouseY() + moduleGrabOffset.y);
    
@@ -165,9 +183,7 @@ void TitleBar::SetModuleFactory(ModuleFactory* factory)
    mModulatorModules.SetList(factory->GetSpawnableModules(kModuleType_Modulator), "");
    mOtherModules.SetList(factory->GetSpawnableModules(kModuleType_Other), "");
    
-   vector<string> vsts;
-   VSTLookup::GetAvailableVSTs(vsts);
-   mVstPlugins.SetList(vsts, "vstplugin");
+   SetUpVstDropdown(false);
    
    File dir(ofToDataPath("prefabs"));
    Array<File> files;
@@ -179,6 +195,14 @@ void TitleBar::SetModuleFactory(ModuleFactory* factory)
          prefabs.push_back(file.getFileName().toStdString());
    }
    mPrefabs.SetList(prefabs, "prefab");
+}
+
+void TitleBar::SetUpVstDropdown(bool rescan)
+{
+   vector<string> vsts;
+   VSTLookup::GetAvailableVSTs(vsts, rescan);
+   vsts.push_back(kRescanPluginsLabel);
+   mVstPlugins.SetList(vsts, "vstplugin");
 }
 
 void TitleBar::ListLayouts()

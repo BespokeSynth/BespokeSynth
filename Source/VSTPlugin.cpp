@@ -24,54 +24,73 @@ namespace
 
 namespace VSTLookup
 {
-   typedef string VstDirExtPair[2];
-   const int kNumVstTypes = 2;
-   //const VstDirExtPair vstDirs[kNumVstTypes] =
-   //                                 {{"/Library/Audio/Plug-Ins/VST3","vst3"},
-   //                                  {"/Library/Audio/Plug-Ins/VST","vst"}};
-#if BESPOKE_WINDOWS
-   const VstDirExtPair vstDirs[kNumVstTypes] = { { "C:/Library/Audio/Plug-Ins/VST3","vst3" }, { "C:/Library/Audio/Plug-Ins/VST","vst" } };
-#else
-   const VstDirExtPair vstDirs[kNumVstTypes] = { {"/Library/Audio/Plug-Ins/VST3","vst3"}, {"/Library/Audio/Plug-Ins/VST","vst"}};
-#endif
+   static AudioPluginFormatManager sFormatManager;
    
-   void GetAvailableVSTs(vector<string>& vsts)
+   void GetAvailableVSTs(vector<string>& vsts, bool rescan)
    {
-      //juce::KnownPluginList.
-      for (int i=0; i<kNumVstTypes; ++i)
+      static bool sFirstTime = true;
+      if (sFirstTime)
+         sFormatManager.addDefaultFormats();
+
+      static juce::KnownPluginList sPluginList;
+      if (rescan)
       {
-         const VstDirExtPair& pair = vstDirs[i];
-         string dirPath = pair[0];
-         string ext = pair[1];
-         DirectoryIterator dir(File(dirPath), true, "*."+ext, File::findFilesAndDirectories);
-         while(dir.next())
+         sPluginList.clear();
+         juce::File deadMansPedalFile(ofToDataPath("internal/deadmanspedal.txt"));
+         juce::FileSearchPath searchPath;
+         for (int i = 0; i < TheSynth->GetUserPrefs()["vstsearchdirs"].size(); ++i)
+            searchPath.add(juce::File(TheSynth->GetUserPrefs()["vstsearchdirs"][i].asString()));
+         for (int i = 0; i < sFormatManager.getNumFormats(); ++i)
          {
-            File file = dir.getFile();
-            vsts.push_back(file.getRelativePathFrom(File(dirPath)).toStdString());
+            juce::PluginDirectoryScanner scanner(sPluginList, *(sFormatManager.getFormat(i)), searchPath, true, deadMansPedalFile, true);
+            juce::String nameOfPluginBeingScanned;
+            while (scanner.scanNextFile(true, nameOfPluginBeingScanned))
+            {
+               ofLog() << "scanning " + nameOfPluginBeingScanned;
+            }
+         }
+         sPluginList.createXml()->writeTo(juce::File(ofToDataPath("internal/found_vsts.xml")));
+      }
+      else
+      {
+         auto file = juce::File(ofToDataPath("internal/found_vsts.xml"));
+         if (file.existsAsFile())
+         {
+            auto xml = juce::parseXML(file);
+            sPluginList.recreateFromXml(*xml);
          }
       }
+      auto types = sPluginList.getTypes();
+      for (int i=0; i<types.size(); ++i)
+      {
+         vsts.push_back(types[i].fileOrIdentifier.toStdString());
+      }
+
+      sFirstTime = false;
    }
    
    void FillVSTList(DropdownList* list)
    {
       assert(list);
       vector<string> vsts;
-      GetAvailableVSTs(vsts);
+      GetAvailableVSTs(vsts, false);
       for (int i=0; i<vsts.size(); ++i)
          list->AddLabel(vsts[i].c_str(), i);
    }
    
    string GetVSTPath(string vstName)
    {
-      for (int i=0; i<kNumVstTypes; ++i)
+      return vstName;
+      /*for (int i=0; i<kNumVstTypes; ++i)
       {
          const VstDirExtPair& pair = vstDirs[i];
          string dirPath = pair[0];
          string ext = pair[1];
-         if (ofIsStringInString(vstName, ext))
-            return dirPath+"/"+vstName;
+         string pathToVst = dirPath + "/" + vstName;
+         if (ofIsStringInString(vstName, ext) && File(pathToVst).existsAsFile())
+            return pathToVst;
       }
-      return "";
+      return "";*/
    }
 }
 
@@ -90,7 +109,8 @@ VSTPlugin::VSTPlugin()
 //, mWindowOverlay(nullptr)
 , mDisplayMode(kDisplayMode_Sliders)
 {
-   mFormatManager.addDefaultFormats();
+   if (VSTLookup::sFormatManager.getNumFormats() == 0)
+      VSTLookup::sFormatManager.addDefaultFormats();
    
    mChannelModulations.resize(kGlobalModulationIdx+1);
 }
@@ -159,12 +179,12 @@ void VSTPlugin::SetVST(string vstName)
    }
    
    juce::String errorMessage;
-   for (int i=0; i<mFormatManager.getNumFormats(); ++i)
+   for (int i=0; i<VSTLookup::sFormatManager.getNumFormats(); ++i)
    {
-      if (mFormatManager.getFormat(i)->fileMightContainThisPluginType(path))
+      if (VSTLookup::sFormatManager.getFormat(i)->fileMightContainThisPluginType(path))
       {
          OwnedArray<PluginDescription> descriptions;
-         mFormatManager.getFormat(i)->findAllTypesForFile(descriptions, path);
+         VSTLookup::sFormatManager.getFormat(i)->findAllTypesForFile(descriptions, path);
          PluginDescription desc;
          if (descriptions.size() == 0)
          {
@@ -199,10 +219,10 @@ void VSTPlugin::SetVST(string vstName)
             callbackDone = true;
          };
          
-         mFormatManager.getFormat(i)->createPluginInstanceAsync(desc, gSampleRate, gBufferSize, completionCallback);*/
+         sFormatManager.getFormat(i)->createPluginInstanceAsync(desc, gSampleRate, gBufferSize, completionCallback);*/
          
          mVSTMutex.lock();
-         mPlugin = mFormatManager.getFormat(i)->createInstanceFromDescription(desc, gSampleRate, gBufferSize);
+         mPlugin = VSTLookup::sFormatManager.getFormat(i)->createInstanceFromDescription(desc, gSampleRate, gBufferSize);
          if (mPlugin != nullptr)
          {
             mPlugin->prepareToPlay(gSampleRate, gBufferSize);
