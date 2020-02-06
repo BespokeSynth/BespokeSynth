@@ -5,14 +5,14 @@ Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "BespokeSynth - App", "Bespo
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
-		Debug|Win32 = Debug|Win32
-		Release|Win32 = Release|Win32
+		Debug|x64 = Debug|x64
+		Release|x64 = Release|x64
 	EndGlobalSection
 	GlobalSection(ProjectConfigurationPlatforms) = postSolution
-		{9407D100-6E22-A15A-0D3D-F7A28F89B271}.Debug|Win32.ActiveCfg = Debug|Win32
-		{9407D100-6E22-A15A-0D3D-F7A28F89B271}.Debug|Win32.Build.0 = Debug|Win32
-		{9407D100-6E22-A15A-0D3D-F7A28F89B271}.Release|Win32.ActiveCfg = Release|Win32
-		{9407D100-6E22-A15A-0D3D-F7A28F89B271}.Release|Win32.Build.0 = Release|Win32
+		{9407D100-6E22-A15A-0D3D-F7A28F89B271}.Debug|x64.ActiveCfg = Debug|x64
+		{9407D100-6E22-A15A-0D3D-F7A28F89B271}.Debug|x64.Build.0 = Debug|x64
+		{9407D100-6E22-A15A-0D3D-F7A28F89B271}.Release|x64.ActiveCfg = Release|x64
+		{9407D100-6E22-A15A-0D3D-F7A28F89B271}.Release|x64.Build.0 = Release|x64
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

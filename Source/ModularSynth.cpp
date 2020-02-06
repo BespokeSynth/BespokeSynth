@@ -1328,8 +1328,8 @@ void ModularSynth::LoadLayout(ofxJSONElement json)
 
 void ModularSynth::UpdateUserPrefsLayout()
 {
-   mUserPrefs["layout"] = mLoadedLayoutPath;
-   mUserPrefs.save(ofToDataPath("userprefs.json"), true);
+   //mUserPrefs["layout"] = mLoadedLayoutPath;
+   //mUserPrefs.save(GetUserPrefsPath(), true);
 }
 
 IDrawableModule* ModularSynth::CreateModule(const ofxJSONElement& moduleInfo)

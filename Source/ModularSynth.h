@@ -3,6 +3,8 @@
 
 #include "../JuceLibraryCode/JuceHeader.h"
 
+#undef LoadString //undo some junk from a windows define
+
 #include "SynthGlobals.h"
 #include "IAudioReceiver.h"
 #include "IDrawableModule.h"
@@ -157,7 +159,11 @@ public:
    
    bool IsLoadingModule() const { return mIsLoadingModule; }
    
+#if BESPOKE_WINDOWS
+   static string GetUserPrefsPath() { return ofToDataPath("userprefs_win.json"); }
+#else
    static string GetUserPrefsPath() { return ofToDataPath("userprefs.json"); }
+#endif
    
    void SaveLayout(string jsonFile = "", bool makeDefaultLayout = true);
    ofxJSONElement GetLayout();
