@@ -109,14 +109,14 @@ void DrawAudioBuffer(float width, float height, const float* buffer, float start
    
    ofPushStyle();
    
-   ofSetLineWidth(.5f);
+   ofSetLineWidth(2);
    ofFill();
    ofSetColor(255,255,255,50);
    ofRect(0, 0, width, height);
    
    if (buffer && end - start > 0)
    {
-      float step = .5f/gDrawScale;
+      float step = 3;
       float samplesPerStep = (end-start) / width * step;
       
       for (float i = 0; i < width; i+=step)
