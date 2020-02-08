@@ -25,6 +25,7 @@ namespace
 namespace VSTLookup
 {
    static AudioPluginFormatManager sFormatManager;
+   static juce::KnownPluginList sPluginList;
    
    void GetAvailableVSTs(vector<string>& vsts, bool rescan)
    {
@@ -32,7 +33,6 @@ namespace VSTLookup
       if (sFirstTime)
          sFormatManager.addDefaultFormats();
 
-      static juce::KnownPluginList sPluginList;
       if (rescan)
       {
          sPluginList.clear();
@@ -80,17 +80,18 @@ namespace VSTLookup
    
    string GetVSTPath(string vstName)
    {
-      return vstName;
-      /*for (int i=0; i<kNumVstTypes; ++i)
+      if (juce::String(vstName).contains("/") || juce::String(vstName).contains("\\"))  //already a path
+         return vstName;
+      
+      auto types = sPluginList.getTypes();
+      for (int i=0; i<types.size(); ++i)
       {
-         const VstDirExtPair& pair = vstDirs[i];
-         string dirPath = pair[0];
-         string ext = pair[1];
-         string pathToVst = dirPath + "/" + vstName;
-         if (ofIsStringInString(vstName, ext) && File(pathToVst).existsAsFile())
-            return pathToVst;
+         juce::File vst(types[i].fileOrIdentifier);
+         if (vst.getFileName().toStdString() == vstName)
+            return types[i].fileOrIdentifier.toStdString();
       }
-      return "";*/
+      
+      return "";
    }
 }
 
