@@ -146,11 +146,30 @@ public:
                                                                     true,
                                                                     preferredDefaultDeviceName,
                                                                     &preferredSetupOptions);
-      jassert (audioError.isEmpty());
-      mGlobalManagers.mDeviceManager.addAudioCallback(this);
+      if (audioError.isEmpty())
+      {
+         auto bufferSize = mGlobalManagers.mDeviceManager.getCurrentAudioDevice()->getCurrentBufferSizeSamples();
+         auto sampleRate = mGlobalManagers.mDeviceManager.getCurrentAudioDevice()->getCurrentSampleRate();
+         if (bufferSize != gBufferSize)
+         {
+            mSynth.SetFatalError("error setting buffer size to "+ofToString(gBufferSize)+", adjust userprefs.json");
+         }
+         else if (sampleRate != gSampleRate)
+         {
+            mSynth.SetFatalError("error setting sample rate to "+ofToString(gSampleRate)+", adjust userprefs.json");
+         }
+         else
+         {
+            mGlobalManagers.mDeviceManager.addAudioCallback(this);
 
-      SetGlobalBufferSize(mGlobalManagers.mDeviceManager.getCurrentAudioDevice()->getCurrentBufferSizeSamples());
-      SetGlobalSampleRate(mGlobalManagers.mDeviceManager.getCurrentAudioDevice()->getCurrentSampleRate());
+            SetGlobalBufferSize(bufferSize);
+            SetGlobalSampleRate(sampleRate);
+         }
+      }
+      else
+      {
+         mSynth.SetFatalError("error initializing audio device: "+audioError.toStdString());
+      }
       
       {
          const MessageManagerLock lock;

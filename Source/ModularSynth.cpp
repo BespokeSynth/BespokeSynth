@@ -130,6 +130,18 @@ void ModularSynth::LoadResources(void* nanoVG, void* fontBoundsNanoVG)
    LoadGlobalResources();
 }
 
+//static
+string ModularSynth::GetUserPrefsPath()
+{
+   #if BESPOKE_WINDOWS
+   string path = ofToDataPath("userprefs_win.json");
+   if (juce::File(path).existsAsFile())
+      return path;
+   #endif
+   
+   return ofToDataPath("userprefs.json");
+}
+
 static int sFrameCount = 0;
 void ModularSynth::Poll()
 {
@@ -208,6 +220,12 @@ void ModularSynth::Draw(void* vg)
    }
    
    DrawLissajous(&mOutputBuffer, 0, 0, ofGetWidth(), ofGetHeight(), .7f, 0, 0);
+   
+   if (mFatalError != "")
+   {
+      DrawText(mFatalError,ofGetWidth()/2-GetStringWidth(mFatalError,30)/2,ofGetHeight()/2-6, 20);
+      return;
+   }
    
    if (gTime == 1)
    {

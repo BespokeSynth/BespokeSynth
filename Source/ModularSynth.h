@@ -159,11 +159,7 @@ public:
    
    bool IsLoadingModule() const { return mIsLoadingModule; }
    
-#if BESPOKE_WINDOWS
-   static string GetUserPrefsPath() { return ofToDataPath("userprefs_win.json"); }
-#else
-   static string GetUserPrefsPath() { return ofToDataPath("userprefs.json"); }
-#endif
+   static string GetUserPrefsPath();
    
    void SaveLayout(string jsonFile = "", bool makeDefaultLayout = true);
    ofxJSONElement GetLayout();
@@ -175,6 +171,8 @@ public:
    void LoadStatePopup();
 
    ofxJSONElement GetUserPrefs() { return mUserPrefs; }
+   
+   void SetFatalError(string error) { mFatalError = error; }
    
 private:
    void ResetLayout();
@@ -271,6 +269,8 @@ private:
    ADSRDisplay* mScheduledEnvelopeEditorSpawnDisplay;
    
    bool mIsLoadingModule;
+   
+   string mFatalError;
 };
 
 extern ModularSynth* TheSynth;
