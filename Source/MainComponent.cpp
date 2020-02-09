@@ -130,10 +130,27 @@ public:
       
       mSynth.Setup(&mGlobalManagers, this);
       
-      String preferredDefaultDeviceName = "";
+      const string kAutoDevice = "auto";
+      
+      ofxJSONElement userPrefs;
+      string outputDevice = kAutoDevice;
+      string inputDevice = kAutoDevice;
+      bool loaded = userPrefs.open(ModularSynth::GetUserPrefsPath());
+      if (loaded)
+      {
+         if (!userPrefs["audio_output_device"].isNull())
+            outputDevice = userPrefs["audio_output_device"].asString();
+         if (!userPrefs["audio_input_device"].isNull())
+            inputDevice = userPrefs["audio_input_device"].asString();
+      }
+      
       AudioDeviceManager::AudioDeviceSetup preferredSetupOptions;
       preferredSetupOptions.sampleRate = gSampleRate;
       preferredSetupOptions.bufferSize = gBufferSize;
+      if (outputDevice != kAutoDevice)
+         preferredSetupOptions.outputDeviceName = outputDevice;
+      if (inputDevice != kAutoDevice)
+         preferredSetupOptions.inputDeviceName = inputDevice;
 
 #ifdef JUCE_WINDOWS
       HRESULT hr;
@@ -144,30 +161,41 @@ public:
                                                                     MAX_OUTPUT_CHANNELS,
                                                                     nullptr,
                                                                     true,
-                                                                    preferredDefaultDeviceName,
+                                                                    "",
                                                                     &preferredSetupOptions);
       if (audioError.isEmpty())
       {
-         auto bufferSize = mGlobalManagers.mDeviceManager.getCurrentAudioDevice()->getCurrentBufferSizeSamples();
-         auto sampleRate = mGlobalManagers.mDeviceManager.getCurrentAudioDevice()->getCurrentSampleRate();
-         if (bufferSize != gBufferSize)
+         auto loadedSetup = mGlobalManagers.mDeviceManager.getAudioDeviceSetup();
+         if (outputDevice != kAutoDevice && loadedSetup.outputDeviceName.toStdString() != outputDevice)
          {
-            mSynth.SetFatalError("error setting buffer size to "+ofToString(gBufferSize)+", adjust userprefs.json");
+            mSynth.SetFatalError("error setting output device to "+outputDevice+", fix this in userprefs.json (use \"auto\" for default device)");
          }
-         else if (sampleRate != gSampleRate)
+         else if (inputDevice != kAutoDevice && loadedSetup.inputDeviceName.toStdString() != inputDevice)
          {
-            mSynth.SetFatalError("error setting sample rate to "+ofToString(gSampleRate)+", adjust userprefs.json");
+            mSynth.SetFatalError("error setting input device to "+inputDevice+", fix this in userprefs.json (use \"auto\" for default device)");
+         }
+         else if (loadedSetup.bufferSize != gBufferSize)
+         {
+            mSynth.SetFatalError("error setting buffer size to "+ofToString(gBufferSize)+", fix this in userprefs.json");
+         }
+         else if (loadedSetup.sampleRate != gSampleRate)
+         {
+            mSynth.SetFatalError("error setting sample rate to "+ofToString(gSampleRate)+", fix this in userprefs.json");
          }
          else
          {
             mGlobalManagers.mDeviceManager.addAudioCallback(this);
+            
+            ofLog() << "output: " << loadedSetup.outputDeviceName << "   input: " << loadedSetup.inputDeviceName;
 
-            SetGlobalBufferSize(bufferSize);
-            SetGlobalSampleRate(sampleRate);
+            SetGlobalBufferSize(loadedSetup.bufferSize);
+            SetGlobalSampleRate(loadedSetup.sampleRate);
          }
       }
       else
       {
+         if (audioError.startsWith("No such device"))
+            audioError += "\nfix this in userprefs.json (you can use \"auto\" for the default device)";
          mSynth.SetFatalError("error initializing audio device: "+audioError.toStdString());
       }
       

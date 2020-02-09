@@ -1,8 +1,10 @@
 {
-   "buffersize" : 64,
-   "height" : 1100,
-   "layout" : "layouts/blank.json",
    "samplerate" : 44100,
-   "vstsearchdirs" : [ "/Library/Audio/Plug-Ins/VST3", "/Library/Audio/Plug-Ins/VST" ],
-   "width" : 1700
+   "buffersize" : 64,
+   "audio_output_device" : "auto",
+   "audio_input_device" : "auto",
+   "height" : 1100,
+   "width" : 1700,
+   "layout" : "layouts/blank.json",
+   "vstsearchdirs" : [ "/Library/Audio/Plug-Ins/VST3", "/Library/Audio/Plug-Ins/VST" ]
 }

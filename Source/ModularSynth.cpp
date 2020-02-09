@@ -223,7 +223,7 @@ void ModularSynth::Draw(void* vg)
    
    if (mFatalError != "")
    {
-      DrawText(mFatalError,ofGetWidth()/2-GetStringWidth(mFatalError,30)/2,ofGetHeight()/2-6, 20);
+      DrawText(mFatalError,100,100, 20);
       return;
    }
    
