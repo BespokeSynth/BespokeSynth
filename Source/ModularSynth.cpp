@@ -97,7 +97,12 @@ void ModularSynth::Setup(GlobalManagers* globalManagers, juce::Component* mainCo
    }
    else
    {
-      LogEvent("Couldn't find or load userprefs.json", kLogEventType_Error);
+      mFatalError = "couldn't find or load userprefs.json";
+#if BESPOKE_MAC
+      if (!juce::File(GetUserPrefsPath()).existsAsFile())
+         mFatalError += "\nplease launch via run_bespoke.command";
+#endif
+      LogEvent("couldn't find or load userprefs.json", kLogEventType_Error);
       SetGlobalBufferSize(64);
       mIOBufferSize = gBufferSize;
       gSampleRate = 44100;
@@ -212,20 +217,17 @@ void ModularSynth::Draw(void* vg)
    
    mDrawRect.set(-mDrawOffset.x, -mDrawOffset.y, ofGetWidth() / gDrawScale, ofGetHeight() / gDrawScale);
    
-   if (!gFont.IsLoaded())
+   if (mFatalError != "")
    {
       ofSetColor(255, 255, 255, 255);
-      DrawFallbackText("please launch via run_bespoke.command", 150, 200);
+      if (gFont.IsLoaded())
+         DrawText(mFatalError,100,100, 20);
+      else
+         DrawFallbackText(mFatalError.c_str(), 100, 100);
       return;
    }
    
    DrawLissajous(&mOutputBuffer, 0, 0, ofGetWidth(), ofGetHeight(), .7f, 0, 0);
-   
-   if (mFatalError != "")
-   {
-      DrawText(mFatalError,100,100, 20);
-      return;
-   }
    
    if (gTime == 1)
    {

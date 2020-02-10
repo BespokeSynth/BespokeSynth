@@ -1249,6 +1249,13 @@ void DrawFallbackText(const char* text, float posX, float posY)
    for(const auto *c = text; *c; ++c)
    {
       const auto ch = *c;
+      
+      if (ch == '\n')
+      {
+         pen.set(posX, pen.y + scale * 60);
+         continue;
+      }
+      
       const auto *it = simplex[ch - 32];
 
       const auto nvtcs = *it++;
