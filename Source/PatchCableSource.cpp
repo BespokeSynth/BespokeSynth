@@ -266,7 +266,8 @@ bool PatchCableSource::MouseMoved(float x, float y)
 
 void PatchCableSource::MouseReleased()
 {
-   for (auto cable : mPatchCables)
+   vector<PatchCable*> cables = mPatchCables;   //copy, since list might get modified here
+   for (auto cable : cables)
       cable->MouseReleased();
 }
 
