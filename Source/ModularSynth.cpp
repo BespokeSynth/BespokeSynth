@@ -95,7 +95,7 @@ void ModularSynth::Setup(GlobalManagers* globalManagers, juce::Component* mainCo
       mIOBufferSize = gBufferSize;
       gSampleRate = mUserPrefs["samplerate"].asInt();
 
-      juce::File(ofToDataPath("savestates")).createDirectory();
+      juce::File(ofToDataPath("savestate")).createDirectory();
       juce::File(ofToDataPath("recordings")).createDirectory();
       juce::File(ofToDataPath("internal")).createDirectory();
    }
@@ -1609,6 +1609,12 @@ void ModularSynth::SaveState(string file)
 void ModularSynth::LoadState(string file)
 {
    ofLog() << "LoadState() " << ofToDataPath(file);
+
+   if (!juce::File(ofToDataPath(file)).existsAsFile())
+   {
+      LogEvent("couldn't find file " + ofToDataPath(file), kLogEventType_Error);
+      return;
+   }
    
    mAudioThreadMutex.Lock("LoadState()");
    LockRender(true);

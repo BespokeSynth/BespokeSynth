@@ -249,11 +249,14 @@ void ModuleContainer::DeleteModule(IDrawableModule* module)
    {
       if (iter->GetPatchCableSource())
       {
+         vector<PatchCable*> cablesToDestroy;
          for (auto cable : iter->GetPatchCableSource()->GetPatchCables())
          {
             if (cable->GetTarget() == module)
-               cable->Destroy();
+               cablesToDestroy.push_back(cable);
          }
+         for (auto cable : cablesToDestroy)
+            cable->Destroy();
       }
    }
    module->SetEnabled(false);

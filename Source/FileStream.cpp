@@ -15,6 +15,11 @@ FileStreamOut::FileStreamOut(const char* file)
    mStream.truncate();
 }
 
+FileStreamOut::~FileStreamOut()
+{
+   mStream.flush();
+}
+
 FileStreamIn::FileStreamIn(const char* file)
 : mStream(File(file))
 {

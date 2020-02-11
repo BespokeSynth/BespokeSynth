@@ -16,6 +16,7 @@ class FileStreamOut
 {
 public:
    FileStreamOut(const char* file);
+   ~FileStreamOut();
    FileStreamOut& operator<<(const int& var);
    FileStreamOut& operator<<(const uint32_t &var);
    FileStreamOut& operator<<(const bool& var);
