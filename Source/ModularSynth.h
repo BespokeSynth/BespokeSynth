@@ -172,7 +172,7 @@ public:
 
    ofxJSONElement GetUserPrefs() { return mUserPrefs; }
    
-   void SetFatalError(string error) { mFatalError = error; }
+   void SetFatalError(string error) { if(mFatalError == "") mFatalError = error; }
    
 private:
    void ResetLayout();

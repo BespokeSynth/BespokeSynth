@@ -94,23 +94,23 @@ void ModularSynth::Setup(GlobalManagers* globalManagers, juce::Component* mainCo
       SetGlobalBufferSize(mUserPrefs["buffersize"].asInt());
       mIOBufferSize = gBufferSize;
       gSampleRate = mUserPrefs["samplerate"].asInt();
+
+      juce::File(ofToDataPath("savestates")).createDirectory();
+      juce::File(ofToDataPath("recordings")).createDirectory();
+      juce::File(ofToDataPath("internal")).createDirectory();
    }
    else
    {
-      mFatalError = "couldn't find or load userprefs.json";
+      mFatalError = "couldn't find or load data/userprefs.json";
 #if BESPOKE_MAC
       if (!juce::File(GetUserPrefsPath()).existsAsFile())
          mFatalError += "\nplease launch via run_bespoke.command";
 #endif
       LogEvent("couldn't find or load userprefs.json", kLogEventType_Error);
-      SetGlobalBufferSize(64);
+      SetGlobalBufferSize(256);
       mIOBufferSize = gBufferSize;
       gSampleRate = 44100;
    }
-
-   juce::File(ofToDataPath("savestates")).createDirectory();
-   juce::File(ofToDataPath("recordings")).createDirectory();
-   juce::File(ofToDataPath("internal")).createDirectory();
    
    SynthInit();
 
