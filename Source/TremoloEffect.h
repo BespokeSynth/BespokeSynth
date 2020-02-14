@@ -41,7 +41,7 @@ public:
 private:
    //IDrawableModule
    void DrawModule() override;
-   void GetModuleDimensions(int& x, int&y) override;
+   void GetModuleDimensions(int& x, int&y) override { x = mWidth; y = mHeight; }
    bool Enabled() const override { return mEnabled; }
 
    float mAmount;
@@ -59,6 +59,8 @@ private:
    static const int kAntiPopWindowSize = 300;
    float mWindow[kAntiPopWindowSize];
    int mWindowPos;
+   float mWidth;
+   float mHeight;
 };
 
 

@@ -36,7 +36,7 @@ public:
 private:
    //IDrawableModule
    void DrawModule() override;
-   void GetModuleDimensions(int& x, int& y) override;
+   void GetModuleDimensions(int& x, int& y) override { x = mWidth; y = mHeight; }
    bool Enabled() const override { return mEnabled; }
    
    float mCrush;
@@ -45,6 +45,9 @@ private:
    float mHeldDownsample[ChannelBuffer::kMaxNumChannels];
    FloatSlider* mCrushSlider;
    FloatSlider* mDownsampleSlider;
+   
+   float mWidth;
+   float mHeight;
 };
 
 #endif /* defined(__additiveSynth__BitcrushEffect__) */

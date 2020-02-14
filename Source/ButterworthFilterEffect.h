@@ -47,7 +47,7 @@ public:
    
 private:
    //IDrawableModule
-   void GetModuleDimensions(int& width, int& height) override;
+   void GetModuleDimensions(int& width, int& height) override { width = mWidth; height = mHeight; }
    void DrawModule() override;
    bool Enabled() const override { return mEnabled; }
    
@@ -57,6 +57,9 @@ private:
    FloatSlider* mFSlider;
    float mQ;
    FloatSlider* mQSlider;
+   
+   float mWidth;
+   float mHeight;
    
    CFilterButterworth24db mButterworth[ChannelBuffer::kMaxNumChannels];
    ChannelBuffer mDryBuffer;

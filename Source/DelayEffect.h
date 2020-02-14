@@ -53,7 +53,7 @@ public:
    
 private:
    //IDrawableModule
-   void GetModuleDimensions(int& width, int& height) override;
+   void GetModuleDimensions(int& width, int& height) override { width = mWidth; height = mHeight; }
    void DrawModule() override;
    
    float GetMinDelayMs() const;
@@ -76,6 +76,9 @@ private:
    bool mDry;
    Checkbox* mDryCheckbox;
    Checkbox* mAcceptInputCheckbox;
+   
+   float mWidth;
+   float mHeight;
    
    bool mFeedbackModuleMode; //special mode when this delay effect is being used in a FeedbackModule
 };

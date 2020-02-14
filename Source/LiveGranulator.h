@@ -49,7 +49,7 @@ private:
    
    //IDrawableModule
    void DrawModule() override;
-   void GetModuleDimensions(int& w, int& h) override;
+   void GetModuleDimensions(int& w, int& h) override { w = mWidth; h = mHeight; }
    bool Enabled() const override { return mEnabled; }   
    
    float mBufferLength;
@@ -72,6 +72,9 @@ private:
    float mDCEstimate[ChannelBuffer::kMaxNumChannels];   //estimate of DC offset
    NoteInterval mAutoCaptureInterval;
    DropdownList* mAutoCaptureDropdown;
+   
+   float mWidth;
+   float mHeight;
 };
 
 #endif /* defined(__modularSynth__LiveGranulator__) */

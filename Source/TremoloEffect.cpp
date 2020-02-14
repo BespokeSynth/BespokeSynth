@@ -9,6 +9,7 @@
 #include "TremoloEffect.h"
 #include "OpenFrameworksPort.h"
 #include "Profiler.h"
+#include "UIControlMacros.h"
 
 TremoloEffect::TremoloEffect()
 : mAmount(0)
@@ -31,11 +32,13 @@ TremoloEffect::TremoloEffect()
 void TremoloEffect::CreateUIControls()
 {
    IDrawableModule::CreateUIControls();
-   mAmountSlider = new FloatSlider(this,"amount",5,4,85,15,&mAmount,0,1);
-   mOffsetSlider = new FloatSlider(this,"offset",5,20,85,15,&mOffset,0,1);
-   mIntervalSelector = new DropdownList(this,"interval",5,57,(int*)(&mInterval));
-   mOscSelector = new DropdownList(this,"osc",50,57,(int*)(&mOscType));
-   mDutySlider = new FloatSlider(this,"duty",5,36,85,15,&mDuty,0,1);
+   UIBLOCK();
+   FLOATSLIDER(mAmountSlider,"amount",&mAmount,0,1);
+   FLOATSLIDER(mOffsetSlider,"offset",&mOffset,0,1);
+   FLOATSLIDER(mDutySlider,"duty",&mDuty,0,1);
+   DROPDOWN(mIntervalSelector,"interval",(int*)(&mInterval),45); UIBLOCK_SHIFTRIGHT();
+   DROPDOWN(mOscSelector,"osc",(int*)(&mOscType),45);
+   ENDUIBLOCK(mWidth, mHeight);
    
    mIntervalSelector->AddLabel("1n", kInterval_1n);
    mIntervalSelector->AddLabel("2n", kInterval_2n);
@@ -99,20 +102,6 @@ void TremoloEffect::DrawModule()
    ofFill();
    ofRect(5, 4, mLFO.Value() * 85 * mAmount, 14);
    ofPopStyle();
-}
-
-void TremoloEffect::GetModuleDimensions(int& width, int& height)
-{
-   if (mEnabled)
-   {
-      width = 95;
-      height = 80;
-   }
-   else
-   {
-      width = 90;
-      height = 0;
-   }
 }
 
 float TremoloEffect::GetEffectAmount()

@@ -40,7 +40,7 @@ public:
 private:
    //IDrawableModule
    void DrawModule() override;
-   void GetModuleDimensions(int& w, int& h) override;
+   void GetModuleDimensions(int& w, int& h) override { w = mWidth; h = mHeight; }
    bool Enabled() const override { return mEnabled; }
 
    
@@ -55,6 +55,9 @@ private:
    float mLastValue;
    float mAmount;
    float mPump;
+   
+   float mWidth;
+   float mHeight;
 };
 
 #endif /* defined(__modularSynth__Pumper__) */

@@ -10,6 +10,7 @@
 #include "SynthGlobals.h"
 #include "Transport.h"
 #include "Profiler.h"
+#include "UIControlMacros.h"
 
 DelayEffect::DelayEffect()
 : mDelay(500)
@@ -34,13 +35,16 @@ DelayEffect::DelayEffect()
 void DelayEffect::CreateUIControls()
 {
    IDrawableModule::CreateUIControls();
-   mDelaySlider = new FloatSlider(this,"delay",5,2,90,15,&mDelay,GetMinDelayMs(),1000);
-   mFeedbackSlider = new FloatSlider(this,"amount",5,18,90,15,&mFeedback,0,1);
-   mEchoCheckbox = new Checkbox(this,"echo",59,49,&mEcho);
-   mIntervalSelector = new DropdownList(this,"interval", 5, 34, (int*)(&mInterval));
-   mShortTimeCheckbox = new Checkbox(this,"short",55,34,&mShortTime);
-   mDryCheckbox = new Checkbox(this,"dry",28,49,&mDry);
-   mAcceptInputCheckbox = new Checkbox(this,"in",3,49,&mAcceptInput);
+   
+   UIBLOCK();
+   FLOATSLIDER(mDelaySlider, "delay",&mDelay,GetMinDelayMs(),1000);
+   FLOATSLIDER(mFeedbackSlider, "amount",&mFeedback,0,1);
+   DROPDOWN(mIntervalSelector, "interval", (int*)(&mInterval), 45); UIBLOCK_SHIFTRIGHT();
+   CHECKBOX(mShortTimeCheckbox, "short",&mShortTime); UIBLOCK_NEWLINE();
+   CHECKBOX(mAcceptInputCheckbox, "in",&mAcceptInput); UIBLOCK_SHIFTRIGHT();
+   CHECKBOX(mDryCheckbox,"dry",&mDry); UIBLOCK_SHIFTRIGHT();
+   CHECKBOX(mEchoCheckbox,"echo",&mEcho);
+   ENDUIBLOCK(mWidth, mHeight);
    
    mIntervalSelector->AddLabel("2", kInterval_2);
    mIntervalSelector->AddLabel("1n", kInterval_1n);
@@ -127,20 +131,6 @@ void DelayEffect::DrawModule()
    mDryCheckbox->Draw();
    mEchoCheckbox->Draw();
    mAcceptInputCheckbox->Draw();
-}
-
-void DelayEffect::GetModuleDimensions(int& width, int& height)
-{
-   if (mEnabled)
-   {
-      width = 100;
-      height = 64;
-   }
-   else
-   {
-      width = 90;
-      height = 0;
-   }
 }
 
 float DelayEffect::GetEffectAmount()

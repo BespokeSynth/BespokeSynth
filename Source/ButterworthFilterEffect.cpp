@@ -10,6 +10,7 @@
 #include "SynthGlobals.h"
 #include "FloatSliderLFOControl.h"
 #include "Profiler.h"
+#include "UIControlMacros.h"
 
 ButterworthFilterEffect::ButterworthFilterEffect()
 : mF(2000)
@@ -25,8 +26,10 @@ ButterworthFilterEffect::ButterworthFilterEffect()
 void ButterworthFilterEffect::CreateUIControls()
 {
    IDrawableModule::CreateUIControls();
-   mFSlider = new FloatSlider(this,"F",4,4,80,15,&mF,10,4000);
-   mQSlider = new FloatSlider(this,"Q",4,20,80,15,&mQ,0,1);
+   UIBLOCK();
+   FLOATSLIDER(mFSlider, "F",&mF,10,4000);
+   FLOATSLIDER(mQSlider, "Q",&mQ,0,1);
+   ENDUIBLOCK(mWidth, mHeight);
    
    mFSlider->SetMaxValueDisplay("inf");
    mFSlider->SetMode(FloatSlider::kSquare);
@@ -94,12 +97,6 @@ float ButterworthFilterEffect::GetEffectAmount()
    if (!mEnabled)
       return 0;
    return ofClamp(1-(mF/(mFSlider->GetMax() * .75f)),0,1);
-}
-
-void ButterworthFilterEffect::GetModuleDimensions(int& width, int& height)
-{
-   width = 90;
-   height = 69;
 }
 
 void ButterworthFilterEffect::ResetFilter()

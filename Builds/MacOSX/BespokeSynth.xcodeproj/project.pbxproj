@@ -3624,6 +3624,13 @@
 			path = ../../Source/freeverb/revmodel.cpp;
 			sourceTree = "SOURCE_ROOT";
 		};
+		8627E26A1408DA6018629A4C = {
+			isa = PBXFileReference;
+			lastKnownFileType = sourcecode.c.h;
+			name = UIControlMacros.h;
+			path = ../../Source/UIControlMacros.h;
+			sourceTree = "SOURCE_ROOT";
+		};
 		86A018E1C5F1109F300F6384 = {
 			isa = PBXFileReference;
 			lastKnownFileType = sourcecode.cpp.cpp;
@@ -6487,6 +6494,7 @@
 		C42053F1D9A29D64BA04592F = {
 			isa = PBXGroup;
 			children = (
+				8627E26A1408DA6018629A4C,
 				2BA1430E14F57AF9A504E9A1,
 				BE3947D52501ED4619839577,
 				E18B722879040E5FCC716AA4,
