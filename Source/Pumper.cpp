@@ -8,6 +8,7 @@
 
 #include "Pumper.h"
 #include "Profiler.h"
+#include "UIControlMacros.h"
 
 Pumper::Pumper()
 : mAmount(.75f)
@@ -27,10 +28,15 @@ Pumper::Pumper()
 void Pumper::CreateUIControls()
 {
    IDrawableModule::CreateUIControls();
-   mAmountSlider = new FloatSlider(this,"amount",5,4,80,15,&mAmount,0,1);
-   mOffsetSlider = new FloatSlider(this,"off",42,21,43,15,&mOffset,0,1,1);
-   mIntervalSelector = new DropdownList(this,"interval",5,21,(int*)(&mInterval));
-   mPumpSlider = new FloatSlider(this,"pump",5,39,80,15,&mPump,0,1);
+   
+   UIBLOCK();
+   FLOATSLIDER(mAmountSlider,"amount",&mAmount,0,1);
+   DROPDOWN(mIntervalSelector,"interval",(int*)(&mInterval),40); UIBLOCK_SHIFTRIGHT();
+   UIBLOCK_PUSHSLIDERWIDTH(55);
+   FLOATSLIDER_DIGITS(mOffsetSlider,"off",&mOffset,0,1,1); UIBLOCK_NEWLINE();
+   UIBLOCK_POPSLIDERWIDTH();
+   FLOATSLIDER(mPumpSlider,"pump",&mPump,0,1);
+   ENDUIBLOCK(mWidth, mHeight);
    
    mIntervalSelector->AddLabel("1n", kInterval_1n);
    mIntervalSelector->AddLabel("2n", kInterval_2n);
@@ -83,20 +89,6 @@ void Pumper::DrawModule()
    mIntervalSelector->Draw();
    mOffsetSlider->Draw();
    mPumpSlider->Draw();
-}
-
-void Pumper::GetModuleDimensions(int& width, int& height)
-{
-   if (mEnabled)
-   {
-      width = 90;
-      height = 56;
-   }
-   else
-   {
-      width = 90;
-      height = 0;
-   }
 }
 
 float Pumper::GetEffectAmount()

@@ -2487,6 +2487,7 @@
     <ClInclude Include="..\..\Source\VSTPlugin.h"/>
     <ClInclude Include="..\..\Source\WaveformViewer.h"/>
     <ClInclude Include="..\..\Source\WhiteKeys.h"/>
+    <ClInclude Include="..\..\Source\UIControlMacros.h"/>
     <ClInclude Include="..\..\Source\ClickButton.h"/>
     <ClInclude Include="..\..\Source\RadioButton.h"/>
     <ClInclude Include="..\..\Source\DropdownList.h"/>

@@ -10,6 +10,7 @@
 #include "OpenFrameworksPort.h"
 #include "SynthGlobals.h"
 #include "Profiler.h"
+#include "UIControlMacros.h"
 
 BitcrushEffect::BitcrushEffect()
 : mCrush(1)
@@ -29,8 +30,10 @@ BitcrushEffect::BitcrushEffect()
 void BitcrushEffect::CreateUIControls()
 {
    IDrawableModule::CreateUIControls();
-   mCrushSlider = new FloatSlider(this,"crush",5,4,85,15,&mCrush,1,24);
-   mDownsampleSlider = new FloatSlider(this,"downsamp",5,21,85,15,&mDownsample,1,40,0);
+   UIBLOCK();
+   FLOATSLIDER(mCrushSlider, "crush",&mCrush,1,24);
+   FLOATSLIDER_DIGITS(mDownsampleSlider, "downsamp",&mDownsample,1,40,0);
+   ENDUIBLOCK(mWidth, mHeight);
 }
 
 void BitcrushEffect::ProcessAudio(double time, ChannelBuffer* buffer)
@@ -72,20 +75,6 @@ void BitcrushEffect::DrawModule()
    
    mDownsampleSlider->Draw();
    mCrushSlider->Draw();
-}
-
-void BitcrushEffect::GetModuleDimensions(int& width, int& height)
-{
-   if (mEnabled)
-   {
-      width = 95;
-      height = 39;
-   }
-   else
-   {
-      width = 95;
-      height = 0;
-   }
 }
 
 float BitcrushEffect::GetEffectAmount()

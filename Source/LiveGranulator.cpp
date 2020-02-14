@@ -9,6 +9,7 @@
 #include "LiveGranulator.h"
 #include "SynthGlobals.h"
 #include "Profiler.h"
+#include "UIControlMacros.h"
 
 LiveGranulator::LiveGranulator()
 : mBufferLength(gSampleRate*5)
@@ -44,17 +45,20 @@ LiveGranulator::LiveGranulator()
 void LiveGranulator::CreateUIControls()
 {
    IDrawableModule::CreateUIControls();
-   mGranOverlap = new FloatSlider(this,"overlap",4,2,80,15,&mGranulator.mGrainOverlap,.5f,MAX_GRAINS);
-   mGranPosRandomize = new FloatSlider(this,"pos r",90,2,70,15,&mGranulator.mPosRandomizeMs,0,200);
-   mGranSpeed = new FloatSlider(this,"speed",4,18,80,15,&mGranulator.mSpeed,-3,3);
-   mGranSpeedRandomize = new FloatSlider(this,"spd r",90,18,70,15,&mGranulator.mSpeedRandomize,0,.3f);
-   mGranLengthMs = new FloatSlider(this,"len ms",4,34,80,15,&mGranulator.mGrainLengthMs,1,200);
-   mFreezeCheckbox = new Checkbox(this,"frz",90,50,&mFreeze);
-   mGranOctaveCheckbox = new Checkbox(this,"g oct",120,50,&mGranulator.mOctaves);
-   mPosSlider = new FloatSlider(this,"pos",90,58,70,15,&mPos,-gSampleRate,gSampleRate);
-   mAddCheckbox = new Checkbox(this,"add",4,58,&mAdd);
-   mAutoCaptureDropdown = new DropdownList(this,"autocapture",40,58,(int*)(&mAutoCaptureInterval));
-   mGranSpacingRandomize = new FloatSlider(this,"spa r",90,34,70,15,&mGranulator.mSpacingRandomize,0,1);
+   UIBLOCK(80);
+   FLOATSLIDER(mGranOverlap,"overlap",&mGranulator.mGrainOverlap,.5f,MAX_GRAINS);
+   FLOATSLIDER(mGranSpeed,"speed",&mGranulator.mSpeed,-3,3);
+   FLOATSLIDER(mGranLengthMs,"len ms",&mGranulator.mGrainLengthMs,1,200);
+   CHECKBOX(mAddCheckbox,"add",&mAdd);
+   DROPDOWN(mAutoCaptureDropdown,"autocapture",(int*)(&mAutoCaptureInterval), 45);
+   UIBLOCK_NEWCOLUMN();
+   FLOATSLIDER(mGranPosRandomize,"pos r",&mGranulator.mPosRandomizeMs,0,200);
+   FLOATSLIDER(mGranSpeedRandomize,"spd r",&mGranulator.mSpeedRandomize,0,.3f);
+   FLOATSLIDER(mGranSpacingRandomize,"spa r",&mGranulator.mSpacingRandomize,0,1);
+   CHECKBOX(mFreezeCheckbox,"frz",&mFreeze); UIBLOCK_SHIFTX(35);
+   CHECKBOX(mGranOctaveCheckbox,"g oct",&mGranulator.mOctaves); UIBLOCK_NEWLINE();
+   FLOATSLIDER(mPosSlider,"pos",&mPos,-gSampleRate,gSampleRate);
+   ENDUIBLOCK(mWidth, mHeight);
    
    mAutoCaptureDropdown->AddLabel("none", kInterval_None);
    mAutoCaptureDropdown->AddLabel("4n", kInterval_4n);
@@ -139,20 +143,6 @@ void LiveGranulator::DrawModule()
    {
       mGranulator.Draw(0,0,170,32,0,mBufferLength);
       //mBuffer.Draw(0,0,170,32);
-   }
-}
-
-void LiveGranulator::GetModuleDimensions(int& width, int& height)
-{
-   if (mEnabled)
-   {
-      width = 164;
-      height = 76;
-   }
-   else
-   {
-      width = 110;
-      height = 0;
    }
 }
 

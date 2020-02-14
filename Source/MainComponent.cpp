@@ -298,15 +298,13 @@ private:
    
    bool keyPressed(const KeyPress& key) override
    {
-      int keyCode = key.getKeyCode();
+      int keyCode = key.getTextCharacter();
       bool isRepeat = true;
       if (find(mPressedKeys.begin(), mPressedKeys.end(), keyCode) == mPressedKeys.end())
       {
          mPressedKeys.push_back(keyCode);
          isRepeat = false;
       }
-      if (CharacterFunctions::isLetter((char)keyCode) && !key.getModifiers().isShiftDown())
-         keyCode -= 'A' - 'a';
       mSynth.KeyPressed(keyCode, isRepeat);
       return true;
    }

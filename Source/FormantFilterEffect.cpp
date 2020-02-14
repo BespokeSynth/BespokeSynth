@@ -10,6 +10,7 @@
 #include "SynthGlobals.h"
 #include "FloatSliderLFOControl.h"
 #include "Profiler.h"
+#include "UIControlMacros.h"
 
 FormantFilterEffect::FormantFilterEffect()
 : mEE(1)
@@ -38,17 +39,15 @@ FormantFilterEffect::FormantFilterEffect()
 void FormantFilterEffect::CreateUIControls()
 {
    IDrawableModule::CreateUIControls();
-   mEESlider = new FloatSlider(this,"ee",4,4,80,15,&mEE,0,1);
-   mOOSlider = new FloatSlider(this,"oo",4,4,80,15,&mOO,0,1);
-   mISlider = new FloatSlider(this,"i",4,4,80,15,&mI,0,1);
-   mESlider = new FloatSlider(this,"e",4,4,80,15,&mE,0,1);
-   mUSlider = new FloatSlider(this,"u",4,4,80,15,&mU,0,1);
-   mASlider = new FloatSlider(this,"a",4,4,80,15,&mA,0,1);
-   mOOSlider->PositionTo(mEESlider, kAnchor_Below);
-   mISlider->PositionTo(mOOSlider, kAnchor_Below);
-   mESlider->PositionTo(mISlider, kAnchor_Below);
-   mUSlider->PositionTo(mESlider, kAnchor_Below);
-   mASlider->PositionTo(mUSlider, kAnchor_Below);
+   UIBLOCK();
+   FLOATSLIDER(mEESlider, "ee",&mEE,0,1);
+   FLOATSLIDER(mOOSlider, "oo",&mOO,0,1);
+   FLOATSLIDER(mISlider, "i",&mI,0,1);
+   FLOATSLIDER(mESlider, "e",&mE,0,1);
+   FLOATSLIDER(mUSlider, "u",&mU,0,1);
+   FLOATSLIDER(mASlider, "a",&mA,0,1);
+   ENDUIBLOCK(mWidth,mHeight);
+   
    mSliders.push_back(mEESlider);
    mSliders.push_back(mOOSlider);
    mSliders.push_back(mISlider);
@@ -106,12 +105,6 @@ float FormantFilterEffect::GetEffectAmount()
    if (!mEnabled)
       return 0;
    return 1;
-}
-
-void FormantFilterEffect::GetModuleDimensions(int& width, int& height)
-{
-   width = 90;
-   height = 100;
 }
 
 void FormantFilterEffect::ResetFilters()

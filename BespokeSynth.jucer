@@ -660,6 +660,8 @@
         <FILE id="Ws1yIL" name="WhiteKeys.h" compile="0" resource="0" file="Source/WhiteKeys.h"/>
       </GROUP>
       <GROUP id="{7A2BD925-14B2-38D6-D71C-56E9018A07FF}" name="uicontrols">
+        <FILE id="An84qD" name="UIControlMacros.h" compile="0" resource="0"
+              file="Source/UIControlMacros.h"/>
         <FILE id="aFaiaz" name="ClickButton.cpp" compile="1" resource="0" file="Source/ClickButton.cpp"/>
         <FILE id="dy9Usx" name="ClickButton.h" compile="0" resource="0" file="Source/ClickButton.h"/>
         <FILE id="R3raUL" name="RadioButton.cpp" compile="1" resource="0" file="Source/RadioButton.cpp"/>

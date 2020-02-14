@@ -114,7 +114,7 @@ public:
 private:
    //IDrawableModule
    void DrawModule() override;
-   void GetModuleDimensions(int& x, int&y) override { x=120; y=91; }
+   void GetModuleDimensions(int& x, int&y) override { x=mWidth; y=mHeight; }
    bool Enabled() const override { return mEnabled; }
 
    
@@ -131,6 +131,8 @@ private:
    
    double mCurrentInputDb;
    double mOutputGain;
+   float mWidth;
+   float mHeight;
 
    // runtime variables
    double envdB_;			// over-threshold envelope (dB)

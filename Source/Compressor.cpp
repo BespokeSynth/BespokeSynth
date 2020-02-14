@@ -10,6 +10,7 @@
 #include "OpenFrameworksPort.h"
 #include "SynthGlobals.h"
 #include "Profiler.h"
+#include "UIControlMacros.h"
 
 static double lin2dB( double lin )
 {
@@ -42,12 +43,15 @@ Compressor::Compressor()
 void Compressor::CreateUIControls()
 {
    IDrawableModule::CreateUIControls();
-   mThresholdSlider = new FloatSlider(this,"threshold",5,8,110,15,&mThreshold,-70,0);
-   mRatioSlider = new FloatSlider(this,"ratio",mThresholdSlider,kAnchor_Below,110,15,&mRatio,1,20);
+   UIBLOCK(100);
+   FLOATSLIDER(mThresholdSlider, "threshold",&mThreshold,-70,0);
+   FLOATSLIDER(mRatioSlider, "ratio",&mRatio,1,20);
+   FLOATSLIDER(mAttackSlider, "attack",&mAttack,.1f,50);
+   FLOATSLIDER(mReleaseSlider, "release",&mRelease,.1f,500);
+   FLOATSLIDER(mOutputAdjustSlider, "output",&mOutputAdjust,0,2);
+   ENDUIBLOCK(mWidth, mHeight);
+
    mRatioSlider->SetMode(FloatSlider::kSquare);
-   mAttackSlider = new FloatSlider(this,"attack",mRatioSlider,kAnchor_Below,110,15,&mAttack,.1f,50);
-   mReleaseSlider = new FloatSlider(this,"release",mAttackSlider,kAnchor_Below,110,15,&mRelease,.1f,500);
-   mOutputAdjustSlider = new FloatSlider(this,"output",mReleaseSlider,kAnchor_Below,110,15,&mOutputAdjust,0,2);
    mOutputAdjustSlider->SetMode(FloatSlider::kSquare);
    
    mEnv.setAttack(mAttack);
