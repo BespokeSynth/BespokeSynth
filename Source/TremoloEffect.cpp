@@ -32,7 +32,7 @@ TremoloEffect::TremoloEffect()
 void TremoloEffect::CreateUIControls()
 {
    IDrawableModule::CreateUIControls();
-   UIBLOCK();
+   UIBLOCK0();
    FLOATSLIDER(mAmountSlider,"amount",&mAmount,0,1);
    FLOATSLIDER(mOffsetSlider,"offset",&mOffset,0,1);
    FLOATSLIDER(mDutySlider,"duty",&mDuty,0,1);

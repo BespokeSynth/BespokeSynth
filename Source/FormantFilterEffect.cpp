@@ -39,7 +39,7 @@ FormantFilterEffect::FormantFilterEffect()
 void FormantFilterEffect::CreateUIControls()
 {
    IDrawableModule::CreateUIControls();
-   UIBLOCK();
+   UIBLOCK0();
    FLOATSLIDER(mEESlider, "ee",&mEE,0,1);
    FLOATSLIDER(mOOSlider, "oo",&mOO,0,1);
    FLOATSLIDER(mISlider, "i",&mI,0,1);

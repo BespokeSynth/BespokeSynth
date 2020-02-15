@@ -29,7 +29,7 @@ void Pumper::CreateUIControls()
 {
    IDrawableModule::CreateUIControls();
    
-   UIBLOCK();
+   UIBLOCK0();
    FLOATSLIDER(mAmountSlider,"amount",&mAmount,0,1);
    DROPDOWN(mIntervalSelector,"interval",(int*)(&mInterval),40); UIBLOCK_SHIFTRIGHT();
    UIBLOCK_PUSHSLIDERWIDTH(55);

@@ -26,7 +26,7 @@ ButterworthFilterEffect::ButterworthFilterEffect()
 void ButterworthFilterEffect::CreateUIControls()
 {
    IDrawableModule::CreateUIControls();
-   UIBLOCK();
+   UIBLOCK0();
    FLOATSLIDER(mFSlider, "F",&mF,10,4000);
    FLOATSLIDER(mQSlider, "Q",&mQ,0,1);
    ENDUIBLOCK(mWidth, mHeight);

@@ -30,7 +30,7 @@ BitcrushEffect::BitcrushEffect()
 void BitcrushEffect::CreateUIControls()
 {
    IDrawableModule::CreateUIControls();
-   UIBLOCK();
+   UIBLOCK0();
    FLOATSLIDER(mCrushSlider, "crush",&mCrush,1,24);
    FLOATSLIDER_DIGITS(mDownsampleSlider, "downsamp",&mDownsample,1,40,0);
    ENDUIBLOCK(mWidth, mHeight);
