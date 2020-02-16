@@ -143,6 +143,7 @@ protected:
 private:
    virtual void PreDrawModule() {}
    virtual void DrawModule() = 0;
+   virtual void DrawModuleUnclipped() {}
    virtual bool Enabled() const { return true; }
    float GetMinimizedWidth();
    PatchCableOld GetPatchCableOld(IClickable* target);

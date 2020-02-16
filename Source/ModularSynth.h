@@ -104,8 +104,8 @@ public:
    
    void LogEvent(string event, LogEventType type);
    
-   void LoadLayoutFromFile(string jsonFile, bool makeDefaultLayout = true);
-   void LoadLayoutFromString(string jsonString);
+   bool LoadLayoutFromFile(string jsonFile, bool makeDefaultLayout = true);
+   bool LoadLayoutFromString(string jsonString);
    void LoadLayout(ofxJSONElement json);
    string GetLoadedLayout() const { return mLoadedLayoutPath; }
    

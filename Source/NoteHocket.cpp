@@ -33,6 +33,12 @@ void NoteHocket::DrawModule()
    mRouteSelector->Draw();
 }
 
+void NoteHocket::DrawModuleUnclipped()
+{
+   for (int i=0; i<mReceivers.size(); ++i)
+      DrawConnection(dynamic_cast<IClickable*>(mReceivers[i]));
+}
+
 void NoteHocket::PlayNote(double time, int pitch, int velocity, int voiceIdx, ModulationParameters modulation)
 {
    if (velocity > 0)

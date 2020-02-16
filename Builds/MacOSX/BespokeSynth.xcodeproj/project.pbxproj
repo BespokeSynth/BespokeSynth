@@ -189,6 +189,14 @@
 			isa = PBXBuildFile;
 			fileRef = 49AB76428A044DEDF45FFAFE;
 		};
+		7D5E32536FDC75B3388BE8F7 = {
+			isa = PBXBuildFile;
+			fileRef = 9640C45FAB115C00A10217AC;
+		};
+		42CEB72AF5EE361CEF220926 = {
+			isa = PBXBuildFile;
+			fileRef = FFFA3EA44DB18F54F3D30E18;
+		};
 		51DBF39E8D4376DC0F89B23B = {
 			isa = PBXBuildFile;
 			fileRef = 214E4BC2A35D18967280ACB2;
@@ -1564,6 +1572,13 @@
 			lastKnownFileType = sourcecode.cpp.cpp;
 			name = PitchChorus.cpp;
 			path = ../../Source/PitchChorus.cpp;
+			sourceTree = "SOURCE_ROOT";
+		};
+		100B7166274CDCD9D76A057B = {
+			isa = PBXFileReference;
+			lastKnownFileType = sourcecode.c.h;
+			name = PulseChance.h;
+			path = ../../Source/PulseChance.h;
 			sourceTree = "SOURCE_ROOT";
 		};
 		100FC6ACFD48D6F4C2EFD264 = {
@@ -3974,6 +3989,13 @@
 			path = ../../Source/Panner.cpp;
 			sourceTree = "SOURCE_ROOT";
 		};
+		9640C45FAB115C00A10217AC = {
+			isa = PBXFileReference;
+			lastKnownFileType = sourcecode.cpp.cpp;
+			name = PulseDelayer.cpp;
+			path = ../../Source/PulseDelayer.cpp;
+			sourceTree = "SOURCE_ROOT";
+		};
 		966CE396F1B8A3ECF3730DFD = {
 			isa = PBXFileReference;
 			lastKnownFileType = sourcecode.c.h;
@@ -4889,6 +4911,13 @@
 			lastKnownFileType = sourcecode.cpp.cpp;
 			name = PreviousNote.cpp;
 			path = ../../Source/PreviousNote.cpp;
+			sourceTree = "SOURCE_ROOT";
+		};
+		C6D41EB1D2DB74AB4B2155ED = {
+			isa = PBXFileReference;
+			lastKnownFileType = sourcecode.c.h;
+			name = PulseDelayer.h;
+			path = ../../Source/PulseDelayer.h;
 			sourceTree = "SOURCE_ROOT";
 		};
 		C7656597DE3584DD1776B837 = {
@@ -5913,6 +5942,13 @@
 			path = ../../Source/RingModulator.h;
 			sourceTree = "SOURCE_ROOT";
 		};
+		FFFA3EA44DB18F54F3D30E18 = {
+			isa = PBXFileReference;
+			lastKnownFileType = sourcecode.cpp.cpp;
+			name = PulseChance.cpp;
+			path = ../../Source/PulseChance.cpp;
+			sourceTree = "SOURCE_ROOT";
+		};
 		E052C73364792FC8F77F9BAF = {
 			isa = PBXGroup;
 			children = (
@@ -6134,6 +6170,10 @@
 		C91AF721DDC182CE3AC80CF9 = {
 			isa = PBXGroup;
 			children = (
+				9640C45FAB115C00A10217AC,
+				C6D41EB1D2DB74AB4B2155ED,
+				FFFA3EA44DB18F54F3D30E18,
+				100B7166274CDCD9D76A057B,
 				214E4BC2A35D18967280ACB2,
 				486670A0AFA94E5856D3C45D,
 				6C11BE7ACAB2BA885E58DA8F,
@@ -7034,6 +7074,8 @@
 				69EB47EC9441C3507BEB277D,
 				75837998247B5E99F3F16392,
 				7B858D802BD0BB608C0F48CF,
+				7D5E32536FDC75B3388BE8F7,
+				42CEB72AF5EE361CEF220926,
 				51DBF39E8D4376DC0F89B23B,
 				CF0D2D59BC21595747710FC6,
 				619C85099C88F52975E2648B,

@@ -1,35 +1,35 @@
 /*
   ==============================================================================
 
-    NoteChance.cpp
-    Created: 29 Jan 2020 9:17:02pm
+    PulseChance.cpp
+    Created: 4 Feb 2020 12:17:59pm
     Author:  Ryan Challinor
 
   ==============================================================================
 */
 
-#include "NoteChance.h"
+#include "PulseChance.h"
 #include "SynthGlobals.h"
 
-NoteChance::NoteChance()
+PulseChance::PulseChance()
 : mChance(1)
 , mLastRejectTime(0)
 , mLastAcceptTime(0)
 {
 }
 
-NoteChance::~NoteChance()
+PulseChance::~PulseChance()
 {
 }
 
-void NoteChance::CreateUIControls()
+void PulseChance::CreateUIControls()
 {
    IDrawableModule::CreateUIControls();
    
    mChanceSlider = new FloatSlider(this, "chance", 3, 2, 100, 15, &mChance, 0, 1);
 }
 
-void NoteChance::DrawModule()
+void PulseChance::DrawModule()
 {
    if (Minimized() || IsVisible() == false)
       return;
@@ -55,38 +55,38 @@ void NoteChance::DrawModule()
    }
 }
 
-void NoteChance::PlayNote(double time, int pitch, int velocity, int voiceIdx, ModulationParameters modulation)
+void PulseChance::OnPulse(float velocity, int samplesTo, int flags)
 {
    if (velocity > 0)
       ComputeSliders(0);
    
    bool accept = ofRandom(1) <= mChance;
    if (accept || velocity == 0)
-      PlayNoteOutput(time, pitch, velocity, voiceIdx, modulation);
+      DispatchPulse(GetPatchCableSource(), velocity, samplesTo, flags);
    
    if (velocity > 0)
    {
       if (accept)
-         mLastAcceptTime = time;
+         mLastAcceptTime = gTime;
       else
-         mLastRejectTime = time;
+         mLastRejectTime = gTime;
    }
 }
 
-void NoteChance::GetModuleDimensions(int& width, int& height)
+void PulseChance::GetModuleDimensions(int& width, int& height)
 {
    width = 118;
    height = 20;
 }
 
-void NoteChance::LoadLayout(const ofxJSONElement& moduleInfo)
+void PulseChance::LoadLayout(const ofxJSONElement& moduleInfo)
 {
    mModuleSaveData.LoadString("target", moduleInfo);
    
    SetUpFromSaveData();
 }
 
-void NoteChance::SetUpFromSaveData()
+void PulseChance::SetUpFromSaveData()
 {
    SetUpPatchCables(mModuleSaveData.GetString("target"));
 }

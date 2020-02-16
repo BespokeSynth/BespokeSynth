@@ -186,6 +186,8 @@
 #include "NoteHocket.h"
 #include "NoteRangeFilter.h"
 #include "NoteChance.h"
+#include "PulseChance.h"
+#include "PulseDelayer.h"
 
 #define REGISTER(class,name,type) Register(#name, &(class::Create), &(class::CanCreate), type, false, false);
 #define REGISTER_HIDDEN(class,name,type) Register(#name, &(class::Create), &(class::CanCreate), type, true, false);
@@ -340,6 +342,8 @@ ModuleFactory::ModuleFactory()
    REGISTER(NoteHocket, notehocket, kModuleType_Note);
    REGISTER(NoteRangeFilter, noterangefilter, kModuleType_Note);
    REGISTER(NoteChance, notechance, kModuleType_Note);
+   REGISTER(PulseChance, pulsechance, kModuleType_Other);
+   REGISTER(PulseDelayer, pulsedelayer, kModuleType_Other);
 
    //REGISTER_EXPERIMENTAL(MidiPlayer, midiplayer, kModuleType_Instrument);
    REGISTER_EXPERIMENTAL(Razor, razor, kModuleType_Synth);

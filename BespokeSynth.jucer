@@ -158,6 +158,11 @@
         <FILE id="RG4zGd" name="TremoloEffect.h" compile="0" resource="0" file="Source/TremoloEffect.h"/>
       </GROUP>
       <GROUP id="{6781AC07-A090-A7AF-8D27-BCB6D9526ABD}" name="modules">
+        <FILE id="tVvPrG" name="PulseDelayer.cpp" compile="1" resource="0"
+              file="Source/PulseDelayer.cpp"/>
+        <FILE id="kqqdy5" name="PulseDelayer.h" compile="0" resource="0" file="Source/PulseDelayer.h"/>
+        <FILE id="J8kVG9" name="PulseChance.cpp" compile="1" resource="0" file="Source/PulseChance.cpp"/>
+        <FILE id="F4BxgR" name="PulseChance.h" compile="0" resource="0" file="Source/PulseChance.h"/>
         <FILE id="eas6gT" name="NoteRangeFilter.cpp" compile="1" resource="0"
               file="Source/NoteRangeFilter.cpp"/>
         <FILE id="VYx64K" name="NoteRangeFilter.h" compile="0" resource="0"

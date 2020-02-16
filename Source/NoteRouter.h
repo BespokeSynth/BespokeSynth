@@ -39,6 +39,7 @@ public:
 private:
    //IDrawableModule
    void DrawModule() override;
+   void DrawModuleUnclipped() override;
    void GetModuleDimensions(int& width, int& height) override;
    bool Enabled() const override { return true; }
 

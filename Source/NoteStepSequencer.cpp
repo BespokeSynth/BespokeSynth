@@ -25,7 +25,7 @@ NoteStepSequencer::NoteStepSequencer()
 , mGrid(nullptr)
 , mLastPitch(-1)
 , mLastVel(0)
-, mOctave(1)
+, mOctave(0)
 , mOctaveSlider(nullptr)
 , mNoteMode(kNoteMode_Scale)
 , mNoteModeSelector(nullptr)
@@ -68,7 +68,7 @@ void NoteStepSequencer::CreateUIControls()
    mIntervalSelector = new DropdownList(this,"interval",75,2,(int*)(&mInterval));
    mLengthSlider = new IntSlider(this,"length",77,20,98,15,&mLength,1,mNumSteps);
    mGrid = new UIGrid(5,55,200,80,8,24, this);
-   mVelocityGrid = new UIGrid(5,117,200,15,8,1, this);
+   mVelocityGrid = new UIGrid(5,117,200,45,8,1, this);
    mOctaveSlider = new IntSlider(this,"octave",166,2,53,15,&mOctave,-2,4);
    mNoteModeSelector = new DropdownList(this,"notemode",5,20,(int*)(&mNoteMode));
    mShiftBackButton = new ClickButton(this,"<",130,2);
@@ -171,6 +171,16 @@ void NoteStepSequencer::DrawModule()
    
    mGrid->Draw();
    mVelocityGrid->Draw();
+   
+   ofPushStyle();
+   ofSetColor(128, 128, 128, gModuleDrawAlpha * .8f);
+   for (int i=0; i<mGrid->GetRows(); ++i)
+   {
+      ofVec2f pos = mGrid->GetCellPosition(0, i) + mGrid->GetPosition(true);
+      float scale = MIN(mGrid->IClickable::GetDimensions().y / mGrid->GetRows(), 20);
+      DrawText(NoteName(RowToPitch(i),false,true) + "("+ ofToString(RowToPitch(i)) + ")", pos.x - 5, pos.y - (scale/8), scale);
+   }
+   ofPopStyle();
    
    DrawTextLeftJustify("random:", 138, 50);
    
@@ -316,7 +326,6 @@ void NoteStepSequencer::GridUpdated(UIGrid* grid, int col, int row, float value,
 int NoteStepSequencer::RowToPitch(int row)
 {
    row += mRowOffset;
-   row -= mNoteRange / 2;
    
    int numPitchesInScale = TheScale->NumPitchesInScale();
    switch (mNoteMode)
@@ -324,7 +333,7 @@ int NoteStepSequencer::RowToPitch(int row)
       case kNoteMode_Scale:
          return TheScale->GetPitchFromTone(row+(mOctave+3)*numPitchesInScale+TheScale->GetScaleDegree());
       case kNoteMode_Chromatic:
-         return row + (mOctave+3) * TheScale->GetTet() + TheScale->ScaleRoot();
+         return row + (mOctave+2) * TheScale->GetTet();
       case kNoteMode_Fifths:
       {
          int oct = (row/2)*numPitchesInScale;
@@ -518,7 +527,7 @@ float NoteStepSequencer::ExtraWidth() const
 
 float NoteStepSequencer::ExtraHeight() const
 {
-   float height = 73;
+   float height = 103;
    if (mLoopResetPointSlider->IsShowing())
       height += 17;
    if (mShowStepControls)
@@ -540,7 +549,7 @@ void NoteStepSequencer::Resize(float w, float h)
 
 void NoteStepSequencer::UpdateVelocityGridPos()
 {
-   mVelocityGrid->SetDimensions(mGrid->GetWidth(), 15);
+   mVelocityGrid->SetDimensions(mGrid->GetWidth(), 45);
    int gridX,gridY;
    mGrid->GetPosition(gridX, gridY, true);
    mVelocityGrid->SetPosition(gridX, gridY + mGrid->GetHeight());
