@@ -966,21 +966,21 @@
         <CONFIGURATION isDebug="0" name="Release" headerPath="../../Source/json/include&#10;../../Source/glew/include"/>
       </CONFIGURATIONS>
       <MODULEPATHS>
-        <MODULEPATH id="juce_video" path="../../juce"/>
-        <MODULEPATH id="juce_osc" path="../../juce"/>
-        <MODULEPATH id="juce_opengl" path="../../juce"/>
-        <MODULEPATH id="juce_gui_extra" path="../../juce"/>
-        <MODULEPATH id="juce_gui_basics" path="../../juce"/>
-        <MODULEPATH id="juce_graphics" path="../../juce"/>
-        <MODULEPATH id="juce_events" path="../../juce"/>
-        <MODULEPATH id="juce_data_structures" path="../../juce"/>
-        <MODULEPATH id="juce_cryptography" path="../../juce"/>
-        <MODULEPATH id="juce_core" path="../../juce"/>
-        <MODULEPATH id="juce_audio_utils" path="../../juce"/>
-        <MODULEPATH id="juce_audio_processors" path="../../juce"/>
-        <MODULEPATH id="juce_audio_formats" path="../../juce"/>
-        <MODULEPATH id="juce_audio_devices" path="../../juce"/>
-        <MODULEPATH id="juce_audio_basics" path="../../juce"/>
+        <MODULEPATH id="juce_video" path="/home/kv/src/JUCE-git/modules"/>
+        <MODULEPATH id="juce_osc" path="/home/kv/src/JUCE-git/modules"/>
+        <MODULEPATH id="juce_opengl" path="/home/kv/src/JUCE-git/modules"/>
+        <MODULEPATH id="juce_gui_extra" path="/home/kv/src/JUCE-git/modules"/>
+        <MODULEPATH id="juce_gui_basics" path="/home/kv/src/JUCE-git/modules"/>
+        <MODULEPATH id="juce_graphics" path="/home/kv/src/JUCE-git/modules"/>
+        <MODULEPATH id="juce_events" path="/home/kv/src/JUCE-git/modules"/>
+        <MODULEPATH id="juce_data_structures" path="/home/kv/src/JUCE-git/modules"/>
+        <MODULEPATH id="juce_cryptography" path="/home/kv/src/JUCE-git/modules"/>
+        <MODULEPATH id="juce_core" path="/home/kv/src/JUCE-git/modules"/>
+        <MODULEPATH id="juce_audio_utils" path="/home/kv/src/JUCE-git/modules"/>
+        <MODULEPATH id="juce_audio_processors" path="/home/kv/src/JUCE-git/modules"/>
+        <MODULEPATH id="juce_audio_formats" path="/home/kv/src/JUCE-git/modules"/>
+        <MODULEPATH id="juce_audio_devices" path="/home/kv/src/JUCE-git/modules"/>
+        <MODULEPATH id="juce_audio_basics" path="/home/kv/src/JUCE-git/modules"/>
       </MODULEPATHS>
     </LINUX_MAKE>
   </EXPORTFORMATS>
