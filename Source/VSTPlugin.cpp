@@ -24,7 +24,7 @@ namespace
 
 namespace VSTLookup
 {
-   static AudioPluginFormatManager sFormatManager;
+   static juce::AudioPluginFormatManager sFormatManager;
    static juce::KnownPluginList sPluginList;
    
    void GetAvailableVSTs(vector<string>& vsts, bool rescan)
@@ -180,23 +180,13 @@ void VSTPlugin::SetVST(string vstName)
    }
    
    juce::String errorMessage;
-   for (int i=0; i<VSTLookup::sFormatManager.getNumFormats(); ++i)
+   auto types = VSTLookup::sPluginList.getTypes();
+   for (int i=0; i<types.size(); ++i)
    {
-      if (VSTLookup::sFormatManager.getFormat(i)->fileMightContainThisPluginType(path))
+      if (path == types[i].fileOrIdentifier)
       {
-         OwnedArray<PluginDescription> descriptions;
-         VSTLookup::sFormatManager.getFormat(i)->findAllTypesForFile(descriptions, path);
-         PluginDescription desc;
-         if (descriptions.size() == 0)
-         {
-            desc.fileOrIdentifier = path;
-            desc.uid = 0;
-         }
-         else
-         {
-            desc = *descriptions[0];
-         }
-         
+         PluginDescription desc = types[i];
+            
          /*auto completionCallback = [this, &callbackDone] (std::unique_ptr<juce::AudioPluginInstance> instance, const String& error)
          {
             if (instance == nullptr)
@@ -223,7 +213,7 @@ void VSTPlugin::SetVST(string vstName)
          sFormatManager.getFormat(i)->createPluginInstanceAsync(desc, gSampleRate, gBufferSize, completionCallback);*/
          
          mVSTMutex.lock();
-         mPlugin = VSTLookup::sFormatManager.getFormat(i)->createInstanceFromDescription(desc, gSampleRate, gBufferSize);
+         mPlugin = VSTLookup::sFormatManager.createPluginInstance(desc, gSampleRate, gBufferSize, errorMessage);
          if (mPlugin != nullptr)
          {
             mPlugin->prepareToPlay(gSampleRate, gBufferSize);
@@ -311,11 +301,13 @@ void VSTPlugin::Process(double time)
    ComputeSliders(0);
    SyncBuffers();
    
+   const int kSafetyMaxChannels = 16; //hitting a crazy issue (memory stomp?) where numchannels is getting blown out sometimes
+   
    int bufferSize = GetBuffer()->BufferSize();
    assert(bufferSize == gBufferSize);
    
    juce::AudioBuffer<float> buffer(inputChannels, bufferSize);
-   for (int i=0; i<inputChannels; ++i)
+   for (int i=0; i<inputChannels && i < kSafetyMaxChannels; ++i)
       buffer.copyFrom(i, 0, GetBuffer()->GetChannel(MIN(i,GetBuffer()->NumActiveChannels()-1)), GetBuffer()->BufferSize());
    
    if (mEnabled && mPlugin != nullptr)
@@ -361,7 +353,7 @@ void VSTPlugin::Process(double time)
       mVSTMutex.unlock();
    
       GetBuffer()->Clear();
-      for (int ch=0; ch < buffer.getNumChannels(); ++ch)
+      for (int ch=0; ch < buffer.getNumChannels() && ch < kSafetyMaxChannels; ++ch)
       {
          int outputChannel = MIN(ch,GetBuffer()->NumActiveChannels()-1);
          for (int sampleIndex=0; sampleIndex < buffer.getNumSamples(); ++sampleIndex)

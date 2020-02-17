@@ -17,8 +17,9 @@
 #include "Slider.h"
 #include "IAudioProcessor.h"
 #include "GridController.h"
+#include "INoteReceiver.h"
 
-class StutterControl : public IAudioProcessor, public IDrawableModule, public IFloatSliderListener, public IGridControllerListener
+class StutterControl : public IAudioProcessor, public IDrawableModule, public IFloatSliderListener, public IGridControllerListener, public INoteReceiver
 {
 public:
    StutterControl();
@@ -34,6 +35,10 @@ public:
    //IGridControllerListener
    void OnControllerPageSelected() override;
    void OnGridButton(int x, int y, float velocity, IGridController* grid) override;
+   
+   //INoteReceiver
+   void PlayNote(double time, int pitch, int velocity, int voiceIdx, ModulationParameters modulation);
+   void SendCC(int control, int value, int voiceIdx) {}
    
    void CheckboxUpdated(Checkbox* checkbox) override;
    void FloatSliderUpdated(FloatSlider* slider, float oldVal) override;

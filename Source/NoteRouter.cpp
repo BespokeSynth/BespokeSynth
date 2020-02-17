@@ -34,6 +34,12 @@ void NoteRouter::DrawModule()
    mRouteSelector->Draw();
 }
 
+void NoteRouter::DrawModuleUnclipped()
+{
+   for (int i=0; i<mReceivers.size(); ++i)
+      DrawConnection(dynamic_cast<IClickable*>(mReceivers[i]));
+}
+
 void NoteRouter::AddReceiver(INoteReceiver* receiver, const char* name)
 {
    if (receiver)

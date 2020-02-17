@@ -1294,7 +1294,7 @@ bool ModularSynth::SetOutputChannel(int channel, OutputChannel* output)
    return false;
 }
 
-void ModularSynth::LoadLayoutFromFile(string jsonFile, bool makeDefaultLayout /*= true*/)
+bool ModularSynth::LoadLayoutFromFile(string jsonFile, bool makeDefaultLayout /*= true*/)
 {
    ofLog() << "Loading layout: " << jsonFile;
    mLoadedLayoutPath = String(jsonFile).replace(ofToDataPath("").c_str(), "").toStdString();
@@ -1306,16 +1306,18 @@ void ModularSynth::LoadLayoutFromFile(string jsonFile, bool makeDefaultLayout /*
    {
       LogEvent("Couldn't load, error parsing "+jsonFile, kLogEventType_Error);
       LogEvent("Try loading it up in a json validator", kLogEventType_Error);
-      return;
+      return false;
    }
    
    LoadLayout(root);
    
    if (makeDefaultLayout)
       UpdateUserPrefsLayout();
+   
+   return true;
 }
 
-void ModularSynth::LoadLayoutFromString(string jsonString)
+bool ModularSynth::LoadLayoutFromString(string jsonString)
 {
    ofxJSONElement root;
    bool loaded = root.parse(jsonString);
@@ -1323,10 +1325,12 @@ void ModularSynth::LoadLayoutFromString(string jsonString)
    if (!loaded)
    {
       LogEvent("Couldn't load, error parsing json string", kLogEventType_Error);
-      return;
+      ofLog() << jsonString;
+      return false;
    }
    
    LoadLayout(root);
+   return true;
 }
 
 void ModularSynth::LoadLayout(ofxJSONElement json)
@@ -1623,13 +1627,16 @@ void ModularSynth::LoadState(string file)
    
    string jsonString;
    in >> jsonString;
-   LoadLayoutFromString(jsonString);
+   bool layoutLoaded = LoadLayoutFromString(jsonString);
    
-   mIsLoadingModule = true;
-   mModuleContainer.LoadState(in);
-   mIsLoadingModule = false;
-   
-   TheTransport->Reset();
+   if (layoutLoaded)
+   {
+      mIsLoadingModule = true;
+      mModuleContainer.LoadState(in);
+      mIsLoadingModule = false;
+      
+      TheTransport->Reset();
+   }
    
    LockRender(false);
    mAudioThreadMutex.Unlock();

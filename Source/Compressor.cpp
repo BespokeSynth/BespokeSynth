@@ -43,7 +43,7 @@ Compressor::Compressor()
 void Compressor::CreateUIControls()
 {
    IDrawableModule::CreateUIControls();
-   UIBLOCK(100);
+   UIBLOCK0();
    FLOATSLIDER(mThresholdSlider, "threshold",&mThreshold,-70,0);
    FLOATSLIDER(mRatioSlider, "ratio",&mRatio,1,20);
    FLOATSLIDER(mAttackSlider, "attack",&mAttack,.1f,50);

@@ -629,7 +629,8 @@ bool ScalePitches::IsInScale(int pitch) const
 {
    pitch -= mScaleRoot;
    pitch += TheScale->GetTet();
-   assert(pitch >= 0);
+   if (pitch < 0)
+      return false;
    pitch %= TheScale->GetTet();
    
    for (int i=0; i<mScalePitches.size(); ++i)

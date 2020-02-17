@@ -138,7 +138,7 @@ void Looper::CreateUIControls()
    mMuteCheckbox = new Checkbox(this,"mute",-1,-1,&mMute);
    mCommitButton = new ClickButton(this,"commit",126,3);
    mQueueCaptureButton = new ClickButton(this,"capture",126,3);
-   mWriteInputCheckbox = new Checkbox(this,"write",130,3,&mWriteInput);
+   mWriteInputCheckbox = new Checkbox(this,"write",80,3,&mWriteInput);
    mSwapButton = new ClickButton(this,"swap",137,81);
    mCopyButton = new ClickButton(this,"copy",140,65);
    mDoubleSpeedButton = new ClickButton(this,"2x",151,28);
@@ -273,7 +273,7 @@ void Looper::Poll()
    mSwapButton->SetShowing(mRecorder != nullptr);
    mCopyButton->SetShowing(mRecorder != nullptr);
    mMergeButton->SetShowing(mRecorder != nullptr);
-   mWriteInputCheckbox->SetShowing(false);//mRecorder == nullptr);
+   mWriteInputCheckbox->SetShowing(mRecorder == nullptr);
    mQueueCaptureButton->SetShowing(mRecorder == nullptr);
 }
 

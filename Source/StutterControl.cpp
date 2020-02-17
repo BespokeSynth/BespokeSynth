@@ -23,45 +23,26 @@ void StutterControl::CreateUIControls()
 {
    IDrawableModule::CreateUIControls();
    
-   mGridController = new GridController(this, "grid", 80, 40);
+   mGridController = new GridController(this, "grid", 5, 145);
    
-   int x = 4;
-   int y = 40;
-   mStutterCheckboxes[kHalf] = new Checkbox(this,"half note",x,y,&mStutter[kHalf]);
-   y += 18;
-   mStutterCheckboxes[kQuarter] = new Checkbox(this,"quarter",x,y,&mStutter[kQuarter]);
-   y += 18;
-   mStutterCheckboxes[k8th] = new Checkbox(this,"8th",x,y,&mStutter[k8th]);
-   y += 18;
-   mStutterCheckboxes[k16th] = new Checkbox(this,"16th",x,y,&mStutter[k16th]);
-   y += 18;
-   mStutterCheckboxes[k32nd] = new Checkbox(this,"32nd",x,y,&mStutter[k32nd]);
-   y += 18;
-   mStutterCheckboxes[k64th] = new Checkbox(this,"64th",x,y,&mStutter[k64th]);
-   y += 18;
-   mStutterCheckboxes[kReverse] = new Checkbox(this,"reverse",x,y,&mStutter[kReverse]);
-   y += 18;
-   mStutterCheckboxes[kRampIn] = new Checkbox(this,"ramp in",x,y,&mStutter[kRampIn]);
-   y += 18;
-   mStutterCheckboxes[kRampOut] = new Checkbox(this,"ramp out",x,y,&mStutter[kRampOut]);
-   y += 18;
-   mStutterCheckboxes[kTumbleUp] = new Checkbox(this,"tumble up",x,y,&mStutter[kTumbleUp]);
-   y += 18;
-   mStutterCheckboxes[kTumbleDown] = new Checkbox(this,"tumble down",x,y,&mStutter[kTumbleDown]);
-   y += 18;
-   mStutterCheckboxes[kHalfSpeed] = new Checkbox(this,"half speed",x,y,&mStutter[kHalfSpeed]);
-   y += 18;
-   mStutterCheckboxes[kDoubleSpeed] = new Checkbox(this,"double speed",x,y,&mStutter[kDoubleSpeed]);
-   y += 18;
-   mStutterCheckboxes[kQuarterTriplets] = new Checkbox(this,"triplets",x,y,&mStutter[kQuarterTriplets]);
-   y += 18;
-   mStutterCheckboxes[kDotted8th] = new Checkbox(this,"dotted eighth",x,y,&mStutter[kDotted8th]);
-   y += 18;
-   mStutterCheckboxes[kFree] = new Checkbox(this,"free",x,y,&mStutter[kFree]);
-   y += 18;
-   mFreeLengthSlider = new FloatSlider(this,"free length",x,y,102,15,&mStutterProcessor.mFreeStutterLength,.005f,.25f);
-   y += 18;
-   mFreeSpeedSlider = new FloatSlider(this,"free speed",x,y,102,15,&mStutterProcessor.mFreeStutterSpeed,0,2);
+   mStutterCheckboxes[kHalf] = new Checkbox(this,"half note",4,3,&mStutter[kHalf]);
+   mStutterCheckboxes[kQuarter] = new Checkbox(this,"quarter",mStutterCheckboxes[kHalf],kAnchor_Below,&mStutter[kQuarter]);
+   mStutterCheckboxes[k8th] = new Checkbox(this,"8th",mStutterCheckboxes[kQuarter],kAnchor_Below,&mStutter[k8th]);
+   mStutterCheckboxes[k16th] = new Checkbox(this,"16th",mStutterCheckboxes[k8th],kAnchor_Below,&mStutter[k16th]);
+   mStutterCheckboxes[k32nd] = new Checkbox(this,"32nd",mStutterCheckboxes[k16th],kAnchor_Below,&mStutter[k32nd]);
+   mStutterCheckboxes[k64th] = new Checkbox(this,"64th",mStutterCheckboxes[k32nd],kAnchor_Below,&mStutter[k64th]);
+   mStutterCheckboxes[kReverse] = new Checkbox(this,"reverse",mStutterCheckboxes[k64th],kAnchor_Below,&mStutter[kReverse]);
+   mStutterCheckboxes[kRampIn] = new Checkbox(this,"ramp in",mStutterCheckboxes[kReverse],kAnchor_Below,&mStutter[kRampIn]);
+   mStutterCheckboxes[kRampOut] = new Checkbox(this,"ramp out",mStutterCheckboxes[kHalf],kAnchor_Right,&mStutter[kRampOut]);
+   mStutterCheckboxes[kTumbleUp] = new Checkbox(this,"tumble up",mStutterCheckboxes[kRampOut],kAnchor_Below,&mStutter[kTumbleUp]);
+   mStutterCheckboxes[kTumbleDown] = new Checkbox(this,"tumble down",mStutterCheckboxes[kTumbleUp],kAnchor_Below,&mStutter[kTumbleDown]);
+   mStutterCheckboxes[kHalfSpeed] = new Checkbox(this,"half speed",mStutterCheckboxes[kTumbleDown],kAnchor_Below,&mStutter[kHalfSpeed]);
+   mStutterCheckboxes[kDoubleSpeed] = new Checkbox(this,"double speed",mStutterCheckboxes[kHalfSpeed],kAnchor_Below,&mStutter[kDoubleSpeed]);
+   mStutterCheckboxes[kQuarterTriplets] = new Checkbox(this,"triplets",mStutterCheckboxes[kDoubleSpeed],kAnchor_Below,&mStutter[kQuarterTriplets]);
+   mStutterCheckboxes[kDotted8th] = new Checkbox(this,"dotted eighth",mStutterCheckboxes[kQuarterTriplets],kAnchor_Below,&mStutter[kDotted8th]);
+   mStutterCheckboxes[kFree] = new Checkbox(this,"free",mStutterCheckboxes[kDotted8th],kAnchor_Below,&mStutter[kFree]);
+   mFreeLengthSlider = new FloatSlider(this,"free length",mStutterCheckboxes[kFree],kAnchor_Below,102,15,&mStutterProcessor.mFreeStutterLength,.005f,.25f);
+   mFreeSpeedSlider = new FloatSlider(this,"free speed",mFreeLengthSlider,kAnchor_Below,102,15,&mStutterProcessor.mFreeStutterSpeed,0,2);
 }
 
 StutterControl::~StutterControl()
@@ -155,8 +136,8 @@ StutterControl::StutterType StutterControl::GetStutterFromKey(int key)
 
 void StutterControl::GetModuleDimensions(int& x, int& y)
 {
-   x = 110;
-   y = 80 + kNumStutterTypes*18;
+   x = 175;
+   y = 172;
 }
 
 StutterParams StutterControl::GetStutter(StutterControl::StutterType type)
@@ -230,6 +211,13 @@ void StutterControl::OnGridButton(int x, int y, float velocity, IGridController*
       mStutter[index] = velocity > 0;
       SendStutter(GetStutter((StutterType)index), mStutter[index]);
    }
+}
+
+void StutterControl::PlayNote(double time, int pitch, int velocity, int voiceIdx, ModulationParameters modulation)
+{
+   int index = pitch % kNumStutterTypes;
+   mStutter[index] = velocity > 0;
+   SendStutter(GetStutter((StutterType)index), mStutter[index]);
 }
 
 void StutterControl::UpdateGridLights()

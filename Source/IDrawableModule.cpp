@@ -270,6 +270,7 @@ void IDrawableModule::Render()
    ofClipWindow(0, 0, w, h);
    DrawModule();
    ofPopMatrix();
+   DrawModuleUnclipped();
    
    float enableToggleOffset = 0;
    if (HasTitleBar())
@@ -376,7 +377,7 @@ ofColor IDrawableModule::GetColor(ModuleType type)
 
 void IDrawableModule::DrawConnection(IClickable* target)
 {
-   float lineWidth = 2;
+   float lineWidth = 1;
    float plugWidth = 4;
    int lineAlpha = 100;
    
@@ -796,6 +797,9 @@ void IDrawableModule::FindClosestSides(float xThis,float yThis,float wThis,float
    int closestPair = 0;
    for (int i=0; i<4; ++i)
    {
+      if (i == 2) //skip top
+         continue;
+      
       for (int j=0; j<4; ++j)
       {
          ofVec2f vDiff = vThat[j]-vThis[i];

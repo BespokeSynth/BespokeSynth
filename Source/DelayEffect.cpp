@@ -36,7 +36,7 @@ void DelayEffect::CreateUIControls()
 {
    IDrawableModule::CreateUIControls();
    
-   UIBLOCK();
+   UIBLOCK0();
    FLOATSLIDER(mDelaySlider, "delay",&mDelay,GetMinDelayMs(),1000);
    FLOATSLIDER(mFeedbackSlider, "amount",&mFeedback,0,1);
    DROPDOWN(mIntervalSelector, "interval", (int*)(&mInterval), 45); UIBLOCK_SHIFTRIGHT();
