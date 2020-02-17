@@ -16,6 +16,7 @@
 #include "ModulationChain.h"
 #include "PolyphonyMgr.h"
 #include "MidiController.h"
+#include <unistd.h>
 
 LinnstrumentControl::LinnstrumentControl()
 : mControllerIndex(-1)
