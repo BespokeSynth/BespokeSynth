@@ -56,6 +56,18 @@ string ofToDataPath(string path, bool makeAbsolute)
    }
 
    return sDataDir + "/" + path;
+#elif JUCE_LINUX
+   static string sDataDir = "";
+   if (sDataDir == "")
+   {
+      string localDataDir = File::getCurrentWorkingDirectory().getChildFile("data").getFullPathName().toStdString();
+      if (juce::File(localDataDir).exists())
+         sDataDir = localDataDir;
+      else
+         sDataDir = File::getCurrentWorkingDirectory().getChildFile("../../MacOSX/build/Release/data").getFullPathName().toStdString();   //fall back to looking at OSX dir in dev environment
+   }
+
+   return sDataDir + "/" + path;
 #else
    #if DEBUG
       return "../Release/data/"+path;

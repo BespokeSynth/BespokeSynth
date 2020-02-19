@@ -143,6 +143,12 @@ string ModularSynth::GetUserPrefsPath()
    if (juce::File(path).existsAsFile())
       return path;
    #endif
+
+   #if BESPOKE_LINUX
+   string path = ofToDataPath("userprefs_linux.json");
+   if (juce::File(path).existsAsFile())
+      return path;
+   #endif
    
    return ofToDataPath("userprefs.json");
 }
