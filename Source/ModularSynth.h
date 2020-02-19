@@ -72,6 +72,9 @@ public:
    void MouseScrolled(float x, float y);
    void FilesDropped(vector<string> files, int x, int y);
    
+   void AddExtraPoller(IPollable* poller);
+   void RemoveExtraPoller(IPollable* poller);
+   
    void AudioOut(float** output, int bufferSize, int nChannels);
    void AudioIn(const float** input, int bufferSize, int nChannels);
 
@@ -269,6 +272,8 @@ private:
    ADSRDisplay* mScheduledEnvelopeEditorSpawnDisplay;
    
    bool mIsLoadingModule;
+   
+   list<IPollable*> mExtraPollers;
    
    string mFatalError;
 };

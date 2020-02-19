@@ -11,10 +11,11 @@
 #pragma once
 
 #include "Slider.h"
+#include "IPollable.h"
 
 class PatchCableSource;
 
-class IModulator
+class IModulator : public IPollable
 {
 public:
    IModulator();
@@ -23,9 +24,10 @@ public:
    virtual bool Active() const = 0;
    virtual bool CanAdjustRange() const { return true; }
    virtual bool InitializeWithZeroRange() const { return false; }
-   float& GetMin() { return mTarget->GetModulatorMin(); }
-   float& GetMax() { return mTarget->GetModulatorMax(); }
+   float& GetMin() { return mTarget ? mTarget->GetModulatorMin() : mDummyMin; }
+   float& GetMax() { return mTarget ? mTarget->GetModulatorMax() : mDummyMax; }
    void OnModulatorRepatch();
+   void Poll() override;
 protected:
    void InitializeRange();
    
@@ -36,4 +38,5 @@ protected:
    FloatSlider* mMinSlider;
    FloatSlider* mMaxSlider;
    FloatSlider* mTarget;
+   IUIControl* mUIControlTarget;
 };

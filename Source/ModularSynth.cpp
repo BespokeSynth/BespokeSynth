@@ -157,6 +157,8 @@ void ModularSynth::Poll()
    }
    
    mZoomer.Update();
+   for (auto p : mExtraPollers)
+      p->Poll();
    mModuleContainer.Poll();
    
    if (mShowLoadStatePopup)
@@ -1354,6 +1356,18 @@ void ModularSynth::UpdateUserPrefsLayout()
 {
    //mUserPrefs["layout"] = mLoadedLayoutPath;
    //mUserPrefs.save(GetUserPrefsPath(), true);
+}
+
+void ModularSynth::AddExtraPoller(IPollable* poller)
+{
+   if (!ListContains(poller, mExtraPollers))
+      mExtraPollers.push_front(poller);
+}
+
+void ModularSynth::RemoveExtraPoller(IPollable* poller)
+{
+   if (ListContains(poller, mExtraPollers))
+      mExtraPollers.remove(poller);
 }
 
 IDrawableModule* ModularSynth::CreateModule(const ofxJSONElement& moduleInfo)
