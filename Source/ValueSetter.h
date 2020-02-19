@@ -48,6 +48,8 @@ private:
    void GetModuleDimensions(int& width, int& height) override { width = mWidth; height = mHeight; }
    bool Enabled() const override { return mEnabled; }
    
+   void Go();
+   
    PatchCableSource* mControlCable;
    IUIControl* mTarget;
    float mValue;

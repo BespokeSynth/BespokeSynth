@@ -99,7 +99,11 @@ void ControlSequencer::OnTimeEvent(int samplesTo)
    mGrid->SetHighlightCol(step);
    
    if (mUIControl && mEnabled)
+   {
       mUIControl->SetFromMidiCC(mGrid->GetVal(step, 0));
+      mControlCable->AddHistoryEvent(gTime, true);
+      mControlCable->AddHistoryEvent(gTime + 15, false);
+   }
 }
 
 void ControlSequencer::DrawModule()

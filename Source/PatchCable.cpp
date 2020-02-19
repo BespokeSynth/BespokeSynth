@@ -66,7 +66,10 @@ void PatchCable::Render()
    
    if (TheSynth->ShouldAccentuateActiveModules())  //only draw if we're making noise
    {
-      if (GetConnectionType() == kConnectionType_Note || GetConnectionType() == kConnectionType_Grid || GetConnectionType() == kConnectionType_Pulse)
+      if (GetConnectionType() == kConnectionType_Note ||
+          GetConnectionType() == kConnectionType_Grid ||
+          GetConnectionType() == kConnectionType_Pulse ||
+          GetConnectionType() == kConnectionType_UIControl)
       {
          bool hasNote = false;
          const NoteHistoryEvent& event = mOwner->GetHistory().GetHistoryEvent(0);
@@ -148,7 +151,10 @@ void PatchCable::Render()
       ofVec2f bezierControl2 = cable.plug + MathUtils::ScaleVec(endDirection, wireLineMag * .5f);
       float wireLength = sqrtf((cable.plug - cable.start).lengthSquared());
       
-      if (type == kConnectionType_Note || type == kConnectionType_Grid || type == kConnectionType_Pulse)
+      if (type == kConnectionType_Note ||
+          type == kConnectionType_Grid ||
+          type == kConnectionType_Pulse ||
+          type == kConnectionType_UIControl)
       {
          ofSetLineWidth(lineWidth);
          ofSetColor(lineColorAlphaed);

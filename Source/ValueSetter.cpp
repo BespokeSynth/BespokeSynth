@@ -56,15 +56,24 @@ void ValueSetter::OnPulse(float velocity, int samplesTo, int flags)
 {
    if (velocity > 0 && mEnabled)
    {
-      if (mTarget)
-         mTarget->SetValue(mValue);
+      Go();
    }
 }
 
 void ValueSetter::ButtonClicked(ClickButton* button)
 {
-   if (button == mButton && mTarget)
+   if (button == mButton)
+      Go();
+}
+
+void ValueSetter::Go()
+{
+   if (mTarget)
+   {
       mTarget->SetValue(mValue);
+      mControlCable->AddHistoryEvent(gTime, true);
+      mControlCable->AddHistoryEvent(gTime + 15, false);
+   }
 }
 
 void ValueSetter::SaveLayout(ofxJSONElement& moduleInfo)
