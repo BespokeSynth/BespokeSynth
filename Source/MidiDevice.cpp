@@ -25,7 +25,6 @@ MidiDevice::~MidiDevice()
 {
    AudioDeviceManager& deviceManager = TheSynth->GetGlobalManagers()->mDeviceManager;
    deviceManager.removeMidiInputCallback(mDeviceNameIn, this);
-   delete mMidiOut;
 }
 
 bool MidiDevice::ConnectInput(const char* name)
@@ -65,7 +64,7 @@ bool MidiDevice::ConnectOutput(const char* name, int channel /*= 1*/)
    
    if (!found)
    {
-      delete mMidiOut;
+      mMidiOut.reset();
       mMidiOut = nullptr;
       mDeviceNameOut[0] = 0;
    }
@@ -75,8 +74,8 @@ bool MidiDevice::ConnectOutput(const char* name, int channel /*= 1*/)
 
 void MidiDevice::ConnectOutput(int index, int channel /*= 1*/)
 {
-   delete mMidiOut;
-   mMidiOut = MidiOutput::openDevice(index).get();
+   mMidiOut.reset();
+   mMidiOut = MidiOutput::openDevice(index);
 
    StringCopy(mDeviceNameOut, mMidiOut->getName().toRawUTF8(), 64);
 

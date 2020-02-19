@@ -94,7 +94,7 @@ private:
    char mDeviceNameIn[64];
    char mDeviceNameOut[64];
    
-   MidiOutput* mMidiOut;
+   unique_ptr<MidiOutput> mMidiOut;
    MidiDeviceListener* mListener;
    int mOutputChannel;
 };
