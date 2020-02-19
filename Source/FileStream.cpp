@@ -7,6 +7,8 @@
 //
 
 #include "FileStream.h"
+#include "ModularSynth.h"
+#include "SynthGlobals.h"
 
 FileStreamOut::FileStreamOut(const char* file)
 : mStream(File(file))
@@ -102,7 +104,12 @@ FileStreamIn& FileStreamIn::operator>>(string &var)
 {
    size_t len;
    mStream.read((void*)&len, sizeof(size_t));
-   assert(len < 99999);   //probably garbage beyond this point
+   
+   if (TheSynth->IsLoadingModule())
+      LoadStateValidate(len < 99999);   //probably garbage beyond this point
+   else
+      assert(len < 99999);   //probably garbage beyond this point
+   
    var.resize(len);
    for (int i=0; i<len; ++i)
       mStream.read((void*)&var[i], sizeof(char));
