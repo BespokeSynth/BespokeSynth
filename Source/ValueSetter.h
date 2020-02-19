@@ -10,13 +10,14 @@
 #define __Bespoke__ValueSetter__
 
 #include "IDrawableModule.h"
-#include "INoteReceiver.h"
+#include "IPulseReceiver.h"
 #include "TextEntry.h"
+#include "ClickButton.h"
 
 class PatchCableSource;
 class IUIControl;
 
-class ValueSetter : public IDrawableModule, public INoteReceiver, public ITextEntryListener
+class ValueSetter : public IDrawableModule, public IPulseReceiver, public ITextEntryListener, public IButtonListener
 {
 public:
    ValueSetter();
@@ -29,8 +30,9 @@ public:
    void SetEnabled(bool enabled) override { mEnabled = enabled; }
    
    //INoteReceiver
-   void PlayNote(double time, int pitch, int velocity, int voiceIdx = -1, ModulationParameters modulation = ModulationParameters()) override;
-   void SendCC(int control, int value, int voiceIdx = -1) override {}
+   void OnPulse(float velocity, int samplesTo, int flags) override;
+   
+   void ButtonClicked(ClickButton* button) override;
    
    //IPatchable
    void PostRepatch(PatchCableSource* cableSource, bool fromUserClick) override;
@@ -43,13 +45,17 @@ public:
 private:
    //IDrawableModule
    void DrawModule() override;
-   void GetModuleDimensions(int& width, int& height) override { width = 110; height = 20; }
+   void GetModuleDimensions(int& width, int& height) override { width = mWidth; height = mHeight; }
    bool Enabled() const override { return mEnabled; }
    
    PatchCableSource* mControlCable;
    IUIControl* mTarget;
    float mValue;
    TextEntry* mValueEntry;
+   ClickButton* mButton;
+   
+   float mWidth;
+   float mHeight;
 };
 
 #endif /* defined(__Bespoke__ValueSetter__) */

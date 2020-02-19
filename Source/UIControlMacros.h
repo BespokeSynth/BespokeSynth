@@ -23,7 +23,7 @@
 #define UIBLOCK0() UIBLOCK3(3,3,100)
 #define UIBLOCK1(A) UIBLOCK3(3,3,A)
 #define UIBLOCK2(A,B) UIBLOCK3(A,B,100)
-#define UIBLOCK3(A,B,C) { float xPos = A; float yPos = B; float originalY = B; float sliderWidth = C; float originalSliderWidth = C; IUIControl* lastUIControl = nullptr; float xMax = 0; float yMax = 0; float xOffset = 0; (void)originalY; (void)originalSliderWidth;
+#define UIBLOCK3(A,B,C) { float xPos = A; float yPos = B; float originalY = B; float sliderWidth = C; float originalSliderWidth = C; IUIControl* lastUIControl = nullptr; float xMax = 0; float yMax = 0; float xOffset = 0; (void)originalY; (void)originalSliderWidth; (void)sliderWidth;
 #define UIBLOCK(...) CALL_OVERLOAD(UIBLOCK, __VA_ARGS__)
 
 #define UIBLOCK_SHIFTDOWN() yPos += lastUIControl->GetDimensions().y + 2;
@@ -37,16 +37,16 @@
 
 #define UIBLOCK_UPDATEEXTENTS() xMax = MAX(xMax, lastUIControl->GetPosition(true).x + lastUIControl->GetDimensions().x); yMax = MAX(yMax, lastUIControl->GetPosition(true).y + lastUIControl->GetDimensions().y);
 
-#define UICONTROLBASICS(name) this,name,xPos+xOffset,yPos
+#define UICONTROL_BASICS(name) this,name,xPos+xOffset,yPos
 
-#define FLOATSLIDER(slider,name,var,min,max) slider = new FloatSlider(UICONTROLBASICS(name),sliderWidth,15,var,min,max); lastUIControl = slider; UIBLOCK_SHIFTDOWN(); UIBLOCK_UPDATEEXTENTS();
-#define FLOATSLIDER_DIGITS(slider,name,var,min,max,digits) slider = new FloatSlider(UICONTROLBASICS(name),sliderWidth,15,var,min,max,digits); lastUIControl = slider; UIBLOCK_SHIFTDOWN(); UIBLOCK_UPDATEEXTENTS();
+#define FLOATSLIDER(slider,name,var,min,max) slider = new FloatSlider(UICONTROL_BASICS(name),sliderWidth,15,var,min,max); lastUIControl = slider; UIBLOCK_SHIFTDOWN(); UIBLOCK_UPDATEEXTENTS();
+#define FLOATSLIDER_DIGITS(slider,name,var,min,max,digits) slider = new FloatSlider(UICONTROL_BASICS(name),sliderWidth,15,var,min,max,digits); lastUIControl = slider; UIBLOCK_SHIFTDOWN(); UIBLOCK_UPDATEEXTENTS();
 
-#define CHECKBOX(checkbox,name,var) checkbox = new Checkbox(UICONTROLBASICS(name),var); lastUIControl = checkbox; UIBLOCK_SHIFTDOWN(); UIBLOCK_UPDATEEXTENTS();
+#define CHECKBOX(checkbox,name,var) checkbox = new Checkbox(UICONTROL_BASICS(name),var); lastUIControl = checkbox; UIBLOCK_SHIFTDOWN(); UIBLOCK_UPDATEEXTENTS();
 
-#define DROPDOWN(dropdown,name,var,width) dropdown = new DropdownList(UICONTROLBASICS(name),var,width); lastUIControl = dropdown; UIBLOCK_SHIFTDOWN(); UIBLOCK_UPDATEEXTENTS();
+#define DROPDOWN(dropdown,name,var,width) dropdown = new DropdownList(UICONTROL_BASICS(name),var,width); lastUIControl = dropdown; UIBLOCK_SHIFTDOWN(); UIBLOCK_UPDATEEXTENTS();
 
-#define UICONTROLCUSTOM(init) lastUIControl = init; UIBLOCK_UPDATEEXTENTS();
+#define UICONTROL_CUSTOM(var,instance) var = instance; lastUIControl = var; UIBLOCK_SHIFTDOWN(); UIBLOCK_UPDATEEXTENTS();
 
 #define UIBLOCKWIDTH() xMax + 3
 #define UIBLOCKHEIGHT() yMax + 2

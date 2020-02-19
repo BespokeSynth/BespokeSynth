@@ -12,6 +12,7 @@
 #include "ModularSynth.h"
 #include "PatchCableSource.h"
 #include "ModulationChain.h"
+#include "UIControlMacros.h"
 
 ValueSetter::ValueSetter()
 : mControlCable(nullptr)
@@ -27,8 +28,11 @@ ValueSetter::~ValueSetter()
 void ValueSetter::CreateUIControls()
 {
    IDrawableModule::CreateUIControls();
-   mValueEntry = new TextEntry(this,"value",40,2,7,&mValue,-99999,99999);
-   mValueEntry->DrawLabel(true);
+   UIBLOCK0();
+   UICONTROL_CUSTOM(mValueEntry, new TextEntry(UICONTROL_BASICS("value"),7,&mValue,-99999,99999); mValueEntry->DrawLabel(true););
+   UIBLOCK_SHIFTRIGHT();
+   UICONTROL_CUSTOM(mButton, new ClickButton(UICONTROL_BASICS("set")));
+   ENDUIBLOCK(mWidth, mHeight);
    
    mControlCable = new PatchCableSource(this, kConnectionType_UIControl);
    AddPatchCableSource(mControlCable);
@@ -40,6 +44,7 @@ void ValueSetter::DrawModule()
       return;
    
    mValueEntry->Draw();
+   mButton->Draw();
 }
 
 void ValueSetter::PostRepatch(PatchCableSource* cableSource, bool fromUserClick)
@@ -47,13 +52,19 @@ void ValueSetter::PostRepatch(PatchCableSource* cableSource, bool fromUserClick)
    mTarget = dynamic_cast<IUIControl*>(mControlCable->GetTarget());
 }
 
-void ValueSetter::PlayNote(double time, int pitch, int velocity, int voiceIdx, ModulationParameters modulation)
+void ValueSetter::OnPulse(float velocity, int samplesTo, int flags)
 {
    if (velocity > 0 && mEnabled)
    {
       if (mTarget)
          mTarget->SetValue(mValue);
    }
+}
+
+void ValueSetter::ButtonClicked(ClickButton* button)
+{
+   if (button == mButton && mTarget)
+      mTarget->SetValue(mValue);
 }
 
 void ValueSetter::SaveLayout(ofxJSONElement& moduleInfo)
