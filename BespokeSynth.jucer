@@ -2,7 +2,7 @@
 
 <JUCERPROJECT id="vxkFwd" name="BespokeSynth" projectType="guiapp" version="1.0.0"
               bundleIdentifier="com.ryanchallinor.Bespoke" includeBinaryInAppConfig="1"
-              jucerVersion="5.4.7" displaySplashScreen="1" reportAppUsage="1"
+              jucerVersion="5.4.5" displaySplashScreen="1" reportAppUsage="1"
               splashScreenColour="Dark" cppLanguageStandard="11" companyCopyright="">
   <MAINGROUP id="w4HLAu" name="BespokeSynth">
     <GROUP id="{531CC336-D9CD-1F6E-7272-2D8ADD98F839}" name="libraries">
@@ -966,21 +966,21 @@
         <CONFIGURATION isDebug="0" name="Release" headerPath="../../Source/json/include&#10;../../Source/glew/include"/>
       </CONFIGURATIONS>
       <MODULEPATHS>
-        <MODULEPATH id="juce_video" path="/home/kv/src/JUCE-git/modules"/>
-        <MODULEPATH id="juce_osc" path="/home/kv/src/JUCE-git/modules"/>
-        <MODULEPATH id="juce_opengl" path="/home/kv/src/JUCE-git/modules"/>
-        <MODULEPATH id="juce_gui_extra" path="/home/kv/src/JUCE-git/modules"/>
-        <MODULEPATH id="juce_gui_basics" path="/home/kv/src/JUCE-git/modules"/>
-        <MODULEPATH id="juce_graphics" path="/home/kv/src/JUCE-git/modules"/>
-        <MODULEPATH id="juce_events" path="/home/kv/src/JUCE-git/modules"/>
-        <MODULEPATH id="juce_data_structures" path="/home/kv/src/JUCE-git/modules"/>
-        <MODULEPATH id="juce_cryptography" path="/home/kv/src/JUCE-git/modules"/>
-        <MODULEPATH id="juce_core" path="/home/kv/src/JUCE-git/modules"/>
-        <MODULEPATH id="juce_audio_utils" path="/home/kv/src/JUCE-git/modules"/>
-        <MODULEPATH id="juce_audio_processors" path="/home/kv/src/JUCE-git/modules"/>
-        <MODULEPATH id="juce_audio_formats" path="/home/kv/src/JUCE-git/modules"/>
-        <MODULEPATH id="juce_audio_devices" path="/home/kv/src/JUCE-git/modules"/>
-        <MODULEPATH id="juce_audio_basics" path="/home/kv/src/JUCE-git/modules"/>
+        <MODULEPATH id="juce_video" path="../../JUCE/modules"/>
+        <MODULEPATH id="juce_osc" path="../../JUCE/modules"/>
+        <MODULEPATH id="juce_opengl" path="../../JUCE/modules"/>
+        <MODULEPATH id="juce_gui_extra" path="../../JUCE/modules"/>
+        <MODULEPATH id="juce_gui_basics" path="../../JUCE/modules"/>
+        <MODULEPATH id="juce_graphics" path="../../JUCE/modules"/>
+        <MODULEPATH id="juce_events" path="../../JUCE/modules"/>
+        <MODULEPATH id="juce_data_structures" path="../../JUCE/modules"/>
+        <MODULEPATH id="juce_cryptography" path="../../JUCE/modules"/>
+        <MODULEPATH id="juce_core" path="../../JUCE/modules"/>
+        <MODULEPATH id="juce_audio_utils" path="../../JUCE/modules"/>
+        <MODULEPATH id="juce_audio_processors" path="../../JUCE/modules"/>
+        <MODULEPATH id="juce_audio_formats" path="../../JUCE/modules"/>
+        <MODULEPATH id="juce_audio_devices" path="../../JUCE/modules"/>
+        <MODULEPATH id="juce_audio_basics" path="../../JUCE/modules"/>
       </MODULEPATHS>
     </LINUX_MAKE>
   </EXPORTFORMATS>

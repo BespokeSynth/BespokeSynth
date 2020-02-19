@@ -135,7 +135,7 @@ void OneShotLauncher::DrawModule()
    /*for (int i=0; i < mNumActive; ++i)
    {
       Sample* beat = mBeatData[i].mBeat;
-      DrawText(beat->Name(), 85, GetRowY(i)+12);
+      DrawTextNormal(beat->Name(), 85, GetRowY(i)+12);
       mBeatData[i].mRemoveButton->Draw();
       mBeatData[i].mVolumeSlider->Draw();
    }*/

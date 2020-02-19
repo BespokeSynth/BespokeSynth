@@ -178,7 +178,7 @@ void NoteStepSequencer::DrawModule()
    {
       ofVec2f pos = mGrid->GetCellPosition(0, i) + mGrid->GetPosition(true);
       float scale = MIN(mGrid->IClickable::GetDimensions().y / mGrid->GetRows(), 20);
-      DrawText(NoteName(RowToPitch(i),false,true) + "("+ ofToString(RowToPitch(i)) + ")", pos.x - 5, pos.y - (scale/8), scale);
+      DrawTextNormal(NoteName(RowToPitch(i),false,true) + "("+ ofToString(RowToPitch(i)) + ")", pos.x - 5, pos.y - (scale/8), scale);
    }
    ofPopStyle();
    

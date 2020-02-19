@@ -251,7 +251,7 @@ void ChaosEngine::DrawModule()
    mInversionSlider->Draw();
    mHideBeatCheckbox->Draw();
    
-   DrawText(mInputChord.Name(true,true), 400, 51);
+   DrawTextNormal(mInputChord.Name(true,true), 400, 51);
    
    for (int i=0; i<mInputChords.size(); ++i)
    {
@@ -261,7 +261,7 @@ void ChaosEngine::DrawModule()
       string accidentalList;
       for (int i=0; i<accidentals.size(); ++i)
          accidentalList += ofToString(accidentals[i].mPitch) + (accidentals[i].mDirection == 1? "#" : "b") + " ";
-      DrawText(mInputChords[i].Name(true,true), 400, 75+i*15);
+      DrawTextNormal(mInputChords[i].Name(true,true), 400, 75+i*15);
    }
    
    if (!mHideBeat)
@@ -299,7 +299,7 @@ void ChaosEngine::DrawModule()
       string accidentalList;
       for (int j=0; j<mChordProgression[i].mAccidentals.size(); ++j)
          accidentalList += ofToString(mChordProgression[i].mAccidentals[j].mPitch) + (mChordProgression[i].mAccidentals[j].mDirection == 1? "#" : "b") + "\n";
-      DrawText(accidentalList, x+180, y-18);
+      DrawTextNormal(accidentalList, x+180, y-18);
       
       int numBeats = mChordProgression[i].mBeatLength;
       if (numBeats == -1)

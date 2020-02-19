@@ -184,11 +184,11 @@ void FMSynth::DrawModule()
    mHarmRatioBaseDropdown2->Draw();
    mPhaseOffsetSlider2->Draw();
 
-   DrawText("env",mAdsrDisplayVol->GetPosition(true).x, mAdsrDisplayVol->GetPosition(true).y+10);
-   DrawText("harm",mAdsrDisplayHarm->GetPosition(true).x, mAdsrDisplayHarm->GetPosition(true).y+10);
-   DrawText("mod",mAdsrDisplayMod->GetPosition(true).x, mAdsrDisplayMod->GetPosition(true).y+10);
-   DrawText("harm2",mAdsrDisplayHarm2->GetPosition(true).x, mAdsrDisplayHarm2->GetPosition(true).y+10);
-   DrawText("mod2",mAdsrDisplayMod2->GetPosition(true).x, mAdsrDisplayMod2->GetPosition(true).y+10);
+   DrawTextNormal("env",mAdsrDisplayVol->GetPosition(true).x, mAdsrDisplayVol->GetPosition(true).y+10);
+   DrawTextNormal("harm",mAdsrDisplayHarm->GetPosition(true).x, mAdsrDisplayHarm->GetPosition(true).y+10);
+   DrawTextNormal("mod",mAdsrDisplayMod->GetPosition(true).x, mAdsrDisplayMod->GetPosition(true).y+10);
+   DrawTextNormal("harm2",mAdsrDisplayHarm2->GetPosition(true).x, mAdsrDisplayHarm2->GetPosition(true).y+10);
+   DrawTextNormal("mod2",mAdsrDisplayMod2->GetPosition(true).x, mAdsrDisplayMod2->GetPosition(true).y+10);
 }
 
 void FMSynth::UpdateHarmonicRatio()

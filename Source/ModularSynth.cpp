@@ -220,7 +220,7 @@ void ModularSynth::Draw(void* vg)
 {
    gNanoVG = (NVGcontext*)vg;
    
-   //DrawText("fps: "+ofToString(ofGetFrameRate(),4)+" "+ofToString(ofGetWidth()*ofGetHeight()), 100, 100,50);
+   //DrawTextNormal("fps: "+ofToString(ofGetFrameRate(),4)+" "+ofToString(ofGetWidth()*ofGetHeight()), 100, 100,50);
    //return;
    
    mDrawRect.set(-mDrawOffset.x, -mDrawOffset.y, ofGetWidth() / gDrawScale, ofGetHeight() / gDrawScale);
@@ -229,7 +229,7 @@ void ModularSynth::Draw(void* vg)
    {
       ofSetColor(255, 255, 255, 255);
       if (gFont.IsLoaded())
-         DrawText(mFatalError,100,100, 20);
+         DrawTextNormal(mFatalError,100,100, 20);
       else
          DrawFallbackText(mFatalError.c_str(), 100, 100);
       return;
@@ -240,14 +240,14 @@ void ModularSynth::Draw(void* vg)
    if (gTime == 1)
    {
       string loading("Bespoke is initializing audio...");
-      DrawText(loading,ofGetWidth()/2-GetStringWidth(loading,30)/2,ofGetHeight()/2-6, 30);
+      DrawTextNormal(loading,ofGetWidth()/2-GetStringWidth(loading,30)/2,ofGetHeight()/2-6, 30);
       return;
    }
    
    if (!mInitialized)
    {
       string loading("Bespoke is loading...");
-      DrawText(loading,ofGetWidth()/2-GetStringWidth(loading,30)/2,ofGetHeight()/2-6, 30);
+      DrawTextNormal(loading,ofGetWidth()/2-GetStringWidth(loading,30)/2,ofGetHeight()/2-6, 30);
       return;
    }
    
@@ -293,7 +293,7 @@ void ModularSynth::Draw(void* vg)
    {
       ofPushStyle();
       ofSetColor(255,255,255, (1.0f-(float(mSoundStream.getTickCount() - mSoundStream.GetLastStarvationTick())/starvationDisplayTicks))*255);
-      DrawText("X", 5, 15);
+      DrawTextNormal("X", 5, 15);
       ofPopStyle();
    }*/
 
@@ -364,7 +364,7 @@ void ModularSynth::DrawConsole()
       {
          ofPushStyle();
          ofSetColor(255,255,0);
-         DrawText(it->first, 10, consoleY);
+         DrawTextNormal(it->first, 10, consoleY);
          ofPopStyle();
          consoleY += 15;
          ++it;
@@ -383,7 +383,7 @@ void ModularSynth::DrawConsole()
          ofSetColor(255,0,0);
          for (int i=0;i<mErrors.size();++i)
          {
-            DrawText(mErrors[i], 10, consoleY);
+            DrawTextNormal(mErrors[i], 10, consoleY);
             consoleY += 15;
          }
          ofPopStyle();

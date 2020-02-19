@@ -33,7 +33,7 @@ void NoteDisplayer::DrawModule()
 
 void NoteDisplayer::DrawNoteName(int pitch, float y) const
 {
-   DrawText(NoteName(pitch) + ofToString(pitch/12 - 2) + " (" + ofToString(pitch) + ")" + " vel:"+ofToString(mVelocities[pitch]), 4, y);
+   DrawTextNormal(NoteName(pitch) + ofToString(pitch/12 - 2) + " (" + ofToString(pitch) + ")" + " vel:"+ofToString(mVelocities[pitch]), 4, y);
 }
 
 void NoteDisplayer::PlayNote(double time, int pitch, int velocity, int voiceIdx, ModulationParameters modulation)

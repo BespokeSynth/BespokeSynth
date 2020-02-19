@@ -16,7 +16,9 @@
 #include "ModulationChain.h"
 #include "PolyphonyMgr.h"
 #include "MidiController.h"
+#ifdef BESPOKE_LINUX
 #include <unistd.h>
+#endif
 
 LinnstrumentControl::LinnstrumentControl()
 : mControllerIndex(-1)

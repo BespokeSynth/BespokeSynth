@@ -22,14 +22,14 @@ void ModulationVisualizer::DrawModule()
       return;
    
    int y=15;
-   DrawText("global:"+mGlobalModulation.GetInfoString(), 3, y);
+   DrawTextNormal("global:"+mGlobalModulation.GetInfoString(), 3, y);
    y += 15;
    
    for (int i=0; i<kNumVoices; ++i)
    {
       if (mVoices[i].mActive)
       {
-         DrawText(ofToString(i)+":"+mVoices[i].GetInfoString(), 3, y);
+         DrawTextNormal(ofToString(i)+":"+mVoices[i].GetInfoString(), 3, y);
          y += 15;
       }
    }

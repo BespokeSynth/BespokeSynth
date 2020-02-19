@@ -380,7 +380,7 @@ void LoopStorer::SampleData::Draw()
    DrawAudioBuffer(100, 36, buffer, 0, bufferLength, -1);
    if (useLooper)
       mLoopStorer->GetLooper()->UnlockBufferMutex();
-   DrawText(ofToString(mNumBars), 4, 12);
+   DrawTextNormal(ofToString(mNumBars), 4, 12);
    if (mLoopStorer->GetQueuedBufferIdx() == mIndex)
    {
       ofPushStyle();

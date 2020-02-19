@@ -456,7 +456,7 @@ void VSTPlugin::DrawModule()
    if (Minimized() || IsVisible() == false)
       return;
    
-   DrawText(GetPluginName(), 3, 32);
+   DrawTextNormal(GetPluginName(), 3, 32);
    
    mVolSlider->Draw();
    mProgramChangeSelector->Draw();

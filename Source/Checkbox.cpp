@@ -98,7 +98,7 @@ void Checkbox::Render()
    ofSetColor(color);
    
    if (mDisplayText)
-      DrawText(Name(), mX+13, mY+12);
+      DrawTextNormal(Name(), mX+13, mY+12);
    if (*mVar)
    {
       if (mUseCircleLook)

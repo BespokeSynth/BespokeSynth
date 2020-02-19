@@ -213,7 +213,7 @@ void NoteCanvasElement::DrawContents()
    ofPushStyle();
    ofSetColor(255,255,255);
    ofFill();
-   //DrawText(ofToString(mVelocity), GetRect(true, false).x, GetRect(true, false).y);
+   //DrawTextNormal(ofToString(mVelocity), GetRect(true, false).x, GetRect(true, false).y);
    for (int i=0; i<2; ++i)
    {
       ofRectangle rect = GetRect(true, i==0 ? false : true);
@@ -484,9 +484,9 @@ void EventCanvasElement::DrawContents()
       text = mUIControl->Name();
       ofRectangle rect = GetRect(true, false);
       ofSetColor(0,0,0);
-      DrawText(text, rect.x+4, rect.y+11);
+      DrawTextNormal(text, rect.x+4, rect.y+11);
       ofSetColor(255,255,255);
-      DrawText(text, rect.x+3, rect.y+10);
+      DrawTextNormal(text, rect.x+3, rect.y+10);
    }
    else if (mUIControl)
    {
@@ -496,9 +496,9 @@ void EventCanvasElement::DrawContents()
       
       ofRectangle rect = GetRect(true, false);
       ofSetColor(0,0,0);
-      DrawText(text, rect.x+rect.width+1, rect.y+11);
+      DrawTextNormal(text, rect.x+rect.width+1, rect.y+11);
       ofSetColor(255,255,255);
-      DrawText(text, rect.x+rect.width, rect.y+10);
+      DrawTextNormal(text, rect.x+rect.width, rect.y+10);
    }
 }
 

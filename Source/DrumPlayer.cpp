@@ -459,7 +459,7 @@ void DrumPlayer::DrawModule()
    mGridController->Draw();
    
    for (int i=0; i<mIndividualOutputs.size(); ++i)
-      DrawText(GetDrumHitName(mIndividualOutputs[i]->mHitIndex), 110, 10 + i*12);
+      DrawTextNormal(GetDrumHitName(mIndividualOutputs[i]->mHitIndex), 110, 10 + i*12);
 
    if (mEditMode)
    {

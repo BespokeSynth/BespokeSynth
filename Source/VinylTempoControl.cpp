@@ -52,7 +52,7 @@ void VinylTempoControl::DrawModule()
    mUseVinylControlCheckbox->Draw();
    
    if (CanStartVinylControl())
-      DrawText(ofToString(mVinylControl.GetPitch(),2),60,14);
+      DrawTextNormal(ofToString(mVinylControl.GetPitch(),2),60,14);
 }
 
 void VinylTempoControl::OnTransportAdvanced(float amount)

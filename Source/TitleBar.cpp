@@ -105,7 +105,7 @@ void SpawnList::Draw()
 {
    int x,y;
    mSpawnList->GetPosition(x, y, true);
-   //DrawText(mLabel,x,y-2);
+   //DrawTextNormal(mLabel,x,y-2);
    mSpawnList->Draw();
 }
 

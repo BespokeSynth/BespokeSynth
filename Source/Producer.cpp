@@ -343,7 +343,7 @@ void Producer::DrawModule()
       mCalcTempoButton->Draw();
       mRestartButton->Draw();
       if (mSample)
-         DrawText(ofToString(mSample->GetPlayPosition()),335,50);
+         DrawTextNormal(ofToString(mSample->GetPlayPosition()),335,50);
    }
    
    for (int i=0; i<PRODUCER_NUM_BIQUADS; ++i)

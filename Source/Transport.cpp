@@ -199,7 +199,7 @@ void Transport::DrawModule()
    string display;
    display += ofToString(mMeasurePos,2)+" "+ofToString(mMeasureCount)+"\n";
    display += ofToString(count);
-   DrawText(display,5,52);
+   DrawTextNormal(display,5,52);
 
    ofPushStyle();
    int w,h;

@@ -304,7 +304,7 @@ void FloatWrap(double& num, float space)
    num -= space * floor(num/space);
 }
 
-void DrawText(string text, int x, int y, float size)
+void DrawTextNormal(string text, int x, int y, float size)
 {
    gFont.DrawString(text, size, x, y);
 }

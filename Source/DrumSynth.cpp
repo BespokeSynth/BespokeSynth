@@ -193,7 +193,7 @@ void DrumSynth::DrawModule()
          ofSetColor(255,255,255,gModuleDrawAlpha);
          
          string name = ofToString(i);
-         DrawText(name,mHits[i]->mX+5,mHits[i]->mY+10);
+         DrawTextNormal(name,mHits[i]->mX+5,mHits[i]->mY+10);
          
          mHits[i]->Draw();
       }

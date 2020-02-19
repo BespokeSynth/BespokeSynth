@@ -120,7 +120,7 @@ void UIGrid::Render()
    if (mCurrentHover != -1 && mShouldDrawValue)
    {
       ofSetColor(ofColor::grey, gModuleDrawAlpha);
-      DrawText(ofToString(GetVal(mCurrentHover % mCols, mCurrentHover / mCols)), mX, mY+12);
+      DrawTextNormal(ofToString(GetVal(mCurrentHover % mCols, mCurrentHover / mCols)), mX, mY+12);
    }
    ofPopStyle();
 }

@@ -681,7 +681,7 @@ void Looper::DrawModule()
       ofRect(0,0,BUFFER_W,BUFFER_H*((age - .5f)*2));
    }
    //ofSetColor(255,255,255,gModuleDrawAlpha);
-   //DrawText(ofToString(mLoopCount),2,12);
+   //DrawTextNormal(ofToString(mLoopCount),2,12);
    ofPopStyle();
    
    assert(mLoopLength > 0);

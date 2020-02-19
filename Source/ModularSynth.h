@@ -16,7 +16,9 @@
 #include "LocationZoomer.h"
 #include "EffectFactory.h"
 #include "ModuleContainer.h"
+#ifdef BESPOKE_LINUX
 #include <climits>
+#endif
 
 class IAudioSource;
 class InputChannel;

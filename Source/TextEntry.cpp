@@ -91,7 +91,7 @@ void TextEntry::Render()
    float xOffset = 0;
    if (mDrawLabel)
    {
-      DrawText(Name(), mX, mY+12);
+      DrawTextNormal(Name(), mX, mY+12);
       xOffset = mLabelSize;
    }
    
@@ -115,7 +115,7 @@ void TextEntry::Render()
    ofSetColor(color,gModuleDrawAlpha);
    ofNoFill();
    ofRect(mX + xOffset,mY,w - xOffset,h);
-   DrawText(mString, mX+2+xOffset, mY+12);
+   DrawTextNormal(mString, mX+2+xOffset, mY+12);
    
    if (sCurrentTextEntry == this)
    {
@@ -147,7 +147,7 @@ void TextEntry::Render()
       ofFill();
       ofRect(mX+xOffset,mY-12,GetStringWidth(Name()),12);
       ofSetColor(255, 255, 255, gModuleDrawAlpha);
-      DrawText(Name(), mX+xOffset, mY);
+      DrawTextNormal(Name(), mX+xOffset, mY);
    }*/
 
    ofPopStyle();

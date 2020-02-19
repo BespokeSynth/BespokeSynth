@@ -72,7 +72,7 @@ void NoteLooper::DrawModule()
    mOctaveSlider->Draw();
    mOverdubCheckbox->Draw();
    
-   DrawText(ofToString(mNumHeldNotes), 170, 13);
+   DrawTextNormal(ofToString(mNumHeldNotes), 170, 13);
    
    int maxPitch = -1;
    int minPitch = 128;
@@ -128,7 +128,7 @@ void NoteLooper::DrawModule()
                }
                ofSetColor(255,0,0);
                if (noteOff == -1)
-                  DrawText("x",x,y+8);
+                  DrawTextNormal("x",x,y+8);
             }
             else
             {

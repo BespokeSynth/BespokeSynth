@@ -101,7 +101,7 @@ void FollowingSong::DrawModule()
    
    ofPushMatrix();
    ofTranslate(10,20);
-   DrawText(mSample.Name(),100,-10);
+   DrawTextNormal(mSample.Name(),100,-10);
    DrawAudioBuffer(540, 100, mSample.Data(), 0, mSample.LengthInSamples()/mSample.GetSampleRateRatio(), mSample.GetPlayPosition());
    ofPopMatrix();
    

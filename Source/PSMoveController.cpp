@@ -144,7 +144,7 @@ void PSMoveController::DrawModule()
    mBindEnergy->Draw();
    
 
-   DrawText("b: "+ofToString(mMoveMgr.GetBattery(0),1), 80, 14);
+   DrawTextNormal("b: "+ofToString(mMoveMgr.GetBattery(0),1), 80, 14);
 }
 
 void PSMoveController::CheckboxUpdated(Checkbox* checkbox)

@@ -781,7 +781,7 @@ void MidiController::DrawModule()
       int w,h;
       GetDimensions(w, h);
       
-      DrawText("last input: "+mLastInput,60,h-5);
+      DrawTextNormal("last input: "+mLastInput,60,h-5);
       
       if (gTime - mLastActivityTime < 200)
       {
@@ -805,12 +805,12 @@ void MidiController::DrawModule()
       if (mIsConnected)
       {
          ofSetColor(ofColor::green);
-         DrawText("connected", 3, 63);
+         DrawTextNormal("connected", 3, 63);
       }
       else
       {
          ofSetColor(ofColor::red);
-         DrawText("not connected", 3, 63);
+         DrawTextNormal("not connected", 3, 63);
       }
       ofPopStyle();
       
@@ -949,12 +949,12 @@ void MidiController::DrawModule()
       if (mIsConnected)
       {
          ofSetColor(ofColor::green);
-         DrawText("connected", 160, 13);
+         DrawTextNormal("connected", 160, 13);
       }
       else
       {
          ofSetColor(ofColor::red);
-         DrawText("not connected", 160, 13);
+         DrawTextNormal("not connected", 160, 13);
       }
       ofPopStyle();
       
@@ -963,8 +963,8 @@ void MidiController::DrawModule()
       mAddConnectionButton->SetPosition(mAddConnectionButton->GetPosition(true).x, h-17);
       mAddConnectionButton->Draw();
       
-      //DrawText("                                                                                                                                                                MIDI out                           all", 12, 34);
-      //DrawText("midi       num   chan    path                                                           type       value        inc        feedback    off    on    blink  pages", 12, 46);
+      //DrawTextNormal("                                                                                                                                                                MIDI out                           all", 12, 34);
+      //DrawTextNormal("midi       num   chan    path                                                           type       value        inc        feedback    off    on    blink  pages", 12, 46);
       
       list<UIControlConnection*> toDraw;
       //draw pageless ones first

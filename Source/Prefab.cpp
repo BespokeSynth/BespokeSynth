@@ -80,7 +80,7 @@ void Prefab::DrawModule()
    
    mSaveButton->Draw();
    mLoadButton->Draw();
-   DrawText("add/remove", 18, 14);
+   DrawTextNormal("add/remove", 18, 14);
    
    mModuleContainer.Draw();
 }

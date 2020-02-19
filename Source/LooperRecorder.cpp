@@ -319,7 +319,7 @@ void LooperRecorder::DrawModule()
       if (cents < 0)
          detune += " -" + ofToString(-cents) + " cents";
       
-      DrawText(speed + detune,5,118);
+      DrawTextNormal(speed + detune,5,118);
    }
 
    mRecordBuffer.Draw(3,3,90,50,gSampleRate,0);
@@ -345,7 +345,7 @@ void LooperRecorder::DrawModule()
    if (mDrawDebug)
       mRecordBuffer.Draw(0,162,800,100,-1,0);
    
-   DrawText("loopers:",125,109);
+   DrawTextNormal("loopers:",125,109);
 }
 
 void LooperRecorder::RemoveLooper(Looper* looper)

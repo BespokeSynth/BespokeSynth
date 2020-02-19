@@ -102,7 +102,7 @@ void KompleteKontrol::DrawModule()
    if (Minimized() || IsVisible() == false)
       return;
    
-   DrawText("midicontroller:",5,13);
+   DrawTextNormal("midicontroller:",5,13);
 }
 
 void KompleteKontrol::PostRepatch(PatchCableSource* cableSource, bool fromUserClick)

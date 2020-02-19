@@ -83,7 +83,7 @@ void QuickSpawnMenu::DrawModule()
          ofSetColor(255, 255, 0);
       else
          ofSetColor(255,255,255);
-      DrawText(mElements[i], 1, i*itemSpacing+12);
+      DrawTextNormal(mElements[i], 1, i*itemSpacing+12);
    }
    
    ofPopStyle();

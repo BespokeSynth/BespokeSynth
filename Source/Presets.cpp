@@ -96,7 +96,7 @@ void Presets::DrawModule()
    if (hover != -1 && !mPresetCollection.empty())
    {
       assert(hover >= 0 && hover < mPresetCollection.size());
-      DrawText(mPresetCollection[hover].mDescription,50,0);
+      DrawTextNormal(mPresetCollection[hover].mDescription,50,0);
    }
 }
 

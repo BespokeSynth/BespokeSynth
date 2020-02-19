@@ -32,7 +32,7 @@ void Neighborhooder::DrawModule()
    mMinSlider->Draw();
    mRangeSlider->Draw();
    
-   DrawText(NoteName(mMinPitch)+ofToString(mMinPitch/12 - 2), 91, 15);
+   DrawTextNormal(NoteName(mMinPitch)+ofToString(mMinPitch/12 - 2), 91, 15);
 }
 
 void Neighborhooder::CheckboxUpdated(Checkbox *checkbox)

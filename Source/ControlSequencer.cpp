@@ -122,7 +122,7 @@ void ControlSequencer::DrawModule()
       ofPushStyle();
       ofSetColor(ofColor::grey);
       float val = mGrid->GetVal(currentHover % mGrid->GetCols(), currentHover / mGrid->GetCols());
-      DrawText(mUIControl->GetDisplayValue(mUIControl->GetValueForMidiCC(val)), mGrid->GetPosition(true).x, mGrid->GetPosition(true).y+12);
+      DrawTextNormal(mUIControl->GetDisplayValue(mUIControl->GetValueForMidiCC(val)), mGrid->GetPosition(true).x, mGrid->GetPosition(true).y+12);
       ofPopStyle();
    }
 }

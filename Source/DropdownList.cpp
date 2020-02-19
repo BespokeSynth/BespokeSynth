@@ -107,7 +107,7 @@ void DropdownList::Render()
    float xOffset = 0;
    if (mDrawLabel)
    {
-      DrawText(Name(), mX, mY+12);
+      DrawTextNormal(Name(), mX, mY+12);
       xOffset = mLabelSize;
    }
    
@@ -128,7 +128,7 @@ void DropdownList::Render()
 
    ofSetColor(textColor);
    
-   DrawText(GetDisplayValue(*mVar), mX+2+xOffset, mY+12);
+   DrawTextNormal(GetDisplayValue(*mVar), mX+2+xOffset, mY+12);
    if (mDrawTriangle)
       ofTriangle(mX+w-11, mY+4, mX+w-3, mY+4, mX+w-7, mY+11);
 
@@ -154,7 +154,7 @@ void DropdownList::DrawDropdown(int w, int h)
       else
          ofSetColor(255,255,255);
       
-      DrawText(mElements[i].mLabel, 1+mModalWidth*col, (i%mMaxPerColumn)*itemSpacing+12);
+      DrawTextNormal(mElements[i].mLabel, 1+mModalWidth*col, (i%mMaxPerColumn)*itemSpacing+12);
    }
    ofSetColor(255,255,255);
    ofSetLineWidth(.5f);

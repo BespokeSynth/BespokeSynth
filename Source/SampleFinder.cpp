@@ -170,8 +170,8 @@ void SampleFinder::DrawModule()
          mDoubleLengthButton->Draw();
          mHalveLengthButton->Draw();
          mReverseCheckbox->Draw();
-         DrawText(ofToString(mSample->GetPlayPosition()),335,50);
-         DrawText("speed: "+ofToString(GetSpeed()), 4, 55);
+         DrawTextNormal(ofToString(mSample->GetPlayPosition()),335,50);
+         DrawTextNormal("speed: "+ofToString(GetSpeed()), 4, 55);
       }
    }
 }

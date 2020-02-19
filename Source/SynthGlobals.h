@@ -148,7 +148,7 @@ float Interp(float a, float start, float end);
 double GetPhaseInc(float freq);
 void FloatWrap(float& num, float space);
 void FloatWrap(double& num, float space);
-void DrawText(string text, int x, int y, float size = 15);
+void DrawTextNormal(string text, int x, int y, float size = 15);
 void DrawTextLeftJustify(string text, int x, int y, float size = 15);
 void DrawTextBold(string text, int x, int y, float size = 15);
 float GetStringWidth(string text, float size = 15);

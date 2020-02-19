@@ -36,7 +36,7 @@ void ScaleDetect::DrawModule()
    mMatchesDropdown->Draw();
    mListMutex.unlock();
 
-   DrawText(NoteName(mLastNote), 5, 12);
+   DrawTextNormal(NoteName(mLastNote), 5, 12);
    
    if (mNotes.size() <= 7)
    {
@@ -47,7 +47,7 @@ void ScaleDetect::DrawModule()
       sort(rootRelative.begin(), rootRelative.end());
       for (int i=0; i<rootRelative.size(); ++i)
          pitchString += ofToString(rootRelative[i]) + " ";
-      DrawText(pitchString, 40, 30);
+      DrawTextNormal(pitchString, 40, 30);
    }
 }
 

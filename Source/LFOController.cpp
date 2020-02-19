@@ -123,7 +123,7 @@ void LFOController::DrawModule()
    
    if (mSlider && mLFO && mLFO->IsEnabled())
    {
-      DrawText(mSlider->Name(), 50, 70);
+      DrawTextNormal(mSlider->Name(), 50, 70);
       DrawConnection(mSlider);
    }
 }

@@ -295,7 +295,7 @@ void SampleEditor::DrawModule()
    mKeepPitchCheckbox->Draw();
    mPitchShiftSlider->Draw();
 
-   DrawText("Original BPM:"+ofToString(mOriginalBpm,1),100,12);
+   DrawTextNormal("Original BPM:"+ofToString(mOriginalBpm,1),100,12);
 
    if (mSample)
    {
@@ -377,7 +377,7 @@ void SampleEditor::DrawModule()
          mPadSampleButton->Draw();
          mWriteButton->Draw();
          if (mSample)
-            DrawText(ofToString(mSample->GetPlayPosition()),335,50);
+            DrawTextNormal(ofToString(mSample->GetPlayPosition()),335,50);
       }
    }
 }

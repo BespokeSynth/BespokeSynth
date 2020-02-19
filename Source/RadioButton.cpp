@@ -166,7 +166,7 @@ void RadioButton::Render()
 
       ofSetColor(textColor);
       //ofRect(mX,mY+i*radioSpacing,w,15);
-      DrawText(mElements[i].mLabel, x+2, y+12);
+      DrawTextNormal(mElements[i].mLabel, x+2, y+12);
    }
 
    ofPopStyle();

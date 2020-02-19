@@ -229,7 +229,7 @@ void ControllingSong::DrawModule()
       ofPushMatrix();
       ofTranslate(10,50);
       if (mCurrentSongIndex != -1)
-         DrawText(mSongList["songs"][mCurrentSongIndex]["name"].asString(),0,-10);
+         DrawTextNormal(mSongList["songs"][mCurrentSongIndex]["name"].asString(),0,-10);
       DrawAudioBuffer(540, 100, mSample.Data(), 0, mSample.LengthInSamples()/mSample.GetSampleRateRatio(), mSample.GetPlayPosition());
       ofPopMatrix();
    }

@@ -56,7 +56,7 @@ void ClickButton::Render()
    ofNoFill();
 
    ofSetColor(textColor);
-   DrawText(Name(), mX+2, mY+12);
+   DrawTextNormal(Name(), mX+2, mY+12);
    
    ofPopStyle();
    
