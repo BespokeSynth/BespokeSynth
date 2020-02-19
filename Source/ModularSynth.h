@@ -16,6 +16,7 @@
 #include "LocationZoomer.h"
 #include "EffectFactory.h"
 #include "ModuleContainer.h"
+#include <climits>
 
 class IAudioSource;
 class InputChannel;
