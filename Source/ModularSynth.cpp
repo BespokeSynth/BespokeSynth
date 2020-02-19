@@ -406,29 +406,34 @@ void ModularSynth::KeyPressed(int key, bool isRepeat)
    if (gHoveredUIControl &&
        TextEntry::GetActiveTextEntry() == nullptr)
    {
-      bool grabEntry = false;
-      if (GetKeyModifiers() == kModifier_None &&
-          (CharacterFunctions::isDigit((char)key) || key == '.' || key == '-'))
-         grabEntry = true;
-      if (key == 'v' && GetKeyModifiers() == kModifier_Command)
+      if ((key == OF_KEY_DOWN || key == OF_KEY_UP) && !isRepeat)
       {
-         juce::String clipboard = SystemClipboard::getTextFromClipboard();
-         bool notNumber = false;
-         for (int i=0; i<clipboard.length(); ++i)
-         {
-            if (!CharacterFunctions::isDigit((char)clipboard[i]) && clipboard[i] != '.' && clipboard[i] != '-')
-            {
-               notNumber = true;
-               break;
-            }
-         }
-         
-         if (!notNumber)
-            grabEntry = true;
+         float inc;
+         if ((key == OF_KEY_DOWN && gHoveredUIControl->InvertScrollDirection() == false) ||
+             (key == OF_KEY_UP   && gHoveredUIControl->InvertScrollDirection() == true))
+            inc = -1;
+         else
+            inc = 1;
+         if (GetKeyModifiers() & kModifier_Shift)
+            inc *= .01f;
+         gHoveredUIControl->Increment(inc);
       }
-      
-      if (grabEntry)
+      else if (key == '[' && !isRepeat)
+      {
+         gHoveredUIControl->Halve();
+      }
+      else if (key == ']' && !isRepeat)
+      {
+         gHoveredUIControl->Double();
+      }
+      else if (key == '\\' && !isRepeat)
+      {
+         gHoveredUIControl->ResetToOriginal();
+      }
+      else
+      {
          gHoveredUIControl->AttemptTextInput();
+      }
    }
    
    if (TextEntry::GetActiveTextEntry())  //active text entry captures all input
@@ -479,28 +484,6 @@ void ModularSynth::KeyPressed(int key, bool isRepeat)
    //   ZoomView(.1f);
    //if (key == '-' && !isRepeat)
    //   ZoomView(-.1f);
-   
-   if (gHoveredUIControl)
-   {
-      if ((key == OF_KEY_DOWN || key == OF_KEY_UP) && !isRepeat)
-      {
-         float inc;
-         if ((key == OF_KEY_DOWN && gHoveredUIControl->InvertScrollDirection() == false) ||
-             (key == OF_KEY_UP   && gHoveredUIControl->InvertScrollDirection() == true))
-            inc = -1;
-         else
-            inc = 1;
-         if (GetKeyModifiers() & kModifier_Shift)
-            inc *= .01f;
-         gHoveredUIControl->Increment(inc);
-      }
-      if (key == '[' && !isRepeat)
-         gHoveredUIControl->Halve();
-      if (key == ']' && !isRepeat)
-         gHoveredUIControl->Double();
-      if (key == '\\' && !isRepeat)
-         gHoveredUIControl->ResetToOriginal();
-   }
 }
 
 void ModularSynth::KeyReleased(int key)

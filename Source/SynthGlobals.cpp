@@ -20,6 +20,7 @@
 #include "PatchCableSource.h"
 #include "ChannelBuffer.h"
 #include "IPulseReceiver.h"
+#include "exprtk/exprtk.hpp"
 
 #ifdef JUCE_MAC
 #import <execinfo.h>
@@ -1279,6 +1280,34 @@ void DrawFallbackText(const char* text, float posX, float posY)
 
       pen += ofVec2f(spacing * scale, 0);
    }
+}
+
+bool EvaluateExpression(string expressionStr, float currentValue, float& output)
+{
+   exprtk::symbol_table<float> symbolTable;
+   exprtk::expression<float> expression;
+   symbolTable.add_variable("current_value",currentValue);
+   symbolTable.add_constants();
+   expression.register_symbol_table(symbolTable);
+   
+   juce::String input = expressionStr;
+   if (input.startsWith("+="))
+      input = input.replace("+=", "current_value+");
+   if (input.startsWith("*="))
+      input = input.replace("*=", "current_value*");
+   if (input.startsWith("/="))
+      input = input.replace("/=", "current_value/");
+   if (input.startsWith("-="))
+      input = input.replace("-=", "current_value-");
+   
+   exprtk::parser<float> parser;
+   bool expressionValid = parser.compile(input.toStdString(), expression);
+   if (expressionValid)
+   {
+      output = expression.value();
+      return true;
+   }
+   return false;
 }
 
 #ifdef BESPOKE_DEBUG_ALLOCATIONS

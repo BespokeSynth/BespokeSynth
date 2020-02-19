@@ -135,7 +135,7 @@ private:
    float mLastDisplayedValue;
    
    TextEntry* mFloatEntry;
-   float mEntryValue;
+   char mEntryString[MAX_TEXTENTRY_LENGTH];
    
    bool mAllowMinMaxAdjustment;
    TextEntry* mMinEntry;
@@ -212,7 +212,7 @@ private:
    bool mShowName;
    
    TextEntry* mIntEntry;
-   int mEntryValue;
+   char mEntryString[MAX_TEXTENTRY_LENGTH];
    
    bool mAllowMinMaxAdjustment;
    TextEntry* mMinEntry;

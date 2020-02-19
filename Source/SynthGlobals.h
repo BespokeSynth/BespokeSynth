@@ -179,6 +179,7 @@ void LoadStateValidate(bool assertion);
 float GetLeftPanGain(float pan);
 float GetRightPanGain(float pan);
 void DrawFallbackText(const char* text, float posX, float posY);
+bool EvaluateExpression(string expression, float currentValue, float& output);
 
 inline static float RandomSample()
 {

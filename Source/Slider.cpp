@@ -590,7 +590,7 @@ bool FloatSlider::AttemptTextInput()
 {
    if (mFloatEntry)
       mFloatEntry->Delete();
-   mFloatEntry = new TextEntry(this, "", HIDDEN_UICONTROL, HIDDEN_UICONTROL, 10, &mEntryValue, mMin, mMax);
+   mFloatEntry = new TextEntry(this, "", HIDDEN_UICONTROL, HIDDEN_UICONTROL, 10, mEntryString);
    mFloatEntry->MakeActiveTextEntry(true);
    mFloatEntry->ClearInput();
    return true;
@@ -602,7 +602,11 @@ void FloatSlider::TextEntryComplete(TextEntry* entry)
    {
       mFloatEntry->Delete();
       mFloatEntry = nullptr;
-      SetValue(mEntryValue);
+      
+      float evaluated = 0;
+      bool expressionValid = EvaluateExpression(mEntryString, *GetModifyValue(), evaluated);
+      if (expressionValid)
+         SetValue(evaluated);
    }
    if (entry == mMaxEntry)
    {
@@ -913,7 +917,7 @@ bool IntSlider::AttemptTextInput()
 {
    if (mIntEntry)
       mIntEntry->Delete();
-   mIntEntry = new TextEntry(this, "", HIDDEN_UICONTROL, HIDDEN_UICONTROL, 10, &mEntryValue, mMin, mMax);
+   mIntEntry = new TextEntry(this, "", HIDDEN_UICONTROL, HIDDEN_UICONTROL, 10, mEntryString);
    mIntEntry->MakeActiveTextEntry(true);
    mIntEntry->ClearInput();
    return true;
@@ -925,7 +929,11 @@ void IntSlider::TextEntryComplete(TextEntry* entry)
    {
       mIntEntry->Delete();
       mIntEntry = nullptr;
-      SetValue(mEntryValue);
+      
+      float evaluated = 0;
+      bool expressionValid = EvaluateExpression(mEntryString, *mVar, evaluated);
+      if (expressionValid)
+         SetValue((int)(evaluated + .5f));
    }
    if (entry == mMaxEntry)
    {
