@@ -31,7 +31,7 @@ public:
    MainContentComponent()
    : mLastFpsUpdateTime(0)
    , mFrameCountAccum(0)
-   , mIsRetina(false)
+   , mPixelRatio(1)
    {
       openGLContext.setOpenGLVersionRequired(juce::OpenGLContext::openGL3_2);
       openGLContext.setContinuousRepainting(false);
@@ -201,7 +201,8 @@ public:
       
       {
          const MessageManagerLock lock;
-         mIsRetina =  (Desktop::getInstance().getDisplays().getMainDisplay().dpi == 144);
+         mPixelRatio = Desktop::getInstance().getDisplays().getMainDisplay().scale;
+         ofLog() << "pixel ratio: " << mPixelRatio;
       }
       
       startTimerHz(60);
@@ -223,13 +224,12 @@ public:
       
       float width = getWidth();
       float height = getHeight();
-      float pixelRatio = mIsRetina ? 2 : 1;
       
-      glViewport(0, 0, width*pixelRatio, height*pixelRatio);
+      glViewport(0, 0, width*mPixelRatio, height*mPixelRatio);
       glClearColor(0,0,0,0);
       glClear(GL_COLOR_BUFFER_BIT|GL_DEPTH_BUFFER_BIT|GL_STENCIL_BUFFER_BIT);
       
-      nvgBeginFrame(mVG, width, height, pixelRatio);
+      nvgBeginFrame(mVG, width, height, mPixelRatio);
       
       nvgLineCap(mVG, NVG_ROUND);
       nvgLineJoin(mVG, NVG_ROUND);
@@ -351,7 +351,7 @@ private:
    int64 mLastFpsUpdateTime;
    int mFrameCountAccum;
    list<int> mPressedKeys;
-   bool mIsRetina;
+   double mPixelRatio;
    
    JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (MainContentComponent)
 };
