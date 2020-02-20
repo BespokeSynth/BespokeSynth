@@ -43,7 +43,7 @@ public:
          auto bounds = Desktop::getInstance().getDisplays().getTotalBounds(true);
          screenWidth = bounds.getWidth();
          screenHeight = bounds.getHeight();
-         ofLog() << "pixel ratio: " << mPixelRatio << "screen width: " << screenWidth << " screen height: " << screenHeight;
+         ofLog() << "pixel ratio: " << mPixelRatio << " screen width: " << screenWidth << " screen height: " << screenHeight;
       }
       
       int width = 600;

@@ -63,6 +63,7 @@ private:
    vector<IUIControl*> mSaveDataControls;
    vector<string> mLabels;
    ClickButton* mApplyButton;
+   ClickButton* mDeleteButton;
    map<DropdownList*,ModuleSaveData::SaveVal*> mStringDropdowns;
 
    int mHeight;

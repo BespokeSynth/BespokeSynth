@@ -11,6 +11,7 @@
 #include "INoteSource.h"
 #include "IAudioReceiver.h"
 #include "INoteReceiver.h"
+#include "ModuleContainer.h"
 
 ModuleSaveDataPanel* TheSaveDataPanel = nullptr;
 
@@ -21,6 +22,7 @@ ModuleSaveDataPanel::ModuleSaveDataPanel()
 , mHeight(100)
 , mAlignmentX(100)
 , mApplyButton(nullptr)
+, mDeleteButton(nullptr)
 {
    assert(TheSaveDataPanel == nullptr);
    TheSaveDataPanel = this;
@@ -153,8 +155,13 @@ void ModuleSaveDataPanel::ReloadSaveData()
    
    y += 6;
    mApplyButton = new ClickButton(this,"apply",x,y);
-   y += itemSpacing;
    mSaveDataControls.push_back(mApplyButton);
+   if (!mSaveModule->IsSingleton())
+   {
+      mDeleteButton = new ClickButton(this,"delete module",x+50,y);
+      mSaveDataControls.push_back(mDeleteButton);
+   }
+   y += itemSpacing;
    
    mHeight = y+5;
 }
@@ -229,6 +236,11 @@ void ModuleSaveDataPanel::ButtonClicked(ClickButton* button)
 {
    if (button == mApplyButton)
       ApplyChanges();
+   if (button == mDeleteButton)
+   {
+      mSaveModule->GetOwningContainer()->DeleteModule(mSaveModule);
+      SetModule(nullptr);
+   }
 }
 
 void ModuleSaveDataPanel::CheckboxUpdated(Checkbox* checkbox)
