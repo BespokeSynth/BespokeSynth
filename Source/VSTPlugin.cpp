@@ -616,11 +616,13 @@ void VSTPlugin::LoadState(FileStreamIn& in)
    in >> hasPlugin;
    if (hasPlugin)
    {
-      assert(mPlugin != nullptr);
       int size;
       in >> size;
       char* data = new char[size];
       in.ReadGeneric(data, size);
-      mPlugin->setStateInformation(data, size);
+      if (mPlugin != nullptr)
+         mPlugin->setStateInformation(data, size);
+      else
+         TheSynth->LogEvent("Couldn't instantiate plugin to load state for", kLogEventType_Error);
    }
 }
