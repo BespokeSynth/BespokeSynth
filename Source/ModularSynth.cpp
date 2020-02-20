@@ -1302,6 +1302,26 @@ bool ModularSynth::LoadLayoutFromFile(string jsonFile, bool makeDefaultLayout /*
    
    LoadLayout(root);
    
+   if (juce::String(jsonFile).endsWith("blank.json"))
+   {
+      IDrawableModule* gain = FindModule("gain");
+      IDrawableModule* splitter = FindModule("splitter");
+      IDrawableModule* output1 = FindModule("output 1");
+      IDrawableModule* output2 = FindModule("output 2");
+      if (output1 != nullptr && output1->GetPosition().y > ofGetHeight() - 20)
+      {
+         float offset = ofGetHeight() - output1->GetPosition().y - 20;
+         if (gain != nullptr)
+            gain->SetPosition(gain->GetPosition().x, gain->GetPosition().y + offset);
+         if (splitter != nullptr)
+            splitter->SetPosition(splitter->GetPosition().x, splitter->GetPosition().y + offset);
+         if (output1 != nullptr)
+            output1->SetPosition(output1->GetPosition().x, output1->GetPosition().y + offset);
+         if (output2 != nullptr)
+            output2->SetPosition(output2->GetPosition().x, output2->GetPosition().y + offset);
+      }
+   }
+   
    if (makeDefaultLayout)
       UpdateUserPrefsLayout();
    

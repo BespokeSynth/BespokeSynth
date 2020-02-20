@@ -374,7 +374,7 @@ void TitleBar::ButtonClicked(ClickButton* button)
       TheSynth->PushModalFocusItem(mHelpDisplay);
    }
    if (button == mResetLayoutButton)
-      TheSynth->LoadLayoutFromFile(ofToDataPath("layouts/blank.json"));
+      TheSynth->LoadLayoutFromFile(ofToDataPath(TheSynth->GetUserPrefs()["layout"].asString()));
 }
 
 

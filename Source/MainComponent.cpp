@@ -36,6 +36,16 @@ public:
       openGLContext.setOpenGLVersionRequired(juce::OpenGLContext::openGL3_2);
       openGLContext.setContinuousRepainting(false);
       
+      int screenWidth, screenHeight;
+      {
+         const MessageManagerLock lock;
+         mPixelRatio = Desktop::getInstance().getDisplays().getMainDisplay().scale;
+         auto bounds = Desktop::getInstance().getDisplays().getTotalBounds(true);
+         screenWidth = bounds.getWidth();
+         screenHeight = bounds.getHeight();
+         ofLog() << "pixel ratio: " << mPixelRatio << "screen width: " << screenWidth << " screen height: " << screenHeight;
+      }
+      
       int width = 600;
       int height = 400;
       ofxJSONElement userPrefs;
@@ -45,6 +55,11 @@ public:
          width = userPrefs["width"].asInt();
          height = userPrefs["height"].asInt();
       }
+      
+      if (width + getPosition().x > screenWidth)
+         width = screenWidth - getPosition().x;
+      if (height + getPosition().y + 20 > screenHeight)
+         height = screenHeight - getPosition().y - 20;
       
       setSize(width, height);
       setWantsKeyboardFocus(true);
@@ -197,12 +212,6 @@ public:
          if (audioError.startsWith("No such device"))
             audioError += "\nfix this in userprefs.json (you can use \"auto\" for the default device)";
          mSynth.SetFatalError("error initializing audio device: "+audioError.toStdString());
-      }
-      
-      {
-         const MessageManagerLock lock;
-         mPixelRatio = Desktop::getInstance().getDisplays().getMainDisplay().scale;
-         ofLog() << "pixel ratio: " << mPixelRatio;
       }
       
       startTimerHz(60);
