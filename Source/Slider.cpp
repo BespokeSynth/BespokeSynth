@@ -933,7 +933,7 @@ void IntSlider::TextEntryComplete(TextEntry* entry)
       float evaluated = 0;
       bool expressionValid = EvaluateExpression(mEntryString, *mVar, evaluated);
       if (expressionValid)
-         SetValue((int)(evaluated + .5f));
+         SetValue(round(evaluated));
    }
    if (entry == mMaxEntry)
    {
