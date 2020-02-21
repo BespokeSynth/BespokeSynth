@@ -410,9 +410,10 @@ IDrawableModule* ModularSynth::GetLastClickedModule() const
 void ModularSynth::KeyPressed(int key, bool isRepeat)
 {
    if (gHoveredUIControl &&
-       TextEntry::GetActiveTextEntry() == nullptr)
+       TextEntry::GetActiveTextEntry() == nullptr &&
+       !isRepeat)
    {
-      if ((key == OF_KEY_DOWN || key == OF_KEY_UP) && !isRepeat)
+      if (key == OF_KEY_DOWN || key == OF_KEY_UP)
       {
          float inc;
          if ((key == OF_KEY_DOWN && gHoveredUIControl->InvertScrollDirection() == false) ||
@@ -424,15 +425,15 @@ void ModularSynth::KeyPressed(int key, bool isRepeat)
             inc *= .01f;
          gHoveredUIControl->Increment(inc);
       }
-      else if (key == '[' && !isRepeat)
+      else if (key == '[')
       {
          gHoveredUIControl->Halve();
       }
-      else if (key == ']' && !isRepeat)
+      else if (key == ']')
       {
          gHoveredUIControl->Double();
       }
-      else if (key == '\\' && !isRepeat)
+      else if (key == '\\')
       {
          gHoveredUIControl->ResetToOriginal();
       }
