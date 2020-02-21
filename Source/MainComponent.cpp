@@ -210,7 +210,9 @@ public:
       else
       {
          if (audioError.startsWith("No such device"))
-            audioError += "\nfix this in userprefs.json (you can use \"auto\" for the default device)";
+            audioError += "\n\nfix this in userprefs.json (you can use \"auto\" for the default device)";
+         else
+            audioError += "\n\ninitialization errors could potentially be fixed by changing buffer size, sample rate, or input/output devices in userprefs.json";
          mSynth.SetFatalError("error initializing audio device: "+audioError.toStdString());
       }
       

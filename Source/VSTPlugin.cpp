@@ -623,6 +623,6 @@ void VSTPlugin::LoadState(FileStreamIn& in)
       if (mPlugin != nullptr)
          mPlugin->setStateInformation(data, size);
       else
-         TheSynth->LogEvent("Couldn't instantiate plugin to load state for", kLogEventType_Error);
+         TheSynth->LogEvent("Couldn't instantiate plugin to load state for "+mModuleSaveData.GetString("vst"), kLogEventType_Error);
    }
 }
