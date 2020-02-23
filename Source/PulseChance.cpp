@@ -57,20 +57,16 @@ void PulseChance::DrawModule()
 
 void PulseChance::OnPulse(float velocity, int samplesTo, int flags)
 {
-   if (velocity > 0)
-      ComputeSliders(0);
+   ComputeSliders(0);
    
    bool accept = ofRandom(1) <= mChance;
-   if (accept || velocity == 0)
+   if (accept)
       DispatchPulse(GetPatchCableSource(), velocity, samplesTo, flags);
    
-   if (velocity > 0)
-   {
-      if (accept)
-         mLastAcceptTime = gTime;
-      else
-         mLastRejectTime = gTime;
-   }
+   if (accept)
+      mLastAcceptTime = gTime;
+   else
+      mLastRejectTime = gTime;
 }
 
 void PulseChance::GetModuleDimensions(int& width, int& height)

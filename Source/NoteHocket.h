@@ -15,9 +15,9 @@
 #include "IDrawableModule.h"
 #include "Checkbox.h"
 #include "INoteSource.h"
-#include "RadioButton.h"
+#include "Slider.h"
 
-class NoteHocket : public INoteReceiver, public INoteSource, public IDrawableModule, public IRadioButtonListener
+class NoteHocket : public INoteReceiver, public INoteSource, public IDrawableModule, public IFloatSliderListener
 {
 public:
    NoteHocket();
@@ -25,17 +25,11 @@ public:
    
    string GetTitleLabel() override { return "hocket"; }
    void CreateUIControls() override;
-
-   void PostRepatch(PatchCableSource* cableSource, bool fromUserClick) override;
    
    void PlayNote(double time, int pitch, int velocity, int voiceIdx, ModulationParameters modulation) override;
    void SendCC(int control, int value, int voiceIdx = -1) override;
    
-   void AddReceiver(INoteReceiver* receiver, const char* name);
-   void SelectNewReceiver();
-
-   //IRadioButtonListener
-   void RadioButtonUpdated(RadioButton* radio, int oldVal) override;
+   void FloatSliderUpdated(FloatSlider* slider, float oldVal) override {}
    
    virtual void LoadLayout(const ofxJSONElement& moduleInfo) override;
    virtual void SetUpFromSaveData() override;
@@ -43,11 +37,16 @@ public:
 private:
    //IDrawableModule
    void DrawModule() override;
-   void DrawModuleUnclipped() override;
-   void GetModuleDimensions(int& width, int& height) override;
+   void GetModuleDimensions(int& width, int& height) override { width = mWidth; height = mHeight; }
    bool Enabled() const override { return true; }
+   
+   void SendNoteToIndex(int index, double time, int pitch, int velocity, int voiceIdx, ModulationParameters modulation);
 
-   int mCurrentReceiver;
-   RadioButton* mRouteSelector;
-   vector<INoteReceiver*> mReceivers;
+   static const int kMaxDestinations = 5;
+   float mWeight[kMaxDestinations];
+   FloatSlider* mWeightSlider[kMaxDestinations];
+   PatchCableSource* mDestinationCables[kMaxDestinations];
+   float mWidth;
+   float mHeight;
+   int mLastNoteDestinations[128];
 };

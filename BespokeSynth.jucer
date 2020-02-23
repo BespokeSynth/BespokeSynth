@@ -158,6 +158,13 @@
         <FILE id="RG4zGd" name="TremoloEffect.h" compile="0" resource="0" file="Source/TremoloEffect.h"/>
       </GROUP>
       <GROUP id="{6781AC07-A090-A7AF-8D27-BCB6D9526ABD}" name="modules">
+        <FILE id="bY2TLB" name="PulseHocket.cpp" compile="1" resource="0" file="Source/PulseHocket.cpp"/>
+        <FILE id="eH4Xld" name="PulseHocket.h" compile="0" resource="0" file="Source/PulseHocket.h"/>
+        <FILE id="qxVbgn" name="PulseGate.cpp" compile="1" resource="0" file="Source/PulseGate.cpp"/>
+        <FILE id="biuPPf" name="PulseGate.h" compile="0" resource="0" file="Source/PulseGate.h"/>
+        <FILE id="aVjUaF" name="NotePanRandom.cpp" compile="1" resource="0"
+              file="Source/NotePanRandom.cpp"/>
+        <FILE id="TsVztT" name="NotePanRandom.h" compile="0" resource="0" file="Source/NotePanRandom.h"/>
         <FILE id="tVvPrG" name="PulseDelayer.cpp" compile="1" resource="0"
               file="Source/PulseDelayer.cpp"/>
         <FILE id="kqqdy5" name="PulseDelayer.h" compile="0" resource="0" file="Source/PulseDelayer.h"/>

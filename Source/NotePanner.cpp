@@ -35,7 +35,7 @@ void NotePanner::DrawModule()
 
 void NotePanner::PlayNote(double time, int pitch, int velocity, int voiceIdx, ModulationParameters modulation)
 {
-   if (mEnabled)
+   if (mEnabled && velocity > 0)
    {
       ComputeSliders(0);
       modulation.pan = mPan;

@@ -437,7 +437,7 @@ void ModularSynth::KeyPressed(int key, bool isRepeat)
       {
          gHoveredUIControl->ResetToOriginal();
       }
-      else if (key != OF_KEY_BACKSPACE)
+      else if (key != OF_KEY_BACKSPACE && key != ' ')
       {
          gHoveredUIControl->AttemptTextInput();
       }

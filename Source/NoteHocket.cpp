@@ -13,37 +13,85 @@
 #include "Scale.h"
 #include "ModularSynth.h"
 #include "PatchCableSource.h"
+#include "UIControlMacros.h"
 
 NoteHocket::NoteHocket()
-: mCurrentReceiver(0)
-, mRouteSelector(nullptr)
 {
+   mWeight[0] = 1;
+   for (int i=1; i<kMaxDestinations; ++i)
+      mWeight[i] = 0;
+   for (int i=0; i<128; ++i)
+      mLastNoteDestinations[i] = -1;
 }
 
 void NoteHocket::CreateUIControls()
 {
    IDrawableModule::CreateUIControls();
-   mRouteSelector = new RadioButton(this,"route",5,3,&mCurrentReceiver);
+   
+   UIBLOCK0();
+   for (int i=0; i<kMaxDestinations; ++i)
+   {
+      FLOATSLIDER(mWeightSlider[i],("weight "+ofToString(i)).c_str(),&mWeight[i],0,1);
+      mDestinationCables[i] = new PatchCableSource(this, kConnectionType_Note);
+      AddPatchCableSource(mDestinationCables[i]);
+      ofRectangle rect = mWeightSlider[i]->GetRect(true);
+      mDestinationCables[i]->SetManualPosition(rect.getMaxX() + 10, rect.y + rect.height/2);
+   }
+   ENDUIBLOCK(mWidth,mHeight);
+   mWidth += 20;
+   
+   GetPatchCableSource()->SetEnabled(false);
 }
 
 void NoteHocket::DrawModule()
 {
    if (Minimized() || IsVisible() == false)
       return;
-   mRouteSelector->Draw();
-}
-
-void NoteHocket::DrawModuleUnclipped()
-{
-   for (int i=0; i<mReceivers.size(); ++i)
-      DrawConnection(dynamic_cast<IClickable*>(mReceivers[i]));
+   
+   for (int i=0; i<kMaxDestinations; ++i)
+      mWeightSlider[i]->Draw();
 }
 
 void NoteHocket::PlayNote(double time, int pitch, int velocity, int voiceIdx, ModulationParameters modulation)
 {
+   int selectedDestination = 0;
    if (velocity > 0)
-      SelectNewReceiver();
-   PlayNoteOutput(time, pitch, velocity, voiceIdx, modulation);
+   {
+      ComputeSliders(0);
+      
+      float totalWeight = 0;
+      for (int i=0; i<kMaxDestinations; ++i)
+         totalWeight += mWeight[i];
+      float random = ofRandom(totalWeight);
+      
+      for (selectedDestination=0; selectedDestination<kMaxDestinations; ++selectedDestination)
+      {
+         if (random <= mWeight[selectedDestination] || selectedDestination == kMaxDestinations - 1)
+            break;
+         random -= mWeight[selectedDestination];
+      }
+      
+      if (mLastNoteDestinations[pitch] != -1 && mLastNoteDestinations[pitch] != selectedDestination)
+         SendNoteToIndex(mLastNoteDestinations[pitch], time, pitch, 0, voiceIdx, modulation);
+      mLastNoteDestinations[pitch] = selectedDestination;
+   }
+   else
+   {
+      selectedDestination = mLastNoteDestinations[pitch];
+      if (selectedDestination == -1)
+         return;
+      mLastNoteDestinations[pitch] = -1;
+   }
+   
+   SendNoteToIndex(selectedDestination, time, pitch, velocity, voiceIdx, modulation);
+}
+
+void NoteHocket::SendNoteToIndex(int index, double time, int pitch, int velocity, int voiceIdx, ModulationParameters modulation)
+{
+   const vector<INoteReceiver*>& receivers = mDestinationCables[index]->GetNoteReceivers();
+   mDestinationCables[index]->AddHistoryEvent(gTime, velocity > 0);
+   for (auto* receiver : receivers)
+      receiver->PlayNote(time, pitch, velocity);
 }
 
 void NoteHocket::SendCC(int control, int value, int voiceIdx)
@@ -51,79 +99,8 @@ void NoteHocket::SendCC(int control, int value, int voiceIdx)
    SendCCOutput(control, value, voiceIdx);
 }
 
-void NoteHocket::AddReceiver(INoteReceiver* receiver, const char* name)
-{
-   if (receiver)
-   {
-      mReceivers.push_back(receiver);
-      mRouteSelector->AddLabel(name, mReceivers.size() - 1);
-   }
-}
-
-void NoteHocket::SelectNewReceiver()
-{
-   int old = mCurrentReceiver;
-   mCurrentReceiver = ofRandom(0, mReceivers.size());
-   if (mCurrentReceiver != old)
-      RadioButtonUpdated(mRouteSelector, old);
-}
-
-void NoteHocket::RadioButtonUpdated(RadioButton* radio, int oldVal)
-{
-   if (radio == mRouteSelector)
-   {
-      if (mReceivers.empty())
-         return;
-      
-      for (auto cable : GetPatchCableSource()->GetPatchCables())
-      {
-         if (mReceivers[oldVal] == dynamic_cast<INoteReceiver*>(cable->GetTarget()))
-         {
-            mNoteOutput.FlushTarget(mReceivers[oldVal]);
-            cable->Destroy();
-            break;
-         }
-      }
-      
-      GetPatchCableSource()->AddPatchCable(dynamic_cast<IClickable*>(mReceivers[mCurrentReceiver]));
-   }
-}
-
-void NoteHocket::PostRepatch(PatchCableSource* cableSource, bool fromUserClick)
-{
-   INoteSource::PostRepatch(cableSource, fromUserClick);
-   for (auto cable : GetPatchCableSource()->GetPatchCables())
-   {
-      INoteReceiver* target = dynamic_cast<INoteReceiver*>(cable->GetTarget());
-      if (target && !VectorContains(target, mReceivers))
-         AddReceiver(target, dynamic_cast<IClickable*>(target)->Name());
-      
-      for (size_t i=0; i<mReceivers.size(); ++i)
-      {
-         if (mReceivers[i] == target)
-            mCurrentReceiver = i;
-      }
-   }
-}
-
-void NoteHocket::GetModuleDimensions(int& width, int& height)
-{
-   int w,h;
-   mRouteSelector->GetDimensions(w, h);
-   width = 10+w;
-   height = 8+h;
-}
-
 void NoteHocket::LoadLayout(const ofxJSONElement& moduleInfo)
 {
-   const Json::Value& targets = moduleInfo["targets"];
-   for (int i=0; i<targets.size(); ++i)
-   {
-      string target = targets[i].asString();
-      INoteReceiver* receiver = TheSynth->FindNoteReceiver(target.c_str());
-      AddReceiver(receiver, target.c_str());
-   }
-   
    SetUpFromSaveData();
 }
 
@@ -134,11 +111,4 @@ void NoteHocket::SetUpFromSaveData()
 void NoteHocket::SaveLayout(ofxJSONElement& moduleInfo)
 {
    IDrawableModule::SaveLayout(moduleInfo);
-   
-   moduleInfo["targets"].resize(mReceivers.size());
-   for (int i=0; i<mReceivers.size(); ++i)
-   {
-      IDrawableModule* module = dynamic_cast<IDrawableModule*>(mReceivers[i]);
-      moduleInfo["targets"][i] = module->Name();
-   }
 }
