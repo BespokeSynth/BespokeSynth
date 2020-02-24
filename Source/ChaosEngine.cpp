@@ -340,7 +340,7 @@ void ChaosEngine::OnClicked(int x, int y, bool right)
          {
             mProgressionMutex.lock();
             mChordProgression.erase(mChordProgression.begin()+idx);
-            mChordProgressionSlider->SetExtents(0, mChordProgression.size()-1);
+            mChordProgressionSlider->SetExtents(0, (int)mChordProgression.size()-1);
             mProgressionMutex.unlock();
          }
          else
@@ -661,7 +661,7 @@ void ChaosEngine::GenerateRandomProgression()
       }
    }
    
-   mChordProgressionSlider->SetExtents(0, mChordProgression.size()-1);
+   mChordProgressionSlider->SetExtents(0, (int)mChordProgression.size()-1);
    
    mProgressionMutex.unlock();
 }
@@ -730,7 +730,7 @@ void ChaosEngine::DropdownUpdated(DropdownList* list, int oldVal)
          mSectionIdx = 0;
       }
       
-      mChordProgressionSlider->SetExtents(0, mChordProgression.size()-1);
+      mChordProgressionSlider->SetExtents(0, (int)mChordProgression.size()-1);
       mProgressionMutex.unlock();
    }
    if (list == mRootNoteList || list == mChordTypeList)
@@ -772,7 +772,7 @@ void ChaosEngine::ButtonClicked(ClickButton* button)
          mChordProgression.push_back(chord);
       }
       mProgressionMutex.unlock();
-      mChordProgressionSlider->SetExtents(0, mChordProgression.size()-1);
+      mChordProgressionSlider->SetExtents(0, (int)mChordProgression.size()-1);
    }
    if (button == mRandomProgressionButton)
    {
@@ -799,7 +799,7 @@ void ChaosEngine::RadioButtonUpdated(RadioButton* list, int oldVal)
       
       mProgressionMutex.unlock();
       
-      mChordProgressionSlider->SetExtents(0, mChordProgression.size()-1);
+      mChordProgressionSlider->SetExtents(0, (int)mChordProgression.size()-1);
    }
 }
 

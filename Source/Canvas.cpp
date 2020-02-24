@@ -263,7 +263,7 @@ void Canvas::OnClicked(int x, int y, bool right)
    else
    {
       bool clickedElement = false;
-      for (int i=mElements.size()-1; i>=0; --i)
+      for (int i=(int)mElements.size()-1; i>=0; --i)
       {
          if (IsOnElement(mElements[i], x, y))
          {
@@ -456,7 +456,7 @@ void Canvas::MouseReleased()
    if (mDragSelecting)
    {
       vector<CanvasElement*> selectedElements;
-      for (int i=mElements.size()-1; i>=0; --i)
+      for (int i=(int)mElements.size()-1; i>=0; --i)
       {
          if (mElements[i]->GetRect(true, false).intersects(mDragSelectRect) ||
              (mWrap && mElements[i]->GetRect(true, true).intersects(mDragSelectRect)))

@@ -102,7 +102,7 @@ void SampleBank::LoadList(const char* filename)
             info.mType = type;
 
             mSamples.push_back(info);
-            mSamplesDropdown->AddLabel(sample->Name(), mSamples.size()-1);
+            mSamplesDropdown->AddLabel(sample->Name(), (int)mSamples.size()-1);
          }
       }
       fin.close();

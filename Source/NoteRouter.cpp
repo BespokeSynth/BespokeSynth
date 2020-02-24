@@ -45,7 +45,7 @@ void NoteRouter::AddReceiver(INoteReceiver* receiver, const char* name)
    if (receiver)
    {
       mReceivers.push_back(receiver);
-      mRouteSelector->AddLabel(name, mReceivers.size() - 1);
+      mRouteSelector->AddLabel(name, (int)mReceivers.size() - 1);
       mModuleSaveData.UpdatePropertyMax("selectedmask",(1 << mReceivers.size())-1);
    }
 }
@@ -156,7 +156,7 @@ void NoteRouter::SaveLayout(ofxJSONElement& moduleInfo)
 {
    IDrawableModule::SaveLayout(moduleInfo);
    
-   moduleInfo["targets"].resize(mReceivers.size());
+   moduleInfo["targets"].resize((unsigned int)mReceivers.size());
    for (int i=0; i<mReceivers.size(); ++i)
    {
       IDrawableModule* module = dynamic_cast<IDrawableModule*>(mReceivers[i]);

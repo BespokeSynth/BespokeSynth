@@ -334,7 +334,7 @@ void BeatBloks::FilesDropped(vector<string> files, int x, int y)
    mClipEnd = mSample->LengthInSamples();
    mZoomStart = 0;
    mZoomEnd = MIN(1400000,mClipEnd);
-   mNumBars = mBars.size();
+   mNumBars = (int)mBars.size();
    mZoomStartSlider->SetExtents(0,mSample->LengthInSamples());
    mZoomEndSlider->SetExtents(0,mSample->LengthInSamples());
    UpdateZoomExtents();

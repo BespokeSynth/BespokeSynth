@@ -596,7 +596,7 @@ void VSTPlugin::SaveState(FileStreamOut& out)
       juce::MemoryBlock vstState;
       mPlugin->getStateInformation(vstState);
       out << (int)vstState.getSize();
-      out.WriteGeneric(vstState.getData(), vstState.getSize());
+      out.WriteGeneric(vstState.getData(), (int)vstState.getSize());
    }
    else
    {

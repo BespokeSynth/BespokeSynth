@@ -221,7 +221,7 @@ void RadioSequencer::SyncControlCablesToGrid()
    
    if (mGrid->GetRows() > mControlCables.size())
    {
-      int oldSize = mControlCables.size();
+      int oldSize = (int)mControlCables.size();
       mControlCables.resize(mGrid->GetRows());
       for (int i=oldSize; i<mControlCables.size(); ++i)
       {

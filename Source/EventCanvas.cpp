@@ -306,7 +306,7 @@ void EventCanvas::SyncControlCablesToCanvas()
    
    if (mCanvas->GetNumRows() > mControlCables.size())
    {
-      int oldSize = mControlCables.size();
+      int oldSize = (int)mControlCables.size();
       mControlCables.resize(mCanvas->GetNumRows());
       for (int i=oldSize; i<mControlCables.size(); ++i)
       {

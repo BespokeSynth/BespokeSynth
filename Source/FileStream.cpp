@@ -139,5 +139,5 @@ bool FileStreamIn::Eof()
 
 int FileStreamIn::GetFilePosition()
 {
-   return mStream.getPosition();
+   return (int)mStream.getPosition();
 }

@@ -281,7 +281,7 @@ static int get_string_property(IOHIDDeviceRef device, CFStringRef prop, wchar_t 
 			len,
 			&used_buf_len);
 		buf[len-1] = 0x00000000;
-		return used_buf_len;
+		return (int)used_buf_len;
 	}
 	else
 		return 0;
@@ -790,7 +790,7 @@ static int set_report(hid_device *dev, IOHIDReportType type, const unsigned char
 					   data_to_send, length_to_send);
 	
 		if (res == kIOReturnSuccess) {
-			return length;
+			return (int)length;
 		}
 		else
 			return -1;

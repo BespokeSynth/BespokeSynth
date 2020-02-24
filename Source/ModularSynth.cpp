@@ -346,7 +346,7 @@ void ModularSynth::DrawConsole()
       consoleY += 15;
    }
    
-   int outputLines = mEvents.size();
+   int outputLines = (int)mEvents.size();
    if (TextEntry::GetActiveTextEntry() == mConsoleEntry)
       outputLines += mErrors.size();
    if (outputLines > 0)
@@ -1926,11 +1926,11 @@ void ModularSynth::SaveOutput()
    
    for (int i=0; i<mRecordingLength; ++i)
    {
-      mSaveOutputBuffer[0][i] = mOutputBuffer.GetSample(mRecordingLength-i-1, 0);
-      mSaveOutputBuffer[1][i] = mOutputBuffer.GetSample(mRecordingLength-i-1, 1);
+      mSaveOutputBuffer[0][i] = mOutputBuffer.GetSample((int)mRecordingLength-i-1, 0);
+      mSaveOutputBuffer[1][i] = mOutputBuffer.GetSample((int)mRecordingLength-i-1, 1);
    }
 
-   Sample::WriteDataToFile(filename.c_str(), mSaveOutputBuffer, mRecordingLength, 2);
+   Sample::WriteDataToFile(filename.c_str(), mSaveOutputBuffer, (int)mRecordingLength, 2);
    
    //mOutputBufferMeasurePos.ReadChunk(mSaveOutputBuffer, mRecordingLength);
    //Sample::WriteDataToFile(filenamePos.c_str(), mSaveOutputBuffer, mRecordingLength, 1);

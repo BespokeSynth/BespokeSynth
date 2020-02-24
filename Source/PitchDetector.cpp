@@ -43,7 +43,7 @@ PitchDetector::PitchDetector()
    
    mnoverlap = 4;
    
-   mFFT = new ::FFT(mcbsize);
+   mFFT = new ::FFT((int)mcbsize);
    
    mffttime = (float*)calloc(mcbsize, sizeof(float));
    mfftfreqre = (float*)calloc(mcorrsize, sizeof(float));

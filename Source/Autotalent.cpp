@@ -134,7 +134,7 @@ Autotalent::Autotalent()
 
    mnoverlap = 4;
 
-   mFFT = new ::FFT(mcbsize);
+   mFFT = new ::FFT((int)mcbsize);
 
    mffttime = (float*)calloc(mcbsize, sizeof(float));
    mfftfreqre = (float*)calloc(mcorrsize, sizeof(float));
@@ -372,8 +372,8 @@ void Autotalent::Process(double time)
    {
       if (iNotes[ti]>=0)
       {
-         iPitch2Note[ti] = ti2;
-         iNote2Pitch[ti2] = ti;
+         iPitch2Note[ti] = (int)ti2;
+         iNote2Pitch[ti2] = (int)ti;
          ti2 = ti2 + 1;
       }
       else
@@ -381,7 +381,7 @@ void Autotalent::Process(double time)
          iPitch2Note[ti] = -1;
       }
    }
-   numNotes = ti2;
+   numNotes = (int)ti2;
    while (ti2<12)
    {
       iNote2Pitch[ti2] = -1;
@@ -392,8 +392,8 @@ void Autotalent::Process(double time)
       for (ti=0; ti<12; ti++)
       {
          iNotes[ti] = 1;
-         iPitch2Note[ti] = ti;
-         iNote2Pitch[ti] = ti;
+         iPitch2Note[ti] = (int)ti;
+         iNote2Pitch[ti] = (int)ti;
       }
       numNotes = 12;
    }

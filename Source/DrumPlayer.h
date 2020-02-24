@@ -47,7 +47,7 @@ public:
    //IAudioSource
    void Process(double time) override;
    void SetEnabled(bool enabled) override { mEnabled = enabled; }
-   int GetNumTargets() override { return 1 + mIndividualOutputs.size(); }
+   int GetNumTargets() override { return 1 + (int)mIndividualOutputs.size(); }
    
    //INoteReceiver
    void PlayNote(double time, int pitch, int velocity, int voiceIdx = -1, ModulationParameters modulation = ModulationParameters()) override;

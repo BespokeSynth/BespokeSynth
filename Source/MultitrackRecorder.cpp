@@ -304,7 +304,7 @@ void MultitrackRecorder::RecordStructure(int offset)
       structure.mSwing = TheTransport->GetSwing();
       mStructureInfoPoints.push_back(structure);
       
-      mActiveStructureIdx = mStructureInfoPoints.size() - 1;
+      mActiveStructureIdx = (int)mStructureInfoPoints.size() - 1;
    }
 }
 
@@ -334,7 +334,7 @@ void MultitrackRecorder::AddRecordBuffer()
 {
    mMutex.Lock("main thread");
    mRecordBuffers.push_back(new RecordBuffer(mRecordingLength));
-   mRecordIdx = mRecordBuffers.size() - 1;
+   mRecordIdx = (int)mRecordBuffers.size() - 1;
    mMutex.Unlock();
 }
 

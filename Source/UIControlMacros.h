@@ -10,6 +10,8 @@
 
 #pragma once
 
+#include "SynthGlobals.h"
+
 // variable-argument macro technique from https://stackoverflow.com/questions/9183993/msvc-variadic-macro-expansion
 #define GLUE(x, y) x y
 #define RETURN_ARG_COUNT(_1_, _2_, _3_, _4_, _5_, count, ...) count
@@ -23,7 +25,7 @@
 #define UIBLOCK0() UIBLOCK3(3,3,100)
 #define UIBLOCK1(A) UIBLOCK3(3,3,A)
 #define UIBLOCK2(A,B) UIBLOCK3(A,B,100)
-#define UIBLOCK3(A,B,C) { float xPos = A; float yPos = B; float originalY = B; float sliderWidth = C; float originalSliderWidth = C; IUIControl* lastUIControl = nullptr; float xMax = 0; float yMax = 0; float xOffset = 0; (void)originalY; (void)originalSliderWidth; (void)sliderWidth;
+#define UIBLOCK3(A,B,C) { float xPos = A; float yPos = B; float originalY = B; float sliderWidth = C; float originalSliderWidth = C; IUIControl* lastUIControl = nullptr; float xMax = 0; float yMax = 0; float xOffset = 0; UNUSED(originalY); UNUSED(originalSliderWidth); UNUSED(sliderWidth);
 #define UIBLOCK(...) CALL_OVERLOAD(UIBLOCK, __VA_ARGS__)
 
 #define UIBLOCK_SHIFTDOWN() yPos += lastUIControl->GetDimensions().y + 2;

@@ -55,7 +55,7 @@ public:
    void SetValueDirect(float value) override;
    float GetValue() const override;
    float GetMidiValue() override;
-   int GetNumValues() override { return mElements.size(); }
+   int GetNumValues() override { return (int)mElements.size(); }
    string GetDisplayValue(float val) const override;
    bool IsBitmask() override { return mMultiSelect; }
    bool InvertScrollDirection() override { return mDirection == kRadioVertical; }

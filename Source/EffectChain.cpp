@@ -252,7 +252,7 @@ void EffectChain::DrawModule()
 
 int EffectChain::NumRows() const
 {
-   return (mEffects.size() + mNumFXWide - 1) / mNumFXWide;  //round up
+   return ((int)mEffects.size() + mNumFXWide - 1) / mNumFXWide;  //round up
 }
 
 int EffectChain::GetRowHeight(int row)
@@ -427,7 +427,7 @@ void EffectChain::SaveLayout(ofxJSONElement& moduleInfo)
 {
    IDrawableModule::SaveLayout(moduleInfo);
    
-   moduleInfo["effects"].resize(mEffects.size());
+   moduleInfo["effects"].resize((unsigned int)mEffects.size());
    for (int i=0; i<mEffects.size(); ++i)
    {
       ofxJSONElement save;

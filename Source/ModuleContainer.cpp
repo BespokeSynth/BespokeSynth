@@ -43,13 +43,13 @@ void ModuleContainer::GetAllModules(vector<IDrawableModule*>& out)
 
 void ModuleContainer::Draw()
 {
-   for (int i = mModules.size()-1; i >= 0; --i)
+   for (int i = (int)mModules.size()-1; i >= 0; --i)
    {
       if (!mModules[i]->AlwaysOnTop())
          mModules[i]->Draw();
    }
    
-   for (int i = mModules.size()-1; i >= 0; --i)
+   for (int i = (int)mModules.size()-1; i >= 0; --i)
    {
       if (mModules[i]->AlwaysOnTop())
          mModules[i]->Draw();
@@ -128,7 +128,7 @@ void ModuleContainer::MouseMoved(float x, float y)
 {
    if (mOwner != nullptr) return;
    
-   for (int i=mModules.size()-1; i>=0; --i)  //run this backwards so that we can figure out the top hover control
+   for (int i=(int)mModules.size()-1; i>=0; --i)  //run this backwards so that we can figure out the top hover control
    {
       ModuleContainer* subcontainer = mModules[i]->GetContainer();
       if (subcontainer)
@@ -454,7 +454,7 @@ ofxJSONElement ModuleContainer::WriteModules()
    
    sort(saveModules.begin(), saveModules.end(), ModuleSorter);
    
-   modules.resize(saveModules.size());
+   modules.resize((unsigned int)saveModules.size());
    
    for (int i=0; i<saveModules.size(); ++i)
    {

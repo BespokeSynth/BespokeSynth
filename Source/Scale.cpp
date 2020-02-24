@@ -180,7 +180,7 @@ int Scale::MakeDiatonic(int pitch)
    
    int pitchOut = (pitch - mScale.mScaleRoot) % mTet; //transform into 0-12 scale space
    
-   for (int i=mScale.mScalePitches.size() - 1; i >= 0; --i)
+   for (int i=(int)mScale.mScalePitches.size() - 1; i >= 0; --i)
    {
       if (mScale.GetScalePitch(i) <= pitchOut)
       {
@@ -644,7 +644,7 @@ bool ScalePitches::IsInScale(int pitch) const
 
 int ScalePitches::GetPitchFromTone(int n) const
 {
-   int numTones = mScalePitches.size();
+   int numTones = (int)mScalePitches.size();
    assert(numTones > 0);
    int octave = n/numTones;
    while (n<0)
@@ -662,7 +662,7 @@ int ScalePitches::GetToneFromPitch(int pitch) const
    assert(mScaleRoot >= 0 && mScaleRoot < TheScale->GetTet());
    assert(mScalePitches.size());
    
-   int numTones = mScalePitches.size();
+   int numTones = (int)mScalePitches.size();
    int rootRel = pitch - mScaleRoot;
    while (rootRel < 0)
       rootRel += TheScale->GetTet();

@@ -56,7 +56,7 @@ float gCornerRoundness = 1;
 
 void SynthInit()
 {
-   srand(time(nullptr));
+   srand((unsigned int)time(nullptr));
    std::locale::global(std::locale::classic());
    
    gDefaultTempo = rand() % 80 + 75;

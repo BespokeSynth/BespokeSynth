@@ -668,7 +668,7 @@ void DrumPlayer::CreateKit()
    }
 
    mKits.push_back(kit);
-   mLoadedKit = mKits.size() - 1;
+   mLoadedKit = (int)mKits.size() - 1;
    mKitSelector->AddLabel(kit.mName.c_str(), mLoadedKit);
 }
 
@@ -748,7 +748,7 @@ void DrumPlayer::CheckboxUpdated(Checkbox* checkbox)
          if (mDrumHits[i].mHasIndividualOutput)
          {
             if (outputIndex == -1)
-               mIndividualOutputs.push_back(new IndividualOutput(this, i, mIndividualOutputs.size()));
+               mIndividualOutputs.push_back(new IndividualOutput(this, i, (int)mIndividualOutputs.size()));
          }
          else
          {

@@ -37,8 +37,8 @@ public:
    void OnGridButton(int x, int y, float velocity, IGridController* grid) override;
    
    //INoteReceiver
-   void PlayNote(double time, int pitch, int velocity, int voiceIdx, ModulationParameters modulation);
-   void SendCC(int control, int value, int voiceIdx) {}
+   void PlayNote(double time, int pitch, int velocity, int voiceIdx, ModulationParameters modulation) override;
+   void SendCC(int control, int value, int voiceIdx) override {}
    
    void CheckboxUpdated(Checkbox* checkbox) override;
    void FloatSliderUpdated(FloatSlider* slider, float oldVal) override;

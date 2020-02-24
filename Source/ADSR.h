@@ -28,7 +28,7 @@ public:
       float curve;
    };
    
-   ADSR(float a, float d, float s, float r) : mStartTime(-10000), mStopTime(-10000), mStartBlendFromValue(0), mStopBlendFromValue(0), mMaxSustain(-1), mFreeReleaseLevel(false) { Set(a,d,s,r); }
+   ADSR(float a, float d, float s, float r) : mStartBlendFromValue(0), mStopBlendFromValue(0), mStartTime(-10000), mStopTime(-10000), mMaxSustain(-1), mFreeReleaseLevel(false) { Set(a,d,s,r); }
    ADSR() : ADSR(1,1,1,1) {}
    void Start(double time, float target);
    void Start(double time, float target, float a, float d, float s, float r);

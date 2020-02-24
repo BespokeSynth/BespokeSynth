@@ -77,7 +77,7 @@ void LocationZoomer::GoHome()
 ofxJSONElement LocationZoomer::GetSaveData()
 {
    ofxJSONElement save;
-   save.resize(mLocations.size());
+   save.resize((unsigned int)mLocations.size());
    int i=0;
    for (auto iter = mLocations.begin(); iter != mLocations.end(); ++iter)
    {

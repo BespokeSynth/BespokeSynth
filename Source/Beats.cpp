@@ -151,7 +151,7 @@ void Beats::CheckboxUpdated(Checkbox *checkbox)
 
 void Beats::GetModuleDimensions(int& x, int&y)
 {
-   x = BEAT_COLUMN_WIDTH * mBeatColumns.size();
+   x = BEAT_COLUMN_WIDTH * (int)mBeatColumns.size();
    y = 96+15*(mRows+1);
 }
 

@@ -94,7 +94,7 @@ public:
    ScalePitches& GetScalePitches() { return mScale; }
    vector<int> GetPitchesForScale(string type);
    void SetRandomSeptatonicScale();
-   int GetNumScaleTypes() { return mScales.size(); }
+   int GetNumScaleTypes() { return (int)mScales.size(); }
    string GetScaleName(int index) { return mScales[index].mName; }
    int NumPitchesInScale() const { return mScale.NumPitchesInScale(); }
    int GetTet() const { return mTet; }

@@ -23,7 +23,7 @@ class SlowLayers : public IAudioProcessor, public IDrawableModule, public IDropd
 {
 public:
    SlowLayers();
-   ~SlowLayers();
+   virtual ~SlowLayers();
    static IDrawableModule* Create() { return new SlowLayers(); }
    
    string GetTitleLabel() override { return "slow layers"; }

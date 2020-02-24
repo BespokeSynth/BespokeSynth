@@ -181,7 +181,7 @@ void TextEntry::OnClicked(int x, int y, bool right)
    size_t checkLength = strnlen(mString, MAX_TEXTENTRY_LENGTH);
    strncpy(caretCheck, mString, checkLength);
    int lastSubstrWidth = GetStringWidth(caretCheck);
-   for (int i=checkLength-1; i >= 0; --i)
+   for (int i=(int)checkLength-1; i >= 0; --i)
    {
       caretCheck[i] = 0;   //shorten string by one
       
@@ -205,7 +205,7 @@ void TextEntry::MakeActiveTextEntry(bool setCaretToEnd)
    if (mListener)
       mListener->TextEntryActivated(this);
    if (setCaretToEnd)
-      mCaretPosition = strlen(mString);
+      mCaretPosition = (int)strlen(mString);
    mCaretBlink = true;
    mCaretBlinkTimer = 0;
 }
@@ -232,7 +232,7 @@ void TextEntry::OnKeyPressed(int key, bool isRepeat)
    }
    else if (key == OF_KEY_BACKSPACE)
    {
-      int len = strlen(mString);
+      int len = (int)strlen(mString);
       if (mCaretPosition > 0)
       {
          for (int i=mCaretPosition-1; i<len; ++i)
@@ -270,7 +270,7 @@ void TextEntry::AddCharacter(char c)
 {
    if (AllowCharacter(c))
    {
-      int len = strlen(mString);
+      int len = (int)strlen(mString);
       if (/*len < mCharWidth && */len < MAX_TEXTENTRY_LENGTH-1)
       {
          for (int i=len; i>mCaretPosition; --i)

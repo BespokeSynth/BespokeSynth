@@ -9,7 +9,7 @@
 #include "vinylcontrol.h"
 
 vinylcontrol::vinylcontrol(int sampleRate)
-:hasBeenAlive(0), pitchfactor(1.0), smoothingIterator(0), pitchAVG(0.0), mSampleRate(sampleRate) {
+:pitchfactor(1.0), pitchAVG(0.0), smoothingIterator(0), hasBeenAlive(0), mSampleRate(sampleRate) {
 
    const char* vinylType;
 

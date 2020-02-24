@@ -33,7 +33,7 @@ void AudioRouter::AddReceiver(IAudioReceiver* receiver, const char* name)
    if (receiver)
    {
       mReceivers.push_back(receiver);
-      mRouteSelector->AddLabel(name, mReceivers.size() - 1);
+      mRouteSelector->AddLabel(name, (int)mReceivers.size() - 1);
       mModuleSaveData.UpdatePropertyMax("initialtarget",mReceivers.size()-1);
    }
 }
@@ -123,7 +123,7 @@ void AudioRouter::SaveLayout(ofxJSONElement& moduleInfo)
 {
    IDrawableModule::SaveLayout(moduleInfo);
    
-   moduleInfo["targets"].resize(mReceivers.size());
+   moduleInfo["targets"].resize((unsigned int)mReceivers.size());
    for (int i=0; i<mReceivers.size(); ++i)
    {
       IDrawableModule* module = dynamic_cast<IDrawableModule*>(mReceivers[i]);

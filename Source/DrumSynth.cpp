@@ -385,7 +385,7 @@ void DrumSynth::CreateKit()
    
    kit.mName = mNewKitName;
    mKits.push_back(kit);
-   mLoadedKit = mKits.size() - 1;
+   mLoadedKit = (int)mKits.size() - 1;
    mKitSelector->AddLabel(kit.mName.c_str(), mLoadedKit);
 }
 

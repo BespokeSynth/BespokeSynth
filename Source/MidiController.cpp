@@ -133,7 +133,7 @@ void MidiController::AddControlConnection(MidiMessageType messageType, int contr
       connection->mPage = mControllerPage;
       if (mSlidersDefaultToIncremental)
          connection->mIncrementAmount = 1;
-      connection->CreateUIControls(mConnections.size());
+      connection->CreateUIControls((int)mConnections.size());
       mConnections.push_back(connection);
       uicontrol->AddRemoteController();
    }
@@ -231,7 +231,7 @@ void MidiController::AddControlConnection(const ofxJSONElement& connection)
             nextPageConnection->mPage += i+1;
             nextPageConnection->mUIControl = uicontrolNextPage;
             nextPageConnection->mEditorControls.clear(); //TODO(Ryan) temp fix
-            nextPageConnection->CreateUIControls(mConnections.size());
+            nextPageConnection->CreateUIControls((int)mConnections.size());
             mConnections.push_back(nextPageConnection);
             uicontrolNextPage->AddRemoteController();
          }
@@ -1286,7 +1286,7 @@ UIControlConnection* MidiController::AddUIControlConnection()
 {
    UIControlConnection* connection = new UIControlConnection(this);
    connection->mPage = mControllerPage;
-   connection->CreateUIControls(mConnections.size());
+   connection->CreateUIControls((int)mConnections.size());
    mConnections.push_back(connection);
    return connection;
 }
@@ -1322,7 +1322,7 @@ void MidiController::ButtonClicked(ClickButton* button)
       if (button == connection->mCopyButton)
       {
          UIControlConnection* copy = connection->MakeCopy();
-         copy->CreateUIControls(mConnections.size());
+         copy->CreateUIControls((int)mConnections.size());
          mConnections.push_back(copy); //make a copy of this one
          break;
       }
@@ -1660,7 +1660,7 @@ void MidiController::SaveLayout(ofxJSONElement& moduleInfo)
    if (dynamic_cast<OscController*>(mNonstandardController) == nullptr) //TODO(Ryan)
    {
       mConnectionsJson.clear();
-      mConnectionsJson.resize(mConnections.size());
+      mConnectionsJson.resize((int)mConnections.size());
       int i = 0;
       for (auto iter = mConnections.begin(); iter != mConnections.end(); ++iter)
       {

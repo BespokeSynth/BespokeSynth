@@ -316,7 +316,7 @@ void ControllingSong::SaveLayout(ofxJSONElement& moduleInfo)
 {
    IDrawableModule::SaveLayout(moduleInfo);
    
-   moduleInfo["followsongs"].resize(mFollowSongs.size());
+   moduleInfo["followsongs"].resize((unsigned int)mFollowSongs.size());
    for (int i=0; i<mFollowSongs.size(); ++i)
    {
       IDrawableModule* module = dynamic_cast<IDrawableModule*>(mFollowSongs[i]);

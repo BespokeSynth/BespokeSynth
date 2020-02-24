@@ -377,7 +377,7 @@ void Arpeggiator::OnTimeEvent(int samplesTo)
          }
          if (mArpIndex > mChord.size() - 1)
          {
-            mArpIndex = mChord.size() - 2;
+            mArpIndex = (int)mChord.size() - 2;
             mArpPingPongDirection = -1;
          }
       }
@@ -542,7 +542,7 @@ void Arpeggiator::SyncGridToArp()
       if (mChord[i].pitch != ARP_REST && mChord[i].pitch != ARP_HOLD)
          mGrid->SetValRefactor(mChord[i].pitch,i,1);
    }
-   mRandomLength = mChord.size();
+   mRandomLength = (int)mChord.size();
    mRandomRange = max;
    mGrid->SetGrid(mRandomLength, mRandomRange+1);
 }

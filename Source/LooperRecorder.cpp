@@ -214,7 +214,7 @@ void LooperRecorder::DrawCircleHash(ofVec2f center, float progress, float width,
 
 void LooperRecorder::SyncCablesToLoopers()
 {
-   int numLoopers = MAX(4, mLoopers.size());
+   int numLoopers = MAX(4, (int)mLoopers.size());
    
    if (!mLoopers.empty() && mLoopers[mLoopers.size()-1] != nullptr)
       ++numLoopers; //add an extra cable for an additional looper
@@ -226,7 +226,7 @@ void LooperRecorder::SyncCablesToLoopers()
    
    if (numLoopers > mLooperPatchCables.size())
    {
-      int oldSize = mLooperPatchCables.size();
+      int oldSize = (int)mLooperPatchCables.size();
       mLooperPatchCables.resize(numLoopers);
       for (int i=0; i<oldSize; ++i)
       {
@@ -714,7 +714,7 @@ void LooperRecorder::LoadLayout(const ofxJSONElement& moduleInfo)
 void LooperRecorder::SaveLayout(ofxJSONElement& moduleInfo)
 {
    IDrawableModule::SaveLayout(moduleInfo);
-   moduleInfo["loopers"].resize(mLoopers.size());
+   moduleInfo["loopers"].resize((unsigned int)mLoopers.size());
    for (int i=0; i<mLoopers.size(); ++i)
    {
       string name;

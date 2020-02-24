@@ -6,8 +6,11 @@
 //
 //
 
-#ifndef modularSynth_SynthGlobals_h
-#define modularSynth_SynthGlobals_h
+#pragma once
+
+#if __clang__
+ #pragma clang diagnostic ignored "-Wreorder"
+#endif
 
 #include "../JuceLibraryCode/JuceHeader.h"
 #include "OpenFrameworksPort.h"
@@ -50,6 +53,9 @@ void* operator new[](std::size_t size, const char *file, int line) throw(std::ba
 //bool labeling technique that I stole from Ableton
 #define K(x) true
 #define L(x,y) y
+
+//avoid "unused variable" warnings
+#define UNUSED(x) ((void) x)
 
 using namespace std;
 
@@ -237,5 +243,3 @@ inline void bzero(void* mem, size_t size)
 #endif
 
 #define FIX_DENORMAL(p) if(fabsf(p)<1e-9) p = 0
-
-#endif

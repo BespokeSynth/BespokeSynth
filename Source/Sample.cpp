@@ -41,7 +41,7 @@ bool Sample::Read(const char* path, bool mono)
    
    if (reader != nullptr)
    {
-      mNumSamples = reader->lengthInSamples;
+      mNumSamples = (int)reader->lengthInSamples;
       mSampleRateRatio = float(reader->sampleRate) / gSampleRate;
       
       mData.Resize(mNumSamples);

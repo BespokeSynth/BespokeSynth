@@ -43,7 +43,7 @@ private:
    
    //IDrawableModule
    void DrawModule() override;
-   void GetModuleDimensions(int& width, int& height) override { width = 110; height = 25+mMappings.size()*kMappingSpacing; }
+   void GetModuleDimensions(int& width, int& height) override { width = 110; height = 25+(int)mMappings.size()*kMappingSpacing; }
    bool Enabled() const override { return mEnabled; }
    
    struct Mapping : public IModulator
