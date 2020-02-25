@@ -73,6 +73,22 @@
 			isa = PBXBuildFile;
 			fileRef = 151EB4A3414A48A6C6D0E90D;
 		};
+		85C998B06E64B090926193AE = {
+			isa = PBXBuildFile;
+			fileRef = 6A38374BB9C11902F99A495D;
+		};
+		ACBC2C313F9C2A59564DA81D = {
+			isa = PBXBuildFile;
+			fileRef = 91EDCC4FD176A864384C2F66;
+		};
+		9EB2433CDF79DC086D4F990E = {
+			isa = PBXBuildFile;
+			fileRef = E1B3664194BC77C633E8E66D;
+		};
+		DD8004314855BD129C5FD83A = {
+			isa = PBXBuildFile;
+			fileRef = 4F2A258F4EF69DB8F86B3ECE;
+		};
 		8A7DD143953B7F7872F5CD40 = {
 			isa = PBXBuildFile;
 			fileRef = 0687B370A7DD65D2D6A950D5;
@@ -188,6 +204,10 @@
 		7B858D802BD0BB608C0F48CF = {
 			isa = PBXBuildFile;
 			fileRef = 49AB76428A044DEDF45FFAFE;
+		};
+		AE13582558A6A0A5F82A58AC = {
+			isa = PBXBuildFile;
+			fileRef = B8B8569A5BBE21A7820B9DD4;
 		};
 		7F24707065D5FC79A46CDA89 = {
 			isa = PBXBuildFile;
@@ -1306,6 +1326,13 @@
 			path = ../../Source/FFT.cpp;
 			sourceTree = "SOURCE_ROOT";
 		};
+		00FCF3E3F5EB45A77D9BC2DC = {
+			isa = PBXFileReference;
+			lastKnownFileType = sourcecode.c.h;
+			name = Push2Control.h;
+			path = ../../Source/Push2Control.h;
+			sourceTree = "SOURCE_ROOT";
+		};
 		01C3EAA9495E54B35349E26F = {
 			isa = PBXFileReference;
 			lastKnownFileType = sourcecode.c.h;
@@ -2209,6 +2236,13 @@
 			path = System/Library/Frameworks/Cocoa.framework;
 			sourceTree = SDKROOT;
 		};
+		3593910B7D5540A74FA34C45 = {
+			isa = PBXFileReference;
+			lastKnownFileType = sourcecode.c.h;
+			name = Result.h;
+			path = ../../Source/push2/Result.h;
+			sourceTree = "SOURCE_ROOT";
+		};
 		35C5E62178D36F76348ADCD1 = {
 			isa = PBXFileReference;
 			lastKnownFileType = sourcecode.c.h;
@@ -2634,6 +2668,13 @@
 			lastKnownFileType = sourcecode.cpp.cpp;
 			name = Sampler.cpp;
 			path = ../../Source/Sampler.cpp;
+			sourceTree = "SOURCE_ROOT";
+		};
+		4F2A258F4EF69DB8F86B3ECE = {
+			isa = PBXFileReference;
+			lastKnownFileType = sourcecode.cpp.cpp;
+			name = Result.cpp;
+			path = ../../Source/push2/Result.cpp;
 			sourceTree = "SOURCE_ROOT";
 		};
 		4F41FC06B09EF90B45EC17B7 = {
@@ -3161,6 +3202,13 @@
 			path = ../../Source/NoteChainNode.cpp;
 			sourceTree = "SOURCE_ROOT";
 		};
+		6A38374BB9C11902F99A495D = {
+			isa = PBXFileReference;
+			lastKnownFileType = sourcecode.cpp.cpp;
+			name = JuceToPush2DisplayBridge.cpp;
+			path = ../../Source/push2/push2/JuceToPush2DisplayBridge.cpp;
+			sourceTree = "SOURCE_ROOT";
+		};
 		6A48219B649AC02E166D9DB6 = {
 			isa = PBXFileReference;
 			lastKnownFileType = sourcecode.c.h;
@@ -3439,6 +3487,13 @@
 			lastKnownFileType = sourcecode.cpp.cpp;
 			name = MultitrackRecorder.cpp;
 			path = ../../Source/MultitrackRecorder.cpp;
+			sourceTree = "SOURCE_ROOT";
+		};
+		7B08204F2B0697CFF92E05D6 = {
+			isa = PBXFileReference;
+			lastKnownFileType = sourcecode.c.h;
+			name = JuceToPush2DisplayBridge.h;
+			path = ../../Source/push2/push2/JuceToPush2DisplayBridge.h;
 			sourceTree = "SOURCE_ROOT";
 		};
 		7B18F4F342890BFD14DD989F = {
@@ -3915,6 +3970,13 @@
 			lastKnownFileType = sourcecode.c.h;
 			name = LFO.h;
 			path = ../../Source/LFO.h;
+			sourceTree = "SOURCE_ROOT";
+		};
+		91EDCC4FD176A864384C2F66 = {
+			isa = PBXFileReference;
+			lastKnownFileType = sourcecode.c.c;
+			name = "libusb_platform_wrapper.c";
+			path = "../../Source/push2/libusb/libusb_platform_wrapper.c";
 			sourceTree = "SOURCE_ROOT";
 		};
 		923405A956C7F7FE4DFE214F = {
@@ -4701,6 +4763,13 @@
 			path = ../../Source/NoteToPulse.h;
 			sourceTree = "SOURCE_ROOT";
 		};
+		B8B8569A5BBE21A7820B9DD4 = {
+			isa = PBXFileReference;
+			lastKnownFileType = sourcecode.cpp.cpp;
+			name = Push2Control.cpp;
+			path = ../../Source/Push2Control.cpp;
+			sourceTree = "SOURCE_ROOT";
+		};
 		B8D509753E00675F6254A465 = {
 			isa = PBXFileReference;
 			lastKnownFileType = sourcecode.c.h;
@@ -4734,6 +4803,13 @@
 			lastKnownFileType = sourcecode.cpp.cpp;
 			name = ModuleSaveData.cpp;
 			path = ../../Source/ModuleSaveData.cpp;
+			sourceTree = "SOURCE_ROOT";
+		};
+		BB5F7F904A53FA9D35B542EA = {
+			isa = PBXFileReference;
+			lastKnownFileType = sourcecode.c.h;
+			name = "Push2-UsbCommunicator.h";
+			path = "../../Source/push2/push2/Push2-UsbCommunicator.h";
 			sourceTree = "SOURCE_ROOT";
 		};
 		BB677D189A9E5B6B57162166 = {
@@ -4776,6 +4852,13 @@
 			lastKnownFileType = sourcecode.c.h;
 			name = ClickButton.h;
 			path = ../../Source/ClickButton.h;
+			sourceTree = "SOURCE_ROOT";
+		};
+		BE426AB1CDA60F632B4F5526 = {
+			isa = PBXFileReference;
+			lastKnownFileType = sourcecode.c.h;
+			name = "Push2-Display.h";
+			path = "../../Source/push2/push2/Push2-Display.h";
 			sourceTree = "SOURCE_ROOT";
 		};
 		BE5CDF770F954A91B00D2990 = {
@@ -4867,6 +4950,13 @@
 			lastKnownFileType = sourcecode.c.h;
 			name = NoteSinger.h;
 			path = ../../Source/NoteSinger.h;
+			sourceTree = "SOURCE_ROOT";
+		};
+		C0A7427D1A335818EE5AF9A2 = {
+			isa = PBXFileReference;
+			lastKnownFileType = sourcecode.c.h;
+			name = "config_msvc.h";
+			path = "../../Source/push2/libusb/config_msvc.h";
 			sourceTree = "SOURCE_ROOT";
 		};
 		C1437AC4288E03F315E80162 = {
@@ -5121,6 +5211,13 @@
 			path = ../../Source/EnvelopeEditor.h;
 			sourceTree = "SOURCE_ROOT";
 		};
+		CED44E3BF7697DF6E3CF06A0 = {
+			isa = PBXFileReference;
+			lastKnownFileType = sourcecode.c.h;
+			name = "config_xcode.h";
+			path = "../../Source/push2/libusb/config_xcode.h";
+			sourceTree = "SOURCE_ROOT";
+		};
 		D033D7F772CD35EE2219F068 = {
 			isa = PBXFileReference;
 			lastKnownFileType = sourcecode.c.h;
@@ -5168,6 +5265,13 @@
 			lastKnownFileType = sourcecode.c.h;
 			name = NoteRouter.h;
 			path = ../../Source/NoteRouter.h;
+			sourceTree = "SOURCE_ROOT";
+		};
+		D26BCA788080C23EECD81305 = {
+			isa = PBXFileReference;
+			lastKnownFileType = sourcecode.c.h;
+			name = "Push2-Bitmap.h";
+			path = "../../Source/push2/push2/Push2-Bitmap.h";
 			sourceTree = "SOURCE_ROOT";
 		};
 		D2A47B6C5A3810B89D7B8399 = {
@@ -5345,6 +5449,13 @@
 			path = ../../Source/Pressure.h;
 			sourceTree = "SOURCE_ROOT";
 		};
+		DBF00B2A166DDD34886C6FF2 = {
+			isa = PBXFileReference;
+			lastKnownFileType = sourcecode.c.h;
+			name = config.h;
+			path = ../../Source/push2/libusb/config.h;
+			sourceTree = "SOURCE_ROOT";
+		};
 		DC785772345CC1B85C5C39EF = {
 			isa = PBXFileReference;
 			lastKnownFileType = sourcecode.cpp.cpp;
@@ -5455,6 +5566,13 @@
 			lastKnownFileType = sourcecode.cpp.cpp;
 			name = RadioButton.cpp;
 			path = ../../Source/RadioButton.cpp;
+			sourceTree = "SOURCE_ROOT";
+		};
+		E1B3664194BC77C633E8E66D = {
+			isa = PBXFileReference;
+			lastKnownFileType = sourcecode.cpp.cpp;
+			name = "Push2-Usb-Communicator.cpp";
+			path = "../../Source/push2/push2/Push2-Usb-Communicator.cpp";
 			sourceTree = "SOURCE_ROOT";
 		};
 		E2853D6DED5EE5B27144F978 = {
@@ -6003,6 +6121,25 @@
 			path = ../../Source/PulseChance.cpp;
 			sourceTree = "SOURCE_ROOT";
 		};
+		B58384FB68E076B58E0430DE = {
+			isa = PBXGroup;
+			children = (
+				DBF00B2A166DDD34886C6FF2,
+				C0A7427D1A335818EE5AF9A2,
+				CED44E3BF7697DF6E3CF06A0,
+				6A38374BB9C11902F99A495D,
+				7B08204F2B0697CFF92E05D6,
+				91EDCC4FD176A864384C2F66,
+				D26BCA788080C23EECD81305,
+				BE426AB1CDA60F632B4F5526,
+				E1B3664194BC77C633E8E66D,
+				BB5F7F904A53FA9D35B542EA,
+				4F2A258F4EF69DB8F86B3ECE,
+				3593910B7D5540A74FA34C45,
+			);
+			name = push2;
+			sourceTree = "<group>";
+		};
 		E052C73364792FC8F77F9BAF = {
 			isa = PBXGroup;
 			children = (
@@ -6168,6 +6305,7 @@
 		5A13D0CA6DCFEF178844C4EC = {
 			isa = PBXGroup;
 			children = (
+				B58384FB68E076B58E0430DE,
 				E052C73364792FC8F77F9BAF,
 				E773DD247550A2F3CF88686D,
 				55A3AD4A7C7A4B1AD8A7E9D3,
@@ -6224,6 +6362,8 @@
 		C91AF721DDC182CE3AC80CF9 = {
 			isa = PBXGroup;
 			children = (
+				B8B8569A5BBE21A7820B9DD4,
+				00FCF3E3F5EB45A77D9BC2DC,
 				C911B31F8DB430B4FE049A6A,
 				FAD1A815BD0B548470A4E57B,
 				EAAFBD1D61DA7178E4184B2D,
@@ -6918,6 +7058,9 @@
 					"../../JuceLibraryCode",
 					"/Users/awwbees/Downloads/JUCE/modules",
 					"../../Source/json/include",
+					"../../Source/push2/",
+					"../../Source/push2/libusb",
+					"../../Source/push2/modules/libusb",
 					"$(inherited)",
 				);
 				INFOPLIST_FILE = Info-App.plist;
@@ -6966,6 +7109,9 @@
 					"../../JuceLibraryCode",
 					"/Users/awwbees/Downloads/JUCE/modules",
 					"../../Source/json/include",
+					"../../Source/push2/",
+					"../../Source/push2/libusb",
+					"../../Source/push2/modules/libusb",
 					"$(inherited)",
 				);
 				INFOPLIST_FILE = Info-App.plist;
@@ -7105,6 +7251,10 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				85C998B06E64B090926193AE,
+				ACBC2C313F9C2A59564DA81D,
+				9EB2433CDF79DC086D4F990E,
+				DD8004314855BD129C5FD83A,
 				8A7DD143953B7F7872F5CD40,
 				229E461FE3F5D79D86077F7A,
 				632548C9D6ACDF3ED512B6BC,
@@ -7134,6 +7284,7 @@
 				69EB47EC9441C3507BEB277D,
 				75837998247B5E99F3F16392,
 				7B858D802BD0BB608C0F48CF,
+				AE13582558A6A0A5F82A58AC,
 				7F24707065D5FC79A46CDA89,
 				7A789C857500A243E5693ACD,
 				D0CAABF818DF4FF0DE76984F,

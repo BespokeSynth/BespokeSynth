@@ -123,8 +123,8 @@ public:
       glewInit();
 #endif
       
-      mVG = nvgCreateGL3(NVG_ANTIALIAS | NVG_STENCIL_STROKES | NVG_DEBUG);
-      mFontBoundsVG = nvgCreateGL3(NVG_ANTIALIAS | NVG_STENCIL_STROKES | NVG_DEBUG);
+      mVG = nvgCreateGL3(NVG_ANTIALIAS | NVG_STENCIL_STROKES);
+      mFontBoundsVG = nvgCreateGL3(NVG_ANTIALIAS | NVG_STENCIL_STROKES);
       
       if (mVG == nullptr)
          printf("Could not init nanovg.\n");
@@ -251,6 +251,8 @@ public:
       mSynth.Draw(mVG);
       
       nvgEndFrame(mVG);
+      
+      mSynth.PostRender();
       
       mSynth.LockRender(false);
       

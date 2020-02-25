@@ -157,23 +157,9 @@ bool IDrawableModule::IsVisible()
    return IsWithinRect(TheSynth->GetDrawRect());
 }
 
-void IDrawableModule::Render()
+void IDrawableModule::DrawFrame(float w, float h, bool drawModule, float& titleBarHeight, float& highlight)
 {
-   if (!mShowing)
-      return;
-   
-   PreDrawModule();
-   
-   if (mMinimized)
-      mMinimizeAnimation += ofGetLastFrameTime() * 5;
-   else
-      mMinimizeAnimation -= ofGetLastFrameTime() * 5;
-   mMinimizeAnimation = ofClamp(mMinimizeAnimation, 0, 1);
-
-   int w, h;
-   GetDimensions(w,h);
-   
-   float titleBarHeight = mTitleBarHeight;
+   titleBarHeight = mTitleBarHeight;
    if (!HasTitleBar())
       titleBarHeight = 0;
    
@@ -183,7 +169,7 @@ void IDrawableModule::Render()
 
    ofColor color = GetColor(mType);
    
-   float highlight = 0;
+   highlight = 0;
    
    if (Enabled())
    {
@@ -265,12 +251,15 @@ void IDrawableModule::Render()
    if (dimModule)
       gModuleDrawAlpha *= .2f;
    
-   ofSetColor(color, gModuleDrawAlpha);
-   ofPushMatrix();
-   ofClipWindow(0, 0, w, h);
-   DrawModule();
-   ofPopMatrix();
-   DrawModuleUnclipped();
+   if (drawModule)
+   {
+      ofSetColor(color, gModuleDrawAlpha);
+      ofPushMatrix();
+      ofClipWindow(0, 0, w, h);
+      DrawModule();
+      ofPopMatrix();
+      DrawModuleUnclipped();
+   }
    
    float enableToggleOffset = 0;
    if (HasTitleBar())
@@ -317,12 +306,34 @@ void IDrawableModule::Render()
       ofRect(-.5f, -titleBarHeight-.5f, w+1, h+titleBarHeight+1, 4);
       ofPopStyle();
    }
+}
+
+void IDrawableModule::Render()
+{
+   if (!mShowing)
+      return;
+   
+   PreDrawModule();
+   
+   if (mMinimized)
+      mMinimizeAnimation += ofGetLastFrameTime() * 5;
+   else
+      mMinimizeAnimation -= ofGetLastFrameTime() * 5;
+   mMinimizeAnimation = ofClamp(mMinimizeAnimation, 0, 1);
+
+   int w, h;
+   GetDimensions(w,h);
+   
+   float titleBarHeight;
+   float highlight;
+   DrawFrame(w,h,true,titleBarHeight,highlight);
    
    if (Minimized() || IsVisible() == false)
       DrawBeacon(30,-titleBarHeight/2);
    
    if (IsResizable() && !Minimized())
    {
+      ofColor color = GetColor(mType);
       ofSetColor(color, 255);
       ofSetLineWidth(2);
       ofLine(w-sResizeCornerSize, h, w, h);

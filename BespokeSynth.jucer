@@ -6,6 +6,25 @@
               splashScreenColour="Dark" cppLanguageStandard="11" companyCopyright="">
   <MAINGROUP id="w4HLAu" name="BespokeSynth">
     <GROUP id="{531CC336-D9CD-1F6E-7272-2D8ADD98F839}" name="libraries">
+      <GROUP id="{C4158546-26E8-FF45-A033-B3162B6CC555}" name="push2">
+        <FILE id="OYwEhI" name="config.h" compile="0" resource="0" file="Source/push2/libusb/config.h"/>
+        <FILE id="AnAVSK" name="config_msvc.h" compile="0" resource="0" file="Source/push2/libusb/config_msvc.h"/>
+        <FILE id="V5haeC" name="config_xcode.h" compile="0" resource="0" file="Source/push2/libusb/config_xcode.h"/>
+        <FILE id="D1eLru" name="JuceToPush2DisplayBridge.cpp" compile="1" resource="0"
+              file="Source/push2/push2/JuceToPush2DisplayBridge.cpp"/>
+        <FILE id="WCXoqC" name="JuceToPush2DisplayBridge.h" compile="0" resource="0"
+              file="Source/push2/push2/JuceToPush2DisplayBridge.h"/>
+        <FILE id="CK1lv0" name="libusb_platform_wrapper.c" compile="1" resource="0"
+              file="Source/push2/libusb/libusb_platform_wrapper.c"/>
+        <FILE id="Shxww3" name="Push2-Bitmap.h" compile="0" resource="0" file="Source/push2/push2/Push2-Bitmap.h"/>
+        <FILE id="GApzLg" name="Push2-Display.h" compile="0" resource="0" file="Source/push2/push2/Push2-Display.h"/>
+        <FILE id="elY6He" name="Push2-Usb-Communicator.cpp" compile="1" resource="0"
+              file="Source/push2/push2/Push2-Usb-Communicator.cpp"/>
+        <FILE id="CRduZo" name="Push2-UsbCommunicator.h" compile="0" resource="0"
+              file="Source/push2/push2/Push2-UsbCommunicator.h"/>
+        <FILE id="bMRStX" name="Result.cpp" compile="1" resource="0" file="Source/push2/Result.cpp"/>
+        <FILE id="SBgbxv" name="Result.h" compile="0" resource="0" file="Source/push2/Result.h"/>
+      </GROUP>
       <GROUP id="{AC29B64C-682F-59BE-B76A-7CFE20311257}" name="exprtk">
         <FILE id="XbwZ8O" name="exprtk.hpp" compile="0" resource="0" file="Source/exprtk/exprtk.hpp"/>
       </GROUP>
@@ -158,6 +177,9 @@
         <FILE id="RG4zGd" name="TremoloEffect.h" compile="0" resource="0" file="Source/TremoloEffect.h"/>
       </GROUP>
       <GROUP id="{6781AC07-A090-A7AF-8D27-BCB6D9526ABD}" name="modules">
+        <FILE id="nzAzn8" name="Push2Control.cpp" compile="1" resource="0"
+              file="Source/Push2Control.cpp"/>
+        <FILE id="qucjjE" name="Push2Control.h" compile="0" resource="0" file="Source/Push2Control.h"/>
         <FILE id="bY2TLB" name="PulseHocket.cpp" compile="1" resource="0" file="Source/PulseHocket.cpp"/>
         <FILE id="eH4Xld" name="PulseHocket.h" compile="0" resource="0" file="Source/PulseHocket.h"/>
         <FILE id="qxVbgn" name="PulseGate.cpp" compile="1" resource="0" file="Source/PulseGate.cpp"/>
@@ -915,9 +937,11 @@
                microphonePermissionNeeded="1" vstLegacyFolder="~/SDKs/VST_SDK/VST2_SDK">
       <CONFIGURATIONS>
         <CONFIGURATION name="Debug" isDebug="1" optimisation="1" targetName="Bespoke"
-                       headerPath="../../Source/json/include" enablePluginBinaryCopyStep="1"/>
+                       headerPath="../../Source/json/include&#10;../../Source/push2/&#10;../../Source/push2/libusb&#10;../../Source/push2/modules/libusb"
+                       enablePluginBinaryCopyStep="1"/>
         <CONFIGURATION name="Release" isDebug="0" optimisation="3" targetName="Bespoke"
-                       headerPath="../../Source/json/include" enablePluginBinaryCopyStep="1"/>
+                       headerPath="../../Source/json/include&#10;../../Source/push2/&#10;../../Source/push2/libusb&#10;../../Source/push2/modules/libusb"
+                       enablePluginBinaryCopyStep="1"/>
       </CONFIGURATIONS>
       <MODULEPATHS>
         <MODULEPATH id="juce_core" path="../../../Downloads/JUCE/modules"/>
@@ -942,10 +966,10 @@
             extraCompilerFlags="/bigobj" vstLegacyFolder="..\VST_SDK\VST2_SDK\public.sdk\source\vst2.x">
       <CONFIGURATIONS>
         <CONFIGURATION name="Debug" winWarningLevel="2" generateManifest="1" winArchitecture="x64"
-                       isDebug="1" optimisation="1" targetName="BespokeSynth" headerPath="../../Source/json/include;../../Source/glew/include"
+                       isDebug="1" optimisation="1" targetName="BespokeSynth" headerPath="../../Source/json/include&#10;../../Source/glew/include&#10;../../Source/push2/&#10;../../Source/push2/libusb&#10;../../Source/push2/modules/libusb"
                        fastMath="0" debugInformationFormat="ProgramDatabase" enablePluginBinaryCopyStep="0"/>
         <CONFIGURATION name="Release" winWarningLevel="2" generateManifest="1" winArchitecture="x64"
-                       isDebug="0" optimisation="3" targetName="BespokeSynth" headerPath="../../Source/json/include;../../Source/glew/include"
+                       isDebug="0" optimisation="3" targetName="BespokeSynth" headerPath="../../Source/json/include&#10;../../Source/glew/include&#10;../../Source/push2/&#10;../../Source/push2/libusb&#10;../../Source/push2/modules/libusb"
                        debugInformationFormat="ProgramDatabase" enablePluginBinaryCopyStep="0"
                        linkTimeOptimisation="1"/>
       </CONFIGURATIONS>
@@ -969,8 +993,8 @@
     </VS2015>
     <LINUX_MAKE targetFolder="Builds/LinuxMakefile" extraDefs="GLEW_STATIC&#10;GL_GLEXT_PROTOTYPES&#10;BESPOKE_LINUX">
       <CONFIGURATIONS>
-        <CONFIGURATION isDebug="1" name="Debug" headerPath="../../Source/json/include&#10;../../Source/glew/include"/>
-        <CONFIGURATION isDebug="0" name="Release" headerPath="../../Source/json/include&#10;../../Source/glew/include"/>
+        <CONFIGURATION isDebug="1" name="Debug" headerPath="../../Source/json/include&#10;../../Source/glew/include&#10;../../Source/push2/&#10;../../Source/push2/libusb&#10;../../Source/push2/modules/libusb"/>
+        <CONFIGURATION isDebug="0" name="Release" headerPath="../../Source/json/include&#10;../../Source/glew/include&#10;../../Source/push2/&#10;../../Source/push2/libusb&#10;../../Source/push2/modules/libusb"/>
       </CONFIGURATIONS>
       <MODULEPATHS>
         <MODULEPATH id="juce_video" path="../../JUCE/modules"/>

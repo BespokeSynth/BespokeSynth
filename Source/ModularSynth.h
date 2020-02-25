@@ -63,6 +63,7 @@ public:
    void LoadResources(void* nanoVG, void* fontBoundsNanoVG);
    void Poll();
    void Draw(void* vg);
+   void PostRender();
    
    void Exit();
    

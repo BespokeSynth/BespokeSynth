@@ -191,6 +191,7 @@
 #include "NotePanRandom.h"
 #include "PulseGate.h"
 #include "PulseHocket.h"
+#include "Push2Control.h"
 
 #define REGISTER(class,name,type) Register(#name, &(class::Create), &(class::CanCreate), type, false, false);
 #define REGISTER_HIDDEN(class,name,type) Register(#name, &(class::Create), &(class::CanCreate), type, true, false);
@@ -350,6 +351,7 @@ ModuleFactory::ModuleFactory()
    REGISTER(NotePanRandom, notepanrandom, kModuleType_Note);
    REGISTER(PulseGate, pulsegate, kModuleType_Other);
    REGISTER(PulseHocket, pulsehocket, kModuleType_Other);
+   REGISTER(Push2Control, push2control, kModuleType_Instrument);
 
    //REGISTER_EXPERIMENTAL(MidiPlayer, midiplayer, kModuleType_Instrument);
    REGISTER_EXPERIMENTAL(Razor, razor, kModuleType_Synth);

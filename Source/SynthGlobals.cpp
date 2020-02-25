@@ -47,6 +47,7 @@ float gNullBuffer[kWorkBufferSize];
 float gZeroBuffer[kWorkBufferSize];
 float gWorkBuffer[kWorkBufferSize];
 ChannelBuffer gWorkChannelBuffer(kWorkBufferSize);
+IDrawableModule* gHoveredModule = nullptr;
 IUIControl* gHoveredUIControl = nullptr;
 IUIControl* gHotBindUIControl[10];
 float gControlTactileFeedback = 0;

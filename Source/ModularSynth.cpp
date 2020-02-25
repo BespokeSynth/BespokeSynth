@@ -220,6 +220,8 @@ void ModularSynth::Draw(void* vg)
 {
    gNanoVG = (NVGcontext*)vg;
    
+   ofNoFill();
+   
    //DrawTextNormal("fps: "+ofToString(ofGetFrameRate(),4)+" "+ofToString(ofGetWidth()*ofGetHeight()), 100, 100,50);
    //return;
    
@@ -320,6 +322,11 @@ void ModularSynth::Draw(void* vg)
    DrawConsole();
    
    ofPopMatrix();
+}
+
+void ModularSynth::PostRender()
+{
+   mModuleContainer.PostRender();
 }
 
 void ModularSynth::DrawConsole()
@@ -598,6 +605,8 @@ void ModularSynth::MouseMoved(int intX, int intY )
       if (x < uiX - 10 || y < uiY - 10 || x > uiX + w + 10 || y > uiY + h + 10)
          gHoveredUIControl = nullptr;
    }
+   
+   gHoveredModule = GetModuleAt(GetMouseX(), GetMouseY());
 }
 
 void ModularSynth::MouseDragged(int intX, int intY, int button)

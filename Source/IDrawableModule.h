@@ -52,6 +52,8 @@ public:
    static bool CanCreate() { return true; }
    
    void Render() override;
+   virtual void PostRender() {}
+   void DrawFrame(float width, float height, bool drawModule, float& titleBarHeight, float& highlight);
    void DrawPatchCables();
    bool CheckNeedsDraw() override;
    virtual bool AlwaysOnTop() { return false; }

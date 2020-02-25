@@ -88,6 +88,7 @@ extern float gNullBuffer[4096];
 extern float gZeroBuffer[4096];
 extern float gWorkBuffer[4096];  //scratch buffer for doing work in
 extern ChannelBuffer gWorkChannelBuffer;
+extern IDrawableModule* gHoveredModule;
 extern IUIControl* gHoveredUIControl;
 extern IUIControl* gHotBindUIControl[10];
 extern float gControlTactileFeedback;

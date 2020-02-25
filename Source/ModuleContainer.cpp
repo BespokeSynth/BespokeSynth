@@ -56,6 +56,12 @@ void ModuleContainer::Draw()
    }
 }
 
+void ModuleContainer::PostRender()
+{
+   for (int i = (int)mModules.size()-1; i >= 0; --i)
+      mModules[i]->PostRender();
+}
+
 void ModuleContainer::DrawPatchCables()
 {
    if (mOwner != nullptr && mOwner->Minimized())
