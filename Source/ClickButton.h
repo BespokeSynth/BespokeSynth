@@ -39,6 +39,8 @@ public:
    void GetDimensions(int& width, int& height) override { width = mWidth; height = 15; }
    void SaveState(FileStreamOut& out) override {}
    void LoadState(FileStreamIn& in, bool shouldSetValue) override {}
+   bool IsSliderControl() override { return false; }
+   bool IsButtonControl() override { return true; }
    
 protected:
    ~ClickButton();   //protected so that it can't be created on the stack

@@ -116,6 +116,8 @@ public:
    void KeyPressed(int key, bool isRepeat) override;
    void SaveState(FileStreamOut& out) override;
    void LoadState(FileStreamIn& in, bool shouldSetValue = true) override;
+   bool IsSliderControl() override { return false; }
+   bool IsButtonControl() override { return false; }
    
    float mStart;
    float mEnd;

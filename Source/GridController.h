@@ -76,6 +76,8 @@ public:
    bool CanBeTargetedBy(PatchCableSource* source) const override;
    void SaveState(FileStreamOut& out) override;
    void LoadState(FileStreamIn& in, bool shouldSetValue = true) override;
+   bool IsSliderControl() override { return false; }
+   bool IsButtonControl() override { return false; }
 
    void OnControllerPageSelected();
    void OnInput(int control, float velocity);

@@ -40,6 +40,8 @@ public:
    void Poll() override;
    void SaveState(FileStreamOut& out) override;
    void LoadState(FileStreamIn& in, bool shouldSetValue = true) override;
+   bool IsSliderControl() override { return false; }
+   bool IsButtonControl() override { return true; }
    
    bool CheckNeedsDraw() override;
    

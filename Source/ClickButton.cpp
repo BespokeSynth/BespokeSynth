@@ -51,6 +51,10 @@ void ClickButton::Render()
    ofSetColor(0, 0, 0, gModuleDrawAlpha * .5f);
    ofRect(mX+1,mY+1,w,h);
    DrawBeacon(mX+w/2, mY+h/2);
+   float press = ofClamp((1 - (gTime - mClickTime) / 200), 0, 1);
+   color.r = ofLerp(color.r, 0, press);
+   color.g = ofLerp(color.g, 0, press);
+   color.b = ofLerp(color.b, 0, press);
    ofSetColor(color);
    ofRect(mX,mY,w,h);
    ofNoFill();
@@ -65,7 +69,7 @@ void ClickButton::Render()
 
 bool ClickButton::ButtonLit()
 {
-   return mClickTime + 400 > gTime;
+   return mClickTime + 200 > gTime;
 }
 
 void ClickButton::OnClicked(int x, int y, bool right)

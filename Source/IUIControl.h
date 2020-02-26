@@ -63,7 +63,8 @@ public:
    void GetColors(ofColor& color, ofColor& textColor);
    bool GetShouldSaveState() const { return mShouldSaveState; }
    void SetShouldSaveState(bool save) { mShouldSaveState = save; }
-   virtual bool IsSimpleControl() { return true; }
+   virtual bool IsSliderControl() { return true; }
+   virtual bool IsButtonControl() { return false; }
    
    virtual void SaveState(FileStreamOut& out) = 0;
    virtual void LoadState(FileStreamIn& in, bool shouldSetValue = true) = 0;

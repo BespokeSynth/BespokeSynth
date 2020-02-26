@@ -58,6 +58,8 @@ public:
    void SetValue(float value) override {}
    void SaveState(FileStreamOut& out) override;
    void LoadState(FileStreamIn& in, bool shouldSetValue = true) override;
+   bool IsSliderControl() override { return false; }
+   bool IsButtonControl() override { return false; }
    
 protected:
    ~TextEntry();   //protected so that it can't be created on the stack

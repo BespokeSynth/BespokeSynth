@@ -18,8 +18,11 @@
 #include "OpenFrameworksPort.h"
 #include "UIControlMacros.h"
 
+bool Push2Control::sDrawingPush2Display = false;
+
 Push2Control::Push2Control()
 : mDisplayModule(nullptr)
+, mDevice(this)
 {
    NBase::Result result = Initialize();
    if (result.Succeeded())
@@ -95,6 +98,17 @@ NBase::Result Push2Control::Initialize()
    
    mFontHandle = nvgCreateFont(mVG, ofToDataPath("frabk.ttf").c_str(), ofToDataPath("frabk.ttf").c_str());
    mFontHandleBold = nvgCreateFont(mVG, ofToDataPath("frabk_m.ttf").c_str(), ofToDataPath("frabk_m.ttf").c_str());
+   
+   const std::vector<string>& devices = mDevice.GetPortList(false);
+   for (int i=0; i<devices.size(); ++i)
+   {
+      if (strcmp(devices[i].c_str(), "Ableton Push 2 Live Port") == 0)
+      {
+         mDevice.ConnectOutput(i);
+         mDevice.ConnectInput(devices[i].c_str());
+         break;
+      }
+   }
 
    return NBase::Result::NoError;
 }
@@ -127,43 +141,54 @@ void Push2Control::DrawToFramebuffer(NVGcontext* vg, NVGLUframebuffer* fb, float
    {
       const float kSpacing = 121;
       
-      vector<IUIControl*> controls = mDisplayModule->GetUIControls();
-      int numDisplayableControls = 0;
-      for (int i=0; i < controls.size(); ++i)
-      {
-         if (controls[i]->IsSimpleControl())
-            ++numDisplayableControls;
-      }
+      mModuleColumnOffsetSmoothed = ofLerp(mModuleColumnOffsetSmoothed, mModuleColumnOffset, .3f);
       
       //nvgFontSize(mVG, 16);
       //nvgText(mVG, 10, 10, mDisplayModule->Name(), nullptr);
       float x;
       float y;
       mDisplayModule->GetPosition(x, y, true);
-      mDisplayModule->SetPosition(5, 15);
+      mDisplayModule->SetPosition(5 - kSpacing * mModuleColumnOffsetSmoothed, 15);
       float titleBarHeight;
       float highlight;
-      mDisplayModule->DrawFrame(kSpacing * numDisplayableControls + 10, 45, false, titleBarHeight, highlight);
+      mDisplayModule->DrawFrame(kSpacing * MAX(1,MAX(mSliderControls.size(), mButtonControls.size())) - 14, 80, false, titleBarHeight, highlight);
       mDisplayModule->SetPosition(x, y);
-   
+      
+      ofSetColor(IDrawableModule::GetColor(mDisplayModule->GetModuleType()));
+      ofNoFill();
+      
       nvgFontSize(mVG, 16);
-      int displayIndex = 0;
-      for (int i=0; i < controls.size(); ++i)
+      for (int i=0; i < mSliderControls.size(); ++i)
       {
-         if (controls[i]->IsSimpleControl())
-         {
-            nvgFontFaceId(mVG, mFontHandleBold);
-            nvgFontSize(mVG, 16);
-            nvgText(mVG, kSpacing * displayIndex + 10, 15, controls[i]->Name(), nullptr);
-            
-            float x;
-            float y;
-            controls[i]->GetPosition(x, y, true);
-            controls[i]->SetPosition(kSpacing * displayIndex + 10, 20);
-            controls[i]->Draw();
-            controls[i]->SetPosition(x, y);
-            ++displayIndex;
-         }
+         if (i - mModuleColumnOffset < -1 || i - mModuleColumnOffset > 8)
+            continue;
+         
+         nvgFontFaceId(mVG, mFontHandleBold);
+         nvgFontSize(mVG, 16);
+         nvgText(mVG, kSpacing * i + 3, 15, mSliderControls[i]->Name(), nullptr);
+         
+         float x;
+         float y;
+         mSliderControls[i]->GetPosition(x, y, true);
+         mSliderControls[i]->SetPosition(kSpacing * i + 3, 20);
+         mSliderControls[i]->Render();
+         mSliderControls[i]->SetPosition(x, y);
+      }
+      for (int i=0; i < mButtonControls.size(); ++i)
+      {
+         if (i - mModuleColumnOffset < -1 || i - mModuleColumnOffset > 8)
+            continue;
+         
+         nvgFontFaceId(mVG, mFontHandleBold);
+         nvgFontSize(mVG, 16);
+         nvgText(mVG, kSpacing * i + 3, 55, mButtonControls[i]->Name(), nullptr);
+         
+         float x;
+         float y;
+         mButtonControls[i]->GetPosition(x, y, true);
+         mButtonControls[i]->SetPosition(kSpacing * i + 3, 60);
+         mButtonControls[i]->Render();
+         mButtonControls[i]->SetPosition(x, y);
       }
    }
 
@@ -179,15 +204,80 @@ void Push2Control::DrawToFramebuffer(NVGcontext* vg, NVGLUframebuffer* fb, float
 void Push2Control::RenderPush2Display()
 {
    if (gHoveredModule != nullptr)
-      mDisplayModule = gHoveredModule;
+   {
+      if (mDisplayModule != gHoveredModule)
+      {
+         mDisplayModule = gHoveredModule;
+         mModuleColumnOffset = 0;
+         mModuleColumnOffsetSmoothed = 0;
+         mSliderControls.clear();
+         mButtonControls.clear();
+         vector<IUIControl*> controls = mDisplayModule->GetUIControls();
+         for (int i=0; i < controls.size(); ++i)
+         {
+            if (controls[i]->IsSliderControl())
+               mSliderControls.push_back(controls[i]);
+            if (controls[i]->IsButtonControl())
+               mButtonControls.push_back(controls[i]);
+         }
+      }
+   }
    
    auto mainVG = gNanoVG;
    gNanoVG = mVG;
-   
+   sDrawingPush2Display = true;
    DrawToFramebuffer(mVG, mFB, gTime/300, mPixelRatio);
-   
+   sDrawingPush2Display = false;
    gNanoVG = mainVG;
 
    // Tells the bridge we're done with drawing and the frame can be sent to the display
    bridge_.Flip(mPixels);
+}
+
+void Push2Control::OnMidiNote(MidiNote& note)
+{
+   if (note.mPitch >= 0 && note.mPitch <= 7) //main encoders
+   {
+      int controlIndex = note.mPitch + mModuleColumnOffset;
+      if (note.mVelocity > 0 && controlIndex < mSliderControls.size())
+         mSliderControls[controlIndex]->StartBeacon();
+   }
+   else
+   {
+      ofLog() << "note " << note.mPitch << " " << note.mVelocity;
+   }
+}
+
+void Push2Control::OnMidiControl(MidiControl& control)
+{
+   if (control.mControl >= 71 && control.mControl <= 78) //main encoders
+   {
+      int controlIndex = control.mControl - 71 + mModuleColumnOffset;
+      if (controlIndex < mSliderControls.size())
+      {
+         float currentNormalized = mSliderControls[controlIndex]->GetMidiValue();
+         float increment = control.mValue < 64 ? control.mValue : control.mValue - 128;
+         increment *= .005f;
+         mSliderControls[controlIndex]->SetFromMidiCC(currentNormalized + increment);
+      }
+   }
+   else if (control.mControl >= 102 && control.mControl <= 110) //main encoders
+   {
+      int controlIndex = control.mControl - 102 + mModuleColumnOffset;
+      if (control.mValue > 0 && controlIndex < mButtonControls.size())
+      {
+         float current = mButtonControls[controlIndex]->GetMidiValue();
+         float newValue = current > 0 ? 0 : 1;
+         mButtonControls[controlIndex]->SetFromMidiCC(newValue);
+      }
+   }
+   else if (control.mControl == 14) //leftmost clicky encoder
+   {
+      int direction = control.mValue == 127 ? -1 : 1;
+      mModuleColumnOffset = (int)ofClamp(mModuleColumnOffset + direction, 0, MAX(0, (int)MAX(mSliderControls.size(), mButtonControls.size()) - 8));
+   }
+   else
+   {
+      ofLog() << "control " << control.mControl << " " << control.mValue;
+   }
 }

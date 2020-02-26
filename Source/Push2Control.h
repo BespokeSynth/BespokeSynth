@@ -12,11 +12,13 @@
 
 #include "push2/push2/JuceToPush2DisplayBridge.h"
 #include "IDrawableModule.h"
+#include "MidiDevice.h"
 
 class NVGcontext;
 class NVGLUframebuffer;
+class IUIControl;
 
-class Push2Control : public IDrawableModule
+class Push2Control : public IDrawableModule, public MidiDeviceListener
 {
 public:
    Push2Control();
@@ -26,9 +28,14 @@ public:
    string GetTitleLabel() override { return "push 2 control"; }
    void CreateUIControls() override;
    
+   void OnMidiNote(MidiNote& note) override;
+   void OnMidiControl(MidiControl& control) override;
+   
    void LoadLayout(const ofxJSONElement& moduleInfo) override;
    void SetUpFromSaveData() override;
    void SaveLayout(ofxJSONElement& moduleInfo) override;
+   
+   static bool sDrawingPush2Display;
    
 private:
    //IDrawableModule
@@ -55,4 +62,10 @@ private:
    int mHeight;
    
    IDrawableModule* mDisplayModule;
+   vector<IUIControl*> mSliderControls;
+   vector<IUIControl*> mButtonControls;
+   int mModuleColumnOffset;
+   float mModuleColumnOffsetSmoothed;
+   
+   MidiDevice mDevice;
 };

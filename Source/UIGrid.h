@@ -79,6 +79,8 @@ public:
    //IUIControl
    void SetFromMidiCC(float slider) override {}
    void SetValue(float value) override {}
+   bool IsSliderControl() override { return false; }
+   bool IsButtonControl() override { return false; }
    
    void SaveState(FileStreamOut& out) override;
    void LoadState(FileStreamIn& in, bool shouldSetValue = true) override;

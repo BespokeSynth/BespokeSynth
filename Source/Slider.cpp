@@ -14,6 +14,7 @@
 #include "FileStream.h"
 #include "ModularSynth.h"
 #include "IModulator.h"
+#include "Push2Control.h"
 
 FloatSlider::FloatSlider(IFloatSliderListener* owner, const char* label, int x, int y, int w, int h, float* var, float min, float max, int digits /* = -1 */)
 : mVar(var)
@@ -97,6 +98,15 @@ void FloatSlider::SetLabel(const char* label)
 
 void FloatSlider::Render()
 {
+   float normalWidth = mWidth;
+   float normalHeight = mHeight;
+   
+   if (Push2Control::sDrawingPush2Display)
+   {
+      mWidth = 100;
+      mHeight = 15;
+   }
+   
    mLastDisplayedValue = *mVar;
    
    ofPushStyle();
@@ -202,6 +212,9 @@ void FloatSlider::Render()
       mMaxEntry->Draw();
    if (mMinEntry)
       mMinEntry->Draw();
+   
+   mWidth = normalWidth;
+   mHeight = normalHeight;
 }
 
 void FloatSlider::DisplayLFOControl()
@@ -751,6 +764,15 @@ void IntSlider::Poll()
 
 void IntSlider::Render()
 {
+   float normalWidth = mWidth;
+   float normalHeight = mHeight;
+   
+   if (Push2Control::sDrawingPush2Display)
+   {
+      mWidth = 100;
+      mHeight = 15;
+   }
+   
    mLastDisplayedValue = *mVar;
    
    ofPushStyle();
@@ -815,6 +837,9 @@ void IntSlider::Render()
       mMaxEntry->Draw();
    if (mMinEntry)
       mMinEntry->Draw();
+   
+   mWidth = normalWidth;
+   mHeight = normalHeight;
 }
 
 void IntSlider::CalcSliderVal()
