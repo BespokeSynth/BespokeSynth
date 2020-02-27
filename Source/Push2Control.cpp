@@ -21,17 +21,20 @@
 bool Push2Control::sDrawingPush2Display = false;
 
 Push2Control::Push2Control()
-: mDisplayModule(nullptr)
+: mDisplayInitialized(false)
+, mDisplayModule(nullptr)
 , mDevice(this)
 {
    NBase::Result result = Initialize();
    if (result.Succeeded())
    {
       ofLog() << "push 2 connected";
+      mDisplayInitialized = true;
    }
    else
    {
       ofLog() << "push 2 failed to connect";
+      mDisplayInitialized = false;
    }
 }
 
@@ -52,11 +55,18 @@ void Push2Control::DrawModule()
 {
    if (Minimized() || IsVisible() == false)
       return;
+   
+   if (!mDisplayInitialized)
+   {
+      ofSetColor(255, 0, 0, gModuleDrawAlpha);
+      DrawTextNormal("no push 2 found", 3, 15);
+   }
 }
  
 void Push2Control::PostRender()
 {
-   RenderPush2Display();
+   if (mDisplayInitialized)
+      RenderPush2Display();
 }
 
 void Push2Control::LoadLayout(const ofxJSONElement& moduleInfo)

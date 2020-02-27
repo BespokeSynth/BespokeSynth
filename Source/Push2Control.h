@@ -48,6 +48,8 @@ private:
    void DrawToFramebuffer(NVGcontext* vg, NVGLUframebuffer* fb, float t, float pxRatio);
    void RenderPush2Display();
    
+   bool mDisplayInitialized;
+   
    ableton::Push2DisplayBridge bridge_;      /* The bridge allowing to use juce::graphics for push */
    ableton::Push2Display push2Display_;      /* The low-level push2 class */
    NVGcontext* mVG;
