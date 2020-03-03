@@ -63,8 +63,8 @@
     <ClCompile>
       <Optimization>Disabled</Optimization>
       <DebugInformationFormat>ProgramDatabase</DebugInformationFormat>
-      <AdditionalIncludeDirectories>..\..\..\VST_SDK\VST3_SDK;..\..\..\VST_SDK\VST2_SDK\public.sdk\source\vst2.x;..\..\JuceLibraryCode;C:\Users\Ryan Challinor\Documents\Code\JUCE\modules;../../Source/json/include;../../Source/glew/include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
-      <PreprocessorDefinitions>_CRT_SECURE_NO_WARNINGS;WIN32;_WINDOWS;DEBUG;_DEBUG;GLEW_STATIC;BESPOKE_WINDOWS;JUCER_VS2015_78A5022=1;JUCE_APP_VERSION=1.0.0;JUCE_APP_VERSION_HEX=0x10000;JucePlugin_Build_VST=0;JucePlugin_Build_VST3=0;JucePlugin_Build_AU=0;JucePlugin_Build_AUv3=0;JucePlugin_Build_RTAS=0;JucePlugin_Build_AAX=0;JucePlugin_Build_Standalone=0;JucePlugin_Build_Unity=0;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <AdditionalIncludeDirectories>..\..\..\VST_SDK\VST3_SDK;..\..\..\VST_SDK\VST2_SDK\public.sdk\source\vst2.x;..\..\JuceLibraryCode;C:\Users\Ryan Challinor\Documents\Code\JUCE\modules;../../Source/json/include;../../Source/glew/include;../../Source/push2/;../../Source/push2/libusb;../../Source/push2/modules/libusb;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <PreprocessorDefinitions>_CRT_SECURE_NO_WARNINGS;WIN32;_WINDOWS;DEBUG;_DEBUG;GLEW_STATIC;BESPOKE_WINDOWS;POLL_WINDOWS;THREADS_WINDOWS;HAVE_STRUCT_TIMESPEC;JUCER_VS2015_78A5022=1;JUCE_APP_VERSION=1.0.0;JUCE_APP_VERSION_HEX=0x10000;JucePlugin_Build_VST=0;JucePlugin_Build_VST3=0;JucePlugin_Build_AU=0;JucePlugin_Build_AUv3=0;JucePlugin_Build_RTAS=0;JucePlugin_Build_AAX=0;JucePlugin_Build_Standalone=0;JucePlugin_Build_Unity=0;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <RuntimeLibrary>MultiThreadedDebugDLL</RuntimeLibrary>
       <RuntimeTypeInfo>true</RuntimeTypeInfo>
       <PrecompiledHeader/>
@@ -105,8 +105,8 @@
     </Midl>
     <ClCompile>
       <Optimization>Full</Optimization>
-      <AdditionalIncludeDirectories>..\..\..\VST_SDK\VST3_SDK;..\..\..\VST_SDK\VST2_SDK\public.sdk\source\vst2.x;..\..\JuceLibraryCode;C:\Users\Ryan Challinor\Documents\Code\JUCE\modules;../../Source/json/include;../../Source/glew/include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
-      <PreprocessorDefinitions>_CRT_SECURE_NO_WARNINGS;WIN32;_WINDOWS;NDEBUG;GLEW_STATIC;BESPOKE_WINDOWS;JUCER_VS2015_78A5022=1;JUCE_APP_VERSION=1.0.0;JUCE_APP_VERSION_HEX=0x10000;JucePlugin_Build_VST=0;JucePlugin_Build_VST3=0;JucePlugin_Build_AU=0;JucePlugin_Build_AUv3=0;JucePlugin_Build_RTAS=0;JucePlugin_Build_AAX=0;JucePlugin_Build_Standalone=0;JucePlugin_Build_Unity=0;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <AdditionalIncludeDirectories>..\..\..\VST_SDK\VST3_SDK;..\..\..\VST_SDK\VST2_SDK\public.sdk\source\vst2.x;..\..\JuceLibraryCode;C:\Users\Ryan Challinor\Documents\Code\JUCE\modules;../../Source/json/include;../../Source/glew/include;../../Source/push2/;../../Source/push2/libusb;../../Source/push2/modules/libusb;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <PreprocessorDefinitions>_CRT_SECURE_NO_WARNINGS;WIN32;_WINDOWS;NDEBUG;GLEW_STATIC;BESPOKE_WINDOWS;POLL_WINDOWS;THREADS_WINDOWS;HAVE_STRUCT_TIMESPEC;JUCER_VS2015_78A5022=1;JUCE_APP_VERSION=1.0.0;JUCE_APP_VERSION_HEX=0x10000;JucePlugin_Build_VST=0;JucePlugin_Build_VST3=0;JucePlugin_Build_AU=0;JucePlugin_Build_AUv3=0;JucePlugin_Build_RTAS=0;JucePlugin_Build_AAX=0;JucePlugin_Build_Standalone=0;JucePlugin_Build_Unity=0;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <RuntimeLibrary>MultiThreadedDLL</RuntimeLibrary>
       <RuntimeTypeInfo>true</RuntimeTypeInfo>
       <PrecompiledHeader/>
@@ -140,6 +140,10 @@
     <Lib/>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClCompile Include="..\..\Source\push2\push2\JuceToPush2DisplayBridge.cpp"/>
+    <ClCompile Include="..\..\Source\push2\libusb\libusb_platform_wrapper.c"/>
+    <ClCompile Include="..\..\Source\push2\push2\Push2-Usb-Communicator.cpp"/>
+    <ClCompile Include="..\..\Source\push2\Result.cpp"/>
     <ClCompile Include="..\..\Source\CFMessaging\Bespoke_CFMessaging.cpp"/>
     <ClCompile Include="..\..\Source\CFMessaging\KontrolKommunicator.cpp">
       <ExcludedFromBuild>true</ExcludedFromBuild>
@@ -193,6 +197,10 @@
     <ClCompile Include="..\..\Source\Pumper.cpp"/>
     <ClCompile Include="..\..\Source\Stutter.cpp"/>
     <ClCompile Include="..\..\Source\TremoloEffect.cpp"/>
+    <ClCompile Include="..\..\Source\Push2Control.cpp"/>
+    <ClCompile Include="..\..\Source\PulseHocket.cpp"/>
+    <ClCompile Include="..\..\Source\PulseGate.cpp"/>
+    <ClCompile Include="..\..\Source\NotePanRandom.cpp"/>
     <ClCompile Include="..\..\Source\PulseDelayer.cpp"/>
     <ClCompile Include="..\..\Source\PulseChance.cpp"/>
     <ClCompile Include="..\..\Source\NoteRangeFilter.cpp"/>
@@ -2260,6 +2268,14 @@
     <ClCompile Include="..\..\JuceLibraryCode\include_juce_video.cpp"/>
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="..\..\Source\push2\libusb\config.h"/>
+    <ClInclude Include="..\..\Source\push2\libusb\config_msvc.h"/>
+    <ClInclude Include="..\..\Source\push2\libusb\config_xcode.h"/>
+    <ClInclude Include="..\..\Source\push2\push2\JuceToPush2DisplayBridge.h"/>
+    <ClInclude Include="..\..\Source\push2\push2\Push2-Bitmap.h"/>
+    <ClInclude Include="..\..\Source\push2\push2\Push2-Display.h"/>
+    <ClInclude Include="..\..\Source\push2\push2\Push2-UsbCommunicator.h"/>
+    <ClInclude Include="..\..\Source\push2\Result.h"/>
     <ClInclude Include="..\..\Source\exprtk\exprtk.hpp"/>
     <ClInclude Include="..\..\Source\CFMessaging\KontrolKommunicator.h"/>
     <ClInclude Include="..\..\Source\CFMessaging\ListenPort.h"/>
@@ -2312,6 +2328,10 @@
     <ClInclude Include="..\..\Source\Pumper.h"/>
     <ClInclude Include="..\..\Source\Stutter.h"/>
     <ClInclude Include="..\..\Source\TremoloEffect.h"/>
+    <ClInclude Include="..\..\Source\Push2Control.h"/>
+    <ClInclude Include="..\..\Source\PulseHocket.h"/>
+    <ClInclude Include="..\..\Source\PulseGate.h"/>
+    <ClInclude Include="..\..\Source\NotePanRandom.h"/>
     <ClInclude Include="..\..\Source\PulseDelayer.h"/>
     <ClInclude Include="..\..\Source\PulseChance.h"/>
     <ClInclude Include="..\..\Source\NoteRangeFilter.h"/>

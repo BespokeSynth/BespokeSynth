@@ -37,6 +37,9 @@ public:
    void SaveLayout(ofxJSONElement& moduleInfo) override;
    
    static bool sDrawingPush2Display;
+   static NVGcontext* sVG;
+   static NVGLUframebuffer* sFB;
+   static void CreateStaticFramebuffer(); //windows was having trouble creating a nanovg context and fbo on the fly
    
 private:
    //IDrawableModule
@@ -68,10 +71,8 @@ private:
    
    ableton::Push2DisplayBridge bridge_;      /* The bridge allowing to use juce::graphics for push */
    ableton::Push2Display push2Display_;      /* The low-level push2 class */
-   NVGcontext* mVG;
-   NVGLUframebuffer* mFB;
    unsigned char* mPixels;
-   int mPixelRatio;
+   const int kPixelRatio = 1;
    
    const float kColumnSpacing = 121;
    

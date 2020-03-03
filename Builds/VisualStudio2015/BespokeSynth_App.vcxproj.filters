@@ -2,6 +2,9 @@
 
 <Project ToolsVersion="14.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
   <ItemGroup>
+    <Filter Include="BespokeSynth\libraries\push2">
+      <UniqueIdentifier>{1A55651A-CAA6-6753-41E6-95655C03B46B}</UniqueIdentifier>
+    </Filter>
     <Filter Include="BespokeSynth\libraries\exprtk">
       <UniqueIdentifier>{58734C2B-CB80-803D-2689-4FA080035CEC}</UniqueIdentifier>
     </Filter>
@@ -484,6 +487,18 @@
     </Filter>
   </ItemGroup>
   <ItemGroup>
+    <ClCompile Include="..\..\Source\push2\push2\JuceToPush2DisplayBridge.cpp">
+      <Filter>BespokeSynth\libraries\push2</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\Source\push2\libusb\libusb_platform_wrapper.c">
+      <Filter>BespokeSynth\libraries\push2</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\Source\push2\push2\Push2-Usb-Communicator.cpp">
+      <Filter>BespokeSynth\libraries\push2</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\Source\push2\Result.cpp">
+      <Filter>BespokeSynth\libraries\push2</Filter>
+    </ClCompile>
     <ClCompile Include="..\..\Source\CFMessaging\Bespoke_CFMessaging.cpp">
       <Filter>BespokeSynth\libraries\CFMessaging</Filter>
     </ClCompile>
@@ -594,6 +609,18 @@
     </ClCompile>
     <ClCompile Include="..\..\Source\TremoloEffect.cpp">
       <Filter>BespokeSynth\Source\effects</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\Source\Push2Control.cpp">
+      <Filter>BespokeSynth\Source\modules</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\Source\PulseHocket.cpp">
+      <Filter>BespokeSynth\Source\modules</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\Source\PulseGate.cpp">
+      <Filter>BespokeSynth\Source\modules</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\Source\NotePanRandom.cpp">
+      <Filter>BespokeSynth\Source\modules</Filter>
     </ClCompile>
     <ClCompile Include="..\..\Source\PulseDelayer.cpp">
       <Filter>BespokeSynth\Source\modules</Filter>
@@ -3324,6 +3351,30 @@
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="..\..\Source\push2\libusb\config.h">
+      <Filter>BespokeSynth\libraries\push2</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\Source\push2\libusb\config_msvc.h">
+      <Filter>BespokeSynth\libraries\push2</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\Source\push2\libusb\config_xcode.h">
+      <Filter>BespokeSynth\libraries\push2</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\Source\push2\push2\JuceToPush2DisplayBridge.h">
+      <Filter>BespokeSynth\libraries\push2</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\Source\push2\push2\Push2-Bitmap.h">
+      <Filter>BespokeSynth\libraries\push2</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\Source\push2\push2\Push2-Display.h">
+      <Filter>BespokeSynth\libraries\push2</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\Source\push2\push2\Push2-UsbCommunicator.h">
+      <Filter>BespokeSynth\libraries\push2</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\Source\push2\Result.h">
+      <Filter>BespokeSynth\libraries\push2</Filter>
+    </ClInclude>
     <ClInclude Include="..\..\Source\exprtk\exprtk.hpp">
       <Filter>BespokeSynth\libraries\exprtk</Filter>
     </ClInclude>
@@ -3479,6 +3530,18 @@
     </ClInclude>
     <ClInclude Include="..\..\Source\TremoloEffect.h">
       <Filter>BespokeSynth\Source\effects</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\Source\Push2Control.h">
+      <Filter>BespokeSynth\Source\modules</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\Source\PulseHocket.h">
+      <Filter>BespokeSynth\Source\modules</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\Source\PulseGate.h">
+      <Filter>BespokeSynth\Source\modules</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\Source\NotePanRandom.h">
+      <Filter>BespokeSynth\Source\modules</Filter>
     </ClInclude>
     <ClInclude Include="..\..\Source\PulseDelayer.h">
       <Filter>BespokeSynth\Source\modules</Filter>

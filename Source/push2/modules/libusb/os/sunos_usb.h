@@ -65,12 +65,6 @@ struct devlink_cbarg {
 	di_minor_t		minor;
 };
 
-typedef struct walk_link {
-	char *path;
-	int len;
-	char **linkpp;
-} walk_link_t;
-
 /* AIO callback args */
 struct aio_callback_args{
 	struct libusb_transfer *transfer;

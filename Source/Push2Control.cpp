@@ -8,6 +8,10 @@
   ==============================================================================
 */
 
+#ifdef BESPOKE_WINDOWS
+#include <GL/glew.h>
+#endif
+
 #include "Push2Control.h"
 #include <cctype>
 #include "SynthGlobals.h"
@@ -23,6 +27,8 @@
 #include "PatchCableSource.h"
 
 bool Push2Control::sDrawingPush2Display = false;
+NVGcontext* Push2Control::sVG = nullptr;
+NVGLUframebuffer* Push2Control::sFB = nullptr;
 
 Push2Control::Push2Control()
 : mDisplayInitialized(false)
@@ -146,6 +152,20 @@ void Push2Control::SaveLayout(ofxJSONElement& moduleInfo)
    IDrawableModule::SaveLayout(moduleInfo);
 }
 
+//static
+void Push2Control::CreateStaticFramebuffer()
+{
+   sVG = nvgCreateGL3(NVG_ANTIALIAS | NVG_STENCIL_STROKES);
+   assert(sVG);
+
+   const auto width = ableton::Push2DisplayBitmap::kWidth;
+   const auto height = ableton::Push2DisplayBitmap::kHeight;
+   const int pixelRatio = 1;
+
+   sFB = nvgluCreateFramebuffer(sVG, width*pixelRatio, height*pixelRatio, 0);
+   assert(sFB);
+}
+
 NBase::Result Push2Control::Initialize()
 {
    // First we initialise the low level push2 object
@@ -156,26 +176,22 @@ NBase::Result Push2Control::Initialize()
    result = bridge_.Init(push2Display_);
    RETURN_IF_FAILED_MESSAGE(result, "Failed to init bridge");
    
-   mVG = nvgCreateGL3(NVG_ANTIALIAS | NVG_STENCIL_STROKES);
-   
    const auto width = ableton::Push2DisplayBitmap::kWidth;
    const auto height = ableton::Push2DisplayBitmap::kHeight;
-   mPixelRatio = 1;
    
-   mFB = nvgluCreateFramebuffer(mVG, width*mPixelRatio, height*mPixelRatio, 0);
-   if (mFB == NULL) {
-      printf("Could not create FBO.\n");
-   }
+   mPixels = new unsigned char[3 * (width * kPixelRatio) * (height * kPixelRatio)];
    
-   mPixels = new unsigned char[3 * (width * mPixelRatio) * (height * mPixelRatio)];
-   
-   mFontHandle = nvgCreateFont(mVG, ofToDataPath("frabk.ttf").c_str(), ofToDataPath("frabk.ttf").c_str());
-   mFontHandleBold = nvgCreateFont(mVG, ofToDataPath("frabk_m.ttf").c_str(), ofToDataPath("frabk_m.ttf").c_str());
+   mFontHandle = nvgCreateFont(sVG, ofToDataPath("frabk.ttf").c_str(), ofToDataPath("frabk.ttf").c_str());
+   mFontHandleBold = nvgCreateFont(sVG, ofToDataPath("frabk_m.ttf").c_str(), ofToDataPath("frabk_m.ttf").c_str());
    
    const std::vector<string>& devices = mDevice.GetPortList(false);
    for (int i=0; i<devices.size(); ++i)
    {
+#if JUCE_WINDOWS
+      if (strcmp(devices[i].c_str(), "Ableton Push 2") == 0)
+#else
       if (strcmp(devices[i].c_str(), "Ableton Push 2 Live Port") == 0)
+#endif
       {
          mDevice.ConnectOutput(i);
          mDevice.ConnectInput(devices[i].c_str());
@@ -234,7 +250,7 @@ void Push2Control::DrawToFramebuffer(NVGcontext* vg, NVGLUframebuffer* fb, float
       ofSetColor(IDrawableModule::GetColor(mDisplayModule->GetModuleType()));
       ofNoFill();
       
-      nvgFontSize(mVG, 16);
+      nvgFontSize(sVG, 16);
       DrawControls(mSliderControls, 20);
       DrawControls(mButtonControls, 60);
       
@@ -433,9 +449,9 @@ void Push2Control::RenderPush2Display()
    }
    
    auto mainVG = gNanoVG;
-   gNanoVG = mVG;
+   gNanoVG = sVG;
    sDrawingPush2Display = true;
-   DrawToFramebuffer(mVG, mFB, gTime/300, mPixelRatio);
+   DrawToFramebuffer(sVG, sFB, gTime/300, kPixelRatio);
    sDrawingPush2Display = false;
    gNanoVG = mainVG;
 

@@ -11,6 +11,7 @@
 #include "nanovg/nanovg_gl.h"
 #include "ModularSynth.h"
 #include "SynthGlobals.h"
+#include "Push2Control.h"  //TODO(Ryan) remove
 
 #ifdef JUCE_WINDOWS
 #include <Windows.h>
@@ -130,6 +131,8 @@ public:
          printf("Could not init nanovg.\n");
       if (mFontBoundsVG == nullptr)
          printf("Could not init font bounds nanovg.\n");
+
+      Push2Control::CreateStaticFramebuffer();
       
       mSynth.LoadResources(mVG, mFontBoundsVG);
       

@@ -36,10 +36,6 @@
 #include <mach/mach_host.h>
 #include <mach/mach_port.h>
 
-/* Suppress warnings about the use of the deprecated objc_registerThreadWithCollector
- * function. Its use is also conditionalized to only older deployment targets. */
-#define OBJC_SILENCE_GC_DEPRECATIONS 1
-
 #include <AvailabilityMacros.h>
 #if MAC_OS_X_VERSION_MIN_REQUIRED >= 1060 && MAC_OS_X_VERSION_MIN_REQUIRED < 101200
   #include <objc/objc-auto.h>
@@ -49,6 +45,7 @@
 /* Apple deprecated the darwin atomics in 10.12 in favor of C11 atomics */
 #include <stdatomic.h>
 #define libusb_darwin_atomic_fetch_add(x, y) atomic_fetch_add(x, y)
+#define OSX_USE_CLOCK_GETTIME 1
 
 _Atomic int32_t initCount = ATOMIC_VAR_INIT(0);
 #else
@@ -60,12 +57,6 @@ _Atomic int32_t initCount = ATOMIC_VAR_INIT(0);
 
 static volatile int32_t initCount = 0;
 
-#endif
-
-/* On 10.12 and later, use newly available clock_*() functions */
-#if MAC_OS_X_VERSION_MIN_REQUIRED >= 101200
-#define OSX_USE_CLOCK_GETTIME 1
-#else
 #define OSX_USE_CLOCK_GETTIME 0
 #endif
 
@@ -233,21 +224,20 @@ static int usb_setup_device_iterator (io_iterator_t *deviceIterator, UInt32 loca
                                                                          &kCFTypeDictionaryKeyCallBacks,
                                                                          &kCFTypeDictionaryValueCallBacks);
 
-    /* there are no unsigned CFNumber types so treat the value as signed. the OS seems to do this
-         internally (CFNumberType of locationID is kCFNumberSInt32Type) */
-    CFTypeRef locationCF = CFNumberCreate (NULL, kCFNumberSInt32Type, &location);
+    if (propertyMatchDict) {
+      /* there are no unsigned CFNumber types so treat the value as signed. the os seems to do this
+         internally (CFNumberType of locationID is 3) */
+      CFTypeRef locationCF = CFNumberCreate (NULL, kCFNumberSInt32Type, &location);
 
-    if (propertyMatchDict && locationCF) {
       CFDictionarySetValue (propertyMatchDict, CFSTR(kUSBDevicePropertyLocationID), locationCF);
+      /* release our reference to the CFNumber (CFDictionarySetValue retains it) */
+      CFRelease (locationCF);
+
       CFDictionarySetValue (matchingDict, CFSTR(kIOPropertyMatchKey), propertyMatchDict);
+      /* release out reference to the CFMutableDictionaryRef (CFDictionarySetValue retains it) */
+      CFRelease (propertyMatchDict);
     }
     /* else we can still proceed as long as the caller accounts for the possibility of other devices in the iterator */
-
-    /* release our references as per the Create Rule */
-    if (propertyMatchDict)
-      CFRelease (propertyMatchDict);
-    if (locationCF)
-      CFRelease (locationCF);
   }
 
   return IOServiceGetMatchingServices(kIOMasterPortDefault, matchingDict, deviceIterator);
@@ -315,7 +305,6 @@ static usb_device_t **darwin_device_from_service (io_service_t service)
 }
 
 static void darwin_devices_attached (void *ptr, io_iterator_t add_devices) {
-  UNUSED(ptr);
   struct libusb_context *ctx;
   io_service_t service;
 
@@ -324,7 +313,7 @@ static void darwin_devices_attached (void *ptr, io_iterator_t add_devices) {
   while ((service = IOIteratorNext(add_devices))) {
     /* add this device to each active context's device list */
     list_for_each_entry(ctx, &active_contexts_list, list, struct libusb_context) {
-      process_new_device (ctx, service);
+      process_new_device (ctx, service);;
     }
 
     IOObjectRelease(service);
@@ -334,7 +323,6 @@ static void darwin_devices_attached (void *ptr, io_iterator_t add_devices) {
 }
 
 static void darwin_devices_detached (void *ptr, io_iterator_t rem_devices) {
-  UNUSED(ptr);
   struct libusb_device *dev = NULL;
   struct libusb_context *ctx;
   struct darwin_cached_device *old_device;
@@ -1039,11 +1027,8 @@ static int process_new_device (struct libusb_context *ctx, io_service_t service)
     case kUSBDeviceSpeedLow: dev->speed = LIBUSB_SPEED_LOW; break;
     case kUSBDeviceSpeedFull: dev->speed = LIBUSB_SPEED_FULL; break;
     case kUSBDeviceSpeedHigh: dev->speed = LIBUSB_SPEED_HIGH; break;
-#if MAC_OS_X_VERSION_MAX_ALLOWED >= 1070
+#if DeviceVersion >= 500
     case kUSBDeviceSpeedSuper: dev->speed = LIBUSB_SPEED_SUPER; break;
-#endif
-#if MAC_OS_X_VERSION_MAX_ALLOWED >= 101200
-    case kUSBDeviceSpeedSuperPlus: dev->speed = LIBUSB_SPEED_SUPER_PLUS; break;
 #endif
     default:
       usbi_warn (ctx, "Got unknown device speed %d", devSpeed);
@@ -1253,9 +1238,9 @@ static int get_endpoints (struct libusb_device_handle *dev_handle, int iface) {
 
   kern_return_t kresult;
 
-  UInt8 numep, direction, number;
-  UInt8 dont_care1, dont_care3;
-  UInt16 dont_care2;
+  u_int8_t numep, direction, number;
+  u_int8_t dont_care1, dont_care3;
+  u_int16_t dont_care2;
   int rc;
 
   usbi_dbg ("building table of endpoints.");

@@ -962,7 +962,7 @@
       </MODULEPATHS>
     </XCODE_MAC>
     <VS2015 targetFolder="Builds/VisualStudio2015" vstFolder="../VST3 SDK"
-            vst3Folder="..\VST_SDK\VST3_SDK" extraDefs="GLEW_STATIC;BESPOKE_WINDOWS"
+            vst3Folder="..\VST_SDK\VST3_SDK" extraDefs="GLEW_STATIC&#10;BESPOKE_WINDOWS&#10;POLL_WINDOWS&#10;THREADS_WINDOWS&#10;HAVE_STRUCT_TIMESPEC"
             extraCompilerFlags="/bigobj" vstLegacyFolder="..\VST_SDK\VST2_SDK\public.sdk\source\vst2.x">
       <CONFIGURATIONS>
         <CONFIGURATION name="Debug" winWarningLevel="2" generateManifest="1" winArchitecture="x64"

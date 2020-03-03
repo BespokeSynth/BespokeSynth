@@ -29,7 +29,7 @@
 # include <unistd.h>
 # include <sys/syscall.h>
 #elif defined(__APPLE__)
-# include <pthread.h>
+# include <mach/mach.h>
 #elif defined(__CYGWIN__)
 # include <windows.h>
 #endif
@@ -59,7 +59,7 @@ int usbi_cond_timedwait(pthread_cond_t *cond,
 
 int usbi_get_tid(void)
 {
-	int ret;
+	int ret = -1;
 #if defined(__ANDROID__)
 	ret = gettid();
 #elif defined(__linux__)
@@ -69,11 +69,10 @@ int usbi_get_tid(void)
 	   real thread support. For 5.1 and earlier, -1 is returned. */
 	ret = syscall(SYS_getthrid);
 #elif defined(__APPLE__)
-	ret = (int)pthread_mach_thread_np(pthread_self());
+	ret = mach_thread_self();
+	mach_port_deallocate(mach_task_self(), ret);
 #elif defined(__CYGWIN__)
 	ret = GetCurrentThreadId();
-#else
-	ret = -1;
 #endif
 /* TODO: NetBSD thread ID support */
 	return ret;
