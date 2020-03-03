@@ -335,6 +335,8 @@ bool PatchCableSource::InAddCableMode() const
 
 bool PatchCableSource::IsValidTarget(IClickable* target) const
 {
+   if (target == nullptr)
+      return false;
    return VectorContains(target, mValidTargets);
 }
 

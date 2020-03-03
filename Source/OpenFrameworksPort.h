@@ -122,6 +122,7 @@ struct ofRectangle
    float getMaxX() const;
    float getMinY() const;
    float getMaxY() const;
+   ofVec2f getCenter() const { return ofVec2f(x + width * .5f, y + height * .5f); }
    float x;
    float y;
    float width;

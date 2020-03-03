@@ -163,8 +163,6 @@ void IDrawableModule::DrawFrame(float w, float h, bool drawModule, float& titleB
    if (!HasTitleBar())
       titleBarHeight = 0;
    
-   ofPushStyle();
-   ofPushMatrix();
    ofTranslate(mX, mY, 0);
 
    ofColor color = GetColor(mType);
@@ -226,8 +224,6 @@ void IDrawableModule::DrawFrame(float w, float h, bool drawModule, float& titleB
    //gModuleShader.end();
    ofNoFill();
 
-   ofPushStyle();
-   ofPushMatrix();
    if (Enabled())
       gModuleDrawAlpha = 255;
    else
@@ -306,6 +302,7 @@ void IDrawableModule::DrawFrame(float w, float h, bool drawModule, float& titleB
       ofRect(-.5f, -titleBarHeight-.5f, w+1, h+titleBarHeight+1, 4);
       ofPopStyle();
    }
+   
 }
 
 void IDrawableModule::Render()
@@ -323,6 +320,9 @@ void IDrawableModule::Render()
 
    int w, h;
    GetDimensions(w,h);
+   
+   ofPushMatrix();
+   ofPushStyle();
    
    float titleBarHeight;
    float highlight;
@@ -352,9 +352,6 @@ void IDrawableModule::Render()
    
    ofPopMatrix();
    ofPopStyle();
-   
-   ofPopMatrix();
-	ofPopStyle();
 }
 
 void IDrawableModule::DrawPatchCables()

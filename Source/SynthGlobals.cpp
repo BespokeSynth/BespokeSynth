@@ -97,11 +97,14 @@ void SetGlobalSampleRate(int rate)
 void DrawAudioBuffer(float width, float height, ChannelBuffer* buffer, float start, float end, float pos, float vol /*=1*/, ofColor color /*=ofColor::black*/)
 {
    ofPushMatrix();
-   int numChannels = buffer->NumActiveChannels();
-   for (int i=0; i<numChannels; ++i)
+   if (buffer != nullptr)
    {
-      DrawAudioBuffer(width, height/numChannels, buffer->GetChannel(i), start, end, pos, vol, color);
-      ofTranslate(0, height/numChannels);
+      int numChannels = buffer->NumActiveChannels();
+      for (int i=0; i<numChannels; ++i)
+      {
+         DrawAudioBuffer(width, height/numChannels, buffer->GetChannel(i), start, end, pos, vol, color);
+         ofTranslate(0, height/numChannels);
+      }
    }
    ofPopMatrix();
 }

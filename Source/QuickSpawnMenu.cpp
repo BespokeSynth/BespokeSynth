@@ -12,10 +12,24 @@
 #include "ModularSynth.h"
 #include "ModuleFactory.h"
 
+QuickSpawnMenu* TheQuickSpawnMenu = nullptr;
+
 namespace
 {
    const int itemSpacing = 15;
    ofVec2f moduleGrabOffset(-40,10);
+}
+
+QuickSpawnMenu::QuickSpawnMenu()
+{
+   assert(TheQuickSpawnMenu == nullptr);
+   TheQuickSpawnMenu = this;
+}
+
+QuickSpawnMenu::~QuickSpawnMenu()
+{
+   assert(TheQuickSpawnMenu == this);
+   TheQuickSpawnMenu = nullptr;
 }
 
 void QuickSpawnMenu::Init()

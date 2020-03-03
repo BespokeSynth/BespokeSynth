@@ -15,7 +15,8 @@
 class QuickSpawnMenu : public IDrawableModule
 {
 public:
-   QuickSpawnMenu() {}
+   QuickSpawnMenu();
+   virtual ~QuickSpawnMenu();
    
    void Init() override;
    void DrawModule() override;
@@ -38,3 +39,5 @@ private:
    std::vector<string> mElements;
    char mCurrentMenuChar;
 };
+
+extern QuickSpawnMenu* TheQuickSpawnMenu;

@@ -1234,6 +1234,7 @@ void ModularSynth::ResetLayout()
    
    delete TheTitleBar;
    delete TheSaveDataPanel;
+   delete mQuickSpawn;
    
    TitleBar* titleBar = new TitleBar();
    titleBar->SetPosition(0,0);

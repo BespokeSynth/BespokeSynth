@@ -196,7 +196,7 @@ void ModuleContainer::GetModulesWithinRect(ofRectangle rect, vector<IDrawableMod
    output.clear();
    for (int i=0; i<mModules.size(); ++i)
    {
-      if (mModules[i]->IsWithinRect(rect) && dynamic_cast<QuickSpawnMenu*>(mModules[i]) == nullptr)
+      if (mModules[i]->IsWithinRect(rect) && mModules[i] != TheQuickSpawnMenu)
          output.push_back(mModules[i]);
    }
 }
