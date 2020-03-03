@@ -991,10 +991,13 @@
         <MODULEPATH id="juce_audio_basics" path="..\JUCE\modules"/>
       </MODULEPATHS>
     </VS2015>
-    <LINUX_MAKE targetFolder="Builds/LinuxMakefile" extraDefs="GLEW_STATIC&#10;GL_GLEXT_PROTOTYPES&#10;BESPOKE_LINUX">
+    <LINUX_MAKE targetFolder="Builds/LinuxMakefile" extraDefs="GLEW_STATIC&#10;GL_GLEXT_PROTOTYPES&#10;BESPOKE_LINUX"
+                externalLibraries="usb-1.0">
       <CONFIGURATIONS>
-        <CONFIGURATION isDebug="1" name="Debug" headerPath="../../Source/json/include&#10;../../Source/glew/include&#10;../../Source/push2/&#10;../../Source/push2/libusb&#10;../../Source/push2/modules/libusb"/>
-        <CONFIGURATION isDebug="0" name="Release" headerPath="../../Source/json/include&#10;../../Source/glew/include&#10;../../Source/push2/&#10;../../Source/push2/libusb&#10;../../Source/push2/modules/libusb"/>
+        <CONFIGURATION isDebug="1" name="Debug" headerPath="../../Source/json/include&#10;../../Source/glew/include&#10;../../Source/push2/&#10;../../Source/push2/libusb&#10;../../Source/push2/modules/libusb"
+                       libraryPath="/usr/lib/x86_64-linux-gnu/"/>
+        <CONFIGURATION isDebug="0" name="Release" headerPath="../../Source/json/include&#10;../../Source/glew/include&#10;../../Source/push2/&#10;../../Source/push2/libusb&#10;../../Source/push2/modules/libusb"
+                       libraryPath="/usr/lib/x86_64-linux-gnu/"/>
       </CONFIGURATIONS>
       <MODULEPATHS>
         <MODULEPATH id="juce_video" path="../../JUCE/modules"/>
