@@ -77,6 +77,8 @@ void ::ADSR::Stop(double time)
    if (mStopTime > mStartTime) //already stopped
       return;
    mStopBlendFromValue = Value(time);
+   if (time == mStartTime)
+      time += .0001f;  //can't be equal
    mStopTime = time;
 }
 
