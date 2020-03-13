@@ -25,6 +25,7 @@
 #include "ModuleSaveDataPanel.h"
 #include "QuickSpawnMenu.h"
 #include "PatchCableSource.h"
+#include "DropdownList.h"
 
 bool Push2Control::sDrawingPush2Display = false;
 NVGcontext* Push2Control::sVG = nullptr;
@@ -58,10 +59,17 @@ Push2Control::Push2Control()
       mLedState[i] = -1;
    for (int i=0; i<8*8; ++i)
       mModuleGrid[i] = nullptr;
+   for (int i=0; i<128; ++i)
+      mNoteHeldState[i] = 0;
 }
 
 Push2Control::~Push2Control()
 {
+   for (int i=0; i<128; ++i)
+   {
+      SetLed(kMidiMessage_Note, i, 0);
+      SetLed(kMidiMessage_Control, i, 0);
+   }
 }
 
 void Push2Control::CreateUIControls()
@@ -228,45 +236,6 @@ void Push2Control::DrawToFramebuffer(NVGcontext* vg, NVGLUframebuffer* fb, float
    static float sSpacing = -.3f;
    nvgTextLetterSpacing(vg, sSpacing);
    
-   ofSetColor(255,255,255);
-   if (mDisplayModule != nullptr)
-   {
-      mModuleColumnOffsetSmoothed = ofLerp(mModuleColumnOffsetSmoothed, mModuleColumnOffset, .3f);
-      
-      ofPushMatrix();
-      ofPushStyle();
-      
-      //nvgFontSize(mVG, 16);
-      //nvgText(mVG, 10, 10, mDisplayModule->Name(), nullptr);
-      float x;
-      float y;
-      mDisplayModule->GetPosition(x, y, true);
-      mDisplayModule->SetPosition(5 - kColumnSpacing * mModuleColumnOffsetSmoothed, 15);
-      float titleBarHeight;
-      float highlight;
-      mDisplayModule->DrawFrame(kColumnSpacing * MAX(1,MAX(mSliderControls.size(), mButtonControls.size())) - 14, 80, false, titleBarHeight, highlight);
-      mDisplayModule->SetPosition(x, y);
-      
-      ofSetColor(IDrawableModule::GetColor(mDisplayModule->GetModuleType()));
-      ofNoFill();
-      
-      nvgFontSize(sVG, 16);
-      DrawControls(mSliderControls, 20);
-      DrawControls(mButtonControls, 60);
-      
-      int topRowLedColors[8] = {0,0,0,0,0,0,0,0};
-      for (int i=0; i < mButtonControls.size(); ++i)
-      {
-         if (i - mModuleColumnOffset >= 0 && i - mModuleColumnOffset < 8)
-            topRowLedColors[i-mModuleColumnOffset] = GetColorForType(mButtonControls[i]->GetModuleParent()->GetModuleType());
-      }
-      for (int i=0; i<8; ++i)
-         SetLed(kMidiMessage_Control, i+102, topRowLedColors[i]);
-      
-      ofPopMatrix();
-      ofPopStyle();
-   }
-   
    mModules.clear();
    for (int i=0; i<8*8; ++i)
       mModuleGrid[i] = nullptr;
@@ -366,6 +335,45 @@ void Push2Control::DrawToFramebuffer(NVGcontext* vg, NVGLUframebuffer* fb, float
       ofPopStyle();
    }
    
+   ofSetColor(255,255,255);
+   if (mDisplayModule != nullptr)
+   {
+      mModuleColumnOffsetSmoothed = ofLerp(mModuleColumnOffsetSmoothed, mModuleColumnOffset, .3f);
+      
+      ofPushMatrix();
+      ofPushStyle();
+      
+      //nvgFontSize(mVG, 16);
+      //nvgText(mVG, 10, 10, mDisplayModule->Name(), nullptr);
+      float x;
+      float y;
+      mDisplayModule->GetPosition(x, y, true);
+      mDisplayModule->SetPosition(5 - kColumnSpacing * mModuleColumnOffsetSmoothed, 15);
+      float titleBarHeight;
+      float highlight;
+      mDisplayModule->DrawFrame(kColumnSpacing * MAX(1,MAX(mSliderControls.size(), mButtonControls.size())) - 14, 80, false, titleBarHeight, highlight);
+      mDisplayModule->SetPosition(x, y);
+      
+      ofSetColor(IDrawableModule::GetColor(mDisplayModule->GetModuleType()));
+      ofNoFill();
+      
+      nvgFontSize(sVG, 16);
+      DrawControls(mButtonControls, false, 60);
+      DrawControls(mSliderControls, true, 20);
+      
+      int topRowLedColors[8] = {0,0,0,0,0,0,0,0};
+      for (int i=0; i < mButtonControls.size(); ++i)
+      {
+         if (i - mModuleColumnOffset >= 0 && i - mModuleColumnOffset < 8)
+            topRowLedColors[i-mModuleColumnOffset] = GetColorForType(mButtonControls[i]->GetModuleParent()->GetModuleType());
+      }
+      for (int i=0; i<8; ++i)
+         SetLed(kMidiMessage_Control, i+102, topRowLedColors[i]);
+      
+      ofPopMatrix();
+      ofPopStyle();
+   }
+   
    for (int i=0; i<8; ++i)
       SetLed(kMidiMessage_Control, i+20, bottomRowLedColors[i]);
    
@@ -411,7 +419,7 @@ int Push2Control::GetColorForType(ModuleType type)
    return color;
 }
 
-void Push2Control::DrawControls(vector<IUIControl*> controls, float yPos)
+void Push2Control::DrawControls(vector<IUIControl*> controls, bool sliders, float yPos)
 {
    for (int i=0; i < controls.size(); ++i)
    {
@@ -432,6 +440,24 @@ void Push2Control::DrawControls(vector<IUIControl*> controls, float yPos)
          DrawTextBold(juce::String(controls[i]->Path()).replace("~","\n").toRawUTF8(), kColumnSpacing * i + 3, yPos-12, 10);
       else
          DrawTextBold(controls[i]->Name(), kColumnSpacing * i + 3, yPos-5, 16);
+      
+      int pushControlIndex = i - mModuleColumnOffset;
+      if (sliders && pushControlIndex >= 0 && pushControlIndex < 8 && mNoteHeldState[pushControlIndex])
+      {
+         DropdownList* dropdown = dynamic_cast<DropdownList*>(mSliderControls[i]);
+         if (dropdown != nullptr)
+         {
+            int w, h;
+            dropdown->GetPopupDimensions(w, h);
+            ofPushMatrix();
+            ofTranslate(kColumnSpacing * i + 3, yPos + 7 - h * controls[i]->GetMidiValue());
+            dropdown->DrawDropdown(w, h);
+            ofFill();
+            ofSetColor(IDrawableModule::GetColor(controls[i]->GetModuleParent()->GetModuleType()));
+            ofCircle(w - 4, h * controls[i]->GetMidiValue(), 2);
+            ofPopMatrix();
+         }
+      }
       
       ofPopStyle();
    }
@@ -581,6 +607,8 @@ void Push2Control::OnMidiNote(MidiNote& note)
    {
       ofLog() << "note " << note.mPitch << " " << note.mVelocity;
    }
+   
+   mNoteHeldState[note.mPitch] = note.mVelocity > 0;
 }
 
 void Push2Control::OnMidiControl(MidiControl& control)

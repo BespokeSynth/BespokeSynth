@@ -37,9 +37,9 @@ public:
    void SetDimensions(int w, int h) { mWidth = w; mHeight = h; }
    bool HasTitleBar() const override { return false; }
    string GetTitleLabel() override { return ""; }
+   void GetDimensions(int& width, int& height) override { width = mWidth; height = mHeight; }
 private:
    void OnClicked(int x, int y, bool right) override;
-   void GetDimensions(int& width, int& height) override { width = mWidth; height = mHeight; }
    int mWidth;
    int mHeight;
    int mColumnWidth;
@@ -66,6 +66,7 @@ public:
    void DrawLabel(bool draw) { mDrawLabel = draw; }
    void SetWidth(int width) { mWidth = width; }
    void SetDrawTriangle(bool draw) { mDrawTriangle = draw; }
+   void GetPopupDimensions(int& width, int& height) { mModalList.GetDimensions(width, height); }
 
    //IUIControl
    void SetFromMidiCC(float slider) override;

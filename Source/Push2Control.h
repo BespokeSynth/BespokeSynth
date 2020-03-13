@@ -55,7 +55,7 @@ private:
    void RenderPush2Display();
    
    void SetDisplayModule(IDrawableModule* module);
-   void DrawControls(vector<IUIControl*> controls, float yPos);
+   void DrawControls(vector<IUIControl*> controls, bool sliders, float yPos);
    void UpdateControlList();
    void AddFavoriteControl(IUIControl* control);
    void RemoveFavoriteControl(IUIControl* control);
@@ -97,6 +97,7 @@ private:
    vector<IUIControl*> mFavoriteControls;
    bool mNewButtonHeld;
    bool mDeleteButtonHeld;
+   bool mNoteHeldState[128];
    IDrawableModule* mHeldModule;
    bool mAllowRepatch;
    

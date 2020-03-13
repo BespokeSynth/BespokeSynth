@@ -295,7 +295,7 @@ void DropdownList::CalcSliderVal()
    int itemIndex = FindItemIndex(*mVar);
    
    if (itemIndex != -1)
-      mSliderVal = ofMap(itemIndex, 0, mElements.size(), 0, 1);
+      mSliderVal = ofMap(itemIndex + .5f, 0, mElements.size(), 0, 1);
    else
       mSliderVal = -1;
    mLastSetValue = *mVar;
