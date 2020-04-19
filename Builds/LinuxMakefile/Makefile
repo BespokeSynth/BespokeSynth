@@ -32,10 +32,10 @@ ifeq ($(CONFIG),Debug)
   JUCE_OUTDIR := build
 
   ifeq ($(TARGET_ARCH),)
-    TARGET_ARCH := 
+    TARGET_ARCH := -march=native
   endif
 
-  JUCE_CPPFLAGS := $(DEPFLAGS) -DLINUX=1 -DDEBUG=1 -D_DEBUG=1 -DGLEW_STATIC -DGL_GLEXT_PROTOTYPES -DBESPOKE_LINUX -DJUCER_LINUX_MAKE_6D53C8B4=1 -DJUCE_APP_VERSION=1.0.0 -DJUCE_APP_VERSION_HEX=0x10000 $(shell pkg-config --cflags alsa x11 xinerama xext freetype2 webkit2gtk-4.0 gtk+-x11-3.0 libcurl) -pthread -I/home/new/Downloads/JUCE/modules/juce_audio_processors/format_types/VST3_SDK -I/home/new/Downloads/VST_SDK/VST3_SDK -I../../JuceLibraryCode -I/home/new/Downloads/JUCE/modules -I../../Source/json/include -I../../Source/glew/include -I../../Source/push2/ -I../../Source/push2/libusb -I../../Source/push2/modules/libusb $(CPPFLAGS)
+  JUCE_CPPFLAGS := $(DEPFLAGS) -DLINUX=1 -DDEBUG=1 -D_DEBUG=1 -DGLEW_STATIC -DGL_GLEXT_PROTOTYPES -DBESPOKE_LINUX -DJUCER_LINUX_MAKE_6D53C8B4=1 -DJUCE_APP_VERSION=1.0.0 -DJUCE_APP_VERSION_HEX=0x10000 $(shell pkg-config --cflags alsa x11 xinerama xext freetype2 webkit2gtk-4.0 gtk+-x11-3.0 libcurl) -pthread -I$(HOME)/JUCE/modules/juce_audio_processors/format_types/VST3_SDK -I../../JuceLibraryCode -I$(HOME)/JUCE/modules -I../../Source/json/include -I../../Source/glew/include -I../../Source/push2/ -I../../Source/push2/libusb -I../../Source/push2/modules/libusb $(CPPFLAGS)
   JUCE_CPPFLAGS_APP := -DJucePlugin_Build_VST=0 -DJucePlugin_Build_VST3=0 -DJucePlugin_Build_AU=0 -DJucePlugin_Build_AUv3=0 -DJucePlugin_Build_RTAS=0 -DJucePlugin_Build_AAX=0 -DJucePlugin_Build_Standalone=0 -DJucePlugin_Build_Unity=0
   JUCE_TARGET_APP := BespokeSynth
 
@@ -53,10 +53,10 @@ ifeq ($(CONFIG),Release)
   JUCE_OUTDIR := build
 
   ifeq ($(TARGET_ARCH),)
-    TARGET_ARCH := 
+    TARGET_ARCH := -march=native
   endif
 
-  JUCE_CPPFLAGS := $(DEPFLAGS) -DLINUX=1 -DNDEBUG=1 -DGLEW_STATIC -DGL_GLEXT_PROTOTYPES -DBESPOKE_LINUX -DJUCER_LINUX_MAKE_6D53C8B4=1 -DJUCE_APP_VERSION=1.0.0 -DJUCE_APP_VERSION_HEX=0x10000 $(shell pkg-config --cflags alsa x11 xinerama xext freetype2 webkit2gtk-4.0 gtk+-x11-3.0 libcurl) -pthread -I/home/new/Downloads/JUCE/modules/juce_audio_processors/format_types/VST3_SDK -I/home/new/Downloads/VST_SDK/VST3_SDK -I../../JuceLibraryCode -I/home/new/Downloads/JUCE/modules -I../../Source/json/include -I../../Source/glew/include -I../../Source/push2/ -I../../Source/push2/libusb -I../../Source/push2/modules/libusb $(CPPFLAGS)
+  JUCE_CPPFLAGS := $(DEPFLAGS) -DLINUX=1 -DNDEBUG=1 -DGLEW_STATIC -DGL_GLEXT_PROTOTYPES -DBESPOKE_LINUX -DJUCER_LINUX_MAKE_6D53C8B4=1 -DJUCE_APP_VERSION=1.0.0 -DJUCE_APP_VERSION_HEX=0x10000 $(shell pkg-config --cflags alsa x11 xinerama xext freetype2 webkit2gtk-4.0 gtk+-x11-3.0 libcurl) -pthread -I$(HOME)/JUCE/modules/juce_audio_processors/format_types/VST3_SDK -I../../JuceLibraryCode -I$(HOME)/JUCE/modules -I../../Source/json/include -I../../Source/glew/include -I../../Source/push2/ -I../../Source/push2/libusb -I../../Source/push2/modules/libusb $(CPPFLAGS)
   JUCE_CPPFLAGS_APP := -DJucePlugin_Build_VST=0 -DJucePlugin_Build_VST3=0 -DJucePlugin_Build_AU=0 -DJucePlugin_Build_AUv3=0 -DJucePlugin_Build_RTAS=0 -DJucePlugin_Build_AAX=0 -DJucePlugin_Build_Standalone=0 -DJucePlugin_Build_Unity=0
   JUCE_TARGET_APP := BespokeSynth
 
@@ -101,6 +101,8 @@ OBJECTS_APP := \
   $(JUCE_OBJDIR)/Pumper_df274e1e.o \
   $(JUCE_OBJDIR)/Stutter_18c3b742.o \
   $(JUCE_OBJDIR)/TremoloEffect_db6065e.o \
+  $(JUCE_OBJDIR)/NoteLatch_3ca8d5d3.o \
+  $(JUCE_OBJDIR)/PulseTrain_b97a43f8.o \
   $(JUCE_OBJDIR)/Push2Control_2a036bee.o \
   $(JUCE_OBJDIR)/PulseHocket_7384f878.o \
   $(JUCE_OBJDIR)/PulseGate_1a495b65.o \
@@ -553,6 +555,16 @@ $(JUCE_OBJDIR)/Stutter_18c3b742.o: ../../Source/Stutter.cpp
 $(JUCE_OBJDIR)/TremoloEffect_db6065e.o: ../../Source/TremoloEffect.cpp
 	-$(V_AT)mkdir -p $(JUCE_OBJDIR)
 	@echo "Compiling TremoloEffect.cpp"
+	$(V_AT)$(CXX) $(JUCE_CXXFLAGS) $(JUCE_CPPFLAGS_APP) $(JUCE_CFLAGS_APP) -o "$@" -c "$<"
+
+$(JUCE_OBJDIR)/NoteLatch_3ca8d5d3.o: ../../Source/NoteLatch.cpp
+	-$(V_AT)mkdir -p $(JUCE_OBJDIR)
+	@echo "Compiling NoteLatch.cpp"
+	$(V_AT)$(CXX) $(JUCE_CXXFLAGS) $(JUCE_CPPFLAGS_APP) $(JUCE_CFLAGS_APP) -o "$@" -c "$<"
+
+$(JUCE_OBJDIR)/PulseTrain_b97a43f8.o: ../../Source/PulseTrain.cpp
+	-$(V_AT)mkdir -p $(JUCE_OBJDIR)
+	@echo "Compiling PulseTrain.cpp"
 	$(V_AT)$(CXX) $(JUCE_CXXFLAGS) $(JUCE_CPPFLAGS_APP) $(JUCE_CFLAGS_APP) -o "$@" -c "$<"
 
 $(JUCE_OBJDIR)/Push2Control_2a036bee.o: ../../Source/Push2Control.cpp

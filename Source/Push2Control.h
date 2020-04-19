@@ -14,12 +14,15 @@
 #include "IDrawableModule.h"
 #include "MidiDevice.h"
 #include "MidiController.h"
+#include "TitleBar.h"
+#include "DropdownList.h"
 
 class NVGcontext;
 class NVGLUframebuffer;
 class IUIControl;
+class IPush2GridController;
 
-class Push2Control : public IDrawableModule, public MidiDeviceListener
+class Push2Control : public IDrawableModule, public MidiDeviceListener, public IDropdownListener
 {
 public:
    Push2Control();
@@ -29,8 +32,13 @@ public:
    string GetTitleLabel() override { return "push 2 control"; }
    void CreateUIControls() override;
    
+   void SetLed(MidiMessageType type, int index, int color, int flashColor = -1);
+   
    void OnMidiNote(MidiNote& note) override;
    void OnMidiControl(MidiControl& control) override;
+   void OnMidiPitchBend(MidiPitchBend& pitchBend) override;
+   
+   void DropdownUpdated(DropdownList* list, int oldVal) override {}
    
    void LoadLayout(const ofxJSONElement& moduleInfo) override;
    void SetUpFromSaveData() override;
@@ -54,12 +62,14 @@ private:
    void DrawToFramebuffer(NVGcontext* vg, NVGLUframebuffer* fb, float t, float pxRatio);
    void RenderPush2Display();
    
+   void SetModuleGridLights();
+   void DrawDisplayModuleControls();
+   void DrawLowerModuleSelector();
    void SetDisplayModule(IDrawableModule* module);
    void DrawControls(vector<IUIControl*> controls, bool sliders, float yPos);
    void UpdateControlList();
    void AddFavoriteControl(IUIControl* control);
    void RemoveFavoriteControl(IUIControl* control);
-   void SetLed(MidiMessageType type, int index, int color, int channel = 1);
    int GetColorForType(ModuleType type);
    bool GetGridIndex(int gridX, int gridY, int& gridIndex) { gridIndex = gridX + gridY * 8; return gridX >= 0 && gridX < 8 && gridY >= 0 && gridY < 8; }
    bool IsIgnorableModule(IDrawableModule* module);
@@ -93,15 +103,39 @@ private:
    float mModuleListOffset;
    float mModuleListOffsetSmoothed;
    IDrawableModule* mModuleGrid[8*8];
+   ofRectangle mModuleGridRect;
    
    vector<IUIControl*> mFavoriteControls;
+   vector<IUIControl*> mSpawnModuleControls;
    bool mNewButtonHeld;
    bool mDeleteButtonHeld;
    bool mNoteHeldState[128];
    IDrawableModule* mHeldModule;
    bool mAllowRepatch;
    
+   enum class ScreenDisplayMode
+   {
+      kNormal,
+      kAddModule
+   };
+   ScreenDisplayMode mScreenDisplayMode;
+   
+   IPush2GridController* mGridControlModule;
+   bool mDisplayModuleCanControlGrid;
+   
    int mLedState[128*2];  //bottom 128 are notes, top 128 are CCs
    
    MidiDevice mDevice;
+   
+   SpawnListManager mSpawnLists;
+};
+
+//https://raw.githubusercontent.com/Ableton/push-interface/master/doc/MidiMapping.png
+class IPush2GridController
+{
+public:
+   virtual ~IPush2GridController() {}
+   virtual void OnPush2Connect() {}
+   virtual bool OnPush2Control(MidiMessageType type, int controlIndex, float midiValue) = 0;
+   virtual void UpdatePush2Leds(Push2Control* push2) = 0;
 };

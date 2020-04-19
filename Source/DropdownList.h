@@ -67,6 +67,7 @@ public:
    void SetWidth(int width) { mWidth = width; }
    void SetDrawTriangle(bool draw) { mDrawTriangle = draw; }
    void GetPopupDimensions(int& width, int& height) { mModalList.GetDimensions(width, height); }
+   void SetMaxPerColumn(int max) { mMaxPerColumn = max; CalculateWidth(); }
 
    //IUIControl
    void SetFromMidiCC(float slider) override;
@@ -109,6 +110,7 @@ private:
    int mLastSetValue;
    bool mAutoCalculateWidth;
    bool mDrawTriangle;
+   double mLastScrolledTime;
 };
 
 #endif /* defined(__modularSynth__DropdownList__) */

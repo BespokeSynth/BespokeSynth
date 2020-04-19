@@ -100,6 +100,9 @@ public:
    void SetManualSide(Side side) { mManualSide = side; }
    void SetClickable(bool clickable) { mClickable = clickable; }
    bool TestHover(float x, float y) const;
+   void SetOverrideCableDir(ofVec2f dir) { mHasOverrideCableDir = true; mOverrideCableDir = dir; }
+   bool HasOverrideCableDir() const { return mHasOverrideCableDir; }
+   ofVec2f GetOverrideCableDir() const { return mOverrideCableDir; }
    
    void AddHistoryEvent(double time, bool on) { mNoteHistory.AddEvent(time, on); }
    NoteHistory& GetHistory() { return mNoteHistory; }
@@ -137,6 +140,8 @@ private:
    bool mClickable;
    Side mSide;
    Side mManualSide;
+   bool mHasOverrideCableDir;
+   ofVec2f mOverrideCableDir;
    
    vector<INoteReceiver*> mNoteReceivers;
    vector<IPulseReceiver*> mPulseReceivers;

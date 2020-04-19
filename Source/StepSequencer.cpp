@@ -172,41 +172,49 @@ void StepSequencer::UpdateLights()
    {
       for (int y=0; y<mGridController->NumRows(); ++y)
       {
-         Vec2i gridPos = ControllerToGrid(Vec2i(x,y));
-         
-         bool cellOn = mGrid->GetVal(gridPos.x,gridPos.y) > 0;
-         bool cellBright = mGrid->GetVal(gridPos.x,gridPos.y) > kMidwayVelocity;
-         bool colOn = (mGrid->GetHighlightCol() == gridPos.x) && mEnabled;
          if (mGridController->IsMultisliderGrid())
          {
+            Vec2i gridPos = ControllerToGrid(Vec2i(x,y));
             mGridController->SetLightDirect(x, y, (int)(mGrid->GetVal(gridPos.x,gridPos.y)*127));
          }
          else
          {
-            GridColor color;
-            if (colOn)
-            {
-               if (cellBright)
-                  color = kGridColor3Bright;
-               else if (cellOn)
-                  color = kGridColor3Dim;
-               else
-                  color = kGridColor2Dim;
-            }
-            else
-            {
-               if (cellBright)
-                  color = kGridColor1Bright;
-               else if (cellOn)
-                  color = kGridColor1Dim;
-               else
-                  color = kGridColorOff;
-            }
+            GridColor color = GetGridColor(x, y);
             
             mGridController->SetLight(x, y, color);
          }
       }
    }
+}
+
+GridColor StepSequencer::GetGridColor(int x, int y)
+{
+   Vec2i gridPos = ControllerToGrid(Vec2i(x,y));
+   bool cellOn = mGrid->GetVal(gridPos.x,gridPos.y) > 0;
+   bool cellBright = mGrid->GetVal(gridPos.x,gridPos.y) > kMidwayVelocity;
+   bool colOn = (mGrid->GetHighlightCol() == gridPos.x) && mEnabled;
+   
+   GridColor color;
+   if (colOn)
+   {
+      if (cellBright)
+         color = kGridColor3Bright;
+      else if (cellOn)
+         color = kGridColor3Dim;
+      else
+         color = kGridColor2Dim;
+   }
+   else
+   {
+      if (cellBright)
+         color = kGridColor1Bright;
+      else if (cellOn)
+         color = kGridColor1Dim;
+      else
+         color = kGridColorOff;
+   }
+   
+   return color;
 }
 
 void StepSequencer::UpdateVelocityLights()
@@ -274,8 +282,7 @@ void StepSequencer::OnGridButton(int x, int y, float velocity, IGridController* 
       {
          Vec2i gridPos = ControllerToGrid(Vec2i(x,y));
          
-         if (mGridController &&
-             mGridController->IsMultisliderGrid())
+         if (grid->IsMultisliderGrid())
          {
             mGrid->SetVal(gridPos.x, gridPos.y, velocity);
          }
@@ -287,7 +294,10 @@ void StepSequencer::OnGridButton(int x, int y, float velocity, IGridController* 
                float val = mGrid->GetVal(gridPos.x,gridPos.y);
                if (val == 0)
                {
-                  mGrid->SetVal(gridPos.x, gridPos.y, 1);
+                  float strength = 1;
+                  if (mUseStrengthSlider)
+                     strength = mStrength;
+                  mGrid->SetVal(gridPos.x, gridPos.y, strength);
                   mHeldButtons.rbegin()->mTime = 0;
                }
             }
@@ -313,13 +323,13 @@ void StepSequencer::OnGridButton(int x, int y, float velocity, IGridController* 
                   else
                   {
                      float val = mGrid->GetVal(gridPos.x,gridPos.y);
-                     /*if (val > kMidwayVelocity)
-                        mGrid->SetVal(gridPos.x,gridPos.y,0);
+                     if (val > kMidwayVelocity)
+                        mGrid->SetVal(gridPos.x,gridPos.y,kMidwayVelocity);
                      else if (val > 0)
-                        mGrid->SetVal(gridPos.x,gridPos.y,1);
+                        mGrid->SetVal(gridPos.x,gridPos.y,0);
                      else
-                        mGrid->SetVal(gridPos.x,gridPos.y,kMidwayVelocity);*/
-                     mGrid->SetVal(gridPos.x, gridPos.y, val > 0 ? 0 : 1);
+                        mGrid->SetVal(gridPos.x,gridPos.y,1);
+                     //mGrid->SetVal(gridPos.x, gridPos.y, val > 0 ? 0 : 1);
                   }
                }
             }
@@ -520,6 +530,69 @@ bool StepSequencer::MouseMoved(float x, float y)
    if (mGrid->NotifyMouseMoved(x,y))
       UpdateLights();
    return false;
+}
+
+bool StepSequencer::OnPush2Control(MidiMessageType type, int controlIndex, float midiValue)
+{
+   if (type == kMidiMessage_Note)
+   {
+      if (controlIndex >= 36 && controlIndex <= 99)
+      {
+         int gridIndex = controlIndex - 36;
+         int gridX = gridIndex % 8;
+         int gridY = 7 - gridIndex / 8;
+         OnGridButton(gridX, gridY, midiValue/127, mGridController);
+         return true;
+      }
+      if (controlIndex == 12) //touching pitchbend
+      {
+         mUseStrengthSlider = midiValue > 0;
+      }
+   }
+   
+   if (type == kMidiMessage_PitchBend)
+   {
+      if (midiValue != 8192)  //default value, happens on pitch bend release
+      {
+         float val = midiValue / 16320.0f;
+         float oldStrength = mStrength;
+         mStrength = val;
+         FloatSliderUpdated(mStrengthSlider, oldStrength);
+      }
+      return true;
+   }
+   
+   return false;
+}
+
+void StepSequencer::UpdatePush2Leds(Push2Control* push2)
+{
+   for (int x=0; x<8; ++x)
+   {
+      for (int y=0; y<8; ++y)
+      {
+         GridColor color = GetGridColor(x, y);
+         int pushColor = 0;
+         switch (color)
+         {
+            case kGridColorOff:  //off
+               pushColor = 0; break;
+            case kGridColor1Dim: //
+               pushColor = 86; break;
+            case kGridColor1Bright: //pressed
+               pushColor = 32; break;
+            case kGridColor2Dim:
+               pushColor = 114; break;
+            case kGridColor2Bright: //root
+               pushColor = 25; break;
+            case kGridColor3Dim: //not in pentatonic
+               pushColor = 116; break;
+            case kGridColor3Bright: //in pentatonic
+               pushColor = 115; break;
+         }
+         push2->SetLed(kMidiMessage_Note, x + (7-y)*8 + 36, pushColor);
+      }
+   }
 }
 
 int StepSequencer::GetNumSteps(NoteInterval interval) const

@@ -68,7 +68,7 @@ public:
    int NumCols() override { return mCols; }
    int NumRows() override { return mRows; }
    bool HasInput() const override;
-   bool IsMultisliderGrid() const override { return mColors.empty(); }
+   //bool IsMultisliderGrid() const override { return mColors.empty(); }   //commented out... don't remember what types of grids this is supposed to be for
    
    //IUIControl
    void SetFromMidiCC(float slider) override {}

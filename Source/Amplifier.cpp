@@ -34,16 +34,19 @@ void Amplifier::Process(double time)
    if (!mEnabled)
       return;
    
-   ComputeSliders(0);
    SyncBuffers();
+   int bufferSize = GetBuffer()->BufferSize();
    
    if (GetTarget())
    {
       ChannelBuffer* out = GetTarget()->GetBuffer();
       for (int ch=0; ch<GetBuffer()->NumActiveChannels(); ++ch)
       {
-         Mult(GetBuffer()->GetChannel(ch), mGain*mGain, out->BufferSize());
-         Add(out->GetChannel(ch), GetBuffer()->GetChannel(ch), out->BufferSize());
+         for (int i=0; i<bufferSize; ++i)
+         {
+            ComputeSliders(i);
+            out->GetChannel(ch)[i] += GetBuffer()->GetChannel(ch)[i] * mGain * mGain;
+         }
          GetVizBuffer()->WriteChunk(GetBuffer()->GetChannel(ch),GetBuffer()->BufferSize(), ch);
       }
    }

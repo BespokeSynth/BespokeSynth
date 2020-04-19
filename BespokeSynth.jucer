@@ -177,6 +177,10 @@
         <FILE id="RG4zGd" name="TremoloEffect.h" compile="0" resource="0" file="Source/TremoloEffect.h"/>
       </GROUP>
       <GROUP id="{6781AC07-A090-A7AF-8D27-BCB6D9526ABD}" name="modules">
+        <FILE id="V7mRjZ" name="NoteLatch.cpp" compile="1" resource="0" file="Source/NoteLatch.cpp"/>
+        <FILE id="IRtI8E" name="NoteLatch.h" compile="0" resource="0" file="Source/NoteLatch.h"/>
+        <FILE id="TlWNNg" name="PulseTrain.cpp" compile="1" resource="0" file="Source/PulseTrain.cpp"/>
+        <FILE id="dK8Ks6" name="PulseTrain.h" compile="0" resource="0" file="Source/PulseTrain.h"/>
         <FILE id="nzAzn8" name="Push2Control.cpp" compile="1" resource="0"
               file="Source/Push2Control.cpp"/>
         <FILE id="qucjjE" name="Push2Control.h" compile="0" resource="0" file="Source/Push2Control.h"/>

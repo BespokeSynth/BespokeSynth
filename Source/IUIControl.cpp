@@ -11,6 +11,7 @@
 #include "SynthGlobals.h"
 #include "ModularSynth.h"
 #include "PatchCable.h"
+#include "Push2Control.h"
 
 IUIControl::~IUIControl()
 {
@@ -64,6 +65,9 @@ void IUIControl::CheckHover(int x, int y)
 
 void IUIControl::DrawHover()
 {
+   if (Push2Control::sDrawingPush2Display)
+      return;
+   
    if (gHoveredUIControl == this)
    {
       int w,h;

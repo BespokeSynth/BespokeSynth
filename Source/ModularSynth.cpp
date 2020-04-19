@@ -835,6 +835,13 @@ void ModularSynth::MouseScrolled(float x, float y)
    }
 }
 
+void ModularSynth::MouseMagnify(int intX, int intY, float scaleFactor)
+{
+   mMousePos.x = intX;
+   mMousePos.y = intY;
+   ZoomView(scaleFactor - 1);
+}
+
 bool ModularSynth::InMidiMapMode()
 {
    return IsKeyHeld('m', kModifier_Shift);
@@ -871,6 +878,11 @@ IDrawableModule* ModularSynth::GetTopModalFocusItem() const
    if (mModalFocusItemStack.empty())
       return nullptr;
    return mModalFocusItemStack.back();
+}
+
+bool ModularSynth::IsModalFocusItem(IDrawableModule* item) const
+{
+   return std::find(mModalFocusItemStack.begin(), mModalFocusItemStack.end(), item) == mModalFocusItemStack.end();
 }
 
 IDrawableModule* ModularSynth::GetModuleAt(int x, int y)

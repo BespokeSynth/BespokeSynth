@@ -74,6 +74,7 @@ public:
    void MousePressed(int x, int y, int button);
    void MouseReleased(int x, int y, int button);
    void MouseScrolled(float x, float y);
+   void MouseMagnify(int x, int y, float scaleFactor);
    void FilesDropped(vector<string> files, int x, int y);
    
    void AddExtraPoller(IPollable* poller);
@@ -108,6 +109,7 @@ public:
    void PushModalFocusItem(IDrawableModule* item);
    void PopModalFocusItem();
    IDrawableModule* GetTopModalFocusItem() const;
+   bool IsModalFocusItem(IDrawableModule* item) const;
    
    void LogEvent(string event, LogEventType type);
    

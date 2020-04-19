@@ -18,26 +18,50 @@
 class ModuleFactory;
 class TitleBar;
 class HelpDisplay;
+struct SpawnListManager;
 
 class SpawnList
 {
 public:
-   SpawnList(TitleBar* owner, int x, int y, string label);
+   SpawnList(IDropdownListener* owner, SpawnListManager* listManager, int x, int y, string label);
    void SetList(vector<string> spawnables, string overrideModuleType);
    void OnSelection(DropdownList* list);
    void SetPosition(int x, int y);
    void SetPositionRelativeTo(SpawnList* list);
    void Draw();
-private:
+   DropdownList* GetList() { return mSpawnList; }
    IDrawableModule* Spawn();
    
+private:
    string mLabel;
    std::vector<string> mSpawnables;
    int mSpawnIndex;
    DropdownList* mSpawnList;
-   TitleBar* mOwner;
+   IDropdownListener* mOwner;
+   SpawnListManager* mListManager;
    ofVec2f mPos;
    string mOverrideModuleType;
+};
+
+struct SpawnListManager
+{
+   SpawnListManager(IDropdownListener* owner);
+   
+   void SetModuleFactory(ModuleFactory* factory);
+   void SetUpVstDropdown(bool rescan);
+   vector<SpawnList*> GetDropdowns() { return mDropdowns; }
+   
+   SpawnList mInstrumentModules;
+   SpawnList mNoteModules;
+   SpawnList mSynthModules;
+   SpawnList mAudioModules;
+   SpawnList mModulatorModules;
+   SpawnList mOtherModules;
+   SpawnList mVstPlugins;
+   SpawnList mPrefabs;
+   
+private:
+   vector<SpawnList*> mDropdowns;
 };
 
 class TitleBar : public IDrawableModule, public IDropdownListener, public IButtonListener, public IFloatSliderListener
@@ -52,9 +76,8 @@ public:
    bool AlwaysOnTop() override { return true; }
    bool IsSingleton() const override { return true; }
    
-   void SetModuleFactory(ModuleFactory* factory);
+   void SetModuleFactory(ModuleFactory* factory) { mSpawnLists.SetModuleFactory(factory); }
    void ListLayouts();
-   void SetUpVstDropdown(bool rescan);
    
    bool IsSaveable() override { return false; }
    
@@ -71,15 +94,6 @@ private:
    
    bool HiddenByZoom() const;
    
-   SpawnList mInstrumentModules;
-   SpawnList mNoteModules;
-   SpawnList mSynthModules;
-   SpawnList mAudioModules;
-   SpawnList mModulatorModules;
-   SpawnList mOtherModules;
-   SpawnList mVstPlugins;
-   SpawnList mPrefabs;
-   
    ClickButton* mSaveLayoutButton;
    ClickButton* mResetLayoutButton;
    ClickButton* mSaveStateButton;
@@ -91,6 +105,8 @@ private:
    int mLoadLayoutIndex;
    
    HelpDisplay* mHelpDisplay;
+   
+   SpawnListManager mSpawnLists;
 };
 
 extern TitleBar* TheTitleBar;

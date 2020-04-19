@@ -21,6 +21,7 @@
 #include "INoteSource.h"
 #include "RadioButton.h"
 #include "SynthGlobals.h"
+#include "Push2Control.h"
 
 #define NUM_STEPSEQ_ROWS 16
 #define META_STEP_MAX 64
@@ -68,7 +69,7 @@ private:
    StepSequencer* mSeq;
 };
 
-class StepSequencer : public IDrawableModule, public INoteSource, public ITimeListener, public IFloatSliderListener, public IGridControllerListener, public IButtonListener, public IDropdownListener, public INoteReceiver, public IRadioButtonListener, public IIntSliderListener
+class StepSequencer : public IDrawableModule, public INoteSource, public ITimeListener, public IFloatSliderListener, public IGridControllerListener, public IButtonListener, public IDropdownListener, public INoteReceiver, public IRadioButtonListener, public IIntSliderListener, public IPush2GridController
 {
 public:
    StepSequencer();
@@ -108,6 +109,10 @@ public:
    void MouseReleased() override;
    bool MouseMoved(float x, float y) override;
    
+   //IPush2GridController
+   bool OnPush2Control(MidiMessageType type, int controlIndex, float midiValue) override;
+   void UpdatePush2Leds(Push2Control* push2) override;
+   
    bool IsMetaStepActive(int col, int row);
 
    void CheckboxUpdated(Checkbox* checkbox) override;
@@ -142,6 +147,7 @@ private:
    int GetNumControllerChunks(); //how many vertical chunks of the sequence are there to fit multi-rowed on the controller?
    int GetMetaStep();
    int GetMetaStepMaskIndex(int col, int row) { return MIN(col, META_STEP_MAX-1) + row * META_STEP_MAX; }
+   GridColor GetGridColor(int x, int y);
    
    struct HeldButton
    {

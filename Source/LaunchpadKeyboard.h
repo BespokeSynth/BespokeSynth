@@ -18,10 +18,13 @@
 #include "IDrawableModule.h"
 #include "INoteSource.h"
 #include "GridController.h"
+#include "Push2Control.h"
+
+class LaunchpadNoteDisplayer;
 
 class Chorder;
 
-class LaunchpadKeyboard : public IDrawableModule, public INoteSource, public IScaleListener, public IIntSliderListener, public ITimeListener, public IDropdownListener, public IFloatSliderListener, public IGridControllerListener
+class LaunchpadKeyboard : public IDrawableModule, public INoteSource, public IScaleListener, public IIntSliderListener, public ITimeListener, public IDropdownListener, public IFloatSliderListener, public IGridControllerListener, public IPush2GridController
 {
 public:
    LaunchpadKeyboard();
@@ -31,7 +34,7 @@ public:
    string GetTitleLabel() override { return "gridkeyboard"; }
    void CreateUIControls() override;
 
-   void SetHasDisplayer() { mHasDisplayer = true; }
+   void SetDisplayer(LaunchpadNoteDisplayer* displayer) { mDisplayer = displayer; }
    void DisplayNote(int pitch, int velocity);
    void SetChorder(Chorder* chorder) { mChorder = chorder; }
    
@@ -50,6 +53,10 @@ public:
 
    //ITimeListener
    void OnTimeEvent(int samplesTo) override;
+   
+   //IPush2GridController
+   bool OnPush2Control(MidiMessageType type, int controlIndex, float midiValue) override;
+   void UpdatePush2Leds(Push2Control* push2) override;
    
    void CheckboxUpdated(Checkbox* checkbox) override;
    void IntSliderUpdated(IntSlider* slider, int oldVal) override;
@@ -70,13 +77,6 @@ private:
       kSeptatonic
    };
    
-   struct HeldButton
-   {
-      int mPitch;
-      int mX;
-      int mY;
-   };
-   
    enum ArrangementMode
    {
       kFull,
@@ -89,17 +89,18 @@ private:
    void GetModuleDimensions(int& width, int& height) override { width=120; height=74; }
    
    void UpdateLights(bool force = false);
+   GridColor GetGridSquareColor(int x, int y);
    int GridToPitch(int x, int y);
    void HandleChordButton(int pitch, bool bOn);
    bool IsChordButtonPressed(int pitch);
-   void PressedNoteFor(int x, int y, int pitch);
+   void PressedNoteFor(int x, int y, int velocity);
    void ReleaseNoteFor(int x, int y);
    int GridToPitchChordSection(int x, int y);
+   int GetHeldVelocity(int pitch) { if (pitch >= 0 && pitch < 128) return mCurrentNotes[pitch]; else return 0; }
    
    int mRootNote;
    
-   list<HeldButton> mHeld;
-   list<int> mCurrentNotes;
+   int mCurrentNotes[128];
    bool mTestKeyHeld;
    int mOctave;
    IntSlider* mOctaveSlider;
@@ -109,7 +110,7 @@ private:
    DropdownList* mLayoutDropdown;
    int mCurrentChord;
    vector< vector<int> > mChords;
-   bool mHasDisplayer;
+   LaunchpadNoteDisplayer* mDisplayer;
    ArrangementMode mArrangementMode;
    DropdownList* mArrangementModeDropdown;
    list<int> mHeldChordTones;

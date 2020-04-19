@@ -80,7 +80,7 @@ void PolyphonyMgr::Start(double time, int pitch, float amount, int voiceIdx, Mod
    bool preserveVoice = voiceIdx != -1 &&  //we specified a voice
                         mVoices[voiceIdx].mPitch != -1; //there is a note playing from that voice
 
-   if (voiceIdx == -1) //haven't specified a voice
+   /*if (voiceIdx == -1) //haven't specified a voice
    {
       for (int i=0; i<kNumVoices; ++i)
       {
@@ -91,7 +91,7 @@ void PolyphonyMgr::Start(double time, int pitch, float amount, int voiceIdx, Mod
             break;
          }
       }
-   }
+   }*/
    
    if (voiceIdx == -1) //need a new voice
    {
@@ -152,6 +152,7 @@ void PolyphonyMgr::Start(double time, int pitch, float amount, int voiceIdx, Mod
    
    mVoices[voiceIdx].mPitch = pitch;
    mVoices[voiceIdx].mTime = time;
+   mVoices[voiceIdx].mNoteOn = true;
 }
 
 void PolyphonyMgr::Stop(double time, int pitch)
@@ -159,7 +160,10 @@ void PolyphonyMgr::Stop(double time, int pitch)
    for (int i=0; i<kNumVoices; ++i)
    {
       if (mVoices[i].mPitch == pitch)
+      {
          mVoices[i].mVoice->Stop(time);
+         mVoices[i].mNoteOn = false;
+      }
    }
 }
 
@@ -175,7 +179,7 @@ void PolyphonyMgr::Process(double time, ChannelBuffer* out, int bufferSize)
       Clear(mWorkBuffer, bufferSize);
       mVoices[i].mVoice->Process(time, out);
       
-      if (mVoices[i].mPitch != -1 && mVoices[i].mVoice->IsDone(time))
+      if (mVoices[i].mPitch != -1 && !mVoices[i].mNoteOn && mVoices[i].mVoice->IsDone(time))
          mVoices[i].mPitch = -1;
    }
    
@@ -190,4 +194,23 @@ void PolyphonyMgr::Process(double time, ChannelBuffer* out, int bufferSize)
    }
    
    mFadeOutBufferPos += bufferSize;
+}
+
+void PolyphonyMgr::DrawDebug(float x, float y)
+{
+   ofPushMatrix();
+   ofPushStyle();
+   ofTranslate(x,y);
+   for (int i=0; i<kNumVoices; ++i)
+   {
+      if (mVoices[i].mPitch == -1)
+         ofSetColor(100, 100, 100);
+      else if (mVoices[i].mNoteOn)
+         ofSetColor(0, 255, 0);
+      else
+         ofSetColor(255, 0, 0);
+      DrawTextNormal(mVoices[i].mPitch == -1 ? "voice "+ofToString(i)+" unused" : "voice "+ofToString(i)+" used: "+ofToString(mVoices[i].mPitch) + (mVoices[i].mNoteOn ? " (on)" : " (off)"), 0, i * 18);
+   }
+   ofPopStyle();
+   ofPopMatrix();
 }

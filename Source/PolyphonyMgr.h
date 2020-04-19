@@ -31,11 +31,12 @@ enum VoiceType
 
 struct VoiceInfo
 {
-   VoiceInfo() : mPitch(-1) {}
+   VoiceInfo() : mPitch(-1), mNoteOn(false) {}
    
    float mPitch;
    IMidiVoice* mVoice;
    double mTime;
+   bool mNoteOn;
 };
 
 class PolyphonyMgr
@@ -51,6 +52,7 @@ public:
    void Stop(double time, int pitch);
    void Process(double time, ChannelBuffer* out, int bufferSize);
    void GetPhaseAndInc(float& phase, float& inc);
+   void DrawDebug(float x, float y);
 private:
    void Prune(double time);
    

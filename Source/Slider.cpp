@@ -801,13 +801,19 @@ void IntSlider::Render()
 
    int val = ofClamp(*mVar,mMin,mMax);
    ofPushStyle();
+   ofSetLineWidth(2);
+   
+   ofSetColor(255,100,0);
+   float xposfloat = mX+1+(mWidth-2)*mSliderVal;
+   ofLine(xposfloat,mY+mHeight/2-1,xposfloat,mY+mHeight/2+1);
+   
    if (*mVar >= mMin && *mVar <= mMax)
       ofSetColor(255,0,0,gModuleDrawAlpha);
    else
       ofSetColor(30,30,30,gModuleDrawAlpha);
    float xpos = mX+1+(mWidth-2)*((val-mMin)/float(mMax-mMin));
-   ofSetLineWidth(2);
    ofLine(xpos,mY+1,xpos,mY+mHeight-1);
+   
    ofPopStyle();
    
    DrawBeacon(xpos, mY+mHeight/2);
@@ -888,7 +894,7 @@ void IntSlider::SetFromMidiCC(float slider)
 float IntSlider::GetValueForMidiCC(float slider) const
 {
    slider = ofClamp(slider,0,1);
-   return int(ofMap(slider,0,1,mMin,mMax));
+   return (int)round(ofMap(slider,0,1,mMin,mMax));
 }
 
 void IntSlider::SetValue(float value)

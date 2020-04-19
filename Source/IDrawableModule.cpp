@@ -36,7 +36,7 @@ float IDrawableModule::sSaturation = 145;
 float IDrawableModule::sBrightness = 220;
 
 IDrawableModule::IDrawableModule()
-: mType(kModuleType_Unknown)
+: mModuleType(kModuleType_Unknown)
 , mMinimized(false)
 , mWidth(100)
 , mHeight(100)
@@ -89,11 +89,11 @@ void IDrawableModule::Init()
    assert(!mInitialized);
    mInitialized = true;
    
-   mType = TheSynth->GetModuleFactory()->GetModuleType(mTypeName);
-   if (mType == kModuleType_Other)
+   mModuleType = TheSynth->GetModuleFactory()->GetModuleType(mTypeName);
+   if (mModuleType == kModuleType_Other)
    {
       if (dynamic_cast<IAudioEffect*>(this))
-         mType = kModuleType_Processor;
+         mModuleType = kModuleType_Processor;
    }
    
    bool wasEnabled = Enabled();
@@ -108,7 +108,7 @@ void IDrawableModule::Init()
    if (showEnableToggle)
    {
       mEnabledCheckbox->SetDisplayText(false);
-      mEnabledCheckbox->UseCircleLook(GetColor(mType));
+      mEnabledCheckbox->UseCircleLook(GetColor(mModuleType));
    }
    else
    {
@@ -165,7 +165,7 @@ void IDrawableModule::DrawFrame(float w, float h, bool drawModule, float& titleB
    
    ofTranslate(mX, mY, 0);
 
-   ofColor color = GetColor(mType);
+   ofColor color = GetColor(mModuleType);
    
    highlight = 0;
    
@@ -333,7 +333,7 @@ void IDrawableModule::Render()
    
    if (IsResizable() && !Minimized())
    {
-      ofColor color = GetColor(mType);
+      ofColor color = GetColor(mModuleType);
       ofSetColor(color, 255);
       ofSetLineWidth(2);
       ofLine(w-sResizeCornerSize, h, w, h);

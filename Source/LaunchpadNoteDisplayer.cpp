@@ -19,7 +19,11 @@ LaunchpadNoteDisplayer::LaunchpadNoteDisplayer()
 
 void LaunchpadNoteDisplayer::DrawModule()
 {
+   
+}
 
+void LaunchpadNoteDisplayer::DrawModuleUnclipped()
+{
    DrawConnection(mLaunchpad);
 }
 
@@ -34,7 +38,7 @@ void LaunchpadNoteDisplayer::PlayNote(double time, int pitch, int velocity, int 
 void LaunchpadNoteDisplayer::LoadLayout(const ofxJSONElement& moduleInfo)
 {
    mModuleSaveData.LoadString("target", moduleInfo);
-   mModuleSaveData.LoadString("launchpad", moduleInfo, "", FillDropdown<LaunchpadKeyboard*>);
+   mModuleSaveData.LoadString("gridkeyboard", moduleInfo, "", FillDropdown<LaunchpadKeyboard*>);
    
    SetUpFromSaveData();
 }
@@ -42,9 +46,9 @@ void LaunchpadNoteDisplayer::LoadLayout(const ofxJSONElement& moduleInfo)
 void LaunchpadNoteDisplayer::SetUpFromSaveData()
 {
    SetUpPatchCables(mModuleSaveData.GetString("target"));
-   mLaunchpad = dynamic_cast<LaunchpadKeyboard*>(TheSynth->FindModule(mModuleSaveData.GetString("launchpad"), false));
+   mLaunchpad = dynamic_cast<LaunchpadKeyboard*>(TheSynth->FindModule(mModuleSaveData.GetString("gridkeyboard"), false));
    if (mLaunchpad)
-      mLaunchpad->SetHasDisplayer();
+      mLaunchpad->SetDisplayer(this);
 }
 
 

@@ -10,6 +10,7 @@
 #include "SynthGlobals.h"
 #include "FileStream.h"
 #include "ModularSynth.h"
+#include "Push2Control.h"
 
 namespace
 {
@@ -30,6 +31,7 @@ DropdownList::DropdownList(IDropdownListener* owner, const char* name, int x, in
 , mSliderVal(0)
 , mAutoCalculateWidth(false)
 , mDrawTriangle(true)
+, mLastScrolledTime(-9999)
 {
    assert(owner);
    SetName(name);
@@ -63,9 +65,6 @@ void DropdownList::AddLabel(string label, int value)
 
    CalculateWidth();
    mHeight = itemSpacing;
-   mColumns = 1 + ((int)mElements.size()-1) / mMaxPerColumn;
-   
-   mModalList.SetDimensions(mModalWidth*mColumns, itemSpacing * MIN((int)mElements.size(), mMaxPerColumn));
    
    CalcSliderVal();
 }
@@ -82,6 +81,9 @@ void DropdownList::CalculateWidth()
    
    if (mAutoCalculateWidth)
       mWidth = MIN(mModalWidth, 180);
+   
+   mColumns = 1 + ((int)mElements.size()-1) / mMaxPerColumn;
+   mModalList.SetDimensions(mModalWidth*mColumns, itemSpacing * MIN((int)mElements.size(), mMaxPerColumn));
 }
 
 string DropdownList::GetLabel(int val) const
@@ -128,13 +130,34 @@ void DropdownList::Render()
 
    ofSetColor(textColor);
    
+   ofPushMatrix();
+   ofClipWindow(mX, mY, w-12, h);
    DrawTextNormal(GetDisplayValue(*mVar), mX+2+xOffset, mY+12);
+   ofPopMatrix();
    if (mDrawTriangle)
       ofTriangle(mX+w-11, mY+4, mX+w-3, mY+4, mX+w-7, mY+11);
 
    ofPopStyle();
    
    DrawHover();
+   
+   if (mLastScrolledTime + 300 > gTime && TheSynth->GetTopModalFocusItem() != &mModalList && !Push2Control::sDrawingPush2Display)
+   {
+      const float kCentering = 7;
+      int w, h;
+      GetPopupDimensions(w, h);
+      ofPushMatrix();
+      ofPushStyle();
+      ofTranslate(mX, mY + kCentering - h * mSliderVal);
+      mModalList.Render();
+      ofFill();
+      ofColor color = IDrawableModule::GetColor(GetModuleParent()->GetModuleType());
+      color.a = 25;
+      ofSetColor(color);
+      ofRect(0,h * mSliderVal - kCentering,w,mHeight);
+      ofPopStyle();
+      ofPopMatrix();
+   }
 }
 
 void DropdownList::DrawDropdown(int w, int h)
@@ -220,6 +243,8 @@ void DropdownList::SetFromMidiCC(float slider)
    SetIndex(int(slider*mElements.size()));
    mSliderVal = slider;
    mLastSetValue = *mVar;
+   
+   mLastScrolledTime = gTime;
 }
 
 float DropdownList::GetValueForMidiCC(float slider) const
@@ -294,10 +319,8 @@ void DropdownList::CalcSliderVal()
 {
    int itemIndex = FindItemIndex(*mVar);
    
-   if (itemIndex != -1)
-      mSliderVal = ofMap(itemIndex + .5f, 0, mElements.size(), 0, 1);
-   else
-      mSliderVal = -1;
+   mSliderVal = ofMap(itemIndex + .5f, 0, mElements.size(), 0, 1);
+
    mLastSetValue = *mVar;
 }
 

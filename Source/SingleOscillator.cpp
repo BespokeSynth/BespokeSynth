@@ -219,6 +219,11 @@ void SingleOscillator::DrawModule()
       ofEndShape(false);
    }
 }
+ 
+void SingleOscillator::DrawModuleUnclipped()
+{
+   //mPolyMgr.DrawDebug(200, 0);
+}
 
 void SingleOscillator::GetModuleDimensions(int& width, int& height)
 {

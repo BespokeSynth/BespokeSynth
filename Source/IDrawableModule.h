@@ -96,7 +96,7 @@ public:
    void RemovePatchCableSource(PatchCableSource* source);
    bool TestClick(int x, int y, bool right, bool testOnly = false) override;
    string GetTypeName() const { return mTypeName; }
-   ModuleType GetModuleType() const { return mType; }
+   ModuleType GetModuleType() const { return mModuleType; }
    virtual bool IsSingleton() const { return false; }
    void ComputeSliders(int samplesIn);
    void SetOwningContainer(ModuleContainer* container) { mOwningContainer = container; }
@@ -141,6 +141,7 @@ protected:
    ModuleSaveData mModuleSaveData;
    Checkbox* mEnabledCheckbox;
    bool mEnabled;
+   ModuleType mModuleType;
 
 private:
    virtual void PreDrawModule() {}
@@ -150,7 +151,6 @@ private:
    float GetMinimizedWidth();
    PatchCableOld GetPatchCableOld(IClickable* target);
 
-   ModuleType mType;
    vector<IUIControl*> mUIControls;
    vector<IDrawableModule*> mChildren;
    vector<FloatSlider*> mFloatSliders;

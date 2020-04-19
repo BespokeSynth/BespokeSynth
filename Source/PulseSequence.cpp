@@ -21,6 +21,7 @@ PulseSequence::PulseSequence()
 , mHasExternalPulseSource(false)
 , mLength(8)
 , mLengthSlider(nullptr)
+, mStep(0)
 , mAdvanceBackwardButton(nullptr)
 , mAdvanceForwardButton(nullptr)
 {
@@ -63,6 +64,7 @@ void PulseSequence::CreateUIControls()
    for (int i=0; i<kIndividualStepCables; ++i)
    {
       mStepCables[i] = new PatchCableSource(this, kConnectionType_Pulse);
+      mStepCables[i]->SetOverrideCableDir(ofVec2f(0,1));
       AddPatchCableSource(mStepCables[i]);
    }
 }

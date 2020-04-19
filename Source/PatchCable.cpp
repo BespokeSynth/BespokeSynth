@@ -402,20 +402,27 @@ PatchCablePos PatchCable::GetPatchCablePos()
    }
    
    ofVec2f startDirection;
-   switch (mOwner->GetCableSide())
+   if (mOwner->HasOverrideCableDir())
    {
-      case PatchCableSource::kBottom:
-         startDirection = ofVec2f(0,1);
-         break;
-      case PatchCableSource::kRight:
-         startDirection = ofVec2f(1,0);
-         break;
-      case PatchCableSource::kLeft:
-         startDirection = ofVec2f(-1,0);
-         break;
-      default:
-         startDirection = ofVec2f(0,0);
-         break;
+      startDirection = mOwner->GetOverrideCableDir();
+   }
+   else
+   {
+      switch (mOwner->GetCableSide())
+      {
+         case PatchCableSource::kBottom:
+            startDirection = ofVec2f(0,1);
+            break;
+         case PatchCableSource::kRight:
+            startDirection = ofVec2f(1,0);
+            break;
+         case PatchCableSource::kLeft:
+            startDirection = ofVec2f(-1,0);
+            break;
+         default:
+            startDirection = ofVec2f(0,0);
+            break;
+      }
    }
    
    ofVec2f endDirection;

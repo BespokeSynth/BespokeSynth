@@ -32,7 +32,7 @@ LaunchpadKeyboard::LaunchpadKeyboard()
 , mLatch(false)
 , mLatchCheckbox(nullptr)
 , mCurrentChord(0)
-, mHasDisplayer(false)
+, mDisplayer(nullptr)
 , mArrangementMode(kFull)
 , mArrangementModeDropdown(nullptr)
 , mChorder(nullptr)
@@ -42,6 +42,9 @@ LaunchpadKeyboard::LaunchpadKeyboard()
 , mPreserveChordRoot(true)
 , mPreserveChordRootCheckbox(nullptr)
 {
+   for (int i=0; i<128; ++i)
+      mCurrentNotes[i] = 0;
+   
    TheScale->AddListener(this);
 
    TheTransport->AddListener(this, kInterval_8n);
@@ -207,9 +210,12 @@ void LaunchpadKeyboard::OnGridButton(int x, int y, float velocity, IGridControll
       if (bOn) //only presses matter in latch, not releases
       {
          int currentPitch = -1;
-         if (mHeld.size() == 1)  //we should only have one at a time in latch mode
-            currentPitch = mHeld.begin()->mPitch;
-         mHeld.clear();
+         for (int i=0; i<128; ++i)  //we should only have one at a time in latch mode
+         {
+            if (mCurrentNotes[i] > 0)
+               currentPitch = i;
+            mCurrentNotes[i] = 0;
+         }
          mNoteOutput.Flush();
 
          if (currentPitch == pitch)
@@ -218,7 +224,7 @@ void LaunchpadKeyboard::OnGridButton(int x, int y, float velocity, IGridControll
          }
          else
          {
-            PressedNoteFor(x, y, pitch);
+            PressedNoteFor(x, y, (int)127*velocity);
             bOn = true;
          }
       }
@@ -232,16 +238,28 @@ void LaunchpadKeyboard::OnGridButton(int x, int y, float velocity, IGridControll
    {
       if (bOn)
       {
-         mHeld.clear();
-         PressedNoteFor(x, y, x+y*8);
+         for (int i=0; i<128; ++i)
+            mCurrentNotes[i] = 0;
+         PressedNoteFor(x, y, (int)127*velocity);
          mNoteOutput.Flush();
          for (int i=0; i<mChords[x].size(); ++i)
             PlayNoteOutput(gTime, TheScale->MakeDiatonic(pitch+mChords[x][i]), 127*velocity, -1);
       }
-      else if (x+y*8 == mHeld.begin()->mPitch)
+      else
       {
-         mHeld.clear();
-         mNoteOutput.Flush();
+         int currentPitch = -1;
+         for (int i=0; i<128; ++i)
+         {
+            if (mCurrentNotes[i] > 0)
+               currentPitch = i;
+         }
+         
+         if (GridToPitch(x, y) == currentPitch)
+         {
+            for (int i=0; i<128; ++i)
+               mCurrentNotes[i] = 0;
+            mNoteOutput.Flush();
+         }
       }
    }
    else
@@ -249,7 +267,7 @@ void LaunchpadKeyboard::OnGridButton(int x, int y, float velocity, IGridControll
       if (bOn)
       {
          PlayNoteOutput(gTime, pitch, 127*velocity, -1);
-         PressedNoteFor(x,y,pitch);
+         PressedNoteFor(x,y,(int)127*velocity);
       }
       else
       {
@@ -257,46 +275,40 @@ void LaunchpadKeyboard::OnGridButton(int x, int y, float velocity, IGridControll
       }
    }
 
-   if (!mHasDisplayer)  //we don't have a displayer, handle it ourselves
+   if (mDisplayer == nullptr)  //we don't have a displayer, handle it ourselves
    {
-      mCurrentNotes.clear();
-      for (auto i=mHeld.begin(); i != mHeld.end(); ++i)
-         mCurrentNotes.push_back(i->mPitch);
-
       UpdateLights();
 
-      int lowestPitch = 999;
-      for (auto iter = mHeld.begin(); iter != mHeld.end(); ++iter)
+      int lowestPitch = -1;
+      for (int i=0; i<128; ++i)
       {
-         if (iter->mPitch < lowestPitch)
-            lowestPitch = iter->mPitch;
+         if (mCurrentNotes[i] > 0)
+         {
+            lowestPitch = i;
+            break;
+         }
       }
       lowestPitch -= TheScale->GetTet();
 
-      if (bOn > 0 && mHeld.size() > 0)
+      if (bOn && lowestPitch > 0)
          gVizFreq = MAX(1,TheScale->PitchToFreq(lowestPitch));
    }
 }
 
-void LaunchpadKeyboard::PressedNoteFor(int x, int y, int pitch)
+void LaunchpadKeyboard::PressedNoteFor(int x, int y, int velocity)
 {
-   HeldButton held;
-   held.mX = x;
-   held.mY = y;
-   held.mPitch = pitch;
-   mHeld.push_back(held);
+   int pitch = GridToPitch(x, y);
+   if (pitch >= 0 && pitch < 128)
+      mCurrentNotes[pitch] = velocity;
 }
 
 void LaunchpadKeyboard::ReleaseNoteFor(int x, int y)
 {
-   for (auto i = mHeld.begin(); i != mHeld.end(); ++i)
+   int pitch = GridToPitch(x, y);
+   if (pitch >= 0 && pitch < 128)
    {
-      if (i->mX == x && i->mY == y)
-      {
-         PlayNoteOutput(gTime, i->mPitch, 0, -1);
-         mHeld.erase(i);
-         return;
-      }
+      PlayNoteOutput(gTime, pitch, 0, -1);
+      mCurrentNotes[pitch] = 0;
    }
 }
 
@@ -353,12 +365,55 @@ void LaunchpadKeyboard::OnTimeEvent(int samplesTo)
 {
 }
 
+bool LaunchpadKeyboard::OnPush2Control(MidiMessageType type, int controlIndex, float midiValue)
+{
+   if (type == kMidiMessage_Note && controlIndex >= 36 && controlIndex <= 99)
+   {
+      int gridIndex = controlIndex - 36;
+      int gridX = gridIndex % 8;
+      int gridY = 7 - gridIndex / 8;
+      OnGridButton(gridX, gridY, midiValue/127, nullptr);
+      return true;
+   }
+   
+   return false;
+}
+
+void LaunchpadKeyboard::UpdatePush2Leds(Push2Control* push2)
+{
+   for (int x=0; x<8; ++x)
+   {
+      for (int y=0; y<8; ++y)
+      {
+         GridColor color = GetGridSquareColor(x, y);
+         int pushColor = 0;
+         switch (color)
+         {
+            case kGridColorOff:  //off
+               pushColor = 0; break;
+            case kGridColor1Dim: //
+               pushColor = 86; break;
+            case kGridColor1Bright: //pressed
+               pushColor = 32; break;
+            case kGridColor2Dim:
+               pushColor = 114; break;
+            case kGridColor2Bright: //root
+               pushColor = 25; break;
+            case kGridColor3Dim: //not in pentatonic
+               pushColor = 116; break;
+            case kGridColor3Bright: //in pentatonic
+               pushColor = 115; break;
+         }
+         push2->SetLed(kMidiMessage_Note, x + (7-y)*8 + 36, pushColor);
+         //push2->SetLed(kMidiMessage_Note, x + (7-y)*8 + 36, x + y*8 + 64);
+      }
+   }
+}
+
 void LaunchpadKeyboard::DisplayNote(int pitch, int velocity)
 {
-   if (velocity > 0)
-      mCurrentNotes.push_back(pitch);
-   else
-      mCurrentNotes.remove(pitch);
+   if (pitch >= 0 && pitch < 128)
+      mCurrentNotes[pitch] = velocity;
 
    UpdateLights();
 }
@@ -522,99 +577,106 @@ void LaunchpadKeyboard::UpdateLights(bool force)
    {
       for (int y=0; y<8; ++y)
       {
-         int pitch = GridToPitch(x,y);
-         bool inScale = TheScale->MakeDiatonic(pitch) == pitch;
-         bool isRoot = pitch%TheScale->GetTet() == TheScale->ScaleRoot();
-         bool isHeld = false;
-         bool isSameOctave = false;
-         bool isInPentatonic = pitch >= 0 && TheScale->IsInPentatonic(pitch);
-         bool isChordButton = pitch != INVALID_PITCH && pitch < 0;
-         bool isPressedChordButton = isChordButton && IsChordButtonPressed(pitch);
-         bool isChorderEnabled = mChorder && mChorder->Enabled();
-
-         if (mLayout == kChord)
-         {
-            isHeld = mCurrentNotes.size() && (x+y*8 == *(mCurrentNotes.begin()));
-            isSameOctave = false;
-         }
-         else
-         {
-            for (list<int>::iterator iter = mCurrentNotes.begin(); iter != mCurrentNotes.end(); ++iter)
-            {
-               if (*iter == pitch)
-                  isHeld = true;
-               if (*iter%TheScale->GetTet() == pitch % TheScale->GetTet())
-                  isSameOctave = true;
-            }
-         }
-         
-         GridColor color;
-         if (pitch == INVALID_PITCH)
-         {
-            color = kGridColorOff;
-         }
-         else if (pitch == CHORD_ENABLE_BUTTON)
-         {
-            if (mChorder && mChorder->Enabled())
-               color = kGridColor1Bright;
-            else
-               color = kGridColor1Dim;
-         }
-         else if (pitch == CHORD_LATCH_BUTTON)
-         {
-            if (mLatchChords)
-               color = kGridColor3Bright;
-            else
-               color = kGridColor3Dim;
-         }
-         else if (pitch == KEY_LATCH_BUTTON)
-         {
-            if (mLatch)
-               color = kGridColor1Bright;
-            else
-               color = kGridColor1Dim;
-         }
-         else if (isPressedChordButton && isChorderEnabled)
-         {
-            color = kGridColor2Bright;
-         }
-         else if (isChordButton && !isChorderEnabled)
-         {
-            color = kGridColor1Dim;
-         }
-         else if (isChordButton)
-         {
-            color = kGridColor2Dim;
-         }
-         else if (isHeld)
-         {
-            color = kGridColor1Bright;
-         }
-         /*else if (isSameOctave)
-         {
-            color = kGridColor3Dim;
-         }*/
-         else if (isRoot)
-         {
-            color = kGridColor2Bright;
-         }
-         else if (isInPentatonic)
-         {
-            color = kGridColor3Bright;
-         }
-         else if (inScale)
-         {
-            color = kGridColor3Dim;
-         }
-         else
-         {
-            color = kGridColorOff;
-         }
+         GridColor color = GetGridSquareColor(x, y);
          
          if (mGridController)
             mGridController->SetLight(x, y, color, force);
       }
    }
+}
+
+GridColor LaunchpadKeyboard::GetGridSquareColor(int x, int y)
+{
+   int pitch = GridToPitch(x,y);
+   bool inScale = TheScale->MakeDiatonic(pitch) == pitch;
+   bool isRoot = pitch%TheScale->GetTet() == TheScale->ScaleRoot();
+   bool isHeld = false;
+   bool isSameOctave = false;
+   bool isInPentatonic = pitch >= 0 && TheScale->IsInPentatonic(pitch);
+   bool isChordButton = pitch != INVALID_PITCH && pitch < 0;
+   bool isPressedChordButton = isChordButton && IsChordButtonPressed(pitch);
+   bool isChorderEnabled = mChorder && mChorder->Enabled();
+
+   if (mLayout == kChord)
+   {
+      isHeld = GetHeldVelocity(GridToPitch(x, y)) > 0;
+      isSameOctave = false;
+   }
+   else
+   {
+      isHeld = GetHeldVelocity(GridToPitch(x, y)) > 0;
+      for (int i=0; i<128; ++i)
+      {
+         if (i % TheScale->GetTet() == pitch % TheScale->GetTet() &&
+             GetHeldVelocity(i) > 0)
+            isSameOctave = true;
+      }
+   }
+   
+   GridColor color;
+   if (pitch == INVALID_PITCH)
+   {
+      color = kGridColorOff;
+   }
+   else if (pitch == CHORD_ENABLE_BUTTON)
+   {
+      if (mChorder && mChorder->Enabled())
+         color = kGridColor1Bright;
+      else
+         color = kGridColor1Dim;
+   }
+   else if (pitch == CHORD_LATCH_BUTTON)
+   {
+      if (mLatchChords)
+         color = kGridColor3Bright;
+      else
+         color = kGridColor3Dim;
+   }
+   else if (pitch == KEY_LATCH_BUTTON)
+   {
+      if (mLatch)
+         color = kGridColor1Bright;
+      else
+         color = kGridColor1Dim;
+   }
+   else if (isPressedChordButton && isChorderEnabled)
+   {
+      color = kGridColor2Bright;
+   }
+   else if (isChordButton && !isChorderEnabled)
+   {
+      color = kGridColor1Dim;
+   }
+   else if (isChordButton)
+   {
+      color = kGridColor2Dim;
+   }
+   else if (isHeld)
+   {
+      color = kGridColor1Bright;
+   }
+   /*else if (isSameOctave)
+   {
+      color = kGridColor3Dim;
+   }*/
+   else if (isRoot)
+   {
+      color = kGridColor2Bright;
+   }
+   else if (isInPentatonic)
+   {
+      color = kGridColor3Bright;
+   }
+   else if (inScale)
+   {
+      color = kGridColor3Dim;
+   }
+   else
+   {
+      color = kGridColorOff;
+   }
+   
+   return color;
 }
 
 void LaunchpadKeyboard::OnControllerPageSelected()
@@ -679,7 +741,8 @@ void LaunchpadKeyboard::IntSliderUpdated(IntSlider* slider, int oldVal)
 {
    if (slider == mOctaveSlider)
    {
-      mHeld.clear();
+      for (int i=0; i<128; ++i)
+         mCurrentNotes[i] = 0;
       mNoteOutput.Flush();
       UpdateLights();
    }

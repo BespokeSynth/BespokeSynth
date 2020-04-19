@@ -205,6 +205,14 @@
 			isa = PBXBuildFile;
 			fileRef = 49AB76428A044DEDF45FFAFE;
 		};
+		8E683D907B0FA56099B2C02D = {
+			isa = PBXBuildFile;
+			fileRef = 49FFBA0909808FD0635DC6CB;
+		};
+		029E68AEBF8C943D13482382 = {
+			isa = PBXBuildFile;
+			fileRef = 20F0152889ED520247EB3CA6;
+		};
 		AE13582558A6A0A5F82A58AC = {
 			isa = PBXBuildFile;
 			fileRef = B8B8569A5BBE21A7820B9DD4;
@@ -1333,6 +1341,13 @@
 			path = ../../Source/Push2Control.h;
 			sourceTree = "SOURCE_ROOT";
 		};
+		01BDC1F810D6521440E47F70 = {
+			isa = PBXFileReference;
+			lastKnownFileType = sourcecode.c.h;
+			name = PulseTrain.h;
+			path = ../../Source/PulseTrain.h;
+			sourceTree = "SOURCE_ROOT";
+		};
 		01C3EAA9495E54B35349E26F = {
 			isa = PBXFileReference;
 			lastKnownFileType = sourcecode.c.h;
@@ -1919,6 +1934,13 @@
 			lastKnownFileType = sourcecode.cpp.cpp;
 			name = ModulatorSubtract.cpp;
 			path = ../../Source/ModulatorSubtract.cpp;
+			sourceTree = "SOURCE_ROOT";
+		};
+		20F0152889ED520247EB3CA6 = {
+			isa = PBXFileReference;
+			lastKnownFileType = sourcecode.cpp.cpp;
+			name = PulseTrain.cpp;
+			path = ../../Source/PulseTrain.cpp;
 			sourceTree = "SOURCE_ROOT";
 		};
 		2116980ADE29959B585A4ADF = {
@@ -2600,6 +2622,13 @@
 			path = ../../Source/Metronome.h;
 			sourceTree = "SOURCE_ROOT";
 		};
+		49FFBA0909808FD0635DC6CB = {
+			isa = PBXFileReference;
+			lastKnownFileType = sourcecode.cpp.cpp;
+			name = NoteLatch.cpp;
+			path = ../../Source/NoteLatch.cpp;
+			sourceTree = "SOURCE_ROOT";
+		};
 		4A3FF3E3A4D72F195363DE6C = {
 			isa = PBXFileReference;
 			lastKnownFileType = sourcecode.cpp.cpp;
@@ -3214,6 +3243,13 @@
 			lastKnownFileType = sourcecode.c.h;
 			name = wglew.h;
 			path = ../../Source/glew/include/GL/wglew.h;
+			sourceTree = "SOURCE_ROOT";
+		};
+		6B30C3F9CB0887938725C721 = {
+			isa = PBXFileReference;
+			lastKnownFileType = sourcecode.c.h;
+			name = NoteLatch.h;
+			path = ../../Source/NoteLatch.h;
 			sourceTree = "SOURCE_ROOT";
 		};
 		6C11BE7ACAB2BA885E58DA8F = {
@@ -6362,6 +6398,10 @@
 		C91AF721DDC182CE3AC80CF9 = {
 			isa = PBXGroup;
 			children = (
+				49FFBA0909808FD0635DC6CB,
+				6B30C3F9CB0887938725C721,
+				20F0152889ED520247EB3CA6,
+				01BDC1F810D6521440E47F70,
 				B8B8569A5BBE21A7820B9DD4,
 				00FCF3E3F5EB45A77D9BC2DC,
 				C911B31F8DB430B4FE049A6A,
@@ -7284,6 +7324,8 @@
 				69EB47EC9441C3507BEB277D,
 				75837998247B5E99F3F16392,
 				7B858D802BD0BB608C0F48CF,
+				8E683D907B0FA56099B2C02D,
+				029E68AEBF8C943D13482382,
 				AE13582558A6A0A5F82A58AC,
 				7F24707065D5FC79A46CDA89,
 				7A789C857500A243E5693ACD,

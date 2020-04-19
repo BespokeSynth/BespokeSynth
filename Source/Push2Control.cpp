@@ -31,6 +31,24 @@ bool Push2Control::sDrawingPush2Display = false;
 NVGcontext* Push2Control::sVG = nullptr;
 NVGLUframebuffer* Push2Control::sFB = nullptr;
 
+//https://raw.githubusercontent.com/Ableton/push-interface/master/doc/MidiMapping.png
+
+namespace
+{
+const int kNewButton = 87;
+const int kDeleteButton = 118;
+const int kRepatchButton = 86;
+const int kAddDeviceButton = 52;
+const int kAboveScreenButtonRow = 102;
+const int kBelowScreenButtonRow = 20;
+const int kUpButton = 46;
+const int kDownButton = 47;
+const int kLeftButton = 44;
+const int kRightButton = 45;
+const int kNoteButton = 50;
+const int kSessionButton = 51;
+}
+
 Push2Control::Push2Control()
 : mDisplayInitialized(false)
 , mDisplayModule(nullptr)
@@ -43,6 +61,10 @@ Push2Control::Push2Control()
 , mDeleteButtonHeld(false)
 , mHeldModule(nullptr)
 , mAllowRepatch(false)
+, mScreenDisplayMode(ScreenDisplayMode::kNormal)
+, mGridControlModule(nullptr)
+, mDisplayModuleCanControlGrid(false)
+, mSpawnLists(this)
 {
    NBase::Result result = Initialize();
    if (result.Succeeded())
@@ -79,6 +101,19 @@ void Push2Control::CreateUIControls()
    //ENDUIBLOCK(mWidth, mHeight);
    mWidth = 100;
    mHeight = 20;
+   
+   mSpawnLists.SetModuleFactory(TheSynth->GetModuleFactory());
+   mSpawnLists.mNoteModules.GetList()->SetMaxPerColumn(9999);
+   for (int i=0; i<mSpawnLists.GetDropdowns().size(); ++i)
+      mSpawnLists.GetDropdowns()[i]->GetList()->SetWidth(100);
+   mSpawnModuleControls.push_back(mSpawnLists.mInstrumentModules.GetList());
+   mSpawnModuleControls.push_back(mSpawnLists.mNoteModules.GetList());
+   mSpawnModuleControls.push_back(mSpawnLists.mSynthModules.GetList());
+   mSpawnModuleControls.push_back(mSpawnLists.mAudioModules.GetList());
+   mSpawnModuleControls.push_back(mSpawnLists.mModulatorModules.GetList());
+   mSpawnModuleControls.push_back(mSpawnLists.mOtherModules.GetList());
+   mSpawnModuleControls.push_back(mSpawnLists.mVstPlugins.GetList());
+   mSpawnModuleControls.push_back(mSpawnLists.mPrefabs.GetList());
 }
 
 void Push2Control::DrawModule()
@@ -203,9 +238,6 @@ NBase::Result Push2Control::Initialize()
       {
          mDevice.ConnectOutput(i);
          mDevice.ConnectInput(devices[i].c_str());
-         
-         SetLed(kMidiMessage_Control, 87, 127);
-         SetLed(kMidiMessage_Control, 118, 127);
          break;
       }
    }
@@ -237,36 +269,103 @@ void Push2Control::DrawToFramebuffer(NVGcontext* vg, NVGLUframebuffer* fb, float
    nvgTextLetterSpacing(vg, sSpacing);
    
    mModules.clear();
-   for (int i=0; i<8*8; ++i)
-      mModuleGrid[i] = nullptr;
-   
    vector<IDrawableModule*> modules;
    TheSynth->GetAllModules(modules);
+   for (int i=0; i<modules.size(); ++i)
+   {
+      if (!IsIgnorableModule(modules[i]))
+         mModules.push_back(modules[i]);
+   }
+   mModules = SortModules(mModules);
+   
+   SetModuleGridLights();
+   
+   if (mScreenDisplayMode == ScreenDisplayMode::kNormal)
+   {
+      DrawLowerModuleSelector();
+      DrawDisplayModuleControls();
+   }
+   else if (mScreenDisplayMode == ScreenDisplayMode::kAddModule)
+   {
+      mModuleColumnOffset = 0;
+      mModuleColumnOffsetSmoothed = 0;
+      
+      ofPushMatrix();
+      ofPushStyle();
+      
+      ofSetColor(IDrawableModule::GetColor(kModuleType_Other));
+      ofNoFill();
+      
+      nvgFontSize(sVG, 16);
+      DrawControls(mButtonControls, false, 60);
+      DrawControls(mSliderControls, true, 20);
+      
+      ofPopMatrix();
+      ofPopStyle();
+      
+      for (int i=0; i<8; ++i)
+      {
+         SetLed(kMidiMessage_Control, i+kAboveScreenButtonRow, 0);
+         SetLed(kMidiMessage_Control, i+kBelowScreenButtonRow, 0);
+      }
+   }
+   
+   SetLed(kMidiMessage_Control, kNewButton, 127, mNewButtonHeld ? 0 : -1);
+   SetLed(kMidiMessage_Control, kDeleteButton, 127, mDeleteButtonHeld ? 0 : -1);
+   SetLed(kMidiMessage_Control, kRepatchButton, 8, mAllowRepatch ? 11 : -1);
+   SetLed(kMidiMessage_Control, kAddDeviceButton, 127, mScreenDisplayMode == ScreenDisplayMode::kAddModule ? 0 : -1);
+   SetLed(kMidiMessage_Control, kUpButton, 127);
+   SetLed(kMidiMessage_Control, kDownButton, 127);
+   SetLed(kMidiMessage_Control, kLeftButton, 127);
+   SetLed(kMidiMessage_Control, kRightButton, 127);
+   if (mGridControlModule != nullptr)
+   {
+      SetLed(kMidiMessage_Control, kNoteButton, 127, 10);
+      SetLed(kMidiMessage_Control, kSessionButton, 10);
+   }
+   else
+   {
+      SetLed(kMidiMessage_Control, kNoteButton, mDisplayModuleCanControlGrid ? 10 : 0);
+      SetLed(kMidiMessage_Control, kSessionButton, 127);
+   }
+   
+   //test led colors
+   //SetLed(kMidiMessage_Note, 92, (int)mModuleListOffset);
+   //ofLog() << (int)mModuleListOffset;
+
+   nvgEndFrame(vg);
+   
+   glFinish();
+   glReadBuffer(GL_COLOR_ATTACHMENT0);
+   glReadPixels(0, 0, winWidth, winHeight, GL_RGB, GL_UNSIGNED_BYTE, mPixels);
+   
+   nvgluBindFramebuffer(NULL);
+}
+
+void Push2Control::SetModuleGridLights()
+{
+   for (int i=0; i<8*8; ++i)
+      mModuleGrid[i] = nullptr;
    
    float minX = 0;
    float minY = 0;
    float maxX = ofGetWidth();
    float maxY = ofGetHeight();
-   for (int i=0; i<modules.size(); ++i)
+   for (int i=0; i<mModules.size(); ++i)
    {
-      if (!IsIgnorableModule(modules[i]))
-      {
-         mModules.push_back(modules[i]);
-         ofVec2f pos = modules[i]->GetPosition();
-         if (pos.x > maxX)
-            maxX = pos.x;
-         if (pos.y > maxY)
-            maxY = pos.y;
-         if (pos.x < minX)
-            minX = pos.x;
-         if (pos.y < minY)
-            minY = pos.y;
-      }
+      ofVec2f pos = mModules[i]->GetPosition();
+      if (pos.x > maxX)
+         maxX = pos.x;
+      if (pos.y > maxY)
+         maxY = pos.y;
+      if (pos.x < minX)
+         minX = pos.x;
+      if (pos.y < minY)
+         minY = pos.y;
    }
    maxX += 1;
    maxY += 1;
-   
-   mModules = SortModules(mModules);
+   mModuleGridRect.set(minX, minY, maxX - minX, maxY - minY);
    
    for (int i=0; i<mModules.size(); ++i)
    {
@@ -295,46 +394,28 @@ void Push2Control::DrawToFramebuffer(NVGcontext* vg, NVGLUframebuffer* fb, float
       }
    }
    
-   for (int i=0; i<8*8; ++i)
+   if (mGridControlModule == nullptr)
    {
-      int gridX = i % 8;
-      int gridY = i / 8;
-      int gridIndex = gridX + (7-gridY) * 8;
-      int padNumber = 36 + i;
-      if (mModuleGrid[gridIndex] != nullptr)
-         SetLed(kMidiMessage_Note, padNumber, GetColorForType(mModuleGrid[gridIndex]->GetModuleType()), mModuleGrid[gridIndex] == mDisplayModule ? 10 : 1);
-      else
-         SetLed(kMidiMessage_Note, padNumber, 0);
+      for (int i=0; i<8*8; ++i)
+      {
+         int gridX = i % 8;
+         int gridY = i / 8;
+         int gridIndex = gridX + (7-gridY) * 8;
+         int padNumber = 36 + i;
+         if (mModuleGrid[gridIndex] != nullptr)
+            SetLed(kMidiMessage_Note, padNumber, GetColorForType(mModuleGrid[gridIndex]->GetModuleType()), mModuleGrid[gridIndex] == mDisplayModule ? 122 : -1);
+         else
+            SetLed(kMidiMessage_Note, padNumber, 0);
+      }
    }
-   
-   mModuleListOffsetSmoothed = ofLerp(mModuleListOffsetSmoothed, round(mModuleListOffset), .3f);
-   int bottomRowLedColors[8] = {0,0,0,0,0,0,0,0};
-   for (int i=0; i<mModules.size(); ++i)
+   else
    {
-      if (i - mModuleListOffset < -1 || i - mModuleListOffset > 8)
-         continue;
-      
-      ofPushMatrix();
-      ofPushStyle();
-      
-      float x;
-      float y;
-      mModules[i]->GetPosition(x, y, true);
-      mModules[i]->SetPosition(3 + kColumnSpacing * (i - mModuleListOffsetSmoothed), 120);
-      float titleBarHeight;
-      float highlight;
-      mModules[i]->DrawFrame(kColumnSpacing - 14, 80, true, titleBarHeight, highlight);
-      if (mModules[i] == mDisplayModule)
-         DrawDisplayModuleRect(ofRectangle(0,0,kColumnSpacing-14,80));
-      mModules[i]->SetPosition(x, y);
-      
-      if (i - round(mModuleListOffset) >= 0 && i - round(mModuleListOffset) < 8)
-         bottomRowLedColors[i-(int)round(mModuleListOffset)] = GetColorForType(mModules[i]->GetModuleType());
-      
-      ofPopMatrix();
-      ofPopStyle();
+      mGridControlModule->UpdatePush2Leds(this);
    }
-   
+}
+
+void Push2Control::DrawDisplayModuleControls()
+{
    ofSetColor(255,255,255);
    if (mDisplayModule != nullptr)
    {
@@ -368,28 +449,45 @@ void Push2Control::DrawToFramebuffer(NVGcontext* vg, NVGLUframebuffer* fb, float
             topRowLedColors[i-mModuleColumnOffset] = GetColorForType(mButtonControls[i]->GetModuleParent()->GetModuleType());
       }
       for (int i=0; i<8; ++i)
-         SetLed(kMidiMessage_Control, i+102, topRowLedColors[i]);
+         SetLed(kMidiMessage_Control, i+kAboveScreenButtonRow, topRowLedColors[i]);
+      
+      ofPopMatrix();
+      ofPopStyle();
+   }
+}
+
+void Push2Control::DrawLowerModuleSelector()
+{
+   mModuleListOffsetSmoothed = ofLerp(mModuleListOffsetSmoothed, round(mModuleListOffset), .3f);
+   int bottomRowLedColors[8] = {0,0,0,0,0,0,0,0};
+   for (int i=0; i<mModules.size(); ++i)
+   {
+      if (i - mModuleListOffset < -1 || i - mModuleListOffset > 8)
+         continue;
+      
+      ofPushMatrix();
+      ofPushStyle();
+      
+      float x;
+      float y;
+      mModules[i]->GetPosition(x, y, true);
+      mModules[i]->SetPosition(3 + kColumnSpacing * (i - mModuleListOffsetSmoothed), 120);
+      float titleBarHeight;
+      float highlight;
+      mModules[i]->DrawFrame(kColumnSpacing - 14, 80, true, titleBarHeight, highlight);
+      if (mModules[i] == mDisplayModule)
+         DrawDisplayModuleRect(ofRectangle(0,0,kColumnSpacing-14,80));
+      mModules[i]->SetPosition(x, y);
+      
+      if (i - round(mModuleListOffset) >= 0 && i - round(mModuleListOffset) < 8)
+         bottomRowLedColors[i-(int)round(mModuleListOffset)] = GetColorForType(mModules[i]->GetModuleType());
       
       ofPopMatrix();
       ofPopStyle();
    }
    
    for (int i=0; i<8; ++i)
-      SetLed(kMidiMessage_Control, i+20, bottomRowLedColors[i]);
-   
-   SetLed(kMidiMessage_Control, 35, mAllowRepatch ? 127 : 5, mAllowRepatch ? 10 : 1);
-   
-   //test led colors
-   //SetLed(kMidiMessage_Note, 92, (int)mModuleListOffset);
-   //ofLog() << (int)mModuleListOffset;
-
-   nvgEndFrame(vg);
-   
-   glFinish();
-   glReadBuffer(GL_COLOR_ATTACHMENT0);
-   glReadPixels(0, 0, winWidth, winHeight, GL_RGB, GL_UNSIGNED_BYTE, mPixels);
-   
-   nvgluBindFramebuffer(NULL);
+      SetLed(kMidiMessage_Control, i+kBelowScreenButtonRow, bottomRowLedColors[i]);
 }
 
 int Push2Control::GetColorForType(ModuleType type)
@@ -421,7 +519,7 @@ int Push2Control::GetColorForType(ModuleType type)
 
 void Push2Control::DrawControls(vector<IUIControl*> controls, bool sliders, float yPos)
 {
-   for (int i=0; i < controls.size(); ++i)
+   for (int i=(int)controls.size()-1; i >= 0; --i)
    {
       if (i - mModuleColumnOffset < -1 || i - mModuleColumnOffset > 8)
          continue;
@@ -434,7 +532,27 @@ void Push2Control::DrawControls(vector<IUIControl*> controls, bool sliders, floa
       controls[i]->SetPosition(x, y);
       
       ofPushStyle();
-      ofSetColor(IDrawableModule::GetColor(controls[i]->GetModuleParent()->GetModuleType()));
+      ModuleType moduleType = controls[i]->GetModuleParent()->GetModuleType();
+      if (mScreenDisplayMode == ScreenDisplayMode::kAddModule)
+      {
+         if (controls[i] == mSpawnLists.mInstrumentModules.GetList())
+            moduleType = kModuleType_Instrument;
+         if (controls[i] == mSpawnLists.mNoteModules.GetList())
+            moduleType = kModuleType_Note;
+         if (controls[i] == mSpawnLists.mSynthModules.GetList())
+            moduleType = kModuleType_Synth;
+         if (controls[i] == mSpawnLists.mAudioModules.GetList())
+            moduleType = kModuleType_Audio;
+         if (controls[i] == mSpawnLists.mModulatorModules.GetList())
+            moduleType = kModuleType_Modulator;
+         if (controls[i] == mSpawnLists.mOtherModules.GetList())
+            moduleType = kModuleType_Other;
+         if (controls[i] == mSpawnLists.mVstPlugins.GetList())
+            moduleType = kModuleType_Synth;
+         if (controls[i] == mSpawnLists.mPrefabs.GetList())
+            moduleType = kModuleType_Other;
+      }
+      ofSetColor(IDrawableModule::GetColor(moduleType));
       
       if (mDisplayModule == this)
          DrawTextBold(juce::String(controls[i]->Path()).replace("~","\n").toRawUTF8(), kColumnSpacing * i + 3, yPos-12, 10);
@@ -447,14 +565,18 @@ void Push2Control::DrawControls(vector<IUIControl*> controls, bool sliders, floa
          DropdownList* dropdown = dynamic_cast<DropdownList*>(mSliderControls[i]);
          if (dropdown != nullptr)
          {
+            const float kCentering = 7;
             int w, h;
             dropdown->GetPopupDimensions(w, h);
             ofPushMatrix();
-            ofTranslate(kColumnSpacing * i + 3, yPos + 7 - h * controls[i]->GetMidiValue());
+            ofTranslate(kColumnSpacing * i + 3, yPos + kCentering - h * controls[i]->GetMidiValue());
             dropdown->DrawDropdown(w, h);
             ofFill();
-            ofSetColor(IDrawableModule::GetColor(controls[i]->GetModuleParent()->GetModuleType()));
-            ofCircle(w - 4, h * controls[i]->GetMidiValue(), 2);
+            ofColor color = IDrawableModule::GetColor(controls[i]->GetModuleParent()->GetModuleType());
+            color.a = 25;
+            ofSetColor(color);
+            //ofCircle(w - 4, h * controls[i]->GetMidiValue(), 2);
+            ofRect(0,h * controls[i]->GetMidiValue() - kCentering,w,controls[i]->GetDimensions().y);
             ofPopMatrix();
          }
       }
@@ -467,7 +589,7 @@ void Push2Control::RenderPush2Display()
 {
    if (gHoveredModule != nullptr)
    {
-      if (mDisplayModule != gHoveredModule && gHoveredModule != mLastModuleSetFromHover && !IsIgnorableModule(gHoveredModule))
+      if (mDisplayModule != gHoveredModule && gHoveredModule != mLastModuleSetFromHover && !IsIgnorableModule(gHoveredModule) && TheSynth->IsModalFocusItem(gHoveredModule))
       {
          SetDisplayModule(gHoveredModule);
          mLastModuleSetFromHover = gHoveredModule;
@@ -488,6 +610,10 @@ void Push2Control::RenderPush2Display()
 void Push2Control::SetDisplayModule(IDrawableModule* module)
 {
    mDisplayModule = module;
+   if (dynamic_cast<IPush2GridController*>(mDisplayModule) != nullptr)
+      mDisplayModuleCanControlGrid = true;
+   else
+      mDisplayModuleCanControlGrid = false;
    mModuleColumnOffset = 0;
    mModuleColumnOffsetSmoothed = 0;
    UpdateControlList();
@@ -498,9 +624,11 @@ void Push2Control::UpdateControlList()
    mSliderControls.clear();
    mButtonControls.clear();
    vector<IUIControl*> controls;
-   if (mDisplayModule == this)
+   if (mScreenDisplayMode == ScreenDisplayMode::kAddModule)
+      controls = mSpawnModuleControls;
+   else if (mDisplayModule == this)
       controls = mFavoriteControls;
-   else
+   else if (mDisplayModule != nullptr)
       controls = mDisplayModule->GetUIControls();
    for (int i=0; i < controls.size(); ++i)
    {
@@ -530,27 +658,30 @@ void Push2Control::RemoveFavoriteControl(IUIControl* control)
    }
 }
 
-void Push2Control::SetLed(MidiMessageType type, int index, int color, int channel)
+void Push2Control::SetLed(MidiMessageType type, int index, int color, int flashColor /*=-1*/)
 {
    if (type == kMidiMessage_Control)
       index += 128;
    assert(index >= 0 && index < 128 * 2);
    
+   int channel = 1;
+   if (flashColor != -1)
+      channel = 10;
    int stateValue = color | channel << 8;
    if (mLedState[index] != stateValue)
    {
-      bool isPulse = (channel >= 7 && channel <= 11);
+      //bool isPulse = (channel >= 7 && channel <= 11);
       mLedState[index] = stateValue;
       if (index < 128)
       {
-         if (isPulse)
-            mDevice.SendNote(index, color == 122 || color == 127 ? 0 : 122);
+         if (flashColor != -1)
+            mDevice.SendNote(index, flashColor);
          mDevice.SendNote(index, color, false, channel);
       }
       else
       {
-         if (isPulse)
-            mDevice.SendCC(index-128, color == 122 || color == 127 ? 0 : 122);
+         if (flashColor != -1)
+            mDevice.SendCC(index-128, flashColor);
          mDevice.SendCC(index-128, color, channel);
       }
    }
@@ -558,20 +689,42 @@ void Push2Control::SetLed(MidiMessageType type, int index, int color, int channe
 
 void Push2Control::OnMidiNote(MidiNote& note)
 {
+   if (mGridControlModule != nullptr)
+   {
+      bool handled = mGridControlModule->OnPush2Control(kMidiMessage_Note, note.mPitch, note.mVelocity);
+      if (handled)
+         return;
+   }
+   
    if (note.mPitch >= 0 && note.mPitch <= 7) //main encoders
    {
-      int controlIndex = note.mPitch + mModuleColumnOffset;
-      if (note.mVelocity > 0 && controlIndex < mSliderControls.size())
+      if (mScreenDisplayMode == ScreenDisplayMode::kNormal)
       {
-         mSliderControls[controlIndex]->StartBeacon();
-         
-         if (mNewButtonHeld)
-            AddFavoriteControl(mSliderControls[controlIndex]);
-         if (mDeleteButtonHeld)
-            RemoveFavoriteControl(mSliderControls[controlIndex]);
+         int controlIndex = note.mPitch + mModuleColumnOffset;
+         if (note.mVelocity > 0 && controlIndex < mSliderControls.size())
+         {
+            mSliderControls[controlIndex]->StartBeacon();
+            
+            if (mNewButtonHeld)
+               AddFavoriteControl(mSliderControls[controlIndex]);
+            if (mDeleteButtonHeld)
+               RemoveFavoriteControl(mSliderControls[controlIndex]);
+         }
+      }
+      
+      if (mScreenDisplayMode == ScreenDisplayMode::kAddModule)
+      {
+         if (note.mVelocity > 0)
+         {
+            for (int i=0; i<mSpawnLists.GetDropdowns().size(); ++i)
+            {
+               if (i != note.mPitch)
+                  mSpawnLists.GetDropdowns()[i]->GetList()->SetValue(-1);
+            }
+         }
       }
    }
-   else if (note.mPitch >= 36 && note.mPitch <= 99)  //pads
+   else if (note.mPitch >= 36 && note.mPitch <= 99 && mGridControlModule == nullptr)  //pads
    {
       if (note.mVelocity > 0)
       {
@@ -602,6 +755,31 @@ void Push2Control::OnMidiNote(MidiNote& note)
       {
          mHeldModule = nullptr;
       }
+      
+      if (mScreenDisplayMode == ScreenDisplayMode::kAddModule)
+      {
+         if (note.mVelocity > 0)
+         {
+            int gridIndex = note.mPitch - 36;
+            int gridX = gridIndex % 8;
+            int gridY = gridIndex / 8;
+            ofVec2f newModuleCenter = ofVec2f(ofMap(gridX, 0, 7, mModuleGridRect.getMinX(), mModuleGridRect.getMaxX()), ofMap(gridY, 7, 0, mModuleGridRect.getMinY(), mModuleGridRect.getMaxY()));
+            
+            for (int i=0; i<mSpawnLists.GetDropdowns().size(); ++i)
+            {
+               if (mSpawnLists.GetDropdowns()[i]->GetList()->GetValue() != -1)
+               {
+                  IDrawableModule* module = mSpawnLists.GetDropdowns()[i]->Spawn();
+                  ofRectangle rect = module->GetRect();
+                  module->SetPosition(newModuleCenter.x-rect.width/2, newModuleCenter.y-rect.height/2);
+                  SetDisplayModule(module);
+                  mSpawnLists.GetDropdowns()[i]->GetList()->SetValue(-1);
+                  mScreenDisplayMode = ScreenDisplayMode::kNormal;
+                  break;
+               }
+            }
+         }
+      }
    }
    else
    {
@@ -613,6 +791,13 @@ void Push2Control::OnMidiNote(MidiNote& note)
 
 void Push2Control::OnMidiControl(MidiControl& control)
 {
+   if (mGridControlModule != nullptr)
+   {
+      bool handled = mGridControlModule->OnPush2Control(kMidiMessage_Control, control.mControl, control.mValue);
+      if (handled)
+         return;
+   }
+   
    if (control.mControl >= 71 && control.mControl <= 78) //main encoders
    {
       int controlIndex = control.mControl - 71 + mModuleColumnOffset;
@@ -624,9 +809,9 @@ void Push2Control::OnMidiControl(MidiControl& control)
          mSliderControls[controlIndex]->SetFromMidiCC(currentNormalized + increment);
       }
    }
-   else if (control.mControl >= 102 && control.mControl <= 110) //buttons below encoders
+   else if (control.mControl >= kAboveScreenButtonRow && control.mControl < kAboveScreenButtonRow + 8) //buttons below encoders
    {
-      int controlIndex = control.mControl - 102 + mModuleColumnOffset;
+      int controlIndex = control.mControl - kAboveScreenButtonRow + mModuleColumnOffset;
       if (control.mValue > 0 && controlIndex < mButtonControls.size())
       {
          if (mNewButtonHeld)
@@ -658,31 +843,104 @@ void Push2Control::OnMidiControl(MidiControl& control)
       increment *= .05f;
       mModuleListOffset += increment;
    }
-   else if (control.mControl >= 20 && control.mControl <= 27) //buttons below screen
+   else if (control.mControl >= kBelowScreenButtonRow && control.mControl < kBelowScreenButtonRow + 8) //buttons below screen
    {
-      int moduleIndex = control.mControl - 20 + round(mModuleListOffset);
+      int moduleIndex = control.mControl - kBelowScreenButtonRow + round(mModuleListOffset);
       if (control.mValue > 0 && moduleIndex < mModules.size())
       {
          SetDisplayModule(mModules[moduleIndex]);
       }
    }
-   else if (control.mControl == 87) //"new"
+   else if (control.mControl == kNewButton)
    {
       mNewButtonHeld = control.mValue > 0;
    }
-   else if (control.mControl == 118) //"delete"
+   else if (control.mControl == kDeleteButton)
    {
       mDeleteButtonHeld = control.mValue > 0;
    }
-   else if (control.mControl == 35) //"convert"
+   else if (control.mControl == kRepatchButton)
    {
       if (control.mValue > 0)
          mAllowRepatch = !mAllowRepatch;
+   }
+   else if (control.mControl == kAddDeviceButton)
+   {
+      if (control.mValue > 0)
+      {
+         if (mScreenDisplayMode == ScreenDisplayMode::kAddModule)
+         {
+            mScreenDisplayMode = ScreenDisplayMode::kNormal;
+         }
+         else
+         {
+            mScreenDisplayMode = ScreenDisplayMode::kAddModule;
+            mGridControlModule = nullptr;
+         }
+         UpdateControlList();
+      }
+   }
+   else if (control.mControl == kUpButton || control.mControl == kDownButton || control.mControl == kLeftButton || control.mControl == kRightButton)
+   {
+      if (control.mValue > 0)
+      {
+         ofVec2f direction;
+         if (control.mControl == kUpButton)
+            direction.y -= 1;
+         if (control.mControl == kDownButton)
+            direction.y += 1;
+         if (control.mControl == kLeftButton)
+            direction.x -= 1;
+         if (control.mControl == kRightButton)
+            direction.x += 1;
+         
+         if (mDisplayModule)
+         {
+            ofVec2f pos = mDisplayModule->GetPosition();
+            pos += direction * 50;
+            mDisplayModule->SetPosition(pos.x, pos.y);
+         }
+      }
+   }
+   else if (control.mControl == kNoteButton)
+   {
+      if (control.mValue > 0)
+      {
+         IPush2GridController* controller = dynamic_cast<IPush2GridController*>(mDisplayModule);
+         if (controller != nullptr && controller != mGridControlModule)
+         {
+            mGridControlModule = controller;
+            
+            for (int i=36; i<=99; ++i)
+               SetLed(kMidiMessage_Note, i, 0);
+            mGridControlModule->OnPush2Connect();
+            
+            mScreenDisplayMode = ScreenDisplayMode::kNormal;
+            UpdateControlList();
+         }
+      }
+   }
+   else if (control.mControl == kSessionButton)
+   {
+      if (control.mValue > 0)
+         mGridControlModule = nullptr;
    }
    else
    {
       ofLog() << "control " << control.mControl << " " << control.mValue;
    }
+}
+
+void Push2Control::OnMidiPitchBend(MidiPitchBend& pitchBend)
+{
+   if (mGridControlModule != nullptr)
+   {
+      bool handled = mGridControlModule->OnPush2Control(kMidiMessage_PitchBend, pitchBend.mChannel, pitchBend.mValue);
+      if (handled)
+         return;
+   }
+   
+   ofLog() << "pitchbend " << pitchBend.mChannel << " " << pitchBend.mValue;
 }
 
 bool Push2Control::IsIgnorableModule(IDrawableModule* module)

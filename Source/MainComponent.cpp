@@ -312,6 +312,11 @@ private:
          mSynth.MouseScrolled(wheel.deltaX * 30, wheel.deltaY * 30);
    }
    
+   void mouseMagnify(const MouseEvent& e, float scaleFactor) override
+   {
+      mSynth.MouseMagnify(e.getPosition().x, e.getPosition().y, scaleFactor);
+   }
+   
    bool keyPressed(const KeyPress& key) override
    {
       int keyCode = key.getTextCharacter();

@@ -33,6 +33,7 @@ void NoteHocket::CreateUIControls()
    {
       FLOATSLIDER(mWeightSlider[i],("weight "+ofToString(i)).c_str(),&mWeight[i],0,1);
       mDestinationCables[i] = new PatchCableSource(this, kConnectionType_Note);
+      mDestinationCables[i]->SetOverrideCableDir(ofVec2f(1,0));
       AddPatchCableSource(mDestinationCables[i]);
       ofRectangle rect = mWeightSlider[i]->GetRect(true);
       mDestinationCables[i]->SetManualPosition(rect.getMaxX() + 10, rect.y + rect.height/2);
