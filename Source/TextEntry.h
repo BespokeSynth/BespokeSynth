@@ -30,18 +30,30 @@ enum TextEntryType
    kTextEntry_Float
 };
 
-class TextEntry : public IUIControl
+class IKeyboardFocusListener
+{
+public:
+   virtual ~IKeyboardFocusListener() {}
+   static void SetActiveKeyboardFocus(IKeyboardFocusListener* focus) { sCurrentKeyboardFocus = focus; }
+   static IKeyboardFocusListener* GetActiveKeyboardFocus() { return sCurrentKeyboardFocus; }
+   static void ClearActiveKeyboardFocus(bool acceptEntry);
+   
+   virtual void OnKeyPressed(int key, bool isRepeat) = 0;
+private:
+   virtual void AcceptEntry() {}
+   static IKeyboardFocusListener* sCurrentKeyboardFocus;
+};
+
+class TextEntry : public IUIControl, public IKeyboardFocusListener
 {
 public:
    TextEntry(ITextEntryListener* owner, const char* name, int x, int y, int charWidth, char* var);
    TextEntry(ITextEntryListener* owner, const char* name, int x, int y, int charWidth, int* var, int min, int max);
    TextEntry(ITextEntryListener* owner, const char* name, int x, int y, int charWidth, float* var, float min, float max);
-   void OnKeyPressed(int key, bool isRepeat);
+   void OnKeyPressed(int key, bool isRepeat) override;
    void Render() override;
    
    void MakeActiveTextEntry(bool setCaretToEnd);
-   static void ClearActiveTextEntry(bool acceptEntry);
-   static TextEntry* GetActiveTextEntry() { return sCurrentTextEntry; }
    
    void SetNextTextEntry(TextEntry* entry);
    void UpdateDisplayString();
@@ -69,7 +81,7 @@ private:
    
    void AddCharacter(char c);
    bool AllowCharacter(char c);
-   void AcceptEntry();
+   void AcceptEntry() override;
    
    void OnClicked(int x, int y, bool right) override;
    bool MouseMoved(float x, float y) override;
@@ -95,8 +107,6 @@ private:
    float mLabelSize;
    bool mFlexibleWidth;
    bool mHovered;
-   
-   static TextEntry* sCurrentTextEntry;
 };
 
 #endif /* defined(__modularSynth__TextEntry__) */

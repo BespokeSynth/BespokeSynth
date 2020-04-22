@@ -19,7 +19,7 @@ NoteSustain::NoteSustain()
 void NoteSustain::CreateUIControls()
 {
    IDrawableModule::CreateUIControls();
-   mSustainSlider = new FloatSlider(this,"sustain",5,2,80,15,&mSustain,1,999);
+   mSustainSlider = new FloatSlider(this,"duration",5,2,100,15,&mSustain,1,999);
    mSustainSlider->SetMode(FloatSlider::kSquare);
 }
 

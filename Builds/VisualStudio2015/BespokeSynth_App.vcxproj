@@ -197,6 +197,7 @@
     <ClCompile Include="..\..\Source\Pumper.cpp"/>
     <ClCompile Include="..\..\Source\Stutter.cpp"/>
     <ClCompile Include="..\..\Source\TremoloEffect.cpp"/>
+    <ClCompile Include="..\..\Source\ScriptModule.cpp"/>
     <ClCompile Include="..\..\Source\NoteLatch.cpp"/>
     <ClCompile Include="..\..\Source\PulseTrain.cpp"/>
     <ClCompile Include="..\..\Source\Push2Control.cpp"/>
@@ -385,6 +386,7 @@
     <ClCompile Include="..\..\Source\VSTPlugin.cpp"/>
     <ClCompile Include="..\..\Source\WaveformViewer.cpp"/>
     <ClCompile Include="..\..\Source\WhiteKeys.cpp"/>
+    <ClCompile Include="..\..\Source\CodeEntry.cpp"/>
     <ClCompile Include="..\..\Source\ClickButton.cpp"/>
     <ClCompile Include="..\..\Source\RadioButton.cpp"/>
     <ClCompile Include="..\..\Source\DropdownList.cpp"/>
@@ -2270,6 +2272,30 @@
     <ClCompile Include="..\..\JuceLibraryCode\include_juce_video.cpp"/>
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="..\..\Source\pybind11\detail\class.h"/>
+    <ClInclude Include="..\..\Source\pybind11\detail\common.h"/>
+    <ClInclude Include="..\..\Source\pybind11\detail\descr.h"/>
+    <ClInclude Include="..\..\Source\pybind11\detail\init.h"/>
+    <ClInclude Include="..\..\Source\pybind11\detail\internals.h"/>
+    <ClInclude Include="..\..\Source\pybind11\detail\typeid.h"/>
+    <ClInclude Include="..\..\Source\pybind11\attr.h"/>
+    <ClInclude Include="..\..\Source\pybind11\buffer_info.h"/>
+    <ClInclude Include="..\..\Source\pybind11\cast.h"/>
+    <ClInclude Include="..\..\Source\pybind11\chrono.h"/>
+    <ClInclude Include="..\..\Source\pybind11\common.h"/>
+    <ClInclude Include="..\..\Source\pybind11\complex.h"/>
+    <ClInclude Include="..\..\Source\pybind11\eigen.h"/>
+    <ClInclude Include="..\..\Source\pybind11\embed.h"/>
+    <ClInclude Include="..\..\Source\pybind11\eval.h"/>
+    <ClInclude Include="..\..\Source\pybind11\functional.h"/>
+    <ClInclude Include="..\..\Source\pybind11\iostream.h"/>
+    <ClInclude Include="..\..\Source\pybind11\numpy.h"/>
+    <ClInclude Include="..\..\Source\pybind11\operators.h"/>
+    <ClInclude Include="..\..\Source\pybind11\options.h"/>
+    <ClInclude Include="..\..\Source\pybind11\pybind11.h"/>
+    <ClInclude Include="..\..\Source\pybind11\pytypes.h"/>
+    <ClInclude Include="..\..\Source\pybind11\stl.h"/>
+    <ClInclude Include="..\..\Source\pybind11\stl_bind.h"/>
     <ClInclude Include="..\..\Source\push2\libusb\config.h"/>
     <ClInclude Include="..\..\Source\push2\libusb\config_msvc.h"/>
     <ClInclude Include="..\..\Source\push2\libusb\config_xcode.h"/>
@@ -2330,6 +2356,7 @@
     <ClInclude Include="..\..\Source\Pumper.h"/>
     <ClInclude Include="..\..\Source\Stutter.h"/>
     <ClInclude Include="..\..\Source\TremoloEffect.h"/>
+    <ClInclude Include="..\..\Source\ScriptModule.h"/>
     <ClInclude Include="..\..\Source\NoteLatch.h"/>
     <ClInclude Include="..\..\Source\PulseTrain.h"/>
     <ClInclude Include="..\..\Source\Push2Control.h"/>
@@ -2515,6 +2542,7 @@
     <ClInclude Include="..\..\Source\VSTPlugin.h"/>
     <ClInclude Include="..\..\Source\WaveformViewer.h"/>
     <ClInclude Include="..\..\Source\WhiteKeys.h"/>
+    <ClInclude Include="..\..\Source\CodeEntry.h"/>
     <ClInclude Include="..\..\Source\UIControlMacros.h"/>
     <ClInclude Include="..\..\Source\ClickButton.h"/>
     <ClInclude Include="..\..\Source\RadioButton.h"/>

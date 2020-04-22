@@ -194,6 +194,7 @@
 #include "Push2Control.h"
 #include "PulseTrain.h"
 #include "NoteLatch.h"
+#include "ScriptModule.h"
 
 #define REGISTER(class,name,type) Register(#name, &(class::Create), &(class::CanCreate), type, false, false);
 #define REGISTER_HIDDEN(class,name,type) Register(#name, &(class::Create), &(class::CanCreate), type, true, false);
@@ -356,6 +357,7 @@ ModuleFactory::ModuleFactory()
    REGISTER(Push2Control, push2control, kModuleType_Instrument);
    REGISTER(PulseTrain, pulsetrain, kModuleType_Other);
    REGISTER(NoteLatch, notelatch, kModuleType_Note);
+   REGISTER(ScriptModule, script, kModuleType_Other);
 
    //REGISTER_EXPERIMENTAL(MidiPlayer, midiplayer, kModuleType_Instrument);
    REGISTER_EXPERIMENTAL(Razor, razor, kModuleType_Synth);

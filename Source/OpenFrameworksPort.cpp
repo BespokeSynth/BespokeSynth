@@ -692,15 +692,21 @@ ofRectangle RetinaTrueTypeFont::DrawStringWrap(string str, float size, float x, 
    return rect;
 }
 
-float RetinaTrueTypeFont::GetStringWidth(string str, float size)
+float RetinaTrueTypeFont::GetStringWidth(string str, float size, bool isRenderThread /*false*/)
 {
    if (!mLoaded)
       return str.size() * 12;
       
-   nvgFontFaceId(gFontBoundsNanoVG, mFontBoundsHandle);
-   nvgFontSize(gFontBoundsNanoVG, size);
+   NVGcontext* vg;
+   if (isRenderThread)
+      vg = gNanoVG;
+   else
+      vg = gFontBoundsNanoVG;
+   
+   nvgFontFaceId(vg, mFontBoundsHandle);
+   nvgFontSize(vg, size);
    float bounds[4];
-   float width = nvgTextBounds(gFontBoundsNanoVG, 0, 0, str.c_str(), nullptr, bounds);
+   float width = nvgTextBounds(vg, 0, 0, str.c_str(), nullptr, bounds);
    
    return width;
 }

@@ -135,7 +135,9 @@ IDrawableModule* IClickable::GetModuleParent()
 
 string IClickable::Path(bool ignoreContext)
 {
-   assert(mName[0] != 0);  //must have a name
+   if (mName[0] == 0)  //must have a name
+      return "";
+   
    string path = mName;
    if (mParent != nullptr)
       path = mParent->Path(true) + "~" + mName;

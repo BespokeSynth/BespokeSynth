@@ -83,6 +83,7 @@ extern float gVizFreq;
 extern IUIControl* gBindToUIControl;
 extern RetinaTrueTypeFont gFont;
 extern RetinaTrueTypeFont gFontBold;
+extern RetinaTrueTypeFont gFontFixedWidth;
 extern float gModuleDrawAlpha;
 extern float gNullBuffer[4096];
 extern float gZeroBuffer[4096];

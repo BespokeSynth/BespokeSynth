@@ -28,6 +28,7 @@
 #include "../JuceLibraryCode/JuceHeader.h"
 #include "QuickSpawnMenu.h"
 #include "AudioToCV.h"
+#include "pybind11/embed.h"
 
 ModularSynth* TheSynth = nullptr;
 
@@ -66,6 +67,8 @@ ModularSynth::ModularSynth()
    mSaveOutputBuffer[1] = new float[RECORDING_LENGTH];
    
    mOutputBuffer.SetNumChannels(2);
+   
+   pybind11::initialize_interpreter();
 }
 
 ModularSynth::~ModularSynth()
@@ -76,6 +79,8 @@ ModularSynth::~ModularSynth()
    
    assert(TheSynth == this);
    TheSynth = nullptr;
+   
+   pybind11::finalize_interpreter();
 }
 
 bool ModularSynth::IsReady()
@@ -346,15 +351,25 @@ void ModularSynth::DrawConsole()
    
    float consoleY = 51;
    
-   if (TextEntry::GetActiveTextEntry() == mConsoleEntry)
+   if (IKeyboardFocusListener::GetActiveKeyboardFocus() == mConsoleEntry)
    {
       mConsoleEntry->SetPosition(0, consoleY-15);
       mConsoleEntry->Draw();
       consoleY += 15;
    }
+   else
+   {
+      if (gHoveredUIControl != nullptr)
+      {
+         ofPushStyle();
+         ofSetColor(0, 255, 255);
+         DrawTextNormal(gHoveredUIControl->Path(), 0, consoleY-4);
+         ofPopStyle();
+      }
+   }
    
    int outputLines = (int)mEvents.size();
-   if (TextEntry::GetActiveTextEntry() == mConsoleEntry)
+   if (IKeyboardFocusListener::GetActiveKeyboardFocus() == mConsoleEntry)
       outputLines += mErrors.size();
    if (outputLines > 0)
    {
@@ -382,7 +397,7 @@ void ModularSynth::DrawConsole()
       }
    }
    
-   if (TextEntry::GetActiveTextEntry() == mConsoleEntry)
+   if (IKeyboardFocusListener::GetActiveKeyboardFocus() == mConsoleEntry)
    {
       if (!mErrors.empty())
       {
@@ -417,7 +432,7 @@ IDrawableModule* ModularSynth::GetLastClickedModule() const
 void ModularSynth::KeyPressed(int key, bool isRepeat)
 {
    if (gHoveredUIControl &&
-       TextEntry::GetActiveTextEntry() == nullptr &&
+       IKeyboardFocusListener::GetActiveKeyboardFocus() == nullptr &&
        !isRepeat)
    {
       if (key == OF_KEY_DOWN || key == OF_KEY_UP)
@@ -450,9 +465,9 @@ void ModularSynth::KeyPressed(int key, bool isRepeat)
       }
    }
    
-   if (TextEntry::GetActiveTextEntry())  //active text entry captures all input
+   if (IKeyboardFocusListener::GetActiveKeyboardFocus())  //active text entry captures all input
    {
-      TextEntry::GetActiveTextEntry()->OnKeyPressed(key, isRepeat);
+      IKeyboardFocusListener::GetActiveKeyboardFocus()->OnKeyPressed(key, isRepeat);
       return;
    }
    
@@ -695,7 +710,7 @@ void ModularSynth::MousePressed(int intX, int intY, int button)
    
    bool rightButton = button == 2;
 
-   TextEntry::ClearActiveTextEntry(K(acceptEntry));
+   IKeyboardFocusListener::ClearActiveKeyboardFocus(K(acceptEntry));
 
    if (GetTopModalFocusItem())
    {
@@ -1227,7 +1242,7 @@ void ModularSynth::ResetLayout()
    mLissajousDrawers.clear();
    mMoveModule = nullptr;
    LFOPool::Shutdown();
-   TextEntry::ClearActiveTextEntry(!K(acceptEntry));
+   IKeyboardFocusListener::ClearActiveKeyboardFocus(!K(acceptEntry));
    
    mEvents.clear();
    mErrors.clear();

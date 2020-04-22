@@ -12,14 +12,14 @@
 #include "IDrawableModule.h"
 #include "FileStream.h"
 
-TextEntry* TextEntry::sCurrentTextEntry = nullptr;
+IKeyboardFocusListener* IKeyboardFocusListener::sCurrentKeyboardFocus = nullptr;
 
 //static
-void TextEntry::ClearActiveTextEntry(bool acceptEntry)
+void IKeyboardFocusListener::ClearActiveKeyboardFocus(bool acceptEntry)
 {
-   if (sCurrentTextEntry && acceptEntry)
-      sCurrentTextEntry->AcceptEntry();
-   sCurrentTextEntry = nullptr;
+   if (sCurrentKeyboardFocus && acceptEntry)
+      sCurrentKeyboardFocus->AcceptEntry();
+   sCurrentKeyboardFocus = nullptr;
 }
 
 TextEntry::TextEntry(ITextEntryListener* owner, const char* name, int x, int y, int charWidth, char* var)
@@ -95,7 +95,7 @@ void TextEntry::Render()
       xOffset = mLabelSize;
    }
    
-   bool isCurrent = sCurrentTextEntry == this;
+   bool isCurrent = IKeyboardFocusListener::GetActiveKeyboardFocus() == this;
    
    ofColor color(255,255,255);
    if (!isCurrent && mInErrorMode)
@@ -117,7 +117,7 @@ void TextEntry::Render()
    ofRect(mX + xOffset,mY,w - xOffset,h);
    DrawTextNormal(mString, mX+2+xOffset, mY+12);
    
-   if (sCurrentTextEntry == this)
+   if (IKeyboardFocusListener::GetActiveKeyboardFocus() == this)
    {
       if (mCaretBlink)
       {
@@ -201,7 +201,7 @@ void TextEntry::OnClicked(int x, int y, bool right)
 
 void TextEntry::MakeActiveTextEntry(bool setCaretToEnd)
 {
-   sCurrentTextEntry = this;
+   SetActiveKeyboardFocus(this);
    if (mListener)
       mListener->TextEntryActivated(this);
    if (setCaretToEnd)
@@ -214,7 +214,7 @@ void TextEntry::OnKeyPressed(int key, bool isRepeat)
 {
    if (key == OF_KEY_RETURN)
    {
-      ClearActiveTextEntry(K(acceptEntry));
+      IKeyboardFocusListener::ClearActiveKeyboardFocus(K(acceptEntry));
    }
    if (key == OF_KEY_TAB)
    {
@@ -242,7 +242,7 @@ void TextEntry::OnKeyPressed(int key, bool isRepeat)
    }
    else if (key == OF_KEY_ESC)
    {
-      ClearActiveTextEntry(!K(acceptEntry));
+      IKeyboardFocusListener::ClearActiveKeyboardFocus(!K(acceptEntry));
    }
    else if (key == OF_KEY_LEFT)
    {
@@ -254,7 +254,7 @@ void TextEntry::OnKeyPressed(int key, bool isRepeat)
       if (mCaretPosition < strlen(mString))
          ++mCaretPosition;
    }
-   else if (key == 'v' && GetKeyModifiers() == kModifier_Command)
+   else if (key == 'V' && GetKeyModifiers() == kModifier_Command)
    {
       juce::String clipboard = SystemClipboard::getTextFromClipboard();
       for (int i=0; i<clipboard.length(); ++i)

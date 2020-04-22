@@ -132,7 +132,7 @@ void Arpeggiator::DrawModule()
    mUpbeatsCheckbox->Draw();
    mPlayOnlyScaleNotesCheckbox->Draw();
    
-   if (TextEntry::GetActiveTextEntry() == mArpEntry)
+   if (IKeyboardFocusListener::GetActiveKeyboardFocus() == mArpEntry)
    {
       mArpEntry->Draw();
    }
@@ -153,7 +153,7 @@ void Arpeggiator::DrawModule()
          }
          else
          {
-            float w = GetStringWidth(pad);
+            float w = gFont.GetStringWidth(pad, 15, K(isRenderThread));
             DrawTextNormal(GetArpNoteDisplay(mChord[i].pitch),5+w+pad.length()/5.0f,25);
             break;
          }

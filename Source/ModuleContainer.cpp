@@ -301,7 +301,7 @@ IDrawableModule* ModuleContainer::FindModule(string name, bool fail)
          IDrawableModule* child = nullptr;
          try
          {
-            mModules[i]->FindChild(tokens[1].c_str());
+            child = mModules[i]->FindChild(tokens[1].c_str());
          }
          catch (UnknownModuleException& e)
          {

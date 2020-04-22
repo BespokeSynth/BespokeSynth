@@ -713,13 +713,13 @@ void MidiController::DrawModule()
       else
          ofSetColor(255,0,0,255*(1-(gTime - mLastActivityTime)/200));
       ofFill();
-      ofRect(30+GetStringWidth(Name()),-11,10,10);
+      ofRect(30+gFont.GetStringWidth(Name(), 15, K(isRenderThread)),-11,10,10);
       ofPopStyle();
    }
    
    if (!mIsConnected)
    {
-      float xStart = 30+GetStringWidth(Name());
+      float xStart = 30+gFont.GetStringWidth(Name(), 15, K(isRenderThread));
       float yStart = -11;
       
       ofPushStyle();
@@ -1423,7 +1423,7 @@ void MidiController::TextEntryActivated(TextEntry* entry)
             connection->mUIControl = gBindToUIControl;
             gBindToUIControl->AddRemoteController();
             gBindToUIControl = nullptr;
-            TextEntry::ClearActiveTextEntry(!K(acceptEntry));
+            IKeyboardFocusListener::ClearActiveKeyboardFocus(!K(acceptEntry));
          }
       }
    }
@@ -1936,7 +1936,7 @@ void UIControlConnection::DrawList(int index)
       ofPopStyle();
    }
    
-   /*if (mUIControlPathEntry == TextEntry::GetActiveTextEntry() || TheSynth->InMidiMapMode())
+   /*if (mUIControlPathEntry == IKeyboardFocusListener::GetActiveKeyboardFocus() || TheSynth->InMidiMapMode())
    {
       IUIControl* uiControl = GetUIControl();
       if (uiControl)
@@ -1946,7 +1946,7 @@ void UIControlConnection::DrawList(int index)
          ofPushMatrix();
          ofTranslate(-parentX, -parentY);
          ofPushStyle();
-         if (mUIControlPathEntry == TextEntry::GetActiveTextEntry())
+         if (mUIControlPathEntry == IKeyboardFocusListener::GetActiveKeyboardFocus())
             ofSetLineWidth(3);
          else
             ofSetLineWidth(1);

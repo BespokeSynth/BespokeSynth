@@ -2,6 +2,12 @@
 
 <Project ToolsVersion="14.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
   <ItemGroup>
+    <Filter Include="BespokeSynth\libraries\pybind11\detail">
+      <UniqueIdentifier>{DB01C8C5-4223-FEFF-6983-0DE92775CBA0}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="BespokeSynth\libraries\pybind11">
+      <UniqueIdentifier>{D63038EC-1F41-5C00-9FEB-BA19CF43409C}</UniqueIdentifier>
+    </Filter>
     <Filter Include="BespokeSynth\libraries\push2">
       <UniqueIdentifier>{1A55651A-CAA6-6753-41E6-95655C03B46B}</UniqueIdentifier>
     </Filter>
@@ -610,6 +616,9 @@
     <ClCompile Include="..\..\Source\TremoloEffect.cpp">
       <Filter>BespokeSynth\Source\effects</Filter>
     </ClCompile>
+    <ClCompile Include="..\..\Source\ScriptModule.cpp">
+      <Filter>BespokeSynth\Source\modules</Filter>
+    </ClCompile>
     <ClCompile Include="..\..\Source\NoteLatch.cpp">
       <Filter>BespokeSynth\Source\modules</Filter>
     </ClCompile>
@@ -1161,6 +1170,9 @@
     </ClCompile>
     <ClCompile Include="..\..\Source\WhiteKeys.cpp">
       <Filter>BespokeSynth\Source\modules</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\Source\CodeEntry.cpp">
+      <Filter>BespokeSynth\Source\uicontrols</Filter>
     </ClCompile>
     <ClCompile Include="..\..\Source\ClickButton.cpp">
       <Filter>BespokeSynth\Source\uicontrols</Filter>
@@ -3357,6 +3369,78 @@
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="..\..\Source\pybind11\detail\class.h">
+      <Filter>BespokeSynth\libraries\pybind11\detail</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\Source\pybind11\detail\common.h">
+      <Filter>BespokeSynth\libraries\pybind11\detail</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\Source\pybind11\detail\descr.h">
+      <Filter>BespokeSynth\libraries\pybind11\detail</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\Source\pybind11\detail\init.h">
+      <Filter>BespokeSynth\libraries\pybind11\detail</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\Source\pybind11\detail\internals.h">
+      <Filter>BespokeSynth\libraries\pybind11\detail</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\Source\pybind11\detail\typeid.h">
+      <Filter>BespokeSynth\libraries\pybind11\detail</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\Source\pybind11\attr.h">
+      <Filter>BespokeSynth\libraries\pybind11</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\Source\pybind11\buffer_info.h">
+      <Filter>BespokeSynth\libraries\pybind11</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\Source\pybind11\cast.h">
+      <Filter>BespokeSynth\libraries\pybind11</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\Source\pybind11\chrono.h">
+      <Filter>BespokeSynth\libraries\pybind11</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\Source\pybind11\common.h">
+      <Filter>BespokeSynth\libraries\pybind11</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\Source\pybind11\complex.h">
+      <Filter>BespokeSynth\libraries\pybind11</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\Source\pybind11\eigen.h">
+      <Filter>BespokeSynth\libraries\pybind11</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\Source\pybind11\embed.h">
+      <Filter>BespokeSynth\libraries\pybind11</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\Source\pybind11\eval.h">
+      <Filter>BespokeSynth\libraries\pybind11</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\Source\pybind11\functional.h">
+      <Filter>BespokeSynth\libraries\pybind11</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\Source\pybind11\iostream.h">
+      <Filter>BespokeSynth\libraries\pybind11</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\Source\pybind11\numpy.h">
+      <Filter>BespokeSynth\libraries\pybind11</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\Source\pybind11\operators.h">
+      <Filter>BespokeSynth\libraries\pybind11</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\Source\pybind11\options.h">
+      <Filter>BespokeSynth\libraries\pybind11</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\Source\pybind11\pybind11.h">
+      <Filter>BespokeSynth\libraries\pybind11</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\Source\pybind11\pytypes.h">
+      <Filter>BespokeSynth\libraries\pybind11</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\Source\pybind11\stl.h">
+      <Filter>BespokeSynth\libraries\pybind11</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\Source\pybind11\stl_bind.h">
+      <Filter>BespokeSynth\libraries\pybind11</Filter>
+    </ClInclude>
     <ClInclude Include="..\..\Source\push2\libusb\config.h">
       <Filter>BespokeSynth\libraries\push2</Filter>
     </ClInclude>
@@ -3536,6 +3620,9 @@
     </ClInclude>
     <ClInclude Include="..\..\Source\TremoloEffect.h">
       <Filter>BespokeSynth\Source\effects</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\Source\ScriptModule.h">
+      <Filter>BespokeSynth\Source\modules</Filter>
     </ClInclude>
     <ClInclude Include="..\..\Source\NoteLatch.h">
       <Filter>BespokeSynth\Source\modules</Filter>
@@ -4091,6 +4178,9 @@
     </ClInclude>
     <ClInclude Include="..\..\Source\WhiteKeys.h">
       <Filter>BespokeSynth\Source\modules</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\Source\CodeEntry.h">
+      <Filter>BespokeSynth\Source\uicontrols</Filter>
     </ClInclude>
     <ClInclude Include="..\..\Source\UIControlMacros.h">
       <Filter>BespokeSynth\Source\uicontrols</Filter>

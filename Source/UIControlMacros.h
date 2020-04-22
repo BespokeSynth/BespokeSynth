@@ -48,6 +48,8 @@
 
 #define DROPDOWN(dropdown,name,var,width) dropdown = new DropdownList(UICONTROL_BASICS(name),var,width); lastUIControl = dropdown; UIBLOCK_SHIFTDOWN(); UIBLOCK_UPDATEEXTENTS();
 
+#define BUTTON(button,name) button = new ClickButton(UICONTROL_BASICS(name)); lastUIControl = button; UIBLOCK_SHIFTDOWN(); UIBLOCK_UPDATEEXTENTS();
+
 #define UICONTROL_CUSTOM(var,instance) var = instance; lastUIControl = var; UIBLOCK_SHIFTDOWN(); UIBLOCK_UPDATEEXTENTS();
 
 #define UIBLOCKWIDTH() xMax + 3

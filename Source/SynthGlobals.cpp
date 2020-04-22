@@ -42,6 +42,7 @@ float gVizFreq = 220;
 IUIControl* gBindToUIControl = nullptr;
 RetinaTrueTypeFont gFont;
 RetinaTrueTypeFont gFontBold;
+RetinaTrueTypeFont gFontFixedWidth;
 float gModuleDrawAlpha = 255;
 float gNullBuffer[kWorkBufferSize];
 float gZeroBuffer[kWorkBufferSize];
@@ -76,6 +77,7 @@ void LoadGlobalResources()
 {
    gFont.LoadFont(ofToDataPath("frabk.ttf"));
    gFontBold.LoadFont(ofToDataPath("frabk_m.ttf"));
+   gFontFixedWidth.LoadFont(ofToDataPath("iosevka-type-light.ttf"));
    //gModuleShader.load(ofToDataPath("shaders/module.vert"), ofToDataPath("shaders/module.frag"));
 }
 
@@ -315,7 +317,7 @@ void DrawTextNormal(string text, int x, int y, float size)
 
 void DrawTextLeftJustify(string text, int x, int y, float size)
 {
-   gFont.DrawString(text, size, x - GetStringWidth(text,size), y);
+   gFont.DrawString(text, size, x - gFont.GetStringWidth(text,size,K(isRenderThread)), y);
 }
 
 void DrawTextBold(string text, int x, int y, float size)
@@ -477,7 +479,7 @@ int GetKeyModifiers()
 
 bool IsKeyHeld(int key, int modifiers)
 {
-   return TextEntry::GetActiveTextEntry() == nullptr &&
+   return IKeyboardFocusListener::GetActiveKeyboardFocus() == nullptr &&
           KeyPress::isKeyCurrentlyDown(key) &&
           GetKeyModifiers() == modifiers;
 }

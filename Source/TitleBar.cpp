@@ -254,7 +254,7 @@ void TitleBar::DrawModule()
    string info;
    if (TheSynth->GetMoveModule())
       info += " (moving module \"" + string(TheSynth->GetMoveModule()->Name()) + "\")";
-   if (TextEntry::GetActiveTextEntry())
+   if (IKeyboardFocusListener::GetActiveKeyboardFocus())
       info += " (entering text)";
    
    DrawTextLeftJustify(info, ofGetWidth()/gDrawScale - 60, 16);

@@ -21,7 +21,7 @@ public:
    ~NoteSustain();
    static IDrawableModule* Create() { return new NoteSustain(); }
    
-   string GetTitleLabel() override { return "note sustain"; }
+   string GetTitleLabel() override { return "note duration"; }
    void CreateUIControls() override;
    
    void SetEnabled(bool enabled) override { mEnabled = enabled; mNoteOutput.Flush(); }

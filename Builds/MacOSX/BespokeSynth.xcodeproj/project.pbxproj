@@ -61,6 +61,10 @@
 			isa = PBXBuildFile;
 			fileRef = 50E7CC09ACCC7A2952504819;
 		};
+		875E6294F5B3915E539F63D1 = {
+			isa = PBXBuildFile;
+			fileRef = C04CA86766D372795F625CD6;
+		};
 		6E3E207FE90E7F3054F31F0E = {
 			isa = PBXBuildFile;
 			fileRef = 09B0EF1C62B45C9802680D2A;
@@ -204,6 +208,10 @@
 		7B858D802BD0BB608C0F48CF = {
 			isa = PBXBuildFile;
 			fileRef = 49AB76428A044DEDF45FFAFE;
+		};
+		9BADC446C19B69FB73777ED5 = {
+			isa = PBXBuildFile;
+			fileRef = D990E7B7B708C0557F79C7BC;
 		};
 		8E683D907B0FA56099B2C02D = {
 			isa = PBXBuildFile;
@@ -932,6 +940,10 @@
 		66160AFEEF6386D6C0AA619F = {
 			isa = PBXBuildFile;
 			fileRef = A7EB14F5150789F720904FE2;
+		};
+		9FA2FB2BB942CC8C6DA6DD9C = {
+			isa = PBXBuildFile;
+			fileRef = 51CA615E8E6CA927C08D8CBD;
 		};
 		002A49550948D0A01E7D518F = {
 			isa = PBXBuildFile;
@@ -1684,6 +1696,13 @@
 			path = ../../Source/json/version;
 			sourceTree = "SOURCE_ROOT";
 		};
+		129A0F94AAE37A84FE0CE227 = {
+			isa = PBXFileReference;
+			lastKnownFileType = sourcecode.c.h;
+			name = "buffer_info.h";
+			path = "../../Source/pybind11/buffer_info.h";
+			sourceTree = "SOURCE_ROOT";
+		};
 		12AFEE7E530C5A0E35F87DD8 = {
 			isa = PBXFileReference;
 			lastKnownFileType = sourcecode.cpp.cpp;
@@ -1936,6 +1955,13 @@
 			path = ../../Source/ModulatorSubtract.cpp;
 			sourceTree = "SOURCE_ROOT";
 		};
+		205604EAF9638B6A05916F76 = {
+			isa = PBXFileReference;
+			lastKnownFileType = sourcecode.c.h;
+			name = CodeEntry.h;
+			path = ../../Source/CodeEntry.h;
+			sourceTree = "SOURCE_ROOT";
+		};
 		20F0152889ED520247EB3CA6 = {
 			isa = PBXFileReference;
 			lastKnownFileType = sourcecode.cpp.cpp;
@@ -2025,6 +2051,13 @@
 			lastKnownFileType = sourcecode.c.h;
 			name = TextEntry.h;
 			path = ../../Source/TextEntry.h;
+			sourceTree = "SOURCE_ROOT";
+		};
+		253339D7E1B72188E3A662FA = {
+			isa = PBXFileReference;
+			lastKnownFileType = sourcecode.c.h;
+			name = embed.h;
+			path = ../../Source/pybind11/embed.h;
 			sourceTree = "SOURCE_ROOT";
 		};
 		2573101E71EED74033CD191D = {
@@ -2146,6 +2179,13 @@
 			path = "../../Source/nanovg/nanovg_gl_utils.h";
 			sourceTree = "SOURCE_ROOT";
 		};
+		2C23DCDFB846298FE1AF29B0 = {
+			isa = PBXFileReference;
+			lastKnownFileType = sourcecode.c.h;
+			name = pytypes.h;
+			path = ../../Source/pybind11/pytypes.h;
+			sourceTree = "SOURCE_ROOT";
+		};
 		2C683B7B296ECFA42592ED1F = {
 			isa = PBXFileReference;
 			lastKnownFileType = sourcecode.c.h;
@@ -2188,11 +2228,25 @@
 			path = ../../Source/ModulationVisualizer.cpp;
 			sourceTree = "SOURCE_ROOT";
 		};
+		3061A256AFF3E96653312A63 = {
+			isa = PBXFileReference;
+			lastKnownFileType = sourcecode.c.h;
+			name = eval.h;
+			path = ../../Source/pybind11/eval.h;
+			sourceTree = "SOURCE_ROOT";
+		};
 		30B4D1FCBD2543DB9119829B = {
 			isa = PBXFileReference;
 			lastKnownFileType = sourcecode.cpp.cpp;
 			name = PitchShifter.cpp;
 			path = ../../Source/PitchShifter.cpp;
+			sourceTree = "SOURCE_ROOT";
+		};
+		31C0D0AA8E6239A6898D05E9 = {
+			isa = PBXFileReference;
+			lastKnownFileType = sourcecode.c.h;
+			name = stl.h;
+			path = ../../Source/pybind11/stl.h;
 			sourceTree = "SOURCE_ROOT";
 		};
 		31C916A51C91614FCB54C3A5 = {
@@ -2552,6 +2606,13 @@
 			path = ../../Source/MidiReader.h;
 			sourceTree = "SOURCE_ROOT";
 		};
+		462553A6E03711AF8D1DD8E0 = {
+			isa = PBXFileReference;
+			lastKnownFileType = sourcecode.c.h;
+			name = typeid.h;
+			path = ../../Source/pybind11/detail/typeid.h;
+			sourceTree = "SOURCE_ROOT";
+		};
 		4625B64B3FB7D2CBF400F9EF = {
 			isa = PBXFileReference;
 			lastKnownFileType = sourcecode.c.h;
@@ -2790,6 +2851,13 @@
 			path = ../../Source/StutterControl.h;
 			sourceTree = "SOURCE_ROOT";
 		};
+		51CA615E8E6CA927C08D8CBD = {
+			isa = PBXFileReference;
+			lastKnownFileType = sourcecode.cpp.cpp;
+			name = CodeEntry.cpp;
+			path = ../../Source/CodeEntry.cpp;
+			sourceTree = "SOURCE_ROOT";
+		};
 		51D8239436E68F71DD09705D = {
 			isa = PBXFileReference;
 			lastKnownFileType = sourcecode.cpp.cpp;
@@ -2895,6 +2963,13 @@
 			path = ../../Source/SingleOscillator.cpp;
 			sourceTree = "SOURCE_ROOT";
 		};
+		57B07A588A620C03BC9C6D87 = {
+			isa = PBXFileReference;
+			lastKnownFileType = sourcecode.c.h;
+			name = functional.h;
+			path = ../../Source/pybind11/functional.h;
+			sourceTree = "SOURCE_ROOT";
+		};
 		581B7569C43728E828C3E886 = {
 			isa = PBXFileReference;
 			lastKnownFileType = sourcecode.cpp.cpp;
@@ -2956,6 +3031,13 @@
 			lastKnownFileType = sourcecode.cpp.cpp;
 			name = Compressor.cpp;
 			path = ../../Source/Compressor.cpp;
+			sourceTree = "SOURCE_ROOT";
+		};
+		5AE7AC85FAFF3402F4A62AB8 = {
+			isa = PBXFileReference;
+			lastKnownFileType = sourcecode.c.h;
+			name = common.h;
+			path = ../../Source/pybind11/detail/common.h;
 			sourceTree = "SOURCE_ROOT";
 		};
 		5B3101762460A6EF508C3638 = {
@@ -3203,6 +3285,13 @@
 			path = "../../Source/nanovg/stb_image.h";
 			sourceTree = "SOURCE_ROOT";
 		};
+		69495AFC3D74398E32640DAE = {
+			isa = PBXFileReference;
+			lastKnownFileType = sourcecode.c.h;
+			name = descr.h;
+			path = ../../Source/pybind11/detail/descr.h;
+			sourceTree = "SOURCE_ROOT";
+		};
 		69A3CB1EB0512122330D9CBB = {
 			isa = PBXFileReference;
 			lastKnownFileType = sourcecode.cpp.cpp;
@@ -3315,6 +3404,13 @@
 			path = ../../Source/IPulseReceiver.cpp;
 			sourceTree = "SOURCE_ROOT";
 		};
+		6F14F3C5818E7DFF16F49703 = {
+			isa = PBXFileReference;
+			lastKnownFileType = sourcecode.c.h;
+			name = operators.h;
+			path = ../../Source/pybind11/operators.h;
+			sourceTree = "SOURCE_ROOT";
+		};
 		6F3543215E1112C3BB5063D0 = {
 			isa = PBXFileReference;
 			lastKnownFileType = sourcecode.c.h;
@@ -3355,6 +3451,13 @@
 			lastKnownFileType = sourcecode.cpp.cpp;
 			name = CanvasElement.cpp;
 			path = ../../Source/CanvasElement.cpp;
+			sourceTree = "SOURCE_ROOT";
+		};
+		70D80825ACE7346D1B26DF9C = {
+			isa = PBXFileReference;
+			lastKnownFileType = sourcecode.c.h;
+			name = cast.h;
+			path = ../../Source/pybind11/cast.h;
 			sourceTree = "SOURCE_ROOT";
 		};
 		70E2C074BBD6839EC2E4C911 = {
@@ -4127,6 +4230,13 @@
 			path = ../../Source/Amplifier.h;
 			sourceTree = "SOURCE_ROOT";
 		};
+		96C911E9DFD3475D83D1732B = {
+			isa = PBXFileReference;
+			lastKnownFileType = sourcecode.c.h;
+			name = attr.h;
+			path = ../../Source/pybind11/attr.h;
+			sourceTree = "SOURCE_ROOT";
+		};
 		96D348959F2ED4DFBA8BE7C7 = {
 			isa = PBXFileReference;
 			lastKnownFileType = sourcecode.c.h;
@@ -4230,6 +4340,13 @@
 			lastKnownFileType = sourcecode.cpp.cpp;
 			name = FreqDomainBoilerplate.cpp;
 			path = ../../Source/FreqDomainBoilerplate.cpp;
+			sourceTree = "SOURCE_ROOT";
+		};
+		9B410BC006A80B0D18B71FB5 = {
+			isa = PBXFileReference;
+			lastKnownFileType = sourcecode.c.h;
+			name = init.h;
+			path = ../../Source/pybind11/detail/init.h;
 			sourceTree = "SOURCE_ROOT";
 		};
 		9B7FBCDF8BF1BEF1DF502A46 = {
@@ -4489,6 +4606,13 @@
 			lastKnownFileType = sourcecode.c.h;
 			name = PanicButton.h;
 			path = ../../Source/PanicButton.h;
+			sourceTree = "SOURCE_ROOT";
+		};
+		A709E2591CDC0426BEA56BBA = {
+			isa = PBXFileReference;
+			lastKnownFileType = sourcecode.c.h;
+			name = common.h;
+			path = ../../Source/pybind11/common.h;
 			sourceTree = "SOURCE_ROOT";
 		};
 		A7D2D9889183CA31A6406E65 = {
@@ -4974,6 +5098,13 @@
 			path = ../../Source/ModWheelToCV.h;
 			sourceTree = "SOURCE_ROOT";
 		};
+		C04CA86766D372795F625CD6 = {
+			isa = PBXFileReference;
+			lastKnownFileType = wrapper.framework;
+			name = Python.framework;
+			path = System/Library/Frameworks/Python.framework;
+			sourceTree = SDKROOT;
+		};
 		C064EA3B5667E6D8429EB178 = {
 			isa = PBXFileReference;
 			lastKnownFileType = sourcecode.cpp.cpp;
@@ -5035,6 +5166,20 @@
 			lastKnownFileType = sourcecode.cpp.cpp;
 			name = KarplusStrong.cpp;
 			path = ../../Source/KarplusStrong.cpp;
+			sourceTree = "SOURCE_ROOT";
+		};
+		C2886DB99774B1DFB6FA5E8A = {
+			isa = PBXFileReference;
+			lastKnownFileType = sourcecode.c.h;
+			name = eigen.h;
+			path = ../../Source/pybind11/eigen.h;
+			sourceTree = "SOURCE_ROOT";
+		};
+		C29B8E2BAA2FBC1922D85840 = {
+			isa = PBXFileReference;
+			lastKnownFileType = sourcecode.c.h;
+			name = class.h;
+			path = ../../Source/pybind11/detail/class.h;
 			sourceTree = "SOURCE_ROOT";
 		};
 		C2FD0EA3D330426B72BD1310 = {
@@ -5163,6 +5308,13 @@
 			path = ../../Source/SampleEditor.cpp;
 			sourceTree = "SOURCE_ROOT";
 		};
+		CBB6C7600FBFFB700DD76B07 = {
+			isa = PBXFileReference;
+			lastKnownFileType = sourcecode.c.h;
+			name = iostream.h;
+			path = ../../Source/pybind11/iostream.h;
+			sourceTree = "SOURCE_ROOT";
+		};
 		CBBC5E37FB8B65747F55D938 = {
 			isa = PBXFileReference;
 			lastKnownFileType = sourcecode.c.h;
@@ -5254,11 +5406,32 @@
 			path = "../../Source/push2/libusb/config_xcode.h";
 			sourceTree = "SOURCE_ROOT";
 		};
+		CED7199C68A70C575C695DF6 = {
+			isa = PBXFileReference;
+			lastKnownFileType = sourcecode.c.h;
+			name = options.h;
+			path = ../../Source/pybind11/options.h;
+			sourceTree = "SOURCE_ROOT";
+		};
+		CFECE52C4F174BEFB75B9F10 = {
+			isa = PBXFileReference;
+			lastKnownFileType = sourcecode.c.h;
+			name = numpy.h;
+			path = ../../Source/pybind11/numpy.h;
+			sourceTree = "SOURCE_ROOT";
+		};
 		D033D7F772CD35EE2219F068 = {
 			isa = PBXFileReference;
 			lastKnownFileType = sourcecode.c.h;
 			name = FloatSliderLFOControl.h;
 			path = ../../Source/FloatSliderLFOControl.h;
+			sourceTree = "SOURCE_ROOT";
+		};
+		D061DBB9EC58214F01C6C9D1 = {
+			isa = PBXFileReference;
+			lastKnownFileType = sourcecode.c.h;
+			name = pybind11.h;
+			path = ../../Source/pybind11/pybind11.h;
 			sourceTree = "SOURCE_ROOT";
 		};
 		D08282EF4EA244C3B0EC940F = {
@@ -5329,6 +5502,13 @@
 			lastKnownFileType = sourcecode.cpp.cpp;
 			name = DropdownList.cpp;
 			path = ../../Source/DropdownList.cpp;
+			sourceTree = "SOURCE_ROOT";
+		};
+		D368C1FEAE730DA12C90C4FE = {
+			isa = PBXFileReference;
+			lastKnownFileType = sourcecode.c.h;
+			name = internals.h;
+			path = ../../Source/pybind11/detail/internals.h;
 			sourceTree = "SOURCE_ROOT";
 		};
 		D392FD42537C77A67BA3AC75 = {
@@ -5448,6 +5628,13 @@
 			lastKnownFileType = sourcecode.c.h;
 			name = Kicker.h;
 			path = ../../Source/Kicker.h;
+			sourceTree = "SOURCE_ROOT";
+		};
+		D990E7B7B708C0557F79C7BC = {
+			isa = PBXFileReference;
+			lastKnownFileType = sourcecode.cpp.cpp;
+			name = ScriptModule.cpp;
+			path = ../../Source/ScriptModule.cpp;
 			sourceTree = "SOURCE_ROOT";
 		};
 		D9DECA3AB3B3390B12DD8E3B = {
@@ -5583,6 +5770,13 @@
 			path = ../../Source/VSTPlayhead.h;
 			sourceTree = "SOURCE_ROOT";
 		};
+		E0F826CD54EA5A8C0A1B2D39 = {
+			isa = PBXFileReference;
+			lastKnownFileType = sourcecode.c.h;
+			name = "stl_bind.h";
+			path = "../../Source/pybind11/stl_bind.h";
+			sourceTree = "SOURCE_ROOT";
+		};
 		E105D251EE87CB203F9D075D = {
 			isa = PBXFileReference;
 			lastKnownFileType = sourcecode.c.h;
@@ -5700,6 +5894,13 @@
 			lastKnownFileType = sourcecode.cpp.cpp;
 			name = Razor.cpp;
 			path = ../../Source/Razor.cpp;
+			sourceTree = "SOURCE_ROOT";
+		};
+		E73C33E280207E9FCB5D13B6 = {
+			isa = PBXFileReference;
+			lastKnownFileType = sourcecode.c.h;
+			name = complex.h;
+			path = ../../Source/pybind11/complex.h;
 			sourceTree = "SOURCE_ROOT";
 		};
 		E73E8A0E6FDC09E40807A96D = {
@@ -5826,6 +6027,13 @@
 			lastKnownFileType = sourcecode.cpp.cpp;
 			name = DrumPlayer.cpp;
 			path = ../../Source/DrumPlayer.cpp;
+			sourceTree = "SOURCE_ROOT";
+		};
+		EF3F6F049985DF9A02FDE7BF = {
+			isa = PBXFileReference;
+			lastKnownFileType = sourcecode.c.h;
+			name = ScriptModule.h;
+			path = ../../Source/ScriptModule.h;
 			sourceTree = "SOURCE_ROOT";
 		};
 		EF677351D768912D3777A9C8 = {
@@ -6038,6 +6246,13 @@
 			path = ../../Source/NoteToFreq.h;
 			sourceTree = "SOURCE_ROOT";
 		};
+		FAFE773EEEE3DBD020392969 = {
+			isa = PBXFileReference;
+			lastKnownFileType = sourcecode.c.h;
+			name = chrono.h;
+			path = ../../Source/pybind11/chrono.h;
+			sourceTree = "SOURCE_ROOT";
+		};
 		FB1982635C8B7D7483E4BAB6 = {
 			isa = PBXFileReference;
 			lastKnownFileType = sourcecode.c.h;
@@ -6156,6 +6371,45 @@
 			name = PulseChance.cpp;
 			path = ../../Source/PulseChance.cpp;
 			sourceTree = "SOURCE_ROOT";
+		};
+		95701AD5927F3233853BF74B = {
+			isa = PBXGroup;
+			children = (
+				C29B8E2BAA2FBC1922D85840,
+				5AE7AC85FAFF3402F4A62AB8,
+				69495AFC3D74398E32640DAE,
+				9B410BC006A80B0D18B71FB5,
+				D368C1FEAE730DA12C90C4FE,
+				462553A6E03711AF8D1DD8E0,
+			);
+			name = detail;
+			sourceTree = "<group>";
+		};
+		3AC4DA8DAB0857E72D5BF1AC = {
+			isa = PBXGroup;
+			children = (
+				95701AD5927F3233853BF74B,
+				96C911E9DFD3475D83D1732B,
+				129A0F94AAE37A84FE0CE227,
+				70D80825ACE7346D1B26DF9C,
+				FAFE773EEEE3DBD020392969,
+				A709E2591CDC0426BEA56BBA,
+				E73C33E280207E9FCB5D13B6,
+				C2886DB99774B1DFB6FA5E8A,
+				253339D7E1B72188E3A662FA,
+				3061A256AFF3E96653312A63,
+				57B07A588A620C03BC9C6D87,
+				CBB6C7600FBFFB700DD76B07,
+				CFECE52C4F174BEFB75B9F10,
+				6F14F3C5818E7DFF16F49703,
+				CED7199C68A70C575C695DF6,
+				D061DBB9EC58214F01C6C9D1,
+				2C23DCDFB846298FE1AF29B0,
+				31C0D0AA8E6239A6898D05E9,
+				E0F826CD54EA5A8C0A1B2D39,
+			);
+			name = pybind11;
+			sourceTree = "<group>";
 		};
 		B58384FB68E076B58E0430DE = {
 			isa = PBXGroup;
@@ -6341,6 +6595,7 @@
 		5A13D0CA6DCFEF178844C4EC = {
 			isa = PBXGroup;
 			children = (
+				3AC4DA8DAB0857E72D5BF1AC,
 				B58384FB68E076B58E0430DE,
 				E052C73364792FC8F77F9BAF,
 				E773DD247550A2F3CF88686D,
@@ -6398,6 +6653,8 @@
 		C91AF721DDC182CE3AC80CF9 = {
 			isa = PBXGroup;
 			children = (
+				D990E7B7B708C0557F79C7BC,
+				EF3F6F049985DF9A02FDE7BF,
 				49FFBA0909808FD0635DC6CB,
 				6B30C3F9CB0887938725C721,
 				20F0152889ED520247EB3CA6,
@@ -6774,6 +7031,8 @@
 		C42053F1D9A29D64BA04592F = {
 			isa = PBXGroup;
 			children = (
+				51CA615E8E6CA927C08D8CBD,
+				205604EAF9638B6A05916F76,
 				8627E26A1408DA6018629A4C,
 				2BA1430E14F57AF9A504E9A1,
 				BE3947D52501ED4619839577,
@@ -7036,6 +7295,7 @@
 				361974AFFEA22328346B422B,
 				44A6DBF54067AF35AF4D623A,
 				50E7CC09ACCC7A2952504819,
+				C04CA86766D372795F625CD6,
 				09B0EF1C62B45C9802680D2A,
 				8A84EC577BD46C2E470114D6,
 			);
@@ -7107,6 +7367,8 @@
 				INFOPLIST_PREPROCESS = NO;
 				INSTALL_PATH = "$(HOME)/Applications";
 				MACOSX_DEPLOYMENT_TARGET = 10.11;
+				OTHER_CPLUSPLUSFLAGS = "-iwithsysroot /System/Library/Frameworks/Python.framework/Versions/2.7/include/python2.7";
+				OTHER_LDFLAGS = "-L/System/Library/Frameworks/Python.framework/Versions/2.7/lib/python2.7/config -lpython2.7 -ldl -framework CoreFoundation";
 				PRODUCT_BUNDLE_IDENTIFIER = com.ryanchallinor.Bespoke;
 				PRODUCT_NAME = "Bespoke";
 				USE_HEADERMAP = NO;
@@ -7159,6 +7421,8 @@
 				INSTALL_PATH = "$(HOME)/Applications";
 				LLVM_LTO = YES;
 				MACOSX_DEPLOYMENT_TARGET = 10.11;
+				OTHER_CPLUSPLUSFLAGS = "-iwithsysroot /System/Library/Frameworks/Python.framework/Versions/2.7/include/python2.7";
+				OTHER_LDFLAGS = "-L/System/Library/Frameworks/Python.framework/Versions/2.7/lib/python2.7/config -lpython2.7 -ldl -framework CoreFoundation";
 				PRODUCT_BUNDLE_IDENTIFIER = com.ryanchallinor.Bespoke;
 				PRODUCT_NAME = "Bespoke";
 				USE_HEADERMAP = NO;
@@ -7324,6 +7588,7 @@
 				69EB47EC9441C3507BEB277D,
 				75837998247B5E99F3F16392,
 				7B858D802BD0BB608C0F48CF,
+				9BADC446C19B69FB73777ED5,
 				8E683D907B0FA56099B2C02D,
 				029E68AEBF8C943D13482382,
 				AE13582558A6A0A5F82A58AC,
@@ -7506,6 +7771,7 @@
 				8164420CFFCF62095F04587B,
 				0120C97B34085967C35CF04B,
 				66160AFEEF6386D6C0AA619F,
+				9FA2FB2BB942CC8C6DA6DD9C,
 				002A49550948D0A01E7D518F,
 				2A3A159EB1D43F6F9AD5D46E,
 				32B49F01AEEEA690D9901A1D,
@@ -7621,6 +7887,7 @@
 				BA1DEF01B6D11504F5D7585C,
 				8E1FC381C30A9AF89BDA221D,
 				FB72E49433F5076A310910A8,
+				875E6294F5B3915E539F63D1,
 				6E3E207FE90E7F3054F31F0E,
 				BD3B38A60408E1F89607B62C,
 			);
