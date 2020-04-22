@@ -75,7 +75,7 @@ PYBIND11_EMBEDDED_MODULE(bespoke, m) {
 
 void ScriptModule::PlayNoteFromScript(int pitch, int velocity)
 {
-   PlayNoteOutput(mScheduledRunTime, pitch, velocity);
+   PlayNoteOutput(mMostRecentRunTime, pitch, velocity);
 }
 
 void ScriptModule::ButtonClicked(ClickButton* button)
