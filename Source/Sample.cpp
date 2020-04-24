@@ -15,6 +15,7 @@
 Sample::Sample()
 : mData(0)
 , mNumSamples(0)
+, mStartTime(0)
 , mOffset(FLT_MAX)
 , mRate(1)
 , mStopPoint(-1)
@@ -141,9 +142,10 @@ bool Sample::WriteDataToFile(const char *path, ChannelBuffer* data, int numSampl
    return ret;
 }
 
-void Sample::Play(float rate /*=1*/, int offset /*=0*/, int stopPoint /*=-1*/)
+void Sample::Play(double startTime, float rate /*=1*/, int offset /*=0*/, int stopPoint /*=-1*/)
 {
    mPlayMutex.lock();
+   mStartTime = startTime;
    mOffset = offset;
    mRate = rate;
    if (stopPoint != -1)
@@ -153,7 +155,7 @@ void Sample::Play(float rate /*=1*/, int offset /*=0*/, int stopPoint /*=-1*/)
    mPlayMutex.unlock();
 }
 
-bool Sample::ConsumeData(ChannelBuffer* out, int size, bool replace)
+bool Sample::ConsumeData(double time, ChannelBuffer* out, int size, bool replace)
 {
    assert(size <= out->BufferSize());
    
@@ -174,21 +176,33 @@ bool Sample::ConsumeData(ChannelBuffer* out, int size, bool replace)
    LockDataMutex(true);
    for (int i=0; i<size; ++i)
    {
-      for (int ch=0; ch<out->NumActiveChannels(); ++ch)
+      if (time < mStartTime)
       {
-         int dataChannel = MIN(ch, mData.NumActiveChannels()-1);
-         
-         float sample = 0;
-         if (mOffset < end || mLooping)
-            sample = GetInterpolatedSample(mOffset, mData.GetChannel(dataChannel), mNumSamples) * mVolume;
-         
          if (replace)
-            out->GetChannel(ch)[i] = sample;
-         else
-            out->GetChannel(ch)[i] += sample;
+         {
+            for (int ch=0; ch<out->NumActiveChannels(); ++ch)
+               out->GetChannel(ch)[i] = 0;
+         }
       }
-      
-      mOffset += mRate * mSampleRateRatio;
+      else
+      {
+         for (int ch=0; ch<out->NumActiveChannels(); ++ch)
+         {
+            int dataChannel = MIN(ch, mData.NumActiveChannels()-1);
+            
+            float sample = 0;
+            if (mOffset < end || mLooping)
+               sample = GetInterpolatedSample(mOffset, mData.GetChannel(dataChannel), mNumSamples) * mVolume;
+            
+            if (replace)
+               out->GetChannel(ch)[i] = sample;
+            else
+               out->GetChannel(ch)[i] += sample;
+         }
+         
+         mOffset += mRate * mSampleRateRatio;
+      }
+      time += gInvSampleRateMs;
    }
    LockDataMutex(false);
    mPlayMutex.unlock();

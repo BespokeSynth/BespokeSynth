@@ -58,7 +58,7 @@ void Beats::Process(double time)
    Clear(mWriteBuffer, gBufferSize);
    
    for (BeatColumn* column : mBeatColumns)
-      column->Process(mWriteBuffer, bufferSize);
+      column->Process(time, mWriteBuffer, bufferSize);
    
    Add(out, mWriteBuffer, bufferSize);
    GetVizBuffer()->WriteChunk(mWriteBuffer, bufferSize, 0);
@@ -230,7 +230,7 @@ BeatColumn::~BeatColumn()
    mVolumeSlider->Delete();
 }
 
-void BeatColumn::Process(float* buffer, int bufferSize)
+void BeatColumn::Process(double time, float* buffer, int bufferSize)
 {
    Sample* beat = mBeatData.mBeat;
    if (beat)
@@ -245,7 +245,7 @@ void BeatColumn::Process(float* buffer, int bufferSize)
       
       //TODO(Ryan) multichannel
       gWorkChannelBuffer.SetNumActiveChannels(1);
-      if (beat->ConsumeData(&gWorkChannelBuffer, bufferSize, true))
+      if (beat->ConsumeData(time, &gWorkChannelBuffer, bufferSize, true))
       {
          mFilterRamp.Start(mFilter,10);
          

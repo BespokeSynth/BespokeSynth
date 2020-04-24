@@ -266,7 +266,7 @@ void DrumPlayer::Process(double time)
 bool DrumPlayer::DrumHit::Process(double time, float speed, float vol, ChannelBuffer* out, int bufferSize)
 {
    mSample.SetRate(speed * mSpeed);
-   if (mSample.ConsumeData(out, bufferSize, true))
+   if (mSample.ConsumeData(time, out, bufferSize, true))
    {
       double timeHit = time;
       for (int j=0; j<bufferSize; ++j)
@@ -325,7 +325,7 @@ void DrumPlayer::PlayNote(double time, int pitch, int velocity, int voiceIdx, Mo
             }
 
             //play this one
-            mDrumHits[pitch].mSample.Play(mSpeed * ofRandom(.99f,1.01f));
+            mDrumHits[pitch].mSample.Play(time, mSpeed * ofRandom(.99f,1.01f), 0);
             mDrumHits[pitch].mVelocity = velocity / 127.0f;
             mDrumHits[pitch].mEnvelope.Start(time, 1);
          }
@@ -718,7 +718,7 @@ void DrumPlayer::FloatSliderUpdated(FloatSlider* slider, float oldVal)
             LoadSampleLock();
             mDrumHits[mAuditionPadIdx].mSample.Read(file.c_str());
             LoadSampleUnlock();
-            mDrumHits[mAuditionPadIdx].mSample.Play(mSpeed);
+            mDrumHits[mAuditionPadIdx].mSample.Play(gTime, mSpeed, 0);
             mDrumHits[mAuditionPadIdx].mVelocity = .5f;
          }
       }
@@ -805,7 +805,7 @@ void DrumPlayer::ButtonClicked(ClickButton *button)
             LoadSampleLock();
             mDrumHits[i].mSample.Read(file.c_str());
             LoadSampleUnlock();
-            mDrumHits[i].mSample.Play(mSpeed);
+            mDrumHits[i].mSample.Play(gTime, mSpeed, 0);
             mDrumHits[i].mVelocity = .5f;
          }
       }

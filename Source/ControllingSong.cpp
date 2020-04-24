@@ -182,7 +182,7 @@ void ControllingSong::Process(double time)
       }
       
       gWorkChannelBuffer.SetNumActiveChannels(1);
-      if (mSample.ConsumeData(&gWorkChannelBuffer, bufferSize, true))
+      if (mSample.ConsumeData(time, &gWorkChannelBuffer, bufferSize, true))
       {
          for (int i=0; i<bufferSize; ++i)
          {

@@ -125,7 +125,7 @@ void SamplePlayer::Process(double time)
    mSample->SetRate(mPlaySpeed);
    
    gWorkChannelBuffer.SetNumActiveChannels(mSample->NumChannels());
-   if (mPlay && mSample->ConsumeData(&gWorkChannelBuffer, bufferSize, true))
+   if (mPlay && mSample->ConsumeData(time, &gWorkChannelBuffer, bufferSize, true))
    {
       for (int ch=0; ch<gWorkChannelBuffer.NumActiveChannels(); ++ch)
       {

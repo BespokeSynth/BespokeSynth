@@ -14,10 +14,17 @@
 #include "SynthGlobals.h"
 #include "TextEntry.h"
 
+class ICodeEntryListener
+{
+public:
+   virtual ~ICodeEntryListener() {}
+   virtual void ExecuteCode(string code) = 0;
+};
+
 class CodeEntry : public IUIControl, public IKeyboardFocusListener
 {
 public:
-   CodeEntry(IDrawableModule* owner, const char* name, int x, int y, float w, float h);
+   CodeEntry(ICodeEntryListener* owner, const char* name, int x, int y, float w, float h);
    void OnKeyPressed(int key, bool isRepeat) override;
    void Render() override;
    
@@ -52,6 +59,7 @@ private:
    void OnClicked(int x, int y, bool right) override;
    bool MouseMoved(float x, float y) override;
    
+   ICodeEntryListener* mListener;
    float mWidth;
    float mHeight;
    float mCharWidth;

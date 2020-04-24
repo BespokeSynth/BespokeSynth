@@ -112,7 +112,7 @@ void SampleEditor::Process(double time)
    mSample->SetRate(speed);
 
    gWorkChannelBuffer.SetNumActiveChannels(mSample->NumChannels());
-   if (mSample->ConsumeData(&gWorkChannelBuffer, bufferSize, true))
+   if (mSample->ConsumeData(time, &gWorkChannelBuffer, bufferSize, true))
    {
       for (int ch=0; ch<gWorkChannelBuffer.NumActiveChannels(); ++ch)
       {
@@ -258,7 +258,7 @@ void SampleEditor::OnTimeEvent(int samplesTo)
       if ((mCurrentBar > mNumBars && (TheTransport->GetMeasure()+mMeasureEarly) % MIN(4,mNumBars) == 0) ||
           (mCurrentBar == mNumBars && mLoop))
       {
-         mSample->Play(1,mSampleStart,mSampleEnd);
+         mSample->Play(gTime + samplesTo * gInvSampleRateMs, 1, mSampleStart, mSampleEnd);
          mCurrentBar = 0;
       }
 
@@ -464,7 +464,7 @@ void SampleEditor::PlayNote(double time, int pitch, int velocity, int voiceIdx, 
          int slice = (pitch/8)*8 + 7-(pitch%8);
          int barLength = (mSampleEnd - mSampleStart) / mNumBars;
          int position = -mOffset*barLength + (barLength/4)*slice + mSampleStart;
-         mSample->Play(1,position);
+         mSample->Play(time, 1, position);
       }
    }
 }

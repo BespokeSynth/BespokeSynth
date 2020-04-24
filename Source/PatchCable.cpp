@@ -184,7 +184,7 @@ void PatchCable::Render()
                ofVec2f pos;
                for (int j=lastElapsed*wireLength; j<elapsed*wireLength; ++j)
                {
-                  pos = MathUtils::Bezier(j/wireLength, cable.start, bezierControl1, bezierControl2, cable.plug);
+                  pos = MathUtils::Bezier(ofClamp(j/wireLength, 0, 1), cable.start, bezierControl1, bezierControl2, cable.plug);
                   ofVertex(pos.x,pos.y);
                }
                ofEndShape();

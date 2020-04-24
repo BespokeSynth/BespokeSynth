@@ -24,8 +24,8 @@ public:
    ~Sample();
    bool Read(const char* path, bool mono = false);
    bool Write(const char* path = nullptr);   //no path = use read filename
-   bool ConsumeData(ChannelBuffer* out, int size, bool replace);
-   void Play(float rate = 1, int offset=0, int stopPoint=-1);
+   bool ConsumeData(double time, ChannelBuffer* out, int size, bool replace);
+   void Play(double time, float rate, int offset, int stopPoint=-1);
    void SetRate(float rate) { mRate = rate; }
    const char* Name() { return mName; }
    int LengthInSamples() const { return mNumSamples; }
@@ -60,6 +60,7 @@ private:
    
    ChannelBuffer mData;
    int mNumSamples;
+   double mStartTime;
    double mOffset;
    float mRate;
    float mSampleRateRatio;

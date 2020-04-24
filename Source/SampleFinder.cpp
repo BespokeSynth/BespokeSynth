@@ -336,7 +336,7 @@ void SampleFinder::PlayNote(double time, int pitch, int velocity, int voiceIdx, 
          int slice = (pitch/8)*8 + 7-(pitch%8);
          int barLength = (mClipEnd - mClipStart) / mNumBars;
          int position = -mOffset*barLength + (barLength/4)*slice + mClipStart;
-         mSample->Play(1,position);
+         mSample->Play(time, 1, position);
       }
    }
 }

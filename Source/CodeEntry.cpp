@@ -11,8 +11,9 @@
 #include "IDrawableModule.h"
 #include "CodeEntry.h"
 
-CodeEntry::CodeEntry(IDrawableModule* owner, const char* name, int x, int y, float w, float h)
-: mCharWidth(5.85f)
+CodeEntry::CodeEntry(ICodeEntryListener* owner, const char* name, int x, int y, float w, float h)
+: mListener(owner)
+, mCharWidth(5.85f)
 , mCharHeight(15)
 , mLastPublishTime(-999)
 {
@@ -24,8 +25,9 @@ CodeEntry::CodeEntry(IDrawableModule* owner, const char* name, int x, int y, flo
    SetPosition(x,y);
    mWidth = w;
    mHeight = h;
-   assert(owner);
-   owner->AddUIControl(this);
+   IDrawableModule* module = dynamic_cast<IDrawableModule*>(owner);
+   assert(module);
+   module->AddUIControl(this);
    SetParent(dynamic_cast<IClickable*>(owner));
 }
 
@@ -218,6 +220,7 @@ void CodeEntry::OnKeyPressed(int key, bool isRepeat)
    else if (key == 'R' && GetKeyModifiers() == kModifier_Command)
    {
       Publish();
+      mListener->ExecuteCode(mString);
    }
    else
    {

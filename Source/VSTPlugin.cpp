@@ -393,14 +393,17 @@ void VSTPlugin::PlayNote(double time, int pitch, int velocity, int voiceIdx, Mod
    
    const juce::ScopedLock lock(mMidiInputLock);
    
+   double juceTime = juce::Time::getMillisecondCounterHiRes();
+   double timeOffset = juceTime - gTime;
+   
    if (velocity > 0)
    {
-      mMidiBuffer.addEvent(juce::MidiMessage::noteOn(mUseVoiceAsChannel ? channel : mChannel, pitch, (uint8)velocity), 0);
+      mMidiBuffer.addEvent(juce::MidiMessage::noteOn(mUseVoiceAsChannel ? channel : mChannel, pitch, (uint8)velocity), (time + timeOffset) * gSampleRateMs);
       //ofLog() << "+ vst note on: " << (mUseVoiceAsChannel ? channel : mChannel) << " " << pitch << " " << (uint8)velocity;
    }
    else
    {
-      mMidiBuffer.addEvent(juce::MidiMessage::noteOff(mUseVoiceAsChannel ? channel : mChannel, pitch), 0);
+      mMidiBuffer.addEvent(juce::MidiMessage::noteOff(mUseVoiceAsChannel ? channel : mChannel, pitch), (time + timeOffset) * gSampleRateMs);
       //ofLog() << "- vst note off: " << (mUseVoiceAsChannel ? channel : mChannel) << " " << pitch;
    }
    

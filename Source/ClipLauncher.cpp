@@ -72,7 +72,7 @@ void ClipLauncher::Process(double time)
    if (sample)
    {
       gWorkChannelBuffer.SetNumActiveChannels(1);
-      sample->ConsumeData(&gWorkChannelBuffer, bufferSize, true);
+      sample->ConsumeData(time, &gWorkChannelBuffer, bufferSize, true);
    }
    
    for (int i=0; i<bufferSize; ++i)
@@ -154,7 +154,7 @@ void ClipLauncher::CheckboxUpdated(Checkbox* checkbox)
             float data[JUMP_BLEND_SAMPLES];
             ChannelBuffer temp(data, JUMP_BLEND_SAMPLES);
             if (currentlyPlaying != -1)
-               mSamples[currentlyPlaying].mSample->ConsumeData(&temp, JUMP_BLEND_SAMPLES, true);
+               mSamples[currentlyPlaying].mSample->ConsumeData(gTime, &temp, JUMP_BLEND_SAMPLES, true);
             mJumpBlender.CaptureForJump(0, data, JUMP_BLEND_SAMPLES, gBufferSize);
             mSampleMutex.unlock();
          }

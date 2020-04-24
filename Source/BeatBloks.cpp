@@ -1006,7 +1006,7 @@ void BeatBloks::PlayNote(double time, int pitch, int velocity, int voiceIdx, Mod
          int slice = (pitch/8)*8 + 7-(pitch%8);
          int barLength = (mClipEnd - mClipStart) / mNumBars;
          int position = (barLength/4)*slice + mClipStart;
-         mSample->Play(1,position);
+         mSample->Play(time, 1,position);
       }
    }
 }

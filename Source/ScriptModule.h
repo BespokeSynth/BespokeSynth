@@ -14,10 +14,13 @@
 #include "OpenFrameworksPort.h"
 #include "CodeEntry.h"
 #include "ClickButton.h"
-#include "INoteSource.h"
+#include "NoteEffectBase.h"
 #include "IPulseReceiver.h"
+#include "pybind11/embed.h"
 
-class ScriptModule : public IDrawableModule, public IButtonListener, public INoteSource, public IPulseReceiver
+namespace py = pybind11;
+
+class ScriptModule : public IDrawableModule, public IButtonListener, public NoteEffectBase, public IPulseReceiver, public ICodeEntryListener
 {
 public:
    ScriptModule();
@@ -29,10 +32,16 @@ public:
    
    void Poll() override;
    
-   void PlayNoteFromScript(int pitch, int velocity);
+   void PlayNoteFromScript(int pitch, int velocity, float measureTime = -1);
    
    void OnPulse(float amount, int samplesTo, int flags) override;
    void ButtonClicked(ClickButton* button) override;
+   
+   //ICodeEntryListener
+   void ExecuteCode(string code) override;
+   
+   //INoteReceiver
+   void PlayNote(double time, int pitch, int velocity, int voiceIdx = -1, ModulationParameters modulation = ModulationParameters()) override;
    
    void SaveState(FileStreamOut& out) override;
    void LoadState(FileStreamIn& in) override;
@@ -44,6 +53,9 @@ public:
    
 private:
    void RunScript(double time);
+   void RunCode(double time, string code);
+   void FixUpCode(string& code);
+   void ScheduleNote(double time, int pitch, int velocity);
    
    //IDrawableModule
    void DrawModule() override;
@@ -57,6 +69,26 @@ private:
    
    float mWidth;
    float mHeight;
-   double mScheduledRunTime;
+   double mScheduledPulseTime;
    double mMostRecentRunTime;
+   
+   py::object mPythonGlobals;
+   
+   struct ScheduledNoteOutput
+   {
+      double time;
+      int pitch;
+      int velocity;
+   };
+   static const int kScheduledNoteOutputBufferSize = 20;
+   ScheduledNoteOutput mScheduledNoteOutput[kScheduledNoteOutputBufferSize];
+   
+   struct PendingNoteInput
+   {
+      double time;
+      int pitch;
+      int velocity;
+   };
+   static const int kPendingNoteInputBufferSize = 20;
+   PendingNoteInput mPendingNoteInput[kPendingNoteInputBufferSize];
 };

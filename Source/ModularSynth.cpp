@@ -67,8 +67,6 @@ ModularSynth::ModularSynth()
    mSaveOutputBuffer[1] = new float[RECORDING_LENGTH];
    
    mOutputBuffer.SetNumChannels(2);
-   
-   pybind11::initialize_interpreter();
 }
 
 ModularSynth::~ModularSynth()
@@ -1384,6 +1382,12 @@ bool ModularSynth::LoadLayoutFromString(string jsonString)
 
 void ModularSynth::LoadLayout(ofxJSONElement json)
 {
+   static bool sFirst = true;
+   if (!sFirst)
+      pybind11::finalize_interpreter();
+   sFirst = false;
+   pybind11::initialize_interpreter();
+   
    //ofLoadURLAsync("http://bespoke.com/telemetry/"+jsonFile);
    
    ScopedMutex mutex(&mAudioThreadMutex, "LoadLayout()");

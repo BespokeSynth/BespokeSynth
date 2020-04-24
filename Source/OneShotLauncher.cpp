@@ -71,7 +71,7 @@ void OneShotLauncher::Process(double time)
       RecalcPos(idx);
       beat->SetRate(speed);
       
-      if (beat->ConsumeData(mWriteBuffer, bufferSize, true))
+      if (beat->ConsumeData(time, mWriteBuffer, bufferSize, true))
       {
          for (int i=0; i<bufferSize; ++i)
          {

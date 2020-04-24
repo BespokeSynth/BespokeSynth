@@ -47,7 +47,7 @@ public:
    void Draw(int x, int y);
    void CreateUIControls();
    void AddBeat(Sample* sample);
-   void Process(float* buffer, int bufferSize);
+   void Process(double time, float* buffer, int bufferSize);
    
    void RadioButtonUpdated(RadioButton* list, int oldVal);
    
