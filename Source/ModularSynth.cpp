@@ -28,7 +28,7 @@
 #include "../JuceLibraryCode/JuceHeader.h"
 #include "QuickSpawnMenu.h"
 #include "AudioToCV.h"
-#include "pybind11/embed.h"
+#include "ScriptModule.h"
 
 ModularSynth* TheSynth = nullptr;
 
@@ -1382,11 +1382,7 @@ bool ModularSynth::LoadLayoutFromString(string jsonString)
 
 void ModularSynth::LoadLayout(ofxJSONElement json)
 {
-   static bool sFirst = true;
-   if (!sFirst)
-      pybind11::finalize_interpreter();
-   sFirst = false;
-   pybind11::initialize_interpreter();
+   ScriptModule::ResetPython();
    
    //ofLoadURLAsync("http://bespoke.com/telemetry/"+jsonFile);
    

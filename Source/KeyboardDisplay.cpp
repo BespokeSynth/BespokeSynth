@@ -9,6 +9,7 @@
 #include "KeyboardDisplay.h"
 #include "SynthGlobals.h"
 #include "Scale.h"
+#include "ModuleContainer.h"
 
 namespace
 {
@@ -283,4 +284,35 @@ void KeyboardDisplay::SetUpFromSaveData()
    mTypingInput = mModuleSaveData.GetBool("typing_control");
    mLatch = mModuleSaveData.GetBool("latch");
 }
+
+namespace
+{
+   const int kSaveStateRev = 1;
+}
+
+void KeyboardDisplay::SaveState(FileStreamOut& out)
+{
+   IDrawableModule::SaveState(out);
+   
+   out << kSaveStateRev;
+   
+   out << mWidth;
+   out << mHeight;
+}
+
+void KeyboardDisplay::LoadState(FileStreamIn& in)
+{
+   IDrawableModule::LoadState(in);
+   
+   if (!ModuleContainer::DoesModuleHaveMoreSaveData(in))
+      return;  //this was saved before we added versioning, bail out
+   
+   int rev;
+   in >> rev;
+   LoadStateValidate(rev == kSaveStateRev);
+   
+   in >> mWidth;
+   in >> mHeight;
+}
+
 

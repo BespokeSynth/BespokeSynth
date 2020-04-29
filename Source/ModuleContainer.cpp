@@ -475,8 +475,6 @@ ofxJSONElement ModuleContainer::WriteModules()
 
 namespace
 {
-   const int kModuleSeparatorLength = 13;
-   const char kModuleSeparator[kModuleSeparatorLength+1] = "ryanchallinor";
    const int kSaveStateRev = 420;
 }
 
@@ -500,8 +498,8 @@ void ModuleContainer::SaveState(FileStreamOut& out)
          //ofLog() << "Saving " << module->Name();
          out << string(module->Name());
          module->SaveState(out);
-         for (int i=0; i<kModuleSeparatorLength; ++i)
-            out << kModuleSeparator[i];
+         for (int i=0; i<GetModuleSeparatorLength(); ++i)
+            out << GetModuleSeparator()[i];
       }
    }
 }
@@ -526,15 +524,15 @@ void ModuleContainer::LoadState(FileStreamIn& in)
       {
          module->LoadState(in);
          
-         for (int j=0; j<kModuleSeparatorLength; ++j)
+         for (int j=0; j<GetModuleSeparatorLength(); ++j)
          {
             char separatorChar;
             in >> separatorChar;
-            if (separatorChar != kModuleSeparator[j])
+            if (separatorChar != GetModuleSeparator()[j])
             {
                ofLog() << "Error loading state for " << module->Name();
                //something went wrong, let's print some info to try to figure it out
-               ofLog() << "Read char " + ofToString(separatorChar) + " but expected " + kModuleSeparator[j] + "!";
+               ofLog() << "Read char " + ofToString(separatorChar) + " but expected " + GetModuleSeparator()[j] + "!";
                ofLog() << "Save state file position is " + ofToString(in.GetFilePosition()) + ", EoF is " + (in.Eof() ? "true" : "false");
                string nextFewChars = "Next 10 characters are:";
                for (int c=0;c<10;++c)
@@ -545,7 +543,7 @@ void ModuleContainer::LoadState(FileStreamIn& in)
                }
                ofLog() << nextFewChars;
             }
-            assert(separatorChar == kModuleSeparator[j]);
+            assert(separatorChar == GetModuleSeparator()[j]);
          }
       }
       catch (LoadStateException& e)
@@ -558,11 +556,11 @@ void ModuleContainer::LoadState(FileStreamIn& in)
          {
             char val;
             in >> val;
-            if (val == kModuleSeparator[separatorProgress])
+            if (val == GetModuleSeparator()[separatorProgress])
                ++separatorProgress;
             else
                separatorProgress = 0;
-            if (separatorProgress == kModuleSeparatorLength)
+            if (separatorProgress == GetModuleSeparatorLength())
                break;   //we did it!
          }
       }
@@ -570,4 +568,15 @@ void ModuleContainer::LoadState(FileStreamIn& in)
    
    for (auto module : mModules)
       module->PostLoadState();
+}
+
+//static
+bool ModuleContainer::DoesModuleHaveMoreSaveData(FileStreamIn& in)
+{
+   char test[GetModuleSeparatorLength()+1];
+   in.Peek(test, GetModuleSeparatorLength());
+   test[GetModuleSeparatorLength()] = 0;
+   if (strcmp(GetModuleSeparator(), test) == 0)
+      return false;
+   return true;
 }

@@ -698,15 +698,49 @@ float RetinaTrueTypeFont::GetStringWidth(string str, float size, bool isRenderTh
       return str.size() * 12;
       
    NVGcontext* vg;
+   int handle;
    if (isRenderThread)
+   {
       vg = gNanoVG;
+      handle = mFontHandle;
+   }
    else
+   {
       vg = gFontBoundsNanoVG;
+      handle = mFontBoundsHandle;
+   }
    
-   nvgFontFaceId(vg, mFontBoundsHandle);
+   nvgFontFaceId(vg, handle);
    nvgFontSize(vg, size);
    float bounds[4];
    float width = nvgTextBounds(vg, 0, 0, str.c_str(), nullptr, bounds);
    
    return width;
+}
+
+float RetinaTrueTypeFont::GetStringHeight(string str, float size, bool isRenderThread /*false*/)
+{
+   if (!mLoaded)
+      return str.size() * 12;
+      
+   NVGcontext* vg;
+   int handle;
+   if (isRenderThread)
+   {
+      vg = gNanoVG;
+      handle = mFontHandle;
+   }
+   else
+   {
+      vg = gFontBoundsNanoVG;
+      handle = mFontBoundsHandle;
+   }
+   
+   nvgFontFaceId(vg, handle);
+   nvgFontSize(vg, size);
+   float bounds[4];
+   nvgTextBounds(vg, 0, 0, str.c_str(), nullptr, bounds);
+   
+   float lineHeight = bounds[3] - bounds[1];
+   return lineHeight;
 }

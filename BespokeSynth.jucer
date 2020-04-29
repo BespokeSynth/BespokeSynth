@@ -205,6 +205,9 @@
         <FILE id="RG4zGd" name="TremoloEffect.h" compile="0" resource="0" file="Source/TremoloEffect.h"/>
       </GROUP>
       <GROUP id="{6781AC07-A090-A7AF-8D27-BCB6D9526ABD}" name="modules">
+        <FILE id="xikyfS" name="ScriptStatus.cpp" compile="1" resource="0"
+              file="Source/ScriptStatus.cpp"/>
+        <FILE id="O1DIxS" name="ScriptStatus.h" compile="0" resource="0" file="Source/ScriptStatus.h"/>
         <FILE id="ULL2vz" name="ScriptModule.cpp" compile="1" resource="0"
               file="Source/ScriptModule.cpp"/>
         <FILE id="zl68yc" name="ScriptModule.h" compile="0" resource="0" file="Source/ScriptModule.h"/>

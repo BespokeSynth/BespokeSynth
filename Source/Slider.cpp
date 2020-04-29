@@ -45,6 +45,8 @@ FloatSlider::FloatSlider(IFloatSliderListener* owner, const char* label, int x, 
 , mSmooth(0)
 , mIsSmoothing(false)
 , mComputeHasBeenCalledOnce(false)
+, mLastComputeTime(0)
+, mLastDisplayedValue(FLT_MAX)
 , mFloatEntry(nullptr)
 , mAllowMinMaxAdjustment(true)
 , mMinEntry(nullptr)
@@ -98,6 +100,9 @@ void FloatSlider::SetLabel(const char* label)
 
 void FloatSlider::Render()
 {
+   if (mLastComputeTime + .1f < gTime)
+      Compute();
+   
    float normalWidth = mWidth;
    float normalHeight = mHeight;
    
@@ -248,7 +253,7 @@ void FloatSlider::OnClicked(int x, int y, bool right)
    if ((GetKeyModifiers() & kModifier_Command) && mAllowMinMaxAdjustment)
    {
       bool adjustMax;
-      if (x > mX + mWidth/2)
+      if (x > mWidth/2)
          adjustMax = true;
       else
          adjustMax = false;
@@ -534,6 +539,7 @@ string FloatSlider::GetDisplayValue(float val) const
 void FloatSlider::Compute(int samplesIn /*= 0*/)
 {
    mComputeHasBeenCalledOnce = true;
+   mLastComputeTime = gTime;
    
    if (mModulator && mModulator->Active())
    {
@@ -640,7 +646,7 @@ void FloatSlider::OnTransportAdvanced(float amount)
 
 namespace
 {
-   const int kFloatSliderSaveStateRev = 3;
+   const int kFloatSliderSaveStateRev = 4;
 }
 
 void FloatSlider::SaveState(FileStreamOut& out)
@@ -662,6 +668,9 @@ void FloatSlider::SaveState(FileStreamOut& out)
    out << mSmooth;
    out << mSmoothTarget;
    out << mIsSmoothing;
+   
+   out << mMin;
+   out << mMax;
 }
 
 void FloatSlider::LoadState(FileStreamIn& in, bool shouldSetValue)
@@ -708,6 +717,12 @@ void FloatSlider::LoadState(FileStreamIn& in, bool shouldSetValue)
       
       if (mIsSmoothing)
          TheTransport->AddAudioPoller(this);
+   }
+   
+   if (rev >= 4)
+   {
+      in >> mMin;
+      in >> mMax;
    }
 }
 

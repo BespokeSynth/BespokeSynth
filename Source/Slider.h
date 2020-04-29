@@ -131,6 +131,7 @@ private:
    Ramp mRamp;
    bool mIsSmoothing;
    bool mComputeHasBeenCalledOnce;
+   double mLastComputeTime;
    
    float mLastDisplayedValue;
    

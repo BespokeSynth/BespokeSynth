@@ -33,6 +33,7 @@ public:
    
    void ClearInput() { mString = ""; mCaretPosition = 0; }
    const string GetText() const { return mPublishedString; }
+   void SetError(bool error, int errorLine = -1);
    
    void GetDimensions(int& width, int& height) override { width = mWidth; height = mHeight; }
    void SetDimensions(float width, float height) { mWidth = width; mHeight = height; }
@@ -54,7 +55,8 @@ private:
    int GetCaretPosition(int col, int row);
    int GetColForX(float x);
    int GetRowForY(float y);
-   ofVec2f GetCaretCoords();
+   ofVec2f GetCaretCoords(int caret);
+   void RemoveSelectedText();
    
    void OnClicked(int x, int y, bool right) override;
    bool MouseMoved(float x, float y) override;
@@ -67,8 +69,11 @@ private:
    string mString;
    string mPublishedString;
    int mCaretPosition;
+   int mCaretPosition2;
    float mCaretBlinkTimer;
    bool mCaretBlink;
    bool mHovered;
    double mLastPublishTime;
+   bool mHasError;
+   int mErrorLine;
 };

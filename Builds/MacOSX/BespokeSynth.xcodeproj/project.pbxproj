@@ -209,6 +209,10 @@
 			isa = PBXBuildFile;
 			fileRef = 49AB76428A044DEDF45FFAFE;
 		};
+		A87161C448037C3DD6D2A7A6 = {
+			isa = PBXBuildFile;
+			fileRef = B9D500ACC4CCC60AE228D3DA;
+		};
 		9BADC446C19B69FB73777ED5 = {
 			isa = PBXBuildFile;
 			fileRef = D990E7B7B708C0557F79C7BC;
@@ -4951,6 +4955,13 @@
 			path = ../../Source/OscController.h;
 			sourceTree = "SOURCE_ROOT";
 		};
+		B9D500ACC4CCC60AE228D3DA = {
+			isa = PBXFileReference;
+			lastKnownFileType = sourcecode.cpp.cpp;
+			name = ScriptStatus.cpp;
+			path = ../../Source/ScriptStatus.cpp;
+			sourceTree = "SOURCE_ROOT";
+		};
 		BA9A94DC9F72592028EE4C73 = {
 			isa = PBXFileReference;
 			lastKnownFileType = sourcecode.cpp.cpp;
@@ -6358,6 +6369,13 @@
 			path = ../../Source/ButterworthFilterEffect.cpp;
 			sourceTree = "SOURCE_ROOT";
 		};
+		FEC0E6463A2ED06AEAB53FF1 = {
+			isa = PBXFileReference;
+			lastKnownFileType = sourcecode.c.h;
+			name = ScriptStatus.h;
+			path = ../../Source/ScriptStatus.h;
+			sourceTree = "SOURCE_ROOT";
+		};
 		FF7A178C52625FF1902C843D = {
 			isa = PBXFileReference;
 			lastKnownFileType = sourcecode.c.h;
@@ -6653,6 +6671,8 @@
 		C91AF721DDC182CE3AC80CF9 = {
 			isa = PBXGroup;
 			children = (
+				B9D500ACC4CCC60AE228D3DA,
+				FEC0E6463A2ED06AEAB53FF1,
 				D990E7B7B708C0557F79C7BC,
 				EF3F6F049985DF9A02FDE7BF,
 				49FFBA0909808FD0635DC6CB,
@@ -7588,6 +7608,7 @@
 				69EB47EC9441C3507BEB277D,
 				75837998247B5E99F3F16392,
 				7B858D802BD0BB608C0F48CF,
+				A87161C448037C3DD6D2A7A6,
 				9BADC446C19B69FB73777ED5,
 				8E683D907B0FA56099B2C02D,
 				029E68AEBF8C943D13482382,

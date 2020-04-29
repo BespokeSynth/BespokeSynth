@@ -10,12 +10,17 @@
 
 #include "IDrawableModule.h"
 #include "CodeEntry.h"
+#include "Transport.h"
 
 CodeEntry::CodeEntry(ICodeEntryListener* owner, const char* name, int x, int y, float w, float h)
 : mListener(owner)
 , mCharWidth(5.85f)
 , mCharHeight(15)
+, mCaretPosition(0)
+, mCaretPosition2(0)
 , mLastPublishTime(-999)
+, mHasError(false)
+, mErrorLine(-1)
 {
    mCaretBlink = true;
    mCaretBlinkTimer = 0;
@@ -38,11 +43,14 @@ CodeEntry::~CodeEntry()
 void CodeEntry::Render()
 {
    ofPushStyle();
+   ofPushMatrix();
    
    ofSetLineWidth(.5f);
    
    int w,h;
    GetDimensions(w,h);
+   
+   ofClipWindow(mX, mY, w, h);
    
    bool isCurrent = IKeyboardFocusListener::GetActiveKeyboardFocus() == this;
    
@@ -59,17 +67,41 @@ void CodeEntry::Render()
       ofPopStyle();
    }
    
+   ofNoFill();
    if (isCurrent)
    {
-      ofSetColor(color,gModuleDrawAlpha * .1f);
-      ofFill();
+      ofPushStyle();
+      int lum = 255 * ofMap(sinf(TheTransport->GetMeasurePos() * TWO_PI * 4), -1, 1, .4f, 1);
+      if (mHasError)
+         ofSetColor(255, 0, 0, gModuleDrawAlpha);
+      else
+         ofSetColor(lum, lum, lum, gModuleDrawAlpha);
+      ofSetLineWidth(4);
+      ofRect(mX,mY,w,h);
+      ofPopStyle();
+   }
+   else
+   {
+      if (mHasError)
+         ofSetColor(255, 0, 0, gModuleDrawAlpha);
+      else
+         ofSetColor(color,gModuleDrawAlpha);
       ofRect(mX,mY,w,h);
    }
+   
+   if (mHasError && mErrorLine >= 0)
+   {
+      ofPushStyle();
+      ofFill();
+      ofSetColor(255, 0, 0, gModuleDrawAlpha * .5f);
+      ofRect(mX, mErrorLine * mCharHeight + mY + 3, mWidth, mCharHeight, L(corner,2));
+      ofFill();
+   }
+   
    ofSetColor(color,gModuleDrawAlpha);
-   ofNoFill();
-   ofRect(mX,mY,w,h);
    const float kFontSize = 14;
    mCharWidth = gFontFixedWidth.GetStringWidth("x", kFontSize, K(isRenderThread));
+   mCharHeight = gFontFixedWidth.GetStringHeight("x", kFontSize, K(isRenderThread));
    gFontFixedWidth.DrawString(mString, kFontSize, mX+2, mY + mCharHeight);
    
    /*for (int i = 0; i<60; ++i)
@@ -82,7 +114,7 @@ void CodeEntry::Render()
    {
       if (mCaretBlink)
       {
-         ofVec2f coords = GetCaretCoords();
+         ofVec2f coords = GetCaretCoords(mCaretPosition);
          
          ofFill();
          ofRect(coords.x * mCharWidth + mX + 1.5f, coords.y * mCharHeight + mY + 2, 1, mCharHeight, L(corner,1));
@@ -92,6 +124,35 @@ void CodeEntry::Render()
       {
          mCaretBlinkTimer -= .3f;
          mCaretBlink = !mCaretBlink;
+      }
+      
+      if (mCaretPosition != mCaretPosition2)
+      {
+         ofPushStyle();
+         ofFill();
+         ofSetColor(255, 255, 255, 50);
+         int caretStart = MIN(mCaretPosition, mCaretPosition2);
+         int caretEnd = MAX(mCaretPosition, mCaretPosition2);
+         ofVec2f coordsStart = GetCaretCoords(caretStart);
+         ofVec2f coordsEnd = GetCaretCoords(caretEnd);
+         
+         int startLineNum = (int)round(coordsStart.y);
+         int endLineNum = (int)round(coordsEnd.y);
+         int startCol = (int)round(coordsStart.x);
+         int endCol = (int)round(coordsEnd.x);
+         vector<string> lines = ofSplitString(mString, "\n");
+         for (int i=startLineNum; i<=endLineNum; ++i)
+         {
+            int begin = 0;
+            int end = (int)lines[i].length();
+            if (i == startLineNum)
+               begin = startCol;
+            if (i == endLineNum)
+               end = endCol;
+            ofRect(begin * mCharWidth + mX + 1.5f, i * mCharHeight + mY + 3, (end - begin) * mCharWidth, mCharHeight, L(corner,2));
+         }
+         
+         ofPopStyle();
       }
    }
    
@@ -104,7 +165,14 @@ void CodeEntry::Render()
       DrawTextNormal(Name(), mX, mY);
    }*/
 
+   ofPopMatrix();
    ofPopStyle();
+}
+
+void CodeEntry::SetError(bool error, int errorLine)
+{
+   mHasError = error;
+   mErrorLine = errorLine;
 }
 
 void CodeEntry::OnClicked(int x, int y, bool right)
@@ -115,6 +183,8 @@ void CodeEntry::OnClicked(int x, int y, bool right)
    float col = GetColForX(x);
    float row = GetRowForY(y);
    mCaretPosition = GetCaretPosition(col, row);
+   if (!(GetKeyModifiers() & kModifier_Shift))
+      mCaretPosition2 = mCaretPosition;
    
    MakeActive();
 }
@@ -128,11 +198,18 @@ void CodeEntry::MakeActive()
 
 void CodeEntry::OnKeyPressed(int key, bool isRepeat)
 {
+   const int kTabSize = 3;
+   
    if (key == OF_KEY_BACKSPACE)
    {
-      if (mCaretPosition > 0)
+      if (mCaretPosition != mCaretPosition2)
+      {
+         RemoveSelectedText();
+      }
+      else if (mCaretPosition > 0)
       {
          --mCaretPosition;
+         mCaretPosition2 = mCaretPosition;
          if (mCaretPosition < mString.length() - 1)
             mString = mString.substr(0, mCaretPosition) + mString.substr(mCaretPosition+1);
          else
@@ -141,8 +218,10 @@ void CodeEntry::OnKeyPressed(int key, bool isRepeat)
    }
    else if (key == OF_KEY_TAB)
    {
-      ofVec2f coords = GetCaretCoords();
-      const int kTabSize = 3;
+      if (mCaretPosition != mCaretPosition2)
+         RemoveSelectedText();
+      
+      ofVec2f coords = GetCaretCoords(mCaretPosition);
       int spacesNeeded = kTabSize - (int)coords.x % kTabSize;
       for (int i=0; i<spacesNeeded; ++i)
          AddCharacter(' ');
@@ -151,52 +230,74 @@ void CodeEntry::OnKeyPressed(int key, bool isRepeat)
    {
       IKeyboardFocusListener::ClearActiveKeyboardFocus(!K(acceptEntry));
       mString = mPublishedString;   //revert
+      mCaretPosition2 = mCaretPosition;
    }
    else if (key == OF_KEY_LEFT)
    {
-      if (GetKeyModifiers() == kModifier_Command)
+      if (GetKeyModifiers() & kModifier_Command)
       {
-         ofVec2f coords = GetCaretCoords();
+         ofVec2f coords = GetCaretCoords(mCaretPosition);
          mCaretPosition = GetCaretPosition(0, coords.y);
+         if (!(GetKeyModifiers() & kModifier_Shift))
+            mCaretPosition2 = mCaretPosition;
       }
       else
       {
          if (mCaretPosition > 0)
+         {
             --mCaretPosition;
+            if (!(GetKeyModifiers() & kModifier_Shift))
+               mCaretPosition2 = mCaretPosition;
+         }
       }
    }
    else if (key == OF_KEY_RIGHT)
    {
-      if (GetKeyModifiers() == kModifier_Command)
+      if (GetKeyModifiers() & kModifier_Command)
       {
-         ofVec2f coords = GetCaretCoords();
+         ofVec2f coords = GetCaretCoords(mCaretPosition);
          mCaretPosition = GetCaretPosition(9999, coords.y);
+         if (!(GetKeyModifiers() & kModifier_Shift))
+            mCaretPosition2 = mCaretPosition;
       }
       else
       {
          if (mCaretPosition < mString.length())
+         {
             ++mCaretPosition;
+            if (!(GetKeyModifiers() & kModifier_Shift))
+               mCaretPosition2 = mCaretPosition;
+         }
       }
    }
    else if (key == OF_KEY_UP)
    {
-      ofVec2f coords = GetCaretCoords();
+      ofVec2f coords = GetCaretCoords(mCaretPosition);
       if (coords.y > 0)
          --coords.y;
       mCaretPosition = GetCaretPosition(coords.x, coords.y);
+      if (!(GetKeyModifiers() & kModifier_Shift))
+         mCaretPosition2 = mCaretPosition;
    }
    else if (key == OF_KEY_DOWN)
    {
-      ofVec2f coords = GetCaretCoords();
+      ofVec2f coords = GetCaretCoords(mCaretPosition);
       ++coords.y;
       mCaretPosition = GetCaretPosition(coords.x, coords.y);
+      if (!(GetKeyModifiers() & kModifier_Shift))
+         mCaretPosition2 = mCaretPosition;
    }
    else if (key == OF_KEY_RETURN)
    {
-      ofVec2f coords = GetCaretCoords();
+      if (mCaretPosition != mCaretPosition2)
+         RemoveSelectedText();
+      
+      ofVec2f coords = GetCaretCoords(mCaretPosition);
       int lineNum = (int)round(coords.y);
       vector<string> lines = ofSplitString(mString, "\n");
       int numSpaces = 0;
+      if (mCaretPosition > 0 && mString[mCaretPosition-1] == ':') //auto-indent
+         numSpaces += kTabSize;
       if (lineNum < (int)lines.size())
       {
          for (int i=0; i<lines[lineNum].length(); ++i)
@@ -213,9 +314,36 @@ void CodeEntry::OnKeyPressed(int key, bool isRepeat)
    }
    else if (key == 'V' && GetKeyModifiers() == kModifier_Command)
    {
+      if (mCaretPosition != mCaretPosition2)
+         RemoveSelectedText();
+      
       juce::String clipboard = SystemClipboard::getTextFromClipboard();
       for (int i=0; i<clipboard.length(); ++i)
          AddCharacter(clipboard[i]);
+   }
+   else if (key == 'V' && (GetKeyModifiers() == kModifier_Command | kModifier_Shift))
+   {
+      if (gHoveredUIControl != nullptr)
+      {
+         if (mCaretPosition != mCaretPosition2)
+            RemoveSelectedText();
+         
+         string insert = gHoveredUIControl->Path();
+         for (int i=0; i<insert.length(); ++i)
+            AddCharacter(insert[i]);
+      }
+   }
+   else if ((key == 'C' || key == 'X') && GetKeyModifiers() == kModifier_Command)
+   {
+      if (mCaretPosition != mCaretPosition2)
+      {
+         int caretStart = MIN(mCaretPosition, mCaretPosition2);
+         int caretEnd = MAX(mCaretPosition, mCaretPosition2);
+         SystemClipboard::copyTextToClipboard(mString.substr(caretStart,caretEnd-caretStart));
+         
+         if (key == 'X')
+            RemoveSelectedText();
+      }
    }
    else if (key == 'R' && GetKeyModifiers() == kModifier_Command)
    {
@@ -232,8 +360,12 @@ void CodeEntry::AddCharacter(char c)
 {
    if (AllowCharacter(c))
    {
+      if (mCaretPosition != mCaretPosition2)
+         RemoveSelectedText();
+      
       mString = mString.substr(0, mCaretPosition) + c + mString.substr(mCaretPosition);
       ++mCaretPosition;
+      mCaretPosition2 = mCaretPosition;
    }
 }
 
@@ -242,6 +374,15 @@ bool CodeEntry::AllowCharacter(char c)
    if (c == '\n')
       return true;
    return c >= ' ' && c <= '~';  //these encompass the ASCII range of printable characters
+}
+
+void CodeEntry::RemoveSelectedText()
+{
+   int caretStart = MIN(mCaretPosition, mCaretPosition2);
+   int caretEnd = MAX(mCaretPosition, mCaretPosition2);
+   mString = mString.substr(0, caretStart) + mString.substr(caretEnd);
+   mCaretPosition = caretStart;
+   mCaretPosition2 = mCaretPosition;
 }
 
 bool CodeEntry::MouseMoved(float x, float y)
@@ -277,10 +418,10 @@ int CodeEntry::GetRowForY(float y)
    return int(y / mCharHeight);
 }
 
-ofVec2f CodeEntry::GetCaretCoords()
+ofVec2f CodeEntry::GetCaretCoords(int caret)
 {
    ofVec2f coords;
-   int caretRemaining = mCaretPosition;
+   int caretRemaining = caret;
    vector<string> lines = ofSplitString(mString, "\n");
    for (size_t i=0; i<lines.size(); ++i)
    {
@@ -318,4 +459,6 @@ void CodeEntry::LoadState(FileStreamIn& in, bool shouldSetValue)
    
    in >> mString;
    Publish();
+   if (mListener != nullptr)
+      mListener->ExecuteCode(mString);
 }

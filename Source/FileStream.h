@@ -41,6 +41,7 @@ public:
    FileStreamIn& operator>>(char& var);
    void Read(float* buffer, int size);
    void ReadGeneric(void* buffer, int size);
+   void Peek(void* buffer, int size);
    int GetFilePosition();
    bool OpenedOk() { return mStream.openedOk(); }
    

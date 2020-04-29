@@ -131,6 +131,13 @@ void FileStreamIn::ReadGeneric(void* buffer, int size)
 {
    mStream.read((void*)buffer, size);
 }
+                        
+void FileStreamIn::Peek(void* buffer, int size)
+{
+   auto pos = mStream.getPosition();
+   mStream.read((void*)buffer, size);
+   mStream.setPosition(pos);
+}
 
 bool FileStreamIn::Eof()
 {

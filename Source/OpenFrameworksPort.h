@@ -230,6 +230,7 @@ public:
    void DrawString(string str, float size, float x, float y);
    ofRectangle DrawStringWrap(string str, float size, float x, float y, float width);
    float GetStringWidth(string str, float size, bool isRenderThread = false);
+   float GetStringHeight(string str, float size, bool isRenderThread = false);
    bool IsLoaded() { return mLoaded; }
 private:
    int mFontHandle;

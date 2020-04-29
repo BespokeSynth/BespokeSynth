@@ -32,6 +32,8 @@ public:
    
    void LoadLayout(const ofxJSONElement& moduleInfo) override;
    void SetUpFromSaveData() override;
+   void SaveState(FileStreamOut& out) override;
+   void LoadState(FileStreamIn& in) override;
    
 private:
    //IDrawableModule
@@ -39,6 +41,8 @@ private:
    void GetModuleDimensions(int& width, int& height) override { width = mWidth; height = mHeight; }
    bool Enabled() const override { return mEnabled; }
    void OnClicked(int x, int y, bool right) override;
+   bool IsResizable() const override { return true; }
+   void Resize(float w, float h) override { mWidth = w; mHeight = h; }
    
    void DrawKeyboard(int x, int y, int w, int h);
    ofRectangle GetKeyboardKeyRect(int pitch, int w, int h, bool& isBlackKey) const;

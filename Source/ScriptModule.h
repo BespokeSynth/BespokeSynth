@@ -17,25 +17,31 @@
 #include "NoteEffectBase.h"
 #include "IPulseReceiver.h"
 #include "pybind11/embed.h"
+#include "Slider.h"
 
 namespace py = pybind11;
 
-class ScriptModule : public IDrawableModule, public IButtonListener, public NoteEffectBase, public IPulseReceiver, public ICodeEntryListener
+class ScriptModule : public IDrawableModule, public IButtonListener, public NoteEffectBase, public IPulseReceiver, public ICodeEntryListener, public IFloatSliderListener
 {
 public:
    ScriptModule();
    virtual ~ScriptModule();
    static IDrawableModule* Create() { return new ScriptModule(); }
    
+   static void ResetPython();
+   
    string GetTitleLabel() override { return "script"; }
    void CreateUIControls() override;
    
    void Poll() override;
    
-   void PlayNoteFromScript(int pitch, int velocity, float measureTime = -1);
+   void PlayNoteFromScript(int pitch, int velocity, float pan = 0);
+   void PlayNoteFromScriptAfterDelay(int pitch, int velocity, float delayMeasureTime);
+   void PlayNoteFromScriptAtMeasureTime(int pitch, int velocity, float measureTime);
    
    void OnPulse(float amount, int samplesTo, int flags) override;
    void ButtonClicked(ClickButton* button) override;
+   void FloatSliderUpdated(FloatSlider* slider, float oldValue) override {}
    
    //ICodeEntryListener
    void ExecuteCode(string code) override;
@@ -66,11 +72,20 @@ private:
    
    CodeEntry* mCodeEntry;
    ClickButton* mRunButton;
+   FloatSlider* mASlider;
+   FloatSlider* mBSlider;
+   FloatSlider* mCSlider;
+   FloatSlider* mDSlider;
+   float mA;
+   float mB;
+   float mC;
+   float mD;
    
    float mWidth;
    float mHeight;
    double mScheduledPulseTime;
    double mMostRecentRunTime;
+   string mLastError;
    
    py::object mPythonGlobals;
    
@@ -80,7 +95,7 @@ private:
       int pitch;
       int velocity;
    };
-   static const int kScheduledNoteOutputBufferSize = 20;
+   static const int kScheduledNoteOutputBufferSize = 50;
    ScheduledNoteOutput mScheduledNoteOutput[kScheduledNoteOutputBufferSize];
    
    struct PendingNoteInput
@@ -89,6 +104,6 @@ private:
       int pitch;
       int velocity;
    };
-   static const int kPendingNoteInputBufferSize = 20;
+   static const int kPendingNoteInputBufferSize = 50;
    PendingNoteInput mPendingNoteInput[kPendingNoteInputBufferSize];
 };
