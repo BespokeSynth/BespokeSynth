@@ -197,6 +197,7 @@
     <ClCompile Include="..\..\Source\Pumper.cpp"/>
     <ClCompile Include="..\..\Source\Stutter.cpp"/>
     <ClCompile Include="..\..\Source\TremoloEffect.cpp"/>
+    <ClCompile Include="..\..\Source\ModulatorGravity.cpp"/>
     <ClCompile Include="..\..\Source\ScriptStatus.cpp"/>
     <ClCompile Include="..\..\Source\ScriptModule.cpp"/>
     <ClCompile Include="..\..\Source\NoteLatch.cpp"/>
@@ -2357,6 +2358,7 @@
     <ClInclude Include="..\..\Source\Pumper.h"/>
     <ClInclude Include="..\..\Source\Stutter.h"/>
     <ClInclude Include="..\..\Source\TremoloEffect.h"/>
+    <ClInclude Include="..\..\Source\ModulatorGravity.h"/>
     <ClInclude Include="..\..\Source\ScriptStatus.h"/>
     <ClInclude Include="..\..\Source\ScriptModule.h"/>
     <ClInclude Include="..\..\Source\NoteLatch.h"/>

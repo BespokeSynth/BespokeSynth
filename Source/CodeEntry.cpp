@@ -58,13 +58,11 @@ void CodeEntry::Render()
    if (mString != mPublishedString)
       color.set(200, 255, 200);
    
+   ofFill();
    if (gTime - mLastPublishTime < 200)
    {
-      ofPushStyle();
       ofSetColor(0,255,0,100*(1-(gTime - mLastPublishTime)/200));
-      ofFill();
       ofRect(mX,mY,w,h);
-      ofPopStyle();
    }
    
    ofNoFill();
@@ -356,6 +354,12 @@ void CodeEntry::OnKeyPressed(int key, bool isRepeat)
    }
 }
 
+void CodeEntry::Publish()
+ {
+    mPublishedString = mString;
+    mLastPublishTime = gTime;
+ }
+
 void CodeEntry::AddCharacter(char c)
 {
    if (AllowCharacter(c))
@@ -418,6 +422,11 @@ int CodeEntry::GetRowForY(float y)
    return int(y / mCharHeight);
 }
 
+ofVec2f CodeEntry::GetLinePos(int lineNum)
+{
+   return ofVec2f(mX, lineNum * mCharHeight + mY);
+}
+
 ofVec2f CodeEntry::GetCaretCoords(int caret)
 {
    ofVec2f coords;
@@ -459,6 +468,6 @@ void CodeEntry::LoadState(FileStreamIn& in, bool shouldSetValue)
    
    in >> mString;
    Publish();
-   if (mListener != nullptr)
-      mListener->ExecuteCode(mString);
+   //if (mListener != nullptr)
+   //   mListener->ExecuteCode(mString);
 }

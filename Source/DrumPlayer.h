@@ -165,6 +165,7 @@ private:
       , mVol(1)
       , mSpeed(1)
       , mVelocity(1)
+      , mPanInput(0)
       , mUseEnvelope(false)
       , mEnvelopeLength(200)
       , mPan(0)
@@ -188,6 +189,7 @@ private:
       float mVol;
       float mSpeed;
       float mVelocity;
+      float mPanInput;
       
       bool mUseEnvelope;
       ::ADSR mEnvelope;

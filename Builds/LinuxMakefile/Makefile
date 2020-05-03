@@ -101,6 +101,7 @@ OBJECTS_APP := \
   $(JUCE_OBJDIR)/Pumper_df274e1e.o \
   $(JUCE_OBJDIR)/Stutter_18c3b742.o \
   $(JUCE_OBJDIR)/TremoloEffect_db6065e.o \
+  $(JUCE_OBJDIR)/ModulatorGravity_4f7b8c68.o \
   $(JUCE_OBJDIR)/ScriptStatus_670522a6.o \
   $(JUCE_OBJDIR)/ScriptModule_245f2c20.o \
   $(JUCE_OBJDIR)/NoteLatch_3ca8d5d3.o \
@@ -558,6 +559,11 @@ $(JUCE_OBJDIR)/Stutter_18c3b742.o: ../../Source/Stutter.cpp
 $(JUCE_OBJDIR)/TremoloEffect_db6065e.o: ../../Source/TremoloEffect.cpp
 	-$(V_AT)mkdir -p $(JUCE_OBJDIR)
 	@echo "Compiling TremoloEffect.cpp"
+	$(V_AT)$(CXX) $(JUCE_CXXFLAGS) $(JUCE_CPPFLAGS_APP) $(JUCE_CFLAGS_APP) -o "$@" -c "$<"
+
+$(JUCE_OBJDIR)/ModulatorGravity_4f7b8c68.o: ../../Source/ModulatorGravity.cpp
+	-$(V_AT)mkdir -p $(JUCE_OBJDIR)
+	@echo "Compiling ModulatorGravity.cpp"
 	$(V_AT)$(CXX) $(JUCE_CXXFLAGS) $(JUCE_CPPFLAGS_APP) $(JUCE_CFLAGS_APP) -o "$@" -c "$<"
 
 $(JUCE_OBJDIR)/ScriptStatus_670522a6.o: ../../Source/ScriptStatus.cpp

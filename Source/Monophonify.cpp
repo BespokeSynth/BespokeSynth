@@ -11,9 +11,12 @@
 #include "ModularSynth.h"
 
 Monophonify::Monophonify()
-: mGlideTime(0)
+: mLastVelocity(0)
+, mGlideTime(0)
 , mGlideSlider(nullptr)
 {
+   for (int i=0; i<128; ++i)
+      mHeldNotes[i] = -1;
 }
 
 void Monophonify::CreateUIControls()
@@ -41,50 +44,69 @@ void Monophonify::PlayNote(double time, int pitch, int velocity, int voiceIdx, M
       return;
    }
    
+   if (pitch < 0 || pitch >= 128)
+      return;
+   
    mPitchBend.AppendTo(modulation.pitchBend);
    modulation.pitchBend = &mPitchBend;
 
    voiceIdx = 0;
    
-   mHeldNotesMutex.lock();
    if (velocity > 0)
    {
-      if (mHeldNotes.size())
+      mLastVelocity = velocity;
+      
+      int mostRecentPitch = GetMostRecentPitch();
+      
+      if (mostRecentPitch != -1)
       {
-         mPitchBend.RampValue(mHeldNotes.rbegin()->mPitch - pitch + mPitchBend.GetIndividualValue(0), 0, mGlideTime);
-         for (list<HeldNote>::iterator iter = mHeldNotes.begin(); iter != mHeldNotes.end(); ++iter)
-            PlayNoteOutput(gTime,(*iter).mPitch,0,-1, modulation);
+         mPitchBend.RampValue(mostRecentPitch - pitch + mPitchBend.GetIndividualValue(0), 0, mGlideTime);
+         PlayNoteOutput(time,mostRecentPitch, 0, -1, modulation);
          PlayNoteOutput(time, pitch, velocity, voiceIdx, modulation);
       }
       else
       {
-         mNoteOutput.Flush();
          PlayNoteOutput(time, pitch, velocity, voiceIdx, modulation);
          mPitchBend.SetValue(0);
       }
-      mHeldNotes.push_back(HeldNote(pitch, velocity));
+      mHeldNotes[pitch] = time;
    }
    else
    {
-      bool wasCurrNote = mHeldNotes.size() && mHeldNotes.rbegin()->mPitch == pitch;
+      bool wasCurrNote = pitch == GetMostRecentPitch();
       
-      for (list<HeldNote>::iterator i = mHeldNotes.begin(); i!=mHeldNotes.end(); ++i)
-      {
-         if ((*i).mPitch == pitch)
-            i = mHeldNotes.erase(i);
-      }
+      mHeldNotes[pitch] = -1;
       
-      if (mHeldNotes.size() && wasCurrNote)
+      int mostRecentPitch = GetMostRecentPitch();
+      
+      if (mostRecentPitch != -1)
       {
-         HeldNote heldNote = *(mHeldNotes.rbegin());
-
-         mPitchBend.RampValue(pitch - heldNote.mPitch + mPitchBend.GetIndividualValue(0), 0, mGlideTime);
-         PlayNoteOutput(time, heldNote.mPitch, heldNote.mVelocity, voiceIdx, modulation);
+         if (wasCurrNote)
+         {
+            mPitchBend.RampValue(pitch - mostRecentPitch + mPitchBend.GetIndividualValue(0), 0, mGlideTime);
+            PlayNoteOutput(time, mostRecentPitch, mLastVelocity, voiceIdx, modulation);
+         }
       }
-
-      PlayNoteOutput(time, pitch, 0, voiceIdx, modulation);
+      else
+      {
+         PlayNoteOutput(time, pitch, 0, voiceIdx, modulation);
+      }
    }
-   mHeldNotesMutex.unlock();
+}
+
+int Monophonify::GetMostRecentPitch() const
+{
+   int mostRecentPitch = -1;
+   double mostRecentTime = 0;
+   for (int i=0; i<128; ++i)
+   {
+      if (mHeldNotes[i] > mostRecentTime)
+      {
+         mostRecentPitch = i;
+         mostRecentTime = mHeldNotes[i];
+      }
+   }
+   return mostRecentPitch;
 }
 
 void Monophonify::CheckboxUpdated(Checkbox* checkbox)
@@ -92,9 +114,8 @@ void Monophonify::CheckboxUpdated(Checkbox* checkbox)
    if (checkbox == mEnabledCheckbox)
    {
       mNoteOutput.Flush();
-      mHeldNotesMutex.lock();
-      mHeldNotes.clear();
-      mHeldNotesMutex.unlock();
+      for (int i=0; i<128; ++i)
+         mHeldNotes[i] = -1;
    }
 }
 

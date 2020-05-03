@@ -209,6 +209,10 @@
 			isa = PBXBuildFile;
 			fileRef = 49AB76428A044DEDF45FFAFE;
 		};
+		3B7F9C4D50AC37136AD264E9 = {
+			isa = PBXBuildFile;
+			fileRef = 662A15065749DC7C10ED9264;
+		};
 		A87161C448037C3DD6D2A7A6 = {
 			isa = PBXBuildFile;
 			fileRef = B9D500ACC4CCC60AE228D3DA;
@@ -3247,6 +3251,13 @@
 			path = ../../Source/KarplusStrong.h;
 			sourceTree = "SOURCE_ROOT";
 		};
+		662A15065749DC7C10ED9264 = {
+			isa = PBXFileReference;
+			lastKnownFileType = sourcecode.cpp.cpp;
+			name = ModulatorGravity.cpp;
+			path = ../../Source/ModulatorGravity.cpp;
+			sourceTree = "SOURCE_ROOT";
+		};
 		66548E3C165D17E79A639583 = {
 			isa = PBXFileReference;
 			lastKnownFileType = sourcecode.cpp.cpp;
@@ -3785,6 +3796,13 @@
 			name = "juce_audio_devices";
 			path = "/Users/awwbees/Downloads/JUCE/modules/juce_audio_devices";
 			sourceTree = "<absolute>";
+		};
+		80A36A0CCEC1EC8F891A09AC = {
+			isa = PBXFileReference;
+			lastKnownFileType = sourcecode.c.h;
+			name = ModulatorGravity.h;
+			path = ../../Source/ModulatorGravity.h;
+			sourceTree = "SOURCE_ROOT";
 		};
 		819150625ACAFFBDC4782AEA = {
 			isa = PBXFileReference;
@@ -6671,6 +6689,8 @@
 		C91AF721DDC182CE3AC80CF9 = {
 			isa = PBXGroup;
 			children = (
+				662A15065749DC7C10ED9264,
+				80A36A0CCEC1EC8F891A09AC,
 				B9D500ACC4CCC60AE228D3DA,
 				FEC0E6463A2ED06AEAB53FF1,
 				D990E7B7B708C0557F79C7BC,
@@ -7608,6 +7628,7 @@
 				69EB47EC9441C3507BEB277D,
 				75837998247B5E99F3F16392,
 				7B858D802BD0BB608C0F48CF,
+				3B7F9C4D50AC37136AD264E9,
 				A87161C448037C3DD6D2A7A6,
 				9BADC446C19B69FB73777ED5,
 				8E683D907B0FA56099B2C02D,

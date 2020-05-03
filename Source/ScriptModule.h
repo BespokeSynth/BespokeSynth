@@ -35,9 +35,10 @@ public:
    
    void Poll() override;
    
-   void PlayNoteFromScript(int pitch, int velocity, float pan = 0);
+   void PlayNoteFromScript(int pitch, int velocity, float pan);
    void PlayNoteFromScriptAfterDelay(int pitch, int velocity, float delayMeasureTime);
-   void PlayNoteFromScriptAtMeasureTime(int pitch, int velocity, float measureTime);
+   void ScheduleMethod(string method, float delayMeasureTime);
+   void HighlightLine(int lineNum);
    
    void OnPulse(float amount, int samplesTo, int flags) override;
    void ButtonClicked(ClickButton* button) override;
@@ -55,16 +56,26 @@ public:
    void SetUpFromSaveData() override;
    void SaveLayout(ofxJSONElement& moduleInfo) override;
    
-   static ScriptModule* sCurrentScriptModule;
+   static std::vector<ScriptModule*> sScriptModules;
+   static float GetScriptMeasureTime();
    
 private:
+   void PlayNote(double time, int pitch, int velocity, float pan, int lineNum);
    void RunScript(double time);
    void RunCode(double time, string code);
    void FixUpCode(string& code);
    void ScheduleNote(double time, int pitch, int velocity);
+   string GetThisName();
+   string GetIndentation(string line);
+   bool ShouldDisplayLineExecutionPre(string priorLine, string line);
+   bool ShouldDisplayLineExecutionPost(string line);
+   void GetFirstAndLastCharacter(string line, char& first, char& last);
+   bool IsNonWhitespace(string line);
+   void DrawTimer(int lineNum, double startTime, double endTime, ofColor color);
    
    //IDrawableModule
    void DrawModule() override;
+   void DrawModuleUnclipped() override;
    bool Enabled() const override { return true; }
    void GetModuleDimensions(int& width, int& height) override;
    bool IsResizable() const override { return true; }
@@ -76,6 +87,7 @@ private:
    FloatSlider* mBSlider;
    FloatSlider* mCSlider;
    FloatSlider* mDSlider;
+   Checkbox* mDebugCheckbox;
    float mA;
    float mB;
    float mC;
@@ -84,19 +96,35 @@ private:
    float mWidth;
    float mHeight;
    double mScheduledPulseTime;
-   double mMostRecentRunTime;
+   static double sMostRecentRunTime;
    string mLastError;
+   size_t mScriptModuleIndex;
+   bool mDrawDebug;
+   string mLastRunLiteralCode;
+   int mNextLineToExecute;
    
    py::object mPythonGlobals;
    
    struct ScheduledNoteOutput
    {
+      double startTime;
       double time;
       int pitch;
       int velocity;
+      int lineNum;
    };
    static const int kScheduledNoteOutputBufferSize = 50;
    ScheduledNoteOutput mScheduledNoteOutput[kScheduledNoteOutputBufferSize];
+   
+   struct ScheduledMethodCall
+   {
+      double startTime;
+      double time;
+      string method;
+      int lineNum;
+   };
+   static const int kScheduledMethodCallBufferSize = 50;
+   ScheduledMethodCall mScheduledMethodCall[kScheduledMethodCallBufferSize];
    
    struct PendingNoteInput
    {
@@ -106,4 +134,29 @@ private:
    };
    static const int kPendingNoteInputBufferSize = 50;
    PendingNoteInput mPendingNoteInput[kPendingNoteInputBufferSize];
+   
+   class LineEventTracker
+   {
+   public:
+      LineEventTracker()
+      {
+         for (int i=0; i<kNumLineTrackers; ++i)
+            mTimes[i] = -999;
+      }
+      
+      void AddEvent(int lineNum)
+      {
+         if (lineNum >= 0 && lineNum < kNumLineTrackers)
+            mTimes[lineNum] = gTime;
+      }
+      
+      void Draw(CodeEntry* codeEntry, int style, ofColor color);
+   private:
+      static const int kNumLineTrackers = 256;
+      double mTimes[kNumLineTrackers];
+   };
+   
+   LineEventTracker mLineExecuteTracker;
+   LineEventTracker mMethodCallTracker;
+   LineEventTracker mNotePlayTracker;
 };

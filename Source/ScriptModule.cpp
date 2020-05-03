@@ -14,25 +14,34 @@
 #include "UIControlMacros.h"
 
 //static
-ScriptModule* ScriptModule::sCurrentScriptModule = nullptr;
+std::vector<ScriptModule*> ScriptModule::sScriptModules;
+//static
+double ScriptModule::sMostRecentRunTime = 0;
 
 ScriptModule::ScriptModule()
 : mCodeEntry(nullptr)
 , mRunButton(nullptr)
 , mScheduledPulseTime(-1)
-, mMostRecentRunTime(0)
 , mA(0)
 , mB(0)
 , mC(0)
 , mD(0)
+, mDrawDebug(false)
+, mNextLineToExecute(-1)
 {
    mPythonGlobals = py::globals();
    
    for (int i=0; i<kScheduledNoteOutputBufferSize; ++i)
       mScheduledNoteOutput[i].time = -1;
    
+   for (int i=0; i<kScheduledMethodCallBufferSize; ++i)
+      mScheduledMethodCall[i].time = -1;
+   
    for (int i=0; i<kPendingNoteInputBufferSize; ++i)
       mPendingNoteInput[i].time = -1;
+   
+   mScriptModuleIndex = sScriptModules.size();
+   sScriptModules.push_back(this);
 }
 
 ScriptModule::~ScriptModule()
@@ -53,6 +62,8 @@ void ScriptModule::CreateUIControls()
    FLOATSLIDER(mCSlider, "c", &mC, 0, 1);
    UIBLOCK_SHIFTRIGHT();
    FLOATSLIDER(mDSlider, "d", &mD, 0, 1);
+   UIBLOCK_SHIFTRIGHT();
+   CHECKBOX(mDebugCheckbox, "debug", &mDrawDebug);
    ENDUIBLOCK(mWidth, mHeight);
 }
 
@@ -64,6 +75,7 @@ void ScriptModule::ResetPython()
    sFirst = false;
    pybind11::initialize_interpreter();
    py::exec("import bespoke", py::globals());
+   py::exec("import scriptmodule", py::globals());
 }
 
 void ScriptModule::DrawModule()
@@ -77,6 +89,7 @@ void ScriptModule::DrawModule()
    mBSlider->Draw();
    mCSlider->Draw();
    mDSlider->Draw();
+   mDebugCheckbox->Draw();
    
    if (mLastError != "")
    {
@@ -85,6 +98,68 @@ void ScriptModule::DrawModule()
       errorPos.x += 60;
       errorPos.y += 12;
       DrawTextNormal(mLastError, errorPos.x, errorPos.y);
+   }
+   
+   mLineExecuteTracker.Draw(mCodeEntry, 0, ofColor::green);
+   mNotePlayTracker.Draw(mCodeEntry, 1, IDrawableModule::GetColor(kModuleType_Note));
+   mMethodCallTracker.Draw(mCodeEntry, 1, IDrawableModule::GetColor(kModuleType_Other));
+   
+   for (int i=0; i<kScheduledNoteOutputBufferSize; ++i)
+   {
+      if (mScheduledNoteOutput[i].time != -1 &&
+          mScheduledNoteOutput[i].velocity != 0 &&
+          gTime + 50 < mScheduledNoteOutput[i].time)
+         DrawTimer(mScheduledNoteOutput[i].lineNum, mScheduledNoteOutput[i].startTime, mScheduledNoteOutput[i].time, IDrawableModule::GetColor(kModuleType_Note));
+   }
+   
+   for (int i=0; i<kScheduledMethodCallBufferSize; ++i)
+   {
+      if (mScheduledMethodCall[i].time != -1 &&
+          gTime + 50 < mScheduledMethodCall[i].time)
+         DrawTimer(mScheduledMethodCall[i].lineNum, mScheduledMethodCall[i].startTime, mScheduledMethodCall[i].time, IDrawableModule::GetColor(kModuleType_Other));
+   }
+}
+
+void ScriptModule::DrawModuleUnclipped()
+{
+   if (mDrawDebug)
+   {
+      string debugText = mLastRunLiteralCode;
+      
+      for (int i=0; i<kScheduledNoteOutputBufferSize; ++i)
+      {
+         if (mScheduledNoteOutput[i].time != -1 &&
+             gTime + 50 < mScheduledNoteOutput[i].time)
+            debugText += "\n"+ofToString(mScheduledNoteOutput[i].pitch) + ", " + ofToString(mScheduledNoteOutput[i].time) + " " + ofToString(mScheduledNoteOutput[i].startTime) + " " + ofToString(mScheduledNoteOutput[i].lineNum);
+      }
+      
+      for (int i=0; i<kScheduledMethodCallBufferSize; ++i)
+      {
+         if (mScheduledMethodCall[i].time != -1 &&
+             gTime + 50 < mScheduledMethodCall[i].time)
+            debugText += "\n"+ofToString(mScheduledMethodCall[i].method) + ", " + ofToString(mScheduledMethodCall[i].time) + " " + ofToString(mScheduledMethodCall[i].startTime) + " " + ofToString(mScheduledMethodCall[i].lineNum);
+      }
+      
+      DrawTextNormal(debugText, mWidth, 0);
+   }
+}
+
+void ScriptModule::DrawTimer(int lineNum, double startTime, double endTime, ofColor color)
+{
+   ofVec2f linePos = mCodeEntry->GetLinePos(lineNum);
+   linePos.x += 11;
+   linePos.y += 10;
+   float t = (gTime - startTime) / (endTime - startTime);
+   if (t > 0 && t < 1)
+   {
+      const float kRadius = 5;
+      ofPushStyle();
+      ofSetColor(color);
+      ofNoFill();
+      ofCircle(linePos.x, linePos.y, kRadius);
+      ofFill();
+      ofCircle(linePos.x + sin(t * TWO_PI) * kRadius, linePos.y - cos(t * TWO_PI) * kRadius, 2);
+      ofPopStyle();
    }
 }
 
@@ -97,16 +172,6 @@ void ScriptModule::Poll()
       mScheduledPulseTime = -1;
    }
    
-   for (int i=0; i<kScheduledNoteOutputBufferSize; ++i)
-   {
-      if (mScheduledNoteOutput[i].time != -1 &&
-          gTime + 50 > mScheduledNoteOutput[i].time)
-      {
-         PlayNoteOutput(mScheduledNoteOutput[i].time, mScheduledNoteOutput[i].pitch, mScheduledNoteOutput[i].velocity);
-         mScheduledNoteOutput[i].time = -1;
-      }
-   }
-   
    for (int i=0; i<kPendingNoteInputBufferSize; ++i)
    {
       if (mPendingNoteInput[i].time != -1 &&
@@ -117,55 +182,49 @@ void ScriptModule::Poll()
          mPendingNoteInput[i].time = -1;
       }
    }
+   
+   for (int i=0; i<kScheduledNoteOutputBufferSize; ++i)
+   {
+      if (mScheduledNoteOutput[i].time != -1 &&
+          gTime + 50 > mScheduledNoteOutput[i].time)
+      {
+         PlayNote(mScheduledNoteOutput[i].time, mScheduledNoteOutput[i].pitch, mScheduledNoteOutput[i].velocity, 0, mScheduledNoteOutput[i].lineNum);
+         mScheduledNoteOutput[i].time = -1;
+      }
+   }
+   
+   for (int i=0; i<kScheduledMethodCallBufferSize; ++i)
+   {
+      if (mScheduledMethodCall[i].time != -1 &&
+          gTime + 50 > mScheduledMethodCall[i].time)
+      {
+         RunCode(mScheduledMethodCall[i].time, mScheduledMethodCall[i].method);
+         mMethodCallTracker.AddEvent(mScheduledMethodCall[i].lineNum);
+         mScheduledMethodCall[i].time = -1;
+      }
+   }
+}
+
+//static
+float ScriptModule::GetScriptMeasureTime()
+{
+   double timeOffset = sMostRecentRunTime - gTime;
+   float measureOffset = timeOffset / TheTransport->MsPerBar();
+   return TheTransport->GetMeasure() + TheTransport->GetMeasurePos() + measureOffset;
 }
 
 PYBIND11_EMBEDDED_MODULE(bespoke, m) {
    // `m` is a `py::module` which is used to bind functions and classes
-   m.def("play_note", [](int pitch, int velocity, float length)
-   {
-      ScriptModule::sCurrentScriptModule->PlayNoteFromScript(pitch, velocity);
-      ScriptModule::sCurrentScriptModule->PlayNoteFromScriptAfterDelay(pitch, 0, length);
-   });
-   m.def("play_note_pan", [](int pitch, int velocity, float length, float pan)
-   {
-      ScriptModule::sCurrentScriptModule->PlayNoteFromScript(pitch, velocity, pan);
-      ScriptModule::sCurrentScriptModule->PlayNoteFromScriptAfterDelay(pitch, 0, length);
-   });
-   m.def("schedule_note", [](float measureTime, int pitch, int velocity, float length)
-   {
-      ScriptModule::sCurrentScriptModule->PlayNoteFromScriptAtMeasureTime(pitch, velocity, measureTime);
-      ScriptModule::sCurrentScriptModule->PlayNoteFromScriptAtMeasureTime(pitch, 0, measureTime + length);
-   });
-   m.def("schedule_note_on", [](float measureTime, int pitch, int velocity)
-   {
-      ScriptModule::sCurrentScriptModule->PlayNoteFromScriptAtMeasureTime(pitch, velocity, measureTime);
-   });
-   m.def("note_on", [](int pitch, int velocity)
-   {
-      ScriptModule::sCurrentScriptModule->PlayNoteFromScript(pitch, velocity);
-   });
-   m.def("note_off", [](int pitch)
-   {
-      ScriptModule::sCurrentScriptModule->PlayNoteFromScript(pitch, 0);
-   });
    m.def("set", [](string path, float value)
    {
-      IUIControl* control;
-      if (ofIsStringInString(path, "~"))
-         control = TheSynth->FindUIControl(path);
-      else
-         control = TheSynth->FindUIControl(ScriptModule::sCurrentScriptModule->Path() + "~" + path);
+      IUIControl* control = TheSynth->FindUIControl(path);
       
       if (control != nullptr)
          control->SetValue(value);
    });
    m.def("get", [](string path)
    {
-      IUIControl* control;
-      if (ofIsStringInString(path, "~"))
-         control = TheSynth->FindUIControl(path);
-      else
-         control = TheSynth->FindUIControl(ScriptModule::sCurrentScriptModule->Path() + "~" + path);
+      IUIControl* control = TheSynth->FindUIControl(path);
       
       if (control != nullptr)
          return control->GetValue();
@@ -173,11 +232,7 @@ PYBIND11_EMBEDDED_MODULE(bespoke, m) {
    });
    m.def("adjust", [](string path, float amount)
    {
-      IUIControl* control;
-      if (ofIsStringInString(path, "~"))
-         control = TheSynth->FindUIControl(path);
-      else
-         control = TheSynth->FindUIControl(ScriptModule::sCurrentScriptModule->Path() + "~" + path);
+      IUIControl* control = TheSynth->FindUIControl(path);
       
       if (control != nullptr)
       {
@@ -188,41 +243,104 @@ PYBIND11_EMBEDDED_MODULE(bespoke, m) {
    });
    m.def("get_measure_time", []()
    {
-      return TheTransport->GetMeasure() + TheTransport->GetMeasurePos();
+      return ScriptModule::GetScriptMeasureTime();
    });
    m.def("get_measure", []()
    {
-      return TheTransport->GetMeasure();
+      return (int)ScriptModule::GetScriptMeasureTime();
    });
    m.def("get_step", [](int subdivision)
    {
-      return int(TheTransport->GetMeasurePos() * subdivision);
+      return int(ScriptModule::GetScriptMeasureTime() * subdivision);
+   });
+   m.def("time_until_subdivision", [](int subdivision)
+   {
+      float measureTime = ScriptModule::GetScriptMeasureTime();
+      return ceil(measureTime * subdivision) / subdivision - measureTime;
    });
 }
 
-void ScriptModule::PlayNoteFromScript(int pitch, int velocity, float pan /*=0*/)
+PYBIND11_EMBEDDED_MODULE(scriptmodule, m)
 {
-   ModulationParameters modulation;
-   modulation.pan = pan;
-   PlayNoteOutput(mMostRecentRunTime, pitch, velocity, -1, modulation);
+   m.def("get_this", [](int scriptModuleIndex)
+   {
+      return ScriptModule::sScriptModules[scriptModuleIndex];
+   }, py::return_value_policy::reference);
+   py::class_<ScriptModule>(m, "scriptmodule")
+      .def("play_note", [](ScriptModule &module, int pitch, int velocity, float length)
+      {
+         module.PlayNoteFromScript(pitch, velocity, 0);
+         module.PlayNoteFromScriptAfterDelay(pitch, 0, length);
+      })
+      .def("play_note_pan", [](ScriptModule &module, int pitch, int velocity, float length, float pan)
+      {
+         module.PlayNoteFromScript(pitch, velocity, pan);
+         module.PlayNoteFromScriptAfterDelay(pitch, 0, length);
+      })
+      .def("schedule_note", [](ScriptModule &module, float delay, int pitch, int velocity, float length)
+      {
+         module.PlayNoteFromScriptAfterDelay(pitch, velocity, delay);
+         module.PlayNoteFromScriptAfterDelay(pitch, 0, delay + length);
+      })
+      .def("schedule_note_on", [](ScriptModule &module, float delay, int pitch, int velocity)
+      {
+         module.PlayNoteFromScriptAfterDelay(pitch, velocity, delay);
+      })
+      .def("schedule_call", [](ScriptModule &module, float delay, string method)
+      {
+         module.ScheduleMethod(method, delay);
+      })
+      .def("note_on", [](ScriptModule &module, int pitch, int velocity)
+      {
+         module.PlayNoteFromScript(pitch, velocity, 0);
+      })
+      .def("note_off", [](ScriptModule &module, int pitch)
+      {
+         module.PlayNoteFromScript(pitch, 0, 0);
+      })
+      .def("set", [](ScriptModule &module, string path, float value)
+      {
+         IUIControl* control = module.FindUIControl(path.c_str());
+         
+         if (control != nullptr)
+            control->SetValue(value);
+      })
+      .def("get", [](ScriptModule &module, string path)
+      {
+         IUIControl* control = module.FindUIControl(path.c_str());
+         
+         if (control != nullptr)
+            return control->GetValue();
+         return 0.0f;
+      })
+      .def("adjust", [](ScriptModule &module, string path, float amount)
+      {
+         IUIControl* control = module.FindUIControl(path.c_str());
+         
+         if (control != nullptr)
+         {
+            float min, max;
+            control->GetRange(min, max);
+            control->SetValue(ofClamp(control->GetValue() + amount, min, max));
+         }
+      })
+      .def("highlight_line", [](ScriptModule& module, int lineNum)
+      {
+         module.HighlightLine(lineNum);
+      });
+}
+
+void ScriptModule::PlayNoteFromScript(int pitch, int velocity, float pan)
+{
+   PlayNote(sMostRecentRunTime, pitch, velocity, pan, mNextLineToExecute);
 }
 
 void ScriptModule::PlayNoteFromScriptAfterDelay(int pitch, int velocity, float delayMeasureTime)
 {
-   double time = mMostRecentRunTime + delayMeasureTime * TheTransport->MsPerBar();
+   double time = sMostRecentRunTime + delayMeasureTime * TheTransport->MsPerBar();
    
-   if (time <= mMostRecentRunTime)
-      PlayNoteOutput(time, pitch, velocity);
-   else
-      ScheduleNote(time, pitch, velocity);
-}
-
-void ScriptModule::PlayNoteFromScriptAtMeasureTime(int pitch, int velocity, float measureTime)
-{
-   double time = mMostRecentRunTime + (measureTime - (TheTransport->GetMeasure() + TheTransport->GetMeasurePos())) * TheTransport->MsPerBar();
-   
-   if (time <= mMostRecentRunTime)
-      PlayNoteOutput(time, pitch, velocity);
+   if (time <= sMostRecentRunTime)
+      PlayNote(time, pitch, velocity, 0, mNextLineToExecute);
    else
       ScheduleNote(time, pitch, velocity);
 }
@@ -234,11 +352,44 @@ void ScriptModule::ScheduleNote(double time, int pitch, int velocity)
       if (mScheduledNoteOutput[i].time == -1)
       {
          mScheduledNoteOutput[i].time = time;
+         mScheduledNoteOutput[i].startTime = sMostRecentRunTime;
          mScheduledNoteOutput[i].pitch = pitch;
          mScheduledNoteOutput[i].velocity = velocity;
+         mScheduledNoteOutput[i].lineNum = mNextLineToExecute;
          break;
       }
    }
+}
+
+void ScriptModule::ScheduleMethod(string method, float delayMeasureTime)
+{
+   for (int i=0; i<kScheduledMethodCallBufferSize; ++i)
+   {
+      if (mScheduledMethodCall[i].time == -1)
+      {
+         double time = sMostRecentRunTime + delayMeasureTime * TheTransport->MsPerBar();
+         
+         mScheduledMethodCall[i].time = time;
+         mScheduledMethodCall[i].startTime = sMostRecentRunTime;
+         mScheduledMethodCall[i].method = method;
+         mScheduledMethodCall[i].lineNum = mNextLineToExecute;
+         break;
+      }
+   }
+}
+
+void ScriptModule::HighlightLine(int lineNum)
+{
+   mNextLineToExecute = lineNum;
+   mLineExecuteTracker.AddEvent(lineNum);
+}
+
+void ScriptModule::PlayNote(double time, int pitch, int velocity, float pan, int lineNum)
+{
+   ModulationParameters modulation;
+   modulation.pan = pan;
+   PlayNoteOutput(time, pitch, velocity, -1, modulation);
+   mNotePlayTracker.AddEvent(lineNum);
 }
 
 void ScriptModule::ButtonClicked(ClickButton* button)
@@ -275,18 +426,36 @@ void ScriptModule::PlayNote(double time, int pitch, int velocity, int voiceIdx /
    }
 }
 
+string ScriptModule::GetThisName()
+{
+   return "this__"+ofToString(mScriptModuleIndex);
+}
+
 void ScriptModule::RunScript(double time)
 {
    //should only be called from main thread
-   RunCode(time, mCodeEntry->GetText());
+   py::exec(GetThisName()+" = scriptmodule.get_this("+ofToString(mScriptModuleIndex)+")", mPythonGlobals);
+   string code = mCodeEntry->GetText();
+   vector<string> lines = ofSplitString(code, "\n");
+   code = "";
+   for (size_t i=0; i<lines.size(); ++i)
+   {
+      if (ShouldDisplayLineExecutionPre(i > 0 ? lines[i-1] : "", lines[i]))
+         code += GetIndentation(lines[i])+"this.highlight_line("+ofToString(i)+")\n";
+      code += lines[i]+"\n";
+      if (ShouldDisplayLineExecutionPost(lines[i]))
+         code += GetIndentation(lines[i])+"   this.highlight_line("+ofToString(i)+")\n";
+   }
+   FixUpCode(code);
+   mLastRunLiteralCode = code;
+   RunCode(time, code);
 }
 
 void ScriptModule::RunCode(double time, string code)
 {
    //should only be called from main thread
    
-   sCurrentScriptModule = this;
-   mMostRecentRunTime = time;
+   sMostRecentRunTime = time;
    ComputeSliders(time);
 
    try
@@ -340,14 +509,89 @@ void ScriptModule::RunCode(double time, string code)
    {
       ofLog() << "python execution exception: " << e.what();
    }
-   
-   sCurrentScriptModule = nullptr;
 }
 
 void ScriptModule::FixUpCode(string& code)
 {
    ofStringReplace(code, "on_pulse(", "on_pulse__"+Path()+"(");
    ofStringReplace(code, "on_note(", "on_note__"+Path()+"(");
+   ofStringReplace(code, "this.", GetThisName()+".");
+}
+
+void ScriptModule::GetFirstAndLastCharacter(string line, char& first, char& last)
+{
+   bool hasFirstCharacter = false;
+   for (size_t i = 0; i < line.length(); ++i)
+   {
+      char c = line[i];
+      if (c != ' ')
+      {
+         if (!hasFirstCharacter)
+         {
+            hasFirstCharacter = true;
+            first = c;
+         }
+         last = c;
+      }
+   }
+}
+
+bool ScriptModule::ShouldDisplayLineExecutionPre(string priorLine, string line)
+{
+   if (!IsNonWhitespace(line))
+      return false;
+   
+   char firstCharacter;
+   char lastCharacter;
+   
+   GetFirstAndLastCharacter(priorLine, firstCharacter, lastCharacter);
+   if (lastCharacter == ',')
+      return false;
+   
+   GetFirstAndLastCharacter(line, firstCharacter, lastCharacter);
+   
+   if (firstCharacter == '#')
+      return false;
+   if (lastCharacter == ':' && (ofIsStringInString(line, "else") || ofIsStringInString(line, "elif")))
+      return false;
+   return true;
+}
+
+bool ScriptModule::ShouldDisplayLineExecutionPost(string line)
+{
+   return false;
+   //return ofIsStringInString(line, "def ");
+   /*
+   char firstCharacter;
+   char lastCharacter;
+   GetFirstAndLastCharacter(line, firstCharacter, lastCharacter);
+   
+   if (firstCharacter == '#')
+      return false;
+   return lastCharacter == ':';*/
+}
+
+string ScriptModule::GetIndentation(string line)
+{
+   string ret;
+   for (size_t i = 0; i < line.length(); ++i)
+   {
+      if (line[i] == ' ')
+         ret += ' ';
+      else
+         break;
+   }
+   return ret;
+}
+
+bool ScriptModule::IsNonWhitespace(string line)
+{
+   for (size_t i = 0; i < line.length(); ++i)
+   {
+      if (line[i] != ' ')
+         return true;
+   }
+   return false;
 }
 
 void ScriptModule::GetModuleDimensions(int& w, int& h)
@@ -366,6 +610,7 @@ void ScriptModule::Resize(float w, float h)
    mBSlider->SetPosition(mBSlider->GetPosition(true).x, mBSlider->GetPosition(true).y + h - mHeight);
    mCSlider->SetPosition(mCSlider->GetPosition(true).x, mCSlider->GetPosition(true).y + h - mHeight);
    mDSlider->SetPosition(mDSlider->GetPosition(true).x, mDSlider->GetPosition(true).y + h - mHeight);
+   mDebugCheckbox->SetPosition(mDebugCheckbox->GetPosition(true).x, mDebugCheckbox->GetPosition(true).y + h - mHeight);
    mWidth = w;
    mHeight = h;
 }
@@ -411,4 +656,24 @@ void ScriptModule::LoadState(FileStreamIn& in)
    in >> w;
    in >> h;
    Resize(w, h);
+}
+
+void ScriptModule::LineEventTracker::Draw(CodeEntry* codeEntry, int style, ofColor color)
+{
+   ofPushStyle();
+   ofFill();
+   for (int i=0; i<kNumLineTrackers; ++i)
+   {
+      if (gTime - mTimes[i] < 200)
+      {
+         float alpha = style == 0 ? 200 : 100;
+         ofSetColor(color, alpha*(1-(gTime - mTimes[i])/200));
+         ofVec2f linePos = codeEntry->GetLinePos(i);
+         if (style == 0)
+            ofRect(linePos.x + 1, linePos.y + 3, 4, codeEntry->GetCharHeight(), L(corner,0));
+         if (style == 1)
+            ofCircle(linePos.x + 11, linePos.y + 10, 5);
+      }
+   }
+   ofPopStyle();
 }

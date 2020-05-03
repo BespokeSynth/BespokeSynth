@@ -16,14 +16,6 @@
 #include "Slider.h"
 #include "ModulationChain.h"
 
-struct HeldNote
-{
-   HeldNote();
-   HeldNote(int p, int v) : mPitch(p), mVelocity(v) {}
-   int mPitch;
-   int mVelocity;
-};
-
 class Monophonify : public NoteEffectBase, public IDrawableModule, public IFloatSliderListener
 {
 public:
@@ -50,9 +42,10 @@ private:
    void DrawModule() override;
    void GetModuleDimensions(int& width, int& height) override { width = 110; height = 20; }
    bool Enabled() const override { return mEnabled; }
+   int GetMostRecentPitch() const;
    
-   list<HeldNote> mHeldNotes;
-   ofMutex mHeldNotesMutex;
+   double mHeldNotes[128];
+   int mLastVelocity;
    
    float mGlideTime;
    FloatSlider* mGlideSlider;

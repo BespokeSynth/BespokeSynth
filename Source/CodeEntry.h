@@ -29,7 +29,7 @@ public:
    void Render() override;
    
    void MakeActive();
-   void Publish() { mPublishedString = mString; }
+   void Publish();
    
    void ClearInput() { mString = ""; mCaretPosition = 0; }
    const string GetText() const { return mPublishedString; }
@@ -45,6 +45,10 @@ public:
    void LoadState(FileStreamIn& in, bool shouldSetValue = true) override;
    bool IsSliderControl() override { return false; }
    bool IsButtonControl() override { return false; }
+   
+   ofVec2f GetLinePos(int lineNum);
+   float GetCharHeight() const { return mCharHeight; }
+   float GetCharWidth() const { return mCharWidth; }
    
 protected:
    ~CodeEntry();   //protected so that it can't be created on the stack

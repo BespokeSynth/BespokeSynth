@@ -279,14 +279,14 @@ bool DrumPlayer::DrumHit::Process(double time, float speed, float vol, ChannelBu
             out->GetChannel(ch)[j] = sample;
          }
          
-         if (mPan != 0 && mOwner->mMonoOutput == false)
+         if (mPan + mPanInput != 0 && mOwner->mMonoOutput == false)
          {
             int secondChannel = out->NumActiveChannels() == 1 ? 0 : 1;
             
             float left = out->GetChannel(0)[j];
             float right = out->GetChannel(secondChannel)[j];
-            out->GetChannel(0)[j] = left * ofMap(mPan, 0, 1, 1, 0, true) + right * ofMap(mPan, -1, 0, 1, 0, true);
-            out->GetChannel(secondChannel)[j] = right * ofMap(mPan, -1, 0, 0, 1, true) + left * ofMap(mPan, 0, 1, 0, 1, true);
+            out->GetChannel(0)[j] = left * ofMap(mPan + mPanInput, 0, 1, 1, 0, true) + right * ofMap(mPan + mPanInput, -1, 0, 1, 0, true);
+            out->GetChannel(secondChannel)[j] = right * ofMap(mPan + mPanInput, -1, 0, 0, 1, true) + left * ofMap(mPan + mPanInput, 0, 1, 0, 1, true);
          }
          
          timeHit += gInvSampleRateMs;
@@ -327,6 +327,7 @@ void DrumPlayer::PlayNote(double time, int pitch, int velocity, int voiceIdx, Mo
             //play this one
             mDrumHits[pitch].mSample.Play(time, mSpeed * ofRandom(.99f,1.01f), 0);
             mDrumHits[pitch].mVelocity = velocity / 127.0f;
+            mDrumHits[pitch].mPanInput = modulation.pan;
             mDrumHits[pitch].mEnvelope.Start(time, 1);
          }
       }

@@ -616,6 +616,9 @@
     <ClCompile Include="..\..\Source\TremoloEffect.cpp">
       <Filter>BespokeSynth\Source\effects</Filter>
     </ClCompile>
+    <ClCompile Include="..\..\Source\ModulatorGravity.cpp">
+      <Filter>BespokeSynth\Source\modules</Filter>
+    </ClCompile>
     <ClCompile Include="..\..\Source\ScriptStatus.cpp">
       <Filter>BespokeSynth\Source\modules</Filter>
     </ClCompile>
@@ -3623,6 +3626,9 @@
     </ClInclude>
     <ClInclude Include="..\..\Source\TremoloEffect.h">
       <Filter>BespokeSynth\Source\effects</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\Source\ModulatorGravity.h">
+      <Filter>BespokeSynth\Source\modules</Filter>
     </ClInclude>
     <ClInclude Include="..\..\Source\ScriptStatus.h">
       <Filter>BespokeSynth\Source\modules</Filter>

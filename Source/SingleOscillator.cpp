@@ -33,8 +33,9 @@ SingleOscillator::SingleOscillator()
 , mPolyMgr(this)
 , mLengthMultiplier(1)
 , mLengthMultiplierSlider(nullptr)
-, mDrawOsc(kOsc_Square)
 , mWriteBuffer(gBufferSize)
+, mDrawOsc(kOsc_Square)
+, mDrawDebug(false)
 {
    mVoiceParams.mAdsr.Set(10,0,1,10);
    mVoiceParams.mVol = .05f;
@@ -154,6 +155,20 @@ void SingleOscillator::PlayNote(double time, int pitch, int velocity, int voiceI
       mVoiceParams.mAdsr.Stop(time);         //for visualization
       mVoiceParams.mFilterAdsr.Stop(time);   //for visualization
    }
+   
+   if (mDrawDebug)
+   {
+      vector<string> lines = ofSplitString(mDebugLines, "\n");
+      mDebugLines = "";
+      const int kNumDisplayLines = 10;
+      for (int i=0; i<kNumDisplayLines-1; ++i)
+      {
+         int lineIndex = (int)lines.size()-(kNumDisplayLines-1) + i;
+         if (lineIndex >= 0)
+            mDebugLines += lines[lineIndex] + "\n";
+      }
+      mDebugLines += "PlayNote("+ofToString(time)+", "+ofToString(pitch)+", "+ofToString(velocity)+", "+ofToString(voiceIdx)+")";
+   }
 }
 
 void SingleOscillator::SetEnabled(bool enabled)
@@ -222,7 +237,11 @@ void SingleOscillator::DrawModule()
  
 void SingleOscillator::DrawModuleUnclipped()
 {
-   //mPolyMgr.DrawDebug(200, 0);
+   if (mDrawDebug)
+   {
+      mPolyMgr.DrawDebug(200, 0);
+      DrawTextNormal(mDebugLines, 0, 160);
+   }
 }
 
 void SingleOscillator::GetModuleDimensions(int& width, int& height)

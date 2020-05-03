@@ -196,6 +196,7 @@
 #include "NoteLatch.h"
 #include "ScriptModule.h"
 #include "ScriptStatus.h"
+#include "ModulatorGravity.h"
 
 #define REGISTER(class,name,type) Register(#name, &(class::Create), &(class::CanCreate), type, false, false);
 #define REGISTER_HIDDEN(class,name,type) Register(#name, &(class::Create), &(class::CanCreate), type, true, false);
@@ -360,6 +361,7 @@ ModuleFactory::ModuleFactory()
    REGISTER(NoteLatch, notelatch, kModuleType_Note);
    REGISTER(ScriptModule, script, kModuleType_Other);
    REGISTER(ScriptStatus, scriptstatus, kModuleType_Other);
+   REGISTER(ModulatorGravity, gravity, kModuleType_Modulator);
 
    //REGISTER_EXPERIMENTAL(MidiPlayer, midiplayer, kModuleType_Instrument);
    REGISTER_EXPERIMENTAL(Razor, razor, kModuleType_Synth);

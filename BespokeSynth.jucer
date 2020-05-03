@@ -205,6 +205,10 @@
         <FILE id="RG4zGd" name="TremoloEffect.h" compile="0" resource="0" file="Source/TremoloEffect.h"/>
       </GROUP>
       <GROUP id="{6781AC07-A090-A7AF-8D27-BCB6D9526ABD}" name="modules">
+        <FILE id="X5ZUvu" name="ModulatorGravity.cpp" compile="1" resource="0"
+              file="Source/ModulatorGravity.cpp"/>
+        <FILE id="Kb01G7" name="ModulatorGravity.h" compile="0" resource="0"
+              file="Source/ModulatorGravity.h"/>
         <FILE id="xikyfS" name="ScriptStatus.cpp" compile="1" resource="0"
               file="Source/ScriptStatus.cpp"/>
         <FILE id="O1DIxS" name="ScriptStatus.h" compile="0" resource="0" file="Source/ScriptStatus.h"/>

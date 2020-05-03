@@ -92,6 +92,9 @@ private:
    ChannelBuffer mWriteBuffer;
    
    Oscillator mDrawOsc;
+   
+   bool mDrawDebug;
+   string mDebugLines;
 };
 
 
