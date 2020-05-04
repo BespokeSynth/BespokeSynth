@@ -92,7 +92,7 @@ void CodeEntry::Render()
       ofPushStyle();
       ofFill();
       ofSetColor(255, 0, 0, gModuleDrawAlpha * .5f);
-      ofRect(mX, mErrorLine * mCharHeight + mY + 3, mWidth, mCharHeight, L(corner,2));
+      ofRect(mX, mErrorLine * mCharHeight + mY + 3 - mScroll.y, mWidth, mCharHeight, L(corner,2));
       ofFill();
    }
    
@@ -100,7 +100,7 @@ void CodeEntry::Render()
    const float kFontSize = 14;
    mCharWidth = gFontFixedWidth.GetStringWidth("x", kFontSize, K(isRenderThread));
    mCharHeight = gFontFixedWidth.GetStringHeight("x", kFontSize, K(isRenderThread));
-   gFontFixedWidth.DrawString(mString, kFontSize, mX+2, mY + mCharHeight);
+   gFontFixedWidth.DrawString(mString, kFontSize, mX+2 - mScroll.x, mY + mCharHeight - mScroll.y);
    
    /*for (int i = 0; i<60; ++i)
    {
@@ -115,7 +115,7 @@ void CodeEntry::Render()
          ofVec2f coords = GetCaretCoords(mCaretPosition);
          
          ofFill();
-         ofRect(coords.x * mCharWidth + mX + 1.5f, coords.y * mCharHeight + mY + 2, 1, mCharHeight, L(corner,1));
+         ofRect(coords.x * mCharWidth + mX + 1.5f - mScroll.x, coords.y * mCharHeight + mY + 2 - mScroll.y, 1, mCharHeight, L(corner,1));
       }
       mCaretBlinkTimer += ofGetLastFrameTime();
       if (mCaretBlinkTimer > .3f)
@@ -147,7 +147,7 @@ void CodeEntry::Render()
                begin = startCol;
             if (i == endLineNum)
                end = endCol;
-            ofRect(begin * mCharWidth + mX + 1.5f, i * mCharHeight + mY + 3, (end - begin) * mCharWidth, mCharHeight, L(corner,2));
+            ofRect(begin * mCharWidth + mX + 1.5f - mScroll.x, i * mCharHeight + mY + 3 - mScroll.y, (end - begin) * mCharWidth, mCharHeight, L(corner,2));
          }
          
          ofPopStyle();
@@ -395,6 +395,18 @@ bool CodeEntry::MouseMoved(float x, float y)
    return false;
 }
 
+bool CodeEntry::MouseScrolled(int x, int y, float scrollX, float scrollY)
+{
+   if (fabs(mScroll.x) > fabsf(mScroll.y))
+      mScroll.y = 0;
+   else
+      mScroll.x = 0;
+   
+   mScroll.x = MAX(mScroll.x + scrollX * -10, 0);
+   mScroll.y = MAX(mScroll.y + scrollY * -10, 0);
+   return false;
+}
+
 int CodeEntry::GetCaretPosition(int col, int row)
 {
    vector<string> lines = ofSplitString(mString, "\n");
@@ -412,6 +424,8 @@ int CodeEntry::GetColForX(float x)
 {
    x -= 2;
    
+   x -= mScroll.x;
+   
    return round(x / mCharWidth);
 }
 
@@ -419,12 +433,14 @@ int CodeEntry::GetRowForY(float y)
 {
    y -= 2;
    
+   y -= mScroll.y;
+   
    return int(y / mCharHeight);
 }
 
 ofVec2f CodeEntry::GetLinePos(int lineNum)
 {
-   return ofVec2f(mX, lineNum * mCharHeight + mY);
+   return ofVec2f(mX - mScroll.x, lineNum * mCharHeight + mY - mScroll.y);
 }
 
 ofVec2f CodeEntry::GetCaretCoords(int caret)

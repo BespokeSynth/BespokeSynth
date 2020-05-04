@@ -39,6 +39,8 @@ public:
    void PlayNoteFromScriptAfterDelay(int pitch, int velocity, float delayMeasureTime);
    void ScheduleMethod(string method, float delayMeasureTime);
    void HighlightLine(int lineNum);
+   IUIControl* GetUIControl(string path);
+   void OnAdjustUIControl();
    
    void OnPulse(float amount, int samplesTo, int flags) override;
    void ButtonClicked(ClickButton* button) override;
@@ -80,6 +82,7 @@ private:
    void GetModuleDimensions(int& width, int& height) override;
    bool IsResizable() const override { return true; }
    void Resize(float w, float h) override;
+   bool MouseScrolled(int x, int y, float scrollX, float scrollY) override;
    
    CodeEntry* mCodeEntry;
    ClickButton* mRunButton;
@@ -159,4 +162,5 @@ private:
    LineEventTracker mLineExecuteTracker;
    LineEventTracker mMethodCallTracker;
    LineEventTracker mNotePlayTracker;
+   LineEventTracker mUIControlTracker;
 };

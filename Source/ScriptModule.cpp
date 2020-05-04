@@ -103,11 +103,12 @@ void ScriptModule::DrawModule()
    mLineExecuteTracker.Draw(mCodeEntry, 0, ofColor::green);
    mNotePlayTracker.Draw(mCodeEntry, 1, IDrawableModule::GetColor(kModuleType_Note));
    mMethodCallTracker.Draw(mCodeEntry, 1, IDrawableModule::GetColor(kModuleType_Other));
+   mUIControlTracker.Draw(mCodeEntry, 1, IDrawableModule::GetColor(kModuleType_Modulator));
    
    for (int i=0; i<kScheduledNoteOutputBufferSize; ++i)
    {
       if (mScheduledNoteOutput[i].time != -1 &&
-          mScheduledNoteOutput[i].velocity != 0 &&
+          mScheduledNoteOutput[i].velocity > 0 &&
           gTime + 50 < mScheduledNoteOutput[i].time)
          DrawTimer(mScheduledNoteOutput[i].lineNum, mScheduledNoteOutput[i].startTime, mScheduledNoteOutput[i].time, IDrawableModule::GetColor(kModuleType_Note));
    }
@@ -215,32 +216,6 @@ float ScriptModule::GetScriptMeasureTime()
 
 PYBIND11_EMBEDDED_MODULE(bespoke, m) {
    // `m` is a `py::module` which is used to bind functions and classes
-   m.def("set", [](string path, float value)
-   {
-      IUIControl* control = TheSynth->FindUIControl(path);
-      
-      if (control != nullptr)
-         control->SetValue(value);
-   });
-   m.def("get", [](string path)
-   {
-      IUIControl* control = TheSynth->FindUIControl(path);
-      
-      if (control != nullptr)
-         return control->GetValue();
-      return 0.0f;
-   });
-   m.def("adjust", [](string path, float amount)
-   {
-      IUIControl* control = TheSynth->FindUIControl(path);
-      
-      if (control != nullptr)
-      {
-         float min, max;
-         control->GetRange(min, max);
-         control->SetValue(ofClamp(control->GetValue() + amount, min, max));
-      }
-   });
    m.def("get_measure_time", []()
    {
       return ScriptModule::GetScriptMeasureTime();
@@ -300,28 +275,29 @@ PYBIND11_EMBEDDED_MODULE(scriptmodule, m)
       })
       .def("set", [](ScriptModule &module, string path, float value)
       {
-         IUIControl* control = module.FindUIControl(path.c_str());
-         
+         IUIControl* control = module.GetUIControl(path);
          if (control != nullptr)
+         {
             control->SetValue(value);
+            module.OnAdjustUIControl();
+         }
       })
       .def("get", [](ScriptModule &module, string path)
       {
-         IUIControl* control = module.FindUIControl(path.c_str());
-         
+         IUIControl* control = module.GetUIControl(path);
          if (control != nullptr)
             return control->GetValue();
          return 0.0f;
       })
       .def("adjust", [](ScriptModule &module, string path, float amount)
       {
-         IUIControl* control = module.FindUIControl(path.c_str());
-         
+         IUIControl* control = module.GetUIControl(path);
          if (control != nullptr)
          {
             float min, max;
             control->GetRange(min, max);
             control->SetValue(ofClamp(control->GetValue() + amount, min, max));
+            module.OnAdjustUIControl();
          }
       })
       .def("highlight_line", [](ScriptModule& module, int lineNum)
@@ -384,12 +360,29 @@ void ScriptModule::HighlightLine(int lineNum)
    mLineExecuteTracker.AddEvent(lineNum);
 }
 
+IUIControl* ScriptModule::GetUIControl(string path)
+{
+   IUIControl* control;
+   if (ofIsStringInString(path, "~"))
+      control = TheSynth->FindUIControl(path);
+   else
+      control = TheSynth->FindUIControl(Path() + "~" + path);
+   
+   return control;
+}
+
+void ScriptModule::OnAdjustUIControl()
+{
+   mUIControlTracker.AddEvent(mNextLineToExecute);
+}
+
 void ScriptModule::PlayNote(double time, int pitch, int velocity, float pan, int lineNum)
 {
    ModulationParameters modulation;
    modulation.pan = pan;
    PlayNoteOutput(time, pitch, velocity, -1, modulation);
-   mNotePlayTracker.AddEvent(lineNum);
+   if (velocity > 0)
+      mNotePlayTracker.AddEvent(lineNum);
 }
 
 void ScriptModule::ButtonClicked(ClickButton* button)
@@ -615,6 +608,12 @@ void ScriptModule::Resize(float w, float h)
    mHeight = h;
 }
 
+bool ScriptModule::MouseScrolled(int x, int y, float scrollX, float scrollY)
+{
+   mCodeEntry->NotifyMouseScrolled(x,y,scrollX,scrollY);
+   return false;
+}
+
 void ScriptModule::LoadLayout(const ofxJSONElement& moduleInfo)
 {
    SetUpFromSaveData();
@@ -664,10 +663,11 @@ void ScriptModule::LineEventTracker::Draw(CodeEntry* codeEntry, int style, ofCol
    ofFill();
    for (int i=0; i<kNumLineTrackers; ++i)
    {
-      if (gTime - mTimes[i] < 200)
+      float alpha = style == 0 ? 200 : 150;
+      float fadeMs = style == 0 ? 200 : 150;
+      if (gTime - mTimes[i] < fadeMs)
       {
-         float alpha = style == 0 ? 200 : 100;
-         ofSetColor(color, alpha*(1-(gTime - mTimes[i])/200));
+         ofSetColor(color, alpha*(1-(gTime - mTimes[i])/fadeMs));
          ofVec2f linePos = codeEntry->GetLinePos(i);
          if (style == 0)
             ofRect(linePos.x + 1, linePos.y + 3, 4, codeEntry->GetCharHeight(), L(corner,0));

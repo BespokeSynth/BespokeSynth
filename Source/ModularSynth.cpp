@@ -689,7 +689,12 @@ void ModularSynth::MouseDragged(int intX, int intY, int button)
    {
       int moduleX,moduleY;
       mResizeModule->GetPosition(moduleX, moduleY);
-      mResizeModule->Resize(x - moduleX, y - moduleY);
+      float newWidth = x - moduleX;
+      float newHeight = y - moduleY;
+      ofVec2f minimumDimensions = mResizeModule->GetMinimumDimensions();
+      newWidth = MAX(newWidth, minimumDimensions.x);
+      newHeight = MAX(newHeight, minimumDimensions.y);
+      mResizeModule->Resize(newWidth, newHeight);
    }
 
    mModuleContainer.MouseMoved(x, y);
