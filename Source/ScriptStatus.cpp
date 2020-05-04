@@ -8,17 +8,22 @@
   ==============================================================================
 */
 
+#define ssize_t ssize_t_undef_hack  //fixes conflict with ssize_t typedefs between python and juce
 #include "ScriptStatus.h"
 #include "SynthGlobals.h"
 #include "ModularSynth.h"
 #include "UIControlMacros.h"
 #include "ScriptModule.h"
+#undef ssize_t
+
+#include "pybind11/embed.h"
+
+namespace py = pybind11;
 
 ScriptStatus::ScriptStatus()
 : mNextUpdateTime(0)
 {
    ScriptModule::InitializePythonIfNecessary();
-   mPythonGlobals = py::globals();
 }
 
 ScriptStatus::~ScriptStatus()
@@ -41,7 +46,7 @@ void ScriptStatus::Poll()
 {
    if (gTime > mNextUpdateTime)
    {
-      mStatus = py::str(mPythonGlobals);
+      mStatus = py::str(py::globals());
       ofStringReplace(mStatus, ",", "\n");
       mNextUpdateTime = gTime + 100;
    }

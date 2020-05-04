@@ -14,9 +14,6 @@
 #include "IDrawableModule.h"
 #include "OpenFrameworksPort.h"
 #include "ClickButton.h"
-#include "pybind11/embed.h"
-
-namespace py = pybind11;
 
 class ScriptStatus : public IDrawableModule, public IButtonListener
 {
@@ -48,7 +45,6 @@ private:
    
    ClickButton* mResetAll;
    
-   py::object mPythonGlobals;
    string mStatus;
    double mNextUpdateTime;
    

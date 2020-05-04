@@ -78,7 +78,7 @@ ModularSynth::~ModularSynth()
    assert(TheSynth == this);
    TheSynth = nullptr;
    
-   pybind11::finalize_interpreter();
+   ScriptModule::UninitializePython();
 }
 
 bool ModularSynth::IsReady()

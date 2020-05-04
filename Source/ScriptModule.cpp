@@ -8,10 +8,16 @@
   ==============================================================================
 */
 
+#define ssize_t ssize_t_undef_hack  //fixes conflict with ssize_t typedefs between python and juce
 #include "ScriptModule.h"
 #include "SynthGlobals.h"
 #include "ModularSynth.h"
 #include "UIControlMacros.h"
+#undef ssize_t
+
+#include "pybind11/embed.h"
+
+namespace py = pybind11;
 
 //static
 std::vector<ScriptModule*> ScriptModule::sScriptModules;
@@ -30,8 +36,6 @@ ScriptModule::ScriptModule()
 , mNextLineToExecute(-1)
 {
    InitializePythonIfNecessary();
-
-   mPythonGlobals = py::globals();
    
    for (int i=0; i<kScheduledNoteOutputBufferSize; ++i)
       mScheduledNoteOutput[i].time = -1;
@@ -438,7 +442,7 @@ string ScriptModule::GetThisName()
 void ScriptModule::RunScript(double time)
 {
    //should only be called from main thread
-   py::exec(GetThisName()+" = scriptmodule.get_this("+ofToString(mScriptModuleIndex)+")", mPythonGlobals);
+   py::exec(GetThisName()+" = scriptmodule.get_this("+ofToString(mScriptModuleIndex)+")", py::globals());
    string code = mCodeEntry->GetText();
    vector<string> lines = ofSplitString(code, "\n");
    code = "";
@@ -469,7 +473,7 @@ void ScriptModule::RunCode(double time, string code)
       
       FixUpCode(code);
       //ofLog() << code;
-      py::exec(code, mPythonGlobals);
+      py::exec(code, py::globals());
       
       //ofLog() << "&&&&";
       //ofLog() << (string)py::str(mPythonGlobals);

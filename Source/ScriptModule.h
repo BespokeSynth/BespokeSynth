@@ -16,10 +16,7 @@
 #include "ClickButton.h"
 #include "NoteEffectBase.h"
 #include "IPulseReceiver.h"
-#include "pybind11/embed.h"
 #include "Slider.h"
-
-namespace py = pybind11;
 
 class ScriptModule : public IDrawableModule, public IButtonListener, public NoteEffectBase, public IPulseReceiver, public ICodeEntryListener, public IFloatSliderListener
 {
@@ -106,8 +103,6 @@ private:
    bool mDrawDebug;
    string mLastRunLiteralCode;
    int mNextLineToExecute;
-   
-   py::object mPythonGlobals;
    
    struct ScheduledNoteOutput
    {
