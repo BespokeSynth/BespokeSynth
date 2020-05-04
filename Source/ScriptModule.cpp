@@ -29,6 +29,8 @@ ScriptModule::ScriptModule()
 , mDrawDebug(false)
 , mNextLineToExecute(-1)
 {
+   InitializePythonIfNecessary();
+
    mPythonGlobals = py::globals();
    
    for (int i=0; i<kScheduledNoteOutputBufferSize; ++i)
@@ -67,15 +69,24 @@ void ScriptModule::CreateUIControls()
    ENDUIBLOCK(mWidth, mHeight);
 }
 
-void ScriptModule::ResetPython()
+static bool sPythonInitialized = false;
+
+void ScriptModule::UninitializePython()
 {
-   static bool sFirst = true;
-   if (!sFirst)
-      pybind11::finalize_interpreter();
-   sFirst = false;
-   pybind11::initialize_interpreter();
-   py::exec("import bespoke", py::globals());
-   py::exec("import scriptmodule", py::globals());
+   if (sPythonInitialized)
+      py::finalize_interpreter();
+   sPythonInitialized = false;
+}
+
+void ScriptModule::InitializePythonIfNecessary()
+{
+   if (!sPythonInitialized)
+   {
+      py::initialize_interpreter();
+      py::exec("import bespoke", py::globals());
+      py::exec("import scriptmodule", py::globals());
+   }
+   sPythonInitialized = true;
 }
 
 void ScriptModule::DrawModule()

@@ -61,7 +61,7 @@ public:
    void SaveState(FileStreamOut& out);
    void LoadState(FileStreamIn& in);
    
-   static int GetModuleSeparatorLength() { return 13; }
+   static constexpr int GetModuleSeparatorLength() { return 13; }
    static const char* GetModuleSeparator() { return "ryanchallinor"; }
    static bool DoesModuleHaveMoreSaveData(FileStreamIn& in);
    

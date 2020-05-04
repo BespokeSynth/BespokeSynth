@@ -17,6 +17,7 @@
 ScriptStatus::ScriptStatus()
 : mNextUpdateTime(0)
 {
+   ScriptModule::InitializePythonIfNecessary();
    mPythonGlobals = py::globals();
 }
 
@@ -58,7 +59,8 @@ void ScriptStatus::DrawModule()
 
 void ScriptStatus::ButtonClicked(ClickButton *button)
 {
-   ScriptModule::ResetPython();
+   ScriptModule::UninitializePython();
+   ScriptModule::InitializePythonIfNecessary();
 }
 
 void ScriptStatus::LoadLayout(const ofxJSONElement& moduleInfo)

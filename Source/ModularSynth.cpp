@@ -1382,7 +1382,7 @@ bool ModularSynth::LoadLayoutFromString(string jsonString)
 
 void ModularSynth::LoadLayout(ofxJSONElement json)
 {
-   ScriptModule::ResetPython();
+   ScriptModule::UninitializePython();
    
    //ofLoadURLAsync("http://bespoke.com/telemetry/"+jsonFile);
    

@@ -28,7 +28,8 @@ public:
    virtual ~ScriptModule();
    static IDrawableModule* Create() { return new ScriptModule(); }
    
-   static void ResetPython();
+   static void UninitializePython();
+   static void InitializePythonIfNecessary();
    
    string GetTitleLabel() override { return "script"; }
    void CreateUIControls() override;

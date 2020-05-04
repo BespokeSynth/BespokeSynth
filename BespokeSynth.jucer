@@ -1013,12 +1013,13 @@
             extraCompilerFlags="/bigobj" vstLegacyFolder="..\VST_SDK\VST2_SDK\public.sdk\source\vst2.x">
       <CONFIGURATIONS>
         <CONFIGURATION name="Debug" winWarningLevel="2" generateManifest="1" winArchitecture="x64"
-                       isDebug="1" optimisation="1" targetName="BespokeSynth" headerPath="../../Source/json/include&#10;../../Source/glew/include&#10;../../Source/push2/&#10;../../Source/push2/libusb&#10;../../Source/push2/modules/libusb"
-                       fastMath="0" debugInformationFormat="ProgramDatabase" enablePluginBinaryCopyStep="0"/>
+                       isDebug="1" optimisation="1" targetName="BespokeSynth" headerPath="../../Source/json/include&#10;../../Source/glew/include&#10;../../Source/push2/&#10;../../Source/push2/libusb&#10;../../Source/push2/modules/libusb&#10;C:\Python27\include"
+                       fastMath="0" debugInformationFormat="ProgramDatabase" enablePluginBinaryCopyStep="0"
+                       libraryPath="C:\Python27\libs"/>
         <CONFIGURATION name="Release" winWarningLevel="2" generateManifest="1" winArchitecture="x64"
-                       isDebug="0" optimisation="3" targetName="BespokeSynth" headerPath="../../Source/json/include&#10;../../Source/glew/include&#10;../../Source/push2/&#10;../../Source/push2/libusb&#10;../../Source/push2/modules/libusb"
+                       isDebug="0" optimisation="3" targetName="BespokeSynth" headerPath="../../Source/json/include&#10;../../Source/glew/include&#10;../../Source/push2/&#10;../../Source/push2/libusb&#10;../../Source/push2/modules/libusb&#10;C:\Python27\include"
                        debugInformationFormat="ProgramDatabase" enablePluginBinaryCopyStep="0"
-                       linkTimeOptimisation="1"/>
+                       linkTimeOptimisation="1" libraryPath="C:\Python27\libs"/>
       </CONFIGURATIONS>
       <MODULEPATHS>
         <MODULEPATH id="juce_video" path="..\JUCE\modules"/>
