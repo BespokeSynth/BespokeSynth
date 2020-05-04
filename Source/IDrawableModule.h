@@ -103,6 +103,7 @@ public:
    ModuleContainer* GetOwningContainer() const { return mOwningContainer; }
    virtual ModuleContainer* GetContainer() { return nullptr; }
    void SetShouldDrawOutline(bool should) { mShouldDrawOutline = should; }
+   ofVec2f GetMinimumDimensions();
    
    virtual void CheckboxUpdated(Checkbox* checkbox) {}
    
@@ -154,8 +155,6 @@ private:
    vector<IUIControl*> mUIControls;
    vector<IDrawableModule*> mChildren;
    vector<FloatSlider*> mFloatSliders;
-   int mWidth;
-   int mHeight;
    static const int mTitleBarHeight = 12;
    string mTypeName;
    static const int sResizeCornerSize = 8;

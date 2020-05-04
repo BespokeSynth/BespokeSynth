@@ -64,6 +64,7 @@ private:
    
    void OnClicked(int x, int y, bool right) override;
    bool MouseMoved(float x, float y) override;
+   bool MouseScrolled(int x, int y, float scrollX, float scrollY) override;
    
    ICodeEntryListener* mListener;
    float mWidth;
@@ -80,4 +81,5 @@ private:
    double mLastPublishTime;
    bool mHasError;
    int mErrorLine;
+   ofVec2f mScroll;
 };

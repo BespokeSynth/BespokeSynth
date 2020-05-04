@@ -38,8 +38,6 @@ float IDrawableModule::sBrightness = 220;
 IDrawableModule::IDrawableModule()
 : mModuleType(kModuleType_Unknown)
 , mMinimized(false)
-, mWidth(100)
-, mHeight(100)
 , mMinimizeAreaClicked(false)
 , mMinimizeAnimation(0)
 , mEnabled(true)
@@ -637,7 +635,9 @@ void IDrawableModule::GetDimensions(int& width, int& height)
    {
       width = 1; height = 1; return;   //special case for repatch stub, let it be 1 pixel
    }
-   moduleWidth = MAX(GetMinimizedWidth() + 10, moduleWidth);
+   ofVec2f minimumDimensions = GetMinimumDimensions();
+   moduleWidth = MAX(moduleWidth, minimumDimensions.x);
+   moduleHeight = MAX(moduleHeight, minimumDimensions.y);
    
    width = EaseIn(moduleWidth, minimizedWidth, mMinimizeAnimation);
    height = EaseOut(moduleHeight, minimizedHeight, mMinimizeAnimation);
@@ -656,6 +656,11 @@ float IDrawableModule::GetMinimizedWidth()
    if (mEnabledCheckbox)
       width += TitleBarHeight();
    return MAX(width, 50);
+}
+
+ofVec2f IDrawableModule::GetMinimumDimensions()
+{
+   return ofVec2f(GetMinimizedWidth() + 10, 10);
 }
 
 void IDrawableModule::KeyPressed(int key, bool isRepeat)
