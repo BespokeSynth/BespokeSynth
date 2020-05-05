@@ -8,12 +8,16 @@
   ==============================================================================
 */
 
+#if BESPOKE_WINDOWS
 #define ssize_t ssize_t_undef_hack  //fixes conflict with ssize_t typedefs between python and juce
+#endif
 #include "ScriptModule.h"
 #include "SynthGlobals.h"
 #include "ModularSynth.h"
 #include "UIControlMacros.h"
+#if BESPOKE_WINDOWS
 #undef ssize_t
+#endif
 
 #include "pybind11/embed.h"
 
