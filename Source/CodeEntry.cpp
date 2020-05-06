@@ -180,9 +180,7 @@ void CodeEntry::OnClicked(int x, int y, bool right)
    
    float col = GetColForX(x);
    float row = GetRowForY(y);
-   mCaretPosition = GetCaretPosition(col, row);
-   if (!(GetKeyModifiers() & kModifier_Shift))
-      mCaretPosition2 = mCaretPosition;
+   MoveCaret(GetCaretPosition(col, row));
    
    MakeActive();
 }
@@ -206,12 +204,25 @@ void CodeEntry::OnKeyPressed(int key, bool isRepeat)
       }
       else if (mCaretPosition > 0)
       {
-         --mCaretPosition;
-         mCaretPosition2 = mCaretPosition;
+         MoveCaret(mCaretPosition - 1, false);
          if (mCaretPosition < mString.length() - 1)
             mString = mString.substr(0, mCaretPosition) + mString.substr(mCaretPosition+1);
          else
             mString = mString.substr(0, mCaretPosition);
+      }
+   }
+   else if (key == KeyPress::deleteKey)
+   {
+      if (mCaretPosition != mCaretPosition2)
+      {
+         RemoveSelectedText();
+      }
+      else if (mCaretPosition > 0)
+      {
+         if (mCaretPosition == 0)
+            mString = mString.substr(1);
+         if (mCaretPosition < mString.length() - 1)
+            mString = mString.substr(0, mCaretPosition) + mString.substr(mCaretPosition + 1);
       }
    }
    else if (key == OF_KEY_TAB)
@@ -234,38 +245,24 @@ void CodeEntry::OnKeyPressed(int key, bool isRepeat)
    {
       if (GetKeyModifiers() & kModifier_Command)
       {
-         ofVec2f coords = GetCaretCoords(mCaretPosition);
-         mCaretPosition = GetCaretPosition(0, coords.y);
-         if (!(GetKeyModifiers() & kModifier_Shift))
-            mCaretPosition2 = mCaretPosition;
+         MoveCaretToStart();
       }
       else
       {
          if (mCaretPosition > 0)
-         {
-            --mCaretPosition;
-            if (!(GetKeyModifiers() & kModifier_Shift))
-               mCaretPosition2 = mCaretPosition;
-         }
+            MoveCaret(mCaretPosition - 1);
       }
    }
    else if (key == OF_KEY_RIGHT)
    {
       if (GetKeyModifiers() & kModifier_Command)
       {
-         ofVec2f coords = GetCaretCoords(mCaretPosition);
-         mCaretPosition = GetCaretPosition(9999, coords.y);
-         if (!(GetKeyModifiers() & kModifier_Shift))
-            mCaretPosition2 = mCaretPosition;
+         MoveCaretToEnd();
       }
       else
       {
          if (mCaretPosition < mString.length())
-         {
-            ++mCaretPosition;
-            if (!(GetKeyModifiers() & kModifier_Shift))
-               mCaretPosition2 = mCaretPosition;
-         }
+            MoveCaret(mCaretPosition + 1);
       }
    }
    else if (key == OF_KEY_UP)
@@ -273,17 +270,13 @@ void CodeEntry::OnKeyPressed(int key, bool isRepeat)
       ofVec2f coords = GetCaretCoords(mCaretPosition);
       if (coords.y > 0)
          --coords.y;
-      mCaretPosition = GetCaretPosition(coords.x, coords.y);
-      if (!(GetKeyModifiers() & kModifier_Shift))
-         mCaretPosition2 = mCaretPosition;
+      MoveCaret(GetCaretPosition(coords.x, coords.y));
    }
    else if (key == OF_KEY_DOWN)
    {
       ofVec2f coords = GetCaretCoords(mCaretPosition);
       ++coords.y;
-      mCaretPosition = GetCaretPosition(coords.x, coords.y);
-      if (!(GetKeyModifiers() & kModifier_Shift))
-         mCaretPosition2 = mCaretPosition;
+      MoveCaret(GetCaretPosition(coords.x, coords.y));
    }
    else if (key == OF_KEY_RETURN)
    {
@@ -343,6 +336,14 @@ void CodeEntry::OnKeyPressed(int key, bool isRepeat)
             RemoveSelectedText();
       }
    }
+   else if (key == KeyPress::endKey)
+   {
+      MoveCaretToEnd();
+   }
+   else if (key == KeyPress::homeKey)
+   {
+      MoveCaretToStart();
+   }
    else if (key == 'R' && GetKeyModifiers() == kModifier_Command)
    {
       Publish();
@@ -368,8 +369,7 @@ void CodeEntry::AddCharacter(char c)
          RemoveSelectedText();
       
       mString = mString.substr(0, mCaretPosition) + c + mString.substr(mCaretPosition);
-      ++mCaretPosition;
-      mCaretPosition2 = mCaretPosition;
+      MoveCaret(mCaretPosition + 1, false);
    }
 }
 
@@ -385,8 +385,28 @@ void CodeEntry::RemoveSelectedText()
    int caretStart = MIN(mCaretPosition, mCaretPosition2);
    int caretEnd = MAX(mCaretPosition, mCaretPosition2);
    mString = mString.substr(0, caretStart) + mString.substr(caretEnd);
-   mCaretPosition = caretStart;
-   mCaretPosition2 = mCaretPosition;
+   MoveCaret(caretStart, false);
+}
+
+void CodeEntry::MoveCaret(int pos, bool allowSelection /*=true*/)
+{
+   mCaretPosition = pos;
+   if (!allowSelection || !(GetKeyModifiers() & kModifier_Shift))
+      mCaretPosition2 = mCaretPosition;
+   mCaretBlink = true;
+   mCaretBlinkTimer = 0;
+}
+
+void CodeEntry::MoveCaretToStart()
+{
+   ofVec2f coords = GetCaretCoords(mCaretPosition);
+   MoveCaret(GetCaretPosition(0, coords.y));
+}
+
+void CodeEntry::MoveCaretToEnd()
+{
+   ofVec2f coords = GetCaretCoords(mCaretPosition);
+   MoveCaret(GetCaretPosition(9999, coords.y));
 }
 
 bool CodeEntry::MouseMoved(float x, float y)

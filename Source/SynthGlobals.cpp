@@ -470,8 +470,10 @@ int GetKeyModifiers()
       ret |= kModifier_Shift;
    if (modifiers.isAltDown())
       ret |= kModifier_Alt;
+#if BESPOKE_MAC
    if (modifiers.isCtrlDown())
-      ret |= kModifier_Control;
+      ret |= kModifier_Control;   //control and command interfere with each other on non-mac keyboards
+#endif
    if (modifiers.isCommandDown())
       ret |= kModifier_Command;
    return ret;

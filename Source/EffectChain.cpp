@@ -116,13 +116,20 @@ void EffectChain::Process(double time)
          mDryBuffer.CopyFrom(GetBuffer());
          
          mEffects[i]->ProcessAudio(time,GetBuffer());
-         
-         float dryWet = mDryWetLevels[i];
+       
+         float* dryWetBuffer = gWorkBuffer;
+         float* invDryWetBuffer = gWorkBuffer + bufferSize;
+         for (int j = 0; j < bufferSize; ++j)
+         {
+            ComputeSliders(j);
+            dryWetBuffer[j] = mDryWetLevels[i];
+            invDryWetBuffer[j] = 1.0f - mDryWetLevels[i];
+         }
 
          for (int ch=0; ch<GetBuffer()->NumActiveChannels(); ++ch)
          {
-            Mult(mDryBuffer.GetChannel(ch), (1-dryWet), bufferSize);
-            Mult(GetBuffer()->GetChannel(ch), dryWet, bufferSize);
+            Mult(mDryBuffer.GetChannel(ch), invDryWetBuffer, bufferSize);
+            Mult(GetBuffer()->GetChannel(ch), dryWetBuffer, bufferSize);
             Add(GetBuffer()->GetChannel(ch), mDryBuffer.GetChannel(ch), bufferSize);
          }
       }

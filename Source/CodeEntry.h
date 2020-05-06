@@ -61,6 +61,9 @@ private:
    int GetRowForY(float y);
    ofVec2f GetCaretCoords(int caret);
    void RemoveSelectedText();
+   void MoveCaret(int pos, bool allowSelection = true);
+   void MoveCaretToStart();
+   void MoveCaretToEnd();
    
    void OnClicked(int x, int y, bool right) override;
    bool MouseMoved(float x, float y) override;

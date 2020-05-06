@@ -562,7 +562,7 @@ void IDrawableModule::MouseReleased()
       source->MouseReleased();
 }
 
-IUIControl* IDrawableModule::FindUIControl(const char* name) const
+IUIControl* IDrawableModule::FindUIControl(const char* name, bool fail /*=true*/) const
 {
    if (name != 0)
    {
@@ -572,7 +572,8 @@ IUIControl* IDrawableModule::FindUIControl(const char* name) const
             return mUIControls[i];
       }
    }
-   throw UnknownUIControlException();
+   if (fail)
+      throw UnknownUIControlException();
    return nullptr;
 }
 
@@ -682,7 +683,7 @@ void IDrawableModule::AddUIControl(IUIControl* control)
       string name = control->Name();
       if (CanSaveState() && name.empty() == false)
       {
-         IUIControl* dupe = FindUIControl(name.c_str());
+         IUIControl* dupe = FindUIControl(name.c_str(), false);
          if (dupe != nullptr)
          {
             if (dynamic_cast<ClickButton*>(control) != nullptr && dynamic_cast<ClickButton*>(dupe) != nullptr)

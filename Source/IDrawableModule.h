@@ -64,7 +64,7 @@ public:
    void DrawConnection(IClickable* target);
    void AddUIControl(IUIControl* control);
    void RemoveUIControl(IUIControl* control);
-   IUIControl* FindUIControl(const char* name) const;
+   IUIControl* FindUIControl(const char* name, bool fail = true) const;
    vector<IUIControl*> GetUIControls() const;
    void AddChild(IDrawableModule* child);
    void RemoveChild(IDrawableModule* child);

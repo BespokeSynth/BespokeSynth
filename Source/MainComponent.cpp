@@ -181,16 +181,30 @@ public:
                                                                     true,
                                                                     "",
                                                                     &preferredSetupOptions);
+
+      if (!audioError.isEmpty() && audioError == "The input and output devices don't share a common sample rate!")
+      {
+         //bail and try again with no input device. TODO(Ryan) this is a gross lazy hack and should be worked out in the future
+         audioError = mGlobalManagers.mDeviceManager.initialise(0,
+                                                                MAX_OUTPUT_CHANNELS,
+                                                                nullptr,
+                                                                true,
+                                                                "",
+                                                                &preferredSetupOptions);
+      }
+
       if (audioError.isEmpty())
       {
          auto loadedSetup = mGlobalManagers.mDeviceManager.getAudioDeviceSetup();
          if (outputDevice != kAutoDevice && loadedSetup.outputDeviceName.toStdString() != outputDevice)
          {
-            mSynth.SetFatalError("error setting output device to "+outputDevice+", fix this in userprefs.json (use \"auto\" for default device)");
+            mSynth.SetFatalError("error setting output device to "+outputDevice+", fix this in userprefs.json (use \"auto\" for default device)"+
+                                 "\n\n\nvalid devices:\n"+GetAudioDevices());
          }
          else if (inputDevice != kAutoDevice && loadedSetup.inputDeviceName.toStdString() != inputDevice)
          {
-            mSynth.SetFatalError("error setting input device to "+inputDevice+", fix this in userprefs.json (use \"auto\" for default device)");
+            mSynth.SetFatalError("error setting input device to "+inputDevice+", fix this in userprefs.json (use \"auto\" for default device)"+
+                                 "\n\n\nvalid devices:\n"+GetAudioDevices());
          }
          else if (loadedSetup.bufferSize != gBufferSize)
          {
@@ -216,7 +230,8 @@ public:
             audioError += "\n\nfix this in userprefs.json (you can use \"auto\" for the default device)";
          else
             audioError += "\n\ninitialization errors could potentially be fixed by changing buffer size, sample rate, or input/output devices in userprefs.json";
-         mSynth.SetFatalError("error initializing audio device: "+audioError.toStdString());
+         mSynth.SetFatalError("error initializing audio device: "+audioError.toStdString() +
+                              "\n\n\nvalid devices:\n" + GetAudioDevices());
       }
       
       startTimerHz(60);
@@ -363,6 +378,35 @@ private:
       mSynth.FilesDropped(strFiles, x, y);
    }
    
+   string GetAudioDevices()
+   {
+      string ret;
+      OwnedArray<AudioIODeviceType> types;
+      mGlobalManagers.mDeviceManager.createAudioDeviceTypes(types);
+      for (int i = 0; i < types.size(); ++i)
+      {
+         String typeName(types[i]->getTypeName());  // This will be things like "DirectSound", "CoreAudio", etc.
+         types[i]->scanForDevices();                 // This must be called before getting the list of devices
+
+         ret += "output:\n";
+         {
+            StringArray deviceNames(types[i]->getDeviceNames(false));
+            for (int j = 0; j < deviceNames.size(); ++j)
+               ret += typeName.toStdString() + ": " + deviceNames[j].toStdString() + "\n";
+         }
+
+         ret += "\ninput:\n";
+         {
+            StringArray deviceNames(types[i]->getDeviceNames(true));
+            for (int j = 0; j < deviceNames.size(); ++j)
+               ret += typeName.toStdString() + ": " + deviceNames[j].toStdString() + "\n";
+         }
+
+         ret += "\n";
+      }
+      return ret;
+   }
+
    GlobalManagers mGlobalManagers;
    
    ModularSynth mSynth;
