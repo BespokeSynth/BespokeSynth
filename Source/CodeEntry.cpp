@@ -312,7 +312,7 @@ void CodeEntry::OnKeyPressed(int key, bool isRepeat)
       for (int i=0; i<clipboard.length(); ++i)
          AddCharacter(clipboard[i]);
    }
-   else if (key == 'V' && (GetKeyModifiers() == kModifier_Command | kModifier_Shift))
+   else if (key == 'V' && (GetKeyModifiers() == (kModifier_Command | kModifier_Shift)))
    {
       if (gHoveredUIControl != nullptr)
       {
@@ -458,9 +458,19 @@ int CodeEntry::GetRowForY(float y)
    return int(y / mCharHeight);
 }
 
-ofVec2f CodeEntry::GetLinePos(int lineNum)
+ofVec2f CodeEntry::GetLinePos(int lineNum, bool end /*= false*/)
 {
-   return ofVec2f(mX - mScroll.x, lineNum * mCharHeight + mY - mScroll.y);
+   float x = mX - mScroll.x;
+   float y = lineNum * mCharHeight + mY - mScroll.y;
+   
+   if (end)
+   {
+      vector<string> lines = ofSplitString(mString, "\n");
+      if (lineNum < (int)lines.size())
+         x += lines[lineNum].length() * mCharWidth;
+   }
+   
+   return ofVec2f(x, y);
 }
 
 ofVec2f CodeEntry::GetCaretCoords(int caret)

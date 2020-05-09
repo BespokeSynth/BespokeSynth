@@ -50,6 +50,9 @@ ScriptModule::ScriptModule()
    for (int i=0; i<kPendingNoteInputBufferSize; ++i)
       mPendingNoteInput[i].time = -1;
    
+   for (int i=0; i<kPrintDisplayBufferSize; ++i)
+      mPrintDisplay[i].time = -1;
+   
    mScriptModuleIndex = sScriptModules.size();
    sScriptModules.push_back(this);
 }
@@ -138,6 +141,39 @@ void ScriptModule::DrawModule()
           gTime + 50 < mScheduledMethodCall[i].time)
          DrawTimer(mScheduledMethodCall[i].lineNum, mScheduledMethodCall[i].startTime, mScheduledMethodCall[i].time, IDrawableModule::GetColor(kModuleType_Other));
    }
+   
+   ofPushStyle();
+   for (int i=0; i<kPrintDisplayBufferSize; ++i)
+   {
+      float fadeMs = 500;
+      if (gTime - mPrintDisplay[i].time < fadeMs)
+      {
+         ofSetColor(ofColor::white, 255*(1-(gTime - mPrintDisplay[i].time)/fadeMs));
+         ofVec2f linePos = mCodeEntry->GetLinePos(mPrintDisplay[i].lineNum, K(end));
+         DrawTextNormal(mPrintDisplay[i].text, linePos.x + 10, linePos.y + 15);
+      }
+      else
+      {
+         mPrintDisplay[i].time = -1;
+      }
+   }
+   
+   for (int i=0; i<kUIControlModificationBufferSize; ++i)
+   {
+      float fadeMs = 500;
+      if (gTime - mUIControlModifications[i].time < fadeMs)
+      {
+         ofSetColor(IDrawableModule::GetColor(kModuleType_Modulator), 255*(1-(gTime - mUIControlModifications[i].time)/fadeMs));
+         ofVec2f linePos = mCodeEntry->GetLinePos(mUIControlModifications[i].lineNum, K(end));
+         DrawTextNormal(ofToString(mUIControlModifications[i].value), linePos.x + 10, linePos.y + 15);
+      }
+      else
+      {
+         mUIControlModifications[i].time = -1;
+      }
+   }
+   
+   ofPopStyle();
 }
 
 void ScriptModule::DrawModuleUnclipped()
@@ -162,6 +198,25 @@ void ScriptModule::DrawModuleUnclipped()
       
       DrawTextNormal(debugText, mWidth, 0);
    }
+   
+   ofPushStyle();
+   for (int i=0; i<kUIControlModificationBufferSize; ++i)
+   {
+      float fadeMs = 200;
+      if (gTime - mUIControlModifications[i].time < fadeMs)
+      {
+         ofSetColor(IDrawableModule::GetColor(kModuleType_Modulator), 100*(1-(gTime - mUIControlModifications[i].time)/fadeMs));
+         
+         ofVec2f linePos = mCodeEntry->GetLinePos(mUIControlModifications[i].lineNum);
+      
+         ofPushMatrix();
+         ofTranslate(-mX, -mY);
+         ofSetLineWidth(1);
+         ofLine(mX + linePos.x + 11, mY + linePos.y + 10, mUIControlModifications[i].position.x, mUIControlModifications[i].position.y);
+         ofPopMatrix();
+      }
+   }
+   ofPopStyle();
 }
 
 void ScriptModule::DrawTimer(int lineNum, double startTime, double endTime, ofColor color)
@@ -188,7 +243,11 @@ void ScriptModule::Poll()
    if (mScheduledPulseTime != -1)
    {
       if (mLastError == "")
+      {
+         if (mScheduledPulseTime < gTime)
+            ofLog() << "trying to run script triggered by pulse too late!";
          RunCode(mScheduledPulseTime, "on_pulse()");
+      }
       mScheduledPulseTime = -1;
    }
    
@@ -198,7 +257,11 @@ void ScriptModule::Poll()
           gTime + 50 > mPendingNoteInput[i].time)
       {
          if (mLastError == "")
+         {
+            if (mScheduledPulseTime < gTime)
+               ofLog() << "trying to run script triggered by note too late!";
             RunCode(mPendingNoteInput[i].time, "on_note("+ofToString(mPendingNoteInput[i].pitch)+", "+ofToString(mPendingNoteInput[i].velocity)+")");
+         }
          mPendingNoteInput[i].time = -1;
       }
    }
@@ -298,7 +361,7 @@ PYBIND11_EMBEDDED_MODULE(scriptmodule, m)
          if (control != nullptr)
          {
             control->SetValue(value);
-            module.OnAdjustUIControl();
+            module.OnAdjustUIControl(control, value);
          }
       })
       .def("get", [](ScriptModule &module, string path)
@@ -315,13 +378,18 @@ PYBIND11_EMBEDDED_MODULE(scriptmodule, m)
          {
             float min, max;
             control->GetRange(min, max);
-            control->SetValue(ofClamp(control->GetValue() + amount, min, max));
-            module.OnAdjustUIControl();
+            float value = ofClamp(control->GetValue() + amount, min, max);
+            control->SetValue(value);
+            module.OnAdjustUIControl(control, value);
          }
       })
       .def("highlight_line", [](ScriptModule& module, int lineNum)
       {
          module.HighlightLine(lineNum);
+      })
+      .def("output", [](ScriptModule& module, string text)
+      {
+         module.PrintText(text);
       });
 }
 
@@ -335,9 +403,15 @@ void ScriptModule::PlayNoteFromScriptAfterDelay(int pitch, int velocity, float d
    double time = sMostRecentRunTime + delayMeasureTime * TheTransport->MsPerBar();
    
    if (time <= sMostRecentRunTime)
+   {
+      if (time < gTime)
+         ofLog() << "trying to play a note in the past!";
       PlayNote(time, pitch, velocity, 0, mNextLineToExecute);
+   }
    else
+   {
       ScheduleNote(time, pitch, velocity);
+   }
 }
 
 void ScriptModule::ScheduleNote(double time, int pitch, int velocity)
@@ -379,6 +453,20 @@ void ScriptModule::HighlightLine(int lineNum)
    mLineExecuteTracker.AddEvent(lineNum);
 }
 
+void ScriptModule::PrintText(string text)
+{
+   for (int i=0; i<kPrintDisplayBufferSize; ++i)
+   {
+      if (mPrintDisplay[i].time == -1 || mPrintDisplay[i].lineNum == mNextLineToExecute)
+      {
+         mPrintDisplay[i].time = gTime;
+         mPrintDisplay[i].text = text;
+         mPrintDisplay[i].lineNum = mNextLineToExecute;
+         break;
+      }
+   }
+}
+
 IUIControl* ScriptModule::GetUIControl(string path)
 {
    IUIControl* control;
@@ -390,9 +478,21 @@ IUIControl* ScriptModule::GetUIControl(string path)
    return control;
 }
 
-void ScriptModule::OnAdjustUIControl()
+void ScriptModule::OnAdjustUIControl(IUIControl* control, float value)
 {
    mUIControlTracker.AddEvent(mNextLineToExecute);
+   
+   for (int i=0; i<kUIControlModificationBufferSize; ++i)
+   {
+      if (mUIControlModifications[i].time == -1 || mUIControlModifications[i].lineNum == mNextLineToExecute)
+      {
+         mUIControlModifications[i].time = gTime;
+         mUIControlModifications[i].position = control->GetRect().getCenter();
+         mUIControlModifications[i].value = value;
+         mUIControlModifications[i].lineNum = mNextLineToExecute;
+         break;
+      }
+   }
 }
 
 void ScriptModule::PlayNote(double time, int pitch, int velocity, float pan, int lineNum)
@@ -401,7 +501,7 @@ void ScriptModule::PlayNote(double time, int pitch, int velocity, float pan, int
    modulation.pan = pan;
    PlayNoteOutput(time, pitch, velocity, -1, modulation);
    if (velocity > 0)
-      mNotePlayTracker.AddEvent(lineNum);
+      mNotePlayTracker.AddEvent(lineNum, ofToString(pitch) + " " + ofToString(velocity));
 }
 
 void ScriptModule::ButtonClicked(ClickButton* button)
@@ -468,6 +568,7 @@ void ScriptModule::RunCode(double time, string code)
    //should only be called from main thread
    
    sMostRecentRunTime = time;
+   mNextLineToExecute = -1;
    ComputeSliders(time);
 
    try
@@ -498,21 +599,42 @@ void ScriptModule::RunCode(double time, string code)
       
       mLastError = (string)py::str(e.type()) + ": "+ (string)py::str(e.value());
       
-      int lineNumber = 0;
-      PyTracebackObject* trace = (PyTracebackObject*)e.trace().ptr();
-      if (trace != nullptr)
+      int lineNumber = mNextLineToExecute;
+      if (lineNumber == -1)
       {
-         while (trace->tb_next)
-            trace = trace->tb_next;
-         PyFrameObject* frame = trace->tb_frame;
-         while (frame)
+         //PyErr_NormalizeException(&e.type().ptr(),&e.value().ptr(),&e.trace().ptr());
+
+         /*char *msg, *file, *text;
+         int line, offset;
+
+         int res = PyArg_ParseTuple(e.value().ptr(),"s(siis)",&msg,&file,&line,&offset,&text);
+
+         //ofLog() << e.value().
+         
+         if (res > 0)
          {
-            if (frame->f_back != nullptr)
-               lineNumber += PyFrame_GetLineNumber(frame);
-            if (frame->f_back == nullptr)
-               lineNumber -= PyFrame_GetLineNumber(frame);  //take away root frame? not sure.
-            frame = frame->f_back;
-         }
+            PyObject* line_no = PyObject_GetAttrString(e.value().ptr(),"lineno");
+            PyObject* line_no_str = PyObject_Str(line_no);
+            PyObject* line_no_unicode = PyUnicode_AsEncodedString(line_no_str,"utf-8", "Error");
+            char *actual_line_no = PyBytes_AsString(line_no_unicode);  // Line number
+            ofLog() << actual_line_no;
+         }*/
+         
+         /*PyTracebackObject* trace = (PyTracebackObject*)e.trace().ptr();
+         if (trace != nullptr)
+         {
+            while (trace->tb_next)
+               trace = trace->tb_next;
+            PyFrameObject* frame = trace->tb_frame;
+            while (frame)
+            {
+               if (frame->f_back != nullptr)
+                  lineNumber += PyFrame_GetLineNumber(frame);
+               if (frame->f_back == nullptr)
+                  lineNumber -= PyFrame_GetLineNumber(frame);  //take away root frame? not sure.
+               frame = frame->f_back;
+            }
+         }*/
       }
       
       mCodeEntry->SetError(true, lineNumber);
@@ -692,6 +814,12 @@ void ScriptModule::LineEventTracker::Draw(CodeEntry* codeEntry, int style, ofCol
             ofRect(linePos.x + 1, linePos.y + 3, 4, codeEntry->GetCharHeight(), L(corner,0));
          if (style == 1)
             ofCircle(linePos.x + 11, linePos.y + 10, 5);
+         
+         if (mText[i] != "")
+         {
+            ofVec2f linePos = codeEntry->GetLinePos(i, K(end));
+            DrawTextNormal(mText[i], linePos.x + 10, linePos.y + 15);
+         }
       }
    }
    ofPopStyle();

@@ -37,8 +37,9 @@ public:
    void PlayNoteFromScriptAfterDelay(int pitch, int velocity, float delayMeasureTime);
    void ScheduleMethod(string method, float delayMeasureTime);
    void HighlightLine(int lineNum);
+   void PrintText(string text);
    IUIControl* GetUIControl(string path);
-   void OnAdjustUIControl();
+   void OnAdjustUIControl(IUIControl* control, float value);
    
    void OnPulse(float amount, int samplesTo, int flags) override;
    void ButtonClicked(ClickButton* button) override;
@@ -134,6 +135,25 @@ private:
    static const int kPendingNoteInputBufferSize = 50;
    PendingNoteInput mPendingNoteInput[kPendingNoteInputBufferSize];
    
+   struct PrintDisplay
+   {
+      double time;
+      string text;
+      int lineNum;
+   };
+   static const int kPrintDisplayBufferSize = 10;
+   PrintDisplay mPrintDisplay[kPrintDisplayBufferSize];
+   
+   struct UIControlModificationDisplay
+   {
+      double time;
+      ofVec2f position;
+      float value;
+      int lineNum;
+   };
+   static const int kUIControlModificationBufferSize = 10;
+   UIControlModificationDisplay mUIControlModifications[kUIControlModificationBufferSize];
+   
    class LineEventTracker
    {
    public:
@@ -143,16 +163,20 @@ private:
             mTimes[i] = -999;
       }
       
-      void AddEvent(int lineNum)
+      void AddEvent(int lineNum, string text = "")
       {
          if (lineNum >= 0 && lineNum < kNumLineTrackers)
+         {
             mTimes[lineNum] = gTime;
+            mText[lineNum] = text;
+         }
       }
       
       void Draw(CodeEntry* codeEntry, int style, ofColor color);
    private:
       static const int kNumLineTrackers = 256;
       double mTimes[kNumLineTrackers];
+      string mText[kNumLineTrackers];
    };
    
    LineEventTracker mLineExecuteTracker;

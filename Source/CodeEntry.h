@@ -46,7 +46,7 @@ public:
    bool IsSliderControl() override { return false; }
    bool IsButtonControl() override { return false; }
    
-   ofVec2f GetLinePos(int lineNum);
+   ofVec2f GetLinePos(int lineNum, bool end=false);
    float GetCharHeight() const { return mCharHeight; }
    float GetCharWidth() const { return mCharWidth; }
    
