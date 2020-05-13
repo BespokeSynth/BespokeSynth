@@ -70,7 +70,7 @@ void NoteRouter::RadioButtonUpdated(RadioButton* radio, int oldVal)
          {
             if (mReceivers[oldVal] == dynamic_cast<INoteReceiver*>(cable->GetTarget()))
             {
-               mNoteOutput.FlushTarget(mReceivers[oldVal]);
+               mNoteOutput.FlushTarget(gTime, mReceivers[oldVal]);
                cable->Destroy();
                break;
             }
@@ -99,7 +99,7 @@ void NoteRouter::RadioButtonUpdated(RadioButton* radio, int oldVal)
                {
                   if (mReceivers[i] == dynamic_cast<INoteReceiver*>(cable->GetTarget()))
                   {
-                     mNoteOutput.FlushTarget(mReceivers[i]);
+                     mNoteOutput.FlushTarget(gTime, mReceivers[i]);
                      cable->Destroy();
                      break;
                   }

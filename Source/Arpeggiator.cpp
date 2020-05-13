@@ -54,7 +54,7 @@ Arpeggiator::Arpeggiator()
 , mOctaveRepeats(1)
 , mOctaveRepeatsSlider(nullptr)
 {
-   TheTransport->AddListener(this, mInterval);
+   TheTransport->AddListener(this, mInterval, OffsetInfo(0, true), true);
    TheScale->AddListener(this);
    
    bzero(mArpString, MAX_TEXTENTRY_LENGTH);
@@ -248,7 +248,7 @@ bool Arpeggiator::MouseMoved(float x, float y)
 void Arpeggiator::CheckboxUpdated(Checkbox* checkbox)
 {
    if (checkbox == mEnabledCheckbox)
-      mNoteOutput.Flush();
+      mNoteOutput.Flush(gTime);
    if (checkbox == mUseHeldNotesCheckbox)
    {
       if (mUseHeldNotes)
@@ -317,7 +317,7 @@ void Arpeggiator::PlayNote(double time, int pitch, int velocity, int voiceIdx, M
    } 
 }
 
-void Arpeggiator::OnTimeEvent(int samplesTo)
+void Arpeggiator::OnTimeEvent(double time)
 {
    if (!mEnabled)
       return;
@@ -345,7 +345,7 @@ void Arpeggiator::OnTimeEvent(int samplesTo)
    if (mChord.size() == 0)
    {
       if (mLastPitch != -1)
-         PlayNoteOutput(gTime, mLastPitch, 0, -1);
+         PlayNoteOutput(time, mLastPitch, 0, -1);
       mLastPitch = -1;
       return;
    }
@@ -387,7 +387,7 @@ void Arpeggiator::OnTimeEvent(int samplesTo)
       }
    }
 
-   if (mResetOnDownbeat && TheTransport->GetQuantized(0, mInterval) == 0)
+   if (mResetOnDownbeat && TheTransport->GetQuantized(time, mInterval) == 0)
       mArpIndex = 0;
 
    int offPitch = -1;
@@ -430,18 +430,18 @@ void Arpeggiator::OnTimeEvent(int samplesTo)
          {
             if (mLastPitch == outPitch)   //same note, play noteoff first
             {
-               PlayNoteOutput(gTime, mLastPitch, 0, -1);
+               PlayNoteOutput(time, mLastPitch, 0, -1);
                offPitch = -1;
             }
             float pressure = current.modulation.pressure ? current.modulation.pressure->GetValue(0) : 0;
-            PlayNoteOutput(gTime, outPitch, ofClamp(current.vel+127*pressure,0,127), current.voiceIdx, current.modulation);
+            PlayNoteOutput(time, outPitch, ofClamp(current.vel+127*pressure,0,127), current.voiceIdx, current.modulation);
             mLastPitch = outPitch;
          }
       }
    }
    if (offPitch != -1)
    {
-      PlayNoteOutput(gTime, offPitch, 0, -1);
+      PlayNoteOutput(time, offPitch, 0, -1);
       if (offPitch == mLastPitch)
          mLastPitch = -1;
    }
@@ -495,7 +495,7 @@ void Arpeggiator::UpdateInterval()
    if (mUpbeats)
       upbeatLength = (1.0f/TheTransport->CountInStandardMeasure(mInterval)) / 2.0f;
    
-   TheTransport->UpdateListener(this, mInterval, upbeatLength, false);
+   TheTransport->UpdateListener(this, mInterval, OffsetInfo(upbeatLength, false));
 }
 
 void Arpeggiator::ButtonClicked(ClickButton* button)

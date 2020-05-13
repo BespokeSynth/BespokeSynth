@@ -23,7 +23,7 @@ Beats::Beats()
 {
    mWriteBuffer = new float[gBufferSize];
    Clear(mWriteBuffer, gBufferSize);
-   TheTransport->AddListener(this, kInterval_1n);
+   TheTransport->AddListener(this, kInterval_1n, OffsetInfo(0, true), false);
 }
 
 void Beats::CreateUIControls()
@@ -113,7 +113,7 @@ void Beats::RadioButtonUpdated(RadioButton* list, int oldVal)
       column->RadioButtonUpdated(list, oldVal);
 }
 
-void Beats::OnTimeEvent(int samplesTo)
+void Beats::OnTimeEvent(double time)
 {
 }
 
@@ -199,9 +199,9 @@ void BeatData::LoadBeat(const SampleInfo* info)
    }
 }
 
-void BeatData::RecalcPos(bool doubleTime)
+void BeatData::RecalcPos(double time, bool doubleTime)
 {
-   float measurePos = TheTransport->GetMeasure() % mNumBars + TheTransport->GetMeasurePos();
+   float measurePos = TheTransport->GetMeasure(time) % mNumBars + TheTransport->GetMeasurePos(time);
    float pos = ofMap(measurePos/mNumBars, 0, 1, 0, mBeat->LengthInSamples(), true);
    if (doubleTime)
    {
@@ -240,7 +240,7 @@ void BeatColumn::Process(double time, float* buffer, int bufferSize)
       float speed = beat->LengthInSamples() * gInvSampleRateMs / TheTransport->MsPerBar() / mBeatData.mNumBars;
       if (mDoubleTime)
          speed *= 2;
-      mBeatData.RecalcPos(mDoubleTime);
+      mBeatData.RecalcPos(time, mDoubleTime);
       beat->SetRate(speed);
       
       //TODO(Ryan) multichannel

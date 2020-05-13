@@ -50,7 +50,7 @@ void ScaleDegree::DrawModule()
 void ScaleDegree::CheckboxUpdated(Checkbox *checkbox)
 {
    if (checkbox == mEnabledCheckbox)
-      mNoteOutput.Flush();
+      mNoteOutput.Flush(gTime);
 }
 
 void ScaleDegree::PlayNote(double time, int pitch, int velocity, int voiceIdx, ModulationParameters modulation)
@@ -129,7 +129,7 @@ void ScaleDegree::DropdownUpdated(DropdownList* slider, int oldVal)
       
       for (list<int>::iterator iter = heldNotes.begin(); iter != heldNotes.end(); ++iter)
          PlayNoteOutput(gTime,*iter,0,-1);*/
-      mNoteOutput.Flush();
+      mNoteOutput.Flush(gTime);
    }
 }
 

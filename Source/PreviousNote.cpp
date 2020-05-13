@@ -41,7 +41,7 @@ void PreviousNote::PlayNote(double time, int pitch, int velocity, int voiceIdx, 
    }
    else
    {
-      mNoteOutput.Flush();
+      mNoteOutput.Flush(time);
    }
 }
 

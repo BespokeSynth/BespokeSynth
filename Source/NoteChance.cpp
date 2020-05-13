@@ -36,16 +36,16 @@ void NoteChance::DrawModule()
    
    mChanceSlider->Draw();
    
-   if (gTime - mLastAcceptTime < 200)
+   if (gTime - mLastAcceptTime > 0 && gTime - mLastAcceptTime < 200)
    {
       ofPushStyle();
-      ofSetColor(0,255,0,255*(1-(gTime - mLastRejectTime)/200));
+      ofSetColor(0,255,0,255*(1-(gTime - mLastAcceptTime)/200));
       ofFill();
       ofRect(106,2,10,7);
       ofPopStyle();
    }
    
-   if (gTime - mLastRejectTime < 200)
+   if (gTime - mLastRejectTime > 0 && gTime - mLastRejectTime < 200)
    {
       ofPushStyle();
       ofSetColor(255,0,0,255*(1-(gTime - mLastRejectTime)/200));

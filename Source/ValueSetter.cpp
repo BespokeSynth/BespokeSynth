@@ -52,7 +52,7 @@ void ValueSetter::PostRepatch(PatchCableSource* cableSource, bool fromUserClick)
    mTarget = dynamic_cast<IUIControl*>(mControlCable->GetTarget());
 }
 
-void ValueSetter::OnPulse(float velocity, int samplesTo, int flags)
+void ValueSetter::OnPulse(double time, float velocity, int flags)
 {
    if (velocity > 0 && mEnabled)
    {

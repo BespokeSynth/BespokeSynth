@@ -38,13 +38,13 @@ void Neighborhooder::DrawModule()
 void Neighborhooder::CheckboxUpdated(Checkbox *checkbox)
 {
    if (checkbox == mEnabledCheckbox)
-      mNoteOutput.Flush();
+      mNoteOutput.Flush(gTime);
 }
 
 void Neighborhooder::IntSliderUpdated(IntSlider* slider, int oldVal)
 {
    if (slider == mMinSlider || slider == mRangeSlider)
-      mNoteOutput.Flush();
+      mNoteOutput.Flush(gTime);
 }
 
 void Neighborhooder::PlayNote(double time, int pitch, int velocity, int voiceIdx, ModulationParameters modulation)

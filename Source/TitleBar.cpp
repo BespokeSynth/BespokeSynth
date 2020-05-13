@@ -153,6 +153,7 @@ void TitleBar::CreateUIControls()
    mQuitButton = new ClickButton(this,"quit",400,1);
    mDisplayHelpButton = new ClickButton(this," ? ",380,1);
    mLoadLayoutDropdown = new DropdownList(this, "load layout", 140, 20, &mLoadLayoutIndex);
+   mEventLookaheadCheckbox = new Checkbox(this, "do event lookahead (exp.)", mResetLayoutButton, kAnchor_Right, &Transport::sDoEventLookahead);
    
    mLoadLayoutDropdown->SetShowing(false);
    mSaveLayoutButton->SetShowing(false);
@@ -331,6 +332,7 @@ void TitleBar::DrawModule()
    mQuitButton->Draw();
    mDisplayHelpButton->SetPosition(ofGetWidth()/gDrawScale - 51, 4);
    mDisplayHelpButton->Draw();
+   mEventLookaheadCheckbox->Draw();
 }
 
 bool TitleBar::HiddenByZoom() const

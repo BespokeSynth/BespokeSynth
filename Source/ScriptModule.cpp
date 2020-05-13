@@ -31,7 +31,6 @@ double ScriptModule::sMostRecentRunTime = 0;
 ScriptModule::ScriptModule()
 : mCodeEntry(nullptr)
 , mRunButton(nullptr)
-, mScheduledPulseTime(-1)
 , mA(0)
 , mB(0)
 , mC(0)
@@ -40,6 +39,9 @@ ScriptModule::ScriptModule()
 , mNextLineToExecute(-1)
 {
    InitializePythonIfNecessary();
+   
+   for (int i=0; i<kScheduledPulseBufferSize; ++i)
+      mScheduledPulseTimes[i] = -1;
    
    for (int i=0; i<kScheduledNoteOutputBufferSize; ++i)
       mScheduledNoteOutput[i].time = -1;
@@ -55,6 +57,8 @@ ScriptModule::ScriptModule()
    
    mScriptModuleIndex = sScriptModules.size();
    sScriptModules.push_back(this);
+   
+   Transport::sDoEventLookahead = true;   //scripts require lookahead to be able to schedule on time
 }
 
 ScriptModule::~ScriptModule()
@@ -96,6 +100,7 @@ void ScriptModule::InitializePythonIfNecessary()
       py::initialize_interpreter();
       py::exec("import bespoke", py::globals());
       py::exec("import scriptmodule", py::globals());
+      py::exec("import random", py::globals());
    }
    sPythonInitialized = true;
 }
@@ -146,7 +151,7 @@ void ScriptModule::DrawModule()
    for (int i=0; i<kPrintDisplayBufferSize; ++i)
    {
       float fadeMs = 500;
-      if (gTime - mPrintDisplay[i].time < fadeMs)
+      if (gTime - mPrintDisplay[i].time > 0 && gTime - mPrintDisplay[i].time < fadeMs)
       {
          ofSetColor(ofColor::white, 255*(1-(gTime - mPrintDisplay[i].time)/fadeMs));
          ofVec2f linePos = mCodeEntry->GetLinePos(mPrintDisplay[i].lineNum, K(end));
@@ -161,7 +166,7 @@ void ScriptModule::DrawModule()
    for (int i=0; i<kUIControlModificationBufferSize; ++i)
    {
       float fadeMs = 500;
-      if (gTime - mUIControlModifications[i].time < fadeMs)
+      if (gTime - mUIControlModifications[i].time > 0 && gTime - mUIControlModifications[i].time < fadeMs)
       {
          ofSetColor(IDrawableModule::GetColor(kModuleType_Modulator), 255*(1-(gTime - mUIControlModifications[i].time)/fadeMs));
          ofVec2f linePos = mCodeEntry->GetLinePos(mUIControlModifications[i].lineNum, K(end));
@@ -178,6 +183,7 @@ void ScriptModule::DrawModule()
 
 void ScriptModule::DrawModuleUnclipped()
 {
+   ofPushStyle();
    if (mDrawDebug)
    {
       string debugText = mLastRunLiteralCode;
@@ -186,7 +192,7 @@ void ScriptModule::DrawModuleUnclipped()
       {
          if (mScheduledNoteOutput[i].time != -1 &&
              gTime + 50 < mScheduledNoteOutput[i].time)
-            debugText += "\n"+ofToString(mScheduledNoteOutput[i].pitch) + ", " + ofToString(mScheduledNoteOutput[i].time) + " " + ofToString(mScheduledNoteOutput[i].startTime) + " " + ofToString(mScheduledNoteOutput[i].lineNum);
+            debugText += "\nP:"+ofToString(mScheduledNoteOutput[i].pitch) + " V:" + ofToString(mScheduledNoteOutput[i].velocity) + ", " + ofToString(mScheduledNoteOutput[i].time) + " " + ofToString(mScheduledNoteOutput[i].startTime) + ", line:" + ofToString(mScheduledNoteOutput[i].lineNum);
       }
       
       for (int i=0; i<kScheduledMethodCallBufferSize; ++i)
@@ -196,14 +202,23 @@ void ScriptModule::DrawModuleUnclipped()
             debugText += "\n"+ofToString(mScheduledMethodCall[i].method) + ", " + ofToString(mScheduledMethodCall[i].time) + " " + ofToString(mScheduledMethodCall[i].startTime) + " " + ofToString(mScheduledMethodCall[i].lineNum);
       }
       
-      DrawTextNormal(debugText, mWidth, 0);
+      string lineNumbers = "";
+      vector<string> lines = ofSplitString(mLastRunLiteralCode, "\n");
+      for (size_t i=0; i<lines.size(); ++i)
+      {
+         lineNumbers += ofToString(i+1)+"\n";
+      }
+      
+      ofSetColor(100,100,100);
+      DrawTextNormal(lineNumbers, mWidth+5, 0);
+      ofSetColor(255,255,255);
+      DrawTextNormal(debugText, mWidth + 30, 0);
    }
    
-   ofPushStyle();
    for (int i=0; i<kUIControlModificationBufferSize; ++i)
    {
       float fadeMs = 200;
-      if (gTime - mUIControlModifications[i].time < fadeMs)
+      if (gTime - mUIControlModifications[i].time > 0 && gTime - mUIControlModifications[i].time < fadeMs)
       {
          ofSetColor(IDrawableModule::GetColor(kModuleType_Modulator), 100*(1-(gTime - mUIControlModifications[i].time)/fadeMs));
          
@@ -240,15 +255,19 @@ void ScriptModule::DrawTimer(int lineNum, double startTime, double endTime, ofCo
 
 void ScriptModule::Poll()
 {
-   if (mScheduledPulseTime != -1)
+   for (int i=0; i<kScheduledPulseBufferSize; ++i)
    {
-      if (mLastError == "")
+      if (mScheduledPulseTimes[i] != -1)
       {
-         if (mScheduledPulseTime < gTime)
-            ofLog() << "trying to run script triggered by pulse too late!";
-         RunCode(mScheduledPulseTime, "on_pulse()");
+         double runTime = mScheduledPulseTimes[i];
+         mScheduledPulseTimes[i] = -1;
+         if (mLastError == "")
+         {
+            //if (runTime < gTime)
+            //   ofLog() << "trying to run script triggered by pulse too late!";
+            RunCode(runTime, "on_pulse()");
+         }
       }
-      mScheduledPulseTime = -1;
    }
    
    for (int i=0; i<kPendingNoteInputBufferSize; ++i)
@@ -258,8 +277,8 @@ void ScriptModule::Poll()
       {
          if (mLastError == "")
          {
-            if (mScheduledPulseTime < gTime)
-               ofLog() << "trying to run script triggered by note too late!";
+            //if (mPendingNoteInput[i].time < gTime)
+            //   ofLog() << "trying to run script triggered by note too late!";
             RunCode(mPendingNoteInput[i].time, "on_note("+ofToString(mPendingNoteInput[i].pitch)+", "+ofToString(mPendingNoteInput[i].velocity)+")");
          }
          mPendingNoteInput[i].time = -1;
@@ -291,9 +310,7 @@ void ScriptModule::Poll()
 //static
 float ScriptModule::GetScriptMeasureTime()
 {
-   double timeOffset = sMostRecentRunTime - gTime;
-   float measureOffset = timeOffset / TheTransport->MsPerBar();
-   return TheTransport->GetMeasure() + TheTransport->GetMeasurePos() + measureOffset;
+   return TheTransport->GetMeasureTime(sMostRecentRunTime);
 }
 
 PYBIND11_EMBEDDED_MODULE(bespoke, m) {
@@ -405,7 +422,7 @@ void ScriptModule::PlayNoteFromScriptAfterDelay(int pitch, int velocity, float d
    if (time <= sMostRecentRunTime)
    {
       if (time < gTime)
-         ofLog() << "trying to play a note in the past!";
+         ofLog() << "script is trying to play a note in the past!";
       PlayNote(time, pitch, velocity, 0, mNextLineToExecute);
    }
    else
@@ -501,7 +518,7 @@ void ScriptModule::PlayNote(double time, int pitch, int velocity, float pan, int
    modulation.pan = pan;
    PlayNoteOutput(time, pitch, velocity, -1, modulation);
    if (velocity > 0)
-      mNotePlayTracker.AddEvent(lineNum, ofToString(pitch) + " " + ofToString(velocity));
+      mNotePlayTracker.AddEvent(lineNum, ofToString(pitch) + " " + ofToString(velocity) + " " + ofToString(pan,1));
 }
 
 void ScriptModule::ButtonClicked(ClickButton* button)
@@ -518,9 +535,16 @@ void ScriptModule::ExecuteCode(string code)
    RunScript(gTime);
 }
 
-void ScriptModule::OnPulse(float amount, int samplesTo, int flags)
+void ScriptModule::OnPulse(double time, float velocity, int flags)
 {
-   mScheduledPulseTime = gTime + samplesTo * gInvSampleRateMs;
+   for (int i=0; i<kScheduledPulseBufferSize; ++i)
+   {
+      if (mScheduledPulseTimes[i] == -1)
+      {
+         mScheduledPulseTimes[i] = time;
+         break;
+      }
+   }
 }
 
 //INoteReceiver
@@ -553,10 +577,10 @@ void ScriptModule::RunScript(double time)
    for (size_t i=0; i<lines.size(); ++i)
    {
       if (ShouldDisplayLineExecutionPre(i > 0 ? lines[i-1] : "", lines[i]))
-         code += GetIndentation(lines[i])+"this.highlight_line("+ofToString(i)+")\n";
+         code += GetIndentation(lines[i])+"this.highlight_line("+ofToString(i)+")               ###instrumentation###\n";
       code += lines[i]+"\n";
       if (ShouldDisplayLineExecutionPost(lines[i]))
-         code += GetIndentation(lines[i])+"   this.highlight_line("+ofToString(i)+")\n";
+         code += GetIndentation(lines[i])+"   this.highlight_line("+ofToString(i)+")               ###instrumentation###\n";
    }
    FixUpCode(code);
    mLastRunLiteralCode = code;
@@ -583,13 +607,6 @@ void ScriptModule::RunCode(double time, string code)
       //ofLog() << "&&&&";
       //ofLog() << (string)py::str(mPythonGlobals);
       
-      //line-by-line attempt
-      /*py::object scope = py::module::import("__main__").attr("__dict__");
-      py::exec("import bespoke", scope);
-      vector<string> lines = ofSplitString(mCodeEntry->GetText(), "\n");
-      for (size_t i=0; i<lines.size(); ++i)
-         py::exec(lines[i], scope);*/
-      
       mCodeEntry->SetError(false);
       mLastError = "";
    }
@@ -602,6 +619,32 @@ void ScriptModule::RunCode(double time, string code)
       int lineNumber = mNextLineToExecute;
       if (lineNumber == -1)
       {
+         string errorString = (string)py::str(e.value());
+         const string lineTextLabel = " line ";
+         const char* lineTextPos = strstr(errorString.c_str(), lineTextLabel.c_str());
+         if (lineTextPos != nullptr)
+         {
+            try
+            {
+               size_t start = lineTextPos + lineTextLabel.length() - errorString.c_str();
+               size_t len = errorString.size() - 1 - start;
+               string lineNumberText = errorString.substr(start, len);
+               int rawLineNumber = stoi(lineNumberText);
+               int realLineNumber = rawLineNumber - 1;
+               
+               vector<string> lines = ofSplitString(mLastRunLiteralCode, "\n");
+               for (size_t i=0; i<lines.size() && i < rawLineNumber; ++i)
+               {
+                  if (ofIsStringInString(lines[i], "###instrumentation###"))
+                     --realLineNumber;
+               }
+               
+               lineNumber = realLineNumber;
+            }
+            catch(std::exception const & e)
+            {
+            }
+         }
          //PyErr_NormalizeException(&e.type().ptr(),&e.value().ptr(),&e.trace().ptr());
 
          /*char *msg, *file, *text;
@@ -806,7 +849,7 @@ void ScriptModule::LineEventTracker::Draw(CodeEntry* codeEntry, int style, ofCol
    {
       float alpha = style == 0 ? 200 : 150;
       float fadeMs = style == 0 ? 200 : 150;
-      if (gTime - mTimes[i] < fadeMs)
+      if (gTime - mTimes[i] > 0 && gTime - mTimes[i] < fadeMs)
       {
          ofSetColor(color, alpha*(1-(gTime - mTimes[i])/fadeMs));
          ofVec2f linePos = codeEntry->GetLinePos(i);

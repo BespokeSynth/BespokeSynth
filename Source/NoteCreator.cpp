@@ -62,13 +62,13 @@ void NoteCreator::OnTransportAdvanced(float amount)
    if (mNoteOn && mNoteOnByTrigger && gTime > mStartTime + mDuration)
    {
       mNoteOn = false;
-      mNoteOutput.Flush();
+      mNoteOutput.Flush(gTime);
    }
 }
 
-void NoteCreator::OnPulse(float amount, int samplesTo, int flags)
+void NoteCreator::OnPulse(double time, float velocity, int flags)
 {
-   TriggerNote(gTime + samplesTo * gInvSampleRateMs, amount * mVelocity);
+   TriggerNote(time, velocity * mVelocity);
 }
 
 void NoteCreator::TriggerNote(double time, float velocity)
@@ -82,7 +82,7 @@ void NoteCreator::TriggerNote(double time, float velocity)
 void NoteCreator::CheckboxUpdated(Checkbox* checkbox)
 {
    if (checkbox == mEnabledCheckbox)
-      mNoteOutput.Flush();
+      mNoteOutput.Flush(gTime);
    if (checkbox == mNoteOnCheckbox)
    {
       if (mNoteOn)
@@ -93,7 +93,7 @@ void NoteCreator::CheckboxUpdated(Checkbox* checkbox)
       else
       {
          PlayNoteOutput(gTime, mPitch, 0, mVoiceIndex);
-         mNoteOutput.Flush();
+         mNoteOutput.Flush(gTime);
       }
    }
 }
@@ -109,7 +109,7 @@ void NoteCreator::TextEntryComplete(TextEntry* entry)
    if (entry == mPitchEntry)
    {
       mNoteOn = false;
-      mNoteOutput.Flush();
+      mNoteOutput.Flush(gTime);
    }
 }
 

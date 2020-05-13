@@ -33,7 +33,7 @@ class StepSequencerRow : public ITimeListener
 public:
    StepSequencerRow(StepSequencer* seq, UIGrid* grid, int row);
    ~StepSequencerRow();
-   void OnTimeEvent(int samplesTo) override;
+   void OnTimeEvent(double time) override;
    void SetOffset(float offset);
    void UpdateTimeListener();
 private:
@@ -48,7 +48,7 @@ class NoteRepeat : public ITimeListener
 public:
    NoteRepeat(StepSequencer* seq, int note);
    ~NoteRepeat();
-   void OnTimeEvent(int samplesTo) override;
+   void OnTimeEvent(double time) override;
    void SetInterval(NoteInterval interval);
    void SetOffset(float offset);
 private:
@@ -64,7 +64,7 @@ public:
    StepSequencerNoteFlusher(StepSequencer* seq);
    ~StepSequencerNoteFlusher();
    void SetInterval(NoteInterval interval);
-   void OnTimeEvent(int samplesTo) override;
+   void OnTimeEvent(double time) override;
 private:
    StepSequencer* mSeq;
 };
@@ -81,13 +81,13 @@ public:
    
    void Init() override;
    void Poll() override;
-   void PlayNote(int note, float val);
+   void PlayStepNote(double time, int note, float val);
    void SetEnabled(bool enabled) override { mEnabled = enabled; }
    bool Enabled() const override { return mEnabled; }
    int GetPadPressure(int row) { return mPadPressures[row]; }
    NoteInterval GetStepInterval() const { return mStepInterval; }
-   int GetStep(float offsetMs);
-   void Flush() { if (mEnabled) mNoteOutput.Flush(); }
+   int GetStepNum(double time);
+   void Flush(double time) { if (mEnabled) mNoteOutput.Flush(time); }
    
    //INoteReceiver
    void PlayNote(double time, int pitch, int velocity, int voiceIdx = -1, ModulationParameters modulation = ModulationParameters()) override;
@@ -95,7 +95,7 @@ public:
    void SendCC(int control, int value, int voiceIdx = -1) override {}
    
    //ITimeListener
-   void OnTimeEvent(int samplesTo) override;
+   void OnTimeEvent(double time) override;
    
    //IGridControllerListener
    void OnControllerPageSelected() override;
@@ -113,7 +113,7 @@ public:
    bool OnPush2Control(MidiMessageType type, int controlIndex, float midiValue) override;
    void UpdatePush2Leds(Push2Control* push2) override;
    
-   bool IsMetaStepActive(int col, int row);
+   bool IsMetaStepActive(double time, int col, int row);
 
    void CheckboxUpdated(Checkbox* checkbox) override;
    void FloatSliderUpdated(FloatSlider* slider, float oldVal) override;
@@ -145,7 +145,7 @@ private:
    int GetNumSteps(NoteInterval interval) const;
    Vec2i ControllerToGrid(const Vec2i& controller);
    int GetNumControllerChunks(); //how many vertical chunks of the sequence are there to fit multi-rowed on the controller?
-   int GetMetaStep();
+   int GetMetaStep(double time);
    int GetMetaStepMaskIndex(int col, int row) { return MIN(col, META_STEP_MAX-1) + row * META_STEP_MAX; }
    GridColor GetGridColor(int x, int y);
    

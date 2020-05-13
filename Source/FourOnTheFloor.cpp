@@ -16,7 +16,7 @@ FourOnTheFloor::FourOnTheFloor()
 : mTwoOnTheFloor(false)
 , mTwoOnTheFloorCheckbox(nullptr)
 {
-   TheTransport->AddListener(this, kInterval_4n);
+   TheTransport->AddListener(this, kInterval_4n, OffsetInfo(0, true), true);
 }
 
 void FourOnTheFloor::CreateUIControls()
@@ -38,13 +38,13 @@ void FourOnTheFloor::DrawModule()
    mTwoOnTheFloorCheckbox->Draw();
 }
 
-void FourOnTheFloor::OnTimeEvent(int samplesTo)
+void FourOnTheFloor::OnTimeEvent(double time)
 {
    if (!mEnabled)
       return;
    
    int kick = 0;
-   PlayNoteOutput(gTime, kick, 127, -1);
+   PlayNoteOutput(time, kick, 127, -1);
 }
 
 void FourOnTheFloor::CheckboxUpdated(Checkbox* checkbox)

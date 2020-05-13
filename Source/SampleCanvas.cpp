@@ -49,7 +49,7 @@ void SampleCanvas::Process(double time)
    
    int numBars = mCanvas->GetNumCols();
    
-   float canvasPos = ((TheTransport->GetMeasure() % numBars) + TheTransport->GetMeasurePos()) / numBars;
+   float canvasPos = ((TheTransport->GetMeasure(time) % numBars) + TheTransport->GetMeasurePos(time)) / numBars;
    
    mCanvas->SetCursorPos(canvasPos);
    

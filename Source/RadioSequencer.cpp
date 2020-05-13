@@ -24,7 +24,7 @@ RadioSequencer::RadioSequencer()
 , mLength(4)
 , mLengthSelector(nullptr)
 {
-   TheTransport->AddListener(this, mInterval, kEarlyOffsetMs);
+   TheTransport->AddListener(this, mInterval, OffsetInfo(kEarlyOffsetMs, true), false);
 }
 
 RadioSequencer::~RadioSequencer()
@@ -110,12 +110,12 @@ void RadioSequencer::UpdateGridLights()
    }
 }
 
-void RadioSequencer::OnTimeEvent(int samplesTo)
+void RadioSequencer::OnTimeEvent(double time)
 {
    int stepsPerMeasure = TheTransport->CountInStandardMeasure(mInterval) * TheTransport->GetTimeSigTop()/TheTransport->GetTimeSigBottom();
    int numMeasures = MAX(1,ceil(float(mGrid->GetCols()) / stepsPerMeasure));
-   int measure = TheTransport->GetMeasure() % numMeasures;
-   int step = (TheTransport->GetQuantized(0, mInterval) + measure * stepsPerMeasure) % mGrid->GetCols();
+   int measure = TheTransport->GetMeasure(time) % numMeasures;
+   int step = (TheTransport->GetQuantized(time, mInterval) + measure * stepsPerMeasure) % mGrid->GetCols();
    
    mGrid->SetHighlightCol(step);
    
@@ -246,7 +246,7 @@ void RadioSequencer::DropdownUpdated(DropdownList* list, int oldVal)
    {
       if (newSteps > 0)
       {
-         TheTransport->UpdateListener(this, mInterval, kEarlyOffsetMs);
+         TheTransport->UpdateListener(this, mInterval);
          SetNumSteps(newSteps, true);
       }
       else

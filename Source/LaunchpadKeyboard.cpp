@@ -47,7 +47,7 @@ LaunchpadKeyboard::LaunchpadKeyboard()
    
    TheScale->AddListener(this);
 
-   TheTransport->AddListener(this, kInterval_8n);
+   TheTransport->AddListener(this, kInterval_8n, OffsetInfo(0, true), false);
 
    mHeldChordTones.push_back(0);
    
@@ -188,7 +188,7 @@ void LaunchpadKeyboard::OnGridButton(int x, int y, float velocity, IGridControll
       {
          mLatch = !mLatch;
          if (!mLatch)
-            mNoteOutput.Flush();
+            mNoteOutput.Flush(gTime);
          UpdateLights();
       }
       return;
@@ -216,7 +216,7 @@ void LaunchpadKeyboard::OnGridButton(int x, int y, float velocity, IGridControll
                currentPitch = i;
             mCurrentNotes[i] = 0;
          }
-         mNoteOutput.Flush();
+         mNoteOutput.Flush(gTime);
 
          if (currentPitch == pitch)
          {
@@ -241,7 +241,7 @@ void LaunchpadKeyboard::OnGridButton(int x, int y, float velocity, IGridControll
          for (int i=0; i<128; ++i)
             mCurrentNotes[i] = 0;
          PressedNoteFor(x, y, (int)127*velocity);
-         mNoteOutput.Flush();
+         mNoteOutput.Flush(gTime);
          for (int i=0; i<mChords[x].size(); ++i)
             PlayNoteOutput(gTime, TheScale->MakeDiatonic(pitch+mChords[x][i]), 127*velocity, -1);
       }
@@ -258,7 +258,7 @@ void LaunchpadKeyboard::OnGridButton(int x, int y, float velocity, IGridControll
          {
             for (int i=0; i<128; ++i)
                mCurrentNotes[i] = 0;
-            mNoteOutput.Flush();
+            mNoteOutput.Flush(gTime);
          }
       }
    }
@@ -361,7 +361,7 @@ bool LaunchpadKeyboard::IsChordButtonPressed(int pitch)
    return ListContains(chordTone,mHeldChordTones);
 }
 
-void LaunchpadKeyboard::OnTimeEvent(int samplesTo)
+void LaunchpadKeyboard::OnTimeEvent(double time)
 {
 }
 
@@ -733,7 +733,7 @@ void LaunchpadKeyboard::CheckboxUpdated(Checkbox* checkbox)
    if (checkbox == mLatchCheckbox)
    {
       if (!mLatch)
-         mNoteOutput.Flush();
+         mNoteOutput.Flush(gTime);
    }
 }
 
@@ -743,7 +743,7 @@ void LaunchpadKeyboard::IntSliderUpdated(IntSlider* slider, int oldVal)
    {
       for (int i=0; i<128; ++i)
          mCurrentNotes[i] = 0;
-      mNoteOutput.Flush();
+      mNoteOutput.Flush(gTime);
       UpdateLights();
    }
 }

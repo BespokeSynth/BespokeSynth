@@ -30,7 +30,7 @@ VelocityStepSequencer::VelocityStepSequencer()
 , mCurrentVelocity(80)
 , mController(nullptr)
 {
-   TheTransport->AddListener(this, mInterval, -.1f);
+   TheTransport->AddListener(this, mInterval, OffsetInfo(-.1f, true), false);
 }
 
 void VelocityStepSequencer::CreateUIControls()
@@ -95,7 +95,7 @@ void VelocityStepSequencer::DrawModule()
 void VelocityStepSequencer::CheckboxUpdated(Checkbox* checkbox)
 {
    if (checkbox == mEnabledCheckbox)
-      mNoteOutput.Flush();
+      mNoteOutput.Flush(gTime);
 }
 
 void VelocityStepSequencer::PlayNote(double time, int pitch, int velocity, int voiceIdx, ModulationParameters modulation)
@@ -109,14 +109,14 @@ void VelocityStepSequencer::PlayNote(double time, int pitch, int velocity, int v
    PlayNoteOutput(time, pitch, velocity > 0 ? mCurrentVelocity : 0, voiceIdx, modulation);
 }
 
-void VelocityStepSequencer::OnTimeEvent(int samplesTo)
+void VelocityStepSequencer::OnTimeEvent(double time)
 {
    ++mArpIndex;
    
    if (mArpIndex >= mLength)
       mArpIndex = 0;
    
-   if (mResetOnDownbeat && TheTransport->GetQuantized(0, mInterval) == 0)
+   if (mResetOnDownbeat && TheTransport->GetQuantized(time, mInterval) == 0)
       mArpIndex = 0;
    
    mCurrentVelocity = mVels[mArpIndex];
@@ -146,7 +146,7 @@ void VelocityStepSequencer::ButtonClicked(ClickButton* button)
 void VelocityStepSequencer::DropdownUpdated(DropdownList* list, int oldVal)
 {
    if (list == mIntervalSelector)
-      TheTransport->UpdateListener(this, mInterval, -.1f);
+      TheTransport->UpdateListener(this, mInterval, OffsetInfo(-.1f, true));
 }
 
 void VelocityStepSequencer::IntSliderUpdated(IntSlider* slider, int oldVal)

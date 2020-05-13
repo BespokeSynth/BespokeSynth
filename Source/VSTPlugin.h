@@ -93,6 +93,7 @@ private:
    std::unique_ptr<AudioProcessor> mPlugin;
    juce::ScopedPointer<VSTWindow> mWindow;
    juce::MidiBuffer mMidiBuffer;
+   juce::MidiBuffer mFutureMidiBuffer;
    juce::CriticalSection mMidiInputLock;
    int mNumInputs;
    int mNumOutputs;

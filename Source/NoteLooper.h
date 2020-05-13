@@ -57,7 +57,7 @@ private:
    void Clear();
    void Retrigger();
    void TriggerRecordedNote(int pitch, int velocity);
-   void RecordNote(int pitch, int velocity);
+   void RecordNote(double time, int pitch, int velocity);
    void StopRecording();
    
    //IDrawableModule

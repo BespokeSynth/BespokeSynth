@@ -102,6 +102,7 @@ private:
    ClickButton* mQuitButton;
    DropdownList* mLoadLayoutDropdown;
    ClickButton* mDisplayHelpButton;
+   Checkbox* mEventLookaheadCheckbox;
    int mLoadLayoutIndex;
    
    HelpDisplay* mHelpDisplay;

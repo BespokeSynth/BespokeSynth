@@ -44,7 +44,7 @@ public:
    //IButtonListener
    void ButtonClicked(ClickButton* button) override;
    //ITimeListener
-   void OnTimeEvent(int samplesTo) override;
+   void OnTimeEvent(double time) override;
    //IFloatSliderLIstener
    void FloatSliderUpdated(FloatSlider* slider, float oldVal) override;
    

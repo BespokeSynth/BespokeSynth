@@ -133,7 +133,7 @@ void Chorder::CheckboxUpdated(Checkbox *checkbox)
 {
    if (checkbox == mEnabledCheckbox)
    {
-      mNoteOutput.Flush();
+      mNoteOutput.Flush(gTime);
       bzero(mHeldCount,TOTAL_NUM_NOTES*sizeof(int));
       bzero(mInputNotes, TOTAL_NUM_NOTES*sizeof(bool));
    }

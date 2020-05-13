@@ -30,7 +30,7 @@ Stutter::Stutter()
 , mFreeStutterLength(.1f)
 , mFreeStutterSpeed(1)
 {
-   TheTransport->AddListener(this, kInterval_16n);
+   TheTransport->AddListener(this, kInterval_16n, OffsetInfo(0, true), false);
    mBlendRamp.SetValue(0);
 }
 
@@ -313,11 +313,11 @@ void Stutter::IntSliderUpdated(IntSlider* slider, int oldVal)
 {
 }
 
-void Stutter::OnTimeEvent(int samplesTo)
+void Stutter::OnTimeEvent(double time)
 {
    if (mEnabled)
    {
-      if (mAutoStutter && TheTransport->GetMeasurePos() > .001f)  //don't auto-stutter downbeat
+      if (mAutoStutter && TheTransport->GetMeasurePos(time) > .001f)  //don't auto-stutter downbeat
       {
          if (rand() % 4 == 0)
          {

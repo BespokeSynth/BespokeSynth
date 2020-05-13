@@ -46,13 +46,13 @@ void NoteRangeFilter::DrawModule()
 void NoteRangeFilter::CheckboxUpdated(Checkbox* checkbox)
 {
    if (checkbox == mEnabledCheckbox)
-      mNoteOutput.Flush();
+      mNoteOutput.Flush(gTime);
 }
 
 void NoteRangeFilter::IntSliderUpdated(IntSlider* slider, int oldVal)
 {
    if (slider == mMinPitchSlider || slider == mMaxPitchSlider)
-      mNoteOutput.Flush();
+      mNoteOutput.Flush(gTime);
 }
 
 void NoteRangeFilter::PlayNote(double time, int pitch, int velocity, int voiceIdx, ModulationParameters modulation)

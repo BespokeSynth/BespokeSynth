@@ -55,7 +55,7 @@ public:
    void DropdownClicked(DropdownList* list) override;
    void DropdownUpdated(DropdownList* list, int oldVal) override;
    void ButtonClicked(ClickButton* button) override;
-   void OnTimeEvent(int samplesTo) override;
+   void OnTimeEvent(double time) override;
    
    void LoadLayout(const ofxJSONElement& moduleInfo) override;
    void SaveLayout(ofxJSONElement& moduleInfo) override;

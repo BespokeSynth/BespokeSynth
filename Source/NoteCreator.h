@@ -31,7 +31,7 @@ public:
    
    void OnTransportAdvanced(float amount) override;
    
-   void OnPulse(float amount, int samplesTo, int flags) override;
+   void OnPulse(double time, float velocity, int flags) override;
    
    void CheckboxUpdated(Checkbox* checkbox) override;
    void ButtonClicked(ClickButton* button) override;

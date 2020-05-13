@@ -18,7 +18,7 @@ Metronome::Metronome()
 , mVolume(.5f)
 , mVolumeSlider(nullptr)
 {
-   TheTransport->AddListener(this, kInterval_4n);
+   TheTransport->AddListener(this, kInterval_4n, OffsetInfo(0, true), false);
 }
 
 void Metronome::CreateUIControls()
@@ -56,9 +56,9 @@ void Metronome::Process(double time)
    }
 }
 
-void Metronome::OnTimeEvent(int samplesTo)
+void Metronome::OnTimeEvent(double time)
 {
-   int step = TheTransport->GetQuantized(0,kInterval_4n);
+   int step = TheTransport->GetQuantized(time,kInterval_4n);
    if (step == 0)
    {
       mPhaseInc = GetPhaseInc(880);

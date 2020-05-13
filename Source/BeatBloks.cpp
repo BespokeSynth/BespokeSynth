@@ -152,7 +152,7 @@ void BeatBloks::Process(double time)
       int numSamples = mSample->LengthInSamples();
       float sampleRateRatio = mSample->GetSampleRateRatio();
       
-      mPlayheadRemainder = TheTransport->GetMeasurePos() + (TheTransport->GetMeasure() % mNumBars);
+      mPlayheadRemainder = TheTransport->GetMeasurePos(time) + (TheTransport->GetMeasure(time) % mNumBars);
       mPlayheadRemainder /= mNumBars;
       mPlayheadRemainder *= clipEnd-clipStart;
       mPlayheadWhole = int(mPlayheadRemainder);

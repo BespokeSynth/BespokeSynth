@@ -51,6 +51,12 @@ FileStreamOut& FileStreamOut::operator<<(const float &var)
    return *this;
 }
 
+FileStreamOut& FileStreamOut::operator<<(const double &var)
+{
+   mStream.write((const void*)&var, sizeof(double));
+   return *this;
+}
+
 FileStreamOut& FileStreamOut::operator<<(const string &var)
 {
    size_t len = var.length();
@@ -97,6 +103,12 @@ FileStreamIn& FileStreamIn::operator>>(bool &var)
 FileStreamIn& FileStreamIn::operator>>(float &var)
 {
    mStream.read((void*)&var, sizeof(float));
+   return *this;
+}
+
+FileStreamIn& FileStreamIn::operator>>(double &var)
+{
+   mStream.read((void*)&var, sizeof(double));
    return *this;
 }
 

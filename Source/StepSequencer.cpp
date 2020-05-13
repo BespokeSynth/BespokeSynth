@@ -44,7 +44,7 @@ StepSequencer::StepSequencer()
 , mShiftLeftButton(nullptr)
 , mShiftRightButton(nullptr)
 {
-   TheTransport->AddListener(this, mStepInterval);
+   TheTransport->AddListener(this, mStepInterval, OffsetInfo(0, true), true);
    mFlusher.SetInterval(mStepInterval);
    
    mMetaStepMasks = new uint32[META_STEP_MAX * NUM_STEPSEQ_ROWS];
@@ -258,7 +258,7 @@ void StepSequencer::UpdateMetaLights()
          GridColor color;
          if (hasHeldButtons && (metaStepMask & (1 << x)))
             color = kGridColor1Bright;
-         else if (!hasHeldButtons && x == GetMetaStep())
+         else if (!hasHeldButtons && x == GetMetaStep(gTime))
             color = kGridColor3Bright;
          else
             color = kGridColorOff;
@@ -469,7 +469,7 @@ void StepSequencer::DrawModule()
                float y = pos.y + ((i / 4 + 1.5f) * (cellHeight / 4)) - cellHeight;
                float radius = cellHeight * .08f;
                
-               if (i == GetMetaStep())
+               if (i == GetMetaStep(gTime))
                {
                   ofSetColor(255, 220, 0);
                   ofCircle(x, y, radius * 1.5f);
@@ -600,13 +600,13 @@ int StepSequencer::GetNumSteps(NoteInterval interval) const
    return TheTransport->CountInStandardMeasure(interval) * TheTransport->GetTimeSigTop()/TheTransport->GetTimeSigBottom() * mNumMeasures;
 }
 
-int StepSequencer::GetStep(float offsetMs)
+int StepSequencer::GetStepNum(double time)
 {
-   int measure = TheTransport->GetMeasure() % mNumMeasures;
-   return TheTransport->GetQuantized(offsetMs, mStepInterval) + measure * GetNumSteps(mStepInterval) / mNumMeasures;
+   int measure = TheTransport->GetMeasure(time) % mNumMeasures;
+   return TheTransport->GetQuantized(time, mStepInterval) + measure * GetNumSteps(mStepInterval) / mNumMeasures;
 }
 
-void StepSequencer::OnTimeEvent(int samplesTo)
+void StepSequencer::OnTimeEvent(double time)
 {
    mGrid->SetGrid(GetNumSteps(mStepInterval),mNumRows);
 
@@ -616,22 +616,22 @@ void StepSequencer::OnTimeEvent(int samplesTo)
       return;
    }
  
-   mCurrentColumn = GetStep(0);
+   mCurrentColumn = GetStepNum(time);
    mGrid->SetHighlightCol(mCurrentColumn);
    UpdateLights();
    UpdateMetaLights();
 }
 
-void StepSequencer::PlayNote(int note, float val)
+void StepSequencer::PlayStepNote(double time, int note, float val)
 {
    if (mStochasticMode)
    {
       if (val > ofRandom(1))
-         mNoteOutput.PlayNote(gTime, note, val * 127);
+         mNoteOutput.PlayNote(time, note, val * 127);
    }
    else
    {
-      mNoteOutput.PlayNote(gTime, note, val * 127);
+      mNoteOutput.PlayNote(time, note, val * 127);
    }
 }
 
@@ -732,20 +732,20 @@ void StepSequencer::SetPreset(int preset)
    }
 }
 
-int StepSequencer::GetMetaStep()
+int StepSequencer::GetMetaStep(double time)
 {
-   return TheTransport->GetMeasure() % kMetaStepLoop;
+   return TheTransport->GetMeasure(time) % kMetaStepLoop;
 }
 
-bool StepSequencer::IsMetaStepActive(int col, int row)
+bool StepSequencer::IsMetaStepActive(double time, int col, int row)
 {
-   return mMetaStepMasks[GetMetaStepMaskIndex(col, row)] & (1 << GetMetaStep());
+   return mMetaStepMasks[GetMetaStepMaskIndex(col, row)] & (1 << GetMetaStep(time));
 }
 
 void StepSequencer::CheckboxUpdated(Checkbox* checkbox)
 {
    if (checkbox == mEnabledCheckbox)
-      mNoteOutput.Flush();
+      mNoteOutput.Flush(gTime);
 }
 
 void StepSequencer::FloatSliderUpdated(FloatSlider* slider, float oldVal)
@@ -923,7 +923,7 @@ StepSequencerRow::StepSequencerRow(StepSequencer* seq, UIGrid* grid, int row)
 , mRow(row)
 , mOffset(0)
 {
-   TheTransport->AddListener(this, mSeq->GetStepInterval());
+   TheTransport->AddListener(this, mSeq->GetStepInterval(), OffsetInfo(0, true), true);
 }
 
 StepSequencerRow::~StepSequencerRow()
@@ -931,16 +931,16 @@ StepSequencerRow::~StepSequencerRow()
    TheTransport->RemoveListener(this);
 }
 
-void StepSequencerRow::OnTimeEvent(int samplesTo)
+void StepSequencerRow::OnTimeEvent(double time)
 {
    if (mSeq->Enabled() == false)
       return;
    
    float offsetMs = mOffset*TheTransport->MsPerBar();
-   int step = mSeq->GetStep(offsetMs);
+   int step = mSeq->GetStepNum(time + offsetMs);
    float val = mGrid->GetVal(step,mRow);
-   if (val > 0 && mSeq->IsMetaStepActive(step,mRow))
-      mSeq->PlayNote(mRow, val * val);
+   if (val > 0 && mSeq->IsMetaStepActive(time, step,mRow))
+      mSeq->PlayStepNote(time, mRow, val * val);
 }
 
 void StepSequencerRow::SetOffset(float offset)
@@ -951,7 +951,7 @@ void StepSequencerRow::SetOffset(float offset)
 
 void StepSequencerRow::UpdateTimeListener()
 {
-   TheTransport->UpdateListener(this, mSeq->GetStepInterval(), mOffset, false);
+   TheTransport->UpdateListener(this, mSeq->GetStepInterval(), OffsetInfo(mOffset, false));
 }
 
 NoteRepeat::NoteRepeat(StepSequencer* seq, int row)
@@ -960,7 +960,7 @@ NoteRepeat::NoteRepeat(StepSequencer* seq, int row)
 , mOffset(0)
 , mInterval(kInterval_None)
 {
-   TheTransport->AddListener(this, mInterval);
+   TheTransport->AddListener(this, mInterval, OffsetInfo(0, true), true);
 }
 
 NoteRepeat::~NoteRepeat()
@@ -968,29 +968,29 @@ NoteRepeat::~NoteRepeat()
    TheTransport->RemoveListener(this);
 }
 
-void NoteRepeat::OnTimeEvent(int samplesTo)
+void NoteRepeat::OnTimeEvent(double time)
 {
    int pressure = mSeq->GetPadPressure(mRow);
    if (pressure > 10)
-      mSeq->PlayNote(mRow, pressure / 85.0f);
+      mSeq->PlayStepNote(time, mRow, pressure / 85.0f);
 }
 
 void NoteRepeat::SetInterval(NoteInterval interval)
 {
    mInterval = interval;
-   TheTransport->UpdateListener(this, mInterval, mOffset, false);
+   TheTransport->UpdateListener(this, mInterval, OffsetInfo(mOffset, false));
 }
 
 void NoteRepeat::SetOffset(float offset)
 {
    mOffset = offset;
-   TheTransport->UpdateListener(this, mInterval, mOffset, false);
+   TheTransport->UpdateListener(this, mInterval, OffsetInfo(mOffset, false));
 }
 
 StepSequencerNoteFlusher::StepSequencerNoteFlusher(StepSequencer* seq)
 : mSeq(seq)
 {
-   TheTransport->AddListener(this, mSeq->GetStepInterval(), .01f, false);
+   TheTransport->AddListener(this, mSeq->GetStepInterval(), OffsetInfo(.01f, false), true);
 }
 
 StepSequencerNoteFlusher::~StepSequencerNoteFlusher()
@@ -1000,11 +1000,11 @@ StepSequencerNoteFlusher::~StepSequencerNoteFlusher()
 
 void StepSequencerNoteFlusher::SetInterval(NoteInterval interval)
 {
-   TheTransport->UpdateListener(this, interval, .01f, false);
+   TheTransport->UpdateListener(this, interval, OffsetInfo(.01f, false));
 }
 
-void StepSequencerNoteFlusher::OnTimeEvent(int samplesTo)
+void StepSequencerNoteFlusher::OnTimeEvent(double time)
 {
-   mSeq->Flush();
+   mSeq->Flush(time);
 }
 

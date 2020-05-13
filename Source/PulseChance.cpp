@@ -36,16 +36,16 @@ void PulseChance::DrawModule()
    
    mChanceSlider->Draw();
    
-   if (gTime - mLastAcceptTime < 200)
+   if (gTime - mLastAcceptTime > 0 && gTime - mLastAcceptTime < 200)
    {
       ofPushStyle();
-      ofSetColor(0,255,0,255*(1-(gTime - mLastRejectTime)/200));
+      ofSetColor(0,255,0,255*(1-(gTime - mLastAcceptTime)/200));
       ofFill();
       ofRect(106,2,10,7);
       ofPopStyle();
    }
    
-   if (gTime - mLastRejectTime < 200)
+   if (gTime - mLastRejectTime > 0 && gTime - mLastRejectTime < 200)
    {
       ofPushStyle();
       ofSetColor(255,0,0,255*(1-(gTime - mLastRejectTime)/200));
@@ -55,13 +55,13 @@ void PulseChance::DrawModule()
    }
 }
 
-void PulseChance::OnPulse(float velocity, int samplesTo, int flags)
+void PulseChance::OnPulse(double time, float velocity, int flags)
 {
    ComputeSliders(0);
    
    bool accept = ofRandom(1) <= mChance;
    if (accept)
-      DispatchPulse(GetPatchCableSource(), velocity, samplesTo, flags);
+      DispatchPulse(GetPatchCableSource(), time, velocity, flags);
    
    if (accept)
       mLastAcceptTime = gTime;

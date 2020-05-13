@@ -28,7 +28,7 @@ PulseSequence::PulseSequence()
    for (int i=0; i<kMaxSteps; ++i)
       mVels[i] = 1;
    
-   TheTransport->AddListener(this, mInterval);
+   TheTransport->AddListener(this, mInterval, OffsetInfo(0, true), false);
    TheTransport->AddAudioPoller(this);
 }
 
@@ -118,19 +118,19 @@ void PulseSequence::OnTransportAdvanced(float amount)
    ComputeSliders(0);
 }
 
-void PulseSequence::OnTimeEvent(int samplesTo)
+void PulseSequence::OnTimeEvent(double time)
 {
    if (!mHasExternalPulseSource)
-      Step(1, samplesTo, 0);
+      Step(time, 1, 0);
 }
 
-void PulseSequence::OnPulse(float velocity, int samplesTo, int flags)
+void PulseSequence::OnPulse(double time, float velocity, int flags)
 {
    mHasExternalPulseSource = true;
-   Step(velocity, samplesTo, flags);
+   Step(time, velocity, flags);
 }
 
-void PulseSequence::Step(float velocity, int samplesTo, int flags)
+void PulseSequence::Step(double time, float velocity, int flags)
 {
    if (!mEnabled)
       return;
@@ -150,18 +150,18 @@ void PulseSequence::Step(float velocity, int samplesTo, int flags)
    {
       int stepsPerMeasure = TheTransport->CountInStandardMeasure(mInterval) * TheTransport->GetTimeSigTop()/TheTransport->GetTimeSigBottom();
       int numMeasures = ceil(float(mLength) / stepsPerMeasure);
-      int measure = TheTransport->GetMeasure() % numMeasures;
-      mStep = (TheTransport->GetQuantized(0, mInterval) + measure * stepsPerMeasure) % mLength;
+      int measure = TheTransport->GetMeasure(time) % numMeasures;
+      mStep = (TheTransport->GetQuantized(time, mInterval) + measure * stepsPerMeasure) % mLength;
    }
    
    float v = mVels[mStep] * velocity;
    
    if (v > 0)
    {
-      DispatchPulse(GetPatchCableSource(), v, samplesTo, 0);
+      DispatchPulse(GetPatchCableSource(), time, v, 0);
       
       if (mStep < kIndividualStepCables)
-         DispatchPulse(mStepCables[mStep], v, samplesTo, 0);
+         DispatchPulse(mStepCables[mStep], time, v, 0);
    }
    
    mVelocityGrid->SetHighlightCol(mStep);
@@ -210,7 +210,7 @@ void PulseSequence::ButtonClicked(ClickButton* button)
 void PulseSequence::DropdownUpdated(DropdownList* list, int oldVal)
 {
    if (list == mIntervalSelector)
-      TheTransport->UpdateListener(this, mInterval, 0, false);
+      TheTransport->UpdateListener(this, mInterval);
 }
 
 void PulseSequence::FloatSliderUpdated(FloatSlider* slider, float oldVal)

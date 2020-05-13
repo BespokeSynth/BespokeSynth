@@ -59,10 +59,10 @@ public:
    void OnTransportAdvanced(float amount) override;
    
    //ITimeListener
-   void OnTimeEvent(int samplesTo) override;
+   void OnTimeEvent(double time) override;
    
    //IPulseReceiver
-   void OnPulse(float velocity, int samplesTo, int flags) override;
+   void OnPulse(double time, float velocity, int flags) override;
    
    //IScaleListener
    void OnScaleChanged() override;
@@ -107,7 +107,7 @@ private:
    float ExtraWidth() const;
    float ExtraHeight() const;
    void RandomizePitches(bool fifths);
-   void Step(float velocity, int samplesTo, int pulseFlags);
+   void Step(double time, float velocity, int pulseFlags);
    
    enum NoteMode
    {

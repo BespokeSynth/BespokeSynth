@@ -21,7 +21,7 @@ class ITimeListener
 {
 public:
    virtual ~ITimeListener() {}
-   virtual void OnTimeEvent(int samplesTo) = 0;
+   virtual void OnTimeEvent(double time) = 0;
 };
 
 enum NoteInterval
@@ -52,15 +52,23 @@ enum NoteInterval
    kInterval_None
 };
 
+struct OffsetInfo
+{
+   OffsetInfo(double offset, bool offsetIsInMs)
+   : mOffset(offset), mOffsetIsInMs(offsetIsInMs) {}
+   double mOffset;
+   bool mOffsetIsInMs;
+};
+
 struct TransportListenerInfo
 {
-   TransportListenerInfo(ITimeListener* listener, NoteInterval interval, float offset = 0, bool offsetIsInMs = true)
-   : mListener(listener), mInterval(interval), mOffset(offset), mOffsetIsInMs(offsetIsInMs) {}
+   TransportListenerInfo(ITimeListener* listener, NoteInterval interval, OffsetInfo offsetInfo, bool useEventLookahead)
+   : mListener(listener), mInterval(interval), mOffsetInfo(offsetInfo), mUseEventLookahead(useEventLookahead) {}
    
    ITimeListener* mListener;
    NoteInterval mInterval;
-   float mOffset;
-   bool mOffsetIsInMs;
+   OffsetInfo mOffsetInfo;
+   bool mUseEventLookahead;
 };
 
 class Transport : public IDrawableModule, public IButtonListener, public IFloatSliderListener, public IDropdownListener
@@ -78,21 +86,22 @@ public:
    int GetTimeSigBottom() { return mTimeSigBottom; }
    void SetSwing(float swing) { mSwing = swing; }
    float GetSwing() { return mSwing; }
-   float MsPerBar() const;
-   void Advance(float ms);
-   void AddListener(ITimeListener* listener, NoteInterval interval, float offset = 0, bool offsetIsInMs = true);
+   double MsPerBar() const { return 60/mTempo * 1000 * mTimeSigTop * 4.0f/mTimeSigBottom; }
+   void Advance(double ms);
+   void AddListener(ITimeListener* listener, NoteInterval interval, OffsetInfo offsetInfo, bool useEventLookahead);
    void RemoveListener(ITimeListener* listener);
-   bool UpdateListener(ITimeListener* listener, NoteInterval interval, float offset = 0, bool offsetIsInMs = true);
+   bool UpdateListener(ITimeListener* listener, NoteInterval interval);
+   bool UpdateListener(ITimeListener* listener, NoteInterval interval, OffsetInfo offsetInfo);
    void AddAudioPoller(IAudioPoller* poller);
    void RemoveAudioPoller(IAudioPoller* poller);
-   float GetDuration(NoteInterval interval);
-   int GetQuantized(float offsetMs, NoteInterval interval);
-   float GetMeasurePos() const { return mMeasurePos; }
-   float GetMeasurePos(int offset) const;
-   void SetMeasurePos(float pos) { mMeasurePos = pos; }
-   int GetMeasure() const { return mMeasureCount; }
-   void SetMeasure(int count) { mMeasureCount = count; }
-   void SetDownbeat() { mMeasurePos = .999f; --mMeasureCount; }
+   double GetDuration(NoteInterval interval);
+   int GetQuantized(double time, NoteInterval interval, double* remainderMs = nullptr);
+   double GetMeasurePos(double time) const { return fmod(GetMeasureTime(time), 1); }
+   void SetMeasurePos(double pos) { mMeasureTime = mMeasureTime - (int)mMeasureTime + pos; }
+   int GetMeasure(double time) const { return (int)GetMeasureTime(time); }
+   double GetMeasureTime(double time) const { return mMeasureTime + (time - gTime) / MsPerBar(); }
+   void SetMeasure(int count) { mMeasureTime = mMeasureTime - (int)mMeasureTime + count; }
+   void SetDownbeat() { mMeasureTime = mMeasureTime - (int)mMeasureTime - .001; }
    static int CountInStandardMeasure(NoteInterval interval);
    void Reset();
    void OnDrumEvent(NoteInterval drumEvent);
@@ -100,6 +109,8 @@ public:
    void ClearLoop() { mLoopStartMeasure = -1; mLoopEndMeasure = -1; }
    
    bool CheckNeedsDraw() override { return true; }
+   
+   double GetEventLookaheadMs() { return sDoEventLookahead ? sEventEarlyMs : 0; }
    
    //IDrawableModule
    void Init() override;
@@ -115,12 +126,17 @@ public:
    void SetUpFromSaveData() override;
    void SaveState(FileStreamOut& out) override;
    void LoadState(FileStreamIn& in) override;
+   
+   static bool sDoEventLookahead;
+   static double sEventEarlyMs;
+   
 private:
-   void UpdateListeners(float jumpMs);
+   void UpdateListeners(double jumpMs);
    float Swing(float measurePos);
    float SwingBeat(float pos);
    void Nudge(float amount);
-   void AdjustTempo(float amount);
+   void AdjustTempo(double amount);
+   double GetMeasureFraction(NoteInterval interval);
 
    //IDrawableModule
    void DrawModule() override;
@@ -130,8 +146,7 @@ private:
    float mTempo;
    int mTimeSigTop;
    int mTimeSigBottom;
-   unsigned int mMeasureCount;
-   float mMeasurePos;
+   double mMeasureTime;
    int mSwingInterval;
    float mSwing;
    FloatSlider* mSwingSlider;

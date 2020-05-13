@@ -73,28 +73,27 @@ void PulseDelayer::OnTransportAdvanced(float amount)
    for (int i=mConsumeIndex; i<end; ++i)
    {
       const PulseInfo& info = mInputPulses[i % kQueueSize];
-      if (gTime + gBufferSize * gInvSampleRateMs > info.mTriggerTime)
+      if (gTime + TheTransport->GetEventLookaheadMs() >= info.mTriggerTime)
       {
-         int samplesTo = (info.mTriggerTime - gTime) * gSampleRateMs;
-         DispatchPulse(GetPatchCableSource(), info.mVelocity, MAX(samplesTo, 0), info.mFlags);
+         DispatchPulse(GetPatchCableSource(), info.mTriggerTime, info.mVelocity, info.mFlags);
          mConsumeIndex = (mConsumeIndex + 1) % kQueueSize;
       }
    }
 }
 
-void PulseDelayer::OnPulse(float velocity, int samplesTo, int flags)
+void PulseDelayer::OnPulse(double time, float velocity, int flags)
 {
    if (!mEnabled)
       return;
    
    if (velocity > 0)
-      mLastPulseTime = gTime;
+      mLastPulseTime = time;
    
    if ((mAppendIndex + 1) % kQueueSize != mConsumeIndex)
    {
       PulseInfo info;
       info.mVelocity = velocity;
-      info.mTriggerTime = gTime + samplesTo * gInvSampleRateMs + mDelay * TheTransport->GetDuration(kInterval_1n);
+      info.mTriggerTime = time + mDelay * TheTransport->GetDuration(kInterval_1n);
       info.mFlags = flags;
       mInputPulses[mAppendIndex] = info;
       mAppendIndex = (mAppendIndex + 1) % kQueueSize;

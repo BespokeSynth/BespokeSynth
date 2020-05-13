@@ -41,7 +41,7 @@ public:
    IUIControl* GetUIControl(string path);
    void OnAdjustUIControl(IUIControl* control, float value);
    
-   void OnPulse(float amount, int samplesTo, int flags) override;
+   void OnPulse(double time, float velocity, int flags) override;
    void ButtonClicked(ClickButton* button) override;
    void FloatSliderUpdated(FloatSlider* slider, float oldValue) override {}
    
@@ -97,7 +97,8 @@ private:
    
    float mWidth;
    float mHeight;
-   double mScheduledPulseTime;
+   static const int kScheduledPulseBufferSize = 20;
+   double mScheduledPulseTimes[kScheduledPulseBufferSize];
    static double sMostRecentRunTime;
    string mLastError;
    size_t mScriptModuleIndex;

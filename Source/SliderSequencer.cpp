@@ -42,7 +42,7 @@ SliderSequencer::~SliderSequencer()
 
 float SliderSequencer::MeasurePos()
 {
-   float pos = TheTransport->GetMeasurePos() * mDivision;
+   float pos = TheTransport->GetMeasurePos(gTime) * mDivision;
    while (pos > 1)
       pos -= 1;
    

@@ -42,7 +42,7 @@ void NotePanRandom::DrawModule()
    
    for (int i=0; i<kPanHistoryDisplaySize; ++i)
    {
-      if (gTime - mPanHistoryDisplay[i].time < 200)
+      if (gTime - mPanHistoryDisplay[i].time > 0 && gTime - mPanHistoryDisplay[i].time < 200)
       {
          ofRectangle sliderRect = mCenterSlider->GetRect(true);
          float t = mPanHistoryDisplay[i].pan / 2 + .5f;

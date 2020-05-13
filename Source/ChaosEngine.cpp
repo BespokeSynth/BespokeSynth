@@ -128,8 +128,8 @@ void ChaosEngine::AudioUpdate()
 {
    PROFILER(ChaosEngine);
    
-   int measure = TheTransport->GetMeasure();
-   int beat = int(TheTransport->GetMeasurePos() * TheTransport->GetTimeSigTop());
+   int measure = TheTransport->GetMeasure(gTime);
+   int beat = int(TheTransport->GetMeasurePos(gTime) * TheTransport->GetTimeSigTop());
    
    if (beat != mLastAudioUpdateBeat && mBeatsLeftToChordChange != -1)
    {
@@ -172,7 +172,7 @@ void ChaosEngine::UpdateProgression(int beat)
       mBeatsLeftToChordChange = TheTransport->GetTimeSigTop()-beat;
    mProgressionMutex.unlock();
    
-   mNoteOutput.Flush();
+   mNoteOutput.Flush(gTime);
    if (mPlayChord)
    {
       vector<int> pitches = GetCurrentChordPitches();
@@ -209,14 +209,12 @@ vector<int> ChaosEngine::GetCurrentChordPitches()
 }
 
 void ChaosEngine::DrawModule()
-{
-
-   
+{   
    ofSetColor(255,255,255);
    
    ofPushStyle();
    
-   float fBeat = TheTransport->GetMeasurePos()*TheTransport->GetTimeSigTop() + 1;
+   float fBeat = TheTransport->GetMeasurePos(gTime)*TheTransport->GetTimeSigTop() + 1;
    int beat = int(fBeat);
    if (!mHideBeat)
    {

@@ -29,7 +29,7 @@ Pulser::Pulser()
 , mRandomStep(false)
 , mRandomStepCheckbox(nullptr)
 {
-   TheTransport->AddListener(this, mInterval);
+   TheTransport->AddListener(this, mInterval, OffsetInfo(0, true), true);
    TheTransport->AddAudioPoller(this);
 }
 
@@ -113,7 +113,7 @@ void Pulser::OnTransportAdvanced(float amount)
    }
 }
 
-void Pulser::OnTimeEvent(int samplesTo)
+void Pulser::OnTimeEvent(double time)
 {
    if (!mEnabled)
       return;
@@ -124,11 +124,11 @@ void Pulser::OnTimeEvent(int samplesTo)
    
    bool shouldResetForDownbeat = false;
    if (mTimeMode == kTimeMode_Downbeat)
-      shouldResetForDownbeat = TheTransport->GetQuantized(offsetMs, mInterval) == 0;
+      shouldResetForDownbeat = TheTransport->GetQuantized(time+offsetMs, mInterval) == 0;
    if (mTimeMode == kTimeMode_Downbeat2)
-      shouldResetForDownbeat = TheTransport->GetQuantized(offsetMs, mInterval) == 0 && TheTransport->GetMeasure() % 2 == 0;
+      shouldResetForDownbeat = TheTransport->GetQuantized(time+offsetMs, mInterval) == 0 && TheTransport->GetMeasure(time+offsetMs) % 2 == 0;
    if (mTimeMode == kTimeMode_Downbeat4)
-      shouldResetForDownbeat = TheTransport->GetQuantized(offsetMs, mInterval) == 0 && TheTransport->GetMeasure() % 4 == 0;
+      shouldResetForDownbeat = TheTransport->GetQuantized(time+offsetMs, mInterval) == 0 && TheTransport->GetMeasure(time+offsetMs) % 4 == 0;
    
    if (shouldResetForDownbeat)
       flags |= kPulseFlag_Reset;
@@ -145,7 +145,7 @@ void Pulser::OnTimeEvent(int samplesTo)
    if (mWaitingForDownbeat && (mTimeMode == kTimeMode_Downbeat || mTimeMode == kTimeMode_Downbeat2 || mTimeMode == kTimeMode_Downbeat4))
       return;
    
-   DispatchPulse(GetPatchCableSource(), 1, samplesTo, flags);
+   DispatchPulse(GetPatchCableSource(), time, 1, flags);
 }
 
 void Pulser::GetModuleDimensions(int& width, int& height)
@@ -168,7 +168,7 @@ float Pulser::GetOffset()
 void Pulser::DropdownUpdated(DropdownList* list, int oldVal)
 {
    if (list == mIntervalSelector)
-      TheTransport->UpdateListener(this, mInterval, GetOffset(), false);
+      TheTransport->UpdateListener(this, mInterval, OffsetInfo(GetOffset(), false));
    if (list == mTimeModeSelector)
    {
       mIntervalSelector->SetShowing(mTimeMode != kTimeMode_Free);
@@ -181,7 +181,7 @@ void Pulser::DropdownUpdated(DropdownList* list, int oldVal)
       }
       else if (oldVal == kTimeMode_Free)
       {
-         TheTransport->UpdateListener(this, mInterval, GetOffset(), false);
+         TheTransport->UpdateListener(this, mInterval, OffsetInfo(GetOffset(), false));
       }
    }
 }
@@ -192,7 +192,7 @@ void Pulser::FloatSliderUpdated(FloatSlider* slider, float oldVal)
    {
       if (mTimeMode != kTimeMode_Free)
       {
-         TheTransport->UpdateListener(this, mInterval, GetOffset(), false);
+         TheTransport->UpdateListener(this, mInterval, OffsetInfo(GetOffset(), false));
       }
    }
 }

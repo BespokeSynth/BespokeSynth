@@ -77,7 +77,7 @@ void DrumPlayer::DrumHit::CreateUIControls(DrumPlayer* owner, int index)
    mPanSlider = new FloatSlider(owner,("pan "+ofToString(index)).c_str(),-1,-1,100,15,&mPan,-1,1);
    mIndividualOutputCheckbox = new Checkbox(owner,("single out "+ofToString(index)).c_str(),-1,-1,&mHasIndividualOutput);
    mUseEnvelopeCheckbox = new Checkbox(owner,("envelope "+ofToString(index)).c_str(),-1,-1,&mUseEnvelope);
-   mEnvelopeLengthSlider = new FloatSlider(owner,("view ms "+ofToString(index)).c_str(),-1,-1,100,15,&mEnvelopeLength,-1,1);
+   mEnvelopeLengthSlider = new FloatSlider(owner,("view ms "+ofToString(index)).c_str(),-1,-1,100,15,&mEnvelopeLength,10,2000);
    mEnvelopeDisplay = new ADSRDisplay(owner,("envelopedisplay "+ofToString(index)).c_str(),305, 200,135, 100,&mEnvelope);
    
    mSpeedSlider->PositionTo(mVolSlider, kAnchor_Below);
@@ -313,23 +313,19 @@ void DrumPlayer::PlayNote(double time, int pitch, int velocity, int voiceIdx, Mo
    {
       if (velocity > 0)
       {
-         if (mDrumHits[pitch].mSample.GetPlayPosition() <= 0 ||
-             mDrumHits[pitch].mSample.GetPlayPosition() > 2000.0f / mDrumHits[pitch].mSample.GetSampleRateRatio())
+         //reset all linked drum hits
+         int playingId = mDrumHits[pitch].mLinkId;
+         for (int i=0; i<NUM_DRUM_HITS; ++i)
          {
-            //reset all linked drum hits
-            int playingId = mDrumHits[pitch].mLinkId;
-            for (int i=0; i<NUM_DRUM_HITS; ++i)
-            {
-               if (mDrumHits[i].mLinkId == playingId && mDrumHits[i].mSample.GetPlayPosition() > 100)
-                  mDrumHits[i].mSample.Reset();
-            }
-
-            //play this one
-            mDrumHits[pitch].mSample.Play(time, mSpeed * ofRandom(.99f,1.01f), 0);
-            mDrumHits[pitch].mVelocity = velocity / 127.0f;
-            mDrumHits[pitch].mPanInput = modulation.pan;
-            mDrumHits[pitch].mEnvelope.Start(time, 1);
+            if (mDrumHits[i].mLinkId == playingId && mDrumHits[i].mSample.GetPlayPosition() > 100)
+               mDrumHits[i].mSample.Reset();
          }
+
+         //play this one
+         mDrumHits[pitch].mSample.Play(time, mSpeed * ofRandom(.99f,1.01f), 0);
+         mDrumHits[pitch].mVelocity = velocity / 127.0f;
+         mDrumHits[pitch].mPanInput = modulation.pan;
+         mDrumHits[pitch].mEnvelope.Start(time, 1);
       }
    }
 }

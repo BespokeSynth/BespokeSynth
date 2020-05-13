@@ -37,7 +37,7 @@ public:
    void SetFreeRate(float rate) { mFreeRate = rate; }
 
    //ITimeListener
-   void OnTimeEvent(int samplesTo) override;
+   void OnTimeEvent(double time) override;
    
    //IAudioPoller
    void OnTransportAdvanced(float amount) override;

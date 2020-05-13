@@ -53,7 +53,7 @@ void PulseHocket::DrawModule()
       mWeightSlider[i]->Draw();
 }
 
-void PulseHocket::OnPulse(float velocity, int samplesTo, int flags)
+void PulseHocket::OnPulse(double time, float velocity, int flags)
 {
    ComputeSliders(0);
    
@@ -70,7 +70,7 @@ void PulseHocket::OnPulse(float velocity, int samplesTo, int flags)
       random -= mWeight[selectedDestination];
    }
    
-   DispatchPulse(mDestinationCables[selectedDestination], velocity, samplesTo, flags);
+   DispatchPulse(mDestinationCables[selectedDestination], time, velocity, flags);
 }
 
 void PulseHocket::LoadLayout(const ofxJSONElement& moduleInfo)

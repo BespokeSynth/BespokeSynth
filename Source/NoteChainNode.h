@@ -31,7 +31,7 @@ public:
    
    void TriggerNote();
    
-   void OnTimeEvent(int samplesTo) override;
+   void OnTimeEvent(double time) override;
    void OnTransportAdvanced(float amount) override;
    
    void PostRepatch(PatchCableSource* cableSource, bool fromUserClick) override;

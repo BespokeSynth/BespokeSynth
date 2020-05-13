@@ -93,8 +93,8 @@ void NoteLooper::DrawModule()
    float height = 90;
    float startx = 10;
    float width = 290;
-   float pos = TheTransport->GetMeasurePos();
-   pos += TheTransport->GetMeasure() % mNumBars;
+   float pos = TheTransport->GetMeasurePos(gTime);
+   pos += TheTransport->GetMeasure(gTime) % mNumBars;
    if (maxPitch != -1)
    {
       float numTones = maxPitch-minPitch + 1;
@@ -150,8 +150,8 @@ void NoteLooper::OnTransportAdvanced(float amount)
 {
    PROFILER(NoteLooper);
    
-   float pos = TheTransport->GetMeasurePos();
-   pos += TheTransport->GetMeasure() % mNumBars;
+   float pos = TheTransport->GetMeasurePos(gTime);
+   pos += TheTransport->GetMeasure(gTime) % mNumBars;
    float lastPos = pos-amount;
    
    for (int i=0; i<NOTELOOPER_MAX_NOTES; ++i)
@@ -223,7 +223,7 @@ void NoteLooper::PlayNote(double time, int pitch, int velocity, int voiceIdx, Mo
 {
    if (mRecord)
    {
-      RecordNote(pitch, velocity);
+      RecordNote(time, pitch, velocity);
       
       if (pitch >= 0 && pitch < NOTELOOPER_NOTE_RANGE)
       {
@@ -242,10 +242,10 @@ void NoteLooper::PlayNote(double time, int pitch, int velocity, int voiceIdx, Mo
    PlayNoteOutput(time, pitch, velocity, voiceIdx, modulation);
 }
 
-void NoteLooper::RecordNote(int pitch, int velocity)
+void NoteLooper::RecordNote(double time, int pitch, int velocity)
 {
-   float pos = TheTransport->GetMeasurePos();
-   pos += TheTransport->GetMeasure() % mNumBars;
+   float pos = TheTransport->GetMeasurePos(time);
+   pos += TheTransport->GetMeasure(time) % mNumBars;
    
    for (int i=0; i<NOTELOOPER_MAX_NOTES; ++i)
    {
@@ -301,7 +301,7 @@ void NoteLooper::Clear()
    {
       mNoteroll[i].mValid = false;
    }
-   mNoteOutput.Flush();
+   mNoteOutput.Flush(gTime);
 }
 
 void NoteLooper::StopRecording()
@@ -312,7 +312,7 @@ void NoteLooper::StopRecording()
       if (mHeldNotes[i])
       {
          mHeldNotes[i] = false;
-         RecordNote(i, 0);
+         RecordNote(gTime, i, 0);
       }
    }
 }
@@ -323,7 +323,7 @@ void NoteLooper::CheckboxUpdated(Checkbox* checkbox)
    {
       if (mPlay == false)
       {
-         mNoteOutput.Flush();
+         mNoteOutput.Flush(gTime);
          StopRecording();
       }
    }
@@ -360,7 +360,7 @@ void NoteLooper::IntSliderUpdated(IntSlider* slider, int oldVal)
 
 void NoteLooper::Retrigger()
 {
-   mNoteOutput.Flush();
+   mNoteOutput.Flush(gTime);
    //retrigger in new octave
    for (int i=0; i<NOTELOOPER_MAX_CHORD; ++i)
    {

@@ -22,7 +22,7 @@ ControlSequencer::ControlSequencer()
 , mControlCable(nullptr)
 , mRandomize(nullptr)
 {
-   TheTransport->AddListener(this, mInterval);
+   TheTransport->AddListener(this, mInterval, OffsetInfo(0, true), false);
    
    sControlSequencers.push_back(this);
 }
@@ -89,12 +89,12 @@ void ControlSequencer::Poll()
 {
 }
 
-void ControlSequencer::OnTimeEvent(int samplesTo)
+void ControlSequencer::OnTimeEvent(double time)
 {
    int stepsPerMeasure = TheTransport->CountInStandardMeasure(mInterval) * TheTransport->GetTimeSigTop()/TheTransport->GetTimeSigBottom();
    int numMeasures = MAX(1,ceil(float(mGrid->GetCols()) / stepsPerMeasure));
-   int measure = TheTransport->GetMeasure() % numMeasures;
-   int step = (TheTransport->GetQuantized(0, mInterval) + measure * stepsPerMeasure) % mGrid->GetCols();
+   int measure = TheTransport->GetMeasure(time) % numMeasures;
+   int step = (TheTransport->GetQuantized(time, mInterval) + measure * stepsPerMeasure) % mGrid->GetCols();
    
    mGrid->SetHighlightCol(step);
    

@@ -38,7 +38,7 @@ public:
    void OnTransportAdvanced(float amount) override;
    
    //ITimeListener
-   void OnTimeEvent(int samplesTo) override;
+   void OnTimeEvent(double time) override;
    
    void ButtonClicked(ClickButton* button) override;
    void CheckboxUpdated(Checkbox* checkbox) override;

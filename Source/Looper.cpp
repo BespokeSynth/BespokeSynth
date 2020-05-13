@@ -301,7 +301,7 @@ void Looper::Process(double time)
    float oldLoopPos = mLoopPos;
    int sampsPerBar = mLoopLength / mNumBars;
    if (!mPausePos)
-      mLoopPos = sampsPerBar * ((TheTransport->GetMeasure() % mNumBars) + TheTransport->GetMeasurePos());
+      mLoopPos = sampsPerBar * ((TheTransport->GetMeasure(time) % mNumBars) + TheTransport->GetMeasurePos(time));
    
    if (oldLoopPos > mLoopLength - bufferSize * mSpeed - 1 && mLoopPos < oldLoopPos)
    {
@@ -362,10 +362,10 @@ void Looper::Process(double time)
          ProcessScratch();
       
       if (mFourTet > 0)
-         ProcessFourTet(i);
+         ProcessFourTet(time, i);
       
       if (mBeatwheel)
-         ProcessBeatwheel(i);
+         ProcessBeatwheel(time, i);
       
       float offset = mLoopPos+i*mSpeed+mLoopPosOffset+latencyOffset;
       float output[ChannelBuffer::kMaxNumChannels];
@@ -514,10 +514,10 @@ void Looper::ProcessScratch()
    FloatWrap(mLoopPosOffset, mLoopLength);
 }
 
-void Looper::ProcessFourTet(int sampleIdx)
+void Looper::ProcessFourTet(double time, int sampleIdx)
 {
-   float measurePos = TheTransport->GetMeasurePos() + sampleIdx/(TheTransport->MsPerBar() / gInvSampleRateMs);
-   measurePos += TheTransport->GetMeasure() % mNumBars;
+   float measurePos = TheTransport->GetMeasurePos(time) + sampleIdx/(TheTransport->MsPerBar() / gInvSampleRateMs);
+   measurePos += TheTransport->GetMeasure(time) % mNumBars;
    measurePos /= mNumBars;
    int numSlices = mFourTetSlices * 2 * mNumBars;
    measurePos *= numSlices;
@@ -534,7 +534,7 @@ void Looper::ProcessFourTet(int sampleIdx)
    FloatWrap(mLoopPosOffset, mLoopLength);
 }
 
-void Looper::ProcessBeatwheel(int sampleIdx)
+void Looper::ProcessBeatwheel(double time, int sampleIdx)
 {
    bool bothHeld = false;
    bool noneHeld = false;
@@ -565,8 +565,8 @@ void Looper::ProcessBeatwheel(int sampleIdx)
    if (noneHeld)
       depthLevel = 2;
    int slicesPerBar = TheTransport->GetTimeSigTop() * (1 << depthLevel);
-   int lastSlice = GetMeasureSliceIndex(sampleIdx-1, slicesPerBar);
-   int slice = GetMeasureSliceIndex(sampleIdx, slicesPerBar);
+   int lastSlice = GetMeasureSliceIndex(time, sampleIdx-1, slicesPerBar);
+   int slice = GetMeasureSliceIndex(time, sampleIdx, slicesPerBar);
    int numSlices = slicesPerBar*mNumBars;
    int loopLength = mLoopLength;
    if (mBeatwheelSingleMeasure)
@@ -618,10 +618,10 @@ float Looper::GetActualLoopPos(int samplesIn) const
    return pos;
 }
 
-int Looper::GetMeasureSliceIndex(int sampleIdx, int slicesPerBar)
+int Looper::GetMeasureSliceIndex(double time, int sampleIdx, int slicesPerBar)
 {
-   float measurePos = TheTransport->GetMeasurePos() + sampleIdx/(TheTransport->MsPerBar() / gInvSampleRateMs);
-   measurePos += TheTransport->GetMeasure() % mNumBars;
+   float measurePos = TheTransport->GetMeasurePos(time) + sampleIdx/(TheTransport->MsPerBar() / gInvSampleRateMs);
+   measurePos += TheTransport->GetMeasure(time) % mNumBars;
    measurePos /= mNumBars;
    int numSlices = slicesPerBar * mNumBars;
    measurePos *= numSlices;
@@ -727,7 +727,7 @@ void Looper::DrawModule()
       if (mWriteInput)
          ofSetColor(255, 0, 0, 150);
       else
-         ofSetColor(255, 100, 0, 100 + 50 * (cosf(TheTransport->GetMeasurePos() * 4 * FTWO_PI)));
+         ofSetColor(255, 100, 0, 100 + 50 * (cosf(TheTransport->GetMeasurePos(gTime) * 4 * FTWO_PI)));
       ofRect(mQueueCaptureButton->GetRect(true));
       ofPopStyle();
    }
@@ -937,7 +937,7 @@ void Looper::UpdateNumBars(int oldNumBars)
    SetLoopLength(MIN(sampsPerBar * mNumBars, MAX_BUFFER_SIZE-1));
    while (mLoopPos > sampsPerBar)
       mLoopPos -= sampsPerBar;
-   mLoopPos += sampsPerBar * (TheTransport->GetMeasure() % mNumBars);
+   mLoopPos += sampsPerBar * (TheTransport->GetMeasure(gTime) % mNumBars);
    if (oldNumBars < mNumBars)
    {
       int oldLoopLength = abs(int(TheTransport->MsPerBar() * oldNumBars / 1000 * gSampleRate));

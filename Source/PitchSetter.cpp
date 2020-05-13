@@ -36,13 +36,13 @@ void PitchSetter::DrawModule()
 void PitchSetter::CheckboxUpdated(Checkbox* checkbox)
 {
    if (checkbox == mEnabledCheckbox)
-      mNoteOutput.Flush();
+      mNoteOutput.Flush(gTime);
 }
 
 void PitchSetter::IntSliderUpdated(IntSlider* slider, int oldVal)
 {
    if (slider == mPitchSlider)
-      mNoteOutput.Flush();
+      mNoteOutput.Flush(gTime);
 }
 
 void PitchSetter::PlayNote(double time, int pitch, int velocity, int voiceIdx, ModulationParameters modulation)

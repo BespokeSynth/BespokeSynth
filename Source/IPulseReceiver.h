@@ -25,12 +25,12 @@ class IPulseReceiver
 {
 public:
    virtual ~IPulseReceiver() {}
-   virtual void OnPulse(float velocity, int samplesTo, int flags) = 0;
+   virtual void OnPulse(double time, float velocity, int flags) = 0;
 };
 
 class IPulseSource
 {
 public:
    virtual ~IPulseSource() {}
-   void DispatchPulse(PatchCableSource* destination, float velocity, int samplesTo, int flags);
+   void DispatchPulse(PatchCableSource* destination, double time, float velocity, int flags);
 };

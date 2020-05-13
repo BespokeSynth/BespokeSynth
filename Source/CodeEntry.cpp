@@ -69,7 +69,7 @@ void CodeEntry::Render()
    if (isCurrent)
    {
       ofPushStyle();
-      int lum = 255 * ofMap(sinf(TheTransport->GetMeasurePos() * TWO_PI * 4), -1, 1, .4f, 1);
+      int lum = 255 * ofMap(sinf(TheTransport->GetMeasurePos(gTime) * TWO_PI * 4), -1, 1, .4f, 1);
       if (mHasError)
          ofSetColor(255, 0, 0, gModuleDrawAlpha);
       else

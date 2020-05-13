@@ -42,7 +42,7 @@ public:
    void SetEnabled(bool enabled) override { mEnabled = enabled; }
    
    //ITimeListener
-   void OnTimeEvent(int samplesTo) override;
+   void OnTimeEvent(double time) override;
    
    //IGridControllerListener
    void OnControllerPageSelected() override;

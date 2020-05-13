@@ -346,6 +346,16 @@ void VSTPlugin::Process(double time)
             }
          }
          
+         /*if (!mMidiBuffer.isEmpty())
+         {
+            ofLog() << mMidiBuffer.getFirstEventTime() << " " << mMidiBuffer.getLastEventTime();
+         }*/
+         
+         mMidiBuffer.addEvents(mFutureMidiBuffer, 0, mFutureMidiBuffer.getLastEventTime() + 1, 0);
+         mFutureMidiBuffer.clear();
+         mFutureMidiBuffer.addEvents(mMidiBuffer, gBufferSize, mMidiBuffer.getLastEventTime()-gBufferSize + 1, -gBufferSize);
+         mMidiBuffer.clear(gBufferSize, mMidiBuffer.getLastEventTime() + 1);
+         
          mPlugin->processBlock(buffer, mMidiBuffer);
          
          mMidiBuffer.clear();
@@ -393,8 +403,7 @@ void VSTPlugin::PlayNote(double time, int pitch, int velocity, int voiceIdx, Mod
    
    const juce::ScopedLock lock(mMidiInputLock);
    
-   double timeOffset = time - gTime;
-   int sampleNumber = timeOffset * gSampleRateMs;
+   int sampleNumber = (time - gTime) * gSampleRateMs;
    //ofLog() << sampleNumber;
    
    if (velocity > 0)

@@ -52,7 +52,7 @@ public:
    void Poll() override;
 
    //ITimeListener
-   void OnTimeEvent(int samplesTo) override;
+   void OnTimeEvent(double time) override;
    
    //IPush2GridController
    bool OnPush2Control(MidiMessageType type, int controlIndex, float midiValue) override;

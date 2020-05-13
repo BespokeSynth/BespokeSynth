@@ -32,7 +32,7 @@ void NoteFlusher::ButtonClicked(ClickButton* button)
 {
    if (button == mFlushButton)
    {
-      mNoteOutput.Flush();
+      mNoteOutput.Flush(gTime);
       for (int i=0; i<127; ++i)
          mNoteOutput.PlayNote(gTime, i, 0);
    }

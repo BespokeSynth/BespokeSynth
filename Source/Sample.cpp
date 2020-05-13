@@ -298,6 +298,14 @@ void Sample::LoadState(FileStreamIn& in)
       int readLength;
       mData.Load(in, readLength, true);
       assert(readLength == mNumSamples);
+      for (int ch=0; ch<mData.NumActiveChannels(); ++ch)
+      {
+         float* channelBuffer = mData.GetChannel(ch);
+         for (int i=0; i<mData.BufferSize(); ++i)
+         {
+            assert(channelBuffer[i] >= -1 && channelBuffer[i] <= 1);
+         }
+      }
    }
    in >> mNumBars;
    in >> mLooping;

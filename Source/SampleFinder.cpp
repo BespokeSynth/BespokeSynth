@@ -102,7 +102,7 @@ void SampleFinder::Process(double time)
    int numSamples = mSample->LengthInSamples();
    float sampleRateRatio = mSample->GetSampleRateRatio();
    
-   mPlayhead = TheTransport->GetMeasurePos() + (TheTransport->GetMeasure() % mNumBars);
+   mPlayhead = TheTransport->GetMeasurePos(time) + (TheTransport->GetMeasure(time) % mNumBars);
    if (mReverse)
       mPlayhead = 1 - mPlayhead;
    mPlayhead /= mNumBars;

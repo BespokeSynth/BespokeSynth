@@ -21,6 +21,7 @@ public:
    FileStreamOut& operator<<(const uint32_t &var);
    FileStreamOut& operator<<(const bool& var);
    FileStreamOut& operator<<(const float& var);
+   FileStreamOut& operator<<(const double& var);
    FileStreamOut& operator<<(const string& var);
    FileStreamOut& operator<<(const char& var);
    void Write(const float* buffer, int size);
@@ -37,6 +38,7 @@ public:
    FileStreamIn& operator>>(uint32_t &var);
    FileStreamIn& operator>>(bool& var);
    FileStreamIn& operator>>(float& var);
+   FileStreamIn& operator>>(double& var);
    FileStreamIn& operator>>(string& var);
    FileStreamIn& operator>>(char& var);
    void Read(float* buffer, int size);

@@ -47,7 +47,7 @@ TimelineControl::~TimelineControl()
 
 void TimelineControl::DrawModule()
 {
-   mTime = TheTransport->GetMeasure() + TheTransport->GetMeasurePos();
+   mTime = TheTransport->GetMeasureTime(gTime);
    
    if (Minimized() || IsVisible() == false)
       return;

@@ -30,7 +30,7 @@ LoopStorer::LoopStorer()
 , mClearButton(nullptr)
 , mLooperCable(nullptr)
 {
-   TheTransport->AddListener(this, kInterval_None);
+   TheTransport->AddListener(this, kInterval_None, OffsetInfo(0, true), false);
 }
 
 void LoopStorer::CreateUIControls()
@@ -116,7 +116,7 @@ int LoopStorer::GetRowY(int idx)
    return 20+idx*40;
 }
 
-void LoopStorer::OnTimeEvent(int samplesTo)
+void LoopStorer::OnTimeEvent(double time)
 {
    if (mQueuedSwapBufferIdx != -1)
    {

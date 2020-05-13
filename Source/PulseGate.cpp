@@ -38,12 +38,12 @@ void PulseGate::DrawModule()
    mAllowCheckbox->Draw();
 }
 
-void PulseGate::OnPulse(float velocity, int samplesTo, int flags)
+void PulseGate::OnPulse(double time, float velocity, int flags)
 {
    ComputeSliders(0);
    
    if (mAllow)
-      DispatchPulse(GetPatchCableSource(), velocity, samplesTo, flags);
+      DispatchPulse(GetPatchCableSource(), time, velocity, flags);
 }
 
 void PulseGate::LoadLayout(const ofxJSONElement& moduleInfo)

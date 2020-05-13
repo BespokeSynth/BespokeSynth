@@ -149,6 +149,7 @@ public:
       mSynth.Setup(&mGlobalManagers, this);
       
       const string kAutoDevice = "auto";
+      const string kNoneDevice = "none";
       
       ofxJSONElement userPrefs;
       string outputDevice = kAutoDevice;
@@ -165,18 +166,26 @@ public:
       AudioDeviceManager::AudioDeviceSetup preferredSetupOptions;
       preferredSetupOptions.sampleRate = gSampleRate;
       preferredSetupOptions.bufferSize = gBufferSize;
-      if (outputDevice != kAutoDevice)
+      if (outputDevice != kAutoDevice && outputDevice != kNoneDevice)
          preferredSetupOptions.outputDeviceName = outputDevice;
-      if (inputDevice != kAutoDevice)
+      if (inputDevice != kAutoDevice && inputDevice != kNoneDevice)
          preferredSetupOptions.inputDeviceName = inputDevice;
 
 #ifdef JUCE_WINDOWS
       HRESULT hr;
       hr = CoInitializeEx(0, COINIT_MULTITHREADED);
 #endif
+      
+      int inputChannels = MAX_INPUT_CHANNELS;
+      int outputChannels = MAX_OUTPUT_CHANNELS;
+      
+      if (inputDevice == kNoneDevice)
+         inputChannels = 0;
+      if (outputDevice == kNoneDevice)
+         outputChannels = 0;
 
-      String audioError = mGlobalManagers.mDeviceManager.initialise(MAX_INPUT_CHANNELS,
-                                                                    MAX_OUTPUT_CHANNELS,
+      String audioError = mGlobalManagers.mDeviceManager.initialise(inputChannels,
+                                                                    outputChannels,
                                                                     nullptr,
                                                                     true,
                                                                     "",
@@ -186,7 +195,7 @@ public:
       {
          //bail and try again with no input device. TODO(Ryan) this is a gross lazy hack and should be worked out in the future
          audioError = mGlobalManagers.mDeviceManager.initialise(0,
-                                                                MAX_OUTPUT_CHANNELS,
+                                                                outputChannels,
                                                                 nullptr,
                                                                 true,
                                                                 "",
@@ -196,12 +205,14 @@ public:
       if (audioError.isEmpty())
       {
          auto loadedSetup = mGlobalManagers.mDeviceManager.getAudioDeviceSetup();
-         if (outputDevice != kAutoDevice && loadedSetup.outputDeviceName.toStdString() != outputDevice)
+         if (outputDevice != kAutoDevice && outputDevice != kNoneDevice &&
+             loadedSetup.outputDeviceName.toStdString() != outputDevice)
          {
             mSynth.SetFatalError("error setting output device to "+outputDevice+", fix this in userprefs.json (use \"auto\" for default device)"+
                                  "\n\n\nvalid devices:\n"+GetAudioDevices());
          }
-         else if (inputDevice != kAutoDevice && loadedSetup.inputDeviceName.toStdString() != inputDevice)
+         else if (inputDevice != kAutoDevice && inputDevice != kNoneDevice &&
+                  loadedSetup.inputDeviceName.toStdString() != inputDevice)
          {
             mSynth.SetFatalError("error setting input device to "+inputDevice+", fix this in userprefs.json (use \"auto\" for default device)"+
                                  "\n\n\nvalid devices:\n"+GetAudioDevices());

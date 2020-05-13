@@ -58,7 +58,7 @@ public:
    //IButtonListener
    void ButtonClicked(ClickButton* button) override;
    //ITimeListener
-   void OnTimeEvent(int samplesTo) override;
+   void OnTimeEvent(double time) override;
    
    virtual void LoadLayout(const ofxJSONElement& moduleInfo) override;
    virtual void SetUpFromSaveData() override;

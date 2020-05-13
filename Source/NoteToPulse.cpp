@@ -37,7 +37,7 @@ void NoteToPulse::DrawModule()
 void NoteToPulse::PlayNote(double time, int pitch, int velocity, int voiceIdx, ModulationParameters modulation)
 {
    if (mEnabled && velocity > 0)
-      DispatchPulse(GetPatchCableSource(), velocity/127.0f, (time - gTime) / gSampleRateMs, 0);
+      DispatchPulse(GetPatchCableSource(), time, velocity/127.0f, 0);
 }
 
 void NoteToPulse::SaveLayout(ofxJSONElement& moduleInfo)

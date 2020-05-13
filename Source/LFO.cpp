@@ -37,8 +37,7 @@ float LFO::CalculatePhase(int samplesIn /*= 0*/) const
    {
       float period = TheTransport->GetDuration(mPeriod) / TheTransport->GetDuration(kInterval_1n);
       
-      float sampsPerMeasure = TheTransport->MsPerBar() / gInvSampleRateMs;
-      float phase = ((TheTransport->GetMeasurePos()+TheTransport->GetMeasure() + samplesIn/sampsPerMeasure) / period + mPhaseOffset + 1);  //+1 so we can have negative samplesIn
+      float phase = TheTransport->GetMeasureTime(gTime+samplesIn*gInvSampleRateMs) / period + mPhaseOffset + 1;  //+1 so we can have negative samplesIn
       
       phase -= int(phase) / 2 * 2;  //using 2 allows for shuffle to work
       
@@ -110,7 +109,7 @@ void LFO::SetType(OscillatorType type)
    mOsc.SetType(type);
    
    if (type == kOsc_Random)
-      TheTransport->AddListener(this, mPeriod);
+      TheTransport->AddListener(this, mPeriod, OffsetInfo(0, true), false);
    else
       TheTransport->RemoveListener(this);
    
@@ -120,7 +119,7 @@ void LFO::SetType(OscillatorType type)
       TheTransport->RemoveAudioPoller(this);
 }
 
-void LFO::OnTimeEvent(int samplesTo)
+void LFO::OnTimeEvent(double time)
 {
    if (mOsc.GetSoften() == 0)
       mRandom.SetValue(ofRandom(1));

@@ -79,7 +79,7 @@ list<int> NoteOutput::GetHeldNotesList()
    return notes;
 }
 
-void NoteOutput::Flush()
+void NoteOutput::Flush(double time)
 {
    bool flushed = false;
    
@@ -88,24 +88,24 @@ void NoteOutput::Flush()
       if (mNotes[i])
       {
          for (auto noteReceiver : mNoteSource->GetPatchCableSource()->GetNoteReceivers())
-            noteReceiver->PlayNote(gTime,i,0);
+            noteReceiver->PlayNote(time,i,0);
          flushed = true;
          mNotes[i] = false;
       }
    }
    
    if (flushed)
-      mNoteSource->GetPatchCableSource()->AddHistoryEvent(gTime, false);
+      mNoteSource->GetPatchCableSource()->AddHistoryEvent(time, false);
 }
 
-void NoteOutput::FlushTarget(INoteReceiver* target)
+void NoteOutput::FlushTarget(double time, INoteReceiver* target)
 {
    if (target)
    {
       for (int i=0; i<128; ++i)
       {
          if (mNotes[i])
-            target->PlayNote(gTime,i,0);
+            target->PlayNote(time,i,0);
       }
    }
 }
@@ -113,6 +113,9 @@ void NoteOutput::FlushTarget(INoteReceiver* target)
 void INoteSource::PlayNoteOutput(double time, int pitch, int velocity, int voiceIdx, ModulationParameters modulation)
 {
    PROFILER(INoteSourcePlayOutput);
+   if (time < gTime)
+      ofLog() << "Calling PlayNoteOutput() with a time in the past!  " << ofToString(time) << " < " << ofToString(gTime);
+   
    mNoteOutput.PlayNote(time, pitch, velocity, voiceIdx, modulation);
    
    if (mIsNoteOrigin)
@@ -137,5 +140,5 @@ void INoteSource::SendCCOutput(int control, int value, int voiceIdx /*=-1*/)
 
 void INoteSource::PreRepatch(PatchCableSource* cableSource)
 {
-   mNoteOutput.Flush();
+   mNoteOutput.Flush(gTime);
 }

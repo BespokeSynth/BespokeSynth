@@ -113,7 +113,7 @@ void Monophonify::CheckboxUpdated(Checkbox* checkbox)
 {
    if (checkbox == mEnabledCheckbox)
    {
-      mNoteOutput.Flush();
+      mNoteOutput.Flush(gTime);
       for (int i=0; i<128; ++i)
          mHeldNotes[i] = -1;
    }

@@ -208,8 +208,6 @@ void ControllingSong::Process(double time)
 
 void ControllingSong::DrawModule()
 {
-
-   
    if (Minimized() || IsVisible() == false)
       return;
    
@@ -240,7 +238,7 @@ void ControllingSong::DrawModule()
    ofFill();
    ofSetColor(255,255,255,50);
    float beatWidth = w/4;
-   ofRect(int(TheTransport->GetMeasurePos()*4)*beatWidth,0,beatWidth,h);
+   ofRect(int(TheTransport->GetMeasurePos(gTime)*4)*beatWidth,0,beatWidth,h);
    ofPopStyle();
 }
 

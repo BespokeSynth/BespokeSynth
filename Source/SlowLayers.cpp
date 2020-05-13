@@ -74,7 +74,7 @@ void SlowLayers::Process(double time)
       mSmoothedVol = mSmoothedVol * (1-smooth) + mVol * smooth;
       float volSq = mSmoothedVol * mSmoothedVol;
       
-      float measurePos = TheTransport->GetMeasurePos(i) + TheTransport->GetMeasure();
+      float measurePos = TheTransport->GetMeasureTime(time);
       FloatWrap(measurePos, 1 << layers * mNumBars);
       int offset = measurePos * loopLengthInSamples;
       
@@ -87,6 +87,8 @@ void SlowLayers::Process(double time)
       output *= volSq;
       
       out[i] += output;
+      
+      time += gInvSampleRateMs;
    }
    
    Add(out, GetBuffer()->GetChannel(0), bufferSize);
@@ -103,8 +105,6 @@ int SlowLayers::LoopLength() const
 
 void SlowLayers::DrawModule()
 {
-
-   
    if (Minimized() || IsVisible() == false)
       return;
    
@@ -112,7 +112,7 @@ void SlowLayers::DrawModule()
    
    ofTranslate(BUFFER_X,BUFFER_Y);
    
-   DrawAudioBuffer(BUFFER_W, BUFFER_H, mBuffer, 0, LoopLength(), TheTransport->GetMeasurePos()*LoopLength(), mVol);
+   DrawAudioBuffer(BUFFER_W, BUFFER_H, mBuffer, 0, LoopLength(), TheTransport->GetMeasurePos(gTime)*LoopLength(), mVol);
    ofSetColor(255,255,0,gModuleDrawAlpha);
    for (int i=1; i<mNumBars; ++i)
    {

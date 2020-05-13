@@ -39,7 +39,7 @@ void NoteTransformer::DrawModule()
    {
       mToneModSlider[i]->Draw();
       
-      if (gTime - mLastTimeTonePlayed[i] < 200)
+      if (gTime - mLastTimeTonePlayed[i] > 0 && gTime - mLastTimeTonePlayed[i] < 200)
       {
          float alpha = 1 - (gTime - mLastTimeTonePlayed[i])/200;
          ofSetColor(0,255,0,alpha*255);
@@ -51,7 +51,7 @@ void NoteTransformer::DrawModule()
 void NoteTransformer::CheckboxUpdated(Checkbox *checkbox)
 {
    if (checkbox == mEnabledCheckbox)
-      mNoteOutput.Flush();
+      mNoteOutput.Flush(gTime);
 }
 
 void NoteTransformer::PlayNote(double time, int pitch, int velocity, int voiceIdx, ModulationParameters modulation)

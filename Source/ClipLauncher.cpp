@@ -20,7 +20,7 @@ ClipLauncher::ClipLauncher()
 : mVolume(1)
 , mVolumeSlider(nullptr)
 {
-   TheTransport->AddListener(this, kInterval_1n);
+   TheTransport->AddListener(this, kInterval_1n, OffsetInfo(0, true), false);
 }
 
 void ClipLauncher::CreateUIControls()
@@ -65,7 +65,7 @@ void ClipLauncher::Process(double time)
       volSq *= volSq;
       
       float speed = sample->LengthInSamples() * gInvSampleRateMs / TheTransport->MsPerBar() / mSamples[sampleToPlay].mNumBars;
-      RecalcPos(sampleToPlay);
+      RecalcPos(time, sampleToPlay);
       sample->SetRate(speed);
    }
    
@@ -97,7 +97,7 @@ void ClipLauncher::DropdownUpdated(DropdownList* list, int oldVal)
 {
 }
 
-void ClipLauncher::OnTimeEvent(int samplesTo)
+void ClipLauncher::OnTimeEvent(double time)
 {
 }
 
@@ -197,14 +197,14 @@ void ClipLauncher::FloatSliderUpdated(FloatSlider* slider, float oldVal)
 {
 }
 
-void ClipLauncher::RecalcPos(int idx)
+void ClipLauncher::RecalcPos(double time, int idx)
 {
    int numBars = mSamples[idx].mNumBars;
    Sample* sample = mSamples[idx].mSample;
    
    if (sample)
    {
-      float measurePos = TheTransport->GetMeasure() % numBars + TheTransport->GetMeasurePos();
+      float measurePos = TheTransport->GetMeasure(time) % numBars + TheTransport->GetMeasurePos(time);
       int pos = ofMap(measurePos/numBars, 0, 1, 0, sample->LengthInSamples(), true);
       sample->SetPlayPosition(pos);
    }

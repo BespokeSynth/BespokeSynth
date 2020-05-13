@@ -16,8 +16,8 @@ bool VSTPlayhead::getCurrentPosition(juce::AudioPlayHead::CurrentPositionInfo& r
    result.timeSigDenominator = TheTransport->GetTimeSigBottom();
    result.timeInSamples = gTime * gSampleRateMs;
    result.timeInSeconds = gTime / 1000.;
-   result.ppqPosition = (TheTransport->GetMeasure() + TheTransport->GetMeasure()) * 480 * 4;
-   result.ppqPositionOfLastBarStart = TheTransport->GetMeasure() * 480 * 4;
+   result.ppqPosition = (TheTransport->GetMeasureTime(gTime)) * 480 * 4;
+   result.ppqPositionOfLastBarStart = TheTransport->GetMeasure(gTime) * 480 * 4;
    result.isPlaying = true;
    result.isRecording = false;
    result.isLooping = false;

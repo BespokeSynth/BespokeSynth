@@ -36,7 +36,7 @@ LiveGranulator::LiveGranulator()
    mGranulator.mGrainOverlap = 3;
    mGranulator.mGrainLengthMs = 100;
    
-   TheTransport->AddListener(this, kInterval_None);
+   TheTransport->AddListener(this, kInterval_None, OffsetInfo(0, true), false);
    
    for (int i=0; i<ChannelBuffer::kMaxNumChannels; ++i)
       mDCEstimate[i] = 0;
@@ -159,7 +159,7 @@ void LiveGranulator::Freeze()
    mFreezeExtraSamples = 0;
 }
 
-void LiveGranulator::OnTimeEvent(int samplesIn)
+void LiveGranulator::OnTimeEvent(double time)
 {
    Freeze();
 }

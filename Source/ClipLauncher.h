@@ -46,13 +46,13 @@ public:
    void DropdownClicked(DropdownList* list) override;
    void DropdownUpdated(DropdownList* list, int oldVal) override;
    void ButtonClicked(ClickButton* button) override;
-   void OnTimeEvent(int samplesTo) override;
+   void OnTimeEvent(double time) override;
    
    virtual void LoadLayout(const ofxJSONElement& moduleInfo) override;
    virtual void SetUpFromSaveData() override;
    
 private:
-   void RecalcPos(int idx);
+   void RecalcPos(double time, int idx);
    
    //IDrawableModule
    void DrawModule() override;

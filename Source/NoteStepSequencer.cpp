@@ -46,7 +46,7 @@ NoteStepSequencer::NoteStepSequencer()
 , mLoopResetPointSlider(nullptr)
 , mHasExternalPulseSource(false)
 {
-   TheTransport->AddListener(this, mInterval);
+   TheTransport->AddListener(this, mInterval, OffsetInfo(0, true), true);
    TheTransport->AddAudioPoller(this);
    
    for (int i=0;i<NSS_MAX_STEPS;++i)
@@ -295,7 +295,7 @@ bool NoteStepSequencer::MouseScrolled(int x, int y, float scrollX, float scrollY
 void NoteStepSequencer::CheckboxUpdated(Checkbox* checkbox)
 {
    if (checkbox == mEnabledCheckbox)
-      mNoteOutput.Flush();
+      mNoteOutput.Flush(gTime);
 }
 
 void NoteStepSequencer::GridUpdated(UIGrid* grid, int col, int row, float value, float oldValue)
@@ -374,20 +374,20 @@ void NoteStepSequencer::OnTransportAdvanced(float amount)
    }
 }
 
-void NoteStepSequencer::OnPulse(float velocity, int samplesTo, int flags)
+void NoteStepSequencer::OnPulse(double time, float velocity, int flags)
 {
    mHasExternalPulseSource = true;
    
-   Step(velocity, samplesTo, flags);
+   Step(time, velocity, flags);
 }
 
-void NoteStepSequencer::OnTimeEvent(int samplesTo)
+void NoteStepSequencer::OnTimeEvent(double time)
 {
    if (!mHasExternalPulseSource)
-      Step(1, samplesTo, 0);
+      Step(time, 1, 0);
 }
 
-void NoteStepSequencer::Step(float velocity, int samplesTo, int pulseFlags)
+void NoteStepSequencer::Step(double time, float velocity, int pulseFlags)
 {
    if (!mEnabled)
       return;
@@ -411,8 +411,8 @@ void NoteStepSequencer::Step(float velocity, int samplesTo, int pulseFlags)
    {
       int stepsPerMeasure = TheTransport->CountInStandardMeasure(mInterval) * TheTransport->GetTimeSigTop()/TheTransport->GetTimeSigBottom();
       int numMeasures = ceil(float(mLength) / stepsPerMeasure);
-      int measure = TheTransport->GetMeasure() % numMeasures;
-      int step = (TheTransport->GetQuantized(0, mInterval) + measure * stepsPerMeasure) % mLength;
+      int measure = TheTransport->GetMeasure(time) % numMeasures;
+      int step = (TheTransport->GetQuantized(time, mInterval) + measure * stepsPerMeasure) % mLength;
       mArpIndex = step;
    }
    
@@ -438,23 +438,23 @@ void NoteStepSequencer::Step(float velocity, int samplesTo, int pulseFlags)
          offPitch = -1;
          mLastVel = mVels[mArpIndex];
          mLastNoteLength = mNoteLengths[mArpIndex];
-         mLastNoteStartTime = gTime;
+         mLastNoteStartTime = time;
          mAlreadyDidNoteOff = false;
       }
       else
       {
          if (mLastPitch == outPitch && !mAlreadyDidNoteOff)   //same note, play noteoff first
          {
-            PlayNoteOutput(gTime, mLastPitch, 0, -1);
+            PlayNoteOutput(time, mLastPitch, 0, -1);
             offPitch = -1;
          }
          if (mVels[mArpIndex] > 1)
          {
-            PlayNoteOutput(gTime, outPitch, mVels[mArpIndex] * velocity, -1);
+            PlayNoteOutput(time, outPitch, mVels[mArpIndex] * velocity, -1);
             mLastPitch = outPitch;
             mLastVel = mVels[mArpIndex];
             mLastNoteLength = mNoteLengths[mArpIndex];
-            mLastNoteStartTime = gTime;
+            mLastNoteStartTime = time;
             mAlreadyDidNoteOff = false;
          }
       }
@@ -462,7 +462,7 @@ void NoteStepSequencer::Step(float velocity, int samplesTo, int pulseFlags)
    
    if (offPitch != -1)
    {
-      PlayNoteOutput(gTime + samplesTo * gInvSampleRateMs, offPitch, 0, -1);
+      PlayNoteOutput(time, offPitch, 0, -1);
       if (offPitch == mLastPitch)
       {
          mLastPitch = -1;
@@ -712,7 +712,7 @@ void NoteStepSequencer::RandomizePitches(bool fifths)
 void NoteStepSequencer::DropdownUpdated(DropdownList* list, int oldVal)
 {
    if (list == mIntervalSelector)
-      TheTransport->UpdateListener(this, mInterval, 0, false);
+      TheTransport->UpdateListener(this, mInterval);
    if (list == mNoteModeSelector)
    {
       if (mNoteMode != oldVal)

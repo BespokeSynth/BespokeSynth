@@ -68,7 +68,7 @@ public:
    string GetType() override { return "stutter"; }
    
    //ITimeListener
-   void OnTimeEvent(int samplesTo) override;
+   void OnTimeEvent(double time) override;
 
    void CheckboxUpdated(Checkbox* checkbox) override;
    void IntSliderUpdated(IntSlider* slider, int oldVal) override;

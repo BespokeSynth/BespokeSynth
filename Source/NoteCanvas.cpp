@@ -101,7 +101,7 @@ void NoteCanvas::PlayNote(double time, int pitch, int velocity, int voiceIdx, Mo
    if (velocity > 0)
    {
       if (mFreeRecord && mFreeRecordStartMeasure == -1)
-         mFreeRecordStartMeasure = TheTransport->GetMeasure();
+         mFreeRecordStartMeasure = TheTransport->GetMeasure(time);
       
       float canvasPos = GetCurPos() * mCanvas->GetNumCols();
       int col = int(canvasPos + .5f); //round off
@@ -153,7 +153,7 @@ void NoteCanvas::KeyPressed(int key, bool isRepeat)
 
 bool NoteCanvas::FreeRecordParityMatched()
 {
-   int currentMeasureParity = (TheTransport->GetMeasure() % (mNumMeasures*2)) / mNumMeasures;
+   int currentMeasureParity = (TheTransport->GetMeasure(gTime) % (mNumMeasures*2)) / mNumMeasures;
    int recordStartMeasureParity = (mFreeRecordStartMeasure % (mNumMeasures*2)) / mNumMeasures;
    return currentMeasureParity == recordStartMeasureParity;
 }
@@ -164,7 +164,7 @@ void NoteCanvas::OnTransportAdvanced(float amount)
    
    if (mFreeRecord && mFreeRecordStartMeasure != -1)
    {
-      if (TheTransport->GetMeasurePos() < amount &&
+      if (TheTransport->GetMeasurePos(gTime) < amount &&
           !FreeRecordParityMatched())
       {
          int oldNumMeasures = mNumMeasures;
@@ -247,7 +247,7 @@ void NoteCanvas::OnTransportAdvanced(float amount)
 
 float NoteCanvas::GetCurPos() const
 {
-   return ((TheTransport->GetMeasure() % mNumMeasures) + TheTransport->GetMeasurePos()) / mNumMeasures;
+   return ((TheTransport->GetMeasure(gTime) % mNumMeasures) + TheTransport->GetMeasurePos(gTime)) / mNumMeasures;
 }
 
 void NoteCanvas::UpdateNumColumns()
@@ -305,7 +305,7 @@ void NoteCanvas::DrawModule()
    if (mRecord)
    {
       ofPushStyle();
-      ofSetColor(205 + 50 * (cosf(TheTransport->GetMeasurePos() * 4 * FTWO_PI)), 0, 0);
+      ofSetColor(205 + 50 * (cosf(TheTransport->GetMeasurePos(gTime) * 4 * FTWO_PI)), 0, 0);
       ofSetLineWidth(4);
       ofRect(mCanvas->GetPosition(true).x, mCanvas->GetPosition(true).y, mCanvas->GetWidth(), mCanvas->GetHeight());
       ofPopStyle();
@@ -472,7 +472,7 @@ void NoteCanvas::CheckboxUpdated(Checkbox* checkbox)
 {
    if (checkbox == mEnabledCheckbox)
    {
-      mNoteOutput.Flush();
+      mNoteOutput.Flush(gTime);
       for (int pitch=0; pitch<128; ++pitch)
          mInputNotes[pitch] = nullptr;
    }
@@ -481,7 +481,7 @@ void NoteCanvas::CheckboxUpdated(Checkbox* checkbox)
       if (!mPlay)
       {
          mRecord = false;
-         mNoteOutput.Flush();
+         mNoteOutput.Flush(gTime);
       }
    }
    if (checkbox == mRecordCheckbox)

@@ -33,7 +33,7 @@ struct BeatData
 {
    BeatData() : mBeat(nullptr) {}
    void LoadBeat(const SampleInfo* info);
-   void RecalcPos(bool doubleTime);
+   void RecalcPos(double time, bool doubleTime);
    
    int mNumBars;
    Sample* mBeat;
@@ -100,7 +100,7 @@ public:
    void RadioButtonUpdated(RadioButton* list, int oldVal) override;
    
    //ITimeListener
-   void OnTimeEvent(int samplesTo) override;
+   void OnTimeEvent(double time) override;
    
    void LoadLayout(const ofxJSONElement& moduleInfo) override;
    void SaveLayout(ofxJSONElement& moduleInfo) override;

@@ -264,7 +264,7 @@ bool MultitrackRecorder::IsRecordingStructure()
 
 void MultitrackRecorder::RecordStructure(int offset)
 {
-   mMeasurePos[ArrangementMaster::mPlayhead] = TheTransport->GetMeasurePos(offset);
+   mMeasurePos[ArrangementMaster::mPlayhead] = TheTransport->GetMeasurePos(gTime + offset * gInvSampleRateMs);
    mMaxRecordedLength = MAX(ArrangementMaster::mPlayhead, mMaxRecordedLength);
    
    if (ArrangementMaster::mPlayhead == 0 || mMeasurePos[ArrangementMaster::mPlayhead-1] > mMeasurePos[ArrangementMaster::mPlayhead])

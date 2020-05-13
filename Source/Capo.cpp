@@ -35,7 +35,7 @@ void Capo::DrawModule()
 void Capo::CheckboxUpdated(Checkbox *checkbox)
 {
    if (checkbox == mEnabledCheckbox)
-      mNoteOutput.Flush();
+      mNoteOutput.Flush(gTime);
 }
 
 void Capo::PlayNote(double time, int pitch, int velocity, int voiceIdx, ModulationParameters modulation)

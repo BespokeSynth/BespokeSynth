@@ -53,7 +53,7 @@ SampleEditor::SampleEditor()
 , mTransposition(0)
 , mDrawBuffer(0)
 {
-   TheTransport->AddListener(this, kInterval_1n);
+   TheTransport->AddListener(this, kInterval_1n, OffsetInfo(0, true), false);
    
    for (int i=0; i<ChannelBuffer::kMaxNumChannels; ++i)
       mPitchShifter[i] = new PitchShifter(1024);
@@ -193,7 +193,7 @@ void SampleEditor::UpdateSample()
    mNumBars = mSample->GetNumBars();
    mSampleStartSlider->SetExtents(0,mSample->LengthInSamples());
    mSampleEndSlider->SetExtents(0,mSample->LengthInSamples());
-   TheTransport->UpdateListener(this, kInterval_1n, -mOffset, false);
+   TheTransport->UpdateListener(this, kInterval_1n, OffsetInfo(-mOffset, false));
    mCurrentBar = mNumBars;
    mVolume = 1;
    mLoop = info.mType != "vox";
@@ -243,7 +243,7 @@ void SampleEditor::ButtonClicked(ClickButton *button)
    }
 }
 
-void SampleEditor::OnTimeEvent(int samplesTo)
+void SampleEditor::OnTimeEvent(double time)
 {
    if (mPlay && mSample)
    {
@@ -251,14 +251,14 @@ void SampleEditor::OnTimeEvent(int samplesTo)
          ++mCurrentBar;
       if (mReset)
       {
-         if (TheTransport->GetMeasure() % 4 == 0)
+         if (TheTransport->GetMeasure(time) % 4 == 0)
             mCurrentBar = 0;
          mReset = false;
       }
-      if ((mCurrentBar > mNumBars && (TheTransport->GetMeasure()+mMeasureEarly) % MIN(4,mNumBars) == 0) ||
+      if ((mCurrentBar > mNumBars && (TheTransport->GetMeasure(time)+mMeasureEarly) % MIN(4,mNumBars) == 0) ||
           (mCurrentBar == mNumBars && mLoop))
       {
-         mSample->Play(gTime + samplesTo * gInvSampleRateMs, 1, mSampleStart, mSampleEnd);
+         mSample->Play(time, 1, mSampleStart, mSampleEnd);
          mCurrentBar = 0;
       }
 
@@ -410,7 +410,7 @@ void SampleEditor::FloatSliderUpdated(FloatSlider* slider, float oldVal)
 {
    if (slider == mOffsetSlider)
    {
-      TheTransport->UpdateListener(this, kInterval_1n, -mOffset, false);
+      TheTransport->UpdateListener(this, kInterval_1n, OffsetInfo(-mOffset, false));
    }
    if (slider == mSampleEndSlider)
    {
@@ -421,8 +421,8 @@ void SampleEditor::FloatSliderUpdated(FloatSlider* slider, float oldVal)
 
 void SampleEditor::RecalcPos()
 {
-   float measurePos = -mOffset + mCurrentBar + TheTransport->GetMeasurePos();
-   if (TheTransport->GetMeasurePos() > 1+mOffset)
+   float measurePos = -mOffset + mCurrentBar + TheTransport->GetMeasurePos(gTime);
+   if (TheTransport->GetMeasurePos(gTime) > 1+mOffset)
       measurePos -= 1;
    int pos = ofMap(measurePos/mNumBars, 0, 1, mSampleStart, mSampleEnd, true);
    mPlayPosition = pos;

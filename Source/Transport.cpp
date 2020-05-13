@@ -14,12 +14,15 @@
 
 Transport* TheTransport = nullptr;
 
+//statics
+bool Transport::sDoEventLookahead = false;
+double Transport::sEventEarlyMs = 100;
+
 Transport::Transport()
 : mTempo(gDefaultTempo)
 , mTimeSigTop(4)
 , mTimeSigBottom(4)
-, mMeasureCount(0)
-, mMeasurePos(0)
+, mMeasureTime(0)
 , mSwingInterval(8)
 , mSwing(.5f)
 , mSwingSlider(nullptr)
@@ -98,30 +101,21 @@ void Transport::KeyPressed(int key, bool isRepeat)
    IDrawableModule::KeyPressed(key, isRepeat);
 }
 
-void Transport::AdjustTempo(float amount)
+void Transport::AdjustTempo(double amount)
 {
    SetTempo(MAX(1,TheTransport->GetTempo() + amount));
 }
 
-float Transport::MsPerBar() const
+void Transport::Advance(double ms)
 {
-   return 60/mTempo * 1000 * mTimeSigTop * 4.0f/mTimeSigBottom;
-}
-
-void Transport::Advance(float ms)
-{
-   float amount = ms/MsPerBar();
+   double amount = ms/MsPerBar();
    
    assert(amount > 0);
    
-   mMeasurePos += amount;
-   while (mMeasurePos>1)
-   {
-      mMeasurePos -= 1;
-      ++mMeasureCount;
-      if (mLoopStartMeasure != -1 && (mMeasureCount < mLoopStartMeasure || mMeasureCount >= mLoopEndMeasure))
-         mMeasureCount = mLoopStartMeasure;
-   }
+   mMeasureTime += amount;
+   
+   if (mLoopStartMeasure != -1 && (GetMeasure(gTime) < mLoopStartMeasure || GetMeasure(gTime) >= mLoopEndMeasure))
+      SetMeasure(mLoopStartMeasure);
    
    if (TheChaosEngine)
       TheChaosEngine->AudioUpdate();
@@ -177,17 +171,7 @@ float Transport::SwingBeat(float pos)
 
 void Transport::Nudge(float amount)
 {
-   mMeasurePos += amount;
-   if (mMeasurePos < 0)
-   {
-      mMeasurePos += 1;
-      --mMeasureCount;
-   }
-   else if (mMeasurePos > 1)
-   {
-      mMeasurePos -= 1;
-      ++mMeasureCount;
-   }
+   mMeasureTime += amount;
 }
 
 void Transport::DrawModule()
@@ -195,9 +179,11 @@ void Transport::DrawModule()
    if (Minimized() || IsVisible() == false)
       return;
    
-   int count = int(mMeasurePos*mTimeSigTop) + 1;
+   double measurePos = GetMeasurePos(gTime);
+   
+   int count = int(fmod(mMeasureTime,1)*mTimeSigTop) + 1;
    string display;
-   display += ofToString(mMeasurePos,2)+" "+ofToString(mMeasureCount)+"\n";
+   display += ofToString(measurePos,2)+" "+ofToString(GetMeasure(gTime))+"\n";
    display += ofToString(count);
    DrawTextNormal(display,5,52);
 
@@ -212,8 +198,8 @@ void Transport::DrawModule()
       ofSetColor(255,0,255);
    else
       ofSetColor(0,255,255);
-   ofLine(w*mMeasurePos,0,w*mMeasurePos,h);
-   ofRect(0,95,w*((mMeasurePos+(mMeasureCount%4))/4),5);
+   ofLine(w*measurePos,0,w*measurePos,h);
+   ofRect(0,95,w*((measurePos+(GetMeasure(gTime)%4))/4),5);
    ofPopStyle();
 
    mSwingSlider->Draw();
@@ -235,13 +221,12 @@ void Transport::DrawModule()
       ofVertex(i+1,h-1-swung*(h-1));
    }
    ofEndShape();
-   ofRect(0,h-Swing(mMeasurePos)*h,4,1);
+   ofRect(0,h-Swing(measurePos)*h,4,1);
 }
 
 void Transport::Reset()
 {
-   mMeasurePos = .999f;
-   mMeasureCount = -1;
+   mMeasureTime = -.001f;
 }
 
 void Transport::ButtonClicked(ClickButton *button)
@@ -258,14 +243,14 @@ void Transport::ButtonClicked(ClickButton *button)
       AdjustTempo(-1);
 }
 
-void Transport::AddListener(ITimeListener* listener, NoteInterval interval, float offset /*= 0*/, bool offsetIsInMs /*=true*/)
+void Transport::AddListener(ITimeListener* listener, NoteInterval interval, OffsetInfo offsetInfo, bool useEventLookahead)
 {
    //try to update first in case we already point to this
-   if (!UpdateListener(listener, interval, offset, offsetIsInMs))
-      mListeners.push_front(TransportListenerInfo(listener, interval, offset, offsetIsInMs));
+   if (!UpdateListener(listener, interval, offsetInfo))
+      mListeners.push_front(TransportListenerInfo(listener, interval, offsetInfo, useEventLookahead));
 }
 
-bool Transport::UpdateListener(ITimeListener* listener, NoteInterval interval, float offset /*= 0*/, bool offsetIsInMs /*=true*/)
+bool Transport::UpdateListener(ITimeListener* listener, NoteInterval interval)
 {
    for (list<TransportListenerInfo>::iterator i = mListeners.begin(); i != mListeners.end(); ++i)
    {
@@ -273,8 +258,21 @@ bool Transport::UpdateListener(ITimeListener* listener, NoteInterval interval, f
       if (info.mListener == listener)
       {
          info.mInterval = interval;
-         info.mOffset = offset;
-         info.mOffsetIsInMs = offsetIsInMs;
+         return true;
+      }
+   }
+   return false;
+}
+
+bool Transport::UpdateListener(ITimeListener* listener, NoteInterval interval, OffsetInfo offsetInfo)
+{
+   for (list<TransportListenerInfo>::iterator i = mListeners.begin(); i != mListeners.end(); ++i)
+   {
+      TransportListenerInfo& info = *i;
+      if (info.mListener == listener)
+      {
+         info.mInterval = interval;
+         info.mOffsetInfo = offsetInfo;
          return true;
       }
    }
@@ -304,26 +302,28 @@ void Transport::RemoveAudioPoller(IAudioPoller* poller)
    mAudioPollers.remove(poller);
 }
 
-int Transport::GetQuantized(float offsetMs, NoteInterval interval)
+int Transport::GetQuantized(double time, NoteInterval interval, double* remainderMs /*=nullptr*/)
 {
-   float offset = offsetMs / MsPerBar();
-   float measurePos = mMeasurePos;
-   while (measurePos+offset > 1) measurePos -= 1;
-   while (measurePos+offset < 0) measurePos += 1;
-   float pos = Swing(measurePos + offset);
-   pos *= float(mTimeSigTop) / mTimeSigBottom;
+   int measure = GetMeasure(time);
+   double pos = Swing(GetMeasurePos(time));
+   pos *= double(mTimeSigTop) / mTimeSigBottom;
    
    switch (interval)
    {
       case kInterval_1n:
-      case kInterval_2: //TODO(Ryan) not really, but whatever
+      case kInterval_2:
       case kInterval_3:
       case kInterval_4:
       case kInterval_8:
       case kInterval_16:
       case kInterval_32:
       case kInterval_64:
-         return (mMeasurePos + offset < 0) || (mMeasurePos + offset >= 1) ? 1 : 0;
+      {
+         int ret = measure / (int)GetMeasureFraction(interval);
+         if (remainderMs != nullptr)
+            *remainderMs = (pos + measure % (int)GetMeasureFraction(interval)) * MsPerBar();
+         return ret;
+      }
       case kInterval_2n:
       case kInterval_2nt:
       case kInterval_4n:
@@ -335,9 +335,17 @@ int Transport::GetQuantized(float offsetMs, NoteInterval interval)
       case kInterval_32n:
       case kInterval_32nt:
       case kInterval_64n:
-         return int(pos * CountInStandardMeasure(interval));
+      {
+         float ret = pos * CountInStandardMeasure(interval);
+         if (remainderMs != nullptr)
+         {
+            double remainder = ret - (int)ret;
+            *remainderMs = remainder * GetDuration(interval);
+         }
+         return (int)ret;
+      }
       case kInterval_None:
-         return int(pos * CountInStandardMeasure(kInterval_16n)); //TODO(Ryan) whatever
+         return GetQuantized(time, kInterval_16n, remainderMs); //TODO(Ryan) whatever
       default:
          //TODO(Ryan) this doesn't really make sense, does it?
          assert(false);
@@ -382,61 +390,65 @@ int Transport::CountInStandardMeasure(NoteInterval interval)
    return 0;
 }
 
-float Transport::GetDuration(NoteInterval interval)
+double Transport::GetDuration(NoteInterval interval)
 {
-   float msPerBar = MsPerBar();
+   return MsPerBar() * GetMeasureFraction(interval);
+}
+
+double Transport::GetMeasureFraction(NoteInterval interval)
+{
    switch (interval)
    {
       case kInterval_1n:
-         return msPerBar;
+         return 1.0;
       case kInterval_2n:
-         return GetDuration(kInterval_4n)*2;
+         return GetMeasureFraction(kInterval_4n)*2;
       case kInterval_2nt:
-         return GetDuration(kInterval_2n) * 2.0f / 3.0f;
+         return GetMeasureFraction(kInterval_2n) * 2.0f / 3.0f;
       case kInterval_4n:
-         return msPerBar/mTimeSigTop;
+         return 1.0/mTimeSigTop;
       case kInterval_4nt:
-         return GetDuration(kInterval_4n) * 2.0f / 3.0f;
+         return GetMeasureFraction(kInterval_4n) * 2.0f / 3.0f;
       case kInterval_8n:
-         return GetDuration(kInterval_4n)*.5f;
+         return GetMeasureFraction(kInterval_4n)*.5f;
       case kInterval_8nt:
-         return GetDuration(kInterval_8n) * 2.0f / 3.0f;
+         return GetMeasureFraction(kInterval_8n) * 2.0f / 3.0f;
       case kInterval_16n:
-         return GetDuration(kInterval_4n)*.25f;
+         return GetMeasureFraction(kInterval_4n)*.25f;
       case kInterval_16nt:
-         return GetDuration(kInterval_16n) * 2.0f / 3.0f;
+         return GetMeasureFraction(kInterval_16n) * 2.0f / 3.0f;
       case kInterval_32n:
-         return GetDuration(kInterval_4n)*.125f;
+         return GetMeasureFraction(kInterval_4n)*.125f;
       case kInterval_32nt:
-         return GetDuration(kInterval_32n) * 2.0f / 3.0f;
+         return GetMeasureFraction(kInterval_32n) * 2.0f / 3.0f;
       case kInterval_64n:
-         return GetDuration(kInterval_4n)*.0625f;
+         return GetMeasureFraction(kInterval_4n)*.0625f;
       case kInterval_4nd:
-         return GetDuration(kInterval_4n)*1.5f;
+         return GetMeasureFraction(kInterval_4n)*1.5f;
       case kInterval_8nd:
-         return GetDuration(kInterval_8n)*1.5f;
+         return GetMeasureFraction(kInterval_8n)*1.5f;
       case kInterval_16nd:
-         return GetDuration(kInterval_16n)*1.5f;
+         return GetMeasureFraction(kInterval_16n)*1.5f;
       case kInterval_2:
-         return msPerBar*2;
+         return 2;
       case kInterval_3:
-         return msPerBar*3;
+         return 3;
       case kInterval_4:
-         return msPerBar*4;
+         return 4;
       case kInterval_8:
-         return msPerBar*8;
+         return 8;
       case kInterval_16:
-         return msPerBar*16;
+         return 16;
       case kInterval_32:
-         return msPerBar*32;
+         return 32;
       case kInterval_64:
-         return msPerBar*64;
+         return 64;
       default:
-         return GetDuration(kInterval_4n)*.25f;
+         return GetMeasureFraction(kInterval_16n);
    }
 }
 
-void Transport::UpdateListeners(float jumpMs)
+void Transport::UpdateListeners(double jumpMs)
 {
    for (list<TransportListenerInfo>::iterator i = mListeners.begin(); i != mListeners.end(); ++i)
    {
@@ -444,20 +456,23 @@ void Transport::UpdateListeners(float jumpMs)
       if (info.mInterval != kInterval_None &&
           info.mInterval != kInterval_Free)
       {
-         if (info.mOffsetIsInMs)
-         {
-            if (GetQuantized(info.mOffset-jumpMs, info.mInterval) != GetQuantized(info.mOffset, info.mInterval))
-            {
-               info.mListener->OnTimeEvent(0); //TODO(Ryan) calc sample offset
-            }
-         }
+         double offsetMs;
+         if (info.mOffsetInfo.mOffsetIsInMs)
+            offsetMs = info.mOffsetInfo.mOffset;
          else
+            offsetMs = info.mOffsetInfo.mOffset*MsPerBar();
+         
+         double lookaheadMs = 0;
+         if (info.mUseEventLookahead)
+            lookaheadMs = GetEventLookaheadMs();
+         
+         double remainderMs;
+         int oldStep = GetQuantized(gTime + offsetMs - jumpMs + lookaheadMs, info.mInterval);
+         int newStep = GetQuantized(gTime + offsetMs + lookaheadMs, info.mInterval, &remainderMs);
+         if (oldStep != newStep)
          {
-            float offsetMs = info.mOffset*MsPerBar();
-            if (GetQuantized(offsetMs-jumpMs, info.mInterval) != GetQuantized(offsetMs, info.mInterval))
-            {
-               info.mListener->OnTimeEvent(0); //TODO(Ryan) calc sample offset
-            }
+            double time = gTime + lookaheadMs + remainderMs;
+            info.mListener->OnTimeEvent(time);
          }
       }
    }
@@ -471,15 +486,6 @@ void Transport::OnDrumEvent(NoteInterval drumEvent)
       if (info.mInterval == drumEvent)
          info.mListener->OnTimeEvent(0); //TODO(Ryan) calc sample offset
    }
-}
-
-float Transport::GetMeasurePos(int offset) const
-{
-   float inc = (offset*gInvSampleRateMs) / MsPerBar();
-   float pos = mMeasurePos + inc;
-   if (pos >= 1)
-      return pos - 1;
-   return pos;
 }
 
 void Transport::FloatSliderUpdated(FloatSlider* slider, float oldVal)
@@ -521,7 +527,7 @@ void Transport::SetUpFromSaveData()
 
 namespace
 {
-   const int kSaveStateRev = 0;
+   const int kSaveStateRev = 1;
 }
 
 void Transport::SaveState(FileStreamOut& out)
@@ -530,7 +536,7 @@ void Transport::SaveState(FileStreamOut& out)
    
    out << kSaveStateRev;
    
-   out << mMeasurePos;
+   out << mMeasureTime;
 }
 
 void Transport::LoadState(FileStreamIn& in)
@@ -539,8 +545,17 @@ void Transport::LoadState(FileStreamIn& in)
    
    int rev;
    in >> rev;
-   LoadStateValidate(rev == kSaveStateRev);
+   LoadStateValidate(rev <= kSaveStateRev);
    
-   in >> mMeasurePos;
+   if (rev == 0) //load as float instead of double
+   {
+      float measurePos;
+      in >> measurePos;
+      mMeasureTime = measurePos;
+   }
+   else
+   {
+      in >> mMeasureTime;
+   }
 }
 

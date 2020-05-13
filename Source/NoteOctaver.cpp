@@ -35,7 +35,7 @@ void NoteOctaver::DrawModule()
 void NoteOctaver::CheckboxUpdated(Checkbox *checkbox)
 {
    if (checkbox == mEnabledCheckbox)
-      mNoteOutput.Flush();
+      mNoteOutput.Flush(gTime);
 }
 
 void NoteOctaver::PlayNote(double time, int pitch, int velocity, int voiceIdx, ModulationParameters modulation)

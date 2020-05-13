@@ -23,8 +23,8 @@ class NoteOutput : public INoteReceiver
 public:
    NoteOutput(INoteSource* source) : mNoteSource(source) { bzero(mNotes, 128*sizeof(bool)); }
    
-   void Flush();
-   void FlushTarget(INoteReceiver* target);
+   void Flush(double time);
+   void FlushTarget(double time, INoteReceiver* target);
    
    //INoteReceiver
    void PlayNote(double time, int pitch, int velocity, int voiceIdx = -1, ModulationParameters modulation = ModulationParameters()) override;

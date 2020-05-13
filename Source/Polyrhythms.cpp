@@ -49,11 +49,11 @@ void Polyrhythms::OnTransportAdvanced(float amount)
    {
       int beats = mRhythmLines[i]->mGrid->GetCols();
       int oldQuantized;
-      if (amount > TheTransport->GetMeasurePos())
+      if (amount > TheTransport->GetMeasurePos(gTime))
          oldQuantized = -1;
       else
-         oldQuantized = int((TheTransport->GetMeasurePos()-amount) * beats);
-      int quantized = int(TheTransport->GetMeasurePos() * beats);
+         oldQuantized = int((TheTransport->GetMeasurePos(gTime)-amount) * beats);
+      int quantized = int(TheTransport->GetMeasurePos(gTime) * beats);
 
       if (quantized != oldQuantized && mRhythmLines[i]->mGrid->GetValRefactor(0,quantized) > 0)
       {

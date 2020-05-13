@@ -25,7 +25,7 @@ void WhiteKeys::DrawModule()
 void WhiteKeys::CheckboxUpdated(Checkbox *checkbox)
 {
    if (checkbox == mEnabledCheckbox)
-      mNoteOutput.Flush();
+      mNoteOutput.Flush(gTime);
 }
 
 void WhiteKeys::PlayNote(double time, int pitch, int velocity, int voiceIdx, ModulationParameters modulation)

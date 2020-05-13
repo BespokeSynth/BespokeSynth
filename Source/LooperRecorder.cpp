@@ -327,8 +327,8 @@ void LooperRecorder::DrawModule()
    ofVec2f center(48,28);
    float radius = 25;
    ofSetColor(255,255,255,100*gModuleDrawAlpha);
-   DrawCircleHash(center, (TheTransport->GetMeasurePos() + TheTransport->GetMeasure() % 8) / 8, 1, radius * .9f, radius);
-   DrawCircleHash(center, (TheTransport->GetMeasurePos() + TheTransport->GetMeasure() % mNumBars) / mNumBars, 3, radius * .7f, radius);
+   DrawCircleHash(center, (TheTransport->GetMeasurePos(gTime) + TheTransport->GetMeasure(gTime) % 8) / 8, 1, radius * .9f, radius);
+   DrawCircleHash(center, (TheTransport->GetMeasurePos(gTime) + TheTransport->GetMeasure(gTime) % mNumBars) / mNumBars, 3, radius * .7f, radius);
    for (int i=0; i<mNumBars; ++i)
       DrawCircleHash(center, float(i)/mNumBars, 1, radius * .8f, radius);
    ofPopStyle();
@@ -570,8 +570,8 @@ void LooperRecorder::ButtonClicked(ClickButton* button)
       }
       TheTransport->SetTempo(TheTransport->GetTempo()*2);
       mBaseTempo = TheTransport->GetTempo();
-      float pos = TheTransport->GetMeasurePos() + (TheTransport->GetMeasure()%8);
-      int count = TheTransport->GetMeasure() - int(pos);
+      float pos = TheTransport->GetMeasurePos(gTime) + (TheTransport->GetMeasure(gTime)%8);
+      int count = TheTransport->GetMeasure(gTime) - int(pos);
       pos *= 2;
       count += int(pos);
       pos -= int(pos);
@@ -588,8 +588,8 @@ void LooperRecorder::ButtonClicked(ClickButton* button)
       }
       TheTransport->SetTempo(TheTransport->GetTempo()/2);
       mBaseTempo = TheTransport->GetTempo();
-      float pos = TheTransport->GetMeasurePos() + (TheTransport->GetMeasure()%8);
-      int count = TheTransport->GetMeasure() - int(pos);
+      float pos = TheTransport->GetMeasurePos(gTime) + (TheTransport->GetMeasure(gTime)%8);
+      int count = TheTransport->GetMeasure(gTime) - int(pos);
       pos /= 2;
       count += int(pos);
       pos -= int(pos);
@@ -604,7 +604,7 @@ void LooperRecorder::ButtonClicked(ClickButton* button)
          if (mLoopers[i])
             mLoopers[i]->ShiftMeasure();
       }
-      int newMeasure = TheTransport->GetMeasure()-1;
+      int newMeasure = TheTransport->GetMeasure(gTime)-1;
       if (newMeasure < 0)
          newMeasure = 7;
       TheTransport->SetMeasure(newMeasure);
@@ -617,18 +617,18 @@ void LooperRecorder::ButtonClicked(ClickButton* button)
          if (mLoopers[i])
             mLoopers[i]->HalfShift();
       }
-      int newMeasure = int(TheTransport->GetMeasure()+TheTransport->GetMeasurePos()-.5f);
+      int newMeasure = int(TheTransport->GetMeasure(gTime)+TheTransport->GetMeasurePos(gTime)-.5f);
       if (newMeasure < 0)
          newMeasure = 7;
       TheTransport->SetMeasure(newMeasure);
-      float newMeasurePos = TheTransport->GetMeasurePos() - .5f;
+      float newMeasurePos = TheTransport->GetMeasurePos(gTime) - .5f;
       FloatWrap(newMeasurePos,1);
       TheTransport->SetMeasurePos(newMeasurePos);
    }
 
    if (button == mShiftDownbeatButton)
    {
-      TheTransport->SetMeasure(TheTransport->GetMeasure()/8 * 8);   //align to 8 bars
+      TheTransport->SetMeasure(TheTransport->GetMeasure(gTime)/8 * 8);   //align to 8 bars
       TheTransport->SetDownbeat();
       for (int i=0; i<mLoopers.size(); ++i)
       {

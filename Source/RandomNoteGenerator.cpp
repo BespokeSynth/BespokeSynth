@@ -27,7 +27,7 @@ RandomNoteGenerator::RandomNoteGenerator()
 , mSkipSlider(nullptr)
 , mSkipCount(0)
 {
-   TheTransport->AddListener(this, mInterval);
+   TheTransport->AddListener(this, mInterval, OffsetInfo(0, true), true);
 }
 
 void RandomNoteGenerator::CreateUIControls()
@@ -68,47 +68,47 @@ void RandomNoteGenerator::DrawModule()
    mOffsetSlider->Draw();
 }
 
-void RandomNoteGenerator::OnTimeEvent(int samplesTo)
+void RandomNoteGenerator::OnTimeEvent(double time)
 {
    if (!mEnabled)
       return;
    
    ++mSkipCount;
    
-   mNoteOutput.Flush();
+   mNoteOutput.Flush(time);
    if (mSkipCount >= mSkip)
    {
       mSkipCount = 0;
       if (mProbability >= ofRandom(1))
-         PlayNoteOutput(gTime, mPitch, mVelocity*127, -1);
+         PlayNoteOutput(time, mPitch, mVelocity*127, -1);
    }
 }
 
 void RandomNoteGenerator::CheckboxUpdated(Checkbox* checkbox)
 {
    if (checkbox == mEnabledCheckbox)
-      mNoteOutput.Flush();
+      mNoteOutput.Flush(gTime);
 }
 
 void RandomNoteGenerator::FloatSliderUpdated(FloatSlider* slider, float oldVal)
 {
    if (slider == mOffsetSlider)
    {
-      TheTransport->UpdateListener(this, mInterval, mOffset/TheTransport->CountInStandardMeasure(mInterval), !K(offsetIsInMs));
+      TheTransport->UpdateListener(this, mInterval, OffsetInfo(mOffset/TheTransport->CountInStandardMeasure(mInterval), !K(offsetIsInMs)));
    }
 }
 
 void RandomNoteGenerator::IntSliderUpdated(IntSlider* slider, int oldVal)
 {
    if (slider == mPitchSlider)
-      mNoteOutput.Flush();
+      mNoteOutput.Flush(gTime);
 }
 
 void RandomNoteGenerator::DropdownUpdated(DropdownList* list, int oldVal)
 {
    if (list == mIntervalSelector)
    {
-      TheTransport->UpdateListener(this, mInterval, mOffset/TheTransport->CountInStandardMeasure(mInterval), !K(offsetIsInMs));
+      TheTransport->UpdateListener(this, mInterval, OffsetInfo(mOffset/TheTransport->CountInStandardMeasure(mInterval), !K(offsetIsInMs)));
    }
 }
 

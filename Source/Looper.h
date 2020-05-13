@@ -108,11 +108,11 @@ private:
    void UpdateNumBars(int oldNumBars);
    void BakeVolume();
    void DoUndo();
-   void ProcessFourTet(int sampleIdx);
+   void ProcessFourTet(double time, int sampleIdx);
    void ProcessScratch();
    void ProcessGranular(double time, float bufferOffset, float* output);
-   void ProcessBeatwheel(int sampleIdx);
-   int GetMeasureSliceIndex(int sampleIdx, int slicesPerBar);
+   void ProcessBeatwheel(double time, int sampleIdx);
+   int GetMeasureSliceIndex(double time, int sampleIdx, int slicesPerBar);
    void DrawBeatwheel();
    float GetActualLoopPos(int samplesIn) const;
    int GetBeatwheelDepthLevel() const;

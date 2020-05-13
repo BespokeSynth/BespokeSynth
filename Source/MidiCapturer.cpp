@@ -47,7 +47,7 @@ void MidiCapturer::DrawModule()
 void MidiCapturer::OnTransportAdvanced(float amount)
 {
    while (mMessages[mPlayhead].getTimeStamp() > 0 &&
-          mMessages[mPlayhead].getTimeStamp() < TheTransport->GetMeasure() + TheTransport->GetMeasurePos() - 1)
+          mMessages[mPlayhead].getTimeStamp() < TheTransport->GetMeasureTime(gTime) - 1)
    {
       for (auto c : mDummyControllers)
          c->SendMidi(mMessages[mPlayhead]);
@@ -65,7 +65,7 @@ void MidiCapturer::SendMidi(const MidiMessage& message)
 {
    //ofLog() << message.getDescription();
    MidiMessage copy = message;
-   copy.setTimeStamp(TheTransport->GetMeasure() + TheTransport->GetMeasurePos());
+   copy.setTimeStamp(TheTransport->GetMeasureTime(gTime));
    mMessages[mRingBufferPos] = copy;
    mRingBufferPos = (mRingBufferPos + 1) % kRingBufferLength;
 }

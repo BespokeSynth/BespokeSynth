@@ -96,11 +96,11 @@ float CurveLooper::GetPlaybackPosition()
 {
    if (mLength < 0)
    {
-      float ret = TheTransport->GetMeasurePos() * (-mLength);
+      float ret = TheTransport->GetMeasurePos(gTime) * (-mLength);
       FloatWrap(ret, 1);
       return ret;
    }
-   return (TheTransport->GetMeasurePos() + TheTransport->GetMeasure() % mLength) / mLength;
+   return (TheTransport->GetMeasurePos(gTime) + TheTransport->GetMeasure(gTime) % mLength) / mLength;
 }
 
 void CurveLooper::DrawModule()

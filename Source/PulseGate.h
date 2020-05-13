@@ -26,7 +26,7 @@ public:
    void SetEnabled(bool enabled) override { mEnabled = enabled; }
    
    //IPulseReceiver
-   void OnPulse(float velocity, int samplesTo, int flags) override;
+   void OnPulse(double time, float velocity, int flags) override;
    
    void LoadLayout(const ofxJSONElement& moduleInfo) override;
    void SetUpFromSaveData() override;

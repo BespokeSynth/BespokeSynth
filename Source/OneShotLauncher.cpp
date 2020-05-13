@@ -26,7 +26,7 @@ OneShotLauncher::OneShotLauncher()
 {
    mWriteBuffer = new float[gBufferSize];
    Clear(mWriteBuffer, gBufferSize);
-   TheTransport->AddListener(this, kInterval_1n);
+   TheTransport->AddListener(this, kInterval_1n, OffsetInfo(0, true), false);
 }
 
 void OneShotLauncher::CreateUIControls()
@@ -118,7 +118,7 @@ void OneShotLauncher::DropdownUpdated(DropdownList* list, int oldVal)
    }
 }
 
-void OneShotLauncher::OnTimeEvent(int samplesTo)
+void OneShotLauncher::OnTimeEvent(double time)
 {
 }
 

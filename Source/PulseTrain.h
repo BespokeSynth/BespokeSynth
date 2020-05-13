@@ -34,13 +34,13 @@ public:
    void SetEnabled(bool enabled) override { mEnabled = enabled; }
    
    //IPulseReceiver
-   void OnPulse(float velocity, int samplesTo, int flags) override;
+   void OnPulse(double time, float velocity, int flags) override;
    
    //IAudioPoller
    void OnTransportAdvanced(float amount) override;
    
    //ITimeListener
-   void OnTimeEvent(int samplesTo) override;
+   void OnTimeEvent(double time) override;
    
    //UIGridListener
    void GridUpdated(UIGrid* grid, int col, int row, float value, float oldValue) override;
@@ -68,7 +68,7 @@ private:
    bool Enabled() const override { return mEnabled; }
    void OnClicked(int x, int y, bool right) override;
    
-   void Step(float velocity, int samplesTo, int flags);
+   void Step(double time, float velocity, int flags);
    
    static const int kMaxSteps = 32;
    float mVels[kMaxSteps];

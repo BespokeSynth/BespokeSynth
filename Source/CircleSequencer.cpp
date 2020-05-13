@@ -65,7 +65,6 @@ void CircleSequencer::OnTransportAdvanced(float amount)
 
 void CircleSequencer::DrawModule()
 {
-
    if (Minimized() || IsVisible() == false)
       return;
    
@@ -74,7 +73,7 @@ void CircleSequencer::DrawModule()
    
    ofPushStyle();
    ofSetColor(ofColor::lime);
-   float pos = TheTransport->GetMeasurePos();
+   float pos = TheTransport->GetMeasurePos(gTime);
    ofVec2f end = PolToCar(pos,100);
    ofLine(100,100,100+end.x,100+end.y);
    ofPopStyle();
@@ -223,7 +222,7 @@ void CircleSequencerRing::OnTransportAdvanced(float amount)
 {
    PROFILER(CircleSequencerRing);
    
-   float pos = TheTransport->GetMeasurePos() - mOffset;
+   float pos = TheTransport->GetMeasurePos(gTime) - mOffset;
    FloatWrap(pos,1);
    int oldQuantized;
    if (amount > pos)

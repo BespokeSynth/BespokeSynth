@@ -30,7 +30,7 @@ NoteChainNode::NoteChainNode()
 {
    SetIsNoteOrigin(true);
    TheTransport->AddAudioPoller(this);
-   TheTransport->AddListener(this, kInterval_8n);
+   TheTransport->AddListener(this, kInterval_8n, OffsetInfo(0, true), false);
 }
 
 NoteChainNode::~NoteChainNode()
@@ -77,7 +77,7 @@ void NoteChainNode::DrawModule()
    mNextSelector->Draw();
 }
 
-void NoteChainNode::OnTimeEvent(int samplesTo)
+void NoteChainNode::OnTimeEvent(double time)
 {
    if (mQueueTrigger)
    {
@@ -91,7 +91,7 @@ void NoteChainNode::OnTransportAdvanced(float amount)
    if (mNoteOn && gTime > mStartTime + mDuration)
    {
       mNoteOn = false;
-      mNoteOutput.Flush();
+      mNoteOutput.Flush(gTime);
    }
    
    if (mWaitingToTrigger && gTime > mStartTime + mNext)
@@ -125,7 +125,7 @@ void NoteChainNode::TriggerNote()
 void NoteChainNode::CheckboxUpdated(Checkbox* checkbox)
 {
    if (checkbox == mEnabledCheckbox)
-      mNoteOutput.Flush();
+      mNoteOutput.Flush(gTime);
 }
 
 void NoteChainNode::ButtonClicked(ClickButton* button)
@@ -139,7 +139,7 @@ void NoteChainNode::TextEntryComplete(TextEntry* entry)
    if (entry == mPitchEntry)
    {
       mNoteOn = false;
-      mNoteOutput.Flush();
+      mNoteOutput.Flush(gTime);
    }
 }
 

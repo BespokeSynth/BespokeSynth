@@ -42,7 +42,7 @@ public:
    
    void SetEnabled(bool enabled) override { mEnabled = enabled; }
    
-   void OnTimeEvent(int samplesTo) override;
+   void OnTimeEvent(double time) override;
    
    void CheckboxUpdated(Checkbox* checkbox) override;
    void FloatSliderUpdated(FloatSlider* slider, float oldVal) override;

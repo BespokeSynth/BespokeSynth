@@ -560,7 +560,7 @@ void MidiController::RemoveConnection(int control, MidiMessageType messageType, 
 void MidiController::Poll()
 {
    bool lastBlink = mBlink;
-   mBlink = int(TheTransport->GetMeasurePos() * TheTransport->GetTimeSigTop() * 2) % 2 == 0;
+   mBlink = int(TheTransport->GetMeasurePos(gTime) * TheTransport->GetTimeSigTop() * 2) % 2 == 0;
    
    if (IsInputConnected())
    {
@@ -705,7 +705,7 @@ void MidiController::Exit()
 
 void MidiController::DrawModule()
 {
-   if (gTime - mLastActivityTime < 200)
+   if (gTime - mLastActivityTime > 0 && gTime - mLastActivityTime < 200)
    {
       ofPushStyle();
       if (mLastActivityBound)
@@ -783,7 +783,7 @@ void MidiController::DrawModule()
       
       DrawTextNormal("last input: "+mLastInput,60,h-5);
       
-      if (gTime - mLastActivityTime < 200)
+      if (gTime - mLastActivityTime > 0 && gTime - mLastActivityTime < 200)
       {
          ofPushStyle();
          if (mLastActivityBound)
@@ -1924,7 +1924,7 @@ void UIControlConnection::DrawList(int index)
    if (mUIOwner->GetLayoutControl(mControl, mMessageType).mControlCable)
       mUIOwner->GetLayoutControl(mControl, mMessageType).mControlCable->SetManualPosition(rect.x + rect.width - 5, rect.y + rect.height/2);
    
-   if (gTime - mLastActivityTime < 200)
+   if (gTime - mLastActivityTime > 0 && gTime - mLastActivityTime < 200)
    {
       ofPushStyle();
       if (GetUIControl())

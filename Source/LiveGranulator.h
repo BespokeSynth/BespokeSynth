@@ -38,7 +38,7 @@ public:
    float GetEffectAmount() override;
    string GetType() override { return "granulator"; }
    
-   void OnTimeEvent(int samplesIn) override;
+   void OnTimeEvent(double time) override;
    
    void CheckboxUpdated(Checkbox* checkbox) override;
    void FloatSliderUpdated(FloatSlider* slider, float oldVal) override;

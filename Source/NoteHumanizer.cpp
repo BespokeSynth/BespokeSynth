@@ -49,7 +49,7 @@ void NoteHumanizer::DrawModule()
 void NoteHumanizer::CheckboxUpdated(Checkbox *checkbox)
 {
    if (checkbox == mEnabledCheckbox)
-      mNoteOutput.Flush();
+      mNoteOutput.Flush(gTime);
 }
 
 void NoteHumanizer::OnTransportAdvanced(float amount)

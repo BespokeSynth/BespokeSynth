@@ -1096,7 +1096,7 @@ void ModularSynth::AudioOut(float** output, int bufferSize, int nChannels)
       
       double elapsed = gInvSampleRateMs * gBufferSize;
       gTime += elapsed;
-      TheTransport->Advance((float)elapsed);
+      TheTransport->Advance(elapsed);
    }
    /////////// AUDIO PROCESSING ENDS HERE /////////////
    
@@ -1388,6 +1388,7 @@ bool ModularSynth::LoadLayoutFromString(string jsonString)
 void ModularSynth::LoadLayout(ofxJSONElement json)
 {
    ScriptModule::UninitializePython();
+   Transport::sDoEventLookahead = false;
    
    //ofLoadURLAsync("http://bespoke.com/telemetry/"+jsonFile);
    

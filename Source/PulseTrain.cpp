@@ -26,7 +26,7 @@ PulseTrain::PulseTrain()
    for (int i=0; i<kMaxSteps; ++i)
       mVels[i] = 1;
    
-   TheTransport->AddListener(this, mInterval);
+   TheTransport->AddListener(this, mInterval, OffsetInfo(0, true), false);
    TheTransport->AddAudioPoller(this);
 }
 
@@ -109,18 +109,18 @@ void PulseTrain::OnTransportAdvanced(float amount)
    ComputeSliders(0);
 }
 
-void PulseTrain::OnTimeEvent(int samplesTo)
+void PulseTrain::OnTimeEvent(double time)
 {
-   Step(1, samplesTo, 0);
+   Step(time, 1, 0);
 }
 
-void PulseTrain::OnPulse(float velocity, int samplesTo, int flags)
+void PulseTrain::OnPulse(double time, float velocity, int flags)
 {
    mStep = 0;
-   Step(velocity, samplesTo, kPulseFlag_Reset);
+   Step(time, velocity, kPulseFlag_Reset);
 }
 
-void PulseTrain::Step(float velocity, int samplesTo, int flags)
+void PulseTrain::Step(double time, float velocity, int flags)
 {
    if (!mEnabled)
       return;
@@ -144,10 +144,10 @@ void PulseTrain::Step(float velocity, int samplesTo, int flags)
       
       if (v > 0)
       {
-         DispatchPulse(GetPatchCableSource(), v, samplesTo, flags);
+         DispatchPulse(GetPatchCableSource(), time, v, flags);
          
          if (mStep < kIndividualStepCables)
-            DispatchPulse(mStepCables[mStep], v, samplesTo, flags);
+            DispatchPulse(mStepCables[mStep], time, v, flags);
       }
    }
    
@@ -189,7 +189,7 @@ bool PulseTrain::MouseScrolled(int x, int y, float scrollX, float scrollY)
 void PulseTrain::DropdownUpdated(DropdownList* list, int oldVal)
 {
    if (list == mIntervalSelector)
-      TheTransport->UpdateListener(this, mInterval, 0, false);
+      TheTransport->UpdateListener(this, mInterval);
 }
 
 void PulseTrain::FloatSliderUpdated(FloatSlider* slider, float oldVal)
