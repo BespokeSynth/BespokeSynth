@@ -191,17 +191,6 @@ public:
                                                                     "",
                                                                     &preferredSetupOptions);
 
-      if (!audioError.isEmpty() && audioError == "The input and output devices don't share a common sample rate!")
-      {
-         //bail and try again with no input device. TODO(Ryan) this is a gross lazy hack and should be worked out in the future
-         audioError = mGlobalManagers.mDeviceManager.initialise(0,
-                                                                outputChannels,
-                                                                nullptr,
-                                                                true,
-                                                                "",
-                                                                &preferredSetupOptions);
-      }
-
       if (audioError.isEmpty())
       {
          auto loadedSetup = mGlobalManagers.mDeviceManager.getAudioDeviceSetup();
@@ -214,7 +203,7 @@ public:
          else if (inputDevice != kAutoDevice && inputDevice != kNoneDevice &&
                   loadedSetup.inputDeviceName.toStdString() != inputDevice)
          {
-            mSynth.SetFatalError("error setting input device to "+inputDevice+", fix this in userprefs.json (use \"auto\" for default device)"+
+            mSynth.SetFatalError("error setting input device to "+inputDevice+", fix this in userprefs.json (use \"auto\" for default device, or \"none\" for no device)"+
                                  "\n\n\nvalid devices:\n"+GetAudioDevices());
          }
          else if (loadedSetup.bufferSize != gBufferSize)
@@ -240,7 +229,7 @@ public:
          if (audioError.startsWith("No such device"))
             audioError += "\n\nfix this in userprefs.json (you can use \"auto\" for the default device)";
          else
-            audioError += "\n\ninitialization errors could potentially be fixed by changing buffer size, sample rate, or input/output devices in userprefs.json";
+            audioError += "\n\ninitialization errors could potentially be fixed by changing buffer size, sample rate, or input/output devices in userprefs.json\nto use no input device, specify \"none\" for \"audio_input_device\"";
          mSynth.SetFatalError("error initializing audio device: "+audioError.toStdString() +
                               "\n\n\nvalid devices:\n" + GetAudioDevices());
       }

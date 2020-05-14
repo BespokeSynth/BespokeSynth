@@ -100,6 +100,7 @@ private:
    void GetModuleDimensions(int& width, int& height) override;
    bool Enabled() const override { return mEnabled; }
    void OnClicked(int x, int y, bool right) override;
+   vector<IUIControl*> ControlsToNotSetDuringLoadState() const override;
    
    ChannelBuffer mOutputBuffer;
    float mSpeed;
@@ -161,7 +162,7 @@ private:
    struct DrumHit
    {
       DrumHit()
-      : mLinkId(0)
+      : mLinkId(-1)
       , mVol(1)
       , mSpeed(1)
       , mVelocity(1)
@@ -208,6 +209,7 @@ private:
       FloatSlider* mPanSlider;
       Checkbox* mIndividualOutputCheckbox;
       FloatSlider* mEnvelopeLengthSlider;
+      IntSlider* mLinkIdSlider;
    };
    
    DrumHit mDrumHits[NUM_DRUM_HITS];

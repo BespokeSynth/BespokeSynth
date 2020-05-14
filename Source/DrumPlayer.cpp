@@ -76,14 +76,16 @@ void DrumPlayer::DrumHit::CreateUIControls(DrumPlayer* owner, int index)
    mSpeedSlider = new FloatSlider(owner,("speed "+ofToString(index)).c_str(),-1,-1,100,15,&mSpeed,.2f,3,2);
    mPanSlider = new FloatSlider(owner,("pan "+ofToString(index)).c_str(),-1,-1,100,15,&mPan,-1,1);
    mIndividualOutputCheckbox = new Checkbox(owner,("single out "+ofToString(index)).c_str(),-1,-1,&mHasIndividualOutput);
+   mLinkIdSlider = new IntSlider(owner, ("linkid " + ofToString(index)).c_str(), -1, -1, 100, 15, &mLinkId, -1, 5);
    mUseEnvelopeCheckbox = new Checkbox(owner,("envelope "+ofToString(index)).c_str(),-1,-1,&mUseEnvelope);
    mEnvelopeLengthSlider = new FloatSlider(owner,("view ms "+ofToString(index)).c_str(),-1,-1,100,15,&mEnvelopeLength,10,2000);
-   mEnvelopeDisplay = new ADSRDisplay(owner,("envelopedisplay "+ofToString(index)).c_str(),305, 200,135, 100,&mEnvelope);
+   mEnvelopeDisplay = new ADSRDisplay(owner,("envelopedisplay "+ofToString(index)).c_str(),305, 218,135, 100,&mEnvelope);
    
    mSpeedSlider->PositionTo(mVolSlider, kAnchor_Below);
    mPanSlider->PositionTo(mSpeedSlider, kAnchor_Below);
    mIndividualOutputCheckbox->PositionTo(mPanSlider, kAnchor_Below);
-   mUseEnvelopeCheckbox->PositionTo(mIndividualOutputCheckbox, kAnchor_Below);
+   mLinkIdSlider->PositionTo(mIndividualOutputCheckbox, kAnchor_Below);
+   mUseEnvelopeCheckbox->PositionTo(mLinkIdSlider, kAnchor_Below);
    mEnvelopeLengthSlider->PositionTo(mUseEnvelopeCheckbox, kAnchor_Below);
    
    int x = 5 + (index % 4) * 70;
@@ -113,6 +115,7 @@ void DrumPlayer::DrumHit::SetUIControlsShowing(bool showing)
    mEnvelopeDisplay->SetShowing(showing);
    mPanSlider->SetShowing(showing && mOwner->mMonoOutput == false);
    mIndividualOutputCheckbox->SetShowing(showing);
+   mLinkIdSlider->SetShowing(showing);
 }
 
 DrumPlayer::~DrumPlayer()
@@ -315,10 +318,13 @@ void DrumPlayer::PlayNote(double time, int pitch, int velocity, int voiceIdx, Mo
       {
          //reset all linked drum hits
          int playingId = mDrumHits[pitch].mLinkId;
-         for (int i=0; i<NUM_DRUM_HITS; ++i)
+         if (playingId != -1)
          {
-            if (mDrumHits[i].mLinkId == playingId && mDrumHits[i].mSample.GetPlayPosition() > 100)
-               mDrumHits[i].mSample.Reset();
+            for (int i = 0; i < NUM_DRUM_HITS; ++i)
+            {
+               if (mDrumHits[i].mLinkId == playingId && mDrumHits[i].mSample.GetPlayPosition() > 100)
+                  mDrumHits[i].mSample.Reset();
+            }
          }
 
          //play this one
@@ -351,7 +357,6 @@ void DrumPlayer::FilesDropped(vector<string> files, int x, int y)
    else
    {
       auditionDir = "";
-      static int sLoadId = 100;
       if (x < 4 && y < 4)
       {
          for (int i=0; i<files.size(); ++i)
@@ -362,11 +367,10 @@ void DrumPlayer::FilesDropped(vector<string> files, int x, int y)
                LoadSampleLock();
                mDrumHits[sampleIdx].mSample.Read(files[i].c_str());
                LoadSampleUnlock();
-               mDrumHits[sampleIdx].mLinkId = sLoadId;
+               mDrumHits[sampleIdx].mLinkId = -1;
                mDrumHits[sampleIdx].mVol = 1;
                mDrumHits[sampleIdx].mSpeed = 1;
                mDrumHits[sampleIdx].mPan = 0;
-               ++sLoadId;
             }
          }
       }
@@ -389,7 +393,6 @@ void DrumPlayer::SampleDropped(int x, int y, Sample* sample)
    y /= 70;
    
    mAuditionDir = "";
-   static int sLoadId = 100;
    if (x < 4 && y < 4)
    {
       int sampleIdx = GetAssociatedSampleIndex(x,y);
@@ -398,11 +401,10 @@ void DrumPlayer::SampleDropped(int x, int y, Sample* sample)
          LoadSampleLock();
          mDrumHits[sampleIdx].mSample.Create(sample->Data());
          LoadSampleUnlock();
-         mDrumHits[sampleIdx].mLinkId = sLoadId;
+         mDrumHits[sampleIdx].mLinkId = -1;
          mDrumHits[sampleIdx].mVol = 1;
          mDrumHits[sampleIdx].mSpeed = 1;
          mDrumHits[sampleIdx].mPan = 0;
-         ++sLoadId;
       }
    }
 }
@@ -562,6 +564,7 @@ void DrumPlayer::DrumHit::DrawUIControls()
    mSpeedSlider->Draw();
    mTestButton->Draw();
    mRandomButton->Draw();
+   mLinkIdSlider->Draw();
    mPanSlider->Draw();
    mIndividualOutputCheckbox->Draw();
    mUseEnvelopeCheckbox->Draw();
@@ -811,6 +814,13 @@ void DrumPlayer::ButtonClicked(ClickButton *button)
 
 void DrumPlayer::TextEntryComplete(TextEntry* entry)
 {
+}
+
+vector<IUIControl*> DrumPlayer::ControlsToNotSetDuringLoadState() const
+{
+   vector<IUIControl*> ignore;
+   ignore.push_back(mKitSelector);
+   return ignore;
 }
 
 void DrumPlayer::LoadLayout(const ofxJSONElement& moduleInfo)

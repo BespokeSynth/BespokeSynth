@@ -101,6 +101,7 @@ void ScriptModule::InitializePythonIfNecessary()
       py::exec("import bespoke", py::globals());
       py::exec("import scriptmodule", py::globals());
       py::exec("import random", py::globals());
+      py::exec("import math", py::globals());
    }
    sPythonInitialized = true;
 }

@@ -445,6 +445,9 @@ int CodeEntry::GetColForX(float x)
    x -= 2;
    
    x -= mScroll.x;
+
+   if (x < 0)
+      x = 0;
    
    return round(x / mCharWidth);
 }
@@ -454,6 +457,9 @@ int CodeEntry::GetRowForY(float y)
    y -= 2;
    
    y -= mScroll.y;
+
+   if (y < 0)
+      y = 0;
    
    return int(y / mCharHeight);
 }
