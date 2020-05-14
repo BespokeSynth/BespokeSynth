@@ -166,7 +166,9 @@ void ChannelBuffer::Load(FileStreamIn& in, int& readLength, bool setBufferSize)
    
    in >> readLength;
    if (setBufferSize)
-      mBufferSize = readLength;
+      Setup(readLength);
+   else
+      assert(readLength == mBufferSize);
    in >> mActiveChannels;
    for (int i=0; i<mActiveChannels; ++i)
       in.Read(GetChannel(i), readLength);
