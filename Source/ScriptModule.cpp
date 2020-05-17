@@ -14,12 +14,14 @@
 #include "ScriptModule.h"
 #include "SynthGlobals.h"
 #include "ModularSynth.h"
+#include "Scale.h"
 #include "UIControlMacros.h"
 #if BESPOKE_WINDOWS
 #undef ssize_t
 #endif
 
 #include "pybind11/embed.h"
+#include "pybind11/stl.h"
 
 namespace py = pybind11;
 
@@ -332,6 +334,18 @@ PYBIND11_EMBEDDED_MODULE(bespoke, m) {
    {
       float measureTime = ScriptModule::GetScriptMeasureTime();
       return ceil(measureTime * subdivision) / subdivision - measureTime;
+   });
+   m.def("get_root", []()
+   {
+      return TheScale->ScaleRoot();
+   });
+   m.def("get_scale", []()
+   {
+      return TheScale->GetScalePitches().mScalePitches;
+   });
+   m.def("tone_to_pitch", [](int index)
+   {
+      return TheScale->GetPitchFromTone(index);
    });
 }
 

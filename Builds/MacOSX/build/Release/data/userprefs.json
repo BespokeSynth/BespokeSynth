@@ -1,8 +1,8 @@
 {
    "samplerate" : 44100,
-   "buffersize" : 64,
+   "buffersize" : 128,
    "audio_output_device" : "auto",
-   "audio_input_device" : "auto",
+   "audio_input_device" : "none",
    "height" : 1100,
    "width" : 1700,
    "layout" : "layouts/blank.json",
