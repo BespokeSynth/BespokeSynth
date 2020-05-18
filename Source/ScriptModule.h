@@ -34,7 +34,7 @@ public:
    void Poll() override;
    
    void PlayNoteFromScript(int pitch, int velocity, float pan);
-   void PlayNoteFromScriptAfterDelay(int pitch, int velocity, float delayMeasureTime);
+   void PlayNoteFromScriptAfterDelay(int pitch, int velocity, float delayMeasureTime, float pan);
    void ScheduleMethod(string method, float delayMeasureTime);
    void HighlightLine(int lineNum);
    void PrintText(string text);
@@ -65,7 +65,7 @@ private:
    void RunScript(double time);
    void RunCode(double time, string code);
    void FixUpCode(string& code);
-   void ScheduleNote(double time, int pitch, int velocity);
+   void ScheduleNote(double time, int pitch, int velocity, float pan);
    string GetThisName();
    string GetIndentation(string line);
    bool ShouldDisplayLineExecutionPre(string priorLine, string line);
@@ -112,6 +112,7 @@ private:
       double time;
       int pitch;
       int velocity;
+      float pan;
       int lineNum;
    };
    static const int kScheduledNoteOutputBufferSize = 50;

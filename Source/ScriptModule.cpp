@@ -293,7 +293,7 @@ void ScriptModule::Poll()
       if (mScheduledNoteOutput[i].time != -1 &&
           gTime + 50 > mScheduledNoteOutput[i].time)
       {
-         PlayNote(mScheduledNoteOutput[i].time, mScheduledNoteOutput[i].pitch, mScheduledNoteOutput[i].velocity, 0, mScheduledNoteOutput[i].lineNum);
+         PlayNote(mScheduledNoteOutput[i].time, mScheduledNoteOutput[i].pitch, mScheduledNoteOutput[i].velocity, mScheduledNoteOutput[i].pan, mScheduledNoteOutput[i].lineNum);
          mScheduledNoteOutput[i].time = -1;
       }
    }
@@ -359,21 +359,26 @@ PYBIND11_EMBEDDED_MODULE(scriptmodule, m)
       .def("play_note", [](ScriptModule &module, int pitch, int velocity, float length)
       {
          module.PlayNoteFromScript(pitch, velocity, 0);
-         module.PlayNoteFromScriptAfterDelay(pitch, 0, length);
+         module.PlayNoteFromScriptAfterDelay(pitch, 0, length, 0);
       })
       .def("play_note_pan", [](ScriptModule &module, int pitch, int velocity, float length, float pan)
       {
          module.PlayNoteFromScript(pitch, velocity, pan);
-         module.PlayNoteFromScriptAfterDelay(pitch, 0, length);
+         module.PlayNoteFromScriptAfterDelay(pitch, 0, length, 0);
       })
       .def("schedule_note", [](ScriptModule &module, float delay, int pitch, int velocity, float length)
       {
-         module.PlayNoteFromScriptAfterDelay(pitch, velocity, delay);
-         module.PlayNoteFromScriptAfterDelay(pitch, 0, delay + length);
+         module.PlayNoteFromScriptAfterDelay(pitch, velocity, delay, 0);
+         module.PlayNoteFromScriptAfterDelay(pitch, 0, delay + length, 0);
+      })
+      .def("schedule_note_pan", [](ScriptModule &module, float delay, int pitch, int velocity, float length, float pan)
+      {
+         module.PlayNoteFromScriptAfterDelay(pitch, velocity, delay, pan);
+         module.PlayNoteFromScriptAfterDelay(pitch, 0, delay + length, 0);
       })
       .def("schedule_note_on", [](ScriptModule &module, float delay, int pitch, int velocity)
       {
-         module.PlayNoteFromScriptAfterDelay(pitch, velocity, delay);
+         module.PlayNoteFromScriptAfterDelay(pitch, velocity, delay, 0);
       })
       .def("schedule_call", [](ScriptModule &module, float delay, string method)
       {
@@ -430,7 +435,7 @@ void ScriptModule::PlayNoteFromScript(int pitch, int velocity, float pan)
    PlayNote(sMostRecentRunTime, pitch, velocity, pan, mNextLineToExecute);
 }
 
-void ScriptModule::PlayNoteFromScriptAfterDelay(int pitch, int velocity, float delayMeasureTime)
+void ScriptModule::PlayNoteFromScriptAfterDelay(int pitch, int velocity, float delayMeasureTime, float pan)
 {
    double time = sMostRecentRunTime + delayMeasureTime * TheTransport->MsPerBar();
    
@@ -438,15 +443,15 @@ void ScriptModule::PlayNoteFromScriptAfterDelay(int pitch, int velocity, float d
    {
       if (time < gTime)
          ofLog() << "script is trying to play a note in the past!";
-      PlayNote(time, pitch, velocity, 0, mNextLineToExecute);
+      PlayNote(time, pitch, velocity, pan, mNextLineToExecute);
    }
    else
    {
-      ScheduleNote(time, pitch, velocity);
+      ScheduleNote(time, pitch, velocity, pan);
    }
 }
 
-void ScriptModule::ScheduleNote(double time, int pitch, int velocity)
+void ScriptModule::ScheduleNote(double time, int pitch, int velocity, float pan)
 {
    for (int i=0; i<kScheduledNoteOutputBufferSize; ++i)
    {
@@ -456,6 +461,7 @@ void ScriptModule::ScheduleNote(double time, int pitch, int velocity)
          mScheduledNoteOutput[i].startTime = sMostRecentRunTime;
          mScheduledNoteOutput[i].pitch = pitch;
          mScheduledNoteOutput[i].velocity = velocity;
+         mScheduledNoteOutput[i].pan = pan;
          mScheduledNoteOutput[i].lineNum = mNextLineToExecute;
          break;
       }
