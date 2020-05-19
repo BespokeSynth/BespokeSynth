@@ -22,4 +22,25 @@ public:
    virtual void SendMidi(const MidiMessage& message) { }
 };
 
+struct NoteInputElement
+{
+   double time;
+   int pitch;
+   float velocity;
+   int voiceIdx;
+   ModulationParameters modulation;
+};
+
+class NoteInputBuffer
+{
+public:
+   NoteInputBuffer(INoteReceiver* receiver);
+   void Process(double time);
+   void QueueNote(double time, int pitch, float velocity, int voiceIdx, ModulationParameters modulation);
+private:
+   static const int kBufferSize = 50;
+   NoteInputElement mBuffer[kBufferSize];
+   INoteReceiver* mReceiver;
+};
+
 #endif

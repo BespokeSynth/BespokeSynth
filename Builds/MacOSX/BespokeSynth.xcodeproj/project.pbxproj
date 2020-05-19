@@ -1093,6 +1093,10 @@
 			isa = PBXBuildFile;
 			fileRef = 5A4051B84B681DA1F039E5F4;
 		};
+		5AF6AE1DDF317984F1A5EC0E = {
+			isa = PBXBuildFile;
+			fileRef = 96FF71CE609177800D205FFD;
+		};
 		3917819C66A73166D1ABB3DD = {
 			isa = PBXBuildFile;
 			fileRef = 6DACD506E4EC1311F1EDC9EE;
@@ -4273,6 +4277,13 @@
 			path = ../../Source/ModWheel.cpp;
 			sourceTree = "SOURCE_ROOT";
 		};
+		96FF71CE609177800D205FFD = {
+			isa = PBXFileReference;
+			lastKnownFileType = sourcecode.cpp.cpp;
+			name = INoteReceiver.cpp;
+			path = ../../Source/INoteReceiver.cpp;
+			sourceTree = "SOURCE_ROOT";
+		};
 		974C0A270F83287087077F8C = {
 			isa = PBXFileReference;
 			lastKnownFileType = sourcecode.cpp.cpp;
@@ -6296,13 +6307,6 @@
 			path = ../../Source/Ramper.cpp;
 			sourceTree = "SOURCE_ROOT";
 		};
-		FB3C3E39E7AF26F8071A72C6 = {
-			isa = PBXFileReference;
-			lastKnownFileType = text.plist.xml;
-			name = BespokeSynth.entitlements;
-			path = BespokeSynth.entitlements;
-			sourceTree = "SOURCE_ROOT";
-		};
 		FB5B07C6B8C3D68C6F84E561 = {
 			isa = PBXFileReference;
 			lastKnownFileType = sourcecode.c.h;
@@ -7158,6 +7162,7 @@
 				5A4051B84B681DA1F039E5F4,
 				58F4A7522C78C03565686F1D,
 				95021C8E6BE29A1B90122843,
+				96FF71CE609177800D205FFD,
 				62D9CD424D0924445C14A5A2,
 				6DACD506E4EC1311F1EDC9EE,
 				8F4E2C64190103CAF9CA2F31,
@@ -7369,7 +7374,6 @@
 				CLANG_CXX_LANGUAGE_STANDARD = "c++11";
 				CLANG_CXX_LIBRARY = "libc++";
 				CLANG_LINK_OBJC_RUNTIME = NO;
-				CODE_SIGN_IDENTITY = "";
 				COMBINE_HIDPI_IMAGES = YES;
 				CONFIGURATION_BUILD_DIR = "$(PROJECT_DIR)/build/$(CONFIGURATION)";
 				COPY_PHASE_STRIP = NO;
@@ -7421,7 +7425,6 @@
 				CLANG_CXX_LANGUAGE_STANDARD = "c++11";
 				CLANG_CXX_LIBRARY = "libc++";
 				CLANG_LINK_OBJC_RUNTIME = NO;
-				CODE_SIGN_IDENTITY = "";
 				COMBINE_HIDPI_IMAGES = YES;
 				CONFIGURATION_BUILD_DIR = "$(PROJECT_DIR)/build/$(CONFIGURATION)";
 				DEAD_CODE_STRIPPING = YES;
@@ -7491,8 +7494,7 @@
 				CLANG_WARN_SUSPICIOUS_MOVE = YES;
 				CLANG_WARN_UNREACHABLE_CODE = YES;
 				CLANG_WARN__DUPLICATE_METHOD_MATCH = YES;
-				CODE_SIGN_IDENTITY = "";
-				DEBUG_INFORMATION_FORMAT = dwarf;
+				DEBUG_INFORMATION_FORMAT = "dwarf";
 				ENABLE_STRICT_OBJC_MSGSEND = YES;
 				ENABLE_TESTABILITY = YES;
 				GCC_C_LANGUAGE_STANDARD = c11;
@@ -7511,7 +7513,7 @@
 				GCC_WARN_UNUSED_VARIABLE = YES;
 				ONLY_ACTIVE_ARCH = YES;
 				PRODUCT_NAME = "Bespoke";
-				WARNING_CFLAGS = "-Wreorder";
+				WARNING_CFLAGS = -Wreorder;
 				ZERO_LINK = NO;
 			};
 			name = Debug;
@@ -7538,8 +7540,7 @@
 				CLANG_WARN_SUSPICIOUS_MOVE = YES;
 				CLANG_WARN_UNREACHABLE_CODE = YES;
 				CLANG_WARN__DUPLICATE_METHOD_MATCH = YES;
-				CODE_SIGN_IDENTITY = "";
-				DEBUG_INFORMATION_FORMAT = dwarf;
+				DEBUG_INFORMATION_FORMAT = "dwarf";
 				ENABLE_STRICT_OBJC_MSGSEND = YES;
 				GCC_C_LANGUAGE_STANDARD = c11;
 				GCC_INLINES_ARE_PRIVATE_EXTERN = YES;
@@ -7556,7 +7557,7 @@
 				GCC_WARN_UNUSED_FUNCTION = YES;
 				GCC_WARN_UNUSED_VARIABLE = YES;
 				PRODUCT_NAME = "Bespoke";
-				WARNING_CFLAGS = "-Wreorder";
+				WARNING_CFLAGS = -Wreorder;
 				ZERO_LINK = NO;
 			};
 			name = Release;
@@ -7849,6 +7850,7 @@
 				5E809A2B21FDF621D24DB3A8,
 				54ADDEE53A57B7DDFBB04C8C,
 				46EE444224611527356AC849,
+				5AF6AE1DDF317984F1A5EC0E,
 				3917819C66A73166D1ABB3DD,
 				9852937B41F07FF36F0A931D,
 				DD748F57044A0B42CADDC10E,
@@ -7953,14 +7955,13 @@
 		EE2382E14CD4E4AC58D9114E = {
 			isa = PBXProject;
 			buildConfigurationList = 7FCFF517466C63AAB04E33BA;
-			attributes = { LastUpgradeCheck = 1100; ORGANIZATIONNAME = ""; TargetAttributes = { DAAB28E086014C75EC54A378 = { SystemCapabilities = {com.apple.ApplicationGroups.iOS = { enabled = 0; }; com.apple.InAppPurchase = { enabled = 0; }; com.apple.InterAppAudio = { enabled = 0; }; com.apple.Push = { enabled = 0; }; com.apple.Sandbox = { enabled = 0; }; com.apple.HardenedRuntime = { enabled = 0; }; }; }; }; };
+			attributes = { LastUpgradeCheck = 0930; ORGANIZATIONNAME = ""; TargetAttributes = { DAAB28E086014C75EC54A378 = { SystemCapabilities = {com.apple.ApplicationGroups.iOS = { enabled = 0; }; com.apple.InAppPurchase = { enabled = 0; }; com.apple.InterAppAudio = { enabled = 0; }; com.apple.Push = { enabled = 0; }; com.apple.Sandbox = { enabled = 0; }; }; }; }; };
 			compatibilityVersion = "Xcode 3.2";
 			hasScannedForEncodings = 0;
 			mainGroup = E1DDBBBBF7A5D496C07CC55D;
 			projectDirPath = "";
 			projectRoot = "";
 			targets = (DAAB28E086014C75EC54A378);
-			knownRegions = (en, Base);
 		};
 	};
 	rootObject = EE2382E14CD4E4AC58D9114E;

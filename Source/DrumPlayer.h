@@ -129,6 +129,7 @@ private:
    bool mMonoOutput;
    Checkbox* mMonoCheckbox;
    GridController* mGridController;
+   NoteInputBuffer mNoteInputBuffer;
    
    void LoadSampleLock();
    void LoadSampleUnlock();

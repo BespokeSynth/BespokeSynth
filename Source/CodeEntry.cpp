@@ -96,10 +96,14 @@ void CodeEntry::Render()
       ofFill();
    }
    
-   ofSetColor(color,gModuleDrawAlpha);
    const float kFontSize = 14;
    mCharWidth = gFontFixedWidth.GetStringWidth("x", kFontSize, K(isRenderThread));
    mCharHeight = gFontFixedWidth.GetStringHeight("x", kFontSize, K(isRenderThread));
+   
+   ofSetColor(color,gModuleDrawAlpha * .2f);
+   gFontFixedWidth.DrawString(mPublishedString, kFontSize, mX+2 - mScroll.x, mY + mCharHeight - mScroll.y);
+   
+   ofSetColor(color,gModuleDrawAlpha);
    gFontFixedWidth.DrawString(mString, kFontSize, mX+2 - mScroll.x, mY + mCharHeight - mScroll.y);
    
    /*for (int i = 0; i<60; ++i)
@@ -138,7 +142,7 @@ void CodeEntry::Render()
          int endLineNum = (int)round(coordsEnd.y);
          int startCol = (int)round(coordsStart.x);
          int endCol = (int)round(coordsEnd.x);
-         vector<string> lines = ofSplitString(mString, "\n");
+         auto lines = GetLines();
          for (int i=startLineNum; i<=endLineNum; ++i)
          {
             int begin = 0;
@@ -285,7 +289,7 @@ void CodeEntry::OnKeyPressed(int key, bool isRepeat)
       
       ofVec2f coords = GetCaretCoords(mCaretPosition);
       int lineNum = (int)round(coords.y);
-      vector<string> lines = ofSplitString(mString, "\n");
+      auto lines = GetLines();
       int numSpaces = 0;
       if (mCaretPosition > 0 && mString[mCaretPosition-1] == ':') //auto-indent
          numSpaces += kTabSize;
@@ -400,7 +404,21 @@ void CodeEntry::MoveCaret(int pos, bool allowSelection /*=true*/)
 void CodeEntry::MoveCaretToStart()
 {
    ofVec2f coords = GetCaretCoords(mCaretPosition);
-   MoveCaret(GetCaretPosition(0, coords.y));
+   auto lines = GetLines();
+   int x = 0;
+   if (coords.y < lines.size())
+   {
+      for (size_t i=0; i<lines[coords.y].size(); ++i)
+      {
+         if (lines[coords.y][i] == ' ')
+            ++x;
+         else
+            break;
+      }
+   }
+   if (x == coords.x)
+      x = 0;
+   MoveCaret(GetCaretPosition(x, coords.y));
 }
 
 void CodeEntry::MoveCaretToEnd()
@@ -429,7 +447,7 @@ bool CodeEntry::MouseScrolled(int x, int y, float scrollX, float scrollY)
 
 int CodeEntry::GetCaretPosition(int col, int row)
 {
-   vector<string> lines = ofSplitString(mString, "\n");
+   auto lines = GetLines();
    int caretPos = 0;
    for (size_t i=0; i<row && i<lines.size(); ++i)
       caretPos += lines[i].length() + 1;
@@ -464,14 +482,14 @@ int CodeEntry::GetRowForY(float y)
    return int(y / mCharHeight);
 }
 
-ofVec2f CodeEntry::GetLinePos(int lineNum, bool end /*= false*/)
+ofVec2f CodeEntry::GetLinePos(int lineNum, bool end)
 {
    float x = mX - mScroll.x;
    float y = lineNum * mCharHeight + mY - mScroll.y;
    
    if (end)
    {
-      vector<string> lines = ofSplitString(mString, "\n");
+      auto lines = ofSplitString(mPublishedString, "\n");
       if (lineNum < (int)lines.size())
          x += lines[lineNum].length() * mCharWidth;
    }
@@ -483,7 +501,7 @@ ofVec2f CodeEntry::GetCaretCoords(int caret)
 {
    ofVec2f coords;
    int caretRemaining = caret;
-   vector<string> lines = ofSplitString(mString, "\n");
+   auto lines = GetLines();
    for (size_t i=0; i<lines.size(); ++i)
    {
       if (caretRemaining >= lines[i].length() + 1)

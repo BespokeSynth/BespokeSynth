@@ -65,6 +65,7 @@ private:
    void UpdateADSRDisplays();
    
    PolyphonyMgr mPolyMgr;
+   NoteInputBuffer mNoteInputBuffer;
    OscillatorVoiceParams mVoiceParams;
    FloatSlider* mVolSlider;
    FloatSlider* mPhaseOffsetSlider;

@@ -24,6 +24,7 @@ KarplusStrong::KarplusStrong()
 , mExciterAttackSlider(nullptr)
 , mExciterDecaySlider(nullptr)
 , mPolyMgr(this)
+, mNoteInputBuffer(this)
 , mWriteBuffer(gBufferSize)
 {
    mPolyMgr.Init(kVoiceType_Karplus, &mVoiceParams);
@@ -73,6 +74,8 @@ void KarplusStrong::Process(double time)
 
    if (!mEnabled || GetTarget() == nullptr)
       return;
+   
+   mNoteInputBuffer.Process(time);
 
    ComputeSliders(0);
 
@@ -94,6 +97,12 @@ void KarplusStrong::Process(double time)
 
 void KarplusStrong::PlayNote(double time, int pitch, int velocity, int voiceIdx, ModulationParameters modulation)
 {
+   if (time > gTime + gBufferSize * gInvSampleRateMs)
+   {
+      mNoteInputBuffer.QueueNote(time, pitch, velocity, voiceIdx, modulation);
+      return;
+   }
+   
    if (velocity > 0)
       mPolyMgr.Start(time, pitch, velocity/127.0f, voiceIdx, modulation);
    else

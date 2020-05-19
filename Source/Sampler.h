@@ -73,6 +73,7 @@ private:
    
    
    PolyphonyMgr mPolyMgr;
+   NoteInputBuffer mNoteInputBuffer;
    SampleVoiceParams mVoiceParams;
    FloatSlider* mVolSlider;
    ADSRDisplay* mADSRDisplay;

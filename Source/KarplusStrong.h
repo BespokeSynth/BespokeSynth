@@ -56,6 +56,7 @@ private:
    bool Enabled() const override { return mEnabled; }
 
    PolyphonyMgr mPolyMgr;
+   NoteInputBuffer mNoteInputBuffer;
    KarplusStrongVoiceParams mVoiceParams;
    FloatSlider* mFilterSlider;
    FloatSlider* mFeedbackSlider;

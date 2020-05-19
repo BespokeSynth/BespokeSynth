@@ -225,7 +225,7 @@ void ScriptModule::DrawModuleUnclipped()
       {
          ofSetColor(IDrawableModule::GetColor(kModuleType_Modulator), 100*(1-(gTime - mUIControlModifications[i].time)/fadeMs));
          
-         ofVec2f linePos = mCodeEntry->GetLinePos(mUIControlModifications[i].lineNum);
+         ofVec2f linePos = mCodeEntry->GetLinePos(mUIControlModifications[i].lineNum, false);
       
          ofPushMatrix();
          ofTranslate(-mX, -mY);
@@ -239,7 +239,7 @@ void ScriptModule::DrawModuleUnclipped()
 
 void ScriptModule::DrawTimer(int lineNum, double startTime, double endTime, ofColor color)
 {
-   ofVec2f linePos = mCodeEntry->GetLinePos(lineNum);
+   ofVec2f linePos = mCodeEntry->GetLinePos(lineNum, false);
    linePos.x += 11;
    linePos.y += 10;
    float t = (gTime - startTime) / (endTime - startTime);
@@ -873,7 +873,7 @@ void ScriptModule::LineEventTracker::Draw(CodeEntry* codeEntry, int style, ofCol
       if (gTime - mTimes[i] > 0 && gTime - mTimes[i] < fadeMs)
       {
          ofSetColor(color, alpha*(1-(gTime - mTimes[i])/fadeMs));
-         ofVec2f linePos = codeEntry->GetLinePos(i);
+         ofVec2f linePos = codeEntry->GetLinePos(i, false);
          if (style == 0)
             ofRect(linePos.x + 1, linePos.y + 3, 4, codeEntry->GetCharHeight(), L(corner,0));
          if (style == 1)

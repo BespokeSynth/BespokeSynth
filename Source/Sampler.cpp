@@ -19,6 +19,8 @@
 
 Sampler::Sampler()
 : IAudioProcessor(gBufferSize)
+, mPolyMgr(this)
+, mNoteInputBuffer(this)
 , mVolSlider(nullptr)
 , mADSRDisplay(nullptr)
 , mRecordPos(0)
@@ -31,7 +33,6 @@ Sampler::Sampler()
 , mWantDetectPitch(false)
 , mPassthrough(false)
 , mPassthroughCheckbox(nullptr)
-, mPolyMgr(this)
 , mWriteBuffer(gBufferSize)
 {
    mSampleData = new float[MAX_SAMPLER_LENGTH];   //store up to 2 seconds
@@ -83,6 +84,8 @@ void Sampler::Process(double time)
    if (!mEnabled || GetTarget() == nullptr)
       return;
    
+   mNoteInputBuffer.Process(time);
+   
    ComputeSliders(0);
    SyncBuffers();
    
@@ -128,6 +131,12 @@ void Sampler::Process(double time)
 
 void Sampler::PlayNote(double time, int pitch, int velocity, int voiceIdx, ModulationParameters modulation)
 {
+   if (time > gTime + gBufferSize * gInvSampleRateMs)
+   {
+      mNoteInputBuffer.QueueNote(time, pitch, velocity, voiceIdx, modulation);
+      return;
+   }
+   
    if (velocity > 0)
    {
       mPolyMgr.Start(time, pitch, velocity/127.0f, voiceIdx, modulation);

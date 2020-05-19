@@ -38,6 +38,7 @@ DrumPlayer::DrumPlayer()
 , mMonoOutput(false)
 , mMonoCheckbox(nullptr)
 , mGridController(nullptr)
+, mNoteInputBuffer(this)
 {
    ReadKits();
    
@@ -205,6 +206,8 @@ void DrumPlayer::Process(double time)
    if (!mEnabled)
       return;
    
+   mNoteInputBuffer.Process(time);
+   
    int numChannels = mMonoOutput ? 1 : 2;
    
    ComputeSliders(0);
@@ -311,6 +314,12 @@ int DrumPlayer::GetIndividualOutputIndex(int hitIndex)
 
 void DrumPlayer::PlayNote(double time, int pitch, int velocity, int voiceIdx, ModulationParameters modulation)
 {
+   if (time > gTime + gBufferSize * gInvSampleRateMs)
+   {
+      mNoteInputBuffer.QueueNote(time, pitch, velocity, voiceIdx, modulation);
+      return;
+   }
+   
    pitch %= 24;
    if (pitch >= 0 && pitch < NUM_DRUM_HITS)
    {
@@ -551,7 +560,7 @@ void DrumPlayer::DrumHit::DrawUIControls()
    if (mUseEnvelope)
       displayLength = mEnvelopeLength * gSampleRateMs;
    ofPushMatrix();
-   ofTranslate(305, 200);
+   ofTranslate(305, 218);
    if (!mOwner->mLoadingSamples)
    {
       mOwner->mLoadSamplesDrawMutex.lock();
@@ -872,5 +881,3 @@ void DrumPlayer::LoadState(FileStreamIn& in)
       in >> mDrumHits[i].mSpeed;
    }
 }
-
-

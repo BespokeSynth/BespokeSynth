@@ -33,6 +33,7 @@ public:
    
    void ClearInput() { mString = ""; mCaretPosition = 0; }
    const string GetText() const { return mPublishedString; }
+   const vector<string> GetLines() const { return ofSplitString(mString, "\n"); }
    void SetError(bool error, int errorLine = -1);
    
    void GetDimensions(int& width, int& height) override { width = mWidth; height = mHeight; }
@@ -46,7 +47,7 @@ public:
    bool IsSliderControl() override { return false; }
    bool IsButtonControl() override { return false; }
    
-   ofVec2f GetLinePos(int lineNum, bool end=false);
+   ofVec2f GetLinePos(int lineNum, bool end);
    float GetCharHeight() const { return mCharHeight; }
    float GetCharWidth() const { return mCharWidth; }
    

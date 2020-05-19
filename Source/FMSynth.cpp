@@ -34,6 +34,7 @@ FMSynth::FMSynth()
 , mPhaseOffsetSlider1(nullptr)
 , mPhaseOffsetSlider2(nullptr)
 , mPolyMgr(this)
+, mNoteInputBuffer(this)
 , mWriteBuffer(gBufferSize)
 {
    mVoiceParams.mOscADSRParams.GetA() = 10;
@@ -128,6 +129,8 @@ void FMSynth::Process(double time)
    if (!mEnabled || GetTarget() == nullptr)
       return;
    
+   mNoteInputBuffer.Process(time);
+   
    ComputeSliders(0);
    
    int bufferSize = GetTarget()->GetBuffer()->BufferSize();
@@ -146,6 +149,12 @@ void FMSynth::Process(double time)
 
 void FMSynth::PlayNote(double time, int pitch, int velocity, int voiceIdx, ModulationParameters modulation)
 {
+   if (time > gTime + gBufferSize * gInvSampleRateMs)
+   {
+      mNoteInputBuffer.QueueNote(time, pitch, velocity, voiceIdx, modulation);
+      return;
+   }
+   
    if (velocity > 0)
    {
       mPolyMgr.Start(time, pitch, velocity/127.0f, voiceIdx, modulation);

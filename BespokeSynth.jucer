@@ -842,6 +842,8 @@
       <FILE id="X0OndJ" name="IModulator.h" compile="0" resource="0" file="Source/IModulator.h"/>
       <FILE id="zcRBgX" name="INonstandardController.h" compile="0" resource="0"
             file="Source/INonstandardController.h"/>
+      <FILE id="LDAEpR" name="INoteReceiver.cpp" compile="1" resource="0"
+            file="Source/INoteReceiver.cpp"/>
       <FILE id="JyID8P" name="INoteReceiver.h" compile="0" resource="0" file="Source/INoteReceiver.h"/>
       <FILE id="Fk9axz" name="INoteSource.cpp" compile="1" resource="0" file="Source/INoteSource.cpp"/>
       <FILE id="ytSCWW" name="INoteSource.h" compile="0" resource="0" file="Source/INoteSource.h"/>
