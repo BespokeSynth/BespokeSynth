@@ -462,7 +462,7 @@ int CodeEntry::GetColForX(float x)
 {
    x -= 2;
    
-   x -= mScroll.x;
+   x += mScroll.x;
 
    if (x < 0)
       x = 0;
@@ -474,7 +474,7 @@ int CodeEntry::GetRowForY(float y)
 {
    y -= 2;
    
-   y -= mScroll.y;
+   y += mScroll.y;
 
    if (y < 0)
       y = 0;
