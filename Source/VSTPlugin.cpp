@@ -65,6 +65,32 @@ namespace VSTLookup
       {
          vsts.push_back(types[i].fileOrIdentifier.toStdString());
       }
+      
+      std::map<string, double> lastUsedTimes;
+      
+      ofxJSONElement root;
+      root.open(ofToDataPath("internal/used_vsts.json"));
+      ofxJSONElement jsonList = root["vsts"];
+
+      for (auto it = jsonList.begin(); it != jsonList.end(); ++it)
+      {
+         string key = it.key().asString();
+         lastUsedTimes[key] = jsonList[key].asDouble();
+      }
+      
+      std::sort(vsts.begin(), vsts.end(), [lastUsedTimes](string a, string b) {
+         auto itA = lastUsedTimes.find(a);
+         auto itB = lastUsedTimes.find(b);
+         if (itA == lastUsedTimes.end() && itB == lastUsedTimes.end())
+            return a < b;
+         if (itA != lastUsedTimes.end() && itB == lastUsedTimes.end())
+            return true;
+         if (itA == lastUsedTimes.end() && itB != lastUsedTimes.end())
+            return false;
+         double timeA = (*itA).second;
+         double timeB = (*itB).second;
+         return timeA > timeB;
+      });
 
       sFirstTime = false;
    }
@@ -167,6 +193,17 @@ void VSTPlugin::SetVST(string vstName)
    
    mModuleSaveData.SetString("vst", vstName);
    string path = VSTLookup::GetVSTPath(vstName);
+   
+   //mark VST as used
+   {
+      ofxJSONElement root;
+      root.open(ofToDataPath("internal/used_vsts.json"));
+      
+      Time time = Time::getCurrentTime();
+      root["vsts"][path] = (double)time.currentTimeMillis();
+
+      root.save(ofToDataPath("internal/used_vsts.json"), true);
+   }
    
    if (mPlugin != nullptr && dynamic_cast<juce::AudioPluginInstance*>(mPlugin.get())->getPluginDescription().fileOrIdentifier.toStdString() == path)
       return;  //this VST is already loaded! we're all set
