@@ -20,6 +20,8 @@
 #undef ssize_t
 #endif
 
+#include "ScriptModule_PythonInterface.i"
+
 #include "pybind11/embed.h"
 #include "pybind11/stl.h"
 
@@ -33,6 +35,7 @@ double ScriptModule::sMostRecentRunTime = 0;
 ScriptModule::ScriptModule()
 : mCodeEntry(nullptr)
 , mRunButton(nullptr)
+, mLoadScriptIndex(-1)
 , mA(0)
 , mB(0)
 , mC(0)
@@ -72,7 +75,13 @@ void ScriptModule::CreateUIControls()
    IDrawableModule::CreateUIControls();
    
    UIBLOCK0();
-   UICONTROL_CUSTOM(mCodeEntry, new CodeEntry(this,"code",2,2,500,300));
+   DROPDOWN(mLoadScriptSelector, "loadscript", &mLoadScriptIndex, 120);
+   UIBLOCK_SHIFTRIGHT();
+   BUTTON(mLoadScriptButton,"load");
+   UIBLOCK_SHIFTRIGHT();
+   BUTTON(mSaveScriptButton,"save as");
+   UIBLOCK_NEWLINE();
+   UICONTROL_CUSTOM(mCodeEntry, new CodeEntry(UICONTROL_BASICS("code"),500,300));
    BUTTON(mRunButton, "run");
    FLOATSLIDER(mASlider, "a", &mA, 0, 1);
    UIBLOCK_SHIFTRIGHT();
@@ -113,6 +122,9 @@ void ScriptModule::DrawModule()
    if (Minimized() || IsVisible() == false)
       return;
    
+   mLoadScriptSelector->Draw();
+   mLoadScriptButton->Draw();
+   mSaveScriptButton->Draw();
    mCodeEntry->Draw();
    mRunButton->Draw();
    mASlider->Draw();
@@ -316,120 +328,6 @@ float ScriptModule::GetScriptMeasureTime()
    return TheTransport->GetMeasureTime(sMostRecentRunTime);
 }
 
-PYBIND11_EMBEDDED_MODULE(bespoke, m) {
-   // `m` is a `py::module` which is used to bind functions and classes
-   m.def("get_measure_time", []()
-   {
-      return ScriptModule::GetScriptMeasureTime();
-   });
-   m.def("get_measure", []()
-   {
-      return (int)ScriptModule::GetScriptMeasureTime();
-   });
-   m.def("get_step", [](int subdivision)
-   {
-      return int(ScriptModule::GetScriptMeasureTime() * subdivision);
-   });
-   m.def("time_until_subdivision", [](int subdivision)
-   {
-      float measureTime = ScriptModule::GetScriptMeasureTime();
-      return ceil(measureTime * subdivision) / subdivision - measureTime;
-   });
-   m.def("get_root", []()
-   {
-      return TheScale->ScaleRoot();
-   });
-   m.def("get_scale", []()
-   {
-      return TheScale->GetScalePitches().mScalePitches;
-   });
-   m.def("tone_to_pitch", [](int index)
-   {
-      return TheScale->GetPitchFromTone(index);
-   });
-}
-
-PYBIND11_EMBEDDED_MODULE(scriptmodule, m)
-{
-   m.def("get_this", [](int scriptModuleIndex)
-   {
-      return ScriptModule::sScriptModules[scriptModuleIndex];
-   }, py::return_value_policy::reference);
-   py::class_<ScriptModule>(m, "scriptmodule")
-      .def("play_note", [](ScriptModule &module, int pitch, int velocity, float length)
-      {
-         module.PlayNoteFromScript(pitch, velocity, 0);
-         module.PlayNoteFromScriptAfterDelay(pitch, 0, length, 0);
-      })
-      .def("play_note_pan", [](ScriptModule &module, int pitch, int velocity, float length, float pan)
-      {
-         module.PlayNoteFromScript(pitch, velocity, pan);
-         module.PlayNoteFromScriptAfterDelay(pitch, 0, length, 0);
-      })
-      .def("schedule_note", [](ScriptModule &module, float delay, int pitch, int velocity, float length)
-      {
-         module.PlayNoteFromScriptAfterDelay(pitch, velocity, delay, 0);
-         module.PlayNoteFromScriptAfterDelay(pitch, 0, delay + length, 0);
-      })
-      .def("schedule_note_pan", [](ScriptModule &module, float delay, int pitch, int velocity, float length, float pan)
-      {
-         module.PlayNoteFromScriptAfterDelay(pitch, velocity, delay, pan);
-         module.PlayNoteFromScriptAfterDelay(pitch, 0, delay + length, 0);
-      })
-      .def("schedule_note_on", [](ScriptModule &module, float delay, int pitch, int velocity)
-      {
-         module.PlayNoteFromScriptAfterDelay(pitch, velocity, delay, 0);
-      })
-      .def("schedule_call", [](ScriptModule &module, float delay, string method)
-      {
-         module.ScheduleMethod(method, delay);
-      })
-      .def("note_on", [](ScriptModule &module, int pitch, int velocity)
-      {
-         module.PlayNoteFromScript(pitch, velocity, 0);
-      })
-      .def("note_off", [](ScriptModule &module, int pitch)
-      {
-         module.PlayNoteFromScript(pitch, 0, 0);
-      })
-      .def("set", [](ScriptModule &module, string path, float value)
-      {
-         IUIControl* control = module.GetUIControl(path);
-         if (control != nullptr)
-         {
-            control->SetValue(value);
-            module.OnAdjustUIControl(control, value);
-         }
-      })
-      .def("get", [](ScriptModule &module, string path)
-      {
-         IUIControl* control = module.GetUIControl(path);
-         if (control != nullptr)
-            return control->GetValue();
-         return 0.0f;
-      })
-      .def("adjust", [](ScriptModule &module, string path, float amount)
-      {
-         IUIControl* control = module.GetUIControl(path);
-         if (control != nullptr)
-         {
-            float min, max;
-            control->GetRange(min, max);
-            float value = ofClamp(control->GetValue() + amount, min, max);
-            control->SetValue(value);
-            module.OnAdjustUIControl(control, value);
-         }
-      })
-      .def("highlight_line", [](ScriptModule& module, int lineNum)
-      {
-         module.HighlightLine(lineNum);
-      })
-      .def("output", [](ScriptModule& module, string text)
-      {
-         module.PrintText(text);
-      });
-}
-
 void ScriptModule::PlayNoteFromScript(int pitch, int velocity, float pan)
 {
    PlayNote(sMostRecentRunTime, pitch, velocity, pan, mNextLineToExecute);
@@ -437,6 +335,7 @@ void ScriptModule::PlayNoteFromScript(int pitch, int velocity, float pan)
 
 void ScriptModule::PlayNoteFromScriptAfterDelay(int pitch, int velocity, float delayMeasureTime, float pan)
 {
+   delayMeasureTime /= float(TheTransport->GetTimeSigTop()) / TheTransport->GetTimeSigBottom();
    double time = sMostRecentRunTime + delayMeasureTime * TheTransport->MsPerBar();
    
    if (time <= sMostRecentRunTime)
@@ -470,6 +369,8 @@ void ScriptModule::ScheduleNote(double time, int pitch, int velocity, float pan)
 
 void ScriptModule::ScheduleMethod(string method, float delayMeasureTime)
 {
+   delayMeasureTime /= float(TheTransport->GetTimeSigTop()) / TheTransport->GetTimeSigBottom();
+   
    for (int i=0; i<kScheduledMethodCallBufferSize; ++i)
    {
       if (mScheduledMethodCall[i].time == -1)
@@ -548,6 +449,99 @@ void ScriptModule::ButtonClicked(ClickButton* button)
    {
       mCodeEntry->Publish();
       RunScript(gTime);
+   }
+   
+   if (button == mSaveScriptButton)
+   {
+      FileChooser chooser("Save script as...", File(ofToDataPath("scripts/script.py")));
+      if (chooser.browseForFileToSave(true))
+      {
+         string path = chooser.getResult().getFullPathName().toStdString();
+         
+         File resourceFile (path);
+         TemporaryFile tempFile (resourceFile);
+         FileOutputStream output (tempFile.getFile());
+
+         if (!output.openedOk())
+         {
+            DBG("FileOutputStream didn't open correctly ...");
+            return;
+         }
+             
+         output.setNewLineString("\n");
+         output.writeString(mCodeEntry->GetText());
+         output.flush(); // (called explicitly to force an fsync on posix)
+
+         if (output.getStatus().failed())
+         {
+            DBG("An error occurred in the FileOutputStream");
+            return;
+         }
+
+         bool success = tempFile.overwriteTargetFileWithTemporary();
+         if (!success)
+         {
+            DBG("An error occurred writing the file");
+            return;
+         }
+         
+         RefreshScriptFiles();
+         
+         for (size_t i=0; i<mScriptFilePaths.size(); ++i)
+         {
+            if (mScriptFilePaths[i] == path)
+            {
+               mLoadScriptIndex = (int)i;
+               break;
+            }
+         }
+      }
+   }
+   
+   if (button == mLoadScriptButton)
+   {
+      if (mLoadScriptIndex >= 0 && mLoadScriptIndex < (int)mScriptFilePaths.size())
+      {
+         File resourceFile = File(mScriptFilePaths[mLoadScriptIndex]);
+         
+         if (!resourceFile.existsAsFile())
+         {
+            DBG("File doesn't exist ...");
+            return;
+         }
+
+         unique_ptr<FileInputStream> input(resourceFile.createInputStream());
+
+         if (!input->openedOk())
+         {
+            DBG("Failed to open file");
+            return;
+         }
+             
+         mCodeEntry->SetText(input->readString().toStdString());
+      }
+   }
+}
+
+void ScriptModule::DropdownClicked(DropdownList* list)
+{
+   if (list == mLoadScriptSelector)
+      RefreshScriptFiles();
+}
+
+void ScriptModule::RefreshScriptFiles()
+{
+   DirectoryIterator dir(File(ofToDataPath("scripts")), false);
+   mScriptFilePaths.clear();
+   mLoadScriptSelector->Clear();
+   while(dir.next())
+   {
+      File file = dir.getFile();
+      if (file.getFileExtension() ==  ".py")
+      {
+         mLoadScriptSelector->AddLabel(file.getFileName().toStdString(), mScriptFilePaths.size());
+         mScriptFilePaths.push_back(file.getFullPathName().toStdString());
+      }
    }
 }
 

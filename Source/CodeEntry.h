@@ -34,6 +34,7 @@ public:
    void ClearInput() { mString = ""; mCaretPosition = 0; }
    const string GetText() const { return mPublishedString; }
    const vector<string> GetLines() const { return ofSplitString(mString, "\n"); }
+   void SetText(string text) { mString = text; }
    void SetError(bool error, int errorLine = -1);
    
    void GetDimensions(int& width, int& height) override { width = mWidth; height = mHeight; }

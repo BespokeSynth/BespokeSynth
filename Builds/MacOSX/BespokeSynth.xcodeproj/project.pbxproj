@@ -209,6 +209,10 @@
 			isa = PBXBuildFile;
 			fileRef = 49AB76428A044DEDF45FFAFE;
 		};
+		0592C486D7B117D0ADFC996F = {
+			isa = PBXBuildFile;
+			fileRef = 7A604598B3A6EA50651EE599;
+		};
 		3B7F9C4D50AC37136AD264E9 = {
 			isa = PBXBuildFile;
 			fileRef = 662A15065749DC7C10ED9264;
@@ -3080,6 +3084,13 @@
 			path = ../../Source/VSTPlugin.cpp;
 			sourceTree = "SOURCE_ROOT";
 		};
+		5B9E6CCBE7FC40842EABD4D8 = {
+			isa = PBXFileReference;
+			lastKnownFileType = sourcecode.c.h;
+			name = NoteStreamDisplay.h;
+			path = ../../Source/NoteStreamDisplay.h;
+			sourceTree = "SOURCE_ROOT";
+		};
 		5BB3D0DA3C4E17A0F654386B = {
 			isa = PBXFileReference;
 			lastKnownFileType = sourcecode.c.h;
@@ -3631,6 +3642,13 @@
 			lastKnownFileType = sourcecode.c.h;
 			name = "stb_truetype.h";
 			path = "../../Source/nanovg/stb_truetype.h";
+			sourceTree = "SOURCE_ROOT";
+		};
+		7A604598B3A6EA50651EE599 = {
+			isa = PBXFileReference;
+			lastKnownFileType = sourcecode.cpp.cpp;
+			name = NoteStreamDisplay.cpp;
+			path = ../../Source/NoteStreamDisplay.cpp;
 			sourceTree = "SOURCE_ROOT";
 		};
 		7A8294A95A281320A7B56778 = {
@@ -5852,6 +5870,13 @@
 			path = ../../Source/CircleSequencer.cpp;
 			sourceTree = "SOURCE_ROOT";
 		};
+		E2905018D494FF57FB75F416 = {
+			isa = PBXFileReference;
+			lastKnownFileType = file.i;
+			name = "ScriptModule_PythonInterface.i";
+			path = "../../Source/ScriptModule_PythonInterface.i";
+			sourceTree = "SOURCE_ROOT";
+		};
 		E307C4FF7ACC9F94D96BA8F6 = {
 			isa = PBXFileReference;
 			lastKnownFileType = sourcecode.cpp.cpp;
@@ -6693,10 +6718,13 @@
 		C91AF721DDC182CE3AC80CF9 = {
 			isa = PBXGroup;
 			children = (
+				7A604598B3A6EA50651EE599,
+				5B9E6CCBE7FC40842EABD4D8,
 				662A15065749DC7C10ED9264,
 				80A36A0CCEC1EC8F891A09AC,
 				B9D500ACC4CCC60AE228D3DA,
 				FEC0E6463A2ED06AEAB53FF1,
+				E2905018D494FF57FB75F416,
 				D990E7B7B708C0557F79C7BC,
 				EF3F6F049985DF9A02FDE7BF,
 				49FFBA0909808FD0635DC6CB,
@@ -7374,6 +7402,7 @@
 				CLANG_CXX_LANGUAGE_STANDARD = "c++11";
 				CLANG_CXX_LIBRARY = "libc++";
 				CLANG_LINK_OBJC_RUNTIME = NO;
+				CODE_SIGN_IDENTITY = "";
 				COMBINE_HIDPI_IMAGES = YES;
 				CONFIGURATION_BUILD_DIR = "$(PROJECT_DIR)/build/$(CONFIGURATION)";
 				COPY_PHASE_STRIP = NO;
@@ -7425,6 +7454,7 @@
 				CLANG_CXX_LANGUAGE_STANDARD = "c++11";
 				CLANG_CXX_LIBRARY = "libc++";
 				CLANG_LINK_OBJC_RUNTIME = NO;
+				CODE_SIGN_IDENTITY = "";
 				COMBINE_HIDPI_IMAGES = YES;
 				CONFIGURATION_BUILD_DIR = "$(PROJECT_DIR)/build/$(CONFIGURATION)";
 				DEAD_CODE_STRIPPING = YES;
@@ -7494,7 +7524,8 @@
 				CLANG_WARN_SUSPICIOUS_MOVE = YES;
 				CLANG_WARN_UNREACHABLE_CODE = YES;
 				CLANG_WARN__DUPLICATE_METHOD_MATCH = YES;
-				DEBUG_INFORMATION_FORMAT = "dwarf";
+				CODE_SIGN_IDENTITY = "";
+				DEBUG_INFORMATION_FORMAT = dwarf;
 				ENABLE_STRICT_OBJC_MSGSEND = YES;
 				ENABLE_TESTABILITY = YES;
 				GCC_C_LANGUAGE_STANDARD = c11;
@@ -7513,7 +7544,8 @@
 				GCC_WARN_UNUSED_VARIABLE = YES;
 				ONLY_ACTIVE_ARCH = YES;
 				PRODUCT_NAME = "Bespoke";
-				WARNING_CFLAGS = -Wreorder;
+				SDKROOT = macosx;
+				WARNING_CFLAGS = "-Wreorder";
 				ZERO_LINK = NO;
 			};
 			name = Debug;
@@ -7540,7 +7572,8 @@
 				CLANG_WARN_SUSPICIOUS_MOVE = YES;
 				CLANG_WARN_UNREACHABLE_CODE = YES;
 				CLANG_WARN__DUPLICATE_METHOD_MATCH = YES;
-				DEBUG_INFORMATION_FORMAT = "dwarf";
+				CODE_SIGN_IDENTITY = "";
+				DEBUG_INFORMATION_FORMAT = dwarf;
 				ENABLE_STRICT_OBJC_MSGSEND = YES;
 				GCC_C_LANGUAGE_STANDARD = c11;
 				GCC_INLINES_ARE_PRIVATE_EXTERN = YES;
@@ -7557,7 +7590,8 @@
 				GCC_WARN_UNUSED_FUNCTION = YES;
 				GCC_WARN_UNUSED_VARIABLE = YES;
 				PRODUCT_NAME = "Bespoke";
-				WARNING_CFLAGS = -Wreorder;
+				SDKROOT = macosx;
+				WARNING_CFLAGS = "-Wreorder";
 				ZERO_LINK = NO;
 			};
 			name = Release;
@@ -7629,6 +7663,7 @@
 				69EB47EC9441C3507BEB277D,
 				75837998247B5E99F3F16392,
 				7B858D802BD0BB608C0F48CF,
+				0592C486D7B117D0ADFC996F,
 				3B7F9C4D50AC37136AD264E9,
 				A87161C448037C3DD6D2A7A6,
 				9BADC446C19B69FB73777ED5,
@@ -7955,13 +7990,14 @@
 		EE2382E14CD4E4AC58D9114E = {
 			isa = PBXProject;
 			buildConfigurationList = 7FCFF517466C63AAB04E33BA;
-			attributes = { LastUpgradeCheck = 0930; ORGANIZATIONNAME = ""; TargetAttributes = { DAAB28E086014C75EC54A378 = { SystemCapabilities = {com.apple.ApplicationGroups.iOS = { enabled = 0; }; com.apple.InAppPurchase = { enabled = 0; }; com.apple.InterAppAudio = { enabled = 0; }; com.apple.Push = { enabled = 0; }; com.apple.Sandbox = { enabled = 0; }; }; }; }; };
+			attributes = { LastUpgradeCheck = 1100; ORGANIZATIONNAME = ""; TargetAttributes = { DAAB28E086014C75EC54A378 = { SystemCapabilities = {com.apple.ApplicationGroups.iOS = { enabled = 0; }; com.apple.InAppPurchase = { enabled = 0; }; com.apple.InterAppAudio = { enabled = 0; }; com.apple.Push = { enabled = 0; }; com.apple.Sandbox = { enabled = 0; }; com.apple.HardenedRuntime = { enabled = 0; }; }; }; }; };
 			compatibilityVersion = "Xcode 3.2";
 			hasScannedForEncodings = 0;
 			mainGroup = E1DDBBBBF7A5D496C07CC55D;
 			projectDirPath = "";
 			projectRoot = "";
 			targets = (DAAB28E086014C75EC54A378);
+			knownRegions = (en, Base);
 		};
 	};
 	rootObject = EE2382E14CD4E4AC58D9114E;

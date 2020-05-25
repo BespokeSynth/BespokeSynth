@@ -92,7 +92,7 @@ void NoteDelayer::PlayNote(double time, int pitch, int velocity, int voiceIdx, M
       NoteInfo info;
       info.mPitch = pitch;
       info.mVelocity = velocity;
-      info.mTriggerTime = time + mDelay * TheTransport->GetDuration(kInterval_1n);
+      info.mTriggerTime = time + mDelay / (float(TheTransport->GetTimeSigTop()) / TheTransport->GetTimeSigBottom()) * TheTransport->MsPerBar();
       info.mModulation = modulation;
       mInputNotes[mAppendIndex] = info;
       mAppendIndex = (mAppendIndex + 1) % kQueueSize;

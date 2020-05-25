@@ -17,8 +17,9 @@
 #include "NoteEffectBase.h"
 #include "IPulseReceiver.h"
 #include "Slider.h"
+#include "DropdownList.h"
 
-class ScriptModule : public IDrawableModule, public IButtonListener, public NoteEffectBase, public IPulseReceiver, public ICodeEntryListener, public IFloatSliderListener
+class ScriptModule : public IDrawableModule, public IButtonListener, public NoteEffectBase, public IPulseReceiver, public ICodeEntryListener, public IFloatSliderListener, public IDropdownListener
 {
 public:
    ScriptModule();
@@ -44,7 +45,9 @@ public:
    void OnPulse(double time, float velocity, int flags) override;
    void ButtonClicked(ClickButton* button) override;
    void FloatSliderUpdated(FloatSlider* slider, float oldValue) override {}
-   
+   void DropdownClicked(DropdownList* list) override;
+   void DropdownUpdated(DropdownList* list, int oldValue) override {}
+ 
    //ICodeEntryListener
    void ExecuteCode(string code) override;
    
@@ -73,6 +76,7 @@ private:
    void GetFirstAndLastCharacter(string line, char& first, char& last);
    bool IsNonWhitespace(string line);
    void DrawTimer(int lineNum, double startTime, double endTime, ofColor color);
+   void RefreshScriptFiles();
    
    //IDrawableModule
    void DrawModule() override;
@@ -83,6 +87,9 @@ private:
    void Resize(float w, float h) override;
    bool MouseScrolled(int x, int y, float scrollX, float scrollY) override;
    
+   DropdownList* mLoadScriptSelector;
+   ClickButton* mLoadScriptButton;
+   ClickButton* mSaveScriptButton;
    CodeEntry* mCodeEntry;
    ClickButton* mRunButton;
    FloatSlider* mASlider;
@@ -90,6 +97,7 @@ private:
    FloatSlider* mCSlider;
    FloatSlider* mDSlider;
    Checkbox* mDebugCheckbox;
+   int mLoadScriptIndex;
    float mA;
    float mB;
    float mC;
@@ -185,4 +193,6 @@ private:
    LineEventTracker mMethodCallTracker;
    LineEventTracker mNotePlayTracker;
    LineEventTracker mUIControlTracker;
+   
+   std::vector<string> mScriptFilePaths;
 };

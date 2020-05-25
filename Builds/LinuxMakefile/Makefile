@@ -32,7 +32,7 @@ ifeq ($(CONFIG),Debug)
   JUCE_OUTDIR := build
 
   ifeq ($(TARGET_ARCH),)
-    TARGET_ARCH := -march=native
+    TARGET_ARCH := 
   endif
 
   JUCE_CPPFLAGS := $(DEPFLAGS) -DLINUX=1 -DDEBUG=1 -D_DEBUG=1 -DGLEW_STATIC -DGL_GLEXT_PROTOTYPES -DBESPOKE_LINUX -DJUCER_LINUX_MAKE_6D53C8B4=1 -DJUCE_APP_VERSION=1.0.0 -DJUCE_APP_VERSION_HEX=0x10000 $(shell pkg-config --cflags alsa x11 xinerama xext freetype2 webkit2gtk-4.0 gtk+-x11-3.0 libcurl) -pthread -I$(HOME)/JUCE/modules/juce_audio_processors/format_types/VST3_SDK -I../../JuceLibraryCode -I$(HOME)/JUCE/modules -I../../Source/json/include -I../../Source/glew/include -I../../Source/push2/ -I../../Source/push2/libusb -I../../Source/push2/modules/libusb $(CPPFLAGS)
@@ -53,7 +53,7 @@ ifeq ($(CONFIG),Release)
   JUCE_OUTDIR := build
 
   ifeq ($(TARGET_ARCH),)
-    TARGET_ARCH := -march=native
+    TARGET_ARCH := 
   endif
 
   JUCE_CPPFLAGS := $(DEPFLAGS) -DLINUX=1 -DNDEBUG=1 -DGLEW_STATIC -DGL_GLEXT_PROTOTYPES -DBESPOKE_LINUX -DJUCER_LINUX_MAKE_6D53C8B4=1 -DJUCE_APP_VERSION=1.0.0 -DJUCE_APP_VERSION_HEX=0x10000 $(shell pkg-config --cflags alsa x11 xinerama xext freetype2 webkit2gtk-4.0 gtk+-x11-3.0 libcurl) -pthread -I$(HOME)/JUCE/modules/juce_audio_processors/format_types/VST3_SDK -I../../JuceLibraryCode -I$(HOME)/JUCE/modules -I../../Source/json/include -I../../Source/glew/include -I../../Source/push2/ -I../../Source/push2/libusb -I../../Source/push2/modules/libusb $(CPPFLAGS)
@@ -101,6 +101,7 @@ OBJECTS_APP := \
   $(JUCE_OBJDIR)/Pumper_df274e1e.o \
   $(JUCE_OBJDIR)/Stutter_18c3b742.o \
   $(JUCE_OBJDIR)/TremoloEffect_db6065e.o \
+  $(JUCE_OBJDIR)/NoteStreamDisplay_120eebb1.o \
   $(JUCE_OBJDIR)/ModulatorGravity_4f7b8c68.o \
   $(JUCE_OBJDIR)/ScriptStatus_670522a6.o \
   $(JUCE_OBJDIR)/ScriptModule_245f2c20.o \
@@ -322,6 +323,7 @@ OBJECTS_APP := \
   $(JUCE_OBJDIR)/IClickable_e3088d82.o \
   $(JUCE_OBJDIR)/IDrawableModule_6078f854.o \
   $(JUCE_OBJDIR)/IModulator_e2388a0f.o \
+  $(JUCE_OBJDIR)/INoteReceiver_6e02b56b.o \
   $(JUCE_OBJDIR)/INoteSource_a401a357.o \
   $(JUCE_OBJDIR)/IPulseReceiver_45936c8.o \
   $(JUCE_OBJDIR)/JumpBlender_6876d311.o \
@@ -559,6 +561,11 @@ $(JUCE_OBJDIR)/Stutter_18c3b742.o: ../../Source/Stutter.cpp
 $(JUCE_OBJDIR)/TremoloEffect_db6065e.o: ../../Source/TremoloEffect.cpp
 	-$(V_AT)mkdir -p $(JUCE_OBJDIR)
 	@echo "Compiling TremoloEffect.cpp"
+	$(V_AT)$(CXX) $(JUCE_CXXFLAGS) $(JUCE_CPPFLAGS_APP) $(JUCE_CFLAGS_APP) -o "$@" -c "$<"
+
+$(JUCE_OBJDIR)/NoteStreamDisplay_120eebb1.o: ../../Source/NoteStreamDisplay.cpp
+	-$(V_AT)mkdir -p $(JUCE_OBJDIR)
+	@echo "Compiling NoteStreamDisplay.cpp"
 	$(V_AT)$(CXX) $(JUCE_CXXFLAGS) $(JUCE_CPPFLAGS_APP) $(JUCE_CFLAGS_APP) -o "$@" -c "$<"
 
 $(JUCE_OBJDIR)/ModulatorGravity_4f7b8c68.o: ../../Source/ModulatorGravity.cpp
@@ -1664,6 +1671,11 @@ $(JUCE_OBJDIR)/IDrawableModule_6078f854.o: ../../Source/IDrawableModule.cpp
 $(JUCE_OBJDIR)/IModulator_e2388a0f.o: ../../Source/IModulator.cpp
 	-$(V_AT)mkdir -p $(JUCE_OBJDIR)
 	@echo "Compiling IModulator.cpp"
+	$(V_AT)$(CXX) $(JUCE_CXXFLAGS) $(JUCE_CPPFLAGS_APP) $(JUCE_CFLAGS_APP) -o "$@" -c "$<"
+
+$(JUCE_OBJDIR)/INoteReceiver_6e02b56b.o: ../../Source/INoteReceiver.cpp
+	-$(V_AT)mkdir -p $(JUCE_OBJDIR)
+	@echo "Compiling INoteReceiver.cpp"
 	$(V_AT)$(CXX) $(JUCE_CXXFLAGS) $(JUCE_CPPFLAGS_APP) $(JUCE_CFLAGS_APP) -o "$@" -c "$<"
 
 $(JUCE_OBJDIR)/INoteSource_a401a357.o: ../../Source/INoteSource.cpp

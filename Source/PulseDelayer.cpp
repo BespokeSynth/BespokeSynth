@@ -93,7 +93,7 @@ void PulseDelayer::OnPulse(double time, float velocity, int flags)
    {
       PulseInfo info;
       info.mVelocity = velocity;
-      info.mTriggerTime = time + mDelay * TheTransport->GetDuration(kInterval_1n);
+      info.mTriggerTime = time + mDelay / (float(TheTransport->GetTimeSigTop()) / TheTransport->GetTimeSigBottom()) * TheTransport->MsPerBar();
       info.mFlags = flags;
       mInputPulses[mAppendIndex] = info;
       mAppendIndex = (mAppendIndex + 1) % kQueueSize;
