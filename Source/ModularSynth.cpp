@@ -458,7 +458,7 @@ void ModularSynth::KeyPressed(int key, bool isRepeat)
       {
          gHoveredUIControl->ResetToOriginal();
       }
-      else if (key != OF_KEY_BACKSPACE && key != ' ')
+      else if (key != OF_KEY_BACKSPACE && key != ' ' && key != OF_KEY_TAB)
       {
          gHoveredUIControl->AttemptTextInput();
       }
@@ -482,7 +482,7 @@ void ModularSynth::KeyPressed(int key, bool isRepeat)
    if (key == '`' && !isRepeat)
       ADSRDisplay::ToggleDisplayMode();
 
-   if (key == 9 && !isRepeat)  //tab
+   if (key == OF_KEY_TAB && !isRepeat)
    {
       bzero(mConsoleText, MAX_TEXTENTRY_LENGTH);
       mConsoleEntry->MakeActiveTextEntry(true);
