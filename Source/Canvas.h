@@ -39,17 +39,6 @@ struct CanvasCoord
 class Canvas : public IUIControl
 {
 public:
-   class ElementMask
-   {
-   public:
-      ElementMask() : top(0), bottom(0) { assert(MAX_CANVAS_MASK_ELEMENTS == 128); } //structure depends on this being 128, need to refactor if we change this
-      void SetBit(bool on, int bit);
-      bool GetBit(int bit) const;
-   private:
-      uint64 top;
-      uint64 bottom;
-   };
-   
    enum HighlightEnd
    {
       kHighlightEnd_None,
@@ -91,9 +80,8 @@ public:
    void SetControls(CanvasControls* controls) { mControls = controls; }
    CanvasControls* GetControls() { return mControls; }
    vector<CanvasElement*>& GetElements() { return mElements; }
-   void GetElementsAt(float pos, vector<CanvasElement*>& elements);
+   void FillElementsAt(float pos, vector<CanvasElement*>& elements) const;
    CanvasElement* GetElementAt(float pos, int row);
-   ElementMask GetElementMask(float pos) const;
    void SetCursorPos(float pos) { mCursorPos = pos; }
    float GetCursorPos() const { return mCursorPos; }
    CanvasElement* CreateElement(int col, int row) { return mElementCreator(this,col,row); }

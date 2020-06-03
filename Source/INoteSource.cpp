@@ -26,17 +26,7 @@ void NoteOutput::PlayNote(double time, int pitch, int velocity, int voiceIdx, Mo
       else
          mNotes[pitch] = false;
       
-      bool hasNotes = false;
-      for (int i=0; i<128; ++i)
-      {
-         if (mNotes[i])
-         {
-            hasNotes = true;
-            break;
-         }
-      }
-      
-      mNoteSource->GetPatchCableSource()->AddHistoryEvent(time, hasNotes);
+      mNoteSource->GetPatchCableSource()->AddHistoryEvent(time, HasHeldNotes());
    }
 }
 
@@ -88,7 +78,10 @@ void NoteOutput::Flush(double time)
       if (mNotes[i])
       {
          for (auto noteReceiver : mNoteSource->GetPatchCableSource()->GetNoteReceivers())
+         {
             noteReceiver->PlayNote(time,i,0);
+            noteReceiver->PlayNote(time+Transport::sEventEarlyMs,i,0);
+         }
          flushed = true;
          mNotes[i] = false;
       }

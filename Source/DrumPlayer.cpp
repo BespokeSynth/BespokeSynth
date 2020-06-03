@@ -14,6 +14,7 @@
 #include "MidiController.h"
 #include "Profiler.h"
 #include "FillSaveDropdown.h"
+#include "UIControlMacros.h"
 
 DrumPlayer::DrumPlayer()
 : mSpeed(1)
@@ -73,28 +74,71 @@ void DrumPlayer::CreateUIControls()
 
 void DrumPlayer::DrumHit::CreateUIControls(DrumPlayer* owner, int index)
 {
-   mVolSlider = new FloatSlider(owner,("vol "+ofToString(index)).c_str(),310,37,100,15,&mVol,0,1,2);
-   mSpeedSlider = new FloatSlider(owner,("speed "+ofToString(index)).c_str(),-1,-1,100,15,&mSpeed,.2f,3,2);
-   mPanSlider = new FloatSlider(owner,("pan "+ofToString(index)).c_str(),-1,-1,100,15,&mPan,-1,1);
-   mIndividualOutputCheckbox = new Checkbox(owner,("single out "+ofToString(index)).c_str(),-1,-1,&mHasIndividualOutput);
-   mLinkIdSlider = new IntSlider(owner, ("linkid " + ofToString(index)).c_str(), -1, -1, 100, 15, &mLinkId, -1, 5);
-   mUseEnvelopeCheckbox = new Checkbox(owner,("envelope "+ofToString(index)).c_str(),-1,-1,&mUseEnvelope);
-   mEnvelopeLengthSlider = new FloatSlider(owner,("view ms "+ofToString(index)).c_str(),-1,-1,100,15,&mEnvelopeLength,10,2000);
-   mEnvelopeDisplay = new ADSRDisplay(owner,("envelopedisplay "+ofToString(index)).c_str(),305, 218,135, 100,&mEnvelope);
-   
-   mSpeedSlider->PositionTo(mVolSlider, kAnchor_Below);
-   mPanSlider->PositionTo(mSpeedSlider, kAnchor_Below);
-   mIndividualOutputCheckbox->PositionTo(mPanSlider, kAnchor_Below);
-   mLinkIdSlider->PositionTo(mIndividualOutputCheckbox, kAnchor_Below);
-   mUseEnvelopeCheckbox->PositionTo(mLinkIdSlider, kAnchor_Below);
-   mEnvelopeLengthSlider->PositionTo(mUseEnvelopeCheckbox, kAnchor_Below);
+   UIBLOCK(310,37);
+#undef UIBLOCK_OWNER
+#define UIBLOCK_OWNER owner //change owner
+   FLOATSLIDER_DIGITS(mVolSlider, ("vol "+ofToString(index)).c_str(),&mVol,0,1,2);
+   FLOATSLIDER_DIGITS(mSpeedSlider, ("speed "+ofToString(index)).c_str(),&mSpeed,.2f,3,2);
+   FLOATSLIDER(mPanSlider, ("pan "+ofToString(index)).c_str(),&mPan,-1,1);
+   CHECKBOX(mIndividualOutputCheckbox, ("single out "+ofToString(index)).c_str(),&mHasIndividualOutput);
+   INTSLIDER(mLinkIdSlider, ("linkid " + ofToString(index)).c_str(), &mLinkId, -1, 5);
+   CHECKBOX(mUseEnvelopeCheckbox, ("envelope "+ofToString(index)).c_str(),&mUseEnvelope);
+   FLOATSLIDER(mEnvelopeLengthSlider, ("view ms "+ofToString(index)).c_str(),&mEnvelopeLength,10,2000);
+   DROPDOWN(mHitCategoryDropdown,("hitcategory"+ofToString(index)).c_str(),&mHitCategoryIndex,100);
+   UICONTROL_CUSTOM(mEnvelopeDisplay, new ADSRDisplay(UICONTROL_BASICS(("envelopedisplay "+ofToString(index)).c_str()),135, 100,&mEnvelope));
+   ENDUIBLOCK0();
+#undef UIBLOCK_OWNER
+#define UIBLOCK_OWNER this //reset
    
    int x = 5 + (index % 4) * 70;
    int y = 70 + (3-(index / 4)) * 70;
    mTestButton = new ClickButton(owner,("test "+ofToString(index)).c_str(),x+5,y+40);
    mRandomButton = new ClickButton(owner,("random "+ofToString(index)).c_str(),x+5,y+53);
    
+   string hitCategory = "Percussion";
+   if (index == 0)
+      hitCategory = "Kick";
+   if (index == 1)
+      hitCategory = "Snare";
+   if (index == 2 || index == 6)
+      hitCategory = "Hihat";
+   if (index == 3)
+      hitCategory = "Ride";
+   if (index == 4)
+      hitCategory = "Shaker";
+   if (index == 5)
+      hitCategory = "Crash";
+   if (index == 6)
+      hitCategory = "Percussion";
+   if (index == 7)
+      hitCategory = "Clap";
+   mHitCategory = hitCategory;
+   
+   UpdateHitDirectoryDropdown();
+   
    mOwner = owner;
+}
+
+void DrumPlayer::DrumHit::UpdateHitDirectoryDropdown()
+{
+   static list<string> sHitDirectories;
+   if (sHitDirectories.size() == 0)
+   {
+      File parentDirectory(ofToDataPath("drums/hits"));
+      Array<File> hitDirs;
+      parentDirectory.findChildFiles(hitDirs, File::findDirectories, true);
+      for (auto dir : hitDirs)
+         sHitDirectories.push_back(dir.getRelativePathFrom(parentDirectory).toStdString());
+   }
+   
+   for (auto dir : sHitDirectories)
+      mHitCategoryDropdown->AddLabel(dir, mHitCategoryDropdown->GetNumValues());
+   mHitCategoryIndex = -1;
+   for (int i=0; i<mHitCategoryDropdown->GetNumValues(); ++i)
+   {
+      if (mHitCategory == mHitCategoryDropdown->GetLabel(i))
+         mHitCategoryIndex = i;
+   }
 }
 
 void DrumPlayer::Poll()
@@ -117,6 +161,7 @@ void DrumPlayer::DrumHit::SetUIControlsShowing(bool showing)
    mPanSlider->SetShowing(showing && mOwner->mMonoOutput == false);
    mIndividualOutputCheckbox->SetShowing(showing);
    mLinkIdSlider->SetShowing(showing);
+   mHitCategoryDropdown->SetShowing(showing);
 }
 
 DrumPlayer::~DrumPlayer()
@@ -513,7 +558,7 @@ void DrumPlayer::DrawModule()
             ofSetColor(255,255,255,gModuleDrawAlpha);
             if (sample)
             {
-               gFont.DrawStringWrap(GetDrumHitName(GetAssociatedSampleIndex(i, j)) + ":\n" + sample->Name(), 15, i*70+5,j*70+10, 60);
+               gFont.DrawStringWrap(sample->Name(), 12, i*70+5,j*70+10, 60);
             }
          }
       }
@@ -560,7 +605,7 @@ void DrumPlayer::DrumHit::DrawUIControls()
    if (mUseEnvelope)
       displayLength = mEnvelopeLength * gSampleRateMs;
    ofPushMatrix();
-   ofTranslate(305, 218);
+   ofTranslate(mEnvelopeDisplay->GetPosition(true).x, mEnvelopeDisplay->GetPosition(true).y);
    if (!mOwner->mLoadingSamples)
    {
       mOwner->mLoadSamplesDrawMutex.lock();
@@ -574,6 +619,7 @@ void DrumPlayer::DrumHit::DrawUIControls()
    mTestButton->Draw();
    mRandomButton->Draw();
    mLinkIdSlider->Draw();
+   mHitCategoryDropdown->Draw();
    mPanSlider->Draw();
    mIndividualOutputCheckbox->Draw();
    mUseEnvelopeCheckbox->Draw();
@@ -742,6 +788,11 @@ void DrumPlayer::DropdownUpdated(DropdownList* list, int oldVal)
 {
    if (list == mKitSelector)
       LoadKit(mLoadedKit);
+   for (int i=0; i<NUM_DRUM_HITS; ++i)
+   {
+      if (list == mDrumHits[i].mHitCategoryDropdown)
+         mDrumHits[i].mHitCategory = mDrumHits[i].mHitCategoryDropdown->GetLabel(mDrumHits[i].mHitCategoryIndex);
+   }
 }
 
 void DrumPlayer::CheckboxUpdated(Checkbox* checkbox)
@@ -772,7 +823,7 @@ void DrumPlayer::CheckboxUpdated(Checkbox* checkbox)
    }
 }
 
-void DrumPlayer::ButtonClicked(ClickButton *button)
+void DrumPlayer::ButtonClicked(ClickButton* button)
 {
    if (button == mSaveButton)
       SaveKits();
@@ -787,24 +838,7 @@ void DrumPlayer::ButtonClicked(ClickButton *button)
          PlayNote(gTime, i, 127);
       if (button == mDrumHits[i].mRandomButton)
       {
-         string hitCategory = "Percussion";
-         if (i == 0)
-            hitCategory = "Kick";
-         if (i == 1)
-            hitCategory = "Snare";
-         if (i == 2 || i == 6)
-            hitCategory = "Hihat";
-         if (i == 3)
-            hitCategory = "Ride";
-         if (i == 4)
-            hitCategory = "Shaker";
-         if (i == 5)
-            hitCategory = "Crash";
-         if (i == 6)
-            hitCategory = "Percussion";
-         if (i == 7)
-            hitCategory = "Clap";
-         File dir(ofToDataPath("drums/hits/"+hitCategory));
+         File dir(ofToDataPath("drums/hits/"+mDrumHits[i].mHitCategory));
          Array<File> files;
          dir.findChildFiles(files, File::findFiles, false);
          if (files.size() > 0)
@@ -814,8 +848,8 @@ void DrumPlayer::ButtonClicked(ClickButton *button)
             LoadSampleLock();
             mDrumHits[i].mSample.Read(file.c_str());
             LoadSampleUnlock();
-            mDrumHits[i].mSample.Play(gTime, mSpeed, 0);
-            mDrumHits[i].mVelocity = .5f;
+            //mDrumHits[i].mSample.Play(gTime, mSpeed, 0);
+            //mDrumHits[i].mVelocity = .5f;
          }
       }
    }
@@ -829,6 +863,8 @@ vector<IUIControl*> DrumPlayer::ControlsToNotSetDuringLoadState() const
 {
    vector<IUIControl*> ignore;
    ignore.push_back(mKitSelector);
+   for (int i=0; i<NUM_DRUM_HITS; ++i)
+      ignore.push_back(mDrumHits[i].mHitCategoryDropdown);
    return ignore;
 }
 
@@ -847,7 +883,7 @@ void DrumPlayer::SetUpFromSaveData()
 
 namespace
 {
-   const int kSaveStateRev = 0;
+   const int kSaveStateRev = 1;
 }
 
 void DrumPlayer::SaveState(FileStreamOut& out)
@@ -862,6 +898,7 @@ void DrumPlayer::SaveState(FileStreamOut& out)
       out << mDrumHits[i].mLinkId;
       out << mDrumHits[i].mVol;
       out << mDrumHits[i].mSpeed;
+      out << mDrumHits[i].mHitCategory;
    }
 }
 
@@ -871,7 +908,7 @@ void DrumPlayer::LoadState(FileStreamIn& in)
    
    int rev;
    in >> rev;
-   LoadStateValidate(rev == kSaveStateRev);
+   LoadStateValidate(rev <= kSaveStateRev);
    
    for (int i=0; i<NUM_DRUM_HITS; ++i)
    {
@@ -879,5 +916,10 @@ void DrumPlayer::LoadState(FileStreamIn& in)
       in >> mDrumHits[i].mLinkId;
       in >> mDrumHits[i].mVol;
       in >> mDrumHits[i].mSpeed;
+      if (rev >= 1)
+      {
+         in >> mDrumHits[i].mHitCategory;
+         mDrumHits[i].UpdateHitDirectoryDropdown();
+      }
    }
 }

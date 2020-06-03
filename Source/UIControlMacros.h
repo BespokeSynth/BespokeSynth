@@ -37,12 +37,16 @@
 #define UIBLOCK_PUSHSLIDERWIDTH(w) sliderWidth = w;
 #define UIBLOCK_POPSLIDERWIDTH() sliderWidth = originalSliderWidth;
 
+#define UIBLOCK_OWNER this
+
 #define UIBLOCK_UPDATEEXTENTS() xMax = MAX(xMax, lastUIControl->GetPosition(true).x + lastUIControl->GetDimensions().x); yMax = MAX(yMax, lastUIControl->GetPosition(true).y + lastUIControl->GetDimensions().y);
 
-#define UICONTROL_BASICS(name) this,name,xPos+xOffset,yPos
+#define UICONTROL_BASICS(name) UIBLOCK_OWNER,name,xPos+xOffset,yPos
 
 #define FLOATSLIDER(slider,name,var,min,max) slider = new FloatSlider(UICONTROL_BASICS(name),sliderWidth,15,var,min,max); lastUIControl = slider; UIBLOCK_SHIFTDOWN(); UIBLOCK_UPDATEEXTENTS();
 #define FLOATSLIDER_DIGITS(slider,name,var,min,max,digits) slider = new FloatSlider(UICONTROL_BASICS(name),sliderWidth,15,var,min,max,digits); lastUIControl = slider; UIBLOCK_SHIFTDOWN(); UIBLOCK_UPDATEEXTENTS();
+
+#define INTSLIDER(slider,name,var,min,max) slider = new IntSlider(UICONTROL_BASICS(name),sliderWidth,15,var,min,max); lastUIControl = slider; UIBLOCK_SHIFTDOWN(); UIBLOCK_UPDATEEXTENTS();
 
 #define CHECKBOX(checkbox,name,var) checkbox = new Checkbox(UICONTROL_BASICS(name),var); lastUIControl = checkbox; UIBLOCK_SHIFTDOWN(); UIBLOCK_UPDATEEXTENTS();
 

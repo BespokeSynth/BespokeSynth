@@ -40,6 +40,9 @@ public:
    void PlayNote(double time, int pitch, int velocity, int voiceIdx = -1, ModulationParameters modulation = ModulationParameters()) override;
    void SendCC(int control, int value, int voiceIdx = -1) override {}
    
+   void Clear();
+   NoteCanvasElement* AddNote(double measurePos, int pitch, int velocity, double length, int voiceIdx = -1, ModulationParameters modulation = ModulationParameters());
+   
    void OnTransportAdvanced(float amount) override;
    
    void CanvasUpdated(Canvas* canvas) override;
@@ -62,7 +65,7 @@ private:
    void GetModuleDimensions(int& width, int& height) override;
    bool Enabled() const override { return mEnabled; }
    
-   float GetCurPos() const;
+   double GetCurPos(double time) const;
    void UpdateNumColumns();
    void SetRecording(bool rec);
    void SetNumMeasures(int numMeasures);
@@ -73,9 +76,9 @@ private:
    Canvas* mCanvas;
    CanvasControls* mCanvasControls;
    float mScrollPartial;
-   Canvas::ElementMask mLastElements;
-   NoteCanvasElement* mInputNotes[128];
-   NoteCanvasElement* mCurrentNotes[128];
+   vector<CanvasElement*> mNoteChecker{128};
+   vector<NoteCanvasElement*> mInputNotes{128};
+   vector<NoteCanvasElement*> mCurrentNotes{128};
    IntSlider* mNumMeasuresSlider;
    int mNumMeasures;
    ClickButton* mQuantizeButton;
@@ -84,6 +87,7 @@ private:
    Checkbox* mPlayCheckbox;
    bool mRecord;
    Checkbox* mRecordCheckbox;
+   bool mStopQueued;
    NoteInterval mInterval;
    DropdownList* mIntervalSelector;
    bool mFreeRecord;

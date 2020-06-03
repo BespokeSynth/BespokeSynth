@@ -26,7 +26,7 @@ DropdownList::DropdownList(IDropdownListener* owner, const char* name, int x, in
 , mOwner(owner)
 , mMaxPerColumn(40)
 , mModalWidth(20)
-, mUnknownItemString("???")
+, mUnknownItemString("-----")
 , mDrawLabel(false)
 , mSliderVal(0)
 , mAutoCalculateWidth(false)

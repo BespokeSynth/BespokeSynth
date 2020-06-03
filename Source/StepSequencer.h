@@ -88,6 +88,8 @@ public:
    NoteInterval GetStepInterval() const { return mStepInterval; }
    int GetStepNum(double time);
    void Flush(double time) { if (mEnabled) mNoteOutput.Flush(time); }
+   int GetStep(int step, int pitch);
+   void SetStep(int step, int pitch, int velocity);
    
    //INoteReceiver
    void PlayNote(double time, int pitch, int velocity, int voiceIdx = -1, ModulationParameters modulation = ModulationParameters()) override;

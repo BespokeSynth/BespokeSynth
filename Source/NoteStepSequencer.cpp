@@ -38,6 +38,7 @@ NoteStepSequencer::NoteStepSequencer()
 , mShiftForwardButton(nullptr)
 , mLastNoteLength(1)
 , mLastNoteStartTime(0)
+, mLastNoteEndTime(0)
 , mAlreadyDidNoteOff(false)
 , mRandomizePitchButton(nullptr)
 , mRandomizeLengthButton(nullptr)
@@ -358,6 +359,17 @@ int NoteStepSequencer::PitchToRow(int pitch)
    return -1;
 }
 
+void NoteStepSequencer::SetStep(int index, int pitch, int velocity, float length)
+{
+   if (index >= 0 && index < NSS_MAX_STEPS)
+   {
+      mTones[index] = PitchToRow(pitch);
+      mVels[index] = ofClamp(velocity, 0, 127);
+      mNoteLengths[index] = length;
+      SyncGridToSeq();
+   }
+}
+
 void NoteStepSequencer::OnTransportAdvanced(float amount)
 {
    PROFILER(NoteStepSequencer);
@@ -366,7 +378,7 @@ void NoteStepSequencer::OnTransportAdvanced(float amount)
    
    if (mLastNoteLength < 1 && !mAlreadyDidNoteOff)
    {
-      if (gTime > mLastNoteStartTime + TheTransport->GetDuration(mInterval) * mLastNoteLength)
+      if (gTime > mLastNoteEndTime)
       {
          PlayNoteOutput(gTime, mLastPitch, 0);
          mAlreadyDidNoteOff = true;
@@ -432,31 +444,20 @@ void NoteStepSequencer::Step(double time, float velocity, int pulseFlags)
    {
       int outPitch = RowToPitch(current);
       
-      if (mLastPitch == outPitch && mVels[mArpIndex] > 1 && mVels[mArpIndex] < mLastVel && !mAlreadyDidNoteOff)
+      if (mLastPitch == outPitch && !mAlreadyDidNoteOff)   //same note, play noteoff first
       {
-         //if it's the same note and repeats are treated as holds, clear note off
+         PlayNoteOutput(time, mLastPitch, 0, -1);
          offPitch = -1;
+      }
+      if (mVels[mArpIndex] > 1)
+      {
+         PlayNoteOutput(time, outPitch, mVels[mArpIndex] * velocity, -1);
+         mLastPitch = outPitch;
          mLastVel = mVels[mArpIndex];
          mLastNoteLength = mNoteLengths[mArpIndex];
          mLastNoteStartTime = time;
+         mLastNoteEndTime = time + mLastNoteLength * TheTransport->GetDuration(mInterval);
          mAlreadyDidNoteOff = false;
-      }
-      else
-      {
-         if (mLastPitch == outPitch && !mAlreadyDidNoteOff)   //same note, play noteoff first
-         {
-            PlayNoteOutput(time, mLastPitch, 0, -1);
-            offPitch = -1;
-         }
-         if (mVels[mArpIndex] > 1)
-         {
-            PlayNoteOutput(time, outPitch, mVels[mArpIndex] * velocity, -1);
-            mLastPitch = outPitch;
-            mLastVel = mVels[mArpIndex];
-            mLastNoteLength = mNoteLengths[mArpIndex];
-            mLastNoteStartTime = time;
-            mAlreadyDidNoteOff = false;
-         }
       }
    }
    

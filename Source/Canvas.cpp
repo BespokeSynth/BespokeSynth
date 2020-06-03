@@ -525,18 +525,6 @@ void Canvas::RescaleNumCols(int cols)
    mNumCols = cols;
 }
 
-void Canvas::GetElementsAt(float pos, vector<CanvasElement*>& elements)
-{
-   elements.clear();
-   for (int i=0; i<mElements.size(); ++i)
-   {
-      if (pos >= mElements[i]->GetStart() && pos < mElements[i]->GetEnd())
-         elements.push_back(mElements[i]);
-      else if (mWrap && pos >= mElements[i]->GetStart() - mLength && pos < mElements[i]->GetEnd() - mLength)
-         elements.push_back(mElements[i]);
-   }
-}
-
 CanvasElement* Canvas::GetElementAt(float pos, int row)
 {
    for (int i=0; i<mElements.size(); ++i)
@@ -549,40 +537,11 @@ CanvasElement* Canvas::GetElementAt(float pos, int row)
    return nullptr;
 }
 
-void Canvas::ElementMask::SetBit(bool on, int bit)
+void Canvas::FillElementsAt(float pos, vector<CanvasElement*>& elementsAt) const
 {
-   assert(bit >=0 && bit < 128);
-   if (on)
-   {
-      if (bit < 64)
-         bottom |= (uint64(1) << bit);
-      else
-         top |= (uint64(1) << (bit-64));
-   }
-   else
-   {
-      if (bit < 64)
-         bottom &= ~(uint64(1) << bit);
-      else
-         top &= ~(uint64(1) << (bit-64));
-   }
-}
-
-bool Canvas::ElementMask::GetBit(int bit) const
-{
-   assert(bit >= 0 && bit < 128);
-   if (bit < 64)
-      return bottom & (uint64(1) << bit);
-   else
-      return top & (uint64(1) << (bit-64));
-}
-
-Canvas::ElementMask Canvas::GetElementMask(float pos) const
-{
-   ElementMask mask;
    for (int i=0; i<mElements.size(); ++i)
    {
-      if (mElements[i]->mRow == -1 || mElements[i]->mCol == -1)
+      if (mElements[i]->mRow == -1 || mElements[i]->mCol == -1 || mElements[i]->mRow >= elementsAt.size())
          continue;
       
       bool on = false;
@@ -591,9 +550,8 @@ Canvas::ElementMask Canvas::GetElementMask(float pos) const
       if (mWrap && pos >= mElements[i]->GetStart() - mLength && pos < mElements[i]->GetEnd() - mLength)
          on = true;
       if (on)
-         mask.SetBit(true, mElements[i]->mRow);
+         elementsAt[mElements[i]->mRow] = mElements[i];
    }
-   return mask;
 }
 
 CanvasCoord Canvas::GetCoordAt(int x, int y)

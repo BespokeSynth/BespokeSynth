@@ -368,6 +368,17 @@ void StepSequencer::OnGridButton(int x, int y, float velocity, IGridController* 
    }
 }
 
+int StepSequencer::GetStep(int step, int pitch)
+{
+   return ofClamp(mGrid->GetVal(step, pitch), 0, 1) * 127;
+}
+
+void StepSequencer::SetStep(int step, int pitch, int velocity)
+{
+   mGrid->SetVal(step, pitch, ofClamp(velocity / 127.0f, 0, 1));
+   UpdateLights();
+}
+
 Vec2i StepSequencer::ControllerToGrid(const Vec2i& controller)
 {
    if (mGridController == nullptr)

@@ -669,11 +669,13 @@ void LoadStateValidate(bool assertion)
 
 float GetLeftPanGain(float pan)
 {
+   assert(pan >= -1 && pan <= 1);
    return 1 - pan;
 }
 
 float GetRightPanGain(float pan)
 {
+   assert(pan >= -1 && pan <= 1);
    return pan + 1;
 }
 

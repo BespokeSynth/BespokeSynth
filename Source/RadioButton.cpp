@@ -284,7 +284,7 @@ string RadioButton::GetDisplayValue(float val) const
    if (curIndex >= 0 && curIndex < mElements.size())
       return mElements[curIndex].mLabel;
    else
-      return "???";
+      return "-----";
 }
 
 void RadioButton::Increment(float amount)

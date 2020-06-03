@@ -130,9 +130,7 @@ void PolyphonyMgr::Start(double time, int pitch, float amount, int voiceIdx, Mod
    
    IMidiVoice* voice = mVoices[voiceIdx].mVoice;
    assert(voice);
-   voice->SetPitch(pitch);
-   voice->SetModulators(modulation);
-   if (!preserveVoice || modulation.pan != voice->GetPan())
+   if (!voice->IsDone(time) && (!preserveVoice || modulation.pan != voice->GetPan()))
    {
       mFadeOutWorkBuffer.Clear();
       voice->Process(time, &mFadeOutWorkBuffer);
@@ -146,6 +144,8 @@ void PolyphonyMgr::Start(double time, int pitch, float amount, int voiceIdx, Mod
       }
       voice->ClearVoice();
    }
+   voice->SetPitch(pitch);
+   voice->SetModulators(modulation);
    voice->Start(time, amount);
    voice->SetPan(modulation.pan);
    mLastVoice = voiceIdx;

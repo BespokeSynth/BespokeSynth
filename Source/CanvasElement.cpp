@@ -187,6 +187,7 @@ NoteCanvasElement::NoteCanvasElement(Canvas* canvas, int col, int row, float off
 : CanvasElement(canvas,col,row,offset,length)
 , mVelocity(.5f)
 , mVoiceIdx(-1)
+, mPan(0)
 {
    mElementOffsetSlider = new FloatSlider(dynamic_cast<IFloatSliderListener*>(canvas->GetControls()),"offset",0,0,100,15,&mOffset,-1,1);
    AddElementUIControl(mElementOffsetSlider);

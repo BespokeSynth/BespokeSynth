@@ -318,12 +318,17 @@ void CodeEntry::OnKeyPressed(int key, bool isRepeat)
    }
    else if (key == 'V' && (GetKeyModifiers() == (kModifier_Command | kModifier_Shift)))
    {
+      IClickable* pasteName = nullptr;
       if (gHoveredUIControl != nullptr)
+         pasteName = gHoveredUIControl;
+      else if (gHoveredModule != nullptr)
+         pasteName = gHoveredModule;
+      if (pasteName != nullptr)
       {
          if (mCaretPosition != mCaretPosition2)
             RemoveSelectedText();
          
-         string insert = gHoveredUIControl->Path();
+         string insert = pasteName->Path();
          for (int i=0; i<insert.length(); ++i)
             AddCharacter(insert[i]);
       }

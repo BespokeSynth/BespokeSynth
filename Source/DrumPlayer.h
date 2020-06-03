@@ -185,6 +185,7 @@ private:
       bool Process(double time, float speed, float vol, ChannelBuffer* out, int bufferSize);
       void SetUIControlsShowing(bool showing);
       void DrawUIControls();
+      void UpdateHitDirectoryDropdown();
       
       Sample mSample;
       int mLinkId;
@@ -211,6 +212,9 @@ private:
       Checkbox* mIndividualOutputCheckbox;
       FloatSlider* mEnvelopeLengthSlider;
       IntSlider* mLinkIdSlider;
+      DropdownList* mHitCategoryDropdown;
+      int mHitCategoryIndex;
+      string mHitCategory;
    };
    
    DrumHit mDrumHits[NUM_DRUM_HITS];

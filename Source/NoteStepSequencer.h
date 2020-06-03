@@ -45,6 +45,7 @@ public:
    
    int RowToPitch(int row);
    int PitchToRow(int pitch);
+   void SetStep(int index, int pitch, int velocity, float length);
    
    //IDrawableModule
    bool IsResizable() const override { return true; }
@@ -131,6 +132,7 @@ private:
    int mLastVel;
    float mLastNoteLength;
    double mLastNoteStartTime;
+   double mLastNoteEndTime;
    bool mAlreadyDidNoteOff;
    int mOctave;
    IntSlider* mOctaveSlider;

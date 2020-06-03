@@ -27,6 +27,7 @@ NoteCanvas::NoteCanvas()
 , mPlayCheckbox(nullptr)
 , mRecord(false)
 , mRecordCheckbox(nullptr)
+, mStopQueued(false)
 , mInterval(kInterval_8n)
 , mIntervalSelector(nullptr)
 , mScrollPartial(0)
@@ -37,8 +38,6 @@ NoteCanvas::NoteCanvas()
 {
    TheTransport->AddAudioPoller(this);
    SetEnabled(true);
-   bzero(mInputNotes, 128*sizeof(NoteCanvasElement*));
-   bzero(mCurrentNotes, 128*sizeof(NoteCanvasElement*));
    mVoiceModulations.resize(kNumVoices+1);
 }
 
@@ -91,7 +90,7 @@ void NoteCanvas::PlayNote(double time, int pitch, int velocity, int voiceIdx, Mo
    
    if (mInputNotes[pitch]) //handle note-offs or retriggers
    {
-      float endPos = GetCurPos();
+      double endPos = GetCurPos(time);
       if (mInputNotes[pitch]->GetStart() > endPos)
          endPos += 1; //wrap
       mInputNotes[pitch]->SetEnd(endPos);
@@ -103,21 +102,9 @@ void NoteCanvas::PlayNote(double time, int pitch, int velocity, int voiceIdx, Mo
       if (mFreeRecord && mFreeRecordStartMeasure == -1)
          mFreeRecordStartMeasure = TheTransport->GetMeasure(time);
       
-      float canvasPos = GetCurPos() * mCanvas->GetNumCols();
-      int col = int(canvasPos + .5f); //round off
-      int row = mCanvas->GetNumRows()-pitch-1;;
-      NoteCanvasElement* element = static_cast<NoteCanvasElement*>(mCanvas->CreateElement(col,row));
+      double measurePos = GetCurPos(time) * mNumMeasures;
+      NoteCanvasElement* element = AddNote(measurePos, pitch, velocity, 1/mCanvas->GetNumCols(), voiceIdx, modulation);
       mInputNotes[pitch] = element;
-      element->mOffset = canvasPos - element->mCol; //the rounded off part
-      element->mLength = .5f;
-      element->SetVelocity(velocity / 127.0f);
-      element->SetVoiceIdx(voiceIdx);
-      int modIdx = voiceIdx;
-      if (modIdx == -1)
-         modIdx = kNumVoices;
-      mVoiceModulations[modIdx] = modulation;
-      mCanvas->AddElement(element);
-      
       mCanvas->SetRowOffset(element->mRow - mCanvas->GetNumVisibleRows()/2);
    }
 }
@@ -178,39 +165,62 @@ void NoteCanvas::OnTransportAdvanced(float amount)
       }
    }
    
+   if (mStopQueued)
+   {
+      mNoteOutput.Flush(gTime);
+      for (int i=0; i<mCurrentNotes.size(); ++i)
+         mCurrentNotes[i] = nullptr;
+      mStopQueued = false;
+   }
+   
    if (!mEnabled || !mPlay)
    {
       mCanvas->SetCursorPos(-1);
       return;
    }
 
-   float curPos = GetCurPos();
-   mCanvas->SetCursorPos(curPos);
+   double cursorPlayTime = gTime;
+   if (Transport::sDoEventLookahead)
+      cursorPlayTime += Transport::sEventEarlyMs;
+   else
+      cursorPlayTime += amount * TheTransport->MsPerBar();
+   double curPos = GetCurPos(cursorPlayTime);
    
-   Canvas::ElementMask curElements = mCanvas->GetElementMask(curPos);
-   
-   for (int i=0; i<MAX_CANVAS_MASK_ELEMENTS; ++i)
+   mCanvas->FillElementsAt(curPos, mNoteChecker);
+   for (int i=0; i<128; ++i)
    {
-      int pitch = MAX_CANVAS_MASK_ELEMENTS - i - 1;
-      bool wasOn = mLastElements.GetBit(i) || mInputNotes[pitch];
-      bool nowOn = curElements.GetBit(i) || mInputNotes[pitch];
+      int pitch = 128 - i - 1;
+      bool wasOn = mCurrentNotes[pitch] != nullptr || mInputNotes[pitch];
+      bool nowOn = mNoteChecker[i] != nullptr || mInputNotes[pitch];
+      
       if (wasOn && !nowOn)
       {
          //note off
          if (mCurrentNotes[pitch])
          {
-            mNoteOutput.PlayNote(gTime, pitch, 0, mCurrentNotes[pitch]->GetVoiceIdx());
+            double cursorAdvanceSinceEvent = curPos - mCurrentNotes[pitch]->GetEnd();
+            if (cursorAdvanceSinceEvent < 0)
+               cursorAdvanceSinceEvent += 1;
+            double time = cursorPlayTime - cursorAdvanceSinceEvent * TheTransport->MsPerBar() * mNumMeasures;
+            mNoteOutput.PlayNote(time, pitch, 0, mCurrentNotes[pitch]->GetVoiceIdx());
             mCurrentNotes[pitch] = nullptr;
          }
       }
-      if (nowOn && !wasOn)
+      if (nowOn && mInputNotes[pitch] == nullptr &&
+          mCurrentNotes[pitch] != static_cast<NoteCanvasElement*>(mNoteChecker[i]))
       {
          //note on
-         NoteCanvasElement* note = ((NoteCanvasElement*)mCanvas->GetElementAt(curPos, i));
+         NoteCanvasElement* note = static_cast<NoteCanvasElement*>(mNoteChecker[i]);
          assert(note);
+         double cursorAdvanceSinceEvent = curPos -note->GetStart();
+         if (cursorAdvanceSinceEvent < 0)
+            cursorAdvanceSinceEvent += 1;
+         double time = cursorPlayTime - cursorAdvanceSinceEvent * TheTransport->MsPerBar() * mNumMeasures;
          mCurrentNotes[pitch] = note;
-         mNoteOutput.PlayNote(gTime, pitch, note->GetVelocity()*127, note->GetVoiceIdx(), ModulationParameters(note->GetPitchBend(), note->GetModWheel(), note->GetPressure(), note->GetPan()));
+         mNoteOutput.PlayNote(time, pitch, note->GetVelocity()*127, note->GetVoiceIdx(), ModulationParameters(note->GetPitchBend(), note->GetModWheel(), note->GetPressure(), note->GetPan()));
       }
+      
+      mNoteChecker[i] = nullptr;
    }
    
    for (int pitch=0; pitch<128; ++pitch)
@@ -241,13 +251,11 @@ void NoteCanvas::OnTransportAdvanced(float amount)
          mCurrentNotes[pitch]->UpdateModulation(curPos);
       }
    }
-   
-   mLastElements = curElements;
 }
 
-float NoteCanvas::GetCurPos() const
+double NoteCanvas::GetCurPos(double time) const
 {
-   return ((TheTransport->GetMeasure(gTime) % mNumMeasures) + TheTransport->GetMeasurePos(gTime)) / mNumMeasures;
+   return ((TheTransport->GetMeasure(time) % mNumMeasures) + TheTransport->GetMeasurePos(time)) / mNumMeasures;
 }
 
 void NoteCanvas::UpdateNumColumns()
@@ -257,6 +265,33 @@ void NoteCanvas::UpdateNumColumns()
       mCanvas->SetMajorColumnInterval(TheTransport->CountInStandardMeasure(mInterval));
    else
       mCanvas->SetMajorColumnInterval(TheTransport->CountInStandardMeasure(mInterval) / 4);
+}
+
+void NoteCanvas::Clear()
+{
+   for (int pitch=0; pitch<128; ++pitch)
+      mInputNotes[pitch] = nullptr;
+   mNoteOutput.Flush(gTime);
+   mCanvas->Clear();
+}
+
+NoteCanvasElement* NoteCanvas::AddNote(double measurePos, int pitch, int velocity, double length, int voiceIdx/*=-1*/, ModulationParameters modulation/* = ModulationParameters()*/)
+{
+   double canvasPos = measurePos / mNumMeasures * mCanvas->GetNumCols();
+   int col = int(canvasPos + .5f); //round off
+   int row = mCanvas->GetNumRows()-pitch-1;
+   NoteCanvasElement* element = static_cast<NoteCanvasElement*>(mCanvas->CreateElement(col,row));
+   element->mOffset = canvasPos - element->mCol; //the rounded off part
+   element->mLength = mCanvas->GetNumCols() * length;
+   element->SetVelocity(velocity / 127.0f);
+   element->SetVoiceIdx(voiceIdx);
+   int modIdx = voiceIdx;
+   if (modIdx == -1)
+      modIdx = kNumVoices;
+   mVoiceModulations[modIdx] = modulation;
+   mCanvas->AddElement(element);
+   
+   return element;
 }
 
 void NoteCanvas::CanvasUpdated(Canvas* canvas)
@@ -291,6 +326,8 @@ void NoteCanvas::DrawModule()
       ofRect(mCanvas->GetPosition(true).x,y,mCanvas->GetGridWidth(),boxHeight);
    }
    ofPopStyle();
+   
+   mCanvas->SetCursorPos(GetCurPos(gTime));
    
    mCanvas->Draw();
    mCanvasControls->Draw();
@@ -472,16 +509,16 @@ void NoteCanvas::CheckboxUpdated(Checkbox* checkbox)
 {
    if (checkbox == mEnabledCheckbox)
    {
-      mNoteOutput.Flush(gTime);
       for (int pitch=0; pitch<128; ++pitch)
          mInputNotes[pitch] = nullptr;
+      mNoteOutput.Flush(gTime);
    }
    if (checkbox == mPlayCheckbox)
    {
       if (!mPlay)
       {
          mRecord = false;
-         mNoteOutput.Flush(gTime);
+         mStopQueued = true;
       }
    }
    if (checkbox == mRecordCheckbox)

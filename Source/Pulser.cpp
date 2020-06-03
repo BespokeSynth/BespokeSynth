@@ -42,6 +42,11 @@ void Pulser::CreateUIControls()
    mOffsetSlider = new FloatSlider(this,"offset",mTimeModeSelector,kAnchor_Below,80,15,&mOffset,-1,1);
    mRandomStepCheckbox = new Checkbox(this,"random",mOffsetSlider,kAnchor_Below,&mRandomStep);
    
+   mIntervalSelector->AddLabel("16", kInterval_16);
+   mIntervalSelector->AddLabel("8", kInterval_8);
+   mIntervalSelector->AddLabel("4", kInterval_4);
+   mIntervalSelector->AddLabel("3", kInterval_3);
+   mIntervalSelector->AddLabel("2", kInterval_2);
    mIntervalSelector->AddLabel("1n", kInterval_1n);
    mIntervalSelector->AddLabel("2n", kInterval_2n);
    mIntervalSelector->AddLabel("4n", kInterval_4n);
@@ -162,6 +167,16 @@ float Pulser::GetOffset()
 {
    if (mInterval == kInterval_None)
       return 0;
+   if (mInterval == kInterval_2)
+      return -mOffset * 2;
+   if (mInterval == kInterval_3)
+      return -mOffset * 3;
+   if (mInterval == kInterval_4)
+      return -mOffset * 4;
+   if (mInterval == kInterval_8)
+      return -mOffset * 8;
+   if (mInterval == kInterval_16)
+      return -mOffset * 16;
    return (-mOffset/TheTransport->CountInStandardMeasure(mInterval));
 }
 
