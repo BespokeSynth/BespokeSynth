@@ -10,19 +10,26 @@
 #include "Profiler.h"
 #include "UIControlMacros.h"
 
+namespace
+{
+   const int kAdsrTime = 10000;
+}
+
 Pumper::Pumper()
-: mAmount(.75f)
-, mAmountSlider(nullptr)
-, mOffset(0)
-, mOffsetSlider(nullptr)
-, mInterval(kInterval_4n)
+: mInterval(kInterval_4n)
 , mIntervalSelector(nullptr)
-, mPump(.5f)
-, mPumpSlider(nullptr)
 , mLastValue(0)
 {
-   mLFO.SetPeriod(mInterval);
-   mLFO.SetType(kOsc_Saw);
+   mAdsr.SetNumStages(2);
+   
+   mAdsr.GetStageData(0).time = kAdsrTime * .05f;
+   mAdsr.GetStageData(0).target = .25f;
+   mAdsr.GetStageData(0).curve = 0;
+   mAdsr.GetStageData(1).time = kAdsrTime * .3f;
+   mAdsr.GetStageData(1).target = 1;
+   mAdsr.GetStageData(1).curve = -0.5f;
+   
+   SyncToAdsr();
 }
 
 void Pumper::CreateUIControls()
@@ -31,11 +38,10 @@ void Pumper::CreateUIControls()
    
    UIBLOCK0();
    FLOATSLIDER(mAmountSlider,"amount",&mAmount,0,1);
+   FLOATSLIDER(mLengthSlider,"length",&mLength,0,1);
+   FLOATSLIDER(mCurveSlider,"curve",&mAdsr.GetStageData(1).curve,-1,1);
+   FLOATSLIDER(mAttackSlider,"attack",&mAttack,0,1);
    DROPDOWN(mIntervalSelector,"interval",(int*)(&mInterval),40); UIBLOCK_SHIFTRIGHT();
-   UIBLOCK_PUSHSLIDERWIDTH(55);
-   FLOATSLIDER_DIGITS(mOffsetSlider,"off",&mOffset,0,1,1); UIBLOCK_NEWLINE();
-   UIBLOCK_POPSLIDERWIDTH();
-   FLOATSLIDER(mPumpSlider,"pump",&mPump,0,1);
    ENDUIBLOCK(mWidth, mHeight);
    
    mIntervalSelector->AddLabel("1n", kInterval_1n);
@@ -60,18 +66,30 @@ void Pumper::ProcessAudio(double time, ChannelBuffer* buffer)
    float bufferSize = buffer->BufferSize();
    
    ComputeSliders(0);
-
-   const float smoothingTimeMs = 35;
+   
+   double intervalPos = GetIntervalPos(time);
+   
+   mAdsr.Clear();
+   mAdsr.Start(0,1);
+   mAdsr.Stop(kAdsrTime);
+   
+   /*const float smoothingTimeMs = 35;
    float smoothingOffset = smoothingTimeMs / TheTransport->GetDuration(mInterval);
-   mLFO.SetOffset(mOffset + smoothingOffset);
+   mLFO.SetOffset(mOffset + smoothingOffset);*/
 
    for (int i=0; i<bufferSize; ++i)
    {
-      float value = mLastValue * .99f + mLFO.Value(i) * .01f;
+      float adsrValue = mAdsr.Value((intervalPos + i * gInvSampleRateMs / TheTransport->GetDuration(mInterval)) * kAdsrTime);
+      float value = mLastValue * .99f + adsrValue * .01f;
       for (int ch=0; ch<buffer->NumActiveChannels(); ++ch)
-         buffer->GetChannel(ch)[i] *= (1 - (mAmount * (1-powf(value,mPump))));
+         buffer->GetChannel(ch)[i] *= value;
       mLastValue = value;
    }
+}
+
+double Pumper::GetIntervalPos(double time)
+{
+   return fmod(TheTransport->GetMeasurePos(time) * TheTransport->CountInStandardMeasure(mInterval), 1.0);
 }
 
 void Pumper::DrawModule()
@@ -79,16 +97,39 @@ void Pumper::DrawModule()
    if (!mEnabled)
       return;
 
-   ofPushStyle();
-   ofSetColor(0,200,0);
-   ofFill();
-   ofRect(5, 6, powf(mLastValue, mPump) * 80 * mAmount, 14);
-   ofPopStyle();
-
    mAmountSlider->Draw();
+   mLengthSlider->Draw();
+   mCurveSlider->Draw();
+   mAttackSlider->Draw();
    mIntervalSelector->Draw();
-   mOffsetSlider->Draw();
-   mPumpSlider->Draw();
+   
+   ofPushStyle();
+   ofSetColor(0,200,0,50);
+   ofFill();
+   ofRect(0, mHeight * .8f, mLastValue * mWidth, mHeight * .2f);
+   ofPopStyle();
+   
+   ofPushStyle();
+   ofSetColor(245, 58, 135);
+   ofBeginShape();
+   ::ADSR drawAdsr(mAdsr);
+   drawAdsr.Clear();
+   drawAdsr.Start(0,1);
+   drawAdsr.Stop(kAdsrTime);
+   for (int i=0; i<mWidth; i++)
+   {
+      float x = i;
+      float y = drawAdsr.Value(float(i) / mWidth * kAdsrTime) * mHeight;
+      ofVertex(x, mHeight-y);
+   }
+   ofEndShape(false);
+   
+   ofSetColor(255,255,255,100);
+   {
+      float x = GetIntervalPos(gTime) * mWidth;
+      ofLine(x, 0, x, mHeight);
+   }
+   ofPopStyle();
 }
 
 float Pumper::GetEffectAmount()
@@ -100,11 +141,55 @@ float Pumper::GetEffectAmount()
 
 void Pumper::DropdownUpdated(DropdownList* list, int oldVal)
 {
-   if (list == mIntervalSelector)
-      mLFO.SetPeriod(mInterval);
 }
 
 void Pumper::FloatSliderUpdated(FloatSlider* slider, float oldVal)
 {
+   if (slider == mAmountSlider)
+   {
+      mAdsr.GetStageData(0).target = 1 - mAmount;
+   }
+   if (slider == mLengthSlider)
+   {
+      mAdsr.GetStageData(1).time = (mLength + mAttack) * kAdsrTime;
+   }
+   if (slider == mAttackSlider)
+   {
+      mAdsr.GetStageData(0).time = mAttack * kAdsrTime;
+      mAdsr.GetStageData(1).time = (mLength + mAttack) * kAdsrTime;
+   }
 }
 
+void Pumper::SyncToAdsr()
+{
+   mAmount = 1 - mAdsr.GetStageData(0).target;
+   mLength = (mAdsr.GetStageData(1).time - mAdsr.GetStageData(0).time) / kAdsrTime;
+   mAttack = mAdsr.GetStageData(0).time / kAdsrTime;
+}
+
+namespace
+{
+   const int kSaveStateRev = 1;
+}
+
+void Pumper::SaveState(FileStreamOut& out)
+{
+   IDrawableModule::SaveState(out);
+   
+   out << kSaveStateRev;
+   
+   mAdsr.SaveState(out);
+}
+
+void Pumper::LoadState(FileStreamIn& in)
+{
+   IDrawableModule::LoadState(in);
+   
+   int rev;
+   in >> rev;
+   LoadStateValidate(rev <= kSaveStateRev);
+   
+   mAdsr.LoadState(in);
+   
+   SyncToAdsr();
+}

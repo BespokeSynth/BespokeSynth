@@ -36,25 +36,30 @@ public:
    void DropdownUpdated(DropdownList* list, int oldVal) override;
    void CheckboxUpdated(Checkbox* checkbox) override {}
    void FloatSliderUpdated(FloatSlider* slider, float oldVal) override;
+   
+   void SaveState(FileStreamOut& out) override;
+   void LoadState(FileStreamIn& in) override;
 
 private:
    //IDrawableModule
    void DrawModule() override;
    void GetModuleDimensions(int& w, int& h) override { w = mWidth; h = mHeight; }
    bool Enabled() const override { return mEnabled; }
-
+   double GetIntervalPos(double time);
+   void SyncToAdsr();
    
    FloatSlider* mAmountSlider;
-   float mOffset;
-   FloatSlider* mOffsetSlider;
-   FloatSlider* mPumpSlider;
+   FloatSlider* mLengthSlider;
+   FloatSlider* mCurveSlider;
+   FloatSlider* mAttackSlider;
    
-   LFO mLFO;
+   ::ADSR mAdsr;
    NoteInterval mInterval;
    DropdownList* mIntervalSelector;
    float mLastValue;
    float mAmount;
-   float mPump;
+   float mLength;
+   float mAttack;
    
    float mWidth;
    float mHeight;
