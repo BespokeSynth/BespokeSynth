@@ -196,10 +196,13 @@ void CodeEntry::MakeActive()
    mCaretBlinkTimer = 0;
 }
 
-void CodeEntry::OnKeyPressed(int key, bool isRepeat)
+namespace
 {
    const int kTabSize = 3;
-   
+}
+
+void CodeEntry::OnKeyPressed(int key, bool isRepeat)
+{
    if (key == OF_KEY_BACKSPACE)
    {
       if (mCaretPosition != mCaretPosition2)
@@ -231,13 +234,17 @@ void CodeEntry::OnKeyPressed(int key, bool isRepeat)
    }
    else if (key == OF_KEY_TAB)
    {
-      if (mCaretPosition != mCaretPosition2)
-         RemoveSelectedText();
-      
-      ofVec2f coords = GetCaretCoords(mCaretPosition);
-      int spacesNeeded = kTabSize - (int)coords.x % kTabSize;
-      for (int i=0; i<spacesNeeded; ++i)
-         AddCharacter(' ');
+      if (mCaretPosition != mCaretPosition2 || (GetKeyModifiers() & kModifier_Shift))
+      {
+         ShiftLines(GetKeyModifiers() & kModifier_Shift);
+      }
+      else
+      {
+         ofVec2f coords = GetCaretCoords(mCaretPosition);
+         int spacesNeeded = kTabSize - (int)coords.x % kTabSize;
+         for (int i=0; i<spacesNeeded; ++i)
+            AddCharacter(' ');
+      }
    }
    else if (key == OF_KEY_ESC)
    {
@@ -395,6 +402,58 @@ void CodeEntry::RemoveSelectedText()
    int caretEnd = MAX(mCaretPosition, mCaretPosition2);
    mString = mString.substr(0, caretStart) + mString.substr(caretEnd);
    MoveCaret(caretStart, false);
+}
+
+void CodeEntry::ShiftLines(bool backwards)
+{
+   int caretStart = MIN(mCaretPosition, mCaretPosition2);
+   int caretEnd = MAX(mCaretPosition, mCaretPosition2);
+   ofVec2f coordsStart = GetCaretCoords(caretStart);
+   ofVec2f coordsEnd = GetCaretCoords(caretEnd);
+   
+   auto lines = GetLines();
+   mString = "";
+   for (size_t i=0; i<lines.size(); ++i)
+   {
+      if (i >= coordsStart.y && i <= coordsEnd.y)
+      {
+         int numSpaces = 0;
+         for (size_t j=0; j<lines[i].size(); ++j)
+         {
+            if (lines[i][j] != ' ')
+               break;
+            ++numSpaces;
+         }
+         
+         if (backwards)
+         {
+            int charsToRemove = numSpaces % kTabSize;
+            if (charsToRemove == 0)
+               charsToRemove = kTabSize;
+            if (charsToRemove > numSpaces)
+               charsToRemove = numSpaces;
+            lines[i] = lines[i].substr(charsToRemove);
+            if (i == coordsStart.y)
+               caretStart = (int)mString.size() + numSpaces - charsToRemove;
+            if (i == coordsEnd.y)
+               caretEnd = (int)mString.size() + (int)lines[i].size();
+         }
+         else
+         {
+            int spacesNeeded = kTabSize - (int)numSpaces % kTabSize;
+            for (int j=0; j<spacesNeeded; ++j)
+               lines[i] = " " + lines[i];
+            if (i == coordsStart.y)
+               caretStart = (int)mString.size() + numSpaces + spacesNeeded;
+            if (i == coordsEnd.y)
+               caretEnd = (int)mString.size() + (int)lines[i].size();
+         }
+      }
+      mString += lines[i] + "\n";
+   }
+   
+   mCaretPosition = caretStart;
+   mCaretPosition2 = caretEnd;
 }
 
 void CodeEntry::MoveCaret(int pos, bool allowSelection /*=true*/)

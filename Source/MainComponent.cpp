@@ -335,7 +335,7 @@ private:
    bool keyPressed(const KeyPress& key) override
    {
       int keyCode = key.getTextCharacter();
-      if (keyCode == 0)
+      if (keyCode < 32)
          keyCode = key.getKeyCode();
       bool isRepeat = true;
       if (find(mPressedKeys.begin(), mPressedKeys.end(), keyCode) == mPressedKeys.end())

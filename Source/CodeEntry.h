@@ -63,6 +63,7 @@ private:
    int GetRowForY(float y);
    ofVec2f GetCaretCoords(int caret);
    void RemoveSelectedText();
+   void ShiftLines(bool backwards);
    void MoveCaret(int pos, bool allowSelection = true);
    void MoveCaretToStart();
    void MoveCaretToEnd();
