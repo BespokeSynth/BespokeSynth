@@ -33,7 +33,7 @@ DrumPlayer::DrumPlayer()
 , mAuditionPadIdx(0)
 , mNewKitNameEntry(nullptr)
 , mLoadingSamples(false)
-, mShuffleSpeedsButton(nullptr)
+, mShuffleButton(nullptr)
 , mSelectedHitIdx(0)
 , mOutputBuffer(gBufferSize)
 , mMonoOutput(false)
@@ -58,7 +58,7 @@ void DrumPlayer::CreateUIControls()
    mNewKitNameEntry = new TextEntry(this,"kitname",200, 40,7,mNewKitName);
    mAuditionSlider = new FloatSlider(this,"aud",140,50,40,15,&mAuditionInc,-1,1,0);
    mMonoCheckbox = new Checkbox(this,"mono",4,34,&mMonoOutput);
-   mShuffleSpeedsButton = new ClickButton(this,"shuffle",140,34);
+   mShuffleButton = new ClickButton(this,"shuffle",140,34);
    mGridController = new GridController(this, "grid", 60, 34);
    
    for (int i=0; i<NUM_DRUM_HITS; ++i)
@@ -80,6 +80,7 @@ void DrumPlayer::DrumHit::CreateUIControls(DrumPlayer* owner, int index)
    FLOATSLIDER_DIGITS(mVolSlider, ("vol "+ofToString(index)).c_str(),&mVol,0,1,2);
    FLOATSLIDER_DIGITS(mSpeedSlider, ("speed "+ofToString(index)).c_str(),&mSpeed,.2f,3,2);
    FLOATSLIDER(mPanSlider, ("pan "+ofToString(index)).c_str(),&mPan,-1,1);
+   INTSLIDER(mWidenSlider, ("widen "+ofToString(index)).c_str(),&mWiden,-150,150);
    CHECKBOX(mIndividualOutputCheckbox, ("single out "+ofToString(index)).c_str(),&mHasIndividualOutput);
    INTSLIDER(mLinkIdSlider, ("linkid " + ofToString(index)).c_str(), &mLinkId, -1, 5);
    CHECKBOX(mUseEnvelopeCheckbox, ("envelope "+ofToString(index)).c_str(),&mUseEnvelope);
@@ -128,9 +129,15 @@ void DrumPlayer::DrumHit::UpdateHitDirectoryDropdown()
       Array<File> hitDirs;
       parentDirectory.findChildFiles(hitDirs, File::findDirectories, true);
       for (auto dir : hitDirs)
-         sHitDirectories.push_back(dir.getRelativePathFrom(parentDirectory).toStdString());
+      {
+         Array<File> filesInDir;
+         dir.findChildFiles(filesInDir, File::findFiles, false);
+         if (filesInDir.size() > 0)
+            sHitDirectories.push_back(dir.getRelativePathFrom(parentDirectory).toStdString());
+      }
    }
    
+   mHitCategoryDropdown->Clear();
    for (auto dir : sHitDirectories)
       mHitCategoryDropdown->AddLabel(dir, mHitCategoryDropdown->GetNumValues());
    mHitCategoryIndex = -1;
@@ -159,6 +166,7 @@ void DrumPlayer::DrumHit::SetUIControlsShowing(bool showing)
    mUseEnvelopeCheckbox->SetShowing(showing);
    mEnvelopeDisplay->SetShowing(showing);
    mPanSlider->SetShowing(showing && mOwner->mMonoOutput == false);
+   mWidenSlider->SetShowing(showing && mOwner->mMonoOutput == false);
    mIndividualOutputCheckbox->SetShowing(showing);
    mLinkIdSlider->SetShowing(showing);
    mHitCategoryDropdown->SetShowing(showing);
@@ -317,6 +325,7 @@ void DrumPlayer::Process(double time)
 bool DrumPlayer::DrumHit::Process(double time, float speed, float vol, ChannelBuffer* out, int bufferSize)
 {
    mSample.SetRate(speed * mSpeed);
+   
    if (mSample.ConsumeData(time, out, bufferSize, true))
    {
       double timeHit = time;
@@ -342,8 +351,32 @@ bool DrumPlayer::DrumHit::Process(double time, float speed, float vol, ChannelBu
          
          timeHit += gInvSampleRateMs;
       }
+      
+      mSamplesRemainingToProcess = bufferSize + abs(mWiden);
+   }
+   else
+   {
+      out->Clear();
+   }
+
+   if (mSamplesRemainingToProcess > 0)
+   {
+      if (abs(mWiden) > 0 && mOwner->mMonoOutput == false)
+      {
+         mWidenerBuffer.SetNumChannels(2);
+         for (int ch=0; ch<out->NumActiveChannels(); ++ch)
+            mWidenerBuffer.WriteChunk(out->GetChannel(ch), bufferSize, ch);
+         if (mWiden < 0)
+            mWidenerBuffer.ReadChunk(out->GetChannel(1), bufferSize, abs(mWiden), 1);
+         else
+            mWidenerBuffer.ReadChunk(out->GetChannel(0), bufferSize, abs(mWiden), 0);
+      }
+      
+      mSamplesRemainingToProcess -= bufferSize;
+      
       return true;
    }
+      
    return false;
 }
 
@@ -526,7 +559,7 @@ void DrumPlayer::DrawModule()
       mNewKitButton->Draw();
       mNewKitNameEntry->Draw();
       mAuditionSlider->Draw();
-      mShuffleSpeedsButton->Draw();
+      mShuffleButton->Draw();
 
       ofPushMatrix();
       ofPushStyle();
@@ -621,6 +654,7 @@ void DrumPlayer::DrumHit::DrawUIControls()
    mLinkIdSlider->Draw();
    mHitCategoryDropdown->Draw();
    mPanSlider->Draw();
+   mWidenSlider->Draw();
    mIndividualOutputCheckbox->Draw();
    mUseEnvelopeCheckbox->Draw();
    if (mUseEnvelope)
@@ -727,10 +761,11 @@ void DrumPlayer::CreateKit()
    mKitSelector->AddLabel(kit.mName.c_str(), mLoadedKit);
 }
 
-void DrumPlayer::ShuffleSpeeds()
+void DrumPlayer::ShuffleKit()
 {
    for (int j=0; j<NUM_DRUM_HITS; ++j)
    {
+      mDrumHits[j].LoadRandomSample();
       mDrumHits[j].mVol *= ofRandom(.9f,1.1f);
       mDrumHits[j].mSpeed *= ofRandom(.9f,1.1f);
       mDrumHits[j].mPan = ofRandom(-1.0f,1.0f);
@@ -829,29 +864,32 @@ void DrumPlayer::ButtonClicked(ClickButton* button)
       SaveKits();
    if (button == mNewKitButton)
       CreateKit();
-   if (button == mShuffleSpeedsButton)
-      ShuffleSpeeds();
+   if (button == mShuffleButton)
+      ShuffleKit();
    
    for (int i=0; i<NUM_DRUM_HITS; ++i)
    {
       if (button == mDrumHits[i].mTestButton)
          PlayNote(gTime, i, 127);
       if (button == mDrumHits[i].mRandomButton)
-      {
-         File dir(ofToDataPath("drums/hits/"+mDrumHits[i].mHitCategory));
-         Array<File> files;
-         dir.findChildFiles(files, File::findFiles, false);
-         if (files.size() > 0)
-         {
-            string file = files[rand() % files.size()].getFullPathName().toStdString();
-            
-            LoadSampleLock();
-            mDrumHits[i].mSample.Read(file.c_str());
-            LoadSampleUnlock();
-            //mDrumHits[i].mSample.Play(gTime, mSpeed, 0);
-            //mDrumHits[i].mVelocity = .5f;
-         }
-      }
+         mDrumHits[i].LoadRandomSample();
+   }
+}
+
+void DrumPlayer::DrumHit::LoadRandomSample()
+{
+   File dir(ofToDataPath("drums/hits/"+mHitCategory));
+   Array<File> files;
+   dir.findChildFiles(files, File::findFiles, false);
+   if (files.size() > 0)
+   {
+      string file = files[rand() % files.size()].getFullPathName().toStdString();
+      
+      mOwner->LoadSampleLock();
+      mSample.Read(file.c_str());
+      mOwner->LoadSampleUnlock();
+      //mSample.Play(gTime, mSpeed, 0);
+      //mVelocity = .5f;
    }
 }
 

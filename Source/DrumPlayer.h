@@ -90,7 +90,7 @@ private:
    void ReadKits();
    void SaveKits();
    void CreateKit();
-   void ShuffleSpeeds();
+   void ShuffleKit();
    void UpdateVisibleControls();
    int GetIndividualOutputIndex(int hitIndex);
    void UpdateLights();
@@ -124,7 +124,7 @@ private:
    ofMutex mLoadSamplesAudioMutex;
    ofMutex mLoadSamplesDrawMutex;
    bool mLoadingSamples;
-   ClickButton* mShuffleSpeedsButton;
+   ClickButton* mShuffleButton;
    int mSelectedHitIdx;
    bool mMonoOutput;
    Checkbox* mMonoCheckbox;
@@ -171,8 +171,11 @@ private:
       , mUseEnvelope(false)
       , mEnvelopeLength(200)
       , mPan(0)
+      , mWiden(0)
       , mHasIndividualOutput(false)
       , mOwner(nullptr)
+      , mWidenerBuffer(2048)
+      , mSamplesRemainingToProcess(0)
       {
          mEnvelope.GetHasSustainStage() = false;
          mEnvelope.GetA() = 1;
@@ -186,6 +189,7 @@ private:
       void SetUIControlsShowing(bool showing);
       void DrawUIControls();
       void UpdateHitDirectoryDropdown();
+      void LoadRandomSample();
       
       Sample mSample;
       int mLinkId;
@@ -198,6 +202,7 @@ private:
       ::ADSR mEnvelope;
       float mEnvelopeLength;
       float mPan;
+      int mWiden;
       bool mHasIndividualOutput;
       string mHitDirectory;
       
@@ -209,12 +214,15 @@ private:
       Checkbox* mUseEnvelopeCheckbox;
       ADSRDisplay* mEnvelopeDisplay;
       FloatSlider* mPanSlider;
+      IntSlider* mWidenSlider;
       Checkbox* mIndividualOutputCheckbox;
       FloatSlider* mEnvelopeLengthSlider;
       IntSlider* mLinkIdSlider;
       DropdownList* mHitCategoryDropdown;
       int mHitCategoryIndex;
       string mHitCategory;
+      RollingBuffer mWidenerBuffer;
+      int mSamplesRemainingToProcess;
    };
    
    DrumHit mDrumHits[NUM_DRUM_HITS];
