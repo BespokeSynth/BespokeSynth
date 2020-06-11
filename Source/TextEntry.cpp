@@ -18,7 +18,7 @@ IKeyboardFocusListener* IKeyboardFocusListener::sCurrentKeyboardFocus = nullptr;
 void IKeyboardFocusListener::ClearActiveKeyboardFocus(bool acceptEntry)
 {
    if (sCurrentKeyboardFocus && acceptEntry)
-      sCurrentKeyboardFocus->AcceptEntry();
+      sCurrentKeyboardFocus->AcceptEntry(false);
    sCurrentKeyboardFocus = nullptr;
 }
 
@@ -65,6 +65,7 @@ void TextEntry::Construct(ITextEntryListener* owner, const char* name, int x, in
    mDrawLabel = false;
    mFlexibleWidth = false;
    mHovered = false;
+   mRequireEnterToAccept = false;
    
    UpdateDisplayString();
    
@@ -214,11 +215,13 @@ void TextEntry::OnKeyPressed(int key, bool isRepeat)
 {
    if (key == OF_KEY_RETURN)
    {
+      if (mRequireEnterToAccept)
+         AcceptEntry(true);
       IKeyboardFocusListener::ClearActiveKeyboardFocus(K(acceptEntry));
    }
    if (key == OF_KEY_TAB)
    {
-      AcceptEntry();
+      AcceptEntry(false);
       if (GetKeyModifiers() == kModifier_Shift)
       {
          if (mPreviousTextEntry)
@@ -291,8 +294,11 @@ void TextEntry::UpdateDisplayString()
       StringCopy(mString, ofToString(*mVarFloat).c_str(), MAX_TEXTENTRY_LENGTH);
 }
 
-void TextEntry::AcceptEntry()
+void TextEntry::AcceptEntry(bool pressedEnter)
 {
+   if (!pressedEnter && mRequireEnterToAccept)
+      return;
+   
    if (mVarString)
       StringCopy(mVarString, mString, MAX_TEXTENTRY_LENGTH);
    if (mVarInt && mString[0] != 0)
@@ -355,5 +361,5 @@ void TextEntry::LoadState(FileStreamIn& in, bool shouldSetValue)
    string var;
    in >> var;
    StringCopy(mString, var.c_str(), MAX_TEXTENTRY_LENGTH);
-   AcceptEntry();
+   AcceptEntry(false);
 }

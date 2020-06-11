@@ -22,9 +22,15 @@ void NoteOutput::PlayNote(double time, int pitch, int velocity, int voiceIdx, Mo
          noteReceiver->PlayNote(time,pitch,velocity,voiceIdx,modulation);
 
       if (velocity>0)
+      {
+         mNoteOnTimes[pitch] = time;
          mNotes[pitch] = true;
+      }
       else
-         mNotes[pitch] = false;
+      {
+         if (time > mNoteOnTimes[pitch])
+            mNotes[pitch] = false;
+      }
       
       mNoteSource->GetPatchCableSource()->AddHistoryEvent(time, HasHeldNotes());
    }

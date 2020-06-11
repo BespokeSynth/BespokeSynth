@@ -646,7 +646,7 @@ void FloatSlider::OnTransportAdvanced(float amount)
 
 namespace
 {
-   const int kFloatSliderSaveStateRev = 4;
+   const int kFloatSliderSaveStateRev = 5;
 }
 
 void FloatSlider::SaveState(FileStreamOut& out)
@@ -654,13 +654,6 @@ void FloatSlider::SaveState(FileStreamOut& out)
    out << kFloatSliderSaveStateRev;
    
    out << (float)*mVar;
-   
-   bool hasLFO = mLFOControl && mLFOControl->Active();
-   out << hasLFO;
-   if (hasLFO)
-   {
-      mLFOControl->SaveState(out);
-   }
    
    out << mModulatorMin;
    out << mModulatorMax;
@@ -671,6 +664,11 @@ void FloatSlider::SaveState(FileStreamOut& out)
    
    out << mMin;
    out << mMax;
+   
+   bool hasLFO = mLFOControl && mLFOControl->Active();
+   out << hasLFO;
+   if (hasLFO)
+      mLFOControl->SaveState(out);
 }
 
 void FloatSlider::LoadState(FileStreamIn& in, bool shouldSetValue)
@@ -680,27 +678,28 @@ void FloatSlider::LoadState(FileStreamIn& in, bool shouldSetValue)
    
    float var;
    in >> var;
-   if (shouldSetValue)
-      SetValueDirect(var);
    
-   bool hasLFO;
-   in >> hasLFO;
-   if (hasLFO)
+   if (rev < 5)
    {
-      FloatSliderLFOControl* lfo = AcquireLFO();
-      if (shouldSetValue)
-         lfo->SetLFOEnabled(true);
-      
-      if (rev == 0)
+      bool hasLFO;
+      in >> hasLFO;
+      if (hasLFO)
       {
-         mLFOControl->GetLFOSettings()->LoadState(in);
+         FloatSliderLFOControl* lfo = AcquireLFO();
+         if (shouldSetValue)
+            lfo->SetLFOEnabled(true);
+         
+         if (rev == 0)
+         {
+            mLFOControl->GetLFOSettings()->LoadState(in);
+         }
+         else if (rev > 0)
+         {
+            mLFOControl->LoadState(in);
+         }
+         if (shouldSetValue)
+            lfo->UpdateFromSettings();
       }
-      else if (rev > 0)
-      {
-         mLFOControl->LoadState(in);
-      }
-      if (shouldSetValue)
-         lfo->UpdateFromSettings();
    }
    
    if (rev >= 2)
@@ -724,6 +723,32 @@ void FloatSlider::LoadState(FileStreamIn& in, bool shouldSetValue)
       in >> mMin;
       in >> mMax;
    }
+   
+   if (rev >= 5)
+   {
+      bool hasLFO;
+      in >> hasLFO;
+      if (hasLFO)
+      {
+         FloatSliderLFOControl* lfo = AcquireLFO();
+         if (shouldSetValue)
+            lfo->SetLFOEnabled(true);
+         
+         if (rev == 0)
+         {
+            mLFOControl->GetLFOSettings()->LoadState(in);
+         }
+         else if (rev > 0)
+         {
+            mLFOControl->LoadState(in);
+         }
+         if (shouldSetValue)
+            lfo->UpdateFromSettings();
+      }
+   }
+   
+   if (shouldSetValue)
+      SetValueDirect(var);
 }
 
 IntSlider::IntSlider(IIntSliderListener* owner, const char* label, int x, int y, int w, int h, int* var, int min, int max)

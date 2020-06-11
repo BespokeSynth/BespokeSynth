@@ -136,7 +136,6 @@ private:
    int mNumBars;
    ClickButton* mClearButton;
    DropdownList* mNumBarsSelector;
-   bool mDrawDebug;
    float mVol;
    float mSmoothedVol;
    FloatSlider* mVolSlider;

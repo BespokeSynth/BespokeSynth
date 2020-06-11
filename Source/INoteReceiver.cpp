@@ -19,9 +19,21 @@ NoteInputBuffer::NoteInputBuffer(INoteReceiver* receiver)
 
 void NoteInputBuffer::Process(double time)
 {
+   //process note offs first
    for (int i=0; i<kBufferSize; ++i)
    {
-      if (mBuffer[i].time != -1)
+      if (mBuffer[i].time != -1 && mBuffer[i].velocity == 0)
+      {
+         NoteInputElement& element = mBuffer[i];
+         mReceiver->PlayNote(element.time, element.pitch, element.velocity, element.voiceIdx, element.modulation);
+         mBuffer[i].time = -1;
+      }
+   }
+   
+   //now process note ons
+   for (int i=0; i<kBufferSize; ++i)
+   {
+      if (mBuffer[i].time != -1 && mBuffer[i].velocity != 0)
       {
          NoteInputElement& element = mBuffer[i];
          mReceiver->PlayNote(element.time, element.pitch, element.velocity, element.voiceIdx, element.modulation);

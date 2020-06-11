@@ -30,7 +30,7 @@
 
 #define UIBLOCK_SHIFTDOWN() yPos += lastUIControl->GetDimensions().y + 2;
 #define UIBLOCK_SHIFTRIGHT() xOffset = lastUIControl->GetPosition(true).x + lastUIControl->GetDimensions().x + 2; yPos = lastUIControl->GetPosition(true).y;
-#define UIBLOCK_SHIFTX(amount) xOffset += amount; yPos = lastUIControl->GetPosition(true).y;
+#define UIBLOCK_SHIFTX(amount) xOffset += amount; if (lastUIControl != nullptr) { yPos = lastUIControl->GetPosition(true).y; }
 #define UIBLOCK_SHIFTY(amount) yPos += amount;
 #define UIBLOCK_NEWLINE() xOffset = 0;
 #define UIBLOCK_NEWCOLUMN() xPos += sliderWidth + 3; yPos = originalY;
@@ -53,6 +53,8 @@
 #define DROPDOWN(dropdown,name,var,width) dropdown = new DropdownList(UICONTROL_BASICS(name),var,width); lastUIControl = dropdown; UIBLOCK_SHIFTDOWN(); UIBLOCK_UPDATEEXTENTS();
 
 #define BUTTON(button,name) button = new ClickButton(UICONTROL_BASICS(name)); lastUIControl = button; UIBLOCK_SHIFTDOWN(); UIBLOCK_UPDATEEXTENTS();
+
+#define TEXTENTRY(entry,name,length,var) entry = new TextEntry(UICONTROL_BASICS(name),length,var); UIBLOCK_SHIFTDOWN(); UIBLOCK_UPDATEEXTENTS();
 
 #define UICONTROL_CUSTOM(var,instance) var = instance; lastUIControl = var; UIBLOCK_SHIFTDOWN(); UIBLOCK_UPDATEEXTENTS();
 

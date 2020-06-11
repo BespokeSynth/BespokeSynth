@@ -23,6 +23,7 @@ ModuleSaveDataPanel::ModuleSaveDataPanel()
 , mAlignmentX(100)
 , mApplyButton(nullptr)
 , mDeleteButton(nullptr)
+, mDrawDebugCheckbox(nullptr)
 {
    assert(TheSaveDataPanel == nullptr);
    TheSaveDataPanel = this;
@@ -161,6 +162,10 @@ void ModuleSaveDataPanel::ReloadSaveData()
       mDeleteButton = new ClickButton(this,"delete module",x+50,y);
       mSaveDataControls.push_back(mDeleteButton);
    }
+   y += itemSpacing;
+   
+   mDrawDebugCheckbox = new Checkbox(this, "draw debug", x, y, &mSaveModule->mDrawDebug);
+   mSaveDataControls.push_back(mDrawDebugCheckbox);
    y += itemSpacing;
    
    mHeight = y+5;

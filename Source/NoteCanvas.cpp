@@ -192,8 +192,9 @@ void NoteCanvas::OnTransportAdvanced(float amount)
       int pitch = 128 - i - 1;
       bool wasOn = mCurrentNotes[pitch] != nullptr || mInputNotes[pitch];
       bool nowOn = mNoteChecker[i] != nullptr || mInputNotes[pitch];
+      bool hasChanged = (nowOn || wasOn) && mCurrentNotes[pitch] != static_cast<NoteCanvasElement*>(mNoteChecker[i]);
       
-      if (wasOn && !nowOn)
+      if (wasOn && mInputNotes[pitch] == nullptr && hasChanged)
       {
          //note off
          if (mCurrentNotes[pitch])
@@ -206,8 +207,7 @@ void NoteCanvas::OnTransportAdvanced(float amount)
             mCurrentNotes[pitch] = nullptr;
          }
       }
-      if (nowOn && mInputNotes[pitch] == nullptr &&
-          mCurrentNotes[pitch] != static_cast<NoteCanvasElement*>(mNoteChecker[i]))
+      if (nowOn && mInputNotes[pitch] == nullptr && hasChanged)
       {
          //note on
          NoteCanvasElement* note = static_cast<NoteCanvasElement*>(mNoteChecker[i]);

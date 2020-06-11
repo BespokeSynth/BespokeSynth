@@ -14,8 +14,7 @@
 #include "ChannelBuffer.h"
 
 SingleOscillatorVoice::SingleOscillatorVoice(IDrawableModule* owner)
-: mStartTime(-1)
-, mUseFilter(false)
+: mUseFilter(false)
 , mOwner(owner)
 {
 }
@@ -150,12 +149,8 @@ bool SingleOscillatorVoice::Process(double time, ChannelBuffer* out)
 void SingleOscillatorVoice::Start(double time, float target)
 {
    mAdsr.Start(time, target, mVoiceParams->mAdsr);
-   mStartTime = time;
    
-   if (mVoiceParams->mFilterCutoff != SINGLEOSCILLATOR_NO_CUTOFF ||
-       mVoiceParams->mFilterAdsr.GetA() > 1 ||
-       mVoiceParams->mFilterAdsr.GetS() < 1 ||
-       mVoiceParams->mFilterAdsr.GetR() > 30)
+   if (mVoiceParams->mFilterCutoff != SINGLEOSCILLATOR_NO_CUTOFF)
    {
       mUseFilter = true;
       mFilterLeft.SetFilterType(kFilterType_Lowpass);

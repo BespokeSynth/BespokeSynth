@@ -96,7 +96,6 @@ private:
    FloatSlider* mBSlider;
    FloatSlider* mCSlider;
    FloatSlider* mDSlider;
-   Checkbox* mDebugCheckbox;
    int mLoadScriptIndex;
    float mA;
    float mB;
@@ -110,7 +109,6 @@ private:
    static double sMostRecentRunTime;
    string mLastError;
    size_t mScriptModuleIndex;
-   bool mDrawDebug;
    string mLastRunLiteralCode;
    int mNextLineToExecute;
    

@@ -40,7 +40,6 @@ ScriptModule::ScriptModule()
 , mB(0)
 , mC(0)
 , mD(0)
-, mDrawDebug(false)
 , mNextLineToExecute(-1)
 {
    InitializePythonIfNecessary();
@@ -90,8 +89,6 @@ void ScriptModule::CreateUIControls()
    FLOATSLIDER(mCSlider, "c", &mC, 0, 1);
    UIBLOCK_SHIFTRIGHT();
    FLOATSLIDER(mDSlider, "d", &mD, 0, 1);
-   UIBLOCK_SHIFTRIGHT();
-   CHECKBOX(mDebugCheckbox, "debug", &mDrawDebug);
    ENDUIBLOCK(mWidth, mHeight);
 }
 
@@ -132,7 +129,6 @@ void ScriptModule::DrawModule()
    mBSlider->Draw();
    mCSlider->Draw();
    mDSlider->Draw();
-   mDebugCheckbox->Draw();
    
    if (mLastError != "")
    {
@@ -151,7 +147,7 @@ void ScriptModule::DrawModule()
    for (int i=0; i<kScheduledNoteOutputBufferSize; ++i)
    {
       if (mScheduledNoteOutput[i].time != -1 &&
-          mScheduledNoteOutput[i].velocity > 0 &&
+          //mScheduledNoteOutput[i].velocity > 0 &&
           gTime + 50 < mScheduledNoteOutput[i].time)
          DrawTimer(mScheduledNoteOutput[i].lineNum, mScheduledNoteOutput[i].startTime, mScheduledNoteOutput[i].time, IDrawableModule::GetColor(kModuleType_Note));
    }
@@ -289,7 +285,7 @@ void ScriptModule::Poll()
    for (int i=0; i<kPendingNoteInputBufferSize; ++i)
    {
       if (mPendingNoteInput[i].time != -1 &&
-          gTime + 50 > mPendingNoteInput[i].time)
+          gTime + TheTransport->GetEventLookaheadMs() > mPendingNoteInput[i].time)
       {
          if (mLastError == "")
          {
@@ -301,10 +297,24 @@ void ScriptModule::Poll()
       }
    }
    
+   //note offs first
    for (int i=0; i<kScheduledNoteOutputBufferSize; ++i)
    {
       if (mScheduledNoteOutput[i].time != -1 &&
-          gTime + 50 > mScheduledNoteOutput[i].time)
+          mScheduledNoteOutput[i].velocity == 0 &&
+          gTime + TheTransport->GetEventLookaheadMs() > mScheduledNoteOutput[i].time)
+      {
+         PlayNote(mScheduledNoteOutput[i].time, mScheduledNoteOutput[i].pitch, mScheduledNoteOutput[i].velocity, mScheduledNoteOutput[i].pan, mScheduledNoteOutput[i].lineNum);
+         mScheduledNoteOutput[i].time = -1;
+      }
+   }
+   
+   //then note ons
+   for (int i=0; i<kScheduledNoteOutputBufferSize; ++i)
+   {
+      if (mScheduledNoteOutput[i].time != -1 &&
+          mScheduledNoteOutput[i].velocity != 0 &&
+          gTime + TheTransport->GetEventLookaheadMs() > mScheduledNoteOutput[i].time)
       {
          PlayNote(mScheduledNoteOutput[i].time, mScheduledNoteOutput[i].pitch, mScheduledNoteOutput[i].velocity, mScheduledNoteOutput[i].pan, mScheduledNoteOutput[i].lineNum);
          mScheduledNoteOutput[i].time = -1;
@@ -314,7 +324,7 @@ void ScriptModule::Poll()
    for (int i=0; i<kScheduledMethodCallBufferSize; ++i)
    {
       if (mScheduledMethodCall[i].time != -1 &&
-          gTime + 50 > mScheduledMethodCall[i].time)
+          gTime + TheTransport->GetEventLookaheadMs() > mScheduledMethodCall[i].time)
       {
          RunCode(mScheduledMethodCall[i].time, mScheduledMethodCall[i].method);
          mMethodCallTracker.AddEvent(mScheduledMethodCall[i].lineNum);
@@ -338,6 +348,10 @@ void ScriptModule::PlayNoteFromScriptAfterDelay(int pitch, int velocity, float d
 {
    delayMeasureTime /= float(TheTransport->GetTimeSigTop()) / TheTransport->GetTimeSigBottom();
    double time = sMostRecentRunTime + delayMeasureTime * TheTransport->MsPerBar();
+   if (velocity == 0)
+      time -= gBufferSize * gInvSampleRateMs + 1;  //TODO(Ryan) hack to make note offs happen a buffer early... figure out why scheduled lengths are longer than it takes to get the next pulse of the same interval
+   
+   //ofLog() << "ScriptModule::PlayNoteFromScriptAfterDelay() " << velocity << " " << time << " " << sMostRecentRunTime << " " << (time - sMostRecentRunTime);
    
    if (time <= sMostRecentRunTime)
    {
@@ -437,10 +451,11 @@ void ScriptModule::OnAdjustUIControl(IUIControl* control, float value)
 
 void ScriptModule::PlayNote(double time, int pitch, int velocity, float pan, int lineNum)
 {
+   //ofLog() << "ScriptModule::PlayNote() " << velocity << " " << time;
    ModulationParameters modulation;
    modulation.pan = pan;
    PlayNoteOutput(time, pitch, velocity, -1, modulation);
-   if (velocity > 0)
+   //if (velocity > 0)
       mNotePlayTracker.AddEvent(lineNum, ofToString(pitch) + " " + ofToString(velocity) + " " + ofToString(pan,1));
 }
 
@@ -803,7 +818,6 @@ void ScriptModule::Resize(float w, float h)
    mBSlider->SetPosition(mBSlider->GetPosition(true).x, mBSlider->GetPosition(true).y + h - mHeight);
    mCSlider->SetPosition(mCSlider->GetPosition(true).x, mCSlider->GetPosition(true).y + h - mHeight);
    mDSlider->SetPosition(mDSlider->GetPosition(true).x, mDSlider->GetPosition(true).y + h - mHeight);
-   mDebugCheckbox->SetPosition(mDebugCheckbox->GetPosition(true).x, mDebugCheckbox->GetPosition(true).y + h - mHeight);
    mWidth = w;
    mHeight = h;
 }

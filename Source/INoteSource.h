@@ -21,7 +21,7 @@ class INoteSource;
 class NoteOutput : public INoteReceiver
 {
 public:
-   NoteOutput(INoteSource* source) : mNoteSource(source) { bzero(mNotes, 128*sizeof(bool)); }
+   NoteOutput(INoteSource* source) : mNoteSource(source) { bzero(mNotes, 128*sizeof(bool)); bzero(mNoteOnTimes, 128*sizeof(double)); }
    
    void Flush(double time);
    void FlushTarget(double time, INoteReceiver* target);
@@ -37,6 +37,7 @@ public:
    list<int> GetHeldNotesList();
 private:
    bool mNotes[128];
+   double mNoteOnTimes[128];
    INoteSource* mNoteSource;
 };
 

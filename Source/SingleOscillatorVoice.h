@@ -68,7 +68,6 @@ private:
    OscData mOscData[kMaxUnison];
    ::ADSR mAdsr;
    OscillatorVoiceParams* mVoiceParams;
-   double mStartTime;
    
    ::ADSR mFilterAdsr;
    BiquadFilter mFilterLeft;

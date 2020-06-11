@@ -36,7 +36,6 @@ SingleOscillator::SingleOscillator()
 , mLengthMultiplierSlider(nullptr)
 , mWriteBuffer(gBufferSize)
 , mDrawOsc(kOsc_Square)
-, mDrawDebug(false)
 {
    mVoiceParams.mAdsr.Set(10,0,1,10);
    mVoiceParams.mVol = .05f;
@@ -161,8 +160,8 @@ void SingleOscillator::PlayNote(double time, int pitch, int velocity, int voiceI
    else
    {
       mPolyMgr.Stop(time, pitch);
-      mVoiceParams.mAdsr.Stop(time);         //for visualization
-      mVoiceParams.mFilterAdsr.Stop(time);   //for visualization
+      mVoiceParams.mAdsr.Stop(time, false);         //for visualization
+      mVoiceParams.mFilterAdsr.Stop(time, false);   //for visualization
    }
    
    if (mDrawDebug)

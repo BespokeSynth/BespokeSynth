@@ -40,7 +40,7 @@ public:
    
    virtual void OnKeyPressed(int key, bool isRepeat) = 0;
 private:
-   virtual void AcceptEntry() {}
+   virtual void AcceptEntry(bool pressedEnter) {}
    static IKeyboardFocusListener* sCurrentKeyboardFocus;
 };
 
@@ -59,6 +59,7 @@ public:
    void UpdateDisplayString();
    void SetInErrorMode(bool error) { mInErrorMode = error; }
    void DrawLabel(bool draw) { mDrawLabel = draw; }
+   void SetRequireEnter(bool require) { mRequireEnterToAccept = require; }
    void SetFlexibleWidth(bool flex) { mFlexibleWidth = flex; }
    void ClearInput() { bzero(mString, MAX_TEXTENTRY_LENGTH); mCaretPosition = 0; }
    const char* GetText() const { return mString; }
@@ -81,7 +82,7 @@ private:
    
    void AddCharacter(char c);
    bool AllowCharacter(char c);
-   void AcceptEntry() override;
+   void AcceptEntry(bool pressedEnter) override;
    
    void OnClicked(int x, int y, bool right) override;
    bool MouseMoved(float x, float y) override;
@@ -107,6 +108,7 @@ private:
    float mLabelSize;
    bool mFlexibleWidth;
    bool mHovered;
+   bool mRequireEnterToAccept;
 };
 
 #endif /* defined(__modularSynth__TextEntry__) */

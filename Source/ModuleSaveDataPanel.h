@@ -64,6 +64,7 @@ private:
    vector<string> mLabels;
    ClickButton* mApplyButton;
    ClickButton* mDeleteButton;
+   Checkbox* mDrawDebugCheckbox;
    map<DropdownList*,ModuleSaveData::SaveVal*> mStringDropdowns;
 
    int mHeight;

@@ -133,6 +133,8 @@ public:
    static float sHueNoteSource;
    static float sSaturation;
    static float sBrightness;
+   
+   bool mDrawDebug;
 
 protected:
    virtual void Poll() override {}

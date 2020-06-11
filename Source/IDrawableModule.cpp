@@ -48,6 +48,7 @@ IDrawableModule::IDrawableModule()
 , mOwningContainer(nullptr)
 , mTitleLabelWidth(0)
 , mShouldDrawOutline(true)
+, mDrawDebug(false)
 {
 }
 

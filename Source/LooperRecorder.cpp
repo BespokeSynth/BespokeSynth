@@ -22,10 +22,8 @@
 LooperRecorder::LooperRecorder()
 : IAudioProcessor(gBufferSize)
 , mRecordBuffer(MAX_BUFFER_SIZE)
-, mDrawDebug(false)
 , mNumBars(1)
 , mNumBarsSelector(nullptr)
-, mDebugCheckbox(nullptr)
 , mSpeed(1.0f)
 , mBaseTempo(120)
 , mResampAndSetButton(nullptr)
@@ -65,7 +63,6 @@ void LooperRecorder::CreateUIControls()
 {
    IDrawableModule::CreateUIControls();
    mNumBarsSelector = new DropdownList(this,"length",97,3,&mNumBars);
-   //mDebugCheckbox = new Checkbox(this,"db",100,168,&mDrawDebug);
    mResampAndSetButton = new ClickButton(this,"resample & set key", -1, -1);
    mResampleButton = new ClickButton(this,"resample", -1, -1);
    mOrigSpeedButton = new ClickButton(this,"orig speed", 3, 57);

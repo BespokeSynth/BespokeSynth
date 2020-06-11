@@ -33,7 +33,7 @@ public:
    void Start(double time, float target);
    void Start(double time, float target, float a, float d, float s, float r);
    void Start(double time, float target, const ADSR& adsr);
-   void Stop(double time);
+   void Stop(double time, bool warn = true);
    float Value(double time) const;
    void Set(float a, float d, float s, float r, float h = -1);
    void Set(const ADSR& other);

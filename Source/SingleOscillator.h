@@ -94,7 +94,6 @@ private:
    
    Oscillator mDrawOsc;
    
-   bool mDrawDebug;
    string mDebugLines;
 };
 

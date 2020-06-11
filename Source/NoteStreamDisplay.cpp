@@ -64,18 +64,34 @@ void NoteStreamDisplay::DrawModule()
                xEnd = mWidth;
             else
                xEnd = ofMap(gTime - mNoteStream[i].timeOff, mDurationMs, 0, 0, mWidth);
-            float yStart = ofMap(mNoteStream[i].pitch, mPitchMin, mPitchMax+1, mHeight - noteHeight, 0);
+            float yStart = GetYPos(mNoteStream[i].pitch, noteHeight);
             
             ofSetColor(0,ofMap(mNoteStream[i].velocity, 0, 127.0f, 50, 200),0);
             ofRect(xStart, yStart, xEnd - xStart, noteHeight, L(cornerRadius, 2));
             
             ofSetColor(mNoteStream[i].velocity / 127.0f * 255, mNoteStream[i].velocity / 127.0f * 255, mNoteStream[i].velocity / 127.0f * 255);
             ofRect(xStart, yStart, 3, noteHeight, L(cornerRadius, 2));
+            
+            ofSetColor(0,0,0);
+            ofRect(xEnd-3, yStart, 3, noteHeight, L(cornerRadius, 2));
          }
+      }
+      
+      ofSetColor(100,100,255);
+      bool* notes = mNoteOutput.GetNotes();
+      for (int i=mPitchMin; i<=mPitchMax; ++i)
+      {
+         if (notes[i])
+            ofRect(mWidth-3, GetYPos(i, noteHeight), 3, noteHeight, L(cornerRadius, 2));
       }
    }
    
    mResetButton->Draw();
+}
+
+float NoteStreamDisplay::GetYPos(int pitch, float noteHeight) const
+{
+   return ofMap(pitch, mPitchMin, mPitchMax+1, mHeight - noteHeight, 0);
 }
 
 void NoteStreamDisplay::PlayNote(double time, int pitch, int velocity, int voiceIdx, ModulationParameters modulation)

@@ -138,12 +138,10 @@ void PolyphonyMgr::Start(double time, int pitch, float amount, int voiceIdx, Mod
       {
          float fade = 1 - (float(i) / kVoiceFadeSamples);
          for (int ch=0; ch<mFadeOutBuffer.NumActiveChannels(); ++ch)
-         {
             mFadeOutBuffer.GetChannel(ch)[(i+mFadeOutBufferPos) % kVoiceFadeSamples] += mFadeOutWorkBuffer.GetChannel(ch)[i] * fade;
-         }
       }
-      voice->ClearVoice();
    }
+   voice->ClearVoice();
    voice->SetPitch(pitch);
    voice->SetModulators(modulation);
    voice->Start(time, amount);
@@ -176,7 +174,6 @@ void PolyphonyMgr::Process(double time, ChannelBuffer* out, int bufferSize)
 
    for (int i=0; i<kNumVoices; ++i)
    {
-      Clear(mWorkBuffer, bufferSize);
       mVoices[i].mVoice->Process(time, out);
       
       if (mVoices[i].mPitch != -1 && !mVoices[i].mNoteOn && mVoices[i].mVoice->IsDone(time))

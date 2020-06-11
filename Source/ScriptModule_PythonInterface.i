@@ -14,6 +14,7 @@
 #include "NoteStepSequencer.h"
 #include "StepSequencer.h"
 #include "NoteCanvas.h"
+#include "SamplePlayer.h"
 
 #include "pybind11/embed.h"
 #include "pybind11/stl.h"
@@ -80,22 +81,22 @@ PYBIND11_EMBEDDED_MODULE(scriptmodule, m)
       .def("play_note", [](ScriptModule& module, int pitch, int velocity, float length)
       {
          module.PlayNoteFromScript(pitch, velocity, 0);
-         module.PlayNoteFromScriptAfterDelay(pitch, 0, length - .01f, 0);
+         module.PlayNoteFromScriptAfterDelay(pitch, 0, length, 0);
       })
       .def("play_note_pan", [](ScriptModule& module, int pitch, int velocity, float length, float pan)
       {
          module.PlayNoteFromScript(pitch, velocity, pan);
-         module.PlayNoteFromScriptAfterDelay(pitch, 0, length - .01f, 0);
+         module.PlayNoteFromScriptAfterDelay(pitch, 0, length, 0);
       })
       .def("schedule_note", [](ScriptModule& module, float delay, int pitch, int velocity, float length)
       {
          module.PlayNoteFromScriptAfterDelay(pitch, velocity, delay, 0);
-         module.PlayNoteFromScriptAfterDelay(pitch, 0, delay + length - .01f, 0);
+         module.PlayNoteFromScriptAfterDelay(pitch, 0, delay + length, 0);
       })
       .def("schedule_note_pan", [](ScriptModule& module, float delay, int pitch, int velocity, float length, float pan)
       {
          module.PlayNoteFromScriptAfterDelay(pitch, velocity, delay, pan);
-         module.PlayNoteFromScriptAfterDelay(pitch, 0, delay + length - .01f, 0);
+         module.PlayNoteFromScriptAfterDelay(pitch, 0, delay + length, 0);
       })
       .def("schedule_note_on", [](ScriptModule& module, float delay, int pitch, int velocity)
       {
@@ -195,6 +196,19 @@ PYBIND11_EMBEDDED_MODULE(notecanvas, m)
       .def("clear", [](NoteCanvas& canvas)
       {
          canvas.Clear();
+      });
+}
+
+PYBIND11_EMBEDDED_MODULE(sampleplayer, m)
+{
+   m.def("get", [](string path)
+   {
+      return dynamic_cast<SamplePlayer*>(TheSynth->FindModule(path));
+   }, py::return_value_policy::reference);
+   py::class_<SamplePlayer, IDrawableModule>(m, "sampleplayer")
+      .def("set_cue_point", [](SamplePlayer& player, int pitch, float startSeconds, float lengthSeconds, float speed)
+      {
+         player.SetCuePoint(pitch, startSeconds, lengthSeconds, speed);
       });
 }
 

@@ -72,13 +72,15 @@ void ::ADSR::Start(double time, float target)
    }
 }
 
-void ::ADSR::Stop(double time)
+void ::ADSR::Stop(double time, bool warn /*= true*/)
 {
-   if (mStopTime > mStartTime) //already stopped
-      return;
    mStopBlendFromValue = Value(time);
    if (time <= mStartTime)
+   {
+      if (warn)
+         ofLog() << "trying to stop before we started (" << time << "<=" << mStartTime << ")";
       time = mStartTime + .0001f;  //must be after start
+   }
    mStopTime = time;
 }
 
@@ -112,24 +114,27 @@ float ::ADSR::Value(double time) const
 
 int ::ADSR::GetStage(double time, double& stageStartTimeOut) const
 {
-   if (time < mStartTime || mStartTime < 0)
+   if (mStartTime < 0)
       return mNumStages;
    
    int stage = 0;
    stageStartTimeOut = mStartTime;
    
-   if (mHasSustainStage && time >= mStopTime && mStopTime > mStartTime)
+   if (time >= mStartTime)
    {
-      stage = mSustainStage+1;
-      stageStartTimeOut = mStopTime;
-   }
-   
-   while (time > mStages[stage].time + stageStartTimeOut && stage < mNumStages)
-   {
-      stageStartTimeOut += mStages[stage].time;
-      ++stage;
-      if (mHasSustainStage && stage == mSustainStage)
-         break;
+      if (mHasSustainStage && time >= mStopTime && mStopTime > mStartTime)
+      {
+         stage = mSustainStage+1;
+         stageStartTimeOut = mStopTime;
+      }
+      
+      while (time > mStages[stage].time + stageStartTimeOut && stage < mNumStages)
+      {
+         stageStartTimeOut += mStages[stage].time;
+         ++stage;
+         if (mHasSustainStage && stage == mSustainStage)
+            break;
+      }
    }
    
    return stage;

@@ -97,10 +97,8 @@ private:
    
    RollingBuffer mRecordBuffer;
    vector<Looper*> mLoopers;
-   bool mDrawDebug;
    int mNumBars;
    DropdownList* mNumBarsSelector;
-   Checkbox* mDebugCheckbox;
    float mSpeed;
    float mBaseTempo;
    ClickButton* mResampleButton;
