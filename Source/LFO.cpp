@@ -17,6 +17,7 @@ LFO::LFO()
 , mMode(kLFOMode_Envelope)
 , mFreePhase(0)
 , mFreeRate(1)
+, mLength(1)
 {
    SetPeriod(kInterval_1n);
 }
@@ -27,11 +28,12 @@ LFO::~LFO()
    TheTransport->RemoveAudioPoller(this);
 }
 
-float LFO::CalculatePhase(int samplesIn /*= 0*/) const
+float LFO::CalculatePhase(int samplesIn /*= 0*/, bool doTransform /* = true*/) const
 {
+   float ret;
    if (mPeriod == kInterval_Free)
    {
-      return mFreePhase + float(samplesIn) / gSampleRate * mFreeRate;
+      ret = mFreePhase + float(samplesIn) / gSampleRate * mFreeRate;
    }
    else
    {
@@ -41,8 +43,19 @@ float LFO::CalculatePhase(int samplesIn /*= 0*/) const
       
       phase -= int(phase) / 2 * 2;  //using 2 allows for shuffle to work
       
-      return phase;
+      ret = phase;
    }
+   
+   if (doTransform)
+      return TransformPhase(ret);
+   return ret;
+}
+
+float LFO::TransformPhase(float phase) const
+{
+   if (mLength != 1)
+      phase = int(phase) + ofClamp((phase - int(phase)) / mLength, 0, 1);
+   return phase;
 }
 
 float LFO::Value(int samplesIn /*= 0*/, float forcePhase /*= -1*/) const

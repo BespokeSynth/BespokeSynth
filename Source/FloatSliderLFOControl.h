@@ -31,6 +31,7 @@ struct LFOSettings
    , mSoften(0)
    , mShuffle(0)
    , mFreeRate(1)
+   , mLength(1)
    {
    }
    
@@ -42,6 +43,7 @@ struct LFOSettings
    float mSoften;
    float mShuffle;
    float mFreeRate;
+   float mLength;
    
    void SaveState(FileStreamOut& out) const;
    void LoadState(FileStreamIn& in);
@@ -87,7 +89,7 @@ public:
    void ButtonClicked(ClickButton* button) override;
    void DropdownUpdated(DropdownList* list, int oldVal) override;
 
-   void GetModuleDimensions(int& width, int& height) override { width = 100; height = 185; }
+   void GetModuleDimensions(int& width, int& height) override { width = mWidth; height = mHeight; }
    
    void SaveLayout(ofxJSONElement& moduleInfo) override;
    void LoadLayout(const ofxJSONElement& moduleInfo) override;
@@ -111,8 +113,11 @@ private:
    FloatSlider* mSoftenSlider;
    FloatSlider* mShuffleSlider;
    FloatSlider* mFreeRateSlider;
+   FloatSlider* mLengthSlider;
    ClickButton* mPinButton;
    Checkbox* mEnableLFOCheckbox;
+   float mWidth;
+   float mHeight;
 
    bool mPinned;
 };

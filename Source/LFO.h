@@ -32,9 +32,11 @@ public:
    void SetType(OscillatorType type);
    void SetPulseWidth(float width) { mOsc.SetPulseWidth(width); }
    void SetMode(LFOMode mode) { mMode = mode; }
-   float CalculatePhase(int samplesIn = 0) const;
+   float CalculatePhase(int samplesIn = 0, bool doTransform = true) const;
    Oscillator* GetOsc() { return &mOsc; }
    void SetFreeRate(float rate) { mFreeRate = rate; }
+   void SetLength(float length) { mLength = length; }
+   float TransformPhase(float phase) const;
 
    //ITimeListener
    void OnTimeEvent(double time) override;
@@ -50,6 +52,7 @@ private:
    float mDrunk;
    double mFreePhase;
    float mFreeRate;
+   float mLength;
 };
 
 #endif /* defined(__modularSynth__LFO__) */
