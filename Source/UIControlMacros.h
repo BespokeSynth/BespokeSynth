@@ -25,7 +25,7 @@
 #define UIBLOCK0() UIBLOCK3(3,3,100)
 #define UIBLOCK1(A) UIBLOCK3(3,3,A)
 #define UIBLOCK2(A,B) UIBLOCK3(A,B,100)
-#define UIBLOCK3(A,B,C) { float xPos = A; float yPos = B; float originalY = B; float sliderWidth = C; float originalSliderWidth = C; IUIControl* lastUIControl = nullptr; float xMax = 0; float yMax = 0; float xOffset = 0; UNUSED(originalY); UNUSED(originalSliderWidth); UNUSED(sliderWidth);
+#define UIBLOCK3(A,B,C) { float xPos = A; float yPos = B; float originalY = B; float sliderWidth = C; float originalSliderWidth = C; IUIControl* lastUIControl = nullptr; float xMax = 0; float yMax = 0; float xOffset = 0; float savedX = 0; float savedY = 0; UNUSED(originalY); UNUSED(originalSliderWidth); UNUSED(sliderWidth); UNUSED(savedX); UNUSED(savedY);
 #define UIBLOCK(...) CALL_OVERLOAD(UIBLOCK, __VA_ARGS__)
 
 #define UIBLOCK_SHIFTDOWN() yPos += lastUIControl->GetDimensions().y + 2;
@@ -37,6 +37,8 @@
 #define UIBLOCK_NEWCOLUMN() xPos += sliderWidth + 3; yPos = originalY;
 #define UIBLOCK_PUSHSLIDERWIDTH(w) sliderWidth = w;
 #define UIBLOCK_POPSLIDERWIDTH() sliderWidth = originalSliderWidth;
+#define UIBLOCK_SAVEPOSITION() savedX = xPos; savedY = yPos;
+#define UIBLOCK_RESTOREPOSITION() xPos = savedX; yPos = savedY;
 
 #define UIBLOCK_OWNER this
 

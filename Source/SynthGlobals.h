@@ -17,6 +17,7 @@
 #include <map>
 #include <list>
 #include <vector>
+#include <array>
 #include <math.h>
 #include <cctype>
 #include <random>
@@ -245,3 +246,19 @@ inline void bzero(void* mem, size_t size)
 #endif
 
 #define FIX_DENORMAL(p) if(fabsf(p)<1e-9) p = 0
+
+class ofLog
+{
+public:
+   ofLog() {}
+   ~ofLog() { cout << gTime << ": " << mMessage << endl; }
+   
+   template <class T>
+   ofLog& operator<<(const T& value)
+   {
+      mMessage += ofToString(value);
+      return *this;
+   }
+private:
+   string mMessage;
+};

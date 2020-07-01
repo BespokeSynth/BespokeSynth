@@ -53,6 +53,7 @@ public:
    void Process(double time, ChannelBuffer* out, int bufferSize);
    void GetPhaseAndInc(float& phase, float& inc);
    void DrawDebug(float x, float y);
+   void SetVoiceLimit(int limit) { mVoiceLimit = limit; }
 private:
    void Prune(double time);
    
@@ -64,6 +65,7 @@ private:
    float mWorkBuffer[2048];
    int mFadeOutBufferPos;
    IDrawableModule* mOwner;
+   int mVoiceLimit;
 };
 
 #endif /* defined(__additiveSynth__PolyphonyMgr__) */

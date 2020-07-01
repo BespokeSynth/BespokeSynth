@@ -9,6 +9,7 @@
 */
 
 #include "INoteReceiver.h"
+#include "Profiler.h"
 
 NoteInputBuffer::NoteInputBuffer(INoteReceiver* receiver)
 : mReceiver(receiver)
@@ -19,10 +20,13 @@ NoteInputBuffer::NoteInputBuffer(INoteReceiver* receiver)
 
 void NoteInputBuffer::Process(double time)
 {
+   PROFILER(NoteInputBuffer);
+   
    //process note offs first
    for (int i=0; i<kBufferSize; ++i)
    {
-      if (mBuffer[i].time != -1 && mBuffer[i].velocity == 0)
+      if (mBuffer[i].time != -1 && mBuffer[i].velocity == 0 &&
+          IsTimeWithinFrame(mBuffer[i].time))
       {
          NoteInputElement& element = mBuffer[i];
          mReceiver->PlayNote(element.time, element.pitch, element.velocity, element.voiceIdx, element.modulation);
@@ -33,7 +37,8 @@ void NoteInputBuffer::Process(double time)
    //now process note ons
    for (int i=0; i<kBufferSize; ++i)
    {
-      if (mBuffer[i].time != -1 && mBuffer[i].velocity != 0)
+      if (mBuffer[i].time != -1 && mBuffer[i].velocity != 0 &&
+          IsTimeWithinFrame(mBuffer[i].time))
       {
          NoteInputElement& element = mBuffer[i];
          mReceiver->PlayNote(element.time, element.pitch, element.velocity, element.voiceIdx, element.modulation);
@@ -57,4 +62,10 @@ void NoteInputBuffer::QueueNote(double time, int pitch, float velocity, int voic
          break;
       }
    }
+}
+
+//static
+bool NoteInputBuffer::IsTimeWithinFrame(double time)
+{
+   return time <= gTime + gBufferSize * gInvSampleRateMs;
 }

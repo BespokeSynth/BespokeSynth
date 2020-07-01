@@ -16,6 +16,7 @@ MidiDevice::MidiDevice(MidiDeviceListener* listener)
    : mListener(listener)
    , mMidiOut(nullptr)
    , mOutputChannel(1)
+   , mIsInputEnabled(false)
 {
    mDeviceNameIn[0] = 0;
    mDeviceNameOut[0] = 0;
@@ -37,6 +38,8 @@ bool MidiDevice::ConnectInput(const char* name)
    
    deviceManager.setMidiInputEnabled(mDeviceNameIn, true);
    deviceManager.addMidiInputCallback(mDeviceNameIn, this);
+   
+   mIsInputEnabled = TheSynth->GetGlobalManagers()->mDeviceManager.isMidiInputEnabled(mDeviceNameIn);
    
    TheSynth->AddMidiDevice(this);   //TODO(Ryan) need better place for this, but constructor is too early
    

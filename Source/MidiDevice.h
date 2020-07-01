@@ -76,7 +76,7 @@ public:
    bool Reconnect();
    bool IsInputConnected();
 
-   const char* Name() { return TheSynth->GetGlobalManagers()->mDeviceManager.isMidiInputEnabled(mDeviceNameIn) ? mDeviceNameIn : mDeviceNameOut; }
+   const char* Name() { return mIsInputEnabled ? mDeviceNameIn : mDeviceNameOut; }
    
    vector<string> GetPortList(bool forInput);
    
@@ -97,6 +97,7 @@ private:
    unique_ptr<MidiOutput> mMidiOut;
    MidiDeviceListener* mListener;
    int mOutputChannel;
+   bool mIsInputEnabled;
 };
 
 #endif /* defined(__additiveSynth__MidiDevice__) */

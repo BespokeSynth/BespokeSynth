@@ -126,6 +126,9 @@ void NoteCanvas::KeyPressed(int key, bool isRepeat)
          if (key == OF_KEY_RIGHT)
             directionLeftRight = 1;
          
+         if (GetKeyModifiers() == kModifier_Shift)
+            directionUpDown *= 12; //octave
+         
          for (auto element : mCanvas->GetElements())
          {
             if (element->GetHighlighted())
@@ -203,6 +206,8 @@ void NoteCanvas::OnTransportAdvanced(float amount)
             if (cursorAdvanceSinceEvent < 0)
                cursorAdvanceSinceEvent += 1;
             double time = cursorPlayTime - cursorAdvanceSinceEvent * TheTransport->MsPerBar() * mNumMeasures;
+            if (time < gTime)
+               time = gTime;
             mNoteOutput.PlayNote(time, pitch, 0, mCurrentNotes[pitch]->GetVoiceIdx());
             mCurrentNotes[pitch] = nullptr;
          }
@@ -212,12 +217,15 @@ void NoteCanvas::OnTransportAdvanced(float amount)
          //note on
          NoteCanvasElement* note = static_cast<NoteCanvasElement*>(mNoteChecker[i]);
          assert(note);
-         double cursorAdvanceSinceEvent = curPos -note->GetStart();
+         double cursorAdvanceSinceEvent = curPos - note->GetStart();
          if (cursorAdvanceSinceEvent < 0)
             cursorAdvanceSinceEvent += 1;
          double time = cursorPlayTime - cursorAdvanceSinceEvent * TheTransport->MsPerBar() * mNumMeasures;
-         mCurrentNotes[pitch] = note;
-         mNoteOutput.PlayNote(time, pitch, note->GetVelocity()*127, note->GetVoiceIdx(), ModulationParameters(note->GetPitchBend(), note->GetModWheel(), note->GetPressure(), note->GetPan()));
+         if (time > gTime)
+         {
+            mCurrentNotes[pitch] = note;
+            mNoteOutput.PlayNote(time, pitch, note->GetVelocity()*127, note->GetVoiceIdx(), ModulationParameters(note->GetPitchBend(), note->GetModWheel(), note->GetPressure(), note->GetPan()));
+         }
       }
       
       mNoteChecker[i] = nullptr;
@@ -270,7 +278,10 @@ void NoteCanvas::UpdateNumColumns()
 void NoteCanvas::Clear()
 {
    for (int pitch=0; pitch<128; ++pitch)
+   {
       mInputNotes[pitch] = nullptr;
+      mCurrentNotes[pitch] = nullptr;
+   }
    mNoteOutput.Flush(gTime);
    mCanvas->Clear();
 }
@@ -282,7 +293,7 @@ NoteCanvasElement* NoteCanvas::AddNote(double measurePos, int pitch, int velocit
    int row = mCanvas->GetNumRows()-pitch-1;
    NoteCanvasElement* element = static_cast<NoteCanvasElement*>(mCanvas->CreateElement(col,row));
    element->mOffset = canvasPos - element->mCol; //the rounded off part
-   element->mLength = mCanvas->GetNumCols() * length;
+   element->mLength = length / mNumMeasures * mCanvas->GetNumCols();
    element->SetVelocity(velocity / 127.0f);
    element->SetVoiceIdx(voiceIdx);
    int modIdx = voiceIdx;
@@ -311,7 +322,8 @@ void NoteCanvas::DrawModule()
    ofFill();
    for (int i=0;i<mCanvas->GetNumVisibleRows();++i)
    {
-      int pitch = mCanvas->GetNumRows()-mCanvas->GetRowOffset()+mCanvas->GetNumVisibleRows()-i-1;
+      bool drawBox = true;
+      int pitch = 127-mCanvas->GetRowOffset()-i;
       if (pitch%TheScale->GetTet() == TheScale->ScaleRoot()%TheScale->GetTet())
          ofSetColor(0,255,0,80);
       else if (pitch%TheScale->GetTet() == (TheScale->ScaleRoot()+7)%TheScale->GetTet())
@@ -319,17 +331,67 @@ void NoteCanvas::DrawModule()
       else if (TheScale->IsInScale(pitch))
          ofSetColor(100,75,0,80);
       else
-         continue;
+         drawBox = false;
       
       float boxHeight = (float(mCanvas->GetGridHeight())/mCanvas->GetNumVisibleRows());
       float y = mCanvas->GetPosition(true).y + i*boxHeight;
-      ofRect(mCanvas->GetPosition(true).x,y,mCanvas->GetGridWidth(),boxHeight);
+      if (drawBox)
+         ofRect(mCanvas->GetPosition(true).x,y,mCanvas->GetGridWidth(),boxHeight);
    }
    ofPopStyle();
    
    mCanvas->SetCursorPos(GetCurPos(gTime));
    
    mCanvas->Draw();
+   
+   ofPushStyle();
+   ofSetColor(128, 128, 128, gModuleDrawAlpha * .8f);
+   for (int i=0;i<mCanvas->GetNumVisibleRows();++i)
+   {
+      int pitch = 127-mCanvas->GetRowOffset()-i;
+      float boxHeight = (float(mCanvas->GetGridHeight())/mCanvas->GetNumVisibleRows());
+      float y = mCanvas->GetPosition(true).y + i*boxHeight;
+      float scale = MIN(boxHeight, 20);
+      DrawTextNormal(NoteName(pitch,false,true) + "("+ ofToString(pitch) + ")", mCanvas->GetPosition(true).x + 2, y - (scale/8) + boxHeight, scale);
+   }
+   ofPopStyle();
+   
+   ofPushMatrix();
+   ofTranslate(mCanvas->GetPosition(true).x, mCanvas->GetPosition(true).y);
+   ofPushStyle();
+   ofSetLineWidth(5);
+   auto elements = mCanvas->GetElements();
+   for (auto e1 : elements)
+   {
+      for (auto e2 : elements)
+      {
+         if (e1 != e2)
+         {
+            if (abs(e1->GetStart() - e2->GetStart()) < (1.0/32) / mNumMeasures)
+            {
+               int interval = abs(e1->mRow - e2->mRow);
+               if (interval == 3 || interval == 4 || interval == 5)
+               {
+                  auto rect1 = e1->GetRect(true, false);
+                  auto rect2 = e2->GetRect(true, false);
+                  if (interval == 3)
+                     ofSetColor(255,0,0,50);
+                  if (interval == 4)
+                     ofSetColor(0,255,0,50);
+                  if (interval == 5)
+                     ofSetColor(0,0,255,50);
+                  
+                  ofLine(rect1.x, rect1.getCenter().y, rect2.x, rect2.getCenter().y);
+                  ofLine(rect1.x, rect1.getCenter().y, rect1.x + 5, rect1.getCenter().y);
+                  ofLine(rect2.x, rect2.getCenter().y, rect2.x + 5, rect2.getCenter().y);
+               }
+            }
+         }
+      }
+   }
+   ofPopStyle();
+   ofPopMatrix();
+   
    mCanvasControls->Draw();
    mQuantizeButton->Draw();
    //mClipButton->Draw();

@@ -52,6 +52,8 @@ public:
    void CheckboxUpdated(Checkbox* checkbox) override;
    void RadioButtonUpdated(RadioButton* list, int oldVal) override;
    
+   bool HasDebugDraw() const override { return true; }
+   
    virtual void LoadLayout(const ofxJSONElement& moduleInfo) override;
    virtual void SetUpFromSaveData() override;
 

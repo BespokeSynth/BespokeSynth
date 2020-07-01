@@ -11,6 +11,7 @@
 #include "MathUtils.h"
 #include "FileStream.h"
 #include "SynthGlobals.h"
+#include "Profiler.h"
 
 void ::ADSR::Set(float a, float d, float s, float r, float h /*=-1*/)
 {
@@ -88,6 +89,8 @@ float ::ADSR::Value(double time) const
 {
    //if (mStartTime < 0)
    //   return 0;
+   
+   //PROFILER(ADSR_Value);
    
    float stageStartValue;
    double stageStartTime;

@@ -69,6 +69,14 @@ PYBIND11_EMBEDDED_MODULE(bespoke, m) {
    {
       return TheScale->GetPitchFromTone(index);
    });
+   m.def("name_to_pitch", [](string noteName)
+   {
+      return PitchFromNoteName(noteName);
+   });
+   m.def("pitch_to_name", [](int pitch)
+   {
+      return NoteName(pitch);
+   });
 }
 
 PYBIND11_EMBEDDED_MODULE(scriptmodule, m)
@@ -98,7 +106,7 @@ PYBIND11_EMBEDDED_MODULE(scriptmodule, m)
          module.PlayNoteFromScriptAfterDelay(pitch, velocity, delay, pan);
          module.PlayNoteFromScriptAfterDelay(pitch, 0, delay + length, 0);
       })
-      .def("schedule_note_on", [](ScriptModule& module, float delay, int pitch, int velocity)
+      .def("schedule_note_msg", [](ScriptModule& module, float delay, int pitch, int velocity)
       {
          module.PlayNoteFromScriptAfterDelay(pitch, velocity, delay, 0);
       })
@@ -106,22 +114,21 @@ PYBIND11_EMBEDDED_MODULE(scriptmodule, m)
       {
          module.ScheduleMethod(method, delay);
       })
-      .def("note_on", [](ScriptModule& module, int pitch, int velocity)
+      .def("note_msg", [](ScriptModule& module, int pitch, int velocity)
       {
          module.PlayNoteFromScript(pitch, velocity, 0);
-      })
-      .def("note_off", [](ScriptModule& module, int pitch)
-      {
-         module.PlayNoteFromScript(pitch, 0, 0);
       })
       .def("set", [](ScriptModule& module, string path, float value)
       {
          IUIControl* control = module.GetUIControl(path);
          if (control != nullptr)
-         {
-            control->SetValue(value);
-            module.OnAdjustUIControl(control, value);
-         }
+            module.ScheduleUIControlValue(control, value, 0);
+      })
+      .def("schedule_set", [](ScriptModule& module, float delay, string path, float value)
+      {
+         IUIControl* control = module.GetUIControl(path);
+         if (control != nullptr)
+            module.ScheduleUIControlValue(control, value, delay);
       })
       .def("get", [](ScriptModule& module, string path)
       {
@@ -138,8 +145,7 @@ PYBIND11_EMBEDDED_MODULE(scriptmodule, m)
             float min, max;
             control->GetRange(min, max);
             float value = ofClamp(control->GetValue() + amount, min, max);
-            control->SetValue(value);
-            module.OnAdjustUIControl(control, value);
+            module.ScheduleUIControlValue(control, value, 0);
          }
       })
       .def("highlight_line", [](ScriptModule& module, int lineNum)

@@ -37,10 +37,10 @@ public:
    void PlayNoteFromScript(int pitch, int velocity, float pan);
    void PlayNoteFromScriptAfterDelay(int pitch, int velocity, float delayMeasureTime, float pan);
    void ScheduleMethod(string method, float delayMeasureTime);
+   void ScheduleUIControlValue(IUIControl* control, float value, float delayMeasureTime);
    void HighlightLine(int lineNum);
    void PrintText(string text);
    IUIControl* GetUIControl(string path);
-   void OnAdjustUIControl(IUIControl* control, float value);
    
    void OnPulse(double time, float velocity, int flags) override;
    void ButtonClicked(ClickButton* button) override;
@@ -54,6 +54,8 @@ public:
    //INoteReceiver
    void PlayNote(double time, int pitch, int velocity, int voiceIdx = -1, ModulationParameters modulation = ModulationParameters()) override;
    
+   bool HasDebugDraw() const override { return true; }
+   
    void SaveState(FileStreamOut& out) override;
    void LoadState(FileStreamIn& in) override;
    void LoadLayout(const ofxJSONElement& moduleInfo) override;
@@ -65,6 +67,7 @@ public:
    
 private:
    void PlayNote(double time, int pitch, int velocity, float pan, int lineNum);
+   void AdjustUIControl(IUIControl* control, float value, int lineNum);
    void RunScript(double time);
    void RunCode(double time, string code);
    void FixUpCode(string& code);
@@ -75,7 +78,7 @@ private:
    bool ShouldDisplayLineExecutionPost(string line);
    void GetFirstAndLastCharacter(string line, char& first, char& last);
    bool IsNonWhitespace(string line);
-   void DrawTimer(int lineNum, double startTime, double endTime, ofColor color);
+   void DrawTimer(int lineNum, double startTime, double endTime, ofColor color, bool filled);
    void RefreshScriptFiles();
    
    //IDrawableModule
@@ -104,8 +107,7 @@ private:
    
    float mWidth;
    float mHeight;
-   static const int kScheduledPulseBufferSize = 20;
-   double mScheduledPulseTimes[kScheduledPulseBufferSize];
+   std::array<double, 20> mScheduledPulseTimes;
    static double sMostRecentRunTime;
    string mLastError;
    size_t mScriptModuleIndex;
@@ -121,8 +123,7 @@ private:
       float pan;
       int lineNum;
    };
-   static const int kScheduledNoteOutputBufferSize = 50;
-   ScheduledNoteOutput mScheduledNoteOutput[kScheduledNoteOutputBufferSize];
+   std::array<ScheduledNoteOutput, 50> mScheduledNoteOutput;
    
    struct ScheduledMethodCall
    {
@@ -131,8 +132,17 @@ private:
       string method;
       int lineNum;
    };
-   static const int kScheduledMethodCallBufferSize = 50;
-   ScheduledMethodCall mScheduledMethodCall[kScheduledMethodCallBufferSize];
+   std::array<ScheduledMethodCall, 50> mScheduledMethodCall;
+   
+   struct ScheduledUIControlValue
+   {
+      double startTime;
+      double time;
+      IUIControl* control;
+      float value;
+      int lineNum;
+   };
+   std::array<ScheduledUIControlValue, 50> mScheduledUIControlValue;
    
    struct PendingNoteInput
    {
@@ -140,8 +150,7 @@ private:
       int pitch;
       int velocity;
    };
-   static const int kPendingNoteInputBufferSize = 50;
-   PendingNoteInput mPendingNoteInput[kPendingNoteInputBufferSize];
+   std::array<PendingNoteInput, 50> mPendingNoteInput;
    
    struct PrintDisplay
    {
@@ -149,8 +158,7 @@ private:
       string text;
       int lineNum;
    };
-   static const int kPrintDisplayBufferSize = 10;
-   PrintDisplay mPrintDisplay[kPrintDisplayBufferSize];
+   std::array<PrintDisplay, 10> mPrintDisplay;
    
    struct UIControlModificationDisplay
    {
@@ -159,21 +167,20 @@ private:
       float value;
       int lineNum;
    };
-   static const int kUIControlModificationBufferSize = 10;
-   UIControlModificationDisplay mUIControlModifications[kUIControlModificationBufferSize];
+   std::array<UIControlModificationDisplay, 10> mUIControlModifications;
    
    class LineEventTracker
    {
    public:
       LineEventTracker()
       {
-         for (int i=0; i<kNumLineTrackers; ++i)
+         for (size_t i=0; i<mTimes.size(); ++i)
             mTimes[i] = -999;
       }
       
       void AddEvent(int lineNum, string text = "")
       {
-         if (lineNum >= 0 && lineNum < kNumLineTrackers)
+         if (lineNum >= 0 && lineNum < (int)mTimes.size())
          {
             mTimes[lineNum] = gTime;
             mText[lineNum] = text;
@@ -182,9 +189,8 @@ private:
       
       void Draw(CodeEntry* codeEntry, int style, ofColor color);
    private:
-      static const int kNumLineTrackers = 256;
-      double mTimes[kNumLineTrackers];
-      string mText[kNumLineTrackers];
+      std::array<double, 256> mTimes;
+      std::array<string, 256> mText;
    };
    
    LineEventTracker mLineExecuteTracker;

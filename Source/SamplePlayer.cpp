@@ -67,6 +67,17 @@ void SamplePlayer::CreateUIControls()
    BUTTON(mStopButton,"stop"); UIBLOCK_SHIFTRIGHT();
    CHECKBOX(mLoopCheckbox,"loop",&mLoop); UIBLOCK_SHIFTRIGHT();
    BUTTON(mDownloadYoutubeButton,"youtube");
+   UIBLOCK_SHIFTX(140);
+   UIBLOCK_NEWCOLUMN();
+   //UIBLOCK_SAVEPOSITION();
+   for (int i=0; i<(int)mSampleCuePoints.size(); ++i)
+   {
+      //UIBLOCK_RESTOREPOSITION();
+      FLOATSLIDER_DIGITS(mSampleCuePoints[i].mStartSlider, ("start"+ofToString(i)).c_str(), &mSampleCuePoints[i].startSeconds, 0, 100, 3);
+      FLOATSLIDER_DIGITS(mSampleCuePoints[i].mLengthSlider, ("length"+ofToString(i)).c_str(), &mSampleCuePoints[i].lengthSeconds, 0, 100, 3);
+      FLOATSLIDER(mSampleCuePoints[i].mSpeedSlider, ("speed"+ofToString(i)).c_str(), &mSampleCuePoints[i].speed, 0, 2);
+      UIBLOCK_NEWCOLUMN();
+   }
    ENDUIBLOCK0();
    
    mSampleBankCable = new PatchCableSource(this, kConnectionType_Special);
@@ -167,7 +178,7 @@ void SamplePlayer::PostRepatch(PatchCableSource* cableSource, bool fromUserClick
 
 void SamplePlayer::PlayNote(double time, int pitch, int velocity, int voiceIdx /*= -1*/, ModulationParameters modulation /*= ModulationParameters()*/)
 {
-   if (time > gTime + gBufferSize * gInvSampleRateMs)
+   if (!NoteInputBuffer::IsTimeWithinFrame(time))
    {
       mNoteInputBuffer.QueueNote(time, pitch, velocity, voiceIdx, modulation);
       return;
@@ -238,6 +249,13 @@ void SamplePlayer::UpdateSample(Sample* sample, bool ownsSample)
    mDrawBuffer.Resize(mSample->LengthInSamples());
    mDrawBuffer.CopyFrom(mSample->Data());
    mSample->LockDataMutex(false);
+   
+   float lengthSeconds = mSample->LengthInSamples() / (gSampleRate * mSample->GetSampleRateRatio());
+   for (size_t i=0; i<mSampleCuePoints.size(); ++i)
+   {
+      mSampleCuePoints[i].mStartSlider->SetExtents(0, lengthSeconds);
+      mSampleCuePoints[i].mLengthSlider->SetExtents(0, lengthSeconds);
+   }
 }
 
 void SamplePlayer::ButtonClicked(ClickButton *button)
@@ -255,19 +273,29 @@ void SamplePlayer::ButtonClicked(ClickButton *button)
       mSample->SetPlayPosition(0);
    }
    if (button == mDownloadYoutubeButton)
-      DownloadYoutube("https://www.youtube.com/watch?v="+mYoutubeId);
+      DownloadYoutube("https://www.youtube.com/watch?v="+mYoutubeId, "");
 }
 
 void SamplePlayer::TextEntryComplete(TextEntry* entry)
 {
    if (entry == mDownloadYoutubeSearch)
-      DownloadYoutube(string("\"ytsearch1:")+mYoutubeSearch+"\"");
+   {
+      int index = 0;
+      vector<string> tokens = ofSplitString(mYoutubeSearch,",");
+      if (tokens.size() > 1)
+         index = ofToInt(tokens[1]);
+      DownloadYoutube(string("\"ytsearch"+ofToString(index+1)+":")+tokens[0]+"\"", "--match-filter \"duration < 610\" --playlist-items "+ofToString(index+1));
+   }
 }
 
-void SamplePlayer::DownloadYoutube(string search)
+void SamplePlayer::DownloadYoutube(string search, string options)
 {
+   auto file = juce::File(ofToDataPath("youtube.wav"));
+   if (file.existsAsFile())
+      file.deleteFile();
+   
    char command[2048];
-   sprintf(command, "export PATH=/opt/local/bin:$PATH; youtube-dl %s -x --audio-format wav -o %s -w", search.c_str(), ofToDataPath("youtube.m4a").c_str());
+   sprintf(command, "export PATH=/opt/local/bin:$PATH; youtube-dl %s -x --audio-format wav -f bestaudio -o %s -w %s", search.c_str(), ofToDataPath("youtube.m4a").c_str(), options.c_str());
    FILE* output = popen(command, "r");
    
    char c;
@@ -280,7 +308,8 @@ void SamplePlayer::DownloadYoutube(string search)
    pclose(output);
    
    Sample* sample = new Sample();
-   sample->Read(ofToDataPath("youtube.wav").c_str());
+   if (juce::File(ofToDataPath("youtube.wav")).existsAsFile())
+      sample->Read(ofToDataPath("youtube.wav").c_str());
    UpdateSample(sample, true);
 }
 
@@ -360,6 +389,12 @@ void SamplePlayer::DrawModule()
    mStopButton->Draw();
    mDownloadYoutubeButton->Draw();
    mDownloadYoutubeSearch->Draw();
+   for (size_t i=0; i<mSampleCuePoints.size(); ++i)
+   {
+      mSampleCuePoints[i].mStartSlider->Draw();
+      mSampleCuePoints[i].mLengthSlider->Draw();
+      mSampleCuePoints[i].mSpeedSlider->Draw();
+   }
 
    ofPushMatrix();
    ofTranslate(5,60);

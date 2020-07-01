@@ -74,7 +74,7 @@ private:
    void UpdateSampleList();
    float GetPlayPositionForMouse(float mouseX) const;
    void GetPlayInfoForPitch(int pitch, float& startSeconds, float& lengthSeconds, float& speed) const;
-   void DownloadYoutube(string search);
+   void DownloadYoutube(string search, string options);
    
    //IDrawableModule
    void DrawModule() override;
@@ -126,6 +126,9 @@ private:
       float startSeconds;
       float lengthSeconds;
       float speed;
+      FloatSlider* mStartSlider;
+      FloatSlider* mLengthSlider;
+      FloatSlider* mSpeedSlider;
    };
    vector<SampleCuePoint> mSampleCuePoints{16};
 };

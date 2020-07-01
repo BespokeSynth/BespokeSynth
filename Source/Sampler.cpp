@@ -131,7 +131,7 @@ void Sampler::Process(double time)
 
 void Sampler::PlayNote(double time, int pitch, int velocity, int voiceIdx, ModulationParameters modulation)
 {
-   if (time > gTime + gBufferSize * gInvSampleRateMs)
+   if (!NoteInputBuffer::IsTimeWithinFrame(time))
    {
       mNoteInputBuffer.QueueNote(time, pitch, velocity, voiceIdx, modulation);
       return;

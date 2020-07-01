@@ -120,23 +120,29 @@ void DrumPlayer::DrumHit::CreateUIControls(DrumPlayer* owner, int index)
    mOwner = owner;
 }
 
-void DrumPlayer::DrumHit::UpdateHitDirectoryDropdown()
+namespace
 {
    static list<string> sHitDirectories;
-   if (sHitDirectories.size() == 0)
+}
+
+//static
+void DrumPlayer::SetUpHitDirectories()
+{
+   sHitDirectories.clear();
+   File parentDirectory(ofToDataPath("drums/hits"));
+   Array<File> hitDirs;
+   parentDirectory.findChildFiles(hitDirs, File::findDirectories, true);
+   for (auto dir : hitDirs)
    {
-      File parentDirectory(ofToDataPath("drums/hits"));
-      Array<File> hitDirs;
-      parentDirectory.findChildFiles(hitDirs, File::findDirectories, true);
-      for (auto dir : hitDirs)
-      {
-         Array<File> filesInDir;
-         dir.findChildFiles(filesInDir, File::findFiles, false);
-         if (filesInDir.size() > 0)
-            sHitDirectories.push_back(dir.getRelativePathFrom(parentDirectory).toStdString());
-      }
+      Array<File> filesInDir;
+      dir.findChildFiles(filesInDir, File::findFiles, false);
+      if (filesInDir.size() > 0)
+         sHitDirectories.push_back(dir.getRelativePathFrom(parentDirectory).toStdString());
    }
-   
+}
+
+void DrumPlayer::DrumHit::UpdateHitDirectoryDropdown()
+{
    mHitCategoryDropdown->Clear();
    for (auto dir : sHitDirectories)
       mHitCategoryDropdown->AddLabel(dir, mHitCategoryDropdown->GetNumValues());
@@ -392,7 +398,7 @@ int DrumPlayer::GetIndividualOutputIndex(int hitIndex)
 
 void DrumPlayer::PlayNote(double time, int pitch, int velocity, int voiceIdx, ModulationParameters modulation)
 {
-   if (time > gTime + gBufferSize * gInvSampleRateMs)
+   if (!NoteInputBuffer::IsTimeWithinFrame(time))
    {
       mNoteInputBuffer.QueueNote(time, pitch, velocity, voiceIdx, modulation);
       return;

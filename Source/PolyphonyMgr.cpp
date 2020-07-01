@@ -22,6 +22,7 @@ PolyphonyMgr::PolyphonyMgr(IDrawableModule* owner)
    , mOwner(owner)
    , mFadeOutBuffer(kVoiceFadeSamples)
    , mFadeOutWorkBuffer(kVoiceFadeSamples)
+   , mVoiceLimit(kNumVoices)
 {
 }
 
@@ -95,9 +96,9 @@ void PolyphonyMgr::Start(double time, int pitch, float amount, int voiceIdx, Mod
    
    if (voiceIdx == -1) //need a new voice
    {
-      for (int i=0; i<kNumVoices; ++i)
+      for (int i=0; i<mVoiceLimit; ++i)
       {
-         int check = (i + mLastVoice + 1) % 16;  //try to keep incrementing through list to allow old voices to finish
+         int check = (i + mLastVoice + 1) % mVoiceLimit;  //try to keep incrementing through list to allow old voices to finish
          if (mVoices[check].mPitch == -1)
          {
             voiceIdx = check;
@@ -112,7 +113,7 @@ void PolyphonyMgr::Start(double time, int pitch, float amount, int voiceIdx, Mod
       {
          double oldest = mVoices[0].mTime;
          int oldestIndex = 0;
-         for (int i=1; i<kNumVoices; ++i)
+         for (int i=1; i<mVoiceLimit; ++i)
          {
             if (mVoices[i].mTime < oldest)
             {
@@ -132,6 +133,7 @@ void PolyphonyMgr::Start(double time, int pitch, float amount, int voiceIdx, Mod
    assert(voice);
    if (!voice->IsDone(time) && (!preserveVoice || modulation.pan != voice->GetPan()))
    {
+      //ofLog() << "fading stolen voice " << voiceIdx << " at " << time;
       mFadeOutWorkBuffer.Clear();
       voice->Process(time, &mFadeOutWorkBuffer);
       for (int i=0; i<kVoiceFadeSamples; ++i)
@@ -157,7 +159,7 @@ void PolyphonyMgr::Stop(double time, int pitch)
 {
    for (int i=0; i<kNumVoices; ++i)
    {
-      if (mVoices[i].mPitch == pitch)
+      if (mVoices[i].mPitch == pitch && mVoices[i].mNoteOn)
       {
          mVoices[i].mVoice->Stop(time);
          mVoices[i].mNoteOn = false;

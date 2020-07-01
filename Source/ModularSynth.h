@@ -166,6 +166,7 @@ public:
    
    void ScheduleEnvelopeEditorSpawn(ADSRDisplay* adsrDisplay);
    
+   bool IsLoadingState() const { return mIsLoadingState; }
    bool IsLoadingModule() const { return mIsLoadingModule; }
    
    static string GetUserPrefsPath();
@@ -232,6 +233,7 @@ private:
    NamedMutex mAudioThreadMutex;
    
    bool mAudioPaused;
+   bool mIsLoadingState;
    
    ModuleFactory mModuleFactory;
    EffectFactory mEffectFactory;

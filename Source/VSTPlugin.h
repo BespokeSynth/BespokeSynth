@@ -102,7 +102,7 @@ private:
    {
       float mValue;
       FloatSlider* mSlider;
-      int mParameterIndex;
+      AudioProcessorParameter* mParameter;
    };
    
    vector<ParameterSlider> mParameterSliders;

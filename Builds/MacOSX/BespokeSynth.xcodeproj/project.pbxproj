@@ -209,6 +209,10 @@
 			isa = PBXBuildFile;
 			fileRef = 49AB76428A044DEDF45FFAFE;
 		};
+		6B2539817D9B87CC16D2781F = {
+			isa = PBXBuildFile;
+			fileRef = 66A2109DCA3AB4928AD5E577;
+		};
 		0592C486D7B117D0ADFC996F = {
 			isa = PBXBuildFile;
 			fileRef = 7A604598B3A6EA50651EE599;
@@ -3294,6 +3298,13 @@
 			path = ../../Source/Panner.h;
 			sourceTree = "SOURCE_ROOT";
 		};
+		66A2109DCA3AB4928AD5E577 = {
+			isa = PBXFileReference;
+			lastKnownFileType = sourcecode.cpp.cpp;
+			name = PulseButton.cpp;
+			path = ../../Source/PulseButton.cpp;
+			sourceTree = "SOURCE_ROOT";
+		};
 		671122D3D22896F35F628FCC = {
 			isa = PBXFileReference;
 			lastKnownFileType = sourcecode.cpp.cpp;
@@ -5268,6 +5279,13 @@
 			path = ../../Source/RollingBuffer.h;
 			sourceTree = "SOURCE_ROOT";
 		};
+		C5221AD3D86D25779EBEAABE = {
+			isa = PBXFileReference;
+			lastKnownFileType = sourcecode.c.h;
+			name = PulseButton.h;
+			path = ../../Source/PulseButton.h;
+			sourceTree = "SOURCE_ROOT";
+		};
 		C653837013023B882E02BB67 = {
 			isa = PBXFileReference;
 			lastKnownFileType = sourcecode.c.h;
@@ -6718,6 +6736,8 @@
 		C91AF721DDC182CE3AC80CF9 = {
 			isa = PBXGroup;
 			children = (
+				66A2109DCA3AB4928AD5E577,
+				C5221AD3D86D25779EBEAABE,
 				7A604598B3A6EA50651EE599,
 				5B9E6CCBE7FC40842EABD4D8,
 				662A15065749DC7C10ED9264,
@@ -7663,6 +7683,7 @@
 				69EB47EC9441C3507BEB277D,
 				75837998247B5E99F3F16392,
 				7B858D802BD0BB608C0F48CF,
+				6B2539817D9B87CC16D2781F,
 				0592C486D7B117D0ADFC996F,
 				3B7F9C4D50AC37136AD264E9,
 				A87161C448037C3DD6D2A7A6,

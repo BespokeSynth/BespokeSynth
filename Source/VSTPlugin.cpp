@@ -281,40 +281,39 @@ void VSTPlugin::CreateParameterSliders()
    }
    mParameterSliders.clear();
    
-   /*
-   if (mPlugin->getNumParameters() <= 100)
+   const auto& parameters = mPlugin->getParameters();
+   
+   int numParameters = MIN(100, parameters.size());
+   mParameterSliders.resize(numParameters);
+   for (int i=0; i<numParameters; ++i)
    {
-      mParameterSliders.resize(mPlugin->getNumParameters());
-      for (int i=0; i<mPlugin->getNumParameters(); ++i)
+      mParameterSliders[i].mValue = parameters[i]->getValue();
+      juce::String name = parameters[i]->getName(32);
+      string label(name.getCharPointer());
+      try
       {
-         mParameterSliders[i].mValue = mPlugin->getParameter(i);
-         juce::String name = mPlugin->getParameterName(i);
-         string label(name.getCharPointer());
-         try
+         int append = 0;
+         while (FindUIControl(label.c_str()))
          {
-            int append = 0;
-            while (FindUIControl(label.c_str()))
-            {
-               ++append;
-               label = name.toStdString() + ofToString(append);
-            }
+            ++append;
+            label = name.toStdString() + ofToString(append);
          }
-         catch(UnknownUIControlException& e)
-         {
-            
-         }
-         mParameterSliders[i].mSlider = new FloatSlider(this, label.c_str(), 3, 35, 200, 15, &mParameterSliders[i].mValue, 0, 1);
-         if (i > 0)
-         {
-            const int kRows = 20;
-            if (i % kRows == 0)
-               mParameterSliders[i].mSlider->PositionTo(mParameterSliders[i-kRows].mSlider, kAnchor_Right);
-            else
-               mParameterSliders[i].mSlider->PositionTo(mParameterSliders[i-1].mSlider, kAnchor_Below);
-         }
-         mParameterSliders[i].mParameterIndex = i;
       }
-   }*/
+      catch(UnknownUIControlException& e)
+      {
+         
+      }
+      mParameterSliders[i].mSlider = new FloatSlider(this, label.c_str(), 3, 35, 200, 15, &mParameterSliders[i].mValue, 0, 1);
+      if (i > 0)
+      {
+         const int kRows = 20;
+         if (i % kRows == 0)
+            mParameterSliders[i].mSlider->PositionTo(mParameterSliders[i-kRows].mSlider, kAnchor_Right);
+         else
+            mParameterSliders[i].mSlider->PositionTo(mParameterSliders[i-1].mSlider, kAnchor_Below);
+      }
+      mParameterSliders[i].mParameter = parameters[i];
+   }
 }
 
 void VSTPlugin::Poll()
@@ -323,7 +322,7 @@ void VSTPlugin::Poll()
    {
       for (int i=0; i<mParameterSliders.size(); ++i)
       {
-         mParameterSliders[i].mValue = mPlugin->getParameter(mParameterSliders[i].mParameterIndex);
+         mParameterSliders[i].mValue = mParameterSliders[i].mParameter->getValue();
       }
    }
 }
@@ -571,7 +570,7 @@ void VSTPlugin::FloatSliderUpdated(FloatSlider* slider, float oldVal)
    {
       if (mParameterSliders[i].mSlider == slider)
       {
-         mPlugin->setParameter(mParameterSliders[i].mParameterIndex, mParameterSliders[i].mValue);
+         mParameterSliders[i].mParameter->setValue(mParameterSliders[i].mValue);
       }
    }
 }
@@ -671,8 +670,13 @@ void VSTPlugin::LoadState(FileStreamIn& in)
       char* data = new char[size];
       in.ReadGeneric(data, size);
       if (mPlugin != nullptr)
+      {
+         ofLog() << "loading vst state for " << mPlugin->getName();
          mPlugin->setStateInformation(data, size);
+      }
       else
+      {
          TheSynth->LogEvent("Couldn't instantiate plugin to load state for "+mModuleSaveData.GetString("vst"), kLogEventType_Error);
+      }
    }
 }

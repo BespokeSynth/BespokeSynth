@@ -145,7 +145,7 @@ void SingleOscillator::Process(double time)
 
 void SingleOscillator::PlayNote(double time, int pitch, int velocity, int voiceIdx, ModulationParameters modulation)
 {
-   if (time > gTime + gBufferSize * gInvSampleRateMs)
+   if (!NoteInputBuffer::IsTimeWithinFrame(time))
    {
       mNoteInputBuffer.QueueNote(time, pitch, velocity, voiceIdx, modulation);
       return;
@@ -271,6 +271,7 @@ void SingleOscillator::LoadLayout(const ofxJSONElement& moduleInfo)
    mModuleSaveData.LoadEnum<OscillatorType>("osc", moduleInfo, kOsc_Sin, mOscSelector);
    mModuleSaveData.LoadFloat("detune", moduleInfo, 1, mDetuneSlider);
    mModuleSaveData.LoadBool("pressure_envelope", moduleInfo);
+   mModuleSaveData.LoadInt("voicelimit", moduleInfo, -1, -1, kNumVoices);
 
    SetUpFromSaveData();
 }
@@ -278,6 +279,9 @@ void SingleOscillator::LoadLayout(const ofxJSONElement& moduleInfo)
 void SingleOscillator::SetUpFromSaveData()
 {
    SetTarget(TheSynth->FindModule(mModuleSaveData.GetString("target")));
+   int voiceLimit = mModuleSaveData.GetInt("voicelimit");
+   if (voiceLimit > 0)
+      mPolyMgr.SetVoiceLimit(voiceLimit);
 }
 
 

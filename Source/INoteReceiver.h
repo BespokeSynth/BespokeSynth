@@ -37,6 +37,7 @@ public:
    NoteInputBuffer(INoteReceiver* receiver);
    void Process(double time);
    void QueueNote(double time, int pitch, float velocity, int voiceIdx, ModulationParameters modulation);
+   static bool IsTimeWithinFrame(double time);
 private:
    static const int kBufferSize = 50;
    NoteInputElement mBuffer[kBufferSize];

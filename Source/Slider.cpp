@@ -15,6 +15,7 @@
 #include "ModularSynth.h"
 #include "IModulator.h"
 #include "Push2Control.h"
+#include "Profiler.h"
 
 FloatSlider::FloatSlider(IFloatSliderListener* owner, const char* label, int x, int y, int w, int h, float* var, float min, float max, int digits /* = -1 */)
 : mVar(var)
@@ -548,6 +549,7 @@ void FloatSlider::Compute(int samplesIn /*= 0*/)
       *var = mModulator->Value(samplesIn);
       if (oldVal != *var && !mIsSmoothing)
       {
+         //PROFILER(FloatSlider_Compute_UpdateSlider);
          mOwner->FloatSliderUpdated(this, oldVal);
       }
    }

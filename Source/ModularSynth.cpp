@@ -29,6 +29,7 @@
 #include "QuickSpawnMenu.h"
 #include "AudioToCV.h"
 #include "ScriptModule.h"
+#include "DrumPlayer.h"
 
 ModularSynth* TheSynth = nullptr;
 
@@ -43,6 +44,7 @@ ModularSynth::ModularSynth()
 : mMoveModule(nullptr)
 , mOutputBuffer(RECORDING_LENGTH)
 , mAudioPaused(false)
+, mIsLoadingState(false)
 , mClickStartX(INT_MAX)
 , mClickStartY(INT_MAX)
 , mHeldSample(nullptr)
@@ -125,6 +127,8 @@ void ModularSynth::Setup(GlobalManagers* globalManagers, juce::Component* mainCo
 
    TheScale->Init();
    TheTransport->Init();
+   
+   DrumPlayer::SetUpHitDirectories();
    
    ResetLayout();
    
@@ -1045,7 +1049,14 @@ void ModularSynth::AudioOut(float** output, int bufferSize, int nChannels)
    PROFILER(audioOut_total);
    
    if (mAudioPaused)
+   {
+      for (int ch=0; ch<nChannels; ++ch)
+      {
+         for (int i=0; i<bufferSize; ++i)
+            output[ch][i] = 0;
+      }
       return;
+   }
    
    ScopedMutex mutex(&mAudioThreadMutex, "audioOut()");
    
@@ -1690,6 +1701,10 @@ void ModularSynth::LoadState(string file)
    
    mAudioThreadMutex.Lock("LoadState()");
    LockRender(true);
+   mAudioPaused = true;
+   mIsLoadingState = true;
+   LockRender(false);
+   mAudioThreadMutex.Unlock();
    
    FileStreamIn in(ofToDataPath(file).c_str());
    
@@ -1706,6 +1721,11 @@ void ModularSynth::LoadState(string file)
       TheTransport->Reset();
    }
    
+   
+   mAudioThreadMutex.Lock("LoadState()");
+   LockRender(true);
+   mAudioPaused = false;
+   mIsLoadingState = false;
    LockRender(false);
    mAudioThreadMutex.Unlock();
 }

@@ -276,14 +276,27 @@ string NoteName(int pitch, bool flat, bool includeOctave)
 
 int PitchFromNoteName(string noteName)
 {
+   int octave = -2;
+   if (isdigit(noteName[noteName.length()-1]))
+   {
+      octave = noteName[noteName.length()-1] - '0';
+      if (noteName[noteName.length()-2] == '-')
+         octave *= -1;
+      if (octave < 0)
+         noteName = noteName.substr(0, noteName.length()-2);
+      else
+         noteName = noteName.substr(0, noteName.length()-1);
+   }
+   
    int pitch;
    for (pitch=0; pitch<12; ++pitch)
    {
       if (noteName == NoteName(pitch, false) || noteName == NoteName(pitch, true))
          break;
    }
-   assert(pitch != 12);
-   return pitch;
+   if (pitch == 12)
+      TheSynth->LogEvent("error finding pitch for note "+noteName, kLogEventType_Error);
+   return pitch + (octave+2) * 12;
 }
 
 float Interp(float a, float start, float end)

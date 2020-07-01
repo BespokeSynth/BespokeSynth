@@ -149,7 +149,7 @@ void FloatSliderLFOControl::DrawModule()
       float phase = i/width;
       if (mLFO.GetOsc()->GetShuffle() > 0)
          phase *= 2;
-      phase += mLFOSettings.mLFOOffset;
+      phase += 1 - mLFOSettings.mLFOOffset;
       float value = GetLFOValue(0, mLFO.TransformPhase(phase));
       ofVertex(i + x, ofMap(value,mTarget->GetMax(),mTarget->GetMin(),0,height) + y);
    }
@@ -167,7 +167,7 @@ void FloatSliderLFOControl::DrawModule()
       squeeze = 2;
    }
    float displayPhase = currentPhase;
-   displayPhase -= mLFOSettings.mLFOOffset;
+   displayPhase -= 1 - mLFOSettings.mLFOOffset;
    if (displayPhase < 0)
       displayPhase += squeeze;
    ofCircle(displayPhase / squeeze * width + x,

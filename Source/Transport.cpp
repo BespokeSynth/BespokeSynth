@@ -16,7 +16,7 @@ Transport* TheTransport = nullptr;
 
 //statics
 bool Transport::sDoEventLookahead = false;
-double Transport::sEventEarlyMs = 100;
+double Transport::sEventEarlyMs = 150;
 
 Transport::Transport()
 : mTempo(gDefaultTempo)

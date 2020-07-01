@@ -120,6 +120,7 @@ public:
    virtual vector<IUIControl*> ControlsToNotSetDuringLoadState() const;
    virtual vector<IUIControl*> ControlsToIgnoreInSaveState() const;
    virtual bool CanSaveState() const { return true; }
+   virtual bool HasDebugDraw() const { return false; }
    
    //IPatchable
    PatchCableSource* GetPatchCableSource(int index=0) override { if (index == 0) return mMainPatchCableSource; else return mPatchCableSources[index]; }

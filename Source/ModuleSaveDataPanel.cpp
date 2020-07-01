@@ -164,9 +164,12 @@ void ModuleSaveDataPanel::ReloadSaveData()
    }
    y += itemSpacing;
    
-   mDrawDebugCheckbox = new Checkbox(this, "draw debug", x, y, &mSaveModule->mDrawDebug);
-   mSaveDataControls.push_back(mDrawDebugCheckbox);
-   y += itemSpacing;
+   if (mSaveModule->HasDebugDraw())
+   {
+      mDrawDebugCheckbox = new Checkbox(this, "draw debug", x, y, &mSaveModule->mDrawDebug);
+      mSaveDataControls.push_back(mDrawDebugCheckbox);
+      y += itemSpacing;
+   }
    
    mHeight = y+5;
 }

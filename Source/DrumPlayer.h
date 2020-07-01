@@ -43,6 +43,7 @@ public:
    void Poll() override;
    
    static string GetDrumHitName(int index);
+   static void SetUpHitDirectories();
    
    //IAudioSource
    void Process(double time) override;

@@ -97,7 +97,7 @@ void KarplusStrong::Process(double time)
 
 void KarplusStrong::PlayNote(double time, int pitch, int velocity, int voiceIdx, ModulationParameters modulation)
 {
-   if (time > gTime + gBufferSize * gInvSampleRateMs)
+   if (!NoteInputBuffer::IsTimeWithinFrame(time))
    {
       mNoteInputBuffer.QueueNote(time, pitch, velocity, voiceIdx, modulation);
       return;
@@ -145,6 +145,7 @@ void KarplusStrong::FloatSliderUpdated(FloatSlider* slider, float oldVal)
 void KarplusStrong::LoadLayout(const ofxJSONElement& moduleInfo)
 {
    mModuleSaveData.LoadString("target", moduleInfo);
+   mModuleSaveData.LoadInt("voicelimit", moduleInfo, -1, -1, kNumVoices);
 
    SetUpFromSaveData();
 }
@@ -152,6 +153,9 @@ void KarplusStrong::LoadLayout(const ofxJSONElement& moduleInfo)
 void KarplusStrong::SetUpFromSaveData()
 {
    SetTarget(TheSynth->FindModule(mModuleSaveData.GetString("target")));
+   int voiceLimit = mModuleSaveData.GetInt("voicelimit");
+   if (voiceLimit > 0)
+      mPolyMgr.SetVoiceLimit(voiceLimit);
 }
 
 

@@ -44,19 +44,22 @@ ScriptModule::ScriptModule()
 {
    InitializePythonIfNecessary();
    
-   for (int i=0; i<kScheduledPulseBufferSize; ++i)
+   for (size_t i=0; i<mScheduledPulseTimes.size(); ++i)
       mScheduledPulseTimes[i] = -1;
    
-   for (int i=0; i<kScheduledNoteOutputBufferSize; ++i)
+   for (size_t i=0; i<mScheduledNoteOutput.size(); ++i)
       mScheduledNoteOutput[i].time = -1;
    
-   for (int i=0; i<kScheduledMethodCallBufferSize; ++i)
+   for (size_t i=0; i<mScheduledMethodCall.size(); ++i)
       mScheduledMethodCall[i].time = -1;
    
-   for (int i=0; i<kPendingNoteInputBufferSize; ++i)
+   for (size_t i=0; i<mScheduledUIControlValue.size(); ++i)
+      mScheduledUIControlValue[i].time = -1;
+   
+   for (size_t i=0; i<mPendingNoteInput.size(); ++i)
       mPendingNoteInput[i].time = -1;
    
-   for (int i=0; i<kPrintDisplayBufferSize; ++i)
+   for (size_t i=0; i<mPrintDisplay.size(); ++i)
       mPrintDisplay[i].time = -1;
    
    mScriptModuleIndex = sScriptModules.size();
@@ -144,23 +147,30 @@ void ScriptModule::DrawModule()
    mMethodCallTracker.Draw(mCodeEntry, 1, IDrawableModule::GetColor(kModuleType_Other));
    mUIControlTracker.Draw(mCodeEntry, 1, IDrawableModule::GetColor(kModuleType_Modulator));
    
-   for (int i=0; i<kScheduledNoteOutputBufferSize; ++i)
+   for (size_t i=0; i<mScheduledNoteOutput.size(); ++i)
    {
       if (mScheduledNoteOutput[i].time != -1 &&
           //mScheduledNoteOutput[i].velocity > 0 &&
           gTime + 50 < mScheduledNoteOutput[i].time)
-         DrawTimer(mScheduledNoteOutput[i].lineNum, mScheduledNoteOutput[i].startTime, mScheduledNoteOutput[i].time, IDrawableModule::GetColor(kModuleType_Note));
+         DrawTimer(mScheduledNoteOutput[i].lineNum, mScheduledNoteOutput[i].startTime, mScheduledNoteOutput[i].time, IDrawableModule::GetColor(kModuleType_Note), mScheduledNoteOutput[i].velocity > 0);
    }
    
-   for (int i=0; i<kScheduledMethodCallBufferSize; ++i)
+   for (size_t i=0; i<mScheduledMethodCall.size(); ++i)
    {
       if (mScheduledMethodCall[i].time != -1 &&
           gTime + 50 < mScheduledMethodCall[i].time)
-         DrawTimer(mScheduledMethodCall[i].lineNum, mScheduledMethodCall[i].startTime, mScheduledMethodCall[i].time, IDrawableModule::GetColor(kModuleType_Other));
+         DrawTimer(mScheduledMethodCall[i].lineNum, mScheduledMethodCall[i].startTime, mScheduledMethodCall[i].time, IDrawableModule::GetColor(kModuleType_Other), true);
+   }
+   
+   for (size_t i=0; i<mScheduledUIControlValue.size(); ++i)
+   {
+      if (mScheduledUIControlValue[i].time != -1 &&
+          gTime + 50 < mScheduledUIControlValue[i].time)
+         DrawTimer(mScheduledUIControlValue[i].lineNum, mScheduledUIControlValue[i].startTime, mScheduledUIControlValue[i].time, IDrawableModule::GetColor(kModuleType_Modulator), true);
    }
    
    ofPushStyle();
-   for (int i=0; i<kPrintDisplayBufferSize; ++i)
+   for (size_t i=0; i<mPrintDisplay.size(); ++i)
    {
       float fadeMs = 500;
       if (gTime - mPrintDisplay[i].time > 0 && gTime - mPrintDisplay[i].time < fadeMs)
@@ -175,7 +185,7 @@ void ScriptModule::DrawModule()
       }
    }
    
-   for (int i=0; i<kUIControlModificationBufferSize; ++i)
+   for (size_t i=0; i<mUIControlModifications.size(); ++i)
    {
       float fadeMs = 500;
       if (gTime - mUIControlModifications[i].time > 0 && gTime - mUIControlModifications[i].time < fadeMs)
@@ -200,18 +210,25 @@ void ScriptModule::DrawModuleUnclipped()
    {
       string debugText = mLastRunLiteralCode;
       
-      for (int i=0; i<kScheduledNoteOutputBufferSize; ++i)
+      for (size_t i=0; i<mScheduledNoteOutput.size(); ++i)
       {
          if (mScheduledNoteOutput[i].time != -1 &&
              gTime + 50 < mScheduledNoteOutput[i].time)
             debugText += "\nP:"+ofToString(mScheduledNoteOutput[i].pitch) + " V:" + ofToString(mScheduledNoteOutput[i].velocity) + ", " + ofToString(mScheduledNoteOutput[i].time) + " " + ofToString(mScheduledNoteOutput[i].startTime) + ", line:" + ofToString(mScheduledNoteOutput[i].lineNum);
       }
       
-      for (int i=0; i<kScheduledMethodCallBufferSize; ++i)
+      for (size_t i=0; i<mScheduledMethodCall.size(); ++i)
       {
          if (mScheduledMethodCall[i].time != -1 &&
              gTime + 50 < mScheduledMethodCall[i].time)
-            debugText += "\n"+ofToString(mScheduledMethodCall[i].method) + ", " + ofToString(mScheduledMethodCall[i].time) + " " + ofToString(mScheduledMethodCall[i].startTime) + " " + ofToString(mScheduledMethodCall[i].lineNum);
+            debugText += "\n"+mScheduledMethodCall[i].method + ", " + ofToString(mScheduledMethodCall[i].time) + " " + ofToString(mScheduledMethodCall[i].startTime) + " " + ofToString(mScheduledMethodCall[i].lineNum);
+      }
+      
+      for (size_t i=0; i<mScheduledUIControlValue.size(); ++i)
+      {
+         if (mScheduledUIControlValue[i].time != -1 &&
+             gTime + 50 < mScheduledUIControlValue[i].time)
+            debugText += "\n"+ string(mScheduledUIControlValue[i].control->Name()) + ": " + ofToString(mScheduledUIControlValue[i].value) + ", " + ofToString(mScheduledUIControlValue[i].time) + " " + ofToString(mScheduledUIControlValue[i].startTime) + " " + ofToString(mScheduledUIControlValue[i].lineNum);
       }
       
       string lineNumbers = "";
@@ -227,7 +244,7 @@ void ScriptModule::DrawModuleUnclipped()
       DrawTextNormal(debugText, mWidth + 30, 0);
    }
    
-   for (int i=0; i<kUIControlModificationBufferSize; ++i)
+   for (size_t i=0; i<mUIControlModifications.size(); ++i)
    {
       float fadeMs = 200;
       if (gTime - mUIControlModifications[i].time > 0 && gTime - mUIControlModifications[i].time < fadeMs)
@@ -246,7 +263,7 @@ void ScriptModule::DrawModuleUnclipped()
    ofPopStyle();
 }
 
-void ScriptModule::DrawTimer(int lineNum, double startTime, double endTime, ofColor color)
+void ScriptModule::DrawTimer(int lineNum, double startTime, double endTime, ofColor color, bool filled)
 {
    ofVec2f linePos = mCodeEntry->GetLinePos(lineNum, false);
    linePos.x += 11;
@@ -256,10 +273,14 @@ void ScriptModule::DrawTimer(int lineNum, double startTime, double endTime, ofCo
    {
       const float kRadius = 5;
       ofPushStyle();
-      ofSetColor(color);
+      if (filled)
+         ofSetColor(color);
+      else
+         ofSetColor(color * .5f);
       ofNoFill();
       ofCircle(linePos.x, linePos.y, kRadius);
-      ofFill();
+      if (filled)
+         ofFill();
       ofCircle(linePos.x + sin(t * TWO_PI) * kRadius, linePos.y - cos(t * TWO_PI) * kRadius, 2);
       ofPopStyle();
    }
@@ -267,7 +288,9 @@ void ScriptModule::DrawTimer(int lineNum, double startTime, double endTime, ofCo
 
 void ScriptModule::Poll()
 {
-   for (int i=0; i<kScheduledPulseBufferSize; ++i)
+   double time = gTime;
+   
+   for (size_t i=0; i<mScheduledPulseTimes.size(); ++i)
    {
       if (mScheduledPulseTimes[i] != -1)
       {
@@ -275,21 +298,21 @@ void ScriptModule::Poll()
          mScheduledPulseTimes[i] = -1;
          if (mLastError == "")
          {
-            //if (runTime < gTime)
+            //if (runTime < time)
             //   ofLog() << "trying to run script triggered by pulse too late!";
             RunCode(runTime, "on_pulse()");
          }
       }
    }
    
-   for (int i=0; i<kPendingNoteInputBufferSize; ++i)
+   for (size_t i=0; i<mPendingNoteInput.size(); ++i)
    {
       if (mPendingNoteInput[i].time != -1 &&
-          gTime + TheTransport->GetEventLookaheadMs() > mPendingNoteInput[i].time)
+          time + TheTransport->GetEventLookaheadMs() > mPendingNoteInput[i].time)
       {
          if (mLastError == "")
          {
-            //if (mPendingNoteInput[i].time < gTime)
+            //if (mPendingNoteInput[i].time < time)
             //   ofLog() << "trying to run script triggered by note too late!";
             RunCode(mPendingNoteInput[i].time, "on_note("+ofToString(mPendingNoteInput[i].pitch)+", "+ofToString(mPendingNoteInput[i].velocity)+")");
          }
@@ -297,12 +320,22 @@ void ScriptModule::Poll()
       }
    }
    
+   for (size_t i=0; i<mScheduledUIControlValue.size(); ++i)
+   {
+      if (mScheduledUIControlValue[i].time != -1 &&
+          time + TheTransport->GetEventLookaheadMs() > mScheduledUIControlValue[i].time)
+      {
+         AdjustUIControl(mScheduledUIControlValue[i].control, mScheduledUIControlValue[i].value, mScheduledUIControlValue[i].lineNum);
+         mScheduledUIControlValue[i].time = -1;
+      }
+   }
+   
    //note offs first
-   for (int i=0; i<kScheduledNoteOutputBufferSize; ++i)
+   for (size_t i=0; i<mScheduledNoteOutput.size(); ++i)
    {
       if (mScheduledNoteOutput[i].time != -1 &&
           mScheduledNoteOutput[i].velocity == 0 &&
-          gTime + TheTransport->GetEventLookaheadMs() > mScheduledNoteOutput[i].time)
+          time + TheTransport->GetEventLookaheadMs() > mScheduledNoteOutput[i].time)
       {
          PlayNote(mScheduledNoteOutput[i].time, mScheduledNoteOutput[i].pitch, mScheduledNoteOutput[i].velocity, mScheduledNoteOutput[i].pan, mScheduledNoteOutput[i].lineNum);
          mScheduledNoteOutput[i].time = -1;
@@ -310,21 +343,21 @@ void ScriptModule::Poll()
    }
    
    //then note ons
-   for (int i=0; i<kScheduledNoteOutputBufferSize; ++i)
+   for (size_t i=0; i<mScheduledNoteOutput.size(); ++i)
    {
       if (mScheduledNoteOutput[i].time != -1 &&
           mScheduledNoteOutput[i].velocity != 0 &&
-          gTime + TheTransport->GetEventLookaheadMs() > mScheduledNoteOutput[i].time)
+          time + TheTransport->GetEventLookaheadMs() > mScheduledNoteOutput[i].time)
       {
          PlayNote(mScheduledNoteOutput[i].time, mScheduledNoteOutput[i].pitch, mScheduledNoteOutput[i].velocity, mScheduledNoteOutput[i].pan, mScheduledNoteOutput[i].lineNum);
          mScheduledNoteOutput[i].time = -1;
       }
    }
    
-   for (int i=0; i<kScheduledMethodCallBufferSize; ++i)
+   for (size_t i=0; i<mScheduledMethodCall.size(); ++i)
    {
       if (mScheduledMethodCall[i].time != -1 &&
-          gTime + TheTransport->GetEventLookaheadMs() > mScheduledMethodCall[i].time)
+          time + TheTransport->GetEventLookaheadMs() > mScheduledMethodCall[i].time)
       {
          RunCode(mScheduledMethodCall[i].time, mScheduledMethodCall[i].method);
          mMethodCallTracker.AddEvent(mScheduledMethodCall[i].lineNum);
@@ -367,7 +400,7 @@ void ScriptModule::PlayNoteFromScriptAfterDelay(int pitch, int velocity, float d
 
 void ScriptModule::ScheduleNote(double time, int pitch, int velocity, float pan)
 {
-   for (int i=0; i<kScheduledNoteOutputBufferSize; ++i)
+   for (size_t i=0; i<mScheduledNoteOutput.size(); ++i)
    {
       if (mScheduledNoteOutput[i].time == -1)
       {
@@ -386,7 +419,7 @@ void ScriptModule::ScheduleMethod(string method, float delayMeasureTime)
 {
    delayMeasureTime /= float(TheTransport->GetTimeSigTop()) / TheTransport->GetTimeSigBottom();
    
-   for (int i=0; i<kScheduledMethodCallBufferSize; ++i)
+   for (size_t i=0; i<mScheduledMethodCall.size(); ++i)
    {
       if (mScheduledMethodCall[i].time == -1)
       {
@@ -401,6 +434,26 @@ void ScriptModule::ScheduleMethod(string method, float delayMeasureTime)
    }
 }
 
+void ScriptModule::ScheduleUIControlValue(IUIControl* control, float value, float delayMeasureTime)
+{
+   delayMeasureTime /= float(TheTransport->GetTimeSigTop()) / TheTransport->GetTimeSigBottom();
+   
+   for (size_t i=0; i<mScheduledUIControlValue.size(); ++i)
+   {
+      if (mScheduledUIControlValue[i].time == -1)
+      {
+         double time = sMostRecentRunTime + delayMeasureTime * TheTransport->MsPerBar();
+         
+         mScheduledUIControlValue[i].time = time;
+         mScheduledUIControlValue[i].startTime = sMostRecentRunTime;
+         mScheduledUIControlValue[i].control = control;
+         mScheduledUIControlValue[i].value = value;
+         mScheduledUIControlValue[i].lineNum = mNextLineToExecute;
+         break;
+      }
+   }
+}
+
 void ScriptModule::HighlightLine(int lineNum)
 {
    mNextLineToExecute = lineNum;
@@ -409,7 +462,7 @@ void ScriptModule::HighlightLine(int lineNum)
 
 void ScriptModule::PrintText(string text)
 {
-   for (int i=0; i<kPrintDisplayBufferSize; ++i)
+   for (size_t i=0; i<mPrintDisplay.size(); ++i)
    {
       if (mPrintDisplay[i].time == -1 || mPrintDisplay[i].lineNum == mNextLineToExecute)
       {
@@ -432,18 +485,20 @@ IUIControl* ScriptModule::GetUIControl(string path)
    return control;
 }
 
-void ScriptModule::OnAdjustUIControl(IUIControl* control, float value)
+void ScriptModule::AdjustUIControl(IUIControl* control, float value, int lineNum)
 {
-   mUIControlTracker.AddEvent(mNextLineToExecute);
+   control->SetValue(value);
    
-   for (int i=0; i<kUIControlModificationBufferSize; ++i)
+   mUIControlTracker.AddEvent(lineNum);
+   
+   for (size_t i=0; i<mUIControlModifications.size(); ++i)
    {
-      if (mUIControlModifications[i].time == -1 || mUIControlModifications[i].lineNum == mNextLineToExecute)
+      if (mUIControlModifications[i].time == -1 || mUIControlModifications[i].lineNum == lineNum)
       {
          mUIControlModifications[i].time = gTime;
          mUIControlModifications[i].position = control->GetRect().getCenter();
          mUIControlModifications[i].value = value;
-         mUIControlModifications[i].lineNum = mNextLineToExecute;
+         mUIControlModifications[i].lineNum = lineNum;
          break;
       }
    }
@@ -451,6 +506,21 @@ void ScriptModule::OnAdjustUIControl(IUIControl* control, float value)
 
 void ScriptModule::PlayNote(double time, int pitch, int velocity, float pan, int lineNum)
 {
+   /*if (velocity > 0)
+   {
+      //run through any scheduled note offs for this pitch
+      for (size_t i=0; i<mScheduledNoteOutput.size(); ++i)
+      {
+         if (mScheduledNoteOutput[i].time != -1 &&
+             mScheduledNoteOutput[i].pitch == pitch &&
+             mScheduledNoteOutput[i].velocity == 0)
+         {
+            PlayNote(time, pitch, 0, 0, lineNum);
+            mScheduledNoteOutput[i].time = -1;
+         }
+      }
+   }*/
+   
    //ofLog() << "ScriptModule::PlayNote() " << velocity << " " << time;
    ModulationParameters modulation;
    modulation.pan = pan;
@@ -568,7 +638,7 @@ void ScriptModule::ExecuteCode(string code)
 
 void ScriptModule::OnPulse(double time, float velocity, int flags)
 {
-   for (int i=0; i<kScheduledPulseBufferSize; ++i)
+   for (size_t i=0; i<mScheduledPulseTimes.size(); ++i)
    {
       if (mScheduledPulseTimes[i] == -1)
       {
@@ -581,7 +651,7 @@ void ScriptModule::OnPulse(double time, float velocity, int flags)
 //INoteReceiver
 void ScriptModule::PlayNote(double time, int pitch, int velocity, int voiceIdx /*= -1*/, ModulationParameters modulation /*= ModulationParameters()*/)
 {
-   for (int i=0; i<kPendingNoteInputBufferSize; ++i)
+   for (size_t i=0; i<mPendingNoteInput.size(); ++i)
    {
       if (mPendingNoteInput[i].time == -1)
       {
@@ -875,7 +945,7 @@ void ScriptModule::LineEventTracker::Draw(CodeEntry* codeEntry, int style, ofCol
 {
    ofPushStyle();
    ofFill();
-   for (int i=0; i<kNumLineTrackers; ++i)
+   for (size_t i=0; i<mText.size(); ++i)
    {
       float alpha = style == 0 ? 200 : 150;
       float fadeMs = style == 0 ? 200 : 150;

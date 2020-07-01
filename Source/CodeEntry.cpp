@@ -54,9 +54,11 @@ void CodeEntry::Render()
    
    bool isCurrent = IKeyboardFocusListener::GetActiveKeyboardFocus() == this;
    
-   ofColor color(255,255,255);
+   ofColor color(220,220,220);
    if (mString != mPublishedString)
       color.set(200, 255, 200);
+   else if (isCurrent)
+      color.set(255,255,255);
    
    ofFill();
    if (gTime - mLastPublishTime < 200)
@@ -65,27 +67,19 @@ void CodeEntry::Render()
       ofRect(mX,mY,w,h);
    }
    
-   ofNoFill();
    if (isCurrent)
    {
-      ofPushStyle();
-      int lum = 255 * ofMap(sinf(TheTransport->GetMeasurePos(gTime) * TWO_PI * 4), -1, 1, .4f, 1);
-      if (mHasError)
-         ofSetColor(255, 0, 0, gModuleDrawAlpha);
-      else
-         ofSetColor(lum, lum, lum, gModuleDrawAlpha);
-      ofSetLineWidth(4);
-      ofRect(mX,mY,w,h);
-      ofPopStyle();
+      ofFill();
+      ofSetColor(80,80,80);
+      ofRect(mX, mY, w, h);
    }
+   
+   ofNoFill();
+   if (mHasError)
+      ofSetColor(255, 0, 0, gModuleDrawAlpha);
    else
-   {
-      if (mHasError)
-         ofSetColor(255, 0, 0, gModuleDrawAlpha);
-      else
-         ofSetColor(color,gModuleDrawAlpha);
-      ofRect(mX,mY,w,h);
-   }
+      ofSetColor(color,gModuleDrawAlpha);
+   ofRect(mX,mY,w,h);
    
    if (mHasError && mErrorLine >= 0)
    {
@@ -601,7 +595,7 @@ void CodeEntry::LoadState(FileStreamIn& in, bool shouldSetValue)
    LoadStateValidate(rev == kSaveStateRev);
    
    in >> mString;
-   Publish();
+   //Publish();
    //if (mListener != nullptr)
    //   mListener->ExecuteCode(mString);
 }

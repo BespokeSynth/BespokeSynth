@@ -119,7 +119,7 @@ void Profiler::Draw()
          ofSetColor(255,0,0);
       else
          ofSetColor(0,255,0);
-      ofRect(250, -10,(float)maxCost / entireFrameUs * (ofGetWidth() - 300), 10);
+      ofRect(250, -10,(float)maxCost / entireFrameUs * (ofGetWidth() - 300) * .5f, 10);
       
       ofTranslate(0, 15);
    }

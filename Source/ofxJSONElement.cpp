@@ -9,6 +9,7 @@
 
 #include "ofxJSONElement.h"
 #include "../JuceLibraryCode/JuceHeader.h"
+#include "SynthGlobals.h"
 
 using namespace Json;
 

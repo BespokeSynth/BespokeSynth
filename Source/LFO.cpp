@@ -8,6 +8,7 @@
 
 #include "LFO.h"
 #include "OpenFrameworksPort.h"
+#include "Profiler.h"
 
 LFO::LFO()
 : mPhaseOffset(0)
@@ -39,7 +40,7 @@ float LFO::CalculatePhase(int samplesIn /*= 0*/, bool doTransform /* = true*/) c
    {
       float period = TheTransport->GetDuration(mPeriod) / TheTransport->GetDuration(kInterval_1n);
       
-      float phase = TheTransport->GetMeasureTime(gTime+samplesIn*gInvSampleRateMs) / period + mPhaseOffset + 1;  //+1 so we can have negative samplesIn
+      float phase = TheTransport->GetMeasureTime(gTime+samplesIn*gInvSampleRateMs) / period + (1 - mPhaseOffset) + 1;  //+1 so we can have negative samplesIn
       
       phase -= int(phase) / 2 * 2;  //using 2 allows for shuffle to work
       
@@ -60,6 +61,8 @@ float LFO::TransformPhase(float phase) const
 
 float LFO::Value(int samplesIn /*= 0*/, float forcePhase /*= -1*/) const
 {
+   //PROFILER(LFO_Value);
+   
    if (mPeriod == kInterval_None)  //no oscillator
       return mMode == kLFOMode_Envelope ? 1 : 0;
 

@@ -132,6 +132,11 @@ void NoteStreamDisplay::PlayNote(double time, int pitch, int velocity, int voice
          mNoteStream[oldestIndex].timeOn = time;
          mNoteStream[oldestIndex].timeOff = -1;
       }
+      
+      if (pitch < mPitchMin)
+         mPitchMin = pitch;
+      if (pitch > mPitchMax)
+         mPitchMax = pitch;
    }
    else
    {
@@ -143,11 +148,6 @@ void NoteStreamDisplay::PlayNote(double time, int pitch, int velocity, int voice
             mNoteStream[i].timeOff = time;
       }
    }
-   
-   if (pitch < mPitchMin)
-      mPitchMin = pitch;
-   if (pitch > mPitchMax)
-      mPitchMax = pitch;
 }
 
 bool NoteStreamDisplay::IsElementActive(int index) const

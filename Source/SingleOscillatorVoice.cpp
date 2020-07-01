@@ -43,6 +43,8 @@ bool SingleOscillatorVoice::Process(double time, ChannelBuffer* out)
    float syncPhaseInc = GetPhaseInc(mVoiceParams->mSyncFreq);
    for (int pos=0; pos<out->BufferSize(); ++pos)
    {
+      //PROFILER(SingleOscillatorVoice_CalcSample);
+      
       {
          //PROFILER(SingleOscillatorVoice_ComputeSliders);
          if (mOwner)
@@ -119,7 +121,7 @@ bool SingleOscillatorVoice::Process(double time, ChannelBuffer* out)
       
       if (mUseFilter)
       {
-         PROFILER(SingleOscillatorVoice_filter);
+         //PROFILER(SingleOscillatorVoice_filter);
          float f = mFilterAdsr.Value(time) * mVoiceParams->mFilterCutoff;
          float q = mVoiceParams->mFilterQ;
          mFilterLeft.SetFilterParams(f, q);
@@ -131,14 +133,17 @@ bool SingleOscillatorVoice::Process(double time, ChannelBuffer* out)
          }
       }
       
-      if (mono)
       {
-         out->GetChannel(0)[pos] += summedLeft;
-      }
-      else
-      {
-         out->GetChannel(0)[pos] += summedLeft;
-         out->GetChannel(1)[pos] += summedRight;
+         //PROFILER(SingleOscillatorVoice_output);
+         if (mono)
+         {
+            out->GetChannel(0)[pos] += summedLeft;
+         }
+         else
+         {
+            out->GetChannel(0)[pos] += summedLeft;
+            out->GetChannel(1)[pos] += summedRight;
+         }
       }
       time += gInvSampleRateMs;
    }

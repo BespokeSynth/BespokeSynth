@@ -223,7 +223,7 @@ void NoteCanvasElement::DrawContents()
       rect.y += oldHeight - rect.height;
       ofRect(rect);
       
-      ofPushStyle();
+      /*ofPushStyle();
       ofSetLineWidth(1.5f * gDrawScale);
       
       rect = GetRect(true, i==0 ? false : true);
@@ -253,7 +253,7 @@ void NoteCanvasElement::DrawContents()
       mPressureCurve.SetColor(ofColor::blue);
       mPressureCurve.Render();
       
-      ofPopStyle();
+      ofPopStyle();*/
    }
    
    ofPopStyle();

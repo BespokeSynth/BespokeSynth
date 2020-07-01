@@ -7,6 +7,7 @@
 //
 
 #include "PerformanceTimer.h"
+#include "SynthGlobals.h"
 
 TimerInstance::TimerInstance(string name, PerformanceTimer& manager)
 : mName(name)

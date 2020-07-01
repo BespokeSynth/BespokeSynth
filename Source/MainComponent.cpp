@@ -84,7 +84,10 @@ public:
       
       mSynth.Poll();
       
-      openGLContext.triggerRepaint();
+      static int sRenderFrame = 0;
+      if (sRenderFrame % 2 == 0)
+         openGLContext.triggerRepaint();
+      ++sRenderFrame;
    }
    
    //==============================================================================
@@ -245,6 +248,9 @@ public:
    
    void render() override
    {
+      if (mSynth.IsLoadingState())
+         return;
+      
       mSynth.LockRender(true);
       
       Point<int> mouse = Desktop::getMousePosition();
