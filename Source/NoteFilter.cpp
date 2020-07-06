@@ -64,7 +64,7 @@ void NoteFilter::PlayNote(double time, int pitch, int velocity, int voiceIdx, Mo
    }
 }
 
-void NoteFilter::GetModuleDimensions(int& width, int& height)
+void NoteFilter::GetModuleDimensions(float& width, float& height)
 {
    width = 80;
    height = 3 + (mMaxPitch - mMinPitch + 1) * 18;

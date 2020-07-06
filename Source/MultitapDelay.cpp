@@ -164,10 +164,10 @@ void MultitapDelay::CheckboxUpdated(Checkbox *checkbox)
 {
 }
 
-void MultitapDelay::GetModuleDimensions(int& x, int& y)
+void MultitapDelay::GetModuleDimensions(float& width, float& height)
 {
-   x = mBufferW + 10;
-   y = mBufferY + mBufferH + 10 + 100 * mNumTaps;
+   width = mBufferW + 10;
+   height = mBufferY + mBufferH + 10 + 100 * mNumTaps;
 }
 
 void MultitapDelay::FloatSliderUpdated(FloatSlider* slider, float oldVal)

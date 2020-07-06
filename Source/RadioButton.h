@@ -64,7 +64,7 @@ public:
    void SaveState(FileStreamOut& out) override;
    void LoadState(FileStreamIn& in, bool shouldSetValue = true) override;
 
-   void GetDimensions(int& width, int& height) override { width = mWidth; height = mHeight; }
+   void GetDimensions(float& width, float& height) override { width = mWidth; height = mHeight; }
    
    ofVec2f GetOptionPosition(int optionIndex);
    

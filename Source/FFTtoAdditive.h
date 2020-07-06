@@ -54,7 +54,7 @@ private:
 
    //IDrawableModule
    void DrawModule() override;
-   void GetModuleDimensions(int& w, int&h) override { w=235; h=170; }
+   void GetModuleDimensions(float& w, float& h) override { w=235; h=170; }
    bool Enabled() const override { return mEnabled; }
 
    FFTData mFFTData;

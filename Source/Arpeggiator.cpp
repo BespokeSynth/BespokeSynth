@@ -176,7 +176,7 @@ void Arpeggiator::DrawModule()
          else
             continue;
          
-         int gridX,gridY;
+         float gridX,gridY;
          mGrid->GetPosition(gridX, gridY, true);
          float boxHeight = (float(mGrid->GetHeight())/mGrid->GetRows());
          float y = gridY + mGrid->GetHeight() - i*boxHeight;

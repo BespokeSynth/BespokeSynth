@@ -115,7 +115,7 @@ void DropdownList::Render()
    
    DrawBeacon(mX+mWidth/2+xOffset, mY+mHeight/2);
 
-   int w,h;
+   float w,h;
    GetDimensions(w,h);
 
    ofColor color,textColor;
@@ -144,7 +144,7 @@ void DropdownList::Render()
    if (mLastScrolledTime + 300 > gTime && TheSynth->GetTopModalFocusItem() != &mModalList && !Push2Control::sDrawingPush2Display)
    {
       const float kCentering = 7;
-      int w, h;
+      float w, h;
       GetPopupDimensions(w, h);
       ofPushMatrix();
       ofPushStyle();
@@ -186,7 +186,7 @@ void DropdownList::DrawDropdown(int w, int h)
    ofPopStyle();
 }
 
-void DropdownList::GetDimensions(int& width, int& height)
+void DropdownList::GetDimensions(float& width, float& height)
 {
    width = mWidth;
    if (mDrawLabel)
@@ -211,7 +211,7 @@ void DropdownList::OnClicked(int x, int y, bool right)
    if (mElements.empty())
       return;
 
-   int thisx,thisy;
+   float thisx,thisy;
    GetPosition(thisx,thisy);
    if (mDrawLabel)
       thisx += mLabelSize;

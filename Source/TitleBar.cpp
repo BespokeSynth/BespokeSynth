@@ -104,7 +104,7 @@ IDrawableModule* SpawnList::Spawn()
 
 void SpawnList::Draw()
 {
-   int x,y;
+   float x,y;
    mSpawnList->GetPosition(x, y, true);
    //DrawTextNormal(mLabel,x,y-2);
    mSpawnList->Draw();
@@ -117,7 +117,7 @@ void SpawnList::SetPosition(int x, int y)
 
 void SpawnList::SetPositionRelativeTo(SpawnList* list)
 {
-   int x,y,w,h;
+   float x,y,w,h;
    list->mSpawnList->GetPosition(x, y, true);
    list->mSpawnList->GetDimensions(w, h);
    mSpawnList->SetPosition(x + w + 5, y);
@@ -340,17 +340,17 @@ bool TitleBar::HiddenByZoom() const
    return ofGetWidth() / gDrawScale < 620;
 }
 
-void TitleBar::GetModuleDimensions(int& x, int& y)
+void TitleBar::GetModuleDimensions(float& width, float& height)
 {
    if (HiddenByZoom())
    {
-      x = 0;
-      y = 0;
+      width = 0;
+      height = 0;
       return;
    }
    
-   x = ofGetWidth() / gDrawScale + 5;
-   y = 36;
+   width = ofGetWidth() / gDrawScale + 5;
+   height = 36;
 }
 
 void TitleBar::CheckboxUpdated(Checkbox* checkbox)
@@ -395,7 +395,7 @@ void TitleBar::ButtonClicked(ClickButton* button)
       TheSynth->Exit();
    if (button == mDisplayHelpButton)
    {
-      int x,y,w,h,butW,butH;
+      float x,y,w,h,butW,butH;
       mDisplayHelpButton->GetPosition(x, y);
       mDisplayHelpButton->GetDimensions(butW, butH);
       mHelpDisplay->GetDimensions(w, h);

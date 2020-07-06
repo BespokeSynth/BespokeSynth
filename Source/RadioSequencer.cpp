@@ -269,7 +269,7 @@ namespace
    const float extraH = 30;
 }
 
-void RadioSequencer::GetModuleDimensions(int &width, int &height)
+void RadioSequencer::GetModuleDimensions(float& width, float& height)
 {
    width = mGrid->GetWidth() + extraW;
    height = mGrid->GetHeight() + extraH;

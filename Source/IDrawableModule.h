@@ -69,8 +69,8 @@ public:
    void AddChild(IDrawableModule* child);
    void RemoveChild(IDrawableModule* child);
    IDrawableModule* FindChild(const char* name) const;
-   void GetDimensions(int& width, int& height) override;
-   virtual void GetModuleDimensions(int& width, int& height) { width = 10; height = 10; }
+   void GetDimensions(float& width, float& height) override;
+   virtual void GetModuleDimensions(float& width, float& height) { width = 10; height = 10; }
    virtual void Init();
    virtual void Exit();
    bool Minimized() const { return mMinimizeAnimation > 0; }

@@ -177,9 +177,9 @@ void EffectChain::DrawModule()
          yPos += GetRowHeight(i/mNumFXWide - 1);
       }
 
-      int w,h;
-      int thisX = xPos;
-      int thisY = yPos;
+      float w,h;
+      float thisX = xPos;
+      float thisY = yPos;
       if (gTime < mSwapTime)  //in swap animation
       {
          double progress = 1 - (mSwapTime - gTime)/gSwapLength;
@@ -228,7 +228,7 @@ void EffectChain::DrawModule()
    {
       mEffects[i]->Draw();
       
-      int x,y,w,h;
+      float x,y,w,h;
       mEffects[i]->GetPosition(x,y,true);
       mEffects[i]->GetDimensions(w,h);
       w = MAX(w,MIN_EFFECT_WIDTH);
@@ -249,7 +249,7 @@ void EffectChain::DrawModule()
       }
    }
 
-   int w,h;
+   float w,h;
    GetDimensions(w,h);
    mVolumeSlider->SetPosition(4, h-15);
    mVolumeSlider->Draw();
@@ -269,7 +269,7 @@ int EffectChain::GetRowHeight(int row)
    {
       if (i/mNumFXWide == row)
       {
-         int w, h;
+         float w, h;
          mEffects[i]->GetDimensions(w, h);
          h += IDrawableModule::TitleBarHeight();
          h += 20;
@@ -280,7 +280,7 @@ int EffectChain::GetRowHeight(int row)
    return max;
 }
 
-void EffectChain::GetModuleDimensions(int& x, int&y)
+void EffectChain::GetModuleDimensions(float& width, float& height)
 {
    int maxX=100;
    if (mShowSpawnList)
@@ -288,15 +288,15 @@ void EffectChain::GetModuleDimensions(int& x, int&y)
    int maxY=0;
    for (int i=0; i<mEffects.size(); ++i)
    {
-      int x,y,w,h;
+      float x,y,w,h;
       mEffects[i]->GetPosition(x,y,true);
       mEffects[i]->GetDimensions(w,h);
       w = MAX(w,MIN_EFFECT_WIDTH);
       maxX = MAX(maxX,x+w);
       maxY = MAX(maxY,y+h);
    }
-   x = maxX + 10;
-   y = maxY + 20;
+   width = maxX + 10;
+   height = maxY + 20;
 }
 
 void EffectChain::KeyPressed(int key, bool isRepeat)

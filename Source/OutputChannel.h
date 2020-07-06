@@ -34,7 +34,7 @@ public:
 private:
    //IDrawableModule
    void DrawModule() override;
-   void GetModuleDimensions(int& x, int&y) override { x=50; y=0; }
+   void GetModuleDimensions(float& width, float& height) override { width=50; height=0; }
    bool Enabled() const override { return true; }
    
    int mChannel;

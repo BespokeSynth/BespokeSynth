@@ -47,7 +47,7 @@ protected:
    //IDrawableModule
    void DrawModule() override;
    bool Enabled() const override { return mEnabled; }
-   void GetModuleDimensions(int& w, int& h) override { w=110; h=58; }
+   void GetModuleDimensions(float& w, float& h) override { w=110; h=58; }
    
    ClickButton* mTriggerButton;
    TextEntry* mPitchEntry;

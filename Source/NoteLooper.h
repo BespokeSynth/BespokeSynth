@@ -62,7 +62,7 @@ private:
    
    //IDrawableModule
    void DrawModule() override;
-   void GetModuleDimensions(int& width, int& height) override { width=305; height=140; }
+   void GetModuleDimensions(float& width, float& height) override { width=305; height=140; }
    bool Enabled() const override { return true; }
    
    struct NoteEvent

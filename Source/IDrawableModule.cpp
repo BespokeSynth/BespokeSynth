@@ -139,9 +139,9 @@ void IDrawableModule::BasePoll()
 
 bool IDrawableModule::IsWithinRect(const ofRectangle& rect)
 {
-   int x,y;
+   float x,y;
    GetPosition(x, y);
-   int w, h;
+   float w, h;
    GetDimensions(w,h);
    
    float titleBarHeight = mTitleBarHeight;
@@ -317,7 +317,7 @@ void IDrawableModule::Render()
       mMinimizeAnimation -= ofGetLastFrameTime() * 5;
    mMinimizeAnimation = ofClamp(mMinimizeAnimation, 0, 1);
 
-   int w, h;
+   float w, h;
    GetDimensions(w,h);
    
    ofPushMatrix();
@@ -412,7 +412,7 @@ void IDrawableModule::DrawConnection(IClickable* target)
    ofColor lineColorAlphaed = lineColor;
    lineColorAlphaed.a = lineAlpha;
    
-   int wThis,hThis,xThis,yThis;
+   float wThis,hThis,xThis,yThis;
    GetDimensions(wThis,hThis);
    GetPosition(xThis,yThis);
 
@@ -487,7 +487,7 @@ bool IDrawableModule::TestClick(int x, int y, bool right, bool testOnly /*=false
 
 void IDrawableModule::OnClicked(int x, int y, bool right)
 {
-   int w,h;
+   float w,h;
    GetModuleDimensions(w, h);
    
    if (y < 0)
@@ -626,12 +626,12 @@ vector<IUIControl*> IDrawableModule::GetUIControls() const
    return controls;
 }
 
-void IDrawableModule::GetDimensions(int& width, int& height)
+void IDrawableModule::GetDimensions(float& width, float& height)
 {
    int minimizedWidth = GetMinimizedWidth();
    int minimizedHeight = 0;
    
-   int moduleWidth,moduleHeight;
+   float moduleWidth,moduleHeight;
    GetModuleDimensions(moduleWidth, moduleHeight);
    if (moduleWidth == 1 && moduleHeight == 1)
    {
@@ -738,7 +738,7 @@ void IDrawableModule::ComputeSliders(int samplesIn)
 
 PatchCableOld IDrawableModule::GetPatchCableOld(IClickable* target)
 {
-   int wThis,hThis,xThis,yThis,wThat,hThat,xThat,yThat;
+   float wThis,hThis,xThis,yThis,wThat,hThat,xThat,yThat;
    GetDimensions(wThis,hThis);
    GetPosition(xThis,yThis);
    if (target)

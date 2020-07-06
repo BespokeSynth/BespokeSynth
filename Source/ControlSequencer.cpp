@@ -243,7 +243,7 @@ namespace
    const float extraH = 30;
 }
 
-void ControlSequencer::GetModuleDimensions(int &width, int &height)
+void ControlSequencer::GetModuleDimensions(float& width, float& height)
 {
    width = mGrid->GetWidth() + extraW;
    height = mGrid->GetHeight() + extraH;

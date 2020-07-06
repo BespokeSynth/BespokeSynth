@@ -486,10 +486,10 @@ void SamplePlayer::CheckboxUpdated(Checkbox* checkbox)
    }
 }
 
-void SamplePlayer::GetModuleDimensions(int& x, int&y)
+void SamplePlayer::GetModuleDimensions(float& width, float& height)
 {
-   x = mWidth;
-   y = mHeight;
+   width = mWidth;
+   height = mHeight;
 }
 
 void SamplePlayer::FloatSliderUpdated(FloatSlider* slider, float oldVal)

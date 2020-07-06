@@ -171,10 +171,10 @@ void OneShotLauncher::CheckboxUpdated(Checkbox *checkbox)
 {
 }
 
-void OneShotLauncher::GetModuleDimensions(int& x, int&y)
+void OneShotLauncher::GetModuleDimensions(float& width, float& height)
 {
-   x = 180;
-   y = 125;
+   width = 180;
+   height = 125;
 }
 
 void OneShotLauncher::FloatSliderUpdated(FloatSlider* slider, float oldVal)

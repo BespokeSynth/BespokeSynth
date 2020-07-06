@@ -76,7 +76,7 @@ private:
    //IDrawableModule
    void DrawModule() override;
    bool Enabled() const override { return mEnabled; }
-   void GetModuleDimensions(int& x, int& y) override;
+   void GetModuleDimensions(float& width, float& height) override;
    void OnClicked(int x, int y, bool right) override;
    
    Sample* mSample;

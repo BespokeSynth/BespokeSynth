@@ -126,8 +126,7 @@ void Compressor::DrawModule()
    
    ofPushStyle();
    ofSetColor(0,255,0,gModuleDrawAlpha);
-   float x,y;
-   int w,h;
+   float x,y,w,h;
    
    mThresholdSlider->GetPosition(x, y, K(local));
    mThresholdSlider->GetDimensions(w, h);

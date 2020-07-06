@@ -884,7 +884,7 @@ void ScriptModule::Stop()
       mPrintDisplay[i].time = -1;
 }
 
-void ScriptModule::GetModuleDimensions(int& w, int& h)
+void ScriptModule::GetModuleDimensions(float& w, float& h)
 {
    w = mWidth;
    h = mHeight;
@@ -892,7 +892,7 @@ void ScriptModule::GetModuleDimensions(int& w, int& h)
 
 void ScriptModule::Resize(float w, float h)
 {
-   int entryW, entryH;
+   float entryW, entryH;
    mCodeEntry->GetDimensions(entryW, entryH);
    mCodeEntry->SetDimensions(entryW + w - mWidth, entryH + h - mHeight);
    mRunButton->SetPosition(mRunButton->GetPosition(true).x, mRunButton->GetPosition(true).y + h - mHeight);

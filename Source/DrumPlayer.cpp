@@ -778,7 +778,7 @@ void DrumPlayer::ShuffleKit()
    }
 }
 
-void DrumPlayer::GetModuleDimensions(int& width, int& height)
+void DrumPlayer::GetModuleDimensions(float& width, float& height)
 {
    if (mEditMode)
    {

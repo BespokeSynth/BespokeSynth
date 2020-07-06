@@ -66,7 +66,7 @@ void FilterViz::DrawModule()
    for (int i=0; i<mFilters.size(); ++i)
       mFilters[i]->Draw();
    
-   int w,h;
+   float w,h;
    GetDimensions(w, h);
    
    ofPushStyle();

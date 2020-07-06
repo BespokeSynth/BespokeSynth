@@ -84,7 +84,7 @@ void ClipArranger::DrawModule()
    ofPopStyle();
 }
 
-void ClipArranger::GetModuleDimensions(int& w, int& h)
+void ClipArranger::GetModuleDimensions(float& w, float& h)
 {
    w = mBufferWidth + 100;
    h = 25 + mBufferHeight;
@@ -175,7 +175,7 @@ bool ClipArranger::MouseMoved(float x, float y)
 
 bool ClipArranger::IsMousePosWithinClip(int x, int y)
 {
-   int w, h;
+   float w, h;
    GetDimensions(w, h);
    return x >= 0 && x < w && y >= 0 && y < h;
 }

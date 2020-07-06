@@ -108,7 +108,7 @@ void WaveformViewer::DrawModule()
    ofSetColor(245, 58, 135);
    ofSetLineWidth(2);
    
-   int w,h;
+   float w,h;
    GetDimensions(w,h);
    int phaseStart = 0;
    int end = BUFFER_VIZ_SIZE - 1;

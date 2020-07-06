@@ -135,7 +135,7 @@ void PatchCable::Render()
    ofColor lineColorAlphaed = lineColor;
    lineColorAlphaed.a = lineAlpha;
    
-   int wThis,hThis,xThis,yThis;
+   float wThis,hThis,xThis,yThis;
    GetDimensions(wThis,hThis);
    GetPosition(xThis,yThis);
    
@@ -319,7 +319,7 @@ void PatchCable::MouseReleased()
                if (uicontrol->IsShowing() == false || !IsValidTarget(uicontrol))
                   continue;
                
-               int x,y,w,h;
+               float x,y,w,h;
                uicontrol->GetPosition(x, y);
                uicontrol->GetDimensions(w, h);
                if (cable.end.x >= x && cable.end.y >= y && cable.end.x < x+w && cable.end.y < y+h)
@@ -363,7 +363,7 @@ PatchCablePos PatchCable::GetPatchCablePos()
 {
    ofVec2f start = mOwner->GetPosition();
    
-   int wThat,hThat,xThat,yThat;
+   float wThat,hThat,xThat,yThat;
    
    int yThatAdjust = 0;
    IDrawableModule* targetModule = dynamic_cast<IDrawableModule*>(mTarget);

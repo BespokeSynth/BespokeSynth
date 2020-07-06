@@ -49,7 +49,7 @@ private:
    //IDrawableModule
    void DrawModule() override;
    bool Enabled() const override { return true; }
-   void GetModuleDimensions(int& w, int& h) override { w=190; h=25; }
+   void GetModuleDimensions(float& w, float& h) override { w=190; h=25; }
    
    int mControllerIndex;
    DropdownList* mControllerList;

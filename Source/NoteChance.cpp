@@ -73,7 +73,7 @@ void NoteChance::PlayNote(double time, int pitch, int velocity, int voiceIdx, Mo
    }
 }
 
-void NoteChance::GetModuleDimensions(int& width, int& height)
+void NoteChance::GetModuleDimensions(float& width, float& height)
 {
    width = 118;
    height = 20;

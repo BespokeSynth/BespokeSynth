@@ -80,7 +80,7 @@ namespace
    const float extraW = 20;
 }
 
-void GroupControl::GetModuleDimensions(int &width, int &height)
+void GroupControl::GetModuleDimensions(float& width, float& height)
 {
    width = mGroupCheckbox->GetRect().width + extraW;
    height = 38;

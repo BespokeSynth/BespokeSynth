@@ -240,7 +240,7 @@ void SignalGenerator::DrawModule()
    mPhaseOffsetSlider->Draw();
 }
 
-void SignalGenerator::GetModuleDimensions(int& width, int& height)
+void SignalGenerator::GetModuleDimensions(float& width, float& height)
 {
    width = 180;
    height = 108;

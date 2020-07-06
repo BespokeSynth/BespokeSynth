@@ -64,7 +64,7 @@ public:
    void ClearInput() { bzero(mString, MAX_TEXTENTRY_LENGTH); mCaretPosition = 0; }
    const char* GetText() const { return mString; }
    
-   void GetDimensions(int& width, int& height) override;
+   void GetDimensions(float& width, float& height) override;
 
    //IUIControl
    void SetFromMidiCC(float slider) override {}

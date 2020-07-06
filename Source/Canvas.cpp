@@ -58,7 +58,7 @@ void Canvas::Render()
    ofPushMatrix();
    ofTranslate(mX, mY);
    ofPushStyle();
-   int w,h;
+   float w,h;
    GetDimensions(w,h);
    ofNoFill();
    ofRect(0,0,mWidth,mHeight);

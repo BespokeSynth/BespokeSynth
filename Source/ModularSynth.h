@@ -45,7 +45,7 @@ enum LogEventType
 class ConsoleListener : public IDrawableModule, public ITextEntryListener
 {
 public:
-   void GetModuleDimensions(int& width, int& height) override { width = 1; height = 1; }
+   void GetModuleDimensions(float& width, float& height) override { width = 1; height = 1; }
    void TextEntryActivated(TextEntry* entry) override;
    void TextEntryComplete(TextEntry* entry) override;
 private:

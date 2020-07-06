@@ -52,7 +52,7 @@ private:
    
    //IDrawableModule
    void DrawModule() override;
-   void GetModuleDimensions(int& w, int&h) override { w=215; h=130; }
+   void GetModuleDimensions(float& w, float& h) override { w=215; h=130; }
    bool Enabled() const override { return mEnabled; }
    
    void CalcFilters();

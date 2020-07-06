@@ -151,7 +151,7 @@ void MacroSlider::Mapping::Draw()
    
    if (mTarget)
    {
-      int x,y,w,h;
+      float x,y,w,h;
       mMinSlider->GetPosition(x, y, K(local));
       mMinSlider->GetDimensions(w, h);
       

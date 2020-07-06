@@ -39,7 +39,7 @@ void NoteGate::PlayNote(double time, int pitch, int velocity, int voiceIdx, Modu
       PlayNoteOutput(time, pitch, velocity, voiceIdx, modulation);
 }
 
-void NoteGate::GetModuleDimensions(int& width, int& height)
+void NoteGate::GetModuleDimensions(float& width, float& height)
 {
    width = 80;
    height = 20;

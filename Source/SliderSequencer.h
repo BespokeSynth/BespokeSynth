@@ -67,7 +67,7 @@ private:
    
    //IDrawableModule
    void DrawModule() override;
-   void GetModuleDimensions(int& width, int& height) override { width=320; height=165; }
+   void GetModuleDimensions(float& width, float& height) override { width=320; height=165; }
    
    float mLastMeasurePos;
    std::vector<SliderLine*> mSliderLines;

@@ -62,7 +62,7 @@ void OSCOutput::DrawModule()
       slider->Draw();
 }
 
-void OSCOutput::GetModuleDimensions(int& w, int& h)
+void OSCOutput::GetModuleDimensions(float& w, float& h)
 {
    w = 200;
    h = (int)mSliders.size() * 15 + 10;

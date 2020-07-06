@@ -209,7 +209,7 @@ float Sampler::DetectSampleFrequency()
    return freq;
 }
 
-void Sampler::GetModuleDimensions(int& width, int& height)
+void Sampler::GetModuleDimensions(float& width, float& height)
 {
    width = 210;
    height = 90;

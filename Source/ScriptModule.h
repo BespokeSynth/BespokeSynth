@@ -88,7 +88,7 @@ private:
    void DrawModule() override;
    void DrawModuleUnclipped() override;
    bool Enabled() const override { return true; }
-   void GetModuleDimensions(int& width, int& height) override;
+   void GetModuleDimensions(float& width, float& height) override;
    bool IsResizable() const override { return true; }
    void Resize(float w, float h) override;
    bool MouseScrolled(int x, int y, float scrollX, float scrollY) override;

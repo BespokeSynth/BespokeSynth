@@ -78,7 +78,7 @@ void Lissajous::DrawModule()
    
    ofSetLineWidth(2);
    
-   int w,h;
+   float w,h;
    GetDimensions(w,h);
    
    ofBeginShape();

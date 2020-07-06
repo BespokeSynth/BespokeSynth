@@ -41,7 +41,7 @@ private:
    //IDrawableModule
    void DrawModule() override;
    bool Enabled() const override { return true; }
-   void GetModuleDimensions(int& x, int&y) override { x=300; y=200; }
+   void GetModuleDimensions(float& width, float& height) override { width=300; height=200; }
    
    float* mImpulseBuffer;
    float* mFFTOutReal;

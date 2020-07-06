@@ -115,7 +115,7 @@ void RadioButton::Render()
    
    DrawBeacon(mX+mWidth/2, mY+mHeight/2);
 
-   int w,h;
+   float w,h;
    GetDimensions(w,h);
    ofFill();
    ofSetColor(0, 0, 0, gModuleDrawAlpha * .5f);
@@ -193,7 +193,7 @@ void RadioButton::OnClicked(int x, int y, bool right)
 
 ofVec2f RadioButton::GetOptionPosition(int optionIndex)
 {
-   int x,y;
+   float x,y;
    GetPosition(x, y, false);
    if (mDirection == kRadioVertical)
       return ofVec2f(x + mWidth, y + float(mHeight)/GetNumValues() * (optionIndex + .5f));

@@ -23,7 +23,6 @@ public:
    void Draw();
    virtual void Render() {}
    void SetPosition(float x, float y) { mX = x; mY = y; }
-   void GetPosition(int& x, int& y, bool local = false) const; //TODO(Ryan) deprecated
    void GetPosition(float& x, float& y, bool local = false) const;
    ofVec2f GetPosition(bool local = false) const;
    virtual void Move(float moveX, float moveY) { mX += moveX; mY += moveY; }
@@ -33,7 +32,7 @@ public:
    bool NotifyMouseMoved(float x, float y);
    bool NotifyMouseScrolled(int x, int y, float scrollX, float scrollY);
    virtual void MouseReleased() {}
-   virtual void GetDimensions(int& width, int& height) { width = 10; height = 10; }
+   virtual void GetDimensions(float& width, float& height) { width = 10; height = 10; }
    ofVec2f GetDimensions();
    ofRectangle GetRect(bool local = false);
    void SetName(const char* name) { StringCopy(mName, name, MAX_TEXTENTRY_LENGTH); }

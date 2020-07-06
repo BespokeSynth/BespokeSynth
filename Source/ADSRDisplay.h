@@ -61,7 +61,7 @@ private:
    } mAdjustMode;
 
    void OnClicked(int x, int y, bool right) override;
-   void GetDimensions(int& width, int& height) override { width = mWidth; height = mHeight; }
+   void GetDimensions(float& width, float& height) override { width = mWidth; height = mHeight; }
    
    void UpdateSliderVisibility();
    

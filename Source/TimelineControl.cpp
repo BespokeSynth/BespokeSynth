@@ -58,10 +58,10 @@ void TimelineControl::DrawModule()
    mLoopEndSlider->Draw();
 }
 
-void TimelineControl::GetModuleDimensions(int& w, int&h)
+void TimelineControl::GetModuleDimensions(float& w, float& h)
 {
-   w=mWidth;
-   h= mLoop ? 57 : 21;
+   w = mWidth;
+   h = mLoop ? 57 : 21;
 }
 
 void TimelineControl::Resize(float width, float height)

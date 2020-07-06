@@ -43,7 +43,7 @@ public:
 private:
    //IDrawableModule
    void DrawModule() override;
-   void GetModuleDimensions(int& w, int&h) override;
+   void GetModuleDimensions(float& w, float& h) override;
    bool Enabled() const override { return mEnabled; }
    
    float mRescale;

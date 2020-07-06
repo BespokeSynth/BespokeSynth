@@ -290,17 +290,17 @@ void SampleFinder::CheckboxUpdated(Checkbox *checkbox)
    }
 }
 
-void SampleFinder::GetModuleDimensions(int& x, int&y)
+void SampleFinder::GetModuleDimensions(float& width, float& height)
 {
    if (mEditMode)
    {
-      x = 910;
-      y = 430;
+      width = 910;
+      height = 430;
    }
    else
    {
-      x = 210;
-      y = 125;
+      width = 210;
+      height = 125;
    }
 }
 

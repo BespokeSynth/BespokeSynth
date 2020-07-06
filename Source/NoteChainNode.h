@@ -49,7 +49,7 @@ private:
    //IDrawableModule
    void DrawModule() override;
    bool Enabled() const override { return mEnabled; }
-   void GetModuleDimensions(int& w, int& h) override { w=110; h=76; }
+   void GetModuleDimensions(float& w, float& h) override { w=110; h=76; }
    
    ClickButton* mTriggerButton;
    TextEntry* mPitchEntry;

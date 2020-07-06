@@ -41,7 +41,7 @@ void ClickButton::Render()
 {
    ofPushStyle();
 
-   int w,h;
+   float w,h;
    GetDimensions(w,h);
 
    ofColor color,textColor;

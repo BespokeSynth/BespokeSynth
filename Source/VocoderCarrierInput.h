@@ -42,7 +42,7 @@ public:
 private:
    //IDrawableModule
    void DrawModule() override;
-   void GetModuleDimensions(int& w, int&h) override { w=60; h=0; }
+   void GetModuleDimensions(float& w, float& h) override { w=60; h=0; }
    bool Enabled() const override { return true; }
 
    VocoderBase* mVocoder;

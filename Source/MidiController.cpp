@@ -778,7 +778,7 @@ void MidiController::DrawModule()
    }
    else
    {
-      int w,h;
+      float w,h;
       GetDimensions(w, h);
       
       DrawTextNormal("last input: "+mLastInput,60,h-5);
@@ -958,7 +958,7 @@ void MidiController::DrawModule()
       }
       ofPopStyle();
       
-      int w,h;
+      float w,h;
       GetDimensions(w, h);
       mAddConnectionButton->SetPosition(mAddConnectionButton->GetPosition(true).x, h-17);
       mAddConnectionButton->Draw();
@@ -1078,7 +1078,7 @@ void MidiController::HighlightPageControls(int page)
    }
 }
 
-void MidiController::GetModuleDimensions(int& width, int& height)
+void MidiController::GetModuleDimensions(float& width, float& height)
 {if (mMappingDisplayMode == kList)
    {
       width = 830;

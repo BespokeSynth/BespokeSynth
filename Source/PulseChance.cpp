@@ -69,7 +69,7 @@ void PulseChance::OnPulse(double time, float velocity, int flags)
       mLastRejectTime = gTime;
 }
 
-void PulseChance::GetModuleDimensions(int& width, int& height)
+void PulseChance::GetModuleDimensions(float& width, float& height)
 {
    width = 118;
    height = 20;

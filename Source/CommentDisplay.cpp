@@ -35,7 +35,7 @@ void CommentDisplay::DrawModule()
    mCommentEntry->Draw();
 }
 
-void CommentDisplay::GetModuleDimensions(int& w, int& h)
+void CommentDisplay::GetModuleDimensions(float& w, float& h)
 {
    mCommentEntry->GetDimensions(w, h);
    w += 4;

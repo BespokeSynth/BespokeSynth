@@ -71,7 +71,7 @@ void HelpDisplay::DrawModule()
    mHeight = rect.height + 55;
 }
 
-void HelpDisplay::GetModuleDimensions(int& w, int& h)
+void HelpDisplay::GetModuleDimensions(float& w, float& h)
 {
    w = mWidth;
    h = mHeight;

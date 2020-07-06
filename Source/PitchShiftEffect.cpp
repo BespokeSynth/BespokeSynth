@@ -66,7 +66,7 @@ void PitchShiftEffect::DrawModule()
    mRatioSelector->Draw();
 }
 
-void PitchShiftEffect::GetModuleDimensions(int& width, int& height)
+void PitchShiftEffect::GetModuleDimensions(float& width, float& height)
 {
    if (mEnabled)
    {

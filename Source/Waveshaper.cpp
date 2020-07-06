@@ -203,7 +203,7 @@ void Waveshaper::DrawModule()
    mESlider->Draw();
 }
 
-void Waveshaper::GetModuleDimensions(int& w, int&h)
+void Waveshaper::GetModuleDimensions(float& w, float& h)
 {
    w = MAX(kGraphX + kGraphWidth + 2, 4 + mTextEntry->GetRect().width);
    h = kGraphY + kGraphHeight;

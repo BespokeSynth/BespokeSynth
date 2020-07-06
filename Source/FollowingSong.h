@@ -51,7 +51,7 @@ private:
    //IDrawableModule
    void DrawModule() override;
    bool Enabled() const override { return mEnabled; }
-   void GetModuleDimensions(int& x, int& y) override { x=560; y=130; }
+   void GetModuleDimensions(float& width, float& height) override { width=560; height=130; }
    
    ofMutex mLoadSongMutex;
    bool mLoadingSong;

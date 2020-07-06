@@ -92,7 +92,7 @@ void SpectralDisplay::DrawModule()
    ofPushStyle();
    ofPushMatrix();
    
-   int w,h;
+   float w,h;
    GetDimensions(w,h);
    
    ofSetColor(255, 255, 255);

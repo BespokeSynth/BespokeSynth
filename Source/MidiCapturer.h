@@ -55,7 +55,7 @@ public:
 private:
    //IDrawableModule
    void DrawModule() override;
-   void GetModuleDimensions(int& width, int& height) override { width = 300; height = 150; }
+   void GetModuleDimensions(float& width, float& height) override { width = 300; height = 150; }
    bool Enabled() const override { return true; }
    
    static const int kRingBufferLength = 1000;

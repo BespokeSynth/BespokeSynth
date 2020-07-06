@@ -94,7 +94,7 @@ private:
    
    //IDrawableModule
    void DrawModule() override;
-   void GetModuleDimensions(int& width, int& height) override { width = 235; height = 124; }
+   void GetModuleDimensions(float& width, float& height) override { width = 235; height = 124; }
    bool Enabled() const override { return mEnabled; }
    
    RollingBuffer mRecordBuffer;

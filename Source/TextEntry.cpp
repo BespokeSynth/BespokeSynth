@@ -105,7 +105,7 @@ void TextEntry::Render()
    if (!isCurrent)
       UpdateDisplayString();
    
-   int w,h;
+   float w,h;
    GetDimensions(w,h);
    if (isCurrent)
    {
@@ -154,7 +154,7 @@ void TextEntry::Render()
    ofPopStyle();
 }
 
-void TextEntry::GetDimensions(int& width, int& height)
+void TextEntry::GetDimensions(float& width, float& height)
 {
    if (mFlexibleWidth)
       width = MAX(30,GetStringWidth(mString) + 4);

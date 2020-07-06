@@ -433,7 +433,7 @@ bool NoteCanvas::MouseScrolled(int x, int y, float scrollX, float scrollY)
 {
    if (GetKeyModifiers() == kModifier_Shift)
    {
-      int canvasX,canvasY;
+      float canvasX,canvasY;
       mCanvas->GetPosition(canvasX, canvasY, true);
       ofVec2f canvasPos = ofVec2f(ofMap(x, canvasX, canvasX+mCanvas->GetWidth(), 0, 1),
                                   ofMap(y, canvasY, canvasY+mCanvas->GetHeight(), 0, 1));
@@ -482,7 +482,7 @@ void NoteCanvas::Resize(float w, float h)
    mCanvas->SetDimensions(w, h);
 }
 
-void NoteCanvas::GetModuleDimensions(int& width, int& height)
+void NoteCanvas::GetModuleDimensions(float& width, float& height)
 {
    width = mCanvas->GetWidth() + extraW;
    height = mCanvas->GetHeight() + extraH;

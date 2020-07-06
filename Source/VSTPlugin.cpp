@@ -521,7 +521,7 @@ void VSTPlugin::DrawModule()
    }
 }
 
-void VSTPlugin::GetModuleDimensions(int& width, int& height)
+void VSTPlugin::GetModuleDimensions(float& width, float& height)
 {
    if (mDisplayMode == kDisplayMode_PluginOverlay)
    {

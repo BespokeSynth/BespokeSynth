@@ -68,7 +68,7 @@ private:
    //IDrawableModule
    void DrawModule() override;
    bool Enabled() const override { return true; }
-   void GetModuleDimensions(int& x, int& y) override { x=100; y=18; }
+   void GetModuleDimensions(float& width, float& height) override { width=100; height=18; }
    
    KontrolKommunicator mKontrol;
    bool mInitialized;

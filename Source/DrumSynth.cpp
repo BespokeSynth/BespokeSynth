@@ -389,7 +389,7 @@ void DrumSynth::CreateKit()
    mKitSelector->AddLabel(kit.mName.c_str(), mLoadedKit);
 }
 
-void DrumSynth::GetModuleDimensions(int& width, int& height)
+void DrumSynth::GetModuleDimensions(float& width, float& height)
 {
    if (mEditMode)
    {

@@ -69,7 +69,7 @@ public:
 private:
    //IDrawableModule
    void DrawModule() override;
-   void GetModuleDimensions(int& width, int& height) override { width = 240; height = mViewGrid ? 225 : 120; }
+   void GetModuleDimensions(float& width, float& height) override { width = 240; height = mViewGrid ? 225 : 120; }
    bool Enabled() const override { return mEnabled; }
    void OnClicked(int x, int y, bool right) override;
    

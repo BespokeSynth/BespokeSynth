@@ -60,7 +60,7 @@ void CodeEntry::Render()
    
    ofSetLineWidth(.5f);
    
-   int w,h;
+   float w,h;
    GetDimensions(w,h);
    
    ofClipWindow(mX, mY, w, h);

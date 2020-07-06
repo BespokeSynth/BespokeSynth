@@ -233,10 +233,10 @@ void SeaOfGrain::CheckboxUpdated(Checkbox *checkbox)
 {
 }
 
-void SeaOfGrain::GetModuleDimensions(int& x, int& y)
+void SeaOfGrain::GetModuleDimensions(float& width, float& height)
 {
-   x = mBufferW + 10;
-   y = mBufferY + mBufferH + 200;
+   width = mBufferW + 10;
+   height = mBufferY + mBufferH + 200;
 }
 
 void SeaOfGrain::FloatSliderUpdated(FloatSlider* slider, float oldVal)

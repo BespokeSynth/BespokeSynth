@@ -36,7 +36,7 @@ bool IClickable::TestClick(int x, int y, bool right, bool testOnly /* = false */
    if (!mShowing)
       return false;
    
-   int w, h;
+   float w, h;
    GetDimensions(w,h);
    
    float titleBarHeight = 0;
@@ -67,14 +67,6 @@ bool IClickable::NotifyMouseScrolled(int x, int y, float scrollX, float scrollY)
    return MouseScrolled(x-mX, y-mY, scrollX, scrollY);
 }
 
-void IClickable::GetPosition(int& x, int& y, bool local /*= false*/) const //TODO(Ryan) deprecated
-{
-   float fX, fY;
-   GetPosition(fX, fY, local);
-   x = (int)fX;
-   y = (int)fY;
-}
-
 void IClickable::GetPosition(float& x, float& y, bool local /*= false*/) const
 {
    if (mParent && !local)
@@ -92,21 +84,21 @@ void IClickable::GetPosition(float& x, float& y, bool local /*= false*/) const
 
 ofVec2f IClickable::GetPosition(bool local /*= false*/) const
 {
-   int x,y;
+   float x,y;
    GetPosition(x, y, local);
    return ofVec2f(x,y);
 }
 
 ofVec2f IClickable::GetDimensions()
 {
-   int w,h;
+   float w,h;
    GetDimensions(w,h);
    return ofVec2f(w,h);
 }
 
 ofRectangle IClickable::GetRect(bool local /*=false*/)
 {
-   int x,y,w,h;
+   float x,y,w,h;
    GetPosition(x, y, local);
    GetDimensions(w,h);
    return ofRectangle(x,y,w,h);

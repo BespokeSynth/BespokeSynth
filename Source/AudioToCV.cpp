@@ -53,7 +53,7 @@ void AudioToCV::DrawModule()
    ofSetColor(0,255,0,gModuleDrawAlpha);
    ofBeginShape();
    float x,y;
-   int w,h;
+   float w,h;
    mGainSlider->GetPosition(x, y, K(local));
    mGainSlider->GetDimensions(w, h);
    for (int i=0; i<gBufferSize; ++i)

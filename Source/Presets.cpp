@@ -123,7 +123,7 @@ void Presets::OnClicked(int x, int y, bool right)
    
    if (mGrid->TestClick(x, y, right, true))
    {
-      int gridX,gridY;
+      float gridX,gridY;
       mGrid->GetPosition(gridX, gridY, true);
       GridCell cell = mGrid->GetGridCellAt(x-gridX,y-gridY);
       
@@ -342,7 +342,7 @@ void Presets::DropdownUpdated(DropdownList* list, int oldVal)
    }
 }
 
-void Presets::GetModuleDimensions(int &width, int &height)
+void Presets::GetModuleDimensions(float& width, float& height)
 {
    width = mGrid->GetWidth() + extraW;
    height = mGrid->GetHeight() + extraH;

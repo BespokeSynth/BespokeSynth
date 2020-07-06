@@ -63,7 +63,7 @@ public:
 private:
    //IDrawableModule
    void DrawModule() override;
-   void GetModuleDimensions(int& x, int& y) override { x=100; y=50; }
+   void GetModuleDimensions(float& width, float& height) override { width=100; height=50; }
    bool Enabled() const override { return mEnabled; }
    
    int GetPitchForBucket(int bucket);

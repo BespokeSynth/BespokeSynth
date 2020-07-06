@@ -37,7 +37,7 @@ private:
    //IDrawableModule
    void DrawModule() override;
    void DrawModuleUnclipped() override;
-   void GetModuleDimensions(int& width, int& height) override { width = 80; height = 0; }
+   void GetModuleDimensions(float& width, float& height) override { width = 80; height = 0; }
    bool Enabled() const override { return true; }
 
    LaunchpadKeyboard* mLaunchpad;

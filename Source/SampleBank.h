@@ -59,7 +59,7 @@ private:
    //IDrawableModule
    void DrawModule() override;
    bool Enabled() const override { return true; }
-   void GetModuleDimensions(int& x, int& y) override { x=200; y=80; }
+   void GetModuleDimensions(float& width, float& height) override { width=200; height=80; }
    void OnClicked(int x, int y, bool right) override;
    
    vector<SampleInfo> mSamples;

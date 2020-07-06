@@ -218,7 +218,7 @@ void ChaosEngine::DrawModule()
    int beat = int(fBeat);
    if (!mHideBeat)
    {
-      int w,h;
+      float w,h;
       GetDimensions(w,h);
       ofFill();
       float beatLeft = 1-(fBeat - beat);

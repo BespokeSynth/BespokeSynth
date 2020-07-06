@@ -167,7 +167,7 @@ void PulseSequence::Step(double time, float velocity, int flags)
    mVelocityGrid->SetHighlightCol(mStep);
 }
 
-void PulseSequence::GetModuleDimensions(int& width, int& height)
+void PulseSequence::GetModuleDimensions(float& width, float& height)
 {
    width = 180;
    height = 52;

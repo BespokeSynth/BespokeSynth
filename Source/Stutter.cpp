@@ -258,7 +258,7 @@ void Stutter::DrawStutterBuffer(float x, float y, float width, float height)
    ofPopMatrix();
 }
 
-void Stutter::GetModuleDimensions(int& width, int& height)
+void Stutter::GetModuleDimensions(float& width, float& height)
 {
    if (mEnabled)
    {

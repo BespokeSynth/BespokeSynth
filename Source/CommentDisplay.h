@@ -34,7 +34,7 @@ private:
    //IDrawableModule
    void DrawModule() override;
    bool Enabled() const override { return true; }
-   void GetModuleDimensions(int& width, int& height) override;
+   void GetModuleDimensions(float& width, float& height) override;
    
    char mComment[MAX_TEXTENTRY_LENGTH];
    TextEntry* mCommentEntry;

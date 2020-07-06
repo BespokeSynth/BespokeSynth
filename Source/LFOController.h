@@ -46,7 +46,7 @@ private:
    //IDrawableModule
    void DrawModule() override;
    bool Enabled() const override { return true; }
-   void GetModuleDimensions(int& x, int&y) override { x=130; y=77; }
+   void GetModuleDimensions(float& width, float& height) override { width=130; height=77; }
    
    int dummy;
    float dummy2;

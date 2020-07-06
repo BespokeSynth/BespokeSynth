@@ -33,7 +33,7 @@ public:
 private:
    //IDrawableModule
    void DrawModule() override;
-   void GetModuleDimensions(int& width, int& height) override { width = 300; height = 100; }
+   void GetModuleDimensions(float& width, float& height) override { width = 300; height = 100; }
    bool Enabled() const override { return mEnabled; }
    
    struct VizVoice

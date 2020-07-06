@@ -199,7 +199,7 @@ void ModuleSaveDataPanel::UpdatePosition()
 {
    if (mSaveModule)
    {
-      int moduleX,moduleY,moduleW,moduleH;
+      float moduleX,moduleY,moduleW,moduleH;
       mSaveModule->GetPosition(moduleX, moduleY);
       mSaveModule->GetDimensions(moduleW, moduleH);
       
@@ -290,7 +290,7 @@ void ModuleSaveDataPanel::DropdownUpdated(DropdownList* list, int oldVal)
    }
 }
 
-void ModuleSaveDataPanel::GetModuleDimensions(int& width, int& height)
+void ModuleSaveDataPanel::GetModuleDimensions(float& width, float& height)
 {
    if (mShowing)
    {

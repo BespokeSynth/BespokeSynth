@@ -135,7 +135,7 @@ void DistortionEffect::SetClip(float amount)
    mGain = 1/pow(amount,3);
 }
 
-void DistortionEffect::GetModuleDimensions(int& width, int& height)
+void DistortionEffect::GetModuleDimensions(float& width, float& height)
 {
    if (mEnabled)
    {

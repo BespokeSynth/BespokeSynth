@@ -83,7 +83,7 @@ public:
    void ButtonClicked(ClickButton* button) override;
    void DropdownUpdated(DropdownList* list, int oldVal) override {}
    
-   void GetModuleDimensions(int& width, int& height) override { width = 400; height = 300; }
+   void GetModuleDimensions(float& width, float& height) override { width = 400; height = 300; }
    
    void SaveLayout(ofxJSONElement& moduleInfo) override;
    void LoadLayout(const ofxJSONElement& moduleInfo) override;

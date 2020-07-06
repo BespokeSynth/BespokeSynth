@@ -149,10 +149,10 @@ void Beats::CheckboxUpdated(Checkbox *checkbox)
 {
 }
 
-void Beats::GetModuleDimensions(int& x, int&y)
+void Beats::GetModuleDimensions(float& width, float& height)
 {
-   x = BEAT_COLUMN_WIDTH * (int)mBeatColumns.size();
-   y = 96+15*(mRows+1);
+   width = BEAT_COLUMN_WIDTH * (int)mBeatColumns.size();
+   height = 96+15*(mRows+1);
 }
 
 void Beats::FloatSliderUpdated(FloatSlider* slider, float oldVal)

@@ -199,7 +199,7 @@ void CurveLooper::ButtonClicked(ClickButton* button)
    }
 }
 
-void CurveLooper::GetModuleDimensions(int &width, int &height)
+void CurveLooper::GetModuleDimensions(float& width, float& height)
 {
    width = mWidth;
    height = mHeight;

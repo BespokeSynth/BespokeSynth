@@ -133,7 +133,7 @@ void PatchCableSource::UpdatePosition()
 {
    if (mAutomaticPositioning)
    {
-      int x,y,w,h;
+      float x,y,w,h;
       mOwner->GetPosition(x, y);
       mOwner->GetDimensions(w, h);
       
@@ -151,7 +151,7 @@ void PatchCableSource::UpdatePosition()
             }
             else if (cable->GetTarget())
             {
-               int targetX,targetY,targetW,targetH;
+               float targetX,targetY,targetW,targetH;
                cable->GetTarget()->GetPosition(targetX, targetY);
                cable->GetTarget()->GetDimensions(targetW, targetH);
                centerOfMass.x += targetX + targetW / 2;
@@ -199,7 +199,7 @@ void PatchCableSource::UpdatePosition()
    }
    else
    {
-      int x,y;
+      float x,y;
       mOwner->GetPosition(x, y);
       mX = mManualPositionX + x;
       mY = mManualPositionY + y;

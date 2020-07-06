@@ -44,7 +44,7 @@ string Prefab::GetTitleLabel()
 
 void Prefab::Poll()
 {
-   int xMin,yMin;
+   float xMin,yMin;
    GetPosition(xMin, yMin);
    for (auto* module : mModuleContainer.GetModules())
    {
@@ -100,7 +100,7 @@ void Prefab::PostRepatch(PatchCableSource* cableSource, bool fromUserClick)
    cableSource->Clear();
 }
 
-void Prefab::GetModuleDimensions(int &width, int &height)
+void Prefab::GetModuleDimensions(float& width, float& height)
 {
    float x,y;
    GetPosition(x, y);

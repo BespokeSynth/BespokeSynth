@@ -57,7 +57,7 @@ public:
 private:
    //IDrawableModule
    void DrawModule() override;
-   void GetModuleDimensions(int& x, int&y) override;
+   void GetModuleDimensions(float& width, float& height) override;
    bool Enabled() const override { return mEnabled; }
    
    int GetRowHeight(int row);
@@ -73,8 +73,8 @@ private:
    double mSwapTime;
    int mSwapFromIdx;
    int mSwapToIdx;
-   Vec2i mSwapFromPos;
-   Vec2i mSwapToPos;
+   ofVec2f mSwapFromPos;
+   ofVec2f mSwapToPos;
    float mVolume;
    FloatSlider* mVolumeSlider;
    int mNumFXWide;

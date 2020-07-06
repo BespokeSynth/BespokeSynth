@@ -35,7 +35,7 @@ public:
 private:
    //IDrawableModule
    void DrawModule() override;
-   void GetModuleDimensions(int& width, int& height) override;
+   void GetModuleDimensions(float& width, float& height) override;
    bool Enabled() const override { return mEnabled; }
    
    float mChance;

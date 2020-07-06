@@ -89,7 +89,7 @@ float EQEffect::GetEffectAmount()
    return 0;
 }
 
-void EQEffect::GetModuleDimensions(int& width, int& height)
+void EQEffect::GetModuleDimensions(float& width, float& height)
 {
    width = 90;
    height = 80;

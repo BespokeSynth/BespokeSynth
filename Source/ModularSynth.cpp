@@ -283,7 +283,7 @@ void ModularSynth::Draw(void* vg)
    
    for (int i=0; i<mLissajousDrawers.size(); ++i)
    {
-      int moduleX, moduleY;
+      float moduleX, moduleY;
       mLissajousDrawers[i]->GetPosition(moduleX, moduleY);
       IAudioSource* source = dynamic_cast<IAudioSource*>(mLissajousDrawers[i]);
       DrawLissajous(source->GetVizBuffer(), moduleX, moduleY-240, 240, 240);
@@ -615,9 +615,9 @@ void ModularSynth::MouseMoved(int intX, int intY )
    
    if (gHoveredUIControl)
    {
-      int uiX,uiY;
+      float uiX,uiY;
       gHoveredUIControl->GetPosition(uiX, uiY);
-      int w, h;
+      float w, h;
       gHoveredUIControl->GetDimensions(w, h);
       
       if (x < uiX - 10 || y < uiY - 10 || x > uiX + w + 10 || y > uiY + h + 10)
@@ -692,7 +692,7 @@ void ModularSynth::MouseDragged(int intX, int intY, int button)
    
    if (mResizeModule)
    {
-      int moduleX,moduleY;
+      float moduleX, moduleY;
       mResizeModule->GetPosition(moduleX, moduleY);
       float newWidth = x - moduleX;
       float newHeight = y - moduleY;
@@ -729,9 +729,9 @@ void ModularSynth::MousePressed(int intX, int intY, int button)
          if (lfo) //if it's an LFO, don't dismiss it if you're adjusting the slider
          {
             FloatSlider* slider = lfo->GetOwner();
-            int uiX,uiY;
+            float uiX,uiY;
             slider->GetPosition(uiX, uiY);
-            int w, h;
+            float w, h;
             slider->GetDimensions(w, h);
             
             if (x < uiX || y < uiY || x > uiX + w || y > uiY + h)
@@ -812,7 +812,7 @@ void ModularSynth::MouseScrolled(float x, float y)
       IntSlider* intSlider = dynamic_cast<IntSlider*>(gHoveredUIControl);
       if (floatSlider || intSlider)
       {
-         int w,h;
+         float w,h;
          gHoveredUIControl->GetDimensions(w, h);
          movementScale = 200.0f / w;
             
@@ -921,7 +921,7 @@ void ModularSynth::CheckClick(IDrawableModule* clickedModule, int x, int y, bool
       MoveToFront(clickedModule);
    
    //check to see if we clicked in the move area
-   int moduleX, moduleY;
+   float moduleX, moduleY;
    clickedModule->GetPosition(moduleX, moduleY);
    int modulePosY = y - moduleY;
    
@@ -932,8 +932,8 @@ void ModularSynth::CheckClick(IDrawableModule* clickedModule, int x, int y, bool
       mMoveModuleOffsetY = moduleY - y;
    }
    
-   int parentX = 0;
-   int parentY = 0;
+   float parentX = 0;
+   float parentY = 0;
    if (clickedModule->GetParent())
       clickedModule->GetParent()->GetPosition(parentX, parentY);
    
@@ -1007,7 +1007,7 @@ void ModularSynth::MouseReleased(int intX, int intY, int button)
 
    if (mMoveModule)
    {
-      int moduleX, moduleY;
+      float moduleX, moduleY;
       mMoveModule->GetPosition(moduleX, moduleY);
       mMoveModule = nullptr;
    }
@@ -1022,7 +1022,7 @@ void ModularSynth::MouseReleased(int intX, int intY, int button)
       IDrawableModule* module = GetModuleAt(x, y);
       if (module)
       {
-         int moduleX, moduleY;
+         float moduleX, moduleY;
          module->GetPosition(moduleX, moduleY);
          module->SampleDropped(x-moduleX, y-moduleY, GetHeldSample());
       }
@@ -1147,7 +1147,7 @@ void ModularSynth::FilesDropped(vector<string> files, int intX, int intY)
 
       if (target != nullptr)
       {
-         int moduleX, moduleY;
+         float moduleX, moduleY;
          target->GetPosition(moduleX, moduleY);
          x -= moduleX;
          y -= moduleY;

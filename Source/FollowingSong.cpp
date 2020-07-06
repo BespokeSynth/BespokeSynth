@@ -106,7 +106,7 @@ void FollowingSong::DrawModule()
    ofPopMatrix();
    
    ofPushStyle();
-   int w,h;
+   float w,h;
    GetDimensions(w,h);
    ofFill();
    ofSetColor(255,255,255,50);

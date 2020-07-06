@@ -100,7 +100,7 @@ private:
    //IDrawableModule
    void DrawModule() override;
    bool Enabled() const override { return true; }
-   void GetModuleDimensions(int& x, int&y) override { x=610; y=700; }
+   void GetModuleDimensions(float& width, float& height) override { width=610; height=700; }
    void OnClicked(int x, int y, bool right) override;
    
    ClickButton* mChaosButton;

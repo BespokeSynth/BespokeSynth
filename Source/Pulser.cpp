@@ -153,7 +153,7 @@ void Pulser::OnTimeEvent(double time)
    DispatchPulse(GetPatchCableSource(), time, 1, flags);
 }
 
-void Pulser::GetModuleDimensions(int& width, int& height)
+void Pulser::GetModuleDimensions(float& width, float& height)
 {
    width = 150;
    height = 52;

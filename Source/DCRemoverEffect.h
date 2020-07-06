@@ -32,7 +32,7 @@ public:
    
 private:
    //IDrawableModule
-   void GetModuleDimensions(int& width, int& height) override;
+   void GetModuleDimensions(float& width, float& height) override;
    void DrawModule() override;
    bool Enabled() const override { return mEnabled; }
    

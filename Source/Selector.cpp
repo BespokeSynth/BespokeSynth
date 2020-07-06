@@ -104,7 +104,7 @@ namespace
    const float extraH = 6 + RadioButton::GetSpacing();
 }
 
-void Selector::GetModuleDimensions(int &width, int &height)
+void Selector::GetModuleDimensions(float& width, float& height)
 {
    width = mSelector->GetRect().width + extraW;
    height = mSelector->GetRect().height + extraH;

@@ -385,10 +385,10 @@ void Producer::CheckboxUpdated(Checkbox *checkbox)
    }
 }
 
-void Producer::GetModuleDimensions(int& x, int&y)
+void Producer::GetModuleDimensions(float& width, float& height)
 {
-   x = 910;
-   y = 430;
+   width = 910;
+   height = 430;
 }
 
 void Producer::FloatSliderUpdated(FloatSlider* slider, float oldVal)

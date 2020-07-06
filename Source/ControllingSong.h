@@ -54,7 +54,7 @@ private:
    //IDrawableModule
    void DrawModule() override;
    bool Enabled() const override { return mEnabled; }
-   void GetModuleDimensions(int& x, int& y) override { x=560; y=160; }
+   void GetModuleDimensions(float& width, float& height) override { width=560; height=160; }
    
    void LoadSong(int index);
    

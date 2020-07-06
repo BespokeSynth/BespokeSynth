@@ -101,7 +101,7 @@ void SampleCanvas::OnClicked(int x, int y, bool right)
 {
    IDrawableModule::OnClicked(x, y, right);
    
-   int canvasX,canvasY;
+   float canvasX,canvasY;
    mCanvas->GetPosition(canvasX, canvasY, true);
    if (y >= 0 && y < canvasY)
    {
@@ -114,7 +114,7 @@ void SampleCanvas::OnClicked(int x, int y, bool right)
 
 bool SampleCanvas::MouseScrolled(int x, int y, float scrollX, float scrollY)
 {
-   int canvasX,canvasY;
+   float canvasX,canvasY;
    mCanvas->GetPosition(canvasX, canvasY, true);
    ofVec2f canvasPos = ofVec2f(ofMap(x, canvasX, canvasX+mCanvas->GetWidth(), 0, 1),
                                ofMap(y, canvasY, canvasY+mCanvas->GetHeight(), 0, 1));

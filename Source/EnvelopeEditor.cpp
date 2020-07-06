@@ -425,7 +425,7 @@ void EnvelopeEditor::DrawModule()
 {
    if (!mPinned)
    {
-      int w,h;
+      float w,h;
       GetDimensions(w,h);
       
       ofPushStyle();

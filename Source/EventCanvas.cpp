@@ -277,7 +277,7 @@ bool EventCanvas::MouseScrolled(int x, int y, float scrollX, float scrollY)
       mCanvas->SetRowOffset(mCanvas->GetRowOffset()+scrollWhole);
    }*/
    
-   int canvasX,canvasY;
+   float canvasX,canvasY;
    mCanvas->GetPosition(canvasX, canvasY, true);
    ofVec2f canvasPos = ofVec2f(ofMap(x, canvasX, canvasX+mCanvas->GetWidth(), 0, 1),
                                ofMap(y, canvasY, canvasY+mCanvas->GetHeight(), 0, 1));
@@ -338,7 +338,7 @@ void EventCanvas::Resize(float w, float h)
    mPositionSlider->SetDimensions(w, 14);
 }
 
-void EventCanvas::GetModuleDimensions(int& width, int& height)
+void EventCanvas::GetModuleDimensions(float& width, float& height)
 {
    width = mCanvas->GetWidth() + extraW;
    height = mCanvas->GetHeight() + extraH;

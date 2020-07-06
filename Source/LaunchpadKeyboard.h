@@ -86,7 +86,7 @@ private:
 
    //IDrawableModule
    void DrawModule() override;
-   void GetModuleDimensions(int& width, int& height) override { width=120; height=74; }
+   void GetModuleDimensions(float& width, float& height) override { width=120; height=74; }
    
    void UpdateLights(bool force = false);
    GridColor GetGridSquareColor(int x, int y);

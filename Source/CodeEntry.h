@@ -37,7 +37,7 @@ public:
    void SetText(string text) { UpdateString(text); }
    void SetError(bool error, int errorLine = -1);
    
-   void GetDimensions(int& width, int& height) override { width = mWidth; height = mHeight; }
+   void GetDimensions(float& width, float& height) override { width = mWidth; height = mHeight; }
    void SetDimensions(float width, float height) { mWidth = width; mHeight = height; }
 
    //IUIControl

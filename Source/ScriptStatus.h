@@ -39,7 +39,7 @@ private:
    //IDrawableModule
    void DrawModule() override;
    bool Enabled() const override { return true; }
-   void GetModuleDimensions(int& width, int& height) override { width = mWidth; height = mHeight; }
+   void GetModuleDimensions(float& width, float& height) override { width = mWidth; height = mHeight; }
    bool IsResizable() const override { return true; }
    void Resize(float w, float h) override { mWidth = w; mHeight = h; }
    

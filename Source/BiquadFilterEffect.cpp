@@ -118,7 +118,7 @@ float BiquadFilterEffect::GetEffectAmount()
    return 0;
 }
 
-void BiquadFilterEffect::GetModuleDimensions(int& width, int& height)
+void BiquadFilterEffect::GetModuleDimensions(float& width, float& height)
 {
    width = 90;
    height = 69;
@@ -158,7 +158,7 @@ bool BiquadFilterEffect::MouseMoved(float x, float y)
 
    if (mMouseControl)
    {
-      int thisx,thisy;
+      float thisx,thisy;
       GetPosition(thisx, thisy);
       x += thisx;
       y += thisy;

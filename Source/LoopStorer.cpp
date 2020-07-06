@@ -193,10 +193,10 @@ void LoopStorer::CheckboxUpdated(Checkbox* checkbox)
    }
 }
 
-void LoopStorer::GetModuleDimensions(int& x, int&y)
+void LoopStorer::GetModuleDimensions(float& width, float& height)
 {
-   x = 180;
-   y = GetRowY((int)mSamples.size());
+   width = 180;
+   height = GetRowY((int)mSamples.size());
 }
 
 void LoopStorer::FloatSliderUpdated(FloatSlider* slider, float oldVal)

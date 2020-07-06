@@ -62,7 +62,7 @@ public:
 private:
    //IDrawableModule
    void DrawModule() override;
-   void GetModuleDimensions(int& width, int& height) override { width = 160; height = 160; }
+   void GetModuleDimensions(float& width, float& height) override { width = 160; height = 160; }
    bool Enabled() const override { return mEnabled; }
    
    int mVels[VSS_MAX_STEPS];

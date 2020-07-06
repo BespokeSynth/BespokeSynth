@@ -55,7 +55,7 @@ void UIGrid::Init(int x, int y, int w, int h, int cols, int rows, IClickable* pa
 void UIGrid::Render()
 {
    ofPushStyle();
-   int w,h;
+   float w,h;
    GetDimensions(w,h);
    float xsize = float(mWidth) / mCols;
    float ysize = float(mHeight) / mRows;

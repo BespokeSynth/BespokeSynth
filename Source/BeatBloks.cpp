@@ -952,10 +952,10 @@ void BeatBloks::CheckboxUpdated(Checkbox *checkbox)
    }
 }
 
-void BeatBloks::GetModuleDimensions(int& x, int& y)
+void BeatBloks::GetModuleDimensions(float& width, float& height)
 {
-   x = 910;
-   y = mRemixBufferY+mBufferH+45;
+   width = 910;
+   height = mRemixBufferY+mBufferH+45;
 }
 
 void BeatBloks::FloatSliderUpdated(FloatSlider* slider, float oldVal)

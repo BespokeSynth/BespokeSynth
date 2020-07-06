@@ -30,7 +30,7 @@ private:
    //IDrawableModule
    void DrawModule() override;
    bool Enabled() const override { return true; }
-   void GetModuleDimensions(int& x, int& y) override { x=150; y=56; }
+   void GetModuleDimensions(float& width, float& height) override { width=150; height=56; }
    
    double mStartTime;
    ClickButton* mResetButton;

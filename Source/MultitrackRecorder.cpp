@@ -78,7 +78,7 @@ void MultitrackRecorder::Poll()
    int reallocDist = gSampleRate; //1 second from the end
    ArrangementMaster::mSampleLength = mRecordingLength;
    
-   int cW, cH;
+   float cW, cH;
    mClipArranger[0].GetDimensions(cW, cH);
    for (int i=0; i<NUM_CLIP_ARRANGERS; ++i)
       mClipArranger[i].SetPosition(0, 25 + mBufferHeight * mRecordBuffers.size() + i*cH);
@@ -401,9 +401,9 @@ void MultitrackRecorder::FilesDropped(vector<string> files, int x, int y)
    }
 }
 
-void MultitrackRecorder::GetModuleDimensions(int& width, int& height)
+void MultitrackRecorder::GetModuleDimensions(float& width, float& height)
 {
-   int cW, cH;
+   float cW, cH;
    mClipArranger[0].GetDimensions(cW, cH);
    
    width = mBufferWidth + 100;

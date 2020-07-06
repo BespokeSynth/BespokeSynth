@@ -421,7 +421,7 @@ void StepSequencer::DrawModule()
    mVelocityGridController->Draw();
    mMetaStepGridController->Draw();
    
-   int gridX, gridY;
+   float gridX, gridY;
    mGrid->GetPosition(gridX, gridY, true);
    for (int i=0; i<NUM_STEPSEQ_ROWS; ++i)
    {
@@ -504,7 +504,7 @@ void StepSequencer::DrawRowLabel(const char* label, int row, int x, int y)
    DrawTextLeftJustify(label, x, y+row*9.4f);
 }
 
-void StepSequencer::GetModuleDimensions(int &width, int &height)
+void StepSequencer::GetModuleDimensions(float& width, float& height)
 {
    width = mGrid->GetWidth() + 45;
    if (mAdjustOffsets)

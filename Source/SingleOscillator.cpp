@@ -252,7 +252,7 @@ void SingleOscillator::DrawModuleUnclipped()
    }
 }
 
-void SingleOscillator::GetModuleDimensions(int& width, int& height)
+void SingleOscillator::GetModuleDimensions(float& width, float& height)
 {
    width = 180;
    height = 143;

@@ -566,7 +566,7 @@ void Push2Control::DrawControls(vector<IUIControl*> controls, bool sliders, floa
          if (dropdown != nullptr)
          {
             const float kCentering = 7;
-            int w, h;
+            float w, h;
             dropdown->GetPopupDimensions(w, h);
             ofPushMatrix();
             ofTranslate(kColumnSpacing * i + 3, yPos + kCentering - h * controls[i]->GetMidiValue());

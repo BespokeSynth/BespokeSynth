@@ -30,7 +30,7 @@ public:
    void Render() override;
    void SetExtents(float start, float end) { mStart = start; mEnd = end; }
    void SetColor(ofColor color) { mColor = color; }
-   void GetDimensions(int& width, int& height) override { width = mWidth; height = mHeight; }
+   void GetDimensions(float& width, float& height) override { width = mWidth; height = mHeight; }
    void SetDimensions(float width, float height) { mWidth = width; mHeight = height; }
    void DeleteBetween(float start, float end);
    

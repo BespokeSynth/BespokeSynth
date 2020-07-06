@@ -46,7 +46,7 @@ public:
    bool TestClick(int x, int y, bool right, bool testOnly = false) override;
    bool MouseMoved(float x, float y) override;
    void MouseReleased() override;
-   void GetDimensions(int& width, int& height) override { width = 10; height = 10; }
+   void GetDimensions(float& width, float& height) override { width = 10; height = 10; }
    
    IDrawableModule* GetOwningModule() const;
    IClickable* GetTarget() const { return mTarget; }

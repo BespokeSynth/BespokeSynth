@@ -345,7 +345,7 @@ void SamplerGrid::DrawModule()
    }
 }
 
-void SamplerGrid::GetModuleDimensions(int& width, int& height)
+void SamplerGrid::GetModuleDimensions(float& width, float& height)
 {
    if (mEditMode)
    {

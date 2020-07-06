@@ -50,7 +50,7 @@ protected:
 
 private:
    void OnClicked(int x, int y, bool right) override;
-   void GetDimensions(int& width, int& height) override { width = mWidth; height = 15; }
+   void GetDimensions(float& width, float& height) override { width = mWidth; height = 15; }
    void CalcSliderVal();
    int mWidth;
    bool* mVar;

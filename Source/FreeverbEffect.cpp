@@ -85,7 +85,7 @@ void FreeverbEffect::DrawModule()
    mWidthSlider->Draw();
 }
 
-void FreeverbEffect::GetModuleDimensions(int& width, int& height)
+void FreeverbEffect::GetModuleDimensions(float& width, float& height)
 {
    if (mEnabled)
    {

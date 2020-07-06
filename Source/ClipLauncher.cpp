@@ -187,10 +187,10 @@ void ClipLauncher::CheckboxUpdated(Checkbox* checkbox)
    }
 }
 
-void ClipLauncher::GetModuleDimensions(int& x, int&y)
+void ClipLauncher::GetModuleDimensions(float& width, float& height)
 {
-   x = 180;
-   y = 180;
+   width = 180;
+   height = 180;
 }
 
 void ClipLauncher::FloatSliderUpdated(FloatSlider* slider, float oldVal)

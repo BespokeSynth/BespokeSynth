@@ -49,7 +49,7 @@ public:
 private:
    //IDrawableModule
    void DrawModule() override;
-   void GetModuleDimensions(int& width, int& height) override { width = 135; height = 75; }
+   void GetModuleDimensions(float& width, float& height) override { width = 135; height = 75; }
    void OnClicked(int x, int y, bool right) override;
    void MouseReleased() override;
    bool MouseMoved(float x, float y) override;

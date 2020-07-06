@@ -35,20 +35,20 @@ bool IUIControl::TestHover(int x, int y)
    if (!mShowing)
       return false;
    
-   int w,h;
+   float w,h;
    GetDimensions(w, h);
    if (x>=0 && x<w && y>=0 && y<h) //make sure we're hovered over the control
    {
       IDrawableModule* moduleParent = GetModuleParent();
-      int thisX,thisY;
+      float thisX,thisY;
       GetPosition(thisX, thisY);
       x += thisX;
       y += thisY;
       if (TheSynth->GetModuleAt(x,y) == moduleParent)
       {
-         int localX,localY;
+         float localX,localY;
          GetPosition(localX, localY, K(localOnly));
-         int parentW,parentH;
+         float parentW,parentH;
          GetParent()->GetDimensions(parentW, parentH);
          if (localX < parentW && localY < parentH)
             return true;
@@ -71,7 +71,7 @@ void IUIControl::DrawHover()
    
    if (gHoveredUIControl == this && IKeyboardFocusListener::GetActiveKeyboardFocus() == nullptr)
    {
-      int w,h;
+      float w,h;
       GetDimensions(w, h);
       ofPushStyle();
       ofNoFill();
@@ -82,7 +82,7 @@ void IUIControl::DrawHover()
    
    if (mRemoteControlCount > 0 && TheSynth->InMidiMapMode())
    {
-      int w,h;
+      float w,h;
       GetDimensions(w, h);
       ofPushStyle();
       ofFill();
@@ -93,7 +93,7 @@ void IUIControl::DrawHover()
    
    if (gBindToUIControl == this)
    {
-      int w,h;
+      float w,h;
       GetDimensions(w, h);
       ofPushStyle();
       ofNoFill();
@@ -113,7 +113,7 @@ void IUIControl::DrawPatchCableHover()
         PatchCable::sActivePatchCable->GetConnectionType() == kConnectionType_Grid) &&
        PatchCable::sActivePatchCable->IsValidTarget(this))
    {
-      int w,h;
+      float w,h;
       GetDimensions(w, h);
       ofPushStyle();
       ofNoFill();

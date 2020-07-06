@@ -132,7 +132,7 @@ void Ramper::ButtonClicked(ClickButton* button)
    }
 }
 
-void Ramper::GetModuleDimensions(int &width, int &height)
+void Ramper::GetModuleDimensions(float& width, float& height)
 {
    width = 100;
    height = 38;

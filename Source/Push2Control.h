@@ -55,7 +55,7 @@ private:
    void DrawModuleUnclipped() override;
    void PostRender() override;
    bool Enabled() const override { return true; }
-   void GetModuleDimensions(int& width, int& height) override { width = mWidth; height = mHeight; }
+   void GetModuleDimensions(float& width, float& height) override { width = mWidth; height = mHeight; }
    void OnClicked(int x, int y, bool right) override;
    
    NBase::Result Initialize();

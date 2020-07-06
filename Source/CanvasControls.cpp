@@ -84,7 +84,7 @@ void CanvasControls::AllowDragModeSelection(bool allow)
 
 void CanvasControls::PreDrawModule()
 {
-   int x,y;
+   float x,y;
    mCanvas->GetPosition(x, y, K(localOnly));
    SetPosition(x,y+mCanvas->GetHeight());
 }
@@ -104,7 +104,7 @@ void CanvasControls::DrawModule()
    }
 }
 
-void CanvasControls::GetModuleDimensions(int& width, int& height)
+void CanvasControls::GetModuleDimensions(float& width, float& height)
 {
    width = mWidth;
    height = 92;

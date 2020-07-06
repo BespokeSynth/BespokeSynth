@@ -41,7 +41,7 @@ private:
    //IDrawableModule
    void DrawModule() override;
    bool Enabled() const override { return true; }
-   void GetModuleDimensions(int& width, int& height) override;
+   void GetModuleDimensions(float& width, float& height) override;
    
    char* mLabels[OSC_OUTPUT_MAX_PARAMS];
    list<TextEntry*> mLabelEntry;

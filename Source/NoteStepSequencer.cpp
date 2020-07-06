@@ -187,7 +187,7 @@ void NoteStepSequencer::DrawModule()
    
    ofPushStyle();
    ofFill();
-   int gridX, gridY, gridW, gridH;
+   float gridX, gridY, gridW, gridH;
    mGrid->GetPosition(gridX, gridY, true);
    gridW = mGrid->GetWidth();
    gridH = mGrid->GetHeight();
@@ -536,7 +536,7 @@ float NoteStepSequencer::ExtraHeight() const
    return height;
 }
 
-void NoteStepSequencer::GetModuleDimensions(int& width, int& height)
+void NoteStepSequencer::GetModuleDimensions(float& width, float& height)
 {
    width = mGrid->GetWidth() + ExtraWidth();
    height = mGrid->GetHeight() + ExtraHeight();
@@ -551,7 +551,7 @@ void NoteStepSequencer::Resize(float w, float h)
 void NoteStepSequencer::UpdateVelocityGridPos()
 {
    mVelocityGrid->SetDimensions(mGrid->GetWidth(), 45);
-   int gridX,gridY;
+   float gridX,gridY;
    mGrid->GetPosition(gridX, gridY, true);
    mVelocityGrid->SetPosition(gridX, gridY + mGrid->GetHeight());
    mLoopResetPointSlider->PositionTo(mVelocityGrid, kAnchor_Below);

@@ -83,7 +83,7 @@ public:
    void OnInput(int control, float velocity);
    
 private:
-   void GetDimensions(int& width, int& height) override { width = 30; height = 15; }
+   void GetDimensions(float& width, float& height) override { width = 30; height = 15; }
    
    unsigned int mRows;
    unsigned int mCols;

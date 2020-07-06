@@ -37,7 +37,7 @@ public:
    void SetDimensions(int w, int h) { mWidth = w; mHeight = h; }
    bool HasTitleBar() const override { return false; }
    string GetTitleLabel() override { return ""; }
-   void GetDimensions(int& width, int& height) override { width = mWidth; height = mHeight; }
+   void GetDimensions(float& width, float& height) override { width = mWidth; height = mHeight; }
 private:
    void OnClicked(int x, int y, bool right) override;
    int mWidth;
@@ -66,7 +66,7 @@ public:
    void DrawLabel(bool draw) { mDrawLabel = draw; }
    void SetWidth(int width) { mWidth = width; }
    void SetDrawTriangle(bool draw) { mDrawTriangle = draw; }
-   void GetPopupDimensions(int& width, int& height) { mModalList.GetDimensions(width, height); }
+   void GetPopupDimensions(float& width, float& height) { mModalList.GetDimensions(width, height); }
    void SetMaxPerColumn(int max) { mMaxPerColumn = max; CalculateWidth(); }
 
    //IUIControl
@@ -83,7 +83,7 @@ public:
    void SaveState(FileStreamOut& out) override;
    void LoadState(FileStreamIn& in, bool shouldSetValue = true) override;
    
-   void GetDimensions(int& width, int& height) override;
+   void GetDimensions(float& width, float& height) override;
    
 protected:
    ~DropdownList();   //protected so that it can't be created on the stack

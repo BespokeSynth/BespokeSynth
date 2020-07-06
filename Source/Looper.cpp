@@ -1072,7 +1072,7 @@ void Looper::SampleDropped(int x, int y, Sample* sample)
    }
 }
 
-void Looper::GetModuleDimensions(int& width, int& height)
+void Looper::GetModuleDimensions(float& width, float& height)
 {
    if (mShowGranular)
    {

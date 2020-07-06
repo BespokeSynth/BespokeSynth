@@ -36,7 +36,7 @@ public:
    float GetMidiValue() override;
    string GetDisplayValue(float val) const override { return val > 0 ? "click" : "nothing"; }
    int GetNumValues() override { return 2; }
-   void GetDimensions(int& width, int& height) override { width = mWidth; height = 15; }
+   void GetDimensions(float& width, float& height) override { width = mWidth; height = 15; }
    void SaveState(FileStreamOut& out) override {}
    void LoadState(FileStreamIn& in, bool shouldSetValue) override {}
    bool IsSliderControl() override { return false; }
