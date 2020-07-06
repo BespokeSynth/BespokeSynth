@@ -12,10 +12,18 @@
 #include "CodeEntry.h"
 #include "Transport.h"
 
+#include "pybind11/embed.h"
+#include "pybind11/stl.h"
+
+namespace py = pybind11;
+
 CodeEntry::CodeEntry(ICodeEntryListener* owner, const char* name, int x, int y, float w, float h)
 : mListener(owner)
 , mCharWidth(5.85f)
 , mCharHeight(15)
+, mUndoBufferPos(0)
+, mUndosLeft(0)
+, mRedosLeft(0)
 , mCaretPosition(0)
 , mCaretPosition2(0)
 , mLastPublishTime(-999)
@@ -40,6 +48,11 @@ CodeEntry::~CodeEntry()
 {
 }
 
+namespace
+{
+   const float kFontSize = 14;
+}
+
 void CodeEntry::Render()
 {
    ofPushStyle();
@@ -54,32 +67,47 @@ void CodeEntry::Render()
    
    bool isCurrent = IKeyboardFocusListener::GetActiveKeyboardFocus() == this;
    
-   ofColor color(220,220,220);
-   if (mString != mPublishedString)
-      color.set(200, 255, 200);
-   else if (isCurrent)
-      color.set(255,255,255);
+   ofColor color = ofColor::white;
    
    ofFill();
+   
+   if (isCurrent)
+   {
+      ofSetColor(60,60,60);
+   }
+   else
+   {
+      if (mString != mPublishedString)
+         ofSetColor(25,35,25);
+      else
+         ofSetColor(35,35,35);
+   }
+   ofRect(mX, mY, w, h);
+   
    if (gTime - mLastPublishTime < 200)
    {
       ofSetColor(0,255,0,100*(1-(gTime - mLastPublishTime)/200));
       ofRect(mX,mY,w,h);
    }
    
-   if (isCurrent)
-   {
-      ofFill();
-      ofSetColor(80,80,80);
-      ofRect(mX, mY, w, h);
-   }
-   
+   ofPushStyle();
    ofNoFill();
    if (mHasError)
+   {
       ofSetColor(255, 0, 0, gModuleDrawAlpha);
+      ofSetLineWidth(2);
+   }
+   else if (mString != mPublishedString)
+   {
+      ofSetColor(170, 255, 170, gModuleDrawAlpha);
+      ofSetLineWidth(2);
+   }
    else
+   {
       ofSetColor(color,gModuleDrawAlpha);
+   }
    ofRect(mX,mY,w,h);
+   ofPopStyle();
    
    if (mHasError && mErrorLine >= 0)
    {
@@ -90,15 +118,51 @@ void CodeEntry::Render()
       ofFill();
    }
    
-   const float kFontSize = 14;
    mCharWidth = gFontFixedWidth.GetStringWidth("x", kFontSize, K(isRenderThread));
    mCharHeight = gFontFixedWidth.GetStringHeight("x", kFontSize, K(isRenderThread));
    
-   ofSetColor(color,gModuleDrawAlpha * .2f);
-   gFontFixedWidth.DrawString(mPublishedString, kFontSize, mX+2 - mScroll.x, mY + mCharHeight - mScroll.y);
+   if (mString != mPublishedString)
+   {
+      ofSetColor(color, gModuleDrawAlpha * .05f);
+      gFontFixedWidth.DrawString(mPublishedString, kFontSize, mX+2 - mScroll.x, mY + mCharHeight - mScroll.y);
+   }
    
-   ofSetColor(color,gModuleDrawAlpha);
-   gFontFixedWidth.DrawString(mString, kFontSize, mX+2 - mScroll.x, mY + mCharHeight - mScroll.y);
+   ofSetColor(color, gModuleDrawAlpha);
+   
+   //syntax-highlighted text
+   static ofColor stringColor(0.9*255, 0.7*255, 0.6*255, 255);
+   static ofColor numberColor(0.9*255, 0.9*255, 1.0*255, 255);
+   static ofColor name1Color(0.4*255, 0.9*255, 0.8*255, 255);
+   static ofColor name2Color(0.7*255, 0.9*255, 0.3*255, 255);
+   static ofColor name3Color(0.3*255, 0.9*255, 0.4*255, 255);
+   static ofColor definedColor(0.6*255, 1.0*255, 0.9*255, 255);
+   static ofColor equalsColor(0.9*255, 0.7*255, 0.6*255, 255);
+   static ofColor parenColor(0.6*255, 0.5*255, 0.9*255, 255);
+   static ofColor braceColor(0.4*255, 0.5*255, 0.7*255, 255);
+   static ofColor bracketColor(0.5*255, 0.8*255, 0.7*255, 255);
+   static ofColor opColor(0.9*255, 0.3*255, 0.6*255, 255);
+   static ofColor commaColor(0.5*255, 0.6*255, 0.5*255, 255);
+   static ofColor commentColor(0.5*255, 0.5*255, 0.5*255, 255);
+   static ofColor unknownColor = ofColor::white;
+   
+   ofPushStyle();
+   const float dim = .7f;
+   DrawSyntaxHighlight(mString, stringColor * (isCurrent ? 1 : dim), mSyntaxHighlightMapping, 3, -1);
+   DrawSyntaxHighlight(mString, numberColor * (isCurrent ? 1 : dim), mSyntaxHighlightMapping, 2, -1);
+   DrawSyntaxHighlight(mString, name1Color * (isCurrent ? 1 : dim), mSyntaxHighlightMapping, 1, -1);
+   DrawSyntaxHighlight(mString, name2Color * (isCurrent ? 1 : dim), mSyntaxHighlightMapping, 90, -1);
+   DrawSyntaxHighlight(mString, name3Color * (isCurrent ? 1 : dim), mSyntaxHighlightMapping, 91, -1);
+   DrawSyntaxHighlight(mString, definedColor * (isCurrent ? 1 : dim), mSyntaxHighlightMapping, 92, -1);
+   DrawSyntaxHighlight(mString, equalsColor * (isCurrent ? 1 : dim), mSyntaxHighlightMapping, 22, -1);
+   DrawSyntaxHighlight(mString, parenColor * (isCurrent ? 1 : dim), mSyntaxHighlightMapping, 7, 8);
+   DrawSyntaxHighlight(mString, braceColor * (isCurrent ? 1 : dim), mSyntaxHighlightMapping, 25, 26);
+   DrawSyntaxHighlight(mString, bracketColor * (isCurrent ? 1 : dim), mSyntaxHighlightMapping, 9, 10);
+   DrawSyntaxHighlight(mString, opColor * (isCurrent ? 1 : dim), mSyntaxHighlightMapping, 51, -1);
+   DrawSyntaxHighlight(mString, commaColor * (isCurrent ? 1 : dim), mSyntaxHighlightMapping, 12, -1);
+   DrawSyntaxHighlight(mString, commentColor * (isCurrent ? 1 : dim), mSyntaxHighlightMapping, 53, -1);
+   DrawSyntaxHighlight(mString, unknownColor * (isCurrent ? 1 : dim), mSyntaxHighlightMapping, 52, -1); //"error" token (like incomplete quotes)
+   DrawSyntaxHighlight(mString, unknownColor * (isCurrent ? 1 : dim), mSyntaxHighlightMapping, -1, -1);
+   ofPopStyle();
    
    /*for (int i = 0; i<60; ++i)
    {
@@ -165,6 +229,139 @@ void CodeEntry::Render()
    ofPopStyle();
 }
 
+void CodeEntry::DrawSyntaxHighlight(string input, ofColor color, std::vector<int> mapping, int filter1, int filter2)
+{
+   string filtered = FilterText(input, mapping, filter1, filter2);
+   ofSetColor(color, gModuleDrawAlpha);
+   gFontFixedWidth.DrawString(filtered, kFontSize, mX+2 - mScroll.x, mY + mCharHeight - mScroll.y);
+}
+
+string CodeEntry::FilterText(string input, std::vector<int> mapping, int filter1, int filter2)
+{
+   int nonSpaceCount = 0;
+   bool inComment = false;
+   for (size_t i=0; i<input.size(); ++i)
+   {
+      bool isSpace = (input[i] == ' ');
+      
+      if (nonSpaceCount < mapping.size() && mapping[nonSpaceCount] == 53 && input[i] == '#') //comment
+         inComment = true;
+      
+      if (input[i] == '\n')
+         inComment = false;
+      
+      if (input[i] != '\n')
+      {
+         if (nonSpaceCount < mapping.size())
+         {
+            if (mapping[nonSpaceCount] != filter1 && mapping[nonSpaceCount] != filter2)
+               input[i] = ' ';
+         }
+         else
+         {
+            bool showLeftovers = (filter1 == -1 && filter2 == -1);
+            if (!showLeftovers)
+               input[i] = ' ';
+         }
+      }
+      
+      if (!isSpace || inComment)
+         ++nonSpaceCount;
+   }
+   return input;
+}
+
+void CodeEntry::UpdateSyntaxHighlightMapping()
+{
+   string syntaxHighlightCode = R"(def syntax_highlight_basic():
+    """
+    this uses the built in lexer/tokenizer in python to identify part of code
+    will return a meaningful lookuptable for index colours per character
+    """
+    import tokenize
+    import io
+    import token
+   
+    text = syntax_highlight_code
+
+    #print(token.tok_name) #   <--- dict of token-kinds.
+    
+    output = []
+    defined = []
+
+    with io.StringIO(unicode(text)) as f:
+        try:
+           tokens = tokenize.generate_tokens(f.readline)
+
+           for token in tokens:
+               #print(token)
+               if token[0] in (0, 5, 56, 256):
+                   continue
+               if not token[1] or (token[2] == token[3]):
+                   continue
+
+               token_type = token[0]
+               
+               if token_type == 1:
+                   if token[1] in {'print', 'def', 'class', 'break', 'continue', 'return', 'while', 'or', 'and', 'dir', 'if', 'elif', 'else', 'is', 'in', 'as', 'out', 'with', 'from', 'import', 'with', 'for'}:
+                       token_type = 90
+                   elif token[1] in {'False', 'True', 'yield', 'repr', 'range', 'enumerate', 'len', 'type', 'list', 'tuple', 'int', 'str', 'float'}:
+                       token_type = 91
+                   elif token[1] in globals() or token[1] in defined:
+                       token_type = 92
+                   else:
+                       defined.append(token[1])
+
+               elif token_type == 51:
+                   # OPS
+                   # 7: 'LPAR', 8: 'RPAR
+                   # 9: 'LSQB', 10: 'RSQB'
+                   # 25: 'LBRACE', 26: 'RBRACE'
+                   #if token.exact_type in {7, 8, 9, 10, 25, 26}:
+                   #    token_type = token.exact_type
+                   #elif token.exact_type == 22:
+                   #    token_type = token.exact_type
+                   if token[1] in {'(', ')'}:
+                      token_type = 7
+                   elif token[1] in {'[', ']'}:
+                      token_type = 9
+                   elif token[1] in {'{', '}'}:
+                     token_type = 25
+                   elif token[1] in {'='}:
+                     token_type = 22
+                   elif token[1] in {','}:
+                     token_type = 12
+
+               # print(token)
+               #  start = (line number, 1 indexed) , (char index, 0 indexed)
+               # print('|start:', token.start, '|end:', token.end, "[", token.exact_type, token.type, "]")
+               row_start, char_start = token[2][0]-1, token[2][1]
+               row_end, char_end = token[3][0]-1, token[3][1]
+               #index1 = (row_start * textWidth) + char_start
+               #index2 = (row_end * textWidth) + char_end
+
+               output = output + [token_type]*(char_end - char_start)
+               #print(char_end-char_start)
+        except:
+           print("exception when syntax highlighting")
+            
+
+    #print(output)
+    return output)";
+   
+   try
+   {
+      py::exec(syntaxHighlightCode, py::globals());
+      py::globals()["syntax_highlight_code"] = mString;
+      py::object ret = py::eval("syntax_highlight_basic()", py::globals());
+      mSyntaxHighlightMapping = ret.cast< std::vector<int> >();
+   }
+   catch (const std::exception &e)
+   {
+      ofLog() << "syntax highlight execution exception: " << e.what();
+   }
+}
+
 void CodeEntry::SetError(bool error, int errorLine)
 {
    mHasError = error;
@@ -207,9 +404,9 @@ void CodeEntry::OnKeyPressed(int key, bool isRepeat)
       {
          MoveCaret(mCaretPosition - 1, false);
          if (mCaretPosition < mString.length() - 1)
-            mString = mString.substr(0, mCaretPosition) + mString.substr(mCaretPosition+1);
+            UpdateString(mString.substr(0, mCaretPosition) + mString.substr(mCaretPosition+1));
          else
-            mString = mString.substr(0, mCaretPosition);
+            UpdateString(mString.substr(0, mCaretPosition));
       }
    }
    else if (key == KeyPress::deleteKey)
@@ -221,9 +418,9 @@ void CodeEntry::OnKeyPressed(int key, bool isRepeat)
       else if (mCaretPosition > 0)
       {
          if (mCaretPosition == 0)
-            mString = mString.substr(1);
+            UpdateString(mString.substr(1));
          if (mCaretPosition < mString.length() - 1)
-            mString = mString.substr(0, mCaretPosition) + mString.substr(mCaretPosition + 1);
+            UpdateString(mString.substr(0, mCaretPosition) + mString.substr(mCaretPosition + 1));
       }
    }
    else if (key == OF_KEY_TAB)
@@ -236,14 +433,24 @@ void CodeEntry::OnKeyPressed(int key, bool isRepeat)
       {
          ofVec2f coords = GetCaretCoords(mCaretPosition);
          int spacesNeeded = kTabSize - (int)coords.x % kTabSize;
+         string tab;
          for (int i=0; i<spacesNeeded; ++i)
-            AddCharacter(' ');
+            tab += " ";
+         AddString(tab);
       }
+   }
+   else if (key == ']' && GetKeyModifiers() == kModifier_Command)
+   {
+      ShiftLines(false);
+   }
+   else if (key == '[' && GetKeyModifiers() == kModifier_Command)
+   {
+      ShiftLines(true);
    }
    else if (key == OF_KEY_ESC)
    {
       IKeyboardFocusListener::ClearActiveKeyboardFocus(!K(acceptEntry));
-      mString = mPublishedString;   //revert
+      UpdateString(mPublishedString);   //revert
       mCaretPosition2 = mCaretPosition;
    }
    else if (key == OF_KEY_LEFT)
@@ -251,6 +458,10 @@ void CodeEntry::OnKeyPressed(int key, bool isRepeat)
       if (GetKeyModifiers() & kModifier_Command)
       {
          MoveCaretToStart();
+      }
+      else if (GetKeyModifiers() & kModifier_Alt)
+      {
+         MoveCaretToNextToken(true);
       }
       else
       {
@@ -263,6 +474,10 @@ void CodeEntry::OnKeyPressed(int key, bool isRepeat)
       if (GetKeyModifiers() & kModifier_Command)
       {
          MoveCaretToEnd();
+      }
+      else if (GetKeyModifiers() & kModifier_Alt)
+      {
+         MoveCaretToNextToken(false);
       }
       else
       {
@@ -304,9 +519,10 @@ void CodeEntry::OnKeyPressed(int key, bool isRepeat)
                break;
          }
       }
-      AddCharacter('\n');
+      string tab = "\n";
       for (int i=0; i<numSpaces; ++i)
-         AddCharacter(' ');
+         tab += ' ';
+      AddString(tab);
    }
    else if (key == 'V' && GetKeyModifiers() == kModifier_Command)
    {
@@ -314,8 +530,7 @@ void CodeEntry::OnKeyPressed(int key, bool isRepeat)
          RemoveSelectedText();
       
       juce::String clipboard = SystemClipboard::getTextFromClipboard();
-      for (int i=0; i<clipboard.length(); ++i)
-         AddCharacter(clipboard[i]);
+      AddString(clipboard.toStdString());
    }
    else if (key == 'V' && (GetKeyModifiers() == (kModifier_Command | kModifier_Shift)))
    {
@@ -330,8 +545,7 @@ void CodeEntry::OnKeyPressed(int key, bool isRepeat)
             RemoveSelectedText();
          
          string insert = pasteName->Path();
-         for (int i=0; i<insert.length(); ++i)
-            AddCharacter(insert[i]);
+         AddString(insert);
       }
    }
    else if ((key == 'C' || key == 'X') && GetKeyModifiers() == kModifier_Command)
@@ -345,6 +559,19 @@ void CodeEntry::OnKeyPressed(int key, bool isRepeat)
          if (key == 'X')
             RemoveSelectedText();
       }
+   }
+   else if (key == 'Z' && GetKeyModifiers() == kModifier_Command)
+   {
+      Undo();
+   }
+   else if (key == 'Z' && (GetKeyModifiers() == (kModifier_Command | kModifier_Shift)))
+   {
+      Redo();
+   }
+   else if (key == 'A' && GetKeyModifiers() == kModifier_Command)
+   {
+      mCaretPosition = 0;
+      mCaretPosition2 = (int)mString.size();
    }
    else if (key == KeyPress::endKey)
    {
@@ -366,21 +593,85 @@ void CodeEntry::OnKeyPressed(int key, bool isRepeat)
 }
 
 void CodeEntry::Publish()
- {
-    mPublishedString = mString;
-    mLastPublishTime = gTime;
- }
+{
+   mPublishedString = mString;
+   mLastPublishTime = gTime;
+   UpdateSyntaxHighlightMapping();
+}
+
+void CodeEntry::Undo()
+{
+   if (mUndosLeft > 0)
+   {
+      int size = (int)mUndoBuffer.size();
+      mUndoBufferPos = (mUndoBufferPos - 1 + size) % size;
+      --mUndosLeft;
+      mRedosLeft = MIN(mRedosLeft + 1, size);
+      
+      mString = mUndoBuffer[mUndoBufferPos].mString;
+      mCaretPosition = mUndoBuffer[mUndoBufferPos].mCaretPos;
+      mCaretPosition2 = mUndoBuffer[mUndoBufferPos].mCaretPos;
+      
+      UpdateSyntaxHighlightMapping();
+   }
+}
+
+void CodeEntry::Redo()
+{
+   if (mRedosLeft > 0)
+   {
+      int size = (int)mUndoBuffer.size();
+      mUndoBufferPos = (mUndoBufferPos + 1) % size;
+      --mRedosLeft;
+      mUndosLeft = MIN(mUndosLeft + 1, size);
+      
+      mString = mUndoBuffer[mUndoBufferPos].mString;
+      mCaretPosition = mUndoBuffer[mUndoBufferPos].mCaretPos;
+      mCaretPosition2 = mUndoBuffer[mUndoBufferPos].mCaretPos;
+      
+      UpdateSyntaxHighlightMapping();
+   }
+}
+
+void CodeEntry::UpdateString(string newString)
+{
+   mUndoBuffer[mUndoBufferPos].mCaretPos = mCaretPosition;
+   
+   mString = newString;
+   
+   int size = (int)mUndoBuffer.size();
+   mRedosLeft = 0;
+   mUndosLeft = MIN(mUndosLeft + 1, size);
+   mUndoBufferPos = (mUndoBufferPos + 1) % size;
+   mUndoBuffer[mUndoBufferPos].mString = mString;
+   
+   UpdateSyntaxHighlightMapping();
+}
 
 void CodeEntry::AddCharacter(char c)
 {
    if (AllowCharacter(c))
    {
-      if (mCaretPosition != mCaretPosition2)
-         RemoveSelectedText();
-      
-      mString = mString.substr(0, mCaretPosition) + c + mString.substr(mCaretPosition);
-      MoveCaret(mCaretPosition + 1, false);
+      string s;
+      s += c;
+      AddString(s);
    }
+}
+
+void CodeEntry::AddString(string s)
+{
+   if (mCaretPosition != mCaretPosition2)
+      RemoveSelectedText();
+   
+   string toAdd;
+   for (int i=0; i<s.size(); ++i)
+   {
+      if (AllowCharacter(s[i]))
+         toAdd += s[i];
+   }
+   
+   UpdateString(mString.substr(0, mCaretPosition) + toAdd + mString.substr(mCaretPosition));
+   MoveCaret(mCaretPosition + toAdd.size(), false);
 }
 
 bool CodeEntry::AllowCharacter(char c)
@@ -394,7 +685,7 @@ void CodeEntry::RemoveSelectedText()
 {
    int caretStart = MIN(mCaretPosition, mCaretPosition2);
    int caretEnd = MAX(mCaretPosition, mCaretPosition2);
-   mString = mString.substr(0, caretStart) + mString.substr(caretEnd);
+   UpdateString(mString.substr(0, caretStart) + mString.substr(caretEnd));
    MoveCaret(caretStart, false);
 }
 
@@ -406,7 +697,7 @@ void CodeEntry::ShiftLines(bool backwards)
    ofVec2f coordsEnd = GetCaretCoords(caretEnd);
    
    auto lines = GetLines();
-   mString = "";
+   string newString = "";
    for (size_t i=0; i<lines.size(); ++i)
    {
       if (i >= coordsStart.y && i <= coordsEnd.y)
@@ -428,9 +719,9 @@ void CodeEntry::ShiftLines(bool backwards)
                charsToRemove = numSpaces;
             lines[i] = lines[i].substr(charsToRemove);
             if (i == coordsStart.y)
-               caretStart = (int)mString.size() + numSpaces - charsToRemove;
+               caretStart = (int)newString.size() + numSpaces - charsToRemove;
             if (i == coordsEnd.y)
-               caretEnd = (int)mString.size() + (int)lines[i].size();
+               caretEnd = (int)newString.size() + (int)lines[i].size();
          }
          else
          {
@@ -438,13 +729,14 @@ void CodeEntry::ShiftLines(bool backwards)
             for (int j=0; j<spacesNeeded; ++j)
                lines[i] = " " + lines[i];
             if (i == coordsStart.y)
-               caretStart = (int)mString.size() + numSpaces + spacesNeeded;
+               caretStart = (int)newString.size() + numSpaces + spacesNeeded;
             if (i == coordsEnd.y)
-               caretEnd = (int)mString.size() + (int)lines[i].size();
+               caretEnd = (int)newString.size() + (int)lines[i].size();
          }
       }
-      mString += lines[i] + "\n";
+      newString += lines[i] + "\n";
    }
+   UpdateString(newString);
    
    mCaretPosition = caretStart;
    mCaretPosition2 = caretEnd;
@@ -483,6 +775,16 @@ void CodeEntry::MoveCaretToEnd()
 {
    ofVec2f coords = GetCaretCoords(mCaretPosition);
    MoveCaret(GetCaretPosition(9999, coords.y));
+}
+
+void CodeEntry::MoveCaretToNextToken(bool backwards)
+{
+   //eh... just move it more for now
+   ofVec2f coords = GetCaretCoords(mCaretPosition);
+   int amount = 5;
+   if (backwards)
+      amount *= -1;
+   MoveCaret(GetCaretPosition(MAX(0, coords.x + amount), coords.y));
 }
 
 bool CodeEntry::MouseMoved(float x, float y)
@@ -595,6 +897,7 @@ void CodeEntry::LoadState(FileStreamIn& in, bool shouldSetValue)
    LoadStateValidate(rev == kSaveStateRev);
    
    in >> mString;
+   UpdateString(mString);
    //Publish();
    //if (mListener != nullptr)
    //   mListener->ExecuteCode(mString);

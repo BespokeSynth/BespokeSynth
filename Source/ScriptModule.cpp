@@ -30,11 +30,14 @@ namespace py = pybind11;
 //static
 std::vector<ScriptModule*> ScriptModule::sScriptModules;
 //static
+ScriptModule* ScriptModule::sLastLineExecutedModule = nullptr;
+//static
 double ScriptModule::sMostRecentRunTime = 0;
 
 ScriptModule::ScriptModule()
 : mCodeEntry(nullptr)
 , mRunButton(nullptr)
+, mStopButton(nullptr)
 , mLoadScriptIndex(-1)
 , mA(0)
 , mB(0)
@@ -44,23 +47,7 @@ ScriptModule::ScriptModule()
 {
    InitializePythonIfNecessary();
    
-   for (size_t i=0; i<mScheduledPulseTimes.size(); ++i)
-      mScheduledPulseTimes[i] = -1;
-   
-   for (size_t i=0; i<mScheduledNoteOutput.size(); ++i)
-      mScheduledNoteOutput[i].time = -1;
-   
-   for (size_t i=0; i<mScheduledMethodCall.size(); ++i)
-      mScheduledMethodCall[i].time = -1;
-   
-   for (size_t i=0; i<mScheduledUIControlValue.size(); ++i)
-      mScheduledUIControlValue[i].time = -1;
-   
-   for (size_t i=0; i<mPendingNoteInput.size(); ++i)
-      mPendingNoteInput[i].time = -1;
-   
-   for (size_t i=0; i<mPrintDisplay.size(); ++i)
-      mPrintDisplay[i].time = -1;
+   Stop();
    
    mScriptModuleIndex = sScriptModules.size();
    sScriptModules.push_back(this);
@@ -77,20 +64,15 @@ void ScriptModule::CreateUIControls()
    IDrawableModule::CreateUIControls();
    
    UIBLOCK0();
-   DROPDOWN(mLoadScriptSelector, "loadscript", &mLoadScriptIndex, 120);
-   UIBLOCK_SHIFTRIGHT();
-   BUTTON(mLoadScriptButton,"load");
-   UIBLOCK_SHIFTRIGHT();
-   BUTTON(mSaveScriptButton,"save as");
-   UIBLOCK_NEWLINE();
+   DROPDOWN(mLoadScriptSelector, "loadscript", &mLoadScriptIndex, 120); UIBLOCK_SHIFTRIGHT();
+   BUTTON(mLoadScriptButton,"load"); UIBLOCK_SHIFTRIGHT();
+   BUTTON(mSaveScriptButton,"save as"); UIBLOCK_NEWLINE();
    UICONTROL_CUSTOM(mCodeEntry, new CodeEntry(UICONTROL_BASICS("code"),500,300));
-   BUTTON(mRunButton, "run");
-   FLOATSLIDER(mASlider, "a", &mA, 0, 1);
-   UIBLOCK_SHIFTRIGHT();
-   FLOATSLIDER(mBSlider, "b", &mB, 0, 1);
-   UIBLOCK_SHIFTRIGHT();
-   FLOATSLIDER(mCSlider, "c", &mC, 0, 1);
-   UIBLOCK_SHIFTRIGHT();
+   BUTTON(mRunButton, "run"); UIBLOCK_SHIFTRIGHT();
+   BUTTON(mStopButton, "stop"); UIBLOCK_NEWLINE();
+   FLOATSLIDER(mASlider, "a", &mA, 0, 1); UIBLOCK_SHIFTRIGHT();
+   FLOATSLIDER(mBSlider, "b", &mB, 0, 1); UIBLOCK_SHIFTRIGHT();
+   FLOATSLIDER(mCSlider, "c", &mC, 0, 1); UIBLOCK_SHIFTRIGHT();
    FLOATSLIDER(mDSlider, "d", &mD, 0, 1);
    ENDUIBLOCK(mWidth, mHeight);
 }
@@ -128,6 +110,7 @@ void ScriptModule::DrawModule()
    mSaveScriptButton->Draw();
    mCodeEntry->Draw();
    mRunButton->Draw();
+   mStopButton->Draw();
    mASlider->Draw();
    mBSlider->Draw();
    mCSlider->Draw();
@@ -136,7 +119,7 @@ void ScriptModule::DrawModule()
    if (mLastError != "")
    {
       ofSetColor(255, 0, 0, gModuleDrawAlpha);
-      ofVec2f errorPos = mRunButton->GetPosition(true);
+      ofVec2f errorPos = mStopButton->GetPosition(true);
       errorPos.x += 60;
       errorPos.y += 12;
       DrawTextNormal(mLastError, errorPos.x, errorPos.y);
@@ -372,6 +355,12 @@ float ScriptModule::GetScriptMeasureTime()
    return TheTransport->GetMeasureTime(sMostRecentRunTime);
 }
 
+//static
+float ScriptModule::GetTimeSigRatio()
+{
+   return float(TheTransport->GetTimeSigTop()) / TheTransport->GetTimeSigBottom();
+}
+
 void ScriptModule::PlayNoteFromScript(int pitch, int velocity, float pan)
 {
    PlayNote(sMostRecentRunTime, pitch, velocity, pan, mNextLineToExecute);
@@ -379,7 +368,6 @@ void ScriptModule::PlayNoteFromScript(int pitch, int velocity, float pan)
 
 void ScriptModule::PlayNoteFromScriptAfterDelay(int pitch, int velocity, float delayMeasureTime, float pan)
 {
-   delayMeasureTime /= float(TheTransport->GetTimeSigTop()) / TheTransport->GetTimeSigBottom();
    double time = sMostRecentRunTime + delayMeasureTime * TheTransport->MsPerBar();
    if (velocity == 0)
       time -= gBufferSize * gInvSampleRateMs + 1;  //TODO(Ryan) hack to make note offs happen a buffer early... figure out why scheduled lengths are longer than it takes to get the next pulse of the same interval
@@ -417,8 +405,6 @@ void ScriptModule::ScheduleNote(double time, int pitch, int velocity, float pan)
 
 void ScriptModule::ScheduleMethod(string method, float delayMeasureTime)
 {
-   delayMeasureTime /= float(TheTransport->GetTimeSigTop()) / TheTransport->GetTimeSigBottom();
-   
    for (size_t i=0; i<mScheduledMethodCall.size(); ++i)
    {
       if (mScheduledMethodCall[i].time == -1)
@@ -436,8 +422,6 @@ void ScriptModule::ScheduleMethod(string method, float delayMeasureTime)
 
 void ScriptModule::ScheduleUIControlValue(IUIControl* control, float value, float delayMeasureTime)
 {
-   delayMeasureTime /= float(TheTransport->GetTimeSigTop()) / TheTransport->GetTimeSigBottom();
-   
    for (size_t i=0; i<mScheduledUIControlValue.size(); ++i)
    {
       if (mScheduledUIControlValue[i].time == -1)
@@ -454,10 +438,11 @@ void ScriptModule::ScheduleUIControlValue(IUIControl* control, float value, floa
    }
 }
 
-void ScriptModule::HighlightLine(int lineNum)
+void ScriptModule::HighlightLine(int lineNum, int scriptModuleIndex)
 {
-   mNextLineToExecute = lineNum;
-   mLineExecuteTracker.AddEvent(lineNum);
+   sLastLineExecutedModule = sScriptModules[scriptModuleIndex];
+   sScriptModules[scriptModuleIndex]->mNextLineToExecute = lineNum;
+   sScriptModules[scriptModuleIndex]->mLineExecuteTracker.AddEvent(lineNum);
 }
 
 void ScriptModule::PrintText(string text)
@@ -536,6 +521,9 @@ void ScriptModule::ButtonClicked(ClickButton* button)
       mCodeEntry->Publish();
       RunScript(gTime);
    }
+   
+   if (button == mStopButton)
+      Stop();
    
    if (button == mSaveScriptButton)
    {
@@ -678,10 +666,10 @@ void ScriptModule::RunScript(double time)
    for (size_t i=0; i<lines.size(); ++i)
    {
       if (ShouldDisplayLineExecutionPre(i > 0 ? lines[i-1] : "", lines[i]))
-         code += GetIndentation(lines[i])+"this.highlight_line("+ofToString(i)+")               ###instrumentation###\n";
+         code += GetIndentation(lines[i])+"this.highlight_line("+ofToString(i)+","+ofToString(mScriptModuleIndex)+")               ###instrumentation###\n";
       code += lines[i]+"\n";
       if (ShouldDisplayLineExecutionPost(lines[i]))
-         code += GetIndentation(lines[i])+"   this.highlight_line("+ofToString(i)+")               ###instrumentation###\n";
+         code += GetIndentation(lines[i])+"   this.highlight_line("+ofToString(i)+","+ofToString(mScriptModuleIndex)+")               ###instrumentation###\n";
    }
    FixUpCode(code);
    mLastRunLiteralCode = code;
@@ -715,9 +703,12 @@ void ScriptModule::RunCode(double time, string code)
    {
       ofLog() << "python execution exception (error_already_set): " << e.what();
       
-      mLastError = (string)py::str(e.type()) + ": "+ (string)py::str(e.value());
+      if (mNextLineToExecute == -1) //this script hasn't executed yet
+         sLastLineExecutedModule = this;
       
-      int lineNumber = mNextLineToExecute;
+      sLastLineExecutedModule->mLastError = (string)py::str(e.type()) + ": "+ (string)py::str(e.value());
+      
+      int lineNumber = sLastLineExecutedModule->mNextLineToExecute;
       if (lineNumber == -1)
       {
          string errorString = (string)py::str(e.value());
@@ -733,7 +724,7 @@ void ScriptModule::RunCode(double time, string code)
                int rawLineNumber = stoi(lineNumberText);
                int realLineNumber = rawLineNumber - 1;
                
-               vector<string> lines = ofSplitString(mLastRunLiteralCode, "\n");
+               vector<string> lines = ofSplitString(sLastLineExecutedModule->mLastRunLiteralCode, "\n");
                for (size_t i=0; i<lines.size() && i < rawLineNumber; ++i)
                {
                   if (ofIsStringInString(lines[i], "###instrumentation###"))
@@ -781,7 +772,7 @@ void ScriptModule::RunCode(double time, string code)
          }*/
       }
       
-      mCodeEntry->SetError(true, lineNumber);
+      sLastLineExecutedModule->mCodeEntry->SetError(true, lineNumber);
    }
    catch (const std::exception &e)
    {
@@ -872,6 +863,27 @@ bool ScriptModule::IsNonWhitespace(string line)
    return false;
 }
 
+void ScriptModule::Stop()
+{
+   for (size_t i=0; i<mScheduledPulseTimes.size(); ++i)
+      mScheduledPulseTimes[i] = -1;
+   
+   for (size_t i=0; i<mScheduledNoteOutput.size(); ++i)
+      mScheduledNoteOutput[i].time = -1;
+   
+   for (size_t i=0; i<mScheduledMethodCall.size(); ++i)
+      mScheduledMethodCall[i].time = -1;
+   
+   for (size_t i=0; i<mScheduledUIControlValue.size(); ++i)
+      mScheduledUIControlValue[i].time = -1;
+   
+   for (size_t i=0; i<mPendingNoteInput.size(); ++i)
+      mPendingNoteInput[i].time = -1;
+   
+   for (size_t i=0; i<mPrintDisplay.size(); ++i)
+      mPrintDisplay[i].time = -1;
+}
+
 void ScriptModule::GetModuleDimensions(int& w, int& h)
 {
    w = mWidth;
@@ -884,6 +896,7 @@ void ScriptModule::Resize(float w, float h)
    mCodeEntry->GetDimensions(entryW, entryH);
    mCodeEntry->SetDimensions(entryW + w - mWidth, entryH + h - mHeight);
    mRunButton->SetPosition(mRunButton->GetPosition(true).x, mRunButton->GetPosition(true).y + h - mHeight);
+   mStopButton->SetPosition(mStopButton->GetPosition(true).x, mStopButton->GetPosition(true).y + h - mHeight);
    mASlider->SetPosition(mASlider->GetPosition(true).x, mASlider->GetPosition(true).y + h - mHeight);
    mBSlider->SetPosition(mBSlider->GetPosition(true).x, mBSlider->GetPosition(true).y + h - mHeight);
    mCSlider->SetPosition(mCSlider->GetPosition(true).x, mCSlider->GetPosition(true).y + h - mHeight);

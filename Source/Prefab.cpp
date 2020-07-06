@@ -28,6 +28,7 @@ void Prefab::CreateUIControls()
    
    mSaveButton = new ClickButton(this, "save", 95, 2);
    mLoadButton = new ClickButton(this, "load", mSaveButton, kAnchor_Right);
+   mDisbandButton = new ClickButton(this, "disband", mLoadButton, kAnchor_Right);
    
    mModuleCable = new PatchCableSource(this, kConnectionType_Special);
    mModuleCable->SetManualPosition(10, 10);
@@ -80,6 +81,7 @@ void Prefab::DrawModule()
    
    mSaveButton->Draw();
    mLoadButton->Draw();
+   mDisbandButton->Draw();
    DrawTextNormal("add/remove", 18, 14);
    
    mModuleContainer.Draw();
@@ -102,11 +104,11 @@ void Prefab::GetModuleDimensions(int &width, int &height)
 {
    float x,y;
    GetPosition(x, y);
-   width = 162;
+   width = 215;
    height = 20;
    
-   if (PatchCable::sActivePatchCable && PatchCable::sActivePatchCable->GetOwningModule() == this)
-      return;
+   //if (PatchCable::sActivePatchCable && PatchCable::sActivePatchCable->GetOwningModule() == this)
+   //   return;
       
    for (auto* module : mModuleContainer.GetModules())
    {
@@ -138,6 +140,13 @@ void Prefab::ButtonClicked(ClickButton* button)
          string loadPath = chooser.getResult().getRelativePathFrom(File(ofToDataPath(""))).toStdString();
          LoadPrefab(ofToDataPath(loadPath));
       }
+   }
+   
+   if (button == mDisbandButton)
+   {
+      for (auto* module : mModuleContainer.GetModules())
+         GetOwningContainer()->TakeModule(module);
+      GetOwningContainer()->DeleteModule(this);
    }
 }
 

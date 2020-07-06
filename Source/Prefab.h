@@ -55,6 +55,7 @@ private:
    PatchCableSource* mModuleCable;
    ClickButton* mSaveButton;
    ClickButton* mLoadButton;
+   ClickButton* mDisbandButton;
    ModuleContainer mModuleContainer;
    string mPrefabName;
 };

@@ -34,7 +34,7 @@ public:
    void ClearInput() { mString = ""; mCaretPosition = 0; }
    const string GetText() const { return mPublishedString; }
    const vector<string> GetLines() const { return ofSplitString(mString, "\n"); }
-   void SetText(string text) { mString = text; }
+   void SetText(string text) { UpdateString(text); }
    void SetError(bool error, int errorLine = -1);
    
    void GetDimensions(int& width, int& height) override { width = mWidth; height = mHeight; }
@@ -57,6 +57,7 @@ protected:
    
 private:
    void AddCharacter(char c);
+   void AddString(string s);
    bool AllowCharacter(char c);
    int GetCaretPosition(int col, int row);
    int GetColForX(float x);
@@ -67,10 +68,24 @@ private:
    void MoveCaret(int pos, bool allowSelection = true);
    void MoveCaretToStart();
    void MoveCaretToEnd();
+   void MoveCaretToNextToken(bool backwards);
+   void Undo();
+   void Redo();
+   void UpdateString(string newString);
+   void DrawSyntaxHighlight(string input, ofColor color, std::vector<int> mapping, int filter1, int filter2);
+   string FilterText(string input, std::vector<int> mapping, int filter1, int filter2);
+   void UpdateSyntaxHighlightMapping();
    
    void OnClicked(int x, int y, bool right) override;
    bool MouseMoved(float x, float y) override;
    bool MouseScrolled(int x, int y, float scrollX, float scrollY) override;
+   
+   struct UndoBufferEntry
+   {
+      UndoBufferEntry() : mCaretPos(0) {}
+      string mString;
+      int mCaretPos;
+   };
    
    ICodeEntryListener* mListener;
    float mWidth;
@@ -79,6 +94,10 @@ private:
    float mCharHeight;
    string mString;
    string mPublishedString;
+   std::array<UndoBufferEntry, 50> mUndoBuffer;
+   int mUndoBufferPos;
+   int mUndosLeft;
+   int mRedosLeft;
    int mCaretPosition;
    int mCaretPosition2;
    float mCaretBlinkTimer;
@@ -88,4 +107,5 @@ private:
    bool mHasError;
    int mErrorLine;
    ofVec2f mScroll;
+   std::vector<int> mSyntaxHighlightMapping;
 };

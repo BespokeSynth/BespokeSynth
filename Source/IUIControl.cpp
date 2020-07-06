@@ -12,6 +12,7 @@
 #include "ModularSynth.h"
 #include "PatchCable.h"
 #include "Push2Control.h"
+#include "TextEntry.h"
 
 IUIControl::~IUIControl()
 {
@@ -68,7 +69,7 @@ void IUIControl::DrawHover()
    if (Push2Control::sDrawingPush2Display)
       return;
    
-   if (gHoveredUIControl == this)
+   if (gHoveredUIControl == this && IKeyboardFocusListener::GetActiveKeyboardFocus() == nullptr)
    {
       int w,h;
       GetDimensions(w, h);

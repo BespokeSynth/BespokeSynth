@@ -33,19 +33,23 @@ PYBIND11_EMBEDDED_MODULE(bespoke, m) {
    });
    m.def("get_step", [](int subdivision)
    {
-      float subdivide = subdivision * (float(TheTransport->GetTimeSigTop()) / TheTransport->GetTimeSigBottom());
+      float subdivide = subdivision * ScriptModule::GetTimeSigRatio();
       return int(ScriptModule::GetScriptMeasureTime() * subdivide);
    });
    m.def("count_per_measure", [](int subdivision)
    {
-      float subdivide = subdivision * (float(TheTransport->GetTimeSigTop()) / TheTransport->GetTimeSigBottom());
+      float subdivide = subdivision * ScriptModule::GetTimeSigRatio();
       return int(subdivide);
    });
    m.def("time_until_subdivision", [](int subdivision)
    {
-      float subdivide = subdivision * (float(TheTransport->GetTimeSigTop()) / TheTransport->GetTimeSigBottom());
+      float subdivide = subdivision * ScriptModule::GetTimeSigRatio();
       float measureTime = ScriptModule::GetScriptMeasureTime();
       return ceil(measureTime * subdivide + .0001f) / subdivide - measureTime;
+   });
+   m.def("get_time_sig_ratio", []()
+   {
+      return ScriptModule::GetTimeSigRatio();
    });
    m.def("get_root", []()
    {
@@ -148,13 +152,17 @@ PYBIND11_EMBEDDED_MODULE(scriptmodule, m)
             module.ScheduleUIControlValue(control, value, 0);
          }
       })
-      .def("highlight_line", [](ScriptModule& module, int lineNum)
+      .def("highlight_line", [](ScriptModule& module, int lineNum, int scriptModuleIndex)
       {
-         module.HighlightLine(lineNum);
+         module.HighlightLine(lineNum, scriptModuleIndex);
       })
-      .def("output", [](ScriptModule& module, string text)
+      .def("output", [](ScriptModule& module, py::object obj)
       {
-         module.PrintText(text);
+         module.PrintText(py::str(obj));
+      })
+      .def("this", [](ScriptModule& module)
+      {
+         return &module;
       });
 }
 

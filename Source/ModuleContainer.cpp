@@ -233,13 +233,16 @@ void ModuleContainer::TakeModule(IDrawableModule* module)
 {
    assert(module->GetOwningContainer()); //module must already be in a container
    ofVec2f oldOwnerPos = module->GetOwningContainer()->GetOwnerPosition();
+   if (module->GetOwningContainer()->mOwner)
+      module->GetOwningContainer()->mOwner->RemoveChild(module);
    RemoveFromVector(module, module->GetOwningContainer()->mModules);
+   
    mModules.push_back(module);
    MoveToFront(module);
    
    ofVec2f offset = oldOwnerPos - GetOwnerPosition();
-   module->SetPosition(module->GetPosition().x + offset.x,
-                       module->GetPosition().y + offset.y);
+   module->SetPosition(module->GetPosition(true).x + offset.x,
+                       module->GetPosition(true).y + offset.y);
    module->SetOwningContainer(this);
    if (mOwner)
       mOwner->AddChild(module);

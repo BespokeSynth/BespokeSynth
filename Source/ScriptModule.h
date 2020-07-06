@@ -38,7 +38,7 @@ public:
    void PlayNoteFromScriptAfterDelay(int pitch, int velocity, float delayMeasureTime, float pan);
    void ScheduleMethod(string method, float delayMeasureTime);
    void ScheduleUIControlValue(IUIControl* control, float value, float delayMeasureTime);
-   void HighlightLine(int lineNum);
+   void HighlightLine(int lineNum, int scriptModuleIndex);
    void PrintText(string text);
    IUIControl* GetUIControl(string path);
    
@@ -61,9 +61,11 @@ public:
    void LoadLayout(const ofxJSONElement& moduleInfo) override;
    void SetUpFromSaveData() override;
    void SaveLayout(ofxJSONElement& moduleInfo) override;
-   
+
    static std::vector<ScriptModule*> sScriptModules;
+   static ScriptModule* sLastLineExecutedModule;
    static float GetScriptMeasureTime();
+   static float GetTimeSigRatio();
    
 private:
    void PlayNote(double time, int pitch, int velocity, float pan, int lineNum);
@@ -80,6 +82,7 @@ private:
    bool IsNonWhitespace(string line);
    void DrawTimer(int lineNum, double startTime, double endTime, ofColor color, bool filled);
    void RefreshScriptFiles();
+   void Stop();
    
    //IDrawableModule
    void DrawModule() override;
@@ -95,6 +98,7 @@ private:
    ClickButton* mSaveScriptButton;
    CodeEntry* mCodeEntry;
    ClickButton* mRunButton;
+   ClickButton* mStopButton;
    FloatSlider* mASlider;
    FloatSlider* mBSlider;
    FloatSlider* mCSlider;
@@ -123,7 +127,7 @@ private:
       float pan;
       int lineNum;
    };
-   std::array<ScheduledNoteOutput, 50> mScheduledNoteOutput;
+   std::array<ScheduledNoteOutput, 200> mScheduledNoteOutput;
    
    struct ScheduledMethodCall
    {

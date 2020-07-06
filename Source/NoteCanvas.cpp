@@ -359,7 +359,7 @@ void NoteCanvas::DrawModule()
    ofPushMatrix();
    ofTranslate(mCanvas->GetPosition(true).x, mCanvas->GetPosition(true).y);
    ofPushStyle();
-   ofSetLineWidth(5);
+   ofSetLineWidth(3);
    auto elements = mCanvas->GetElements();
    for (auto e1 : elements)
    {
@@ -370,20 +370,38 @@ void NoteCanvas::DrawModule()
             if (abs(e1->GetStart() - e2->GetStart()) < (1.0/32) / mNumMeasures)
             {
                int interval = abs(e1->mRow - e2->mRow);
-               if (interval == 3 || interval == 4 || interval == 5)
+               if (interval >= 3 && interval <= 7)
                {
                   auto rect1 = e1->GetRect(true, false);
                   auto rect2 = e2->GetRect(true, false);
+                  float offset = 0;
                   if (interval == 3)
+                  {
                      ofSetColor(255,0,0,50);
+                  }
                   if (interval == 4)
+                  {
                      ofSetColor(0,255,0,50);
+                  }
                   if (interval == 5)
+                  {
                      ofSetColor(0,0,255,50);
+                     offset = -1;
+                  }
+                  if (interval == 6)
+                  {
+                     ofSetColor(255,0,255,50);
+                     offset = 3;
+                  }
+                  if (interval == 7)
+                  {
+                     ofSetColor(0,0,0,50);
+                     offset = -3;
+                  }
                   
-                  ofLine(rect1.x, rect1.getCenter().y, rect2.x, rect2.getCenter().y);
-                  ofLine(rect1.x, rect1.getCenter().y, rect1.x + 5, rect1.getCenter().y);
-                  ofLine(rect2.x, rect2.getCenter().y, rect2.x + 5, rect2.getCenter().y);
+                  ofLine(rect1.x + offset, rect1.getCenter().y, rect2.x + offset, rect2.getCenter().y);
+                  ofLine(rect1.x + offset, rect1.getCenter().y, rect1.x + 5 + offset, rect1.getCenter().y);
+                  ofLine(rect2.x + offset, rect2.getCenter().y, rect2.x + 5 + offset, rect2.getCenter().y);
                }
             }
          }
