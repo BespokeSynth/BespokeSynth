@@ -3,7 +3,8 @@
 <JUCERPROJECT id="vxkFwd" name="BespokeSynth" projectType="guiapp" version="1.0.0"
               bundleIdentifier="com.ryanchallinor.Bespoke" includeBinaryInAppConfig="1"
               displaySplashScreen="1" reportAppUsage="1" splashScreenColour="Dark"
-              cppLanguageStandard="11" companyCopyright="" jucerFormatVersion="1">
+              cppLanguageStandard="11" companyCopyright="" jucerFormatVersion="1"
+              headerPath="C:\Python37\include">
   <MAINGROUP id="w4HLAu" name="BespokeSynth">
     <GROUP id="{531CC336-D9CD-1F6E-7272-2D8ADD98F839}" name="libraries">
       <GROUP id="{EDAC49B3-0F38-670A-A6C8-02B0A9640225}" name="pybind11">
