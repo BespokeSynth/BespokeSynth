@@ -1,0 +1,90 @@
+{
+   "kits" : [
+      {
+         "name" : "808",
+         "samples" : [
+            {
+               "linkid" : 3,
+               "sample" : "drums/808/kick.aif",
+               "vol" : 1.0
+            },
+            {
+               "linkid" : 2,
+               "sample" : "drums/808/snare_rim.aif",
+               "vol" : 1.0
+            },
+            {
+               "linkid" : 1,
+               "sample" : "drums/808/hat_closed.aif",
+               "vol" : 1.0
+            },
+            {
+               "linkid" : 0,
+               "sample" : "drums/808/ride.aif",
+               "vol" : 1.0
+            },
+            {
+               "linkid" : 12,
+               "sample" : "drums/808/snare.aif",
+               "vol" : 1.0
+            },
+            {
+               "linkid" : 10,
+               "sample" : "drums/808/clap.aif",
+               "vol" : 1.0
+            },
+            {
+               "linkid" : 1,
+               "sample" : "drums/808/hat_open.aif",
+               "vol" : 1.0
+            },
+            {
+               "linkid" : 11,
+               "sample" : "drums/808/clav.aif",
+               "vol" : 1.0
+            },
+            {
+               "linkid" : 4,
+               "sample" : "drums/808/tom_low.aif",
+               "vol" : 1.0
+            },
+            {
+               "linkid" : 5,
+               "sample" : "drums/808/conga_low.aif",
+               "vol" : 1.0
+            },
+            {
+               "linkid" : 6,
+               "sample" : "drums/808/conga_mid.aif",
+               "vol" : 1.0
+            },
+            {
+               "linkid" : 7,
+               "sample" : "drums/808/conga_high.aif",
+               "vol" : 1.0
+            },
+            {
+               "linkid" : 13,
+               "sample" : "drums/808/crash.aif",
+               "vol" : 1.0
+            },
+            {
+               "linkid" : 1,
+               "sample" : "drums/808/hat_closed.aif",
+               "vol" : 1.0
+            },
+            {
+               "linkid" : 8,
+               "sample" : "drums/808/cowbell.aif",
+               "vol" : 1.0
+            },
+            {
+               "linkid" : 3,
+               "sample" : "drums/808/kick.aif",
+               "vol" : 1.0
+            }
+         ]
+      }
+   ]
+}
+

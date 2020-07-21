@@ -1,0 +1,8 @@
+{
+   "buffersize" : 480,
+   "height" : 800,
+   "layout" : "layouts/layout.json",
+   "samplerate" : 48000,
+   "width" : 1280
+}
+

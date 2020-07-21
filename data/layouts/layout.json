@@ -1,0 +1,38 @@
+{
+   "modules" : [
+      {
+         "channel" : 1,
+         "name" : "output 1",
+         "position" : [ 844, 728 ],
+         "type" : "output"
+      },
+      {
+         "name" : "stereofier",
+         "pan" : 0.0,
+         "position" : [ 857, 657 ],
+         "target" : "output 1",
+         "target2" : "output 2",
+         "type" : "stereofier"
+      },
+      {
+         "channel" : 2,
+         "name" : "output 2",
+         "position" : [ 947, 727 ],
+         "type" : "output"
+      },
+      {
+         "name" : "transport",
+         "nanopad" : "",
+         "nanopadscene" : 4,
+         "position" : [ 4, 65 ],
+         "type" : "transport"
+      },
+      {
+         "name" : "scale",
+         "position" : [ 148, 66 ],
+         "type" : "scale"
+      }
+   ],
+   "zoomlocations" : []
+}
+
