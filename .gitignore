@@ -1,3 +1,7 @@
+#build directories
+/Builds
+/JuceLibraryCode
+
 # Bespoke stuff
 Release/Bespoke.app/*
 **/data/savestate/*
