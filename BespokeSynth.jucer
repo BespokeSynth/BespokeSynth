@@ -2,8 +2,8 @@
 
 <JUCERPROJECT id="vxkFwd" name="BespokeSynth" projectType="guiapp" version="1.0.0"
               bundleIdentifier="com.ryanchallinor.Bespoke" includeBinaryInAppConfig="1"
-              jucerVersion="5.4.7" displaySplashScreen="1" reportAppUsage="1"
-              splashScreenColour="Dark" cppLanguageStandard="11" companyCopyright="">
+              displaySplashScreen="1" reportAppUsage="1" splashScreenColour="Dark"
+              cppLanguageStandard="11" companyCopyright="" jucerFormatVersion="1">
   <MAINGROUP id="w4HLAu" name="BespokeSynth">
     <GROUP id="{531CC336-D9CD-1F6E-7272-2D8ADD98F839}" name="libraries">
       <GROUP id="{EDAC49B3-0F38-670A-A6C8-02B0A9640225}" name="pybind11">
@@ -1020,7 +1020,7 @@
     </XCODE_MAC>
     <VS2015 targetFolder="Builds/VisualStudio2015" vstFolder="../VST3 SDK"
             vst3Folder="..\VST_SDK\VST3_SDK" extraDefs="GLEW_STATIC&#10;BESPOKE_WINDOWS&#10;POLL_WINDOWS&#10;THREADS_WINDOWS&#10;HAVE_STRUCT_TIMESPEC"
-            extraCompilerFlags="/bigobj" vstLegacyFolder="..\VST_SDK\VST2_SDK\public.sdk\source\vst2.x">
+            extraCompilerFlags="/bigobj" vstLegacyFolder="..\..\VST_SDK\VST2_SDK\public.sdk\source\vst2.x">
       <CONFIGURATIONS>
         <CONFIGURATION name="Debug" winWarningLevel="2" generateManifest="1" winArchitecture="x64"
                        isDebug="1" optimisation="1" targetName="BespokeSynth" headerPath="../../Source/json/include&#10;../../Source/glew/include&#10;../../Source/push2/&#10;../../Source/push2/libusb&#10;../../Source/push2/modules/libusb&#10;C:\Python38\include"
