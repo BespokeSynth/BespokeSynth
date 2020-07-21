@@ -1,6 +1,6 @@
 #build directories
-/Builds
-/JuceLibraryCode
+/Builds/*
+/JuceLibraryCode/*
 
 # Bespoke stuff
 Release/Bespoke.app/*
