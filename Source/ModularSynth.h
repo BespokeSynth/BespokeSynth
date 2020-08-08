@@ -194,6 +194,7 @@ private:
    void LoadStatePopupImp();
    IDrawableModule* DuplicateModule(IDrawableModule* module);
    void DeleteAllModules();
+   void TriggerClapboard();
    
    ofSoundStream mSoundStream;
    int mIOBufferSize;
@@ -284,6 +285,8 @@ private:
    list<IPollable*> mExtraPollers;
    
    string mFatalError;
+   
+   double mLastClapboardTime;
 };
 
 extern ModularSynth* TheSynth;

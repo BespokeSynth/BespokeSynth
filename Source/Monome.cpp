@@ -10,19 +10,14 @@
 #include "Profiler.h"
 
 Monome::Monome(MidiDeviceListener* listener)
-: mHasMonome(false)
+: mIsOscSetUp(false)
+, mHasMonome(false)
 , mMaxColumns(8)
 , mListener(listener)
 {
-   bool connected = OSCReceiver::connect(MONOME_RECEIVE_PORT);
-   assert(connected);
-   
-   OSCReceiver::addListener(this);
-   
-	connected = mToSerialOsc.connect( HOST, SERIAL_OSC_PORT );
-   assert(connected);
-   
-   Connect();
+   bool success = SetUpOsc();
+   if (success)
+      Connect();
 }
 
 Monome::~Monome()
@@ -30,8 +25,32 @@ Monome::~Monome()
    OSCReceiver::disconnect();
 }
 
+bool Monome::SetUpOsc()
+{
+   assert(!mIsOscSetUp);
+   
+   bool connected = OSCReceiver::connect(MONOME_RECEIVE_PORT);
+   if (!connected)
+      return false;
+   
+   OSCReceiver::addListener(this);
+   
+   connected = mToSerialOsc.connect( HOST, SERIAL_OSC_PORT );
+   if (!connected)
+      return false;
+   
+   return true;
+}
+
 void Monome::Connect()
 {
+   if (!mIsOscSetUp)
+   {
+      bool success = SetUpOsc();
+      if (!success)
+         return;
+   }
+   
    OSCMessage listMsg("/serialosc/list");
    listMsg.addString("localhost");
    listMsg.addInt32(MONOME_RECEIVE_PORT);

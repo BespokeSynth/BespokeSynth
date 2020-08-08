@@ -171,6 +171,7 @@ private:
    string mLastTitleLabel;
    float mTitleLabelWidth;
    bool mShouldDrawOutline;
+   bool mHoveringOverResizeHandle;
 
    ofMutex mSliderMutex;
    

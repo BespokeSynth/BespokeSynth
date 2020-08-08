@@ -141,6 +141,19 @@ void MidiController::AddControlConnection(MidiMessageType messageType, int contr
 
 void MidiController::AddControlConnection(const ofxJSONElement& connection)
 {
+   if (connection.isMember("grid"))
+   {
+      int index = connection["grid_index"].asInt();
+      string path = connection["grid"].asString();
+      if (index < (int)mGrids.size())
+      {
+         GridLayout* grid = mGrids[index];
+         if (path.length() > 0)
+            grid->mGridCable->SetTarget(GetOwningContainer()->FindUIControl(path));
+      }
+      return;
+   }
+   
    int control = connection["control"].asInt() % MIDI_PAGE_WIDTH;
    string path = connection["uicontrol"].asString();
    string type = connection["type"].asString();
@@ -699,7 +712,7 @@ void MidiController::Exit()
       if (connection->mMessageType == kMidiMessage_Control)
          mDevice.SendCC(connection->mControl, 0, connection->mChannel);
       if (connection->mMessageType == kMidiMessage_Note)
-         mDevice.SendNote(connection->mControl, 0, connection->mChannel);
+         mDevice.SendNote(gTime, connection->mControl, 0, false, connection->mChannel);
    }
 }
 
@@ -1060,7 +1073,7 @@ void MidiController::SetEntirePageToZero(int page)
          if (connection->mMessageType == kMidiMessage_Control)
             mDevice.SendCC(connection->mControl, 0, connection->mChannel);
          if (connection->mMessageType == kMidiMessage_Note)
-            mDevice.SendNote(connection->mControl, 0, connection->mChannel);
+            mDevice.SendNote(gTime, connection->mControl, 0, false, connection->mChannel);
       }
    }
 }
@@ -1108,7 +1121,7 @@ void MidiController::SendNote(int page, int pitch, int velocity, bool forceNoteO
 {
    if (page == mControllerPage)
    {
-      mDevice.SendNote(pitch,velocity,forceNoteOn, channel);
+      mDevice.SendNote(gTime, pitch,velocity,forceNoteOn, channel);
       
       if (mNonstandardController)
          mNonstandardController->SendValue(page, pitch, velocity/127.0f, forceNoteOn, channel);
@@ -1572,18 +1585,27 @@ void MidiController::ConnectDevice()
    }
    else if (mDeviceIn == "monome")
    {
-      Monome* monome = new Monome(this);
-      mNonstandardController = monome;
+      if (dynamic_cast<Monome*>(mNonstandardController) == nullptr)
+      {
+         Monome* monome = new Monome(this);
+         mNonstandardController = monome;
+      }
    }
    else if (mDeviceIn == "osccontroller")
    {
-      OscController* osc = new OscController(this,"192.168.1.128",9000,8000);
-      mNonstandardController = osc;
+      if (dynamic_cast<OscController*>(mNonstandardController) == nullptr)
+      {
+         OscController* osc = new OscController(this,"192.168.1.128",9000,8000);
+         mNonstandardController = osc;
+      }
    }
    else if (mDeviceIn == "midicapturer")
    {
-      MidiCapturerDummyController* cap = new MidiCapturerDummyController(this);
-      mNonstandardController = cap;
+      if (dynamic_cast<MidiCapturerDummyController*>(mNonstandardController) == nullptr)
+      {
+         MidiCapturerDummyController* cap = new MidiCapturerDummyController(this);
+         mNonstandardController = cap;
+      }
    }
    else if (mDeviceIn.length() > 0)
    {
@@ -1720,6 +1742,18 @@ void MidiController::SaveLayout(ofxJSONElement& moduleInfo)
             mConnectionsJson[i]["feedbackcontrol"] = connection->mFeedbackControl;
 
          ++i;
+      }
+      
+      int gridIndex = 0;
+      for (auto* grid : mGrids)
+      {
+         mConnectionsJson[i]["gridIndex"] = gridIndex;
+         if (grid->mGridCable->GetTarget())
+            mConnectionsJson[i]["grid"] = grid->mGridCable->GetTarget()->Path();
+         else
+            mConnectionsJson[i]["grid"] = "";
+         ++i;
+         ++gridIndex;
       }
    }
    

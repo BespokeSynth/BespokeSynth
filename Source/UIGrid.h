@@ -50,6 +50,7 @@ public:
    void SetHighlightCol(int col) { mHighlightCol = col; }
    int GetHighlightCol() const { return mHighlightCol; }
    void SetMajorColSize(int size) { mMajorCol = size; }
+   int GetMajorColSize() const { return mMajorCol; }
    void SetSingleColumnMode(int set) { mSingleColumn = set; }
    void Clear();
    void SetFlip(bool flip) { mFlip = flip; }
@@ -57,9 +58,9 @@ public:
    int CurrentHover() { return mCurrentHover; }
    void SetListener(UIGridListener* listener) { mListener = listener; }
    void SetDrawOffset(int row, float amount) { mDrawOffset[row] = amount; }
-   void SetDimensions(int width, int height) { mWidth = width; mHeight = height; }
-   int GetWidth() const { return mWidth; }
-   int GetHeight() const { return mHeight; }
+   void SetDimensions(float width, float height) { mWidth = width; mHeight = height; }
+   float GetWidth() const { return mWidth; }
+   float GetHeight() const { return mHeight; }
    void SetRestrictDragToRow(bool set) { mRestrictDragToRow = set; }
    void SetClickClearsToZero(bool set) { mClickClearsToZero = set; }
    void SetShouldDrawValue(bool draw) { mShouldDrawValue = draw; }
@@ -95,8 +96,8 @@ private:
    float GetX(int col, int row) const;
    float GetY(int row) const;
    
-   int mWidth;
-   int mHeight;
+   float mWidth;
+   float mHeight;
    int mRows;
    int mCols;
    bool mClick;

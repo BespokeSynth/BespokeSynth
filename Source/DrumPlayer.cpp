@@ -550,8 +550,10 @@ void DrumPlayer::DrawModule()
    mMonoCheckbox->Draw();
    mGridController->Draw();
    
+   float moduleW, moduleH;
+   GetDimensions(moduleW, moduleH);
    for (int i=0; i<mIndividualOutputs.size(); ++i)
-      DrawTextNormal(GetDrumHitName(mIndividualOutputs[i]->mHitIndex), 110, 10 + i*12);
+      DrawTextNormal(ofToString(mIndividualOutputs[i]->mHitIndex), moduleW - 20, 10 + i*12);
 
    if (mEditMode)
    {

@@ -199,6 +199,7 @@
 #include "ModulatorGravity.h"
 #include "NoteStreamDisplay.h"
 #include "PulseButton.h"
+#include "GridModule.h"
 
 #define REGISTER(class,name,type) Register(#name, &(class::Create), &(class::CanCreate), type, false, false);
 #define REGISTER_HIDDEN(class,name,type) Register(#name, &(class::Create), &(class::CanCreate), type, true, false);
@@ -366,6 +367,7 @@ ModuleFactory::ModuleFactory()
    REGISTER(ModulatorGravity, gravity, kModuleType_Modulator);
    REGISTER(NoteStreamDisplay, notestream, kModuleType_Note);
    REGISTER(PulseButton, pulsebutton, kModuleType_Other);
+   REGISTER(GridModule, grid, kModuleType_Other);
 
    //REGISTER_EXPERIMENTAL(MidiPlayer, midiplayer, kModuleType_Instrument);
    REGISTER_EXPERIMENTAL(Razor, razor, kModuleType_Synth);

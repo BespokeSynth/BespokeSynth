@@ -26,6 +26,8 @@ MidiDevice::~MidiDevice()
 {
    AudioDeviceManager& deviceManager = TheSynth->GetGlobalManagers()->mDeviceManager;
    deviceManager.removeMidiInputCallback(mDeviceNameIn, this);
+   if (mMidiOut.get())
+      mMidiOut->stopBackgroundThread();
 }
 
 bool MidiDevice::ConnectInput(const char* name)
@@ -67,6 +69,8 @@ bool MidiDevice::ConnectOutput(const char* name, int channel /*= 1*/)
    
    if (!found)
    {
+      if (mMidiOut.get())
+         mMidiOut->stopBackgroundThread();
       mMidiOut.reset();
       mMidiOut = nullptr;
       mDeviceNameOut[0] = 0;
@@ -79,6 +83,7 @@ void MidiDevice::ConnectOutput(int index, int channel /*= 1*/)
 {
    mMidiOut.reset();
    mMidiOut = MidiOutput::openDevice(index);
+   mMidiOut->startBackgroundThread();
 
    StringCopy(mDeviceNameOut, mMidiOut->getName().toRawUTF8(), 64);
 
@@ -121,17 +126,23 @@ vector<string> MidiDevice::GetPortList(bool forInput)
    return portList;
 }
 
-void MidiDevice::SendNote(int pitch, int velocity, bool forceNoteOn /*= false*/, int channel /*= -1*/)
+void MidiDevice::SendNote(double time, int pitch, int velocity, bool forceNoteOn, int channel)
 {
    if (mMidiOut)
    {
       if (channel == -1)
          channel = mOutputChannel;
       
+      int sampleNumber = (time - gTime) * gSampleRateMs;
+      
+      juce::MidiBuffer midiBuffer;
+      
       if (velocity > 0 || forceNoteOn)
-         mMidiOut->sendMessageNow(MidiMessage::noteOn(channel, pitch, (uint8)velocity));
+         midiBuffer.addEvent(MidiMessage::noteOn(channel, pitch, (uint8)velocity), sampleNumber);
       else
-         mMidiOut->sendMessageNow(MidiMessage::noteOff(channel, pitch));
+         midiBuffer.addEvent(MidiMessage::noteOff(channel, pitch), sampleNumber);
+      
+      mMidiOut->sendBlockOfMessages(midiBuffer, Time::getMillisecondCounter(), gSampleRate);
    }
 }
 

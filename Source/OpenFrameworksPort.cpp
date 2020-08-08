@@ -32,6 +32,7 @@ ofColor ofColor::orange(255,165,0);
 ofColor ofColor::blue(0,0,255);
 ofColor ofColor::purple(148,0,211);
 ofColor ofColor::lime(0,255,0);
+ofColor ofColor::magenta(255,0,255);
 
 NVGcontext* gNanoVG = nullptr;
 NVGcontext* gFontBoundsNanoVG = nullptr;
@@ -44,6 +45,16 @@ string ofToDataPath(string path, bool makeAbsolute)
       return path;
    if (path.empty() == false && path[1] == ':')
       return path;
+   
+   static juce::File sWorkingDirectory;
+   static bool sFirstTime = true;
+   if (sFirstTime)
+   {
+      sFirstTime = false;
+      sWorkingDirectory = juce::File::getCurrentWorkingDirectory();
+   }
+   sWorkingDirectory.setAsCurrentWorkingDirectory(); //restore working directory, in case a VST plugin changed it (ROLI Studio Drums does this!)
+   
 #if JUCE_WINDOWS
    static string sDataDir = "";
    if (sDataDir == "")

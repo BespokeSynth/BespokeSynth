@@ -48,6 +48,7 @@ IDrawableModule::IDrawableModule()
 , mOwningContainer(nullptr)
 , mTitleLabelWidth(0)
 , mShouldDrawOutline(true)
+, mHoveringOverResizeHandle(false)
 , mDrawDebug(false)
 {
 }
@@ -246,19 +247,10 @@ void IDrawableModule::DrawFrame(float w, float h, bool drawModule, float& titleB
    if (dimModule)
       gModuleDrawAlpha *= .2f;
    
-   if (drawModule)
-   {
-      ofSetColor(color, gModuleDrawAlpha);
-      ofPushMatrix();
-      ofClipWindow(0, 0, w, h);
-      DrawModule();
-      ofPopMatrix();
-      DrawModuleUnclipped();
-   }
-   
    float enableToggleOffset = 0;
    if (HasTitleBar())
    {
+      ofPushStyle();
       ofSetColor(color, 50);
       ofFill();
       ofPushMatrix();
@@ -288,7 +280,32 @@ void IDrawableModule::DrawFrame(float w, float h, bool drawModule, float& titleB
                        w-6,  -2);
          }
       }
+      ofPopStyle();
    }
+   
+   const bool kDrawInnerFade = true;
+   if (kDrawInnerFade)
+   {
+      float fadeRoundness = 100;
+      float fadeLength = w / 3;
+      const float kFadeStrength = .75f;
+      NVGpaint shadowPaint = nvgBoxGradient(gNanoVG, 0, -titleBarHeight, w,h+titleBarHeight, fadeRoundness, fadeLength, nvgRGBA(color.r * .2f, color.g * .2f, color.b * .2f, 255 * kFadeStrength), nvgRGBA(0,0,0,0));
+      nvgBeginPath(gNanoVG);
+      nvgRect(gNanoVG, 0, -titleBarHeight, w,h+titleBarHeight);
+      nvgFillPaint(gNanoVG, shadowPaint);
+      nvgFill(gNanoVG);
+   }
+   
+   if (drawModule)
+   {
+      ofSetColor(color, gModuleDrawAlpha);
+      ofPushMatrix();
+      ofClipWindow(0, 0, w, h);
+      DrawModule();
+      ofPopMatrix();
+      DrawModuleUnclipped();
+   }
+   
    ofSetColor(color * (1-GetBeaconAmount()) + ofColor::yellow * GetBeaconAmount(), gModuleDrawAlpha);
    DrawTextBold(GetTitleLabel(),5+enableToggleOffset,10-titleBarHeight,16);
    
@@ -301,7 +318,6 @@ void IDrawableModule::DrawFrame(float w, float h, bool drawModule, float& titleB
       ofRect(-.5f, -titleBarHeight-.5f, w+1, h+titleBarHeight+1, 4);
       ofPopStyle();
    }
-   
 }
 
 void IDrawableModule::Render()
@@ -334,7 +350,10 @@ void IDrawableModule::Render()
    {
       ofColor color = GetColor(mModuleType);
       ofSetColor(color, 255);
-      ofSetLineWidth(2);
+      if (mHoveringOverResizeHandle)
+         ofSetLineWidth(4);
+      else
+         ofSetLineWidth(2);
       ofLine(w-sResizeCornerSize, h, w, h);
       ofLine(w, h-sResizeCornerSize, w, h);
    }
@@ -490,6 +509,12 @@ void IDrawableModule::OnClicked(int x, int y, bool right)
    float w,h;
    GetModuleDimensions(w, h);
    
+   if (IsResizable() && mHoveringOverResizeHandle)
+   {
+      TheSynth->SetResizeModule(this);
+      return;
+   }
+   
    if (y < 0)
    {
       if (mEnabledCheckbox && x < 20)
@@ -511,12 +536,6 @@ void IDrawableModule::OnClicked(int x, int y, bool right)
       }
    }
    
-   if (IsResizable() && x > w - sResizeCornerSize && y > h - sResizeCornerSize)
-   {
-      TheSynth->SetResizeModule(this);
-      return;
-   }
-   
    for (int i=0; i<mUIControls.size(); ++i)
       mUIControls[i]->TestClick(x,y,right);
    for (int i=0; i<mChildren.size(); ++i)
@@ -535,6 +554,13 @@ void IDrawableModule::OnClicked(int x, int y, bool right)
 
 bool IDrawableModule::MouseMoved(float x, float y)
 {
+   float w,h;
+   GetModuleDimensions(w, h);
+   if (mShowing && !Minimized() && IsResizable() && x > w - sResizeCornerSize && y > h - sResizeCornerSize && x <= w && y <= h)
+      mHoveringOverResizeHandle = true;
+   else
+      mHoveringOverResizeHandle = false;
+   
    if (!mShowing)
       return false;
    for (auto source : mPatchCableSources)

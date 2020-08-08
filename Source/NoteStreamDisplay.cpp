@@ -91,7 +91,7 @@ void NoteStreamDisplay::DrawModule()
 
 float NoteStreamDisplay::GetYPos(int pitch, float noteHeight) const
 {
-   return ofMap(pitch, mPitchMin, mPitchMax+1, mHeight - noteHeight, 0);
+   return ofMap(pitch, mPitchMin, mPitchMax+1, mHeight-noteHeight, -noteHeight);
 }
 
 void NoteStreamDisplay::PlayNote(double time, int pitch, int velocity, int voiceIdx, ModulationParameters modulation)

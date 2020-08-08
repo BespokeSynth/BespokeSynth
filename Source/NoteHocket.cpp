@@ -92,7 +92,7 @@ void NoteHocket::SendNoteToIndex(int index, double time, int pitch, int velocity
    const vector<INoteReceiver*>& receivers = mDestinationCables[index]->GetNoteReceivers();
    mDestinationCables[index]->AddHistoryEvent(gTime, velocity > 0);
    for (auto* receiver : receivers)
-      receiver->PlayNote(time, pitch, velocity);
+      receiver->PlayNote(time, pitch, velocity, voiceIdx, modulation);
 }
 
 void NoteHocket::SendCC(int control, int value, int voiceIdx)

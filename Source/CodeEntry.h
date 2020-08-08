@@ -18,7 +18,8 @@ class ICodeEntryListener
 {
 public:
    virtual ~ICodeEntryListener() {}
-   virtual void ExecuteCode(string code) = 0;
+   virtual void ExecuteCode() = 0;
+   virtual void ExecuteBlock(int lineStart, int lineEnd) = 0;
 };
 
 class CodeEntry : public IUIControl, public IKeyboardFocusListener
@@ -38,7 +39,7 @@ public:
    void SetError(bool error, int errorLine = -1);
    
    void GetDimensions(float& width, float& height) override { width = mWidth; height = mHeight; }
-   void SetDimensions(float width, float height) { mWidth = width; mHeight = height; }
+   void SetDimensions(float width, float height);
 
    //IUIControl
    void SetFromMidiCC(float slider) override {}
@@ -75,6 +76,7 @@ private:
    void DrawSyntaxHighlight(string input, ofColor color, std::vector<int> mapping, int filter1, int filter2);
    string FilterText(string input, std::vector<int> mapping, int filter1, int filter2);
    void UpdateSyntaxHighlightMapping();
+   string GetVisibleCode();
    
    void OnClicked(int x, int y, bool right) override;
    bool MouseMoved(float x, float y) override;
@@ -108,4 +110,5 @@ private:
    int mErrorLine;
    ofVec2f mScroll;
    std::vector<int> mSyntaxHighlightMapping;
+   double mLastInputTime;
 };

@@ -105,8 +105,9 @@ void CodeEntry::Render()
    }
    else if (mString != mPublishedString)
    {
-      ofSetColor(170, 255, 170, gModuleDrawAlpha);
-      ofSetLineWidth(2);
+      float highlight = 1 - ofClamp((gTime - mLastInputTime) / 150, 0, 1);
+      ofSetColor(ofLerp(170,255,highlight), 255, ofLerp(170,255,highlight), gModuleDrawAlpha);
+      ofSetLineWidth(2 + highlight * 3);
    }
    else
    {
@@ -135,6 +136,8 @@ void CodeEntry::Render()
    
    ofSetColor(color, gModuleDrawAlpha);
    
+   string drawString = GetVisibleCode();
+   
    //syntax-highlighted text
    static ofColor stringColor(0.9*255, 0.7*255, 0.6*255, 255);
    static ofColor numberColor(0.9*255, 0.9*255, 1.0*255, 255);
@@ -153,21 +156,21 @@ void CodeEntry::Render()
    
    ofPushStyle();
    const float dim = .7f;
-   DrawSyntaxHighlight(mString, stringColor * (isCurrent ? 1 : dim), mSyntaxHighlightMapping, 3, -1);
-   DrawSyntaxHighlight(mString, numberColor * (isCurrent ? 1 : dim), mSyntaxHighlightMapping, 2, -1);
-   DrawSyntaxHighlight(mString, name1Color * (isCurrent ? 1 : dim), mSyntaxHighlightMapping, 1, -1);
-   DrawSyntaxHighlight(mString, name2Color * (isCurrent ? 1 : dim), mSyntaxHighlightMapping, 90, -1);
-   DrawSyntaxHighlight(mString, name3Color * (isCurrent ? 1 : dim), mSyntaxHighlightMapping, 91, -1);
-   DrawSyntaxHighlight(mString, definedColor * (isCurrent ? 1 : dim), mSyntaxHighlightMapping, 92, -1);
-   DrawSyntaxHighlight(mString, equalsColor * (isCurrent ? 1 : dim), mSyntaxHighlightMapping, 22, -1);
-   DrawSyntaxHighlight(mString, parenColor * (isCurrent ? 1 : dim), mSyntaxHighlightMapping, 7, 8);
-   DrawSyntaxHighlight(mString, braceColor * (isCurrent ? 1 : dim), mSyntaxHighlightMapping, 25, 26);
-   DrawSyntaxHighlight(mString, bracketColor * (isCurrent ? 1 : dim), mSyntaxHighlightMapping, 9, 10);
-   DrawSyntaxHighlight(mString, opColor * (isCurrent ? 1 : dim), mSyntaxHighlightMapping, 51, -1);
-   DrawSyntaxHighlight(mString, commaColor * (isCurrent ? 1 : dim), mSyntaxHighlightMapping, 12, -1);
-   DrawSyntaxHighlight(mString, commentColor * (isCurrent ? 1 : dim), mSyntaxHighlightMapping, 53, -1);
-   DrawSyntaxHighlight(mString, unknownColor * (isCurrent ? 1 : dim), mSyntaxHighlightMapping, 52, -1); //"error" token (like incomplete quotes)
-   DrawSyntaxHighlight(mString, unknownColor * (isCurrent ? 1 : dim), mSyntaxHighlightMapping, -1, -1);
+   DrawSyntaxHighlight(drawString, stringColor * (isCurrent ? 1 : dim), mSyntaxHighlightMapping, 3, -1);
+   DrawSyntaxHighlight(drawString, numberColor * (isCurrent ? 1 : dim), mSyntaxHighlightMapping, 2, -1);
+   DrawSyntaxHighlight(drawString, name1Color * (isCurrent ? 1 : dim), mSyntaxHighlightMapping, 1, -1);
+   DrawSyntaxHighlight(drawString, name2Color * (isCurrent ? 1 : dim), mSyntaxHighlightMapping, 90, -1);
+   DrawSyntaxHighlight(drawString, name3Color * (isCurrent ? 1 : dim), mSyntaxHighlightMapping, 91, -1);
+   DrawSyntaxHighlight(drawString, definedColor * (isCurrent ? 1 : dim), mSyntaxHighlightMapping, 92, -1);
+   DrawSyntaxHighlight(drawString, equalsColor * (isCurrent ? 1 : dim), mSyntaxHighlightMapping, 22, -1);
+   DrawSyntaxHighlight(drawString, parenColor * (isCurrent ? 1 : dim), mSyntaxHighlightMapping, 7, 8);
+   DrawSyntaxHighlight(drawString, braceColor * (isCurrent ? 1 : dim), mSyntaxHighlightMapping, 25, 26);
+   DrawSyntaxHighlight(drawString, bracketColor * (isCurrent ? 1 : dim), mSyntaxHighlightMapping, 9, 10);
+   DrawSyntaxHighlight(drawString, opColor * (isCurrent ? 1 : dim), mSyntaxHighlightMapping, 51, -1);
+   DrawSyntaxHighlight(drawString, commaColor * (isCurrent ? 1 : dim), mSyntaxHighlightMapping, 12, -1);
+   DrawSyntaxHighlight(drawString, commentColor * (isCurrent ? 1 : dim), mSyntaxHighlightMapping, 53, -1);
+   DrawSyntaxHighlight(drawString, unknownColor * (isCurrent ? 1 : dim), mSyntaxHighlightMapping, 52, -1); //"error" token (like incomplete quotes)
+   DrawSyntaxHighlight(drawString, unknownColor * (isCurrent ? 1 : dim), mSyntaxHighlightMapping, -1, -1);
    ofPopStyle();
    
    /*for (int i = 0; i<60; ++i)
@@ -235,11 +238,32 @@ void CodeEntry::Render()
    ofPopStyle();
 }
 
+string CodeEntry::GetVisibleCode()
+{
+   string visible;
+   auto lines = GetLines();
+   int i=0;
+   for (auto line : lines)
+   {
+      if ((i+1) * mCharHeight < mScroll.y || i * mCharHeight > mScroll.y + mHeight)
+         visible += "\n";
+      else
+         visible += line + "\n";
+      ++i;
+   }
+   return visible;
+}
+
 void CodeEntry::DrawSyntaxHighlight(string input, ofColor color, std::vector<int> mapping, int filter1, int filter2)
 {
    string filtered = FilterText(input, mapping, filter1, filter2);
    ofSetColor(color, gModuleDrawAlpha);
-   gFontFixedWidth.DrawString(filtered, kFontSize, mX+2 - mScroll.x, mY + mCharHeight - mScroll.y);
+   
+   float shake = (1 - ofClamp((gTime - mLastPublishTime) / 150, 0, 1)) * 3.0f;
+   float offsetX = ofRandom(-shake, shake);
+   float offsetY = ofRandom(-shake, shake);
+   
+   gFontFixedWidth.DrawString(filtered, kFontSize, mX+2 - mScroll.x + offsetX, mY + mCharHeight - mScroll.y + offsetY);
 }
 
 string CodeEntry::FilterText(string input, std::vector<int> mapping, int filter1, int filter2)
@@ -349,7 +373,8 @@ void CodeEntry::UpdateSyntaxHighlightMapping()
                output = output + [token_type]*(char_end - char_start)
                #print(char_end-char_start)
         except:
-           print("exception when syntax highlighting")
+           #print("exception when syntax highlighting")
+           pass
             
 
     #print(output)
@@ -358,7 +383,7 @@ void CodeEntry::UpdateSyntaxHighlightMapping()
    try
    {
       py::exec(syntaxHighlightCode, py::globals());
-      py::globals()["syntax_highlight_code"] = mString;
+      py::globals()["syntax_highlight_code"] = GetVisibleCode();
       py::object ret = py::eval("syntax_highlight_basic()", py::globals());
       mSyntaxHighlightMapping = ret.cast< std::vector<int> >();
    }
@@ -590,7 +615,13 @@ void CodeEntry::OnKeyPressed(int key, bool isRepeat)
    else if (key == 'R' && GetKeyModifiers() == kModifier_Command)
    {
       Publish();
-      mListener->ExecuteCode(mString);
+      mListener->ExecuteCode();
+   }
+   else if (key == 'R' && GetKeyModifiers() == (kModifier_Command | kModifier_Shift))
+   {
+      Publish();
+      mListener->ExecuteBlock(MIN(GetCaretCoords(mCaretPosition).y, GetCaretCoords(mCaretPosition2).y),
+                              MAX(GetCaretCoords(mCaretPosition).y, GetCaretCoords(mCaretPosition2).y));
    }
    else
    {
@@ -652,6 +683,8 @@ void CodeEntry::UpdateString(string newString)
    mUndoBuffer[mUndoBufferPos].mString = mString;
    
    UpdateSyntaxHighlightMapping();
+   
+   mLastInputTime = gTime;
 }
 
 void CodeEntry::AddCharacter(char c)
@@ -808,7 +841,17 @@ bool CodeEntry::MouseScrolled(int x, int y, float scrollX, float scrollY)
    
    mScroll.x = MAX(mScroll.x + scrollX * -10, 0);
    mScroll.y = MAX(mScroll.y + scrollY * -10, 0);
+   
+   UpdateSyntaxHighlightMapping();
+   
    return false;
+}
+
+void CodeEntry::SetDimensions(float width, float height)
+{
+   mWidth = width;
+   mHeight = height;
+   UpdateSyntaxHighlightMapping();
 }
 
 int CodeEntry::GetCaretPosition(int col, int row)

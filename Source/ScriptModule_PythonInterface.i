@@ -15,11 +15,13 @@
 #include "StepSequencer.h"
 #include "NoteCanvas.h"
 #include "SamplePlayer.h"
+#include "GridModule.h"
 
 #include "pybind11/embed.h"
 #include "pybind11/stl.h"
 
 namespace py = pybind11;
+using namespace pybind11::literals;
 
 PYBIND11_EMBEDDED_MODULE(bespoke, m) {
    // `m` is a `py::module` which is used to bind functions and classes
@@ -30,6 +32,10 @@ PYBIND11_EMBEDDED_MODULE(bespoke, m) {
    m.def("get_measure", []()
    {
       return (int)ScriptModule::GetScriptMeasureTime();
+   });
+   m.def("reset_transport", []()
+   {
+      TheTransport->Reset();
    });
    m.def("get_step", [](int subdivision)
    {
@@ -90,38 +96,28 @@ PYBIND11_EMBEDDED_MODULE(scriptmodule, m)
       return ScriptModule::sScriptModules[scriptModuleIndex];
    }, py::return_value_policy::reference);
    py::class_<ScriptModule, IDrawableModule>(m, "scriptmodule")
-      .def("play_note", [](ScriptModule& module, int pitch, int velocity, float length)
+      .def("play_note", [](ScriptModule& module, int pitch, int velocity, float length, float pan, int noteOutputIndex)
       {
-         module.PlayNoteFromScript(pitch, velocity, 0);
-         module.PlayNoteFromScriptAfterDelay(pitch, 0, length, 0);
-      })
-      .def("play_note_pan", [](ScriptModule& module, int pitch, int velocity, float length, float pan)
+         module.PlayNoteFromScript(pitch, velocity, pan, noteOutputIndex);
+         module.PlayNoteFromScriptAfterDelay(pitch, 0, length, 0, noteOutputIndex);
+      }, "pitch"_a, "velocity"_a, "length"_a=1.0f/16.0f, "pan"_a = 0, "output_index"_a = 0)
+      .def("schedule_note", [](ScriptModule& module, float delay, int pitch, int velocity, float length, float pan, int noteOutputIndex)
       {
-         module.PlayNoteFromScript(pitch, velocity, pan);
-         module.PlayNoteFromScriptAfterDelay(pitch, 0, length, 0);
-      })
-      .def("schedule_note", [](ScriptModule& module, float delay, int pitch, int velocity, float length)
+         module.PlayNoteFromScriptAfterDelay(pitch, velocity, delay, pan, noteOutputIndex);
+         module.PlayNoteFromScriptAfterDelay(pitch, 0, delay + length, 0, noteOutputIndex);
+      }, "delay"_a, "pitch"_a, "velocity"_a, "length"_a=1.0f/16.0f, "pan"_a = 0, "output_index"_a = 0)
+      .def("schedule_note_msg", [](ScriptModule& module, float delay, int pitch, int velocity, float pan, int noteOutputIndex)
       {
-         module.PlayNoteFromScriptAfterDelay(pitch, velocity, delay, 0);
-         module.PlayNoteFromScriptAfterDelay(pitch, 0, delay + length, 0);
-      })
-      .def("schedule_note_pan", [](ScriptModule& module, float delay, int pitch, int velocity, float length, float pan)
-      {
-         module.PlayNoteFromScriptAfterDelay(pitch, velocity, delay, pan);
-         module.PlayNoteFromScriptAfterDelay(pitch, 0, delay + length, 0);
-      })
-      .def("schedule_note_msg", [](ScriptModule& module, float delay, int pitch, int velocity)
-      {
-         module.PlayNoteFromScriptAfterDelay(pitch, velocity, delay, 0);
-      })
+         module.PlayNoteFromScriptAfterDelay(pitch, velocity, delay, pan, noteOutputIndex);
+      }, "delay"_a, "pitch"_a, "velocity"_a, "pan"_a = 0, "output_index"_a = 0)
       .def("schedule_call", [](ScriptModule& module, float delay, string method)
       {
          module.ScheduleMethod(method, delay);
       })
-      .def("note_msg", [](ScriptModule& module, int pitch, int velocity)
+      .def("note_msg", [](ScriptModule& module, int pitch, int velocity, float pan, int noteOutputIndex)
       {
-         module.PlayNoteFromScript(pitch, velocity, 0);
-      })
+         module.PlayNoteFromScript(pitch, velocity, pan, noteOutputIndex);
+      }, "pitch"_a, "velocity"_a, "pan"_a = 0, "output_index"_a = 0)
       .def("set", [](ScriptModule& module, string path, float value)
       {
          IUIControl* control = module.GetUIControl(path);
@@ -163,6 +159,18 @@ PYBIND11_EMBEDDED_MODULE(scriptmodule, m)
       .def("this", [](ScriptModule& module)
       {
          return &module;
+      })
+      .def("stop", [](ScriptModule& module)
+      {
+         return module.Stop();
+      })
+      .def("get_caller", [](ScriptModule& module)
+      {
+         return ScriptModule::sPriorExecutedModule;
+      })
+      .def("set_num_note_outputs", [](ScriptModule& module, int num)
+      {
+         module.SetNumNoteOutputs(num);
       });
 }
 
@@ -193,6 +201,65 @@ PYBIND11_EMBEDDED_MODULE(drumsequencer, m)
       .def("get", [](StepSequencer& seq, int step, int pitch)
       {
          return seq.GetStep(step, pitch);
+      });
+}
+
+PYBIND11_EMBEDDED_MODULE(grid, m)
+{
+   m.def("get", [](string path)
+   {
+      return dynamic_cast<GridModule*>(TheSynth->FindModule(path));
+   }, py::return_value_policy::reference);
+   py::class_<GridModule, IDrawableModule>(m, "grid")
+      .def("set", [](GridModule& grid, int col, int row, float value)
+      {
+         grid.Set(col, row, value);
+      })
+      .def("get", [](GridModule& grid, int col, int row)
+      {
+         return grid.Get(col, row);
+      })
+      .def("set_grid", [](GridModule& grid, int cols, int rows)
+      {
+         grid.SetGrid(cols, rows);
+      })
+      .def("set_label", [](GridModule& grid, int row, string label)
+      {
+         grid.SetLabel(row, label);
+      })
+      .def("set_color", [](GridModule& grid, int colorIndex, float r, float g, float b)
+      {
+         grid.SetColor(colorIndex, ofColor(r*255,g*255,b*255));
+      })
+      .def("highlight_cell", [](GridModule& grid, int col, int row, double delay, double duration, int colorIndex)
+      {
+         double startTime = ScriptModule::sMostRecentLineExecutedModule->GetScheduledTime(delay);
+         double endTime = ScriptModule::sMostRecentLineExecutedModule->GetScheduledTime(delay + duration);
+         grid.HighlightCell(col, row, startTime, endTime - startTime, colorIndex);
+      }, "col"_a, "row"_a, "delay"_a, "duration"_a, "colorIndex"_a=1)
+      .def("set_division", [](GridModule& grid, int division)
+      {
+         grid.SetDivision(division);
+      })
+      .def("set_momentary", [](GridModule& grid, bool momentary)
+      {
+         grid.SetMomentary(momentary);
+      })
+      .def("set_cell_color", [](GridModule& grid, int col, int row, int colorIndex)
+      {
+         grid.SetCellColor(col, row, colorIndex);
+      })
+      .def("get_cell_color", [](GridModule& grid, int col, int row)
+      {
+         return grid.GetCellColor(col, row);
+      })
+      .def("add_listener", [](GridModule& grid, ScriptModule* script)
+      {
+         grid.AddListener(script);
+      })
+      .def("clear", [](GridModule& grid)
+      {
+         grid.Clear();
       });
 }
 

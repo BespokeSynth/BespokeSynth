@@ -306,7 +306,7 @@ void LinnstrumentControl::PlayNote(double time, int pitch, int velocity, int voi
 void LinnstrumentControl::OnMidiNote(MidiNote& note)
 {
    if (mControlPlayedLights)
-      mDevice.SendNote(note.mPitch, 0, false, note.mChannel); //don't allow linnstrument to light played notes
+      mDevice.SendNote(gTime, note.mPitch, 0, false, note.mChannel); //don't allow linnstrument to light played notes
 }
 
 void LinnstrumentControl::OnMidiControl(MidiControl& control)

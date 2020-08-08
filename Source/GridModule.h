@@ -1,0 +1,103 @@
+/*
+  ==============================================================================
+
+    GridModule.h
+    Created: 19 Jul 2020 10:36:16pm
+    Author:  Ryan Challinor
+
+  ==============================================================================
+*/
+
+#pragma once
+
+#include <iostream>
+#include "INoteReceiver.h"
+#include "IDrawableModule.h"
+#include "Slider.h"
+#include "DropdownList.h"
+#include "Checkbox.h"
+#include "MidiDevice.h"
+#include "GridController.h"
+#include "UIGrid.h"
+
+class ScriptModule;
+
+class GridModule : public IDrawableModule, public IGridControllerListener, public UIGridListener, public INoteReceiver
+{
+public:
+   GridModule();
+   ~GridModule();
+   static IDrawableModule* Create() { return new GridModule(); }
+   
+   string GetTitleLabel() override { return "grid"; }
+   void CreateUIControls() override;
+   
+   void Init() override;
+   
+   void SetGrid(int cols, int rows) { mGrid->SetGrid(cols, rows); }
+   void SetLabel(int row, string label);
+   void Set(int col, int row, float value) { mGrid->SetVal(col, row, value, !K(notifyListener)); UpdateLights(); }
+   float Get(int col, int row) { return mGrid->GetVal(col, row); }
+   void HighlightCell(int col, int row, double time, double duration, int colorIndex);
+   void SetDivision(int steps) { return mGrid->SetMajorColSize(steps); }
+   int GetCols() const { return mGrid->GetCols(); }
+   int GetRows() const { return mGrid->GetRows(); }
+   void SetColor(int colorIndex, ofColor color);
+   void SetMomentary(bool momentary) { mGrid->SetMomentary(momentary); }
+   void SetCellColor(int col, int row, int colorIndex);
+   int GetCellColor(int col, int row) { return mGridOverlay[row * kGridOverlayMaxDim + col]; }
+   void AddListener(ScriptModule* listener);
+   void Clear();
+   
+   //IGridControllerListener
+   void OnControllerPageSelected() override;
+   void OnGridButton(int x, int y, float velocity, IGridController* grid) override;
+   
+   //INoteReceiver
+   void PlayNote(double time, int pitch, int velocity, int voiceIdx = -1, ModulationParameters modulation = ModulationParameters()) override;
+   void SendCC(int control, int value, int voiceIdx = -1) override {}
+   
+   //UIGridListener
+   void GridUpdated(UIGrid* grid, int col, int row, float value, float oldValue) override;
+   
+   void CheckboxUpdated(Checkbox* checkbox) override;
+   
+   virtual void LoadLayout(const ofxJSONElement& moduleInfo) override;
+   virtual void SetUpFromSaveData() override;
+   void SaveState(FileStreamOut& out) override;
+   void LoadState(FileStreamIn& in) override;
+   
+private:
+   //IDrawableModule
+   void DrawModule() override;
+   void GetModuleDimensions(float& width, float& height) override;
+   bool Enabled() const override { return mEnabled; }
+   void OnClicked(int x, int y, bool right) override;
+   void MouseReleased() override;
+   bool IsResizable() const override { return true; }
+   void Resize(float w, float h) override;
+   ofColor GetColor(int colorIndex) const;
+   
+   void UpdateLights();
+   
+   GridController* mGridController;
+   
+   UIGrid* mGrid;
+   vector<string> mLabels;
+   vector<ofColor> mColors;
+   
+   struct HighlightCellElement
+   {
+      double time;
+      Vec2i position;
+      double duration;
+      ofColor color;
+   };
+   std::array<HighlightCellElement, 50> mHighlightCells;
+   
+   static const int kGridOverlayMaxDim = 256;
+   std::array<int, kGridOverlayMaxDim*kGridOverlayMaxDim> mGridOverlay;
+   
+   std::list<ScriptModule*> mScriptListeners;
+};
+

@@ -29,6 +29,7 @@ public:
    Monome(MidiDeviceListener* listener);
    ~Monome();
    
+   bool SetUpOsc();
    void Connect();
    void SetLight(int x, int y, bool on);
    void SetLightFlicker(int x, int y, float flickerMs);
@@ -45,6 +46,7 @@ private:
    
    OSCSender mToSerialOsc;
    OSCSender mToMonome;
+   bool mIsOscSetUp;
    bool mHasMonome;
    int mMaxColumns;
    

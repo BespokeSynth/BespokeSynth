@@ -34,13 +34,18 @@ public:
    
    void Poll() override;
    
-   void PlayNoteFromScript(int pitch, int velocity, float pan);
-   void PlayNoteFromScriptAfterDelay(int pitch, int velocity, float delayMeasureTime, float pan);
+   void PlayNoteFromScript(int pitch, int velocity, float pan, int noteOutputIndex);
+   void PlayNoteFromScriptAfterDelay(int pitch, int velocity, float delayMeasureTime, float pan, int noteOutputIndex);
    void ScheduleMethod(string method, float delayMeasureTime);
    void ScheduleUIControlValue(IUIControl* control, float value, float delayMeasureTime);
    void HighlightLine(int lineNum, int scriptModuleIndex);
    void PrintText(string text);
    IUIControl* GetUIControl(string path);
+   void Stop();
+   double GetScheduledTime(double delayMeasureTime);
+   void SetNumNoteOutputs(int num);
+   
+   void RunCode(double time, string code);
    
    void OnPulse(double time, float velocity, int flags) override;
    void ButtonClicked(ClickButton* button) override;
@@ -49,7 +54,8 @@ public:
    void DropdownUpdated(DropdownList* list, int oldValue) override {}
  
    //ICodeEntryListener
-   void ExecuteCode(string code) override;
+   void ExecuteCode() override;
+   void ExecuteBlock(int lineStart, int lineEnd) override;
    
    //INoteReceiver
    void PlayNote(double time, int pitch, int velocity, int voiceIdx = -1, ModulationParameters modulation = ModulationParameters()) override;
@@ -63,26 +69,27 @@ public:
    void SaveLayout(ofxJSONElement& moduleInfo) override;
 
    static std::vector<ScriptModule*> sScriptModules;
-   static ScriptModule* sLastLineExecutedModule;
+   static std::list<ScriptModule*> sScriptsRequestingInitExecution;
+   static ScriptModule* sMostRecentLineExecutedModule;
+   static ScriptModule* sPriorExecutedModule;
    static float GetScriptMeasureTime();
    static float GetTimeSigRatio();
    
 private:
-   void PlayNote(double time, int pitch, int velocity, float pan, int lineNum);
+   void PlayNote(double time, int pitch, int velocity, float pan, int noteOutputIndex, int lineNum);
    void AdjustUIControl(IUIControl* control, float value, int lineNum);
-   void RunScript(double time);
-   void RunCode(double time, string code);
+   void RunScript(double time, int lineStart = -1, int lineEnd = -1);
    void FixUpCode(string& code);
-   void ScheduleNote(double time, int pitch, int velocity, float pan);
+   void ScheduleNote(double time, int pitch, int velocity, float pan, int noteOutputIndex);
+   void SendNoteToIndex(int index, double time, int pitch, int velocity, int voiceIdx, ModulationParameters modulation);
    string GetThisName();
    string GetIndentation(string line);
    bool ShouldDisplayLineExecutionPre(string priorLine, string line);
-   bool ShouldDisplayLineExecutionPost(string line);
    void GetFirstAndLastCharacter(string line, char& first, char& last);
    bool IsNonWhitespace(string line);
    void DrawTimer(int lineNum, double startTime, double endTime, ofColor color, bool filled);
    void RefreshScriptFiles();
-   void Stop();
+   void Reset();
    
    //IDrawableModule
    void DrawModule() override;
@@ -117,6 +124,7 @@ private:
    size_t mScriptModuleIndex;
    string mLastRunLiteralCode;
    int mNextLineToExecute;
+   int mInitExecutePriority;
    
    struct ScheduledNoteOutput
    {
@@ -125,6 +133,7 @@ private:
       int pitch;
       int velocity;
       float pan;
+      int noteOutputIndex;
       int lineNum;
    };
    std::array<ScheduledNoteOutput, 200> mScheduledNoteOutput;
@@ -203,4 +212,6 @@ private:
    LineEventTracker mUIControlTracker;
    
    std::vector<string> mScriptFilePaths;
+   
+   std::vector<PatchCableSource*> mExtraNoteOutputs;
 };

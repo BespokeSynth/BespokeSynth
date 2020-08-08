@@ -682,14 +682,12 @@ void LoadStateValidate(bool assertion)
 
 float GetLeftPanGain(float pan)
 {
-   assert(pan >= -1 && pan <= 1);
-   return 1 - pan;
+   return 1 - ofClamp(pan,-1,1);
 }
 
 float GetRightPanGain(float pan)
 {
-   assert(pan >= -1 && pan <= 1);
-   return pan + 1;
+   return ofClamp(pan,-1,1) + 1;
 }
 
 void DrawFallbackText(const char* text, float posX, float posY)

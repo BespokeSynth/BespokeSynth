@@ -365,7 +365,7 @@ private:
    int mHighlightedLayoutElement;
    int mLayoutWidth;
    int mLayoutHeight;
-   list<GridLayout*> mGrids;
+   vector<GridLayout*> mGrids;
    
    ofMutex mQueuedMessageMutex;
 };

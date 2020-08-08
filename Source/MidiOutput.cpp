@@ -90,7 +90,7 @@ void MidiOutputModule::PlayNote(double time, int pitch, int velocity, int voiceI
    if (voiceIdx == -1)
       channel = 1;
    
-   mDevice.SendNote(pitch, velocity, false, mUseVoiceAsChannel ? channel : mChannel);
+   mDevice.SendNote(time, pitch, velocity, false, mUseVoiceAsChannel ? channel : mChannel);
    
    int modIdx = voiceIdx;
    if (voiceIdx == -1)

@@ -175,7 +175,7 @@ void SingleOscillator::PlayNote(double time, int pitch, int velocity, int voiceI
          if (lineIndex >= 0)
             mDebugLines += lines[lineIndex] + "\n";
       }
-      mDebugLines += "PlayNote("+ofToString(time)+", "+ofToString(pitch)+", "+ofToString(velocity)+", "+ofToString(voiceIdx)+")";
+      mDebugLines += "PlayNote("+ofToString(time/1000)+", "+ofToString(pitch)+", "+ofToString(velocity)+", "+ofToString(voiceIdx)+")";
    }
 }
 

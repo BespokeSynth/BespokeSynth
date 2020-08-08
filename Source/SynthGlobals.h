@@ -251,7 +251,7 @@ class ofLog
 {
 public:
    ofLog() {}
-   ~ofLog() { cout << gTime << ": " << mMessage << endl; }
+   ~ofLog() { cout << (gTime/1000) << ": " << mMessage << endl; }
    
    template <class T>
    ofLog& operator<<(const T& value)

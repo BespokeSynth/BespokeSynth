@@ -226,7 +226,7 @@ void Transport::DrawModule()
 
 void Transport::Reset()
 {
-   mMeasureTime = -.001f;
+   mMeasureTime = -.5f;
 }
 
 void Transport::ButtonClicked(ClickButton *button)

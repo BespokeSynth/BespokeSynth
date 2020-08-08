@@ -675,8 +675,8 @@ void Push2Control::SetLed(MidiMessageType type, int index, int color, int flashC
       if (index < 128)
       {
          if (flashColor != -1)
-            mDevice.SendNote(index, flashColor);
-         mDevice.SendNote(index, color, false, channel);
+            mDevice.SendNote(gTime, index, flashColor, false, -1);
+         mDevice.SendNote(gTime, index, color, false, channel);
       }
       else
       {

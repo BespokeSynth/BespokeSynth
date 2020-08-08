@@ -18,7 +18,7 @@ extern NVGcontext* gFontBoundsNanoVG;
 
 struct ofColor
 {
-   ofColor() : ofColor(1,1,1) {}
+   ofColor() : ofColor(255,255,255) {}
    ofColor(int _r, int _g, int _b) : r(_r), g(_g), b(_b), a(255) {}
    ofColor(int _r, int _g, int _b, int _a) : r(_r), g(_g), b(_b), a(_a) {}
    void set(int _r, int _g, int _b, int _a = 255) { r=_r; g=_g; b=_b; a=_a; }
@@ -36,7 +36,7 @@ struct ofColor
    int b;
    int a;
    
-   static ofColor black,white,grey,red,green,yellow,blue,orange,purple,lime;
+   static ofColor black,white,grey,red,green,yellow,blue,orange,purple,lime,magenta;
 };
 
 struct ofVec2f

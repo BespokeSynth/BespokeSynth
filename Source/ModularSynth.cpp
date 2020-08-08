@@ -60,6 +60,7 @@ ModularSynth::ModularSynth()
 , mQuickSpawn(nullptr)
 , mScheduledEnvelopeEditorSpawnDisplay(nullptr)
 , mIsLoadingModule(false)
+, mLastClapboardTime(-9999)
 {
    mConsoleText[0] = 0;
    assert(TheSynth == nullptr);
@@ -171,9 +172,13 @@ void ModularSynth::Poll()
    }
    
    mZoomer.Update();
-   for (auto p : mExtraPollers)
-      p->Poll();
-   mModuleContainer.Poll();
+   
+   if (!mIsLoadingState)
+   {
+      for (auto p : mExtraPollers)
+         p->Poll();
+      mModuleContainer.Poll();
+   }
    
    if (mShowLoadStatePopup)
    {
@@ -328,6 +333,13 @@ void ModularSynth::Draw(void* vg)
    Profiler::Draw();
    
    DrawConsole();
+   
+   if (gTime - mLastClapboardTime < 100)
+   {
+      ofSetColor(255,255,255,(1 - (gTime - mLastClapboardTime) / 100) * 255);
+      ofFill();
+      ofRect(0, 0, ofGetWidth(), ofGetHeight());
+   }
    
    ofPopMatrix();
 }
@@ -484,7 +496,12 @@ void ModularSynth::KeyPressed(int key, bool isRepeat)
    }
    
    if (key == '`' && !isRepeat)
-      ADSRDisplay::ToggleDisplayMode();
+   {
+      if (GetKeyModifiers() == kModifier_Shift)
+         TriggerClapboard();
+      else
+         ADSRDisplay::ToggleDisplayMode();
+   }
 
    if (key == OF_KEY_TAB && !isRepeat)
    {
@@ -1110,6 +1127,19 @@ void ModularSynth::AudioOut(float** output, int bufferSize, int nChannels)
       gTime += elapsed;
       TheTransport->Advance(elapsed);
    }
+   
+   if (gTime - mLastClapboardTime < 100)
+   {
+      for (int ch=0; ch<nChannels; ++ch)
+      {
+         for (int i=0; i<bufferSize; ++i)
+         {
+            float sample = sin(GetPhaseInc(440) * i) * (1 - ((gTime - mLastClapboardTime) / 100));
+            output[ch][i] = sample;
+            outBuffer[ch][i] = sample;
+         }
+      }
+   }
    /////////// AUDIO PROCESSING ENDS HERE /////////////
    
    mOutputBuffer.WriteChunk(outBuffer[0], bufferSize, 0);
@@ -1135,6 +1165,11 @@ void ModularSynth::AudioIn(const float** input, int bufferSize, int nChannels)
       if (mInput[i])
          BufferCopy(mInput[i]->GetBuffer()->GetChannel(0), input[i], bufferSize);
    }
+}
+
+void ModularSynth::TriggerClapboard()
+{
+   mLastClapboardTime = gTime; //for synchronizing internally recorded audio and externally recorded video
 }
 
 void ModularSynth::FilesDropped(vector<string> files, int intX, int intY)

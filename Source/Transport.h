@@ -97,8 +97,8 @@ public:
    double GetDuration(NoteInterval interval);
    int GetQuantized(double time, NoteInterval interval, double* remainderMs = nullptr);
    double GetMeasurePos(double time) const { return fmod(GetMeasureTime(time), 1); }
-   void SetMeasurePos(double pos) { mMeasureTime = mMeasureTime - (int)mMeasureTime + pos; }
-   int GetMeasure(double time) const { return (int)GetMeasureTime(time); }
+   void SetMeasurePos(double pos) { mMeasureTime = mMeasureTime - floor(mMeasureTime) + pos; }
+   int GetMeasure(double time) const { return (int)floor(GetMeasureTime(time)); }
    double GetMeasureTime(double time) const { return mMeasureTime + (time - gTime) / MsPerBar(); }
    void SetMeasure(int count) { mMeasureTime = mMeasureTime - (int)mMeasureTime + count; }
    void SetDownbeat() { mMeasureTime = mMeasureTime - (int)mMeasureTime - .001; }

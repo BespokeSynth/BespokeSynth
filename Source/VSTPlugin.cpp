@@ -135,6 +135,7 @@ VSTPlugin::VSTPlugin()
 , mOpenEditorButton(nullptr)
 //, mWindowOverlay(nullptr)
 , mDisplayMode(kDisplayMode_Sliders)
+, mShowParameterIndex(-1)
 {
    if (VSTLookup::sFormatManager.getNumFormats() == 0)
       VSTLookup::sFormatManager.addDefaultFormats();
@@ -148,6 +149,7 @@ void VSTPlugin::CreateUIControls()
    mVolSlider = new FloatSlider(this,"vol",3,3,80,15,&mVol,0,1);
    mProgramChangeSelector = new DropdownList(this,"program change",100,3,&mProgramChange);
    mOpenEditorButton = new ClickButton(this, "open", 150, 3);
+   mShowParameterDropdown = new DropdownList(this,"show parameter",3,20,&mShowParameterIndex);
    
    for (int i=0; i<128; ++i)
       mProgramChangeSelector->AddLabel(ofToString(i), i);
@@ -281,6 +283,8 @@ void VSTPlugin::CreateParameterSliders()
    }
    mParameterSliders.clear();
    
+   mShowParameterDropdown->Clear();
+   
    const auto& parameters = mPlugin->getParameters();
    
    int numParameters = MIN(100, parameters.size());
@@ -303,16 +307,10 @@ void VSTPlugin::CreateParameterSliders()
       {
          
       }
-      mParameterSliders[i].mSlider = new FloatSlider(this, label.c_str(), 3, 35, 200, 15, &mParameterSliders[i].mValue, 0, 1);
-      if (i > 0)
-      {
-         const int kRows = 20;
-         if (i % kRows == 0)
-            mParameterSliders[i].mSlider->PositionTo(mParameterSliders[i-kRows].mSlider, kAnchor_Right);
-         else
-            mParameterSliders[i].mSlider->PositionTo(mParameterSliders[i-1].mSlider, kAnchor_Below);
-      }
+      mParameterSliders[i].mSlider = new FloatSlider(this, label.c_str(), -1, -1, 200, 15, &mParameterSliders[i].mValue, 0, 1);
       mParameterSliders[i].mParameter = parameters[i];
+      mParameterSliders[i].mShowing = false;
+      mShowParameterDropdown->AddLabel(label.c_str(), i);
    }
 }
 
@@ -505,18 +503,31 @@ void VSTPlugin::DrawModule()
    if (Minimized() || IsVisible() == false)
       return;
    
-   DrawTextNormal(GetPluginName(), 3, 32);
+   DrawTextNormal(GetPluginName(), 3, 49);
    
    mVolSlider->Draw();
    mProgramChangeSelector->Draw();
    mOpenEditorButton->Draw();
+   mShowParameterDropdown->Draw();
    
    if (mDisplayMode == kDisplayMode_Sliders)
    {
+      int sliderCount = 0;
       for (auto& slider : mParameterSliders)
       {
          if (slider.mSlider)
-            slider.mSlider->Draw();
+         {
+            slider.mSlider->SetShowing(slider.mShowing);
+            if (slider.mShowing)
+            {
+               const int kRows = 20;
+               slider.mSlider->SetPosition(3 + (slider.mSlider->GetRect().width + 2) * (sliderCount / kRows), 52 + (17 * (sliderCount % kRows)));
+               
+               slider.mSlider->Draw();
+               
+               ++sliderCount;
+            }
+         }
       }
    }
 }
@@ -542,7 +553,7 @@ void VSTPlugin::GetModuleDimensions(float& width, float& height)
       height = 40;
       for (auto slider : mParameterSliders)
       {
-         if (slider.mSlider)
+         if (slider.mSlider && slider.mShowing)
          {
             width = MAX(width, slider.mSlider->GetRect(true).x + slider.mSlider->GetRect(true).width + 3);
             height = MAX(height, slider.mSlider->GetRect(true).y + slider.mSlider->GetRect(true).height + 3);
@@ -561,6 +572,11 @@ void VSTPlugin::DropdownUpdated(DropdownList* list, int oldVal)
    if (list == mProgramChangeSelector)
    {
       mMidiBuffer.addEvent(juce::MidiMessage::programChange(1, mProgramChange), 0);
+   }
+   if (list == mShowParameterDropdown)
+   {
+      mParameterSliders[mShowParameterIndex].mShowing = true;
+      mShowParameterIndex = -1;
    }
 }
 
