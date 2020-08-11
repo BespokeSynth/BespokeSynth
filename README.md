@@ -4,6 +4,8 @@ A software modular synth that I'm building for myself, and you can use it if you
 ![screenshot](screenshot-1.png)
 
 ### Recent videos of Bespoke usage
+* https://twitter.com/awwbees/status/1282500237697921025
+* https://twitter.com/awwbees/status/1289710877734834187
 * https://twitter.com/awwbees/status/1229246748037697536
 * https://twitter.com/awwbees/status/1222722343451099137
 * https://twitter.com/awwbees/status/1219496022277283840
