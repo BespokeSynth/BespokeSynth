@@ -205,9 +205,9 @@ void FloatSlider::Render()
    }
    
    if (mMaxEntry)
-      display = "set max:";
+      display = "max:";
    if (mMinEntry)
-      display = "set min:";
+      display = "min:";
    
    ofSetColor(textColor);
    DrawTextNormal(display, mX+2, mY+5+mHeight/2);

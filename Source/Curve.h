@@ -12,9 +12,13 @@
 #include "OpenFrameworksPort.h"
 #include "IClickable.h"
 
+class FileStreamOut;
+class FileStreamIn;
+
 struct CurvePoint
 {
 public:
+   CurvePoint() {}
    CurvePoint(float time, float value) : mTime(time), mValue(value) {}
    float mTime;
    float mValue;
@@ -26,13 +30,18 @@ public:
    Curve();
    void AddPoint(CurvePoint point);
    void AddPointAtEnd(CurvePoint point);  //only use this if you are sure that there are no points already added at an earlier time
-   float Evaluate(float time);
+   float Evaluate(float time, bool holdEndForLoop = false);
    void Render() override;
    void SetExtents(float start, float end) { mStart = start; mEnd = end; }
    void SetColor(ofColor color) { mColor = color; }
    void GetDimensions(float& width, float& height) override { width = mWidth; height = mHeight; }
    void SetDimensions(float width, float height) { mWidth = width; mHeight = height; }
-   void DeleteBetween(float start, float end);
+   void Clear();
+   int GetNumPoints() const { return mNumCurvePoints; }
+   CurvePoint* GetPoint(int index);
+   
+   void SaveState(FileStreamOut& out);
+   void LoadState(FileStreamIn& in);
    
 protected:
    void OnClicked(int x, int y, bool right) override;
@@ -40,8 +49,9 @@ protected:
    bool MouseScrolled(int x, int y, float scrollX, float scrollY) override;
 
 private:
-   list<CurvePoint> mPoints;
-   ofMutex mCurveMutex;
+   bool IsAtCapacity() { return mNumCurvePoints >= (int)mPoints.size(); }
+   array<CurvePoint,5000> mPoints;
+   int mNumCurvePoints;
    float mWidth;
    float mHeight;
    float mStart;

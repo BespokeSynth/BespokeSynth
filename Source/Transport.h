@@ -107,6 +107,7 @@ public:
    void OnDrumEvent(NoteInterval drumEvent);
    void SetLoop(int measureStart, int measureEnd) { assert(measureStart < measureEnd); mLoopStartMeasure = measureStart; mLoopEndMeasure = measureEnd; }
    void ClearLoop() { mLoopStartMeasure = -1; mLoopEndMeasure = -1; }
+   double GetMeasureFraction(NoteInterval interval);
    
    bool CheckNeedsDraw() override { return true; }
    
@@ -136,7 +137,6 @@ private:
    float SwingBeat(float pos);
    void Nudge(float amount);
    void AdjustTempo(double amount);
-   double GetMeasureFraction(NoteInterval interval);
 
    //IDrawableModule
    void DrawModule() override;

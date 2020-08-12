@@ -14,7 +14,6 @@
 #include "Checkbox.h"
 #include "Transport.h"
 #include "DropdownList.h"
-#include "Curve.h"
 #include "Checkbox.h"
 #include "EnvelopeEditor.h"
 

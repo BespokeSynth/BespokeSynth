@@ -7,9 +7,12 @@
 //
 
 #include "Curve.h"
+#include "FileStream.h"
+#include <algorithm>
 
 Curve::Curve()
-: mStart(0)
+: mNumCurvePoints(0)
+, mStart(0)
 , mEnd(1)
 , mColor(ofColor::white)
 {
@@ -17,57 +20,62 @@ Curve::Curve()
 
 void Curve::AddPoint(CurvePoint point)
 {
-   mCurveMutex.lock();
+   if (IsAtCapacity())
+      return;
+   
    bool inserted = false;
-   for (auto iter = mPoints.begin(); iter != mPoints.end(); ++iter)
+   for (int i=0; i<mNumCurvePoints; ++i)
    {
-      if (iter->mTime > point.mTime)
+      if (mPoints[i].mTime > point.mTime)
       {
-         mPoints.insert(iter, point);
+         for (int j=i; j<mNumCurvePoints; ++j)
+            mPoints[j+1] = mPoints[j];
+         mPoints[i] = point;
          inserted = true;
+         ++mNumCurvePoints;
          break;
       }
    }
    if (!inserted)
-      mPoints.push_back(point);
-   mCurveMutex.unlock();
+      AddPointAtEnd(point);
 }
 
 void Curve::AddPointAtEnd(CurvePoint point)
 {
-   mCurveMutex.lock();
-   mPoints.push_back(point);
-   mCurveMutex.unlock();
+   if (IsAtCapacity())
+      return;
+   mPoints[mNumCurvePoints] = point;
+   ++mNumCurvePoints;
 }
 
-float Curve::Evaluate(float time)
+float Curve::Evaluate(float time, bool holdEndForLoop)
 {
    float retVal = 0;
    
-   mCurveMutex.lock();
-   
-   if (mPoints.empty() == false)
+   if (mNumCurvePoints > 0)
    {
-      const CurvePoint* before = &(*mPoints.begin());
+      if (holdEndForLoop && time < mPoints[0].mTime)
+         return mPoints[mNumCurvePoints-1].mValue;
+      
+      const CurvePoint* before = &mPoints[0];
       const CurvePoint* after = nullptr;
-      for (const auto& point : mPoints)
+      for (int i=0; i<mNumCurvePoints; ++i)
       {
-         if (point.mTime < time)
+         if (mPoints[i].mTime < time)
          {
-            before = &point;
+            before = &mPoints[i];
          }
          else
          {
-            after = &point;
+            after = &mPoints[i];
             break;
          }
       }
       if (after == nullptr)
          after = before;
       
-      retVal = ofMap(time, before->mTime, after->mTime, before->mValue, after->mValue);
+      retVal = ofMap(time, before->mTime, after->mTime, before->mValue, after->mValue, K(clamp));
    }
-   mCurveMutex.unlock();
    
    return retVal;
 }
@@ -91,62 +99,15 @@ void Curve::Render()
    ofPopStyle();
 }
 
-void Curve::DeleteBetween(float start, float end)
+void Curve::Clear()
 {
-   mCurveMutex.lock();
-   
-   //ofLog() << mPoints.size() << ": delete between " << start << " " << end;
-   
-   if (mPoints.empty() == false)
-   {
-      list<CurvePoint>::iterator before = mPoints.end();
-      list<CurvePoint>::iterator after = mPoints.begin();
-      int i=0;
-      int ibefore = -1;
-      int iafter = -1;
-      bool lookingForStart = true;
-      for (auto iter = mPoints.begin(); iter != mPoints.end(); ++iter)
-      {
-         //ofLog() << i << ": " << iter->mTime;
-         if (iter->mTime > start && lookingForStart)
-         {
-            before = iter;
-            ibefore = i;
-            lookingForStart = false;
-         }
-         else if (iter->mTime < end && !lookingForStart)
-         {
-            after = iter;
-            iafter = i;
-         }
-         
-         ++i;
-      }
-      
-      //ofLog() << ibefore << " " << iafter;
-      
-      if (before != mPoints.end() && after != mPoints.begin())
-      {
-         if (start < end)
-         {
-            mPoints.erase(before, after);
-         }
-         else
-         {
-            mPoints.erase(before, mPoints.end());
-            
-            list<CurvePoint>::iterator after = mPoints.end();
-            for (auto iter = mPoints.begin(); iter != mPoints.end(); ++iter)
-            {
-               if (iter->mTime < end)
-                  after = iter;
-            }
-            
-            mPoints.erase(mPoints.begin(), after);
-         }
-      }
-   }
-   mCurveMutex.unlock();
+   mNumCurvePoints = 0;
+}
+
+CurvePoint* Curve::GetPoint(int index)
+{
+   assert(index < mNumCurvePoints);
+   return &mPoints[index];
 }
 
 void Curve::OnClicked(int x, int y, bool right)
@@ -164,4 +125,29 @@ bool Curve::MouseScrolled(int x, int y, float scrollX, float scrollY)
 {
    ofLog() << "curve mousescrolled";
    return false;
+}
+
+namespace
+{
+   const int kSaveStateRev = 1;
+}
+
+void Curve::SaveState(FileStreamOut& out)
+{
+   out << kSaveStateRev;
+   
+   out << mNumCurvePoints;
+   for (int i=0; i<mNumCurvePoints; ++i)
+      out << mPoints[i].mTime << mPoints[i].mValue;
+}
+
+void Curve::LoadState(FileStreamIn& in)
+{
+   int rev;
+   in >> rev;
+   LoadStateValidate(rev <= kSaveStateRev);
+   
+   in >> mNumCurvePoints;
+   for (int i=0; i<mNumCurvePoints; ++i)
+      in >> mPoints[i].mTime >> mPoints[i].mValue;
 }

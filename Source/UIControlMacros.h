@@ -31,6 +31,7 @@
 #define UIBLOCK_SHIFTDOWN() yPos += lastUIControl->GetDimensions().y + 2;
 #define UIBLOCK_SHIFTUP() yPos -= lastUIControl->GetDimensions().y + 2;
 #define UIBLOCK_SHIFTRIGHT() xOffset = lastUIControl->GetPosition(true).x + lastUIControl->GetDimensions().x + 2; yPos = lastUIControl->GetPosition(true).y;
+#define UIBLOCK_SHIFTLEFT() xOffset = lastUIControl->GetPosition(true).x; yPos = lastUIControl->GetPosition(true).y;
 #define UIBLOCK_SHIFTX(amount) xOffset += amount; if (lastUIControl != nullptr) { yPos = lastUIControl->GetPosition(true).y; }
 #define UIBLOCK_SHIFTY(amount) yPos += amount;
 #define UIBLOCK_NEWLINE() xOffset = 0;

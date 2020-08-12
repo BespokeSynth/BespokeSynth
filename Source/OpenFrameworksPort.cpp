@@ -136,6 +136,11 @@ void ofTranslate(float x, float y, float z)
    nvgTranslate(gNanoVG, x, y);
 }
 
+void ofRotate(float radians)
+{
+   nvgRotate(gNanoVG, radians);
+}
+
 void ofClipWindow(float x, float y, float width, float height)
 {
    nvgScissor(gNanoVG, x, y, width, height);
@@ -263,7 +268,10 @@ void ofLine(ofVec2f v1, ofVec2f v2)
 void ofSetLineWidth(float width)
 {
    sStyleStack.GetStyle().lineWidth = width;
-   nvgStrokeWidth(gNanoVG, width);
+   
+   const float kLineWidthAdjustAmount = 0.25f;
+   const float kLineWidthAdjustFactor = 1.5f;
+   nvgStrokeWidth(gNanoVG, width * kLineWidthAdjustFactor + kLineWidthAdjustAmount);
 }
 
 namespace
@@ -296,7 +304,11 @@ void ofVertex(float x, float y, float z)
 
 float ofMap(float val, float fromStart, float fromEnd, float toStart, float toEnd, bool clamp)
 {
-   float ret = ((val - fromStart) / (fromEnd - fromStart)) * (toEnd - toStart) + toStart;
+   float ret;
+   if (fromEnd - fromStart != 0)
+      ret = ((val - fromStart) / (fromEnd - fromStart)) * (toEnd - toStart) + toStart;
+   else
+      ret = toEnd;
    if (clamp)
       ret = ofClamp(ret, MIN(toStart,toEnd), MAX(toStart,toEnd));
    return ret;

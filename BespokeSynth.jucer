@@ -6,6 +6,8 @@
               splashScreenColour="Dark" cppLanguageStandard="11" companyCopyright="">
   <MAINGROUP id="w4HLAu" name="BespokeSynth">
     <GROUP id="{531CC336-D9CD-1F6E-7272-2D8ADD98F839}" name="libraries">
+      <FILE id="u46FMQ" name="PerlinNoise.h" compile="0" resource="0" file="Source/PerlinNoise.h"/>
+      <FILE id="JW0e41" name="PerlinNoise.cpp" compile="1" resource="0" file="Source/PerlinNoise.cpp"/>
       <GROUP id="{EDAC49B3-0F38-670A-A6C8-02B0A9640225}" name="pybind11">
         <GROUP id="{D72EB779-61A3-79ED-7E84-187801DF14B1}" name="detail">
           <FILE id="gBLH1i" name="class.h" compile="0" resource="0" file="Source/pybind11/detail/class.h"/>
@@ -205,6 +207,9 @@
         <FILE id="RG4zGd" name="TremoloEffect.h" compile="0" resource="0" file="Source/TremoloEffect.h"/>
       </GROUP>
       <GROUP id="{6781AC07-A090-A7AF-8D27-BCB6D9526ABD}" name="modules">
+        <FILE id="FU40XK" name="FubbleModule.cpp" compile="1" resource="0"
+              file="Source/FubbleModule.cpp"/>
+        <FILE id="XLf5ZZ" name="FubbleModule.h" compile="0" resource="0" file="Source/FubbleModule.h"/>
         <FILE id="kLDNXp" name="GridModule.cpp" compile="1" resource="0" file="Source/GridModule.cpp"/>
         <FILE id="N725Dx" name="GridModule.h" compile="0" resource="0" file="Source/GridModule.h"/>
         <FILE id="LLtoND" name="PulseButton.cpp" compile="1" resource="0" file="Source/PulseButton.cpp"/>
