@@ -15,6 +15,7 @@ Curve::Curve()
 , mStart(0)
 , mEnd(1)
 , mColor(ofColor::white)
+, mLastEvalIndex(0)
 {
 }
 
@@ -48,33 +49,67 @@ void Curve::AddPointAtEnd(CurvePoint point)
    ++mNumCurvePoints;
 }
 
+int Curve::FindIndexForTime(float time)
+{
+   int max = mNumCurvePoints-1;
+   int left = 0;
+   int right = max;
+   while (left <= right)
+   {
+      int mid = left + (right-left)/2;
+
+      if (mPoints[mid].mTime < time && (mid == max || mPoints[mid+1].mTime >= time)) // Check if x is present at mid
+         return mid;
+      if (mPoints[mid].mTime < time) // If time greater, ignore left half
+         left = mid + 1;
+      else // If time is smaller, ignore right half
+         right = mid - 1;
+  }
+  
+  // if we reach here, then element was not present
+  return -1;
+}
+
 float Curve::Evaluate(float time, bool holdEndForLoop)
 {
    float retVal = 0;
    
    if (mNumCurvePoints > 0)
    {
-      if (holdEndForLoop && time < mPoints[0].mTime)
-         return mPoints[mNumCurvePoints-1].mValue;
-      
-      const CurvePoint* before = &mPoints[0];
-      const CurvePoint* after = nullptr;
-      for (int i=0; i<mNumCurvePoints; ++i)
+      if (time <= mPoints[0].mTime)
       {
-         if (mPoints[i].mTime < time)
-         {
-            before = &mPoints[i];
-         }
+         if (holdEndForLoop)
+            return mPoints[mNumCurvePoints-1].mValue;
          else
-         {
-            after = &mPoints[i];
-            break;
-         }
+            return mPoints[0].mValue;
       }
-      if (after == nullptr)
-         after = before;
       
-      retVal = ofMap(time, before->mTime, after->mTime, before->mValue, after->mValue, K(clamp));
+      int beforeIndex = 0;
+      int quickCheckIndex = mLastEvalIndex;
+      if (quickCheckIndex < mNumCurvePoints &&
+          mPoints[quickCheckIndex].mTime < time &&
+          (quickCheckIndex == mNumCurvePoints-1 || mPoints[quickCheckIndex+1].mTime >= time))
+      {
+         beforeIndex = quickCheckIndex;
+      }
+      else
+      {
+         /*for (int i=1; i<mNumCurvePoints; ++i)
+         {
+            if (mPoints[i].mTime >= time)
+            {
+               beforeIndex = i-1;
+               break;
+            }
+         }*/
+         beforeIndex = FindIndexForTime(time);
+         assert(beforeIndex >= 0 && beforeIndex < mNumCurvePoints);
+      }
+      
+      mLastEvalIndex = beforeIndex;
+      int afterIndex = MIN(beforeIndex+1, mNumCurvePoints-1);
+      
+      retVal = ofMap(time, mPoints[beforeIndex].mTime, mPoints[afterIndex].mTime, mPoints[beforeIndex].mValue, mPoints[afterIndex].mValue, K(clamp));
    }
    
    return retVal;

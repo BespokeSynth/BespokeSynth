@@ -50,6 +50,7 @@ protected:
 
 private:
    bool IsAtCapacity() { return mNumCurvePoints >= (int)mPoints.size(); }
+   int FindIndexForTime(float time);
    array<CurvePoint,5000> mPoints;
    int mNumCurvePoints;
    float mWidth;
@@ -57,6 +58,7 @@ private:
    float mStart;
    float mEnd;
    ofColor mColor;
+   int mLastEvalIndex;
 };
 
 #endif /* defined(__Bespoke__Curve__) */
