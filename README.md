@@ -3,7 +3,7 @@ A software modular synth that I'm building for myself, and you can use it if you
 
 You can find the most recent builds for Mac/Windows/Linux at https://github.com/awwbees/BespokeSynth/releases
 
-(the current release doesn't include fubbles or most of the latest python livecoding hotness. stay tuned, I'll make a new build soon!)
+_(the current release doesn't include fubbles or most of the latest python livecoding hotness. stay tuned, I'll make a new build soon!)_
 
 ![screenshot](screenshot-1.png)
 
