@@ -1,9 +1,12 @@
 # Bespoke Synth
-A software modular synth that I'm building for myself, and you can use it if you want to. Some out of date documentation available at https://www.reddit.com/r/BespokeSynth
+A software modular synth that I'm building for myself, and you can use it if you want to. If you're interested, you can find some out of date documentation at https://www.reddit.com/r/BespokeSynth, or you can just jump in and start messing around.
+
+You can find the most recent builds for Mac/Windows/Linux at https://github.com/awwbees/BespokeSynth/releases
 
 ![screenshot](screenshot-1.png)
 
 ### Recent videos of Bespoke usage
+* https://twitter.com/awwbees/status/1294025917510168578
 * https://twitter.com/awwbees/status/1282500237697921025
 * https://twitter.com/awwbees/status/1289710877734834187
 * https://twitter.com/awwbees/status/1229246748037697536
