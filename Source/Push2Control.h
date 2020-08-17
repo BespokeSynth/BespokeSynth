@@ -89,8 +89,8 @@ private:
    int mFontHandle;
    int mFontHandleBold;
    
-   int mWidth;
-   int mHeight;
+   float mWidth;
+   float mHeight;
    
    IDrawableModule* mDisplayModule;
    IDrawableModule* mLastModuleSetFromHover;

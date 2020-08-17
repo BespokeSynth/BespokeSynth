@@ -31,7 +31,7 @@ FubbleModule::FubbleModule()
 , mQuantizeLengthSelector(nullptr)
 , mSpeed(1)
 , mSpeedSlider(nullptr)
-, mWidth(211)
+, mWidth(220)
 , mHeight(kTopControlHeight+200+kTimelineSectionHeight+kBottomControlHeight)
 , mRecordStartOffset(0)
 , mIsDrawing(false)
@@ -165,14 +165,16 @@ void FubbleModule::DrawModule()
    
    if (mPerlinStrength > 0)
    {
-      float drawBlockSize = 4;
       double perlinTime = gTime;
-      for (int x=0; x<rect.width; x+=drawBlockSize)
+      const int kGridSize = 30;
+      for (int col=0; col<kGridSize; ++col)
       {
-         for (int y=0; y<rect.height; y+=drawBlockSize)
+         for (int row=0; row<kGridSize; ++row)
          {
+            float x = col * (rect.width/kGridSize);
+            float y = row * (rect.height/kGridSize);
             ofSetColor(GetPerlinNoiseValue(perlinTime, x/rect.width, y/rect.height, true)*255, 0, GetPerlinNoiseValue(perlinTime, x/rect.width, y/rect.height, false)*255, ofClamp(mPerlinStrength, 0, 1) * 255);
-            ofRect(x,y,drawBlockSize,drawBlockSize,0);
+            ofRect(x,y,(rect.width/kGridSize),(rect.height/kGridSize),0);
          }
       }
    }
@@ -220,8 +222,9 @@ void FubbleModule::DrawModule()
    ofSetColor(255,255,255);
    if (mAxisH.mHasRecorded)
    {
-      float currentX = mAxisH.mCurve.Evaluate(GetPlaybackTime(gTime), true) * rect.width;
-      float currentY = (1 - mAxisV.mCurve.Evaluate(GetPlaybackTime(gTime), true)) * rect.height;
+      float time = mIsDrawing ? mRecordStartOffset : GetPlaybackTime(gTime);
+      float currentX = mAxisH.mCurve.Evaluate(time, true) * rect.width;
+      float currentY = (1 - mAxisV.mCurve.Evaluate(time, true)) * rect.height;
       ofCircle(currentX, currentY, 4);
    }
    
@@ -453,12 +456,14 @@ void FubbleModule::GetModuleDimensions(float& width, float& height)
 
 void FubbleModule::Resize(float w, float h)
 {
+   w = MAX(w, 211);
+   h = MAX(h, 180);
    mPerlinStrengthSlider->SetPosition(mPerlinStrengthSlider->GetPosition(true).x, mPerlinStrengthSlider->GetPosition(true).y + h - mHeight);
    mPerlinScaleSlider->SetPosition(mPerlinScaleSlider->GetPosition(true).x, mPerlinScaleSlider->GetPosition(true).y + h - mHeight);
    mPerlinSpeedSlider->SetPosition(mPerlinSpeedSlider->GetPosition(true).x, mPerlinSpeedSlider->GetPosition(true).y + h - mHeight);
    mUpdatePerlinSeedButton->SetPosition(mUpdatePerlinSeedButton->GetPosition(true).x, mUpdatePerlinSeedButton->GetPosition(true).y + h - mHeight);
-   mWidth = MAX(w, 211);
-   mHeight = MAX(h, 120);
+   mWidth = w;
+   mHeight = h;
 }
 
 void FubbleModule::SaveLayout(ofxJSONElement& moduleInfo)

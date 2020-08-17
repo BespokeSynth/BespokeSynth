@@ -303,7 +303,7 @@ string CodeEntry::FilterText(string input, std::vector<int> mapping, int filter1
 
 void CodeEntry::UpdateSyntaxHighlightMapping()
 {
-   string syntaxHighlightCode = R"(def syntax_highlight_basic():
+   const string syntaxHighlightCode = R"(def syntax_highlight_basic():
     """
     this uses the built in lexer/tokenizer in python to identify part of code
     will return a meaningful lookuptable for index colours per character

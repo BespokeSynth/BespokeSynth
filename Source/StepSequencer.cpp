@@ -429,7 +429,7 @@ void StepSequencer::DrawModule()
       {
          float y = gridY + mGrid->GetHeight() - (i+1) * (mGrid->GetHeight() / float(mNumRows));
          
-         DrawTextLeftJustify(DrumPlayer::GetDrumHitName(i).c_str(), gridX - 7, y + 9);
+         DrawTextLeftJustify(ofToString(i), gridX - 7, y + 9);
          
          if (mAdjustOffsets)
          {

@@ -53,6 +53,7 @@ PYBIND11_EMBEDDED_MODULE(bespoke, m) {
       float measureTime = ScriptModule::GetScriptMeasureTime();
       return ceil(measureTime * subdivide + .0001f) / subdivide - measureTime;
    });
+   ///example: this.schedule_call(bespoke.time_until_subdivision(1), "on_downbeat()")
    m.def("get_time_sig_ratio", []()
    {
       return ScriptModule::GetTimeSigRatio();
@@ -96,27 +97,30 @@ PYBIND11_EMBEDDED_MODULE(scriptmodule, m)
       return ScriptModule::sScriptModules[scriptModuleIndex];
    }, py::return_value_policy::reference);
    py::class_<ScriptModule, IDrawableModule>(m, "scriptmodule")
-      .def("play_note", [](ScriptModule& module, int pitch, int velocity, float length, float pan, int noteOutputIndex)
+      .def("play_note", [](ScriptModule& module, int pitch, int velocity, float length, float pan, int output_index)
       {
-         module.PlayNoteFromScript(pitch, velocity, pan, noteOutputIndex);
-         module.PlayNoteFromScriptAfterDelay(pitch, 0, length, 0, noteOutputIndex);
+         module.PlayNoteFromScript(pitch, velocity, pan, output_index);
+         module.PlayNoteFromScriptAfterDelay(pitch, 0, length, 0, output_index);
       }, "pitch"_a, "velocity"_a, "length"_a=1.0f/16.0f, "pan"_a = 0, "output_index"_a = 0)
-      .def("schedule_note", [](ScriptModule& module, float delay, int pitch, int velocity, float length, float pan, int noteOutputIndex)
+      ///example: this.play_note(60, 127, 1.0/8)
+      .def("schedule_note", [](ScriptModule& module, float delay, int pitch, int velocity, float length, float pan, int output_index)
       {
-         module.PlayNoteFromScriptAfterDelay(pitch, velocity, delay, pan, noteOutputIndex);
-         module.PlayNoteFromScriptAfterDelay(pitch, 0, delay + length, 0, noteOutputIndex);
+         module.PlayNoteFromScriptAfterDelay(pitch, velocity, delay, pan, output_index);
+         module.PlayNoteFromScriptAfterDelay(pitch, 0, delay + length, 0, output_index);
       }, "delay"_a, "pitch"_a, "velocity"_a, "length"_a=1.0f/16.0f, "pan"_a = 0, "output_index"_a = 0)
-      .def("schedule_note_msg", [](ScriptModule& module, float delay, int pitch, int velocity, float pan, int noteOutputIndex)
+      ///example: this.schedule_note(1.0/4, 60, 127, 1.0/8)
+      .def("schedule_note_msg", [](ScriptModule& module, float delay, int pitch, int velocity, float pan, int output_index)
       {
-         module.PlayNoteFromScriptAfterDelay(pitch, velocity, delay, pan, noteOutputIndex);
+         module.PlayNoteFromScriptAfterDelay(pitch, velocity, delay, pan, output_index);
       }, "delay"_a, "pitch"_a, "velocity"_a, "pan"_a = 0, "output_index"_a = 0)
       .def("schedule_call", [](ScriptModule& module, float delay, string method)
       {
          module.ScheduleMethod(method, delay);
       })
-      .def("note_msg", [](ScriptModule& module, int pitch, int velocity, float pan, int noteOutputIndex)
+      ///example: this.schedule_call(1.0/4, "dotask()")
+      .def("note_msg", [](ScriptModule& module, int pitch, int velocity, float pan, int output_index)
       {
-         module.PlayNoteFromScript(pitch, velocity, pan, noteOutputIndex);
+         module.PlayNoteFromScript(pitch, velocity, pan, output_index);
       }, "pitch"_a, "velocity"_a, "pan"_a = 0, "output_index"_a = 0)
       .def("set", [](ScriptModule& module, string path, float value)
       {
@@ -124,6 +128,7 @@ PYBIND11_EMBEDDED_MODULE(scriptmodule, m)
          if (control != nullptr)
             module.ScheduleUIControlValue(control, value, 0);
       })
+      ///example: this.set("oscillator~pw", .2)
       .def("schedule_set", [](ScriptModule& module, float delay, string path, float value)
       {
          IUIControl* control = module.GetUIControl(path);
@@ -137,6 +142,7 @@ PYBIND11_EMBEDDED_MODULE(scriptmodule, m)
             return control->GetValue();
          return 0.0f;
       })
+      ///example: pulsewidth = this.get("oscillator~pulsewidth")
       .def("adjust", [](ScriptModule& module, string path, float amount)
       {
          IUIControl* control = module.GetUIControl(path);
@@ -156,6 +162,7 @@ PYBIND11_EMBEDDED_MODULE(scriptmodule, m)
       {
          module.PrintText(py::str(obj));
       })
+      ///example: this.output("hello world!")
       .def("this", [](ScriptModule& module)
       {
          return &module;
@@ -165,6 +172,7 @@ PYBIND11_EMBEDDED_MODULE(scriptmodule, m)
          return module.Stop();
       })
       .def("get_caller", [](ScriptModule& module)
+      ///example: this.get_caller().play_note(60,127)
       {
          return ScriptModule::sPriorExecutedModule;
       })
@@ -210,6 +218,7 @@ PYBIND11_EMBEDDED_MODULE(grid, m)
    {
       return dynamic_cast<GridModule*>(TheSynth->FindModule(path));
    }, py::return_value_policy::reference);
+   ///example: g = grid.get("grid")  #assuming there's a grid called "grid" somewhere in the layout
    py::class_<GridModule, IDrawableModule>(m, "grid")
       .def("set", [](GridModule& grid, int col, int row, float value)
       {
@@ -299,9 +308,9 @@ PYBIND11_EMBEDDED_MODULE(module, m)
    {
       return TheSynth->FindModule(path);
    }, py::return_value_policy::reference);
-   m.def("create", [](string moduleName, int x, int y)
+   m.def("create", [](string moduleType, int x, int y)
    {
-      return TheSynth->SpawnModuleOnTheFly(moduleName, x, y);
+      return TheSynth->SpawnModuleOnTheFly(moduleType, x, y);
    }, py::return_value_policy::reference);
    py::class_<IDrawableModule>(m, "module")
       .def("set_position", [](IDrawableModule& module, int x, int y)

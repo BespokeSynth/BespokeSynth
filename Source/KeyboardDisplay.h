@@ -51,8 +51,8 @@ private:
    int NumKeys() const;
    int GetPitchForTypingKey(int key) const;
    
-   int mWidth;
-   int mHeight;
+   float mWidth;
+   float mHeight;
    int mRootOctave;
    int mNumOctaves;
    int mPlayingMousePitch;

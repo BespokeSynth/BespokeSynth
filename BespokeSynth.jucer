@@ -212,6 +212,8 @@
         <FILE id="XLf5ZZ" name="FubbleModule.h" compile="0" resource="0" file="Source/FubbleModule.h"/>
         <FILE id="kLDNXp" name="GridModule.cpp" compile="1" resource="0" file="Source/GridModule.cpp"/>
         <FILE id="N725Dx" name="GridModule.h" compile="0" resource="0" file="Source/GridModule.h"/>
+        <FILE id="eNHV16" name="NoteSprayer.cpp" compile="1" resource="0" file="Source/NoteSprayer.cpp"/>
+        <FILE id="gcd72u" name="NoteSprayer.h" compile="0" resource="0" file="Source/NoteSprayer.h"/>
         <FILE id="LLtoND" name="PulseButton.cpp" compile="1" resource="0" file="Source/PulseButton.cpp"/>
         <FILE id="jBmOht" name="PulseButton.h" compile="0" resource="0" file="Source/PulseButton.h"/>
         <FILE id="ZRcVIM" name="NoteStreamDisplay.cpp" compile="1" resource="0"

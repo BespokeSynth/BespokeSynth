@@ -106,8 +106,8 @@ private:
    float mSpeed;
    FloatSlider* mSpeedSlider;
    ClickButton* mClearButton;
-   int mWidth;
-   int mHeight;
+   float mWidth;
+   float mHeight;
    double mRecordStartOffset;
    bool mIsDrawing;
    bool mIsRightClicking;

@@ -117,7 +117,7 @@ void IUIControl::DrawPatchCableHover()
       GetDimensions(w, h);
       ofPushStyle();
       ofNoFill();
-      ofSetLineWidth(5);
+      ofSetLineWidth(1.5f);
       ofSetColor(255,0,255,200);
       ofRect(mX,mY,w,h);
       ofPopStyle();

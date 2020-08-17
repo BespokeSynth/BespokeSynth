@@ -69,8 +69,8 @@ private:
    int mLength;
    DropdownList* mLengthSelector;
    PatchCableSource* mControlCable;
-   int mWidth;
-   int mHeight;
+   float mWidth;
+   float mHeight;
    EnvelopeControl mEnvelopeControl;
    ::ADSR mAdsr;
    ClickButton* mRandomizeButton;

@@ -39,8 +39,8 @@ private:
    string mEffectsReference;
    RadioButton* mHelpPageSelector;
    int mHelpPage;
-   int mWidth;
-   int mHeight;
+   float mWidth;
+   float mHeight;
 };
 
 #endif /* defined(__Bespoke__HelpDisplay__) */

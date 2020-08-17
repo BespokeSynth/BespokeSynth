@@ -135,7 +135,10 @@ void DropdownList::Render()
    DrawTextNormal(GetDisplayValue(*mVar), mX+2+xOffset, mY+12);
    ofPopMatrix();
    if (mDrawTriangle)
+   {
+      ofSetLineWidth(.5f);
       ofTriangle(mX+w-11, mY+4, mX+w-3, mY+4, mX+w-7, mY+11);
+   }
 
    ofPopStyle();
    

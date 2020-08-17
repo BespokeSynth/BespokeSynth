@@ -1,10 +1,10 @@
+WARNING! Much of this documentation is out of date
+
 Important buttons on the title bar:
 
-* layout dropdown: Load up any layout saved into the data/layouts/ directory.
-* save layout: Save the currently opened layout file
-* save layout as: Save the currently opened layout file with another name
+* save state: Save the state of everything
+* load state: Reload into a previously saved state
 * write audio: Save the last 30 minutes of audio that you played to your data/recordings/ directory. This way you can aimlessly jam and never miss anything that sounded cool.
-* repatch mode: When in this mode, clicking on a module will allow you to repatch it to be connected to other modules. Holding 'r' also puts you in repatch mode.
 * quit: Quits Bespoke.
  
  
@@ -14,17 +14,20 @@ Input reference:
 * Click and drag the bar at the top of a module to move it. Click on the module's name to minimize it. 
 * Click on the triangle on the right of that bar to open the save data configuration for that module.
 * Hold space bar and move your finger around on your trackpad to move around on Bespoke's canvas.
-* Hold space bar and drag two fingers vertically to zoom in and out.
-* If you've gotten to a zoom level and position that you like, press shift+(number) to save that location. To return to a location after you've saved it, simply press that number. This way you can jump between multiple areas on the canvas. If you store a location at shift-1, this is the location that you will start at when the layout is loaded.
-* Click and drag on the plug at the end of a patch cable to repatch it. Release the cable on a module to set that as the new target. You can instead hold 'r' and click on a module to repatch it, if you prefer. While repatching, invalid targets will dim.
+* Hold space bar and scroll vertically to zoom in and out.
+* Click and drag on the plug at the end of a patch cable to repatch it. Release the cable on a module to set that as the new target. While repatching, invalid targets will dim.
+* Hold shift when clicking a patch cable source to create multiple cables, for modules which support this (note and pulse modules)
+* Hold shift when attaching a patch cable to "insert" the new module into the old chain. (i.e., if you wanted to add a gain between signalgenerator and output which are already patched together, patch the signalgenerator into the gain while holding shift)
+* Hold shift while dragging a module and "touch" it to other modules to automatically create patch connections to those modules.
 * Hold shift when dragging a float slider to move it with higher precision.
 * Hold command when dragging a float slider to limit yourself within the current integer. So if you've got a slider on 1.3 and are holding command, it'll stay between 1 and 2.
-* When you hover over a UI control, you'll see that it outlines in cyan. On your trackpad, you can use two fingers dragging vertically to adjust the currently cyan-highlighted control.
+* When you hover over a UI control, you can scroll your trackpad/mousewheel vertically to adjust that cyan-highlighted hovered control. Hold shift for finer control.
 * Right click a slider to start an LFO on that slider. When the slider is in LFO mode, clicking and dragging horizontally sets the LFO max, and vertically sets the LFO min.
-* Press '-' while hovered over a float slider to halve its value, or '+' to double it.
-* Press '0' while hovered over a slider to revert it to its original value.
+* Press '[' while hovered over a float slider to halve its value, or ']' to double it.
+* Type a number or expression when hovered over a slider to enter a value for that slider.
+* Hold command and click the start/end of a slider to enter a new value for the minimum or maximum of that slider. Doing this could adjust a slider to operate outside it's intended range, which could lead to unexpected behavior, so be warned!
 * Press '/' to toggle full screen mode.
-* Click a module and press "delete" to delete it. Any other modules clicked while holding delete will be deleted.
+* Delete modules by using the triangle menu for that module, or by drag-selecting and pressing "delete" on your keyboard.
 
 
 In your data directory there is a userprefs.json file. This contains a few settings:
@@ -45,7 +48,6 @@ If you press the tab key, you can bring up the console. A few good console comma
 
 #module reference:
    adsrtrigger - Triggers ADSRs that you can find in the dropdown you get when you hit 'q' while hovered over a slider.
-   amplifier - Volume booster.
    arpeggiator - Arpeggiates held chords.
    audiorouter - Selector for switching where audio is routed to.
    autotalent - Autotuner.
@@ -63,8 +65,8 @@ If you press the tab key, you can bring up the console. A few good console comma
    eigenharpnotesource - Pairs with eigenharp, turns it into note data.
    fmsynth - FM synthesis.
    fouronthefloor - Sends a kick note every beat.
-   freeverboutput - Apply stereo reverb to your overall output before it hits the speakers.
    freqdelay - Very short delay intended for pitched delay effects, you can patch a note cable to it to delay at an amount that will create that pitch.
+   gain - Volume booster.
    gridcontroller - Represents a hardware grid (Launchpad, monome, etc) to be used as an interface to grid-based modules, such as the drumsequencer or the launchpadkeyboard.
    input - Input channel from your audio interface/sound card.
    karplusstrong - Plucked string synthesis.

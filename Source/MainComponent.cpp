@@ -85,8 +85,14 @@ public:
       mSynth.Poll();
       
       static int sRenderFrame = 0;
+#if DEBUG
       if (sRenderFrame % 2 == 0)
+#else
+      if (true)
+#endif
+      {
          openGLContext.triggerRepaint();
+      }
       ++sRenderFrame;
    }
    

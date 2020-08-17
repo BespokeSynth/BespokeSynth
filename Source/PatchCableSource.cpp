@@ -236,7 +236,7 @@ void PatchCableSource::Render()
    {
       ofPushStyle();
       ofSetColor(0,0,0);
-      ofSetLineWidth(3);
+      ofSetLineWidth(2);
       ofLine(mX,mY-(patchCableSourceRadius-1),mX,mY+(patchCableSourceRadius-1));
       ofLine(mX-(patchCableSourceRadius-1),mY,mX+(patchCableSourceRadius-1),mY);
       ofPopStyle();
