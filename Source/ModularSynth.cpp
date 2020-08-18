@@ -820,7 +820,7 @@ void ModularSynth::MouseScrolled(float x, float y)
    {
 #if JUCE_WINDOWS
       y *= -1;
-      y -= x / 3; //taking advantage of logitech horizontal scroll wheel
+      y -= x / 7; //taking advantage of logitech horizontal scroll wheel
 #endif
 
       float val = gHoveredUIControl->GetMidiValue();
@@ -866,7 +866,6 @@ void ModularSynth::MouseScrolled(float x, float y)
    {
 #if JUCE_WINDOWS
       y *= -1;
-      y -= x / 3; //taking advantage of logitech horizontal scroll wheel
 #endif
 
       IDrawableModule* module = GetModuleAt(GetMouseX(), GetMouseY());

@@ -1,12 +1,14 @@
 {
-   "buffersize" : 256,
-   "height" : 1100,
-   "layout" : "\\layouts\\blank.json",
    "samplerate" : 48000,
+   "buffersize" : 256,
+   "audio_output_device" : "auto",
+   "audio_input_device" : "none",
+   "height" : 1100,
+   "width" : 1700,
+   "layout" : "\\layouts\\blank.json",
    "vstsearchdirs" : [
       "C:\\Program Files\\Common Files\\VST2",
       "C:\\Program Files\\Common Files\\VST3",
       "C:\\Program Files\\Steinberg\\VSTPlugins"
-   ],
-   "width" : 1700
+   ]
 }
