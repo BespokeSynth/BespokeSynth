@@ -21,6 +21,7 @@
 #define NANOVG_GL3_IMPLEMENTATION
 #include "nanovg/nanovg_gl.h"
 #include "ModularSynth.h"
+#include "Push2Control.h"
 
 ofColor ofColor::black(0,0,0);
 ofColor ofColor::white(255,255,255);
@@ -149,6 +150,12 @@ void ofClipWindow(float x, float y, float width, float height)
 void ofSetColor(float r, float g, float b, float a)
 {
    sStyleStack.GetStyle().color = ofColor(r,g,b,a);
+   if (Push2Control::sDrawingPush2Display)
+   {
+      nvgStrokeColor(gNanoVG, nvgRGBA(r, g, b, a));
+      nvgFillColor(gNanoVG, nvgRGBA(r, g, b, a));
+      return;
+   }
    static int sImage = -1;
    if (sImage == -1)
       sImage = nvgCreateImage(gNanoVG, ofToDataPath("noise.jpg").c_str(), NVG_IMAGE_REPEATX | NVG_IMAGE_REPEATY);

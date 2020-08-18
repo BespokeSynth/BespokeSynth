@@ -224,9 +224,9 @@ void Transport::DrawModule()
    ofRect(0,h-Swing(measurePos)*h,4,1);
 }
 
-void Transport::Reset()
+void Transport::Reset(float rewindAmount)
 {
-   mMeasureTime = -.5f;
+   mMeasureTime = -rewindAmount;
 }
 
 void Transport::ButtonClicked(ClickButton *button)

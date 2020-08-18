@@ -174,7 +174,7 @@ void FubbleModule::DrawModule()
             float x = col * (rect.width/kGridSize);
             float y = row * (rect.height/kGridSize);
             ofSetColor(GetPerlinNoiseValue(perlinTime, x/rect.width, y/rect.height, true)*255, 0, GetPerlinNoiseValue(perlinTime, x/rect.width, y/rect.height, false)*255, ofClamp(mPerlinStrength, 0, 1) * 255);
-            ofRect(x,y,(rect.width/kGridSize),(rect.height/kGridSize),0);
+            ofRect(x,y,(rect.width/kGridSize)+.5f,(rect.height/kGridSize)+.5f,0);
          }
       }
    }
