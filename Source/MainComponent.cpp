@@ -7,7 +7,7 @@
 
 #include "../JuceLibraryCode/JuceHeader.h"
 #include "nanovg/nanovg.h"
-#define NANOVG_GL3_IMPLEMENTATION
+#define NANOVG_GLES2_IMPLEMENTATION
 #include "nanovg/nanovg_gl.h"
 #include "ModularSynth.h"
 #include "SynthGlobals.h"
@@ -133,8 +133,8 @@ public:
       glewInit();
 #endif
       
-      mVG = nvgCreateGL3(NVG_ANTIALIAS | NVG_STENCIL_STROKES);
-      mFontBoundsVG = nvgCreateGL3(NVG_ANTIALIAS | NVG_STENCIL_STROKES);
+      mVG = nvgCreateGLES2(NVG_ANTIALIAS | NVG_STENCIL_STROKES);
+      mFontBoundsVG = nvgCreateGLES2(NVG_ANTIALIAS | NVG_STENCIL_STROKES);
       
       if (mVG == nullptr)
          printf("Could not init nanovg.\n");
@@ -248,8 +248,8 @@ public:
    
    void shutdown() override
    {
-      nvgDeleteGL3(mVG);
-      nvgDeleteGL3(mFontBoundsVG);
+      nvgDeleteGLES2(mVG);
+      nvgDeleteGLES2(mFontBoundsVG);
    }
    
    void render() override

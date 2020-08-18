@@ -16,7 +16,7 @@
 #include <cctype>
 #include "SynthGlobals.h"
 #include "nanovg/nanovg.h"
-#define NANOVG_GL3_IMPLEMENTATION
+#define NANOVG_GLES2_IMPLEMENTATION
 #include "nanovg/nanovg_gl.h"
 #include "nanovg/nanovg_gl_utils.h"
 #include "OpenFrameworksPort.h"
@@ -198,7 +198,7 @@ void Push2Control::SaveLayout(ofxJSONElement& moduleInfo)
 //static
 void Push2Control::CreateStaticFramebuffer()
 {
-   sVG = nvgCreateGL3(NVG_ANTIALIAS | NVG_STENCIL_STROKES);
+   sVG = nvgCreateGLES2(NVG_ANTIALIAS | NVG_STENCIL_STROKES);
    assert(sVG);
 
    const auto width = ableton::Push2DisplayBitmap::kWidth;

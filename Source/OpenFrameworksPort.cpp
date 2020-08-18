@@ -18,7 +18,7 @@
 
 #include "OpenFrameworksPort.h"
 #include "nanovg/nanovg.h"
-#define NANOVG_GL3_IMPLEMENTATION
+#define NANOVG_GLES2_IMPLEMENTATION
 #include "nanovg/nanovg_gl.h"
 #include "ModularSynth.h"
 #include "Push2Control.h"

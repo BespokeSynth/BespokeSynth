@@ -726,6 +726,10 @@ static int glnvg__renderCreateTexture(void* uptr, int type, int w, int h, int im
 		glTexParameteri(GL_TEXTURE_2D, GL_GENERATE_MIPMAP, GL_TRUE);
 	}
 #endif
+   
+#if !defined (GL_LUMINANCE)
+#define GL_LUMINANCE GL_RED
+#endif
 
 	if (type == NVG_TEXTURE_RGBA)
 		glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, w, h, 0, GL_RGBA, GL_UNSIGNED_BYTE, data);
