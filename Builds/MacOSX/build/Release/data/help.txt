@@ -13,7 +13,7 @@ Input reference:
 * Click on the circle in the top left corner of a module to enable/disable it.
 * Click and drag the bar at the top of a module to move it. Click on the module's name to minimize it. 
 * Click on the triangle on the right of that bar to open the save data configuration for that module.
-* Hold space bar and move your finger around on your trackpad to move around on Bespoke's canvas.
+* Hold space bar and mouse around to move around on Bespoke's canvas.
 * Hold space bar and scroll vertically to zoom in and out.
 * Click and drag on the plug at the end of a patch cable to repatch it. Release the cable on a module to set that as the new target. While repatching, invalid targets will dim.
 * Hold shift when clicking a patch cable source to create multiple cables, for modules which support this (note and pulse modules)
