@@ -195,6 +195,15 @@ inline static float RandomSample()
    return (float(rand())/RAND_MAX) * 2.0f - 1.0f;
 }
 
+inline static string GetPathSeparator()
+{
+#if BESPOKE_WINDOWS
+   return "\\";
+#else
+   return "/";
+#endif
+}
+
 #ifndef assert
 #define assert Assert
 

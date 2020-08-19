@@ -275,7 +275,7 @@ void BeatBloks::FilesDropped(vector<string> files, int x, int y)
    
    ResetRead();
    
-   vector<string> tokens = ofSplitString(files[0].c_str(),"/");
+   vector<string> tokens = ofSplitString(files[0].c_str(), GetPathSeparator());
    string cachedFilename = tokens[tokens.size()-1].c_str();
    tokens = ofSplitString(cachedFilename, ".");
    cachedFilename = tokens[0]+".cached";

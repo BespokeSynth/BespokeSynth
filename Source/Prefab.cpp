@@ -212,7 +212,7 @@ void Prefab::LoadPrefab(string loadPath)
 
 void Prefab::UpdatePrefabName(string path)
 {
-   vector<string> tokens = ofSplitString(path, "/");
+   vector<string> tokens = ofSplitString(path, GetPathSeparator());
    mPrefabName = tokens[tokens.size() - 1];
    ofStringReplace(mPrefabName, ".pfb", "");
 }

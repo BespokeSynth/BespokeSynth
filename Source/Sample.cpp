@@ -33,7 +33,7 @@ Sample::~Sample()
 bool Sample::Read(const char* path, bool mono)
 {
    StringCopy(mReadPath,path,MAX_SAMPLE_READ_PATH_LENGTH);
-   vector<string> tokens = ofSplitString(path,"/");
+   vector<string> tokens = ofSplitString(path, GetPathSeparator());
    StringCopy(mName,tokens[tokens.size()-1].c_str(),32);
    mName[strlen(mName)-4] = 0;
    
