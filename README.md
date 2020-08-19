@@ -1,9 +1,7 @@
 # Bespoke Synth
 A software modular synth that I'm building for myself, and you can use it if you want to. If you're interested, you can find some out of date documentation at https://www.reddit.com/r/BespokeSynth, or you can just jump in and start messing around.
 
-You can find the most recent builds for Mac/Windows/Linux at https://github.com/awwbees/BespokeSynth/releases
-
-_(the current release doesn't include fubbles or most of the latest python livecoding hotness. stay tuned, I'll make a new build soon!)_
+You can find the most recent builds for Mac/Windows/Linux at https://github.com/awwbees/BespokeSynth/releases. To find the download, expand the "Assets" dropdown under the latest release.
 
 ![screenshot](screenshot-1.png)
 
