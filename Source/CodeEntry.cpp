@@ -35,6 +35,7 @@ CodeEntry::CodeEntry(ICodeEntryListener* owner, const char* name, int x, int y, 
 , mLastPublishTime(-999)
 , mHasError(false)
 , mErrorLine(-1)
+, mDoSyntaxHighlighting(true)
 {
    mCaretBlink = true;
    mCaretBlinkTimer = 0;
@@ -303,14 +304,20 @@ string CodeEntry::FilterText(string input, std::vector<int> mapping, int filter1
 
 void CodeEntry::UpdateSyntaxHighlightMapping()
 {
-   const string syntaxHighlightCode = R"(def syntax_highlight_basic():
-    """
-    this uses the built in lexer/tokenizer in python to identify part of code
-    will return a meaningful lookuptable for index colours per character
-    """
+   const string syntaxHighlightCode = R"(def syntax_highlight_basic():    
+    #this uses the built in lexer/tokenizer in python to identify part of code 
+    #will return a meaningful lookuptable for index colours per character 
     import tokenize
     import io
     import token
+    import sys
+
+    isPython3 = False
+    if sys.version_info[0] >= 3:
+       isPython3 = True
+
+    if isPython3:
+       unicode = str
    
     text = syntax_highlight_code
 
@@ -324,7 +331,7 @@ void CodeEntry::UpdateSyntaxHighlightMapping()
            tokens = tokenize.generate_tokens(f.readline)
 
            for token in tokens:
-               #print(token)
+               #print(token)              
                if token[0] in (0, 5, 56, 256):
                    continue
                if not token[1] or (token[2] == token[3]):
@@ -341,16 +348,20 @@ void CodeEntry::UpdateSyntaxHighlightMapping()
                        token_type = 92
                    else:
                        defined.append(token[1])
-
+               elif isPython3 and token.type == 54:
+                   # OPS
+                   # 7: 'LPAR', 8: 'RPAR
+                   # 9: 'LSQB', 10: 'RSQB'
+                   # 25: 'LBRACE', 26: 'RBRACE'
+                   if token.exact_type in {7, 8, 9, 10, 25, 26}:
+                       token_type = token.exact_type
+                   else:
+                       token_type = 51
                elif token_type == 51:
                    # OPS
                    # 7: 'LPAR', 8: 'RPAR
                    # 9: 'LSQB', 10: 'RSQB'
                    # 25: 'LBRACE', 26: 'RBRACE'
-                   #if token.exact_type in {7, 8, 9, 10, 25, 26}:
-                   #    token_type = token.exact_type
-                   #elif token.exact_type == 22:
-                   #    token_type = token.exact_type
                    if token[1] in {'(', ')'}:
                       token_type = 7
                    elif token[1] in {'[', ']'}:
@@ -361,17 +372,13 @@ void CodeEntry::UpdateSyntaxHighlightMapping()
                      token_type = 22
                    elif token[1] in {','}:
                      token_type = 12
+               elif isPython3 and token_type == 60:
+                  token_type = 53
 
-               # print(token)
-               #  start = (line number, 1 indexed) , (char index, 0 indexed)
-               # print('|start:', token.start, '|end:', token.end, "[", token.exact_type, token.type, "]")
                row_start, char_start = token[2][0]-1, token[2][1]
                row_end, char_end = token[3][0]-1, token[3][1]
-               #index1 = (row_start * textWidth) + char_start
-               #index2 = (row_end * textWidth) + char_end
 
                output = output + [token_type]*(char_end - char_start)
-               #print(char_end-char_start)
         except:
            #print("exception when syntax highlighting")
            pass
@@ -380,16 +387,28 @@ void CodeEntry::UpdateSyntaxHighlightMapping()
     #print(output)
     return output)";
    
-   try
+   if (mDoSyntaxHighlighting)
    {
-      py::exec(syntaxHighlightCode, py::globals());
-      py::globals()["syntax_highlight_code"] = GetVisibleCode();
-      py::object ret = py::eval("syntax_highlight_basic()", py::globals());
-      mSyntaxHighlightMapping = ret.cast< std::vector<int> >();
+      try
+      {
+         static bool sInitialized = false;
+         if (!sInitialized)
+         {
+            py::exec(syntaxHighlightCode, py::globals());
+            sInitialized = true;
+         }
+         py::globals()["syntax_highlight_code"] = GetVisibleCode();
+         py::object ret = py::eval("syntax_highlight_basic()", py::globals());
+         mSyntaxHighlightMapping = ret.cast< std::vector<int> >();
+      }
+      catch (const std::exception &e)
+      {
+         ofLog() << "syntax highlight execution exception: " << e.what();
+      }
    }
-   catch (const std::exception &e)
+   else
    {
-      ofLog() << "syntax highlight execution exception: " << e.what();
+      mSyntaxHighlightMapping.clear();
    }
 }
 
@@ -834,11 +853,15 @@ bool CodeEntry::MouseMoved(float x, float y)
 
 bool CodeEntry::MouseScrolled(int x, int y, float scrollX, float scrollY)
 {
-   if (fabs(mScroll.x) > fabsf(mScroll.y))
-      mScroll.y = 0;
+   if (fabs(scrollX) > fabsf(scrollY))
+      scrollY = 0;
    else
-      mScroll.x = 0;
-   
+      scrollX = 0;
+
+#if BESPOKE_WINDOWS
+   scrollY *= -1;
+#endif
+
    mScroll.x = MAX(mScroll.x + scrollX * -10, 0);
    mScroll.y = MAX(mScroll.y + scrollY * -10, 0);
    

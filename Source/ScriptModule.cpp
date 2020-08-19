@@ -910,7 +910,7 @@ bool ScriptModule::ShouldDisplayLineExecutionPre(string priorLine, string line)
    
    if (firstCharacter == '#')
       return false;
-   if (lastCharacter == ':' && (ofIsStringInString(line, "else") || ofIsStringInString(line, "elif")))
+   if (lastCharacter == ':' && (ofIsStringInString(line, "else") || ofIsStringInString(line, "elif") || ofIsStringInString(line,"except")))
       return false;
    return true;
 }
@@ -1006,6 +1006,7 @@ void ScriptModule::LoadLayout(const ofxJSONElement& moduleInfo)
 {
    mModuleSaveData.LoadBool("execute_on_init", moduleInfo, false);
    mModuleSaveData.LoadInt("init_execute_priority", moduleInfo, 0, -9999, 9999, K(isTextField));
+   mModuleSaveData.LoadBool("syntax_highlighting", moduleInfo, true);
    
    SetUpFromSaveData();
 }
@@ -1024,6 +1025,8 @@ void ScriptModule::SetUpFromSaveData()
                                                               }),
                                              this);
    }
+
+   mCodeEntry->SetDoSyntaxHighlighting(mModuleSaveData.GetBool("syntax_highlighting"));
 }
 
 void ScriptModule::SaveLayout(ofxJSONElement& moduleInfo)
