@@ -317,16 +317,16 @@ void CodeEntry::UpdateSyntaxHighlightMapping()
        isPython3 = True
 
     if isPython3:
-       unicode = str
-   
-    text = syntax_highlight_code
+       text = str(syntax_highlight_code)
+    else:
+       text = unicode(syntax_highlight_code)
 
     #print(token.tok_name) #   <--- dict of token-kinds.
     
     output = []
     defined = []
 
-    with io.StringIO(unicode(text)) as f:
+    with io.StringIO(text) as f:
         try:
            tokens = tokenize.generate_tokens(f.readline)
 
