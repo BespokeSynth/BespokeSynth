@@ -160,8 +160,7 @@ void SingleOscillatorVoice::Start(double time, float target)
       mUseFilter = true;
       mFilterLeft.SetFilterType(kFilterType_Lowpass);
       mFilterRight.SetFilterType(kFilterType_Lowpass);
-      mFilterAdsr = mVoiceParams->mFilterAdsr;
-      mFilterAdsr.Start(time,1);
+      mFilterAdsr.Start(time,1, mVoiceParams->mFilterAdsr);
    }
    else
    {
@@ -172,6 +171,7 @@ void SingleOscillatorVoice::Start(double time, float target)
 void SingleOscillatorVoice::Stop(double time)
 {
    mAdsr.Stop(time);
+   mFilterAdsr.Stop(time);
 }
 
 void SingleOscillatorVoice::ClearVoice()
