@@ -206,22 +206,24 @@ public:
          if (outputDevice != kAutoDevice && outputDevice != kNoneDevice &&
              loadedSetup.outputDeviceName.toStdString() != outputDevice)
          {
-            mSynth.SetFatalError("error setting output device to "+outputDevice+", fix this in userprefs.json (use \"auto\" for default device)"+
+            mSynth.SetFatalError("error setting output device to '"+outputDevice+"', fix this in userprefs.json (use \"auto\" for default device)"+
                                  "\n\n\nvalid devices:\n"+GetAudioDevices());
          }
          else if (inputDevice != kAutoDevice && inputDevice != kNoneDevice &&
                   loadedSetup.inputDeviceName.toStdString() != inputDevice)
          {
-            mSynth.SetFatalError("error setting input device to "+inputDevice+", fix this in userprefs.json (use \"auto\" for default device, or \"none\" for no device)"+
+            mSynth.SetFatalError("error setting input device to '"+inputDevice+"', fix this in userprefs.json (use \"auto\" for default device, or \"none\" for no device)"+
                                  "\n\n\nvalid devices:\n"+GetAudioDevices());
          }
          else if (loadedSetup.bufferSize != gBufferSize)
          {
-            mSynth.SetFatalError("error setting buffer size to "+ofToString(gBufferSize)+", fix this in userprefs.json");
+            mSynth.SetFatalError("error setting buffer size to "+ofToString(gBufferSize)+" on device '"+ loadedSetup.outputDeviceName.toStdString()+"', fix this in userprefs.json" +
+                                 "\n\n(a valid buffer size might be: " + ofToString(loadedSetup.bufferSize) + ")");
          }
          else if (loadedSetup.sampleRate != gSampleRate)
          {
-            mSynth.SetFatalError("error setting sample rate to "+ofToString(gSampleRate)+", fix this in userprefs.json");
+            mSynth.SetFatalError("error setting sample rate to "+ofToString(gSampleRate) + " on device '" + loadedSetup.outputDeviceName.toStdString() + "', fix this in userprefs.json"+
+                                 "\n\n(a valid sample rate might be: "+ofToString(loadedSetup.sampleRate)+")");
          }
          else
          {
