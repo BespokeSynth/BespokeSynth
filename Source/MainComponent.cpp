@@ -85,7 +85,7 @@ public:
       mSynth.Poll();
       
       static int sRenderFrame = 0;
-#if DEBUG
+#if DEBUG || BESPOKE_LINUX
       if (sRenderFrame % 2 == 0)
 #else
       if (true)
