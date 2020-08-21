@@ -327,6 +327,11 @@ void VSTPlugin::Poll()
 
 void VSTPlugin::Process(double time)
 {
+#if BESPOKE_LINUX //HACK: weird race condition, which this seems to fix for now
+   if (mPlugin == nullptr)
+      return;
+#endif
+
    PROFILER(VSTPlugin);
    
    int inputChannels = MAX(2, mNumInputs);
