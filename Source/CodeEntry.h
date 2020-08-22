@@ -39,6 +39,8 @@ public:
    void SetError(bool error, int errorLine = -1);
    void SetDoSyntaxHighlighting(bool highlight) { mDoSyntaxHighlighting = highlight; }
    
+   static void SetUpSyntaxHighlighting();
+   
    void GetDimensions(float& width, float& height) override { width = mWidth; height = mHeight; }
    void SetDimensions(float width, float height);
 

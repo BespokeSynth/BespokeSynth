@@ -302,101 +302,108 @@ string CodeEntry::FilterText(string input, std::vector<int> mapping, int filter1
    return input;
 }
 
+//static
+void CodeEntry::SetUpSyntaxHighlighting()
+{
+   const string syntaxHighlightCode = R"(def syntax_highlight_basic():
+   #this uses the built in lexer/tokenizer in python to identify part of code
+   #will return a meaningful lookuptable for index colours per character
+   import tokenize
+   import io
+   import token
+   import sys
+
+   isPython3 = False
+   if sys.version_info[0] >= 3:
+      isPython3 = True
+
+   if isPython3:
+      text = str(syntax_highlight_code)
+   else:
+      text = unicode(syntax_highlight_code)
+
+   #print(token.tok_name) #   <--- dict of token-kinds.
+   
+   output = []
+   defined = []
+
+   with io.StringIO(text) as f:
+       try:
+          tokens = tokenize.generate_tokens(f.readline)
+
+          for token in tokens:
+              #print(token)
+              if token[0] in (0, 5, 56, 256):
+                  continue
+              if not token[1] or (token[2] == token[3]):
+                  continue
+
+              token_type = token[0]
+              
+              if token_type == 1:
+                  if token[1] in {'print', 'def', 'class', 'break', 'continue', 'return', 'while', 'or', 'and', 'dir', 'if', 'elif', 'else', 'is', 'in', 'as', 'out', 'with', 'from', 'import', 'with', 'for'}:
+                      token_type = 90
+                  elif token[1] in {'False', 'True', 'yield', 'repr', 'range', 'enumerate', 'len', 'type', 'list', 'tuple', 'int', 'str', 'float'}:
+                      token_type = 91
+                  elif token[1] in globals() or token[1] in defined:
+                      token_type = 92
+                  else:
+                      defined.append(token[1])
+              elif isPython3 and token.type == 54:
+                  # OPS
+                  # 7: 'LPAR', 8: 'RPAR
+                  # 9: 'LSQB', 10: 'RSQB'
+                  # 25: 'LBRACE', 26: 'RBRACE'
+                  if token.exact_type in {7, 8, 9, 10, 25, 26}:
+                      token_type = token.exact_type
+                  else:
+                      token_type = 51
+              elif token_type == 51:
+                  # OPS
+                  # 7: 'LPAR', 8: 'RPAR
+                  # 9: 'LSQB', 10: 'RSQB'
+                  # 25: 'LBRACE', 26: 'RBRACE'
+                  if token[1] in {'(', ')'}:
+                     token_type = 7
+                  elif token[1] in {'[', ']'}:
+                     token_type = 9
+                  elif token[1] in {'{', '}'}:
+                    token_type = 25
+                  elif token[1] in {'='}:
+                    token_type = 22
+                  elif token[1] in {','}:
+                    token_type = 12
+              elif isPython3 and token_type == 60:
+                 token_type = 53
+
+              row_start, char_start = token[2][0]-1, token[2][1]
+              row_end, char_end = token[3][0]-1, token[3][1]
+
+              output = output + [token_type]*(char_end - char_start)
+       except:
+          #print("exception when syntax highlighting")
+          pass
+           
+
+   #print(output)
+   return output)";
+   
+   try
+   {
+      py::exec(syntaxHighlightCode, py::globals());
+   }
+   catch (const std::exception &e)
+   {
+      ofLog() << "syntax highlight initialization exception: " << e.what();
+   }
+}
+
 void CodeEntry::UpdateSyntaxHighlightMapping()
 {
-   const string syntaxHighlightCode = R"(def syntax_highlight_basic():    
-    #this uses the built in lexer/tokenizer in python to identify part of code 
-    #will return a meaningful lookuptable for index colours per character 
-    import tokenize
-    import io
-    import token
-    import sys
-
-    isPython3 = False
-    if sys.version_info[0] >= 3:
-       isPython3 = True
-
-    if isPython3:
-       text = str(syntax_highlight_code)
-    else:
-       text = unicode(syntax_highlight_code)
-
-    #print(token.tok_name) #   <--- dict of token-kinds.
-    
-    output = []
-    defined = []
-
-    with io.StringIO(text) as f:
-        try:
-           tokens = tokenize.generate_tokens(f.readline)
-
-           for token in tokens:
-               #print(token)              
-               if token[0] in (0, 5, 56, 256):
-                   continue
-               if not token[1] or (token[2] == token[3]):
-                   continue
-
-               token_type = token[0]
-               
-               if token_type == 1:
-                   if token[1] in {'print', 'def', 'class', 'break', 'continue', 'return', 'while', 'or', 'and', 'dir', 'if', 'elif', 'else', 'is', 'in', 'as', 'out', 'with', 'from', 'import', 'with', 'for'}:
-                       token_type = 90
-                   elif token[1] in {'False', 'True', 'yield', 'repr', 'range', 'enumerate', 'len', 'type', 'list', 'tuple', 'int', 'str', 'float'}:
-                       token_type = 91
-                   elif token[1] in globals() or token[1] in defined:
-                       token_type = 92
-                   else:
-                       defined.append(token[1])
-               elif isPython3 and token.type == 54:
-                   # OPS
-                   # 7: 'LPAR', 8: 'RPAR
-                   # 9: 'LSQB', 10: 'RSQB'
-                   # 25: 'LBRACE', 26: 'RBRACE'
-                   if token.exact_type in {7, 8, 9, 10, 25, 26}:
-                       token_type = token.exact_type
-                   else:
-                       token_type = 51
-               elif token_type == 51:
-                   # OPS
-                   # 7: 'LPAR', 8: 'RPAR
-                   # 9: 'LSQB', 10: 'RSQB'
-                   # 25: 'LBRACE', 26: 'RBRACE'
-                   if token[1] in {'(', ')'}:
-                      token_type = 7
-                   elif token[1] in {'[', ']'}:
-                      token_type = 9
-                   elif token[1] in {'{', '}'}:
-                     token_type = 25
-                   elif token[1] in {'='}:
-                     token_type = 22
-                   elif token[1] in {','}:
-                     token_type = 12
-               elif isPython3 and token_type == 60:
-                  token_type = 53
-
-               row_start, char_start = token[2][0]-1, token[2][1]
-               row_end, char_end = token[3][0]-1, token[3][1]
-
-               output = output + [token_type]*(char_end - char_start)
-        except:
-           #print("exception when syntax highlighting")
-           pass
-            
-
-    #print(output)
-    return output)";
-   
    if (mDoSyntaxHighlighting)
    {
       try
       {
-         static bool sInitialized = false;
-         if (!sInitialized)
-         {
-            py::exec(syntaxHighlightCode, py::globals());
-            sInitialized = true;
-         }
          py::globals()["syntax_highlight_code"] = GetVisibleCode();
          py::object ret = py::eval("syntax_highlight_basic()", py::globals());
          mSyntaxHighlightMapping = ret.cast< std::vector<int> >();
