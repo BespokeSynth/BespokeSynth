@@ -873,6 +873,7 @@ void ScriptModule::FixUpCode(string& code)
 {
    ofStringReplace(code, "on_pulse(", "on_pulse__"+Path()+"(");
    ofStringReplace(code, "on_note(", "on_note__"+Path()+"(");
+   ofStringReplace(code, "on_grid_button(", "on_grid_button__"+Path()+"(");
    ofStringReplace(code, "this.", GetThisName()+".");
 }
 
