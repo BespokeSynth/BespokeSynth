@@ -61,6 +61,8 @@ ModularSynth::ModularSynth()
 , mScheduledEnvelopeEditorSpawnDisplay(nullptr)
 , mIsLoadingModule(false)
 , mLastClapboardTime(-9999)
+, mScrollMultiplierHorizontal(1)
+, mScrollMultiplierVertical(1)
 {
    mConsoleText[0] = 0;
    assert(TheSynth == nullptr);
@@ -100,6 +102,11 @@ void ModularSynth::Setup(GlobalManagers* globalManagers, juce::Component* mainCo
       SetGlobalBufferSize(mUserPrefs["buffersize"].asInt());
       mIOBufferSize = gBufferSize;
       gSampleRate = mUserPrefs["samplerate"].asInt();
+
+      if (!mUserPrefs["scroll_multiplier_horizontal"].isNull())
+         mScrollMultiplierHorizontal = mUserPrefs["scroll_multiplier_horizontal"].asDouble();
+      if (!mUserPrefs["scroll_multiplier_vertical"].isNull())
+         mScrollMultiplierVertical = mUserPrefs["scroll_multiplier_vertical"].asDouble();
 
       juce::File(ofToDataPath("savestate")).createDirectory();
       juce::File(ofToDataPath("recordings")).createDirectory();
@@ -812,6 +819,9 @@ void ModularSynth::MousePressed(int intX, int intY, int button)
 
 void ModularSynth::MouseScrolled(float x, float y)
 {
+   x *= mScrollMultiplierHorizontal;
+   y *= mScrollMultiplierVertical;
+
    if (IsKeyHeld(' '))
    {
       ZoomView(y/100);
@@ -819,7 +829,6 @@ void ModularSynth::MouseScrolled(float x, float y)
    else if (gHoveredUIControl)
    {
 #if JUCE_WINDOWS
-      y *= -1;
       y -= x / 7; //taking advantage of logitech horizontal scroll wheel
 #endif
 
@@ -864,10 +873,6 @@ void ModularSynth::MouseScrolled(float x, float y)
    }
    else
    {
-#if JUCE_WINDOWS
-      y *= -1;
-#endif
-
       IDrawableModule* module = GetModuleAt(GetMouseX(), GetMouseY());
       if (module)
          module->NotifyMouseScrolled(GetMouseX(), GetMouseY(), x, y);

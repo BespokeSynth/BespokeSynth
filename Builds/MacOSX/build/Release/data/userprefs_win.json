@@ -6,6 +6,8 @@
    "height" : 1100,
    "width" : 1700,
    "layout" : "\\layouts\\blank.json",
+   "scroll_multiplier_horizontal" : 1,
+   "scroll_multiplier_vertical" : -0.2,
    "vstsearchdirs" : [
       "C:\\Program Files\\Common Files\\VST2",
       "C:\\Program Files\\Common Files\\VST3",

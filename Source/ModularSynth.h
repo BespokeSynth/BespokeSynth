@@ -287,6 +287,9 @@ private:
    string mFatalError;
    
    double mLastClapboardTime;
+
+   float mScrollMultiplierHorizontal;
+   float mScrollMultiplierVertical;
 };
 
 extern ModularSynth* TheSynth;
