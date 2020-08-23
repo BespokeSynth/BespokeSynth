@@ -38,6 +38,7 @@ SamplePlayer::SamplePlayer()
 , mPauseButton(nullptr)
 , mStopButton(nullptr)
 , mDownloadYoutubeButton(nullptr)
+, mSelectLocalFileButton(nullptr)
 , mScrubbingSample(false)
 , mOscWheelGrabbed(false)
 , mOscWheelSpeed(0)
@@ -62,6 +63,7 @@ void SamplePlayer::CreateUIControls()
    TEXTENTRY(mDownloadYoutubeSearch,"yt:",30,mYoutubeSearch); UIBLOCK_NEWLINE();
    mDownloadYoutubeSearch->DrawLabel(true);
    mDownloadYoutubeSearch->SetRequireEnter(true);
+   BUTTON(mSelectLocalFileButton,"local file");  UIBLOCK_NEWLINE();
    BUTTON(mPlayButton,"play"); UIBLOCK_SHIFTRIGHT();
    BUTTON(mPauseButton,"pause"); UIBLOCK_SHIFTRIGHT();
    BUTTON(mStopButton,"stop"); UIBLOCK_SHIFTRIGHT();
@@ -277,6 +279,8 @@ void SamplePlayer::ButtonClicked(ClickButton *button)
    }
    if (button == mDownloadYoutubeButton)
       DownloadYoutube("https://www.youtube.com/watch?v="+mYoutubeId, "");
+   if (button == mSelectLocalFileButton)
+      LoadLocalFile();
 }
 
 void SamplePlayer::TextEntryComplete(TextEntry* entry)
@@ -314,6 +318,20 @@ void SamplePlayer::DownloadYoutube(string search, string options)
    if (juce::File(ofToDataPath("youtube.wav")).existsAsFile())
       sample->Read(ofToDataPath("youtube.wav").c_str());
    UpdateSample(sample, true);
+}
+
+void SamplePlayer::LoadLocalFile()
+{
+   FileChooser chooser("Load sample", File());
+   if (chooser.browseForFileToOpen())
+   {
+      auto file = chooser.getResult();
+
+      Sample* sample = new Sample();
+      if (file.existsAsFile())
+         sample->Read(file.getFullPathName().toStdString().c_str());
+      UpdateSample(sample, true);
+   }
 }
 
 void SamplePlayer::OnClicked(int x, int y, bool right)
@@ -392,6 +410,7 @@ void SamplePlayer::DrawModule()
    mStopButton->Draw();
    mDownloadYoutubeButton->Draw();
    mDownloadYoutubeSearch->Draw();
+   mSelectLocalFileButton->Draw();
    for (size_t i=0; i<mSampleCuePoints.size(); ++i)
    {
       mSampleCuePoints[i].mStartSlider->Draw();
@@ -400,7 +419,7 @@ void SamplePlayer::DrawModule()
    }
 
    ofPushMatrix();
-   ofTranslate(5,60);
+   ofTranslate(5,80);
    if (mSample)
    {
       float sampleWidth = mWidth - 10;
@@ -588,5 +607,6 @@ vector<IUIControl*> SamplePlayer::ControlsToIgnoreInSaveState() const
 {
    vector<IUIControl*> ignore;
    ignore.push_back(mDownloadYoutubeSearch);
+   ignore.push_back(mSelectLocalFileButton);
    return ignore;
 }
