@@ -260,11 +260,10 @@ void VSTPlugin::SetVST(string vstName)
             mNumInputs = CLAMP(mPlugin->getTotalNumInputChannels(), 1, 4);
             mNumOutputs = CLAMP(mPlugin->getTotalNumOutputChannels(), 1, 4);
             ofLog() << "vst inputs: " << mNumInputs << "  vst outputs: " << mNumOutputs;
+
+            CreateParameterSliders();
          }
          mVSTMutex.unlock();
-         
-         if (mPlugin != nullptr)
-            CreateParameterSliders();
 
          break;
       }
