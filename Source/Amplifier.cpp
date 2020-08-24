@@ -45,10 +45,10 @@ void Amplifier::Process(double time)
          for (int i=0; i<bufferSize; ++i)
          {
             ComputeSliders(i);
-            gWorkChannelBuffer.GetChannel(ch)[i] = GetBuffer()->GetChannel(ch)[i] * mGain;
+            gWorkBuffer[i] = GetBuffer()->GetChannel(ch)[i] * mGain;
          }
-         Add(out->GetChannel(ch), gWorkChannelBuffer.GetChannel(ch), GetBuffer()->BufferSize());
-         GetVizBuffer()->WriteChunk(gWorkChannelBuffer.GetChannel(ch),GetBuffer()->BufferSize(), ch);
+         Add(out->GetChannel(ch), gWorkBuffer, GetBuffer()->BufferSize());
+         GetVizBuffer()->WriteChunk(gWorkBuffer, GetBuffer()->BufferSize(), ch);
       }
    }
    
