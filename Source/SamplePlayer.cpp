@@ -260,17 +260,20 @@ void SamplePlayer::UpdateSample(Sample* sample, bool ownsSample)
 
 void SamplePlayer::ButtonClicked(ClickButton *button)
 {
-   if (button == mPlayButton)
+   if (mSample)
    {
-      mPlay = true;
-      mAdsr.Start(gTime, 1);
-   }
-   if (button == mPauseButton)
-      mPlay = false;
-   if (button == mStopButton)
-   {
-      mPlay = false;
-      mSample->SetPlayPosition(0);
+      if (button == mPlayButton)
+      {
+         mPlay = true;
+         mAdsr.Start(gTime, 1);
+      }
+      if (button == mPauseButton)
+         mPlay = false;
+      if (button == mStopButton)
+      {
+         mPlay = false;
+         mSample->SetPlayPosition(0);
+      }
    }
    if (button == mDownloadYoutubeButton)
       DownloadYoutube("https://www.youtube.com/watch?v="+mYoutubeId, "");
