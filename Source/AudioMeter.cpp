@@ -27,7 +27,7 @@ void AudioMeter::CreateUIControls()
 
 AudioMeter::~AudioMeter()
 {
-   delete mAnalysisBuffer;
+   delete[] mAnalysisBuffer;
 }
 
 void AudioMeter::Process(double time)
