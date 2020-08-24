@@ -40,7 +40,7 @@ void Amplifier::Process(double time)
    if (GetTarget())
    {
       ChannelBuffer* out = GetTarget()->GetBuffer();
-      for (int ch=0; ch<GetBuffer()->NumActiveChannels(); ++ch)
+      for (int ch=0; ch<out->NumActiveChannels(); ++ch)
       {
          for (int i=0; i<bufferSize; ++i)
          {
