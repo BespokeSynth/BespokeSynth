@@ -471,6 +471,8 @@ void DrawLissajous(RollingBuffer* buffer, float x, float y, float w, float h, fl
 
 void StringCopy(char* dest, const char* source, int destLength)
 {
+   if (dest == source)
+      return;
    strncpy(dest, source, destLength);
    dest[destLength-1] = 0;
 }
