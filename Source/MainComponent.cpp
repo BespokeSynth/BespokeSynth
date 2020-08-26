@@ -268,11 +268,22 @@ public:
       float width = getWidth();
       float height = getHeight();
       
+      static float kMotionTrails = .4f;
+      
+      ofVec3f bgColor(.09f,.09f,.09f);
       glViewport(0, 0, width*mPixelRatio, height*mPixelRatio);
-      glClearColor(.09f,.09f,.09f,0);
-      glClear(GL_COLOR_BUFFER_BIT|GL_DEPTH_BUFFER_BIT|GL_STENCIL_BUFFER_BIT);
+      glClearColor(bgColor.x,bgColor.y,bgColor.z,0);
+      if (kMotionTrails <= 0)
+         glClear(GL_COLOR_BUFFER_BIT|GL_DEPTH_BUFFER_BIT|GL_STENCIL_BUFFER_BIT);
       
       nvgBeginFrame(mVG, width, height, mPixelRatio);
+      
+      if (kMotionTrails > 0)
+      {
+         ofSetColor(bgColor.x*255,bgColor.y*255,bgColor.z*255,(1-kMotionTrails*(ofGetFrameRate()/60.0f))*255);
+         ofFill();
+         ofRect(0,0,width,height);
+      }
       
       nvgLineCap(mVG, NVG_ROUND);
       nvgLineJoin(mVG, NVG_ROUND);
