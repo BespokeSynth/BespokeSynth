@@ -17,10 +17,8 @@ OSCOutput::OSCOutput()
    for (int i=0; i<OSC_OUTPUT_MAX_PARAMS; ++i)
    {
       mParams[i] = 0;
-      mLabels[i] = new char[32];
-      mLabels[i][0] = 0;
-      strcat(mLabels[i], "slider");
-      strcat(mLabels[i], ofToString(i).c_str());
+      mLabels[i] = new char[MAX_TEXTENTRY_LENGTH];
+      strcpy(mLabels[i], ("slider"+ofToString(i)).c_str());
    }
 }
 
@@ -41,8 +39,8 @@ void OSCOutput::CreateUIControls()
    
    for (int i=0; i<5; ++i)
    {
-      mLabelEntry.push_back(new TextEntry(this, ("label"+ofToString(i)).c_str(), 5, 5 + i*15, 10, mLabels[i]));
-      mSliders.push_back(new FloatSlider(this, mLabels[i], 100, 5 + i * 15, 100, 15, &mParams[i], 0, 1));
+      mLabelEntry.push_back(new TextEntry(this, ("label"+ofToString(i)).c_str(), 5, 5 + i*18, 10, mLabels[i]));
+      mSliders.push_back(new FloatSlider(this, mLabels[i], 100, 5 + i * 18, 130, 15, &mParams[i], 0, 1));
    }
 }
 
@@ -64,8 +62,8 @@ void OSCOutput::DrawModule()
 
 void OSCOutput::GetModuleDimensions(float& w, float& h)
 {
-   w = 200;
-   h = (int)mSliders.size() * 15 + 10;
+   w = 235;
+   h = (int)mSliders.size() * 18 + 10;
 }
 
 void OSCOutput::FloatSliderUpdated(FloatSlider* slider, float oldVal)
