@@ -18,6 +18,7 @@
 #include "IPulseReceiver.h"
 #include "Slider.h"
 #include "DropdownList.h"
+#include "ModulationChain.h"
 
 class ScriptModule : public IDrawableModule, public IButtonListener, public NoteEffectBase, public IPulseReceiver, public ICodeEntryListener, public IFloatSliderListener, public IDropdownListener
 {
@@ -34,10 +35,10 @@ public:
    
    void Poll() override;
    
-   void PlayNoteFromScript(int pitch, int velocity, float pan, int noteOutputIndex);
-   void PlayNoteFromScriptAfterDelay(int pitch, int velocity, float delayMeasureTime, float pan, int noteOutputIndex);
-   void ScheduleMethod(string method, float delayMeasureTime);
-   void ScheduleUIControlValue(IUIControl* control, float value, float delayMeasureTime);
+   void PlayNoteFromScript(float pitch, float velocity, float pan, int noteOutputIndex);
+   void PlayNoteFromScriptAfterDelay(float pitch, float velocity, double delayMeasureTime, float pan, int noteOutputIndex);
+   void ScheduleMethod(string method, double delayMeasureTime);
+   void ScheduleUIControlValue(IUIControl* control, float value, double delayMeasureTime);
    void HighlightLine(int lineNum, int scriptModuleIndex);
    void PrintText(string text);
    IUIControl* GetUIControl(string path);
@@ -76,11 +77,11 @@ public:
    static float GetTimeSigRatio();
    
 private:
-   void PlayNote(double time, int pitch, int velocity, float pan, int noteOutputIndex, int lineNum);
+   void PlayNote(double time, float pitch, float velocity, float pan, int noteOutputIndex, int lineNum);
    void AdjustUIControl(IUIControl* control, float value, int lineNum);
    void RunScript(double time, int lineStart = -1, int lineEnd = -1);
    void FixUpCode(string& code);
-   void ScheduleNote(double time, int pitch, int velocity, float pan, int noteOutputIndex);
+   void ScheduleNote(double time, float pitch, float velocity, float pan, int noteOutputIndex);
    void SendNoteToIndex(int index, double time, int pitch, int velocity, int voiceIdx, ModulationParameters modulation);
    string GetThisName();
    string GetIndentation(string line);
@@ -130,8 +131,8 @@ private:
    {
       double startTime;
       double time;
-      int pitch;
-      int velocity;
+      float pitch;
+      float velocity;
       float pan;
       int noteOutputIndex;
       int lineNum;
@@ -214,4 +215,5 @@ private:
    std::vector<string> mScriptFilePaths;
    
    std::vector<PatchCableSource*> mExtraNoteOutputs;
+   std::array<ModulationChain, 128> mPitchBends;
 };

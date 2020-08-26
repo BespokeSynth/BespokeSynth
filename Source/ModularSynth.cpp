@@ -1105,6 +1105,10 @@ void ModularSynth::AudioOut(float** output, int bufferSize, int nChannels)
             mOutput[i]->ClearBuffer();
       }
       
+      double elapsed = gInvSampleRateMs * gBufferSize;
+      gTime += elapsed;
+      TheTransport->Advance(elapsed);
+      
       //get audio from sources
       for (int i=0; i<mSources.size(); ++i)
          mSources[i]->Process(gTime);
@@ -1126,10 +1130,6 @@ void ModularSynth::AudioOut(float** output, int bufferSize, int nChannels)
       
       for (int ch=0; ch<nChannels; ++ch)
          BufferCopy(output[ch]+ioOffset, outBuffer[ch]+ioOffset, gBufferSize);
-      
-      double elapsed = gInvSampleRateMs * gBufferSize;
-      gTime += elapsed;
-      TheTransport->Advance(elapsed);
    }
    
    if (gTime - mLastClapboardTime < 100)

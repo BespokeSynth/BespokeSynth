@@ -97,19 +97,19 @@ PYBIND11_EMBEDDED_MODULE(scriptmodule, m)
       return ScriptModule::sScriptModules[scriptModuleIndex];
    }, py::return_value_policy::reference);
    py::class_<ScriptModule, IDrawableModule>(m, "scriptmodule")
-      .def("play_note", [](ScriptModule& module, int pitch, int velocity, float length, float pan, int output_index)
+      .def("play_note", [](ScriptModule& module, float pitch, float velocity, float length, float pan, int output_index)
       {
          module.PlayNoteFromScript(pitch, velocity, pan, output_index);
          module.PlayNoteFromScriptAfterDelay(pitch, 0, length, 0, output_index);
-      }, "pitch"_a, "velocity"_a, "length"_a=1.0f/16.0f, "pan"_a = 0, "output_index"_a = 0)
+      }, "pitch"_a, "velocity"_a, "length"_a=1.0/16.0, "pan"_a = 0, "output_index"_a = 0)
       ///example: this.play_note(60, 127, 1.0/8)
-      .def("schedule_note", [](ScriptModule& module, float delay, int pitch, int velocity, float length, float pan, int output_index)
+      .def("schedule_note", [](ScriptModule& module, float delay, float pitch, float velocity, float length, float pan, int output_index)
       {
          module.PlayNoteFromScriptAfterDelay(pitch, velocity, delay, pan, output_index);
          module.PlayNoteFromScriptAfterDelay(pitch, 0, delay + length, 0, output_index);
-      }, "delay"_a, "pitch"_a, "velocity"_a, "length"_a=1.0f/16.0f, "pan"_a = 0, "output_index"_a = 0)
+      }, "delay"_a, "pitch"_a, "velocity"_a, "length"_a=1.0/16.0, "pan"_a = 0, "output_index"_a = 0)
       ///example: this.schedule_note(1.0/4, 60, 127, 1.0/8)
-      .def("schedule_note_msg", [](ScriptModule& module, float delay, int pitch, int velocity, float pan, int output_index)
+      .def("schedule_note_msg", [](ScriptModule& module, float delay, float pitch,float velocity, float pan, int output_index)
       {
          module.PlayNoteFromScriptAfterDelay(pitch, velocity, delay, pan, output_index);
       }, "delay"_a, "pitch"_a, "velocity"_a, "pan"_a = 0, "output_index"_a = 0)
@@ -118,7 +118,7 @@ PYBIND11_EMBEDDED_MODULE(scriptmodule, m)
          module.ScheduleMethod(method, delay);
       })
       ///example: this.schedule_call(1.0/4, "dotask()")
-      .def("note_msg", [](ScriptModule& module, int pitch, int velocity, float pan, int output_index)
+      .def("note_msg", [](ScriptModule& module, float pitch, float velocity, float pan, int output_index)
       {
          module.PlayNoteFromScript(pitch, velocity, pan, output_index);
       }, "pitch"_a, "velocity"_a, "pan"_a = 0, "output_index"_a = 0)

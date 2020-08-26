@@ -384,16 +384,16 @@ double ScriptModule::GetScheduledTime(double delayMeasureTime)
    return sMostRecentRunTime + delayMeasureTime * TheTransport->MsPerBar();
 }
 
-void ScriptModule::PlayNoteFromScript(int pitch, int velocity, float pan, int noteOutputIndex)
+void ScriptModule::PlayNoteFromScript(float pitch, float velocity, float pan, int noteOutputIndex)
 {
    PlayNote(sMostRecentRunTime, pitch, velocity, pan, noteOutputIndex, mNextLineToExecute);
 }
 
-void ScriptModule::PlayNoteFromScriptAfterDelay(int pitch, int velocity, float delayMeasureTime, float pan, int noteOutputIndex)
+void ScriptModule::PlayNoteFromScriptAfterDelay(float pitch, float velocity, double delayMeasureTime, float pan, int noteOutputIndex)
 {
    double time = GetScheduledTime(delayMeasureTime);
-   if (velocity == 0)
-      time -= gBufferSize * gInvSampleRateMs + 1;  //TODO(Ryan) hack to make note offs happen a buffer early... figure out why scheduled lengths are longer than it takes to get the next pulse of the same interval
+   //if (velocity == 0)
+   //   time -= gBufferSize * gInvSampleRateMs + 1;  //TODO(Ryan) hack to make note offs happen a buffer early... figure out why scheduled lengths are longer than it takes to get the next pulse of the same interval
    
    //ofLog() << "ScriptModule::PlayNoteFromScriptAfterDelay() " << velocity << " " << time << " " << sMostRecentRunTime << " " << (time - sMostRecentRunTime);
    
@@ -409,7 +409,7 @@ void ScriptModule::PlayNoteFromScriptAfterDelay(int pitch, int velocity, float d
    }
 }
 
-void ScriptModule::ScheduleNote(double time, int pitch, int velocity, float pan, int noteOutputIndex)
+void ScriptModule::ScheduleNote(double time, float pitch, float velocity, float pan, int noteOutputIndex)
 {
    for (size_t i=0; i<mScheduledNoteOutput.size(); ++i)
    {
@@ -427,7 +427,7 @@ void ScriptModule::ScheduleNote(double time, int pitch, int velocity, float pan,
    }
 }
 
-void ScriptModule::ScheduleMethod(string method, float delayMeasureTime)
+void ScriptModule::ScheduleMethod(string method, double delayMeasureTime)
 {
    for (size_t i=0; i<mScheduledMethodCall.size(); ++i)
    {
@@ -444,7 +444,7 @@ void ScriptModule::ScheduleMethod(string method, float delayMeasureTime)
    }
 }
 
-void ScriptModule::ScheduleUIControlValue(IUIControl* control, float value, float delayMeasureTime)
+void ScriptModule::ScheduleUIControlValue(IUIControl* control, float value, double delayMeasureTime)
 {
    for (size_t i=0; i<mScheduledUIControlValue.size(); ++i)
    {
@@ -518,27 +518,34 @@ void ScriptModule::AdjustUIControl(IUIControl* control, float value, int lineNum
    }
 }
 
-void ScriptModule::PlayNote(double time, int pitch, int velocity, float pan, int noteOutputIndex, int lineNum)
+void ScriptModule::PlayNote(double time, float pitch, float velocity, float pan, int noteOutputIndex, int lineNum)
 {
-   /*if (velocity > 0)
+   if (velocity > 0)
    {
       //run through any scheduled note offs for this pitch
       for (size_t i=0; i<mScheduledNoteOutput.size(); ++i)
       {
-         if (mScheduledNoteOutput[i].time != -1 &&
+         if (mScheduledNoteOutput[i].velocity == 0 &&
              mScheduledNoteOutput[i].pitch == pitch &&
-             mScheduledNoteOutput[i].velocity == 0)
+             mScheduledNoteOutput[i].time != -1 &&
+             mScheduledNoteOutput[i].time - 3 <= time)
          {
-            PlayNote(time, pitch, 0, 0, lineNum);
+            PlayNote(MIN(mScheduledNoteOutput[i].time, time), mScheduledNoteOutput[i].pitch, mScheduledNoteOutput[i].velocity, mScheduledNoteOutput[i].pan, mScheduledNoteOutput[i].noteOutputIndex, mScheduledNoteOutput[i].lineNum);
             mScheduledNoteOutput[i].time = -1;
          }
       }
-   }*/
+   }
    
    //ofLog() << "ScriptModule::PlayNote() " << velocity << " " << time;
+   int intPitch = int(pitch+.5f);
    ModulationParameters modulation;
    modulation.pan = pan;
-   SendNoteToIndex(noteOutputIndex, time, pitch, velocity, -1, modulation);
+   if (pitch - intPitch != 0)
+   {
+      modulation.pitchBend = &mPitchBends[intPitch];
+      modulation.pitchBend->SetValue(pitch - intPitch);
+   }
+   SendNoteToIndex(noteOutputIndex, time, intPitch, (int)velocity, -1, modulation);
    
    if (velocity > 0)
       mNotePlayTracker.AddEvent(lineNum, ofToString(pitch) + " " + ofToString(velocity) + " " + ofToString(pan,1));
@@ -555,7 +562,7 @@ void ScriptModule::SendNoteToIndex(int index, double time, int pitch, int veloci
    if (index-1 < (int)mExtraNoteOutputs.size())
    {
       const vector<INoteReceiver*>& receivers = mExtraNoteOutputs[index-1]->GetNoteReceivers();
-      mExtraNoteOutputs[index-1]->AddHistoryEvent(gTime, velocity > 0);
+      mExtraNoteOutputs[index-1]->AddHistoryEvent(time, velocity > 0);
       for (auto* receiver : receivers)
          receiver->PlayNote(time, pitch, velocity, voiceIdx, modulation);
    }

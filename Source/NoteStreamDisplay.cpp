@@ -89,6 +89,14 @@ void NoteStreamDisplay::DrawModule()
    mResetButton->Draw();
 }
 
+void NoteStreamDisplay::DrawModuleUnclipped()
+{
+   if (mDrawDebug)
+   {
+      DrawTextNormal(mDebugLines, mWidth+10, 0);
+   }
+}
+
 float NoteStreamDisplay::GetYPos(int pitch, float noteHeight) const
 {
    return ofMap(pitch, mPitchMin, mPitchMax+1, mHeight-noteHeight, -noteHeight);
@@ -147,6 +155,20 @@ void NoteStreamDisplay::PlayNote(double time, int pitch, int velocity, int voice
              mNoteStream[i].timeOn < time)
             mNoteStream[i].timeOff = time;
       }
+   }
+   
+   if (mDrawDebug)
+   {
+      vector<string> lines = ofSplitString(mDebugLines, "\n");
+      mDebugLines = "";
+      const int kNumDisplayLines = 35;
+      for (int i=0; i<kNumDisplayLines-1; ++i)
+      {
+         int lineIndex = (int)lines.size()-(kNumDisplayLines-1) + i;
+         if (lineIndex >= 0)
+            mDebugLines += lines[lineIndex] + "\n";
+      }
+      mDebugLines += "PlayNote("+ofToString(time/1000)+", "+ofToString(pitch)+", "+ofToString(velocity)+", "+ofToString(voiceIdx)+")";
    }
 }
 

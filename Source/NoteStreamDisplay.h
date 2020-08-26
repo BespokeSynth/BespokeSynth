@@ -31,6 +31,8 @@ public:
    
    void ButtonClicked(ClickButton* button) override;
    
+   bool HasDebugDraw() const override { return true; }
+   
    void LoadLayout(const ofxJSONElement& moduleInfo) override;
    void SaveLayout(ofxJSONElement& moduleInfo) override;
    void SetUpFromSaveData() override;
@@ -38,6 +40,7 @@ public:
 private:
    //IDrawableModule
    void DrawModule() override;
+   void DrawModuleUnclipped() override;
    void GetModuleDimensions(float& w, float& h) override { w=mWidth; h=mHeight; }
    bool Enabled() const override { return true; }
    bool IsElementActive(int index) const;
@@ -59,4 +62,5 @@ private:
    int mPitchMin;
    int mPitchMax;
    ClickButton* mResetButton;
+   string mDebugLines;
 };

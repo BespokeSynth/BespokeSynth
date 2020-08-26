@@ -76,6 +76,12 @@ void ::ADSR::Start(double time, float target)
 void ::ADSR::Stop(double time, bool warn /*= true*/)
 {
    mStopBlendFromValue = Value(time);
+   
+   /*if (time - mStartTime < 10)
+   {
+      ofLog() << "**********************short adsr: " << (time - mStartTime);
+   }*/
+   
    if (time <= mStartTime)
    {
       if (warn)

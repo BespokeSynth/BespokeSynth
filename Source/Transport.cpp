@@ -462,16 +462,18 @@ void Transport::UpdateListeners(double jumpMs)
          else
             offsetMs = info.mOffsetInfo.mOffset*MsPerBar();
          
-         double lookaheadMs = 0;
+         double lookaheadMs = jumpMs;
          if (info.mUseEventLookahead)
-            lookaheadMs = GetEventLookaheadMs();
+            lookaheadMs = MAX(lookaheadMs, GetEventLookaheadMs());
+         
+         double checkTime = gTime + lookaheadMs;
          
          double remainderMs;
-         int oldStep = GetQuantized(gTime + offsetMs - jumpMs + lookaheadMs, info.mInterval);
-         int newStep = GetQuantized(gTime + offsetMs + lookaheadMs, info.mInterval, &remainderMs);
+         int oldStep = GetQuantized(checkTime + offsetMs - jumpMs, info.mInterval);
+         int newStep = GetQuantized(checkTime + offsetMs, info.mInterval, &remainderMs);
          if (oldStep != newStep)
          {
-            double time = gTime + lookaheadMs + remainderMs;
+            double time = checkTime - remainderMs;
             info.mListener->OnTimeEvent(time);
          }
       }
