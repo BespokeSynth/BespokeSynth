@@ -1,3 +1,5 @@
+the script module takes python code as input. any python code and imports should work fine. this document describes the specific calls you get from bespoke and can make into bespoke.
+
 script module inputs:
    on_pulse(): called by pulse input
    on_note(pitch, velocity): called by note input
