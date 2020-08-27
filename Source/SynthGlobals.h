@@ -259,8 +259,8 @@ inline void bzero(void* mem, size_t size)
 class ofLog
 {
 public:
-   ofLog() {}
-   ~ofLog() { cout << (gTime/1000) << ": " << mMessage << endl; }
+   ofLog() : mSendToBespokeConsole(true) {}
+   ~ofLog();
    
    template <class T>
    ofLog& operator<<(const T& value)
@@ -268,6 +268,13 @@ public:
       mMessage += ofToString(value);
       return *this;
    }
+
+   ofLog& operator!()
+   {
+      mSendToBespokeConsole = false;
+      return *this;
+   }
 private:
    string mMessage;
+   bool mSendToBespokeConsole;
 };

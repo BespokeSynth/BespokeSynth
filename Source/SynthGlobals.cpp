@@ -1331,6 +1331,14 @@ bool EvaluateExpression(string expressionStr, float currentValue, float& output)
    return false;
 }
 
+ofLog::~ofLog()
+{
+   string output = ofToString(gTime / 1000) + ": " + mMessage;
+   DBG(output);
+   if (mSendToBespokeConsole)
+      TheSynth->LogEvent(output, kLogEventType_Verbose);
+}
+
 #ifdef BESPOKE_DEBUG_ALLOCATIONS
 FILE* logAllocationsFile;
 

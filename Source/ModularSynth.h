@@ -38,7 +38,8 @@ class ADSRDisplay;
 
 enum LogEventType
 {
-   kLogEventType_Normal,
+   kLogEventType_Verbose,
+   kLogEventType_Warning,
    kLogEventType_Error
 };
 
@@ -226,8 +227,15 @@ private:
    RollingBuffer mOutputBuffer;
    long long mRecordingLength;
    
-   std::vector< std::pair<string,double> > mEvents;
-   std::vector<string> mErrors;
+   struct LogEventItem
+   {
+      LogEventItem(double _time, string _text, LogEventType _type) : time(_time), text(_text), type(_type) {}
+      double time;
+      string text;
+      LogEventType type;
+   };
+   std::list<LogEventItem> mEvents;
+   std::list<string> mErrors;
    
    ofVec2f mDrawOffset;
    

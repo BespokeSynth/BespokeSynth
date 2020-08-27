@@ -390,44 +390,44 @@ void ModularSynth::DrawConsole()
       }
    }
    
-   int outputLines = (int)mEvents.size();
    if (IKeyboardFocusListener::GetActiveKeyboardFocus() == mConsoleEntry)
-      outputLines += mErrors.size();
-   if (outputLines > 0)
    {
-      ofPushStyle();
-      ofSetColor(0,0,0,150);
-      ofFill();
-      ofRect(10,consoleY-15,400,outputLines*15+3);
-      ofPopStyle();
-   }
-   
-   for (auto it=mEvents.begin(); it != mEvents.end();)
-   {
-      if (it->second + 3000 > gTime)
+      int outputLines = (int)mEvents.size();
+      if (IKeyboardFocusListener::GetActiveKeyboardFocus() == mConsoleEntry)
+         outputLines += mErrors.size();
+      if (outputLines > 0)
       {
          ofPushStyle();
-         ofSetColor(255,255,0);
-         DrawTextNormal(it->first, 10, consoleY);
+         ofSetColor(0, 0, 0, 150);
+         ofFill();
+         float titleBarW, titleBarH;
+         TheTitleBar->GetDimensions(titleBarW, titleBarH);
+         ofRect(0, consoleY - 16, titleBarW, outputLines * 15 + 3);
+         ofPopStyle();
+      }
+
+      for (auto it = mEvents.begin(); it != mEvents.end(); ++it)
+      {
+         ofPushStyle();
+         if (it->type == kLogEventType_Error)
+            ofSetColor(255, 0, 0);
+         else if (it->type == kLogEventType_Warning)
+            ofSetColor(255, 255, 0);
+         else
+            ofSetColor(200, 200, 200);
+         DrawTextNormal(it->text, 10, consoleY);
          ofPopStyle();
          consoleY += 15;
-         ++it;
       }
-      else
-      {
-         it = mEvents.erase(it);
-      }
-   }
-   
-   if (IKeyboardFocusListener::GetActiveKeyboardFocus() == mConsoleEntry)
-   {
+
       if (!mErrors.empty())
       {
+         consoleY = 0;
          ofPushStyle();
          ofSetColor(255,0,0);
-         for (int i=0;i<mErrors.size();++i)
+         for (auto it = mErrors.begin(); it != mErrors.end(); ++it)
          {
-            DrawTextNormal(mErrors[i], 10, consoleY);
+            DrawTextNormal(*it, 600, consoleY);
             consoleY += 15;
          }
          ofPopStyle();
@@ -1298,7 +1298,6 @@ void ModularSynth::ResetLayout()
    LFOPool::Shutdown();
    IKeyboardFocusListener::ClearActiveKeyboardFocus(!K(acceptEntry));
    
-   mEvents.clear();
    mErrors.clear();
    
    vector<PatchCable*> cablesToDelete = mPatchCables;
@@ -1616,18 +1615,19 @@ void ModularSynth::ClearHeldSample()
 
 void ModularSynth::LogEvent(string event, LogEventType type)
 {
-   if (type == kLogEventType_Normal)
+   if (type == kLogEventType_Warning)
    {
-      ofLog() << "event: " << event;
-      
-      mEvents.push_back(std::pair<string,double>(event,gTime));
+      !ofLog() << "warning: " << event;
    }
    else if (type == kLogEventType_Error)
    {
-      ofLog() << "error: " << event;
-      
+      !ofLog() << "error: " << event;
       mErrors.push_back(event);
    }
+
+   mEvents.push_back(LogEventItem(gTime, event, type));
+   if (mEvents.size() > 30)
+      mEvents.pop_front();
 }
 
 IDrawableModule* ModularSynth::DuplicateModule(IDrawableModule* module)
@@ -1989,11 +1989,11 @@ IDrawableModule* ModularSynth::SpawnModuleOnTheFly(string moduleName, float x, f
    }
    catch (LoadingJSONException& e)
    {
-      LogEvent("Error spawning \""+moduleName+"\" on the fly", kLogEventType_Normal);
+      LogEvent("Error spawning \""+moduleName+"\" on the fly", kLogEventType_Warning);
    }
    catch (UnknownModuleException& e)
    {
-      LogEvent("Error spawning \""+moduleName+"\" on the fly, couldn't find \""+e.mSearchName+"\"", kLogEventType_Normal);
+      LogEvent("Error spawning \""+moduleName+"\" on the fly, couldn't find \""+e.mSearchName+"\"", kLogEventType_Warning);
    }
 
    return module;
