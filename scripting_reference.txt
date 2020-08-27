@@ -1,0 +1,113 @@
+script module inputs:
+   on_pulse(): called by pulse input
+   on_note(pitch, velocity): called by note input
+   on_grid_button(col, row, velocity): called by grid input
+
+
+globals:
+   bespoke.get_measure_time()
+   bespoke.get_measure()
+   bespoke.reset_transport()
+   bespoke.get_step(subdivision)
+   bespoke.count_per_measure(subdivision)
+   bespoke.time_until_subdivision(subdivision)
+      example: this.schedule_call(bespoke.time_until_subdivision(1), "on_downbeat()")
+   bespoke.get_time_sig_ratio()
+   bespoke.get_root()
+   bespoke.get_scale()
+   bespoke.get_scale_range(octave, count)
+   bespoke.tone_to_pitch(index)
+   bespoke.name_to_pitch(noteName)
+   bespoke.pitch_to_name(pitch)
+
+
+script-relative:
+   this.play_note(pitch, velocity, length, pan, output_index)
+      optional: length=1.0f/16.0f, pan = 0, output_index = 0
+      example: this.play_note(60, 127, 1.0/8)
+   this.schedule_note(delay, pitch, velocity, length, pan, output_index)
+      optional: length=1.0f/16.0f, pan = 0, output_index = 0
+      example: this.schedule_note(1.0/4, 60, 127, 1.0/8)
+   this.schedule_note_msg(delay, pitch, velocity, pan, output_index)
+      optional: pan = 0, output_index = 0
+   this.schedule_call(delay, method)
+      example: this.schedule_call(1.0/4, "dotask()")
+   this.note_msg(pitch, velocity, pan, output_index)
+      optional: pan = 0, output_index = 0
+   this.set(path, value)
+      example: this.set("oscillator~pw", .2)
+   this.schedule_set(delay, path, value)
+   this.get(path)
+      example: pulsewidth = this.get("oscillator~pulsewidth")
+   this.adjust(path, amount)
+   this.highlight_line(lineNum, scriptModuleIndex)
+   this.output(obj)
+      example: this.output("hello world!")
+   this.this()
+   this.stop()
+   this.get_caller()
+      example: this.get_caller().play_note(60,127)
+   this.set_num_note_outputs(num)
+
+
+import notesequencer
+   static:
+      notesequencer.get(path)
+   instance:
+      n.set_step(step, pitch, velocity, length)
+
+
+import drumsequencer
+   static:
+      drumsequencer.get(path)
+   instance:
+      d.set(step, pitch, velocity)
+      d.get(step, pitch)
+
+
+import grid
+   static:
+      grid.get(path)
+         example: g = grid.get("grid")  #assuming there's a grid called "grid" somewhere in the layout
+   instance:
+      g.set(col, row, value)
+      g.get(col, row)
+      g.set_grid(cols, rows)
+      g.set_label(row, label)
+      g.set_color(colorIndex, r, g, b)
+      g.highlight_cell(col, row, delay, duration, colorIndex)
+         optional: colorIndex=1
+      g.set_division(division)
+      g.set_momentary(momentary)
+      g.set_cell_color(col, row, colorIndex)
+      g.get_cell_color(col, row)
+      g.add_listener(script)
+      g.clear()
+
+
+import notecanvas
+   static:
+      notecanvas.get(path)
+   instance:
+      n.add_note(measurePos, pitch, velocity, length)
+      n.clear()
+
+
+import sampleplayer
+   static:
+      sampleplayer.get(path)
+   instance:
+      s.set_cue_point(pitch, startSeconds, lengthSeconds, speed)
+
+
+import module
+   static:
+      module.get(path)
+      module.create(moduleType, x, y)
+   instance:
+      m.set_position(x, y)
+      m.set_target(target)
+      m.delete()
+      m.set(path, value)
+      m.get(path)
+      m.adjust(path, amount)
