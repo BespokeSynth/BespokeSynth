@@ -218,15 +218,39 @@ void VSTPlugin::SetVST(string vstName)
       //mWindowOverlay = nullptr;
    }
    
-   juce::String errorMessage;
    auto types = VSTLookup::sPluginList.getTypes();
+   bool found = false;
    for (int i=0; i<types.size(); ++i)
    {
       if (path == types[i].fileOrIdentifier)
       {
+         found = true;
          PluginDescription desc = types[i];
-            
-         /*auto completionCallback = [this, &callbackDone] (std::unique_ptr<juce::AudioPluginInstance> instance, const String& error)
+         LoadVST(desc);
+         break;
+      }
+   }
+
+   if (!found) //couldn't find the VST at this path. maybe its installation got moved, or the bespoke state was saved on a different computer. try to find a VST of the same name.
+   {
+      juce::String desiredVstName = juce::String(path).replaceCharacter('\\', '/').fromLastOccurrenceOf("/", false, false).upToFirstOccurrenceOf(".", false, false);
+      for (int i = 0; i < types.size(); ++i)
+      {
+         juce::String thisVstName = juce::String(types[i].fileOrIdentifier).replaceCharacter('\\', '/').fromLastOccurrenceOf("/", false, false).upToFirstOccurrenceOf(".", false, false);
+         if (thisVstName == desiredVstName)
+         {
+            found = true;
+            PluginDescription desc = types[i];
+            LoadVST(desc);
+            break;
+         }
+      }
+   }
+}
+
+void VSTPlugin::LoadVST(juce::PluginDescription desc)
+{
+   /*auto completionCallback = [this, &callbackDone] (std::unique_ptr<juce::AudioPluginInstance> instance, const String& error)
          {
             if (instance == nullptr)
             {
@@ -248,26 +272,27 @@ void VSTPlugin::SetVST(string vstName)
                CreateParameterSliders();
             callbackDone = true;
          };
-         
+
          sFormatManager.getFormat(i)->createPluginInstanceAsync(desc, gSampleRate, gBufferSize, completionCallback);*/
-         
-         mVSTMutex.lock();
-         mPlugin = VSTLookup::sFormatManager.createPluginInstance(desc, gSampleRate, gBufferSize, errorMessage);
-         if (mPlugin != nullptr)
-         {
-            mPlugin->prepareToPlay(gSampleRate, gBufferSize);
-            mPlugin->setPlayHead(&mPlayhead);
-            mNumInputs = CLAMP(mPlugin->getTotalNumInputChannels(), 1, 4);
-            mNumOutputs = CLAMP(mPlugin->getTotalNumOutputChannels(), 1, 4);
-            ofLog() << "vst inputs: " << mNumInputs << "  vst outputs: " << mNumOutputs;
 
-            CreateParameterSliders();
-         }
-         mVSTMutex.unlock();
+   mVSTMutex.lock();
+   juce::String errorMessage;
+   mPlugin = VSTLookup::sFormatManager.createPluginInstance(desc, gSampleRate, gBufferSize, errorMessage);
+   if (mPlugin != nullptr)
+   {
+      mPlugin->prepareToPlay(gSampleRate, gBufferSize);
+      mPlugin->setPlayHead(&mPlayhead);
+      mNumInputs = CLAMP(mPlugin->getTotalNumInputChannels(), 1, 4);
+      mNumOutputs = CLAMP(mPlugin->getTotalNumOutputChannels(), 1, 4);
+      ofLog() << "vst inputs: " << mNumInputs << "  vst outputs: " << mNumOutputs;
 
-         break;
-      }
+      CreateParameterSliders();
    }
+   else
+   {
+      TheSynth->LogEvent("error loading VST: " + errorMessage.toStdString(), kLogEventType_Error);
+   }
+   mVSTMutex.unlock();
 }
 
 void VSTPlugin::CreateParameterSliders()

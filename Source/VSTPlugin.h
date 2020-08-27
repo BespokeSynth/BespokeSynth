@@ -78,6 +78,7 @@ private:
    void DrawModule() override;
    void GetModuleDimensions(float& width, float& height) override;
    bool Enabled() const override { return mEnabled; }
+   void LoadVST(juce::PluginDescription desc);
    
    string GetPluginName();
    void CreateParameterSliders();
