@@ -203,6 +203,9 @@ ofVec2f RadioButton::GetOptionPosition(int optionIndex)
 
 void RadioButton::SetIndex(int i)
 {
+   if (mElements.empty())
+      return;
+
    i = ofClamp(i,0,mElements.size()-1);
    int oldVal = *mVar;
    if (mMultiSelect)
