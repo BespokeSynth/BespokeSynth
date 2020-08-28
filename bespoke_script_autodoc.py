@@ -10,7 +10,7 @@ def extractParamString(group, skipFirst):
 sourceFile = open("Source/ScriptModule_PythonInterface.i")
 lines = sourceFile.readlines()
 
-print"the script module takes python code as input. any python code and imports should work fine. this document describes the specific calls you get from bespoke and can make into bespoke.\n")
+print("the script module takes python code as input. any python code and imports should work fine. this document describes the specific calls you get from bespoke and can make into bespoke.\n")
 print("script module inputs:")
 print("   on_pulse(): called by pulse input")
 print("   on_note(pitch, velocity): called by note input")
