@@ -35,7 +35,10 @@ public:
    virtual void GetDimensions(float& width, float& height) { width = 10; height = 10; }
    ofVec2f GetDimensions();
    ofRectangle GetRect(bool local = false);
-   void SetName(const char* name) { StringCopy(mName, name, MAX_TEXTENTRY_LENGTH); }
+   void SetName(const char* name) {
+     if (mName != name)
+       StringCopy(mName, name, MAX_TEXTENTRY_LENGTH);
+   }
    const char* Name() const { return mName; }
    char* NameMutable() { return mName; }
    string Path(bool ignoreContext = false);
