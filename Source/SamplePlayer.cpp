@@ -38,6 +38,7 @@ SamplePlayer::SamplePlayer()
 , mPauseButton(nullptr)
 , mStopButton(nullptr)
 , mDownloadYoutubeButton(nullptr)
+, mLoadFileButton(nullptr)
 , mScrubbingSample(false)
 , mOscWheelGrabbed(false)
 , mOscWheelSpeed(0)
@@ -66,6 +67,8 @@ void SamplePlayer::CreateUIControls()
    BUTTON(mPauseButton,"pause"); UIBLOCK_SHIFTRIGHT();
    BUTTON(mStopButton,"stop"); UIBLOCK_SHIFTRIGHT();
    CHECKBOX(mLoopCheckbox,"loop",&mLoop); UIBLOCK_SHIFTRIGHT();
+   UIBLOCK_SHIFTX(30);
+   BUTTON(mLoadFileButton,"load"); UIBLOCK_SHIFTRIGHT();
    BUTTON(mDownloadYoutubeButton,"youtube");
    UIBLOCK_SHIFTX(140);
    UIBLOCK_NEWCOLUMN();
@@ -277,6 +280,8 @@ void SamplePlayer::ButtonClicked(ClickButton *button)
    }
    if (button == mDownloadYoutubeButton)
       DownloadYoutube("https://www.youtube.com/watch?v="+mYoutubeId, "");
+   if (button == mLoadFileButton)
+      LoadFile();
 }
 
 void SamplePlayer::TextEntryComplete(TextEntry* entry)
@@ -314,6 +319,21 @@ void SamplePlayer::DownloadYoutube(string search, string options)
    if (juce::File(ofToDataPath("youtube.wav")).existsAsFile())
       sample->Read(ofToDataPath("youtube.wav").c_str());
    UpdateSample(sample, true);
+}
+
+void SamplePlayer::LoadFile()
+{
+   FileChooser chooser("Load sample", File(ofToDataPath("samples")),
+                       TheSynth->GetGlobalManagers()->mAudioFormatManager.getWildcardForAllFormats());
+   if (chooser.browseForFileToOpen())
+   {
+      auto file = chooser.getResult();
+
+      Sample* sample = new Sample();
+      if (file.existsAsFile())
+         sample->Read(file.getFullPathName().toStdString().c_str());
+      UpdateSample(sample, true);
+   }
 }
 
 void SamplePlayer::OnClicked(int x, int y, bool right)
@@ -392,6 +412,7 @@ void SamplePlayer::DrawModule()
    mStopButton->Draw();
    mDownloadYoutubeButton->Draw();
    mDownloadYoutubeSearch->Draw();
+   mLoadFileButton->Draw();
    for (size_t i=0; i<mSampleCuePoints.size(); ++i)
    {
       mSampleCuePoints[i].mStartSlider->Draw();
@@ -400,7 +421,7 @@ void SamplePlayer::DrawModule()
    }
 
    ofPushMatrix();
-   ofTranslate(5,60);
+   ofTranslate(5,58);
    if (mSample)
    {
       float sampleWidth = mWidth - 10;
@@ -430,6 +451,8 @@ void SamplePlayer::DrawModule()
       ofFill();
       ofSetColor(255,255,255,50);
       ofRect(0, 0, mWidth-10, mHeight - 65);
+      ofSetColor(40,40,40);
+      DrawTextNormal("drag and drop a sample here...", 10, 10, 10);
       ofPopStyle();
    }
    ofPopMatrix();
@@ -507,8 +530,8 @@ void SamplePlayer::LoadLayout(const ofxJSONElement& moduleInfo)
 {
    mModuleSaveData.LoadString("target", moduleInfo);
    mModuleSaveData.LoadString("samplebank", moduleInfo,"",FillDropdown<SampleBank*>);
-   mModuleSaveData.LoadFloat("width", moduleInfo, 210);
-   mModuleSaveData.LoadFloat("height", moduleInfo, 125);
+   mModuleSaveData.LoadFloat("width", moduleInfo, mWidth);
+   mModuleSaveData.LoadFloat("height", moduleInfo, mHeight);
    
    SetUpFromSaveData();
 }
@@ -588,5 +611,6 @@ vector<IUIControl*> SamplePlayer::ControlsToIgnoreInSaveState() const
 {
    vector<IUIControl*> ignore;
    ignore.push_back(mDownloadYoutubeSearch);
+   ignore.push_back(mLoadFileButton);
    return ignore;
 }

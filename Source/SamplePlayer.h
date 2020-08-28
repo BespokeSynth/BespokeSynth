@@ -75,6 +75,7 @@ private:
    float GetPlayPositionForMouse(float mouseX) const;
    void GetPlayInfoForPitch(int pitch, float& startSeconds, float& lengthSeconds, float& speed) const;
    void DownloadYoutube(string search, string options);
+   void LoadFile();
    
    //IDrawableModule
    void DrawModule() override;
@@ -110,6 +111,7 @@ private:
    ClickButton* mDownloadYoutubeButton;
    TextEntry* mDownloadYoutubeSearch;
    char mYoutubeSearch[MAX_TEXTENTRY_LENGTH];
+   ClickButton* mLoadFileButton;
    
    bool mOscWheelGrabbed;
    float mOscWheelPos;
