@@ -111,6 +111,7 @@ void ModularSynth::Setup(GlobalManagers* globalManagers, juce::Component* mainCo
       juce::File(ofToDataPath("savestate")).createDirectory();
       juce::File(ofToDataPath("recordings")).createDirectory();
       juce::File(ofToDataPath("internal")).createDirectory();
+      juce::File(ofToDataPath("samples")).createDirectory();
       juce::File(ofToDataPath("scripts")).createDirectory();
    }
    else
