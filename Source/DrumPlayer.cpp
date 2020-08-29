@@ -644,7 +644,7 @@ void DrumPlayer::DrumHit::DrawUIControls()
 {
    float displayLength = mSample.LengthInSamples();
    if (mUseEnvelope)
-      displayLength = mEnvelopeLength * gSampleRateMs;
+      displayLength = MIN(mEnvelopeLength * gSampleRateMs, displayLength);
    ofPushMatrix();
    ofTranslate(mEnvelopeDisplay->GetPosition(true).x, mEnvelopeDisplay->GetPosition(true).y);
    if (!mOwner->mLoadingSamples)
