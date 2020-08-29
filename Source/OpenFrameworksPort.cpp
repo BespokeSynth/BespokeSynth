@@ -72,12 +72,37 @@ string ofToDataPath(string path, bool makeAbsolute)
    static string sDataDir = "";
    if (sDataDir == "")
    {
+      //look for a "data" folder in the current working directory
+      //failing that, look for ~/.config/BespokeSynth/data
+      //failing that, look for /usr/share/BespokeSynth/data
+      //failing that, look in the OSX folder, which is my shared data folder for development
       string localDataDir = File::getCurrentWorkingDirectory().getChildFile("data").getFullPathName().toStdString();
       if (juce::File(localDataDir).exists())
+      {
          sDataDir = localDataDir;
+      }
       else
-         sDataDir = File::getCurrentWorkingDirectory().getChildFile("../../MacOSX/build/Release/data").getFullPathName().toStdString();   //fall back to looking at OSX dir in dev environment
+      {
+         string localDataDir = File::getSpecialLocation(File::userApplicationDataDirectory).getChildFile("BespokeSynth/data").getFullPathName().toStdString();
+         if (juce::File(localDataDir).exists())
+         {
+            sDataDir = localDataDir;
+         }
+         else
+         {
+            sDataDir = File::getSpecialLocation(File::globalApplicationsDirectory).getChildFile("share/BespokeSynth/data").getFullPathName().toStdString();
+            if (juce::File(localDataDir).exists())
+            {
+               sDataDir = localDataDir;
+            }
+            else
+            {
+               sDataDir = File::getCurrentWorkingDirectory().getChildFile("../../MacOSX/build/Release/data").getFullPathName().toStdString();
+            }
+         }
+      }
    }
+
 
    return sDataDir + "/" + path;
 #else
