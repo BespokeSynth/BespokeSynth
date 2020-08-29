@@ -30,6 +30,7 @@ public:
    void Poll() override;
 protected:
    void InitializeRange();
+   bool RequiresManualPolling() { return mUIControlTarget != nullptr && mTarget == nullptr; }
    
    float mDummyMin;
    float mDummyMax;

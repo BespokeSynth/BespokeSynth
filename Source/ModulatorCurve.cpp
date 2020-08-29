@@ -76,7 +76,7 @@ float ModulatorCurve::Value(int samplesIn)
    float val = ofClamp(mAdsr.Value(mInput * kAdsrTime), 0, 1);
    if (val != val)
       val = 0;
-   return ofLerp(mTarget->GetModulatorMin(), mTarget->GetModulatorMax(), val);
+   return ofLerp(GetMin(), GetMax(), val);
 }
 
 void ModulatorCurve::OnClicked(int x, int y, bool right)

@@ -52,7 +52,7 @@ void IModulator::OnModulatorRepatch()
       mUIControlTarget = nullptr;
    }
    
-   if (mUIControlTarget != nullptr && mTarget == nullptr)
+   if (RequiresManualPolling())
       TheSynth->AddExtraPoller(this);
    else
       TheSynth->RemoveExtraPoller(this);
@@ -60,7 +60,7 @@ void IModulator::OnModulatorRepatch()
 
 void IModulator::Poll()
 {
-   if (mUIControlTarget != nullptr && mTarget == nullptr)
+   if (RequiresManualPolling())
       mUIControlTarget->SetFromMidiCC(Value());
 }
 
