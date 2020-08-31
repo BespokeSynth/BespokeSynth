@@ -104,7 +104,7 @@ void DrawAudioBuffer(float width, float height, ChannelBuffer* buffer, float sta
       int numChannels = buffer->NumActiveChannels();
       for (int i=0; i<numChannels; ++i)
       {
-         DrawAudioBuffer(width, height/numChannels, buffer->GetChannel(i), start, end, pos, vol, color);
+         DrawAudioBuffer(width, height/numChannels, buffer->GetChannel(i), start, MIN(end, buffer->BufferSize()), pos, vol, color);
          ofTranslate(0, height/numChannels);
       }
    }
