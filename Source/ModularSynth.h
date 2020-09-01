@@ -128,8 +128,8 @@ public:
    
    float GetRawMouseX() { return mMousePos.x; }
    float GetRawMouseY() { return mMousePos.y; }
-   float GetMouseX(float rawX = FLT_MAX) { return (rawX == FLT_MAX ? mMousePos.x : rawX) / gDrawScale - mDrawOffset.x; }
-   float GetMouseY(float rawY = FLT_MAX) { return ((rawY == FLT_MAX ? mMousePos.y : rawY) - 4) / gDrawScale - mDrawOffset.y; }
+   float GetMouseX(float rawX = FLT_MAX);
+   float GetMouseY(float rawY = FLT_MAX);
    ofVec2f GetDrawOffset() { return mDrawOffset; }
    void SetDrawOffset(ofVec2f offset) { mDrawOffset = offset; }
    const ofRectangle& GetDrawRect() const { return mDrawRect; }

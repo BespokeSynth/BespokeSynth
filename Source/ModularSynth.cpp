@@ -309,6 +309,15 @@ void ModularSynth::Draw(void* vg)
       ofRect(mClickStartX, mClickStartY, GetMouseX()-mClickStartX, GetMouseY()-mClickStartY);
       ofPopStyle();
    }
+
+   const bool kDrawCursorDot = false;
+   if (kDrawCursorDot)
+   {
+      ofPushStyle();
+      ofSetColor(255, 255, 255);
+      ofCircle(GetMouseX(), GetMouseY(), 1);
+      ofPopStyle();
+   }   
    
    /*TODO_PORT(Ryan)
    const int starvationDisplayTicks = 500;
@@ -551,6 +560,21 @@ void ModularSynth::KeyReleased(int key)
    //   mouseReleased(GetMouseX(), GetMouseY(), 0);
    
    mModuleContainer.KeyReleased(key);
+}
+
+float ModularSynth::GetMouseX(float rawX /*= FLT_MAX*/)
+{
+   return (rawX == FLT_MAX ? mMousePos.x : rawX) / gDrawScale - mDrawOffset.x;
+}
+
+float ModularSynth::GetMouseY(float rawY /*= FLT_MAX*/)
+{
+#if BESPOKE_MAC
+   const float kYOffset = -4;
+#else
+   const float kYOffset = 0;
+#endif
+   return ((rawY == FLT_MAX ? mMousePos.y : rawY) + kYOffset) / gDrawScale - mDrawOffset.y;
 }
 
 void ModularSynth::MouseMoved(int intX, int intY )

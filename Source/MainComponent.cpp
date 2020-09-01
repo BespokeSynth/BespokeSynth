@@ -94,6 +94,9 @@ public:
          openGLContext.triggerRepaint();
       }
       ++sRenderFrame;
+
+      if (sRenderFrame % 30 == 0)
+         mPixelRatio = Desktop::getInstance().getDisplays().findDisplayForRect(getScreenBounds()).scale; //adjust pixel ratio based on which screen has the majority of the window
    }
    
    //==============================================================================
