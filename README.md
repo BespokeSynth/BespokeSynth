@@ -23,4 +23,7 @@ Some context: this is my home project that I've been working on since 2011 and h
 
 These days, I only get an hour or two every few nights to work on Bespoke. It's hard to take that short amount of time and devote it to bugfixing, instead I prefer to add new features and modules. As a result, bugs can get left in the wake and some of the modules stay half-finished. Most of the bugfixing I do happens when a bug directly gets in the way of me using the software, rather than any proactive bug-chasing. I think this process is important, to keep Bespoke as my fun little zen garden, rather than a chore that I will eventually abandon.
 
-Any releases I put up will have bugs and stability issues, but that seems better than never doing any releases at all. I can't currently see a future where a fully-stable and mostly-bug-free release would happen... maybe when I retire. Watch this space in 2050!
+Any releases I put up will have bugs and stability issues with some of the modules, but that seems better than never doing any releases at all. I can't currently see a future where a fully-stable and mostly-bug-free release would happen... maybe when I retire. Watch this space in 2050!
+
+### Releases
+Sign up here to receive an email whenever I put out a new release: http://bespokesynth.substack.com/
