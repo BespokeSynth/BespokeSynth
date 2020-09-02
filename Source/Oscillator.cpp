@@ -12,7 +12,7 @@ float Oscillator::Value(float phase) const
 {
    if (mShuffle > 0)
    {
-      while (phase > FTWO_PI * 2) { phase -= FTWO_PI * 2; }
+      phase = fmod(phase, FTWO_PI * 2);
       
       float shufflePoint = FTWO_PI * (1+mShuffle);
       
@@ -22,7 +22,7 @@ float Oscillator::Value(float phase) const
          phase = (phase - shufflePoint) / (1-mShuffle);
    }
    
-   while (phase > FTWO_PI) { phase -= FTWO_PI; }
+   phase = fmod(phase, FTWO_PI);
    
    float sample;
    switch (mType)
