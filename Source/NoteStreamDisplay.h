@@ -54,7 +54,7 @@ private:
       double timeOff;
    };
    
-   static const int kNoteStreamCapacity = 50;
+   static const int kNoteStreamCapacity = 100;
    NoteStreamElement mNoteStream[kNoteStreamCapacity];
    float mWidth;
    float mHeight;

@@ -155,17 +155,12 @@ void ModularSynth::LoadResources(void* nanoVG, void* fontBoundsNanoVG)
 //static
 string ModularSynth::GetUserPrefsPath()
 {
-   #if BESPOKE_WINDOWS
-   string path = ofToDataPath("userprefs_win.json");
-   if (juce::File(path).existsAsFile())
-      return path;
-   #endif
-
-   #if BESPOKE_LINUX
-   string path = ofToDataPath("userprefs_linux.json");
-   if (juce::File(path).existsAsFile())
-      return path;
-   #endif
+   if (JUCEApplication::getCommandLineParameterArray().size() > 0)
+   {
+      string path = ofToDataPath(JUCEApplication::getCommandLineParameterArray()[0].toStdString());
+      if (juce::File(path).existsAsFile())
+         return path;
+   }
    
    return ofToDataPath("userprefs.json");
 }
