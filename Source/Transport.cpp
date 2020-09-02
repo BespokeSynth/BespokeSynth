@@ -149,27 +149,27 @@ float QuadraticBezier (float x, float a, float b)
 	return y;
 }
 
-float Transport::Swing(float measurePos)
+double Transport::Swing(double measurePos)
 {
-   float swingSlices = float(mSwingInterval) * mTimeSigTop / 4.0f;
+   double swingSlices = double(mSwingInterval) * mTimeSigTop / 4.0;
    
-   float swingPos = measurePos * swingSlices;
+   double swingPos = measurePos * swingSlices;
    int swingBeat = int(swingPos);
    swingPos -= swingBeat;
    
-   float swung = SwingBeat(swingPos);
+   double swung = SwingBeat(swingPos);
    
    return (swingBeat + swung) / swingSlices;
 }
 
-float Transport::SwingBeat(float pos)
+double Transport::SwingBeat(double pos)
 {
-   float term = (.5f-mSwing) / (mSwing*mSwing - mSwing);
+   double term = (.5-mSwing) / (mSwing*mSwing - mSwing);
    pos = term*pos*pos + (1-term)*pos;
    return pos;
 }
 
-void Transport::Nudge(float amount)
+void Transport::Nudge(double amount)
 {
    mMeasureTime += amount;
 }
@@ -234,9 +234,9 @@ void Transport::ButtonClicked(ClickButton *button)
    if (button == mResetButton)
       Reset();
    if (button == mNudgeBackButton)
-      Nudge(-.03f);
+      Nudge(-.03);
    if (button == mNudgeForwardButton)
-      Nudge(.03f);
+      Nudge(.03);
    if (button == mIncreaseTempoButton)
       AdjustTempo(1);
    if (button == mDecreaseTempoButton)
@@ -336,7 +336,7 @@ int Transport::GetQuantized(double time, NoteInterval interval, double* remainde
       case kInterval_32nt:
       case kInterval_64n:
       {
-         float ret = pos * CountInStandardMeasure(interval);
+         double ret = pos * CountInStandardMeasure(interval);
          if (remainderMs != nullptr)
          {
             double remainder = ret - (int)ret;
@@ -404,31 +404,31 @@ double Transport::GetMeasureFraction(NoteInterval interval)
       case kInterval_2n:
          return GetMeasureFraction(kInterval_4n)*2;
       case kInterval_2nt:
-         return GetMeasureFraction(kInterval_2n) * 2.0f / 3.0f;
+         return GetMeasureFraction(kInterval_2n) * 2.0 / 3.0;
       case kInterval_4n:
          return 1.0/mTimeSigTop;
       case kInterval_4nt:
-         return GetMeasureFraction(kInterval_4n) * 2.0f / 3.0f;
+         return GetMeasureFraction(kInterval_4n) * 2.0 / 3.0;
       case kInterval_8n:
-         return GetMeasureFraction(kInterval_4n)*.5f;
+         return GetMeasureFraction(kInterval_4n)*.5;
       case kInterval_8nt:
-         return GetMeasureFraction(kInterval_8n) * 2.0f / 3.0f;
+         return GetMeasureFraction(kInterval_8n) * 2.0 / 3.0;
       case kInterval_16n:
-         return GetMeasureFraction(kInterval_4n)*.25f;
+         return GetMeasureFraction(kInterval_4n)*.25;
       case kInterval_16nt:
-         return GetMeasureFraction(kInterval_16n) * 2.0f / 3.0f;
+         return GetMeasureFraction(kInterval_16n) * 2.0 / 3.0;
       case kInterval_32n:
-         return GetMeasureFraction(kInterval_4n)*.125f;
+         return GetMeasureFraction(kInterval_4n)*.125;
       case kInterval_32nt:
-         return GetMeasureFraction(kInterval_32n) * 2.0f / 3.0f;
+         return GetMeasureFraction(kInterval_32n) * 2.0 / 3.0;
       case kInterval_64n:
-         return GetMeasureFraction(kInterval_4n)*.0625f;
+         return GetMeasureFraction(kInterval_4n)*.0625;
       case kInterval_4nd:
-         return GetMeasureFraction(kInterval_4n)*1.5f;
+         return GetMeasureFraction(kInterval_4n)*1.5;
       case kInterval_8nd:
-         return GetMeasureFraction(kInterval_8n)*1.5f;
+         return GetMeasureFraction(kInterval_8n)*1.5;
       case kInterval_16nd:
-         return GetMeasureFraction(kInterval_16n)*1.5f;
+         return GetMeasureFraction(kInterval_16n)*1.5;
       case kInterval_2:
          return 2;
       case kInterval_3:
@@ -473,7 +473,15 @@ void Transport::UpdateListeners(double jumpMs)
          int newStep = GetQuantized(checkTime + offsetMs, info.mInterval, &remainderMs);
          if (oldStep != newStep)
          {
-            double time = checkTime - remainderMs;
+            double time = checkTime - remainderMs + .0001;  //TODO(Ryan) investigate this fudge number. I would think that subtracting remainderMs from checkTime would give me a number that gives me the same GetQuantized() result with a zero remainder, but sometimes it is just short of the correct quantization
+            /*ofLog() << oldStep << " " << newStep << " " << remainderMs << " " << jumpMs << " " << checkTime << " " << time << " " << GetQuantized(checkTime, info.mInterval) << " " << GetQuantized(time, info.mInterval);
+            if (GetQuantized(checkTime + offsetMs, info.mInterval) != GetQuantized(time + offsetMs, info.mInterval))
+            {
+               double remainderShouldBeZeroMs;
+               GetQuantized(time + offsetMs, info.mInterval, &remainderShouldBeZeroMs);
+               ofLog() << remainderShouldBeZeroMs;
+            }*/
+            //assert(GetQuantized(checkTime + offsetMs, info.mInterval) == GetQuantized(time + offsetMs, info.mInterval));
             info.mListener->OnTimeEvent(time);
          }
       }

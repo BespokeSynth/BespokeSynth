@@ -86,7 +86,7 @@ public:
    int GetTimeSigBottom() { return mTimeSigBottom; }
    void SetSwing(float swing) { mSwing = swing; }
    float GetSwing() { return mSwing; }
-   double MsPerBar() const { return 60/mTempo * 1000 * mTimeSigTop * 4.0f/mTimeSigBottom; }
+   double MsPerBar() const { return 60/mTempo * 1000 * mTimeSigTop * 4.0/mTimeSigBottom; }
    void Advance(double ms);
    void AddListener(ITimeListener* listener, NoteInterval interval, OffsetInfo offsetInfo, bool useEventLookahead);
    void RemoveListener(ITimeListener* listener);
@@ -133,9 +133,9 @@ public:
    
 private:
    void UpdateListeners(double jumpMs);
-   float Swing(float measurePos);
-   float SwingBeat(float pos);
-   void Nudge(float amount);
+   double Swing(double measurePos);
+   double SwingBeat(double pos);
+   void Nudge(double amount);
    void AdjustTempo(double amount);
 
    //IDrawableModule
