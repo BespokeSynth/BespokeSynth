@@ -106,11 +106,27 @@ string ofToDataPath(string path, bool makeAbsolute)
 
    return sDataDir + "/" + path;
 #else
-   #if DEBUG
-      return "../Release/data/"+path;
-   #else
-      return "./data/"+path;
-   #endif
+   static string sDataDir = "";
+   if (sDataDir == "")
+   {
+      #if DEBUG
+         string relative = "../Release/data";
+      #else
+         string relative = "data";
+      #endif
+      
+      string localDataDir = File::getCurrentWorkingDirectory().getChildFile(relative).getFullPathName().toStdString();
+      if (juce::File(localDataDir).exists())
+      {
+         sDataDir = localDataDir;
+      }
+      else
+      {
+         sDataDir = "/Applications/BespokeSynth/data";
+      }
+   }
+   
+   return sDataDir + "/" + path;
 #endif
 }
 
