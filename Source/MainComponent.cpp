@@ -101,6 +101,8 @@ public:
          mPixelRatio = Desktop::getInstance().getDisplays().findDisplayForRect(getScreenBounds()).scale; //adjust pixel ratio based on which screen has the majority of the window
          TheSynth->SetPixelRatio(mPixelRatio);
       }
+      
+      mScreenPosition = getScreenPosition();
    }
    
    //==============================================================================
@@ -269,7 +271,7 @@ public:
       mSynth.LockRender(true);
       
       Point<int> mouse = Desktop::getMousePosition();
-      mouse -= getScreenPosition();
+      mouse -= mScreenPosition;
       mSynth.MouseMoved(mouse.x, mouse.y);
       
       float width = getWidth();
@@ -457,6 +459,7 @@ private:
    int mFrameCountAccum;
    list<int> mPressedKeys;
    double mPixelRatio;
+   Point<int> mScreenPosition;
    
    JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (MainContentComponent)
 };
