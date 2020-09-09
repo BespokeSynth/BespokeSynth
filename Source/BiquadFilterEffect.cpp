@@ -28,7 +28,7 @@ void BiquadFilterEffect::CreateUIControls()
    IDrawableModule::CreateUIControls();
    mTypeSelector = new RadioButton(this,"type",4,52,(int*)(&mBiquad[0].mType),kRadioHorizontal);
    mFSlider = new FloatSlider(this,"F",4,4,80,15,&mBiquad[0].mF,10,4000);
-   mQSlider = new FloatSlider(this,"Q",4,20,80,15,&mBiquad[0].mQ,1,10);
+   mQSlider = new FloatSlider(this,"Q",4,20,80,15,&mBiquad[0].mQ,.1f,10);
    mGSlider = new FloatSlider(this,"G",4,36,80,15,&mBiquad[0].mDbGain,-96,96,1);
    
    mTypeSelector->AddLabel("lp", kFilterType_Lowpass);
@@ -171,6 +171,11 @@ bool BiquadFilterEffect::MouseMoved(float x, float y)
 
 void BiquadFilterEffect::CheckboxUpdated(Checkbox* checkbox)
 {
+   if (checkbox == mEnabledCheckbox)
+   {
+      for (int i = 0; i < ChannelBuffer::kMaxNumChannels; ++i)
+         mBiquad[i].Clear();
+   }
 }
 
 void BiquadFilterEffect::FloatSliderUpdated(FloatSlider* slider, float oldVal)

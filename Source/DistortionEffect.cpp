@@ -170,6 +170,11 @@ float DistortionEffect::GetEffectAmount()
 
 void DistortionEffect::CheckboxUpdated(Checkbox* checkbox)
 {
+   if (checkbox == mEnabledCheckbox)
+   {
+      for (int i = 0; i < ChannelBuffer::kMaxNumChannels; ++i)
+         mDCRemover[i].Clear();
+   }
 }
 
 void DistortionEffect::FloatSliderUpdated(FloatSlider* slider, float oldVal)

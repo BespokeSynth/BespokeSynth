@@ -29,6 +29,8 @@ public:
    void SetEnabled(bool enabled) override { mEnabled = enabled; }
    float GetEffectAmount() override;
    string GetType() override { return "dcremover"; }
+
+   void CheckboxUpdated(Checkbox* checkbox) override;
    
 private:
    //IDrawableModule

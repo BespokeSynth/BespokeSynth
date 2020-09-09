@@ -78,7 +78,7 @@ void DelayEffect::ProcessAudio(double time, ChannelBuffer* buffer)
       ComputeSliders(i);
 
       mAmountRamp.Start(mFeedback,3);
-      float delay = mDelayRamp.Value(time);
+      float delay = MAX(mDelayRamp.Value(time), GetMinDelayMs());
 
       float delaySamps = delay / gInvSampleRateMs;
       if (mFeedbackModuleMode)

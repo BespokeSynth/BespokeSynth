@@ -54,3 +54,12 @@ void DCRemoverEffect::GetModuleDimensions(float& width, float& height)
    width = 30;
    height = 0;
 }
+
+void DCRemoverEffect::CheckboxUpdated(Checkbox* checkbox)
+{
+   if (checkbox == mEnabledCheckbox)
+   {
+      for (int i = 0; i < ChannelBuffer::kMaxNumChannels; ++i)
+         mBiquad[i].Clear();
+   }
+}
