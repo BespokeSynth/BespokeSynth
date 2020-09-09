@@ -121,7 +121,7 @@ void ModularSynth::Setup(GlobalManagers* globalManagers, juce::Component* mainCo
       mFatalError = "couldn't find or load data/userprefs.json";
 #if BESPOKE_MAC
       if (!juce::File(GetUserPrefsPath()).existsAsFile())
-         mFatalError += "\nplease launch via run_bespoke.command";
+         mFatalError += "\nplease install to /Applications/BespokeSynth or launch via run_bespoke.command";
 #endif
       LogEvent("couldn't find or load userprefs.json", kLogEventType_Error);
       SetGlobalBufferSize(256);

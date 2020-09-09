@@ -48,7 +48,7 @@ public:
          ofLog() << "pixel ratio: " << mPixelRatio << " screen width: " << screenWidth << " screen height: " << screenHeight;
       }
       
-      int width = 600;
+      int width = 800;
       int height = 400;
       ofxJSONElement userPrefs;
       bool loaded = userPrefs.open(ModularSynth::GetUserPrefsPath());
