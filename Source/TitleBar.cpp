@@ -129,7 +129,6 @@ TitleBar::TitleBar()
 , mSaveStateButton(nullptr)
 , mLoadStateButton(nullptr)
 , mWriteAudioButton(nullptr)
-, mQuitButton(nullptr)
 , mLoadLayoutDropdown(nullptr)
 , mLoadLayoutIndex(-1)
 , mSpawnLists(this)
@@ -150,7 +149,6 @@ void TitleBar::CreateUIControls()
    mSaveStateButton = new ClickButton(this,"save state",205,1);
    mResetLayoutButton = new ClickButton(this,"reset layout",140,19);
    mWriteAudioButton = new ClickButton(this,"write audio",280,1);
-   mQuitButton = new ClickButton(this,"quit",400,1);
    mDisplayHelpButton = new ClickButton(this," ? ",380,1);
    mLoadLayoutDropdown = new DropdownList(this, "load layout", 140, 20, &mLoadLayoutIndex);
    mEventLookaheadCheckbox = new Checkbox(this, "do event lookahead (exp.)", mResetLayoutButton, kAnchor_Right, &Transport::sDoEventLookahead);
@@ -328,9 +326,7 @@ void TitleBar::DrawModule()
    else
       ofSetColor(255,255,255);
    DrawTextLeftJustify(stats, ofGetWidth()/gDrawScale - 5, 33);
-   mQuitButton->SetPosition(ofGetWidth()/gDrawScale - 31, 4);
-   mQuitButton->Draw();
-   mDisplayHelpButton->SetPosition(ofGetWidth()/gDrawScale - 51, 4);
+   mDisplayHelpButton->SetPosition(ofGetWidth()/gDrawScale - 20, 4);
    mDisplayHelpButton->Draw();
    mEventLookaheadCheckbox->Draw();
 }
@@ -391,8 +387,6 @@ void TitleBar::ButtonClicked(ClickButton* button)
       TheSynth->LoadStatePopup();
    if (button == mWriteAudioButton)
       TheSynth->SaveOutput();
-   if (button == mQuitButton)
-      TheSynth->Exit();
    if (button == mDisplayHelpButton)
    {
       float x,y,w,h,butW,butH;

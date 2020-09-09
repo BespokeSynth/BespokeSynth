@@ -99,7 +99,6 @@ private:
    ClickButton* mSaveStateButton;
    ClickButton* mLoadStateButton;
    ClickButton* mWriteAudioButton;
-   ClickButton* mQuitButton;
    DropdownList* mLoadLayoutDropdown;
    ClickButton* mDisplayHelpButton;
    Checkbox* mEventLookaheadCheckbox;
