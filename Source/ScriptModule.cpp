@@ -679,7 +679,7 @@ void ScriptModule::RefreshScriptFiles()
       File file = dir.getFile();
       if (file.getFileExtension() ==  ".py")
       {
-         mLoadScriptSelector->AddLabel(file.getFileName().toStdString(), mScriptFilePaths.size());
+         mLoadScriptSelector->AddLabel(file.getFileName().toStdString(), (int)mScriptFilePaths.size());
          mScriptFilePaths.push_back(file.getFullPathName().toStdString());
       }
    }
@@ -1077,7 +1077,7 @@ void ScriptModule::LineEventTracker::Draw(CodeEntry* codeEntry, int style, ofCol
 {
    ofPushStyle();
    ofFill();
-   for (size_t i=0; i<mText.size(); ++i)
+   for (int i=0; i<(int)mText.size(); ++i)
    {
       float alpha = style == 0 ? 200 : 150;
       float fadeMs = style == 0 ? 200 : 150;

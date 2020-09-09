@@ -736,7 +736,7 @@ void CodeEntry::AddString(string s)
    }
    
    UpdateString(mString.substr(0, mCaretPosition) + toAdd + mString.substr(mCaretPosition));
-   MoveCaret(mCaretPosition + toAdd.size(), false);
+   MoveCaret(mCaretPosition + (int)toAdd.size(), false);
 }
 
 bool CodeEntry::AllowCharacter(char c)
