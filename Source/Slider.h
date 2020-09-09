@@ -132,6 +132,7 @@ private:
    bool mIsSmoothing;
    bool mComputeHasBeenCalledOnce;
    double mLastComputeTime;
+   int mLastComputeSamplesIn;
    
    float mLastDisplayedValue;
    

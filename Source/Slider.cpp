@@ -47,6 +47,7 @@ FloatSlider::FloatSlider(IFloatSliderListener* owner, const char* label, int x, 
 , mIsSmoothing(false)
 , mComputeHasBeenCalledOnce(false)
 , mLastComputeTime(0)
+, mLastComputeSamplesIn(0)
 , mLastDisplayedValue(FLT_MAX)
 , mFloatEntry(nullptr)
 , mAllowMinMaxAdjustment(true)
@@ -540,7 +541,12 @@ string FloatSlider::GetDisplayValue(float val) const
 void FloatSlider::Compute(int samplesIn /*= 0*/)
 {
    mComputeHasBeenCalledOnce = true;
+
+   if (mLastComputeTime == gTime && mLastComputeSamplesIn == samplesIn)
+      return;  //we've just calculated this, no need to do it again! earlying out avoids wasted work and circular modulation loops
+
    mLastComputeTime = gTime;
+   mLastComputeSamplesIn = samplesIn;
    
    if (mModulator && mModulator->Active())
    {
@@ -553,6 +559,7 @@ void FloatSlider::Compute(int samplesIn /*= 0*/)
          mOwner->FloatSliderUpdated(this, oldVal);
       }
    }
+
    if (mIsSmoothing)
    {
       float oldVal = *mVar;
