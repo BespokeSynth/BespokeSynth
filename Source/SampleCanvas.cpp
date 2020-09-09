@@ -124,8 +124,8 @@ bool SampleCanvas::MouseScrolled(int x, int y, float scrollX, float scrollY)
       float distFromStart = zoomCenter - mCanvas->mStart;
       float distFromEnd = zoomCenter - mCanvas->mEnd;
       
-      distFromStart *= 1 + scrollY/100;
-      distFromEnd *= 1 + scrollY/100;
+      distFromStart *= 1 - scrollY/100;
+      distFromEnd *= 1 - scrollY/100;
       
       float slideX = (mCanvas->mEnd - mCanvas->mStart) * -scrollX/300;
       

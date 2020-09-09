@@ -34,7 +34,7 @@ void GridController::Render()
    ofPushStyle();
    
    ofNoFill();
-   ofSetLineWidth(3);
+   ofSetLineWidth(2);
    ofSetColor(200,200,200,gModuleDrawAlpha);
    ofCircle(mX+6,mY+8,5);
    

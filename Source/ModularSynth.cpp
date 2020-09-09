@@ -42,6 +42,7 @@ void AtExit()
 
 ModularSynth::ModularSynth()
 : mMoveModule(nullptr)
+, mIsMousePanning(false)
 , mOutputBuffer(RECORDING_LENGTH)
 , mAudioPaused(false)
 , mIsLoadingState(false)
@@ -63,6 +64,7 @@ ModularSynth::ModularSynth()
 , mLastClapboardTime(-9999)
 , mScrollMultiplierHorizontal(1)
 , mScrollMultiplierVertical(1)
+, mPixelRatio(1)
 {
    mConsoleText[0] = 0;
    assert(TheSynth == nullptr);
@@ -577,7 +579,7 @@ void ModularSynth::MouseMoved(int intX, int intY )
    mMousePos.x = intX;
    mMousePos.y = intY;
    
-   if (IsKeyHeld(' '))
+   if (IsKeyHeld(' ') || mIsMousePanning)
    {
       mDrawOffset += (ofVec2f(intX,intY) - mLastMoveMouseScreenPos) / gDrawScale;
       mZoomer.CancelMovement();
@@ -817,7 +819,12 @@ void ModularSynth::MousePressed(int intX, int intY, int button)
    mClickStartX = x;
    mClickStartY = y;
    if (clicked == nullptr)
-      mGroupSelectContext = &mModuleContainer;
+   {
+      if (rightButton)
+         mIsMousePanning = true;
+      else
+         SetGroupSelectContext(&mModuleContainer);
+   }
    if (clicked != nullptr && clicked != TheTitleBar)
       mLastClickedModule = clicked;
    else
@@ -842,14 +849,14 @@ void ModularSynth::MouseScrolled(float x, float y)
    x *= mScrollMultiplierHorizontal;
    y *= mScrollMultiplierVertical;
 
-   if (IsKeyHeld(' '))
+   if (IsKeyHeld(' ') || GetModuleAt(GetMouseX(), GetMouseY()) == nullptr)
    {
       ZoomView(y/100);
    }
    else if (gHoveredUIControl)
    {
 #if JUCE_WINDOWS
-      y -= x / 7; //taking advantage of logitech horizontal scroll wheel
+      y += x / 2; //taking advantage of logitech horizontal scroll wheel
 #endif
 
       float val = gHoveredUIControl->GetMidiValue();
@@ -866,7 +873,7 @@ void ModularSynth::MouseScrolled(float x, float y)
             movementScale *= .01f;
       }
          
-      float change = -y/100 * movementScale;
+      float change = y/100 * movementScale;
          
       if (floatSlider && floatSlider->GetLFO() && floatSlider->GetLFO()->Enabled())
       {
@@ -1072,17 +1079,27 @@ void ModularSynth::MouseReleased(int intX, int intY, int button)
    
    if (mGroupSelectContext != nullptr)
    {
-      mGroupSelectContext->GetModulesWithinRect(ofRectangle(ofPoint(mClickStartX,mClickStartY),ofPoint(x,y)), mGroupSelectedModules);
-      if (mGroupSelectedModules.size() > 0)
+      ofRectangle rect = ofRectangle(ofPoint(MIN(mClickStartX, x), MIN(mClickStartY, y)), ofPoint(MAX(mClickStartX, x), MAX(mClickStartY, y)));
+      if (rect.width > 10 || rect.height > 10)
       {
-         for (int i=(int)mGroupSelectedModules.size()-1; i>=0; --i) //do this backwards to preserve existing order
-            MoveToFront(mGroupSelectedModules[i]);
+         mGroupSelectContext->GetModulesWithinRect(rect, mGroupSelectedModules);
+         if (mGroupSelectedModules.size() > 0)
+         {
+            for (int i = (int)mGroupSelectedModules.size() - 1; i >= 0; --i) //do this backwards to preserve existing order
+               MoveToFront(mGroupSelectedModules[i]);
+         }
+      }
+      else
+      {
+         mGroupSelectedModules.clear();
       }
       mGroupSelectContext = nullptr;
    }
    
    mClickStartX = INT_MAX;
    mClickStartY = INT_MAX;
+
+   mIsMousePanning = false;
 }
 
 void ModularSynth::AudioOut(float** output, int bufferSize, int nChannels)

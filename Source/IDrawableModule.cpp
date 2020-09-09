@@ -313,8 +313,19 @@ void IDrawableModule::DrawFrame(float w, float h, bool drawModule, float& titleB
    {
       ofPushStyle();
       ofNoFill();
-      ofSetColor(color.r*(.5f+highlight),color.g*(.5f+highlight),color.b*(.5f+highlight),255);
-      ofSetLineWidth(1);
+
+      bool groupSelected = !TheSynth->GetGroupSelectedModules().empty() && VectorContains(this, TheSynth->GetGroupSelectedModules());
+      if (groupSelected)
+      {
+         float pulse = ofMap(sin(gTime / 500 * PI * 2), -1, 1, .2f, 1);
+         ofSetColor(ofLerp(color.r, 255, pulse), ofLerp(color.g, 255, pulse), ofLerp(color.b, 255, pulse), 255);
+         ofSetLineWidth(2);
+      }
+      else
+      {
+         ofSetColor(color.r*(.5f + highlight), color.g*(.5f + highlight), color.b*(.5f + highlight), 255);
+         ofSetLineWidth(1);
+      }      
       ofRect(-.5f, -titleBarHeight-.5f, w+1, h+titleBarHeight+1, 4);
       ofPopStyle();
    }

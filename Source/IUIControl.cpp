@@ -69,7 +69,7 @@ void IUIControl::DrawHover()
    if (Push2Control::sDrawingPush2Display)
       return;
    
-   if (gHoveredUIControl == this && IKeyboardFocusListener::GetActiveKeyboardFocus() == nullptr)
+   if (gHoveredUIControl == this && IKeyboardFocusListener::GetActiveKeyboardFocus() == nullptr && TheSynth->GetGroupSelectedModules().empty())
    {
       float w,h;
       GetDimensions(w, h);

@@ -321,7 +321,7 @@ bool UIGrid::MouseScrolled(int x, int y, float scrollX, float scrollY)
          if (!mSingleColumn || data > 0)
          {
             float oldValue = data;
-            data = ofClamp(data - scrollY / 100, FLT_EPSILON, 1);
+            data = ofClamp(data + scrollY / 100, FLT_EPSILON, 1);
             if (mListener)
                mListener->GridUpdated(this, cell.mCol, cell.mRow, data, oldValue);
          }

@@ -200,7 +200,7 @@ void ofSetColor(float r, float g, float b, float a)
    static int sImage = -1;
    if (sImage == -1)
       sImage = nvgCreateImage(gNanoVG, ofToDataPath("noise.jpg").c_str(), NVG_IMAGE_REPEATX | NVG_IMAGE_REPEATY);
-   NVGpaint pattern = nvgImagePattern(gNanoVG, ofRandom(0,10), ofRandom(0,10), 300, 300, ofRandom(0,10), sImage, a);
+   NVGpaint pattern = nvgImagePattern(gNanoVG, ofRandom(0,10), ofRandom(0,10), 300 / gDrawScale / TheSynth->GetPixelRatio(), 300 / gDrawScale / TheSynth->GetPixelRatio(), ofRandom(0,10), sImage, a);
    pattern.innerColor = nvgRGBA(r, g, b, a);
    pattern.outerColor = nvgRGBA(r, g, b, a);
    nvgStrokePaint(gNanoVG, pattern);

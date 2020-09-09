@@ -41,6 +41,7 @@ public:
       {
          const MessageManagerLock lock;
          mPixelRatio = Desktop::getInstance().getDisplays().getMainDisplay().scale;
+         TheSynth->SetPixelRatio(mPixelRatio);
          auto bounds = Desktop::getInstance().getDisplays().getTotalBounds(true);
          screenWidth = bounds.getWidth();
          screenHeight = bounds.getHeight();
@@ -96,7 +97,10 @@ public:
       ++sRenderFrame;
 
       if (sRenderFrame % 30 == 0)
+      {
          mPixelRatio = Desktop::getInstance().getDisplays().findDisplayForRect(getScreenBounds()).scale; //adjust pixel ratio based on which screen has the majority of the window
+         TheSynth->SetPixelRatio(mPixelRatio);
+      }
    }
    
    //==============================================================================
@@ -351,8 +355,16 @@ private:
    
    void mouseWheelMove(const MouseEvent& e, const MouseWheelDetails& wheel) override
    {
+      float invert = 1;
+      if (wheel.isReversed)
+         invert = -1;
+
+      float scale = 6;
+      if (wheel.isSmooth)
+         scale = 30;
+
       if (!wheel.isInertial)
-         mSynth.MouseScrolled(wheel.deltaX * 30, wheel.deltaY * 30);
+         mSynth.MouseScrolled(wheel.deltaX * scale, wheel.deltaY * scale * invert);
    }
    
    void mouseMagnify(const MouseEvent& e, float scaleFactor) override

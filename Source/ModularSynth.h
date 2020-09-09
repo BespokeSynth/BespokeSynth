@@ -133,6 +133,8 @@ public:
    ofVec2f GetDrawOffset() { return mDrawOffset; }
    void SetDrawOffset(ofVec2f offset) { mDrawOffset = offset; }
    const ofRectangle& GetDrawRect() const { return mDrawRect; }
+   void SetPixelRatio(double ratio) { mPixelRatio = ratio; }
+   double GetPixelRatio() const { return mPixelRatio; }
    
    void SetResizeModule(IDrawableModule* module) { mResizeModule = module; }
    
@@ -214,6 +216,7 @@ private:
    
    ofVec2f mLastMoveMouseScreenPos;
    ofVec2f mLastMouseDragPos;
+   bool mIsMousePanning;
 
    char mConsoleText[MAX_TEXTENTRY_LENGTH];
    TextEntry* mConsoleEntry;
@@ -298,6 +301,8 @@ private:
 
    float mScrollMultiplierHorizontal;
    float mScrollMultiplierVertical;
+
+   double mPixelRatio;
 };
 
 extern ModularSynth* TheSynth;

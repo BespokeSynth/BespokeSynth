@@ -865,8 +865,8 @@ bool CodeEntry::MouseScrolled(int x, int y, float scrollX, float scrollY)
    else
       scrollX = 0;
 
-   mScroll.x = MAX(mScroll.x + scrollX * -10, 0);
-   mScroll.y = MAX(mScroll.y + scrollY * -10, 0);
+   mScroll.x = MAX(mScroll.x + scrollX * 10, 0);
+   mScroll.y = MAX(mScroll.y + scrollY * 10, 0);
    
    UpdateSyntaxHighlightMapping();
    

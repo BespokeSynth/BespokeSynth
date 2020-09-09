@@ -186,8 +186,8 @@ bool SampleFinder::MouseScrolled(int x, int y, float scrollX, float scrollY)
       float distFromStart = zoomCenter - mZoomStart;
       float distFromEnd = zoomCenter - mZoomEnd;
       
-      distFromStart *= 1 + scrollY/100;
-      distFromEnd *= 1 + scrollY/100;
+      distFromStart *= 1 - scrollY/100;
+      distFromEnd *= 1 - scrollY/100;
       
       float slideX = (mZoomEnd - mZoomStart) * -scrollX/300;
       
