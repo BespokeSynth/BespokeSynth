@@ -66,7 +66,10 @@ void EffectChain::AddEffect(string type, bool onTheFly /*=false*/)
    if (effect == nullptr)
       throw UnknownEffectTypeException();
    assert(effect->GetType() == type);  //make sure things are named the same in code
-   string name = GetUniqueName(type, vector<IDrawableModule*>(mEffects.begin(), mEffects.end()));
+   vector<string> otherEffectNames;
+   for (auto* e : mEffects)
+      otherEffectNames.push_back(e->Name());
+   string name = GetUniqueName(type, otherEffectNames);
    effect->SetName(name.c_str());
    effect->SetParent(this);
    effect->CreateUIControls();
