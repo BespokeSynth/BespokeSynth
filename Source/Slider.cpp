@@ -95,6 +95,12 @@ void FloatSlider::SetLFO(FloatSliderLFOControl* lfo)
    mModulator = lfo;
 }
 
+void FloatSlider::SetModulator(IModulator* modulator)
+{
+   mModulator = modulator;
+   mLFOControl = nullptr;
+}
+
 void FloatSlider::SetLabel(const char* label)
 {
    SetName(label);
@@ -229,6 +235,9 @@ void FloatSlider::DisplayLFOControl()
    FloatSliderLFOControl* lfo = AcquireLFO();
    if (lfo)
    {
+      if (lfo->IsPinned())
+         return;
+
       float thisx,thisy;
       GetPosition(thisx,thisy);
       

@@ -117,7 +117,7 @@ void DrawAudioBuffer(float width, float height, const float* buffer, float start
    
    ofPushStyle();
    
-   ofSetLineWidth(2);
+   ofSetLineWidth(1);
    ofFill();
    ofSetColor(255,255,255,50);
    ofRect(0, 0, width, height);

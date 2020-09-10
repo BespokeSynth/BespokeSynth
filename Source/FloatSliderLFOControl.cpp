@@ -228,8 +228,11 @@ void FloatSliderLFOControl::RandomizeSettings()
 
 void FloatSliderLFOControl::PostRepatch(PatchCableSource* cableSource, bool fromUserClick)
 {
-   SetOwner(dynamic_cast<FloatSlider*>(mTargetCable->GetTarget()));
-   OnModulatorRepatch();
+   if (mTarget != mTargetCable->GetTarget() || mTargetCable->GetTarget() == nullptr)
+   {
+      SetOwner(dynamic_cast<FloatSlider*>(mTargetCable->GetTarget()));
+      OnModulatorRepatch();
+   }
 }
 
 void FloatSliderLFOControl::Load(LFOSettings settings)

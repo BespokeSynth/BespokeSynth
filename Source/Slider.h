@@ -54,7 +54,7 @@ public:
    void SetShowName(bool show) { mShowName = show; }
    void SetDimensions(int w, int h) { mWidth = w; mHeight = h; }
    void SetBezierControl(float control) { mBezierControl = control; }
-   void SetModulator(IModulator* modulator) { mModulator = modulator; }
+   void SetModulator(IModulator* modulator);
    float& GetModulatorMin() { return mModulatorMin; }
    float& GetModulatorMax() { return mModulatorMax; }
    void OnTransportAdvanced(float amount) override;
