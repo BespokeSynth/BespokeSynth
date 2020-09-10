@@ -271,7 +271,7 @@ bool EventCanvas::MouseScrolled(int x, int y, float scrollX, float scrollY)
    /*if (x >= mCanvas->GetPosition(true).x && y >= mCanvas->GetPosition(true).y &&
        x < mCanvas->GetPosition(true).x + mCanvas->GetWidth() && y < mCanvas->GetPosition(true).y + mCanvas->GetHeight())
    {
-      mScrollPartial += -scrollY;
+      mScrollPartial -= scrollY;
       int scrollWhole = int(mScrollPartial);
       mScrollPartial -= scrollWhole;
       mCanvas->SetRowOffset(mCanvas->GetRowOffset()+scrollWhole);

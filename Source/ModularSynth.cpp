@@ -851,12 +851,12 @@ void ModularSynth::MouseScrolled(float x, float y)
 
    if (IsKeyHeld(' ') || GetModuleAt(GetMouseX(), GetMouseY()) == nullptr)
    {
-      ZoomView(y/100);
+      ZoomView(y/50);
    }
    else if (gHoveredUIControl)
    {
 #if JUCE_WINDOWS
-      y += x / 2; //taking advantage of logitech horizontal scroll wheel
+      y += x / 4; //taking advantage of logitech horizontal scroll wheel
 #endif
 
       float val = gHoveredUIControl->GetMidiValue();
