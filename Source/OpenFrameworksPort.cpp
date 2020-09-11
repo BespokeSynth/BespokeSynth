@@ -480,10 +480,12 @@ void ofExit()
 
 void ofToggleFullscreen()
 {
+#if !BESPOKE_WINDOWS
    if (Desktop::getInstance().getKioskModeComponent() == nullptr)
       Desktop::getInstance().setKioskModeComponent(TheSynth->GetMainComponent()->getTopLevelComponent(), false);
    else
       Desktop::getInstance().setKioskModeComponent(nullptr, false);
+#endif
 }
 
 void ofStringReplace(string& input, string searchStr, string replaceStr, bool firstOnly /*= false*/)
