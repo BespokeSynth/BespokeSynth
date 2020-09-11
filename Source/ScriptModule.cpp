@@ -609,22 +609,25 @@ void ScriptModule::ButtonClicked(ClickButton* button)
          
          File resourceFile (path);
          TemporaryFile tempFile (resourceFile);
-         FileOutputStream output (tempFile.getFile());
 
-         if (!output.openedOk())
          {
-            DBG("FileOutputStream didn't open correctly ...");
-            return;
-         }
-             
-         output.setNewLineString("\n");
-         output.writeString(mCodeEntry->GetText());
-         output.flush(); // (called explicitly to force an fsync on posix)
+            FileOutputStream output(tempFile.getFile());
 
-         if (output.getStatus().failed())
-         {
-            DBG("An error occurred in the FileOutputStream");
-            return;
+            if (!output.openedOk())
+            {
+               DBG("FileOutputStream didn't open correctly ...");
+               return;
+            }
+
+            output.setNewLineString("\n");
+            output.writeString(mCodeEntry->GetText());
+            output.flush(); // (called explicitly to force an fsync on posix)
+
+            if (output.getStatus().failed())
+            {
+               DBG("An error occurred in the FileOutputStream");
+               return;
+            }
          }
 
          bool success = tempFile.overwriteTargetFileWithTemporary();
