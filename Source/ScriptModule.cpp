@@ -163,8 +163,11 @@ void ScriptModule::DrawModule()
    ofPushStyle();
    for (size_t i=0; i<mPrintDisplay.size(); ++i)
    {
+      if (mPrintDisplay[i].time == -1)
+         continue;
+
       float fadeMs = 500;
-      if (gTime - mPrintDisplay[i].time > 0 && gTime - mPrintDisplay[i].time < fadeMs)
+      if (gTime - mPrintDisplay[i].time >= 0 && gTime - mPrintDisplay[i].time < fadeMs)
       {
          ofSetColor(ofColor::white, 255*(1-(gTime - mPrintDisplay[i].time)/fadeMs));
          ofVec2f linePos = mCodeEntry->GetLinePos(mPrintDisplay[i].lineNum, K(end));
@@ -178,8 +181,11 @@ void ScriptModule::DrawModule()
    
    for (size_t i=0; i<mUIControlModifications.size(); ++i)
    {
+      if (mUIControlModifications[i].time == -1)
+         continue;
+
       float fadeMs = 500;
-      if (gTime - mUIControlModifications[i].time > 0 && gTime - mUIControlModifications[i].time < fadeMs)
+      if (gTime - mUIControlModifications[i].time >= 0 && gTime - mUIControlModifications[i].time < fadeMs)
       {
          ofSetColor(IDrawableModule::GetColor(kModuleType_Modulator), 255*(1-(gTime - mUIControlModifications[i].time)/fadeMs));
          ofVec2f linePos = mCodeEntry->GetLinePos(mUIControlModifications[i].lineNum, K(end));
@@ -237,8 +243,11 @@ void ScriptModule::DrawModuleUnclipped()
    
    for (size_t i=0; i<mUIControlModifications.size(); ++i)
    {
+      if (mUIControlModifications[i].time == -1)
+         continue;
+
       float fadeMs = 200;
-      if (gTime - mUIControlModifications[i].time > 0 && gTime - mUIControlModifications[i].time < fadeMs)
+      if (gTime - mUIControlModifications[i].time >= 0 && gTime - mUIControlModifications[i].time < fadeMs)
       {
          ofSetColor(IDrawableModule::GetColor(kModuleType_Modulator), 100*(1-(gTime - mUIControlModifications[i].time)/fadeMs));
          
