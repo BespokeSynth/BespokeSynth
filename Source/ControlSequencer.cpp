@@ -94,7 +94,7 @@ void ControlSequencer::OnTimeEvent(double time)
    int stepsPerMeasure = TheTransport->CountInStandardMeasure(mInterval) * TheTransport->GetTimeSigTop()/TheTransport->GetTimeSigBottom();
    int numMeasures = MAX(1,ceil(float(mGrid->GetCols()) / stepsPerMeasure));
    int measure = TheTransport->GetMeasure(time) % numMeasures;
-   int step = (TheTransport->GetQuantized(time, mInterval) + measure * stepsPerMeasure) % mGrid->GetCols();
+   int step = ((TheTransport->GetQuantized(time, mInterval) % stepsPerMeasure) + measure * stepsPerMeasure) % mGrid->GetCols();
    
    mGrid->SetHighlightCol(step);
    

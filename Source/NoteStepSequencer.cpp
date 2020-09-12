@@ -424,7 +424,7 @@ void NoteStepSequencer::Step(double time, float velocity, int pulseFlags)
       int stepsPerMeasure = TheTransport->CountInStandardMeasure(mInterval) * TheTransport->GetTimeSigTop()/TheTransport->GetTimeSigBottom();
       int numMeasures = ceil(float(mLength) / stepsPerMeasure);
       int measure = TheTransport->GetMeasure(time) % numMeasures;
-      int step = (TheTransport->GetQuantized(time, mInterval) + measure * stepsPerMeasure) % mLength;
+      int step = ((TheTransport->GetQuantized(time, mInterval) % stepsPerMeasure) + measure * stepsPerMeasure) % mLength;
       mArpIndex = step;
    }
    

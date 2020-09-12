@@ -151,7 +151,7 @@ void PulseSequence::Step(double time, float velocity, int flags)
       int stepsPerMeasure = TheTransport->CountInStandardMeasure(mInterval) * TheTransport->GetTimeSigTop()/TheTransport->GetTimeSigBottom();
       int numMeasures = ceil(float(mLength) / stepsPerMeasure);
       int measure = TheTransport->GetMeasure(time) % numMeasures;
-      mStep = (TheTransport->GetQuantized(time, mInterval) + measure * stepsPerMeasure) % mLength;
+      mStep = ((TheTransport->GetQuantized(time, mInterval) % stepsPerMeasure) + measure * stepsPerMeasure) % mLength;
    }
    
    float v = mVels[mStep] * velocity;
