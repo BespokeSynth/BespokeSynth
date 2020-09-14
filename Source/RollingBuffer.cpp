@@ -117,7 +117,7 @@ void RollingBuffer::Draw(int x, int y, int width, int height, int samples /*= -1
 
 namespace
 {
-   const int kSaveStateRev = 2;
+   const int kSaveStateRev = 3;
 }
 
 void RollingBuffer::SaveState(FileStreamOut& out)
@@ -125,6 +125,7 @@ void RollingBuffer::SaveState(FileStreamOut& out)
    out << kSaveStateRev;
    
    out << mBuffer.NumActiveChannels();
+   out << Size();
    for (int i=0; i<mBuffer.NumActiveChannels(); ++i)
    {
       out << mOffsetToStart[i];
@@ -140,10 +141,26 @@ void RollingBuffer::LoadState(FileStreamIn& in)
    int channels = ChannelBuffer::kMaxNumChannels;
    if (rev >= 2)
       in >> channels;
+   int savedSize = Size();
+   if (rev >= 3)
+      in >> savedSize;
    mBuffer.SetNumActiveChannels(channels);
    for (int i=0; i<channels; ++i)
    {
       in >> mOffsetToStart[i];
-      in.Read(mBuffer.GetChannel(i), Size());
+      if (savedSize <= Size())
+      {
+         in.Read(mBuffer.GetChannel(i), savedSize);
+      }
+      else
+      {
+         //saved with a longer buffer than we have... not sure what the right solution here is, but lets just fill the buffer over and over again until we consume all of the samples
+         int sizeLeft = savedSize;
+         while (sizeLeft > 0)
+         {
+            in.Read(mBuffer.GetChannel(i), MIN(sizeLeft, Size()));
+            sizeLeft -= Size();
+         }
+      }
    }
 }
