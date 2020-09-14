@@ -242,15 +242,36 @@ void CodeEntry::Render()
 string CodeEntry::GetVisibleCode()
 {
    string visible;
-   auto lines = GetLines();
-   int i=0;
-   for (auto line : lines)
+   vector<string> lines = GetLines();
+   if (lines.empty())
+      return "";
+   
+   int firstVisibleLine = -1;
+   int lastVisibleLine = -1;
+   
+   for (int i=0; i<(int)lines.size(); ++i)
    {
-      if ((i+1) * mCharHeight < mScroll.y || i * mCharHeight > mScroll.y + mHeight)
-         visible += "\n";
+      if ((i+1) * mCharHeight >= mScroll.y && i * mCharHeight <= mScroll.y + mHeight)
+      {
+         if (firstVisibleLine == -1)
+            firstVisibleLine = i;
+         lastVisibleLine = i;
+      }
+   }
+   
+   while (firstVisibleLine > 0)
+   {
+      if (lines[firstVisibleLine][0] != ' ')
+         break;
+      --firstVisibleLine;
+   }
+   
+   for (int i=0; i<(int)lines.size(); ++i)
+   {
+      if (i >= firstVisibleLine && i <= lastVisibleLine)
+         visible += lines[i] + "\n";
       else
-         visible += line + "\n";
-      ++i;
+         visible += "\n";
    }
    return visible;
 }
@@ -269,23 +290,13 @@ void CodeEntry::DrawSyntaxHighlight(string input, ofColor color, std::vector<int
 
 string CodeEntry::FilterText(string input, std::vector<int> mapping, int filter1, int filter2)
 {
-   int nonSpaceCount = 0;
-   bool inComment = false;
    for (size_t i=0; i<input.size(); ++i)
    {
-      bool isSpace = (input[i] == ' ');
-      
-      if (nonSpaceCount < mapping.size() && mapping[nonSpaceCount] == 53 && input[i] == '#') //comment
-         inComment = true;
-      
-      if (input[i] == '\n')
-         inComment = false;
-      
       if (input[i] != '\n')
       {
-         if (nonSpaceCount < mapping.size())
+         if (i < mapping.size())
          {
-            if (mapping[nonSpaceCount] != filter1 && mapping[nonSpaceCount] != filter2)
+            if (mapping[i] != filter1 && mapping[i] != filter2)
                input[i] = ' ';
          }
          else
@@ -295,9 +306,6 @@ string CodeEntry::FilterText(string input, std::vector<int> mapping, int filter1
                input[i] = ' ';
          }
       }
-      
-      if (!isSpace || inComment)
-         ++nonSpaceCount;
    }
    return input;
 }
@@ -326,6 +334,8 @@ void CodeEntry::SetUpSyntaxHighlighting()
    
    output = []
    defined = []
+   lastCharEnd = 0
+   lastRowEnd = 0
 
    with io.StringIO(text) as f:
        try:
@@ -378,8 +388,12 @@ void CodeEntry::SetUpSyntaxHighlighting()
 
               row_start, char_start = token[2][0]-1, token[2][1]
               row_end, char_end = token[3][0]-1, token[3][1]
+              if lastRowEnd != row_end:
+                 lastCharEnd = 0
 
-              output = output + [token_type]*(char_end - char_start)
+              output = output + [99]*(char_start - lastCharEnd) + [token_type]*(char_end - char_start)
+              lastCharEnd = char_end
+              lastRowEnd = row_end
        except:
           #print("exception when syntax highlighting")
           pass
@@ -865,7 +879,7 @@ bool CodeEntry::MouseScrolled(int x, int y, float scrollX, float scrollY)
    else
       scrollX = 0;
 
-   mScroll.x = MAX(mScroll.x + scrollX * 10, 0);
+   mScroll.x = MAX(mScroll.x - scrollX * 10, 0);
    mScroll.y = MAX(mScroll.y + scrollY * 10, 0);
    
    UpdateSyntaxHighlightMapping();
