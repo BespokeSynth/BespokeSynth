@@ -143,7 +143,6 @@ void FloatSliderLFOControl::DrawModule()
    ofSetLineWidth(1);
    
    ofBeginShape();
-   
    for (float i=0; i<width; i+=(.25f/gDrawScale))
    {
       float phase = i/width;
@@ -151,7 +150,7 @@ void FloatSliderLFOControl::DrawModule()
          phase *= 2;
       phase += 1 - mLFOSettings.mLFOOffset;
       float value = GetLFOValue(0, mLFO.TransformPhase(phase));
-      ofVertex(i + x, ofMap(value,mTarget->GetMax(),mTarget->GetMin(),0,height) + y);
+      ofVertex(i + x, ofMap(value,GetTargetMax(),GetTargetMin(),0,height) + y);
    }
    ofEndShape(false);
    
@@ -171,7 +170,7 @@ void FloatSliderLFOControl::DrawModule()
    if (displayPhase < 0)
       displayPhase += squeeze;
    ofCircle(displayPhase / squeeze * width + x,
-            ofMap(GetLFOValue(0, mLFO.TransformPhase(currentPhase)),mTarget->GetMax(),mTarget->GetMin(),0,height) + y, 2);
+            ofMap(GetLFOValue(0, mLFO.TransformPhase(currentPhase)),GetTargetMax(),GetTargetMin(),0,height) + y, 2);
 }
 
 void FloatSliderLFOControl::SetLFOEnabled(bool enabled)
@@ -228,6 +227,8 @@ void FloatSliderLFOControl::RandomizeSettings()
 
 void FloatSliderLFOControl::PostRepatch(PatchCableSource* cableSource, bool fromUserClick)
 {
+   if (mTargetCable == nullptr)
+      return;
    if (mTarget != mTargetCable->GetTarget() || mTargetCable->GetTarget() == nullptr)
    {
       SetOwner(dynamic_cast<FloatSlider*>(mTargetCable->GetTarget()));
@@ -253,7 +254,21 @@ float FloatSliderLFOControl::GetLFOValue(int samplesIn /*= 0*/, float forcePhase
    float val = mLFO.Value(samplesIn, forcePhase);
    if (mLFOSettings.mSpread > 0)
       val = val * (1-mLFOSettings.mSpread) + (-cosf(val * FPI) + 1) * .5f * mLFOSettings.mSpread;
-   return ofClamp(Interp(val, GetMin(), GetMax()), mTarget->GetMin(), mTarget->GetMax());
+   return ofClamp(Interp(val, GetMin(), GetMax()), GetTargetMin(), GetTargetMax());
+}
+
+float FloatSliderLFOControl::GetTargetMin() const
+{
+   if (mTarget != nullptr)
+      return mTarget->GetMin();
+   return 0;
+}
+
+float FloatSliderLFOControl::GetTargetMax() const
+{
+   if (mTarget != nullptr)
+      return mTarget->GetMax();
+   return 1;
 }
 
 void FloatSliderLFOControl::UpdateFromSettings()

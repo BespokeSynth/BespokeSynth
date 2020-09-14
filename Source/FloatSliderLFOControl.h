@@ -101,6 +101,8 @@ protected:
 private:
    void UpdateVisibleControls();
    float GetLFOValue(int samplesIn = 0, float forcePhase = -1);
+   float GetTargetMin() const;
+   float GetTargetMax() const;
    
    LFOSettings mLFOSettings;
 
