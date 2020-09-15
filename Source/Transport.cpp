@@ -164,7 +164,8 @@ double Transport::Swing(double measurePos)
 
 double Transport::SwingBeat(double pos)
 {
-   double term = (.5-mSwing) / (mSwing*mSwing - mSwing);
+   double swingDouble = mSwing;
+   double term = (.5 - swingDouble) / (swingDouble*swingDouble - swingDouble);
    pos = term*pos*pos + (1-term)*pos;
    return pos;
 }
@@ -305,7 +306,8 @@ void Transport::RemoveAudioPoller(IAudioPoller* poller)
 int Transport::GetQuantized(double time, NoteInterval interval, double* remainderMs /*=nullptr*/)
 {
    int measure = GetMeasure(time);
-   double pos = Swing(GetMeasurePos(time));
+   double measurePos = GetMeasurePos(time);
+   double pos = Swing(measurePos);
    pos *= double(mTimeSigTop) / mTimeSigBottom;
    
    switch (interval)
@@ -340,7 +342,10 @@ int Transport::GetQuantized(double time, NoteInterval interval, double* remainde
          if (remainderMs != nullptr)
          {
             double remainder = ret - (int)ret;
-            *remainderMs = remainder * GetDuration(interval);
+            if (mSwing == .5f)
+               *remainderMs = remainder * GetDuration(interval);
+            else
+               *remainderMs = 0; //TODO(Ryan) this is incorrect, figure out how to properly calculate remainderMs when swing is applied
          }
          return (int)ret;
       }
@@ -477,6 +482,8 @@ void Transport::UpdateListeners(double jumpMs)
             /*ofLog() << oldStep << " " << newStep << " " << remainderMs << " " << jumpMs << " " << checkTime << " " << time << " " << GetQuantized(checkTime, info.mInterval) << " " << GetQuantized(time, info.mInterval);
             if (GetQuantized(checkTime + offsetMs, info.mInterval) != GetQuantized(time + offsetMs, info.mInterval))
             {
+               double aboveRemainderMs;
+               GetQuantized(checkTime + offsetMs, info.mInterval, &aboveRemainderMs);
                double remainderShouldBeZeroMs;
                GetQuantized(time + offsetMs, info.mInterval, &remainderShouldBeZeroMs);
                ofLog() << remainderShouldBeZeroMs;

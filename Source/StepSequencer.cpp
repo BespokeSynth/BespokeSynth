@@ -614,7 +614,9 @@ int StepSequencer::GetNumSteps(NoteInterval interval) const
 int StepSequencer::GetStepNum(double time)
 {
    int measure = TheTransport->GetMeasure(time) % mNumMeasures;
-   return TheTransport->GetQuantized(time, mStepInterval) + measure * GetNumSteps(mStepInterval) / mNumMeasures;
+   int stepsPerMeasure = GetNumSteps(mStepInterval);
+
+   return TheTransport->GetQuantized(time, mStepInterval) % stepsPerMeasure + measure * stepsPerMeasure / mNumMeasures;
 }
 
 void StepSequencer::OnTimeEvent(double time)
