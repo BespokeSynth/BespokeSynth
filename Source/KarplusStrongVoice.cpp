@@ -93,8 +93,6 @@ bool KarplusStrongVoice::Process(double time, ChannelBuffer* out)
       else if (mVoiceParams->mSourceType == kSourceTypeSaw)
          sample = mOsc.Audio(time, mOscPhase) / (1+pitchBlend*6);   //quieter at higher pitches
       sample *= mEnv.Value(time) + mVoiceParams->mExcitation;
-      //AssertIfDenormal(sample);
-      FIX_DENORMAL(sample);
 
       float samplesAgo = gSampleRate/freq;
       AssertIfDenormal(samplesAgo);
@@ -116,6 +114,7 @@ bool KarplusStrongVoice::Process(double time, ChannelBuffer* out)
       feedbackSample = (1-filter) * feedbackSample + filter * mFilterSample;
       //AssertIfDenormal(feedbackSample);
       mFilterSample = feedbackSample;
+      FIX_DENORMAL(mFilterSample);
       //sample += mFeedbackRamp.Value(time) * feedbackSample;
       sample += feedbackSample * sqrtf(mVoiceParams->mFeedback) * mMuteRamp.Value(time);
       FIX_DENORMAL(sample);

@@ -254,7 +254,7 @@ inline void bzero(void* mem, size_t size)
 }
 #endif
 
-#define FIX_DENORMAL(p) if(fabsf(p)<1e-9) p = 0
+#define FIX_DENORMAL(p) JUCE_UNDENORMALISE(p)
 
 class ofLog
 {

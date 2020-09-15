@@ -134,6 +134,14 @@ void KarplusStrong::DrawModule()
    mBiquad.Draw();
 }
 
+void KarplusStrong::DrawModuleUnclipped()
+{
+   if (mDrawDebug)
+   {
+      mPolyMgr.DrawDebug(250, 0);
+   }
+}
+
 void KarplusStrong::DropdownUpdated(DropdownList* list, int oldVal)
 {
 }

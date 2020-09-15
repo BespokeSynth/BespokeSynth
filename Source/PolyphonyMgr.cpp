@@ -174,7 +174,7 @@ void PolyphonyMgr::Process(double time, ChannelBuffer* out, int bufferSize)
    mFadeOutBuffer.SetNumActiveChannels(out->NumActiveChannels());
    mFadeOutWorkBuffer.SetNumActiveChannels(out->NumActiveChannels());
 
-   for (int i=0; i<kNumVoices; ++i)
+   for (int i=0; i<mVoiceLimit; ++i)
    {
       mVoices[i].mVoice->Process(time, out);
       

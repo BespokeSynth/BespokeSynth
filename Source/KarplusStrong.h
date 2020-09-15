@@ -39,12 +39,11 @@ public:
    void PlayNote(double time, int pitch, int velocity, int voiceIdx = -1, ModulationParameters modulation = ModulationParameters()) override;
    void SendCC(int control, int value, int voiceIdx = -1) override {}
 
-   //IDropdownListener
    void DropdownUpdated(DropdownList* list, int oldVal) override;
-   //IFloatSliderListener
    void FloatSliderUpdated(FloatSlider* slider, float oldVal) override;
-   
    void CheckboxUpdated(Checkbox* checkbox) override {}
+
+   bool HasDebugDraw() const override { return true; }
    
    virtual void LoadLayout(const ofxJSONElement& moduleInfo) override;
    virtual void SetUpFromSaveData() override;
@@ -52,6 +51,7 @@ public:
 private:
    //IDrawableModule
    void DrawModule() override;
+   void DrawModuleUnclipped() override;
    void GetModuleDimensions(float& width, float& height) override { width = 250; height = 90; }
    bool Enabled() const override { return mEnabled; }
 
