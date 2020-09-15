@@ -170,7 +170,7 @@ void CodeEntry::Render()
    DrawSyntaxHighlight(drawString, opColor * (isCurrent ? 1 : dim), mSyntaxHighlightMapping, 51, -1);
    DrawSyntaxHighlight(drawString, commaColor * (isCurrent ? 1 : dim), mSyntaxHighlightMapping, 12, -1);
    DrawSyntaxHighlight(drawString, commentColor * (isCurrent ? 1 : dim), mSyntaxHighlightMapping, 53, -1);
-   DrawSyntaxHighlight(drawString, unknownColor * (isCurrent ? 1 : dim), mSyntaxHighlightMapping, 52, -1); //"error" token (like incomplete quotes)
+   DrawSyntaxHighlight(drawString, unknownColor * (isCurrent ? 1 : dim), mSyntaxHighlightMapping, 52, 59); //"error" token (like incomplete quotes)
    DrawSyntaxHighlight(drawString, unknownColor * (isCurrent ? 1 : dim), mSyntaxHighlightMapping, -1, -1);
    ofPopStyle();
    
