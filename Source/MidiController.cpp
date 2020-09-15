@@ -1630,7 +1630,7 @@ void MidiController::LoadLayout(const ofxJSONElement& moduleInfo)
    mModuleSaveData.LoadFloat("pitchbendrange",moduleInfo,2,1,96,K(isTextField));
    mModuleSaveData.LoadInt("modwheelcc(1or74)",moduleInfo,1,0,127,K(isTextField));
    
-   mModuleSaveData.LoadInt("outchannel", moduleInfo, 1, 0, 15);
+   mModuleSaveData.LoadInt("outchannel", moduleInfo, 1, 1, 16);
    
    mModuleSaveData.LoadBool("negativeedge",moduleInfo,false);
    mModuleSaveData.LoadBool("incrementalsliders", moduleInfo, false);
