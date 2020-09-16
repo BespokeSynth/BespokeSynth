@@ -85,6 +85,7 @@ private:
    void SendNoteToIndex(int index, double time, int pitch, int velocity, int voiceIdx, ModulationParameters modulation);
    string GetThisName();
    string GetIndentation(string line);
+   string GetMethodPrefix();
    bool ShouldDisplayLineExecutionPre(string priorLine, string line);
    void GetFirstAndLastCharacter(string line, char& first, char& last);
    bool IsNonWhitespace(string line);

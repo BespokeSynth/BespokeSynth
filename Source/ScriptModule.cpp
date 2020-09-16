@@ -890,11 +890,19 @@ void ScriptModule::RunCode(double time, string code)
    }
 }
 
+string ScriptModule::GetMethodPrefix()
+{
+   string prefix = Path();
+   ofStringReplace(prefix, "~", "");
+   return prefix;
+}
+
 void ScriptModule::FixUpCode(string& code)
 {
-   ofStringReplace(code, "on_pulse(", "on_pulse__"+Path()+"(");
-   ofStringReplace(code, "on_note(", "on_note__"+Path()+"(");
-   ofStringReplace(code, "on_grid_button(", "on_grid_button__"+Path()+"(");
+   string prefix = GetMethodPrefix();
+   ofStringReplace(code, "on_pulse(", "on_pulse__"+ prefix +"(");
+   ofStringReplace(code, "on_note(", "on_note__"+ prefix +"(");
+   ofStringReplace(code, "on_grid_button(", "on_grid_button__"+ prefix +"(");
    ofStringReplace(code, "this.", GetThisName()+".");
 }
 
@@ -1026,7 +1034,7 @@ bool ScriptModule::MouseScrolled(int x, int y, float scrollX, float scrollY)
 
 void ScriptModule::LoadLayout(const ofxJSONElement& moduleInfo)
 {
-   mModuleSaveData.LoadBool("execute_on_init", moduleInfo, false);
+   mModuleSaveData.LoadBool("execute_on_init", moduleInfo, true);
    mModuleSaveData.LoadInt("init_execute_priority", moduleInfo, 0, -9999, 9999, K(isTextField));
    mModuleSaveData.LoadBool("syntax_highlighting", moduleInfo, true);
    
