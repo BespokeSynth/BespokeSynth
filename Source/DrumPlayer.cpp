@@ -40,6 +40,7 @@ DrumPlayer::DrumPlayer()
 , mMonoCheckbox(nullptr)
 , mGridController(nullptr)
 , mNoteInputBuffer(this)
+, mNeedSetup(true)
 {
    ReadKits();
    
@@ -60,6 +61,8 @@ void DrumPlayer::CreateUIControls()
    mMonoCheckbox = new Checkbox(this,"mono",4,34,&mMonoOutput);
    mShuffleButton = new ClickButton(this,"shuffle",140,34);
    mGridController = new GridController(this, "grid", 60, 34);
+
+   mKitSelector->SetShowing(false); //TODO(Ryan) replace "kits" concept with a better form of serialization
    
    for (int i=0; i<NUM_DRUM_HITS; ++i)
       mDrumHits[i].CreateUIControls(this, i);
@@ -137,7 +140,7 @@ void DrumPlayer::SetUpHitDirectories()
       Array<File> filesInDir;
       dir.findChildFiles(filesInDir, File::findFiles, false);
       if (filesInDir.size() > 0)
-         sHitDirectories.push_back(dir.getRelativePathFrom(parentDirectory).toStdString());
+         sHitDirectories.push_back(dir.getRelativePathFrom(parentDirectory).replaceCharacter('\\', '/').toStdString());
    }
 }
 
@@ -156,7 +159,31 @@ void DrumPlayer::DrumHit::UpdateHitDirectoryDropdown()
 
 void DrumPlayer::Poll()
 {
+   if (mNeedSetup)
+      SetUpNewDrumPlayer();
+
    UpdateLights();
+}
+
+void DrumPlayer::SetUpNewDrumPlayer()
+{
+   array<string, 8> categories = { "808kit/Kick", "808kit/Snare", "808kit/HatClosed", "808kit/HatOpen", "808kit/Kick", "808kit/Clap", "808kit/HatClosed", "808kit/Perc"};
+   for (int i = 0; i < NUM_DRUM_HITS; ++i)
+   {
+      string category = categories[i % categories.size()];
+      File dir(ofToDataPath("drums/hits/" + category));
+      if (dir.exists())
+      {
+         mDrumHits[i].mHitCategory = category;
+         mDrumHits[i].UpdateHitDirectoryDropdown();
+      }
+      mDrumHits[i].LoadRandomSample();
+
+      if (i == 2 || i == 3 || i == 6)
+         mDrumHits[i].mLinkId = 0;
+   }
+
+   mNeedSetup = false;
 }
 
 void DrumPlayer::UpdateVisibleControls()
@@ -888,7 +915,12 @@ void DrumPlayer::DrumHit::LoadRandomSample()
 {
    File dir(ofToDataPath("drums/hits/"+mHitCategory));
    Array<File> files;
-   dir.findChildFiles(files, File::findFiles, false);
+   for (auto file : dir.findChildFiles(File::findFiles, false))
+   {
+      if (file.getFileName()[0] != '.')
+         files.add(file);
+   }
+
    if (files.size() > 0)
    {
       string file = files[rand() % files.size()].getFullPathName().toStdString();
@@ -924,7 +956,7 @@ void DrumPlayer::LoadLayout(const ofxJSONElement& moduleInfo)
 void DrumPlayer::SetUpFromSaveData()
 {
    SetTarget(TheSynth->FindModule(mModuleSaveData.GetString("target")));
-   LoadKit(0);
+   //LoadKit(0);
 }
 
 namespace
@@ -968,4 +1000,6 @@ void DrumPlayer::LoadState(FileStreamIn& in)
          mDrumHits[i].UpdateHitDirectoryDropdown();
       }
    }
+
+   mNeedSetup = false;
 }

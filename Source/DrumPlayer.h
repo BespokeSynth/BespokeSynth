@@ -95,6 +95,7 @@ private:
    void UpdateVisibleControls();
    int GetIndividualOutputIndex(int hitIndex);
    void UpdateLights();
+   void SetUpNewDrumPlayer();
    
    //IDrawableModule
    void DrawModule() override;
@@ -131,6 +132,7 @@ private:
    Checkbox* mMonoCheckbox;
    GridController* mGridController;
    NoteInputBuffer mNoteInputBuffer;
+   bool mNeedSetup;
    
    void LoadSampleLock();
    void LoadSampleUnlock();
