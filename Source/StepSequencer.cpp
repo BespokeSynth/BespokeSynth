@@ -676,71 +676,71 @@ void StepSequencer::SetPreset(int preset)
    {
       case 0:
          for (int i=0;i<16;++i)
-            mGrid->SetValRefactor(2,i,.5f);
-         mGrid->SetValRefactor(0,0,.5f);
-         mGrid->SetValRefactor(1,4,.5f);
-         mGrid->SetValRefactor(0,8,.5f);
-         mGrid->SetValRefactor(1,12,.5f);
+            mGrid->SetValRefactor(2,i,1.0f);
+         mGrid->SetValRefactor(0,0,1.0f);
+         mGrid->SetValRefactor(1,4,1.0f);
+         mGrid->SetValRefactor(0,8,1.0f);
+         mGrid->SetValRefactor(1,12,1.0f);
          break;
       case 1:
          for (int i=0;i<16;i+=2)
-            mGrid->SetValRefactor(2,i,.5f);
-         mGrid->SetValRefactor(0,0,.5f);
-         mGrid->SetValRefactor(1,4,.5f);
-         mGrid->SetValRefactor(0,8,.5f);
-         mGrid->SetValRefactor(1,12,.5f);
+            mGrid->SetValRefactor(2,i,1.0f);
+         mGrid->SetValRefactor(0,0,1.0f);
+         mGrid->SetValRefactor(1,4,1.0f);
+         mGrid->SetValRefactor(0,8,1.0f);
+         mGrid->SetValRefactor(1,12,1.0f);
          break;
       case 2:
-         mGrid->SetValRefactor(0,0,.5f);
-         mGrid->SetValRefactor(0,4,.5f);
-         mGrid->SetValRefactor(1,4,.5f);
-         mGrid->SetValRefactor(0,8,.5f);
-         mGrid->SetValRefactor(0,12,.5f);
-         mGrid->SetValRefactor(1,12,.5f);
+         mGrid->SetValRefactor(0,0,1.0f);
+         mGrid->SetValRefactor(0,4,1.0f);
+         mGrid->SetValRefactor(1,4,1.0f);
+         mGrid->SetValRefactor(0,8,1.0f);
+         mGrid->SetValRefactor(0,12,1.0f);
+         mGrid->SetValRefactor(1,12,1.0f);
          break;
       case 3:  //amen
-         mGrid->SetValRefactor(0,0,.5f);
-         mGrid->SetValRefactor(6,0,.1f);
-         mGrid->SetValRefactor(0,2,.5f);
-         mGrid->SetValRefactor(6,2,.1f);
-         mGrid->SetValRefactor(1,4,.5f);
-         mGrid->SetValRefactor(2,6,.5f);
-         mGrid->SetValRefactor(6,6,.1f);
-         mGrid->SetValRefactor(4,7,.25f);
-         mGrid->SetValRefactor(2,8,.5f);
-         mGrid->SetValRefactor(6,8,.1f);
-         mGrid->SetValRefactor(4,9,.25f);
-         mGrid->SetValRefactor(0,10,.5f);
-         mGrid->SetValRefactor(6,10,.1f);
-         mGrid->SetValRefactor(1,12,.5f);
-         mGrid->SetValRefactor(2,14,.5f);
-         mGrid->SetValRefactor(6,15,.1f);
+         mGrid->SetValRefactor(0,0,1.0f);
+         mGrid->SetValRefactor(6,0,.25f);
+         mGrid->SetValRefactor(0,2,1.0f);
+         mGrid->SetValRefactor(6,2,.25f);
+         mGrid->SetValRefactor(1,4,1.0f);
+         mGrid->SetValRefactor(2,6,1.0f);
+         mGrid->SetValRefactor(6,6,.25f);
+         mGrid->SetValRefactor(4,7,.5f);
+         mGrid->SetValRefactor(2,8,1.0f);
+         mGrid->SetValRefactor(6,8,.25f);
+         mGrid->SetValRefactor(4,9,.5f);
+         mGrid->SetValRefactor(0,10,1.0f);
+         mGrid->SetValRefactor(6,10,.25f);
+         mGrid->SetValRefactor(1,12,1.0f);
+         mGrid->SetValRefactor(2,14,1.0f);
+         mGrid->SetValRefactor(6,15,.25f);
          break;
       case 4:
          for (int i=0;i<16;i+=2)
-            mGrid->SetValRefactor(2,i,.5f);
-         mGrid->SetValRefactor(0,0,.5f);
-         mGrid->SetValRefactor(1,4,.5f);
-         mGrid->SetValRefactor(1,7,.5f);
-         mGrid->SetValRefactor(1,9,.5f);
-         mGrid->SetValRefactor(0,10,.5f);
-         mGrid->SetValRefactor(1,12,.5f);
+            mGrid->SetValRefactor(2,i,1.0f);
+         mGrid->SetValRefactor(0,0,1.0f);
+         mGrid->SetValRefactor(1,4,1.0f);
+         mGrid->SetValRefactor(1,7,1.0f);
+         mGrid->SetValRefactor(1,9,1.0f);
+         mGrid->SetValRefactor(0,10,1.0f);
+         mGrid->SetValRefactor(1,12,1.0f);
          break;
       case 5:
-         mGrid->SetValRefactor(0,0,.5f);
-         mGrid->SetValRefactor(1,8,.5f);
+         mGrid->SetValRefactor(0,0,1.0f);
+         mGrid->SetValRefactor(1,8,1.0f);
          break;
       case 6:
-         mGrid->SetValRefactor(0,0,.5f);
-         mGrid->SetValRefactor(2,2,.5f);
-         mGrid->SetValRefactor(0,4,.5f);
-         mGrid->SetValRefactor(1,4,.5f);
-         mGrid->SetValRefactor(2,6,.5f);
-         mGrid->SetValRefactor(0,8,.5f);
-         mGrid->SetValRefactor(2,10,.5f);
-         mGrid->SetValRefactor(0,12,.5f);
-         mGrid->SetValRefactor(1,12,.5f);
-         mGrid->SetValRefactor(2,14,.5f);
+         mGrid->SetValRefactor(0,0,1.0f);
+         mGrid->SetValRefactor(2,2,1.0f);
+         mGrid->SetValRefactor(0,4,1.0f);
+         mGrid->SetValRefactor(1,4,1.0f);
+         mGrid->SetValRefactor(2,6,1.0f);
+         mGrid->SetValRefactor(0,8,1.0f);
+         mGrid->SetValRefactor(2,10,1.0f);
+         mGrid->SetValRefactor(0,12,1.0f);
+         mGrid->SetValRefactor(1,12,1.0f);
+         mGrid->SetValRefactor(2,14,1.0f);
          break;
    }
 }
