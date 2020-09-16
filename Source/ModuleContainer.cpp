@@ -245,7 +245,13 @@ void ModuleContainer::TakeModule(IDrawableModule* module)
                        module->GetPosition(true).y + offset.y);
    module->SetOwningContainer(this);
    if (mOwner)
+   {
       mOwner->AddChild(module);
+   }
+   else   //root modulecontainer
+   {
+      module->SetName(GetUniqueName(module->Name(), mModules).c_str());
+   }
 }
 
 void ModuleContainer::DeleteModule(IDrawableModule* module)
