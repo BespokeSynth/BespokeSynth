@@ -96,7 +96,7 @@ IDrawableModule* SpawnList::Spawn()
    if (mOverrideModuleType == "prefab")
    {
       Prefab* prefab = dynamic_cast<Prefab*>(module);
-      prefab->LoadPrefab("prefabs/"+mSpawnables[mSpawnIndex]);
+      prefab->LoadPrefab("prefabs"+GetPathSeparator()+mSpawnables[mSpawnIndex]);
    }
    
    return module;

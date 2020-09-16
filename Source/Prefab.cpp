@@ -144,7 +144,8 @@ void Prefab::ButtonClicked(ClickButton* button)
    
    if (button == mDisbandButton)
    {
-      for (auto* module : mModuleContainer.GetModules())
+      auto modules = mModuleContainer.GetModules();
+      for (auto* module : modules)
          GetOwningContainer()->TakeModule(module);
       GetOwningContainer()->DeleteModule(this);
    }
@@ -231,4 +232,31 @@ void Prefab::LoadLayout(const ofxJSONElement& moduleInfo)
 
 void Prefab::SetUpFromSaveData()
 {
+}
+
+namespace
+{
+   const int kSaveStateRev = 0;
+}
+
+void Prefab::SaveState(FileStreamOut& out)
+{
+   IDrawableModule::SaveState(out);
+
+   out << kSaveStateRev;
+   out << mPrefabName;
+}
+
+void Prefab::LoadState(FileStreamIn& in)
+{
+   IDrawableModule::LoadState(in);
+
+   if (!ModuleContainer::DoesModuleHaveMoreSaveData(in))
+      return;  //this was saved before we added versioning, bail out
+
+   int rev;
+   in >> rev;
+   LoadStateValidate(rev <= kSaveStateRev);
+
+   in >> mPrefabName;
 }
