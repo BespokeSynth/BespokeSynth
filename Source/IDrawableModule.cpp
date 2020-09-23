@@ -596,7 +596,8 @@ void IDrawableModule::MouseReleased()
       mUIControls[i]->MouseReleased();
    for (int i=0; i<mChildren.size(); ++i)
       mChildren[i]->MouseReleased();
-   for (auto source : mPatchCableSources)
+   auto sources = mPatchCableSources;
+   for (auto source : sources)
       source->MouseReleased();
 }
 
