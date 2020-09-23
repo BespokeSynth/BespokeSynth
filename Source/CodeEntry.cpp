@@ -901,7 +901,7 @@ int CodeEntry::GetCaretPosition(int col, int row)
    for (size_t i=0; i<row && i<lines.size(); ++i)
       caretPos += lines[i].length() + 1;
    
-   if (row < (int)lines.size())
+   if (row >= 0 && row < (int)lines.size())
       caretPos += MIN(col, lines[row].length());
    
    return MIN(caretPos, (int)mString.length());
