@@ -17,7 +17,7 @@ LocationZoomer::LocationZoomer()
 
 void LocationZoomer::Init()
 {
-   mHome.mZoomLevel = 1;
+   mHome.mZoomLevel = TheSynth->GetUserPrefs()["zoom"].isNull() ? 1 : TheSynth->GetUserPrefs()["zoom"].asDouble();
    mHome.mOffset.set(0,0);
    mStart = mHome;
    mDestination = mHome;

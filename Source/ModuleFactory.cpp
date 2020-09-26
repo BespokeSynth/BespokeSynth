@@ -201,6 +201,7 @@
 #include "PulseButton.h"
 #include "GridModule.h"
 #include "FubbleModule.h"
+#include "GlobalControls.h"
 
 #define REGISTER(class,name,type) Register(#name, &(class::Create), &(class::CanCreate), type, false, false);
 #define REGISTER_HIDDEN(class,name,type) Register(#name, &(class::Create), &(class::CanCreate), type, true, false);
@@ -370,6 +371,7 @@ ModuleFactory::ModuleFactory()
    REGISTER(PulseButton, pulsebutton, kModuleType_Other);
    REGISTER(GridModule, grid, kModuleType_Other);
    REGISTER(FubbleModule, fubble, kModuleType_Modulator);
+   REGISTER(GlobalControls, globalcontrols, kModuleType_Other);
 
    //REGISTER_EXPERIMENTAL(MidiPlayer, midiplayer, kModuleType_Instrument);
    REGISTER_EXPERIMENTAL(Razor, razor, kModuleType_Synth);

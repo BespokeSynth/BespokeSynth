@@ -207,6 +207,10 @@
         <FILE id="RG4zGd" name="TremoloEffect.h" compile="0" resource="0" file="Source/TremoloEffect.h"/>
       </GROUP>
       <GROUP id="{6781AC07-A090-A7AF-8D27-BCB6D9526ABD}" name="modules">
+        <FILE id="lUxXQ6" name="GlobalControls.cpp" compile="1" resource="0"
+              file="Source/GlobalControls.cpp"/>
+        <FILE id="JH3qj5" name="GlobalControls.h" compile="0" resource="0"
+              file="Source/GlobalControls.h"/>
         <FILE id="FU40XK" name="FubbleModule.cpp" compile="1" resource="0"
               file="Source/FubbleModule.cpp"/>
         <FILE id="XLf5ZZ" name="FubbleModule.h" compile="0" resource="0" file="Source/FubbleModule.h"/>

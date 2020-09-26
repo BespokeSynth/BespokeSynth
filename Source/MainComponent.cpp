@@ -50,18 +50,26 @@ public:
       
       int width = 800;
       int height = 400;
+      mDesiredInitialPosition.setXY(INT_MAX, INT_MAX);
       ofxJSONElement userPrefs;
       bool loaded = userPrefs.open(ModularSynth::GetUserPrefsPath());
       if (loaded)
       {
          width = userPrefs["width"].asInt();
          height = userPrefs["height"].asInt();
+         if (!userPrefs["position"].isNull())
+            mDesiredInitialPosition.setXY(userPrefs["position"]["x"].asInt(), userPrefs["position"]["y"].asInt());
       }
       
-      if (width + getPosition().x > screenWidth)
-         width = screenWidth - getPosition().x;
-      if (height + getPosition().y + 20 > screenHeight)
-         height = screenHeight - getPosition().y - 20;
+      if (mDesiredInitialPosition.x == INT_MAX)
+      {
+         if (width + getTopLevelComponent()->getPosition().x > screenWidth)
+            width = screenWidth - getTopLevelComponent()->getPosition().x;
+         if (height + getTopLevelComponent()->getPosition().y + 20 > screenHeight)
+            height = screenHeight - getTopLevelComponent()->getPosition().y - 20;
+
+         setSize(width, height);
+      }
       
       setSize(width, height);
       setWantsKeyboardFocus(true);
@@ -76,6 +84,10 @@ public:
    
    void timerCallback() override
    {
+      static int sRenderFrame = 0;
+      if (sRenderFrame == 0 && mDesiredInitialPosition.x != INT_MAX)
+         getTopLevelComponent()->setTopLeftPosition(mDesiredInitialPosition);
+
       static bool sHasGrabbedFocus = false;
       if (!sHasGrabbedFocus && !hasKeyboardFocus(true) && isVisible())
       {
@@ -85,7 +97,6 @@ public:
       
       mSynth.Poll();
       
-      static int sRenderFrame = 0;
 #if DEBUG || BESPOKE_LINUX
       if (sRenderFrame % 2 == 0)
 #else
@@ -460,6 +471,7 @@ private:
    list<int> mPressedKeys;
    double mPixelRatio;
    Point<int> mScreenPosition;
+   Point<int> mDesiredInitialPosition;
    
    JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (MainContentComponent)
 };
