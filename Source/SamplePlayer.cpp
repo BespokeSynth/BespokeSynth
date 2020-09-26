@@ -324,7 +324,7 @@ void SamplePlayer::DownloadYoutube(string search, string options)
 void SamplePlayer::LoadFile()
 {
    FileChooser chooser("Load sample", File(ofToDataPath("samples")),
-                       TheSynth->GetGlobalManagers()->mAudioFormatManager.getWildcardForAllFormats());
+                       TheSynth->GetGlobalManagers()->mAudioFormatManager.getWildcardForAllFormats(), true, false, TheSynth->GetMainComponent()->getTopLevelComponent());
    if (chooser.browseForFileToOpen())
    {
       auto file = chooser.getResult();

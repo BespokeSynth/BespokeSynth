@@ -602,7 +602,7 @@ void ScriptModule::ButtonClicked(ClickButton* button)
    
    if (button == mSaveScriptButton)
    {
-      FileChooser chooser("Save script as...", File(ofToDataPath("scripts/script.py")));
+      FileChooser chooser("Save script as...", File(ofToDataPath("scripts/script.py")), "*.py", true, false, TheSynth->GetMainComponent()->getTopLevelComponent());
       if (chooser.browseForFileToSave(true))
       {
          string path = chooser.getResult().getFullPathName().toStdString();

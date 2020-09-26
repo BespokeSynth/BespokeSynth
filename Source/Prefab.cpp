@@ -124,7 +124,7 @@ void Prefab::ButtonClicked(ClickButton* button)
 {
    if (button == mSaveButton)
    {
-      FileChooser chooser("Save prefab as...", File(ofToDataPath("prefabs/prefab.pfb")));
+      FileChooser chooser("Save prefab as...", File(ofToDataPath("prefabs/prefab.pfb")), "*.pfb", true, false, TheSynth->GetMainComponent()->getTopLevelComponent());
       if (chooser.browseForFileToSave(true))
       {
          string savePath = chooser.getResult().getRelativePathFrom(File(ofToDataPath(""))).toStdString();
@@ -134,7 +134,7 @@ void Prefab::ButtonClicked(ClickButton* button)
    
    if (button == mLoadButton)
    {
-      FileChooser chooser("Load prefab...", File(ofToDataPath("prefabs")));
+      FileChooser chooser("Load prefab...", File(ofToDataPath("prefabs")), "*.pfb", true, false, TheSynth->GetMainComponent()->getTopLevelComponent());
       if (chooser.browseForFileToOpen())
       {
          string loadPath = chooser.getResult().getRelativePathFrom(File(ofToDataPath(""))).toStdString();

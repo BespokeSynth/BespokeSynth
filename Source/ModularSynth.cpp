@@ -1729,14 +1729,14 @@ void ModularSynth::SaveLayout(string jsonFile, bool makeDefaultLayout /*= true*/
 
 void ModularSynth::SaveLayoutAsPopup()
 {
-   FileChooser chooser("Save current layout as...", File(ofToDataPath("layouts/newlayout.json")));
+   FileChooser chooser("Save current layout as...", File(ofToDataPath("layouts/newlayout.json")), "*.json", true, false, mMainComponent->getTopLevelComponent());
    if (chooser.browseForFileToSave(true))
       SaveLayout(chooser.getResult().getRelativePathFrom(File(ofToDataPath(""))).toStdString());
 }
 
 void ModularSynth::SaveStatePopup()
 {
-   FileChooser chooser("Save current state as...", File(ofToDataPath(ofGetTimestampString("savestate/%Y-%m-%d_%H-%M.bsk"))));
+   FileChooser chooser("Save current state as...", File(ofToDataPath(ofGetTimestampString("savestate/%Y-%m-%d_%H-%M.bsk"))), "*.bsk", true, false, mMainComponent->getTopLevelComponent());
    if (chooser.browseForFileToSave(true))
       SaveState(chooser.getResult().getRelativePathFrom(File(ofToDataPath(""))).toStdString());
 }
@@ -1748,7 +1748,7 @@ void ModularSynth::LoadStatePopup()
 
 void ModularSynth::LoadStatePopupImp()
 {
-   FileChooser chooser("Load state", File(ofToDataPath("savestate")), "*.bsk");
+   FileChooser chooser("Load state", File(ofToDataPath("savestate")), "*.bsk", true, false, mMainComponent->getTopLevelComponent());
    if (chooser.browseForFileToOpen())
       LoadState(chooser.getResult().getRelativePathFrom(File(ofToDataPath(""))).toStdString());
 }
