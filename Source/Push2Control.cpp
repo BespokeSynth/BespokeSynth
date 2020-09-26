@@ -632,9 +632,9 @@ void Push2Control::UpdateControlList()
       controls = mDisplayModule->GetUIControls();
    for (int i=0; i < controls.size(); ++i)
    {
-      if (controls[i]->IsSliderControl())
+      if (controls[i]->IsSliderControl() && controls[i]->GetShouldSaveState())
          mSliderControls.push_back(controls[i]);
-      if (controls[i]->IsButtonControl())
+      if (controls[i]->IsButtonControl() && controls[i]->GetShouldSaveState())
          mButtonControls.push_back(controls[i]);
    }
 }
