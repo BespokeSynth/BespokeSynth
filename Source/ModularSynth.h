@@ -130,7 +130,7 @@ public:
    float GetRawMouseY() { return mMousePos.y; }
    float GetMouseX(float rawX = FLT_MAX);
    float GetMouseY(float rawY = FLT_MAX);
-   ofVec2f GetDrawOffset() { return mDrawOffset; }
+   ofVec2f& GetDrawOffset() { return mDrawOffset; }
    void SetDrawOffset(ofVec2f offset) { mDrawOffset = offset; }
    const ofRectangle& GetDrawRect() const { return mDrawRect; }
    void SetPixelRatio(double ratio) { mPixelRatio = ratio; }
