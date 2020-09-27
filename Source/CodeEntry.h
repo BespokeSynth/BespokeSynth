@@ -51,6 +51,7 @@ public:
    void LoadState(FileStreamIn& in, bool shouldSetValue = true) override;
    bool IsSliderControl() override { return false; }
    bool IsButtonControl() override { return false; }
+   bool IsTextEntry() const override { return true; }
    
    ofVec2f GetLinePos(int lineNum, bool end);
    float GetCharHeight() const { return mCharHeight; }

@@ -196,6 +196,45 @@ void ModularSynth::Poll()
       mScheduledEnvelopeEditorSpawnDisplay->SpawnEnvelopeEditor();
       mScheduledEnvelopeEditorSpawnDisplay = nullptr;
    }
+
+   {
+      static MouseCursor sCurrentCursor = MouseCursor::NormalCursor;
+      MouseCursor desiredCursor;
+
+      if (mIsLoadingState)
+      {
+         desiredCursor = MouseCursor::WaitCursor;
+      }
+      else if (gHoveredUIControl != nullptr && gHoveredUIControl->IsMouseDown())
+      {
+         if (GetKeyModifiers() == kModifier_Shift)
+            desiredCursor = MouseCursor::CrosshairCursor;
+         else
+            desiredCursor = MouseCursor::LeftRightResizeCursor;
+      }
+      else if (gHoveredUIControl != nullptr && gHoveredUIControl->IsTextEntry())
+      {
+         desiredCursor = MouseCursor::IBeamCursor;
+      }
+      else if (mIsMousePanning)
+      {
+         desiredCursor = MouseCursor::DraggingHandCursor;
+      }
+      else if (GetKeyModifiers() == kModifier_Shift)
+      {
+         desiredCursor = MouseCursor::PointingHandCursor;
+      }
+      else
+      {
+         desiredCursor = MouseCursor::NormalCursor;
+      }
+
+      if (desiredCursor != sCurrentCursor)
+      {
+         sCurrentCursor = desiredCursor;
+         mMainComponent->setMouseCursor(desiredCursor);
+      }
+   }
    
    ++sFrameCount;
 }
@@ -666,8 +705,11 @@ void ModularSynth::MouseMoved(int intX, int intY )
       float w, h;
       gHoveredUIControl->GetDimensions(w, h);
       
-      if (x < uiX - 10 || y < uiY - 10 || x > uiX + w + 10 || y > uiY + h + 10)
-         gHoveredUIControl = nullptr;
+      if (!gHoveredUIControl->IsMouseDown())
+      {
+         if (x < uiX - 10 || y < uiY - 10 || x > uiX + w + 10 || y > uiY + h + 10)
+            gHoveredUIControl = nullptr;
+      }
    }
    
    gHoveredModule = GetModuleAt(GetMouseX(), GetMouseY());
@@ -1962,6 +2004,10 @@ void ModularSynth::OnConsoleInput()
       else if (tokens[0] == "l")
       {
          LoadState("savestate/quicksave.bsk");
+      }
+      else if (tokens[0] == "getwindowinfo")
+      {
+         ofLog() << "pos:(" << mMainComponent->getTopLevelComponent()->getPosition().x << ", " << mMainComponent->getTopLevelComponent()->getPosition().y << ") size:(" << ofGetWidth() << ", " << ofGetHeight() << ")";
       }
       else
       {

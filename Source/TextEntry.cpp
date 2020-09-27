@@ -337,6 +337,7 @@ void TextEntry::SetNextTextEntry(TextEntry* entry)
 bool TextEntry::MouseMoved(float x, float y)
 {
    mHovered = TestHover(x, y);
+   CheckHover(x, y);
    return false;
 }
 

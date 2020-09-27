@@ -869,6 +869,7 @@ void CodeEntry::MoveCaretToNextToken(bool backwards)
 bool CodeEntry::MouseMoved(float x, float y)
 {
    mHovered = TestHover(x, y);
+   CheckHover(x, y);
    return false;
 }
 

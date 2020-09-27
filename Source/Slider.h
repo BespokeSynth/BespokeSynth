@@ -36,7 +36,7 @@ public:
    void Render() override;
    bool MouseMoved(float x, float y) override;
    void MouseReleased() override;
-   bool IsMouseDown() const { return mMouseDown; }
+   bool IsMouseDown() const override { return mMouseDown; }
    void SetExtents(float min, float max) { mMin = min; mMax = max; }
    void Compute(int samplesIn = 0);
    void DisplayLFOControl();
@@ -163,7 +163,7 @@ public:
    void Render() override;
    bool MouseMoved(float x, float y) override;
    void MouseReleased() override { mMouseDown = false; }
-   bool IsMouseDown() const { return mMouseDown; }
+   bool IsMouseDown() const override { return mMouseDown; }
    void SetExtents(int min, int max) { mMin = min; mMax = max; CalcSliderVal(); }
    void SetShowName(bool show) { mShowName = show; }
    void SetDimensions(int w, int h) { mWidth = w; mHeight = h; }

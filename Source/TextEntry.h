@@ -73,6 +73,7 @@ public:
    void LoadState(FileStreamIn& in, bool shouldSetValue = true) override;
    bool IsSliderControl() override { return false; }
    bool IsButtonControl() override { return false; }
+   bool IsTextEntry() const override { return true; }
    
 protected:
    ~TextEntry();   //protected so that it can't be created on the stack

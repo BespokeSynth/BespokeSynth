@@ -31,7 +31,7 @@ public:
    IUIControl() : mRemoteControlCount(0), mNoHover(false), mShouldSaveState(true) {}
    void Delete() { delete this; }
    void AddRemoteController() { ++mRemoteControlCount; }
-   void RemoveRemoteController() { ++mRemoteControlCount; }
+   void RemoveRemoteController() { --mRemoteControlCount; }
    virtual void SetFromMidiCC(float slider) = 0;
    virtual float GetValueForMidiCC(float slider) const { return 0; }
    virtual void SetValue(float value) = 0;
@@ -65,6 +65,8 @@ public:
    void SetShouldSaveState(bool save) { mShouldSaveState = save; }
    virtual bool IsSliderControl() { return true; }
    virtual bool IsButtonControl() { return false; }
+   virtual bool IsMouseDown() const { return false; }
+   virtual bool IsTextEntry() const { return false; }
    
    virtual void SaveState(FileStreamOut& out) = 0;
    virtual void LoadState(FileStreamIn& in, bool shouldSetValue = true) = 0;

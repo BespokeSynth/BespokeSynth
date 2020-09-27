@@ -60,7 +60,7 @@ bool IUIControl::TestHover(int x, int y)
 
 void IUIControl::CheckHover(int x, int y)
 {
-   if (TestHover(x, y))
+   if (TestHover(x, y) && (gHoveredUIControl == nullptr || !gHoveredUIControl->IsMouseDown()))
       gHoveredUIControl = this;
 }
 
