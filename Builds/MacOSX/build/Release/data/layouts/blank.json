@@ -20,7 +20,7 @@
       },
       {
          "name" : "scale",
-         "position" : [ 148.0, 66.0 ],
+         "position" : [ 148.0, 95.0 ],
          "type" : "scale"
       },
       {
@@ -32,7 +32,7 @@
       },
       {
          "name" : "transport",
-         "position" : [ 4.0, 65.0 ],
+         "position" : [ 4.0, 95.0 ],
          "type" : "transport"
       }
    ],

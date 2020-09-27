@@ -242,6 +242,17 @@ void TitleBar::ListLayouts()
    mSaveLayoutButton->PositionTo(mLoadLayoutDropdown, kAnchor_Right);
 }
 
+namespace
+{
+   const float kHideThreshold = 675;
+   const float kDoubleHeightThreshold = 1200;
+
+   float GetPixelWidth()
+   {
+      return ofGetWidth() / gDrawScale;
+   }
+}
+
 void TitleBar::DrawModule()
 {
    if (HiddenByZoom())
@@ -255,67 +266,71 @@ void TitleBar::DrawModule()
       info += " (moving module \"" + string(TheSynth->GetMoveModule()->Name()) + "\")";
    if (IKeyboardFocusListener::GetActiveKeyboardFocus())
       info += " (entering text)";
+
+   float pixelWidth = GetPixelWidth();
    
-   DrawTextLeftJustify(info, ofGetWidth()/gDrawScale - 60, 16);
+   DrawTextLeftJustify(info, pixelWidth - 60, 16);
    
-   if (ofGetWidth() / gDrawScale >= 620)
+   mSaveLayoutButton->Draw();
+   mSaveStateButton->Draw();
+   mLoadStateButton->Draw();
+   mWriteAudioButton->Draw();
+   mLoadLayoutDropdown->Draw();
+   mResetLayoutButton->Draw();
+
+   float startX = 400;
+   float startY = 2;
+
+   if (pixelWidth < kDoubleHeightThreshold)
    {
-      mSaveLayoutButton->Draw();
-      mSaveStateButton->Draw();
-      mLoadStateButton->Draw();
-      mWriteAudioButton->Draw();
-      mLoadLayoutDropdown->Draw();
-      mResetLayoutButton->Draw();
+      startX = 10;
+      startY += 16 * 2 + 4;
    }
-   
-   if (ofGetWidth() / gDrawScale >= 920)
+
+   float x = startX;
+   float y = startY;
+   array<SpawnList*, 8> lists = { &mSpawnLists.mInstrumentModules,
+                                  &mSpawnLists.mNoteModules,
+                                  &mSpawnLists.mSynthModules,
+                                  &mSpawnLists.mAudioModules,
+                                  &mSpawnLists.mModulatorModules,
+                                  &mSpawnLists.mOtherModules,
+                                  &mSpawnLists.mVstPlugins,
+                                  &mSpawnLists.mPrefabs };
+
+   for (auto list : lists)
    {
-      if (ofGetWidth() / gDrawScale >= 1280)
+      list->SetPosition(x, y);
+      float w, h;
+      list->GetList()->GetDimensions(w, h);
+      x += w + 5;
+
+      if (x >= pixelWidth - 250)
       {
-         mSpawnLists.mInstrumentModules.SetPosition(400,2);
-         mSpawnLists.mNoteModules.SetPositionRelativeTo(&mSpawnLists.mInstrumentModules);
-         mSpawnLists.mSynthModules.SetPositionRelativeTo(&mSpawnLists.mNoteModules);
-         mSpawnLists.mAudioModules.SetPositionRelativeTo(&mSpawnLists.mSynthModules);
-         mSpawnLists.mModulatorModules.SetPositionRelativeTo(&mSpawnLists.mAudioModules);
-         mSpawnLists.mOtherModules.SetPositionRelativeTo(&mSpawnLists.mModulatorModules);
-         if (ofGetWidth() / gDrawScale >= 1550)
-            mSpawnLists.mVstPlugins.SetPositionRelativeTo(&mSpawnLists.mOtherModules);
-         else
-            mSpawnLists.mVstPlugins.SetPosition(400,18);
-         mSpawnLists.mPrefabs.SetPositionRelativeTo(&mSpawnLists.mVstPlugins);
+         x = startX;
+         y += 16;
       }
-      else
-      {
-         mSpawnLists.mInstrumentModules.SetPosition(400,2);
-         mSpawnLists.mNoteModules.SetPositionRelativeTo(&mSpawnLists.mInstrumentModules);
-         mSpawnLists.mSynthModules.SetPositionRelativeTo(&mSpawnLists.mNoteModules);
-         mSpawnLists.mAudioModules.SetPosition(400, 18);
-         mSpawnLists.mModulatorModules.SetPositionRelativeTo(&mSpawnLists.mAudioModules);
-         mSpawnLists.mOtherModules.SetPositionRelativeTo(&mSpawnLists.mModulatorModules);
-         mSpawnLists.mVstPlugins.SetPositionRelativeTo(&mSpawnLists.mOtherModules);
-         mSpawnLists.mPrefabs.SetPositionRelativeTo(&mSpawnLists.mVstPlugins);
-      }
-      
-      //temporarily fake the module type to get the colors we want for each dropdown
-      auto type = GetModuleType();
-      mModuleType = kModuleType_Instrument;
-      mSpawnLists.mInstrumentModules.Draw();
-      mModuleType = kModuleType_Note;
-      mSpawnLists.mNoteModules.Draw();
-      mModuleType = kModuleType_Synth;
-      mSpawnLists.mSynthModules.Draw();
-      mModuleType = kModuleType_Audio;
-      mSpawnLists.mAudioModules.Draw();
-      mModuleType = kModuleType_Modulator;
-      mSpawnLists.mModulatorModules.Draw();
-      mModuleType = kModuleType_Other;
-      mSpawnLists.mOtherModules.Draw();
-      mModuleType = kModuleType_Synth;
-      mSpawnLists.mVstPlugins.Draw();
-      mModuleType = kModuleType_Other;
-      mSpawnLists.mPrefabs.Draw();
-      mModuleType = type;
    }
+
+   //temporarily fake the module type to get the colors we want for each dropdown
+   auto type = GetModuleType();
+   mModuleType = kModuleType_Instrument;
+   mSpawnLists.mInstrumentModules.Draw();
+   mModuleType = kModuleType_Note;
+   mSpawnLists.mNoteModules.Draw();
+   mModuleType = kModuleType_Synth;
+   mSpawnLists.mSynthModules.Draw();
+   mModuleType = kModuleType_Audio;
+   mSpawnLists.mAudioModules.Draw();
+   mModuleType = kModuleType_Modulator;
+   mSpawnLists.mModulatorModules.Draw();
+   mModuleType = kModuleType_Other;
+   mSpawnLists.mOtherModules.Draw();
+   mModuleType = kModuleType_Synth;
+   mSpawnLists.mVstPlugins.Draw();
+   mModuleType = kModuleType_Other;
+   mSpawnLists.mPrefabs.Draw();
+   mModuleType = type;
    
    float usage = TheSynth->GetGlobalManagers()->mDeviceManager.getCpuUsage();
    string stats;
@@ -346,7 +361,10 @@ void TitleBar::GetModuleDimensions(float& width, float& height)
    }
    
    width = ofGetWidth() / gDrawScale + 5;
-   height = 36;
+   if (GetPixelWidth() < kDoubleHeightThreshold)
+      height = 36 * 2;
+   else
+      height = 36;
 }
 
 void TitleBar::CheckboxUpdated(Checkbox* checkbox)
