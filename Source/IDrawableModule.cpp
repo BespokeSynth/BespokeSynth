@@ -49,6 +49,7 @@ IDrawableModule::IDrawableModule()
 , mTitleLabelWidth(0)
 , mShouldDrawOutline(true)
 , mHoveringOverResizeHandle(false)
+, mDeleted(false)
 , mDrawDebug(false)
 {
 }

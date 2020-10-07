@@ -35,18 +35,20 @@ NVGLUframebuffer* Push2Control::sFB = nullptr;
 
 namespace
 {
-const int kNewButton = 87;
-const int kDeleteButton = 118;
-const int kRepatchButton = 86;
-const int kAddDeviceButton = 52;
-const int kAboveScreenButtonRow = 102;
-const int kBelowScreenButtonRow = 20;
-const int kUpButton = 46;
-const int kDownButton = 47;
-const int kLeftButton = 44;
-const int kRightButton = 45;
-const int kNoteButton = 50;
-const int kSessionButton = 51;
+   const int kTapTempoButton = 3;
+   const int kMetronomeButton = 9;
+   const int kNewButton = 87;
+   const int kDeleteButton = 118;
+   const int kRepatchButton = 86;
+   const int kAddDeviceButton = 52;
+   const int kAboveScreenButtonRow = 102;
+   const int kBelowScreenButtonRow = 20;
+   const int kUpButton = 46;
+   const int kDownButton = 47;
+   const int kLeftButton = 44;
+   const int kRightButton = 45;
+   const int kNoteButton = 50;
+   const int kSessionButton = 51;
 }
 
 Push2Control::Push2Control()
@@ -130,7 +132,7 @@ void Push2Control::DrawModule()
 
 void Push2Control::DrawModuleUnclipped()
 {
-   if (mDisplayModule != nullptr && !sDrawingPush2Display)
+   if (mDisplayModule != nullptr && !mDisplayModule->IsDeleted() && !sDrawingPush2Display)
    {
       ofPushMatrix();
       ofPushStyle();
@@ -310,6 +312,7 @@ void Push2Control::DrawToFramebuffer(NVGcontext* vg, NVGLUframebuffer* fb, float
       }
    }
    
+   SetLed(kMidiMessage_Control, kTapTempoButton, (gHoveredModule != mDisplayModule && gHoveredModule != nullptr) ? 127 : 0, 0);
    SetLed(kMidiMessage_Control, kNewButton, 127, mNewButtonHeld ? 0 : -1);
    SetLed(kMidiMessage_Control, kDeleteButton, 127, mDeleteButtonHeld ? 0 : -1);
    SetLed(kMidiMessage_Control, kRepatchButton, 8, mAllowRepatch ? 11 : -1);
@@ -416,6 +419,12 @@ void Push2Control::SetModuleGridLights()
 
 void Push2Control::DrawDisplayModuleControls()
 {
+   if (mDisplayModule != nullptr && mDisplayModule->IsDeleted())
+   {
+      SetDisplayModule(nullptr);
+      return;
+   }
+
    ofSetColor(255,255,255);
    if (mDisplayModule != nullptr)
    {
@@ -586,16 +595,7 @@ void Push2Control::DrawControls(vector<IUIControl*> controls, bool sliders, floa
 }
 
 void Push2Control::RenderPush2Display()
-{
-   if (gHoveredModule != nullptr)
-   {
-      if (mDisplayModule != gHoveredModule && gHoveredModule != mLastModuleSetFromHover && !IsIgnorableModule(gHoveredModule) && TheSynth->IsModalFocusItem(gHoveredModule))
-      {
-         SetDisplayModule(gHoveredModule);
-         mLastModuleSetFromHover = gHoveredModule;
-      }
-   }
-   
+{   
    auto mainVG = gNanoVG;
    gNanoVG = sVG;
    sDrawingPush2Display = true;
@@ -863,6 +863,11 @@ void Push2Control::OnMidiControl(MidiControl& control)
    {
       if (control.mValue > 0)
          mAllowRepatch = !mAllowRepatch;
+   }
+   else if (control.mControl == kTapTempoButton)
+   {
+      if (gHoveredModule != nullptr && gHoveredModule != mDisplayModule)
+         SetDisplayModule(gHoveredModule);
    }
    else if (control.mControl == kAddDeviceButton)
    {

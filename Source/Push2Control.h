@@ -93,7 +93,6 @@ private:
    float mHeight;
    
    IDrawableModule* mDisplayModule;
-   IDrawableModule* mLastModuleSetFromHover;
    vector<IUIControl*> mSliderControls;
    vector<IUIControl*> mButtonControls;
    int mModuleColumnOffset;

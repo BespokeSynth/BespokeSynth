@@ -104,6 +104,8 @@ public:
    virtual ModuleContainer* GetContainer() { return nullptr; }
    void SetShouldDrawOutline(bool should) { mShouldDrawOutline = should; }
    ofVec2f GetMinimumDimensions();
+   void MarkAsDeleted() { mDeleted = true; }
+   bool IsDeleted() const { return mDeleted; }
    
    virtual void CheckboxUpdated(Checkbox* checkbox) {}
    
@@ -172,6 +174,7 @@ private:
    float mTitleLabelWidth;
    bool mShouldDrawOutline;
    bool mHoveringOverResizeHandle;
+   bool mDeleted;
 
    ofMutex mSliderMutex;
    
