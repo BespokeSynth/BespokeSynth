@@ -80,7 +80,7 @@ void DrumPlayer::DrumHit::CreateUIControls(DrumPlayer* owner, int index)
    UIBLOCK(310,37);
 #undef UIBLOCK_OWNER
 #define UIBLOCK_OWNER owner //change owner
-   FLOATSLIDER_DIGITS(mVolSlider, ("vol "+ofToString(index)).c_str(),&mVol,0,1,2);
+   FLOATSLIDER_DIGITS(mVolSlider, ("vol "+ofToString(index)).c_str(),&mVol,0,2,2);
    FLOATSLIDER_DIGITS(mSpeedSlider, ("speed "+ofToString(index)).c_str(),&mSpeed,.2f,3,2);
    FLOATSLIDER(mPanSlider, ("pan "+ofToString(index)).c_str(),&mPan,-1,1);
    INTSLIDER(mWidenSlider, ("widen "+ofToString(index)).c_str(),&mWiden,-150,150);

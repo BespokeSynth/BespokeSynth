@@ -35,8 +35,8 @@ private:
    void GetModuleDimensions(float& width, float& height) override;
    bool Enabled() const override { return mEnabled; }
    
-   bool mGate[128];
-   float mLastPlayTime[128];
+   array<bool, 128> mGate;
+   array<float, 128> mLastPlayTime;
    vector<Checkbox*> mGateCheckboxes;
    int mMinPitch;
    int mMaxPitch;

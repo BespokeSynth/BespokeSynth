@@ -757,7 +757,7 @@ bool CodeEntry::AllowCharacter(char c)
 {
    if (c == '\n')
       return true;
-   return c >= ' ' && c <= '~';  //these encompass the ASCII range of printable characters
+   return juce::CharacterFunctions::isPrintable(c);
 }
 
 void CodeEntry::RemoveSelectedText()

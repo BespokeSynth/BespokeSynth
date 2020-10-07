@@ -260,7 +260,7 @@ public:
          if (audioError.startsWith("No such device"))
             audioError += "\n\nfix this in userprefs.json (you can use \"auto\" for the default device)";
          else
-            audioError += "\n\ninitialization errors could potentially be fixed by changing buffer size, sample rate, or input/output devices in userprefs.json\nto use no input device, specify \"none\" for \"audio_input_device\"";
+            audioError += juce::String("\n\nattempted to set output to: "+outputDevice+" and input to: "+inputDevice+"\n\ninitialization errors could potentially be fixed by changing buffer size, sample rate, or input/output devices in userprefs.json\nto use no input device, specify \"none\" for \"audio_input_device\"");
          mSynth.SetFatalError("error initializing audio device: "+audioError.toStdString() +
                               "\n\n\nvalid devices:\n" + GetAudioDevices());
       }

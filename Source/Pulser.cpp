@@ -16,7 +16,7 @@
 #include "PatchCableSource.h"
 
 Pulser::Pulser()
-: mInterval(kInterval_8n)
+: mInterval(kInterval_16n)
 , mIntervalSelector(nullptr)
 , mTimeMode(kTimeMode_Step)
 , mTimeModeSelector(nullptr)

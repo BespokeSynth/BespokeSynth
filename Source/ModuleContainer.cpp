@@ -274,6 +274,7 @@ void ModuleContainer::DeleteModule(IDrawableModule* module)
             cable->Destroy();
       }
    }
+   module->MarkAsDeleted();
    module->SetEnabled(false);
    module->Exit();
    TheSynth->OnModuleDeleted(module);

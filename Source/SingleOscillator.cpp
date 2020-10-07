@@ -45,7 +45,7 @@ SingleOscillator::SingleOscillator()
    mVoiceParams.mMult = 1;
    mVoiceParams.mOscType = kOsc_Square;
    mVoiceParams.mDetune = 1;
-   mVoiceParams.mFilterAdsr.Set(1,0,1,30);
+   mVoiceParams.mFilterAdsr.Set(1,0,1,1000);
    mVoiceParams.mFilterCutoff = SINGLEOSCILLATOR_NO_CUTOFF;
    mVoiceParams.mFilterQ = 1;
    mVoiceParams.mShuffle = 0;
@@ -81,7 +81,7 @@ void SingleOscillator::CreateUIControls()
    mLengthMultiplierSlider = new FloatSlider(this,"len",mADSRDisplay,kAnchor_Below,80,15,&mLengthMultiplier,.01f,10);
    mVolSlider = new FloatSlider(this,"vol",mLengthMultiplierSlider,kAnchor_Below,80,15,&mVoiceParams.mVol,0,1);
    mFilterCutoffSlider = new FloatSlider(this,"f",mVolSlider,kAnchor_Below,40,15,&mVoiceParams.mFilterCutoff,0,SINGLEOSCILLATOR_NO_CUTOFF);
-   mFilterQSlider = new FloatSlider(this,"q",mFilterCutoffSlider,kAnchor_Right,40,15,&mVoiceParams.mFilterQ,.1,9.99f,2);
+   mFilterQSlider = new FloatSlider(this,"q",mFilterCutoffSlider,kAnchor_Right,40,15,&mVoiceParams.mFilterQ,.1,20,2);
    mSyncCheckbox = new Checkbox(this,"sync",mFilterCutoffSlider,kAnchor_Below,&mVoiceParams.mSync);
    mSyncFreqSlider = new FloatSlider(this,"syncf",mSyncCheckbox,kAnchor_Right,40,15,&mVoiceParams.mSyncFreq,10,999.9f);
 

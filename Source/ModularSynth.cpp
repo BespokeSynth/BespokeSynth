@@ -527,7 +527,7 @@ void ModularSynth::KeyPressed(int key, bool isRepeat)
       {
          gHoveredUIControl->ResetToOriginal();
       }
-      else if (key != OF_KEY_BACKSPACE && key != ' ' && key != OF_KEY_TAB)
+      else if (key != ' ' && key != OF_KEY_TAB && key != '`' && juce::CharacterFunctions::isPrintable((char)key))
       {
          gHoveredUIControl->AttemptTextInput();
       }

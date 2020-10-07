@@ -54,7 +54,7 @@ void NoteFilter::PlayNote(double time, int pitch, int velocity, int voiceIdx, Mo
       if (pitch >= 0 && pitch < 128)
       {
          mLastPlayTime[pitch] = time;
-         if (mGate[pitch])
+         if (mGate[pitch] || velocity == 0)
             PlayNoteOutput(time, pitch, velocity, voiceIdx, modulation);
       }
    }

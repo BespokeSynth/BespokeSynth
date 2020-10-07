@@ -319,7 +319,7 @@ void TextEntry::AcceptEntry(bool pressedEnter)
 bool TextEntry::AllowCharacter(char c)
 {
    if (mType == kTextEntry_Text)
-      return c >= ' ' && c <= '~';  //these encompass the ASCII range of printable characters
+      return juce::CharacterFunctions::isPrintable(c);
    if (mType == kTextEntry_Int)
       return CharacterFunctions::isDigit((char)c) || c == '-';
    if (mType == kTextEntry_Float)
