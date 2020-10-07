@@ -415,7 +415,7 @@ void TitleBar::ButtonClicked(ClickButton* button)
       TheSynth->PushModalFocusItem(mHelpDisplay);
    }
    if (button == mResetLayoutButton)
-      TheSynth->LoadLayoutFromFile(ofToDataPath(TheSynth->GetUserPrefs()["layout"].asString()));
+      TheSynth->ReloadInitialLayout();
 }
 
 

@@ -48,6 +48,7 @@ ModularSynth::ModularSynth()
 , mIsLoadingState(false)
 , mClickStartX(INT_MAX)
 , mClickStartY(INT_MAX)
+, mWantReloadInitialLayout(false)
 , mHeldSample(nullptr)
 , mConsoleListener(nullptr)
 , mLastClickedModule(nullptr)
@@ -174,6 +175,12 @@ void ModularSynth::Poll()
    {
       LoadLayoutFromFile(ofToDataPath(mUserPrefs["layout"].asString()));
       mInitialized = true;
+   }
+
+   if (mWantReloadInitialLayout)
+   {
+      LoadLayoutFromFile(ofToDataPath(TheSynth->GetUserPrefs()["layout"].asString()));
+      mWantReloadInitialLayout = false;
    }
    
    mZoomer.Update();

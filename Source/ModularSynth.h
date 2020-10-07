@@ -118,6 +118,7 @@ public:
    bool LoadLayoutFromString(string jsonString);
    void LoadLayout(ofxJSONElement json);
    string GetLoadedLayout() const { return mLoadedLayoutPath; }
+   void ReloadInitialLayout() { mWantReloadInitialLayout = true; }
    
    void AddLissajousDrawer(IDrawableModule* module) { mLissajousDrawers.push_back(module); }
    bool IsLissajousDrawer(IDrawableModule* module) { return VectorContains(module, mLissajousDrawers); }
@@ -254,6 +255,7 @@ private:
    int mClickStartY;
    
    string mLoadedLayoutPath;
+   bool mWantReloadInitialLayout;
    
    Sample* mHeldSample;
    
