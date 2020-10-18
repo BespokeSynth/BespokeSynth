@@ -16,6 +16,8 @@
 #include "NoteCanvas.h"
 #include "SamplePlayer.h"
 #include "GridModule.h"
+#include "MidiController.h"
+#include "LinnstrumentControl.h"
 
 #include "pybind11/embed.h"
 #include "pybind11/stl.h"
@@ -300,6 +302,65 @@ PYBIND11_EMBEDDED_MODULE(sampleplayer, m)
       {
          player.SetCuePoint(pitch, startSeconds, lengthSeconds, speed);
       });
+}
+
+PYBIND11_EMBEDDED_MODULE(midicontroller, m)
+{
+   m.def("get", [](string path)
+   {
+      return dynamic_cast<MidiController*>(TheSynth->FindModule(path));
+   }, py::return_value_policy::reference);
+   py::class_<MidiController, IDrawableModule>(m, "midicontroller")
+      .def("add_connection", [](MidiController& midicontroller, MidiMessageType messageType, int control, int channel, string controlPath)
+      {
+         IUIControl* uicontrol = TheSynth->FindUIControl(controlPath.c_str());
+         if (uicontrol != nullptr)
+            midicontroller.AddControlConnection(messageType, control, channel, uicontrol);
+      })
+      .def("send_note", [](MidiController& midicontroller, int pitch, int velocity, bool forceNoteOn, int channel, int page)
+      {
+         midicontroller.SendNote(page, pitch, velocity, forceNoteOn, channel);
+      }, "pitch"_a, "velocity"_a, "forceNoteOn"_a = false, "channel"_a = -1, "page"_a = 0)
+      .def("send_cc", [](MidiController& midicontroller, int ctl, int value, int channel, int page)
+      {
+         midicontroller.SendCC(page, ctl, value, channel);
+      }, "ctl"_a, "value"_a, "channel"_a = -1, "page"_a = 0)
+      .def("send_pitchbend", [](MidiController& midicontroller, int bend, int channel, int page)
+      {
+         midicontroller.SendPitchBend(page, bend, channel);
+      }, "bend"_a, "channel"_a = -1, "page"_a = 0)
+      .def("send_data", [](MidiController& midicontroller, unsigned char a, unsigned char b, unsigned char c, int page)
+      {
+         midicontroller.SendData(page, a, b, c);
+      }, "a"_a, "b"_a, "c"_a, "page"_a = 0);
+}
+
+PYBIND11_EMBEDDED_MODULE(linnstrument, m)
+{
+   m.def("get", [](string path)
+   {
+      return dynamic_cast<LinnstrumentControl*>(TheSynth->FindModule(path));
+   }, py::return_value_policy::reference);
+   py::class_<LinnstrumentControl, IDrawableModule> linnClass(m, "linnstrumentcontrol");
+
+   linnClass.def("set_color", [](LinnstrumentControl& linnstrument, int x, int y, LinnstrumentControl::LinnstrumentColor color)
+      {
+         linnstrument.SetGridColor(x, y, color);
+      });
+   py::enum_<LinnstrumentControl::LinnstrumentColor>(linnClass, "LinnstrumentColor")
+      .value("Off", LinnstrumentControl::LinnstrumentColor::kLinnColor_Off)
+      .value("Red", LinnstrumentControl::LinnstrumentColor::kLinnColor_Red)
+      .value("Yellow", LinnstrumentControl::LinnstrumentColor::kLinnColor_Yellow)
+      .value("Green", LinnstrumentControl::LinnstrumentColor::kLinnColor_Green)
+      .value("Cyan", LinnstrumentControl::LinnstrumentColor::kLinnColor_Cyan)
+      .value("Blue", LinnstrumentControl::LinnstrumentColor::kLinnColor_Blue)
+      .value("Magenta", LinnstrumentControl::LinnstrumentColor::kLinnColor_Magenta)
+      .value("Black", LinnstrumentControl::LinnstrumentColor::kLinnColor_Black)
+      .value("White", LinnstrumentControl::LinnstrumentColor::kLinnColor_White)
+      .value("Orange", LinnstrumentControl::LinnstrumentColor::kLinnColor_Orange)
+      .value("Lime", LinnstrumentControl::LinnstrumentColor::kLinnColor_Lime)
+      .value("Pink", LinnstrumentControl::LinnstrumentColor::kLinnColor_Pink)
+      .export_values();
 }
 
 PYBIND11_EMBEDDED_MODULE(module, m)

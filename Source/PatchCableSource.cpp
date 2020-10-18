@@ -105,7 +105,7 @@ void PatchCableSource::SetPatchCableTarget(PatchCable* cable, IClickable* target
    mOwner->PostRepatch(this, fromUserClick);
    
    //insert
-   if (GetKeyModifiers() == kModifier_Shift)
+   if (GetKeyModifiers() == kModifier_Shift && fromUserClick)
    {
       if (sAllowInsert)  //avoid cascade on the next set
       {

@@ -18,8 +18,6 @@ MidiDevice::MidiDevice(MidiDeviceListener* listener)
    , mOutputChannel(1)
    , mIsInputEnabled(false)
 {
-   mDeviceNameIn[0] = 0;
-   mDeviceNameOut[0] = 0;
 }
 
 MidiDevice::~MidiDevice()
@@ -32,12 +30,11 @@ MidiDevice::~MidiDevice()
 
 bool MidiDevice::ConnectInput(const char* name)
 {
+   DisconnectInput();
+   
+   mDeviceNameIn = name;
+   
    AudioDeviceManager& deviceManager = TheSynth->GetGlobalManagers()->mDeviceManager;
-   
-   deviceManager.removeMidiInputCallback(mDeviceNameIn, this);
-   
-   StringCopy(mDeviceNameIn, name, 64);
-   
    deviceManager.setMidiInputEnabled(mDeviceNameIn, true);
    deviceManager.addMidiInputCallback(mDeviceNameIn, this);
    
@@ -45,7 +42,7 @@ bool MidiDevice::ConnectInput(const char* name)
    
    TheSynth->AddMidiDevice(this);   //TODO(Ryan) need better place for this, but constructor is too early
    
-   return true;
+   return mIsInputEnabled;
 }
 
 void MidiDevice::ConnectInput(int index)
@@ -55,6 +52,8 @@ void MidiDevice::ConnectInput(int index)
 
 bool MidiDevice::ConnectOutput(const char* name, int channel /*= 1*/)
 {
+   DisconnectOutput();
+
    bool found = false;
    StringArray devices = MidiOutput::getDevices();
    for (int i=0; i<devices.size(); ++i)
@@ -68,13 +67,7 @@ bool MidiDevice::ConnectOutput(const char* name, int channel /*= 1*/)
    }
    
    if (!found)
-   {
-      if (mMidiOut.get())
-         mMidiOut->stopBackgroundThread();
-      mMidiOut.reset();
-      mMidiOut = nullptr;
-      mDeviceNameOut[0] = 0;
-   }
+      DisconnectOutput();
    
    return found;
 }
@@ -85,25 +78,54 @@ void MidiDevice::ConnectOutput(int index, int channel /*= 1*/)
    mMidiOut = MidiOutput::openDevice(index);
    mMidiOut->startBackgroundThread();
 
-   StringCopy(mDeviceNameOut, mMidiOut->getName().toRawUTF8(), 64);
+   mDeviceNameOut = mMidiOut->getName();
 
    assert(channel > 0 && channel <= 16);
    mOutputChannel = channel;
 }
 
+void MidiDevice::DisconnectInput()
+{
+   AudioDeviceManager& deviceManager = TheSynth->GetGlobalManagers()->mDeviceManager;
+   deviceManager.setMidiInputEnabled(mDeviceNameIn, false);
+   deviceManager.removeMidiInputCallback(mDeviceNameIn, this);
+}
+
+void MidiDevice::DisconnectOutput()
+{
+   if (mMidiOut.get())
+      mMidiOut->stopBackgroundThread();
+   mMidiOut.reset();
+   mMidiOut = nullptr;
+   mDeviceNameOut = "";
+}
+
 bool MidiDevice::Reconnect()
 {
    bool ret = false;
-   if (strlen(mDeviceNameIn) > 0)
-      ret = ConnectInput(mDeviceNameIn);
-   if (strlen(mDeviceNameOut) > 0)
-      ConnectOutput(mDeviceNameOut);
+   if (mDeviceNameIn.isNotEmpty())
+      ret = ConnectInput(mDeviceNameIn.toRawUTF8());
+   if (mDeviceNameOut.isNotEmpty())
+      ConnectOutput(mDeviceNameOut.toRawUTF8());
    return ret;
 }
 
-bool MidiDevice::IsInputConnected()
+bool MidiDevice::IsInputConnected(bool immediate)
 {
-   return TheSynth->GetGlobalManagers()->mDeviceManager.isMidiInputEnabled(mDeviceNameIn);
+   static juce::Array<juce::MidiDeviceInfo> sConnectedInputDevices;
+   static double sLastUpdatedListTime = -9999;
+   if (sLastUpdatedListTime + 5000 < gTime || immediate)  //refresh every 5 seconds (getAvailableDevices() is slow on windows)
+   {
+      sConnectedInputDevices = MidiInput::getAvailableDevices();
+      sLastUpdatedListTime = gTime;
+   }   
+
+   for (auto& device : sConnectedInputDevices)
+   {
+      if (device.name == mDeviceNameIn)
+         return TheSynth->GetGlobalManagers()->mDeviceManager.isMidiInputDeviceEnabled(device.identifier);
+   }
+   return false;
 }
 
 vector<string> MidiDevice::GetPortList(bool forInput)
@@ -195,7 +217,7 @@ void MidiDevice::handleIncomingMidiMessage(MidiInput* source, const MidiMessage&
    
    if (mListener)
    {
-      MidiDevice::SendMidiMessage(mListener, mDeviceNameIn, message);
+      MidiDevice::SendMidiMessage(mListener, mDeviceNameIn.toRawUTF8(), message);
       
       if (gPrintMidiInput)
          ofLog() << mDeviceNameIn << " " << message.getDescription();

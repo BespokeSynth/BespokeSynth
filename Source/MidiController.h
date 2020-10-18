@@ -192,7 +192,7 @@ enum ControlDrawType
 struct ControlLayoutElement
 {
    ControlLayoutElement() : mActive(false), mControlCable(nullptr) {}
-   void Setup(MidiController* owner, MidiMessageType type, int control, ControlDrawType drawType, bool incremental, float x, float y, float w, float h);
+   void Setup(MidiController* owner, MidiMessageType type, int control, ControlDrawType drawType, bool incremental, int offVal, int onVal, float x, float y, float w, float h);
    
    bool mActive;
    MidiMessageType mType;
@@ -201,6 +201,8 @@ struct ControlLayoutElement
    ofVec2f mDimensions;
    ControlDrawType mDrawType;
    bool mIncremental;
+   int mOffVal;
+   int mOnVal;
    
    PatchCableSource* mControlCable;
    
@@ -239,16 +241,16 @@ public:
    void Init() override;
 
    void AddControlConnection(const ofxJSONElement& connection);
-   void AddControlConnection(MidiMessageType messageType, int control, int channel, IUIControl* uicontrol);
+   UIControlConnection* AddControlConnection(MidiMessageType messageType, int control, int channel, IUIControl* uicontrol);
    void UseNegativeEdge(bool use) { mUseNegativeEdge = use; }
    void AddListener(MidiDeviceListener* listener, int page);
    void RemoveListener(MidiDeviceListener* listener);
    int GetPage() const { return mControllerPage; }
-   bool IsInputConnected();
+   bool IsInputConnected(bool immediate);
    string GetDeviceIn() const { return mDeviceIn; }
    string GetDeviceOut() const { return mDeviceOut; }
    UIControlConnection* GetConnectionForControl(MidiMessageType messageType, int control);
-   void ConnectDevice();
+   bool JustBoundControl() const { return gTime - mLastBoundControlTime < 500; }
    
    void SetVelocityMult(float mult) { mVelocityMult = mult; }
    void SetUseChannelAsVoice(bool use) { mUseChannelAsVoice = use; }
@@ -291,6 +293,8 @@ public:
    virtual void LoadLayout(const ofxJSONElement& moduleInfo) override;
    virtual void SetUpFromSaveData() override;
    virtual void SaveLayout(ofxJSONElement& moduleInfo) override;
+
+   static bool sQuickMidiMapMode;
    
 private:
    enum MappingDisplayMode
@@ -302,10 +306,12 @@ private:
    
    //IDrawableModule
    void DrawModule() override;
+   void DrawModuleUnclipped() override;
    void GetModuleDimensions(float& width, float& height) override;
    bool Enabled() const override { return mEnabled; }
    void OnClicked(int x, int y, bool right) override;
 
+   void ConnectDevice();
    void MidiReceived(MidiMessageType messageType, int control, float value, int channel = -1);
    void RemoveConnection(int control, MidiMessageType messageType, int channel, int page);
    void ResyncTwoWay();
@@ -314,8 +320,8 @@ private:
    void BuildControllerList();
    void HighlightPageControls(int page);
    void OnDeviceChanged();
-   UIControlConnection* AddUIControlConnection();
    int GetLayoutControlIndexForCable(PatchCableSource* cable) const;
+   int GetLayoutControlIndexForMidi(MidiMessageType type, int control) const;
    
    float mVelocityMult;
    bool mUseChannelAsVoice;
@@ -349,8 +355,10 @@ private:
 
    int mControllerIndex;
    double mLastActivityTime;
+   IUIControl* mLastActivityUIControl;
    bool mLastActivityBound;
-   double mLastBindControllerTime;
+   double mLastBoundControlTime;
+   IUIControl* mLastBoundUIControl;
    bool mBlink;
    int mControllerPage;
    DropdownList* mPageSelector;
@@ -360,6 +368,7 @@ private:
    INonstandardController* mNonstandardController;
    bool mIsConnected;
    bool mHasCreatedConnectionUIControls;
+   float mReconnectWaitTimer;
    
    ControlLayoutElement mLayoutControls[NUM_LAYOUT_CONTROLS];
    int mHighlightedLayoutElement;
