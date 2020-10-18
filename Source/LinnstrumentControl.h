@@ -37,6 +37,25 @@ public:
    
    void PlayNote(double time, int pitch, int velocity, int voiceIdx = -1, ModulationParameters modulation = ModulationParameters()) override;
    void SendCC(int control, int value, int voiceIdx = -1) override {}
+
+   enum LinnstrumentColor
+   {
+      kLinnColor_Off,
+      kLinnColor_Red,
+      kLinnColor_Yellow,
+      kLinnColor_Green,
+      kLinnColor_Cyan,
+      kLinnColor_Blue,
+      kLinnColor_Magenta,
+      kLinnColor_Black,
+      kLinnColor_White,
+      kLinnColor_Orange,
+      kLinnColor_Lime,
+      kLinnColor_Pink,
+      kLinnColor_Invalid
+   };
+
+   void SetGridColor(int x, int y, LinnstrumentColor color, bool ignoreRow = false);
    
    void OnMidiNote(MidiNote& note) override;
    void OnMidiControl(MidiControl& control) override;
@@ -51,30 +70,13 @@ public:
    virtual void LoadLayout(const ofxJSONElement& moduleInfo) override;
    virtual void SetUpFromSaveData() override;
    
-private:
-   enum LinnstrumentColor
-   {
-      kLinnColor_Off,
-      kLinnColor_Red,
-      kLinnColor_Yellow,
-      kLinnColor_Green,
-      kLinnColor_Cyan,
-      kLinnColor_Blue,
-      kLinnColor_Magenta,
-      kLinnColor_Black,
-      kLinnColor_White,
-      kLinnColor_Orange,
-      kLinnColor_Lime,
-      kLinnColor_Pink
-   };
-   
+private:   
    void InitController();
    void BuildControllerList();
    
    void UpdateScaleDisplay();
    void SendScaleInfo();
-   void SetGridColor(int x, int y, LinnstrumentColor color);
-   LinnstrumentColor GetGridColor(int x, int y);
+   LinnstrumentColor GetDesiredGridColor(int x, int y);
    int GridToPitch(int x, int y);
    void SetPitchColor(int pitch, LinnstrumentColor color);
    void SendNRPN(int param, int value);
@@ -97,7 +99,10 @@ private:
       void Update(int pitch, LinnstrumentControl* linnstrument);
    };
    
-   NoteAge mNoteAge[128];
+   static const int kRows = 8;
+   static const int kCols = 25;
+   array<LinnstrumentColor, kRows*kCols> mGridColorState;
+   array<NoteAge, 128> mNoteAge;
    float mDecayMs;
    FloatSlider* mDecaySlider;
    bool mBlackout;
@@ -114,7 +119,7 @@ private:
    int mLastReceivedNRPNValueMSB;
    int mLastReceivedNRPNValueLSB;
    
-   ModulationParameters mModulators[kNumVoices];
+   array<ModulationParameters, kNumVoices> mModulators;
    
    double mRequestedOctaveTime;
    

@@ -34,9 +34,12 @@ LinnstrumentControl::LinnstrumentControl()
 , mLinnstrumentOctave(5)
 , mGuitarLines(false)
 , mGuitarLinesCheckbox(nullptr)
-, mControlPlayedLights(false)
+, mControlPlayedLights(true)
 {
    TheScale->AddListener(this);
+
+   for (size_t i = 0; i < mGridColorState.size(); ++i)
+      mGridColorState[i] = kLinnColor_Invalid;
 }
 
 LinnstrumentControl::~LinnstrumentControl()
@@ -120,25 +123,32 @@ void LinnstrumentControl::UpdateScaleDisplay()
 {
    //SendScaleInfo();
    
-   for (int y=0; y<8; ++y)
+   for (int y=0; y<kRows; ++y)
    {
-      mDevice.SendCC(21, y);
-      for (int x=0; x<25; ++x)
+      mDevice.SendCC(21, y);  //only set row once, to cut down on messages
+      for (int x=0; x<kCols; ++x)
       {
-         mDevice.SendCC(20, x + 1);
-         mDevice.SendCC(22, GetGridColor(x, y));
+         SetGridColor(x, y, GetDesiredGridColor(x, y), true);
       }
    }
 }
 
-void LinnstrumentControl::SetGridColor(int x, int y, LinnstrumentColor color)
+void LinnstrumentControl::SetGridColor(int x, int y, LinnstrumentColor color, bool ignoreRow /*= false*/)
 {
-   mDevice.SendCC(21, y);
-   mDevice.SendCC(20, x + 1);
-   mDevice.SendCC(22, color);
+   if (x < kCols && y < kRows)
+   {
+      if (color != mGridColorState[x + y * kCols])
+      {
+         if (!ignoreRow)
+            mDevice.SendCC(21, y);
+         mDevice.SendCC(20, x + 1);
+         mDevice.SendCC(22, color);
+         mGridColorState[x + y * kCols] = color;
+      }
+   }
 }
 
-LinnstrumentControl::LinnstrumentColor LinnstrumentControl::GetGridColor(int x, int y)
+LinnstrumentControl::LinnstrumentColor LinnstrumentControl::GetDesiredGridColor(int x, int y)
 {
    if (mBlackout)
       return kLinnColor_Black;
@@ -202,12 +212,12 @@ int LinnstrumentControl::GridToPitch(int x, int y)
 
 void LinnstrumentControl::SetPitchColor(int pitch, LinnstrumentColor color)
 {
-   for (int y=0; y<8; ++y)
+   for (int y=0; y<kRows; ++y)
    {
-      for (int x=0; x<25; ++x)
+      for (int x=0; x<kCols; ++x)
       {
          if (GridToPitch(x, y) == pitch)
-            SetGridColor(x, y, (color == kLinnColor_Off) ? GetGridColor(x, y) : color);
+            SetGridColor(x, y, (color == kLinnColor_Off) ? GetDesiredGridColor(x, y) : color);
       }
    }
 }
@@ -292,6 +302,9 @@ void LinnstrumentControl::SendNRPN(int param, int value)
 
 void LinnstrumentControl::PlayNote(double time, int pitch, int velocity, int voiceIdx, ModulationParameters modulation)
 {
+   if (voiceIdx == -1)
+      voiceIdx = 0;
+
    mModulators[voiceIdx] = modulation;
    
    if (pitch >= 0 && pitch < 128)

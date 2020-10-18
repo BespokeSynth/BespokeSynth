@@ -73,10 +73,12 @@ public:
    void ConnectInput(int index);
    bool ConnectOutput(const char* name, int channel = 1);
    void ConnectOutput(int index, int channel = 1);
+   void DisconnectInput();
+   void DisconnectOutput();
    bool Reconnect();
-   bool IsInputConnected();
+   bool IsInputConnected(bool immediate);
 
-   const char* Name() { return mIsInputEnabled ? mDeviceNameIn : mDeviceNameOut; }
+   const char* Name() { return mIsInputEnabled ? mDeviceNameIn.toRawUTF8() : mDeviceNameOut.toRawUTF8(); }
    
    vector<string> GetPortList(bool forInput);
    
@@ -91,8 +93,8 @@ public:
 private:
    void handleIncomingMidiMessage(MidiInput* source, const MidiMessage& message) override;
    
-   char mDeviceNameIn[64];
-   char mDeviceNameOut[64];
+   juce::String mDeviceNameIn;
+   juce::String mDeviceNameOut;
    
    unique_ptr<MidiOutput> mMidiOut;
    MidiDeviceListener* mListener;
