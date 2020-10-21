@@ -411,6 +411,8 @@ ofColor IDrawableModule::GetColor(ModuleType type)
       color.setHsb(170, 100, 255);
    if (type == kModuleType_Modulator)
       color.setHsb(200, 100, 255);
+   if (type == kModuleType_Pulse)
+      color.setHsb(43, sSaturation, sBrightness);
    return color;
 }
 

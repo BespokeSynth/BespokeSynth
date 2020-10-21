@@ -45,7 +45,7 @@ PatchCableSource::PatchCableSource(IDrawableModule* owner, ConnectionType type)
    else if (mType == kConnectionType_UIControl)
       mColor = IDrawableModule::GetColor(kModuleType_Modulator);
    else if (mType == kConnectionType_Pulse)
-      mColor = ofColor::white;
+      mColor = IDrawableModule::GetColor(kModuleType_Pulse);
    else
       mColor = IDrawableModule::GetColor(kModuleType_Other);
    mColor.setBrightness(mColor.getBrightness() * .8f);

@@ -173,6 +173,7 @@ SpawnListManager::SpawnListManager(IDropdownListener* owner)
 , mSynthModules(owner,this,0,0,"synths:")
 , mAudioModules(owner,this,0,0,"audio effects:")
 , mModulatorModules(owner,this,0,0,"modulators:")
+, mPulseModules(owner, this, 0, 0, "pulse:")
 , mOtherModules(owner,this,0,0,"other:")
 , mVstPlugins(owner,this,0,0,"vst plugins:")
 , mPrefabs(owner,this,0,0,"prefabs:")
@@ -186,6 +187,7 @@ void SpawnListManager::SetModuleFactory(ModuleFactory* factory)
    mSynthModules.SetList(factory->GetSpawnableModules(kModuleType_Synth), "");
    mAudioModules.SetList(factory->GetSpawnableModules(kModuleType_Audio), "");
    mModulatorModules.SetList(factory->GetSpawnableModules(kModuleType_Modulator), "");
+   mPulseModules.SetList(factory->GetSpawnableModules(kModuleType_Pulse), "");
    mOtherModules.SetList(factory->GetSpawnableModules(kModuleType_Other), "");
    
    SetUpVstDropdown(false);
@@ -206,6 +208,7 @@ void SpawnListManager::SetModuleFactory(ModuleFactory* factory)
    mDropdowns.push_back(&mSynthModules);
    mDropdowns.push_back(&mAudioModules);
    mDropdowns.push_back(&mModulatorModules);
+   mDropdowns.push_back(&mPulseModules);
    mDropdowns.push_back(&mOtherModules);
    mDropdowns.push_back(&mVstPlugins);
    mDropdowns.push_back(&mPrefabs);
@@ -289,11 +292,12 @@ void TitleBar::DrawModule()
 
    float x = startX;
    float y = startY;
-   array<SpawnList*, 8> lists = { &mSpawnLists.mInstrumentModules,
+   array<SpawnList*, 9> lists = { &mSpawnLists.mInstrumentModules,
                                   &mSpawnLists.mNoteModules,
                                   &mSpawnLists.mSynthModules,
                                   &mSpawnLists.mAudioModules,
                                   &mSpawnLists.mModulatorModules,
+                                  &mSpawnLists.mPulseModules,
                                   &mSpawnLists.mOtherModules,
                                   &mSpawnLists.mVstPlugins,
                                   &mSpawnLists.mPrefabs };
@@ -324,6 +328,8 @@ void TitleBar::DrawModule()
    mSpawnLists.mAudioModules.Draw();
    mModuleType = kModuleType_Modulator;
    mSpawnLists.mModulatorModules.Draw();
+   mModuleType = kModuleType_Pulse;
+   mSpawnLists.mPulseModules.Draw();
    mModuleType = kModuleType_Other;
    mSpawnLists.mOtherModules.Draw();
    mModuleType = kModuleType_Synth;
@@ -385,6 +391,7 @@ void TitleBar::DropdownUpdated(DropdownList* list, int oldVal)
    mSpawnLists.mSynthModules.OnSelection(list);
    mSpawnLists.mAudioModules.OnSelection(list);
    mSpawnLists.mModulatorModules.OnSelection(list);
+   mSpawnLists.mPulseModules.OnSelection(list);
    mSpawnLists.mOtherModules.OnSelection(list);
    mSpawnLists.mVstPlugins.OnSelection(list);
    mSpawnLists.mPrefabs.OnSelection(list);

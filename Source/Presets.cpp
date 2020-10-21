@@ -221,10 +221,10 @@ void Presets::PostRepatch(PatchCableSource* cableSource, bool fromUserClick)
 {
    mPresetModules.clear();
    for (auto cable : mModuleCable->GetPatchCables())
-      mPresetModules.push_back((IDrawableModule*)cable->GetTarget());
+      mPresetModules.push_back(static_cast<IDrawableModule*>(cable->GetTarget()));
    mPresetControls.clear();
    for (auto cable : mUIControlCable->GetPatchCables())
-      mPresetControls.push_back((IUIControl*)cable->GetTarget());
+      mPresetControls.push_back(static_cast<IUIControl*>(cable->GetTarget()));
 }
 
 void Presets::Store(int idx)

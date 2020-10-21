@@ -56,6 +56,7 @@ struct SpawnListManager
    SpawnList mSynthModules;
    SpawnList mAudioModules;
    SpawnList mModulatorModules;
+   SpawnList mPulseModules;
    SpawnList mOtherModules;
    SpawnList mVstPlugins;
    SpawnList mPrefabs;

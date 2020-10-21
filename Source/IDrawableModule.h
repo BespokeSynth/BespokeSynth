@@ -33,6 +33,7 @@ enum ModuleType
    kModuleType_Instrument,
    kModuleType_Processor,
    kModuleType_Modulator,
+   kModuleType_Pulse,
    kModuleType_Other,
    kModuleType_Unknown
 };

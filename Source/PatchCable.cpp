@@ -313,7 +313,7 @@ void PatchCable::MouseReleased()
          IClickable* potentialTarget = TheSynth->GetModuleAt(cable.end.x, cable.end.y);
          if (potentialTarget && (GetConnectionType() == kConnectionType_UIControl || GetConnectionType() == kConnectionType_Grid))
          {
-            const auto& uicontrols = ((IDrawableModule*)potentialTarget)->GetUIControls();
+            const auto& uicontrols = (static_cast<IDrawableModule*>(potentialTarget))->GetUIControls();
             for (auto uicontrol : uicontrols)
             {
                if (uicontrol->IsShowing() == false || !IsValidTarget(uicontrol))
