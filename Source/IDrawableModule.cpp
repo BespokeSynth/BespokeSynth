@@ -301,7 +301,8 @@ void IDrawableModule::DrawFrame(float w, float h, bool drawModule, float& titleB
    {
       ofSetColor(color, gModuleDrawAlpha);
       ofPushMatrix();
-      ofClipWindow(0, 0, w, h);
+      if (ShouldClipContents())
+         ofClipWindow(0, 0, w, h);
       DrawModule();
       ofPopMatrix();
       DrawModuleUnclipped();

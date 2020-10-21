@@ -106,6 +106,7 @@ public:
    ofVec2f GetMinimumDimensions();
    void MarkAsDeleted() { mDeleted = true; }
    bool IsDeleted() const { return mDeleted; }
+   virtual bool ShouldClipContents() { return true; }
    
    virtual void CheckboxUpdated(Checkbox* checkbox) {}
    

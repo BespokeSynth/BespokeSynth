@@ -30,6 +30,7 @@ public:
    ModuleContainer* GetContainer() override { return &mModuleContainer; }
    
    void Poll() override;
+   bool ShouldClipContents() override { return false; }
    
    void ButtonClicked(ClickButton* button) override;
    
