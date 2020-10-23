@@ -52,6 +52,7 @@ MidiController::MidiController()
 , mIsConnected(false)
 , mHasCreatedConnectionUIControls(false)
 , mReconnectWaitTimer(0)
+, mChannelFilter(ChannelFilter::kAny)
 , mVelocityMult(1)
 , mUseChannelAsVoice(false)
 , mNoteOffset(0)
@@ -310,7 +311,7 @@ void MidiController::OnTransportAdvanced(float amount)
 
 void MidiController::OnMidiNote(MidiNote& note)
 {
-   if (!mEnabled)
+   if (!mEnabled || (mChannelFilter != ChannelFilter::kAny && note.mChannel != (int)mChannelFilter))
       return;
    
    MidiReceived(kMidiMessage_Note, note.mPitch, note.mVelocity/127.0f, note.mChannel);
@@ -325,7 +326,7 @@ void MidiController::OnMidiNote(MidiNote& note)
 
 void MidiController::OnMidiControl(MidiControl& control)
 {
-   if (!mEnabled)
+   if (!mEnabled || (mChannelFilter != ChannelFilter::kAny && control.mChannel != (int)mChannelFilter))
       return;
    
    int voiceIdx = -1;
@@ -353,7 +354,7 @@ void MidiController::OnMidiControl(MidiControl& control)
 
 void MidiController::OnMidiPressure(MidiPressure& pressure)
 {
-   if (!mEnabled)
+   if (!mEnabled || (mChannelFilter != ChannelFilter::kAny && pressure.mChannel != (int)mChannelFilter))
       return;
    
    int voiceIdx = -1;
@@ -368,7 +369,7 @@ void MidiController::OnMidiPressure(MidiPressure& pressure)
 
 void MidiController::OnMidiProgramChange(MidiProgramChange& program)
 {
-   if (!mEnabled)
+   if (!mEnabled || (mChannelFilter != ChannelFilter::kAny && program.mChannel != (int)mChannelFilter))
       return;
    
    MidiReceived(kMidiMessage_Program, program.mProgram, program.mChannel);
@@ -383,7 +384,7 @@ void MidiController::OnMidiProgramChange(MidiProgramChange& program)
 
 void MidiController::OnMidiPitchBend(MidiPitchBend& pitchBend)
 {
-   if (!mEnabled)
+   if (!mEnabled || (mChannelFilter != ChannelFilter::kAny && pitchBend.mChannel != (int)mChannelFilter))
       return;
    
    int voiceIdx = -1;
@@ -409,6 +410,8 @@ void MidiController::OnMidiPitchBend(MidiPitchBend& pitchBend)
 
 void MidiController::OnMidi(const MidiMessage& message)
 {
+   if (!mEnabled || (mChannelFilter != ChannelFilter::kAny && message.getChannel() != (int)mChannelFilter))
+      return;
    mNoteOutput.SendMidi(message);
 }
 
@@ -1782,6 +1785,25 @@ void MidiController::LoadLayout(const ofxJSONElement& moduleInfo)
    mModuleSaveData.LoadString("target", moduleInfo);
    mModuleSaveData.LoadFloat("velocitymult",moduleInfo,1,0,10,K(isTextField));
    mModuleSaveData.LoadBool("usechannelasvoice",moduleInfo,false);
+   EnumMap channelMap;
+   channelMap["any"] = (int)ChannelFilter::kAny;
+   channelMap["01"] = (int)ChannelFilter::k1;
+   channelMap["02"] = (int)ChannelFilter::k2;
+   channelMap["03"] = (int)ChannelFilter::k3;
+   channelMap["04"] = (int)ChannelFilter::k4;
+   channelMap["05"] = (int)ChannelFilter::k5;
+   channelMap["06"] = (int)ChannelFilter::k6;
+   channelMap["07"] = (int)ChannelFilter::k7;
+   channelMap["08"] = (int)ChannelFilter::k8;
+   channelMap["09"] = (int)ChannelFilter::k9;
+   channelMap["10"] = (int)ChannelFilter::k10;
+   channelMap["11"] = (int)ChannelFilter::k11;
+   channelMap["12"] = (int)ChannelFilter::k12;
+   channelMap["13"] = (int)ChannelFilter::k13;
+   channelMap["14"] = (int)ChannelFilter::k14;
+   channelMap["15"] = (int)ChannelFilter::k15;
+   channelMap["16"] = (int)ChannelFilter::k16;
+   mModuleSaveData.LoadEnum<ChannelFilter>("channelfilter", moduleInfo, (int)ChannelFilter::kAny, nullptr, &channelMap);
    mModuleSaveData.LoadInt("noteoffset",moduleInfo,0,-999,999,K(isTextField));
    mModuleSaveData.LoadFloat("pitchbendrange",moduleInfo,2,1,96,K(isTextField));
    mModuleSaveData.LoadInt("modwheelcc(1or74)",moduleInfo,1,0,127,K(isTextField));
@@ -1804,6 +1826,7 @@ void MidiController::SetUpFromSaveData()
    SetUpPatchCables(mModuleSaveData.GetString("target"));
    SetVelocityMult(mModuleSaveData.GetFloat("velocitymult"));
    SetUseChannelAsVoice(mModuleSaveData.GetBool("usechannelasvoice"));
+   mChannelFilter = mModuleSaveData.GetEnum<ChannelFilter>("channelfilter");
    SetNoteOffset(mModuleSaveData.GetInt("noteoffset"));
    SetPitchBendRange(mModuleSaveData.GetFloat("pitchbendrange"));
    

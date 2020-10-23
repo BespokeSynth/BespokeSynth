@@ -60,6 +60,11 @@ enum SpecialControlBinding
    kSpecialBinding_HotBind9
 };
 
+enum class ChannelFilter
+{
+   kAny, k1, k2, k3, k4, k5, k6, k7, k8, k9, k10, k11, k12, k13, k14, k15, k16
+};
+
 namespace Json
 {
    class Value;
@@ -369,6 +374,7 @@ private:
    bool mIsConnected;
    bool mHasCreatedConnectionUIControls;
    float mReconnectWaitTimer;
+   ChannelFilter mChannelFilter;
    
    ControlLayoutElement mLayoutControls[NUM_LAYOUT_CONTROLS];
    int mHighlightedLayoutElement;
