@@ -108,6 +108,9 @@ public:
    void MarkAsDeleted() { mDeleted = true; }
    bool IsDeleted() const { return mDeleted; }
    virtual bool ShouldClipContents() { return true; }
+   bool CanReceiveAudio() { return mCanReceiveAudio; }
+   bool CanReceiveNotes() { return mCanReceiveNotes; }
+   bool CanReceivePulses() { return mCanReceivePulses; }
    
    virtual void CheckboxUpdated(Checkbox* checkbox) {}
    
@@ -177,6 +180,9 @@ private:
    bool mShouldDrawOutline;
    bool mHoveringOverResizeHandle;
    bool mDeleted;
+   bool mCanReceiveAudio;
+   bool mCanReceiveNotes;
+   bool mCanReceivePulses;
 
    ofMutex mSliderMutex;
    

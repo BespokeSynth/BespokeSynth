@@ -364,11 +364,11 @@ void PatchCableSource::FindValidTargets()
          continue;
       if (mTypeFilter.empty() == false && !VectorContains(module->GetTypeName(), mTypeFilter))
          continue;
-      if (mType == kConnectionType_Audio && dynamic_cast<IAudioReceiver*>(module))
+      if (mType == kConnectionType_Audio && module->CanReceiveAudio())
          mValidTargets.push_back(module);
-      if (mType == kConnectionType_Note && dynamic_cast<INoteReceiver*>(module))
+      if (mType == kConnectionType_Note && module->CanReceiveNotes())
          mValidTargets.push_back(module);
-      if (mType == kConnectionType_Pulse && dynamic_cast<IPulseReceiver*>(module))
+      if (mType == kConnectionType_Pulse && module->CanReceivePulses())
          mValidTargets.push_back(module);
       if (mType == kConnectionType_Special)
       {

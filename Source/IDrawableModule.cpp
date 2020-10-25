@@ -50,6 +50,9 @@ IDrawableModule::IDrawableModule()
 , mShouldDrawOutline(true)
 , mHoveringOverResizeHandle(false)
 , mDeleted(false)
+, mCanReceiveAudio(false)
+, mCanReceiveNotes(false)
+, mCanReceivePulses(false)
 , mDrawDebug(false)
 {
 }
@@ -96,6 +99,10 @@ void IDrawableModule::Init()
       if (dynamic_cast<IAudioEffect*>(this))
          mModuleType = kModuleType_Processor;
    }
+
+   mCanReceiveAudio = (dynamic_cast<IAudioReceiver*>(this) != nullptr);
+   mCanReceiveNotes = (dynamic_cast<INoteReceiver*>(this) != nullptr);
+   mCanReceivePulses = (dynamic_cast<IPulseReceiver*>(this) != nullptr);
    
    bool wasEnabled = Enabled();
    bool showEnableToggle = false;
@@ -358,6 +365,32 @@ void IDrawableModule::Render()
    
    if (Minimized() || IsVisible() == false)
       DrawBeacon(30,-titleBarHeight/2);
+
+   ofPushStyle();
+   const float kPipWidth = 8;
+   const float kPipSpacing = 2;
+   float receiveIndicatorX = w - (kPipWidth + kPipSpacing);
+   ofFill();
+   
+   if (CanReceiveAudio())
+   {
+      ofSetColor(GetColor(kModuleType_Audio));
+      ofRect(receiveIndicatorX, -titleBarHeight - 2, kPipWidth, 3, 1.0f);
+      receiveIndicatorX -= kPipWidth + kPipSpacing;
+   }
+   if (CanReceiveNotes())
+   {
+      ofSetColor(GetColor(kModuleType_Note));
+      ofRect(receiveIndicatorX, -titleBarHeight - 2, kPipWidth, 3, 1.0f);
+      receiveIndicatorX -= kPipWidth + kPipSpacing;
+   }
+   if (CanReceivePulses())
+   {
+      ofSetColor(GetColor(kModuleType_Pulse));
+      ofRect(receiveIndicatorX, -titleBarHeight - 2, kPipWidth, 3, 1.0f);
+      receiveIndicatorX -= kPipWidth + kPipSpacing;
+   }
+   ofPopStyle();
    
    if (IsResizable() && !Minimized())
    {
