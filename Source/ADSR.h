@@ -6,11 +6,11 @@
 //
 //
 
-#ifndef __additiveSynth__ADSR__
-#define __additiveSynth__ADSR__
+#pragma once
 
 #include <iostream>
 #include <vector>
+#include <array>
 
 #define MAX_ADSR_STAGES 20
 
@@ -28,7 +28,7 @@ public:
       float curve;
    };
    
-   ADSR(float a, float d, float s, float r) : mStartBlendFromValue(0), mStopBlendFromValue(0), mStartTime(-10000), mStopTime(-10000), mMaxSustain(-1), mFreeReleaseLevel(false) { Set(a,d,s,r); }
+   ADSR(float a, float d, float s, float r) : mNextEventPointer(0), mMaxSustain(-1), mFreeReleaseLevel(false) { Set(a,d,s,r); }
    ADSR() : ADSR(1,1,1,1) {}
    void Start(double time, float target);
    void Start(double time, float target, float a, float d, float s, float r);
@@ -37,13 +37,13 @@ public:
    float Value(double time) const;
    void Set(float a, float d, float s, float r, float h = -1);
    void Set(const ADSR& other);
-   void Clear() { mMult = 0; mStartTime = -10000; mStopTime = -10000; mStartBlendFromValue = 0; mStopBlendFromValue = 0; }
+   void Clear() { for (auto e : mEvents) { e.Reset(); } }
    void SetMaxSustain(float max) { mMaxSustain = max; }
    void SetSustainStage(int stage) { mSustainStage = stage; }
    bool IsDone(double time) const;
    bool IsStandardADSR() const { return mNumStages == 3 && mSustainStage == 1; }
-   float GetStartTime() const { return mStartTime; }
-   float GetStopTime() const { return mStopTime; }
+   float GetStartTime(double time) const { return GetEventConst(time)->mStartTime; }
+   float GetStopTime(double time) const { return GetEventConst(time)->mStopTime; }
    
    int GetNumStages() const { return mNumStages; }
    void SetNumStages(int num) { mNumStages = num; }
@@ -64,11 +64,22 @@ public:
    void LoadState(FileStreamIn& in);
    
 private:
-   float mStartBlendFromValue;
-   float mStopBlendFromValue;
-   float mMult;
-   double mStartTime;
-   double mStopTime;
+   struct EventInfo
+   {
+      EventInfo() { Reset(); }
+      void Reset() { mStartBlendFromValue = 0; mStopBlendFromValue = 0; mMult = 1; mStartTime = -10000; mStopTime = -10000; }
+      float mStartBlendFromValue;
+      float mStopBlendFromValue;
+      float mMult;
+      double mStartTime;
+      double mStopTime;
+   };
+
+   EventInfo* GetEvent(double time);
+   const EventInfo* GetEventConst(double time) const;
+   
+   std::array<EventInfo, 5> mEvents;
+   int mNextEventPointer;
    int mSustainStage;
    float mMaxSustain;
    Stage mStages[MAX_ADSR_STAGES];
@@ -76,5 +87,3 @@ private:
    bool mHasSustainStage;
    bool mFreeReleaseLevel;
 };
-
-#endif /* defined(__additiveSynth__ADSR__) */

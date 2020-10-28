@@ -140,7 +140,7 @@ void LFO::OnTimeEvent(double time)
    if (mOsc.GetSoften() == 0)
       mRandom.SetValue(ofRandom(1));
    else
-      mRandom.Start(ofRandom(1), mOsc.GetSoften() * 30);
+      mRandom.Start(time, ofRandom(1), time+mOsc.GetSoften() * 30);
 }
 
 void LFO::OnTransportAdvanced(float amount)

@@ -309,7 +309,7 @@ void SignalGenerator::FloatSliderUpdated(FloatSlider* slider, float oldVal)
    if (slider == mFreqSlider)
    {
       if (mFreqMode == kFreqMode_Ramp)
-         mFreqRamp.Start(mFreq, mFreqRampTime);
+         mFreqRamp.Start(gTime, mFreq, gTime + mFreqRampTime);
    }
    if (slider == mSoftenSlider)
       mOsc.mOsc.SetSoften(mSoften);

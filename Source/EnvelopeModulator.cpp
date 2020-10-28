@@ -14,8 +14,12 @@
 
 EnvelopeModulator::EnvelopeModulator()
 : mWidth(250)
-, mHeight(102)
+, mHeight(122)
+, mAdvancedDisplayCheckbox(nullptr)
+, mAdvancedDisplay(false)
+, mAdsrDisplay(nullptr)
 , mEnvelopeControl(ofVec2f(105,5),ofVec2f(mWidth-110,mHeight-10))
+, mUseVelocity(false)
 , mADSRViewLength(1000)
 , mADSRViewLengthSlider(nullptr)
 , mHasSustainStageCheckbox(nullptr)
@@ -25,7 +29,7 @@ EnvelopeModulator::EnvelopeModulator()
    mEnvelopeControl.SetViewLength(mADSRViewLength);
    mEnvelopeControl.SetADSR(&mAdsr);
    mAdsr.GetFreeReleaseLevel() = true;
-   mAdsr.Set(100,100,.7f,100);
+   mAdsr.Set(10,100,.5f,100);
 }
 
 void EnvelopeModulator::CreateUIControls()
@@ -37,10 +41,13 @@ void EnvelopeModulator::CreateUIControls()
    mTargetCable = new PatchCableSource(this, kConnectionType_UIControl);
    AddPatchCableSource(mTargetCable);
    
-   mMinSlider = new FloatSlider(this, "low", 2, 2, 100, 15, &mDummyMin, 0, 1);
+   mAdvancedDisplayCheckbox = new Checkbox(this, "advanced", 2, 2, &mAdvancedDisplay);
+   mAdsrDisplay = new ADSRDisplay(this, "adsr", 105, 2, 100, 66, &mAdsr);
+   mMinSlider = new FloatSlider(this, "low", mAdvancedDisplayCheckbox, kAnchor_Below, 100, 15, &mDummyMin, 0, 1);
    mMaxSlider = new FloatSlider(this, "high", mMinSlider, kAnchor_Below, 100, 15, &mDummyMax, 0, 1);
    mADSRViewLengthSlider = new FloatSlider(this,"length", mMaxSlider, kAnchor_Below,100,15,&mADSRViewLength,100,10000);
-   mHasSustainStageCheckbox = new Checkbox(this, "has sustain", mADSRViewLengthSlider, kAnchor_Below, &mAdsr.GetHasSustainStage());
+   mUseVelocityCheckbox = new Checkbox(this, "use velocity", mADSRViewLengthSlider, kAnchor_Below, &mUseVelocity);
+   mHasSustainStageCheckbox = new Checkbox(this, "has sustain", mUseVelocityCheckbox, kAnchor_Below, &mAdsr.GetHasSustainStage());
    mSustainStageSlider = new IntSlider(this, "sustain stage", mHasSustainStageCheckbox, kAnchor_Below, 100, 15, &mAdsr.GetSustainStage(), 1, MAX_ADSR_STAGES-1);
    mMaxSustainSlider = new FloatSlider(this, "max sustain", mSustainStageSlider, kAnchor_Below, 100, 15, &mAdsr.GetMaxSustain(), -1, 5000);
    
@@ -49,6 +56,10 @@ void EnvelopeModulator::CreateUIControls()
    
    mSustainStageSlider->SetShowing(mAdsr.GetHasSustainStage());
    mMaxSustainSlider->SetShowing(mAdsr.GetHasSustainStage());
+
+   mHasSustainStageCheckbox->SetShowing(mAdvancedDisplay);
+   mSustainStageSlider->SetShowing(mAdvancedDisplay);
+   mMaxSustainSlider->SetShowing(mAdvancedDisplay);
 }
 
 EnvelopeModulator::~EnvelopeModulator()
@@ -62,14 +73,19 @@ void EnvelopeModulator::DrawModule()
    
    mSustainStageSlider->SetExtents(1, mAdsr.GetNumStages() - 2);
    
+   mAdvancedDisplayCheckbox->Draw();
    mMinSlider->Draw();
    mMaxSlider->Draw();
    mADSRViewLengthSlider->Draw();
+   mUseVelocityCheckbox->Draw();
    mHasSustainStageCheckbox->Draw();
    mSustainStageSlider->Draw();
    mMaxSustainSlider->Draw();
+
+   mAdsrDisplay->Draw();
    
-   mEnvelopeControl.Draw();
+   if (mAdvancedDisplay)
+      mEnvelopeControl.Draw();
 }
 
 void EnvelopeModulator::PlayNote(double time, int pitch, int velocity, int voiceIdx, ModulationParameters modulation)
@@ -82,7 +98,26 @@ void EnvelopeModulator::PlayNote(double time, int pitch, int velocity, int voice
    }
    else if (velocity > 0)
    {
-      mAdsr.Start(time,velocity/127.0f);
+      mAdsr.Start(time, mUseVelocity ? velocity/127.0f : 1);
+   }
+}
+
+void EnvelopeModulator::OnPulse(double time, float velocity, int flags)
+{
+   mAdsr.Start(time, mUseVelocity ? velocity / 127.0f : 1);
+}
+
+void EnvelopeModulator::GetModuleDimensions(float& width, float& height)
+{
+   if (mAdvancedDisplay)
+   {
+      width = mWidth;
+      height = mHeight;
+   }
+   else
+   {
+      width = 208;
+      height = 90;
    }
 }
 
@@ -131,6 +166,13 @@ void EnvelopeModulator::PostRepatch(PatchCableSource* cableSource, bool fromUser
 
 void EnvelopeModulator::CheckboxUpdated(Checkbox* checkbox)
 {
+   if (checkbox == mAdvancedDisplayCheckbox)
+   {
+      mAdsrDisplay->SetShowing(!mAdvancedDisplay);
+      mHasSustainStageCheckbox->SetShowing(mAdvancedDisplay);
+      mSustainStageSlider->SetShowing(mAdvancedDisplay);
+      mMaxSustainSlider->SetShowing(mAdvancedDisplay);
+   }
    if (checkbox == mHasSustainStageCheckbox)
    {
       mSustainStageSlider->SetShowing(mAdsr.GetHasSustainStage());
@@ -145,7 +187,10 @@ void EnvelopeModulator::ButtonClicked(ClickButton* button)
 void EnvelopeModulator::FloatSliderUpdated(FloatSlider* slider, float oldVal)
 {
    if (slider == mADSRViewLengthSlider)
+   {
       mEnvelopeControl.SetViewLength(mADSRViewLength);
+      mAdsrDisplay->SetMaxTime(mADSRViewLength);
+   }
 }
 
 void EnvelopeModulator::SaveLayout(ofxJSONElement& moduleInfo)

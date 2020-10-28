@@ -107,7 +107,7 @@ void SamplerGrid::Process(double time)
          {
             gWorkBuffer[i] += sample.mSampleData[sample.mPlayhead] * rampVal * volSq;
             ++sample.mPlayhead;
-            if (sample.mRamp.Target() == 1 &&
+            if (sample.mRamp.Target(time) == 1 &&
                 sample.mPlayhead + SAMPLE_RAMP_MS/gInvSampleRateMs >= sample.mSampleEnd)
                sample.mRamp.Start(time, 0, time+SAMPLE_RAMP_MS);
          }
@@ -210,7 +210,7 @@ void SamplerGrid::OnGridButton(int x, int y, float velocity, IGridController* gr
       {
          if (bOn)
             mGridSamples[gridSampleIdx].mPlayhead = mGridSamples[gridSampleIdx].mSampleStart;
-         mGridSamples[gridSampleIdx].mRamp.Start(bOn ? 1 : 0, SAMPLE_RAMP_MS);
+         mGridSamples[gridSampleIdx].mRamp.Start(gTime, bOn ? 1 : 0, gTime+SAMPLE_RAMP_MS);
       }
       else if (bOn)
       {

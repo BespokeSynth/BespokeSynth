@@ -59,12 +59,12 @@ void Stutter::ProcessAudio(double time, ChannelBuffer* buffer)
    for (int ch=0; ch<buffer->NumActiveChannels(); ++ch)
       mRecordBuffer.WriteChunk(buffer->GetChannel(ch), bufferSize, ch);
 
-   if (mBlendRamp.Target() > 0 || mBlendRamp.Value(time) > 0)
+   if (mBlendRamp.Target(time) > 0 || mBlendRamp.Value(time) > 0)
    {
       if (mCurrentStutter.interval == kInterval_None)
       {
-         mStutterLengthRamp.Start(mFreeStutterLength * gSampleRate, 20);
-         mStutterSpeed.Start(mFreeStutterSpeed, 20);
+         mStutterLengthRamp.Start(time, mFreeStutterLength * gSampleRate, time+20);
+         mStutterSpeed.Start(time, mFreeStutterSpeed, time+20);
       }
       
       for (int i=0; i<bufferSize; ++i)
@@ -192,7 +192,7 @@ void Stutter::StopStutter()
 {
    if (mStuttering)
    {
-      mBlendRamp.Start(0, STUTTER_START_BLEND_MS);
+      mBlendRamp.Start(gTime, 0, gTime+STUTTER_START_BLEND_MS);
       mStuttering = false;
    }
 }
@@ -223,7 +223,7 @@ void Stutter::DoStutter(StutterParams stutter)
       
    mStutterPos = 0;
    mStuttering = true;
-   mBlendRamp.Start(1, STUTTER_START_BLEND_MS);
+   mBlendRamp.Start(gTime, 1, gTime+STUTTER_START_BLEND_MS);
    if (stutter.interval != kInterval_None)
       mStutterLength = int(TheTransport->GetDuration(stutter.interval) / 1000 * gSampleRate);
    else

@@ -45,9 +45,10 @@ void PitchDive::PlayNote(double time, int pitch, int velocity, int voiceIdx, Mod
    if (mEnabled && velocity > 0 && mStart != 0 && mTime != 0)
    {
       ComputeSliders(0);
-      mModulation.GetPitchBend(voiceIdx)->AppendTo(modulation.pitchBend);
-      mModulation.GetPitchBend(voiceIdx)->RampValue(mStart, 0, mTime);
-      modulation.pitchBend = mModulation.GetPitchBend(voiceIdx);
+      auto* pitchBend = mModulation.GetPitchBend(voiceIdx);
+      pitchBend->RampValue(time, mStart, 0, mTime);
+      pitchBend->AppendTo(modulation.pitchBend);
+      modulation.pitchBend = pitchBend;
    }
    
    PlayNoteOutput(time, pitch, velocity, voiceIdx, modulation);

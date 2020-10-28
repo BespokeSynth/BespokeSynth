@@ -143,7 +143,8 @@ void PolyphonyMgr::Start(double time, int pitch, float amount, int voiceIdx, Mod
             mFadeOutBuffer.GetChannel(ch)[(i+mFadeOutBufferPos) % kVoiceFadeSamples] += mFadeOutWorkBuffer.GetChannel(ch)[i] * fade;
       }
    }
-   voice->ClearVoice();
+   if (!preserveVoice)
+      voice->ClearVoice();
    voice->SetPitch(pitch);
    voice->SetModulators(modulation);
    voice->Start(time, amount);

@@ -19,7 +19,7 @@ public:
    float GetValue(int samplesIn) const;
    float GetIndividualValue(int samplesIn) const;
    void SetValue(float value);
-   void RampValue(float from, float to, double time);
+   void RampValue(double time, float from, float to, double length);
    void SetLFO(NoteInterval interval, float amount);
    void AppendTo(ModulationChain* chain);
    void SetSidechain(ModulationChain* chain);

@@ -659,7 +659,7 @@ void FloatSlider::TextEntryComplete(TextEntry* entry)
 
 void FloatSlider::OnTransportAdvanced(float amount)
 {
-   mRamp.Start(mSmoothTarget, (amount * TheTransport->MsPerBar() * (mSmooth*300)));
+   mRamp.Start(gTime, mSmoothTarget, gTime + (amount * TheTransport->MsPerBar() * (mSmooth*300)));
 }
 
 namespace

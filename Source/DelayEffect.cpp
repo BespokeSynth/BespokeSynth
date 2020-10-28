@@ -70,14 +70,16 @@ void DelayEffect::ProcessAudio(double time, ChannelBuffer* buffer)
    if (mInterval != kInterval_None)
    {
       mDelay = TheTransport->GetDuration(mInterval) + .1f; //+1 to avoid perfect sample collision
-      mDelayRamp.Start(mDelay, 10);
+      mDelayRamp.Start(time, mDelay, time+10);
    }
 
+   mAmountRamp.Start(time, mFeedback, time + 3);
    for (int i=0; i<bufferSize; ++i)
    {
+      mFeedback = mAmountRamp.Value(time);
+
       ComputeSliders(i);
 
-      mAmountRamp.Start(mFeedback,3);
       float delay = MAX(mDelayRamp.Value(time), GetMinDelayMs());
 
       float delaySamps = delay / gInvSampleRateMs;
@@ -100,7 +102,7 @@ void DelayEffect::ProcessAudio(double time, ChannelBuffer* buffer)
          if (!mEcho && mAcceptInput) //single delay, no continuous feedback so do it pre
             mDelayBuffer.Write(buffer->GetChannel(ch)[i], ch);
 
-         float delayInput = delayedSample * mAmountRamp.Value(time);
+         float delayInput = delayedSample * mFeedback;
          FIX_DENORMAL(delayInput);
          if (delayInput == delayInput) //filter NaNs
             buffer->GetChannel(ch)[i] += delayInput;
@@ -143,7 +145,7 @@ float DelayEffect::GetEffectAmount()
 void DelayEffect::SetDelay(float delay)
 {
    mDelay = delay;
-   mDelayRamp.Start(mDelay, 10);
+   mDelayRamp.Start(gTime, mDelay, gTime+10);
    mInterval = kInterval_None;
 }
 
@@ -196,7 +198,7 @@ void DelayEffect::FloatSliderUpdated(FloatSlider* slider, float oldVal)
    if (slider == mDelaySlider)
    {
       mInterval = kInterval_None;
-      mDelayRamp.Start(mDelay, 30);
+      mDelayRamp.Start(gTime, mDelay, gTime+30);
    }
 }
 

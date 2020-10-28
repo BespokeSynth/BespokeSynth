@@ -9,41 +9,65 @@
 #include "Ramp.h"
 #include "SynthGlobals.h"
 
-void Ramp::Start(double end, double length)
-{
-   Start(gTime, Value(gTime), end, gTime+length);
-}
-
 void Ramp::Start(double curTime, float end, double endTime)
 {
-   Start(curTime, Value(curTime), end, endTime);
+   float startValue = Value(curTime);
+   Start(curTime, startValue, end, endTime);
 }
 
 void Ramp::Start(double curTime, float start, float end, double endTime)
 {
-   mStartTime = curTime;
-   mStartValue = start;
-   mEndValue = end;
-   mEndTime = endTime;
+   mRampDatas[mRampDataPointer].mStartTime = curTime;
+   mRampDatas[mRampDataPointer].mStartValue = start;
+   mRampDatas[mRampDataPointer].mEndValue = end;
+   mRampDatas[mRampDataPointer].mEndTime = endTime;
+   mRampDataPointer = (mRampDataPointer + 1) % mRampDatas.size();
 }
 
-void Ramp::SetValue(float start)
+void Ramp::SetValue(float val)
 {
-   mStartValue = start;
-   mEndValue = start;
-   mStartTime = -1;
+   for (size_t i = 0; i < mRampDatas.size(); ++i)
+   {
+      mRampDatas[i].mStartValue = val;
+      mRampDatas[i].mEndValue = val;
+      mRampDatas[i].mStartTime = 0;
+   }
+}
+
+bool Ramp::HasValue(double time) const
+{
+   const RampData* rampData = GetCurrentRampData(time);
+   if (rampData->mStartTime == -1)
+      return false;
+   return true;
 }
 
 float Ramp::Value(double time) const
 {
-   if (mStartTime == -1 || time <= mStartTime)
-      return mStartValue;
-   if (time >= mEndTime)
-      return mEndValue;
+   const RampData* rampData = GetCurrentRampData(time);
+   if (rampData->mStartTime == -1 || time <= rampData->mStartTime)
+      return rampData->mStartValue;
+   if (time >= rampData->mEndTime)
+      return rampData->mEndValue;
    
-   double blend = (time - mStartTime) / (mEndTime - mStartTime);
-   float retVal = mStartValue + blend * (mEndValue - mStartValue);
+   double blend = (time - rampData->mStartTime) / (rampData->mEndTime - rampData->mStartTime);
+   float retVal = rampData->mStartValue + blend * (rampData->mEndValue - rampData->mStartValue);
    if (fabsf(retVal) < FLT_EPSILON)
       return 0;
    return retVal;
+}
+
+const Ramp::RampData* Ramp::GetCurrentRampData(double time) const
+{
+   int ret = 0;
+   double latestTime = -1;
+   for (size_t i = 0; i < mRampDatas.size(); ++i)
+   {
+      if (mRampDatas[i].mStartTime < time && mRampDatas[i].mStartTime > latestTime)
+      {
+         ret = i;
+         latestTime = mRampDatas[i].mStartTime;
+      }
+   }
+   return &(mRampDatas[ret]);
 }

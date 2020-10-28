@@ -456,6 +456,9 @@ void VSTPlugin::PlayNote(double time, int pitch, int velocity, int voiceIdx, Mod
 {
    if (mPlugin == nullptr)
       return;
+
+   if (!mEnabled)
+      return;
    
    if (pitch < 0 || pitch > 127)
       return;

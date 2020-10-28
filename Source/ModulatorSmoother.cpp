@@ -63,7 +63,7 @@ void ModulatorSmoother::PostRepatch(PatchCableSource* cableSource, bool fromUser
 
 void ModulatorSmoother::OnTransportAdvanced(float amount)
 {
-   mRamp.Start(mInput, (amount * TheTransport->MsPerBar() * (mSmooth*300)));
+   mRamp.Start(gTime, mInput, gTime+(amount * TheTransport->MsPerBar() * (mSmooth*300)));
 }
 
 float ModulatorSmoother::Value(int samplesIn)

@@ -9,9 +9,12 @@
 #include "Monophonify.h"
 #include "OpenFrameworksPort.h"
 #include "ModularSynth.h"
+#include "UIControlMacros.h"
 
 Monophonify::Monophonify()
-: mLastVelocity(0)
+: mLastPlayedPitch(-1)
+, mLastVelocity(0)
+, mRequireHeldNote(false)
 , mGlideTime(0)
 , mGlideSlider(nullptr)
 {
@@ -22,17 +25,20 @@ Monophonify::Monophonify()
 void Monophonify::CreateUIControls()
 {
    IDrawableModule::CreateUIControls();
-   mGlideSlider = new FloatSlider(this,"glide",4,2,100,15,&mGlideTime,0,1000);
+   UIBLOCK0();
+   CHECKBOX(mRequireHeldNoteCheckbox, "require held", &mRequireHeldNote);
+   FLOATSLIDER(mGlideSlider, "glide", &mGlideTime, 0, 1000);
+   ENDUIBLOCK(mWidth, mHeight);
    
    mGlideSlider->SetMode(FloatSlider::kSquare);
 }
 
 void Monophonify::DrawModule()
 {
-
    if (Minimized() || IsVisible() == false)
       return;
    
+   mRequireHeldNoteCheckbox->Draw();
    mGlideSlider->Draw();
 }
 
@@ -60,15 +66,20 @@ void Monophonify::PlayNote(double time, int pitch, int velocity, int voiceIdx, M
       
       if (mostRecentPitch != -1)
       {
-         mPitchBend.RampValue(mostRecentPitch - pitch + mPitchBend.GetIndividualValue(0), 0, mGlideTime);
+         mPitchBend.RampValue(time, mostRecentPitch - pitch + mPitchBend.GetIndividualValue(0), 0, mGlideTime);
          PlayNoteOutput(time,mostRecentPitch, 0, -1, modulation);
          PlayNoteOutput(time, pitch, velocity, voiceIdx, modulation);
       }
       else
       {
+         if (!mRequireHeldNote && mLastPlayedPitch != -1)
+            mPitchBend.RampValue(time, mLastPlayedPitch - pitch + mPitchBend.GetIndividualValue(0), 0, mGlideTime);
+         else
+            mPitchBend.RampValue(time, 0, 0, 0);
+
          PlayNoteOutput(time, pitch, velocity, voiceIdx, modulation);
-         mPitchBend.SetValue(0);
       }
+      mLastPlayedPitch = pitch;
       mHeldNotes[pitch] = time;
    }
    else
@@ -83,7 +94,7 @@ void Monophonify::PlayNote(double time, int pitch, int velocity, int voiceIdx, M
       {
          if (wasCurrNote)
          {
-            mPitchBend.RampValue(pitch - mostRecentPitch + mPitchBend.GetIndividualValue(0), 0, mGlideTime);
+            mPitchBend.RampValue(time, pitch - mostRecentPitch + mPitchBend.GetIndividualValue(0), 0, mGlideTime);
             PlayNoteOutput(time, mostRecentPitch, mLastVelocity, voiceIdx, modulation);
          }
       }
@@ -106,6 +117,7 @@ int Monophonify::GetMostRecentPitch() const
          mostRecentTime = mHeldNotes[i];
       }
    }
+
    return mostRecentPitch;
 }
 

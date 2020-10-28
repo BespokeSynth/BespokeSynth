@@ -34,7 +34,11 @@ float ModulationChain::GetValue(int samplesIn) const
 float ModulationChain::GetIndividualValue(int samplesIn) const
 {
    double time = gTime + gInvSampleRateMs*samplesIn;
-   float value = mRamp.Value(time);
+   float value;
+   if (mRamp.HasValue(time))
+      value = mRamp.Value(time);
+   else
+      value = 0;
    if (mLFOAmount != 0)
       value += mLFO.Value(samplesIn) * mLFOAmount;
    return value;
@@ -42,12 +46,12 @@ float ModulationChain::GetIndividualValue(int samplesIn) const
 
 void ModulationChain::SetValue(float value)
 {
-   mRamp.Start(value, gInvSampleRateMs*gBufferSize);
+   mRamp.Start(gTime, value, gTime + gInvSampleRateMs*gBufferSize);
 }
 
-void ModulationChain::RampValue(float from, float to, double time)
+void ModulationChain::RampValue(double time, float from, float to, double length)
 {
-   mRamp.Start(gTime, from, to, gTime + time);
+   mRamp.Start(time, from, to, time + length);
 }
 
 void ModulationChain::SetLFO(NoteInterval interval, float amount)

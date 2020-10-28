@@ -247,7 +247,7 @@ void BeatColumn::Process(double time, float* buffer, int bufferSize)
       gWorkChannelBuffer.SetNumActiveChannels(1);
       if (beat->ConsumeData(time, &gWorkChannelBuffer, bufferSize, true))
       {
-         mFilterRamp.Start(mFilter,10);
+         mFilterRamp.Start(time,mFilter,time+10);
          
          double time = gTime;
          for (int i=0; i<bufferSize; ++i)

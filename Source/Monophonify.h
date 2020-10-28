@@ -40,13 +40,18 @@ public:
 private:
    //IDrawableModule
    void DrawModule() override;
-   void GetModuleDimensions(float& width, float& height) override { width = 110; height = 20; }
+   void GetModuleDimensions(float& width, float& height) override { width = mWidth; height = mHeight; }
    bool Enabled() const override { return mEnabled; }
    int GetMostRecentPitch() const;
    
    double mHeldNotes[128];
+   int mLastPlayedPitch;
    int mLastVelocity;
+   float mWidth;
+   float mHeight;
    
+   bool mRequireHeldNote;
+   Checkbox* mRequireHeldNoteCheckbox;
    float mGlideTime;
    FloatSlider* mGlideSlider;
    ModulationChain mPitchBend;

@@ -312,13 +312,13 @@ void Looper::Process(double time)
       
       if (mCaptureQueued && !mWriteInput)
       {
-         mWriteInputRamp.Start(1,10);
+         mWriteInputRamp.Start(time, 1, time+10);
          mWriteInput = true;
       }
       else if (mWriteInput && mCaptureQueued)
       {
          mCaptureQueued = false;
-         mWriteInputRamp.Start(0,10);
+         mWriteInputRamp.Start(time, 0, time+10);
          mWriteInput = false;
       }
    }
@@ -460,7 +460,7 @@ void Looper::DoCommit()
    {
       Clear();
       mMute = false;
-      mMuteRamp.Start(mMute ? 0 : 1, 1);
+      mMuteRamp.Start(gTime, mMute ? 0 : 1, gTime + 1);
    }
 
    {
@@ -1199,7 +1199,7 @@ void Looper::CheckboxUpdated(Checkbox* checkbox)
    }
    if (checkbox == mMuteCheckbox)
    {
-      mMuteRamp.Start(mMute ? 0 : 1, 1);
+      mMuteRamp.Start(gTime, mMute ? 0 : 1, gTime+1);
    }
    if (checkbox == mShowGranularCheckbox)
    {
@@ -1227,9 +1227,9 @@ void Looper::CheckboxUpdated(Checkbox* checkbox)
    if (checkbox == mWriteInputCheckbox)
    {
       if (mWriteInput)
-         mWriteInputRamp.Start(1,10);
+         mWriteInputRamp.Start(gTime, 1, gTime+10);
       else
-         mWriteInputRamp.Start(0,10);
+         mWriteInputRamp.Start(gTime, 0, gTime+10);
    }
 }
 

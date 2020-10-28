@@ -193,7 +193,7 @@ void BeatBloks::Process(double time)
          }
          if (mBlokPreviewPlayhead > heldBlok->mDuration*numSamples)
          {
-            if (mBlokPreviewRamp.Target() != 0)
+            if (mBlokPreviewRamp.Target(time) != 0)
                mBlokPreviewRamp.Start(time,0,time+1);
             
             if (mBlokPreviewRamp.Value(time) == 0)

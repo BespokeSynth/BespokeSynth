@@ -121,10 +121,10 @@ void ADSRDisplay::Render()
          ofSetLineWidth(1);
          ofSetColor(0,255,0,gModuleDrawAlpha * .5f);
          float drawTime = 0;
-         if (mAdsr->GetStartTime() > 0 && mAdsr->GetStartTime() >= mAdsr->GetStopTime())
-            drawTime = ofClamp(gTime - mAdsr->GetStartTime(), 0, releaseTime);
-         if (mAdsr->GetStopTime() > mAdsr->GetStartTime())
-            drawTime = releaseTime + (gTime - mAdsr->GetStopTime());
+         if (mAdsr->GetStartTime(gTime) > 0 && mAdsr->GetStartTime(gTime) >= mAdsr->GetStopTime(gTime))
+            drawTime = ofClamp(gTime - mAdsr->GetStartTime(gTime), 0, releaseTime);
+         if (mAdsr->GetStopTime(gTime) > mAdsr->GetStartTime(gTime))
+            drawTime = releaseTime + (gTime - mAdsr->GetStopTime(gTime));
          if (drawTime > 0 && drawTime < mMaxTime)
             ofLine(drawTime/mMaxTime*mWidth, 0, drawTime/mMaxTime*mWidth, mHeight);
       }

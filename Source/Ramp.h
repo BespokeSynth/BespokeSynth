@@ -10,22 +10,32 @@
 #define __modularSynth__Ramp__
 
 #include <iostream>
+#include <array>
 
 class Ramp
 {
 public:
-   Ramp() : mStartTime(-1), mStartValue(0), mEndValue(1) {}
-   void Start(double end, double length);
+   Ramp() : mRampDataPointer(0) {}
    void Start(double curTime, float end, double endTime);
    void Start(double curTime, float start, float end, double endTime);
-   void SetValue(float start);
+   void SetValue(float val);
+   bool HasValue(double time) const;
    float Value(double time) const;
-   float Target() const { return mEndValue; }
+   float Target(double time) const { return GetCurrentRampData(time)->mEndValue; }
 private:
-   double mStartTime;
-   float mStartValue;
-   float mEndValue;
-   double mEndTime;
+   struct RampData
+   {
+      RampData() : mStartTime(-1), mStartValue(0), mEndValue(1), mEndTime(-1) {}
+      double mStartTime;
+      float mStartValue;
+      float mEndValue;
+      double mEndTime;
+   };
+
+   const RampData* GetCurrentRampData(double time) const;
+
+   std::array<RampData, 10> mRampDatas;
+   int mRampDataPointer;
 };
 
 #endif /* defined(__modularSynth__Ramp__) */

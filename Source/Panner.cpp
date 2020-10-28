@@ -67,16 +67,17 @@ void Panner::Process(double time)
          mWidenerBuffer.ReadChunk(GetBuffer()->GetChannel(0), GetBuffer()->BufferSize(), abs(mWiden), 0);
    }
    
+   mPanRamp.Start(time, mPan, time + 2);
    for (int i=0; i<GetBuffer()->BufferSize(); ++i)
    {
+      mPan = mPanRamp.Value(time);
+
       ComputeSliders(i);
-      mPanRamp.Start(mPan,2);
-      float pan = mPanRamp.Value(time);
       
       float left = GetBuffer()->GetChannel(0)[i];
       float right = secondChannel[i];
-      GetBuffer()->GetChannel(0)[i] = left * ofMap(pan, 0, 1, 1, 0, true) + right * ofMap(pan, -1, 0, 1, 0, true);
-      secondChannel[i] = right * ofMap(pan, -1, 0, 0, 1, true) + left * ofMap(pan, 0, 1, 0, 1, true);
+      GetBuffer()->GetChannel(0)[i] = left * ofMap(mPan, 0, 1, 1, 0, true) + right * ofMap(mPan, -1, 0, 1, 0, true);
+      secondChannel[i] = right * ofMap(mPan, -1, 0, 0, 1, true) + left * ofMap(mPan, 0, 1, 0, 1, true);
       
       out->GetChannel(0)[i] += GetBuffer()->GetChannel(0)[i];
       out->GetChannel(1)[i] += secondChannel[i];

@@ -138,7 +138,7 @@ void LooperRecorder::Process(double time)
       mCommitToLooper->Commit();
       
       mRecorderMode = kRecorderMode_Record;
-      mQuietInputRamp.Start(0, 10);
+      mQuietInputRamp.Start(gTime, 0, gTime+10);
       mUnquietInputTime = gTime + 1000; //no input for 1 second
       mCommitToLooper = nullptr;
    }

@@ -142,10 +142,10 @@ void EnvelopeControl::Draw()
    ofSetLineWidth(1);
    ofSetColor(0,255,0,gModuleDrawAlpha * .5f);
    float drawTime = 0;
-   if (mAdsr->GetStartTime() > 0 && mAdsr->GetStartTime() >= mAdsr->GetStopTime())
-      drawTime = ofClamp(gTime - mAdsr->GetStartTime(), 0, GetReleaseTime());
-   if (mAdsr->GetStopTime() > mAdsr->GetStartTime())
-      drawTime = GetReleaseTime() + (gTime - mAdsr->GetStopTime());
+   if (mAdsr->GetStartTime(gTime) > 0 && mAdsr->GetStartTime(gTime) >= mAdsr->GetStopTime(gTime))
+      drawTime = ofClamp(gTime - mAdsr->GetStartTime(gTime), 0, GetReleaseTime());
+   if (mAdsr->GetStopTime(gTime) > mAdsr->GetStartTime(gTime))
+      drawTime = GetReleaseTime() + (gTime - mAdsr->GetStopTime(gTime));
    if (drawTime > 0 && drawTime < mViewLength)
       ofLine(GetXForTime(drawTime), mPosition.y, GetXForTime(drawTime), mPosition.y + mDimensions.y);
    

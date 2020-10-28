@@ -16,11 +16,13 @@
 #include "ClickButton.h"
 #include "DropdownList.h"
 #include "ADSR.h"
+#include "ADSRDisplay.h"
 #include "EnvelopeEditor.h"
 #include "NoteEffectBase.h"
 #include "IModulator.h"
+#include "IPulseReceiver.h"
 
-class EnvelopeModulator : public IDrawableModule, public IRadioButtonListener, public IFloatSliderListener, public IButtonListener, public IDropdownListener, public IIntSliderListener, public NoteEffectBase, public IModulator
+class EnvelopeModulator : public IDrawableModule, public IRadioButtonListener, public IFloatSliderListener, public IButtonListener, public IDropdownListener, public IIntSliderListener, public NoteEffectBase, public IModulator, public IPulseReceiver
 {
 public:
    EnvelopeModulator();
@@ -34,10 +36,11 @@ public:
    void CreateUIControls() override;
    void MouseReleased() override;
    bool MouseMoved(float x, float y) override;
-   bool IsResizable() const override { return true; }
+   bool IsResizable() const override { return mAdvancedDisplay; }
    void Resize(float w, float h) override;
    
    void PlayNote(double time, int pitch, int velocity, int voiceIdx = -1, ModulationParameters modulation = ModulationParameters()) override;
+   void OnPulse(double time, float velocity, int flags) override;
    
    //IModulator
    float Value(int samplesIn = 0) override;
@@ -53,7 +56,7 @@ public:
    void ButtonClicked(ClickButton* button) override;
    void DropdownUpdated(DropdownList* list, int oldVal) override {}
    
-   void GetModuleDimensions(float& width, float& height) override { width = mWidth; height = mHeight; }
+   void GetModuleDimensions(float& width, float& height);
    
    void SaveLayout(ofxJSONElement& moduleInfo) override;
    void LoadLayout(const ofxJSONElement& moduleInfo) override;
@@ -70,9 +73,14 @@ private:
    float mWidth;
    float mHeight;
    
+   Checkbox* mAdvancedDisplayCheckbox;
+   bool mAdvancedDisplay;
+   ADSRDisplay* mAdsrDisplay;
    EnvelopeControl mEnvelopeControl;
    ::ADSR mAdsr;
    
+   bool mUseVelocity;
+   Checkbox* mUseVelocityCheckbox;
    float mADSRViewLength;
    FloatSlider* mADSRViewLengthSlider;
    Checkbox* mHasSustainStageCheckbox;
