@@ -410,7 +410,7 @@ void MidiController::OnMidiPitchBend(MidiPitchBend& pitchBend)
 
 void MidiController::OnMidi(const MidiMessage& message)
 {
-   if (!mEnabled || (mChannelFilter != ChannelFilter::kAny && message.getChannel() != (int)mChannelFilter))
+   if (!mEnabled || (mChannelFilter != ChannelFilter::kAny && message.getChannel() != (int)mChannelFilter && !message.isSysEx()))
       return;
    mNoteOutput.SendMidi(message);
 }
