@@ -32,6 +32,7 @@ public:
    ::ADSR* GetADSR() { return mAdsr; }
    void SetActive(bool active);
    void SpawnEnvelopeEditor();
+   void SetOverrideDrawTime(double time) { mOverrideDrawTime = time; }
    
    //IUIControl
    void SetFromMidiCC(float slider) override {}
@@ -82,6 +83,7 @@ private:
    FloatSlider* mRSlider;
    static DisplayMode sDisplayMode;
    EnvelopeEditor* mEditor;
+   double mOverrideDrawTime;
 };
 
 

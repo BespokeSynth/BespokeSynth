@@ -106,10 +106,12 @@ private:
    
    ChannelBuffer mOutputBuffer;
    float mSpeed;
+   float mSpeedRandomization;
    float mVolume;
    int mLoadedKit;
    FloatSlider* mVolSlider;
    FloatSlider* mSpeedSlider;
+   FloatSlider* mSpeedRandomizationSlider;
    DropdownList* mKitSelector;
    bool mEditMode;
    Checkbox* mEditCheckbox;
@@ -165,12 +167,23 @@ private:
    
    struct DrumHit
    {
+      struct Playhead
+      {
+         Playhead() : mStartTime(-1) {}
+         double mStartTime;
+         double mCutOffTime;
+         double mOffset;
+         double mRunningTime;
+         float mSpeedTweak;
+      };
+
       DrumHit()
       : mLinkId(-1)
       , mVol(1)
       , mSpeed(1)
       , mVelocity(1)
       , mPanInput(0)
+      , mPitchBend(nullptr)
       , mUseEnvelope(false)
       , mEnvelopeLength(200)
       , mPan(0)
@@ -179,12 +192,14 @@ private:
       , mOwner(nullptr)
       , mWidenerBuffer(2048)
       , mSamplesRemainingToProcess(0)
+      , mCurrentPlayheadIndex(0)
       {
          mEnvelope.GetHasSustainStage() = false;
          mEnvelope.GetA() = 1;
          mEnvelope.GetD() = 1;
          mEnvelope.GetS() = 1;
          mEnvelope.GetR() = 100;
+         mEnvelope.Start(0, 1);
       }
       
       void CreateUIControls(DrumPlayer* owner, int index);
@@ -193,6 +208,9 @@ private:
       void DrawUIControls();
       void UpdateHitDirectoryDropdown();
       void LoadRandomSample();
+      void StartPlayhead(double time);
+      void StopLinked(double time);
+      float GetPlayProgress(double time);
       
       Sample mSample;
       int mLinkId;
@@ -200,6 +218,7 @@ private:
       float mSpeed;
       float mVelocity;
       float mPanInput;
+      ModulationChain* mPitchBend;
       
       bool mUseEnvelope;
       ::ADSR mEnvelope;
@@ -226,6 +245,9 @@ private:
       string mHitCategory;
       RollingBuffer mWidenerBuffer;
       int mSamplesRemainingToProcess;
+
+      array<Playhead,2> mPlayheads;
+      int mCurrentPlayheadIndex;
    };
    
    DrumHit mDrumHits[NUM_DRUM_HITS];

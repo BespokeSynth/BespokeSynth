@@ -18,6 +18,7 @@
 
 DrumPlayer::DrumPlayer()
 : mSpeed(1)
+, mSpeedRandomization(0.01f)
 , mVolume(1)
 , mLoadedKit(0)
 , mVolSlider(nullptr)
@@ -52,15 +53,16 @@ void DrumPlayer::CreateUIControls()
    IDrawableModule::CreateUIControls();
    mVolSlider = new FloatSlider(this,"vol",4,2,100,15,&mVolume,0,2);
    mSpeedSlider = new FloatSlider(this,"speed",4,18,100,15,&mSpeed,0.2f,3);
+   mSpeedRandomizationSlider = new FloatSlider(this, "speed rnd", 4, 34, 100, 15, &mSpeedRandomization, 0, .2f);
    mKitSelector = new DropdownList(this,"kit",4,50,&mLoadedKit);
    mEditCheckbox = new Checkbox(this,"edit",73,52,&mEditMode);
    mSaveButton = new ClickButton(this,"save current",200,22);
    mNewKitButton = new ClickButton(this,"new kit", 200, 4);
    mNewKitNameEntry = new TextEntry(this,"kitname",200, 40,7,mNewKitName);
    mAuditionSlider = new FloatSlider(this,"aud",140,50,40,15,&mAuditionInc,-1,1,0);
-   mMonoCheckbox = new Checkbox(this,"mono",4,34,&mMonoOutput);
+   mMonoCheckbox = new Checkbox(this,"mono",mVolSlider,kAnchor_Right_Padded,&mMonoOutput);
    mShuffleButton = new ClickButton(this,"shuffle",140,34);
-   mGridController = new GridController(this, "grid", 60, 34);
+   mGridController = new GridController(this, "grid", 4, 50);
 
    mKitSelector->SetShowing(false); //TODO(Ryan) replace "kits" concept with a better form of serialization
    
@@ -73,6 +75,7 @@ void DrumPlayer::CreateUIControls()
    UpdateVisibleControls();
    
    GetPatchCableSource()->SetManualSide(PatchCableSource::kBottom);
+   mSpeedRandomizationSlider->SetMode(FloatSlider::kSquare);
 }
 
 void DrumPlayer::DrumHit::CreateUIControls(DrumPlayer* owner, int index)
@@ -355,58 +358,130 @@ void DrumPlayer::Process(double time)
    }
 }
 
+void DrumPlayer::DrumHit::StartPlayhead(double time)
+{
+   mCurrentPlayheadIndex = (mCurrentPlayheadIndex + 1) % mPlayheads.size();
+   for (size_t i = 0; i < mPlayheads.size(); ++i)
+   {
+      if (i == mCurrentPlayheadIndex)
+      {
+         mPlayheads[i].mStartTime = time;
+         mPlayheads[i].mCutOffTime = -1;
+         mPlayheads[i].mOffset = 0;
+         mPlayheads[i].mRunningTime = 0;
+         mPlayheads[i].mSpeedTweak = ofRandom(1-mOwner->mSpeedRandomization, 1+ mOwner->mSpeedRandomization);
+      }
+      else
+      {
+         mPlayheads[i].mCutOffTime = time;
+      }
+   }
+}
+
+void DrumPlayer::DrumHit::StopLinked(double time)
+{
+   for (size_t i = 0; i < mPlayheads.size(); ++i)
+   {
+      if (mPlayheads[i].mCutOffTime == -1)
+         mPlayheads[i].mCutOffTime = time;
+   }
+}
+
+float DrumPlayer::DrumHit::GetPlayProgress(double time)
+{
+   int playheadIdx = -1;
+   double startTime = -1;
+   for (size_t i = 0; i < mPlayheads.size(); ++i)
+   {
+      if (mPlayheads[i].mStartTime <= time && mPlayheads[i].mStartTime > startTime)
+      {
+         startTime = mPlayheads[i].mStartTime;
+         playheadIdx = i;
+      }
+   }
+
+   if (startTime != -1 && mSample.Data() != nullptr)
+      return mPlayheads[playheadIdx].mOffset / mSample.LengthInSamples();
+   return 1;
+}
+
 bool DrumPlayer::DrumHit::Process(double time, float speed, float vol, ChannelBuffer* out, int bufferSize)
 {
-   mSample.SetRate(speed * mSpeed);
-   
-   if (mSample.ConsumeData(time, out, bufferSize, true))
+   ChannelBuffer* sampleData = mSample.Data();
+   speed *= mSpeed;
+
+   for (int i = 0; i < bufferSize; ++i)
    {
-      double timeHit = time;
-      for (int j=0; j<bufferSize; ++j)
+      float sampleSpeed = speed;
+      if (mPitchBend != nullptr)
+         sampleSpeed *= ofMap(mPitchBend->GetValue(i), -.5f, .5f, 0, 2);
+
+      for (int ch = 0; ch < out->NumActiveChannels(); ++ch)
+         gWorkBuffer[ch] = 0;
+
+      for (size_t playhead = 0; playhead < mPlayheads.size(); ++playhead)
       {
-         for (int ch=0; ch<out->NumActiveChannels(); ++ch)
+         if (mPlayheads[playhead].mStartTime != -1 && time > mPlayheads[playhead].mStartTime && mPlayheads[playhead].mOffset < mSample.LengthInSamples())
          {
-            float sample = out->GetChannel(ch)[j] * mVelocity * vol * mVol * mVol;
-            if (mUseEnvelope)
-               sample *= mEnvelope.Value(timeHit);
-            out->GetChannel(ch)[j] = sample;
+            for (int ch = 0; ch < out->NumActiveChannels(); ++ch)
+            {
+               int dataChannel = MIN(ch, sampleData->NumActiveChannels() - 1);
+               float sample = GetInterpolatedSample(mPlayheads[playhead].mOffset, sampleData->GetChannel(dataChannel), mSample.LengthInSamples());
+               sample *= mVelocity * vol * mVol * mVol;
+               if (mUseEnvelope)
+                  sample *= mEnvelope.Value(mPlayheads[playhead].mRunningTime);
+
+               if (mPlayheads[playhead].mCutOffTime != -1 && time > mPlayheads[playhead].mCutOffTime)
+               {
+                  float fade = ofMap(time - mPlayheads[playhead].mCutOffTime, 0, .25f, 1, 0, K(clamp));
+                  sample *= fade;
+                  if (fade == 0)
+                     mPlayheads[playhead].mStartTime = -1;
+               }
+
+               gWorkBuffer[ch] += sample;
+            }
+
+            mPlayheads[playhead].mOffset += sampleSpeed * mPlayheads[playhead].mSpeedTweak * mSample.GetSampleRateRatio();
+            mPlayheads[playhead].mRunningTime += gInvSampleRateMs;
+            mSamplesRemainingToProcess = bufferSize + abs(mWiden);
          }
-         
-         if (mPan + mPanInput != 0 && mOwner->mMonoOutput == false)
-         {
-            int secondChannel = out->NumActiveChannels() == 1 ? 0 : 1;
-            
-            float left = out->GetChannel(0)[j];
-            float right = out->GetChannel(secondChannel)[j];
-            out->GetChannel(0)[j] = left * ofMap(mPan + mPanInput, 0, 1, 1, 0, true) + right * ofMap(mPan + mPanInput, -1, 0, 1, 0, true);
-            out->GetChannel(secondChannel)[j] = right * ofMap(mPan + mPanInput, -1, 0, 0, 1, true) + left * ofMap(mPan + mPanInput, 0, 1, 0, 1, true);
-         }
-         
-         timeHit += gInvSampleRateMs;
       }
-      
-      mSamplesRemainingToProcess = bufferSize + abs(mWiden);
-   }
-   else
-   {
-      out->Clear();
-   }
+
+      int secondChannel = out->NumActiveChannels() == 1 ? 0 : 1;
+      float left = gWorkBuffer[0];
+      float right = gWorkBuffer[secondChannel];
+
+      if (mPan + mPanInput != 0 && mOwner->mMonoOutput == false)
+      {
+         out->GetChannel(0)[i] = left * ofMap(mPan + mPanInput, 0, 1, 1, 0, true) + right * ofMap(mPan + mPanInput, -1, 0, 1, 0, true);
+         out->GetChannel(secondChannel)[i] = right * ofMap(mPan + mPanInput, -1, 0, 0, 1, true) + left * ofMap(mPan + mPanInput, 0, 1, 0, 1, true);
+      }
+      else
+      {
+         out->GetChannel(0)[i] = left;
+         if (secondChannel == 1)
+            out->GetChannel(secondChannel)[i] = right;
+      }
+
+      time += gInvSampleRateMs;
+   }   
 
    if (mSamplesRemainingToProcess > 0)
    {
       if (abs(mWiden) > 0 && mOwner->mMonoOutput == false)
       {
          mWidenerBuffer.SetNumChannels(2);
-         for (int ch=0; ch<out->NumActiveChannels(); ++ch)
+         for (int ch = 0; ch < out->NumActiveChannels(); ++ch)
             mWidenerBuffer.WriteChunk(out->GetChannel(ch), bufferSize, ch);
          if (mWiden < 0)
             mWidenerBuffer.ReadChunk(out->GetChannel(1), bufferSize, abs(mWiden), 1);
          else
             mWidenerBuffer.ReadChunk(out->GetChannel(0), bufferSize, abs(mWiden), 0);
       }
-      
+
       mSamplesRemainingToProcess -= bufferSize;
-      
+
       return true;
    }
       
@@ -425,6 +500,9 @@ int DrumPlayer::GetIndividualOutputIndex(int hitIndex)
 
 void DrumPlayer::PlayNote(double time, int pitch, int velocity, int voiceIdx, ModulationParameters modulation)
 {
+   if (!mEnabled)
+      return;
+
    if (!NoteInputBuffer::IsTimeWithinFrame(time))
    {
       mNoteInputBuffer.QueueNote(time, pitch, velocity, voiceIdx, modulation);
@@ -442,16 +520,16 @@ void DrumPlayer::PlayNote(double time, int pitch, int velocity, int voiceIdx, Mo
          {
             for (int i = 0; i < NUM_DRUM_HITS; ++i)
             {
-               if (mDrumHits[i].mLinkId == playingId && mDrumHits[i].mSample.GetPlayPosition() > 100)
-                  mDrumHits[i].mSample.Reset();
+               if (i != pitch && mDrumHits[i].mLinkId == playingId)
+                  mDrumHits[i].StopLinked(time);
             }
          }
 
          //play this one
-         mDrumHits[pitch].mSample.Play(time, mSpeed * ofRandom(.99f,1.01f), 0);
          mDrumHits[pitch].mVelocity = velocity / 127.0f;
          mDrumHits[pitch].mPanInput = modulation.pan;
-         mDrumHits[pitch].mEnvelope.Start(time, 1);
+         mDrumHits[pitch].mPitchBend = modulation.pitchBend;
+         mDrumHits[pitch].StartPlayhead(time);
       }
    }
 }
@@ -572,9 +650,9 @@ void DrumPlayer::DrawModule()
    
    mVolSlider->Draw();
    mSpeedSlider->Draw();
+   mSpeedRandomizationSlider->Draw();
    mKitSelector->Draw();
    mEditCheckbox->Draw();
-   mMonoCheckbox->Draw();
    mGridController->Draw();
    
    float moduleW, moduleH;
@@ -590,6 +668,7 @@ void DrumPlayer::DrawModule()
       ofRect(300, 5, 145, 360);
       ofPopStyle();
       
+      mMonoCheckbox->Draw();
       mSaveButton->Draw();
       mNewKitButton->Draw();
       mNewKitNameEntry->Draw();
@@ -604,16 +683,14 @@ void DrumPlayer::DrawModule()
          for (int j=0; j<4; ++j)
          {
             int sampleIdx = GetAssociatedSampleIndex(i, j);
-            ofSetColor(200,100,0,gModuleDrawAlpha);
-            Sample* sample = nullptr;
-            if (sampleIdx != -1)
-               sample = &(mDrumHits[sampleIdx].mSample);
-            if (sample &&
-                sample->IsPlaying() &&
-                sample->GetPlayPosition() < gSampleRate * .25f)
-               ofFill();
-            else
-               ofNoFill();
+
+            ofSetColor(200, 100, 0, gModuleDrawAlpha);
+            ofNoFill();
+            ofRect(i * 70, j * 70, 70, 70);
+
+            float alpha = sqrt(1 - mDrumHits[sampleIdx].GetPlayProgress(gTime));
+            ofSetColor(200,100,0,gModuleDrawAlpha * alpha);
+            ofFill();
             ofRect(i*70,j*70,70,70);
             
             if (sampleIdx == mSelectedHitIdx)
@@ -624,10 +701,7 @@ void DrumPlayer::DrawModule()
             }
 
             ofSetColor(255,255,255,gModuleDrawAlpha);
-            if (sample)
-            {
-               gFont.DrawStringWrap(sample->Name(), 12, i*70+5,j*70+10, 60);
-            }
+            gFont.DrawStringWrap(mDrumHits[sampleIdx].mSample.Name(), 12, i*70+5,j*70+10, 60);
          }
       }
       ofPopStyle();
@@ -697,6 +771,7 @@ void DrumPlayer::DrumHit::DrawUIControls()
       mEnvelopeLengthSlider->SetExtents(10, mSample.LengthInSamples() * gInvSampleRateMs);
       mEnvelopeLengthSlider->Draw();
       mEnvelopeDisplay->SetMaxTime(mEnvelopeLength);
+      mEnvelopeDisplay->SetOverrideDrawTime(mPlayheads[mCurrentPlayheadIndex].mRunningTime);
       mEnvelopeDisplay->Draw();
    }
 }
@@ -843,7 +918,7 @@ void DrumPlayer::FloatSliderUpdated(FloatSlider* slider, float oldVal)
             LoadSampleLock();
             mDrumHits[mAuditionPadIdx].mSample.Read(file.c_str());
             LoadSampleUnlock();
-            mDrumHits[mAuditionPadIdx].mSample.Play(gTime, mSpeed, 0);
+            mDrumHits[mAuditionPadIdx].StartPlayhead(gTime);
             mDrumHits[mAuditionPadIdx].mVelocity = .5f;
          }
       }
