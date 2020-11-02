@@ -453,6 +453,24 @@ vector<string> ModuleFactory::GetSpawnableModules(char c)
           (mIsHiddenModuleMap[iter->first] == false || gShowDevModules))
          modules.push_back(iter->first);
    }
+
+   vector<string> vsts;
+   VSTLookup::GetAvailableVSTs(vsts, false);
+   for (auto vstFile : vsts)
+   {
+      string vstName = juce::File(vstFile).getFileName().toStdString();
+      if (tolower(vstName[0]) == c)
+         modules.push_back(vstName + " " + kVSTSuffix);
+   }
+
+   vector<string> prefabs;
+   ModuleFactory::GetPrefabs(prefabs);
+   for (auto prefab : prefabs)
+   {
+      if (tolower(prefab[0]) == c)
+         modules.push_back(prefab + " " + kPrefabSuffix);
+   }
+
    sort(modules.begin(), modules.end());
    return modules;
 }
@@ -461,6 +479,8 @@ ModuleType ModuleFactory::GetModuleType(string typeName)
 {
    if (mModuleTypeMap.find(typeName) != mModuleTypeMap.end())
       return mModuleTypeMap[typeName];
+   if (juce::String(typeName).endsWith(kVSTSuffix))
+      return kModuleType_Synth;
    return kModuleType_Other;
 }
 
@@ -469,4 +489,17 @@ bool ModuleFactory::IsExperimental(string typeName)
    if (mIsExperimentalModuleMap.find(typeName) != mIsExperimentalModuleMap.end())
       return mIsExperimentalModuleMap[typeName];
    return false;
+}
+
+//static
+void ModuleFactory::GetPrefabs(vector<string>& prefabs)
+{
+   File dir(ofToDataPath("prefabs"));
+   Array<File> files;
+   dir.findChildFiles(files, File::findFiles, false);
+   for (auto file : files)
+   {
+      if (file.getFileExtension() == ".pfb")
+         prefabs.push_back(file.getFileName().toStdString());
+   }
 }

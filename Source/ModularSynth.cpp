@@ -30,6 +30,8 @@
 #include "AudioToCV.h"
 #include "ScriptModule.h"
 #include "DrumPlayer.h"
+#include "VSTPlugin.h"
+#include "Prefab.h"
 
 ModularSynth* TheSynth = nullptr;
 
@@ -2037,18 +2039,44 @@ IDrawableModule* ModularSynth::SpawnModuleOnTheFly(string moduleName, float x, f
    vector<string> tokens = ofSplitString(moduleName," ");
    if (tokens.size() == 0)
       return nullptr;
+
+   string moduleType = tokens[0];
    
-   if (tokens[0] == "siggen")
-      tokens[0] = "signalgenerator";
+   if (moduleType == "siggen")
+      moduleType = "signalgenerator";
+
+   string vstToSetUp = "";
+   if (tokens.size() > 1 && tokens[tokens.size() - 1] == ModuleFactory::kVSTSuffix)
+   {
+      moduleType = "vstplugin";
+      for (size_t i = 0; i < tokens.size() - 1; ++i)
+      {
+         vstToSetUp += tokens[i];
+         if (i != tokens.size() - 2)
+            vstToSetUp += " ";
+      }
+   }
+
+   string prefabToSetUp = "";
+   if (tokens.size() > 1 && tokens[tokens.size() - 1] == ModuleFactory::kPrefabSuffix)
+   {
+      moduleType = "prefab";
+      for (size_t i = 0; i < tokens.size() - 1; ++i)
+      {
+         prefabToSetUp += tokens[i];
+         if (i != tokens.size() - 2)
+            prefabToSetUp += " ";
+      }
+   }
 
    ofxJSONElement dummy;
-   dummy["type"] = tokens[0];
+   dummy["type"] = moduleType;
    vector<IDrawableModule*> allModules;
    mModuleContainer.GetAllModules(allModules);
-   dummy["name"] = GetUniqueName(tokens[0], allModules);
+   dummy["name"] = GetUniqueName(moduleType, allModules);
    dummy["onthefly"] = true;
 
-   if (tokens[0] == "effectchain")
+   if (moduleType == "effectchain")
    {
       for (int i=1; i<tokens.size(); ++i)
       {
@@ -2084,6 +2112,20 @@ IDrawableModule* ModularSynth::SpawnModuleOnTheFly(string moduleName, float x, f
    catch (UnknownModuleException& e)
    {
       LogEvent("Error spawning \""+moduleName+"\" on the fly, couldn't find \""+e.mSearchName+"\"", kLogEventType_Warning);
+   }
+
+   if (vstToSetUp != "")
+   {
+      VSTPlugin* plugin = dynamic_cast<VSTPlugin*>(module);
+      if (plugin != nullptr)
+         plugin->SetVST(vstToSetUp);
+   }
+
+   if (prefabToSetUp != "")
+   {
+      Prefab* prefab = dynamic_cast<Prefab*>(module);
+      if (prefab != nullptr)
+         prefab->LoadPrefab("prefabs" + GetPathSeparator() + prefabToSetUp);
    }
 
    return module;

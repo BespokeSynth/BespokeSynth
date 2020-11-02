@@ -51,8 +51,16 @@ void QuickSpawnMenu::KeyPressed(int key, bool isRepeat)
          
          if (TheSynth->GetTopModalFocusItem() == this)
             TheSynth->PopModalFocusItem();
+
+         float width = 150;
+         for (auto element : mElements)
+         {
+            float elementWidth = GetStringWidth(element) + 10;
+            if (elementWidth > width)
+               width = elementWidth;
+         }
          
-         SetDimensions(150, (int)mElements.size() * itemSpacing);
+         SetDimensions(width, (int)mElements.size() * itemSpacing);
          SetPosition(TheSynth->GetMouseX()-mWidth/2, TheSynth->GetMouseY()-mHeight/2);
          TheSynth->PushModalFocusItem(this);
          SetShowing(true);

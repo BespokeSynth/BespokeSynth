@@ -24,6 +24,10 @@ public:
    vector<string> GetSpawnableModules(char c);
    ModuleType GetModuleType(string typeName);
    bool IsExperimental(string typeName);
+   static void GetPrefabs(vector<string>& prefabs);
+
+   static constexpr const char* kVSTSuffix = "[vst]";
+   static constexpr const char* kPrefabSuffix = "[prefab]";
 private:
    void Register(string type, CreateModuleFn creator, CanCreateModuleFn canCreate, ModuleType moduleType, bool hidden, bool experimental);
    map<string, CreateModuleFn> mFactoryMap;

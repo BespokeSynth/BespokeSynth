@@ -192,15 +192,8 @@ void SpawnListManager::SetModuleFactory(ModuleFactory* factory)
    
    SetUpVstDropdown(false);
    
-   File dir(ofToDataPath("prefabs"));
-   Array<File> files;
-   dir.findChildFiles(files, File::findFiles, false);
    vector<string> prefabs;
-   for (auto file : files)
-   {
-      if (file.getFileExtension() == ".pfb")
-         prefabs.push_back(file.getFileName().toStdString());
-   }
+   ModuleFactory::GetPrefabs(prefabs);
    mPrefabs.SetList(prefabs, "prefab");
    
    mDropdowns.push_back(&mInstrumentModules);
