@@ -8,6 +8,7 @@
 
 #include "VSTWindow.h"
 #include "VSTPlugin.h"
+#include "ModularSynth.h"
 
 VSTWindow::VSTWindow (VSTPlugin* vst,
                       Component* const pluginEditor,
@@ -24,8 +25,10 @@ VSTWindow::VSTWindow (VSTPlugin* vst,
    
    setContentOwned (pluginEditor, true);
    
-   setTopLeftPosition (juce::Random::getSystemRandom().nextInt (500),
-                       juce::Random::getSystemRandom().nextInt (500));
+   auto mainMon = Desktop::getInstance().getDisplays().findDisplayForRect(TheSynth->GetMainComponent()->getScreenBounds()).userArea;
+
+   setTopLeftPosition(mainMon.getX() + mainMon.getWidth() / 4,
+                      mainMon.getY() + mainMon.getHeight() / 4);
    
    setVisible (true);
    
