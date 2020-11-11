@@ -1569,6 +1569,7 @@ IDrawableModule* ModularSynth::CreateModule(const ofxJSONElement& moduleInfo)
       return nullptr;
 
    string type = moduleInfo["type"].asString();
+   type = ModuleFactory::FixUpTypeName(type);
    
    try
    {
@@ -2042,8 +2043,7 @@ IDrawableModule* ModularSynth::SpawnModuleOnTheFly(string moduleName, float x, f
 
    string moduleType = tokens[0];
    
-   if (moduleType == "siggen")
-      moduleType = "signalgenerator";
+   moduleType = ModuleFactory::FixUpTypeName(moduleType);
 
    string vstToSetUp = "";
    if (tokens.size() > 1 && tokens[tokens.size() - 1] == ModuleFactory::kVSTSuffix)

@@ -478,9 +478,9 @@ void FloatSlider::SetValue(float value)
          value -= mRelativeOffset;
       }
    }
-   if (mClamped)
+   /*if (mClamped)
       *var = ofClamp(value,mMin,mMax);
-   else
+   else*/
       *var = value;
    DisableLFO();
    if (oldVal != *var)
@@ -572,7 +572,7 @@ void FloatSlider::Compute(int samplesIn /*= 0*/)
    if (mIsSmoothing)
    {
       float oldVal = *mVar;
-      *mVar = ofClamp(mRamp.Value(gTime + samplesIn * gInvSampleRateMs), mMin, mMax);
+      *mVar = mRamp.Value(gTime + samplesIn * gInvSampleRateMs);
       if (oldVal != *mVar)
       {
          mOwner->FloatSliderUpdated(this, oldVal);

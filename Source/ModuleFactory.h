@@ -25,6 +25,7 @@ public:
    ModuleType GetModuleType(string typeName);
    bool IsExperimental(string typeName);
    static void GetPrefabs(vector<string>& prefabs);
+   static string FixUpTypeName(string typeName);
 
    static constexpr const char* kVSTSuffix = "[vst]";
    static constexpr const char* kPrefabSuffix = "[prefab]";

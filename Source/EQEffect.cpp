@@ -22,7 +22,7 @@ EQEffect::EQEffect()
    {
       for (int i=0; i<NUM_EQ_FILTERS; ++i)
       {
-         mBanks[ch].mBiquad[i].SetFilterType(kFilterType_PeakNotch);
+         mBanks[ch].mBiquad[i].SetFilterType(kFilterType_Peak);
          mBanks[ch].mBiquad[i].SetFilterParams(40 * powf(2.2f,i), .1f);
       }
    }

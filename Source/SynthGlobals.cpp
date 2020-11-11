@@ -176,6 +176,18 @@ void Add(float* buff1, const float* buff2, int bufferSize)
 #endif
 }
 
+void Subtract(float* buff1, const float* buff2, int bufferSize)
+{
+#ifdef USE_VECTOR_OPS
+   FloatVectorOperations::subtract(buff1, buff2, bufferSize);
+#else
+   for (int i = 0; i < bufferSize; ++i)
+   {
+      buff1[i] -= buff2[i];
+   }
+#endif
+}
+
 void Mult(float* buff, float val, int bufferSize)
 {
 #ifdef USE_VECTOR_OPS

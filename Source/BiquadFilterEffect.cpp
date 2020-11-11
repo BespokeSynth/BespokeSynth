@@ -28,17 +28,19 @@ void BiquadFilterEffect::CreateUIControls()
    IDrawableModule::CreateUIControls();
    mTypeSelector = new RadioButton(this,"type",4,52,(int*)(&mBiquad[0].mType),kRadioHorizontal);
    mFSlider = new FloatSlider(this,"F",4,4,80,15,&mBiquad[0].mF,10,4000);
-   mQSlider = new FloatSlider(this,"Q",4,20,80,15,&mBiquad[0].mQ,.1f,10);
+   mQSlider = new FloatSlider(this,"Q",4,20,80,15,&mBiquad[0].mQ,.1f,18);
    mGSlider = new FloatSlider(this,"G",4,36,80,15,&mBiquad[0].mDbGain,-96,96,1);
    
    mTypeSelector->AddLabel("lp", kFilterType_Lowpass);
    mTypeSelector->AddLabel("hp", kFilterType_Highpass);
    mTypeSelector->AddLabel("bp", kFilterType_Bandpass);
-   mTypeSelector->AddLabel("pn", kFilterType_PeakNotch);
+   mTypeSelector->AddLabel("pk", kFilterType_Peak);
    
    mFSlider->SetMaxValueDisplay("inf");
    mFSlider->SetMode(FloatSlider::kSquare);
-   mGSlider->SetShowing(mBiquad[0].mType == kFilterType_PeakNotch);
+   mQSlider->SetMode(FloatSlider::kSquare);
+   mQSlider->SetShowing(mBiquad[0].UsesQ());
+   mGSlider->SetShowing(mBiquad[0].UsesGain());
 }
 
 BiquadFilterEffect::~BiquadFilterEffect()
@@ -101,6 +103,25 @@ void BiquadFilterEffect::DrawModule()
    mFSlider->Draw();
    mQSlider->Draw();
    mGSlider->Draw();
+
+   auto FreqForPos = [](float pos) { return 20.0 * std::pow(2.0, pos * 10); };
+
+   float w, h;
+   GetModuleDimensions(w, h);
+   ofSetColor(52, 204, 235);
+   ofSetLineWidth(1);
+   ofBeginShape();
+   const int kPixelStep = 1;
+   for (int x = 0; x < w + kPixelStep; x += kPixelStep)
+   {
+      float freq = FreqForPos(x / w);
+      if (freq < gSampleRate / 2)
+      {
+         float response = mBiquad[0].GetMagnitudeResponseAt(freq);
+         ofVertex(x, (.5f - .666f * log10(response)) * h);
+      }
+   }
+   ofEndShape(false);
 }
 
 float BiquadFilterEffect::GetEffectAmount()
@@ -113,7 +134,7 @@ float BiquadFilterEffect::GetEffectAmount()
       return ofClamp(mBiquad[0].mF/(mFSlider->GetMax() * .75f),0,1);
    if (mBiquad[0].mType == kFilterType_Bandpass)
       return ofClamp(.3f+(mBiquad[0].mQ/mQSlider->GetMax()),0,1);
-   if (mBiquad[0].mType == kFilterType_PeakNotch)
+   if (mBiquad[0].mType == kFilterType_Peak)
       return ofClamp(fabsf(mBiquad[0].mDbGain/96),0,1);
    return 0;
 }
@@ -147,7 +168,8 @@ void BiquadFilterEffect::RadioButtonUpdated(RadioButton* list, int oldVal)
          mBiquad[0].SetFilterParams(mFSlider->GetMax(), mQSlider->GetMin());
       if (mBiquad[0].mType == kFilterType_Highpass)
          mBiquad[0].SetFilterParams(mFSlider->GetMin(), mQSlider->GetMin());
-      mGSlider->SetShowing(mBiquad[0].mType == kFilterType_PeakNotch);
+      mQSlider->SetShowing(mBiquad[0].UsesQ());
+      mGSlider->SetShowing(mBiquad[0].UsesGain());
       mCoefficientsHaveChanged = true;
    }
 }

@@ -147,6 +147,7 @@ void SetGlobalSampleRate(int rate);
 void DrawAudioBuffer(float width, float height, ChannelBuffer* buffer, float start, float end, float pos, float vol=1, ofColor color=ofColor::black);
 void DrawAudioBuffer(float width, float height, const float* buffer, float start, float end, float pos, float vol=1, ofColor color=ofColor::black);
 void Add(float* buff1, const float* buff2, int bufferSize);
+void Subtract(float* buff1, const float* buff2, int bufferSize);
 void Mult(float* buff, float val, int bufferSize);
 void Mult(float* buff1, const float* buff2, int bufferSize);
 void Clear(float* buffer, int bufferSize);

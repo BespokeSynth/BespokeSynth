@@ -9,6 +9,7 @@
 #include "BandVocoder.h"
 #include "ModularSynth.h"
 #include "Profiler.h"
+#include "UIControlMacros.h"
 
 BandVocoder::BandVocoder()
 : IAudioProcessor(gBufferSize)
@@ -20,18 +21,19 @@ BandVocoder::BandVocoder()
 , mVolumeSlider(nullptr)
 , mDryWet(1)
 , mDryWetSlider(nullptr)
-, mNumBands(64)
+, mNumBands(16)
 , mNumBandsSlider(nullptr)
-, mFreqMin(50)
-, mFMinSlider(nullptr)
-, mFreqMax(7500)
-, mFMaxSlider(nullptr)
+, mFreqBase(50)
+, mFBaseSlider(nullptr)
+, mFreqRange(7500)
+, mFRangeSlider(nullptr)
 , mQ(25)
 , mQSlider(nullptr)
 , mRingTime(.01f)
 , mRingTimeSlider(nullptr)
 , mMaxBand(.3f)
 , mMaxBandSlider(nullptr)
+, mSpacingStyle(0)
 {
    mCarrierInputBuffer = new float[GetBuffer()->BufferSize()];
    Clear(mCarrierInputBuffer, GetBuffer()->BufferSize());
@@ -56,16 +58,20 @@ BandVocoder::BandVocoder()
 void BandVocoder::CreateUIControls()
 {
    IDrawableModule::CreateUIControls();
-   mInputSlider = new FloatSlider(this,"input", 5, 29, 100, 15, &mInputPreamp, 0, 2);
-   mCarrierSlider = new FloatSlider(this,"carrier", 5, 47, 100, 15, &mCarrierPreamp, 0, 2);
-   mVolumeSlider = new FloatSlider(this,"volume", 5, 65, 100, 15, &mVolume, 0, 2);
-   mDryWetSlider = new FloatSlider(this,"dry/wet", 5, 83, 100, 15, &mDryWet, 0, 1);
-   mNumBandsSlider = new IntSlider(this,"bands", 110, 29, 100, 15, &mNumBands, 1, VOCODER_MAX_BANDS);
-   mFMinSlider = new FloatSlider(this,"fmin", 110, 47, 100, 15, &mFreqMin, 10, 300);
-   mFMaxSlider = new FloatSlider(this,"fmax", 110, 65, 100, 15, &mFreqMax, 300, gSampleRate/2-1);
-   mQSlider = new FloatSlider(this,"q", 110, 83, 100, 15, &mQ, 0.1f, 50);
-   mRingTimeSlider = new FloatSlider(this, "ring", 110, 101, 100, 15, &mRingTime, .0001f, .1f, 4);
-   mMaxBandSlider = new FloatSlider(this,"max band", 5, 101, 100, 15, &mMaxBand, 0.001f, 1);
+   UIBLOCK0();
+   FLOATSLIDER(mInputSlider,"input", &mInputPreamp, 0, 2);
+   FLOATSLIDER(mCarrierSlider,"carrier", &mCarrierPreamp, 0, 2);
+   FLOATSLIDER(mVolumeSlider,"volume", &mVolume, 0, 2);
+   FLOATSLIDER(mDryWetSlider,"dry/wet", &mDryWet, 0, 1);
+   FLOATSLIDER(mMaxBandSlider, "max band", &mMaxBand, 0.001f, 1);
+   FLOATSLIDER(mSpacingStyleSlider, "spacing", &mSpacingStyle, 0, 1);
+   UIBLOCK_NEWCOLUMN();
+   INTSLIDER(mNumBandsSlider, "bands", &mNumBands, 1, VOCODER_MAX_BANDS);
+   FLOATSLIDER(mFBaseSlider,"f base", &mFreqBase, 10, 300);
+   FLOATSLIDER(mFRangeSlider,"f range", &mFreqRange, 0, gSampleRate/2-1);
+   FLOATSLIDER(mQSlider,"q", &mQ, 0.1f, 50);
+   FLOATSLIDER_DIGITS(mRingTimeSlider, "ring", &mRingTime, .0001f, .1f, 4);
+   ENDUIBLOCK0();
 }
 
 BandVocoder::~BandVocoder()
@@ -143,26 +149,49 @@ void BandVocoder::Process(double time)
 
 void BandVocoder::DrawModule()
 {
-
    if (Minimized() || IsVisible() == false)
-      return;
-   
+      return;  
    
    mInputSlider->Draw();
    mCarrierSlider->Draw();
    mVolumeSlider->Draw();
    mDryWetSlider->Draw();
-   mFMinSlider->Draw();
-   mFMaxSlider->Draw();
+   mFBaseSlider->Draw();
+   mFRangeSlider->Draw();
    mQSlider->Draw();
    mNumBandsSlider->Draw();
    mRingTimeSlider->Draw();
    mMaxBandSlider->Draw();
+   mSpacingStyleSlider->Draw();
    
+   float w, h;
+   GetModuleDimensions(w, h);
+
+   auto PosForFreq = [](float freq) { return log2(freq / 20) / 10; };
    ofSetColor(0,255,0);
    for (int i=0; i<mNumBands; ++i)
    {
-      ofLine(i*3,0,i*3,-mPeaks[i].GetPeak()*200);
+      float x = PosForFreq(mBiquadCarrier[i].mF) * w;
+      ofLine(x,h,x,h-mPeaks[i].GetPeak()*200);
+   }
+
+   auto FreqForPos = [](float pos) { return 20.0 * std::pow(2.0, pos * 10); };
+   ofSetColor(52, 204, 235, 70);
+   ofSetLineWidth(1);
+   for (int i = 0; i < mNumBands; ++i)
+   {
+      ofBeginShape();
+      const int kPixelStep = 1;
+      for (int x = 0; x < w + kPixelStep; x += kPixelStep)
+      {
+         float freq = FreqForPos(x / w);
+         if (freq < gSampleRate / 2)
+         {
+            float response = mBiquadCarrier[i].GetMagnitudeResponseAt(freq);
+            ofVertex(x, (.5f - .666f * log10(response)) * h);
+         }
+      }
+      ofEndShape(false);
    }
 }
 
@@ -170,28 +199,16 @@ void BandVocoder::CalcFilters()
 {
    for (int i=0; i<mNumBands; ++i)
    {
-      float a = float(i)/mNumBands;
-      //float f = Interp(a, mFreqMin, mFreqMax);
-      float f = mFreqMin * powf(mFreqMax/mFreqMin, a);
+      float a = float(i)/(mNumBands-1);
+      float freqMax = ofClamp(mFreqBase + mFreqRange, 0, gSampleRate/2);
+      float fExp = mFreqBase * powf(freqMax /mFreqBase, a);
+      float fLin = ofLerp(mFreqBase, freqMax, a);
+      float f = ofLerp(fExp, fLin, mSpacingStyle);
       
-      if (i==0)
-      {
-         mBiquadCarrier[i].SetFilterType(kFilterType_Lowpass);
-         mBiquadOut[i].SetFilterType(kFilterType_Lowpass);
-      }
-      else if (i == mNumBands-1)
-      {
-         mBiquadCarrier[i].SetFilterType(kFilterType_Highpass);
-         mBiquadOut[i].SetFilterType(kFilterType_Highpass);
-      }
-      else
-      {
-         mBiquadCarrier[i].SetFilterType(kFilterType_Bandpass);
-         mBiquadOut[i].SetFilterType(kFilterType_Bandpass);
-      }
-      
+      mBiquadCarrier[i].SetFilterType(kFilterType_Bandpass);
+      mBiquadOut[i].SetFilterType(kFilterType_Bandpass);
       mBiquadCarrier[i].SetFilterParams(f, mQ);
-      mBiquadOut[i].SetFilterParams(f, mQ);
+      mBiquadOut[i].CopyCoeffFrom(mBiquadCarrier[i]);
    }
 }
 
@@ -209,7 +226,7 @@ void BandVocoder::IntSliderUpdated(IntSlider* slider, int oldVal)
 
 void BandVocoder::FloatSliderUpdated(FloatSlider* slider, float oldVal)
 {
-   if (slider == mFMinSlider || slider == mFMaxSlider || slider == mQSlider)
+   if (slider == mFBaseSlider || slider == mFRangeSlider || slider == mQSlider || slider == mSpacingStyleSlider)
    {
       CalcFilters();
    }

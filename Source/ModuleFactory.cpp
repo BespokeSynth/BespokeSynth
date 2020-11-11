@@ -203,6 +203,7 @@
 #include "FubbleModule.h"
 #include "GlobalControls.h"
 #include "ValueStream.h"
+#include "EQModule.h"
 
 #define REGISTER(class,name,type) Register(#name, &(class::Create), &(class::CanCreate), type, false, false);
 #define REGISTER_HIDDEN(class,name,type) Register(#name, &(class::Create), &(class::CanCreate), type, true, false);
@@ -374,6 +375,7 @@ ModuleFactory::ModuleFactory()
    REGISTER(FubbleModule, fubble, kModuleType_Modulator);
    REGISTER(GlobalControls, globalcontrols, kModuleType_Other);
    REGISTER(ValueStream, valuestream, kModuleType_Other);
+   REGISTER(EQModule, eq, kModuleType_Audio);
 
    //REGISTER_EXPERIMENTAL(MidiPlayer, midiplayer, kModuleType_Instrument);
    REGISTER_EXPERIMENTAL(Razor, razor, kModuleType_Synth);
@@ -502,4 +504,16 @@ void ModuleFactory::GetPrefabs(vector<string>& prefabs)
       if (file.getFileExtension() == ".pfb")
          prefabs.push_back(file.getFileName().toStdString());
    }
+}
+
+//static
+string ModuleFactory::FixUpTypeName(string name)
+{
+   if (name == "siggen")
+      return "signalgenerator";
+
+   if (name == "eqmodule")
+      return "eq";
+
+   return name;
 }

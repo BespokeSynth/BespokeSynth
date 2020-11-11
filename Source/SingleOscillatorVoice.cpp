@@ -124,11 +124,12 @@ bool SingleOscillatorVoice::Process(double time, ChannelBuffer* out)
          //PROFILER(SingleOscillatorVoice_filter);
          float f = mFilterAdsr.Value(time) * mVoiceParams->mFilterCutoff;
          float q = mVoiceParams->mFilterQ;
-         mFilterLeft.SetFilterParams(f, q);
+         if (f != mFilterLeft.mF || q != mFilterLeft.mQ)
+            mFilterLeft.SetFilterParams(f, q);
          summedLeft = mFilterLeft.Filter(summedLeft);
          if (!mono)
          {
-            mFilterRight.SetFilterParams(f, q);
+            mFilterRight.CopyCoeffFrom(mFilterLeft);
             summedRight = mFilterRight.Filter(summedRight);
          }
       }

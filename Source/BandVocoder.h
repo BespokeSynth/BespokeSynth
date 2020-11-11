@@ -74,14 +74,16 @@ private:
    FloatSlider* mQSlider;
    IntSlider* mNumBandsSlider;
    int mNumBands;
-   float mFreqMin;
-   float mFreqMax;
-   FloatSlider* mFMinSlider;
-   FloatSlider* mFMaxSlider;
+   float mFreqBase;
+   float mFreqRange;
+   FloatSlider* mFBaseSlider;
+   FloatSlider* mFRangeSlider;
    float mRingTime;
    FloatSlider* mRingTimeSlider;
    float mMaxBand;
    FloatSlider* mMaxBandSlider;
+   float mSpacingStyle;
+   FloatSlider* mSpacingStyleSlider;
    
    BiquadFilter mBiquadCarrier[VOCODER_MAX_BANDS];
    BiquadFilter mBiquadOut[VOCODER_MAX_BANDS];
