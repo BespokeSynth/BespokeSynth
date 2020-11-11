@@ -172,13 +172,16 @@ void EQModule::DrawModule()
    ofSetLineWidth(1);
    int end = kNumFFTBins / 2 + 1;
    ofBeginShape();
+   int lastX = -1;
    for (int i = kBinIgnore; i < end; i++)
    {
       float freq = FreqForBin(i);
       float x = PosForFreq(freq) * w;
       float samp = sqrtf(fabsf(mFFTData.mRealValues[i]) / end) * 3;
       float y = (1 - ofClamp(samp, 0, 1)) * h + kDrawYOffset;
-      ofVertex(x, y);
+      if (int(x) != lastX)
+         ofVertex(x, y);
+      lastX = int(x);
 
       mSmoother[i - kBinIgnore] = ofLerp(mSmoother[i - kBinIgnore], samp, .1f);
    }
@@ -193,7 +196,9 @@ void EQModule::DrawModule()
       float freq = FreqForBin(i);
       float x = PosForFreq(freq) * w;
       float y = (1 - ofClamp(mSmoother[i - kBinIgnore], 0, 1)) * h + kDrawYOffset;
-      ofVertex(x, y);
+      if (int(x) != lastX)
+         ofVertex(x, y);
+      lastX = int(x);
    }
    ofEndShape(false);
 
@@ -216,7 +221,8 @@ void EQModule::DrawModule()
                if (filter.mEnabled)
                   response *= filter.mFilter[0].GetMagnitudeResponseAt(freq);
             }
-            mFrequencyResponse[responseGraphIndex] = response;
+            if (responseGraphIndex < mFrequencyResponse.size())
+               mFrequencyResponse[responseGraphIndex] = response;
          }
          else
          {

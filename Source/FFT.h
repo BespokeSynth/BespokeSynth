@@ -10,6 +10,7 @@
 #define __modularSynth__FFT__
 
 #include <iostream>
+#include "SynthGlobals.h"
 
 // Variables for FFT routine
 class FFT
@@ -28,17 +29,31 @@ private:
 struct FFTData
 {
    FFTData(int windowSize, int freqDomainSize)
+      : mWindowSize(windowSize)
+      , mFreqDomainSize(freqDomainSize)
    {
       mRealValues = new float[freqDomainSize];
       mImaginaryValues = new float[freqDomainSize];
       mTimeDomain = new float[windowSize];
+      Clear();
    }
+
    ~FFTData()
    {
       delete[] mRealValues;
       delete[] mImaginaryValues;
       delete[] mTimeDomain;
    }
+
+   void Clear()
+   {
+      bzero(mRealValues, mFreqDomainSize * sizeof(float));
+      bzero(mImaginaryValues, mFreqDomainSize * sizeof(float));
+      bzero(mTimeDomain, mWindowSize * sizeof(float));
+   }
+
+   int mWindowSize;
+   int mFreqDomainSize;
    float* mRealValues;
    float* mImaginaryValues;
    float* mTimeDomain;
