@@ -3,7 +3,7 @@
 <JUCERPROJECT id="vxkFwd" name="BespokeSynth" projectType="guiapp" version="1.0.0"
               bundleIdentifier="com.ryanchallinor.Bespoke" includeBinaryInAppConfig="1"
               jucerVersion="5.4.7" displaySplashScreen="1" reportAppUsage="1"
-              splashScreenColour="Dark" cppLanguageStandard="11" companyCopyright="">
+              splashScreenColour="Dark" cppLanguageStandard="14" companyCopyright="">
   <MAINGROUP id="w4HLAu" name="BespokeSynth">
     <GROUP id="{531CC336-D9CD-1F6E-7272-2D8ADD98F839}" name="libraries">
       <FILE id="u46FMQ" name="PerlinNoise.h" compile="0" resource="0" file="Source/PerlinNoise.h"/>
@@ -1068,7 +1068,7 @@
       </MODULEPATHS>
     </VS2015>
     <LINUX_MAKE targetFolder="Builds/LinuxMakefile" extraDefs="GLEW_STATIC&#10;GL_GLEXT_PROTOTYPES&#10;BESPOKE_LINUX"
-                externalLibraries="usb-1.0" extraCompilerFlags="&#96;python-config --cflags&#96;"
+                externalLibraries="usb-1.0" extraCompilerFlags="&#96;python-config --cflags&#96; -fvisibility=hidden"
                 extraLinkerFlags="&#96;python-config --ldflags&#96;" smallIcon="h1Eo7f"
                 bigIcon="h1Eo7f">
       <CONFIGURATIONS>
