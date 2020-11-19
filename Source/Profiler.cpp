@@ -9,6 +9,9 @@
 #include "Profiler.h"
 #include "SynthGlobals.h"
 #include <time.h>
+#if BESPOKE_WINDOWS
+#include <intrin.h>
+#endif
 
 Profiler::Cost Profiler::sCosts[];
 bool Profiler::sEnableProfiler = false;
@@ -17,7 +20,12 @@ namespace {
    static inline uint64_t rdtscp( uint32_t & aux )
    {
 #if BESPOKE_WINDOWS
-      return 0;   //TODO(Ryan)
+      unsigned __int64 i;
+      unsigned int ui;
+      i = __rdtscp(&ui);
+      //printf_s("%I64d ticks\n", i);
+      //printf_s("TSC_AUX was %x\n", ui);
+      return i;
 #else
       uint64_t rax,rdx;
       asm volatile ( "rdtscp\n" : "=a" (rax), "=d" (rdx), "=c" (aux) : : );
