@@ -68,10 +68,13 @@ void FloatSliderLFOControl::CreateUIControls()
    mIntervalSelector->AddLabel("2n", kInterval_2n);
    mIntervalSelector->AddLabel("4n", kInterval_4n);
    mIntervalSelector->AddLabel("4nt", kInterval_4nt);
+   mIntervalSelector->AddLabel("4nd", kInterval_4nd);
    mIntervalSelector->AddLabel("8n", kInterval_8n);
    mIntervalSelector->AddLabel("8nt", kInterval_8nt);
+   mIntervalSelector->AddLabel("8nd", kInterval_8nd);
    mIntervalSelector->AddLabel("16n", kInterval_16n);
    mIntervalSelector->AddLabel("16nt", kInterval_16nt);
+   mIntervalSelector->AddLabel("16nd", kInterval_16nd);
    mIntervalSelector->AddLabel("32n", kInterval_32n);
    
    mOscSelector->AddLabel("sin",kOsc_Sin);
