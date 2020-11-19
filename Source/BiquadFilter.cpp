@@ -12,7 +12,7 @@
 BiquadFilter::BiquadFilter()
 : mType(kFilterType_Lowpass)
 , mF(4000)
-, mQ(1)
+, mQ(sqrt(2) / 2)
 , mDbGain(0)
 {
    Clear();
@@ -27,7 +27,7 @@ void BiquadFilter::Clear()
 
 void BiquadFilter::UpdateFilterCoeff()
 {
-   if (mF<=0)
+   if (mF <= 0 || mF != mF)
    {
       mA0 = 1;
       mA1 = 0;
@@ -167,6 +167,14 @@ void BiquadFilter::UpdateFilterCoeff()
             mB1 = 2 * (K * K - V) * norm;
             mB2 = (V - sqrt(2 * V) * K + K * K) * norm;
          }
+         break;
+      case kFilterType_Allpass:
+         norm = 1 / (1 + K / mQ + K * K);
+         mA0 = (1 - K / mQ + K * K) * norm;
+         mA1 = 2 * (K * K - 1) * norm;
+         mA2 = 1;
+         mB1 = mA1;
+         mB2 = mA0;
          break;
    }
 }

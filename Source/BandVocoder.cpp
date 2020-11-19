@@ -64,10 +64,10 @@ void BandVocoder::CreateUIControls()
    FLOATSLIDER(mVolumeSlider,"volume", &mVolume, 0, 2);
    FLOATSLIDER(mDryWetSlider,"dry/wet", &mDryWet, 0, 1);
    FLOATSLIDER(mMaxBandSlider, "max band", &mMaxBand, 0.001f, 1);
-   FLOATSLIDER(mSpacingStyleSlider, "spacing", &mSpacingStyle, 0, 1);
+   FLOATSLIDER(mSpacingStyleSlider, "spacing", &mSpacingStyle, -1, 1);
    UIBLOCK_NEWCOLUMN();
-   INTSLIDER(mNumBandsSlider, "bands", &mNumBands, 1, VOCODER_MAX_BANDS);
-   FLOATSLIDER(mFBaseSlider,"f base", &mFreqBase, 10, 300);
+   INTSLIDER(mNumBandsSlider, "bands", &mNumBands, 2, VOCODER_MAX_BANDS);
+   FLOATSLIDER(mFBaseSlider,"f base", &mFreqBase, 20, 300);
    FLOATSLIDER(mFRangeSlider,"f range", &mFreqRange, 0, gSampleRate/2-1);
    FLOATSLIDER(mQSlider,"q", &mQ, 0.1f, 50);
    FLOATSLIDER_DIGITS(mRingTimeSlider, "ring", &mRingTime, .0001f, .1f, 4);
@@ -201,9 +201,14 @@ void BandVocoder::CalcFilters()
    {
       float a = float(i)/(mNumBands-1);
       float freqMax = ofClamp(mFreqBase + mFreqRange, 0, gSampleRate/2);
-      float fExp = mFreqBase * powf(freqMax /mFreqBase, a);
+      float fExp = mFreqBase * powf(freqMax / mFreqBase, a);
       float fLin = ofLerp(mFreqBase, freqMax, a);
-      float f = ofLerp(fExp, fLin, mSpacingStyle);
+      float fBass = ofLerp(mFreqBase, freqMax, a*a*a*a);
+      float f;
+      if (mSpacingStyle >= 0)
+         f = ofLerp(fExp, fLin, mSpacingStyle);
+      else
+         f = ofLerp(fExp, fBass, -mSpacingStyle);
       
       mBiquadCarrier[i].SetFilterType(kFilterType_Bandpass);
       mBiquadOut[i].SetFilterType(kFilterType_Bandpass);
@@ -214,6 +219,14 @@ void BandVocoder::CalcFilters()
 
 void BandVocoder::CheckboxUpdated(Checkbox* checkbox)
 {
+   if (checkbox == mEnabledCheckbox)
+   {
+      for (int i = 0; i < VOCODER_MAX_BANDS; ++i)
+      {
+         mBiquadCarrier[i].Clear();
+         mBiquadOut[i].Clear();
+      }
+   }
 }
 
 void BandVocoder::IntSliderUpdated(IntSlider* slider, int oldVal)

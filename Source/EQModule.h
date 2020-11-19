@@ -91,4 +91,5 @@ private:
    int mDragging;
    std::array<float, 1024> mFrequencyResponse;
    bool mNeedToUpdateFrequencyResponseGraph;
+   float mDrawGain;
 };

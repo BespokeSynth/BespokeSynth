@@ -23,6 +23,7 @@ EQModule::EQModule()
    , mHoveredFilterHandleIndex(-1)
    , mDragging(false)
    , mNeedToUpdateFrequencyResponseGraph(true)
+   , mDrawGain(1)
 {
    // Generate a window with a single raised cosine from N/4 to 3N/4
    mWindower = new float[kNumFFTBins];
@@ -177,8 +178,8 @@ void EQModule::DrawModule()
    {
       float freq = FreqForBin(i);
       float x = PosForFreq(freq) * w;
-      float samp = sqrtf(fabsf(mFFTData.mRealValues[i]) / end) * 3;
-      float y = (1 - ofClamp(samp, 0, 1)) * h + kDrawYOffset;
+      float samp = ofClamp(sqrtf(fabsf(mFFTData.mRealValues[i]) / end) * 3 * mDrawGain, 0, 1);
+      float y = (1 - samp) * h + kDrawYOffset;
       if (int(x) != lastX)
          ofVertex(x, y);
       lastX = int(x);
@@ -195,7 +196,7 @@ void EQModule::DrawModule()
    {
       float freq = FreqForBin(i);
       float x = PosForFreq(freq) * w;
-      float y = (1 - ofClamp(mSmoother[i - kBinIgnore], 0, 1)) * h + kDrawYOffset;
+      float y = (1 - mSmoother[i - kBinIgnore]) * h + kDrawYOffset;
       if (int(x) != lastX)
          ofVertex(x, y);
       lastX = int(x);
@@ -353,7 +354,11 @@ void EQModule::CheckboxUpdated(Checkbox* checkbox)
    for (auto& filter : mFilters)
    {
       if (checkbox == filter.mEnabledCheckbox)
+      {
+         filter.mFilter[0].Clear();
+         filter.mFilter[1].Clear();
          mNeedToUpdateFrequencyResponseGraph = true;
+      }
    }
 }
 
@@ -371,6 +376,7 @@ void EQModule::LoadLayout(const ofxJSONElement& moduleInfo)
    mModuleSaveData.LoadString("target", moduleInfo);
    mModuleSaveData.LoadInt("width", moduleInfo, mWidth, 50, 2000, K(isTextField));
    mModuleSaveData.LoadInt("height", moduleInfo, mHeight, 50, 2000, K(isTextField));
+   mModuleSaveData.LoadFloat("draw_gain", moduleInfo, 1, .1f, 4, K(isTextField));
 
    SetUpFromSaveData();
 }
@@ -387,4 +393,5 @@ void EQModule::SetUpFromSaveData()
    SetTarget(TheSynth->FindModule(mModuleSaveData.GetString("target")));
    mWidth = mModuleSaveData.GetInt("width");
    mHeight = mModuleSaveData.GetInt("height");
+   mDrawGain = mModuleSaveData.GetFloat("draw_gain");
 }

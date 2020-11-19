@@ -22,7 +22,8 @@ enum FilterType
    kFilterType_LowShelf,
    kFilterType_HighShelf,
    kFilterType_LowShelfNoQ,
-   kFilterType_HighShelfNoQ
+   kFilterType_HighShelfNoQ,
+   kFilterType_Allpass
 };
 
 class BiquadFilter

@@ -28,13 +28,14 @@ void BiquadFilterEffect::CreateUIControls()
    IDrawableModule::CreateUIControls();
    mTypeSelector = new RadioButton(this,"type",4,52,(int*)(&mBiquad[0].mType),kRadioHorizontal);
    mFSlider = new FloatSlider(this,"F",4,4,80,15,&mBiquad[0].mF,10,4000);
-   mQSlider = new FloatSlider(this,"Q",4,20,80,15,&mBiquad[0].mQ,.1f,18);
+   mQSlider = new FloatSlider(this,"Q",4,20,80,15,&mBiquad[0].mQ,.1f,18,3);
    mGSlider = new FloatSlider(this,"G",4,36,80,15,&mBiquad[0].mDbGain,-96,96,1);
    
    mTypeSelector->AddLabel("lp", kFilterType_Lowpass);
    mTypeSelector->AddLabel("hp", kFilterType_Highpass);
    mTypeSelector->AddLabel("bp", kFilterType_Bandpass);
    mTypeSelector->AddLabel("pk", kFilterType_Peak);
+   mTypeSelector->AddLabel("ap", kFilterType_Allpass);
    
    mFSlider->SetMaxValueDisplay("inf");
    mFSlider->SetMode(FloatSlider::kSquare);
@@ -141,16 +142,16 @@ float BiquadFilterEffect::GetEffectAmount()
 
 void BiquadFilterEffect::GetModuleDimensions(float& width, float& height)
 {
-   width = 90;
+   width = 120;
    height = 69;
 }
 
 void BiquadFilterEffect::ResetFilter()
 {
    if (mBiquad[0].mType == kFilterType_Lowpass)
-      mBiquad[0].SetFilterParams(mFSlider->GetMax(), mQSlider->GetMin());
+      mBiquad[0].SetFilterParams(mFSlider->GetMax(), sqrt(2) / 2);
    if (mBiquad[0].mType == kFilterType_Highpass)
-      mBiquad[0].SetFilterParams(mFSlider->GetMin(), mQSlider->GetMin());
+      mBiquad[0].SetFilterParams(mFSlider->GetMin(), sqrt(2) / 2);
    
    for (int i=0; i<ChannelBuffer::kMaxNumChannels; ++i)
       mBiquad[i].Clear();
@@ -208,16 +209,10 @@ void BiquadFilterEffect::FloatSliderUpdated(FloatSlider* slider, float oldVal)
 
 void BiquadFilterEffect::LoadLayout(const ofxJSONElement& info)
 {
-   mModuleSaveData.LoadFloat("f_min", info, 10, 1, 40000, K(isTextField));
-   mModuleSaveData.LoadFloat("f_max", info, 4000, 1, 40000, K(isTextField));
-   mModuleSaveData.LoadFloat("q_min", info, 1, .1f, 50, K(isTextField));
-   mModuleSaveData.LoadFloat("q_max", info, 10, .1f, 50, K(isTextField));
 }
 
 void BiquadFilterEffect::SetUpFromSaveData()
 {
-   mFSlider->SetExtents(mModuleSaveData.GetFloat("f_min"), mModuleSaveData.GetFloat("f_max"));
-   mQSlider->SetExtents(mModuleSaveData.GetFloat("q_min"), mModuleSaveData.GetFloat("q_max"));
    ResetFilter();
 }
 
