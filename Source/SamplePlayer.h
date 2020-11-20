@@ -133,5 +133,7 @@ private:
       FloatSlider* mSpeedSlider;
    };
    vector<SampleCuePoint> mSampleCuePoints{16};
+
+   string mErrorString;
 };
 

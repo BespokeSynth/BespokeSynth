@@ -75,6 +75,10 @@ bool Sample::Read(const char* path, bool mono)
       Reset();
       return true;
    }
+   else
+   {
+      TheSynth->LogEvent("failed to load sample " + file.getFullPathName().toStdString(), kLogEventType_Error);
+   }
    
    return false;
 }

@@ -262,6 +262,8 @@ void SamplePlayer::UpdateSample(Sample* sample, bool ownsSample)
       mSampleCuePoints[i].mStartSlider->SetExtents(0, lengthSeconds);
       mSampleCuePoints[i].mLengthSlider->SetExtents(0, lengthSeconds);
    }
+
+   mErrorString = "";
 }
 
 void SamplePlayer::ButtonClicked(ClickButton *button)
@@ -301,27 +303,60 @@ void SamplePlayer::TextEntryComplete(TextEntry* entry)
 
 void SamplePlayer::DownloadYoutube(string search, string options)
 {
-   auto file = juce::File(ofToDataPath("youtube.wav"));
-   if (file.existsAsFile())
-      file.deleteFile();
+   mPlay = false;
+   if (mSample)
+      mSample->SetPlayPosition(0);
+
+   const char* tempDownloadName = "youtube.m4a";
+   {
+      auto file = juce::File(ofToDataPath(tempDownloadName));
+      if (file.existsAsFile())
+         file.deleteFile();
+   }
+
+   const char* tempFinalName = "youtube.wav";
+   {
+      auto file = juce::File(ofToDataPath(tempFinalName));
+      if (file.existsAsFile())
+         file.deleteFile();
+   }
    
    char command[2048];
-   sprintf(command, "export PATH=/opt/local/bin:$PATH; youtube-dl %s -x --audio-format wav -f bestaudio -o %s -w %s", search.c_str(), ofToDataPath("youtube.m4a").c_str(), options.c_str());
+#if BESPOKE_WINDOWS
+   string prefix = "youtube-dl.exe";
+#else
+   string prefix = "export PATH=/opt/local/bin:$PATH; youtube-dl";
+#endif
+   sprintf(command, "%s %s --extract-audio --audio-format wav --audio-quality 0 -o \"%s\" %s", prefix.c_str(), search.c_str(), ofToDataPath(tempDownloadName).c_str(), options.c_str());
+   ofLog() << "running " << command;
    FILE* output = popen(command, "r");
-   
-   char c;
-   do
+
+   string print = "";
+   while (true)
    {
-      c = fgetc(output);
-      printf("%c",c);
-   } while (c != EOF);
+      char c = fgetc(output);
+      if (c != EOF)
+         print += c;
+      else
+         break;
+   }
+   ofLog() << print;
    
    pclose(output);
+
+   ofLog() << "finished running " << command;
    
    Sample* sample = new Sample();
-   if (juce::File(ofToDataPath("youtube.wav")).existsAsFile())
-      sample->Read(ofToDataPath("youtube.wav").c_str());
-   UpdateSample(sample, true);
+   if (juce::File(ofToDataPath(tempFinalName)).existsAsFile())
+   {
+      sample->Read(ofToDataPath(tempFinalName).c_str());
+      UpdateSample(sample, true);
+   }
+   else
+   {
+      UpdateSample(new Sample(), true);
+      mErrorString = "couldn't download sample. do you have youtube-dl and ffmpeg installed?";
+   }
 }
 
 void SamplePlayer::LoadFile()
@@ -425,7 +460,17 @@ void SamplePlayer::DrawModule()
 
    ofPushMatrix();
    ofTranslate(5,58);
-   if (mSample)
+   if (mErrorString != "")
+   {
+      ofPushStyle();
+      ofFill();
+      ofSetColor(255, 255, 255, 50);
+      ofRect(0, 0, mWidth - 10, mHeight - 65);
+      ofSetColor(220, 0, 0);
+      DrawTextNormal(mErrorString, 10, 10, 10);
+      ofPopStyle();
+   }
+   else if (mSample && mSample->LengthInSamples() > 0)
    {
       float sampleWidth = mWidth - 10;
       DrawAudioBuffer(sampleWidth, mHeight - 65, &mDrawBuffer, 0, mDrawBuffer.BufferSize(), mSample->GetPlayPosition());
