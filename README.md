@@ -5,7 +5,7 @@ You can find the most recent builds for Mac/Windows/Linux at https://github.com/
 
 ![screenshot](screenshot-1.png)
 
-## Basic Overview/Tutorial
+## Basic Overview/Tutorial Video
 [![Bespoke Overview](https://img.youtube.com/vi/SYBc8X2IxqM/0.jpg)](https://www.youtube.com/watch?v=SYBc8X2IxqM)
 * https://youtu.be/SYBc8X2IxqM
 
