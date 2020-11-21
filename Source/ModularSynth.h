@@ -187,6 +187,8 @@ public:
    ofxJSONElement GetUserPrefs() { return mUserPrefs; }
    
    void SetFatalError(string error) { if(mFatalError == "") mFatalError = error; }
+
+   static bool sShouldAutosave;
    
 private:
    void ResetLayout();
@@ -199,6 +201,7 @@ private:
    IDrawableModule* DuplicateModule(IDrawableModule* module);
    void DeleteAllModules();
    void TriggerClapboard();
+   void DoAutosave();
    
    ofSoundStream mSoundStream;
    int mIOBufferSize;

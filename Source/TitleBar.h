@@ -104,6 +104,7 @@ private:
    ClickButton* mDisplayHelpButton;
    Checkbox* mEventLookaheadCheckbox;
    int mLoadLayoutIndex;
+   Checkbox* mShouldAutosaveCheckbox;
    
    HelpDisplay* mHelpDisplay;
    

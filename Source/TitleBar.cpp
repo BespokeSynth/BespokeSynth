@@ -151,7 +151,8 @@ void TitleBar::CreateUIControls()
    mWriteAudioButton = new ClickButton(this,"write audio",280,1);
    mDisplayHelpButton = new ClickButton(this," ? ",380,1);
    mLoadLayoutDropdown = new DropdownList(this, "load layout", 140, 20, &mLoadLayoutIndex);
-   mEventLookaheadCheckbox = new Checkbox(this, "do event lookahead (exp.)", mResetLayoutButton, kAnchor_Right, &Transport::sDoEventLookahead);
+   mEventLookaheadCheckbox = new Checkbox(this, "lookahead (exp.)", mResetLayoutButton, kAnchor_Right, &Transport::sDoEventLookahead);
+   mShouldAutosaveCheckbox = new Checkbox(this, "autosave", mEventLookaheadCheckbox, kAnchor_Right_Padded, &ModularSynth::sShouldAutosave);
    
    mLoadLayoutDropdown->SetShowing(false);
    mSaveLayoutButton->SetShowing(false);
@@ -343,6 +344,7 @@ void TitleBar::DrawModule()
    mDisplayHelpButton->SetPosition(ofGetWidth()/gDrawScale - 20, 4);
    mDisplayHelpButton->Draw();
    mEventLookaheadCheckbox->Draw();
+   mShouldAutosaveCheckbox->Draw();
 }
 
 bool TitleBar::HiddenByZoom() const

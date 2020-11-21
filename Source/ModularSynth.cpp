@@ -37,6 +37,9 @@ ModularSynth* TheSynth = nullptr;
 
 #define RECORDING_LENGTH (gSampleRate*60*30) //30 minutes of recording
 
+//static
+bool ModularSynth::sShouldAutosave = true;
+
 void AtExit()
 {
    TheSynth->Exit();
@@ -108,12 +111,15 @@ void ModularSynth::Setup(GlobalManagers* globalManagers, juce::Component* mainCo
       mIOBufferSize = gBufferSize;
       gSampleRate = mUserPrefs["samplerate"].asInt();
 
+      sShouldAutosave = mUserPrefs["autosave"].isNull() ? false : (mUserPrefs["autosave"].asInt() > 0);
+
       if (!mUserPrefs["scroll_multiplier_horizontal"].isNull())
          mScrollMultiplierHorizontal = mUserPrefs["scroll_multiplier_horizontal"].asDouble();
       if (!mUserPrefs["scroll_multiplier_vertical"].isNull())
          mScrollMultiplierVertical = mUserPrefs["scroll_multiplier_vertical"].asDouble();
 
       juce::File(ofToDataPath("savestate")).createDirectory();
+      juce::File(ofToDataPath("savestate/autosave")).createDirectory();
       juce::File(ofToDataPath("recordings")).createDirectory();
       juce::File(ofToDataPath("internal")).createDirectory();
       juce::File(ofToDataPath("samples")).createDirectory();
@@ -2035,11 +2041,44 @@ void ModularSynth::ClearConsoleInput()
    mConsoleEntry->UpdateDisplayString();
 }
 
+namespace
+{
+   class FileTimeComparator
+   {
+   public:
+      int compareElements(juce::File first, juce::File second)
+      {
+         return (first.getCreationTime() < second.getCreationTime()) ? 1 : ((first.getCreationTime() == second.getCreationTime()) ? 0 : -1);
+      }
+   };
+}
+
+void ModularSynth::DoAutosave()
+{
+   const int kMaxAutosaveSlots = 10;
+
+   juce::File parentDirectory(ofToDataPath("savestate/autosave"));
+   Array<juce::File> autosaveFiles;
+   parentDirectory.findChildFiles(autosaveFiles, juce::File::findFiles, false, "*.bsk");
+   if (autosaveFiles.size() >= kMaxAutosaveSlots)
+   {
+      FileTimeComparator cmp;
+      autosaveFiles.sort(cmp, false);
+      for (int i = kMaxAutosaveSlots; i < autosaveFiles.size(); ++i) //delete oldest files beyond slot limit
+         autosaveFiles[i].deleteFile();
+   }
+
+   SaveState(ofGetTimestampString("savestate/autosave/autosave_%Y-%m-%d_%H-%M-%S.bsk"));
+}
+
 IDrawableModule* ModularSynth::SpawnModuleOnTheFly(string moduleName, float x, float y, bool addToContainer)
 {
    vector<string> tokens = ofSplitString(moduleName," ");
    if (tokens.size() == 0)
       return nullptr;
+
+   if (sShouldAutosave)
+      DoAutosave();
 
    string moduleType = tokens[0];
    
