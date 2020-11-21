@@ -12,6 +12,13 @@ You can find the most recent builds for Mac/Windows/Linux at https://github.com/
 ### Quick Reference
 ![quick reference](bespoke_quick_reference.png)
 
+### Features
+* live-patchable environment, so you can build while the music is playing
+* VST hosting
+* Python livecoding
+* MIDI controller mapping
+* Works on Windows, Mac, and Linux
+
 ### Recent videos of Bespoke usage
 * https://twitter.com/awwbees/status/1294025917510168578
 * https://twitter.com/awwbees/status/1282500237697921025
