@@ -47,7 +47,7 @@ void ControlSequencer::CreateUIControls()
    AddPatchCableSource(mControlCable);
    
    mGrid->SetGridMode(UIGrid::kMultislider);
-   mGrid->SetHighlightCol(-1);
+   mGrid->SetHighlightCol(gTime, -1);
    mGrid->SetClickClearsToZero(false);
    mGrid->SetMajorColSize(4);
    mGrid->SetListener(this);
@@ -96,7 +96,7 @@ void ControlSequencer::OnTimeEvent(double time)
    int measure = TheTransport->GetMeasure(time) % numMeasures;
    int step = ((TheTransport->GetQuantized(time, mInterval) % stepsPerMeasure) + measure * stepsPerMeasure) % mGrid->GetCols();
    
-   mGrid->SetHighlightCol(step);
+   mGrid->SetHighlightCol(time, step);
    
    if (mUIControl && mEnabled)
    {

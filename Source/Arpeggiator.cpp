@@ -446,7 +446,7 @@ void Arpeggiator::OnTimeEvent(double time)
          mLastPitch = -1;
    }
 
-   mGrid->SetHighlightCol(mArpIndex);
+   mGrid->SetHighlightCol(time, mArpIndex);
 }
 
 void Arpeggiator::TextEntryComplete(TextEntry* entry)

@@ -192,7 +192,7 @@ GridColor StepSequencer::GetGridColor(int x, int y)
    Vec2i gridPos = ControllerToGrid(Vec2i(x,y));
    bool cellOn = mGrid->GetVal(gridPos.x,gridPos.y) > 0;
    bool cellBright = mGrid->GetVal(gridPos.x,gridPos.y) > kMidwayVelocity;
-   bool colOn = (mGrid->GetHighlightCol() == gridPos.x) && mEnabled;
+   bool colOn = (mGrid->GetHighlightCol(gTime) == gridPos.x) && mEnabled;
    
    GridColor color;
    if (colOn)
@@ -630,7 +630,7 @@ void StepSequencer::OnTimeEvent(double time)
    }
  
    mCurrentColumn = GetStepNum(time);
-   mGrid->SetHighlightCol(mCurrentColumn);
+   mGrid->SetHighlightCol(time, mCurrentColumn);
    UpdateLights();
    UpdateMetaLights();
 }

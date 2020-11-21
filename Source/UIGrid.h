@@ -47,8 +47,8 @@ public:
    void SetVal(int col, int row, float val, bool notifyListener = true);
    float GetValRefactor(int row, int col);
    void SetValRefactor(int row, int col, float val);
-   void SetHighlightCol(int col) { mHighlightCol = col; }
-   int GetHighlightCol() const { return mHighlightCol; }
+   void SetHighlightCol(double time, int col);
+   int GetHighlightCol(double time) const;
    void SetMajorColSize(int size) { mMajorCol = size; }
    int GetMajorColSize() const { return mMajorCol; }
    void SetSingleColumnMode(int set) { mSingleColumn = set; }
@@ -95,6 +95,13 @@ private:
    
    float GetX(int col, int row) const;
    float GetY(int row) const;
+
+   struct HighlightColBuffer
+   {
+      HighlightColBuffer() : time(0), col(-1) {}
+      double time;
+      int col;
+   };
    
    float mWidth;
    float mHeight;
@@ -105,7 +112,8 @@ private:
    int mHoldCol;
    int mHoldRow;
    float mData[MAX_GRID_SIZE][MAX_GRID_SIZE];
-   int mHighlightCol;
+   std::array<HighlightColBuffer, 10> mHighlightColBuffer;
+   int mNextHighlightColPointer;
    int mMajorCol;
    bool mSingleColumn;
    bool mFlip;

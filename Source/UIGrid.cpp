@@ -14,6 +14,7 @@ UIGrid::UIGrid(int x, int y, int w, int h, int cols, int rows, IClickable* paren
 : mClick(false)
 , mWidth(w)
 , mHeight(h)
+, mNextHighlightColPointer(0)
 , mMajorCol(-1)
 , mSingleColumn(false)
 , mFlip(false)
@@ -25,7 +26,6 @@ UIGrid::UIGrid(int x, int y, int w, int h, int cols, int rows, IClickable* paren
 , mHoldRow(0)
 , mRestrictDragToRow(false)
 , mClickClearsToZero(true)
-, mHighlightCol(-1)
 , mShouldDrawValue(false)
 , mMomentary(false)
 {
@@ -110,12 +110,12 @@ void UIGrid::Render()
             ofRect(GetX(i,j), GetY(j), xsize, ysize);
       }
    }
-   if (mHighlightCol != -1)
+   if (GetHighlightCol(gTime) != -1)
    {
       ofNoFill();
       ofSetColor(0,255,0, gModuleDrawAlpha);
       for (int j=0; j<mRows; ++j)
-         ofRect(GetX(mHighlightCol,j), GetY(j), xsize, ysize);
+         ofRect(GetX(GetHighlightCol(gTime),j), GetY(j), xsize, ysize);
    }
    if (mCurrentHover != -1 && mShouldDrawValue)
    {
@@ -382,6 +382,28 @@ float UIGrid::GetValRefactor(int row, int col)
 void UIGrid::SetValRefactor(int row, int col, float val)
 {
    SetVal(col, row, val);
+}
+
+void UIGrid::SetHighlightCol(double time, int col)
+{
+   mHighlightColBuffer[mNextHighlightColPointer].time = time;
+   mHighlightColBuffer[mNextHighlightColPointer].col = col;
+   mNextHighlightColPointer = (mNextHighlightColPointer + 1) % mHighlightColBuffer.size();
+}
+
+int UIGrid::GetHighlightCol(double time) const
+{
+   int ret = -1;
+   double latestTime = -1;
+   for (size_t i = 0; i < mHighlightColBuffer.size(); ++i)
+   {
+      if (mHighlightColBuffer[i].time <= time && mHighlightColBuffer[i].time > latestTime)
+      {
+         ret = mHighlightColBuffer[i].col;
+         latestTime = mHighlightColBuffer[i].time;
+      }
+   }
+   return ret;
 }
 
 namespace

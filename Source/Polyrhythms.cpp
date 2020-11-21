@@ -60,7 +60,7 @@ void Polyrhythms::OnTransportAdvanced(float amount)
          PlayNoteOutput(gTime, mRhythmLines[i]->mNote, 127, -1);
       }
 
-      mRhythmLines[i]->mGrid->SetHighlightCol(quantized);
+      mRhythmLines[i]->mGrid->SetHighlightCol(gTime, quantized);
    }
 }
 

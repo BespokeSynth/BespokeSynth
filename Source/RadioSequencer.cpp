@@ -40,7 +40,7 @@ void RadioSequencer::CreateUIControls()
    mLengthSelector = new DropdownList(this,"length",-1,-1,(int*)(&mLength));
    mGridController = new GridController(this, "grid", -1, -1);
    
-   mGrid->SetHighlightCol(-1);
+   mGrid->SetHighlightCol(gTime, -1);
    mGrid->SetSingleColumnMode(true);
    mGrid->SetMajorColSize(4);
    mGrid->SetListener(this);
@@ -102,7 +102,7 @@ void RadioSequencer::UpdateGridLights()
       {
          if (mGrid->GetVal(col, row) == 1)
             mGridController->SetLight(col, row, GridColor::kGridColor1Bright);
-         else if (col == mGrid->GetHighlightCol())
+         else if (col == mGrid->GetHighlightCol(gTime))
             mGridController->SetLight(col, row, GridColor::kGridColor1Dim);
          else
             mGridController->SetLight(col, row, GridColor::kGridColorOff);
@@ -117,7 +117,7 @@ void RadioSequencer::OnTimeEvent(double time)
    int measure = TheTransport->GetMeasure(time) % numMeasures;
    int step = ((TheTransport->GetQuantized(time, mInterval) % stepsPerMeasure) + measure * stepsPerMeasure) % mGrid->GetCols();
    
-   mGrid->SetHighlightCol(step);
+   mGrid->SetHighlightCol(time, step);
    
    IUIControl* controlToEnable = nullptr;
    for (int i=0; i<mControlCables.size(); ++i)

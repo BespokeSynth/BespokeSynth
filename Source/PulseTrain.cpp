@@ -151,7 +151,7 @@ void PulseTrain::Step(double time, float velocity, int flags)
       }
    }
    
-   mVelocityGrid->SetHighlightCol(mStep);
+   mVelocityGrid->SetHighlightCol(time, mStep);
 }
 
 void PulseTrain::GetModuleDimensions(float& width, float& height)

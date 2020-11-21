@@ -471,8 +471,8 @@ void NoteStepSequencer::Step(double time, float velocity, int pulseFlags)
       }
    }
    
-   mGrid->SetHighlightCol(mArpIndex);
-   mVelocityGrid->SetHighlightCol(mArpIndex);
+   mGrid->SetHighlightCol(time, mArpIndex);
+   mVelocityGrid->SetHighlightCol(time, mArpIndex);
    
    UpdateLights();
 }

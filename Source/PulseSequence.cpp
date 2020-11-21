@@ -164,7 +164,7 @@ void PulseSequence::Step(double time, float velocity, int flags)
          DispatchPulse(mStepCables[mStep], time, v, 0);
    }
    
-   mVelocityGrid->SetHighlightCol(mStep);
+   mVelocityGrid->SetHighlightCol(time, mStep);
 }
 
 void PulseSequence::GetModuleDimensions(float& width, float& height)

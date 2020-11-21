@@ -40,8 +40,6 @@ void Presets::CreateUIControls()
    mBlendTimeSlider = new FloatSlider(this,"blend ms",5,20,120,15,&mBlendTime,0,5000);
    mCurrentPresetSelector = new DropdownList(this,"preset",85,3,&mCurrentPreset);
    
-   mGrid->SetHighlightCol(-1);
-   
    for (int i=0; i<100; ++i)
       mCurrentPresetSelector->AddLabel(ofToString(i).c_str(), i);
    
