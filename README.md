@@ -5,9 +5,11 @@ You can find the most recent builds for Mac/Windows/Linux at https://github.com/
 
 ![screenshot](screenshot-1.png)
 
-### Basics tutorial
+## Basic Overview/Tutorial
+[![Bespoke Overview](https://img.youtube.com/vi/SYBc8X2IxqM/0.jpg)](https://www.youtube.com/watch?v=SYBc8X2IxqM)
 * https://youtu.be/SYBc8X2IxqM
 
+### Quick Reference
 ![quick reference](bespoke_quick_reference.png)
 
 ### Recent videos of Bespoke usage
