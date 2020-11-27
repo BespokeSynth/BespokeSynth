@@ -21,6 +21,9 @@ bool VSTPlayhead::getCurrentPosition(juce::AudioPlayHead::CurrentPositionInfo& r
    result.isPlaying = true;
    result.isRecording = false;
    result.isLooping = false;
+   result.ppqLoopStart = 0;
+   result.ppqLoopEnd = 480*result.timeSigDenominator;
+   result.frameRate = AudioPlayHead::fps60;
    
    return true;
 }
