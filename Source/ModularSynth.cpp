@@ -2142,6 +2142,13 @@ IDrawableModule* ModularSynth::SpawnModuleOnTheFly(string moduleName, float x, f
             mModuleContainer.AddModule(module);
          SetUpModule(module, dummy);
          module->Init();
+
+         if (vstToSetUp != "")
+         {
+            VSTPlugin* plugin = dynamic_cast<VSTPlugin*>(module);
+            if (plugin != nullptr)
+               plugin->SetVST(vstToSetUp);
+         }
       }
    }
    catch (LoadingJSONException& e)
@@ -2151,13 +2158,6 @@ IDrawableModule* ModularSynth::SpawnModuleOnTheFly(string moduleName, float x, f
    catch (UnknownModuleException& e)
    {
       LogEvent("Error spawning \""+moduleName+"\" on the fly, couldn't find \""+e.mSearchName+"\"", kLogEventType_Warning);
-   }
-
-   if (vstToSetUp != "")
-   {
-      VSTPlugin* plugin = dynamic_cast<VSTPlugin*>(module);
-      if (plugin != nullptr)
-         plugin->SetVST(vstToSetUp);
    }
 
    if (prefabToSetUp != "")
