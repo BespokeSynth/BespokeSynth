@@ -469,7 +469,7 @@ vector<string> ModuleFactory::GetSpawnableModules(char c)
    ModuleFactory::GetPrefabs(prefabs);
    for (auto prefab : prefabs)
    {
-      if (tolower(prefab[0]) == c)
+      if (tolower(prefab[0]) == c || c == ';')
          modules.push_back(prefab + " " + kPrefabSuffix);
    }
 
