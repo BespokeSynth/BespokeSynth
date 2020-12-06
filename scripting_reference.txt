@@ -9,11 +9,12 @@ script module inputs:
 globals:
    bespoke.get_measure_time()
    bespoke.get_measure()
-   bespoke.reset_transport()
+   bespoke.reset_transport(rewind_amount)
+      optional: rewind_amount=.001f
    bespoke.get_step(subdivision)
    bespoke.count_per_measure(subdivision)
    bespoke.time_until_subdivision(subdivision)
-      example: this.schedule_call(bespoke.time_until_subdivision(1), "on_downbeat()")
+      example: me.schedule_call(bespoke.time_until_subdivision(1), "on_downbeat()")
    bespoke.get_time_sig_ratio()
    bespoke.get_root()
    bespoke.get_scale()
@@ -24,32 +25,32 @@ globals:
 
 
 script-relative:
-   this.play_note(pitch, velocity, length, pan, output_index)
-      optional: length=1.0f/16.0f, pan = 0, output_index = 0
-      example: this.play_note(60, 127, 1.0/8)
-   this.schedule_note(delay, pitch, velocity, length, pan, output_index)
-      optional: length=1.0f/16.0f, pan = 0, output_index = 0
-      example: this.schedule_note(1.0/4, 60, 127, 1.0/8)
-   this.schedule_note_msg(delay, pitch, velocity, pan, output_index)
+   me.play_note(pitch, velocity, length, pan, output_index)
+      optional: length=1.0/16.0, pan = 0, output_index = 0
+      example: me.play_note(60, 127, 1.0/8)
+   me.schedule_note(delay, pitch, velocity, length, pan, output_index)
+      optional: length=1.0/16.0, pan = 0, output_index = 0
+      example: me.schedule_note(1.0/4, 60, 127, 1.0/8)
+   me.schedule_note_msg(delay, pitch, velocity, pan, output_index)
       optional: pan = 0, output_index = 0
-   this.schedule_call(delay, method)
-      example: this.schedule_call(1.0/4, "dotask()")
-   this.note_msg(pitch, velocity, pan, output_index)
+   me.schedule_call(delay, method)
+      example: me.schedule_call(1.0/4, "dotask()")
+   me.note_msg(pitch, velocity, pan, output_index)
       optional: pan = 0, output_index = 0
-   this.set(path, value)
-      example: this.set("oscillator~pw", .2)
-   this.schedule_set(delay, path, value)
-   this.get(path)
-      example: pulsewidth = this.get("oscillator~pulsewidth")
-   this.adjust(path, amount)
-   this.highlight_line(lineNum, scriptModuleIndex)
-   this.output(obj)
-      example: this.output("hello world!")
-   this.this()
-   this.stop()
-   this.get_caller()
-      example: this.get_caller().play_note(60,127)
-   this.set_num_note_outputs(num)
+   me.set(path, value)
+      example: me.set("oscillator~pw", .2)
+   me.schedule_set(delay, path, value)
+   me.get(path)
+      example: pulsewidth = me.get("oscillator~pulsewidth")
+   me.adjust(path, amount)
+   me.highlight_line(lineNum, scriptModuleIndex)
+   me.output(obj)
+      example: me.output("hello world!")
+   me.me()
+   me.stop()
+   me.get_caller()
+      example: me.get_caller().play_note(60,127)
+   me.set_num_note_outputs(num)
 
 
 import notesequencer
@@ -100,6 +101,28 @@ import sampleplayer
       sampleplayer.get(path)
    instance:
       s.set_cue_point(pitch, startSeconds, lengthSeconds, speed)
+
+
+import midicontroller
+   static:
+      midicontroller.get(path)
+   instance:
+      m.add_connection(messageType, control, channel, controlPath)
+      m.send_note(pitch, velocity, forceNoteOn, channel, page)
+         optional: forceNoteOn = false, channel = -1, page = 0
+      m.send_cc(ctl, value, channel, page)
+         optional: channel = -1, page = 0
+      m.send_pitchbend(bend, channel, page)
+         optional: channel = -1, page = 0
+      m.send_data(a, b, c, page)
+         optional: page = 0
+
+
+import linnstrument
+   static:
+      linnstrument.get(path)
+   instance:
+      l.set_color(x, y, color)
 
 
 import module

@@ -97,13 +97,9 @@ void ScriptModule::InitializePythonIfNecessary()
    if (!sPythonInitialized)
    {
       py::initialize_interpreter();
-      py::exec("import bespoke", py::globals());
-      py::exec("import module", py::globals());
-      py::exec("import scriptmodule", py::globals());
-      py::exec("import random", py::globals());
-      py::exec("import math", py::globals());
+      py::exec(GetBootstrapImportString(), py::globals());
       
-      CodeEntry::SetUpSyntaxHighlighting();
+      CodeEntry::OnPythonInit();
    }
    sPythonInitialized = true;
 }
@@ -202,6 +198,8 @@ void ScriptModule::DrawModule()
 
 void ScriptModule::DrawModuleUnclipped()
 {
+   mCodeEntry->RenderOverlay();
+
    ofPushStyle();
    if (mDrawDebug)
    {
@@ -736,13 +734,13 @@ void ScriptModule::PlayNote(double time, int pitch, int velocity, int voiceIdx /
 
 string ScriptModule::GetThisName()
 {
-   return "this__"+ofToString(mScriptModuleIndex);
+   return "me__"+ofToString(mScriptModuleIndex);
 }
 
 void ScriptModule::RunScript(double time, int lineStart/*=-1*/, int lineEnd/*=-1*/)
 {
    //should only be called from main thread
-   py::exec(GetThisName()+" = scriptmodule.get_this("+ofToString(mScriptModuleIndex)+")", py::globals());
+   py::exec(GetThisName()+" = scriptmodule.get_me("+ofToString(mScriptModuleIndex)+")", py::globals());
    string code = mCodeEntry->GetText();
    vector<string> lines = ofSplitString(code, "\n");
    
@@ -776,7 +774,7 @@ void ScriptModule::RunScript(double time, int lineStart/*=-1*/, int lineEnd/*=-1
       if (i < executionStartLine || i > executionEndLine)
          prefix = "#";
       if (ShouldDisplayLineExecutionPre(i > 0 ? lines[i-1] : "", lines[i]))
-         code += prefix + GetIndentation(lines[i])+"this.highlight_line("+ofToString(i)+","+ofToString(mScriptModuleIndex)+")               ###instrumentation###\n";
+         code += prefix + GetIndentation(lines[i])+"me.highlight_line("+ofToString(i)+","+ofToString(mScriptModuleIndex)+")               ###instrumentation###\n";
       code += prefix + lines[i]+"\n";
    }
    FixUpCode(code);
@@ -904,6 +902,7 @@ void ScriptModule::FixUpCode(string& code)
    ofStringReplace(code, "on_note(", "on_note__"+ prefix +"(");
    ofStringReplace(code, "on_grid_button(", "on_grid_button__"+ prefix +"(");
    ofStringReplace(code, "this.", GetThisName()+".");
+   ofStringReplace(code, "me.", GetThisName() + ".");
 }
 
 void ScriptModule::GetFirstAndLastCharacter(string line, char& first, char& last)
@@ -933,11 +932,14 @@ bool ScriptModule::ShouldDisplayLineExecutionPre(string priorLine, string line)
    char lastCharacter;
    
    GetFirstAndLastCharacter(priorLine, firstCharacter, lastCharacter);
+   if (firstCharacter == '@')
+      return false;
    if (lastCharacter == ',')
       return false;
    
    GetFirstAndLastCharacter(line, firstCharacter, lastCharacter);
-   
+   if (firstCharacter == '@')
+      return false;
    if (firstCharacter == '#')
       return false;
    if (lastCharacter == ':' && (ofIsStringInString(line, "else") || ofIsStringInString(line, "elif") || ofIsStringInString(line,"except")))
@@ -1024,12 +1026,6 @@ void ScriptModule::Resize(float w, float h)
    mDSlider->SetPosition(mDSlider->GetPosition(true).x, mDSlider->GetPosition(true).y + h - mHeight);
    mWidth = w;
    mHeight = h;
-}
-
-bool ScriptModule::MouseScrolled(int x, int y, float scrollX, float scrollY)
-{
-   mCodeEntry->NotifyMouseScrolled(x,y,scrollX,scrollY);
-   return false;
 }
 
 void ScriptModule::LoadLayout(const ofxJSONElement& moduleInfo)

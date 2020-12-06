@@ -75,6 +75,8 @@ public:
    static ScriptModule* sPriorExecutedModule;
    static float GetScriptMeasureTime();
    static float GetTimeSigRatio();
+
+   static string GetBootstrapImportString() { return "import bespoke; import module; import scriptmodule; import random; import math"; }
    
 private:
    void PlayNote(double time, float pitch, float velocity, float pan, int noteOutputIndex, int lineNum);
@@ -100,7 +102,6 @@ private:
    void GetModuleDimensions(float& width, float& height) override;
    bool IsResizable() const override { return true; }
    void Resize(float w, float h) override;
-   bool MouseScrolled(int x, int y, float scrollX, float scrollY) override;
    
    DropdownList* mLoadScriptSelector;
    ClickButton* mLoadScriptButton;

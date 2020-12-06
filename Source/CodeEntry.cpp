@@ -14,6 +14,7 @@
 #include "IDrawableModule.h"
 #include "CodeEntry.h"
 #include "Transport.h"
+#include "ScriptModule.h"
 #if BESPOKE_WINDOWS
 #undef ssize_t
 #endif
@@ -36,6 +37,10 @@ CodeEntry::CodeEntry(ICodeEntryListener* owner, const char* name, int x, int y, 
 , mHasError(false)
 , mErrorLine(-1)
 , mDoSyntaxHighlighting(true)
+, mDoPythonAutocomplete(true)
+, mAutocompleteUpdateTimer(0)
+, mWantToShowAutocomplete(false)
+, mAutocompleteHighlightIndex(0)
 {
    mCaretBlink = true;
    mCaretBlinkTimer = 0;
@@ -58,6 +63,105 @@ CodeEntry::~CodeEntry()
 namespace
 {
    const float kFontSize = 14;
+}
+
+void CodeEntry::Poll()
+{
+   if (mAutocompleteUpdateTimer > 0)
+   {
+      mAutocompleteUpdateTimer -= 1.0 / ofGetFrameRate();
+      if (mAutocompleteUpdateTimer <= 0)
+      {
+         if (mDoPythonAutocomplete)
+         {
+            mAutocompleteCaretCoords = GetCaretCoords(mCaretPosition);
+
+            if (!GetVisibleCode().empty())
+            {
+               try
+               {
+                  string prefix = ScriptModule::GetBootstrapImportString() + "; import me\n";
+                  py::exec("jediScript = jedi.Script('''" + prefix + GetVisibleCode() + "''', project=jediProject)", py::globals());
+                  //py::exec("jediScript = jedi.Script('''" + prefix + GetVisibleCode() + "''')", py::globals());
+                  //py::exec("jediScript = jedi.Interpreter('''" + prefix + GetVisibleCode() + "''', [locals(), globals()])", py::globals());
+                  auto coords = GetCaretCoords(mCaretPosition);
+
+                  {
+                     py::object ret = py::eval("jediScript.get_signatures(" + ofToString(coords.y + 2) + "," + ofToString(coords.x) + ")", py::globals());
+                     auto signatures = ret.cast< std::list<py::object> >();
+
+                     size_t i = 0;
+                     for (auto signature : signatures)
+                     {
+                        mWantToShowAutocomplete = true;
+                        if (i < mAutocompleteSignatures.size())
+                        {
+                           mAutocompleteSignatures[i].valid = true;
+                           mAutocompleteSignatures[i].entryIndex = signature.attr("index").cast<int>();
+                           auto params = signature.attr("params").cast< std::vector<py::object> >();
+                           mAutocompleteSignatures[i].params.resize(params.size());
+                           for (size_t j = 0; j < params.size(); ++j)
+                              mAutocompleteSignatures[i].params[j] = juce::String(params[j].attr("description").str()).replace("param ","").toStdString();
+                           ++i;
+                        }
+                        else
+                        {
+                           break;
+                        }
+                     }
+
+                     for (; i < mAutocompleteSignatures.size(); ++i)
+                        mAutocompleteSignatures[i].valid = false;
+                  }
+
+                  {
+                     py::object ret = py::eval("jediScript.complete(" + ofToString(coords.y + 2) + "," + ofToString(coords.x) + ")", py::globals());
+                     auto autocompletes = ret.cast< std::list<py::object> >();
+                     //ofLog() << "autocompletes:";
+
+                     size_t i = 0;
+                     if (autocompletes.size() < 100)
+                     {
+                        mWantToShowAutocomplete = true;
+                        mAutocompleteHighlightIndex = 0;
+                        for (auto autocomplete : autocompletes)
+                        {
+                           //ofLog() << "    --" << autocomplete;
+                           string full = autocomplete.attr("name").str();
+                           string rest = autocomplete.attr("complete").str();
+                           if (i < mAutocompletes.size())// && full.length() > rest.length())
+                           {
+                              mAutocompletes[i].valid = true;
+                              mAutocompletes[i].autocompleteFull = full;
+                              mAutocompletes[i].autocompleteRest = rest;
+                              ++i;
+                           }
+                           else
+                           {
+                              break;
+                           }
+                        }
+                     }
+
+                     for (; i < mAutocompletes.size(); ++i)
+                        mAutocompletes[i].valid = false;
+                  }
+               }
+               catch (const std::exception &e)
+               {
+                  ofLog() << "autocomplete exception: " << e.what();
+               }
+            }
+            else
+            {
+               for (size_t i=0; i < mAutocompleteSignatures.size(); ++i)
+                  mAutocompleteSignatures[i].valid = false;
+               for (size_t i=0; i < mAutocompletes.size(); ++i)
+                  mAutocompletes[i].valid = false;
+            }
+         }
+      }
+   }
 }
 
 void CodeEntry::Render()
@@ -182,12 +286,13 @@ void CodeEntry::Render()
    
    if (IKeyboardFocusListener::GetActiveKeyboardFocus() == this)
    {
+      ofVec2f coords = GetCaretCoords(mCaretPosition);
+      ofVec2f caretPos = ofVec2f(coords.x * mCharWidth + mX + 1.5f - mScroll.x, coords.y * mCharHeight + mY + 2 - mScroll.y);
+
       if (mCaretBlink)
       {
-         ofVec2f coords = GetCaretCoords(mCaretPosition);
-         
          ofFill();
-         ofRect(coords.x * mCharWidth + mX + 1.5f - mScroll.x, coords.y * mCharHeight + mY + 2 - mScroll.y, 1, mCharHeight, L(corner,1));
+         ofRect(caretPos.x, caretPos.y, 1, mCharHeight, L(corner,1));
       }
       mCaretBlinkTimer += ofGetLastFrameTime();
       if (mCaretBlinkTimer > .3f)
@@ -223,7 +328,7 @@ void CodeEntry::Render()
          }
          
          ofPopStyle();
-      }
+      }  
    }
    
    /*if (mHovered)
@@ -237,6 +342,84 @@ void CodeEntry::Render()
 
    ofPopMatrix();
    ofPopStyle();
+}
+
+void CodeEntry::RenderOverlay()
+{
+   if (IKeyboardFocusListener::GetActiveKeyboardFocus() != this)
+      return;
+
+   if (!IsAutocompleteShowing())
+      return;
+
+   ofVec2f caretPos = ofVec2f(mAutocompleteCaretCoords.x * mCharWidth + mX + 1.5f - mScroll.x, mAutocompleteCaretCoords.y * mCharHeight + mY + 2 - mScroll.y);
+
+   ofFill();
+
+   for (size_t i = 0; i < mAutocompletes.size(); ++i)
+   {
+      if (mAutocompletes[i].valid)
+      {
+         int charactersLeft = mAutocompletes[i].autocompleteFull.length() - mAutocompletes[i].autocompleteRest.length();
+         float x = caretPos.x - charactersLeft * mCharWidth;
+         float y = caretPos.y + mCharHeight * (i + 2) - 2;
+         if (i == mAutocompleteHighlightIndex)
+            ofSetColor(100, 100, 100);
+         else
+            ofSetColor(70, 70, 70);
+         ofRect(x, y - mCharHeight+2, gFontFixedWidth.GetStringWidth(mAutocompletes[i].autocompleteFull, kFontSize, K(isRenderThread)), mCharHeight);
+
+         ofSetColor(200, 200, 200);
+         gFontFixedWidth.DrawString(mAutocompletes[i].autocompleteFull, kFontSize, x, y);
+         ofSetColor(255, 255, 255);
+         string prefix = "";
+         for (size_t j = 0; j < charactersLeft; ++j)
+            prefix += " ";
+         gFontFixedWidth.DrawString(prefix + mAutocompletes[i].autocompleteRest, kFontSize, x, y);
+      }
+   }
+
+   for (size_t i = 0; i < mAutocompleteSignatures.size(); ++i)
+   {
+      if (mAutocompleteSignatures[i].valid && mAutocompleteSignatures[i].params.size() > 0)
+      {
+         string params = "(";
+         string highlightParamString = " ";
+         for (size_t j = 0; j < mAutocompleteSignatures[i].params.size(); ++j)
+         {
+            string param = mAutocompleteSignatures[i].params[j];
+            string placeholder = "";
+            for (size_t k = 0; k < param.length(); ++k)
+               placeholder += " ";
+            if (j == mAutocompleteSignatures[i].entryIndex)
+            {
+               params += placeholder;
+               highlightParamString += mAutocompleteSignatures[i].params[j];
+            }
+            else
+            {
+               params += mAutocompleteSignatures[i].params[j];
+               highlightParamString += placeholder;
+            }
+            
+            if (j < mAutocompleteSignatures[i].params.size() - 1)
+            {
+               params += ", ";
+               highlightParamString += "  ";
+            }
+         }
+         params += ")";
+         highlightParamString += " ";
+         float x = GetLinePos(mAutocompleteCaretCoords.y, K(end), !K(published)).x + 10;
+         float y = caretPos.y + mCharHeight * (i + 1) - 2;
+         ofSetColor(70, 70, 70);
+         ofRect(x, y-mCharHeight+2, gFontFixedWidth.GetStringWidth(params, kFontSize, K(isRenderThread)), mCharHeight+2);
+         ofSetColor(170, 170, 255);
+         gFontFixedWidth.DrawString(params, kFontSize, x, y);
+         ofSetColor(230, 230, 255);
+         gFontFixedWidth.DrawString(highlightParamString, kFontSize, x, y);
+      }
+   }
 }
 
 string CodeEntry::GetVisibleCode()
@@ -311,7 +494,7 @@ string CodeEntry::FilterText(string input, std::vector<int> mapping, int filter1
 }
 
 //static
-void CodeEntry::SetUpSyntaxHighlighting()
+void CodeEntry::OnPythonInit()
 {
    const string syntaxHighlightCode = R"(def syntax_highlight_basic():
    #this uses the built in lexer/tokenizer in python to identify part of code
@@ -410,9 +593,34 @@ void CodeEntry::SetUpSyntaxHighlighting()
    {
       ofLog() << "syntax highlight initialization exception: " << e.what();
    }
+
+
+   //autocomplete
+   try
+   {
+      py::exec("import jedi", py::globals());
+      
+      try
+      {
+         //py::exec("jedi.preload_module(['bespoke','module','scriptmodule','random','math'])", py::globals());
+         py::exec("jediProject = jedi.get_default_project()", py::globals());
+         py::exec("jediProject.added_sys_path = [\"" + ofToDataPath("internal/python_stubs") + "\"]", py::globals());
+         //py::eval_file(ofToDataPath("internal/bespoke_stubs.pyi"), py::globals());
+         //py::exec("import sys;sys.path.append(\""+ ofToDataPath("internal/python_stubs")+"\")", py::globals());
+      }
+      catch (const std::exception &e)
+      {
+         ofLog() << "autocomplete setup exception: " << e.what();
+      }
+   }
+   catch (const std::exception &e)
+   {
+      ofLog() << "autocomplete initialization exception: " << e.what();
+      ofLog() << "maybe jedi is not installed? if you want autocompletion, use \"python -m pip install jedi\" in your system console to install";
+   }
 }
 
-void CodeEntry::UpdateSyntaxHighlightMapping()
+void CodeEntry::OnCodeUpdated()
 {
    if (mDoSyntaxHighlighting)
    {
@@ -431,6 +639,23 @@ void CodeEntry::UpdateSyntaxHighlightMapping()
    {
       mSyntaxHighlightMapping.clear();
    }
+}
+
+bool CodeEntry::IsAutocompleteShowing()
+{
+   if (!mWantToShowAutocomplete || mCaretPosition != mCaretPosition2)
+      return false;
+
+   if (mAutocompletes[0].valid == false && mAutocompleteSignatures[0].valid == false)
+      return false;
+
+   if (mAutocompleteUpdateTimer <= 0)
+   {
+      ofVec2f coords = GetCaretCoords(mCaretPosition);
+      return coords.x == mAutocompleteCaretCoords.x && coords.y == mAutocompleteCaretCoords.y;
+   }
+
+   return true;
 }
 
 void CodeEntry::SetError(bool error, int errorLine)
@@ -520,9 +745,16 @@ void CodeEntry::OnKeyPressed(int key, bool isRepeat)
    }
    else if (key == OF_KEY_ESC)
    {
-      IKeyboardFocusListener::ClearActiveKeyboardFocus(!K(acceptEntry));
-      UpdateString(mPublishedString);   //revert
-      mCaretPosition2 = mCaretPosition;
+      if (IsAutocompleteShowing())
+      {
+         mWantToShowAutocomplete = false;
+      }
+      else
+      {
+         IKeyboardFocusListener::ClearActiveKeyboardFocus(!K(acceptEntry));
+         UpdateString(mPublishedString);   //revert
+         mCaretPosition2 = mCaretPosition;
+      }
    }
    else if (key == OF_KEY_LEFT)
    {
@@ -558,42 +790,63 @@ void CodeEntry::OnKeyPressed(int key, bool isRepeat)
    }
    else if (key == OF_KEY_UP)
    {
-      ofVec2f coords = GetCaretCoords(mCaretPosition);
-      if (coords.y > 0)
-         --coords.y;
-      MoveCaret(GetCaretPosition(coords.x, coords.y));
+      if (IsAutocompleteShowing() && mAutocompleteHighlightIndex > 0)
+      {
+         --mAutocompleteHighlightIndex;
+      }
+      else
+      {
+         ofVec2f coords = GetCaretCoords(mCaretPosition);
+         if (coords.y > 0)
+            --coords.y;
+         MoveCaret(GetCaretPosition(coords.x, coords.y));
+      }
    }
    else if (key == OF_KEY_DOWN)
    {
-      ofVec2f coords = GetCaretCoords(mCaretPosition);
-      ++coords.y;
-      MoveCaret(GetCaretPosition(coords.x, coords.y));
+      if (IsAutocompleteShowing() && (mAutocompleteHighlightIndex + 1 < mAutocompletes.size() && mAutocompletes[mAutocompleteHighlightIndex].valid))
+      {
+         ++mAutocompleteHighlightIndex;
+      }
+      else
+      {
+         ofVec2f coords = GetCaretCoords(mCaretPosition);
+         ++coords.y;
+         MoveCaret(GetCaretPosition(coords.x, coords.y));
+      }
    }
    else if (key == OF_KEY_RETURN)
    {
-      if (mCaretPosition != mCaretPosition2)
-         RemoveSelectedText();
-      
-      ofVec2f coords = GetCaretCoords(mCaretPosition);
-      int lineNum = (int)round(coords.y);
-      auto lines = GetLines();
-      int numSpaces = 0;
-      if (mCaretPosition > 0 && mString[mCaretPosition-1] == ':') //auto-indent
-         numSpaces += kTabSize;
-      if (lineNum < (int)lines.size())
+      if (IsAutocompleteShowing())
       {
-         for (int i=0; i<lines[lineNum].length(); ++i)
-         {
-            if (lines[lineNum][i] == ' ')
-               ++numSpaces;
-            else
-               break;
-         }
+         AcceptAutocompletion();
       }
-      string tab = "\n";
-      for (int i=0; i<numSpaces; ++i)
-         tab += ' ';
-      AddString(tab);
+      else
+      {
+         if (mCaretPosition != mCaretPosition2)
+            RemoveSelectedText();
+
+         ofVec2f coords = GetCaretCoords(mCaretPosition);
+         int lineNum = (int)round(coords.y);
+         auto lines = GetLines();
+         int numSpaces = 0;
+         if (mCaretPosition > 0 && mString[mCaretPosition - 1] == ':') //auto-indent
+            numSpaces += kTabSize;
+         if (lineNum < (int)lines.size())
+         {
+            for (int i = 0; i < lines[lineNum].length(); ++i)
+            {
+               if (lines[lineNum][i] == ' ')
+                  ++numSpaces;
+               else
+                  break;
+            }
+         }
+         string tab = "\n";
+         for (int i = 0; i < numSpaces; ++i)
+            tab += ' ';
+         AddString(tab);
+      }
    }
    else if (key == 'V' && GetKeyModifiers() == kModifier_Command)
    {
@@ -669,11 +922,18 @@ void CodeEntry::OnKeyPressed(int key, bool isRepeat)
    }
 }
 
+void CodeEntry::AcceptAutocompletion()
+{
+   juce::String clipboard = SystemClipboard::getTextFromClipboard();
+   AddString(mAutocompletes[mAutocompleteHighlightIndex].autocompleteRest);
+   mAutocompleteUpdateTimer = 0;
+}
+
 void CodeEntry::Publish()
 {
    mPublishedString = mString;
    mLastPublishTime = gTime;
-   UpdateSyntaxHighlightMapping();
+   OnCodeUpdated();
 }
 
 void CodeEntry::Undo()
@@ -689,7 +949,7 @@ void CodeEntry::Undo()
       mCaretPosition = mUndoBuffer[mUndoBufferPos].mCaretPos;
       mCaretPosition2 = mUndoBuffer[mUndoBufferPos].mCaretPos;
       
-      UpdateSyntaxHighlightMapping();
+      OnCodeUpdated();
    }
 }
 
@@ -706,7 +966,7 @@ void CodeEntry::Redo()
       mCaretPosition = mUndoBuffer[mUndoBufferPos].mCaretPos;
       mCaretPosition2 = mUndoBuffer[mUndoBufferPos].mCaretPos;
       
-      UpdateSyntaxHighlightMapping();
+      OnCodeUpdated();
    }
 }
 
@@ -722,7 +982,7 @@ void CodeEntry::UpdateString(string newString)
    mUndoBufferPos = (mUndoBufferPos + 1) % size;
    mUndoBuffer[mUndoBufferPos].mString = mString;
    
-   UpdateSyntaxHighlightMapping();
+   OnCodeUpdated();
    
    mLastInputTime = gTime;
 }
@@ -734,6 +994,8 @@ void CodeEntry::AddCharacter(char c)
       string s;
       s += c;
       AddString(s);
+
+      mAutocompleteUpdateTimer = .2f;
    }
 }
 
@@ -883,7 +1145,9 @@ bool CodeEntry::MouseScrolled(int x, int y, float scrollX, float scrollY)
    mScroll.x = MAX(mScroll.x - scrollX * 10, 0);
    mScroll.y = MAX(mScroll.y + scrollY * 10, 0);
    
-   UpdateSyntaxHighlightMapping();
+   OnCodeUpdated();
+
+   mWantToShowAutocomplete = false;
    
    return false;
 }
@@ -892,7 +1156,7 @@ void CodeEntry::SetDimensions(float width, float height)
 {
    mWidth = width;
    mHeight = height;
-   UpdateSyntaxHighlightMapping();
+   OnCodeUpdated();
 }
 
 int CodeEntry::GetCaretPosition(int col, int row)
@@ -932,14 +1196,15 @@ int CodeEntry::GetRowForY(float y)
    return int(y / mCharHeight);
 }
 
-ofVec2f CodeEntry::GetLinePos(int lineNum, bool end)
+ofVec2f CodeEntry::GetLinePos(int lineNum, bool end, bool published /*= true*/)
 {
    float x = mX - mScroll.x;
    float y = lineNum * mCharHeight + mY - mScroll.y;
    
    if (end)
    {
-      auto lines = ofSplitString(mPublishedString, "\n");
+      string str = published ? mPublishedString : mString;
+      auto lines = ofSplitString(str, "\n");
       if (lineNum < (int)lines.size())
          x += lines[lineNum].length() * mCharWidth;
    }

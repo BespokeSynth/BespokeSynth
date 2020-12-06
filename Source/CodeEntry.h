@@ -28,7 +28,9 @@ public:
    CodeEntry(ICodeEntryListener* owner, const char* name, int x, int y, float w, float h);
    void OnKeyPressed(int key, bool isRepeat) override;
    void Render() override;
+   void Poll() override;
    
+   void RenderOverlay();
    void MakeActive();
    void Publish();
    
@@ -39,7 +41,7 @@ public:
    void SetError(bool error, int errorLine = -1);
    void SetDoSyntaxHighlighting(bool highlight) { mDoSyntaxHighlighting = highlight; }
    
-   static void SetUpSyntaxHighlighting();
+   static void OnPythonInit();
    
    void GetDimensions(float& width, float& height) override { width = mWidth; height = mHeight; }
    void SetDimensions(float width, float height);
@@ -53,7 +55,7 @@ public:
    bool IsButtonControl() override { return false; }
    bool IsTextEntry() const override { return true; }
    
-   ofVec2f GetLinePos(int lineNum, bool end);
+   ofVec2f GetLinePos(int lineNum, bool end, bool published = true);
    float GetCharHeight() const { return mCharHeight; }
    float GetCharWidth() const { return mCharWidth; }
    
@@ -79,8 +81,10 @@ private:
    void UpdateString(string newString);
    void DrawSyntaxHighlight(string input, ofColor color, std::vector<int> mapping, int filter1, int filter2);
    string FilterText(string input, std::vector<int> mapping, int filter1, int filter2);
-   void UpdateSyntaxHighlightMapping();
+   void OnCodeUpdated();
    string GetVisibleCode();
+   bool IsAutocompleteShowing();
+   void AcceptAutocompletion();
    
    void OnClicked(int x, int y, bool right) override;
    bool MouseMoved(float x, float y) override;
@@ -91,6 +95,20 @@ private:
       UndoBufferEntry() : mCaretPos(0) {}
       string mString;
       int mCaretPos;
+   };
+
+   struct AutocompleteSignatureInfo
+   {
+      bool valid;
+      int entryIndex;
+      vector<string> params;
+   };
+
+   struct AutocompleteInfo
+   {
+      bool valid;
+      string autocompleteFull;
+      string autocompleteRest;
    };
    
    ICodeEntryListener* mListener;
@@ -115,5 +133,12 @@ private:
    ofVec2f mScroll;
    std::vector<int> mSyntaxHighlightMapping;
    bool mDoSyntaxHighlighting;
+   bool mDoPythonAutocomplete;
    double mLastInputTime;
+   std::array<AutocompleteSignatureInfo, 10> mAutocompleteSignatures;
+   std::array<AutocompleteInfo, 10> mAutocompletes;
+   float mAutocompleteUpdateTimer;
+   ofVec2f mAutocompleteCaretCoords;
+   bool mWantToShowAutocomplete;
+   int mAutocompleteHighlightIndex;
 };
