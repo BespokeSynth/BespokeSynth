@@ -83,7 +83,7 @@ private:
       FloatSlider* mQSlider;
       bool mNeedToCalculateCoefficients;
 
-      void UpdateCoefficientsIfNecessary();
+      bool UpdateCoefficientsIfNecessary();
    };
 
    std::array<Filter, 8> mFilters;

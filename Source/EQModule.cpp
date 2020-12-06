@@ -93,21 +93,25 @@ void EQModule::Process(double time)
 
    ComputeSliders(0);
 
-   if (!mEnabled)
-      return;
-
    for (auto& filter : mFilters)
    {
       if (filter.mEnabled)
-         filter.UpdateCoefficientsIfNecessary();
+      {
+         bool updated = filter.UpdateCoefficientsIfNecessary();
+         if (updated)
+            mNeedToUpdateFrequencyResponseGraph = true;
+      }
    }
+
+   if (GetTarget() == nullptr)
+      return;
 
    SyncBuffers();
 
-   Clear(gWorkBuffer, GetBuffer()->BufferSize());
-
-   if (GetTarget())
+   if (mEnabled)
    {
+      Clear(gWorkBuffer, GetBuffer()->BufferSize());
+
       ChannelBuffer* out = GetTarget()->GetBuffer();
       gWorkChannelBuffer.SetNumActiveChannels(out->NumActiveChannels());
 
@@ -127,17 +131,26 @@ void EQModule::Process(double time)
 
       for (int ch = 0; ch < GetBuffer()->NumActiveChannels(); ++ch)
          Add(gWorkBuffer, gWorkChannelBuffer.GetChannel(ch), GetBuffer()->BufferSize());
+
+      mRollingInputBuffer.WriteChunk(gWorkBuffer, GetBuffer()->BufferSize(), 0);
+
+      //copy rolling input buffer into working buffer and window it
+      mRollingInputBuffer.ReadChunk(mFFTData.mTimeDomain, kNumFFTBins, 0, 0);
+      Mult(mFFTData.mTimeDomain, mWindower, kNumFFTBins);
+
+      mFFT.Forward(mFFTData.mTimeDomain,
+         mFFTData.mRealValues,
+         mFFTData.mImaginaryValues);
    }
-
-   mRollingInputBuffer.WriteChunk(gWorkBuffer, GetBuffer()->BufferSize(), 0);
-
-   //copy rolling input buffer into working buffer and window it
-   mRollingInputBuffer.ReadChunk(mFFTData.mTimeDomain, kNumFFTBins, 0, 0);
-   Mult(mFFTData.mTimeDomain, mWindower, kNumFFTBins);
-
-   mFFT.Forward(mFFTData.mTimeDomain,
-                mFFTData.mRealValues,
-                mFFTData.mImaginaryValues);
+   else   //passthrough
+   {
+      for (int ch = 0; ch < GetBuffer()->NumActiveChannels(); ++ch)
+      {
+         float* buffer = GetBuffer()->GetChannel(ch);
+         Add(GetTarget()->GetBuffer()->GetChannel(ch), buffer, GetBuffer()->BufferSize());
+         GetVizBuffer()->WriteChunk(buffer, GetBuffer()->BufferSize(), ch);
+      }
+   }
 
    GetBuffer()->Reset();
 }
@@ -208,6 +221,12 @@ void EQModule::DrawModule()
    ofSetLineWidth(3);
    ofBeginShape();
    const int kPixelStep = 2;
+   bool updateFrequencyResponseGraph = false;
+   if (mNeedToUpdateFrequencyResponseGraph)
+   {
+      updateFrequencyResponseGraph = true;
+      mNeedToUpdateFrequencyResponseGraph = false;
+   }
    for (int x = 0; x < w + kPixelStep; x += kPixelStep)
    {
       float response = 1;
@@ -215,7 +234,7 @@ void EQModule::DrawModule()
       if (freq < gSampleRate / 2)
       {
          int responseGraphIndex = x / kPixelStep;
-         if (mNeedToUpdateFrequencyResponseGraph || responseGraphIndex >= mFrequencyResponse.size())
+         if (updateFrequencyResponseGraph || responseGraphIndex >= mFrequencyResponse.size())
          {
             for (auto& filter : mFilters)
             {
@@ -232,7 +251,6 @@ void EQModule::DrawModule()
          ofVertex(x, (.5f - .666f * log10(response)) * h + kDrawYOffset);
       }
    }
-   mNeedToUpdateFrequencyResponseGraph = false;
    ofEndShape(false);
 
    ofSetLineWidth(1);
@@ -261,7 +279,7 @@ void EQModule::DrawModule()
    ofPopStyle();
 }
 
-void EQModule::Filter::UpdateCoefficientsIfNecessary()
+bool EQModule::Filter::UpdateCoefficientsIfNecessary()
 {
    if (mNeedToCalculateCoefficients)
    {
@@ -269,7 +287,10 @@ void EQModule::Filter::UpdateCoefficientsIfNecessary()
       for (size_t ch = 1; ch < mFilter.size(); ++ch)
          mFilter[ch].CopyCoeffFrom(mFilter[0]);
       mNeedToCalculateCoefficients = false;
+      return true;
    }
+
+   return false;
 }
 
 void EQModule::OnClicked(int x, int y, bool right)
@@ -330,7 +351,6 @@ void EQModule::FloatSliderUpdated(FloatSlider* slider, float oldVal)
          if (slider == filter.mFSlider || slider == filter.mQSlider || slider == filter.mGSlider)
          {
             filter.mNeedToCalculateCoefficients = true;
-            mNeedToUpdateFrequencyResponseGraph = true;
          }
       }
    }
@@ -344,7 +364,6 @@ void EQModule::DropdownUpdated(DropdownList* list, int oldVal)
       {
          filter.mFilter[0].SetFilterType(filter.mFilter[0].mType);
          filter.mNeedToCalculateCoefficients = true;
-         mNeedToUpdateFrequencyResponseGraph = true;
       }
    }
 }
@@ -368,7 +387,7 @@ void EQModule::Resize(float w, float h)
    mHeight = h;
    mModuleSaveData.SetInt("width", w);
    mModuleSaveData.SetInt("height", h);
-   mNeedToUpdateFrequencyResponseGraph = true;
+   mNeedToUpdateFrequencyResponseGraph = false;
 }
 
 void EQModule::LoadLayout(const ofxJSONElement& moduleInfo)
