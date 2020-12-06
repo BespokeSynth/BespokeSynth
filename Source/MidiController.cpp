@@ -313,6 +313,12 @@ void MidiController::OnMidiNote(MidiNote& note)
 {
    if (!mEnabled || (mChannelFilter != ChannelFilter::kAny && note.mChannel != (int)mChannelFilter))
       return;
+
+   if (mUseChannelAsVoice)
+   {
+      int voiceIdx = note.mChannel - 1;
+      mModulation.GetPitchBend(voiceIdx)->SetValue(0);
+   }
    
    MidiReceived(kMidiMessage_Note, note.mPitch, note.mVelocity/127.0f, note.mChannel);
    
