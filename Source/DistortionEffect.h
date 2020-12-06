@@ -45,7 +45,8 @@ private:
       kDirty,
       kSoft,
       kAsymmetric,
-      kFold
+      kFold,
+      kGrungy
    };
    
    //IDrawableModule

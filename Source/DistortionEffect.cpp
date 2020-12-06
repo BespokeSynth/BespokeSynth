@@ -42,6 +42,7 @@ void DistortionEffect::CreateUIControls()
    mTypeDropdown->AddLabel("soft", kSoft);
    mTypeDropdown->AddLabel("asym", kAsymmetric);
    mTypeDropdown->AddLabel("fold", kFold);
+   mTypeDropdown->AddLabel("grungy", kGrungy);
 }
 
 void DistortionEffect::ProcessAudio(double time, ChannelBuffer* buffer)
@@ -78,6 +79,13 @@ void DistortionEffect::ProcessAudio(double time, ChannelBuffer* buffer)
          for (int i=0; i<bufferSize; ++i)
          {
             buffer->GetChannel(ch)[i] = sin((buffer->GetChannel(ch)[i]+mDCAdjust) * mPreamp * mGain) / mGain;
+         }
+      }
+      else if (mType == kGrungy)
+      {
+         for (int i = 0; i < bufferSize; ++i)
+         {
+            buffer->GetChannel(ch)[i] = asin(ofClamp((buffer->GetChannel(ch)[i] + mDCAdjust) * mPreamp * mGain, -1, 1)) / mGain;
          }
       }
       //soft and asymmetric from http://www.music.mcgill.ca/~gary/courses/projects/618_2009/NickDonaldson/#Distortion
@@ -151,8 +159,6 @@ void DistortionEffect::GetModuleDimensions(float& width, float& height)
 
 void DistortionEffect::DrawModule()
 {
-   
-   
    if (!Enabled())
       return;
    
