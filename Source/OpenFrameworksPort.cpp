@@ -65,6 +65,7 @@ string ofToDataPath(string path, bool makeAbsolute)
          sDataDir = localDataDir;
       else
          sDataDir = File::getCurrentWorkingDirectory().getChildFile("../MacOSX/build/Release/data").getFullPathName().toStdString();   //fall back to looking at OSX dir in dev environment
+      ofStringReplace(sDataDir, "\\", "/");
    }
 
    return sDataDir + "/" + path;

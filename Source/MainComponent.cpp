@@ -52,7 +52,7 @@ public:
       int height = 400;
       mDesiredInitialPosition.setXY(INT_MAX, INT_MAX);
       ofxJSONElement userPrefs;
-      bool loaded = userPrefs.open(ModularSynth::GetUserPrefsPath());
+      bool loaded = userPrefs.open(ModularSynth::GetUserPrefsPath(false));
       if (loaded)
       {
          width = userPrefs["width"].asInt();
@@ -183,7 +183,7 @@ public:
       ofxJSONElement userPrefs;
       string outputDevice = kAutoDevice;
       string inputDevice = kAutoDevice;
-      bool loaded = userPrefs.open(ModularSynth::GetUserPrefsPath());
+      bool loaded = userPrefs.open(ModularSynth::GetUserPrefsPath(false));
       if (loaded)
       {
          if (!userPrefs["audio_output_device"].isNull())

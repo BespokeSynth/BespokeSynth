@@ -104,7 +104,7 @@ void ModularSynth::Setup(GlobalManagers* globalManagers, juce::Component* mainCo
    mGlobalManagers = globalManagers;
    mMainComponent = mainComponent;
    
-   bool loaded = mUserPrefs.open(GetUserPrefsPath());
+   bool loaded = mUserPrefs.open(GetUserPrefsPath(false));
    if (loaded)
    {
       SetGlobalBufferSize(mUserPrefs["buffersize"].asInt());
@@ -127,9 +127,9 @@ void ModularSynth::Setup(GlobalManagers* globalManagers, juce::Component* mainCo
    }
    else
    {
-      mFatalError = "couldn't find or load data/userprefs.json";
+      mFatalError = "couldn't find or load data/"+GetUserPrefsPath(true);
 #if BESPOKE_MAC
-      if (!juce::File(GetUserPrefsPath()).existsAsFile())
+      if (!juce::File(GetUserPrefsPath(false)).existsAsFile())
          mFatalError += "\nplease install to /Applications/BespokeSynth or launch via run_bespoke.command";
 #endif
       LogEvent("couldn't find or load userprefs.json", kLogEventType_Error);
@@ -164,15 +164,21 @@ void ModularSynth::LoadResources(void* nanoVG, void* fontBoundsNanoVG)
 }
 
 //static
-string ModularSynth::GetUserPrefsPath()
+string ModularSynth::GetUserPrefsPath(bool relative)
 {
    if (JUCEApplication::getCommandLineParameterArray().size() > 0)
    {
       string path = ofToDataPath(JUCEApplication::getCommandLineParameterArray()[0].toStdString());
       if (juce::File(path).existsAsFile())
+      {
+         if (relative)
+            return JUCEApplication::getCommandLineParameterArray()[0].toStdString();
          return path;
+      }
    }
    
+   if (relative)
+      return "userprefs.json";
    return ofToDataPath("userprefs.json");
 }
 
@@ -954,6 +960,8 @@ void ModularSynth::MouseScrolled(float x, float y)
          val += change;
       val = ofClamp(val, 0, 1);
       gHoveredUIControl->SetFromMidiCC(val);
+
+      gHoveredUIControl->NotifyMouseScrolled(GetMouseX(), GetMouseY(), x, y);
    }
    else
    {
