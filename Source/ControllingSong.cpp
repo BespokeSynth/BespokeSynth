@@ -71,7 +71,7 @@ void ControllingSong::Init()
       mSongSelector->AddLabel(title.c_str(), i);
    }
    
-   random_shuffle(mShuffleList.begin(), mShuffleList.end());
+  // random_shuffle(mShuffleList.begin(), mShuffleList.end());
 }
 
 void ControllingSong::Poll()
@@ -86,7 +86,7 @@ void ControllingSong::Poll()
          if (mShuffleIndex == mSongList["songs"].size())
          {
             mShuffleIndex = 0;
-            random_shuffle(mShuffleList.begin(), mShuffleList.end());
+    //        random_shuffle(mShuffleList.begin(), mShuffleList.end());
          }
       }
       else
