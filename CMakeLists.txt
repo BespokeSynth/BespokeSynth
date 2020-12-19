@@ -4,8 +4,8 @@ cmake_minimum_required(VERSION 3.4)
 
 project("BespokeSynth")
 
-
-list(APPEND CMAKE_MODULE_PATH "${CMAKE_CURRENT_LIST_DIR}/../FRUT/prefix/FRUT/cmake")
+#list(APPEND CMAKE_MODULE_PATH "${CMAKE_CURRENT_LIST_DIR}/../FRUT/prefix/FRUT/cmake")
+list(APPEND CMAKE_MODULE_PATH "C:\\Users\\eglis\\localRepositories\\FRUT\\cmake")
 include(Reprojucer)
 
 
@@ -14,7 +14,8 @@ set(BespokeSynth_jucer_FILE
 )
 
 
-set(JUCE_MODULES_GLOBAL_PATH "${CMAKE_CURRENT_LIST_DIR}/../../JUCE/modules")
+#set(JUCE_MODULES_GLOBAL_PATH "${CMAKE_CURRENT_LIST_DIR}/../../JUCE/modules")
+set(JUCE_MODULES_GLOBAL_PATH "C:\\SDKs\\JUCE\\modules")
 
 
 jucer_project_begin(
@@ -33,7 +34,7 @@ jucer_project_settings(
   PROJECT_TYPE "GUI Application"
   BUNDLE_IDENTIFIER "com.ryanchallinor.Bespoke"
   INCLUDE_BINARYDATA ON
-  CXX_LANGUAGE_STANDARD "C++17"
+  CXX_LANGUAGE_STANDARD "C++14"
   HEADER_SEARCH_PATHS
     "C:\\Python37\\include"
 )
@@ -840,7 +841,7 @@ jucer_project_module(
 jucer_project_module(
   juce_audio_processors
   PATH "${JUCE_MODULES_GLOBAL_PATH}"
-  JUCE_PLUGINHOST_VST ON
+  #JUCE_PLUGINHOST_VST ON
   JUCE_PLUGINHOST_VST3 ON
   # JUCE_PLUGINHOST_AU
   # JUCE_PLUGINHOST_LADSPA
@@ -980,9 +981,9 @@ jucer_export_target_configuration(
 )
 
 jucer_export_target(
-  "Visual Studio 2015"
-  VST_LEGACY_SDK_FOLDER "..\\..\\VST_SDK\\VST2_SDK\\public.sdk\\source\\vst2.x"
-  VST3_SDK_FOLDER "..\\VST_SDK\\VST3_SDK"
+  "Visual Studio 2019"
+  #VST_LEGACY_SDK_FOLDER "C:\\SDKs\\VST_SDK\\VST2_SDK\\public.sdk\\source\\vst2.x"
+  VST3_SDK_FOLDER "C:\\SDKs\\VST_SDK\\VST3_SDK"
   EXTRA_PREPROCESSOR_DEFINITIONS
     "GLEW_STATIC"
     "BESPOKE_WINDOWS"
@@ -994,7 +995,7 @@ jucer_export_target(
 )
 
 jucer_export_target_configuration(
-  "Visual Studio 2015"
+  "Visual Studio 2019"
   NAME "Debug"
   DEBUG_MODE ON
   BINARY_NAME "BespokeSynth"
@@ -1004,9 +1005,9 @@ jucer_export_target_configuration(
     "Source\\push2"
     "Source\\push2\\libusb"
     "Source\\push2\\modules\\libusb"
-    "C:\\Python38\\include"
+    "C:\\Python39\\include"
   EXTRA_LIBRARY_SEARCH_PATHS
-    "C:\\Python38\\libs"
+    "C:\\Python39\\libs"
   OPTIMISATION "No optimisation"
   ENABLE_PLUGIN_COPY_STEP OFF
   WARNING_LEVEL "Low"
@@ -1017,7 +1018,7 @@ jucer_export_target_configuration(
 )
 
 jucer_export_target_configuration(
-  "Visual Studio 2015"
+  "Visual Studio 2019"
   NAME "Release"
   DEBUG_MODE OFF
   BINARY_NAME "BespokeSynth"
@@ -1027,9 +1028,9 @@ jucer_export_target_configuration(
     "Source\\push2"
     "Source\\push2\\libusb"
     "Source\\push2\\modules\\libusb"
-    "C:\\Python38\\include"
+    "C:\\Python39\\include"
   EXTRA_LIBRARY_SEARCH_PATHS
-    "C:\\Python38\\libs"
+    "C:\\Python39\\libs"
   LINK_TIME_OPTIMISATION ON
   OPTIMISATION "Maximise speed"
   ENABLE_PLUGIN_COPY_STEP OFF
