@@ -42,7 +42,11 @@ private:
    FloatSlider* mZoomSlider;
    FloatSlider* mXSlider;
    FloatSlider* mYSlider;
+   FloatSlider* mMouseScrollXSlider;
+   FloatSlider* mMouseScrollYSlider;
 
    float mWidth;
    float mHeight;
+   float mMouseScrollX;
+   float mMouseScrollY;
 };

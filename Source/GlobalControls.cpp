@@ -14,6 +14,8 @@
 #include "UIControlMacros.h"
 
 GlobalControls::GlobalControls()
+   : mMouseScrollX(0)
+   , mMouseScrollY(0)
 {
 }
 
@@ -29,6 +31,8 @@ void GlobalControls::CreateUIControls()
    FLOATSLIDER(mZoomSlider, "zoom", &gDrawScale, .1f, 8.0f);
    FLOATSLIDER(mXSlider, "x pos", &(TheSynth->GetDrawOffset().x), -10000, 10000);
    FLOATSLIDER(mYSlider, "y pos", &(TheSynth->GetDrawOffset().y), -10000, 10000);
+   FLOATSLIDER(mMouseScrollXSlider, "scroll x", &mMouseScrollX, -100, 100);
+   FLOATSLIDER(mMouseScrollYSlider, "scroll y", &mMouseScrollY, -100, 100);
    ENDUIBLOCK(mWidth, mHeight);
 }
 
@@ -40,6 +44,8 @@ void GlobalControls::DrawModule()
    mZoomSlider->Draw();
    mXSlider->Draw();
    mYSlider->Draw();
+   mMouseScrollXSlider->Draw();
+   mMouseScrollYSlider->Draw();
 }
 
 void GlobalControls::FloatSliderUpdated(FloatSlider* slider, float oldVal)
@@ -50,6 +56,20 @@ void GlobalControls::FloatSliderUpdated(FloatSlider* slider, float oldVal)
       float zoomAmount = (gDrawScale - oldVal) / oldVal;
       ofVec2f zoomCenter = ofVec2f(TheSynth->GetMouseX(), TheSynth->GetMouseY()) + TheSynth->GetDrawOffset();
       TheSynth->GetDrawOffset() -= zoomCenter * zoomAmount;
+   }
+
+   if (slider == mMouseScrollXSlider)
+   {
+      float delta = mMouseScrollX - oldVal;
+      TheSynth->MouseScrolled(-delta, 0);
+      mMouseScrollX = 0;
+   }
+
+   if (slider == mMouseScrollYSlider)
+   {
+      float delta = mMouseScrollY - oldVal;
+      TheSynth->MouseScrolled(0, -delta);
+      mMouseScrollY = 0;
    }
 }
 
@@ -79,6 +99,8 @@ vector<IUIControl*> GlobalControls::ControlsToNotSetDuringLoadState() const
    ignore.push_back(mZoomSlider);
    ignore.push_back(mXSlider);
    ignore.push_back(mYSlider);
+   ignore.push_back(mMouseScrollXSlider);
+   ignore.push_back(mMouseScrollYSlider);
    return ignore;
 }
 
