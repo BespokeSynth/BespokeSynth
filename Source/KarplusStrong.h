@@ -52,7 +52,7 @@ private:
    //IDrawableModule
    void DrawModule() override;
    void DrawModuleUnclipped() override;
-   void GetModuleDimensions(float& width, float& height) override { width = 250; height = 90; }
+   void GetModuleDimensions(float& width, float& height) override { width = 275; height = 90; }
    bool Enabled() const override { return mEnabled; }
 
    PolyphonyMgr mPolyMgr;
