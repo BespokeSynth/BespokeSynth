@@ -1,47 +1,47 @@
 from __future__ import annotations
 
-   def play_note(pitch, velocity, length=1.0/16.0, pan = 0, output_index = 0):
+   def play_note(this, pitch, velocity, length=1.0/16.0, pan = 0, output_index = 0):
       pass
 
-   def schedule_note(delay, pitch, velocity, length=1.0/16.0, pan = 0, output_index = 0):
+   def schedule_note(this, delay, pitch, velocity, length=1.0/16.0, pan = 0, output_index = 0):
       pass
 
-   def schedule_note_msg(delay, pitch, velocity, pan = 0, output_index = 0):
+   def schedule_note_msg(this, delay, pitch, velocity, pan = 0, output_index = 0):
       pass
 
-   def schedule_call(delay, method):
+   def schedule_call(this, delay, method):
       pass
 
-   def note_msg(pitch, velocity, pan = 0, output_index = 0):
+   def note_msg(this, pitch, velocity, pan = 0, output_index = 0):
       pass
 
-   def set(path, value):
+   def set(this, path, value):
       pass
 
-   def schedule_set(delay, path, value):
+   def schedule_set(this, delay, path, value):
       pass
 
-   def get(path):
+   def get(this, path):
       pass
 
-   def adjust(path, amount):
+   def adjust(this, path, amount):
       pass
 
-   def highlight_line(lineNum, scriptModuleIndex):
+   def highlight_line(this, lineNum, scriptModuleIndex):
       pass
 
-   def output(obj):
+   def output(this, obj):
       pass
 
-   def me():
+   def me(this, ):
       pass
 
-   def stop():
+   def stop(this, ):
       pass
 
-   def get_caller():
+   def get_caller(this, ):
       pass
 
-   def set_num_note_outputs(num):
+   def set_num_note_outputs(this, num):
       pass
 

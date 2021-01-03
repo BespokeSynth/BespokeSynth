@@ -25,7 +25,7 @@ StepSequencer::StepSequencer()
 , mStochasticMode(false)
 , mStochasticCheckbox(nullptr)
 , mGridController(nullptr)
-, mPreset(0)
+, mPreset(-1)
 , mPresetDropdown(nullptr)
 , mColorOffset(3)
 , mLpYOff(0)
@@ -43,6 +43,7 @@ StepSequencer::StepSequencer()
 , mFlusher(this)
 , mShiftLeftButton(nullptr)
 , mShiftRightButton(nullptr)
+, mIsSetUp(false)
 {
    TheTransport->AddListener(this, mStepInterval, OffsetInfo(0, true), true);
    mFlusher.SetInterval(mStepInterval);
@@ -74,6 +75,7 @@ void StepSequencer::CreateUIControls()
    mGrid->SetMajorColSize(4);
    mGrid->SetFlip(true);
    
+   mPresetDropdown->AddLabel("clear", -1);
    mPresetDropdown->AddLabel("16s", 0);
    mPresetDropdown->AddLabel("8s", 1);
    mPresetDropdown->AddLabel("kicksnare", 2);
@@ -81,7 +83,6 @@ void StepSequencer::CreateUIControls()
    mPresetDropdown->AddLabel("boogaloo", 4);
    mPresetDropdown->AddLabel("dubstep", 5);
    mPresetDropdown->AddLabel("trades", 6);
-   mPresetDropdown->AddLabel("clear", -1);
    
    mLpYOffDropdown->AddLabel("0", 0);
    mLpYOffDropdown->AddLabel("1", 1);
@@ -136,8 +137,6 @@ StepSequencer::~StepSequencer()
 void StepSequencer::Init()
 {
    IDrawableModule::Init();
-   
-   SetPreset(rand() % 7);
 }
 
 void StepSequencer::Poll()
@@ -621,6 +620,9 @@ int StepSequencer::GetStepNum(double time)
 
 void StepSequencer::OnTimeEvent(double time)
 {
+   if (!mIsSetUp)
+      return;
+
    mGrid->SetGrid(GetNumSteps(mStepInterval),mNumRows);
 
    if (!mEnabled)
@@ -890,6 +892,8 @@ void StepSequencer::SetUpFromSaveData()
    mGrid->SetGridMode(multisliderMode ? UIGrid::kMultislider : UIGrid::kNormal);
    mGrid->SetRestrictDragToRow(multisliderMode);
    mGrid->SetClickClearsToZero(!multisliderMode);
+
+   mIsSetUp = true;
 }
 
 namespace

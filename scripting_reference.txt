@@ -22,6 +22,8 @@ globals:
    bespoke.tone_to_pitch(index)
    bespoke.name_to_pitch(noteName)
    bespoke.pitch_to_name(pitch)
+   bespoke.pitch_to_freq(pitch)
+   bespoke.get_tempo()
 
 
 script-relative:
@@ -101,6 +103,7 @@ import sampleplayer
       sampleplayer.get(path)
    instance:
       s.set_cue_point(pitch, startSeconds, lengthSeconds, speed)
+      s.fill(data)
 
 
 import midicontroller

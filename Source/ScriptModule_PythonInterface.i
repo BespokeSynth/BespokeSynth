@@ -90,6 +90,14 @@ PYBIND11_EMBEDDED_MODULE(bespoke, m) {
    {
       return NoteName(pitch);
    });
+   m.def("pitch_to_freq", [](float pitch)
+   {
+      return TheScale->PitchToFreq(pitch);
+   });
+   m.def("get_tempo", []()
+   {
+      return TheTransport->GetTempo();
+   });
 }
 
 PYBIND11_EMBEDDED_MODULE(scriptmodule, m)
@@ -301,6 +309,10 @@ PYBIND11_EMBEDDED_MODULE(sampleplayer, m)
       .def("set_cue_point", [](SamplePlayer& player, int pitch, float startSeconds, float lengthSeconds, float speed)
       {
          player.SetCuePoint(pitch, startSeconds, lengthSeconds, speed);
+      })
+      .def("fill", [](SamplePlayer& player, vector<float> data)
+      {
+         player.FillData(data);
       });
 }
 

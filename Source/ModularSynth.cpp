@@ -483,8 +483,9 @@ void ModularSynth::DrawConsole()
          else
             ofSetColor(200, 200, 200);
          DrawTextNormal(it->text, 10, consoleY);
+         vector<string> lines = ofSplitString(it->text, "\n");
          ofPopStyle();
-         consoleY += 15;
+         consoleY += 15 * lines.size();
       }
 
       if (!mErrors.empty())
@@ -495,7 +496,8 @@ void ModularSynth::DrawConsole()
          for (auto it = mErrors.begin(); it != mErrors.end(); ++it)
          {
             DrawTextNormal(*it, 600, consoleY);
-            consoleY += 15;
+            vector<string> lines = ofSplitString(*it, "\n");
+            consoleY += 15 * lines.size();
          }
          ofPopStyle();
       }
@@ -636,6 +638,8 @@ float ModularSynth::GetMouseY(float rawY /*= FLT_MAX*/)
 
 void ModularSynth::MouseMoved(int intX, int intY )
 {
+   bool changed = (mMousePos.x != intX || mMousePos.y != intY);
+
    mMousePos.x = intX;
    mMousePos.y = intY;
    
@@ -650,8 +654,11 @@ void ModularSynth::MouseMoved(int intX, int intY )
    float x = GetMouseX();
    float y = GetMouseY();
 
-   for (auto* modal : mModalFocusItemStack)
-      modal->NotifyMouseMoved(x,y);
+   if (changed)
+   {
+      for (auto* modal : mModalFocusItemStack)
+         modal->NotifyMouseMoved(x, y);
+   }
 
    if (mMoveModule)
    {
@@ -717,17 +724,17 @@ void ModularSynth::MouseMoved(int intX, int intY )
       return;
    }
 
-   mModuleContainer.MouseMoved(x, y);
+   if (changed)
+      mModuleContainer.MouseMoved(x, y);
    
    if (gHoveredUIControl)
-   {
-      float uiX,uiY;
-      gHoveredUIControl->GetPosition(uiX, uiY);
-      float w, h;
-      gHoveredUIControl->GetDimensions(w, h);
-      
+   {  
       if (!gHoveredUIControl->IsMouseDown())
       {
+         float uiX, uiY;
+         gHoveredUIControl->GetPosition(uiX, uiY);
+         float w, h;
+         gHoveredUIControl->GetDimensions(w, h);
          if (x < uiX - 10 || y < uiY - 10 || x > uiX + w + 10 || y > uiY + h + 10)
             gHoveredUIControl = nullptr;
       }

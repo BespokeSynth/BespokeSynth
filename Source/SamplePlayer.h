@@ -20,11 +20,12 @@
 #include "DropdownList.h"
 #include "ClickButton.h"
 #include "TextEntry.h"
+#include "RadioButton.h"
 
 class SampleBank;
 class Sample;
 
-class SamplePlayer : public IAudioSource, public IDrawableModule, public INoteReceiver, public IFloatSliderListener, public IIntSliderListener, public IDropdownListener, public IButtonListener, public ITextEntryListener, private OSCReceiver, private OSCReceiver::Listener<OSCReceiver::RealtimeCallback>
+class SamplePlayer : public IAudioSource, public IDrawableModule, public INoteReceiver, public IFloatSliderListener, public IIntSliderListener, public IDropdownListener, public IButtonListener, public IRadioButtonListener, public ITextEntryListener, private OSCReceiver, private OSCReceiver::Listener<OSCReceiver::RealtimeCallback>
 {
 public:
    SamplePlayer();
@@ -50,6 +51,7 @@ public:
    void Resize(float width, float height) override { mWidth = ofClamp(width, 210, 9999); mHeight = ofClamp(height, 125, 9999); }
    
    void SetCuePoint(int pitch, float startSeconds, float lengthSeconds, float speed);
+   void FillData(vector<float> data);
    
    void oscMessageReceived(const OSCMessage& msg) override;
    void oscBundleReceived(const OSCBundle& bundle) override;
@@ -61,6 +63,7 @@ public:
    void DropdownUpdated(DropdownList* list, int oldVal) override;
    void ButtonClicked(ClickButton* button) override;
    void TextEntryComplete(TextEntry* entry) override;
+   void RadioButtonUpdated(RadioButton* radio, int oldVal) override;
    
    void LoadLayout(const ofxJSONElement& moduleInfo) override;
    void SaveLayout(ofxJSONElement& moduleInfo) override;
@@ -75,7 +78,15 @@ private:
    float GetPlayPositionForMouse(float mouseX) const;
    void GetPlayInfoForPitch(int pitch, float& startSeconds, float& lengthSeconds, float& speed) const;
    void DownloadYoutube(string search, string options);
+   void SearchYoutube(string searchTerm);
    void LoadFile();
+   void OnYoutubeDownloadComplete(string filename);
+   void SwitchAndRamp();
+   void SetCuePointForX(float mouseX);
+   float GetZoomStartSample() const;
+   float GetZoomEndSample() const;
+   float GetZoomStartSeconds() const;
+   float GetZoomEndSeconds() const;
    
    //IDrawableModule
    void DrawModule() override;
@@ -84,6 +95,7 @@ private:
    void OnClicked(int x, int y, bool right) override;
    bool MouseMoved(float x, float y) override;
    void MouseReleased() override;
+   bool MouseScrolled(int x, int y, float scrollX, float scrollY) override;
       
    float mWidth;
    float mHeight;
@@ -112,6 +124,9 @@ private:
    TextEntry* mDownloadYoutubeSearch;
    char mYoutubeSearch[MAX_TEXTENTRY_LENGTH];
    ClickButton* mLoadFileButton;
+   bool mIsLoadingSample;
+   float mZoomLevel;
+   float mZoomOffset;
    
    bool mOscWheelGrabbed;
    float mOscWheelPos;
@@ -124,7 +139,7 @@ private:
    
    struct SampleCuePoint
    {
-      SampleCuePoint() : startSeconds(0), lengthSeconds(1), speed(0) {}
+      SampleCuePoint() : startSeconds(0), lengthSeconds(2), speed(0) {}
       float startSeconds;
       float lengthSeconds;
       float speed;
@@ -133,7 +148,33 @@ private:
       FloatSlider* mSpeedSlider;
    };
    vector<SampleCuePoint> mSampleCuePoints{16};
+   RadioButton* mCuePointSelector;
+   int mActiveCuePointIndex;
+   bool mSetCuePoint;
+   Checkbox* mSetCuePointCheckbox;
 
    string mErrorString;
+
+   static const int kMaxYoutubeSearchResults = 10;
+   enum class RunningProcessType
+   {
+      None,
+      SearchYoutube,
+      DownloadYoutube
+   };
+   struct YoutubeSearchResult
+   {
+      string name;
+      float lengthSeconds;
+      string youtubeId;
+   };
+   RunningProcessType mRunningProcessType;
+   ChildProcess* mRunningProcess;
+   std::function<void()> mOnRunningProcessComplete;
+   vector<YoutubeSearchResult> mYoutubeSearchResults;
+   std::array<ClickButton*, kMaxYoutubeSearchResults> mSearchResultButtons;
+
+   ChannelBuffer mLastOutputSample;
+   ChannelBuffer mSwitchAndRampVal;
 };
 

@@ -12,7 +12,7 @@
 #include "ModularSynth.h"
 
 VelocitySetter::VelocitySetter()
-: mVelocity(.65f)
+: mVelocity(1)
 , mVelocitySlider(nullptr)
 , mRandomness(0)
 , mRandomnessSlider(nullptr)

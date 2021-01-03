@@ -194,6 +194,7 @@ private:
    ClickButton* mShiftRightButton;
    std::list<HeldButton> mHeldButtons;
    uint32* mMetaStepMasks;
+   bool mIsSetUp;
 };
 
 

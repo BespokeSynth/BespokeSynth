@@ -17,12 +17,18 @@ class FileStreamIn;
 
 #define MAX_SAMPLE_READ_PATH_LENGTH 1024
 
-class Sample
+class Sample : public juce::Timer
 {
 public:
+   enum class ReadType
+   {
+      Sync,
+      Async
+   };
+
    Sample();
    ~Sample();
-   bool Read(const char* path, bool mono = false);
+   bool Read(const char* path, bool mono = false, ReadType readType = ReadType::Sync);
    bool Write(const char* path = nullptr);   //no path = use read filename
    bool ConsumeData(double time, ChannelBuffer* out, int size, bool replace);
    void Play(double time, float rate, int offset, int stopPoint=-1);
@@ -52,11 +58,16 @@ public:
    int GetNumBars() const { return mNumBars; }
    void SetVolume(float vol) { mVolume = vol; }
    void CopyFrom(Sample* sample);
+   bool IsSampleLoading() { return mSamplesLeftToRead > 0; }
+   float GetSampleLoadProgress() { return (mNumSamples > 0) ? (1 - (float(mSamplesLeftToRead) / mNumSamples)) : 1; }
    
    void SaveState(FileStreamOut& out);
    void LoadState(FileStreamIn& in);
 private:
    void Setup(int length);
+   void FinishRead();
+   //juce::Timer
+   void timerCallback();
    
    ChannelBuffer mData;
    int mNumSamples;
@@ -72,6 +83,10 @@ private:
    bool mLooping;
    int mNumBars;
    float mVolume;
+
+   AudioFormatReader* mReader;
+   unique_ptr<AudioSampleBuffer> mReadBuffer;
+   int mSamplesLeftToRead;
 };
 
 #endif /* defined(__modularSynth__Sample__) */

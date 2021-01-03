@@ -24,6 +24,11 @@
 
 namespace py = pybind11;
 
+namespace
+{
+   const float kFontSize = 14;
+}
+
 CodeEntry::CodeEntry(ICodeEntryListener* owner, const char* name, int x, int y, float w, float h)
 : mListener(owner)
 , mCharWidth(5.85f)
@@ -58,11 +63,6 @@ CodeEntry::CodeEntry(ICodeEntryListener* owner, const char* name, int x, int y, 
 
 CodeEntry::~CodeEntry()
 {
-}
-
-namespace
-{
-   const float kFontSize = 14;
 }
 
 void CodeEntry::Poll()
@@ -1143,7 +1143,7 @@ bool CodeEntry::MouseScrolled(int x, int y, float scrollX, float scrollY)
       scrollX = 0;
 
    mScroll.x = MAX(mScroll.x - scrollX * 10, 0);
-   mScroll.y = MAX(mScroll.y + scrollY * 10, 0);
+   mScroll.y = MAX(mScroll.y - scrollY * 10, 0);
    
    OnCodeUpdated();
 

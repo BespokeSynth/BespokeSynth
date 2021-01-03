@@ -39,3 +39,9 @@ def name_to_pitch(noteName):
 def pitch_to_name(pitch):
    pass
 
+def pitch_to_freq(pitch):
+   pass
+
+def get_tempo():
+   pass
+

@@ -4,6 +4,6 @@ def get(path) -> linnstrument:
    pass
 
 class linnstrument:
-   def set_color(x, y, color):
+   def set_color(this, x, y, color):
       pass
 

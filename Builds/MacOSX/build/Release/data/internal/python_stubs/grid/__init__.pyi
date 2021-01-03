@@ -4,39 +4,39 @@ def get(path) -> grid:
    pass
 
 class grid:
-   def set(col, row, value):
+   def set(this, col, row, value):
       pass
 
-   def get(col, row):
+   def get(this, col, row):
       pass
 
-   def set_grid(cols, rows):
+   def set_grid(this, cols, rows):
       pass
 
-   def set_label(row, label):
+   def set_label(this, row, label):
       pass
 
-   def set_color(colorIndex, r, g, b):
+   def set_color(this, colorIndex, r, g, b):
       pass
 
-   def highlight_cell(col, row, delay, duration, colorIndex=1):
+   def highlight_cell(this, col, row, delay, duration, colorIndex=1):
       pass
 
-   def set_division(division):
+   def set_division(this, division):
       pass
 
-   def set_momentary(momentary):
+   def set_momentary(this, momentary):
       pass
 
-   def set_cell_color(col, row, colorIndex):
+   def set_cell_color(this, col, row, colorIndex):
       pass
 
-   def get_cell_color(col, row):
+   def get_cell_color(this, col, row):
       pass
 
-   def add_listener(script):
+   def add_listener(this, script):
       pass
 
-   def clear():
+   def clear(this, ):
       pass
 

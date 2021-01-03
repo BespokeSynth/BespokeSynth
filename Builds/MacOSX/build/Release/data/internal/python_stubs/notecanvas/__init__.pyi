@@ -4,9 +4,9 @@ def get(path) -> notecanvas:
    pass
 
 class notecanvas:
-   def add_note(measurePos, pitch, velocity, length):
+   def add_note(this, measurePos, pitch, velocity, length):
       pass
 
-   def clear():
+   def clear(this, ):
       pass
 

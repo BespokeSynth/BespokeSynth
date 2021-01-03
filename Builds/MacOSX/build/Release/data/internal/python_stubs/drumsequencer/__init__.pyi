@@ -4,9 +4,9 @@ def get(path) -> drumsequencer:
    pass
 
 class drumsequencer:
-   def set(step, pitch, velocity):
+   def set(this, step, pitch, velocity):
       pass
 
-   def get(step, pitch):
+   def get(this, step, pitch):
       pass
 

@@ -22,6 +22,8 @@ Sample::Sample()
 , mLooping(false)
 , mNumBars(-1)
 , mVolume(1)
+, mReader(nullptr)
+, mSamplesLeftToRead(0)
 {
    mName[0] = 0;
 }
@@ -30,7 +32,7 @@ Sample::~Sample()
 {
 }
 
-bool Sample::Read(const char* path, bool mono)
+bool Sample::Read(const char* path, bool mono, ReadType readType)
 {
    StringCopy(mReadPath,path,MAX_SAMPLE_READ_PATH_LENGTH);
    vector<string> tokens = ofSplitString(path, GetPathSeparator());
@@ -38,41 +40,36 @@ bool Sample::Read(const char* path, bool mono)
    mName[strlen(mName)-4] = 0;
    
    File file(ofToDataPath(path));
-   ScopedPointer<AudioFormatReader> reader(TheSynth->GetGlobalManagers()->mAudioFormatManager.createReaderFor(file));
+   delete mReader;
+   mReader = TheSynth->GetGlobalManagers()->mAudioFormatManager.createReaderFor(file);
    
-   if (reader != nullptr)
+   if (mReader != nullptr)
    {
-      mNumSamples = (int)reader->lengthInSamples;
-      mSampleRateRatio = float(reader->sampleRate) / gSampleRate;
-      
-      mData.Resize(mNumSamples);
-      
-      AudioSampleBuffer fileBuffer;
-      fileBuffer.setSize (reader->numChannels, mNumSamples);
-      reader->read(&fileBuffer, 0, mNumSamples, 0, true, true);
-      
+      mData.Resize(mReader->lengthInSamples);
       if (mono)
          mData.SetNumActiveChannels(1);
       else
-         mData.SetNumActiveChannels(reader->numChannels);
+         mData.SetNumActiveChannels(mReader->numChannels);
+      mData.Clear();
+
+      mNumSamples = (int)mReader->lengthInSamples;
+      mOffset = mNumSamples;
+      mSampleRateRatio = float(mReader->sampleRate) / gSampleRate;
       
-      for (int i=0; i<reader->lengthInSamples; ++i)
+      mReadBuffer = make_unique<AudioSampleBuffer>();
+      mReadBuffer->setSize(mReader->numChannels, mNumSamples);
+      
+      if (readType == ReadType::Sync)
       {
-         if (mono)
-         {
-            mData.GetChannel(0)[i] = fileBuffer.getSample(0, i); //put first channel in
-            for (int ch=1; ch<reader->numChannels; ++ch)
-               mData.GetChannel(0)[i] += fileBuffer.getSample(ch, i); //add the other channels
-            mData.GetChannel(0)[i] /= reader->numChannels;   //normalize volume
-         }
-         else
-         {
-            for (int ch=0; ch<reader->numChannels; ++ch)
-               mData.GetChannel(ch)[i] = fileBuffer.getSample(ch, i);
-         }
+         mReader->read(mReadBuffer.get(), 0, mNumSamples, 0, true, true);
+         FinishRead();
       }
-      
-      Reset();
+      else if (readType == ReadType::Async)
+      {
+         mSamplesLeftToRead = mNumSamples;
+         startTimer(100);
+      }
+
       return true;
    }
    else
@@ -81,6 +78,39 @@ bool Sample::Read(const char* path, bool mono)
    }
    
    return false;
+}
+
+void Sample::FinishRead()
+{
+   if (mData.NumActiveChannels() == 1 && mReadBuffer->getNumChannels() > 1)
+   {
+      BufferCopy(mData.GetChannel(0), mReadBuffer->getReadPointer(0), mReadBuffer->getNumSamples());  //put first channel in
+      for (int ch = 1; ch < mReadBuffer->getNumChannels(); ++ch)
+         Add(mData.GetChannel(0), mReadBuffer->getReadPointer(ch), mReadBuffer->getNumSamples()); //add the other channels
+      Mult(mData.GetChannel(0), 1.0f / mReadBuffer->getNumChannels(), mReadBuffer->getNumSamples());   //normalize volume
+   }
+   else
+   {
+      for (int ch = 0; ch < mReadBuffer->getNumChannels(); ++ch)
+         BufferCopy(mData.GetChannel(ch), mReadBuffer->getReadPointer(ch), mReadBuffer->getNumSamples());
+   }
+}
+
+//juce::Timer
+void Sample::timerCallback()
+{
+   int samplesToRead = 44100 * 10;
+   if (samplesToRead > mSamplesLeftToRead)
+      samplesToRead = mSamplesLeftToRead;
+   int startSample = mNumSamples - mSamplesLeftToRead;
+   mReader->read(mReadBuffer.get(), startSample, samplesToRead, startSample, true, true);
+   mSamplesLeftToRead -= samplesToRead;
+
+   if (mSamplesLeftToRead <= 0)
+   {
+      FinishRead();
+      stopTimer();
+   }
 }
 
 void Sample::Create(int length)

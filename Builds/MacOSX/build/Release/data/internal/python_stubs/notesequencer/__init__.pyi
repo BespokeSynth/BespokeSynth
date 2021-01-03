@@ -4,6 +4,6 @@ def get(path) -> notesequencer:
    pass
 
 class notesequencer:
-   def set_step(step, pitch, velocity, length):
+   def set_step(this, step, pitch, velocity, length):
       pass
 

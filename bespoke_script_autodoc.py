@@ -83,7 +83,7 @@ for line in lines:
                instanceName = currentModule[0]
             docLine(tab+instanceName+"."+m.group(1)+"("+paramString+")")
             #docLine(tab+example: "+currentModule+"."+m.group(1)+"("+paramString+")")
-            stubLine(currentModule, "   def "+m.group(1)+"("+paramString+"):")
+            stubLine(currentModule, "   def "+m.group(1)+"(this, "+paramString+"):")
             stubLine(currentModule, "      pass\n")
          else:
             m = re.match(" *}, (\".*)\)", line)

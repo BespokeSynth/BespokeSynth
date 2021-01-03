@@ -358,3 +358,7 @@ Builds/LinuxMakefile/build/BespokeSynth
 Builds/MacOSX/build/Release/data/internal/used_vsts.json
 
 Builds/MacOSX/build/BespokeSynth/
+
+Builds/MacOSX/build/Release/data/savestate_mac/
+
+Builds/MacOSX/build/Release/data/youtube_temp/

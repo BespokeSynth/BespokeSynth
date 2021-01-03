@@ -7,21 +7,21 @@ def create(moduleType, x, y):
    pass
 
 class module:
-   def set_position(x, y):
+   def set_position(this, x, y):
       pass
 
-   def set_target(target):
+   def set_target(this, target):
       pass
 
-   def delete():
+   def delete(this, ):
       pass
 
-   def set(path, value):
+   def set(this, path, value):
       pass
 
-   def get(path):
+   def get(this, path):
       pass
 
-   def adjust(path, amount):
+   def adjust(this, path, amount):
       pass
 

@@ -37,7 +37,7 @@ public:
    float Value(double time) const;
    void Set(float a, float d, float s, float r, float h = -1);
    void Set(const ADSR& other);
-   void Clear() { for (auto e : mEvents) { e.Reset(); } }
+   void Clear() { for (auto& e : mEvents) { e.Reset(); } }
    void SetMaxSustain(float max) { mMaxSustain = max; }
    void SetSustainStage(int stage) { mSustainStage = stage; }
    bool IsDone(double time) const;
