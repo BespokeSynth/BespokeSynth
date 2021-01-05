@@ -12,7 +12,9 @@
 #include "FileStream.h"
 
 Checkbox::Checkbox(IDrawableModule* owner, const char* label, int x, int y, bool* var)
-: mVar(var)
+: mWidth(15)
+, mHeight(15)
+, mVar(var)
 , mOwner(owner)
 , mDisplayText(true)
 , mUseCircleLook(false)
@@ -42,7 +44,7 @@ void Checkbox::SetLabel(const char* label)
    if (mDisplayText)
       mWidth = 12+GetStringWidth(label);
    else
-      mWidth = 13;
+      mWidth = mHeight-3;
 }
 
 void Checkbox::SetDisplayText(bool display)
@@ -87,12 +89,12 @@ void Checkbox::Render()
    if (mUseCircleLook)
    {
       ofSetColor(darkColor);
-      ofCircle(mX+6,mY+8,5);
+      ofCircle(mX+mHeight/2-1,mY+mHeight/2+1,mHeight/3);
    }
    else
    {
       ofSetColor(color.r,color.g,color.b,color.a*.2f);
-      ofRect(mX,mY+1,12,12);
+      ofRect(mX,mY+1,mHeight-3,mHeight-3);
    }
 
    ofSetColor(color);
@@ -102,9 +104,9 @@ void Checkbox::Render()
    if (*mVar)
    {
       if (mUseCircleLook)
-         ofCircle(mX+6,mY+8,3);
+         ofCircle(mX+mHeight/2-1,mY+mHeight/2+1,mHeight/5);
       else
-         ofRect(mX+2, mY+3, 8, 8, 2);
+         ofRect(mX+2, mY+3, mHeight-7, mHeight-7, 2);
    }
 
    ofPopStyle();

@@ -30,6 +30,7 @@ public:
    ModuleContainer* GetContainer() override { return &mModuleContainer; }
    
    void Poll() override;
+   void KeyPressed(int key, bool isRepeat) override;
    bool ShouldClipContents() override { return false; }
    
    void ButtonClicked(ClickButton* button) override;
@@ -52,6 +53,7 @@ private:
    void GetModuleDimensions(float& width, float& height) override;
    void OnClicked(int x, int y, bool right) override;
    
+   bool CanAddGroup();
    void SavePrefab(string savePath);
    void UpdatePrefabName(string path);
    

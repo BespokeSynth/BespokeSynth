@@ -13,11 +13,10 @@ Monome::Monome(MidiDeviceListener* listener)
 : mIsOscSetUp(false)
 , mHasMonome(false)
 , mMaxColumns(8)
+, mGridRotation(3)
 , mListener(listener)
 {
-   bool success = SetUpOsc();
-   if (success)
-      Connect();
+   Connect();
 }
 
 Monome::~Monome()
@@ -39,11 +38,15 @@ bool Monome::SetUpOsc()
    if (!connected)
       return false;
    
+   mIsOscSetUp = true;
    return true;
 }
 
 void Monome::Connect()
 {
+   if (mHasMonome)
+      return;
+
    if (!mIsOscSetUp)
    {
       bool success = SetUpOsc();
@@ -64,8 +67,9 @@ void Monome::SetLightInternal(int x, int y, bool on)
       return;
    
    OSCMessage lightMsg("/monome/grid/led/set");
-   lightMsg.addInt32(x);
-   lightMsg.addInt32(y);
+   Vec2i pos = Rotate(x, y, mGridRotation);
+   lightMsg.addInt32(pos.x);
+   lightMsg.addInt32(pos.y);
    lightMsg.addInt32(on ? 1 : 0);
    bool written = mToMonome.send(lightMsg);
    assert(written);
@@ -125,13 +129,12 @@ void Monome::oscMessageReceived(const OSCMessage& msg)
    }
    else if (label == "/monome/grid/key")
    {
-      int row = msg[0].getInt32();
-      int col = msg[1].getInt32();
+      Vec2i pos = Rotate(msg[0].getInt32(), msg[1].getInt32(), -mGridRotation);
       int val = msg[2].getInt32();
       
       MidiNote note;
-      note.mPitch = row + col*mMaxColumns;
-      note.mVelocity = val * 127;
+      note.mPitch = pos.x + pos.y*mMaxColumns;
+      note.mVelocity = val * 127.0f;
       note.mChannel = 0;
       note.mDeviceName = "monome";
       mListener->OnMidiNote(note);
@@ -154,4 +157,19 @@ void Monome::SendValue(int page, int control, float value, bool forceNoteOn /*= 
 {
    //SetLightFlicker(control%8,control/8,value);
    SetLight(control%mMaxColumns,control/mMaxColumns,value>0);
+}
+
+Vec2i Monome::Rotate(int x, int y, int rotations)
+{
+   if (rotations < 0)
+      rotations += 4;
+   Vec2i ret(x, y);
+   for (int i = 0; i < rotations; ++i)
+   {
+      x = ret.y;
+      y = mMaxColumns - 1 - ret.x;
+      ret.x = x;
+      ret.y = y;
+   }
+   return ret;
 }

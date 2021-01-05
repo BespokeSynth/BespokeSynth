@@ -472,7 +472,7 @@ void ScriptModule::ScheduleUIControlValue(IUIControl* control, float value, doub
 void ScriptModule::HighlightLine(int lineNum, int scriptModuleIndex)
 {
    ScriptModule* module = sScriptModules[scriptModuleIndex];
-   if (module != sMostRecentLineExecutedModule)
+   if (module != sMostRecentLineExecutedModule || sPriorExecutedModule == nullptr)
    {
       sPriorExecutedModule = sMostRecentLineExecutedModule;
       sMostRecentLineExecutedModule = module;

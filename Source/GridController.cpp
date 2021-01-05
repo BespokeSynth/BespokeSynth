@@ -126,6 +126,10 @@ void GridController::SetLight(int x, int y, GridColor color, bool force)
       }
       rawColor = mColors[colorIdx];
    }
+   else
+   {
+      rawColor = colorIdx > 0 ? 127 : 0;
+   }
    
    SetLightDirect(x, y, rawColor, force);
 }

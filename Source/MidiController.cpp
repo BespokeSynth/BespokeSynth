@@ -314,7 +314,7 @@ void MidiController::OnMidiNote(MidiNote& note)
    if (!mEnabled || (mChannelFilter != ChannelFilter::kAny && note.mChannel != (int)mChannelFilter))
       return;
 
-   if (mUseChannelAsVoice)
+   if (mUseChannelAsVoice && note.mVelocity > 0)
    {
       int voiceIdx = note.mChannel - 1;
       mModulation.GetPitchBend(voiceIdx)->SetValue(0);
@@ -620,6 +620,12 @@ void MidiController::Poll()
             {
                ResyncTwoWay();
                mIsConnected = true;
+
+               for (auto* grid : mGrids)
+               {
+                  if (grid->mGridController[mControllerPage] != nullptr)
+                     grid->mGridController[mControllerPage]->OnControllerPageSelected();
+               }
             }
          }
          else
@@ -2228,7 +2234,8 @@ void UIControlConnection::SetNext(UIControlConnection* next)
 bool UIControlConnection::PostRepatch(PatchCableSource* cableSource, bool fromUserClick)
 {
    if (cableSource == mUIOwner->GetLayoutControl(mControl, mMessageType).mControlCable &&
-       (mPage == mUIOwner->GetPage() || mPageless))
+       (mPage == mUIOwner->GetPage() || mPageless) &&
+       fromUserClick)
    {
       mUIControl = dynamic_cast<IUIControl*>(cableSource->GetTarget());
       return true;

@@ -30,7 +30,7 @@
 
 #define NUM_DRUM_HITS 16
 
-class DrumPlayer : public IAudioSource, public INoteReceiver, public IDrawableModule, public IFloatSliderListener, public IDropdownListener, public IButtonListener, public IIntSliderListener, public ITextEntryListener, public IGridControllerListener
+class DrumPlayer : public IAudioSource, public INoteReceiver, public IDrawableModule, public IFloatSliderListener, public IDropdownListener, public IButtonListener, public IIntSliderListener, public ITextEntryListener, public IGridControllerListener, public ITimeListener
 {
 public:
    DrumPlayer();
@@ -61,6 +61,9 @@ public:
    //IGridControllerListener
    void OnControllerPageSelected() override;
    void OnGridButton(int x, int y, float velocity, IGridController* grid) override;
+
+   //ITimeListener
+   void OnTimeEvent(double time) override;
 
    void FloatSliderUpdated(FloatSlider* slider, float oldVal) override;
    void IntSliderUpdated(IntSlider* slider, int oldVal) override;
@@ -135,6 +138,10 @@ private:
    GridController* mGridController;
    NoteInputBuffer mNoteInputBuffer;
    bool mNeedSetup;
+   bool mNoteRepeat;
+   Checkbox* mNoteRepeatCheckbox;
+   NoteInterval mQuantizeInterval;
+   DropdownList* mQuantizeIntervalSelector;
    
    void LoadSampleLock();
    void LoadSampleUnlock();
@@ -193,6 +200,7 @@ private:
       , mWidenerBuffer(2048)
       , mSamplesRemainingToProcess(0)
       , mCurrentPlayheadIndex(0)
+      , mButtonHeldVelocity(0)
       {
          mEnvelope.GetHasSustainStage() = false;
          mEnvelope.GetA() = 1;
@@ -227,6 +235,7 @@ private:
       int mWiden;
       bool mHasIndividualOutput;
       string mHitDirectory;
+      int mButtonHeldVelocity;
       
       DrumPlayer* mOwner;
       FloatSlider* mVolSlider;
@@ -250,7 +259,7 @@ private:
       int mCurrentPlayheadIndex;
    };
    
-   DrumHit mDrumHits[NUM_DRUM_HITS];
+   std::array<DrumHit, NUM_DRUM_HITS> mDrumHits;
 };
 
 #endif /* defined(__modularSynth__DrumPlayer__) */

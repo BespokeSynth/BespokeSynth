@@ -331,5 +331,7 @@ void SingleOscillator::IntSliderUpdated(IntSlider* slider, int oldVal)
 
 void SingleOscillator::CheckboxUpdated(Checkbox* checkbox)
 {
+   if (checkbox == mEnabledCheckbox)
+      mPolyMgr.KillAll();
 }
 

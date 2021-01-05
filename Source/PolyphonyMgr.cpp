@@ -168,6 +168,15 @@ void PolyphonyMgr::Stop(double time, int pitch)
    }
 }
 
+void PolyphonyMgr::KillAll()
+{
+   for (int i = 0; i < kNumVoices; ++i)
+   {
+      mVoices[i].mVoice->ClearVoice();
+      mVoices[i].mNoteOn = false;
+   }
+}
+
 void PolyphonyMgr::Process(double time, ChannelBuffer* out, int bufferSize)
 {
    PROFILER(PolyphonyMgr);

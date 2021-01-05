@@ -51,12 +51,10 @@ public:
    void Start(double time, int pitch, float amount, int voiceIdx, ModulationParameters modulation);
    void Stop(double time, int pitch);
    void Process(double time, ChannelBuffer* out, int bufferSize);
-   void GetPhaseAndInc(float& phase, float& inc);
    void DrawDebug(float x, float y);
    void SetVoiceLimit(int limit) { mVoiceLimit = limit; }
+   void KillAll();
 private:
-   void Prune(double time);
-   
    VoiceInfo mVoices[kNumVoices];
    bool mAllowStealing;
    int mLastVoice;

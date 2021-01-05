@@ -189,16 +189,19 @@ NoteCanvasElement::NoteCanvasElement(Canvas* canvas, int col, int row, float off
 , mVoiceIdx(-1)
 , mPan(0)
 {
-   mElementOffsetSlider = new FloatSlider(dynamic_cast<IFloatSliderListener*>(canvas->GetControls()),"offset",0,0,100,15,&mOffset,-1,1);
-   AddElementUIControl(mElementOffsetSlider);
-   mElementLengthSlider = new FloatSlider(dynamic_cast<IFloatSliderListener*>(canvas->GetControls()),"length",0,0,100,15,&mLength,0,mCanvas->GetNumCols());
-   AddElementUIControl(mElementLengthSlider);
-   mElementRowSlider = new IntSlider(dynamic_cast<IIntSliderListener*>(canvas->GetControls()),"row",0,0,100,15,&mRow,0,mCanvas->GetNumRows()-1);
-   AddElementUIControl(mElementRowSlider);
-   mElementColSlider = new IntSlider(dynamic_cast<IIntSliderListener*>(canvas->GetControls()),"step",0,0,100,15,&mCol,0,mCanvas->GetNumCols()-1);
-   AddElementUIControl(mElementColSlider);
-   mVelocitySlider = new FloatSlider(dynamic_cast<IFloatSliderListener*>(canvas->GetControls()),"velocity",0,0,100,15,&mVelocity,0,1);
-   AddElementUIControl(mVelocitySlider);
+   if (canvas->GetControls())
+   {
+      mElementOffsetSlider = new FloatSlider(dynamic_cast<IFloatSliderListener*>(canvas->GetControls()), "offset", 0, 0, 100, 15, &mOffset, -1, 1);
+      AddElementUIControl(mElementOffsetSlider);
+      mElementLengthSlider = new FloatSlider(dynamic_cast<IFloatSliderListener*>(canvas->GetControls()), "length", 0, 0, 100, 15, &mLength, 0, mCanvas->GetNumCols());
+      AddElementUIControl(mElementLengthSlider);
+      mElementRowSlider = new IntSlider(dynamic_cast<IIntSliderListener*>(canvas->GetControls()), "row", 0, 0, 100, 15, &mRow, 0, mCanvas->GetNumRows() - 1);
+      AddElementUIControl(mElementRowSlider);
+      mElementColSlider = new IntSlider(dynamic_cast<IIntSliderListener*>(canvas->GetControls()), "step", 0, 0, 100, 15, &mCol, 0, mCanvas->GetNumCols() - 1);
+      AddElementUIControl(mElementColSlider);
+      mVelocitySlider = new FloatSlider(dynamic_cast<IFloatSliderListener*>(canvas->GetControls()), "velocity", 0, 0, 100, 15, &mVelocity, 0, 1);
+      AddElementUIControl(mVelocitySlider);
+   }
 }
 
 CanvasElement* NoteCanvasElement::CreateDuplicate() const

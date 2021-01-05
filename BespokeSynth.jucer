@@ -207,6 +207,16 @@
         <FILE id="RG4zGd" name="TremoloEffect.h" compile="0" resource="0" file="Source/TremoloEffect.h"/>
       </GROUP>
       <GROUP id="{6781AC07-A090-A7AF-8D27-BCB6D9526ABD}" name="modules">
+        <FILE id="LR35O8" name="PlaySequencer.cpp" compile="1" resource="0"
+              file="Source/PlaySequencer.cpp"/>
+        <FILE id="aM2hLL" name="PlaySequencer.h" compile="0" resource="0" file="Source/PlaySequencer.h"/>
+        <FILE id="xoTTXT" name="NoteQuantizer.cpp" compile="1" resource="0"
+              file="Source/NoteQuantizer.cpp"/>
+        <FILE id="PKZbyV" name="NoteQuantizer.h" compile="0" resource="0" file="Source/NoteQuantizer.h"/>
+        <FILE id="Qk40NI" name="SampleCapturer.cpp" compile="1" resource="0"
+              file="Source/SampleCapturer.cpp"/>
+        <FILE id="yuzUvU" name="SampleCapturer.h" compile="0" resource="0"
+              file="Source/SampleCapturer.h"/>
         <FILE id="GNe9mj" name="EQModule.cpp" compile="1" resource="0" file="Source/EQModule.cpp"/>
         <FILE id="Emra1l" name="EQModule.h" compile="0" resource="0" file="Source/EQModule.h"/>
         <FILE id="g6FaB1" name="ValueStream.cpp" compile="1" resource="0" file="Source/ValueStream.cpp"/>

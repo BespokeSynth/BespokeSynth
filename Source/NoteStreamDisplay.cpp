@@ -168,7 +168,9 @@ void NoteStreamDisplay::PlayNote(double time, int pitch, int velocity, int voice
          if (lineIndex >= 0)
             mDebugLines += lines[lineIndex] + "\n";
       }
-      mDebugLines += "PlayNote("+ofToString(time/1000)+", "+ofToString(pitch)+", "+ofToString(velocity)+", "+ofToString(voiceIdx)+")";
+      string line = "PlayNote(" + ofToString(time / 1000) + ", " + ofToString(pitch) + ", " + ofToString(velocity) + ", " + ofToString(voiceIdx) + ")";
+      mDebugLines += line;
+      ofLog() << line;
    }
 }
 

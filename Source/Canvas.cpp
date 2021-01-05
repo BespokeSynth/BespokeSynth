@@ -22,6 +22,7 @@ Canvas::Canvas(IDrawableModule* parent, int x, int y, int w, int h, float length
 , mListener(nullptr)
 , mStart(0)
 , mEnd(length)
+, mControls(nullptr)
 , mCursorPos(-1)
 , mElementCreator(elementCreator)
 , mClickedElement(nullptr)
@@ -35,6 +36,7 @@ Canvas::Canvas(IDrawableModule* parent, int x, int y, int w, int h, float length
 , mDragEnd(kHighlightEnd_None)
 , mMajorColumnInterval(-1)
 , mHasDuplicatedThisDrag(false)
+, mScrollable(true)
 , mDragMode(kDragBoth)
 {
    SetName("canvas");
@@ -62,6 +64,20 @@ void Canvas::Render()
    GetDimensions(w,h);
    ofNoFill();
    ofRect(0,0,mWidth,mHeight);
+   if (ShowVerticalScrollBar())
+   {
+      ofPushStyle();
+      ofFill();
+      ofRect(GetGridWidth(), 0, scrollBarSize, GetGridHeight());
+      ofPopStyle();
+   }
+   if (ShowHorizontalScrollBar())
+   {
+      ofPushStyle();
+      ofFill();
+      ofRect(0, GetGridHeight(), GetGridWidth(), scrollBarSize);
+      ofPopStyle();
+   }
    ofRect(0,0,GetGridWidth(),GetGridHeight());
    
    for (int i=1; i<GetNumVisibleRows(); ++i)
@@ -109,6 +125,7 @@ void Canvas::Render()
    if (ShowVerticalScrollBar())
    {
       ofFill();
+      ofSetColor(ofColor::white);
       ofRect(GetGridWidth(), GetScrollBarTop(),
              scrollBarSize, GetScrollBarBottom()-GetScrollBarTop());
    }
@@ -142,7 +159,8 @@ void Canvas::SelectElement(CanvasElement* element)
    if (!commandHeld)
    {
       mClickedElement = element;
-      mControls->SetElement(element);
+      if (mControls)
+         mControls->SetElement(element);
       
       if (element && element->GetHighlighted())
          return;
@@ -168,7 +186,8 @@ void Canvas::SelectElement(CanvasElement* element)
 void Canvas::SelectElements(vector<CanvasElement*> elements)
 {
    bool commandHeld = GetKeyModifiers() == kModifier_Command;
-   mControls->SetElement(elements.empty() ? nullptr : elements[0]);
+   if (mControls)
+      mControls->SetElement(elements.empty() ? nullptr : elements[0]);
    
    for (int i=0; i<mElements.size(); ++i)
    {
@@ -208,12 +227,12 @@ float Canvas::GetGridHeight() const
 
 bool Canvas::ShowVerticalScrollBar() const
 {
-   return GetNumVisibleRows() < mNumRows;
+   return mScrollable && GetNumVisibleRows() < mNumRows;
 }
 
 bool Canvas::ShowHorizontalScrollBar() const
 {
-   return false;
+   return mScrollable && false;
 }
 
 float Canvas::GetScrollBarTop() const
@@ -475,7 +494,8 @@ void Canvas::KeyPressed(int key, bool isRepeat)
    {
       if (key == OF_KEY_BACKSPACE)
       {
-         mControls->SetElement(nullptr);
+         if (mControls)
+            mControls->SetElement(nullptr);
          
          vector<CanvasElement*> toRemove;
          for (auto element : mElements)
@@ -552,6 +572,27 @@ void Canvas::FillElementsAt(float pos, vector<CanvasElement*>& elementsAt) const
       if (on)
          elementsAt[mElements[i]->mRow] = mElements[i];
    }
+}
+
+void Canvas::EraseElementsAt(float pos)
+{
+   vector<CanvasElement*> toErase;
+   for (int i = 0; i < mElements.size(); ++i)
+   {
+      if (mElements[i]->mRow == -1 || mElements[i]->mCol == -1)
+         continue;
+
+      bool on = false;
+      if (pos >= mElements[i]->GetStart() && pos < mElements[i]->GetEnd())
+         on = true;
+      if (mWrap && pos >= mElements[i]->GetStart() - mLength && pos < mElements[i]->GetEnd() - mLength)
+         on = true;
+      if (on)
+         toErase.push_back(mElements[i]);
+   }
+
+   for (auto* elem : toErase)
+      RemoveElement(elem);
 }
 
 CanvasCoord Canvas::GetCoordAt(int x, int y)

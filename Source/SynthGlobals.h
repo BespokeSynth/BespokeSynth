@@ -69,7 +69,7 @@ typedef map<string,int> EnumMap;
 
 const int kWorkBufferSize = 4096; //larger than the audio buffer size would ever be
 
-const int kNumVoices = 18;
+const int kNumVoices = 16;
 
 extern int gSampleRate;
 extern int gBufferSize;

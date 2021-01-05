@@ -177,7 +177,7 @@ void NoteStepSequencer::DrawModule()
    ofSetColor(128, 128, 128, gModuleDrawAlpha * .8f);
    for (int i=0; i<mGrid->GetRows(); ++i)
    {
-      ofVec2f pos = mGrid->GetCellPosition(0, i) + mGrid->GetPosition(true);
+      ofVec2f pos = mGrid->GetCellPosition(0, i-1) + mGrid->GetPosition(true);
       float scale = MIN(mGrid->IClickable::GetDimensions().y / mGrid->GetRows(), 20);
       DrawTextNormal(NoteName(RowToPitch(i),false,true) + "("+ ofToString(RowToPitch(i)) + ")", pos.x - 5, pos.y - (scale/8), scale);
    }

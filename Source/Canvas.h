@@ -81,6 +81,7 @@ public:
    CanvasControls* GetControls() { return mControls; }
    vector<CanvasElement*>& GetElements() { return mElements; }
    void FillElementsAt(float pos, vector<CanvasElement*>& elements) const;
+   void EraseElementsAt(float pos);
    CanvasElement* GetElementAt(float pos, int row);
    void SetCursorPos(float pos) { mCursorPos = pos; }
    float GetCursorPos() const { return mCursorPos; }
@@ -97,6 +98,7 @@ public:
    void SetMajorColumnInterval(int interval) { mMajorColumnInterval = interval; }
    void SetDragMode(DragMode mode) { mDragMode = mode; }
    bool IsRowVisible(int row) const;
+   void SetScrollable(bool scrollable) { mScrollable = scrollable; }
    
    //IUIControl
    void SetFromMidiCC(float slider) override {}
@@ -144,6 +146,7 @@ private:
    HighlightEnd mDragEnd;
    int mMajorColumnInterval;
    bool mHasDuplicatedThisDrag;
+   bool mScrollable;
    
    int mNumRows;
    int mNumCols;

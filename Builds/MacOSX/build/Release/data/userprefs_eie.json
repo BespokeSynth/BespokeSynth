@@ -1,18 +1,20 @@
 {
-   "samplerate" : 44100,
+   "samplerate" : 48000,
    "buffersize" : 256,
-   "audio_output_device" : "Speakers (2- EIE)",
-   "audio_input_device" : "EIE (2- EIE)",
+   "audio_output_device" : "Speakers (Realtek High Definition Audio)",
+   "audio_input_device" : "none",
    "height" : 1897,
    "width" : 1080,
    "position" : { "x": -3640, "y": 349 },
-   "zoom" : 1.5,
+   "zoom" : 1.4,
    "layout" : "\\layouts\\blank.json",
    "scroll_multiplier_horizontal" : 1,
-   "scroll_multiplier_vertical" : -0.2,
+   "scroll_multiplier_vertical" : 0.5,
+   "autosave" : true,
    "vstsearchdirs" : [
       "C:\\Program Files\\Common Files\\VST2",
       "C:\\Program Files\\Common Files\\VST3",
-      "C:\\Program Files\\Steinberg\\VSTPlugins"
+      "C:\\Program Files\\Steinberg\\VSTPlugins",
+      "C:\\Program Files\\Native Instruments\\VSTPlugins 64 bit"
    ]
 }

@@ -42,6 +42,7 @@ public:
    void LoadState(FileStreamIn& in, bool shouldSetValue = true) override;
    bool IsSliderControl() override { return false; }
    bool IsButtonControl() override { return true; }
+   void SetBoxSize(float size) { mHeight = size; }
    
    bool CheckNeedsDraw() override;
    
@@ -50,9 +51,10 @@ protected:
 
 private:
    void OnClicked(int x, int y, bool right) override;
-   void GetDimensions(float& width, float& height) override { width = mWidth; height = 15; }
+   void GetDimensions(float& width, float& height) override { width = mWidth; height = mHeight; }
    void CalcSliderVal();
-   int mWidth;
+   float mWidth;
+   float mHeight;
    bool* mVar;
    IDrawableModule* mOwner;
    bool mLastDisplayedValue;

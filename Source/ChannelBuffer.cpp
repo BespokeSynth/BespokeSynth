@@ -145,7 +145,7 @@ void ChannelBuffer::Resize(int bufferSize)
 
 namespace
 {
-   const int kSaveStateRev = 0;
+   const int kSaveStateRev = 1;
 }
 
 void ChannelBuffer::Save(FileStreamOut& out, int writeLength)
@@ -154,8 +154,13 @@ void ChannelBuffer::Save(FileStreamOut& out, int writeLength)
    
    out << writeLength;
    out << mActiveChannels;
-   for (int i=0; i<mActiveChannels; ++i)
-      out.Write(mBuffers[i], writeLength);
+   for (int i = 0; i < mActiveChannels; ++i)
+   {
+      bool hasBuffer = mBuffers[i] != nullptr;
+      out << hasBuffer;
+      if (hasBuffer)
+         out.Write(mBuffers[i], writeLength);
+   }
 }
 
 void ChannelBuffer::Load(FileStreamIn& in, int& readLength, bool setBufferSize)
@@ -170,6 +175,13 @@ void ChannelBuffer::Load(FileStreamIn& in, int& readLength, bool setBufferSize)
    else
       assert(readLength == mBufferSize);
    in >> mActiveChannels;
-   for (int i=0; i<mActiveChannels; ++i)
-      in.Read(GetChannel(i), readLength);
+   for (int i = 0; i < mActiveChannels; ++i)
+   {
+      bool hasBuffer = true;
+      if (rev >= 1)
+         in >> hasBuffer;
+      
+      if (hasBuffer)
+         in.Read(GetChannel(i), readLength);
+   }
 }

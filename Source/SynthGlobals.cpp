@@ -70,7 +70,7 @@ void SynthInit()
    
    TheSynth->GetGlobalManagers()->mAudioFormatManager.registerBasicFormats();
    
-   //assert(kNumVoices <= 16);  //assumption that we don't have more voices than midi channels
+   assert(kNumVoices <= 16);  //assumption that we don't have more voices than midi channels
 }
 
 void LoadGlobalResources()

@@ -43,12 +43,14 @@ public:
 
 private:
    void SetLightInternal(int x, int y, bool on);
+   Vec2i Rotate(int x, int y, int rotations);
    
    OSCSender mToSerialOsc;
    OSCSender mToMonome;
    bool mIsOscSetUp;
    bool mHasMonome;
    int mMaxColumns;
+   int mGridRotation;
    
    MidiDeviceListener* mListener;
 };

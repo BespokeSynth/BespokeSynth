@@ -18,7 +18,7 @@
 
 DrumPlayer::DrumPlayer()
 : mSpeed(1)
-, mSpeedRandomization(0.01f)
+, mSpeedRandomization(0)
 , mVolume(1)
 , mLoadedKit(0)
 , mVolSlider(nullptr)
@@ -42,10 +42,22 @@ DrumPlayer::DrumPlayer()
 , mGridController(nullptr)
 , mNoteInputBuffer(this)
 , mNeedSetup(true)
+, mNoteRepeat(false)
+, mQuantizeInterval(kInterval_None)
 {
+   TheTransport->AddListener(this, mQuantizeInterval, OffsetInfo(0, true), false);
+
    ReadKits();
    
    strcpy(mNewKitName, "new");
+}
+
+DrumPlayer::~DrumPlayer()
+{
+   TheTransport->RemoveListener(this);
+
+   for (int i = 0; i < mIndividualOutputs.size(); ++i)
+      delete mIndividualOutputs[i];
 }
 
 void DrumPlayer::CreateUIControls()
@@ -56,15 +68,27 @@ void DrumPlayer::CreateUIControls()
    mSpeedRandomizationSlider = new FloatSlider(this, "speed rnd", 4, 34, 100, 15, &mSpeedRandomization, 0, .2f);
    mKitSelector = new DropdownList(this,"kit",4,50,&mLoadedKit);
    mEditCheckbox = new Checkbox(this,"edit",73,52,&mEditMode);
-   mSaveButton = new ClickButton(this,"save current",200,22);
-   mNewKitButton = new ClickButton(this,"new kit", 200, 4);
-   mNewKitNameEntry = new TextEntry(this,"kitname",200, 40,7,mNewKitName);
+   //mSaveButton = new ClickButton(this,"save current",200,22);
+   //mNewKitButton = new ClickButton(this,"new kit", 200, 4);
+   //mNewKitNameEntry = new TextEntry(this,"kitname",200, 40,7,mNewKitName);
    mAuditionSlider = new FloatSlider(this,"aud",140,50,40,15,&mAuditionInc,-1,1,0);
    mMonoCheckbox = new Checkbox(this,"mono",mVolSlider,kAnchor_Right_Padded,&mMonoOutput);
    mShuffleButton = new ClickButton(this,"shuffle",140,34);
    mGridController = new GridController(this, "grid", 4, 50);
+   mQuantizeIntervalSelector = new DropdownList(this, "quantize", 200, 4, (int*)(&mQuantizeInterval));
+   mNoteRepeatCheckbox = new Checkbox(this, "repeat", 200, 22, &mNoteRepeat);
 
    mKitSelector->SetShowing(false); //TODO(Ryan) replace "kits" concept with a better form of serialization
+
+   mQuantizeIntervalSelector->AddLabel("none", kInterval_None);
+   mQuantizeIntervalSelector->AddLabel("4n", kInterval_4n);
+   mQuantizeIntervalSelector->AddLabel("4nt", kInterval_4nt);
+   mQuantizeIntervalSelector->AddLabel("8n", kInterval_8n);
+   mQuantizeIntervalSelector->AddLabel("8nt", kInterval_8nt);
+   mQuantizeIntervalSelector->AddLabel("16n", kInterval_16n);
+   mQuantizeIntervalSelector->AddLabel("16nt", kInterval_16nt);
+   mQuantizeIntervalSelector->AddLabel("32n", kInterval_32n);
+   mQuantizeIntervalSelector->AddLabel("64n", kInterval_64n);
    
    for (int i=0; i<NUM_DRUM_HITS; ++i)
       mDrumHits[i].CreateUIControls(this, i);
@@ -206,12 +230,6 @@ void DrumPlayer::DrumHit::SetUIControlsShowing(bool showing)
    mIndividualOutputCheckbox->SetShowing(showing);
    mLinkIdSlider->SetShowing(showing);
    mHitCategoryDropdown->SetShowing(showing);
-}
-
-DrumPlayer::~DrumPlayer()
-{
-   for (int i=0; i<mIndividualOutputs.size(); ++i)
-      delete mIndividualOutputs[i];
 }
 
 void DrumPlayer::LoadKit(int kit)
@@ -637,9 +655,35 @@ void DrumPlayer::OnClicked(int x, int y, bool right)
 void DrumPlayer::OnGridButton(int x, int y, float velocity, IGridController* grid)
 {
    int sampleIdx = GetAssociatedSampleIndex(x, y);
-   if (sampleIdx != -1)
+   if (sampleIdx >= 0)
    {
-      PlayNote(gTime, sampleIdx, velocity*127);
+      if (velocity > 0 && mQuantizeInterval == kInterval_None)
+      {
+         PlayNote(gTime, sampleIdx, velocity * 127);
+      }
+      else
+      {
+         if (sampleIdx < mDrumHits.size())
+         {
+            if (velocity > 0)
+               mDrumHits[sampleIdx].mButtonHeldVelocity = velocity * 127;
+            else if (mNoteRepeat)
+               mDrumHits[sampleIdx].mButtonHeldVelocity = 0;
+         }
+      }
+   }
+}
+
+void DrumPlayer::OnTimeEvent(double time)
+{
+   for (size_t i = 0; i < mDrumHits.size(); ++i)
+   {
+      if (mDrumHits[i].mButtonHeldVelocity > 0)
+      {
+         PlayNote(time, i, mDrumHits[i].mButtonHeldVelocity);
+         if (!mNoteRepeat)
+            mDrumHits[i].mButtonHeldVelocity = 0;
+      }
    }
 }
 
@@ -669,11 +713,13 @@ void DrumPlayer::DrawModule()
       ofPopStyle();
       
       mMonoCheckbox->Draw();
-      mSaveButton->Draw();
-      mNewKitButton->Draw();
-      mNewKitNameEntry->Draw();
+      //mSaveButton->Draw();
+      //mNewKitButton->Draw();
+      //mNewKitNameEntry->Draw();
       mAuditionSlider->Draw();
       mShuffleButton->Draw();
+      mQuantizeIntervalSelector->Draw();
+      mNoteRepeatCheckbox->Draw();
 
       ofPushMatrix();
       ofPushStyle();
@@ -724,9 +770,7 @@ void DrumPlayer::UpdateLights()
          Sample* sample = nullptr;
          if (sampleIdx != -1)
             sample = &(mDrumHits[sampleIdx].mSample);
-         if (sample &&
-             sample->IsPlaying() &&
-             sample->GetPlayPosition() < gSampleRate * .25f)
+         if (mDrumHits[sampleIdx].GetPlayProgress(gTime) < .75f)
             mGridController->SetLight(x,y,kGridColor3Bright);
          else if (sample)
             mGridController->SetLight(x,y,kGridColor3Dim);
@@ -938,6 +982,11 @@ void DrumPlayer::DropdownUpdated(DropdownList* list, int oldVal)
       if (list == mDrumHits[i].mHitCategoryDropdown)
          mDrumHits[i].mHitCategory = mDrumHits[i].mHitCategoryDropdown->GetLabel(mDrumHits[i].mHitCategoryIndex);
    }
+
+   if (list == mQuantizeIntervalSelector)
+   {
+      TheTransport->UpdateListener(this, mQuantizeInterval);
+   }
 }
 
 void DrumPlayer::CheckboxUpdated(Checkbox* checkbox)
@@ -970,10 +1019,10 @@ void DrumPlayer::CheckboxUpdated(Checkbox* checkbox)
 
 void DrumPlayer::ButtonClicked(ClickButton* button)
 {
-   if (button == mSaveButton)
+   /*if (button == mSaveButton)
       SaveKits();
    if (button == mNewKitButton)
-      CreateKit();
+      CreateKit();*/
    if (button == mShuffleButton)
       ShuffleKit();
    

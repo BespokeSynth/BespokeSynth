@@ -293,7 +293,7 @@ void UsbCommunicator::OnTransferFinished(libusb_transfer* transfer)
 {
   if (transfer->status != LIBUSB_TRANSFER_COMPLETED)
   {
-    assert(0);
+    //assert(0);
     switch (transfer->status)
     {
       case LIBUSB_TRANSFER_ERROR:     printf("transfer failed\n"); break;

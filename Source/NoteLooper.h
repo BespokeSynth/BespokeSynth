@@ -6,8 +6,7 @@
 //
 //
 
-#ifndef __modularSynth__NoteLooper__
-#define __modularSynth__NoteLooper__
+#pragma once
 
 #include <iostream>
 #include "NoteEffectBase.h"
@@ -15,16 +14,14 @@
 #include "Checkbox.h"
 #include "Slider.h"
 #include "IDrawableModule.h"
-#include "ClickButton.h"
 #include "DropdownList.h"
 #include "MidiDevice.h"
 #include "Scale.h"
+#include "Canvas.h"
+#include "CanvasElement.h"
+#include "ClickButton.h"
 
-#define NOTELOOPER_MAX_NOTES 500
-#define NOTELOOPER_MAX_CHORD 10
-#define NOTELOOPER_NOTE_RANGE 127
-
-class NoteLooper : public IDrawableModule, public NoteEffectBase, public IAudioPoller, public IFloatSliderListener, public IButtonListener, public IIntSliderListener, public IDropdownListener
+class NoteLooper : public IDrawableModule, public NoteEffectBase, public IAudioPoller, public IFloatSliderListener, public IIntSliderListener, public IDropdownListener, public IButtonListener
 {
 public:
    NoteLooper();
@@ -33,6 +30,7 @@ public:
    
    string GetTitleLabel() override { return "note looper"; }
    void CreateUIControls() override;
+   void SetEnabled(bool enabled) override { mEnabled = enabled; }
 
    //INoteReceiver
    void PlayNote(double time, int pitch, int velocity, int voiceIdx = -1, ModulationParameters modulation = ModulationParameters()) override;
@@ -43,27 +41,26 @@ public:
    void CheckboxUpdated(Checkbox* checkbox) override;
    //IFloatSliderListener
    void FloatSliderUpdated(FloatSlider* slider, float oldVal) override;
-   //IButtonListener
-   void ButtonClicked(ClickButton* button) override;
    //IIntSliderListener
    void IntSliderUpdated(IntSlider* slider, int oldVal) override;
    //IDropdownListener
    void DropdownUpdated(DropdownList* list, int oldVal) override;
+   //IButtonListener
+   void ButtonClicked(ClickButton* button) override;
    
    virtual void LoadLayout(const ofxJSONElement& moduleInfo) override;
    virtual void SetUpFromSaveData() override;
    
 private:
-   void Clear();
-   void Retrigger();
-   void TriggerRecordedNote(int pitch, int velocity);
-   void RecordNote(double time, int pitch, int velocity);
-   void StopRecording();
+   double GetCurPos(double time) const;
+   NoteCanvasElement* AddNote(double measurePos, int pitch, int velocity, double length, int voiceIdx = -1, ModulationParameters modulation = ModulationParameters());
+   void SetNumMeasures(int numMeasures);
+   int GetNewVoice(int voiceIdx);
    
    //IDrawableModule
    void DrawModule() override;
-   void GetModuleDimensions(float& width, float& height) override { width=305; height=140; }
-   bool Enabled() const override { return true; }
+   void GetModuleDimensions(float& width, float& height) override { width=mWidth; height=mHeight; }
+   bool Enabled() const override { return mEnabled; }
    
    struct NoteEvent
    {
@@ -81,24 +78,24 @@ private:
       int mVelocity;
    };
 
-   bool mPlay;
-   Checkbox* mPlayCheckbox;
-   bool mRecord;
-   Checkbox* mRecordCheckbox;
-   IntSlider* mNumBarsSlider;
-   int mOctave;
-   int mNumBars;
+   float mWidth;
+   float mHeight;
+   int mMinRow;
+   int mMaxRow;
+   bool mWrite;
+   Checkbox* mWriteCheckbox;
+   bool mDeleteOrMute;
+   Checkbox* mDeleteOrMuteCheckbox;
+   IntSlider* mNumMeasuresSlider;
+   int mNumMeasures;
+   vector<CanvasElement*> mNoteChecker {128};
+   std::array<NoteCanvasElement*, 128> mInputNotes {};
+   std::array<NoteCanvasElement*, 128> mCurrentNotes {};
+   Canvas* mCanvas;
    ClickButton* mClearButton;
-   IntSlider* mOctaveSlider;
-   NoteEvent mNoteroll[NOTELOOPER_MAX_NOTES];
-   CurrentNote mCurrentNotes[NOTELOOPER_MAX_CHORD];
-   bool mOverdub;
-   Checkbox* mOverdubCheckbox;
-   bool mHeldNotes[127];
-   int mNumHeldNotes;
-   ClickButton* mNumBarsDecrement;
-   ClickButton* mNumBarsIncrement;
-};
+   int mVoiceRoundRobin;
 
-#endif /* defined(__modularSynth__NoteLooper__) */
+   std::array<ModulationParameters, kNumVoices+1> mVoiceModulations {};
+   std::array<int, kNumVoices> mVoiceMap {};
+};
 

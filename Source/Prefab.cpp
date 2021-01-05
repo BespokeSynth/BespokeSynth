@@ -57,7 +57,8 @@ void Prefab::Poll()
    for (auto* module : mModuleContainer.GetModules())
       module->SetPosition(module->GetPosition(true).x + xOffset, module->GetPosition(true).y + yOffset);
    
-   SetPosition(xMin, yMin);
+   if (abs(GetPosition().x - xMin) >= 1 || abs(GetPosition().y - yMin) >= 1)
+      SetPosition(xMin, yMin);
 }
 
 void Prefab::OnClicked(int x, int y, bool right)
@@ -78,13 +79,21 @@ void Prefab::DrawModule()
 {
    if (Minimized() || IsVisible() == false)
       return;
-   
+
    mSaveButton->Draw();
    mLoadButton->Draw();
    mDisbandButton->Draw();
    DrawTextNormal("add/remove", 18, 14);
+
+   if (CanAddGroup())
+      DrawTextNormal("type + to add group", 3, 34);
    
    mModuleContainer.Draw();
+}
+
+bool Prefab::CanAddGroup()
+{
+   return !TheSynth->GetGroupSelectedModules().empty() && VectorContains(static_cast<IDrawableModule*>(this), TheSynth->GetGroupSelectedModules());
 }
 
 void Prefab::PostRepatch(PatchCableSource* cableSource, bool fromUserClick)
@@ -105,7 +114,7 @@ void Prefab::GetModuleDimensions(float& width, float& height)
    float x,y;
    GetPosition(x, y);
    width = 215;
-   height = 20;
+   height = 40;
    
    //if (PatchCable::sActivePatchCable && PatchCable::sActivePatchCable->GetOwningModule() == this)
    //   return;
@@ -148,6 +157,21 @@ void Prefab::ButtonClicked(ClickButton* button)
       for (auto* module : modules)
          GetOwningContainer()->TakeModule(module);
       GetOwningContainer()->DeleteModule(this);
+   }
+}
+
+void Prefab::KeyPressed(int key, bool isRepeat)
+{
+   if (key == '=')
+   {
+      if (CanAddGroup())
+      {
+         for (auto* module : TheSynth->GetGroupSelectedModules())
+         {
+            if (module != this && !VectorContains(module, mModuleContainer.GetModules()))
+               mModuleContainer.TakeModule(module);
+         }
+      }
    }
 }
 

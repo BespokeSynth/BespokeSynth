@@ -204,6 +204,9 @@
 #include "GlobalControls.h"
 #include "ValueStream.h"
 #include "EQModule.h"
+#include "SampleCapturer.h"
+#include "NoteQuantizer.h"
+#include "PlaySequencer.h"
 
 #define REGISTER(class,name,type) Register(#name, &(class::Create), &(class::CanCreate), type, false, false);
 #define REGISTER_HIDDEN(class,name,type) Register(#name, &(class::Create), &(class::CanCreate), type, true, false);
@@ -376,6 +379,10 @@ ModuleFactory::ModuleFactory()
    REGISTER(GlobalControls, globalcontrols, kModuleType_Other);
    REGISTER(ValueStream, valuestream, kModuleType_Other);
    REGISTER(EQModule, eq, kModuleType_Audio);
+   REGISTER(SampleCapturer, samplecapturer, kModuleType_Audio);
+   REGISTER(NoteQuantizer, quantizer, kModuleType_Note);
+   REGISTER(NoteLooper, notelooper, kModuleType_Instrument);
+   REGISTER(PlaySequencer, playsequencer, kModuleType_Instrument);
 
    //REGISTER_EXPERIMENTAL(MidiPlayer, midiplayer, kModuleType_Instrument);
    REGISTER_EXPERIMENTAL(Razor, razor, kModuleType_Synth);
@@ -405,7 +412,6 @@ ModuleFactory::ModuleFactory()
 #endif
    REGISTER_HIDDEN(ControlTactileFeedback, controltactilefeedback, kModuleType_Synth);
    REGISTER_HIDDEN(FloatSliderLFOControl, lfo, kModuleType_Other);
-   REGISTER_HIDDEN(NoteLooper, notelooper, kModuleType_Note);
    REGISTER_HIDDEN(EnvelopeEditor, envelopeeditor, kModuleType_Other);
 }
 

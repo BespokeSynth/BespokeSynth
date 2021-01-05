@@ -177,7 +177,7 @@ ofVec2f UIGrid::GetCellPosition(int col, int row)
    ret.y = ysize * row;
    
    if (mFlip)
-      ret.y = (mHeight-1) - ret.y;
+      ret.y = (mHeight-1) - ret.y - ysize;
    
    return ret;
 }
