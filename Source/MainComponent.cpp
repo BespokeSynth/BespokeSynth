@@ -281,7 +281,7 @@ public:
       
       mSynth.LockRender(true);
       
-      Point<int> mouse = Desktop::getMousePosition();
+      juce::Point<int> mouse = Desktop::getMousePosition();
       mouse -= mScreenPosition;
       mSynth.MouseMoved(mouse.x, mouse.y);
       
@@ -470,8 +470,8 @@ private:
    int mFrameCountAccum;
    list<int> mPressedKeys;
    double mPixelRatio;
-   Point<int> mScreenPosition;
-   Point<int> mDesiredInitialPosition;
+   juce::Point<int> mScreenPosition;
+   juce::Point<int> mDesiredInitialPosition;
    
    JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (MainContentComponent)
 };
