@@ -50,9 +50,10 @@ ScriptModule::ScriptModule()
 , mD(0)
 , mNextLineToExecute(-1)
 , mInitExecutePriority(0)
-{
-   InitializePythonIfNecessary();
-   
+{ 
+   if (TheSynth->IsLoadingState())
+      InitializePythonIfNecessary();
+
    Reset();
    
    mScriptModuleIndex = sScriptModules.size();
@@ -286,6 +287,8 @@ void ScriptModule::DrawTimer(int lineNum, double startTime, double endTime, ofCo
 
 void ScriptModule::Poll()
 {
+   InitializePythonIfNecessary();
+
    if (sScriptsRequestingInitExecution.size() > 0)
    {
       for (auto s : sScriptsRequestingInitExecution)
