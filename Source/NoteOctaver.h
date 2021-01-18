@@ -41,7 +41,8 @@ public:
 private:
    struct NoteInfo
    {
-      int mPitch;
+      NoteInfo() : mOn(false), mVelocity(0), mVoiceIdx(-1) {}
+      bool mOn;
       int mVelocity;
       int mVoiceIdx;
    };
@@ -49,14 +50,11 @@ private:
    //IDrawableModule
    void DrawModule() override;
    void GetModuleDimensions(float& width, float& height) override { width = 108; height = 22; }
-   bool Enabled() const override { return mEnabled; }
-
-   
+   bool Enabled() const override { return mEnabled; }   
    
    int mOctave;
    IntSlider* mOctaveSlider;
-   std::list<NoteInfo> mInputNotes;
-   ofMutex mNotesMutex;
+   std::array<NoteInfo, 128> mInputNotes;
 };
 
 

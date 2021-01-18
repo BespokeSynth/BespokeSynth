@@ -40,7 +40,8 @@ public:
 private:
    struct NoteInfo
    {
-      int mPitch;
+      NoteInfo() : mOn(false), mVelocity(0), mVoiceIdx(-1) {}
+      bool mOn;
       int mVelocity;
       int mVoiceIdx;
    };
@@ -52,8 +53,7 @@ private:
    
    int mCapo;
    IntSlider* mCapoSlider;
-   std::list<NoteInfo> mInputNotes;
-   ofMutex mNotesMutex;
+   std::array<NoteInfo, 128> mInputNotes;
 };
 
 

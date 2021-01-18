@@ -46,67 +46,35 @@ void Capo::PlayNote(double time, int pitch, int velocity, int voiceIdx, Modulati
       return;
    }
    
-   if (velocity > 0)
+   if (pitch >= 0 && pitch < 128)
    {
-      bool found = false;
-      for (list<NoteInfo>::iterator iter = mInputNotes.begin(); iter != mInputNotes.end(); ++iter)
+      if (velocity > 0)
       {
-         if ((*iter).mPitch == pitch)
-         {
-            (*iter).mVelocity = velocity;
-            (*iter).mVoiceIdx = voiceIdx;
-            found = true;
-            break;
-         }
+         mInputNotes[pitch].mOn = true;
+         mInputNotes[pitch].mVelocity = velocity;
+         mInputNotes[pitch].mVoiceIdx = voiceIdx;
       }
-      if (!found)
+      else
       {
-         mNotesMutex.lock();
-         NoteInfo note;
-         note.mPitch = pitch;
-         note.mVelocity = velocity;
-         note.mVoiceIdx = voiceIdx;
-         mInputNotes.push_back(note);
-         mNotesMutex.unlock();
-      }
-   }
-   else
-   {
-      for (list<NoteInfo>::iterator iter = mInputNotes.begin(); iter != mInputNotes.end(); ++iter)
-      {
-         if ((*iter).mPitch == pitch)
-         {
-            mNotesMutex.lock();
-            mInputNotes.erase(iter);
-            mNotesMutex.unlock();
-            break;
-         }
+         mInputNotes[pitch].mOn = false;
       }
    }
    
-   pitch += mCapo;
-   PlayNoteOutput(time, pitch, velocity, voiceIdx, modulation);
+   PlayNoteOutput(time, pitch + mCapo, velocity, voiceIdx, modulation);
 }
 
 void Capo::IntSliderUpdated(IntSlider* slider, int oldVal)
 {
    if (slider == mCapoSlider && mEnabled)
    {
-      list<int> heldNotes = mNoteOutput.GetHeldNotesList();
-      
-      mNotesMutex.lock();
-      for (list<NoteInfo>::iterator iter = mInputNotes.begin(); iter != mInputNotes.end(); ++iter)
+      for (int pitch=0; pitch<128; ++pitch)
       {
-         const NoteInfo& note = *iter;
-         int pitch = note.mPitch + mCapo;
-         //PlayNoteOutput fix
-         PlayNoteOutput(gTime, pitch, note.mVelocity, note.mVoiceIdx, ModulationParameters());
-         heldNotes.remove(pitch);
+         if (mInputNotes[pitch].mOn)
+         {
+            PlayNoteOutput(gTime+.01, pitch + oldVal, 0, mInputNotes[pitch].mVoiceIdx, ModulationParameters());
+            PlayNoteOutput(gTime, pitch + mCapo, mInputNotes[pitch].mVelocity, mInputNotes[pitch].mVoiceIdx, ModulationParameters());
+         }
       }
-      mNotesMutex.unlock();
-      
-      for (list<int>::iterator iter = heldNotes.begin(); iter != heldNotes.end(); ++iter)
-         PlayNoteOutput(gTime,*iter,0,-1,ModulationParameters());
    }
 }
 
