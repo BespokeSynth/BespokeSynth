@@ -39,6 +39,9 @@ ScriptModule* ScriptModule::sPriorExecutedModule = nullptr;
 //static
 double ScriptModule::sMostRecentRunTime = 0;
 
+static bool sPythonInitialized = false;
+static bool sHasPythonEverSuccessfullyInitialized = false;
+
 ScriptModule::ScriptModule()
 : mCodeEntry(nullptr)
 , mRunButton(nullptr)
@@ -50,8 +53,9 @@ ScriptModule::ScriptModule()
 , mD(0)
 , mNextLineToExecute(-1)
 , mInitExecutePriority(0)
-{ 
-   if (TheSynth->IsLoadingState())
+{
+   CheckIfPythonEverSuccessfullyInitialized();
+   if (TheSynth->IsLoadingState() && sHasPythonEverSuccessfullyInitialized)
       InitializePythonIfNecessary();
 
    Reset();
@@ -84,13 +88,16 @@ void ScriptModule::CreateUIControls()
    ENDUIBLOCK(mWidth, mHeight);
 }
 
-static bool sPythonInitialized = false;
-
 void ScriptModule::UninitializePython()
 {
    if (sPythonInitialized)
       py::finalize_interpreter();
    sPythonInitialized = false;
+}
+
+namespace
+{
+   string kPythonIsInstalledMarkerFile = "python_installed";
 }
 
 void ScriptModule::InitializePythonIfNecessary()
@@ -103,12 +110,46 @@ void ScriptModule::InitializePythonIfNecessary()
       CodeEntry::OnPythonInit();
    }
    sPythonInitialized = true;
+
+   if (!sHasPythonEverSuccessfullyInitialized)
+   {
+      File(ofToDataPath("internal/" + kPythonIsInstalledMarkerFile)).create();
+      sHasPythonEverSuccessfullyInitialized = true;
+   }
+}
+
+//static
+void ScriptModule::CheckIfPythonEverSuccessfullyInitialized()
+{
+   if (!sHasPythonEverSuccessfullyInitialized)
+   {
+      if (File(ofToDataPath("internal/"+kPythonIsInstalledMarkerFile)).existsAsFile())
+         sHasPythonEverSuccessfullyInitialized = true;
+   }
+}
+
+void ScriptModule::OnClicked(int x, int y, bool right)
+{
+   if (!sHasPythonEverSuccessfullyInitialized)
+   {
+      InitializePythonIfNecessary();
+   }
+   else
+   {
+      IDrawableModule::OnClicked(x, y, right);
+   }
 }
 
 void ScriptModule::DrawModule()
 {
    if (Minimized() || IsVisible() == false)
       return;
+
+   if (!sHasPythonEverSuccessfullyInitialized)
+   {
+      DrawTextNormal("please ensure that you have Python 3.8 installed\nif you do not have Python 3.8 installed, Bespoke may crash\n\nclick to continue...", 20, 20);
+      return;
+   }
    
    mLoadScriptSelector->Draw();
    mLoadScriptButton->Draw();
@@ -287,7 +328,11 @@ void ScriptModule::DrawTimer(int lineNum, double startTime, double endTime, ofCo
 
 void ScriptModule::Poll()
 {
-   InitializePythonIfNecessary();
+   if (sHasPythonEverSuccessfullyInitialized)
+      InitializePythonIfNecessary();
+
+   if (!sPythonInitialized)
+      return;
 
    if (sScriptsRequestingInitExecution.size() > 0)
    {
@@ -743,6 +788,13 @@ string ScriptModule::GetThisName()
 void ScriptModule::RunScript(double time, int lineStart/*=-1*/, int lineEnd/*=-1*/)
 {
    //should only be called from main thread
+
+   if (!sPythonInitialized)
+   {
+      TheSynth->LogEvent("trying to call ScriptModule::RunScript() before python is initialized", kLogEventType_Error);
+      return;
+   }
+
    py::exec(GetThisName()+" = scriptmodule.get_me("+ofToString(mScriptModuleIndex)+")", py::globals());
    string code = mCodeEntry->GetText();
    vector<string> lines = ofSplitString(code, "\n");
@@ -790,6 +842,12 @@ void ScriptModule::RunCode(double time, string code)
 {
    //should only be called from main thread
    
+   if (!sPythonInitialized)
+   {
+      TheSynth->LogEvent("trying to call ScriptModule::RunCode() before python is initialized", kLogEventType_Error);
+      return;
+   }
+
    sMostRecentRunTime = time;
    mNextLineToExecute = -1;
    ComputeSliders(time);

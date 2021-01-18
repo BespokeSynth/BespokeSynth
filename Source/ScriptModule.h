@@ -94,6 +94,8 @@ private:
    void DrawTimer(int lineNum, double startTime, double endTime, ofColor color, bool filled);
    void RefreshScriptFiles();
    void Reset();
+
+   static void CheckIfPythonEverSuccessfullyInitialized();
    
    //IDrawableModule
    void DrawModule() override;
@@ -102,6 +104,7 @@ private:
    void GetModuleDimensions(float& width, float& height) override;
    bool IsResizable() const override { return true; }
    void Resize(float w, float h) override;
+   void OnClicked(int x, int y, bool right) override;
    
    DropdownList* mLoadScriptSelector;
    ClickButton* mLoadScriptButton;
