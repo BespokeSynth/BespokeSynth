@@ -34,12 +34,12 @@ Sample::~Sample()
 
 bool Sample::Read(const char* path, bool mono, ReadType readType)
 {
-   StringCopy(mReadPath,path,MAX_SAMPLE_READ_PATH_LENGTH);
-   vector<string> tokens = ofSplitString(path, GetPathSeparator());
-   StringCopy(mName,tokens[tokens.size()-1].c_str(),32);
-   mName[strlen(mName)-4] = 0;
+   mReadPath = path;
+   ofStringReplace(mReadPath, GetPathSeparator(), "/");
+   vector<string> tokens = ofSplitString(mReadPath, "/");
+   mName = tokens[tokens.size()-1].c_str();
    
-   File file(ofToDataPath(path));
+   File file(ofToDataPath(mReadPath));
    delete mReader;
    mReader = TheSynth->GetGlobalManagers()->mAudioFormatManager.createReaderFor(file);
    
@@ -138,13 +138,13 @@ void Sample::Setup(int length)
    mOffset = length;
    mSampleRateRatio = 1;
    mStopPoint = -1;
-   strcpy(mName, "newsample");
-   mReadPath[0] = 0;
+   mName = "newsample";
+   mReadPath = "";
 }
 
 bool Sample::Write(const char* path /*=nullptr*/)
 {
-   const char* writeTo = path ? path : mReadPath;
+   const char* writeTo = path ? path : mReadPath.c_str();
    WriteDataToFile(writeTo, &mData, mNumSamples);
    return true;
 }
@@ -296,8 +296,8 @@ void Sample::CopyFrom(Sample* sample)
    mRate = sample->mRate;
    mSampleRateRatio = sample->mSampleRateRatio;
    mStopPoint = sample->mStopPoint;
-   strcpy(mName, sample->mName);
-   strcpy(mReadPath, sample->mReadPath);
+   mName = sample->mName;
+   mReadPath = sample->mReadPath;
 }
 
 namespace
@@ -317,8 +317,8 @@ void Sample::SaveState(FileStreamOut& out)
    out << mRate;
    out << mSampleRateRatio;
    out << mStopPoint;
-   out << string(mName);
-   out << string(mReadPath);
+   out << mName;
+   out << mReadPath;
 }
 
 void Sample::LoadState(FileStreamIn& in)
@@ -346,10 +346,6 @@ void Sample::LoadState(FileStreamIn& in)
    in >> mRate;
    in >> mSampleRateRatio;
    in >> mStopPoint;
-   string name;
-   in >> name;
-   StringCopy(mName,name.c_str(),32);
-   string readPath;
-   in >> readPath;
-   StringCopy(mReadPath, readPath.c_str(), MAX_SAMPLE_READ_PATH_LENGTH);
+   in >> mName;
+   in >> mReadPath;
 }

@@ -15,8 +15,6 @@
 class FileStreamOut;
 class FileStreamIn;
 
-#define MAX_SAMPLE_READ_PATH_LENGTH 1024
-
 class Sample : public juce::Timer
 {
 public:
@@ -33,7 +31,8 @@ public:
    bool ConsumeData(double time, ChannelBuffer* out, int size, bool replace);
    void Play(double time, float rate, int offset, int stopPoint=-1);
    void SetRate(float rate) { mRate = rate; }
-   const char* Name() { return mName; }
+   string Name() const { return mName; }
+   void SetName(string name) { mName = name; }
    int LengthInSamples() const { return mNumSamples; }
    int NumChannels() const { return mData.NumActiveChannels(); }
    ChannelBuffer* Data() { return &mData; }
@@ -46,7 +45,7 @@ public:
    void PadBack(int amount);
    void ClipTo(int start, int end);
    void ShiftWrap(int numSamples);
-   const char* GetReadPath() const { return mReadPath; }
+   string GetReadPath() const { return mReadPath; }
    static bool WriteDataToFile(const char* path, float** data, int numSamples, int channels = 1);
    static bool WriteDataToFile(const char* path, ChannelBuffer* data, int numSamples);
    bool IsPlaying() { return mOffset < mNumSamples; }
@@ -76,8 +75,8 @@ private:
    float mRate;
    float mSampleRateRatio;
    int mStopPoint;
-   char mName[32];
-   char mReadPath[MAX_SAMPLE_READ_PATH_LENGTH];
+   string mName;
+   string mReadPath;
    ofMutex mDataMutex;
    ofMutex mPlayMutex;
    bool mLooping;
