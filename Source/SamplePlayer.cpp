@@ -51,6 +51,9 @@ SamplePlayer::SamplePlayer()
 , mZoomOffset(0)
 , mActiveCuePointIndex(0)
 , mSetCuePoint(false)
+, mSelectPlayedCuePoint(false)
+, mRecentPlayedCuePoint(-1)
+, mShowGrid(false)
 , mRunningProcessType(RunningProcessType::None)
 , mRunningProcess(nullptr)
 , mOnRunningProcessComplete(nullptr)
@@ -59,7 +62,6 @@ SamplePlayer::SamplePlayer()
 , mSwitchAndRampVal(1)
 {
    mYoutubeSearch[0] = 0;
-   mSampleCuePoints[0].speed = 1;
 }
 
 void SamplePlayer::CreateUIControls()
@@ -82,20 +84,18 @@ void SamplePlayer::CreateUIControls()
    BUTTON(mDownloadYoutubeButton,"youtube");
    UIBLOCK_SHIFTX(120);
    UIBLOCK_NEWCOLUMN();
-   UIBLOCK_SAVEPOSITION();
-   for (int i=0; i<(int)mSampleCuePoints.size(); ++i)
-   {
-      UIBLOCK_RESTOREPOSITION();
-      FLOATSLIDER_DIGITS(mSampleCuePoints[i].mStartSlider, ("start"+ofToString(i)).c_str(), &mSampleCuePoints[i].startSeconds, 0, 100, 3);
-      FLOATSLIDER_DIGITS(mSampleCuePoints[i].mLengthSlider, ("length"+ofToString(i)).c_str(), &mSampleCuePoints[i].lengthSeconds, 0, 100, 3);
-      FLOATSLIDER(mSampleCuePoints[i].mSpeedSlider, ("speed"+ofToString(i)).c_str(), &mSampleCuePoints[i].speed, 0, 2);
-      mSampleCuePoints[i].mStartSlider->SetShowing(i == 0);
-      mSampleCuePoints[i].mLengthSlider->SetShowing(i == 0);
-      mSampleCuePoints[i].mSpeedSlider->SetShowing(i == 0);
-      UIBLOCK_NEWCOLUMN();
-   }
+   FLOATSLIDER_DIGITS(mCuePointStartSlider, "cue start", &mSampleCuePoints[0].startSeconds, 0, 100, 3);
+   FLOATSLIDER_DIGITS(mCuePointLengthSlider, "cue length", &mSampleCuePoints[0].lengthSeconds, 0, 100, 3);
+   FLOATSLIDER(mCuePointSpeedSlider, "cue speed", &mSampleCuePoints[0].speed, 0, 2);
+   UIBLOCK_NEWCOLUMN();
    UICONTROL_CUSTOM(mCuePointSelector, new RadioButton(UICONTROL_BASICS("cuepoint"), &mActiveCuePointIndex, kRadioHorizontal));
-   CHECKBOX(mSetCuePointCheckbox, "set cue point", &mSetCuePoint);
+   CHECKBOX(mSetCuePointCheckbox, "click sets cue point", &mSetCuePoint);
+   CHECKBOX(mSelectPlayedCuePointCheckbox, "select played", &mSelectPlayedCuePoint);
+   UIBLOCK_NEWCOLUMN();
+   UIBLOCK_NEWCOLUMN();
+   UIBLOCK_SHIFTDOWN();
+   BUTTON(mPlayCurrentCuePointButton, "play cue");
+   CHECKBOX(mShowGridCheckbox, "show grid", &mShowGrid);
    ENDUIBLOCK0();
 
    UIBLOCK(0, 65);
@@ -212,6 +212,18 @@ void SamplePlayer::Poll()
             mOnRunningProcessComplete();
       }
    }
+
+   if (mRecentPlayedCuePoint != -1)
+   {
+      int index = mRecentPlayedCuePoint;
+      mRecentPlayedCuePoint = -1;
+
+      if (index >= 0 && index < (int)mSampleCuePoints.size())
+      {
+         mActiveCuePointIndex = index;
+         UpdateActiveCuePoint();
+      }
+   }
 }
 
 void SamplePlayer::Process(double time)
@@ -293,6 +305,9 @@ void SamplePlayer::PlayNote(double time, int pitch, int velocity, int voiceIdx /
    if (!mEnabled)
       return;
 
+   if (mSelectPlayedCuePoint)
+      mRecentPlayedCuePoint = pitch;
+
    if (!NoteInputBuffer::IsTimeWithinFrame(time))
    {
       mNoteInputBuffer.QueueNote(time, pitch, velocity, voiceIdx, modulation);
@@ -300,17 +315,21 @@ void SamplePlayer::PlayNote(double time, int pitch, int velocity, int voiceIdx /
    }
    
    if (velocity > 0 && mSample != nullptr)
-   {
-      float startSeconds, lengthSeconds, speed;
-      GetPlayInfoForPitch(pitch + (modulation.pitchBend ? modulation.pitchBend->GetValue(0) : 0), startSeconds, lengthSeconds, speed);
-      mSample->SetPlayPosition(((gTime - time)/1000 + startSeconds) * gSampleRate * mSample->GetSampleRateRatio());
-      mPlay = true;
-      mSpeed = speed;
-      mAdsr.Clear();
-      mAdsr.Start(time, velocity / 127.0f);
-      mAdsr.Stop(time + lengthSeconds*1000);
-      SwitchAndRamp();
-   }
+      PlayCuePoint(time, pitch, velocity);
+}
+
+void SamplePlayer::PlayCuePoint(double time, int index, int velocity)
+{
+   float startSeconds, lengthSeconds, speed;
+   GetPlayInfoForPitch(index, startSeconds, lengthSeconds, speed);
+   mSample->SetPlayPosition(((gTime - time) / 1000 + startSeconds) * gSampleRate * mSample->GetSampleRateRatio());
+   mPlay = true;
+   mSpeed = speed;
+   mAdsr.Clear();
+   mAdsr.Start(time, velocity / 127.0f);
+   if (lengthSeconds > 0)
+      mAdsr.Stop(time + lengthSeconds * 1000);
+   SwitchAndRamp();
 }
 
 void SamplePlayer::SwitchAndRamp()
@@ -351,13 +370,16 @@ void SamplePlayer::DropdownUpdated(DropdownList* list, int oldVal)
 void SamplePlayer::RadioButtonUpdated(RadioButton* radio, int oldVal)
 {
    if (radio == mCuePointSelector)
+      UpdateActiveCuePoint();
+}
+
+void SamplePlayer::UpdateActiveCuePoint()
+{
+   if (mActiveCuePointIndex >= 0 && mActiveCuePointIndex < (int)mSampleCuePoints.size())
    {
-      for (int i = 0; i < (int)mSampleCuePoints.size(); ++i)
-      {
-         mSampleCuePoints[i].mStartSlider->SetShowing(i == mActiveCuePointIndex);
-         mSampleCuePoints[i].mLengthSlider->SetShowing(i == mActiveCuePointIndex);
-         mSampleCuePoints[i].mSpeedSlider->SetShowing(i == mActiveCuePointIndex);
-      }
+      mCuePointStartSlider->SetVar(&mSampleCuePoints[mActiveCuePointIndex].startSeconds);
+      mCuePointLengthSlider->SetVar(&mSampleCuePoints[mActiveCuePointIndex].lengthSeconds);
+      mCuePointSpeedSlider->SetVar(&mSampleCuePoints[mActiveCuePointIndex].speed);
    }
 }
 
@@ -375,8 +397,8 @@ void SamplePlayer::UpdateSample(Sample* sample, bool ownsSample)
    float lengthSeconds = sample->LengthInSamples() / (gSampleRate * sample->GetSampleRateRatio());
    for (size_t i = 0; i < mSampleCuePoints.size(); ++i)
    {
-      mSampleCuePoints[i].mStartSlider->SetExtents(0, lengthSeconds);
-      mSampleCuePoints[i].mLengthSlider->SetExtents(0, lengthSeconds);
+      mCuePointStartSlider->SetExtents(0, lengthSeconds);
+      mCuePointLengthSlider->SetExtents(0, lengthSeconds);
    }
    
    sample->SetPlayPosition(0);
@@ -420,7 +442,7 @@ void SamplePlayer::ButtonClicked(ClickButton *button)
       }
    }
    if (button == mDownloadYoutubeButton)
-      DownloadYoutube("https://www.youtube.com/watch?v="+mYoutubeId, "");
+      DownloadYoutube("https://www.youtube.com/watch?v="+mYoutubeId, "", mYoutubeId);
    if (button == mLoadFileButton)
       LoadFile();
 
@@ -430,13 +452,16 @@ void SamplePlayer::ButtonClicked(ClickButton *button)
       {
          if (i < mYoutubeSearchResults.size())
          {
-            DownloadYoutube("https://www.youtube.com/watch?v=" + mYoutubeSearchResults[i].youtubeId, "");
+            DownloadYoutube("https://www.youtube.com/watch?v=" + mYoutubeSearchResults[i].youtubeId, "", mYoutubeSearchResults[i].name);
 
             mYoutubeSearchResults.clear();
             break;
          }
       }
    }
+
+   if (button == mPlayCurrentCuePointButton)
+      PlayCuePoint(gTime, mActiveCuePointIndex, 127);
 }
 
 void SamplePlayer::TextEntryComplete(TextEntry* entry)
@@ -460,7 +485,7 @@ namespace
    }
 }
 
-void SamplePlayer::DownloadYoutube(string search, string options)
+void SamplePlayer::DownloadYoutube(string search, string options, string title)
 {
    mPlay = false;
    if (mSample)
@@ -484,7 +509,7 @@ void SamplePlayer::DownloadYoutube(string search, string options)
    ofLog() << "running " << command;
    mRunningProcessType = RunningProcessType::DownloadYoutube;
 
-   mOnRunningProcessComplete = [this, tempConvertedName] { OnYoutubeDownloadComplete(tempConvertedName); };
+   mOnRunningProcessComplete = [this, tempConvertedName, title] { OnYoutubeDownloadComplete(tempConvertedName, title); };
 
    if (mRunningProcess)
       mRunningProcess->kill();
@@ -493,12 +518,13 @@ void SamplePlayer::DownloadYoutube(string search, string options)
    mRunningProcess->start(command);
 }
 
-void SamplePlayer::OnYoutubeDownloadComplete(string filename)
+void SamplePlayer::OnYoutubeDownloadComplete(string filename, string title)
 {
    Sample* sample = new Sample();
    if (juce::File(ofToDataPath(filename)).existsAsFile())
    {
       sample->Read(ofToDataPath(filename).c_str(), false, Sample::ReadType::Async);
+      sample->SetName(title);
       UpdateSample(sample, true);
    }
    else
@@ -618,7 +644,7 @@ float SamplePlayer::GetPlayPositionForMouse(float mouseX) const
 
 void SamplePlayer::GetPlayInfoForPitch(int pitch, float& startSeconds, float& lengthSeconds, float& speed) const
 {
-   if (pitch < mSampleCuePoints.size() && mSampleCuePoints[pitch].speed > 0)
+   if (pitch < mSampleCuePoints.size())
    {
       startSeconds = mSampleCuePoints[pitch].startSeconds;
       lengthSeconds = mSampleCuePoints[pitch].lengthSeconds;
@@ -627,7 +653,7 @@ void SamplePlayer::GetPlayInfoForPitch(int pitch, float& startSeconds, float& le
    else
    {
       startSeconds = 0;
-      lengthSeconds = 1;
+      lengthSeconds = 0;
       speed = 1;
    }
 }
@@ -659,12 +685,13 @@ void SamplePlayer::DrawModule()
    mLoadFileButton->Draw();
    mCuePointSelector->Draw();
    mSetCuePointCheckbox->Draw();
-   for (size_t i=0; i<mSampleCuePoints.size(); ++i)
-   {
-      mSampleCuePoints[i].mStartSlider->Draw();
-      mSampleCuePoints[i].mLengthSlider->Draw();
-      mSampleCuePoints[i].mSpeedSlider->Draw();
-   }
+   mSelectPlayedCuePointCheckbox->Draw();
+   mCuePointStartSlider->Draw();
+   mCuePointLengthSlider->Draw();
+   mCuePointSpeedSlider->Draw();
+   mPlayCurrentCuePointButton->Draw();
+   mShowGridCheckbox->Draw();
+
    for (size_t i = 0; i < mSearchResultButtons.size(); ++i)
    {
       if (i < mYoutubeSearchResults.size())
@@ -742,15 +769,34 @@ void SamplePlayer::DrawModule()
       ofPushStyle();
       ofFill();
 
-      float lengthSeconds = mSample->LengthInSamples() / (gSampleRate * mSample->GetSampleRateRatio());
-
-      float x = ofMap(mSample->GetPlayPosition(), GetZoomStartSample(), GetZoomEndSample(), 0, sampleWidth);
       ofSetColor(255, 255, 255);
+      DrawTextNormal(mSample->Name(), 5, 27);
+
+      float lengthSeconds = mSample->LengthInSamples() / (gSampleRate * mSample->GetSampleRateRatio());
+      float x = ofMap(mSample->GetPlayPosition(), GetZoomStartSample(), GetZoomEndSample(), 0, sampleWidth);
       DrawTextNormal(ofToString(mSample->GetPlayPosition() / (gSampleRate * mSample->GetSampleRateRatio()), 1), x + 2, mHeight - 65, 11);
+
+      if (mShowGrid && GetZoomEndSeconds() - GetZoomStartSeconds() < 5)
+      {
+         float lengthSeconds = GetZoomEndSeconds() - GetZoomStartSeconds();
+         float lengthBeats = TheTransport->GetTempo() * (lengthSeconds / 60) * mSampleCuePoints[mActiveCuePointIndex].speed;
+         float alpha = ofMap(lengthSeconds, 5, 4, 0, 200, true);
+         ofSetColor(0, 255, 255, alpha);
+         float secondsPerBeat = 60 / (TheTransport->GetTempo() * mSampleCuePoints[mActiveCuePointIndex].speed);
+         float offset = mSampleCuePoints[mActiveCuePointIndex].startSeconds;
+         float firstBeat = ceil((GetZoomStartSeconds() - offset) / secondsPerBeat);
+         float firstBeatSeconds = firstBeat * secondsPerBeat + offset;
+         for (int i = 0; i < ceil(lengthBeats); ++i)
+         {
+            float second = firstBeatSeconds + i * secondsPerBeat;
+            float x = ofMap(second, GetZoomStartSeconds(), GetZoomEndSeconds(), 0, sampleWidth);
+            ofLine(x, 0, x, mHeight - 65);
+         }
+      }
 
       for (size_t i=0; i<mSampleCuePoints.size(); ++i)
       {
-         if (mSampleCuePoints[i].speed > 0)
+         if (i == 0 || mSampleCuePoints[i].startSeconds != mSampleCuePoints[i-1].startSeconds)
          {
             float x = ofMap(mSampleCuePoints[i].startSeconds, GetZoomStartSeconds(), GetZoomEndSeconds(), 0, sampleWidth);
             float xEnd = ofMap(mSampleCuePoints[i].startSeconds + mSampleCuePoints[i].lengthSeconds, GetZoomStartSeconds(), GetZoomEndSeconds(), 0, sampleWidth);

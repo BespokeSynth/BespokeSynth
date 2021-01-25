@@ -77,16 +77,18 @@ private:
    void UpdateSampleList();
    float GetPlayPositionForMouse(float mouseX) const;
    void GetPlayInfoForPitch(int pitch, float& startSeconds, float& lengthSeconds, float& speed) const;
-   void DownloadYoutube(string search, string options);
+   void DownloadYoutube(string search, string options, string title);
    void SearchYoutube(string searchTerm);
    void LoadFile();
-   void OnYoutubeDownloadComplete(string filename);
+   void OnYoutubeDownloadComplete(string filename, string title);
    void SwitchAndRamp();
    void SetCuePointForX(float mouseX);
    float GetZoomStartSample() const;
    float GetZoomEndSample() const;
    float GetZoomStartSeconds() const;
    float GetZoomEndSeconds() const;
+   void UpdateActiveCuePoint();
+   void PlayCuePoint(double time, int index, int velocity);
    
    //IDrawableModule
    void DrawModule() override;
@@ -139,19 +141,25 @@ private:
    
    struct SampleCuePoint
    {
-      SampleCuePoint() : startSeconds(0), lengthSeconds(2), speed(0) {}
+      SampleCuePoint() : startSeconds(0), lengthSeconds(0), speed(1) {}
       float startSeconds;
       float lengthSeconds;
-      float speed;
-      FloatSlider* mStartSlider;
-      FloatSlider* mLengthSlider;
-      FloatSlider* mSpeedSlider;
+      float speed; 
    };
    vector<SampleCuePoint> mSampleCuePoints{16};
    RadioButton* mCuePointSelector;
+   FloatSlider* mCuePointStartSlider;
+   FloatSlider* mCuePointLengthSlider;
+   FloatSlider* mCuePointSpeedSlider;
    int mActiveCuePointIndex;
    bool mSetCuePoint;
    Checkbox* mSetCuePointCheckbox;
+   bool mSelectPlayedCuePoint;
+   Checkbox* mSelectPlayedCuePointCheckbox;
+   int mRecentPlayedCuePoint;
+   ClickButton* mPlayCurrentCuePointButton;
+   bool mShowGrid;
+   Checkbox* mShowGridCheckbox;
 
    string mErrorString;
 
