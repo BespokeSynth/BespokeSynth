@@ -306,7 +306,7 @@ void BeatColumn::CreateUIControls()
 
 void BeatColumn::AddBeat(Sample* sample)
 {
-   mSelector->AddLabel(sample->Name(), mSelector->GetNumValues());
+   mSelector->AddLabel(sample->Name().c_str(), mSelector->GetNumValues());
 }
 
 void BeatColumn::RadioButtonUpdated(RadioButton* list, int oldVal)
