@@ -442,7 +442,7 @@ void SamplePlayer::ButtonClicked(ClickButton *button)
       }
    }
    if (button == mDownloadYoutubeButton)
-      DownloadYoutube("https://www.youtube.com/watch?v="+mYoutubeId, "", mYoutubeId);
+      DownloadYoutube("https://www.youtube.com/watch?v="+mYoutubeId, mYoutubeId);
    if (button == mLoadFileButton)
       LoadFile();
 
@@ -452,7 +452,7 @@ void SamplePlayer::ButtonClicked(ClickButton *button)
       {
          if (i < mYoutubeSearchResults.size())
          {
-            DownloadYoutube("https://www.youtube.com/watch?v=" + mYoutubeSearchResults[i].youtubeId, "", mYoutubeSearchResults[i].name);
+            DownloadYoutube("https://www.youtube.com/watch?v=" + mYoutubeSearchResults[i].youtubeId, mYoutubeSearchResults[i].name);
 
             mYoutubeSearchResults.clear();
             break;
@@ -475,17 +475,50 @@ void SamplePlayer::TextEntryComplete(TextEntry* entry)
 
 namespace
 {
-   const char* GetYoutubeDlPrefix()
+   string GetYoutubeDlPath()
    {
+      static string sPath = "";
+      if (sPath == "")
+      {
+         if (TheSynth->GetUserPrefs()["youtube-dl_path"].isNull())
+         {
 #if BESPOKE_WINDOWS
-      return "youtube-dl.exe ";
+            sPath = "youtube-dl.exe";
 #else
-      return "export PATH=/opt/local/bin:$PATH; youtube-dl ";
+            sPath = "/opt/local/bin/youtube-dl";
 #endif
+         }
+         else
+         {
+            sPath = TheSynth->GetUserPrefs()["youtube-dl_path"].asString();
+         }
+      }
+      return sPath;
+   }
+
+   string GetFfmpegPath()
+   {
+      static string sPath = "";
+      if (sPath == "")
+      {
+         if (TheSynth->GetUserPrefs()["ffmpeg_path"].isNull())
+         {
+   #if BESPOKE_WINDOWS
+            sPath = "ffmpeg.exe";
+   #else
+            sPath = "/opt/local/bin/ffmpeg";
+   #endif
+         }
+         else
+         {
+            sPath = TheSynth->GetUserPrefs()["ffmpeg_path"].asString();
+         }
+      }
+      return sPath;
    }
 }
 
-void SamplePlayer::DownloadYoutube(string search, string options, string title)
+void SamplePlayer::DownloadYoutube(string url, string title)
 {
    mPlay = false;
    if (mSample)
@@ -505,17 +538,25 @@ void SamplePlayer::DownloadYoutube(string search, string options, string title)
          file.deleteFile();
    }
    
-   string command = GetYoutubeDlPrefix() + search + " --extract-audio --audio-format wav --audio-quality 0 --no-progress -o \""+ ofToDataPath(tempDownloadName) +"\" "+ options;
-   ofLog() << "running " << command;
+   StringArray args;
+   args.add(GetYoutubeDlPath());
+   args.add(url);
+   args.add("--extract-audio");
+   args.add("--audio-format");
+   args.add("wav");
+   args.add("--audio-quality");
+   args.add("0");
+   args.add("--no-progress");
+   args.add("--ffmpeg-location");
+   args.add(GetFfmpegPath());
+   args.add("-o");
+   args.add(ofToDataPath(tempDownloadName));
+   
    mRunningProcessType = RunningProcessType::DownloadYoutube;
 
    mOnRunningProcessComplete = [this, tempConvertedName, title] { OnYoutubeDownloadComplete(tempConvertedName, title); };
 
-   if (mRunningProcess)
-      mRunningProcess->kill();
-   delete mRunningProcess;
-   mRunningProcess = new ChildProcess();
-   mRunningProcess->start(command);
+   RunProcess(args);
 }
 
 void SamplePlayer::OnYoutubeDownloadComplete(string filename, string title)
@@ -530,8 +571,23 @@ void SamplePlayer::OnYoutubeDownloadComplete(string filename, string title)
    else
    {
       UpdateSample(new Sample(), true);
-      mErrorString = "couldn't download sample. do you have youtube-dl and ffmpeg installed?";
+      mErrorString = "couldn't download sample. do you have youtube-dl and ffmpeg installed,\nwith their paths set in userprefs.json?";
    }
+}
+
+void SamplePlayer::RunProcess(const StringArray& args)
+{
+   string command = "";
+   for (auto& arg : args)
+      command += arg.toStdString() + " ";
+   ofLog() << "running " << command;
+   if (mRunningProcess)
+      mRunningProcess->kill();
+   delete mRunningProcess;
+   mRunningProcess = new ChildProcess();
+   bool success = mRunningProcess->start(args);
+   if (!success)
+      ofLog() << "error running process from bespoke";
 }
 
 void SamplePlayer::SearchYoutube(string searchTerm)
@@ -543,19 +599,36 @@ void SamplePlayer::SearchYoutube(string searchTerm)
    dir.createDirectory();
    mYoutubeSearchResults.clear();
 
-   string options = "\"ytsearch"+ofToString(kMaxYoutubeSearchResults)+":"+searchTerm+"\" --no-playlist --write-info-json --skip-download -o \""+tempPath+"/%(title)s#%(duration)s#%(id)s.%(ext)s\"";
-   string command = GetYoutubeDlPrefix() + options;
-   ofLog() << "running " << command;
+   StringArray args;
+   args.add(GetYoutubeDlPath());
+   args.add("ytsearch"+ofToString(kMaxYoutubeSearchResults)+":"+searchTerm);
+   args.add("--no-playlist");
+   args.add("--write-info-json");
+   args.add("--skip-download");
+   args.add("-o");
+   args.add(tempPath+"/%(title)s#%(duration)s#%(id)s.%(ext)s");
 
    mRunningProcessType = RunningProcessType::SearchYoutube;
 
-   mOnRunningProcessComplete = [this, searchTerm] { if (mYoutubeSearchResults.size() == 0) { mErrorString = "zero results found for " + searchTerm; } };
+   double searchTime = gTime;
+   mOnRunningProcessComplete = [this, searchTerm, searchTime] { OnYoutubeSearchComplete(searchTerm, searchTime); };
 
-   if (mRunningProcess)
-      mRunningProcess->kill();
-   delete mRunningProcess;
-   mRunningProcess = new ChildProcess();
-   mRunningProcess->start(command);
+   RunProcess(args);
+}
+
+void SamplePlayer::OnYoutubeSearchComplete(string searchTerm, double searchTime)
+{
+   if (mYoutubeSearchResults.size() == 0)
+   {
+      if (gTime - searchTime < 500)
+      {
+         mErrorString = "couldn't search. do you have youtube-dl installed, with its path set in userprefs.json?";
+      }
+      else
+      {
+         mErrorString = "zero results found for " + searchTerm;
+      }
+   }
 }
 
 void SamplePlayer::LoadFile()

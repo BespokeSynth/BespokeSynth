@@ -6,5 +6,9 @@
    "height" : 1100,
    "width" : 1700,
    "layout" : "layouts/blank.json",
-   "vstsearchdirs" : [ "/Library/Audio/Plug-Ins/VST3", "/Library/Audio/Plug-Ins/VST" ]
+   "scroll_multiplier_horizontal" : 1,
+   "scroll_multiplier_vertical" : 1,
+   "vstsearchdirs" : [ "/Library/Audio/Plug-Ins/VST3", "/Library/Audio/Plug-Ins/VST" ],
+   "youtube-dl_path" : "/opt/local/bin/youtube-dl",
+   "ffmpeg_path" : "/opt/local/bin/ffmpeg"
 }

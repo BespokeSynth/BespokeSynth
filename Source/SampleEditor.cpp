@@ -238,7 +238,7 @@ void SampleEditor::ButtonClicked(ClickButton *button)
          mSampleEndSlider->SetExtents(0,mSampleEnd);
 
          const SampleInfo& info = mBank->GetSampleInfo(mSampleIndex);
-         printf("\"%s\" %d %f %f %s\n", mSample->GetReadPath(), mNumBars, mOffset, mVolume, info.mType.c_str());
+         printf("\"%s\" %d %f %f %s\n", mSample->GetReadPath().c_str(), mNumBars, mOffset, mVolume, info.mType.c_str());
       }
    }
 }

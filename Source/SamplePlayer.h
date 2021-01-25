@@ -77,9 +77,10 @@ private:
    void UpdateSampleList();
    float GetPlayPositionForMouse(float mouseX) const;
    void GetPlayInfoForPitch(int pitch, float& startSeconds, float& lengthSeconds, float& speed) const;
-   void DownloadYoutube(string search, string options, string title);
+   void DownloadYoutube(string url, string titles);
    void SearchYoutube(string searchTerm);
    void LoadFile();
+   void OnYoutubeSearchComplete(string searchTerm, double searchStartTime);
    void OnYoutubeDownloadComplete(string filename, string title);
    void SwitchAndRamp();
    void SetCuePointForX(float mouseX);
@@ -89,6 +90,7 @@ private:
    float GetZoomEndSeconds() const;
    void UpdateActiveCuePoint();
    void PlayCuePoint(double time, int index, int velocity);
+   void RunProcess(const StringArray& args);
    
    //IDrawableModule
    void DrawModule() override;
@@ -163,7 +165,7 @@ private:
 
    string mErrorString;
 
-   static const int kMaxYoutubeSearchResults = 10;
+#define kMaxYoutubeSearchResults 10
    enum class RunningProcessType
    {
       None,
