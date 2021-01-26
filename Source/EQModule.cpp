@@ -387,7 +387,7 @@ void EQModule::Resize(float w, float h)
    mHeight = h;
    mModuleSaveData.SetInt("width", w);
    mModuleSaveData.SetInt("height", h);
-   mNeedToUpdateFrequencyResponseGraph = false;
+   mNeedToUpdateFrequencyResponseGraph = true;
 }
 
 void EQModule::LoadLayout(const ofxJSONElement& moduleInfo)

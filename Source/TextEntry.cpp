@@ -15,9 +15,9 @@
 IKeyboardFocusListener* IKeyboardFocusListener::sCurrentKeyboardFocus = nullptr;
 
 //static
-void IKeyboardFocusListener::ClearActiveKeyboardFocus(bool acceptEntry)
+void IKeyboardFocusListener::ClearActiveKeyboardFocus(bool notifyListeners)
 {
-   if (sCurrentKeyboardFocus && acceptEntry)
+   if (sCurrentKeyboardFocus && notifyListeners)
       sCurrentKeyboardFocus->AcceptEntry(false);
    sCurrentKeyboardFocus = nullptr;
 }
@@ -215,9 +215,8 @@ void TextEntry::OnKeyPressed(int key, bool isRepeat)
 {
    if (key == OF_KEY_RETURN)
    {
-      if (mRequireEnterToAccept)
-         AcceptEntry(true);
-      IKeyboardFocusListener::ClearActiveKeyboardFocus(K(acceptEntry));
+      AcceptEntry(true);
+      IKeyboardFocusListener::ClearActiveKeyboardFocus(!K(notifyListeners));
    }
    if (key == OF_KEY_TAB)
    {
@@ -245,7 +244,7 @@ void TextEntry::OnKeyPressed(int key, bool isRepeat)
    }
    else if (key == OF_KEY_ESC)
    {
-      IKeyboardFocusListener::ClearActiveKeyboardFocus(!K(acceptEntry));
+      IKeyboardFocusListener::ClearActiveKeyboardFocus(K(notifyListeners));
    }
    else if (key == OF_KEY_LEFT)
    {
@@ -297,7 +296,10 @@ void TextEntry::UpdateDisplayString()
 void TextEntry::AcceptEntry(bool pressedEnter)
 {
    if (!pressedEnter && mRequireEnterToAccept)
+   {
+      CancelEntry();
       return;
+   }
    
    if (mVarString)
       StringCopy(mVarString, mString, MAX_TEXTENTRY_LENGTH);
@@ -314,6 +316,12 @@ void TextEntry::AcceptEntry(bool pressedEnter)
    
    if (mListener)
       mListener->TextEntryComplete(this);
+}
+
+void TextEntry::CancelEntry()
+{
+   if (mListener)
+      mListener->TextEntryCancelled(this);
 }
 
 bool TextEntry::AllowCharacter(char c)

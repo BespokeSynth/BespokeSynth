@@ -26,8 +26,11 @@ KeyboardDisplay::KeyboardDisplay()
 {
    SetIsNoteOrigin(true);
    
-   for (int i=0; i<128; ++i)
-      mLastPlayedTime[i] = 0;
+   for (int i = 0; i < 128; ++i)
+   {
+      mLastOnTime[i] = 0;
+      mLastOffTime[i] = 0;
+   }
 }
 
 void KeyboardDisplay::CreateUIControls()
@@ -47,10 +50,12 @@ void KeyboardDisplay::PlayNote(double time, int pitch, int velocity, int voiceId
 {
    PlayNoteOutput(time, pitch, velocity, voiceIdx, modulation);
    
-   if (velocity > 0)
+   if (pitch >= 0 && pitch < 128)
    {
-      assert(pitch < 128);
-      mLastPlayedTime[pitch] = gTime;
+      if (velocity > 0)
+         mLastOnTime[pitch] = time;
+      else
+         mLastOffTime[pitch] = time;
    }
 }
 
@@ -154,17 +159,16 @@ void KeyboardDisplay::DrawKeyboard(int x, int y, int w, int h)
    ofPushStyle();
    ofFill();
    ofSetLineWidth(2);
-   list<int> heldNotes = mNoteOutput.GetHeldNotesList();
-   for (int pitch : heldNotes)
+   for (int pitch = RootKey(); pitch < RootKey() + NumKeys(); ++pitch)
    {
-      bool isBlackKey;
-      if (pitch >= RootKey() && pitch < RootKey() + NumKeys())
+      if (gTime >= mLastOnTime[pitch] && (gTime <= mLastOffTime[pitch] || mLastOffTime[pitch] < mLastOnTime[pitch]))
       {
+         bool isBlackKey;
          ofRectangle key = GetKeyboardKeyRect(pitch, w, h, isBlackKey);
          key.height /= 3;
          key.y += key.height*2;
          
-         ofSetColor(255,255,255,ofLerp(255, 150, ofClamp((gTime - mLastPlayedTime[pitch]) / 150.0f, 0, 1)));
+         ofSetColor(255,255,255,ofLerp(255, 150, ofClamp((gTime - mLastOnTime[pitch]) / 150.0f, 0, 1)));
          
          ofRect(key);
       }

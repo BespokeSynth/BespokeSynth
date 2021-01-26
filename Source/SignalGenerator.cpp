@@ -30,7 +30,7 @@ SignalGenerator::SignalGenerator()
 , mSyncCheckbox(nullptr)
 , mSyncFreq(200)
 , mSyncFreqSlider(nullptr)
-, mDetune(1)
+, mDetune(0)
 , mDetuneSlider(nullptr)
 , mFreq(220)
 , mFreqSlider(nullptr)
@@ -69,9 +69,9 @@ void SignalGenerator::CreateUIControls()
    mMultSelector = new DropdownList(this,"mult",mSoftenSlider,kAnchor_Below,&mMult);
    mPhaseOffsetSlider = new FloatSlider(this,"phase",mShuffleSlider,kAnchor_Below,80,15,&mPhaseOffset,0,1,3);
    mVolSlider = new FloatSlider(this,"vol",mMultSelector,kAnchor_Below,80,15,&mVol,0,1);
-   mDetuneSlider = new FloatSlider(this,"detune",mPhaseOffsetSlider,kAnchor_Below,80,15,&mDetune,.98f,1.02f,3);
+   mDetuneSlider = new FloatSlider(this,"detune",mPhaseOffsetSlider,kAnchor_Below,80,15,&mDetune, -.05f, .05f, 3);
    
-   mSyncFreqSlider->SetLabel("");
+   mSyncFreqSlider->SetShowName(false);
    
    SetFreqMode(kFreqMode_Instant);
    
@@ -153,7 +153,7 @@ void SignalGenerator::Process(double time)
       float mult = mMult;
       if (mult < 0)
          mult = -1.0f/mult;
-      float phaseInc = GetPhaseInc(mFreq * mDetune * mult);
+      float phaseInc = GetPhaseInc(mFreq * exp2(mDetune) * mult);
       
       mPhase += phaseInc;
       if (mPhase == INFINITY)
@@ -274,7 +274,7 @@ void SignalGenerator::LoadLayout(const ofxJSONElement& moduleInfo)
    mModuleSaveData.LoadString("target", moduleInfo);
    mModuleSaveData.LoadFloat("vol", moduleInfo, 0, mVolSlider);
    mModuleSaveData.LoadEnum<OscillatorType>("osc", moduleInfo, kOsc_Sin, mOscSelector);
-   mModuleSaveData.LoadFloat("detune", moduleInfo, 1, mDetuneSlider);
+   mModuleSaveData.LoadFloat("detune", moduleInfo, 0, mDetuneSlider);
    mModuleSaveData.LoadEnum<FreqMode>("freq_mode", moduleInfo, kFreqMode_Instant, mFreqModeSelector);
    
    SetUpFromSaveData();

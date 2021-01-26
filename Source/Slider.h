@@ -31,7 +31,6 @@ class FloatSlider : public IUIControl, public ITextEntryListener, public IAudioP
 public:
    FloatSlider(IFloatSliderListener* owner, const char* label, int x, int y, int w, int h, float* var, float min, float max, int digits = -1);
    FloatSlider(IFloatSliderListener* owner, const char* label, IUIControl* anchor, AnchorDirection anchorDir, int w, int h, float* var, float min, float max, int digits = -1);
-   void SetLabel(const char* label);
    void SetVar(float* var) { mVar = var; }
    void Render() override;
    bool MouseMoved(float x, float y) override;
@@ -55,6 +54,7 @@ public:
    void SetDimensions(int w, int h) { mWidth = w; mHeight = h; }
    void SetBezierControl(float control) { mBezierControl = control; }
    void SetModulator(IModulator* modulator);
+   IModulator* GetModulator() { return mModulator; }
    float& GetModulatorMin() { return mModulatorMin; }
    float& GetModulatorMax() { return mModulatorMax; }
    void OnTransportAdvanced(float amount) override;
@@ -85,6 +85,7 @@ public:
    
    bool AttemptTextInput() override;
    void TextEntryComplete(TextEntry* entry) override;
+   void TextEntryCancelled(TextEntry* entry) override;
    
    void UpdateTouching();
    bool mTouching;   //to be controlled with external checkbox for "relative" sliders
@@ -158,7 +159,6 @@ class IntSlider : public IUIControl, public ITextEntryListener
 public:
    IntSlider(IIntSliderListener* owner, const char* label, int x, int y, int w, int h, int* var, int min, int max);
    IntSlider(IIntSliderListener* owner, const char* label, IUIControl* anchor, AnchorDirection anchorDir, int w, int h, int* var, int min, int max);
-   void SetLabel(const char* label);
    void SetVar(int* var) { mVar = var; }
    void Render() override;
    bool MouseMoved(float x, float y) override;
@@ -189,6 +189,7 @@ public:
    
    bool AttemptTextInput() override;
    void TextEntryComplete(TextEntry* entry) override;
+   void TextEntryCancelled(TextEntry* entry) override;
    
 protected:
    ~IntSlider();   //protected so that it can't be created on the stack

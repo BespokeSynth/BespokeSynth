@@ -53,6 +53,7 @@ public:
    virtual void LoadLayout(const ofxJSONElement& moduleInfo) override;
    virtual void SetUpFromSaveData() override;
    virtual void SaveLayout(ofxJSONElement& moduleInfo) override;
+   virtual void UpdateOldControlName(string& oldName) override;
    
 private:
    //IDrawableModule

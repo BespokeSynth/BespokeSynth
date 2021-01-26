@@ -20,6 +20,7 @@ class ITextEntryListener
 public:
    virtual ~ITextEntryListener() {}
    virtual void TextEntryComplete(TextEntry* entry) = 0;
+   virtual void TextEntryCancelled(TextEntry* entry) {}
    virtual void TextEntryActivated(TextEntry* entry) {}
 };
 
@@ -36,11 +37,12 @@ public:
    virtual ~IKeyboardFocusListener() {}
    static void SetActiveKeyboardFocus(IKeyboardFocusListener* focus) { sCurrentKeyboardFocus = focus; }
    static IKeyboardFocusListener* GetActiveKeyboardFocus() { return sCurrentKeyboardFocus; }
-   static void ClearActiveKeyboardFocus(bool acceptEntry);
+   static void ClearActiveKeyboardFocus(bool notifyListeners);
    
    virtual void OnKeyPressed(int key, bool isRepeat) = 0;
 private:
    virtual void AcceptEntry(bool pressedEnter) {}
+   virtual void CancelEntry() {}
    static IKeyboardFocusListener* sCurrentKeyboardFocus;
 };
 
@@ -84,6 +86,7 @@ private:
    void AddCharacter(char c);
    bool AllowCharacter(char c);
    void AcceptEntry(bool pressedEnter) override;
+   void CancelEntry() override;
    
    void OnClicked(int x, int y, bool right) override;
    bool MouseMoved(float x, float y) override;

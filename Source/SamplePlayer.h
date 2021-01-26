@@ -84,8 +84,8 @@ private:
    void OnYoutubeDownloadComplete(string filename, string title);
    void SwitchAndRamp();
    void SetCuePointForX(float mouseX);
-   float GetZoomStartSample() const;
-   float GetZoomEndSample() const;
+   int GetZoomStartSample() const;
+   int GetZoomEndSample() const;
    float GetZoomStartSeconds() const;
    float GetZoomEndSeconds() const;
    void UpdateActiveCuePoint();
@@ -131,6 +131,7 @@ private:
    bool mIsLoadingSample;
    float mZoomLevel;
    float mZoomOffset;
+   ClickButton* mTrimToZoomButton;
    
    bool mOscWheelGrabbed;
    float mOscWheelPos;

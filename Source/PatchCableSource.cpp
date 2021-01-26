@@ -16,7 +16,8 @@
 
 namespace
 {
-   const int patchCableSourceRadius = 5;
+   const int kPatchCableSourceRadius = 5;
+   const int kPatchCableSpacing = 8;
 }
 
 bool PatchCableSource::sAllowInsert = true;
@@ -24,7 +25,7 @@ bool PatchCableSource::sAllowInsert = true;
 PatchCableSource::PatchCableSource(IDrawableModule* owner, ConnectionType type)
 : mOwner(owner)
 , mType(type)
-, mHovered(false)
+, mHoverIndex(-1)
 , mOverrideVizBuffer(nullptr)
 , mAutomaticPositioning(true)
 , mAudioReceiver(nullptr)
@@ -32,8 +33,8 @@ PatchCableSource::PatchCableSource(IDrawableModule* owner, ConnectionType type)
 , mPatchCableDrawMode(kPatchCableDrawMode_Normal)
 , mEnabled(true)
 , mClickable(true)
-, mSide(kNone)
-, mManualSide(kNone)
+, mSide(Side::kNone)
+, mManualSide(Side::kNone)
 , mHasOverrideCableDir(false)
 {
    mAllowMultipleTargets = (mType == kConnectionType_Note || mType == kConnectionType_Pulse);
@@ -137,7 +138,7 @@ void PatchCableSource::UpdatePosition()
       mOwner->GetPosition(x, y);
       mOwner->GetDimensions(w, h);
       
-      if (mManualSide == kNone)
+      if (mManualSide == Side::kNone)
       {
          ofVec2f centerOfMass;
          int count = 0;
@@ -165,15 +166,15 @@ void PatchCableSource::UpdatePosition()
          if (count > 0)
          {
             if (centerOfMass.y > y+h)
-               mSide = kBottom;
+               mSide = Side::kBottom;
             else if (centerOfMass.x < x+w/2)
-               mSide = kLeft;
+               mSide = Side::kLeft;
             else
-               mSide = kRight;
+               mSide = Side::kRight;
          }
          else
          {
-            mSide = kBottom;
+            mSide = Side::kBottom;
          }
       }
       else
@@ -181,17 +182,17 @@ void PatchCableSource::UpdatePosition()
          mSide = mManualSide;
       }
       
-      if (mSide == kBottom)
+      if (mSide == Side::kBottom)
       {
          mX = x+w/2;
          mY = y+h+3;
       }
-      else if (mSide == kLeft)
+      else if (mSide == Side::kLeft)
       {
          mX = x-3;
          mY = y+h/2;
       }
-      else if (mSide == kRight)
+      else if (mSide == Side::kRight)
       {
          mX = x+w+3;
          mY = y+h/2;
@@ -212,38 +213,120 @@ void PatchCableSource::Render()
    if (!Enabled())
       return;
    
-   if (mPatchCableDrawMode == kPatchCableDrawMode_Normal ||
-       (mPatchCableDrawMode == kPatchCableDrawMode_HoverOnly && mHovered))
-   for (auto cable : mPatchCables)
-      cable->Draw();
-   
-   ofPushMatrix();
-   ofPushStyle();
-   
-   ofPushStyle();
-   ofSetLineWidth(0);
-   ofSetColor(mColor);
-   ofFill();
-   ofCircle(mX,mY,patchCableSourceRadius);
-   if (mHovered)
+   if (mPatchCableDrawMode == kPatchCableDrawMode_Normal || (mPatchCableDrawMode == kPatchCableDrawMode_HoverOnly && mHoverIndex != -1))
    {
-      ofSetColor(ofColor::white);
-      ofCircle(mX,mY,patchCableSourceRadius-2);
-   }
-   ofPopStyle();
-   
-   if (mHovered && InAddCableMode())
-   {
-      ofPushStyle();
-      ofSetColor(0,0,0);
-      ofSetLineWidth(2);
-      ofLine(mX,mY-(patchCableSourceRadius-1),mX,mY+(patchCableSourceRadius-1));
-      ofLine(mX-(patchCableSourceRadius-1),mY,mX+(patchCableSourceRadius-1),mY);
-      ofPopStyle();
+      for (auto cable : mPatchCables)
+         cable->Draw();
    }
    
+   ofPushStyle();
+   float cableX = mX;
+   float cableY = mY;
+   for (size_t i = 0; i < mPatchCables.size() || i == 0; ++i)
+   {
+      if (i < mPatchCables.size())
+         mPatchCables[i]->SetSourceIndex(i);
+
+      ofSetLineWidth(0);
+      ofSetColor(mColor);
+      ofFill();
+      ofCircle(cableX, cableY, kPatchCableSourceRadius);
+      if (mHoverIndex == i)
+      {
+         ofSetColor(ofColor::white);
+         ofCircle(cableX, cableY, kPatchCableSourceRadius - 2);
+         if (InAddCableMode())
+         {
+            ofSetColor(0, 0, 0);
+            ofSetLineWidth(2);
+            ofLine(cableX, cableY - (kPatchCableSourceRadius - 1), cableX, cableY + (kPatchCableSourceRadius - 1));
+            ofLine(cableX - (kPatchCableSourceRadius - 1), cableY, cableX + (kPatchCableSourceRadius - 1), cableY);
+         }
+      }
+
+      if (mSide == Side::kBottom)
+         cableY += kPatchCableSpacing;
+      else if (mSide == Side::kLeft)
+         cableX -= kPatchCableSpacing;
+      else if (mSide == Side::kRight)
+         cableX += kPatchCableSpacing;
+   }
    ofPopStyle();
-   ofPopMatrix();
+}
+
+ofVec2f PatchCableSource::GetCableStart(int index) const
+{
+   float cableX = mX;
+   float cableY = mY;
+
+   if (mSide == Side::kBottom)
+      cableY += kPatchCableSpacing * index;
+   else if (mSide == Side::kLeft)
+      cableX -= kPatchCableSpacing * index;
+   else if (mSide == Side::kRight)
+      cableX += kPatchCableSpacing * index;
+
+   return ofVec2f(cableX, cableY);
+}
+
+ofVec2f PatchCableSource::GetCableStartDir(int index, ofVec2f dest) const
+{
+   if (mHasOverrideCableDir)
+   {
+      return mOverrideCableDir;
+   }
+   else
+   {
+      enum class Direction
+      {
+         kUp,
+         kDown,
+         kLeft,
+         kRight,
+         kNone
+      };
+
+      Direction dir;
+      switch (mSide)
+      {
+      case Side::kBottom: dir = Direction::kDown; break;
+      case Side::kLeft: dir = Direction::kLeft; break;
+      case Side::kRight: dir = Direction::kRight; break;
+      case Side::kNone: dir = Direction::kNone; break;
+      }
+
+      if (mPatchCables.size() > 0 && index < mPatchCables.size() - 1)  //not the top of the cable stack
+      {
+         if (mSide == Side::kBottom)
+         {
+            if (dest.x < mX)
+               dir = Direction::kLeft;
+            else
+               dir = Direction::kRight;
+         }
+         else if (mSide == Side::kLeft || mSide == Side::kRight)
+         {
+            if (dest.y < mY)
+               dir = Direction::kUp;
+            else
+               dir = Direction::kDown;
+         }
+      }
+
+      switch (dir)
+      {
+      case Direction::kDown:
+         return ofVec2f(0, 1);
+      case Direction::kRight:
+         return ofVec2f(1, 0);
+      case Direction::kLeft:
+         return ofVec2f(-1, 0);
+      case Direction::kUp:
+         return ofVec2f(0, -1);
+      default:
+         return ofVec2f(0, 0);
+      }
+   }
 }
 
 bool PatchCableSource::MouseMoved(float x, float y)
@@ -257,10 +340,13 @@ bool PatchCableSource::MouseMoved(float x, float y)
    x = TheSynth->GetMouseX();
    y = TheSynth->GetMouseY();
    
-   mHovered = ofDistSquared(x, y, mX, mY) < patchCableSourceRadius * patchCableSourceRadius;
+   mHoverIndex = GetHoverIndex(x, y);
    
-   for (auto cable : mPatchCables)
-      cable->NotifyMouseMoved(x, y);
+   for (size_t i=0; i<mPatchCables.size(); ++i)
+   {
+      mPatchCables[i]->SetHoveringOnSource(i == mHoverIndex);
+      mPatchCables[i]->NotifyMouseMoved(x, y);
+   }
    
    return false;
 }
@@ -280,7 +366,7 @@ bool PatchCableSource::TestClick(int x, int y, bool right, bool testOnly /* = fa
    if (!mClickable)
       return false;
    
-   if (mHovered)
+   if (mHoverIndex != -1)
    {
       if (!testOnly)
       {
@@ -291,7 +377,7 @@ bool PatchCableSource::TestClick(int x, int y, bool right, bool testOnly /* = fa
          }
          else
          {
-            mPatchCables[mPatchCables.size()-1]->Grab();
+            mPatchCables[mHoverIndex]->Grab();
          }
       }
       return true;
@@ -314,9 +400,27 @@ bool PatchCableSource::TestHover(float x, float y) const
    if (!mClickable)
       return false;
    
-   ofVec2f myPos = GetPosition();
-   
-   return ofDistSquared(x, y, myPos.x, myPos.y) < patchCableSourceRadius * patchCableSourceRadius;
+   return GetHoverIndex(x, y) != -1;
+}
+
+int PatchCableSource::GetHoverIndex(float x, float y) const
+{
+   float cableX = mX;
+   float cableY = mY;
+   for (int i = 0; i < mPatchCables.size() || i == 0; ++i)
+   {
+      if (ofDistSquared(x, y, cableX, cableY) < kPatchCableSourceRadius * kPatchCableSourceRadius)
+         return i;
+
+      if (mSide == Side::kBottom)
+         cableY += kPatchCableSpacing;
+      else if (mSide == Side::kLeft)
+         cableX -= kPatchCableSpacing;
+      else if (mSide == Side::kRight)
+         cableX += kPatchCableSpacing;
+   }
+
+   return -1;
 }
 
 bool PatchCableSource::Enabled() const

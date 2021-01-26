@@ -126,6 +126,7 @@ public:
    virtual void PostLoadState() {}
    virtual vector<IUIControl*> ControlsToNotSetDuringLoadState() const;
    virtual vector<IUIControl*> ControlsToIgnoreInSaveState() const;
+   virtual void UpdateOldControlName(string& oldName) {}
    virtual bool CanSaveState() const { return true; }
    virtual bool HasDebugDraw() const { return false; }
    

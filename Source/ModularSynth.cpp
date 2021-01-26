@@ -876,7 +876,7 @@ void ModularSynth::MousePressed(int intX, int intY, int button)
    
    bool rightButton = button == 2;
 
-   IKeyboardFocusListener::ClearActiveKeyboardFocus(K(acceptEntry));
+   IKeyboardFocusListener::ClearActiveKeyboardFocus(K(notifyListeners));
 
    if (GetTopModalFocusItem())
    {
@@ -988,18 +988,16 @@ void ModularSynth::MouseScrolled(float x, float y, bool canZoomCanvas)
          
       float change = y/100 * movementScale;
          
-      if (floatSlider && floatSlider->GetLFO() && floatSlider->GetLFO()->Enabled())
+      if (floatSlider && floatSlider->GetModulator() && floatSlider->GetModulator()->Active() && floatSlider->GetModulator()->CanAdjustRange())
       {
-         FloatSliderLFOControl* lfo = floatSlider->GetLFO();
+         IModulator* modulator = floatSlider->GetModulator();
          float min = floatSlider->GetMin();
          float max = floatSlider->GetMax();
-         float lfoMin = ofMap(lfo->GetMin(),min,max,0,1);
-         float lfoMax = ofMap(lfo->GetMax(),min,max,0,1);
+         float modMin = ofMap(modulator->GetMin(),min,max,0,1);
+         float modMax = ofMap(modulator->GetMax(),min,max,0,1);
             
-         float changeX = x/100 * movementScale;
-            
-         lfo->GetMin() = ofMap(lfoMin + change,0,1,min,max,K(clamp));
-         lfo->GetMax() = ofMap(lfoMax + changeX,0,1,min,max,K(clamp));
+         modulator->GetMin() = ofMap(modMin - change,0,1,min,max,K(clamp));
+         modulator->GetMax() = ofMap(modMax + change,0,1,min,max,K(clamp));
             
          return;
       }
@@ -1448,7 +1446,7 @@ void ModularSynth::ResetLayout()
    mLissajousDrawers.clear();
    mMoveModule = nullptr;
    LFOPool::Shutdown();
-   IKeyboardFocusListener::ClearActiveKeyboardFocus(!K(acceptEntry));
+   IKeyboardFocusListener::ClearActiveKeyboardFocus(!K(notifyListeners));
    
    mErrors.clear();
    

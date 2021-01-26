@@ -98,7 +98,7 @@ void DrumPlayer::CreateUIControls()
    
    UpdateVisibleControls();
    
-   GetPatchCableSource()->SetManualSide(PatchCableSource::kBottom);
+   GetPatchCableSource()->SetManualSide(PatchCableSource::Side::kBottom);
    mSpeedRandomizationSlider->SetMode(FloatSlider::kSquare);
 }
 

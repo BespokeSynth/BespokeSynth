@@ -52,6 +52,8 @@ public:
    IClickable* GetTarget() const { return mTarget; }
    ConnectionType GetConnectionType() const;
    bool IsDragging() const { return mDragging; }
+   void SetHoveringOnSource(bool hovering) { mHoveringOnSource = hovering; }
+   void SetSourceIndex(int index) { mSourceIndex = index; }
    
    void Grab();
    bool IsValidTarget(IClickable* target) const;
@@ -66,8 +68,6 @@ protected:
 private:
    void SetTarget(IClickable* target);
    PatchCablePos GetPatchCablePos();
-   bool IsOverStart(int x, int y);
-   bool IsOverEnd(int x, int y);
    ofVec2f FindClosestSide(int x, int y, int w, int h, ofVec2f start, ofVec2f startDirection, ofVec2f& endDirection);
    
    PatchCableSource* mOwner;
@@ -79,6 +79,8 @@ private:
    bool mHovered;
    bool mDragging;
    ofVec2f mGrabPos;
+   bool mHoveringOnSource;
+   int mSourceIndex;
 };
 
 #endif /* defined(__Bespoke__PatchCable__) */

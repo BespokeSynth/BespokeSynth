@@ -57,7 +57,7 @@ private:
 class PatchCableSource : public IClickable
 {
 public:
-   enum Side
+   enum class Side
    {
       kNone,
       kBottom,
@@ -96,13 +96,12 @@ public:
    bool Enabled() const;
    void AddTypeFilter(string type) { mTypeFilter.push_back(type); }
    void ClearTypeFilter() { mTypeFilter.clear(); }
-   Side GetCableSide() const { return mSide; }
    void SetManualSide(Side side) { mManualSide = side; }
    void SetClickable(bool clickable) { mClickable = clickable; }
    bool TestHover(float x, float y) const;
    void SetOverrideCableDir(ofVec2f dir) { mHasOverrideCableDir = true; mOverrideCableDir = dir; }
-   bool HasOverrideCableDir() const { return mHasOverrideCableDir; }
-   ofVec2f GetOverrideCableDir() const { return mOverrideCableDir; }
+   ofVec2f GetCableStart(int index) const;
+   ofVec2f GetCableStartDir(int index, ofVec2f dest) const;
    
    void AddHistoryEvent(double time, bool on) { mNoteHistory.AddEvent(time, on); }
    NoteHistory& GetHistory() { return mNoteHistory; }
@@ -123,9 +122,10 @@ protected:
    void OnClicked(int x, int y, bool right) override;
 private:
    bool InAddCableMode() const;
+   int GetHoverIndex(float x, float y) const;
    
    vector<PatchCable*> mPatchCables;
-   bool mHovered;
+   int mHoverIndex; //-1 = not hovered
    ConnectionType mType;
    bool mAllowMultipleTargets;
    DefaultPatchBehavior mDefaultPatchBehavior;

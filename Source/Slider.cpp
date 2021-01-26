@@ -55,7 +55,7 @@ FloatSlider::FloatSlider(IFloatSliderListener* owner, const char* label, int x, 
 , mMaxEntry(nullptr)
 {
    assert(owner);
-   SetLabel(label);
+   SetName(label);
    SetPosition(x,y);
    (dynamic_cast<IDrawableModule*>(owner))->AddUIControl(this);
    SetParent(dynamic_cast<IClickable*>(owner));
@@ -99,11 +99,6 @@ void FloatSlider::SetModulator(IModulator* modulator)
 {
    mModulator = modulator;
    mLFOControl = nullptr;
-}
-
-void FloatSlider::SetLabel(const char* label)
-{
-   SetName(label);
 }
 
 void FloatSlider::Render()
@@ -271,11 +266,13 @@ void FloatSlider::OnClicked(int x, int y, bool right)
       
       if (adjustMax)
       {
+         mMaxEntry->Delete();
          mMaxEntry = new TextEntry(this, "", mX+mWidth-5*9, mY, 5, &mMax, -FLT_MAX, FLT_MAX);
          mMaxEntry->MakeActiveTextEntry(true);
       }
       else
       {
+         mMinEntry->Delete();
          //mMinEntry = new TextEntry(this, "", mX, mY, 5, &mMin, -FLT_MAX, FLT_MAX);
          mMinEntry = new TextEntry(this, "", mX+mWidth-5*9, mY, 5, &mMin, -FLT_MAX, FLT_MAX);
          mMinEntry->MakeActiveTextEntry(true);
@@ -629,6 +626,7 @@ bool FloatSlider::AttemptTextInput()
       mFloatEntry->Delete();
    mFloatEntry = new TextEntry(this, "", HIDDEN_UICONTROL, HIDDEN_UICONTROL, 10, mEntryString);
    mFloatEntry->MakeActiveTextEntry(true);
+   mFloatEntry->SetRequireEnter(true);
    mFloatEntry->ClearInput();
    return true;
 }
@@ -654,6 +652,15 @@ void FloatSlider::TextEntryComplete(TextEntry* entry)
    {
       mMinEntry->Delete();
       mMinEntry = nullptr;
+   }
+}
+
+void FloatSlider::TextEntryCancelled(TextEntry* entry)
+{
+   if (entry == mFloatEntry)
+   {
+      mFloatEntry->Delete();
+      mFloatEntry = nullptr;
    }
 }
 
@@ -786,7 +793,7 @@ IntSlider::IntSlider(IIntSliderListener* owner, const char* label, int x, int y,
 , mMaxEntry(nullptr)
 {
    assert(owner);
-   SetLabel(label);
+   SetName(label);
    SetPosition(x,y);
    (dynamic_cast<IDrawableModule*>(owner))->AddUIControl(this);
    SetParent(dynamic_cast<IClickable*>(owner));
@@ -807,11 +814,6 @@ void IntSlider::Init()
 {
    if (mVar)
       mOriginalValue = *mVar;
-}
-
-void IntSlider::SetLabel(const char* label)
-{
-   SetName(label);
 }
 
 void IntSlider::Poll()
@@ -1008,6 +1010,7 @@ bool IntSlider::AttemptTextInput()
       mIntEntry->Delete();
    mIntEntry = new TextEntry(this, "", HIDDEN_UICONTROL, HIDDEN_UICONTROL, 10, mEntryString);
    mIntEntry->MakeActiveTextEntry(true);
+   mIntEntry->SetRequireEnter(true);
    mIntEntry->ClearInput();
    return true;
 }
@@ -1033,6 +1036,15 @@ void IntSlider::TextEntryComplete(TextEntry* entry)
    {
       mMinEntry->Delete();
       mMinEntry = nullptr;
+   }
+}
+
+void IntSlider::TextEntryCancelled(TextEntry* entry)
+{
+   if (entry == mIntEntry)
+   {
+      mIntEntry->Delete();
+      mIntEntry = nullptr;
    }
 }
 

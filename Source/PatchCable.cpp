@@ -25,6 +25,8 @@ PatchCable* PatchCable::sActivePatchCable = nullptr;
 PatchCable::PatchCable(PatchCableSource* owner)
 : mHovered(false)
 , mDragging(false)
+, mHoveringOnSource(false)
+, mSourceIndex(0)
 , mTarget(nullptr)
 , mTargetRadioButton(nullptr)
 , mUIControlConnection(nullptr)
@@ -132,6 +134,8 @@ void PatchCable::Render()
    
    ConnectionType type = mOwner->GetConnectionType();
    ofColor lineColor = mOwner->GetColor();
+   if (mHoveringOnSource)
+      lineColor = ofColor::lerp(lineColor, ofColor::white, .5f);
    ofColor lineColorAlphaed = lineColor;
    lineColorAlphaed.a = lineAlpha;
    
@@ -236,7 +240,7 @@ void PatchCable::Render()
                sample = sqrtf(fabsf(sample)) * (sample < 0 ? -1 : 1);
                sample = ofClamp(sample, -1.0f, 1.0f);
                ofVec2f sampleOffsetDir = MathUtils::BezierPerpendicular(i/wireLength, cable.start, bezierControl1, bezierControl2, cable.plug);
-               pos += sampleOffsetDir * 15 * sample;
+               pos += sampleOffsetDir * 10 * sample;
                ofVertex(pos.x + offset.x,pos.y + offset.y);
             }
             ofVertex(cable.plug.x + offset.x,cable.plug.y + offset.y);
@@ -361,7 +365,7 @@ void PatchCable::OnClicked(int x, int y, bool right)
 
 PatchCablePos PatchCable::GetPatchCablePos()
 {
-   ofVec2f start = mOwner->GetPosition();
+   ofVec2f start = mOwner->GetCableStart(mSourceIndex);
    
    float wThat,hThat,xThat,yThat;
    
@@ -401,30 +405,7 @@ PatchCablePos PatchCable::GetPatchCablePos()
       yThat = start.y;
    }
    
-   ofVec2f startDirection;
-   if (mOwner->HasOverrideCableDir())
-   {
-      startDirection = mOwner->GetOverrideCableDir();
-   }
-   else
-   {
-      switch (mOwner->GetCableSide())
-      {
-         case PatchCableSource::kBottom:
-            startDirection = ofVec2f(0,1);
-            break;
-         case PatchCableSource::kRight:
-            startDirection = ofVec2f(1,0);
-            break;
-         case PatchCableSource::kLeft:
-            startDirection = ofVec2f(-1,0);
-            break;
-         default:
-            startDirection = ofVec2f(0,0);
-            break;
-      }
-   }
-   
+   ofVec2f startDirection = mOwner->GetCableStartDir(mSourceIndex, ofVec2f(xThat, yThat));   
    ofVec2f endDirection;
    ofVec2f end = FindClosestSide(xThat,yThat-yThatAdjust,wThat,hThat+yThatAdjust, start, startDirection, endDirection);
    

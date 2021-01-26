@@ -15,10 +15,11 @@
 #include "Transport.h"
 #include "Ramp.h"
 #include "ClickButton.h"
+#include "IPulseReceiver.h"
 
 class PatchCableSource;
 
-class ModulatorGravity : public IDrawableModule, public IFloatSliderListener, public IModulator, public IAudioPoller, public IButtonListener
+class ModulatorGravity : public IDrawableModule, public IFloatSliderListener, public IModulator, public IAudioPoller, public IButtonListener, public IPulseReceiver
 {
 public:
    ModulatorGravity();
@@ -31,6 +32,8 @@ public:
    void SetEnabled(bool enabled) override { mEnabled = enabled; }
    
    void PostRepatch(PatchCableSource* cableSource, bool fromUserClick) override;
+
+   void OnPulse(double time, float velocity, int flags) override;
    
    //IModulator
    float Value(int samplesIn = 0) override;
@@ -52,6 +55,8 @@ public:
    void SetUpFromSaveData() override;
    
 private:
+   void Kick(float strength);
+
    //IDrawableModule
    void DrawModule() override;
    void GetModuleDimensions(float& w, float& h) override { w=mWidth; h=mHeight; }

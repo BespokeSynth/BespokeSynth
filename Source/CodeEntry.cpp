@@ -751,7 +751,7 @@ void CodeEntry::OnKeyPressed(int key, bool isRepeat)
       }
       else
       {
-         IKeyboardFocusListener::ClearActiveKeyboardFocus(!K(acceptEntry));
+         IKeyboardFocusListener::ClearActiveKeyboardFocus(K(notifyListeners));
          UpdateString(mPublishedString);   //revert
          mCaretPosition2 = mCaretPosition;
       }

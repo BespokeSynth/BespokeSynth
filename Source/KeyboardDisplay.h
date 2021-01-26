@@ -58,7 +58,8 @@ private:
    int mPlayingMousePitch;
    bool mTypingInput;
    bool mLatch;
-   float mLastPlayedTime[128];
+   std::array<float, 128> mLastOnTime{};
+   std::array<float, 128> mLastOffTime{};
 };
 
 #endif /* defined(__Bespoke__KeyboardDisplay__) */

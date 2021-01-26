@@ -1559,7 +1559,7 @@ void MidiController::TextEntryActivated(TextEntry* entry)
             connection->mUIControl = gBindToUIControl;
             gBindToUIControl->AddRemoteController();
             gBindToUIControl = nullptr;
-            IKeyboardFocusListener::ClearActiveKeyboardFocus(!K(acceptEntry));
+            IKeyboardFocusListener::ClearActiveKeyboardFocus(!K(notifyListeners));
          }
       }
    }

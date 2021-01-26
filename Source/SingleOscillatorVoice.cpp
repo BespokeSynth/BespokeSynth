@@ -63,7 +63,7 @@ bool SingleOscillatorVoice::Process(double time, ChannelBuffer* out)
          mOscData[u].mOsc.SetPulseWidth(mVoiceParams->mPulseWidth);
          mOscData[u].mOsc.SetShuffle(mVoiceParams->mShuffle);
          
-         float detune = ((mVoiceParams->mDetune - 1) * mOscData[u].mDetuneFactor) + 1;
+         float detune = exp2(mVoiceParams->mDetune * mOscData[u].mDetuneFactor);
          float phaseInc = GetPhaseInc(freq * detune);
          
          {

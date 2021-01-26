@@ -71,7 +71,7 @@ void NoteDelayer::OnTransportAdvanced(float amount)
    for (int i=mConsumeIndex; i<end; ++i)
    {
       const NoteInfo& info = mInputNotes[i % kQueueSize];
-      if (gTime > info.mTriggerTime)
+      if (gTime + gBufferSize * gInvSampleRateMs >= info.mTriggerTime)
       {
          PlayNoteOutput(info.mTriggerTime, info.mPitch, info.mVelocity, -1, info.mModulation);
          mConsumeIndex = (mConsumeIndex + 1) % kQueueSize;

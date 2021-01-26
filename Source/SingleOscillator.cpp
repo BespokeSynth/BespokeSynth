@@ -44,7 +44,7 @@ SingleOscillator::SingleOscillator()
    mVoiceParams.mSyncFreq = 200;
    mVoiceParams.mMult = 1;
    mVoiceParams.mOscType = kOsc_Square;
-   mVoiceParams.mDetune = 1;
+   mVoiceParams.mDetune = 0;
    mVoiceParams.mFilterAdsr.Set(1,0,1,1000);
    mVoiceParams.mFilterCutoff = SINGLEOSCILLATOR_NO_CUTOFF;
    mVoiceParams.mFilterQ = 1;
@@ -70,7 +70,7 @@ void SingleOscillator::CreateUIControls()
    mMultSelector = new DropdownList(this,"mult",mOscSelector,kAnchor_Right,&mMult);
    mPulseWidthSlider = new FloatSlider(this,"pw",5,55,80,15,&mVoiceParams.mPulseWidth,0.01f,.99f,2);
    mShuffleSlider = new FloatSlider(this,"shuffle",mPulseWidthSlider,kAnchor_Below,80,15,&mVoiceParams.mShuffle, 0, 1);
-   mDetuneSlider = new FloatSlider(this,"detune",mShuffleSlider,kAnchor_Below,80,15,&mVoiceParams.mDetune,.95f,1.05f,3);
+   mDetuneSlider = new FloatSlider(this,"detune",mShuffleSlider,kAnchor_Below,80,15,&mVoiceParams.mDetune,-.05f,.05f,3);
    mPhaseOffsetSlider = new FloatSlider(this,"phase",mDetuneSlider,kAnchor_Below,80,15,&mVoiceParams.mPhaseOffset,0,TWO_PI);
    mUnisonSlider = new IntSlider(this,"unison",mPhaseOffsetSlider,kAnchor_Below,80,15,&mVoiceParams.mUnison,1,SingleOscillatorVoice::kMaxUnison);
    mUnisonWidthSlider = new FloatSlider(this,"width",mUnisonSlider,kAnchor_Right,80,15,&mVoiceParams.mUnisonWidth,0,1);
@@ -85,7 +85,7 @@ void SingleOscillator::CreateUIControls()
    mSyncCheckbox = new Checkbox(this,"sync",mFilterCutoffSlider,kAnchor_Below,&mVoiceParams.mSync);
    mSyncFreqSlider = new FloatSlider(this,"syncf",mSyncCheckbox,kAnchor_Right,40,15,&mVoiceParams.mSyncFreq,10,999.9f);
 
-   mSyncFreqSlider->SetLabel("");
+   mSyncFreqSlider->SetShowName(false);
    
    mFilterCutoffSlider->SetMaxValueDisplay("none");
    
@@ -272,7 +272,7 @@ void SingleOscillator::LoadLayout(const ofxJSONElement& moduleInfo)
    mModuleSaveData.LoadString("target", moduleInfo);
    mModuleSaveData.LoadFloat("vol", moduleInfo, .5, mVolSlider);
    mModuleSaveData.LoadEnum<OscillatorType>("osc", moduleInfo, kOsc_Sin, mOscSelector);
-   mModuleSaveData.LoadFloat("detune", moduleInfo, 1, mDetuneSlider);
+   mModuleSaveData.LoadFloat("detune", moduleInfo, 0, mDetuneSlider);
    mModuleSaveData.LoadBool("pressure_envelope", moduleInfo);
    mModuleSaveData.LoadInt("voicelimit", moduleInfo, -1, -1, kNumVoices);
 

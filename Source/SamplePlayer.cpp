@@ -81,6 +81,7 @@ void SamplePlayer::CreateUIControls()
    CHECKBOX(mLoopCheckbox,"loop",&mLoop); UIBLOCK_SHIFTRIGHT();
    UIBLOCK_SHIFTX(30);
    BUTTON(mLoadFileButton,"load"); UIBLOCK_SHIFTRIGHT();
+   BUTTON(mTrimToZoomButton, "trim"); UIBLOCK_SHIFTRIGHT();
    BUTTON(mDownloadYoutubeButton,"youtube");
    UIBLOCK_SHIFTX(120);
    UIBLOCK_NEWCOLUMN();
@@ -445,6 +446,19 @@ void SamplePlayer::ButtonClicked(ClickButton *button)
       DownloadYoutube("https://www.youtube.com/watch?v="+mYoutubeId, mYoutubeId);
    if (button == mLoadFileButton)
       LoadFile();
+   if (button == mTrimToZoomButton)
+   {
+      Sample* sample = new Sample();
+      sample->Create(GetZoomEndSample() - GetZoomStartSample());
+      for (int ch = 0; ch < mSample->NumChannels(); ++ch)
+      {
+         float* sampleData = sample->Data()->GetChannel(ch);
+         for (int i = 0; i < sample->LengthInSamples(); ++i)
+            sampleData[i] = mSample->Data()->GetChannel(ch)[i + GetZoomStartSample()];
+      }
+      sample->SetName(mSample->Name());
+      UpdateSample(sample, true);
+   }
 
    for (size_t i = 0; i < mSearchResultButtons.size(); ++i)
    {
@@ -745,6 +759,8 @@ void SamplePlayer::DrawModule()
 {
    if (Minimized() || IsVisible() == false)
       return;
+
+   mTrimToZoomButton->SetShowing(mZoomLevel != 1);
    
    mVolumeSlider->Draw();
    mSpeedSlider->Draw();
@@ -753,6 +769,7 @@ void SamplePlayer::DrawModule()
    mPlayButton->Draw();
    mPauseButton->Draw();
    mStopButton->Draw();
+   mTrimToZoomButton->Draw();
    mDownloadYoutubeButton->Draw();
    mDownloadYoutubeSearch->Draw();
    mLoadFileButton->Draw();
@@ -911,18 +928,18 @@ void SamplePlayer::DrawModule()
    }
 }
 
-float SamplePlayer::GetZoomStartSample() const
+int SamplePlayer::GetZoomStartSample() const
 {
    if (mSample == nullptr)
       return 0;
-   return ofClamp(mSample->LengthInSamples() * mZoomOffset, 0, mSample->LengthInSamples());
+   return (int)ofClamp(mSample->LengthInSamples() * mZoomOffset, 0, mSample->LengthInSamples());
 }
 
-float SamplePlayer::GetZoomEndSample() const
+int SamplePlayer::GetZoomEndSample() const
 {
    if (mSample == nullptr)
       return 1;
-   return ofClamp(GetZoomStartSample() + mSample->LengthInSamples() / mZoomLevel, 1, mSample->LengthInSamples());
+   return (int)ofClamp(GetZoomStartSample() + mSample->LengthInSamples() / mZoomLevel, 1, mSample->LengthInSamples());
 }
 
 float SamplePlayer::GetZoomStartSeconds() const
@@ -996,7 +1013,7 @@ bool SamplePlayer::MouseScrolled(int x, int y, float scrollX, float scrollY)
 
    //zoom scroll
    float oldZoomLevel = mZoomLevel;
-   mZoomLevel = ofClamp(mZoomLevel + scrollY*.2f, 1, 20);
+   mZoomLevel = ofClamp(mZoomLevel + scrollY*.2f, 1, 40);
    float zoomAmount = (mZoomLevel - oldZoomLevel) / oldZoomLevel; //find actual adjusted amount
    float zoomCenter = ofMap(x, 5, mWidth-10, 0, 1, true)/oldZoomLevel;
    mZoomOffset += zoomCenter * zoomAmount;
@@ -1116,5 +1133,7 @@ vector<IUIControl*> SamplePlayer::ControlsToIgnoreInSaveState() const
    vector<IUIControl*> ignore;
    ignore.push_back(mDownloadYoutubeSearch);
    ignore.push_back(mLoadFileButton);
+   for (size_t i = 0; i < mSearchResultButtons.size(); ++i)
+      ignore.push_back(mSearchResultButtons[i]);
    return ignore;
 }

@@ -90,7 +90,7 @@ void EffectChain::AddEffect(string type, bool onTheFly /*=false*/)
    
    float* dryWet = &(mDryWetLevels[mEffects.size()-1]);
    *dryWet = 1;
-   mDryWetSliders.push_back(new FloatSlider(this,("dw"+ofToString(mEffects.size()-1)).c_str(),0,0,60,13,dryWet,0,1,2));
+   mDryWetSliders.push_back(new FloatSlider(this,("mix"+ofToString(mEffects.size()-1)).c_str(),0,0,60,13,dryWet,0,1,2));
    
    if (mEffects.size() > 1)
    {
@@ -389,6 +389,14 @@ void EffectChain::DropdownUpdated(DropdownList* list, int oldVal)
       AddEffect(mEffectTypesToSpawn[mSpawnIndex], K(onTheFly));
       mSpawnIndex = -1;
    }
+}
+
+void EffectChain::UpdateOldControlName(string& oldName)
+{
+   IDrawableModule::UpdateOldControlName(oldName);
+
+   if (oldName.size() > 2 && oldName[0] == 'd' && oldName[1] == 'w')
+      ofStringReplace(oldName, "dw", "mix");
 }
 
 void EffectChain::LoadBasics(const ofxJSONElement& moduleInfo, string typeName)

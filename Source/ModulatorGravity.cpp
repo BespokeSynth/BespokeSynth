@@ -81,10 +81,20 @@ float ModulatorGravity::Value(int samplesIn)
    return ofLerp(GetMin(), GetMax(), mValue); //TODO(integrate over samples)
 }
 
+void ModulatorGravity::OnPulse(double time, float velocity, int flags)
+{
+   Kick(velocity);
+}
+
 void ModulatorGravity::ButtonClicked(ClickButton* button)
 {
    if (button == mKickButton)
-      mVelocity += mKickAmount / 1000;
+      Kick(1);
+}
+
+void ModulatorGravity::Kick(float strength)
+{
+   mVelocity += mKickAmount / 1000 * strength;
 }
 
 void ModulatorGravity::SaveLayout(ofxJSONElement& moduleInfo)

@@ -218,7 +218,7 @@ void PolyphonyMgr::DrawDebug(float x, float y)
          ofSetColor(0, 255, 0);
       else
          ofSetColor(255, 0, 0);
-      DrawTextNormal(mVoices[i].mPitch == -1 ? "voice "+ofToString(i)+" unused" : "voice "+ofToString(i)+" used: "+ofToString(mVoices[i].mPitch) + (mVoices[i].mNoteOn ? " (on)" : " (off)"), 0, i * 18);
+      DrawTextNormal(mVoices[i].mPitch == -1 ? "voice "+ofToString(i)+" unused" : "voice "+ofToString(i)+" used: "+ofToString(mVoices[i].mPitch) + (mVoices[i].mNoteOn ? " (note on)" : " (note off)"), 0, i * 18);
    }
    ofPopStyle();
    ofPopMatrix();
