@@ -74,7 +74,7 @@ public:
    void MouseDragged(int x, int y, int button);
    void MousePressed(int x, int y, int button);
    void MouseReleased(int x, int y, int button);
-   void MouseScrolled(float x, float y);
+   void MouseScrolled(float x, float y, bool canZoomCanvas);
    void MouseMagnify(int x, int y, float scaleFactor);
    void FilesDropped(vector<string> files, int x, int y);
    
@@ -136,6 +136,12 @@ public:
    const ofRectangle& GetDrawRect() const { return mDrawRect; }
    void SetPixelRatio(double ratio) { mPixelRatio = ratio; }
    double GetPixelRatio() const { return mPixelRatio; }
+
+   void ZoomView(float zoomAmount, bool fromMouse);
+   void PanView(float x, float y);
+   void SetRawSpaceMouseTwist(float twist, bool isUsing) { mSpaceMouseInfo.mTwist = twist; mSpaceMouseInfo.mUsingTwist = isUsing; }
+   void SetRawSpaceMouseZoom(float zoom, bool isUsing) { mSpaceMouseInfo.mZoom = zoom; mSpaceMouseInfo.mUsingZoom = isUsing; }
+   void SetRawSpaceMousePan(float x, float y, bool isUsing) { mSpaceMouseInfo.mPan.set(x, y); mSpaceMouseInfo.mUsingPan = isUsing; }
    
    void SetResizeModule(IDrawableModule* module) { mResizeModule = module; }
    
@@ -194,7 +200,6 @@ private:
    void ResetLayout();
    void ReconnectMidiDevices();
    void DrawConsole();
-   void ZoomView(float zoomAmount);
    void CheckClick(IDrawableModule* clickedModule, int x, int y, bool rightButton);
    void UpdateUserPrefsLayout();
    void LoadStatePopupImp();
@@ -221,6 +226,17 @@ private:
    ofVec2f mLastMoveMouseScreenPos;
    ofVec2f mLastMouseDragPos;
    bool mIsMousePanning;
+   struct SpaceMouseInfo
+   {
+      SpaceMouseInfo() : mTwist(0), mZoom(0), mPan(0, 0), mUsingTwist(false), mUsingZoom(false), mUsingPan(false) {}
+      float mTwist;
+      float mZoom;
+      ofVec2f mPan;
+      bool mUsingTwist;
+      bool mUsingZoom;
+      bool mUsingPan;
+   };
+   SpaceMouseInfo mSpaceMouseInfo;
 
    char mConsoleText[MAX_TEXTENTRY_LENGTH];
    TextEntry* mConsoleEntry;

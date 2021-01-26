@@ -37,6 +37,11 @@ struct ofColor
    int a;
    
    static ofColor black,white,grey,red,green,yellow,blue,orange,purple,lime,magenta;
+
+   static ofColor lerp(ofColor a, ofColor b, float t)
+   {
+      return ofColor(int(a.r * (1 - t) + b.r * t), int(a.g * (1 - t) + b.g * t), int(a.b * (1 - t) + b.b * t), int(a.a * (1 - t) + b.a * t));
+   }
 };
 
 struct ofVec2f

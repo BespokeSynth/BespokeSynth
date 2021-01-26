@@ -35,7 +35,7 @@
 
 ModularSynth* TheSynth = nullptr;
 
-#define RECORDING_LENGTH (gSampleRate*60*30) //30 minutes of recording
+#define RECORDING_LENGTH (44100*60*30) //30 minutes of recording if we're running at 44100
 
 //static
 bool ModularSynth::sShouldAutosave = true;
@@ -281,7 +281,7 @@ bool SortPointsByY(ofVec2f a, ofVec2f b)
    return a.y < b.y;
 }
 
-void ModularSynth::ZoomView(float zoomAmount)
+void ModularSynth::ZoomView(float zoomAmount, bool fromMouse)
 {
    float oldDrawScale = gDrawScale;
    gDrawScale *= 1 + zoomAmount;
@@ -289,9 +289,18 @@ void ModularSynth::ZoomView(float zoomAmount)
    float maxZoom = 8;
    gDrawScale = ofClamp(gDrawScale,minZoom,maxZoom);
    zoomAmount = (gDrawScale - oldDrawScale) / oldDrawScale; //find actual adjusted amount
-   ofVec2f zoomCenter = ofVec2f(GetMouseX(), GetMouseY()) + mDrawOffset;
+   ofVec2f zoomCenter;
+   if (fromMouse)
+      zoomCenter = ofVec2f(GetMouseX(), GetMouseY()) + mDrawOffset;
+   else
+      zoomCenter = ofVec2f(ofGetWidth() / gDrawScale * .5f, ofGetHeight() / gDrawScale * .5f);
    mDrawOffset -= zoomCenter * zoomAmount;
    mZoomer.CancelMovement();
+}
+
+void ModularSynth::PanView(float x, float y)
+{
+   mDrawOffset += ofVec2f(x, y) / gDrawScale;
 }
 
 void ModularSynth::Draw(void* vg)
@@ -416,6 +425,39 @@ void ModularSynth::Draw(void* vg)
    }
    
    ofPopMatrix();
+
+   ofPushStyle();
+   ofNoFill();
+   float centerX = ofGetWidth() * .5f;
+   float centerY = ofGetHeight() * .5f;
+   if (mSpaceMouseInfo.mTwist != 0)
+   {
+      if (mSpaceMouseInfo.mUsingTwist)
+         ofSetColor(0, 255, 255, 100);
+      else
+         ofSetColor(0, 100, 255, 100);
+      ofSetLineWidth(1.5f);
+      ofCircle(centerX + sin(mSpaceMouseInfo.mTwist * M_PI) * 20, centerY + cos(mSpaceMouseInfo.mTwist * M_PI) * 20, 3);
+      ofCircle(centerX + sin(mSpaceMouseInfo.mTwist * M_PI + M_PI) * 20, centerY + cos(mSpaceMouseInfo.mTwist * M_PI + M_PI) * 20, 3);
+   }
+   ofSetLineWidth(3);
+   if (mSpaceMouseInfo.mZoom != 0)
+   {
+      if (mSpaceMouseInfo.mUsingZoom)
+         ofSetColor(0, 255, 255, 100);
+      else
+         ofSetColor(0, 100, 255, 100);
+      ofCircle(centerX, centerY, 15 - (mSpaceMouseInfo.mZoom * 15));
+   }
+   if (mSpaceMouseInfo.mPan.x != 0 || mSpaceMouseInfo.mPan.y != 0)
+   {
+      if (mSpaceMouseInfo.mUsingPan)
+         ofSetColor(0, 255, 255, 100);
+      else
+         ofSetColor(0, 100, 255, 100);
+      ofLine(centerX, centerY, centerX + mSpaceMouseInfo.mPan.x * 40, centerY + mSpaceMouseInfo.mPan.y * 40);
+   }
+   ofPopStyle();
 }
 
 void ModularSynth::PostRender()
@@ -914,14 +956,15 @@ void ModularSynth::MousePressed(int intX, int intY, int button)
       TheSaveDataPanel->SetModule(nullptr);
 }
 
-void ModularSynth::MouseScrolled(float x, float y)
+void ModularSynth::MouseScrolled(float x, float y, bool canZoomCanvas)
 {
    x *= mScrollMultiplierHorizontal;
    y *= mScrollMultiplierVertical;
 
    if (IsKeyHeld(' ') || GetModuleAt(GetMouseX(), GetMouseY()) == nullptr)
    {
-      ZoomView(y/50);
+      if (canZoomCanvas)
+         ZoomView(y/50, true);
    }
    else if (gHoveredUIControl)
    {
@@ -982,7 +1025,7 @@ void ModularSynth::MouseMagnify(int intX, int intY, float scaleFactor)
 {
    mMousePos.x = intX;
    mMousePos.y = intY;
-   ZoomView(scaleFactor - 1);
+   ZoomView(scaleFactor - 1, true);
 }
 
 bool ModularSynth::InMidiMapMode()

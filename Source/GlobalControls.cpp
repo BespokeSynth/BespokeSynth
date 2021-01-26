@@ -61,14 +61,14 @@ void GlobalControls::FloatSliderUpdated(FloatSlider* slider, float oldVal)
    if (slider == mMouseScrollXSlider)
    {
       float delta = mMouseScrollX - oldVal;
-      TheSynth->MouseScrolled(-delta, 0);
+      TheSynth->MouseScrolled(-delta, 0, false);
       mMouseScrollX = 0;
    }
 
    if (slider == mMouseScrollYSlider)
    {
       float delta = mMouseScrollY - oldVal;
-      TheSynth->MouseScrolled(0, -delta);
+      TheSynth->MouseScrolled(0, -delta, false);
       mMouseScrollY = 0;
    }
 }

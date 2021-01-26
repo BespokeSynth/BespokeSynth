@@ -362,3 +362,6 @@ Builds/MacOSX/build/BespokeSynth/
 Builds/MacOSX/build/Release/data/savestate_mac/
 
 Builds/MacOSX/build/Release/data/youtube_temp/
+
+# explicitly allow spacemouse lib, so it doesn't get excluded by *.lib above
+!*/3DxWare/Lib/**

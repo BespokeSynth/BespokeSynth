@@ -996,6 +996,10 @@
             file="Source/SingleOscillatorVoice.cpp"/>
       <FILE id="p0QEow" name="SingleOscillatorVoice.h" compile="0" resource="0"
             file="Source/SingleOscillatorVoice.h"/>
+      <FILE id="dcbMk6" name="SpaceMouseControl.cpp" compile="1" resource="0"
+            file="Source/SpaceMouseControl.cpp"/>
+      <FILE id="H5aMz0" name="SpaceMouseControl.h" compile="0" resource="0"
+            file="Source/SpaceMouseControl.h"/>
       <FILE id="VXE3ul" name="SynthGlobals.cpp" compile="1" resource="0"
             file="Source/SynthGlobals.cpp"/>
       <FILE id="n8yIX1" name="SynthGlobals.h" compile="0" resource="0" file="Source/SynthGlobals.h"/>
@@ -1048,16 +1052,16 @@
     <VS2015 targetFolder="Builds/VisualStudio2015" vstFolder="../VST3 SDK"
             vst3Folder="..\VST_SDK\VST3_SDK" extraDefs="GLEW_STATIC&#10;BESPOKE_WINDOWS&#10;POLL_WINDOWS&#10;THREADS_WINDOWS&#10;HAVE_STRUCT_TIMESPEC"
             extraCompilerFlags="/bigobj" vstLegacyFolder="..\VST_SDK\VST2_SDK\public.sdk\source\vst2.x"
-            smallIcon="h1Eo7f" bigIcon="h1Eo7f">
+            smallIcon="h1Eo7f" bigIcon="h1Eo7f" externalLibraries="siapp.lib">
       <CONFIGURATIONS>
         <CONFIGURATION name="Debug" winWarningLevel="2" generateManifest="1" winArchitecture="x64"
                        isDebug="1" optimisation="1" targetName="BespokeSynth" headerPath="../../Source/json/include&#10;../../Source/glew/include&#10;../../Source/push2/&#10;../../Source/push2/libusb&#10;../../Source/push2/modules/libusb&#10;C:\Python38\include"
                        fastMath="0" debugInformationFormat="ProgramDatabase" enablePluginBinaryCopyStep="0"
-                       libraryPath="C:\Python38\libs"/>
+                       libraryPath="C:\Python38\libs&#10;../../Source/3DxWare/Lib/x64"/>
         <CONFIGURATION name="Release" winWarningLevel="2" generateManifest="1" winArchitecture="x64"
                        isDebug="0" optimisation="3" targetName="BespokeSynth" headerPath="../../Source/json/include&#10;../../Source/glew/include&#10;../../Source/push2/&#10;../../Source/push2/libusb&#10;../../Source/push2/modules/libusb&#10;C:\Python38\include"
                        debugInformationFormat="ProgramDatabase" enablePluginBinaryCopyStep="0"
-                       linkTimeOptimisation="1" libraryPath="C:\Python38\libs"/>
+                       linkTimeOptimisation="1" libraryPath="C:\Python38\libs&#10;../../Source/3DxWare/Lib/x64"/>
       </CONFIGURATIONS>
       <MODULEPATHS>
         <MODULEPATH id="juce_video" path="..\JUCE\modules"/>

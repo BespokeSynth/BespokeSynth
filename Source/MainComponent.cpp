@@ -12,6 +12,7 @@
 #include "ModularSynth.h"
 #include "SynthGlobals.h"
 #include "Push2Control.h"  //TODO(Ryan) remove
+#include "SpaceMouseControl.h"
 
 #ifdef JUCE_WINDOWS
 #include <Windows.h>
@@ -33,6 +34,9 @@ public:
    : mLastFpsUpdateTime(0)
    , mFrameCountAccum(0)
    , mPixelRatio(1)
+#if BESPOKE_WINDOWS
+   , mSpaceMouseReader(&mSynth)
+#endif
    {
       openGLContext.setOpenGLVersionRequired(juce::OpenGLContext::openGL3_2);
       openGLContext.setContinuousRepainting(false);
@@ -114,6 +118,10 @@ public:
       }
       
       mScreenPosition = getScreenPosition();
+
+#if BESPOKE_WINDOWS
+      mSpaceMouseReader.Poll();
+#endif
    }
    
    //==============================================================================
@@ -377,7 +385,7 @@ private:
          scale = 30;
 
       if (!wheel.isInertial)
-         mSynth.MouseScrolled(wheel.deltaX * scale, wheel.deltaY * scale * invert);
+         mSynth.MouseScrolled(wheel.deltaX * scale, wheel.deltaY * scale * invert, true);
    }
    
    void mouseMagnify(const MouseEvent& e, float scaleFactor) override
@@ -472,6 +480,9 @@ private:
    double mPixelRatio;
    juce::Point<int> mScreenPosition;
    juce::Point<int> mDesiredInitialPosition;
+#if BESPOKE_WINDOWS
+   SpaceMouseMessageWindow mSpaceMouseReader;
+#endif
    
    JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (MainContentComponent)
 };
