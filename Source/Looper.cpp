@@ -349,6 +349,7 @@ void Looper::Process(double time)
    if (mPitchShift != 1)
       latencyOffset = mPitchShifter[0]->GetLatency();
 
+   double processStartTime = gTime;
    for (int i=0; i<bufferSize; ++i)
    {
       float smooth = .001f;
@@ -361,17 +362,17 @@ void Looper::Process(double time)
          ProcessScratch();
       
       if (mFourTet > 0)
-         ProcessFourTet(time, i);
+         ProcessFourTet(processStartTime, i);
       
       if (mBeatwheel)
-         ProcessBeatwheel(time, i);
+         ProcessBeatwheel(processStartTime, i);
       
       float offset = mLoopPos+i*mSpeed+mLoopPosOffset+latencyOffset;
       float output[ChannelBuffer::kMaxNumChannels];
       ::Clear(output, ChannelBuffer::kMaxNumChannels);
       
       if (mGranular)
-         ProcessGranular(time, offset, output);
+         ProcessGranular(processStartTime, offset, output);
       
       for (int ch=0; ch<mBuffer->NumActiveChannels(); ++ch)
       {
@@ -523,9 +524,9 @@ void Looper::ProcessFourTet(double time, int sampleIdx)
    int slice = (int)measurePos;
    float sliceProgress = measurePos - slice;
    if (slice % 2 == 0)
-      mLoopPosOffset = (sliceProgress + slice/2) * (mLoopLength/numSlices * 2);
+      mLoopPosOffset = (sliceProgress + slice/2) * (mLoopLength/float(numSlices) * 2);
    else
-      mLoopPosOffset = (1 - sliceProgress + slice/2) * (mLoopLength/numSlices * 2);
+      mLoopPosOffset = (1 - sliceProgress + slice/2) * (mLoopLength/float(numSlices) * 2);
    
    //offset regular movement
    mLoopPosOffset -= mLoopPos+sampleIdx*mSpeed;
