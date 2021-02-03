@@ -79,8 +79,8 @@ private:
    
    bool mDisplayInitialized;
    
-   ableton::Push2DisplayBridge bridge_;      /* The bridge allowing to use juce::graphics for push */
-   ableton::Push2Display push2Display_;      /* The low-level push2 class */
+   static ableton::Push2DisplayBridge* sPush2Bridge;      /* The bridge allowing to use juce::graphics for push */
+   static ableton::Push2Display* sPush2Display;           /* The low-level push2 class */
    unsigned char* mPixels;
    const int kPixelRatio = 1;
    

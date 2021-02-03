@@ -30,6 +30,8 @@
 bool Push2Control::sDrawingPush2Display = false;
 NVGcontext* Push2Control::sVG = nullptr;
 NVGLUframebuffer* Push2Control::sFB = nullptr;
+ableton::Push2DisplayBridge* Push2Control::sPush2Bridge = nullptr;
+ableton::Push2Display* Push2Control::sPush2Display = nullptr;
 
 //https://raw.githubusercontent.com/Ableton/push-interface/master/doc/MidiMapping.png
 
@@ -214,13 +216,22 @@ void Push2Control::CreateStaticFramebuffer()
 
 NBase::Result Push2Control::Initialize()
 {
-   // First we initialise the low level push2 object
-   NBase::Result result = push2Display_.Init();
-   RETURN_IF_FAILED_MESSAGE(result, "Failed to init push2");
+   if (sPush2Display == nullptr)
+   {
+      ableton::Push2Display* push2Display = new ableton::Push2Display();
+      ableton::Push2DisplayBridge* push2Bridge = new ableton::Push2DisplayBridge();
 
-   // Then we initialise the juce to push bridge
-   result = bridge_.Init(push2Display_);
-   RETURN_IF_FAILED_MESSAGE(result, "Failed to init bridge");
+      // First we initialise the low level push2 object
+      NBase::Result result = push2Display->Init();
+      RETURN_IF_FAILED_MESSAGE(result, "Failed to init push2");
+
+      // Then we initialise the juce to push bridge
+      result = push2Bridge->Init(*push2Display);
+      RETURN_IF_FAILED_MESSAGE(result, "Failed to init bridge");
+
+      sPush2Display = push2Display;
+      sPush2Bridge = push2Bridge;
+   }
    
    const auto width = ableton::Push2DisplayBitmap::kWidth;
    const auto height = ableton::Push2DisplayBitmap::kHeight;
@@ -282,22 +293,43 @@ void Push2Control::DrawToFramebuffer(NVGcontext* vg, NVGLUframebuffer* fb, float
    mModules = SortModules(mModules);
    
    SetModuleGridLights();
+
+   mModuleColumnOffsetSmoothed = ofLerp(mModuleColumnOffsetSmoothed, mModuleColumnOffset, .3f);
+   mModuleListOffsetSmoothed = ofLerp(mModuleListOffsetSmoothed, round(mModuleListOffset), .3f);
    
    if (mScreenDisplayMode == ScreenDisplayMode::kNormal)
    {
       DrawLowerModuleSelector();
       DrawDisplayModuleControls();
+
+      string stateInfo = "";
+      if (mAllowRepatch)
+         stateInfo = "repatching...";
+      if (mNewButtonHeld)
+         stateInfo = "tap control to add favorite...";
+      if (mDeleteButtonHeld)
+         stateInfo = "tap control to remove favorite...";
+
+      if (stateInfo != "")
+      {
+         ofPushStyle();
+         ofSetColor(255, 255, 255, ofMap(sin(gTime / 1000 * PI * 2), -1, 1, 150, 255));
+         DrawTextBold(stateInfo, 5, 21, 20);
+         ofPopStyle();
+      }
    }
    else if (mScreenDisplayMode == ScreenDisplayMode::kAddModule)
-   {
-      mModuleColumnOffset = 0;
-      mModuleColumnOffsetSmoothed = 0;
-      
+   {      
       ofPushMatrix();
       ofPushStyle();
+
+      ofSetColor(255, 255, 255);
+      DrawTextBold("select a module, then tap a grid square", 5, 80, 20);
       
       ofSetColor(IDrawableModule::GetColor(kModuleType_Other));
       ofNoFill();
+
+      ofTranslate(-kColumnSpacing * mModuleColumnOffsetSmoothed, 0);
       
       nvgFontSize(sVG, 16);
       DrawControls(mButtonControls, false, 60);
@@ -428,9 +460,7 @@ void Push2Control::DrawDisplayModuleControls()
 
    ofSetColor(255,255,255);
    if (mDisplayModule != nullptr)
-   {
-      mModuleColumnOffsetSmoothed = ofLerp(mModuleColumnOffsetSmoothed, mModuleColumnOffset, .3f);
-      
+   {      
       ofPushMatrix();
       ofPushStyle();
       
@@ -468,7 +498,6 @@ void Push2Control::DrawDisplayModuleControls()
 
 void Push2Control::DrawLowerModuleSelector()
 {
-   mModuleListOffsetSmoothed = ofLerp(mModuleListOffsetSmoothed, round(mModuleListOffset), .3f);
    int bottomRowLedColors[8] = {0,0,0,0,0,0,0,0};
    for (int i=0; i<mModules.size(); ++i)
    {
@@ -607,7 +636,7 @@ void Push2Control::RenderPush2Display()
    gNanoVG = mainVG;
 
    // Tells the bridge we're done with drawing and the frame can be sent to the display
-   bridge_.Flip(mPixels);
+   sPush2Bridge->Flip(mPixels);
 }
 
 void Push2Control::SetDisplayModule(IDrawableModule* module)
@@ -775,9 +804,9 @@ void Push2Control::OnMidiNote(MidiNote& note)
                   IDrawableModule* module = mSpawnLists.GetDropdowns()[i]->Spawn();
                   ofRectangle rect = module->GetRect();
                   module->SetPosition(newModuleCenter.x-rect.width/2, newModuleCenter.y-rect.height/2);
-                  SetDisplayModule(module);
                   mSpawnLists.GetDropdowns()[i]->GetList()->SetValue(-1);
                   mScreenDisplayMode = ScreenDisplayMode::kNormal;
+                  SetDisplayModule(module);
                   break;
                }
             }
@@ -885,6 +914,11 @@ void Push2Control::OnMidiControl(MidiControl& control)
             mScreenDisplayMode = ScreenDisplayMode::kAddModule;
             mGridControlModule = nullptr;
          }
+
+         mModuleColumnOffset = 0;
+         mModuleColumnOffsetSmoothed = 0;
+         mModuleListOffset = 0;
+         mModuleListOffsetSmoothed = 0;
          UpdateControlList();
       }
    }
