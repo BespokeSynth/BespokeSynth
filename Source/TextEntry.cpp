@@ -23,7 +23,18 @@ void IKeyboardFocusListener::ClearActiveKeyboardFocus(bool notifyListeners)
 }
 
 TextEntry::TextEntry(ITextEntryListener* owner, const char* name, int x, int y, int charWidth, char* var)
-: mVarString(var)
+: mVarCString(var)
+, mVarString(nullptr)
+, mVarInt(nullptr)
+, mVarFloat(nullptr)
+, mType(kTextEntry_Text)
+{
+   Construct(owner, name, x, y, charWidth);
+}
+
+TextEntry::TextEntry(ITextEntryListener* owner, const char* name, int x, int y, int charWidth, string* var)
+: mVarCString(nullptr)
+, mVarString(var)
 , mVarInt(nullptr)
 , mVarFloat(nullptr)
 , mType(kTextEntry_Text)
@@ -32,7 +43,8 @@ TextEntry::TextEntry(ITextEntryListener* owner, const char* name, int x, int y, 
 }
 
 TextEntry::TextEntry(ITextEntryListener* owner, const char* name, int x, int y, int charWidth, int* var, int min, int max)
-: mVarString(nullptr)
+: mVarCString(nullptr)
+, mVarString(nullptr)
 , mVarInt(var)
 , mVarFloat(nullptr)
 , mType(kTextEntry_Int)
@@ -43,7 +55,8 @@ TextEntry::TextEntry(ITextEntryListener* owner, const char* name, int x, int y, 
 }
 
 TextEntry::TextEntry(ITextEntryListener* owner, const char* name, int x, int y, int charWidth, float* var, float min, float max)
-: mVarString(nullptr)
+: mVarCString(nullptr)
+, mVarString(nullptr)
 , mVarInt(nullptr)
 , mVarFloat(var)
 , mType(kTextEntry_Float)
@@ -285,8 +298,10 @@ void TextEntry::AddCharacter(char c)
 
 void TextEntry::UpdateDisplayString()
 {
+   if (mVarCString)
+      StringCopy(mString, mVarCString, MAX_TEXTENTRY_LENGTH);
    if (mVarString)
-      StringCopy(mString, mVarString, MAX_TEXTENTRY_LENGTH);
+      StringCopy(mString, mVarString->c_str(), MAX_TEXTENTRY_LENGTH);
    if (mVarInt)
       StringCopy(mString, ofToString(*mVarInt).c_str(), MAX_TEXTENTRY_LENGTH);
    if (mVarFloat)
@@ -301,8 +316,10 @@ void TextEntry::AcceptEntry(bool pressedEnter)
       return;
    }
    
+   if (mVarCString)
+      StringCopy(mVarCString, mString, MAX_TEXTENTRY_LENGTH);
    if (mVarString)
-      StringCopy(mVarString, mString, MAX_TEXTENTRY_LENGTH);
+      *mVarString = mString;
    if (mVarInt && mString[0] != 0)
    {
       *mVarInt = ofClamp(ofToInt(mString), mIntMin, mIntMax);

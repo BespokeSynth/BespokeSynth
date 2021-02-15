@@ -32,6 +32,7 @@
 #include "DrumPlayer.h"
 #include "VSTPlugin.h"
 #include "Prefab.h"
+#include "UserPrefsEditor.h"
 
 ModularSynth* TheSynth = nullptr;
 
@@ -56,6 +57,7 @@ ModularSynth::ModularSynth()
 , mWantReloadInitialLayout(false)
 , mHeldSample(nullptr)
 , mConsoleListener(nullptr)
+, mUserPrefsEditor(nullptr)
 , mLastClickedModule(nullptr)
 , mInitialized(false)
 , mRecordingLength(0)
@@ -185,16 +187,19 @@ string ModularSynth::GetUserPrefsPath(bool relative)
 static int sFrameCount = 0;
 void ModularSynth::Poll()
 {
-   if (!mInitialized && sFrameCount > 3) //let some frames render before blocking for a load
+   if (mFatalError == "")
    {
-      LoadLayoutFromFile(ofToDataPath(mUserPrefs["layout"].asString()));
-      mInitialized = true;
-   }
+      if (!mInitialized && sFrameCount > 3) //let some frames render before blocking for a load
+      {
+         LoadLayoutFromFile(ofToDataPath(mUserPrefs["layout"].asString()));
+         mInitialized = true;
+      }
 
-   if (mWantReloadInitialLayout)
-   {
-      LoadLayoutFromFile(ofToDataPath(TheSynth->GetUserPrefs()["layout"].asString()));
-      mWantReloadInitialLayout = false;
+      if (mWantReloadInitialLayout)
+      {
+         LoadLayoutFromFile(ofToDataPath(TheSynth->GetUserPrefs()["layout"].asString()));
+         mWantReloadInitialLayout = false;
+      }
    }
    
    mZoomer.Update();
@@ -321,19 +326,18 @@ void ModularSynth::Draw(void* vg)
          DrawTextNormal(mFatalError,100,100, 20);
       else
          DrawFallbackText(mFatalError.c_str(), 100, 100);
-      return;
    }
    
    DrawLissajous(&mOutputBuffer, 0, 0, ofGetWidth(), ofGetHeight(), .7f, 0, 0);
    
-   if (gTime == 1)
+   if (gTime == 1 && mFatalError == "")
    {
       string loading("Bespoke is initializing audio...");
       DrawTextNormal(loading,ofGetWidth()/2-GetStringWidth(loading,30)/2,ofGetHeight()/2-6, 30);
       return;
    }
    
-   if (!mInitialized)
+   if (!mInitialized && mFatalError == "")
    {
       string loading("Bespoke is loading...");
       DrawTextNormal(loading,ofGetWidth()/2-GetStringWidth(loading,30)/2,ofGetHeight()/2-6, 30);
@@ -1486,6 +1490,19 @@ void ModularSynth::ResetLayout()
    mQuickSpawn->CreateUIControls();
    mQuickSpawn->Init();
    mModuleContainer.AddModule(mQuickSpawn);
+
+   mUserPrefsEditor = new UserPrefsEditor();
+   mUserPrefsEditor->SetName("userprefseditor");
+   mUserPrefsEditor->CreateUIControls();
+   mUserPrefsEditor->Init();
+   mUserPrefsEditor->SetPosition(300, 300);
+   mUserPrefsEditor->SetShowing(false);
+   mModuleContainer.AddModule(mUserPrefsEditor);
+   if (mFatalError != "")
+   {
+      mUserPrefsEditor->Show();
+      TheTitleBar->SetShowing(false);
+   }
    
    mDrawOffset.set(0,0);
    mZoomer.Init();
@@ -2267,6 +2284,18 @@ void ModularSynth::SaveOutput()
    
    mOutputBuffer.ClearBuffer();
    mRecordingLength = 0;
+}
+
+void ModularSynth::SetFatalError(string error)
+{
+   if (mFatalError == "")
+   {
+      mFatalError = error;
+      if (mUserPrefsEditor != nullptr)
+         mUserPrefsEditor->Show();
+      if (TheTitleBar != nullptr)
+         TheTitleBar->SetShowing(false);
+   }
 }
 
 void ConsoleListener::TextEntryActivated(TextEntry* entry)

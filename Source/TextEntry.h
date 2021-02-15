@@ -50,6 +50,7 @@ class TextEntry : public IUIControl, public IKeyboardFocusListener
 {
 public:
    TextEntry(ITextEntryListener* owner, const char* name, int x, int y, int charWidth, char* var);
+   TextEntry(ITextEntryListener* owner, const char* name, int x, int y, int charWidth, string* var);
    TextEntry(ITextEntryListener* owner, const char* name, int x, int y, int charWidth, int* var, int min, int max);
    TextEntry(ITextEntryListener* owner, const char* name, int x, int y, int charWidth, float* var, float min, float max);
    void OnKeyPressed(int key, bool isRepeat) override;
@@ -94,7 +95,8 @@ private:
    int mCharWidth;
    ITextEntryListener* mListener;
    char mString[MAX_TEXTENTRY_LENGTH];
-   char* mVarString;
+   char* mVarCString;
+   string* mVarString;
    int* mVarInt;
    float* mVarFloat;
    int mIntMin;

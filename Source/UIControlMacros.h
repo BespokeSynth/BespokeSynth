@@ -30,8 +30,8 @@
 
 #define UIBLOCK_SHIFTDOWN() yPos += lastUIControl->GetDimensions().y + 2;
 #define UIBLOCK_SHIFTUP() yPos -= lastUIControl->GetDimensions().y + 2;
-#define UIBLOCK_SHIFTRIGHT() xOffset = lastUIControl->GetPosition(true).x + lastUIControl->GetDimensions().x + 2; yPos = lastUIControl->GetPosition(true).y;
-#define UIBLOCK_SHIFTLEFT() xOffset = lastUIControl->GetPosition(true).x; yPos = lastUIControl->GetPosition(true).y;
+#define UIBLOCK_SHIFTRIGHT() xOffset = lastUIControl->GetPosition(true).x + lastUIControl->GetDimensions().x + 3 - xPos; yPos = lastUIControl->GetPosition(true).y;
+#define UIBLOCK_SHIFTLEFT() xOffset = lastUIControl->GetPosition(true).x - xPos; yPos = lastUIControl->GetPosition(true).y;
 #define UIBLOCK_SHIFTX(amount) xOffset += amount; if (lastUIControl != nullptr) { yPos = lastUIControl->GetPosition(true).y; }
 #define UIBLOCK_SHIFTY(amount) yPos += amount;
 #define UIBLOCK_NEWLINE() xOffset = 0;
@@ -59,6 +59,7 @@
 #define BUTTON(button,name) button = new ClickButton(UICONTROL_BASICS(name)); lastUIControl = button; UIBLOCK_SHIFTDOWN(); UIBLOCK_UPDATEEXTENTS();
 
 #define TEXTENTRY(entry,name,length,var) entry = new TextEntry(UICONTROL_BASICS(name),length,var); UIBLOCK_SHIFTDOWN(); UIBLOCK_UPDATEEXTENTS();
+#define TEXTENTRY_NUM(entry,name,length,var,min,max) entry = new TextEntry(UICONTROL_BASICS(name),length,var,min,max); UIBLOCK_SHIFTDOWN(); UIBLOCK_UPDATEEXTENTS();
 
 #define UICONTROL_CUSTOM(var,instance) var = instance; lastUIControl = var; UIBLOCK_SHIFTDOWN(); UIBLOCK_UPDATEEXTENTS();
 

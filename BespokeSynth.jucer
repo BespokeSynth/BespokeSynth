@@ -207,6 +207,10 @@
         <FILE id="RG4zGd" name="TremoloEffect.h" compile="0" resource="0" file="Source/TremoloEffect.h"/>
       </GROUP>
       <GROUP id="{6781AC07-A090-A7AF-8D27-BCB6D9526ABD}" name="modules">
+        <FILE id="kvaiqk" name="UserPrefsEditor.cpp" compile="1" resource="0"
+              file="Source/UserPrefsEditor.cpp"/>
+        <FILE id="Q33dmW" name="UserPrefsEditor.h" compile="0" resource="0"
+              file="Source/UserPrefsEditor.h"/>
         <FILE id="LR35O8" name="PlaySequencer.cpp" compile="1" resource="0"
               file="Source/PlaySequencer.cpp"/>
         <FILE id="aM2hLL" name="PlaySequencer.h" compile="0" resource="0" file="Source/PlaySequencer.h"/>

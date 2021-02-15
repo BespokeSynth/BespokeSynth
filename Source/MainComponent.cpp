@@ -61,8 +61,8 @@ public:
       {
          width = userPrefs["width"].asInt();
          height = userPrefs["height"].asInt();
-         if (!userPrefs["position"].isNull())
-            mDesiredInitialPosition.setXY(userPrefs["position"]["x"].asInt(), userPrefs["position"]["y"].asInt());
+         if (!userPrefs["position_x"].isNull())
+            mDesiredInitialPosition.setXY(userPrefs["position_x"].asInt(), userPrefs["position_y"].asInt());
       }
       
       if (mDesiredInitialPosition.x == INT_MAX)
@@ -184,16 +184,20 @@ public:
       }*/
       
       mSynth.Setup(&mGlobalManagers, this);
+
+      mGlobalManagers.mDeviceManager.getAvailableDeviceTypes();   //scans for device types ("Windows Audio", "DirectSound", etc)
       
       const string kAutoDevice = "auto";
       const string kNoneDevice = "none";
-      
+
       ofxJSONElement userPrefs;
       string outputDevice = kAutoDevice;
       string inputDevice = kAutoDevice;
       bool loaded = userPrefs.open(ModularSynth::GetUserPrefsPath(false));
       if (loaded)
       {
+         if (!userPrefs["devicetype"].isNull() && userPrefs["devicetype"].asString() != "auto")
+            mGlobalManagers.mDeviceManager.setCurrentAudioDeviceType(userPrefs["devicetype"].asString(), true);
          if (!userPrefs["audio_output_device"].isNull())
             outputDevice = userPrefs["audio_output_device"].asString();
          if (!userPrefs["audio_input_device"].isNull())

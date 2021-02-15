@@ -1,18 +1,23 @@
 {
-   "samplerate" : 48000,
-   "buffersize" : 256,
+   "devicetype" : "Windows Audio",
    "audio_output_device" : "Speakers (Realtek High Definition Audio)",
    "audio_input_device" : "none",
-   "height" : 1100,
+   "samplerate" : 48000,
+   "buffersize" : 256,
    "width" : 1700,
-   "layout" : "\\layouts\\blank.json",
-   "scroll_multiplier_horizontal" : 1,
-   "scroll_multiplier_vertical" : 0.5,
+   "height" : 1100,
+   "zoom" : 1.0,
+   "scroll_multiplier_vertical" : 0.50,
+   "scroll_multiplier_horizontal" : 1.0,
    "autosave" : true,
+   "tooltips" : "internal/tooltips_eng.txt",
+   "layout" : "layouts/blank.json",
+   "youtube-dl_path" : "youtube-dl.exe",
+   "ffmpeg_path" : "ffmpeg.exe",
    "vstsearchdirs" : [
-      "C:\\Program Files\\Common Files\\VST2",
-      "C:\\Program Files\\Common Files\\VST3",
-      "C:\\Program Files\\Steinberg\\VSTPlugins",
-      "C:\\Program Files\\Native Instruments\\VSTPlugins 64 bit"
+      "C:/Program Files/Common Files/VST2",
+      "C:/Program Files/Common Files/VST3",
+      "C:/Program Files/Steinberg/VSTPlugins",
+      "C:/Program Files/Native Instruments/VSTPlugins 64 bit"
    ]
 }

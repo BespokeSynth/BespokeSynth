@@ -32,6 +32,7 @@ class MidiController;
 class NVGcontext;
 class QuickSpawnMenu;
 class ADSRDisplay;
+class UserPrefsEditor;
 
 #define MAX_OUTPUT_CHANNELS 8
 #define MAX_INPUT_CHANNELS 8
@@ -191,8 +192,9 @@ public:
    void LoadStatePopup();
 
    ofxJSONElement GetUserPrefs() { return mUserPrefs; }
+   UserPrefsEditor* GetUserPrefsEditor() { return mUserPrefsEditor; }
    
-   void SetFatalError(string error) { if(mFatalError == "") mFatalError = error; }
+   void SetFatalError(string error);
 
    static bool sShouldAutosave;
    
@@ -246,6 +248,7 @@ private:
 
    LocationZoomer mZoomer;
    QuickSpawnMenu* mQuickSpawn;
+   UserPrefsEditor* mUserPrefsEditor;
 
    RollingBuffer mOutputBuffer;
    long long mRecordingLength;

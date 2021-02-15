@@ -102,6 +102,7 @@ private:
    ClickButton* mWriteAudioButton;
    DropdownList* mLoadLayoutDropdown;
    ClickButton* mDisplayHelpButton;
+   ClickButton* mDisplayUserPrefsEditorButton;
    Checkbox* mEventLookaheadCheckbox;
    int mLoadLayoutIndex;
    Checkbox* mShouldAutosaveCheckbox;

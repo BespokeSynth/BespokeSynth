@@ -15,6 +15,7 @@
 #include "HelpDisplay.h"
 #include "VSTPlugin.h"
 #include "Prefab.h"
+#include "UserPrefsEditor.h"
 
 TitleBar* TheTitleBar = nullptr;
 
@@ -150,6 +151,7 @@ void TitleBar::CreateUIControls()
    mResetLayoutButton = new ClickButton(this,"reset layout",140,19);
    mWriteAudioButton = new ClickButton(this,"write audio",280,1);
    mDisplayHelpButton = new ClickButton(this," ? ",380,1);
+   mDisplayUserPrefsEditorButton = new ClickButton(this, "settings", 330, 1);
    mLoadLayoutDropdown = new DropdownList(this, "load layout", 140, 20, &mLoadLayoutIndex);
    mEventLookaheadCheckbox = new Checkbox(this, "lookahead (exp.)", mResetLayoutButton, kAnchor_Right, &Transport::sDoEventLookahead);
    mShouldAutosaveCheckbox = new Checkbox(this, "autosave", mEventLookaheadCheckbox, kAnchor_Right_Padded, &ModularSynth::sShouldAutosave);
@@ -343,6 +345,8 @@ void TitleBar::DrawModule()
    DrawTextLeftJustify(stats, ofGetWidth()/gDrawScale - 5, 33);
    mDisplayHelpButton->SetPosition(ofGetWidth()/gDrawScale - 20, 4);
    mDisplayHelpButton->Draw();
+   mDisplayUserPrefsEditorButton->SetPosition(mDisplayHelpButton->GetPosition(true).x - 55, 4);
+   mDisplayUserPrefsEditorButton->Draw();
    mEventLookaheadCheckbox->Draw();
    mShouldAutosaveCheckbox->Draw();
 }
@@ -416,6 +420,8 @@ void TitleBar::ButtonClicked(ClickButton* button)
       mHelpDisplay->SetPosition(x-w+butW,y+butH);
       TheSynth->PushModalFocusItem(mHelpDisplay);
    }
+   if (button == mDisplayUserPrefsEditorButton)
+      TheSynth->GetUserPrefsEditor()->Show();
    if (button == mResetLayoutButton)
       TheSynth->ReloadInitialLayout();
 }
