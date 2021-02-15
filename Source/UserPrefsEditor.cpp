@@ -322,7 +322,7 @@ void UserPrefsEditor::ButtonClicked(ClickButton* button)
 {
    if (button == mSaveButton)
    {
-      auto& userPrefs = TheSynth->GetUserPrefs();
+      auto userPrefs = TheSynth->GetUserPrefs();
 
       PrepareForSave();
       if (mDeviceTypeIndex != -1)
