@@ -94,6 +94,13 @@ void Monome::SetLightFlicker(int x, int y, float intensity)
    }
 }
 
+string Monome::GetControlTooltip(MidiMessageType type, int control)
+{
+   if (type == kMidiMessage_Note)
+      return "(" + ofToString(control % 8) + ", " + ofToString(control/8) + ")";
+   return MidiController::GetDefaultTooltip(type, control);
+}
+
 void Monome::oscMessageReceived(const OSCMessage& msg)
 {
    String label = msg.getAddressPattern().toString();
@@ -172,4 +179,21 @@ Vec2i Monome::Rotate(int x, int y, int rotations)
       ret.y = y;
    }
    return ret;
+}
+
+namespace
+{
+   const int kSaveStateRev = 1;
+}
+
+void Monome::SaveState(FileStreamOut& out)
+{
+   out << kSaveStateRev;
+}
+
+void Monome::LoadState(FileStreamIn& in)
+{
+   int rev;
+   in >> rev;
+   LoadStateValidate(rev == kSaveStateRev);
 }

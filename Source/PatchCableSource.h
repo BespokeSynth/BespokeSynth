@@ -27,7 +27,8 @@ enum DefaultPatchBehavior
 enum PatchCableDrawMode
 {
    kPatchCableDrawMode_Normal,
-   kPatchCableDrawMode_HoverOnly
+   kPatchCableDrawMode_CablesOnHoverOnly,
+   kPatchCableDrawMode_SourceOnHoverOnly
 };
 
 #define NOTE_HISTORY_LENGTH 250
@@ -106,6 +107,8 @@ public:
    void AddHistoryEvent(double time, bool on) { mNoteHistory.AddEvent(time, on); }
    NoteHistory& GetHistory() { return mNoteHistory; }
    
+   void DrawSource();
+   void DrawCables();
    void Render() override;
    bool TestClick(int x, int y, bool right, bool testOnly = false) override;
    bool MouseMoved(float x, float y) override;
@@ -151,6 +154,13 @@ private:
    vector<IClickable*> mValidTargets;
    
    NoteHistory mNoteHistory;
+
+   enum class DrawPass
+   {
+      kSource,
+      kCables
+   };
+   DrawPass mDrawPass;
 };
 
 #endif /* defined(__Bespoke__PatchCableSource__) */

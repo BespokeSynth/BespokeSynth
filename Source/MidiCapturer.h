@@ -27,6 +27,9 @@ public:
    
    void SendMidi(const MidiMessage& message);
 
+   void SaveState(FileStreamOut& out) override;
+   void LoadState(FileStreamIn& in) override;
+
 private:
    MidiDeviceListener* mListener;
 };

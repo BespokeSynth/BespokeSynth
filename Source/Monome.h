@@ -33,6 +33,7 @@ public:
    void Connect();
    void SetLight(int x, int y, bool on);
    void SetLightFlicker(int x, int y, float flickerMs);
+   string GetControlTooltip(MidiMessageType type, int control) override;
    
    void oscMessageReceived(const OSCMessage& msg) override;
    
@@ -40,6 +41,9 @@ public:
    
    bool IsInputConnected() override { return mHasMonome; }
    bool Reconnect() override { Connect(); return mHasMonome; }
+
+   void SaveState(FileStreamOut& out) override;
+   void LoadState(FileStreamIn& in) override;
 
 private:
    void SetLightInternal(int x, int y, bool on);

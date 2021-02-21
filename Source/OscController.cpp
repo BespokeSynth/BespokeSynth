@@ -15,6 +15,7 @@ OscController::OscController(MidiDeviceListener* listener, string outAddress, in
 , mOutAddress(outAddress)
 , mOutPort(outPort)
 , mInPort(inPort)
+, mOutputConnected(false)
 {
    Connect();
 }
@@ -33,14 +34,40 @@ void OscController::Connect()
       
       OSCReceiver::addListener(this);
       
-      connected = mOscOut.connect( mOutAddress, mOutPort );
-      assert(connected);
+      ConnectOutput();
       
       mConnected = true;
    }
    catch (exception e)
    {
    }
+}
+
+void OscController::ConnectOutput()
+{
+   if (mOutAddress != "" && mOutPort > 0)
+   {
+      mOutputConnected = mOscOut.connect(mOutAddress, mOutPort);
+   }
+}
+
+bool OscController::SetInPort(int port)
+{
+   if (mInPort != port)
+   {
+      mInPort = port;
+      OSCReceiver::disconnect();
+      return OSCReceiver::connect(mInPort);
+   }
+
+   return false;
+}
+
+string OscController::GetControlTooltip(MidiMessageType type, int control)
+{
+   if (type == kMidiMessage_Control && control >= 0 && control < mOscMap.size())
+      return mOscMap[control].mAddress;
+   return "[unmapped]";
 }
 
 void OscController::SendValue(int page, int control, float value, bool forceNoteOn /*= false*/, int channel /*= -1*/)
@@ -50,60 +77,137 @@ void OscController::SendValue(int page, int control, float value, bool forceNote
    
    for (int i=0; i<mOscMap.size(); ++i)
    {
-      if (control == mOscMap[i].mControl && mOscMap[i].mLastChangedTime + 50 < gTime)
+      if (control == mOscMap[i].mControl)// && mOscMap[i].mLastChangedTime + 50 < gTime)
       {
-         mOscMap[i].mValue = value;
-         
          OSCMessage msg(mOscMap[i].mAddress.c_str());
-         
-         map<int, float> values;
-         for (int j=0; j<mOscMap.size(); ++j)
+
+         if (mOscMap[i].mIsFloat)
          {
-            if (mOscMap[i].mAddress == mOscMap[j].mAddress)
-               values[mOscMap[j].mIndex] = mOscMap[j].mValue;
+            mOscMap[i].mFloatValue = value;
+            msg.addFloat32(mOscMap[i].mFloatValue);
+         }
+         else
+         {
+            mOscMap[i].mIntValue = value*127;
+            msg.addInt32(mOscMap[i].mIntValue);
          }
          
-         for (int j=0; j<values.size(); ++j)
-            msg.addFloat32(values[j]);
-         
-         mOscOut.send(msg);
+         if (mOutputConnected)
+            mOscOut.send(msg);
       }
    }
 }
 
 void OscController::oscMessageReceived(const OSCMessage& msg)
 {
-   for (int j=0; j < msg.size(); ++j)
+   string address = msg.getAddressPattern().toString().toStdString();
+
+   if (address == "/jockey/sync")
    {
-      for (int i=0; i<mOscMap.size(); ++i)
+      string outputAddress = msg[0].getString().toStdString();
+      vector<string> tokens= ofSplitString(outputAddress, ":");
+      if (tokens.size() == 2)
       {
-         if (mOscMap[i].mIndex == j && msg.getAddressPattern().toString().toStdString() == mOscMap[i].mAddress)
-         {
-            mOscMap[i].mLastChangedTime = gTime;
-            mOscMap[i].mValue = msg[j].getFloat32();
-            MidiControl control;
-            control.mControl = mOscMap[i].mControl;
-            control.mValue = mOscMap[i].mValue * 127;
-            control.mDeviceName = "osccontroller";
-            mListener->OnMidiControl(control);
-         }
+         mOutAddress = tokens[0];
+         mOutPort = ofToInt(tokens[1]);
+         ConnectOutput();
+      }
+      return;
+   }
+
+   if (msg.size() == 0 || (!msg[0].isFloat32() && !msg[0].isInt32()))
+      return;
+
+   int mapIndex = -1;
+   for (int i = 0; i < mOscMap.size(); ++i)
+   {
+      if (address == mOscMap[i].mAddress)
+      {
+         mapIndex = i;
+         break;
       }
    }
+
+   bool isNew = false;
+   if (mapIndex == -1)  //create a new map entry
+   {
+      isNew = true;
+      OscMap entry;
+      mapIndex = mOscMap.size();
+      entry.mControl = mapIndex;
+      entry.mAddress = address;
+      entry.mIsFloat = msg[0].isFloat32();
+      mOscMap.push_back(entry);
+   }
+
+   MidiControl control;
+   control.mControl = mOscMap[mapIndex].mControl;
+   control.mDeviceName = "osccontroller";
+   control.mChannel = 1;
+   mOscMap[mapIndex].mLastChangedTime = gTime;
+   if (mOscMap[mapIndex].mIsFloat)
+   {
+      assert(msg[0].isFloat32());
+      mOscMap[mapIndex].mFloatValue = msg[0].getFloat32();
+      control.mValue = mOscMap[mapIndex].mFloatValue * 127;
+   }
+   else
+   {
+      assert(msg[0].isInt32());
+      mOscMap[mapIndex].mIntValue = msg[0].getInt32();
+      control.mValue = mOscMap[mapIndex].mIntValue;
+   }
+
+   if (isNew)
+   {
+      MidiController* midiController = dynamic_cast<MidiController*>(mListener);
+      if (midiController)
+      {
+         auto& layoutControl = midiController->GetLayoutControl(control.mControl, kMidiMessage_Control);
+         layoutControl.mConnectionType = mOscMap[mapIndex].mIsFloat ? kControlType_Slider : kControlType_Direct;
+      }
+   }
+
+   mListener->OnMidiControl(control);
 }
 
-void OscController::LoadInfo(const ofxJSONElement& moduleInfo)
+namespace
 {
-   const ofxJSONElement& connections = moduleInfo["connections"];
-   
-   for (int i=0; i<connections.size(); ++i)
+   const int kSaveStateRev = 1;
+}
+
+void OscController::SaveState(FileStreamOut& out)
+{
+   out << kSaveStateRev;
+
+   out << (int)mOscMap.size();
+   for (size_t i = 0; i < mOscMap.size(); ++i)
    {
-      OscMap oscMap;
-      oscMap.mControl = connections[i]["control"].asInt();
-      oscMap.mAddress = connections[i]["oscaddress"].asString();
-      oscMap.mIndex = connections[i]["oscidx"].asInt();
-      oscMap.mValue = 0;
-      oscMap.mLastChangedTime = -9999;
-      mOscMap.push_back(oscMap);
+      out << mOscMap[i].mControl;
+      out << mOscMap[i].mAddress;
+      out << mOscMap[i].mIsFloat;
+      out << mOscMap[i].mFloatValue;
+      out << mOscMap[i].mIntValue;
+      out << mOscMap[i].mLastChangedTime;
    }
 }
 
+void OscController::LoadState(FileStreamIn& in)
+{
+   int rev;
+   in >> rev;
+   LoadStateValidate(rev == kSaveStateRev);
+
+   int mapSize;
+   in >> mapSize;
+   mOscMap.resize(mapSize);
+   for (size_t i = 0; i < mOscMap.size(); ++i)
+   {
+      in >> mOscMap[i].mControl;
+      in >> mOscMap[i].mAddress;
+      in >> mOscMap[i].mIsFloat;
+      in >> mOscMap[i].mFloatValue;
+      in >> mOscMap[i].mIntValue;
+      in >> mOscMap[i].mLastChangedTime;
+   }
+}

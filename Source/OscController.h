@@ -18,8 +18,9 @@ struct OscMap
 {
    int mControl;
    string mAddress;
-   int mIndex;
-   float mValue;
+   bool mIsFloat;
+   float mFloatValue;
+   int mIntValue;
    double mLastChangedTime;
 };
 
@@ -35,19 +36,25 @@ public:
    void oscMessageReceived(const OSCMessage& msg) override;
    void SendValue(int page, int control, float value, bool forceNoteOn = false, int channel = -1) override;
    
-   void LoadInfo(const ofxJSONElement& moduleInfo) override;
-   
    bool IsInputConnected() override { return mConnected; }
    bool Reconnect() override { Connect(); return mConnected; }
+   bool SetInPort(int port);
+   string GetControlTooltip(MidiMessageType type, int control) override;
+
+   void SaveState(FileStreamOut& out) override;
+   void LoadState(FileStreamIn& in) override;
 
 private:
    MidiDeviceListener* mListener;
+
+   void ConnectOutput();
    
    string mOutAddress;
    int mOutPort;
    int mInPort;
    OSCSender mOscOut;
    bool mConnected;
+   bool mOutputConnected;
    
    vector<OscMap> mOscMap;
 };

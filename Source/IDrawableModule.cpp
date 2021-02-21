@@ -312,7 +312,6 @@ void IDrawableModule::DrawFrame(float w, float h, bool drawModule, float& titleB
          ofClipWindow(0, 0, w, h);
       DrawModule();
       ofPopMatrix();
-      DrawModuleUnclipped();
    }
    
    ofSetColor(color * (1-GetBeaconAmount()) + ofColor::yellow * GetBeaconAmount(), gModuleDrawAlpha);
@@ -338,6 +337,9 @@ void IDrawableModule::DrawFrame(float w, float h, bool drawModule, float& titleB
       ofRect(-.5f, -titleBarHeight-.5f, w+1, h+titleBarHeight+1, 4);
       ofPopStyle();
    }
+
+   if (drawModule)
+      DrawModuleUnclipped();
 }
 
 void IDrawableModule::Render()
@@ -416,6 +418,12 @@ void IDrawableModule::Render()
    
    ofPopMatrix();
    ofPopStyle();
+
+   for (auto source : mPatchCableSources)
+   {
+      source->UpdatePosition();
+      source->DrawSource();
+   }
 }
 
 void IDrawableModule::DrawPatchCables()
@@ -423,7 +431,7 @@ void IDrawableModule::DrawPatchCables()
    for (auto source : mPatchCableSources)
    {
       source->UpdatePosition();
-      source->Draw();
+      source->DrawCables();
    }
 }
 

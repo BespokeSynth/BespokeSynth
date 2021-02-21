@@ -323,7 +323,7 @@ PYBIND11_EMBEDDED_MODULE(midicontroller, m)
       return dynamic_cast<MidiController*>(TheSynth->FindModule(path));
    }, py::return_value_policy::reference);
    py::class_<MidiController, IDrawableModule>(m, "midicontroller")
-      .def("add_connection", [](MidiController& midicontroller, MidiMessageType messageType, int control, int channel, string controlPath)
+      .def("set_connection", [](MidiController& midicontroller, MidiMessageType messageType, int control, int channel, string controlPath)
       {
          IUIControl* uicontrol = TheSynth->FindUIControl(controlPath.c_str());
          if (uicontrol != nullptr)

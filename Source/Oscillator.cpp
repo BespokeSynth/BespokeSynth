@@ -24,7 +24,7 @@ float Oscillator::Value(float phase) const
    
    phase = fmod(phase, FTWO_PI);
    
-   float sample;
+   float sample = 0;
    switch (mType)
    {
       case kOsc_Sin:
@@ -57,7 +57,7 @@ float Oscillator::Value(float phase) const
          sample = ofRandom(-1,1);
          break;
       case kOsc_Drunk:
-         assert(false);
+         //assert(false);
          break;
    }
    

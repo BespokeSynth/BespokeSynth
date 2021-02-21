@@ -18,7 +18,6 @@
 #include "RadioButton.h"
 #include "ofxJSONElement.h"
 #include "Transport.h"
-#include "INonstandardController.h"
 #include "TextEntry.h"
 #include "ModulationChain.h"
 #include "INoteSource.h"
@@ -73,6 +72,7 @@ namespace Json
 class Monome;
 class MidiController;
 class GridController;
+class INonstandardController;
 
 struct UIControlConnection
 {
@@ -196,8 +196,8 @@ enum ControlDrawType
 
 struct ControlLayoutElement
 {
-   ControlLayoutElement() : mActive(false), mControlCable(nullptr) {}
-   void Setup(MidiController* owner, MidiMessageType type, int control, ControlDrawType drawType, bool incremental, int offVal, int onVal, float x, float y, float w, float h);
+   ControlLayoutElement() : mActive(false), mControlCable(nullptr), mConnectionType(kControlType_Slider) {}
+   void Setup(MidiController* owner, MidiMessageType type, int control, ControlDrawType drawType, bool incremental, int offVal, int onVal, ControlType connectionType, float x, float y, float w, float h);
    
    bool mActive;
    MidiMessageType mType;
@@ -208,6 +208,7 @@ struct ControlLayoutElement
    bool mIncremental;
    int mOffVal;
    int mOnVal;
+   ControlType mConnectionType;
    
    PatchCableSource* mControlCable;
    
@@ -299,7 +300,11 @@ public:
    virtual void SetUpFromSaveData() override;
    virtual void SaveLayout(ofxJSONElement& moduleInfo) override;
 
+   void SaveState(FileStreamOut& out) override;
+   void LoadState(FileStreamIn& in) override;
+
    static bool sQuickMidiMapMode;
+   static string GetDefaultTooltip(MidiMessageType type, int control);
    
 private:
    enum MappingDisplayMode
@@ -315,6 +320,7 @@ private:
    void GetModuleDimensions(float& width, float& height) override;
    bool Enabled() const override { return mEnabled; }
    void OnClicked(int x, int y, bool right) override;
+   bool MouseMoved(float x, float y) override;
 
    void ConnectDevice();
    void MidiReceived(MidiMessageType messageType, int control, float value, int channel = -1);
@@ -327,6 +333,7 @@ private:
    void OnDeviceChanged();
    int GetLayoutControlIndexForCable(PatchCableSource* cable) const;
    int GetLayoutControlIndexForMidi(MidiMessageType type, int control) const;
+   string GetLayoutTooltip(int controlIndex);
    
    float mVelocityMult;
    bool mUseChannelAsVoice;
@@ -357,6 +364,8 @@ private:
    Checkbox* mDrawCablesCheckbox;
    MappingDisplayMode mMappingDisplayMode;
    RadioButton* mMappingDisplayModeSelector;
+   int mOscInPort;
+   TextEntry* mOscInPortEntry;
 
    int mControllerIndex;
    double mLastActivityTime;
@@ -376,8 +385,9 @@ private:
    float mReconnectWaitTimer;
    ChannelFilter mChannelFilter;
    
-   ControlLayoutElement mLayoutControls[NUM_LAYOUT_CONTROLS];
+   std::array<ControlLayoutElement, NUM_LAYOUT_CONTROLS> mLayoutControls;
    int mHighlightedLayoutElement;
+   int mHoveredLayoutElement;
    int mLayoutWidth;
    int mLayoutHeight;
    vector<GridLayout*> mGrids;
