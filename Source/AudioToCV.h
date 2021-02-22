@@ -28,7 +28,6 @@ public:
    
    void SetEnabled(bool enabled) override { mEnabled = enabled; }
    
-   InputMode GetInputMode() override { return kInputMode_Mono; }
    void Process(double time) override;
    
    void PostRepatch(PatchCableSource* cableSource, bool fromUserClick) override;

@@ -75,7 +75,10 @@ void AudioToCV::Process(double time)
    SyncBuffers();
    
    assert(GetBuffer()->BufferSize());
-   BufferCopy(mModulationBuffer, GetBuffer()->GetChannel(0), gBufferSize);
+   Clear(gWorkBuffer, gBufferSize);
+   for (int ch = 0; ch < GetBuffer()->NumActiveChannels(); ++ch)
+      Add(gWorkBuffer, GetBuffer()->GetChannel(ch), gBufferSize);
+   BufferCopy(mModulationBuffer, gWorkBuffer, gBufferSize);
    Mult(mModulationBuffer, mGain, gBufferSize);
    
    GetBuffer()->Reset();

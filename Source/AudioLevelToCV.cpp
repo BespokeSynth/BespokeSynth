@@ -92,10 +92,12 @@ void AudioLevelToCV::Process(double time)
    SyncBuffers();
    
    assert(GetBuffer()->BufferSize());
-   float* data = GetBuffer()->GetChannel(0);
+   Clear(gWorkBuffer, gBufferSize);
+   for (int ch = 0; ch < GetBuffer()->NumActiveChannels(); ++ch)
+      Add(gWorkBuffer, GetBuffer()->GetChannel(ch), gBufferSize);
    for (int i=0; i<gBufferSize; ++i)
    {
-      float sample = fabsf(data[i]);
+      float sample = fabsf(gWorkBuffer[i]);
       if (sample > mVal)
          mVal = mAttackFactor * (mVal - sample) + sample;
       else
