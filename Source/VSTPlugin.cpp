@@ -280,10 +280,11 @@ void VSTPlugin::LoadVST(juce::PluginDescription desc)
    mPlugin = VSTLookup::sFormatManager.createPluginInstance(desc, gSampleRate, gBufferSize, errorMessage);
    if (mPlugin != nullptr)
    {
+      mPlugin->enableAllBuses();
       mPlugin->prepareToPlay(gSampleRate, gBufferSize);
       mPlugin->setPlayHead(&mPlayhead);
-      mNumInputs = CLAMP(mPlugin->getTotalNumInputChannels(), 1, 4);
-      mNumOutputs = CLAMP(mPlugin->getTotalNumOutputChannels(), 1, 4);
+      mNumInputs = MIN(mPlugin->getTotalNumInputChannels(), 4);
+      mNumOutputs = MIN(mPlugin->getTotalNumOutputChannels(), 4);
       ofLog() << "vst inputs: " << mNumInputs << "  vst outputs: " << mNumOutputs;
 
       CreateParameterSliders();
