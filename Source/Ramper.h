@@ -16,10 +16,11 @@
 #include "DropdownList.h"
 #include "ClickButton.h"
 #include "Slider.h"
+#include "IPulseReceiver.h"
 
 class PatchCableSource;
 
-class Ramper : public IDrawableModule, public IDropdownListener, public IAudioPoller, public IButtonListener, public IFloatSliderListener
+class Ramper : public IDrawableModule, public IDropdownListener, public IAudioPoller, public IButtonListener, public IFloatSliderListener, public IPulseReceiver
 {
 public:
    Ramper();
@@ -36,6 +37,9 @@ public:
    
    //IAudioPoller
    void OnTransportAdvanced(float amount) override;
+
+   //IPulseReceiver
+   void OnPulse(double time, float velocity, int flags) override;
    
    void DropdownUpdated(DropdownList* list, int oldVal) override {}
    void ButtonClicked(ClickButton* button) override;
@@ -56,6 +60,8 @@ private:
    void OnClicked(int x, int y, bool right) override;
    bool MouseMoved(float x, float y) override;
    void MouseReleased() override;
+
+   void Go(double time);
    
    IUIControl* mUIControl;
    NoteInterval mLength;

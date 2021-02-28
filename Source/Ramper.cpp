@@ -119,17 +119,26 @@ void Ramper::PostRepatch(PatchCableSource* cableSource, bool fromUserClick)
    }
 }
 
+void Ramper::Go(double time)
+{
+   if (mUIControl)
+   {
+      mStartValue = mUIControl->GetValue();
+      mStartMeasure = TheTransport->GetMeasureTime(time);
+      mRamping = true;
+   }
+}
+
+void Ramper::OnPulse(double time, float velocity, int flags)
+{
+   if (velocity > 0 && mEnabled)
+      Go(time);
+}
+
 void Ramper::ButtonClicked(ClickButton* button)
 {
    if (button == mTriggerButton)
-   {
-      if (mUIControl)
-      {
-         mStartValue = mUIControl->GetValue();
-         mStartMeasure = TheTransport->GetMeasureTime(gTime);
-         mRamping = true;
-      }
-   }
+      Go(gTime);
 }
 
 void Ramper::GetModuleDimensions(float& width, float& height)
