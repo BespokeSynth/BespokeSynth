@@ -53,6 +53,7 @@ script-relative:
    me.get_caller()
       example: me.get_caller().play_note(60,127)
    me.set_num_note_outputs(num)
+   me.connect_osc_input(port)
 
 
 import notesequencer
@@ -104,13 +105,14 @@ import sampleplayer
    instance:
       s.set_cue_point(pitch, startSeconds, lengthSeconds, speed)
       s.fill(data)
+      s.play_cue(cue)
 
 
 import midicontroller
    static:
       midicontroller.get(path)
    instance:
-      m.add_connection(messageType, control, channel, controlPath)
+      m.set_connection(messageType, control, channel, controlPath)
       m.send_note(pitch, velocity, forceNoteOn, channel, page)
          optional: forceNoteOn = false, channel = -1, page = 0
       m.send_cc(ctl, value, channel, page)
@@ -119,6 +121,7 @@ import midicontroller
          optional: channel = -1, page = 0
       m.send_data(a, b, c, page)
          optional: page = 0
+      m.add_script_listener(script)
 
 
 import linnstrument
@@ -126,6 +129,22 @@ import linnstrument
       linnstrument.get(path)
    instance:
       l.set_color(x, y, color)
+
+
+import osccontroller
+   static:
+      osccontroller.get(path)
+   instance:
+      o.add_control(address, isFloat)
+
+
+import oscoutput
+   static:
+      oscoutput.get(path)
+   instance:
+      o.send_float(address, val)
+      o.send_int(address, val)
+      o.send_string(address, val)
 
 
 import module
