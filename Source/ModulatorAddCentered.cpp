@@ -66,7 +66,10 @@ void ModulatorAddCentered::PostRepatch(PatchCableSource* cableSource, bool fromU
 float ModulatorAddCentered::Value(int samplesIn)
 {
    ComputeSliders(samplesIn);
-   return ofClamp(mValue1 + mValue2 * mValue2Range, mTarget->GetMin(), mTarget->GetMax());
+   if (mTarget)
+      return ofClamp(mValue1 + mValue2 * mValue2Range, mTarget->GetMin(), mTarget->GetMax());
+   else
+      return mValue1 + mValue2 * mValue2Range;
 }
 
 void ModulatorAddCentered::SaveLayout(ofxJSONElement& moduleInfo)

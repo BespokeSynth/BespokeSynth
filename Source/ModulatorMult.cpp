@@ -61,7 +61,10 @@ void ModulatorMult::PostRepatch(PatchCableSource* cableSource, bool fromUserClic
 float ModulatorMult::Value(int samplesIn)
 {
    ComputeSliders(samplesIn);
-   return ofClamp(mValue1 * mValue2, mTarget->GetMin(), mTarget->GetMax());
+   if (mTarget)
+      return ofClamp(mValue1 * mValue2, mTarget->GetMin(), mTarget->GetMax());
+   else
+      return mValue1 * mValue2;
 }
 
 void ModulatorMult::SaveLayout(ofxJSONElement& moduleInfo)

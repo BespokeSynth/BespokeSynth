@@ -61,7 +61,10 @@ void ModulatorSubtract::PostRepatch(PatchCableSource* cableSource, bool fromUser
 float ModulatorSubtract::Value(int samplesIn)
 {
    ComputeSliders(samplesIn);
-   return ofClamp(mValue1 - mValue2, mTarget->GetMin(), mTarget->GetMax());
+   if (mTarget)
+      return ofClamp(mValue1 - mValue2, mTarget->GetMin(), mTarget->GetMax());
+   else
+      return mValue1 - mValue2;
 }
 
 void ModulatorSubtract::SaveLayout(ofxJSONElement& moduleInfo)
