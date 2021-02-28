@@ -172,7 +172,7 @@ void Waveshaper::DrawModule()
    else
    {
       ofPushMatrix();
-      ofClipWindow(kGraphX, kGraphY, kGraphWidth, kGraphHeight);
+      ofClipWindow(kGraphX, kGraphY, kGraphWidth, kGraphHeight, true);
       ofSetColor(0,255,0,gModuleDrawAlpha);
       ofNoFill();
       ofBeginShape();

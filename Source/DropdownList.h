@@ -38,6 +38,7 @@ public:
    bool HasTitleBar() const override { return false; }
    string GetTitleLabel() override { return ""; }
    void GetDimensions(float& width, float& height) override { width = mWidth; height = mHeight; }
+   bool ShouldClipContents() override { return false; }
 private:
    void OnClicked(int x, int y, bool right) override;
    int mWidth;

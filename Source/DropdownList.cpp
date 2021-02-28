@@ -131,7 +131,7 @@ void DropdownList::Render()
    ofSetColor(textColor);
    
    ofPushMatrix();
-   ofClipWindow(mX, mY, w-12, h);
+   ofClipWindow(mX, mY, w-12, h, true);
    DrawTextNormal(GetDisplayValue(*mVar), mX+2+xOffset, mY+12);
    ofPopMatrix();
    if (mDrawTriangle)

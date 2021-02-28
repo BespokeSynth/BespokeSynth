@@ -174,7 +174,7 @@ void CodeEntry::Render()
    float w,h;
    GetDimensions(w,h);
    
-   ofClipWindow(mX, mY, w, h);
+   ofClipWindow(mX, mY, w, h, true);
    
    bool isCurrent = IKeyboardFocusListener::GetActiveKeyboardFocus() == this;
    

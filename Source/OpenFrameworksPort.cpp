@@ -184,9 +184,17 @@ void ofRotate(float radians)
    nvgRotate(gNanoVG, radians);
 }
 
-void ofClipWindow(float x, float y, float width, float height)
+void ofClipWindow(float x, float y, float width, float height, bool intersectWithExisting)
 {
-   nvgScissor(gNanoVG, x, y, width, height);
+   if (intersectWithExisting)
+      nvgIntersectScissor(gNanoVG, x, y, width, height);
+   else
+      nvgScissor(gNanoVG, x, y, width, height);
+}
+
+void ofResetClipWindow()
+{
+   nvgResetScissor(gNanoVG);
 }
 
 void ofSetColor(float r, float g, float b, float a)

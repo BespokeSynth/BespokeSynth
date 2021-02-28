@@ -262,7 +262,7 @@ void IDrawableModule::DrawFrame(float w, float h, bool drawModule, float& titleB
       ofSetColor(color, 50);
       ofFill();
       ofPushMatrix();
-      ofClipWindow(0, -titleBarHeight, w, titleBarHeight);
+      ofClipWindow(0, -titleBarHeight, w, titleBarHeight, true);
       ofRect(0,-titleBarHeight,w,titleBarHeight*2);
       ofPopMatrix();
       
@@ -309,7 +309,9 @@ void IDrawableModule::DrawFrame(float w, float h, bool drawModule, float& titleB
       ofSetColor(color, gModuleDrawAlpha);
       ofPushMatrix();
       if (ShouldClipContents())
-         ofClipWindow(0, 0, w, h);
+         ofClipWindow(0, 0, w, h, true);
+      else
+         ofResetClipWindow();
       DrawModule();
       ofPopMatrix();
    }
