@@ -39,11 +39,18 @@ public:
    string GetTitleLabel() override { return ""; }
    void GetDimensions(float& width, float& height) override { width = mWidth; height = mHeight; }
    bool ShouldClipContents() override { return false; }
+   DropdownList* GetOwner() const { return mOwner; }
+   bool MouseMoved(float x, float y) override;
+   string GetHoveredLabel();
+   float GetMouseX() { return mMouseX; }
+   float GetMouseY() { return mMouseY; }
 private:
    void OnClicked(int x, int y, bool right) override;
    int mWidth;
    int mHeight;
    int mColumnWidth;
+   float mMouseX;
+   float mMouseY;
    DropdownList* mOwner;
 };
 
@@ -69,6 +76,8 @@ public:
    void SetDrawTriangle(bool draw) { mDrawTriangle = draw; }
    void GetPopupDimensions(float& width, float& height) { mModalList.GetDimensions(width, height); }
    void SetMaxPerColumn(int max) { mMaxPerColumn = max; CalculateWidth(); }
+   int GetItemIndex(int x, int y);
+   DropdownListElement GetElement(int index) { return mElements[index]; }
 
    //IUIControl
    void SetFromMidiCC(float slider) override;
@@ -95,6 +104,8 @@ private:
    int FindItemIndex(float val) const;
    void SetValue(int value, bool forceUpdate);
    void CalculateWidth();
+   void UpdateModalListPosition();
+
    int mWidth;
    int mHeight;
    int mModalWidth;

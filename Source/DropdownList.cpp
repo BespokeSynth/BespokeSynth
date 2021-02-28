@@ -144,22 +144,25 @@ void DropdownList::Render()
    
    DrawHover();
    
-   if (mLastScrolledTime + 300 > gTime && TheSynth->GetTopModalFocusItem() != &mModalList && !Push2Control::sDrawingPush2Display)
+   if (mLastScrolledTime + 300 > gTime && TheSynth->GetTopModalFocusItem() != &mModalList && !Push2Control::sDrawingPush2Display && mElements.size() < mMaxPerColumn)
    {
       const float kCentering = 7;
       float w, h;
       GetPopupDimensions(w, h);
+      
+      mModalList.SetPosition(0, 0);
       ofPushMatrix();
-      ofPushStyle();
       ofTranslate(mX, mY + kCentering - h * mSliderVal);
       mModalList.Render();
+      ofPopMatrix();
+
+      ofPushStyle();
       ofFill();
       ofColor color = IDrawableModule::GetColor(GetModuleParent()->GetModuleType());
-      color.a = 25;
+      color.a = 80;
       ofSetColor(color);
-      ofRect(0,h * mSliderVal - kCentering,w,mHeight);
-      ofPopStyle();
-      ofPopMatrix();
+      ofRect(mX, mY, w, mHeight);
+      ofPopStyle();      
    }
 }
 
@@ -167,14 +170,21 @@ void DropdownList::DrawDropdown(int w, int h)
 {
    ofPushStyle();
 
+   int hoverIndex = GetItemIndex(mModalList.GetMouseX(), mModalList.GetMouseY());
+
    ofSetColor(0,0,0);
    ofFill();
    ofRect(0,0,w,h);
-   ofNoFill();
    for (int i=0; i<mElements.size(); ++i)
    {
       int col = i/mMaxPerColumn;
       
+      if (i == hoverIndex)
+      {
+         ofSetColor(100, 100, 100, 100);
+         ofRect(mModalWidth * col, (i%mMaxPerColumn)*itemSpacing, mModalWidth, itemSpacing);
+      }
+
       if (mVar && mElements[i].mValue == *mVar)
          ofSetColor(255,255,0);
       else
@@ -184,6 +194,7 @@ void DropdownList::DrawDropdown(int w, int h)
    }
    ofSetColor(255,255,255);
    ofSetLineWidth(.5f);
+   ofNoFill();
    ofRect(0,0,w,h);
 
    ofPopStyle();
@@ -199,7 +210,7 @@ void DropdownList::GetDimensions(float& width, float& height)
 
 void DropdownList::DropdownClicked(int x, int y)
 {
-   int index = y/itemSpacing + x/mModalWidth * mMaxPerColumn;
+   int index = GetItemIndex(x,y);
    if (index >= 0 && index < mElements.size())
       SetIndex(index, K(forceUpdate));
 }
@@ -214,12 +225,22 @@ void DropdownList::OnClicked(int x, int y, bool right)
    if (mElements.empty())
       return;
 
-   float thisx,thisy;
-   GetPosition(thisx,thisy);
+   UpdateModalListPosition();
+   TheSynth->PushModalFocusItem(&mModalList);
+}
+
+int DropdownList::GetItemIndex(int x, int y)
+{
+   return y / itemSpacing + x / mModalWidth * mMaxPerColumn;
+}
+
+void DropdownList::UpdateModalListPosition()
+{
+   float thisx, thisy;
+   GetPosition(thisx, thisy);
    if (mDrawLabel)
       thisx += mLabelSize;
-   mModalList.SetPosition(thisx,thisy+itemSpacing);
-   TheSynth->PushModalFocusItem(&mModalList);
+   mModalList.SetPosition(thisx, thisy + itemSpacing);
 }
 
 bool DropdownList::MouseMoved(float x, float y)
@@ -388,6 +409,21 @@ void DropdownList::LoadState(FileStreamIn& in, bool shouldSetValue)
 void DropdownListModal::DrawModule()
 {
    mOwner->DrawDropdown(mWidth, mHeight);
+}
+
+string DropdownListModal::GetHoveredLabel()
+{
+   int index = mOwner->GetItemIndex((int)mMouseX, (int)mMouseY);
+   if (index >= 0 && index < mOwner->GetNumValues())
+      return mOwner->GetElement(index).mLabel;
+   return "";
+}
+
+bool DropdownListModal::MouseMoved(float x, float y)
+{
+   mMouseX = x;
+   mMouseY = y;
+   return false;
 }
 
 void DropdownListModal::OnClicked(int x, int y, bool right)
