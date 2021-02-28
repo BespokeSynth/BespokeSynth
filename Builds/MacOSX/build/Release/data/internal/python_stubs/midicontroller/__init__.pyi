@@ -4,7 +4,7 @@ def get(path) -> midicontroller:
    pass
 
 class midicontroller:
-   def add_connection(this, messageType, control, channel, controlPath):
+   def set_connection(this, messageType, control, channel, controlPath):
       pass
 
    def send_note(this, pitch, velocity, forceNoteOn = false, channel = -1, page = 0):
@@ -17,5 +17,8 @@ class midicontroller:
       pass
 
    def send_data(this, a, b, c, page = 0):
+      pass
+
+   def add_script_listener(this, script):
       pass
 

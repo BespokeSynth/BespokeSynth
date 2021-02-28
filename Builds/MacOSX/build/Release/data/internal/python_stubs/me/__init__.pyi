@@ -45,3 +45,6 @@ from __future__ import annotations
    def set_num_note_outputs(num):
       pass
 
+   def connect_osc_input(port):
+      pass
+

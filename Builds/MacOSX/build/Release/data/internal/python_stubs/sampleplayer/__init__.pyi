@@ -10,3 +10,6 @@ class sampleplayer:
    def fill(this, data):
       pass
 
+   def play_cue(this, cue):
+      pass
+
