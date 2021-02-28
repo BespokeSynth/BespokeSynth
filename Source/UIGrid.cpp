@@ -66,7 +66,7 @@ void UIGrid::Render()
          float x = GetX(i,j);
          float y = GetY(j);
 
-         float data = mData[j][i];
+         float data = mData[GetDataIndex(i,j)];
          if (data)
          {
             ofFill();
@@ -191,14 +191,15 @@ void UIGrid::OnClicked(int x, int y, bool right)
 
    float clickHeight, clickWidth;
    GridCell cell = GetGridCellAt(x, y, &clickHeight, &clickWidth);
-   float oldValue = mData[cell.mRow][cell.mCol];
+   int dataIndex = GetDataIndex(cell.mCol, cell.mRow);
+   float oldValue = mData[dataIndex];
 
    if (mGridMode == kMultislider)// || mGridMode == kHorislider)
    {
-      if (mData[cell.mRow][cell.mCol] > 0 && mClickClearsToZero)
-         mData[cell.mRow][cell.mCol] = 0;
+      if (mData[dataIndex] > 0 && mClickClearsToZero)
+         mData[dataIndex] = 0;
       else
-         mData[cell.mRow][cell.mCol] = mGridMode == kMultislider ? clickHeight : clickWidth;
+         mData[dataIndex] = mGridMode == kMultislider ? clickHeight : clickWidth;
    }
    else
    {
@@ -208,29 +209,29 @@ void UIGrid::OnClicked(int x, int y, bool right)
       {
          for (int i=0; i<MAX_GRID_SIZE; ++i)
          {
-            if (mData[i][cell.mCol] != 0)
-               val = mData[i][cell.mCol];
+            if (mData[GetDataIndex(cell.mCol, i)] != 0)
+               val = mData[GetDataIndex(cell.mCol, i)];
          }
       }
       
-      if (mData[cell.mRow][cell.mCol] == mStrength && mClickClearsToZero)
-         mData[cell.mRow][cell.mCol] = 0;
+      if (mData[dataIndex] == mStrength && mClickClearsToZero)
+         mData[dataIndex] = 0;
       else
-         mData[cell.mRow][cell.mCol] = val;
+         mData[dataIndex] = val;
    }
    if (mSingleColumn)
    {
       for (int i=0; i<MAX_GRID_SIZE; ++i)
       {
          if (i != cell.mRow)
-            mData[i][cell.mCol] = 0;
+            mData[GetDataIndex(cell.mCol, i)] = 0;
       }
    }
    
    if (mListener)
-      mListener->GridUpdated(this, cell.mCol, cell.mRow, mData[cell.mRow][cell.mCol], oldValue);
+      mListener->GridUpdated(this, cell.mCol, cell.mRow, mData[dataIndex], oldValue);
 
-   mHoldVal = mData[cell.mRow][cell.mCol];
+   mHoldVal = mData[dataIndex];
    mHoldCol = cell.mCol;
    mHoldRow = cell.mRow;
 }
@@ -239,8 +240,8 @@ void UIGrid::MouseReleased()
 {
    if (mClick && mMomentary)
    {
-      float oldValue = mData[mHoldRow][mHoldCol];
-      mData[mHoldRow][mHoldCol] = 0;
+      float oldValue = mData[GetDataIndex(mHoldCol, mHoldRow)];
+      mData[GetDataIndex(mHoldCol, mHoldRow)] = 0;
       mListener->GridUpdated(this, mHoldCol, mHoldRow, 0, oldValue);
    }
    
@@ -269,26 +270,27 @@ bool UIGrid::MouseMoved(float x, float y)
          cell.mRow = mHoldRow;
       }
       
-      float oldValue = mData[cell.mRow][cell.mCol];
+      int dataIndex = GetDataIndex(cell.mCol, cell.mRow);
+      float oldValue = mData[dataIndex];
       
       if (mGridMode == kMultislider && mHoldVal != 0)
       {
-         mData[cell.mRow][cell.mCol] = clickHeight;
+         mData[dataIndex] = clickHeight;
       }
       else if (mGridMode == kHorislider && mSingleColumn)
       {
          float val = mHoldVal;
          for (int i=0; i<MAX_GRID_SIZE; ++i)
          {
-            if (mData[i][cell.mCol] != 0)
-               val = mData[i][cell.mCol];
+            if (mData[GetDataIndex(cell.mCol, i)] != 0)
+               val = mData[GetDataIndex(cell.mCol, i)];
          }
          
-         mData[cell.mRow][cell.mCol] = val;
+         mData[dataIndex] = val;
       }
       else
       {
-         mData[cell.mRow][cell.mCol] = mHoldVal;
+         mData[dataIndex] = mHoldVal;
       }
       
       if (mSingleColumn)
@@ -296,12 +298,12 @@ bool UIGrid::MouseMoved(float x, float y)
          for (int i=0; i<MAX_GRID_SIZE; ++i)
          {
             if (i != cell.mRow)
-               mData[i][cell.mCol] = 0;
+               mData[GetDataIndex(cell.mCol, i)] = 0;
          }
       }
       
       if (mListener)
-         mListener->GridUpdated(this, cell.mCol, cell.mRow, mData[cell.mRow][cell.mCol], oldValue);
+         mListener->GridUpdated(this, cell.mCol, cell.mRow, mData[dataIndex], oldValue);
    }
    
    return false;
@@ -317,7 +319,7 @@ bool UIGrid::MouseScrolled(int x, int y, float scrollX, float scrollY)
       GridCell cell = GetGridCellAt(x, y, &clickHeight, &clickWidth);
       if (isMouseOver)
       {
-         float& data = mData[cell.mRow][cell.mCol];
+         float& data = mData[GetDataIndex(cell.mCol, cell.mRow)];
          if (!mSingleColumn || data > 0)
          {
             float oldValue = data;
@@ -341,31 +343,31 @@ void UIGrid::SetGrid(int cols, int rows)
 
 void UIGrid::Clear()
 {
-   bzero(mData, MAX_GRID_SIZE*MAX_GRID_SIZE*sizeof(int));
+   mData.fill(0);
 }
 
 float& UIGrid::GetVal(int col, int row)
 {
    col = ofClamp(col, 0, MAX_GRID_SIZE-1);
    row = ofClamp(row, 0, MAX_GRID_SIZE-1);
-   return mData[row][col];
+   return mData[GetDataIndex(col,row)];
 }
 
 void UIGrid::SetVal(int col, int row, float val, bool notifyListener)
 {
    col = ofClamp(col, 0, MAX_GRID_SIZE-1);
    row = ofClamp(row, 0, MAX_GRID_SIZE-1);
-   if (val != mData[row][col])
+   if (val != mData[GetDataIndex(col,row)])
    {
-      float oldValue = mData[row][col];
-      mData[row][col] = val;
+      float oldValue = mData[GetDataIndex(col,row)];
+      mData[GetDataIndex(col,row)] = val;
       
       if (mSingleColumn)
       {
          for (int i=0; i<MAX_GRID_SIZE; ++i)
          {
             if (i != row)
-               mData[i][col] = 0;
+               mData[GetDataIndex(col, i)] = 0;
          }
       }
       
@@ -415,12 +417,9 @@ void UIGrid::SaveState(FileStreamOut& out)
 {
    out << kSaveStateRev;
    
-   for (int i=0; i<MAX_GRID_SIZE; ++i)
+   for (int i=0; i<MAX_GRID_SIZE*MAX_GRID_SIZE; ++i)
    {
-      for (int j=0; j<MAX_GRID_SIZE; ++j)
-      {
-         out << mData[i][j];
-      }
+      out << mData[i];
    }
 }
 
@@ -439,10 +438,11 @@ void UIGrid::LoadState(FileStreamIn& in, bool shouldSetValue)
    {
       for (int j=0; j<gridSize; ++j)
       {
-         float oldVal = mData[i][j];
-         in >> mData[i][j];
+         int dataIndex = GetDataIndex(j, i);
+         float oldVal = mData[dataIndex];
+         in >> mData[dataIndex];
          if (mListener)
-            mListener->GridUpdated(this, j, i, mData[i][j], oldVal);
+            mListener->GridUpdated(this, j, i, mData[dataIndex], oldVal);
       }
    }
 }

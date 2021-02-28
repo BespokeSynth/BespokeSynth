@@ -31,6 +31,8 @@ public:
    string GetTitleLabel() override { return "note looper"; }
    void CreateUIControls() override;
    void SetEnabled(bool enabled) override { mEnabled = enabled; }
+   bool IsResizable() const override { return true; }
+   void Resize(float w, float h) override;
 
    //INoteReceiver
    void PlayNote(double time, int pitch, int velocity, int voiceIdx = -1, ModulationParameters modulation = ModulationParameters()) override;
@@ -48,8 +50,10 @@ public:
    //IButtonListener
    void ButtonClicked(ClickButton* button) override;
    
-   virtual void LoadLayout(const ofxJSONElement& moduleInfo) override;
-   virtual void SetUpFromSaveData() override;
+   void LoadLayout(const ofxJSONElement& moduleInfo) override;
+   void SetUpFromSaveData() override;
+   void SaveState(FileStreamOut& out) override;
+   void LoadState(FileStreamIn& in) override;
    
 private:
    double GetCurPos(double time) const;
@@ -78,6 +82,13 @@ private:
       int mVelocity;
    };
 
+   struct SavedPattern
+   {
+      ClickButton* mStoreButton;
+      ClickButton* mLoadButton;
+      vector<CanvasElement*> mNotes;
+   };
+
    float mWidth;
    float mHeight;
    int mMinRow;
@@ -97,5 +108,7 @@ private:
 
    std::array<ModulationParameters, kNumVoices+1> mVoiceModulations {};
    std::array<int, kNumVoices> mVoiceMap {};
+
+   std::array<SavedPattern, 4> mSavedPatterns;
 };
 

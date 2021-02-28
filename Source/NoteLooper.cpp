@@ -13,9 +13,10 @@
 #include "MidiController.h"
 #include "ModularSynth.h"
 #include "Profiler.h"
+#include "UIControlMacros.h"
 
 NoteLooper::NoteLooper()
-: mWidth(305)
+: mWidth(370)
 , mHeight(140)
 , mMinRow(127)
 , mMaxRow(0)
@@ -33,10 +34,23 @@ NoteLooper::NoteLooper()
 void NoteLooper::CreateUIControls()
 {
    IDrawableModule::CreateUIControls();
-   mWriteCheckbox = new Checkbox(this,"write",4,4,&mWrite);
-   mDeleteOrMuteCheckbox = new Checkbox(this, "del/mute", 4, 24, &mDeleteOrMute);
-   mNumMeasuresSlider = new IntSlider(this,"num bars",80,4,85,15,&mNumMeasures,1,8);   
-   mClearButton = new ClickButton(this, "clear", 80, 24);
+   float w, h;
+   UIBLOCK(80);
+   CHECKBOX(mWriteCheckbox, "write", &mWrite);
+   CHECKBOX(mDeleteOrMuteCheckbox, "del/mute", &mDeleteOrMute);
+   UIBLOCK_NEWCOLUMN();
+   INTSLIDER(mNumMeasuresSlider, "num bars", &mNumMeasures, 1, 8);
+   BUTTON(mClearButton, "clear");
+   ENDUIBLOCK(w,h);
+
+   UIBLOCK(w+10, 3, 45);
+   for (size_t i = 0; i < mSavedPatterns.size(); ++i)
+   {
+      BUTTON(mSavedPatterns[i].mStoreButton, ("store" + ofToString(i)).c_str());
+      BUTTON(mSavedPatterns[i].mLoadButton, ("load" + ofToString(i)).c_str());
+      UIBLOCK_NEWCOLUMN();
+   }
+   ENDUIBLOCK0();
 
    mCanvas = new Canvas(this, 3, 45, mWidth-6, mHeight-48, L(length, 1), L(rows, 128), L(cols, 16), &(NoteCanvasElement::Create));
    AddUIControl(mCanvas);
@@ -59,6 +73,20 @@ void NoteLooper::DrawModule()
    mNumMeasuresSlider->Draw();
    mDeleteOrMuteCheckbox->Draw();
    mClearButton->Draw();
+   for (size_t i = 0; i < mSavedPatterns.size(); ++i)
+   {
+      mSavedPatterns[i].mStoreButton->Draw();
+      mSavedPatterns[i].mLoadButton->Draw();
+      if (mSavedPatterns[i].mNotes.size() > 0)
+      {
+         ofPushStyle();
+         ofFill();
+         ofSetColor(0, 255, 0, 80);
+         ofRectangle rect = mSavedPatterns[i].mLoadButton->GetRect(K(local));
+         ofRect(rect);
+         ofPopStyle();
+      }
+   }
 
    if (mMinRow <= mMaxRow)
    {
@@ -67,6 +95,13 @@ void NoteLooper::DrawModule()
    }
    mCanvas->SetCursorPos(GetCurPos(gTime));
    mCanvas->Draw();
+}
+
+void NoteLooper::Resize(float w, float h)
+{
+   mWidth = MAX(w, 370);
+   mHeight = MAX(h, 140);
+   mCanvas->SetDimensions(mWidth - 6, mHeight - 48);
 }
 
 double NoteLooper::GetCurPos(double time) const
@@ -85,10 +120,8 @@ void NoteLooper::OnTransportAdvanced(float amount)
    }
 
    double cursorPlayTime = gTime;
-   if (Transport::sDoEventLookahead)
-      cursorPlayTime += Transport::sEventEarlyMs;
-   else
-      cursorPlayTime += amount * TheTransport->MsPerBar();
+   //don't use Transport::sEventEarlyMs, it makes it not work well for recording in realtime, and causes issues with stuck notes
+   cursorPlayTime += amount * TheTransport->MsPerBar();
    double curPos = GetCurPos(cursorPlayTime);
 
    if (mDeleteOrMute)
@@ -289,6 +322,30 @@ void NoteLooper::ButtonClicked(ClickButton* button)
          }
       }
       mCanvas->Clear();
+      mMinRow = 127;
+      mMaxRow = 0;
+   }
+   for (size_t i = 0; i < mSavedPatterns.size(); ++i)
+   {
+      if (button == mSavedPatterns[i].mStoreButton)
+         mSavedPatterns[i].mNotes = mCanvas->GetElements();
+
+      if (button == mSavedPatterns[i].mLoadButton)
+      {
+         mCanvas->Clear();
+         mMinRow = 127;
+         mMaxRow = 0;
+         for (auto& element : mSavedPatterns[i].mNotes)
+         {
+            mCanvas->AddElement(element);
+
+            int row = element->mRow;
+            if (row < mMinRow)
+               mMinRow = row;
+            if (row > mMaxRow)
+               mMaxRow = row;
+         }
+      }
    }
 }
 
@@ -318,4 +375,70 @@ void NoteLooper::SetUpFromSaveData()
    SetUpPatchCables(mModuleSaveData.GetString("target"));
 }
 
+namespace
+{
+   const int kSaveStateRev = 0;
+}
+
+void NoteLooper::SaveState(FileStreamOut& out)
+{
+   IDrawableModule::SaveState(out);
+
+   out << kSaveStateRev;
+
+   out << mWidth;
+   out << mHeight;
+
+   out << mMinRow;
+   out << mMaxRow;
+   
+   out << (int)mSavedPatterns.size();
+   for (size_t i = 0; i < mSavedPatterns.size(); ++i)
+   {
+      out << (int)mSavedPatterns[i].mNotes.size();
+      for (auto& note : mSavedPatterns[i].mNotes)
+      {
+         out << note->mCol;
+         out << note->mRow;
+         note->SaveState(out);
+      }
+   }
+}
+
+void NoteLooper::LoadState(FileStreamIn& in)
+{
+   IDrawableModule::LoadState(in);
+
+   if (!ModuleContainer::DoesModuleHaveMoreSaveData(in))
+      return;  //this was saved before we added versioning, bail out
+
+   int rev;
+   in >> rev;
+   LoadStateValidate(rev <= kSaveStateRev);
+
+   in >> mWidth;
+   in >> mHeight;
+   Resize(mWidth, mHeight);
+
+   in >> mMinRow;
+   in >> mMaxRow;
+
+   int numPatterns;
+   in >> numPatterns;
+   LoadStateValidate(numPatterns == mSavedPatterns.size());
+   for (size_t i = 0; i < mSavedPatterns.size(); ++i)
+   {
+      int numNotes;
+      in >> numNotes;
+      mSavedPatterns[i].mNotes.resize(numNotes);
+      for (int j = 0; j < numNotes; ++j)
+      {
+         int col, row;
+         in >> col;
+         in >> row;
+         mSavedPatterns[i].mNotes[j] = NoteCanvasElement::Create(mCanvas, col, row);
+         mSavedPatterns[i].mNotes[j]->LoadState(in);
+      }
+   }
+}
 

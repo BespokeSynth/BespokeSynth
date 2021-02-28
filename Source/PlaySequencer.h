@@ -64,6 +64,8 @@ public:
 
    virtual void LoadLayout(const ofxJSONElement& moduleInfo) override;
    virtual void SetUpFromSaveData() override;
+   void SaveState(FileStreamOut& out) override;
+   void LoadState(FileStreamIn& in) override;
 
 private:
    //IDrawableModule
@@ -120,4 +122,16 @@ private:
    };
 
    std::array<PlayLane, 16> mLanes;
+
+   struct SavedPattern
+   {
+      SavedPattern() : mNumMeasures(1), mHasSequence(false) {}
+      ClickButton* mStoreButton;
+      ClickButton* mLoadButton;
+      float mNumMeasures;
+      std::array<float, MAX_GRID_SIZE*MAX_GRID_SIZE> mData;
+      bool mHasSequence;
+   };
+
+   std::array<SavedPattern, 5> mSavedPatterns;
 };

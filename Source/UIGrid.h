@@ -65,6 +65,8 @@ public:
    void SetClickClearsToZero(bool set) { mClickClearsToZero = set; }
    void SetShouldDrawValue(bool draw) { mShouldDrawValue = draw; }
    void SetMomentary(bool momentary) { mMomentary = momentary; }
+   const std::array<float, MAX_GRID_SIZE*MAX_GRID_SIZE>& GetData() const { return mData; }
+   void SetData(std::array<float, MAX_GRID_SIZE*MAX_GRID_SIZE>& data) { mData = data; }
    
    enum GridMode
    {
@@ -93,6 +95,7 @@ private:
    void OnClicked(int x, int y, bool right) override;
    void GetDimensions(float& width, float& height) override { width = mWidth; height = mHeight; }
    
+   int GetDataIndex(int col, int row) { return col + row * MAX_GRID_SIZE; }
    float GetX(int col, int row) const;
    float GetY(int row) const;
 
@@ -111,7 +114,7 @@ private:
    float mHoldVal;
    int mHoldCol;
    int mHoldRow;
-   float mData[MAX_GRID_SIZE][MAX_GRID_SIZE];
+   std::array<float, MAX_GRID_SIZE*MAX_GRID_SIZE> mData;
    std::array<HighlightColBuffer, 10> mHighlightColBuffer;
    int mNextHighlightColPointer;
    int mMajorCol;

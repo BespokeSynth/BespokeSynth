@@ -21,7 +21,6 @@ PlaySequencer::PlaySequencer()
    , mNoteRepeat(false)
    , mLinkColumns(false)
    , mWidth(240)
-   , mHeight(225)
    , mUseLightVelocity(false)
    , mUseMedVelocity(false)
    , mClearLane(false)
@@ -58,6 +57,15 @@ void PlaySequencer::CreateUIControls()
    mGrid->SetFlip(true);
    mGrid->SetGridMode(UIGrid::kMultislider);
    mGrid->SetRestrictDragToRow(true);
+
+   UIBLOCK(3, mHeight+3, 45);
+   for (size_t i = 0; i < mSavedPatterns.size(); ++i)
+   {
+      BUTTON(mSavedPatterns[i].mStoreButton, ("store" + ofToString(i)).c_str());
+      BUTTON(mSavedPatterns[i].mLoadButton, ("load" + ofToString(i)).c_str());
+      UIBLOCK_NEWCOLUMN();
+   }
+   ENDUIBLOCK(width, mHeight);
 
    ofRectangle gridRect = mGrid->GetRect(true);
    for (size_t i = 0; i<mLanes.size(); ++i)
@@ -108,6 +116,20 @@ void PlaySequencer::DrawModule()
    mNumMeasuresSelector->Draw();
    for (size_t i = 0; i < mLanes.size(); ++i)
       mLanes[i].mMuteOrEraseCheckbox->Draw();
+   for (size_t i = 0; i < mSavedPatterns.size(); ++i)
+   {
+      mSavedPatterns[i].mStoreButton->Draw();
+      mSavedPatterns[i].mLoadButton->Draw();
+      if (mSavedPatterns[i].mHasSequence)
+      {
+         ofPushStyle();
+         ofFill();
+         ofSetColor(0, 255, 0, 80);
+         ofRectangle rect = mSavedPatterns[i].mLoadButton->GetRect(K(local));
+         ofRect(rect);
+         ofPopStyle();
+      }
+   }
 
    mGrid->Draw();
 
@@ -399,6 +421,11 @@ void PlaySequencer::OnGridButton(int x, int y, float velocity, IGridController* 
          if (x == 2 && y == 3 && mClearLane)
             mGrid->Clear();
 
+         if (x >= 4 && y == 0)
+            ButtonClicked(mSavedPatterns[x - 4].mStoreButton);
+         if (x >= 4 && y == 1)
+            ButtonClicked(mSavedPatterns[x - 4].mLoadButton);
+
          if (y >= 4)
          {
             int pitch = x / 2 + (7 - y) * 4;
@@ -452,6 +479,30 @@ void PlaySequencer::OnGridButton(int x, int y, float velocity, IGridController* 
 
 void PlaySequencer::ButtonClicked(ClickButton* button)
 {
+   for (size_t i = 0; i < mSavedPatterns.size(); ++i)
+   {
+      if (button == mSavedPatterns[i].mStoreButton)
+      {
+         mSavedPatterns[i].mNumMeasures = mNumMeasures;
+         mSavedPatterns[i].mData = mGrid->GetData();
+         mSavedPatterns[i].mHasSequence = false;
+         for (auto& cell : mSavedPatterns[i].mData)
+         {
+            if (cell != 0)
+            {
+               mSavedPatterns[i].mHasSequence = true;
+               break;
+            }
+         }
+      }
+
+      if (button == mSavedPatterns[i].mLoadButton)
+      {
+         mNumMeasures = mSavedPatterns[i].mNumMeasures;
+         UpdateNumMeasures(mNumMeasures);
+         mGrid->SetData(mSavedPatterns[i].mData);
+      }
+   }
 }
 
 void PlaySequencer::DropdownUpdated(DropdownList* list, int oldVal)
@@ -484,4 +535,56 @@ void PlaySequencer::SetUpFromSaveData()
    mVelocityFull = mModuleSaveData.GetFloat("velocity_full");
    mVelocityMed = mModuleSaveData.GetFloat("velocity_med");
    mVelocityLight = mModuleSaveData.GetFloat("velocity_light");
+}
+
+namespace
+{
+   const int kSaveStateRev = 0;
+}
+
+void PlaySequencer::SaveState(FileStreamOut& out)
+{
+   IDrawableModule::SaveState(out);
+
+   out << kSaveStateRev;
+
+   mGrid->SaveState(out);
+
+   out << (int)mSavedPatterns.size();
+   for (size_t i = 0; i < mSavedPatterns.size(); ++i)
+   {
+      out << mSavedPatterns[i].mNumMeasures;
+      out << mSavedPatterns[i].mHasSequence;
+      out << (int)mSavedPatterns[i].mData.size();
+      for (auto& data : mSavedPatterns[i].mData)
+         out << data;
+   }
+}
+
+void PlaySequencer::LoadState(FileStreamIn& in)
+{
+   IDrawableModule::LoadState(in);
+
+   if (!ModuleContainer::DoesModuleHaveMoreSaveData(in))
+      return;  //this was saved before we added versioning, bail out
+
+   int rev;
+   in >> rev;
+   LoadStateValidate(rev <= kSaveStateRev);
+
+   mGrid->LoadState(in);
+
+   int numPatterns;
+   in >> numPatterns;
+   LoadStateValidate(numPatterns == mSavedPatterns.size());
+   for (size_t i = 0; i < mSavedPatterns.size(); ++i)
+   {
+      in >> mSavedPatterns[i].mNumMeasures;
+      in >> mSavedPatterns[i].mHasSequence;
+      int size;
+      in >> size;
+      LoadStateValidate(size == (int)mSavedPatterns[i].mData.size());
+      for (int j = 0; j < size; ++j)
+         in >> mSavedPatterns[i].mData[j];
+   }
 }
