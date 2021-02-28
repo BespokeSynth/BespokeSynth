@@ -65,7 +65,7 @@ private:
    void SetModuleGridLights();
    void DrawDisplayModuleControls();
    void DrawLowerModuleSelector();
-   void SetDisplayModule(IDrawableModule* module);
+   void SetDisplayModule(IDrawableModule* module, bool addToHistory);
    void DrawControls(vector<IUIControl*> controls, bool sliders, float yPos);
    void UpdateControlList();
    void AddFavoriteControl(IUIControl* control);
@@ -108,9 +108,12 @@ private:
    vector<IUIControl*> mSpawnModuleControls;
    bool mNewButtonHeld;
    bool mDeleteButtonHeld;
+   bool mModulationButtonHeld;
    bool mNoteHeldState[128];
    IDrawableModule* mHeldModule;
    bool mAllowRepatch;
+   vector<IDrawableModule*> mModuleHistory;
+   int mModuleHistoryPosition;
    
    enum class ScreenDisplayMode
    {

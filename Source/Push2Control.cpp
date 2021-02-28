@@ -26,6 +26,7 @@
 #include "QuickSpawnMenu.h"
 #include "PatchCableSource.h"
 #include "DropdownList.h"
+#include "FloatSliderLFOControl.h"
 
 bool Push2Control::sDrawingPush2Display = false;
 NVGcontext* Push2Control::sVG = nullptr;
@@ -41,7 +42,8 @@ namespace
    const int kMetronomeButton = 9;
    const int kNewButton = 87;
    const int kDeleteButton = 118;
-   const int kRepatchButton = 86;
+   const int kAutomateButton = 89;
+   const int kCircleButton = 86;
    const int kAddDeviceButton = 52;
    const int kAboveScreenButtonRow = 102;
    const int kBelowScreenButtonRow = 20;
@@ -51,6 +53,8 @@ namespace
    const int kRightButton = 45;
    const int kNoteButton = 50;
    const int kSessionButton = 51;
+   const int kPageLeftButton = 62;
+   const int kPageRightButton = 63;
 }
 
 Push2Control::Push2Control()
@@ -63,8 +67,10 @@ Push2Control::Push2Control()
 , mModuleListOffsetSmoothed(0)
 , mNewButtonHeld(false)
 , mDeleteButtonHeld(false)
+, mModulationButtonHeld(false)
 , mHeldModule(nullptr)
 , mAllowRepatch(false)
+, mModuleHistoryPosition(-1)
 , mScreenDisplayMode(ScreenDisplayMode::kNormal)
 , mGridControlModule(nullptr)
 , mDisplayModuleCanControlGrid(false)
@@ -135,7 +141,8 @@ void Push2Control::DrawModule()
 
 void Push2Control::DrawModuleUnclipped()
 {
-   if (mDisplayModule != nullptr && !mDisplayModule->IsDeleted() && !sDrawingPush2Display)
+   if (mDisplayModule != nullptr && !mDisplayModule->IsDeleted() && !sDrawingPush2Display &&
+       mDisplayModule->GetOwningContainer() != nullptr && mDisplayModule->IsShowing())
    {
       ofPushMatrix();
       ofPushStyle();
@@ -304,17 +311,22 @@ void Push2Control::DrawToFramebuffer(NVGcontext* vg, NVGLUframebuffer* fb, float
 
       string stateInfo = "";
       if (mAllowRepatch)
-         stateInfo = "repatching...";
+         stateInfo = "repatch mode: hold a source module and tap the target module";
       if (mNewButtonHeld)
          stateInfo = "tap control to add favorite...";
       if (mDeleteButtonHeld)
          stateInfo = "tap control to remove favorite...";
+      if (mModulationButtonHeld)
+         stateInfo = "tap a control to add/edit LFO...";
 
       if (stateInfo != "")
       {
          ofPushStyle();
-         ofSetColor(255, 255, 255, ofMap(sin(gTime / 1000 * PI * 2), -1, 1, 150, 255));
-         DrawTextBold(stateInfo, 5, 21, 20);
+         ofFill();
+         ofSetColor(175, 255, 221);
+         ofRect(1, 120, ableton::Push2DisplayBitmap::kWidth-2, ableton::Push2DisplayBitmap::kHeight - 120);
+         ofSetColor(0, 0, 0, ofMap(sin(gTime / 1000 * PI * 2), -1, 1, 170, 255));
+         DrawTextBold(stateInfo, 10, 147, 20);
          ofPopStyle();
       }
    }
@@ -348,12 +360,15 @@ void Push2Control::DrawToFramebuffer(NVGcontext* vg, NVGLUframebuffer* fb, float
    SetLed(kMidiMessage_Control, kTapTempoButton, (gHoveredModule != mDisplayModule && gHoveredModule != nullptr) ? 127 : 0, 0);
    SetLed(kMidiMessage_Control, kNewButton, 127, mNewButtonHeld ? 0 : -1);
    SetLed(kMidiMessage_Control, kDeleteButton, 127, mDeleteButtonHeld ? 0 : -1);
-   SetLed(kMidiMessage_Control, kRepatchButton, 8, mAllowRepatch ? 11 : -1);
+   SetLed(kMidiMessage_Control, kAutomateButton, 126, mModulationButtonHeld ? 0 : -1);
+   SetLed(kMidiMessage_Control, kCircleButton, 8, mAllowRepatch ? 11 : -1);
    SetLed(kMidiMessage_Control, kAddDeviceButton, 127, mScreenDisplayMode == ScreenDisplayMode::kAddModule ? 0 : -1);
    SetLed(kMidiMessage_Control, kUpButton, 127);
    SetLed(kMidiMessage_Control, kDownButton, 127);
    SetLed(kMidiMessage_Control, kLeftButton, 127);
    SetLed(kMidiMessage_Control, kRightButton, 127);
+   SetLed(kMidiMessage_Control, kPageLeftButton, mModuleHistoryPosition > 0 ? 127 : 0);
+   SetLed(kMidiMessage_Control, kPageRightButton, mModuleHistoryPosition < mModuleHistory.size()-1 ? 127 : 0);
    if (mGridControlModule != nullptr)
    {
       SetLed(kMidiMessage_Control, kNoteButton, 127, 10);
@@ -454,7 +469,7 @@ void Push2Control::DrawDisplayModuleControls()
 {
    if (mDisplayModule != nullptr && mDisplayModule->IsDeleted())
    {
-      SetDisplayModule(nullptr);
+      SetDisplayModule(nullptr, false);
       return;
    }
 
@@ -639,7 +654,7 @@ void Push2Control::RenderPush2Display()
    sPush2Bridge->Flip(mPixels);
 }
 
-void Push2Control::SetDisplayModule(IDrawableModule* module)
+void Push2Control::SetDisplayModule(IDrawableModule* module, bool addToHistory)
 {
    mDisplayModule = module;
    if (dynamic_cast<IPush2GridController*>(mDisplayModule) != nullptr)
@@ -649,6 +664,14 @@ void Push2Control::SetDisplayModule(IDrawableModule* module)
    mModuleColumnOffset = 0;
    mModuleColumnOffsetSmoothed = 0;
    UpdateControlList();
+
+   if (module != nullptr && addToHistory)
+   {
+      while (mModuleHistory.size() > mModuleHistoryPosition + 1)
+         mModuleHistory.pop_back();
+      mModuleHistory.push_back(module);
+      ++mModuleHistoryPosition;
+   }
 }
 
 void Push2Control::UpdateControlList()
@@ -741,6 +764,18 @@ void Push2Control::OnMidiNote(MidiNote& note)
                AddFavoriteControl(mSliderControls[controlIndex]);
             if (mDeleteButtonHeld)
                RemoveFavoriteControl(mSliderControls[controlIndex]);
+            if (mModulationButtonHeld)
+            {
+               FloatSlider* slider = dynamic_cast<FloatSlider*>(mSliderControls[controlIndex]);
+               if (slider != nullptr)
+               {
+                  bool hadLFO = (slider->GetLFO() != nullptr);
+                  FloatSliderLFOControl* lfo = slider->AcquireLFO();
+                  if (!hadLFO)
+                     lfo->SetEnabled(true);
+                  SetDisplayModule(lfo, true);
+               }
+            }
          }
       }
       
@@ -765,7 +800,7 @@ void Push2Control::OnMidiNote(MidiNote& note)
          int gridY = gridIndex / 8;
          gridIndex = gridX + (7-gridY) * 8;
          if (mModuleGrid[gridIndex] != nullptr)
-            SetDisplayModule(mModuleGrid[gridIndex]);
+            SetDisplayModule(mModuleGrid[gridIndex], true);
          
          if (mHeldModule != nullptr)
          {
@@ -806,7 +841,7 @@ void Push2Control::OnMidiNote(MidiNote& note)
                   module->SetPosition(newModuleCenter.x-rect.width/2, newModuleCenter.y-rect.height/2);
                   mSpawnLists.GetDropdowns()[i]->GetList()->SetValue(-1);
                   mScreenDisplayMode = ScreenDisplayMode::kNormal;
-                  SetDisplayModule(module);
+                  SetDisplayModule(module, true);
                   break;
                }
             }
@@ -880,7 +915,7 @@ void Push2Control::OnMidiControl(MidiControl& control)
       int moduleIndex = control.mControl - kBelowScreenButtonRow + round(mModuleListOffset);
       if (control.mValue > 0 && moduleIndex < mModules.size())
       {
-         SetDisplayModule(mModules[moduleIndex]);
+         SetDisplayModule(mModules[moduleIndex], true);
       }
    }
    else if (control.mControl == kNewButton)
@@ -891,7 +926,11 @@ void Push2Control::OnMidiControl(MidiControl& control)
    {
       mDeleteButtonHeld = control.mValue > 0;
    }
-   else if (control.mControl == kRepatchButton)
+   else if (control.mControl == kAutomateButton)
+   {
+      mModulationButtonHeld = control.mValue > 0;
+   }
+   else if (control.mControl == kCircleButton)
    {
       if (control.mValue > 0)
          mAllowRepatch = !mAllowRepatch;
@@ -899,7 +938,7 @@ void Push2Control::OnMidiControl(MidiControl& control)
    else if (control.mControl == kTapTempoButton)
    {
       if (gHoveredModule != nullptr && gHoveredModule != mDisplayModule)
-         SetDisplayModule(gHoveredModule);
+         SetDisplayModule(gHoveredModule, true);
    }
    else if (control.mControl == kAddDeviceButton)
    {
@@ -941,6 +980,24 @@ void Push2Control::OnMidiControl(MidiControl& control)
             ofVec2f pos = mDisplayModule->GetPosition();
             pos += direction * 50;
             mDisplayModule->SetPosition(pos.x, pos.y);
+         }
+      }
+   }
+   else if (control.mControl == kPageLeftButton || control.mControl == kPageRightButton)
+   {
+      if (control.mValue > 0)
+      {
+         int direction = 0;
+         if (control.mControl == kPageLeftButton)
+            direction -= 1;
+         if (control.mControl == kPageRightButton)
+            direction += 1;
+
+         int newHistoryPos = mModuleHistoryPosition + direction;
+         if (newHistoryPos >= 0 && newHistoryPos < mModuleHistory.size())
+         {
+            mModuleHistoryPosition = newHistoryPos;
+            SetDisplayModule(mModuleHistory[mModuleHistoryPosition], false);
          }
       }
    }
