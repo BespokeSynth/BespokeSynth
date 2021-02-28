@@ -15,10 +15,11 @@
 #include "OpenFrameworksPort.h"
 #include "TextEntry.h"
 #include "Slider.h"
+#include "INoteReceiver.h"
 
 #define OSC_OUTPUT_MAX_PARAMS 50
 
-class OSCOutput : public IDrawableModule, public ITextEntryListener, public IFloatSliderListener
+class OSCOutput : public IDrawableModule, public ITextEntryListener, public IFloatSliderListener, public INoteReceiver
 {
 public:
    OSCOutput();
@@ -29,6 +30,10 @@ public:
    void Poll() override;
    string GetTitleLabel() override { return "osc output"; }
    void CreateUIControls() override;
+   
+   //INoteReceiver
+   void PlayNote(double time, int pitch, int velocity, int voiceIdx, ModulationParameters modulation);
+   void SendCC(int control, int value, int voiceIdx = -1) {}
    
    void FloatSliderUpdated(FloatSlider* slider, float oldVal) override;
    void TextEntryComplete(TextEntry* entry) override;
@@ -47,6 +52,17 @@ private:
    list<TextEntry*> mLabelEntry;
    float mParams[OSC_OUTPUT_MAX_PARAMS];
    list<FloatSlider*> mSliders;
+
+   string mOscOutAddress;
+   TextEntry* mOscOutAddressEntry;
+   int mOscOutPort;
+   TextEntry* mOscOutPortEntry;
+
+   string mNoteOutLabel;
+   TextEntry* mNoteOutLabelEntry;
    
    OSCSender mOscOut;
+
+   float mWidth;
+   float mHeight;
 };

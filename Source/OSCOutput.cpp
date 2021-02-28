@@ -11,8 +11,11 @@
 #include "OSCOutput.h"
 #include "SynthGlobals.h"
 #include "ModularSynth.h"
+#include "UIControlMacros.h"
 
 OSCOutput::OSCOutput()
+: mOscOutAddress("127.0.0.1")
+, mOscOutPort(7000)
 {
    for (int i=0; i<OSC_OUTPUT_MAX_PARAMS; ++i)
    {
@@ -30,18 +33,34 @@ void OSCOutput::Init()
 {
    IDrawableModule::Init();
    
-   mOscOut.connect( "127.0.0.1", 56456 );
+   mOscOut.connect(mOscOutAddress, mOscOutPort);
 }
 
 void OSCOutput::CreateUIControls()
 {
    IDrawableModule::CreateUIControls();
    
-   for (int i=0; i<5; ++i)
+   UIBLOCK0();
+   TEXTENTRY(mOscOutAddressEntry, "osc out address", 16, &mOscOutAddress); UIBLOCK_SHIFTRIGHT();
+   TEXTENTRY_NUM(mOscOutPortEntry, "osc out port", 6, &mOscOutPort, 0, 99999); UIBLOCK_NEWLINE();
+   UIBLOCK_SHIFTY(5);
+   for (int i=0; i<8; ++i)
    {
-      mLabelEntry.push_back(new TextEntry(this, ("label"+ofToString(i)).c_str(), 5, 5 + i*18, 10, mLabels[i]));
-      mSliders.push_back(new FloatSlider(this, mLabels[i], 100, 5 + i * 18, 130, 15, &mParams[i], 0, 1));
+      TextEntry* labelEntry;
+      TEXTENTRY(labelEntry, ("label" + ofToString(i)).c_str(), 10, mLabels[i]);
+      mLabelEntry.push_back(labelEntry);
+      UIBLOCK_SHIFTRIGHT();
+
+      FloatSlider* oscSlider;
+      FLOATSLIDER(oscSlider, mLabels[i], &mParams[i], 0, 1);
+      mSliders.push_back(oscSlider);
+      UIBLOCK_NEWLINE();
    }
+   UIBLOCK_SHIFTY(5);
+   TEXTENTRY(mNoteOutLabelEntry, "note out address", 10, &mNoteOutLabel);
+   ENDUIBLOCK(mWidth, mHeight);
+
+   mNoteOutLabelEntry->DrawLabel(true);
 }
 
 void OSCOutput::Poll()
@@ -53,17 +72,36 @@ void OSCOutput::DrawModule()
 {
    if (Minimized() || IsVisible() == false)
       return;
+
+   mOscOutAddressEntry->Draw();
+   mOscOutPortEntry->Draw();
    
    for (auto* entry : mLabelEntry)
       entry->Draw();
    for (auto* slider : mSliders)
       slider->Draw();
+
+   mNoteOutLabelEntry->Draw();
+}
+
+void OSCOutput::PlayNote(double time, int pitch, int velocity, int voiceIdx, ModulationParameters modulation)
+{
+   if (mNoteOutLabel.size() > 0)
+   {
+      OSCMessage msg(("/bespoke/"+mNoteOutLabel+"/").c_str());
+      float pitchOut = pitch;
+      if (modulation.pitchBend != nullptr)
+         pitchOut += modulation.pitchBend->GetValue(0);
+      msg.addFloat32(pitchOut);
+      msg.addFloat32(velocity);
+      mOscOut.send(msg);
+   }
 }
 
 void OSCOutput::GetModuleDimensions(float& w, float& h)
 {
-   w = 235;
-   h = (int)mSliders.size() * 18 + 10;
+   w = mWidth;
+   h = mHeight;
 }
 
 void OSCOutput::FloatSliderUpdated(FloatSlider* slider, float oldVal)
@@ -89,6 +127,12 @@ void OSCOutput::TextEntryComplete(TextEntry* entry)
          (*sliderIter)->SetName(mLabels[i]);
       }
       ++i;
+   }
+
+   if (entry == mOscOutAddressEntry || entry == mOscOutPortEntry)
+   {
+      mOscOut.disconnect();
+      mOscOut.connect(mOscOutAddress, mOscOutPort);
    }
 }
 
