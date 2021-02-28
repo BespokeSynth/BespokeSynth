@@ -60,8 +60,12 @@ bool IUIControl::TestHover(int x, int y)
 
 void IUIControl::CheckHover(int x, int y)
 {
-   if (TestHover(x, y) && (gHoveredUIControl == nullptr || !gHoveredUIControl->IsMouseDown()))
+   static int sLastHoveredUIControlFrame = 0;
+   if (TheSynth->GetFrameCount() != sLastHoveredUIControlFrame && TestHover(x, y) && (gHoveredUIControl == nullptr || !gHoveredUIControl->IsMouseDown()))
+   {
       gHoveredUIControl = this;
+      sLastHoveredUIControlFrame = TheSynth->GetFrameCount();
+   }
 }
 
 void IUIControl::DrawHover()

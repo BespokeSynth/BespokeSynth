@@ -790,6 +790,17 @@ void Looper::DrawModule()
    {
       DrawBeatwheel();
    }
+
+   if (mRecorder != nullptr && mRecorder->GetNextCommitTarget() == this)
+   {
+      ofPushStyle();
+      float w, h;
+      GetDimensions(w, h);
+      ofSetColor(255, 255, 255, 200);
+      ofSetLineWidth(3);
+      ofRect(0, 0, w, h);
+      ofPopStyle();
+   }
 }
 
 void Looper::DrawBeatwheel()
@@ -922,7 +933,7 @@ void Looper::SetNumBars(int numBars)
 
 void Looper::BakeVolume()
 {
-   mUndoBuffer->CopyFrom(mBuffer);
+   mUndoBuffer->CopyFrom(mBuffer, mLoopLength);
    for (int ch=0; ch<mBuffer->NumActiveChannels(); ++ch)
       Mult(mBuffer->GetChannel(ch), mVol*mVol, mLoopLength);
    mVol = 1;
@@ -1006,7 +1017,7 @@ void Looper::SwapBuffers(Looper* otherLooper)
 void Looper::CopyBuffer(Looper* sourceLooper)
 {
    assert(sourceLooper);
-   mBuffer->CopyFrom(sourceLooper->mBuffer);
+   mBuffer->CopyFrom(sourceLooper->mBuffer, mLoopLength);
    SetLoopLength(sourceLooper->mLoopLength);
    mNumBars = sourceLooper->mNumBars;
 }
@@ -1106,7 +1117,7 @@ void Looper::ButtonClicked(ClickButton* button)
 {
    if (button == mClearButton)
    {
-      mUndoBuffer->CopyFrom(mBuffer);
+      mUndoBuffer->CopyFrom(mBuffer, mLoopLength);
       Clear();
    }
    if (button == mMergeButton && mRecorder)

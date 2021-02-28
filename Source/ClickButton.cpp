@@ -11,8 +11,11 @@
 #include "SynthGlobals.h"
 
 ClickButton::ClickButton(IButtonListener* owner, const char* label, int x, int y)
-: mClickTime(-9999)
+: mWidth(40)
+, mHeight(15)
+, mClickTime(-9999)
 , mOwner(owner)
+, mDisplayText(true)
 {
    assert(owner);
    SetLabel(label);
@@ -34,7 +37,7 @@ ClickButton::~ClickButton()
 void ClickButton::SetLabel(const char* label)
 {
    SetName(label);
-   mWidth = GetStringWidth(label)+5;
+   mWidth = GetStringWidth(label) + 3 + .25f * strnlen(label, 50);
 }
 
 void ClickButton::Render()
@@ -59,8 +62,11 @@ void ClickButton::Render()
    ofRect(mX,mY,w,h);
    ofNoFill();
 
-   ofSetColor(textColor);
-   DrawTextNormal(Name(), mX+2, mY+12);
+   if (mDisplayText)
+   {
+      ofSetColor(textColor);
+      DrawTextNormal(Name(), mX + 2, mY + 12);
+   }
    
    ofPopStyle();
    

@@ -68,6 +68,7 @@ ModularSynth::ModularSynth()
 , mFrameRate(0)
 , mQuickSpawn(nullptr)
 , mScheduledEnvelopeEditorSpawnDisplay(nullptr)
+, mFrameCount(0)
 , mIsLoadingModule(false)
 , mLastClapboardTime(-9999)
 , mScrollMultiplierHorizontal(1)
@@ -462,6 +463,8 @@ void ModularSynth::Draw(void* vg)
       ofLine(centerX, centerY, centerX + mSpaceMouseInfo.mPan.x * 40, centerY + mSpaceMouseInfo.mPan.y * 40);
    }
    ofPopStyle();
+
+   ++mFrameCount;
 }
 
 void ModularSynth::PostRender()

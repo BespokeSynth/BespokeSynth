@@ -137,6 +137,7 @@ public:
    const ofRectangle& GetDrawRect() const { return mDrawRect; }
    void SetPixelRatio(double ratio) { mPixelRatio = ratio; }
    double GetPixelRatio() const { return mPixelRatio; }
+   long GetFrameCount() { return mFrameCount; }
 
    void ZoomView(float zoomAmount, bool fromMouse);
    void PanView(float x, float y);
@@ -310,6 +311,7 @@ private:
    
    CriticalSection mRenderLock;
    float mFrameRate;
+   long mFrameCount;
    
    ModuleContainer mModuleContainer;
    

@@ -18,9 +18,12 @@
 #include "VinylTempoControl.h"
 #include "FillSaveDropdown.h"
 #include "PatchCableSource.h"
+#include "UIControlMacros.h"
 
 LooperRecorder::LooperRecorder()
 : IAudioProcessor(gBufferSize)
+, mWidth(235)
+, mHeight(125)
 , mRecordBuffer(MAX_BUFFER_SIZE)
 , mNumBars(1)
 , mNumBarsSelector(nullptr)
@@ -45,6 +48,7 @@ LooperRecorder::LooperRecorder()
 , mOutputTarget(nullptr)
 , mCommitDelay(0)
 , mCommitDelaySlider(nullptr)
+, mNextCommitTargetIndex(0)
 , mFreeRecording(false)
 , mFreeRecordingCheckbox(nullptr)
 , mStartFreeRecordTime(0)
@@ -53,31 +57,56 @@ LooperRecorder::LooperRecorder()
 , mRecorderMode(kRecorderMode_Record)
 , mModeSelector(nullptr)
 , mWriteBuffer(gBufferSize)
-, mBarRecordTime(0)
-, mBarRecordButton(nullptr)
 {
    mQuietInputRamp.SetValue(1);
+}
+
+namespace
+{
+   const float kBufferSegmentWidth = 30;
+   const float kBufferHeight = 50;
 }
 
 void LooperRecorder::CreateUIControls()
 {
    IDrawableModule::CreateUIControls();
-   mNumBarsSelector = new DropdownList(this,"length",97,3,&mNumBars);
-   mResampAndSetButton = new ClickButton(this,"resample & set key", -1, -1);
-   mResampleButton = new ClickButton(this,"resample", -1, -1);
-   mOrigSpeedButton = new ClickButton(this,"orig speed", 3, 57);
-   mDoubleTempoButton = new ClickButton(this,"2xtempo",-1,-1);
-   mHalfTempoButton = new ClickButton(this,".5tempo",-1,-1);
-   mShiftMeasureButton = new ClickButton(this,"shift",-1,-1);
-   mHalfShiftButton = new ClickButton(this,"half",-1,-1);
-   mShiftDownbeatButton = new ClickButton(this,"downbeat",-1,-1);
-   mModeSelector = new RadioButton(this,"mode",162,3,((int*)(&mRecorderMode)));
-   mClearOverdubButton = new ClickButton(this,"clear",-1,-1);
-   mSnapPitchButton = new ClickButton(this,"snap to pitch",-1,-1);
-   mCommitDelaySlider = new FloatSlider(this,"delay",-1,-1,70,15,&mCommitDelay,0,1);
-   mFreeRecordingCheckbox = new Checkbox(this,"free rec",97,86,&mFreeRecording);
-   mCancelFreeRecordButton = new ClickButton(this,"cancel",mFreeRecordingCheckbox,kAnchor_Right);
-   mBarRecordButton = new ClickButton(this,"bar rec",mCancelFreeRecordButton,kAnchor_Right);
+   
+   mCommit1BarButton = new ClickButton(this, "1", 3 + kBufferSegmentWidth*3, 3);
+   mCommit2BarsButton = new ClickButton(this, "2", 3 + kBufferSegmentWidth * 2, 3);
+   mCommit4BarsButton = new ClickButton(this, "4", 3 + kBufferSegmentWidth, 3);
+   mCommit8BarsButton = new ClickButton(this, "8", 3, 3);
+
+   float width, height;
+
+   UIBLOCK(kBufferSegmentWidth*4 + 6, 3, 60);
+   DROPDOWN(mNumBarsSelector, "length", &mNumBars, 50);
+   BUTTON(mDoubleTempoButton, "2xtempo");
+   BUTTON(mHalfTempoButton, ".5tempo");
+   //BUTTON(mShiftMeasureButton, "shift"); UIBLOCK_SHIFTUP(); UIBLOCK_SHIFTX(30);
+   //BUTTON(mHalfShiftButton, "half"); UIBLOCK_NEWLINE();
+   //BUTTON(mShiftDownbeatButton, "downbeat");
+   INTSLIDER(mNextCommitTargetSlider, "target", &mNextCommitTargetIndex, 0, 3);
+   UIBLOCK_NEWCOLUMN();
+   UIBLOCK_PUSHSLIDERWIDTH(80);
+   DROPDOWN(mModeSelector, "mode", ((int*)(&mRecorderMode)), 60);
+   FLOATSLIDER(mCommitDelaySlider, "delay", &mCommitDelay, 0, 1);
+   BUTTON(mClearOverdubButton, "clear");
+   CHECKBOX(mFreeRecordingCheckbox, "free rec", &mFreeRecording);
+   BUTTON(mCancelFreeRecordButton, "cancel free rec");
+   ENDUIBLOCK(width, height);
+
+   mWidth = MAX(mWidth, width);
+   mHeight = MAX(mHeight, height);
+
+   UIBLOCK(3, kBufferHeight+6);
+   BUTTON(mOrigSpeedButton, "orig speed");
+   BUTTON(mSnapPitchButton, "snap to pitch");
+   BUTTON(mResampleButton, "resample");
+   BUTTON(mResampAndSetButton, "resample & set key");
+   ENDUIBLOCK(width, height);
+
+   mWidth = MAX(mWidth, width);
+   mHeight = MAX(mHeight, height);   
    
    mNumBarsSelector->AddLabel(" 1 ",1);
    mNumBarsSelector->AddLabel(" 2 ",2);
@@ -90,19 +119,15 @@ void LooperRecorder::CreateUIControls()
    mModeSelector->AddLabel("record", kRecorderMode_Record);
    mModeSelector->AddLabel("overdub", kRecorderMode_Overdub);
    mModeSelector->AddLabel("loop", kRecorderMode_Loop);
-   
-   mDoubleTempoButton->PositionTo(mNumBarsSelector, kAnchor_Below);
-   mHalfTempoButton->PositionTo(mDoubleTempoButton, kAnchor_Below);
-   mShiftMeasureButton->PositionTo(mHalfTempoButton, kAnchor_Below);
-   mHalfShiftButton->PositionTo(mShiftMeasureButton, kAnchor_Right);
-   mShiftDownbeatButton->PositionTo(mShiftMeasureButton, kAnchor_Below);
-   
-   mCommitDelaySlider->PositionTo(mModeSelector, kAnchor_Below);
-   mClearOverdubButton->PositionTo(mCommitDelaySlider, kAnchor_Below);
-   
-   mSnapPitchButton->PositionTo(mOrigSpeedButton, kAnchor_Below);
-   mResampleButton->PositionTo(mSnapPitchButton, kAnchor_Below);
-   mResampAndSetButton->PositionTo(mResampleButton, kAnchor_Below);
+
+   mCommit1BarButton->SetDisplayText(false);
+   mCommit1BarButton->SetDimensions(kBufferSegmentWidth,kBufferHeight);
+   mCommit2BarsButton->SetDisplayText(false);
+   mCommit2BarsButton->SetDimensions(kBufferSegmentWidth*2, kBufferHeight);
+   mCommit4BarsButton->SetDisplayText(false);
+   mCommit4BarsButton->SetDimensions(kBufferSegmentWidth*3, kBufferHeight);
+   mCommit8BarsButton->SetDisplayText(false);
+   mCommit8BarsButton->SetDimensions(kBufferSegmentWidth*4, kBufferHeight);
    
    SyncCablesToLoopers();
 }
@@ -216,8 +241,6 @@ void LooperRecorder::SyncCablesToLoopers()
    if (!mLoopers.empty() && mLoopers[mLoopers.size()-1] != nullptr)
       ++numLoopers; //add an extra cable for an additional looper
    
-   numLoopers = MIN(9, numLoopers);
-   
    if (numLoopers == mLooperPatchCables.size())
       return;  //nothing to do
    
@@ -267,15 +290,22 @@ void LooperRecorder::PreRepatch(PatchCableSource* cableSource)
 void LooperRecorder::PostRepatch(PatchCableSource* cableSource, bool fromUserClick)
 {
    mLoopers.resize(mLooperPatchCables.size());
-   for (int i=0; i<mLooperPatchCables.size(); ++i)
+   int maxLooperIndex = 0;
+   for (int i=0; i< mLoopers.size(); ++i)
    {
       if (cableSource == mLooperPatchCables[i])
       {
          mLoopers[i] = dynamic_cast<Looper*>(mLooperPatchCables[i]->GetTarget());
          if (mLoopers[i])
+         {
             mLoopers[i]->SetRecorder(this);
+            maxLooperIndex = i;
+         }
       }
    }
+
+   if (maxLooperIndex > 0)
+      mNextCommitTargetSlider->SetExtents(0, maxLooperIndex);
    
    SyncCablesToLoopers();
 }
@@ -289,18 +319,18 @@ void LooperRecorder::DrawModule()
    mResampAndSetButton->Draw();
    mDoubleTempoButton->Draw();
    mHalfTempoButton->Draw();
-   mShiftMeasureButton->Draw();
-   mShiftDownbeatButton->Draw();
+   //mShiftMeasureButton->Draw();
+   //mHalfShiftButton->Draw();
+   //mShiftDownbeatButton->Draw();
    mModeSelector->Draw();
    mClearOverdubButton->Draw();
    mNumBarsSelector->Draw();
    mOrigSpeedButton->Draw();
    mSnapPitchButton->Draw();
-   mHalfShiftButton->Draw();
    mCommitDelaySlider->Draw();
    mFreeRecordingCheckbox->Draw();
    mCancelFreeRecordButton->Draw();
-   mBarRecordButton->Draw();
+   mNextCommitTargetSlider->Draw();
 
    if (mSpeed != 1)
    {
@@ -319,8 +349,50 @@ void LooperRecorder::DrawModule()
       DrawTextNormal(speed + detune,5,118);
    }
 
-   mRecordBuffer.Draw(3,3,90,50,gSampleRate,0);
+   if (mCommit1BarButton == gHoveredUIControl)
+      mCommit1BarButton->Draw();
+   if (mCommit2BarsButton == gHoveredUIControl)
+      mCommit2BarsButton->Draw();
+   if (mCommit4BarsButton == gHoveredUIControl)
+      mCommit4BarsButton->Draw();
+   if (mCommit8BarsButton == gHoveredUIControl)
+      mCommit8BarsButton->Draw();
+
    ofPushStyle();
+   float originalCornerRoundness = gCornerRoundness;
+   gCornerRoundness = 0;
+   int sampsPerBar = abs(int(TheTransport->MsPerBar() / 1000 * gSampleRate));
+   for (int i = 0; i < 4; ++i)   //segments
+   {
+      int bars = 1;
+      int barOffset = 0;
+      if (i == 1)
+      {
+         barOffset = 1;
+      }
+      if (i == 2)
+      {
+         bars = 2;
+         barOffset = 2;
+      }
+      if (i == 3)
+      {
+         bars = 4;
+         barOffset = 4;
+      }
+      mRecordBuffer.Draw(3+(3-i)*kBufferSegmentWidth, 3, kBufferSegmentWidth, kBufferHeight, sampsPerBar*bars, -1, sampsPerBar*barOffset);
+   }
+
+   ofSetColor(0, 0, 0, 20);
+   for (int i = 1; i < 4; ++i)
+   {
+      float x = 3 + i * kBufferSegmentWidth;
+      ofLine(x, 3, x, 3 + kBufferHeight);
+   }
+   gCornerRoundness = originalCornerRoundness;   
+   ofPopStyle();
+
+   /*ofPushStyle();
    ofVec2f center(48,28);
    float radius = 25;
    ofSetColor(255,255,255,100*gModuleDrawAlpha);
@@ -328,19 +400,10 @@ void LooperRecorder::DrawModule()
    DrawCircleHash(center, (TheTransport->GetMeasurePos(gTime) + TheTransport->GetMeasure(gTime) % mNumBars) / mNumBars, 3, radius * .7f, radius);
    for (int i=0; i<mNumBars; ++i)
       DrawCircleHash(center, float(i)/mNumBars, 1, radius * .8f, radius);
-   ofPopStyle();
-   
-   if (mBarRecordTime > 0)
-   {
-      ofPushStyle();
-      ofSetColor(255, 0, 0, 50);
-      ofFill();
-      ofRect(mBarRecordButton->GetRect(true));
-      ofPopStyle();
-   }
+   ofPopStyle();*/
    
    if (mDrawDebug)
-      mRecordBuffer.Draw(0,162,800,100,-1,0);
+      mRecordBuffer.Draw(0,162,800,100);
    
    DrawTextNormal("loopers:",125,109);
 }
@@ -446,14 +509,6 @@ void LooperRecorder::SyncLoopLengths()
 
 void LooperRecorder::Commit(Looper* looper)
 {
-   if (mBarRecordTime > 0)
-   {
-      double time = gTime - mBarRecordTime;
-      float bars = time / TheTransport->MsPerBar();
-      mNumBars = ofClamp(powf(2, ceilf(log2f(bars - .5f))), 1, 16);
-      mBarRecordTime = 0;  //reset
-   }
-   
    mCommitToLooper = looper;
 }
 
@@ -543,7 +598,6 @@ void LooperRecorder::CancelFreeRecord()
 {
    mFreeRecording = false;
    mStartFreeRecordTime = 0;
-   mBarRecordTime = 0;
 }
 
 void LooperRecorder::ButtonClicked(ClickButton* button)
@@ -649,9 +703,24 @@ void LooperRecorder::ButtonClicked(ClickButton* button)
    
    if (button == mCancelFreeRecordButton)
       CancelFreeRecord();
-   
-   if (button == mBarRecordButton)
-      mBarRecordTime = gTime;
+
+   if (button == mCommit1BarButton ||
+       button == mCommit2BarsButton ||
+       button == mCommit4BarsButton ||
+       button == mCommit8BarsButton)
+   {
+      int numBars = 1;
+      if (button == mCommit1BarButton)  numBars = 1;
+      if (button == mCommit2BarsButton) numBars = 2;
+      if (button == mCommit4BarsButton) numBars = 4; 
+      if (button == mCommit8BarsButton) numBars = 8;
+
+      mNumBars = numBars;
+      if (mNextCommitTargetIndex < (int)mLoopers.size())
+         Commit(mLoopers[mNextCommitTargetIndex]);
+      if (mLoopers.size() > 0)
+         mNextCommitTargetIndex = (mNextCommitTargetIndex + 1) % mLoopers.size();
+   }
 }
 
 void LooperRecorder::CheckboxUpdated(Checkbox* checkbox)

@@ -597,10 +597,16 @@ void IDrawableModule::OnClicked(int x, int y, bool right)
       }
    }
    
-   for (int i=0; i<mUIControls.size(); ++i)
-      mUIControls[i]->TestClick(x,y,right);
-   for (int i=0; i<mChildren.size(); ++i)
-      mChildren[i]->TestClick(x, y, right);
+   for (int i = 0; i < mUIControls.size(); ++i)
+   {
+      if (mUIControls[i]->TestClick(x, y, right))
+         break;
+   }
+   for (int i = 0; i < mChildren.size(); ++i)
+   {
+      if (mChildren[i]->TestClick(x, y, right))
+         break;
+   }
    
    for (auto* seq : ControlSequencer::sControlSequencers)
    {

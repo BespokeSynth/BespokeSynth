@@ -51,6 +51,7 @@ public:
    void ResetSpeed();
    float GetCommitDelay() { return mCommitDelay; }
    RollingBuffer* GetRecordBuffer() { return &mRecordBuffer; }
+   Looper* GetNextCommitTarget() { return (mNextCommitTargetIndex < (int)mLoopers.size()) ? mLoopers[mNextCommitTargetIndex] : nullptr; }
    
    void StartFreeRecord();
    void EndFreeRecord();
@@ -83,7 +84,6 @@ public:
    void LoadState(FileStreamIn& in) override;
    
 private:
-   void DoCommit();
    void SyncLoopLengths();
    void UpdateSpeed();
    float AdjustedRootForSpeed();
@@ -94,9 +94,11 @@ private:
    
    //IDrawableModule
    void DrawModule() override;
-   void GetModuleDimensions(float& width, float& height) override { width = 235; height = 124; }
+   void GetModuleDimensions(float& width, float& height) override { width = mWidth; height = mHeight; }
    bool Enabled() const override { return mEnabled; }
    
+   float mWidth;
+   float mHeight;
    RollingBuffer mRecordBuffer;
    vector<Looper*> mLoopers;
    int mNumBars;
@@ -126,8 +128,12 @@ private:
    ChannelBuffer mWriteBuffer;
    Looper* mCommitToLooper;
    vector<PatchCableSource*> mLooperPatchCables;
-   double mBarRecordTime;
-   ClickButton* mBarRecordButton;
+   ClickButton* mCommit1BarButton;
+   ClickButton* mCommit2BarsButton;
+   ClickButton* mCommit4BarsButton;
+   ClickButton* mCommit8BarsButton;
+   IntSlider* mNextCommitTargetSlider;
+   int mNextCommitTargetIndex;
    
    bool mFreeRecording;
    Checkbox* mFreeRecordingCheckbox;
@@ -141,7 +147,7 @@ private:
       kRecorderMode_Loop
    };
    RecorderMode mRecorderMode;
-   RadioButton* mModeSelector;
+   DropdownList* mModeSelector;
 };
 
 

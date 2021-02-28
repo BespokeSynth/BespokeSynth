@@ -29,6 +29,8 @@ public:
    void Render() override;
    void MouseReleased() override;
    bool MouseMoved(float x, float y) override;
+   void SetDisplayText(bool display) { mDisplayText = display; }
+   void SetDimensions(float width, float height) { mWidth = width; mHeight = height; }
 
    //IUIControl
    void SetFromMidiCC(float slider) override;
@@ -36,7 +38,7 @@ public:
    float GetMidiValue() override;
    string GetDisplayValue(float val) const override { return val > 0 ? "click" : "nothing"; }
    int GetNumValues() override { return 2; }
-   void GetDimensions(float& width, float& height) override { width = mWidth; height = 15; }
+   void GetDimensions(float& width, float& height) override { width = mWidth; height = mHeight; }
    void SaveState(FileStreamOut& out) override {}
    void LoadState(FileStreamIn& in, bool shouldSetValue) override {}
    bool IsSliderControl() override { return false; }
@@ -49,9 +51,11 @@ private:
    bool ButtonLit();
 
    void OnClicked(int x, int y, bool right) override;
-   int mWidth;
+   float mWidth;
+   float mHeight;
    double mClickTime;
    IButtonListener* mOwner;
+   bool mDisplayText;
 };
 
 #endif /* defined(__modularSynth__ClickButton__) */

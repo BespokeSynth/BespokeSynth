@@ -23,10 +23,10 @@ public:
    void WriteChunk(float* samples, int size, int channel);
    void Write(float sample, int channel);
    void ClearBuffer();
-   void Draw(int x, int y, int width, int height, int samples /*= -1*/, int channel);
+   void Draw(int x, int y, int width, int height, int length = -1, int channel = -1, int delayOffset = 0);
    int Size() { return mBuffer.BufferSize(); }
    ChannelBuffer* GetRawBuffer() { return &mBuffer; }
-   int GetRawBufferOffset(int channel) { return mOffsetToStart[channel]; }
+   int GetRawBufferOffset(int channel) { return mOffsetToNow[channel]; }
    void Accum(int samplesAgo, float sample, int channel);
    void SetNumChannels(int channels) { mBuffer.SetNumActiveChannels(channels); }
    int NumChannels() const { return mBuffer.NumActiveChannels(); }
@@ -34,7 +34,7 @@ public:
    void SaveState(FileStreamOut& out);
    void LoadState(FileStreamIn& in);
 private:
-   int mOffsetToStart[ChannelBuffer::kMaxNumChannels];
+   int mOffsetToNow[ChannelBuffer::kMaxNumChannels];
    ChannelBuffer mBuffer;
 };
 
