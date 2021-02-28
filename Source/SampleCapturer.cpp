@@ -284,5 +284,5 @@ void SampleCapturer::LoadState(FileStreamIn& in)
 
    int readLength;
    for (int i = 0; i < mSamples.size(); ++i)
-      mSamples[i].mBuffer.Load(in, readLength, true);
+      mSamples[i].mBuffer.Load(in, readLength, ChannelBuffer::LoadMode::kSetBufferSize);
 }

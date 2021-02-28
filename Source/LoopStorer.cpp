@@ -297,7 +297,7 @@ void LoopStorer::LoadState(FileStreamIn& in)
          if (sampleData->mBufferLength != -1)
          {
             int readLength;
-            sampleData->mBuffer->Load(in, readLength, false);
+            sampleData->mBuffer->Load(in, readLength, ChannelBuffer::LoadMode::kAnyBufferSize);
             assert(sampleData->mBufferLength == sampleData->mBuffer->BufferSize());
          }
       }

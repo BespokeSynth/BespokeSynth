@@ -330,7 +330,7 @@ void Sample::LoadState(FileStreamIn& in)
    if (mNumSamples > 0)
    {
       int readLength;
-      mData.Load(in, readLength, true);
+      mData.Load(in, readLength, ChannelBuffer::LoadMode::kSetBufferSize);
       assert(readLength == mNumSamples);
       for (int ch=0; ch<mData.NumActiveChannels(); ++ch)
       {

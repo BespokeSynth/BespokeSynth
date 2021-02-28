@@ -34,8 +34,15 @@ public:
    void Reset() { Clear(); mRecentActiveChannels = mActiveChannels; SetNumActiveChannels(1); }
    void Resize(int bufferSize);
    
+   enum class LoadMode
+   {
+      kSetBufferSize,
+      kRequireExactBufferSize,
+      kAnyBufferSize
+   };
+
    void Save(FileStreamOut& out, int writeLength);
-   void Load(FileStreamIn& in, int &readLength, bool setBufferSize);
+   void Load(FileStreamIn& in, int &readLength, LoadMode loadMode);
    
    static const int kMaxNumChannels = 2;
    

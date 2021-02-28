@@ -163,17 +163,19 @@ void ChannelBuffer::Save(FileStreamOut& out, int writeLength)
    }
 }
 
-void ChannelBuffer::Load(FileStreamIn& in, int& readLength, bool setBufferSize)
+void ChannelBuffer::Load(FileStreamIn& in, int& readLength, LoadMode loadMode)
 {
    int rev;
    in >> rev;
    LoadStateValidate(rev == kSaveStateRev);
    
    in >> readLength;
-   if (setBufferSize)
+   if (loadMode == LoadMode::kSetBufferSize)
       Setup(readLength);
-   else
+   else if (loadMode == LoadMode::kRequireExactBufferSize)
       assert(readLength == mBufferSize);
+   else
+      assert(readLength <= mBufferSize);
    in >> mActiveChannels;
    for (int i = 0; i < mActiveChannels; ++i)
    {
