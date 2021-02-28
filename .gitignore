@@ -365,3 +365,13 @@ Builds/MacOSX/build/Release/data/youtube_temp/
 
 # explicitly allow spacemouse lib, so it doesn't get excluded by *.lib above
 !*/3DxWare/Lib/**
+
+Builds/MacOSX/build/Release/data/internal/python_installed
+
+Builds/MacOSX/BespokeSynth.xcodeproj/
+
+Builds/MacOSX/Icon.icns
+
+Builds/MacOSX/Info-App.plist
+
+Builds/LinuxMakefile/Makefile
