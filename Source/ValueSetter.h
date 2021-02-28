@@ -29,7 +29,7 @@ public:
    
    void SetEnabled(bool enabled) override { mEnabled = enabled; }
    
-   //INoteReceiver
+   //IPulseReceiver
    void OnPulse(double time, float velocity, int flags) override;
    
    void ButtonClicked(ClickButton* button) override;

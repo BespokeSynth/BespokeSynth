@@ -251,9 +251,15 @@ void TextEntry::OnKeyPressed(int key, bool isRepeat)
       if (mCaretPosition > 0)
       {
          for (int i=mCaretPosition-1; i<len; ++i)
-            mString[i] = mString[i+1];
+            mString[i] = mString[i + 1];
          --mCaretPosition;
       }
+   }
+   else if (key == KeyPress::deleteKey)
+   {
+      int len = (int)strlen(mString);
+      for (int i = mCaretPosition; i < len; ++i)
+         mString[i] = mString[i + 1];
    }
    else if (key == OF_KEY_ESC)
    {
@@ -261,12 +267,16 @@ void TextEntry::OnKeyPressed(int key, bool isRepeat)
    }
    else if (key == OF_KEY_LEFT)
    {
-      if (mCaretPosition > 0)
+      if (GetKeyModifiers() & kModifier_Command)
+         mCaretPosition = 0;
+      else if (mCaretPosition > 0)
          --mCaretPosition;
    }
    else if (key == OF_KEY_RIGHT)
    {
-      if (mCaretPosition < strlen(mString))
+      if (GetKeyModifiers() & kModifier_Command)
+         mCaretPosition = strlen(mString);
+      else if (mCaretPosition < strlen(mString))
          ++mCaretPosition;
    }
    else if (key == 'V' && GetKeyModifiers() == kModifier_Command)
@@ -274,6 +284,14 @@ void TextEntry::OnKeyPressed(int key, bool isRepeat)
       juce::String clipboard = SystemClipboard::getTextFromClipboard();
       for (int i=0; i<clipboard.length(); ++i)
          AddCharacter(clipboard[i]);
+   }
+   else if (key == KeyPress::homeKey)
+   {
+      mCaretPosition = 0;
+   }
+   else if (key == KeyPress::endKey)
+   {
+      mCaretPosition = strlen(mString);
    }
    else
    {

@@ -52,6 +52,8 @@ void Compressor::CreateUIControls()
    ENDUIBLOCK(mWidth, mHeight);
 
    mRatioSlider->SetMode(FloatSlider::kSquare);
+   mAttackSlider->SetMode(FloatSlider::kSquare);
+   mReleaseSlider->SetMode(FloatSlider::kSquare);
    mOutputAdjustSlider->SetMode(FloatSlider::kSquare);
    
    mEnv.setAttack(mAttack);

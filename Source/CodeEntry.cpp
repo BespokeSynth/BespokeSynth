@@ -711,7 +711,7 @@ void CodeEntry::OnKeyPressed(int key, bool isRepeat)
       {
          RemoveSelectedText();
       }
-      else if (mCaretPosition > 0)
+      else
       {
          if (mCaretPosition == 0)
             UpdateString(mString.substr(1));

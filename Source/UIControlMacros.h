@@ -58,8 +58,8 @@
 
 #define BUTTON(button,name) button = new ClickButton(UICONTROL_BASICS(name)); lastUIControl = button; UIBLOCK_SHIFTDOWN(); UIBLOCK_UPDATEEXTENTS();
 
-#define TEXTENTRY(entry,name,length,var) entry = new TextEntry(UICONTROL_BASICS(name),length,var); UIBLOCK_SHIFTDOWN(); UIBLOCK_UPDATEEXTENTS();
-#define TEXTENTRY_NUM(entry,name,length,var,min,max) entry = new TextEntry(UICONTROL_BASICS(name),length,var,min,max); UIBLOCK_SHIFTDOWN(); UIBLOCK_UPDATEEXTENTS();
+#define TEXTENTRY(entry,name,length,var) entry = new TextEntry(UICONTROL_BASICS(name),length,var); lastUIControl = entry; UIBLOCK_SHIFTDOWN(); UIBLOCK_UPDATEEXTENTS();
+#define TEXTENTRY_NUM(entry,name,length,var,min,max) entry = new TextEntry(UICONTROL_BASICS(name),length,var,min,max); lastUIControl = entry; UIBLOCK_SHIFTDOWN(); UIBLOCK_UPDATEEXTENTS();
 
 #define UICONTROL_CUSTOM(var,instance) var = instance; lastUIControl = var; UIBLOCK_SHIFTDOWN(); UIBLOCK_UPDATEEXTENTS();
 
