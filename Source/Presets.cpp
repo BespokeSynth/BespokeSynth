@@ -40,6 +40,8 @@ void Presets::CreateUIControls()
    mBlendTimeSlider = new FloatSlider(this,"blend ms",5,20,120,15,&mBlendTime,0,5000);
    mCurrentPresetSelector = new DropdownList(this,"preset",85,3,&mCurrentPreset);
    
+   mSaveButton->SetShowing(false);
+
    for (int i=0; i<100; ++i)
       mCurrentPresetSelector->AddLabel(ofToString(i).c_str(), i);
    
@@ -217,6 +219,8 @@ void Presets::OnTransportAdvanced(float amount)
 
 void Presets::PostRepatch(PatchCableSource* cableSource, bool fromUserClick)
 {
+   if (TheSynth->IsLoadingState())
+      return;
    mPresetModules.clear();
    for (auto cable : mModuleCable->GetPatchCables())
       mPresetModules.push_back(static_cast<IDrawableModule*>(cable->GetTarget()));
