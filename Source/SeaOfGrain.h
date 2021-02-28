@@ -44,6 +44,7 @@ public:
    //IDrawableModule
    void FilesDropped(vector<string> files, int x, int y) override;
    void SampleDropped(int x, int y, Sample* sample) override;
+   bool CanDropSample() const override { return true; }
    void Poll() override;
    
    //IClickable

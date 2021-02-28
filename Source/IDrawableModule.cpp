@@ -251,6 +251,9 @@ void IDrawableModule::DrawFrame(float w, float h, bool drawModule, float& titleB
    {
       dimModule = true;
    }
+
+   if (TheSynth->GetHeldSample() != nullptr && !CanDropSample())
+      dimModule = true;
    
    if (dimModule)
       gModuleDrawAlpha *= .2f;

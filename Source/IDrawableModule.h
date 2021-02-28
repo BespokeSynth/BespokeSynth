@@ -84,6 +84,7 @@ public:
    virtual void SetEnabled(bool enabled) {}
    virtual bool CanMinimize() { return true; }
    virtual void SampleDropped(int x, int y, Sample* sample) {}
+   virtual bool CanDropSample() const { return false; }
    void BasePoll();  //calls poll, using this to guarantee base poll is always called
    bool IsWithinRect(const ofRectangle& rect);
    bool IsVisible();

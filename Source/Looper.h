@@ -60,6 +60,7 @@ public:
    void LockBufferMutex() { mBufferMutex.lock(); }
    void UnlockBufferMutex() { mBufferMutex.unlock(); }
    void SampleDropped(int x, int y, Sample* sample) override;
+   bool CanDropSample() const override { return true; }
    
    void Poll() override;
    void Exit() override;
