@@ -11,6 +11,8 @@
 #include <time.h>
 #if BESPOKE_WINDOWS
 #include <intrin.h>
+#else
+#include <chrono>
 #endif
 
 Profiler::Cost Profiler::sCosts[];
@@ -27,9 +29,8 @@ namespace {
       //printf_s("TSC_AUX was %x\n", ui);
       return i;
 #else
-      uint64_t rax,rdx;
-      asm volatile ( "rdtscp\n" : "=a" (rax), "=d" (rdx), "=c" (aux) : : );
-      return (rdx << 32) + rax;
+      std::chrono::high_resolution_clock::time_point time_point = std::chrono::high_resolution_clock::now();
+      return time_point.time_since_epoch().count();
 #endif
    }
 }
