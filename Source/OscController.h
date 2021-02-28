@@ -35,6 +35,7 @@ public:
    void Connect();
    void oscMessageReceived(const OSCMessage& msg) override;
    void SendValue(int page, int control, float value, bool forceNoteOn = false, int channel = -1) override;
+   int AddControl(string address, bool isFloat);
    
    bool IsInputConnected() override { return mConnected; }
    bool Reconnect() override { Connect(); return mConnected; }
@@ -47,6 +48,7 @@ public:
 private:
    MidiDeviceListener* mListener;
 
+   int FindControl(string address);
    void ConnectOutput();
    
    string mOutAddress;

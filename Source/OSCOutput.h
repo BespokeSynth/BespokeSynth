@@ -30,7 +30,11 @@ public:
    void Poll() override;
    string GetTitleLabel() override { return "osc output"; }
    void CreateUIControls() override;
-   
+
+   void SendFloat(string address, float val);
+   void SendInt(string address, int val);
+   void SendString(string address, string val);
+
    //INoteReceiver
    void PlayNote(double time, int pitch, int velocity, int voiceIdx, ModulationParameters modulation);
    void SendCC(int control, int value, int voiceIdx = -1) {}

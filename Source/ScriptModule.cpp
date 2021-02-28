@@ -53,6 +53,7 @@ ScriptModule::ScriptModule()
 , mD(0)
 , mNextLineToExecute(-1)
 , mInitExecutePriority(0)
+, mOscInputPort(-1)
 {
    CheckIfPythonEverSuccessfullyInitialized();
    if (TheSynth->IsLoadingState() && sHasPythonEverSuccessfullyInitialized)
@@ -62,6 +63,8 @@ ScriptModule::ScriptModule()
    
    mScriptModuleIndex = sScriptModules.size();
    sScriptModules.push_back(this);
+
+   OSCReceiver::addListener(this);
    
    Transport::sDoEventLookahead = true;   //scripts require lookahead to be able to schedule on time
 }
@@ -420,6 +423,15 @@ void ScriptModule::Poll()
          mScheduledMethodCall[i].time = -1;
       }
    }
+
+   if (mMidiMessageQueue.size() > 0)
+   {
+      mMidiMessageQueueMutex.lock();
+      for (string& methodCall : mMidiMessageQueue)
+         RunCode(gTime, methodCall);
+      mMidiMessageQueue.clear();
+      mMidiMessageQueueMutex.unlock();
+   }
 }
 
 //static
@@ -633,6 +645,41 @@ void ScriptModule::SetNumNoteOutputs(int num)
       cableSource->SetManualPosition(0, 30+20*(int)mExtraNoteOutputs.size());
       mExtraNoteOutputs.push_back(cableSource);
    }
+}
+
+void ScriptModule::ConnectOscInput(int port)
+{
+   if (port != mOscInputPort)
+   {
+      mOscInputPort = port;
+      OSCReceiver::disconnect();
+      OSCReceiver::connect(port);
+   }
+}
+
+void ScriptModule::oscMessageReceived(const OSCMessage& msg)
+{
+   string address = msg.getAddressPattern().toString().toStdString();
+   string messageString = address;
+
+   for (int i = 0; i < msg.size(); ++i)
+   {
+      if (msg[i].isFloat32())
+         messageString += " " + ofToString(msg[i].getFloat32());
+      if (msg[i].isInt32())
+         messageString += " " + ofToString(msg[i].getInt32());
+      if (msg[i].isString())
+         messageString += " " + msg[i].getString().toStdString();
+   }
+
+   RunCode(gTime, "on_osc(\""+ messageString +"\")");
+}
+
+void ScriptModule::MidiReceived(MidiMessageType messageType, int control, float value, int channel)
+{
+   mMidiMessageQueueMutex.lock();
+   mMidiMessageQueue.push_back("on_midi(" + ofToString((int)messageType) + ", " + ofToString(control) + ", " + ofToString(value) + ", " + ofToString(channel) + ")");
+   mMidiMessageQueueMutex.unlock();
 }
 
 void ScriptModule::ButtonClicked(ClickButton* button)
@@ -962,6 +1009,8 @@ void ScriptModule::FixUpCode(string& code)
    ofStringReplace(code, "on_pulse(", "on_pulse__"+ prefix +"(");
    ofStringReplace(code, "on_note(", "on_note__"+ prefix +"(");
    ofStringReplace(code, "on_grid_button(", "on_grid_button__"+ prefix +"(");
+   ofStringReplace(code, "on_osc(", "on_osc__" + prefix + "(");
+   ofStringReplace(code, "on_midi(", "on_midi__" + prefix + "(");
    ofStringReplace(code, "this.", GetThisName()+".");
    ofStringReplace(code, "me.", GetThisName() + ".");
 }

@@ -73,6 +73,7 @@ class Monome;
 class MidiController;
 class GridController;
 class INonstandardController;
+class ScriptModule;
 
 struct UIControlConnection
 {
@@ -251,6 +252,7 @@ public:
    void UseNegativeEdge(bool use) { mUseNegativeEdge = use; }
    void AddListener(MidiDeviceListener* listener, int page);
    void RemoveListener(MidiDeviceListener* listener);
+   void AddScriptListener(ScriptModule* script);
    int GetPage() const { return mControllerPage; }
    bool IsInputConnected(bool immediate);
    string GetDeviceIn() const { return mDeviceIn; }
@@ -267,6 +269,8 @@ public:
    void SendCC(int page, int ctl, int value, int channel = -1);
    void SendPitchBend(int page, int bend, int channel = -1);
    void SendData(int page, unsigned char a, unsigned char b, unsigned char c);
+
+   INonstandardController* GetNonstandardController() { return mNonstandardController; }
 
    //IDrawableModule
    void Poll() override;
@@ -377,6 +381,7 @@ private:
    int mControllerPage;
    DropdownList* mPageSelector;
    vector< list<MidiDeviceListener*> > mListeners;
+   vector<ScriptModule*> mScriptListeners;
    bool mPrintInput;
    string mLastInput;
    INonstandardController* mNonstandardController;

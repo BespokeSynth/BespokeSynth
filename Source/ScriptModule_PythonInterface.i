@@ -18,6 +18,8 @@
 #include "GridModule.h"
 #include "MidiController.h"
 #include "LinnstrumentControl.h"
+#include "OscController.h"
+#include "OscOutput.h"
 
 #include "pybind11/embed.h"
 #include "pybind11/stl.h"
@@ -189,6 +191,10 @@ PYBIND11_EMBEDDED_MODULE(scriptmodule, m)
       .def("set_num_note_outputs", [](ScriptModule& module, int num)
       {
          module.SetNumNoteOutputs(num);
+      })
+      .def("connect_osc_input", [](ScriptModule& module, int port)
+      {
+         module.ConnectOscInput(port);
       });
 }
 
@@ -322,7 +328,8 @@ PYBIND11_EMBEDDED_MODULE(midicontroller, m)
    {
       return dynamic_cast<MidiController*>(TheSynth->FindModule(path));
    }, py::return_value_policy::reference);
-   py::class_<MidiController, IDrawableModule>(m, "midicontroller")
+   py::class_<MidiController, IDrawableModule> midiControllerClass(m, "midicontroller");
+   midiControllerClass
       .def("set_connection", [](MidiController& midicontroller, MidiMessageType messageType, int control, int channel, string controlPath)
       {
          IUIControl* uicontrol = TheSynth->FindUIControl(controlPath.c_str());
@@ -344,7 +351,17 @@ PYBIND11_EMBEDDED_MODULE(midicontroller, m)
       .def("send_data", [](MidiController& midicontroller, int a, int b, int c, int page)
       {
          midicontroller.SendData(page, a, b, c);
-      }, "a"_a, "b"_a, "c"_a, "page"_a = 0);
+      }, "a"_a, "b"_a, "c"_a, "page"_a = 0)
+      .def("add_script_listener", [](MidiController& midicontroller, ScriptModule* script)
+      {
+         midicontroller.AddScriptListener(script);
+      });
+   py::enum_<MidiMessageType>(midiControllerClass, "MidiMessageType")
+      .value("Note", MidiMessageType::kMidiMessage_Note)
+      .value("Control", MidiMessageType::kMidiMessage_Control)
+      .value("Program", MidiMessageType::kMidiMessage_Program)
+      .value("PitchBend", MidiMessageType::kMidiMessage_PitchBend)
+      .export_values();
 }
 
 PYBIND11_EMBEDDED_MODULE(linnstrument, m)
@@ -373,6 +390,44 @@ PYBIND11_EMBEDDED_MODULE(linnstrument, m)
       .value("Lime", LinnstrumentControl::LinnstrumentColor::kLinnColor_Lime)
       .value("Pink", LinnstrumentControl::LinnstrumentColor::kLinnColor_Pink)
       .export_values();
+}
+
+PYBIND11_EMBEDDED_MODULE(osccontroller, m)
+{
+   m.def("get", [](string path)
+   {
+      MidiController* midicontroller = dynamic_cast<MidiController*>(TheSynth->FindModule(path));
+      if (midicontroller)
+         return dynamic_cast<OscController*>(midicontroller->GetNonstandardController());
+      else
+         return (OscController*)nullptr;
+   }, py::return_value_policy::reference);
+   py::class_<OscController>(m, "osccontroller")
+      .def("add_control", [](OscController& osccontroller, string address, bool isFloat)
+      {
+         osccontroller.AddControl(address, isFloat);
+      });
+}
+
+PYBIND11_EMBEDDED_MODULE(oscoutput, m)
+{
+   m.def("get", [](string path)
+   {
+      return dynamic_cast<OSCOutput*>(TheSynth->FindModule(path));
+   }, py::return_value_policy::reference);
+   py::class_<OSCOutput, IDrawableModule>(m, "oscoutput")
+      .def("send_float", [](OSCOutput& oscoutput, string address, float val)
+      {
+         oscoutput.SendFloat(address, val);
+      })
+      .def("send_int", [](OSCOutput& oscoutput, string address, int val)
+      {
+         oscoutput.SendInt(address, val);
+      })
+      .def("send_string", [](OSCOutput& oscoutput, string address, string val)
+      {
+         oscoutput.SendString(address, val);
+      });
 }
 
 PYBIND11_EMBEDDED_MODULE(module, m)

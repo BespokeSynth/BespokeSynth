@@ -98,6 +98,27 @@ void OSCOutput::PlayNote(double time, int pitch, int velocity, int voiceIdx, Mod
    }
 }
 
+void OSCOutput::SendFloat(string address, float val)
+{
+   OSCMessage msg(address.c_str());
+   msg.addFloat32(val);
+   mOscOut.send(msg);
+}
+
+void OSCOutput::SendInt(string address, int val)
+{
+   OSCMessage msg(address.c_str());
+   msg.addInt32(val);
+   mOscOut.send(msg);
+}
+
+void OSCOutput::SendString(string address, string val)
+{
+   OSCMessage msg(address.c_str());
+   msg.addString(val);
+   mOscOut.send(msg);
+}
+
 void OSCOutput::GetModuleDimensions(float& w, float& h)
 {
    w = mWidth;

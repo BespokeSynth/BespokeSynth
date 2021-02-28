@@ -118,26 +118,13 @@ void OscController::oscMessageReceived(const OSCMessage& msg)
    if (msg.size() == 0 || (!msg[0].isFloat32() && !msg[0].isInt32()))
       return;
 
-   int mapIndex = -1;
-   for (int i = 0; i < mOscMap.size(); ++i)
-   {
-      if (address == mOscMap[i].mAddress)
-      {
-         mapIndex = i;
-         break;
-      }
-   }
+   int mapIndex = FindControl(address);
 
    bool isNew = false;
    if (mapIndex == -1)  //create a new map entry
    {
       isNew = true;
-      OscMap entry;
-      mapIndex = mOscMap.size();
-      entry.mControl = mapIndex;
-      entry.mAddress = address;
-      entry.mIsFloat = msg[0].isFloat32();
-      mOscMap.push_back(entry);
+      mapIndex = AddControl(address, msg[0].isFloat32());
    }
 
    MidiControl control;
@@ -169,6 +156,33 @@ void OscController::oscMessageReceived(const OSCMessage& msg)
    }
 
    mListener->OnMidiControl(control);
+}
+
+int OscController::FindControl(string address)
+{
+   for (int i = 0; i < mOscMap.size(); ++i)
+   {
+      if (address == mOscMap[i].mAddress)
+         return i;
+   }
+
+   return -1;
+}
+
+int OscController::AddControl(string address, bool isFloat)
+{
+   int existing = FindControl(address);
+   if (existing != -1)
+      return existing;
+
+   OscMap entry;
+   int mapIndex = mOscMap.size();
+   entry.mControl = mapIndex;
+   entry.mAddress = address;
+   entry.mIsFloat = isFloat;
+   mOscMap.push_back(entry);
+
+   return mapIndex;
 }
 
 namespace

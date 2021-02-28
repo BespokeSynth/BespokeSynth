@@ -19,8 +19,11 @@
 #include "Slider.h"
 #include "DropdownList.h"
 #include "ModulationChain.h"
+#include "MidiController.h"
 
-class ScriptModule : public IDrawableModule, public IButtonListener, public NoteEffectBase, public IPulseReceiver, public ICodeEntryListener, public IFloatSliderListener, public IDropdownListener
+class ScriptModule : public IDrawableModule, public IButtonListener, public NoteEffectBase, public IPulseReceiver, public ICodeEntryListener, public IFloatSliderListener, public IDropdownListener,
+                     private OSCReceiver,
+                     private OSCReceiver::Listener<OSCReceiver::MessageLoopCallback>
 {
 public:
    ScriptModule();
@@ -45,6 +48,8 @@ public:
    void Stop();
    double GetScheduledTime(double delayMeasureTime);
    void SetNumNoteOutputs(int num);
+   void ConnectOscInput(int port);
+   void MidiReceived(MidiMessageType messageType, int control, float value, int channel);
    
    void RunCode(double time, string code);
    
@@ -60,6 +65,9 @@ public:
    
    //INoteReceiver
    void PlayNote(double time, int pitch, int velocity, int voiceIdx = -1, ModulationParameters modulation = ModulationParameters()) override;
+
+   //OSCReceiver
+   void oscMessageReceived(const OSCMessage& msg) override;
    
    bool HasDebugDraw() const override { return true; }
    
@@ -131,6 +139,7 @@ private:
    string mLastRunLiteralCode;
    int mNextLineToExecute;
    int mInitExecutePriority;
+   int mOscInputPort;
    
    struct ScheduledNoteOutput
    {
@@ -221,4 +230,6 @@ private:
    
    std::vector<PatchCableSource*> mExtraNoteOutputs;
    std::array<ModulationChain, 128> mPitchBends;
+   std::list<string> mMidiMessageQueue;
+   ofMutex mMidiMessageQueueMutex;
 };

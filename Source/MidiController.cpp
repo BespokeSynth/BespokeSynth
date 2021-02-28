@@ -19,6 +19,7 @@
 #include "PatchCableSource.h"
 #include "GridController.h"
 #include "MidiCapturer.h"
+#include "ScriptModule.h"
 
 bool UIControlConnection::sDrawCables = true;
 bool MidiController::sQuickMidiMapMode = true;
@@ -579,6 +580,15 @@ void MidiController::MidiReceived(MidiMessageType messageType, int control, floa
       if (messageType == kMidiMessage_Control)
          SendCC(mControllerPage, control, 0);
    }*/
+
+   for (auto* script : mScriptListeners)
+      script->MidiReceived(messageType, control, value, channel);
+}
+
+void MidiController::AddScriptListener(ScriptModule* script)
+{
+   if (!VectorContains(script, mScriptListeners))
+      mScriptListeners.push_back(script); 
 }
 
 void MidiController::RemoveConnection(int control, MidiMessageType messageType, int channel, int page)
