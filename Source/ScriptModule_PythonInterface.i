@@ -19,7 +19,7 @@
 #include "MidiController.h"
 #include "LinnstrumentControl.h"
 #include "OscController.h"
-#include "OscOutput.h"
+#include "OSCOutput.h"
 
 #include "pybind11/embed.h"
 #include "pybind11/stl.h"
