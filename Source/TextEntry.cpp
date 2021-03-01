@@ -279,7 +279,7 @@ void TextEntry::OnKeyPressed(int key, bool isRepeat)
       else if (mCaretPosition < strlen(mString))
          ++mCaretPosition;
    }
-   else if (key == 'V' && GetKeyModifiers() == kModifier_Command)
+   else if (toupper(key) == 'V' && GetKeyModifiers() == kModifier_Command)
    {
       juce::String clipboard = SystemClipboard::getTextFromClipboard();
       for (int i=0; i<clipboard.length(); ++i)
