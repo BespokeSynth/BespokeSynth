@@ -1850,6 +1850,7 @@ void MidiController::ConnectDevice()
    string deviceInName = mControllerList->GetLabel(mControllerIndex);
    string deviceOutName = String(deviceInName).replace("Input", "Output").replace("input", "output").toStdString();
    bool hasOutput = MidiOutput::getDevices().contains(String(deviceOutName));
+   bool deviceChanged = (mDeviceIn != deviceInName);
    mDeviceIn = deviceInName;
    mDeviceOut = hasOutput ? deviceOutName : "";
    mModuleSaveData.SetString("devicein", mDeviceIn);
@@ -1897,10 +1898,10 @@ void MidiController::ConnectDevice()
       bool isRoli = strstr(deviceInName.c_str(), "Seaboard") != nullptr ||
          strstr(deviceInName.c_str(), "Lightpad BLOCK") != nullptr;
       bool isLinnstrument = strstr(deviceInName.c_str(), "LinnStrument") != nullptr;
-      if (isRoli || isLinnstrument)
+      if ((isRoli || isLinnstrument) && deviceChanged)
       {
          SetUseChannelAsVoice(true);
-         SetPitchBendRange(isRoli ? 48 : 24);
+         SetPitchBendRange(48);
          mModwheelCC = 74;
 
          mModuleSaveData.SetBool("usechannelasvoice", mUseChannelAsVoice);
