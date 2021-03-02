@@ -63,7 +63,7 @@ bool SingleOscillatorVoice::Process(double time, ChannelBuffer* out)
          mOscData[u].mOsc.SetPulseWidth(mVoiceParams->mPulseWidth);
          mOscData[u].mOsc.SetShuffle(mVoiceParams->mShuffle);
          
-         float detune = exp2(mVoiceParams->mDetune * mOscData[u].mDetuneFactor);
+         float detune = exp2(mVoiceParams->mDetune * mOscData[u].mDetuneFactor * (1 + GetPressure(pos) * 3));
          float phaseInc = GetPhaseInc(freq * detune);
          
          {
@@ -122,7 +122,7 @@ bool SingleOscillatorVoice::Process(double time, ChannelBuffer* out)
       if (mUseFilter)
       {
          //PROFILER(SingleOscillatorVoice_filter);
-         float f = mFilterAdsr.Value(time) * mVoiceParams->mFilterCutoff;
+         float f = mFilterAdsr.Value(time) * mVoiceParams->mFilterCutoff * (1 - GetModWheel(pos) * .9f);
          float q = mVoiceParams->mFilterQ;
          if (f != mFilterLeft.mF || q != mFilterLeft.mQ)
             mFilterLeft.SetFilterParams(f, q);
