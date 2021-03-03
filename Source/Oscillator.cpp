@@ -10,6 +10,9 @@
 
 float Oscillator::Value(float phase) const
 {
+   if (mType == kOsc_Tri)
+      phase += .5f * FPI;  //shift phase to make triangle start at zero instead of 1, to eliminate click on start
+
    if (mShuffle > 0)
    {
       phase = fmod(phase, FTWO_PI * 2);
