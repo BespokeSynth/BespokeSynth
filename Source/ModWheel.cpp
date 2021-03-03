@@ -26,7 +26,7 @@ ModWheel::~ModWheel()
 void ModWheel::CreateUIControls()
 {
    IDrawableModule::CreateUIControls();
-   mModWheelSlider = new FloatSlider(this,"modwheel",5,2,110,15,&mModWheel,-1,1);
+   mModWheelSlider = new FloatSlider(this,"modwheel",5,2,110,15,&mModWheel,0,1);
 }
 
 void ModWheel::DrawModule()

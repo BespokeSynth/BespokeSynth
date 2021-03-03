@@ -13,6 +13,7 @@ ModulationChain::ModulationChain()
 , mPrev(nullptr)
 , mSidechain(nullptr)
 , mMultiplyIn(nullptr)
+, mBuffer(nullptr)
 {
    mLFO.SetMode(kLFOMode_Oscillator);
 }
@@ -41,6 +42,8 @@ float ModulationChain::GetIndividualValue(int samplesIn) const
       value = 0;
    if (mLFOAmount != 0)
       value += mLFO.Value(samplesIn) * mLFOAmount;
+   if (mBuffer != nullptr && samplesIn >= 0 && samplesIn < gBufferSize)
+      value += mBuffer[samplesIn];
    return value;
 }
 
@@ -73,6 +76,25 @@ void ModulationChain::SetSidechain(ModulationChain* chain)
 void ModulationChain::MultiplyIn(ModulationChain* chain)
 {
    mMultiplyIn = chain;
+}
+
+void ModulationChain::CreateBuffer()
+{
+   if (mBuffer == nullptr)
+      mBuffer = new float[gBufferSize];
+   Clear(mBuffer, gBufferSize);
+}
+
+void ModulationChain::FillBuffer(float* buffer)
+{
+   BufferCopy(mBuffer, buffer, gBufferSize);
+}
+
+float ModulationChain::GetBufferValue(int sampleIdx)
+{
+   if (mBuffer != nullptr && sampleIdx >=0 && sampleIdx < gBufferSize)
+      return mBuffer[sampleIdx];
+   return 0;
 }
 
 Modulations::Modulations(bool isGlobalEffect)

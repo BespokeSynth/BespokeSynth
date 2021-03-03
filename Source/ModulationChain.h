@@ -24,10 +24,14 @@ public:
    void AppendTo(ModulationChain* chain);
    void SetSidechain(ModulationChain* chain);
    void MultiplyIn(ModulationChain* chain);
+   void CreateBuffer();
+   void FillBuffer(float* buffer);
+   float GetBufferValue(int sampleIdx);
 private:
    Ramp mRamp;
    LFO mLFO;
    float mLFOAmount;
+   float* mBuffer;
    ModulationChain* mPrev;
    ModulationChain* mSidechain;
    ModulationChain* mMultiplyIn;

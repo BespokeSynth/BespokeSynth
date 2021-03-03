@@ -207,6 +207,17 @@
         <FILE id="RG4zGd" name="TremoloEffect.h" compile="0" resource="0" file="Source/TremoloEffect.h"/>
       </GROUP>
       <GROUP id="{6781AC07-A090-A7AF-8D27-BCB6D9526ABD}" name="modules">
+        <FILE id="USlXuu" name="UnstablePressure.cpp" compile="1" resource="0"
+              file="Source/UnstablePressure.cpp"/>
+        <FILE id="Wl98iS" name="UnstablePressure.h" compile="0" resource="0"
+              file="Source/UnstablePressure.h"/>
+        <FILE id="RJM2hd" name="UnstableModWheel.cpp" compile="1" resource="0"
+              file="Source/UnstableModWheel.cpp"/>
+        <FILE id="AtPBmi" name="UnstableModWheel.h" compile="0" resource="0"
+              file="Source/UnstableModWheel.h"/>
+        <FILE id="ZzcrZd" name="UnstablePitch.cpp" compile="1" resource="0"
+              file="Source/UnstablePitch.cpp"/>
+        <FILE id="Bay4ZY" name="UnstablePitch.h" compile="0" resource="0" file="Source/UnstablePitch.h"/>
         <FILE id="kvaiqk" name="UserPrefsEditor.cpp" compile="1" resource="0"
               file="Source/UserPrefsEditor.cpp"/>
         <FILE id="Q33dmW" name="UserPrefsEditor.h" compile="0" resource="0"

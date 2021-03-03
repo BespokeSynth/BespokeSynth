@@ -207,6 +207,9 @@
 #include "SampleCapturer.h"
 #include "NoteQuantizer.h"
 #include "PlaySequencer.h"
+#include "UnstablePitch.h"
+#include "UnstableModWheel.h"
+#include "UnstablePressure.h"
 
 #define REGISTER(class,name,type) Register(#name, &(class::Create), &(class::CanCreate), type, false, false);
 #define REGISTER_HIDDEN(class,name,type) Register(#name, &(class::Create), &(class::CanCreate), type, true, false);
@@ -247,7 +250,7 @@ ModuleFactory::ModuleFactory()
    REGISTER(Vocoder, vocoder, kModuleType_Audio);
    REGISTER(FreqDelay, freqdelay, kModuleType_Audio);
    REGISTER(VelocitySetter, velocitysetter, kModuleType_Note);
-   REGISTER(NoteSinger, notesinger, kModuleType_Synth);
+   REGISTER(NoteSinger, notesinger, kModuleType_Instrument);
    REGISTER(NoteOctaver, noteoctaver, kModuleType_Note);
    REGISTER(FourOnTheFloor, fouronthefloor, kModuleType_Instrument);
    REGISTER(Amplifier, gain, kModuleType_Audio);
@@ -274,7 +277,6 @@ ModuleFactory::ModuleFactory()
    //REGISTER(EigenChorder, eigenchorder, kModuleType_Note);
    REGISTER(PitchBender, pitchbender, kModuleType_Note);
    //REGISTER(EigenharpNoteSource, eigenharpnotesource, kModuleType_Instrument);
-   REGISTER(LFOController, lfocontroller, kModuleType_Other);
    REGISTER(VinylTempoControl, vinylcontrol, kModuleType_Other);
    REGISTER(NoteFlusher, noteflusher, kModuleType_Note);
    REGISTER(NoteCanvas, notecanvas, kModuleType_Instrument);
@@ -383,14 +385,17 @@ ModuleFactory::ModuleFactory()
    REGISTER(NoteQuantizer, quantizer, kModuleType_Note);
    REGISTER(NoteLooper, notelooper, kModuleType_Instrument);
    REGISTER(PlaySequencer, playsequencer, kModuleType_Instrument);
+   REGISTER(UnstablePitch, unstablepitch, kModuleType_Note);
+   REGISTER(UnstableModWheel, unstablemodwheel, kModuleType_Note);
+   REGISTER(UnstablePressure, unstablepressure, kModuleType_Note);
 
    //REGISTER_EXPERIMENTAL(MidiPlayer, midiplayer, kModuleType_Instrument);
    REGISTER_EXPERIMENTAL(Razor, razor, kModuleType_Synth);
    REGISTER_EXPERIMENTAL(SampleCanvas, samplecanvas, kModuleType_Synth);
    REGISTER_EXPERIMENTAL(LoopStorer, loopstorer, kModuleType_Other);
-   REGISTER_EXPERIMENTAL(ComboGridController, combogrid, kModuleType_Other);
    REGISTER_EXPERIMENTAL(PitchChorus, pitchchorus, kModuleType_Audio);
 
+   REGISTER_HIDDEN(ComboGridController, combogrid, kModuleType_Other);
    REGISTER_HIDDEN(VSTPlugin, vstplugin, kModuleType_Synth);
    REGISTER_HIDDEN(SampleFinder, samplefinder, kModuleType_Audio);
    REGISTER_HIDDEN(Producer, producer, kModuleType_Audio);
@@ -413,6 +418,7 @@ ModuleFactory::ModuleFactory()
    REGISTER_HIDDEN(ControlTactileFeedback, controltactilefeedback, kModuleType_Synth);
    REGISTER_HIDDEN(FloatSliderLFOControl, lfo, kModuleType_Other);
    REGISTER_HIDDEN(EnvelopeEditor, envelopeeditor, kModuleType_Other);
+   REGISTER_HIDDEN(LFOController, lfocontroller, kModuleType_Other); //old, probably irrelevant
 }
 
 void ModuleFactory::Register(string type, CreateModuleFn creator, CanCreateModuleFn canCreate, ModuleType moduleType, bool hidden, bool experimental)

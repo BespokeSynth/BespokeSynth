@@ -110,6 +110,9 @@ void SingleOscillator::CreateUIControls()
    mADSRModeSelector->AddLabel("filter",1);
    
    UpdateADSRDisplays();
+
+   mFilterCutoffSlider->SetMode(FloatSlider::kSquare);
+   mFilterQSlider->SetMode(FloatSlider::kSquare);
    
    mWriteBuffer.SetNumActiveChannels(2);
 }
