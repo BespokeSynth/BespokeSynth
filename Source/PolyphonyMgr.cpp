@@ -76,8 +76,6 @@ void PolyphonyMgr::Start(double time, int pitch, float amount, int voiceIdx, Mod
 {
    assert(voiceIdx < kNumVoices);
    
-   amount = amount * amount; //increase the importance of velocity
-   
    bool preserveVoice = voiceIdx != -1 &&  //we specified a voice
                         mVoices[voiceIdx].mPitch != -1; //there is a note playing from that voice
 

@@ -32,11 +32,11 @@ public:
    ADSR() : ADSR(1,1,1,1) {}
    void Start(double time, float target);
    void Start(double time, float target, float a, float d, float s, float r);
-   void Start(double time, float target, const ADSR& adsr);
+   void Start(double time, float target, const ADSR& adsr, float scale = 1);
    void Stop(double time, bool warn = true);
    float Value(double time) const;
    void Set(float a, float d, float s, float r, float h = -1);
-   void Set(const ADSR& other);
+   void Set(const ADSR& other, float scale = 1);
    void Clear() { for (auto& e : mEvents) { e.Reset(); } }
    void SetMaxSustain(float max) { mMaxSustain = max; }
    void SetSustainStage(int stage) { mSustainStage = stage; }

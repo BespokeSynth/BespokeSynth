@@ -154,14 +154,15 @@ bool SingleOscillatorVoice::Process(double time, ChannelBuffer* out)
 
 void SingleOscillatorVoice::Start(double time, float target)
 {
-   mAdsr.Start(time, target, mVoiceParams->mAdsr);
+   float adsrScale = ofMap(target, 0, 1, .2f, 1);
+   mAdsr.Start(time, target, mVoiceParams->mAdsr, adsrScale);
    
    if (mVoiceParams->mFilterCutoff != SINGLEOSCILLATOR_NO_CUTOFF)
    {
       mUseFilter = true;
       mFilterLeft.SetFilterType(kFilterType_Lowpass);
       mFilterRight.SetFilterType(kFilterType_Lowpass);
-      mFilterAdsr.Start(time,1, mVoiceParams->mFilterAdsr);
+      mFilterAdsr.Start(time, 1, mVoiceParams->mFilterAdsr, adsrScale);
    }
    else
    {

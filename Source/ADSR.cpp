@@ -30,10 +30,13 @@ void ::ADSR::Set(float a, float d, float s, float r, float h /*=-1*/)
    mHasSustainStage = true;
 }
 
-void ::ADSR::Set(const ADSR& other)
+void ::ADSR::Set(const ADSR& other, float scale)
 {
-   for (int i=0; i<other.mNumStages; ++i)
+   for (int i = 0; i < other.mNumStages; ++i)
+   {
       mStages[i] = other.mStages[i];
+      mStages[i].time *= scale;
+   }
    mNumStages = other.mNumStages;
    mSustainStage = other.mSustainStage;
    mMaxSustain = other.mMaxSustain;
@@ -47,9 +50,9 @@ void ::ADSR::Start(double time, float target, float a, float d, float s, float r
    Start(time, target);
 }
 
-void ::ADSR::Start(double time, float target, const ADSR& adsr)
+void ::ADSR::Start(double time, float target, const ADSR& adsr, float scale)
 {
-   Set(adsr);
+   Set(adsr, scale);
    Start(time, target);
 }
 
@@ -61,7 +64,7 @@ void ::ADSR::Start(double time, float target)
    mEvents[mNextEventPointer].mMult = target;
    mNextEventPointer = (mNextEventPointer + 1) % mEvents.size();
    
-   if (mMaxSustain != -1 && mHasSustainStage)
+   if (mMaxSustain >= 0 && mHasSustainStage)
    {
       float stopTime = time;
       for (int i=0; i<mNumStages; ++i)
