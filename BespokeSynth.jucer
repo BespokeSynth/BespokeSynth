@@ -207,6 +207,8 @@
         <FILE id="RG4zGd" name="TremoloEffect.h" compile="0" resource="0" file="Source/TremoloEffect.h"/>
       </GROUP>
       <GROUP id="{6781AC07-A090-A7AF-8D27-BCB6D9526ABD}" name="modules">
+        <FILE id="W7k12j" name="ChordHolder.cpp" compile="1" resource="0" file="Source/ChordHolder.cpp"/>
+        <FILE id="cYHy7q" name="ChordHolder.h" compile="0" resource="0" file="Source/ChordHolder.h"/>
         <FILE id="USlXuu" name="UnstablePressure.cpp" compile="1" resource="0"
               file="Source/UnstablePressure.cpp"/>
         <FILE id="Wl98iS" name="UnstablePressure.h" compile="0" resource="0"

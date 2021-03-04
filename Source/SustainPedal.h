@@ -13,7 +13,6 @@
 #include "NoteEffectBase.h"
 #include "IDrawableModule.h"
 #include "Checkbox.h"
-#include "TextEntry.h"
 
 class SustainPedal : public NoteEffectBase, public IDrawableModule
 {
@@ -22,8 +21,7 @@ public:
    static IDrawableModule* Create() { return new SustainPedal(); }
    
    string GetTitleLabel() override { return "sustain"; }
-   
-   void SetEnabled(bool enabled) override { mEnabled = enabled; }
+   void CreateUIControls() override;
    
    //INoteReceiver
    void PlayNote(double time, int pitch, int velocity, int voiceIdx = -1, ModulationParameters modulation = ModulationParameters()) override;
@@ -35,11 +33,12 @@ public:
 private:
    //IDrawableModule
    void DrawModule() override;
-   void GetModuleDimensions(float& width, float& height) override { width = 90; height = 0; }
-   bool Enabled() const override { return mEnabled; }
+   void GetModuleDimensions(float& width, float& height) override { width = 90; height = 21; }
+   bool Enabled() const override { return true; }
    
-   list<int> mSustainedNotes;
-   ofMutex mMutex;
+   std::array<bool, 128> mIsNoteBeingSustained{ false };
+   bool mSustain;
+   Checkbox* mSustainCheckbox;
 };
 
 #endif /* defined(__Bespoke__SustainPedal__) */

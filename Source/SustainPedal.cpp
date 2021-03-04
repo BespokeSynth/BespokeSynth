@@ -11,50 +11,56 @@
 #include "ModularSynth.h"
 
 SustainPedal::SustainPedal()
+: mSustain(false)
 {
-   SetEnabled(false);
+}
+
+void SustainPedal::CreateUIControls()
+{
+   IDrawableModule::CreateUIControls();
+
+   mSustainCheckbox = new Checkbox(this, "sustain", 3, 3, &mSustain);
 }
 
 void SustainPedal::DrawModule()
 {
-
    if (Minimized() || IsVisible() == false)
       return;
-   
+   mSustainCheckbox->Draw();
 }
 
-void SustainPedal::CheckboxUpdated(Checkbox *checkbox)
+void SustainPedal::CheckboxUpdated(Checkbox* checkbox)
 {
-   if (checkbox == mEnabledCheckbox)
+   if (checkbox == mSustainCheckbox)
    {
-      mMutex.lock();
-      if (!mEnabled)
+      if (!mSustain)
       {
-         for (auto i = mSustainedNotes.begin(); i != mSustainedNotes.end(); ++i)
-            PlayNoteOutput(gTime, *i, 0, -1);
-         mSustainedNotes.clear();
+         for (int i = 0; i < 128; ++i)
+         {
+            if (mIsNoteBeingSustained[i])
+            {
+               PlayNoteOutput(gBufferSize*gInvSampleRateMs, i, 0, -1);
+               mIsNoteBeingSustained[i] = false;
+            }
+         }
       }
-      mMutex.unlock();
    }
 }
 
 void SustainPedal::PlayNote(double time, int pitch, int velocity, int voiceIdx, ModulationParameters modulation)
 {
-   if (mEnabled)
+   if (mSustain)
    {
-      mMutex.lock();
       if (velocity > 0)
       {
-         if (!ListContains(pitch, mSustainedNotes)) //don't replay already-sustained notes
+         if (!mIsNoteBeingSustained[pitch]) //don't replay already-sustained notes
             PlayNoteOutput(time, pitch, velocity, voiceIdx, modulation);
-         mSustainedNotes.remove(pitch);   //not sustaining it if it's held down
+         mIsNoteBeingSustained[pitch] = false;   //not being sustained by this module it if it's held down
       }
       else
       {
-         if (!ListContains(pitch, mSustainedNotes))
-            mSustainedNotes.push_back(pitch);
+         mIsNoteBeingSustained[pitch] = true;
       }
-      mMutex.unlock();
    }
    else
    {
