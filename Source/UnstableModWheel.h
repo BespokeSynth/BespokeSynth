@@ -53,6 +53,7 @@ private:
    float mHeight;
    std::array<bool, kNumVoices> mIsVoiceUsed{ false };
    std::array<int, 128> mPitchToVoice;
+   int mVoiceRoundRobin;
 
    Modulations mModulation;
 };

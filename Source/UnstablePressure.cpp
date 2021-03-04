@@ -16,6 +16,7 @@
 UnstablePressure::UnstablePressure()
    : mPerlin(.2f, .1f, 0)
    , mModulation(false)
+   , mVoiceRoundRobin(0)
 {
    TheTransport->AddAudioPoller(this);
 
@@ -31,7 +32,7 @@ UnstablePressure::~UnstablePressure()
 void UnstablePressure::CreateUIControls()
 {
    IDrawableModule::CreateUIControls();
-   UIBLOCK(3, 40, 120);
+   UIBLOCK(3, 40, 140);
    FLOATSLIDER(mAmountSlider, "amount", &mPerlin.mPerlinAmount, 0, 1);
    FLOATSLIDER(mWarbleSlider, "warble", &mPerlin.mPerlinWarble, 0, 1);
    FLOATSLIDER(mNoiseSlider, "noise", &mPerlin.mPerlinNoise, 0, 1);
@@ -93,9 +94,11 @@ void UnstablePressure::PlayNote(double time, int pitch, int velocity, int voiceI
          {
             for (size_t i = 0; i < mIsVoiceUsed.size(); ++i)
             {
-               if (mIsVoiceUsed[i] == false)
+               int voiceToCheck = (i + mVoiceRoundRobin) % kNumVoices;
+               if (mIsVoiceUsed[voiceToCheck] == false)
                {
-                  voiceIdx = i;
+                  voiceIdx = voiceToCheck;
+                  mVoiceRoundRobin = (mVoiceRoundRobin + 1) % kNumVoices;
                   break;
                }
             }
@@ -106,7 +109,7 @@ void UnstablePressure::PlayNote(double time, int pitch, int velocity, int voiceI
          }
       }
 
-      if (voiceIdx == -1)
+      if (voiceIdx < 0 || voiceIdx >= kNumVoices)
          voiceIdx = 0;
 
       mIsVoiceUsed[voiceIdx] = velocity > 0;
