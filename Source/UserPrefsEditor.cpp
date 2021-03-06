@@ -338,7 +338,7 @@ void UserPrefsEditor::ButtonClicked(ClickButton* button)
       if (mSetWindowPosition)
       {
          UpdatePrefInt(userPrefs, "position_x", mWindowPositionX);
-         UpdatePrefInt(userPrefs, "position_y", mWindowPositionX);
+         UpdatePrefInt(userPrefs, "position_y", mWindowPositionY);
       }
       else
       {
