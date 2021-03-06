@@ -16,7 +16,6 @@
 #include "MultitrackRecorder.h"
 #include "Sample.h"
 #include "FloatSliderLFOControl.h"
-#include "VinylTempoControl.h"
 //#include <CoreServices/CoreServices.h>
 #include "fenv.h"
 #include <stdlib.h>
@@ -1142,8 +1141,6 @@ void ModularSynth::OnModuleDeleted(IDrawableModule* module)
       TheChaosEngine = nullptr;
    if (module == TheLFOController)
       TheLFOController = nullptr;
-   if (module == TheVinylTempoControl)
-      TheVinylTempoControl = nullptr;
    
    for (int i=0; i<MAX_INPUT_CHANNELS; ++i)
    {
@@ -1247,15 +1244,6 @@ void ModularSynth::AudioOut(float** output, int bufferSize, int nChannels)
                                           //if we want these different, need to fix outBuffer here, and also fix audioIn()
    for (int ioOffset = 0; ioOffset < mIOBufferSize; ioOffset += gBufferSize)
    {
-      if (TheVinylTempoControl &&
-          mInput[TheVinylTempoControl->GetLeftChannel()-1] &&
-          mInput[TheVinylTempoControl->GetRightChannel()-1])
-      {
-         TheVinylTempoControl->SetVinylControlInput(
-               mInput[TheVinylTempoControl->GetLeftChannel()-1]->GetBuffer()->GetChannel(0),
-               mInput[TheVinylTempoControl->GetRightChannel()-1]->GetBuffer()->GetChannel(0), gBufferSize);
-      }
-
       for (int i=0; i<nChannels; ++i)
       {
          if (mOutput[i])

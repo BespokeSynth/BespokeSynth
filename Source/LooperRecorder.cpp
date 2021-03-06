@@ -15,7 +15,6 @@
 #include "ModularSynth.h"
 #include "ChaosEngine.h"
 #include "Profiler.h"
-#include "VinylTempoControl.h"
 #include "FillSaveDropdown.h"
 #include "PatchCableSource.h"
 #include "UIControlMacros.h"
@@ -502,9 +501,6 @@ void LooperRecorder::SyncLoopLengths()
    }
 
    mBaseTempo = TheTransport->GetTempo();
-   
-   if (TheVinylTempoControl)
-      TheVinylTempoControl->Stop();
 }
 
 void LooperRecorder::Commit(Looper* looper)
@@ -566,9 +562,6 @@ void LooperRecorder::RequestCopy(Looper *looper)
 void LooperRecorder::ResetSpeed()
 {
    mBaseTempo = TheTransport->GetTempo();
-   
-   if (TheVinylTempoControl)
-      TheVinylTempoControl->Stop();
 }
 
 void LooperRecorder::StartFreeRecord()

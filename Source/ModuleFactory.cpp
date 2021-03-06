@@ -277,7 +277,7 @@ ModuleFactory::ModuleFactory()
    //REGISTER(EigenChorder, eigenchorder, kModuleType_Note);
    REGISTER(PitchBender, pitchbender, kModuleType_Note);
    //REGISTER(EigenharpNoteSource, eigenharpnotesource, kModuleType_Instrument);
-   REGISTER(VinylTempoControl, vinylcontrol, kModuleType_Other);
+   REGISTER(VinylTempoControl, vinylcontrol, kModuleType_Modulator);
    REGISTER(NoteFlusher, noteflusher, kModuleType_Note);
    REGISTER(NoteCanvas, notecanvas, kModuleType_Instrument);
    REGISTER(CommentDisplay, comment, kModuleType_Other);

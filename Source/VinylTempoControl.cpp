@@ -15,37 +15,34 @@
 VinylTempoControl* TheVinylTempoControl = nullptr;
 
 VinylTempoControl::VinylTempoControl()
-: mReferencePitch(1)
-, mReferenceTempo(120)
+: IAudioProcessor(gBufferSize)
+, mReferencePitch(1)
 , mVinylControl(gSampleRate)
-, mVinylControlInLeft(nullptr)
-, mVinylControlInRight(nullptr)
 , mUseVinylControl(false)
 , mUseVinylControlCheckbox(nullptr)
-, mLeftChannel(0)
-, mRightChannel(1)
+, mSpeed(1)
 {
-   assert(TheVinylTempoControl == nullptr);
-   TheVinylTempoControl = this;
-   TheTransport->AddAudioPoller(this);
+   //mModulationBuffer = new float[gBufferSize];
 }
 
 VinylTempoControl::~VinylTempoControl()
 {
-   assert(TheVinylTempoControl == this || TheVinylTempoControl == nullptr);
-   TheVinylTempoControl = nullptr;
-   TheTransport->RemoveAudioPoller(this);
+   //delete[] mModulationBuffer;
 }
 
 void VinylTempoControl::CreateUIControls()
 {
    IDrawableModule::CreateUIControls();
    mUseVinylControlCheckbox = new Checkbox(this,"control",4,2,&mUseVinylControl);
+
+   GetPatchCableSource()->SetEnabled(false);
+
+   mTargetCable = new PatchCableSource(this, kConnectionType_UIControl);
+   AddPatchCableSource(mTargetCable);
 }
 
 void VinylTempoControl::DrawModule()
 {
-   DrawConnection(TheTransport);
    if (Minimized() || IsVisible() == false)
       return;
    
@@ -55,37 +52,47 @@ void VinylTempoControl::DrawModule()
       DrawTextNormal(ofToString(mVinylControl.GetPitch(),2),60,14);
 }
 
-void VinylTempoControl::OnTransportAdvanced(float amount)
+void VinylTempoControl::Process(double time)
 {
    PROFILER(VinylTempoControl);
    
    if (!mEnabled)
       return;
-   
-   if (mVinylControlInLeft && mVinylControlInRight)
+
+   ComputeSliders(0);
+   SyncBuffers();
+
+   assert(GetBuffer()->BufferSize());
+
+   if (GetBuffer()->NumActiveChannels() >= 2)
    {
-      mVinylControl.Process(mVinylControlInLeft, mVinylControlInRight, gBufferSize);
-      
+      mVinylControl.Process(GetBuffer()->GetChannel(0), GetBuffer()->GetChannel(1), gBufferSize);
+
       if (mUseVinylControl)
       {
          float speed = mVinylControl.GetPitch() / mReferencePitch;
          if (speed == 0 || mVinylControl.GetStopped())
             speed = .0001f;
-         TheTransport->SetTempo(speed * mReferenceTempo);
+         mSpeed = speed;
       }
       else
       {
          mReferencePitch = mVinylControl.GetPitch();
-         mReferenceTempo = TheTransport->GetTempo();
       }
    }
+
+   GetBuffer()->Reset();
 }
 
-void VinylTempoControl::SetVinylControlInput(float *left, float *right, int numSamples)
+void VinylTempoControl::PostRepatch(PatchCableSource* cableSource, bool fromUserClick)
 {
-   assert(numSamples == gBufferSize);
-   mVinylControlInLeft = left;
-   mVinylControlInRight = right;
+   OnModulatorRepatch();
+}
+
+float VinylTempoControl::Value(int samplesIn)
+{
+   //return mModulationBuffer[samplesIn];
+   return mSpeed;
 }
 
 bool VinylTempoControl::CanStartVinylControl()
@@ -102,16 +109,24 @@ void VinylTempoControl::CheckboxUpdated(Checkbox* checkbox)
    }
 }
 
+void VinylTempoControl::SaveLayout(ofxJSONElement& moduleInfo)
+{
+   IDrawableModule::SaveLayout(moduleInfo);
+
+   string targetPath = "";
+   if (mTarget)
+      targetPath = mTarget->Path();
+
+   moduleInfo["target"] = targetPath;
+}
+
 void VinylTempoControl::LoadLayout(const ofxJSONElement& moduleInfo)
 {
-   mModuleSaveData.LoadInt("leftchannel", moduleInfo, 1, 1, MAX_INPUT_CHANNELS);
-   mModuleSaveData.LoadInt("rightchannel", moduleInfo, 2, 1, MAX_INPUT_CHANNELS);
-   
+   mModuleSaveData.LoadString("target", moduleInfo);
+
    SetUpFromSaveData();
 }
 
 void VinylTempoControl::SetUpFromSaveData()
 {
-   mLeftChannel = mModuleSaveData.GetInt("leftchannel");
-   mRightChannel = mModuleSaveData.GetInt("rightchannel");
 }

@@ -11,14 +11,15 @@
 
 #include <iostream>
 #include "IDrawableModule.h"
-#include "Transport.h"
+#include "IAudioProcessor.h"
+#include "IModulator.h"
 #include "vinylcontrol/vinylcontrol.h"
 
 class VinylTempoControl;
 
 extern VinylTempoControl* TheVinylTempoControl;
 
-class VinylTempoControl : public IDrawableModule, public IAudioPoller
+class VinylTempoControl : public IDrawableModule, public IAudioProcessor, public IModulator
 {
 public:
    VinylTempoControl();
@@ -28,20 +29,23 @@ public:
    
    string GetTitleLabel() override { return "vinylcontrol"; }
    
-   void SetVinylControlInput(float* left, float* right, int numSamples);
-   int GetLeftChannel() const { return mLeftChannel; }
-   int GetRightChannel() const { return mRightChannel; }
-   void Stop() { mUseVinylControl = false; }
-   
    void SetEnabled(bool enabled) override { mEnabled = enabled; }
    void CreateUIControls() override;
    
-   void OnTransportAdvanced(float amount) override;
+   void Process(double time) override;
+
+   void PostRepatch(PatchCableSource* cableSource, bool fromUserClick) override;
+
+   //IModulator
+   float Value(int samplesIn = 0) override;
+   bool Active() const override { return mEnabled; }
+   bool CanAdjustRange() const override { return false; }
    
    void CheckboxUpdated(Checkbox* checkbox) override;
    
-   virtual void LoadLayout(const ofxJSONElement& moduleInfo) override;
-   virtual void SetUpFromSaveData() override;
+   void SaveLayout(ofxJSONElement& moduleInfo) override;
+   void LoadLayout(const ofxJSONElement& moduleInfo) override;
+   void SetUpFromSaveData() override;
 private:
    bool CanStartVinylControl();
    
@@ -53,12 +57,9 @@ private:
    bool mUseVinylControl;
    Checkbox* mUseVinylControlCheckbox;
    float mReferencePitch;
-   float mReferenceTempo;
    vinylcontrol mVinylControl;
-   float* mVinylControlInLeft;
-   float* mVinylControlInRight;
-   int mLeftChannel;
-   int mRightChannel;
+   //float* mModulationBuffer;
+   float mSpeed;
 };
 
 #endif /* defined(__Bespoke__VinylTempoControl__) */
