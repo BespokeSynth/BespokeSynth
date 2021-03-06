@@ -210,6 +210,7 @@
 #include "UnstablePitch.h"
 #include "UnstableModWheel.h"
 #include "UnstablePressure.h"
+#include "ChordHolder.h"
 
 #define REGISTER(class,name,type) Register(#name, &(class::Create), &(class::CanCreate), type, false, false);
 #define REGISTER_HIDDEN(class,name,type) Register(#name, &(class::Create), &(class::CanCreate), type, true, false);
@@ -388,6 +389,7 @@ ModuleFactory::ModuleFactory()
    REGISTER(UnstablePitch, unstablepitch, kModuleType_Note);
    REGISTER(UnstableModWheel, unstablemodwheel, kModuleType_Note);
    REGISTER(UnstablePressure, unstablepressure, kModuleType_Note);
+   REGISTER(ChordHolder, chordholder, kModuleType_Note);
 
    //REGISTER_EXPERIMENTAL(MidiPlayer, midiplayer, kModuleType_Instrument);
    REGISTER_EXPERIMENTAL(Razor, razor, kModuleType_Synth);
