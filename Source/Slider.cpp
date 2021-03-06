@@ -205,21 +205,64 @@ void FloatSlider::Render()
          display += GetDisplayValue(*mVar);
       }
    }
-   
-   if (mMaxEntry)
-      display = "max:";
-   if (mMinEntry)
-      display = "min:";
+
+   if (mMaxEntry || mMinEntry)
+      display = "";
    
    ofSetColor(textColor);
-   DrawTextNormal(display, mX+2, mY+5+mHeight/2);
+   DrawTextNormal(display, mX + 2, mY + 5 + mHeight / 2);
 
    ofPopStyle();
    
    if (mMaxEntry)
+   {
+      ofPushStyle();
+      ofFill();
+      ofSetColor(120, 120, 120, 255);
+      ofRectangle rect = mMaxEntry->GetRect(K(local));
+      ofRect(rect.x - 28, rect.y, rect.width + 28, rect.height);
       mMaxEntry->Draw();
+      ofSetColor(255, 255, 255);
+      DrawTextLeftJustify("max:", rect.x, rect.y + 5 + mHeight / 2);
+      ofPopStyle();
+   }
    if (mMinEntry)
+   {
+      ofPushStyle();
+      ofFill();
+      ofSetColor(120, 120, 120, 255);
+      ofRectangle rect = mMinEntry->GetRect(K(local));
+      ofRect(rect.x - 28, rect.y, rect.width + 28, rect.height);
       mMinEntry->Draw();
+      ofSetColor(255, 255, 255);
+      DrawTextLeftJustify("min:", rect.x, rect.y + 5 + mHeight / 2);
+      ofPopStyle();
+   }
+
+   if (gHoveredUIControl == this && (GetKeyModifiers() & kModifier_Command) && mAllowMinMaxAdjustment && mMinEntry == nullptr && mMaxEntry == nullptr)
+   {
+      ofPushStyle();
+      ofFill();
+      ofSetColor(120, 120, 120, 255);
+      ofRect(mX, mY, mWidth * .4f, mHeight);
+      ofRect(mX + mWidth * .6f, mY, mWidth * .4f, mHeight);
+      ofNoFill();
+      ofSetColor(255, 255, 255);
+      ofRect(mX, mY, mWidth * .4f, mHeight);
+      ofRect(mX + mWidth * .6f, mY, mWidth * .4f, mHeight);
+      
+      ofPushMatrix();
+      ofClipWindow(mX, mY, mWidth * .4f, mHeight, true);
+      DrawTextNormal(ofToString(mMin), mX+2, mY + 4 + mHeight / 2, 12);
+      ofPopMatrix();
+
+      ofPushMatrix();
+      ofClipWindow(mX + mWidth * .6f, mY, mWidth * .4f, mHeight, true);
+      DrawTextLeftJustify(ofToString(mMax), mX+mWidth-2, mY + 5 + mHeight / 2, 12);
+      ofPopMatrix();
+
+      ofPopStyle();
+   }
    
    mWidth = normalWidth;
    mHeight = normalHeight;
@@ -894,15 +937,55 @@ void IntSlider::Render()
    {
       display += GetDisplayValue(*mVar);
    }
+
+   if (mMaxEntry || mMinEntry)
+      display = "";
+
    ofSetColor(textColor);
-   DrawTextNormal(display, mX+2, mY+5+mHeight/2);
+   DrawTextNormal(display, mX + 2, mY + 5 + mHeight / 2);
 
    ofPopStyle();
-   
+
    if (mMaxEntry)
+   {
+      ofPushStyle();
+      ofFill();
+      ofSetColor(120, 120, 120, 255);
+      ofRectangle rect = mMaxEntry->GetRect(K(local));
+      ofRect(rect.x - 28, rect.y, rect.width + 28, rect.height);
       mMaxEntry->Draw();
+      ofSetColor(255, 255, 255);
+      DrawTextLeftJustify("max:", rect.x, rect.y + 5 + mHeight / 2);
+      ofPopStyle();
+   }
    if (mMinEntry)
+   {
+      ofPushStyle();
+      ofFill();
+      ofSetColor(120, 120, 120, 255);
+      ofRectangle rect = mMinEntry->GetRect(K(local));
+      ofRect(rect.x - 28, rect.y, rect.width + 28, rect.height);
       mMinEntry->Draw();
+      ofSetColor(255, 255, 255);
+      DrawTextLeftJustify("min:", rect.x, rect.y + 5 + mHeight / 2);
+      ofPopStyle();
+   }
+
+   if (gHoveredUIControl == this && (GetKeyModifiers() & kModifier_Command) && mAllowMinMaxAdjustment && mMinEntry == nullptr && mMaxEntry == nullptr)
+   {
+      ofPushStyle();
+      ofFill();
+      ofSetColor(120, 120, 120, 255);
+      ofRect(mX, mY, mWidth * .4f, mHeight);
+      ofRect(mX + mWidth * .6f, mY, mWidth * .4f, mHeight);
+      ofNoFill();
+      ofSetColor(255, 255, 255);
+      ofRect(mX, mY, mWidth * .4f, mHeight);
+      ofRect(mX + mWidth * .6f, mY, mWidth * .4f, mHeight);
+      DrawTextNormal(ofToString(mMin), mX + 2, mY + 4 + mHeight / 2, 12);
+      DrawTextLeftJustify(ofToString(mMax), mX + mWidth - 2, mY + 5 + mHeight / 2, 12);
+      ofPopStyle();
+   }
    
    mWidth = normalWidth;
    mHeight = normalHeight;
@@ -918,6 +1001,31 @@ void IntSlider::OnClicked(int x, int y, bool right)
 {
    if (right)
       return;
+
+   if ((GetKeyModifiers() & kModifier_Command) && mAllowMinMaxAdjustment)
+   {
+      bool adjustMax;
+      if (x > mWidth / 2)
+         adjustMax = true;
+      else
+         adjustMax = false;
+
+      if (adjustMax)
+      {
+         mMaxEntry->Delete();
+         mMaxEntry = new TextEntry(this, "", mX + mWidth - 5 * 9, mY, 5, &mMax, -INT_MAX, INT_MAX);
+         mMaxEntry->MakeActiveTextEntry(true);
+      }
+      else
+      {
+         mMinEntry->Delete();
+         //mMinEntry = new TextEntry(this, "", mX, mY, 5, &mMin, -FLT_MAX, FLT_MAX);
+         mMinEntry = new TextEntry(this, "", mX + mWidth - 5 * 9, mY, 5, &mMin, -INT_MAX, INT_MAX);
+         mMinEntry->MakeActiveTextEntry(true);
+      }
+
+      return;
+   }
    
    SetValueForMouse(x,y);
    mMouseDown = true;
