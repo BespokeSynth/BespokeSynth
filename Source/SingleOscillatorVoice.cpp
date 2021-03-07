@@ -154,8 +154,9 @@ bool SingleOscillatorVoice::Process(double time, ChannelBuffer* out)
 
 void SingleOscillatorVoice::Start(double time, float target)
 {
-   float adsrScale = ofMap(target, 0, 1, .2f, 1);
-   mAdsr.Start(time, target, mVoiceParams->mAdsr, adsrScale);
+   float volume = ofLerp((1 - mVoiceParams->mVelToVolume), 1, target);
+   float adsrScale = ofLerp((1 - mVoiceParams->mVelToEnvelope), 1, target);
+   mAdsr.Start(time, volume, mVoiceParams->mAdsr, adsrScale);
    
    if (mVoiceParams->mFilterCutoff != SINGLEOSCILLATOR_NO_CUTOFF)
    {

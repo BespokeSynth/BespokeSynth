@@ -13,6 +13,7 @@
 #include "ofxJSONElement.h"
 #include "ModularSynth.h"
 #include "Profiler.h"
+#include "UIControlMacros.h"
 
 SingleOscillator::SingleOscillator()
 : mVolSlider(nullptr)
@@ -27,8 +28,6 @@ SingleOscillator::SingleOscillator()
 , mDetuneSlider(nullptr)
 , mUnisonSlider(nullptr)
 , mUnisonWidthSlider(nullptr)
-, mADSRModeSelector(nullptr)
-, mADSRMode(0)
 , mShuffleSlider(nullptr)
 , mPolyMgr(this)
 , mNoteInputBuffer(this)
@@ -38,7 +37,7 @@ SingleOscillator::SingleOscillator()
 , mDrawOsc(kOsc_Square)
 {
    mVoiceParams.mAdsr.Set(10,0,1,10);
-   mVoiceParams.mVol = .05f;
+   mVoiceParams.mVol = .5f;
    mVoiceParams.mPulseWidth = .5f;
    mVoiceParams.mSync = false;
    mVoiceParams.mSyncFreq = 200;
@@ -52,38 +51,62 @@ SingleOscillator::SingleOscillator()
    mVoiceParams.mPhaseOffset = 0;
    mVoiceParams.mUnison = 1;
    mVoiceParams.mUnisonWidth = 0;
+   mVoiceParams.mVelToVolume = .5f;
+   mVoiceParams.mVelToEnvelope = .5f;
    
    mPolyMgr.Init(kVoiceType_SingleOscillator, &mVoiceParams);
+}
+
+namespace
+{
+   const float kColumnWidth = 90;
+   const float kGap = 5;
 }
 
 void SingleOscillator::CreateUIControls()
 {
    IDrawableModule::CreateUIControls();
    
-   mOscSelector = new DropdownList(this,"osc",5,1,(int*)(&mVoiceParams.mOscType));
-   mOscSelector->AddLabel("sin",kOsc_Sin);
-   mOscSelector->AddLabel("squ",kOsc_Square);
-   mOscSelector->AddLabel("tri",kOsc_Tri);
-   mOscSelector->AddLabel("saw",kOsc_Saw);
-   mOscSelector->AddLabel("-saw",kOsc_NegSaw);
-   mOscSelector->AddLabel("noise",kOsc_Random);
-   mMultSelector = new DropdownList(this,"mult",mOscSelector,kAnchor_Right,&mMult);
-   mPulseWidthSlider = new FloatSlider(this,"pw",5,55,80,15,&mVoiceParams.mPulseWidth,0.01f,.99f,2);
-   mShuffleSlider = new FloatSlider(this,"shuffle",mPulseWidthSlider,kAnchor_Below,80,15,&mVoiceParams.mShuffle, 0, 1);
-   mDetuneSlider = new FloatSlider(this,"detune",mShuffleSlider,kAnchor_Below,80,15,&mVoiceParams.mDetune,-.05f,.05f,3);
-   mPhaseOffsetSlider = new FloatSlider(this,"phase",mDetuneSlider,kAnchor_Below,80,15,&mVoiceParams.mPhaseOffset,0,TWO_PI);
-   mUnisonSlider = new IntSlider(this,"unison",mPhaseOffsetSlider,kAnchor_Below,80,15,&mVoiceParams.mUnison,1,SingleOscillatorVoice::kMaxUnison);
-   mUnisonWidthSlider = new FloatSlider(this,"width",mUnisonSlider,kAnchor_Right,80,15,&mVoiceParams.mUnisonWidth,0,1);
+   float width, height;
+   UIBLOCK(3, 42, kColumnWidth);
+   DROPDOWN(mOscSelector, "osc", (int*)(&mVoiceParams.mOscType), kColumnWidth / 2); UIBLOCK_SHIFTRIGHT();
+   DROPDOWN(mMultSelector, "mult", &mMult, kColumnWidth / 2-3); UIBLOCK_NEWLINE();
+   FLOATSLIDER_DIGITS(mPulseWidthSlider,"pw",&mVoiceParams.mPulseWidth,0.01f,.99f,2);
+   FLOATSLIDER(mShuffleSlider,"shuffle", &mVoiceParams.mShuffle, 0, 1);
+   FLOATSLIDER(mPhaseOffsetSlider,"phase",&mVoiceParams.mPhaseOffset,0,TWO_PI);
+   CHECKBOX(mSyncCheckbox, "sync", &mVoiceParams.mSync); UIBLOCK_SHIFTRIGHT();
+   UIBLOCK_PUSHSLIDERWIDTH(47);
+   FLOATSLIDER(mSyncFreqSlider, "syncf", &mVoiceParams.mSyncFreq, 10, 999.9f); UIBLOCK_NEWLINE();
+   UIBLOCK_POPSLIDERWIDTH();
+   ENDUIBLOCK(mWidth, mHeight);
    
-   mADSRModeSelector = new RadioButton(this,"envmode",95,1,&mADSRMode,kRadioHorizontal);
-   mADSRDisplay = new ADSRDisplay(this,"env",95,18,80,36,&mVoiceParams.mAdsr);
-   mFilterADSRDisplay = new ADSRDisplay(this,"envfilter",95,18,80,36,&mVoiceParams.mFilterAdsr);
-   mLengthMultiplierSlider = new FloatSlider(this,"len",mADSRDisplay,kAnchor_Below,80,15,&mLengthMultiplier,.01f,10);
-   mVolSlider = new FloatSlider(this,"vol",mLengthMultiplierSlider,kAnchor_Below,80,15,&mVoiceParams.mVol,0,1);
-   mFilterCutoffSlider = new FloatSlider(this,"f",mVolSlider,kAnchor_Below,40,15,&mVoiceParams.mFilterCutoff,0,SINGLEOSCILLATOR_NO_CUTOFF);
-   mFilterQSlider = new FloatSlider(this,"q",mFilterCutoffSlider,kAnchor_Right,40,15,&mVoiceParams.mFilterQ,.1,20,2);
-   mSyncCheckbox = new Checkbox(this,"sync",mFilterCutoffSlider,kAnchor_Below,&mVoiceParams.mSync);
-   mSyncFreqSlider = new FloatSlider(this,"syncf",mSyncCheckbox,kAnchor_Right,40,15,&mVoiceParams.mSyncFreq,10,999.9f);
+   UIBLOCK(3 + kGap + kColumnWidth, 3, kColumnWidth);
+   UICONTROL_CUSTOM(mADSRDisplay, new ADSRDisplay(UICONTROL_BASICS("env"), kColumnWidth,36,&mVoiceParams.mAdsr));
+   FLOATSLIDER(mVolSlider, "vol", &mVoiceParams.mVol, 0, 1);
+   FLOATSLIDER_DIGITS(mDetuneSlider, "detune", &mVoiceParams.mDetune, -.05f, .05f, 3);
+   INTSLIDER(mUnisonSlider, "unison", &mVoiceParams.mUnison, 1, SingleOscillatorVoice::kMaxUnison);
+   FLOATSLIDER(mUnisonWidthSlider, "width", &mVoiceParams.mUnisonWidth, 0, 1);
+   ENDUIBLOCK(width, height);
+   mWidth = MAX(width, mWidth);
+   mHeight = MAX(height, mHeight);
+
+   UIBLOCK(3 + (kGap + kColumnWidth) * 2, 3, kColumnWidth);
+   UICONTROL_CUSTOM(mFilterADSRDisplay, new ADSRDisplay(UICONTROL_BASICS("envfilter"), kColumnWidth, 36, &mVoiceParams.mFilterAdsr));
+   FLOATSLIDER(mFilterCutoffSlider, "f", &mVoiceParams.mFilterCutoff, 0, SINGLEOSCILLATOR_NO_CUTOFF);
+   FLOATSLIDER(mFilterQSlider, "q", &mVoiceParams.mFilterQ, .1, 20);
+   FLOATSLIDER(mVelToVolumeSlider, "vel2vol", &mVoiceParams.mVelToVolume, 0, 1);
+   FLOATSLIDER(mVelToEnvelopeSlider, "vel2env", &mVoiceParams.mVelToEnvelope, 0, 1);
+   FLOATSLIDER_DIGITS(mLengthMultiplierSlider, "adsr len", &mLengthMultiplier, .01f, 10, 1);
+   ENDUIBLOCK(width, height);
+   mWidth = MAX(width, mWidth);
+   mHeight = MAX(height, mHeight);
+
+   mOscSelector->AddLabel("sin", kOsc_Sin);
+   mOscSelector->AddLabel("squ", kOsc_Square);
+   mOscSelector->AddLabel("tri", kOsc_Tri);
+   mOscSelector->AddLabel("saw", kOsc_Saw);
+   mOscSelector->AddLabel("-saw", kOsc_NegSaw);
+   mOscSelector->AddLabel("noise", kOsc_Random);
 
    mSyncFreqSlider->SetShowName(false);
    
@@ -105,11 +128,6 @@ void SingleOscillator::CreateUIControls()
    mMultSelector->AddLabel("6", 6);
    mMultSelector->AddLabel("7", 7);
    mMultSelector->AddLabel("8", 8);
-   
-   mADSRModeSelector->AddLabel("vol",0);
-   mADSRModeSelector->AddLabel("filter",1);
-   
-   UpdateADSRDisplays();
 
    mFilterCutoffSlider->SetMode(FloatSlider::kSquare);
    mFilterQSlider->SetMode(FloatSlider::kSquare);
@@ -206,26 +224,20 @@ void SingleOscillator::DrawModule()
    mUnisonSlider->Draw();
    mUnisonWidthSlider->Draw();
    mShuffleSlider->Draw();
+   mVelToVolumeSlider->Draw();
+   mVelToEnvelopeSlider->Draw();
    mFilterADSRDisplay->Draw();
    mFilterCutoffSlider->Draw();
    mFilterQSlider->Draw();
-   if (mADSRMode == 0)  //draw order
-   {
-      mADSRModeSelector->Draw();
-      mADSRDisplay->Draw();
-   }
-   else
-   {
-      mADSRDisplay->Draw();
-      mADSRModeSelector->Draw();
-   }
+   mADSRDisplay->Draw();
    mMultSelector->Draw();
    
    {
-      int x = 5;
-      int y = 18;
+      ofPushStyle();
+      int x = 3;
+      int y = 3;
       int height = 36;
-      int width = 80;
+      int width = kColumnWidth;
       
       ofSetColor(100,100,.8f*gModuleDrawAlpha);
       ofSetLineWidth(.5f);
@@ -240,13 +252,27 @@ void SingleOscillator::DrawModule()
       {
          float phase = i/width * FTWO_PI;
          phase += gTime * .005f;
+         if (mVoiceParams.mSync)
+         {
+            FloatWrap(phase, FTWO_PI);
+            phase *= mVoiceParams.mSyncFreq / 200;
+         }
          if (mDrawOsc.GetShuffle() > 0)
             phase *= 2;
          float value = mDrawOsc.Value(phase);
          ofVertex(i + x, ofMap(value,-1,1,0,height) + y);
       }
       ofEndShape(false);
+      ofPopStyle();
    }
+
+   DrawTextLeftJustify("wave", kGap + kColumnWidth - 3, 15);
+   DrawTextLeftJustify("volume", (kGap + kColumnWidth) * 2 - 3, 15);
+   ofPushStyle();
+   if (mVoiceParams.mFilterCutoff == SINGLEOSCILLATOR_NO_CUTOFF)
+      ofSetColor(100, 100, 100);
+   DrawTextLeftJustify("filter", (kGap + kColumnWidth) * 3 - 3, 15);
+   ofPopStyle();
 }
  
 void SingleOscillator::DrawModuleUnclipped()
@@ -256,18 +282,6 @@ void SingleOscillator::DrawModuleUnclipped()
       mPolyMgr.DrawDebug(200, 0);
       DrawTextNormal(mDebugLines, 0, 160);
    }
-}
-
-void SingleOscillator::GetModuleDimensions(float& width, float& height)
-{
-   width = 180;
-   height = 143;
-}
-
-void SingleOscillator::UpdateADSRDisplays()
-{
-   mADSRDisplay->SetActive(mADSRMode == 0);
-   mFilterADSRDisplay->SetActive(mADSRMode == 1);
 }
 
 void SingleOscillator::LoadLayout(const ofxJSONElement& moduleInfo)
@@ -308,10 +322,6 @@ void SingleOscillator::DropdownUpdated(DropdownList* list, int oldVal)
 
 void SingleOscillator::RadioButtonUpdated(RadioButton* list, int oldVal)
 {
-   if (list == mADSRModeSelector)
-   {
-      UpdateADSRDisplays();
-   }
 }
 
 void SingleOscillator::FloatSliderUpdated(FloatSlider* slider, float oldVal)

@@ -61,11 +61,11 @@ private:
    //IDrawableModule
    void DrawModule() override;
    void DrawModuleUnclipped() override;
-   void GetModuleDimensions(float& width, float& height) override;
+   void GetModuleDimensions(float& width, float& height) override { width = mWidth; height = mHeight; }
    bool Enabled() const override { return mEnabled; }
-
-   void UpdateADSRDisplays();
    
+   float mWidth;
+   float mHeight;
    PolyphonyMgr mPolyMgr;
    NoteInputBuffer mNoteInputBuffer;
    OscillatorVoiceParams mVoiceParams;
@@ -84,13 +84,12 @@ private:
    FloatSlider* mShuffleSlider;
    float mLengthMultiplier;
    FloatSlider* mLengthMultiplierSlider;
+   FloatSlider* mVelToVolumeSlider;
+   FloatSlider* mVelToEnvelopeSlider;
    
    FloatSlider* mFilterCutoffSlider;
    FloatSlider* mFilterQSlider;
    ADSRDisplay* mFilterADSRDisplay;
-   
-   RadioButton* mADSRModeSelector;
-   int mADSRMode;
 
    ChannelBuffer mWriteBuffer;
    

@@ -39,6 +39,9 @@ public:
    float mFilterCutoff;
    float mFilterQ;
    ::ADSR mFilterAdsr;
+
+   float mVelToVolume;
+   float mVelToEnvelope;
 };
 
 class SingleOscillatorVoice : public IMidiVoice
