@@ -24,9 +24,12 @@ public:
    string GetTitleLabel() override { return "chord holder"; }
    void CreateUIControls() override;
 
+   void SetEnabled(bool enabled) override { mEnabled = enabled; }
+
    //INoteReceiver
    void PlayNote(double time, int pitch, int velocity, int voiceIdx = -1, ModulationParameters modulation = ModulationParameters()) override;
 
+   void CheckboxUpdated(Checkbox* checkbox) override;
    void ButtonClicked(ClickButton* button) override;
 
    virtual void LoadLayout(const ofxJSONElement& moduleInfo) override;
@@ -35,7 +38,9 @@ private:
    //IDrawableModule
    void DrawModule() override;
    void GetModuleDimensions(float& width, float& height) override { width = 90; height = 21; }
-   bool Enabled() const override { return true; }
+   bool Enabled() const override { return mEnabled; }
+
+   void Stop();
 
    std::array<bool, 128> mNoteInputHeld{ false };
    std::array<bool, 128> mNotePlaying{ false };

@@ -30,57 +30,83 @@ void ChordHolder::DrawModule()
    mStopButton->Draw();
 }
 
+void ChordHolder::Stop()
+{
+   for (int i = 0; i < 128; ++i)
+   {
+      if (mNotePlaying[i] && !mNoteInputHeld[i])
+      {
+         PlayNoteOutput(gTime + gBufferSizeMs, i, 0, -1);
+         mNotePlaying[i] = false;
+      }
+   }
+}
+
 void ChordHolder::ButtonClicked(ClickButton* button)
 {
    if (button == mStopButton)
+      Stop();
+}
+
+void ChordHolder::CheckboxUpdated(Checkbox* checkbox)
+{
+   if (checkbox == mEnabledCheckbox)
    {
-      for (int i = 0; i < 128; ++i)
+      if (mEnabled)
       {
-         if (mNotePlaying[i] && !mNoteInputHeld[i])
-         {
-            PlayNoteOutput(gTime+gBufferSize*gInvSampleRateMs, i, 0, -1);
-            mNotePlaying[i] = false;
-         }
+         for (int i = 0; i < 128; ++i)
+            mNotePlaying[i] = mNoteInputHeld[i];
+      }
+      else
+      {
+         Stop();
       }
    }
 }
 
 void ChordHolder::PlayNote(double time, int pitch, int velocity, int voiceIdx, ModulationParameters modulation)
 {
-   bool anyInputNotesHeld = false;
-   for (int i = 0; i < 128; ++i)
+   if (mEnabled)
    {
-      if (mNoteInputHeld[i])
-         anyInputNotesHeld = true;
-   }
-
-   if (!anyInputNotesHeld) //new input, clear any existing output
-   {
+      bool anyInputNotesHeld = false;
       for (int i = 0; i < 128; ++i)
       {
-         if (mNotePlaying[i])
+         if (mNoteInputHeld[i])
+            anyInputNotesHeld = true;
+      }
+
+      if (!anyInputNotesHeld) //new input, clear any existing output
+      {
+         for (int i = 0; i < 128; ++i)
          {
-            PlayNoteOutput(time, i, 0, -1);
-            mNotePlaying[i] = false;
+            if (mNotePlaying[i])
+            {
+               PlayNoteOutput(time, i, 0, -1);
+               mNotePlaying[i] = false;
+            }
+         }
+      }
+
+      if (velocity > 0)
+      {
+         if (!mNotePlaying[pitch]) //don't replay already-sustained notes
+            PlayNoteOutput(time, pitch, velocity, voiceIdx, modulation);
+         mNotePlaying[pitch] = true;
+
+         //stop playing any voices in the chord that aren't being held anymore
+         for (int i = 0; i < 128; ++i)
+         {
+            if (i != pitch && mNotePlaying[i] && !mNoteInputHeld[i])
+            {
+               PlayNoteOutput(time, i, 0, -1);
+               mNotePlaying[i] = false;
+            }
          }
       }
    }
-
-   if (velocity > 0)
+   else
    {
-      if (!mNotePlaying[pitch]) //don't replay already-sustained notes
-         PlayNoteOutput(time, pitch, velocity, voiceIdx, modulation);
-      mNotePlaying[pitch] = true;
-
-      //stop playing any voices in the chord that aren't being held anymore
-      for (int i = 0; i < 128; ++i)
-      {
-         if (i != pitch && mNotePlaying[i] && !mNoteInputHeld[i])
-         {
-            PlayNoteOutput(time, i, 0, -1);
-            mNotePlaying[i] = false;
-         }
-      }
+      PlayNoteOutput(time, pitch, velocity, voiceIdx, modulation);
    }
 
    mNoteInputHeld[pitch] = velocity > 0;
