@@ -159,8 +159,7 @@ void SampleCanvas::SampleDropped(int x, int y, Sample* sample)
    coord.row = MAX(0,coord.row);
    SampleCanvasElement* element = static_cast<SampleCanvasElement*>(mCanvas->CreateElement(coord.col,coord.row));
    Sample* newSamp = new Sample();
-   newSamp->Create(sample->Data());
-   newSamp->SetNumBars(sample->GetNumBars());
+   newSamp->CopyFrom(sample);
    element->SetSample(newSamp);
    mCanvas->AddElement(element);
    mCanvas->SelectElement(element);

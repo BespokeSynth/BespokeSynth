@@ -622,7 +622,7 @@ void DrumPlayer::SampleDropped(int x, int y, Sample* sample)
       if (sampleIdx != -1)
       {
          LoadSampleLock();
-         mDrumHits[sampleIdx].mSample.Create(sample->Data());
+         mDrumHits[sampleIdx].mSample.CopyFrom(sample);
          LoadSampleUnlock();
          mDrumHits[sampleIdx].mLinkId = -1;
          mDrumHits[sampleIdx].mVol = 1;

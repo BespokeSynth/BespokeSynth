@@ -290,6 +290,8 @@ void Sample::ShiftWrap(int numSamplesToShift)
 void Sample::CopyFrom(Sample* sample)
 {
    mNumSamples = sample->mNumSamples;
+   if (mData.BufferSize() != sample->mData.BufferSize())
+      mData.Resize(sample->mNumSamples);
    mData.CopyFrom(&sample->mData);
    mNumBars = sample->mNumBars;
    mLooping = sample->mLooping;
