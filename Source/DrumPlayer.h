@@ -181,7 +181,8 @@ private:
          double mStartTime;
          double mCutOffTime;
          double mOffset;
-         double mRunningTime;
+         double mEnvelopeTime;
+         double mEnvelopeSpeed;
          float mSpeedTweak;
       };
 
@@ -217,7 +218,7 @@ private:
       void DrawUIControls();
       void UpdateHitDirectoryDropdown();
       void LoadRandomSample();
-      void StartPlayhead(double time);
+      void StartPlayhead(double time, float startOffsetPercent, float velocity);
       void StopLinked(double time);
       float GetPlayProgress(double time);
       

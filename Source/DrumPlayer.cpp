@@ -229,6 +229,7 @@ void DrumPlayer::DrumHit::SetUIControlsShowing(bool showing)
    mWidenSlider->SetShowing(showing && mOwner->mMonoOutput == false);
    mIndividualOutputCheckbox->SetShowing(showing);
    mLinkIdSlider->SetShowing(showing);
+   mEnvelopeLengthSlider->SetShowing(showing);
    mHitCategoryDropdown->SetShowing(showing);
 }
 
@@ -247,6 +248,7 @@ void DrumPlayer::LoadKit(int kit)
          mDrumHits[i].mVol = mKits[kit].mVols[i];
          mDrumHits[i].mSpeed = mKits[kit].mSpeeds[i];
          mDrumHits[i].mPan = mKits[kit].mPans[i];
+         mDrumHits[i].mEnvelopeLength = mDrumHits[i].mSample.LengthInSamples() * gInvSampleRateMs;
       }
       LoadSampleUnlock();
    }
@@ -376,7 +378,7 @@ void DrumPlayer::Process(double time)
    }
 }
 
-void DrumPlayer::DrumHit::StartPlayhead(double time)
+void DrumPlayer::DrumHit::StartPlayhead(double time, float startOffsetPercent, float velocity)
 {
    mCurrentPlayheadIndex = (mCurrentPlayheadIndex + 1) % mPlayheads.size();
    for (size_t i = 0; i < mPlayheads.size(); ++i)
@@ -385,8 +387,9 @@ void DrumPlayer::DrumHit::StartPlayhead(double time)
       {
          mPlayheads[i].mStartTime = time;
          mPlayheads[i].mCutOffTime = -1;
-         mPlayheads[i].mOffset = 0;
-         mPlayheads[i].mRunningTime = 0;
+         mPlayheads[i].mOffset = startOffsetPercent * mSample.LengthInSamples();
+         mPlayheads[i].mEnvelopeTime = 0;
+         mPlayheads[i].mEnvelopeSpeed = ofMap(velocity, 0, 1, .2f, 1);
          mPlayheads[i].mSpeedTweak = ofRandom(1-mOwner->mSpeedRandomization, 1+ mOwner->mSpeedRandomization);
       }
       else
@@ -447,7 +450,7 @@ bool DrumPlayer::DrumHit::Process(double time, float speed, float vol, ChannelBu
                float sample = GetInterpolatedSample(mPlayheads[playhead].mOffset, sampleData->GetChannel(dataChannel), mSample.LengthInSamples());
                sample *= mVelocity * vol * mVol * mVol;
                if (mUseEnvelope)
-                  sample *= mEnvelope.Value(mPlayheads[playhead].mRunningTime);
+                  sample *= mEnvelope.Value(mPlayheads[playhead].mEnvelopeTime);
 
                if (mPlayheads[playhead].mCutOffTime != -1 && time > mPlayheads[playhead].mCutOffTime)
                {
@@ -461,7 +464,7 @@ bool DrumPlayer::DrumHit::Process(double time, float speed, float vol, ChannelBu
             }
 
             mPlayheads[playhead].mOffset += sampleSpeed * mPlayheads[playhead].mSpeedTweak * mSample.GetSampleRateRatio();
-            mPlayheads[playhead].mRunningTime += gInvSampleRateMs;
+            mPlayheads[playhead].mEnvelopeTime += gInvSampleRateMs / mPlayheads[playhead].mEnvelopeSpeed;
             mSamplesRemainingToProcess = bufferSize + abs(mWiden);
          }
       }
@@ -547,7 +550,10 @@ void DrumPlayer::PlayNote(double time, int pitch, int velocity, int voiceIdx, Mo
          mDrumHits[pitch].mVelocity = velocity / 127.0f;
          mDrumHits[pitch].mPanInput = modulation.pan;
          mDrumHits[pitch].mPitchBend = modulation.pitchBend;
-         mDrumHits[pitch].StartPlayhead(time);
+         float startOffsetPercent = 0;
+         if (modulation.modWheel != nullptr)
+            startOffsetPercent = modulation.modWheel->GetValue(0);
+         mDrumHits[pitch].StartPlayhead(time, startOffsetPercent, velocity/127.0f);
       }
    }
 }
@@ -587,6 +593,7 @@ void DrumPlayer::FilesDropped(vector<string> files, int x, int y)
                mDrumHits[sampleIdx].mVol = 1;
                mDrumHits[sampleIdx].mSpeed = 1;
                mDrumHits[sampleIdx].mPan = 0;
+               mDrumHits[sampleIdx].mEnvelopeLength = mDrumHits[sampleIdx].mSample.LengthInSamples() * gInvSampleRateMs;
             }
          }
       }
@@ -621,6 +628,7 @@ void DrumPlayer::SampleDropped(int x, int y, Sample* sample)
          mDrumHits[sampleIdx].mVol = 1;
          mDrumHits[sampleIdx].mSpeed = 1;
          mDrumHits[sampleIdx].mPan = 0;
+         mDrumHits[sampleIdx].mEnvelopeLength = mDrumHits[sampleIdx].mSample.LengthInSamples() * gInvSampleRateMs;
       }
    }
 }
@@ -815,7 +823,7 @@ void DrumPlayer::DrumHit::DrawUIControls()
       mEnvelopeLengthSlider->SetExtents(10, mSample.LengthInSamples() * gInvSampleRateMs);
       mEnvelopeLengthSlider->Draw();
       mEnvelopeDisplay->SetMaxTime(mEnvelopeLength);
-      mEnvelopeDisplay->SetOverrideDrawTime(mPlayheads[mCurrentPlayheadIndex].mRunningTime);
+      mEnvelopeDisplay->SetOverrideDrawTime(mPlayheads[mCurrentPlayheadIndex].mEnvelopeTime);
       mEnvelopeDisplay->Draw();
    }
 }
@@ -962,8 +970,9 @@ void DrumPlayer::FloatSliderUpdated(FloatSlider* slider, float oldVal)
             LoadSampleLock();
             mDrumHits[mAuditionPadIdx].mSample.Read(file.c_str());
             LoadSampleUnlock();
-            mDrumHits[mAuditionPadIdx].StartPlayhead(gTime);
+            mDrumHits[mAuditionPadIdx].StartPlayhead(gTime, 0, 1);
             mDrumHits[mAuditionPadIdx].mVelocity = .5f;
+            mDrumHits[mAuditionPadIdx].mEnvelopeLength = mDrumHits[mAuditionPadIdx].mSample.LengthInSamples() * gInvSampleRateMs;
          }
       }
    }
@@ -1054,6 +1063,7 @@ void DrumPlayer::DrumHit::LoadRandomSample()
       mOwner->LoadSampleUnlock();
       //mSample.Play(gTime, mSpeed, 0);
       //mVelocity = .5f;
+      mEnvelopeLength = mSample.LengthInSamples() * gInvSampleRateMs;
    }
 }
 
