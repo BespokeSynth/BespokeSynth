@@ -15,7 +15,7 @@ DCRemoverEffect::DCRemoverEffect()
    
    for (int i=0; i<ChannelBuffer::kMaxNumChannels; ++i)
    {
-      mBiquad[i].SetFilterParams(10, 1);
+      mBiquad[i].SetFilterParams(10, sqrt(2)/2);
       mBiquad[i].SetFilterType(kFilterType_Highpass);
       mBiquad[i].UpdateFilterCoeff();
    }
