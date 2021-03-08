@@ -35,7 +35,7 @@
 
 ModularSynth* TheSynth = nullptr;
 
-#define RECORDING_LENGTH (44100*60*30) //30 minutes of recording if we're running at 44100
+#define RECORDING_LENGTH (48000*60*30) //30 minutes of recording if we're running at 48000
 
 //static
 bool ModularSynth::sShouldAutosave = true;
@@ -109,10 +109,6 @@ void ModularSynth::Setup(GlobalManagers* globalManagers, juce::Component* mainCo
    bool loaded = mUserPrefs.open(GetUserPrefsPath(false));
    if (loaded)
    {
-      SetGlobalBufferSize(mUserPrefs["buffersize"].asInt());
-      mIOBufferSize = gBufferSize;
-      gSampleRate = mUserPrefs["samplerate"].asInt();
-
       sShouldAutosave = mUserPrefs["autosave"].isNull() ? false : (mUserPrefs["autosave"].asInt() > 0);
 
       if (!mUserPrefs["scroll_multiplier_horizontal"].isNull())
@@ -135,10 +131,9 @@ void ModularSynth::Setup(GlobalManagers* globalManagers, juce::Component* mainCo
          mFatalError += "\nplease install to /Applications/BespokeSynth or launch via run_bespoke.command";
 #endif
       LogEvent("couldn't find or load userprefs.json", kLogEventType_Error);
-      SetGlobalBufferSize(256);
-      mIOBufferSize = gBufferSize;
-      gSampleRate = 44100;
    }
+
+   mIOBufferSize = gBufferSize;
    
    SynthInit();
 
@@ -156,6 +151,7 @@ void ModularSynth::Setup(GlobalManagers* globalManagers, juce::Component* mainCo
    
    mConsoleListener = new ConsoleListener();
    mConsoleEntry = new TextEntry(mConsoleListener,"console",0,20,50,mConsoleText);
+   mConsoleEntry->SetRequireEnter(true);
 }
 
 void ModularSynth::LoadResources(void* nanoVG, void* fontBoundsNanoVG)
@@ -958,7 +954,7 @@ void ModularSynth::MousePressed(int intX, int intY, int button)
 
    if (clicked)
       CheckClick(clicked, x, y, rightButton);
-   else
+   else if (TheSaveDataPanel != nullptr)
       TheSaveDataPanel->SetModule(nullptr);
 }
 

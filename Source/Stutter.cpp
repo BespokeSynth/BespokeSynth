@@ -139,7 +139,7 @@ float Stutter::GetBufferReadPos(float stutterPos)
 
 //TODO(Ryan) figure out how to blend out when we hit the rewrite button
 
-void Stutter::StartStutter(StutterParams stutter)
+void Stutter::StartStutter(double time, StutterParams stutter)
 {
    if (mAutoStutter || !mEnabled)
       return;
@@ -153,10 +153,10 @@ void Stutter::StartStutter(StutterParams stutter)
       quantize = false; //"free stutter" shouldn't be quantized
    
    if (!quantize)
-      DoStutter(stutter);
+      DoStutter(time, stutter);
 }
 
-void Stutter::EndStutter(StutterParams stutter)
+void Stutter::EndStutter(double time, StutterParams stutter)
 {
    if (mAutoStutter || !mEnabled)
       return;
@@ -182,22 +182,22 @@ void Stutter::EndStutter(StutterParams stutter)
    if (!quantize)
    {
       if (mStutterStack.empty())
-         StopStutter();
+         StopStutter(time);
       else if (hasNewStutter)
-         DoStutter(stutter);
+         DoStutter(time, stutter);
    }
 }
 
-void Stutter::StopStutter()
+void Stutter::StopStutter(double time)
 {
    if (mStuttering)
    {
-      mBlendRamp.Start(gTime, 0, gTime+STUTTER_START_BLEND_MS);
+      mBlendRamp.Start(time, 0, time+STUTTER_START_BLEND_MS);
       mStuttering = false;
    }
 }
 
-void Stutter::DoStutter(StutterParams stutter)
+void Stutter::DoStutter(double time, StutterParams stutter)
 {
    if (mStuttering && stutter == mCurrentStutter)
       return;
@@ -223,7 +223,7 @@ void Stutter::DoStutter(StutterParams stutter)
       
    mStutterPos = 0;
    mStuttering = true;
-   mBlendRamp.Start(gTime, 1, gTime+STUTTER_START_BLEND_MS);
+   mBlendRamp.Start(time, 1, time+STUTTER_START_BLEND_MS);
    if (stutter.interval != kInterval_None)
       mStutterLength = int(TheTransport->GetDuration(stutter.interval) / 1000 * gSampleRate);
    else
@@ -231,7 +231,7 @@ void Stutter::DoStutter(StutterParams stutter)
    if (stutter.speedBlendTime == 0)
       mStutterSpeed.SetValue(stutter.speedStart);
    else
-      mStutterSpeed.Start(gTime,stutter.speedStart,stutter.speedEnd,gTime+stutter.speedBlendTime);
+      mStutterSpeed.Start(time,stutter.speedStart,stutter.speedEnd,time+stutter.speedBlendTime);
    mStutterLength /= sStutterSubdivide;
    mStutterLength = MAX(1,mStutterLength); //don't allow it to be zero
    mStutterLengthRamp.SetValue(mStutterLength);
@@ -299,7 +299,7 @@ void Stutter::CheckboxUpdated(Checkbox* checkbox)
          mMutex.lock();
          mStutterStack.clear();
          mMutex.unlock();
-         StopStutter();
+         StopStutter(gTime + gBufferSizeMs);
          TheTransport->UpdateListener(this, kInterval_16n);
       }
       else
@@ -330,11 +330,11 @@ void Stutter::OnTimeEvent(double time)
                                                     StutterParams(kInterval_2n, -1),
                                                     StutterParams(kInterval_8n, .5f),
                                                     StutterParams(kInterval_8n, 2)};
-            DoStutter(randomStutters[rand() % 9]);
+            DoStutter(time, randomStutters[rand() % 9]);
          }
          else
          {
-            StopStutter();
+            StopStutter(time);
          }
       }
       
@@ -342,9 +342,9 @@ void Stutter::OnTimeEvent(double time)
       {
          mMutex.lock();
          if (mStutterStack.empty())
-            StopStutter();
+            StopStutter(time);
          else
-            DoStutter(*mStutterStack.begin());
+            DoStutter(time, *mStutterStack.begin());
          mMutex.unlock();
       }
    }
@@ -357,7 +357,7 @@ void Stutter::UpdateEnabled()
       mMutex.lock();
       mStutterStack.clear();
       mMutex.unlock();
-      StopStutter();
+      StopStutter(gTime + gBufferSizeMs);
    }
 }
 

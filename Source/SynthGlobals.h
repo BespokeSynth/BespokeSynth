@@ -73,11 +73,12 @@ const int kNumVoices = 16;
 
 extern int gSampleRate;
 extern int gBufferSize;
-extern float gDefaultTempo;
 extern double gTwoPiOverSampleRate;
 extern double gSampleRateMs;
 extern double gInvSampleRateMs;
-extern float gNyquistLimit;
+extern double gBufferSizeMs;
+extern double gNyquistLimit;
+extern float gDefaultTempo;
 extern bool gPrintMidiInput;
 extern double gTime;
 extern IUIControl* gBindToUIControl;
@@ -141,8 +142,7 @@ class LoadStateException : public exception {};
 void SynthInit();
 void LoadGlobalResources();
 
-void SetGlobalBufferSize(int size);
-void SetGlobalSampleRate(int rate);
+void SetGlobalSampleRateAndBufferSize(int rate, int size);
 void DrawAudioBuffer(float width, float height, ChannelBuffer* buffer, float start, float end, float pos, float vol=1, ofColor color=ofColor::black);
 void DrawAudioBuffer(float width, float height, const float* buffer, float start, float end, float pos, float vol=1, ofColor color=ofColor::black);
 void Add(float* buff1, const float* buff2, int bufferSize);

@@ -159,6 +159,7 @@ void LaunchpadKeyboard::OnGridButton(int x, int y, float velocity, IGridControll
 {
    bool bOn = velocity > 0;
    int pitch = GridToPitch(x,y);
+   double time = gTime + gBufferSizeMs;
    
    if (pitch == INVALID_PITCH)
    {
@@ -239,9 +240,9 @@ void LaunchpadKeyboard::OnGridButton(int x, int y, float velocity, IGridControll
          for (int i=0; i<128; ++i)
             mCurrentNotes[i] = 0;
          PressedNoteFor(x, y, (int)127*velocity);
-         mNoteOutput.Flush(gTime);
+         mNoteOutput.Flush(time);
          for (int i=0; i<mChords[x].size(); ++i)
-            PlayNoteOutput(gTime, TheScale->MakeDiatonic(pitch+mChords[x][i]), 127*velocity, -1);
+            PlayNoteOutput(time, TheScale->MakeDiatonic(pitch+mChords[x][i]), 127*velocity, -1);
       }
       else
       {
@@ -256,7 +257,7 @@ void LaunchpadKeyboard::OnGridButton(int x, int y, float velocity, IGridControll
          {
             for (int i=0; i<128; ++i)
                mCurrentNotes[i] = 0;
-            mNoteOutput.Flush(gTime);
+            mNoteOutput.Flush(time);
          }
       }
    }
@@ -264,7 +265,7 @@ void LaunchpadKeyboard::OnGridButton(int x, int y, float velocity, IGridControll
    {
       if (bOn)
       {
-         PlayNoteOutput(gTime, pitch, 127*velocity, -1);
+         PlayNoteOutput(time, pitch, 127*velocity, -1);
          PressedNoteFor(x,y,(int)127*velocity);
       }
       else
@@ -287,9 +288,6 @@ void LaunchpadKeyboard::OnGridButton(int x, int y, float velocity, IGridControll
          }
       }
       lowestPitch -= TheScale->GetTet();
-
-      if (bOn && lowestPitch > 0)
-         gVizFreq = MAX(1,TheScale->PitchToFreq(lowestPitch));
    }
 }
 
@@ -305,7 +303,8 @@ void LaunchpadKeyboard::ReleaseNoteFor(int x, int y)
    int pitch = GridToPitch(x, y);
    if (pitch >= 0 && pitch < 128)
    {
-      PlayNoteOutput(gTime, pitch, 0, -1);
+      double time = gTime + gBufferSizeMs;
+      PlayNoteOutput(time, pitch, 0, -1);
       mCurrentNotes[pitch] = 0;
    }
 }
@@ -731,7 +730,10 @@ void LaunchpadKeyboard::CheckboxUpdated(Checkbox* checkbox)
    if (checkbox == mLatchCheckbox)
    {
       if (!mLatch)
-         mNoteOutput.Flush(gTime);
+      {
+         double time = gTime + gBufferSizeMs;
+         mNoteOutput.Flush(time);
+      }
    }
 }
 
@@ -741,7 +743,8 @@ void LaunchpadKeyboard::IntSliderUpdated(IntSlider* slider, int oldVal)
    {
       for (int i=0; i<128; ++i)
          mCurrentNotes[i] = 0;
-      mNoteOutput.Flush(gTime);
+      double time = gTime + gBufferSizeMs;
+      mNoteOutput.Flush(time);
       UpdateLights();
    }
 }

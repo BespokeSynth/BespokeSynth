@@ -88,12 +88,12 @@ void StutterControl::DrawModule()
    mGridController->Draw();
 }
 
-void StutterControl::SendStutter(StutterParams stutter, bool on)
+void StutterControl::SendStutter(double time, StutterParams stutter, bool on)
 {
    if (on)
-      mStutterProcessor.StartStutter(stutter);
+      mStutterProcessor.StartStutter(time, stutter);
    else
-      mStutterProcessor.EndStutter(stutter);
+      mStutterProcessor.EndStutter(time, stutter);
    UpdateGridLights();
 }
 
@@ -185,11 +185,12 @@ StutterParams StutterControl::GetStutter(StutterControl::StutterType type)
 
 void StutterControl::CheckboxUpdated(Checkbox* checkbox)
 {
+   double time = gTime + gBufferSizeMs;
    for (int i=0; i<kNumStutterTypes; ++i)
    {
       if (checkbox == mStutterCheckboxes[i])
       {
-         SendStutter(GetStutter((StutterType)i), mStutter[i]);
+         SendStutter(time, GetStutter((StutterType)i), mStutter[i]);
       }
    }
 }
@@ -206,10 +207,11 @@ void StutterControl::OnControllerPageSelected()
 void StutterControl::OnGridButton(int x, int y, float velocity, IGridController* grid)
 {
    int index = x + y * grid->NumCols();
+   double time = gTime + gBufferSizeMs;
    if (index < kNumStutterTypes)
    {
       mStutter[index] = velocity > 0;
-      SendStutter(GetStutter((StutterType)index), mStutter[index]);
+      SendStutter(time, GetStutter((StutterType)index), mStutter[index]);
    }
 }
 
@@ -217,7 +219,7 @@ void StutterControl::PlayNote(double time, int pitch, int velocity, int voiceIdx
 {
    int index = pitch % kNumStutterTypes;
    mStutter[index] = velocity > 0;
-   SendStutter(GetStutter((StutterType)index), mStutter[index]);
+   SendStutter(time, GetStutter((StutterType)index), mStutter[index]);
 }
 
 void StutterControl::UpdateGridLights()

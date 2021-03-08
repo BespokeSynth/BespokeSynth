@@ -67,5 +67,5 @@ void NoteInputBuffer::QueueNote(double time, int pitch, float velocity, int voic
 //static
 bool NoteInputBuffer::IsTimeWithinFrame(double time)
 {
-   return time <= gTime + gBufferSize * gInvSampleRateMs;
+   return time <= gTime + gBufferSizeMs;
 }

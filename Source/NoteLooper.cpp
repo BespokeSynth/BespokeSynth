@@ -280,11 +280,12 @@ void NoteLooper::CheckboxUpdated(Checkbox* checkbox)
 {
    if (checkbox == mEnabledCheckbox)
    {
+      double time = gTime + gBufferSizeMs;
       for (size_t i = 0; i < mCurrentNotes.size(); ++i)
       {
          if (mCurrentNotes[i] != nullptr)
          {
-            mNoteOutput.PlayNote(gTime, i, 0, mCurrentNotes[i]->GetVoiceIdx());
+            mNoteOutput.PlayNote(time, i, 0, mCurrentNotes[i]->GetVoiceIdx());
             mCurrentNotes[i] = nullptr;
          }
       }
@@ -305,11 +306,12 @@ void NoteLooper::ButtonClicked(ClickButton* button)
 {
    if (button == mClearButton)
    {
+      double time = gTime + gBufferSizeMs;
       for (size_t i = 0; i < mCurrentNotes.size(); ++i)
       {
          if (mCurrentNotes[i] != nullptr)
          {
-            mNoteOutput.PlayNote(gTime, i, 0, mCurrentNotes[i]->GetVoiceIdx());
+            mNoteOutput.PlayNote(time, i, 0, mCurrentNotes[i]->GetVoiceIdx());
             mCurrentNotes[i] = nullptr;
          }
       }
@@ -317,7 +319,7 @@ void NoteLooper::ButtonClicked(ClickButton* button)
       {
          if (mInputNotes[i] != nullptr)
          {
-            mNoteOutput.PlayNote(gTime, i, 0, mInputNotes[i]->GetVoiceIdx());
+            mNoteOutput.PlayNote(time, i, 0, mInputNotes[i]->GetVoiceIdx());
             mInputNotes[i] = nullptr;
          }
       }

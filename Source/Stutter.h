@@ -58,8 +58,8 @@ public:
    void CreateUIControls() override;
    
    void DrawStutterBuffer(float x, float y, float width, float height);
-   void StartStutter(StutterParams stutter);
-   void EndStutter(StutterParams stutter);
+   void StartStutter(double time, StutterParams stutter);
+   void EndStutter(double time, StutterParams stutter);
    
    //IAudioEffect
    void ProcessAudio(double time, ChannelBuffer* buffer) override;
@@ -84,8 +84,8 @@ private:
    void DoCapture();
    void UpdateEnabled();
    float GetStutterSampleWithWraparoundBlend(int pos, int ch);
-   void DoStutter(StutterParams stutter);
-   void StopStutter();
+   void DoStutter(double time, StutterParams stutter);
+   void StopStutter(double time);
    float GetBufferReadPos(float stutterPos);
 
    //IDrawableModule

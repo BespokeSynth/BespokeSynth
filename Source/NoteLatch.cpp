@@ -28,10 +28,11 @@ void NoteLatch::CheckboxUpdated(Checkbox *checkbox)
 {
    if (checkbox == mEnabledCheckbox)
    {
+      double time = gTime + gBufferSizeMs;
       for (int i=0; i<128; ++i)
       {
          if (mNoteState[i])
-            PlayNoteOutput(gTime, i, 0);
+            PlayNoteOutput(time, i, 0);
       }
    }
 }

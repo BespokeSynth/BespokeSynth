@@ -26,13 +26,14 @@
 #import <execinfo.h>
 #endif
 
-int gBufferSize = 64;
-int gSampleRate = 44100;
+int gBufferSize = -999; //values set in SetGlobalSampleRateAndBufferSize(), setting them to bad values here to highlight any bugs
+int gSampleRate = -999;
+double gTwoPiOverSampleRate = -999;
+double gSampleRateMs = -999;
+double gInvSampleRateMs = -999;
+double gBufferSizeMs = -999;
+double gNyquistLimit = -999;
 float gDefaultTempo = 105;
-double gTwoPiOverSampleRate = TWO_PI / gSampleRate;
-double gSampleRateMs = gSampleRate / 1000.0;
-double gInvSampleRateMs = 1000.0 / gSampleRate;
-float gNyquistLimit = gSampleRate / 2.0f;
 bool gPrintMidiInput = false;
 double gTime = 1; //using a double here, so I'm going to lose nanosecond accuracy
                   //if I run for 4 months straight
@@ -80,18 +81,16 @@ void LoadGlobalResources()
    //gModuleShader.load(ofToDataPath("shaders/module.vert"), ofToDataPath("shaders/module.frag"));
 }
 
-void SetGlobalBufferSize(int size)
+void SetGlobalSampleRateAndBufferSize(int rate, int size)
 {
    assert(size <= kWorkBufferSize);
    gBufferSize = size;
-}
 
-void SetGlobalSampleRate(int rate)
-{
    gSampleRate = rate;
    gTwoPiOverSampleRate = TWO_PI / gSampleRate;
    gSampleRateMs = gSampleRate / 1000.0;
    gInvSampleRateMs = 1000.0 / gSampleRate;
+   gBufferSizeMs = gBufferSize / gSampleRateMs;
    gNyquistLimit = gSampleRate / 2.0f;
 }
 

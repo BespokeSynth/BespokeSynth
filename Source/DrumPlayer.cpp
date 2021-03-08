@@ -667,7 +667,7 @@ void DrumPlayer::OnGridButton(int x, int y, float velocity, IGridController* gri
    {
       if (velocity > 0 && mQuantizeInterval == kInterval_None)
       {
-         PlayNote(gTime, sampleIdx, velocity * 127);
+         PlayNote(gTime + gBufferSizeMs, sampleIdx, velocity * 127);
       }
       else
       {
@@ -1038,7 +1038,7 @@ void DrumPlayer::ButtonClicked(ClickButton* button)
    for (int i=0; i<NUM_DRUM_HITS; ++i)
    {
       if (button == mDrumHits[i].mTestButton)
-         PlayNote(gTime, i, 127);
+         PlayNote(gTime + gBufferSizeMs, i, 127);
       if (button == mDrumHits[i].mRandomButton)
          mDrumHits[i].LoadRandomSample();
    }

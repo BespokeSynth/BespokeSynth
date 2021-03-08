@@ -30,7 +30,6 @@ NoteSustain::~NoteSustain()
 
 void NoteSustain::DrawModule()
 {
-
    if (Minimized() || IsVisible() == false)
       return;
    

@@ -460,7 +460,7 @@ void ScriptModule::PlayNoteFromScriptAfterDelay(float pitch, float velocity, dou
 {
    double time = GetScheduledTime(delayMeasureTime);
    //if (velocity == 0)
-   //   time -= gBufferSize * gInvSampleRateMs + 1;  //TODO(Ryan) hack to make note offs happen a buffer early... figure out why scheduled lengths are longer than it takes to get the next pulse of the same interval
+   //   time -= gBufferSizeMs + 1;  //TODO(Ryan) hack to make note offs happen a buffer early... figure out why scheduled lengths are longer than it takes to get the next pulse of the same interval
    
    //ofLog() << "ScriptModule::PlayNoteFromScriptAfterDelay() " << velocity << " " << time << " " << sMostRecentRunTime << " " << (time - sMostRecentRunTime);
    
@@ -1082,13 +1082,15 @@ bool ScriptModule::IsNonWhitespace(string line)
 
 void ScriptModule::Stop()
 {
+   double time = gTime + gBufferSizeMs;
+
    //run through any scheduled note offs for this pitch
    for (size_t i=0; i<mScheduledNoteOutput.size(); ++i)
    {
       if (mScheduledNoteOutput[i].time != -1 &&
           mScheduledNoteOutput[i].velocity == 0)
       {
-         PlayNote(gTime, mScheduledNoteOutput[i].pitch, 0, 0, mScheduledNoteOutput[i].noteOutputIndex, mScheduledNoteOutput[i].lineNum);
+         PlayNote(time, mScheduledNoteOutput[i].pitch, 0, 0, mScheduledNoteOutput[i].noteOutputIndex, mScheduledNoteOutput[i].lineNum);
          mScheduledNoteOutput[i].time = -1;
       }
    }

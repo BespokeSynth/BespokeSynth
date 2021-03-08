@@ -85,7 +85,7 @@ void Chorder::AddTone(int tone, float velocity)
       {
          int chordtone = tone + TheScale->GetToneFromPitch(i);
          int outPitch = TheScale->MakeDiatonic(TheScale->GetPitchFromTone(chordtone));
-         PlayChorderNote(gTime, outPitch, mVelocity * velocity, -1, ModulationParameters());
+         PlayChorderNote(gTime + gBufferSizeMs, outPitch, mVelocity * velocity, -1, ModulationParameters());
       }
    }
 }
@@ -101,7 +101,7 @@ void Chorder::RemoveTone(int tone)
       {
          int chordtone = tone + TheScale->GetToneFromPitch(i);
          int outPitch = TheScale->MakeDiatonic(TheScale->GetPitchFromTone(chordtone));
-         PlayChorderNote(gTime, outPitch, 0, -1, ModulationParameters());
+         PlayChorderNote(gTime + gBufferSizeMs, outPitch, 0, -1, ModulationParameters());
       }
    }
 }
@@ -133,7 +133,7 @@ void Chorder::CheckboxUpdated(Checkbox *checkbox)
 {
    if (checkbox == mEnabledCheckbox)
    {
-      mNoteOutput.Flush(gTime);
+      mNoteOutput.Flush(gTime + gBufferSizeMs);
       bzero(mHeldCount,TOTAL_NUM_NOTES*sizeof(int));
       bzero(mInputNotes, TOTAL_NUM_NOTES*sizeof(bool));
    }

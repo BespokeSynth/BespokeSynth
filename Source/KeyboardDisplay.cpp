@@ -61,6 +61,7 @@ void KeyboardDisplay::OnClicked(int x, int y, bool right)
 {
    IDrawableModule::OnClicked(x,y,right);
    
+   double time = gTime + gBufferSizeMs;
    for (int i=0; i<NumKeys(); ++i)
    {
       for (int pass=0; pass<2; ++pass)
@@ -75,15 +76,15 @@ void KeyboardDisplay::OnClicked(int x, int y, bool right)
                   int pitch = i+RootKey();
                   if (mPlayingMousePitch == -1 || !mLatch)
                   {
-                     PlayNote(gTime, pitch, 127);
+                     PlayNote(time, pitch, 127);
                      mPlayingMousePitch = pitch;
                   }
                   else
                   {
                      bool newNote = (mPlayingMousePitch != pitch);
                      if (newNote)
-                        PlayNote(gTime, pitch, 127);
-                     PlayNote(gTime, mPlayingMousePitch, 0);
+                        PlayNote(time, pitch, 127);
+                     PlayNote(time, mPlayingMousePitch, 0);
                      mPlayingMousePitch = newNote ? pitch : -1;
                   }
                   return;
@@ -99,7 +100,8 @@ void KeyboardDisplay::MouseReleased()
    IDrawableModule::MouseReleased();
    if (mPlayingMousePitch != -1 && !mLatch)
    {
-      PlayNote(gTime, mPlayingMousePitch, 0);
+      double time = gTime + gBufferSizeMs;
+      PlayNote(time, mPlayingMousePitch, 0);
       mPlayingMousePitch = -1;
    }
 }
@@ -251,9 +253,10 @@ void KeyboardDisplay::KeyPressed(int key, bool isRepeat)
    
    if (mTypingInput && mEnabled && !isRepeat)
    {
+      double time = gTime + gBufferSizeMs;
       int pitch = GetPitchForTypingKey(key);
       if (pitch != -1)
-         PlayNote(gTime, pitch, 127);
+         PlayNote(time, pitch, 127);
    }
 }
 
@@ -261,9 +264,10 @@ void KeyboardDisplay::KeyReleased(int key)
 {
    if (mTypingInput && mEnabled)
    {
+      double time = gTime + gBufferSizeMs;
       int pitch = GetPitchForTypingKey(key);
       if (pitch != -1)
-         PlayNote(gTime, pitch, 0);
+         PlayNote(time, pitch, 0);
    }
 }
 

@@ -69,7 +69,7 @@ private:
    };
    
    StutterType GetStutterFromKey(int key);
-   void SendStutter(StutterParams stutter, bool on);
+   void SendStutter(double time, StutterParams stutter, bool on);
    StutterParams GetStutter(StutterType type);
    
    //IDrawableModule

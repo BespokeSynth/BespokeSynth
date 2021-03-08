@@ -103,7 +103,7 @@ void EventCanvas::OnTransportAdvanced(float amount)
       return;
    
    //look ahead one buffer so that we set things slightly early, so we'll do things like catch the downbeat right after enabling a sequencer, etc.
-   float posOffset = gBufferSize * gInvSampleRateMs / TheTransport->MsPerBar() / mNumMeasures;
+   float posOffset = gBufferSizeMs / TheTransport->MsPerBar() / mNumMeasures;
    
    float curPos = ((TheTransport->GetMeasure(gTime) % mNumMeasures) + TheTransport->GetMeasurePos(gTime)) / mNumMeasures + posOffset;
    FloatWrap(curPos, 1);

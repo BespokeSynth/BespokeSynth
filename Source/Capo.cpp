@@ -67,12 +67,13 @@ void Capo::IntSliderUpdated(IntSlider* slider, int oldVal)
 {
    if (slider == mCapoSlider && mEnabled)
    {
+      double time = gTime + gBufferSizeMs;
       for (int pitch=0; pitch<128; ++pitch)
       {
          if (mInputNotes[pitch].mOn)
          {
-            PlayNoteOutput(gTime+.01, pitch + oldVal, 0, mInputNotes[pitch].mVoiceIdx, ModulationParameters());
-            PlayNoteOutput(gTime, pitch + mCapo, mInputNotes[pitch].mVelocity, mInputNotes[pitch].mVoiceIdx, ModulationParameters());
+            PlayNoteOutput(time+.01, pitch + oldVal, 0, mInputNotes[pitch].mVoiceIdx, ModulationParameters());
+            PlayNoteOutput(time, pitch + mCapo, mInputNotes[pitch].mVelocity, mInputNotes[pitch].mVoiceIdx, ModulationParameters());
          }
       }
    }

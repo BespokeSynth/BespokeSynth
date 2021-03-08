@@ -52,6 +52,7 @@ void Muter::DrawModule()
 
 void Muter::CheckboxUpdated(Checkbox* checkbox)
 {
-   mRamp.Start(gTime, mPass ? 1 : 0, gTime+mRampTimeMs);
+   double time = gTime + gBufferSizeMs;
+   mRamp.Start(time, mPass ? 1 : 0, time+mRampTimeMs);
 }
 

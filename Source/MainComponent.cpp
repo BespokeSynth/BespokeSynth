@@ -182,20 +182,21 @@ public:
          for (auto output : deviceType->getDeviceNames(false))
             ofLog() << output.toStdString();
       }*/
-      
-      mSynth.Setup(&mGlobalManagers, this);
-
-      mGlobalManagers.mDeviceManager.getAvailableDeviceTypes();   //scans for device types ("Windows Audio", "DirectSound", etc)
-      
-      const string kAutoDevice = "auto";
-      const string kNoneDevice = "none";
 
       ofxJSONElement userPrefs;
+      const string kAutoDevice = "auto";
+      const string kNoneDevice = "none";
       string outputDevice = kAutoDevice;
       string inputDevice = kAutoDevice;
+      int sampleRate = 44100;
+      int bufferSize = 256;
       bool loaded = userPrefs.open(ModularSynth::GetUserPrefsPath(false));
       if (loaded)
       {
+         if (!userPrefs["samplerate"].isNull())
+            sampleRate = userPrefs["samplerate"].asInt();
+         if (!userPrefs["buffersize"].isNull())
+            bufferSize = userPrefs["buffersize"].asInt();
          if (!userPrefs["devicetype"].isNull() && userPrefs["devicetype"].asString() != "auto")
             mGlobalManagers.mDeviceManager.setCurrentAudioDeviceType(userPrefs["devicetype"].asString(), true);
          if (!userPrefs["audio_output_device"].isNull())
@@ -203,6 +204,12 @@ public:
          if (!userPrefs["audio_input_device"].isNull())
             inputDevice = userPrefs["audio_input_device"].asString();
       }
+
+      SetGlobalSampleRateAndBufferSize(sampleRate, bufferSize);
+      
+      mSynth.Setup(&mGlobalManagers, this);
+
+      mGlobalManagers.mDeviceManager.getAvailableDeviceTypes();   //scans for device types ("Windows Audio", "DirectSound", etc)
       
       AudioDeviceManager::AudioDeviceSetup preferredSetupOptions;
       preferredSetupOptions.sampleRate = gSampleRate;
@@ -262,9 +269,6 @@ public:
             mGlobalManagers.mDeviceManager.addAudioCallback(this);
             
             ofLog() << "output: " << loadedSetup.outputDeviceName << "   input: " << loadedSetup.inputDeviceName;
-
-            SetGlobalBufferSize(loadedSetup.bufferSize);
-            SetGlobalSampleRate(loadedSetup.sampleRate);
          }
       }
       else
