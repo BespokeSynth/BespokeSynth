@@ -47,6 +47,8 @@ public:
    void SetEnabled(bool enabled) override { mEnabled = enabled; }
    
    void FilesDropped(vector<string> files, int x, int y) override;
+   void SampleDropped(int x, int y, Sample* sample);
+   bool CanDropSample() const override { return true; }
    bool IsResizable() const override { return true; }
    void Resize(float width, float height) override { mWidth = ofClamp(width, 210, 9999); mHeight = ofClamp(height, 125, 9999); }
    
@@ -89,8 +91,9 @@ private:
    float GetZoomStartSeconds() const;
    float GetZoomEndSeconds() const;
    void UpdateActiveCuePoint();
-   void PlayCuePoint(double time, int index, int velocity);
+   void PlayCuePoint(double time, int index, int velocity, float speedMult, float startOffsetSeconds);
    void RunProcess(const StringArray& args);
+   void AutoSlice(NoteInterval interval);
    
    //IDrawableModule
    void DrawModule() override;
@@ -149,8 +152,8 @@ private:
       float lengthSeconds;
       float speed; 
    };
-   vector<SampleCuePoint> mSampleCuePoints{16};
-   RadioButton* mCuePointSelector;
+   vector<SampleCuePoint> mSampleCuePoints{128};
+   DropdownList* mCuePointSelector;
    FloatSlider* mCuePointStartSlider;
    FloatSlider* mCuePointLengthSlider;
    FloatSlider* mCuePointSpeedSlider;
@@ -163,6 +166,10 @@ private:
    ClickButton* mPlayCurrentCuePointButton;
    bool mShowGrid;
    Checkbox* mShowGridCheckbox;
+   ofRectangle mCueClipGrabRect;
+   ClickButton* mAutoSlice4n;
+   ClickButton* mAutoSlice8n;
+   ClickButton* mAutoSlice16n;
 
    string mErrorString;
 
@@ -176,6 +183,7 @@ private:
    struct YoutubeSearchResult
    {
       string name;
+      string channel;
       float lengthSeconds;
       string youtubeId;
    };

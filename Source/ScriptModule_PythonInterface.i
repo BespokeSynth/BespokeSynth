@@ -319,7 +319,18 @@ PYBIND11_EMBEDDED_MODULE(sampleplayer, m)
       .def("fill", [](SamplePlayer& player, vector<float> data)
       {
          player.FillData(data);
-      });
+      })
+      .def("play_cue", [](SamplePlayer& player, int cue, float speedMult, float startOffsetSeconds)
+      {
+         ScriptModule* scriptModule = ScriptModule::sMostRecentLineExecutedModule;
+         double time = scriptModule->GetScheduledTime(0);
+         ModulationParameters modulation;
+         modulation.pitchBend = scriptModule->GetPitchBend(cue);
+         modulation.pitchBend->SetValue(log2(speedMult));
+         modulation.modWheel = scriptModule->GetModWheel(cue);
+         modulation.modWheel->SetValue(startOffsetSeconds);
+         player.PlayNote(time, cue, 127, -1, modulation);
+      }, "cue"_a, "speedMult"_a = 1, "startOffsetSeconds"_a = 0);
 }
 
 PYBIND11_EMBEDDED_MODULE(midicontroller, m)

@@ -84,6 +84,10 @@ public:
    static float GetScriptMeasureTime();
    static float GetTimeSigRatio();
 
+   ModulationChain* GetPitchBend(int pitch) { return &mPitchBends[pitch]; }
+   ModulationChain* GetModWheel(int pitch) { return &mModWheels[pitch]; }
+   ModulationChain* GetPressure(int pitch) { return &mPressures[pitch]; }
+
    static string GetBootstrapImportString() { return "import bespoke; import module; import scriptmodule; import random; import math"; }
    
 private:
@@ -230,6 +234,8 @@ private:
    
    std::vector<PatchCableSource*> mExtraNoteOutputs;
    std::array<ModulationChain, 128> mPitchBends;
+   std::array<ModulationChain, 128> mModWheels;
+   std::array<ModulationChain, 128> mPressures;
    std::list<string> mMidiMessageQueue;
    ofMutex mMidiMessageQueueMutex;
 };

@@ -54,6 +54,7 @@ SamplePlayer::SamplePlayer()
 , mSelectPlayedCuePoint(false)
 , mRecentPlayedCuePoint(-1)
 , mShowGrid(false)
+, mCueClipGrabRect(-100,100,1,1)
 , mRunningProcessType(RunningProcessType::None)
 , mRunningProcess(nullptr)
 , mOnRunningProcessComplete(nullptr)
@@ -83,20 +84,21 @@ void SamplePlayer::CreateUIControls()
    BUTTON(mLoadFileButton,"load"); UIBLOCK_SHIFTRIGHT();
    BUTTON(mTrimToZoomButton, "trim"); UIBLOCK_SHIFTRIGHT();
    BUTTON(mDownloadYoutubeButton,"youtube");
-   UIBLOCK_SHIFTX(120);
+   UIBLOCK_SHIFTX(90);
    UIBLOCK_NEWCOLUMN();
    FLOATSLIDER_DIGITS(mCuePointStartSlider, "cue start", &mSampleCuePoints[0].startSeconds, 0, 100, 3);
    FLOATSLIDER_DIGITS(mCuePointLengthSlider, "cue length", &mSampleCuePoints[0].lengthSeconds, 0, 100, 3);
    FLOATSLIDER(mCuePointSpeedSlider, "cue speed", &mSampleCuePoints[0].speed, 0, 2);
    UIBLOCK_NEWCOLUMN();
-   UICONTROL_CUSTOM(mCuePointSelector, new RadioButton(UICONTROL_BASICS("cuepoint"), &mActiveCuePointIndex, kRadioHorizontal));
-   CHECKBOX(mSetCuePointCheckbox, "click sets cue point", &mSetCuePoint);
+   DROPDOWN(mCuePointSelector, "cuepoint", &mActiveCuePointIndex, 40);
+   CHECKBOX(mSetCuePointCheckbox, "click sets cue", &mSetCuePoint);
    CHECKBOX(mSelectPlayedCuePointCheckbox, "select played", &mSelectPlayedCuePoint);
    UIBLOCK_NEWCOLUMN();
-   UIBLOCK_NEWCOLUMN();
-   UIBLOCK_SHIFTDOWN();
    BUTTON(mPlayCurrentCuePointButton, "play cue");
    CHECKBOX(mShowGridCheckbox, "show grid", &mShowGrid);
+   BUTTON(mAutoSlice4n, "4n"); UIBLOCK_SHIFTRIGHT();
+   BUTTON(mAutoSlice8n, "8n"); UIBLOCK_SHIFTRIGHT();
+   BUTTON(mAutoSlice16n, "16n"); UIBLOCK_SHIFTRIGHT();
    ENDUIBLOCK0();
 
    UIBLOCK(0, 65);
@@ -141,6 +143,15 @@ void SamplePlayer::Poll()
       mYoutubeId = clipId.toStdString();
       mDownloadYoutubeButton->SetShowing(true);
    }
+   else if (clipboard.contains("youtu.be"))
+   {
+      vector<string> tokens = ofSplitString(clipboard.toStdString(), "/");
+      if (tokens.size() > 0)
+      {
+         mYoutubeId = tokens[tokens.size() - 1];
+         mDownloadYoutubeButton->SetShowing(true);
+      }
+   }
    else
    {
       mYoutubeId = "";
@@ -179,8 +190,9 @@ void SamplePlayer::Poll()
                   vector<string> tokens = ofSplitString(file, "#");
                   if (tokens.size() >= 3)
                   {
-                     string lengthStr = tokens[tokens.size() - 2];
-                     string id = tokens[tokens.size() - 1];
+                     string lengthStr = tokens[tokens.size() - 3];
+                     string id = tokens[tokens.size() - 2];
+                     string channel = tokens[tokens.size() - 1];
                      bool found = false;
                      for (auto& existing : mYoutubeSearchResults)
                      {
@@ -191,9 +203,10 @@ void SamplePlayer::Poll()
                      {
                         YoutubeSearchResult resultToAdd;
                         string name = "";
-                        for (size_t i = 0; i < tokens.size() - 2; ++i)
+                        for (size_t i = 0; i < tokens.size() - 3; ++i)
                            name += tokens[i];
                         resultToAdd.name = name;
+                        resultToAdd.channel = channel;
                         resultToAdd.lengthSeconds = ofToFloat(lengthStr);
                         resultToAdd.youtubeId = id;
                         mYoutubeSearchResults.push_back(resultToAdd);
@@ -316,20 +329,20 @@ void SamplePlayer::PlayNote(double time, int pitch, int velocity, int voiceIdx /
    }
    
    if (velocity > 0 && mSample != nullptr)
-      PlayCuePoint(time, pitch, velocity);
+      PlayCuePoint(time, pitch, velocity, modulation.pitchBend ? exp2(modulation.pitchBend->GetValue(0)) : 1, modulation.modWheel ? modulation.modWheel->GetValue(0) : 0);
 }
 
-void SamplePlayer::PlayCuePoint(double time, int index, int velocity)
+void SamplePlayer::PlayCuePoint(double time, int index, int velocity, float speedMult, float startOffsetSeconds)
 {
    float startSeconds, lengthSeconds, speed;
    GetPlayInfoForPitch(index, startSeconds, lengthSeconds, speed);
-   mSample->SetPlayPosition(((gTime - time) / 1000 + startSeconds) * gSampleRate * mSample->GetSampleRateRatio());
+   mSample->SetPlayPosition(((gTime - time) / 1000 + startSeconds + startOffsetSeconds) * gSampleRate * mSample->GetSampleRateRatio());
    mPlay = true;
-   mSpeed = speed;
+   mSpeed = speed * speedMult;
    mAdsr.Clear();
    mAdsr.Start(time, velocity / 127.0f);
    if (lengthSeconds > 0)
-      mAdsr.Stop(time + lengthSeconds * 1000);
+      mAdsr.Stop(time + lengthSeconds * 1000 / speed);
    SwitchAndRamp();
 }
 
@@ -366,12 +379,13 @@ void SamplePlayer::DropdownUpdated(DropdownList* list, int oldVal)
    {
       UpdateSample(mBank->GetSampleInfo(mSampleIndex).mSample, false);
    }
+   if (list == mCuePointSelector)
+      UpdateActiveCuePoint();
 }
 
 void SamplePlayer::RadioButtonUpdated(RadioButton* radio, int oldVal)
 {
-   if (radio == mCuePointSelector)
-      UpdateActiveCuePoint();
+   
 }
 
 void SamplePlayer::UpdateActiveCuePoint()
@@ -384,6 +398,21 @@ void SamplePlayer::UpdateActiveCuePoint()
    }
 }
 
+void SamplePlayer::AutoSlice(NoteInterval interval)
+{
+   int count = TheTransport->CountInStandardMeasure(interval);
+   float sliceLengthSeconds = TheTransport->GetDuration(kInterval_1n) / count / 1000.0f * mSampleCuePoints[mActiveCuePointIndex].speed;
+   for (int i = 0; i < count; ++i)
+   {
+      if (mActiveCuePointIndex + i < mSampleCuePoints.size())
+      {
+         mSampleCuePoints[mActiveCuePointIndex + i].startSeconds = mSampleCuePoints[mActiveCuePointIndex].startSeconds + sliceLengthSeconds *i;
+         mSampleCuePoints[mActiveCuePointIndex + i].lengthSeconds = sliceLengthSeconds;
+         mSampleCuePoints[mActiveCuePointIndex + i].speed = mSampleCuePoints[mActiveCuePointIndex].speed;
+      }
+   }
+}
+
 void SamplePlayer::FilesDropped(vector<string> files, int x, int y)
 {
    Sample* sample = new Sample();
@@ -391,16 +420,20 @@ void SamplePlayer::FilesDropped(vector<string> files, int x, int y)
    UpdateSample(sample, true);
 }
 
+void SamplePlayer::SampleDropped(int x, int y, Sample* sample)
+{
+   Sample* copy = new Sample();
+   copy->CopyFrom(sample);
+   UpdateSample(copy, true);
+}
+
 void SamplePlayer::UpdateSample(Sample* sample, bool ownsSample)
 {
    Sample* oldSamplePtr = mSample;
 
    float lengthSeconds = sample->LengthInSamples() / (gSampleRate * sample->GetSampleRateRatio());
-   for (size_t i = 0; i < mSampleCuePoints.size(); ++i)
-   {
-      mCuePointStartSlider->SetExtents(0, lengthSeconds);
-      mCuePointLengthSlider->SetExtents(0, lengthSeconds);
-   }
+   mCuePointStartSlider->SetExtents(0, lengthSeconds);
+   mCuePointLengthSlider->SetExtents(0, lengthSeconds);
    
    sample->SetPlayPosition(0);
    sample->SetLooping(mLoop);
@@ -475,7 +508,14 @@ void SamplePlayer::ButtonClicked(ClickButton *button)
    }
 
    if (button == mPlayCurrentCuePointButton)
-      PlayCuePoint(gTime, mActiveCuePointIndex, 127);
+      PlayCuePoint(gTime, mActiveCuePointIndex, 127, 1, 0);
+
+   if (button == mAutoSlice4n)
+      AutoSlice(kInterval_4n);
+   if (button == mAutoSlice8n)
+      AutoSlice(kInterval_8n);
+   if (button == mAutoSlice16n)
+      AutoSlice(kInterval_16n);
 }
 
 void SamplePlayer::TextEntryComplete(TextEntry* entry)
@@ -497,7 +537,7 @@ namespace
          if (TheSynth->GetUserPrefs()["youtube-dl_path"].isNull())
          {
 #if BESPOKE_WINDOWS
-            sPath = "youtube-dl.exe";
+            sPath = "c:/youtube-dl/bin/youtube-dl.exe";
 #else
             sPath = "/opt/local/bin/youtube-dl";
 #endif
@@ -518,7 +558,7 @@ namespace
          if (TheSynth->GetUserPrefs()["ffmpeg_path"].isNull())
          {
    #if BESPOKE_WINDOWS
-            sPath = "ffmpeg.exe";
+            sPath = "c:/ffmpeg/bin/ffmpeg.exe";
    #else
             sPath = "/opt/local/bin/ffmpeg";
    #endif
@@ -620,7 +660,7 @@ void SamplePlayer::SearchYoutube(string searchTerm)
    args.add("--write-info-json");
    args.add("--skip-download");
    args.add("-o");
-   args.add(tempPath+"/%(title)s#%(duration)s#%(id)s.%(ext)s");
+   args.add(tempPath+"/%(title)s#%(duration)s#%(id)s#%(uploader)s.%(ext)s");
 
    mRunningProcessType = RunningProcessType::SearchYoutube;
 
@@ -676,6 +716,40 @@ void SamplePlayer::OnClicked(int x, int y, bool right)
    
    if (right)
       return;
+
+   if (mSample != nullptr)
+   {
+      float startSeconds, lengthSeconds, speed;
+      GetPlayInfoForPitch(mActiveCuePointIndex, startSeconds, lengthSeconds, speed);
+
+      if (lengthSeconds > 0 && mCueClipGrabRect.contains(x,y))
+      {
+         int startSamples = startSeconds * gSampleRate * mSample->GetSampleRateRatio();
+         int lengthSamplesSrc = lengthSeconds * gSampleRate * mSample->GetSampleRateRatio();
+         if (startSamples >= mSample->Data()->BufferSize())
+            startSamples = mSample->Data()->BufferSize() - 1;
+         if (startSamples + lengthSamplesSrc >= mSample->Data()->BufferSize())
+            lengthSamplesSrc = mSample->Data()->BufferSize() - 1 - startSamples;
+         int lengthSamplesDest = lengthSamplesSrc / speed / mSample->GetSampleRateRatio();
+         ChannelBuffer grab(lengthSamplesDest);
+         grab.SetNumActiveChannels(mSample->Data()->NumActiveChannels());
+         /*for (int ch = 0; ch < grab.NumActiveChannels(); ++ch)
+         {
+            BufferCopy(grab.GetChannel(ch), mSample->Data()->GetChannel(ch) + startSamples, lengthSamplesSrc);
+         }*/
+
+         for (int ch = 0; ch < grab.NumActiveChannels(); ++ch)
+         {
+            for (int i = 0; i < lengthSamplesDest; ++i)
+            {
+               float offset = i * speed * mSample->GetSampleRateRatio();
+               grab.GetChannel(ch)[i] = GetInterpolatedSample(offset, mSample->Data()->GetChannel(ch) + startSamples, lengthSamplesSrc);
+            }
+         }
+
+         TheSynth->GrabSample(&grab, false, 1);
+      }
+   }
 
    if (mYoutubeSearchResults.size() > 0)
       return;
@@ -781,6 +855,26 @@ void SamplePlayer::DrawModule()
    mCuePointSpeedSlider->Draw();
    mPlayCurrentCuePointButton->Draw();
    mShowGridCheckbox->Draw();
+   mAutoSlice4n->Draw();
+   mAutoSlice8n->Draw();
+   mAutoSlice16n->Draw();
+
+   //draw grabbable clip for cue
+   if (mSample != nullptr)
+   {
+      float startSeconds, lengthSeconds, speed;
+      GetPlayInfoForPitch(mActiveCuePointIndex, startSeconds, lengthSeconds, speed);
+
+      if (lengthSeconds > 0)
+      {
+         ofPushMatrix();
+         ofRectangle rect = mAutoSlice16n->GetRect(true);
+         mCueClipGrabRect.set(rect.getMaxX() + 3, 3, 150, 52);
+         ofTranslate(mCueClipGrabRect.x, mCueClipGrabRect.y);
+         DrawAudioBuffer(mCueClipGrabRect.width, mCueClipGrabRect.height, mSample->Data(), startSeconds * gSampleRate * mSample->GetSampleRateRatio(), (startSeconds + lengthSeconds) * gSampleRate * mSample->GetSampleRateRatio(), -1);
+         ofPopMatrix();
+      }
+   }
 
    for (size_t i = 0; i < mSearchResultButtons.size(); ++i)
    {
@@ -793,7 +887,7 @@ void SamplePlayer::DrawModule()
          if (secondsRemainder < 10)
             lengthStr += "0";
          lengthStr += ofToString(secondsRemainder);
-         mSearchResultButtons[i]->SetLabel(("(" + lengthStr + ") " + mYoutubeSearchResults[i].name).c_str());
+         mSearchResultButtons[i]->SetLabel(("(" + lengthStr + ") " + mYoutubeSearchResults[i].name + "   [" + mYoutubeSearchResults[i].channel + "]").c_str());
       }
       else
       {
@@ -866,21 +960,24 @@ void SamplePlayer::DrawModule()
       float x = ofMap(mSample->GetPlayPosition(), GetZoomStartSample(), GetZoomEndSample(), 0, sampleWidth);
       DrawTextNormal(ofToString(mSample->GetPlayPosition() / (gSampleRate * mSample->GetSampleRateRatio()), 1), x + 2, mHeight - 65, 11);
 
-      if (mShowGrid && GetZoomEndSeconds() - GetZoomStartSeconds() < 5)
+      if (mShowGrid)
       {
          float lengthSeconds = GetZoomEndSeconds() - GetZoomStartSeconds();
-         float lengthBeats = TheTransport->GetTempo() * (lengthSeconds / 60) * mSampleCuePoints[mActiveCuePointIndex].speed;
-         float alpha = ofMap(lengthSeconds, 5, 4, 0, 200, true);
-         ofSetColor(0, 255, 255, alpha);
-         float secondsPerBeat = 60 / (TheTransport->GetTempo() * mSampleCuePoints[mActiveCuePointIndex].speed);
-         float offset = mSampleCuePoints[mActiveCuePointIndex].startSeconds;
-         float firstBeat = ceil((GetZoomStartSeconds() - offset) / secondsPerBeat);
-         float firstBeatSeconds = firstBeat * secondsPerBeat + offset;
-         for (int i = 0; i < ceil(lengthBeats); ++i)
+         float lengthBeats = TheTransport->GetTempo() * (lengthSeconds / 60) / mSampleCuePoints[mActiveCuePointIndex].speed;
+         if (lengthBeats < 30)
          {
-            float second = firstBeatSeconds + i * secondsPerBeat;
-            float x = ofMap(second, GetZoomStartSeconds(), GetZoomEndSeconds(), 0, sampleWidth);
-            ofLine(x, 0, x, mHeight - 65);
+            float alpha = ofMap(lengthBeats, 30, 28, 0, 200, true);
+            ofSetColor(0, 255, 255, alpha);
+            float secondsPerBeat = 60 / (TheTransport->GetTempo() / mSampleCuePoints[mActiveCuePointIndex].speed);
+            float offset = mSampleCuePoints[mActiveCuePointIndex].startSeconds;
+            float firstBeat = ceil((GetZoomStartSeconds() - offset) / secondsPerBeat);
+            float firstBeatSeconds = firstBeat * secondsPerBeat + offset;
+            for (int i = 0; i < ceil(lengthBeats); ++i)
+            {
+               float second = firstBeatSeconds + i * secondsPerBeat;
+               float x = ofMap(second, GetZoomStartSeconds(), GetZoomEndSeconds(), 0, sampleWidth);
+               ofLine(x, 0, x, mHeight - 65);
+            }
          }
       }
 
