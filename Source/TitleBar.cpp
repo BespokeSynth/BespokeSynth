@@ -138,6 +138,7 @@ TitleBar::TitleBar()
    TheTitleBar = this;
    
    mHelpDisplay = dynamic_cast<HelpDisplay*>(HelpDisplay::Create());
+   mHelpDisplay->SetTypeName("helpdisplay");
    
    SetShouldDrawOutline(false);
 }
@@ -308,7 +309,7 @@ void TitleBar::DrawModule()
       if (x >= pixelWidth - 250)
       {
          x = startX;
-         y += 16;
+         y += 18;
       }
    }
 

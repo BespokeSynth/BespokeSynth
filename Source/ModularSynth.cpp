@@ -1460,6 +1460,7 @@ void ModularSynth::ResetLayout()
    TitleBar* titleBar = new TitleBar();
    titleBar->SetPosition(0,0);
    titleBar->SetName("titlebar");
+   titleBar->SetTypeName("titlebar");
    titleBar->CreateUIControls();
    titleBar->SetModuleFactory(&mModuleFactory);
    titleBar->Init();

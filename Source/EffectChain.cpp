@@ -71,6 +71,7 @@ void EffectChain::AddEffect(string type, bool onTheFly /*=false*/)
       otherEffectNames.push_back(e->Name());
    string name = GetUniqueName(type, otherEffectNames);
    effect->SetName(name.c_str());
+   effect->SetTypeName(type);
    effect->SetParent(this);
    effect->CreateUIControls();
    if (onTheFly)

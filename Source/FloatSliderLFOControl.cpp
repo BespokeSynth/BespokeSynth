@@ -412,7 +412,7 @@ void LFOPool::Init()
       sLFOPool[i] = new FloatSliderLFOControl();
       sLFOPool[i]->CreateUIControls();
       sLFOPool[i]->Init();
-      sLFOPool[i]->SetType("lfo");
+      sLFOPool[i]->SetTypeName("lfo");
    }
    sInitialized = true;
 }

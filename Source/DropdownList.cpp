@@ -39,6 +39,8 @@ DropdownList::DropdownList(IDropdownListener* owner, const char* name, int x, in
    SetPosition(x,y);
    SetParent(dynamic_cast<IClickable*>(owner));
    (dynamic_cast<IDrawableModule*>(owner))->AddUIControl(this);
+
+   mModalList.SetTypeName("dropdownlist");
    
    if (width == -1)
       mAutoCalculateWidth = true;

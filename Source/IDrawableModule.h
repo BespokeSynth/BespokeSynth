@@ -53,6 +53,7 @@ public:
    static bool CanCreate() { return true; }
    
    void Render() override;
+   void RenderUnclipped();
    virtual void PostRender() {}
    void DrawFrame(float width, float height, bool drawModule, float& titleBarHeight, float& highlight);
    void DrawPatchCables();
@@ -91,7 +92,7 @@ public:
    vector<IDrawableModule*> GetChildren() const { return mChildren; }
    virtual bool IsResizable() const { return false; }
    virtual void Resize(float width, float height) { assert(false); }
-   void SetType(string type) { mTypeName = type; }
+   void SetTypeName(string type) { mTypeName = type; }
    void SetTarget(IClickable* target);
    void SetUpPatchCables(string targets);
    void AddPatchCableSource(PatchCableSource* source);
