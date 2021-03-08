@@ -57,6 +57,8 @@ public:
    bool Process(double time, ChannelBuffer* out) override;
    void SetVoiceParams(IVoiceParams* params) override;
    bool IsDone(double time) override;
+
+   static float GetADSRScale(float velocity, float velToEnvelope);
    
    static const int kMaxUnison = 8;
 private:

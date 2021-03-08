@@ -30,9 +30,9 @@ public:
    void SetMaxTime(float maxTime);
    void SetADSR(::ADSR* adsr);
    ::ADSR* GetADSR() { return mAdsr; }
-   void SetActive(bool active);
    void SpawnEnvelopeEditor();
    void SetOverrideDrawTime(double time) { mOverrideDrawTime = time; }
+   void SetShowing(bool showing) override { IUIControl::SetShowing(showing); UpdateSliderVisibility(); }
    
    //IUIControl
    void SetFromMidiCC(float slider) override {}
@@ -76,7 +76,6 @@ private:
    ofVec2f mClickStart;
    ::ADSR mClickAdsr;
    bool mHighlighted;
-   bool mActive;
    FloatSlider* mASlider;
    FloatSlider* mDSlider;
    FloatSlider* mSSlider;

@@ -23,7 +23,6 @@ ADSRDisplay::ADSRDisplay(IDrawableModule* owner, const char* name, int x, int y,
 , mMaxTime(1000)
 , mAdjustMode(kAdjustNone)
 , mHighlighted(false)
-, mActive(true)
 , mEditor(nullptr)
 , mOverrideDrawTime(-1)
 {
@@ -78,18 +77,10 @@ void ADSRDisplay::Render()
    ofSetLineWidth(.5f);
    ofRect(0, 0, mWidth, mHeight, 0);
 
-   if (mAdsr && (mActive || sDisplayMode == kDisplayEnvelope))
+   if (mAdsr && sDisplayMode == kDisplayEnvelope)
    {
-      if (mActive)
-      {
-         ofSetColor(245, 58, 0, gModuleDrawAlpha);
-         ofSetLineWidth(1);
-      }
-      else
-      {
-         ofSetColor(0, 230, 245, .3f*gModuleDrawAlpha);
-         ofSetLineWidth(.5f);
-      }
+      ofSetColor(245, 58, 0, gModuleDrawAlpha);
+      ofSetLineWidth(1);
 
       ofBeginShape();
 
@@ -117,25 +108,22 @@ void ADSRDisplay::Render()
       }
       ofEndShape(false);
       
-      if (mActive)
+      ofSetLineWidth(1);
+      ofSetColor(0,255,0,gModuleDrawAlpha * .5f);
+      float drawTime = 0;
+      if (mOverrideDrawTime != -1)
       {
-         ofSetLineWidth(1);
-         ofSetColor(0,255,0,gModuleDrawAlpha * .5f);
-         float drawTime = 0;
-         if (mOverrideDrawTime != -1)
-         {
-            drawTime = mOverrideDrawTime;
-         }
-         else
-         {
-            if (mAdsr->GetStartTime(gTime) > 0 && mAdsr->GetStartTime(gTime) >= mAdsr->GetStopTime(gTime))
-               drawTime = ofClamp(gTime - mAdsr->GetStartTime(gTime), 0, releaseTime);
-            if (mAdsr->GetStopTime(gTime) > mAdsr->GetStartTime(gTime))
-               drawTime = releaseTime + (gTime - mAdsr->GetStopTime(gTime));
-         }
-         if (drawTime > 0 && drawTime < mMaxTime)
-            ofLine(drawTime/mMaxTime*mWidth, 0, drawTime/mMaxTime*mWidth, mHeight);
+         drawTime = mOverrideDrawTime;
       }
+      else
+      {
+         if (mAdsr->GetStartTime(gTime) > 0 && mAdsr->GetStartTime(gTime) >= mAdsr->GetStopTime(gTime))
+            drawTime = ofClamp(gTime - mAdsr->GetStartTime(gTime), 0, releaseTime) / mAdsr->GetTimeScale();
+         if (mAdsr->GetStopTime(gTime) > mAdsr->GetStartTime(gTime))
+            drawTime = releaseTime + (gTime - mAdsr->GetStopTime(gTime)) / mAdsr->GetTimeScale();
+      }
+      if (drawTime > 0 && drawTime < mMaxTime)
+         ofLine(drawTime/mMaxTime*mWidth, 0, drawTime/mMaxTime*mWidth, mHeight);
    }
    
    ofFill();
@@ -146,7 +134,7 @@ void ADSRDisplay::Render()
       ofRect(0,0,mWidth,mHeight, 0);
    }
 
-   if (mActive && sDisplayMode == kDisplayEnvelope)
+   if (sDisplayMode == kDisplayEnvelope)
    {
       ofSetColor(0,255,255,.2f*gModuleDrawAlpha);
       switch (mAdjustMode)
@@ -210,14 +198,9 @@ void ADSRDisplay::SetADSR(::ADSR* adsr)
    }
 }
 
-void ADSRDisplay::SetActive(bool active)
-{
-   mActive = active;
-}
-
 void ADSRDisplay::UpdateSliderVisibility()
 {
-   bool slidersActive = mActive && (sDisplayMode == kDisplaySliders) && mAdsr != nullptr && mAdsr->IsStandardADSR();
+   bool slidersActive = (sDisplayMode == kDisplaySliders) && mAdsr != nullptr && mAdsr->IsStandardADSR() && IsShowing();
    if (mASlider)
    {
       mASlider->SetShowing(slidersActive);
@@ -249,7 +232,7 @@ void ADSRDisplay::SpawnEnvelopeEditor()
 
 void ADSRDisplay::OnClicked(int x, int y, bool right)
 {
-   if (!mShowing || !mActive || sDisplayMode != kDisplayEnvelope)
+   if (!mShowing || sDisplayMode != kDisplayEnvelope)
       return;
    
    if (right)

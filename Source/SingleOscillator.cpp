@@ -178,8 +178,9 @@ void SingleOscillator::PlayNote(double time, int pitch, int velocity, int voiceI
    if (velocity > 0)
    {
       mPolyMgr.Start(time, pitch, velocity/127.0f, voiceIdx, modulation);
-      mVoiceParams.mAdsr.Start(time,1);         //for visualization
-      mVoiceParams.mFilterAdsr.Start(time,1);   //for visualization
+      float adsrScale = SingleOscillatorVoice::GetADSRScale(velocity/127.0f, mVoiceParams.mVelToEnvelope);
+      mVoiceParams.mAdsr.Start(time, 1, adsrScale);         //for visualization
+      mVoiceParams.mFilterAdsr.Start(time, 1, adsrScale);   //for visualization
    }
    else
    {

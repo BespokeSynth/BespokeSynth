@@ -28,15 +28,15 @@ public:
       float curve;
    };
    
-   ADSR(float a, float d, float s, float r) : mNextEventPointer(0), mMaxSustain(-1), mFreeReleaseLevel(false) { Set(a,d,s,r); }
+   ADSR(float a, float d, float s, float r) : mNextEventPointer(0), mMaxSustain(-1), mFreeReleaseLevel(false), mTimeScale(1) { Set(a,d,s,r); }
    ADSR() : ADSR(1,1,1,1) {}
-   void Start(double time, float target);
-   void Start(double time, float target, float a, float d, float s, float r);
-   void Start(double time, float target, const ADSR& adsr, float scale = 1);
+   void Start(double time, float target, float timeScale = 1);
+   void Start(double time, float target, float a, float d, float s, float r, float timeScale = 1);
+   void Start(double time, float target, const ADSR& adsr, float timeScale = 1);
    void Stop(double time, bool warn = true);
    float Value(double time) const;
    void Set(float a, float d, float s, float r, float h = -1);
-   void Set(const ADSR& other, float scale = 1);
+   void Set(const ADSR& other);
    void Clear() { for (auto& e : mEvents) { e.Reset(); } }
    void SetMaxSustain(float max) { mMaxSustain = max; }
    void SetSustainStage(int stage) { mSustainStage = stage; }
@@ -50,6 +50,8 @@ public:
    Stage& GetStageData(int stage) { return mStages[stage]; }
    int GetStageForTime(double time) const;
    int GetStage(double time, double& stageStartTimeOut) const;
+
+   float GetTimeScale() const { return mTimeScale; }
    
    float& GetA() { return mStages[0].time; }
    float& GetD() { return mStages[1].time; }
@@ -86,4 +88,5 @@ private:
    int mNumStages;
    bool mHasSustainStage;
    bool mFreeReleaseLevel;
+   float mTimeScale;
 };

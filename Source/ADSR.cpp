@@ -30,13 +30,10 @@ void ::ADSR::Set(float a, float d, float s, float r, float h /*=-1*/)
    mHasSustainStage = true;
 }
 
-void ::ADSR::Set(const ADSR& other, float scale)
+void ::ADSR::Set(const ADSR& other)
 {
    for (int i = 0; i < other.mNumStages; ++i)
-   {
       mStages[i] = other.mStages[i];
-      mStages[i].time *= scale;
-   }
    mNumStages = other.mNumStages;
    mSustainStage = other.mSustainStage;
    mMaxSustain = other.mMaxSustain;
@@ -44,32 +41,33 @@ void ::ADSR::Set(const ADSR& other, float scale)
    mFreeReleaseLevel = other.mFreeReleaseLevel;
 }
 
-void ::ADSR::Start(double time, float target, float a, float d, float s, float r)
+void ::ADSR::Start(double time, float target, float a, float d, float s, float r, float timeScale /*=1*/)
 {
    Set(a,d,s,r);
-   Start(time, target);
+   Start(time, target, timeScale);
 }
 
-void ::ADSR::Start(double time, float target, const ADSR& adsr, float scale)
+void ::ADSR::Start(double time, float target, const ADSR& adsr, float timeScale)
 {
-   Set(adsr, scale);
-   Start(time, target);
+   Set(adsr);
+   Start(time, target, timeScale);
 }
 
-void ::ADSR::Start(double time, float target)
+void ::ADSR::Start(double time, float target, float timeScale /*=1*/)
 {
    mEvents[mNextEventPointer].Reset();
    mEvents[mNextEventPointer].mStartBlendFromValue = Value(time);
    mEvents[mNextEventPointer].mStartTime = time;
    mEvents[mNextEventPointer].mMult = target;
    mNextEventPointer = (mNextEventPointer + 1) % mEvents.size();
+   mTimeScale = timeScale;
    
    if (mMaxSustain >= 0 && mHasSustainStage)
    {
       float stopTime = time;
       for (int i=0; i<mNumStages; ++i)
       {
-         stopTime += mStages[i].time;
+         stopTime += mStages[i].time * timeScale;
          if (i == mSustainStage)
             break;
       }
@@ -150,10 +148,10 @@ float ::ADSR::Value(double time) const
    else
       stageStartValue = mStages[stage-1].target * e->mMult;
    
-   if (mHasSustainStage && stage == mSustainStage && time > stageStartTime + mStages[mSustainStage].time)
+   if (mHasSustainStage && stage == mSustainStage && time > stageStartTime + (mStages[mSustainStage].time * mTimeScale))
       return mStages[mSustainStage].target * e->mMult;
    
-   float lerp = ofClamp((time - stageStartTime) / mStages[stage].time, 0, 1);
+   float lerp = ofClamp((time - stageStartTime) / (mStages[stage].time * mTimeScale), 0, 1);
    if (mStages[stage].curve != 0)
       lerp = MathUtils::Curve(lerp, mStages[stage].curve * ((stageStartValue < mStages[stage].target*e->mMult) ? 1 : -1));
    
@@ -178,9 +176,9 @@ int ::ADSR::GetStage(double time, double& stageStartTimeOut) const
          stageStartTimeOut = e->mStopTime;
       }
       
-      while (time > mStages[stage].time + stageStartTimeOut && stage < mNumStages)
+      while (time > mStages[stage].time * mTimeScale + stageStartTimeOut && stage < mNumStages)
       {
-         stageStartTimeOut += mStages[stage].time;
+         stageStartTimeOut += mStages[stage].time * mTimeScale;
          ++stage;
          if (mHasSustainStage && stage == mSustainStage)
             break;
@@ -204,7 +202,7 @@ int ::ADSR::GetStageForTime(double time) const
 
 namespace
 {
-   const int kSaveStateRev = 0;
+   const int kSaveStateRev = 1;
 }
 
 void ::ADSR::SaveState(FileStreamOut& out)
@@ -225,6 +223,7 @@ void ::ADSR::SaveState(FileStreamOut& out)
       out << mStages[i].target;
       out << mStages[i].time;
    }
+   out << mTimeScale;
 }
 
 void ::ADSR::LoadState(FileStreamIn& in)
@@ -249,4 +248,7 @@ void ::ADSR::LoadState(FileStreamIn& in)
       in >> mStages[i].target;
       in >> mStages[i].time;
    }
+
+   if (rev >= 1)
+      in >> mTimeScale;
 }
