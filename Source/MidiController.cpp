@@ -22,7 +22,6 @@
 #include "ScriptModule.h"
 
 bool UIControlConnection::sDrawCables = true;
-bool MidiController::sQuickMidiMapMode = true;
 
 namespace
 {
@@ -79,7 +78,7 @@ void MidiController::CreateUIControls()
    IDrawableModule::CreateUIControls();
    mControllerList = new DropdownList(this,"controller",3,2,&mControllerIndex, 150);
    mMappingDisplayModeSelector = new RadioButton(this,"mappingdisplay",mControllerList,kAnchor_Below,(int*)&mMappingDisplayMode, kRadioHorizontal);
-   mBindCheckbox = new Checkbox(this,"bind (hold shift)",mMappingDisplayModeSelector,kAnchor_Below,&mBindMode);
+   mBindCheckbox = new Checkbox(this,"bind (hold shift or left mouse)",mMappingDisplayModeSelector,kAnchor_Below,&mBindMode);
    mPageSelector = new DropdownList(this,"page",mBindCheckbox,kAnchor_Right,&mControllerPage);
    mAddConnectionButton = new ClickButton(this,"add",12,300);
    mOscInPortEntry = new TextEntry(this, "osc input port", 3, 70, 6, &mOscInPort, 0, 99999);
@@ -465,7 +464,7 @@ void MidiController::MidiReceived(MidiMessageType messageType, int control, floa
       return;
    }
 
-   if (mBindMode && sQuickMidiMapMode && gHoveredUIControl && GetKeyModifiers() == kModifier_Shift)
+   if (mBindMode && gHoveredUIControl && (GetKeyModifiers() == kModifier_Shift || TheSynth->IsMouseButtonHeld(1)))
    {
       AddControlConnection(messageType, control, channel, gHoveredUIControl);
       mLastBoundControlTime = gTime;

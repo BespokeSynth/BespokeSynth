@@ -681,6 +681,14 @@ float ModularSynth::GetMouseY(float rawY /*= FLT_MAX*/)
    return ((rawY == FLT_MAX ? mMousePos.y : rawY) + kYOffset) / gDrawScale - mDrawOffset.y;
 }
 
+bool ModularSynth::IsMouseButtonHeld(int button)
+{
+   if (button >= 0 && button < (int)mIsMouseButtonHeld.size())
+      return mIsMouseButtonHeld[button];
+
+   return false;
+}
+
 void ModularSynth::MouseMoved(int intX, int intY )
 {
    bool changed = (mMousePos.x != intX || mMousePos.y != intY);
@@ -870,6 +878,9 @@ void ModularSynth::MousePressed(int intX, int intY, int button)
 {
    mMousePos.x = intX;
    mMousePos.y = intY;
+
+   if (button >= 0 && button < (int)mIsMouseButtonHeld.size())
+      mIsMouseButtonHeld[button] = true;
    
    float x = GetMouseX();
    float y = GetMouseY();
@@ -1158,6 +1169,9 @@ void ModularSynth::MouseReleased(int intX, int intY, int button)
 {
    mMousePos.x = intX;
    mMousePos.y = intY;
+
+   if (button >= 0 && button < (int)mIsMouseButtonHeld.size())
+      mIsMouseButtonHeld[button] = false;
    
    float x = GetMouseX();
    float y = GetMouseY();

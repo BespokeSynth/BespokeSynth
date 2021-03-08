@@ -132,6 +132,7 @@ public:
    float GetRawMouseY() { return mMousePos.y; }
    float GetMouseX(float rawX = FLT_MAX);
    float GetMouseY(float rawY = FLT_MAX);
+   bool IsMouseButtonHeld(int button);
    ofVec2f& GetDrawOffset() { return mDrawOffset; }
    void SetDrawOffset(ofVec2f offset) { mDrawOffset = offset; }
    const ofRectangle& GetDrawRect() const { return mDrawRect; }
@@ -229,6 +230,7 @@ private:
    ofVec2f mLastMoveMouseScreenPos;
    ofVec2f mLastMouseDragPos;
    bool mIsMousePanning;
+   array<bool, 5> mIsMouseButtonHeld{ false };
    struct SpaceMouseInfo
    {
       SpaceMouseInfo() : mTwist(0), mZoom(0), mPan(0, 0), mUsingTwist(false), mUsingZoom(false), mUsingPan(false) {}

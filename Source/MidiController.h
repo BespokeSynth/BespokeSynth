@@ -307,7 +307,6 @@ public:
    void SaveState(FileStreamOut& out) override;
    void LoadState(FileStreamIn& in) override;
 
-   static bool sQuickMidiMapMode;
    static string GetDefaultTooltip(MidiMessageType type, int control);
    
 private:
