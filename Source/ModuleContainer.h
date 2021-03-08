@@ -25,6 +25,7 @@ public:
    void SetOwner(IDrawableModule* owner) { mOwner = owner; }
    void Draw();
    void DrawPatchCables();
+   void DrawUnclipped();
    void PostRender();
    void Poll();
    void Clear();

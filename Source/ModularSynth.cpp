@@ -356,6 +356,7 @@ void ModularSynth::Draw(void* vg)
    
    mModuleContainer.Draw();
    mModuleContainer.DrawPatchCables();
+   mModuleContainer.DrawUnclipped();
    
    for (auto* modal : mModalFocusItemStack)
       modal->Draw();

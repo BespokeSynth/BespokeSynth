@@ -56,6 +56,21 @@ void ModuleContainer::Draw()
    }
 }
 
+void ModuleContainer::DrawUnclipped()
+{
+   for (int i = (int)mModules.size() - 1; i >= 0; --i)
+   {
+      if (!mModules[i]->AlwaysOnTop())
+         mModules[i]->RenderUnclipped();
+   }
+
+   for (int i = (int)mModules.size() - 1; i >= 0; --i)
+   {
+      if (mModules[i]->AlwaysOnTop())
+         mModules[i]->RenderUnclipped();
+   }
+}
+
 void ModuleContainer::PostRender()
 {
    for (int i = (int)mModules.size()-1; i >= 0; --i)
@@ -196,7 +211,7 @@ void ModuleContainer::GetModulesWithinRect(ofRectangle rect, vector<IDrawableMod
    output.clear();
    for (int i=0; i<mModules.size(); ++i)
    {
-      if (mModules[i]->IsWithinRect(rect) && mModules[i] != TheQuickSpawnMenu)
+      if (mModules[i]->IsWithinRect(rect) && mModules[i] != TheQuickSpawnMenu && mModules[i]->IsShowing())
          output.push_back(mModules[i]);
    }
 }

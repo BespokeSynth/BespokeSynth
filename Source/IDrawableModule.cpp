@@ -342,9 +342,6 @@ void IDrawableModule::DrawFrame(float w, float h, bool drawModule, float& titleB
       ofRect(-.5f, -titleBarHeight-.5f, w+1, h+titleBarHeight+1, 4);
       ofPopStyle();
    }
-
-   if (drawModule)
-      DrawModuleUnclipped();
 }
 
 void IDrawableModule::Render()
@@ -429,6 +426,24 @@ void IDrawableModule::Render()
       source->UpdatePosition();
       source->DrawSource();
    }
+}
+
+void IDrawableModule::RenderUnclipped()
+{
+   if (!mShowing)
+      return;
+
+   ofPushMatrix();
+   ofPushStyle();
+
+   ofTranslate(mX, mY, 0);
+   ofColor color = GetColor(mModuleType);
+   ofSetColor(color);
+
+   DrawModuleUnclipped();
+
+   ofPopMatrix();
+   ofPopStyle();
 }
 
 void IDrawableModule::DrawPatchCables()
