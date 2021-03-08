@@ -409,6 +409,9 @@ PatchCablePos PatchCable::GetPatchCablePos()
    ofVec2f endDirection;
    ofVec2f end = FindClosestSide(xThat,yThat-yThatAdjust,wThat,hThat+yThatAdjust, start, startDirection, endDirection);
    
+   //update direction to match found side
+   startDirection = mOwner->GetCableStartDir(mSourceIndex, end);
+   
    if (mTargetRadioButton && mUIControlConnection && !mDragging)
    {
       mTarget->GetDimensions(wThat,hThat);
