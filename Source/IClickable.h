@@ -43,7 +43,7 @@ public:
    char* NameMutable() { return mName; }
    string Path(bool ignoreContext = false);
    virtual bool CheckNeedsDraw();
-   void SetShowing(bool showing) { mShowing = showing; }
+   virtual void SetShowing(bool showing) { mShowing = showing; }
    bool IsShowing() const { return mShowing; }
    virtual void StartBeacon() { mBeaconTime = gTime; }
    float GetBeaconAmount() const;
