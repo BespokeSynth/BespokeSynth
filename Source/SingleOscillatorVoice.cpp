@@ -91,7 +91,7 @@ bool SingleOscillatorVoice::Process(double time, ChannelBuffer* out)
             if (mVoiceParams->mSync)
                sample = mOscData[u].mOsc.Value(mOscData[u].mSyncPhase) * adsrVal * vol;
             else
-               sample = mOscData[u].mOsc.Value(mOscData[u].mPhase + mVoiceParams->mPhaseOffset) * adsrVal * vol;
+               sample = mOscData[u].mOsc.Value(mOscData[u].mPhase + mVoiceParams->mPhaseOffset * (1 + (float(u) / mVoiceParams->mUnison))) * adsrVal * vol;
          }
          
          if (u >= 2)
