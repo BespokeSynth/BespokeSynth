@@ -58,8 +58,6 @@ NoteStepSequencer::NoteStepSequencer()
    
    RandomizePitches(true);
    
-   SetIsNoteOrigin(true);
-   
    TheScale->AddListener(this);
 }
 

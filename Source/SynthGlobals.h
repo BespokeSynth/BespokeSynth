@@ -80,7 +80,6 @@ extern double gInvSampleRateMs;
 extern float gNyquistLimit;
 extern bool gPrintMidiInput;
 extern double gTime;
-extern float gVizFreq;
 extern IUIControl* gBindToUIControl;
 extern RetinaTrueTypeFont gFont;
 extern RetinaTrueTypeFont gFontBold;

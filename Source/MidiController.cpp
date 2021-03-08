@@ -71,8 +71,6 @@ MidiController::MidiController()
 {
    mListeners.resize(MAX_MIDI_PAGES);
    
-   SetIsNoteOrigin(true);
-   
    TheTransport->AddAudioPoller(this);
 }
 

@@ -219,7 +219,7 @@
 ModuleFactory::ModuleFactory()
 {
    REGISTER(LooperRecorder, looperrecorder, kModuleType_Audio);
-   REGISTER(WaveformViewer, waveform, kModuleType_Audio);
+   REGISTER(WaveformViewer, waveformviewer, kModuleType_Audio);
    REGISTER(EffectChain, effectchain, kModuleType_Audio);
    REGISTER(DrumPlayer, drumplayer, kModuleType_Synth);
    REGISTER(Chorder, chorder, kModuleType_Note);

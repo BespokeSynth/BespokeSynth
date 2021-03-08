@@ -23,9 +23,7 @@ KeyboardDisplay::KeyboardDisplay()
 , mNumOctaves(3)
 , mPlayingMousePitch(-1)
 , mTypingInput(false)
-{
-   SetIsNoteOrigin(true);
-   
+{   
    for (int i = 0; i < 128; ++i)
    {
       mLastOnTime[i] = 0;

@@ -9,9 +9,12 @@
 #include "WaveformViewer.h"
 #include "ModularSynth.h"
 #include "Profiler.h"
+#include "Scale.h"
 
 WaveformViewer::WaveformViewer()
 : IAudioProcessor(gBufferSize)
+, mDisplayFreq(220)
+, mDrawGain(2)
 , mPhaseAlign(true)
 , mDoubleBufferFlip(false)
 , mHueNote(nullptr)
@@ -40,6 +43,9 @@ WaveformViewer::WaveformViewer()
 void WaveformViewer::CreateUIControls()
 {
    IDrawableModule::CreateUIControls();
+   mDisplayFreqEntry = new TextEntry(this, "freq", 3, 3, 10, &mDisplayFreq, 1, 10000);
+   mDrawGainSlider = new FloatSlider(this, "draw gain", mDisplayFreqEntry, kAnchor_Below, 100, 15, &mDrawGain, .1f, 5);
+   mDisplayFreqEntry->DrawLabel(true);
    /*mHueNote = new FloatSlider(this,"note",5,0,100,15,&IDrawableModule::sHueNote,0,255);
    mHueAudio = new FloatSlider(this,"audio",5,15,100,15,&IDrawableModule::sHueAudio,0,255);
    mHueInstrument = new FloatSlider(this,"instrument",110,0,100,15,&IDrawableModule::sHueInstrument,0,255);
@@ -83,7 +89,7 @@ void WaveformViewer::Process(double time)
       
    GetBuffer()->Reset();
    
-   float vizPhaseInc = GetPhaseInc(gVizFreq);
+   float vizPhaseInc = GetPhaseInc(mDisplayFreq/2);
    mVizPhase[!mDoubleBufferFlip] += vizPhaseInc * bufferSize;
    while (mVizPhase[!mDoubleBufferFlip] > FTWO_PI) { mVizPhase[!mDoubleBufferFlip] -= FTWO_PI; }
    
@@ -95,6 +101,8 @@ void WaveformViewer::DrawModule()
    if (Minimized() || IsVisible() == false)
       return;
    
+   mDisplayFreqEntry->Draw();
+   mDrawGainSlider->Draw();
    /*mHueNote->Draw();
    mHueAudio->Draw();
    mHueInstrument->Draw();
@@ -113,15 +121,9 @@ void WaveformViewer::DrawModule()
    int phaseStart = 0;
    int end = BUFFER_VIZ_SIZE - 1;
 
-   while (gVizFreq > 0 && gVizFreq < 50)
-      gVizFreq *= 2;
-
-   if (mPhaseAlign)
-   {
-      float vizPhaseInc = GetPhaseInc(gVizFreq);
-      phaseStart = (FTWO_PI - mVizPhase[mDoubleBufferFlip]) / vizPhaseInc;
-      end = BUFFER_VIZ_SIZE-(FTWO_PI/vizPhaseInc);
-   }
+   float vizPhaseInc = GetPhaseInc(mDisplayFreq/2);
+   phaseStart = (FTWO_PI - mVizPhase[mDoubleBufferFlip]) / vizPhaseInc;
+   end = BUFFER_VIZ_SIZE-(FTWO_PI/vizPhaseInc);
    
    if (mDrawWaveform)
    {
@@ -130,7 +132,7 @@ void WaveformViewer::DrawModule()
       {
          float x = ofMap(i-phaseStart, 0, end, 0, w, true);
          float samp = mAudioView[(i+mBufferVizOffset[mDoubleBufferFlip])%BUFFER_VIZ_SIZE][mDoubleBufferFlip];
-         samp *= 3;
+         samp *= mDrawGain;
          if (x<w)
             ofVertex(x, h/2-samp*(h/2));
       }
@@ -149,9 +151,9 @@ void WaveformViewer::DrawModule()
             float rad = a * MIN(w,h)/2;
             float samp = mAudioView[(i+mBufferVizOffset[mDoubleBufferFlip])%BUFFER_VIZ_SIZE][mDoubleBufferFlip];
             if (samp > 0)
-               ofSetColor(245, 58, 135, ofMap(samp*2,0,1,0,255,true));
+               ofSetColor(245, 58, 135, ofMap(samp*mDrawGain/10,0,1,0,255,true));
             else
-               ofSetColor(58, 245, 135, ofMap(-samp*2,0,1,0,255,true));
+               ofSetColor(58, 245, 135, ofMap(-samp*mDrawGain/10,0,1,0,255,true));
             ofCircle(w/2,h/2,rad);
          }
       }
@@ -165,6 +167,17 @@ void WaveformViewer::DrawModule()
    mBufferVizOffset[mDoubleBufferFlip] = mBufferVizOffset[!mDoubleBufferFlip];
    mVizPhase[mDoubleBufferFlip] = mVizPhase[!mDoubleBufferFlip];
    mDoubleBufferFlip = !mDoubleBufferFlip;
+}
+
+void WaveformViewer::PlayNote(double time, int pitch, int velocity, int voiceIdx, ModulationParameters modulation)
+{
+   if (velocity > 0)
+   {
+      float floatPitch = pitch;
+      if (modulation.pitchBend != nullptr)
+         floatPitch += modulation.pitchBend->GetValue(0);
+      mDisplayFreq = TheScale->PitchToFreq(floatPitch);
+   }
 }
 
 void WaveformViewer::Resize(float w, float h)

@@ -32,7 +32,7 @@ public:
    ~SingleOscillator();
    static IDrawableModule* Create() { return new SingleOscillator(); }
    
-   string GetTitleLabel() override { return "osc"; }
+   string GetTitleLabel() override { return "oscillator"; }
    void CreateUIControls() override;
    
    void SetType(OscillatorType type) { mVoiceParams.mOscType = type; }

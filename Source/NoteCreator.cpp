@@ -26,7 +26,6 @@ NoteCreator::NoteCreator()
 , mNoteOnByTrigger(false)
 , mVoiceIndex(-1)
 {
-   SetIsNoteOrigin(true);
    TheTransport->AddAudioPoller(this);
 }
 

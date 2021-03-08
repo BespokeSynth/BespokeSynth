@@ -44,20 +44,16 @@ private:
 class INoteSource : public virtual IPatchable
 {
 public:
-   INoteSource() : mIsNoteOrigin(false), mNoteOutput(this) {}
+   INoteSource() : mNoteOutput(this) {}
    virtual ~INoteSource() {}
    NoteOutput* GetNoteOutput() { return &mNoteOutput; }
    void PlayNoteOutput(double time, int pitch, int velocity, int voiceIdx = -1, ModulationParameters modulation = ModulationParameters());
    void SendCCOutput(int control, int value, int voiceIdx = -1);
-   void SetIsNoteOrigin(bool origin) { mIsNoteOrigin = origin; }
-   void SetTargets(string targets);
    
    //IPatchable
    void PreRepatch(PatchCableSource* cableSource) override;
 protected:
    NoteOutput mNoteOutput;
-private:
-   bool mIsNoteOrigin;
 };
 
 #endif

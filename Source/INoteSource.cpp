@@ -116,20 +116,6 @@ void INoteSource::PlayNoteOutput(double time, int pitch, int velocity, int voice
       ofLog() << "Calling PlayNoteOutput() with a time in the past!  " << ofToString(time/1000) << " < " << ofToString(gTime/1000);
    
    mNoteOutput.PlayNote(time, pitch, velocity, voiceIdx, modulation);
-   
-   if (mIsNoteOrigin)
-   {
-      //update visual info for waveform display
-      bool* heldNotes = mNoteOutput.GetNotes();
-      for (int i=0; i<128; ++i)
-      {
-         if (heldNotes[i])
-         {
-            gVizFreq = MAX(1,TheScale->PitchToFreq(i-12));
-            break;
-         }
-      }
-   }
 }
 
 void INoteSource::SendCCOutput(int control, int value, int voiceIdx /*=-1*/)

@@ -51,8 +51,6 @@ LaunchpadKeyboard::LaunchpadKeyboard()
 
    mHeldChordTones.push_back(0);
    
-   SetIsNoteOrigin(true);
-
    vector<int> chord;
    //triad
    chord.push_back(0);

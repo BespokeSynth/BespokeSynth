@@ -13,17 +13,19 @@
 #include "IAudioProcessor.h"
 #include "IDrawableModule.h"
 #include "Slider.h"
+#include "TextEntry.h"
+#include "INoteReceiver.h"
 
 #define BUFFER_VIZ_SIZE 2048
 
-class WaveformViewer : public IAudioProcessor, public IDrawableModule, public IFloatSliderListener
+class WaveformViewer : public IAudioProcessor, public IDrawableModule, public IFloatSliderListener, public ITextEntryListener, public INoteReceiver
 {
 public:
    WaveformViewer();
    virtual ~WaveformViewer();
    static IDrawableModule* Create() { return new WaveformViewer(); }
    
-   string GetTitleLabel() override { return "waveform"; }
+   string GetTitleLabel() override { return "waveform viewer"; }
    void CreateUIControls() override;
    
    //IAudioSource
@@ -38,6 +40,11 @@ public:
    virtual void SetUpFromSaveData() override;
    
    void FloatSliderUpdated(FloatSlider* slider, float oldVal) override {}
+   void TextEntryComplete(TextEntry* entry) override {}
+
+   //INoteReceiver
+   void PlayNote(double time, int pitch, int velocity, int voiceIdx = -1, ModulationParameters modulation = ModulationParameters()) override;
+   void SendCC(int control, int value, int voiceIdx = -1) override {}
    
 private:
    //IDrawableModule
@@ -51,6 +58,8 @@ private:
    int mBufferVizOffset[2];
    float mVizPhase[2];
 
+   float mDisplayFreq;
+   float mDrawGain;
    bool mPhaseAlign;
    float mWidth;
    float mHeight;
@@ -63,6 +72,8 @@ private:
    FloatSlider* mHueNoteSource;
    FloatSlider* mSaturation;
    FloatSlider* mBrightness;
+   TextEntry* mDisplayFreqEntry;
+   FloatSlider* mDrawGainSlider;
 };
 
 #endif /* defined(__modularSynth__WaveformViewer__) */

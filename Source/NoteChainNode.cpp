@@ -28,7 +28,6 @@ NoteChainNode::NoteChainNode()
 , mNextInterval(kInterval_8n)
 , mQueueTrigger(false)
 {
-   SetIsNoteOrigin(true);
    TheTransport->AddAudioPoller(this);
    TheTransport->AddListener(this, kInterval_8n, OffsetInfo(0, true), false);
 }
