@@ -114,8 +114,11 @@ void Push2Control::CreateUIControls()
    
    mSpawnLists.SetModuleFactory(TheSynth->GetModuleFactory());
    mSpawnLists.mNoteModules.GetList()->SetMaxPerColumn(9999);
-   for (int i=0; i<mSpawnLists.GetDropdowns().size(); ++i)
+   for (int i = 0; i < mSpawnLists.GetDropdowns().size(); ++i)
+   {
       mSpawnLists.GetDropdowns()[i]->GetList()->SetWidth(100);
+      mSpawnLists.GetDropdowns()[i]->GetList()->SetPosition(-999, -999);
+   }
    mSpawnModuleControls.push_back(mSpawnLists.mInstrumentModules.GetList());
    mSpawnModuleControls.push_back(mSpawnLists.mNoteModules.GetList());
    mSpawnModuleControls.push_back(mSpawnLists.mSynthModules.GetList());
