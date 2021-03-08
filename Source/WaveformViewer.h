@@ -16,9 +16,9 @@
 #include "TextEntry.h"
 #include "INoteReceiver.h"
 
-#define BUFFER_VIZ_SIZE 2048
+#define BUFFER_VIZ_SIZE 10000
 
-class WaveformViewer : public IAudioProcessor, public IDrawableModule, public IFloatSliderListener, public ITextEntryListener, public INoteReceiver
+class WaveformViewer : public IAudioProcessor, public IDrawableModule, public IFloatSliderListener, public IIntSliderListener, public ITextEntryListener, public INoteReceiver
 {
 public:
    WaveformViewer();
@@ -40,6 +40,7 @@ public:
    virtual void SetUpFromSaveData() override;
    
    void FloatSliderUpdated(FloatSlider* slider, float oldVal) override {}
+   void IntSliderUpdated(IntSlider* slider, int oldVal) override {}
    void TextEntryComplete(TextEntry* entry) override {}
 
    //INoteReceiver
@@ -59,6 +60,7 @@ private:
    float mVizPhase[2];
 
    float mDisplayFreq;
+   int mLengthSamples;
    float mDrawGain;
    bool mPhaseAlign;
    float mWidth;
@@ -73,6 +75,7 @@ private:
    FloatSlider* mSaturation;
    FloatSlider* mBrightness;
    TextEntry* mDisplayFreqEntry;
+   IntSlider* mLengthSamplesSlider;
    FloatSlider* mDrawGainSlider;
 };
 
