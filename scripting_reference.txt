@@ -105,7 +105,8 @@ import sampleplayer
    instance:
       s.set_cue_point(pitch, startSeconds, lengthSeconds, speed)
       s.fill(data)
-      s.play_cue(cue)
+      s.play_cue(cue, speedMult, startOffsetSeconds)
+         optional: speedMult = 1, startOffsetSeconds = 0
 
 
 import midicontroller

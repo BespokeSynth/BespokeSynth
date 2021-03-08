@@ -10,6 +10,6 @@ class sampleplayer:
    def fill(this, data):
       pass
 
-   def play_cue(this, cue):
+   def play_cue(this, cue, speedMult = 1, startOffsetSeconds = 0):
       pass
 
