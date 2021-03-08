@@ -54,7 +54,7 @@ public:
    void SetValue(float value) override;
    void SetValueDirect(float value) override;
    float GetValue() const override;
-   float GetMidiValue() override;
+   float GetMidiValue() const override;
    int GetNumValues() override { return (int)mElements.size(); }
    string GetDisplayValue(float val) const override;
    bool IsBitmask() override { return mMultiSelect; }

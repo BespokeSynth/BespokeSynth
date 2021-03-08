@@ -35,8 +35,9 @@ public:
    //IUIControl
    void SetFromMidiCC(float slider) override;
    void SetValue(float value) override;
-   float GetMidiValue() override;
-   string GetDisplayValue(float val) const override { return val > 0 ? "click" : "nothing"; }
+   float GetValue() const override { return GetMidiValue(); }
+   float GetMidiValue() const override;
+   string GetDisplayValue(float val) const override;
    int GetNumValues() override { return 2; }
    void GetDimensions(float& width, float& height) override { width = mWidth; height = mHeight; }
    void SaveState(FileStreamOut& out) override {}
@@ -48,7 +49,7 @@ protected:
    ~ClickButton();   //protected so that it can't be created on the stack
 
 private:
-   bool ButtonLit();
+   bool ButtonLit() const;
 
    void OnClicked(int x, int y, bool right) override;
    float mWidth;

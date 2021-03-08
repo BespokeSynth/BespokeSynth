@@ -84,7 +84,7 @@ public:
    float GetValueForMidiCC(float slider) const override;
    void SetValue(float value) override;
    float GetValue() const override;
-   float GetMidiValue() override;
+   float GetMidiValue() const override;
    int GetNumValues() override { return (int)mElements.size(); }
    string GetDisplayValue(float val) const override;
    bool InvertScrollDirection() override { return true; }

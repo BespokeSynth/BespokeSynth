@@ -73,7 +73,7 @@ public:
    void SetValue(float value) override;
    float GetValue() const override;
    string GetDisplayValue(float val) const override;
-   float GetMidiValue() override;
+   float GetMidiValue() const override;
    void GetRange(float& min, float& max) override { min = mMin; max = mMax; }
    void Double() override;
    void Halve() override;
@@ -177,7 +177,7 @@ public:
    float GetValueForMidiCC(float slider) const override;
    void SetValue(float value) override;
    float GetValue() const override;
-   float GetMidiValue() override;
+   float GetMidiValue() const override;
    int GetNumValues() override { return mMax - mMin + 1; }
    string GetDisplayValue(float val) const override;
    void GetRange(int& min, int& max) { min = mMin; max = mMax; }

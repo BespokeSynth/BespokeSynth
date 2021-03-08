@@ -33,7 +33,7 @@ public:
    float GetValueForMidiCC(float slider) const override;
    void SetValue(float value) override;
    float GetValue() const override;
-   float GetMidiValue() override;
+   float GetMidiValue() const override;
    int GetNumValues() override { return 2; }
    string GetDisplayValue(float val) const override;
    void Increment(float amount) override;
@@ -53,6 +53,8 @@ private:
    void OnClicked(int x, int y, bool right) override;
    void GetDimensions(float& width, float& height) override { width = mWidth; height = mHeight; }
    void CalcSliderVal();
+   void UpdateWidth();
+
    float mWidth;
    float mHeight;
    bool* mVar;

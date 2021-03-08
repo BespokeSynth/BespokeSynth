@@ -556,7 +556,7 @@ float FloatSlider::GetValue() const
    return *mVar;
 }
 
-float FloatSlider::GetMidiValue()
+float FloatSlider::GetMidiValue() const
 {
    if (mMin == mMax)
       return 0;
@@ -1082,7 +1082,7 @@ float IntSlider::GetValue() const
    return *mVar;
 }
 
-float IntSlider::GetMidiValue()
+float IntSlider::GetMidiValue() const
 {
    return mSliderVal;
 }

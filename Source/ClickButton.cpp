@@ -73,7 +73,7 @@ void ClickButton::Render()
    DrawHover();
 }
 
-bool ClickButton::ButtonLit()
+bool ClickButton::ButtonLit() const
 {
    return mClickTime + 200 > gTime;
 }
@@ -114,9 +114,16 @@ void ClickButton::SetValue(float value)
       MouseReleased();
 }
 
-float ClickButton::GetMidiValue()
+float ClickButton::GetMidiValue() const
 {
    if (ButtonLit())
       return 1;
    return 0;
+}
+
+string ClickButton::GetDisplayValue(float val) const
+{
+   if (val > 0)
+      return "click";
+   return "_";
 }

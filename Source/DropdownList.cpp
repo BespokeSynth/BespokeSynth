@@ -313,7 +313,7 @@ float DropdownList::GetValue() const
    return *mVar;
 }
 
-float DropdownList::GetMidiValue()
+float DropdownList::GetMidiValue() const
 {
    return mSliderVal;
 }

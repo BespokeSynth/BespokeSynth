@@ -263,7 +263,7 @@ float RadioButton::GetValue() const
    return *mVar;
 }
 
-float RadioButton::GetMidiValue()
+float RadioButton::GetMidiValue() const
 {
    if (mMultiSelect)
       return GetValue();

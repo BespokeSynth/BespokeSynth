@@ -37,7 +37,7 @@ public:
    virtual void SetValue(float value) = 0;
    virtual void SetValueDirect(float value) { SetValue(value); } //override if you need special control here
    virtual float GetValue() const { return 0; }
-   virtual float GetMidiValue() { return 0; }
+   virtual float GetMidiValue() const { return 0; }
    virtual int GetNumValues() { return 0; } //the number of distinct values that you can have for this control, zero indicates infinite (like a float slider)
    virtual string GetDisplayValue(float val) const { return "unimplemented"; }
    virtual void Init() {}

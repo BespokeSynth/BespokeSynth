@@ -41,16 +41,21 @@ Checkbox::~Checkbox()
 void Checkbox::SetLabel(const char* label)
 {
    SetName(label);
-   if (mDisplayText)
-      mWidth = 12+GetStringWidth(label);
-   else
-      mWidth = mHeight-3;
+   UpdateWidth();
 }
 
 void Checkbox::SetDisplayText(bool display)
 {
    mDisplayText = display;
-   SetLabel(Name()); //recalculate width
+   UpdateWidth();
+}
+
+void Checkbox::UpdateWidth()
+{
+   if (mDisplayText)
+      mWidth = 15 + GetStringWidth(Name());
+   else
+      mWidth = mHeight - 3;
 }
 
 void Checkbox::UseCircleLook(ofColor color)
@@ -165,7 +170,7 @@ void Checkbox::SetValue(float value)
    }
 }
 
-float Checkbox::GetMidiValue()
+float Checkbox::GetMidiValue() const
 {
    return mSliderVal;
 }
