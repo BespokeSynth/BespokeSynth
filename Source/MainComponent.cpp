@@ -183,6 +183,8 @@ public:
             ofLog() << output.toStdString();
       }*/
 
+      mGlobalManagers.mDeviceManager.getAvailableDeviceTypes();   //scans for device types ("Windows Audio", "DirectSound", etc)
+
       ofxJSONElement userPrefs;
       const string kAutoDevice = "auto";
       const string kNoneDevice = "none";
@@ -208,8 +210,6 @@ public:
       SetGlobalSampleRateAndBufferSize(sampleRate, bufferSize);
       
       mSynth.Setup(&mGlobalManagers, this);
-
-      mGlobalManagers.mDeviceManager.getAvailableDeviceTypes();   //scans for device types ("Windows Audio", "DirectSound", etc)
       
       AudioDeviceManager::AudioDeviceSetup preferredSetupOptions;
       preferredSetupOptions.sampleRate = gSampleRate;
