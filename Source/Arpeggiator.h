@@ -103,8 +103,8 @@ private:
    Checkbox* mUseHeldNotesCheckbox;
    TextEntry* mArpEntry;
    ClickButton* mEasyButton;
-   bool mRepeatIsHold;
-   Checkbox* mRepeatIsHoldCheckbox;
+   bool mRepeat;
+   Checkbox* mRepeatCheckbox;
    Checkbox* mRestartOnPressCheckbox;
    int mArpStep;
    int mArpPingPongDirection;

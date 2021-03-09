@@ -69,6 +69,7 @@ public:
    int NumRows() override { return mRows; }
    bool HasInput() const override;
    //bool IsMultisliderGrid() const override { return mColors.empty(); }   //commented out... don't remember what types of grids this is supposed to be for
+   bool IsConnected() { return mController != nullptr; }
    
    //IUIControl
    void SetFromMidiCC(float slider) override {}
@@ -84,6 +85,7 @@ public:
    
 private:
    void GetDimensions(float& width, float& height) override { width = 30; height = 15; }
+   bool MouseMoved(float x, float y) override;
    
    unsigned int mRows;
    unsigned int mCols;

@@ -233,6 +233,7 @@ void MidiDevice::SendMidiMessage(MidiDeviceListener* listener, const char* devic
    {
       MidiNote note;
       note.mDeviceName = deviceName;
+      note.mTimestamp = message.getTimeStamp();
       note.mPitch = message.getNoteNumber();
       if (message.isNoteOn())
          note.mVelocity = message.getVelocity();

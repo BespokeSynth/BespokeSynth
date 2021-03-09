@@ -77,6 +77,8 @@ public:
    bool AlwaysOnTop() override { return true; }
    bool IsSingleton() const override { return true; }
    
+   HelpDisplay* GetHelpDisplay() { return mHelpDisplay; }
+
    void SetModuleFactory(ModuleFactory* factory) { mSpawnLists.SetModuleFactory(factory); }
    void ListLayouts();
    

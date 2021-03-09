@@ -1,138 +1,46 @@
-WARNING! Much of this documentation is out of date
+video overview available at youtube.com/awwbees
 
-Important buttons on the title bar:
-
-* save state: Save the state of everything
-* load state: Reload into a previously saved state
-* write audio: Save the last 30 minutes of audio that you played to your data/recordings/ directory. This way you can aimlessly jam and never miss anything that sounded cool.
-* quit: Quits Bespoke.
- 
- 
-Input reference:
-
-* Click on the circle in the top left corner of a module to enable/disable it.
-* Click and drag the bar at the top of a module to move it. Click on the module's name to minimize it. 
-* Click on the triangle on the right of that bar to open the save data configuration for that module.
-* Hold space bar and mouse around to move around on Bespoke's canvas.
-* Hold space bar and scroll vertically to zoom in and out.
-* Click and drag on the plug at the end of a patch cable to repatch it. Release the cable on a module to set that as the new target. While repatching, invalid targets will dim.
-* Hold shift when clicking a patch cable source to create multiple cables, for modules which support this (note and pulse modules)
-* Hold shift when attaching a patch cable to "insert" the new module into the old chain. (i.e., if you wanted to add a gain between signalgenerator and output which are already patched together, patch the signalgenerator into the gain while holding shift)
-* Hold shift while dragging a module and "touch" it to other modules to automatically create patch connections to those modules.
-* Hold shift when dragging a float slider to move it with higher precision.
-* Hold command when dragging a float slider to limit yourself within the current integer. So if you've got a slider on 1.3 and are holding command, it'll stay between 1 and 2.
-* When you hover over a UI control, you can scroll your trackpad/mousewheel vertically to adjust that cyan-highlighted hovered control. Hold shift for finer control.
-* Right click a slider to start an LFO on that slider. When the slider is in LFO mode, clicking and dragging horizontally sets the LFO max, and vertically sets the LFO min.
-* Press '[' while hovered over a float slider to halve its value, or ']' to double it.
-* Type a number or expression when hovered over a slider to enter a value for that slider.
-* Hold command and click the start/end of a slider to enter a new value for the minimum or maximum of that slider. Doing this could adjust a slider to operate outside it's intended range, which could lead to unexpected behavior, so be warned!
-* Press '/' to toggle full screen mode.
-* Delete modules by using the triangle menu for that module, or by drag-selecting and pressing "delete" on your keyboard.
+navigation:
+* space bar + move mouse to pan, or right-click drag in empty space
+* space bar + mousewheel/trackpad-scroll to zoom, or scroll in empty space
+* if you get lost, press tab and type "home" into the console to reset to the initial position and zoom
 
 
-In your data directory there is a userprefs.json file. This contains a few settings:
+creating modules
+*drag items out of the top bar menus
+OR
+*hold the first letter of a module and drag them out of the popup menu
+*to delete a module, lasso select + backspace OR use the triangle menu and choose "delete module"
+*to duplicate a module, hold alt/option and drag from the title bar
 
-* layout: which layout file to open when Bespoke starts
-* buffersize: The size of the audio buffer that Bespoke uses. Lower numbers demand more from your CPU, and higher numbers introduce more latency. If you're getting audio crackling and seeing that the "audio cpu" readout in the title bar is reporting numbers higher than 100%, your buffersize is too low and you should increase it. Number must be a power of 2 (so, it must be 32, 64, 128, 256, etc). 64 works well on my machine.
-* samplerate: Sample rate at which to run. You'll probably wanna leave this at 44100.
-* width: Window width
-* height: Window height
+
+patching
+*drag the circle from the bottom of a module to the target OR click the circle then click the target to patch
+*drag a cable and press backspace to unpatch
+*hold shift while patching to insert
+*drag a module by the title bar and touch its circle to another module, or the mouse pointer to another module's circle, to quick patch
 
 
-If you press the tab key, you can bring up the console. A few good console commands are:
+ui controls
+*click or drag a slider to adjust its value
+*hold shift to fine-tune
+*while hovered:
+   -use mousewheel/trackpad-scroll to adjust (shift to fine-tune)
+   -type a value into a slider (such as 1.5) and press enter
+   -type an expression into a slider (such as 1/16 or +=10) and press enter  
+   -press up or down to increase the value by 1 (hold shift for .01)
+   -press [ or ] to halve or double the value
+   -press \ to reset to the initial value
+*hold alt/option and drag to adjust slew amount (smoothing)
+*right click a slider to add an LFO
+   -click and drag a green modulated slider vertically to adjust the modulation min, and horizontally to adjust the modulation max
+*hold ctrl/command and click the lower or upper half of a slider to adjust that slider's minimum or maximum value, to give it increased or reduced range   (warning! increasing range can lead to unpredictable behavior in some cases)
+*press backtick/tilde to toggle number view for ADSR controls
 
-* home: zoom back to the "home" position of Bespoke, if you ended up scrolling to a place where you can't find your way back
-* profiler: see which modules are eating up the most of your audio CPU cycles. Enter "profiler" again to dismiss this view.
-* tempo [number]: set the transport to a tempo.
-* You can type the name of any module to spawn it, as an alternative to using the dropdowns. You can also type "effectchain biquad delay [...other effects]" to create an effectchain containing those effects.
 
-#module reference:
-   adsrtrigger - Triggers ADSRs that you can find in the dropdown you get when you hit 'q' while hovered over a slider.
-   arpeggiator - Arpeggiates held chords.
-   audiorouter - Selector for switching where audio is routed to.
-   autotalent - Autotuner.
-   bandvocoder - Frequency band-based vocoder. This must be paired with a vocodercarrier to work. Send the voice into this.
-   beats - Multi-loop player. Requires a samplebank.
-   capo - Shifts incoming notes by semitones.
-   chorder - Plays diatonic chords with incoming notes. Pairs with launchpadkeyboard for a nice Launchpad interface.
-   combogridcontroller - Allows you to use multiple hardware grid controllers to represent a single grid surface. This lets you put two Launchpads side-by-side and essentially have a 128-button Launchpad. Never can have enough buttons for your step sequencer!
-   drumplayer - Sample-based drum player. Click "edit" to expand it, and drag 44.1k wav samples onto each of the 16 pads. You can also drop a whole directory full of samples onto a pad, hover the mouse over the "aud" (audition) slider, and press up and down to cycle between all the samples in that directory (or you can bind a midi controller to "aud" for the same effect).
-   drumsequencer - Drum step sequencer. Click the "offsets" checkbox to slide rows off the grid. Pass a gridcontroller into it for physical control.
-   drumsynth - Oscillator+noise drum synth.
-   effectchain - This holds the effects that are in the second list at the bottom of this post. Each effect has a dry/wet slider and < and > buttons that allow you to reorder the effects.
-   eigenchorder - Note effect that pairs with Eigenharp to allow you to play pressure-sensitive diatonic chords matching the incoming notes.
-   eigenharp - Support for Eigenharp Pico, a weird controller that you probably don't have.
-   eigenharpnotesource - Pairs with eigenharp, turns it into note data.
-   fmsynth - FM synthesis.
-   fouronthefloor - Sends a kick note every beat.
-   freqdelay - Very short delay intended for pitched delay effects, you can patch a note cable to it to delay at an amount that will create that pitch.
-   gain - Volume booster.
-   gridcontroller - Represents a hardware grid (Launchpad, monome, etc) to be used as an interface to grid-based modules, such as the drumsequencer or the launchpadkeyboard.
-   input - Input channel from your audio interface/sound card.
-   karplusstrong - Plucked string synthesis.
-   kicker - Sends a kick to a specified drumplayer whenever a note is passed into it.
-   launchpadkeyboard - Ableton Push-like keyboard layout on a Novation Launchpad (although I came up with this design before the Push came out!!). Pass an 8x8 gridcontroller into it.
-   launchpadnotedisplayer - Lights a specified Launchpad up with the notes that are passed into it.
-   lfocontroller - A midi-mappable way of controlling the slider LFOs that you have access to when you press 'q' while hovered over a slider. This maps to the LFO that you have most recently 'q'ed up.
-   lissajous - Awesome waveform visualization.
-   looper - This works in conjunction with the looperrecorder. Send the audio into the looperrecorder, and press "commit" on the looper to grab it and start looping. This works a bit different from most loopers, in that you hit commit immediately after playing your loop, rather than immediately before. For something closer to the "immediately before" behavior, use the "overdub" functionality in looperrecorder.
-   looperrecorder - This works in conjunction with loopers.
-   loopstorer - This is a bank of buffers that you pair with a looper which allows you to swap out which loop is playing and being recorded to. This module is pretty new, but seems promising for adding an Ableton "clip launcher" style of workflow.
-   metronome - Sends metronome audio.
-   midicontroller - Allows you to hook MIDI controller up to sliders and other controls.
-   midiinstrument - Sends note/pitchbend/pressure signals from midi controllers.
-   midiplayer - Plays a midi file, but a very basic interface. Drop a midi file onto it to start playing.
-   monophonify - Only allows a single note through at a time, adding glide if you had a prior note held.
-   neighborhooder - Wraps notes to play within a specified octave.
-   notecanvas - Still a major work in progress, but should be pretty awesome when it's done: a sequencer that allows you to go way off-grid.
-   noteflusher - Sends a note off all currently on notes.
-   notelooper - Not a great interface right now, but allows you to record a loop of midi notes
-   noteoctaver - Raise/lower the octave of the note sent in.
-   noterouter - Route notes to destinations via handy midi-mappable buttons. When creating your layout, patch this into note receivers to add them to the list.
-   notesequencer - Step sequencer for notes. Currently designed to work well with a Novation LaunchControl, need to make midi mapping more flexible for this.
-   notesinger - Takes audio in (for example, a singing voice) and sends the detected notes out. Could be used with the vocoder to create an auto-tune effect.
-   notetransformer - Allows you to scramble up notes. One application is mangling what comes out of a step sequencer, then afterwards it's easy to restore the original sequence by simply zeroing out all of the sliders.
-   oscillator - Bread and butter ADSR'ed oscillator. Enable the "pitch" checkbox for some fun pitch dive stuff, and the "sync" checkbox for a hard-synced oscillator. Play two of these side by side with sawtooth waves slightly detuned for awesome times.
-   output - Output channel to your audio interface/sound card.
-   pitchbender - Sends pitch bend messages. If your keyboard is already sending pitch bends, they're already going through the note signal chain, so no need for one of these in that case.
-   polyrhythms - Drum sequencer with grids of different divisions.
-   presets - Store/load settings for specified UI controls.
-   psmove - Allows you to map a Playstation Move controller input to sliders.
-   razor - This one's pretty raw, but it gives you monophonic additive synthesis like NI's Razor.
-   rewriter - Pairs with a looper to take the audio that goes into it and feed it back to the looper. The standard idea for using it is to have the looper go into an effectchain, then the effectchain goes into this. That'll allow you to print those effects to the wave data in the loop.
-   ringmodulator - Ring modulator, you can patch a note cable to it to modulate at a certain pitch.
-   samplebank - Holds audio samples loaded up via a text file in a weird format. I need to document this.
-   sampleplayer - Plays samples that are in a samplebank.
-   sampler - Recording sampler synth. Patch an audio input and a note input into this, check "rec", then sing/play something into it and you'll see it record a short sample. Now when you have it play notes, pitched samples will come out.
-   samplergrid - This allows you to use a gridcontroller to capture incoming audio into individual buttons, and play it back by pressing those buttons.
-   scaledetect - Detects what scale you could be playing given the notes that have been sent to it.
-   signalgenerator - Non-enveloped signal generator.
-   slidersequencer - Off-grid drum sequencer.
-   stereofier - This splits audio to two signals and pans according to the slider. To patch the left channel, click the left side of the module while repatching, and the right side for the right channel.
-   stuttercontrol - This is the interface to control any stutter effects that you have in effectchains. You should probably map the checkboxes to a midicontroller. Also hacked in: hold shift-letter to access the stutters. Letters are Q-U and A-K on a QWERTY keyboard.
-   sustainpedal - Sustains notes.
-   timerdisplay - Handy timer to let you know how long you've been jamming for. How time flies!
-   velocitysetter - Sets the velocity of incoming notes. Also allows for velocity randomization.
-   velocitystepsequencer - Sets velocity of incoming notes, sequenced.
-   vinylcontrol - Kinda experimental, but allows you to control the Transport with control vinyl. Scratching loopers sorta works.
-   vocoder - FFT-based phase vocoder. This must be paired with a vocodercarrier to work. Send the voice into this.
-   vocodercarrier - This must be paired with a vocoder to work. Send the synth signal into this.
-   waveform - Waveform display, phase-locked to the last pitch you played.
-   whitekeys - This allows you to play in the current global scale by hitting only the white keys on a keyboard controller.  
-   
-#effects reference:
-   biquad - Lowpass, highpass, bandpass, and peak-notch filter.
-   bitcrush - Bitcrusher.
-   compressor - Compressor that I don't really use, so I'm not sure how well it works.
-   dcremover - Highpass filter to get rid of that DC component.
-   delay - Beat-synced (or not) delay.
-   distortion - Waveshaping distortion.
-   eq - Shitty equalizer, needs a lot of work.
-   freeverb - Reverb.
-   gate - Noise gate to eliminate ambient noise on a mic, etc.
-   granulator - Live granulator.
-   muter - Mutes all audio going through it.
-   noisify - Multiplies static into input.
-   pumper - Fake sidechaining.
-   stutter - Beat-synced stutter. To control stutters, use it with a stuttercontrol module (specify the stuttercontrol in the effectchain's configuration panel).
-   tremolo - Beat-synced tremolo.
+saving
+*"write audio" button: write the last 30 minutes of audio to the /data/recordings folder, perfect for making sure you don't miss any cool moments
+*"save state" button: save the current layout to a file
+*"load state" button: load previously saved layouts
+*tab+'s'+enter: quicksave
+*tab+'l'+enter: quickload

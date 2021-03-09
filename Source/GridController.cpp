@@ -193,6 +193,12 @@ bool GridController::CanBeTargetedBy(PatchCableSource* source) const
    return source->GetConnectionType() == kConnectionType_Grid;
 }
 
+bool GridController::MouseMoved(float x, float y)
+{
+   CheckHover(x, y);
+   return false;
+}
+
 namespace
 {
    const int kSaveStateRev = 1;

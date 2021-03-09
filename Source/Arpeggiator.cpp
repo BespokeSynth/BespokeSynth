@@ -32,8 +32,8 @@ Arpeggiator::Arpeggiator()
 , mRandomRange(24)
 , mRandomRest(false)
 , mRandomHold(false)
-, mRepeatIsHold(true)
-, mRepeatIsHoldCheckbox(nullptr)
+, mRepeat(true)
+, mRepeatCheckbox(nullptr)
 , mRandomLengthSlider(nullptr)
 , mRandomRangeSlider(nullptr)
 , mRandomRestCheckbox(nullptr)
@@ -68,7 +68,7 @@ void Arpeggiator::CreateUIControls()
    mRestartOnPressCheckbox = new Checkbox(this,"restart", 5, 84, &mRestartOnPress);
    mArpEntry = new TextEntry(this,"arpentry",3,13,10,mArpString);
    mEasyButton = new ClickButton(this,"easy",80,30);
-   mRepeatIsHoldCheckbox = new Checkbox(this,"!repeat",4,67,&mRepeatIsHold);
+   mRepeatCheckbox = new Checkbox(this,"repeat",4,67,&mRepeat);
    mRandomLengthSlider = new IntSlider(this,"r len",130,30,100,15,&mRandomLength,3,16);
    mRandomRangeSlider = new IntSlider(this,"r range",130,48,100,15,&mRandomRange,4,48);
    mRandomRestCheckbox = new Checkbox(this,"r rests",130,66,&mRandomRest);
@@ -120,7 +120,7 @@ void Arpeggiator::DrawModule()
    mIntervalSelector->Draw();
    mUseHeldNotesCheckbox->Draw();
    mEasyButton->Draw();
-   mRepeatIsHoldCheckbox->Draw();
+   mRepeatCheckbox->Draw();
    mRandomLengthSlider->Draw();
    mRandomRangeSlider->Draw();
    mRandomRestCheckbox->Draw();
@@ -416,7 +416,7 @@ void Arpeggiator::OnTimeEvent(double time)
          
          outPitch += mCurrentOctaveOffset * TheScale->GetTet();
 
-         if (mLastPitch == outPitch && mRepeatIsHold)
+         if (mLastPitch == outPitch && !mRepeat)
          {
             //if it's the same note and repeats are treated as holds, clear note off
             offPitch = -1;

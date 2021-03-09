@@ -21,6 +21,8 @@ namespace
 }
 
 QuickSpawnMenu::QuickSpawnMenu()
+: mLastHoverX(0)
+, mLastHoverY(0)
 {
    assert(TheQuickSpawnMenu == nullptr);
    TheQuickSpawnMenu = this;
@@ -111,18 +113,41 @@ void QuickSpawnMenu::DrawModule()
    ofPopStyle();
 }
 
+bool QuickSpawnMenu::MouseMoved(float x, float y)
+{
+   mLastHoverX = x;
+   mLastHoverY = y;
+   return false;
+}
+
 void QuickSpawnMenu::OnClicked(int x, int y, bool right)
 {
    if (right)
       return;
    
-   int index = y/itemSpacing;
-   if (index >= 0 && index < mElements.size())
+   string moduleTypeName = GetModuleTypeNameAt(x, y);
+   if (moduleTypeName != "")
    {
-      IDrawableModule* module = TheSynth->SpawnModuleOnTheFly(mElements[index], TheSynth->GetMouseX() + moduleGrabOffset.x, TheSynth->GetMouseY() + moduleGrabOffset.y);
+      IDrawableModule* module = TheSynth->SpawnModuleOnTheFly(moduleTypeName, TheSynth->GetMouseX() + moduleGrabOffset.x, TheSynth->GetMouseY() + moduleGrabOffset.y);
       TheSynth->SetMoveModule(module, moduleGrabOffset.x, moduleGrabOffset.y);
    }
    
    TheSynth->PopModalFocusItem();
    SetShowing(false);
+}
+
+string QuickSpawnMenu::GetHoveredModuleTypeName()
+{
+   return GetModuleTypeNameAt(mLastHoverX, mLastHoverY);
+}
+
+string QuickSpawnMenu::GetModuleTypeNameAt(int x, int y)
+{
+   int index = y / itemSpacing;
+   if (index >= 0 && index < mElements.size())
+   {
+      return mElements[index];
+   }
+
+   return "";
 }

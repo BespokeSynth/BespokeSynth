@@ -282,6 +282,7 @@ void MidiController::OnTransportAdvanced(float amount)
       if (mUseChannelAsVoice)
          voiceIdx = note->mChannel - 1;
       
+      //TODO(Ryan) how can I use note->mTimestamp to get more accurate timing for midi input?
       PlayNoteOutput(gTime, note->mPitch + mNoteOffset, MIN(127,note->mVelocity*mVelocityMult), voiceIdx, ModulationParameters(mModulation.GetPitchBend(voiceIdx), mModulation.GetModWheel(voiceIdx), mModulation.GetPressure(voiceIdx), 0));
       
       for (auto i = mListeners[mControllerPage].begin(); i != mListeners[mControllerPage].end(); ++i)

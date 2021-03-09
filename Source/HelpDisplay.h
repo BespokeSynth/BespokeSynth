@@ -11,8 +11,9 @@
 
 #include "IDrawableModule.h"
 #include "RadioButton.h"
+#include "ClickButton.h"
 
-class HelpDisplay : public IDrawableModule, public IRadioButtonListener
+class HelpDisplay : public IDrawableModule, public IRadioButtonListener, public IButtonListener
 {
 public:
    HelpDisplay();
@@ -24,7 +25,15 @@ public:
    bool HasTitleBar() const override { return false; }
    void CreateUIControls() override;
 
-void RadioButtonUpdated(RadioButton* radio, int oldVal) override {}
+   string GetUIControlTooltip(IUIControl* control);
+   string GetModuleTooltip(IDrawableModule* module);
+   string GetModuleTooltipFromName(string moduleTypeName);
+
+   void CheckboxUpdated(Checkbox* checkbox) override;
+   void RadioButtonUpdated(RadioButton* radio, int oldVal) override {}
+   void ButtonClicked(ClickButton* button) override;
+
+   static bool sShowTooltips;
 
 private:
    //IDrawableModule
@@ -32,15 +41,31 @@ private:
    bool Enabled() const override { return true; }
    void GetModuleDimensions(float& w, float& h) override;
    
+   struct UIControlTooltipInfo
+   {
+      string controlName;
+      string tooltip;
+   };
+
+   struct ModuleTooltipInfo
+   {
+      string module;
+      string tooltip;
+      list<UIControlTooltipInfo> controlTooltips;
+   };
+
    void LoadHelp();
+   void LoadTooltips();
+   ModuleTooltipInfo* FindModuleInfo(string moduleTypeName);
+   UIControlTooltipInfo* FindControlInfo(IUIControl* control);
    
-   string mOverviewText;
-   string mModuleReference;
-   string mEffectsReference;
-   RadioButton* mHelpPageSelector;
-   int mHelpPage;
+   string mHelpText;
+   Checkbox* mShowTooltipsCheckbox;
+   ClickButton* mDumpModuleInfo;
    float mWidth;
    float mHeight;
+   bool mTooltipsLoaded;
+   list<ModuleTooltipInfo> mTooltips;
 };
 
 #endif /* defined(__Bespoke__HelpDisplay__) */

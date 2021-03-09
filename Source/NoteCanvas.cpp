@@ -183,9 +183,9 @@ void NoteCanvas::OnTransportAdvanced(float amount)
    }
 
    double cursorPlayTime = gTime;
-   if (Transport::sDoEventLookahead)
-      cursorPlayTime += Transport::sEventEarlyMs;
-   else
+   //if (Transport::sDoEventLookahead)??? should we?
+   //   cursorPlayTime += Transport::sEventEarlyMs;
+   //else
       cursorPlayTime += amount * TheTransport->MsPerBar();
    double curPos = GetCurPos(cursorPlayTime);
    

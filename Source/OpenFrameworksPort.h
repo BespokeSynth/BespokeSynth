@@ -237,6 +237,7 @@ public:
    float GetStringWidth(string str, float size, bool isRenderThread = false);
    float GetStringHeight(string str, float size, bool isRenderThread = false);
    bool IsLoaded() { return mLoaded; }
+   int GetFontHandle() const { return mFontHandle; }
 private:
    int mFontHandle;
    int mFontBoundsHandle;
