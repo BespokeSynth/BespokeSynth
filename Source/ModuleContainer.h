@@ -30,6 +30,7 @@ public:
    void Poll();
    void Clear();
    void Exit();
+   ofVec2f GetOwnerPosition() const;
    
    void KeyPressed(int key, bool isRepeat);
    void KeyReleased(int key);
@@ -66,9 +67,7 @@ public:
    static const char* GetModuleSeparator() { return "ryanchallinor"; }
    static bool DoesModuleHaveMoreSaveData(FileStreamIn& in);
    
-private:
-   ofVec2f GetOwnerPosition() const;
-   
+private:   
    vector<IDrawableModule*> mModules;
    IDrawableModule* mOwner;
 };
