@@ -16,6 +16,7 @@
 OSCOutput::OSCOutput()
 : mOscOutAddress("127.0.0.1")
 , mOscOutPort(7000)
+, mNoteOutLabel("note")
 {
    for (int i=0; i<OSC_OUTPUT_MAX_PARAMS; ++i)
    {
@@ -88,7 +89,7 @@ void OSCOutput::PlayNote(double time, int pitch, int velocity, int voiceIdx, Mod
 {
    if (mNoteOutLabel.size() > 0)
    {
-      OSCMessage msg(("/bespoke/"+mNoteOutLabel+"/").c_str());
+      OSCMessage msg(("/bespoke/"+mNoteOutLabel).c_str());
       float pitchOut = pitch;
       if (modulation.pitchBend != nullptr)
          pitchOut += modulation.pitchBend->GetValue(0);
