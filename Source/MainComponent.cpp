@@ -224,8 +224,8 @@ public:
       hr = CoInitializeEx(0, COINIT_MULTITHREADED);
 #endif
       
-      int inputChannels = MAX_INPUT_CHANNELS;
-      int outputChannels = MAX_OUTPUT_CHANNELS;
+      int inputChannels = 16;
+      int outputChannels = 16;
       
       if (inputDevice == kNoneDevice)
          inputChannels = 0;
@@ -265,10 +265,28 @@ public:
                                  "\n\n(a valid sample rate might be: "+ofToString(loadedSetup.sampleRate)+")");
          }
          else
-         {
-            mGlobalManagers.mDeviceManager.addAudioCallback(this);
-            
+         {            
             ofLog() << "output: " << loadedSetup.outputDeviceName << "   input: " << loadedSetup.inputDeviceName;
+
+            int numInputChannels = 0;
+            int64 inputMask = loadedSetup.inputChannels.toInteger();
+            while (inputMask != 0)
+            {
+               ++numInputChannels;
+               inputMask >>= 1;
+            }
+
+            int numOutputChannels = 0;
+            int64 outputMask = loadedSetup.outputChannels.toInteger();
+            while (outputMask != 0)
+            {
+               ++numOutputChannels;
+               outputMask >>= 1;
+            }
+
+            mSynth.InitIOBuffers(numInputChannels, numOutputChannels);
+
+            mGlobalManagers.mDeviceManager.addAudioCallback(this);
          }
       }
       else

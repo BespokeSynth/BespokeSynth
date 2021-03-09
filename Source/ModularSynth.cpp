@@ -50,7 +50,7 @@ void AtExit()
 ModularSynth::ModularSynth()
 : mMoveModule(nullptr)
 , mIsMousePanning(false)
-, mOutputBuffer(RECORDING_LENGTH)
+, mGlobalRecordBuffer(RECORDING_LENGTH)
 , mAudioPaused(false)
 , mIsLoadingState(false)
 , mClickStartX(INT_MAX)
@@ -83,7 +83,7 @@ ModularSynth::ModularSynth()
    mSaveOutputBuffer[0] = new float[RECORDING_LENGTH];
    mSaveOutputBuffer[1] = new float[RECORDING_LENGTH];
    
-   mOutputBuffer.SetNumChannels(2);
+   mGlobalRecordBuffer.SetNumChannels(2);
 }
 
 ModularSynth::~ModularSynth()
@@ -161,6 +161,14 @@ void ModularSynth::LoadResources(void* nanoVG, void* fontBoundsNanoVG)
    gNanoVG = (NVGcontext*)nanoVG;
    gFontBoundsNanoVG = (NVGcontext*)fontBoundsNanoVG;
    LoadGlobalResources();
+}
+
+void ModularSynth::InitIOBuffers(int inputChannelCount, int outputChannelCount)
+{
+   for (int i = 0; i < inputChannelCount; ++i)
+      mInputBuffers.push_back(new float[gBufferSize]);
+   for (int i = 0; i < outputChannelCount; ++i)
+      mOutputBuffers.push_back(new float[gBufferSize]);
 }
 
 //static
@@ -326,7 +334,7 @@ void ModularSynth::Draw(void* vg)
          DrawFallbackText(mFatalError.c_str(), 100, 100);
    }
    
-   DrawLissajous(&mOutputBuffer, 0, 0, ofGetWidth(), ofGetHeight(), .7f, 0, 0);
+   DrawLissajous(&mGlobalRecordBuffer, 0, 0, ofGetWidth(), ofGetHeight(), .7f, 0, 0);
    
    if (gTime == 1 && mFatalError == "")
    {
@@ -1209,18 +1217,6 @@ void ModularSynth::OnModuleDeleted(IDrawableModule* module)
    if (module == TheLFOController)
       TheLFOController = nullptr;
    
-   for (int i=0; i<MAX_INPUT_CHANNELS; ++i)
-   {
-      if (module == mInput[i])
-         mInput[i] = nullptr;
-   }
-   
-   for (int i=0; i<MAX_OUTPUT_CHANNELS; ++i)
-   {
-      if (module == mOutput[i])
-         mOutput[i] = nullptr;
-   }
-   
    mAudioThreadMutex.Unlock();
 }
 
@@ -1305,46 +1301,31 @@ void ModularSynth::AudioOut(float** output, int bufferSize, int nChannels)
    
    ScopedMutex mutex(&mAudioThreadMutex, "audioOut()");
    
-   assert(nChannels <= MAX_OUTPUT_CHANNELS);
-   
    /////////// AUDIO PROCESSING STARTS HERE /////////////
-   float* outBuffer[MAX_OUTPUT_CHANNELS];
    assert(bufferSize == mIOBufferSize);
+   assert(nChannels == (int)mOutputBuffers.size());
    assert(mIOBufferSize == gBufferSize);  //need to be the same for now
                                           //if we want these different, need to fix outBuffer here, and also fix audioIn()
+                                          //by now, many assumptions will have to be fixed to support mIOBufferSize and gBufferSize diverging
    for (int ioOffset = 0; ioOffset < mIOBufferSize; ioOffset += gBufferSize)
    {
-      for (int i=0; i<nChannels; ++i)
-      {
-         if (mOutput[i])
-            mOutput[i]->ClearBuffer();
-      }
-      
-      double elapsed = gInvSampleRateMs * gBufferSize;
+      for (size_t i = 0; i < mOutputBuffers.size(); ++i)
+         Clear(mOutputBuffers[i], mIOBufferSize);
+
+      double elapsed = gInvSampleRateMs * mIOBufferSize;
       gTime += elapsed;
       TheTransport->Advance(elapsed);
       
-      //get audio from sources
+      //process all audio
       for (int i=0; i<mSources.size(); ++i)
          mSources[i]->Process(gTime);
-      
+
       //put it into speakers
-      for (int i=0; i<MAX_OUTPUT_CHANNELS; ++i)
-         outBuffer[i] = gZeroBuffer;
-      for (int i=0; i<nChannels; ++i)
-      {
-         if (mOutput[i])
-         {
-            mOutput[i]->Process();
-            outBuffer[i] = mOutput[i]->GetBuffer()->GetChannel(0);
-         }
-      }
+      for (int i = 0; i < nChannels; ++i)
+         BufferCopy(output[i], mOutputBuffers[i], gBufferSize);
       
-      if (TheMultitrackRecorder)
-         TheMultitrackRecorder->Process(gTime, outBuffer[0], outBuffer[1], gBufferSize);
-      
-      for (int ch=0; ch<nChannels; ++ch)
-         BufferCopy(output[ch]+ioOffset, outBuffer[ch]+ioOffset, gBufferSize);
+      if (TheMultitrackRecorder && mOutputBuffers.size() >= 2)
+         TheMultitrackRecorder->Process(gTime, mOutputBuffers[0], mOutputBuffers[1], gBufferSize);
    }
    
    if (gTime - mLastClapboardTime < 100)
@@ -1355,14 +1336,14 @@ void ModularSynth::AudioOut(float** output, int bufferSize, int nChannels)
          {
             float sample = sin(GetPhaseInc(440) * i) * (1 - ((gTime - mLastClapboardTime) / 100));
             output[ch][i] = sample;
-            outBuffer[ch][i] = sample;
          }
       }
    }
    /////////// AUDIO PROCESSING ENDS HERE /////////////
-   
-   mOutputBuffer.WriteChunk(outBuffer[0], bufferSize, 0);
-   mOutputBuffer.WriteChunk(outBuffer[1], bufferSize, 1);
+   if (nChannels >= 1)
+      mGlobalRecordBuffer.WriteChunk(output[0], bufferSize, 0);
+   if (nChannels >= 2)
+      mGlobalRecordBuffer.WriteChunk(output[1], bufferSize, 1);
    mRecordingLength += bufferSize;
    mRecordingLength = MIN(mRecordingLength, RECORDING_LENGTH);
    
@@ -1377,13 +1358,22 @@ void ModularSynth::AudioIn(const float** input, int bufferSize, int nChannels)
    ScopedMutex mutex(&mAudioThreadMutex, "audioIn()");
 
    assert(bufferSize == mIOBufferSize);
-   assert(nChannels <= MAX_INPUT_CHANNELS);
+   assert(nChannels == (int)mInputBuffers.size());
    
    for (int i=0; i<nChannels; ++i)
    {
-      if (mInput[i])
-         BufferCopy(mInput[i]->GetBuffer()->GetChannel(0), input[i], bufferSize);
+      BufferCopy(mInputBuffers[i], input[i], bufferSize);
    }
+}
+
+float* ModularSynth::GetInputBuffer(int channel)
+{
+   return mInputBuffers[channel];
+}
+
+float* ModularSynth::GetOutputBuffer(int channel)
+{
+   return mOutputBuffers[channel];
 }
 
 void ModularSynth::TriggerClapboard()
@@ -1500,11 +1490,6 @@ void ModularSynth::ResetLayout()
    
    for (int i=0; i<mDeletedModules.size(); ++i)
       delete mDeletedModules[i];
-   
-   for (int i=0; i<MAX_INPUT_CHANNELS; ++i)
-      mInput[i] = nullptr;
-   for (int i=0; i<MAX_OUTPUT_CHANNELS; ++i)
-      mOutput[i] = nullptr;
 
    mDeletedModules.clear();
    mSources.clear();
@@ -1568,41 +1553,6 @@ void ModularSynth::ResetLayout()
    
    mDrawOffset.set(0,0);
    mZoomer.Init();
-}
-
-bool ModularSynth::SetInputChannel(int channel, InputChannel* input)
-{
-   assert(channel > 0 && channel <= MAX_INPUT_CHANNELS);
-   
-   //ScopedMutex mutex(&mAudioThreadMutex, "SetInputChannel()");
-   
-   for (int i=0; i<MAX_INPUT_CHANNELS; ++i)  //remove if we're changing an already assigned channel
-   {
-      if (mInput[channel-1] == input)
-         mInput[channel-1] = nullptr;
-   }
-   
-   if (mInput[channel-1] == nullptr)
-   {
-      mInput[channel-1] = input;
-      return true;
-   }
-   
-   return false;
-}
-
-bool ModularSynth::SetOutputChannel(int channel, OutputChannel* output)
-{
-   assert(channel > 0 && channel <= MAX_OUTPUT_CHANNELS);
-   
-   //ScopedMutex mutex(&mAudioThreadMutex, "SetOutputChannel()");
-   if (mOutput[channel-1] == nullptr)
-   {
-      mOutput[channel-1] = output;
-      return true;
-   }
-   
-   return false;
 }
 
 bool ModularSynth::LoadLayoutFromFile(string jsonFile, bool makeDefaultLayout /*= true*/)
@@ -2335,8 +2285,8 @@ void ModularSynth::SaveOutput()
    
    for (int i=0; i<mRecordingLength; ++i)
    {
-      mSaveOutputBuffer[0][i] = mOutputBuffer.GetSample((int)mRecordingLength-i-1, 0);
-      mSaveOutputBuffer[1][i] = mOutputBuffer.GetSample((int)mRecordingLength-i-1, 1);
+      mSaveOutputBuffer[0][i] = mGlobalRecordBuffer.GetSample((int)mRecordingLength-i-1, 0);
+      mSaveOutputBuffer[1][i] = mGlobalRecordBuffer.GetSample((int)mRecordingLength-i-1, 1);
    }
 
    Sample::WriteDataToFile(filename.c_str(), mSaveOutputBuffer, (int)mRecordingLength, 2);
@@ -2344,7 +2294,7 @@ void ModularSynth::SaveOutput()
    //mOutputBufferMeasurePos.ReadChunk(mSaveOutputBuffer, mRecordingLength);
    //Sample::WriteDataToFile(filenamePos.c_str(), mSaveOutputBuffer, mRecordingLength, 1);
    
-   mOutputBuffer.ClearBuffer();
+   mGlobalRecordBuffer.ClearBuffer();
    mRecordingLength = 0;
 }
 

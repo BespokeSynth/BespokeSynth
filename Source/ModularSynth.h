@@ -21,8 +21,6 @@
 #endif
 
 class IAudioSource;
-class InputChannel;
-class OutputChannel;
 class IAudioReceiver;
 class INoteReceiver;
 class MidiDevice;
@@ -33,9 +31,6 @@ class NVGcontext;
 class QuickSpawnMenu;
 class ADSRDisplay;
 class UserPrefsEditor;
-
-#define MAX_OUTPUT_CHANNELS 8
-#define MAX_INPUT_CHANNELS 8
 
 enum LogEventType
 {
@@ -63,6 +58,7 @@ public:
    
    void Setup(GlobalManagers* globalManagers, juce::Component* mainComponent);
    void LoadResources(void* nanoVG, void* fontBoundsNanoVG);
+   void InitIOBuffers(int inputChannelCount, int outputChannelCount);
    void Poll();
    void Draw(void* vg);
    void PostRender();
@@ -95,8 +91,10 @@ public:
    IDrawableModule* SpawnModuleOnTheFly(string moduleName, float x, float y, bool addToContainer = true);
    void SetMoveModule(IDrawableModule* module, float offsetX, float offsetY);
    
-   bool SetInputChannel(int channel, InputChannel* input);
-   bool SetOutputChannel(int channel, OutputChannel* input);
+   int GetNumInputChannels() const { return (int)mInputBuffers.size(); }
+   int GetNumOutputChannels() const { return (int)mOutputBuffers.size(); }
+   float* GetInputBuffer(int channel);
+   float* GetOutputBuffer(int channel);
    
    IDrawableModule* FindModule(string name, bool fail = true);
    IAudioReceiver* FindAudioReceiver(string name, bool fail = true);
@@ -216,8 +214,6 @@ private:
    int mIOBufferSize;
    
    vector<IAudioSource*> mSources;
-   InputChannel* mInput[MAX_INPUT_CHANNELS];
-   OutputChannel* mOutput[MAX_OUTPUT_CHANNELS];
    vector<IDrawableModule*> mLissajousDrawers;
    vector<IDrawableModule*> mDeletedModules;
    
@@ -253,7 +249,7 @@ private:
    QuickSpawnMenu* mQuickSpawn;
    UserPrefsEditor* mUserPrefsEditor;
 
-   RollingBuffer mOutputBuffer;
+   RollingBuffer mGlobalRecordBuffer;
    long long mRecordingLength;
    
    struct LogEventItem
@@ -331,6 +327,9 @@ private:
    float mScrollMultiplierVertical;
 
    double mPixelRatio;
+
+   vector<float*> mInputBuffers;
+   vector<float*> mOutputBuffers;
 };
 
 extern ModularSynth* TheSynth;

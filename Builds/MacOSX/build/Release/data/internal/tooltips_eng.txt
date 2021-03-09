@@ -1,7 +1,7 @@
 
 
 
-vinylcontrol~modulator which outputs a speed value based upon control vinyl input audio. give it a stereo signal from control vinyl (like you'd use to control serato). to properly feed it a signal, you'll want to create two "input" modules for each channel, two "panner" modules panned hard left and hard right for each input, then send the outputs of both panners into here.
+vinylcontrol~modulator which outputs a speed value based upon control vinyl input audio. provide it with a stereo signal from control vinyl (like you'd use to control serato) patched in from an "input" module.
 ~control~enable/disable transport control. when you enable it, it will use the current speed as the reference speed (so, the output will output a value of 1 until you change the vinyl's speed)
 
 

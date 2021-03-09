@@ -10,34 +10,40 @@
 #define __modularSynth__OutputChannel__
 
 #include <iostream>
-#include "IAudioReceiver.h"
+#include "IAudioProcessor.h"
 #include "IDrawableModule.h"
+#include "DropdownList.h"
 
-class OutputChannel : public IAudioReceiver, public IDrawableModule
+class OutputChannel : public IAudioProcessor, public IDrawableModule, public IDropdownListener
 {
 public:
    OutputChannel();
    virtual ~OutputChannel();
    static IDrawableModule* Create() { return new OutputChannel(); }
    
-   string GetTitleLabel() override { return "out "+ofToString(mChannel); }
+   string GetTitleLabel() override { return "output"; }
+   void CreateUIControls() override;
    
    //IAudioReceiver
-   InputMode GetInputMode() override { return kInputMode_Mono; }
+   InputMode GetInputMode() override { return mChannelSelectionIndex < mStereoSelectionOffset ? kInputMode_Mono : kInputMode_Multichannel; }
    
-   void Process();
-   void ClearBuffer();
+   //IAudioSource
+   void Process(double time) override;
    
+   void DropdownUpdated(DropdownList* list, int oldVal) override {}
+
    virtual void LoadLayout(const ofxJSONElement& moduleInfo) override;
    virtual void SetUpFromSaveData() override;
    
 private:
    //IDrawableModule
    void DrawModule() override;
-   void GetModuleDimensions(float& width, float& height) override { width=50; height=0; }
+   void GetModuleDimensions(float& width, float& height) override { width=50; height=20; }
    bool Enabled() const override { return true; }
    
-   int mChannel;
+   DropdownList* mChannelSelector;
+   int mChannelSelectionIndex;
+   int mStereoSelectionOffset;
 };
 
 #endif /* defined(__modularSynth__OutputChannel__) */
