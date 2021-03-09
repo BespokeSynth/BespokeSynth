@@ -7,15 +7,15 @@
          "type" : "gain"
       },
       {
-         "channel" : 1,
+         "channel" : 0,
          "name" : "output 1",
-         "position" : [ 40.0, 1062.0 ],
+         "position" : [ 30.0, 1062.0 ],
          "type" : "output"
       },
       {
-         "channel" : 2,
+         "channel" : 1,
          "name" : "output 2",
-         "position" : [ 109.0, 1062.0 ],
+         "position" : [ 119.0, 1062.0 ],
          "type" : "output"
       },
       {
