@@ -22,7 +22,7 @@ void NoteGate::CreateUIControls()
 {
    IDrawableModule::CreateUIControls();
    
-   mGateCheckbox = new Checkbox(this, "gate", 3, 4, &mGate);
+   mGateCheckbox = new Checkbox(this, "open", 3, 4, &mGate);
 }
 
 void NoteGate::DrawModule()
