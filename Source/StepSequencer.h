@@ -164,13 +164,11 @@ private:
    FloatSlider* mStrengthSlider;
    bool mUseStrengthSlider;
    Checkbox* mUseStrengthSliderCheckbox;
-   bool mStochasticMode;
-   Checkbox* mStochasticCheckbox;
-   int mLpYOff;
+   int mGridYOff;
    DropdownList* mPresetDropdown;
    int mPreset;
    int mColorOffset;
-   DropdownList* mLpYOffDropdown;
+   DropdownList* mGridYOffDropdown;
    StepSequencerRow* mRows[NUM_STEPSEQ_ROWS];
    bool mAdjustOffsets;
    Checkbox* mAdjustOffsetsCheckbox;

@@ -22,14 +22,12 @@ StepSequencer::StepSequencer()
 : mGrid(nullptr)
 , mStrength(1)
 , mStrengthSlider(nullptr)
-, mStochasticMode(false)
-, mStochasticCheckbox(nullptr)
 , mGridController(nullptr)
 , mPreset(-1)
 , mPresetDropdown(nullptr)
 , mColorOffset(3)
-, mLpYOff(0)
-, mLpYOffDropdown(nullptr)
+, mGridYOff(0)
+, mGridYOffDropdown(nullptr)
 , mAdjustOffsets(false)
 , mAdjustOffsetsCheckbox(nullptr)
 , mRepeatRate(kInterval_None)
@@ -59,9 +57,8 @@ void StepSequencer::CreateUIControls()
    mGrid = new UIGrid(40,45,180,150,16,NUM_STEPSEQ_ROWS, this);
    mStrengthSlider = new FloatSlider(this,"str",75,22,50,15,&mStrength,0,1,2);
    mUseStrengthSliderCheckbox = new Checkbox(this,"use str",128,22,&mUseStrengthSlider);
-   mStochasticCheckbox = new Checkbox(this,"stch",145,22,&mStochasticMode);
    mPresetDropdown = new DropdownList(this,"preset",5,4,&mPreset);
-   mLpYOffDropdown = new DropdownList(this,"yoff",190,22,&mLpYOff);
+   mGridYOffDropdown = new DropdownList(this,"yoff",190,22,&mGridYOff);
    mAdjustOffsetsCheckbox = new Checkbox(this,"offsets",175,4,&mAdjustOffsets);
    mRepeatRateDropdown = new DropdownList(this,"repeat",5,22,(int*)(&mRepeatRate));
    mStepIntervalDropdown = new DropdownList(this,"step",133,4,(int*)(&mStepInterval));
@@ -84,10 +81,10 @@ void StepSequencer::CreateUIControls()
    mPresetDropdown->AddLabel("dubstep", 5);
    mPresetDropdown->AddLabel("trades", 6);
    
-   mLpYOffDropdown->AddLabel("0", 0);
-   mLpYOffDropdown->AddLabel("1", 1);
-   mLpYOffDropdown->AddLabel("2", 2);
-   mLpYOffDropdown->AddLabel("3", 3);
+   mGridYOffDropdown->AddLabel("0", 0);
+   mGridYOffDropdown->AddLabel("1", 1);
+   mGridYOffDropdown->AddLabel("2", 2);
+   mGridYOffDropdown->AddLabel("3", 3);
    
    for (int i=0; i<NUM_STEPSEQ_ROWS; ++i)
    {
@@ -145,14 +142,14 @@ void StepSequencer::Poll()
    
    ComputeSliders(0);
    
-   if (mGridController)
+   if (mGridController->IsConnected())
    {
       int numChunks = GetNumControllerChunks();
-      if (numChunks != mLpYOffDropdown->GetNumValues())
+      if (numChunks != mGridYOffDropdown->GetNumValues())
       {
-         mLpYOffDropdown->Clear();
+         mGridYOffDropdown->Clear();
          for (int i=0; i<numChunks; ++i)
-            mLpYOffDropdown->AddLabel(ofToString(i).c_str(), i);
+            mGridYOffDropdown->AddLabel(ofToString(i).c_str(), i);
       }
    }
 }
@@ -164,7 +161,7 @@ namespace
 
 void StepSequencer::UpdateLights()
 {
-   if (mGridController == nullptr)
+   if (!mGridController->IsConnected())
       return;
    
    for (int x=0; x<mGridController->NumCols(); ++x)
@@ -380,19 +377,19 @@ void StepSequencer::SetStep(int step, int pitch, int velocity)
 
 Vec2i StepSequencer::ControllerToGrid(const Vec2i& controller)
 {
-   if (mGridController == nullptr)
+   if (!mGridController->IsConnected())
       return Vec2i(0,0);
    
    int numChunks = GetNumControllerChunks();
    int chunkSize = mGrid->GetRows() / numChunks;
    int col = controller.x + (controller.y/chunkSize)*mGridController->NumCols();
-   int row = (chunkSize-1)-(controller.y%chunkSize)+mLpYOff*chunkSize;
+   int row = (chunkSize-1)-(controller.y%chunkSize)+mGridYOff*chunkSize;
    return Vec2i(col,row);
 }
 
 int StepSequencer::GetNumControllerChunks()
 {
-   if (mGridController == nullptr)
+   if (!mGridController->IsConnected())
       return 1;
    
    int numBreaks = int((mGrid->GetCols() / MAX(1.0f,mGridController->NumCols())) + .5f);
@@ -404,15 +401,16 @@ void StepSequencer::DrawModule()
 {
    if (Minimized() || IsVisible() == false)
       return;
+
+   mGridYOffDropdown->SetShowing(mGridController->IsConnected());
    
    mGrid->Draw();
    mStrengthSlider->Draw();
    mUseStrengthSliderCheckbox->Draw();
-   mStochasticCheckbox->Draw();
    mPresetDropdown->Draw();
    mAdjustOffsetsCheckbox->Draw();
    mRepeatRateDropdown->Draw();
-   mLpYOffDropdown->Draw();
+   mGridYOffDropdown->Draw();
    mStepIntervalDropdown->Draw();
    mShiftLeftButton->Draw();
    mShiftRightButton->Draw();
@@ -447,7 +445,7 @@ void StepSequencer::DrawModule()
       }
    }
 
-   if (mGridController)
+   if (mGridController->IsConnected())
    {
       ofPushStyle();
       ofNoFill();
@@ -457,7 +455,7 @@ void StepSequencer::DrawModule()
       float squarew = float(mGrid->GetWidth())/GetNumSteps(mStepInterval);
       int chunkSize = mGrid->GetRows() / GetNumControllerChunks();
       float width = MIN(mGrid->GetWidth(), squarew * mGridController->NumCols() * GetNumControllerChunks());
-      ofRect(gridX,gridY+squareh*(mNumRows-chunkSize)-squareh*mLpYOff*chunkSize,width,squareh*chunkSize);
+      ofRect(gridX,gridY+squareh*(mNumRows-chunkSize)-squareh*mGridYOff*chunkSize,width,squareh*chunkSize);
       ofPopStyle();
    }
    
@@ -639,21 +637,15 @@ void StepSequencer::OnTimeEvent(double time)
 
 void StepSequencer::PlayStepNote(double time, int note, float val)
 {
-   if (mStochasticMode)
-   {
-      if (val > ofRandom(1))
-         mNoteOutput.PlayNote(time, note, val * 127);
-   }
-   else
-   {
-      mNoteOutput.PlayNote(time, note, val * 127);
-   }
+   mNoteOutput.PlayNote(time, note, val * 127);
 }
 
 void StepSequencer::PlayNote(double time, int pitch, int velocity, int voiceIdx, ModulationParameters modulation)
 {
    if (mRepeatRate == kInterval_None)
       PlayNoteOutput(time, pitch, velocity, voiceIdx, modulation);
+   else
+      mPadPressures[pitch] = velocity;
 }
 
 void StepSequencer::SendPressure(int pitch, int pressure)
@@ -664,7 +656,7 @@ void StepSequencer::SendPressure(int pitch, int pressure)
 void StepSequencer::Exit()
 {
    IDrawableModule::Exit();
-   if (mGridController)
+   if (!mGridController->IsConnected())
       mGridController->ResetLights();
 }
 
