@@ -19,7 +19,7 @@
 #include "Slider.h"
 #include "Transport.h"
 
-class NoteHumanizer : public NoteEffectBase, public IDrawableModule, public IFloatSliderListener, public IAudioPoller
+class NoteHumanizer : public NoteEffectBase, public IDrawableModule, public IFloatSliderListener
 {
 public:
    NoteHumanizer();
@@ -34,8 +34,6 @@ public:
    //INoteReceiver
    void PlayNote(double time, int pitch, int velocity, int voiceIdx = -1, ModulationParameters modulation = ModulationParameters()) override;
    
-   void OnTransportAdvanced(float amount) override;
-   
    void CheckboxUpdated(Checkbox* checkbox) override;
    void FloatSliderUpdated(FloatSlider* slider, float oldVal) override;
    
@@ -43,15 +41,7 @@ public:
    virtual void SetUpFromSaveData() override;
    
    
-private:
-   struct NoteInfo
-   {
-      int mPitch;
-      int mVelocity;
-      double mTriggerTime;
-      ModulationParameters mModulation;
-   };
-   
+private:   
    //IDrawableModule
    void DrawModule() override;
    void GetModuleDimensions(float& width, float& height) override { width = 108; height = 40; }
@@ -61,9 +51,8 @@ private:
    FloatSlider* mTimeSlider;
    float mVelocity;
    FloatSlider* mVelocitySlider;
-   
-   ofMutex mNoteMutex;
-   vector<NoteInfo> mInputNotes;
+
+   std::array<float, 128> mLastDelayMs;
 };
 
 
