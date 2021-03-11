@@ -60,10 +60,11 @@ void Canvas::Render()
    ofPushMatrix();
    ofTranslate(mX, mY);
    ofPushStyle();
+   ofSetLineWidth(.5f);
    float w,h;
    GetDimensions(w,h);
    ofNoFill();
-   ofRect(0,0,mWidth,mHeight);
+   ofRect(0,0,mWidth,mHeight,0);
    if (ShowVerticalScrollBar())
    {
       ofPushStyle();
@@ -78,7 +79,7 @@ void Canvas::Render()
       ofRect(0, GetGridHeight(), GetGridWidth(), scrollBarSize);
       ofPopStyle();
    }
-   ofRect(0,0,GetGridWidth(),GetGridHeight());
+   ofRect(0,0,GetGridWidth(),GetGridHeight(),0);
    
    for (int i=1; i<GetNumVisibleRows(); ++i)
    {
@@ -154,7 +155,7 @@ void Canvas::RemoveElement(CanvasElement* element)
 
 void Canvas::SelectElement(CanvasElement* element)
 {
-   bool commandHeld = GetKeyModifiers() == kModifier_Command;
+   bool commandHeld = GetKeyModifiers() & kModifier_Command;
    
    if (!commandHeld)
    {
@@ -185,7 +186,7 @@ void Canvas::SelectElement(CanvasElement* element)
 
 void Canvas::SelectElements(vector<CanvasElement*> elements)
 {
-   bool commandHeld = GetKeyModifiers() == kModifier_Command;
+   bool commandHeld = GetKeyModifiers() & kModifier_Command;
    if (mControls)
       mControls->SetElement(elements.empty() ? nullptr : elements[0]);
    
@@ -300,7 +301,7 @@ void Canvas::OnClicked(int x, int y, bool right)
       {
          SelectElement(nullptr);
          
-         if (GetKeyModifiers() == kModifier_Shift)
+         if (GetKeyModifiers() & kModifier_Shift)
          {
             CanvasCoord coord = GetCoordAt(x, y);
             CanvasElement* element = CreateElement(coord.col,coord.row);
@@ -334,11 +335,12 @@ bool Canvas::MouseMoved(float x, float y)
       mRowOffset = ofClamp(int(ofMap(y - mScrollBarOffset, 0, GetGridHeight(), 0, mNumRows)+.5f), 0, mNumRows - GetNumVisibleRows());
       return true;
    }
+
+   bool quantize = GetKeyModifiers() & kModifier_Command;
    
    if (mDragEnd != kHighlightEnd_None)
    {
       ofVec2f scaled = RescaleForZoom(x, y);
-      bool quantize = GetKeyModifiers() == kModifier_Command;
       if (mDragEnd == kHighlightEnd_Start)
       {
          float oldStart = mClickedElement->GetStart();
@@ -351,7 +353,7 @@ bool Canvas::MouseMoved(float x, float y)
                float start = element->GetStart() + startDelta;
                if (quantize)
                   start = QuantizeToGrid(start);
-               element->SetStart(start);
+               element->SetStart(start, false);
             }
          }
       }
@@ -386,18 +388,19 @@ bool Canvas::MouseMoved(float x, float y)
             x -= mElementClickOffset.x;
             y -= mElementClickOffset.y;
             ofVec2f scaled = RescaleForZoom(x, y);
+
             int newCol = mClickedElement->mCol;
             if (mDragMode & kDragHorizontal)
-               newCol = ofClamp(int(((scaled.x / GetGridWidth() / mLength) * mNumCols) + .5f), 0, mNumCols-1);
+               newCol = ofClamp(int(((scaled.x / GetGridWidth() / mLength) * mNumCols) + .5f), 0, mNumCols - 1);
             int newRow = mClickedElement->mRow;;
             if (mDragMode & kDragVertical)
-               newRow = ofClamp(int(((scaled.y / GetGridHeight()) * GetNumVisibleRows()) + .5f), 0, GetNumVisibleRows()-1) + mRowOffset;
+               newRow = ofClamp(int(((scaled.y / GetGridHeight()) * GetNumVisibleRows()) + .5f), 0, GetNumVisibleRows() - 1) + mRowOffset;
             colShift = newCol - mClickedElement->mCol;
             rowShift = newRow - mClickedElement->mRow;
-            
+
             if (colShift != 0 || rowShift != 0) //duplicate only if we've dragged to a new position
             {
-               if (GetKeyModifiers() == kModifier_Shift && !mHasDuplicatedThisDrag)
+               if (GetKeyModifiers() & kModifier_Shift && !mHasDuplicatedThisDrag)
                {
                   mHasDuplicatedThisDrag = true;
                   vector<CanvasElement*> newElements;
@@ -410,9 +413,29 @@ bool Canvas::MouseMoved(float x, float y)
                      mElements.push_back(newElement);
                }
             }
-            
-            mClickedElement->mCol = newCol;
+
+            if (GetKeyModifiers() & kModifier_Alt)   //non-snapped drag
+            {
+               float oldStart = mClickedElement->GetStart();
+               float newStart = scaled.x / GetGridWidth() / mLength;
+               float startDelta = newStart - oldStart;
+               for (auto* element : mElements)
+               {
+                  if (element->GetHighlighted())
+                  {
+                     float start = element->GetStart() + startDelta;
+                     if (quantize)
+                        start = QuantizeToGrid(start);
+                     element->SetStart(start, true);
+                  }
+               }
+            }
+            else
+            {
+               mClickedElement->mCol = newCol;
+            }
             mClickedElement->mRow = newRow;
+
             if (mListener)
                mListener->CanvasUpdated(this);
          }
@@ -508,7 +531,7 @@ void Canvas::KeyPressed(int key, bool isRepeat)
             RemoveElement(element);
          }
       }
-      if (key == 'a' && GetKeyModifiers() == kModifier_Command)
+      if (key == 'a' && GetKeyModifiers() & kModifier_Command)
       {
          for (auto* element : mElements)
             element->SetHighlight(true);
@@ -539,7 +562,7 @@ void Canvas::RescaleNumCols(int cols)
    float ratio = (float)cols / mNumCols;
    for (auto* element : mElements)
    {
-      element->SetStart(element->GetStart() * ratio);
+      element->SetStart(element->GetStart() * ratio, true);
       element->mLength *= ratio;
    }
    mNumCols = cols;

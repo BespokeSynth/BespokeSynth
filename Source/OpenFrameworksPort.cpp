@@ -138,7 +138,7 @@ struct StyleStack
       Style() : fill(false), color(255,255,255), lineWidth(1) {}
       bool fill;
       ofColor color;
-      int lineWidth;
+      float lineWidth;
    };
    
    StyleStack() { stack.push_front(Style()); }

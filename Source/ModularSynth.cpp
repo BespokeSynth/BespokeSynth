@@ -556,7 +556,7 @@ void ModularSynth::DrawConsole()
    {
       mConsoleEntry->SetPosition(0, consoleY-15);
       mConsoleEntry->Draw();
-      consoleY += 15;
+      consoleY += 17;
    }
    else
    {

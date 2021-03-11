@@ -34,7 +34,7 @@ public:
    bool GetHighlighted() const { return mHighlighted; }
    ofRectangle GetRect(bool clamp, bool wrapped) const;
    float GetStart() const;
-   void SetStart(float start);
+   void SetStart(float start, bool preserveLength);
    virtual float GetEnd() const;
    void SetEnd(float end);
    vector<IUIControl*>& GetUIControls() { return mUIControls; }

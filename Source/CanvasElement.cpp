@@ -39,16 +39,21 @@ void CanvasElement::DrawElement(bool wrapped)
    ofRectangle fullRect = GetRect(!K(clamp), wrapped);
    
    ofPushStyle();
+   ofSetLineWidth(.5f);
    
    ofSetColor(GetColor());
    ofFill();
-   ofRect(rect);
+   ofRect(rect, 0);
+
+   ofPushStyle();
+   DrawContents();
+   ofPopStyle();
    
    ofNoFill();
    if (mHighlighted)
    {
-      ofSetColor(255,255,255);
-      ofSetLineWidth(1.5f * gDrawScale);
+      ofSetColor(255,200,0);
+      ofSetLineWidth(.75f);
    }
    else
    {
@@ -61,7 +66,7 @@ void CanvasElement::DrawElement(bool wrapped)
       ofPushStyle();
       if (mHighlighted && mCanvas->GetHighlightEnd() == Canvas::kHighlightEnd_Start)
       {
-         ofSetLineWidth(2 * gDrawScale);
+         ofSetLineWidth(1.5f);
          ofSetColor(255,100,100);
       }
       ofLine(rect.x,rect.y,rect.x,rect.y+rect.height);
@@ -72,17 +77,13 @@ void CanvasElement::DrawElement(bool wrapped)
       ofPushStyle();
       if (mHighlighted && mCanvas->GetHighlightEnd() == Canvas::kHighlightEnd_End && IsResizable())
       {
-         ofSetLineWidth(2 * gDrawScale);
+         ofSetLineWidth(1.5f);
          ofSetColor(255,100,100);
       }
       ofLine(rect.x+rect.width,rect.y,rect.x+rect.width,rect.y+rect.height);
       ofPopStyle();
    }
    
-   ofPopStyle();
-   
-   ofPushStyle();
-   DrawContents();
    ofPopStyle();
 }
 
@@ -91,12 +92,17 @@ float CanvasElement::GetStart() const
    return (mCol + mOffset) / mCanvas->GetNumCols();
 }
 
-void CanvasElement::SetStart(float start)
+void CanvasElement::SetStart(float start, bool preserveLength)
 {
+   float end;
+   if (!preserveLength)
+      end = GetEnd();
    FloatWrap(start, 1);
    start *= mCanvas->GetNumCols();
    mCol = int(start + .5f);
    mOffset = start - mCol;
+   if (!preserveLength)
+      SetEnd(end);
 }
 
 float CanvasElement::GetEnd() const
@@ -224,7 +230,7 @@ void NoteCanvasElement::DrawContents()
       float oldHeight = rect.height;
       rect.height *= mVelocity;
       rect.y += oldHeight - rect.height;
-      ofRect(rect);
+      ofRect(rect, 0);
       
       /*ofPushStyle();
       ofSetLineWidth(1.5f * gDrawScale);

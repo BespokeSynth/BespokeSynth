@@ -164,7 +164,7 @@ void NoteCanvas::OnTransportAdvanced(float amount)
          SetNumMeasures(mNumMeasures);
          
          for (auto* element : mCanvas->GetElements())
-            element->SetStart(element->GetStart() + float(shift) / mNumMeasures);
+            element->SetStart(element->GetStart() + float(shift) / mNumMeasures, true);
       }
    }
    
@@ -560,7 +560,7 @@ void NoteCanvas::ClipNotes()
       int shift = -clipStart;
       
       for (auto* element : mCanvas->GetElements())
-         element->SetStart(element->GetStart() + float(shift) / mNumMeasures);
+         element->SetStart(element->GetStart() + float(shift) / mNumMeasures, true);
    }
 }
 
