@@ -92,6 +92,7 @@ void UnstablePitch::PlayNote(double time, int pitch, int velocity, int voiceIdx,
       {
          if (velocity > 0)
          {
+            bool foundVoice = false;
             for (size_t i = 0; i < mIsVoiceUsed.size(); ++i)
             {
                int voiceToCheck = (i + mVoiceRoundRobin) % kNumVoices;
@@ -99,8 +100,15 @@ void UnstablePitch::PlayNote(double time, int pitch, int velocity, int voiceIdx,
                {
                   voiceIdx = voiceToCheck;
                   mVoiceRoundRobin = (mVoiceRoundRobin + 1) % kNumVoices;
+                  foundVoice = true;
                   break;
                }
+            }
+
+            if (!foundVoice)
+            {
+               voiceIdx = mVoiceRoundRobin;
+               mVoiceRoundRobin = (mVoiceRoundRobin + 1) % kNumVoices;
             }
          }
          else
@@ -144,6 +152,14 @@ void UnstablePitch::FloatSliderUpdated(FloatSlider* slider, float oldVal)
 
 void UnstablePitch::CheckboxUpdated(Checkbox* checkbox)
 {
+   if (checkbox == mEnabledCheckbox)
+   {
+      if (!mEnabled)
+      {
+         for (size_t i = 0; i < mIsVoiceUsed.size(); ++i)
+            mIsVoiceUsed[i] = false;
+      }
+   }
 }
 
 void UnstablePitch::LoadLayout(const ofxJSONElement& moduleInfo)
