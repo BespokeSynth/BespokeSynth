@@ -309,13 +309,15 @@ void FloatSlider::OnClicked(int x, int y, bool right)
       
       if (adjustMax)
       {
-         mMaxEntry->Delete();
+         if (mMaxEntry != nullptr)
+            mMaxEntry->Delete();
          mMaxEntry = new TextEntry(this, "", mX+mWidth-5*9, mY, 5, &mMax, -FLT_MAX, FLT_MAX);
          mMaxEntry->MakeActiveTextEntry(true);
       }
       else
       {
-         mMinEntry->Delete();
+         if (mMinEntry != nullptr)
+            mMinEntry->Delete();
          //mMinEntry = new TextEntry(this, "", mX, mY, 5, &mMin, -FLT_MAX, FLT_MAX);
          mMinEntry = new TextEntry(this, "", mX+mWidth-5*9, mY, 5, &mMin, -FLT_MAX, FLT_MAX);
          mMinEntry->MakeActiveTextEntry(true);
@@ -1012,13 +1014,15 @@ void IntSlider::OnClicked(int x, int y, bool right)
 
       if (adjustMax)
       {
-         mMaxEntry->Delete();
+         if (mMaxEntry != nullptr)
+            mMaxEntry->Delete();
          mMaxEntry = new TextEntry(this, "", mX + mWidth - 5 * 9, mY, 5, &mMax, -INT_MAX, INT_MAX);
          mMaxEntry->MakeActiveTextEntry(true);
       }
       else
       {
-         mMinEntry->Delete();
+         if (mMinEntry != nullptr)
+            mMinEntry->Delete();
          //mMinEntry = new TextEntry(this, "", mX, mY, 5, &mMin, -FLT_MAX, FLT_MAX);
          mMinEntry = new TextEntry(this, "", mX + mWidth - 5 * 9, mY, 5, &mMin, -INT_MAX, INT_MAX);
          mMinEntry->MakeActiveTextEntry(true);
