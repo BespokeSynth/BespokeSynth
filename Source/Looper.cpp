@@ -1313,13 +1313,16 @@ void Looper::DoShiftOffset()
 {
    float* newBuffer = new float[MAX_BUFFER_SIZE];
    int shift = int(mLoopPosOffset);
-   for (int ch=0; ch<mBuffer->NumActiveChannels(); ++ch)
+   if (shift != 0)
    {
-      BufferCopy(newBuffer, mBuffer->GetChannel(ch)+shift, mLoopLength-shift);
-      BufferCopy(newBuffer+mLoopLength-shift, mBuffer->GetChannel(ch), shift);
-      mBufferMutex.lock();
-      mBuffer->SetChannelPointer(newBuffer, ch, true);
-      mBufferMutex.unlock();
+      for (int ch = 0; ch < mBuffer->NumActiveChannels(); ++ch)
+      {
+         BufferCopy(newBuffer, mBuffer->GetChannel(ch) + shift, mLoopLength - shift);
+         BufferCopy(newBuffer + mLoopLength - shift, mBuffer->GetChannel(ch), shift);
+         mBufferMutex.lock();
+         mBuffer->SetChannelPointer(newBuffer, ch, true);
+         mBufferMutex.unlock();
+      }
    }
    mWantShiftOffset = false;
    mLoopPosOffset = 0;
