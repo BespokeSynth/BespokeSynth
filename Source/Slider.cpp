@@ -258,7 +258,7 @@ void FloatSlider::Render()
 
       ofPushMatrix();
       ofClipWindow(mX + mWidth * .6f, mY, mWidth * .4f, mHeight, true);
-      DrawTextLeftJustify(ofToString(mMax), mX+mWidth-2, mY + 5 + mHeight / 2, 12);
+      DrawTextLeftJustify(ofToString(mMax), mX+mWidth-2, mY + 4 + mHeight / 2, 12);
       ofPopMatrix();
 
       ofPopStyle();
@@ -985,7 +985,7 @@ void IntSlider::Render()
       ofRect(mX, mY, mWidth * .4f, mHeight);
       ofRect(mX + mWidth * .6f, mY, mWidth * .4f, mHeight);
       DrawTextNormal(ofToString(mMin), mX + 2, mY + 4 + mHeight / 2, 12);
-      DrawTextLeftJustify(ofToString(mMax), mX + mWidth - 2, mY + 5 + mHeight / 2, 12);
+      DrawTextLeftJustify(ofToString(mMax), mX + mWidth - 2, mY + 4 + mHeight / 2, 12);
       ofPopStyle();
    }
    

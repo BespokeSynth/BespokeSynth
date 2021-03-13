@@ -33,6 +33,7 @@ void OutputChannel::CreateUIControls()
    for (int i = 0; i < TheSynth->GetNumOutputChannels()-1; ++i)
       mChannelSelector->AddLabel(ofToString(i + 1) + "&" + ofToString(i + 2), mChannelSelector->GetNumValues());
    mChannelSelector->DrawLabel(true);
+   mChannelSelector->SetWidth(43);
 
    GetPatchCableSource()->SetEnabled(false);
 }

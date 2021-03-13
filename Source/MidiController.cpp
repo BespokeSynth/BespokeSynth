@@ -76,9 +76,9 @@ MidiController::MidiController()
 void MidiController::CreateUIControls()
 {
    IDrawableModule::CreateUIControls();
-   mControllerList = new DropdownList(this,"controller",3,2,&mControllerIndex, 150);
+   mControllerList = new DropdownList(this,"controller",3,2,&mControllerIndex, 157);
    mMappingDisplayModeSelector = new RadioButton(this,"mappingdisplay",mControllerList,kAnchor_Below,(int*)&mMappingDisplayMode, kRadioHorizontal);
-   mBindCheckbox = new Checkbox(this,"bind (hold shift or left mouse)",mMappingDisplayModeSelector,kAnchor_Below,&mBindMode);
+   mBindCheckbox = new Checkbox(this,"bind (hold shift)",mMappingDisplayModeSelector,kAnchor_Below,&mBindMode);
    mPageSelector = new DropdownList(this,"page",mBindCheckbox,kAnchor_Right,&mControllerPage);
    mAddConnectionButton = new ClickButton(this,"add",12,300);
    mOscInPortEntry = new TextEntry(this, "osc input port", 3, 70, 6, &mOscInPort, 0, 99999);
@@ -465,7 +465,7 @@ void MidiController::MidiReceived(MidiMessageType messageType, int control, floa
       return;
    }
 
-   if (mBindMode && gHoveredUIControl && (GetKeyModifiers() == kModifier_Shift || TheSynth->IsMouseButtonHeld(1)))
+   if (mBindMode && gHoveredUIControl && (GetKeyModifiers() == kModifier_Shift))
    {
       AddControlConnection(messageType, control, channel, gHoveredUIControl);
       mLastBoundControlTime = gTime;
@@ -869,8 +869,6 @@ void MidiController::DrawModule()
          UIControlConnection* connection = *iter;
          connection->SetShowing(false);   //set all to not be showing
       }
-      mBindCheckbox->SetShowing(false);
-      mPageSelector->SetShowing(false);
    }
    else
    {
@@ -891,7 +889,6 @@ void MidiController::DrawModule()
          ofPopStyle();
       }
       
-      mBindCheckbox->SetShowing(true);
       mPageSelector->SetShowing(true);
    }
    
@@ -1059,12 +1056,12 @@ void MidiController::DrawModule()
       if (mIsConnected)
       {
          ofSetColor(ofColor::green);
-         DrawTextNormal("connected", 160, 13);
+         DrawTextNormal("connected", 165, 13);
       }
       else
       {
          ofSetColor(ofColor::red);
-         DrawTextNormal("not connected", 160, 13);
+         DrawTextNormal("not connected", 165, 13);
       }
       ofPopStyle();
       
@@ -1306,7 +1303,7 @@ void MidiController::GetModuleDimensions(float& width, float& height)
 {if (mMappingDisplayMode == kList)
    {
       width = 830;
-      height = 65 + 20 * GetNumConnectionsOnPage(mControllerPage);
+      height = 72 + 20 * GetNumConnectionsOnPage(mControllerPage);
    }
    else if (mMappingDisplayMode == kLayout)
    {
@@ -1315,8 +1312,8 @@ void MidiController::GetModuleDimensions(float& width, float& height)
    }
    else
    {
-      width = 156;
-      height = 36;
+      width = 163;
+      height = 54;
    }
 }
 
@@ -1655,8 +1652,6 @@ void MidiController::RadioButtonUpdated(RadioButton* radio, int oldVal)
 {
    if (radio == mMappingDisplayModeSelector)
    {
-      mBindCheckbox->SetShowing(mMappingDisplayMode != kHide);
-      mPageSelector->SetShowing(mMappingDisplayMode != kHide);
       mAddConnectionButton->SetShowing(mMappingDisplayMode == kList);
    }
 }
