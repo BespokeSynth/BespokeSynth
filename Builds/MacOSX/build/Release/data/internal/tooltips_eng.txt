@@ -381,17 +381,17 @@ playsequencer~[no tooltip]
 
 
 
-notesequencer~[no tooltip]
-~interval~[no tooltip]
-~length~[no tooltip]
-~octave~[no tooltip]
-~notemode~[no tooltip]
-~<~[no tooltip]
-~>~[no tooltip]
-~pitch~[no tooltip]
-~len~[no tooltip]
-~vel~[no tooltip]
-~loop reset~[no tooltip]
+notesequencer~looping sequence of notes at an interval. pair with a "pulser" module for more interesting step control.
+~interval~note length
+~length~length that the sequence below should play. the overall grid length can be changed by adjusting "gridsteps" in the triangle menu.
+~octave~octave of the bottom pitch of this sequence
+~notemode~which set of pitches should the rows represent?
+~<~shift the sequence to the left
+~>~shift the sequence to the right
+~pitch~randomize pitches in the sequence. hold shift to constrain the randomization to only pick roots and fifths.
+~len~randomize the length of each step's note.
+~vel~randomize the velocity of each step's note.
+~loop reset~when sequence loops, reset to here instead. send a "downbeat"-style message from a pulser to restart the sequence from the first step.
 ~tone*~pitch for this column
 ~vel*~velocity for this column
 ~len*~length for this column
@@ -405,7 +405,7 @@ notelooper~note loop recorder with overdubbing and replacement functionality
 ~clear~clear pattern
 ~store*~save pattern
 ~load*~restore pattern
-~canvas~[no tooltip]
+~canvas~[none]
 
 
 
@@ -577,7 +577,7 @@ send~duplicate a signal and send it to a second destination
 
 
 samplergrid~record input onto pads, and play back the pads. intended to be used with an 64-pad grid controller.
-~passthrough~[no tooltip]
+~passthrough~should the incoming audio pass through to the output?
 ~vol~[no tooltip]
 ~clear~[no tooltip]
 ~edit~[no tooltip]
@@ -603,9 +603,9 @@ ringmodulator~[no tooltip]
 
 
 
-rewriter~[no tooltip]
-~go~[no tooltip]
-~start~[no tooltip]
+looperrewriter~rewrites the contents of a looper with received input, to help you resample your own loops. attach the grey dot to a "looper" module. the ideal way to use this module is to hook the "looper" directly up to a "send", hook the leftmost outlet of the "send" up to your effects processing (like an "effectchain"), hook the effect processing up to this "rewriter", and then also connect the rightmost outlet of the "send" up to this "rewriter"
+~ go ~rewrite the connected looper, and if that looper is connected to a send, set that send to output only to the right outlet
+~new loop~start recording a dynamic loop length. press "go" when you want to rewrite it to the looper. this will also change bespoke's global tempo to match this new loop, so it's quite powerful and scary! click it again to cancel.
 
 
 
@@ -634,12 +634,12 @@ multitapdelay~[no tooltip]
 
 
 looperrecorder~[no tooltip]
-~1~[no tooltip]
-~2~[no tooltip]
-~4~[no tooltip]
-~8~[no tooltip]
+~1~capture the last measure to the currently-targeted looper
+~2~capture the last 2 measures to the currently-targeted looper
+~4~capture the last 4 measures to the currently-targeted looper
+~8~capture the last 8 measures to the currently-targeted looper
 ~length~[no tooltip]
-~2xtempo~[no tooltip]
+~2xtempo~[no tooltip]      
 ~.5tempo~[no tooltip]
 ~target~[no tooltip]
 ~mode~[no tooltip]

@@ -26,7 +26,7 @@ public:
    virtual ~Rewriter();
    static IDrawableModule* Create() { return new Rewriter(); }
    
-   string GetTitleLabel() override { return "rewriter"; }
+   string GetTitleLabel() override { return "looper rewriter"; }
    void CreateUIControls() override;
 
    void Go();
@@ -35,10 +35,6 @@ public:
 
    //IAudioSource
    void Process(double time) override;
-
-   //MidiDeviceListener
-   void OnMidiNote(MidiNote& note);
-   void OnMidiControl(MidiControl& control) {}
 
    //IButtonListener
    void ButtonClicked(ClickButton* button) override;
@@ -52,9 +48,12 @@ public:
 private:
    //IDrawableModule
    void DrawModule() override;
-   void GetModuleDimensions(float& w, float& h) override { w=80; h=20; }
+   void GetModuleDimensions(float& w, float& h) override { w=mWidth; h=mHeight; }
    bool Enabled() const override { return mEnabled; }
    
+   float mWidth;
+   float mHeight;
+
    double mStartRecordTime;
 
    ClickButton* mRewriteButton;

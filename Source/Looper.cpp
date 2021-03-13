@@ -284,7 +284,10 @@ void Looper::Process(double time)
       return;
 
    ComputeSliders(0);
-   GetBuffer()->SetNumActiveChannels(MAX(GetBuffer()->NumActiveChannels(), mBuffer->NumActiveChannels()));
+   int numChannels = MAX(GetBuffer()->NumActiveChannels(), mBuffer->NumActiveChannels());
+   if (mRecorder)
+      numChannels = MAX(numChannels, mRecorder->GetBuffer()->NumActiveChannels());
+   GetBuffer()->SetNumActiveChannels(numChannels);
    SyncBuffers();
    mBuffer->SetNumActiveChannels(GetBuffer()->NumActiveChannels());
    mWorkBuffer.SetNumActiveChannels(GetBuffer()->NumActiveChannels());
@@ -372,7 +375,7 @@ void Looper::Process(double time)
       ::Clear(output, ChannelBuffer::kMaxNumChannels);
       
       if (mGranular)
-         ProcessGranular(processStartTime, offset, output);
+         ProcessGranular(time, offset, output);
       
       for (int ch=0; ch<mBuffer->NumActiveChannels(); ++ch)
       {
@@ -444,9 +447,6 @@ void Looper::DoCommit()
 {
    PROFILER(LooperDoCommit);
    
-   if (mRecorder == nullptr)
-      return;
-   
    assert(mCommitBuffer);
 
    {
@@ -466,7 +466,9 @@ void Looper::DoCommit()
 
    {
       PROFILER(LooperDoCommit_commit);
-      int commitSamplesBack = mRecorder->GetCommitDelay() * TheTransport->MsPerBar() / gInvSampleRateMs;
+      int commitSamplesBack = 0;
+      if (mRecorder != nullptr)
+         commitSamplesBack = mRecorder->GetCommitDelay() * TheTransport->MsPerBar() / gInvSampleRateMs;
       int commitLength = mLoopLength+LOOPER_COMMIT_FADE_SAMPLES;
       for (int i=0; i<commitLength; ++i)
       {

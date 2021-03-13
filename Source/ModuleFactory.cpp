@@ -243,7 +243,7 @@ ModuleFactory::ModuleFactory()
    REGISTER(Neighborhooder, notewrap, kModuleType_Note);
    REGISTER(Polyrhythms, polyrhythms, kModuleType_Instrument);
    REGISTER(Looper, looper, kModuleType_Audio);
-   REGISTER(Rewriter, rewriter, kModuleType_Audio);
+   REGISTER(Rewriter, looperrewriter, kModuleType_Audio);
    REGISTER(Metronome, metronome, kModuleType_Synth);
    REGISTER(NoteRouter, noterouter, kModuleType_Note);
    REGISTER(AudioRouter, audiorouter, kModuleType_Audio);

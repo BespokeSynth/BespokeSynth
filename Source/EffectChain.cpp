@@ -300,7 +300,7 @@ void EffectChain::GetModuleDimensions(float& width, float& height)
       maxY = MAX(maxY,y+h);
    }
    width = maxX + 10;
-   height = maxY + 20;
+   height = maxY + 22;
 }
 
 void EffectChain::KeyPressed(int key, bool isRepeat)

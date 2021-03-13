@@ -13,8 +13,9 @@
 #include "MidiController.h"
 #include "Profiler.h"
 #include "FillSaveDropdown.h"
-#include "AudioRouter.h"
 #include "PatchCableSource.h"
+#include "AudioSend.h"
+#include "UIControlMacros.h"
 
 Rewriter::Rewriter()
 : IAudioProcessor(gBufferSize)
@@ -29,11 +30,13 @@ Rewriter::Rewriter()
 void Rewriter::CreateUIControls()
 {
    IDrawableModule::CreateUIControls();
-   mRewriteButton = new ClickButton(this,"go",5,2);
-   mStartRecordTimeButton = new ClickButton(this,"start",30,2);
+   UIBLOCK0();
+   BUTTON(mRewriteButton, " go "); UIBLOCK_SHIFTRIGHT();
+   BUTTON(mStartRecordTimeButton,"new loop");
+   ENDUIBLOCK(mWidth, mHeight);
    
    mLooperCable = new PatchCableSource(this,kConnectionType_Special);
-   mLooperCable->SetManualPosition(70, 10);
+   mLooperCable->SetManualPosition(99, 10);
    mLooperCable->AddTypeFilter("looper");
    AddPatchCableSource(mLooperCable);
 }
@@ -85,12 +88,23 @@ void Rewriter::DrawModule()
    
    mRewriteButton->Draw();
    mStartRecordTimeButton->Draw();
+
+   if (mStartRecordTime != -1)
+   {
+      ofSetColor(255, 100, 0, 100 + 50 * (cosf(TheTransport->GetMeasurePos(gTime) * 4 * FTWO_PI)));
+      ofRect(mStartRecordTimeButton->GetRect(true));
+   }
 }
 
 void Rewriter::ButtonClicked(ClickButton *button)
 {
    if (button == mStartRecordTimeButton)
-      mStartRecordTime = gTime;
+   {
+      if (mStartRecordTime == -1)
+         mStartRecordTime = gTime + gBufferSizeMs;
+      else
+         mStartRecordTime = -1;
+   }
    if (button == mRewriteButton)
       Go();
 }
@@ -105,25 +119,25 @@ void Rewriter::Go()
    {
       if (mStartRecordTime != -1)
       {
-         int numBars = 1;
-         float recordedTime = gTime - mStartRecordTime;
+         float recordedMs = gTime + gBufferSizeMs - mStartRecordTime;
+         float numBarsCurrentTempo = recordedMs / TheTransport->MsPerBar();
+         int numBars = int(numBarsCurrentTempo + .5f);
+         numBars = MAX(1, int(Pow2(floor(log2(numBars)))));   //find closest power of 2
+         
          int beats = numBars * TheTransport->GetTimeSigTop();
-         float minutes = recordedTime / 1000.0f / 60.0f;
-         float bpm = beats/minutes;
-         if (bpm > 45 && bpm < 250)
-         {
-            TheTransport->SetTempo(bpm);
-            TheTransport->SetDownbeat();
-            mConnectedLooper->SetNumBars(1);
-         }
+         float minutes = recordedMs / 1000.0f / 60.0f;
+         float bpm = beats / minutes;
+         TheTransport->SetTempo(bpm);
+         TheTransport->SetDownbeat();
+         mConnectedLooper->SetNumBars(numBars);
          mStartRecordTime = -1;
       }
 
       mConnectedLooper->SetNumBars(mConnectedLooper->GetRecorderNumBars());
       mConnectedLooper->Commit(&mRecordBuffer);
-      AudioRouter* connectedRouter = dynamic_cast<AudioRouter*>(mConnectedLooper->GetTarget());
-      if (connectedRouter)
-         connectedRouter->GetPatchCableSource()->SetTarget(this);
+      AudioSend* connectedSend = dynamic_cast<AudioSend*>(mConnectedLooper->GetTarget());
+      if (connectedSend)
+         connectedSend->SetSend(1, true);
       TheSynth->ArrangeAudioSourceDependencies();
    }
 }
