@@ -118,9 +118,9 @@ void ADSRDisplay::Render()
       else
       {
          if (mAdsr->GetStartTime(gTime) > 0 && mAdsr->GetStartTime(gTime) >= mAdsr->GetStopTime(gTime))
-            drawTime = ofClamp(gTime - mAdsr->GetStartTime(gTime), 0, releaseTime) / mAdsr->GetTimeScale();
+            drawTime = ofClamp(gTime - mAdsr->GetStartTime(gTime), 0, releaseTime * mAdsr->GetTimeScale()) / mAdsr->GetTimeScale();
          if (mAdsr->GetStopTime(gTime) > mAdsr->GetStartTime(gTime))
-            drawTime = releaseTime + (gTime - mAdsr->GetStopTime(gTime)) / mAdsr->GetTimeScale();
+            drawTime = releaseTime * mAdsr->GetTimeScale() + (gTime - mAdsr->GetStopTime(gTime)) / mAdsr->GetTimeScale();
       }
       if (drawTime > 0 && drawTime < mMaxTime)
          ofLine(drawTime/mMaxTime*mWidth, 0, drawTime/mMaxTime*mWidth, mHeight);
