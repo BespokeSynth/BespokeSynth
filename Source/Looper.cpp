@@ -27,7 +27,7 @@ bool Looper::mBeatwheelSingleMeasure = 0;
 
 Looper::Looper()
 : IAudioProcessor(gBufferSize)
-, mLoopLength(4 * 60.0f / gDefaultTempo * gSampleRate)
+, mLoopLength(-1)
 , mLoopPos(0)
 , mNumBars(1)
 , mCommitBuffer(nullptr)
@@ -98,6 +98,7 @@ Looper::Looper()
 , mWorkBuffer(gBufferSize)
 , mQueuedNewBuffer(nullptr)
 , mGranulator(nullptr)
+, mBufferTempo(-1)
 {
    //TODO(Ryan) buffer sizes
    mBuffer = new ChannelBuffer(MAX_BUFFER_SIZE);
@@ -111,6 +112,8 @@ Looper::Looper()
       mPitchShifter[i] = new PitchShifter(1024);
       mLastInputSample[i] = 0;
    }
+
+   SetLoopLength(4 * 60.0f / gDefaultTempo * gSampleRate);
 }
 
 void Looper::CreateUIControls()
@@ -147,6 +150,7 @@ void Looper::CreateUIControls()
    mBeatwheelSingleMeasureCheckbox = new Checkbox(this,"beatwheel single measure",HIDDEN_UICONTROL,HIDDEN_UICONTROL,&mBeatwheelSingleMeasure);
    mPitchShiftSlider = new FloatSlider(this,"pitch",-1,-1,130,15,&mPitchShift,.5f,2);
    mKeepPitchCheckbox = new Checkbox(this,"auto",-1,-1,&mKeepPitch);
+   mResampleButton = new ClickButton(this, "resample for new tempo", 15, 40);
    
    mNumBarsSelector->AddLabel(" 1 ",1);
    mNumBarsSelector->AddLabel(" 2 ",2);
@@ -687,6 +691,8 @@ void Looper::DrawModule()
    mKeepPitchCheckbox->Draw();
    mWriteInputCheckbox->Draw();
    mQueueCaptureButton->Draw();
+   mResampleButton->SetShowing(mBufferTempo != TheTransport->GetTempo());
+   mResampleButton->Draw();
    if (mCaptureQueued)
    {
       ofPushStyle();
@@ -913,7 +919,9 @@ void Looper::SetLoopLength(int length)
 {
    assert(length > 0);
    mLoopLength = length;
-   mLoopPosOffsetSlider->SetExtents(0, length);
+   if (mLoopPosOffsetSlider != nullptr)
+      mLoopPosOffsetSlider->SetExtents(0, length);
+   mBufferTempo = TheTransport->GetTempo();
 }
 
 void Looper::MergeIn(Looper* otherLooper)
@@ -1104,6 +1112,8 @@ void Looper::ButtonClicked(ClickButton* button)
       mCaptureQueued = true;
       mLastCommitTime = gTime;
    }
+   if (button == mResampleButton)
+      ResampleForNewSpeed();
 }
 
 void Looper::FloatSliderUpdated(FloatSlider* slider, float oldVal)

@@ -197,6 +197,8 @@ private:
    bool mCaptureQueued;
    Ramp mWriteInputRamp;
    float mLastInputSample[ChannelBuffer::kMaxNumChannels];
+   float mBufferTempo;
+   ClickButton* mResampleButton;
    
    //beatwheel
    bool mBeatwheel;
