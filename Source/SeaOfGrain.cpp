@@ -340,7 +340,7 @@ void SeaOfGrain::GrainMPEVoice::Process(float* out, int outLength, float* sample
          float outSample[1];
          outSample[0] = 0;
          float pos = (mPitch + pitchBend + MIN(.125f, mPlay) - mOwner->mKeyboardBasePitch) / mOwner->mKeyboardNumPitches;
-         mGranulator.Process(time, &temp, sampleLength, ofLerp(mOwner->mDisplayStartSamples, mOwner->mDisplayEndSamples, pos), outSample);
+         mGranulator.ProcessFrame(time, &temp, sampleLength, ofLerp(mOwner->mDisplayStartSamples, mOwner->mDisplayEndSamples, pos), outSample);
          outSample[0] *= sqrtf(mGain);
          outSample[0] *= mADSR.Value(time);
          out[i] += outSample[0];
@@ -398,7 +398,7 @@ void SeaOfGrain::GrainManualVoice::Process(float* out, int outLength, float* sam
          ChannelBuffer temp(sample, sampleLength);
          float outSample[1];
          outSample[0] = 0;
-         mGranulator.Process(time, &temp, sampleLength, ofLerp(mOwner->mDisplayStartSamples, mOwner->mDisplayEndSamples, mPosition), outSample);
+         mGranulator.ProcessFrame(time, &temp, sampleLength, ofLerp(mOwner->mDisplayStartSamples, mOwner->mDisplayEndSamples, mPosition), outSample);
          outSample[0] *= mGain;
          out[i] += outSample[0];
          time += gInvSampleRateMs;

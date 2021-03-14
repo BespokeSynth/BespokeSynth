@@ -29,9 +29,17 @@ void Granulator::Reset()
    mSpeedRandomize = 0;
    mSpacingRandomize = 0;
    mOctaves = false;
+
+   for (int i = 0; i < ChannelBuffer::kMaxNumChannels; ++i)
+   {
+      mBiquad[i].SetFilterParams(10, sqrt(2) / 2);
+      mBiquad[i].SetFilterType(kFilterType_Highpass);
+      mBiquad[i].UpdateFilterCoeff();
+      mBiquad[i].Clear();
+   }
 }
 
-void Granulator::Process(double time, ChannelBuffer* buffer, int bufferLength, double offset, float* output)
+void Granulator::ProcessFrame(double time, ChannelBuffer* buffer, int bufferLength, double offset, float* output)
 {
    if (time >= mLastGrainSpawnMs+mGrainLengthMs*1/mGrainOverlap*ofRandom(1-mSpacingRandomize/2,1+mSpacingRandomize/2))
    {
@@ -42,10 +50,11 @@ void Granulator::Process(double time, ChannelBuffer* buffer, int bufferLength, d
    for (int i=0; i<MAX_GRAINS; ++i)
       mGrains[i].Process(time, buffer, bufferLength, output);
    
-   if (mGrainOverlap > 4)
+   for (int ch = 0; ch < buffer->NumActiveChannels(); ++ch)
    {
-      for (int ch=0; ch<buffer->NumActiveChannels(); ++ch)
-         output[ch] *= ofMap(mGrainOverlap,MAX_GRAINS,4,.5f,1);   //lower volume on dense granulation, starting at 4 overlap
+      if (mGrainOverlap > 4)
+         output[ch] *= ofMap(mGrainOverlap, MAX_GRAINS, 4, .5f, 1);   //lower volume on dense granulation, starting at 4 overlap
+      output[ch] = mBiquad[ch].Filter(output[ch]);
    }
 }
 
@@ -138,6 +147,6 @@ void Grain::DrawGrain(int idx, float x, float y, float w, float h, int bufferSta
    ofFill();
    float alpha = GetWindow(gTime);
    ofSetColor(255,0,0,alpha*alpha*255*.5);
-   ofRect(x+a*w, y+mDrawPos*h, MAX(1,w/100), h/MAX_GRAINS);
+   ofRect(x+a*w, y+mDrawPos*h, MAX(4,w/100), MAX(4,h/MAX_GRAINS));
    ofPopStyle();
 }

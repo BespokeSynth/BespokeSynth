@@ -154,7 +154,12 @@ void Rewriter::LoadLayout(const ofxJSONElement& moduleInfo)
 void Rewriter::SaveLayout(ofxJSONElement& moduleInfo)
 {
    IDrawableModule::SaveLayout(moduleInfo);
-   moduleInfo["looper"] = mConnectedLooper ? mConnectedLooper->Name() : "";
+
+   string targetPath = "";
+   if (mConnectedLooper)
+      targetPath = mConnectedLooper->Path();
+
+   moduleInfo["looper"] = targetPath;
 }
 
 void Rewriter::SetUpFromSaveData()

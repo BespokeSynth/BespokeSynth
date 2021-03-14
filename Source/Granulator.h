@@ -11,10 +11,10 @@
 
 #include <iostream>
 #include "Ramp.h"
+#include "BiquadFilter.h"
+#include "ChannelBuffer.h"
 
 #define MAX_GRAINS 32
-
-class ChannelBuffer;
 
 class Grain
 {
@@ -39,7 +39,7 @@ class Granulator
 {
 public:
    Granulator();
-   void Process(double time, ChannelBuffer* buffer, int bufferLength, double offset, float* output);
+   void ProcessFrame(double time, ChannelBuffer* buffer, int bufferLength, double offset, float* output);
    void Draw(float x, float y, float w, float h, int bufferStart, int bufferLength, bool wrapAround = true);
    void Reset();
    void ClearGrains();
@@ -60,6 +60,7 @@ private:
    int mNextGrainIdx;
    Grain mGrains[MAX_GRAINS];
    bool mLiveMode;
+   BiquadFilter mBiquad[ChannelBuffer::kMaxNumChannels];
 };
 
 #endif /* defined(__modularSynth__Granulator__) */

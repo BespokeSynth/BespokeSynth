@@ -19,7 +19,6 @@
 #include "DropdownList.h"
 #include "Checkbox.h"
 #include "Ramp.h"
-#include "Granulator.h"
 #include "JumpBlender.h"
 #include "PitchShifter.h"
 #include "INoteReceiver.h"
@@ -27,6 +26,7 @@
 class LooperRecorder;
 class Rewriter;
 class Sample;
+class LooperGranulator;
 
 #define LOOPER_COMMIT_FADE_SAMPLES 200
 
@@ -61,6 +61,9 @@ public:
    void UnlockBufferMutex() { mBufferMutex.unlock(); }
    void SampleDropped(int x, int y, Sample* sample) override;
    bool CanDropSample() const override { return true; }
+   float* GetLoopPosVar() { return &mLoopPos; }
+   int GetLoopLength() { return mLoopLength; }
+   void SetGranulator(LooperGranulator* granulator) { mGranulator = granulator; }
    
    void Poll() override;
    void Exit() override;
@@ -111,7 +114,6 @@ private:
    void DoUndo();
    void ProcessFourTet(double time, int sampleIdx);
    void ProcessScratch();
-   void ProcessGranular(double time, float bufferOffset, float* output);
    void ProcessBeatwheel(double time, int sampleIdx);
    int GetMeasureSliceIndex(double time, int sampleIdx, int slicesPerBar);
    void DrawBeatwheel();
@@ -195,22 +197,6 @@ private:
    bool mCaptureQueued;
    Ramp mWriteInputRamp;
    float mLastInputSample[ChannelBuffer::kMaxNumChannels];
-
-   //granular
-   bool mShowGranular;
-   Checkbox* mShowGranularCheckbox;
-   bool mGranular;
-   Checkbox* mGranularCheckbox;
-   Granulator mGranulator;
-   FloatSlider* mGranOverlap;
-   FloatSlider* mGranSpeed;
-   FloatSlider* mGranLengthMs;
-   FloatSlider* mPosSlider;
-   bool mPausePos;
-   Checkbox* mPausePosCheckbox;
-   FloatSlider* mGranPosRandomize;
-   FloatSlider* mGranSpeedRandomize;
-   Checkbox* mGranOctaveCheckbox;
    
    //beatwheel
    bool mBeatwheel;
@@ -233,6 +219,8 @@ private:
    FloatSlider* mPitchShiftSlider;
    bool mKeepPitch;
    Checkbox* mKeepPitchCheckbox;
+
+   LooperGranulator* mGranulator;
 };
 
 

@@ -37,7 +37,7 @@ SingleOscillator::SingleOscillator()
 , mDrawOsc(kOsc_Square)
 {
    mVoiceParams.mAdsr.Set(10,0,1,10);
-   mVoiceParams.mVol = .5f;
+   mVoiceParams.mVol = .25f;
    mVoiceParams.mPulseWidth = .5f;
    mVoiceParams.mSync = false;
    mVoiceParams.mSyncFreq = 200;

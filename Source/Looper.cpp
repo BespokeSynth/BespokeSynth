@@ -17,6 +17,7 @@
 #include "Profiler.h"
 #include "Rewriter.h"
 #include "FillSaveDropdown.h"
+#include "LooperGranulator.h"
 
 float Looper::mBeatwheelPosRight = 0;
 float Looper::mBeatwheelDepthRight = 0;
@@ -70,19 +71,6 @@ Looper::Looper()
 , mFourTetSlider(nullptr)
 , mFourTetSlices(4)
 , mFourTetSlicesDropdown(nullptr)
-, mShowGranular(false)
-, mShowGranularCheckbox(nullptr)
-, mGranular(false)
-, mGranularCheckbox(nullptr)
-, mGranOverlap(nullptr)
-, mGranSpeed(nullptr)
-, mGranLengthMs(nullptr)
-, mPosSlider(nullptr)
-, mPausePos(false)
-, mPausePosCheckbox(nullptr)
-, mGranPosRandomize(nullptr)
-, mGranSpeedRandomize(nullptr)
-, mGranOctaveCheckbox(nullptr)
 , mBeatwheel(false)
 , mBeatwheelCheckbox(nullptr)
 , mBeatwheelPosRightSlider(nullptr)
@@ -109,6 +97,7 @@ Looper::Looper()
 , mWantHalfShift(false)
 , mWorkBuffer(gBufferSize)
 , mQueuedNewBuffer(nullptr)
+, mGranulator(nullptr)
 {
    //TODO(Ryan) buffer sizes
    mBuffer = new ChannelBuffer(MAX_BUFFER_SIZE);
@@ -150,16 +139,6 @@ void Looper::CreateUIControls()
    mAllowScratchCheckbox = new Checkbox(this,"scr",-1,-1,&mAllowScratch);
    mFourTetSlider = new FloatSlider(this,"fourtet",4,65,65,15,&mFourTet,0,1,1);
    mFourTetSlicesDropdown = new DropdownList(this,"fourtetslices",-1,-1,&mFourTetSlices);
-   mShowGranularCheckbox = new Checkbox(this,"granular",-1,-1,&mShowGranular);
-   mGranularCheckbox = new Checkbox(this,"g on",3,168,&mGranular);
-   mGranOverlap = new FloatSlider(this,"g overlap",-1,-1,84,15,&mGranulator.mGrainOverlap,.5f,MAX_GRAINS);
-   mGranSpeed = new FloatSlider(this,"g speed",-1,-1,84,15,&mGranulator.mSpeed,-3,3);
-   mGranLengthMs = new FloatSlider(this,"g len ms",-1,-1,84,15,&mGranulator.mGrainLengthMs,1,200);
-   mPosSlider = new FloatSlider(this,"pos",-1,-1,140,15,&mLoopPos,0,mLoopLength);
-   mPausePosCheckbox = new Checkbox(this,"frz",-1,-1,&mPausePos);
-   mGranPosRandomize = new FloatSlider(this,"g pos r",-1,-1,84,15,&mGranulator.mPosRandomizeMs,0,200);
-   mGranSpeedRandomize = new FloatSlider(this,"g speed r",-1,-1,84,15,&mGranulator.mSpeedRandomize,0,.3f,2);
-   mGranOctaveCheckbox = new Checkbox(this,"g oct",-1,-1,&mGranulator.mOctaves);
    mBeatwheelCheckbox = new Checkbox(this,"beatwheel on",HIDDEN_UICONTROL,HIDDEN_UICONTROL,&mBeatwheel);
    mBeatwheelPosRightSlider = new FloatSlider(this,"beatwheel pos right",HIDDEN_UICONTROL,HIDDEN_UICONTROL,1,1,&mBeatwheelPosRight,0,1);
    mBeatwheelDepthRightSlider = new FloatSlider(this,"beatwheel depth right",HIDDEN_UICONTROL,HIDDEN_UICONTROL,1,1,&mBeatwheelDepthRight,0,1);
@@ -186,16 +165,12 @@ void Looper::CreateUIControls()
    mBeatwheelPosLeftSlider->SetClamped(false);
    mBeatwheelPosRightSlider->SetClamped(false);
    
-   mGranPosRandomize->SetMode(FloatSlider::kSquare);
-   mGranLengthMs->SetMode(FloatSlider::kSquare);
-   
    mDecaySlider->SetMode(FloatSlider::kSquare);
    
    mClearButton->PositionTo(mNumBarsSelector, kAnchor_Right);
    mVolumeBakeButton->PositionTo(mVolSlider, kAnchor_Right);
    mMergeButton->PositionTo(mVolumeBakeButton, kAnchor_Right);
    mDecaySlider->PositionTo(mNumBarsSelector, kAnchor_Below);
-   mShowGranularCheckbox->PositionTo(mDecaySlider, kAnchor_Right);
    mFourTetSlicesDropdown->PositionTo(mFourTetSlider, kAnchor_Right);
    mMuteCheckbox->PositionTo(mFourTetSlider, kAnchor_Below);
    mSaveButton->PositionTo(mMuteCheckbox, kAnchor_Right);
@@ -207,15 +182,6 @@ void Looper::CreateUIControls()
    mWriteOffsetButton->PositionTo(mResetOffsetButton, kAnchor_Right);
    mScratchSpeedSlider->PositionTo(mLoopPosOffsetSlider, kAnchor_Below);
    mAllowScratchCheckbox->PositionTo(mScratchSpeedSlider, kAnchor_Right);
-   
-   mGranOctaveCheckbox->PositionTo(mGranularCheckbox, kAnchor_Right);
-   mGranLengthMs->PositionTo(mGranOctaveCheckbox, kAnchor_Right);
-   mGranOverlap->PositionTo(mGranularCheckbox, kAnchor_Below);
-   mGranPosRandomize->PositionTo(mGranOverlap, kAnchor_Right);
-   mGranSpeed->PositionTo(mGranOverlap, kAnchor_Below);
-   mGranSpeedRandomize->PositionTo(mGranSpeed, kAnchor_Right);
-   mPosSlider->PositionTo(mGranSpeed, kAnchor_Below);
-   mPausePosCheckbox->PositionTo(mPosSlider, kAnchor_Right);
 }
 
 Looper::~Looper()
@@ -274,6 +240,9 @@ void Looper::Poll()
    mMergeButton->SetShowing(mRecorder != nullptr);
    mWriteInputCheckbox->SetShowing(mRecorder == nullptr);
    mQueueCaptureButton->SetShowing(mRecorder == nullptr);
+
+   if (mGranulator && mGranulator->IsDeleted())
+      mGranulator = nullptr;
 }
 
 void Looper::Process(double time)
@@ -293,6 +262,8 @@ void Looper::Process(double time)
    mWorkBuffer.SetNumActiveChannels(GetBuffer()->NumActiveChannels());
    mUndoBuffer->SetNumActiveChannels(GetBuffer()->NumActiveChannels());
 
+   bool doGranular = mGranulator != nullptr && mGranulator->IsActive();
+
    if (mWantBakeVolume)
       BakeVolume();
    if (mWantShiftDownbeat)
@@ -302,7 +273,7 @@ void Looper::Process(double time)
 
    float oldLoopPos = mLoopPos;
    int sampsPerBar = mLoopLength / mNumBars;
-   if (!mPausePos)
+   if (!doGranular || !mGranulator->ShouldFreeze())
       mLoopPos = sampsPerBar * ((TheTransport->GetMeasure(time) % mNumBars) + TheTransport->GetMeasurePos(time));
    
    if (oldLoopPos > mLoopLength - bufferSize * mSpeed - 1 && mLoopPos < oldLoopPos)
@@ -373,13 +344,13 @@ void Looper::Process(double time)
       float offset = mLoopPos+i*mSpeed+mLoopPosOffset+latencyOffset;
       float output[ChannelBuffer::kMaxNumChannels];
       ::Clear(output, ChannelBuffer::kMaxNumChannels);
-      
-      if (mGranular)
-         ProcessGranular(time, offset, output);
+
+      if (doGranular)
+         mGranulator->ProcessFrame(time, offset, output);
       
       for (int ch=0; ch<mBuffer->NumActiveChannels(); ++ch)
       {
-         if (!mGranular)
+         if (!doGranular)
          {
             output[ch] = GetInterpolatedSample(offset, mBuffer->GetChannel(ch), mLoopLength);
             output[ch] = mJumpBlender[ch].Process(output[ch],i);
@@ -631,11 +602,6 @@ int Looper::GetMeasureSliceIndex(double time, int sampleIdx, int slicesPerBar)
    return slice;
 }
 
-void Looper::ProcessGranular(double time, float bufferOffset, float* output)
-{
-   mGranulator.Process(time, mBuffer, mLoopLength, bufferOffset, output);
-}
-
 void Looper::ResampleForNewSpeed()
 {
    int oldLoopLength = mLoopLength;
@@ -717,7 +683,6 @@ void Looper::DrawModule()
    mAllowScratchCheckbox->Draw();
    mFourTetSlider->Draw();
    mFourTetSlicesDropdown->Draw();
-   mShowGranularCheckbox->Draw();
    mPitchShiftSlider->Draw();
    mKeepPitchCheckbox->Draw();
    mWriteInputCheckbox->Draw();
@@ -767,31 +732,12 @@ void Looper::DrawModule()
    mSaveButton->Draw();
    mMuteCheckbox->Draw();
    mCommitButton->Draw();
-   
-   if (mShowGranular)
-   {
-      ofPushStyle();
-      ofSetColor(100,100,200,100);
-      ofFill();
-      ofRect(0,165,GetRect().width,73);
-      ofPopStyle();
-      mGranularCheckbox->Draw();
-      mGranOverlap->Draw();
-      mGranSpeed->Draw();
-      mGranLengthMs->Draw();
-      mPosSlider->Draw();
-      mPausePosCheckbox->Draw();
-      mGranPosRandomize->Draw();
-      mGranSpeedRandomize->Draw();
-      mGranOctaveCheckbox->Draw();
-      if (mGranular)
-         mGranulator.Draw(4,35,155,32,0,mLoopLength);
-   }
+
+   if (mGranulator)
+      mGranulator->DrawOverlay(ofRectangle(4, 35, 155, 32), mLoopLength);
    
    if (mBeatwheel)
-   {
       DrawBeatwheel();
-   }
 
    if (mRecorder != nullptr && mRecorder->GetNextCommitTarget() == this)
    {
@@ -968,7 +914,6 @@ void Looper::SetLoopLength(int length)
    assert(length > 0);
    mLoopLength = length;
    mLoopPosOffsetSlider->SetExtents(0, length);
-   mPosSlider->SetExtents(0, length);
 }
 
 void Looper::MergeIn(Looper* otherLooper)
@@ -1041,10 +986,9 @@ void Looper::Commit(RollingBuffer* commitBuffer /* = nullptr */)
    mAllowScratch = false;
    mScratchSpeed = 1;
    mFourTet = 0;
-   mGranular = false;
-   mShowGranular = false;
-   mPausePos = false;
    mPitchShift = 1;
+   if (mGranulator)
+      mGranulator->OnCommit();
    
    if (commitBuffer) //specified buffer
    {
@@ -1088,16 +1032,8 @@ void Looper::SampleDropped(int x, int y, Sample* sample)
 
 void Looper::GetModuleDimensions(float& width, float& height)
 {
-   if (mShowGranular)
-   {
-      width = BUFFER_X*2+BUFFER_W;
-      height = 238;
-   }
-   else
-   {
-      width = BUFFER_X*2+BUFFER_W;
-      height = 165;
-   }
+   width = BUFFER_X*2+BUFFER_W;
+   height = 165;
 }
 
 void Looper::OnClicked(int x, int y, bool right)
@@ -1214,29 +1150,6 @@ void Looper::CheckboxUpdated(Checkbox* checkbox)
    if (checkbox == mMuteCheckbox)
    {
       mMuteRamp.Start(gTime, mMute ? 0 : 1, gTime+1);
-   }
-   if (checkbox == mShowGranularCheckbox)
-   {
-      mGranulator.Reset();
-      
-      if (mShowGranular == false)
-      {
-         mGranular = false;
-         mPausePos = false;
-      }
-   }
-   if (checkbox == mGranularCheckbox)
-   {
-      if (mGranular == false)
-         mPausePos = false;
-   }
-   if (checkbox == mPausePosCheckbox)
-   {
-      if (mPausePos)
-      {
-         mShowGranular = true;
-         mGranular = true;
-      }
    }
    if (checkbox == mWriteInputCheckbox)
    {

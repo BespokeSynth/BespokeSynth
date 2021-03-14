@@ -103,7 +103,7 @@ void LiveGranulator::ProcessAudio(double time, ChannelBuffer* buffer)
       {
          float sample[ChannelBuffer::kMaxNumChannels];
          Clear(sample, ChannelBuffer::kMaxNumChannels);
-         mGranulator.Process(time, mBuffer.GetRawBuffer(), mBufferLength, mBuffer.GetRawBufferOffset(0)-mFreezeExtraSamples-1+mPos, sample);
+         mGranulator.ProcessFrame(time, mBuffer.GetRawBuffer(), mBufferLength, mBuffer.GetRawBufferOffset(0)-mFreezeExtraSamples-1+mPos, sample);
          for (int ch=0; ch<buffer->NumActiveChannels(); ++ch)
          {
             sample[ch] -= mDCEstimate[ch];
