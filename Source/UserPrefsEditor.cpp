@@ -40,10 +40,10 @@ void UserPrefsEditor::CreateUIControls()
    FLOATSLIDER(mScrollMultiplierVerticalSlider, "scroll_multiplier_vertical", &mScrollMultiplierVertical, -2, 2);
    FLOATSLIDER(mScrollMultiplierHorizontalSlider, "scroll_multiplier_horizontal", &mScrollMultiplierHorizontal, -2, 2);
    CHECKBOX(mAutosaveCheckbox, "autosave", &mAutosave);
-   TEXTENTRY(mTooltipsFilePathEntry, "tooltips", 100, &mTooltipsFilePath);
-   TEXTENTRY(mDefaultLayoutPathEntry, "layout", 100, &mDefaultLayoutPath);
-   TEXTENTRY(mYoutubeDlPathEntry, "youtube-dl_path", 100, &mYoutubeDlPath);
-   TEXTENTRY(mFfmpegPathEntry, "ffmpeg_path", 100, &mFfmpegPath);
+   TEXTENTRY(mTooltipsFilePathEntry, "tooltips        ", 100, &mTooltipsFilePath);
+   TEXTENTRY(mDefaultLayoutPathEntry, "layout          ", 100, &mDefaultLayoutPath);
+   TEXTENTRY(mYoutubeDlPathEntry, "youtube-dl_path ", 100, &mYoutubeDlPath);
+   TEXTENTRY(mFfmpegPathEntry, "ffmpeg_path     ", 100, &mFfmpegPath);
    UIBLOCK_SHIFTDOWN();
    BUTTON(mSaveButton, "save and exit bespoke");
    BUTTON(mCancelButton, "cancel");
