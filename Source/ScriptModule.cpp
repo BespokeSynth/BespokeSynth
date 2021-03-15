@@ -712,8 +712,7 @@ void ScriptModule::ButtonClicked(ClickButton* button)
                return;
             }
 
-            output.setNewLineString("\n");
-            output.writeString(mCodeEntry->GetText());
+            output.writeText(mCodeEntry->GetText(), false, false, nullptr);
             output.flush(); // (called explicitly to force an fsync on posix)
 
             if (output.getStatus().failed())
