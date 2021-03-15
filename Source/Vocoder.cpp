@@ -55,15 +55,15 @@ Vocoder::Vocoder()
 void Vocoder::CreateUIControls()
 {
    IDrawableModule::CreateUIControls();
-   mInputSlider = new FloatSlider(this,"input", 5, 29, 100, 15, &mInputPreamp, 0, 2);
-   mCarrierSlider = new FloatSlider(this,"carrier", 5, 47, 100, 15, &mCarrierPreamp, 0, 2);
-   mVolumeSlider = new FloatSlider(this,"volume", 5, 65, 100, 15, &mVolume, 0, 2);
-   mDryWetSlider = new FloatSlider(this,"dry/wet", 5, 83, 100, 15, &mDryWet, 0, 1);
-   mFricativeSlider = new FloatSlider(this,"fric thresh", 5, 101, 100, 15, &mFricativeThresh, 0, 1);
-   mWhisperSlider = new FloatSlider(this,"whisper", 5, 119, 100, 15, &mWhisper, 0, 1);
-   mPhaseOffsetSlider = new FloatSlider(this,"phase off", 5, 137, 100, 15, &mPhaseOffset, 0, FTWO_PI);
-   mCutSlider = new IntSlider(this,"cut",5,155,100,15,&mCut,0,100);
-   
+   mInputSlider = new FloatSlider(this,"input", 5, 2, 100, 15, &mInputPreamp, 0, 2);
+   mCarrierSlider = new FloatSlider(this,"carrier", mInputSlider, kAnchor_Below, 100, 15, &mCarrierPreamp, 0, 2);
+   mVolumeSlider = new FloatSlider(this,"volume", mCarrierSlider, kAnchor_Below, 100, 15, &mVolume, 0, 2);
+   mDryWetSlider = new FloatSlider(this,"dry/wet", mVolumeSlider, kAnchor_Below, 100, 15, &mDryWet, 0, 1);
+   mFricativeSlider = new FloatSlider(this,"fric thresh", mDryWetSlider, kAnchor_Below, 100, 15, &mFricativeThresh, 0, 1);
+   mWhisperSlider = new FloatSlider(this,"whisper", mFricativeSlider, kAnchor_Below, 100, 15, &mWhisper, 0, 1);
+   mPhaseOffsetSlider = new FloatSlider(this,"phase off", mWhisperSlider, kAnchor_Below, 100, 15, &mPhaseOffset, 0, FTWO_PI);
+   mCutSlider = new IntSlider(this,"cut", mPhaseOffsetSlider, kAnchor_Below,100,15,&mCut,0,100);
+
    mGate.CreateUIControls();
 }
 
