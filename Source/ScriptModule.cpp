@@ -794,9 +794,9 @@ void ScriptModule::ExecuteCode()
    RunScript(gTime);
 }
 
-void ScriptModule::ExecuteBlock(int lineStart, int lineEnd)
+pair<int,int> ScriptModule::ExecuteBlock(int lineStart, int lineEnd)
 {
-   RunScript(gTime, lineStart, lineEnd);
+   return RunScript(gTime, lineStart, lineEnd);
 }
 
 void ScriptModule::OnPulse(double time, float velocity, int flags)
@@ -831,14 +831,14 @@ string ScriptModule::GetThisName()
    return "me__"+ofToString(mScriptModuleIndex);
 }
 
-void ScriptModule::RunScript(double time, int lineStart/*=-1*/, int lineEnd/*=-1*/)
+pair<int,int> ScriptModule::RunScript(double time, int lineStart/*=-1*/, int lineEnd/*=-1*/)
 {
    //should only be called from main thread
 
    if (!sPythonInitialized)
    {
       TheSynth->LogEvent("trying to call ScriptModule::RunScript() before python is initialized", kLogEventType_Error);
-      return;
+      return std::make_pair(0,0);
    }
 
    py::exec(GetThisName()+" = scriptmodule.get_me("+ofToString(mScriptModuleIndex)+")", py::globals());
@@ -882,6 +882,8 @@ void ScriptModule::RunScript(double time, int lineStart/*=-1*/, int lineEnd/*=-1
    mLastRunLiteralCode = code;
    
    RunCode(time, code);
+
+   return std::make_pair(executionStartLine, executionEndLine);
 }
 
 void ScriptModule::RunCode(double time, string code)

@@ -61,7 +61,7 @@ public:
  
    //ICodeEntryListener
    void ExecuteCode() override;
-   void ExecuteBlock(int lineStart, int lineEnd) override;
+   pair<int,int> ExecuteBlock(int lineStart, int lineEnd) override;
    
    //INoteReceiver
    void PlayNote(double time, int pitch, int velocity, int voiceIdx = -1, ModulationParameters modulation = ModulationParameters()) override;
@@ -93,7 +93,7 @@ public:
 private:
    void PlayNote(double time, float pitch, float velocity, float pan, int noteOutputIndex, int lineNum);
    void AdjustUIControl(IUIControl* control, float value, int lineNum);
-   void RunScript(double time, int lineStart = -1, int lineEnd = -1);
+   pair<int,int> RunScript(double time, int lineStart = -1, int lineEnd = -1);
    void FixUpCode(string& code);
    void ScheduleNote(double time, float pitch, float velocity, float pan, int noteOutputIndex);
    void SendNoteToIndex(int index, double time, int pitch, int velocity, int voiceIdx, ModulationParameters modulation);

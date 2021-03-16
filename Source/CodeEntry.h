@@ -19,7 +19,7 @@ class ICodeEntryListener
 public:
    virtual ~ICodeEntryListener() {}
    virtual void ExecuteCode() = 0;
-   virtual void ExecuteBlock(int lineStart, int lineEnd) = 0;
+   virtual pair<int,int> ExecuteBlock(int lineStart, int lineEnd) = 0;  //return start/end lines that actually ran
 };
 
 class CodeEntry : public IUIControl, public IKeyboardFocusListener
@@ -128,6 +128,8 @@ private:
    bool mCaretBlink;
    bool mHovered;
    double mLastPublishTime;
+   int mLastPublishedLineStart;
+   int mLastPublishedLineEnd;
    bool mHasError;
    int mErrorLine;
    ofVec2f mScroll;
