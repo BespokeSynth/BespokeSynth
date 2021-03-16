@@ -50,6 +50,7 @@ public:
    void SetNumNoteOutputs(int num);
    void ConnectOscInput(int port);
    void MidiReceived(MidiMessageType messageType, int control, float value, int channel);
+   void OnModuleReferenceBound(IDrawableModule* target);
    
    void RunCode(double time, string code);
    
@@ -229,6 +230,14 @@ private:
    LineEventTracker mMethodCallTracker;
    LineEventTracker mNotePlayTracker;
    LineEventTracker mUIControlTracker;
+
+   struct BoundModuleConnection
+   {
+      int mLineIndex;
+      string mLineText;
+      IDrawableModule* mTarget;
+   };
+   std::vector<BoundModuleConnection> mBoundModuleConnections;
    
    std::vector<string> mScriptFilePaths;
    

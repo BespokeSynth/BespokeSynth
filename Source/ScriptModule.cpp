@@ -303,6 +303,57 @@ void ScriptModule::DrawModuleUnclipped()
          ofPopMatrix();
       }
    }
+
+   if (mBoundModuleConnections.size() > 0)
+   {
+      vector<string> lines = mCodeEntry->GetLines();
+
+      for (size_t i = 0; i < mBoundModuleConnections.size(); ++i)
+      {
+         if (mBoundModuleConnections[i].mTarget == nullptr)
+            continue;
+         if (mBoundModuleConnections[i].mTarget->IsDeleted())
+         {
+            mBoundModuleConnections[i].mTarget = nullptr;
+            continue;
+         }
+
+         ofSetColor(IDrawableModule::GetColor(kModuleType_Other));
+
+         if (mBoundModuleConnections[i].mLineText != lines[mBoundModuleConnections[i].mLineIndex])
+         {
+            bool found = false;
+            for (size_t j = 0; j < lines.size(); ++j)
+            {
+               if (lines[j] == mBoundModuleConnections[i].mLineText)
+               {
+                  found = true;
+                  mBoundModuleConnections[i].mLineIndex = j;
+               }
+            }
+
+            if (!found)
+               mBoundModuleConnections[i].mTarget = nullptr;
+         }
+
+         if (mBoundModuleConnections[i].mTarget != nullptr)
+         {
+            ofVec2f linePos = mCodeEntry->GetLinePos(mBoundModuleConnections[i].mLineIndex, false);
+
+            ofPushMatrix();
+            ofTranslate(-mX, -mY);
+            ofSetLineWidth(1.5f);
+
+            float startX, startY, endX, endY;
+            ofRectangle targetRect = mBoundModuleConnections[i].mTarget->GetRect();
+            FindClosestSides(mX + linePos.x, mY + linePos.y + 10, 0, 0, targetRect.x, targetRect.y, targetRect.width, targetRect.height, startX, startY, endX, endY);
+            ofLine(startX, startY, endX, endY);
+            
+            ofPopMatrix();
+         }
+      }
+   }
+
    ofPopStyle();
 }
 
@@ -1079,6 +1130,29 @@ bool ScriptModule::IsNonWhitespace(string line)
          return true;
    }
    return false;
+}
+
+void ScriptModule::OnModuleReferenceBound(IDrawableModule* target)
+{
+   if (target != nullptr)
+   {
+      for (size_t i = 0; i < mBoundModuleConnections.size(); ++i)
+      {
+         if (mBoundModuleConnections[i].mTarget == target)
+            return;
+      }
+
+      string code = mCodeEntry->GetText();
+      vector<string> lines = ofSplitString(code, "\n");
+      if (mNextLineToExecute >= 0 && mNextLineToExecute < lines.size())
+      {
+         BoundModuleConnection connection;
+         connection.mLineIndex = mNextLineToExecute;
+         connection.mLineText = lines[mNextLineToExecute];
+         connection.mTarget = target;
+         mBoundModuleConnections.push_back(connection);
+      }
+   }
 }
 
 void ScriptModule::Stop()

@@ -202,7 +202,9 @@ PYBIND11_EMBEDDED_MODULE(notesequencer, m)
 {
    m.def("get", [](string path)
    {
-      return dynamic_cast<NoteStepSequencer*>(TheSynth->FindModule(path));
+      auto* ret = dynamic_cast<NoteStepSequencer*>(TheSynth->FindModule(path));
+      ScriptModule::sMostRecentLineExecutedModule->OnModuleReferenceBound(ret);
+      return ret;
    }, py::return_value_policy::reference);
    py::class_<NoteStepSequencer, IDrawableModule>(m, "notesequencer")
       .def("set_step", [](NoteStepSequencer& seq, int step, int pitch, int velocity, float length)
@@ -215,7 +217,9 @@ PYBIND11_EMBEDDED_MODULE(drumsequencer, m)
 {
    m.def("get", [](string path)
    {
-      return dynamic_cast<StepSequencer*>(TheSynth->FindModule(path));
+      auto* ret = dynamic_cast<StepSequencer*>(TheSynth->FindModule(path));
+      ScriptModule::sMostRecentLineExecutedModule->OnModuleReferenceBound(ret);
+      return ret;
    }, py::return_value_policy::reference);
    py::class_<StepSequencer, IDrawableModule>(m, "drumsequencer")
       .def("set", [](StepSequencer& seq, int step, int pitch, int velocity)
@@ -232,7 +236,9 @@ PYBIND11_EMBEDDED_MODULE(grid, m)
 {
    m.def("get", [](string path)
    {
-      return dynamic_cast<GridModule*>(TheSynth->FindModule(path));
+      auto* ret = dynamic_cast<GridModule*>(TheSynth->FindModule(path));
+      ScriptModule::sMostRecentLineExecutedModule->OnModuleReferenceBound(ret);
+      return ret;
    }, py::return_value_policy::reference);
    ///example: g = grid.get("grid")  #assuming there's a grid called "grid" somewhere in the layout
    py::class_<GridModule, IDrawableModule>(m, "grid")
@@ -292,7 +298,9 @@ PYBIND11_EMBEDDED_MODULE(notecanvas, m)
 {
    m.def("get", [](string path)
    {
-      return dynamic_cast<NoteCanvas*>(TheSynth->FindModule(path));
+      auto* ret = dynamic_cast<NoteCanvas*>(TheSynth->FindModule(path));
+      ScriptModule::sMostRecentLineExecutedModule->OnModuleReferenceBound(ret);
+      return ret;
    }, py::return_value_policy::reference);
    py::class_<NoteCanvas, IDrawableModule>(m, "notecanvas")
       .def("add_note", [](NoteCanvas& canvas, double measurePos, int pitch, int velocity, double length)
@@ -309,7 +317,9 @@ PYBIND11_EMBEDDED_MODULE(sampleplayer, m)
 {
    m.def("get", [](string path)
    {
-      return dynamic_cast<SamplePlayer*>(TheSynth->FindModule(path));
+      auto* ret = dynamic_cast<SamplePlayer*>(TheSynth->FindModule(path));
+      ScriptModule::sMostRecentLineExecutedModule->OnModuleReferenceBound(ret);
+      return ret;
    }, py::return_value_policy::reference);
    py::class_<SamplePlayer, IDrawableModule>(m, "sampleplayer")
       .def("set_cue_point", [](SamplePlayer& player, int pitch, float startSeconds, float lengthSeconds, float speed)
@@ -337,7 +347,9 @@ PYBIND11_EMBEDDED_MODULE(midicontroller, m)
 {
    m.def("get", [](string path)
    {
-      return dynamic_cast<MidiController*>(TheSynth->FindModule(path));
+      auto* ret = dynamic_cast<MidiController*>(TheSynth->FindModule(path));
+      ScriptModule::sMostRecentLineExecutedModule->OnModuleReferenceBound(ret);
+      return ret;
    }, py::return_value_policy::reference);
    py::class_<MidiController, IDrawableModule> midiControllerClass(m, "midicontroller");
    midiControllerClass
@@ -379,7 +391,9 @@ PYBIND11_EMBEDDED_MODULE(linnstrument, m)
 {
    m.def("get", [](string path)
    {
-      return dynamic_cast<LinnstrumentControl*>(TheSynth->FindModule(path));
+      auto* ret = dynamic_cast<LinnstrumentControl*>(TheSynth->FindModule(path));
+      ScriptModule::sMostRecentLineExecutedModule->OnModuleReferenceBound(ret);
+      return ret;
    }, py::return_value_policy::reference);
    py::class_<LinnstrumentControl, IDrawableModule> linnClass(m, "linnstrumentcontrol");
 
@@ -409,9 +423,16 @@ PYBIND11_EMBEDDED_MODULE(osccontroller, m)
    {
       MidiController* midicontroller = dynamic_cast<MidiController*>(TheSynth->FindModule(path));
       if (midicontroller)
-         return dynamic_cast<OscController*>(midicontroller->GetNonstandardController());
+      {
+         auto* ret = dynamic_cast<OscController*>(midicontroller->GetNonstandardController());
+         if (ret != nullptr)
+            ScriptModule::sMostRecentLineExecutedModule->OnModuleReferenceBound(midicontroller);
+         return ret;
+      }
       else
+      {
          return (OscController*)nullptr;
+      }
    }, py::return_value_policy::reference);
    py::class_<OscController>(m, "osccontroller")
       .def("add_control", [](OscController& osccontroller, string address, bool isFloat)
@@ -424,7 +445,9 @@ PYBIND11_EMBEDDED_MODULE(oscoutput, m)
 {
    m.def("get", [](string path)
    {
-      return dynamic_cast<OSCOutput*>(TheSynth->FindModule(path));
+      auto* ret = dynamic_cast<OSCOutput*>(TheSynth->FindModule(path));
+      ScriptModule::sMostRecentLineExecutedModule->OnModuleReferenceBound(ret);
+      return ret;
    }, py::return_value_policy::reference);
    py::class_<OSCOutput, IDrawableModule>(m, "oscoutput")
       .def("send_float", [](OSCOutput& oscoutput, string address, float val)
@@ -445,7 +468,9 @@ PYBIND11_EMBEDDED_MODULE(module, m)
 {
    m.def("get", [](string path)
    {
-      return TheSynth->FindModule(path);
+      auto* ret = TheSynth->FindModule(path);
+      ScriptModule::sMostRecentLineExecutedModule->OnModuleReferenceBound(ret);
+      return ret;
    }, py::return_value_policy::reference);
    m.def("create", [](string moduleType, int x, int y)
    {
