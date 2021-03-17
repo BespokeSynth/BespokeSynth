@@ -45,15 +45,15 @@ void FloatSliderLFOControl::CreateUIControls()
    UIBLOCK_SHIFTY(40);
    DROPDOWN(mIntervalSelector,"interval",(int*)(&mLFOSettings.mInterval), 47); UIBLOCK_SHIFTRIGHT();
    DROPDOWN(mOscSelector,"osc",(int*)(&mLFOSettings.mOscType), 47); UIBLOCK_NEWLINE();
-   FLOATSLIDER(mOffsetSlider,"off",&mLFOSettings.mLFOOffset,0,1); UIBLOCK_SHIFTUP();
+   FLOATSLIDER(mOffsetSlider,"offset",&mLFOSettings.mLFOOffset,0,1); UIBLOCK_SHIFTUP();
    FLOATSLIDER(mFreeRateSlider,"free rate",&mLFOSettings.mFreeRate,0,20);
-   FLOATSLIDER(mBiasSlider,"bias",&mLFOSettings.mBias,0,1);
    FLOATSLIDER(mMinSlider,"low",&mDummyMin,0,1);
    FLOATSLIDER(mMaxSlider,"high",&mDummyMax,0,1);
    FLOATSLIDER(mSpreadSlider,"spread",&mLFOSettings.mSpread,0,1);
+   FLOATSLIDER(mBiasSlider, "bias", &mLFOSettings.mBias, 0, 1);
+   FLOATSLIDER(mLengthSlider, "length", &mLFOSettings.mLength, 0, 1);
+   FLOATSLIDER(mShuffleSlider, "shuffle", &mLFOSettings.mShuffle, 0, 1);
    FLOATSLIDER(mSoftenSlider,"soften",&mLFOSettings.mSoften,0,1);
-   FLOATSLIDER(mShuffleSlider,"shuffle",&mLFOSettings.mShuffle,0,1);
-   FLOATSLIDER(mLengthSlider,"length",&mLFOSettings.mLength,0,1);
    ENDUIBLOCK(mWidth,mHeight);
    
    mIntervalSelector->AddLabel("free", kInterval_Free);
@@ -82,8 +82,9 @@ void FloatSliderLFOControl::CreateUIControls()
    mOscSelector->AddLabel("-saw",kOsc_NegSaw);
    mOscSelector->AddLabel("squ",kOsc_Square);
    mOscSelector->AddLabel("tri",kOsc_Tri);
-   mOscSelector->AddLabel("rand",kOsc_Random);
-   mOscSelector->AddLabel("drnk",kOsc_Drunk);
+   mOscSelector->AddLabel("s&h",kOsc_Random);
+   mOscSelector->AddLabel("drunk",kOsc_Drunk);
+   mOscSelector->AddLabel("perlin", kOsc_Perlin);
    
    mOscSelector->PositionTo(mIntervalSelector, kAnchor_Right);
    
@@ -151,7 +152,8 @@ void FloatSliderLFOControl::DrawModule()
       float phase = i/width;
       if (mLFO.GetOsc()->GetShuffle() > 0)
          phase *= 2;
-      phase += 1 - mLFOSettings.mLFOOffset;
+      if (mLFO.GetOsc()->GetType() != kOsc_Perlin)
+         phase += 1 - mLFOSettings.mLFOOffset;
       float value = GetLFOValue(0, mLFO.TransformPhase(phase));
       ofVertex(i + x, ofMap(value,GetTargetMax(),GetTargetMin(),0,height) + y);
    }
@@ -168,6 +170,8 @@ void FloatSliderLFOControl::DrawModule()
    {
       squeeze = 2;
    }
+   if (mLFO.GetOsc()->GetType() == kOsc_Perlin)
+      currentPhase = 0;
    float displayPhase = currentPhase;
    displayPhase -= 1 - mLFOSettings.mLFOOffset;
    if (displayPhase < 0)
@@ -287,8 +291,15 @@ void FloatSliderLFOControl::UpdateFromSettings()
 
 void FloatSliderLFOControl::UpdateVisibleControls()
 {
-   mOffsetSlider->SetShowing(mLFOSettings.mInterval != kInterval_Free);
-   mFreeRateSlider->SetShowing(mLFOSettings.mInterval == kInterval_Free);
+   bool isPerlin = mLFO.GetOsc()->GetType() == kOsc_Perlin;
+   bool showFreeRate = mLFOSettings.mInterval == kInterval_Free || isPerlin;
+   mOffsetSlider->SetShowing(!showFreeRate);
+   mFreeRateSlider->SetShowing(showFreeRate);
+   mIntervalSelector->SetShowing(!isPerlin);
+   mShuffleSlider->SetShowing(!isPerlin);
+   mSoftenSlider->SetShowing(mLFO.GetOsc()->GetType() == kOsc_Saw || mLFO.GetOsc()->GetType() == kOsc_Square);
+   mSpreadSlider->SetShowing(mLFO.GetOsc()->GetType() != kOsc_Square);
+   mLengthSlider->SetShowing(!isPerlin && mLFO.GetOsc()->GetType() != kOsc_Drunk);
 }
 
 void FloatSliderLFOControl::SetRate(NoteInterval rate)
@@ -315,7 +326,18 @@ void FloatSliderLFOControl::DropdownUpdated(DropdownList* list, int oldVal)
       UpdateVisibleControls();
    }
    if (list == mOscSelector)
+   {
       mLFO.SetType(mLFOSettings.mOscType);
+      UpdateVisibleControls();
+
+      if (mLFOSettings.mOscType == kOsc_Perlin)
+      {
+         mLFOSettings.mShuffle = 0;
+         mLFOSettings.mLFOOffset = 0;
+         mLFO.GetOsc()->SetShuffle(0);
+         mLFO.SetOffset(0);
+      }
+   }
 }
 
 void FloatSliderLFOControl::FloatSliderUpdated(FloatSlider* slider, float oldVal)

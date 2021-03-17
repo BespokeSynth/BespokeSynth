@@ -112,7 +112,8 @@ enum OscillatorType
    kOsc_Saw,
    kOsc_NegSaw,
    kOsc_Random,
-   kOsc_Drunk
+   kOsc_Drunk,
+   kOsc_Perlin
 };
 
 enum KeyModifiers

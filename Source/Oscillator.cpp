@@ -59,7 +59,7 @@ float Oscillator::Value(float phase) const
       case kOsc_Random:
          sample = ofRandom(-1,1);
          break;
-      case kOsc_Drunk:
+      default:
          //assert(false);
          break;
    }

@@ -14,6 +14,7 @@
 #include "Transport.h"
 #include "Oscillator.h"
 #include "Ramp.h"
+#include "PerlinNoise.h"
 
 enum LFOMode
 {
@@ -53,6 +54,9 @@ private:
    double mFreePhase;
    float mFreeRate;
    float mLength;
+   int mPerlinSeed;
+
+   static PerlinNoise sPerlinNoise;
 };
 
 #endif /* defined(__modularSynth__LFO__) */

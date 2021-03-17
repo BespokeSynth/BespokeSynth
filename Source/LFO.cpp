@@ -10,6 +10,9 @@
 #include "OpenFrameworksPort.h"
 #include "Profiler.h"
 
+//static
+PerlinNoise LFO::sPerlinNoise;
+
 LFO::LFO()
 : mPhaseOffset(0)
 , mOsc(kOsc_Sin)
@@ -74,6 +77,7 @@ float LFO::Value(int samplesIn /*= 0*/, float forcePhase /*= -1*/) const
    phase *= FTWO_PI;
    
    float sample;
+   bool nonstandardOsc = false;
    
    //use sample-and-hold value
    if (mOsc.GetType() == kOsc_Random &&
@@ -85,21 +89,37 @@ float LFO::Value(int samplesIn /*= 0*/, float forcePhase /*= -1*/) const
          mPeriod == kInterval_32 ||
          mPeriod == kInterval_64))
    {
+      nonstandardOsc = true;
       sample = pow(mRandom.Value(gTime + samplesIn * gInvSampleRateMs), powf((1-mOsc.GetPulseWidth())*2, 2));
-      if (mMode == kLFOMode_Oscillator)   //rescale to -1 1
-         sample = (sample - .5f) * 2;
    }
    else if (mOsc.GetType() == kOsc_Drunk)
    {
+      nonstandardOsc = true;
       sample = mDrunk;
-      if (mMode == kLFOMode_Oscillator)   //rescale to -1 1
-         sample = (sample - .5f * 2);
+   }
+   else if (mOsc.GetType() == kOsc_Perlin)
+   {
+      nonstandardOsc = true;
+
+      double perlinPos = gTime + gInvSampleRateMs * samplesIn;
+      if (forcePhase != -1)
+         perlinPos += forcePhase * 1000;
+      sample = sPerlinNoise.noise(perlinPos * mFreeRate / 1000.0f, mPerlinSeed, 0);
    }
    else
    {
       sample = mOsc.Value(phase);
       if (mMode == kLFOMode_Envelope)     //rescale to 0 1
          sample = sample * .5f + .5f;
+   }
+
+   if (nonstandardOsc)
+   {
+      if (mOsc.GetPulseWidth() != .5f)
+         sample = Bias(sample, mOsc.GetPulseWidth());
+
+      if (mMode == kLFOMode_Oscillator)   //rescale to -1 1
+         sample = (sample - .5f * 2);
    }
 
    return sample;
@@ -128,8 +148,11 @@ void LFO::SetType(OscillatorType type)
       TheTransport->AddListener(this, mPeriod, OffsetInfo(0, true), false);
    else
       TheTransport->RemoveListener(this);
+
+   if (type == kOsc_Perlin)
+      mPerlinSeed = rand() % 10000;
    
-   if (mOsc.GetType() == kOsc_Drunk || mPeriod == kInterval_Free)
+   if (mOsc.GetType() == kOsc_Drunk || mOsc.GetType() == kOsc_Perlin || mPeriod == kInterval_Free)
       TheTransport->AddAudioPoller(this);
    else
       TheTransport->RemoveAudioPoller(this);
@@ -153,7 +176,7 @@ void LFO::OnTransportAdvanced(float amount)
          drunk *= -1;
       mDrunk = ofClamp(mDrunk+drunk, 0, 1);
    }
-   if (mPeriod == kInterval_Free)
+   if (mPeriod == kInterval_Free || mOsc.GetType() == kOsc_Perlin)
    {
       mFreePhase += mFreeRate * amount * TheTransport->MsPerBar() / 1000;
       if (mFreePhase > 2)
