@@ -25,10 +25,10 @@ void UserPrefsEditor::CreateUIControls()
 {
    IDrawableModule::CreateUIControls();
 
-   UIBLOCK(3,50,200);
-   DROPDOWN(mDeviceTypeDropdown, "devicetype", &mDeviceTypeIndex, 100);
-   DROPDOWN(mAudioOutputDeviceDropdown, "audio_output_device", &mAudioOutputDeviceIndex, 200);
-   DROPDOWN(mAudioInputDeviceDropdown, "audio_input_device", &mAudioInputDeviceIndex, 200);
+   UIBLOCK(165,50,200);
+   DROPDOWN(mDeviceTypeDropdown, "devicetype", &mDeviceTypeIndex, 200);
+   DROPDOWN(mAudioOutputDeviceDropdown, "audio_output_device", &mAudioOutputDeviceIndex, 350);
+   DROPDOWN(mAudioInputDeviceDropdown, "audio_input_device", &mAudioInputDeviceIndex, 350);
    DROPDOWN(mSampleRateDropdown, "samplerate", &mSampleRateIndex, 100);
    DROPDOWN(mBufferSizeDropdown, "buffersize", &mBufferSizeIndex, 100);
    TEXTENTRY_NUM(mWindowWidthEntry, "width", 5, &mWindowWidth, 1, 10000);
@@ -48,22 +48,12 @@ void UserPrefsEditor::CreateUIControls()
    BUTTON(mSaveButton, "save and exit bespoke");
    BUTTON(mCancelButton, "cancel");
    ENDUIBLOCK(mWidth, mHeight);
-   mWidth = 1000;
+   mWidth = 1150;
 
-   mDeviceTypeDropdown->DrawLabel(true);
-   mAudioOutputDeviceDropdown->DrawLabel(true);
-   mAudioInputDeviceDropdown->DrawLabel(true);
-   mSampleRateDropdown->DrawLabel(true);
-   mBufferSizeDropdown->DrawLabel(true);
-   
-   mWindowWidthEntry->DrawLabel(true);
-   mWindowHeightEntry->DrawLabel(true);
-   mWindowPositionXEntry->DrawLabel(true);
-   mWindowPositionYEntry->DrawLabel(true);
-   mTooltipsFilePathEntry->DrawLabel(true);
-   mDefaultLayoutPathEntry->DrawLabel(true);
-   mYoutubeDlPathEntry->DrawLabel(true);
-   mFfmpegPathEntry->DrawLabel(true);
+
+   mZoomSlider->SetShowName(false);
+   mScrollMultiplierVerticalSlider->SetShowName(false);
+   mScrollMultiplierHorizontalSlider->SetShowName(false);
 }
 
 void UserPrefsEditor::Show()
@@ -247,7 +237,11 @@ void UserPrefsEditor::DrawModule()
    DrawTextNormal("any changes will not take effect until bespoke is restarted", 3, 35);
 
    for (auto* control : GetUIControls())
+   {
+      if (control->IsShowing() && control != mSaveButton && control != mCancelButton)
+         DrawTextNormal(control->Name(), 3, control->GetPosition(K(local)).y + 12);
       control->Draw();
+   }
 
    if (mDeviceTypeDropdown->GetLabel(mDeviceTypeIndex) == "DirectSound")
       DrawRightLabel(mDeviceTypeDropdown, "warning: DirectSound can cause crackle and strange behavior for some sample rates and buffer sizes", ofColor::yellow);
