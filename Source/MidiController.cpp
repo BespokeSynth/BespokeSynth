@@ -1111,6 +1111,9 @@ void MidiController::DrawModule()
 
 void MidiController::DrawModuleUnclipped()
 {
+   if (Minimized() || IsVisible() == false)
+      return;
+
    const float kDisplayMs = 500;
    string displayString;
    

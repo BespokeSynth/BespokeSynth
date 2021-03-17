@@ -243,6 +243,9 @@ void ScriptModule::DrawModule()
 
 void ScriptModule::DrawModuleUnclipped()
 {
+   if (Minimized() || IsVisible() == false)
+      return;
+
    mCodeEntry->RenderOverlay();
 
    ofPushStyle();

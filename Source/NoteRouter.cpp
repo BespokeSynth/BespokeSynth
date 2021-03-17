@@ -28,7 +28,6 @@ void NoteRouter::CreateUIControls()
 
 void NoteRouter::DrawModule()
 {
-
    if (Minimized() || IsVisible() == false)
       return;
    mRouteSelector->Draw();
@@ -36,6 +35,9 @@ void NoteRouter::DrawModule()
 
 void NoteRouter::DrawModuleUnclipped()
 {
+   if (Minimized() || IsVisible() == false)
+      return;
+
    for (int i=0; i<mReceivers.size(); ++i)
       DrawConnection(dynamic_cast<IClickable*>(mReceivers[i]));
 }

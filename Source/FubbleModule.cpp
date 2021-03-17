@@ -305,8 +305,10 @@ float FubbleModule::GetPerlinNoiseValue(double time, float x, float y, bool hori
 
 void FubbleModule::DrawModuleUnclipped()
 {
-   if (!Minimized())
-      DrawTextNormal("(concept by @_ojack_)", 60, -3, 11);
+   if (Minimized() || IsVisible() == false)
+      return;
+
+   DrawTextNormal("(concept by @_ojack_)", 60, -3, 11);
 }
 
 ofRectangle FubbleModule::GetFubbleRect()
