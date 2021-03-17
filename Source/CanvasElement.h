@@ -39,7 +39,6 @@ public:
    void SetEnd(float end);
    vector<IUIControl*>& GetUIControls() { return mUIControls; }
    
-   virtual ofColor GetColor() const { return ofColor::grey; }
    virtual bool IsResizable() const { return true; }
    virtual CanvasElement* CreateDuplicate() const = 0;
    
@@ -56,7 +55,7 @@ public:
    float mLength;
    
 protected:
-   virtual void DrawContents() = 0;
+   virtual void DrawContents(bool wrapped) = 0;
    void DrawElement(bool wrapped);
    void AddElementUIControl(IUIControl* control);
    
@@ -87,7 +86,7 @@ public:
    void LoadState(FileStreamIn& in) override;
    
 private:
-   void DrawContents() override;
+   void DrawContents(bool wrapped) override;
    
    float mVelocity;
    FloatSlider* mElementOffsetSlider;
@@ -127,7 +126,7 @@ public:
    void LoadState(FileStreamIn& in) override;
    
 private:
-   void DrawContents() override;
+   void DrawContents(bool wrapped) override;
    
    Sample* mSample;
    int mNumLoops;
@@ -155,7 +154,6 @@ public:
    void Trigger();
    void TriggerEnd();
    
-   ofColor GetColor() const override;
    bool IsResizable() const override { return mIsCheckbox; }
    float GetEnd() const override;
    
@@ -163,7 +161,7 @@ public:
    void LoadState(FileStreamIn& in) override;
    
 private:
-   void DrawContents() override;
+   void DrawContents(bool wrapped) override;
    
    IUIControl* mUIControl;
    float mValue;

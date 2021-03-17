@@ -320,23 +320,17 @@ void NoteCanvas::DrawModule()
    
    ofPushStyle();
    ofFill();
-   for (int i=0;i<mCanvas->GetNumVisibleRows();++i)
+   for (int i=0;i<128;++i)
    {
-      bool drawBox = true;
-      int pitch = 127-mCanvas->GetRowOffset()-i;
-      if (pitch%TheScale->GetTet() == TheScale->ScaleRoot()%TheScale->GetTet())
-         ofSetColor(0,255,0,80);
-      else if (pitch%TheScale->GetTet() == (TheScale->ScaleRoot()+7)%TheScale->GetTet())
-         ofSetColor(200,150,0,80);
+      int pitch = 127-i;
+      if (pitch%TheScale->GetTet() == TheScale->ScaleRoot() % TheScale->GetTet())
+         mCanvas->SetRowColor(i, ofColor(0, 255, 0, 80));
+      else if (pitch%TheScale->GetTet() == (TheScale->ScaleRoot() + 7) % TheScale->GetTet())
+         mCanvas->SetRowColor(i, ofColor(200, 150, 0, 80));
       else if (TheScale->IsInScale(pitch))
-         ofSetColor(100,75,0,80);
+         mCanvas->SetRowColor(i, ofColor(100, 75, 0, 80));
       else
-         drawBox = false;
-      
-      float boxHeight = (float(mCanvas->GetGridHeight())/mCanvas->GetNumVisibleRows());
-      float y = mCanvas->GetPosition(true).y + i*boxHeight;
-      if (drawBox)
-         ofRect(mCanvas->GetPosition(true).x,y,mCanvas->GetGridWidth(),boxHeight);
+         mCanvas->SetRowColor(i, ofColor(100,100,100,30));
    }
    ofPopStyle();
    

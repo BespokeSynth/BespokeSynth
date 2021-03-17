@@ -37,54 +37,46 @@ void CanvasElement::DrawElement(bool wrapped)
 {
    ofRectangle rect = GetRect(K(clamp), wrapped);
    ofRectangle fullRect = GetRect(!K(clamp), wrapped);
-   
-   ofPushStyle();
-   ofSetLineWidth(.5f);
-   
-   ofSetColor(GetColor());
-   ofFill();
-   ofRect(rect, 0);
 
    ofPushStyle();
-   DrawContents();
+   DrawContents(wrapped);
    ofPopStyle();
    
-   ofNoFill();
    if (mHighlighted)
    {
-      ofSetColor(255,200,0);
+      ofPushStyle();
+      ofNoFill();
+      ofSetColor(255, 200, 0);
       ofSetLineWidth(.75f);
-   }
-   else
-   {
-      ofSetColor(0,0,0);
-   }
-   ofLine(rect.x,rect.y,rect.x+rect.width,rect.y);
-   ofLine(rect.x,rect.y+rect.height,rect.x+rect.width,rect.y+rect.height);
-   if (fullRect.x >= 0)
-   {
-      ofPushStyle();
-      if (mHighlighted && mCanvas->GetHighlightEnd() == Canvas::kHighlightEnd_Start)
+
+      ofLine(rect.x, rect.y, rect.x + rect.width, rect.y);
+      ofLine(rect.x, rect.y + rect.height, rect.x + rect.width, rect.y + rect.height);
+
+      if (fullRect.x >= 0)
       {
-         ofSetLineWidth(1.5f);
-         ofSetColor(255,100,100);
+         ofPushStyle();
+         if (mCanvas->GetHighlightEnd() == Canvas::kHighlightEnd_Start)
+         {
+            ofSetLineWidth(1.5f);
+            ofSetColor(255, 100, 100);
+         }
+         ofLine(rect.x, rect.y, rect.x, rect.y + rect.height);
+         ofPopStyle();
       }
-      ofLine(rect.x,rect.y,rect.x,rect.y+rect.height);
+      if (fullRect.x + fullRect.width <= mCanvas->GetLength() * mCanvas->GetGridWidth())
+      {
+         ofPushStyle();
+         if (mCanvas->GetHighlightEnd() == Canvas::kHighlightEnd_End && IsResizable())
+         {
+            ofSetLineWidth(1.5f);
+            ofSetColor(255, 100, 100);
+         }
+         ofLine(rect.x + rect.width, rect.y, rect.x + rect.width, rect.y + rect.height);
+         ofPopStyle();
+      }
+
       ofPopStyle();
    }
-   if (fullRect.x+fullRect.width <= mCanvas->GetLength() * mCanvas->GetGridWidth())
-   {
-      ofPushStyle();
-      if (mHighlighted && mCanvas->GetHighlightEnd() == Canvas::kHighlightEnd_End && IsResizable())
-      {
-         ofSetLineWidth(1.5f);
-         ofSetColor(255,100,100);
-      }
-      ofLine(rect.x+rect.width,rect.y,rect.x+rect.width,rect.y+rect.height);
-      ofPopStyle();
-   }
-   
-   ofPopStyle();
 }
 
 float CanvasElement::GetStart() const
@@ -218,19 +210,22 @@ CanvasElement* NoteCanvasElement::CreateDuplicate() const
    return element;
 }
 
-void NoteCanvasElement::DrawContents()
+void NoteCanvasElement::DrawContents(bool wrapped)
 {
    ofPushStyle();
-   ofSetColor(255,255,255);
    ofFill();
    //DrawTextNormal(ofToString(mVelocity), GetRect(true, false).x, GetRect(true, false).y);
    for (int i=0; i<2; ++i)
    {
       ofRectangle rect = GetRect(true, i==0 ? false : true);
-      float oldHeight = rect.height;
+      float fullHeight = rect.height;
       rect.height *= mVelocity;
-      rect.y += oldHeight - rect.height;
-      ofRect(rect, 0);
+      rect.y += (fullHeight - rect.height) * .5f;
+      if (rect.width > 0)
+      {
+         ofSetColorGradient(ofColor::white, ofColor(210,210,210), ofVec2f(ofLerp(rect.getMinX(),rect.getMaxX(),.5f), rect.y), ofVec2f(rect.getMaxX(), rect.y));
+         ofRect(rect, 0);
+      }
       
       /*ofPushStyle();
       ofSetLineWidth(1.5f * gDrawScale);
@@ -370,10 +365,8 @@ void SampleCanvasElement::CheckboxUpdated(string label, bool value)
    }
 }
 
-void SampleCanvasElement::DrawContents()
-{
-   mLength = mNumBars * mNumLoops;
-   
+void SampleCanvasElement::DrawContents(bool wrapped)
+{   
    ofRectangle fullRect = GetRect(false, false);
    ofRectangle clampedRect = GetRect(true, false);
    float clampedRectEndX = clampedRect.x + clampedRect.width;
@@ -424,7 +417,8 @@ void SampleCanvasElement::SaveState(FileStreamOut& out)
    
    bool hasSample = mSample != nullptr;
    out << hasSample;
-   mSample->SaveState(out);
+   if (mSample != nullptr)
+      mSample->SaveState(out);
    out << mNumLoops;
    out << mNumBars;
    out << mVolume;
@@ -483,10 +477,14 @@ CanvasElement* EventCanvasElement::CreateDuplicate() const
    return element;
 }
 
-void EventCanvasElement::DrawContents()
+void EventCanvasElement::DrawContents(bool wrapped)
 {
    if (GetRect(false,false).width != GetRect(true,false).width)
       return;  //only draw text for fully visible elements
+
+   ofSetColor(mEventCanvas->GetRowColor(mRow));
+   ofFill();
+   ofRect(GetRect(K(clamp), wrapped), 0);
    
    string text;
    if (mIsCheckbox)
@@ -536,11 +534,6 @@ void EventCanvasElement::TriggerEnd()
 {
    if (mUIControl && mIsCheckbox)
        mUIControl->SetValue(0);
-}
-
-ofColor EventCanvasElement::GetColor() const
-{
-   return mEventCanvas->GetRowColor(mRow);
 }
 
 float EventCanvasElement::GetEnd() const

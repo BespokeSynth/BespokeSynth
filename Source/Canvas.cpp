@@ -42,6 +42,9 @@ Canvas::Canvas(IDrawableModule* parent, int x, int y, int w, int h, float length
    SetName("canvas");
    SetPosition(x,y);
    SetParent(parent);
+
+   for (size_t i = 0; i < mRowColors.size(); ++i)
+      mRowColors[i] = ofColor(200, 200, 200, 70);
 }
 
 Canvas::~Canvas()
@@ -81,11 +84,17 @@ void Canvas::Render()
    }
    ofRect(0,0,GetGridWidth(),GetGridHeight(),0);
    
-   for (int i=1; i<GetNumVisibleRows(); ++i)
+   ofPushStyle();
+   ofFill();
+   const float rowHeight = GetGridHeight() / GetNumVisibleRows();
+   for (int i=0; i<GetNumVisibleRows(); ++i)
    {
-      float pos = i*GetGridHeight()/GetNumVisibleRows();
-      ofLine(0, pos, GetGridWidth(), pos);
+      int row = mRowOffset + i;
+      if (row >= 0 && row < mRowColors.size())
+         ofSetColorGradient(mRowColors[row], ofColor::lerp(mRowColors[row], ofColor::clear, .1f), ofVec2f(0,i*rowHeight + rowHeight*0.0f), ofVec2f(0, i*rowHeight+rowHeight));
+      ofRect(0, i*rowHeight, GetGridWidth(), rowHeight, 0);
    }
+   ofPopStyle();
    
    for (int i=0; i<GetNumCols(); ++i)
    {
@@ -566,6 +575,12 @@ void Canvas::RescaleNumCols(int cols)
       element->mLength *= ratio;
    }
    mNumCols = cols;
+}
+
+void Canvas::SetRowColor(int row, ofColor color)
+{
+   if (row >= 0 && row <= mRowColors.size())
+      mRowColors[row] = color;
 }
 
 CanvasElement* Canvas::GetElementAt(float pos, int row)

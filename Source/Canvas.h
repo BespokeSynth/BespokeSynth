@@ -99,6 +99,7 @@ public:
    void SetDragMode(DragMode mode) { mDragMode = mode; }
    bool IsRowVisible(int row) const;
    void SetScrollable(bool scrollable) { mScrollable = scrollable; }
+   void SetRowColor(int row, ofColor color);
    
    //IUIControl
    void SetFromMidiCC(float slider) override {}
@@ -147,6 +148,7 @@ private:
    int mMajorColumnInterval;
    bool mHasDuplicatedThisDrag;
    bool mScrollable;
+   std::array<ofColor, 128> mRowColors;
    
    int mNumRows;
    int mNumCols;
