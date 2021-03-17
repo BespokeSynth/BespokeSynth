@@ -898,7 +898,7 @@ PatchCableOld IDrawableModule::GetPatchCableOld(IClickable* target)
    return cable;
 }
 
-void IDrawableModule::FindClosestSides(float xThis,float yThis,float wThis,float hThis,float xThat,float yThat,float wThat,float hThat, float& startX,float& startY,float& endX,float& endY)
+void IDrawableModule::FindClosestSides(float xThis, float yThis, float wThis, float hThis, float xThat, float yThat, float wThat, float hThat, float& startX, float& startY, float& endX, float& endY, bool sidesOnly /*= false*/)
 {
    ofVec2f vDirs[4];
    vDirs[0].set(-1,0);
@@ -923,6 +923,9 @@ void IDrawableModule::FindClosestSides(float xThis,float yThis,float wThis,float
    {
       if (i == 2) //skip top
          continue;
+
+      if (sidesOnly && i == 3)
+         continue;   //skip bottom
       
       for (int j=0; j<4; ++j)
       {
@@ -947,7 +950,7 @@ void IDrawableModule::FindClosestSides(float xThis,float yThis,float wThis,float
    startY = vThis[closestPair%4].y;
    endX = vThat[closestPair/4].x;
    endY = vThat[closestPair/4].y;
-   if (endY > vThis[3].y)
+   if (endY > vThis[3].y && !sidesOnly)
    {
       startX = vThis[3].x;
       startY = vThis[3].y;

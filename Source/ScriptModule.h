@@ -63,6 +63,7 @@ public:
    //ICodeEntryListener
    void ExecuteCode() override;
    pair<int,int> ExecuteBlock(int lineStart, int lineEnd) override;
+   void OnCodeUpdated() override;
    
    //INoteReceiver
    void PlayNote(double time, int pitch, int velocity, int voiceIdx = -1, ModulationParameters modulation = ModulationParameters()) override;

@@ -306,8 +306,6 @@ void ScriptModule::DrawModuleUnclipped()
 
    if (mBoundModuleConnections.size() > 0)
    {
-      vector<string> lines = mCodeEntry->GetLines();
-
       for (size_t i = 0; i < mBoundModuleConnections.size(); ++i)
       {
          if (mBoundModuleConnections[i].mTarget == nullptr)
@@ -318,39 +316,22 @@ void ScriptModule::DrawModuleUnclipped()
             continue;
          }
 
-         ofSetColor(IDrawableModule::GetColor(kModuleType_Other));
+         ofVec2f linePos = mCodeEntry->GetLinePos(mBoundModuleConnections[i].mLineIndex, false);
 
-         if (mBoundModuleConnections[i].mLineText != lines[mBoundModuleConnections[i].mLineIndex])
-         {
-            bool found = false;
-            for (size_t j = 0; j < lines.size(); ++j)
-            {
-               if (lines[j] == mBoundModuleConnections[i].mLineText)
-               {
-                  found = true;
-                  mBoundModuleConnections[i].mLineIndex = j;
-               }
-            }
+         ofSetColor(IDrawableModule::GetColor(kModuleType_Other), 30);
+         ofFill();
+         float codeY = mCodeEntry->GetPosition(true).y;
+         float topY = ofClamp(linePos.y + 3, codeY, codeY+mCodeEntry->GetRect().height);
+         float bottomY = ofClamp(linePos.y + 3 + mCodeEntry->GetCharHeight(), codeY, codeY+mCodeEntry->GetRect().height);
+         ofRectangle lineRect(linePos.x, topY, mCodeEntry->GetRect().width, bottomY - topY);
+         ofRect(lineRect, L(corner, 0));
 
-            if (!found)
-               mBoundModuleConnections[i].mTarget = nullptr;
-         }
-
-         if (mBoundModuleConnections[i].mTarget != nullptr)
-         {
-            ofVec2f linePos = mCodeEntry->GetLinePos(mBoundModuleConnections[i].mLineIndex, false);
-
-            ofPushMatrix();
-            ofTranslate(-mX, -mY);
-            ofSetLineWidth(1.5f);
-
-            float startX, startY, endX, endY;
-            ofRectangle targetRect = mBoundModuleConnections[i].mTarget->GetRect();
-            FindClosestSides(mX + linePos.x, mY + linePos.y + 10, 0, 0, targetRect.x, targetRect.y, targetRect.width, targetRect.height, startX, startY, endX, endY);
-            ofLine(startX, startY, endX, endY);
-            
-            ofPopMatrix();
-         }
+         ofSetLineWidth(2);
+         ofSetColor(IDrawableModule::GetColor(kModuleType_Other), 30);
+         float startX, startY, endX, endY;
+         ofRectangle targetRect = mBoundModuleConnections[i].mTarget->GetRect();
+         FindClosestSides(lineRect.x, lineRect.y, lineRect.width, lineRect.height, targetRect.x - mX, targetRect.y - mY, targetRect.width, targetRect.height, startX, startY, endX, endY, K(sidesOnly));
+         ofLine(startX, startY, endX, endY);
       }
    }
 
@@ -850,6 +831,33 @@ pair<int,int> ScriptModule::ExecuteBlock(int lineStart, int lineEnd)
    return RunScript(gTime, lineStart, lineEnd);
 }
 
+void ScriptModule::OnCodeUpdated()
+{
+   if (mBoundModuleConnections.size() > 0)
+   {
+      vector<string> lines = mCodeEntry->GetLines();
+
+      for (size_t i = 0; i < mBoundModuleConnections.size(); ++i)
+      {
+         if (mBoundModuleConnections[i].mLineText != lines[mBoundModuleConnections[i].mLineIndex])
+         {
+            bool found = false;
+            for (size_t j = 0; j < lines.size(); ++j)
+            {
+               if (lines[j] == mBoundModuleConnections[i].mLineText)
+               {
+                  found = true;
+                  mBoundModuleConnections[i].mLineIndex = j;
+               }
+            }
+
+            if (!found)
+               mBoundModuleConnections[i].mTarget = nullptr;
+         }
+      }
+   }
+}
+
 void ScriptModule::OnPulse(double time, float velocity, int flags)
 {
    for (size_t i=0; i<mScheduledPulseTimes.size(); ++i)
@@ -1070,6 +1078,8 @@ void ScriptModule::FixUpCode(string& code)
 void ScriptModule::GetFirstAndLastCharacter(string line, char& first, char& last)
 {
    bool hasFirstCharacter = false;
+   first = 0;
+   last = 0;
    for (size_t i = 0; i < line.length(); ++i)
    {
       char c = line[i];

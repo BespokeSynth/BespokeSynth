@@ -639,6 +639,9 @@ void CodeEntry::OnCodeUpdated()
    {
       mSyntaxHighlightMapping.clear();
    }
+
+   if (mListener)
+      mListener->OnCodeUpdated();
 }
 
 bool CodeEntry::IsAutocompleteShowing()
