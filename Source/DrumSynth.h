@@ -25,7 +25,6 @@
 #include "RadioButton.h"
 #include "PeakTracker.h"
 #include "BiquadFilter.h"
-#include "MidiDevice.h"
 #include "DrumPlayer.h"
 #include "TextEntry.h"
 
@@ -33,7 +32,7 @@ class MidiController;
 
 #define PAD_DRAW_SIZE 140
 
-class DrumSynth : public IAudioSource, public INoteReceiver, public IDrawableModule, public IFloatSliderListener, public IDropdownListener, public IButtonListener, public IIntSliderListener, public IRadioButtonListener, public MidiDeviceListener, public ITextEntryListener
+class DrumSynth : public IAudioSource, public INoteReceiver, public IDrawableModule, public IFloatSliderListener, public IDropdownListener, public IButtonListener, public IIntSliderListener, public IRadioButtonListener, public ITextEntryListener
 {
 public:
    DrumSynth();
@@ -50,10 +49,6 @@ public:
    //INoteReceiver
    void PlayNote(double time, int pitch, int velocity, int voiceIdx = -1, ModulationParameters modulation = ModulationParameters()) override;
    void SendCC(int control, int value, int voiceIdx = -1) override {}
-   
-   //MidiDeviceListener
-   void OnMidiNote(MidiNote& note) override;
-   void OnMidiControl(MidiControl& control) override;
    
    void FloatSliderUpdated(FloatSlider* slider, float oldVal) override;
    void IntSliderUpdated(IntSlider* slider, int oldVal) override;
@@ -74,7 +69,8 @@ private:
       EnvOscillator mTone;
       EnvOscillator mNoise;
       ::ADSR mFreqAdsr;
-      float mFreq;
+      float mFreqMax;
+      float mFreqMin;
       float mVol;
       float mVolNoise;
    };
@@ -96,7 +92,8 @@ private:
       ADSRDisplay* mFreqAdsrDisplay;
       ADSRDisplay* mNoiseAdsrDisplay;
       FloatSlider* mVolSlider;
-      FloatSlider* mFreqSlider;
+      FloatSlider* mFreqMaxSlider;
+      FloatSlider* mFreqMinSlider;
       RadioButton* mToneType;
       double mStartTime;
       PeakTracker mLevel;
@@ -107,17 +104,7 @@ private:
       int mY;
    };
    
-   struct StoredDrumKit
-   {
-      string mName;
-      DrumSynthHitSerialData mHits[NUM_DRUM_HITS];
-   };
-   
-   void LoadKit(int kit);
    int GetAssociatedSampleIndex(int x, int y);
-   void ReadKits();
-   void SaveKits();
-   void CreateKit();
    
    //IDrawableModule
    void DrawModule() override;
@@ -131,17 +118,9 @@ private:
    
    float* mOutputBuffer;
    float mVolume;
-   int mLoadedKit;
    FloatSlider* mVolSlider;
-   DropdownList* mKitSelector;
    bool mEditMode;
    Checkbox* mEditCheckbox;
-   std::vector<StoredDrumKit> mKits;
-   ClickButton* mSaveButton;
-   ClickButton* mNewKitButton;
-   MidiController* mTwister;
-   char mNewKitName[MAX_TEXTENTRY_LENGTH];
-   TextEntry* mNewKitNameEntry;
 };
 
 #endif /* defined(__Bespoke__DrumSynth__) */

@@ -13,22 +13,14 @@
 #include "ModularSynth.h"
 #include "MidiController.h"
 #include "Profiler.h"
-#include "FillSaveDropdown.h"
 
 DrumSynth::DrumSynth()
 : mVolume(1)
-, mLoadedKit(0)
 , mVolSlider(nullptr)
-, mKitSelector(nullptr)
 , mEditMode(false)
 , mEditCheckbox(nullptr)
-, mSaveButton(nullptr)
-, mNewKitButton(nullptr)
 , mCurrentEditHit(3)
-, mNewKitNameEntry(nullptr)
 {
-   ReadKits();
-
    mOutputBuffer = new float[gBufferSize];
    
    for (int i=0; i<NUM_DRUM_HITS; ++i)
@@ -37,22 +29,13 @@ DrumSynth::DrumSynth()
       int y = (3-(i/4))*PAD_DRAW_SIZE + 70;
       mHits[i] = new DrumSynthHit(this, i,  x, y);
    }
-   
-   strcpy(mNewKitName, "new");
 }
 
 void DrumSynth::CreateUIControls()
 {
    IDrawableModule::CreateUIControls();
    mVolSlider = new FloatSlider(this,"vol",4,4,100,15,&mVolume,0,2);
-   mKitSelector = new DropdownList(this,"kit",4,20,&mLoadedKit);
    mEditCheckbox = new Checkbox(this,"edit",73,20,&mEditMode);
-   mSaveButton = new ClickButton(this,"save current",200,22);
-   mNewKitButton = new ClickButton(this,"new kit", 200, 4);
-   mNewKitNameEntry = new TextEntry(this,"kitname", 130,4,7,mNewKitName);
-   
-   for (int i=0; i<mKits.size(); ++i)
-      mKitSelector->AddLabel(mKits[i].mName.c_str(), i);
    
    for (int i=0; i<NUM_DRUM_HITS; ++i)
       mHits[i]->CreateUIControls();
@@ -63,34 +46,6 @@ DrumSynth::~DrumSynth()
    delete[] mOutputBuffer;
    for (int i=0; i<NUM_DRUM_HITS; ++i)
       delete mHits[i];
-}
-
-void DrumSynth::LoadKit(int kit)
-{
-   if (kit >= 0 && kit < mKits.size())
-   {
-      mLoadedKit = kit;
-      
-      for (int j=0; j<NUM_DRUM_HITS; ++j)
-      {
-         mHits[j]->mData.mTone.mOsc.mType = mKits[kit].mHits[j].mTone.mOsc.mType;
-         mHits[j]->mData.mVol = mKits[kit].mHits[j].mVol;
-         mHits[j]->mData.mTone.GetADSR()->GetA() = mKits[kit].mHits[j].mTone.GetADSR()->GetA();
-         mHits[j]->mData.mTone.GetADSR()->GetD() = mKits[kit].mHits[j].mTone.GetADSR()->GetD();
-         mHits[j]->mData.mTone.GetADSR()->GetS() = mKits[kit].mHits[j].mTone.GetADSR()->GetS();
-         mHits[j]->mData.mTone.GetADSR()->GetR() = mKits[kit].mHits[j].mTone.GetADSR()->GetR();
-         mHits[j]->mData.mVolNoise = mKits[kit].mHits[j].mVolNoise;
-         mHits[j]->mData.mNoise.GetADSR()->GetA() = mKits[kit].mHits[j].mNoise.GetADSR()->GetA();
-         mHits[j]->mData.mNoise.GetADSR()->GetD() = mKits[kit].mHits[j].mNoise.GetADSR()->GetD();
-         mHits[j]->mData.mNoise.GetADSR()->GetS() = mKits[kit].mHits[j].mNoise.GetADSR()->GetS();
-         mHits[j]->mData.mNoise.GetADSR()->GetR() = mKits[kit].mHits[j].mNoise.GetADSR()->GetR();
-         mHits[j]->mData.mFreq = mKits[kit].mHits[j].mFreq;
-         mHits[j]->mData.mFreqAdsr.GetA() = mKits[kit].mHits[j].mFreqAdsr.GetA();
-         mHits[j]->mData.mFreqAdsr.GetD() = mKits[kit].mHits[j].mFreqAdsr.GetD();
-         mHits[j]->mData.mFreqAdsr.GetS() = mKits[kit].mHits[j].mFreqAdsr.GetS();
-         mHits[j]->mData.mFreqAdsr.GetR() = mKits[kit].mHits[j].mFreqAdsr.GetR();
-      }
-   }
 }
 
 void DrumSynth::Process(double time)
@@ -160,21 +115,14 @@ void DrumSynth::OnClicked(int x, int y, bool right)
 
 void DrumSynth::DrawModule()
 {
-
-   
    if (Minimized() || IsVisible() == false)
       return;
    
    mVolSlider->Draw();
-   mKitSelector->Draw();
    mEditCheckbox->Draw();
    
    if (mEditMode)
    {
-      mSaveButton->Draw();
-      mNewKitButton->Draw();
-      mNewKitNameEntry->Draw();
-      
       ofPushMatrix();
       for (int i=0; i<NUM_DRUM_HITS; ++i)
       {
@@ -201,192 +149,12 @@ void DrumSynth::DrawModule()
    }
 }
 
-void DrumSynth::OnMidiNote(MidiNote& note)
-{
-}
-
-void DrumSynth::OnMidiControl(MidiControl& control)
-{
-   int c = control.mControl;
-   if (c >= 32 && c < 48)
-   {
-      if (control.mChannel == 1)
-      {
-         float value = control.mValue / 127.0f;
-         if (c == 32)
-            mHits[mCurrentEditHit]->mVolSlider->SetFromMidiCC(value);
-         else if (c == 33)
-            mHits[mCurrentEditHit]->mVolNoiseSlider->SetFromMidiCC(value);
-         else if (c == 34)
-            mHits[mCurrentEditHit]->mToneType->SetFromMidiCC(value);
-         else if (c == 35)
-            mHits[mCurrentEditHit]->mFreqSlider->SetFromMidiCC(value);
-         else
-         {
-            int row = (c - 32) / 4;
-            int col = (c - 32) % 4;
-            
-            ::ADSR* adsr;
-            
-            if (row == 1)
-               adsr = mHits[mCurrentEditHit]->mData.mTone.GetADSR();
-            else if (row == 2)
-               adsr = mHits[mCurrentEditHit]->mData.mNoise.GetADSR();
-            else
-               adsr = &mHits[mCurrentEditHit]->mData.mFreqAdsr;
-            
-            if (col == 0)
-               adsr->GetA() = value * 300 + 1;
-            else if (col == 1)
-               adsr->GetD() = value * 300;
-            else if (col == 2)
-               adsr->GetS() = value;
-            else
-               adsr->GetR() = value * 300 + 1;
-         }
-         
-      }
-      else if (control.mChannel == 2)
-      {
-         int pos = 47 - c;
-         int x = 3 - pos % 4;
-         int y = 3 - pos / 4;
-         int index = GetAssociatedSampleIndex(x, y);
-         
-         if (index >= 0 && index < NUM_DRUM_HITS)
-         {
-            mCurrentEditHit = index;
-            
-            mTwister->SendCC(0, 32, mHits[mCurrentEditHit]->mVolSlider->GetMidiValue()*127);
-            mTwister->SendCC(0, 33, mHits[mCurrentEditHit]->mVolNoiseSlider->GetMidiValue()*127);
-            mTwister->SendCC(0, 34, mHits[mCurrentEditHit]->mToneType->GetMidiValue()*127);
-            mTwister->SendCC(0, 35, mHits[mCurrentEditHit]->mFreqSlider->GetMidiValue()*127);
-            for (int i=0; i<3; ++i)
-            {
-               ::ADSR* adsr;
-               if (i == 0)
-                  adsr = mHits[mCurrentEditHit]->mData.mTone.GetADSR();
-               else if (i == 1)
-                  adsr = mHits[mCurrentEditHit]->mData.mNoise.GetADSR();
-               else
-                  adsr = &mHits[mCurrentEditHit]->mData.mFreqAdsr;
-               
-               mTwister->SendCC(0, 36+i*4, adsr->GetA()/300*127);
-               mTwister->SendCC(0, 37+i*4, adsr->GetD()/300*127);
-               mTwister->SendCC(0, 38+i*4, adsr->GetS()*127);
-               mTwister->SendCC(0, 39+i*4, adsr->GetR()/300*127);
-            }
-         }
-      }
-   }
-}
-
 int DrumSynth::GetAssociatedSampleIndex(int x, int y)
 {
    int pos = x+(3-y)*4;
    if (pos < 16)
       return pos;
    return -1;
-}
-
-void DrumSynth::SaveKits()
-{
-   ofxJSONElement root;
-   
-   Json::Value& kits = root["kits"];
-   for (int i=0; i<mKits.size(); ++i)
-   {
-      Json::Value& kit = kits[i];
-      
-      if (i == mLoadedKit)
-      {
-         for (int j=0; j<NUM_DRUM_HITS; ++j)
-         {
-            mKits[i].mHits[j].mTone.mOsc.mType = mHits[j]->mData.mTone.mOsc.mType;
-            mKits[i].mHits[j].mVol = mHits[j]->mData.mVol;
-            mKits[i].mHits[j].mTone.GetADSR()->GetA() = mHits[j]->mData.mTone.GetADSR()->GetA();
-            mKits[i].mHits[j].mTone.GetADSR()->GetD() = mHits[j]->mData.mTone.GetADSR()->GetD();
-            mKits[i].mHits[j].mTone.GetADSR()->GetS() = mHits[j]->mData.mTone.GetADSR()->GetS();
-            mKits[i].mHits[j].mTone.GetADSR()->GetR() = mHits[j]->mData.mTone.GetADSR()->GetR();
-            mKits[i].mHits[j].mVolNoise = mHits[j]->mData.mVolNoise;
-            mKits[i].mHits[j].mNoise.GetADSR()->GetA() = mHits[j]->mData.mNoise.GetADSR()->GetA();
-            mKits[i].mHits[j].mNoise.GetADSR()->GetD() = mHits[j]->mData.mNoise.GetADSR()->GetD();
-            mKits[i].mHits[j].mNoise.GetADSR()->GetS() = mHits[j]->mData.mNoise.GetADSR()->GetS();
-            mKits[i].mHits[j].mNoise.GetADSR()->GetR() = mHits[j]->mData.mNoise.GetADSR()->GetR();
-            mKits[i].mHits[j].mFreq = mHits[j]->mData.mFreq;
-            mKits[i].mHits[j].mFreqAdsr.GetA() = mHits[j]->mData.mFreqAdsr.GetA();
-            mKits[i].mHits[j].mFreqAdsr.GetD() = mHits[j]->mData.mFreqAdsr.GetD();
-            mKits[i].mHits[j].mFreqAdsr.GetS() = mHits[j]->mData.mFreqAdsr.GetS();
-            mKits[i].mHits[j].mFreqAdsr.GetR() = mHits[j]->mData.mFreqAdsr.GetR();
-         }
-      }
-      
-      for (int j=0; j<NUM_DRUM_HITS; ++j)
-      {
-         kit["hits"][j]["tonetype"] = mKits[i].mHits[j].mTone.mOsc.mType;
-         kit["hits"][j]["tonevol"] = mKits[i].mHits[j].mVol;
-         kit["hits"][j]["tone_a"] = mKits[i].mHits[j].mTone.GetADSR()->GetA();
-         kit["hits"][j]["tone_d"] = mKits[i].mHits[j].mTone.GetADSR()->GetD();
-         kit["hits"][j]["tone_s"] = mKits[i].mHits[j].mTone.GetADSR()->GetS();
-         kit["hits"][j]["tone_r"] = mKits[i].mHits[j].mTone.GetADSR()->GetR();
-         kit["hits"][j]["noisevol"] = mKits[i].mHits[j].mVolNoise;
-         kit["hits"][j]["noise_a"] = mKits[i].mHits[j].mNoise.GetADSR()->GetA();
-         kit["hits"][j]["noise_d"] = mKits[i].mHits[j].mNoise.GetADSR()->GetD();
-         kit["hits"][j]["noise_s"] = mKits[i].mHits[j].mNoise.GetADSR()->GetS();
-         kit["hits"][j]["noise_r"] = mKits[i].mHits[j].mNoise.GetADSR()->GetR();
-         kit["hits"][j]["freq"] = mKits[i].mHits[j].mFreq;
-         kit["hits"][j]["freq_a"] = mKits[i].mHits[j].mFreqAdsr.GetA();
-         kit["hits"][j]["freq_d"] = mKits[i].mHits[j].mFreqAdsr.GetD();
-         kit["hits"][j]["freq_s"] = mKits[i].mHits[j].mFreqAdsr.GetS();
-         kit["hits"][j]["freq_r"] = mKits[i].mHits[j].mFreqAdsr.GetR();
-      }
-      kit["name"] = mKits[i].mName;
-   }
-   
-   root.save(ofToDataPath("drums/drumsynth.json"), true);
-}
-
-void DrumSynth::ReadKits()
-{
-   ofxJSONElement root;
-   root.open(ofToDataPath("drums/drumsynth.json"));
-   
-   Json::Value& kits = root["kits"];
-   mKits.resize(kits.size());
-   for (int i=0; i<kits.size(); ++i)
-   {
-      Json::Value& kit = kits[i];
-      for (int j=0; j<NUM_DRUM_HITS; ++j)
-      {
-         mKits[i].mHits[j].mTone.mOsc.mType = (OscillatorType)kit["hits"][j]["tonetype"].asInt();
-         mKits[i].mHits[j].mVol = kit["hits"][j]["tonevol"].asDouble();
-         mKits[i].mHits[j].mTone.GetADSR()->GetA() = kit["hits"][j]["tone_a"].asDouble();
-         mKits[i].mHits[j].mTone.GetADSR()->GetD() = kit["hits"][j]["tone_d"].asDouble();
-         mKits[i].mHits[j].mTone.GetADSR()->GetS() = kit["hits"][j]["tone_s"].asDouble();
-         mKits[i].mHits[j].mTone.GetADSR()->GetR() = kit["hits"][j]["tone_r"].asDouble();
-         mKits[i].mHits[j].mVolNoise = kit["hits"][j]["noisevol"].asDouble();
-         mKits[i].mHits[j].mNoise.GetADSR()->GetA() = kit["hits"][j]["noise_a"].asDouble();
-         mKits[i].mHits[j].mNoise.GetADSR()->GetD() = kit["hits"][j]["noise_d"].asDouble();
-         mKits[i].mHits[j].mNoise.GetADSR()->GetS() = kit["hits"][j]["noise_s"].asDouble();
-         mKits[i].mHits[j].mNoise.GetADSR()->GetR() = kit["hits"][j]["noise_r"].asDouble();
-         mKits[i].mHits[j].mFreq = kit["hits"][j]["freq"].asDouble();
-         mKits[i].mHits[j].mFreqAdsr.GetA() = kit["hits"][j]["freq_a"].asDouble();
-         mKits[i].mHits[j].mFreqAdsr.GetD() = kit["hits"][j]["freq_d"].asDouble();
-         mKits[i].mHits[j].mFreqAdsr.GetS() = kit["hits"][j]["freq_s"].asDouble();
-         mKits[i].mHits[j].mFreqAdsr.GetR() = kit["hits"][j]["freq_r"].asDouble();
-      }
-      mKits[i].mName = kit["name"].asString();
-   }
-}
-
-void DrumSynth::CreateKit()
-{
-   StoredDrumKit kit;
-   
-   kit.mName = mNewKitName;
-   mKits.push_back(kit);
-   mLoadedKit = (int)mKits.size() - 1;
-   mKitSelector->AddLabel(kit.mName.c_str(), mLoadedKit);
 }
 
 void DrumSynth::GetModuleDimensions(float& width, float& height)
@@ -413,8 +181,6 @@ void DrumSynth::IntSliderUpdated(IntSlider* slider, int oldVal)
 
 void DrumSynth::DropdownUpdated(DropdownList* list, int oldVal)
 {
-   if (list == mKitSelector)
-      LoadKit(mLoadedKit);
 }
 
 void DrumSynth::CheckboxUpdated(Checkbox* checkbox)
@@ -427,10 +193,6 @@ void DrumSynth::CheckboxUpdated(Checkbox* checkbox)
 
 void DrumSynth::ButtonClicked(ClickButton *button)
 {
-   if (button == mSaveButton)
-      SaveKits();
-   if (button == mNewKitButton)
-      CreateKit();
 }
 
 void DrumSynth::RadioButtonUpdated(RadioButton* radio, int oldVal)
@@ -444,8 +206,6 @@ void DrumSynth::TextEntryComplete(TextEntry* entry)
 void DrumSynth::LoadLayout(const ofxJSONElement& moduleInfo)
 {
    mModuleSaveData.LoadString("target", moduleInfo);
-   mModuleSaveData.LoadInt("drumkit", moduleInfo, 5, 0, 100, true);
-   mModuleSaveData.LoadString("twister", moduleInfo, "", FillDropdown<MidiController*>);
    
    SetUpFromSaveData();
 }
@@ -453,17 +213,13 @@ void DrumSynth::LoadLayout(const ofxJSONElement& moduleInfo)
 void DrumSynth::SetUpFromSaveData()
 {
    SetTarget(TheSynth->FindModule(mModuleSaveData.GetString("target")));
-   LoadKit(mModuleSaveData.GetInt("drumkit"));
-   
-   mTwister = TheSynth->FindMidiController(mModuleSaveData.GetString("twister"));
-   if (mTwister)
-      mTwister->AddListener(this, 0);
 }
 
 DrumSynth::DrumSynthHit::DrumSynthHit(DrumSynth* parent, int index, int x, int y)
 : mPhase(0)
 , mVolSlider(nullptr)
-, mFreqSlider(nullptr)
+, mFreqMaxSlider(nullptr)
+, mFreqMinSlider(nullptr)
 , mToneType(nullptr)
 , mToneAdsrDisplay(nullptr)
 , mFreqAdsrDisplay(nullptr)
@@ -479,10 +235,11 @@ DrumSynth::DrumSynthHit::DrumSynthHit(DrumSynth* parent, int index, int x, int y
 void DrumSynth::DrumSynthHit::CreateUIControls()
 {
    mVolSlider = new FloatSlider(mParent, ("vol"+ofToString(mIndex)).c_str(), mX+5, mY+55, 60,15,&mData.mVol,0,1);
-   mFreqSlider = new FloatSlider(mParent, ("freq"+ofToString(mIndex)).c_str(), mX+35, mY+120,100,15,&mData.mFreq,25,1600);
+   mFreqMaxSlider = new FloatSlider(mParent, ("fmax" + ofToString(mIndex)).c_str(), mX + 35, mY + 105, 100, 15, &mData.mFreqMax, 0, 1600);
+   mFreqMinSlider = new FloatSlider(mParent, ("fmin" + ofToString(mIndex)).c_str(), mX + 35, mY + 120, 100, 15, &mData.mFreqMin, 0, 1600);
    mToneType = new RadioButton(mParent, ("type"+ofToString(mIndex)).c_str(), mX+5, mY+75,(int*)(&mData.mTone.mOsc.mType));
    mToneAdsrDisplay = new ADSRDisplay(mParent, ("adsrtone"+ofToString(mIndex)).c_str(), mX+5, mY+15, 60,40,mData.mTone.GetADSR());
-   mFreqAdsrDisplay = new ADSRDisplay(mParent, ("adsrfreq"+ofToString(mIndex)).c_str(), mX+35, mY+76,100,44,&mData.mFreqAdsr);
+   mFreqAdsrDisplay = new ADSRDisplay(mParent, ("adsrfreq"+ofToString(mIndex)).c_str(), mX+35, mY+75,100,29,&mData.mFreqAdsr);
    mVolNoiseSlider = new FloatSlider(mParent, ("noise"+ofToString(mIndex)).c_str(), mX+70, mY+55,60,15,&mData.mVolNoise,0,1,2);
    mNoiseAdsrDisplay = new ADSRDisplay(mParent, ("adsrnoise"+ofToString(mIndex)).c_str(), mX+70, mY+15,60,40,mData.mNoise.GetADSR());
    
@@ -495,14 +252,16 @@ void DrumSynth::DrumSynthHit::CreateUIControls()
    mToneAdsrDisplay->SetMaxTime(500);
    mNoiseAdsrDisplay->SetMaxTime(500);
    
-   mFreqSlider->SetMode(FloatSlider::kLogarithmic);
+   mFreqMaxSlider->SetMode(FloatSlider::kSquare);
+   mFreqMinSlider->SetMode(FloatSlider::kSquare);
 }
 
 void DrumSynth::DrumSynthHit::Play(double time, float velocity)
 {
-   mData.mFreqAdsr.Start(time, 1);
-   mData.mTone.Start(time, velocity);
-   mData.mNoise.Start(time,velocity);
+   float envelopeScale = ofLerp(.2f, 1, velocity);
+   mData.mFreqAdsr.Start(time, 1, envelopeScale);
+   mData.mTone.GetADSR()->Start(time, velocity, envelopeScale);
+   mData.mNoise.GetADSR()->Start(time,velocity, envelopeScale);
    mStartTime = time;
 }
 
@@ -516,7 +275,7 @@ void DrumSynth::DrumSynthHit::Process(double time, float* out, int bufferSize)
    
    for (int i=0; i<bufferSize; ++i)
    {
-      float freq = mData.mFreqAdsr.Value(time) * mData.mFreq;
+      float freq = ofLerp(mData.mFreqMin, mData.mFreqMax, mData.mFreqAdsr.Value(time));
       float phaseInc = GetPhaseInc(freq);
       
       float sample = mData.mTone.Audio(time, mPhase) * mData.mVol * mData.mVol;
@@ -536,11 +295,11 @@ void DrumSynth::DrumSynthHit::Process(double time, float* out, int bufferSize)
 void DrumSynth::DrumSynthHit::Draw()
 {
    ofSetColor(255,0,0);
-   ofRect(mX+4,mY+14,62,42);
+   ofRect(mToneAdsrDisplay->GetRect(true));
    ofSetColor(0,255,0);
-   ofRect(mX+69,mY+14,62,42);
+   ofRect(mNoiseAdsrDisplay->GetRect(true));
    ofSetColor(0,0,255);
-   ofRect(mX+34,mY+75,102,46);
+   ofRect(mFreqAdsrDisplay->GetRect(true));
    
    mToneAdsrDisplay->Draw();
    mVolSlider->Draw();
@@ -548,7 +307,8 @@ void DrumSynth::DrumSynthHit::Draw()
    mVolNoiseSlider->Draw();
    mToneType->Draw();
    mFreqAdsrDisplay->Draw();
-   mFreqSlider->Draw();
+   mFreqMaxSlider->Draw();
+   mFreqMinSlider->Draw();
    
    float time = gTime - mStartTime;
    if (time >= 0 && time < 500)
@@ -563,7 +323,8 @@ void DrumSynth::DrumSynthHit::Draw()
 DrumSynth::DrumSynthHitSerialData::DrumSynthHitSerialData()
 : mTone(kOsc_Sin)
 , mNoise(kOsc_Random)
-, mFreq(150)
+, mFreqMax(150)
+, mFreqMin(10)
 , mVol(0)
 , mVolNoise(0)
 {

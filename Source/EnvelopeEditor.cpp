@@ -387,14 +387,14 @@ EnvelopeEditor::EnvelopeEditor()
 void EnvelopeEditor::CreateUIControls()
 {
    IDrawableModule::CreateUIControls();
-   mADSRViewLengthSlider = new FloatSlider(this,"length",2,20,120,15,&mADSRViewLength,100,10000);
+   mADSRViewLengthSlider = new FloatSlider(this,"length",2,20,120,15,&mADSRViewLength,10,10000);
    mPinButton = new ClickButton(this,"pin",3,2);
    
    static bool dummyBool;
    static int dummyInt;
    static float dummyFloat;
    
-   mHasSustainStageCheckbox = new Checkbox(this, "has sustain", 2, mEnvelopeControl.GetPosition().y + mEnvelopeControl.GetDimensions().y + 2, &dummyBool);
+   mHasSustainStageCheckbox = new Checkbox(this, "has sustain", 2, mEnvelopeControl.GetPosition().y + mEnvelopeControl.GetDimensions().y + 6, &dummyBool);
    mSustainStageSlider = new IntSlider(this, "sustain stage", mHasSustainStageCheckbox, kAnchor_Right, 100, 15, &dummyInt, 1, MAX_ADSR_STAGES-1);
    mMaxSustainSlider = new FloatSlider(this, "max sustain", mSustainStageSlider, kAnchor_Right, 100, 15, &dummyFloat, -1, 5000);
    mFreeReleaseLevelCheckbox = new Checkbox(this, "free release", mHasSustainStageCheckbox, kAnchor_Below, &dummyBool);
@@ -412,6 +412,8 @@ void EnvelopeEditor::SetADSRDisplay(ADSRDisplay* adsrDisplay)
    mEnvelopeControl.SetADSR(adsrDisplay->GetADSR());
    
    mADSRDisplay = adsrDisplay;
+   mADSRViewLength = adsrDisplay->GetMaxTime()+10;
+   mEnvelopeControl.SetViewLength(mADSRViewLength);
    mHasSustainStageCheckbox->SetVar(&adsrDisplay->GetADSR()->GetHasSustainStage());
    mSustainStageSlider->SetVar(&adsrDisplay->GetADSR()->GetSustainStage());
    mMaxSustainSlider->SetVar(&adsrDisplay->GetADSR()->GetMaxSustain());
@@ -518,7 +520,11 @@ void EnvelopeEditor::Pin()
 void EnvelopeEditor::FloatSliderUpdated(FloatSlider* slider, float oldVal)
 {
    if (slider == mADSRViewLengthSlider)
+   {
       mEnvelopeControl.SetViewLength(mADSRViewLength);
+      if (mADSRDisplay != nullptr)
+         mADSRDisplay->SetMaxTime(mADSRViewLength);
+   }
 }
 
 void EnvelopeEditor::SaveLayout(ofxJSONElement& moduleInfo)
