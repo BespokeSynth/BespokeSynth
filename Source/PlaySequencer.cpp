@@ -55,7 +55,8 @@ void PlaySequencer::CreateUIControls()
    mGrid = new UIGrid(3, height, mWidth-16, 150, TheTransport->CountInStandardMeasure(mInterval), mLanes.size(), this);
    mHeight = height + 153;
    mGrid->SetFlip(true);
-   mGrid->SetGridMode(UIGrid::kMultislider);
+   mGrid->SetGridMode(UIGrid::kMultisliderBipolar);
+   mGrid->SetRequireShiftForMultislider(true);
    mGrid->SetRestrictDragToRow(true);
 
    UIBLOCK(3, mHeight+3, 45);

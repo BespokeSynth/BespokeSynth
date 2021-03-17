@@ -881,9 +881,9 @@ void StepSequencer::SetUpFromSaveData()
    mGrid->SetGrid(mNumRows, GetNumSteps(mStepInterval));
    
    bool multisliderMode = mModuleSaveData.GetBool("multislider_mode");
-   mGrid->SetGridMode(multisliderMode ? UIGrid::kMultislider : UIGrid::kNormal);
+   mGrid->SetGridMode(multisliderMode ? UIGrid::kMultisliderBipolar : UIGrid::kNormal);
    mGrid->SetRestrictDragToRow(multisliderMode);
-   mGrid->SetClickClearsToZero(!multisliderMode);
+   mGrid->SetRequireShiftForMultislider(true);
 
    mIsSetUp = true;
 }

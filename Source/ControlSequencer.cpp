@@ -48,7 +48,6 @@ void ControlSequencer::CreateUIControls()
    
    mGrid->SetGridMode(UIGrid::kMultislider);
    mGrid->SetHighlightCol(gTime, -1);
-   mGrid->SetClickClearsToZero(false);
    mGrid->SetMajorColSize(4);
    mGrid->SetListener(this);
    

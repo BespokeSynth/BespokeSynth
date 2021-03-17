@@ -24,7 +24,7 @@
 #include "Scale.h"
 #include "IPulseReceiver.h"
 
-#define NSS_MAX_STEPS 16
+#define NSS_MAX_STEPS 32
 
 class NoteStepSequencer : public IDrawableModule, public ITimeListener, public INoteSource, public IButtonListener, public IDropdownListener, public IIntSliderListener, public IFloatSliderListener, public MidiDeviceListener, public UIGridListener, public IAudioPoller, public IScaleListener, public INoteReceiver, public IPulseReceiver
 {

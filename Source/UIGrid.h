@@ -62,7 +62,7 @@ public:
    float GetWidth() const { return mWidth; }
    float GetHeight() const { return mHeight; }
    void SetRestrictDragToRow(bool set) { mRestrictDragToRow = set; }
-   void SetClickClearsToZero(bool set) { mClickClearsToZero = set; }
+   void SetRequireShiftForMultislider(bool set) { mRequireShiftForMultislider = set; }
    void SetShouldDrawValue(bool draw) { mShouldDrawValue = draw; }
    void SetMomentary(bool momentary) { mMomentary = momentary; }
    const std::array<float, MAX_GRID_SIZE*MAX_GRID_SIZE>& GetData() const { return mData; }
@@ -72,7 +72,8 @@ public:
    {
       kNormal,
       kMultislider,
-      kHorislider
+      kHorislider,
+      kMultisliderBipolar
    };
    void SetGridMode(GridMode mode) { mGridMode = mode; }
    
@@ -98,6 +99,7 @@ private:
    int GetDataIndex(int col, int row) { return col + row * MAX_GRID_SIZE; }
    float GetX(int col, int row) const;
    float GetY(int row) const;
+   bool CanAdjustMultislider() const;
 
    struct HighlightColBuffer
    {
@@ -126,7 +128,7 @@ private:
    float mDrawOffset[MAX_GRID_SIZE];
    GridMode mGridMode;
    bool mRestrictDragToRow;
-   bool mClickClearsToZero;
+   bool mRequireShiftForMultislider;
    bool mShouldDrawValue;
    bool mMomentary;
 };

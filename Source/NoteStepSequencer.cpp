@@ -14,6 +14,7 @@
 #include "LaunchpadInterpreter.h"
 #include "Profiler.h"
 #include "FillSaveDropdown.h"
+#include "UIControlMacros.h"
 
 NoteStepSequencer::NoteStepSequencer()
 : mInterval(kInterval_8n)
@@ -25,7 +26,7 @@ NoteStepSequencer::NoteStepSequencer()
 , mGrid(nullptr)
 , mLastPitch(-1)
 , mLastVel(0)
-, mOctave(0)
+, mOctave(3)
 , mOctaveSlider(nullptr)
 , mNoteMode(kNoteMode_Scale)
 , mNoteModeSelector(nullptr)
@@ -64,17 +65,21 @@ NoteStepSequencer::NoteStepSequencer()
 void NoteStepSequencer::CreateUIControls()
 {
    IDrawableModule::CreateUIControls();
-   mIntervalSelector = new DropdownList(this,"interval",75,2,(int*)(&mInterval));
-   mLengthSlider = new IntSlider(this,"length",77,20,98,15,&mLength,1,mNumSteps);
-   mGrid = new UIGrid(5,55,200,80,8,24, this);
-   mVelocityGrid = new UIGrid(5,117,200,45,8,1, this);
-   mOctaveSlider = new IntSlider(this,"octave",166,2,53,15,&mOctave,-2,4);
-   mNoteModeSelector = new DropdownList(this,"notemode",5,20,(int*)(&mNoteMode));
-   mShiftBackButton = new ClickButton(this,"<",130,2);
-   mShiftForwardButton = new ClickButton(this,">",145,2);
-   mRandomizePitchButton = new ClickButton(this,"pitch",140,38);
-   mRandomizeLengthButton = new ClickButton(this,"len",-1,-1);
-   mRandomizeVelocityButton = new ClickButton(this,"vel",-1,-1);
+   UIBLOCK(130);
+   DROPDOWN(mIntervalSelector,"interval",(int*)(&mInterval), 40);   UIBLOCK_SHIFTRIGHT();
+   UIBLOCK_SHIFTX(93);
+   BUTTON(mRandomizePitchButton, "pitch");  UIBLOCK_SHIFTRIGHT();
+   BUTTON(mRandomizeLengthButton, "len");  UIBLOCK_SHIFTRIGHT();
+   BUTTON(mRandomizeVelocityButton, "vel");  UIBLOCK_NEWLINE();
+   INTSLIDER(mLengthSlider, "length", &mLength, 1, mNumSteps); UIBLOCK_SHIFTRIGHT();
+   BUTTON(mShiftBackButton, "<"); UIBLOCK_SHIFTRIGHT();
+   BUTTON(mShiftForwardButton, ">"); UIBLOCK_NEWLINE();
+   INTSLIDER(mOctaveSlider,"octave",&mOctave,0,7); UIBLOCK_SHIFTRIGHT();
+   DROPDOWN(mNoteModeSelector,"notemode",(int*)(&mNoteMode),80); UIBLOCK_NEWLINE();
+   ENDUIBLOCK0();
+
+   mGrid = new UIGrid(5, 55, 200, 80, 8, 24, this);
+   mVelocityGrid = new UIGrid(5, 117, 200, 45, 8, 1, this);
    mLoopResetPointSlider = new IntSlider(this,"loop reset",-1,-1,100,15,&mLoopResetPoint,0,mLength);
    
    for (int i=0; i<NSS_MAX_STEPS; ++i)
@@ -111,9 +116,8 @@ void NoteStepSequencer::CreateUIControls()
    mGrid->SetFlip(true);
    mGrid->SetListener(this);
    mGrid->SetGridMode(UIGrid::kHorislider);
-   mGrid->SetClickClearsToZero(false);
-   mVelocityGrid->SetGridMode(UIGrid::kMultislider);
-   mVelocityGrid->SetClickClearsToZero(false);
+   mGrid->SetRequireShiftForMultislider(true);
+   mVelocityGrid->SetGridMode(UIGrid::kMultisliderBipolar);
    mVelocityGrid->SetListener(this);
    
    mLoopResetPointSlider->SetShowing(mHasExternalPulseSource);
@@ -177,11 +181,11 @@ void NoteStepSequencer::DrawModule()
    {
       ofVec2f pos = mGrid->GetCellPosition(0, i-1) + mGrid->GetPosition(true);
       float scale = MIN(mGrid->IClickable::GetDimensions().y / mGrid->GetRows(), 20);
-      DrawTextNormal(NoteName(RowToPitch(i),false,true) + "("+ ofToString(RowToPitch(i)) + ")", pos.x - 5, pos.y - (scale/8), scale);
+      DrawTextNormal(NoteName(RowToPitch(i),false,true) + "("+ ofToString(RowToPitch(i)) + ")", pos.x + 1, pos.y - (scale/8) + 1, scale);
    }
    ofPopStyle();
    
-   DrawTextLeftJustify("random:", 138, 50);
+   DrawTextLeftJustify("randomize:", 138, 14);
    
    ofPushStyle();
    ofFill();
@@ -303,6 +307,7 @@ void NoteStepSequencer::GridUpdated(UIGrid* grid, int col, int row, float value,
    {
       for (int i=0; i<mGrid->GetCols(); ++i)
       {
+         bool colHasPitch = false;
          for (int j=0; j<mGrid->GetRows(); ++j)
          {
             float val = mGrid->GetVal(i,j);
@@ -310,9 +315,16 @@ void NoteStepSequencer::GridUpdated(UIGrid* grid, int col, int row, float value,
             {
                mTones[i] = j;
                mNoteLengths[i] = val;
+               colHasPitch = true;
                break;
             }
          }
+
+         if (!colHasPitch)
+            mVels[i] = 0;
+         else if (colHasPitch && mVels[i] == 0)
+            mVels[i] = 127;
+         mVelocityGrid->SetVal(i, 0, mVels[i]/127.0f, false);
       }
    }
    if (grid == mVelocityGrid)
@@ -330,9 +342,9 @@ int NoteStepSequencer::RowToPitch(int row)
    switch (mNoteMode)
    {
       case kNoteMode_Scale:
-         return TheScale->GetPitchFromTone(row+(mOctave+3)*numPitchesInScale+TheScale->GetScaleDegree());
+         return TheScale->GetPitchFromTone(row+mOctave*numPitchesInScale+TheScale->GetScaleDegree());
       case kNoteMode_Chromatic:
-         return row + (mOctave+2) * TheScale->GetTet();
+         return row + mOctave * TheScale->GetTet();
       case kNoteMode_Fifths:
       {
          int oct = (row/2)*numPitchesInScale;
@@ -340,7 +352,7 @@ int NoteStepSequencer::RowToPitch(int row)
          int fifths = oct;
          if (isFifth)
             fifths += 4;
-         return TheScale->GetPitchFromTone(fifths+(mOctave+3)*numPitchesInScale+TheScale->GetScaleDegree());
+         return TheScale->GetPitchFromTone(fifths+mOctave*numPitchesInScale+TheScale->GetScaleDegree());
 
       }
    }
@@ -604,7 +616,7 @@ void NoteStepSequencer::PlayNote(double time, int pitch, int velocity, int voice
    if (velocity > 0)
    {
       int tet = TheScale->GetTet();
-      mOctave = (pitch - TheScale->ScaleRoot()) / tet - 3;
+      mOctave = (pitch - TheScale->ScaleRoot()) / tet;
       
       if (mNoteMode == kNoteMode_Scale)
          mRowOffset = TheScale->GetToneFromPitch(pitch) % TheScale->NumPitchesInScale();
@@ -657,16 +669,21 @@ void NoteStepSequencer::ButtonClicked(ClickButton* button)
    {
       for (int i=0; i<mNumSteps; ++i)
       {
-         switch (rand() % 4)
+         switch (rand() % 5)
          {
             case 0:
                mVels[i] = 0;
                break;
             case 1:
+               mVels[i] = 50;
+               break;
             case 2:
                mVels[i] = 80;
                break;
             case 3:
+               mVels[i] = 110;
+               break;
+            case 4:
                mVels[i] = 127;
                break;
          }

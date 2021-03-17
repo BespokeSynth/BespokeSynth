@@ -36,7 +36,6 @@ void EQEffect::CreateUIControls()
    mEvenButton = new ClickButton(this,"even",5,5);
    
    mMultiSlider->SetGridMode(UIGrid::kMultislider);
-   mMultiSlider->SetClickClearsToZero(false);
    for (int i=0; i<NUM_EQ_FILTERS; ++i)
       mMultiSlider->SetValRefactor(0, i, .5f);
    mMultiSlider->SetListener(this);
