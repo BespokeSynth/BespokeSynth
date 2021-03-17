@@ -83,7 +83,7 @@ void TextEntry::Construct(ITextEntryListener* owner, const char* name, int x, in
    UpdateDisplayString();
    
    SetName(name);
-   mLabelSize = gFontFixedWidth.GetStringWidth(name, 14) + 3;
+   mLabelSize = gFontFixedWidth.GetStringWidth(name, 14) + 3 + .25f * strnlen(name, 50);
    SetPosition(x,y);
    assert(owner);
    IDrawableModule* module = dynamic_cast<IDrawableModule*>(owner);

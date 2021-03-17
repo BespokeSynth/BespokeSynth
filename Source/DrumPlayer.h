@@ -182,7 +182,7 @@ private:
          double mCutOffTime;
          double mOffset;
          double mEnvelopeTime;
-         double mEnvelopeSpeed;
+         double mEnvelopeScale;
          float mSpeedTweak;
       };
 

@@ -1049,7 +1049,8 @@ void Looper::OnClicked(int x, int y, bool right)
    IDrawableModule::OnClicked(x, y, right);
    
    if (x >= BUFFER_X + BUFFER_W / 3 && x < BUFFER_X + (BUFFER_W * 2) / 3 &&
-       y >= BUFFER_Y + BUFFER_H / 3 && y < BUFFER_Y + (BUFFER_H * 2) / 3)
+       y >= BUFFER_Y + BUFFER_H / 3 && y < BUFFER_Y + (BUFFER_H * 2) / 3 &&
+       mBufferTempo == TheTransport->GetTempo())
    {
       ChannelBuffer grab(mLoopLength);
       grab.SetNumActiveChannels(mBuffer->NumActiveChannels());

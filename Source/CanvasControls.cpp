@@ -35,14 +35,17 @@ void CanvasControls::CreateUIControls()
    IDrawableModule::CreateUIControls();
    mAddElementButton = new ClickButton(this," + ",0,2);
    mRemoveElementButton = new ClickButton(this," - ",28,2);
-   mCanvasLengthEntry = new TextEntry(this,"canvaslength",60,2,3,&mCanvas->mNumCols,1,128);
-   mNumVisibleRowsEntry = new TextEntry(this,"rowsentry",100,2,3,&mCanvas->mNumVisibleRows,1,128);
-   mClearButton = new ClickButton(this, "clear", 140, 2);
-   mDragModeSelector = new DropdownList(this, "drag mode", 180, 2, (int*)(&mCanvas->mDragMode));
+   mCanvasLengthEntry = new TextEntry(this,"canvas length",55,2,3,&mCanvas->mNumCols,1,128);
+   mNumVisibleRowsEntry = new TextEntry(this,"num rows ",175,2,3,&mCanvas->mNumVisibleRows,1,128);
+   mClearButton = new ClickButton(this, "clear", 270, 2);
+   mDragModeSelector = new DropdownList(this, "drag mode", 310, 2, (int*)(&mCanvas->mDragMode));
    
    mDragModeSelector->AddLabel("drag both", Canvas::kDragBoth);
    mDragModeSelector->AddLabel("horizontal", Canvas::kDragHorizontal);
    mDragModeSelector->AddLabel("vertical", Canvas::kDragVertical);
+
+   mCanvasLengthEntry->DrawLabel(true);
+   mNumVisibleRowsEntry->DrawLabel(true);
    
    SetElement(nullptr);
 }
