@@ -2193,6 +2193,18 @@ IDrawableModule* ModularSynth::SpawnModuleOnTheFly(string moduleName, float x, f
       }
    }
 
+   string midiControllerToSetUp = "";
+   if (tokens.size() > 1 && tokens[tokens.size() - 1] == ModuleFactory::kMidiControllerSuffix)
+   {
+      moduleType = "midicontroller";
+      for (size_t i = 0; i < tokens.size() - 1; ++i)
+      {
+         midiControllerToSetUp += tokens[i];
+         if (i != tokens.size() - 2)
+            midiControllerToSetUp += " ";
+      }
+   }
+
    ofxJSONElement dummy;
    dummy["type"] = moduleType;
    vector<IDrawableModule*> allModules;
@@ -2250,6 +2262,16 @@ IDrawableModule* ModularSynth::SpawnModuleOnTheFly(string moduleName, float x, f
       Prefab* prefab = dynamic_cast<Prefab*>(module);
       if (prefab != nullptr)
          prefab->LoadPrefab("prefabs" + GetPathSeparator() + prefabToSetUp);
+   }
+
+   if (midiControllerToSetUp != "")
+   {
+      MidiController* controller = dynamic_cast<MidiController*>(module);
+      if (controller != nullptr)
+      {
+         controller->GetSaveData().SetString("devicein", midiControllerToSetUp);
+         controller->SetUpFromSaveData();
+      }
    }
 
    return module;

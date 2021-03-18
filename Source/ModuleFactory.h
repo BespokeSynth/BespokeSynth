@@ -29,6 +29,7 @@ public:
 
    static constexpr const char* kVSTSuffix = "[vst]";
    static constexpr const char* kPrefabSuffix = "[prefab]";
+   static constexpr const char* kMidiControllerSuffix = "[midicontroller]";
 private:
    void Register(string type, CreateModuleFn creator, CanCreateModuleFn canCreate, ModuleType moduleType, bool hidden, bool experimental);
    map<string, CreateModuleFn> mFactoryMap;

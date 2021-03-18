@@ -1790,44 +1790,52 @@ int MidiController::GetLayoutControlIndexForMidi(MidiMessageType type, int contr
    return -1;
 }
 
+//static
+vector<string> MidiController::GetAvailableInputDevices()
+{
+   vector<string> devices;
+   for (auto& d : MidiInput::getAvailableDevices())
+   {
+      if (d.identifier == "blah")   //my BCF-2000 and BCR-2000 both report as a BCF-2000, come up with some hack here to name it correctly
+         devices.push_back("BCR-2000");
+      else
+         devices.push_back(d.name.toStdString());
+   }
+
+   devices.push_back("monome");
+   devices.push_back("osccontroller");
+
+   return devices;
+}
+
+//static
+vector<string> MidiController::GetAvailableOutputDevices()
+{
+   vector<string> devices;
+   for (auto& d : MidiOutput::getDevices())
+      devices.push_back(d.toStdString());
+
+   devices.push_back("monome");
+   devices.push_back("osccontroller");
+
+   return devices;
+}
+
 namespace {
    void FillMidiInput(DropdownList* list)
    {
       assert(list);
-      StringArray input;
-      for (auto& d : MidiInput::getAvailableDevices())
-      {
-         if (d.identifier == "blah")
-         {
-            input.add("BCR-2000");
-         }
-         else
-         {
-            input.add(d.name);
-         }
-      }
-
-      int i;
-      for (i=0; i<input.size(); ++i)
-         list->AddLabel(input[i].toRawUTF8(), i);
-      list->AddLabel("monome", i);
-      ++i;
-      list->AddLabel("osccontroller", i);
-      ++i;
-      //list->AddLabel("midicapturer", i);
-      //++i;
+      auto& devices = MidiController::GetAvailableInputDevices();
+      for (int i=0; i< devices.size(); ++i)
+         list->AddLabel(devices[i].c_str(), i);
    }
+
    void FillMidiOutput(DropdownList* list)
    {
       assert(list);
-      const StringArray input = MidiOutput::getDevices();
-      int i;
-      for (i=0; i<input.size(); ++i)
-         list->AddLabel(input[i].toRawUTF8(), i);
-      list->AddLabel("monome", i);
-      ++i;
-      list->AddLabel("osccontroller", i);
-      ++i;
+      auto& devices = MidiController::GetAvailableOutputDevices();
+      for (int i = 0; i < devices.size(); ++i)
+         list->AddLabel(devices[i].c_str(), i);
    }
 }
 
@@ -1973,19 +1981,19 @@ void MidiController::SetUpFromSaveData()
    mOutChannel = mModuleSaveData.GetInt("outchannel");
    assert(mOutChannel > 0 && mOutChannel <= 16);
    
-   ConnectDevice();
-   
    UseNegativeEdge(mModuleSaveData.GetBool("negativeedge"));
    mSlidersDefaultToIncremental = mModuleSaveData.GetBool("incrementalsliders");
    
    BuildControllerList();
    
-   const std::vector<string>& devices = mDevice.GetPortList(true);
+   auto& devices = GetAvailableInputDevices();
    for (int i=0; i<devices.size(); ++i)
    {
       if (devices[i].c_str() == mDeviceIn)
          mControllerIndex = i;
    }
+
+   ConnectDevice();
    
    OnDeviceChanged();
 }
