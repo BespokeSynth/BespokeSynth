@@ -146,7 +146,7 @@ VSTPlugin::VSTPlugin()
 void VSTPlugin::CreateUIControls()
 {
    IDrawableModule::CreateUIControls();
-   mVolSlider = new FloatSlider(this,"vol",3,3,80,15,&mVol,0,1);
+   mVolSlider = new FloatSlider(this,"vol",3,3,80,15,&mVol,0,4);
    mProgramChangeSelector = new DropdownList(this,"program change",100,3,&mProgramChange);
    mOpenEditorButton = new ClickButton(this, "open", 150, 3);
    mShowParameterDropdown = new DropdownList(this,"show parameter",3,20,&mShowParameterIndex);
