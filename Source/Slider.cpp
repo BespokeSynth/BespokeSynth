@@ -424,10 +424,14 @@ void FloatSlider::SmoothUpdated()
    {
       TheTransport->AddAudioPoller(this);
       mSmoothTarget = *mVar;
+      mRamp.SetValue(mSmoothTarget);
+      mIsSmoothing = true;
    }
-   if (mSmooth <= 0 && mIsSmoothing)
+   else if (mSmooth <= 0 && mIsSmoothing)
+   {
       TheTransport->RemoveAudioPoller(this);
-   mIsSmoothing = mSmooth > 0;
+      mIsSmoothing = false;
+   }
 }
 
 void FloatSlider::SetFromMidiCC(float slider)
