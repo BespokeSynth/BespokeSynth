@@ -119,6 +119,7 @@ private:
    void DrawBeatwheel();
    float GetActualLoopPos(int samplesIn) const;
    int GetBeatwheelDepthLevel() const;
+   double GetPlaybackSpeed() const;
    
    //IDrawableModule
    void DrawModule() override;
