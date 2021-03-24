@@ -104,7 +104,8 @@ float LFO::Value(int samplesIn /*= 0*/, float forcePhase /*= -1*/) const
       double perlinPos = gTime + gInvSampleRateMs * samplesIn;
       if (forcePhase != -1)
          perlinPos += forcePhase * 1000;
-      sample = sPerlinNoise.noise(perlinPos * mFreeRate / 1000.0f, mPerlinSeed, 0);
+      double perlinPhase = perlinPos * mFreeRate / 1000.0f;
+      sample = sPerlinNoise.noise(perlinPhase, mPerlinSeed, -perlinPhase);
    }
    else
    {
