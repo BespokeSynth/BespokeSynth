@@ -127,7 +127,7 @@ void GridModule::DrawModule()
             float xsize = float(mGrid->GetWidth()) / mGrid->GetCols();
             float ysize = float(mGrid->GetHeight()) / mGrid->GetRows();
             ofSetColor(GetColor(mGridOverlay[i]));
-            ofRect(pos.x+3, pos.y-ysize+3, xsize-6, ysize-6);
+            ofRect(pos.x+3, pos.y+3, xsize-6, ysize-6);
          }
       }
    }
@@ -147,7 +147,7 @@ void GridModule::DrawModule()
                float xsize = float(mGrid->GetWidth()) / mGrid->GetCols();
                float ysize = float(mGrid->GetHeight()) / mGrid->GetRows();
                ofSetColor(mHighlightCells[i].color, (1 - (gTime - mHighlightCells[i].time) / mHighlightCells[i].duration) * 255);
-               ofRect(pos.x, pos.y-ysize, xsize, ysize);
+               ofRect(pos.x, pos.y, xsize, ysize);
             }
          }
          else
