@@ -197,6 +197,9 @@ public:
    void SetFatalError(string error);
 
    static bool sShouldAutosave;
+   static float sBackgroundLissajousR;
+   static float sBackgroundLissajousG;
+   static float sBackgroundLissajousB;
    
 private:
    void ResetLayout();

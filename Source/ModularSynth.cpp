@@ -41,6 +41,9 @@ ModularSynth* TheSynth = nullptr;
 
 //static
 bool ModularSynth::sShouldAutosave = true;
+float ModularSynth::sBackgroundLissajousR = 0.704081655f;
+float ModularSynth::sBackgroundLissajousG = 0.387755096f;
+float ModularSynth::sBackgroundLissajousB = 0.795918345f;
 
 void AtExit()
 {
@@ -334,7 +337,7 @@ void ModularSynth::Draw(void* vg)
          DrawFallbackText(mFatalError.c_str(), 100, 100);
    }
    
-   DrawLissajous(&mGlobalRecordBuffer, 0, 0, ofGetWidth(), ofGetHeight(), .7f, 0, 0);
+   DrawLissajous(&mGlobalRecordBuffer, 0, 0, ofGetWidth(), ofGetHeight(), sBackgroundLissajousR, sBackgroundLissajousG, sBackgroundLissajousB);
    
    if (gTime == 1 && mFatalError == "")
    {

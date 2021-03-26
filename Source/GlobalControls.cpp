@@ -33,6 +33,9 @@ void GlobalControls::CreateUIControls()
    FLOATSLIDER(mYSlider, "y pos", &(TheSynth->GetDrawOffset().y), -10000, 10000);
    FLOATSLIDER(mMouseScrollXSlider, "scroll x", &mMouseScrollX, -100, 100);
    FLOATSLIDER(mMouseScrollYSlider, "scroll y", &mMouseScrollY, -100, 100);
+   FLOATSLIDER(mBackgroundLissajousRSlider, "lissajous r", &ModularSynth::sBackgroundLissajousR, 0, 1);
+   FLOATSLIDER(mBackgroundLissajousGSlider, "lissajous g", &ModularSynth::sBackgroundLissajousG, 0, 1);
+   FLOATSLIDER(mBackgroundLissajousBSlider, "lissajous b", &ModularSynth::sBackgroundLissajousB, 0, 1);
    ENDUIBLOCK(mWidth, mHeight);
 }
 
@@ -46,11 +49,14 @@ void GlobalControls::DrawModule()
    mYSlider->Draw();
    mMouseScrollXSlider->Draw();
    mMouseScrollYSlider->Draw();
+   mBackgroundLissajousRSlider->Draw();
+   mBackgroundLissajousGSlider->Draw();
+   mBackgroundLissajousBSlider->Draw();
 }
 
 void GlobalControls::FloatSliderUpdated(FloatSlider* slider, float oldVal)
 {
-   if (slider == mZoomSlider)
+   if (slider == mZoomSlider && gHoveredUIControl != mZoomSlider) //avoid bad behavior when adjusting these via mouse
    {
       //zoom in on center of screen
       float zoomAmount = (gDrawScale - oldVal) / oldVal;
@@ -58,14 +64,14 @@ void GlobalControls::FloatSliderUpdated(FloatSlider* slider, float oldVal)
       TheSynth->GetDrawOffset() -= zoomCenter * zoomAmount;
    }
 
-   if (slider == mMouseScrollXSlider)
+   if (slider == mMouseScrollXSlider && gHoveredUIControl != mMouseScrollXSlider) //avoid bad behavior when adjusting these via mouse
    {
       float delta = mMouseScrollX - oldVal;
       TheSynth->MouseScrolled(-delta, 0, false);
       mMouseScrollX = 0;
    }
 
-   if (slider == mMouseScrollYSlider)
+   if (slider == mMouseScrollYSlider && gHoveredUIControl != mMouseScrollYSlider) //avoid bad behavior when adjusting these via mouse
    {
       float delta = mMouseScrollY - oldVal;
       TheSynth->MouseScrolled(0, -delta, false);
