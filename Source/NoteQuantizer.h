@@ -45,10 +45,11 @@ private:
 
    struct InputInfo
    {
-      InputInfo() : velocity(0), voiceIdx(-1), held(false) {}
+      InputInfo() : velocity(0), voiceIdx(-1), held(false), hasPlayedYet(false) {}
       int velocity;
       int voiceIdx;
       bool held;
+      bool hasPlayedYet;
       ModulationParameters modulation;
    };
 
@@ -58,5 +59,6 @@ private:
    DropdownList* mQuantizeIntervalSelector;
    std::array<InputInfo, 128> mInputInfos{};
    std::array<bool, 128> mScheduledOffs{};
+   std::array<bool, 128> mPreScheduledOffs{};
    bool mHasReceivedPulse;
 };

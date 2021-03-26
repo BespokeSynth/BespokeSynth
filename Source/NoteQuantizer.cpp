@@ -69,19 +69,24 @@ void NoteQuantizer::PlayNote(double time, int pitch, int velocity, int voiceIdx,
       {
          if (velocity > 0)
          {
-            if ((mScheduledOffs[pitch] || mInputInfos[pitch].held) && mInputInfos[pitch].voiceIdx != voiceIdx)
+            if ((mScheduledOffs[pitch] || mPreScheduledOffs[pitch] || mInputInfos[pitch].held) && mInputInfos[pitch].voiceIdx != voiceIdx)
             {
                PlayNoteOutput(time, pitch, 0, mInputInfos[pitch].voiceIdx, mInputInfos[pitch].modulation);
                mScheduledOffs[pitch] = false;
+               mPreScheduledOffs[pitch] = false;
             }
             mInputInfos[pitch].velocity = velocity;
             mInputInfos[pitch].voiceIdx = voiceIdx;
             mInputInfos[pitch].modulation = modulation;
             mInputInfos[pitch].held = true;
+            mInputInfos[pitch].hasPlayedYet = false;
          }
          else
          {
-            mScheduledOffs[pitch] = true;
+            if (mInputInfos[pitch].hasPlayedYet)
+               mScheduledOffs[pitch] = true;
+            else
+               mPreScheduledOffs[pitch] = true;
 
             if (mNoteRepeat)
                mInputInfos[pitch].velocity = 0;
@@ -96,7 +101,7 @@ void NoteQuantizer::OnEvent(double time, float strength)
 {
    for (size_t i = 0; i < mInputInfos.size(); ++i)
    {
-      if ((mNoteRepeat || mInputInfos[i].velocity == 0) && mScheduledOffs[i])
+      if (mScheduledOffs[i])
       {
          PlayNoteOutput(time, i, 0, mInputInfos[i].voiceIdx, mInputInfos[i].modulation);
          mScheduledOffs[i] = false;
@@ -105,10 +110,16 @@ void NoteQuantizer::OnEvent(double time, float strength)
       if (mInputInfos[i].velocity > 0)
       {
          PlayNoteOutput(time, i, mInputInfos[i].velocity * strength, mInputInfos[i].voiceIdx, mInputInfos[i].modulation);
+         mInputInfos[i].hasPlayedYet = true;
          if (!mNoteRepeat)
             mInputInfos[i].velocity = 0;
          else
             mScheduledOffs[i] = true;
+         if (mPreScheduledOffs[i])
+         {
+            mPreScheduledOffs[i] = false;
+            mScheduledOffs[i] = true;
+         }
       }
    }
 }
