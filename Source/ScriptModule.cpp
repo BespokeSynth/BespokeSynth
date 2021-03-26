@@ -960,7 +960,7 @@ void ScriptModule::RunCode(double time, string code)
 
    sMostRecentRunTime = time;
    mNextLineToExecute = -1;
-   ComputeSliders(time);
+   ComputeSliders(0);
    sPriorExecutedModule = nullptr;
 
    try
