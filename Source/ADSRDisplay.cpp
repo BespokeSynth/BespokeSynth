@@ -238,7 +238,16 @@ void ADSRDisplay::SpawnEnvelopeEditor()
 
 void ADSRDisplay::OnClicked(int x, int y, bool right)
 {
-   if (!mShowing || sDisplayMode != kDisplayEnvelope)
+   if (sDisplayMode == kDisplaySliders)
+   {
+      if (gHoveredUIControl == mASlider) mASlider->TestClick(x + mX, y + mY, right, false);
+      if (gHoveredUIControl == mDSlider) mDSlider->TestClick(x + mX, y + mY, right, false);
+      if (gHoveredUIControl == mSSlider) mSSlider->TestClick(x + mX, y + mY, right, false);
+      if (gHoveredUIControl == mRSlider) mRSlider->TestClick(x + mX, y + mY, right, false);
+      return;
+   }
+
+   if (!mShowing)
       return;
    
    if (right)
