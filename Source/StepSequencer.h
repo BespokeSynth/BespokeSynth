@@ -36,11 +36,21 @@ public:
    void OnTimeEvent(double time) override;
    void SetOffset(float offset);
    void UpdateTimeListener();
+   void DrawOverlay();
 private:
    UIGrid* mGrid;
    int mRow;
    StepSequencer* mSeq;
    float mOffset;
+
+   struct PlayedStep
+   {
+      PlayedStep() : time(-1) {}
+      int step;
+      double time;
+   };
+   std::array<PlayedStep, 5> mPlayedSteps;
+   int mPlayedStepsRoundRobin;
 };
 
 class NoteRepeat : public ITimeListener

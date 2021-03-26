@@ -438,6 +438,8 @@ void StepSequencer::DrawModule()
          {
             mOffsetSlider[i]->SetShowing(false);
          }
+
+         mRows[i]->DrawOverlay();
       }
       else
       {
@@ -931,6 +933,7 @@ StepSequencerRow::StepSequencerRow(StepSequencer* seq, UIGrid* grid, int row)
 , mGrid(grid)
 , mRow(row)
 , mOffset(0)
+, mPlayedStepsRoundRobin(0)
 {
    TheTransport->AddListener(this, mSeq->GetStepInterval(), OffsetInfo(0, true), true);
 }
@@ -948,8 +951,13 @@ void StepSequencerRow::OnTimeEvent(double time)
    float offsetMs = mOffset*TheTransport->MsPerBar();
    int step = mSeq->GetStepNum(time + offsetMs);
    float val = mGrid->GetVal(step,mRow);
-   if (val > 0 && mSeq->IsMetaStepActive(time, step,mRow))
+   if (val > 0 && mSeq->IsMetaStepActive(time, step, mRow))
+   {
       mSeq->PlayStepNote(time, mRow, val * val);
+      mPlayedSteps[mPlayedStepsRoundRobin].step = step;
+      mPlayedSteps[mPlayedStepsRoundRobin].time = time;
+      mPlayedStepsRoundRobin = (mPlayedStepsRoundRobin + 1) % mPlayedSteps.size();
+   }
 }
 
 void StepSequencerRow::SetOffset(float offset)
@@ -961,6 +969,36 @@ void StepSequencerRow::SetOffset(float offset)
 void StepSequencerRow::UpdateTimeListener()
 {
    TheTransport->UpdateListener(this, mSeq->GetStepInterval(), OffsetInfo(mOffset, false));
+}
+
+void StepSequencerRow::DrawOverlay()
+{
+   const float kPlayHighlightDurationMs = 250;
+   for (size_t i = 0; i < mPlayedSteps.size(); ++i)
+   {
+      if (mPlayedSteps[i].time != -1)
+      {
+         if (gTime - mPlayedSteps[i].time < kPlayHighlightDurationMs)
+         {
+            if (gTime - mPlayedSteps[i].time > 0)
+            {
+               float fade = (1 - (gTime - mPlayedSteps[i].time) / kPlayHighlightDurationMs);
+               ofPushStyle();
+               ofSetLineWidth(3 * fade);
+               ofVec2f pos = mGrid->GetCellPosition(mPlayedSteps[i].step, mRow) + mGrid->GetPosition(true);
+               float xsize = float(mGrid->GetWidth()) / mGrid->GetCols();
+               float ysize = float(mGrid->GetHeight()) / mGrid->GetRows();
+               ofSetColor(ofColor::white, fade * 255);
+               ofRect(pos.x, pos.y, xsize, ysize);
+               ofPopStyle();
+            }
+         }
+         else
+         {
+            mPlayedSteps[i].time = -1;
+         }
+      }
+   }
 }
 
 NoteRepeat::NoteRepeat(StepSequencer* seq, int row)

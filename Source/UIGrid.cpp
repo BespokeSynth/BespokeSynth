@@ -54,6 +54,8 @@ void UIGrid::Init(int x, int y, int w, int h, int cols, int rows, IClickable* pa
 
 void UIGrid::Render()
 {
+   ofPushMatrix();
+   ofTranslate(mX, mY);
    ofPushStyle();
    ofSetLineWidth(.5f);
    float w,h;
@@ -127,24 +129,25 @@ void UIGrid::Render()
    if (mCurrentHover != -1 && mShouldDrawValue)
    {
       ofSetColor(ofColor::grey, gModuleDrawAlpha);
-      DrawTextNormal(ofToString(GetVal(mCurrentHover % mCols, mCurrentHover / mCols)), mX, mY+12);
+      DrawTextNormal(ofToString(GetVal(mCurrentHover % mCols, mCurrentHover / mCols)), 0, 12);
    }
    ofPopStyle();
+   ofPopMatrix();
 }
 
 float UIGrid::GetX(int col, int row) const
 {
    float xsize = float(mWidth) / mCols;
-   return mX+(col+mDrawOffset[row])*xsize;
+   return (col+mDrawOffset[row])*xsize;
 }
 
 float UIGrid::GetY(int row) const
 {
    float ysize = float(mHeight) / mRows;
    if (mFlip)
-      return mHeight+mY-(row+1)*ysize;
+      return mHeight-(row+1)*ysize;
    else
-      return mY+row*ysize;
+      return row*ysize;
 }
 
 GridCell UIGrid::GetGridCellAt(float x, float y, float* clickHeight, float* clickWidth)
@@ -175,18 +178,7 @@ GridCell UIGrid::GetGridCellAt(float x, float y, float* clickHeight, float* clic
 
 ofVec2f UIGrid::GetCellPosition(int col, int row)
 {
-   ofVec2f ret;
-   
-   float xsize = float(mWidth) / mCols;
-   float ysize = float(mHeight) / mRows;
-   
-   ret.x = xsize * col;
-   ret.y = ysize * row;
-   
-   if (mFlip)
-      ret.y = (mHeight-1) - ret.y - ysize;
-   
-   return ret;
+   return ofVec2f(GetX(col, row), GetY(row));
 }
 
 bool UIGrid::CanAdjustMultislider() const
