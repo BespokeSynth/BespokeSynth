@@ -59,6 +59,8 @@ FloatSlider::FloatSlider(IFloatSliderListener* owner, const char* label, int x, 
    SetPosition(x,y);
    (dynamic_cast<IDrawableModule*>(owner))->AddUIControl(this);
    SetParent(dynamic_cast<IClickable*>(owner));
+   mLastComputeCacheTime = new double[gBufferSize];
+   mLastComputeCacheValue = new float[gBufferSize];
 }
 
 FloatSlider::FloatSlider(IFloatSliderListener* owner, const char* label, IUIControl* anchor, AnchorDirection anchorDir, int w, int h, float* var, float min, float max, int digits /* = -1 */)
@@ -600,30 +602,41 @@ void FloatSlider::Compute(int samplesIn /*= 0*/)
    if (mLastComputeTime == gTime && mLastComputeSamplesIn == samplesIn)
       return;  //we've just calculated this, no need to do it again! earlying out avoids wasted work and circular modulation loops
 
+   if (mLFOControl && mLFOControl->Active() && mLFOControl->InLowResMode() && samplesIn != 0)
+      return;  //only do the math on Compute(0) for low res mode
+
    mLastComputeTime = gTime;
    mLastComputeSamplesIn = samplesIn;
-   
-   if (mModulator && mModulator->Active())
+
+   float oldVal = *mVar;
+
+   static bool sUseCache = true;
+   if (sUseCache && samplesIn >= 0 && samplesIn < gBufferSize && mLastComputeCacheTime[samplesIn] == gTime)
    {
-      float* var = mIsSmoothing ? &mSmoothTarget : mVar;
-      float oldVal = *var;
-      *var = mModulator->Value(samplesIn);
-      if (oldVal != *var && !mIsSmoothing)
+      *mVar = mLastComputeCacheValue[samplesIn];
+   }
+   else
+   {
+      if (mModulator && mModulator->Active())
       {
-         //PROFILER(FloatSlider_Compute_UpdateSlider);
-         mOwner->FloatSliderUpdated(this, oldVal);
+         if (mIsSmoothing)
+            mSmoothTarget = mModulator->Value(samplesIn);
+         else
+            *mVar = mModulator->Value(samplesIn);
+      }
+
+      if (mIsSmoothing)
+         *mVar = mRamp.Value(gTime + samplesIn * gInvSampleRateMs);
+
+      if (samplesIn >= 0 && samplesIn < gBufferSize && mLastComputeCacheTime[samplesIn] == gTime)
+      {
+         mLastComputeCacheValue[samplesIn] = *mVar;
+         mLastComputeCacheTime[samplesIn] = gTime;
       }
    }
 
-   if (mIsSmoothing)
-   {
-      float oldVal = *mVar;
-      *mVar = mRamp.Value(gTime + samplesIn * gInvSampleRateMs);
-      if (oldVal != *mVar)
-      {
-         mOwner->FloatSliderUpdated(this, oldVal);
-      }
-   }
+   if (oldVal != *mVar)
+      mOwner->FloatSliderUpdated(this, oldVal);
 }
 
 float* FloatSlider::GetModifyValue()

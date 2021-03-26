@@ -54,6 +54,7 @@ void FloatSliderLFOControl::CreateUIControls()
    FLOATSLIDER(mLengthSlider, "length", &mLFOSettings.mLength, 0, 1);
    FLOATSLIDER(mShuffleSlider, "shuffle", &mLFOSettings.mShuffle, 0, 1);
    FLOATSLIDER(mSoftenSlider,"soften",&mLFOSettings.mSoften,0,1);
+   CHECKBOX(mLowResModeCheckbox, "low res", &mLFOSettings.mLowResMode);
    ENDUIBLOCK(mWidth,mHeight);
    
    mIntervalSelector->AddLabel("free", kInterval_Free);
@@ -131,6 +132,7 @@ void FloatSliderLFOControl::DrawModule()
    mSoftenSlider->Draw();
    mShuffleSlider->Draw();
    mLengthSlider->Draw();
+   mLowResModeCheckbox->Draw();
    if (!mPinned)
       mPinButton->Draw();
    
@@ -468,7 +470,7 @@ FloatSliderLFOControl* LFOPool::GetLFO(FloatSlider* owner)
 
 namespace
 {
-   const int kSaveStateRev = 4;
+   const int kSaveStateRev = 5;
    const int kFixNonRevvedData = 999;
 }
 
@@ -486,6 +488,7 @@ void LFOSettings::SaveState(FileStreamOut& out) const
    out << mShuffle;
    out << mFreeRate;
    out << mLength;
+   out << mLowResMode;
 }
 
 void LFOSettings::LoadState(FileStreamIn& in)
@@ -516,5 +519,7 @@ void LFOSettings::LoadState(FileStreamIn& in)
       in >> mFreeRate;
    if (rev >= 4)
       in >> mLength;
+   if (rev >= 5)
+      in >> mLowResMode;
 }
 
