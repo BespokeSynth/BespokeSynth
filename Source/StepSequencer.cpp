@@ -32,6 +32,7 @@ StepSequencer::StepSequencer()
 , mAdjustOffsetsCheckbox(nullptr)
 , mRepeatRate(kInterval_None)
 , mRepeatRateDropdown(nullptr)
+, mNumMeasures(1)
 , mStepInterval(kInterval_16n)
 , mStepIntervalDropdown(nullptr)
 , mUseStrengthSliderCheckbox(nullptr)
@@ -57,8 +58,9 @@ void StepSequencer::CreateUIControls()
    mGrid = new UIGrid(40,45,180,150,16,NUM_STEPSEQ_ROWS, this);
    mStrengthSlider = new FloatSlider(this,"str",75,22,50,15,&mStrength,0,1,2);
    mUseStrengthSliderCheckbox = new Checkbox(this,"use str",128,22,&mUseStrengthSlider);
+   mNumMeasuresSlider = new IntSlider(this, "measures", 145, 22, 80, 15, &mNumMeasures, 1, 4);
    mPresetDropdown = new DropdownList(this,"preset",5,4,&mPreset);
-   mGridYOffDropdown = new DropdownList(this,"yoff",190,22,&mGridYOff);
+   mGridYOffDropdown = new DropdownList(this,"yoff",288,4,&mGridYOff);
    mAdjustOffsetsCheckbox = new Checkbox(this,"offsets",175,4,&mAdjustOffsets);
    mRepeatRateDropdown = new DropdownList(this,"repeat",5,22,(int*)(&mRepeatRate));
    mStepIntervalDropdown = new DropdownList(this,"step",133,4,(int*)(&mStepInterval));
@@ -407,6 +409,7 @@ void StepSequencer::DrawModule()
    mGrid->Draw();
    mStrengthSlider->Draw();
    mUseStrengthSliderCheckbox->Draw();
+   mNumMeasuresSlider->Draw();
    mPresetDropdown->Draw();
    mAdjustOffsetsCheckbox->Draw();
    mRepeatRateDropdown->Draw();
@@ -786,6 +789,25 @@ void StepSequencer::RadioButtonUpdated(RadioButton* radio, int oldVal)
 
 void StepSequencer::IntSliderUpdated(IntSlider* slider, int oldVal)
 {
+   if (slider == mNumMeasuresSlider)
+   {
+      mGrid->SetGrid(GetNumSteps(mStepInterval), mNumRows);
+      if (mNumMeasures > oldVal)
+      {
+         int newChunkCount = ceil(mNumMeasures / oldVal);
+         int stepsPerChunk = GetNumSteps(mStepInterval) / newChunkCount;
+         for (int chunk = 1; chunk < newChunkCount; ++chunk)
+         {
+            for (int col = 0; col < stepsPerChunk && col + stepsPerChunk * chunk < mGrid->GetCols(); ++col)
+            {
+               for (int row = 0; row < mGrid->GetRows(); ++row)
+               {
+                  mGrid->SetVal(col + stepsPerChunk * chunk, row, mGrid->GetVal(col, row), false);
+               }
+            }
+         }
+      }
+   }
 }
 
 void StepSequencer::ButtonClicked(ClickButton* button)
@@ -879,8 +901,7 @@ void StepSequencer::SetUpFromSaveData()
    SetUpPatchCables(mModuleSaveData.GetString("target"));
    mGrid->SetDimensions(mModuleSaveData.GetInt("gridwidth"), mModuleSaveData.GetInt("gridheight"));
    mNumRows = mModuleSaveData.GetInt("gridrows");
-   mNumMeasures = mModuleSaveData.GetInt("gridmeasures");
-   mGrid->SetGrid(mNumRows, GetNumSteps(mStepInterval));
+   mGrid->SetGrid(GetNumSteps(mStepInterval), mNumRows);
    
    bool multisliderMode = mModuleSaveData.GetBool("multislider_mode");
    mGrid->SetGridMode(multisliderMode ? UIGrid::kMultisliderBipolar : UIGrid::kNormal);

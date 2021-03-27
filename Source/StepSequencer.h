@@ -190,6 +190,7 @@ private:
    NoteRepeat* mNoteRepeats[NUM_STEPSEQ_ROWS];
    int mNumRows;
    int mNumMeasures;
+   IntSlider* mNumMeasuresSlider;
    NoteInterval mStepInterval;
    DropdownList* mStepIntervalDropdown;
    GridController* mGridController;
