@@ -29,6 +29,7 @@ void HelpDisplay::CreateUIControls()
    
    mShowTooltipsCheckbox = new Checkbox(this, "show tooltips", 3, 22, &sShowTooltips);
    mDumpModuleInfo = new ClickButton(this, "dump module info", 110, 22);
+   mTutorialVideoLinkButton = new ClickButton(this, "youtu.be/SYBc8X2IxqM", 160, 63);
 
    //mDumpModuleInfo->SetShowing(false);
 }
@@ -41,7 +42,11 @@ void HelpDisplay::LoadHelp()
 {
    File file(ofToDataPath("help.txt").c_str());
    if (file.existsAsFile())
-      mHelpText = file.loadFileAsString().toStdString();
+   {
+      string help = file.loadFileAsString().toStdString();
+      ofStringReplace(help, "\r", "");
+      mHelpText = ofSplitString(help, "\n");
+   }
 }
 
 void HelpDisplay::DrawModule()
@@ -55,10 +60,15 @@ void HelpDisplay::DrawModule()
    mShowTooltipsCheckbox->Draw();
    mDumpModuleInfo->Draw();
    
-   ofRectangle rect;
-   rect = gFont.DrawStringWrap(mHelpText,15,4,75,mWidth-8);
+   DrawTextNormal("video overview available at:", 4, 75);
+   mTutorialVideoLinkButton->Draw();
    
-   mHeight = rect.height + 75;
+   mHeight = 100;
+   for (size_t i = 0; i < mHelpText.size(); ++i)
+   {
+      DrawTextNormal(mHelpText[i], 4, mHeight);
+      mHeight += 14;
+   }
 }
 
 void HelpDisplay::GetModuleDimensions(float& w, float& h)
@@ -99,7 +109,8 @@ void HelpDisplay::LoadTooltips()
       {
          if (lines[i].isNotEmpty())
          {
-            vector<string> tokens = ofSplitString(lines[i].toStdString(), "~");
+            juce::String line = lines[i].replace("\\n", "\n");
+            vector<string> tokens = ofSplitString(line.toStdString(), "~");
             if (tokens.size() == 2)
             {
                if (!moduleInfo.module.empty())
@@ -213,6 +224,21 @@ HelpDisplay::UIControlTooltipInfo* HelpDisplay::FindControlInfo(IUIControl* cont
             return &info;
       }
    }
+
+   //didn't find it, try again with the "module parent"
+   parent = control->GetModuleParent();
+   if (parent != nullptr)
+      moduleInfo = FindModuleInfo(parent->GetTypeName());
+   if (moduleInfo)
+   {
+      string controlName = control->Name();
+      for (auto& info : moduleInfo->controlTooltips)
+      {
+         if (StringMatch(info.controlName, controlName))
+            return &info;
+      }
+   }
+
    return nullptr;
 }
 
@@ -253,6 +279,10 @@ string HelpDisplay::GetModuleTooltipFromName(string moduleTypeName)
 
 void HelpDisplay::ButtonClicked(ClickButton* button)
 {
+   if (button == mTutorialVideoLinkButton)
+   {
+      URL("https://youtu.be/SYBc8X2IxqM").launchInDefaultBrowser();
+   }
    if (button == mDumpModuleInfo)
    {
       /*vector<ModuleType> moduleTypes = {
