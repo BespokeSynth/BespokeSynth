@@ -1825,7 +1825,7 @@ namespace {
    void FillMidiInput(DropdownList* list)
    {
       assert(list);
-      auto& devices = MidiController::GetAvailableInputDevices();
+      const auto& devices = MidiController::GetAvailableInputDevices();
       for (int i=0; i< devices.size(); ++i)
          list->AddLabel(devices[i].c_str(), i);
    }
@@ -1833,7 +1833,7 @@ namespace {
    void FillMidiOutput(DropdownList* list)
    {
       assert(list);
-      auto& devices = MidiController::GetAvailableOutputDevices();
+      const auto& devices = MidiController::GetAvailableOutputDevices();
       for (int i = 0; i < devices.size(); ++i)
          list->AddLabel(devices[i].c_str(), i);
    }
@@ -1986,7 +1986,7 @@ void MidiController::SetUpFromSaveData()
    
    BuildControllerList();
    
-   auto& devices = GetAvailableInputDevices();
+   const auto& devices = GetAvailableInputDevices();
    for (int i=0; i<devices.size(); ++i)
    {
       if (devices[i].c_str() == mDeviceIn)
