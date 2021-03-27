@@ -29,15 +29,17 @@ class CanvasElement
 public:
    CanvasElement(Canvas* canvas, int col, int row, float offset, float length);
    virtual ~CanvasElement() {}
-   void Draw();
+   void Draw(ofVec2f offset);
+   void DrawOffscreen();
    void SetHighlight(bool highlight) { mHighlighted = highlight; }
    bool GetHighlighted() const { return mHighlighted; }
-   ofRectangle GetRect(bool clamp, bool wrapped) const;
+   ofRectangle GetRect(bool clamp, bool wrapped, ofVec2f offset = ofVec2f(0,0)) const;
    float GetStart() const;
    void SetStart(float start, bool preserveLength);
    virtual float GetEnd() const;
    void SetEnd(float end);
    vector<IUIControl*>& GetUIControls() { return mUIControls; }
+   void MoveElementByDrag(ofVec2f dragOffset);
    
    virtual bool IsResizable() const { return true; }
    virtual CanvasElement* CreateDuplicate() const = 0;
@@ -45,6 +47,7 @@ public:
    virtual void CheckboxUpdated(string label, bool value);
    virtual void FloatSliderUpdated(string label, float oldVal, float newVal);
    virtual void IntSliderUpdated(string label, int oldVal, float newVal);
+   virtual void ButtonClicked(string label);
    
    virtual void SaveState(FileStreamOut& out);
    virtual void LoadState(FileStreamIn& in);
@@ -55,9 +58,13 @@ public:
    float mLength;
    
 protected:
-   virtual void DrawContents(bool wrapped) = 0;
-   void DrawElement(bool wrapped);
+   virtual void DrawContents(bool clamp, bool wrapped, ofVec2f offset) = 0;
+   void DrawElement(bool clamp, bool wrapped, ofVec2f offset);
    void AddElementUIControl(IUIControl* control);
+   void GetDragDestinationData(ofVec2f dragOffset, int& newRow, int& newCol, float& newOffset) const;
+   ofRectangle GetRectAtDestination(bool clamp, bool wrapped, ofVec2f dragOffset) const;
+   float GetStart(int col, float offset) const;
+   float GetEnd(int col, float offset, float length) const;
    
    Canvas* mCanvas;
    bool mHighlighted;
@@ -86,7 +93,7 @@ public:
    void LoadState(FileStreamIn& in) override;
    
 private:
-   void DrawContents(bool wrapped) override;
+   void DrawContents(bool clamp, bool wrapped, ofVec2f offset) override;
    
    float mVelocity;
    FloatSlider* mElementOffsetSlider;
@@ -113,31 +120,28 @@ public:
    static CanvasElement* Create(Canvas* canvas, int col, int row) { return new SampleCanvasElement(canvas,col,row,0,1); }
    void SetSample(Sample* sample);
    Sample* GetSample() const { return mSample; }
-   void SetNumLoops(int numLoops) { mNumLoops = numLoops; }
-   int GetNumLoops() const { return mNumLoops; }
    float GetVolume() const { return mVolume; }
-   bool ShouldMeasureSync() const { return mMeasureSync; }
+   bool IsMuted() const { return mMute; }
    
    CanvasElement* CreateDuplicate() const override;
    
    void CheckboxUpdated(string label, bool value) override;
+   void ButtonClicked(string label) override;
    
    void SaveState(FileStreamOut& out) override;
    void LoadState(FileStreamIn& in) override;
    
 private:
-   void DrawContents(bool wrapped) override;
+   void DrawContents(bool clamp, bool wrapped, ofVec2f offset) override;
    
    Sample* mSample;
-   int mNumLoops;
-   int mNumBars;
-   IntSlider* mNumLoopsSlider;
-   TextEntry* mNumBarsEntry;
    FloatSlider* mElementOffsetSlider;
    float mVolume;
    FloatSlider* mVolumeSlider;
-   bool mMeasureSync;
-   Checkbox* mMeasureSyncCheckbox;
+   bool mMute;
+   Checkbox* mMuteCheckbox;
+   ClickButton* mSplitSampleButton;
+   ClickButton* mResetSpeedButton;
 };
 
 class EventCanvasElement : public CanvasElement
@@ -161,7 +165,7 @@ public:
    void LoadState(FileStreamIn& in) override;
    
 private:
-   void DrawContents(bool wrapped) override;
+   void DrawContents(bool clamp, bool wrapped, ofVec2f offset) override;
    
    IUIControl* mUIControl;
    float mValue;

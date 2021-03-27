@@ -19,7 +19,6 @@ CanvasControls::CanvasControls()
 , mDummyInt(0)
 , mCanvas(nullptr)
 , mSelectedElement(nullptr)
-, mAddElementButton(nullptr)
 , mRemoveElementButton(nullptr)
 , mNumVisibleRowsEntry(nullptr)
 , mClearButton(nullptr)
@@ -33,18 +32,15 @@ CanvasControls::~CanvasControls()
 void CanvasControls::CreateUIControls()
 {
    IDrawableModule::CreateUIControls();
-   mAddElementButton = new ClickButton(this," + ",0,2);
-   mRemoveElementButton = new ClickButton(this," - ",28,2);
-   mCanvasLengthEntry = new TextEntry(this,"canvas length",55,2,3,&mCanvas->mNumCols,1,128);
-   mNumVisibleRowsEntry = new TextEntry(this,"num rows ",175,2,3,&mCanvas->mNumVisibleRows,1,128);
-   mClearButton = new ClickButton(this, "clear", 270, 2);
-   mDragModeSelector = new DropdownList(this, "drag mode", 310, 2, (int*)(&mCanvas->mDragMode));
+   mRemoveElementButton = new ClickButton(this,"delete",5,1);
+   mNumVisibleRowsEntry = new TextEntry(this,"view rows",175,1,3,&mCanvas->mNumVisibleRows,1,9999);
+   mClearButton = new ClickButton(this, "clear", 270, 1);
+   mDragModeSelector = new DropdownList(this, "drag mode", 310, 1, (int*)(&mCanvas->mDragMode));
    
    mDragModeSelector->AddLabel("drag both", Canvas::kDragBoth);
    mDragModeSelector->AddLabel("horizontal", Canvas::kDragHorizontal);
    mDragModeSelector->AddLabel("vertical", Canvas::kDragVertical);
 
-   mCanvasLengthEntry->DrawLabel(true);
    mNumVisibleRowsEntry->DrawLabel(true);
    
    SetElement(nullptr);
@@ -89,14 +85,17 @@ void CanvasControls::PreDrawModule()
 {
    float x,y;
    mCanvas->GetPosition(x, y, K(localOnly));
-   SetPosition(x,y+mCanvas->GetHeight());
+   SetPosition(x,y+13+mCanvas->GetHeight());
 }
 
 void CanvasControls::DrawModule()
 {
-   mAddElementButton->Draw();
+   ofPushStyle();
+   ofFill();
+   ofSetColor(100, 100, 100);
+   ofRect(0, 0, mWidth, 19);
+   ofPopStyle();
    mRemoveElementButton->Draw();
-   mCanvasLengthEntry->Draw();
    mNumVisibleRowsEntry->Draw();
    mClearButton->Draw();
    mDragModeSelector->Draw();
@@ -140,14 +139,17 @@ void CanvasControls::IntSliderUpdated(IntSlider* slider, int oldVal)
    }
 }
 
+void CanvasControls::TextEntryComplete(TextEntry* entry)
+{
+   if (entry == mNumVisibleRowsEntry)
+   {
+      if (mCanvas->mNumVisibleRows > mCanvas->GetNumRows())
+         mCanvas->mNumVisibleRows = mCanvas->GetNumRows();
+   }
+}
+
 void CanvasControls::ButtonClicked(ClickButton* button)
 {
-   if (button == mAddElementButton)
-   {
-      CanvasElement* element = mCanvas->CreateElement(0,0);
-      mCanvas->AddElement(element);
-      mCanvas->SelectElement(element);
-   }
    if (button == mRemoveElementButton)
    {
       mSelectedElement = nullptr;
@@ -171,6 +173,13 @@ void CanvasControls::ButtonClicked(ClickButton* button)
    if (button == mClearButton)
    {
       mCanvas->Clear();
+   }
+
+   std::vector<CanvasElement*> elements = mCanvas->GetElements(); //make a copy of the list, since I may modify the list through the actions below
+   for (auto* element : elements)
+   {
+      if (element->GetHighlighted())
+         element->ButtonClicked(button->Name());
    }
 }
 

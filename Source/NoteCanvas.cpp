@@ -16,10 +16,15 @@
 #include "CanvasElement.h"
 #include "Profiler.h"
 #include "PolyphonyMgr.h"
+#include "CanvasTimeline.h"
+#include "CanvasScrollbar.h"
 
 NoteCanvas::NoteCanvas()
 : mCanvas(nullptr)
 , mCanvasControls(nullptr)
+, mCanvasTimeline(nullptr)
+, mCanvasScrollbarHorizontal(nullptr)
+, mCanvasScrollbarVertical(nullptr)
 , mNumMeasuresSlider(nullptr)
 , mNumMeasures(1)
 , mQuantizeButton(nullptr)
@@ -30,11 +35,11 @@ NoteCanvas::NoteCanvas()
 , mStopQueued(false)
 , mInterval(kInterval_8n)
 , mIntervalSelector(nullptr)
-, mScrollPartial(0)
 , mFreeRecordCheckbox(nullptr)
 , mFreeRecord(false)
 , mFreeRecordStartMeasure(0)
 , mClipButton(nullptr)
+, mShowIntervals(false)
 {
    TheTransport->AddAudioPoller(this);
    SetEnabled(true);
@@ -51,6 +56,7 @@ void NoteCanvas::CreateUIControls()
    mRecordCheckbox = new Checkbox(this,"rec",50,5,&mRecord);
    mFreeRecordCheckbox = new Checkbox(this,"free rec",90,5,&mFreeRecord);
    mNumMeasuresSlider = new IntSlider(this,"measures",5,25,100,15,&mNumMeasures,1,16);
+   mShowIntervalsCheckbox = new Checkbox(this, "show chord intervals", 160, 25, &mShowIntervals);
    
    mIntervalSelector = new DropdownList(this,"interval",110,25,(int*)(&mInterval));
    mIntervalSelector->AddLabel("4n", kInterval_4n);
@@ -62,7 +68,7 @@ void NoteCanvas::CreateUIControls()
    mIntervalSelector->AddLabel("32n", kInterval_32n);
    mIntervalSelector->AddLabel("64n", kInterval_64n);
    
-   mCanvas = new Canvas(this, 5, 45, 390, 100, L(length,1), L(rows,128), L(cols,16), &(NoteCanvasElement::Create));
+   mCanvas = new Canvas(this, 5, 55, 390, 200, L(length,1), L(rows,128), L(cols,16), &(NoteCanvasElement::Create));
    AddUIControl(mCanvas);
    mCanvas->SetNumVisibleRows(16);
    mCanvas->SetRowOffset(60);
@@ -73,6 +79,15 @@ void NoteCanvas::CreateUIControls()
    UpdateNumColumns();
    
    mCanvas->SetListener(this);
+
+   mCanvasTimeline = new CanvasTimeline(mCanvas, "timeline");
+   AddUIControl(mCanvasTimeline);
+
+   mCanvasScrollbarHorizontal = new CanvasScrollbar(mCanvas, "scrollh", CanvasScrollbar::Style::kHorizontal);
+   AddUIControl(mCanvasScrollbarHorizontal);
+
+   mCanvasScrollbarVertical = new CanvasScrollbar(mCanvas, "scrollv", CanvasScrollbar::Style::kVertical);
+   AddUIControl(mCanvasScrollbarVertical);
 }
 
 NoteCanvas::~NoteCanvas()
@@ -137,6 +152,10 @@ void NoteCanvas::KeyPressed(int key, bool isRepeat)
                element->mCol = ofClamp(element->mCol + directionLeftRight, 0, mCanvas->GetNumCols()-1);
             }
          }
+      }
+      else
+      {
+         mCanvas->KeyPressed(key, isRepeat);
       }
    }
 }
@@ -263,7 +282,8 @@ void NoteCanvas::OnTransportAdvanced(float amount)
 
 double NoteCanvas::GetCurPos(double time) const
 {
-   return ((TheTransport->GetMeasure(time) % mNumMeasures) + TheTransport->GetMeasurePos(time)) / mNumMeasures;
+   int loopMeasures = MAX(1, int(mCanvas->mLoopEnd - mCanvas->mLoopStart));
+   return (((TheTransport->GetMeasure(time) % loopMeasures) + TheTransport->GetMeasurePos(time)) + mCanvas->mLoopStart) / mCanvas->GetLength();
 }
 
 void NoteCanvas::UpdateNumColumns()
@@ -337,72 +357,78 @@ void NoteCanvas::DrawModule()
    mCanvas->SetCursorPos(GetCurPos(gTime));
    
    mCanvas->Draw();
+   mCanvasTimeline->Draw();
+   mCanvasScrollbarHorizontal->Draw();
+   mCanvasScrollbarVertical->Draw();
    
    ofPushStyle();
    ofSetColor(128, 128, 128, gModuleDrawAlpha * .8f);
    for (int i=0;i<mCanvas->GetNumVisibleRows();++i)
    {
       int pitch = 127-mCanvas->GetRowOffset()-i;
-      float boxHeight = (float(mCanvas->GetGridHeight())/mCanvas->GetNumVisibleRows());
+      float boxHeight = (float(mCanvas->GetHeight())/mCanvas->GetNumVisibleRows());
       float y = mCanvas->GetPosition(true).y + i*boxHeight;
       float scale = MIN(boxHeight, 20);
       DrawTextNormal(NoteName(pitch,false,true) + "("+ ofToString(pitch) + ")", mCanvas->GetPosition(true).x + 2, y - (scale/8) + boxHeight, scale);
    }
    ofPopStyle();
    
-   ofPushMatrix();
-   ofTranslate(mCanvas->GetPosition(true).x, mCanvas->GetPosition(true).y);
-   ofPushStyle();
-   ofSetLineWidth(3);
-   auto elements = mCanvas->GetElements();
-   for (auto e1 : elements)
+   if (mShowIntervals)
    {
-      for (auto e2 : elements)
+      ofPushMatrix();
+      ofTranslate(mCanvas->GetPosition(true).x, mCanvas->GetPosition(true).y);
+      ofPushStyle();
+      ofSetLineWidth(3);
+      auto elements = mCanvas->GetElements();
+      for (auto e1 : elements)
       {
-         if (e1 != e2)
+         for (auto e2 : elements)
          {
-            if (abs(e1->GetStart() - e2->GetStart()) < (1.0/32) / mNumMeasures)
+            if (e1 != e2)
             {
-               int interval = abs(e1->mRow - e2->mRow);
-               if (interval >= 3 && interval <= 7)
+               if (abs(e1->GetStart() - e2->GetStart()) < (1.0 / 32) / mNumMeasures)
                {
-                  auto rect1 = e1->GetRect(true, false);
-                  auto rect2 = e2->GetRect(true, false);
-                  float offset = 0;
-                  if (interval == 3)
+                  int interval = abs(e1->mRow - e2->mRow);
+                  if (interval >= 3 && interval <= 7)
                   {
-                     ofSetColor(255,0,0,50);
+                     auto rect1 = e1->GetRect(true, false);
+                     auto rect2 = e2->GetRect(true, false);
+                     float offset = 0;
+                     if (interval == 3)
+                     {
+                        ofSetColor(255, 0, 0, 50);
+                     }
+                     if (interval == 4)
+                     {
+                        ofSetColor(0, 255, 0, 50);
+                     }
+                     if (interval == 5)
+                     {
+                        ofSetColor(0, 0, 255, 50);
+                        offset = -1;
+                     }
+                     if (interval == 6)
+                     {
+                        ofSetColor(255, 0, 255, 50);
+                        offset = 3;
+                     }
+                     if (interval == 7)
+                     {
+                        ofSetColor(0, 0, 0, 50);
+                        offset = -3;
+                     }
+
+                     ofLine(rect1.x + offset, rect1.getCenter().y, rect2.x + offset, rect2.getCenter().y);
+                     ofLine(rect1.x + offset, rect1.getCenter().y, rect1.x + 5 + offset, rect1.getCenter().y);
+                     ofLine(rect2.x + offset, rect2.getCenter().y, rect2.x + 5 + offset, rect2.getCenter().y);
                   }
-                  if (interval == 4)
-                  {
-                     ofSetColor(0,255,0,50);
-                  }
-                  if (interval == 5)
-                  {
-                     ofSetColor(0,0,255,50);
-                     offset = -1;
-                  }
-                  if (interval == 6)
-                  {
-                     ofSetColor(255,0,255,50);
-                     offset = 3;
-                  }
-                  if (interval == 7)
-                  {
-                     ofSetColor(0,0,0,50);
-                     offset = -3;
-                  }
-                  
-                  ofLine(rect1.x + offset, rect1.getCenter().y, rect2.x + offset, rect2.getCenter().y);
-                  ofLine(rect1.x + offset, rect1.getCenter().y, rect1.x + 5 + offset, rect1.getCenter().y);
-                  ofLine(rect2.x + offset, rect2.getCenter().y, rect2.x + 5 + offset, rect2.getCenter().y);
                }
             }
          }
       }
+      ofPopStyle();
+      ofPopMatrix();
    }
-   ofPopStyle();
-   ofPopMatrix();
    
    mCanvasControls->Draw();
    mQuantizeButton->Draw();
@@ -412,6 +438,7 @@ void NoteCanvas::DrawModule()
    mFreeRecordCheckbox->Draw();
    mNumMeasuresSlider->Draw();
    mIntervalSelector->Draw();
+   mShowIntervalsCheckbox->Draw();
    
    if (mRecord)
    {
@@ -423,50 +450,10 @@ void NoteCanvas::DrawModule()
    }
 }
 
-bool NoteCanvas::MouseScrolled(int x, int y, float scrollX, float scrollY)
-{
-   if (GetKeyModifiers() == kModifier_Shift)
-   {
-      float canvasX,canvasY;
-      mCanvas->GetPosition(canvasX, canvasY, true);
-      ofVec2f canvasPos = ofVec2f(ofMap(x, canvasX, canvasX+mCanvas->GetWidth(), 0, 1),
-                                  ofMap(y, canvasY, canvasY+mCanvas->GetHeight(), 0, 1));
-      if (IsInUnitBox(canvasPos))
-      {
-         float zoomCenter = ofLerp(mCanvas->mStart, mCanvas->mEnd, canvasPos.x);
-         float distFromStart = zoomCenter - mCanvas->mStart;
-         float distFromEnd = zoomCenter - mCanvas->mEnd;
-         
-         distFromStart *= 1 - scrollY/100;
-         distFromEnd *= 1 - scrollY/100;
-         
-         float slideX = (mCanvas->mEnd - mCanvas->mStart) * -scrollX/300;
-         
-         mCanvas->mStart = ofClamp(zoomCenter - distFromStart + slideX, 0, mNumMeasures);
-         mCanvas->mEnd = ofClamp(zoomCenter - distFromEnd + slideX, 0, mNumMeasures);
-         ofLog() << mCanvas->mStart << " " << mCanvas->mEnd;
-         return true;
-      }
-   }
-   else
-   {
-      if (x >= mCanvas->GetPosition(true).x && y >= mCanvas->GetPosition(true).y &&
-          x < mCanvas->GetPosition(true).x + mCanvas->GetWidth() && y < mCanvas->GetPosition(true).y + mCanvas->GetHeight())
-      {
-         mScrollPartial -= scrollY;
-         int scrollWhole = int(mScrollPartial);
-         mScrollPartial -= scrollWhole;
-         mCanvas->SetRowOffset(mCanvas->GetRowOffset()+scrollWhole);
-         return true;
-      }
-   }
-   return false;
-}
-
 namespace
 {
-   const float extraW = 10;
-   const float extraH = 140;
+   const float extraW = 20;
+   const float extraH = 163;
 }
 
 void NoteCanvas::Resize(float w, float h)
@@ -491,8 +478,10 @@ void NoteCanvas::SetNumMeasures(int numMeasures)
       mCanvas->SetMajorColumnInterval(TheTransport->CountInStandardMeasure(mInterval));
    else
       mCanvas->SetMajorColumnInterval(TheTransport->CountInStandardMeasure(mInterval) / 4);
-   mCanvas->mStart = 0;
-   mCanvas->mEnd = mNumMeasures;
+   mCanvas->mViewStart = 0;
+   mCanvas->mViewEnd = mNumMeasures;
+   mCanvas->mLoopStart = 0;
+   mCanvas->mLoopEnd = mNumMeasures;
 }
 
 void NoteCanvas::SetRecording(bool rec)
@@ -642,7 +631,7 @@ void NoteCanvas::LoadLayout(const ofxJSONElement& moduleInfo)
 {
    mModuleSaveData.LoadString("target", moduleInfo);
    mModuleSaveData.LoadFloat("canvaswidth", moduleInfo, 390, 390, 99999, K(isTextField));
-   mModuleSaveData.LoadFloat("canvasheight", moduleInfo, 100, 40, 99999, K(isTextField));
+   mModuleSaveData.LoadFloat("canvasheight", moduleInfo, 200, 40, 99999, K(isTextField));
    
    SetUpFromSaveData();
 }

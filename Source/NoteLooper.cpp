@@ -56,7 +56,6 @@ void NoteLooper::CreateUIControls()
    AddUIControl(mCanvas);
    mCanvas->SetNumVisibleRows(1);
    mCanvas->SetRowOffset(0);
-   mCanvas->SetScrollable(false);
    SetNumMeasures(mNumMeasures);
 }
 
@@ -357,8 +356,10 @@ void NoteLooper::SetNumMeasures(int numMeasures)
    mCanvas->SetLength(mNumMeasures);
    mCanvas->SetNumCols(TheTransport->CountInStandardMeasure(kInterval_8n) * mNumMeasures);
    mCanvas->SetMajorColumnInterval(TheTransport->CountInStandardMeasure(kInterval_8n));
-   mCanvas->mStart = 0;
-   mCanvas->mEnd = mNumMeasures;
+   mCanvas->mViewStart = 0;
+   mCanvas->mViewEnd = mNumMeasures;
+   mCanvas->mLoopStart = 0;
+   mCanvas->mLoopEnd = mNumMeasures;
 }
 
 void NoteLooper::DropdownUpdated(DropdownList* list, int oldVal)

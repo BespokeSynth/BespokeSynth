@@ -61,11 +61,12 @@ public:
    void Render() override;
    void MouseReleased() override;
    bool MouseMoved(float x, float y) override;
+   bool MouseScrolled(int x, int y, float scrollX, float scrollY) override;
    void Clear();
    void SetListener(ICanvasListener* listener) { mListener = listener; }
    void SetDimensions(int width, int height) { mWidth = width; mHeight = height; }
-   int GetWidth() const { return mWidth; }
-   int GetHeight() const { return mHeight; }
+   float GetWidth() const { return mWidth; }
+   float GetHeight() const { return mHeight; }
    void SetLength(float length) { mLength = length; }
    float GetLength() const { return mLength; }
    void SetNumRows(int rows) { mNumRows = rows; }
@@ -91,15 +92,15 @@ public:
    int GetNumVisibleRows() const { return MIN(mNumVisibleRows, mNumRows); }
    void SetRowOffset(int offset) { mRowOffset = ofClamp(offset,0,mNumRows-mNumVisibleRows); }
    int GetRowOffset() const { return mRowOffset; }
-   float GetGridWidth() const;
-   float GetGridHeight() const;
    bool ShouldWrap() const { return mWrap; }
    HighlightEnd GetHighlightEnd() const { return mHighlightEnd; }
    void SetMajorColumnInterval(int interval) { mMajorColumnInterval = interval; }
    void SetDragMode(DragMode mode) { mDragMode = mode; }
+   DragMode GetDragMode() const { return mDragMode; }
    bool IsRowVisible(int row) const;
-   void SetScrollable(bool scrollable) { mScrollable = scrollable; }
    void SetRowColor(int row, ofColor color);
+   MouseCursor GetMouseCursorType();
+   ofVec2f RescaleForZoom(float x, float y) const;
    
    //IUIControl
    void SetFromMidiCC(float slider) override {}
@@ -110,24 +111,21 @@ public:
    bool IsSliderControl() override { return false; }
    bool IsButtonControl() override { return false; }
    
-   float mStart;
-   float mEnd;
+   float mViewStart;
+   float mViewEnd;
+   float mLoopStart;
+   float mLoopEnd;
    
 private:
    void OnClicked(int x, int y, bool right) override;
    void GetDimensions(float& width, float& height) override { width = mWidth; height = mHeight; }
-   ofVec2f RescaleForZoom(float x, float y) const;
    
-   bool ShowVerticalScrollBar() const;
-   bool ShowHorizontalScrollBar() const;
-   float GetScrollBarTop() const;
-   float GetScrollBarBottom() const;
    bool IsOnElement(CanvasElement* element, float x, float y) const;
    float QuantizeToGrid(float input) const;
    
    bool mClick;
    CanvasElement* mClickedElement;
-   ofVec2f mElementClickOffset;
+   ofVec2f mClickedElementStartMousePos;
    float mWidth;
    float mHeight;
    float mLength;
@@ -137,17 +135,18 @@ private:
    float mCursorPos;
    CreateCanvasElementFn mElementCreator;
    int mRowOffset;
-   bool mScrolling;
-   float mScrollBarOffset;
    bool mWrap;
    bool mDragSelecting;
    ofRectangle mDragSelectRect;
+   bool mDragCanvasMoving;
+   ofVec2f mDragCanvasStartMousePos;
+   ofVec2f mDragCanvasStartCanvasPos;
    HighlightEnd mHighlightEnd;
    CanvasElement* mHighlightEndElement;
    HighlightEnd mDragEnd;
    int mMajorColumnInterval;
    bool mHasDuplicatedThisDrag;
-   bool mScrollable;
+   float mScrollVerticalPartial;
    std::array<ofColor, 128> mRowColors;
    
    int mNumRows;

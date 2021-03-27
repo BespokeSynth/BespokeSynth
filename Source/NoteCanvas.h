@@ -20,6 +20,8 @@
 #include "DropdownList.h"
 
 class CanvasControls;
+class CanvasTimeline;
+class CanvasScrollbar;
 
 class NoteCanvas : public IDrawableModule, public INoteSource, public ICanvasListener, public IFloatSliderListener, public IAudioPoller, public IIntSliderListener, public INoteReceiver, public IButtonListener, public IDropdownListener
 {
@@ -34,7 +36,6 @@ public:
    void SetEnabled(bool enabled) override { mEnabled = enabled; }
    bool IsResizable() const override { return true; }
    void Resize(float w, float h) override;
-   bool MouseScrolled(int x, int y, float scrollX, float scrollY) override;
    void KeyPressed(int key, bool isRepeat) override;
    
    void PlayNote(double time, int pitch, int velocity, int voiceIdx = -1, ModulationParameters modulation = ModulationParameters()) override;
@@ -75,7 +76,9 @@ private:
    
    Canvas* mCanvas;
    CanvasControls* mCanvasControls;
-   float mScrollPartial;
+   CanvasTimeline* mCanvasTimeline;
+   CanvasScrollbar* mCanvasScrollbarHorizontal;
+   CanvasScrollbar* mCanvasScrollbarVertical;
    vector<CanvasElement*> mNoteChecker{128};
    vector<NoteCanvasElement*> mInputNotes{128};
    vector<NoteCanvasElement*> mCurrentNotes{128};
@@ -93,6 +96,8 @@ private:
    bool mFreeRecord;
    Checkbox* mFreeRecordCheckbox;
    int mFreeRecordStartMeasure;
+   bool mShowIntervals;
+   Checkbox* mShowIntervalsCheckbox;
    
    vector<ModulationParameters> mVoiceModulations;
 };

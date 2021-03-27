@@ -15,6 +15,7 @@
 #include "PatchCableSource.h"
 #include "ModularSynth.h"
 #include "EventCanvas.h"
+#include "SampleCanvas.h"
 
 CanvasElement::CanvasElement(Canvas* canvas, int col, int row, float offset, float length)
 : mCanvas(canvas)
@@ -26,20 +27,45 @@ CanvasElement::CanvasElement(Canvas* canvas, int col, int row, float offset, flo
 {
 }
 
-void CanvasElement::Draw()
+void CanvasElement::Draw(ofVec2f offset)
 {
-   DrawElement(false);
-   if (mCanvas->ShouldWrap() && GetEnd() > 1)
-      DrawElement(true);
+   if (offset.x == 0 && offset.y == 0)
+   {
+      DrawElement(K(clamp), !K(wrapped), offset);
+      if (mCanvas->ShouldWrap() && GetEnd() > 1)
+         DrawElement(K(clamp), K(wrapped), offset);
+   }
+   else
+   {      
+      ofPushStyle();
+      ofSetLineWidth(1.5f);
+      ofNoFill();
+      ofSetColor(255, 255, 255, ofMap(sin(gTime / 1000 * PI * 2), -1, 1, 60, 100));
+      ofRect(GetRectAtDestination(K(clamp), !K(wrapped), offset), 0);
+      if (mCanvas->ShouldWrap() && GetEnd() > 1)
+         ofRect(GetRectAtDestination(K(clamp), K(wrapped), offset), 0);
+      ofPopStyle();
+
+      DrawElement(!K(clamp), !K(wrapped), offset);
+   }
 }
 
-void CanvasElement::DrawElement(bool wrapped)
+void CanvasElement::DrawElement(bool clamp, bool wrapped, ofVec2f offset)
 {
-   ofRectangle rect = GetRect(K(clamp), wrapped);
-   ofRectangle fullRect = GetRect(!K(clamp), wrapped);
+   ofRectangle rect = GetRect(clamp, wrapped, offset);
+   ofRectangle fullRect = GetRect(false, wrapped, offset);
+
+   if (rect.width < 0)
+   {
+      ofPushStyle();
+      ofFill();
+      ofSetColor(255, 0, 0);
+      ofRect(rect.x + rect.width, rect.y, -rect.width, rect.height, 0);
+      ofPopStyle();
+   }
 
    ofPushStyle();
-   DrawContents(wrapped);
+   DrawContents(clamp, wrapped, offset);
    ofPopStyle();
    
    if (mHighlighted)
@@ -55,7 +81,7 @@ void CanvasElement::DrawElement(bool wrapped)
       if (fullRect.x >= 0)
       {
          ofPushStyle();
-         if (mCanvas->GetHighlightEnd() == Canvas::kHighlightEnd_Start)
+         if (mCanvas->GetHighlightEnd() == Canvas::kHighlightEnd_Start && IsResizable())
          {
             ofSetLineWidth(1.5f);
             ofSetColor(255, 100, 100);
@@ -63,7 +89,7 @@ void CanvasElement::DrawElement(bool wrapped)
          ofLine(rect.x, rect.y, rect.x, rect.y + rect.height);
          ofPopStyle();
       }
-      if (fullRect.x + fullRect.width <= mCanvas->GetLength() * mCanvas->GetGridWidth())
+      if (fullRect.x + fullRect.width <= mCanvas->GetLength() * mCanvas->GetWidth())
       {
          ofPushStyle();
          if (mCanvas->GetHighlightEnd() == Canvas::kHighlightEnd_End && IsResizable())
@@ -79,9 +105,58 @@ void CanvasElement::DrawElement(bool wrapped)
    }
 }
 
+void CanvasElement::DrawOffscreen()
+{
+   ofPushStyle();
+   ofSetLineWidth(1);
+   ofSetColor(255, 255, 255);
+   {
+      ofRectangle rect = GetRect(K(clamp), !K(wrapped));
+      if (rect.y < 0)
+      {
+         rect.y = 0;
+         rect.height = 1;
+      }
+      if (rect.y + rect.height > mCanvas->GetHeight())
+      {
+         rect.y = mCanvas->GetHeight()-1;
+         rect.height = 1;
+      }
+      rect.width = MAX(rect.width, 1);
+      ofRect(rect);
+   }
+   if (mCanvas->ShouldWrap() && GetEnd() > 1)
+   {
+      ofRectangle rect = GetRect(K(clamp), K(wrapped));
+      if (rect.y < 0)
+      {
+         rect.y = 0;
+         rect.height = 1;
+      }
+      if (rect.y > mCanvas->GetHeight())
+      {
+         rect.y = mCanvas->GetHeight() - 1;
+         rect.height = 1;
+      }
+      rect.width = MAX(rect.width, 1);
+      ofRect(rect);
+   }
+   ofPopStyle();
+}
+
+float CanvasElement::GetStart(int col, float offset) const
+{
+   return (col + offset) / mCanvas->GetNumCols();
+}
+
+float CanvasElement::GetEnd(int col, float offset, float length) const
+{
+   return (col + offset + length) / mCanvas->GetNumCols();
+}
+
 float CanvasElement::GetStart() const
 {
-   return (mCol + mOffset) / mCanvas->GetNumCols();
+   return GetStart(mCol, mOffset);
 }
 
 void CanvasElement::SetStart(float start, bool preserveLength)
@@ -89,7 +164,6 @@ void CanvasElement::SetStart(float start, bool preserveLength)
    float end;
    if (!preserveLength)
       end = GetEnd();
-   FloatWrap(start, 1);
    start *= mCanvas->GetNumCols();
    mCol = int(start + .5f);
    mOffset = start - mCol;
@@ -99,7 +173,7 @@ void CanvasElement::SetStart(float start, bool preserveLength)
 
 float CanvasElement::GetEnd() const
 {
-   return (mCol + mOffset + mLength) / mCanvas->GetNumCols();
+   return GetEnd(mCol, mOffset, mLength);
 }
 
 void CanvasElement::SetEnd(float end)
@@ -107,15 +181,65 @@ void CanvasElement::SetEnd(float end)
    mLength = end * mCanvas->GetNumCols() - mCol - mOffset;
 }
 
-ofRectangle CanvasElement::GetRect(bool clamp, bool wrapped) const
+ofRectangle CanvasElement::GetRect(bool clamp, bool wrapped, ofVec2f offset) const
 {
-   float offset = wrapped ? -1 : 0;
-   float start = ofMap(GetStart() + offset,mCanvas->mStart/mCanvas->GetLength(),mCanvas->mEnd/mCanvas->GetLength(),0,1,clamp) * mCanvas->GetGridWidth();
-   float end = ofMap(GetEnd() + offset,mCanvas->mStart/mCanvas->GetLength(),mCanvas->mEnd/mCanvas->GetLength(),0,1,clamp) * mCanvas->GetGridWidth();
-   float y = (float(mRow-mCanvas->GetRowOffset()) / mCanvas->GetNumVisibleRows()) * mCanvas->GetGridHeight();
-   float height = float(mCanvas->GetGridHeight()) / mCanvas->GetNumVisibleRows();
+   float wrapOffset = wrapped ? -1 : 0;
+   float start = ofMap(GetStart() + wrapOffset,mCanvas->mViewStart/mCanvas->GetLength(),mCanvas->mViewEnd/mCanvas->GetLength(),0,1,clamp) * mCanvas->GetWidth();
+   float end = ofMap(GetEnd() + wrapOffset,mCanvas->mViewStart/mCanvas->GetLength(),mCanvas->mViewEnd/mCanvas->GetLength(),0,1,clamp) * mCanvas->GetWidth();
+   float y = (float(mRow-mCanvas->GetRowOffset()) / mCanvas->GetNumVisibleRows()) * mCanvas->GetHeight();
+   float height = float(mCanvas->GetHeight()) / mCanvas->GetNumVisibleRows();
    
-   return ofRectangle(start, y, end-start, height);
+   return ofRectangle(start + offset.x, y + offset.y, end-start, height);
+}
+
+ofRectangle CanvasElement::GetRectAtDestination(bool clamp, bool wrapped, ofVec2f dragOffset) const
+{
+   int newRow;
+   int newCol;
+   float newOffset;
+   GetDragDestinationData(dragOffset, newRow, newCol, newOffset);
+
+   float wrapOffset = wrapped ? -1 : 0;
+   float start = ofMap(GetStart(newCol, newOffset) + wrapOffset, mCanvas->mViewStart / mCanvas->GetLength(), mCanvas->mViewEnd / mCanvas->GetLength(), 0, 1, clamp) * mCanvas->GetWidth();
+   float end = ofMap(GetEnd(newCol, newOffset, mLength) + wrapOffset, mCanvas->mViewStart / mCanvas->GetLength(), mCanvas->mViewEnd / mCanvas->GetLength(), 0, 1, clamp) * mCanvas->GetWidth();
+   float y = (float(newRow - mCanvas->GetRowOffset()) / mCanvas->GetNumVisibleRows()) * mCanvas->GetHeight();
+   float height = float(mCanvas->GetHeight()) / mCanvas->GetNumVisibleRows();
+
+   return ofRectangle(start, y, end - start, height);
+}
+
+void CanvasElement::GetDragDestinationData(ofVec2f dragOffset, int& newRow, int& newCol, float& newOffset) const
+{
+   dragOffset.x *= mCanvas->mViewEnd - mCanvas->mViewStart;
+
+   float colDrag = (dragOffset.x / mCanvas->GetWidth()) * mCanvas->GetNumCols() / mCanvas->GetLength();
+   float rowDrag = (dragOffset.y / mCanvas->GetHeight()) * mCanvas->GetNumVisibleRows();
+
+   newCol = mCol;
+   if (mCanvas->GetDragMode() & Canvas::kDragHorizontal)
+      newCol = ofClamp(int(mCol + colDrag + .5f), 0, mCanvas->GetNumCols() - 1);
+
+   newRow = mRow;
+   if (mCanvas->GetDragMode() & Canvas::kDragVertical)
+      newRow = ofClamp(int(mRow + rowDrag + .5f), 0, mCanvas->GetNumRows() - 1);
+
+   newOffset = mOffset;
+   if (GetKeyModifiers() & kModifier_Alt)   //non-snapped drag
+      newOffset = mOffset + colDrag - (newCol - mCol);
+   if (GetKeyModifiers() & kModifier_Command)   //quantize
+      newOffset = 0;
+}
+
+void CanvasElement::MoveElementByDrag(ofVec2f dragOffset)
+{
+   int newRow;
+   int newCol;
+   float newOffset;
+   GetDragDestinationData(dragOffset, newRow, newCol, newOffset);
+
+   mRow = newRow;
+   mCol = newCol;
+   mOffset = newOffset;
 }
 
 void CanvasElement::AddElementUIControl(IUIControl* control)
@@ -149,6 +273,10 @@ void CanvasElement::IntSliderUpdated(string label, int oldVal, float newVal)
       if (control->Name() == label)
          control->SetValue(newVal);
    }
+}
+
+void CanvasElement::ButtonClicked(string label)
+{
 }
 
 namespace
@@ -210,55 +338,50 @@ CanvasElement* NoteCanvasElement::CreateDuplicate() const
    return element;
 }
 
-void NoteCanvasElement::DrawContents(bool wrapped)
+void NoteCanvasElement::DrawContents(bool clamp, bool wrapped, ofVec2f offset)
 {
    ofPushStyle();
    ofFill();
    //DrawTextNormal(ofToString(mVelocity), GetRect(true, false).x, GetRect(true, false).y);
-   for (int i=0; i<2; ++i)
+   
+   ofRectangle rect = GetRect(clamp, wrapped, offset);
+   float fullHeight = rect.height;
+   rect.height *= mVelocity;
+   rect.y += (fullHeight - rect.height) * .5f;
+   if (rect.width > 0)
    {
-      ofRectangle rect = GetRect(true, i==0 ? false : true);
-      float fullHeight = rect.height;
-      rect.height *= mVelocity;
-      rect.y += (fullHeight - rect.height) * .5f;
-      if (rect.width > 0)
-      {
-         ofSetColorGradient(ofColor::white, ofColor(210,210,210), ofVec2f(ofLerp(rect.getMinX(),rect.getMaxX(),.5f), rect.y), ofVec2f(rect.getMaxX(), rect.y));
-         ofRect(rect, 0);
-      }
-      
-      /*ofPushStyle();
-      ofSetLineWidth(1.5f * gDrawScale);
-      
-      rect = GetRect(true, i==0 ? false : true);
-      ofRectangle fullRect = GetRect(false, false);
-      if (i == 1)
-         fullRect.x -= mCanvas->GetGridWidth();
-      float length = (GetEnd()-GetStart()) * mCanvas->GetLength();
-      
-      float start = (float(rect.x-fullRect.x)/fullRect.width);
-      float end = ((float(rect.x+rect.width)-(fullRect.x))/fullRect.width);
-      
-      mPitchBendCurve.SetPosition(rect.x, rect.y - rect.height/2);
-      mPitchBendCurve.SetDimensions(rect.width, rect.height);
-      mPitchBendCurve.SetExtents(start*length, end*length);
-      mPitchBendCurve.SetColor(ofColor::red);
-      mPitchBendCurve.Render();
-      
-      mModWheelCurve.SetPosition(rect.x, rect.y);
-      mModWheelCurve.SetDimensions(rect.width, rect.height);
-      mModWheelCurve.SetExtents(start*length, end*length);
-      mModWheelCurve.SetColor(ofColor::green);
-      mModWheelCurve.Render();
-      
-      mPressureCurve.SetPosition(rect.x, rect.y);
-      mPressureCurve.SetDimensions(rect.width, rect.height);
-      mPressureCurve.SetExtents(start*length, end*length);
-      mPressureCurve.SetColor(ofColor::blue);
-      mPressureCurve.Render();
-      
-      ofPopStyle();*/
+      ofSetColorGradient(ofColor::white, ofColor(210,210,210), ofVec2f(ofLerp(rect.getMinX(),rect.getMaxX(),.5f), rect.y), ofVec2f(rect.getMaxX(), rect.y));
+      ofRect(rect, 0);
    }
+   
+   /*ofSetLineWidth(1.5f * gDrawScale);
+      
+   rect = GetRect(clamp, wrapped);
+   ofRectangle fullRect = GetRect(false, false);
+   if (wrapped)
+      fullRect.x -= mCanvas->GetWidth();
+   float length = (GetEnd()-GetStart()) * mCanvas->GetLength();
+      
+   float start = (float(rect.x-fullRect.x)/fullRect.width);
+   float end = ((float(rect.x+rect.width)-(fullRect.x))/fullRect.width);
+      
+   mPitchBendCurve.SetPosition(rect.x, rect.y - rect.height/2);
+   mPitchBendCurve.SetDimensions(rect.width, rect.height);
+   mPitchBendCurve.SetExtents(start*length, end*length);
+   mPitchBendCurve.SetColor(ofColor::red);
+   mPitchBendCurve.Render();
+      
+   mModWheelCurve.SetPosition(rect.x, rect.y);
+   mModWheelCurve.SetDimensions(rect.width, rect.height);
+   mModWheelCurve.SetExtents(start*length, end*length);
+   mModWheelCurve.SetColor(ofColor::green);
+   mModWheelCurve.Render();
+      
+   mPressureCurve.SetPosition(rect.x, rect.y);
+   mPressureCurve.SetDimensions(rect.width, rect.height);
+   mPressureCurve.SetExtents(start*length, end*length);
+   mPressureCurve.SetColor(ofColor::blue);
+   mPressureCurve.Render();*/
    
    ofPopStyle();
 }
@@ -313,21 +436,19 @@ void NoteCanvasElement::LoadState(FileStreamIn& in)
 SampleCanvasElement::SampleCanvasElement(Canvas* canvas, int col, int row, float offset, float length)
 : CanvasElement(canvas,col,row,offset,length)
 , mSample(nullptr)
-, mNumLoops(1)
-, mNumBars(1)
 , mVolume(1)
-, mMeasureSync(true)
+, mMute(false)
 {
-   mNumBarsEntry = new TextEntry(dynamic_cast<ITextEntryListener*>(canvas->GetControls()),"num bars",60,2,3,&mNumBars,1,128);
-   AddElementUIControl(mNumBarsEntry);
    mElementOffsetSlider = new FloatSlider(dynamic_cast<IFloatSliderListener*>(canvas->GetControls()),"offset",0,0,100,15,&mOffset,-1,1);
    AddElementUIControl(mElementOffsetSlider);
-   mNumLoopsSlider = new IntSlider(dynamic_cast<IIntSliderListener*>(canvas->GetControls()),"loops",0,0,100,15,&mNumLoops,1,16);
-   AddElementUIControl(mNumLoopsSlider);
    mVolumeSlider = new FloatSlider(dynamic_cast<IFloatSliderListener*>(canvas->GetControls()),"volume",0,0,100,15,&mVolume,0,2);
    AddElementUIControl(mVolumeSlider);
-   mMeasureSyncCheckbox = new Checkbox(dynamic_cast<IDrawableModule*>(canvas->GetControls()),"measure sync",0,0,&mMeasureSync);
-   AddElementUIControl(mMeasureSyncCheckbox);
+   mMuteCheckbox = new Checkbox(dynamic_cast<IDrawableModule*>(canvas->GetControls()), "mute", 0, 0, &mMute);
+   AddElementUIControl(mMuteCheckbox);
+   mSplitSampleButton = new ClickButton(dynamic_cast<IButtonListener*>(canvas->GetControls()), "split", 0, 0);
+   AddElementUIControl(mSplitSampleButton);
+   mResetSpeedButton = new ClickButton(dynamic_cast<IButtonListener*>(canvas->GetControls()), "reset speed", 0, 0);
+   AddElementUIControl(mResetSpeedButton);
 }
 
 SampleCanvasElement::~SampleCanvasElement()
@@ -340,73 +461,103 @@ CanvasElement* SampleCanvasElement::CreateDuplicate() const
    SampleCanvasElement* element = new SampleCanvasElement(mCanvas, mCol, mRow, mOffset, mLength);
    element->mSample = new Sample();
    element->mSample->Create(mSample->Data());
-   element->mSample->SetNumBars(mSample->GetNumBars());
-   element->mNumLoops = mNumLoops;
-   element->mNumBars = mNumBars;
    element->mVolume = mVolume;
-   element->mMeasureSync = mMeasureSync;
+   element->mMute = mMute;
    return element;
 }
 
 void SampleCanvasElement::SetSample(Sample* sample)
 {
    mSample = sample;
-   if (sample->GetNumBars() > -1)
-      mNumBars = sample->GetNumBars();
 }
 
 void SampleCanvasElement::CheckboxUpdated(string label, bool value)
 {
    CanvasElement::CheckboxUpdated(label, value);
-   if (label == mMeasureSyncCheckbox->Name())
-   {
-      mNumBarsEntry->SetShowing(value);
-      mNumLoopsSlider->SetShowing(value);
-   }
 }
 
-void SampleCanvasElement::DrawContents(bool wrapped)
-{   
-   ofRectangle fullRect = GetRect(false, false);
-   ofRectangle clampedRect = GetRect(true, false);
-   float clampedRectEndX = clampedRect.x + clampedRect.width;
-   float sampleRectLoopWidth = fullRect.width / mNumLoops;
-   for (int i=0; i<mNumLoops; ++i)
+void SampleCanvasElement::ButtonClicked(string label)
+{
+   CanvasElement::ButtonClicked(label);
+   if (label == "split")
    {
-      float sampleRectX = fullRect.x + i*sampleRectLoopWidth;
-      float sampleRectEnd = sampleRectX + sampleRectLoopWidth;
-      float samplePosStart = ofMap(clampedRect.x, sampleRectX, sampleRectEnd, 0, 1, K(clamp));
-      float samplePosEnd = ofMap(clampedRectEndX, sampleRectX, sampleRectEnd, 0, 1, K(clamp));
-      if ((sampleRectX >= clampedRect.x && sampleRectX <= clampedRectEndX) ||
-          (sampleRectEnd >= clampedRect.x && sampleRectEnd <= clampedRectEndX) ||
-          (sampleRectX < clampedRect.x && sampleRectEnd > clampedRectEndX))
+      ChannelBuffer* firstHalf = new ChannelBuffer(mSample->Data()->BufferSize() / 2);
+      ChannelBuffer* secondHalf = new ChannelBuffer(mSample->Data()->BufferSize() / 2);
+      firstHalf->CopyFrom(mSample->Data(), firstHalf->BufferSize(), 0);
+      secondHalf->CopyFrom(mSample->Data(), secondHalf->BufferSize(), mSample->Data()->BufferSize() / 2);
+
+      SampleCanvasElement* element = new SampleCanvasElement(mCanvas, mCol, mRow, mOffset, mLength);
+      element->mSample = new Sample();
+      element->mSample->Create(secondHalf);
+      element->mVolume = mVolume;
+      element->mMute = mMute;
+      element->SetStart((GetStart() + GetEnd()) * .5f, false);
+      mCanvas->AddElement(element);
+
+      mSample->Create(firstHalf);
+      mLength /= 2;
+   }
+   if (label == "reset speed")
+   {
+      SampleCanvas* sampleCanvas = dynamic_cast<SampleCanvas*>(mCanvas->GetParent());
+      if (sampleCanvas != nullptr)
       {
-         ofPushMatrix();
-         ofTranslate(MAX(clampedRect.x, sampleRectX),clampedRect.y);
-         if (mSample)
-         {
-            float width = MIN(sampleRectEnd, clampedRectEndX) - MAX(sampleRectX, clampedRect.x);
-            int length = mSample->LengthInSamples();
-            DrawAudioBuffer(width, clampedRect.height, mSample->Data(), samplePosStart * length, samplePosEnd * length, -1);
-            if (i > 0 && sampleRectX > clampedRect.x)
-            {
-               ofSetColor(255,255,0);
-               ofLine(0,0,0,clampedRect.height);
-            }
-         }
-         else
-         {
-            ofSetColor(0,0,0);
-            ofRect(0,0,clampedRect.width,clampedRect.height);
-         }
-         ofPopMatrix();
+         float lengthMs = mSample->LengthInSamples() / mSample->GetSampleRateRatio() / gSampleRateMs;
+         float lengthOriginalSpeed = lengthMs / TheTransport->GetDuration(sampleCanvas->GetInterval());
+         mLength = lengthOriginalSpeed;
       }
    }
 }
 
+void SampleCanvasElement::DrawContents(bool clamp, bool wrapped, ofVec2f offset)
+{
+   if (wrapped)
+      return;
+
+   ofRectangle rect = GetRect(false, false, offset);
+
+   ofPushMatrix();
+   ofTranslate(rect.x,rect.y);
+   if (mSample)
+   {
+      float width = rect.width;
+      DrawAudioBuffer(width, rect.height, mSample->Data(), 0, mSample->LengthInSamples(), -1);
+   }
+   else
+   {
+      ofSetColor(0,0,0);
+      ofRect(0,0,rect.width,rect.height);
+   }
+   ofPopMatrix();
+
+   if (rect.width < 0)
+      rect.set(rect.x + rect.width, rect.y, -rect.width, rect.height);
+
+   SampleCanvas* sampleCanvas = dynamic_cast<SampleCanvas*>(mCanvas->GetParent());
+   if (sampleCanvas != nullptr)
+   {
+      float lengthMs = mSample->LengthInSamples() / mSample->GetSampleRateRatio() / gSampleRateMs;
+      float lengthOriginalSpeed = lengthMs / TheTransport->GetDuration(sampleCanvas->GetInterval());
+      float speed = lengthOriginalSpeed / mLength;
+      ofSetColor(255, 255, 255);
+      DrawTextBold(ofToString(speed, 2), rect.x + 3, rect.y + 10, 12);
+   }
+
+   if (mMute)
+   {
+      ofSetColor(0, 0, 0, 140);
+      ofFill();
+      ofRect(rect);
+   }
+
+   ofSetColor(255, 255, 255);
+   ofNoFill();
+   ofRect(rect);
+}
+
 namespace
 {
-   const int kSCESaveStateRev = 0;
+   const int kSCESaveStateRev = 2;
 }
 
 void SampleCanvasElement::SaveState(FileStreamOut& out)
@@ -419,10 +570,8 @@ void SampleCanvasElement::SaveState(FileStreamOut& out)
    out << hasSample;
    if (mSample != nullptr)
       mSample->SaveState(out);
-   out << mNumLoops;
-   out << mNumBars;
    out << mVolume;
-   out << mMeasureSync;
+   out << mMute;
 }
 
 void SampleCanvasElement::LoadState(FileStreamIn& in)
@@ -431,7 +580,7 @@ void SampleCanvasElement::LoadState(FileStreamIn& in)
    
    int rev;
    in >> rev;
-   LoadStateValidate(rev == kSCESaveStateRev);
+   LoadStateValidate(rev <= kSCESaveStateRev);
    
    bool hasSample;
    in >> hasSample;
@@ -440,10 +589,20 @@ void SampleCanvasElement::LoadState(FileStreamIn& in)
       mSample = new Sample();
       mSample->LoadState(in);
    }
-   in >> mNumLoops;
-   in >> mNumBars;
+   if (rev < 2)
+   {
+      int dummy;
+      in >> dummy;
+      in >> dummy;
+   }
    in >> mVolume;
-   in >> mMeasureSync;
+   if (rev == 0)
+   {
+      bool dummy;
+      in >> dummy;
+   }
+   if (rev >= 1)
+      in >> mMute;
 }
 
 /////////////////////
@@ -477,20 +636,23 @@ CanvasElement* EventCanvasElement::CreateDuplicate() const
    return element;
 }
 
-void EventCanvasElement::DrawContents(bool wrapped)
+void EventCanvasElement::DrawContents(bool clamp, bool wrapped, ofVec2f offset)
 {
-   if (GetRect(false,false).width != GetRect(true,false).width)
+   if (wrapped)
+      return;
+
+   if (GetRect(false, false, offset).width != GetRect(clamp, false, offset).width)
       return;  //only draw text for fully visible elements
 
    ofSetColor(mEventCanvas->GetRowColor(mRow));
    ofFill();
-   ofRect(GetRect(K(clamp), wrapped), 0);
+   ofRect(GetRect(clamp, wrapped, offset), 0);
    
    string text;
    if (mIsCheckbox)
    {
       text = mUIControl->Name();
-      ofRectangle rect = GetRect(true, false);
+      ofRectangle rect = GetRect(clamp, false, offset);
       ofSetColor(0,0,0);
       DrawTextNormal(text, rect.x+4, rect.y+11);
       ofSetColor(255,255,255);
@@ -502,7 +664,7 @@ void EventCanvasElement::DrawContents(bool wrapped)
       text += ":";
       text += mUIControl->GetDisplayValue(mValue);
       
-      ofRectangle rect = GetRect(true, false);
+      ofRectangle rect = GetRect(clamp, false, offset);
       ofSetColor(0,0,0);
       DrawTextNormal(text, rect.x+rect.width+1, rect.y+11);
       ofSetColor(255,255,255);
@@ -542,8 +704,8 @@ float EventCanvasElement::GetEnd() const
       return CanvasElement::GetEnd();
    
    float size = 4;
-   float span = mCanvas->mEnd - mCanvas->mStart;
-   return GetStart() + size * span / mCanvas->GetGridWidth();
+   float span = mCanvas->mViewEnd - mCanvas->mViewStart;
+   return GetStart() + size * span / mCanvas->GetWidth();
 }
 
 namespace

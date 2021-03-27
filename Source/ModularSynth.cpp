@@ -34,6 +34,7 @@
 #include "HelpDisplay.h"
 #include "nanovg/nanovg.h"
 #include "UserPrefsEditor.h"
+#include "Canvas.h"
 
 ModularSynth* TheSynth = nullptr;
 
@@ -250,6 +251,10 @@ void ModularSynth::Poll()
       else if (gHoveredUIControl != nullptr && gHoveredUIControl->IsTextEntry())
       {
          desiredCursor = MouseCursor::IBeamCursor;
+      }
+      else if (gHoveredUIControl != nullptr && dynamic_cast<Canvas*>(gHoveredUIControl) != nullptr)
+      {
+         desiredCursor = dynamic_cast<Canvas*>(gHoveredUIControl)->GetMouseCursorType();
       }
       else if (mIsMousePanning)
       {
