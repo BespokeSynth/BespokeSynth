@@ -20,7 +20,6 @@ NoteStepSequencer::NoteStepSequencer()
 : mInterval(kInterval_8n)
 , mArpIndex(-1)
 , mIntervalSelector(nullptr)
-, mNumSteps(8)
 , mLength(8)
 , mLengthSlider(nullptr)
 , mGrid(nullptr)
@@ -71,9 +70,11 @@ void NoteStepSequencer::CreateUIControls()
    BUTTON(mRandomizePitchButton, "pitch");  UIBLOCK_SHIFTRIGHT();
    BUTTON(mRandomizeLengthButton, "len");  UIBLOCK_SHIFTRIGHT();
    BUTTON(mRandomizeVelocityButton, "vel");  UIBLOCK_NEWLINE();
-   INTSLIDER(mLengthSlider, "length", &mLength, 1, mNumSteps); UIBLOCK_SHIFTRIGHT();
+   UIBLOCK_PUSHSLIDERWIDTH(170);
+   INTSLIDER(mLengthSlider, "length", &mLength, 1, NSS_MAX_STEPS); UIBLOCK_SHIFTRIGHT();
    BUTTON(mShiftBackButton, "<"); UIBLOCK_SHIFTRIGHT();
    BUTTON(mShiftForwardButton, ">"); UIBLOCK_NEWLINE();
+   UIBLOCK_POPSLIDERWIDTH();
    INTSLIDER(mOctaveSlider,"octave",&mOctave,0,7); UIBLOCK_SHIFTRIGHT();
    DROPDOWN(mNoteModeSelector,"notemode",(int*)(&mNoteMode),80); UIBLOCK_NEWLINE();
    ENDUIBLOCK0();
@@ -229,6 +230,31 @@ void NoteStepSequencer::DrawModule()
          ofSetColor(0,0,0,100);
          ofFill();
          ofRect(gridX + boxWidth * i, gridY, boxWidth, gridH);
+      }
+
+      const float kPlayHighlightDurationMs = 250;
+      if (mLastStepPlayTime[i] != -1)
+      {
+         if (gTime - mLastStepPlayTime[i] < kPlayHighlightDurationMs)
+         {
+            if (gTime - mLastStepPlayTime[i] > 0)
+            {
+               float fade = (1 - (gTime - mLastStepPlayTime[i]) / kPlayHighlightDurationMs);
+               ofPushStyle();
+               ofNoFill();
+               ofSetLineWidth(3 * fade);
+               ofVec2f pos = mGrid->GetCellPosition(i, mTones[i]) + mGrid->GetPosition(true);
+               float xsize = float(mGrid->GetWidth()) / mGrid->GetCols();
+               float ysize = float(mGrid->GetHeight()) / mGrid->GetRows();
+               ofSetColor(ofColor::white, fade * 255);
+               ofRect(pos.x, pos.y, xsize, ysize);
+               ofPopStyle();
+            }
+         }
+         else
+         {
+            mLastStepPlayTime[i] = -1;
+         }
       }
    }
    
@@ -467,6 +493,7 @@ void NoteStepSequencer::Step(double time, float velocity, int pulseFlags)
          mLastNoteLength = mNoteLengths[mArpIndex];
          mLastNoteStartTime = time;
          mLastNoteEndTime = time + mLastNoteLength * TheTransport->GetDuration(mInterval);
+         mLastStepPlayTime[mArpIndex] = time;
          mAlreadyDidNoteOff = false;
       }
    }
@@ -661,13 +688,13 @@ void NoteStepSequencer::ButtonClicked(ClickButton* button)
    }
    if (button == mRandomizeLengthButton)
    {
-      for (int i=0; i<mNumSteps; ++i)
+      for (int i=0; i < mLength; ++i)
          mNoteLengths[i] = ofClamp(ofRandom(2), FLT_EPSILON, 1);
       SyncGridToSeq();
    }
    if (button == mRandomizeVelocityButton)
    {
-      for (int i=0; i<mNumSteps; ++i)
+      for (int i=0; i < mLength; ++i)
       {
          switch (rand() % 5)
          {
@@ -696,7 +723,7 @@ void NoteStepSequencer::RandomizePitches(bool fifths)
 {
    if (fifths)
    {
-      for (int i=0; i<mNumSteps; ++i)
+      for (int i=0; i < mLength; ++i)
       {
          switch (rand() % 5)
          {
@@ -720,7 +747,7 @@ void NoteStepSequencer::RandomizePitches(bool fifths)
    }
    else
    {
-      for (int i=0; i<mNumSteps; ++i)
+      for (int i=0; i < mLength; ++i)
          mTones[i] = rand() % mNoteRange;
    }
 }
@@ -756,7 +783,15 @@ void NoteStepSequencer::IntSliderUpdated(IntSlider* slider, int oldVal)
    if (slider == mLoopResetPointSlider || slider == mLengthSlider)
       mLoopResetPoint = MIN(mLoopResetPoint, mLength-1);
    if (slider == mLengthSlider)
+   {
+      mLength = MIN(mLength, NSS_MAX_STEPS);
+      for (int i = oldVal; i < mLength; ++i)
+         mTones[i] = rand() % mNoteRange;
+      mGrid->SetGrid(mLength, mNoteRange);
+      mVelocityGrid->SetGrid(mLength, 1);
+      mLoopResetPointSlider->SetExtents(0, mLength);
       SyncGridToSeq();
+   }
    if (slider == mOctaveSlider)
       SetUpStepControls();
    for (int i=0; i<NSS_MAX_STEPS; ++i)
@@ -778,8 +813,8 @@ void NoteStepSequencer::SyncGridToSeq()
       mGrid->SetVal(i,mTones[i],mNoteLengths[i],false);
       mVelocityGrid->SetVal(i, 0, mVels[i]/127.0f, false);
    }
-   mGrid->SetGrid(mNumSteps, mNoteRange);
-   mVelocityGrid->SetGrid(mNumSteps, 1);
+   mGrid->SetGrid(mLength, mNoteRange);
+   mVelocityGrid->SetGrid(mLength, 1);
 }
 
 void NoteStepSequencer::OnScaleChanged()
@@ -828,13 +863,7 @@ void NoteStepSequencer::SetUpFromSaveData()
    SetMidiController(mModuleSaveData.GetString("controller"));
    mGrid->SetDimensions(mModuleSaveData.GetInt("gridwidth"), mModuleSaveData.GetInt("gridheight"));
    mNoteRange = mModuleSaveData.GetInt("gridrows");
-   mNumSteps = mModuleSaveData.GetInt("gridsteps");
    mShowStepControls = mModuleSaveData.GetBool("stepcontrols");
-   mLength = MIN(mLength, mNumSteps);
-   mGrid->SetGrid(mNumSteps, mNoteRange);
-   mVelocityGrid->SetGrid(mNumSteps, 1);
-   mLengthSlider->SetExtents(1, mNumSteps);
-   mLoopResetPointSlider->SetExtents(0, mNumSteps);
    UpdateVelocityGridPos();
 }
 
