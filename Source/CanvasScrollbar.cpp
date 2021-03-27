@@ -23,14 +23,6 @@ CanvasScrollbar::CanvasScrollbar(Canvas* canvas, string name, Style style)
 
 void CanvasScrollbar::Render()
 {
-   if (mAutoHide && GetBarStart() == 0)
-   {
-      if (mStyle == Style::kHorizontal && GetBarEnd() == mWidth)
-         return;
-      if (mStyle == Style::kVertical && GetBarEnd() == mHeight)
-         return;
-   }
-
    ofRectangle canvasRect = mCanvas->GetRect(true);
    if (mStyle == Style::kHorizontal)
    {
@@ -41,6 +33,14 @@ void CanvasScrollbar::Render()
    {
       SetPosition(canvasRect.getMaxX(), canvasRect.y);
       SetDimensions(10, canvasRect.height);
+   }
+   
+   if (mAutoHide && GetBarStart() == 0)
+   {
+      if (mStyle == Style::kHorizontal && GetBarEnd() == mWidth)
+         return;
+      if (mStyle == Style::kVertical && GetBarEnd() == mHeight)
+         return;
    }
 
    ofPushMatrix();
