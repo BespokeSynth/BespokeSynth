@@ -92,7 +92,7 @@ void SingleOscillator::CreateUIControls()
 
    UIBLOCK(3 + (kGap + kColumnWidth) * 2, 3, kColumnWidth);
    UICONTROL_CUSTOM(mFilterADSRDisplay, new ADSRDisplay(UICONTROL_BASICS("envfilter"), kColumnWidth, 36, &mVoiceParams.mFilterAdsr));
-   FLOATSLIDER(mFilterCutoffSlider, "f", &mVoiceParams.mFilterCutoff, 0, SINGLEOSCILLATOR_NO_CUTOFF);
+   FLOATSLIDER(mFilterCutoffSlider, "f", &mVoiceParams.mFilterCutoff, 10, SINGLEOSCILLATOR_NO_CUTOFF);
    FLOATSLIDER(mFilterQSlider, "q", &mVoiceParams.mFilterQ, .1, 20);
    FLOATSLIDER(mVelToVolumeSlider, "vel2vol", &mVoiceParams.mVelToVolume, 0, 1);
    FLOATSLIDER(mVelToEnvelopeSlider, "vel2env", &mVoiceParams.mVelToEnvelope, 0, 1);
