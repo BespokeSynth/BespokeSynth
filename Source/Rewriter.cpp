@@ -27,6 +27,11 @@ Rewriter::Rewriter()
 {
 }
 
+namespace
+{
+   const int kBufferHeight = 60;
+}
+
 void Rewriter::CreateUIControls()
 {
    IDrawableModule::CreateUIControls();
@@ -35,8 +40,11 @@ void Rewriter::CreateUIControls()
    BUTTON(mStartRecordTimeButton,"new loop");
    ENDUIBLOCK(mWidth, mHeight);
    
+   mWidth = 110;
+   mHeight += kBufferHeight + 3;
+
    mLooperCable = new PatchCableSource(this,kConnectionType_Special);
-   mLooperCable->SetManualPosition(99, 10);
+   mLooperCable->SetManualPosition(mWidth-10, 10);
    mLooperCable->AddTypeFilter("looper");
    AddPatchCableSource(mLooperCable);
 }
@@ -93,6 +101,27 @@ void Rewriter::DrawModule()
    {
       ofSetColor(255, 100, 0, 100 + 50 * (cosf(TheTransport->GetMeasurePos(gTime) * 4 * FTWO_PI)));
       ofRect(mStartRecordTimeButton->GetRect(true));
+   }
+
+   if (mConnectedLooper)
+   {
+      float originalCornerRoundness = gCornerRoundness;
+      gCornerRoundness = 0;
+      
+      int loopSamples = abs(int(TheTransport->MsPerBar() / 1000 * gSampleRate)) * mConnectedLooper->NumBars();
+      ofRectangle rect(3, mHeight - kBufferHeight - 3, mWidth - 6, kBufferHeight);
+      float playhead = fmod(TheTransport->GetMeasureTime(gTime), mConnectedLooper->NumBars()) / mConnectedLooper->NumBars();
+      mRecordBuffer.Draw(rect.x, rect.y, rect.width, rect.height, loopSamples, 1, loopSamples * playhead);
+      mRecordBuffer.Draw(rect.x, rect.y, rect.width * playhead, rect.height, loopSamples * playhead, 1);
+
+      gCornerRoundness = originalCornerRoundness;
+
+      ofSetColor(0, 255, 0);
+      ofLine(rect.x + rect.width*playhead, rect.y, rect.x + rect.width*playhead, rect.y + rect.height);
+   }
+   else
+   {
+      DrawTextNormal("connect a looper", 5, mHeight - 3 - kBufferHeight / 2);
    }
 }
 
