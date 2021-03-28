@@ -33,6 +33,7 @@ Canvas::Canvas(IDrawableModule* parent, int x, int y, int w, int h, float length
 , mWrap(false)
 , mDragSelecting(false)
 , mDragCanvasMoving(false)
+, mDragCanvasZooming(false)
 , mHighlightEnd(kHighlightEnd_None)
 , mHighlightEndElement(nullptr)
 , mDragEnd(kHighlightEnd_None)
@@ -256,6 +257,13 @@ void Canvas::OnClicked(int x, int y, bool right)
             mDragCanvasStartMousePos.set(ofGetMouseX(), ofGetMouseY());
             mDragCanvasStartCanvasPos.set(mViewStart, mRowOffset);
          }
+         else if (GetKeyModifiers() & kModifier_Command)
+         {
+            mDragCanvasZooming = true;
+            mDragCanvasStartMousePos.set(x, y);
+            mDragCanvasStartCanvasPos.set(ofMap(x, 0, mWidth, mViewStart, mViewEnd), ofMap(y, 0, mHeight, mRowOffset, mRowOffset + mNumVisibleRows));
+            mDragZoomStartDimensions.set(mViewEnd - mViewStart, mNumVisibleRows);
+         }
          else
          {
             mDragSelecting = true;
@@ -379,20 +387,47 @@ bool Canvas::MouseMoved(float x, float y)
 
    if (mDragCanvasMoving && (GetKeyModifiers() & kModifier_Alt))
    {
+      
       ofVec2f mousePos(ofGetMouseX(), ofGetMouseY());
       ofVec2f delta = (mousePos - mDragCanvasStartMousePos) / gDrawScale;
 
       float viewLength = mViewEnd - mViewStart;
-      float moveX = -delta.x / GetWidth() * viewLength;
+      float moveX = -delta.x / mWidth * viewLength;
       mViewStart = ofClamp(mDragCanvasStartCanvasPos.x + moveX, 0, mLength - viewLength);
       mViewEnd = mViewStart + viewLength;
 
-      float moveY = -delta.y / GetHeight() * GetNumVisibleRows();
+      float moveY = -delta.y / mHeight * GetNumVisibleRows();
       mRowOffset = ofClamp(int(mDragCanvasStartCanvasPos.y + moveY + .5f), 0, GetNumRows() - GetNumVisibleRows());
    }
    else
    {
       mDragCanvasMoving = false;
+   }
+
+   if (mDragCanvasZooming && (GetKeyModifiers() & kModifier_Command))
+   {
+      ofVec2f mousePos(x, y);
+      ofVec2f delta = (mousePos - mDragCanvasStartMousePos) / gDrawScale;
+
+      {
+         float originalViewLength = mDragZoomStartDimensions.x;
+         float originalViewCenterX = mDragCanvasStartCanvasPos.x;
+         float newViewLength = MAX((1 - delta.x / mWidth) * originalViewLength, .01f);
+         mViewStart = ofClamp(originalViewCenterX - newViewLength * (mDragCanvasStartMousePos.x / mWidth), 0, mLength);
+         mViewEnd = ofClamp(originalViewCenterX + newViewLength * (1 - mDragCanvasStartMousePos.x / mWidth), 0, mLength);
+      }
+
+      {
+         float originalViewHeight = mDragZoomStartDimensions.y;
+         float originalViewCenterY = mDragCanvasStartCanvasPos.y;
+         float newViewHeight = MAX((1 + delta.y / mHeight) * originalViewHeight, .01f);
+         mRowOffset = int(ofClamp(originalViewCenterY - newViewHeight * (mDragCanvasStartMousePos.y / mHeight), 0, mNumRows-1) + .5f);
+         mNumVisibleRows = int(ofClamp(originalViewCenterY + newViewHeight * (1 - mDragCanvasStartMousePos.y / mHeight), mRowOffset+1, mNumRows) + .5f) - mRowOffset;
+      }
+   }
+   else
+   {
+      mDragCanvasZooming = false;
    }
    
    return false;
@@ -432,6 +467,7 @@ void Canvas::MouseReleased()
    }
 
    mDragCanvasMoving = false;
+   mDragCanvasZooming = false;
 }
 
 bool Canvas::MouseScrolled(int x, int y, float scrollX, float scrollY)

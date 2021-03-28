@@ -114,7 +114,7 @@ eventcanvas~schedule values to set over time
 ~measures~length of loop
 ~interval~grid for snapping events to
 ~record~record connected values as they change
-~canvas~canvas of events. canvas controls:\n-shift-click to add an event\n-hold shift and drag an event to duplicate\n-hold alt to drag an event without snapping\n-hold ctrl while dragging to snap to an interval\n-hold shift and scroll to zoom\n-hold alt and grab empty space to move slide the canvas view
+~canvas~canvas of events. canvas controls:\n-shift-click to add an event\n-hold shift and drag an event to duplicate\n-hold alt to drag an event without snapping\n-hold ctrl while dragging to snap to an interval\n-hold shift and scroll to zoom\n-hold alt and grab empty space to move slide the canvas view\n-hold ctrl and grab empty space to zoom the canvas view
 ~timeline~control loop points
 ~delete~delete highlighted elements
 ~view rows~number of visible rows
@@ -432,7 +432,7 @@ notecanvas~looping note roll
 ~free rec~[no tooltip]
 ~measures~loop length
 ~interval~interval to quantize to
-~canvas~canvas of notes. canvas controls:\n-shift-click to add a note\n-hold shift and drag a note to duplicate\n-hold alt to drag a note without snapping\n-hold ctrl while dragging to snap to an interval\n-hold shift and scroll to zoom\n-hold alt and grab empty space to move slide the canvas view
+~canvas~canvas of notes. canvas controls:\n-shift-click to add a note\n-hold shift and drag a note to duplicate\n-hold alt to drag a note without snapping\n-hold ctrl while dragging to snap to an interval\n-hold shift and scroll to zoom\n-hold alt and grab empty space to move slide the canvas view\n-hold ctrl and grab empty space to zoom the canvas view
 ~timeline~control loop points
 ~delete~delete highlighted elements
 ~view rows~number of visible rows
@@ -909,7 +909,7 @@ sampleeditor~[abandoned work in progress, possibly broken] sample editor for cre
 
 
 samplecanvas~sample arranging view
-~canvas~canvas of samples. drag and drop samples onto here. canvas controls:\n-hold shift and drag a sample to duplicate\n-hold alt to drag a sample without snapping\n-hold ctrl while dragging to snap to an interval\n-hold shift and scroll to zoom\n-hold alt and grab empty space to move slide the canvas view
+~canvas~canvas of samples. drag and drop samples onto here. canvas controls:\n-hold shift and drag a sample to duplicate\n-hold alt to drag a sample without snapping\n-hold ctrl while dragging to snap to an interval\n-hold shift and scroll to zoom\n-hold alt and grab empty space to move slide the canvas view\n-hold ctrl and grab empty space to zoom the canvas view
 ~timeline~control loop points
 ~delete~delete highlighted elements
 ~view rows~number of visible rows

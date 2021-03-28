@@ -139,8 +139,10 @@ private:
    bool mDragSelecting;
    ofRectangle mDragSelectRect;
    bool mDragCanvasMoving;
+   bool mDragCanvasZooming;
    ofVec2f mDragCanvasStartMousePos;
    ofVec2f mDragCanvasStartCanvasPos;
+   ofVec2f mDragZoomStartDimensions;
    HighlightEnd mHighlightEnd;
    CanvasElement* mHighlightEndElement;
    HighlightEnd mDragEnd;
