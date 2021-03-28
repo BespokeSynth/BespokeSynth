@@ -66,6 +66,7 @@ float CanvasScrollbar::GetBarStart() const
       return mCanvas->mViewStart / mCanvas->GetLength() * mWidth;
    if (mStyle == Style::kVertical)
       return ofMap(mCanvas->GetRowOffset(), 0, mCanvas->GetNumRows(), 0, mHeight);
+   return 0;
 }
 
 float CanvasScrollbar::GetBarEnd() const
@@ -74,6 +75,7 @@ float CanvasScrollbar::GetBarEnd() const
       return mCanvas->mViewEnd / mCanvas->GetLength() * mWidth;
    if (mStyle == Style::kVertical)
       return ofMap(mCanvas->GetRowOffset() + mCanvas->GetNumVisibleRows(), 0, mCanvas->GetNumRows(), 0, mHeight);
+   return 1;
 }
 
 void CanvasScrollbar::OnClicked(int x, int y, bool right)
