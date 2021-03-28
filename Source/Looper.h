@@ -168,7 +168,6 @@ private:
    bool mReplaceOnCommit;
    float mLoopPosOffset;
    FloatSlider* mLoopPosOffsetSlider;
-   ClickButton* mResetOffsetButton;
    bool mAllowChop;
    Checkbox* mAllowChopCheckbox;
    int mChopMeasure;

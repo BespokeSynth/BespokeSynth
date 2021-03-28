@@ -57,7 +57,6 @@ Looper::Looper()
 , mWantUndo(false)
 , mLoopPosOffset(0)
 , mLoopPosOffsetSlider(nullptr)
-, mResetOffsetButton(nullptr)
 , mWriteOffsetButton(nullptr)
 , mAllowChop(false)
 , mAllowChopCheckbox(nullptr)
@@ -136,8 +135,7 @@ void Looper::CreateUIControls()
    mHalveSpeedButton = new ClickButton(this,".5x",147,43);
    mUndoButton = new ClickButton(this,"undo",-1,-1);
    mLoopPosOffsetSlider = new FloatSlider(this,"offset",-1,-1,130,15,&mLoopPosOffset,0,mLoopLength);
-   mResetOffsetButton = new ClickButton(this," r ",-1,-1);
-   mWriteOffsetButton = new ClickButton(this," w ",-1,-1);
+   mWriteOffsetButton = new ClickButton(this,"set",-1,-1);
    mScratchSpeedSlider = new FloatSlider(this,"scrspd",-1,-1,130,15,&mScratchSpeed,-2,2);
    mAllowScratchCheckbox = new Checkbox(this,"scr",-1,-1,&mAllowScratch);
    mFourTetSlider = new FloatSlider(this,"fourtet",4,65,65,15,&mFourTet,0,1,1);
@@ -182,8 +180,7 @@ void Looper::CreateUIControls()
    mPitchShiftSlider->PositionTo(mVolSlider, kAnchor_Below);
    mKeepPitchCheckbox->PositionTo(mPitchShiftSlider, kAnchor_Right);
    mLoopPosOffsetSlider->PositionTo(mPitchShiftSlider, kAnchor_Below);
-   mResetOffsetButton->PositionTo(mLoopPosOffsetSlider, kAnchor_Right);
-   mWriteOffsetButton->PositionTo(mResetOffsetButton, kAnchor_Right);
+   mWriteOffsetButton->PositionTo(mLoopPosOffsetSlider, kAnchor_Right);
    mScratchSpeedSlider->PositionTo(mLoopPosOffsetSlider, kAnchor_Below);
    mAllowScratchCheckbox->PositionTo(mScratchSpeedSlider, kAnchor_Right);
 }
@@ -688,7 +685,6 @@ void Looper::DrawModule()
    mHalveSpeedButton->Draw();
    mUndoButton->Draw();
    mLoopPosOffsetSlider->Draw();
-   mResetOffsetButton->Draw();
    mWriteOffsetButton->Draw();
    mScratchSpeedSlider->Draw();
    mAllowScratchCheckbox->Draw();
@@ -1108,11 +1104,6 @@ void Looper::ButtonClicked(ClickButton* button)
    }
    if (button == mUndoButton)
       mWantUndo = true;
-   if (button == mResetOffsetButton)
-   {
-      mLoopPosOffset = 0;
-      mLoopPosOffsetSlider->DisableLFO();
-   }
    if (button == mWriteOffsetButton)
       mWantShiftOffset = true;
    if (button == mQueueCaptureButton)
@@ -1229,10 +1220,10 @@ void Looper::DoHalfShift()
 
 void Looper::DoShiftDownbeat()
 {
-   float* newBuffer = new float[MAX_BUFFER_SIZE];
    int shift = int(mLoopPos);
    for (int ch=0; ch<mBuffer->NumActiveChannels(); ++ch)
    {
+      float* newBuffer = new float[MAX_BUFFER_SIZE];
       BufferCopy(newBuffer, mBuffer->GetChannel(ch)+shift, mLoopLength-shift);
       BufferCopy(newBuffer+mLoopLength-shift, mBuffer->GetChannel(ch), shift);
       mBufferMutex.lock();
@@ -1244,12 +1235,12 @@ void Looper::DoShiftDownbeat()
 
 void Looper::DoShiftOffset()
 {
-   float* newBuffer = new float[MAX_BUFFER_SIZE];
    int shift = int(mLoopPosOffset);
    if (shift != 0)
    {
       for (int ch = 0; ch < mBuffer->NumActiveChannels(); ++ch)
       {
+         float* newBuffer = new float[MAX_BUFFER_SIZE];
          BufferCopy(newBuffer, mBuffer->GetChannel(ch) + shift, mLoopLength - shift);
          BufferCopy(newBuffer + mLoopLength - shift, mBuffer->GetChannel(ch), shift);
          mBufferMutex.lock();
@@ -1314,7 +1305,7 @@ void Looper::SetUpFromSaveData()
 
 namespace
 {
-   const int kSaveStateRev = 0;
+   const int kSaveStateRev = 1;
 }
 
 void Looper::SaveState(FileStreamOut& out)
@@ -1324,6 +1315,7 @@ void Looper::SaveState(FileStreamOut& out)
    out << kSaveStateRev;
    
    out << mLoopLength;
+   out << mBufferTempo;
    mBuffer->Save(out, mLoopLength);
 }
 
@@ -1333,9 +1325,11 @@ void Looper::LoadState(FileStreamIn& in)
    
    int rev;
    in >> rev;
-   LoadStateValidate(rev == kSaveStateRev);
+   LoadStateValidate(rev <= kSaveStateRev);
    
    in >> mLoopLength;
+   if (rev >= 1)
+      in >> mBufferTempo;
    int readLength;
    mBuffer->Load(in, readLength, ChannelBuffer::LoadMode::kAnyBufferSize);
    assert(mLoopLength == readLength);
