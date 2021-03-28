@@ -29,7 +29,7 @@ Rewriter::Rewriter()
 
 namespace
 {
-   const int kBufferHeight = 60;
+   const int kBufferHeight = 40;
 }
 
 void Rewriter::CreateUIControls()
@@ -111,7 +111,13 @@ void Rewriter::DrawModule()
       int loopSamples = abs(int(TheTransport->MsPerBar() / 1000 * gSampleRate)) * mConnectedLooper->NumBars();
       ofRectangle rect(3, mHeight - kBufferHeight - 3, mWidth - 6, kBufferHeight);
       float playhead = fmod(TheTransport->GetMeasureTime(gTime), mConnectedLooper->NumBars()) / mConnectedLooper->NumBars();
+      ofColor bgColor = ofColor::lerp(GetColor(kModuleType_Audio), ofColor::black, .5f);
+      ofFill();
+      ofSetColor(bgColor);
+      ofRect(rect);
       mRecordBuffer.Draw(rect.x, rect.y, rect.width, rect.height, loopSamples, 1, loopSamples * playhead);
+      ofSetColor(bgColor);
+      ofRect(rect.x, rect.y, rect.width * playhead, rect.height);
       mRecordBuffer.Draw(rect.x, rect.y, rect.width * playhead, rect.height, loopSamples * playhead, 1);
 
       gCornerRoundness = originalCornerRoundness;
