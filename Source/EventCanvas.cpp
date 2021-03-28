@@ -16,6 +16,7 @@
 #include "CanvasElement.h"
 #include "Profiler.h"
 #include "PatchCableSource.h"
+#include "CanvasScrollbar.h"
 
 EventCanvas::EventCanvas()
 : mCanvas(nullptr)
@@ -27,7 +28,6 @@ EventCanvas::EventCanvas()
 , mIntervalSelector(nullptr)
 , mScrollPartial(0)
 , mPosition(0)
-, mPositionSlider(nullptr)
 , mRecord(false)
 , mRecordCheckbox(nullptr)
 , mPreviousPosition(0)
@@ -56,9 +56,8 @@ void EventCanvas::CreateUIControls()
    IDrawableModule::CreateUIControls();
    
    mQuantizeButton = new ClickButton(this,"quantize",160,5);
-   mNumMeasuresEntry = new TextEntry(this,"measures",63,5,3,&mNumMeasures,1,999);
+   mNumMeasuresEntry = new TextEntry(this,"measures",5,5,3,&mNumMeasures,1,999);
    mIntervalSelector = new DropdownList(this,"interval",110,5,(int*)(&mInterval));
-   mPositionSlider = new FloatSlider(this,"position",5,31,390,15,&mPosition,0,1);
    mRecordCheckbox = new Checkbox(this,"record",220,5,&mRecord);
    
    mNumMeasuresEntry->DrawLabel(true);
@@ -85,6 +84,9 @@ void EventCanvas::CreateUIControls()
    mCanvas->SetListener(this);
    mCanvas->SetDragMode(Canvas::kDragHorizontal);
    mCanvas->SetNumVisibleRows(8);
+
+   mCanvasScrollbarHorizontal = new CanvasScrollbar(mCanvas, "scrollh", CanvasScrollbar::Style::kHorizontal);
+   AddUIControl(mCanvasScrollbarHorizontal);
    
    SyncControlCablesToCanvas();
 }
@@ -231,9 +233,9 @@ void EventCanvas::DrawModule()
       color.a = 50;
       ofSetColor(color);
       
-      float boxHeight = (float(mCanvas->GetGridHeight())/mCanvas->GetNumVisibleRows());
+      float boxHeight = (float(mCanvas->GetHeight())/mCanvas->GetNumVisibleRows());
       float y = mCanvas->GetPosition(true).y + i*boxHeight;
-      ofRect(mCanvas->GetPosition(true).x,y,mCanvas->GetGridWidth(),boxHeight);
+      ofRect(mCanvas->GetPosition(true).x,y,mCanvas->GetWidth(),boxHeight);
    }
    ofPopStyle();
    
@@ -241,14 +243,13 @@ void EventCanvas::DrawModule()
    ofSetColor(128,128,128);
    mCanvas->Draw();
    ofPopStyle();
-   
-   mPositionSlider->SetExtents(mCanvas->mStart, mCanvas->mEnd);
+
+   mCanvasScrollbarHorizontal->Draw();
    
    mCanvasControls->Draw();
    mQuantizeButton->Draw();
    mNumMeasuresEntry->Draw();
    mIntervalSelector->Draw();
-   mPositionSlider->Draw();
    mRecordCheckbox->Draw();
    
    ofRectangle canvasRect = mCanvas->GetRect(true);
@@ -264,39 +265,6 @@ void EventCanvas::DrawModule()
          mControlCables[i]->SetEnabled(false);
       }
    }
-}
-
-bool EventCanvas::MouseScrolled(int x, int y, float scrollX, float scrollY)
-{
-   /*if (x >= mCanvas->GetPosition(true).x && y >= mCanvas->GetPosition(true).y &&
-       x < mCanvas->GetPosition(true).x + mCanvas->GetWidth() && y < mCanvas->GetPosition(true).y + mCanvas->GetHeight())
-   {
-      mScrollPartial -= scrollY;
-      int scrollWhole = int(mScrollPartial);
-      mScrollPartial -= scrollWhole;
-      mCanvas->SetRowOffset(mCanvas->GetRowOffset()+scrollWhole);
-   }*/
-   
-   float canvasX,canvasY;
-   mCanvas->GetPosition(canvasX, canvasY, true);
-   ofVec2f canvasPos = ofVec2f(ofMap(x, canvasX, canvasX+mCanvas->GetWidth(), 0, 1),
-                               ofMap(y, canvasY, canvasY+mCanvas->GetHeight(), 0, 1));
-   if (IsInUnitBox(canvasPos))
-   {
-      float zoomCenter = ofLerp(mCanvas->mStart, mCanvas->mEnd, canvasPos.x);
-      float distFromStart = zoomCenter - mCanvas->mStart;
-      float distFromEnd = zoomCenter - mCanvas->mEnd;
-      
-      distFromStart *= 1 - scrollY/100;
-      distFromEnd *= 1 - scrollY/100;
-      
-      float slideX = (mCanvas->mEnd - mCanvas->mStart) * -scrollX/300;
-      
-      mCanvas->mStart = ofClamp(zoomCenter - distFromStart + slideX, 0, 1);
-      mCanvas->mEnd = ofClamp(zoomCenter - distFromEnd + slideX, 0, 1);
-      return true;
-   }
-   return false;
 }
 
 void EventCanvas::SyncControlCablesToCanvas()
@@ -327,7 +295,7 @@ void EventCanvas::SyncControlCablesToCanvas()
 namespace
 {
    const float extraW = 10;
-   const float extraH = 140;
+   const float extraH = 150;
 }
 
 void EventCanvas::Resize(float w, float h)
@@ -335,7 +303,6 @@ void EventCanvas::Resize(float w, float h)
    w = MAX(w - extraW, 390);
    h = MAX(h - extraH, 100);
    mCanvas->SetDimensions(w, h);
-   mPositionSlider->SetDimensions(w, 14);
 }
 
 void EventCanvas::GetModuleDimensions(float& width, float& height)
@@ -386,12 +353,6 @@ void EventCanvas::ButtonClicked(ClickButton* button)
 
 void EventCanvas::FloatSliderUpdated(FloatSlider* slider, float oldVal)
 {
-   if (slider == mPositionSlider)
-   {
-      float measure = mNumMeasures * mPosition;
-      TheTransport->SetMeasure((int)measure);
-      TheTransport->SetMeasurePos(measure - (int)measure);
-   }
 }
 
 void EventCanvas::IntSliderUpdated(IntSlider* slider, int oldVal)
@@ -481,8 +442,6 @@ void EventCanvas::LoadState(FileStreamIn& in)
    }
    
    mCanvas->LoadState(in);
-   
-   mPositionSlider->SetDimensions(mCanvas->GetWidth(), 14);
 }
 
 vector<IUIControl*> EventCanvas::ControlsToIgnoreInSaveState() const

@@ -44,6 +44,9 @@ private:
    FloatSlider* mYSlider;
    FloatSlider* mMouseScrollXSlider;
    FloatSlider* mMouseScrollYSlider;
+   FloatSlider* mBackgroundLissajousRSlider;
+   FloatSlider* mBackgroundLissajousGSlider;
+   FloatSlider* mBackgroundLissajousBSlider;
 
    float mWidth;
    float mHeight;

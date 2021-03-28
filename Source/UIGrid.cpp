@@ -25,7 +25,7 @@ UIGrid::UIGrid(int x, int y, int w, int h, int cols, int rows, IClickable* paren
 , mHoldCol(0)
 , mHoldRow(0)
 , mRestrictDragToRow(false)
-, mClickClearsToZero(true)
+, mRequireShiftForMultislider(false)
 , mShouldDrawValue(false)
 , mMomentary(false)
 {
@@ -54,6 +54,8 @@ void UIGrid::Init(int x, int y, int w, int h, int cols, int rows, IClickable* pa
 
 void UIGrid::Render()
 {
+   ofPushMatrix();
+   ofTranslate(mX, mY);
    ofPushStyle();
    ofSetLineWidth(.5f);
    float w,h;
@@ -71,17 +73,17 @@ void UIGrid::Render()
          if (data)
          {
             ofFill();
+            float sliderFillAmount = ofClamp(ofLerp(.15f, 1, data), 0, 1);
             if (mGridMode == kNormal)
             {
                ofSetColor(255 * data, 255 * data, 255 * data, gModuleDrawAlpha);
                ofRect(x,y,xsize,ysize);
             }
-            float fillAmount = ofClamp(ofLerp(.15f, 1, data), 0, 1);
-            if (mGridMode == kMultislider)
+            else if (mGridMode == kMultislider)
             {
                float fadeAmount = ofClamp(ofLerp(.5f, 1, data), 0, 1);
                ofSetColor(255 * fadeAmount, 255 * fadeAmount, 255 * fadeAmount, gModuleDrawAlpha);
-               ofRect(x+.5f, y+.5f+(ysize*(1-fillAmount)), xsize-1, ysize*fillAmount-1, 0);
+               ofRect(x+.5f, y+.5f+(ysize*(1- sliderFillAmount)), xsize-1, ysize*sliderFillAmount -1, 0);
                /*ofSetColor(255, 255, 255, gModuleDrawAlpha);
                ofNoFill();
                ofRect(x+1,y+1,xsize-2,ysize-2, gCornerRoundness*.99f);*/
@@ -89,7 +91,13 @@ void UIGrid::Render()
             else if (mGridMode == kHorislider)
             {
                ofSetColor(255,255,255, gModuleDrawAlpha);
-               ofRect(x, y, xsize*fillAmount, ysize);
+               ofRect(x, y, xsize*sliderFillAmount, ysize);
+            }
+            else if (mGridMode == kMultisliderBipolar)
+            {
+               float fadeAmount = ofClamp(ofLerp(.5f, 1, data), 0, 1);
+               ofSetColor(255 * fadeAmount, 255 * fadeAmount, 255 * fadeAmount, gModuleDrawAlpha);
+               ofRect(x, y + ysize * (.5f - sliderFillAmount/2), xsize, ysize * sliderFillAmount);
             }
          }
       }
@@ -121,24 +129,25 @@ void UIGrid::Render()
    if (mCurrentHover != -1 && mShouldDrawValue)
    {
       ofSetColor(ofColor::grey, gModuleDrawAlpha);
-      DrawTextNormal(ofToString(GetVal(mCurrentHover % mCols, mCurrentHover / mCols)), mX, mY+12);
+      DrawTextNormal(ofToString(GetVal(mCurrentHover % mCols, mCurrentHover / mCols)), 0, 12);
    }
    ofPopStyle();
+   ofPopMatrix();
 }
 
 float UIGrid::GetX(int col, int row) const
 {
    float xsize = float(mWidth) / mCols;
-   return mX+(col+mDrawOffset[row])*xsize;
+   return (col+mDrawOffset[row])*xsize;
 }
 
 float UIGrid::GetY(int row) const
 {
    float ysize = float(mHeight) / mRows;
    if (mFlip)
-      return mHeight+mY-(row+1)*ysize;
+      return mHeight-(row+1)*ysize;
    else
-      return mY+row*ysize;
+      return row*ysize;
 }
 
 GridCell UIGrid::GetGridCellAt(float x, float y, float* clickHeight, float* clickWidth)
@@ -169,18 +178,12 @@ GridCell UIGrid::GetGridCellAt(float x, float y, float* clickHeight, float* clic
 
 ofVec2f UIGrid::GetCellPosition(int col, int row)
 {
-   ofVec2f ret;
-   
-   float xsize = float(mWidth) / mCols;
-   float ysize = float(mHeight) / mRows;
-   
-   ret.x = xsize * col;
-   ret.y = ysize * row;
-   
-   if (mFlip)
-      ret.y = (mHeight-1) - ret.y - ysize;
-   
-   return ret;
+   return ofVec2f(GetX(col, row), GetY(row));
+}
+
+bool UIGrid::CanAdjustMultislider() const
+{
+   return !mRequireShiftForMultislider || (GetKeyModifiers() & kModifier_Shift);
 }
 
 void UIGrid::OnClicked(int x, int y, bool right)
@@ -195,31 +198,52 @@ void UIGrid::OnClicked(int x, int y, bool right)
    int dataIndex = GetDataIndex(cell.mCol, cell.mRow);
    float oldValue = mData[dataIndex];
 
-   if (mGridMode == kMultislider)// || mGridMode == kHorislider)
+   if (mGridMode == kMultislider || mGridMode == kMultisliderBipolar)
    {
-      if (mData[dataIndex] > 0 && mClickClearsToZero)
-         mData[dataIndex] = 0;
+      if (CanAdjustMultislider())
+      {
+         mData[dataIndex] = clickHeight;
+      }
       else
-         mData[dataIndex] = mGridMode == kMultislider ? clickHeight : clickWidth;
+      {
+         if (mData[dataIndex] > 0)
+            mData[dataIndex] = 0;
+         else
+            mData[dataIndex] = 1;
+      }
+   }
+   else if (mGridMode == kHorislider)
+   {
+      if (CanAdjustMultislider())
+      {
+         mData[dataIndex] = clickWidth;
+      }
+      else
+      {
+         float val = mStrength;
+         if (mSingleColumn)
+         {
+            for (int i = 0; i < MAX_GRID_SIZE; ++i)
+            {
+               if (mData[GetDataIndex(cell.mCol, i)] != 0)
+                  val = mData[GetDataIndex(cell.mCol, i)];
+            }
+         }
+
+         if (mData[dataIndex] > 0)
+            mData[dataIndex] = 0;
+         else
+            mData[dataIndex] = val;
+      }
    }
    else
    {
-      float val = mStrength;
-      
-      if (mSingleColumn && mGridMode == kHorislider)
-      {
-         for (int i=0; i<MAX_GRID_SIZE; ++i)
-         {
-            if (mData[GetDataIndex(cell.mCol, i)] != 0)
-               val = mData[GetDataIndex(cell.mCol, i)];
-         }
-      }
-      
-      if (mData[dataIndex] == mStrength && mClickClearsToZero)
+      if (mData[dataIndex] == mStrength)
          mData[dataIndex] = 0;
       else
-         mData[dataIndex] = val;
+         mData[dataIndex] = mStrength;
    }
+
    if (mSingleColumn)
    {
       for (int i=0; i<MAX_GRID_SIZE; ++i)
@@ -274,18 +298,29 @@ bool UIGrid::MouseMoved(float x, float y)
       int dataIndex = GetDataIndex(cell.mCol, cell.mRow);
       float oldValue = mData[dataIndex];
       
-      if (mGridMode == kMultislider && mHoldVal != 0)
+      if (mGridMode == kMultislider && mHoldVal != 0 && CanAdjustMultislider())
       {
          mData[dataIndex] = clickHeight;
       }
-      else if (mGridMode == kHorislider && mSingleColumn)
+      else if (mGridMode == kMultisliderBipolar && mHoldVal != 0 && CanAdjustMultislider())
+      {
+         mData[dataIndex] = clickHeight;
+      }
+      else if (mGridMode == kHorislider)
       {
          float val = mHoldVal;
-         for (int i=0; i<MAX_GRID_SIZE; ++i)
+
+         if (mSingleColumn)
          {
-            if (mData[GetDataIndex(cell.mCol, i)] != 0)
-               val = mData[GetDataIndex(cell.mCol, i)];
+            for (int i = 0; i < MAX_GRID_SIZE; ++i)
+            {
+               if (mData[GetDataIndex(cell.mCol, i)] != 0)
+                  val = mData[GetDataIndex(cell.mCol, i)];
+            }
          }
+
+         if (CanAdjustMultislider())
+            val = clickWidth;
          
          mData[dataIndex] = val;
       }
@@ -312,7 +347,7 @@ bool UIGrid::MouseMoved(float x, float y)
 
 bool UIGrid::MouseScrolled(int x, int y, float scrollX, float scrollY)
 {
-   if (mGridMode == kMultislider || mGridMode == kHorislider)
+   if (mGridMode == kMultislider || mGridMode == kHorislider || mGridMode == kMultisliderBipolar)
    {
       bool isMouseOver = (x >= 0 && x < mWidth && y >= 0 && y < mHeight);
       

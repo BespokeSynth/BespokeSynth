@@ -489,6 +489,13 @@ vector<string> ModuleFactory::GetSpawnableModules(char c)
          modules.push_back(prefab + " " + kPrefabSuffix);
    }
 
+   vector<string> midicontrollers = MidiController::GetAvailableInputDevices();
+   for (auto midicontroller : midicontrollers)
+   {
+      if (tolower(midicontroller[0]) == c)
+         modules.push_back(midicontroller + " " + kMidiControllerSuffix);
+   }
+
    sort(modules.begin(), modules.end());
    return modules;
 }
@@ -499,6 +506,8 @@ ModuleType ModuleFactory::GetModuleType(string typeName)
       return mModuleTypeMap[typeName];
    if (juce::String(typeName).endsWith(kVSTSuffix))
       return kModuleType_Synth;
+   if (juce::String(typeName).endsWith(kMidiControllerSuffix))
+      return kModuleType_Instrument;
    return kModuleType_Other;
 }
 

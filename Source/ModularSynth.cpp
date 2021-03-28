@@ -34,6 +34,7 @@
 #include "HelpDisplay.h"
 #include "nanovg/nanovg.h"
 #include "UserPrefsEditor.h"
+#include "Canvas.h"
 
 ModularSynth* TheSynth = nullptr;
 
@@ -41,6 +42,9 @@ ModularSynth* TheSynth = nullptr;
 
 //static
 bool ModularSynth::sShouldAutosave = true;
+float ModularSynth::sBackgroundLissajousR = 0.704081655f;
+float ModularSynth::sBackgroundLissajousG = 0.387755096f;
+float ModularSynth::sBackgroundLissajousB = 0.795918345f;
 
 void AtExit()
 {
@@ -248,6 +252,10 @@ void ModularSynth::Poll()
       {
          desiredCursor = MouseCursor::IBeamCursor;
       }
+      else if (gHoveredUIControl != nullptr && dynamic_cast<Canvas*>(gHoveredUIControl) != nullptr)
+      {
+         desiredCursor = dynamic_cast<Canvas*>(gHoveredUIControl)->GetMouseCursorType();
+      }
       else if (mIsMousePanning)
       {
          desiredCursor = MouseCursor::DraggingHandCursor;
@@ -334,7 +342,7 @@ void ModularSynth::Draw(void* vg)
          DrawFallbackText(mFatalError.c_str(), 100, 100);
    }
    
-   DrawLissajous(&mGlobalRecordBuffer, 0, 0, ofGetWidth(), ofGetHeight(), .7f, 0, 0);
+   DrawLissajous(&mGlobalRecordBuffer, 0, 0, ofGetWidth(), ofGetHeight(), sBackgroundLissajousR, sBackgroundLissajousG, sBackgroundLissajousB);
    
    if (gTime == 1 && mFatalError == "")
    {
@@ -2193,6 +2201,18 @@ IDrawableModule* ModularSynth::SpawnModuleOnTheFly(string moduleName, float x, f
       }
    }
 
+   string midiControllerToSetUp = "";
+   if (tokens.size() > 1 && tokens[tokens.size() - 1] == ModuleFactory::kMidiControllerSuffix)
+   {
+      moduleType = "midicontroller";
+      for (size_t i = 0; i < tokens.size() - 1; ++i)
+      {
+         midiControllerToSetUp += tokens[i];
+         if (i != tokens.size() - 2)
+            midiControllerToSetUp += " ";
+      }
+   }
+
    ofxJSONElement dummy;
    dummy["type"] = moduleType;
    vector<IDrawableModule*> allModules;
@@ -2250,6 +2270,16 @@ IDrawableModule* ModularSynth::SpawnModuleOnTheFly(string moduleName, float x, f
       Prefab* prefab = dynamic_cast<Prefab*>(module);
       if (prefab != nullptr)
          prefab->LoadPrefab("prefabs" + GetPathSeparator() + prefabToSetUp);
+   }
+
+   if (midiControllerToSetUp != "")
+   {
+      MidiController* controller = dynamic_cast<MidiController*>(module);
+      if (controller != nullptr)
+      {
+         controller->GetSaveData().SetString("devicein", midiControllerToSetUp);
+         controller->SetUpFromSaveData();
+      }
    }
 
    return module;

@@ -24,7 +24,7 @@ struct UnstablePerlinModulation
       , mPerlinWarble(warble)
       , mPerlinNoise(noise)
    {
-      mPerlinSeed = rand() % 1000;
+      mPerlinSeed = rand() % 10000;
    }
 
    PerlinNoise mNoise;

@@ -55,8 +55,7 @@ void PulseSequence::CreateUIControls()
    mAdvanceBackwardButton = new ClickButton(this,"<",mIntervalSelector,kAnchor_Right);
    mAdvanceForwardButton = new ClickButton(this,">",mAdvanceBackwardButton,kAnchor_Right);
    
-   mVelocityGrid->SetGridMode(UIGrid::kMultislider);
-   mVelocityGrid->SetClickClearsToZero(false);
+   mVelocityGrid->SetGridMode(UIGrid::kMultisliderBipolar);
    mVelocityGrid->SetListener(this);
    for (int i=0; i<kMaxSteps; ++i)
       mVelocityGrid->SetVal(i, 0, mVels[i], !K(notifyListener));

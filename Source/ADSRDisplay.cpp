@@ -152,6 +152,12 @@ void ADSRDisplay::Render()
             ofSetColor(255,255,255,.2f*gModuleDrawAlpha);
             ofRect(mWidth-10,0,10,10);
             break;
+         case kAdjustAttackAR:
+            ofRect(0, 0, mWidth*.5f, mHeight);
+            break;
+         case kAdjustReleaseAR:
+            ofRect(mWidth*.5f, 0, mWidth*.5f, mHeight);
+            break;
          default:
             break;
       }
@@ -232,7 +238,16 @@ void ADSRDisplay::SpawnEnvelopeEditor()
 
 void ADSRDisplay::OnClicked(int x, int y, bool right)
 {
-   if (!mShowing || sDisplayMode != kDisplayEnvelope)
+   if (sDisplayMode == kDisplaySliders)
+   {
+      if (gHoveredUIControl == mASlider) mASlider->TestClick(x + mX, y + mY, right, false);
+      if (gHoveredUIControl == mDSlider) mDSlider->TestClick(x + mX, y + mY, right, false);
+      if (gHoveredUIControl == mSSlider) mSSlider->TestClick(x + mX, y + mY, right, false);
+      if (gHoveredUIControl == mRSlider) mRSlider->TestClick(x + mX, y + mY, right, false);
+      return;
+   }
+
+   if (!mShowing)
       return;
    
    if (right)
@@ -248,7 +263,7 @@ void ADSRDisplay::OnClicked(int x, int y, bool right)
    {
       TheSynth->ScheduleEnvelopeEditorSpawn(this);
    }
-   else if (mAdsr->IsStandardADSR())
+   else if (mAdsr->IsStandardADSR() || mAdsr->GetNumStages() == 2)
    {
       mClick = true;
       mClickStart.set(x,y);
@@ -265,18 +280,29 @@ bool ADSRDisplay::MouseMoved(float x, float y)
 {
    if (!mClick)
    {
-      if (x >= mWidth-10 && x <= mWidth && y >= 0 && y <=10)
-      {
-         mAdjustMode = kAdjustEnvelopeEditor;
-      }
-      else if (!mAdsr->IsStandardADSR())
-      {
-         
-      }
-      else if (x<0 || y<0 || x>mWidth || y>mHeight)
+      if (x<0 || y<0 || x>mWidth || y>mHeight)
       {
          mAdjustMode = kAdjustNone;
       }
+      else if (x >= mWidth-10 && x <= mWidth && y >= 0 && y <=10)
+      {
+         mAdjustMode = kAdjustEnvelopeEditor;
+      }
+      else if (mAdsr->GetNumStages() == 2)   //2-stage AR envelope
+      {
+         if (x < mWidth/2)
+         {
+            mAdjustMode = kAdjustAttackAR;
+         }
+         else
+         {
+            mAdjustMode = kAdjustReleaseAR;
+         }
+      }
+      else if (!mAdsr->IsStandardADSR())
+      {
+         mAdjustMode = kAdjustNone;
+      }      
       else if (x<20)
       {
          mAdjustMode = kAdjustAttack;
@@ -300,6 +326,7 @@ bool ADSRDisplay::MouseMoved(float x, float y)
       switch (mAdjustMode)
       {
          case kAdjustAttack:
+         case kAdjustAttackAR:
          {
             float a = ofClamp(mClickAdsr.GetA() + mousePosSq * mMaxTime * .1f,1,mMaxTime);
             mViewAdsr.GetA() = a;
@@ -321,6 +348,13 @@ bool ADSRDisplay::MouseMoved(float x, float y)
             float r = ofClamp(mClickAdsr.GetR() + mousePosSq * mMaxTime,1,mMaxTime);
             mViewAdsr.GetR() = r;
             mAdsr->GetR() = r;
+            break;
+         }
+         case kAdjustReleaseAR:
+         {
+            float r = ofClamp(mClickAdsr.GetD() + mousePosSq * mMaxTime, 1, mMaxTime);
+            mViewAdsr.GetD() = r;
+            mAdsr->GetD() = r;
             break;
          }
          default:

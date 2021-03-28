@@ -24,7 +24,7 @@
 #include "Scale.h"
 #include "IPulseReceiver.h"
 
-#define NSS_MAX_STEPS 16
+#define NSS_MAX_STEPS 32
 
 class NoteStepSequencer : public IDrawableModule, public ITimeListener, public INoteSource, public IButtonListener, public IDropdownListener, public IIntSliderListener, public IFloatSliderListener, public MidiDeviceListener, public UIGridListener, public IAudioPoller, public IScaleListener, public INoteReceiver, public IPulseReceiver
 {
@@ -145,7 +145,6 @@ private:
    IntSlider* mLengthSlider;
    bool mSetLength;
    int mNoteRange;
-   int mNumSteps;
    bool mShowStepControls;
    int mRowOffset;
    
@@ -158,9 +157,10 @@ private:
    ClickButton* mRandomizeLengthButton;
    ClickButton* mRandomizeVelocityButton;
    
-   DropdownList* mToneDropdowns[NSS_MAX_STEPS];
-   IntSlider* mVelocitySliders[NSS_MAX_STEPS];
-   FloatSlider* mLengthSliders[NSS_MAX_STEPS];
+   std::array<double, NSS_MAX_STEPS> mLastStepPlayTime;
+   std::array<DropdownList*, NSS_MAX_STEPS> mToneDropdowns;
+   std::array<IntSlider*, NSS_MAX_STEPS> mVelocitySliders;
+   std::array<FloatSlider*, NSS_MAX_STEPS> mLengthSliders;
    
    bool mHasExternalPulseSource;
 };

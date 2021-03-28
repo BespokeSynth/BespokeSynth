@@ -243,6 +243,9 @@ void ScriptModule::DrawModule()
 
 void ScriptModule::DrawModuleUnclipped()
 {
+   if (Minimized() || IsVisible() == false)
+      return;
+
    mCodeEntry->RenderOverlay();
 
    ofPushStyle();
@@ -303,6 +306,38 @@ void ScriptModule::DrawModuleUnclipped()
          ofPopMatrix();
       }
    }
+
+   if (mBoundModuleConnections.size() > 0)
+   {
+      for (size_t i = 0; i < mBoundModuleConnections.size(); ++i)
+      {
+         if (mBoundModuleConnections[i].mTarget == nullptr)
+            continue;
+         if (mBoundModuleConnections[i].mTarget->IsDeleted())
+         {
+            mBoundModuleConnections[i].mTarget = nullptr;
+            continue;
+         }
+
+         ofVec2f linePos = mCodeEntry->GetLinePos(mBoundModuleConnections[i].mLineIndex, false);
+
+         ofSetColor(IDrawableModule::GetColor(kModuleType_Other), 30);
+         ofFill();
+         float codeY = mCodeEntry->GetPosition(true).y;
+         float topY = ofClamp(linePos.y + 3, codeY, codeY+mCodeEntry->GetRect().height);
+         float bottomY = ofClamp(linePos.y + 3 + mCodeEntry->GetCharHeight(), codeY, codeY+mCodeEntry->GetRect().height);
+         ofRectangle lineRect(linePos.x, topY, mCodeEntry->GetRect().width, bottomY - topY);
+         ofRect(lineRect, L(corner, 0));
+
+         ofSetLineWidth(2);
+         ofSetColor(IDrawableModule::GetColor(kModuleType_Other), 30);
+         float startX, startY, endX, endY;
+         ofRectangle targetRect = mBoundModuleConnections[i].mTarget->GetRect();
+         FindClosestSides(lineRect.x, lineRect.y, lineRect.width, lineRect.height, targetRect.x - mX, targetRect.y - mY, targetRect.width, targetRect.height, startX, startY, endX, endY, K(sidesOnly));
+         ofLine(startX, startY, endX, endY);
+      }
+   }
+
    ofPopStyle();
 }
 
@@ -712,8 +747,7 @@ void ScriptModule::ButtonClicked(ClickButton* button)
                return;
             }
 
-            output.setNewLineString("\n");
-            output.writeString(mCodeEntry->GetText());
+            output.writeText(mCodeEntry->GetText(), false, false, nullptr);
             output.flush(); // (called explicitly to force an fsync on posix)
 
             if (output.getStatus().failed())
@@ -795,9 +829,36 @@ void ScriptModule::ExecuteCode()
    RunScript(gTime);
 }
 
-void ScriptModule::ExecuteBlock(int lineStart, int lineEnd)
+pair<int,int> ScriptModule::ExecuteBlock(int lineStart, int lineEnd)
 {
-   RunScript(gTime, lineStart, lineEnd);
+   return RunScript(gTime, lineStart, lineEnd);
+}
+
+void ScriptModule::OnCodeUpdated()
+{
+   if (mBoundModuleConnections.size() > 0)
+   {
+      vector<string> lines = mCodeEntry->GetLines();
+
+      for (size_t i = 0; i < mBoundModuleConnections.size(); ++i)
+      {
+         if (mBoundModuleConnections[i].mLineText != lines[mBoundModuleConnections[i].mLineIndex])
+         {
+            bool found = false;
+            for (size_t j = 0; j < lines.size(); ++j)
+            {
+               if (lines[j] == mBoundModuleConnections[i].mLineText)
+               {
+                  found = true;
+                  mBoundModuleConnections[i].mLineIndex = j;
+               }
+            }
+
+            if (!found)
+               mBoundModuleConnections[i].mTarget = nullptr;
+         }
+      }
+   }
 }
 
 void ScriptModule::OnPulse(double time, float velocity, int flags)
@@ -832,14 +893,14 @@ string ScriptModule::GetThisName()
    return "me__"+ofToString(mScriptModuleIndex);
 }
 
-void ScriptModule::RunScript(double time, int lineStart/*=-1*/, int lineEnd/*=-1*/)
+pair<int,int> ScriptModule::RunScript(double time, int lineStart/*=-1*/, int lineEnd/*=-1*/)
 {
    //should only be called from main thread
 
    if (!sPythonInitialized)
    {
       TheSynth->LogEvent("trying to call ScriptModule::RunScript() before python is initialized", kLogEventType_Error);
-      return;
+      return std::make_pair(0,0);
    }
 
    py::exec(GetThisName()+" = scriptmodule.get_me("+ofToString(mScriptModuleIndex)+")", py::globals());
@@ -883,6 +944,8 @@ void ScriptModule::RunScript(double time, int lineStart/*=-1*/, int lineEnd/*=-1
    mLastRunLiteralCode = code;
    
    RunCode(time, code);
+
+   return std::make_pair(executionStartLine, executionEndLine);
 }
 
 void ScriptModule::RunCode(double time, string code)
@@ -897,7 +960,7 @@ void ScriptModule::RunCode(double time, string code)
 
    sMostRecentRunTime = time;
    mNextLineToExecute = -1;
-   ComputeSliders(time);
+   ComputeSliders(0);
    sPriorExecutedModule = nullptr;
 
    try
@@ -1018,6 +1081,8 @@ void ScriptModule::FixUpCode(string& code)
 void ScriptModule::GetFirstAndLastCharacter(string line, char& first, char& last)
 {
    bool hasFirstCharacter = false;
+   first = 0;
+   last = 0;
    for (size_t i = 0; i < line.length(); ++i)
    {
       char c = line[i];
@@ -1078,6 +1143,29 @@ bool ScriptModule::IsNonWhitespace(string line)
          return true;
    }
    return false;
+}
+
+void ScriptModule::OnModuleReferenceBound(IDrawableModule* target)
+{
+   if (target != nullptr)
+   {
+      for (size_t i = 0; i < mBoundModuleConnections.size(); ++i)
+      {
+         if (mBoundModuleConnections[i].mTarget == target)
+            return;
+      }
+
+      string code = mCodeEntry->GetText();
+      vector<string> lines = ofSplitString(code, "\n");
+      if (mNextLineToExecute >= 0 && mNextLineToExecute < lines.size())
+      {
+         BoundModuleConnection connection;
+         connection.mLineIndex = mNextLineToExecute;
+         connection.mLineText = lines[mNextLineToExecute];
+         connection.mTarget = target;
+         mBoundModuleConnections.push_back(connection);
+      }
+   }
 }
 
 void ScriptModule::Stop()

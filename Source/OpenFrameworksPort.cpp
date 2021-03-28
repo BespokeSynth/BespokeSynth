@@ -34,6 +34,7 @@ ofColor ofColor::blue(0,0,255);
 ofColor ofColor::purple(148,0,211);
 ofColor ofColor::lime(0,255,0);
 ofColor ofColor::magenta(255,0,255);
+ofColor ofColor::clear(0, 0, 0, 0);
 
 NVGcontext* gNanoVG = nullptr;
 NVGcontext* gFontBoundsNanoVG = nullptr;
@@ -212,6 +213,20 @@ void ofSetColor(float r, float g, float b, float a)
    NVGpaint pattern = nvgImagePattern(gNanoVG, ofRandom(0,10), ofRandom(0,10), 300 / gDrawScale / TheSynth->GetPixelRatio(), 300 / gDrawScale / TheSynth->GetPixelRatio(), ofRandom(0,10), sImage, a);
    pattern.innerColor = nvgRGBA(r, g, b, a);
    pattern.outerColor = nvgRGBA(r, g, b, a);
+   nvgStrokePaint(gNanoVG, pattern);
+   nvgFillPaint(gNanoVG, pattern);
+}
+
+void ofSetColorGradient(const ofColor& colorA, const ofColor& colorB, ofVec2f gradientStart, ofVec2f gradientEnd)
+{
+   sStyleStack.GetStyle().color = colorA;
+   if (Push2Control::sDrawingPush2Display)
+   {
+      nvgStrokeColor(gNanoVG, nvgRGBA(colorA.r, colorA.g, colorA.b, colorA.a));
+      nvgFillColor(gNanoVG, nvgRGBA(colorA.r, colorA.g, colorA.b, colorA.a));
+      return;
+   }
+   NVGpaint pattern = nvgLinearGradient(gNanoVG, gradientStart.x, gradientStart.y, gradientEnd.x, gradientEnd.y, nvgRGBA(colorA.r, colorA.g, colorA.b, colorA.a), nvgRGBA(colorB.r, colorB.g, colorB.b, colorB.a));
    nvgStrokePaint(gNanoVG, pattern);
    nvgFillPaint(gNanoVG, pattern);
 }

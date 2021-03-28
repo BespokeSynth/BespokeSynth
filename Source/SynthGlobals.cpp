@@ -118,17 +118,20 @@ void DrawAudioBuffer(float width, float height, const float* buffer, float start
    ofSetLineWidth(1);
    ofFill();
    ofSetColor(255,255,255,50);
-   ofRect(0, 0, width, height);
+   if (width > 0)
+      ofRect(0, 0, width, height);
+   else
+      ofRect(width, 0, -width, height);
    
    if (buffer && end - start > 0)
    {
-      float step = 3;
+      float step = width > 0 ? 3 : -3;
       float samplesPerStep = (end-start) / width * step;
       
-      for (float i = 0; i < width; i+=step)
+      for (float i = 0; abs(i) < abs(width); i+=step)
       {
          float mag = 0;
-         int position =  ofMap(i, 0, width, start, end-1, true);
+         int position =  ofMap(abs(i), 0, abs(width), start, end-1, true);
          //rms
          int j;
          int inc = 1+samplesPerStep / 100;

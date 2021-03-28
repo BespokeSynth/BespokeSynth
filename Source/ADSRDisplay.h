@@ -27,6 +27,7 @@ public:
 
    void SetVol(float vol) { mVol = vol; }
    void SetHighlighted(bool highlighted) { mHighlighted = highlighted; }
+   float GetMaxTime() const { return mMaxTime; }
    void SetMaxTime(float maxTime);
    void SetADSR(::ADSR* adsr);
    ::ADSR* GetADSR() { return mAdsr; }
@@ -58,7 +59,9 @@ private:
       kAdjustDecaySustain,
       kAdjustRelease,
       kAdjustEnvelopeEditor,
-      kAdjustNone
+      kAdjustNone,
+      kAdjustAttackAR,
+      kAdjustReleaseAR,
    } mAdjustMode;
 
    void OnClicked(int x, int y, bool right) override;

@@ -134,6 +134,8 @@ private:
    bool mComputeHasBeenCalledOnce;
    double mLastComputeTime;
    int mLastComputeSamplesIn;
+   double* mLastComputeCacheTime;
+   float* mLastComputeCacheValue;
    
    float mLastDisplayedValue;
    

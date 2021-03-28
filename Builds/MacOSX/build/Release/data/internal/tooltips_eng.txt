@@ -109,19 +109,17 @@ globalcontrols~interface controls, intended to allow you to use midi controllers
 
 
 
-eventcanvas~[no tooltip]
-~quantize~[no tooltip]
-~measures~[no tooltip]
-~interval~[no tooltip]
-~position~[no tooltip]
-~record~[no tooltip]
-~canvas~[no tooltip]
-~ + ~[no tooltip]
-~ - ~[no tooltip]
-~canvaslength~[no tooltip]
-~rowsentry~[no tooltip]
-~clear~[no tooltip]
-~drag mode~[no tooltip]
+eventcanvas~schedule values to set over time
+~quantize~quantizes events to grid
+~measures~length of loop
+~interval~grid for snapping events to
+~record~record connected values as they change
+~canvas~canvas of events. canvas controls:\n-shift-click to add an event\n-hold shift and drag an event to duplicate\n-hold alt to drag an event without snapping\n-hold ctrl while dragging to snap to an interval\n-hold shift and scroll to zoom\n-hold alt and grab empty space to move slide the canvas view\n-hold ctrl and grab empty space to zoom the canvas view
+~timeline~control loop points
+~delete~delete highlighted elements
+~view rows~number of visible rows
+~clear~delete all elements
+~drag mode~direction that elements can be dragged
 
 
 
@@ -381,7 +379,7 @@ playsequencer~[no tooltip]
 
 
 
-notesequencer~looping sequence of notes at an interval. pair with a "pulser" module for more interesting step control.
+notesequencer~looping sequence of notes at an interval. pair with a "pulser" module for more interesting step control. hold "shift" to adjust step length.
 ~interval~note length
 ~length~length that the sequence below should play. the overall grid length can be changed by adjusting "gridsteps" in the triangle menu.
 ~octave~octave of the bottom pitch of this sequence
@@ -405,7 +403,7 @@ notelooper~note loop recorder with overdubbing and replacement functionality
 ~clear~clear pattern
 ~store*~save pattern
 ~load*~restore pattern
-~canvas~[none]
+~canvas~canvas of recorded notes
 
 
 
@@ -434,22 +432,21 @@ notecanvas~looping note roll
 ~free rec~[no tooltip]
 ~measures~loop length
 ~interval~interval to quantize to
-~canvas~[no tooltip]
-~ + ~[no tooltip]
-~ - ~[no tooltip]
-~canvaslength~[no tooltip]
-~rowsentry~[no tooltip]
-~clear~clear canvas
-~drag mode~[no tooltip]
+~canvas~canvas of notes. canvas controls:\n-shift-click to add a note\n-hold shift and drag a note to duplicate\n-hold alt to drag a note without snapping\n-hold ctrl while dragging to snap to an interval\n-hold shift and scroll to zoom\n-hold alt and grab empty space to move slide the canvas view\n-hold ctrl and grab empty space to zoom the canvas view
+~timeline~control loop points
+~delete~delete highlighted elements
+~view rows~number of visible rows
+~clear~delete all elements
+~drag mode~direction that elements can be dragged
 
 
 
 midicontroller~get midi input from external devices
 ~controller~midi device to use
-~mappingdisplay~[no tooltip]
-~bind (hold shift or left mouse)~when this is enabled, you can map a midi input to a UI control by hovering over a UI control, holding shift or the left mouse button, and then using desired midi input
-~page~[no tooltip]
-~add~[no tooltip]
+~mappingdisplay~which mapping view to see
+~bind (hold shift)~when this is enabled, you can map a midi input to a UI control by hovering over a UI control, holding shift, and then using desired midi input
+~page~select which page of midi controls to use. each page acts like an independent midi controller, so you can use pages to allow one midi controller to switch between controlling many things
+~add~add a mapping manually
 
 
 
@@ -472,7 +469,7 @@ fouronthefloor~sends note 0 every beat, to trigger a kick drum
 
 
 
-drumsequencer~step sequencer intended for drums
+drumsequencer~step sequencer intended for drums. hold shift when dragging on the grid to adjust step velocity.
 ~str~velocity to use when setting a step via a grid controller, if the checkbox next to this slider is checked
 ~use str~if the "str" slider should be used for setting velocity
 ~preset~select a pattern preset
@@ -819,17 +816,17 @@ audiometer~sets a slider to an audio level's volume. useful to map a midi displa
 
 
 signalgenerator~basic oscillator signal
-~freq~[no tooltip]
+~freq~signal frequency
 ~freq mode~[no tooltip]
-~osc~[no tooltip]
-~pw~[no tooltip]
+~osc~oscillator type
+~pw~pulse width (or shape for non-square waves)
 ~slider~[no tooltip]
 ~ramp~[no tooltip]
 ~sync~[no tooltip]
 ~syncf~[no tooltip]
 ~soften~[no tooltip]
 ~shuffle~[no tooltip]
-~mult~[no tooltip]
+~mult~multiplier for frequency
 ~phase~[no tooltip]
 ~vol~[no tooltip]
 ~detune~[no tooltip]
@@ -911,14 +908,13 @@ sampleeditor~[abandoned work in progress, possibly broken] sample editor for cre
 
 
 
-samplecanvas~[abandoned work in progress, possibly broken] sample arranging view
-~canvas~[todo]
-~ + ~[todo]
-~ - ~[todo]
-~canvaslength~[todo]
-~rowsentry~[todo]
-~clear~[todo]
-~drag mode~[todo]
+samplecanvas~sample arranging view
+~canvas~canvas of samples. drag and drop samples onto here. canvas controls:\n-hold shift and drag a sample to duplicate\n-hold alt to drag a sample without snapping\n-hold ctrl while dragging to snap to an interval\n-hold shift and scroll to zoom\n-hold alt and grab empty space to move slide the canvas view\n-hold ctrl and grab empty space to zoom the canvas view
+~timeline~control loop points
+~delete~delete highlighted elements
+~view rows~number of visible rows
+~clear~delete all elements
+~drag mode~direction that elements can be dragged
 
 
 

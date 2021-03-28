@@ -59,9 +59,10 @@ private:
    ModuleTooltipInfo* FindModuleInfo(string moduleTypeName);
    UIControlTooltipInfo* FindControlInfo(IUIControl* control);
    
-   string mHelpText;
+   vector<string> mHelpText;
    Checkbox* mShowTooltipsCheckbox;
    ClickButton* mDumpModuleInfo;
+   ClickButton* mTutorialVideoLinkButton;
    float mWidth;
    float mHeight;
    bool mTooltipsLoaded;

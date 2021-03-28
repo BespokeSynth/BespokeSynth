@@ -195,10 +195,10 @@ void CodeEntry::Render()
    }
    ofRect(mX, mY, w, h);
    
-   if (gTime - mLastPublishTime < 200)
+   if (gTime - mLastPublishTime < 400)
    {
-      ofSetColor(0,255,0,100*(1-(gTime - mLastPublishTime)/200));
-      ofRect(mX,mY,w,h);
+      ofSetColor(0,255,0,150*(1-(gTime - mLastPublishTime)/400));
+      ofRect(mX, mLastPublishedLineStart * mCharHeight + mY + 3 - mScroll.y, mWidth, mCharHeight * (mLastPublishedLineEnd+1-mLastPublishedLineStart), L(corner, 2));
    }
    
    ofPushStyle();
@@ -639,6 +639,9 @@ void CodeEntry::OnCodeUpdated()
    {
       mSyntaxHighlightMapping.clear();
    }
+
+   if (mListener)
+      mListener->OnCodeUpdated();
 }
 
 bool CodeEntry::IsAutocompleteShowing()
@@ -913,8 +916,11 @@ void CodeEntry::OnKeyPressed(int key, bool isRepeat)
    else if (toupper(key) == 'R' && GetKeyModifiers() == (kModifier_Command | kModifier_Shift))
    {
       Publish();
-      mListener->ExecuteBlock(MIN(GetCaretCoords(mCaretPosition).y, GetCaretCoords(mCaretPosition2).y),
-                              MAX(GetCaretCoords(mCaretPosition).y, GetCaretCoords(mCaretPosition2).y));
+      int lineStart = MIN(GetCaretCoords(mCaretPosition).y, GetCaretCoords(mCaretPosition2).y);
+      int lineEnd = MAX(GetCaretCoords(mCaretPosition).y, GetCaretCoords(mCaretPosition2).y);
+      pair<int, int> ranLines = mListener->ExecuteBlock(lineStart, lineEnd);
+      mLastPublishedLineStart = ranLines.first;
+      mLastPublishedLineEnd = ranLines.second;
    }
    else
    {
@@ -933,6 +939,8 @@ void CodeEntry::Publish()
 {
    mPublishedString = mString;
    mLastPublishTime = gTime;
+   mLastPublishedLineStart = 0;
+   mLastPublishedLineEnd = GetLines().size();
    OnCodeUpdated();
 }
 

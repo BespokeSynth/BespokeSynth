@@ -272,6 +272,9 @@ public:
 
    INonstandardController* GetNonstandardController() { return mNonstandardController; }
 
+   static vector<string> GetAvailableInputDevices();
+   static vector<string> GetAvailableOutputDevices();
+
    //IDrawableModule
    void Poll() override;
    void SetEnabled(bool enabled) override { mEnabled = enabled; }

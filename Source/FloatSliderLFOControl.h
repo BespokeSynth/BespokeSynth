@@ -32,6 +32,7 @@ struct LFOSettings
    , mShuffle(0)
    , mFreeRate(1)
    , mLength(1)
+   , mLowResMode(false)
    {
    }
    
@@ -44,6 +45,7 @@ struct LFOSettings
    float mShuffle;
    float mFreeRate;
    float mLength;
+   bool mLowResMode;
    
    void SaveState(FileStreamOut& out) const;
    void LoadState(FileStreamIn& in);
@@ -74,6 +76,7 @@ public:
    void CreateUIControls() override;
    bool IsPinned() const { return mPinned; }
    void RandomizeSettings();
+   bool InLowResMode() const { return mLFOSettings.mLowResMode; }
    
    //IModulator
    float Value(int samplesIn = 0) override;
@@ -118,6 +121,7 @@ private:
    FloatSlider* mLengthSlider;
    ClickButton* mPinButton;
    Checkbox* mEnableLFOCheckbox;
+   Checkbox* mLowResModeCheckbox;
    float mWidth;
    float mHeight;
 

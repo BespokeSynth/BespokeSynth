@@ -150,7 +150,7 @@ void Looper::CreateUIControls()
    mBeatwheelSingleMeasureCheckbox = new Checkbox(this,"beatwheel single measure",HIDDEN_UICONTROL,HIDDEN_UICONTROL,&mBeatwheelSingleMeasure);
    mPitchShiftSlider = new FloatSlider(this,"pitch",-1,-1,130,15,&mPitchShift,.5f,2);
    mKeepPitchCheckbox = new Checkbox(this,"auto",-1,-1,&mKeepPitch);
-   mResampleButton = new ClickButton(this, "resample for new tempo", 15, 40);
+   mResampleButton = new ClickButton(this, "resample for tempo", 15, 40);
    
    mNumBarsSelector->AddLabel(" 1 ",1);
    mNumBarsSelector->AddLabel(" 2 ",2);
@@ -280,7 +280,9 @@ void Looper::Process(double time)
    if (!doGranular || !mGranulator->ShouldFreeze())
       mLoopPos = sampsPerBar * ((TheTransport->GetMeasure(time) % mNumBars) + TheTransport->GetMeasurePos(time));
    
-   if (oldLoopPos > mLoopLength - bufferSize * mSpeed - 1 && mLoopPos < oldLoopPos)
+   double speed = GetPlaybackSpeed();
+
+   if (oldLoopPos > mLoopLength - bufferSize * speed - 1 && mLoopPos < oldLoopPos)
    {
       ++mLoopCount;
       /*if (mLoopCount > 6 && mMute == false && mDecay)
@@ -301,7 +303,7 @@ void Looper::Process(double time)
       }
    }
 
-   if (mSpeed == 1)
+   if (speed == 1)
    {
       //TODO(Ryan) reevaluate
       //mLoopPos = int(mLoopPos);  //fix in-between sample error
@@ -322,7 +324,7 @@ void Looper::Process(double time)
    }
    
    if (mKeepPitch)
-      mPitchShift = 1/mSpeed;
+      mPitchShift = 1/speed;
    int latencyOffset = 0;
    if (mPitchShift != 1)
       latencyOffset = mPitchShifter[0]->GetLatency();
@@ -345,7 +347,7 @@ void Looper::Process(double time)
       if (mBeatwheel)
          ProcessBeatwheel(processStartTime, i);
       
-      float offset = mLoopPos+i*mSpeed+mLoopPosOffset+latencyOffset;
+      float offset = mLoopPos+i*speed+mLoopPosOffset+latencyOffset;
       float output[ChannelBuffer::kMaxNumChannels];
       ::Clear(output, ChannelBuffer::kMaxNumChannels);
 
@@ -363,7 +365,7 @@ void Looper::Process(double time)
          if (mFourTet > 0 && mFourTet < 1)   //fourtet wet/dry
          {
             output[ch] *= mFourTet;
-            float normalOffset = mLoopPos+i*mSpeed;
+            float normalOffset = mLoopPos+i*speed;
             output[ch] += GetInterpolatedSample(normalOffset, mBuffer->GetChannel(ch), mLoopLength) * (1-mFourTet);
          }
          
@@ -448,7 +450,7 @@ void Looper::DoCommit()
       for (int i=0; i<commitLength; ++i)
       {
          int idx = i - LOOPER_COMMIT_FADE_SAMPLES;
-         int pos = int(mLoopPos+(idx*mSpeed)+(mLoopLength-commitSamplesBack)) % mLoopLength;
+         int pos = int(mLoopPos+(idx*GetPlaybackSpeed())+(mLoopLength-commitSamplesBack)) % mLoopLength;
          float fade = 1;
          if (idx < 0)
             fade = float(LOOPER_COMMIT_FADE_SAMPLES + idx) / LOOPER_COMMIT_FADE_SAMPLES;
@@ -485,9 +487,14 @@ int Looper::GetRecorderNumBars() const
    return NumBars();
 }
 
+double Looper::GetPlaybackSpeed() const
+{
+   return mSpeed * TheTransport->GetTempo() / mBufferTempo;
+}
+
 void Looper::ProcessScratch()
 {
-   mLoopPosOffset = mLoopPosOffset - mSpeed + mScratchSpeed;
+   mLoopPosOffset = mLoopPosOffset - GetPlaybackSpeed() + mScratchSpeed;
    FloatWrap(mLoopPosOffset, mLoopLength);
 }
 
@@ -506,7 +513,7 @@ void Looper::ProcessFourTet(double time, int sampleIdx)
       mLoopPosOffset = (1 - sliceProgress + slice/2) * (mLoopLength/float(numSlices) * 2);
    
    //offset regular movement
-   mLoopPosOffset -= mLoopPos+sampleIdx*mSpeed;
+   mLoopPosOffset -= mLoopPos + sampleIdx * GetPlaybackSpeed();
    
    FloatWrap(mLoopPosOffset, mLoopLength);
 }
@@ -571,7 +578,7 @@ void Looper::ProcessBeatwheel(double time, int sampleIdx)
          mLoopPosOffset = playSlice * (loopLength/numSlices);
          
          //offset regular movement
-         mLoopPosOffset -= mLoopPos+sampleIdx*mSpeed;
+         mLoopPosOffset -= mLoopPos + sampleIdx * GetPlaybackSpeed();
          
          FloatWrap(mLoopPosOffset, mLoopLength);
       }
@@ -1049,7 +1056,8 @@ void Looper::OnClicked(int x, int y, bool right)
    IDrawableModule::OnClicked(x, y, right);
    
    if (x >= BUFFER_X + BUFFER_W / 3 && x < BUFFER_X + (BUFFER_W * 2) / 3 &&
-       y >= BUFFER_Y + BUFFER_H / 3 && y < BUFFER_Y + (BUFFER_H * 2) / 3)
+       y >= BUFFER_Y + BUFFER_H / 3 && y < BUFFER_Y + (BUFFER_H * 2) / 3 &&
+       mBufferTempo == TheTransport->GetTempo())
    {
       ChannelBuffer grab(mLoopLength);
       grab.SetNumActiveChannels(mBuffer->NumActiveChannels());

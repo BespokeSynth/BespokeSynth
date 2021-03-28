@@ -19,7 +19,7 @@
 
 class CanvasControls;
 class PatchCableSource;
-
+class CanvasScrollbar;
 
 class EventCanvas : public IDrawableModule, public ICanvasListener, public IFloatSliderListener, public IAudioPoller, public IIntSliderListener, public IButtonListener, public IDropdownListener, public ITextEntryListener
 {
@@ -37,7 +37,6 @@ public:
    void SetEnabled(bool enabled) override { mEnabled = enabled; }
    bool IsResizable() const override { return true; }
    void Resize(float w, float h) override;
-   bool MouseScrolled(int x, int y, float scrollX, float scrollY) override;
    
    void OnTransportAdvanced(float amount) override;
    
@@ -71,6 +70,7 @@ private:
    
    Canvas* mCanvas;
    CanvasControls* mCanvasControls;
+   CanvasScrollbar* mCanvasScrollbarHorizontal;
    float mScrollPartial;
    TextEntry* mNumMeasuresEntry;
    int mNumMeasures;
@@ -78,7 +78,6 @@ private:
    NoteInterval mInterval;
    DropdownList* mIntervalSelector;
    float mPosition;
-   FloatSlider* mPositionSlider;
    vector<PatchCableSource*> mControlCables;
    vector<ofColor> mRowColors;
    bool mRecord;

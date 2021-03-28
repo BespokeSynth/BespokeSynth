@@ -353,7 +353,9 @@ int Transport::GetQuantized(double time, NoteInterval interval, double* remainde
          return GetQuantized(time, kInterval_16n, remainderMs); //TODO(Ryan) whatever
       default:
          //TODO(Ryan) this doesn't really make sense, does it?
-         assert(false);
+         //assert(false);
+         TheSynth->LogEvent("error: GetQuantized() called with invalid interval " + ofToString(interval), kLogEventType_Error);
+         return 0;
    }
    return 0;
 }
@@ -390,7 +392,9 @@ int Transport::CountInStandardMeasure(NoteInterval interval)
          return 16;  //TODO(Ryan) whatever
       default:
          //TODO(Ryan) this doesn't really make sense, does it?
-         assert(false);
+         //assert(false);
+         TheSynth->LogEvent("error: CountInStandardMeasure() called with invalid interval "+ofToString(interval), kLogEventType_Error);
+         return 1;
    }
    return 0;
 }

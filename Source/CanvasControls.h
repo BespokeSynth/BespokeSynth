@@ -39,7 +39,7 @@ public:
    void FloatSliderUpdated(FloatSlider* slider, float oldVal) override;
    void IntSliderUpdated(IntSlider* slider, int oldVal) override;
    void ButtonClicked(ClickButton* button) override;
-   void TextEntryComplete(TextEntry* entry) override {}
+   void TextEntryComplete(TextEntry* entry) override;
    void DropdownUpdated(DropdownList* list, int oldVal) override {}
    
    void LoadLayout(const ofxJSONElement& moduleInfo) override;
@@ -55,9 +55,7 @@ private:
    float mWidth;
    Canvas* mCanvas;
    CanvasElement* mSelectedElement;
-   ClickButton* mAddElementButton;
    ClickButton* mRemoveElementButton;
-   TextEntry* mCanvasLengthEntry;
    TextEntry* mNumVisibleRowsEntry;
    ClickButton* mClearButton;
    float mDummyFloat;

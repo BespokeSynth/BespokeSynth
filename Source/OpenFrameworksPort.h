@@ -36,7 +36,7 @@ struct ofColor
    int b;
    int a;
    
-   static ofColor black,white,grey,red,green,yellow,blue,orange,purple,lime,magenta;
+   static ofColor black,white,grey,red,green,yellow,blue,orange,purple,lime,magenta,clear;
 
    static ofColor lerp(ofColor a, ofColor b, float t)
    {
@@ -270,6 +270,7 @@ void ofSetColor(float r, float g, float b, float a=255);
 void ofSetColor(float grey);
 void ofSetColor(const ofColor& color);
 void ofSetColor(const ofColor& color, float a);
+void ofSetColorGradient(const ofColor& colorA, const ofColor& colorB, ofVec2f gradientStart, ofVec2f gradientEnd);
 void ofFill();
 void ofNoFill();
 void ofCircle(float x, float y, float radius);

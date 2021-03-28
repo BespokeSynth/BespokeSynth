@@ -32,6 +32,7 @@ StepSequencer::StepSequencer()
 , mAdjustOffsetsCheckbox(nullptr)
 , mRepeatRate(kInterval_None)
 , mRepeatRateDropdown(nullptr)
+, mNumMeasures(1)
 , mStepInterval(kInterval_16n)
 , mStepIntervalDropdown(nullptr)
 , mUseStrengthSliderCheckbox(nullptr)
@@ -57,8 +58,9 @@ void StepSequencer::CreateUIControls()
    mGrid = new UIGrid(40,45,180,150,16,NUM_STEPSEQ_ROWS, this);
    mStrengthSlider = new FloatSlider(this,"str",75,22,50,15,&mStrength,0,1,2);
    mUseStrengthSliderCheckbox = new Checkbox(this,"use str",128,22,&mUseStrengthSlider);
+   mNumMeasuresSlider = new IntSlider(this, "measures", 145, 22, 80, 15, &mNumMeasures, 1, 4);
    mPresetDropdown = new DropdownList(this,"preset",5,4,&mPreset);
-   mGridYOffDropdown = new DropdownList(this,"yoff",190,22,&mGridYOff);
+   mGridYOffDropdown = new DropdownList(this,"yoff",288,4,&mGridYOff);
    mAdjustOffsetsCheckbox = new Checkbox(this,"offsets",175,4,&mAdjustOffsets);
    mRepeatRateDropdown = new DropdownList(this,"repeat",5,22,(int*)(&mRepeatRate));
    mStepIntervalDropdown = new DropdownList(this,"step",133,4,(int*)(&mStepInterval));
@@ -407,6 +409,7 @@ void StepSequencer::DrawModule()
    mGrid->Draw();
    mStrengthSlider->Draw();
    mUseStrengthSliderCheckbox->Draw();
+   mNumMeasuresSlider->Draw();
    mPresetDropdown->Draw();
    mAdjustOffsetsCheckbox->Draw();
    mRepeatRateDropdown->Draw();
@@ -438,6 +441,8 @@ void StepSequencer::DrawModule()
          {
             mOffsetSlider[i]->SetShowing(false);
          }
+
+         mRows[i]->DrawOverlay();
       }
       else
       {
@@ -784,6 +789,25 @@ void StepSequencer::RadioButtonUpdated(RadioButton* radio, int oldVal)
 
 void StepSequencer::IntSliderUpdated(IntSlider* slider, int oldVal)
 {
+   if (slider == mNumMeasuresSlider)
+   {
+      mGrid->SetGrid(GetNumSteps(mStepInterval), mNumRows);
+      if (mNumMeasures > oldVal)
+      {
+         int newChunkCount = ceil(mNumMeasures / oldVal);
+         int stepsPerChunk = GetNumSteps(mStepInterval) / newChunkCount;
+         for (int chunk = 1; chunk < newChunkCount; ++chunk)
+         {
+            for (int col = 0; col < stepsPerChunk && col + stepsPerChunk * chunk < mGrid->GetCols(); ++col)
+            {
+               for (int row = 0; row < mGrid->GetRows(); ++row)
+               {
+                  mGrid->SetVal(col + stepsPerChunk * chunk, row, mGrid->GetVal(col, row), false);
+               }
+            }
+         }
+      }
+   }
 }
 
 void StepSequencer::ButtonClicked(ClickButton* button)
@@ -877,13 +901,12 @@ void StepSequencer::SetUpFromSaveData()
    SetUpPatchCables(mModuleSaveData.GetString("target"));
    mGrid->SetDimensions(mModuleSaveData.GetInt("gridwidth"), mModuleSaveData.GetInt("gridheight"));
    mNumRows = mModuleSaveData.GetInt("gridrows");
-   mNumMeasures = mModuleSaveData.GetInt("gridmeasures");
-   mGrid->SetGrid(mNumRows, GetNumSteps(mStepInterval));
+   mGrid->SetGrid(GetNumSteps(mStepInterval), mNumRows);
    
    bool multisliderMode = mModuleSaveData.GetBool("multislider_mode");
-   mGrid->SetGridMode(multisliderMode ? UIGrid::kMultislider : UIGrid::kNormal);
+   mGrid->SetGridMode(multisliderMode ? UIGrid::kMultisliderBipolar : UIGrid::kNormal);
    mGrid->SetRestrictDragToRow(multisliderMode);
-   mGrid->SetClickClearsToZero(!multisliderMode);
+   mGrid->SetRequireShiftForMultislider(true);
 
    mIsSetUp = true;
 }
@@ -931,6 +954,7 @@ StepSequencerRow::StepSequencerRow(StepSequencer* seq, UIGrid* grid, int row)
 , mGrid(grid)
 , mRow(row)
 , mOffset(0)
+, mPlayedStepsRoundRobin(0)
 {
    TheTransport->AddListener(this, mSeq->GetStepInterval(), OffsetInfo(0, true), true);
 }
@@ -948,8 +972,13 @@ void StepSequencerRow::OnTimeEvent(double time)
    float offsetMs = mOffset*TheTransport->MsPerBar();
    int step = mSeq->GetStepNum(time + offsetMs);
    float val = mGrid->GetVal(step,mRow);
-   if (val > 0 && mSeq->IsMetaStepActive(time, step,mRow))
+   if (val > 0 && mSeq->IsMetaStepActive(time, step, mRow))
+   {
       mSeq->PlayStepNote(time, mRow, val * val);
+      mPlayedSteps[mPlayedStepsRoundRobin].step = step;
+      mPlayedSteps[mPlayedStepsRoundRobin].time = time;
+      mPlayedStepsRoundRobin = (mPlayedStepsRoundRobin + 1) % mPlayedSteps.size();
+   }
 }
 
 void StepSequencerRow::SetOffset(float offset)
@@ -961,6 +990,36 @@ void StepSequencerRow::SetOffset(float offset)
 void StepSequencerRow::UpdateTimeListener()
 {
    TheTransport->UpdateListener(this, mSeq->GetStepInterval(), OffsetInfo(mOffset, false));
+}
+
+void StepSequencerRow::DrawOverlay()
+{
+   const float kPlayHighlightDurationMs = 250;
+   for (size_t i = 0; i < mPlayedSteps.size(); ++i)
+   {
+      if (mPlayedSteps[i].time != -1)
+      {
+         if (gTime - mPlayedSteps[i].time < kPlayHighlightDurationMs)
+         {
+            if (gTime - mPlayedSteps[i].time > 0)
+            {
+               float fade = (1 - (gTime - mPlayedSteps[i].time) / kPlayHighlightDurationMs);
+               ofPushStyle();
+               ofSetLineWidth(3 * fade);
+               ofVec2f pos = mGrid->GetCellPosition(mPlayedSteps[i].step, mRow) + mGrid->GetPosition(true);
+               float xsize = float(mGrid->GetWidth()) / mGrid->GetCols();
+               float ysize = float(mGrid->GetHeight()) / mGrid->GetRows();
+               ofSetColor(ofColor::white, fade * 255);
+               ofRect(pos.x, pos.y, xsize, ysize);
+               ofPopStyle();
+            }
+         }
+         else
+         {
+            mPlayedSteps[i].time = -1;
+         }
+      }
+   }
 }
 
 NoteRepeat::NoteRepeat(StepSequencer* seq, int row)

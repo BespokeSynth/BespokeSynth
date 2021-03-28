@@ -276,9 +276,9 @@ void Chorder::SetUpFromSaveData()
    SetUpPatchCables(mModuleSaveData.GetString("target"));
    
    bool multisliderMode = mModuleSaveData.GetBool("multislider_mode");
-   mChordGrid->SetGridMode(multisliderMode ? UIGrid::kMultislider : UIGrid::kNormal);
+   mChordGrid->SetGridMode(multisliderMode ? UIGrid::kMultisliderBipolar : UIGrid::kNormal);
    mChordGrid->SetRestrictDragToRow(multisliderMode);
-   mChordGrid->SetClickClearsToZero(true);//!multisliderMode);
+   mChordGrid->SetRequireShiftForMultislider(true);
 }
 
 namespace

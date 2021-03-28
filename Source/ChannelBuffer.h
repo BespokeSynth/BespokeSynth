@@ -29,7 +29,7 @@ public:
    int RecentNumActiveChannels() const { return mRecentActiveChannels; }
    int NumTotalChannels() const { return mNumChannels; }
    int BufferSize() const { return mBufferSize; }
-   void CopyFrom(ChannelBuffer* src, int length = -1);
+   void CopyFrom(ChannelBuffer* src, int length = -1, int startOffset = 0);
    void SetChannelPointer(float* data, int channel, bool deleteOldData);
    void Reset() { Clear(); mRecentActiveChannels = mActiveChannels; SetNumActiveChannels(1); }
    void Resize(int bufferSize);

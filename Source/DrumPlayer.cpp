@@ -389,7 +389,7 @@ void DrumPlayer::DrumHit::StartPlayhead(double time, float startOffsetPercent, f
          mPlayheads[i].mCutOffTime = -1;
          mPlayheads[i].mOffset = startOffsetPercent * mSample.LengthInSamples();
          mPlayheads[i].mEnvelopeTime = 0;
-         mPlayheads[i].mEnvelopeSpeed = ofMap(velocity, 0, 1, .2f, 1);
+         mPlayheads[i].mEnvelopeScale = ofLerp(.2f, 1, velocity);
          mPlayheads[i].mSpeedTweak = ofRandom(1-mOwner->mSpeedRandomization, 1+ mOwner->mSpeedRandomization);
       }
       else
@@ -464,7 +464,7 @@ bool DrumPlayer::DrumHit::Process(double time, float speed, float vol, ChannelBu
             }
 
             mPlayheads[playhead].mOffset += sampleSpeed * mPlayheads[playhead].mSpeedTweak * mSample.GetSampleRateRatio();
-            mPlayheads[playhead].mEnvelopeTime += gInvSampleRateMs / mPlayheads[playhead].mEnvelopeSpeed;
+            mPlayheads[playhead].mEnvelopeTime += gInvSampleRateMs / mPlayheads[playhead].mEnvelopeScale;
             mSamplesRemainingToProcess = bufferSize + abs(mWiden);
          }
       }

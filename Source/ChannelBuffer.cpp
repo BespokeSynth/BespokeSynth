@@ -99,12 +99,12 @@ void ChannelBuffer::SetMaxAllowedChannels(int channels)
       mActiveChannels = channels;
 }
 
-void ChannelBuffer::CopyFrom(ChannelBuffer* src, int length /*= -1*/)
+void ChannelBuffer::CopyFrom(ChannelBuffer* src, int length /*= -1*/, int startOffset /*= 0*/)
 {
    if (length == -1)
       length = mBufferSize;
    assert(length <= mBufferSize);
-   assert(length <= src->mBufferSize);
+   assert(length + startOffset <= src->mBufferSize);
    mActiveChannels = src->mActiveChannels;
    for (int i=0; i<mActiveChannels; ++i)
    {
@@ -116,7 +116,7 @@ void ChannelBuffer::CopyFrom(ChannelBuffer* src, int length /*= -1*/)
             mBuffers[i] = new float[mBufferSize];
             ::Clear(mBuffers[i], mBufferSize);
          }
-         BufferCopy(mBuffers[i], src->mBuffers[i], length);
+         BufferCopy(mBuffers[i], src->mBuffers[i] + startOffset, length);
       }
       else
       {

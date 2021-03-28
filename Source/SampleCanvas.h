@@ -15,10 +15,13 @@
 #include "Checkbox.h"
 #include "Canvas.h"
 #include "Slider.h"
+#include "DropdownList.h"
 
 class CanvasControls;
+class CanvasTimeline;
+class CanvasScrollbar;
 
-class SampleCanvas : public IDrawableModule, public IAudioSource, public ICanvasListener, public IFloatSliderListener, public IIntSliderListener
+class SampleCanvas : public IDrawableModule, public IAudioSource, public ICanvasListener, public IFloatSliderListener, public IIntSliderListener, public IDropdownListener
 {
 public:
    SampleCanvas();
@@ -29,13 +32,15 @@ public:
    void CreateUIControls() override;
    
    void SetEnabled(bool enabled) override { mEnabled = enabled; }
+   bool IsResizable() const override { return true; }
+   void Resize(float w, float h) override;
    
    void Process(double time) override;
+   NoteInterval GetInterval() const { return mInterval; }
    
    void CanvasUpdated(Canvas* canvas) override;
    
    void OnClicked(int x, int y, bool right) override;
-   bool MouseScrolled(int x, int y, float scrollX, float scrollY) override;
    
    void FilesDropped(vector<string> files, int x, int y) override;
    void SampleDropped(int x, int y, Sample* sample) override;
@@ -44,6 +49,7 @@ public:
    void CheckboxUpdated(Checkbox* checkbox) override;
    void FloatSliderUpdated(FloatSlider* slider, float oldVal) override;
    void IntSliderUpdated(IntSlider* slider, int oldVal) override;
+   void DropdownUpdated(DropdownList* list, int oldVal) override;
    
    virtual void LoadLayout(const ofxJSONElement& moduleInfo) override;
    virtual void SetUpFromSaveData() override;
@@ -51,11 +57,23 @@ public:
 private:
    //IDrawableModule
    void DrawModule() override;
-   void GetModuleDimensions(float& width, float& height) override { width=810; height=210; }
+   void GetModuleDimensions(float& width, float& height) override;
    bool Enabled() const override { return mEnabled; }
+
+   void SetNumMeasures(int numMeasures);
+   void UpdateNumColumns();
+   double GetCurPos(double time) const;
    
    Canvas* mCanvas;
    CanvasControls* mCanvasControls;
+   CanvasTimeline* mCanvasTimeline;
+   CanvasScrollbar* mCanvasScrollbarHorizontal;
+   CanvasScrollbar* mCanvasScrollbarVertical;
+
+   IntSlider* mNumMeasuresSlider;
+   int mNumMeasures;
+   NoteInterval mInterval;
+   DropdownList* mIntervalSelector;
 };
 
 #endif /* defined(__Bespoke__SampleCanvas__) */
