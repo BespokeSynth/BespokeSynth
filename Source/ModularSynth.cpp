@@ -2221,6 +2221,18 @@ IDrawableModule* ModularSynth::SpawnModuleOnTheFly(string moduleName, float x, f
       }
    }
 
+   string effectToSetUp = "";
+   if (tokens.size() > 1 && tokens[tokens.size() - 1] == ModuleFactory::kEffectChainSuffix)
+   {
+      moduleType = "effectchain";
+      for (size_t i = 0; i < tokens.size() - 1; ++i)
+      {
+         effectToSetUp += tokens[i];
+         if (i != tokens.size() - 2)
+            effectToSetUp += " ";
+      }
+   }
+
    ofxJSONElement dummy;
    dummy["type"] = moduleType;
    vector<IDrawableModule*> allModules;
@@ -2288,6 +2300,13 @@ IDrawableModule* ModularSynth::SpawnModuleOnTheFly(string moduleName, float x, f
          controller->GetSaveData().SetString("devicein", midiControllerToSetUp);
          controller->SetUpFromSaveData();
       }
+   }
+
+   if (effectToSetUp != "")
+   {
+      EffectChain* effectChain = dynamic_cast<EffectChain*>(module);
+      if (effectChain != nullptr)
+         effectChain->AddEffect(effectToSetUp, K(onTheFly));
    }
 
    return module;

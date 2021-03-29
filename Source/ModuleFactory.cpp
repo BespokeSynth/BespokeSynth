@@ -496,6 +496,13 @@ vector<string> ModuleFactory::GetSpawnableModules(char c)
          modules.push_back(midicontroller + " " + kMidiControllerSuffix);
    }
 
+   vector<string> effects = TheSynth->GetEffectFactory()->GetSpawnableEffects();
+   for (auto effect : effects)
+   {
+      if (tolower(effect[0]) == c)
+         modules.push_back(effect + " " + kEffectChainSuffix);
+   }
+
    sort(modules.begin(), modules.end());
    return modules;
 }
@@ -508,6 +515,8 @@ ModuleType ModuleFactory::GetModuleType(string typeName)
       return kModuleType_Synth;
    if (juce::String(typeName).endsWith(kMidiControllerSuffix))
       return kModuleType_Instrument;
+   if (juce::String(typeName).endsWith(kEffectChainSuffix))
+      return kModuleType_Audio;
    return kModuleType_Other;
 }
 
