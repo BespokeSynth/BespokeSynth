@@ -46,7 +46,7 @@ EffectFactory::EffectFactory()
    Register("granulator", &(LiveGranulator::Create));
    Register("dcremover", &(DCRemoverEffect::Create));
    Register("freeverb", &(FreeverbEffect::Create));
-   Register("eq", &(EQEffect::Create));
+   Register("basiceq", &(EQEffect::Create));
    //Register("audiounit", &(AudioUnitEffect::Create));
    Register("pitchshift", &(PitchShiftEffect::Create));
    Register("formant", &(FormantFilterEffect::Create));
@@ -60,6 +60,9 @@ void EffectFactory::Register(string type, CreateEffectFn creator)
 
 IAudioEffect* EffectFactory::MakeEffect(string type)
 {
+   if (type == "eq") //fix up old save data
+      type = "basiceq";
+
    auto iter = mFactoryMap.find(type);
    if (iter != mFactoryMap.end())
       return iter->second();

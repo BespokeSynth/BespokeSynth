@@ -35,6 +35,7 @@
 #include "nanovg/nanovg.h"
 #include "UserPrefsEditor.h"
 #include "Canvas.h"
+#include "EffectChain.h"
 
 ModularSynth* TheSynth = nullptr;
 
@@ -445,13 +446,20 @@ void ModularSynth::Draw(void* vg)
          {
             tooltip = helpDisplay->GetModuleTooltipFromName(mQuickSpawn->GetHoveredModuleTypeName());
          }
-         else if (gHoveredModule == GetTopModalFocusItem() &&
-                  dynamic_cast<DropdownListModal*>(gHoveredModule) &&
-                  dynamic_cast<DropdownListModal*>(gHoveredModule)->GetOwner()->GetModuleParent() == TheTitleBar)
+         else if (gHoveredModule == GetTopModalFocusItem() && dynamic_cast<DropdownListModal*>(gHoveredModule))
          {
-            string moduleTypeName = dynamic_cast<DropdownListModal*>(gHoveredModule)->GetHoveredLabel();
-            ofStringReplace(moduleTypeName, " (exp.)", "");
-            tooltip = helpDisplay->GetModuleTooltipFromName(moduleTypeName);
+            DropdownListModal* list = dynamic_cast<DropdownListModal*>(gHoveredModule);
+            if (list->GetOwner()->GetModuleParent() == TheTitleBar)
+            {
+               string moduleTypeName = dynamic_cast<DropdownListModal*>(gHoveredModule)->GetHoveredLabel();
+               ofStringReplace(moduleTypeName, " (exp.)", "");
+               tooltip = helpDisplay->GetModuleTooltipFromName(moduleTypeName);
+            }
+            else if (dynamic_cast<EffectChain*>(list->GetOwner()->GetParent()) != nullptr)
+            {
+               string effectName = dynamic_cast<DropdownListModal*>(gHoveredModule)->GetHoveredLabel();
+               tooltip = helpDisplay->GetModuleTooltipFromName(effectName);
+            }
          }
          else
          {

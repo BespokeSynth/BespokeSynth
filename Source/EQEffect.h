@@ -29,7 +29,7 @@ public:
    
    static IAudioEffect* Create() { return new EQEffect(); }
    
-   string GetTitleLabel() override { return "eq"; }
+   string GetTitleLabel() override { return "basiceq"; }
    void CreateUIControls() override;
    
    void Init() override;
@@ -38,7 +38,7 @@ public:
    void ProcessAudio(double time, ChannelBuffer* buffer) override;
    void SetEnabled(bool enabled) override { mEnabled = enabled; }
    float GetEffectAmount() override;
-   string GetType() override { return "eq"; }
+   string GetType() override { return "basiceq"; }
    
    void DropdownUpdated(DropdownList* list, int oldVal) override;
    void CheckboxUpdated(Checkbox* checkbox) override;

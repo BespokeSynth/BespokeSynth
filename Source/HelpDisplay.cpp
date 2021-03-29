@@ -285,7 +285,9 @@ void HelpDisplay::ButtonClicked(ClickButton* button)
    }
    if (button == mDumpModuleInfo)
    {
-      /*vector<ModuleType> moduleTypes = {
+      LoadTooltips();
+
+      vector<ModuleType> moduleTypes = {
                                           kModuleType_Note,
                                           kModuleType_Synth,
                                           kModuleType_Audio,
@@ -300,7 +302,7 @@ void HelpDisplay::ButtonClicked(ClickButton* button)
          vector<string> spawnable = TheSynth->GetModuleFactory()->GetSpawnableModules(type);
          for (auto toSpawn : spawnable)
             TheSynth->SpawnModuleOnTheFly(toSpawn, 0, 0);
-      }*/
+      }
 
       string output;
       vector<IDrawableModule*> modules;
@@ -315,13 +317,23 @@ void HelpDisplay::ButtonClicked(ClickButton* button)
 
          for (auto* module : toDump)
          {
-            output += "\n\n\n" + module->GetTypeName() + "~[no tooltip]\n";
+            string moduleTooltip = "[no tooltip]";
+            ModuleTooltipInfo* moduleInfo = FindModuleInfo(module->GetTypeName());
+            if (moduleInfo)
+               moduleTooltip = moduleInfo->tooltip;
+            output += "\n\n\n" + module->GetTypeName() + "~"+moduleTooltip+"\n";
             vector<IUIControl*> controls = module->GetUIControls();
             for (auto* control : controls)
             {
                string name = control->Name();
                if (name != "enabled")
-                  output += "~" + name + "~[no tooltip]\n";
+               {
+                  string controlTooltip = "[no tooltip]";
+                  UIControlTooltipInfo* controlInfo = FindControlInfo(control);
+                  if (controlInfo)
+                     controlTooltip = controlInfo->tooltip;
+                  output += "~" + name + "~"+controlTooltip+"\n";
+               }
             }
          }
       }
