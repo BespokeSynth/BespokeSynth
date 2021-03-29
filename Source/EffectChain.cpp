@@ -24,9 +24,8 @@ EffectChain::EffectChain()
 , mEffectSpawnList(nullptr)
 , mInitialized(false)
 , mSwapTime(-1)
-, mDeleteLastEffectButton(nullptr)
 , mShowSpawnList(true)
-, mWantDeleteLastEffect(false)
+, mWantToDeleteEffectAtIndex(-1)
 {
 }
 
@@ -42,7 +41,6 @@ void EffectChain::CreateUIControls()
    
    mVolumeSlider = new FloatSlider(this,"volume", 10, 100, 100, 15, &mVolume, 0, 2);
    mEffectSpawnList = new DropdownList(this,"effect", 10, 100, &mSpawnIndex);
-   mDeleteLastEffectButton = new ClickButton(this,"x", 10, 100);
 }
 
 void EffectChain::Init()
@@ -91,13 +89,13 @@ void EffectChain::AddEffect(string type, bool onTheFly /*=false*/)
    
    float* dryWet = &(mDryWetLevels[mEffects.size()-1]);
    *dryWet = 1;
-   mDryWetSliders.push_back(new FloatSlider(this,("mix"+ofToString(mEffects.size()-1)).c_str(),0,0,60,13,dryWet,0,1,2));
    
-   if (mEffects.size() > 1)
-   {
-      mMoveButtons.push_back(new ClickButton(this,">",0,0));
-      mMoveButtons.push_back(new ClickButton(this,"<",0,0));
-   }
+   EffectControls controls;
+   controls.mMoveLeftButton = new ClickButton(this, "<", 0, 0);
+   controls.mMoveRightButton = new ClickButton(this, ">", 0, 0);
+   controls.mDeleteButton = new ClickButton(this, "x", 0, 0);
+   controls.mDryWetSlider = new FloatSlider(this, ("mix" + ofToString(mEffects.size() - 1)).c_str(), 0, 0, 60, 13, dryWet, 0, 1, 2);
+   mEffectControls.push_back(controls);
 }
 
 void EffectChain::Process(double time)
@@ -156,16 +154,15 @@ void EffectChain::Process(double time)
 
 void EffectChain::Poll()
 {
-   if (mWantDeleteLastEffect)
+   if (mWantToDeleteEffectAtIndex != -1)
    {
-      DeleteLastEffect();
-      mWantDeleteLastEffect = false;
+      DeleteEffect(mWantToDeleteEffectAtIndex);
+      mWantToDeleteEffectAtIndex = -1;
    }
 }
 
 void EffectChain::DrawModule()
 {
-
    if (Minimized() || IsVisible() == false)
       return;
    
@@ -203,27 +200,20 @@ void EffectChain::DrawModule()
       mEffects[i]->GetDimensions(w,h);
       w = MAX(w,MIN_EFFECT_WIDTH);
       
-      int leftButtonIdx = i*2-1;
-      if (leftButtonIdx >= 0 && leftButtonIdx < mMoveButtons.size())
-      {
-         mMoveButtons[leftButtonIdx]->SetPosition(thisX + w/2 - 46, thisY-30);
-         mMoveButtons[leftButtonIdx]->Draw();
-      }
-      int rightButtonIdx = i*2;
-      if (rightButtonIdx >= 0 && rightButtonIdx < mMoveButtons.size())
-      {
-         mMoveButtons[rightButtonIdx]->SetPosition(thisX + w/2 + 35, thisY-30);
-         mMoveButtons[rightButtonIdx]->Draw();
-      }
+      mEffectControls[i].mMoveLeftButton->SetShowing(i > 0);
+      mEffectControls[i].mMoveLeftButton->SetPosition(thisX + w/2 - 46, thisY-30);
+      mEffectControls[i].mMoveLeftButton->Draw();
+
+      mEffectControls[i].mMoveRightButton->SetShowing(i < (int)mEffects.size() - 1 && !(GetKeyModifiers() & kModifier_Shift));
+      mEffectControls[i].mMoveRightButton->SetPosition(thisX + w/2 + 35, thisY-30);
+      mEffectControls[i].mMoveRightButton->Draw();
       
-      if (i == mEffects.size()-1)
-      {
-         mDeleteLastEffectButton->SetPosition(thisX + w/2 + 35, thisY-30);
-         mDeleteLastEffectButton->Draw();
-      }
+      mEffectControls[i].mDeleteButton->SetShowing(i == (int)mEffects.size() - 1 || (GetKeyModifiers() & kModifier_Shift));
+      mEffectControls[i].mDeleteButton->SetPosition(thisX + w / 2 + 35, thisY - 30);
+      mEffectControls[i].mDeleteButton->Draw();
       
-      mDryWetSliders[i]->SetPosition(thisX + w/2 - 30, thisY-29);
-      mDryWetSliders[i]->Draw();
+      mEffectControls[i].mDryWetSlider->SetPosition(thisX + w/2 - 30, thisY-29);
+      mEffectControls[i].mDryWetSlider->Draw();
       
       xPos += w+20;
    }
@@ -255,9 +245,9 @@ void EffectChain::DrawModule()
 
    float w,h;
    GetDimensions(w,h);
-   mVolumeSlider->SetPosition(4, h-15);
+   mVolumeSlider->SetPosition(4, h-17);
    mVolumeSlider->Draw();
-   mEffectSpawnList->SetPosition(106, h-15);
+   mEffectSpawnList->SetPosition(106, h-17);
    mEffectSpawnList->Draw();
 }
 
@@ -300,7 +290,7 @@ void EffectChain::GetModuleDimensions(float& width, float& height)
       maxY = MAX(maxY,y+h);
    }
    width = maxX + 10;
-   height = maxY + 22;
+   height = maxY + 24;
 }
 
 void EffectChain::KeyPressed(int key, bool isRepeat)
@@ -316,62 +306,90 @@ void EffectChain::KeyReleased(int key)
       mEffects[i]->KeyReleased(key);
 }
 
-void EffectChain::DeleteLastEffect()
+void EffectChain::DeleteEffect(int index)
 {
    assert(!mEffects.empty());
    
-   if (mEffects.size() > 1)
    {
-      RemoveUIControl(mMoveButtons[mMoveButtons.size()-1]);
-      RemoveUIControl(mMoveButtons[mMoveButtons.size()-2]);
-      mMoveButtons[mMoveButtons.size()-1]->Delete();
-      mMoveButtons[mMoveButtons.size()-2]->Delete();
-      mMoveButtons.resize(mMoveButtons.size() - 2);
+      RemoveUIControl(mEffectControls[index].mMoveLeftButton);
+      RemoveUIControl(mEffectControls[index].mMoveRightButton);
+      RemoveUIControl(mEffectControls[index].mDeleteButton);
+      RemoveUIControl(mEffectControls[index].mDryWetSlider);
+      mEffectControls[index].mMoveLeftButton->Delete();
+      mEffectControls[index].mMoveRightButton->Delete();
+      mEffectControls[index].mDeleteButton->Delete();
+      mEffectControls[index].mDryWetSlider->Delete();
+      //remove the element from mEffectControls
+      for (auto iter = mEffectControls.begin(); iter != mEffectControls.end(); ++iter)
+      {
+         if (iter->mDeleteButton == mEffectControls[index].mDeleteButton)  //delete buttons match, we found the right one
+         {
+            mEffectControls.erase(iter);
+            break;
+         }
+      }
+
+      UpdateReshuffledDryWetSliders();
    }
-   RemoveUIControl(mDryWetSliders[mDryWetSliders.size()-1]);
-   mDryWetSliders[mDryWetSliders.size()-1]->Delete();
-   mDryWetSliders.resize(mDryWetSliders.size()-1);
    
+   {
+      mEffectMutex.lock();
+      IAudioEffect* toRemove = mEffects[index];
+      RemoveFromVector(toRemove, mEffects);
+      RemoveChild(toRemove);
+      //delete toRemove;   TODO(Ryan) can't do this in case stuff is referring to its UI controls
+      mEffectMutex.unlock();
+   }
+}
+
+void EffectChain::MoveEffect(int fromIndex, int direction)
+{
+   int newIndex = fromIndex + direction;
+   assert(newIndex >= 0 && newIndex < mEffects.size());
+
+   mSwapFromIdx = fromIndex;
+   mSwapToIdx = newIndex;
+
+   mEffects[mSwapFromIdx]->GetPosition(mSwapFromPos.x, mSwapFromPos.y, true);
+   mEffects[mSwapToIdx]->GetPosition(mSwapToPos.x, mSwapToPos.y, true);
+   mSwapTime = gTime + gSwapLength;
+
    mEffectMutex.lock();
-   IAudioEffect* toRemove = mEffects[mEffects.size()-1];
-   RemoveFromVector(toRemove, mEffects);
-   RemoveChild(toRemove);
-   //delete toRemove;   TODO(Ryan) can't do this in case stuff is referring to its UI controls
+   IAudioEffect* swap = mEffects[newIndex];
+   mEffects[newIndex] = mEffects[fromIndex];
+   mEffects[fromIndex] = swap;
    mEffectMutex.unlock();
+
+   float level = mDryWetLevels[newIndex];
+   mDryWetLevels[newIndex] = mDryWetLevels[fromIndex];
+   mDryWetLevels[fromIndex] = level;
+
+   FloatSlider* dryWetSlider = mEffectControls[newIndex].mDryWetSlider;
+   mEffectControls[newIndex].mDryWetSlider = mEffectControls[fromIndex].mDryWetSlider;
+   mEffectControls[fromIndex].mDryWetSlider = dryWetSlider;
+
+   UpdateReshuffledDryWetSliders();
+}
+
+void EffectChain::UpdateReshuffledDryWetSliders()
+{
+   for (size_t i = 0; i < mEffectControls.size(); ++i)
+   {
+      mEffectControls[i].mDryWetSlider->SetName(("mix" + ofToString(i)).c_str());
+      mEffectControls[i].mDryWetSlider->SetVar(&mDryWetLevels[i]);
+   }
 }
 
 void EffectChain::ButtonClicked(ClickButton* button)
 {
-   for (int i=0; i<mMoveButtons.size(); ++i)
+   for (size_t i=0; i<mEffectControls.size(); ++i)
    {
-      if (mMoveButtons[i] == button)
-      {
-         int effectIndex = (i+1)/2;
-         bool left = i%2==1;
-         int newIndex = left ? effectIndex-1 : effectIndex+1;
-         assert(newIndex>=0 && newIndex < mEffects.size());
-
-         mSwapFromIdx = effectIndex;
-         mSwapToIdx = newIndex;
-
-         mEffects[mSwapFromIdx]->GetPosition(mSwapFromPos.x,mSwapFromPos.y,true);
-         mEffects[mSwapToIdx]->GetPosition(mSwapToPos.x,mSwapToPos.y,true);
-         mSwapTime = gTime + gSwapLength;
-
-         mEffectMutex.lock();
-         IAudioEffect* swap = mEffects[newIndex];
-         mEffects[newIndex] = mEffects[effectIndex];
-         mEffects[effectIndex] = swap;
-         mEffectMutex.unlock();
-         
-         float level = mDryWetLevels[newIndex];
-         mDryWetLevels[newIndex] = mDryWetLevels[effectIndex];
-         mDryWetLevels[effectIndex] = level;
-      }
-   }
-   if (button == mDeleteLastEffectButton)
-   {
-      mWantDeleteLastEffect = true;
+      if (button == mEffectControls[i].mMoveLeftButton)
+         MoveEffect(i, -1);
+      if (button == mEffectControls[i].mMoveRightButton)
+         MoveEffect(i, 1);
+      if (button == mEffectControls[i].mDeleteButton)
+         DeleteEffect(i);
    }
 }
 

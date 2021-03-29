@@ -742,7 +742,7 @@ eq~multi-band equalizer, to adjust output levels at frequency ranges
 
 
 
-effectchain~container to hold a list of effects, applied in series
+effectchain~container to hold a list of effects, applied in series. the effects can be easily reordered with the < and > buttons, and deleted with the x button. hold shift to expose a x button for all effects.
 ~volume~output gain
 ~effect~select which effect to add
 ~mix*~wet/dry slider for this effect

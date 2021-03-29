@@ -63,12 +63,21 @@ private:
    
    int GetRowHeight(int row);
    int NumRows() const;
-   void DeleteLastEffect();
+   void DeleteEffect(int index);
+   void MoveEffect(int index, int direction);
+   void UpdateReshuffledDryWetSliders();
+
+   struct EffectControls
+   {
+      ClickButton* mMoveLeftButton;
+      ClickButton* mMoveRightButton;
+      ClickButton* mDeleteButton;
+      FloatSlider* mDryWetSlider;
+   };
    
    vector<IAudioEffect*> mEffects;
    ChannelBuffer mDryBuffer;
-   vector<ClickButton*> mMoveButtons;
-   vector<FloatSlider*> mDryWetSliders;
+   vector<EffectControls> mEffectControls;
    float mDryWetLevels[MAX_EFFECTS_IN_CHAIN];  //implicit max of 100 effects
    
    double mSwapTime;
@@ -81,12 +90,11 @@ private:
    int mNumFXWide;
    bool mInitialized;
    bool mShowSpawnList;
-   bool mWantDeleteLastEffect;
+   int mWantToDeleteEffectAtIndex;
    
    std::vector<string> mEffectTypesToSpawn;
    int mSpawnIndex;
    DropdownList* mEffectSpawnList;
-   ClickButton* mDeleteLastEffectButton;
    
    ofMutex mEffectMutex;
 };
