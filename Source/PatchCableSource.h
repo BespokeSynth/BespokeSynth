@@ -48,7 +48,7 @@ public:
    bool CurrentlyOn();
    double GetLastOnEventTime() { return mLastOnEventTime; }
    const NoteHistoryEvent& GetHistoryEvent(int ago) const;
-   static const int kHistorySize = 20;
+   static const int kHistorySize = 100;
 private:
    NoteHistoryEvent mHistory[kHistorySize];
    int mHistoryPos;

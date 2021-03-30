@@ -179,21 +179,20 @@ void PatchCable::Render()
          {
             const NoteHistoryEvent& event = mOwner->GetHistory().GetHistoryEvent(i);
             float elapsed = float(gTime - event.mTime) / NOTE_HISTORY_LENGTH;
-            ofSetLineWidth(lineWidth * (4 + ofClamp(1 - elapsed * .7f, 0, 1) * 5 + cos((gTime - event.mTime) * PI * 8 / TheTransport->MsPerBar()) * .3f));
-            if (elapsed > 1)
-               elapsed = 1;
+            float clampedElapsed = MIN(elapsed, 1);
             if (event.mOn)
             {
+               ofSetLineWidth(lineWidth * (4 + ofClamp(1 - elapsed * .7f, 0, 1) * 5 + cos((gTime - event.mTime) * PI * 8 / TheTransport->MsPerBar()) * .3f));
                ofBeginShape();
                ofVec2f pos;
-               for (int j=lastElapsed*wireLength; j<elapsed*wireLength; ++j)
+               for (int j=lastElapsed*wireLength; j< clampedElapsed*wireLength; ++j)
                {
                   pos = MathUtils::Bezier(ofClamp(j/wireLength, 0, 1), cable.start, bezierControl1, bezierControl2, cable.plug);
                   ofVertex(pos.x,pos.y);
                }
                ofEndShape();
                
-               /*if (elapsed < 1)
+               /*if (clampedElapsed < 1)
                {
                   ofPushStyle();
                   ofFill();
@@ -202,9 +201,9 @@ void PatchCable::Render()
                   ofPopStyle();
                }*/
             }
-            lastElapsed = elapsed;
+            lastElapsed = clampedElapsed;
             
-            if (elapsed >= 1)
+            if (clampedElapsed >= 1)
                break;
          }
          
