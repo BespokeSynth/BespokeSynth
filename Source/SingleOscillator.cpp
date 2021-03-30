@@ -237,15 +237,17 @@ void SingleOscillator::DrawModule()
    mFilterADSRDisplay->Draw();
    mFilterCutoffMaxSlider->Draw();
    mFilterCutoffMinSlider->Draw();
+   mFilterQSlider->Draw();
    if (mVoiceParams.mFilterCutoffMax == SINGLEOSCILLATOR_NO_CUTOFF)
    {
       ofPushStyle();
-      ofSetColor(0, 0, 0, 50);
+      ofSetColor(0, 0, 0, 100);
       ofFill();
+      ofRect(mFilterADSRDisplay->GetRect(true).grow(1));
       ofRect(mFilterCutoffMinSlider->GetRect(true));
+      ofRect(mFilterQSlider->GetRect(true));
       ofPopStyle();
    }
-   mFilterQSlider->Draw();
    mADSRDisplay->Draw();
    mMultSelector->Draw();
    mSoftenSlider->Draw();

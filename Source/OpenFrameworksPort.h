@@ -123,6 +123,14 @@ struct ofRectangle
    void set(float _x, float _y, float _w, float _h) { x = _x; y = _y; width = _w; height = _h; }
    bool intersects(const ofRectangle& other) const;
    bool contains(float x, float y) const;
+   ofRectangle& grow(float amount)
+   {
+      x -= amount;
+      y -= amount;
+      width += amount * 2;
+      height += amount * 2;
+      return *this;
+   }
    float getMinX() const;
    float getMaxX() const;
    float getMinY() const;
