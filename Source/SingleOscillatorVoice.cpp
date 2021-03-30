@@ -62,6 +62,7 @@ bool SingleOscillatorVoice::Process(double time, ChannelBuffer* out)
       {
          mOscData[u].mOsc.SetPulseWidth(mVoiceParams->mPulseWidth);
          mOscData[u].mOsc.SetShuffle(mVoiceParams->mShuffle);
+         mOscData[u].mOsc.SetSoften(mVoiceParams->mSoften);
          
          float detune = exp2(mVoiceParams->mDetune * mOscData[u].mDetuneFactor * (1 - GetPressure(pos)));
          float phaseInc = GetPhaseInc(freq * detune);
@@ -123,7 +124,7 @@ bool SingleOscillatorVoice::Process(double time, ChannelBuffer* out)
       {
          //PROFILER(SingleOscillatorVoice_filter);
          float minCutoff = 10;
-         float f = mFilterAdsr.Value(time) * (mVoiceParams->mFilterCutoff-minCutoff) * (1 - GetModWheel(pos) * .9f) + minCutoff;
+         float f = mFilterAdsr.Value(time) * (mVoiceParams->mFilterCutoffMax - mVoiceParams->mFilterCutoffMin) * (1 - GetModWheel(pos) * .9f) + mVoiceParams->mFilterCutoffMin;
          float q = mVoiceParams->mFilterQ;
          if (f != mFilterLeft.mF || q != mFilterLeft.mQ)
             mFilterLeft.SetFilterParams(f, q);
@@ -165,7 +166,7 @@ void SingleOscillatorVoice::Start(double time, float target)
    float adsrScale = GetADSRScale(target, mVoiceParams->mVelToEnvelope);
    mAdsr.Start(time, volume, mVoiceParams->mAdsr, adsrScale);
    
-   if (mVoiceParams->mFilterCutoff != SINGLEOSCILLATOR_NO_CUTOFF)
+   if (mVoiceParams->mFilterCutoffMax != SINGLEOSCILLATOR_NO_CUTOFF)
    {
       mUseFilter = true;
       mFilterLeft.SetFilterType(kFilterType_Lowpass);

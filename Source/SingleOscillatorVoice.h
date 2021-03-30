@@ -35,8 +35,10 @@ public:
    float mPhaseOffset;
    int mUnison;
    float mUnisonWidth;
+   float mSoften;
    
-   float mFilterCutoff;
+   float mFilterCutoffMax;
+   float mFilterCutoffMin;
    float mFilterQ;
    ::ADSR mFilterAdsr;
 
