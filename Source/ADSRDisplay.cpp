@@ -252,10 +252,18 @@ void ADSRDisplay::OnClicked(int x, int y, bool right)
    
    if (right)
    {
-      mAdsr->Set(ofMap(pow(ofRandom(1),2),0,1,1,100),
-                 ofMap(pow(ofRandom(1),2),0,1,1,100),
-                 ofRandom(0,1),
-                 ofMap(pow(ofRandom(1),2),0,1,1,100));
+      //randomize
+      for (int i = 0; i < mAdsr->GetNumStages(); ++i)
+      {
+         if (i == 0)
+            mAdsr->GetStageData(i).target = 1;
+         else if (i == mAdsr->GetNumStages() - 1)
+            mAdsr->GetStageData(i).target = 0;
+         else
+            mAdsr->GetStageData(i).target = ofRandom(0, 1);
+
+         mAdsr->GetStageData(i).time = ofMap(pow(ofRandom(1), 2), 0, 1, 1, 200);
+      }
       return;
    }
    
