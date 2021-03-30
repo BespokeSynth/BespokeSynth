@@ -145,11 +145,7 @@ string QuickSpawnMenu::GetModuleTypeNameAt(int x, int y)
 {
    int index = y / itemSpacing;
    if (index >= 0 && index < mElements.size())
-   {
-      string name = mElements[index];
-      ofStringReplace(name, " " + string(ModuleFactory::kEffectChainSuffix), "");   //strip this suffix if it's there
-      return name;
-   }
+      return mElements[index];
 
    return "";
 }

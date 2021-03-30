@@ -444,7 +444,9 @@ void ModularSynth::Draw(void* vg)
       {
          if (gHoveredModule == mQuickSpawn)
          {
-            tooltip = helpDisplay->GetModuleTooltipFromName(mQuickSpawn->GetHoveredModuleTypeName());
+            string name = mQuickSpawn->GetHoveredModuleTypeName();
+            ofStringReplace(name, " " + string(ModuleFactory::kEffectChainSuffix), "");   //strip this suffix if it's there
+            tooltip = helpDisplay->GetModuleTooltipFromName(name);
          }
          else if (gHoveredModule == GetTopModalFocusItem() && dynamic_cast<DropdownListModal*>(gHoveredModule))
          {
