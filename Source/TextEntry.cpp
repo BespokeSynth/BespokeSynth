@@ -233,17 +233,17 @@ void TextEntry::OnKeyPressed(int key, bool isRepeat)
    }
    if (key == OF_KEY_TAB)
    {
-      AcceptEntry(false);
+      TextEntry* pendingNewEntry = nullptr;
       if (GetKeyModifiers() == kModifier_Shift)
-      {
-         if (mPreviousTextEntry)
-            mPreviousTextEntry->MakeActiveTextEntry(true);
-      }
+         pendingNewEntry = mPreviousTextEntry;
       else
-      {
-         if (mNextTextEntry)
-            mNextTextEntry->MakeActiveTextEntry(true);
-      }
+         pendingNewEntry = mNextTextEntry;
+
+      AcceptEntry(false);
+      IKeyboardFocusListener::ClearActiveKeyboardFocus(!K(notifyListeners));
+      
+      if (pendingNewEntry)
+         pendingNewEntry->MakeActiveTextEntry(true);
    }
    else if (key == OF_KEY_BACKSPACE)
    {
