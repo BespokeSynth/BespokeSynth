@@ -105,22 +105,27 @@ void Rewriter::DrawModule()
 
    if (mConnectedLooper)
    {
-      float originalCornerRoundness = gCornerRoundness;
-      gCornerRoundness = 0;
-      
       int loopSamples = abs(int(TheTransport->MsPerBar() / 1000 * gSampleRate)) * mConnectedLooper->NumBars();
       ofRectangle rect(3, mHeight - kBufferHeight - 3, mWidth - 6, kBufferHeight);
       float playhead = fmod(TheTransport->GetMeasureTime(gTime), mConnectedLooper->NumBars()) / mConnectedLooper->NumBars();
-      ofColor bgColor = ofColor::lerp(GetColor(kModuleType_Audio), ofColor::black, .5f);
-      ofFill();
-      ofSetColor(bgColor);
-      ofRect(rect);
-      mRecordBuffer.Draw(rect.x, rect.y, rect.width, rect.height, loopSamples, 1, loopSamples * playhead);
-      ofSetColor(bgColor);
-      ofRect(rect.x, rect.y, rect.width * playhead, rect.height);
-      mRecordBuffer.Draw(rect.x, rect.y, rect.width * playhead, rect.height, loopSamples * playhead, 1);
+      //mRecordBuffer.Draw(rect.x, rect.y, rect.width, rect.height, loopSamples, L(channel,0), loopSamples * playhead);
+      //mRecordBuffer.Draw(rect.x, rect.y, rect.width * playhead, rect.height, loopSamples * playhead, L(channel, 0));
 
-      gCornerRoundness = originalCornerRoundness;
+      ofPushMatrix();
+      ofTranslate(rect.x, rect.y);
+      int nowOffset = mRecordBuffer.GetRawBufferOffset(0);
+      int startSample = nowOffset - loopSamples * playhead;
+      if (startSample < 0)
+         startSample += mRecordBuffer.Size();
+      int endSample = startSample - 1;
+      if (endSample < 0)
+         endSample += loopSamples;
+      int loopBeginSample = startSample - loopSamples * (1-playhead);
+      if (loopBeginSample < 0)
+         loopBeginSample += mRecordBuffer.Size();
+
+      DrawAudioBuffer(rect.width, rect.height, mRecordBuffer.GetRawBuffer()->GetChannel(0), startSample, endSample, -1, 1, ofColor::black, nowOffset, loopBeginSample, mRecordBuffer.Size());
+      ofPopMatrix();
 
       ofSetColor(0, 255, 0);
       ofLine(rect.x + rect.width*playhead, rect.y, rect.x + rect.width*playhead, rect.y + rect.height);

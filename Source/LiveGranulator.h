@@ -75,6 +75,7 @@ private:
    
    float mWidth;
    float mHeight;
+   float mBufferX;
 };
 
 #endif /* defined(__modularSynth__LiveGranulator__) */

@@ -302,7 +302,7 @@ void MultitapDelay::DelayMPETap::Draw(float w, float h)
          ofPopStyle();
       }
       
-      mGranulator.Draw(0, 0, w, h, mOwner->mDisplayStartSamples, mOwner->mDisplayEndSamples - mOwner->mDisplayStartSamples, false);
+      mGranulator.Draw(0, 0, w, h, mOwner->mDisplayStartSamples, mOwner->mDisplayEndSamples - mOwner->mDisplayStartSamples, mOwner->mSample->LengthInSamples());
    }*/
 }
 

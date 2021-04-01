@@ -94,7 +94,7 @@ void SetGlobalSampleRateAndBufferSize(int rate, int size)
    gNyquistLimit = gSampleRate / 2.0f;
 }
 
-void DrawAudioBuffer(float width, float height, ChannelBuffer* buffer, float start, float end, float pos, float vol /*=1*/, ofColor color /*=ofColor::black*/)
+void DrawAudioBuffer(float width, float height, ChannelBuffer* buffer, float start, float end, float pos, float vol /*=1*/, ofColor color /*=ofColor::black*/, int wraparoundFrom /*= -1*/, int wraparoundTo /*= 0*/)
 {
    ofPushMatrix();
    if (buffer != nullptr)
@@ -102,14 +102,14 @@ void DrawAudioBuffer(float width, float height, ChannelBuffer* buffer, float sta
       int numChannels = buffer->NumActiveChannels();
       for (int i=0; i<numChannels; ++i)
       {
-         DrawAudioBuffer(width, height/numChannels, buffer->GetChannel(i), start, MIN(end, buffer->BufferSize()), pos, vol, color);
+         DrawAudioBuffer(width, height/numChannels, buffer->GetChannel(i), start, MIN(end, buffer->BufferSize()), pos, vol, color, wraparoundFrom, wraparoundTo, buffer->BufferSize());
          ofTranslate(0, height/numChannels);
       }
    }
    ofPopMatrix();
 }
 
-void DrawAudioBuffer(float width, float height, const float* buffer, float start, float end, float pos, float vol /*=1*/, ofColor color /*=ofColor::black*/)
+void DrawAudioBuffer(float width, float height, const float* buffer, float start, float end, float pos, float vol /*=1*/, ofColor color /*=ofColor::black*/, int wraparoundFrom /*= -1*/, int wraparoundTo /*= 0*/, int bufferSize /*=-1*/)
 {
    vol = MAX(.1f,vol); //make sure we at least draw something if there is waveform data
    
@@ -122,21 +122,41 @@ void DrawAudioBuffer(float width, float height, const float* buffer, float start
       ofRect(0, 0, width, height);
    else
       ofRect(width, 0, -width, height);
+
+   float length = end - 1 - start;
+   if (length < 0)
+      length = length + wraparoundFrom - wraparoundTo;
+   if (length < 0)
+      length += bufferSize;
+
+   const float kStepSize = 3;
+   float step = kStepSize;
+   if (width < 0)
+      step *= -1;
+   float samplesPerStep = length / abs(width) * kStepSize;
+   start = start - (int(start) % int(samplesPerStep));
    
-   if (buffer && end - start > 0)
+   if (buffer && length > 0)
    {
       float step = width > 0 ? 3 : -3;
-      float samplesPerStep = (end-start) / width * step;
+      float samplesPerStep = length / width * step;
       
       for (float i = 0; abs(i) < abs(width); i+=step)
       {
          float mag = 0;
-         int position =  ofMap(abs(i), 0, abs(width), start, end-1, true);
+         int position = i / width * length + start;
          //rms
          int j;
          int inc = 1+samplesPerStep / 100;
-         for (j=0; j<samplesPerStep && position+j < end-1; j+=inc)
-            mag = MAX(mag,fabsf(buffer[position+j]));
+         for (j = 0; j < samplesPerStep; j += inc)
+         {
+            int sampleIdx = position + j;
+            if (wraparoundFrom != -1 && sampleIdx > wraparoundFrom)
+               sampleIdx = sampleIdx - wraparoundFrom + wraparoundTo;
+            if (bufferSize > 0)
+               sampleIdx %= bufferSize;
+            mag = MAX(mag, fabsf(buffer[sampleIdx]));
+         }
          mag = sqrt(mag);
          mag = sqrt(mag);
          mag *= height/2 * vol;

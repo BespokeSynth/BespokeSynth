@@ -42,13 +42,18 @@ LiveGranulator::LiveGranulator()
       mDCEstimate[i] = 0;
 }
 
+namespace
+{
+   const float kBufferWidth = 80;
+}
+
 void LiveGranulator::CreateUIControls()
 {
    IDrawableModule::CreateUIControls();
    UIBLOCK(80);
    FLOATSLIDER(mGranOverlap,"overlap",&mGranulator.mGrainOverlap,.5f,MAX_GRAINS);
    FLOATSLIDER(mGranSpeed,"speed",&mGranulator.mSpeed,-3,3);
-   FLOATSLIDER(mGranLengthMs,"len ms",&mGranulator.mGrainLengthMs,1,200);
+   FLOATSLIDER(mGranLengthMs,"len ms",&mGranulator.mGrainLengthMs,1,1000);
    CHECKBOX(mAddCheckbox,"add",&mAdd);
    DROPDOWN(mAutoCaptureDropdown,"autocapture",(int*)(&mAutoCaptureInterval), 45);
    UIBLOCK_NEWCOLUMN();
@@ -59,6 +64,9 @@ void LiveGranulator::CreateUIControls()
    CHECKBOX(mGranOctaveCheckbox,"g oct",&mGranulator.mOctaves); UIBLOCK_NEWLINE();
    FLOATSLIDER(mPosSlider,"pos",&mPos,-gSampleRate,gSampleRate);
    ENDUIBLOCK(mWidth, mHeight);
+
+   mBufferX = mWidth + 3;
+   mWidth += kBufferWidth + 3 * 2;
    
    mAutoCaptureDropdown->AddLabel("none", kInterval_None);
    mAutoCaptureDropdown->AddLabel("4n", kInterval_4n);
@@ -121,8 +129,6 @@ void LiveGranulator::ProcessAudio(double time, ChannelBuffer* buffer)
    }
 }
 
-
-
 void LiveGranulator::DrawModule()
 {
    if (!mEnabled)
@@ -141,8 +147,11 @@ void LiveGranulator::DrawModule()
    mGranSpacingRandomize->Draw();
    if (mEnabled)
    {
-      mGranulator.Draw(0,0,170,32,0,mBufferLength);
-      //mBuffer.Draw(0,0,170,32);
+      int drawLength = MIN(mBufferLength, gSampleRate*2);
+      if (mFreeze)
+         drawLength = MIN(mBufferLength, drawLength + mFreezeExtraSamples);
+      mGranulator.Draw(mBufferX, 3+20, kBufferWidth, 70-20*2, mBuffer.GetRawBufferOffset(0)-drawLength, drawLength, mBufferLength);
+      mBuffer.Draw(mBufferX, 3, kBufferWidth, 70, drawLength);
    }
 }
 
@@ -199,7 +208,7 @@ void LiveGranulator::FloatSliderUpdated(FloatSlider* slider, float oldVal)
    if (slider == mPosSlider)
    {
       if (!mFreeze)
-         mPos = 0;
+         mPos = MIN(mPos, 0);
    }
 }
 

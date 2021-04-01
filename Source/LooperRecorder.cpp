@@ -358,8 +358,6 @@ void LooperRecorder::DrawModule()
       mCommit8BarsButton->Draw();
 
    ofPushStyle();
-   float originalCornerRoundness = gCornerRoundness;
-   gCornerRoundness = 0;
    int sampsPerBar = abs(int(TheTransport->MsPerBar() / 1000 * gSampleRate));
    for (int i = 0; i < 4; ++i)   //segments
    {
@@ -388,7 +386,6 @@ void LooperRecorder::DrawModule()
       float x = 3 + i * kBufferSegmentWidth;
       ofLine(x, 3, x, 3 + kBufferHeight);
    }
-   gCornerRoundness = originalCornerRoundness;   
    ofPopStyle();
 
    /*ofPushStyle();

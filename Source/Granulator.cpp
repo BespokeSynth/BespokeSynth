@@ -91,10 +91,10 @@ void Granulator::SpawnGrain(double time, double offset, bool stereo)
    mNextGrainIdx = (mNextGrainIdx+1) % MAX_GRAINS;
 }
 
-void Granulator::Draw(float x, float y, float w, float h, int bufferStart, int bufferLength, bool wrapAround /*= true*/)
+void Granulator::Draw(float x, float y, float w, float h, int bufferStart, int viewLength, int bufferLength)
 {
    for (int i=0; i<MAX_GRAINS; ++i)
-      mGrains[i].DrawGrain(i, x, y, w, h, bufferStart, bufferLength, wrapAround);
+      mGrains[i].DrawGrain(i, x, y, w, h, bufferStart, viewLength, bufferLength);
 }
 
 void Granulator::ClearGrains()
@@ -136,17 +136,15 @@ double Grain::GetWindow(double time)
    return 0;
 }
 
-void Grain::DrawGrain(int idx, float x, float y, float w, float h, int bufferStart, int bufferLength, bool wrapAround)
+void Grain::DrawGrain(int idx, float x, float y, float w, float h, int bufferStart, int viewLength, int bufferLength)
 {
-   float a = (mPos - bufferStart) / bufferLength;
-   if (wrapAround)
-      FloatWrap(a,1);
+   float a = fmod((mPos - bufferStart), bufferLength) / viewLength;
    if (a < 0 || a > 1)
       return;
    ofPushStyle();
    ofFill();
    float alpha = GetWindow(gTime);
    ofSetColor(255,0,0,alpha*alpha*255*.5);
-   ofRect(x+a*w, y+mDrawPos*h, MAX(4,w/100), MAX(4,h/MAX_GRAINS));
+   ofCircle(x+a*w, y+mDrawPos*h, MAX(3,h/MAX_GRAINS/2));
    ofPopStyle();
 }

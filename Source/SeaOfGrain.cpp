@@ -376,7 +376,7 @@ void SeaOfGrain::GrainMPEVoice::Draw(float w, float h)
          ofPopStyle();
       }
       
-      mGranulator.Draw(0, 0, w, h, mOwner->mDisplayStartSamples, mOwner->mDisplayEndSamples - mOwner->mDisplayStartSamples, false);
+      mGranulator.Draw(0, 0, w, h, mOwner->mDisplayStartSamples, mOwner->mDisplayEndSamples - mOwner->mDisplayStartSamples, mOwner->mSample->LengthInSamples());
    }
 }
 
@@ -421,7 +421,7 @@ void SeaOfGrain::GrainManualVoice::Draw(float w, float h)
       ofLine(x, y, x, h);
       ofRect(x-5, y-5, 10, 10);
       ofPopStyle();
-      mGranulator.Draw(0, 0, w, h, mOwner->mDisplayStartSamples, mOwner->mDisplayEndSamples - mOwner->mDisplayStartSamples, false);
+      mGranulator.Draw(0, 0, w, h, mOwner->mDisplayStartSamples, mOwner->mDisplayEndSamples - mOwner->mDisplayStartSamples, mOwner->mSample->LengthInSamples());
    }
 }
 
