@@ -212,6 +212,7 @@
 #include "UnstablePressure.h"
 #include "ChordHolder.h"
 #include "LooperGranulator.h"
+#include "AudioToPulse.h"
 
 #define REGISTER(class,name,type) Register(#name, &(class::Create), &(class::CanCreate), type, false, false);
 #define REGISTER_HIDDEN(class,name,type) Register(#name, &(class::Create), &(class::CanCreate), type, true, false);
@@ -392,6 +393,7 @@ ModuleFactory::ModuleFactory()
    REGISTER(UnstablePressure, unstablepressure, kModuleType_Note);
    REGISTER(ChordHolder, chordholder, kModuleType_Note);
    REGISTER(LooperGranulator, loopergranulator, kModuleType_Other);
+   REGISTER(AudioToPulse, audiotopulse, kModuleType_Pulse);
 
    //REGISTER_EXPERIMENTAL(MidiPlayer, midiplayer, kModuleType_Instrument);
    REGISTER_EXPERIMENTAL(Razor, razor, kModuleType_Synth);
