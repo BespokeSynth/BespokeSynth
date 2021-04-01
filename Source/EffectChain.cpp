@@ -168,54 +168,44 @@ void EffectChain::DrawModule()
    
    mEffectSpawnList->SetShowing(mShowSpawnList);
 
-   float xPos = 10;
-   float yPos = 32;
    for (int i=0; i<mEffects.size(); ++i)
    {
-      if (i > 0 && i%mNumFXWide == 0) //newline
-      {
-         xPos = 10;
-         yPos += GetRowHeight(i/mNumFXWide - 1);
-      }
+      ofVec2f pos = GetEffectPos(i);
 
-      float w,h;
-      float thisX = xPos;
-      float thisY = yPos;
       if (gTime < mSwapTime)  //in swap animation
       {
          double progress = 1 - (mSwapTime - gTime)/gSwapLength;
          if (i == mSwapFromIdx)
          {
-            thisX = int(mSwapToPos.x * (1-progress) + mSwapFromPos.x * progress);
-            thisY = int(mSwapToPos.y * (1-progress) + mSwapFromPos.y * progress);
+            pos.set(mSwapToPos.x * (1-progress) + pos.x * progress, 
+                    mSwapToPos.y * (1-progress) + pos.y * progress);
          }
          if (i == mSwapToIdx)
          {
-            thisX = int(mSwapFromPos.x * (1-progress) + mSwapToPos.x * progress);
-            thisY = int(mSwapFromPos.y * (1-progress) + mSwapToPos.y * progress);
+            pos.set(mSwapFromPos.x * (1-progress) + pos.x * progress, 
+                    mSwapFromPos.y * (1-progress) + pos.y * progress);
          }
       }
       
-      mEffects[i]->SetPosition(thisX,thisY);
+      mEffects[i]->SetPosition(pos.x, pos.y);
+      float w, h;
       mEffects[i]->GetDimensions(w,h);
       w = MAX(w,MIN_EFFECT_WIDTH);
       
       mEffectControls[i].mMoveLeftButton->SetShowing(i > 0);
-      mEffectControls[i].mMoveLeftButton->SetPosition(thisX + w/2 - 46, thisY-30);
+      mEffectControls[i].mMoveLeftButton->SetPosition(pos.x + w / 2 - 46, pos.y - 30);
       mEffectControls[i].mMoveLeftButton->Draw();
 
       mEffectControls[i].mMoveRightButton->SetShowing(i < (int)mEffects.size() - 1 && !(GetKeyModifiers() & kModifier_Shift));
-      mEffectControls[i].mMoveRightButton->SetPosition(thisX + w/2 + 35, thisY-30);
+      mEffectControls[i].mMoveRightButton->SetPosition(pos.x + w / 2 + 35, pos.y - 30);
       mEffectControls[i].mMoveRightButton->Draw();
-      
+
       mEffectControls[i].mDeleteButton->SetShowing(i == (int)mEffects.size() - 1 || (GetKeyModifiers() & kModifier_Shift));
-      mEffectControls[i].mDeleteButton->SetPosition(thisX + w / 2 + 35, thisY - 30);
+      mEffectControls[i].mDeleteButton->SetPosition(pos.x + w / 2 + 35, pos.y - 30);
       mEffectControls[i].mDeleteButton->Draw();
-      
-      mEffectControls[i].mDryWetSlider->SetPosition(thisX + w/2 - 30, thisY-29);
+
+      mEffectControls[i].mDryWetSlider->SetPosition(pos.x + w / 2 - 30, pos.y - 29);
       mEffectControls[i].mDryWetSlider->Draw();
-      
-      xPos += w+20;
    }
    
    for (int i=0; i<mEffects.size(); ++i)
@@ -256,7 +246,7 @@ int EffectChain::NumRows() const
    return ((int)mEffects.size() + mNumFXWide - 1) / mNumFXWide;  //round up
 }
 
-int EffectChain::GetRowHeight(int row)
+int EffectChain::GetRowHeight(int row) const
 {
    float max = 0;
    for (int i=0; i<mEffects.size(); ++i)
@@ -272,6 +262,31 @@ int EffectChain::GetRowHeight(int row)
    }
    
    return max;
+}
+
+ofVec2f EffectChain::GetEffectPos(int index) const
+{
+   float xPos = 10;
+   float yPos = 32;
+   for (int i = 0; i < mEffects.size(); ++i)
+   {
+      if (i > 0 && i%mNumFXWide == 0) //newline
+      {
+         xPos = 10;
+         yPos += GetRowHeight(i / mNumFXWide - 1);
+      }
+
+      if (i == index)
+         return ofVec2f(xPos, yPos);
+
+      float w, h;
+      mEffects[i]->GetDimensions(w, h);
+      w = MAX(w, MIN_EFFECT_WIDTH);
+
+      xPos += w + 20;
+   }
+
+   return ofVec2f(xPos, yPos);
 }
 
 void EffectChain::GetModuleDimensions(float& width, float& height)

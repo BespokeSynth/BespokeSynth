@@ -61,11 +61,12 @@ private:
    void GetModuleDimensions(float& width, float& height) override;
    bool Enabled() const override { return mEnabled; }
    
-   int GetRowHeight(int row);
+   int GetRowHeight(int row) const;
    int NumRows() const;
    void DeleteEffect(int index);
    void MoveEffect(int index, int direction);
    void UpdateReshuffledDryWetSliders();
+   ofVec2f GetEffectPos(int index) const;
 
    struct EffectControls
    {
