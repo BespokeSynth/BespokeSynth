@@ -96,11 +96,11 @@ public:
    float* GetInputBuffer(int channel);
    float* GetOutputBuffer(int channel);
    
-   IDrawableModule* FindModule(string name, bool fail = true);
-   IAudioReceiver* FindAudioReceiver(string name, bool fail = true);
-   INoteReceiver* FindNoteReceiver(string name, bool fail = true);
+   IDrawableModule* FindModule(string name, bool fail = false);
+   IAudioReceiver* FindAudioReceiver(string name, bool fail = false);
+   INoteReceiver* FindNoteReceiver(string name, bool fail = false);
    IUIControl* FindUIControl(string path);
-   MidiController* FindMidiController(string name, bool fail = true);
+   MidiController* FindMidiController(string name, bool fail = false);
    void MoveToFront(IDrawableModule* module);
    IDrawableModule* GetModuleAt(int x, int y);
    bool InMidiMapMode();
