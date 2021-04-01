@@ -250,7 +250,7 @@ void DrumSynth::DrumSynthHit::CreateUIControls()
 
    UIBLOCK_NEWCOLUMN();
    UICONTROL_CUSTOM(mNoiseAdsrDisplay, new ADSRDisplay(UICONTROL_BASICS(("adsrnoise" + ofToString(mIndex)).c_str()), kColumnWidth, 36, mData.mNoise.GetADSR()));
-   FLOATSLIDER(mVolNoiseSlider, ("noise" + ofToString(mIndex)).c_str(), &mData.mVolNoise, 0, 1, 2);
+   FLOATSLIDER_DIGITS(mVolNoiseSlider, ("noise" + ofToString(mIndex)).c_str(), &mData.mVolNoise, 0, 1, 2);
    ENDUIBLOCK(width, height);
 
    UIBLOCK(mX + 5, height+3);
