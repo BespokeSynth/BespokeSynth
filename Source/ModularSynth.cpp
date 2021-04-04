@@ -1307,6 +1307,13 @@ void ModularSynth::AudioOut(float** output, int bufferSize, int nChannels)
 {
    PROFILER(audioOut_total);
    
+   bool sFirst = true;
+   if (sFirst)
+   {
+      FloatVectorOperations::disableDenormalisedNumberSupport();
+      sFirst = false;
+   }
+   
    if (mAudioPaused)
    {
       for (int ch=0; ch<nChannels; ++ch)
