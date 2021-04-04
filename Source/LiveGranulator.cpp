@@ -25,26 +25,24 @@ LiveGranulator::LiveGranulator()
 , mFreezeExtraSamples(0)
 , mPos(0)
 , mPosSlider(nullptr)
-, mAdd(false)
-, mAddCheckbox(nullptr)
+, mDry(0)
+, mDrySlider(nullptr)
 , mAutoCaptureInterval(kInterval_None)
 , mAutoCaptureDropdown(nullptr)
 , mGranSpacingRandomize(nullptr)
 {
    mGranulator.SetLiveMode(true);
    mGranulator.mSpeed = 1;
-   mGranulator.mGrainOverlap = 3;
-   mGranulator.mGrainLengthMs = 100;
+   mGranulator.mGrainOverlap = 12;
+   mGranulator.mGrainLengthMs = 300;
    
    TheTransport->AddListener(this, kInterval_None, OffsetInfo(0, true), false);
-   
-   for (int i=0; i<ChannelBuffer::kMaxNumChannels; ++i)
-      mDCEstimate[i] = 0;
 }
 
 namespace
 {
    const float kBufferWidth = 80;
+   const float kBufferHeight = 65;
 }
 
 void LiveGranulator::CreateUIControls()
@@ -54,7 +52,7 @@ void LiveGranulator::CreateUIControls()
    FLOATSLIDER(mGranOverlap,"overlap",&mGranulator.mGrainOverlap,.5f,MAX_GRAINS);
    FLOATSLIDER(mGranSpeed,"speed",&mGranulator.mSpeed,-3,3);
    FLOATSLIDER(mGranLengthMs,"len ms",&mGranulator.mGrainLengthMs,1,1000);
-   CHECKBOX(mAddCheckbox,"add",&mAdd);
+   FLOATSLIDER(mDrySlider,"dry",&mDry,0,1);
    DROPDOWN(mAutoCaptureDropdown,"autocapture",(int*)(&mAutoCaptureInterval), 45);
    UIBLOCK_NEWCOLUMN();
    FLOATSLIDER(mGranPosRandomize,"pos r",&mGranulator.mPosRandomizeMs,0,200);
@@ -62,11 +60,15 @@ void LiveGranulator::CreateUIControls()
    FLOATSLIDER(mGranSpacingRandomize,"spa r",&mGranulator.mSpacingRandomize,0,1);
    CHECKBOX(mFreezeCheckbox,"frz",&mFreeze); UIBLOCK_SHIFTX(35);
    CHECKBOX(mGranOctaveCheckbox,"g oct",&mGranulator.mOctaves); UIBLOCK_NEWLINE();
-   FLOATSLIDER(mPosSlider,"pos",&mPos,-gSampleRate,gSampleRate);
+   FLOATSLIDER(mWidthSlider, "width", &mGranulator.mWidth, 0, 1);
    ENDUIBLOCK(mWidth, mHeight);
 
    mBufferX = mWidth + 3;
    mWidth += kBufferWidth + 3 * 2;
+   
+   UIBLOCK(mBufferX, mHeight - 17, kBufferWidth);
+   FLOATSLIDER(mPosSlider,"pos",&mPos,-gSampleRate,gSampleRate);
+   ENDUIBLOCK0();
    
    mAutoCaptureDropdown->AddLabel("none", kInterval_None);
    mAutoCaptureDropdown->AddLabel("4n", kInterval_4n);
@@ -113,16 +115,7 @@ void LiveGranulator::ProcessAudio(double time, ChannelBuffer* buffer)
          Clear(sample, ChannelBuffer::kMaxNumChannels);
          mGranulator.ProcessFrame(time, mBuffer.GetRawBuffer(), mBufferLength, mBuffer.GetRawBufferOffset(0)-mFreezeExtraSamples-1+mPos, sample);
          for (int ch=0; ch<buffer->NumActiveChannels(); ++ch)
-         {
-            sample[ch] -= mDCEstimate[ch];
-         
-            if (mAdd)
-               buffer->GetChannel(ch)[i] += sample[ch];
-            else
-               buffer->GetChannel(ch)[i] = sample[ch];
-            
-            mDCEstimate[ch] = .999f*mDCEstimate[ch] + .001f*buffer->GetChannel(ch)[i]; //rolling average
-         }
+            buffer->GetChannel(ch)[i] = mDry * buffer->GetChannel(ch)[i] + sample[ch];
       }
       
       time += gInvSampleRateMs;
@@ -142,16 +135,17 @@ void LiveGranulator::DrawModule()
    mFreezeCheckbox->Draw();
    mGranOctaveCheckbox->Draw();
    mPosSlider->Draw();
-   mAddCheckbox->Draw();
+   mDrySlider->Draw();
    mAutoCaptureDropdown->Draw();
    mGranSpacingRandomize->Draw();
+   mWidthSlider->Draw();
    if (mEnabled)
    {
       int drawLength = MIN(mBufferLength, gSampleRate*2);
       if (mFreeze)
          drawLength = MIN(mBufferLength, drawLength + mFreezeExtraSamples);
-      mGranulator.Draw(mBufferX, 3+20, kBufferWidth, 70-20*2, mBuffer.GetRawBufferOffset(0)-drawLength, drawLength, mBufferLength);
-      mBuffer.Draw(mBufferX, 3, kBufferWidth, 70, drawLength);
+      mGranulator.Draw(mBufferX, 3+20, kBufferWidth, kBufferHeight-20*2, mBuffer.GetRawBufferOffset(0)-drawLength, drawLength, mBufferLength);
+      mBuffer.Draw(mBufferX, 3, kBufferWidth, kBufferHeight, drawLength);
    }
 }
 
@@ -179,7 +173,6 @@ void LiveGranulator::CheckboxUpdated(Checkbox* checkbox)
       mBuffer.ClearBuffer();
    if (checkbox == mFreezeCheckbox)
    {
-      mPos = 0;
       mFreezeExtraSamples = 0;
       if (mFreeze)
       {
@@ -197,7 +190,6 @@ void LiveGranulator::DropdownUpdated(DropdownList* list, int oldVal)
       if (mAutoCaptureInterval == kInterval_None)
       {
          mFreeze = false;
-         mPos = 0;
          mFreezeExtraSamples = 0;
       }
    }

@@ -72,6 +72,7 @@ public:
 private:
    void UpdateSample();
    void UpdateDisplaySamples();
+   void LoadFile();
 
    //IDrawableModule
    void DrawModule() override;
@@ -117,15 +118,19 @@ private:
       FloatSlider* mLengthMsSlider;
       FloatSlider* mPosRandomizeSlider;
       FloatSlider* mSpeedRandomizeSlider;
+      FloatSlider* mSpacingRandomizeSlider;
+      Checkbox* mOctaveCheckbox;
+      FloatSlider* mWidthSlider;
    };
    
    static const int kNumMPEVoices = 16;
    GrainMPEVoice mMPEVoices[kNumMPEVoices];
-   static const int kNumManualVoices = 4;
+   static const int kNumManualVoices = 6;
    GrainManualVoice mManualVoices[kNumManualVoices];
    
    Sample* mSample;
    
+   ClickButton* mLoadButton;
    float mVolume;
    FloatSlider* mVolumeSlider;
    float* mWriteBuffer;

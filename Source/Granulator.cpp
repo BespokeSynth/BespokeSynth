@@ -13,7 +13,7 @@
 
 Granulator::Granulator()
 : mNextGrainIdx(0)
-, mLastGrainSpawnMs(0)
+, mNextGrainSpawnMs(0)
 , mLiveMode(false)
 , mOctaves(false)
 {
@@ -27,8 +27,9 @@ void Granulator::Reset()
    mGrainOverlap = 10;
    mPosRandomizeMs = 5;
    mSpeedRandomize = 0;
-   mSpacingRandomize = 0;
+   mSpacingRandomize = 1;
    mOctaves = false;
+   mWidth = 1;
 
    for (int i = 0; i < ChannelBuffer::kMaxNumChannels; ++i)
    {
@@ -41,10 +42,13 @@ void Granulator::Reset()
 
 void Granulator::ProcessFrame(double time, ChannelBuffer* buffer, int bufferLength, double offset, float* output)
 {
-   if (time >= mLastGrainSpawnMs+mGrainLengthMs*1/mGrainOverlap*ofRandom(1-mSpacingRandomize/2,1+mSpacingRandomize/2))
+   if (time + gInvSampleRateMs >= mNextGrainSpawnMs)
    {
-      mLastGrainSpawnMs = time;
-      SpawnGrain(time, offset, buffer->NumActiveChannels() == 2);
+      double startFromMs = mNextGrainSpawnMs;
+      if (startFromMs < time - 1000)   //must have recently started processing, reset
+         startFromMs = time;
+      SpawnGrain(mNextGrainSpawnMs, offset, buffer->NumActiveChannels() == 2 ? mWidth : 0);
+      mNextGrainSpawnMs = startFromMs + mGrainLengthMs * 1/mGrainOverlap * ofRandom(1-mSpacingRandomize/2,1+mSpacingRandomize/2);
    }
    
    for (int i=0; i<MAX_GRAINS; ++i)
@@ -58,7 +62,7 @@ void Granulator::ProcessFrame(double time, ChannelBuffer* buffer, int bufferLeng
    }
 }
 
-void Granulator::SpawnGrain(double time, double offset, bool stereo)
+void Granulator::SpawnGrain(double time, double offset, float width)
 {
    if (mLiveMode)
    {
@@ -86,7 +90,7 @@ void Granulator::SpawnGrain(double time, double offset, bool stereo)
       }
    }
    offset += ofRandom(-mPosRandomizeMs, mPosRandomizeMs) / gInvSampleRateMs;
-   mGrains[mNextGrainIdx].Spawn(time, offset, speed, mGrainLengthMs, vol, stereo);
+   mGrains[mNextGrainIdx].Spawn(time, offset, speed, mGrainLengthMs, vol, width);
    
    mNextGrainIdx = (mNextGrainIdx+1) % MAX_GRAINS;
 }
@@ -103,14 +107,14 @@ void Granulator::ClearGrains()
       mGrains[i].Clear();
 }
 
-void Grain::Spawn(double time, double pos, float speed, float lengthInMs, float vol, bool stereo)
+void Grain::Spawn(double time, double pos, float speed, float lengthInMs, float vol, float width)
 {
    mPos = pos;
    mSpeed = speed;
    mStartTime = time;
    mEndTime = time + lengthInMs;
    mVol = vol;
-   mStereoPosition = stereo ? ofRandom(1) : 0;
+   mStereoPosition = ofRandom(-width, width);
    mDrawPos = ofRandom(1);
 }
 
@@ -118,11 +122,13 @@ void Grain::Process(double time, ChannelBuffer* buffer, int bufferLength, float*
 {
    if (time >= mStartTime && time <= mEndTime && mVol != 0)
    {
-      float sample = GetInterpolatedSample(mPos, buffer, bufferLength, mStereoPosition);
       mPos += mSpeed;
       float window = GetWindow(time);
       for (int ch=0; ch<buffer->NumActiveChannels(); ++ch)
-         output[ch] += sample * window * mVol * (ch == 0 ? (1-mStereoPosition) : mStereoPosition);
+      {
+         float sample = GetInterpolatedSample(mPos, buffer, bufferLength, ofClamp(ch + mStereoPosition, 0, 1));
+         output[ch] += sample * window * mVol * (1 + (ch == 0 ? mStereoPosition : -mStereoPosition));
+      }
    }
 }
 

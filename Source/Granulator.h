@@ -20,7 +20,7 @@ class Grain
 {
 public:
    Grain() : mPos(0), mSpeed(0), mStartTime(0), mEndTime(0), mVol(0), mStereoPosition(0) {}
-   void Spawn(double time, double pos, float speed, float lengthInMs, float vol, bool stereo);
+   void Spawn(double time, double pos, float speed, float lengthInMs, float vol, float width);
    void Process(double time, ChannelBuffer* buffer, int bufferLength, float* output);
    void DrawGrain(int idx, float x, float y, float w, float h, int bufferStart, int viewLength, int bufferLength);
    void Clear() { mVol = 0; }
@@ -52,11 +52,12 @@ public:
    float mSpeedRandomize;
    float mSpacingRandomize;
    bool mOctaves;
+   float mWidth;
    
 private:
-   void SpawnGrain(double time, double offset, bool stereo);
+   void SpawnGrain(double time, double offset, float width);
    
-   double mLastGrainSpawnMs;
+   double mNextGrainSpawnMs;
    int mNextGrainIdx;
    Grain mGrains[MAX_GRAINS];
    bool mLiveMode;

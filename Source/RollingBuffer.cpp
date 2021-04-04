@@ -84,6 +84,8 @@ void RollingBuffer::Write(float sample, int channel)
 void RollingBuffer::ClearBuffer()
 {
    mBuffer.Clear();
+   for (int i=0; i<ChannelBuffer::kMaxNumChannels; ++i)
+      mOffsetToNow[i] = 0;
 }
 
 void RollingBuffer::Draw(int x, int y, int width, int height, int length /*= -1*/, int channel /*= -1*/, int delayOffset /*= 0*/)

@@ -62,16 +62,16 @@ private:
    FloatSlider* mGranSpeedRandomize;
    FloatSlider* mGranSpacingRandomize;
    Checkbox* mGranOctaveCheckbox;
-   bool mAdd;
-   Checkbox* mAddCheckbox;
+   float mDry;
+   FloatSlider* mDrySlider;
    bool mFreeze;
    Checkbox* mFreezeCheckbox;
    int mFreezeExtraSamples;
    float mPos;
    FloatSlider* mPosSlider;
-   float mDCEstimate[ChannelBuffer::kMaxNumChannels];   //estimate of DC offset
    NoteInterval mAutoCaptureInterval;
    DropdownList* mAutoCaptureDropdown;
+   FloatSlider* mWidthSlider;
    
    float mWidth;
    float mHeight;

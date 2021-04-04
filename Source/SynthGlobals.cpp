@@ -129,56 +129,59 @@ void DrawAudioBuffer(float width, float height, const float* buffer, float start
    if (length < 0)
       length += bufferSize;
 
-   const float kStepSize = 3;
-   float step = kStepSize;
-   if (width < 0)
-      step *= -1;
-   float samplesPerStep = length / abs(width) * kStepSize;
-   start = start - (int(start) % int(samplesPerStep));
-   
-   if (buffer && length > 0)
+   if (length > 0)
    {
-      float step = width > 0 ? 3 : -3;
-      float samplesPerStep = length / width * step;
+      const float kStepSize = 3;
+      float step = kStepSize;
+      if (width < 0)
+         step *= -1;
+      float samplesPerStep = length / abs(width) * kStepSize;
+      start = start - (int(start) % int(samplesPerStep));
       
-      for (float i = 0; abs(i) < abs(width); i+=step)
+      if (buffer && length > 0)
       {
-         float mag = 0;
-         int position = i / width * length + start;
-         //rms
-         int j;
-         int inc = 1+samplesPerStep / 100;
-         for (j = 0; j < samplesPerStep; j += inc)
+         float step = width > 0 ? 3 : -3;
+         float samplesPerStep = length / width * step;
+         
+         for (float i = 0; abs(i) < abs(width); i+=step)
          {
-            int sampleIdx = position + j;
-            if (wraparoundFrom != -1 && sampleIdx > wraparoundFrom)
-               sampleIdx = sampleIdx - wraparoundFrom + wraparoundTo;
-            if (bufferSize > 0)
-               sampleIdx %= bufferSize;
-            mag = MAX(mag, fabsf(buffer[sampleIdx]));
+            float mag = 0;
+            int position = i / width * length + start;
+            //rms
+            int j;
+            int inc = 1+samplesPerStep / 100;
+            for (j = 0; j < samplesPerStep; j += inc)
+            {
+               int sampleIdx = position + j;
+               if (wraparoundFrom != -1 && sampleIdx > wraparoundFrom)
+                  sampleIdx = sampleIdx - wraparoundFrom + wraparoundTo;
+               if (bufferSize > 0)
+                  sampleIdx %= bufferSize;
+               mag = MAX(mag, fabsf(buffer[sampleIdx]));
+            }
+            mag = sqrt(mag);
+            mag = sqrt(mag);
+            mag *= height/2 * vol;
+            if (mag > height/2)
+            {
+               ofSetColor(255,0,0);
+               mag = height/2;
+            }
+            else
+            {
+               ofSetColor(color);
+            }
+            if (mag == 0)
+               mag = .1f;
+            ofLine(i, height/2-mag, i, height/2+mag);
          }
-         mag = sqrt(mag);
-         mag = sqrt(mag);
-         mag *= height/2 * vol;
-         if (mag > height/2)
+         
+         if (pos != -1)
          {
-            ofSetColor(255,0,0);
-            mag = height/2;
+            ofSetColor(0,255,0);
+            int position =  ofMap(pos, start, end, 0, width, true);
+            ofLine(position,0,position,height);
          }
-         else
-         {
-            ofSetColor(color);
-         }
-         if (mag == 0)
-            mag = .1f;
-         ofLine(i, height/2-mag, i, height/2+mag);
-      }
-      
-      if (pos != -1)
-      {
-         ofSetColor(0,255,0);
-         int position =  ofMap(pos, start, end, 0, width, true);
-         ofLine(position,0,position,height);
       }
    }
 
@@ -398,12 +401,13 @@ float GetInterpolatedSample(double offset, const float* buffer, int bufferSize)
 float GetInterpolatedSample(double offset, ChannelBuffer* buffer, int bufferSize, float channelBlend)
 {
    assert(channelBlend <= buffer->NumActiveChannels());
+   assert(channelBlend >= 0);
    
    if (buffer->NumActiveChannels() == 1)
       return GetInterpolatedSample(offset, buffer->GetChannel(0), bufferSize);
    
    int channelA = floor(channelBlend);
-   if (channelA == buffer->NumActiveChannels())
+   if (channelA == buffer->NumActiveChannels() - 1)
       channelA -= 1;
    int channelB = channelA + 1;
    
