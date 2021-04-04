@@ -199,7 +199,7 @@ void NoteStepSequencer::DrawModule()
    
    for (int i=0; i<mGrid->GetCols()-1; ++i)
    {
-      if (mNoteLengths[i] == 1 && mTones[i] == mTones[i+1] && mVels[i] > mVels[i+1])
+      if (mNoteLengths[i] == 1 && mTones[i] == mTones[i+1] && mVels[i] > mVels[i+1] && mVels[i+1] != 0)
       {
          ofSetColor(255,255,255,255);
          ofFill();
