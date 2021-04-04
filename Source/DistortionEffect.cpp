@@ -23,7 +23,7 @@ DistortionEffect::DistortionEffect()
    
    for (int i=0; i<ChannelBuffer::kMaxNumChannels; ++i)
    {
-      mDCRemover[i].SetFilterParams(10, 1);
+      mDCRemover[i].SetFilterParams(10, sqrt(2)/2);
       mDCRemover[i].SetFilterType(kFilterType_Highpass);
       mDCRemover[i].UpdateFilterCoeff();
    }

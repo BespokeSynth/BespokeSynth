@@ -33,7 +33,7 @@ KarplusStrong::KarplusStrong()
    mBiquad.SetPosition(150,15);
    mBiquad.SetEnabled(true);
    mBiquad.SetFilterType(kFilterType_Lowpass);
-   mBiquad.SetFilterParams(1600, 1);
+   mBiquad.SetFilterParams(1600, sqrt(2)/2);
    mBiquad.SetName("biquad");
 }
 

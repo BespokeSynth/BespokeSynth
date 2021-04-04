@@ -59,7 +59,7 @@ Producer::Producer()
       AddChild(&mBiquad[i]);
       mBiquad[i].SetPosition(150+100*i,mBufferY+10);
       mBiquad[i].SetFilterType(kFilterType_Lowpass);
-      mBiquad[i].SetFilterParams(1600, 1);
+      mBiquad[i].SetFilterParams(1600, sqrt(2)/2);
    }
 }
 

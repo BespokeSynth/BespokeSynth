@@ -233,7 +233,7 @@ DrumSynth::DrumSynthHit::DrumSynthHit(DrumSynth* parent, int index, int x, int y
 , mY(y)
 {
    mFilter.SetFilterType(kFilterType_Lowpass);
-   mFilter.SetFilterParams(1000, 1);
+   mFilter.SetFilterParams(1000, sqrt(2)/2);
 }
 
 void DrumSynth::DrumSynthHit::CreateUIControls()
