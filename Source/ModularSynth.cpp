@@ -961,6 +961,9 @@ void ModularSynth::MouseDragged(int intX, int intY, int button)
 
 void ModularSynth::MousePressed(int intX, int intY, int button)
 {
+   if (PatchCable::sActivePatchCable != nullptr)
+      return;
+   
    mMousePos.x = intX;
    mMousePos.y = intY;
 
