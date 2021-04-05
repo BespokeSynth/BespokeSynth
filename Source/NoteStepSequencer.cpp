@@ -457,6 +457,13 @@ void NoteStepSequencer::Step(double time, float velocity, int pulseFlags)
    
    if (!mHasExternalPulseSource || (pulseFlags & kPulseFlag_SyncToTransport))
    {
+      int stepsPerMeasure = TheTransport->CountInStandardMeasure(mInterval) * TheTransport->GetTimeSigTop() / TheTransport->GetTimeSigBottom();
+      int measure = TheTransport->GetMeasure(time);
+      mArpIndex = (TheTransport->GetQuantized(time, mInterval) + measure * stepsPerMeasure) % mLength;
+   }
+
+   if (pulseFlags & kPulseFlag_Align)
+   {
       int stepsPerMeasure = TheTransport->CountInStandardMeasure(mInterval) * TheTransport->GetTimeSigTop()/TheTransport->GetTimeSigBottom();
       int numMeasures = ceil(float(mLength) / stepsPerMeasure);
       int measure = TheTransport->GetMeasure(time) % numMeasures;

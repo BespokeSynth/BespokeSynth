@@ -65,7 +65,8 @@ private:
       kTimeMode_Downbeat,
       kTimeMode_Downbeat2,
       kTimeMode_Downbeat4,
-      kTimeMode_Free
+      kTimeMode_Free,
+      kTimeMode_Align
    };
    
    NoteInterval mInterval;

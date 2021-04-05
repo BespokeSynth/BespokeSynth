@@ -61,6 +61,7 @@ void Pulser::CreateUIControls()
    
    mTimeModeSelector->AddLabel("step", kTimeMode_Step);
    mTimeModeSelector->AddLabel("sync", kTimeMode_Sync);
+   mTimeModeSelector->AddLabel("align", kTimeMode_Align);
    mTimeModeSelector->AddLabel("downbeat", kTimeMode_Downbeat);
    mTimeModeSelector->AddLabel("dnbeat2", kTimeMode_Downbeat2);
    mTimeModeSelector->AddLabel("dnbeat4", kTimeMode_Downbeat4);
