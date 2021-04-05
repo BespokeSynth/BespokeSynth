@@ -182,5 +182,7 @@ void LFO::OnTransportAdvanced(float amount)
       mFreePhase += mFreeRate * amount * TheTransport->MsPerBar() / 1000;
       if (mFreePhase > 2)
          mFreePhase -= 2;
+      if (mFreePhase < 2)
+         mFreePhase += 2;
    }
 }
