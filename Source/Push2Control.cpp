@@ -657,6 +657,33 @@ void Push2Control::RenderPush2Display()
    sPush2Bridge->Flip(mPixels);
 }
 
+void Push2Control::Poll()
+{
+   if (mPendingSpawnPitch != -1)
+   {
+      int gridIndex = mPendingSpawnPitch - 36;
+      int gridX = gridIndex % 8;
+      int gridY = gridIndex / 8;
+      ofVec2f newModuleCenter = ofVec2f(ofMap(gridX, 0, 7, mModuleGridRect.getMinX(), mModuleGridRect.getMaxX()), ofMap(gridY, 7, 0, mModuleGridRect.getMinY(), mModuleGridRect.getMaxY()));
+      
+      for (int i=0; i<mSpawnLists.GetDropdowns().size(); ++i)
+      {
+         if (mSpawnLists.GetDropdowns()[i]->GetList()->GetValue() != -1)
+         {
+            IDrawableModule* module = mSpawnLists.GetDropdowns()[i]->Spawn();
+            ofRectangle rect = module->GetRect();
+            module->SetPosition(newModuleCenter.x-rect.width/2, newModuleCenter.y-rect.height/2);
+            mSpawnLists.GetDropdowns()[i]->GetList()->SetValue(-1);
+            mScreenDisplayMode = ScreenDisplayMode::kNormal;
+            SetDisplayModule(module, true);
+            break;
+         }
+      }
+      
+      mPendingSpawnPitch = -1;
+   }
+}
+
 void Push2Control::SetDisplayModule(IDrawableModule* module, bool addToHistory)
 {
    mDisplayModule = module;
@@ -829,26 +856,7 @@ void Push2Control::OnMidiNote(MidiNote& note)
       if (mScreenDisplayMode == ScreenDisplayMode::kAddModule)
       {
          if (note.mVelocity > 0)
-         {
-            int gridIndex = note.mPitch - 36;
-            int gridX = gridIndex % 8;
-            int gridY = gridIndex / 8;
-            ofVec2f newModuleCenter = ofVec2f(ofMap(gridX, 0, 7, mModuleGridRect.getMinX(), mModuleGridRect.getMaxX()), ofMap(gridY, 7, 0, mModuleGridRect.getMinY(), mModuleGridRect.getMaxY()));
-            
-            for (int i=0; i<mSpawnLists.GetDropdowns().size(); ++i)
-            {
-               if (mSpawnLists.GetDropdowns()[i]->GetList()->GetValue() != -1)
-               {
-                  IDrawableModule* module = mSpawnLists.GetDropdowns()[i]->Spawn();
-                  ofRectangle rect = module->GetRect();
-                  module->SetPosition(newModuleCenter.x-rect.width/2, newModuleCenter.y-rect.height/2);
-                  mSpawnLists.GetDropdowns()[i]->GetList()->SetValue(-1);
-                  mScreenDisplayMode = ScreenDisplayMode::kNormal;
-                  SetDisplayModule(module, true);
-                  break;
-               }
-            }
-         }
+            mPendingSpawnPitch = note.mPitch;
       }
    }
    else
