@@ -66,7 +66,8 @@ private:
       kTimeMode_Downbeat2,
       kTimeMode_Downbeat4,
       kTimeMode_Free,
-      kTimeMode_Align
+      kTimeMode_Align,
+      kTimeMode_Reset
    };
    
    NoteInterval mInterval;
@@ -85,5 +86,7 @@ private:
    FloatSlider* mFreeTimeSlider;
    float mFreeTimeStep;
    float mFreeTimeCounter;
+   int mResetLength;
+   IntSlider* mResetLengthSlider;
 };
 

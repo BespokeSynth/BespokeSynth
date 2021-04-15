@@ -443,6 +443,8 @@ void NoteStepSequencer::Step(double time, float velocity, int pulseFlags)
    int direction = 1;
    if (pulseFlags & kPulseFlag_Backward)
       direction = -1;
+   if (pulseFlags & kPulseFlag_Repeat)
+      direction = 0;
    
    mArpIndex += direction;
    if (direction > 0 && mArpIndex >= mLength)
@@ -649,15 +651,9 @@ void NoteStepSequencer::PlayNote(double time, int pitch, int velocity, int voice
 {
    if (velocity > 0)
    {
-      int tet = TheScale->GetTet();
-      mOctave = (pitch - TheScale->ScaleRoot()) / tet;
-      
-      if (mNoteMode == kNoteMode_Scale)
-         mRowOffset = TheScale->GetToneFromPitch(pitch) % TheScale->NumPitchesInScale();
-      else if (mNoteMode == kNoteMode_Chromatic)
-         mRowOffset = ((pitch % tet) - (TheScale->ScaleRoot() % tet) + tet) % tet;
-      else if (mNoteMode == kNoteMode_Fifths)
-         mRowOffset = 0;
+      mHasExternalPulseSource = true;
+      mArpIndex = pitch % mLength;
+      Step(time, velocity/127.0f, kPulseFlag_Repeat);
    }
 }
 
