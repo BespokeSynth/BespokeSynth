@@ -25,7 +25,7 @@ WaveformViewer::WaveformViewer()
 , mSaturation(nullptr)
 , mBrightness(nullptr)
 , mWidth(600)
-, mHeight(100)
+, mHeight(150)
 , mDrawWaveform(true)
 , mDrawCircle(false)
 {
@@ -196,7 +196,7 @@ void WaveformViewer::LoadLayout(const ofxJSONElement& moduleInfo)
 {
    mModuleSaveData.LoadString("target", moduleInfo);
    mModuleSaveData.LoadInt("width", moduleInfo, 600, 50, 2000, K(isTextField));
-   mModuleSaveData.LoadInt("height", moduleInfo, 100, 50, 2000, K(isTextField));
+   mModuleSaveData.LoadInt("height", moduleInfo, 150, 50, 2000, K(isTextField));
    mModuleSaveData.LoadBool("draw_waveform", moduleInfo, true);
    mModuleSaveData.LoadBool("draw_circle", moduleInfo, false);
 
