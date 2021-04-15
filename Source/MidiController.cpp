@@ -1803,9 +1803,13 @@ int MidiController::GetLayoutControlIndexForMidi(MidiMessageType type, int contr
    return -1;
 }
 
+static vector<string> sCachedInputDevices;
 //static
 vector<string> MidiController::GetAvailableInputDevices()
 {
+   if (!juce::MessageManager::existsAndIsCurrentThread())
+      return sCachedInputDevices;
+   
    vector<string> devices;
    for (auto& d : MidiInput::getAvailableDevices())
    {
@@ -1817,19 +1821,27 @@ vector<string> MidiController::GetAvailableInputDevices()
 
    devices.push_back("monome");
    devices.push_back("osccontroller");
+   
+   sCachedInputDevices = devices;
 
    return devices;
 }
 
+static vector<string> sCachedOutputDevices;
 //static
 vector<string> MidiController::GetAvailableOutputDevices()
 {
+   if (!juce::MessageManager::existsAndIsCurrentThread())
+      return sCachedOutputDevices;
+   
    vector<string> devices;
    for (auto& d : MidiOutput::getDevices())
       devices.push_back(d.toStdString());
 
    devices.push_back("monome");
    devices.push_back("osccontroller");
+   
+   sCachedOutputDevices = devices;
 
    return devices;
 }
