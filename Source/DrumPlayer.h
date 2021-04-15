@@ -125,7 +125,6 @@ private:
    float mAuditionInc;
    FloatSlider* mAuditionSlider;
    string mAuditionDir;
-   int mAuditionPadIdx;
    char mNewKitName[MAX_TEXTENTRY_LENGTH];
    TextEntry* mNewKitNameEntry;
    ofMutex mLoadSamplesAudioMutex;

@@ -31,7 +31,6 @@ DrumPlayer::DrumPlayer()
 , mAuditionSampleIdx(0)
 , mAuditionInc(0)
 , mAuditionSlider(nullptr)
-, mAuditionPadIdx(0)
 , mNewKitNameEntry(nullptr)
 , mLoadingSamples(false)
 , mShuffleButton(nullptr)
@@ -533,7 +532,7 @@ void DrumPlayer::FilesDropped(vector<string> files, int x, int y)
    {
       mAuditionDir = files[0];
       if (x < 4 && y < 4)
-         mAuditionPadIdx = GetAssociatedSampleIndex(x,y);
+         mSelectedHitIdx = GetAssociatedSampleIndex(x,y);
       mAuditionSampleIdx = -1;
    }
    else
@@ -615,6 +614,7 @@ void DrumPlayer::OnClicked(int x, int y, bool right)
       if (sampleIdx != -1)
       {
          mSelectedHitIdx = sampleIdx;
+         mAuditionDir = ofToDataPath("drums/hits/"+mDrumHits[sampleIdx].mHitCategory);
          UpdateVisibleControls();
       }
    }
@@ -925,14 +925,14 @@ void DrumPlayer::FloatSliderUpdated(FloatSlider* slider, float oldVal)
          mAuditionSampleIdx = ofClamp(mAuditionSampleIdx,0,files.size()-1);
          
          string file = files[mAuditionSampleIdx].getFullPathName().toStdString();
-         if (mAuditionPadIdx >= 0 && mAuditionPadIdx < NUM_DRUM_HITS)
+         if (mSelectedHitIdx >= 0 && mSelectedHitIdx < NUM_DRUM_HITS)
          {
             LoadSampleLock();
-            mDrumHits[mAuditionPadIdx].mSample.Read(file.c_str());
+            mDrumHits[mSelectedHitIdx].mSample.Read(file.c_str());
             LoadSampleUnlock();
-            mDrumHits[mAuditionPadIdx].StartPlayhead(gTime, 0, 1);
-            mDrumHits[mAuditionPadIdx].mVelocity = .5f;
-            mDrumHits[mAuditionPadIdx].mEnvelopeLength = mDrumHits[mAuditionPadIdx].mSample.LengthInSamples() * gInvSampleRateMs;
+            mDrumHits[mSelectedHitIdx].StartPlayhead(gTime, 0, 1);
+            mDrumHits[mSelectedHitIdx].mVelocity = .5f;
+            mDrumHits[mSelectedHitIdx].mEnvelopeLength = mDrumHits[mSelectedHitIdx].mSample.LengthInSamples() * gInvSampleRateMs;
          }
       }
    }
