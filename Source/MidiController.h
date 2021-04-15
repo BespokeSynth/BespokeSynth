@@ -340,6 +340,7 @@ private:
    int GetLayoutControlIndexForCable(PatchCableSource* cable) const;
    int GetLayoutControlIndexForMidi(MidiMessageType type, int control) const;
    string GetLayoutTooltip(int controlIndex);
+   void UpdateControllerIndex();
    
    float mVelocityMult;
    bool mUseChannelAsVoice;

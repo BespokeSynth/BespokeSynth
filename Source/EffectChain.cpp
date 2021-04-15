@@ -41,6 +41,7 @@ void EffectChain::CreateUIControls()
    
    mVolumeSlider = new FloatSlider(this,"volume", 10, 100, 100, 15, &mVolume, 0, 2);
    mEffectSpawnList = new DropdownList(this,"effect", 10, 100, &mSpawnIndex);
+   mSpawnEffectButton = new ClickButton(this,"spawn", -1, -1);
 }
 
 void EffectChain::Init()
@@ -51,7 +52,6 @@ void EffectChain::Init()
    mEffectSpawnList->SetUnknownItemString("add effect:");
    for (int i=0; i<mEffectTypesToSpawn.size(); ++i)
       mEffectSpawnList->AddLabel(mEffectTypesToSpawn[i].c_str(), i);
-   mEffectSpawnList->SetNoHover(true);
    
    mInitialized = true;
 }
@@ -167,6 +167,7 @@ void EffectChain::DrawModule()
       return;
    
    mEffectSpawnList->SetShowing(mShowSpawnList);
+   mSpawnEffectButton->SetShowing(mShowSpawnList && mSpawnIndex != -1);
 
    for (int i=0; i<mEffects.size(); ++i)
    {
@@ -239,6 +240,8 @@ void EffectChain::DrawModule()
    mVolumeSlider->Draw();
    mEffectSpawnList->SetPosition(106, h-17);
    mEffectSpawnList->Draw();
+   mSpawnEffectButton->SetPosition(mEffectSpawnList->GetRect(true).getMaxX()+2, h-17);
+   mSpawnEffectButton->Draw();
 }
 
 int EffectChain::NumRows() const
@@ -397,7 +400,15 @@ void EffectChain::UpdateReshuffledDryWetSliders()
 
 void EffectChain::ButtonClicked(ClickButton* button)
 {
-   for (size_t i=0; i<mEffectControls.size(); ++i)
+   if (button == mSpawnEffectButton)
+   {
+      if (mSpawnIndex >= 0 && mSpawnIndex < (int)mEffectTypesToSpawn.size())
+      {
+         AddEffect(mEffectTypesToSpawn[mSpawnIndex], K(onTheFly));
+         mSpawnIndex = -1;
+      }
+   }
+   for (int i=0; i<(int)mEffectControls.size(); ++i)
    {
       if (button == mEffectControls[i].mMoveLeftButton)
          MoveEffect(i, -1);
@@ -420,8 +431,11 @@ void EffectChain::DropdownUpdated(DropdownList* list, int oldVal)
 {
    if (list == mEffectSpawnList)
    {
-      AddEffect(mEffectTypesToSpawn[mSpawnIndex], K(onTheFly));
-      mSpawnIndex = -1;
+      if (TheSynth->GetTopModalFocusItem() == mEffectSpawnList->GetModalDropdown())
+      {
+         AddEffect(mEffectTypesToSpawn[mSpawnIndex], K(onTheFly));
+         mSpawnIndex = -1;
+      }
    }
 }
 

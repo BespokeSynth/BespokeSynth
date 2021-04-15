@@ -96,6 +96,7 @@ private:
    std::vector<string> mEffectTypesToSpawn;
    int mSpawnIndex;
    DropdownList* mEffectSpawnList;
+   ClickButton* mSpawnEffectButton;
    
    ofMutex mEffectMutex;
 };

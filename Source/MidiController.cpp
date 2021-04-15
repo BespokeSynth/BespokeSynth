@@ -1643,9 +1643,16 @@ void MidiController::DropdownUpdated(DropdownList* list, int oldVal)
       ResyncTwoWay();
    }
    if (list == mControllerList)
-   {      
-      ConnectDevice();
-      OnDeviceChanged();
+   {
+      if (TheSynth->GetTopModalFocusItem() == mControllerList->GetModalDropdown())
+      {
+         ConnectDevice();
+         OnDeviceChanged();
+      }
+      else
+      {
+         UpdateControllerIndex();
+      }
    }
 }
 
@@ -1992,16 +1999,22 @@ void MidiController::SetUpFromSaveData()
    
    BuildControllerList();
    
+   UpdateControllerIndex();
+
+   ConnectDevice();
+   
+   OnDeviceChanged();
+}
+
+void MidiController::UpdateControllerIndex()
+{
+   mControllerIndex = -1;
    const auto& devices = GetAvailableInputDevices();
    for (int i=0; i<devices.size(); ++i)
    {
       if (devices[i].c_str() == mDeviceIn)
          mControllerIndex = i;
    }
-
-   ConnectDevice();
-   
-   OnDeviceChanged();
 }
 
 void MidiController::SaveLayout(ofxJSONElement& moduleInfo)
