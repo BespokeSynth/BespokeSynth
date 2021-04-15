@@ -66,7 +66,6 @@ void Polyrhythms::OnTransportAdvanced(float amount)
 
 void Polyrhythms::DrawModule()
 {
-
    if (Minimized() || IsVisible() == false)
       return;
    
@@ -102,14 +101,6 @@ bool Polyrhythms::MouseMoved(float x, float y)
    for (int i=0; i<mRhythmLines.size(); ++i)
       mRhythmLines[i]->MouseMoved(x,y);
    return false;
-}
-
-void Polyrhythms::CheckboxUpdated(Checkbox* checkbox)
-{
-}
-
-void Polyrhythms::FloatSliderUpdated(FloatSlider* slider, float oldVal)
-{
 }
 
 void Polyrhythms::DropdownUpdated(DropdownList* list, int oldVal)
@@ -151,7 +142,7 @@ void RhythmLine::CreateUIControls()
 {
    mGrid = new UIGrid(4,4+mIndex*17,100,15,4,1, mOwner);
    mLengthSelector = new DropdownList(mOwner,("length"+ofToString(mIndex)).c_str(),-1,-1,&mLength);
-   mNoteSelector = new DropdownList(mOwner,("note"+ofToString(mIndex)).c_str(),-1,-1,&mNote);
+   mNoteSelector = new TextEntry(mOwner,("note"+ofToString(mIndex)).c_str(),-1,-1,4,&mNote,0,127);
    
    mLengthSelector->AddLabel("3", 3);
    mLengthSelector->AddLabel("4", 4);
@@ -167,9 +158,6 @@ void RhythmLine::CreateUIControls()
    mLengthSelector->AddLabel("7x4", 28);
    mLengthSelector->AddLabel("8x4", 32);
    mLengthSelector->AddLabel("9x4", 36);
-   
-   for (int i=0; i<NUM_DRUM_HITS; ++i)
-      mNoteSelector->AddLabel(DrumPlayer::GetDrumHitName(i).c_str(), i);
    
    OnResize();
 }

@@ -129,13 +129,14 @@ void CircleSequencer::SetUpFromSaveData()
 CircleSequencerRing::CircleSequencerRing(CircleSequencer* owner, int index)
 : mLength(4)
 , mLengthSelector(nullptr)
-, mNote(0)
+, mNote(index)
 , mNoteSelector(nullptr)
 , mOwner(owner)
 , mIndex(index)
 , mOffset(0)
 , mOffsetSlider(nullptr)
 , mCurrentlyClickedStepIdx(-1)
+, mHighlightStepIdx(-1)
 {
    bzero(mSteps,sizeof(float)*CIRCLE_SEQUENCER_MAX_STEPS);
 }
@@ -144,14 +145,11 @@ void CircleSequencerRing::CreateUIControls()
 {
    int y = mIndex*20+20;
    mLengthSelector = new DropdownList(mOwner,("length"+ofToString(mIndex)).c_str(),220,y,&mLength);
-   mNoteSelector = new DropdownList(mOwner,("note"+ofToString(mIndex)).c_str(),260,y,&mNote);
-   mOffsetSlider = new FloatSlider(mOwner,("offset"+ofToString(mIndex)).c_str(),320,y,70,15,&mOffset,-.25f,.25f);
+   mNoteSelector = new TextEntry(mOwner,("note"+ofToString(mIndex)).c_str(),260,y,4,&mNote,0,127);
+   mOffsetSlider = new FloatSlider(mOwner,("offset"+ofToString(mIndex)).c_str(),300,y,90,15,&mOffset,-.25f,.25f,2);
    
    for (int i=0; i<CIRCLE_SEQUENCER_MAX_STEPS; ++i)
       mLengthSelector->AddLabel(ofToString(i+1).c_str(), i+1);
-   
-   for (int i=0; i<NUM_DRUM_HITS; ++i)
-      mNoteSelector->AddLabel(DrumPlayer::GetDrumHitName(i).c_str(), i);
 }
 
 void CircleSequencerRing::Draw()
@@ -167,11 +165,19 @@ void CircleSequencerRing::Draw()
       ofVec2f p1 = PolToCar(pos, GetRadius()-3);
       ofVec2f p2 = PolToCar(pos, GetRadius()+3);
       ofLine(p1.x+100,p1.y+100,p2.x+100,p2.y+100);
+      ofVec2f point = PolToCar(pos, GetRadius());
       
       if (mSteps[i] > 0)
-      {
-         ofVec2f point = PolToCar(pos, GetRadius());
          ofCircle(100+point.x,100+point.y,3+6*mSteps[i]);
+      
+      if (i == mHighlightStepIdx)
+      {
+         ofPushStyle();
+         ofSetColor(255,255,255,100);
+         ofSetLineWidth(.5f);
+         ofNoFill();
+         ofCircle(100+point.x,100+point.y,3+6);
+         ofPopStyle();
       }
    }
    ofPopStyle();
@@ -180,23 +186,35 @@ void CircleSequencerRing::Draw()
    mOffsetSlider->Draw();
 }
 
+int CircleSequencerRing::GetStepIndex(int x, int y, float &radiusOut)
+{
+   ofVec2f polar = CarToPol(x-100,y-100);
+   float pos = polar.x - mOffset;
+   FloatWrap(pos,1);
+   int idx = int(pos * mLength + .5f) % mLength;
+   
+   ofVec2f stepPos = PolToCar(float(idx)/mLength + mOffset, GetRadius());
+   if (ofDistSquared(x, y, stepPos.x+100, stepPos.y+100) < 7*7)
+   {
+      radiusOut = polar.y;
+      return idx;
+   }
+   
+   return -1;
+}
+
 void CircleSequencerRing::OnClicked(int x, int y, bool right)
 {
    if (right)
       return;
    
-   ofVec2f polar = CarToPol(x-100,y-100);
-   if (fabsf(polar.y - GetRadius()) < 5)
+   mCurrentlyClickedStepIdx = GetStepIndex(x, y, mLastMouseRadius);
+   if (mCurrentlyClickedStepIdx != -1)
    {
-      float pos = polar.x - mOffset;
-      FloatWrap(pos,1);
-      int idx = int(pos * mLength + .5f) % mLength;
-      if (mSteps[idx])
-         mSteps[idx] = 0;
+      if (mSteps[mCurrentlyClickedStepIdx])
+         mSteps[mCurrentlyClickedStepIdx] = 0;
       else
-         mSteps[idx] = .5f;
-      mCurrentlyClickedStepIdx = idx;
-      mLastMouseRadius = polar.y;
+         mSteps[mCurrentlyClickedStepIdx] = .5f;
    }
 }
 
@@ -215,6 +233,11 @@ void CircleSequencerRing::MouseMoved(float x, float y)
       mSteps[mCurrentlyClickedStepIdx] = ofClamp(mSteps[mCurrentlyClickedStepIdx]+change,0,1);
       
       mLastMouseRadius = polar.y;
+   }
+   else
+   {
+      float radius;
+      mHighlightStepIdx = GetStepIndex(x, y, radius);
    }
 }
 

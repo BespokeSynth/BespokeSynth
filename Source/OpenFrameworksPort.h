@@ -232,8 +232,8 @@ public:
    void stop() {}
 };
 
-#define PI 3.14159265358979
-#define TWO_PI PI*2
+#define PI 3.14159265358979323846
+#define TWO_PI 6.28318530717958647693
 
 class RetinaTrueTypeFont
 {

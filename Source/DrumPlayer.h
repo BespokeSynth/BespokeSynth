@@ -42,7 +42,6 @@ public:
    
    void Poll() override;
    
-   static string GetDrumHitName(int index);
    static void SetUpHitDirectories();
    
    //IAudioSource

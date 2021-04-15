@@ -18,6 +18,7 @@
 #include "DropdownList.h"
 #include "IDrawableModule.h"
 #include "INoteSource.h"
+#include "TextEntry.h"
 
 class CircleSequencer;
 
@@ -35,20 +36,22 @@ public:
    void OnTransportAdvanced(float amount);
 private:
    float GetRadius() { return 90-mIndex*15; }
+   int GetStepIndex(int x, int y, float& radiusOut);
    int mLength;
    DropdownList* mLengthSelector;
    int mNote;
-   DropdownList* mNoteSelector;
+   TextEntry* mNoteSelector;
    CircleSequencer* mOwner;
    int mIndex;
    float mSteps[CIRCLE_SEQUENCER_MAX_STEPS];
    float mOffset;
    FloatSlider* mOffsetSlider;
    int mCurrentlyClickedStepIdx;
+   int mHighlightStepIdx;
    float mLastMouseRadius;
 };
 
-class CircleSequencer : public IDrawableModule, public INoteSource, public IAudioPoller, public IFloatSliderListener, public IDropdownListener
+class CircleSequencer : public IDrawableModule, public INoteSource, public IAudioPoller, public IFloatSliderListener, public IDropdownListener, public ITextEntryListener
 {
 public:
    CircleSequencer();
@@ -70,6 +73,7 @@ public:
    void CheckboxUpdated(Checkbox* checkbox) override;
    void FloatSliderUpdated(FloatSlider* slider, float oldVal) override;
    void DropdownUpdated(DropdownList* list, int oldVal) override;
+   void TextEntryComplete(TextEntry* entry) override {}
    
    virtual void LoadLayout(const ofxJSONElement& moduleInfo) override;
    virtual void SetUpFromSaveData() override;

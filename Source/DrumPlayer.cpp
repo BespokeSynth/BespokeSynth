@@ -268,46 +268,6 @@ void DrumPlayer::LoadSampleUnlock()
    mLoadSamplesAudioMutex.unlock();
 }
 
-string DrumPlayer::GetDrumHitName(int index)
-{
-   switch (index)
-   {
-      case 0:
-         return "kick";
-      case 1:
-         return "rim";
-      case 2:
-         return "closed";
-      case 3:
-         return "ride";
-      case 4:
-         return "snare";
-      case 5:
-         return "crash";
-      case 6:
-         return "open";
-      case 7:
-         return "stick";
-      case 8:
-         return "floor";
-      case 9:
-         return "low";
-      case 10:
-         return "mid";
-      case 11:
-         return "hi";
-      case 12:
-         return "misc1";
-      case 13:
-         return "misc2";
-      case 14:
-         return "misc3";
-      case 15:
-         return "misc4";
-   }
-   return ofToString(index);
-}
-
 void DrumPlayer::Process(double time)
 {
    PROFILER(DrumPlayer);

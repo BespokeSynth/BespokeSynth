@@ -147,12 +147,9 @@ SliderLine::SliderLine(SliderSequencer* owner, int x, int y, int index)
 void SliderLine::CreateUIControls()
 {
    mSlider = new FloatSlider(mOwner,("time"+ofToString(mIndex)).c_str(),mX,mY,180,15,&mPoint,0,1);
-   mVelocitySlider = new FloatSlider(mOwner,("vel"+ofToString(mIndex)).c_str(),mX+185,mY,60,15,&mVelocity,0,.99f);
-   mNoteSelector = new DropdownList(mOwner,("note"+ofToString(mIndex)).c_str(),mX+250,mY,&mNote);
+   mVelocitySlider = new FloatSlider(mOwner,("vel"+ofToString(mIndex)).c_str(),mX+185,mY,80,15,&mVelocity,0,.99f,2);
+   mNoteSelector = new TextEntry(mOwner,("note"+ofToString(mIndex)).c_str(),mX+270,mY,4,&mNote,0,127);
    mPlayingCheckbox = new Checkbox(mOwner,("playing"+ofToString(mIndex)).c_str(),HIDDEN_UICONTROL,HIDDEN_UICONTROL,&mPlaying);
-   
-   for (int i=0; i<NUM_DRUM_HITS; ++i)
-      mNoteSelector->AddLabel(DrumPlayer::GetDrumHitName(i).c_str(), i);
 }
 
 void SliderLine::Draw()
