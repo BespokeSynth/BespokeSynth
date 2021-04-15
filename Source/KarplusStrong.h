@@ -20,6 +20,7 @@
 #include "DropdownList.h"
 #include "Checkbox.h"
 #include "BiquadFilterEffect.h"
+#include "ChannelBuffer.h"
 
 class KarplusStrong : public IAudioSource, public INoteReceiver, public IDrawableModule, public IDropdownListener, public IFloatSliderListener
 {
@@ -62,8 +63,9 @@ private:
    FloatSlider* mFeedbackSlider;
    FloatSlider* mVolSlider;
    DropdownList* mSourceDropdown;
-   Checkbox* mMuteCheckbox;
+   Checkbox* mInvertCheckbox;
    BiquadFilterEffect mBiquad;
+   BiquadFilter mDCRemover[ChannelBuffer::kMaxNumChannels];
    
    Checkbox* mStretchCheckbox;
    FloatSlider* mExciterFreqSlider;

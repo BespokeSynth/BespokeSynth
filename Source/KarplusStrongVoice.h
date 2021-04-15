@@ -36,7 +36,7 @@ public:
    , mVol(1.0f)
    , mFeedback(.998f)
    , mSourceType(kSourceTypeMix)
-   , mMute(true)
+   , mInvert(false)
    , mStretch(false)
    , mExciterFreq(100)
    , mExciterAttack(3)
@@ -47,7 +47,7 @@ public:
    float mVol;
    float mFeedback;
    KarplusStrongSourceType mSourceType;
-   bool mMute;
+   bool mInvert;
    bool mStretch;
    float mExciterFreq;
    float mExciterAttack;
