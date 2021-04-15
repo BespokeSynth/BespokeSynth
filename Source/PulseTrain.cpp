@@ -51,6 +51,7 @@ void PulseTrain::CreateUIControls()
    mIntervalSelector->AddLabel("none", kInterval_None);
    
    mVelocityGrid->SetGridMode(UIGrid::kMultisliderBipolar);
+   mVelocityGrid->SetRequireShiftForMultislider(true);
    mVelocityGrid->SetListener(this);
    for (int i=0; i<kMaxSteps; ++i)
       mVelocityGrid->SetVal(i, 0, mVels[i], !K(notifyListener));

@@ -57,6 +57,7 @@ void PulseSequence::CreateUIControls()
    
    mVelocityGrid->SetGridMode(UIGrid::kMultisliderBipolar);
    mVelocityGrid->SetListener(this);
+   mVelocityGrid->SetRequireShiftForMultislider(true);
    for (int i=0; i<kMaxSteps; ++i)
       mVelocityGrid->SetVal(i, 0, mVels[i], !K(notifyListener));
    
