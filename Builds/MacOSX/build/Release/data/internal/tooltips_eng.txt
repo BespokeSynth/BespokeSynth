@@ -78,10 +78,10 @@ oscoutput~send OSC messages when slider values change or when notes are received
 
 
 loopstorer~[abandoned module, probably broken]store a looper's loops to swap them in and out
-~rewrite~[no tooltip]
-~quantization~[no tooltip]
-~clear~[no tooltip]
-~select *~[no tooltip]
+~rewrite~[todo]
+~quantization~[todo]
+~clear~[todo]
+~select *~[todo]
 
 
 
@@ -126,17 +126,17 @@ comment~a box to display some text, to explain a section of a patch
 
 
 
-pulsetrain~[no tooltip]
-~length~[no tooltip]
-~interval~[no tooltip]
+pulsetrain~defines a list of pulses to execute, once pulsed
+~length~length of the sequence
+~interval~length of each step within the sequence
 
 
 
-pulsesequence~[no tooltip]
-~length~[no tooltip]
-~interval~[no tooltip]
-~<~[no tooltip]
-~>~[no tooltip]
+pulsesequence~defines a looping sequence of pulses
+~length~length of the sequence
+~interval~length of each step within the sequence
+~<~shift sequence to the left
+~>~shift sequence to the right
 
 
 
@@ -350,13 +350,13 @@ slidersequencer~[abandoned module, likely broken]
 
 
 
-randomnote~[no tooltip]
-~interval~[no tooltip]
-~probability~[no tooltip]
-~pitch~[no tooltip]
-~velocity~[no tooltip]
-~offset~[no tooltip]
-~skip~[no tooltip]
+randomnote~play the note at a given interval with a random chance
+~interval~the note length
+~probability~the chance that a note will play each interval
+~pitch~the pitch to use
+~velocity~the velocity to use
+~offset~the amount of time to offset playback within the interval
+~skip~after a note plays, don't play a note the next n-1 times that it would have played
 
 
 
@@ -364,21 +364,21 @@ push2control~use an ableton push 2 to control bespoke's interface
 
 
 
-polyrhythms~[no tooltip]
-~length*~[no tooltip]
-~note*~[no tooltip]
+polyrhythms~looping sequence with lines on different divisions
+~length*~number of steps for this line
+~note*~pitch to use for this line
 
 
 
-playsequencer~[no tooltip]
-~interval~[no tooltip]
-~measures~[no tooltip]
-~write~[no tooltip]
-~note repeat~[no tooltip]
-~link columns~[no tooltip]
-~store*~[no tooltip]
-~load*~[no tooltip]
-~mute/delete*~[no tooltip]
+playsequencer~drum sequencer that allows you to punch in to record and overdub steps, inspired by the pulsar–23 drum machine
+~interval~the step size
+~measures~the loop length
+~write~if the current input should be written to the sequence. this will also delete steps if mute/delete is enabled for this row
+~note repeat~if held notes should repeat every step
+~link columns~if the mute/delete control should be shared across the entire column
+~store*~store the current sequence to this slot
+~load*~load the sequence stored in this slot
+~mute/delete*~if write is disabled, mute this row. if write is enabled, clear the steps as the playhead passes them
 
 
 
@@ -434,7 +434,7 @@ notecanvas~looping note roll
 ~rec~record input notes to canvas
 ~free rec~[no tooltip]
 ~measures~loop length
-~show chord intervals~[no tooltip]
+~show chord intervals~show brackets to indicate chord relationships
 ~interval~interval to quantize to
 ~canvas~canvas of notes. canvas controls:\n-shift-click to add a note\n-hold shift and drag a note to duplicate\n-hold alt to drag a note without snapping\n-hold ctrl while dragging to snap to an interval\n-hold shift and scroll to zoom\n-hold alt and grab empty space to move slide the canvas view\n-hold ctrl and grab empty space to zoom the canvas view
 ~timeline~control loop points
@@ -451,7 +451,7 @@ midicontroller~get midi input from external devices
 ~bind (hold shift)~when this is enabled, you can map a midi input to a UI control by hovering over a UI control, holding shift, and then using desired midi input
 ~page~select which page of midi controls to use. each page acts like an independent midi controller, so you can use pages to allow one midi controller to switch between controlling many things
 ~add~add a mapping manually
-~osc input port~[no tooltip]
+~osc input port~port to use for osccontroller input
 
 
 
@@ -460,9 +460,9 @@ keyboarddisplay~displays input notes on a keyboard, and allows you to click the 
 
 
 gridkeyboard~grid-based keyboard, intended primarily for 64-pad grid controllers
-~layout~[no tooltip]
-~octave~[no tooltip]
-~latch~[no tooltip]
+~layout~keyboard style
+~octave~base octave
+~latch~latch key presses, so you press once to play a note, and press again to release a note
 ~arrangement~[no tooltip]
 ~ch.latch~[no tooltip]
 ~p.root~[no tooltip]
@@ -477,7 +477,7 @@ fouronthefloor~sends note 0 every beat, to trigger a kick drum
 drumsequencer~step sequencer intended for drums. hold shift when dragging on the grid to adjust step velocity.
 ~str~velocity to use when setting a step via a grid controller, if the checkbox next to this slider is checked
 ~use str~if the "str" slider should be used for setting velocity
-~measures~[no tooltip]
+~measures~length of the sequence in measures
 ~preset~select a pattern preset
 ~yoff~vertical offset for grid controller's view of the pattern
 ~offsets~show "offsets" sliders
@@ -496,10 +496,10 @@ helpdisplay~displays help information
 ~help page~which page of help information to show
 
 
-circlesequencer~[abandoned module, possibly broken]sequencer that views the loop in a circle
-~length*~[no tooltip]
-~note*~[no tooltip]
-~offset*~[no tooltip]
+circlesequencer~sequencer that views a loop as a circle
+~length*~number of steps in this ring
+~note*~pitch to use for this ring
+~offset*~timing offset for this ring
 
 
 
@@ -515,9 +515,9 @@ waveshaper~waveshaping with expressions
 
 
 waveform~waveform display
-~freq~[no tooltip]
-~length~[no tooltip]
-~draw gain~[no tooltip]
+~freq~frequency to sync display to. gets automatically set if you patch a note input into this module
+~length~number of samples to capture
+~draw gain~adjust waveform display scale
 
 
 
@@ -541,7 +541,7 @@ vocoder~FFT-based vocoder
 
 
 takerecorder~[abandoned module, possibly broken]
-~start~[no tooltip]
+~start~[todo]
 
 
 
@@ -584,20 +584,20 @@ send~duplicate a signal and send it to a second destination
 
 samplergrid~record input onto pads, and play back the pads. intended to be used with an 64-pad grid controller.
 ~passthrough~should the incoming audio pass through to the output?
-~vol~[no tooltip]
-~clear~[no tooltip]
-~edit~[no tooltip]
-~duplicate~[no tooltip]
-~start~[no tooltip]
-~end~[no tooltip]
+~vol~the output volume
+~clear~when enabled, clears any pressed grid squares
+~edit~enable controls to adjust recorded sample for last pressed grid square
+~duplicate~what enabled, duplicates last pressed sample onto any pressed grid squares
+~start~sample start
+~end~sample end
 
 
 
-samplecapturer~[no tooltip]
-~record~[no tooltip]
-~play~[no tooltip]
-~save~[no tooltip]
-~delete~[no tooltip]
+samplecapturer~[work in progress]record audio to short clips. recording starts when audio passes a threshold.
+~record~should we record?
+~play~play this clip
+~save~save this clip to a file
+~delete~clear this clip
 
 
 
@@ -700,8 +700,8 @@ inverter~multiply a signal by -1. enables some pretty interesting effects when u
 
 
 
-input~[no tooltip]
-~ch~[no tooltip]
+input~get audio from input source, like a microphone
+~ch~which channel (or channels, if you want stereo) to use
 
 
 
@@ -830,18 +830,22 @@ signalgenerator~basic oscillator signal
 
 
 seaofgrain~granular synth, playable with sliders or MPE input
-~volume~[no tooltip]
-~offset~[no tooltip]
-~display length~[no tooltip]
-~keyboard base pitch~[no tooltip]
-~keyboard num pitches~[no tooltip]
-~gain *~[no tooltip]
-~pos *~[no tooltip]
-~overlap *~[no tooltip]
-~speed *~[no tooltip]
-~len ms *~[no tooltip]
-~pos r *~[no tooltip]
-~speed r *~[no tooltip]
+~load~load a sample file
+~volume~output volume
+~offset~where to start view of the sample
+~display length~amount of sample to view
+~keyboard base pitch~midi pitch that represents the start of the sample
+~keyboard num pitches~amount of pitches to assign across the sample
+~gain *~volume of this voice
+~pos *~position of this voice within the sample
+~overlap *~number of overlapping grains
+~speed *~speed of grain playback
+~len ms *~length of each grain in milliseconds
+~pos r *~randomization of grain start point
+~speed r *~randomization of grain speed
+~spacing r*~randomization of time between grains
+~octaves *~should we add octaves and fifths?
+~width *~stereo width of grain placement
 
 
 
@@ -966,7 +970,7 @@ oscillator~polyphonic enveloped oscillator. modulations (with MPE support): modw
 ~syncf~frequency to reset the phase, when "sync" is enabled
 ~vel2vol~how much should the input velocity affect the output volume?
 ~vel2env~how much should the input velocity affect the speed of the volume and filter envelopes?
-~adsr len~[no tooltip]
+~adsr len~view length of ADSR controls
 
 
 
@@ -981,103 +985,103 @@ metronome~beeps to the beat
 
 
 karplusstrong~polyphonic plucked string physical modeling synth
-~vol~[no tooltip]
-~mute~[no tooltip]
-~filter~[no tooltip]
-~feedback~[no tooltip]
-~source type~[no tooltip]
-~x freq~[no tooltip]
-~x att~[no tooltip]
-~x dec~[no tooltip]
-~type~[no tooltip]
-~F~[no tooltip]
-~Q~[no tooltip]
-~G~[no tooltip]
+~vol~output volume
+~invert~should the feedback invert?
+~filter~amount to filter resonance
+~feedback~amount of feedback for resonance
+~source type~audio to use for excitation
+~x freq~frequency of excitation audio
+~x att~fade in time for excitation audio
+~x dec~fade out time for excitation audio
+~type~biquad filter style
+~f~filter cutoff
+~q~filter resonance
+~g~filter gain
 
 
 
 fmsynth~polyphonic fm synthesis
-~adsroscA~[no tooltip]
-~adsroscD~[no tooltip]
-~adsroscS~[no tooltip]
-~adsroscR~[no tooltip]
-~adsrharmA~[no tooltip]
-~adsrharmD~[no tooltip]
-~adsrharmS~[no tooltip]
-~adsrharmR~[no tooltip]
-~adsrmodA~[no tooltip]
-~adsrmodD~[no tooltip]
-~adsrmodS~[no tooltip]
-~adsrmodR~[no tooltip]
-~adsrharm2A~[no tooltip]
-~adsrharm2D~[no tooltip]
-~adsrharm2S~[no tooltip]
-~adsrharm2R~[no tooltip]
-~adsrmod2A~[no tooltip]
-~adsrmod2D~[no tooltip]
-~adsrmod2S~[no tooltip]
-~adsrmod2R~[no tooltip]
-~harmratio~[no tooltip]
-~harmratio2~[no tooltip]
-~tweak~[no tooltip]
-~mod~[no tooltip]
-~tweak2~[no tooltip]
-~mod2~[no tooltip]
-~vol~[no tooltip]
-~phase0~[no tooltip]
-~phase1~[no tooltip]
-~phase2~[no tooltip]
+~adsroscA~
+~adsroscD~
+~adsroscS~
+~adsroscR~
+~adsrharmA~
+~adsrharmD~
+~adsrharmS~
+~adsrharmR~
+~adsrmodA~
+~adsrmodD~
+~adsrmodS~
+~adsrmodR~
+~adsrharm2A~
+~adsrharm2D~
+~adsrharm2S~
+~adsrharm2R~
+~adsrmod2A~
+~adsrmod2D~
+~adsrmod2S~
+~adsrmod2R~
+~harmratio~harmonic ratio of first-order modulator to input pitch
+~harmratio2~harmonic ratio of second-order modulator to input pitch
+~tweak~multiplier to harmonic ratio for first-order modulator
+~mod~amount to modulate first-order modulator
+~tweak2~multiplier to harmonic ratio for second-order modulator
+~mod2~amount to modulate second-order modulator
+~vol~the output volume
+~phase0~phase offset for base oscillator
+~phase1~phase offset for first-order modulator
+~phase2~phase offset for second-order modulator
 
 
 
 drumsynth~oscillator+noise drum synth
-~vol~[no tooltip]
-~edit~[no tooltip]
-~save current~[no tooltip]
-~new kit~[no tooltip]
-~kitname~[no tooltip]
-~vol*~[no tooltip]
-~freq*~[no tooltip]
-~type*~[no tooltip]
-~adsrtone*~[no tooltip]
-~adsrtone*A~[no tooltip]
-~adsrtone*D~[no tooltip]
-~adsrtone*S~[no tooltip]
-~adsrtone*R~[no tooltip]
-~adsrfreq*~[no tooltip]
-~adsrfreq*A~[no tooltip]
-~adsrfreq*D~[no tooltip]
-~adsrfreq*S~[no tooltip]
-~adsrfreq*R~[no tooltip]
-~noise*~[no tooltip]
-~adsrnoise*~[no tooltip]
-~adsrnoise*A~[no tooltip]
-~adsrnoise*D~[no tooltip]
-~adsrnoise*S~[no tooltip]
-~adsrnoise*R~[no tooltip]
+~vol~the output volume
+~edit~display parameters for each hit
+~vol*~oscillator volume
+~freqmax*~oscillator start frequency
+~freqmin*~oscillator end frequency
+~type*~oscillator type
+~cutoffmax*~filter start cutoff frequency
+~cutoffmin*~filter end cutoff frequency
+~q*~filter resonance
+~adsrtone*~
+~adsrtone*A~
+~adsrtone*D~
+~adsrtone*S~
+~adsrtone*R~
+~adsrfreq*~
+~adsrfreq*A~
+~adsrfreq*D~
+~adsrfreq*S~
+~adsrfreq*R~
+~noise*~noise volume
+~adsrnoise*~
+~adsrnoise*A~
+~adsrnoise*D~
+~adsrnoise*S~
+~adsrnoise*R~
 
 
 
 drumplayer~sample player intended for drum playback
-~vol~[no tooltip]
-~speed~[no tooltip]
-~speed rnd~[no tooltip]
-~kit~[no tooltip]
-~edit~[no tooltip]
-~aud~[no tooltip]
-~mono~[no tooltip]
-~shuffle~[no tooltip]
-~quantize~[no tooltip]
-~repeat~[no tooltip]
-~vol *~[no tooltip]
-~speed *~[no tooltip]
-~pan *~[no tooltip]
-~widen *~[no tooltip]
-~single out *~[no tooltip]
-~linkid *~[no tooltip]
-~envelope *~[no tooltip]
-~view ms *~[no tooltip]
-~hitcategory*~[no tooltip]
+~vol~the output volume
+~speed~global sample speed multiplier
+~speed rnd~global sample speed randomization amount
+~edit~show pads for editing
+~aud~scroll to audition samples in the current pad's head category, or a directory last dropped onto a pad
+~mono~force output to mono
+~shuffle~random is samples, speeds, and pans
+~quantize~quantize input to this interval
+~repeat~if quantizing, should held notes repeat at that interval?
+~vol *~volume of sample 
+~speed *~speed of sample
+~pan *~stereo pan position of sample
+~widen *~stereo delay of sample to create width
+~single out *~should the sample have its own individual output?
+~linkid *~if linkid is not -1, silence any other sample with a matching linkid (useful for linking open and closed hats)
+~envelope *~should we apply a volume envelope to the sample?
+~view ms *~envelope view length in milliseconds
+~hitcategory*~folder to choose from, when clicking the "random" button. these folders are found in the data/drums/hits/ directory
 ~envelopedisplay *A~envelope attack
 ~envelopedisplay *D~envelope decay
 ~envelopedisplay *S~envelope sustain
@@ -1091,22 +1095,22 @@ beats~[abandoned module, possibly broken] multi-loop player
 
 
 
-whitekeys~[no tooltip]
+whitekeys~remap the white keys that correspond to the C major scale to instead play the current global scale
 
 
 
 volcabeatscontrol~outputs MIDI data to control varios aspects of the KORG volca beats drum machine
-~clap speed~[no tooltip]
-~clave speed~[no tooltip]
-~agogo speed~[no tooltip]
-~crash speed~[no tooltip]
-~stutter time~[no tooltip]
-~stutter depth~[no tooltip]
-~tom decay~[no tooltip]
-~closed hat decay~[no tooltip]
-~open hat decay~[no tooltip]
-~hat grain~[no tooltip]
-~level *~[no tooltip]
+~clap speed~
+~clave speed~
+~agogo speed~
+~crash speed~
+~stutter time~
+~stutter depth~
+~tom decay~
+~closed hat decay~
+~open hat decay~
+~hat grain~
+~level *~
 
 
 
@@ -1135,24 +1139,24 @@ velocityscaler~scale a note's velocity to be higher or lower
 
 
 
-unstablepressure~[no tooltip]
-~amount~[no tooltip]
-~warble~[no tooltip]
-~noise~[no tooltip]
+unstablepressure~mutate MPE pressure with perlin noise
+~amount~amount of mutation
+~warble~slow-layer mutation rate
+~noise~fast-later mutation rate
 
 
 
-unstablepitch~[no tooltip]
-~amount~[no tooltip]
-~warble~[no tooltip]
-~noise~[no tooltip]
+unstablepitch~mutate MPE pitchbend with perlin noise
+~amount~amount of mutation
+~warble~slow-layer mutation rate
+~noise~fast-later mutation rate
 
 
 
-unstablemodwheel~[no tooltip]
-~amount~[no tooltip]
-~warble~[no tooltip]
-~noise~[no tooltip]
+unstablemodwheel~mutate MPE slide with perlin noise
+~amount~amount of mutation
+~warble~slow-layer mutation rate
+~noise~fast-later mutation rate
 
 
 
@@ -1208,8 +1212,8 @@ portamento~only allows one note to play at a time, and uses pitch bend to glide 
 
 
 
-pitchsetter~[no tooltip]
-~pitch~[no tooltip]
+pitchsetter~set an incoming note to use a specified pitch
+~pitch~the pitch to use
 
 
 
@@ -1251,13 +1255,13 @@ notestrummer~[no tooltip]
 
 
 
-notestream~[no tooltip]
-~reset~[no tooltip]
+notestream~view are stream of notes as they're played
+~reset~reset the pitch range
 
 
 
-noterouter~[no tooltip]
-~route~[no tooltip]
+noterouter~allows you to control where notes are routed to using a UI control. to add destinations to the list, patch them as a target
+~route~the noterouter's destination module
 
 
 
@@ -1293,9 +1297,9 @@ notelatch~[no tooltip]
 
 
 
-notehumanizer~[no tooltip]
-~time~[no tooltip]
-~velocity~[no tooltip]
+notehumanizer~add randomness to timing and velocity
+~time~amount of timing randomness, in milliseconds.
+~velocity~amount of velocity randomness
 
 
 
@@ -1304,8 +1308,8 @@ notehocket~sends notes to a random destinations
 
 
 
-notegate~[no tooltip]
-~open~[no tooltip]
+notegate~allow or disallow notes to pass through
+~open~if notes are allowed to pass
 
 
 
@@ -1314,15 +1318,15 @@ noteflusher~send a note-off for all notes
 
 
 
-notefilter~[no tooltip]
-~C-2 (0)~[no tooltip]
-~C#-2 (1)~[no tooltip]
-~D-2 (2)~[no tooltip]
-~D#-2 (3)~[no tooltip]
-~E-2 (4)~[no tooltip]
-~F-2 (5)~[no tooltip]
-~F#-2 (6)~[no tooltip]
-~G-2 (7)~[no tooltip]
+notefilter~only allow a certain pitches through
+~C-2 (0)~
+~C#-2 (1)~
+~D-2 (2)~
+~D#-2 (3)~
+~E-2 (4)~
+~F-2 (5)~
+~F#-2 (6)~
+~G-2 (7)~
 
 
 
@@ -1330,8 +1334,8 @@ notedisplayer~show input note info
 
 
 
-notedelayer~[no tooltip]
-~delay~[no tooltip]
+notedelayer~delay input notes by a specified amount
+~delay~amount of time to delay, in measures
 
 
 
@@ -1340,9 +1344,9 @@ notechance~randomly allow notes through
 
 
 
-modwheeltovibrato~[no tooltip]
-~vibrato~[no tooltip]
-~vibinterval~[no tooltip]
+modwheeltovibrato~convert note mod wheel input rhythmic pitch bend
+~vibrato~amount of pitch bend
+~vibinterval~rate of vibrato
 
 
 
@@ -1471,7 +1475,7 @@ scale~controls the global scale used by various modules
 
 
 output~route audio in here to send it to an output channel (your speakers or audio interface)
-~ch~[no tooltip]
+~ch~channel (or channels, if you want stereo) to send audio to
 
 
 
@@ -1500,12 +1504,12 @@ butterworth~filter using the butterworth formula
 
 
 
-compressor~[no tooltip]
-~threshold~[no tooltip]
-~ratio~[no tooltip]
-~attack~[no tooltip]
-~release~[no tooltip]
-~output~[no tooltip]
+compressor~try to keep volume at a certain level
+~threshold~threshold where gain should start to be reduced
+~ratio~how much gain reduction to apply when the single passes the threshold
+~attack~speed to apply gain reduction
+~release~speed to remove gain reduction
+~output~makeup gain, to increase volume
 
 
 
@@ -1563,18 +1567,19 @@ gate~only allow signal in when it's above a certain threshold. useful to elimina
 
 
 
-granulator~[no tooltip]
-~overlap~[no tooltip]
-~speed~[no tooltip]
-~len ms~[no tooltip]
-~add~[no tooltip]
-~autocapture~[no tooltip]
-~pos r~[no tooltip]
-~spd r~[no tooltip]
-~spa r~[no tooltip]
-~frz~[no tooltip]
-~g oct~[no tooltip]
-~pos~[no tooltip]
+granulator~granulate live input
+~dry~amount of dry signal to allow through
+~autocapture~freeze input at this interval
+~frz~freeze the current recorded buffer
+~pos~playback position within the buffer
+~overlap~number of overlapping grains
+~speed~speed of grain playback
+~len ms~length of each grain in milliseconds
+~pos r~randomization of grain start point
+~spd r~randomization of grain speed
+~spa r~randomization of time between grains
+~g oct~should we add octaves and fifths?
+~width~stereo width of grain placement
 
 
 
