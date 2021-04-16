@@ -103,7 +103,9 @@ void EQModule::Process(double time)
       }
    }
 
-   if (GetTarget() == nullptr)
+   IAudioReceiver* target = GetTarget();
+
+   if (target == nullptr)
       return;
 
    SyncBuffers();
@@ -112,7 +114,7 @@ void EQModule::Process(double time)
    {
       Clear(gWorkBuffer, GetBuffer()->BufferSize());
 
-      ChannelBuffer* out = GetTarget()->GetBuffer();
+      ChannelBuffer* out = target->GetBuffer();
       gWorkChannelBuffer.SetNumActiveChannels(out->NumActiveChannels());
 
       for (int ch = 0; ch < GetBuffer()->NumActiveChannels(); ++ch)
@@ -147,7 +149,7 @@ void EQModule::Process(double time)
       for (int ch = 0; ch < GetBuffer()->NumActiveChannels(); ++ch)
       {
          float* buffer = GetBuffer()->GetChannel(ch);
-         Add(GetTarget()->GetBuffer()->GetChannel(ch), buffer, GetBuffer()->BufferSize());
+         Add(target->GetBuffer()->GetChannel(ch), buffer, GetBuffer()->BufferSize());
          GetVizBuffer()->WriteChunk(buffer, GetBuffer()->BufferSize(), ch);
       }
    }

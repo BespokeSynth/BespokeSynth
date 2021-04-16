@@ -36,9 +36,11 @@ void Inverter::Process(double time)
    ComputeSliders(0);
    SyncBuffers();
    
-   if (GetTarget())
+   IAudioReceiver* target = GetTarget();
+
+   if (target)
    {
-      ChannelBuffer* out = GetTarget()->GetBuffer();
+      ChannelBuffer* out = target->GetBuffer();
       for (int ch=0; ch<GetBuffer()->NumActiveChannels(); ++ch)
       {
          Mult(GetBuffer()->GetChannel(ch), -1, out->BufferSize());

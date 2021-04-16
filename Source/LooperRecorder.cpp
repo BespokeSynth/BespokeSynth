@@ -145,7 +145,9 @@ void LooperRecorder::Process(double time)
 {
    PROFILER(LooperRecorder);
 
-   if (!mEnabled || GetTarget() == nullptr)
+   IAudioReceiver* target = GetTarget();
+
+   if (!mEnabled || target == nullptr)
       return;
 
    ComputeSliders(0);
@@ -216,7 +218,7 @@ void LooperRecorder::Process(double time)
    {
       mRecordBuffer.WriteChunk(mWriteBuffer.GetChannel(ch), bufferSize, ch);
    
-      Add(GetTarget()->GetBuffer()->GetChannel(ch), GetBuffer()->GetChannel(ch), bufferSize);
+      Add(target->GetBuffer()->GetChannel(ch), GetBuffer()->GetChannel(ch), bufferSize);
    
       GetVizBuffer()->WriteChunk(GetBuffer()->GetChannel(ch),bufferSize, ch);
    }

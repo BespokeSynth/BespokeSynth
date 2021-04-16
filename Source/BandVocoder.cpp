@@ -90,7 +90,8 @@ void BandVocoder::Process(double time)
 {
    PROFILER(BandVocoder);
 
-   if (GetTarget() == nullptr || !mEnabled)
+   IAudioReceiver* target = GetTarget();
+   if (target == nullptr || !mEnabled)
       return;
    
    ComputeSliders(0);
@@ -139,10 +140,10 @@ void BandVocoder::Process(double time)
    Mult(GetBuffer()->GetChannel(0), (1-mDryWet)/inputPreampSq * volSq, bufferSize);
    Mult(mOutBuffer, mDryWet * volSq, bufferSize);
    
-   Add(GetTarget()->GetBuffer()->GetChannel(0), GetBuffer()->GetChannel(0), bufferSize);
-   Add(GetTarget()->GetBuffer()->GetChannel(0), mOutBuffer, bufferSize);
+   Add(target->GetBuffer()->GetChannel(0), GetBuffer()->GetChannel(0), bufferSize);
+   Add(target->GetBuffer()->GetChannel(0), mOutBuffer, bufferSize);
    
-   GetVizBuffer()->WriteChunk(GetTarget()->GetBuffer()->GetChannel(0),bufferSize,0);
+   GetVizBuffer()->WriteChunk(target->GetBuffer()->GetChannel(0),bufferSize,0);
    
    GetBuffer()->Reset();
 }

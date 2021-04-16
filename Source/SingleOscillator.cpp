@@ -148,14 +148,16 @@ void SingleOscillator::Process(double time)
 {
    PROFILER(SingleOscillator);
 
-   if (!mEnabled || GetTarget() == nullptr)
+   IAudioReceiver* target = GetTarget();
+
+   if (!mEnabled || target == nullptr)
       return;
    
    mNoteInputBuffer.Process(time);
    
    ComputeSliders(0);
    
-   int bufferSize = GetTarget()->GetBuffer()->BufferSize();
+   int bufferSize = target->GetBuffer()->BufferSize();
    assert(bufferSize == gBufferSize);
    
    mWriteBuffer.Clear();
@@ -165,7 +167,7 @@ void SingleOscillator::Process(double time)
    for (int ch=0; ch<mWriteBuffer.NumActiveChannels(); ++ch)
    {
       GetVizBuffer()->WriteChunk(mWriteBuffer.GetChannel(ch),mWriteBuffer.BufferSize(), ch);
-      Add(GetTarget()->GetBuffer()->GetChannel(ch), mWriteBuffer.GetChannel(ch), gBufferSize);
+      Add(target->GetBuffer()->GetChannel(ch), mWriteBuffer.GetChannel(ch), gBufferSize);
    }
 }
 

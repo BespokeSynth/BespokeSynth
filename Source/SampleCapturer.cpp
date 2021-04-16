@@ -48,10 +48,11 @@ void SampleCapturer::Process(double time)
 
    SyncBuffers();
    int bufferSize = GetBuffer()->BufferSize();
+   IAudioReceiver* target = GetTarget();
 
-   if (GetTarget())
+   if (target)
    {
-      ChannelBuffer* out = GetTarget()->GetBuffer();
+      ChannelBuffer* out = target->GetBuffer();
       gWorkChannelBuffer.SetNumActiveChannels(GetBuffer()->NumActiveChannels());
       for (int ch = 0; ch < GetBuffer()->NumActiveChannels(); ++ch)
       {

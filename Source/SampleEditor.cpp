@@ -95,13 +95,15 @@ void SampleEditor::Process(double time)
 {
    PROFILER(SampleEditor);
 
-   if (!mEnabled || GetTarget() == nullptr || mSample == nullptr)
+   IAudioReceiver* target = GetTarget();
+
+   if (!mEnabled || target == nullptr || mSample == nullptr)
       return;
 
    ComputeSliders(0);
    SyncOutputBuffer(mSample->NumChannels());
    
-   int bufferSize = GetTarget()->GetBuffer()->BufferSize();
+   int bufferSize = target->GetBuffer()->BufferSize();
    assert(bufferSize == gBufferSize);
 
    float volSq = mVolume * mVolume * .25f;
@@ -128,7 +130,7 @@ void SampleEditor::Process(double time)
          }
          
          Mult(gWorkChannelBuffer.GetChannel(ch), volSq, bufferSize);
-         Add(GetTarget()->GetBuffer()->GetChannel(ch), gWorkChannelBuffer.GetChannel(ch), bufferSize);
+         Add(target->GetBuffer()->GetChannel(ch), gWorkChannelBuffer.GetChannel(ch), bufferSize);
          GetVizBuffer()->WriteChunk(gWorkChannelBuffer.GetChannel(ch), bufferSize, ch);
       }
    }

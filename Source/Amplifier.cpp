@@ -37,9 +37,10 @@ void Amplifier::Process(double time)
    SyncBuffers();
    int bufferSize = GetBuffer()->BufferSize();
    
-   if (GetTarget())
+   IAudioReceiver* target = GetTarget();
+   if (target)
    {
-      ChannelBuffer* out = GetTarget()->GetBuffer();
+      ChannelBuffer* out = target->GetBuffer();
       for (int ch=0; ch<GetBuffer()->NumActiveChannels(); ++ch)
       {
          for (int i=0; i<bufferSize; ++i)

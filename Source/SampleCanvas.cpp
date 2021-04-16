@@ -73,14 +73,16 @@ void SampleCanvas::Process(double time)
 {
    PROFILER(SampleCanvas);
    
-   if (!mEnabled || GetTarget() == nullptr)
+   IAudioReceiver* target = GetTarget();
+
+   if (!mEnabled || target == nullptr)
       return;
    
    float canvasPos = GetCurPos(time);
    
    mCanvas->SetCursorPos(canvasPos);
    
-   int bufferSize = GetTarget()->GetBuffer()->BufferSize();
+   int bufferSize = target->GetBuffer()->BufferSize();
    assert(bufferSize == gBufferSize);
    
    gWorkChannelBuffer.Clear();
@@ -106,7 +108,7 @@ void SampleCanvas::Process(double time)
          
          if (sample >= 0 && sample < clip->LengthInSamples())
          {
-            for (int ch = 0; ch < GetTarget()->GetBuffer()->NumActiveChannels(); ++ch)
+            for (int ch = 0; ch < target->GetBuffer()->NumActiveChannels(); ++ch)
             {
                int sampleChannel = MAX(ch, clip->NumChannels() - 1);
                gWorkChannelBuffer.GetChannel(ch)[i] += GetInterpolatedSample(sample, clip->Data()->GetChannel(sampleChannel), clip->LengthInSamples());
@@ -115,9 +117,9 @@ void SampleCanvas::Process(double time)
       }
    }
    
-   for (int ch = 0; ch < GetTarget()->GetBuffer()->NumActiveChannels(); ++ch)
+   for (int ch = 0; ch < target->GetBuffer()->NumActiveChannels(); ++ch)
    {
-      ChannelBuffer* out = GetTarget(0)->GetBuffer();
+      ChannelBuffer* out = GetTarget()->GetBuffer();
       Add(out->GetChannel(ch), gWorkChannelBuffer.GetChannel(ch), gBufferSize);
       GetVizBuffer()->WriteChunk(gWorkChannelBuffer.GetChannel(ch), gBufferSize, ch);
    }

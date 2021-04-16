@@ -69,7 +69,9 @@ void Rewriter::Process(double time)
 {
    PROFILER(Rewriter);
 
-   if (GetTarget() == nullptr)
+   IAudioReceiver* target = GetTarget();
+
+   if (target == nullptr)
       return;
    
    SyncBuffers();
@@ -81,7 +83,7 @@ void Rewriter::Process(double time)
    {
       mRecordBuffer.WriteChunk(GetBuffer()->GetChannel(ch), bufferSize, ch);
 
-      Add(GetTarget()->GetBuffer()->GetChannel(ch), GetBuffer()->GetChannel(ch), bufferSize);
+      Add(target->GetBuffer()->GetChannel(ch), GetBuffer()->GetChannel(ch), bufferSize);
 
       GetVizBuffer()->WriteChunk(GetBuffer()->GetChannel(ch),bufferSize, ch);
    }

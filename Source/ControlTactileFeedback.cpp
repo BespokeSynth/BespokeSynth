@@ -35,11 +35,12 @@ void ControlTactileFeedback::Process(double time)
 {
    PROFILER(ControlTactileFeedback);
 
-   if (!mEnabled || GetTarget() == nullptr)
+   IAudioReceiver* target = GetTarget();
+   if (!mEnabled || target == nullptr)
       return;
    
-   int bufferSize = GetTarget()->GetBuffer()->BufferSize();
-   float* out = GetTarget()->GetBuffer()->GetChannel(0);
+   int bufferSize = target->GetBuffer()->BufferSize();
+   float* out = target->GetBuffer()->GetChannel(0);
    assert(bufferSize == gBufferSize);
    
    for (int i=0; i<bufferSize; ++i)

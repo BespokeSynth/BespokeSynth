@@ -205,7 +205,7 @@ void DrumPlayer::SetUpNewDrumPlayer()
       }
       mDrumHits[i].LoadRandomSample();
 
-      if (i == 2 || i == 3 || i == 6)
+      if (i == 2 || i == 3)
          mDrumHits[i].mLinkId = 0;
    }
 
@@ -305,8 +305,9 @@ void DrumPlayer::Process(double time)
                if (individualOutputIndex != -1)
                {
                   int targetIndex = individualOutputIndex + 1;
-                  if (GetTarget(targetIndex))
-                     Add(GetTarget(targetIndex)->GetBuffer()->GetChannel(ch), gWorkChannelBuffer.GetChannel(ch), bufferSize);
+                  IAudioReceiver* targetOut = GetTarget(targetIndex);
+                  if (targetOut)
+                     Add(targetOut->GetBuffer()->GetChannel(ch), gWorkChannelBuffer.GetChannel(ch), bufferSize);
                   mIndividualOutputs[individualOutputIndex]->mVizBuffer->WriteChunk(gWorkChannelBuffer.GetChannel(ch), bufferSize, ch);
                }
                else
@@ -328,12 +329,13 @@ void DrumPlayer::Process(double time)
       mLoadSamplesAudioMutex.unlock();
    }
    
+   IAudioReceiver* target = GetTarget();
    for (int ch=0; ch<numChannels; ++ch)
    {
       GetVizBuffer()->WriteChunk(mOutputBuffer.GetChannel(ch), bufferSize, ch);
    
-      if (GetTarget())
-         Add(GetTarget()->GetBuffer()->GetChannel(ch), mOutputBuffer.GetChannel(ch), bufferSize);
+      if (target)
+         Add(target->GetBuffer()->GetChannel(ch), mOutputBuffer.GetChannel(ch), bufferSize);
    }
 }
 

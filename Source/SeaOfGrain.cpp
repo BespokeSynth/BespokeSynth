@@ -99,13 +99,15 @@ void SeaOfGrain::Process(double time)
 {
    PROFILER(SeaOfGrain);
    
-   if (!mEnabled || GetTarget() == nullptr || mSample == nullptr || mLoading)
+   IAudioReceiver* target = GetTarget();
+
+   if (!mEnabled || target == nullptr || mSample == nullptr || mLoading)
       return;
    
    ComputeSliders(0);
    
-   int bufferSize = GetTarget()->GetBuffer()->BufferSize();
-   float* out = GetTarget()->GetBuffer()->GetChannel(0);
+   int bufferSize = target->GetBuffer()->BufferSize();
+   float* out = target->GetBuffer()->GetChannel(0);
    assert(bufferSize == gBufferSize);
    
    Clear(mWriteBuffer, bufferSize);

@@ -52,11 +52,12 @@ void FeedbackModule::Process(double time)
    SyncBuffers();
    
    int bufferSize = GetBuffer()->BufferSize();
-   
+   IAudioReceiver* target = GetTarget();
+
    for (int ch=0; ch<GetBuffer()->NumActiveChannels(); ++ch)
    {
-      if (GetTarget())
-         Add(GetTarget()->GetBuffer()->GetChannel(ch), GetBuffer()->GetChannel(ch), bufferSize);
+      if (target)
+         Add(target->GetBuffer()->GetChannel(ch), GetBuffer()->GetChannel(ch), bufferSize);
    
       GetVizBuffer()->WriteChunk(GetBuffer()->GetChannel(ch),bufferSize,ch);
    }

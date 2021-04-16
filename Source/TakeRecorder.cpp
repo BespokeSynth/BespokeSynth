@@ -40,9 +40,10 @@ void TakeRecorder::Process(double time)
    SyncBuffers();
    
    int bufferSize = GetBuffer()->BufferSize();
-   if (GetTarget())
+   IAudioReceiver* target = GetTarget();
+   if (target)
    {
-      Add(GetTarget()->GetBuffer()->GetChannel(0), GetBuffer()->GetChannel(0), bufferSize);
+      Add(target->GetBuffer()->GetChannel(0), GetBuffer()->GetChannel(0), bufferSize);
    }
    
    GetVizBuffer()->WriteChunk(GetBuffer()->GetChannel(0),bufferSize, 0);

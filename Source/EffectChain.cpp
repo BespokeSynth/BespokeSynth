@@ -100,7 +100,9 @@ void EffectChain::AddEffect(string type, bool onTheFly /*=false*/)
 
 void EffectChain::Process(double time)
 {
-   if (GetTarget() == nullptr)
+   IAudioReceiver* target = GetTarget();
+
+   if (target == nullptr)
       return;
 
    ComputeSliders(0);
@@ -145,7 +147,7 @@ void EffectChain::Process(double time)
       float volSq = mVolume * mVolume;
       for (int i=0; i<bufferSize; ++i)
          buffer[i] *= volSq;
-      Add(GetTarget()->GetBuffer()->GetChannel(ch), buffer, bufferSize);
+      Add(target->GetBuffer()->GetChannel(ch), buffer, bufferSize);
       GetVizBuffer()->WriteChunk(buffer, bufferSize, ch);
    }
    

@@ -46,9 +46,10 @@ void Splitter::Process(double time)
    if (!mEnabled)
       return;
    
-   if (GetTarget(0))
+   IAudioReceiver* target0 = GetTarget(0);
+   if (target0)
    {
-      ChannelBuffer* out = GetTarget(0)->GetBuffer();
+      ChannelBuffer* out = target0->GetBuffer();
       Add(out->GetChannel(0), GetBuffer()->GetChannel(0), GetBuffer()->BufferSize());
       GetVizBuffer()->WriteChunk(GetBuffer()->GetChannel(0), GetBuffer()->BufferSize(), 0);
    }
@@ -56,9 +57,10 @@ void Splitter::Process(double time)
    int secondChannel = 1;
    if (GetBuffer()->NumActiveChannels() == 1)
       secondChannel = 0;
-   if (GetTarget(1))
+   IAudioReceiver* target1 = GetTarget(1);
+   if (target1)
    {
-      ChannelBuffer* out2 = GetTarget(1)->GetBuffer();
+      ChannelBuffer* out2 = target1->GetBuffer();
       Add(out2->GetChannel(0), GetBuffer()->GetChannel(secondChannel), GetBuffer()->BufferSize());
       mVizBuffer2.WriteChunk(GetBuffer()->GetChannel(secondChannel), GetBuffer()->BufferSize(), 0);
    }

@@ -373,6 +373,8 @@ void VSTPlugin::Process(double time)
    juce::AudioBuffer<float> buffer(inputChannels, bufferSize);
    for (int i=0; i<inputChannels && i < kSafetyMaxChannels; ++i)
       buffer.copyFrom(i, 0, GetBuffer()->GetChannel(MIN(i,GetBuffer()->NumActiveChannels()-1)), GetBuffer()->BufferSize());
+
+   IAudioReceiver* target = GetTarget();
    
    if (mEnabled && mPlugin != nullptr)
    {
@@ -434,8 +436,8 @@ void VSTPlugin::Process(double time)
          {
             GetBuffer()->GetChannel(outputChannel)[sampleIndex] += buffer.getSample(ch, sampleIndex) * mVol;
          }
-         if (GetTarget())
-            Add(GetTarget()->GetBuffer()->GetChannel(outputChannel), GetBuffer()->GetChannel(outputChannel), bufferSize);
+         if (target)
+            Add(target->GetBuffer()->GetChannel(outputChannel), GetBuffer()->GetChannel(outputChannel), bufferSize);
          GetVizBuffer()->WriteChunk(GetBuffer()->GetChannel(outputChannel), bufferSize, outputChannel);
       }
    }
@@ -444,8 +446,8 @@ void VSTPlugin::Process(double time)
       //bypass
       for (int ch=0; ch<GetBuffer()->NumActiveChannels(); ++ch)
       {
-         if (GetTarget())
-            Add(GetTarget()->GetBuffer()->GetChannel(ch), GetBuffer()->GetChannel(ch), GetBuffer()->BufferSize());
+         if (target)
+            Add(target->GetBuffer()->GetChannel(ch), GetBuffer()->GetChannel(ch), GetBuffer()->BufferSize());
          GetVizBuffer()->WriteChunk(GetBuffer()->GetChannel(ch),GetBuffer()->BufferSize(), ch);
       }
    }

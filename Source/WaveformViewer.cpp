@@ -74,9 +74,10 @@ void WaveformViewer::Process(double time)
    int lengthSamples = MIN(mLengthSamples, BUFFER_VIZ_SIZE);
    
    int bufferSize = GetBuffer()->BufferSize();
-   if (GetTarget())
+   IAudioReceiver* target = GetTarget();
+   if (target)
    {
-      ChannelBuffer* out = GetTarget()->GetBuffer();
+      ChannelBuffer* out = target->GetBuffer();
       for (int ch=0; ch<GetBuffer()->NumActiveChannels(); ++ch)
       {
          if (ch == 0)

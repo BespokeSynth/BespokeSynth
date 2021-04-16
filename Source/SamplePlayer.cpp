@@ -244,7 +244,9 @@ void SamplePlayer::Process(double time)
 {
    PROFILER(SamplePlayer);
    
-   if (!mEnabled || GetTarget() == nullptr || mSample == nullptr)
+   IAudioReceiver* target = GetTarget();
+
+   if (!mEnabled || target == nullptr || mSample == nullptr)
       return;
    
    mNoteInputBuffer.Process(time);
@@ -252,7 +254,7 @@ void SamplePlayer::Process(double time)
    ComputeSliders(0);
    SyncOutputBuffer(mSample->NumChannels());
    
-   int bufferSize = GetTarget()->GetBuffer()->BufferSize();
+   int bufferSize = target->GetBuffer()->BufferSize();
    assert(bufferSize == gBufferSize);
    
    float volSq = mVolume * mVolume;
@@ -298,7 +300,7 @@ void SamplePlayer::Process(double time)
             mSwitchAndRampVal.GetChannel(ch)[0] = 0;
       }
 
-      Add(GetTarget()->GetBuffer()->GetChannel(ch), gWorkChannelBuffer.GetChannel(ch), bufferSize);
+      Add(target->GetBuffer()->GetChannel(ch), gWorkChannelBuffer.GetChannel(ch), bufferSize);
       GetVizBuffer()->WriteChunk(gWorkChannelBuffer.GetChannel(ch), bufferSize, ch);
       mLastOutputSample.GetChannel(ch)[0] = gWorkChannelBuffer.GetChannel(ch)[bufferSize-1];
    }

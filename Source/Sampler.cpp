@@ -81,7 +81,9 @@ void Sampler::Process(double time)
 {
    PROFILER(Sampler);
 
-   if (!mEnabled || GetTarget() == nullptr)
+   IAudioReceiver* target = GetTarget();
+
+   if (!mEnabled || target == nullptr)
       return;
    
    mNoteInputBuffer.Process(time);
@@ -123,7 +125,7 @@ void Sampler::Process(double time)
    for (int ch=0; ch<mWriteBuffer.NumActiveChannels(); ++ch)
    {
       GetVizBuffer()->WriteChunk(mWriteBuffer.GetChannel(ch),mWriteBuffer.BufferSize(), ch);
-      Add(GetTarget()->GetBuffer()->GetChannel(ch), mWriteBuffer.GetChannel(ch), gBufferSize);
+      Add(target->GetBuffer()->GetChannel(ch), mWriteBuffer.GetChannel(ch), gBufferSize);
    }
    
    GetBuffer()->Reset();

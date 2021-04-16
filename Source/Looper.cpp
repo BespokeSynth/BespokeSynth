@@ -250,7 +250,9 @@ void Looper::Process(double time)
 {
    PROFILER(Looper);
 
-   if (!mEnabled || GetTarget() == nullptr)
+   IAudioReceiver* target = GetTarget();
+
+   if (!mEnabled || target == nullptr)
       return;
 
    ComputeSliders(0);
@@ -393,8 +395,8 @@ void Looper::Process(double time)
    
    for (int ch=0; ch<mBuffer->NumActiveChannels(); ++ch)
    {
-      Add(GetTarget()->GetBuffer()->GetChannel(ch), GetBuffer()->GetChannel(ch), bufferSize);
-      Add(GetTarget()->GetBuffer()->GetChannel(ch), mWorkBuffer.GetChannel(ch), bufferSize);
+      Add(target->GetBuffer()->GetChannel(ch), GetBuffer()->GetChannel(ch), bufferSize);
+      Add(target->GetBuffer()->GetChannel(ch), mWorkBuffer.GetChannel(ch), bufferSize);
    }
    
    GetBuffer()->Reset();

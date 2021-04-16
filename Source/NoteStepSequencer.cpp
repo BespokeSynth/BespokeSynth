@@ -853,8 +853,8 @@ void NoteStepSequencer::LoadLayout(const ofxJSONElement& moduleInfo)
    mModuleSaveData.LoadString("controller", moduleInfo, "", FillDropdown<MidiController*>);
    mModuleSaveData.LoadInt("gridwidth", moduleInfo, 210, 210, 2000, true);
    mModuleSaveData.LoadInt("gridheight", moduleInfo, 120, 80, 2000, true);
-   mModuleSaveData.LoadInt("gridrows", moduleInfo, 15, 1, 127);
-   mModuleSaveData.LoadInt("gridsteps", moduleInfo, 8, 1, NSS_MAX_STEPS);
+   mModuleSaveData.LoadInt("gridrows", moduleInfo, 15, 1, 127, K(isTextField));
+   mModuleSaveData.LoadInt("gridsteps", moduleInfo, 8, 1, NSS_MAX_STEPS, K(isTextField));
    mModuleSaveData.LoadBool("stepcontrols", moduleInfo, false);
 
    SetUpFromSaveData();
@@ -868,6 +868,7 @@ void NoteStepSequencer::SetUpFromSaveData()
    mNoteRange = mModuleSaveData.GetInt("gridrows");
    mShowStepControls = mModuleSaveData.GetBool("stepcontrols");
    UpdateVelocityGridPos();
+   SyncGridToSeq();
 }
 
 namespace

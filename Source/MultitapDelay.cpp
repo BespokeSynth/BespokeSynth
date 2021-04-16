@@ -62,7 +62,9 @@ void MultitapDelay::Process(double time)
 {
    PROFILER(MultitapDelay);
    
-   if (!mEnabled || GetTarget() == nullptr)
+   IAudioReceiver* target = GetTarget();
+
+   if (!mEnabled || target == nullptr)
       return;
    
    SyncBuffers();
@@ -71,7 +73,7 @@ void MultitapDelay::Process(double time)
    for (int t=0; t<mNumTaps; ++t)
       mTaps[t].mTapBuffer.SetNumActiveChannels(mWriteBuffer.NumActiveChannels());
    
-   int bufferSize = GetTarget()->GetBuffer()->BufferSize();
+   int bufferSize = target->GetBuffer()->BufferSize();
    assert(bufferSize == gBufferSize);
    
    mWriteBuffer.Clear();
@@ -98,7 +100,7 @@ void MultitapDelay::Process(double time)
 
    for (int ch=0; ch<GetBuffer()->NumActiveChannels(); ++ch)
    {
-      Add(GetTarget()->GetBuffer()->GetChannel(ch), mWriteBuffer.GetChannel(ch), bufferSize);
+      Add(target->GetBuffer()->GetChannel(ch), mWriteBuffer.GetChannel(ch), bufferSize);
       
       GetVizBuffer()->WriteChunk(mWriteBuffer.GetChannel(ch),bufferSize, ch);
    }

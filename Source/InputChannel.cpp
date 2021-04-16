@@ -49,6 +49,8 @@ void InputChannel::Process(double time)
       numChannels = 2;
 
    SyncBuffers(numChannels);
+
+   IAudioReceiver* target = GetTarget();
    
    if (mChannelSelectionIndex < mStereoSelectionOffset)  //mono
    {
@@ -57,8 +59,8 @@ void InputChannel::Process(double time)
       if (channel >= 0 && channel < TheSynth->GetNumInputChannels())
          buffer = TheSynth->GetInputBuffer(channel);
 
-      if (GetTarget())
-         Add(GetTarget()->GetBuffer()->GetChannel(0), buffer, gBufferSize);
+      if (target)
+         Add(target->GetBuffer()->GetChannel(0), buffer, gBufferSize);
 
       GetVizBuffer()->WriteChunk(buffer, gBufferSize, 0);
    }
@@ -74,10 +76,10 @@ void InputChannel::Process(double time)
       if (channel2 >= 0 && channel2 < TheSynth->GetNumInputChannels())
          buffer2 = TheSynth->GetInputBuffer(channel2);
 
-      if (GetTarget())
+      if (target)
       {
-         Add(GetTarget()->GetBuffer()->GetChannel(0), buffer1, gBufferSize);
-         Add(GetTarget()->GetBuffer()->GetChannel(1), buffer2, gBufferSize);
+         Add(target->GetBuffer()->GetChannel(0), buffer1, gBufferSize);
+         Add(target->GetBuffer()->GetChannel(1), buffer2, gBufferSize);
       }
 
       GetVizBuffer()->WriteChunk(buffer1, gBufferSize, 0);

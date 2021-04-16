@@ -42,7 +42,8 @@ void PitchChorus::Process(double time)
    SyncBuffers();
    
    int bufferSize = GetBuffer()->BufferSize();
-   if (GetTarget())
+   IAudioReceiver* target = GetTarget();
+   if (target)
    {
       Clear(mOutputBuffer, gBufferSize);
       for (int i=0; i<kNumShifters; ++i)
@@ -62,7 +63,7 @@ void PitchChorus::Process(double time)
       
       if (mPassthrough)
          Add(mOutputBuffer, GetBuffer()->GetChannel(0), bufferSize);
-      Add(GetTarget()->GetBuffer()->GetChannel(0), mOutputBuffer, bufferSize);
+      Add(target->GetBuffer()->GetChannel(0), mOutputBuffer, bufferSize);
    }
    
    GetVizBuffer()->WriteChunk(mOutputBuffer,bufferSize, 0);
