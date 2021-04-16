@@ -259,11 +259,45 @@ void SampleCanvas::DropdownUpdated(DropdownList* list, int oldVal)
 void SampleCanvas::LoadLayout(const ofxJSONElement& moduleInfo)
 {
    mModuleSaveData.LoadString("target", moduleInfo);
-   
+   mModuleSaveData.LoadInt("rows", moduleInfo, 4, 1, 30, K(isTextField));
+
    SetUpFromSaveData();
 }
 
 void SampleCanvas::SetUpFromSaveData()
 {
    SetTarget(TheSynth->FindModule(mModuleSaveData.GetString("target")));
+   mCanvas->SetNumRows(mModuleSaveData.GetInt("rows"));
+}
+
+namespace
+{
+   const int kSaveStateRev = 1;
+}
+
+void SampleCanvas::SaveState(FileStreamOut& out)
+{
+   IDrawableModule::SaveState(out);
+
+   out << kSaveStateRev;
+
+   out << mCanvas->GetWidth();
+   out << mCanvas->GetHeight();
+}
+
+void SampleCanvas::LoadState(FileStreamIn& in)
+{
+   IDrawableModule::LoadState(in);
+
+   if (!ModuleContainer::DoesModuleHaveMoreSaveData(in))
+      return;  //this was saved before we added versioning, bail out
+
+   int rev;
+   in >> rev;
+   LoadStateValidate(rev <= kSaveStateRev);
+
+   float w, h;
+   in >> w;
+   in >> h;
+   mCanvas->SetDimensions(w, h);
 }
