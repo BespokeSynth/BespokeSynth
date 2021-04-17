@@ -279,6 +279,48 @@ void TextEntry::OnKeyPressed(int key, bool isRepeat)
       else if (mCaretPosition < strlen(mString))
          ++mCaretPosition;
    }
+   else if (key == OF_KEY_UP)
+   {
+      if (mType == kTextEntry_Float)
+      {
+         if (*mVarFloat + 1 <= mFloatMax)
+         {
+            *mVarFloat += 1;
+            UpdateDisplayString();
+            AcceptEntry(false);
+         }
+      }
+      if (mType == kTextEntry_Int)
+      {
+         if (*mVarInt + 1 <= mIntMax)
+         {
+            *mVarInt += 1;
+            UpdateDisplayString();
+            AcceptEntry(false);
+         }
+      }
+   }
+   else if (key == OF_KEY_DOWN)
+   {
+      if (mType == kTextEntry_Float)
+      {
+         if (*mVarFloat - 1 >= mFloatMin)
+         {
+            *mVarFloat -= 1;
+            UpdateDisplayString();
+            AcceptEntry(false);
+         }
+      }
+      if (mType == kTextEntry_Int)
+      {
+         if (*mVarInt - 1 >= mIntMin)
+         {
+            *mVarInt -= 1;
+            UpdateDisplayString();
+            AcceptEntry(false);
+         }
+      }
+   }
    else if (toupper(key) == 'V' && GetKeyModifiers() == kModifier_Command)
    {
       juce::String clipboard = SystemClipboard::getTextFromClipboard();
