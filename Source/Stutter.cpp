@@ -300,11 +300,15 @@ void Stutter::CheckboxUpdated(Checkbox* checkbox)
          mStutterStack.clear();
          mMutex.unlock();
          StopStutter(gTime + gBufferSizeMs);
-         TheTransport->UpdateListener(this, kInterval_16n);
+         TransportListenerInfo* transportListenerInfo = TheTransport->GetListenerInfo(this);
+         if (transportListenerInfo != nullptr)
+            transportListenerInfo->mInterval = kInterval_16n;
       }
       else
       {
-         TheTransport->UpdateListener(this, kInterval_8n);
+         TransportListenerInfo* transportListenerInfo = TheTransport->GetListenerInfo(this);
+         if (transportListenerInfo != nullptr)
+            transportListenerInfo->mInterval = kInterval_8n;
       }
    }
 }

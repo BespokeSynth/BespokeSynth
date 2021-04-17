@@ -139,7 +139,11 @@ void NoteQuantizer::OnPulse(double time, float velocity, int flags)
 void NoteQuantizer::DropdownUpdated(DropdownList* list, int oldVal)
 {
    if (list == mQuantizeIntervalSelector)
-      TheTransport->UpdateListener(this, mQuantizeInterval);
+   {
+      TransportListenerInfo* transportListenerInfo = TheTransport->GetListenerInfo(this);
+      if (transportListenerInfo != nullptr)
+         transportListenerInfo->mInterval = mQuantizeInterval;
+   }
 }
 
 void NoteQuantizer::LoadLayout(const ofxJSONElement& moduleInfo)

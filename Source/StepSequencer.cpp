@@ -43,8 +43,10 @@ StepSequencer::StepSequencer()
 , mShiftLeftButton(nullptr)
 , mShiftRightButton(nullptr)
 , mIsSetUp(false)
+, mNoteInputMode(NoteInputMode::PlayStepIndex)
+, mHasExternalPulseSource(false)
 {
-   TheTransport->AddListener(this, mStepInterval, OffsetInfo(0, true), true);
+   mTransportListenerInfo = TheTransport->AddListener(this, mStepInterval, OffsetInfo(0, true), true);
    mFlusher.SetInterval(mStepInterval);
    
    mMetaStepMasks = new uint32[META_STEP_MAX * NUM_STEPSEQ_ROWS];
@@ -56,13 +58,13 @@ void StepSequencer::CreateUIControls()
 {
    IDrawableModule::CreateUIControls();
    mGrid = new UIGrid(40,45,180,150,16,NUM_STEPSEQ_ROWS, this);
-   mStrengthSlider = new FloatSlider(this,"str",75,22,50,15,&mStrength,0,1,2);
-   mUseStrengthSliderCheckbox = new Checkbox(this,"use str",128,22,&mUseStrengthSlider);
-   mNumMeasuresSlider = new IntSlider(this, "measures", 145, 22, 80, 15, &mNumMeasures, 1, 4);
+   mStrengthSlider = new FloatSlider(this,"str",87,22,50,15,&mStrength,0,1,2);
+   mUseStrengthSliderCheckbox = new Checkbox(this,"use str",139,22,&mUseStrengthSlider);
+   mNumMeasuresSlider = new IntSlider(this, "measures", 5, 22, 80, 15, &mNumMeasures, 1, 4);
    mPresetDropdown = new DropdownList(this,"preset",5,4,&mPreset);
    mGridYOffDropdown = new DropdownList(this,"yoff",288,4,&mGridYOff);
    mAdjustOffsetsCheckbox = new Checkbox(this,"offsets",175,4,&mAdjustOffsets);
-   mRepeatRateDropdown = new DropdownList(this,"repeat",5,22,(int*)(&mRepeatRate));
+   mRepeatRateDropdown = new DropdownList(this,"repeat",155,22,(int*)(&mRepeatRate));
    mStepIntervalDropdown = new DropdownList(this,"step",133,4,(int*)(&mStepInterval));
    mCurrentColumnSlider = new IntSlider(this,"column",HIDDEN_UICONTROL,HIDDEN_UICONTROL,100,15,&mCurrentColumn,0,15);
    mShiftLeftButton = new ClickButton(this,"<",80,4);
@@ -405,6 +407,9 @@ void StepSequencer::DrawModule()
       return;
 
    mGridYOffDropdown->SetShowing(mGridController->IsConnected());
+   mAdjustOffsetsCheckbox->SetShowing(!mHasExternalPulseSource);
+   mCurrentColumnSlider->SetExtents(0, GetNumSteps(mStepInterval));
+   mRepeatRateDropdown->SetShowing(mNoteInputMode == NoteInputMode::RepeatHeld);
    
    mGrid->Draw();
    mStrengthSlider->Draw();
@@ -618,10 +623,16 @@ int StepSequencer::GetStepNum(double time)
    int measure = TheTransport->GetMeasure(time) % mNumMeasures;
    int stepsPerMeasure = GetNumSteps(mStepInterval);
 
-   return TheTransport->GetQuantized(time, mStepInterval) % stepsPerMeasure + measure * stepsPerMeasure / mNumMeasures;
+   return TheTransport->GetQuantized(time, mTransportListenerInfo) % stepsPerMeasure + measure * stepsPerMeasure / mNumMeasures;
 }
 
 void StepSequencer::OnTimeEvent(double time)
+{
+   if (!mHasExternalPulseSource)
+      Step(time, 1, 0);
+}
+
+void StepSequencer::Step(double time, float velocity, int pulseFlags)
 {
    if (!mIsSetUp)
       return;
@@ -633,11 +644,41 @@ void StepSequencer::OnTimeEvent(double time)
       UpdateLights();
       return;
    }
+
+   int direction = 1;
+   if (pulseFlags & kPulseFlag_Backward)
+      direction = -1;
+   if (pulseFlags & kPulseFlag_Repeat)
+      direction = 0;
+
+   mCurrentColumn = (mCurrentColumn + direction + GetNumSteps(mStepInterval)) % GetNumSteps(mStepInterval);
+
+   if (pulseFlags & kPulseFlag_Reset)
+      mCurrentColumn = 0;
+   else if (pulseFlags & kPulseFlag_Random)
+      mCurrentColumn = rand() % GetNumSteps(mStepInterval);
+
+   if (!mHasExternalPulseSource || (pulseFlags & kPulseFlag_SyncToTransport))
+      mCurrentColumn = GetStepNum(time);
+
+   if (pulseFlags & kPulseFlag_Align)
+   {
+      int stepsPerMeasure = TheTransport->GetStepsPerMeasure(this);
+      int numMeasures = ceil(float(GetNumSteps(mStepInterval)) / stepsPerMeasure);
+      int measure = TheTransport->GetMeasure(time) % numMeasures;
+      int step = ((TheTransport->GetQuantized(time, mTransportListenerInfo) % stepsPerMeasure) + measure * stepsPerMeasure) % GetNumSteps(mStepInterval);
+      mCurrentColumn = step;
+   }
  
-   mCurrentColumn = GetStepNum(time);
    mGrid->SetHighlightCol(time, mCurrentColumn);
    UpdateLights();
    UpdateMetaLights();
+
+   if (mHasExternalPulseSource)
+   {
+      for (auto& row : mRows)
+         row->PlayStep(time, mCurrentColumn);
+   }
 }
 
 void StepSequencer::PlayStepNote(double time, int note, float val)
@@ -647,11 +688,44 @@ void StepSequencer::PlayStepNote(double time, int note, float val)
 
 void StepSequencer::PlayNote(double time, int pitch, int velocity, int voiceIdx, ModulationParameters modulation)
 {
-   if (mRepeatRate == kInterval_None)
-      PlayNoteOutput(time, pitch, velocity, voiceIdx, modulation);
+   if (mNoteInputMode == NoteInputMode::PlayStepIndex)
+   {
+      if (velocity > 0)
+      {
+         if (!mHasExternalPulseSource)
+         {
+            mHasExternalPulseSource = true;
+            mAdjustOffsets = false;
+            for (int i = 0; i < NUM_STEPSEQ_ROWS; ++i)
+               mOffsets[i] = 0;
+         }
+
+         mCurrentColumn = pitch % GetNumSteps(mStepInterval);
+         Step(time, velocity / 127.0f, kPulseFlag_Repeat);
+      }
+   }
    else
-      mPadPressures[pitch] = velocity;
+   {
+      if (mRepeatRate == kInterval_None)
+         PlayNoteOutput(time, pitch, velocity, voiceIdx, modulation);
+      else
+         mPadPressures[pitch] = velocity;
+   }
 }
+
+void StepSequencer::OnPulse(double time, float velocity, int flags)
+{
+   if (!mHasExternalPulseSource)
+   {
+      mHasExternalPulseSource = true;
+      mAdjustOffsets = false;
+      for (int i = 0; i < NUM_STEPSEQ_ROWS; ++i)
+         mOffsets[i] = 0;
+   }
+
+   Step(time, velocity, flags);
+}
+
 
 void StepSequencer::SendPressure(int pitch, int pressure)
 {
@@ -855,7 +929,9 @@ void StepSequencer::DropdownUpdated(DropdownList* list, int oldVal)
          }
       }
       oldGrid->Delete();
-      TheTransport->UpdateListener(this, mStepInterval);
+      TransportListenerInfo* transportListenerInfo = TheTransport->GetListenerInfo(this);
+      if (transportListenerInfo != nullptr)
+         transportListenerInfo->mInterval = mStepInterval;
       mFlusher.SetInterval(mStepInterval);
       mGrid->SetMajorColSize(TheTransport->CountInStandardMeasure(mStepInterval) / 4);
       for (int i=0; i<NUM_STEPSEQ_ROWS; ++i)
@@ -893,6 +969,11 @@ void StepSequencer::LoadLayout(const ofxJSONElement& moduleInfo)
    mModuleSaveData.LoadInt("gridmeasures", moduleInfo, 1, 1, 16);
    mModuleSaveData.LoadBool("multislider_mode", moduleInfo, true);
 
+   EnumMap noteInputModeMap;
+   noteInputModeMap["play step index"] = (int)NoteInputMode::PlayStepIndex;
+   noteInputModeMap["repeat held"] = (int)NoteInputMode::RepeatHeld;
+   mModuleSaveData.LoadEnum<NoteInputMode>("note_input_mode", moduleInfo, (int)NoteInputMode::PlayStepIndex, nullptr, &noteInputModeMap);
+
    SetUpFromSaveData();
 }
 
@@ -907,6 +988,8 @@ void StepSequencer::SetUpFromSaveData()
    mGrid->SetGridMode(multisliderMode ? UIGrid::kMultisliderBipolar : UIGrid::kNormal);
    mGrid->SetRestrictDragToRow(multisliderMode);
    mGrid->SetRequireShiftForMultislider(true);
+
+   mNoteInputMode = mModuleSaveData.GetEnum<NoteInputMode>("note_input_mode");
 
    mIsSetUp = true;
 }
@@ -966,12 +1049,17 @@ StepSequencerRow::~StepSequencerRow()
 
 void StepSequencerRow::OnTimeEvent(double time)
 {
-   if (mSeq->Enabled() == false)
+   if (mSeq->Enabled() == false || mSeq->HasExternalPulseSource())
       return;
    
    float offsetMs = mOffset*TheTransport->MsPerBar();
    int step = mSeq->GetStepNum(time + offsetMs);
-   float val = mGrid->GetVal(step,mRow);
+   PlayStep(time, step);
+}
+
+void StepSequencerRow::PlayStep(double time, int step)
+{
+   float val = mGrid->GetVal(step, mRow);
    if (val > 0 && mSeq->IsMetaStepActive(time, step, mRow))
    {
       mSeq->PlayStepNote(time, mRow, val * val);
@@ -989,7 +1077,12 @@ void StepSequencerRow::SetOffset(float offset)
 
 void StepSequencerRow::UpdateTimeListener()
 {
-   TheTransport->UpdateListener(this, mSeq->GetStepInterval(), OffsetInfo(mOffset, false));
+   TransportListenerInfo* transportListenerInfo = TheTransport->GetListenerInfo(this);
+   if (transportListenerInfo != nullptr)
+   {
+      transportListenerInfo->mInterval = mSeq->GetStepInterval();
+      transportListenerInfo->mOffsetInfo = OffsetInfo(mOffset, false);
+   }
 }
 
 void StepSequencerRow::DrawOverlay()
@@ -1046,13 +1139,23 @@ void NoteRepeat::OnTimeEvent(double time)
 void NoteRepeat::SetInterval(NoteInterval interval)
 {
    mInterval = interval;
-   TheTransport->UpdateListener(this, mInterval, OffsetInfo(mOffset, false));
+   TransportListenerInfo* transportListenerInfo = TheTransport->GetListenerInfo(this);
+   if (transportListenerInfo != nullptr)
+   {
+      transportListenerInfo->mInterval = mInterval;
+      transportListenerInfo->mOffsetInfo = OffsetInfo(mOffset, false);
+   }
 }
 
 void NoteRepeat::SetOffset(float offset)
 {
    mOffset = offset;
-   TheTransport->UpdateListener(this, mInterval, OffsetInfo(mOffset, false));
+   TransportListenerInfo* transportListenerInfo = TheTransport->GetListenerInfo(this);
+   if (transportListenerInfo != nullptr)
+   {
+      transportListenerInfo->mInterval = mInterval;
+      transportListenerInfo->mOffsetInfo = OffsetInfo(mOffset, false);
+   }
 }
 
 StepSequencerNoteFlusher::StepSequencerNoteFlusher(StepSequencer* seq)
@@ -1068,7 +1171,12 @@ StepSequencerNoteFlusher::~StepSequencerNoteFlusher()
 
 void StepSequencerNoteFlusher::SetInterval(NoteInterval interval)
 {
-   TheTransport->UpdateListener(this, interval, OffsetInfo(.01f, false));
+   TransportListenerInfo* transportListenerInfo = TheTransport->GetListenerInfo(this);
+   if (transportListenerInfo != nullptr)
+   {
+      transportListenerInfo->mInterval = interval;
+      transportListenerInfo->mOffsetInfo = OffsetInfo(.01f, false);
+   }
 }
 
 void StepSequencerNoteFlusher::OnTimeEvent(double time)

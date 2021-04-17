@@ -163,6 +163,8 @@ private:
    std::array<FloatSlider*, NSS_MAX_STEPS> mLengthSliders;
    
    bool mHasExternalPulseSource;
+
+   TransportListenerInfo* mTransportListenerInfo;
 };
 
 

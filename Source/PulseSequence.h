@@ -88,4 +88,6 @@ private:
    PatchCableSource* mStepCables[kIndividualStepCables];
    
    UIGrid* mVelocityGrid;
+
+   TransportListenerInfo* mTransportListenerInfo;
 };

@@ -186,7 +186,9 @@ void LiveGranulator::DropdownUpdated(DropdownList* list, int oldVal)
 {
    if (list == mAutoCaptureDropdown)
    {
-      TheTransport->UpdateListener(this, mAutoCaptureInterval);
+      TransportListenerInfo* transportListenerInfo = TheTransport->GetListenerInfo(this);
+      if (transportListenerInfo != nullptr)
+         transportListenerInfo->mInterval = mAutoCaptureInterval;
       if (mAutoCaptureInterval == kInterval_None)
       {
          mFreeze = false;

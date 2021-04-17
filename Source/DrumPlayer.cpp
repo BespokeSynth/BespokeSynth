@@ -956,7 +956,9 @@ void DrumPlayer::DropdownUpdated(DropdownList* list, int oldVal)
 
    if (list == mQuantizeIntervalSelector)
    {
-      TheTransport->UpdateListener(this, mQuantizeInterval);
+      TransportListenerInfo* transportListenerInfo = TheTransport->GetListenerInfo(this);
+      if (transportListenerInfo != nullptr)
+         transportListenerInfo->mInterval = mQuantizeInterval;
    }
 }
 

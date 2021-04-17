@@ -15,7 +15,6 @@
 #include "Transport.h"
 #include "Checkbox.h"
 #include "DropdownList.h"
-#include "TextEntry.h"
 #include "ClickButton.h"
 #include "Slider.h"
 #include "IPulseReceiver.h"
@@ -88,5 +87,9 @@ private:
    float mFreeTimeCounter;
    int mResetLength;
    IntSlider* mResetLengthSlider;
+   int mCustomDivisor;
+   IntSlider* mCustomDivisorSlider;
+
+   TransportListenerInfo* mTransportListenerInfo;
 };
 

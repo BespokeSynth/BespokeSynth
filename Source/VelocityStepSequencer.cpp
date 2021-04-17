@@ -30,7 +30,7 @@ VelocityStepSequencer::VelocityStepSequencer()
 , mCurrentVelocity(80)
 , mController(nullptr)
 {
-   TheTransport->AddListener(this, mInterval, OffsetInfo(-.1f, true), false);
+   mTransportListenerInfo = TheTransport->AddListener(this, mInterval, OffsetInfo(-.1f, true), false);
 }
 
 void VelocityStepSequencer::CreateUIControls()
@@ -116,7 +116,7 @@ void VelocityStepSequencer::OnTimeEvent(double time)
    if (mArpIndex >= mLength)
       mArpIndex = 0;
    
-   if (mResetOnDownbeat && TheTransport->GetQuantized(time, mInterval) == 0)
+   if (mResetOnDownbeat && TheTransport->GetQuantized(time, mTransportListenerInfo) == 0)
       mArpIndex = 0;
    
    mCurrentVelocity = mVels[mArpIndex];
@@ -146,7 +146,14 @@ void VelocityStepSequencer::ButtonClicked(ClickButton* button)
 void VelocityStepSequencer::DropdownUpdated(DropdownList* list, int oldVal)
 {
    if (list == mIntervalSelector)
-      TheTransport->UpdateListener(this, mInterval, OffsetInfo(-.1f, true));
+   {
+      TransportListenerInfo* transportListenerInfo = TheTransport->GetListenerInfo(this);
+      if (transportListenerInfo != nullptr)
+      {
+         transportListenerInfo->mInterval = mInterval;
+         transportListenerInfo->mOffsetInfo = OffsetInfo(-.1f, true);
+      }
+   }
 }
 
 void VelocityStepSequencer::IntSliderUpdated(IntSlider* slider, int oldVal)

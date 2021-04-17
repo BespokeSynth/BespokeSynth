@@ -28,7 +28,7 @@ PulseSequence::PulseSequence()
    for (int i=0; i<kMaxSteps; ++i)
       mVels[i] = 1;
    
-   TheTransport->AddListener(this, mInterval, OffsetInfo(0, true), false);
+   mTransportListenerInfo = TheTransport->AddListener(this, mInterval, OffsetInfo(0, true), false);
    TheTransport->AddAudioPoller(this);
 }
 
@@ -148,17 +148,17 @@ void PulseSequence::Step(double time, float velocity, int flags)
 
    if (flags & kPulseFlag_SyncToTransport)
    {
-      int stepsPerMeasure = TheTransport->CountInStandardMeasure(mInterval) * TheTransport->GetTimeSigTop() / TheTransport->GetTimeSigBottom();
+      int stepsPerMeasure = TheTransport->GetStepsPerMeasure(this);
       int measure = TheTransport->GetMeasure(time);
-      mStep = (TheTransport->GetQuantized(time, mInterval) + measure * stepsPerMeasure) % mLength;
+      mStep = (TheTransport->GetQuantized(time, mTransportListenerInfo) + measure * stepsPerMeasure) % mLength;
    }
    
    if (flags & kPulseFlag_Align)
    {
-      int stepsPerMeasure = TheTransport->CountInStandardMeasure(mInterval) * TheTransport->GetTimeSigTop()/TheTransport->GetTimeSigBottom();
+      int stepsPerMeasure = TheTransport->GetStepsPerMeasure(this);
       int numMeasures = ceil(float(mLength) / stepsPerMeasure);
       int measure = TheTransport->GetMeasure(time) % numMeasures;
-      mStep = ((TheTransport->GetQuantized(time, mInterval) % stepsPerMeasure) + measure * stepsPerMeasure) % mLength;
+      mStep = ((TheTransport->GetQuantized(time, mTransportListenerInfo) % stepsPerMeasure) + measure * stepsPerMeasure) % mLength;
    }
    
    float v = mVels[mStep] * velocity;
@@ -217,7 +217,11 @@ void PulseSequence::ButtonClicked(ClickButton* button)
 void PulseSequence::DropdownUpdated(DropdownList* list, int oldVal)
 {
    if (list == mIntervalSelector)
-      TheTransport->UpdateListener(this, mInterval);
+   {
+      TransportListenerInfo* transportListenerInfo = TheTransport->GetListenerInfo(this);
+      if (transportListenerInfo != nullptr)
+         transportListenerInfo->mInterval = mInterval;
+   }
 }
 
 void PulseSequence::FloatSliderUpdated(FloatSlider* slider, float oldVal)

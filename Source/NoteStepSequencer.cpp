@@ -47,7 +47,7 @@ NoteStepSequencer::NoteStepSequencer()
 , mLoopResetPointSlider(nullptr)
 , mHasExternalPulseSource(false)
 {
-   TheTransport->AddListener(this, mInterval, OffsetInfo(0, true), true);
+   mTransportListenerInfo = TheTransport->AddListener(this, mInterval, OffsetInfo(0, true), true);
    TheTransport->AddAudioPoller(this);
    
    for (int i=0;i<NSS_MAX_STEPS;++i)
@@ -459,17 +459,17 @@ void NoteStepSequencer::Step(double time, float velocity, int pulseFlags)
    
    if (!mHasExternalPulseSource || (pulseFlags & kPulseFlag_SyncToTransport))
    {
-      int stepsPerMeasure = TheTransport->CountInStandardMeasure(mInterval) * TheTransport->GetTimeSigTop() / TheTransport->GetTimeSigBottom();
+      int stepsPerMeasure = TheTransport->GetStepsPerMeasure(this);
       int measure = TheTransport->GetMeasure(time);
-      mArpIndex = (TheTransport->GetQuantized(time, mInterval) + measure * stepsPerMeasure) % mLength;
+      mArpIndex = (TheTransport->GetQuantized(time, mTransportListenerInfo) + measure * stepsPerMeasure) % mLength;
    }
 
    if (pulseFlags & kPulseFlag_Align)
    {
-      int stepsPerMeasure = TheTransport->CountInStandardMeasure(mInterval) * TheTransport->GetTimeSigTop()/TheTransport->GetTimeSigBottom();
+      int stepsPerMeasure = TheTransport->GetStepsPerMeasure(this);
       int numMeasures = ceil(float(mLength) / stepsPerMeasure);
       int measure = TheTransport->GetMeasure(time) % numMeasures;
-      int step = ((TheTransport->GetQuantized(time, mInterval) % stepsPerMeasure) + measure * stepsPerMeasure) % mLength;
+      int step = ((TheTransport->GetQuantized(time, mTransportListenerInfo) % stepsPerMeasure) + measure * stepsPerMeasure) % mLength;
       mArpIndex = step;
    }
    
@@ -758,7 +758,11 @@ void NoteStepSequencer::RandomizePitches(bool fifths)
 void NoteStepSequencer::DropdownUpdated(DropdownList* list, int oldVal)
 {
    if (list == mIntervalSelector)
-      TheTransport->UpdateListener(this, mInterval);
+   {
+      TransportListenerInfo* transportListenerInfo = TheTransport->GetListenerInfo(this);
+      if (transportListenerInfo != nullptr)
+         transportListenerInfo->mInterval = mInterval;
+   }
    if (list == mNoteModeSelector)
    {
       if (mNoteMode != oldVal)

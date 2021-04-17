@@ -30,7 +30,7 @@ PlaySequencer::PlaySequencer()
    , mVelocityMed(.5f)
    , mVelocityLight(.25f)
 {
-   TheTransport->AddListener(this, mInterval, OffsetInfo(0, true), false);
+   mTransportListenerInfo = TheTransport->AddListener(this, mInterval, OffsetInfo(0, true), false);
    TheTransport->AddListener(&mNoteOffScheduler, mInterval, OffsetInfo(TheTransport->GetMeasureFraction(mInterval) * .5f, false), false);
 
    mNoteOffScheduler.mOwner = this;
@@ -285,15 +285,27 @@ void PlaySequencer::NoteOffScheduler::OnTimeEvent(double time)
 int PlaySequencer::GetStep(double time)
 {
    int measure = TheTransport->GetMeasure(time) % mNumMeasures;
-   int stepsPerMeasure = TheTransport->CountInStandardMeasure(mInterval) * TheTransport->GetTimeSigTop() / TheTransport->GetTimeSigBottom();
-   int step = TheTransport->GetQuantized(time, mInterval) + stepsPerMeasure * measure;
+   int stepsPerMeasure = TheTransport->GetStepsPerMeasure(this);
+   int step = TheTransport->GetQuantized(time, mTransportListenerInfo) + stepsPerMeasure * measure;
    return step;
 }
 
 void PlaySequencer::UpdateInterval()
 {
-   TheTransport->UpdateListener(this, mInterval, OffsetInfo(0, false));
-   TheTransport->UpdateListener(&mNoteOffScheduler, mInterval, OffsetInfo(TheTransport->GetMeasureFraction(mInterval) * .5f, false));
+   TransportListenerInfo* transportListenerInfo = TheTransport->GetListenerInfo(this);
+   if (transportListenerInfo != nullptr)
+   {
+      transportListenerInfo->mInterval = mInterval;
+      transportListenerInfo->mOffsetInfo = OffsetInfo(0, false);
+   }
+
+   TransportListenerInfo* noteOffListenerInfo = TheTransport->GetListenerInfo(&mNoteOffScheduler);
+   if (noteOffListenerInfo != nullptr)
+   {
+      noteOffListenerInfo->mInterval = mInterval;
+      noteOffListenerInfo->mOffsetInfo = OffsetInfo(TheTransport->GetMeasureFraction(mInterval) * .5f, false);
+   }
+
    UpdateNumMeasures(mNumMeasures);
 }
 
@@ -301,7 +313,7 @@ void PlaySequencer::UpdateNumMeasures(int oldNumMeasures)
 {
    int oldSteps = mGrid->GetCols();
 
-   int stepsPerMeasure = TheTransport->CountInStandardMeasure(mInterval) * TheTransport->GetTimeSigTop() / TheTransport->GetTimeSigBottom();
+   int stepsPerMeasure = TheTransport->GetStepsPerMeasure(this);
    mGrid->SetGrid(stepsPerMeasure * mNumMeasures, mLanes.size());
 
    if (mNumMeasures > oldNumMeasures)

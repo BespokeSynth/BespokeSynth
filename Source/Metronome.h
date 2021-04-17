@@ -57,6 +57,8 @@ private:
    
    float mVolume;
    FloatSlider* mVolumeSlider;
+
+   TransportListenerInfo* mTransportListenerInfo;
 };
 
 #endif /* defined(__modularSynth__Metronome__) */

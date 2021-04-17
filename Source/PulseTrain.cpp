@@ -189,7 +189,11 @@ bool PulseTrain::MouseScrolled(int x, int y, float scrollX, float scrollY)
 void PulseTrain::DropdownUpdated(DropdownList* list, int oldVal)
 {
    if (list == mIntervalSelector)
-      TheTransport->UpdateListener(this, mInterval);
+   {
+      TransportListenerInfo* transportListenerInfo = TheTransport->GetListenerInfo(this);
+      if (transportListenerInfo != nullptr)
+         transportListenerInfo->mInterval = mInterval;
+   }
 }
 
 void PulseTrain::FloatSliderUpdated(FloatSlider* slider, float oldVal)

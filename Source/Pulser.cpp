@@ -29,8 +29,9 @@ Pulser::Pulser()
 , mRandomStep(false)
 , mRandomStepCheckbox(nullptr)
 , mResetLength(8)
+, mCustomDivisor(8)
 {
-   TheTransport->AddListener(this, mInterval, OffsetInfo(0, true), true);
+   mTransportListenerInfo = TheTransport->AddListener(this, mInterval, OffsetInfo(0, true), true);
    TheTransport->AddAudioPoller(this);
 }
 
@@ -40,9 +41,10 @@ void Pulser::CreateUIControls()
    mIntervalSelector = new DropdownList(this,"interval",75,2,(int*)(&mInterval));
    mTimeModeSelector = new DropdownList(this,"timemode",5,2,(int*)(&mTimeMode));
    mFreeTimeSlider = new FloatSlider(this,"t",75,2,44,15,&mFreeTimeStep,0,1000,0);
-   mOffsetSlider = new FloatSlider(this,"offset",mTimeModeSelector,kAnchor_Below,119,15,&mOffset,-1,1);
+   mOffsetSlider = new FloatSlider(this,"offset",mTimeModeSelector,kAnchor_Below,113,15,&mOffset,-1,1);
    mRandomStepCheckbox = new Checkbox(this,"random",mOffsetSlider,kAnchor_Below,&mRandomStep);
-   mResetLengthSlider = new IntSlider(this, "reset", mRandomStepCheckbox, kAnchor_Below, 80, 15, &mResetLength, 1, 16);
+   mResetLengthSlider = new IntSlider(this, "reset", mRandomStepCheckbox, kAnchor_Below, 113, 15, &mResetLength, 1, 16);
+   mCustomDivisorSlider = new IntSlider(this, "div", mRandomStepCheckbox, kAnchor_Right, 52, 15, &mCustomDivisor, 1, 32);
    
    mIntervalSelector->AddLabel("16", kInterval_16);
    mIntervalSelector->AddLabel("8", kInterval_8);
@@ -60,6 +62,7 @@ void Pulser::CreateUIControls()
    mIntervalSelector->AddLabel("32n", kInterval_32n);
    mIntervalSelector->AddLabel("64n", kInterval_64n);
    mIntervalSelector->AddLabel("none", kInterval_None);
+   mIntervalSelector->AddLabel("div", kInterval_CustomDivisor);
    
    mTimeModeSelector->AddLabel("step", kTimeMode_Step);
    mTimeModeSelector->AddLabel("reset", kTimeMode_Reset);
@@ -94,6 +97,8 @@ void Pulser::DrawModule()
    mOffsetSlider->Draw();
    mRandomStepCheckbox->Draw();
    mResetLengthSlider->Draw();
+   mCustomDivisorSlider->SetShowing(mInterval == kInterval_CustomDivisor);
+   mCustomDivisorSlider->Draw();
 }
 
 void Pulser::CheckboxUpdated(Checkbox* checkbox)
@@ -127,23 +132,23 @@ void Pulser::OnTimeEvent(double time)
 {
    if (!mEnabled)
       return;
-   
+
    float offsetMs = GetOffset()*TheTransport->MsPerBar();
    
    int flags = 0;
    
    bool shouldReset = false;
    if (mTimeMode == kTimeMode_Downbeat)
-      shouldReset = TheTransport->GetQuantized(time+offsetMs, mInterval) == 0;
-   if (mTimeMode == kTimeMode_Downbeat2)
-      shouldReset = TheTransport->GetQuantized(time+offsetMs, mInterval) == 0 && TheTransport->GetMeasure(time+offsetMs) % 2 == 0;
-   if (mTimeMode == kTimeMode_Downbeat4)
-      shouldReset = TheTransport->GetQuantized(time+offsetMs, mInterval) == 0 && TheTransport->GetMeasure(time+offsetMs) % 4 == 0;
+      shouldReset = TheTransport->GetQuantized(time, mTransportListenerInfo) == 0;
+   if (mTimeMode == kTimeMode_Downbeat2)           
+      shouldReset = TheTransport->GetQuantized(time, mTransportListenerInfo) == 0 && TheTransport->GetMeasure(time+offsetMs) % 2 == 0;
+   if (mTimeMode == kTimeMode_Downbeat4)           
+      shouldReset = TheTransport->GetQuantized(time, mTransportListenerInfo) == 0 && TheTransport->GetMeasure(time+offsetMs) % 4 == 0;
    if (mTimeMode == kTimeMode_Reset)
    {
-      int stepsPerMeasure = TheTransport->CountInStandardMeasure(mInterval) * TheTransport->GetTimeSigTop() / TheTransport->GetTimeSigBottom();
+      int stepsPerMeasure = TheTransport->GetStepsPerMeasure(this);
       int measure = TheTransport->GetMeasure(time);
-      int step = (TheTransport->GetQuantized(time, mInterval) + measure * stepsPerMeasure);
+      int step = (TheTransport->GetQuantized(time, mTransportListenerInfo) + measure * stepsPerMeasure);
       if (step % mResetLength == 0)
          shouldReset = true;
    }
@@ -192,13 +197,22 @@ float Pulser::GetOffset()
       return -mOffset * 8;
    if (mInterval == kInterval_16)
       return -mOffset * 16;
+   if (mInterval == kInterval_CustomDivisor)
+      return -mOffset / mCustomDivisor;
    return (-mOffset/TheTransport->CountInStandardMeasure(mInterval));
 }
 
 void Pulser::DropdownUpdated(DropdownList* list, int oldVal)
 {
    if (list == mIntervalSelector)
-      TheTransport->UpdateListener(this, mInterval, OffsetInfo(GetOffset(), false));
+   {
+      TransportListenerInfo* transportListenerInfo = TheTransport->GetListenerInfo(this);
+      if (transportListenerInfo != nullptr)
+      {
+         transportListenerInfo->mInterval = mInterval;
+         transportListenerInfo->mOffsetInfo = OffsetInfo(GetOffset(), false);
+      }
+   }
    if (list == mTimeModeSelector)
    {
       mIntervalSelector->SetShowing(mTimeMode != kTimeMode_Free);
@@ -207,11 +221,18 @@ void Pulser::DropdownUpdated(DropdownList* list, int oldVal)
       if (mTimeMode == kTimeMode_Free && mInterval < kInterval_None)
       {
          mFreeTimeStep = TheTransport->GetDuration(mInterval);
-         TheTransport->UpdateListener(this, kInterval_None);
+         TransportListenerInfo* transportListenerInfo = TheTransport->GetListenerInfo(this);
+         if (transportListenerInfo != nullptr)
+            transportListenerInfo->mInterval = kInterval_None;
       }
       else if (oldVal == kTimeMode_Free)
       {
-         TheTransport->UpdateListener(this, mInterval, OffsetInfo(GetOffset(), false));
+         TransportListenerInfo* transportListenerInfo = TheTransport->GetListenerInfo(this);
+         if (transportListenerInfo != nullptr)
+         {
+            transportListenerInfo->mInterval = mInterval;
+            transportListenerInfo->mOffsetInfo = OffsetInfo(GetOffset(), false);
+         }
       }
       
       mResetLengthSlider->SetShowing(mTimeMode == kTimeMode_Reset);
@@ -224,13 +245,20 @@ void Pulser::FloatSliderUpdated(FloatSlider* slider, float oldVal)
    {
       if (mTimeMode != kTimeMode_Free)
       {
-         TheTransport->UpdateListener(this, mInterval, OffsetInfo(GetOffset(), false));
+         TransportListenerInfo* transportListenerInfo = TheTransport->GetListenerInfo(this);
+         if (transportListenerInfo != nullptr)
+         {
+            transportListenerInfo->mInterval = mInterval;
+            transportListenerInfo->mOffsetInfo = OffsetInfo(GetOffset(), false);
+         }
       }
    }
 }
 
 void Pulser::IntSliderUpdated(IntSlider* slider, int oldVal)
 {
+   if (slider == mCustomDivisorSlider)
+      mTransportListenerInfo->mCustomDivisor = mCustomDivisor;
 }
 
 void Pulser::SaveLayout(ofxJSONElement& moduleInfo)

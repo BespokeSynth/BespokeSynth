@@ -131,6 +131,8 @@ private:
    Checkbox* mUpbeatsCheckbox;
 
    ofMutex mChordMutex;
+
+   TransportListenerInfo* mTransportListenerInfo;
 };
 
 #endif /* defined(__modularSynth__Arpeggiator__) */

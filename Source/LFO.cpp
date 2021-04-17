@@ -133,7 +133,11 @@ void LFO::SetPeriod(NoteInterval interval)
    
    mPeriod = interval;
    if (mOsc.GetType() == kOsc_Random)
-      TheTransport->UpdateListener(this, mPeriod);
+   {
+      TransportListenerInfo* transportListenerInfo = TheTransport->GetListenerInfo(this);
+      if (transportListenerInfo != nullptr)
+         transportListenerInfo->mInterval = mPeriod;
+   }
    
    if (mOsc.GetType() == kOsc_Drunk || mPeriod == kInterval_Free)
       TheTransport->AddAudioPoller(this);

@@ -22,6 +22,7 @@
 #include "RadioButton.h"
 #include "SynthGlobals.h"
 #include "Push2Control.h"
+#include "IPulseReceiver.h"
 
 #define NUM_STEPSEQ_ROWS 16
 #define META_STEP_MAX 64
@@ -34,6 +35,7 @@ public:
    StepSequencerRow(StepSequencer* seq, UIGrid* grid, int row);
    ~StepSequencerRow();
    void OnTimeEvent(double time) override;
+   void PlayStep(double time, int step);
    void SetOffset(float offset);
    void UpdateTimeListener();
    void DrawOverlay();
@@ -79,7 +81,7 @@ private:
    StepSequencer* mSeq;
 };
 
-class StepSequencer : public IDrawableModule, public INoteSource, public ITimeListener, public IFloatSliderListener, public IGridControllerListener, public IButtonListener, public IDropdownListener, public INoteReceiver, public IRadioButtonListener, public IIntSliderListener, public IPush2GridController
+class StepSequencer : public IDrawableModule, public INoteSource, public ITimeListener, public IFloatSliderListener, public IGridControllerListener, public IButtonListener, public IDropdownListener, public INoteReceiver, public IRadioButtonListener, public IIntSliderListener, public IPush2GridController, public IPulseReceiver
 {
 public:
    StepSequencer();
@@ -105,6 +107,9 @@ public:
    void PlayNote(double time, int pitch, int velocity, int voiceIdx = -1, ModulationParameters modulation = ModulationParameters()) override;
    void SendPressure(int pitch, int pressure) override;
    void SendCC(int control, int value, int voiceIdx = -1) override {}
+
+   //IPulseReceiver
+   void OnPulse(double time, float velocity, int flags) override;
    
    //ITimeListener
    void OnTimeEvent(double time) override;
@@ -126,6 +131,7 @@ public:
    void UpdatePush2Leds(Push2Control* push2) override;
    
    bool IsMetaStepActive(double time, int col, int row);
+   bool HasExternalPulseSource() const { return mHasExternalPulseSource; }
 
    void CheckboxUpdated(Checkbox* checkbox) override;
    void FloatSliderUpdated(FloatSlider* slider, float oldVal) override;
@@ -160,6 +166,7 @@ private:
    int GetMetaStep(double time);
    int GetMetaStepMaskIndex(int col, int row) { return MIN(col, META_STEP_MAX-1) + row * META_STEP_MAX; }
    GridColor GetGridColor(int x, int y);
+   void Step(double time, float velocity, int pulseFlags);
    
    struct HeldButton
    {
@@ -167,6 +174,12 @@ private:
       int mCol;
       int mRow;
       double mTime;
+   };
+
+   enum class NoteInputMode
+   {
+      PlayStepIndex,
+      RepeatHeld
    };
    
    UIGrid* mGrid;
@@ -204,6 +217,10 @@ private:
    std::list<HeldButton> mHeldButtons;
    uint32* mMetaStepMasks;
    bool mIsSetUp;
+   NoteInputMode mNoteInputMode;
+   bool mHasExternalPulseSource;
+
+   TransportListenerInfo* mTransportListenerInfo;
 };
 
 

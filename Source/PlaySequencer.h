@@ -134,4 +134,6 @@ private:
    };
 
    std::array<SavedPattern, 5> mSavedPatterns;
+
+   TransportListenerInfo* mTransportListenerInfo;
 };

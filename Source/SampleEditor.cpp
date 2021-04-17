@@ -195,7 +195,12 @@ void SampleEditor::UpdateSample()
    mNumBars = mSample->GetNumBars();
    mSampleStartSlider->SetExtents(0,mSample->LengthInSamples());
    mSampleEndSlider->SetExtents(0,mSample->LengthInSamples());
-   TheTransport->UpdateListener(this, kInterval_1n, OffsetInfo(-mOffset, false));
+   TransportListenerInfo* transportListenerInfo = TheTransport->GetListenerInfo(this);
+   if (transportListenerInfo != nullptr)
+   {
+      transportListenerInfo->mInterval = kInterval_1n;
+      transportListenerInfo->mOffsetInfo = OffsetInfo(-mOffset, false);
+   }
    mCurrentBar = mNumBars;
    mVolume = 1;
    mLoop = info.mType != "vox";
@@ -412,7 +417,12 @@ void SampleEditor::FloatSliderUpdated(FloatSlider* slider, float oldVal)
 {
    if (slider == mOffsetSlider)
    {
-      TheTransport->UpdateListener(this, kInterval_1n, OffsetInfo(-mOffset, false));
+      TransportListenerInfo* transportListenerInfo = TheTransport->GetListenerInfo(this);
+      if (transportListenerInfo != nullptr)
+      {
+         transportListenerInfo->mInterval = kInterval_1n;
+         transportListenerInfo->mOffsetInfo = OffsetInfo(-mOffset, false);
+      }
    }
    if (slider == mSampleEndSlider)
    {
