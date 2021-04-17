@@ -127,6 +127,7 @@ void UnstablePressure::PlayNote(double time, int pitch, int velocity, int voiceI
       modulation.pressure = mModulation.GetPressure(voiceIdx);
    }
 
+   FillModulationBuffer(time, voiceIdx);
    PlayNoteOutput(time, pitch, velocity, voiceIdx, modulation);
 }
 
@@ -137,13 +138,16 @@ void UnstablePressure::OnTransportAdvanced(float amount)
    for (int voice = 0; voice < kNumVoices; ++voice)
    {
       if (mIsVoiceUsed[voice])
-      {
-         for (int i = 0; i < gBufferSize; ++i)
-            gWorkBuffer[i] = ofMap(mPerlin.GetValue(gTime + i * gInvSampleRateMs, (gTime + i * gInvSampleRateMs) / 1000, voice), 0, 1, 0, mPerlin.mPerlinAmount);
-
-         mModulation.GetPressure(voice)->FillBuffer(gWorkBuffer);
-      }
+         FillModulationBuffer(gTime, voice);
    }
+}
+
+void UnstablePressure::FillModulationBuffer(double time, int voiceIdx)
+{
+   for (int i = 0; i < gBufferSize; ++i)
+      gWorkBuffer[i] = ofMap(mPerlin.GetValue(time + i * gInvSampleRateMs, (time + i * gInvSampleRateMs) / 1000, voiceIdx), 0, 1, 0, mPerlin.mPerlinAmount);
+
+   mModulation.GetPressure(voiceIdx)->FillBuffer(gWorkBuffer);
 }
 
 void UnstablePressure::FloatSliderUpdated(FloatSlider* slider, float oldVal)

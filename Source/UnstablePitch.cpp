@@ -127,6 +127,7 @@ void UnstablePitch::PlayNote(double time, int pitch, int velocity, int voiceIdx,
       modulation.pitchBend = mModulation.GetPitchBend(voiceIdx);
    }
 
+   FillModulationBuffer(time, voiceIdx);
    PlayNoteOutput(time, pitch, velocity, voiceIdx, modulation);
 }
 
@@ -137,13 +138,16 @@ void UnstablePitch::OnTransportAdvanced(float amount)
    for (int voice = 0; voice < kNumVoices; ++voice)
    {
       if (mIsVoiceUsed[voice])
-      {
-         for (int i = 0; i < gBufferSize; ++i)
-            gWorkBuffer[i] = ofMap(mPerlin.GetValue(gTime + i * gInvSampleRateMs, (gTime + i * gInvSampleRateMs) / 1000, voice), 0, 1, -mPerlin.mPerlinAmount, mPerlin.mPerlinAmount);
-
-         mModulation.GetPitchBend(voice)->FillBuffer(gWorkBuffer);
-      }
+         FillModulationBuffer(gTime, voice);
    }
+}
+
+void UnstablePitch::FillModulationBuffer(double time, int voiceIdx)
+{
+   for (int i = 0; i < gBufferSize; ++i)
+      gWorkBuffer[i] = ofMap(mPerlin.GetValue(time + i * gInvSampleRateMs, (time + i * gInvSampleRateMs) / 1000, voiceIdx), 0, 1, -mPerlin.mPerlinAmount, mPerlin.mPerlinAmount);
+
+   mModulation.GetPitchBend(voiceIdx)->FillBuffer(gWorkBuffer);
 }
 
 void UnstablePitch::FloatSliderUpdated(FloatSlider* slider, float oldVal)

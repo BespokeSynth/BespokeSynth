@@ -127,6 +127,7 @@ void UnstableModWheel::PlayNote(double time, int pitch, int velocity, int voiceI
       modulation.modWheel = mModulation.GetModWheel(voiceIdx);
    }
 
+   FillModulationBuffer(time, voiceIdx);
    PlayNoteOutput(time, pitch, velocity, voiceIdx, modulation);
 }
 
@@ -137,13 +138,16 @@ void UnstableModWheel::OnTransportAdvanced(float amount)
    for (int voice = 0; voice < kNumVoices; ++voice)
    {
       if (mIsVoiceUsed[voice])
-      {
-         for (int i = 0; i < gBufferSize; ++i)
-            gWorkBuffer[i] = ofMap(mPerlin.GetValue(gTime + i * gInvSampleRateMs, (gTime + i * gInvSampleRateMs) / 1000, voice), 0, 1, 0, mPerlin.mPerlinAmount);
-
-         mModulation.GetModWheel(voice)->FillBuffer(gWorkBuffer);
-      }
+         FillModulationBuffer(gTime, voice);
    }
+}
+
+void UnstableModWheel::FillModulationBuffer(double time, int voiceIdx)
+{
+   for (int i = 0; i < gBufferSize; ++i)
+      gWorkBuffer[i] = ofMap(mPerlin.GetValue(time + i * gInvSampleRateMs, (time + i * gInvSampleRateMs) / 1000, voiceIdx), 0, 1, 0, mPerlin.mPerlinAmount);
+
+   mModulation.GetModWheel(voiceIdx)->FillBuffer(gWorkBuffer);
 }
 
 void UnstableModWheel::FloatSliderUpdated(FloatSlider* slider, float oldVal)
