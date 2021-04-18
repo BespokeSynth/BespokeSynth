@@ -40,6 +40,9 @@ void Selector::DrawModule()
 
 void Selector::PostRepatch(PatchCableSource* cableSource, bool fromUserClick)
 {
+   if (!fromUserClick)
+      return;
+
    for (int i=0; i<mControlCables.size(); ++i)
    {
       if (mControlCables[i] == cableSource)
