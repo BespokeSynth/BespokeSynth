@@ -26,6 +26,7 @@ EffectChain::EffectChain()
 , mSwapTime(-1)
 , mShowSpawnList(true)
 , mWantToDeleteEffectAtIndex(-1)
+, mPush2DisplayEffect(nullptr)
 {
 }
 
@@ -42,6 +43,8 @@ void EffectChain::CreateUIControls()
    mVolumeSlider = new FloatSlider(this,"volume", 10, 100, 100, 15, &mVolume, 0, 2);
    mEffectSpawnList = new DropdownList(this,"effect", 10, 100, &mSpawnIndex);
    mSpawnEffectButton = new ClickButton(this,"spawn", -1, -1);
+   mPush2ExitEffectButton = new ClickButton(this, "exit effect", HIDDEN_UICONTROL, HIDDEN_UICONTROL);
+   mPush2ExitEffectButton->SetShowing(false);
 }
 
 void EffectChain::Init()
@@ -95,6 +98,8 @@ void EffectChain::AddEffect(string type, bool onTheFly /*=false*/)
    controls.mMoveRightButton = new ClickButton(this, ">", 0, 0);
    controls.mDeleteButton = new ClickButton(this, "x", 0, 0);
    controls.mDryWetSlider = new FloatSlider(this, ("mix" + ofToString(mEffects.size() - 1)).c_str(), 0, 0, 60, 13, dryWet, 0, 1, 2);
+   controls.mPush2DisplayEffectButton = new ClickButton(this, ("edit "+name).c_str(), 0, 0);
+   controls.mPush2DisplayEffectButton->SetShowing(false);
    mEffectControls.push_back(controls);
 }
 
@@ -294,6 +299,42 @@ ofVec2f EffectChain::GetEffectPos(int index) const
    return ofVec2f(xPos, yPos);
 }
 
+vector<IUIControl*> EffectChain::GetPush2OverrideControls() const
+{
+   vector<IUIControl*> controls;
+
+   int effectIndex = -1;
+   if (mPush2DisplayEffect != nullptr)
+   {
+      for (int i = 0; i < (int)mEffects.size(); ++i)
+      {
+         if (mEffects[i] == mPush2DisplayEffect)
+            effectIndex = i;
+      }
+   }
+
+   if (effectIndex == -1)
+   {
+      controls.push_back(mVolumeSlider);
+      controls.push_back(mEffectSpawnList);
+      controls.push_back(mSpawnEffectButton);
+      for (int i = 0; i < (int)mEffects.size(); ++i)
+         controls.push_back(mEffectControls[i].mPush2DisplayEffectButton);
+   }
+   else
+   {
+      controls.push_back(mEffectControls[effectIndex].mDryWetSlider);
+      controls.push_back(mPush2ExitEffectButton);
+      controls.push_back(mEffectControls[effectIndex].mMoveLeftButton);
+      controls.push_back(mEffectControls[effectIndex].mMoveRightButton);
+      controls.push_back(mEffectControls[effectIndex].mDeleteButton);
+      for (auto* control : mPush2DisplayEffect->GetUIControls())
+         controls.push_back(control);
+   }
+
+   return controls;
+}
+
 void EffectChain::GetModuleDimensions(float& width, float& height)
 {
    int maxX=100;
@@ -335,10 +376,12 @@ void EffectChain::DeleteEffect(int index)
       RemoveUIControl(mEffectControls[index].mMoveRightButton);
       RemoveUIControl(mEffectControls[index].mDeleteButton);
       RemoveUIControl(mEffectControls[index].mDryWetSlider);
+      RemoveUIControl(mEffectControls[index].mPush2DisplayEffectButton);
       mEffectControls[index].mMoveLeftButton->Delete();
       mEffectControls[index].mMoveRightButton->Delete();
       mEffectControls[index].mDeleteButton->Delete();
       mEffectControls[index].mDryWetSlider->Delete();
+      mEffectControls[index].mPush2DisplayEffectButton->Delete();
       //remove the element from mEffectControls
       for (auto iter = mEffectControls.begin(); iter != mEffectControls.end(); ++iter)
       {
@@ -365,30 +408,35 @@ void EffectChain::DeleteEffect(int index)
 void EffectChain::MoveEffect(int fromIndex, int direction)
 {
    int newIndex = fromIndex + direction;
-   assert(newIndex >= 0 && newIndex < mEffects.size());
+   if (newIndex >= 0 && newIndex < mEffects.size())
+   {
+      mSwapFromIdx = fromIndex;
+      mSwapToIdx = newIndex;
 
-   mSwapFromIdx = fromIndex;
-   mSwapToIdx = newIndex;
+      mEffects[mSwapFromIdx]->GetPosition(mSwapFromPos.x, mSwapFromPos.y, true);
+      mEffects[mSwapToIdx]->GetPosition(mSwapToPos.x, mSwapToPos.y, true);
+      mSwapTime = gTime + gSwapLength;
 
-   mEffects[mSwapFromIdx]->GetPosition(mSwapFromPos.x, mSwapFromPos.y, true);
-   mEffects[mSwapToIdx]->GetPosition(mSwapToPos.x, mSwapToPos.y, true);
-   mSwapTime = gTime + gSwapLength;
+      mEffectMutex.lock();
+      IAudioEffect* swap = mEffects[newIndex];
+      mEffects[newIndex] = mEffects[fromIndex];
+      mEffects[fromIndex] = swap;
+      mEffectMutex.unlock();
 
-   mEffectMutex.lock();
-   IAudioEffect* swap = mEffects[newIndex];
-   mEffects[newIndex] = mEffects[fromIndex];
-   mEffects[fromIndex] = swap;
-   mEffectMutex.unlock();
+      float level = mDryWetLevels[newIndex];
+      mDryWetLevels[newIndex] = mDryWetLevels[fromIndex];
+      mDryWetLevels[fromIndex] = level;
 
-   float level = mDryWetLevels[newIndex];
-   mDryWetLevels[newIndex] = mDryWetLevels[fromIndex];
-   mDryWetLevels[fromIndex] = level;
+      FloatSlider* dryWetSlider = mEffectControls[newIndex].mDryWetSlider;
+      mEffectControls[newIndex].mDryWetSlider = mEffectControls[fromIndex].mDryWetSlider;
+      mEffectControls[fromIndex].mDryWetSlider = dryWetSlider;
 
-   FloatSlider* dryWetSlider = mEffectControls[newIndex].mDryWetSlider;
-   mEffectControls[newIndex].mDryWetSlider = mEffectControls[fromIndex].mDryWetSlider;
-   mEffectControls[fromIndex].mDryWetSlider = dryWetSlider;
+      ClickButton* displayButton = mEffectControls[newIndex].mPush2DisplayEffectButton;
+      mEffectControls[newIndex].mPush2DisplayEffectButton = mEffectControls[fromIndex].mPush2DisplayEffectButton;
+      mEffectControls[fromIndex].mPush2DisplayEffectButton = displayButton;
 
-   UpdateReshuffledDryWetSliders();
+      UpdateReshuffledDryWetSliders();
+   }
 }
 
 void EffectChain::UpdateReshuffledDryWetSliders()
@@ -410,6 +458,8 @@ void EffectChain::ButtonClicked(ClickButton* button)
          mSpawnIndex = -1;
       }
    }
+   if (button == mPush2ExitEffectButton)
+      mPush2DisplayEffect = nullptr;
    for (int i=0; i<(int)mEffectControls.size(); ++i)
    {
       if (button == mEffectControls[i].mMoveLeftButton)
@@ -417,7 +467,15 @@ void EffectChain::ButtonClicked(ClickButton* button)
       if (button == mEffectControls[i].mMoveRightButton)
          MoveEffect(i, 1);
       if (button == mEffectControls[i].mDeleteButton)
+      {
          DeleteEffect(i);
+         return;
+      }
+      if (button == mEffectControls[i].mPush2DisplayEffectButton)
+      {
+         mPush2DisplayEffect = mEffects[i];
+         mPush2ExitEffectButton->SetLabel((string("exit ") + mEffects[i]->Name()).c_str());
+      }
    }
 }
 

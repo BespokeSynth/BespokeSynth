@@ -44,6 +44,9 @@ public:
    void KeyPressed(int key, bool isRepeat) override;
    void KeyReleased(int key) override;
 
+   bool HasPush2OverrideControls() const override { return true; }
+   vector<IUIControl*> GetPush2OverrideControls() const override;
+
    void ButtonClicked(ClickButton* button) override;
    void CheckboxUpdated(Checkbox* checkbox) override;
    void FloatSliderUpdated(FloatSlider* slider, float oldVal) override;
@@ -74,6 +77,7 @@ private:
       ClickButton* mMoveRightButton;
       ClickButton* mDeleteButton;
       FloatSlider* mDryWetSlider;
+      ClickButton* mPush2DisplayEffectButton;
    };
    
    vector<IAudioEffect*> mEffects;
@@ -92,11 +96,13 @@ private:
    bool mInitialized;
    bool mShowSpawnList;
    int mWantToDeleteEffectAtIndex;
+   IAudioEffect* mPush2DisplayEffect;
    
    std::vector<string> mEffectTypesToSpawn;
    int mSpawnIndex;
    DropdownList* mEffectSpawnList;
    ClickButton* mSpawnEffectButton;
+   ClickButton* mPush2ExitEffectButton;
    
    ofMutex mEffectMutex;
 };

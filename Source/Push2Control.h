@@ -96,6 +96,7 @@ private:
    IDrawableModule* mDisplayModule;
    vector<IUIControl*> mSliderControls;
    vector<IUIControl*> mButtonControls;
+   vector<IUIControl*> mDisplayedControls;
    int mModuleColumnOffset;
    float mModuleColumnOffsetSmoothed;
    

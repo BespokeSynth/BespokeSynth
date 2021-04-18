@@ -27,6 +27,7 @@
 #include "PatchCableSource.h"
 #include "DropdownList.h"
 #include "FloatSliderLFOControl.h"
+#include "UserPrefsEditor.h"
 
 bool Push2Control::sDrawingPush2Display = false;
 NVGcontext* Push2Control::sVG = nullptr;
@@ -682,6 +683,30 @@ void Push2Control::Poll()
       
       mPendingSpawnPitch = -1;
    }
+
+   if (mDisplayModule != nullptr && mDisplayModule->HasPush2OverrideControls())
+   {
+      auto& desiredControls = mDisplayModule->GetPush2OverrideControls();
+      bool changed = false;
+      if (desiredControls.size() != mDisplayedControls.size())
+      {
+         changed = true;
+      }
+      else
+      {
+         for (size_t i = 0; i < desiredControls.size(); ++i)
+         {
+            if (desiredControls[i] != mDisplayedControls[i])
+            {
+               changed = true;
+               break;
+            }
+         }
+      }
+
+      if (changed)
+         UpdateControlList();
+   }
 }
 
 void Push2Control::SetDisplayModule(IDrawableModule* module, bool addToHistory)
@@ -710,11 +735,21 @@ void Push2Control::UpdateControlList()
    mButtonControls.clear();
    vector<IUIControl*> controls;
    if (mScreenDisplayMode == ScreenDisplayMode::kAddModule)
+   {
       controls = mSpawnModuleControls;
+   }
    else if (mDisplayModule == this)
+   {
       controls = mFavoriteControls;
+   }
    else if (mDisplayModule != nullptr)
-      controls = mDisplayModule->GetUIControls();
+   {
+      if (mDisplayModule->HasPush2OverrideControls())
+         controls = mDisplayModule->GetPush2OverrideControls();
+      else
+         controls = mDisplayModule->GetUIControls();
+   }
+
    for (int i=0; i < controls.size(); ++i)
    {
       if (controls[i]->IsSliderControl() && controls[i]->GetShouldSaveState())
@@ -722,6 +757,7 @@ void Push2Control::UpdateControlList()
       if (controls[i]->IsButtonControl() && controls[i]->GetShouldSaveState())
          mButtonControls.push_back(controls[i]);
    }
+   mDisplayedControls = controls;
 }
 
 void Push2Control::AddFavoriteControl(IUIControl* control)
@@ -1055,7 +1091,7 @@ void Push2Control::OnMidiPitchBend(MidiPitchBend& pitchBend)
 
 bool Push2Control::IsIgnorableModule(IDrawableModule* module)
 {
-   return module == TheTitleBar || module == TheSaveDataPanel || module == TheQuickSpawnMenu;
+   return module == TheTitleBar || module == TheSaveDataPanel || module == TheQuickSpawnMenu || module == TheSynth->GetUserPrefsEditor();
 }
 
 vector<IDrawableModule*> Push2Control::SortModules(vector<IDrawableModule*> modules)

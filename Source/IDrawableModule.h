@@ -131,6 +131,8 @@ public:
    virtual void UpdateOldControlName(string& oldName) {}
    virtual bool CanSaveState() const { return true; }
    virtual bool HasDebugDraw() const { return false; }
+   virtual bool HasPush2OverrideControls() const { return false; }
+   virtual vector<IUIControl*> GetPush2OverrideControls() const { vector<IUIControl*> dummy; return dummy; }
    
    //IPatchable
    PatchCableSource* GetPatchCableSource(int index=0) override { if (index == 0) return mMainPatchCableSource; else return mPatchCableSources[index]; }
