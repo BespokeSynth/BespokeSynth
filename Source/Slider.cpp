@@ -187,9 +187,11 @@ void FloatSlider::Render()
    DrawHover();
 
    string display;
+   float textSize = 15;
    if (AdjustSmooth())
    {
-      display = "s:"+ofToString(mSmooth, 3);
+      display = "smooth: "+ofToString(mSmooth, 3);
+      textSize = 11;
    }
    else
    {
@@ -212,7 +214,7 @@ void FloatSlider::Render()
       display = "";
    
    ofSetColor(textColor);
-   DrawTextNormal(display, mX + 2, mY + 5 + mHeight / 2);
+   DrawTextNormal(display, mX + 2, mY + 5 + mHeight / 2, textSize);
 
    ofPopStyle();
    
