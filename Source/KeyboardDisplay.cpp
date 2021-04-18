@@ -51,9 +51,14 @@ void KeyboardDisplay::PlayNote(double time, int pitch, int velocity, int voiceId
    if (pitch >= 0 && pitch < 128)
    {
       if (velocity > 0)
+      {
          mLastOnTime[pitch] = time;
+         mLastOffTime[pitch] = 0;
+      }
       else
+      {
          mLastOffTime[pitch] = time;
+      }
    }
 }
 
