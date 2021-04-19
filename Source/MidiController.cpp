@@ -287,8 +287,14 @@ void MidiController::OnTransportAdvanced(float amount)
       //this here is not accurate, but prevents notes played within the same buffer from having the exact same time
       double playTime;
       if (firstNoteTimestampMs == -1) //this is the first note
+      {
          firstNoteTimestampMs = note->mTimestampMs;
-      playTime = gTime + note->mTimestampMs - firstNoteTimestampMs;
+         playTime = gTime;
+      }
+      else
+      {
+         playTime = gTime + (note->mTimestampMs - firstNoteTimestampMs);
+      }
       PlayNoteOutput(playTime, note->mPitch + mNoteOffset, MIN(127,note->mVelocity*mVelocityMult), voiceIdx, ModulationParameters(mModulation.GetPitchBend(voiceIdx), mModulation.GetModWheel(voiceIdx), mModulation.GetPressure(voiceIdx), 0));
       
       for (auto i = mListeners[mControllerPage].begin(); i != mListeners[mControllerPage].end(); ++i)
