@@ -45,6 +45,7 @@ private:
    int GetMostRecentPitch() const;
    
    double mHeldNotes[128];
+   int mInitialPitch;
    int mLastPlayedPitch;
    int mLastVelocity;
    float mWidth;
