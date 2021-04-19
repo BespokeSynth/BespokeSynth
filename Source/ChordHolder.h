@@ -14,8 +14,9 @@
 #include "NoteEffectBase.h"
 #include "IDrawableModule.h"
 #include "ClickButton.h"
+#include "IPulseReceiver.h"
 
-class ChordHolder : public NoteEffectBase, public IDrawableModule, public IButtonListener
+class ChordHolder : public NoteEffectBase, public IDrawableModule, public IButtonListener, public IPulseReceiver
 {
 public:
    ChordHolder();
@@ -29,6 +30,9 @@ public:
    //INoteReceiver
    void PlayNote(double time, int pitch, int velocity, int voiceIdx = -1, ModulationParameters modulation = ModulationParameters()) override;
 
+   //IPulseReceiver
+   void OnPulse(double time, float velocity, int flags) override;
+
    void CheckboxUpdated(Checkbox* checkbox) override;
    void ButtonClicked(ClickButton* button) override;
 
@@ -37,7 +41,7 @@ public:
 private:
    //IDrawableModule
    void DrawModule() override;
-   void GetModuleDimensions(float& width, float& height) override { width = 90; height = 21; }
+   void GetModuleDimensions(float& width, float& height) override { width = 131; height = 21; }
    bool Enabled() const override { return mEnabled; }
 
    void Stop();
@@ -46,4 +50,6 @@ private:
    std::array<bool, 128> mNotePlaying{ false };
 
    ClickButton* mStopButton;
+   bool mOnlyPlayWhenPulsed;
+   Checkbox* mOnlyPlayWhenPulsedCheckbox;
 };
