@@ -24,6 +24,8 @@ globals:
    bespoke.pitch_to_name(pitch)
    bespoke.pitch_to_freq(pitch)
    bespoke.get_tempo()
+   bespoke.set_background_text(text, size, red, green, blue)
+      optional: size=50, red = 1, green = 1, blue = 1
 
 
 script-relative:

@@ -20,7 +20,7 @@
 TitleBar* TheTitleBar = nullptr;
 
 //static
-bool TitleBar::sBespokeJustLoaded = true;
+bool TitleBar::sShowInitialHelpOverlay = true;
 
 namespace
 {
@@ -360,7 +360,7 @@ void TitleBar::DrawModuleUnclipped()
    if (HiddenByZoom())
       return;
 
-   if (sBespokeJustLoaded)
+   if (sShowInitialHelpOverlay)
    {
       ofPushStyle();
       ofSetColor(255, 255, 255);
@@ -443,12 +443,13 @@ void TitleBar::ButtonClicked(ClickButton* button)
       TheSynth->SaveOutput();
    if (button == mDisplayHelpButton)
    {
-      float x,y,w,h,butW,butH;
+      float x, y, w, h, butW, butH;
       mDisplayHelpButton->GetPosition(x, y);
       mDisplayHelpButton->GetDimensions(butW, butH);
       mHelpDisplay->GetDimensions(w, h);
-      mHelpDisplay->SetPosition(x-w+butW,y+butH);
+      mHelpDisplay->SetPosition(x - w + butW, y + butH);
       TheSynth->PushModalFocusItem(mHelpDisplay);
+      sShowInitialHelpOverlay = false;
    }
    if (button == mDisplayUserPrefsEditorButton)
       TheSynth->GetUserPrefsEditor()->Show();

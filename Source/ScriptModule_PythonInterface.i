@@ -100,6 +100,12 @@ PYBIND11_EMBEDDED_MODULE(bespoke, m) {
    {
       return TheTransport->GetTempo();
    });
+   m.def("set_background_text", [](string text, float size, float red, float green, float blue)
+   {
+      ScriptModule::sBackgroundTextString = text;
+      ScriptModule::sBackgroundTextSize = size;
+      ScriptModule::sBackgroundTextColor.set(red * 255, green * 255, blue * 255);
+   }, "text"_a, "size"_a=50, "red"_a = 1, "green"_a = 1, "blue"_a = 1);
 }
 
 PYBIND11_EMBEDDED_MODULE(scriptmodule, m)

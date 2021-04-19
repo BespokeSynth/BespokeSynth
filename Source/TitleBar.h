@@ -89,7 +89,7 @@ public:
    void ButtonClicked(ClickButton* button) override;
    void FloatSliderUpdated(FloatSlider* slider, float oldVal) override {}
 
-   static bool sBespokeJustLoaded;
+   static bool sShowInitialHelpOverlay;
    
 private:
    //IDrawableModule

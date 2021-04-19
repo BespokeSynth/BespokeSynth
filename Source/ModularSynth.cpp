@@ -344,6 +344,14 @@ void ModularSynth::Draw(void* vg)
    }
    
    DrawLissajous(&mGlobalRecordBuffer, 0, 0, ofGetWidth(), ofGetHeight(), sBackgroundLissajousR, sBackgroundLissajousG, sBackgroundLissajousB);
+
+   if (ScriptModule::sBackgroundTextString != "")
+   {
+      ofPushStyle();
+      ofSetColor(ScriptModule::sBackgroundTextColor);
+      DrawTextBold(ScriptModule::sBackgroundTextString, 150, 200 + ScriptModule::sBackgroundTextSize, ScriptModule::sBackgroundTextSize);
+      ofPopStyle();
+   }
    
    if (gTime == 1 && mFatalError == "")
    {
@@ -1947,7 +1955,7 @@ void ModularSynth::LoadState(string file)
    }
 
    if (mInitialized)
-      TitleBar::sBespokeJustLoaded = false;  //don't show initial help popup
+      TitleBar::sShowInitialHelpOverlay = false;  //don't show initial help popup
    
    mAudioThreadMutex.Lock("LoadState()");
    LockRender(true);
@@ -2190,7 +2198,7 @@ void ModularSynth::DoAutosave()
 IDrawableModule* ModularSynth::SpawnModuleOnTheFly(string moduleName, float x, float y, bool addToContainer)
 {
    if (mInitialized)
-      TitleBar::sBespokeJustLoaded = false;  //don't show initial help popup
+      TitleBar::sShowInitialHelpOverlay = false;  //don't show initial help popup
 
    vector<string> tokens = ofSplitString(moduleName," ");
    if (tokens.size() == 0)

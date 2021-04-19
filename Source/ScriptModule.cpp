@@ -38,6 +38,12 @@ ScriptModule* ScriptModule::sMostRecentLineExecutedModule = nullptr;
 ScriptModule* ScriptModule::sPriorExecutedModule = nullptr;
 //static
 double ScriptModule::sMostRecentRunTime = 0;
+//static
+string ScriptModule::sBackgroundTextString = "";
+//static
+float ScriptModule::sBackgroundTextSize = 30;
+//static
+ofColor ScriptModule::sBackgroundTextColor = ofColor::white;
 
 static bool sPythonInitialized = false;
 static bool sHasPythonEverSuccessfullyInitialized = false;
