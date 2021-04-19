@@ -115,6 +115,8 @@ void SingleOscillator::CreateUIControls()
    mSyncFreqSlider->SetShowName(false);
    
    mFilterCutoffMaxSlider->SetMaxValueDisplay("none");
+
+   mLengthMultiplierSlider->SetMode(FloatSlider::kSquare);
    
    mMultSelector->AddLabel("1/8", -8);
    mMultSelector->AddLabel("1/7", -7);

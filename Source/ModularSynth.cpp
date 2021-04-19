@@ -1945,6 +1945,9 @@ void ModularSynth::LoadState(string file)
       LogEvent("couldn't find file " + ofToDataPath(file), kLogEventType_Error);
       return;
    }
+
+   if (mInitialized)
+      TitleBar::sBespokeJustLoaded = false;  //don't show initial help popup
    
    mAudioThreadMutex.Lock("LoadState()");
    LockRender(true);
@@ -2186,6 +2189,9 @@ void ModularSynth::DoAutosave()
 
 IDrawableModule* ModularSynth::SpawnModuleOnTheFly(string moduleName, float x, float y, bool addToContainer)
 {
+   if (mInitialized)
+      TitleBar::sBespokeJustLoaded = false;  //don't show initial help popup
+
    vector<string> tokens = ofSplitString(moduleName," ");
    if (tokens.size() == 0)
       return nullptr;

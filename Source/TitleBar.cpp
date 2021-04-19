@@ -19,6 +19,9 @@
 
 TitleBar* TheTitleBar = nullptr;
 
+//static
+bool TitleBar::sBespokeJustLoaded = true;
+
 namespace
 {
    const string kRescanPluginsLabel = "rescan VSTs...";
@@ -269,7 +272,7 @@ void TitleBar::DrawModule()
 
    float pixelWidth = GetPixelWidth();
    
-   DrawTextLeftJustify(info, pixelWidth - 60, 16);
+   DrawTextLeftJustify(info, pixelWidth - 140, 32);
    
    mSaveLayoutButton->Draw();
    mSaveStateButton->Draw();
@@ -350,6 +353,32 @@ void TitleBar::DrawModule()
    mDisplayUserPrefsEditorButton->Draw();
    mEventLookaheadCheckbox->Draw();
    mShouldAutosaveCheckbox->Draw();
+}
+
+void TitleBar::DrawModuleUnclipped()
+{
+   if (HiddenByZoom())
+      return;
+
+   if (sBespokeJustLoaded)
+   {
+      ofPushStyle();
+      ofSetColor(255, 255, 255);
+      string text = "view help and enable tooltips";
+      float size = 28;
+      float titleBarWidth, titleBarHeight;
+      TheTitleBar->GetDimensions(titleBarWidth, titleBarHeight);
+      ofRectangle helpButtonRect = mDisplayHelpButton->GetRect(true);
+      float x = helpButtonRect.getCenter().x;
+      float y = helpButtonRect.getCenter().y + 15 + titleBarHeight;
+      gFontBold.DrawString(text, size, x - gFontBold.GetStringWidth(text, size, K(isRenderThread)) - 15 * gDrawScale, y);
+      ofSetLineWidth(2);
+      ofLine(x - 10, y - 6 * gDrawScale, x, y - 6 * gDrawScale);
+      ofLine(x, y - 6 * gDrawScale, x, y - 18 * gDrawScale);
+      ofLine(x - 3 * gDrawScale, y - 15 * gDrawScale, x, y - 18 * gDrawScale);
+      ofLine(x + 3 * gDrawScale, y - 15 * gDrawScale, x, y - 18 * gDrawScale);
+      ofPopStyle();
+   }
 }
 
 bool TitleBar::HiddenByZoom() const
