@@ -299,10 +299,8 @@ ofVec2f EffectChain::GetEffectPos(int index) const
    return ofVec2f(xPos, yPos);
 }
 
-vector<IUIControl*> EffectChain::GetPush2OverrideControls() const
+void EffectChain::GetPush2OverrideControls(vector<IUIControl*>& controls) const
 {
-   vector<IUIControl*> controls;
-
    int effectIndex = -1;
    if (mPush2DisplayEffect != nullptr)
    {
@@ -331,8 +329,6 @@ vector<IUIControl*> EffectChain::GetPush2OverrideControls() const
       for (auto* control : mPush2DisplayEffect->GetUIControls())
          controls.push_back(control);
    }
-
-   return controls;
 }
 
 void EffectChain::GetModuleDimensions(float& width, float& height)

@@ -132,7 +132,7 @@ public:
    virtual bool CanSaveState() const { return true; }
    virtual bool HasDebugDraw() const { return false; }
    virtual bool HasPush2OverrideControls() const { return false; }
-   virtual vector<IUIControl*> GetPush2OverrideControls() const { vector<IUIControl*> dummy; return dummy; }
+   virtual void GetPush2OverrideControls(vector<IUIControl*>& controls) const { }
    
    //IPatchable
    PatchCableSource* GetPatchCableSource(int index=0) override { if (index == 0) return mMainPatchCableSource; else return mPatchCableSources[index]; }

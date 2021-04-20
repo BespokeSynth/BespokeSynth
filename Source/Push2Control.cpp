@@ -686,7 +686,8 @@ void Push2Control::Poll()
 
    if (mDisplayModule != nullptr && mDisplayModule->HasPush2OverrideControls())
    {
-      vector<IUIControl*>& desiredControls = mDisplayModule->GetPush2OverrideControls();
+      vector<IUIControl*> desiredControls;
+      mDisplayModule->GetPush2OverrideControls(desiredControls);
       bool changed = false;
       if (desiredControls.size() != mDisplayedControls.size())
       {
@@ -745,7 +746,7 @@ void Push2Control::UpdateControlList()
    else if (mDisplayModule != nullptr)
    {
       if (mDisplayModule->HasPush2OverrideControls())
-         controls = mDisplayModule->GetPush2OverrideControls();
+         mDisplayModule->GetPush2OverrideControls(controls);
       else
          controls = mDisplayModule->GetUIControls();
    }

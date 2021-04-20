@@ -45,7 +45,7 @@ public:
    void KeyReleased(int key) override;
 
    bool HasPush2OverrideControls() const override { return true; }
-   vector<IUIControl*> GetPush2OverrideControls() const override;
+   void GetPush2OverrideControls(vector<IUIControl*>& controls) const override;
 
    void ButtonClicked(ClickButton* button) override;
    void CheckboxUpdated(Checkbox* checkbox) override;
