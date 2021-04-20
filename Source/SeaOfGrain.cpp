@@ -35,8 +35,6 @@ SeaOfGrain::SeaOfGrain()
 , mDisplayStartSamples(0)
 , mDisplayEndSamples(0)
 {
-   mWriteBuffer = new float[gBufferSize];
-   Clear(mWriteBuffer, gBufferSize);
    mSample = new Sample();
    
    for (int i=0; i<kNumMPEVoices; ++i)
@@ -87,7 +85,6 @@ void SeaOfGrain::CreateUIControls()
 
 SeaOfGrain::~SeaOfGrain()
 {
-   delete[] mWriteBuffer;
    delete mSample;
 }
 
@@ -105,20 +102,24 @@ void SeaOfGrain::Process(double time)
       return;
    
    ComputeSliders(0);
+   SyncOutputBuffer(mSample->NumChannels());
    
    int bufferSize = target->GetBuffer()->BufferSize();
-   float* out = target->GetBuffer()->GetChannel(0);
+   ChannelBuffer* out = target->GetBuffer();
    assert(bufferSize == gBufferSize);
    
-   Clear(mWriteBuffer, bufferSize);
+   gWorkChannelBuffer.SetNumActiveChannels(out->NumActiveChannels());
+   gWorkChannelBuffer.Clear();
    for (int i=0; i<kNumMPEVoices; ++i)
-      mMPEVoices[i].Process(mWriteBuffer, bufferSize, mSample->Data()->GetChannel(0), mSample->LengthInSamples());
+      mMPEVoices[i].Process(&gWorkChannelBuffer, bufferSize, mSample->Data());
    for (int i=0; i<kNumManualVoices; ++i)
-      mManualVoices[i].Process(mWriteBuffer, bufferSize, mSample->Data()->GetChannel(0), mSample->LengthInSamples());
-   Mult(mWriteBuffer, mVolume, bufferSize);
-   GetVizBuffer()->WriteChunk(mWriteBuffer, bufferSize, 0);
-   
-   Add(out, mWriteBuffer, bufferSize);
+      mManualVoices[i].Process(&gWorkChannelBuffer, bufferSize, mSample->Data());
+   for (int ch = 0; ch < out->NumActiveChannels(); ++ch)
+   {
+      Mult(gWorkChannelBuffer.GetChannel(ch), mVolume, bufferSize);
+      GetVizBuffer()->WriteChunk(gWorkChannelBuffer.GetChannel(ch), bufferSize, ch);
+      Add(out->GetChannel(ch), gWorkChannelBuffer.GetChannel(ch), bufferSize);
+   }
 }
 
 void SeaOfGrain::DrawModule()
@@ -342,12 +343,12 @@ SeaOfGrain::GrainMPEVoice::GrainMPEVoice()
    mGranulator.mGrainLengthMs = 150;
 }
 
-void SeaOfGrain::GrainMPEVoice::Process(float* out, int outLength, float* sample, int sampleLength)
+void SeaOfGrain::GrainMPEVoice::Process(ChannelBuffer* output, int bufferSize, ChannelBuffer* source)
 {
-   if (!mADSR.IsDone(gTime) && sampleLength > 0)
+   if (!mADSR.IsDone(gTime) && source->BufferSize() > 0)
    {
       double time = gTime;
-      for (int i=0; i<outLength; ++i)
+      for (int i=0; i< bufferSize; ++i)
       {
          float pitchBend = mPitchBend ? mPitchBend->GetValue(i) : 0;
          float pressure = mPressure ? mPressure->GetValue(i) : 0;
@@ -361,15 +362,14 @@ void SeaOfGrain::GrainMPEVoice::Process(float* out, int outLength, float* sample
          
          float blend = .0005f;
          mGain = mGain * (1-blend) + pressure * blend;
-         
-         ChannelBuffer temp(sample, sampleLength);
-         float outSample[1];
-         outSample[0] = 0;
+
+         float outSample[ChannelBuffer::kMaxNumChannels];
+         Clear(outSample, ChannelBuffer::kMaxNumChannels);
          float pos = (mPitch + pitchBend + MIN(.125f, mPlay) - mOwner->mKeyboardBasePitch) / mOwner->mKeyboardNumPitches;
-         mGranulator.ProcessFrame(time, &temp, sampleLength, ofLerp(mOwner->mDisplayStartSamples, mOwner->mDisplayEndSamples, pos), outSample);
-         outSample[0] *= sqrtf(mGain);
-         outSample[0] *= mADSR.Value(time);
-         out[i] += outSample[0];
+         mGranulator.ProcessFrame(time, source, source->BufferSize(), ofLerp(mOwner->mDisplayStartSamples, mOwner->mDisplayEndSamples, pos), outSample);
+         for (int ch = 0; ch < output->NumActiveChannels(); ++ch)
+            output->GetChannel(ch)[i] += outSample[ch] * sqrtf(mGain) * mADSR.Value(time);
+
          time += gInvSampleRateMs;
          mPlay += .001f;
       }
@@ -415,19 +415,18 @@ SeaOfGrain::GrainManualVoice::GrainManualVoice()
    mGranulator.mGrainLengthMs = 150;
 }
 
-void SeaOfGrain::GrainManualVoice::Process(float* out, int outLength, float* sample, int sampleLength)
+void SeaOfGrain::GrainManualVoice::Process(ChannelBuffer* output, int bufferSize, ChannelBuffer* source)
 {
-   if (mGain > 0 && sampleLength > 0)
+   if (mGain > 0 && source->BufferSize() > 0)
    {
       double time = gTime;
-      for (int i=0; i<outLength; ++i)
+      for (int i=0; i < bufferSize; ++i)
       {
-         ChannelBuffer temp(sample, sampleLength);
-         float outSample[1];
-         outSample[0] = 0;
-         mGranulator.ProcessFrame(time, &temp, sampleLength, ofLerp(mOwner->mDisplayStartSamples, mOwner->mDisplayEndSamples, mPosition), outSample);
-         outSample[0] *= mGain;
-         out[i] += outSample[0];
+         float outSample[ChannelBuffer::kMaxNumChannels];
+         Clear(outSample, ChannelBuffer::kMaxNumChannels);
+         mGranulator.ProcessFrame(time, source, source->BufferSize(), ofLerp(mOwner->mDisplayStartSamples, mOwner->mDisplayEndSamples, mPosition), outSample);
+         for (int ch = 0; ch < output->NumActiveChannels(); ++ch)
+            output->GetChannel(ch)[i] += outSample[ch] * mGain;
          time += gInvSampleRateMs;
       }
    }

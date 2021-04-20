@@ -83,7 +83,7 @@ private:
    struct GrainMPEVoice
    {
       GrainMPEVoice();
-      void Process(float* out, int outLength, float* sample, int sampleLength);
+      void Process(ChannelBuffer* output, int bufferSize, ChannelBuffer* source);
       void Draw(float w, float h);
       
       float mPlay;
@@ -102,7 +102,7 @@ private:
    struct GrainManualVoice
    {
       GrainManualVoice();
-      void Process(float* out, int outLength, float* sample, int sampleLength);
+      void Process(ChannelBuffer* output, int bufferSize, ChannelBuffer* source);
       void Draw(float w, float h);
       
       float mGain;
@@ -133,7 +133,6 @@ private:
    ClickButton* mLoadButton;
    float mVolume;
    FloatSlider* mVolumeSlider;
-   float* mWriteBuffer;
    bool mLoading;
    FloatSlider* mDisplayOffsetSlider;
    float mDisplayOffset;
