@@ -686,7 +686,7 @@ void Push2Control::Poll()
 
    if (mDisplayModule != nullptr && mDisplayModule->HasPush2OverrideControls())
    {
-      auto& desiredControls = mDisplayModule->GetPush2OverrideControls();
+      vector<IUIControl*>& desiredControls = mDisplayModule->GetPush2OverrideControls();
       bool changed = false;
       if (desiredControls.size() != mDisplayedControls.size())
       {
