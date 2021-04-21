@@ -340,7 +340,11 @@ void Push2Control::DrawToFramebuffer(NVGcontext* vg, NVGLUframebuffer* fb, float
       ofPushStyle();
 
       ofSetColor(255, 255, 255);
-      DrawTextBold("select a module, then tap a grid square", 5, 80, 20);
+      string text = "choose a module, then tap a grid square";
+      string moduleTypeToSpawn = GetModuleTypeToSpawn();
+      if (moduleTypeToSpawn != "")
+         text += "\ntap grid to spawn " + moduleTypeToSpawn;
+      DrawTextBold(text, 5, 80, 20);
       
       ofSetColor(IDrawableModule::GetColor(kModuleType_Other));
       ofNoFill();
@@ -708,6 +712,17 @@ void Push2Control::Poll()
       if (changed)
          UpdateControlList();
    }
+}
+
+string Push2Control::GetModuleTypeToSpawn()
+{
+   for (int i = 0; i < mSpawnLists.GetDropdowns().size(); ++i)
+   {
+      if (mSpawnLists.GetDropdowns()[i]->GetList()->GetValue() != -1)
+         return mSpawnLists.GetDropdowns()[i]->GetList()->GetDisplayValue(mSpawnLists.GetDropdowns()[i]->GetList()->GetValue());
+   }
+
+   return "";
 }
 
 void Push2Control::SetDisplayModule(IDrawableModule* module, bool addToHistory)

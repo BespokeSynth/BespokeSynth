@@ -77,6 +77,7 @@ private:
    vector<IDrawableModule*> SortModules(vector<IDrawableModule*> modules);
    void AddModuleChain(IDrawableModule* module, vector<IDrawableModule*>& modules, vector<IDrawableModule*>& output);
    void DrawDisplayModuleRect(ofRectangle rect);
+   string GetModuleTypeToSpawn();
    
    bool mDisplayInitialized;
    
