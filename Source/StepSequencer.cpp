@@ -991,6 +991,9 @@ void StepSequencer::SetUpFromSaveData()
 
    mNoteInputMode = mModuleSaveData.GetEnum<NoteInputMode>("note_input_mode");
 
+   if (mNoteInputMode == NoteInputMode::RepeatHeld)
+      mHasExternalPulseSource = false;
+
    mIsSetUp = true;
 }
 
