@@ -364,7 +364,7 @@ void TitleBar::DrawModuleUnclipped()
    {
       ofPushStyle();
       ofSetColor(255, 255, 255);
-      string text = "view help and enable tooltips";
+      string text = "click ? to view help and enable tooltips";
       float size = 28;
       float titleBarWidth, titleBarHeight;
       TheTitleBar->GetDimensions(titleBarWidth, titleBarHeight);
