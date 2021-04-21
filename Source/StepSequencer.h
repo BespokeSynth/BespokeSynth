@@ -167,6 +167,7 @@ private:
    int GetMetaStepMaskIndex(int col, int row) { return MIN(col, META_STEP_MAX-1) + row * META_STEP_MAX; }
    GridColor GetGridColor(int x, int y);
    void Step(double time, float velocity, int pulseFlags);
+   bool HasGridController();
    
    struct HeldButton
    {
@@ -219,6 +220,7 @@ private:
    bool mIsSetUp;
    NoteInputMode mNoteInputMode;
    bool mHasExternalPulseSource;
+   bool mPush2Connected;
 
    TransportListenerInfo* mTransportListenerInfo;
 };

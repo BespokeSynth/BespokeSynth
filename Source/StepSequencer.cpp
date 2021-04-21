@@ -45,6 +45,7 @@ StepSequencer::StepSequencer()
 , mIsSetUp(false)
 , mNoteInputMode(NoteInputMode::PlayStepIndex)
 , mHasExternalPulseSource(false)
+, mPush2Connected(false)
 {
    mTransportListenerInfo = TheTransport->AddListener(this, mStepInterval, OffsetInfo(0, true), true);
    mFlusher.SetInterval(mStepInterval);
@@ -146,7 +147,7 @@ void StepSequencer::Poll()
    
    ComputeSliders(0);
    
-   if (mGridController->IsConnected())
+   if (HasGridController())
    {
       int numChunks = GetNumControllerChunks();
       if (numChunks != mGridYOffDropdown->GetNumValues())
@@ -165,7 +166,7 @@ namespace
 
 void StepSequencer::UpdateLights()
 {
-   if (!mGridController->IsConnected())
+   if (!HasGridController())
       return;
    
    for (int x=0; x<mGridController->NumCols(); ++x)
@@ -381,7 +382,7 @@ void StepSequencer::SetStep(int step, int pitch, int velocity)
 
 Vec2i StepSequencer::ControllerToGrid(const Vec2i& controller)
 {
-   if (!mGridController->IsConnected())
+   if (!HasGridController())
       return Vec2i(0,0);
    
    int numChunks = GetNumControllerChunks();
@@ -393,7 +394,7 @@ Vec2i StepSequencer::ControllerToGrid(const Vec2i& controller)
 
 int StepSequencer::GetNumControllerChunks()
 {
-   if (!mGridController->IsConnected())
+   if (!HasGridController())
       return 1;
    
    int numBreaks = int((mGrid->GetCols() / MAX(1.0f,mGridController->NumCols())) + .5f);
@@ -406,7 +407,7 @@ void StepSequencer::DrawModule()
    if (Minimized() || IsVisible() == false)
       return;
 
-   mGridYOffDropdown->SetShowing(mGridController->IsConnected());
+   mGridYOffDropdown->SetShowing(HasGridController());
    mAdjustOffsetsCheckbox->SetShowing(!mHasExternalPulseSource);
    mCurrentColumnSlider->SetExtents(0, GetNumSteps(mStepInterval));
    mRepeatRateDropdown->SetShowing(mNoteInputMode == NoteInputMode::RepeatHeld);
@@ -455,7 +456,7 @@ void StepSequencer::DrawModule()
       }
    }
 
-   if (mGridController->IsConnected())
+   if (HasGridController())
    {
       ofPushStyle();
       ofNoFill();
@@ -552,6 +553,8 @@ bool StepSequencer::MouseMoved(float x, float y)
 
 bool StepSequencer::OnPush2Control(MidiMessageType type, int controlIndex, float midiValue)
 {
+   mPush2Connected = true;
+
    if (type == kMidiMessage_Note)
    {
       if (controlIndex >= 36 && controlIndex <= 99)
@@ -585,6 +588,8 @@ bool StepSequencer::OnPush2Control(MidiMessageType type, int controlIndex, float
 
 void StepSequencer::UpdatePush2Leds(Push2Control* push2)
 {
+   mPush2Connected = true;
+
    for (int x=0; x<8; ++x)
    {
       for (int y=0; y<8; ++y)
@@ -826,6 +831,13 @@ int StepSequencer::GetMetaStep(double time)
 bool StepSequencer::IsMetaStepActive(double time, int col, int row)
 {
    return mMetaStepMasks[GetMetaStepMaskIndex(col, row)] & (1 << GetMetaStep(time));
+}
+
+bool StepSequencer::HasGridController()
+{
+   if (mPush2Connected)
+      return true;
+   return mGridController->IsConnected();
 }
 
 void StepSequencer::CheckboxUpdated(Checkbox* checkbox)
