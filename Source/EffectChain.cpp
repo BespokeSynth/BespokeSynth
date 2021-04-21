@@ -175,6 +175,8 @@ void EffectChain::DrawModule()
    
    mEffectSpawnList->SetShowing(mShowSpawnList);
    mSpawnEffectButton->SetShowing(mShowSpawnList && mSpawnIndex != -1);
+   if (mSpawnIndex != -1)
+      mSpawnEffectButton->SetLabel((string("spawn ") + mEffectSpawnList->GetLabel(mSpawnIndex)).c_str());
 
    for (int i=0; i<mEffects.size(); ++i)
    {
@@ -315,9 +317,10 @@ void EffectChain::GetPush2OverrideControls(vector<IUIControl*>& controls) const
    {
       controls.push_back(mVolumeSlider);
       controls.push_back(mEffectSpawnList);
-      controls.push_back(mSpawnEffectButton);
       for (int i = 0; i < (int)mEffects.size(); ++i)
          controls.push_back(mEffectControls[i].mPush2DisplayEffectButton);
+      if (mSpawnIndex != -1)
+         controls.push_back(mSpawnEffectButton);
    }
    else
    {
@@ -493,6 +496,13 @@ void EffectChain::DropdownUpdated(DropdownList* list, int oldVal)
          mSpawnIndex = -1;
       }
    }
+}
+
+vector<IUIControl*> EffectChain::ControlsToIgnoreInSaveState() const
+{
+   vector<IUIControl*> ignore;
+   ignore.push_back(mSpawnEffectButton);
+   return ignore;
 }
 
 void EffectChain::UpdateOldControlName(string& oldName)
