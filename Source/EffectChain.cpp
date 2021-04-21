@@ -464,7 +464,7 @@ void EffectChain::ButtonClicked(ClickButton* button)
          MoveEffect(i, 1);
       if (button == mEffectControls[i].mDeleteButton)
       {
-         DeleteEffect(i);
+         mWantToDeleteEffectAtIndex = i;
          return;
       }
       if (button == mEffectControls[i].mPush2DisplayEffectButton)
