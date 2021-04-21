@@ -229,7 +229,9 @@ void IDrawableModule::DrawFrame(float w, float h, bool drawModule, float& titleB
    else
       ofSetColor(color.r*.2f,color.g*.2f,color.b*.2f,120);
    //gModuleShader.begin();
-   ofRect(0, -titleBarHeight, w, h+titleBarHeight);
+   const float kHighlightGrowAmount = 40;
+   ofRect(0 - highlight * kHighlightGrowAmount, -titleBarHeight - highlight * kHighlightGrowAmount,
+          w + highlight * kHighlightGrowAmount * 2, h + titleBarHeight + highlight * kHighlightGrowAmount * 2, 3 + highlight * kHighlightGrowAmount);
    //gModuleShader.end();
    ofNoFill();
 
