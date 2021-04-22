@@ -146,9 +146,18 @@ void Pulser::OnTimeEvent(double time)
       shouldReset = TheTransport->GetQuantized(time, mTransportListenerInfo) == 0 && TheTransport->GetMeasure(time+offsetMs) % 4 == 0;
    if (mTimeMode == kTimeMode_Reset)
    {
-      int stepsPerMeasure = TheTransport->GetStepsPerMeasure(this);
-      int measure = TheTransport->GetMeasure(time);
-      int step = (TheTransport->GetQuantized(time, mTransportListenerInfo) + measure * stepsPerMeasure);
+      int step = 0;
+      if (TheTransport->GetMeasureFraction(mInterval) < 1)
+      {
+         int stepsPerMeasure = TheTransport->GetStepsPerMeasure(this);
+         int measure = TheTransport->GetMeasure(time);
+         step = (TheTransport->GetQuantized(time, mTransportListenerInfo) + measure * stepsPerMeasure);
+      }
+      else
+      {
+         int measure = TheTransport->GetMeasure(time);
+         step = measure / TheTransport->GetMeasureFraction(mInterval);
+      }
       if (step % mResetLength == 0)
          shouldReset = true;
    }

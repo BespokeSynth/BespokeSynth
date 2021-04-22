@@ -148,9 +148,17 @@ void PulseSequence::Step(double time, float velocity, int flags)
 
    if (flags & kPulseFlag_SyncToTransport)
    {
-      int stepsPerMeasure = TheTransport->GetStepsPerMeasure(this);
-      int measure = TheTransport->GetMeasure(time);
-      mStep = (TheTransport->GetQuantized(time, mTransportListenerInfo) + measure * stepsPerMeasure) % mLength;
+      if (TheTransport->GetMeasureFraction(mInterval) < 1)
+      {
+         int stepsPerMeasure = TheTransport->GetStepsPerMeasure(this);
+         int measure = TheTransport->GetMeasure(time);
+         mStep = (TheTransport->GetQuantized(time, mTransportListenerInfo) + measure * stepsPerMeasure) % mLength;
+      }
+      else
+      {
+         int measure = TheTransport->GetMeasure(time);
+         mStep = int(measure / TheTransport->GetMeasureFraction(mInterval)) % mLength;;
+      }
    }
    
    if (flags & kPulseFlag_Align)

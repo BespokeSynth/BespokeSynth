@@ -97,6 +97,9 @@ void NoteStepSequencer::CreateUIControls()
    }
    SetUpStepControls();
    
+   mIntervalSelector->AddLabel("4", kInterval_4);
+   mIntervalSelector->AddLabel("3", kInterval_3);
+   mIntervalSelector->AddLabel("2", kInterval_2);
    mIntervalSelector->AddLabel("1n", kInterval_1n);
    mIntervalSelector->AddLabel("2n", kInterval_2n);
    mIntervalSelector->AddLabel("4n", kInterval_4n);
@@ -459,9 +462,17 @@ void NoteStepSequencer::Step(double time, float velocity, int pulseFlags)
    
    if (!mHasExternalPulseSource || (pulseFlags & kPulseFlag_SyncToTransport))
    {
-      int stepsPerMeasure = TheTransport->GetStepsPerMeasure(this);
-      int measure = TheTransport->GetMeasure(time);
-      mArpIndex = (TheTransport->GetQuantized(time, mTransportListenerInfo) + measure * stepsPerMeasure) % mLength;
+      if (TheTransport->GetMeasureFraction(mInterval) < 1)
+      {
+         int stepsPerMeasure = TheTransport->GetStepsPerMeasure(this);
+         int measure = TheTransport->GetMeasure(time);
+         mArpIndex = (TheTransport->GetQuantized(time, mTransportListenerInfo) + measure * stepsPerMeasure) % mLength;
+      }
+      else
+      {
+         int measure = TheTransport->GetMeasure(time);
+         mArpIndex = int(measure / TheTransport->GetMeasureFraction(mInterval)) % mLength;
+      }
    }
 
    if (pulseFlags & kPulseFlag_Align)
