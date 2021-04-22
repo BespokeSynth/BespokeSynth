@@ -362,6 +362,7 @@ private:
    bool mBindMode;
    Checkbox* mBindCheckbox;
    bool mTwoWay;
+   bool mSendTwoWayOnChange;
    ClickButton* mAddConnectionButton;
    std::list<MidiNote> mQueuedNotes;
    std::list<MidiControl> mQueuedControls;
