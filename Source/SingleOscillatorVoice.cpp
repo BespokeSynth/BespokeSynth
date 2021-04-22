@@ -124,7 +124,7 @@ bool SingleOscillatorVoice::Process(double time, ChannelBuffer* out)
       {
          //PROFILER(SingleOscillatorVoice_filter);
          float minCutoff = 10;
-         float f = mFilterAdsr.Value(time) * (mVoiceParams->mFilterCutoffMax - mVoiceParams->mFilterCutoffMin) * (1 - GetModWheel(pos) * .9f) + mVoiceParams->mFilterCutoffMin;
+         float f = ofLerp(mVoiceParams->mFilterCutoffMin, mVoiceParams->mFilterCutoffMax, mFilterAdsr.Value(time)) * (1 - GetModWheel(pos) * .9f);
          float q = mVoiceParams->mFilterQ;
          if (f != mFilterLeft.mF || q != mFilterLeft.mQ)
             mFilterLeft.SetFilterParams(f, q);
