@@ -47,7 +47,7 @@ SingleOscillator::SingleOscillator()
    mVoiceParams.mFilterAdsr.Set(1,0,1,1000);
    mVoiceParams.mFilterCutoffMax = SINGLEOSCILLATOR_NO_CUTOFF;
    mVoiceParams.mFilterCutoffMin = 10;
-   mVoiceParams.mFilterQ = 1;
+   mVoiceParams.mFilterQ = sqrt(2)/2;
    mVoiceParams.mShuffle = 0;
    mVoiceParams.mPhaseOffset = 0;
    mVoiceParams.mUnison = 1;
