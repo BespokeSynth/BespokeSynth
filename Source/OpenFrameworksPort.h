@@ -246,10 +246,12 @@ public:
    float GetStringHeight(string str, float size, bool isRenderThread = false);
    bool IsLoaded() { return mLoaded; }
    int GetFontHandle() const { return mFontHandle; }
+   string GetFontPath() const { return mFontPath; }
 private:
    int mFontHandle;
    int mFontBoundsHandle;
    bool mLoaded;
+   string mFontPath;
 };
 
 struct ofFileDialogResult

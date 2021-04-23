@@ -166,6 +166,9 @@ void ModularSynth::LoadResources(void* nanoVG, void* fontBoundsNanoVG)
    gNanoVG = (NVGcontext*)nanoVG;
    gFontBoundsNanoVG = (NVGcontext*)fontBoundsNanoVG;
    LoadGlobalResources();
+
+   if (!gFont.IsLoaded())
+      mFatalError = "couldn't load font from " + gFont.GetFontPath();
 }
 
 void ModularSynth::InitIOBuffers(int inputChannelCount, int outputChannelCount)
