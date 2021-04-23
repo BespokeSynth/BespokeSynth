@@ -165,9 +165,12 @@ void Stutter::EndStutter(double time, StutterParams stutter)
    bool hasNewStutter = false;
    if (mStutterStack.size() > 1 && *(mStutterStack.begin()) == stutter)
    {  //if we're removing the current stutter and there are held stutters
-      mStutterStack.remove(stutter);
-      stutter = *(mStutterStack.begin());   //use previously held as stutter
-      hasNewStutter = true;
+      mStutterStack.remove(stutter);   //remove all matching stutters
+      if (mStutterStack.size() > 0) //if there's anything left
+      {
+         stutter = *(mStutterStack.begin());   //use previously held as stutter
+         hasNewStutter = true;
+      }
    }
    else
    {
