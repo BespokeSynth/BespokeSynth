@@ -712,9 +712,16 @@ void MidiController::Poll()
             continue;
          
          int control = connection->mControl;
+         int messageType = connection->mMessageType;
          
          if (connection->mFeedbackControl != -1) // "self"
-            control = connection->mFeedbackControl;
+         {
+            control = connection->mFeedbackControl%128;
+            if (connection->mFeedbackControl < 128)
+               messageType = kMidiMessage_Control;
+            else
+               messageType = kMidiMessage_Note;
+         }
          
          if (connection->mFeedbackControl == -2) // "none"
             continue;
@@ -737,11 +744,11 @@ void MidiController::Poll()
                {
                   outVal = connection->mMidiOffValue;
                }
-               if (connection->mMessageType == kMidiMessage_Note)
+               if (messageType == kMidiMessage_Note)
                   SendNote(mControllerPage, control, outVal, true, connection->mChannel);
-               else if (connection->mMessageType == kMidiMessage_Control)
+               else if (messageType == kMidiMessage_Control)
                   SendCC(mControllerPage, control, outVal, connection->mChannel);
-               else if (connection->mMessageType == kMidiMessage_PitchBend)
+               else if (messageType == kMidiMessage_PitchBend)
                   SendPitchBend(mControllerPage, outVal, connection->mChannel);
             }
             else if (connection->mType == kControlType_Slider)
@@ -752,11 +759,11 @@ void MidiController::Poll()
                {
                   outVal = int((curValue / 127.0f) * (connection->mMidiOnValue - connection->mMidiOffValue) + connection->mMidiOffValue);
                }
-               if (connection->mMessageType == kMidiMessage_Note)
+               if (messageType == kMidiMessage_Note)
                   SendNote(mControllerPage, control, outVal, true, connection->mChannel);
-               else if (connection->mMessageType == kMidiMessage_Control)
+               else if (messageType == kMidiMessage_Control)
                   SendCC(mControllerPage, control, outVal, connection->mChannel);
-               else if (connection->mMessageType == kMidiMessage_PitchBend)
+               else if (messageType == kMidiMessage_PitchBend)
                   SendPitchBend(mControllerPage, outVal, connection->mChannel);
             }
             else if (connection->mType == kControlType_SetValue)
@@ -776,21 +783,21 @@ void MidiController::Poll()
                {
                   outVal = connection->mMidiOffValue;
                }
-               if (connection->mMessageType == kMidiMessage_Note)
+               if (messageType == kMidiMessage_Note)
                   SendNote(mControllerPage, control, outVal, true, connection->mChannel);
-               else if (connection->mMessageType == kMidiMessage_Control)
+               else if (messageType == kMidiMessage_Control)
                   SendCC(mControllerPage, control, outVal, connection->mChannel);
-               else if (connection->mMessageType == kMidiMessage_PitchBend)
+               else if (messageType == kMidiMessage_PitchBend)
                   SendPitchBend(mControllerPage, outVal, connection->mChannel);
             }
             else if (connection->mType == kControlType_Direct)
             {
                curValue = uicontrol->GetValue();
-               if (connection->mMessageType == kMidiMessage_Note)
+               if (messageType == kMidiMessage_Note)
                   SendNote(mControllerPage, control, uicontrol->GetValue(), true, connection->mChannel);
-               else if (connection->mMessageType == kMidiMessage_Control)
+               else if (messageType == kMidiMessage_Control)
                   SendCC(mControllerPage, control, uicontrol->GetValue(), connection->mChannel);
-               else if (connection->mMessageType == kMidiMessage_PitchBend)
+               else if (messageType == kMidiMessage_PitchBend)
                   SendPitchBend(mControllerPage, uicontrol->GetValue(), connection->mChannel);
             }
             connection->mLastControlValue = curValue;
@@ -2286,8 +2293,10 @@ void UIControlConnection::CreateUIControls(int index)
    
    mFeedbackDropdown->AddLabel("self", -1);
    mFeedbackDropdown->AddLabel("none", -2);
-   for (int i=0; i<=127; ++i)
-      mFeedbackDropdown->AddLabel(ofToString(i).c_str(), i);
+   for (int i=0; i<=127; ++i)   //CCs
+      mFeedbackDropdown->AddLabel(("cc"+ofToString(i)).c_str(), i);
+   for (int i = 0; i <= 127; ++i)   //notes
+      mFeedbackDropdown->AddLabel(("n" + ofToString(i)).c_str(), i+128);
 }
 
 void UIControlConnection::SetShowing(bool enabled)
