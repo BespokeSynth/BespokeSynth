@@ -299,7 +299,7 @@ void FloatSliderLFOControl::UpdateVisibleControls()
    mFreeRateSlider->SetShowing(showFreeRate);
    mIntervalSelector->SetShowing(!isPerlin);
    mShuffleSlider->SetShowing(!isPerlin);
-   mSoftenSlider->SetShowing(mLFO.GetOsc()->GetType() == kOsc_Saw || mLFO.GetOsc()->GetType() == kOsc_Square);
+   mSoftenSlider->SetShowing(mLFO.GetOsc()->GetType() == kOsc_Saw || mLFO.GetOsc()->GetType() == kOsc_Square || mLFO.GetOsc()->GetType() == kOsc_NegSaw);
    mSpreadSlider->SetShowing(mLFO.GetOsc()->GetType() != kOsc_Square);
    mLengthSlider->SetShowing(!isPerlin && mLFO.GetOsc()->GetType() != kOsc_Drunk);
 }
