@@ -53,8 +53,8 @@ void KarplusStrong::CreateUIControls()
    mFeedbackSlider = new FloatSlider(this,"feedback",mFilterSlider,kAnchor_Below,140,15,&mVoiceParams.mFeedback,.9f,.9999f,4);
    mSourceDropdown = new DropdownList(this,"source type",mFeedbackSlider,kAnchor_Below,(int*)&mVoiceParams.mSourceType,45);
    mExciterFreqSlider = new FloatSlider(this,"x freq",mSourceDropdown,kAnchor_Right,92,15,&mVoiceParams.mExciterFreq,10,4000);
-   mExciterAttackSlider = new FloatSlider(this,"x att",mSourceDropdown,kAnchor_Below,69,15,&mVoiceParams.mExciterAttack,1,40);
-   mExciterDecaySlider = new FloatSlider(this,"x dec",mExciterAttackSlider,kAnchor_Right,68,15,&mVoiceParams.mExciterDecay,1,40);
+   mExciterAttackSlider = new FloatSlider(this,"x att",mSourceDropdown,kAnchor_Below,69,15,&mVoiceParams.mExciterAttack,0,40);
+   mExciterDecaySlider = new FloatSlider(this,"x dec",mExciterAttackSlider,kAnchor_Right,68,15,&mVoiceParams.mExciterDecay,0,40);
    //mStretchCheckbox = new Checkbox(this,"stretch",mVolSlider,kAnchor_Right,&mVoiceParams.mStretch);
    
    mSourceDropdown->AddLabel("sin", kSourceTypeSin);
