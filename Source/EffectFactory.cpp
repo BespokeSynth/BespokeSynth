@@ -28,6 +28,7 @@
 #include "PitchShiftEffect.h"
 #include "FormantFilterEffect.h"
 #include "ButterworthFilterEffect.h"
+#include "GainStageEffect.h"
 
 EffectFactory::EffectFactory()
 {
@@ -51,6 +52,7 @@ EffectFactory::EffectFactory()
    Register("pitchshift", &(PitchShiftEffect::Create));
    Register("formant", &(FormantFilterEffect::Create));
    Register("butterworth", &(ButterworthFilterEffect::Create));
+   Register("gainstage", &(GainStageEffect::Create));
 }
 
 void EffectFactory::Register(string type, CreateEffectFn creator)

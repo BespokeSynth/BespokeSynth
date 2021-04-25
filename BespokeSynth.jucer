@@ -184,6 +184,10 @@
               file="Source/FreeverbEffect.cpp"/>
         <FILE id="mt09aJ" name="FreeverbEffect.h" compile="0" resource="0"
               file="Source/FreeverbEffect.h"/>
+        <FILE id="gCsM94" name="GainStageEffect.cpp" compile="1" resource="0"
+              file="Source/GainStageEffect.cpp"/>
+        <FILE id="jOJtwc" name="GainStageEffect.h" compile="0" resource="0"
+              file="Source/GainStageEffect.h"/>
         <FILE id="dsUdFy" name="GateEffect.cpp" compile="1" resource="0" file="Source/GateEffect.cpp"/>
         <FILE id="z76bqB" name="GateEffect.h" compile="0" resource="0" file="Source/GateEffect.h"/>
         <FILE id="Hgk6me" name="LiveGranulator.cpp" compile="1" resource="0"
