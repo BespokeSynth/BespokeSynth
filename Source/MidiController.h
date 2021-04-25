@@ -377,6 +377,7 @@ private:
 
    int mControllerIndex;
    double mLastActivityTime;
+   double mLastConnectedActivityTime;
    IUIControl* mLastActivityUIControl;
    bool mLastActivityBound;
    double mLastBoundControlTime;

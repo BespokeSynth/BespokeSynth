@@ -41,6 +41,7 @@ MidiController::MidiController()
 , mSendTwoWayOnChange(false)
 , mControllerIndex(-1)
 , mLastActivityTime(-9999)
+, mLastConnectedActivityTime(-9999)
 , mLastActivityUIControl(nullptr)
 , mLastBoundControlTime(-9999)
 , mLastBoundUIControl(nullptr)
@@ -446,7 +447,6 @@ void MidiController::MidiReceived(MidiMessageType messageType, int control, floa
    mLastActivityBound = false;
    //if (value > 0)
       mLastActivityTime = gTime;
-   mLastActivityUIControl = nullptr;
    
    GetLayoutControl(control, messageType).mLastActivityTime = gTime;
    GetLayoutControl(control, messageType).mLastValue = value;
@@ -504,6 +504,7 @@ void MidiController::MidiReceived(MidiMessageType messageType, int control, floa
             continue;
          
          mLastActivityUIControl = uicontrol;
+         mLastConnectedActivityTime = gTime;
 
          if (connection->mType == kControlType_Slider)
          {
@@ -1125,9 +1126,6 @@ void MidiController::DrawModule()
 
 void MidiController::DrawModuleUnclipped()
 {
-   if (Minimized() || IsVisible() == false)
-      return;
-
    const float kDisplayMs = 500;
    string displayString;
    
@@ -1138,7 +1136,7 @@ void MidiController::DrawModuleUnclipped()
       if (drawControl != nullptr)
          displayString = drawControl->Path() + " bound!";
    }
-   else if (gTime < mLastActivityTime + kDisplayMs)
+   else if (gTime < mLastConnectedActivityTime + kDisplayMs)
    {
       drawControl = mLastActivityUIControl;
       if (drawControl != nullptr)
@@ -1317,7 +1315,8 @@ void MidiController::HighlightPageControls(int page)
 }
 
 void MidiController::GetModuleDimensions(float& width, float& height)
-{if (mMappingDisplayMode == kList)
+{
+   if (mMappingDisplayMode == kList)
    {
       width = 830;
       height = 72 + 20 * GetNumConnectionsOnPage(mControllerPage);
