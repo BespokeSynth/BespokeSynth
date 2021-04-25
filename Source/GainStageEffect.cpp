@@ -32,10 +32,12 @@ void GainStageEffect::ProcessAudio(double time, ChannelBuffer* buffer)
    
    float bufferSize = buffer->BufferSize();
 
-   ComputeSliders(0);
-
-   for (int ch=0; ch<buffer->NumActiveChannels(); ++ch)
-      Mult(buffer->GetChannel(ch), mGain, bufferSize);
+   for (int i = 0; i < bufferSize; ++i)
+   {
+      ComputeSliders(i);
+      for (int ch = 0; ch < buffer->NumActiveChannels(); ++ch)
+         buffer->GetChannel(ch)[i] *= mGain;
+   }
 }
 
 void GainStageEffect::DrawModule()
