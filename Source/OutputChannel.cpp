@@ -76,13 +76,18 @@ void OutputChannel::DrawModule()
 
 void OutputChannel::LoadLayout(const ofxJSONElement& moduleInfo)
 {
-   mModuleSaveData.LoadInt("channel", moduleInfo, 0, 0, TheSynth->GetNumOutputChannels()-1);
+   if (!moduleInfo["channel"].isNull())
+      mModuleSaveData.LoadInt("channel", moduleInfo, 0, 0, TheSynth->GetNumOutputChannels() - 1);
+   mModuleSaveData.LoadEnum<int>("channels", moduleInfo, 0, mChannelSelector);
 
    SetUpFromSaveData();
 }
 
 void OutputChannel::SetUpFromSaveData()
 {
-   mChannelSelectionIndex = mModuleSaveData.GetInt("channel");
+   if (mModuleSaveData.HasProperty("channel"))  //old version
+      mChannelSelectionIndex = mModuleSaveData.GetInt("channel") - 1;
+   else
+      mChannelSelectionIndex = mModuleSaveData.GetEnum<int>("channels");
 }
 
