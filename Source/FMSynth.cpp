@@ -170,6 +170,22 @@ void FMSynth::PlayNote(double time, int pitch, int velocity, int voiceIdx, Modul
       mPolyMgr.Stop(time, pitch);
       mVoiceParams.mOscADSRParams.Stop(time);   //for visualization
    }
+
+   if (mDrawDebug)
+   {
+      vector<string> lines = ofSplitString(mDebugLines, "\n");
+      mDebugLines = "";
+      const int kNumDisplayLines = 10;
+      for (int i = 0; i < kNumDisplayLines - 1; ++i)
+      {
+         int lineIndex = (int)lines.size() - (kNumDisplayLines - 1) + i;
+         if (lineIndex >= 0)
+            mDebugLines += lines[lineIndex] + "\n";
+      }
+      string debugLine = "PlayNote(" + ofToString(time / 1000) + ", " + ofToString(pitch) + ", " + ofToString(velocity) + ", " + ofToString(voiceIdx) + ")";
+      mDebugLines += debugLine;
+      ofLog() << debugLine;
+   }
 }
 
 void FMSynth::SetEnabled(bool enabled)
@@ -205,6 +221,17 @@ void FMSynth::DrawModule()
    DrawTextNormal("mod2",mAdsrDisplayMod2->GetPosition(true).x, mAdsrDisplayMod2->GetPosition(true).y+10);
 }
 
+void FMSynth::DrawModuleUnclipped()
+{
+   if (mDrawDebug)
+   {
+      float width, height;
+      GetModuleDimensions(width, height);
+      mPolyMgr.DrawDebug(width + 3, 0);
+      DrawTextNormal(mDebugLines, 0, height + 15);
+   }
+}
+
 void FMSynth::UpdateHarmonicRatio()
 {
    if (mHarmRatioBase < 0)
@@ -232,9 +259,16 @@ void FMSynth::FloatSliderUpdated(FloatSlider* slider, float oldVal)
       UpdateHarmonicRatio();
 }
 
+void FMSynth::CheckboxUpdated(Checkbox* checkbox)
+{
+   if (checkbox == mEnabledCheckbox)
+      mPolyMgr.KillAll();
+}
+
 void FMSynth::LoadLayout(const ofxJSONElement& moduleInfo)
 {
    mModuleSaveData.LoadString("target", moduleInfo);
+   mModuleSaveData.LoadInt("voicelimit", moduleInfo, -1, -1, kNumVoices);
 
    SetUpFromSaveData();
 }
@@ -242,6 +276,9 @@ void FMSynth::LoadLayout(const ofxJSONElement& moduleInfo)
 void FMSynth::SetUpFromSaveData()
 {
    SetTarget(TheSynth->FindModule(mModuleSaveData.GetString("target")));
+   int voiceLimit = mModuleSaveData.GetInt("voicelimit");
+   if (voiceLimit > 0)
+      mPolyMgr.SetVoiceLimit(voiceLimit);
 }
 
 

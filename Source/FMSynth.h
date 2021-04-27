@@ -38,22 +38,23 @@ public:
    void PlayNote(double time, int pitch, int velocity, int voiceIdx = -1, ModulationParameters modulation = ModulationParameters()) override;
    void SendCC(int control, int value, int voiceIdx = -1) override {}
 
-   //IDropdownListener
    void DropdownUpdated(DropdownList* list, int oldVal) override;
-   //IFloatSliderListener
    void FloatSliderUpdated(FloatSlider* slider, float oldVal) override;
+   void CheckboxUpdated(Checkbox* checkbox) override;
 
    virtual void LoadLayout(const ofxJSONElement& moduleInfo) override;
    virtual void SetUpFromSaveData() override;
+
+   bool HasDebugDraw() const override { return true; }
    
 private:
    void UpdateHarmonicRatio();
 
    //IDrawableModule
    void DrawModule() override;
+   void DrawModuleUnclipped() override;
    void GetModuleDimensions(float& width, float& height) override { width = 180; height = 203; }
    bool Enabled() const override { return mEnabled; }
-
    
    PolyphonyMgr mPolyMgr;
    NoteInputBuffer mNoteInputBuffer;
@@ -81,6 +82,8 @@ private:
    FloatSlider* mPhaseOffsetSlider2;
 
    ChannelBuffer mWriteBuffer;
+
+   string mDebugLines;
 };
 
 #endif /* defined(__modularSynth__FMSynth__) */
