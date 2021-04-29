@@ -22,6 +22,7 @@ NoteCounter::NoteCounter()
 , mLength(16)
 , mStep(0)
 , mCustomDivisor(8)
+, mRandom(false)
 {
    mTransportListenerInfo = TheTransport->AddListener(this, mInterval, OffsetInfo(0, true), true);
 }
@@ -35,6 +36,7 @@ void NoteCounter::CreateUIControls()
    CHECKBOX(mSyncCheckbox, "sync", &mSync); UIBLOCK_NEWLINE();
    INTSLIDER(mStartSlider, "start", &mStart, 0, 32);
    INTSLIDER(mLengthSlider, "length", &mLength, 1, 32);
+   CHECKBOX(mRandomCheckbox, "random", &mRandom);
    INTSLIDER(mCustomDivisorSlider, "div", &mCustomDivisor, 1, 32);
    ENDUIBLOCK(mWidth, mHeight);
    
@@ -64,6 +66,7 @@ void NoteCounter::DrawModule()
    mSyncCheckbox->Draw();
    mStartSlider->Draw();
    mLengthSlider->Draw();
+   mRandomCheckbox->Draw();
    mCustomDivisorSlider->SetShowing(mInterval == kInterval_CustomDivisor);
    mCustomDivisorSlider->Draw();
 }
@@ -85,7 +88,10 @@ void NoteCounter::OnTimeEvent(double time)
    }
    
    mNoteOutput.Flush(time);
-   PlayNoteOutput(time, mStep + mStart, 127, -1);
+   if (mRandom)
+      PlayNoteOutput(time, rand() % mLength + mStart, 127, -1);
+   else
+      PlayNoteOutput(time, mStep + mStart, 127, -1);
 }
 
 void NoteCounter::CheckboxUpdated(Checkbox* checkbox)

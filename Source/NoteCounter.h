@@ -56,6 +56,8 @@ private:
    bool mSync;
    int mCustomDivisor;
    IntSlider* mCustomDivisorSlider;
+   bool mRandom;
+   Checkbox* mRandomCheckbox;
    
    TransportListenerInfo* mTransportListenerInfo;
 };
