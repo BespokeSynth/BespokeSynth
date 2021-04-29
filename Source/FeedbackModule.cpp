@@ -16,11 +16,15 @@ FeedbackModule::FeedbackModule()
 , mFeedbackTarget(nullptr)
 , mFeedbackTargetCable(nullptr)
 , mFeedbackVizBuffer(VIZ_BUFFER_SECONDS*gSampleRate)
+, mSignalLimit(1)
 {
    AddChild(&mDelay);
    mDelay.SetPosition(3,15);
    mDelay.SetEnabled(true);
    mDelay.SetName("delay");
+
+   for (int i = 0; i < ChannelBuffer::kMaxNumChannels; ++i)
+      mGainScale[i] = 1;
 }
 
 void FeedbackModule::CreateUIControls()
@@ -34,7 +38,11 @@ void FeedbackModule::CreateUIControls()
    AddPatchCableSource(mFeedbackTargetCable);
    
    mDelay.CreateUIControls();
-   mDelay.SetFeedbackModuleMode(true);
+   mDelay.SetFeedbackModuleMode();
+
+   ofRectangle delayModuleRect = mDelay.GetRect(true);
+   mSignalLimitSlider = new FloatSlider(this, "limit", delayModuleRect.x, delayModuleRect.getMaxY() + 3, delayModuleRect.width, 15, &mSignalLimit, 0.01f, 1);
+   mSignalLimitSlider->SetMode(FloatSlider::kSquare);
 }
 
 FeedbackModule::~FeedbackModule()
@@ -68,8 +76,31 @@ void FeedbackModule::Process(double time)
       mFeedbackVizBuffer.SetNumChannels(GetBuffer()->NumActiveChannels());
       mDelay.ProcessAudio(gTime, GetBuffer());
       
+      const double kReleaseMs = 50;
+      const double kReleaseCoeff = exp(-1000.0 / (kReleaseMs * gSampleRate));
       for (int ch=0; ch<GetBuffer()->NumActiveChannels(); ++ch)
       {
+         float* channel = GetBuffer()->GetChannel(ch);
+         for (int i = 0; i < bufferSize; ++i)
+         {
+            //ofLog() << "input: " << channel[i];
+            if (abs(channel[i]) * mGainScale[ch] > mSignalLimit)
+            {
+               mGainScale[ch] = mSignalLimit / abs(channel[i]);  //limit immediately
+               //ofLog() << "limiting, new scale " << mGainScale[ch];
+            }
+            else
+            {
+               mGainScale[ch] = MIN(1 - kReleaseCoeff * (mGainScale[ch] - 1),    //blend towards 1
+                                    mSignalLimit / abs(channel[i])); //but don't make the scale less than it would have to be to limit the output
+               //ofLog() << "releasing, new scale " << mGainScale[ch];
+            }
+            
+            channel[i] *= mGainScale[ch];
+            //ofLog() << "output: " << channel[i];
+            //assert(abs(channel[i]) <= mSignalLimit);
+         }
+
          if (mDelay.Enabled())
          {
             Add(mFeedbackTarget->GetBuffer()->GetChannel(ch), GetBuffer()->GetChannel(ch), bufferSize);
@@ -91,6 +122,7 @@ void FeedbackModule::DrawModule()
       return;
    
    mDelay.Draw();
+   mSignalLimitSlider->Draw();
 }
 
 void FeedbackModule::PostRepatch(PatchCableSource* cableSource, bool fromUserClick)
