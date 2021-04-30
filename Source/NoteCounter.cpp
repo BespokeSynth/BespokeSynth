@@ -78,9 +78,7 @@ void NoteCounter::OnTimeEvent(double time)
    
    if (mSync)
    {
-      int stepsPerMeasure = TheTransport->GetStepsPerMeasure(this);
-      int measure = TheTransport->GetMeasure(time);
-      mStep = (TheTransport->GetQuantized(time, mTransportListenerInfo) + measure * stepsPerMeasure) % mLength;
+      mStep = TheTransport->GetSyncedStep(time, this, mTransportListenerInfo, mLength);
    }
    else
    {

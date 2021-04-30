@@ -462,17 +462,7 @@ void NoteStepSequencer::Step(double time, float velocity, int pulseFlags)
    
    if (!mHasExternalPulseSource || (pulseFlags & kPulseFlag_SyncToTransport))
    {
-      if (TheTransport->GetMeasureFraction(mInterval) < 1)
-      {
-         int stepsPerMeasure = TheTransport->GetStepsPerMeasure(this);
-         int measure = TheTransport->GetMeasure(time);
-         mArpIndex = (TheTransport->GetQuantized(time, mTransportListenerInfo) + measure * stepsPerMeasure) % mLength;
-      }
-      else
-      {
-         int measure = TheTransport->GetMeasure(time);
-         mArpIndex = int(measure / TheTransport->GetMeasureFraction(mInterval)) % mLength;
-      }
+      mArpIndex = TheTransport->GetSyncedStep(time, this, mTransportListenerInfo, mLength);
    }
 
    if (pulseFlags & kPulseFlag_Align)

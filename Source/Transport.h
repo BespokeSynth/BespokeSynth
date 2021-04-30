@@ -110,6 +110,7 @@ public:
    void ClearLoop() { mLoopStartMeasure = -1; mLoopEndMeasure = -1; }
    double GetMeasureFraction(NoteInterval interval);
    int GetStepsPerMeasure(ITimeListener* listener);
+   int GetSyncedStep(double time, ITimeListener* listener, const TransportListenerInfo* listenerInfo, int length = -1);
    
    bool CheckNeedsDraw() override { return true; }
    

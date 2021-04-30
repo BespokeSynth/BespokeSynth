@@ -103,7 +103,7 @@ void Transport::KeyPressed(int key, bool isRepeat)
 
 void Transport::AdjustTempo(double amount)
 {
-   SetTempo(MAX(1,TheTransport->GetTempo() + amount));
+   SetTempo(MAX(1, GetTempo() + amount));
 }
 
 void Transport::Advance(double ms)
@@ -421,10 +421,31 @@ int Transport::GetStepsPerMeasure(ITimeListener* listener)
    {
       if (info->mInterval == kInterval_CustomDivisor)
          return info->mCustomDivisor;
-      return TheTransport->CountInStandardMeasure(info->mInterval) * TheTransport->GetTimeSigTop() / TheTransport->GetTimeSigBottom();
+      return CountInStandardMeasure(info->mInterval) * GetTimeSigTop() / GetTimeSigBottom();
    }
    TheSynth->LogEvent("error: GetStepsPerMeasure() called with unregistered listener", kLogEventType_Error);
    return 8;
+}
+
+int Transport::GetSyncedStep(double time, ITimeListener* listener, const TransportListenerInfo* listenerInfo, int length)
+{
+   int step;
+   if (GetMeasureFraction(listenerInfo->mInterval) < 1)
+   {
+      int stepsPerMeasure = GetStepsPerMeasure(listener);
+      int measure = GetMeasure(time);
+      step = GetQuantized(time, listenerInfo) + measure * stepsPerMeasure;
+   }
+   else
+   {
+      int measure = GetMeasure(time);
+      step = int(measure / GetMeasureFraction(listenerInfo->mInterval));
+   }
+
+   if (length > 0)
+      step %= length;
+
+   return step;
 }
 
 double Transport::GetDuration(NoteInterval interval)
@@ -549,8 +570,8 @@ void Transport::CheckboxUpdated(Checkbox* checkbox)
          float recordedTime = gTime - mStartRecordTime;
          int beats = numBars * GetTimeSigTop();
          float minutes = recordedTime / 1000.0f / 60.0f;
-         TheTransport->SetTempo(beats/minutes);
-         TheTransport->SetDownbeat();
+         SetTempo(beats/minutes);
+         SetDownbeat();
       }
    }
 }

@@ -90,10 +90,7 @@ void ControlSequencer::Poll()
 
 void ControlSequencer::OnTimeEvent(double time)
 {
-   int stepsPerMeasure = TheTransport->GetStepsPerMeasure(this);
-   int numMeasures = MAX(1,ceil(float(mGrid->GetCols()) / stepsPerMeasure));
-   int measure = TheTransport->GetMeasure(time);
-   int step = (TheTransport->GetQuantized(time, mTransportListenerInfo) + measure * stepsPerMeasure) % mGrid->GetCols();
+   int step = TheTransport->GetSyncedStep(time, this, mTransportListenerInfo, mGrid->GetCols());
    
    mGrid->SetHighlightCol(time, step);
    

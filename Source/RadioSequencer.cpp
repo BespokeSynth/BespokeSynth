@@ -112,19 +112,7 @@ void RadioSequencer::UpdateGridLights()
 
 void RadioSequencer::OnTimeEvent(double time)
 {
-   int step = 0;
-   if (TheTransport->GetMeasureFraction(mInterval) < 1)
-   {
-      int stepsPerMeasure = TheTransport->GetStepsPerMeasure(this);
-      int measure = TheTransport->GetMeasure(time);
-      step = (TheTransport->GetQuantized(time, mTransportListenerInfo) + measure * stepsPerMeasure);
-   }
-   else
-   {
-      int measure = TheTransport->GetMeasure(time);
-      step = measure / TheTransport->GetMeasureFraction(mInterval);
-   }
-   step %= mGrid->GetCols();
+   int step = TheTransport->GetSyncedStep(time, this, mTransportListenerInfo, mGrid->GetCols());
    
    mGrid->SetHighlightCol(time, step);
    

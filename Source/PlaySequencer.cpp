@@ -284,9 +284,7 @@ void PlaySequencer::NoteOffScheduler::OnTimeEvent(double time)
 
 int PlaySequencer::GetStep(double time)
 {
-   int measure = TheTransport->GetMeasure(time) % mNumMeasures;
-   int stepsPerMeasure = TheTransport->GetStepsPerMeasure(this);
-   int step = TheTransport->GetQuantized(time, mTransportListenerInfo) + stepsPerMeasure * measure;
+   int step = TheTransport->GetSyncedStep(time, this, mTransportListenerInfo);
    return step;
 }
 

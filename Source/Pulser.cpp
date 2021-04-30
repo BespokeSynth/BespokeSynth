@@ -149,9 +149,7 @@ void Pulser::OnTimeEvent(double time)
       int step = 0;
       if (TheTransport->GetMeasureFraction(mInterval) < 1)
       {
-         int stepsPerMeasure = TheTransport->GetStepsPerMeasure(this);
-         int measure = TheTransport->GetMeasure(time);
-         step = (TheTransport->GetQuantized(time, mTransportListenerInfo) + measure * stepsPerMeasure);
+         step = TheTransport->GetSyncedStep(time, this, mTransportListenerInfo);
       }
       else
       {
