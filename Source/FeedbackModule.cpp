@@ -19,7 +19,7 @@ FeedbackModule::FeedbackModule()
 , mSignalLimit(1)
 {
    AddChild(&mDelay);
-   mDelay.SetPosition(3,15);
+   mDelay.SetPosition(4,32);
    mDelay.SetEnabled(true);
    mDelay.SetName("delay");
 
@@ -32,7 +32,7 @@ void FeedbackModule::CreateUIControls()
    IDrawableModule::CreateUIControls();
    
    mFeedbackTargetCable = new PatchCableSource(this, kConnectionType_Audio);
-   mFeedbackTargetCable->SetManualPosition(110, 8);
+   mFeedbackTargetCable->SetManualPosition(108, 8);
    mFeedbackTargetCable->SetOverrideCableDir(ofVec2f(1,0));
    mFeedbackTargetCable->SetOverrideVizBuffer(&mFeedbackVizBuffer);
    AddPatchCableSource(mFeedbackTargetCable);
@@ -123,6 +123,8 @@ void FeedbackModule::DrawModule()
    
    mDelay.Draw();
    mSignalLimitSlider->Draw();
+
+   DrawTextLeftJustify("feedback out:", 100, 12);
 }
 
 void FeedbackModule::PostRepatch(PatchCableSource* cableSource, bool fromUserClick)
