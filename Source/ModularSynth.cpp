@@ -43,9 +43,9 @@ ModularSynth* TheSynth = nullptr;
 
 //static
 bool ModularSynth::sShouldAutosave = true;
-float ModularSynth::sBackgroundLissajousR = 0.704081655f;
-float ModularSynth::sBackgroundLissajousG = 0.387755096f;
-float ModularSynth::sBackgroundLissajousB = 0.795918345f;
+float ModularSynth::sBackgroundLissajousR = 0.408f;
+float ModularSynth::sBackgroundLissajousG = 0.245f;
+float ModularSynth::sBackgroundLissajousB = 0.418f;
 
 void AtExit()
 {
