@@ -252,7 +252,7 @@ private:
    QuickSpawnMenu* mQuickSpawn;
    UserPrefsEditor* mUserPrefsEditor;
 
-   RollingBuffer mGlobalRecordBuffer;
+   RollingBuffer* mGlobalRecordBuffer;
    long long mRecordingLength;
    
    struct LogEventItem

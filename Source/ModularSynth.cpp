@@ -39,8 +39,6 @@
 
 ModularSynth* TheSynth = nullptr;
 
-#define RECORDING_LENGTH (48000*60*30) //30 minutes of recording if we're running at 48000
-
 //static
 bool ModularSynth::sShouldAutosave = true;
 float ModularSynth::sBackgroundLissajousR = 0.408f;
@@ -55,7 +53,7 @@ void AtExit()
 ModularSynth::ModularSynth()
 : mMoveModule(nullptr)
 , mIsMousePanning(false)
-, mGlobalRecordBuffer(RECORDING_LENGTH)
+, mGlobalRecordBuffer(nullptr)
 , mAudioPaused(false)
 , mIsLoadingState(false)
 , mClickStartX(INT_MAX)
@@ -84,17 +82,16 @@ ModularSynth::ModularSynth()
    mConsoleText[0] = 0;
    assert(TheSynth == nullptr);
    TheSynth = this;
-   
-   mSaveOutputBuffer[0] = new float[RECORDING_LENGTH];
-   mSaveOutputBuffer[1] = new float[RECORDING_LENGTH];
-   
-   mGlobalRecordBuffer.SetNumChannels(2);
 }
 
 ModularSynth::~ModularSynth()
 {
    DeleteAllModules();
    
+   delete mGlobalRecordBuffer;
+   delete[] mSaveOutputBuffer[0];
+   delete[] mSaveOutputBuffer[1];
+
    SetMemoryTrackingEnabled(false); //avoid crashes when the tracking lists themselves are deleted
    
    assert(TheSynth == this);
@@ -122,6 +119,14 @@ void ModularSynth::Setup(GlobalManagers* globalManagers, juce::Component* mainCo
          mScrollMultiplierHorizontal = mUserPrefs["scroll_multiplier_horizontal"].asDouble();
       if (!mUserPrefs["scroll_multiplier_vertical"].isNull())
          mScrollMultiplierVertical = mUserPrefs["scroll_multiplier_vertical"].asDouble();
+
+      int recordBufferLengthMinutes = 30;
+      if (!mUserPrefs["record_buffer_length_minutes"].isNull())
+         recordBufferLengthMinutes = mUserPrefs["record_buffer_length_minutes"].asDouble();
+      mGlobalRecordBuffer = new RollingBuffer(recordBufferLengthMinutes * 60 * gSampleRate);
+      mGlobalRecordBuffer->SetNumChannels(2);
+      mSaveOutputBuffer[0] = new float[mGlobalRecordBuffer->Size()];
+      mSaveOutputBuffer[1] = new float[mGlobalRecordBuffer->Size()];
 
       juce::File(ofToDataPath("savestate")).createDirectory();
       juce::File(ofToDataPath("savestate/autosave")).createDirectory();
@@ -346,7 +351,7 @@ void ModularSynth::Draw(void* vg)
          DrawFallbackText(mFatalError.c_str(), 100, 100);
    }
    
-   DrawLissajous(&mGlobalRecordBuffer, 0, 0, ofGetWidth(), ofGetHeight(), sBackgroundLissajousR, sBackgroundLissajousG, sBackgroundLissajousB);
+   DrawLissajous(mGlobalRecordBuffer, 0, 0, ofGetWidth(), ofGetHeight(), sBackgroundLissajousR, sBackgroundLissajousG, sBackgroundLissajousB);
 
    if (ScriptModule::sBackgroundTextString != "")
    {
@@ -1380,11 +1385,11 @@ void ModularSynth::AudioOut(float** output, int bufferSize, int nChannels)
    }
    /////////// AUDIO PROCESSING ENDS HERE /////////////
    if (nChannels >= 1)
-      mGlobalRecordBuffer.WriteChunk(output[0], bufferSize, 0);
+      mGlobalRecordBuffer->WriteChunk(output[0], bufferSize, 0);
    if (nChannels >= 2)
-      mGlobalRecordBuffer.WriteChunk(output[1], bufferSize, 1);
+      mGlobalRecordBuffer->WriteChunk(output[1], bufferSize, 1);
    mRecordingLength += bufferSize;
-   mRecordingLength = MIN(mRecordingLength, RECORDING_LENGTH);
+   mRecordingLength = MIN(mRecordingLength, mGlobalRecordBuffer->Size());
    
    Profiler::PrintCounters();
 }
@@ -2367,12 +2372,12 @@ void ModularSynth::SaveOutput()
    string filename = ofGetTimestampString("recordings/recording_%Y-%m-%d_%H-%M.wav");
    //string filenamePos = ofGetTimestampString("recordings/pos_%Y-%m-%d_%H-%M.wav");
 
-   assert(mRecordingLength <= RECORDING_LENGTH);
+   assert(mRecordingLength <= mGlobalRecordBuffer->Size());
    
    for (int i=0; i<mRecordingLength; ++i)
    {
-      mSaveOutputBuffer[0][i] = mGlobalRecordBuffer.GetSample((int)mRecordingLength-i-1, 0);
-      mSaveOutputBuffer[1][i] = mGlobalRecordBuffer.GetSample((int)mRecordingLength-i-1, 1);
+      mSaveOutputBuffer[0][i] = mGlobalRecordBuffer->GetSample((int)mRecordingLength-i-1, 0);
+      mSaveOutputBuffer[1][i] = mGlobalRecordBuffer->GetSample((int)mRecordingLength-i-1, 1);
    }
 
    Sample::WriteDataToFile(filename.c_str(), mSaveOutputBuffer, (int)mRecordingLength, 2);
@@ -2380,7 +2385,7 @@ void ModularSynth::SaveOutput()
    //mOutputBufferMeasurePos.ReadChunk(mSaveOutputBuffer, mRecordingLength);
    //Sample::WriteDataToFile(filenamePos.c_str(), mSaveOutputBuffer, mRecordingLength, 1);
    
-   mGlobalRecordBuffer.ClearBuffer();
+   mGlobalRecordBuffer->ClearBuffer();
    mRecordingLength = 0;
 }
 

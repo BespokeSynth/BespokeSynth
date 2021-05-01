@@ -83,6 +83,8 @@ private:
    float mScrollMultiplierHorizontal;
    Checkbox* mAutosaveCheckbox;
    bool mAutosave;
+   TextEntry* mRecordBufferLengthEntry;
+   float mRecordBufferLengthMinutes;
    TextEntry* mTooltipsFilePathEntry;
    string mTooltipsFilePath;
    TextEntry* mDefaultLayoutPathEntry;

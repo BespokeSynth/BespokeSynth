@@ -25,7 +25,7 @@ void UserPrefsEditor::CreateUIControls()
 {
    IDrawableModule::CreateUIControls();
 
-   UIBLOCK(165,50,200);
+   UIBLOCK(175,50,200);
    DROPDOWN(mDeviceTypeDropdown, "devicetype", &mDeviceTypeIndex, 200);
    DROPDOWN(mAudioOutputDeviceDropdown, "audio_output_device", &mAudioOutputDeviceIndex, 350);
    DROPDOWN(mAudioInputDeviceDropdown, "audio_input_device", &mAudioInputDeviceIndex, 350);
@@ -40,6 +40,7 @@ void UserPrefsEditor::CreateUIControls()
    FLOATSLIDER(mScrollMultiplierVerticalSlider, "scroll_multiplier_vertical", &mScrollMultiplierVertical, -2, 2);
    FLOATSLIDER(mScrollMultiplierHorizontalSlider, "scroll_multiplier_horizontal", &mScrollMultiplierHorizontal, -2, 2);
    CHECKBOX(mAutosaveCheckbox, "autosave", &mAutosave);
+   TEXTENTRY_NUM(mRecordBufferLengthEntry, "record_buffer_length_minutes", 5, &mRecordBufferLengthMinutes, 1, 120);
    TEXTENTRY(mTooltipsFilePathEntry, "tooltips", 100, &mTooltipsFilePath);
    TEXTENTRY(mDefaultLayoutPathEntry, "layout", 100, &mDefaultLayoutPath);
    TEXTENTRY(mYoutubeDlPathEntry, "youtube-dl_path", 100, &mYoutubeDlPath);
@@ -87,6 +88,11 @@ void UserPrefsEditor::Show()
       mScrollMultiplierHorizontal = 1;
    else
       mScrollMultiplierHorizontal = TheSynth->GetUserPrefs()["scroll_multiplier_horizontal"].asDouble();
+
+   if (TheSynth->GetUserPrefs()["record_buffer_length_minutes"].isNull())
+      mRecordBufferLengthMinutes = 30;
+   else
+      mRecordBufferLengthMinutes = TheSynth->GetUserPrefs()["record_buffer_length_minutes"].asDouble();
 
    if (TheSynth->GetUserPrefs()["tooltips"].isNull())
       mTooltipsFilePath = "internal/tooltips_eng.txt";
@@ -343,6 +349,7 @@ void UserPrefsEditor::ButtonClicked(ClickButton* button)
       UpdatePrefFloat(userPrefs, "scroll_multiplier_vertical", mScrollMultiplierVertical);
       UpdatePrefFloat(userPrefs, "scroll_multiplier_horizontal", mScrollMultiplierHorizontal);
       UpdatePrefBool(userPrefs, "autosave", mAutosave);
+      UpdatePrefFloat(userPrefs, "record_buffer_length_minutes", mRecordBufferLengthMinutes);
       UpdatePrefStr(userPrefs, "tooltips", mTooltipsFilePath);
       UpdatePrefStr(userPrefs, "layout", mDefaultLayoutPath);
       UpdatePrefStr(userPrefs, "youtube-dl_path", mYoutubeDlPath);
