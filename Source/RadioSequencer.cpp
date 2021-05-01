@@ -112,6 +112,9 @@ void RadioSequencer::UpdateGridLights()
 
 void RadioSequencer::OnTimeEvent(double time)
 {
+   if (!mEnabled)
+      return;
+
    int step = TheTransport->GetSyncedStep(time, this, mTransportListenerInfo, mGrid->GetCols());
    
    mGrid->SetHighlightCol(time, step);
