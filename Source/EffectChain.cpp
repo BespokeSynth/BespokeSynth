@@ -227,12 +227,14 @@ void EffectChain::DrawModule()
       mEffects[i]->GetDimensions(w,h);
       w = MAX(w,MIN_EFFECT_WIDTH);
       
-      /*ofPushStyle();
-      ofNoFill();
-      ofSetLineWidth(2);
-      ofSetColor(0,255,255,gModuleDrawAlpha*mEffects[i]->GetEffectAmount()*mDryWetLevels[i]);
-      ofRect(x,y-IDrawableModule::TitleBarHeight(),w,h+IDrawableModule::TitleBarHeight());
-      ofPopStyle();*/
+      if (mDryWetLevels[i] == 0)
+      {
+         ofPushStyle();
+         ofFill();
+         ofSetColor(0, 0, 0, 100);
+         ofRect(x, y - IDrawableModule::TitleBarHeight(), w, h + IDrawableModule::TitleBarHeight());
+         ofPopStyle();
+      }
       
       if (i < mEffects.size() - 1)
       {
