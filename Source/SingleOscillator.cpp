@@ -138,8 +138,6 @@ void SingleOscillator::CreateUIControls()
    mFilterCutoffMaxSlider->SetMode(FloatSlider::kSquare);
    mFilterCutoffMinSlider->SetMode(FloatSlider::kSquare);
    mFilterQSlider->SetMode(FloatSlider::kSquare);
-   
-   mWriteBuffer.SetNumActiveChannels(2);
 }
 
 SingleOscillator::~SingleOscillator()
@@ -325,6 +323,7 @@ void SingleOscillator::LoadLayout(const ofxJSONElement& moduleInfo)
    mModuleSaveData.LoadFloat("detune", moduleInfo, 0, mDetuneSlider);
    mModuleSaveData.LoadBool("pressure_envelope", moduleInfo);
    mModuleSaveData.LoadInt("voicelimit", moduleInfo, -1, -1, kNumVoices);
+   mModuleSaveData.LoadBool("mono", moduleInfo, false);
 
    SetUpFromSaveData();
 }
@@ -332,9 +331,13 @@ void SingleOscillator::LoadLayout(const ofxJSONElement& moduleInfo)
 void SingleOscillator::SetUpFromSaveData()
 {
    SetTarget(TheSynth->FindModule(mModuleSaveData.GetString("target")));
+
    int voiceLimit = mModuleSaveData.GetInt("voicelimit");
    if (voiceLimit > 0)
       mPolyMgr.SetVoiceLimit(voiceLimit);
+   
+   bool mono = mModuleSaveData.GetBool("mono");
+   mWriteBuffer.SetNumActiveChannels(mono ? 1 : 2);
 }
 
 

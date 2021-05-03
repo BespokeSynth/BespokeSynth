@@ -67,8 +67,6 @@ void KarplusStrong::CreateUIControls()
    mExciterDecaySlider->SetMode(FloatSlider::kSquare);
    
    mBiquad.CreateUIControls();
-   
-   mWriteBuffer.SetNumActiveChannels(2);
 }
 
 KarplusStrong::~KarplusStrong()
@@ -171,6 +169,7 @@ void KarplusStrong::LoadLayout(const ofxJSONElement& moduleInfo)
 {
    mModuleSaveData.LoadString("target", moduleInfo);
    mModuleSaveData.LoadInt("voicelimit", moduleInfo, -1, -1, kNumVoices);
+   mModuleSaveData.LoadBool("mono", moduleInfo, false);
 
    SetUpFromSaveData();
 }
@@ -178,9 +177,13 @@ void KarplusStrong::LoadLayout(const ofxJSONElement& moduleInfo)
 void KarplusStrong::SetUpFromSaveData()
 {
    SetTarget(TheSynth->FindModule(mModuleSaveData.GetString("target")));
+
    int voiceLimit = mModuleSaveData.GetInt("voicelimit");
    if (voiceLimit > 0)
       mPolyMgr.SetVoiceLimit(voiceLimit);
+
+   bool mono = mModuleSaveData.GetBool("mono");
+   mWriteBuffer.SetNumActiveChannels(mono ? 1 : 2);
 }
 
 
