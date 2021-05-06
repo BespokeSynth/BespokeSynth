@@ -27,7 +27,7 @@ public:
    virtual ~Vocoder();
    static IDrawableModule* Create() { return new Vocoder(); }
    
-   string GetTitleLabel() override { return "vocoder"; }
+   string GetTitleLabel() override { return "fft vocoder"; }
    void CreateUIControls() override;
    
    void SetEnabled(bool enabled) override { mEnabled = enabled; }

@@ -27,8 +27,8 @@ void VocoderCarrierInput::CreateUIControls()
 {
    IDrawableModule::CreateUIControls();
    
+   GetPatchCableSource()->AddTypeFilter("fftvocoder");
    GetPatchCableSource()->AddTypeFilter("vocoder");
-   GetPatchCableSource()->AddTypeFilter("bandvocoder");
 }
 
 void VocoderCarrierInput::Process(double time)

@@ -251,7 +251,7 @@ ModuleFactory::ModuleFactory()
    REGISTER(NoteRouter, noterouter, kModuleType_Note);
    REGISTER(AudioRouter, audiorouter, kModuleType_Audio);
    REGISTER(LaunchpadNoteDisplayer, gridnotedisplayer, kModuleType_Note);
-   REGISTER(Vocoder, vocoder, kModuleType_Audio);
+   REGISTER(Vocoder, fftvocoder, kModuleType_Audio);
    REGISTER(FreqDelay, freqdelay, kModuleType_Audio);
    REGISTER(VelocitySetter, velocitysetter, kModuleType_Note);
    REGISTER(NoteSinger, notesinger, kModuleType_Instrument);
@@ -261,7 +261,7 @@ ModuleFactory::ModuleFactory()
    REGISTER(Presets, presets, kModuleType_Other);
    REGISTER(NoteStepSequencer, notesequencer, kModuleType_Instrument);
    REGISTER(SingleOscillator, oscillator, kModuleType_Synth);
-   REGISTER(BandVocoder, bandvocoder, kModuleType_Audio);
+   REGISTER(BandVocoder, vocoder, kModuleType_Audio);
    REGISTER(Capo, capo, kModuleType_Note);
    REGISTER(VocoderCarrierInput, vocodercarrier, kModuleType_Audio);
    REGISTER(InputChannel, input, kModuleType_Audio);

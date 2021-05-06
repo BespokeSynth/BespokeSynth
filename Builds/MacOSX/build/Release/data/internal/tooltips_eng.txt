@@ -521,11 +521,11 @@ waveform~waveform display
 
 
 
-vocodercarrier~connect to "vocoder" or "bandvocoder" modules. send the synth audio into this module, and the voice audio into the vocoder module.
+vocodercarrier~connect to "vocoder" or "fftvocoder" modules. send the synth audio into this module, and the voice audio into the vocoder module.
 
 
 
-vocoder~FFT-based vocoder
+fftvocoder~FFT-based vocoder
 ~input~[no tooltip]
 ~carrier~[no tooltip]
 ~volume~[no tooltip]
@@ -757,18 +757,18 @@ dcoffset~add a constant offset to an audio signal
 
 
 
-bandvocoder~frequency band-based vocoder. this must be paired with a "vocodercarrier" module. voice should be routed into this module, and a synth should be patched into the vocodercarrier.
-~input~[no tooltip]
-~carrier~[no tooltip]
-~volume~[no tooltip]
-~dry/wet~[no tooltip]
-~max band~[no tooltip]
-~spacing~[no tooltip]
-~bands~[no tooltip]
-~f base~[no tooltip]
-~f range~[no tooltip]
-~q~[no tooltip]
-~ring~[no tooltip]
+vocoder~frequency band-based vocoder. this must be paired with a "vocodercarrier" module. voice should be routed into this module, and a synth should be patched into the vocodercarrier.
+~input~input signal gain
+~carrier~carrier signal gain
+~volume~output gain
+~mix~how much original input vs vocoded signal to output
+~max band~volume limit for each frequency band
+~spacing~how frequency bands should be spaced
+~bands~how many frequency bands to use
+~f base~frequency for lowest band
+~f range~frequency range to highest band
+~q~resonance of the bands
+~ring~how long it should take the bands to "cool down"
 
 
 
@@ -1099,7 +1099,7 @@ whitekeys~remap the white keys that correspond to the C major scale to instead p
 
 
 
-volcabeatscontrol~outputs MIDI data to control varios aspects of the KORG volca beats drum machine
+volcabeatscontrol~outputs MIDI data to control various aspects of the KORG volca beats drum machine
 ~clap speed~
 ~clave speed~
 ~agogo speed~
@@ -1372,7 +1372,7 @@ midicapturer~[no tooltip]
 
 
 
-linnstrumentcontrol~[no tooltip]
+linnstrumentcontrol~control the lights of a linnstrument controller in various ways
 ~controller~[no tooltip]
 ~decay~[no tooltip]
 ~blackout~[no tooltip]

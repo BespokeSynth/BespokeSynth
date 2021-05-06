@@ -28,7 +28,7 @@ public:
    virtual ~BandVocoder();
    static IDrawableModule* Create() { return new BandVocoder(); }
    
-   string GetTitleLabel() override { return "band vocoder"; }
+   string GetTitleLabel() override { return "vocoder"; }
    void CreateUIControls() override;
    
    void SetCarrierBuffer(float* carrier, int bufferSize) override;
