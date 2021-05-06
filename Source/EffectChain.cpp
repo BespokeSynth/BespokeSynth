@@ -384,6 +384,7 @@ void EffectChain::DeleteEffect(int index)
       mEffectControls[index].mDryWetSlider->Delete();
       mEffectControls[index].mPush2DisplayEffectButton->Delete();
       //remove the element from mEffectControls
+      int i = 0;
       for (auto iter = mEffectControls.begin(); iter != mEffectControls.end(); ++iter)
       {
          if (iter->mDeleteButton == mEffectControls[index].mDeleteButton)  //delete buttons match, we found the right one
@@ -391,7 +392,11 @@ void EffectChain::DeleteEffect(int index)
             mEffectControls.erase(iter);
             break;
          }
+         ++i;
       }
+
+      for (; i < mEffectControls.size() + 1; ++i)
+         mDryWetLevels[i] = mDryWetLevels[i + 1];
 
       UpdateReshuffledDryWetSliders();
    }

@@ -84,7 +84,7 @@ private:
    vector<IAudioEffect*> mEffects;
    ChannelBuffer mDryBuffer;
    vector<EffectControls> mEffectControls;
-   float mDryWetLevels[MAX_EFFECTS_IN_CHAIN];  //implicit max of 100 effects
+   std::array<float, MAX_EFFECTS_IN_CHAIN> mDryWetLevels;
    
    double mSwapTime;
    int mSwapFromIdx;
