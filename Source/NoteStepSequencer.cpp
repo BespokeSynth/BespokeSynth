@@ -878,7 +878,7 @@ void NoteStepSequencer::SetUpFromSaveData()
 
 namespace
 {
-   const int kSaveStateRev = 1;
+   const int kSaveStateRev = 2;
 }
 
 void NoteStepSequencer::SaveState(FileStreamOut& out)
@@ -889,6 +889,7 @@ void NoteStepSequencer::SaveState(FileStreamOut& out)
    
    mGrid->SaveState(out);
    mVelocityGrid->SaveState(out);
+   out << mHasExternalPulseSource;
 }
 
 void NoteStepSequencer::LoadState(FileStreamIn& in)
@@ -897,10 +898,12 @@ void NoteStepSequencer::LoadState(FileStreamIn& in)
    
    int rev;
    in >> rev;
-   LoadStateValidate(rev == kSaveStateRev);
+   LoadStateValidate(rev <= kSaveStateRev);
    
    mGrid->LoadState(in);
    mVelocityGrid->LoadState(in);
    GridUpdated(mGrid, 0, 0, 0, 0);
    GridUpdated(mVelocityGrid, 0, 0, 0, 0);
+   if (rev >= 2)
+      in >> mHasExternalPulseSource;
 }

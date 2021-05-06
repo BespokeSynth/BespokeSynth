@@ -1011,7 +1011,7 @@ void StepSequencer::SetUpFromSaveData()
 
 namespace
 {
-   const int kSaveStateRev = 1;
+   const int kSaveStateRev = 2;
 }
 
 void StepSequencer::SaveState(FileStreamOut& out)
@@ -1026,6 +1026,7 @@ void StepSequencer::SaveState(FileStreamOut& out)
    out << numMetaStepMasks;
    for (int i=0; i<numMetaStepMasks; ++i)
       out << mMetaStepMasks[i];
+   out << mHasExternalPulseSource;
 }
 
 void StepSequencer::LoadState(FileStreamIn& in)
@@ -1045,6 +1046,8 @@ void StepSequencer::LoadState(FileStreamIn& in)
       for (int i=0; i<numMetaStepMasks; ++i)
          in >> mMetaStepMasks[i];
    }
+   if (rev >= 2)
+      in >> mHasExternalPulseSource;
 }
 
 StepSequencerRow::StepSequencerRow(StepSequencer* seq, UIGrid* grid, int row)

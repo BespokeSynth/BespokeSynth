@@ -246,7 +246,7 @@ void PulseSequence::GridUpdated(UIGrid* grid, int col, int row, float value, flo
 
 namespace
 {
-   const int kSaveStateRev = 1;
+   const int kSaveStateRev = 2;
 }
 
 void PulseSequence::SaveState(FileStreamOut& out)
@@ -256,6 +256,7 @@ void PulseSequence::SaveState(FileStreamOut& out)
    out << kSaveStateRev;
    
    mVelocityGrid->SaveState(out);
+   out << mHasExternalPulseSource;
 }
 
 void PulseSequence::LoadState(FileStreamIn& in)
@@ -264,10 +265,13 @@ void PulseSequence::LoadState(FileStreamIn& in)
    
    int rev;
    in >> rev;
-   LoadStateValidate(rev == kSaveStateRev);
+   LoadStateValidate(rev <= kSaveStateRev);
    
    mVelocityGrid->LoadState(in);
    GridUpdated(mVelocityGrid, 0, 0, 0, 0);
+
+   if (rev >= 2)
+      in >> mHasExternalPulseSource;
 }
 
 void PulseSequence::SaveLayout(ofxJSONElement& moduleInfo)
