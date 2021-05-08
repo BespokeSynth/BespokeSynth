@@ -570,6 +570,8 @@
         <FILE id="EkwIdT" name="PitchDive.h" compile="0" resource="0" file="Source/PitchDive.h"/>
         <FILE id="l8IC95" name="PitchPanner.cpp" compile="1" resource="0" file="Source/PitchPanner.cpp"/>
         <FILE id="rJ71EF" name="PitchPanner.h" compile="0" resource="0" file="Source/PitchPanner.h"/>
+        <FILE id="QBfFaP" name="PitchRemap.cpp" compile="1" resource="0" file="Source/PitchRemap.cpp"/>
+        <FILE id="PMhzTb" name="PitchRemap.h" compile="0" resource="0" file="Source/PitchRemap.h"/>
         <FILE id="iXiwJw" name="PitchSetter.cpp" compile="1" resource="0" file="Source/PitchSetter.cpp"/>
         <FILE id="tGoqwJ" name="PitchSetter.h" compile="0" resource="0" file="Source/PitchSetter.h"/>
         <FILE id="f31QHm" name="PitchToCV.cpp" compile="1" resource="0" file="Source/PitchToCV.cpp"/>

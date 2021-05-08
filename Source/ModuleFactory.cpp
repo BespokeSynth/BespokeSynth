@@ -214,6 +214,7 @@
 #include "LooperGranulator.h"
 #include "AudioToPulse.h"
 #include "NoteCounter.h"
+#include "PitchRemap.h"
 
 #define REGISTER(class,name,type) Register(#name, &(class::Create), &(class::CanCreate), type, false, false);
 #define REGISTER_HIDDEN(class,name,type) Register(#name, &(class::Create), &(class::CanCreate), type, true, false);
@@ -269,7 +270,7 @@ ModuleFactory::ModuleFactory()
    //REGISTER(Eigenharp, eigenharp, kModuleType_Synth);
    REGISTER(Beats, beats, kModuleType_Synth);
    REGISTER(Sampler, sampler, kModuleType_Synth);
-   REGISTER(NoteTransformer, notetransformer, kModuleType_Note);
+   //REGISTER(NoteTransformer, notetransformer, kModuleType_Note);
    REGISTER(SliderSequencer, slidersequencer, kModuleType_Instrument);
    REGISTER(VelocityStepSequencer, velocitystepsequencer, kModuleType_Note);
    REGISTER(SustainPedal, sustainpedal, kModuleType_Note);
@@ -396,6 +397,7 @@ ModuleFactory::ModuleFactory()
    REGISTER(LooperGranulator, loopergranulator, kModuleType_Other);
    REGISTER(AudioToPulse, audiotopulse, kModuleType_Pulse);
    REGISTER(NoteCounter, notecounter, kModuleType_Instrument);
+   REGISTER(PitchRemap, pitchremap, kModuleType_Note);
 
    //REGISTER_EXPERIMENTAL(MidiPlayer, midiplayer, kModuleType_Instrument);
    REGISTER_EXPERIMENTAL(Razor, razor, kModuleType_Synth);
