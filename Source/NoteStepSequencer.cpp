@@ -415,7 +415,7 @@ void NoteStepSequencer::OnTransportAdvanced(float amount)
    
    ComputeSliders(0);
    
-   if (mLastNoteLength < 1 && !mAlreadyDidNoteOff)
+   if ((mLastNoteLength < 1 || mHasExternalPulseSource) && !mAlreadyDidNoteOff)
    {
       if (gTime > mLastNoteEndTime)
       {
@@ -493,6 +493,7 @@ void NoteStepSequencer::Step(double time, float velocity, int pulseFlags)
       if (mLastPitch == outPitch && !mAlreadyDidNoteOff)   //same note, play noteoff first
       {
          PlayNoteOutput(time, mLastPitch, 0, -1);
+         mAlreadyDidNoteOff = true;
          offPitch = -1;
       }
       if (mVels[mArpIndex] > 1)
