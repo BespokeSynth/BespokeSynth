@@ -422,6 +422,10 @@
               file="Source/ModulatorCurve.cpp"/>
         <FILE id="k5icRR" name="ModulatorCurve.h" compile="0" resource="0"
               file="Source/ModulatorCurve.h"/>
+        <FILE id="Z6ye8w" name="ModulatorExpression.cpp" compile="1" resource="0"
+              file="Source/ModulatorExpression.cpp"/>
+        <FILE id="rgLUZQ" name="ModulatorExpression.h" compile="0" resource="0"
+              file="Source/ModulatorExpression.h"/>
         <FILE id="X5ZUvu" name="ModulatorGravity.cpp" compile="1" resource="0"
               file="Source/ModulatorGravity.cpp"/>
         <FILE id="Kb01G7" name="ModulatorGravity.h" compile="0" resource="0"

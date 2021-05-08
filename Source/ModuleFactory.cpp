@@ -215,6 +215,7 @@
 #include "AudioToPulse.h"
 #include "NoteCounter.h"
 #include "PitchRemap.h"
+#include "ModulatorExpression.h"
 
 #define REGISTER(class,name,type) Register(#name, &(class::Create), &(class::CanCreate), type, false, false);
 #define REGISTER_HIDDEN(class,name,type) Register(#name, &(class::Create), &(class::CanCreate), type, true, false);
@@ -398,6 +399,7 @@ ModuleFactory::ModuleFactory()
    REGISTER(AudioToPulse, audiotopulse, kModuleType_Pulse);
    REGISTER(NoteCounter, notecounter, kModuleType_Instrument);
    REGISTER(PitchRemap, pitchremap, kModuleType_Note);
+   REGISTER(ModulatorExpression, expression, kModuleType_Modulator);
 
    //REGISTER_EXPERIMENTAL(MidiPlayer, midiplayer, kModuleType_Instrument);
    REGISTER_EXPERIMENTAL(Razor, razor, kModuleType_Synth);
