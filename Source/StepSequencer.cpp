@@ -94,6 +94,7 @@ void StepSequencer::CreateUIControls()
    for (int i=0; i<NUM_STEPSEQ_ROWS; ++i)
    {
       mRows[i] = new StepSequencerRow(this, mGrid, i);
+      mRows[i]->CreateUIControls();
       mOffsets[i] = 0;
       mOffsetSlider[i] = new FloatSlider(this,("offset"+ofToString(i)).c_str(),230,185-i*9.4f,90,9,&mOffsets[i],-1,1);
       mNoteRepeats[i] = new NoteRepeat(this, i);
@@ -435,8 +436,6 @@ void StepSequencer::DrawModule()
       {
          float y = gridY + mGrid->GetHeight() - (i+1) * (mGrid->GetHeight() / float(mNumRows));
          
-         DrawTextLeftJustify(ofToString(i), gridX - 7, y + 9);
-         
          if (mAdjustOffsets)
          {
             mOffsetSlider[i]->SetShowing(true);
@@ -448,7 +447,7 @@ void StepSequencer::DrawModule()
             mOffsetSlider[i]->SetShowing(false);
          }
 
-         mRows[i]->DrawOverlay();
+         mRows[i]->Draw(gridX, y);
       }
       else
       {
@@ -1057,12 +1056,18 @@ StepSequencerRow::StepSequencerRow(StepSequencer* seq, UIGrid* grid, int row)
 , mOffset(0)
 , mPlayedStepsRoundRobin(0)
 {
+   mRowPitch = row;
    TheTransport->AddListener(this, mSeq->GetStepInterval(), OffsetInfo(0, true), true);
 }
 
 StepSequencerRow::~StepSequencerRow()
 {
    TheTransport->RemoveListener(this);
+}
+
+void StepSequencerRow::CreateUIControls()
+{
+   mRowPitchEntry = new TextEntry(mSeq, ("rowpitch"+ofToString(mRow)).c_str(), -1, -1, 3, &mRowPitch, 0, 127);
 }
 
 void StepSequencerRow::OnTimeEvent(double time)
@@ -1080,7 +1085,7 @@ void StepSequencerRow::PlayStep(double time, int step)
    float val = mGrid->GetVal(step, mRow);
    if (val > 0 && mSeq->IsMetaStepActive(time, step, mRow))
    {
-      mSeq->PlayStepNote(time, mRow, val * val);
+      mSeq->PlayStepNote(time, mRowPitch, val * val);
       mPlayedSteps[mPlayedStepsRoundRobin].step = step;
       mPlayedSteps[mPlayedStepsRoundRobin].time = time;
       mPlayedStepsRoundRobin = (mPlayedStepsRoundRobin + 1) % mPlayedSteps.size();
@@ -1103,8 +1108,19 @@ void StepSequencerRow::UpdateTimeListener()
    }
 }
 
-void StepSequencerRow::DrawOverlay()
+void StepSequencerRow::Draw(float x, float y)
 {
+   float xCellSize = float(mGrid->GetWidth()) / mGrid->GetCols();
+   float yCellSize = float(mGrid->GetHeight()) / mGrid->GetRows();
+   
+   bool showTextEntry = yCellSize > 14;
+   mRowPitchEntry->SetShowing(showTextEntry);
+   mRowPitchEntry->SetPosition(x-32, y);
+   mRowPitchEntry->Draw();
+   
+   if (!showTextEntry)
+      DrawTextLeftJustify(ofToString(mRowPitch), x - 7, y + 10);
+       
    const float kPlayHighlightDurationMs = 250;
    for (size_t i = 0; i < mPlayedSteps.size(); ++i)
    {
@@ -1118,10 +1134,8 @@ void StepSequencerRow::DrawOverlay()
                ofPushStyle();
                ofSetLineWidth(3 * fade);
                ofVec2f pos = mGrid->GetCellPosition(mPlayedSteps[i].step, mRow) + mGrid->GetPosition(true);
-               float xsize = float(mGrid->GetWidth()) / mGrid->GetCols();
-               float ysize = float(mGrid->GetHeight()) / mGrid->GetRows();
                ofSetColor(ofColor::white, fade * 255);
-               ofRect(pos.x, pos.y, xsize, ysize);
+               ofRect(pos.x, pos.y, xCellSize, yCellSize);
                ofPopStyle();
             }
          }
@@ -1151,7 +1165,7 @@ void NoteRepeat::OnTimeEvent(double time)
 {
    int pressure = mSeq->GetPadPressure(mRow);
    if (pressure > 10)
-      mSeq->PlayStepNote(time, mRow, pressure / 85.0f);
+      mSeq->PlayStepNote(time, mSeq->GetRowPitch(mRow), pressure / 85.0f);
 }
 
 void NoteRepeat::SetInterval(NoteInterval interval)

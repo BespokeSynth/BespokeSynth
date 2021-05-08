@@ -23,6 +23,7 @@
 #include "SynthGlobals.h"
 #include "Push2Control.h"
 #include "IPulseReceiver.h"
+#include "TextEntry.h"
 
 #define NUM_STEPSEQ_ROWS 16
 #define META_STEP_MAX 64
@@ -34,11 +35,13 @@ class StepSequencerRow : public ITimeListener
 public:
    StepSequencerRow(StepSequencer* seq, UIGrid* grid, int row);
    ~StepSequencerRow();
+   void CreateUIControls();
    void OnTimeEvent(double time) override;
    void PlayStep(double time, int step);
    void SetOffset(float offset);
    void UpdateTimeListener();
-   void DrawOverlay();
+   void Draw(float x, float y);
+   int GetRowPitch() const { return mRowPitch; }
 private:
    UIGrid* mGrid;
    int mRow;
@@ -53,6 +56,8 @@ private:
    };
    std::array<PlayedStep, 5> mPlayedSteps;
    int mPlayedStepsRoundRobin;
+   TextEntry* mRowPitchEntry;
+   int mRowPitch;
 };
 
 class NoteRepeat : public ITimeListener
@@ -81,7 +86,7 @@ private:
    StepSequencer* mSeq;
 };
 
-class StepSequencer : public IDrawableModule, public INoteSource, public ITimeListener, public IFloatSliderListener, public IGridControllerListener, public IButtonListener, public IDropdownListener, public INoteReceiver, public IRadioButtonListener, public IIntSliderListener, public IPush2GridController, public IPulseReceiver
+class StepSequencer : public IDrawableModule, public INoteSource, public ITimeListener, public IFloatSliderListener, public IGridControllerListener, public IButtonListener, public IDropdownListener, public INoteReceiver, public IRadioButtonListener, public IIntSliderListener, public IPush2GridController, public IPulseReceiver, public ITextEntryListener
 {
 public:
    StepSequencer();
@@ -102,6 +107,7 @@ public:
    void Flush(double time) { if (mEnabled) mNoteOutput.Flush(time); }
    int GetStep(int step, int pitch);
    void SetStep(int step, int pitch, int velocity);
+   int GetRowPitch(int row) const { return mRows[row]->GetRowPitch(); }
    
    //INoteReceiver
    void PlayNote(double time, int pitch, int velocity, int voiceIdx = -1, ModulationParameters modulation = ModulationParameters()) override;
@@ -139,6 +145,7 @@ public:
    void DropdownUpdated(DropdownList* list, int oldVal) override;
    void RadioButtonUpdated(RadioButton* radio, int oldVal) override;
    void IntSliderUpdated(IntSlider* slider, int oldVal) override;
+   void TextEntryComplete(TextEntry* entry) override {}
 
    void SaveLayout(ofxJSONElement& moduleInfo) override;
    void LoadLayout(const ofxJSONElement& moduleInfo) override;
@@ -193,15 +200,15 @@ private:
    int mPreset;
    int mColorOffset;
    DropdownList* mGridYOffDropdown;
-   StepSequencerRow* mRows[NUM_STEPSEQ_ROWS];
+   std::array<StepSequencerRow*, NUM_STEPSEQ_ROWS> mRows;
    bool mAdjustOffsets;
    Checkbox* mAdjustOffsetsCheckbox;
-   float mOffsets[NUM_STEPSEQ_ROWS];
-   FloatSlider* mOffsetSlider[NUM_STEPSEQ_ROWS];
+   std::array<float, NUM_STEPSEQ_ROWS> mOffsets;
+   std::array<FloatSlider*, NUM_STEPSEQ_ROWS> mOffsetSlider;
    std::map<int,int> mPadPressures;
    NoteInterval mRepeatRate;
    DropdownList* mRepeatRateDropdown;
-   NoteRepeat* mNoteRepeats[NUM_STEPSEQ_ROWS];
+   std::array<NoteRepeat*, NUM_STEPSEQ_ROWS> mNoteRepeats;
    int mNumRows;
    int mNumMeasures;
    IntSlider* mNumMeasuresSlider;
