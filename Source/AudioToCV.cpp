@@ -32,6 +32,7 @@ void AudioToCV::CreateUIControls()
    GetPatchCableSource()->SetEnabled(false);
    
    mTargetCable = new PatchCableSource(this, kConnectionType_UIControl);
+   mTargetCable->SetModulatorOwner(this);
    AddPatchCableSource(mTargetCable);
 }
 

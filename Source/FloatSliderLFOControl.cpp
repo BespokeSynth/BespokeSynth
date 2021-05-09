@@ -382,6 +382,7 @@ void FloatSliderLFOControl::ButtonClicked(ClickButton* button)
          if (mTargetCable == nullptr)
          {
             mTargetCable = new PatchCableSource(this, kConnectionType_UIControl);
+            mTargetCable->SetModulatorOwner(this);
             AddPatchCableSource(mTargetCable);
             mTargetCable->SetTarget(mTarget);
          }
@@ -420,6 +421,7 @@ void FloatSliderLFOControl::SetUpFromSaveData()
    if (mTargetCable == nullptr)
    {
       mTargetCable = new PatchCableSource(this, kConnectionType_UIControl);
+      mTargetCable->SetModulatorOwner(this);
       AddPatchCableSource(mTargetCable);
       mTargetCable->SetTarget(mTarget);
    }

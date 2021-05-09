@@ -19,6 +19,7 @@
 #include "IPulseReceiver.h"
 #include "RadioButton.h"
 #include "MidiController.h"
+#include "IModulator.h"
 
 PatchCable* PatchCable::sActivePatchCable = nullptr;
 
@@ -172,39 +173,68 @@ void PatchCable::Render()
          ofVertex(cable.plug.x,cable.plug.y);
          ofEndShape();
          
-         ofSetColor(lineColor);
-         
-         float lastElapsed = 0;
-         for (int i=0; i<NoteHistory::kHistorySize; ++i)
+         IModulator* modulator = mOwner->GetModulatorOwner();
+         if (modulator != nullptr)
          {
-            const NoteHistoryEvent& event = mOwner->GetHistory().GetHistoryEvent(i);
-            float elapsed = float(gTime - event.mTime) / NOTE_HISTORY_LENGTH;
-            float clampedElapsed = MIN(elapsed, 1);
-            if (event.mOn)
-            {
-               ofSetLineWidth(lineWidth * (4 + ofClamp(1 - elapsed * .7f, 0, 1) * 5 + cos((gTime - event.mTime) * PI * 8 / TheTransport->MsPerBar()) * .3f));
-               ofBeginShape();
-               ofVec2f pos;
-               for (int j=lastElapsed*wireLength; j< clampedElapsed*wireLength; ++j)
-               {
-                  pos = MathUtils::Bezier(ofClamp(j/wireLength, 0, 1), cable.start, bezierControl1, bezierControl2, cable.plug);
-                  ofVertex(pos.x,pos.y);
-               }
-               ofEndShape();
-               
-               /*if (clampedElapsed < 1)
-               {
-                  ofPushStyle();
-                  ofFill();
-                  ofSetLineWidth(1);
-                  ofCircle(pos.x, pos.y, 4);
-                  ofPopStyle();
-               }*/
-            }
-            lastElapsed = clampedElapsed;
+            float range = abs(modulator->GetMax() - modulator->GetMin());
+            float delta = ofClamp(modulator->GetRecentChange() / range, -1, 1);
+            ofColor color = ofColor::lerp(ofColor::blue, ofColor::red, delta * .5f + .5f);
+            color.a = abs(1 - ((1-delta)*(1-delta))) * 150;
+            ofSetColor(color);
+            ofSetLineWidth(3);
             
-            if (clampedElapsed >= 1)
-               break;
+            ofBeginShape();
+            ofVertex(cable.start.x,cable.start.y);
+            for (int i=1; i<wireLength-1; ++i)
+            {
+               ofVec2f pos = MathUtils::Bezier(i/wireLength, cable.start, bezierControl1, bezierControl2, cable.plug);
+               ofVertex(pos.x,pos.y);
+            }
+            ofVertex(cable.plug.x,cable.plug.y);
+            ofEndShape();
+            
+            //change plug color
+            if (delta > 0)
+               lineColor = ofColor::lerp(lineColor, ofColor::red, delta);
+            else
+               lineColor = ofColor::lerp(lineColor, ofColor::blue, -delta);
+         }
+         else
+         {
+            ofSetColor(lineColor);
+            
+            float lastElapsed = 0;
+            for (int i=0; i<NoteHistory::kHistorySize; ++i)
+            {
+               const NoteHistoryEvent& event = mOwner->GetHistory().GetHistoryEvent(i);
+               float elapsed = float(gTime - event.mTime) / NOTE_HISTORY_LENGTH;
+               float clampedElapsed = MIN(elapsed, 1);
+               if (event.mOn)
+               {
+                  ofSetLineWidth(lineWidth * (4 + ofClamp(1 - elapsed * .7f, 0, 1) * 5 + cos((gTime - event.mTime) * PI * 8 / TheTransport->MsPerBar()) * .3f));
+                  ofBeginShape();
+                  ofVec2f pos;
+                  for (int j=lastElapsed*wireLength; j< clampedElapsed*wireLength; ++j)
+                  {
+                     pos = MathUtils::Bezier(ofClamp(j/wireLength, 0, 1), cable.start, bezierControl1, bezierControl2, cable.plug);
+                     ofVertex(pos.x,pos.y);
+                  }
+                  ofEndShape();
+                  
+                  /*if (clampedElapsed < 1)
+                  {
+                     ofPushStyle();
+                     ofFill();
+                     ofSetLineWidth(1);
+                     ofCircle(pos.x, pos.y, 4);
+                     ofPopStyle();
+                  }*/
+               }
+               lastElapsed = clampedElapsed;
+               
+               if (clampedElapsed >= 1)
+                  break;
+            }
          }
          
          ofSetLineWidth(plugWidth);

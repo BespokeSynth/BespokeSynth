@@ -39,6 +39,7 @@ void EnvelopeModulator::CreateUIControls()
    GetPatchCableSource()->SetEnabled(false);
    
    mTargetCable = new PatchCableSource(this, kConnectionType_UIControl);
+   mTargetCable->SetModulatorOwner(this);
    AddPatchCableSource(mTargetCable);
    
    mAdvancedDisplayCheckbox = new Checkbox(this, "advanced", 2, 2, &mAdvancedDisplay);

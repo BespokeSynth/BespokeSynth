@@ -43,6 +43,7 @@ void ModulatorCurve::CreateUIControls()
    mInputSlider = new FloatSlider(this, "input", 3, 2, 100, 15, &mInput, 0, 1);
    
    mTargetCable = new PatchCableSource(this, kConnectionType_UIControl);
+   mTargetCable->SetModulatorOwner(this);
    AddPatchCableSource(mTargetCable);
 }
 

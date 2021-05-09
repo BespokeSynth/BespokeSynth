@@ -36,6 +36,7 @@ PatchCableSource::PatchCableSource(IDrawableModule* owner, ConnectionType type)
 , mSide(Side::kNone)
 , mManualSide(Side::kNone)
 , mHasOverrideCableDir(false)
+, mModulatorOwner(nullptr)
 , mDrawPass(DrawPass::kSource)
 {
    mAllowMultipleTargets = (mType == kConnectionType_Note || mType == kConnectionType_Pulse);

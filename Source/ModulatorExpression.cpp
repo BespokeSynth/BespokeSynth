@@ -55,6 +55,7 @@ void ModulatorExpression::CreateUIControls()
    mESlider = new FloatSlider(this,"e",mDSlider,kAnchor_Below,110,15,&mE,-10,10,4);
    
    mTargetCable = new PatchCableSource(this, kConnectionType_UIControl);
+   mTargetCable->SetModulatorOwner(this);
    AddPatchCableSource(mTargetCable);
    
    mSymbolTable.add_variable("x",mExpressionInput);
