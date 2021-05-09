@@ -147,15 +147,15 @@ private:
    
    struct IndividualOutput
    {
-      IndividualOutput(DrumPlayer* owner, int hitIndex, int outputIndex)
-      : mHitIndex(hitIndex)
+      IndividualOutput(DrumPlayer* owner, int hitIndex)
+      : mDrumPlayer(owner)
+      , mHitIndex(hitIndex)
       , mVizBuffer(nullptr)
       , mPatchCableSource(nullptr)
       {
          mVizBuffer = new RollingBuffer(VIZ_BUFFER_SECONDS*gSampleRate);
          mPatchCableSource = new PatchCableSource(owner, kConnectionType_Audio);
          
-         mPatchCableSource->SetManualPosition(152, 7 + outputIndex * 12);
          mPatchCableSource->SetOverrideVizBuffer(mVizBuffer);
          mPatchCableSource->SetManualSide(PatchCableSource::Side::kRight);
          owner->AddPatchCableSource(mPatchCableSource);
@@ -164,7 +164,15 @@ private:
       {
          delete mVizBuffer;
       }
+      void UpdatePosition(int outputIndex)
+      {
+         float w,h;
+         mDrumPlayer->GetDimensions(w,h);
+         mPatchCableSource->SetManualPosition(w, 7 + outputIndex * 12);
+      }
+      DrumPlayer* mDrumPlayer;
       int mHitIndex;
+      int mOutputIndex;
       RollingBuffer* mVizBuffer;
       PatchCableSource* mPatchCableSource;
    };

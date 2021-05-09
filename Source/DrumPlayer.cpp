@@ -668,11 +668,6 @@ void DrumPlayer::DrawModule()
    mKitSelector->Draw();
    mEditCheckbox->Draw();
    mGridController->Draw();
-   
-   float moduleW, moduleH;
-   GetDimensions(moduleW, moduleH);
-   for (int i=0; i<mIndividualOutputs.size(); ++i)
-      DrawTextNormal(ofToString(mIndividualOutputs[i]->mHitIndex), moduleW - 20, 10 + i*12);
 
    if (mEditMode)
    {
@@ -725,6 +720,14 @@ void DrumPlayer::DrawModule()
       
       if (mSelectedHitIdx != -1)
          mDrumHits[mSelectedHitIdx].DrawUIControls();
+   }
+   
+   float moduleW, moduleH;
+   GetDimensions(moduleW, moduleH);
+   for (int i=0; i<mIndividualOutputs.size(); ++i)
+   {
+      DrawTextNormal(ofToString(mIndividualOutputs[i]->mHitIndex), moduleW - 20, 10 + i*12);
+      mIndividualOutputs[i]->UpdatePosition(i);
    }
 }
 
@@ -975,7 +978,7 @@ void DrumPlayer::CheckboxUpdated(Checkbox* checkbox)
          if (mDrumHits[i].mHasIndividualOutput)
          {
             if (outputIndex == -1)
-               mIndividualOutputs.push_back(new IndividualOutput(this, i, (int)mIndividualOutputs.size()));
+               mIndividualOutputs.push_back(new IndividualOutput(this, i));
          }
          else
          {
