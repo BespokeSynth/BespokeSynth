@@ -11,6 +11,7 @@
 #include "SynthGlobals.h"
 #include "ModularSynth.h"
 #include "TitleBar.h"
+#include "EffectChain.h"
 
 bool HelpDisplay::sShowTooltips = false;
 
@@ -58,6 +59,7 @@ void HelpDisplay::DrawModule()
    ofPopStyle();
    
    mShowTooltipsCheckbox->Draw();
+   mDumpModuleInfo->SetShowing(GetKeyModifiers() == kModifier_Shift);
    mDumpModuleInfo->Draw();
    
    DrawTextNormal("video overview available at:", 4, 75);
@@ -310,29 +312,57 @@ void HelpDisplay::ButtonClicked(ClickButton* button)
 
       for (auto* topLevelModule : modules)
       {
+         if (topLevelModule->GetTypeName() == "effectchain")
+         {
+            EffectChain* effectChain = dynamic_cast<EffectChain*>(topLevelModule);
+            vector<string> effects = TheSynth->GetEffectFactory()->GetSpawnableEffects();
+            for (string effect : effects)
+               effectChain->AddEffect(effect);
+         }
+         
          vector<IDrawableModule*> toDump;
          toDump.push_back(topLevelModule);
          for (auto* child : topLevelModule->GetChildren())
             toDump.push_back(child);
 
+         list<string> addedModuleNames;
          for (auto* module : toDump)
          {
+            if (ListContains(module->GetTypeName(), addedModuleNames) || module->GetTypeName().length() == 0)
+               continue;
+            addedModuleNames.push_back(module->GetTypeName());
+            
             string moduleTooltip = "[no tooltip]";
             ModuleTooltipInfo* moduleInfo = FindModuleInfo(module->GetTypeName());
             if (moduleInfo)
+            {
                moduleTooltip = moduleInfo->tooltip;
+               ofStringReplace(moduleTooltip,"\n","\\n");
+            }
             output += "\n\n\n" + module->GetTypeName() + "~"+moduleTooltip+"\n";
             vector<IUIControl*> controls = module->GetUIControls();
+            list<string> addedControlNames;
             for (auto* control : controls)
             {
-               string name = control->Name();
-               if (name != "enabled")
+               if (control->GetParent() != module && VectorContains(dynamic_cast<IDrawableModule*>(control->GetParent()), toDump))
+                  continue;   //we'll print this control's info when we are printing for the specific parent module
+               
+               string controlName = control->Name();
+               if (controlName != "enabled")
                {
                   string controlTooltip = "[no tooltip]";
                   UIControlTooltipInfo* controlInfo = FindControlInfo(control);
                   if (controlInfo)
+                  {
+                     controlName = controlInfo->controlName;
                      controlTooltip = controlInfo->tooltip;
-                  output += "~" + name + "~"+controlTooltip+"\n";
+                     ofStringReplace(controlTooltip,"\n","\\n");
+                  }
+                  if (!ListContains(controlName, addedControlNames))
+                  {
+                     output += "~" + controlName + "~"+controlTooltip+"\n";
+                     addedControlNames.push_back(controlName);
+                  }
                }
             }
          }

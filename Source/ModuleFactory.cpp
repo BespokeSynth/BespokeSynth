@@ -234,9 +234,6 @@ ModuleFactory::ModuleFactory()
    REGISTER(LaunchpadKeyboard, gridkeyboard, kModuleType_Instrument);
    REGISTER(FMSynth, fmsynth, kModuleType_Synth);
    REGISTER(MidiController, midicontroller, kModuleType_Instrument);
-#ifdef BESPOKE_MAC
-   REGISTER(PSMoveController, psmove, kModuleType_Other);
-#endif
    REGISTER(SampleBank, samplebank, kModuleType_Other);
    REGISTER(SampleEditor, sampleeditor, kModuleType_Synth);
    REGISTER(Autotalent, autotalent, kModuleType_Audio);
@@ -426,6 +423,7 @@ ModuleFactory::ModuleFactory()
    REGISTER_HIDDEN(ClipLauncher, cliplauncher, kModuleType_Synth);
 #ifdef BESPOKE_MAC
    REGISTER_HIDDEN(KompleteKontrol, kompletekontrol, kModuleType_Note);
+   REGISTER_HIDDEN(PSMoveController, psmove, kModuleType_Other);
 #endif
    REGISTER_HIDDEN(ControlTactileFeedback, controltactilefeedback, kModuleType_Synth);
    REGISTER_HIDDEN(FloatSliderLFOControl, lfo, kModuleType_Other);
