@@ -45,6 +45,7 @@ void UserPrefsEditor::CreateUIControls()
    TEXTENTRY(mDefaultLayoutPathEntry, "layout", 100, &mDefaultLayoutPath);
    TEXTENTRY(mYoutubeDlPathEntry, "youtube-dl_path", 100, &mYoutubeDlPath);
    TEXTENTRY(mFfmpegPathEntry, "ffmpeg_path", 100, &mFfmpegPath);
+   TEXTENTRY(mVstSearchDirsEntry, "vstsearchdirs", 1000, &mVstSearchDirs);
    UIBLOCK_SHIFTDOWN();
    BUTTON(mSaveButton, "save and exit bespoke");
    BUTTON(mCancelButton, "cancel");
@@ -55,6 +56,7 @@ void UserPrefsEditor::CreateUIControls()
    mZoomSlider->SetShowName(false);
    mScrollMultiplierVerticalSlider->SetShowName(false);
    mScrollMultiplierHorizontalSlider->SetShowName(false);
+   mVstSearchDirsEntry->SetFlexibleWidth(true);
 }
 
 void UserPrefsEditor::Show()
@@ -113,6 +115,28 @@ void UserPrefsEditor::Show()
       mFfmpegPath = "c:/ffmpeg/bin/ffmpeg.exe";
    else
       mFfmpegPath = TheSynth->GetUserPrefs()["ffmpeg_path"].asString();
+   
+   if (TheSynth->GetUserPrefs()["vstsearchdirs"].isNull())
+   {
+#if BESPOKE_MAC
+      mVstSearchDirs = "/Library/Audio/Plug-Ins/VST3, /Library/Audio/Plug-Ins/VST";
+#elif BESPOKE_LINUX
+      mVstSearchDirs = "~/.vst/";
+#else
+      mVstSearchDirs = "C:/Program Files/Common Files/VST2, C:/Program Files/Common Files/VST3, C:/Program Files/Steinberg/VSTPlugins";
+#endif
+   }
+   else
+   {
+      const ofxJSONElement& strArray = TheSynth->GetUserPrefs()["vstsearchdirs"];
+      mVstSearchDirs = "";
+      for (unsigned int i=0; i<strArray.size(); ++i)
+      {
+         mVstSearchDirs += strArray[i].asString();
+         if (i < strArray.size()-1)
+            mVstSearchDirs += ", ";
+      }
+   }
 
    mWindowPositionXEntry->SetShowing(mSetWindowPosition);
    mWindowPositionYEntry->SetShowing(mSetWindowPosition);
@@ -289,6 +313,16 @@ void UserPrefsEditor::UpdatePrefStr(ofxJSONElement& userPrefs, string prefName, 
    ++mSavePrefIndex;
 }
 
+void UserPrefsEditor::UpdatePrefStrArray(ofxJSONElement& userPrefs, string prefName, vector<string> value)
+{
+   userPrefs.removeMember(prefName);
+   ofxJSONElement strArray;
+   for (string str : value)
+      strArray.append(str);
+   userPrefs["**"+ ToStringLeadingZeroes(mSavePrefIndex) + "**"+prefName] = strArray;
+   ++mSavePrefIndex;
+}
+
 void UserPrefsEditor::UpdatePrefInt(ofxJSONElement& userPrefs, string prefName, int value)
 {
    userPrefs.removeMember(prefName);
@@ -354,6 +388,9 @@ void UserPrefsEditor::ButtonClicked(ClickButton* button)
       UpdatePrefStr(userPrefs, "layout", mDefaultLayoutPath);
       UpdatePrefStr(userPrefs, "youtube-dl_path", mYoutubeDlPath);
       UpdatePrefStr(userPrefs, "ffmpeg_path", mFfmpegPath);
+      string vstSearchDirs = mVstSearchDirs;
+      ofStringReplace(vstSearchDirs, ", ", ",");
+      UpdatePrefStrArray(userPrefs, "vstsearchdirs", ofSplitString(vstSearchDirs, ","));
       string output = userPrefs.getRawString(true);
       CleanUpSave(output);
 

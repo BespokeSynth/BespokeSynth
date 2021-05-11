@@ -35,7 +35,7 @@ void* operator new[](std::size_t size, const char *file, int line) throw(std::ba
 #define new DEBUG_NEW
 
 #define MAX_BUFFER_SIZE 30*gSampleRate
-#define MAX_TEXTENTRY_LENGTH 128
+#define MAX_TEXTENTRY_LENGTH 1024
 
 #ifndef M_PI
 #define M_PI PI
@@ -47,7 +47,7 @@ void* operator new[](std::size_t size, const char *file, int line) throw(std::ba
 #define USE_VECTOR_OPS
 
 #if JUCE_WINDOWS
-#define popen _popen
+#define popen _popenj
 #define pclose _pclose
 #endif
 
