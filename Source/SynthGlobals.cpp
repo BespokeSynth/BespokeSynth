@@ -381,7 +381,7 @@ float GetStringWidth(string text, float size)
 
 void AssertIfDenormal(float input)
 {
-   assert(input == 0 || fabsf(input) > numeric_limits<float>::min());
+   assert(input == 0 || input != input || fabsf(input) > numeric_limits<float>::min());
 }
 
 float GetInterpolatedSample(double offset, const float* buffer, int bufferSize)
