@@ -357,7 +357,6 @@ ModuleFactory::ModuleFactory()
    REGISTER(PulseSequence, pulsesequence, kModuleType_Pulse);
    REGISTER(LinnstrumentControl, linnstrumentcontrol, kModuleType_Note);
    REGISTER(MultitapDelay, multitapdelay, kModuleType_Audio);
-   REGISTER(MidiCapturer, midicapturer, kModuleType_Note);
    REGISTER(Inverter, inverter, kModuleType_Audio);
    REGISTER(SpectralDisplay, spectrum, kModuleType_Audio);
    REGISTER(DCOffset, dcoffset, kModuleType_Audio);
@@ -397,10 +396,9 @@ ModuleFactory::ModuleFactory()
    REGISTER(NoteCounter, notecounter, kModuleType_Instrument);
    REGISTER(PitchRemap, pitchremap, kModuleType_Note);
    REGISTER(ModulatorExpression, expression, kModuleType_Modulator);
+   REGISTER(SampleCanvas, samplecanvas, kModuleType_Synth);
 
    //REGISTER_EXPERIMENTAL(MidiPlayer, midiplayer, kModuleType_Instrument);
-   REGISTER_EXPERIMENTAL(Razor, razor, kModuleType_Synth);
-   REGISTER_EXPERIMENTAL(SampleCanvas, samplecanvas, kModuleType_Synth);
    REGISTER_EXPERIMENTAL(LoopStorer, loopstorer, kModuleType_Other);
    REGISTER_EXPERIMENTAL(PitchChorus, pitchchorus, kModuleType_Audio);
 
@@ -429,6 +427,8 @@ ModuleFactory::ModuleFactory()
    REGISTER_HIDDEN(FloatSliderLFOControl, lfo, kModuleType_Other);
    REGISTER_HIDDEN(EnvelopeEditor, envelopeeditor, kModuleType_Other);
    REGISTER_HIDDEN(LFOController, lfocontroller, kModuleType_Other); //old, probably irrelevant
+   REGISTER_HIDDEN(Razor, razor, kModuleType_Synth);
+   REGISTER_HIDDEN(MidiCapturer, midicapturer, kModuleType_Note);
 }
 
 void ModuleFactory::Register(string type, CreateModuleFn creator, CanCreateModuleFn canCreate, ModuleType moduleType, bool hidden, bool experimental)
