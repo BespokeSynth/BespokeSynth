@@ -12,8 +12,9 @@
 
 ScaleDetect::ScaleDetect()
 : mResetButton(nullptr)
-, mLastNote(0)
+, mLastPitch(0)
 , mDoDetect(true)
+, mNeedsUpdate(false)
 , mSelectedMatch(0)
 , mMatchesDropdown(nullptr)
 {
@@ -32,18 +33,41 @@ void ScaleDetect::DrawModule()
       return;
 
    mResetButton->Draw();
-   mListMutex.lock();
    mMatchesDropdown->Draw();
-   mListMutex.unlock();
 
-   DrawTextNormal(NoteName(mLastNote), 5, 12);
+   DrawTextNormal(NoteName(mLastPitch), 5, 12);
    
-   if (mNotes.size() <= 7)
+   if (mNeedsUpdate)
+   {
+      mMatchesDropdown->Clear();
+      int numMatches = 0;
+      mSelectedMatch = 0;
+
+      if (mDoDetect)
+      {
+         int numScaleTypes = TheScale->GetNumScaleTypes();
+         for (int j=0; j<numScaleTypes-1; ++j)
+         {
+            if (ScaleSatisfied(mLastPitch%TheScale->GetTet(), TheScale->GetScaleName(j)))
+               mMatchesDropdown->AddLabel(TheScale->GetScaleName(j).c_str(), numMatches++);
+         }
+      }
+      
+      mNeedsUpdate = false;
+   }
+   
    {
       string pitchString;
       vector<int> rootRelative;
-      for (int i=0; i<mNotes.size(); ++i)
-         rootRelative.push_back((mNotes[i]-mLastNote+120)%TheScale->GetTet());
+      for (int i=0; i<128; ++i)
+      {
+         if (mPitchOn[i])
+         {
+            int entry = (i-mLastPitch+TheScale->GetTet()*10)%TheScale->GetTet();
+            if (!VectorContains(entry, rootRelative))
+               rootRelative.push_back(entry);
+         }
+      }
       sort(rootRelative.begin(), rootRelative.end());
       for (int i=0; i<rootRelative.size(); ++i)
          pitchString += ofToString(rootRelative[i]) + " ";
@@ -55,31 +79,12 @@ void ScaleDetect::PlayNote(double time, int pitch, int velocity, int voiceIdx, M
 {
    PlayNoteOutput(time, pitch, velocity, voiceIdx, modulation);
 
-   //TODO_PORT(Ryan) threads get fucked up here, adding a label causes text width to be calculated, which locks a mutex
-   /*if (velocity > 0)
+   if (velocity > 0 && pitch >= 0 && pitch < 128)
    {
-      mListMutex.lock();
-      mMatchesDropdown->Clear();
-      int numMatches = 0;
-      mSelectedMatch = 0;
-      
-      if (!VectorContains(pitch%TheScale->GetTet(),mNotes))
-         mNotes.push_back(pitch % TheScale->GetTet());
-      mLastNote = pitch;
-
-      if (mDoDetect)
-      {
-         int numScaleTypes = TheScale->GetNumScaleTypes();
-         for (int j=0; j<numScaleTypes-1; ++j)
-         {
-            if (ScaleSatisfied(pitch%TheScale->GetTet(), TheScale->GetScaleName(j)))
-            {
-               mMatchesDropdown->AddLabel(TheScale->GetScaleName(j).c_str(), numMatches++);
-            }
-         }
-      }
-      mListMutex.unlock();
-   }*/
+      mPitchOn[pitch] = true;
+      mLastPitch = pitch;
+      mNeedsUpdate = true;
+   }
 }
 
 bool ScaleDetect::ScaleSatisfied(int root, string type)
@@ -88,9 +93,9 @@ bool ScaleDetect::ScaleSatisfied(int root, string type)
    scale.SetRoot(root);
    scale.SetScaleType(type);
    
-   for (auto i = mNotes.begin(); i != mNotes.end(); ++i)
+   for (int i=0; i<128; ++i)
    {
-      if (!scale.IsInScale(*i))
+      if (mPitchOn[i] && !scale.IsInScale(i))
          return false;
    }
    return true;
@@ -100,10 +105,10 @@ void ScaleDetect::ButtonClicked(ClickButton *button)
 {
    if (button == mResetButton)
    {
-      mNotes.clear();
-      mListMutex.lock();
+      for (int i=0; i<128; ++i)
+         mPitchOn[i] = false;
       mMatchesDropdown->Clear();
-      mListMutex.unlock();
+      mNeedsUpdate = true;
    }
 }
 
@@ -111,9 +116,7 @@ void ScaleDetect::DropdownUpdated(DropdownList* list, int oldVal)
 {
    if (list == mMatchesDropdown)
    {
-      mListMutex.lock();
-      TheScale->SetScale(mLastNote, mMatchesDropdown->GetLabel(mSelectedMatch));
-      mListMutex.unlock();
+      TheScale->SetScale(mLastPitch, mMatchesDropdown->GetLabel(mSelectedMatch));
    }
 }
 
