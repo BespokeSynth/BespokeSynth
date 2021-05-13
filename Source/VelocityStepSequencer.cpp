@@ -74,7 +74,6 @@ void VelocityStepSequencer::SetMidiController(string name)
 
 void VelocityStepSequencer::DrawModule()
 {
-
    if (Minimized() || IsVisible() == false)
       return;
    
@@ -82,14 +81,14 @@ void VelocityStepSequencer::DrawModule()
    mLengthSlider->Draw();
    mResetOnDownbeatCheckbox->Draw();
    
+   for (int i=0;i<VSS_MAX_STEPS;++i)
+      mVelSliders[i]->Draw();
+   
    ofPushStyle();
-   ofSetColor(0,255,0,gModuleDrawAlpha);
+   ofSetColor(0,255,0,50);
    ofFill();
    ofRect(10,35+mArpIndex*15,80,15);
    ofPopStyle();
-   
-   for (int i=0;i<VSS_MAX_STEPS;++i)
-      mVelSliders[i]->Draw();
 }
 
 void VelocityStepSequencer::CheckboxUpdated(Checkbox* checkbox)
