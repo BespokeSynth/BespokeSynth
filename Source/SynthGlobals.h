@@ -47,7 +47,7 @@ void* operator new[](std::size_t size, const char *file, int line) throw(std::ba
 #define USE_VECTOR_OPS
 
 #if JUCE_WINDOWS
-#define popen _popenj
+#define popen _popen
 #define pclose _pclose
 #endif
 
