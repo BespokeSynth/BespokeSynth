@@ -48,7 +48,7 @@ Vocoder::Vocoder()
    Clear(mCarrierInputBuffer, GetBuffer()->BufferSize());
 
    AddChild(&mGate);
-   mGate.SetPosition(110,5);
+   mGate.SetPosition(110,20);
    mGate.SetEnabled(false);
 }
 

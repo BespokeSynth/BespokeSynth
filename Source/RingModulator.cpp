@@ -113,6 +113,7 @@ void RingModulator::PlayNote(double time, int pitch, int velocity, int voiceIdx,
    {
       float freq = TheScale->PitchToFreq(pitch);
       mFreqRamp.Start(time, freq, time + mGlideTime);
+      mFreq = freq;
    }
 }
 

@@ -710,35 +710,35 @@ void Looper::DrawModule()
       ofPopStyle();
    }
    
+   mMergeButton->Draw();
    if (mRecorder && mRecorder->GetMergeSource() == this)
    {
       ofPushStyle();
       ofFill();
-      ofSetColor(255,0,0);
-      ofRect(165,61,26,15);
+      ofSetColor(255,0,0,100);
+      ofRect(mMergeButton->GetRect(true));
       ofPopStyle();
    }
-   mMergeButton->Draw();
 
+   mSwapButton->Draw();
    if (mRecorder && mRecorder->GetSwapSource() == this)
    {
       ofPushStyle();
       ofFill();
-      ofSetColor(0,0,255);
-      ofRect(120,82,35,15);
+      ofSetColor(0,0,255,100);
+      ofRect(mSwapButton->GetRect(true));
       ofPopStyle();
    }
-   mSwapButton->Draw();
    
+   mCopyButton->Draw();
    if (mRecorder && mRecorder->GetCopySource() == this)
    {
       ofPushStyle();
       ofFill();
-      ofSetColor(0,0,255);
-      ofRect(120,65,35,15);
+      ofSetColor(0,0,255,100);
+      ofRect(mCopyButton->GetRect(true));
       ofPopStyle();
    }
-   mCopyButton->Draw();
 
    mSaveButton->Draw();
    mMuteCheckbox->Draw();

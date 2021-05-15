@@ -48,9 +48,10 @@ void MultitapDelay::CreateUIControls()
    for (int i=0; i<mNumTaps; ++i)
    {
       float y = mBufferY + mBufferH + 10 + i * 100;
-      mTaps[i].mDelayMsSlider = new FloatSlider(this,("delay "+ofToString(i+1)).c_str(),10,y,90,15,&mTaps[i].mDelayMs,gBufferSize/gSampleRateMs,mDelayBuffer.Size()/gSampleRateMs);
-      mTaps[i].mGainSlider = new FloatSlider(this,("gain "+ofToString(i+1)).c_str(),mTaps[i].mDelayMsSlider, kAnchor_Below,90,15,&mTaps[i].mGain,0,1);
-      mTaps[i].mFeedbackSlider = new FloatSlider(this,("feedback "+ofToString(i+1)).c_str(),mTaps[i].mGainSlider, kAnchor_Below,90,15,&mTaps[i].mFeedback,0,1);
+      mTaps[i].mDelayMsSlider = new FloatSlider(this,("delay "+ofToString(i+1)).c_str(),10,y,150,15,&mTaps[i].mDelayMs,gBufferSize/gSampleRateMs,mDelayBuffer.Size()/gSampleRateMs);
+      mTaps[i].mGainSlider = new FloatSlider(this,("gain "+ofToString(i+1)).c_str(),mTaps[i].mDelayMsSlider, kAnchor_Below,150,15,&mTaps[i].mGain,0,1);
+      mTaps[i].mFeedbackSlider = new FloatSlider(this,("feedback "+ofToString(i+1)).c_str(),mTaps[i].mGainSlider, kAnchor_Below,150,15,&mTaps[i].mFeedback,0,1);
+      mTaps[i].mPanSlider = new FloatSlider(this,("pan "+ofToString(i+1)).c_str(),mTaps[i].mFeedbackSlider, kAnchor_Below,150,15,&mTaps[i].mPan,-1,1);
    }
 }
 
@@ -121,6 +122,7 @@ void MultitapDelay::DrawModule()
       mTaps[i].mDelayMsSlider->Draw();
       mTaps[i].mGainSlider->Draw();
       mTaps[i].mFeedbackSlider->Draw();
+      mTaps[i].mPanSlider->Draw();
    }
    
    for (int ch=0; ch<mDelayBuffer.NumChannels(); ++ch)
@@ -313,6 +315,7 @@ MultitapDelay::DelayTap::DelayTap()
 : mDelayMs(100)
 , mGain(0)
 , mFeedback(0)
+, mPan(0)
 , mOwner(nullptr)
 , mTapBuffer(gBufferSize)
 {
@@ -337,7 +340,8 @@ void MultitapDelay::DelayTap::Process(float* sampleOut, int offset, int ch)
       mTapBuffer.GetChannel(ch)[offset] = outputSample;
       
       *sampleOut += outputSample;
-      mOwner->mDelayBuffer.Accum(gBufferSize-offset, outputSample * mFeedback, ch);
+      float panGain = ch == 0 ? GetLeftPanGain(mPan) : GetRightPanGain(mPan);
+      mOwner->mDelayBuffer.Accum(gBufferSize-offset, outputSample * mFeedback * panGain, ch);
    }
 }
 

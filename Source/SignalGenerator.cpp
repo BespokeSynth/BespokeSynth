@@ -99,7 +99,6 @@ void SignalGenerator::CreateUIControls()
    mMultSelector->AddLabel("8", 8);
    
    mFreqModeSelector->AddLabel("instant", kFreqMode_Instant);
-   mFreqModeSelector->AddLabel("root", kFreqMode_Root);
    mFreqModeSelector->AddLabel("ramp", kFreqMode_Ramp);
    mFreqModeSelector->AddLabel("slider", kFreqMode_Slider);
    

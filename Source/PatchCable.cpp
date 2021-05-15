@@ -177,27 +177,30 @@ void PatchCable::Render()
          if (modulator != nullptr)
          {
             float range = abs(modulator->GetMax() - modulator->GetMin());
-            float delta = ofClamp(modulator->GetRecentChange() / range, -1, 1);
-            ofColor color = ofColor::lerp(ofColor::blue, ofColor::red, delta * .5f + .5f);
-            color.a = abs(1 - ((1-delta)*(1-delta))) * 150;
-            ofSetColor(color);
-            ofSetLineWidth(3);
-            
-            ofBeginShape();
-            ofVertex(cable.start.x,cable.start.y);
-            for (int i=1; i<wireLength-1; ++i)
+            if (range > .00001f)
             {
-               ofVec2f pos = MathUtils::Bezier(i/wireLength, cable.start, bezierControl1, bezierControl2, cable.plug);
-               ofVertex(pos.x,pos.y);
+               float delta = ofClamp(modulator->GetRecentChange() / range, -1, 1);
+               ofColor color = ofColor::lerp(ofColor::blue, ofColor::red, delta * .5f + .5f);
+               color.a = abs(1 - ((1-delta)*(1-delta))) * 150;
+               ofSetColor(color);
+               ofSetLineWidth(3);
+               
+               ofBeginShape();
+               ofVertex(cable.start.x,cable.start.y);
+               for (int i=1; i<wireLength-1; ++i)
+               {
+                  ofVec2f pos = MathUtils::Bezier(i/wireLength, cable.start, bezierControl1, bezierControl2, cable.plug);
+                  ofVertex(pos.x,pos.y);
+               }
+               ofVertex(cable.plug.x,cable.plug.y);
+               ofEndShape();
+               
+               //change plug color
+               if (delta > 0)
+                  lineColor = ofColor::lerp(lineColor, ofColor::red, delta);
+               else
+                  lineColor = ofColor::lerp(lineColor, ofColor::blue, -delta);
             }
-            ofVertex(cable.plug.x,cable.plug.y);
-            ofEndShape();
-            
-            //change plug color
-            if (delta > 0)
-               lineColor = ofColor::lerp(lineColor, ofColor::red, delta);
-            else
-               lineColor = ofColor::lerp(lineColor, ofColor::blue, -delta);
          }
          else
          {

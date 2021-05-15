@@ -240,7 +240,7 @@ ModuleFactory::ModuleFactory()
    REGISTER(ScaleDetect, scaledetect, kModuleType_Note);
    REGISTER(KarplusStrong, karplusstrong, kModuleType_Synth);
    REGISTER(WhiteKeys, whitekeys, kModuleType_Note);
-   REGISTER(Kicker, kicker, kModuleType_Note);
+   //REGISTER(Kicker, kicker, kModuleType_Note);
    REGISTER(RingModulator, ringmodulator, kModuleType_Audio);
    REGISTER(Neighborhooder, notewrap, kModuleType_Note);
    REGISTER(Polyrhythms, polyrhythms, kModuleType_Instrument);

@@ -32,7 +32,10 @@ void NoteLatch::CheckboxUpdated(Checkbox *checkbox)
       for (int i=0; i<128; ++i)
       {
          if (mNoteState[i])
+         {
             PlayNoteOutput(time, i, 0);
+            mNoteState[i] = false;
+         }
       }
    }
 }

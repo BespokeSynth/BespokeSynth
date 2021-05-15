@@ -88,7 +88,7 @@ void LooperRecorder::CreateUIControls()
    UIBLOCK_NEWCOLUMN();
    UIBLOCK_PUSHSLIDERWIDTH(80);
    DROPDOWN(mModeSelector, "mode", ((int*)(&mRecorderMode)), 60);
-   FLOATSLIDER(mCommitDelaySlider, "delay", &mCommitDelay, 0, 1);
+   //FLOATSLIDER(mCommitDelaySlider, "delay", &mCommitDelay, 0, 1);
    BUTTON(mClearOverdubButton, "clear");
    CHECKBOX(mFreeRecordingCheckbox, "free rec", &mFreeRecording);
    BUTTON(mCancelFreeRecordButton, "cancel free rec");
@@ -328,7 +328,7 @@ void LooperRecorder::DrawModule()
    mNumBarsSelector->Draw();
    mOrigSpeedButton->Draw();
    mSnapPitchButton->Draw();
-   mCommitDelaySlider->Draw();
+   //mCommitDelaySlider->Draw();
    mFreeRecordingCheckbox->Draw();
    mCancelFreeRecordButton->Draw();
    mNextCommitTargetSlider->Draw();
@@ -347,7 +347,7 @@ void LooperRecorder::DrawModule()
       if (cents < 0)
          detune += " -" + ofToString(-cents) + " cents";
       
-      DrawTextNormal(speed + detune,5,118);
+      DrawTextNormal(speed + detune,100,80);
    }
 
    if (mCommit1BarButton == gHoveredUIControl)
@@ -620,6 +620,11 @@ void LooperRecorder::ButtonClicked(ClickButton* button)
       pos -= int(pos);
       TheTransport->SetMeasurePos(pos);
       TheTransport->SetMeasure(count);
+      for (int i=0; i<mLoopers.size(); ++i)
+      {
+         if (mLoopers[i])
+            mLoopers[i]->ResampleForNewSpeed();
+      }
    }
 
    if (button == mHalfTempoButton)
@@ -638,6 +643,11 @@ void LooperRecorder::ButtonClicked(ClickButton* button)
       pos -= int(pos);
       TheTransport->SetMeasurePos(pos);
       TheTransport->SetMeasure(count);
+      for (int i=0; i<mLoopers.size(); ++i)
+      {
+         if (mLoopers[i])
+            mLoopers[i]->ResampleForNewSpeed();
+      }
    }
 
    if (button == mShiftMeasureButton)
@@ -710,8 +720,12 @@ void LooperRecorder::ButtonClicked(ClickButton* button)
       mNumBars = numBars;
       if (mNextCommitTargetIndex < (int)mLoopers.size())
          Commit(mLoopers[mNextCommitTargetIndex]);
-      if (mLoopers.size() > 0)
+      for (int i=0; i<(int)mLoopers.size(); ++i)
+      {
          mNextCommitTargetIndex = (mNextCommitTargetIndex + 1) % mLoopers.size();
+         if (mLoopers[mNextCommitTargetIndex] != nullptr)
+            break;
+      }
    }
 }
 

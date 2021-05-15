@@ -109,11 +109,11 @@ void RollingBuffer::Draw(int x, int y, int width, int height, int length /*= -1*
          startSample = mOffsetToNow[0] - length - delayOffset;
       else
          startSample = mOffsetToNow[channel] - length - delayOffset;
-      if (startSample < 0)
+      while (startSample < 0)
          startSample += Size();
       int endSample = startSample + length;
 
-      if (endSample >= Size())
+      while (endSample >= Size())
          endSample -= Size();     //draw wraparound
 
       if (channel == -1)

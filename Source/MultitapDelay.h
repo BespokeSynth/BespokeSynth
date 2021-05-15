@@ -78,12 +78,14 @@ private:
       float mDelayMs;
       float mGain;
       float mFeedback;
+      float mPan;
       
       MultitapDelay* mOwner;
       
       FloatSlider* mDelayMsSlider;
       FloatSlider* mGainSlider;
       FloatSlider* mFeedbackSlider;
+      FloatSlider* mPanSlider;
       
       ChannelBuffer mTapBuffer;
    };
