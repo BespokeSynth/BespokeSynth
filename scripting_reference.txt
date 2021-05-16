@@ -158,6 +158,13 @@ import envelope
       e.schedule(delay, tuple<float,float> stages)
 
 
+import drumplayer
+   static:
+      drumplayer.get(path)
+   instance:
+      d.import_sampleplayer_cue(samplePlayer, srcCueIndex, destHitIndex)
+
+
 import module
    static:
       module.get(path)

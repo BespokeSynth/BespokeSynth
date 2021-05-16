@@ -30,6 +30,8 @@
 
 #define NUM_DRUM_HITS 16
 
+class SamplePlayer;
+
 class DrumPlayer : public IAudioSource, public INoteReceiver, public IDrawableModule, public IFloatSliderListener, public IDropdownListener, public IButtonListener, public IIntSliderListener, public ITextEntryListener, public IGridControllerListener, public ITimeListener
 {
 public:
@@ -43,6 +45,8 @@ public:
    void Poll() override;
    
    static void SetUpHitDirectories();
+   
+   void ImportSampleCuePoint(SamplePlayer* player, int sourceCueIndex, int destHitIndex);
    
    //IAudioSource
    void Process(double time) override;
@@ -99,6 +103,7 @@ private:
    int GetIndividualOutputIndex(int hitIndex);
    void UpdateLights();
    void SetUpNewDrumPlayer();
+   void SetHitSample(int sampleIndex, Sample* sample);
    
    //IDrawableModule
    void DrawModule() override;

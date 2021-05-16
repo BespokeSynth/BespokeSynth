@@ -21,6 +21,7 @@
 #include "OscController.h"
 #include "OSCOutput.h"
 #include "EnvelopeModulator.h"
+#include "DrumPlayer.h"
 
 #include "pybind11/embed.h"
 #include "pybind11/stl.h"
@@ -505,6 +506,21 @@ PYBIND11_EMBEDDED_MODULE(envelope, m)
       {
          double time = ScriptModule::sMostRecentLineExecutedModule->GetScheduledTime(delay);
          StartEnvelope(envelope, time, stages);
+      });
+}
+
+PYBIND11_EMBEDDED_MODULE(drumplayer, m)
+{
+   m.def("get", [](string path)
+   {
+      auto* ret = dynamic_cast<DrumPlayer*>(TheSynth->FindModule(path));
+      ScriptModule::sMostRecentLineExecutedModule->OnModuleReferenceBound(ret);
+      return ret;
+   }, py::return_value_policy::reference);
+   py::class_<DrumPlayer, IDrawableModule>(m, "drumplayer")
+      .def("import_sampleplayer_cue", [](DrumPlayer& drumPlayer, SamplePlayer* samplePlayer, int srcCueIndex, int destHitIndex)
+      {
+         drumPlayer.ImportSampleCuePoint(samplePlayer, srcCueIndex, destHitIndex);
       });
 }
 

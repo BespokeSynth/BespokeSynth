@@ -726,30 +726,9 @@ void SamplePlayer::OnClicked(int x, int y, bool right)
 
       if (lengthSeconds > 0 && mCueClipGrabRect.contains(x,y))
       {
-         int startSamples = startSeconds * gSampleRate * mSample->GetSampleRateRatio();
-         int lengthSamplesSrc = lengthSeconds * gSampleRate * mSample->GetSampleRateRatio();
-         if (startSamples >= mSample->Data()->BufferSize())
-            startSamples = mSample->Data()->BufferSize() - 1;
-         if (startSamples + lengthSamplesSrc >= mSample->Data()->BufferSize())
-            lengthSamplesSrc = mSample->Data()->BufferSize() - 1 - startSamples;
-         int lengthSamplesDest = lengthSamplesSrc / speed / mSample->GetSampleRateRatio();
-         ChannelBuffer grab(lengthSamplesDest);
-         grab.SetNumActiveChannels(mSample->Data()->NumActiveChannels());
-         /*for (int ch = 0; ch < grab.NumActiveChannels(); ++ch)
-         {
-            BufferCopy(grab.GetChannel(ch), mSample->Data()->GetChannel(ch) + startSamples, lengthSamplesSrc);
-         }*/
-
-         for (int ch = 0; ch < grab.NumActiveChannels(); ++ch)
-         {
-            for (int i = 0; i < lengthSamplesDest; ++i)
-            {
-               float offset = i * speed * mSample->GetSampleRateRatio();
-               grab.GetChannel(ch)[i] = GetInterpolatedSample(offset, mSample->Data()->GetChannel(ch) + startSamples, lengthSamplesSrc);
-            }
-         }
-
-         TheSynth->GrabSample(&grab, false, 1);
+         ChannelBuffer* data = GetCueSampleData(mActiveCuePointIndex);
+         TheSynth->GrabSample(data, false, 1);
+         delete data;
       }
    }
 
@@ -768,6 +747,38 @@ void SamplePlayer::OnClicked(int x, int y, bool right)
       if (mSetCuePoint)
          SetCuePointForX(x);
    }
+}
+
+ChannelBuffer* SamplePlayer::GetCueSampleData(int cueIndex)
+{
+   float startSeconds, lengthSeconds, speed;
+   GetPlayInfoForPitch(cueIndex, startSeconds, lengthSeconds, speed);
+   if (lengthSeconds <= 0)
+      lengthSeconds = 1;
+   int startSamples = startSeconds * gSampleRate * mSample->GetSampleRateRatio();
+   int lengthSamplesSrc = lengthSeconds * gSampleRate * mSample->GetSampleRateRatio();
+   if (startSamples >= mSample->Data()->BufferSize())
+      startSamples = mSample->Data()->BufferSize() - 1;
+   if (startSamples + lengthSamplesSrc >= mSample->Data()->BufferSize())
+      lengthSamplesSrc = mSample->Data()->BufferSize() - 1 - startSamples;
+   int lengthSamplesDest = lengthSamplesSrc / speed / mSample->GetSampleRateRatio();
+   ChannelBuffer* data = new ChannelBuffer(lengthSamplesDest);
+   data->SetNumActiveChannels(mSample->Data()->NumActiveChannels());
+   /*for (int ch = 0; ch < data->NumActiveChannels(); ++ch)
+   {
+      BufferCopy(data->GetChannel(ch), mSample->Data()->GetChannel(ch) + startSamples, lengthSamplesSrc);
+   }*/
+
+   for (int ch = 0; ch < data->NumActiveChannels(); ++ch)
+   {
+      for (int i = 0; i < lengthSamplesDest; ++i)
+      {
+         float offset = i * speed * mSample->GetSampleRateRatio();
+         data->GetChannel(ch)[i] = GetInterpolatedSample(offset, mSample->Data()->GetChannel(ch) + startSamples, lengthSamplesSrc);
+      }
+   }
+   
+   return data;
 }
 
 bool SamplePlayer::MouseMoved(float x, float y)

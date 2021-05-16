@@ -15,6 +15,7 @@
 #include "Profiler.h"
 #include "FillSaveDropdown.h"
 #include "UIControlMacros.h"
+#include "SamplePlayer.h"
 
 DrumPlayer::DrumPlayer()
 : mSpeed(1)
@@ -581,17 +582,29 @@ void DrumPlayer::SampleDropped(int x, int y, Sample* sample)
    {
       int sampleIdx = GetAssociatedSampleIndex(x,y);
       if (sampleIdx != -1)
-      {
-         LoadSampleLock();
-         mDrumHits[sampleIdx].mSample.CopyFrom(sample);
-         LoadSampleUnlock();
-         mDrumHits[sampleIdx].mLinkId = -1;
-         mDrumHits[sampleIdx].mVol = 1;
-         mDrumHits[sampleIdx].mSpeed = 1;
-         mDrumHits[sampleIdx].mPan = 0;
-         mDrumHits[sampleIdx].mEnvelopeLength = mDrumHits[sampleIdx].mSample.LengthInSamples() * gInvSampleRateMs;
-      }
+         SetHitSample(sampleIdx, sample);
    }
+}
+
+void DrumPlayer::ImportSampleCuePoint(SamplePlayer* player, int sourceCueIndex, int destHitIndex)
+{
+   ChannelBuffer* data = player->GetCueSampleData(sourceCueIndex);
+   Sample sample;
+   sample.Create(data);
+   SetHitSample(destHitIndex, &sample);
+   delete data;
+}
+
+void DrumPlayer::SetHitSample(int sampleIndex, Sample* sample)
+{
+   LoadSampleLock();
+   mDrumHits[sampleIndex].mSample.CopyFrom(sample);
+   LoadSampleUnlock();
+   mDrumHits[sampleIndex].mLinkId = -1;
+   mDrumHits[sampleIndex].mVol = 1;
+   mDrumHits[sampleIndex].mSpeed = 1;
+   mDrumHits[sampleIndex].mPan = 0;
+   mDrumHits[sampleIndex].mEnvelopeLength = mDrumHits[sampleIndex].mSample.LengthInSamples() * gInvSampleRateMs;
 }
 
 void DrumPlayer::OnClicked(int x, int y, bool right)
