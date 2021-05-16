@@ -20,6 +20,7 @@
 #include "LinnstrumentControl.h"
 #include "OscController.h"
 #include "OSCOutput.h"
+#include "EnvelopeModulator.h"
 
 #include "pybind11/embed.h"
 #include "pybind11/stl.h"
@@ -467,6 +468,43 @@ PYBIND11_EMBEDDED_MODULE(oscoutput, m)
       .def("send_string", [](OSCOutput& oscoutput, string address, string val)
       {
          oscoutput.SendString(address, val);
+      });
+}
+
+namespace
+{
+   void StartEnvelope(EnvelopeModulator& envelope, double time, const vector< tuple<float,float> >& stages)
+   {
+      ::ADSR adsr;
+      adsr.SetNumStages((int)stages.size());
+      adsr.GetHasSustainStage() = false;
+      for (size_t i=0; i<stages.size(); ++i)
+      {
+         adsr.GetStageData((int)i).time = get<0>(stages[i]);
+         adsr.GetStageData((int)i).target = get<1>(stages[i]);
+      }
+      envelope.Start(time, adsr);
+   }
+}
+
+PYBIND11_EMBEDDED_MODULE(envelope, m)
+{
+   m.def("get", [](string path)
+   {
+      auto* ret = dynamic_cast<EnvelopeModulator*>(TheSynth->FindModule(path));
+      ScriptModule::sMostRecentLineExecutedModule->OnModuleReferenceBound(ret);
+      return ret;
+   }, py::return_value_policy::reference);
+   py::class_<EnvelopeModulator, IDrawableModule>(m, "envelope")
+      .def("start", [](EnvelopeModulator& envelope, vector< tuple<float,float> > stages)
+      {
+         double time = ScriptModule::sMostRecentLineExecutedModule->GetScheduledTime(0);
+         StartEnvelope(envelope, time, stages);
+      })
+      .def("schedule", [](EnvelopeModulator& envelope, float delay, vector< tuple<float,float> > stages)
+      {
+         double time = ScriptModule::sMostRecentLineExecutedModule->GetScheduledTime(delay);
+         StartEnvelope(envelope, time, stages);
       });
 }
 

@@ -89,6 +89,11 @@ void EnvelopeModulator::DrawModule()
       mEnvelopeControl.Draw();
 }
 
+void EnvelopeModulator::Start(double time, const ::ADSR& adsr)
+{
+   mAdsr.Start(time, 1, adsr);
+}
+
 void EnvelopeModulator::PlayNote(double time, int pitch, int velocity, int voiceIdx, ModulationParameters modulation)
 {
    PlayNoteOutput(time, pitch, velocity, voiceIdx, modulation);

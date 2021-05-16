@@ -150,6 +150,14 @@ import oscoutput
       o.send_string(address, val)
 
 
+import envelope
+   static:
+      envelope.get(path)
+   instance:
+      e.start(tuple<float,float> stages)
+      e.schedule(delay, tuple<float,float> stages)
+
+
 import module
    static:
       module.get(path)

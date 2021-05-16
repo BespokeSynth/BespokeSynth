@@ -26,10 +26,12 @@ class EnvelopeModulator : public IDrawableModule, public IRadioButtonListener, p
 {
 public:
    EnvelopeModulator();
+   virtual ~EnvelopeModulator();
    static IDrawableModule* Create() { return new EnvelopeModulator(); }
    void Delete() { delete this; }
    void DrawModule() override;
    
+   void Start(double time, const ::ADSR& adsr);
    void SetEnabled(bool enabled) override { mEnabled = enabled; }
    bool Enabled() const override { return mEnabled; }
    string GetTitleLabel() override { return "envelope"; }
@@ -56,16 +58,13 @@ public:
    void ButtonClicked(ClickButton* button) override;
    void DropdownUpdated(DropdownList* list, int oldVal) override {}
    
-   void GetModuleDimensions(float& width, float& height);
+   void GetModuleDimensions(float& width, float& height) override;
    
    void SaveLayout(ofxJSONElement& moduleInfo) override;
    void LoadLayout(const ofxJSONElement& moduleInfo) override;
    void SetUpFromSaveData() override;
    void SaveState(FileStreamOut& out) override;
    void LoadState(FileStreamIn& in) override;
-   
-protected:
-   ~EnvelopeModulator();
    
 private:
    void OnClicked(int x, int y, bool right) override;
