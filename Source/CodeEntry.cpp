@@ -930,9 +930,9 @@ void CodeEntry::OnKeyPressed(int key, bool isRepeat)
 
 void CodeEntry::AcceptAutocompletion()
 {
-   juce::String clipboard = SystemClipboard::getTextFromClipboard();
    AddString(mAutocompletes[mAutocompleteHighlightIndex].autocompleteRest);
    mAutocompleteUpdateTimer = 0;
+   mWantToShowAutocomplete = false;
 }
 
 void CodeEntry::Publish()
