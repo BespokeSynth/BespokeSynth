@@ -102,6 +102,8 @@ void CodeEntry::Poll()
                            mAutocompleteSignatures[i].params.resize(params.size());
                            for (size_t j = 0; j < params.size(); ++j)
                               mAutocompleteSignatures[i].params[j] = juce::String(params[j].attr("description").str()).replace("param ","").toStdString();
+                           auto bracket_start = signature.attr("bracket_start").cast< std::tuple<int, int> >();
+                           mAutocompleteSignatures[i].caretPos = GetCaretPosition(get<1>(bracket_start), get<0>(bracket_start)-2);
                            ++i;
                         }
                         else
@@ -124,21 +126,61 @@ void CodeEntry::Poll()
                      {
                         mWantToShowAutocomplete = true;
                         mAutocompleteHighlightIndex = 0;
-                        for (auto autocomplete : autocompletes)
+                        bool isPathAutocomplete = false;
+                        if (mAutocompleteSignatures.size() > 0 &&
+                            mAutocompleteSignatures[0].valid &&
+                            mAutocompleteSignatures[0].params.size() > 0 &&
+                            mAutocompleteSignatures[0].params[0] == "path")
+                           isPathAutocomplete = true;
+
+                        if (!isPathAutocomplete) //normal autocomplete
                         {
-                           //ofLog() << "    --" << autocomplete;
-                           string full = autocomplete.attr("name").str();
-                           string rest = autocomplete.attr("complete").str();
-                           if (i < mAutocompletes.size())// && full.length() > rest.length())
+                           for (auto autocomplete : autocompletes)
                            {
-                              mAutocompletes[i].valid = true;
-                              mAutocompletes[i].autocompleteFull = full;
-                              mAutocompletes[i].autocompleteRest = rest;
-                              ++i;
+                              //ofLog() << "    --" << autocomplete;
+                              string full = autocomplete.attr("name").str();
+                              string rest = autocomplete.attr("complete").str();
+                              if (!((juce::String)full).startsWith("__") && i < mAutocompletes.size())
+                              {
+                                 mAutocompletes[i].valid = true;
+                                 mAutocompletes[i].autocompleteFull = full;
+                                 mAutocompletes[i].autocompleteRest = rest;
+                                 ++i;
+                              }
+                              else
+                              {
+                                 break;
+                              }
                            }
-                           else
+                        }
+                        else //we're autocompleting a path, look for matching instantiated module names
+                        {
+                           int stringStart = mAutocompleteSignatures[0].caretPos + 2;
+                           string writtenSoFar = mString.substr(stringStart, mCaretPosition - stringStart);
+
+                           vector<IDrawableModule*> modules;
+                           TheSynth->GetAllModules(modules);
+
+                           for (auto module : modules)
                            {
-                              break;
+                              juce::String modulePath = module->Path();
+                              if (modulePath.startsWith(writtenSoFar))
+                              {
+                                 string full = modulePath.toStdString();
+                                 string rest = full;
+                                 ofStringReplace(rest, writtenSoFar, "", true);
+                                 if (i < mAutocompletes.size())
+                                 {
+                                    mAutocompletes[i].valid = true;
+                                    mAutocompletes[i].autocompleteFull = full;
+                                    mAutocompletes[i].autocompleteRest = rest;
+                                    ++i;
+                                 }
+                                 else
+                                 {
+                                    break;
+                                 }
+                              }
                            }
                         }
                      }
