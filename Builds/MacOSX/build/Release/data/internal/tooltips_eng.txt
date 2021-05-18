@@ -433,6 +433,7 @@ notesequencer~looping sequence of notes at an interval. pair with a "pulser" mod
 ~length~length that the sequence below should play. the overall grid length can be changed by adjusting "gridsteps" in the triangle menu.
 ~<~shift the sequence to the left
 ~>~shift the sequence to the right
+~clear~clear all steps
 ~octave~octave of the bottom pitch of this sequence
 ~notemode~which set of pitches should the rows represent?
 ~loop reset~when sequence loops, reset to here instead. send a "downbeat"-style message from a pulser to restart the sequence from the first step.

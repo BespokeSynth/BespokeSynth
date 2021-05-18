@@ -26,6 +26,8 @@
 
 #define NSS_MAX_STEPS 32
 
+class PatchCableSource;
+
 class NoteStepSequencer : public IDrawableModule, public ITimeListener, public INoteSource, public IButtonListener, public IDropdownListener, public IIntSliderListener, public IFloatSliderListener, public MidiDeviceListener, public UIGridListener, public IAudioPoller, public IScaleListener, public INoteReceiver, public IPulseReceiver
 {
 public:
@@ -109,6 +111,7 @@ private:
    float ExtraHeight() const;
    void RandomizePitches(bool fifths);
    void Step(double time, float velocity, int pulseFlags);
+   void SendNoteToCable(int index, double time, int pitch, int velocity);
    
    enum NoteMode
    {
@@ -130,6 +133,7 @@ private:
    UIGrid* mVelocityGrid;
    int mLastPitch;
    int mLastVel;
+   int mLastStepIndex;
    float mLastNoteLength;
    double mLastNoteStartTime;
    double mLastNoteEndTime;
@@ -152,6 +156,7 @@ private:
 
    ClickButton* mShiftBackButton;
    ClickButton* mShiftForwardButton;
+   ClickButton* mClearButton;
    
    ClickButton* mRandomizePitchButton;
    ClickButton* mRandomizeLengthButton;
@@ -163,6 +168,8 @@ private:
    std::array<FloatSlider*, NSS_MAX_STEPS> mLengthSliders;
    
    bool mHasExternalPulseSource;
+
+   std::array<PatchCableSource*, NSS_MAX_STEPS> mStepCables;
 
    TransportListenerInfo* mTransportListenerInfo;
 };

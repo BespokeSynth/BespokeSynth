@@ -15,6 +15,7 @@
 #include "Profiler.h"
 #include "FillSaveDropdown.h"
 #include "UIControlMacros.h"
+#include "PatchCableSource.h"
 
 NoteStepSequencer::NoteStepSequencer()
 : mInterval(kInterval_8n)
@@ -67,13 +68,14 @@ void NoteStepSequencer::CreateUIControls()
    UIBLOCK(130);
    DROPDOWN(mIntervalSelector,"interval",(int*)(&mInterval), 40);   UIBLOCK_SHIFTRIGHT();
    UIBLOCK_SHIFTX(93);
-   BUTTON(mRandomizePitchButton, "pitch");  UIBLOCK_SHIFTRIGHT();
-   BUTTON(mRandomizeLengthButton, "len");  UIBLOCK_SHIFTRIGHT();
-   BUTTON(mRandomizeVelocityButton, "vel");  UIBLOCK_NEWLINE();
-   UIBLOCK_PUSHSLIDERWIDTH(170);
+   BUTTON(mRandomizePitchButton, "pitch"); UIBLOCK_SHIFTRIGHT();
+   BUTTON(mRandomizeVelocityButton, "vel"); UIBLOCK_SHIFTRIGHT();
+   BUTTON(mRandomizeLengthButton, "len"); UIBLOCK_NEWLINE();
+   UIBLOCK_PUSHSLIDERWIDTH(150);
    INTSLIDER(mLengthSlider, "length", &mLength, 1, NSS_MAX_STEPS); UIBLOCK_SHIFTRIGHT();
    BUTTON(mShiftBackButton, "<"); UIBLOCK_SHIFTRIGHT();
-   BUTTON(mShiftForwardButton, ">"); UIBLOCK_NEWLINE();
+   BUTTON(mShiftForwardButton, ">"); UIBLOCK_SHIFTRIGHT();
+   BUTTON(mClearButton, "clear"); UIBLOCK_NEWLINE();
    UIBLOCK_POPSLIDERWIDTH();
    INTSLIDER(mOctaveSlider,"octave",&mOctave,0,7); UIBLOCK_SHIFTRIGHT();
    DROPDOWN(mNoteModeSelector,"notemode",(int*)(&mNoteMode),80); UIBLOCK_NEWLINE();
@@ -128,6 +130,13 @@ void NoteStepSequencer::CreateUIControls()
    
    mRandomizeLengthButton->PositionTo(mRandomizePitchButton, kAnchor_Right);
    mRandomizeVelocityButton->PositionTo(mRandomizeLengthButton, kAnchor_Right);
+
+   for (int i = 0; i < NSS_MAX_STEPS; ++i)
+   {
+      mStepCables[i] = new PatchCableSource(this, kConnectionType_Note);
+      mStepCables[i]->SetOverrideCableDir(ofVec2f(0, 1));
+      AddPatchCableSource(mStepCables[i]);
+   }
 }
 
 NoteStepSequencer::~NoteStepSequencer()
@@ -171,6 +180,7 @@ void NoteStepSequencer::DrawModule()
    mNoteModeSelector->Draw();
    mShiftBackButton->Draw();
    mShiftForwardButton->Draw();
+   mClearButton->Draw();
    mRandomizePitchButton->Draw();
    mRandomizeLengthButton->Draw();
    mRandomizeVelocityButton->Draw();
@@ -262,6 +272,8 @@ void NoteStepSequencer::DrawModule()
    }
    
    float controlYPos = gridY+gridH+mVelocityGrid->GetHeight();
+   float moduleWidth, moduleHeight;
+   GetModuleDimensions(moduleWidth, moduleHeight);
    if (mLoopResetPointSlider->IsShowing())
       controlYPos += 19;
    for (int i=0; i<NSS_MAX_STEPS; ++i)
@@ -288,6 +300,19 @@ void NoteStepSequencer::DrawModule()
          mToneDropdowns[i]->SetShowing(false);
          mVelocitySliders[i]->SetShowing(false);
          mLengthSliders[i]->SetShowing(false);
+      }
+
+      if (i < mLength && mShowStepControls)
+      {
+         ofVec2f pos = mVelocityGrid->GetCellPosition(i, 0) + mVelocityGrid->GetPosition(true);
+         pos.x += mVelocityGrid->GetWidth() / float(mLength) * .5f;
+         pos.y = moduleHeight - 7;
+         mStepCables[i]->SetManualPosition(pos.x, pos.y);
+         mStepCables[i]->SetEnabled(true);
+      }
+      else
+      {
+         mStepCables[i]->SetEnabled(false);
       }
    }
    
@@ -358,8 +383,9 @@ void NoteStepSequencer::GridUpdated(UIGrid* grid, int col, int row, float value,
    }
    if (grid == mVelocityGrid)
    {
-      for (int i=0; i<mVelocityGrid->GetCols(); ++i)
-         mVels[i] = mVelocityGrid->GetVal(i,0) * 127;
+      for (int i = 0; i < mVelocityGrid->GetCols(); ++i)
+         mVels[i] = mVelocityGrid->GetVal(i, 0) * 127;
+      SyncGridToSeq();
    }
 }
 
@@ -420,6 +446,8 @@ void NoteStepSequencer::OnTransportAdvanced(float amount)
       if (gTime > mLastNoteEndTime)
       {
          PlayNoteOutput(gTime, mLastPitch, 0);
+         if (mShowStepControls && mLastStepIndex < (int)mStepCables.size())
+            SendNoteToCable(mLastStepIndex, gTime, mLastPitch, 0);
          mAlreadyDidNoteOff = true;
       }
    }
@@ -475,9 +503,11 @@ void NoteStepSequencer::Step(double time, float velocity, int pulseFlags)
    }
    
    int offPitch = -1;
+   int offStep = -1;
    if (mLastPitch >= 0 && !mAlreadyDidNoteOff)
    {
       offPitch = mLastPitch;
+      offStep = mLastStepIndex;
    }
    
    int current = mTones[mArpIndex];
@@ -493,14 +523,19 @@ void NoteStepSequencer::Step(double time, float velocity, int pulseFlags)
       if (mLastPitch == outPitch && !mAlreadyDidNoteOff)   //same note, play noteoff first
       {
          PlayNoteOutput(time, mLastPitch, 0, -1);
+         if (mShowStepControls && mLastStepIndex < (int)mStepCables.size())
+            SendNoteToCable(mLastStepIndex, time, mLastPitch, 0);
          mAlreadyDidNoteOff = true;
          offPitch = -1;
       }
       if (mVels[mArpIndex] > 1)
       {
          PlayNoteOutput(time, outPitch, mVels[mArpIndex] * velocity, -1);
+         if (mShowStepControls && mArpIndex < (int)mStepCables.size())
+            SendNoteToCable(mArpIndex, time, outPitch, mVels[mArpIndex] * velocity);
          mLastPitch = outPitch;
          mLastVel = mVels[mArpIndex];
+         mLastStepIndex = mArpIndex;
          mLastNoteLength = mNoteLengths[mArpIndex];
          mLastNoteStartTime = time;
          mLastNoteEndTime = time + mLastNoteLength * TheTransport->GetDuration(mInterval);
@@ -512,6 +547,8 @@ void NoteStepSequencer::Step(double time, float velocity, int pulseFlags)
    if (offPitch != -1)
    {
       PlayNoteOutput(time, offPitch, 0, -1);
+      if (mShowStepControls && offStep < (int)mStepCables.size())
+         SendNoteToCable(offStep, time, offPitch, 0);
       if (offPitch == mLastPitch)
       {
          mLastPitch = -1;
@@ -523,6 +560,14 @@ void NoteStepSequencer::Step(double time, float velocity, int pulseFlags)
    mVelocityGrid->SetHighlightCol(time, mArpIndex);
    
    UpdateLights();
+}
+
+void NoteStepSequencer::SendNoteToCable(int index, double time, int pitch, int velocity)
+{
+   const vector<INoteReceiver*>& receivers = mStepCables[index]->GetNoteReceivers();
+   mStepCables[index]->AddHistoryEvent(gTime, velocity > 0);
+   for (auto* receiver : receivers)
+      receiver->PlayNote(time, pitch, velocity);
 }
 
 void NoteStepSequencer::UpdateLights()
@@ -580,7 +625,7 @@ float NoteStepSequencer::ExtraHeight() const
    if (mLoopResetPointSlider->IsShowing())
       height += 17;
    if (mShowStepControls)
-      height += 17 * 3;
+      height += 17 * 3 + 5;
    return height;
 }
 
@@ -686,6 +731,12 @@ void NoteStepSequencer::ButtonClicked(ClickButton* button)
       ShiftSteps(-1);
    if (button == mShiftForwardButton)
       ShiftSteps(1);
+   if (button == mClearButton)
+   {
+      for (int i = 0; i < mLength; ++i)
+         mVels[i] = 0;
+      SyncGridToSeq();
+   }
    if (button == mRandomizePitchButton)
    {
       RandomizePitches(GetKeyModifiers() & kModifier_Shift);
@@ -818,8 +869,8 @@ void NoteStepSequencer::SyncGridToSeq()
    {
       if (mTones[i] < 0)
          continue;
-      
-      mGrid->SetVal(i,mTones[i],mNoteLengths[i],false);
+
+      mGrid->SetVal(i,mTones[i], mVels[i] > 0 ? mNoteLengths[i] : 0,false);
       mVelocityGrid->SetVal(i, 0, mVels[i]/127.0f, false);
    }
    mGrid->SetGrid(mLength, mNoteRange);

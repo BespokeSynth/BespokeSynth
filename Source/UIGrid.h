@@ -116,6 +116,7 @@ private:
    float mHoldVal;
    int mHoldCol;
    int mHoldRow;
+   bool mLastClickWasClear;
    std::array<float, MAX_GRID_SIZE*MAX_GRID_SIZE> mData;
    std::array<HighlightColBuffer, 10> mHighlightColBuffer;
    int mNextHighlightColPointer;
