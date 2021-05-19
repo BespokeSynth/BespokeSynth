@@ -176,7 +176,7 @@ int OscController::AddControl(string address, bool isFloat)
       return existing;
 
    OscMap entry;
-   int mapIndex = mOscMap.size();
+   int mapIndex = (int)mOscMap.size();
    entry.mControl = mapIndex;
    entry.mAddress = address;
    entry.mIsFloat = isFloat;

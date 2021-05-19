@@ -1,0 +1,24 @@
+// This file generated automatically:
+// https://github.com/ruslo/sugar/wiki/Cross-platform-warning-suppression
+
+// Copyright (c) 2014, Ruslan Baratov
+// All rights reserved.
+
+#if !defined(LEATHERS_PUSH_)
+# error "`leathers/objc-missing-property-synthesis` used "
+      "without `leathers/push`, "
+      "see README.txt for more info"
+#endif
+
+#if defined(LEATHERS_OBJC_MISSING_PROPERTY_SYNTHESIS_)
+# error "`leathers/objc-missing-property-synthesis` "
+    "already included; see README.txt for more info"
+#else
+# define LEATHERS_OBJC_MISSING_PROPERTY_SYNTHESIS_
+#endif
+
+#if (__clang__)
+# if __has_warning("-Wobjc-missing-property-synthesis")
+#  pragma clang diagnostic ignored "-Wobjc-missing-property-synthesis"
+# endif
+#endif

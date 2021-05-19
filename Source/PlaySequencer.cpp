@@ -52,7 +52,7 @@ void PlaySequencer::CreateUIControls()
    UIBLOCK_SHIFTUP();
    CHECKBOX(mLinkColumnsCheckbox, "link columns", &mLinkColumns);
    ENDUIBLOCK(width, height);
-   mGrid = new UIGrid(3, height, mWidth-16, 150, TheTransport->CountInStandardMeasure(mInterval), mLanes.size(), this);
+   mGrid = new UIGrid(3, height, mWidth-16, 150, TheTransport->CountInStandardMeasure(mInterval), (int)mLanes.size(), this);
    mHeight = height + 153;
    mGrid->SetFlip(true);
    mGrid->SetGridMode(UIGrid::kMultisliderBipolar);
@@ -69,7 +69,7 @@ void PlaySequencer::CreateUIControls()
    ENDUIBLOCK(width, mHeight);
 
    ofRectangle gridRect = mGrid->GetRect(true);
-   for (size_t i = 0; i<mLanes.size(); ++i)
+   for (int i = 0; i<(int)mLanes.size(); ++i)
    {
       ofVec2f cellPos = mGrid->GetCellPosition(mGrid->GetCols() - 1, i) + mGrid->GetPosition(true);
       mLanes[i].mMuteOrEraseCheckbox = new Checkbox(this, ("mute/delete"+ofToString(i)).c_str(), gridRect.getMaxX() + 3, cellPos.y+1, &mLanes[i].mMuteOrErase);
@@ -137,7 +137,7 @@ void PlaySequencer::DrawModule()
    ofPushStyle();
    ofSetColor(255, 0, 0, 50);
    ofFill();
-   for (size_t i = 0; i < mLanes.size(); ++i)
+   for (int i = 0; i < (int)mLanes.size(); ++i)
    {
       if (mLanes[i].mMuteOrErase)
       {
@@ -218,7 +218,7 @@ void PlaySequencer::OnTimeEvent(double time)
 
    mGrid->SetHighlightCol(time, step);
 
-   for (size_t i = 0; i < mLanes.size(); ++i)
+   for (int i = 0; i < (int)mLanes.size(); ++i)
    {
       float gridVal = mGrid->GetVal(step, i);
       int playVelocity = (int)(gridVal * 127);
@@ -270,7 +270,7 @@ void PlaySequencer::NoteOffScheduler::OnTimeEvent(double time)
    if (mOwner->mSustain)
       return;
 
-   for (size_t i = 0; i < mOwner->mLanes.size(); ++i)
+   for (int i = 0; i < (int)mOwner->mLanes.size(); ++i)
    {
       if (mOwner->mLanes[i].mIsPlaying)
       {
@@ -312,7 +312,7 @@ void PlaySequencer::UpdateNumMeasures(int oldNumMeasures)
    int oldSteps = mGrid->GetCols();
 
    int stepsPerMeasure = TheTransport->GetStepsPerMeasure(this);
-   mGrid->SetGrid(stepsPerMeasure * mNumMeasures, mLanes.size());
+   mGrid->SetGrid(stepsPerMeasure * mNumMeasures, (int)mLanes.size());
 
    if (mNumMeasures > oldNumMeasures)
    {
@@ -360,7 +360,7 @@ void PlaySequencer::UpdateLights(bool betweener)
       mGridController->SetLight(x, y, step % 16 == i ? kGridColor3Bright : kGridColorOff);
    }
 
-   for (size_t i = 0; i < mLanes.size(); ++i)
+   for (int i = 0; i < (int)mLanes.size(); ++i)
    {
       int x = i % 4 * 2;
       int y = 7 - i / 4;
@@ -472,7 +472,7 @@ void PlaySequencer::OnGridButton(int x, int y, float velocity, IGridController* 
 
                      if (mLinkColumns)
                      {
-                        for (size_t j = 0; j < mLanes.size(); ++j)
+                        for (int j = 0; j < (int)mLanes.size(); ++j)
                         {
                            if (j % 4 == pitch % 4)
                               mGrid->SetVal(i, j, 0);

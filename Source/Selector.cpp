@@ -82,7 +82,7 @@ void Selector::SyncList()
 
 void Selector::PlayNote(double time, int pitch, int velocity, int voiceIdx, ModulationParameters modulation)
 {
-   int range = mControlCables.size() - 1;
+   int range = (int)mControlCables.size() - 1;
    if (velocity > 0 && range > 0)
       SetIndex(pitch % range);
 }

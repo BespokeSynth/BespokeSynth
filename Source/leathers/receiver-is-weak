@@ -1,0 +1,24 @@
+// This file generated automatically:
+// https://github.com/ruslo/sugar/wiki/Cross-platform-warning-suppression
+
+// Copyright (c) 2014, Ruslan Baratov
+// All rights reserved.
+
+#if !defined(LEATHERS_PUSH_)
+# error "`leathers/receiver-is-weak` used "
+      "without `leathers/push`, "
+      "see README.txt for more info"
+#endif
+
+#if defined(LEATHERS_RECEIVER_IS_WEAK_)
+# error "`leathers/receiver-is-weak` "
+    "already included; see README.txt for more info"
+#else
+# define LEATHERS_RECEIVER_IS_WEAK_
+#endif
+
+#if (__clang__)
+# if __has_warning("-Wreceiver-is-weak")
+#  pragma clang diagnostic ignored "-Wreceiver-is-weak"
+# endif
+#endif

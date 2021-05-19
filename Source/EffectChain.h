@@ -63,7 +63,7 @@ private:
    void DrawModule() override;
    void GetModuleDimensions(float& width, float& height) override;
    bool Enabled() const override { return mEnabled; }
-   vector<IUIControl*> ControlsToIgnoreInSaveState() const;
+   vector<IUIControl*> ControlsToIgnoreInSaveState() const override;
    
    int GetRowHeight(int row) const;
    int NumRows() const;

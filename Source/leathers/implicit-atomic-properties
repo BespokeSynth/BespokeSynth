@@ -1,0 +1,24 @@
+// This file generated automatically:
+// https://github.com/ruslo/sugar/wiki/Cross-platform-warning-suppression
+
+// Copyright (c) 2014, Ruslan Baratov
+// All rights reserved.
+
+#if !defined(LEATHERS_PUSH_)
+# error "`leathers/implicit-atomic-properties` used "
+      "without `leathers/push`, "
+      "see README.txt for more info"
+#endif
+
+#if defined(LEATHERS_IMPLICIT_ATOMIC_PROPERTIES_)
+# error "`leathers/implicit-atomic-properties` "
+    "already included; see README.txt for more info"
+#else
+# define LEATHERS_IMPLICIT_ATOMIC_PROPERTIES_
+#endif
+
+#if (__clang__)
+# if __has_warning("-Wimplicit-atomic-properties")
+#  pragma clang diagnostic ignored "-Wimplicit-atomic-properties"
+# endif
+#endif

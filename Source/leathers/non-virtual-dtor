@@ -1,0 +1,32 @@
+// This file generated automatically:
+// https://github.com/ruslo/sugar/wiki/Cross-platform-warning-suppression
+
+// Copyright (c) 2014, Ruslan Baratov
+// All rights reserved.
+
+#if !defined(LEATHERS_PUSH_)
+# error "`leathers/non-virtual-dtor` used "
+      "without `leathers/push`, "
+      "see README.txt for more info"
+#endif
+
+#if defined(LEATHERS_NON_VIRTUAL_DTOR_)
+# error "`leathers/non-virtual-dtor` "
+    "already included; see README.txt for more info"
+#else
+# define LEATHERS_NON_VIRTUAL_DTOR_
+#endif
+
+#if (__clang__)
+# if __has_warning("-Wnon-virtual-dtor")
+#  pragma clang diagnostic ignored "-Wnon-virtual-dtor"
+# endif
+#endif
+
+#if (__GNUC__)
+# pragma GCC diagnostic ignored "-Wnon-virtual-dtor"
+#endif
+
+#if (_MSC_VER)
+# pragma warning(disable: 4265)
+#endif

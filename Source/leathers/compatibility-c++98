@@ -1,0 +1,8 @@
+// This file generated automatically:
+// https://github.com/ruslo/sugar/wiki/Cross-platform-warning-suppression
+
+// Copyright (c) 2014, Ruslan Baratov
+// All rights reserved.
+
+#include <leathers/c++98-compat>
+#include <leathers/c++98-compat-pedantic>

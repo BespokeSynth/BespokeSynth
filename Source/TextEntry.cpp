@@ -275,8 +275,8 @@ void TextEntry::OnKeyPressed(int key, bool isRepeat)
    else if (key == OF_KEY_RIGHT)
    {
       if (GetKeyModifiers() & kModifier_Command)
-         mCaretPosition = strlen(mString);
-      else if (mCaretPosition < strlen(mString))
+         mCaretPosition = (int)strlen(mString);
+      else if (mCaretPosition < (int)strlen(mString))
          ++mCaretPosition;
    }
    else if (key == OF_KEY_UP)
@@ -333,7 +333,7 @@ void TextEntry::OnKeyPressed(int key, bool isRepeat)
    }
    else if (key == KeyPress::endKey)
    {
-      mCaretPosition = strlen(mString);
+      mCaretPosition = (int)strlen(mString);
    }
    else
    {

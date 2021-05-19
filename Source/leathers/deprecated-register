@@ -1,0 +1,24 @@
+// This file generated automatically:
+// https://github.com/ruslo/sugar/wiki/Cross-platform-warning-suppression
+
+// Copyright (c) 2014, Ruslan Baratov
+// All rights reserved.
+
+#if !defined(LEATHERS_PUSH_)
+# error "`leathers/deprecated-register` used "
+      "without `leathers/push`, "
+      "see README.txt for more info"
+#endif
+
+#if defined(LEATHERS_DEPRECATED_REGISTER_)
+# error "`leathers/deprecated-register` "
+    "already included; see README.txt for more info"
+#else
+# define LEATHERS_DEPRECATED_REGISTER_
+#endif
+
+#if (__clang__)
+# if __has_warning("-Wdeprecated-register")
+#  pragma clang diagnostic ignored "-Wdeprecated-register"
+# endif
+#endif

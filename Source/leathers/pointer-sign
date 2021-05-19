@@ -1,0 +1,28 @@
+// This file generated automatically:
+// https://github.com/ruslo/sugar/wiki/Cross-platform-warning-suppression
+
+// Copyright (c) 2014, Ruslan Baratov
+// All rights reserved.
+
+#if !defined(LEATHERS_PUSH_)
+# error "`leathers/pointer-sign` used "
+      "without `leathers/push`, "
+      "see README.txt for more info"
+#endif
+
+#if defined(LEATHERS_POINTER_SIGN_)
+# error "`leathers/pointer-sign` "
+    "already included; see README.txt for more info"
+#else
+# define LEATHERS_POINTER_SIGN_
+#endif
+
+#if (__clang__)
+# if __has_warning("-Wpointer-sign")
+#  pragma clang diagnostic ignored "-Wpointer-sign"
+# endif
+#endif
+
+#if (__GNUC__)
+# pragma GCC diagnostic ignored "-Wpointer-sign"
+#endif

@@ -1,0 +1,32 @@
+// This file generated automatically:
+// https://github.com/ruslo/sugar/wiki/Cross-platform-warning-suppression
+
+// Copyright (c) 2014, Ruslan Baratov
+// All rights reserved.
+
+#if !defined(LEATHERS_PUSH_)
+# error "`leathers/switch` used "
+      "without `leathers/push`, "
+      "see README.txt for more info"
+#endif
+
+#if defined(LEATHERS_SWITCH_)
+# error "`leathers/switch` "
+    "already included; see README.txt for more info"
+#else
+# define LEATHERS_SWITCH_
+#endif
+
+#if (__clang__)
+# if __has_warning("-Wswitch")
+#  pragma clang diagnostic ignored "-Wswitch"
+# endif
+#endif
+
+#if (__GNUC__)
+# pragma GCC diagnostic ignored "-Wswitch"
+#endif
+
+#if (_MSC_VER)
+# pragma warning(disable: 4062)
+#endif

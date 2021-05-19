@@ -1,0 +1,12 @@
+// This file generated automatically:
+// https://github.com/ruslo/sugar/wiki/Cross-platform-warning-suppression
+
+// Copyright (c) 2014, Ruslan Baratov
+// All rights reserved.
+
+#include <leathers/assign-base-inaccessible>
+#include <leathers/assign-could-not-be-generated>
+#include <leathers/copy-ctor-could-not-be-generated>
+#include <leathers/dflt-ctor-base-inaccessible>
+#include <leathers/dflt-ctor-could-not-be-generated>
+#include <leathers/user-ctor-required>

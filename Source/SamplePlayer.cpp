@@ -705,7 +705,7 @@ void SamplePlayer::LoadFile()
 void SamplePlayer::FillData(vector<float> data)
 {
    Sample* sample = new Sample();
-   sample->Create(data.size());
+   sample->Create((int)data.size());
    float* sampleData = sample->Data()->GetChannel(0);
    for (size_t i = 0; i < data.size(); ++i)
       sampleData[i] = data[i];
@@ -969,7 +969,6 @@ void SamplePlayer::DrawModule()
       ofSetColor(255, 255, 255);
       DrawTextNormal(mSample->Name(), 5, 27);
 
-      float lengthSeconds = mSample->LengthInSamples() / (gSampleRate * mSample->GetSampleRateRatio());
       float x = ofMap(mSample->GetPlayPosition(), GetZoomStartSample(), GetZoomEndSample(), 0, sampleWidth);
       DrawTextNormal(ofToString(mSample->GetPlayPosition() / (gSampleRate * mSample->GetSampleRateRatio()), 1), x + 2, mHeight - 65, 11);
 

@@ -100,7 +100,7 @@ void ::ADSR::Stop(double time, bool warn /*= true*/)
 {
    int ret = 0;
    double latestTime = -1;
-   for (size_t i = 0; i < mEvents.size(); ++i)
+   for (int i = 0; i < (int)mEvents.size(); ++i)
    {
       if (mEvents[i].mStartTime < time && mEvents[i].mStartTime > latestTime)
       {
@@ -115,7 +115,7 @@ const ::ADSR::EventInfo* ::ADSR::GetEventConst(double time) const
 {
    int ret = 0;
    double latestTime = -1;
-   for (size_t i = 0; i < mEvents.size(); ++i)
+   for (int i = 0; i < (int)mEvents.size(); ++i)
    {
       if (mEvents[i].mStartTime < time && mEvents[i].mStartTime > latestTime)
       {

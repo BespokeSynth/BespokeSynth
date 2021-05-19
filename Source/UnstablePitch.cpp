@@ -49,7 +49,6 @@ void UnstablePitch::DrawModule()
 
    ofPushStyle();
    ofRectangle rect(3, 3, mWidth-6, 34);
-   double perlinTime = gTime;
    const int kGridSize = 30;
    ofFill();
    for (int col = 0; col < kGridSize; ++col)

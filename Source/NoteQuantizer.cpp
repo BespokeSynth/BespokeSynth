@@ -99,7 +99,7 @@ void NoteQuantizer::PlayNote(double time, int pitch, int velocity, int voiceIdx,
 
 void NoteQuantizer::OnEvent(double time, float strength)
 {
-   for (size_t i = 0; i < mInputInfos.size(); ++i)
+   for (int i = 0; i < (int)mInputInfos.size(); ++i)
    {
       if (mScheduledOffs[i])
       {

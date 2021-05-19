@@ -23,8 +23,12 @@
 #include "EnvelopeModulator.h"
 #include "DrumPlayer.h"
 
-#include "pybind11/embed.h"
-#include "pybind11/stl.h"
+#include "leathers/push"
+#include "leathers/unused-value"
+#include "leathers/range-loop-analysis"
+   #include "pybind11/embed.h"
+   #include "pybind11/stl.h"
+#include "leathers/pop"
 
 namespace py = pybind11;
 using namespace pybind11::literals;

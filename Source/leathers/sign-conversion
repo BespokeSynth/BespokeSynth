@@ -1,0 +1,32 @@
+// This file generated automatically:
+// https://github.com/ruslo/sugar/wiki/Cross-platform-warning-suppression
+
+// Copyright (c) 2014, Ruslan Baratov
+// All rights reserved.
+
+#if !defined(LEATHERS_PUSH_)
+# error "`leathers/sign-conversion` used "
+      "without `leathers/push`, "
+      "see README.txt for more info"
+#endif
+
+#if defined(LEATHERS_SIGN_CONVERSION_)
+# error "`leathers/sign-conversion` "
+    "already included; see README.txt for more info"
+#else
+# define LEATHERS_SIGN_CONVERSION_
+#endif
+
+#if (__clang__)
+# if __has_warning("-Wsign-conversion")
+#  pragma clang diagnostic ignored "-Wsign-conversion"
+# endif
+#endif
+
+#if (__GNUC__)
+# pragma GCC diagnostic ignored "-Wsign-conversion"
+#endif
+
+#if (_MSC_VER)
+# pragma warning(disable: 4365)
+#endif

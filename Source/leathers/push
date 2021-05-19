@@ -1,0 +1,25 @@
+// This file generated automatically:
+// https://github.com/ruslo/sugar/wiki/Cross-platform-warning-suppression
+
+// Copyright (c) 2014, Ruslan Baratov
+// All rights reserved.
+
+#if defined(LEATHERS_PUSH_)
+# error "Not ending 'leathers/push' include detected;"
+    "every 'push' must ends with 'pop'; "
+    "see `https://github.com/ruslo/leathers/wiki/Pitfalls` for more info"
+#else
+# define LEATHERS_PUSH_
+#endif
+
+#if (__clang__)
+# pragma clang diagnostic push
+#endif
+
+#if (__GNUC__)
+# pragma GCC diagnostic push
+#endif
+
+#if (_MSC_VER)
+# pragma warning(push)
+#endif

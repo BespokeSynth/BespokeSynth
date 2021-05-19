@@ -19,8 +19,12 @@
 #undef ssize_t
 #endif
 
-#include "pybind11/embed.h"
-#include "pybind11/stl.h"
+#include "leathers/push"
+#include "leathers/unused-value"
+#include "leathers/range-loop-analysis"
+   #include "pybind11/embed.h"
+   #include "pybind11/stl.h"
+#include "leathers/pop"
 
 namespace py = pybind11;
 
@@ -101,7 +105,7 @@ void CodeEntry::Poll()
                            auto params = signature.attr("params").cast< std::vector<py::object> >();
                            mAutocompleteSignatures[i].params.resize(params.size());
                            for (size_t j = 0; j < params.size(); ++j)
-                              mAutocompleteSignatures[i].params[j] = juce::String(params[j].attr("description").str()).replace("param ","").toStdString();
+                              mAutocompleteSignatures[i].params[j] = juce::String(py::str(params[j].attr("description"))).replace("param ","").toStdString();
                            auto bracket_start = signature.attr("bracket_start").cast< std::tuple<int, int> >();
                            mAutocompleteSignatures[i].caretPos = GetCaretPosition(get<1>(bracket_start), get<0>(bracket_start)-2);
                            ++i;
@@ -138,8 +142,8 @@ void CodeEntry::Poll()
                            for (auto autocomplete : autocompletes)
                            {
                               //ofLog() << "    --" << autocomplete;
-                              string full = autocomplete.attr("name").str();
-                              string rest = autocomplete.attr("complete").str();
+                              string full = py::str(autocomplete.attr("name"));
+                              string rest = py::str(autocomplete.attr("complete"));
                               if (!((juce::String)full).startsWith("__") && i < mAutocompletes.size())
                               {
                                  mAutocompletes[i].valid = true;
@@ -402,7 +406,7 @@ void CodeEntry::RenderOverlay()
    {
       if (mAutocompletes[i].valid)
       {
-         int charactersLeft = mAutocompletes[i].autocompleteFull.length() - mAutocompletes[i].autocompleteRest.length();
+         int charactersLeft = (int)mAutocompletes[i].autocompleteFull.length() - (int)mAutocompletes[i].autocompleteRest.length();
          float x = caretPos.x - charactersLeft * mCharWidth;
          float y = caretPos.y + mCharHeight * (i + 2) - 2;
          if (i == mAutocompleteHighlightIndex)
@@ -982,7 +986,7 @@ void CodeEntry::Publish()
    mPublishedString = mString;
    mLastPublishTime = gTime;
    mLastPublishedLineStart = 0;
-   mLastPublishedLineEnd = GetLines().size();
+   mLastPublishedLineEnd = (int)GetLines().size();
    OnCodeUpdated();
 }
 

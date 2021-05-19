@@ -1,0 +1,24 @@
+// This file generated automatically:
+// https://github.com/ruslo/sugar/wiki/Cross-platform-warning-suppression
+
+// Copyright (c) 2014, Ruslan Baratov
+// All rights reserved.
+
+#if !defined(LEATHERS_PUSH_)
+# error "`leathers/used-but-marked-unused` used "
+      "without `leathers/push`, "
+      "see README.txt for more info"
+#endif
+
+#if defined(LEATHERS_USED_BUT_MARKED_UNUSED_)
+# error "`leathers/used-but-marked-unused` "
+    "already included; see README.txt for more info"
+#else
+# define LEATHERS_USED_BUT_MARKED_UNUSED_
+#endif
+
+#if (__clang__)
+# if __has_warning("-Wused-but-marked-unused")
+#  pragma clang diagnostic ignored "-Wused-but-marked-unused"
+# endif
+#endif

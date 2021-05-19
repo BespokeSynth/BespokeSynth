@@ -1,0 +1,10 @@
+// This file generated automatically:
+// https://github.com/ruslo/sugar/wiki/Cross-platform-warning-suppression
+
+// Copyright (c) 2014, Ruslan Baratov
+// All rights reserved.
+
+#include <leathers/automatic-inline>
+#include <leathers/force-not-inlined>
+#include <leathers/not-inlined>
+#include <leathers/unreferenced-inline>

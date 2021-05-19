@@ -1,0 +1,24 @@
+// This file generated automatically:
+// https://github.com/ruslo/sugar/wiki/Cross-platform-warning-suppression
+
+// Copyright (c) 2014, Ruslan Baratov
+// All rights reserved.
+
+#if !defined(LEATHERS_PUSH_)
+# error "`leathers/implicit-fallthrough` used "
+      "without `leathers/push`, "
+      "see README.txt for more info"
+#endif
+
+#if defined(LEATHERS_IMPLICIT_FALLTHROUGH_)
+# error "`leathers/implicit-fallthrough` "
+    "already included; see README.txt for more info"
+#else
+# define LEATHERS_IMPLICIT_FALLTHROUGH_
+#endif
+
+#if (__clang__)
+# if __has_warning("-Wimplicit-fallthrough")
+#  pragma clang diagnostic ignored "-Wimplicit-fallthrough"
+# endif
+#endif

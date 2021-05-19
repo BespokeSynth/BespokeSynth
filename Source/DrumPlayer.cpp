@@ -374,7 +374,7 @@ float DrumPlayer::DrumHit::GetPlayProgress(double time)
 {
    int playheadIdx = -1;
    double startTime = -1;
-   for (size_t i = 0; i < mPlayheads.size(); ++i)
+   for (int i = 0; i < (int)mPlayheads.size(); ++i)
    {
       if (mPlayheads[i].mStartTime <= time && mPlayheads[i].mStartTime > startTime)
       {
@@ -659,7 +659,7 @@ void DrumPlayer::OnGridButton(int x, int y, float velocity, IGridController* gri
 
 void DrumPlayer::OnTimeEvent(double time)
 {
-   for (size_t i = 0; i < mDrumHits.size(); ++i)
+   for (int i = 0; i < (int)mDrumHits.size(); ++i)
    {
       if (mDrumHits[i].mButtonHeldVelocity > 0)
       {

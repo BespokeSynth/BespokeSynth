@@ -1,0 +1,24 @@
+// This file generated automatically:
+// https://github.com/ruslo/sugar/wiki/Cross-platform-warning-suppression
+
+// Copyright (c) 2014, Ruslan Baratov
+// All rights reserved.
+
+#if !defined(LEATHERS_PUSH_)
+# error "`leathers/disabled-macro-expansion` used "
+      "without `leathers/push`, "
+      "see README.txt for more info"
+#endif
+
+#if defined(LEATHERS_DISABLED_MACRO_EXPANSION_)
+# error "`leathers/disabled-macro-expansion` "
+    "already included; see README.txt for more info"
+#else
+# define LEATHERS_DISABLED_MACRO_EXPANSION_
+#endif
+
+#if (__clang__)
+# if __has_warning("-Wdisabled-macro-expansion")
+#  pragma clang diagnostic ignored "-Wdisabled-macro-expansion"
+# endif
+#endif

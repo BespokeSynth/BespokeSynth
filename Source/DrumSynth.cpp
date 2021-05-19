@@ -25,7 +25,7 @@ DrumSynth::DrumSynth()
 {
    mOutputBuffer = new float[gBufferSize];
    
-   for (size_t i=0; i<mHits.size(); ++i)
+   for (int i=0; i<(int)mHits.size(); ++i)
    {
       int x = (i % DRUMSYNTH_PADS_HORIZONTAL)*DRUMSYNTH_PAD_WIDTH + 5;
       int y = (1-(i/ DRUMSYNTH_PADS_HORIZONTAL))*DRUMSYNTH_PAD_HEIGHT + 50;

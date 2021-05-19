@@ -176,6 +176,13 @@ void BiquadFilter::UpdateFilterCoeff()
          mB1 = mA1;
          mB2 = mA0;
          break;
+      case kFilterType_Off:
+         mA0 = 1;
+         mA1 = 0;
+         mA2 = 0;
+         mB1 = 0;
+         mB2 = 0;
+         break;
    }
 }
 

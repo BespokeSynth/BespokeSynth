@@ -37,6 +37,8 @@ ableton::Push2Display* Push2Control::sPush2Display = nullptr;
 
 //https://raw.githubusercontent.com/Ableton/push-interface/master/doc/MidiMapping.png
 
+#include "leathers/push"
+#include "leathers/unused-variable"
 namespace
 {
    const int kTapTempoButton = 3;
@@ -57,6 +59,7 @@ namespace
    const int kPageLeftButton = 62;
    const int kPageRightButton = 63;
 }
+#include "leathers/pop"
 
 Push2Control::Push2Control()
 : mDisplayInitialized(false)

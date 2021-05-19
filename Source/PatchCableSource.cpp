@@ -246,7 +246,7 @@ void PatchCableSource::Render()
          cableX -= mOwner->GetOwningContainer()->GetOwnerPosition().x;
          cableY -= mOwner->GetOwningContainer()->GetOwnerPosition().y;
       }
-      for (size_t i = 0; i < mPatchCables.size() || i == 0; ++i)
+      for (int i = 0; i < (int)mPatchCables.size() || i == 0; ++i)
       {
          if (i < mPatchCables.size())
             mPatchCables[i]->SetSourceIndex(i);

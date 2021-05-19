@@ -210,7 +210,7 @@ void SampleCapturer::OnClicked(int x, int y, bool right)
    if (right)
       return;
 
-   for (size_t i = 0; i < mSamples.size(); ++i)
+   for (int i = 0; i < (int)mSamples.size(); ++i)
    {
       if (y >= kBufferStartY + i * (kBufferHeight + kBufferSpacing) && y <= kBufferStartY + i * (kBufferHeight + kBufferSpacing) + kBufferHeight)
       {

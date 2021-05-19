@@ -247,7 +247,6 @@ void TitleBar::ListLayouts()
 
 namespace
 {
-   const float kHideThreshold = 675;
    const float kDoubleHeightThreshold = 1200;
 
    float GetPixelWidth()

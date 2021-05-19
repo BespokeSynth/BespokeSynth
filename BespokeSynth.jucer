@@ -69,11 +69,186 @@
             <FILE id="xxuHea" name="json_valueiterator.inl" compile="0" resource="0"
                   file="Source/json/src/lib_json/json_valueiterator.inl"/>
             <FILE id="Pc90MT" name="json_writer.cpp" compile="1" resource="0" file="Source/json/src/lib_json/json_writer.cpp"/>
-            <FILE id="SAdkEZ" name="sconscript" compile="0" resource="1" file="Source/json/src/lib_json/sconscript"/>
+            <FILE id="SAdkEZ" name="sconscript" compile="0" resource="0" file="Source/json/src/lib_json/sconscript"/>
           </GROUP>
         </GROUP>
-        <FILE id="uDRsNc" name="README.txt" compile="0" resource="1" file="Source/json/README.txt"/>
-        <FILE id="yyddqK" name="version" compile="0" resource="1" file="Source/json/version"/>
+        <FILE id="uDRsNc" name="README.txt" compile="0" resource="0" file="Source/json/README.txt"/>
+        <FILE id="yyddqK" name="version" compile="0" resource="0" file="Source/json/version"/>
+      </GROUP>
+      <GROUP id="{6D30310A-64AC-BCE2-A092-25F584E1166B}" name="leathers">
+        <FILE id="ZU9oaX" name="all" compile="0" resource="0" file="Source/leathers/all"/>
+        <FILE id="mKkfPo" name="arc-bridge-casts-disallowed-in-nonarc" compile="0"
+              resource="0" file="Source/leathers/arc-bridge-casts-disallowed-in-nonarc"/>
+        <FILE id="lBJy2y" name="arc-repeated-use-of-weak" compile="0" resource="0"
+              file="Source/leathers/arc-repeated-use-of-weak"/>
+        <FILE id="YABnVF" name="assign-base-inaccessible" compile="0" resource="0"
+              file="Source/leathers/assign-base-inaccessible"/>
+        <FILE id="ApkhCP" name="assign-could-not-be-generated" compile="0"
+              resource="0" file="Source/leathers/assign-could-not-be-generated"/>
+        <FILE id="pqtgaa" name="assignment-within-conditional" compile="0"
+              resource="0" file="Source/leathers/assignment-within-conditional"/>
+        <FILE id="ZrwSNd" name="automatic-inline" compile="0" resource="0"
+              file="Source/leathers/automatic-inline"/>
+        <FILE id="BCJvzR" name="behavior-change" compile="0" resource="0" file="Source/leathers/behavior-change"/>
+        <FILE id="dHJrD0" name="bool-conversion" compile="0" resource="0" file="Source/leathers/bool-conversion"/>
+        <FILE id="Gysvmj" name="c++11-extensions" compile="0" resource="0"
+              file="Source/leathers/c++11-extensions"/>
+        <FILE id="j75sv1" name="c++98-compat" compile="0" resource="0" file="Source/leathers/c++98-compat"/>
+        <FILE id="GsxiM5" name="c++98-compat-pedantic" compile="0" resource="0"
+              file="Source/leathers/c++98-compat-pedantic"/>
+        <FILE id="TegNX8" name="cast-align" compile="0" resource="0" file="Source/leathers/cast-align"/>
+        <FILE id="rThqfw" name="catch-semantic-changed" compile="0" resource="0"
+              file="Source/leathers/catch-semantic-changed"/>
+        <FILE id="axHBRY" name="compatibility-c++98" compile="0" resource="0"
+              file="Source/leathers/compatibility-c++98"/>
+        <FILE id="cJuyBG" name="conditional-uninitialized" compile="0" resource="0"
+              file="Source/leathers/conditional-uninitialized"/>
+        <FILE id="HmkKUR" name="constant-conditional" compile="0" resource="0"
+              file="Source/leathers/constant-conditional"/>
+        <FILE id="lkqvrv" name="constant-conversion" compile="0" resource="0"
+              file="Source/leathers/constant-conversion"/>
+        <FILE id="jgsYM3" name="conversion" compile="0" resource="0" file="Source/leathers/conversion"/>
+        <FILE id="HH5ejo" name="conversion-loss" compile="0" resource="0" file="Source/leathers/conversion-loss"/>
+        <FILE id="NG8GKr" name="conversion-sign-extended" compile="0" resource="0"
+              file="Source/leathers/conversion-sign-extended"/>
+        <FILE id="WJwYJr" name="copy-ctor-could-not-be-generated" compile="0"
+              resource="0" file="Source/leathers/copy-ctor-could-not-be-generated"/>
+        <FILE id="sj1Sq0" name="covered-switch-default" compile="0" resource="0"
+              file="Source/leathers/covered-switch-default"/>
+        <FILE id="cCm8aP" name="deprecated" compile="0" resource="0" file="Source/leathers/deprecated"/>
+        <FILE id="j5c3Ef" name="deprecated-declarations" compile="0" resource="0"
+              file="Source/leathers/deprecated-declarations"/>
+        <FILE id="kXIHZP" name="deprecated-implementations" compile="0" resource="0"
+              file="Source/leathers/deprecated-implementations"/>
+        <FILE id="Z8LSH9" name="deprecated-objc-isa-usage" compile="0" resource="0"
+              file="Source/leathers/deprecated-objc-isa-usage"/>
+        <FILE id="Uk7AEP" name="deprecated-register" compile="0" resource="0"
+              file="Source/leathers/deprecated-register"/>
+        <FILE id="UU6jIb" name="dflt-ctor-base-inaccessible" compile="0" resource="0"
+              file="Source/leathers/dflt-ctor-base-inaccessible"/>
+        <FILE id="Ci9Ca3" name="dflt-ctor-could-not-be-generated" compile="0"
+              resource="0" file="Source/leathers/dflt-ctor-could-not-be-generated"/>
+        <FILE id="QTDuVn" name="digraphs-not-supported" compile="0" resource="0"
+              file="Source/leathers/digraphs-not-supported"/>
+        <FILE id="XDGNyj" name="disabled-macro-expansion" compile="0" resource="0"
+              file="Source/leathers/disabled-macro-expansion"/>
+        <FILE id="XorYBr" name="documentation" compile="0" resource="0" file="Source/leathers/documentation"/>
+        <FILE id="Wm8myU" name="documentation-unknown-command" compile="0"
+              resource="0" file="Source/leathers/documentation-unknown-command"/>
+        <FILE id="B5Ra1Z" name="duplicate-method-match" compile="0" resource="0"
+              file="Source/leathers/duplicate-method-match"/>
+        <FILE id="uCL6oL" name="empty-body" compile="0" resource="0" file="Source/leathers/empty-body"/>
+        <FILE id="iqoF8H" name="enum-conversion" compile="0" resource="0" file="Source/leathers/enum-conversion"/>
+        <FILE id="FDgUPN" name="exit-time-destructors" compile="0" resource="0"
+              file="Source/leathers/exit-time-destructors"/>
+        <FILE id="PMIIRD" name="explicit-ownership-type" compile="0" resource="0"
+              file="Source/leathers/explicit-ownership-type"/>
+        <FILE id="UlX66d" name="extra-semi" compile="0" resource="0" file="Source/leathers/extra-semi"/>
+        <FILE id="q5wEcr" name="force-not-inlined" compile="0" resource="0"
+              file="Source/leathers/force-not-inlined"/>
+        <FILE id="BXYOuF" name="format" compile="0" resource="0" file="Source/leathers/format"/>
+        <FILE id="fpmrof" name="four-char-constants" compile="0" resource="0"
+              file="Source/leathers/four-char-constants"/>
+        <FILE id="tWKwKD" name="global-constructors" compile="0" resource="0"
+              file="Source/leathers/global-constructors"/>
+        <FILE id="wupdvu" name="ill-formed-comma-expr" compile="0" resource="0"
+              file="Source/leathers/ill-formed-comma-expr"/>
+        <FILE id="XTgjlr" name="implicit-atomic-properties" compile="0" resource="0"
+              file="Source/leathers/implicit-atomic-properties"/>
+        <FILE id="vTSlmF" name="implicit-fallthrough" compile="0" resource="0"
+              file="Source/leathers/implicit-fallthrough"/>
+        <FILE id="PQI5Bb" name="implicit-retain-self" compile="0" resource="0"
+              file="Source/leathers/implicit-retain-self"/>
+        <FILE id="D5YGRF" name="inherits-via-dominance" compile="0" resource="0"
+              file="Source/leathers/inherits-via-dominance"/>
+        <FILE id="kSYMkB" name="inline" compile="0" resource="0" file="Source/leathers/inline"/>
+        <FILE id="qIGcur" name="int-conversion" compile="0" resource="0" file="Source/leathers/int-conversion"/>
+        <FILE id="BUTKeM" name="invalid-offsetof" compile="0" resource="0"
+              file="Source/leathers/invalid-offsetof"/>
+        <FILE id="NtFZed" name="is-defined-to-be" compile="0" resource="0"
+              file="Source/leathers/is-defined-to-be"/>
+        <FILE id="Z3IOeu" name="layout-changed" compile="0" resource="0" file="Source/leathers/layout-changed"/>
+        <FILE id="ptqN47" name="missing-braces" compile="0" resource="0" file="Source/leathers/missing-braces"/>
+        <FILE id="qceFZA" name="missing-field-initializers" compile="0" resource="0"
+              file="Source/leathers/missing-field-initializers"/>
+        <FILE id="GRTAJ6" name="missing-noreturn" compile="0" resource="0"
+              file="Source/leathers/missing-noreturn"/>
+        <FILE id="MiFKMs" name="missing-prototypes" compile="0" resource="0"
+              file="Source/leathers/missing-prototypes"/>
+        <FILE id="IV9VjK" name="name-length-exceeded" compile="0" resource="0"
+              file="Source/leathers/name-length-exceeded"/>
+        <FILE id="XS2WA3" name="narrowing" compile="0" resource="0" file="Source/leathers/narrowing"/>
+        <FILE id="iTmIPo" name="newline-eof" compile="0" resource="0" file="Source/leathers/newline-eof"/>
+        <FILE id="ynaQev" name="no-such-warning" compile="0" resource="0" file="Source/leathers/no-such-warning"/>
+        <FILE id="L7GLeS" name="non-virtual-dtor" compile="0" resource="0"
+              file="Source/leathers/non-virtual-dtor"/>
+        <FILE id="ARqUGX" name="not-inlined" compile="0" resource="0" file="Source/leathers/not-inlined"/>
+        <FILE id="EIzvUk" name="objc-missing-property-synthesis" compile="0"
+              resource="0" file="Source/leathers/objc-missing-property-synthesis"/>
+        <FILE id="gfVWmD" name="objc-root-class" compile="0" resource="0" file="Source/leathers/objc-root-class"/>
+        <FILE id="NzIvSt" name="object-layout-change" compile="0" resource="0"
+              file="Source/leathers/object-layout-change"/>
+        <FILE id="yyOyBh" name="old-style-cast" compile="0" resource="0" file="Source/leathers/old-style-cast"/>
+        <FILE id="aipFM7" name="overloaded-virtual" compile="0" resource="0"
+              file="Source/leathers/overloaded-virtual"/>
+        <FILE id="LcFjCP" name="padded" compile="0" resource="0" file="Source/leathers/padded"/>
+        <FILE id="htpuLG" name="parentheses" compile="0" resource="0" file="Source/leathers/parentheses"/>
+        <FILE id="gtjrlF" name="pedantic" compile="0" resource="0" file="Source/leathers/pedantic"/>
+        <FILE id="LOdPa4" name="pointer-sign" compile="0" resource="0" file="Source/leathers/pointer-sign"/>
+        <FILE id="G3nZGM" name="pop" compile="0" resource="0" file="Source/leathers/pop"/>
+        <FILE id="jNYVtC" name="protocol" compile="0" resource="0" file="Source/leathers/protocol"/>
+        <FILE id="VgtlA1" name="push" compile="0" resource="0" file="Source/leathers/push"/>
+        <FILE id="jT4rVn" name="range-loop-analysis" compile="0" resource="0"
+              file="Source/leathers/range-loop-analysis"/>
+        <FILE id="o6anO7" name="receiver-is-weak" compile="0" resource="0"
+              file="Source/leathers/receiver-is-weak"/>
+        <FILE id="LyJCHe" name="return-type" compile="0" resource="0" file="Source/leathers/return-type"/>
+        <FILE id="jkC3Hr" name="selector" compile="0" resource="0" file="Source/leathers/selector"/>
+        <FILE id="T0AkuI" name="shadow" compile="0" resource="0" file="Source/leathers/shadow"/>
+        <FILE id="P0XX8Z" name="shift-sign-overflow" compile="0" resource="0"
+              file="Source/leathers/shift-sign-overflow"/>
+        <FILE id="HF5H87" name="shorten-64-to-32" compile="0" resource="0"
+              file="Source/leathers/shorten-64-to-32"/>
+        <FILE id="WO1npQ" name="sign-compare" compile="0" resource="0" file="Source/leathers/sign-compare"/>
+        <FILE id="L4QawR" name="sign-conversion" compile="0" resource="0" file="Source/leathers/sign-conversion"/>
+        <FILE id="YDvCu6" name="signed-unsigned-compare" compile="0" resource="0"
+              file="Source/leathers/signed-unsigned-compare"/>
+        <FILE id="hkesR7" name="special-members" compile="0" resource="0" file="Source/leathers/special-members"/>
+        <FILE id="ogQQAh" name="static-ctor-not-thread-safe" compile="0" resource="0"
+              file="Source/leathers/static-ctor-not-thread-safe"/>
+        <FILE id="ha1UYz" name="strict-selector-match" compile="0" resource="0"
+              file="Source/leathers/strict-selector-match"/>
+        <FILE id="s6jQHX" name="sugar.cmake" compile="0" resource="0" file="Source/leathers/sugar.cmake"/>
+        <FILE id="yDjVyy" name="switch" compile="0" resource="0" file="Source/leathers/switch"/>
+        <FILE id="Z7CIes" name="switch-enum" compile="0" resource="0" file="Source/leathers/switch-enum"/>
+        <FILE id="WvVkHy" name="this-used-in-init" compile="0" resource="0"
+              file="Source/leathers/this-used-in-init"/>
+        <FILE id="bpdnXh" name="undeclared-selector" compile="0" resource="0"
+              file="Source/leathers/undeclared-selector"/>
+        <FILE id="V7G770" name="undef" compile="0" resource="0" file="Source/leathers/undef"/>
+        <FILE id="wXK31C" name="uninitialized" compile="0" resource="0" file="Source/leathers/uninitialized"/>
+        <FILE id="QpHGgb" name="unknown-pragmas" compile="0" resource="0" file="Source/leathers/unknown-pragmas"/>
+        <FILE id="koiMgP" name="unreachable-code" compile="0" resource="0"
+              file="Source/leathers/unreachable-code"/>
+        <FILE id="sjaguW" name="unreachable-code-return" compile="0" resource="0"
+              file="Source/leathers/unreachable-code-return"/>
+        <FILE id="fbGTT3" name="unreferenced-inline" compile="0" resource="0"
+              file="Source/leathers/unreferenced-inline"/>
+        <FILE id="Ib1nti" name="unsafe-conversion" compile="0" resource="0"
+              file="Source/leathers/unsafe-conversion"/>
+        <FILE id="pCWuC2" name="unused-but-set-variable" compile="0" resource="0"
+              file="Source/leathers/unused-but-set-variable"/>
+        <FILE id="gF43Ak" name="unused-function" compile="0" resource="0" file="Source/leathers/unused-function"/>
+        <FILE id="P290uS" name="unused-label" compile="0" resource="0" file="Source/leathers/unused-label"/>
+        <FILE id="Dr7oK3" name="unused-parameter" compile="0" resource="0"
+              file="Source/leathers/unused-parameter"/>
+        <FILE id="wk4kGb" name="unused-value" compile="0" resource="0" file="Source/leathers/unused-value"/>
+        <FILE id="VYf4eR" name="unused-variable" compile="0" resource="0" file="Source/leathers/unused-variable"/>
+        <FILE id="m2SgVS" name="used-but-marked-unused" compile="0" resource="0"
+              file="Source/leathers/used-but-marked-unused"/>
+        <FILE id="BopweQ" name="user-ctor-required" compile="0" resource="0"
+              file="Source/leathers/user-ctor-required"/>
+        <FILE id="BIx0dB" name="weak-vtables" compile="0" resource="0" file="Source/leathers/weak-vtables"/>
       </GROUP>
       <GROUP id="{352BA5B3-0006-BBD8-3E19-AE807986DDBB}" name="nanovg">
         <FILE id="il5Rmq" name="fontstash.h" compile="0" resource="0" file="Source/nanovg/fontstash.h"/>
