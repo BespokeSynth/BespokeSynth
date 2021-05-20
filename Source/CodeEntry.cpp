@@ -365,7 +365,9 @@ void CodeEntry::Render()
          for (int i=startLineNum; i<=endLineNum; ++i)
          {
             int begin = 0;
-            int end = (int)lines[i].length();
+            int end = 0;
+            if (i < (int)lines.size())
+               end = (int)lines[i].length();
             if (i == startLineNum)
                begin = startCol;
             if (i == endLineNum)
