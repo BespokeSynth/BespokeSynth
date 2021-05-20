@@ -39,11 +39,12 @@ void DCOffset::Process(double time)
    ComputeSliders(0);
    SyncBuffers();
    
-   if (GetTarget())
+   IAudioReceiver* target = GetTarget();
+   if (target)
    {
       int bufferSize = GetBuffer()->BufferSize();
       
-      ChannelBuffer* out = GetTarget()->GetBuffer();
+      ChannelBuffer* out = target->GetBuffer();
       for (int ch=0; ch<GetBuffer()->NumActiveChannels(); ++ch)
       {
          float* buffer = GetBuffer()->GetChannel(ch);

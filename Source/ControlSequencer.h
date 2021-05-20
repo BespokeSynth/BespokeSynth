@@ -80,6 +80,8 @@ private:
    DropdownList* mLengthSelector;
    PatchCableSource* mControlCable;
    ClickButton* mRandomize;
+
+   TransportListenerInfo* mTransportListenerInfo;
 };
 
 #endif /* defined(__Bespoke__ControlSequencer__) */

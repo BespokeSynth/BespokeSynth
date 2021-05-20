@@ -78,6 +78,7 @@ public:
    void SetMaxPerColumn(int max) { mMaxPerColumn = max; CalculateWidth(); }
    int GetItemIndex(int x, int y);
    DropdownListElement GetElement(int index) { return mElements[index]; }
+   DropdownListModal* GetModalDropdown() { return &mModalList; }
 
    //IUIControl
    void SetFromMidiCC(float slider) override;

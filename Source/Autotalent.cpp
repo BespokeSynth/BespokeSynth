@@ -291,7 +291,8 @@ void Autotalent::Process(double time)
 {
    PROFILER(Autotalent);
 
-   if (!mEnabled || GetTarget() == nullptr)
+   IAudioReceiver* target = GetTarget();
+   if (!mEnabled || target == nullptr)
       return;
 
    ComputeSliders(0);
@@ -905,7 +906,7 @@ void Autotalent::Process(double time)
       *(pfOutput++) = mMix*tf + (1-mMix)*mcbi[ti4];
    }
 
-   Add(GetTarget()->GetBuffer()->GetChannel(0), mWorkingBuffer, bufferSize);
+   Add(target->GetBuffer()->GetChannel(0), mWorkingBuffer, bufferSize);
 
    GetVizBuffer()->WriteChunk(mWorkingBuffer, bufferSize, 0);
 

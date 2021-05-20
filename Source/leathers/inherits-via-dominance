@@ -1,0 +1,22 @@
+// This file generated automatically:
+// https://github.com/ruslo/sugar/wiki/Cross-platform-warning-suppression
+
+// Copyright (c) 2014, Ruslan Baratov
+// All rights reserved.
+
+#if !defined(LEATHERS_PUSH_)
+# error "`leathers/inherits-via-dominance` used "
+      "without `leathers/push`, "
+      "see README.txt for more info"
+#endif
+
+#if defined(LEATHERS_INHERITS_VIA_DOMINANCE_)
+# error "`leathers/inherits-via-dominance` "
+    "already included; see README.txt for more info"
+#else
+# define LEATHERS_INHERITS_VIA_DOMINANCE_
+#endif
+
+#if (_MSC_VER)
+# pragma warning(disable: 4250)
+#endif

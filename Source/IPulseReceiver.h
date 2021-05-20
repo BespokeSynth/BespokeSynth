@@ -18,7 +18,9 @@ enum PulseFlags
    kPulseFlag_Reset = 0x1,
    kPulseFlag_Random = 0x2,
    kPulseFlag_SyncToTransport = 0x4,
-   kPulseFlag_Backward = 0x8
+   kPulseFlag_Backward = 0x8,
+   kPulseFlag_Align = 0x10,
+   kPulseFlag_Repeat = 0x20
 };
 
 class IPulseReceiver

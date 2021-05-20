@@ -31,6 +31,7 @@ public:
    
    string GetTitleLabel() override { return "push 2 control"; }
    void CreateUIControls() override;
+   void Poll() override;
    
    void SetLed(MidiMessageType type, int index, int color, int flashColor = -1);
    
@@ -76,6 +77,7 @@ private:
    vector<IDrawableModule*> SortModules(vector<IDrawableModule*> modules);
    void AddModuleChain(IDrawableModule* module, vector<IDrawableModule*>& modules, vector<IDrawableModule*>& output);
    void DrawDisplayModuleRect(ofRectangle rect);
+   string GetModuleTypeToSpawn();
    
    bool mDisplayInitialized;
    
@@ -95,6 +97,7 @@ private:
    IDrawableModule* mDisplayModule;
    vector<IUIControl*> mSliderControls;
    vector<IUIControl*> mButtonControls;
+   vector<IUIControl*> mDisplayedControls;
    int mModuleColumnOffset;
    float mModuleColumnOffsetSmoothed;
    
@@ -130,6 +133,7 @@ private:
    MidiDevice mDevice;
    
    SpawnListManager mSpawnLists;
+   int mPendingSpawnPitch;
 };
 
 //https://raw.githubusercontent.com/Ableton/push-interface/master/doc/MidiMapping.png

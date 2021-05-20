@@ -233,7 +233,7 @@ void MidiDevice::SendMidiMessage(MidiDeviceListener* listener, const char* devic
    {
       MidiNote note;
       note.mDeviceName = deviceName;
-      note.mTimestamp = message.getTimeStamp();
+      note.mTimestampMs = message.getTimeStamp() * 1000; //message.getTimeStamp() is equivalent to Time::getMillisecondCounter() / 1000.0 (see juce_MidiDevices.h)
       note.mPitch = message.getNoteNumber();
       if (message.isNoteOn())
          note.mVelocity = message.getVelocity();

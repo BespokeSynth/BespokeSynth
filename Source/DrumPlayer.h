@@ -30,6 +30,8 @@
 
 #define NUM_DRUM_HITS 16
 
+class SamplePlayer;
+
 class DrumPlayer : public IAudioSource, public INoteReceiver, public IDrawableModule, public IFloatSliderListener, public IDropdownListener, public IButtonListener, public IIntSliderListener, public ITextEntryListener, public IGridControllerListener, public ITimeListener
 {
 public:
@@ -42,8 +44,9 @@ public:
    
    void Poll() override;
    
-   static string GetDrumHitName(int index);
    static void SetUpHitDirectories();
+   
+   void ImportSampleCuePoint(SamplePlayer* player, int sourceCueIndex, int destHitIndex);
    
    //IAudioSource
    void Process(double time) override;
@@ -100,6 +103,7 @@ private:
    int GetIndividualOutputIndex(int hitIndex);
    void UpdateLights();
    void SetUpNewDrumPlayer();
+   void SetHitSample(int sampleIndex, Sample* sample);
    
    //IDrawableModule
    void DrawModule() override;
@@ -126,7 +130,6 @@ private:
    float mAuditionInc;
    FloatSlider* mAuditionSlider;
    string mAuditionDir;
-   int mAuditionPadIdx;
    char mNewKitName[MAX_TEXTENTRY_LENGTH];
    TextEntry* mNewKitNameEntry;
    ofMutex mLoadSamplesAudioMutex;
@@ -149,15 +152,15 @@ private:
    
    struct IndividualOutput
    {
-      IndividualOutput(DrumPlayer* owner, int hitIndex, int outputIndex)
-      : mHitIndex(hitIndex)
+      IndividualOutput(DrumPlayer* owner, int hitIndex)
+      : mDrumPlayer(owner)
+      , mHitIndex(hitIndex)
       , mVizBuffer(nullptr)
       , mPatchCableSource(nullptr)
       {
          mVizBuffer = new RollingBuffer(VIZ_BUFFER_SECONDS*gSampleRate);
          mPatchCableSource = new PatchCableSource(owner, kConnectionType_Audio);
          
-         mPatchCableSource->SetManualPosition(152, 7 + outputIndex * 12);
          mPatchCableSource->SetOverrideVizBuffer(mVizBuffer);
          mPatchCableSource->SetManualSide(PatchCableSource::Side::kRight);
          owner->AddPatchCableSource(mPatchCableSource);
@@ -166,7 +169,15 @@ private:
       {
          delete mVizBuffer;
       }
+      void UpdatePosition(int outputIndex)
+      {
+         float w,h;
+         mDrumPlayer->GetDimensions(w,h);
+         mPatchCableSource->SetManualPosition(w, 7 + outputIndex * 12);
+      }
+      DrumPlayer* mDrumPlayer;
       int mHitIndex;
+      int mOutputIndex;
       RollingBuffer* mVizBuffer;
       PatchCableSource* mPatchCableSource;
    };

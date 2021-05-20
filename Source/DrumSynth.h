@@ -30,7 +30,10 @@
 
 class MidiController;
 
-#define PAD_DRAW_SIZE 140
+#define DRUMSYNTH_PAD_WIDTH 180
+#define DRUMSYNTH_PAD_HEIGHT 236
+#define DRUMSYNTH_PADS_HORIZONTAL 4
+#define DRUMSYNTH_PADS_VERTICAL 2
 
 class DrumSynth : public IAudioSource, public INoteReceiver, public IDrawableModule, public IFloatSliderListener, public IDropdownListener, public IButtonListener, public IIntSliderListener, public IRadioButtonListener, public ITextEntryListener
 {
@@ -69,10 +72,14 @@ private:
       EnvOscillator mTone;
       EnvOscillator mNoise;
       ::ADSR mFreqAdsr;
+      ::ADSR mFilterAdsr;
       float mFreqMax;
       float mFreqMin;
       float mVol;
       float mVolNoise;
+      float mCutoffMax;
+      float mCutoffMin;
+      float mQ;
    };
    
    class DrumSynthHit
@@ -91,6 +98,7 @@ private:
       ADSRDisplay* mToneAdsrDisplay;
       ADSRDisplay* mFreqAdsrDisplay;
       ADSRDisplay* mNoiseAdsrDisplay;
+      ADSRDisplay* mFilterAdsrDisplay;
       FloatSlider* mVolSlider;
       FloatSlider* mFreqMaxSlider;
       FloatSlider* mFreqMinSlider;
@@ -98,10 +106,14 @@ private:
       double mStartTime;
       PeakTracker mLevel;
       FloatSlider* mVolNoiseSlider;
+      FloatSlider* mFilterCutoffMaxSlider;
+      FloatSlider* mFilterCutoffMinSlider;
+      FloatSlider* mFilterQSlider;
       DrumSynth* mParent;
       int mIndex;
       int mX;
       int mY;
+      BiquadFilter mFilter;
    };
    
    int GetAssociatedSampleIndex(int x, int y);
@@ -112,9 +124,8 @@ private:
    bool Enabled() const override { return mEnabled; }
    void OnClicked(int x, int y, bool right) override;
    
-   DrumSynthHit* mHits[NUM_DRUM_HITS];
-   int mCurrentEditHit;
-   float mVelocity[NUM_DRUM_HITS];
+   std::array<DrumSynthHit*, DRUMSYNTH_PADS_HORIZONTAL * DRUMSYNTH_PADS_VERTICAL> mHits;
+   std::array<float, DRUMSYNTH_PADS_HORIZONTAL * DRUMSYNTH_PADS_VERTICAL> mVelocity;
    
    float* mOutputBuffer;
    float mVolume;

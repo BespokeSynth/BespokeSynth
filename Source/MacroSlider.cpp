@@ -129,6 +129,7 @@ void MacroSlider::Mapping::CreateUIControls()
    mMinSlider = new FloatSlider(mOwner,("start"+ofToString(mIndex+1)).c_str(), 5, 25+mIndex*kMappingSpacing, 100, 15, &mDummyMin, 0, 1);
    mMaxSlider = new FloatSlider(mOwner,("end"+ofToString(mIndex+1)).c_str(), 5, 39+mIndex*kMappingSpacing, 100, 15, &mDummyMax, 0, 1);
    mTargetCable = new PatchCableSource(mOwner, kConnectionType_UIControl);
+   mTargetCable->SetModulatorOwner(this);
    mTargetCable->SetManualPosition(110, 39+mIndex*kMappingSpacing);
    mOwner->AddPatchCableSource(mTargetCable);
 }

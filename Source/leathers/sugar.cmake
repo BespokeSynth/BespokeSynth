@@ -1,0 +1,123 @@
+# This file generated automatically:
+# https://github.com/ruslo/sugar/wiki/Cross-platform-warning-suppression
+
+# Copyright (c) 2014, Ruslan Baratov
+# All rights reserved.
+
+if(DEFINED LEATHERS_SOURCE_LEATHERS_SUGAR_CMAKE_)
+  return()
+else()
+  set(LEATHERS_SOURCE_LEATHERS_SUGAR_CMAKE_ 1)
+endif()
+
+include(sugar_files)
+
+sugar_files(
+    LEATHERS_SOURCES
+    ###
+    push
+    pop
+    ###
+    all
+    ###
+    c++98-compat
+    c++98-compat-pedantic
+    assign-base-inaccessible
+    assign-could-not-be-generated
+    copy-ctor-could-not-be-generated
+    dflt-ctor-base-inaccessible
+    dflt-ctor-could-not-be-generated
+    user-ctor-required
+    automatic-inline
+    force-not-inlined
+    not-inlined
+    unreferenced-inline
+    behavior-change
+    bool-conversion
+    c++11-extensions
+    cast-align
+    catch-semantic-changed
+    conditional-uninitialized
+    constant-conditional
+    constant-conversion
+    conversion
+    conversion-loss
+    conversion-sign-extended
+    covered-switch-default
+    deprecated
+    deprecated-declarations
+    deprecated-objc-isa-usage
+    deprecated-register
+    digraphs-not-supported
+    disabled-macro-expansion
+    documentation
+    documentation-unknown-command
+    empty-body
+    enum-conversion
+    exit-time-destructors
+    extra-semi
+    format
+    four-char-constants
+    global-constructors
+    ill-formed-comma-expr
+    implicit-fallthrough
+    inherits-via-dominance
+    int-conversion
+    invalid-offsetof
+    is-defined-to-be
+    layout-changed
+    missing-braces
+    missing-field-initializers
+    missing-noreturn
+    missing-prototypes
+    name-length-exceeded
+    newline-eof
+    no-such-warning
+    non-virtual-dtor
+    object-layout-change
+    old-style-cast
+    overloaded-virtual
+    padded
+    parentheses
+    pedantic
+    pointer-sign
+    return-type
+    shadow
+    shift-sign-overflow
+    shorten-64-to-32
+    sign-compare
+    sign-conversion
+    signed-unsigned-compare
+    static-ctor-not-thread-safe
+    switch
+    switch-enum
+    this-used-in-init
+    undef
+    uninitialized
+    unknown-pragmas
+    unreachable-code
+    unreachable-code-return
+    unsafe-conversion
+    unused-but-set-variable
+    unused-function
+    unused-label
+    unused-parameter
+    unused-value
+    unused-variable
+    used-but-marked-unused
+    weak-vtables
+    arc-bridge-casts-disallowed-in-nonarc
+    arc-repeated-use-of-weak
+    deprecated-implementations
+    duplicate-method-match
+    explicit-ownership-type
+    implicit-atomic-properties
+    implicit-retain-self
+    objc-missing-property-synthesis
+    objc-root-class
+    protocol
+    receiver-is-weak
+    selector
+    strict-selector-match
+    undeclared-selector
+)

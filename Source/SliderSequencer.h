@@ -17,6 +17,7 @@
 #include "DropdownList.h"
 #include "IDrawableModule.h"
 #include "INoteSource.h"
+#include "TextEntry.h"
 
 class SliderSequencer;
 
@@ -32,7 +33,7 @@ public:
    float mVelocity;
    FloatSlider* mVelocitySlider;
    int mNote;
-   DropdownList* mNoteSelector;
+   TextEntry* mNoteSelector;
    double mPlayTime;
    bool mPlaying;
    Checkbox* mPlayingCheckbox;
@@ -42,7 +43,7 @@ public:
    int mIndex;
 };
 
-class SliderSequencer : public IDrawableModule, public INoteSource, public IAudioPoller, public IFloatSliderListener, public IDropdownListener, public IIntSliderListener
+class SliderSequencer : public IDrawableModule, public INoteSource, public IAudioPoller, public IFloatSliderListener, public IDropdownListener, public IIntSliderListener, public ITextEntryListener
 {
 public:
    SliderSequencer();
@@ -59,6 +60,7 @@ public:
    void FloatSliderUpdated(FloatSlider* slider, float oldVal) override;
    void DropdownUpdated(DropdownList* list, int oldVal) override;
    void IntSliderUpdated(IntSlider* slider, int oldVal) override;
+   void TextEntryComplete(TextEntry* entry) override {}
    
    virtual void LoadLayout(const ofxJSONElement& moduleInfo) override;
    virtual void SetUpFromSaveData() override;

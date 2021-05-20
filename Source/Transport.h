@@ -49,7 +49,8 @@ enum NoteInterval
    kInterval_32,
    kInterval_64,
    kInterval_Free,
-   kInterval_None
+   kInterval_None,
+   kInterval_CustomDivisor
 };
 
 struct OffsetInfo
@@ -63,12 +64,13 @@ struct OffsetInfo
 struct TransportListenerInfo
 {
    TransportListenerInfo(ITimeListener* listener, NoteInterval interval, OffsetInfo offsetInfo, bool useEventLookahead)
-   : mListener(listener), mInterval(interval), mOffsetInfo(offsetInfo), mUseEventLookahead(useEventLookahead) {}
+   : mListener(listener), mInterval(interval), mOffsetInfo(offsetInfo), mUseEventLookahead(useEventLookahead), mCustomDivisor(8) {}
    
    ITimeListener* mListener;
    NoteInterval mInterval;
    OffsetInfo mOffsetInfo;
    bool mUseEventLookahead;
+   int mCustomDivisor;
 };
 
 class Transport : public IDrawableModule, public IButtonListener, public IFloatSliderListener, public IDropdownListener
@@ -88,14 +90,13 @@ public:
    float GetSwing() { return mSwing; }
    double MsPerBar() const { return 60.0/mTempo * 1000 * mTimeSigTop * 4.0/mTimeSigBottom; }
    void Advance(double ms);
-   void AddListener(ITimeListener* listener, NoteInterval interval, OffsetInfo offsetInfo, bool useEventLookahead);
+   TransportListenerInfo* AddListener(ITimeListener* listener, NoteInterval interval, OffsetInfo offsetInfo, bool useEventLookahead);
    void RemoveListener(ITimeListener* listener);
-   bool UpdateListener(ITimeListener* listener, NoteInterval interval);
-   bool UpdateListener(ITimeListener* listener, NoteInterval interval, OffsetInfo offsetInfo);
+   TransportListenerInfo* GetListenerInfo(ITimeListener* listener);
    void AddAudioPoller(IAudioPoller* poller);
    void RemoveAudioPoller(IAudioPoller* poller);
    double GetDuration(NoteInterval interval);
-   int GetQuantized(double time, NoteInterval interval, double* remainderMs = nullptr);
+   int GetQuantized(double time, const TransportListenerInfo* listenerInfo, double* remainderMs = nullptr);
    double GetMeasurePos(double time) const { return fmod(GetMeasureTime(time), 1); }
    void SetMeasurePos(double pos) { mMeasureTime = mMeasureTime - floor(mMeasureTime) + pos; }
    int GetMeasure(double time) const { return (int)floor(GetMeasureTime(time)); }
@@ -108,6 +109,8 @@ public:
    void SetLoop(int measureStart, int measureEnd) { assert(measureStart < measureEnd); mLoopStartMeasure = measureStart; mLoopEndMeasure = measureEnd; }
    void ClearLoop() { mLoopStartMeasure = -1; mLoopEndMeasure = -1; }
    double GetMeasureFraction(NoteInterval interval);
+   int GetStepsPerMeasure(ITimeListener* listener);
+   int GetSyncedStep(double time, ITimeListener* listener, const TransportListenerInfo* listenerInfo, int length = -1);
    
    bool CheckNeedsDraw() override { return true; }
    

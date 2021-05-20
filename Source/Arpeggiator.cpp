@@ -54,7 +54,7 @@ Arpeggiator::Arpeggiator()
 , mOctaveRepeats(1)
 , mOctaveRepeatsSlider(nullptr)
 {
-   TheTransport->AddListener(this, mInterval, OffsetInfo(0, true), true);
+   mTransportListenerInfo = TheTransport->AddListener(this, mInterval, OffsetInfo(0, true), true);
    TheScale->AddListener(this);
    
    bzero(mArpString, MAX_TEXTENTRY_LENGTH);
@@ -387,7 +387,7 @@ void Arpeggiator::OnTimeEvent(double time)
       }
    }
 
-   if (mResetOnDownbeat && TheTransport->GetQuantized(time, mInterval) == 0)
+   if (mResetOnDownbeat && TheTransport->GetQuantized(time, mTransportListenerInfo) == 0)
       mArpIndex = 0;
 
    int offPitch = -1;
@@ -495,7 +495,12 @@ void Arpeggiator::UpdateInterval()
    if (mUpbeats)
       upbeatLength = (1.0f/TheTransport->CountInStandardMeasure(mInterval)) / 2.0f;
    
-   TheTransport->UpdateListener(this, mInterval, OffsetInfo(upbeatLength, false));
+   TransportListenerInfo* transportListenerInfo = TheTransport->GetListenerInfo(this);
+   if (transportListenerInfo != nullptr)
+   {
+      transportListenerInfo->mInterval = mInterval;
+      transportListenerInfo->mOffsetInfo = OffsetInfo(upbeatLength, false);
+   }
 }
 
 void Arpeggiator::ButtonClicked(ClickButton* button)

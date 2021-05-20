@@ -36,6 +36,7 @@ PatchCableSource::PatchCableSource(IDrawableModule* owner, ConnectionType type)
 , mSide(Side::kNone)
 , mManualSide(Side::kNone)
 , mHasOverrideCableDir(false)
+, mModulatorOwner(nullptr)
 , mDrawPass(DrawPass::kSource)
 {
    mAllowMultipleTargets = (mType == kConnectionType_Note || mType == kConnectionType_Pulse);
@@ -245,7 +246,7 @@ void PatchCableSource::Render()
          cableX -= mOwner->GetOwningContainer()->GetOwnerPosition().x;
          cableY -= mOwner->GetOwningContainer()->GetOwnerPosition().y;
       }
-      for (size_t i = 0; i < mPatchCables.size() || i == 0; ++i)
+      for (int i = 0; i < (int)mPatchCables.size() || i == 0; ++i)
       {
          if (i < mPatchCables.size())
             mPatchCables[i]->SetSourceIndex(i);

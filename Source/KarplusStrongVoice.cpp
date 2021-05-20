@@ -115,12 +115,15 @@ bool KarplusStrongVoice::Process(double time, ChannelBuffer* out)
       FIX_DENORMAL(feedbackSample);
       mFilterSample = feedbackSample;
       //sample += mFeedbackRamp.Value(time) * feedbackSample;
-      sample += feedbackSample * sqrtf(mVoiceParams->mFeedback) * mMuteRamp.Value(time);
+      float feedback = feedbackSample * sqrtf(mVoiceParams->mFeedback) * mMuteRamp.Value(time);
+      if (mVoiceParams->mInvert)
+         feedback *= -1;
+      sample += feedback;
       FIX_DENORMAL(sample);
 
       mBuffer.Write(sample, 0);
 
-      float output = sample * mVoiceParams->mVol/10.0f * (1 + GetPressure(pos*renderRatio));
+      float output = sample * mVoiceParams->mVol/10.0f;// * (1 + GetPressure(pos*renderRatio));
       FIX_DENORMAL(output);
       AssertIfDenormal(output);
       
@@ -175,10 +178,7 @@ void KarplusStrongVoice::Start(double time, float target)
 
 void KarplusStrongVoice::Stop(double time)
 {
-   if (mVoiceParams->mMute)
-   {
-      mMuteRamp.Start(time, 0, time+400);
-   }
+   mMuteRamp.Start(time, 0, time+400);
 }
 
 void KarplusStrongVoice::ClearVoice()

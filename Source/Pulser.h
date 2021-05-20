@@ -15,7 +15,6 @@
 #include "Transport.h"
 #include "Checkbox.h"
 #include "DropdownList.h"
-#include "TextEntry.h"
 #include "ClickButton.h"
 #include "Slider.h"
 #include "IPulseReceiver.h"
@@ -65,7 +64,9 @@ private:
       kTimeMode_Downbeat,
       kTimeMode_Downbeat2,
       kTimeMode_Downbeat4,
-      kTimeMode_Free
+      kTimeMode_Free,
+      kTimeMode_Align,
+      kTimeMode_Reset
    };
    
    NoteInterval mInterval;
@@ -84,5 +85,11 @@ private:
    FloatSlider* mFreeTimeSlider;
    float mFreeTimeStep;
    float mFreeTimeCounter;
+   int mResetLength;
+   IntSlider* mResetLengthSlider;
+   int mCustomDivisor;
+   IntSlider* mCustomDivisorSlider;
+
+   TransportListenerInfo* mTransportListenerInfo;
 };
 

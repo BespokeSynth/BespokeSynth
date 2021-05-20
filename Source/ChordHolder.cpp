@@ -13,6 +13,7 @@
 #include "ModularSynth.h"
 
 ChordHolder::ChordHolder()
+: mOnlyPlayWhenPulsed(false)
 {
 }
 
@@ -21,6 +22,7 @@ void ChordHolder::CreateUIControls()
    IDrawableModule::CreateUIControls();
 
    mStopButton = new ClickButton(this, "stop", 3, 3);
+   mOnlyPlayWhenPulsedCheckbox = new Checkbox(this, "pulse to play", 40, 3, &mOnlyPlayWhenPulsed);
 }
 
 void ChordHolder::DrawModule()
@@ -28,6 +30,7 @@ void ChordHolder::DrawModule()
    if (Minimized() || IsVisible() == false)
       return;
    mStopButton->Draw();
+   mOnlyPlayWhenPulsedCheckbox->Draw();
 }
 
 void ChordHolder::Stop()
@@ -87,7 +90,7 @@ void ChordHolder::PlayNote(double time, int pitch, int velocity, int voiceIdx, M
          }
       }
 
-      if (velocity > 0)
+      if (velocity > 0 && !mOnlyPlayWhenPulsed)
       {
          if (!mNotePlaying[pitch]) //don't replay already-sustained notes
             PlayNoteOutput(time, pitch, velocity, voiceIdx, modulation);
@@ -110,6 +113,24 @@ void ChordHolder::PlayNote(double time, int pitch, int velocity, int voiceIdx, M
    }
 
    mNoteInputHeld[pitch] = velocity > 0;
+}
+
+void ChordHolder::OnPulse(double time, float velocity, int flags)
+{
+   for (int i = 0; i < 128; ++i)
+   {
+      if (mNotePlaying[i])
+      {
+         PlayNoteOutput(time, i, 0, -1);
+         mNotePlaying[i] = false;
+      }
+
+      if (mNoteInputHeld[i])
+      {
+         PlayNoteOutput(time, i, velocity, -1);
+         mNotePlaying[i] = true;
+      }
+   }
 }
 
 void ChordHolder::LoadLayout(const ofxJSONElement& moduleInfo)

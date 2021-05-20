@@ -27,6 +27,7 @@
 #include "PatchCableSource.h"
 #include "DropdownList.h"
 #include "FloatSliderLFOControl.h"
+#include "UserPrefsEditor.h"
 
 bool Push2Control::sDrawingPush2Display = false;
 NVGcontext* Push2Control::sVG = nullptr;
@@ -36,6 +37,8 @@ ableton::Push2Display* Push2Control::sPush2Display = nullptr;
 
 //https://raw.githubusercontent.com/Ableton/push-interface/master/doc/MidiMapping.png
 
+#include "leathers/push"
+#include "leathers/unused-variable"
 namespace
 {
    const int kTapTempoButton = 3;
@@ -56,6 +59,7 @@ namespace
    const int kPageLeftButton = 62;
    const int kPageRightButton = 63;
 }
+#include "leathers/pop"
 
 Push2Control::Push2Control()
 : mDisplayInitialized(false)
@@ -339,7 +343,11 @@ void Push2Control::DrawToFramebuffer(NVGcontext* vg, NVGLUframebuffer* fb, float
       ofPushStyle();
 
       ofSetColor(255, 255, 255);
-      DrawTextBold("select a module, then tap a grid square", 5, 80, 20);
+      string text = "choose a module, then tap a grid square";
+      string moduleTypeToSpawn = GetModuleTypeToSpawn();
+      if (moduleTypeToSpawn != "")
+         text += "\ntap grid to spawn " + moduleTypeToSpawn;
+      DrawTextBold(text, 5, 80, 20);
       
       ofSetColor(IDrawableModule::GetColor(kModuleType_Other));
       ofNoFill();
@@ -657,6 +665,69 @@ void Push2Control::RenderPush2Display()
    sPush2Bridge->Flip(mPixels);
 }
 
+void Push2Control::Poll()
+{
+   if (mPendingSpawnPitch != -1)
+   {
+      int gridIndex = mPendingSpawnPitch - 36;
+      int gridX = gridIndex % 8;
+      int gridY = gridIndex / 8;
+      ofVec2f newModuleCenter = ofVec2f(ofMap(gridX, 0, 7, mModuleGridRect.getMinX(), mModuleGridRect.getMaxX()), ofMap(gridY, 7, 0, mModuleGridRect.getMinY(), mModuleGridRect.getMaxY()));
+      
+      for (int i=0; i<mSpawnLists.GetDropdowns().size(); ++i)
+      {
+         if (mSpawnLists.GetDropdowns()[i]->GetList()->GetValue() != -1)
+         {
+            IDrawableModule* module = mSpawnLists.GetDropdowns()[i]->Spawn();
+            ofRectangle rect = module->GetRect();
+            module->SetPosition(newModuleCenter.x-rect.width/2, newModuleCenter.y-rect.height/2);
+            mSpawnLists.GetDropdowns()[i]->GetList()->SetValue(-1);
+            mScreenDisplayMode = ScreenDisplayMode::kNormal;
+            SetDisplayModule(module, true);
+            break;
+         }
+      }
+      
+      mPendingSpawnPitch = -1;
+   }
+
+   if (mDisplayModule != nullptr && mDisplayModule->HasPush2OverrideControls())
+   {
+      vector<IUIControl*> desiredControls;
+      mDisplayModule->GetPush2OverrideControls(desiredControls);
+      bool changed = false;
+      if (desiredControls.size() != mDisplayedControls.size())
+      {
+         changed = true;
+      }
+      else
+      {
+         for (size_t i = 0; i < desiredControls.size(); ++i)
+         {
+            if (desiredControls[i] != mDisplayedControls[i])
+            {
+               changed = true;
+               break;
+            }
+         }
+      }
+
+      if (changed)
+         UpdateControlList();
+   }
+}
+
+string Push2Control::GetModuleTypeToSpawn()
+{
+   for (int i = 0; i < mSpawnLists.GetDropdowns().size(); ++i)
+   {
+      if (mSpawnLists.GetDropdowns()[i]->GetList()->GetValue() != -1)
+         return mSpawnLists.GetDropdowns()[i]->GetList()->GetDisplayValue(mSpawnLists.GetDropdowns()[i]->GetList()->GetValue());
+   }
+
+   return "";
+}
+
 void Push2Control::SetDisplayModule(IDrawableModule* module, bool addToHistory)
 {
    mDisplayModule = module;
@@ -683,11 +754,21 @@ void Push2Control::UpdateControlList()
    mButtonControls.clear();
    vector<IUIControl*> controls;
    if (mScreenDisplayMode == ScreenDisplayMode::kAddModule)
+   {
       controls = mSpawnModuleControls;
+   }
    else if (mDisplayModule == this)
+   {
       controls = mFavoriteControls;
+   }
    else if (mDisplayModule != nullptr)
-      controls = mDisplayModule->GetUIControls();
+   {
+      if (mDisplayModule->HasPush2OverrideControls())
+         mDisplayModule->GetPush2OverrideControls(controls);
+      else
+         controls = mDisplayModule->GetUIControls();
+   }
+
    for (int i=0; i < controls.size(); ++i)
    {
       if (controls[i]->IsSliderControl() && controls[i]->GetShouldSaveState())
@@ -695,6 +776,7 @@ void Push2Control::UpdateControlList()
       if (controls[i]->IsButtonControl() && controls[i]->GetShouldSaveState())
          mButtonControls.push_back(controls[i]);
    }
+   mDisplayedControls = controls;
 }
 
 void Push2Control::AddFavoriteControl(IUIControl* control)
@@ -829,26 +911,7 @@ void Push2Control::OnMidiNote(MidiNote& note)
       if (mScreenDisplayMode == ScreenDisplayMode::kAddModule)
       {
          if (note.mVelocity > 0)
-         {
-            int gridIndex = note.mPitch - 36;
-            int gridX = gridIndex % 8;
-            int gridY = gridIndex / 8;
-            ofVec2f newModuleCenter = ofVec2f(ofMap(gridX, 0, 7, mModuleGridRect.getMinX(), mModuleGridRect.getMaxX()), ofMap(gridY, 7, 0, mModuleGridRect.getMinY(), mModuleGridRect.getMaxY()));
-            
-            for (int i=0; i<mSpawnLists.GetDropdowns().size(); ++i)
-            {
-               if (mSpawnLists.GetDropdowns()[i]->GetList()->GetValue() != -1)
-               {
-                  IDrawableModule* module = mSpawnLists.GetDropdowns()[i]->Spawn();
-                  ofRectangle rect = module->GetRect();
-                  module->SetPosition(newModuleCenter.x-rect.width/2, newModuleCenter.y-rect.height/2);
-                  mSpawnLists.GetDropdowns()[i]->GetList()->SetValue(-1);
-                  mScreenDisplayMode = ScreenDisplayMode::kNormal;
-                  SetDisplayModule(module, true);
-                  break;
-               }
-            }
-         }
+            mPendingSpawnPitch = note.mPitch;
       }
    }
    else
@@ -1047,7 +1110,7 @@ void Push2Control::OnMidiPitchBend(MidiPitchBend& pitchBend)
 
 bool Push2Control::IsIgnorableModule(IDrawableModule* module)
 {
-   return module == TheTitleBar || module == TheSaveDataPanel || module == TheQuickSpawnMenu;
+   return module == TheTitleBar || module == TheSaveDataPanel || module == TheQuickSpawnMenu || module == TheSynth->GetUserPrefsEditor();
 }
 
 vector<IDrawableModule*> Push2Control::SortModules(vector<IDrawableModule*> modules)

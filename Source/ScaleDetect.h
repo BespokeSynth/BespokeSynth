@@ -50,12 +50,12 @@ private:
    void GetModuleDimensions(float& width, float& height) override { width = 140; height = 36; }
    bool Enabled() const override { return true; }
 
-   vector<int> mNotes;
+   std::array<bool,128> mPitchOn{false};
    ClickButton* mResetButton;
-   int mLastNote;
+   int mLastPitch;
    bool mDoDetect;
+   bool mNeedsUpdate;
    
-   ofMutex mListMutex;
    DropdownList* mMatchesDropdown;
    int mSelectedMatch;
 };

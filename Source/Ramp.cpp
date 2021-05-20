@@ -61,7 +61,7 @@ const Ramp::RampData* Ramp::GetCurrentRampData(double time) const
 {
    int ret = 0;
    double latestTime = -1;
-   for (size_t i = 0; i < mRampDatas.size(); ++i)
+   for (int i = 0; i < (int)mRampDatas.size(); ++i)
    {
       if (mRampDatas[i].mStartTime < time && mRampDatas[i].mStartTime > latestTime)
       {

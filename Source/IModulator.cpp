@@ -21,7 +21,14 @@ IModulator::IModulator()
 , mMaxSlider(nullptr)
 , mTarget(nullptr)
 , mUIControlTarget(nullptr)
+, mLastPollValue(0)
+, mSmoothedValue(0)
 {
+}
+
+IModulator::~IModulator()
+{
+   TheSynth->RemoveExtraPoller(this);
 }
 
 void IModulator::OnModulatorRepatch()
@@ -52,16 +59,24 @@ void IModulator::OnModulatorRepatch()
       mUIControlTarget = nullptr;
    }
    
-   if (RequiresManualPolling())
+   TheSynth->RemoveExtraPoller(this);
+   //if (RequiresManualPolling())
       TheSynth->AddExtraPoller(this);
-   else
-      TheSynth->RemoveExtraPoller(this);
 }
 
 void IModulator::Poll()
 {
+   mLastPollValue = Value();
+   const float kBlendRate = -9.65784f;
+   float blend = exp2(kBlendRate / ofGetFrameRate()); //framerate-independent blend
+   mSmoothedValue = mSmoothedValue * blend + mLastPollValue * (1-blend);
    if (RequiresManualPolling())
-      mUIControlTarget->SetFromMidiCC(Value());
+      mUIControlTarget->SetFromMidiCC(mLastPollValue);
+}
+
+float IModulator::GetRecentChange() const
+{
+   return mLastPollValue - mSmoothedValue;
 }
 
 void IModulator::InitializeRange()

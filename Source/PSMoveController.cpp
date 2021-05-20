@@ -39,7 +39,7 @@ PSMoveController::PSMoveController()
 
    mVibration.SetValue(0);
 
-   TheTransport->AddListener(this, kInterval_4n, OffsetInfo(mMetronomeLagOffset, false), false);
+   mTransportListenerInfo = TheTransport->AddListener(this, kInterval_4n, OffsetInfo(mMetronomeLagOffset, false), false);
 }
 
 void PSMoveController::CreateUIControls()
@@ -182,7 +182,7 @@ void PSMoveController::OnTimeEvent(double time)
    if (mVibronomeOn)
    {
       float length = 100;
-      if (TheTransport->GetQuantized(time+mMetronomeLagOffset, kInterval_4n) == 0)
+      if (TheTransport->GetQuantized(time, mTransportListenerInfo) == 0)
          length = 200;
       mVibration.Start(1,0,length);
       mMoveMgr.SetVibration(0, 1);
@@ -193,7 +193,12 @@ void PSMoveController::FloatSliderUpdated(FloatSlider* slider, float oldVal)
 {
    if (slider == mOffsetSlider)
    {
-      TheTransport->UpdateListener(this, kInterval_4n, OffsetInfo(mMetronomeLagOffset, true));
+      TransportListenerInfo* transportListenerInfo = TheTransport->GetListenerInfo(this);
+      if (transportListenerInfo != nullptr)
+      {
+         transportListenerInfo->mInterval = kInterval_4n;
+         transportListenerInfo->mOffsetInfo = OffsetInfo(mMetronomeLagOffset, true);
+      }
    }
 }
 

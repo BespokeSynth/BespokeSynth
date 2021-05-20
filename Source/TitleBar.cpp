@@ -19,6 +19,9 @@
 
 TitleBar* TheTitleBar = nullptr;
 
+//static
+bool TitleBar::sShowInitialHelpOverlay = true;
+
 namespace
 {
    const string kRescanPluginsLabel = "rescan VSTs...";
@@ -244,7 +247,6 @@ void TitleBar::ListLayouts()
 
 namespace
 {
-   const float kHideThreshold = 675;
    const float kDoubleHeightThreshold = 1200;
 
    float GetPixelWidth()
@@ -269,7 +271,7 @@ void TitleBar::DrawModule()
 
    float pixelWidth = GetPixelWidth();
    
-   DrawTextLeftJustify(info, pixelWidth - 60, 16);
+   DrawTextLeftJustify(info, pixelWidth - 140, 32);
    
    mSaveLayoutButton->Draw();
    mSaveStateButton->Draw();
@@ -352,6 +354,32 @@ void TitleBar::DrawModule()
    mShouldAutosaveCheckbox->Draw();
 }
 
+void TitleBar::DrawModuleUnclipped()
+{
+   if (HiddenByZoom())
+      return;
+
+   if (sShowInitialHelpOverlay)
+   {
+      ofPushStyle();
+      ofSetColor(255, 255, 255);
+      string text = "click ? to view help and enable tooltips";
+      float size = 28;
+      float titleBarWidth, titleBarHeight;
+      TheTitleBar->GetDimensions(titleBarWidth, titleBarHeight);
+      ofRectangle helpButtonRect = mDisplayHelpButton->GetRect(true);
+      float x = helpButtonRect.getCenter().x;
+      float y = helpButtonRect.getCenter().y + 15 + titleBarHeight;
+      gFontBold.DrawString(text, size, x - gFontBold.GetStringWidth(text, size, K(isRenderThread)) - 15 * gDrawScale, y);
+      ofSetLineWidth(2);
+      ofLine(x - 10, y - 6 * gDrawScale, x, y - 6 * gDrawScale);
+      ofLine(x, y - 6 * gDrawScale, x, y - 18 * gDrawScale);
+      ofLine(x - 3 * gDrawScale, y - 15 * gDrawScale, x, y - 18 * gDrawScale);
+      ofLine(x + 3 * gDrawScale, y - 15 * gDrawScale, x, y - 18 * gDrawScale);
+      ofPopStyle();
+   }
+}
+
 bool TitleBar::HiddenByZoom() const
 {
    return ofGetWidth() / gDrawScale < 620;
@@ -414,12 +442,13 @@ void TitleBar::ButtonClicked(ClickButton* button)
       TheSynth->SaveOutput();
    if (button == mDisplayHelpButton)
    {
-      float x,y,w,h,butW,butH;
+      float x, y, w, h, butW, butH;
       mDisplayHelpButton->GetPosition(x, y);
       mDisplayHelpButton->GetDimensions(butW, butH);
       mHelpDisplay->GetDimensions(w, h);
-      mHelpDisplay->SetPosition(x-w+butW,y+butH);
+      mHelpDisplay->SetPosition(x - w + butW, y + butH);
       TheSynth->PushModalFocusItem(mHelpDisplay);
+      sShowInitialHelpOverlay = false;
    }
    if (button == mDisplayUserPrefsEditorButton)
       TheSynth->GetUserPrefsEditor()->Show();

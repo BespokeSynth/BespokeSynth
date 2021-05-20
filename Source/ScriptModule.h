@@ -85,6 +85,9 @@ public:
    static ScriptModule* sPriorExecutedModule;
    static float GetScriptMeasureTime();
    static float GetTimeSigRatio();
+   static string sBackgroundTextString;
+   static float sBackgroundTextSize;
+   static ofColor sBackgroundTextColor;
 
    ModulationChain* GetPitchBend(int pitch) { return &mPitchBends[pitch]; }
    ModulationChain* GetModWheel(int pitch) { return &mModWheels[pitch]; }

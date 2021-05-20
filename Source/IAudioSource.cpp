@@ -23,7 +23,7 @@ void IAudioSource::SyncOutputBuffer(int numChannels)
       if (GetTarget(i))
       {
          ChannelBuffer* out = GetTarget(i)->GetBuffer();
-         out->SetNumActiveChannels(numChannels);
+         out->SetNumActiveChannels(MAX(numChannels, out->NumActiveChannels()));
       }
    }
    GetVizBuffer()->SetNumChannels(numChannels);

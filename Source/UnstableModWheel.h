@@ -45,6 +45,8 @@ private:
    void GetModuleDimensions(float& width, float& height) override { width = mWidth; height = mHeight; }
    bool Enabled() const override { return mEnabled; }
 
+   void FillModulationBuffer(double time, int voiceIdx);
+
    UnstablePerlinModulation mPerlin;
    FloatSlider* mAmountSlider;
    FloatSlider* mWarbleSlider;

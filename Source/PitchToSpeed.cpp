@@ -31,6 +31,7 @@ void PitchToSpeed::CreateUIControls()
 {
    IDrawableModule::CreateUIControls();
    mTargetCable = new PatchCableSource(this, kConnectionType_UIControl);
+   mTargetCable->SetModulatorOwner(this);
    AddPatchCableSource(mTargetCable);
    
    mReferenceFreqSlider = new FloatSlider(this, "ref freq", 3, 2, 100, 15, &mReferenceFreq, 10, 1000);

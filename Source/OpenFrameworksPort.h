@@ -123,6 +123,14 @@ struct ofRectangle
    void set(float _x, float _y, float _w, float _h) { x = _x; y = _y; width = _w; height = _h; }
    bool intersects(const ofRectangle& other) const;
    bool contains(float x, float y) const;
+   ofRectangle& grow(float amount)
+   {
+      x -= amount;
+      y -= amount;
+      width += amount * 2;
+      height += amount * 2;
+      return *this;
+   }
    float getMinX() const;
    float getMaxX() const;
    float getMinY() const;
@@ -224,8 +232,8 @@ public:
    void stop() {}
 };
 
-#define PI 3.14159265358979
-#define TWO_PI PI*2
+#define PI 3.14159265358979323846
+#define TWO_PI 6.28318530717958647693
 
 class RetinaTrueTypeFont
 {
@@ -238,10 +246,12 @@ public:
    float GetStringHeight(string str, float size, bool isRenderThread = false);
    bool IsLoaded() { return mLoaded; }
    int GetFontHandle() const { return mFontHandle; }
+   string GetFontPath() const { return mFontPath; }
 private:
    int mFontHandle;
    int mFontBoundsHandle;
    bool mLoaded;
+   string mFontPath;
 };
 
 struct ofFileDialogResult

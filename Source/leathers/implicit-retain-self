@@ -1,0 +1,24 @@
+// This file generated automatically:
+// https://github.com/ruslo/sugar/wiki/Cross-platform-warning-suppression
+
+// Copyright (c) 2014, Ruslan Baratov
+// All rights reserved.
+
+#if !defined(LEATHERS_PUSH_)
+# error "`leathers/implicit-retain-self` used "
+      "without `leathers/push`, "
+      "see README.txt for more info"
+#endif
+
+#if defined(LEATHERS_IMPLICIT_RETAIN_SELF_)
+# error "`leathers/implicit-retain-self` "
+    "already included; see README.txt for more info"
+#else
+# define LEATHERS_IMPLICIT_RETAIN_SELF_
+#endif
+
+#if (__clang__)
+# if __has_warning("-Wimplicit-retain-self")
+#  pragma clang diagnostic ignored "-Wimplicit-retain-self"
+# endif
+#endif

@@ -19,7 +19,7 @@ class IModulator : public IPollable
 {
 public:
    IModulator();
-   virtual ~IModulator() {}
+   virtual ~IModulator();
    virtual float Value(int samplesIn = 0) = 0;
    virtual bool Active() const = 0;
    virtual bool CanAdjustRange() const { return true; }
@@ -28,6 +28,7 @@ public:
    float& GetMax() { return mTarget ? mTarget->GetModulatorMax() : mDummyMax; }
    void OnModulatorRepatch();
    void Poll() override;
+   float GetRecentChange() const;
 protected:
    void InitializeRange();
    bool RequiresManualPolling() { return mUIControlTarget != nullptr && mTarget == nullptr; }
@@ -40,4 +41,6 @@ protected:
    FloatSlider* mMaxSlider;
    FloatSlider* mTarget;
    IUIControl* mUIControlTarget;
+   float mLastPollValue;
+   float mSmoothedValue;
 };

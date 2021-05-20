@@ -1,0 +1,33 @@
+// This file generated automatically:
+// https://github.com/ruslo/sugar/wiki/Cross-platform-warning-suppression
+
+// Copyright (c) 2014, Ruslan Baratov
+// All rights reserved.
+
+#if !defined(LEATHERS_PUSH_)
+# error "`leathers/range-loop-analysis` used "
+      "without `leathers/push`, "
+      "see README.txt for more info"
+#endif
+
+#if defined(LEATHERS_RANGE_LOOP_ANALYSIS_)
+# error "`leathers/range-loop-analysis` "
+    "already included; see README.txt for more info"
+#else
+# define LEATHERS_RANGE_LOOP_ANALYSIS_
+#endif
+
+#if (__clang__)
+# if __has_warning("-Wrange-loop-analysis")
+#  pragma clang diagnostic ignored "-Wrange-loop-analysis"
+# endif
+#endif
+
+#if (__GNUC__)
+# pragma GCC diagnostic ignored "-Wrange-loop-analysis"
+#endif
+
+//unsure what the MSVC code is for this
+//#if (_MSC_VER)
+//# pragma warning(disable: 4XXX)
+//#endif

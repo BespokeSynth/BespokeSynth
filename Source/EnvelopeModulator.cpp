@@ -39,6 +39,7 @@ void EnvelopeModulator::CreateUIControls()
    GetPatchCableSource()->SetEnabled(false);
    
    mTargetCable = new PatchCableSource(this, kConnectionType_UIControl);
+   mTargetCable->SetModulatorOwner(this);
    AddPatchCableSource(mTargetCable);
    
    mAdvancedDisplayCheckbox = new Checkbox(this, "advanced", 2, 2, &mAdvancedDisplay);
@@ -86,6 +87,11 @@ void EnvelopeModulator::DrawModule()
    
    if (mAdvancedDisplay)
       mEnvelopeControl.Draw();
+}
+
+void EnvelopeModulator::Start(double time, const ::ADSR& adsr)
+{
+   mAdsr.Start(time, 1, adsr);
 }
 
 void EnvelopeModulator::PlayNote(double time, int pitch, int velocity, int voiceIdx, ModulationParameters modulation)

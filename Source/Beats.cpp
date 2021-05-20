@@ -46,13 +46,14 @@ void Beats::Process(double time)
 {
    PROFILER(Beats);
 
-   if (!mEnabled || GetTarget() == nullptr)
+   IAudioReceiver* target = GetTarget();
+   if (!mEnabled || target == nullptr)
       return;
    
    ComputeSliders(0);
    
-   int bufferSize = GetTarget()->GetBuffer()->BufferSize();
-   float* out = GetTarget()->GetBuffer()->GetChannel(0);
+   int bufferSize = target->GetBuffer()->BufferSize();
+   float* out = target->GetBuffer()->GetChannel(0);
    assert(bufferSize == gBufferSize);
    
    Clear(mWriteBuffer, gBufferSize);
@@ -254,8 +255,8 @@ void BeatColumn::Process(double time, float* buffer, int bufferSize)
          {
             float filter = mFilterRamp.Value(time);
             
-            mLowpass.SetFilterParams(ofMap(sqrtf(ofClamp(-filter,0,1)),0,1,6000,80), 1);
-            mHighpass.SetFilterParams(ofMap(ofClamp(filter,0,1),0,1,10,6000), 1);
+            mLowpass.SetFilterParams(ofMap(sqrtf(ofClamp(-filter,0,1)),0,1,6000,80), sqrt(2)/2);
+            mHighpass.SetFilterParams(ofMap(ofClamp(filter,0,1),0,1,10,6000), sqrt(2)/2);
             
             const float crossfade = .1f;
             float normalAmount = ofClamp(1 - fabsf(filter/crossfade),0,1);

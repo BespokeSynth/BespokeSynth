@@ -35,16 +35,15 @@
 #include "nanovg/nanovg.h"
 #include "UserPrefsEditor.h"
 #include "Canvas.h"
+#include "EffectChain.h"
 
 ModularSynth* TheSynth = nullptr;
 
-#define RECORDING_LENGTH (48000*60*30) //30 minutes of recording if we're running at 48000
-
 //static
 bool ModularSynth::sShouldAutosave = true;
-float ModularSynth::sBackgroundLissajousR = 0.704081655f;
-float ModularSynth::sBackgroundLissajousG = 0.387755096f;
-float ModularSynth::sBackgroundLissajousB = 0.795918345f;
+float ModularSynth::sBackgroundLissajousR = 0.408f;
+float ModularSynth::sBackgroundLissajousG = 0.245f;
+float ModularSynth::sBackgroundLissajousB = 0.418f;
 
 void AtExit()
 {
@@ -54,7 +53,7 @@ void AtExit()
 ModularSynth::ModularSynth()
 : mMoveModule(nullptr)
 , mIsMousePanning(false)
-, mGlobalRecordBuffer(RECORDING_LENGTH)
+, mGlobalRecordBuffer(nullptr)
 , mAudioPaused(false)
 , mIsLoadingState(false)
 , mClickStartX(INT_MAX)
@@ -83,17 +82,16 @@ ModularSynth::ModularSynth()
    mConsoleText[0] = 0;
    assert(TheSynth == nullptr);
    TheSynth = this;
-   
-   mSaveOutputBuffer[0] = new float[RECORDING_LENGTH];
-   mSaveOutputBuffer[1] = new float[RECORDING_LENGTH];
-   
-   mGlobalRecordBuffer.SetNumChannels(2);
 }
 
 ModularSynth::~ModularSynth()
 {
    DeleteAllModules();
    
+   delete mGlobalRecordBuffer;
+   delete[] mSaveOutputBuffer[0];
+   delete[] mSaveOutputBuffer[1];
+
    SetMemoryTrackingEnabled(false); //avoid crashes when the tracking lists themselves are deleted
    
    assert(TheSynth == this);
@@ -121,6 +119,14 @@ void ModularSynth::Setup(GlobalManagers* globalManagers, juce::Component* mainCo
          mScrollMultiplierHorizontal = mUserPrefs["scroll_multiplier_horizontal"].asDouble();
       if (!mUserPrefs["scroll_multiplier_vertical"].isNull())
          mScrollMultiplierVertical = mUserPrefs["scroll_multiplier_vertical"].asDouble();
+
+      int recordBufferLengthMinutes = 30;
+      if (!mUserPrefs["record_buffer_length_minutes"].isNull())
+         recordBufferLengthMinutes = mUserPrefs["record_buffer_length_minutes"].asDouble();
+      mGlobalRecordBuffer = new RollingBuffer(recordBufferLengthMinutes * 60 * gSampleRate);
+      mGlobalRecordBuffer->SetNumChannels(2);
+      mSaveOutputBuffer[0] = new float[mGlobalRecordBuffer->Size()];
+      mSaveOutputBuffer[1] = new float[mGlobalRecordBuffer->Size()];
 
       juce::File(ofToDataPath("savestate")).createDirectory();
       juce::File(ofToDataPath("savestate/autosave")).createDirectory();
@@ -165,6 +171,9 @@ void ModularSynth::LoadResources(void* nanoVG, void* fontBoundsNanoVG)
    gNanoVG = (NVGcontext*)nanoVG;
    gFontBoundsNanoVG = (NVGcontext*)fontBoundsNanoVG;
    LoadGlobalResources();
+
+   if (!gFont.IsLoaded())
+      mFatalError = "couldn't load font from " + gFont.GetFontPath();
 }
 
 void ModularSynth::InitIOBuffers(int inputChannelCount, int outputChannelCount)
@@ -342,7 +351,15 @@ void ModularSynth::Draw(void* vg)
          DrawFallbackText(mFatalError.c_str(), 100, 100);
    }
    
-   DrawLissajous(&mGlobalRecordBuffer, 0, 0, ofGetWidth(), ofGetHeight(), sBackgroundLissajousR, sBackgroundLissajousG, sBackgroundLissajousB);
+   DrawLissajous(mGlobalRecordBuffer, 0, 0, ofGetWidth(), ofGetHeight(), sBackgroundLissajousR, sBackgroundLissajousG, sBackgroundLissajousB);
+
+   if (ScriptModule::sBackgroundTextString != "")
+   {
+      ofPushStyle();
+      ofSetColor(ScriptModule::sBackgroundTextColor);
+      DrawTextBold(ScriptModule::sBackgroundTextString, 150, 200 + ScriptModule::sBackgroundTextSize, ScriptModule::sBackgroundTextSize);
+      ofPopStyle();
+   }
    
    if (gTime == 1 && mFatalError == "")
    {
@@ -443,15 +460,24 @@ void ModularSynth::Draw(void* vg)
       {
          if (gHoveredModule == mQuickSpawn)
          {
-            tooltip = helpDisplay->GetModuleTooltipFromName(mQuickSpawn->GetHoveredModuleTypeName());
+            string name = mQuickSpawn->GetHoveredModuleTypeName();
+            ofStringReplace(name, " " + string(ModuleFactory::kEffectChainSuffix), "");   //strip this suffix if it's there
+            tooltip = helpDisplay->GetModuleTooltipFromName(name);
          }
-         else if (gHoveredModule == GetTopModalFocusItem() &&
-                  dynamic_cast<DropdownListModal*>(gHoveredModule) &&
-                  dynamic_cast<DropdownListModal*>(gHoveredModule)->GetOwner()->GetModuleParent() == TheTitleBar)
+         else if (gHoveredModule == GetTopModalFocusItem() && dynamic_cast<DropdownListModal*>(gHoveredModule))
          {
-            string moduleTypeName = dynamic_cast<DropdownListModal*>(gHoveredModule)->GetHoveredLabel();
-            ofStringReplace(moduleTypeName, " (exp.)", "");
-            tooltip = helpDisplay->GetModuleTooltipFromName(moduleTypeName);
+            DropdownListModal* list = dynamic_cast<DropdownListModal*>(gHoveredModule);
+            if (list->GetOwner()->GetModuleParent() == TheTitleBar)
+            {
+               string moduleTypeName = dynamic_cast<DropdownListModal*>(gHoveredModule)->GetHoveredLabel();
+               ofStringReplace(moduleTypeName, " (exp.)", "");
+               tooltip = helpDisplay->GetModuleTooltipFromName(moduleTypeName);
+            }
+            else if (dynamic_cast<EffectChain*>(list->GetOwner()->GetParent()) != nullptr)
+            {
+               string effectName = dynamic_cast<DropdownListModal*>(gHoveredModule)->GetHoveredLabel();
+               tooltip = helpDisplay->GetModuleTooltipFromName(effectName);
+            }
          }
          else
          {
@@ -951,6 +977,9 @@ void ModularSynth::MouseDragged(int intX, int intY, int button)
 
 void ModularSynth::MousePressed(int intX, int intY, int button)
 {
+   if (PatchCable::sActivePatchCable != nullptr)
+      return;
+   
    mMousePos.x = intX;
    mMousePos.y = intY;
 
@@ -1297,6 +1326,13 @@ void ModularSynth::AudioOut(float** output, int bufferSize, int nChannels)
 {
    PROFILER(audioOut_total);
    
+   bool sFirst = true;
+   if (sFirst)
+   {
+      FloatVectorOperations::disableDenormalisedNumberSupport();
+      sFirst = false;
+   }
+   
    if (mAudioPaused)
    {
       for (int ch=0; ch<nChannels; ++ch)
@@ -1349,11 +1385,11 @@ void ModularSynth::AudioOut(float** output, int bufferSize, int nChannels)
    }
    /////////// AUDIO PROCESSING ENDS HERE /////////////
    if (nChannels >= 1)
-      mGlobalRecordBuffer.WriteChunk(output[0], bufferSize, 0);
+      mGlobalRecordBuffer->WriteChunk(output[0], bufferSize, 0);
    if (nChannels >= 2)
-      mGlobalRecordBuffer.WriteChunk(output[1], bufferSize, 1);
+      mGlobalRecordBuffer->WriteChunk(output[1], bufferSize, 1);
    mRecordingLength += bufferSize;
-   mRecordingLength = MIN(mRecordingLength, RECORDING_LENGTH);
+   mRecordingLength = MIN(mRecordingLength, mGlobalRecordBuffer->Size());
    
    Profiler::PrintCounters();
 }
@@ -1925,6 +1961,9 @@ void ModularSynth::LoadState(string file)
       LogEvent("couldn't find file " + ofToDataPath(file), kLogEventType_Error);
       return;
    }
+
+   if (mInitialized)
+      TitleBar::sShowInitialHelpOverlay = false;  //don't show initial help popup
    
    mAudioThreadMutex.Lock("LoadState()");
    LockRender(true);
@@ -2166,6 +2205,9 @@ void ModularSynth::DoAutosave()
 
 IDrawableModule* ModularSynth::SpawnModuleOnTheFly(string moduleName, float x, float y, bool addToContainer)
 {
+   if (mInitialized)
+      TitleBar::sShowInitialHelpOverlay = false;  //don't show initial help popup
+
    vector<string> tokens = ofSplitString(moduleName," ");
    if (tokens.size() == 0)
       return nullptr;
@@ -2210,6 +2252,18 @@ IDrawableModule* ModularSynth::SpawnModuleOnTheFly(string moduleName, float x, f
          midiControllerToSetUp += tokens[i];
          if (i != tokens.size() - 2)
             midiControllerToSetUp += " ";
+      }
+   }
+
+   string effectToSetUp = "";
+   if (tokens.size() > 1 && tokens[tokens.size() - 1] == ModuleFactory::kEffectChainSuffix)
+   {
+      moduleType = "effectchain";
+      for (size_t i = 0; i < tokens.size() - 1; ++i)
+      {
+         effectToSetUp += tokens[i];
+         if (i != tokens.size() - 2)
+            effectToSetUp += " ";
       }
    }
 
@@ -2282,6 +2336,13 @@ IDrawableModule* ModularSynth::SpawnModuleOnTheFly(string moduleName, float x, f
       }
    }
 
+   if (effectToSetUp != "")
+   {
+      EffectChain* effectChain = dynamic_cast<EffectChain*>(module);
+      if (effectChain != nullptr)
+         effectChain->AddEffect(effectToSetUp, K(onTheFly));
+   }
+
    return module;
 }
 
@@ -2311,12 +2372,12 @@ void ModularSynth::SaveOutput()
    string filename = ofGetTimestampString("recordings/recording_%Y-%m-%d_%H-%M.wav");
    //string filenamePos = ofGetTimestampString("recordings/pos_%Y-%m-%d_%H-%M.wav");
 
-   assert(mRecordingLength <= RECORDING_LENGTH);
+   assert(mRecordingLength <= mGlobalRecordBuffer->Size());
    
    for (int i=0; i<mRecordingLength; ++i)
    {
-      mSaveOutputBuffer[0][i] = mGlobalRecordBuffer.GetSample((int)mRecordingLength-i-1, 0);
-      mSaveOutputBuffer[1][i] = mGlobalRecordBuffer.GetSample((int)mRecordingLength-i-1, 1);
+      mSaveOutputBuffer[0][i] = mGlobalRecordBuffer->GetSample((int)mRecordingLength-i-1, 0);
+      mSaveOutputBuffer[1][i] = mGlobalRecordBuffer->GetSample((int)mRecordingLength-i-1, 1);
    }
 
    Sample::WriteDataToFile(filename.c_str(), mSaveOutputBuffer, (int)mRecordingLength, 2);
@@ -2324,7 +2385,7 @@ void ModularSynth::SaveOutput()
    //mOutputBufferMeasurePos.ReadChunk(mSaveOutputBuffer, mRecordingLength);
    //Sample::WriteDataToFile(filenamePos.c_str(), mSaveOutputBuffer, mRecordingLength, 1);
    
-   mGlobalRecordBuffer.ClearBuffer();
+   mGlobalRecordBuffer->ClearBuffer();
    mRecordingLength = 0;
 }
 

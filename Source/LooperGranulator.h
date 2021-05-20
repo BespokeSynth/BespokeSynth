@@ -72,5 +72,7 @@ private:
    Checkbox* mFreezeCheckbox;
    FloatSlider* mGranPosRandomize;
    FloatSlider* mGranSpeedRandomize;
+   FloatSlider* mGranSpacingRandomize;
    Checkbox* mGranOctaveCheckbox;
+   FloatSlider* mGranWidthSlider;
 };

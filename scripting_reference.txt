@@ -24,6 +24,8 @@ globals:
    bespoke.pitch_to_name(pitch)
    bespoke.pitch_to_freq(pitch)
    bespoke.get_tempo()
+   bespoke.set_background_text(text, size, red, green, blue)
+      optional: size=50, red = 1, green = 1, blue = 1
 
 
 script-relative:
@@ -146,6 +148,21 @@ import oscoutput
       o.send_float(address, val)
       o.send_int(address, val)
       o.send_string(address, val)
+
+
+import envelope
+   static:
+      envelope.get(path)
+   instance:
+      e.start(tuple<float,float> stages)
+      e.schedule(delay, tuple<float,float> stages)
+
+
+import drumplayer
+   static:
+      drumplayer.get(path)
+   instance:
+      d.import_sampleplayer_cue(samplePlayer, srcCueIndex, destHitIndex)
 
 
 import module

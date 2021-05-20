@@ -45,11 +45,12 @@ void Lissajous::Process(double time)
    SyncBuffers();
    
    int bufferSize = GetBuffer()->BufferSize();
-   if (GetTarget())
+   IAudioReceiver* target = GetTarget();
+   if (target)
    {
       for (int ch=0; ch<GetBuffer()->NumActiveChannels(); ++ch)
       {
-         Add(GetTarget()->GetBuffer()->GetChannel(ch), GetBuffer()->GetChannel(ch), bufferSize);
+         Add(target->GetBuffer()->GetChannel(ch), GetBuffer()->GetChannel(ch), bufferSize);
          GetVizBuffer()->WriteChunk(GetBuffer()->GetChannel(ch),GetBuffer()->BufferSize(), ch);
       }
    }

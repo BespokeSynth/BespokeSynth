@@ -42,7 +42,7 @@ public:
 private:
    //IDrawableModule
    void DrawModule() override;
-   void GetModuleDimensions(float& w, float& h) override { w=120; h=90; }
+   void GetModuleDimensions(float& w, float& h) override { w=115; h=125; }
    bool Enabled() const override { return mEnabled; }
    
    DelayEffect mDelay;
@@ -50,6 +50,9 @@ private:
    IAudioReceiver* mFeedbackTarget;
    PatchCableSource* mFeedbackTargetCable;
    RollingBuffer mFeedbackVizBuffer;
+   float mSignalLimit;
+   double mGainScale[ChannelBuffer::kMaxNumChannels];
+   FloatSlider* mSignalLimitSlider;
 };
 
 #endif /* defined(__Bespoke__FeedbackModule__) */

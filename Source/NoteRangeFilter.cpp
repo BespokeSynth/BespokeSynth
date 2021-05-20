@@ -12,16 +12,14 @@
 #include "OpenFrameworksPort.h"
 #include "SynthGlobals.h"
 #include "ModularSynth.h"
-
-#include "OpenFrameworksPort.h"
-#include "SynthGlobals.h"
-#include "ModularSynth.h"
+#include "UIControlMacros.h"
 
 NoteRangeFilter::NoteRangeFilter()
 : mMinPitch(24)
 , mMinPitchSlider(nullptr)
 , mMaxPitch(36)
 , mMaxPitchSlider(nullptr)
+, mWrap(false)
 {
    SetEnabled(true);
 }
@@ -29,8 +27,12 @@ NoteRangeFilter::NoteRangeFilter()
 void NoteRangeFilter::CreateUIControls()
 {
    IDrawableModule::CreateUIControls();
-   mMinPitchSlider = new IntSlider(this,"min",5,2,80,15,&mMinPitch,0,127);
-   mMaxPitchSlider = new IntSlider(this,"max",5,20,80,15,&mMaxPitch,0,127);
+   
+   UIBLOCK0();
+   INTSLIDER(mMinPitchSlider,"min",&mMinPitch,0,127);
+   INTSLIDER(mMaxPitchSlider,"max",&mMaxPitch,0,127);
+   CHECKBOX(mWrapCheckbox,"wrap",&mWrap);
+   ENDUIBLOCK(mWidth, mHeight);
 }
 
 void NoteRangeFilter::DrawModule()
@@ -41,6 +43,7 @@ void NoteRangeFilter::DrawModule()
    
    mMinPitchSlider->Draw();
    mMaxPitchSlider->Draw();
+   mWrapCheckbox->Draw();
 }
 
 void NoteRangeFilter::CheckboxUpdated(Checkbox* checkbox)
@@ -58,6 +61,15 @@ void NoteRangeFilter::IntSliderUpdated(IntSlider* slider, int oldVal)
 void NoteRangeFilter::PlayNote(double time, int pitch, int velocity, int voiceIdx, ModulationParameters modulation)
 {
    ComputeSliders(0);
+
+   if (mWrap && mMaxPitch > mMinPitch)
+   {
+      int length = mMaxPitch - mMinPitch + 1;
+      while (pitch < mMinPitch)
+         pitch += length;
+      while (pitch > mMaxPitch)
+         pitch -= length;
+   }
    
    if (!mEnabled || (pitch >= mMinPitch && pitch <= mMaxPitch))
    {

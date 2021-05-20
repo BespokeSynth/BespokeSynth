@@ -35,7 +35,7 @@ void* operator new[](std::size_t size, const char *file, int line) throw(std::ba
 #define new DEBUG_NEW
 
 #define MAX_BUFFER_SIZE 30*gSampleRate
-#define MAX_TEXTENTRY_LENGTH 128
+#define MAX_TEXTENTRY_LENGTH 1024
 
 #ifndef M_PI
 #define M_PI PI
@@ -144,8 +144,8 @@ void SynthInit();
 void LoadGlobalResources();
 
 void SetGlobalSampleRateAndBufferSize(int rate, int size);
-void DrawAudioBuffer(float width, float height, ChannelBuffer* buffer, float start, float end, float pos, float vol=1, ofColor color=ofColor::black);
-void DrawAudioBuffer(float width, float height, const float* buffer, float start, float end, float pos, float vol=1, ofColor color=ofColor::black);
+void DrawAudioBuffer(float width, float height, ChannelBuffer* buffer, float start, float end, float pos, float vol=1, ofColor color=ofColor::black, int wraparoundFrom = -1, int wraparoundTo = 0);
+void DrawAudioBuffer(float width, float height, const float* buffer, float start, float end, float pos, float vol=1, ofColor color=ofColor::black, int wraparoundFrom = -1, int wraparoundTo = 0, int bufferSize = -1);
 void Add(float* buff1, const float* buff2, int bufferSize);
 void Subtract(float* buff1, const float* buff2, int bufferSize);
 void Mult(float* buff, float val, int bufferSize);

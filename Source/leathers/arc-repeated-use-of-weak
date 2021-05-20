@@ -1,0 +1,24 @@
+// This file generated automatically:
+// https://github.com/ruslo/sugar/wiki/Cross-platform-warning-suppression
+
+// Copyright (c) 2014, Ruslan Baratov
+// All rights reserved.
+
+#if !defined(LEATHERS_PUSH_)
+# error "`leathers/arc-repeated-use-of-weak` used "
+      "without `leathers/push`, "
+      "see README.txt for more info"
+#endif
+
+#if defined(LEATHERS_ARC_REPEATED_USE_OF_WEAK_)
+# error "`leathers/arc-repeated-use-of-weak` "
+    "already included; see README.txt for more info"
+#else
+# define LEATHERS_ARC_REPEATED_USE_OF_WEAK_
+#endif
+
+#if (__clang__)
+# if __has_warning("-Warc-repeated-use-of-weak")
+#  pragma clang diagnostic ignored "-Warc-repeated-use-of-weak"
+# endif
+#endif

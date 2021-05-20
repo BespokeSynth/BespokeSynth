@@ -23,8 +23,12 @@
 
 #include "ScriptModule_PythonInterface.i"
 
-#include "pybind11/embed.h"
-#include "pybind11/stl.h"
+#include "leathers/push"
+#include "leathers/unused-value"
+#include "leathers/range-loop-analysis"
+   #include "pybind11/embed.h"
+   #include "pybind11/stl.h"
+#include "leathers/pop"
 
 namespace py = pybind11;
 
@@ -38,6 +42,12 @@ ScriptModule* ScriptModule::sMostRecentLineExecutedModule = nullptr;
 ScriptModule* ScriptModule::sPriorExecutedModule = nullptr;
 //static
 double ScriptModule::sMostRecentRunTime = 0;
+//static
+string ScriptModule::sBackgroundTextString = "";
+//static
+float ScriptModule::sBackgroundTextSize = 30;
+//static
+ofColor ScriptModule::sBackgroundTextColor = ofColor::white;
 
 static bool sPythonInitialized = false;
 static bool sHasPythonEverSuccessfullyInitialized = false;
@@ -845,7 +855,7 @@ void ScriptModule::OnCodeUpdated()
          if (mBoundModuleConnections[i].mLineText != lines[mBoundModuleConnections[i].mLineIndex])
          {
             bool found = false;
-            for (size_t j = 0; j < lines.size(); ++j)
+            for (int j = 0; j < (int)lines.size(); ++j)
             {
                if (lines[j] == mBoundModuleConnections[i].mLineText)
                {

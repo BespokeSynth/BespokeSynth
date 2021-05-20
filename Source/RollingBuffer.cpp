@@ -69,17 +69,23 @@ void RollingBuffer::WriteChunk(float* samples, int size, int channel)
    }
    
    mOffsetToNow[channel] = (mOffsetToNow[channel] + size) % Size();
+   if (channel != 0 && mOffsetToNow[channel] < mOffsetToNow[0] - gBufferSize * 2)   //channels out of sync, probably was only writing to channel 0 for a while
+      mOffsetToNow[channel] = mOffsetToNow[0];
 }
 
 void RollingBuffer::Write(float sample, int channel)
 {
    mBuffer.GetChannel(channel)[mOffsetToNow[channel]] = sample;
    mOffsetToNow[channel] = (mOffsetToNow[channel] + 1) % Size();
+   if (channel != 0 && mOffsetToNow[channel] < mOffsetToNow[0] - gBufferSize * 2)   //channels out of sync, probably was only writing to channel 0 for a while
+      mOffsetToNow[channel] = mOffsetToNow[0];
 }
 
 void RollingBuffer::ClearBuffer()
 {
    mBuffer.Clear();
+   for (int i=0; i<ChannelBuffer::kMaxNumChannels; ++i)
+      mOffsetToNow[i] = 0;
 }
 
 void RollingBuffer::Draw(int x, int y, int width, int height, int length /*= -1*/, int channel /*= -1*/, int delayOffset /*= 0*/)
@@ -103,35 +109,17 @@ void RollingBuffer::Draw(int x, int y, int width, int height, int length /*= -1*
          startSample = mOffsetToNow[0] - length - delayOffset;
       else
          startSample = mOffsetToNow[channel] - length - delayOffset;
-      if (startSample < 0)
+      while (startSample < 0)
          startSample += Size();
       int endSample = startSample + length;
 
-      if (endSample >= Size())
-      {
-         endSample -= Size();
-         int firstHalfSamples = Size() - startSample;
-         int widthFirstHalf = width * firstHalfSamples/length;
-         if (widthFirstHalf > 0)
-         {
-            if (channel == -1)
-               DrawAudioBuffer(widthFirstHalf, height, &mBuffer, startSample, Size() - 1, -1);
-            else
-               DrawAudioBuffer(widthFirstHalf, height, mBuffer.GetChannel(channel), startSample, Size() - 1, -1);
-         }
-         ofTranslate(widthFirstHalf,0);
-         if (channel == -1)
-            DrawAudioBuffer(width-widthFirstHalf, height, &mBuffer, 0, endSample, -1);
-         else
-            DrawAudioBuffer(width-widthFirstHalf, height, mBuffer.GetChannel(channel), 0, endSample, -1);
-      }
+      while (endSample >= Size())
+         endSample -= Size();     //draw wraparound
+
+      if (channel == -1)
+         DrawAudioBuffer(width, height, &mBuffer, startSample, endSample, -1, 1, ofColor::black, Size());
       else
-      {
-         if (channel == -1)
-            DrawAudioBuffer(width, height, &mBuffer, startSample, endSample, -1);
-         else
-            DrawAudioBuffer(width, height, mBuffer.GetChannel(channel), startSample, endSample, -1);
-      }
+         DrawAudioBuffer(width, height, mBuffer.GetChannel(channel), startSample, endSample, -1, 1, ofColor::black, Size());
    }
    
    ofPopMatrix();

@@ -22,7 +22,7 @@ public:
    static IDrawableModule* Create() { return new InputChannel(); }
    
    string GetTitleLabel() override { return "input"; }
-   void CreateUIControls();
+   void CreateUIControls() override;
    
    //IAudioReceiver
    InputMode GetInputMode() override { return mChannelSelectionIndex < mStereoSelectionOffset ? kInputMode_Mono : kInputMode_Multichannel; }

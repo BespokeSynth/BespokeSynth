@@ -340,6 +340,7 @@ private:
    int GetLayoutControlIndexForCable(PatchCableSource* cable) const;
    int GetLayoutControlIndexForMidi(MidiMessageType type, int control) const;
    string GetLayoutTooltip(int controlIndex);
+   void UpdateControllerIndex();
    
    float mVelocityMult;
    bool mUseChannelAsVoice;
@@ -361,6 +362,7 @@ private:
    bool mBindMode;
    Checkbox* mBindCheckbox;
    bool mTwoWay;
+   bool mSendTwoWayOnChange;
    ClickButton* mAddConnectionButton;
    std::list<MidiNote> mQueuedNotes;
    std::list<MidiControl> mQueuedControls;
@@ -375,6 +377,7 @@ private:
 
    int mControllerIndex;
    double mLastActivityTime;
+   double mLastConnectedActivityTime;
    IUIControl* mLastActivityUIControl;
    bool mLastActivityBound;
    double mLastBoundControlTime;

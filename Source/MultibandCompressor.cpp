@@ -63,7 +63,8 @@ void MultibandCompressor::Process(double time)
    SyncBuffers();
    
    int bufferSize = GetBuffer()->BufferSize();
-   if (GetTarget())
+   IAudioReceiver* target = GetTarget();
+   if (target)
    {
       Clear(mOutBuffer, bufferSize);
       
@@ -105,8 +106,8 @@ void MultibandCompressor::Process(double time)
       Mult(GetBuffer()->GetChannel(0), (1-mDryWet), bufferSize);
       Mult(mOutBuffer, mDryWet, bufferSize);
       
-      Add(GetTarget()->GetBuffer()->GetChannel(0), GetBuffer()->GetChannel(0), bufferSize);
-      Add(GetTarget()->GetBuffer()->GetChannel(0), mOutBuffer, bufferSize);
+      Add(target->GetBuffer()->GetChannel(0), GetBuffer()->GetChannel(0), bufferSize);
+      Add(target->GetBuffer()->GetChannel(0), mOutBuffer, bufferSize);
    }
    
    GetVizBuffer()->WriteChunk(GetBuffer()->GetChannel(0),bufferSize, 0);

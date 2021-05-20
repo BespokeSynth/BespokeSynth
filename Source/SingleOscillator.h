@@ -63,6 +63,7 @@ private:
    void DrawModuleUnclipped() override;
    void GetModuleDimensions(float& width, float& height) override { width = mWidth; height = mHeight; }
    bool Enabled() const override { return mEnabled; }
+   void UpdateOldControlName(string& oldName) override;
    
    float mWidth;
    float mHeight;
@@ -73,6 +74,7 @@ private:
    FloatSlider* mPhaseOffsetSlider;
    DropdownList* mOscSelector;
    FloatSlider* mPulseWidthSlider;
+   FloatSlider* mSoftenSlider;
    int mMult;
    DropdownList* mMultSelector;
    ADSRDisplay* mADSRDisplay;
@@ -87,7 +89,8 @@ private:
    FloatSlider* mVelToVolumeSlider;
    FloatSlider* mVelToEnvelopeSlider;
    
-   FloatSlider* mFilterCutoffSlider;
+   FloatSlider* mFilterCutoffMaxSlider;
+   FloatSlider* mFilterCutoffMinSlider;
    FloatSlider* mFilterQSlider;
    ADSRDisplay* mFilterADSRDisplay;
 

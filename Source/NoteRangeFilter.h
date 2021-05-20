@@ -37,11 +37,15 @@ public:
 private:
    //IDrawableModule
    void DrawModule() override;
-   void GetModuleDimensions(float& width, float& height) override { width = 90; height = 38; }
+   void GetModuleDimensions(float& width, float& height) override { width = mWidth; height = mHeight; }
    bool Enabled() const override { return mEnabled; }
    
+   float mWidth;
+   float mHeight;
    int mMinPitch;
    IntSlider* mMinPitchSlider;
    int mMaxPitch;
    IntSlider* mMaxPitchSlider;
+   bool mWrap;
+   Checkbox* mWrapCheckbox;
 };

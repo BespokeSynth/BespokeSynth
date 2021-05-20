@@ -212,6 +212,10 @@
 #include "UnstablePressure.h"
 #include "ChordHolder.h"
 #include "LooperGranulator.h"
+#include "AudioToPulse.h"
+#include "NoteCounter.h"
+#include "PitchRemap.h"
+#include "ModulatorExpression.h"
 
 #define REGISTER(class,name,type) Register(#name, &(class::Create), &(class::CanCreate), type, false, false);
 #define REGISTER_HIDDEN(class,name,type) Register(#name, &(class::Create), &(class::CanCreate), type, true, false);
@@ -230,16 +234,13 @@ ModuleFactory::ModuleFactory()
    REGISTER(LaunchpadKeyboard, gridkeyboard, kModuleType_Instrument);
    REGISTER(FMSynth, fmsynth, kModuleType_Synth);
    REGISTER(MidiController, midicontroller, kModuleType_Instrument);
-#ifdef BESPOKE_MAC
-   REGISTER(PSMoveController, psmove, kModuleType_Other);
-#endif
    REGISTER(SampleBank, samplebank, kModuleType_Other);
    REGISTER(SampleEditor, sampleeditor, kModuleType_Synth);
    REGISTER(Autotalent, autotalent, kModuleType_Audio);
    REGISTER(ScaleDetect, scaledetect, kModuleType_Note);
    REGISTER(KarplusStrong, karplusstrong, kModuleType_Synth);
    REGISTER(WhiteKeys, whitekeys, kModuleType_Note);
-   REGISTER(Kicker, kicker, kModuleType_Note);
+   //REGISTER(Kicker, kicker, kModuleType_Note);
    REGISTER(RingModulator, ringmodulator, kModuleType_Audio);
    REGISTER(Neighborhooder, notewrap, kModuleType_Note);
    REGISTER(Polyrhythms, polyrhythms, kModuleType_Instrument);
@@ -249,7 +250,7 @@ ModuleFactory::ModuleFactory()
    REGISTER(NoteRouter, noterouter, kModuleType_Note);
    REGISTER(AudioRouter, audiorouter, kModuleType_Audio);
    REGISTER(LaunchpadNoteDisplayer, gridnotedisplayer, kModuleType_Note);
-   REGISTER(Vocoder, vocoder, kModuleType_Audio);
+   REGISTER(Vocoder, fftvocoder, kModuleType_Audio);
    REGISTER(FreqDelay, freqdelay, kModuleType_Audio);
    REGISTER(VelocitySetter, velocitysetter, kModuleType_Note);
    REGISTER(NoteSinger, notesinger, kModuleType_Instrument);
@@ -259,7 +260,7 @@ ModuleFactory::ModuleFactory()
    REGISTER(Presets, presets, kModuleType_Other);
    REGISTER(NoteStepSequencer, notesequencer, kModuleType_Instrument);
    REGISTER(SingleOscillator, oscillator, kModuleType_Synth);
-   REGISTER(BandVocoder, bandvocoder, kModuleType_Audio);
+   REGISTER(BandVocoder, vocoder, kModuleType_Audio);
    REGISTER(Capo, capo, kModuleType_Note);
    REGISTER(VocoderCarrierInput, vocodercarrier, kModuleType_Audio);
    REGISTER(InputChannel, input, kModuleType_Audio);
@@ -267,7 +268,7 @@ ModuleFactory::ModuleFactory()
    //REGISTER(Eigenharp, eigenharp, kModuleType_Synth);
    REGISTER(Beats, beats, kModuleType_Synth);
    REGISTER(Sampler, sampler, kModuleType_Synth);
-   REGISTER(NoteTransformer, notetransformer, kModuleType_Note);
+   //REGISTER(NoteTransformer, notetransformer, kModuleType_Note);
    REGISTER(SliderSequencer, slidersequencer, kModuleType_Instrument);
    REGISTER(VelocityStepSequencer, velocitystepsequencer, kModuleType_Note);
    REGISTER(SustainPedal, sustainpedal, kModuleType_Note);
@@ -288,7 +289,7 @@ ModuleFactory::ModuleFactory()
    REGISTER(MidiOutputModule, midioutput, kModuleType_Note);
    REGISTER(NoteDisplayer, notedisplayer, kModuleType_Note);
    REGISTER(AudioMeter, audiometer, kModuleType_Audio);
-   REGISTER(NoteSustain, notesustain, kModuleType_Note);
+   REGISTER(NoteSustain, noteduration, kModuleType_Note);
    REGISTER(ControlSequencer, controlsequencer, kModuleType_Modulator);
    REGISTER(PitchSetter, pitchsetter, kModuleType_Note);
    REGISTER(NoteFilter, notefilter, kModuleType_Note);
@@ -356,7 +357,6 @@ ModuleFactory::ModuleFactory()
    REGISTER(PulseSequence, pulsesequence, kModuleType_Pulse);
    REGISTER(LinnstrumentControl, linnstrumentcontrol, kModuleType_Note);
    REGISTER(MultitapDelay, multitapdelay, kModuleType_Audio);
-   REGISTER(MidiCapturer, midicapturer, kModuleType_Note);
    REGISTER(Inverter, inverter, kModuleType_Audio);
    REGISTER(SpectralDisplay, spectrum, kModuleType_Audio);
    REGISTER(DCOffset, dcoffset, kModuleType_Audio);
@@ -392,10 +392,13 @@ ModuleFactory::ModuleFactory()
    REGISTER(UnstablePressure, unstablepressure, kModuleType_Note);
    REGISTER(ChordHolder, chordholder, kModuleType_Note);
    REGISTER(LooperGranulator, loopergranulator, kModuleType_Other);
+   REGISTER(AudioToPulse, audiotopulse, kModuleType_Pulse);
+   REGISTER(NoteCounter, notecounter, kModuleType_Instrument);
+   REGISTER(PitchRemap, pitchremap, kModuleType_Note);
+   REGISTER(ModulatorExpression, expression, kModuleType_Modulator);
+   REGISTER(SampleCanvas, samplecanvas, kModuleType_Synth);
 
    //REGISTER_EXPERIMENTAL(MidiPlayer, midiplayer, kModuleType_Instrument);
-   REGISTER_EXPERIMENTAL(Razor, razor, kModuleType_Synth);
-   REGISTER_EXPERIMENTAL(SampleCanvas, samplecanvas, kModuleType_Synth);
    REGISTER_EXPERIMENTAL(LoopStorer, loopstorer, kModuleType_Other);
    REGISTER_EXPERIMENTAL(PitchChorus, pitchchorus, kModuleType_Audio);
 
@@ -418,11 +421,14 @@ ModuleFactory::ModuleFactory()
    REGISTER_HIDDEN(ClipLauncher, cliplauncher, kModuleType_Synth);
 #ifdef BESPOKE_MAC
    REGISTER_HIDDEN(KompleteKontrol, kompletekontrol, kModuleType_Note);
+   REGISTER_HIDDEN(PSMoveController, psmove, kModuleType_Other);
 #endif
    REGISTER_HIDDEN(ControlTactileFeedback, controltactilefeedback, kModuleType_Synth);
    REGISTER_HIDDEN(FloatSliderLFOControl, lfo, kModuleType_Other);
    REGISTER_HIDDEN(EnvelopeEditor, envelopeeditor, kModuleType_Other);
    REGISTER_HIDDEN(LFOController, lfocontroller, kModuleType_Other); //old, probably irrelevant
+   REGISTER_HIDDEN(Razor, razor, kModuleType_Synth);
+   REGISTER_HIDDEN(MidiCapturer, midicapturer, kModuleType_Note);
 }
 
 void ModuleFactory::Register(string type, CreateModuleFn creator, CanCreateModuleFn canCreate, ModuleType moduleType, bool hidden, bool experimental)
@@ -496,6 +502,13 @@ vector<string> ModuleFactory::GetSpawnableModules(char c)
          modules.push_back(midicontroller + " " + kMidiControllerSuffix);
    }
 
+   vector<string> effects = TheSynth->GetEffectFactory()->GetSpawnableEffects();
+   for (auto effect : effects)
+   {
+      if (tolower(effect[0]) == c)
+         modules.push_back(effect + " " + kEffectChainSuffix);
+   }
+
    sort(modules.begin(), modules.end());
    return modules;
 }
@@ -508,6 +521,8 @@ ModuleType ModuleFactory::GetModuleType(string typeName)
       return kModuleType_Synth;
    if (juce::String(typeName).endsWith(kMidiControllerSuffix))
       return kModuleType_Instrument;
+   if (juce::String(typeName).endsWith(kEffectChainSuffix))
+      return kModuleType_Audio;
    return kModuleType_Other;
 }
 

@@ -311,14 +311,6 @@ void EventCanvas::GetModuleDimensions(float& width, float& height)
    height = mCanvas->GetHeight() + extraH;
 }
 
-namespace
-{
-   bool ElementSort(EventCanvasElement* a, EventCanvasElement* b)
-   {
-      return a->GetStart() < b->GetStart();
-   }
-}
-
 void EventCanvas::CheckboxUpdated(Checkbox* checkbox)
 {
    if (checkbox == mEnabledCheckbox)

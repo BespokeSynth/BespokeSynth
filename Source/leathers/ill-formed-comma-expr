@@ -1,0 +1,32 @@
+// This file generated automatically:
+// https://github.com/ruslo/sugar/wiki/Cross-platform-warning-suppression
+
+// Copyright (c) 2014, Ruslan Baratov
+// All rights reserved.
+
+#if !defined(LEATHERS_PUSH_)
+# error "`leathers/ill-formed-comma-expr` used "
+      "without `leathers/push`, "
+      "see README.txt for more info"
+#endif
+
+#if defined(LEATHERS_ILL_FORMED_COMMA_EXPR_)
+# error "`leathers/ill-formed-comma-expr` "
+    "already included; see README.txt for more info"
+#else
+# define LEATHERS_ILL_FORMED_COMMA_EXPR_
+#endif
+
+#if (__clang__)
+# if __has_warning("-Wunused-value")
+#  pragma clang diagnostic ignored "-Wunused-value"
+# endif
+#endif
+
+#if (__GNUC__)
+# pragma GCC diagnostic ignored "-Wunused-value"
+#endif
+
+#if (_MSC_VER)
+# pragma warning(disable: 4548)
+#endif

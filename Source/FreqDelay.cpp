@@ -39,7 +39,9 @@ void FreqDelay::Process(double time)
 {
    PROFILER(FreqDelay);
 
-   if (GetTarget() == nullptr)
+   IAudioReceiver* target = GetTarget();
+
+   if (target == nullptr)
       return;
    
    SyncBuffers();
@@ -55,7 +57,7 @@ void FreqDelay::Process(double time)
       Mult(mDryBuffer.GetChannel(ch), (1-mDryWet), bufferSize);
       Mult(GetBuffer()->GetChannel(ch), mDryWet, bufferSize);
       Add(GetBuffer()->GetChannel(ch), mDryBuffer.GetChannel(ch), bufferSize);
-      Add(GetTarget()->GetBuffer()->GetChannel(ch), GetBuffer()->GetChannel(ch), bufferSize);
+      Add(target->GetBuffer()->GetChannel(ch), GetBuffer()->GetChannel(ch), bufferSize);
       GetVizBuffer()->WriteChunk(GetBuffer()->GetChannel(ch),bufferSize, ch);
    }
 

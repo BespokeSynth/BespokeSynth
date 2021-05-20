@@ -18,6 +18,7 @@
 #include "DropdownList.h"
 #include "IDrawableModule.h"
 #include "INoteSource.h"
+#include "TextEntry.h"
 
 class Polyrhythms;
 
@@ -38,11 +39,11 @@ public:
    int mLength;
    DropdownList* mLengthSelector;
    int mNote;
-   DropdownList* mNoteSelector;
+   TextEntry* mNoteSelector;
    Polyrhythms* mOwner;
 };
 
-class Polyrhythms : public IDrawableModule, public INoteSource, public IAudioPoller, public IFloatSliderListener, public IDropdownListener
+class Polyrhythms : public INoteSource, public IDrawableModule, public IAudioPoller, public IDropdownListener, public ITextEntryListener
 {
 public:
    Polyrhythms();
@@ -63,9 +64,8 @@ public:
    void MouseReleased() override;
    bool MouseMoved(float x, float y) override;
    
-   void CheckboxUpdated(Checkbox* checkbox) override;
-   void FloatSliderUpdated(FloatSlider* slider, float oldVal) override;
    void DropdownUpdated(DropdownList* list, int oldVal) override;
+   void TextEntryComplete(TextEntry* entry) override {}
    
    virtual void LoadLayout(const ofxJSONElement& moduleInfo) override;
    virtual void SetUpFromSaveData() override;

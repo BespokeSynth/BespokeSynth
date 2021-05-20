@@ -1,0 +1,24 @@
+// This file generated automatically:
+// https://github.com/ruslo/sugar/wiki/Cross-platform-warning-suppression
+
+// Copyright (c) 2014, Ruslan Baratov
+// All rights reserved.
+
+#if !defined(LEATHERS_PUSH_)
+# error "`leathers/extra-semi` used "
+      "without `leathers/push`, "
+      "see README.txt for more info"
+#endif
+
+#if defined(LEATHERS_EXTRA_SEMI_)
+# error "`leathers/extra-semi` "
+    "already included; see README.txt for more info"
+#else
+# define LEATHERS_EXTRA_SEMI_
+#endif
+
+#if (__clang__)
+# if __has_warning("-Wextra-semi")
+#  pragma clang diagnostic ignored "-Wextra-semi"
+# endif
+#endif

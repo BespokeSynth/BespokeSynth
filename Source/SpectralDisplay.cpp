@@ -56,10 +56,12 @@ void SpectralDisplay::Process(double time)
       return;
    
    SyncBuffers();
+
+   IAudioReceiver* target = GetTarget();
    
-   if (GetTarget())
+   if (target)
    {
-      ChannelBuffer* out = GetTarget()->GetBuffer();
+      ChannelBuffer* out = target->GetBuffer();
       for (int ch=0; ch<GetBuffer()->NumActiveChannels(); ++ch)
       {
          if (ch == 0)

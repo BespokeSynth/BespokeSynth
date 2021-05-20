@@ -36,8 +36,8 @@ public:
    void SendString(string address, string val);
 
    //INoteReceiver
-   void PlayNote(double time, int pitch, int velocity, int voiceIdx, ModulationParameters modulation);
-   void SendCC(int control, int value, int voiceIdx = -1) {}
+   void PlayNote(double time, int pitch, int velocity, int voiceIdx, ModulationParameters modulation) override;
+   void SendCC(int control, int value, int voiceIdx = -1) override {}
    
    void FloatSliderUpdated(FloatSlider* slider, float oldVal) override;
    void TextEntryComplete(TextEntry* entry) override;

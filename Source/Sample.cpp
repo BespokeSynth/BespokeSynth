@@ -45,7 +45,7 @@ bool Sample::Read(const char* path, bool mono, ReadType readType)
    
    if (mReader != nullptr)
    {
-      mData.Resize(mReader->lengthInSamples);
+      mData.Resize((int)mReader->lengthInSamples);
       if (mono)
          mData.SetNumActiveChannels(1);
       else

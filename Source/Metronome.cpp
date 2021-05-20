@@ -18,7 +18,7 @@ Metronome::Metronome()
 , mVolume(.5f)
 , mVolumeSlider(nullptr)
 {
-   TheTransport->AddListener(this, kInterval_4n, OffsetInfo(0, true), false);
+   mTransportListenerInfo = TheTransport->AddListener(this, kInterval_4n, OffsetInfo(0, true), false);
 }
 
 void Metronome::CreateUIControls()
@@ -36,11 +36,13 @@ void Metronome::Process(double time)
 {
    PROFILER(Metronome);
 
-   if (!mEnabled || GetTarget() == nullptr)
+   IAudioReceiver* target = GetTarget();
+
+   if (!mEnabled || target == nullptr)
       return;
 
-   int bufferSize = GetTarget()->GetBuffer()->BufferSize();
-   float* out = GetTarget()->GetBuffer()->GetChannel(0);
+   int bufferSize = target->GetBuffer()->BufferSize();
+   float* out = target->GetBuffer()->GetChannel(0);
    assert(bufferSize == gBufferSize);
 
    for (int i=0; i<bufferSize; ++i)
@@ -58,7 +60,7 @@ void Metronome::Process(double time)
 
 void Metronome::OnTimeEvent(double time)
 {
-   int step = TheTransport->GetQuantized(time,kInterval_4n);
+   int step = TheTransport->GetQuantized(time, mTransportListenerInfo);
    if (step == 0)
    {
       mPhaseInc = GetPhaseInc(880);

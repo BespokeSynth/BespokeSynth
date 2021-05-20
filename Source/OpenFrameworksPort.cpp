@@ -739,7 +739,8 @@ ofColor ofColor::operator+(const ofColor& other)
 
 void RetinaTrueTypeFont::LoadFont(string path)
 {
-   File file(ofToDataPath(path).c_str());
+   mFontPath = ofToDataPath(path);
+   File file(mFontPath.c_str());
    if (file.existsAsFile())
    {
       mFontHandle = nvgCreateFont(gNanoVG, path.c_str(), path.c_str());

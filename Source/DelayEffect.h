@@ -36,7 +36,7 @@ public:
    void SetFeedback(float feedback) { mFeedback = feedback; }
    void Clear() { mDelayBuffer.ClearBuffer(); }
    void SetDry(bool dry) { mDry = dry; }
-   void SetFeedbackModuleMode(bool feedbackMode);
+   void SetFeedbackModuleMode();
    
    //IAudioEffect
    void ProcessAudio(double time, ChannelBuffer* buffer) override;
@@ -74,8 +74,10 @@ private:
    Ramp mAmountRamp;
    bool mAcceptInput;
    bool mDry;
+   bool mInvert;
    Checkbox* mDryCheckbox;
    Checkbox* mAcceptInputCheckbox;
+   Checkbox* mInvertCheckbox;
    
    float mWidth;
    float mHeight;

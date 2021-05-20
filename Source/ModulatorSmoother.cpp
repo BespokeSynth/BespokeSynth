@@ -32,6 +32,7 @@ void ModulatorSmoother::CreateUIControls()
    mSmoothSlider->SetMode(FloatSlider::kSquare);
    
    mTargetCable = new PatchCableSource(this, kConnectionType_UIControl);
+   mTargetCable->SetModulatorOwner(this);
    AddPatchCableSource(mTargetCable);
 }
 

@@ -56,7 +56,11 @@ void NoteDelayer::DrawModule()
 void NoteDelayer::CheckboxUpdated(Checkbox *checkbox)
 {
    if (checkbox == mEnabledCheckbox)
+   {
       mNoteOutput.Flush(gTime);
+      mAppendIndex = 0;
+      mConsumeIndex = 0;
+   }
 }
 
 void NoteDelayer::OnTransportAdvanced(float amount)

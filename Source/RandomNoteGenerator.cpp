@@ -94,7 +94,12 @@ void RandomNoteGenerator::FloatSliderUpdated(FloatSlider* slider, float oldVal)
 {
    if (slider == mOffsetSlider)
    {
-      TheTransport->UpdateListener(this, mInterval, OffsetInfo(mOffset/TheTransport->CountInStandardMeasure(mInterval), !K(offsetIsInMs)));
+      TransportListenerInfo* transportListenerInfo = TheTransport->GetListenerInfo(this);
+      if (transportListenerInfo != nullptr)
+      {
+         transportListenerInfo->mInterval = mInterval;
+         transportListenerInfo->mOffsetInfo = OffsetInfo(mOffset / TheTransport->CountInStandardMeasure(mInterval), !K(offsetIsInMs));
+      }
    }
 }
 
@@ -108,7 +113,12 @@ void RandomNoteGenerator::DropdownUpdated(DropdownList* list, int oldVal)
 {
    if (list == mIntervalSelector)
    {
-      TheTransport->UpdateListener(this, mInterval, OffsetInfo(mOffset/TheTransport->CountInStandardMeasure(mInterval), !K(offsetIsInMs)));
+      TransportListenerInfo* transportListenerInfo = TheTransport->GetListenerInfo(this);
+      if (transportListenerInfo != nullptr)
+      {
+         transportListenerInfo->mInterval = mInterval;
+         transportListenerInfo->mOffsetInfo = OffsetInfo(mOffset / TheTransport->CountInStandardMeasure(mInterval), !K(offsetIsInMs));
+      }
    }
 }
 

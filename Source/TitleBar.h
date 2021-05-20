@@ -88,10 +88,13 @@ public:
    void DropdownUpdated(DropdownList* list, int oldVal) override;
    void ButtonClicked(ClickButton* button) override;
    void FloatSliderUpdated(FloatSlider* slider, float oldVal) override {}
+
+   static bool sShowInitialHelpOverlay;
    
 private:
    //IDrawableModule
    void DrawModule() override;
+   void DrawModuleUnclipped() override;
    bool Enabled() const override { return true; }
    void GetModuleDimensions(float& width, float& height) override;
    

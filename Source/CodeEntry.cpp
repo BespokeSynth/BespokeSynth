@@ -19,8 +19,12 @@
 #undef ssize_t
 #endif
 
-#include "pybind11/embed.h"
-#include "pybind11/stl.h"
+#include "leathers/push"
+#include "leathers/unused-value"
+#include "leathers/range-loop-analysis"
+   #include "pybind11/embed.h"
+   #include "pybind11/stl.h"
+#include "leathers/pop"
 
 namespace py = pybind11;
 
@@ -101,7 +105,9 @@ void CodeEntry::Poll()
                            auto params = signature.attr("params").cast< std::vector<py::object> >();
                            mAutocompleteSignatures[i].params.resize(params.size());
                            for (size_t j = 0; j < params.size(); ++j)
-                              mAutocompleteSignatures[i].params[j] = juce::String(params[j].attr("description").str()).replace("param ","").toStdString();
+                              mAutocompleteSignatures[i].params[j] = juce::String(py::str(params[j].attr("description"))).replace("param ","").toStdString();
+                           auto bracket_start = signature.attr("bracket_start").cast< std::tuple<int, int> >();
+                           mAutocompleteSignatures[i].caretPos = GetCaretPosition(get<1>(bracket_start), get<0>(bracket_start)-2);
                            ++i;
                         }
                         else
@@ -124,21 +130,61 @@ void CodeEntry::Poll()
                      {
                         mWantToShowAutocomplete = true;
                         mAutocompleteHighlightIndex = 0;
-                        for (auto autocomplete : autocompletes)
+                        bool isPathAutocomplete = false;
+                        if (mAutocompleteSignatures.size() > 0 &&
+                            mAutocompleteSignatures[0].valid &&
+                            mAutocompleteSignatures[0].params.size() > 0 &&
+                            mAutocompleteSignatures[0].params[0] == "path")
+                           isPathAutocomplete = true;
+
+                        if (!isPathAutocomplete) //normal autocomplete
                         {
-                           //ofLog() << "    --" << autocomplete;
-                           string full = autocomplete.attr("name").str();
-                           string rest = autocomplete.attr("complete").str();
-                           if (i < mAutocompletes.size())// && full.length() > rest.length())
+                           for (auto autocomplete : autocompletes)
                            {
-                              mAutocompletes[i].valid = true;
-                              mAutocompletes[i].autocompleteFull = full;
-                              mAutocompletes[i].autocompleteRest = rest;
-                              ++i;
+                              //ofLog() << "    --" << autocomplete;
+                              string full = py::str(autocomplete.attr("name"));
+                              string rest = py::str(autocomplete.attr("complete"));
+                              if (!((juce::String)full).startsWith("__") && i < mAutocompletes.size())
+                              {
+                                 mAutocompletes[i].valid = true;
+                                 mAutocompletes[i].autocompleteFull = full;
+                                 mAutocompletes[i].autocompleteRest = rest;
+                                 ++i;
+                              }
+                              else
+                              {
+                                 break;
+                              }
                            }
-                           else
+                        }
+                        else //we're autocompleting a path, look for matching instantiated module names
+                        {
+                           int stringStart = mAutocompleteSignatures[0].caretPos + 2;
+                           string writtenSoFar = mString.substr(stringStart, mCaretPosition - stringStart);
+
+                           vector<IDrawableModule*> modules;
+                           TheSynth->GetAllModules(modules);
+
+                           for (auto module : modules)
                            {
-                              break;
+                              juce::String modulePath = module->Path();
+                              if (modulePath.startsWith(writtenSoFar))
+                              {
+                                 string full = modulePath.toStdString();
+                                 string rest = full;
+                                 ofStringReplace(rest, writtenSoFar, "", true);
+                                 if (i < mAutocompletes.size())
+                                 {
+                                    mAutocompletes[i].valid = true;
+                                    mAutocompletes[i].autocompleteFull = full;
+                                    mAutocompletes[i].autocompleteRest = rest;
+                                    ++i;
+                                 }
+                                 else
+                                 {
+                                    break;
+                                 }
+                              }
                            }
                         }
                      }
@@ -360,7 +406,7 @@ void CodeEntry::RenderOverlay()
    {
       if (mAutocompletes[i].valid)
       {
-         int charactersLeft = mAutocompletes[i].autocompleteFull.length() - mAutocompletes[i].autocompleteRest.length();
+         int charactersLeft = (int)mAutocompletes[i].autocompleteFull.length() - (int)mAutocompletes[i].autocompleteRest.length();
          float x = caretPos.x - charactersLeft * mCharWidth;
          float y = caretPos.y + mCharHeight * (i + 2) - 2;
          if (i == mAutocompleteHighlightIndex)
@@ -930,9 +976,9 @@ void CodeEntry::OnKeyPressed(int key, bool isRepeat)
 
 void CodeEntry::AcceptAutocompletion()
 {
-   juce::String clipboard = SystemClipboard::getTextFromClipboard();
    AddString(mAutocompletes[mAutocompleteHighlightIndex].autocompleteRest);
    mAutocompleteUpdateTimer = 0;
+   mWantToShowAutocomplete = false;
 }
 
 void CodeEntry::Publish()
@@ -940,7 +986,7 @@ void CodeEntry::Publish()
    mPublishedString = mString;
    mLastPublishTime = gTime;
    mLastPublishedLineStart = 0;
-   mLastPublishedLineEnd = GetLines().size();
+   mLastPublishedLineEnd = (int)GetLines().size();
    OnCodeUpdated();
 }
 

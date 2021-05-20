@@ -49,13 +49,15 @@ void RingModulator::Process(double time)
 {
    PROFILER(RingModulator);
 
-   if (GetTarget() == nullptr)
+   IAudioReceiver* target = GetTarget();
+
+   if (target == nullptr)
       return;
    
    SyncBuffers();
    mDryBuffer.SetNumActiveChannels(GetBuffer()->NumActiveChannels());
 
-   int bufferSize = GetTarget()->GetBuffer()->BufferSize();
+   int bufferSize = target->GetBuffer()->BufferSize();
 
    if (mEnabled)
    {
@@ -85,7 +87,7 @@ void RingModulator::Process(double time)
          Add(GetBuffer()->GetChannel(ch), mDryBuffer.GetChannel(ch), GetBuffer()->BufferSize());
       }
       
-      Add(GetTarget()->GetBuffer()->GetChannel(ch), GetBuffer()->GetChannel(ch), GetBuffer()->BufferSize());
+      Add(target->GetBuffer()->GetChannel(ch), GetBuffer()->GetChannel(ch), GetBuffer()->BufferSize());
       GetVizBuffer()->WriteChunk(GetBuffer()->GetChannel(ch), GetBuffer()->BufferSize(), ch);
    }
 
@@ -111,6 +113,7 @@ void RingModulator::PlayNote(double time, int pitch, int velocity, int voiceIdx,
    {
       float freq = TheScale->PitchToFreq(pitch);
       mFreqRamp.Start(time, freq, time + mGlideTime);
+      mFreq = freq;
    }
 }
 

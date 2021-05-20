@@ -158,7 +158,9 @@ void LoopStorer::DropdownUpdated(DropdownList* list, int oldVal)
 {
    if (list == mQuantizationDropdown)
    {
-      TheTransport->UpdateListener(this, mQuantization);
+      TransportListenerInfo* transportListenerInfo = TheTransport->GetListenerInfo(this);
+      if (transportListenerInfo != nullptr)
+         transportListenerInfo->mInterval = mQuantization;
    }
 }
 
@@ -236,7 +238,9 @@ void LoopStorer::SetUpFromSaveData()
    }
    
    mQuantization = mModuleSaveData.GetEnum<NoteInterval>("quantization");
-   TheTransport->UpdateListener(this, mQuantization);
+   TransportListenerInfo* transportListenerInfo = TheTransport->GetListenerInfo(this);
+   if (transportListenerInfo != nullptr)
+      transportListenerInfo->mInterval = mQuantization;
 }
 
 namespace

@@ -28,7 +28,7 @@ PulseSequence::PulseSequence()
    for (int i=0; i<kMaxSteps; ++i)
       mVels[i] = 1;
    
-   TheTransport->AddListener(this, mInterval, OffsetInfo(0, true), false);
+   mTransportListenerInfo = TheTransport->AddListener(this, mInterval, OffsetInfo(0, true), false);
    TheTransport->AddAudioPoller(this);
 }
 
@@ -57,6 +57,7 @@ void PulseSequence::CreateUIControls()
    
    mVelocityGrid->SetGridMode(UIGrid::kMultisliderBipolar);
    mVelocityGrid->SetListener(this);
+   mVelocityGrid->SetRequireShiftForMultislider(true);
    for (int i=0; i<kMaxSteps; ++i)
       mVelocityGrid->SetVal(i, 0, mVels[i], !K(notifyListener));
    
@@ -144,13 +145,18 @@ void PulseSequence::Step(double time, float velocity, int flags)
       mStep = 0;
    else if (flags & kPulseFlag_Random)
       mStep = rand() % mLength;
-   
+
    if (flags & kPulseFlag_SyncToTransport)
    {
-      int stepsPerMeasure = TheTransport->CountInStandardMeasure(mInterval) * TheTransport->GetTimeSigTop()/TheTransport->GetTimeSigBottom();
+      mStep = TheTransport->GetSyncedStep(time, this, mTransportListenerInfo, mLength);
+   }
+   
+   if (flags & kPulseFlag_Align)
+   {
+      int stepsPerMeasure = TheTransport->GetStepsPerMeasure(this);
       int numMeasures = ceil(float(mLength) / stepsPerMeasure);
       int measure = TheTransport->GetMeasure(time) % numMeasures;
-      mStep = ((TheTransport->GetQuantized(time, mInterval) % stepsPerMeasure) + measure * stepsPerMeasure) % mLength;
+      mStep = ((TheTransport->GetQuantized(time, mTransportListenerInfo) % stepsPerMeasure) + measure * stepsPerMeasure) % mLength;
    }
    
    float v = mVels[mStep] * velocity;
@@ -209,7 +215,11 @@ void PulseSequence::ButtonClicked(ClickButton* button)
 void PulseSequence::DropdownUpdated(DropdownList* list, int oldVal)
 {
    if (list == mIntervalSelector)
-      TheTransport->UpdateListener(this, mInterval);
+   {
+      TransportListenerInfo* transportListenerInfo = TheTransport->GetListenerInfo(this);
+      if (transportListenerInfo != nullptr)
+         transportListenerInfo->mInterval = mInterval;
+   }
 }
 
 void PulseSequence::FloatSliderUpdated(FloatSlider* slider, float oldVal)
@@ -236,7 +246,7 @@ void PulseSequence::GridUpdated(UIGrid* grid, int col, int row, float value, flo
 
 namespace
 {
-   const int kSaveStateRev = 1;
+   const int kSaveStateRev = 2;
 }
 
 void PulseSequence::SaveState(FileStreamOut& out)
@@ -246,6 +256,7 @@ void PulseSequence::SaveState(FileStreamOut& out)
    out << kSaveStateRev;
    
    mVelocityGrid->SaveState(out);
+   out << mHasExternalPulseSource;
 }
 
 void PulseSequence::LoadState(FileStreamIn& in)
@@ -254,10 +265,13 @@ void PulseSequence::LoadState(FileStreamIn& in)
    
    int rev;
    in >> rev;
-   LoadStateValidate(rev == kSaveStateRev);
+   LoadStateValidate(rev <= kSaveStateRev);
    
    mVelocityGrid->LoadState(in);
    GridUpdated(mVelocityGrid, 0, 0, 0, 0);
+
+   if (rev >= 2)
+      in >> mHasExternalPulseSource;
 }
 
 void PulseSequence::SaveLayout(ofxJSONElement& moduleInfo)

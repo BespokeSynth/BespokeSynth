@@ -42,14 +42,15 @@ void AudioRouter::Process(double time)
 {
    PROFILER(AudioRouter);
 
-   if (GetTarget() == nullptr)
+   IAudioReceiver* target = GetTarget();
+   if (target == nullptr)
       return;
 
    SyncBuffers();
 
    for (int ch=0; ch<GetBuffer()->NumActiveChannels(); ++ch)
    {
-      Add(GetTarget()->GetBuffer()->GetChannel(ch), GetBuffer()->GetChannel(ch), GetBuffer()->BufferSize());
+      Add(target->GetBuffer()->GetChannel(ch), GetBuffer()->GetChannel(ch), GetBuffer()->BufferSize());
       GetVizBuffer()->WriteChunk(GetBuffer()->GetChannel(ch),GetBuffer()->BufferSize(), ch);
    }
 

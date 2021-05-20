@@ -28,6 +28,7 @@ void VelocityToCV::CreateUIControls()
 {
    IDrawableModule::CreateUIControls();
    mTargetCable = new PatchCableSource(this, kConnectionType_UIControl);
+   mTargetCable->SetModulatorOwner(this);
    AddPatchCableSource(mTargetCable);
    
    mMinSlider = new FloatSlider(this, "min", 3, 2, 100, 15, &mDummyMin, 0, 1);

@@ -244,7 +244,9 @@ void SamplePlayer::Process(double time)
 {
    PROFILER(SamplePlayer);
    
-   if (!mEnabled || GetTarget() == nullptr || mSample == nullptr)
+   IAudioReceiver* target = GetTarget();
+
+   if (!mEnabled || target == nullptr || mSample == nullptr)
       return;
    
    mNoteInputBuffer.Process(time);
@@ -252,7 +254,7 @@ void SamplePlayer::Process(double time)
    ComputeSliders(0);
    SyncOutputBuffer(mSample->NumChannels());
    
-   int bufferSize = GetTarget()->GetBuffer()->BufferSize();
+   int bufferSize = target->GetBuffer()->BufferSize();
    assert(bufferSize == gBufferSize);
    
    float volSq = mVolume * mVolume;
@@ -298,7 +300,7 @@ void SamplePlayer::Process(double time)
             mSwitchAndRampVal.GetChannel(ch)[0] = 0;
       }
 
-      Add(GetTarget()->GetBuffer()->GetChannel(ch), gWorkChannelBuffer.GetChannel(ch), bufferSize);
+      Add(target->GetBuffer()->GetChannel(ch), gWorkChannelBuffer.GetChannel(ch), bufferSize);
       GetVizBuffer()->WriteChunk(gWorkChannelBuffer.GetChannel(ch), bufferSize, ch);
       mLastOutputSample.GetChannel(ch)[0] = gWorkChannelBuffer.GetChannel(ch)[bufferSize-1];
    }
@@ -703,7 +705,7 @@ void SamplePlayer::LoadFile()
 void SamplePlayer::FillData(vector<float> data)
 {
    Sample* sample = new Sample();
-   sample->Create(data.size());
+   sample->Create((int)data.size());
    float* sampleData = sample->Data()->GetChannel(0);
    for (size_t i = 0; i < data.size(); ++i)
       sampleData[i] = data[i];
@@ -724,30 +726,9 @@ void SamplePlayer::OnClicked(int x, int y, bool right)
 
       if (lengthSeconds > 0 && mCueClipGrabRect.contains(x,y))
       {
-         int startSamples = startSeconds * gSampleRate * mSample->GetSampleRateRatio();
-         int lengthSamplesSrc = lengthSeconds * gSampleRate * mSample->GetSampleRateRatio();
-         if (startSamples >= mSample->Data()->BufferSize())
-            startSamples = mSample->Data()->BufferSize() - 1;
-         if (startSamples + lengthSamplesSrc >= mSample->Data()->BufferSize())
-            lengthSamplesSrc = mSample->Data()->BufferSize() - 1 - startSamples;
-         int lengthSamplesDest = lengthSamplesSrc / speed / mSample->GetSampleRateRatio();
-         ChannelBuffer grab(lengthSamplesDest);
-         grab.SetNumActiveChannels(mSample->Data()->NumActiveChannels());
-         /*for (int ch = 0; ch < grab.NumActiveChannels(); ++ch)
-         {
-            BufferCopy(grab.GetChannel(ch), mSample->Data()->GetChannel(ch) + startSamples, lengthSamplesSrc);
-         }*/
-
-         for (int ch = 0; ch < grab.NumActiveChannels(); ++ch)
-         {
-            for (int i = 0; i < lengthSamplesDest; ++i)
-            {
-               float offset = i * speed * mSample->GetSampleRateRatio();
-               grab.GetChannel(ch)[i] = GetInterpolatedSample(offset, mSample->Data()->GetChannel(ch) + startSamples, lengthSamplesSrc);
-            }
-         }
-
-         TheSynth->GrabSample(&grab, false, 1);
+         ChannelBuffer* data = GetCueSampleData(mActiveCuePointIndex);
+         TheSynth->GrabSample(data, false, 1);
+         delete data;
       }
    }
 
@@ -766,6 +747,38 @@ void SamplePlayer::OnClicked(int x, int y, bool right)
       if (mSetCuePoint)
          SetCuePointForX(x);
    }
+}
+
+ChannelBuffer* SamplePlayer::GetCueSampleData(int cueIndex)
+{
+   float startSeconds, lengthSeconds, speed;
+   GetPlayInfoForPitch(cueIndex, startSeconds, lengthSeconds, speed);
+   if (lengthSeconds <= 0)
+      lengthSeconds = 1;
+   int startSamples = startSeconds * gSampleRate * mSample->GetSampleRateRatio();
+   int lengthSamplesSrc = lengthSeconds * gSampleRate * mSample->GetSampleRateRatio();
+   if (startSamples >= mSample->Data()->BufferSize())
+      startSamples = mSample->Data()->BufferSize() - 1;
+   if (startSamples + lengthSamplesSrc >= mSample->Data()->BufferSize())
+      lengthSamplesSrc = mSample->Data()->BufferSize() - 1 - startSamples;
+   int lengthSamplesDest = lengthSamplesSrc / speed / mSample->GetSampleRateRatio();
+   ChannelBuffer* data = new ChannelBuffer(lengthSamplesDest);
+   data->SetNumActiveChannels(mSample->Data()->NumActiveChannels());
+   /*for (int ch = 0; ch < data->NumActiveChannels(); ++ch)
+   {
+      BufferCopy(data->GetChannel(ch), mSample->Data()->GetChannel(ch) + startSamples, lengthSamplesSrc);
+   }*/
+
+   for (int ch = 0; ch < data->NumActiveChannels(); ++ch)
+   {
+      for (int i = 0; i < lengthSamplesDest; ++i)
+      {
+         float offset = i * speed * mSample->GetSampleRateRatio();
+         data->GetChannel(ch)[i] = GetInterpolatedSample(offset, mSample->Data()->GetChannel(ch) + startSamples, lengthSamplesSrc);
+      }
+   }
+   
+   return data;
 }
 
 bool SamplePlayer::MouseMoved(float x, float y)
@@ -956,7 +969,6 @@ void SamplePlayer::DrawModule()
       ofSetColor(255, 255, 255);
       DrawTextNormal(mSample->Name(), 5, 27);
 
-      float lengthSeconds = mSample->LengthInSamples() / (gSampleRate * mSample->GetSampleRateRatio());
       float x = ofMap(mSample->GetPlayPosition(), GetZoomStartSample(), GetZoomEndSample(), 0, sampleWidth);
       DrawTextNormal(ofToString(mSample->GetPlayPosition() / (gSampleRate * mSample->GetSampleRateRatio()), 1), x + 2, mHeight - 65, 11);
 

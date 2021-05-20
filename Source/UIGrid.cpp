@@ -24,6 +24,7 @@ UIGrid::UIGrid(int x, int y, int w, int h, int cols, int rows, IClickable* paren
 , mGridMode(kNormal)
 , mHoldCol(0)
 , mHoldRow(0)
+, mLastClickWasClear(false)
 , mRestrictDragToRow(false)
 , mRequireShiftForMultislider(false)
 , mShouldDrawValue(false)
@@ -192,6 +193,7 @@ void UIGrid::OnClicked(int x, int y, bool right)
       return;
    
    mClick = true;
+   mLastClickWasClear = false;
 
    float clickHeight, clickWidth;
    GridCell cell = GetGridCellAt(x, y, &clickHeight, &clickWidth);
@@ -207,9 +209,14 @@ void UIGrid::OnClicked(int x, int y, bool right)
       else
       {
          if (mData[dataIndex] > 0)
+         {
             mData[dataIndex] = 0;
+            mLastClickWasClear = true;
+         }
          else
+         {
             mData[dataIndex] = 1;
+         }
       }
    }
    else if (mGridMode == kHorislider)
@@ -231,17 +238,27 @@ void UIGrid::OnClicked(int x, int y, bool right)
          }
 
          if (mData[dataIndex] > 0)
+         {
             mData[dataIndex] = 0;
+            mLastClickWasClear = true;
+         }
          else
+         {
             mData[dataIndex] = val;
+         }
       }
    }
    else
    {
       if (mData[dataIndex] == mStrength)
+      {
          mData[dataIndex] = 0;
+         mLastClickWasClear = true;
+      }
       else
+      {
          mData[dataIndex] = mStrength;
+      }
    }
 
    if (mSingleColumn)
@@ -333,7 +350,7 @@ bool UIGrid::MouseMoved(float x, float y)
       {
          for (int i=0; i<MAX_GRID_SIZE; ++i)
          {
-            if (i != cell.mRow)
+            if (i != cell.mRow || mLastClickWasClear)
                mData[GetDataIndex(cell.mCol, i)] = 0;
          }
       }

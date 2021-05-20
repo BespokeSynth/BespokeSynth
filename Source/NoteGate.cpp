@@ -35,7 +35,7 @@ void NoteGate::DrawModule()
 
 void NoteGate::PlayNote(double time, int pitch, int velocity, int voiceIdx, ModulationParameters modulation)
 {
-   if (mGate || velocity == 0)
+   if (mGate || (velocity == 0 && mActiveNotes[pitch].velocity != 0))
    {
       PlayNoteOutput(time, pitch, velocity, voiceIdx, modulation);
 

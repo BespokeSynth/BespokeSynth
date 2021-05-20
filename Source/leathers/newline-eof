@@ -1,0 +1,24 @@
+// This file generated automatically:
+// https://github.com/ruslo/sugar/wiki/Cross-platform-warning-suppression
+
+// Copyright (c) 2014, Ruslan Baratov
+// All rights reserved.
+
+#if !defined(LEATHERS_PUSH_)
+# error "`leathers/newline-eof` used "
+      "without `leathers/push`, "
+      "see README.txt for more info"
+#endif
+
+#if defined(LEATHERS_NEWLINE_EOF_)
+# error "`leathers/newline-eof` "
+    "already included; see README.txt for more info"
+#else
+# define LEATHERS_NEWLINE_EOF_
+#endif
+
+#if (__clang__)
+# if __has_warning("-Wnewline-eof")
+#  pragma clang diagnostic ignored "-Wnewline-eof"
+# endif
+#endif

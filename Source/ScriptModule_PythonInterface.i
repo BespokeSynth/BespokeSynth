@@ -20,9 +20,15 @@
 #include "LinnstrumentControl.h"
 #include "OscController.h"
 #include "OSCOutput.h"
+#include "EnvelopeModulator.h"
+#include "DrumPlayer.h"
 
-#include "pybind11/embed.h"
-#include "pybind11/stl.h"
+#include "leathers/push"
+#include "leathers/unused-value"
+#include "leathers/range-loop-analysis"
+   #include "pybind11/embed.h"
+   #include "pybind11/stl.h"
+#include "leathers/pop"
 
 namespace py = pybind11;
 using namespace pybind11::literals;
@@ -100,6 +106,12 @@ PYBIND11_EMBEDDED_MODULE(bespoke, m) {
    {
       return TheTransport->GetTempo();
    });
+   m.def("set_background_text", [](string text, float size, float red, float green, float blue)
+   {
+      ScriptModule::sBackgroundTextString = text;
+      ScriptModule::sBackgroundTextSize = size;
+      ScriptModule::sBackgroundTextColor.set(red * 255, green * 255, blue * 255);
+   }, "text"_a, "size"_a=50, "red"_a = 1, "green"_a = 1, "blue"_a = 1);
 }
 
 PYBIND11_EMBEDDED_MODULE(scriptmodule, m)
@@ -461,6 +473,58 @@ PYBIND11_EMBEDDED_MODULE(oscoutput, m)
       .def("send_string", [](OSCOutput& oscoutput, string address, string val)
       {
          oscoutput.SendString(address, val);
+      });
+}
+
+namespace
+{
+   void StartEnvelope(EnvelopeModulator& envelope, double time, const vector< tuple<float,float> >& stages)
+   {
+      ::ADSR adsr;
+      adsr.SetNumStages((int)stages.size());
+      adsr.GetHasSustainStage() = false;
+      for (size_t i=0; i<stages.size(); ++i)
+      {
+         adsr.GetStageData((int)i).time = get<0>(stages[i]);
+         adsr.GetStageData((int)i).target = get<1>(stages[i]);
+      }
+      envelope.Start(time, adsr);
+   }
+}
+
+PYBIND11_EMBEDDED_MODULE(envelope, m)
+{
+   m.def("get", [](string path)
+   {
+      auto* ret = dynamic_cast<EnvelopeModulator*>(TheSynth->FindModule(path));
+      ScriptModule::sMostRecentLineExecutedModule->OnModuleReferenceBound(ret);
+      return ret;
+   }, py::return_value_policy::reference);
+   py::class_<EnvelopeModulator, IDrawableModule>(m, "envelope")
+      .def("start", [](EnvelopeModulator& envelope, vector< tuple<float,float> > stages)
+      {
+         double time = ScriptModule::sMostRecentLineExecutedModule->GetScheduledTime(0);
+         StartEnvelope(envelope, time, stages);
+      })
+      .def("schedule", [](EnvelopeModulator& envelope, float delay, vector< tuple<float,float> > stages)
+      {
+         double time = ScriptModule::sMostRecentLineExecutedModule->GetScheduledTime(delay);
+         StartEnvelope(envelope, time, stages);
+      });
+}
+
+PYBIND11_EMBEDDED_MODULE(drumplayer, m)
+{
+   m.def("get", [](string path)
+   {
+      auto* ret = dynamic_cast<DrumPlayer*>(TheSynth->FindModule(path));
+      ScriptModule::sMostRecentLineExecutedModule->OnModuleReferenceBound(ret);
+      return ret;
+   }, py::return_value_policy::reference);
+   py::class_<DrumPlayer, IDrawableModule>(m, "drumplayer")
+      .def("import_sampleplayer_cue", [](DrumPlayer& drumPlayer, SamplePlayer* samplePlayer, int srcCueIndex, int destHitIndex)
+      {
+         drumPlayer.ImportSampleCuePoint(samplePlayer, srcCueIndex, destHitIndex);
       });
 }
 

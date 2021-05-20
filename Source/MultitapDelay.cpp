@@ -48,9 +48,10 @@ void MultitapDelay::CreateUIControls()
    for (int i=0; i<mNumTaps; ++i)
    {
       float y = mBufferY + mBufferH + 10 + i * 100;
-      mTaps[i].mDelayMsSlider = new FloatSlider(this,("delay "+ofToString(i+1)).c_str(),10,y,90,15,&mTaps[i].mDelayMs,gBufferSize/gSampleRateMs,mDelayBuffer.Size()/gSampleRateMs);
-      mTaps[i].mGainSlider = new FloatSlider(this,("gain "+ofToString(i+1)).c_str(),mTaps[i].mDelayMsSlider, kAnchor_Below,90,15,&mTaps[i].mGain,0,1);
-      mTaps[i].mFeedbackSlider = new FloatSlider(this,("feedback "+ofToString(i+1)).c_str(),mTaps[i].mGainSlider, kAnchor_Below,90,15,&mTaps[i].mFeedback,0,1);
+      mTaps[i].mDelayMsSlider = new FloatSlider(this,("delay "+ofToString(i+1)).c_str(),10,y,150,15,&mTaps[i].mDelayMs,gBufferSize/gSampleRateMs,mDelayBuffer.Size()/gSampleRateMs);
+      mTaps[i].mGainSlider = new FloatSlider(this,("gain "+ofToString(i+1)).c_str(),mTaps[i].mDelayMsSlider, kAnchor_Below,150,15,&mTaps[i].mGain,0,1);
+      mTaps[i].mFeedbackSlider = new FloatSlider(this,("feedback "+ofToString(i+1)).c_str(),mTaps[i].mGainSlider, kAnchor_Below,150,15,&mTaps[i].mFeedback,0,1);
+      mTaps[i].mPanSlider = new FloatSlider(this,("pan "+ofToString(i+1)).c_str(),mTaps[i].mFeedbackSlider, kAnchor_Below,150,15,&mTaps[i].mPan,-1,1);
    }
 }
 
@@ -62,7 +63,9 @@ void MultitapDelay::Process(double time)
 {
    PROFILER(MultitapDelay);
    
-   if (!mEnabled || GetTarget() == nullptr)
+   IAudioReceiver* target = GetTarget();
+
+   if (!mEnabled || target == nullptr)
       return;
    
    SyncBuffers();
@@ -71,7 +74,7 @@ void MultitapDelay::Process(double time)
    for (int t=0; t<mNumTaps; ++t)
       mTaps[t].mTapBuffer.SetNumActiveChannels(mWriteBuffer.NumActiveChannels());
    
-   int bufferSize = GetTarget()->GetBuffer()->BufferSize();
+   int bufferSize = target->GetBuffer()->BufferSize();
    assert(bufferSize == gBufferSize);
    
    mWriteBuffer.Clear();
@@ -98,7 +101,7 @@ void MultitapDelay::Process(double time)
 
    for (int ch=0; ch<GetBuffer()->NumActiveChannels(); ++ch)
    {
-      Add(GetTarget()->GetBuffer()->GetChannel(ch), mWriteBuffer.GetChannel(ch), bufferSize);
+      Add(target->GetBuffer()->GetChannel(ch), mWriteBuffer.GetChannel(ch), bufferSize);
       
       GetVizBuffer()->WriteChunk(mWriteBuffer.GetChannel(ch),bufferSize, ch);
    }
@@ -119,6 +122,7 @@ void MultitapDelay::DrawModule()
       mTaps[i].mDelayMsSlider->Draw();
       mTaps[i].mGainSlider->Draw();
       mTaps[i].mFeedbackSlider->Draw();
+      mTaps[i].mPanSlider->Draw();
    }
    
    for (int ch=0; ch<mDelayBuffer.NumChannels(); ++ch)
@@ -302,7 +306,7 @@ void MultitapDelay::DelayMPETap::Draw(float w, float h)
          ofPopStyle();
       }
       
-      mGranulator.Draw(0, 0, w, h, mOwner->mDisplayStartSamples, mOwner->mDisplayEndSamples - mOwner->mDisplayStartSamples, false);
+      mGranulator.Draw(0, 0, w, h, mOwner->mDisplayStartSamples, mOwner->mDisplayEndSamples - mOwner->mDisplayStartSamples, mOwner->mSample->LengthInSamples());
    }*/
 }
 
@@ -311,6 +315,7 @@ MultitapDelay::DelayTap::DelayTap()
 : mDelayMs(100)
 , mGain(0)
 , mFeedback(0)
+, mPan(0)
 , mOwner(nullptr)
 , mTapBuffer(gBufferSize)
 {
@@ -335,7 +340,8 @@ void MultitapDelay::DelayTap::Process(float* sampleOut, int offset, int ch)
       mTapBuffer.GetChannel(ch)[offset] = outputSample;
       
       *sampleOut += outputSample;
-      mOwner->mDelayBuffer.Accum(gBufferSize-offset, outputSample * mFeedback, ch);
+      float panGain = ch == 0 ? GetLeftPanGain(mPan) : GetRightPanGain(mPan);
+      mOwner->mDelayBuffer.Accum(gBufferSize-offset, outputSample * mFeedback * panGain, ch);
    }
 }
 

@@ -1,0 +1,22 @@
+// This file generated automatically:
+// https://github.com/ruslo/sugar/wiki/Cross-platform-warning-suppression
+
+// Copyright (c) 2014, Ruslan Baratov
+// All rights reserved.
+
+#if !defined(LEATHERS_PUSH_)
+# error "`leathers/layout-changed` used "
+      "without `leathers/push`, "
+      "see README.txt for more info"
+#endif
+
+#if defined(LEATHERS_LAYOUT_CHANGED_)
+# error "`leathers/layout-changed` "
+    "already included; see README.txt for more info"
+#else
+# define LEATHERS_LAYOUT_CHANGED_
+#endif
+
+#if (_MSC_VER)
+# pragma warning(disable: 4371)
+#endif

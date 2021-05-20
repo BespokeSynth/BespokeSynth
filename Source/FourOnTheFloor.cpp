@@ -52,9 +52,17 @@ void FourOnTheFloor::CheckboxUpdated(Checkbox* checkbox)
    if (checkbox == mTwoOnTheFloorCheckbox)
    {
       if (mTwoOnTheFloor)
-         TheTransport->UpdateListener(this, kInterval_2n);
+      {
+         TransportListenerInfo* transportListenerInfo = TheTransport->GetListenerInfo(this);
+         if (transportListenerInfo != nullptr)
+            transportListenerInfo->mInterval = kInterval_2n;
+      }
       else
-         TheTransport->UpdateListener(this, kInterval_4n);
+      {
+         TransportListenerInfo* transportListenerInfo = TheTransport->GetListenerInfo(this);
+         if (transportListenerInfo != nullptr)
+            transportListenerInfo->mInterval = kInterval_4n;
+      }
    }
 }
 

@@ -80,8 +80,9 @@ private:
    IUIControl* mRollUIControl;
    IUIControl* mEnergyUIControl;
    
-   
    bool mPSButtonDown;
+
+   TransportListenerInfo* mTransportListenerInfo;
 };
 
 #endif /* defined(__modularSynth__PSMoveController__) */

@@ -99,7 +99,7 @@ void NoteQuantizer::PlayNote(double time, int pitch, int velocity, int voiceIdx,
 
 void NoteQuantizer::OnEvent(double time, float strength)
 {
-   for (size_t i = 0; i < mInputInfos.size(); ++i)
+   for (int i = 0; i < (int)mInputInfos.size(); ++i)
    {
       if (mScheduledOffs[i])
       {
@@ -139,7 +139,11 @@ void NoteQuantizer::OnPulse(double time, float velocity, int flags)
 void NoteQuantizer::DropdownUpdated(DropdownList* list, int oldVal)
 {
    if (list == mQuantizeIntervalSelector)
-      TheTransport->UpdateListener(this, mQuantizeInterval);
+   {
+      TransportListenerInfo* transportListenerInfo = TheTransport->GetListenerInfo(this);
+      if (transportListenerInfo != nullptr)
+         transportListenerInfo->mInterval = mQuantizeInterval;
+   }
 }
 
 void NoteQuantizer::LoadLayout(const ofxJSONElement& moduleInfo)

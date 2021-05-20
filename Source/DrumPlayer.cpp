@@ -15,6 +15,7 @@
 #include "Profiler.h"
 #include "FillSaveDropdown.h"
 #include "UIControlMacros.h"
+#include "SamplePlayer.h"
 
 DrumPlayer::DrumPlayer()
 : mSpeed(1)
@@ -31,7 +32,6 @@ DrumPlayer::DrumPlayer()
 , mAuditionSampleIdx(0)
 , mAuditionInc(0)
 , mAuditionSlider(nullptr)
-, mAuditionPadIdx(0)
 , mNewKitNameEntry(nullptr)
 , mLoadingSamples(false)
 , mShuffleButton(nullptr)
@@ -206,7 +206,7 @@ void DrumPlayer::SetUpNewDrumPlayer()
       }
       mDrumHits[i].LoadRandomSample();
 
-      if (i == 2 || i == 3 || i == 6)
+      if (i == 2 || i == 3)
          mDrumHits[i].mLinkId = 0;
    }
 
@@ -268,46 +268,6 @@ void DrumPlayer::LoadSampleUnlock()
    mLoadSamplesAudioMutex.unlock();
 }
 
-string DrumPlayer::GetDrumHitName(int index)
-{
-   switch (index)
-   {
-      case 0:
-         return "kick";
-      case 1:
-         return "rim";
-      case 2:
-         return "closed";
-      case 3:
-         return "ride";
-      case 4:
-         return "snare";
-      case 5:
-         return "crash";
-      case 6:
-         return "open";
-      case 7:
-         return "stick";
-      case 8:
-         return "floor";
-      case 9:
-         return "low";
-      case 10:
-         return "mid";
-      case 11:
-         return "hi";
-      case 12:
-         return "misc1";
-      case 13:
-         return "misc2";
-      case 14:
-         return "misc3";
-      case 15:
-         return "misc4";
-   }
-   return ofToString(index);
-}
-
 void DrumPlayer::Process(double time)
 {
    PROFILER(DrumPlayer);
@@ -346,8 +306,9 @@ void DrumPlayer::Process(double time)
                if (individualOutputIndex != -1)
                {
                   int targetIndex = individualOutputIndex + 1;
-                  if (GetTarget(targetIndex))
-                     Add(GetTarget(targetIndex)->GetBuffer()->GetChannel(ch), gWorkChannelBuffer.GetChannel(ch), bufferSize);
+                  IAudioReceiver* targetOut = GetTarget(targetIndex);
+                  if (targetOut)
+                     Add(targetOut->GetBuffer()->GetChannel(ch), gWorkChannelBuffer.GetChannel(ch), bufferSize);
                   mIndividualOutputs[individualOutputIndex]->mVizBuffer->WriteChunk(gWorkChannelBuffer.GetChannel(ch), bufferSize, ch);
                }
                else
@@ -369,12 +330,13 @@ void DrumPlayer::Process(double time)
       mLoadSamplesAudioMutex.unlock();
    }
    
+   IAudioReceiver* target = GetTarget();
    for (int ch=0; ch<numChannels; ++ch)
    {
       GetVizBuffer()->WriteChunk(mOutputBuffer.GetChannel(ch), bufferSize, ch);
    
-      if (GetTarget())
-         Add(GetTarget()->GetBuffer()->GetChannel(ch), mOutputBuffer.GetChannel(ch), bufferSize);
+      if (target)
+         Add(target->GetBuffer()->GetChannel(ch), mOutputBuffer.GetChannel(ch), bufferSize);
    }
 }
 
@@ -412,7 +374,7 @@ float DrumPlayer::DrumHit::GetPlayProgress(double time)
 {
    int playheadIdx = -1;
    double startTime = -1;
-   for (size_t i = 0; i < mPlayheads.size(); ++i)
+   for (int i = 0; i < (int)mPlayheads.size(); ++i)
    {
       if (mPlayheads[i].mStartTime <= time && mPlayheads[i].mStartTime > startTime)
       {
@@ -573,7 +535,7 @@ void DrumPlayer::FilesDropped(vector<string> files, int x, int y)
    {
       mAuditionDir = files[0];
       if (x < 4 && y < 4)
-         mAuditionPadIdx = GetAssociatedSampleIndex(x,y);
+         mSelectedHitIdx = GetAssociatedSampleIndex(x,y);
       mAuditionSampleIdx = -1;
    }
    else
@@ -620,17 +582,29 @@ void DrumPlayer::SampleDropped(int x, int y, Sample* sample)
    {
       int sampleIdx = GetAssociatedSampleIndex(x,y);
       if (sampleIdx != -1)
-      {
-         LoadSampleLock();
-         mDrumHits[sampleIdx].mSample.CopyFrom(sample);
-         LoadSampleUnlock();
-         mDrumHits[sampleIdx].mLinkId = -1;
-         mDrumHits[sampleIdx].mVol = 1;
-         mDrumHits[sampleIdx].mSpeed = 1;
-         mDrumHits[sampleIdx].mPan = 0;
-         mDrumHits[sampleIdx].mEnvelopeLength = mDrumHits[sampleIdx].mSample.LengthInSamples() * gInvSampleRateMs;
-      }
+         SetHitSample(sampleIdx, sample);
    }
+}
+
+void DrumPlayer::ImportSampleCuePoint(SamplePlayer* player, int sourceCueIndex, int destHitIndex)
+{
+   ChannelBuffer* data = player->GetCueSampleData(sourceCueIndex);
+   Sample sample;
+   sample.Create(data);
+   SetHitSample(destHitIndex, &sample);
+   delete data;
+}
+
+void DrumPlayer::SetHitSample(int sampleIndex, Sample* sample)
+{
+   LoadSampleLock();
+   mDrumHits[sampleIndex].mSample.CopyFrom(sample);
+   LoadSampleUnlock();
+   mDrumHits[sampleIndex].mLinkId = -1;
+   mDrumHits[sampleIndex].mVol = 1;
+   mDrumHits[sampleIndex].mSpeed = 1;
+   mDrumHits[sampleIndex].mPan = 0;
+   mDrumHits[sampleIndex].mEnvelopeLength = mDrumHits[sampleIndex].mSample.LengthInSamples() * gInvSampleRateMs;
 }
 
 void DrumPlayer::OnClicked(int x, int y, bool right)
@@ -655,6 +629,7 @@ void DrumPlayer::OnClicked(int x, int y, bool right)
       if (sampleIdx != -1)
       {
          mSelectedHitIdx = sampleIdx;
+         mAuditionDir = ofToDataPath("drums/hits/"+mDrumHits[sampleIdx].mHitCategory);
          UpdateVisibleControls();
       }
    }
@@ -684,7 +659,7 @@ void DrumPlayer::OnGridButton(int x, int y, float velocity, IGridController* gri
 
 void DrumPlayer::OnTimeEvent(double time)
 {
-   for (size_t i = 0; i < mDrumHits.size(); ++i)
+   for (int i = 0; i < (int)mDrumHits.size(); ++i)
    {
       if (mDrumHits[i].mButtonHeldVelocity > 0)
       {
@@ -706,11 +681,6 @@ void DrumPlayer::DrawModule()
    mKitSelector->Draw();
    mEditCheckbox->Draw();
    mGridController->Draw();
-   
-   float moduleW, moduleH;
-   GetDimensions(moduleW, moduleH);
-   for (int i=0; i<mIndividualOutputs.size(); ++i)
-      DrawTextNormal(ofToString(mIndividualOutputs[i]->mHitIndex), moduleW - 20, 10 + i*12);
 
    if (mEditMode)
    {
@@ -763,6 +733,14 @@ void DrumPlayer::DrawModule()
       
       if (mSelectedHitIdx != -1)
          mDrumHits[mSelectedHitIdx].DrawUIControls();
+   }
+   
+   float moduleW, moduleH;
+   GetDimensions(moduleW, moduleH);
+   for (int i=0; i<mIndividualOutputs.size(); ++i)
+   {
+      DrawTextNormal(ofToString(mIndividualOutputs[i]->mHitIndex), moduleW - 20, 10 + i*12);
+      mIndividualOutputs[i]->UpdatePosition(i);
    }
 }
 
@@ -965,14 +943,14 @@ void DrumPlayer::FloatSliderUpdated(FloatSlider* slider, float oldVal)
          mAuditionSampleIdx = ofClamp(mAuditionSampleIdx,0,files.size()-1);
          
          string file = files[mAuditionSampleIdx].getFullPathName().toStdString();
-         if (mAuditionPadIdx >= 0 && mAuditionPadIdx < NUM_DRUM_HITS)
+         if (mSelectedHitIdx >= 0 && mSelectedHitIdx < NUM_DRUM_HITS)
          {
             LoadSampleLock();
-            mDrumHits[mAuditionPadIdx].mSample.Read(file.c_str());
+            mDrumHits[mSelectedHitIdx].mSample.Read(file.c_str());
             LoadSampleUnlock();
-            mDrumHits[mAuditionPadIdx].StartPlayhead(gTime, 0, 1);
-            mDrumHits[mAuditionPadIdx].mVelocity = .5f;
-            mDrumHits[mAuditionPadIdx].mEnvelopeLength = mDrumHits[mAuditionPadIdx].mSample.LengthInSamples() * gInvSampleRateMs;
+            mDrumHits[mSelectedHitIdx].StartPlayhead(gTime, 0, 1);
+            mDrumHits[mSelectedHitIdx].mVelocity = .5f;
+            mDrumHits[mSelectedHitIdx].mEnvelopeLength = mDrumHits[mSelectedHitIdx].mSample.LengthInSamples() * gInvSampleRateMs;
          }
       }
    }
@@ -994,7 +972,9 @@ void DrumPlayer::DropdownUpdated(DropdownList* list, int oldVal)
 
    if (list == mQuantizeIntervalSelector)
    {
-      TheTransport->UpdateListener(this, mQuantizeInterval);
+      TransportListenerInfo* transportListenerInfo = TheTransport->GetListenerInfo(this);
+      if (transportListenerInfo != nullptr)
+         transportListenerInfo->mInterval = mQuantizeInterval;
    }
 }
 
@@ -1011,7 +991,7 @@ void DrumPlayer::CheckboxUpdated(Checkbox* checkbox)
          if (mDrumHits[i].mHasIndividualOutput)
          {
             if (outputIndex == -1)
-               mIndividualOutputs.push_back(new IndividualOutput(this, i, (int)mIndividualOutputs.size()));
+               mIndividualOutputs.push_back(new IndividualOutput(this, i));
          }
          else
          {

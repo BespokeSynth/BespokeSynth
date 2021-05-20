@@ -23,7 +23,7 @@ DistortionEffect::DistortionEffect()
    
    for (int i=0; i<ChannelBuffer::kMaxNumChannels; ++i)
    {
-      mDCRemover[i].SetFilterParams(10, 1);
+      mDCRemover[i].SetFilterParams(10, sqrt(2)/2);
       mDCRemover[i].SetFilterType(kFilterType_Highpass);
       mDCRemover[i].UpdateFilterCoeff();
    }
@@ -123,7 +123,7 @@ void DistortionEffect::ProcessAudio(double time, ChannelBuffer* buffer)
       {
          for (int i=0; i<bufferSize; ++i)
          {
-            float sample = (buffer->GetChannel(ch)[i]*.5f+mDCAdjust) * mPreamp * mGain;
+            float sample = ofClamp((buffer->GetChannel(ch)[i]*.5f+mDCAdjust) * mPreamp * mGain, -100, 100);
             while (sample > 1 || sample < -1)
             {
                if (sample > 1)

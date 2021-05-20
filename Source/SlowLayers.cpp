@@ -55,15 +55,17 @@ SlowLayers::~SlowLayers()
 void SlowLayers::Process(double time)
 {
    PROFILER(SlowLayers);
+
+   IAudioReceiver* target = GetTarget();
    
-   if (!mEnabled || GetTarget() == nullptr)
+   if (!mEnabled || target == nullptr)
       return;
    
    ComputeSliders(0);
    SyncBuffers();
    
    int bufferSize = GetBuffer()->BufferSize();
-   float* out = GetTarget()->GetBuffer()->GetChannel(0);
+   float* out = target->GetBuffer()->GetChannel(0);
    
    int loopLengthInSamples = LoopLength();
    

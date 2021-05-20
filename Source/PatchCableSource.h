@@ -17,6 +17,7 @@
 class IAudioReceiver;
 class INoteReceiver;
 class IPulseReceiver;
+class IModulator;
 
 enum DefaultPatchBehavior
 {
@@ -48,7 +49,7 @@ public:
    bool CurrentlyOn();
    double GetLastOnEventTime() { return mLastOnEventTime; }
    const NoteHistoryEvent& GetHistoryEvent(int ago) const;
-   static const int kHistorySize = 20;
+   static const int kHistorySize = 100;
 private:
    NoteHistoryEvent mHistory[kHistorySize];
    int mHistoryPos;
@@ -103,6 +104,8 @@ public:
    void SetOverrideCableDir(ofVec2f dir) { mHasOverrideCableDir = true; mOverrideCableDir = dir; }
    ofVec2f GetCableStart(int index) const;
    ofVec2f GetCableStartDir(int index, ofVec2f dest) const;
+   void SetModulatorOwner(IModulator* modulator) { mModulatorOwner = modulator; }
+   IModulator* GetModulatorOwner() const { return mModulatorOwner; }
    
    void AddHistoryEvent(double time, bool on) { mNoteHistory.AddEvent(time, on); }
    NoteHistory& GetHistory() { return mNoteHistory; }
@@ -154,6 +157,8 @@ private:
    vector<IClickable*> mValidTargets;
    
    NoteHistory mNoteHistory;
+   
+   IModulator* mModulatorOwner;
 
    enum class DrawPass
    {

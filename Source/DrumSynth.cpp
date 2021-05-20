@@ -13,20 +13,22 @@
 #include "ModularSynth.h"
 #include "MidiController.h"
 #include "Profiler.h"
+#include "UIControlMacros.h"
+
+#define DRUMSYNTH_NO_CUTOFF 10000
 
 DrumSynth::DrumSynth()
 : mVolume(1)
 , mVolSlider(nullptr)
 , mEditMode(false)
 , mEditCheckbox(nullptr)
-, mCurrentEditHit(3)
 {
    mOutputBuffer = new float[gBufferSize];
    
-   for (int i=0; i<NUM_DRUM_HITS; ++i)
+   for (int i=0; i<(int)mHits.size(); ++i)
    {
-      int x = i%4*PAD_DRAW_SIZE + 5;
-      int y = (3-(i/4))*PAD_DRAW_SIZE + 70;
+      int x = (i % DRUMSYNTH_PADS_HORIZONTAL)*DRUMSYNTH_PAD_WIDTH + 5;
+      int y = (1-(i/ DRUMSYNTH_PADS_HORIZONTAL))*DRUMSYNTH_PAD_HEIGHT + 50;
       mHits[i] = new DrumSynthHit(this, i,  x, y);
    }
 }
@@ -37,14 +39,14 @@ void DrumSynth::CreateUIControls()
    mVolSlider = new FloatSlider(this,"vol",4,4,100,15,&mVolume,0,2);
    mEditCheckbox = new Checkbox(this,"edit",73,20,&mEditMode);
    
-   for (int i=0; i<NUM_DRUM_HITS; ++i)
+   for (size_t i=0; i<mHits.size(); ++i)
       mHits[i]->CreateUIControls();
 }
 
 DrumSynth::~DrumSynth()
 {
    delete[] mOutputBuffer;
-   for (int i=0; i<NUM_DRUM_HITS; ++i)
+   for (size_t i=0; i<mHits.size(); ++i)
       delete mHits[i];
 }
 
@@ -52,20 +54,21 @@ void DrumSynth::Process(double time)
 {
    PROFILER(DrumSynth);
    
-   if (!mEnabled || GetTarget() == nullptr)
+   IAudioReceiver* target = GetTarget();
+   if (!mEnabled || target == nullptr)
       return;
    
    ComputeSliders(0);
    
-   int bufferSize = GetTarget()->GetBuffer()->BufferSize();
-   float* out = GetTarget()->GetBuffer()->GetChannel(0);
+   int bufferSize = target->GetBuffer()->BufferSize();
+   float* out = target->GetBuffer()->GetChannel(0);
    assert(bufferSize == gBufferSize);
    
    float volSq = mVolume * mVolume;
    
    Clear(mOutputBuffer, bufferSize);
    
-   for (int i=0; i<NUM_DRUM_HITS; ++i)
+   for (size_t i=0; i<mHits.size(); ++i)
    {
       mHits[i]->Process(time, mOutputBuffer, bufferSize);
    }
@@ -79,7 +82,7 @@ void DrumSynth::Process(double time)
 
 void DrumSynth::PlayNote(double time, int pitch, int velocity, int voiceIdx, ModulationParameters modulation)
 {
-   if (pitch >= 0 && pitch < NUM_DRUM_HITS)
+   if (pitch >= 0 && pitch < mHits.size())
    {
       if (velocity > 0)
          mHits[pitch]->Play(time, velocity/127.0f);
@@ -97,12 +100,12 @@ void DrumSynth::OnClicked(int x, int y, bool right)
       return;
    
    x -= 5;
-   y -= 70;
+   y -= 50;
    if (x<0 || y<0)
       return;
-   x /= PAD_DRAW_SIZE;
-   y /= PAD_DRAW_SIZE;
-   if (x < 4 && y < 4)
+   x /= DRUMSYNTH_PAD_WIDTH;
+   y /= DRUMSYNTH_PAD_HEIGHT;
+   if (x < DRUMSYNTH_PADS_HORIZONTAL && y < DRUMSYNTH_PADS_VERTICAL)
    {
       int sampleIdx = GetAssociatedSampleIndex(x, y);
       if (sampleIdx != -1)
@@ -124,18 +127,18 @@ void DrumSynth::DrawModule()
    if (mEditMode)
    {
       ofPushMatrix();
-      for (int i=0; i<NUM_DRUM_HITS; ++i)
+      for (size_t i=0; i<mHits.size(); ++i)
       {
          ofPushStyle();
          if (mHits[i]->Level() > 0)
          {
             ofFill();
             ofSetColor(200,100,0,gModuleDrawAlpha * sqrtf(mHits[i]->Level()));
-            ofRect(mHits[i]->mX,mHits[i]->mY,PAD_DRAW_SIZE,PAD_DRAW_SIZE);
+            ofRect(mHits[i]->mX,mHits[i]->mY, DRUMSYNTH_PAD_WIDTH, DRUMSYNTH_PAD_HEIGHT);
          }
          ofSetColor(200,100,0,gModuleDrawAlpha);
          ofNoFill();
-         ofRect(mHits[i]->mX,mHits[i]->mY,PAD_DRAW_SIZE,PAD_DRAW_SIZE);
+         ofRect(mHits[i]->mX,mHits[i]->mY, DRUMSYNTH_PAD_WIDTH, DRUMSYNTH_PAD_HEIGHT);
          ofPopStyle();
          
          ofSetColor(255,255,255,gModuleDrawAlpha);
@@ -151,8 +154,8 @@ void DrumSynth::DrawModule()
 
 int DrumSynth::GetAssociatedSampleIndex(int x, int y)
 {
-   int pos = x+(3-y)*4;
-   if (pos < 16)
+   int pos = x+(DRUMSYNTH_PADS_VERTICAL-1-y)*DRUMSYNTH_PADS_HORIZONTAL;
+   if (pos < DRUMSYNTH_PADS_HORIZONTAL * DRUMSYNTH_PADS_VERTICAL)
       return pos;
    return -1;
 }
@@ -161,8 +164,8 @@ void DrumSynth::GetModuleDimensions(float& width, float& height)
 {
    if (mEditMode)
    {
-      width = 600;
-      height = 670;
+      width = 10 + MIN(mHits.size(), DRUMSYNTH_PADS_HORIZONTAL) * DRUMSYNTH_PAD_WIDTH;
+      height = 52 + mHits.size() / DRUMSYNTH_PADS_HORIZONTAL * DRUMSYNTH_PAD_HEIGHT;
    }
    else
    {
@@ -230,18 +233,48 @@ DrumSynth::DrumSynthHit::DrumSynthHit(DrumSynth* parent, int index, int x, int y
 , mX(x)
 , mY(y)
 {
+   mFilter.SetFilterType(kFilterType_Lowpass);
+   mFilter.SetFilterParams(1000, sqrt(2)/2);
 }
 
 void DrumSynth::DrumSynthHit::CreateUIControls()
 {
-   mVolSlider = new FloatSlider(mParent, ("vol"+ofToString(mIndex)).c_str(), mX+5, mY+55, 60,15,&mData.mVol,0,1);
-   mFreqMaxSlider = new FloatSlider(mParent, ("fmax" + ofToString(mIndex)).c_str(), mX + 35, mY + 105, 100, 15, &mData.mFreqMax, 0, 1600);
-   mFreqMinSlider = new FloatSlider(mParent, ("fmin" + ofToString(mIndex)).c_str(), mX + 35, mY + 120, 100, 15, &mData.mFreqMin, 0, 1600);
-   mToneType = new RadioButton(mParent, ("type"+ofToString(mIndex)).c_str(), mX+5, mY+75,(int*)(&mData.mTone.mOsc.mType));
-   mToneAdsrDisplay = new ADSRDisplay(mParent, ("adsrtone"+ofToString(mIndex)).c_str(), mX+5, mY+15, 60,40,mData.mTone.GetADSR());
-   mFreqAdsrDisplay = new ADSRDisplay(mParent, ("adsrfreq"+ofToString(mIndex)).c_str(), mX+35, mY+75,100,29,&mData.mFreqAdsr);
-   mVolNoiseSlider = new FloatSlider(mParent, ("noise"+ofToString(mIndex)).c_str(), mX+70, mY+55,60,15,&mData.mVolNoise,0,1,2);
-   mNoiseAdsrDisplay = new ADSRDisplay(mParent, ("adsrnoise"+ofToString(mIndex)).c_str(), mX+70, mY+15,60,40,mData.mNoise.GetADSR());
+#undef UIBLOCK_OWNER
+#define UIBLOCK_OWNER mParent //change owner
+
+   float width, height;
+   float kColumnWidth = (DRUMSYNTH_PAD_WIDTH-5*2-3) * .5f;
+   UIBLOCK(mX + 5, mY + 15, kColumnWidth);
+
+   UICONTROL_CUSTOM(mToneAdsrDisplay, new ADSRDisplay(UICONTROL_BASICS(("adsrtone" + ofToString(mIndex)).c_str()), kColumnWidth, 36, mData.mTone.GetADSR()));
+   FLOATSLIDER(mVolSlider, ("vol" + ofToString(mIndex)).c_str(), &mData.mVol, 0, 1);
+
+   UIBLOCK_NEWCOLUMN();
+   UICONTROL_CUSTOM(mNoiseAdsrDisplay, new ADSRDisplay(UICONTROL_BASICS(("adsrnoise" + ofToString(mIndex)).c_str()), kColumnWidth, 36, mData.mNoise.GetADSR()));
+   FLOATSLIDER_DIGITS(mVolNoiseSlider, ("noise" + ofToString(mIndex)).c_str(), &mData.mVolNoise, 0, 1, 2);
+   ENDUIBLOCK(width, height);
+
+   UIBLOCK(mX + 5, height+3);
+   UICONTROL_CUSTOM(mToneType, new RadioButton(UICONTROL_BASICS(("type" + ofToString(mIndex)).c_str()), (int*)(&mData.mTone.mOsc.mType)));
+   UIBLOCK_SHIFTX(30);
+   float freqAdsrWidth = DRUMSYNTH_PAD_WIDTH - 5 * 2 - 3 - 30;
+   UICONTROL_CUSTOM(mFreqAdsrDisplay, new ADSRDisplay(UICONTROL_BASICS(("adsrfreq" + ofToString(mIndex)).c_str()), freqAdsrWidth, 36, &mData.mFreqAdsr));
+   UIBLOCK_PUSHSLIDERWIDTH(freqAdsrWidth);
+   FLOATSLIDER(mFreqMaxSlider, ("freqmax" + ofToString(mIndex)).c_str(), &mData.mFreqMax, 0, 1600);
+   FLOATSLIDER(mFreqMinSlider, ("freqmin" + ofToString(mIndex)).c_str(), &mData.mFreqMin, 0, 1600);   
+
+   UIBLOCK_NEWLINE();
+   float filterAdsrWidth = DRUMSYNTH_PAD_WIDTH - 5 * 2;
+   UICONTROL_CUSTOM(mFilterAdsrDisplay, new ADSRDisplay(UICONTROL_BASICS(("adsrfilter" + ofToString(mIndex)).c_str()), filterAdsrWidth, 36, &mData.mFilterAdsr));
+   UIBLOCK_PUSHSLIDERWIDTH(filterAdsrWidth);
+   FLOATSLIDER(mFilterCutoffMaxSlider, ("cutoffmax" + ofToString(mIndex)).c_str(), &mData.mCutoffMax, 10, DRUMSYNTH_NO_CUTOFF);
+   FLOATSLIDER(mFilterCutoffMinSlider, ("cutoffmin" + ofToString(mIndex)).c_str(), &mData.mCutoffMin, 10, DRUMSYNTH_NO_CUTOFF);
+   FLOATSLIDER(mFilterQSlider, ("q" + ofToString(mIndex)).c_str(), &mData.mQ, .1, 20);
+
+   ENDUIBLOCK0();
+
+#undef UIBLOCK_OWNER
+#define UIBLOCK_OWNER this //reset
    
    mToneType->AddLabel("sin",kOsc_Sin);
    mToneType->AddLabel("saw",kOsc_Saw);
@@ -251,15 +284,20 @@ void DrumSynth::DrumSynthHit::CreateUIControls()
    mFreqAdsrDisplay->SetMaxTime(500);
    mToneAdsrDisplay->SetMaxTime(500);
    mNoiseAdsrDisplay->SetMaxTime(500);
+   mFilterAdsrDisplay->SetMaxTime(500);
    
    mFreqMaxSlider->SetMode(FloatSlider::kSquare);
    mFreqMinSlider->SetMode(FloatSlider::kSquare);
+   mFilterCutoffMaxSlider->SetMode(FloatSlider::kSquare);
+   mFilterCutoffMinSlider->SetMode(FloatSlider::kSquare);
+   mFilterCutoffMaxSlider->SetMaxValueDisplay("none");
 }
 
 void DrumSynth::DrumSynthHit::Play(double time, float velocity)
 {
    float envelopeScale = ofLerp(.2f, 1, velocity);
    mData.mFreqAdsr.Start(time, 1, envelopeScale);
+   mData.mFilterAdsr.Start(time, 1, envelopeScale);
    mData.mTone.GetADSR()->Start(time, velocity, envelopeScale);
    mData.mNoise.GetADSR()->Start(time,velocity, envelopeScale);
    mStartTime = time;
@@ -273,16 +311,20 @@ void DrumSynth::DrumSynthHit::Process(double time, float* out, int bufferSize)
       return;
    }
    
-   for (int i=0; i<bufferSize; ++i)
+   for (size_t i=0; i<bufferSize; ++i)
    {
       float freq = ofLerp(mData.mFreqMin, mData.mFreqMax, mData.mFreqAdsr.Value(time));
+      if (mData.mCutoffMax != DRUMSYNTH_NO_CUTOFF)
+         mFilter.SetFilterParams(ofLerp(mData.mCutoffMin, mData.mCutoffMax, mData.mFilterAdsr.Value(time)), mData.mQ);
       float phaseInc = GetPhaseInc(freq);
       
       float sample = mData.mTone.Audio(time, mPhase) * mData.mVol * mData.mVol;
       float noise = mData.mNoise.Audio(time, mPhase);
       noise *= noise * (noise > 0 ? 1 : -1); //square but keep sign
       sample += noise * mData.mVolNoise * mData.mVolNoise;
-      mLevel.Process(&sample, 1);
+      if (mData.mCutoffMax != DRUMSYNTH_NO_CUTOFF)
+         sample = mFilter.Filter(sample);
+      mLevel.Process(&sample, 1);      
       out[i] += sample;
       
       mPhase += phaseInc;
@@ -294,12 +336,12 @@ void DrumSynth::DrumSynthHit::Process(double time, float* out, int bufferSize)
 
 void DrumSynth::DrumSynthHit::Draw()
 {
-   ofSetColor(255,0,0);
+   /*ofSetColor(255,0,0);
    ofRect(mToneAdsrDisplay->GetRect(true));
    ofSetColor(0,255,0);
    ofRect(mNoiseAdsrDisplay->GetRect(true));
    ofSetColor(0,0,255);
-   ofRect(mFreqAdsrDisplay->GetRect(true));
+   ofRect(mFreqAdsrDisplay->GetRect(true));*/
    
    mToneAdsrDisplay->Draw();
    mVolSlider->Draw();
@@ -309,15 +351,37 @@ void DrumSynth::DrumSynthHit::Draw()
    mFreqAdsrDisplay->Draw();
    mFreqMaxSlider->Draw();
    mFreqMinSlider->Draw();
-   
-   float time = gTime - mStartTime;
-   if (time >= 0 && time < 500)
+   mFilterAdsrDisplay->Draw();
+   mFilterCutoffMaxSlider->Draw();
+   mFilterCutoffMinSlider->Draw();
+   mFilterQSlider->Draw();
+
+   ofPushStyle();
+   ofSetColor(0, 0, 0, 100);
+   ofFill();
+   if (mData.mVol == 0)
    {
-      ofPushStyle();
-      ofSetColor(255,0,0);
-      ofRect(mX+(time/500)*140,mY,1,140);
-      ofPopStyle();
+      ofRect(mToneAdsrDisplay->GetRect(true).grow(1));
+      ofRect(mFreqAdsrDisplay->GetRect(true).grow(1));
+      ofRect(mFreqMaxSlider->GetRect(true));
+      ofRect(mFreqMinSlider->GetRect(true));
+      ofRect(mToneType->GetRect(true));
    }
+   if (mData.mVolNoise == 0)
+   {
+      ofRect(mNoiseAdsrDisplay->GetRect(true).grow(1));
+   }
+   if (mData.mVol == 0 && mData.mVolNoise == 0)
+   {
+      ofRect(mFilterCutoffMaxSlider->GetRect(true));
+   }
+   if (mData.mCutoffMax == DRUMSYNTH_NO_CUTOFF || (mData.mVol == 0 && mData.mVolNoise == 0))
+   {
+      ofRect(mFilterAdsrDisplay->GetRect(true).grow(1));
+      ofRect(mFilterCutoffMinSlider->GetRect(true));
+      ofRect(mFilterQSlider->GetRect(true));  
+   }
+   ofPopStyle();
 }
 
 DrumSynth::DrumSynthHitSerialData::DrumSynthHitSerialData()
@@ -327,6 +391,9 @@ DrumSynth::DrumSynthHitSerialData::DrumSynthHitSerialData()
 , mFreqMin(10)
 , mVol(0)
 , mVolNoise(0)
+, mCutoffMax(DRUMSYNTH_NO_CUTOFF)
+, mCutoffMin(10)
+, mQ(1)
 {
    mTone.GetADSR()->SetNumStages(2);
    mTone.GetADSR()->GetHasSustainStage() = false;
@@ -334,12 +401,14 @@ DrumSynth::DrumSynthHitSerialData::DrumSynthHitSerialData()
    mTone.GetADSR()->GetStageData(0).target = 1;
    mTone.GetADSR()->GetStageData(1).time = 100;
    mTone.GetADSR()->GetStageData(1).target = 0;
+
    mNoise.GetADSR()->SetNumStages(2);
    mNoise.GetADSR()->GetHasSustainStage() = false;
    mNoise.GetADSR()->GetStageData(0).time = 1;
    mNoise.GetADSR()->GetStageData(0).target = 1;
    mNoise.GetADSR()->GetStageData(1).time = 40;
    mNoise.GetADSR()->GetStageData(1).target = 0;
+
    mFreqAdsr.SetNumStages(2);
    mFreqAdsr.GetHasSustainStage() = false;
    mFreqAdsr.GetFreeReleaseLevel() = true;
@@ -347,6 +416,14 @@ DrumSynth::DrumSynthHitSerialData::DrumSynthHitSerialData()
    mFreqAdsr.GetStageData(0).target = 1;
    mFreqAdsr.GetStageData(1).time = 500;
    mFreqAdsr.GetStageData(1).target = 0;
+
+   mFilterAdsr.SetNumStages(2);
+   mFilterAdsr.GetHasSustainStage() = false;
+   mFilterAdsr.GetFreeReleaseLevel() = true;
+   mFilterAdsr.GetStageData(0).time = 1;
+   mFilterAdsr.GetStageData(0).target = 1;
+   mFilterAdsr.GetStageData(1).time = 500;
+   mFilterAdsr.GetStageData(1).target = 0;
 }
 
 

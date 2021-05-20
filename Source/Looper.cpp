@@ -57,7 +57,6 @@ Looper::Looper()
 , mWantUndo(false)
 , mLoopPosOffset(0)
 , mLoopPosOffsetSlider(nullptr)
-, mResetOffsetButton(nullptr)
 , mWriteOffsetButton(nullptr)
 , mAllowChop(false)
 , mAllowChopCheckbox(nullptr)
@@ -136,8 +135,7 @@ void Looper::CreateUIControls()
    mHalveSpeedButton = new ClickButton(this,".5x",147,43);
    mUndoButton = new ClickButton(this,"undo",-1,-1);
    mLoopPosOffsetSlider = new FloatSlider(this,"offset",-1,-1,130,15,&mLoopPosOffset,0,mLoopLength);
-   mResetOffsetButton = new ClickButton(this," r ",-1,-1);
-   mWriteOffsetButton = new ClickButton(this," w ",-1,-1);
+   mWriteOffsetButton = new ClickButton(this,"set",-1,-1);
    mScratchSpeedSlider = new FloatSlider(this,"scrspd",-1,-1,130,15,&mScratchSpeed,-2,2);
    mAllowScratchCheckbox = new Checkbox(this,"scr",-1,-1,&mAllowScratch);
    mFourTetSlider = new FloatSlider(this,"fourtet",4,65,65,15,&mFourTet,0,1,1);
@@ -182,8 +180,7 @@ void Looper::CreateUIControls()
    mPitchShiftSlider->PositionTo(mVolSlider, kAnchor_Below);
    mKeepPitchCheckbox->PositionTo(mPitchShiftSlider, kAnchor_Right);
    mLoopPosOffsetSlider->PositionTo(mPitchShiftSlider, kAnchor_Below);
-   mResetOffsetButton->PositionTo(mLoopPosOffsetSlider, kAnchor_Right);
-   mWriteOffsetButton->PositionTo(mResetOffsetButton, kAnchor_Right);
+   mWriteOffsetButton->PositionTo(mLoopPosOffsetSlider, kAnchor_Right);
    mScratchSpeedSlider->PositionTo(mLoopPosOffsetSlider, kAnchor_Below);
    mAllowScratchCheckbox->PositionTo(mScratchSpeedSlider, kAnchor_Right);
 }
@@ -253,13 +250,15 @@ void Looper::Process(double time)
 {
    PROFILER(Looper);
 
-   if (!mEnabled || GetTarget() == nullptr)
+   IAudioReceiver* target = GetTarget();
+
+   if (!mEnabled || target == nullptr)
       return;
 
    ComputeSliders(0);
    int numChannels = MAX(GetBuffer()->NumActiveChannels(), mBuffer->NumActiveChannels());
    if (mRecorder)
-      numChannels = MAX(numChannels, mRecorder->GetBuffer()->NumActiveChannels());
+      numChannels = MAX(numChannels, mRecorder->GetRecordBuffer()->NumChannels());
    GetBuffer()->SetNumActiveChannels(numChannels);
    SyncBuffers();
    mBuffer->SetNumActiveChannels(GetBuffer()->NumActiveChannels());
@@ -396,8 +395,8 @@ void Looper::Process(double time)
    
    for (int ch=0; ch<mBuffer->NumActiveChannels(); ++ch)
    {
-      Add(GetTarget()->GetBuffer()->GetChannel(ch), GetBuffer()->GetChannel(ch), bufferSize);
-      Add(GetTarget()->GetBuffer()->GetChannel(ch), mWorkBuffer.GetChannel(ch), bufferSize);
+      Add(target->GetBuffer()->GetChannel(ch), GetBuffer()->GetChannel(ch), bufferSize);
+      Add(target->GetBuffer()->GetChannel(ch), mWorkBuffer.GetChannel(ch), bufferSize);
    }
    
    GetBuffer()->Reset();
@@ -613,11 +612,11 @@ int Looper::GetMeasureSliceIndex(double time, int sampleIdx, int slicesPerBar)
    return slice;
 }
 
-void Looper::ResampleForNewSpeed()
+void Looper::ResampleForSpeed(float speed)
 {
    int oldLoopLength = mLoopLength;
-   SetLoopLength(MIN(int(abs(mLoopLength/mSpeed)), MAX_BUFFER_SIZE-1));
-   mLoopPos /= mSpeed;
+   SetLoopLength(MIN(int(abs(mLoopLength/speed)), MAX_BUFFER_SIZE-1));
+   mLoopPos /= speed;
    while (mLoopPos < 0)
       mLoopPos += mLoopLength;
    for (int ch=0; ch<mBuffer->NumActiveChannels(); ++ch)
@@ -626,7 +625,7 @@ void Looper::ResampleForNewSpeed()
       BufferCopy(oldBuffer, mBuffer->GetChannel(ch), oldLoopLength);
       for (int i=0; i<mLoopLength; ++i)
       {
-         float offset = i*mSpeed;
+         float offset = i*speed;
          mBuffer->GetChannel(ch)[i] = GetInterpolatedSample(offset, oldBuffer, oldLoopLength);
       }
       delete[] oldBuffer;
@@ -635,10 +634,11 @@ void Looper::ResampleForNewSpeed()
    if (mKeepPitch)
    {
       mKeepPitch = false;
-      mPitchShift = 1/mSpeed;
+      mPitchShift = 1/speed;
    }
    
    mSpeed = 1;
+   mBufferTempo = TheTransport->GetTempo();
 }
 
 void Looper::DrawModule()
@@ -688,7 +688,6 @@ void Looper::DrawModule()
    mHalveSpeedButton->Draw();
    mUndoButton->Draw();
    mLoopPosOffsetSlider->Draw();
-   mResetOffsetButton->Draw();
    mWriteOffsetButton->Draw();
    mScratchSpeedSlider->Draw();
    mAllowScratchCheckbox->Draw();
@@ -712,35 +711,35 @@ void Looper::DrawModule()
       ofPopStyle();
    }
    
+   mMergeButton->Draw();
    if (mRecorder && mRecorder->GetMergeSource() == this)
    {
       ofPushStyle();
       ofFill();
-      ofSetColor(255,0,0);
-      ofRect(165,61,26,15);
+      ofSetColor(255,0,0,100);
+      ofRect(mMergeButton->GetRect(true));
       ofPopStyle();
    }
-   mMergeButton->Draw();
 
+   mSwapButton->Draw();
    if (mRecorder && mRecorder->GetSwapSource() == this)
    {
       ofPushStyle();
       ofFill();
-      ofSetColor(0,0,255);
-      ofRect(120,82,35,15);
+      ofSetColor(0,0,255,100);
+      ofRect(mSwapButton->GetRect(true));
       ofPopStyle();
    }
-   mSwapButton->Draw();
    
+   mCopyButton->Draw();
    if (mRecorder && mRecorder->GetCopySource() == this)
    {
       ofPushStyle();
       ofFill();
-      ofSetColor(0,0,255);
-      ofRect(120,65,35,15);
+      ofSetColor(0,0,255,100);
+      ofRect(mCopyButton->GetRect(true));
       ofPopStyle();
    }
-   mCopyButton->Draw();
 
    mSaveButton->Draw();
    mMuteCheckbox->Draw();
@@ -1057,7 +1056,8 @@ void Looper::OnClicked(int x, int y, bool right)
    
    if (x >= BUFFER_X + BUFFER_W / 3 && x < BUFFER_X + (BUFFER_W * 2) / 3 &&
        y >= BUFFER_Y + BUFFER_H / 3 && y < BUFFER_Y + (BUFFER_H * 2) / 3 &&
-       mBufferTempo == TheTransport->GetTempo())
+       mBufferTempo == TheTransport->GetTempo() &&
+       gHoveredUIControl == nullptr)
    {
       ChannelBuffer grab(mLoopLength);
       grab.SetNumActiveChannels(mBuffer->NumActiveChannels());
@@ -1094,7 +1094,7 @@ void Looper::ButtonClicked(ClickButton* button)
       {
          HalveNumBars();
          mSpeed = 2;
-         ResampleForNewSpeed();
+         ResampleForSpeed(GetPlaybackSpeed());
       }
    }
    if (button == mHalveSpeedButton)
@@ -1103,16 +1103,11 @@ void Looper::ButtonClicked(ClickButton* button)
       {
          DoubleNumBars();
          mSpeed = .5f;
-         ResampleForNewSpeed();
+         ResampleForSpeed(GetPlaybackSpeed());
       }
    }
    if (button == mUndoButton)
       mWantUndo = true;
-   if (button == mResetOffsetButton)
-   {
-      mLoopPosOffset = 0;
-      mLoopPosOffsetSlider->DisableLFO();
-   }
    if (button == mWriteOffsetButton)
       mWantShiftOffset = true;
    if (button == mQueueCaptureButton)
@@ -1121,7 +1116,7 @@ void Looper::ButtonClicked(ClickButton* button)
       mLastCommitTime = gTime;
    }
    if (button == mResampleButton)
-      ResampleForNewSpeed();
+      ResampleForSpeed(GetPlaybackSpeed());
 }
 
 void Looper::FloatSliderUpdated(FloatSlider* slider, float oldVal)
@@ -1229,10 +1224,10 @@ void Looper::DoHalfShift()
 
 void Looper::DoShiftDownbeat()
 {
-   float* newBuffer = new float[MAX_BUFFER_SIZE];
    int shift = int(mLoopPos);
    for (int ch=0; ch<mBuffer->NumActiveChannels(); ++ch)
    {
+      float* newBuffer = new float[MAX_BUFFER_SIZE];
       BufferCopy(newBuffer, mBuffer->GetChannel(ch)+shift, mLoopLength-shift);
       BufferCopy(newBuffer+mLoopLength-shift, mBuffer->GetChannel(ch), shift);
       mBufferMutex.lock();
@@ -1244,12 +1239,12 @@ void Looper::DoShiftDownbeat()
 
 void Looper::DoShiftOffset()
 {
-   float* newBuffer = new float[MAX_BUFFER_SIZE];
    int shift = int(mLoopPosOffset);
    if (shift != 0)
    {
       for (int ch = 0; ch < mBuffer->NumActiveChannels(); ++ch)
       {
+         float* newBuffer = new float[MAX_BUFFER_SIZE];
          BufferCopy(newBuffer, mBuffer->GetChannel(ch) + shift, mLoopLength - shift);
          BufferCopy(newBuffer + mLoopLength - shift, mBuffer->GetChannel(ch), shift);
          mBufferMutex.lock();
@@ -1314,7 +1309,7 @@ void Looper::SetUpFromSaveData()
 
 namespace
 {
-   const int kSaveStateRev = 0;
+   const int kSaveStateRev = 1;
 }
 
 void Looper::SaveState(FileStreamOut& out)
@@ -1324,6 +1319,7 @@ void Looper::SaveState(FileStreamOut& out)
    out << kSaveStateRev;
    
    out << mLoopLength;
+   out << mBufferTempo;
    mBuffer->Save(out, mLoopLength);
 }
 
@@ -1333,9 +1329,11 @@ void Looper::LoadState(FileStreamIn& in)
    
    int rev;
    in >> rev;
-   LoadStateValidate(rev == kSaveStateRev);
+   LoadStateValidate(rev <= kSaveStateRev);
    
    in >> mLoopLength;
+   if (rev >= 1)
+      in >> mBufferTempo;
    int readLength;
    mBuffer->Load(in, readLength, ChannelBuffer::LoadMode::kAnyBufferSize);
    assert(mLoopLength == readLength);

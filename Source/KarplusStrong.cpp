@@ -18,7 +18,7 @@ KarplusStrong::KarplusStrong()
 , mFeedbackSlider(nullptr)
 , mVolSlider(nullptr)
 , mSourceDropdown(nullptr)
-, mMuteCheckbox(nullptr)
+, mInvertCheckbox(nullptr)
 , mStretchCheckbox(nullptr)
 , mExciterFreqSlider(nullptr)
 , mExciterAttackSlider(nullptr)
@@ -33,21 +33,28 @@ KarplusStrong::KarplusStrong()
    mBiquad.SetPosition(150,15);
    mBiquad.SetEnabled(true);
    mBiquad.SetFilterType(kFilterType_Lowpass);
-   mBiquad.SetFilterParams(1600, 1);
+   mBiquad.SetFilterParams(1600, sqrt(2)/2);
    mBiquad.SetName("biquad");
+   
+   for (int i=0; i<ChannelBuffer::kMaxNumChannels; ++i)
+   {
+      mDCRemover[i].SetFilterParams(10, sqrt(2)/2);
+      mDCRemover[i].SetFilterType(kFilterType_Highpass);
+      mDCRemover[i].UpdateFilterCoeff();
+   }
 }
 
 void KarplusStrong::CreateUIControls()
 {
    IDrawableModule::CreateUIControls();
    mVolSlider = new FloatSlider(this,"vol",3,2,80,15,&mVoiceParams.mVol,0,2);
-   mMuteCheckbox = new Checkbox(this,"mute",mVolSlider,kAnchor_Right,&mVoiceParams.mMute);
+   mInvertCheckbox = new Checkbox(this,"invert",mVolSlider,kAnchor_Right,&mVoiceParams.mInvert);
    mFilterSlider = new FloatSlider(this,"filter",mVolSlider,kAnchor_Below,140,15,&mVoiceParams.mFilter,0,1.2f);
    mFeedbackSlider = new FloatSlider(this,"feedback",mFilterSlider,kAnchor_Below,140,15,&mVoiceParams.mFeedback,.9f,.9999f,4);
    mSourceDropdown = new DropdownList(this,"source type",mFeedbackSlider,kAnchor_Below,(int*)&mVoiceParams.mSourceType,45);
    mExciterFreqSlider = new FloatSlider(this,"x freq",mSourceDropdown,kAnchor_Right,92,15,&mVoiceParams.mExciterFreq,10,4000);
-   mExciterAttackSlider = new FloatSlider(this,"x att",mSourceDropdown,kAnchor_Below,69,15,&mVoiceParams.mExciterAttack,1,40);
-   mExciterDecaySlider = new FloatSlider(this,"x dec",mExciterAttackSlider,kAnchor_Right,68,15,&mVoiceParams.mExciterDecay,1,40);
+   mExciterAttackSlider = new FloatSlider(this,"x att",mSourceDropdown,kAnchor_Below,69,15,&mVoiceParams.mExciterAttack,0,40);
+   mExciterDecaySlider = new FloatSlider(this,"x dec",mExciterAttackSlider,kAnchor_Right,68,15,&mVoiceParams.mExciterDecay,0,40);
    //mStretchCheckbox = new Checkbox(this,"stretch",mVolSlider,kAnchor_Right,&mVoiceParams.mStretch);
    
    mSourceDropdown->AddLabel("sin", kSourceTypeSin);
@@ -60,8 +67,6 @@ void KarplusStrong::CreateUIControls()
    mExciterDecaySlider->SetMode(FloatSlider::kSquare);
    
    mBiquad.CreateUIControls();
-   
-   mWriteBuffer.SetNumActiveChannels(2);
 }
 
 KarplusStrong::~KarplusStrong()
@@ -72,18 +77,26 @@ void KarplusStrong::Process(double time)
 {
    PROFILER(KarplusStrong);
 
-   if (!mEnabled || GetTarget() == nullptr)
+   IAudioReceiver* target = GetTarget();
+
+   if (!mEnabled || target == nullptr)
       return;
    
    mNoteInputBuffer.Process(time);
 
    ComputeSliders(0);
 
-   int bufferSize = GetTarget()->GetBuffer()->BufferSize();
+   int bufferSize = target->GetBuffer()->BufferSize();
    assert(bufferSize == gBufferSize);
 
    mWriteBuffer.Clear();
    mPolyMgr.Process(time, &mWriteBuffer, bufferSize);
+   
+   if (!mVoiceParams.mInvert)  //unnecessary if inversion is eliminating dc offset
+   {
+      for (int ch=0; ch<mWriteBuffer.NumActiveChannels(); ++ch)
+         mDCRemover[ch].Filter(mWriteBuffer.GetChannel(ch), bufferSize);
+   }
 
    mBiquad.ProcessAudio(time, &mWriteBuffer);
 
@@ -91,7 +104,7 @@ void KarplusStrong::Process(double time)
    for (int ch=0; ch<mWriteBuffer.NumActiveChannels(); ++ch)
    {
       GetVizBuffer()->WriteChunk(mWriteBuffer.GetChannel(ch),mWriteBuffer.BufferSize(), ch);
-      Add(GetTarget()->GetBuffer()->GetChannel(ch), mWriteBuffer.GetChannel(ch), gBufferSize);
+      Add(target->GetBuffer()->GetChannel(ch), mWriteBuffer.GetChannel(ch), gBufferSize);
    }
 }
 
@@ -119,7 +132,6 @@ void KarplusStrong::SetEnabled(bool enabled)
 
 void KarplusStrong::DrawModule()
 {
-
    if (Minimized() || IsVisible() == false)
       return;
 
@@ -127,7 +139,7 @@ void KarplusStrong::DrawModule()
    mFeedbackSlider->Draw();
    mVolSlider->Draw();
    mSourceDropdown->Draw();
-   mMuteCheckbox->Draw();
+   mInvertCheckbox->Draw();
    
    //mStretchCheckbox->Draw();
    mExciterFreqSlider->Draw();
@@ -157,6 +169,7 @@ void KarplusStrong::LoadLayout(const ofxJSONElement& moduleInfo)
 {
    mModuleSaveData.LoadString("target", moduleInfo);
    mModuleSaveData.LoadInt("voicelimit", moduleInfo, -1, -1, kNumVoices);
+   mModuleSaveData.LoadBool("mono", moduleInfo, false);
 
    SetUpFromSaveData();
 }
@@ -164,9 +177,13 @@ void KarplusStrong::LoadLayout(const ofxJSONElement& moduleInfo)
 void KarplusStrong::SetUpFromSaveData()
 {
    SetTarget(TheSynth->FindModule(mModuleSaveData.GetString("target")));
+
    int voiceLimit = mModuleSaveData.GetInt("voicelimit");
    if (voiceLimit > 0)
       mPolyMgr.SetVoiceLimit(voiceLimit);
+
+   bool mono = mModuleSaveData.GetBool("mono");
+   mWriteBuffer.SetNumActiveChannels(mono ? 1 : 2);
 }
 
 

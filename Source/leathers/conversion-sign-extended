@@ -1,0 +1,22 @@
+// This file generated automatically:
+// https://github.com/ruslo/sugar/wiki/Cross-platform-warning-suppression
+
+// Copyright (c) 2014, Ruslan Baratov
+// All rights reserved.
+
+#if !defined(LEATHERS_PUSH_)
+# error "`leathers/conversion-sign-extended` used "
+      "without `leathers/push`, "
+      "see README.txt for more info"
+#endif
+
+#if defined(LEATHERS_CONVERSION_SIGN_EXTENDED_)
+# error "`leathers/conversion-sign-extended` "
+    "already included; see README.txt for more info"
+#else
+# define LEATHERS_CONVERSION_SIGN_EXTENDED_
+#endif
+
+#if (_MSC_VER)
+# pragma warning(disable: 4826)
+#endif

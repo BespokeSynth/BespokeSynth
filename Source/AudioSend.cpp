@@ -66,12 +66,13 @@ void AudioSend::Process(double time)
       dryAmountBuffer[i] = 1-mAmount;
    }
    
-   if (GetTarget(0))
+   IAudioReceiver* target0 = GetTarget(0);
+   if (target0)
    {
       gWorkChannelBuffer.CopyFrom(GetBuffer(), GetBuffer()->BufferSize());
       for (int ch=0; ch<GetBuffer()->NumActiveChannels(); ++ch)
       {
-         ChannelBuffer* out = GetTarget(0)->GetBuffer();
+         ChannelBuffer* out = target0->GetBuffer();
          if (mCrossfade)
             Mult(gWorkChannelBuffer.GetChannel(ch), dryAmountBuffer, GetBuffer()->BufferSize());
          Add(out->GetChannel(ch), gWorkChannelBuffer.GetChannel(ch), GetBuffer()->BufferSize());
@@ -79,11 +80,12 @@ void AudioSend::Process(double time)
       }
    }
    
-   if (GetTarget(1))
+   IAudioReceiver* target1 = GetTarget(1);
+   if (target1)
    {
       for (int ch=0; ch<GetBuffer()->NumActiveChannels(); ++ch)
       {
-         ChannelBuffer* out2 = GetTarget(1)->GetBuffer();
+         ChannelBuffer* out2 = target1->GetBuffer();
          Mult(GetBuffer()->GetChannel(ch), amountBuffer, GetBuffer()->BufferSize());
          Add(out2->GetChannel(ch), GetBuffer()->GetChannel(ch), GetBuffer()->BufferSize());
          mVizBuffer2.WriteChunk(GetBuffer()->GetChannel(ch), GetBuffer()->BufferSize(), ch);

@@ -103,7 +103,7 @@ void Transport::KeyPressed(int key, bool isRepeat)
 
 void Transport::AdjustTempo(double amount)
 {
-   SetTempo(MAX(1,TheTransport->GetTempo() + amount));
+   SetTempo(MAX(1, GetTempo() + amount));
 }
 
 void Transport::Advance(double ms)
@@ -244,40 +244,33 @@ void Transport::ButtonClicked(ClickButton *button)
       AdjustTempo(-1);
 }
 
-void Transport::AddListener(ITimeListener* listener, NoteInterval interval, OffsetInfo offsetInfo, bool useEventLookahead)
+TransportListenerInfo* Transport::AddListener(ITimeListener* listener, NoteInterval interval, OffsetInfo offsetInfo, bool useEventLookahead)
 {
    //try to update first in case we already point to this
-   if (!UpdateListener(listener, interval, offsetInfo))
+   TransportListenerInfo* info = GetListenerInfo(listener);
+   if (info != nullptr)
+   {
+      info->mInterval = interval;
+      info->mOffsetInfo = offsetInfo;
+      info->mUseEventLookahead = useEventLookahead;
+   }
+   else
+   {
       mListeners.push_front(TransportListenerInfo(listener, interval, offsetInfo, useEventLookahead));
+   }
+
+   return GetListenerInfo(listener);
 }
 
-bool Transport::UpdateListener(ITimeListener* listener, NoteInterval interval)
+TransportListenerInfo* Transport::GetListenerInfo(ITimeListener* listener)
 {
    for (list<TransportListenerInfo>::iterator i = mListeners.begin(); i != mListeners.end(); ++i)
    {
       TransportListenerInfo& info = *i;
       if (info.mListener == listener)
-      {
-         info.mInterval = interval;
-         return true;
-      }
+         return &info;
    }
-   return false;
-}
-
-bool Transport::UpdateListener(ITimeListener* listener, NoteInterval interval, OffsetInfo offsetInfo)
-{
-   for (list<TransportListenerInfo>::iterator i = mListeners.begin(); i != mListeners.end(); ++i)
-   {
-      TransportListenerInfo& info = *i;
-      if (info.mListener == listener)
-      {
-         info.mInterval = interval;
-         info.mOffsetInfo = offsetInfo;
-         return true;
-      }
-   }
-   return false;
+   return nullptr;
 }
 
 void Transport::RemoveListener(ITimeListener* listener)
@@ -303,13 +296,21 @@ void Transport::RemoveAudioPoller(IAudioPoller* poller)
    mAudioPollers.remove(poller);
 }
 
-int Transport::GetQuantized(double time, NoteInterval interval, double* remainderMs /*=nullptr*/)
+int Transport::GetQuantized(double time, const TransportListenerInfo* listenerInfo, double* remainderMs /*=nullptr*/)
 {
+   double offsetMs;
+   if (listenerInfo->mOffsetInfo.mOffsetIsInMs)
+      offsetMs = listenerInfo->mOffsetInfo.mOffset;
+   else
+      offsetMs = listenerInfo->mOffsetInfo.mOffset*MsPerBar();
+   time += offsetMs;
+
    int measure = GetMeasure(time);
    double measurePos = GetMeasurePos(time);
    double pos = Swing(measurePos);
    pos *= double(mTimeSigTop) / mTimeSigBottom;
    
+   NoteInterval interval = listenerInfo->mInterval;
    switch (interval)
    {
       case kInterval_1n:
@@ -326,6 +327,9 @@ int Transport::GetQuantized(double time, NoteInterval interval, double* remainde
             *remainderMs = (pos + measure % (int)GetMeasureFraction(interval)) * MsPerBar();
          return ret;
       }
+      case kInterval_None:
+         interval = kInterval_16n;  //just pick some default value
+         //intentionally fall through
       case kInterval_2n:
       case kInterval_2nt:
       case kInterval_4n:
@@ -349,8 +353,19 @@ int Transport::GetQuantized(double time, NoteInterval interval, double* remainde
          }
          return (int)ret;
       }
-      case kInterval_None:
-         return GetQuantized(time, kInterval_16n, remainderMs); //TODO(Ryan) whatever
+      case kInterval_CustomDivisor:
+      {
+         double ret = pos * listenerInfo->mCustomDivisor;
+         if (remainderMs != nullptr)
+         {
+            double remainder = ret - (int)ret;
+            if (mSwing == .5f)
+               *remainderMs = remainder * (MsPerBar() / listenerInfo->mCustomDivisor);
+            else
+               *remainderMs = 0; //TODO(Ryan) this is incorrect, figure out how to properly calculate remainderMs when swing is applied
+         }
+         return (int)ret;
+      }
       default:
          //TODO(Ryan) this doesn't really make sense, does it?
          //assert(false);
@@ -397,6 +412,40 @@ int Transport::CountInStandardMeasure(NoteInterval interval)
          return 1;
    }
    return 0;
+}
+
+int Transport::GetStepsPerMeasure(ITimeListener* listener)
+{
+   TransportListenerInfo* info = GetListenerInfo(listener);
+   if (info != nullptr)
+   {
+      if (info->mInterval == kInterval_CustomDivisor)
+         return info->mCustomDivisor;
+      return CountInStandardMeasure(info->mInterval) * GetTimeSigTop() / GetTimeSigBottom();
+   }
+   TheSynth->LogEvent("error: GetStepsPerMeasure() called with unregistered listener", kLogEventType_Error);
+   return 8;
+}
+
+int Transport::GetSyncedStep(double time, ITimeListener* listener, const TransportListenerInfo* listenerInfo, int length)
+{
+   int step;
+   if (GetMeasureFraction(listenerInfo->mInterval) < 1)
+   {
+      int stepsPerMeasure = GetStepsPerMeasure(listener);
+      int measure = GetMeasure(time);
+      step = GetQuantized(time, listenerInfo) + measure * stepsPerMeasure;
+   }
+   else
+   {
+      int measure = GetMeasure(time);
+      step = int(measure / GetMeasureFraction(listenerInfo->mInterval));
+   }
+
+   if (length > 0)
+      step %= length;
+
+   return step;
 }
 
 double Transport::GetDuration(NoteInterval interval)
@@ -464,13 +513,7 @@ void Transport::UpdateListeners(double jumpMs)
       const TransportListenerInfo& info = *i;
       if (info.mInterval != kInterval_None &&
           info.mInterval != kInterval_Free)
-      {
-         double offsetMs;
-         if (info.mOffsetInfo.mOffsetIsInMs)
-            offsetMs = info.mOffsetInfo.mOffset;
-         else
-            offsetMs = info.mOffsetInfo.mOffset*MsPerBar();
-         
+      {         
          double lookaheadMs = jumpMs;
          if (info.mUseEventLookahead)
             lookaheadMs = MAX(lookaheadMs, GetEventLookaheadMs());
@@ -478,8 +521,8 @@ void Transport::UpdateListeners(double jumpMs)
          double checkTime = gTime + lookaheadMs;
          
          double remainderMs;
-         int oldStep = GetQuantized(checkTime + offsetMs - jumpMs, info.mInterval);
-         int newStep = GetQuantized(checkTime + offsetMs, info.mInterval, &remainderMs);
+         int oldStep = GetQuantized(checkTime - jumpMs, &info);
+         int newStep = GetQuantized(checkTime, &info, &remainderMs);
          if (oldStep != newStep)
          {
             double time = checkTime - remainderMs + .0001;  //TODO(Ryan) investigate this fudge number. I would think that subtracting remainderMs from checkTime would give me a number that gives me the same GetQuantized() result with a zero remainder, but sometimes it is just short of the correct quantization
@@ -527,8 +570,8 @@ void Transport::CheckboxUpdated(Checkbox* checkbox)
          float recordedTime = gTime - mStartRecordTime;
          int beats = numBars * GetTimeSigTop();
          float minutes = recordedTime / 1000.0f / 60.0f;
-         TheTransport->SetTempo(beats/minutes);
-         TheTransport->SetDownbeat();
+         SetTempo(beats/minutes);
+         SetDownbeat();
       }
    }
 }

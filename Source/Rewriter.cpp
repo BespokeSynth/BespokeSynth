@@ -27,6 +27,11 @@ Rewriter::Rewriter()
 {
 }
 
+namespace
+{
+   const int kBufferHeight = 40;
+}
+
 void Rewriter::CreateUIControls()
 {
    IDrawableModule::CreateUIControls();
@@ -35,8 +40,11 @@ void Rewriter::CreateUIControls()
    BUTTON(mStartRecordTimeButton,"new loop");
    ENDUIBLOCK(mWidth, mHeight);
    
+   mWidth = 110;
+   mHeight += kBufferHeight + 3;
+
    mLooperCable = new PatchCableSource(this,kConnectionType_Special);
-   mLooperCable->SetManualPosition(99, 10);
+   mLooperCable->SetManualPosition(mWidth-10, 10);
    mLooperCable->AddTypeFilter("looper");
    AddPatchCableSource(mLooperCable);
 }
@@ -61,7 +69,9 @@ void Rewriter::Process(double time)
 {
    PROFILER(Rewriter);
 
-   if (GetTarget() == nullptr)
+   IAudioReceiver* target = GetTarget();
+
+   if (target == nullptr)
       return;
    
    SyncBuffers();
@@ -73,7 +83,7 @@ void Rewriter::Process(double time)
    {
       mRecordBuffer.WriteChunk(GetBuffer()->GetChannel(ch), bufferSize, ch);
 
-      Add(GetTarget()->GetBuffer()->GetChannel(ch), GetBuffer()->GetChannel(ch), bufferSize);
+      Add(target->GetBuffer()->GetChannel(ch), GetBuffer()->GetChannel(ch), bufferSize);
 
       GetVizBuffer()->WriteChunk(GetBuffer()->GetChannel(ch),bufferSize, ch);
    }
@@ -93,6 +103,38 @@ void Rewriter::DrawModule()
    {
       ofSetColor(255, 100, 0, 100 + 50 * (cosf(TheTransport->GetMeasurePos(gTime) * 4 * FTWO_PI)));
       ofRect(mStartRecordTimeButton->GetRect(true));
+   }
+
+   if (mConnectedLooper)
+   {
+      int loopSamples = abs(int(TheTransport->MsPerBar() / 1000 * gSampleRate)) * mConnectedLooper->NumBars();
+      ofRectangle rect(3, mHeight - kBufferHeight - 3, mWidth - 6, kBufferHeight);
+      float playhead = fmod(TheTransport->GetMeasureTime(gTime), mConnectedLooper->NumBars()) / mConnectedLooper->NumBars();
+      //mRecordBuffer.Draw(rect.x, rect.y, rect.width, rect.height, loopSamples, L(channel,0), loopSamples * playhead);
+      //mRecordBuffer.Draw(rect.x, rect.y, rect.width * playhead, rect.height, loopSamples * playhead, L(channel, 0));
+
+      ofPushMatrix();
+      ofTranslate(rect.x, rect.y);
+      int nowOffset = mRecordBuffer.GetRawBufferOffset(0);
+      int startSample = nowOffset - loopSamples * playhead;
+      if (startSample < 0)
+         startSample += mRecordBuffer.Size();
+      int endSample = startSample - 1;
+      if (endSample < 0)
+         endSample += loopSamples;
+      int loopBeginSample = startSample - loopSamples * (1-playhead);
+      if (loopBeginSample < 0)
+         loopBeginSample += mRecordBuffer.Size();
+
+      DrawAudioBuffer(rect.width, rect.height, mRecordBuffer.GetRawBuffer()->GetChannel(0), startSample, endSample, -1, 1, ofColor::black, nowOffset, loopBeginSample, mRecordBuffer.Size());
+      ofPopMatrix();
+
+      ofSetColor(0, 255, 0);
+      ofLine(rect.x + rect.width*playhead, rect.y, rect.x + rect.width*playhead, rect.y + rect.height);
+   }
+   else
+   {
+      DrawTextNormal("connect a looper", 5, mHeight - 3 - kBufferHeight / 2);
    }
 }
 

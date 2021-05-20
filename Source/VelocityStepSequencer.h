@@ -81,6 +81,8 @@ private:
    bool mSetLength;
    
    MidiController* mController;
+
+   TransportListenerInfo* mTransportListenerInfo;
 };
 
 #endif /* defined(__Bespoke__VelocityStepSequencer__) */

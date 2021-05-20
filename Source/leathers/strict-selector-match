@@ -1,0 +1,28 @@
+// This file generated automatically:
+// https://github.com/ruslo/sugar/wiki/Cross-platform-warning-suppression
+
+// Copyright (c) 2014, Ruslan Baratov
+// All rights reserved.
+
+#if !defined(LEATHERS_PUSH_)
+# error "`leathers/strict-selector-match` used "
+      "without `leathers/push`, "
+      "see README.txt for more info"
+#endif
+
+#if defined(LEATHERS_STRICT_SELECTOR_MATCH_)
+# error "`leathers/strict-selector-match` "
+    "already included; see README.txt for more info"
+#else
+# define LEATHERS_STRICT_SELECTOR_MATCH_
+#endif
+
+#if (__clang__)
+# if __has_warning("-Wstrict-selector-match")
+#  pragma clang diagnostic ignored "-Wstrict-selector-match"
+# endif
+#endif
+
+#if (__GNUC__)
+# pragma GCC diagnostic ignored "-Wstrict-selector-match"
+#endif

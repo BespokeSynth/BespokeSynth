@@ -58,12 +58,14 @@ void StutterControl::Process(double time)
    
    ComputeSliders(0);
    SyncBuffers();
+
+   IAudioReceiver* target = GetTarget();
    
-   if (GetTarget())
+   if (target)
    {
       mStutterProcessor.ProcessAudio(time, GetBuffer());
       
-      ChannelBuffer* out = GetTarget()->GetBuffer();
+      ChannelBuffer* out = target->GetBuffer();
       for (int ch=0; ch<GetBuffer()->NumActiveChannels(); ++ch)
       {
          Add(out->GetChannel(ch), GetBuffer()->GetChannel(ch), out->BufferSize());

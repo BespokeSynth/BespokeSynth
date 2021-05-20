@@ -99,11 +99,13 @@ void Waveshaper::Process(double time)
    float max = 0;
    float min = 0;
    
-   if (GetTarget())
+   IAudioReceiver* target = GetTarget();
+
+   if (target)
    {
       int bufferSize = GetBuffer()->BufferSize();
       
-      ChannelBuffer* out = GetTarget()->GetBuffer();
+      ChannelBuffer* out = target->GetBuffer();
       for (int ch=0; ch<GetBuffer()->NumActiveChannels(); ++ch)
       {
          float* buffer = GetBuffer()->GetChannel(ch);

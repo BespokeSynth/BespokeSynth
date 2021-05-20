@@ -40,6 +40,9 @@ void Selector::DrawModule()
 
 void Selector::PostRepatch(PatchCableSource* cableSource, bool fromUserClick)
 {
+   if (!fromUserClick)
+      return;
+
    for (int i=0; i<mControlCables.size(); ++i)
    {
       if (mControlCables[i] == cableSource)
@@ -77,8 +80,22 @@ void Selector::SyncList()
    }
 }
 
+void Selector::PlayNote(double time, int pitch, int velocity, int voiceIdx, ModulationParameters modulation)
+{
+   int range = (int)mControlCables.size() - 1;
+   if (velocity > 0 && range > 0)
+      SetIndex(pitch % range);
+}
+
 void Selector::RadioButtonUpdated(RadioButton* radio, int oldVal)
 {
+   SetIndex(mCurrentValue);
+}
+
+void Selector::SetIndex(int index)
+{
+   mCurrentValue = index;
+
    IUIControl* controlToEnable = nullptr;
    for (int i=0; i<mControlCables.size(); ++i)
    {

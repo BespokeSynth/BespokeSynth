@@ -233,17 +233,17 @@ void TextEntry::OnKeyPressed(int key, bool isRepeat)
    }
    if (key == OF_KEY_TAB)
    {
-      AcceptEntry(false);
+      TextEntry* pendingNewEntry = nullptr;
       if (GetKeyModifiers() == kModifier_Shift)
-      {
-         if (mPreviousTextEntry)
-            mPreviousTextEntry->MakeActiveTextEntry(true);
-      }
+         pendingNewEntry = mPreviousTextEntry;
       else
-      {
-         if (mNextTextEntry)
-            mNextTextEntry->MakeActiveTextEntry(true);
-      }
+         pendingNewEntry = mNextTextEntry;
+
+      AcceptEntry(false);
+      IKeyboardFocusListener::ClearActiveKeyboardFocus(!K(notifyListeners));
+      
+      if (pendingNewEntry)
+         pendingNewEntry->MakeActiveTextEntry(true);
    }
    else if (key == OF_KEY_BACKSPACE)
    {
@@ -275,9 +275,51 @@ void TextEntry::OnKeyPressed(int key, bool isRepeat)
    else if (key == OF_KEY_RIGHT)
    {
       if (GetKeyModifiers() & kModifier_Command)
-         mCaretPosition = strlen(mString);
-      else if (mCaretPosition < strlen(mString))
+         mCaretPosition = (int)strlen(mString);
+      else if (mCaretPosition < (int)strlen(mString))
          ++mCaretPosition;
+   }
+   else if (key == OF_KEY_UP)
+   {
+      if (mType == kTextEntry_Float)
+      {
+         if (*mVarFloat + 1 <= mFloatMax)
+         {
+            *mVarFloat += 1;
+            UpdateDisplayString();
+            AcceptEntry(false);
+         }
+      }
+      if (mType == kTextEntry_Int)
+      {
+         if (*mVarInt + 1 <= mIntMax)
+         {
+            *mVarInt += 1;
+            UpdateDisplayString();
+            AcceptEntry(false);
+         }
+      }
+   }
+   else if (key == OF_KEY_DOWN)
+   {
+      if (mType == kTextEntry_Float)
+      {
+         if (*mVarFloat - 1 >= mFloatMin)
+         {
+            *mVarFloat -= 1;
+            UpdateDisplayString();
+            AcceptEntry(false);
+         }
+      }
+      if (mType == kTextEntry_Int)
+      {
+         if (*mVarInt - 1 >= mIntMin)
+         {
+            *mVarInt -= 1;
+            UpdateDisplayString();
+            AcceptEntry(false);
+         }
+      }
    }
    else if (toupper(key) == 'V' && GetKeyModifiers() == kModifier_Command)
    {
@@ -291,7 +333,7 @@ void TextEntry::OnKeyPressed(int key, bool isRepeat)
    }
    else if (key == KeyPress::endKey)
    {
-      mCaretPosition = strlen(mString);
+      mCaretPosition = (int)strlen(mString);
    }
    else
    {

@@ -63,7 +63,9 @@ void FreqDomainBoilerplate::Process(double time)
 {
    PROFILER(FreqDomainBoilerplate);
 
-   if (GetTarget() == nullptr || !mEnabled)
+   IAudioReceiver* target = GetTarget();
+
+   if (target == nullptr || !mEnabled)
       return;
 
    ComputeSliders(0);
@@ -121,7 +123,7 @@ void FreqDomainBoilerplate::Process(double time)
    for (int i=0; i<bufferSize; ++i)
       GetBuffer()->GetChannel(0)[i] += mRollingOutputBuffer.GetSample(fftWindowSize-i-1, 0) * volSq * mDryWet;
 
-   Add(GetTarget()->GetBuffer()->GetChannel(0), GetBuffer()->GetChannel(0), bufferSize);
+   Add(target->GetBuffer()->GetChannel(0), GetBuffer()->GetChannel(0), bufferSize);
 
    GetVizBuffer()->WriteChunk(GetBuffer()->GetChannel(0),bufferSize, 0);
 

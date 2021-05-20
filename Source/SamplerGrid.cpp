@@ -84,8 +84,10 @@ void SamplerGrid::Poll()
 void SamplerGrid::Process(double time)
 {
    PROFILER(SamplerGrid);
+
+   IAudioReceiver* target = GetTarget();
    
-   if (!mEnabled || GetTarget() == nullptr)
+   if (!mEnabled || target == nullptr)
       return;
    
    ComputeSliders(0);
@@ -141,7 +143,7 @@ void SamplerGrid::Process(double time)
    
    GetVizBuffer()->WriteChunk(gWorkBuffer, bufferSize, 0);
    
-   Add(GetTarget()->GetBuffer()->GetChannel(0), gWorkBuffer, bufferSize);
+   Add(target->GetBuffer()->GetChannel(0), gWorkBuffer, bufferSize);
    
    GetBuffer()->Reset();
 }

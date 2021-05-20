@@ -11,10 +11,11 @@
 
 #include "IDrawableModule.h"
 #include "RadioButton.h"
+#include "INoteReceiver.h"
 
 class PatchCableSource;
 
-class Selector : public IDrawableModule, public IRadioButtonListener
+class Selector : public IDrawableModule, public IRadioButtonListener, public INoteReceiver
 {
 public:
    Selector();
@@ -29,6 +30,10 @@ public:
    void LoadLayout(const ofxJSONElement& moduleInfo) override;
    void SaveLayout(ofxJSONElement& moduleInfo) override;
    void SetUpFromSaveData() override;
+
+   //INoteReceiver
+   void PlayNote(double time, int pitch, int velocity, int voiceIdx = -1, ModulationParameters modulation = ModulationParameters()) override;
+   void SendCC(int control, int value, int voiceIdx = -1) override {}
    
    //IPatchable
    void PostRepatch(PatchCableSource* cableSource, bool fromUserClick) override;
@@ -40,6 +45,7 @@ private:
    void GetModuleDimensions(float& width, float& height) override;
    
    void SyncList();
+   void SetIndex(int index);
    
    RadioButton* mSelector;
    int mCurrentValue;

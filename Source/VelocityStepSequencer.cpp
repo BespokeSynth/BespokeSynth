@@ -30,7 +30,7 @@ VelocityStepSequencer::VelocityStepSequencer()
 , mCurrentVelocity(80)
 , mController(nullptr)
 {
-   TheTransport->AddListener(this, mInterval, OffsetInfo(-.1f, true), false);
+   mTransportListenerInfo = TheTransport->AddListener(this, mInterval, OffsetInfo(-.1f, true), false);
 }
 
 void VelocityStepSequencer::CreateUIControls()
@@ -74,7 +74,6 @@ void VelocityStepSequencer::SetMidiController(string name)
 
 void VelocityStepSequencer::DrawModule()
 {
-
    if (Minimized() || IsVisible() == false)
       return;
    
@@ -82,14 +81,14 @@ void VelocityStepSequencer::DrawModule()
    mLengthSlider->Draw();
    mResetOnDownbeatCheckbox->Draw();
    
+   for (int i=0;i<VSS_MAX_STEPS;++i)
+      mVelSliders[i]->Draw();
+   
    ofPushStyle();
-   ofSetColor(0,255,0,gModuleDrawAlpha);
+   ofSetColor(0,255,0,50);
    ofFill();
    ofRect(10,35+mArpIndex*15,80,15);
    ofPopStyle();
-   
-   for (int i=0;i<VSS_MAX_STEPS;++i)
-      mVelSliders[i]->Draw();
 }
 
 void VelocityStepSequencer::CheckboxUpdated(Checkbox* checkbox)
@@ -116,7 +115,7 @@ void VelocityStepSequencer::OnTimeEvent(double time)
    if (mArpIndex >= mLength)
       mArpIndex = 0;
    
-   if (mResetOnDownbeat && TheTransport->GetQuantized(time, mInterval) == 0)
+   if (mResetOnDownbeat && TheTransport->GetQuantized(time, mTransportListenerInfo) == 0)
       mArpIndex = 0;
    
    mCurrentVelocity = mVels[mArpIndex];
@@ -146,7 +145,14 @@ void VelocityStepSequencer::ButtonClicked(ClickButton* button)
 void VelocityStepSequencer::DropdownUpdated(DropdownList* list, int oldVal)
 {
    if (list == mIntervalSelector)
-      TheTransport->UpdateListener(this, mInterval, OffsetInfo(-.1f, true));
+   {
+      TransportListenerInfo* transportListenerInfo = TheTransport->GetListenerInfo(this);
+      if (transportListenerInfo != nullptr)
+      {
+         transportListenerInfo->mInterval = mInterval;
+         transportListenerInfo->mOffsetInfo = OffsetInfo(-.1f, true);
+      }
+   }
 }
 
 void VelocityStepSequencer::IntSliderUpdated(IntSlider* slider, int oldVal)

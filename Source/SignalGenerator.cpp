@@ -99,7 +99,6 @@ void SignalGenerator::CreateUIControls()
    mMultSelector->AddLabel("8", 8);
    
    mFreqModeSelector->AddLabel("instant", kFreqMode_Instant);
-   mFreqModeSelector->AddLabel("root", kFreqMode_Root);
    mFreqModeSelector->AddLabel("ramp", kFreqMode_Ramp);
    mFreqModeSelector->AddLabel("slider", kFreqMode_Slider);
    
@@ -118,11 +117,13 @@ void SignalGenerator::Process(double time)
 {
    PROFILER(SignalGenerator);
    
-   if (!mEnabled || GetTarget() == nullptr)
+   IAudioReceiver* target = GetTarget();
+
+   if (!mEnabled || target == nullptr)
       return;
    
-   int bufferSize = GetTarget()->GetBuffer()->BufferSize();
-   float* out = GetTarget()->GetBuffer()->GetChannel(0);
+   int bufferSize = target->GetBuffer()->BufferSize();
+   float* out = target->GetBuffer()->GetChannel(0);
    assert(bufferSize == gBufferSize);
    
    Clear(mWriteBuffer, gBufferSize);

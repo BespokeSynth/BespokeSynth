@@ -1,0 +1,24 @@
+// This file generated automatically:
+// https://github.com/ruslo/sugar/wiki/Cross-platform-warning-suppression
+
+// Copyright (c) 2014, Ruslan Baratov
+// All rights reserved.
+
+#if !defined(LEATHERS_PUSH_)
+# error "`leathers/deprecated-objc-isa-usage` used "
+      "without `leathers/push`, "
+      "see README.txt for more info"
+#endif
+
+#if defined(LEATHERS_DEPRECATED_OBJC_ISA_USAGE_)
+# error "`leathers/deprecated-objc-isa-usage` "
+    "already included; see README.txt for more info"
+#else
+# define LEATHERS_DEPRECATED_OBJC_ISA_USAGE_
+#endif
+
+#if (__clang__)
+# if __has_warning("-Wdeprecated-objc-isa-usage")
+#  pragma clang diagnostic ignored "-Wdeprecated-objc-isa-usage"
+# endif
+#endif

@@ -15,7 +15,7 @@
 struct MidiNote
 {
    const char* mDeviceName;
-   double mTimestamp;
+   double mTimestampMs;
    int mPitch;
    float mVelocity; //0-127
    int mChannel;

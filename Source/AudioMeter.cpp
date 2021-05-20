@@ -42,10 +42,11 @@ void AudioMeter::Process(double time)
    
    Clear(mAnalysisBuffer, gBufferSize);
    
+   IAudioReceiver* target = GetTarget();
    for (int ch=0; ch<GetBuffer()->NumActiveChannels(); ++ch)
    {
-      if (GetTarget())
-         Add(GetTarget()->GetBuffer()->GetChannel(ch), GetBuffer()->GetChannel(ch), GetBuffer()->BufferSize());
+      if (target)
+         Add(target->GetBuffer()->GetChannel(ch), GetBuffer()->GetChannel(ch), GetBuffer()->BufferSize());
       Add(mAnalysisBuffer, GetBuffer()->GetChannel(ch), GetBuffer()->BufferSize());
       GetVizBuffer()->WriteChunk(GetBuffer()->GetChannel(ch),GetBuffer()->BufferSize(), ch);
    }

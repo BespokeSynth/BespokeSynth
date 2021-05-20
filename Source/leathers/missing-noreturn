@@ -1,0 +1,28 @@
+// This file generated automatically:
+// https://github.com/ruslo/sugar/wiki/Cross-platform-warning-suppression
+
+// Copyright (c) 2014, Ruslan Baratov
+// All rights reserved.
+
+#if !defined(LEATHERS_PUSH_)
+# error "`leathers/missing-noreturn` used "
+      "without `leathers/push`, "
+      "see README.txt for more info"
+#endif
+
+#if defined(LEATHERS_MISSING_NORETURN_)
+# error "`leathers/missing-noreturn` "
+    "already included; see README.txt for more info"
+#else
+# define LEATHERS_MISSING_NORETURN_
+#endif
+
+#if (__clang__)
+# if __has_warning("-Wmissing-noreturn")
+#  pragma clang diagnostic ignored "-Wmissing-noreturn"
+# endif
+#endif
+
+#if (__GNUC__)
+# pragma GCC diagnostic ignored "-Wmissing-noreturn"
+#endif

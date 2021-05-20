@@ -84,7 +84,9 @@ void FFTtoAdditive::Process(double time)
 {
    PROFILER(FFTtoAdditive);
 
-   if (GetTarget() == nullptr || !mEnabled)
+   IAudioReceiver* target = GetTarget();
+
+   if (target == nullptr || !mEnabled)
       return;
 
    ComputeSliders(0);
@@ -119,7 +121,7 @@ void FFTtoAdditive::Process(double time)
       mFFTData.mImaginaryValues[i] = phase;
    }
 
-   float* out = GetTarget()->GetBuffer()->GetChannel(0);
+   float* out = target->GetBuffer()->GetChannel(0);
    for (int i=0; i<bufferSize; ++i)
    {
       float write = 0;

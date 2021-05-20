@@ -26,9 +26,11 @@ DelayEffect::DelayEffect()
 , mShortTime(false)
 , mShortTimeCheckbox(nullptr)
 , mDry(true)
+, mInvert(false)
 , mDryCheckbox(nullptr)
 , mFeedbackModuleMode(false)
 , mAcceptInputCheckbox(nullptr)
+, mInvertCheckbox(nullptr)
 {
 }
 
@@ -41,9 +43,10 @@ void DelayEffect::CreateUIControls()
    FLOATSLIDER(mFeedbackSlider, "amount",&mFeedback,0,1);
    DROPDOWN(mIntervalSelector, "interval", (int*)(&mInterval), 45); UIBLOCK_SHIFTRIGHT();
    CHECKBOX(mShortTimeCheckbox, "short",&mShortTime); UIBLOCK_NEWLINE();
-   CHECKBOX(mAcceptInputCheckbox, "in",&mAcceptInput); UIBLOCK_SHIFTRIGHT();
-   CHECKBOX(mDryCheckbox,"dry",&mDry); UIBLOCK_SHIFTRIGHT();
-   CHECKBOX(mEchoCheckbox,"echo",&mEcho);
+   CHECKBOX(mDryCheckbox, "dry", &mDry);  UIBLOCK_SHIFTRIGHT();
+   CHECKBOX(mEchoCheckbox, "feedback", &mEcho);  UIBLOCK_NEWLINE();
+   CHECKBOX(mAcceptInputCheckbox, "input", &mAcceptInput); UIBLOCK_SHIFTRIGHT();
+   CHECKBOX(mInvertCheckbox, "invert", &mInvert);
    ENDUIBLOCK(mWidth, mHeight);
    
    mIntervalSelector->AddLabel("2", kInterval_2);
@@ -102,7 +105,7 @@ void DelayEffect::ProcessAudio(double time, ChannelBuffer* buffer)
          if (!mEcho && mAcceptInput) //single delay, no continuous feedback so do it pre
             mDelayBuffer.Write(buffer->GetChannel(ch)[i], ch);
 
-         float delayInput = delayedSample * mFeedback;
+         float delayInput = delayedSample * mFeedback * (mInvert ? -1 : 1);
          FIX_DENORMAL(delayInput);
          if (delayInput == delayInput) //filter NaNs
             buffer->GetChannel(ch)[i] += delayInput;
@@ -133,6 +136,7 @@ void DelayEffect::DrawModule()
    mDryCheckbox->Draw();
    mEchoCheckbox->Draw();
    mAcceptInputCheckbox->Draw();
+   mInvertCheckbox->Draw();
 }
 
 float DelayEffect::GetEffectAmount()
@@ -155,17 +159,21 @@ void DelayEffect::SetShortMode(bool on)
    mDelaySlider->SetExtents(GetMinDelayMs(),mShortTime?20:1000);
 }
 
-void DelayEffect::SetFeedbackModuleMode(bool feedbackMode)
+void DelayEffect::SetFeedbackModuleMode()
 {
-   mFeedbackModuleMode = feedbackMode;
-   if (mFeedbackModuleMode)
-   {
-      mDry = false;
-      mEcho = false;
-      mDelaySlider->SetExtents(GetMinDelayMs(),1000);
-   }
-   mDryCheckbox->SetShowing(!mFeedbackModuleMode);
-   mEchoCheckbox->SetShowing(!mFeedbackModuleMode);
+   mFeedbackModuleMode = true;
+
+   mDry = false;
+   mEcho = false;
+   mInvert = true;
+   SetShortMode(true);
+   SetDelay(20);
+
+   mDryCheckbox->SetShowing(false);
+   mEchoCheckbox->SetShowing(false);
+   mAcceptInputCheckbox->SetPosition(mAcceptInputCheckbox->GetPosition(true).x, mAcceptInputCheckbox->GetPosition(true).y - 17);
+   mInvertCheckbox->SetPosition(mInvertCheckbox->GetPosition(true).x, mInvertCheckbox->GetPosition(true).y - 17);
+   mHeight -= 17;
 }
 
 float DelayEffect::GetMinDelayMs() const

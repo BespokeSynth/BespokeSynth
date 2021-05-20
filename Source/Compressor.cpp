@@ -144,8 +144,10 @@ void Compressor::DrawModule()
    ofPopStyle();
 }
 
-void Compressor::CheckboxUpdated(Checkbox *checkbox)
+void Compressor::CheckboxUpdated(Checkbox* checkbox)
 {
+   if (checkbox == mEnabledCheckbox)
+      envdB_ = DC_OFFSET;  //reset state
 }
 
 void Compressor::FloatSliderUpdated(FloatSlider* slider, float oldVal)

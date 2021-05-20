@@ -41,7 +41,7 @@ public:
 private:
    //IDrawableModule
    void DrawModule() override;
-   void GetModuleDimensions(float& width, float& height) override { width = 130; height = 110; }
+   void GetModuleDimensions(float& width, float& height) override { width = 130; height = 120; }
    bool Enabled() const override { return true; }
 
    ChannelBuffer mDryBuffer;

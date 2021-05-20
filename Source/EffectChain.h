@@ -44,6 +44,9 @@ public:
    void KeyPressed(int key, bool isRepeat) override;
    void KeyReleased(int key) override;
 
+   bool HasPush2OverrideControls() const override { return true; }
+   void GetPush2OverrideControls(vector<IUIControl*>& controls) const override;
+
    void ButtonClicked(ClickButton* button) override;
    void CheckboxUpdated(Checkbox* checkbox) override;
    void FloatSliderUpdated(FloatSlider* slider, float oldVal) override;
@@ -60,16 +63,28 @@ private:
    void DrawModule() override;
    void GetModuleDimensions(float& width, float& height) override;
    bool Enabled() const override { return mEnabled; }
+   vector<IUIControl*> ControlsToIgnoreInSaveState() const override;
    
-   int GetRowHeight(int row);
+   int GetRowHeight(int row) const;
    int NumRows() const;
-   void DeleteLastEffect();
+   void DeleteEffect(int index);
+   void MoveEffect(int index, int direction);
+   void UpdateReshuffledDryWetSliders();
+   ofVec2f GetEffectPos(int index) const;
+
+   struct EffectControls
+   {
+      ClickButton* mMoveLeftButton;
+      ClickButton* mMoveRightButton;
+      ClickButton* mDeleteButton;
+      FloatSlider* mDryWetSlider;
+      ClickButton* mPush2DisplayEffectButton;
+   };
    
    vector<IAudioEffect*> mEffects;
    ChannelBuffer mDryBuffer;
-   vector<ClickButton*> mMoveButtons;
-   vector<FloatSlider*> mDryWetSliders;
-   float mDryWetLevels[MAX_EFFECTS_IN_CHAIN];  //implicit max of 100 effects
+   vector<EffectControls> mEffectControls;
+   std::array<float, MAX_EFFECTS_IN_CHAIN> mDryWetLevels;
    
    double mSwapTime;
    int mSwapFromIdx;
@@ -81,12 +96,14 @@ private:
    int mNumFXWide;
    bool mInitialized;
    bool mShowSpawnList;
-   bool mWantDeleteLastEffect;
+   int mWantToDeleteEffectAtIndex;
+   IAudioEffect* mPush2DisplayEffect;
    
    std::vector<string> mEffectTypesToSpawn;
    int mSpawnIndex;
    DropdownList* mEffectSpawnList;
-   ClickButton* mDeleteLastEffectButton;
+   ClickButton* mSpawnEffectButton;
+   ClickButton* mPush2ExitEffectButton;
    
    ofMutex mEffectMutex;
 };

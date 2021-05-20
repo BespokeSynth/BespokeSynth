@@ -72,6 +72,7 @@ public:
 private:
    void UpdateSample();
    void UpdateDisplaySamples();
+   void LoadFile();
 
    //IDrawableModule
    void DrawModule() override;
@@ -82,7 +83,7 @@ private:
    struct GrainMPEVoice
    {
       GrainMPEVoice();
-      void Process(float* out, int outLength, float* sample, int sampleLength);
+      void Process(ChannelBuffer* output, int bufferSize, ChannelBuffer* source);
       void Draw(float w, float h);
       
       float mPlay;
@@ -101,7 +102,7 @@ private:
    struct GrainManualVoice
    {
       GrainManualVoice();
-      void Process(float* out, int outLength, float* sample, int sampleLength);
+      void Process(ChannelBuffer* output, int bufferSize, ChannelBuffer* source);
       void Draw(float w, float h);
       
       float mGain;
@@ -117,18 +118,21 @@ private:
       FloatSlider* mLengthMsSlider;
       FloatSlider* mPosRandomizeSlider;
       FloatSlider* mSpeedRandomizeSlider;
+      FloatSlider* mSpacingRandomizeSlider;
+      Checkbox* mOctaveCheckbox;
+      FloatSlider* mWidthSlider;
    };
    
    static const int kNumMPEVoices = 16;
    GrainMPEVoice mMPEVoices[kNumMPEVoices];
-   static const int kNumManualVoices = 4;
+   static const int kNumManualVoices = 6;
    GrainManualVoice mManualVoices[kNumManualVoices];
    
    Sample* mSample;
    
+   ClickButton* mLoadButton;
    float mVolume;
    FloatSlider* mVolumeSlider;
-   float* mWriteBuffer;
    bool mLoading;
    FloatSlider* mDisplayOffsetSlider;
    float mDisplayOffset;

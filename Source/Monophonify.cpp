@@ -12,7 +12,8 @@
 #include "UIControlMacros.h"
 
 Monophonify::Monophonify()
-: mLastPlayedPitch(-1)
+: mInitialPitch(-1)
+, mLastPlayedPitch(-1)
 , mLastVelocity(0)
 , mRequireHeldNote(false)
 , mGlideTime(0)
@@ -62,13 +63,21 @@ void Monophonify::PlayNote(double time, int pitch, int velocity, int voiceIdx, M
    {
       mLastVelocity = velocity;
       
-      int mostRecentPitch = GetMostRecentPitch();
+      int bendFromPitch = GetMostRecentPitch();
       
-      if (mostRecentPitch != -1)
+      if (bendFromPitch != -1)
       {
-         mPitchBend.RampValue(time, mostRecentPitch - pitch + mPitchBend.GetIndividualValue(0), 0, mGlideTime);
-         PlayNoteOutput(time,mostRecentPitch, 0, -1, modulation);
-         PlayNoteOutput(time, pitch, velocity, voiceIdx, modulation);
+         if (mRequireHeldNote)
+         {
+            //just bend to the new note
+            mPitchBend.RampValue(time, mPitchBend.GetIndividualValue(0), pitch - mInitialPitch, mGlideTime);
+         }
+         else
+         {
+            mPitchBend.RampValue(time, bendFromPitch - pitch + mPitchBend.GetIndividualValue(0), 0, mGlideTime);
+            PlayNoteOutput(time, bendFromPitch, 0, -1, modulation);
+            PlayNoteOutput(time, pitch, velocity, voiceIdx, modulation);
+         }
       }
       else
       {
@@ -77,6 +86,7 @@ void Monophonify::PlayNote(double time, int pitch, int velocity, int voiceIdx, M
          else
             mPitchBend.RampValue(time, 0, 0, 0);
 
+         mInitialPitch = pitch;
          PlayNoteOutput(time, pitch, velocity, voiceIdx, modulation);
       }
       mLastPlayedPitch = pitch;
@@ -88,19 +98,27 @@ void Monophonify::PlayNote(double time, int pitch, int velocity, int voiceIdx, M
       
       mHeldNotes[pitch] = -1;
       
-      int mostRecentPitch = GetMostRecentPitch();
+      int returnToPitch = GetMostRecentPitch();
       
-      if (mostRecentPitch != -1)
+      if (returnToPitch != -1)
       {
          if (wasCurrNote)
          {
-            mPitchBend.RampValue(time, pitch - mostRecentPitch + mPitchBend.GetIndividualValue(0), 0, mGlideTime);
-            PlayNoteOutput(time, mostRecentPitch, mLastVelocity, voiceIdx, modulation);
+            if (mRequireHeldNote)
+            {
+               //bend back to old note
+               mPitchBend.RampValue(time, mPitchBend.GetIndividualValue(0), returnToPitch - mInitialPitch, mGlideTime);
+            }
+            else
+            {
+               mPitchBend.RampValue(time, pitch - returnToPitch + mPitchBend.GetIndividualValue(0), 0, mGlideTime);
+               PlayNoteOutput(time, returnToPitch, mLastVelocity, voiceIdx, modulation);
+            }
          }
       }
       else
       {
-         PlayNoteOutput(time, pitch, 0, voiceIdx, modulation);
+         PlayNoteOutput(time, mRequireHeldNote ? mInitialPitch : pitch, 0, voiceIdx, modulation);
       }
    }
 }

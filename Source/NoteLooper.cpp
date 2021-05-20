@@ -280,7 +280,7 @@ void NoteLooper::CheckboxUpdated(Checkbox* checkbox)
    if (checkbox == mEnabledCheckbox)
    {
       double time = gTime + gBufferSizeMs;
-      for (size_t i = 0; i < mCurrentNotes.size(); ++i)
+      for (int i = 0; i < (int)mCurrentNotes.size(); ++i)
       {
          if (mCurrentNotes[i] != nullptr)
          {
@@ -306,7 +306,7 @@ void NoteLooper::ButtonClicked(ClickButton* button)
    if (button == mClearButton)
    {
       double time = gTime + gBufferSizeMs;
-      for (size_t i = 0; i < mCurrentNotes.size(); ++i)
+      for (int i = 0; i < (int)mCurrentNotes.size(); ++i)
       {
          if (mCurrentNotes[i] != nullptr)
          {
@@ -314,7 +314,7 @@ void NoteLooper::ButtonClicked(ClickButton* button)
             mCurrentNotes[i] = nullptr;
          }
       }
-      for (size_t i = 0; i < mInputNotes.size(); ++i)
+      for (int i = 0; i < (int)mInputNotes.size(); ++i)
       {
          if (mInputNotes[i] != nullptr)
          {

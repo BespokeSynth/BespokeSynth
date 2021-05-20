@@ -50,6 +50,7 @@ private:
    void DrawRightLabel(IUIControl* control, string text, ofColor color);
    void PrepareForSave();
    void UpdatePrefStr(ofxJSONElement& userPrefs, string prefName, string value);
+   void UpdatePrefStrArray(ofxJSONElement& userPrefs, string prefName, vector<string> value);
    void UpdatePrefInt(ofxJSONElement& userPrefs, string prefName, int value);
    void UpdatePrefFloat(ofxJSONElement& userPrefs, string prefName, float value);
    void UpdatePrefBool(ofxJSONElement& userPrefs, string prefName, bool value);
@@ -83,6 +84,8 @@ private:
    float mScrollMultiplierHorizontal;
    Checkbox* mAutosaveCheckbox;
    bool mAutosave;
+   TextEntry* mRecordBufferLengthEntry;
+   float mRecordBufferLengthMinutes;
    TextEntry* mTooltipsFilePathEntry;
    string mTooltipsFilePath;
    TextEntry* mDefaultLayoutPathEntry;
@@ -91,6 +94,8 @@ private:
    string mYoutubeDlPath;
    TextEntry* mFfmpegPathEntry;
    string mFfmpegPath;
+   TextEntry* mVstSearchDirsEntry;
+   string mVstSearchDirs;
    ClickButton* mSaveButton;
    ClickButton* mCancelButton;
 

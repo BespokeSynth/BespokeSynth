@@ -22,7 +22,7 @@ ControlSequencer::ControlSequencer()
 , mControlCable(nullptr)
 , mRandomize(nullptr)
 {
-   TheTransport->AddListener(this, mInterval, OffsetInfo(0, true), false);
+   mTransportListenerInfo = TheTransport->AddListener(this, mInterval, OffsetInfo(0, true), false);
    
    sControlSequencers.push_back(this);
 }
@@ -90,10 +90,7 @@ void ControlSequencer::Poll()
 
 void ControlSequencer::OnTimeEvent(double time)
 {
-   int stepsPerMeasure = TheTransport->CountInStandardMeasure(mInterval) * TheTransport->GetTimeSigTop()/TheTransport->GetTimeSigBottom();
-   int numMeasures = MAX(1,ceil(float(mGrid->GetCols()) / stepsPerMeasure));
-   int measure = TheTransport->GetMeasure(time) % numMeasures;
-   int step = ((TheTransport->GetQuantized(time, mInterval) % stepsPerMeasure) + measure * stepsPerMeasure) % mGrid->GetCols();
+   int step = TheTransport->GetSyncedStep(time, this, mTransportListenerInfo, mGrid->GetCols());
    
    mGrid->SetHighlightCol(time, step);
    
@@ -210,7 +207,9 @@ void ControlSequencer::DropdownUpdated(DropdownList* list, int oldVal)
    {
       if (newSteps > 0)
       {
-         TheTransport->UpdateListener(this, mInterval);
+         TransportListenerInfo* transportListenerInfo = TheTransport->GetListenerInfo(this);
+         if (transportListenerInfo != nullptr)
+            transportListenerInfo->mInterval =  mInterval;
          SetNumSteps(newSteps, true);
       }
       else

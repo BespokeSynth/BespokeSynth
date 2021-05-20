@@ -37,8 +37,10 @@ Panner::~Panner()
 void Panner::Process(double time)
 {
    PROFILER(Panner);
+
+   IAudioReceiver* target = GetTarget();
    
-   if (!mEnabled || GetTarget() == nullptr)
+   if (!mEnabled || target == nullptr)
       return;
  
    SyncBuffers(2);
@@ -55,7 +57,7 @@ void Panner::Process(double time)
       secondChannel = GetBuffer()->GetChannel(1);
    }
    
-   ChannelBuffer* out = GetTarget()->GetBuffer();
+   ChannelBuffer* out = target->GetBuffer();
    
    if (abs(mWiden) > 0)
    {

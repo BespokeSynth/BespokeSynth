@@ -47,13 +47,14 @@ public:
    void SetEnabled(bool enabled) override { mEnabled = enabled; }
    
    void FilesDropped(vector<string> files, int x, int y) override;
-   void SampleDropped(int x, int y, Sample* sample);
+   void SampleDropped(int x, int y, Sample* sample) override;
    bool CanDropSample() const override { return true; }
    bool IsResizable() const override { return true; }
    void Resize(float width, float height) override { mWidth = ofClamp(width, 210, 9999); mHeight = ofClamp(height, 125, 9999); }
    
    void SetCuePoint(int pitch, float startSeconds, float lengthSeconds, float speed);
    void FillData(vector<float> data);
+   ChannelBuffer* GetCueSampleData(int cueIndex);
    
    void oscMessageReceived(const OSCMessage& msg) override;
    void oscBundleReceived(const OSCBundle& bundle) override;

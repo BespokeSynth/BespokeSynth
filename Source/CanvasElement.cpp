@@ -38,9 +38,9 @@ void CanvasElement::Draw(ofVec2f offset)
    else
    {      
       ofPushStyle();
-      ofSetLineWidth(1.5f);
+      ofSetLineWidth(3.0f);
       ofNoFill();
-      ofSetColor(255, 255, 255, ofMap(sin(gTime / 1000 * PI * 2), -1, 1, 60, 100));
+      ofSetColor(255, 255, 255, ofMap(sin(gTime / 500 * PI * 2), -1, 1, 40, 120));
       ofRect(GetRectAtDestination(K(clamp), !K(wrapped), offset), 0);
       if (mCanvas->ShouldWrap() && GetEnd() > 1)
          ofRect(GetRectAtDestination(K(clamp), K(wrapped), offset), 0);

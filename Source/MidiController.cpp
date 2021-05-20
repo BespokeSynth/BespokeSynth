@@ -38,8 +38,10 @@ MidiController::MidiController()
 , mBindMode(false)
 , mBindCheckbox(nullptr)
 , mTwoWay(true)
+, mSendTwoWayOnChange(false)
 , mControllerIndex(-1)
 , mLastActivityTime(-9999)
+, mLastConnectedActivityTime(-9999)
 , mLastActivityUIControl(nullptr)
 , mLastBoundControlTime(-9999)
 , mLastBoundUIControl(nullptr)
@@ -275,6 +277,7 @@ void MidiController::OnTransportAdvanced(float amount)
    
    mQueuedMessageMutex.lock();
    
+   double firstNoteTimestampMs = -1;
    for (auto note = mQueuedNotes.begin(); note != mQueuedNotes.end(); ++note)
    {
       int voiceIdx = -1;
@@ -283,7 +286,18 @@ void MidiController::OnTransportAdvanced(float amount)
          voiceIdx = note->mChannel - 1;
       
       //TODO(Ryan) how can I use note->mTimestamp to get more accurate timing for midi input?
-      PlayNoteOutput(gTime, note->mPitch + mNoteOffset, MIN(127,note->mVelocity*mVelocityMult), voiceIdx, ModulationParameters(mModulation.GetPitchBend(voiceIdx), mModulation.GetModWheel(voiceIdx), mModulation.GetPressure(voiceIdx), 0));
+      //this here is not accurate, but prevents notes played within the same buffer from having the exact same time
+      double playTime;
+      if (firstNoteTimestampMs == -1) //this is the first note
+      {
+         firstNoteTimestampMs = note->mTimestampMs;
+         playTime = gTime;
+      }
+      else
+      {
+         playTime = gTime + (note->mTimestampMs - firstNoteTimestampMs);
+      }
+      PlayNoteOutput(playTime, note->mPitch + mNoteOffset, MIN(127,note->mVelocity*mVelocityMult), voiceIdx, ModulationParameters(mModulation.GetPitchBend(voiceIdx), mModulation.GetModWheel(voiceIdx), mModulation.GetPressure(voiceIdx), 0));
       
       for (auto i = mListeners[mControllerPage].begin(); i != mListeners[mControllerPage].end(); ++i)
          (*i)->OnMidiNote(*note);
@@ -433,7 +447,6 @@ void MidiController::MidiReceived(MidiMessageType messageType, int control, floa
    mLastActivityBound = false;
    //if (value > 0)
       mLastActivityTime = gTime;
-   mLastActivityUIControl = nullptr;
    
    GetLayoutControl(control, messageType).mLastActivityTime = gTime;
    GetLayoutControl(control, messageType).mLastValue = value;
@@ -491,6 +504,7 @@ void MidiController::MidiReceived(MidiMessageType messageType, int control, floa
             continue;
          
          mLastActivityUIControl = uicontrol;
+         mLastConnectedActivityTime = gTime;
 
          if (connection->mType == kControlType_Slider)
          {
@@ -551,7 +565,8 @@ void MidiController::MidiReceived(MidiMessageType messageType, int control, floa
             uicontrol->StartBeacon();
          }
 
-         connection->mLastControlValue = int(uicontrol->GetMidiValue() * 127);
+         if (!mSendTwoWayOnChange)
+            connection->mLastControlValue = int(uicontrol->GetMidiValue() * 127);   //set expected value here, so we don't send the value. otherwise, this will send the input value right back as output. (although, this behavior is desirable for some controllers, hence mSendTwoWayOnChange)
       }
    }
    
@@ -697,9 +712,16 @@ void MidiController::Poll()
             continue;
          
          int control = connection->mControl;
+         int messageType = connection->mMessageType;
          
          if (connection->mFeedbackControl != -1) // "self"
-            control = connection->mFeedbackControl;
+         {
+            control = connection->mFeedbackControl%128;
+            if (connection->mFeedbackControl < 128)
+               messageType = kMidiMessage_Control;
+            else
+               messageType = kMidiMessage_Note;
+         }
          
          if (connection->mFeedbackControl == -2) // "none"
             continue;
@@ -722,11 +744,11 @@ void MidiController::Poll()
                {
                   outVal = connection->mMidiOffValue;
                }
-               if (connection->mMessageType == kMidiMessage_Note)
+               if (messageType == kMidiMessage_Note)
                   SendNote(mControllerPage, control, outVal, true, connection->mChannel);
-               else if (connection->mMessageType == kMidiMessage_Control)
+               else if (messageType == kMidiMessage_Control)
                   SendCC(mControllerPage, control, outVal, connection->mChannel);
-               else if (connection->mMessageType == kMidiMessage_PitchBend)
+               else if (messageType == kMidiMessage_PitchBend)
                   SendPitchBend(mControllerPage, outVal, connection->mChannel);
             }
             else if (connection->mType == kControlType_Slider)
@@ -737,11 +759,11 @@ void MidiController::Poll()
                {
                   outVal = int((curValue / 127.0f) * (connection->mMidiOnValue - connection->mMidiOffValue) + connection->mMidiOffValue);
                }
-               if (connection->mMessageType == kMidiMessage_Note)
+               if (messageType == kMidiMessage_Note)
                   SendNote(mControllerPage, control, outVal, true, connection->mChannel);
-               else if (connection->mMessageType == kMidiMessage_Control)
+               else if (messageType == kMidiMessage_Control)
                   SendCC(mControllerPage, control, outVal, connection->mChannel);
-               else if (connection->mMessageType == kMidiMessage_PitchBend)
+               else if (messageType == kMidiMessage_PitchBend)
                   SendPitchBend(mControllerPage, outVal, connection->mChannel);
             }
             else if (connection->mType == kControlType_SetValue)
@@ -761,21 +783,21 @@ void MidiController::Poll()
                {
                   outVal = connection->mMidiOffValue;
                }
-               if (connection->mMessageType == kMidiMessage_Note)
+               if (messageType == kMidiMessage_Note)
                   SendNote(mControllerPage, control, outVal, true, connection->mChannel);
-               else if (connection->mMessageType == kMidiMessage_Control)
+               else if (messageType == kMidiMessage_Control)
                   SendCC(mControllerPage, control, outVal, connection->mChannel);
-               else if (connection->mMessageType == kMidiMessage_PitchBend)
+               else if (messageType == kMidiMessage_PitchBend)
                   SendPitchBend(mControllerPage, outVal, connection->mChannel);
             }
             else if (connection->mType == kControlType_Direct)
             {
                curValue = uicontrol->GetValue();
-               if (connection->mMessageType == kMidiMessage_Note)
+               if (messageType == kMidiMessage_Note)
                   SendNote(mControllerPage, control, uicontrol->GetValue(), true, connection->mChannel);
-               else if (connection->mMessageType == kMidiMessage_Control)
+               else if (messageType == kMidiMessage_Control)
                   SendCC(mControllerPage, control, uicontrol->GetValue(), connection->mChannel);
-               else if (connection->mMessageType == kMidiMessage_PitchBend)
+               else if (messageType == kMidiMessage_PitchBend)
                   SendPitchBend(mControllerPage, uicontrol->GetValue(), connection->mChannel);
             }
             connection->mLastControlValue = curValue;
@@ -1111,9 +1133,6 @@ void MidiController::DrawModule()
 
 void MidiController::DrawModuleUnclipped()
 {
-   if (Minimized() || IsVisible() == false)
-      return;
-
    const float kDisplayMs = 500;
    string displayString;
    
@@ -1124,7 +1143,7 @@ void MidiController::DrawModuleUnclipped()
       if (drawControl != nullptr)
          displayString = drawControl->Path() + " bound!";
    }
-   else if (gTime < mLastActivityTime + kDisplayMs)
+   else if (gTime < mLastConnectedActivityTime + kDisplayMs)
    {
       drawControl = mLastActivityUIControl;
       if (drawControl != nullptr)
@@ -1303,7 +1322,8 @@ void MidiController::HighlightPageControls(int page)
 }
 
 void MidiController::GetModuleDimensions(float& width, float& height)
-{if (mMappingDisplayMode == kList)
+{
+   if (mMappingDisplayMode == kList)
    {
       width = 830;
       height = 72 + 20 * GetNumConnectionsOnPage(mControllerPage);
@@ -1413,6 +1433,7 @@ void MidiController::OnDeviceChanged()
    }
    mGrids.clear();
    
+   bool useDefaultLayout = true;
    ofxJSONElement layout;
    string filename = mDeviceIn + ".json";
    ofStringReplace(filename, "/", "");
@@ -1431,111 +1452,136 @@ void MidiController::OnDeviceChanged()
          mTwoWay = true;
          mDevice.ConnectOutput(mDeviceOut.c_str(), mOutChannel);
       }
-      for (int group=0; group<layout["groups"].size(); ++group)
+      if (!layout["usechannelasvoice"].isNull())
       {
-         int rows = layout["groups"][group]["rows"].asInt();
-         int cols = layout["groups"][group]["cols"].asInt();
-         ofVec2f pos;
-         pos.x = (layout["groups"][group]["position"])[0u].asDouble();
-         pos.y = (layout["groups"][group]["position"])[1u].asDouble();
-         ofVec2f dim;
-         dim.x = (layout["groups"][group]["dimensions"])[0u].asDouble();
-         dim.y = (layout["groups"][group]["dimensions"])[1u].asDouble();
-         ofVec2f spacing;
-         spacing.x = (layout["groups"][group]["spacing"])[0u].asDouble();
-         spacing.y = (layout["groups"][group]["spacing"])[1u].asDouble();
-         MidiMessageType messageType;
-         if (layout["groups"][group]["messageType"] == "control")
-            messageType = kMidiMessage_Control;
-         if (layout["groups"][group]["messageType"] == "note")
-            messageType = kMidiMessage_Note;
-         if (layout["groups"][group]["messageType"] == "pitchbend")
-            messageType = kMidiMessage_PitchBend;
-         ControlDrawType drawType;
-         if (layout["groups"][group]["drawType"] == "button")
-            drawType = kDrawType_Button;
-         if (layout["groups"][group]["drawType"] == "knob")
-            drawType = kDrawType_Knob;
-         if (layout["groups"][group]["drawType"] == "slider")
-            drawType = kDrawType_Slider;
-         bool incremental = false;
-         if (!layout["groups"][group]["incremental"].isNull())
-            incremental = layout["groups"][group]["incremental"].asBool();
-         int offVal = 0;
-         int onVal = 127;
-         if (!layout["groups"][group]["colors"].isNull() &&
-            layout["groups"][group]["colors"].size() > 1)
+         SetUseChannelAsVoice(layout["usechannelasvoice"].asBool());
+         mModuleSaveData.SetBool("usechannelasvoice", mUseChannelAsVoice);
+      }
+      if (!layout["pitchbendrange"].isNull())
+      {
+         SetPitchBendRange(layout["pitchbendrange"].asInt());
+         mModuleSaveData.SetFloat("pitchbendrange", mPitchBendRange);
+      }
+      if (!layout["modwheelcc"].isNull())
+      {
+         mModwheelCC = layout["modwheelcc"].asInt();
+         mModuleSaveData.SetInt("modwheelcc(1or74)", mModwheelCC);
+      }
+      if (!layout["twoway_on_change"].isNull())
+      {
+         mSendTwoWayOnChange = layout["twoway_on_change"].asBool();
+         mModuleSaveData.SetBool("twoway_on_change", mSendTwoWayOnChange);
+      }
+      if (!layout["groups"].isNull())
+      {
+         useDefaultLayout = false;
+         for (int group = 0; group < layout["groups"].size(); ++group)
          {
-            offVal = layout["groups"][group]["colors"][0u].asInt();
-            onVal = layout["groups"][group]["colors"][1u].asInt();
-         }
-         ControlType connectionType = kControlType_Slider;
-         if (layout["groups"][group]["connection_type"] == "slider")
-            connectionType = kControlType_Slider;
-         if (layout["groups"][group]["connection_type"] == "set")
-            connectionType = kControlType_SetValue;
-         if (layout["groups"][group]["connection_type"] == "release")
-            connectionType = kControlType_SetValueOnRelease;
-         if (layout["groups"][group]["connection_type"] == "toggle")
-            connectionType = kControlType_Toggle;
-         if (layout["groups"][group]["connection_type"] == "direct")
-            connectionType = kControlType_Direct;
-         for (int row=0; row<rows; ++row)
-         {
-            for (int col=0; col<cols; ++col)
+            int rows = layout["groups"][group]["rows"].asInt();
+            int cols = layout["groups"][group]["cols"].asInt();
+            ofVec2f pos;
+            pos.x = (layout["groups"][group]["position"])[0u].asDouble();
+            pos.y = (layout["groups"][group]["position"])[1u].asDouble();
+            ofVec2f dim;
+            dim.x = (layout["groups"][group]["dimensions"])[0u].asDouble();
+            dim.y = (layout["groups"][group]["dimensions"])[1u].asDouble();
+            ofVec2f spacing;
+            spacing.x = (layout["groups"][group]["spacing"])[0u].asDouble();
+            spacing.y = (layout["groups"][group]["spacing"])[1u].asDouble();
+            MidiMessageType messageType;
+            if (layout["groups"][group]["messageType"] == "control")
+               messageType = kMidiMessage_Control;
+            if (layout["groups"][group]["messageType"] == "note")
+               messageType = kMidiMessage_Note;
+            if (layout["groups"][group]["messageType"] == "pitchbend")
+               messageType = kMidiMessage_PitchBend;
+            ControlDrawType drawType;
+            if (layout["groups"][group]["drawType"] == "button")
+               drawType = kDrawType_Button;
+            if (layout["groups"][group]["drawType"] == "knob")
+               drawType = kDrawType_Knob;
+            if (layout["groups"][group]["drawType"] == "slider")
+               drawType = kDrawType_Slider;
+            bool incremental = false;
+            if (!layout["groups"][group]["incremental"].isNull())
+               incremental = layout["groups"][group]["incremental"].asBool();
+            int offVal = 0;
+            int onVal = 127;
+            if (!layout["groups"][group]["colors"].isNull() &&
+               layout["groups"][group]["colors"].size() > 1)
             {
-               int index = col + row * cols;
-               int control = layout["groups"][group]["controls"][index].asInt();
-               GetLayoutControl(control, messageType).Setup(this, messageType, control, drawType, incremental, offVal, onVal, connectionType, pos.x+kLayoutButtonsX+spacing.x*col, pos.y+kLayoutButtonsY+spacing.y*row, dim.x, dim.y);
-               
-               //clear out values on controllers
-               /*if (messageType == kMidiMessage_Note)
-                  SendNote(0, control, offVal, true);
-               if (messageType == kMidiMessage_Control)
-                  SendCC(0, control, offVal);*/
+               offVal = layout["groups"][group]["colors"][0u].asInt();
+               onVal = layout["groups"][group]["colors"][1u].asInt();
             }
-         }
-         
-         if (drawType == kDrawType_Button && rows * cols >= 8) //we're a button grid
-         {
-            GridLayout* grid = new GridLayout();
-            grid->mRows = rows;
-            grid->mCols = cols;
-            grid->mPosition.set(pos.x + kLayoutButtonsX - 2, pos.y + kLayoutButtonsY - 2);
-            grid->mDimensions.set(spacing.x*cols + 2, spacing.y*rows + 2);
-            grid->mType = messageType;
-            grid->mGridCable = new PatchCableSource(this, kConnectionType_Grid);
-            grid->mGridCable->SetManualPosition(pos.x+kLayoutButtonsX-2, pos.y+kLayoutButtonsY-2);
-            grid->mGridCable->AddTypeFilter("gridcontroller");
-            AddPatchCableSource(grid->mGridCable);
-            
-            for (int row=0; row<rows; ++row)
+            ControlType connectionType = kControlType_Slider;
+            if (layout["groups"][group]["connection_type"] == "slider")
+               connectionType = kControlType_Slider;
+            if (layout["groups"][group]["connection_type"] == "set")
+               connectionType = kControlType_SetValue;
+            if (layout["groups"][group]["connection_type"] == "release")
+               connectionType = kControlType_SetValueOnRelease;
+            if (layout["groups"][group]["connection_type"] == "toggle")
+               connectionType = kControlType_Toggle;
+            if (layout["groups"][group]["connection_type"] == "direct")
+               connectionType = kControlType_Direct;
+            for (int row = 0; row < rows; ++row)
             {
-               for (int col=0; col<cols; ++col)
+               for (int col = 0; col < cols; ++col)
                {
                   int index = col + row * cols;
                   int control = layout["groups"][group]["controls"][index].asInt();
-                  grid->mControls.push_back(control);
+                  GetLayoutControl(control, messageType).Setup(this, messageType, control, drawType, incremental, offVal, onVal, connectionType, pos.x + kLayoutButtonsX + spacing.x*col, pos.y + kLayoutButtonsY + spacing.y*row, dim.x, dim.y);
+
+                  //clear out values on controllers
+                  /*if (messageType == kMidiMessage_Note)
+                     SendNote(0, control, offVal, true);
+                  if (messageType == kMidiMessage_Control)
+                     SendCC(0, control, offVal);*/
                }
             }
-            
-            if (!layout["groups"][group]["colors"].isNull() &&
-               layout["groups"][group]["colors"].size() > 0)
+
+            if (drawType == kDrawType_Button && rows * cols >= 8) //we're a button grid
             {
-               for (int i=0; i<layout["groups"][group]["colors"].size(); ++i)
-                  grid->mColors.push_back(layout["groups"][group]["colors"][i].asInt());
+               GridLayout* grid = new GridLayout();
+               grid->mRows = rows;
+               grid->mCols = cols;
+               grid->mPosition.set(pos.x + kLayoutButtonsX - 2, pos.y + kLayoutButtonsY - 2);
+               grid->mDimensions.set(spacing.x*cols + 2, spacing.y*rows + 2);
+               grid->mType = messageType;
+               grid->mGridCable = new PatchCableSource(this, kConnectionType_Grid);
+               grid->mGridCable->SetManualPosition(pos.x + kLayoutButtonsX - 2, pos.y + kLayoutButtonsY - 2);
+               grid->mGridCable->AddTypeFilter("gridcontroller");
+               AddPatchCableSource(grid->mGridCable);
+
+               for (int row = 0; row < rows; ++row)
+               {
+                  for (int col = 0; col < cols; ++col)
+                  {
+                     int index = col + row * cols;
+                     int control = layout["groups"][group]["controls"][index].asInt();
+                     grid->mControls.push_back(control);
+                  }
+               }
+
+               if (!layout["groups"][group]["colors"].isNull() &&
+                  layout["groups"][group]["colors"].size() > 0)
+               {
+                  for (int i = 0; i < layout["groups"][group]["colors"].size(); ++i)
+                     grid->mColors.push_back(layout["groups"][group]["colors"][i].asInt());
+               }
+               else
+               {
+                  grid->mColors.push_back(0);
+                  grid->mColors.push_back(127);
+               }
+
+               mGrids.push_back(grid);
             }
-            else
-            {
-               grid->mColors.push_back(0);
-               grid->mColors.push_back(127);
-            }
-            
-            mGrids.push_back(grid);
          }
       }
    }
-   else
+   
+   if (useDefaultLayout)
    {
       const float kSpacingX = 20;
       const float kSpacingY = 20;
@@ -1637,9 +1683,16 @@ void MidiController::DropdownUpdated(DropdownList* list, int oldVal)
       ResyncTwoWay();
    }
    if (list == mControllerList)
-   {      
-      ConnectDevice();
-      OnDeviceChanged();
+   {
+      if (TheSynth->GetTopModalFocusItem() == mControllerList->GetModalDropdown())
+      {
+         ConnectDevice();
+         OnDeviceChanged();
+      }
+      else
+      {
+         UpdateControllerIndex();
+      }
    }
 }
 
@@ -1790,9 +1843,13 @@ int MidiController::GetLayoutControlIndexForMidi(MidiMessageType type, int contr
    return -1;
 }
 
+static vector<string> sCachedInputDevices;
 //static
 vector<string> MidiController::GetAvailableInputDevices()
 {
+   if (!juce::MessageManager::existsAndIsCurrentThread())
+      return sCachedInputDevices;
+   
    vector<string> devices;
    for (auto& d : MidiInput::getAvailableDevices())
    {
@@ -1804,19 +1861,27 @@ vector<string> MidiController::GetAvailableInputDevices()
 
    devices.push_back("monome");
    devices.push_back("osccontroller");
+   
+   sCachedInputDevices = devices;
 
    return devices;
 }
 
+static vector<string> sCachedOutputDevices;
 //static
 vector<string> MidiController::GetAvailableOutputDevices()
 {
+   if (!juce::MessageManager::existsAndIsCurrentThread())
+      return sCachedOutputDevices;
+   
    vector<string> devices;
    for (auto& d : MidiOutput::getDevices())
       devices.push_back(d.toStdString());
 
    devices.push_back("monome");
    devices.push_back("osccontroller");
+   
+   sCachedOutputDevices = devices;
 
    return devices;
 }
@@ -1854,7 +1919,6 @@ void MidiController::ConnectDevice()
    string deviceInName = mControllerList->GetLabel(mControllerIndex);
    string deviceOutName = String(deviceInName).replace("Input", "Output").replace("input", "output").toStdString();
    bool hasOutput = MidiOutput::getDevices().contains(String(deviceOutName));
-   bool deviceChanged = (mDeviceIn != deviceInName);
    mDeviceIn = deviceInName;
    mDeviceOut = hasOutput ? deviceOutName : "";
    mModuleSaveData.SetString("devicein", mDeviceIn);
@@ -1897,20 +1961,6 @@ void MidiController::ConnectDevice()
       {
          delete mNonstandardController;
          mNonstandardController = nullptr;
-      }
-
-      bool isRoli = strstr(deviceInName.c_str(), "Seaboard") != nullptr ||
-         strstr(deviceInName.c_str(), "Lightpad BLOCK") != nullptr;
-      bool isLinnstrument = strstr(deviceInName.c_str(), "LinnStrument") != nullptr;
-      if ((isRoli || isLinnstrument) && deviceChanged)
-      {
-         SetUseChannelAsVoice(true);
-         SetPitchBendRange(48);
-         mModwheelCC = 74;
-
-         mModuleSaveData.SetBool("usechannelasvoice", mUseChannelAsVoice);
-         mModuleSaveData.SetFloat("pitchbendrange", mPitchBendRange);
-         mModuleSaveData.SetInt("modwheelcc(1or74)", mModwheelCC);
       }
 
       mDevice.ConnectInput(mDeviceIn.c_str());
@@ -1959,6 +2009,7 @@ void MidiController::LoadLayout(const ofxJSONElement& moduleInfo)
    
    mModuleSaveData.LoadBool("negativeedge",moduleInfo,false);
    mModuleSaveData.LoadBool("incrementalsliders", moduleInfo, false);
+   mModuleSaveData.LoadBool("twoway_on_change", moduleInfo, false);
    
    mConnectionsJson = moduleInfo["connections"];
 
@@ -1983,19 +2034,26 @@ void MidiController::SetUpFromSaveData()
    
    UseNegativeEdge(mModuleSaveData.GetBool("negativeedge"));
    mSlidersDefaultToIncremental = mModuleSaveData.GetBool("incrementalsliders");
+   mSendTwoWayOnChange = mModuleSaveData.GetBool("twoway_on_change");
    
    BuildControllerList();
    
+   UpdateControllerIndex();
+
+   ConnectDevice();
+   
+   OnDeviceChanged();
+}
+
+void MidiController::UpdateControllerIndex()
+{
+   mControllerIndex = -1;
    const auto& devices = GetAvailableInputDevices();
    for (int i=0; i<devices.size(); ++i)
    {
       if (devices[i].c_str() == mDeviceIn)
          mControllerIndex = i;
    }
-
-   ConnectDevice();
-   
-   OnDeviceChanged();
 }
 
 void MidiController::SaveLayout(ofxJSONElement& moduleInfo)
@@ -2235,8 +2293,10 @@ void UIControlConnection::CreateUIControls(int index)
    
    mFeedbackDropdown->AddLabel("self", -1);
    mFeedbackDropdown->AddLabel("none", -2);
-   for (int i=0; i<=127; ++i)
-      mFeedbackDropdown->AddLabel(ofToString(i).c_str(), i);
+   for (int i=0; i<=127; ++i)   //CCs
+      mFeedbackDropdown->AddLabel(("cc"+ofToString(i)).c_str(), i);
+   for (int i = 0; i <= 127; ++i)   //notes
+      mFeedbackDropdown->AddLabel(("n" + ofToString(i)).c_str(), i+128);
 }
 
 void UIControlConnection::SetShowing(bool enabled)

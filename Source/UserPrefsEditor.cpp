@@ -25,7 +25,7 @@ void UserPrefsEditor::CreateUIControls()
 {
    IDrawableModule::CreateUIControls();
 
-   UIBLOCK(165,50,200);
+   UIBLOCK(175,50,200);
    DROPDOWN(mDeviceTypeDropdown, "devicetype", &mDeviceTypeIndex, 200);
    DROPDOWN(mAudioOutputDeviceDropdown, "audio_output_device", &mAudioOutputDeviceIndex, 350);
    DROPDOWN(mAudioInputDeviceDropdown, "audio_input_device", &mAudioInputDeviceIndex, 350);
@@ -40,10 +40,12 @@ void UserPrefsEditor::CreateUIControls()
    FLOATSLIDER(mScrollMultiplierVerticalSlider, "scroll_multiplier_vertical", &mScrollMultiplierVertical, -2, 2);
    FLOATSLIDER(mScrollMultiplierHorizontalSlider, "scroll_multiplier_horizontal", &mScrollMultiplierHorizontal, -2, 2);
    CHECKBOX(mAutosaveCheckbox, "autosave", &mAutosave);
+   TEXTENTRY_NUM(mRecordBufferLengthEntry, "record_buffer_length_minutes", 5, &mRecordBufferLengthMinutes, 1, 120);
    TEXTENTRY(mTooltipsFilePathEntry, "tooltips", 100, &mTooltipsFilePath);
    TEXTENTRY(mDefaultLayoutPathEntry, "layout", 100, &mDefaultLayoutPath);
    TEXTENTRY(mYoutubeDlPathEntry, "youtube-dl_path", 100, &mYoutubeDlPath);
    TEXTENTRY(mFfmpegPathEntry, "ffmpeg_path", 100, &mFfmpegPath);
+   TEXTENTRY(mVstSearchDirsEntry, "vstsearchdirs", 1000, &mVstSearchDirs);
    UIBLOCK_SHIFTDOWN();
    BUTTON(mSaveButton, "save and exit bespoke");
    BUTTON(mCancelButton, "cancel");
@@ -54,6 +56,7 @@ void UserPrefsEditor::CreateUIControls()
    mZoomSlider->SetShowName(false);
    mScrollMultiplierVerticalSlider->SetShowName(false);
    mScrollMultiplierHorizontalSlider->SetShowName(false);
+   mVstSearchDirsEntry->SetFlexibleWidth(true);
 }
 
 void UserPrefsEditor::Show()
@@ -88,6 +91,11 @@ void UserPrefsEditor::Show()
    else
       mScrollMultiplierHorizontal = TheSynth->GetUserPrefs()["scroll_multiplier_horizontal"].asDouble();
 
+   if (TheSynth->GetUserPrefs()["record_buffer_length_minutes"].isNull())
+      mRecordBufferLengthMinutes = 30;
+   else
+      mRecordBufferLengthMinutes = TheSynth->GetUserPrefs()["record_buffer_length_minutes"].asDouble();
+
    if (TheSynth->GetUserPrefs()["tooltips"].isNull())
       mTooltipsFilePath = "internal/tooltips_eng.txt";
    else
@@ -107,6 +115,28 @@ void UserPrefsEditor::Show()
       mFfmpegPath = "c:/ffmpeg/bin/ffmpeg.exe";
    else
       mFfmpegPath = TheSynth->GetUserPrefs()["ffmpeg_path"].asString();
+   
+   if (TheSynth->GetUserPrefs()["vstsearchdirs"].isNull())
+   {
+#if BESPOKE_MAC
+      mVstSearchDirs = "/Library/Audio/Plug-Ins/VST3, /Library/Audio/Plug-Ins/VST";
+#elif BESPOKE_LINUX
+      mVstSearchDirs = "~/.vst/";
+#else
+      mVstSearchDirs = "C:/Program Files/Common Files/VST2, C:/Program Files/Common Files/VST3, C:/Program Files/Steinberg/VSTPlugins";
+#endif
+   }
+   else
+   {
+      const ofxJSONElement& strArray = TheSynth->GetUserPrefs()["vstsearchdirs"];
+      mVstSearchDirs = "";
+      for (unsigned int i=0; i<strArray.size(); ++i)
+      {
+         mVstSearchDirs += strArray[i].asString();
+         if (i < strArray.size()-1)
+            mVstSearchDirs += ", ";
+      }
+   }
 
    mWindowPositionXEntry->SetShowing(mSetWindowPosition);
    mWindowPositionYEntry->SetShowing(mSetWindowPosition);
@@ -283,6 +313,16 @@ void UserPrefsEditor::UpdatePrefStr(ofxJSONElement& userPrefs, string prefName, 
    ++mSavePrefIndex;
 }
 
+void UserPrefsEditor::UpdatePrefStrArray(ofxJSONElement& userPrefs, string prefName, vector<string> value)
+{
+   userPrefs.removeMember(prefName);
+   ofxJSONElement strArray;
+   for (string str : value)
+      strArray.append(str);
+   userPrefs["**"+ ToStringLeadingZeroes(mSavePrefIndex) + "**"+prefName] = strArray;
+   ++mSavePrefIndex;
+}
+
 void UserPrefsEditor::UpdatePrefInt(ofxJSONElement& userPrefs, string prefName, int value)
 {
    userPrefs.removeMember(prefName);
@@ -343,10 +383,14 @@ void UserPrefsEditor::ButtonClicked(ClickButton* button)
       UpdatePrefFloat(userPrefs, "scroll_multiplier_vertical", mScrollMultiplierVertical);
       UpdatePrefFloat(userPrefs, "scroll_multiplier_horizontal", mScrollMultiplierHorizontal);
       UpdatePrefBool(userPrefs, "autosave", mAutosave);
+      UpdatePrefFloat(userPrefs, "record_buffer_length_minutes", mRecordBufferLengthMinutes);
       UpdatePrefStr(userPrefs, "tooltips", mTooltipsFilePath);
       UpdatePrefStr(userPrefs, "layout", mDefaultLayoutPath);
       UpdatePrefStr(userPrefs, "youtube-dl_path", mYoutubeDlPath);
       UpdatePrefStr(userPrefs, "ffmpeg_path", mFfmpegPath);
+      string vstSearchDirs = mVstSearchDirs;
+      ofStringReplace(vstSearchDirs, ", ", ",");
+      UpdatePrefStrArray(userPrefs, "vstsearchdirs", ofSplitString(vstSearchDirs, ","));
       string output = userPrefs.getRawString(true);
       CleanUpSave(output);
 

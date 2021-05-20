@@ -299,7 +299,7 @@ void FloatSliderLFOControl::UpdateVisibleControls()
    mFreeRateSlider->SetShowing(showFreeRate);
    mIntervalSelector->SetShowing(!isPerlin);
    mShuffleSlider->SetShowing(!isPerlin);
-   mSoftenSlider->SetShowing(mLFO.GetOsc()->GetType() == kOsc_Saw || mLFO.GetOsc()->GetType() == kOsc_Square);
+   mSoftenSlider->SetShowing(mLFO.GetOsc()->GetType() == kOsc_Saw || mLFO.GetOsc()->GetType() == kOsc_Square || mLFO.GetOsc()->GetType() == kOsc_NegSaw);
    mSpreadSlider->SetShowing(mLFO.GetOsc()->GetType() != kOsc_Square);
    mLengthSlider->SetShowing(!isPerlin && mLFO.GetOsc()->GetType() != kOsc_Drunk);
 }
@@ -382,6 +382,7 @@ void FloatSliderLFOControl::ButtonClicked(ClickButton* button)
          if (mTargetCable == nullptr)
          {
             mTargetCable = new PatchCableSource(this, kConnectionType_UIControl);
+            mTargetCable->SetModulatorOwner(this);
             AddPatchCableSource(mTargetCable);
             mTargetCable->SetTarget(mTarget);
          }
@@ -420,6 +421,7 @@ void FloatSliderLFOControl::SetUpFromSaveData()
    if (mTargetCable == nullptr)
    {
       mTargetCable = new PatchCableSource(this, kConnectionType_UIControl);
+      mTargetCable->SetModulatorOwner(this);
       AddPatchCableSource(mTargetCable);
       mTargetCable->SetTarget(mTarget);
    }

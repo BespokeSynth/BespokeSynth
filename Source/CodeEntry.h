@@ -103,6 +103,7 @@ private:
       bool valid;
       int entryIndex;
       vector<string> params;
+      int caretPos;
    };
 
    struct AutocompleteInfo
