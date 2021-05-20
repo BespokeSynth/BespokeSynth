@@ -612,11 +612,11 @@ int Looper::GetMeasureSliceIndex(double time, int sampleIdx, int slicesPerBar)
    return slice;
 }
 
-void Looper::ResampleForNewSpeed()
+void Looper::ResampleForSpeed(float speed)
 {
    int oldLoopLength = mLoopLength;
-   SetLoopLength(MIN(int(abs(mLoopLength/mSpeed)), MAX_BUFFER_SIZE-1));
-   mLoopPos /= mSpeed;
+   SetLoopLength(MIN(int(abs(mLoopLength/speed)), MAX_BUFFER_SIZE-1));
+   mLoopPos /= speed;
    while (mLoopPos < 0)
       mLoopPos += mLoopLength;
    for (int ch=0; ch<mBuffer->NumActiveChannels(); ++ch)
@@ -625,7 +625,7 @@ void Looper::ResampleForNewSpeed()
       BufferCopy(oldBuffer, mBuffer->GetChannel(ch), oldLoopLength);
       for (int i=0; i<mLoopLength; ++i)
       {
-         float offset = i*mSpeed;
+         float offset = i*speed;
          mBuffer->GetChannel(ch)[i] = GetInterpolatedSample(offset, oldBuffer, oldLoopLength);
       }
       delete[] oldBuffer;
@@ -634,10 +634,11 @@ void Looper::ResampleForNewSpeed()
    if (mKeepPitch)
    {
       mKeepPitch = false;
-      mPitchShift = 1/mSpeed;
+      mPitchShift = 1/speed;
    }
    
    mSpeed = 1;
+   mBufferTempo = TheTransport->GetTempo();
 }
 
 void Looper::DrawModule()
@@ -1055,7 +1056,8 @@ void Looper::OnClicked(int x, int y, bool right)
    
    if (x >= BUFFER_X + BUFFER_W / 3 && x < BUFFER_X + (BUFFER_W * 2) / 3 &&
        y >= BUFFER_Y + BUFFER_H / 3 && y < BUFFER_Y + (BUFFER_H * 2) / 3 &&
-       mBufferTempo == TheTransport->GetTempo())
+       mBufferTempo == TheTransport->GetTempo() &&
+       gHoveredUIControl == nullptr)
    {
       ChannelBuffer grab(mLoopLength);
       grab.SetNumActiveChannels(mBuffer->NumActiveChannels());
@@ -1092,7 +1094,7 @@ void Looper::ButtonClicked(ClickButton* button)
       {
          HalveNumBars();
          mSpeed = 2;
-         ResampleForNewSpeed();
+         ResampleForSpeed(GetPlaybackSpeed());
       }
    }
    if (button == mHalveSpeedButton)
@@ -1101,7 +1103,7 @@ void Looper::ButtonClicked(ClickButton* button)
       {
          DoubleNumBars();
          mSpeed = .5f;
-         ResampleForNewSpeed();
+         ResampleForSpeed(GetPlaybackSpeed());
       }
    }
    if (button == mUndoButton)
@@ -1114,7 +1116,7 @@ void Looper::ButtonClicked(ClickButton* button)
       mLastCommitTime = gTime;
    }
    if (button == mResampleButton)
-      ResampleForNewSpeed();
+      ResampleForSpeed(GetPlaybackSpeed());
 }
 
 void Looper::FloatSliderUpdated(FloatSlider* slider, float oldVal)

@@ -261,7 +261,8 @@ void LooperRecorder::SyncCablesToLoopers()
          if (i < mLoopers.size())
             looper = mLoopers[i];
          mLooperPatchCables[i]->SetTarget(looper);
-         mLooperPatchCables[i]->SetManualPosition(130+i*12, 117);
+         mLooperPatchCables[i]->SetManualPosition(160+i*12, 117);
+         mLooperPatchCables[i]->SetOverrideCableDir(ofVec2f(0, 1));
          AddPatchCableSource(mLooperPatchCables[i]);
       }
    }
@@ -403,7 +404,7 @@ void LooperRecorder::DrawModule()
    if (mDrawDebug)
       mRecordBuffer.Draw(0,162,800,100);
    
-   DrawTextNormal("loopers:",125,109);
+   DrawTextNormal("loopers:",155,109);
 }
 
 void LooperRecorder::RemoveLooper(Looper* looper)
@@ -476,11 +477,6 @@ void LooperRecorder::UpdateSpeed()
       mSpeed = newSpeed;
       if (mSpeed == 0)
          mSpeed = .001f;
-      for (int i=0; i<mLoopers.size(); ++i)
-      {
-         if (mLoopers[i])
-            mLoopers[i]->SetSpeed(mSpeed);
-      }
    }
 }
 
@@ -494,7 +490,7 @@ void LooperRecorder::SyncLoopLengths()
       if (mLoopers[i])
       {
          if (mSpeed != 1)
-            mLoopers[i]->ResampleForNewSpeed();
+            mLoopers[i]->ResampleForSpeed(mLoopers[i]->GetPlaybackSpeed());
          mLoopers[i]->RecalcLoopLength();
       }
    }
@@ -620,10 +616,10 @@ void LooperRecorder::ButtonClicked(ClickButton* button)
       pos -= int(pos);
       TheTransport->SetMeasurePos(pos);
       TheTransport->SetMeasure(count);
-      for (int i=0; i<mLoopers.size(); ++i)
+      for (int i = 0; i < mLoopers.size(); ++i)
       {
          if (mLoopers[i])
-            mLoopers[i]->ResampleForNewSpeed();
+            mLoopers[i]->ResampleForSpeed(1);
       }
    }
 
@@ -643,10 +639,10 @@ void LooperRecorder::ButtonClicked(ClickButton* button)
       pos -= int(pos);
       TheTransport->SetMeasurePos(pos);
       TheTransport->SetMeasure(count);
-      for (int i=0; i<mLoopers.size(); ++i)
+      for (int i = 0; i < mLoopers.size(); ++i)
       {
          if (mLoopers[i])
-            mLoopers[i]->ResampleForNewSpeed();
+            mLoopers[i]->ResampleForSpeed(1);
       }
    }
 

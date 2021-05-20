@@ -44,11 +44,10 @@ public:
    void Clear();
    void Commit(RollingBuffer* commitBuffer = nullptr);
    void Fill(ChannelBuffer* buffer, int length);
-   void ResampleForNewSpeed();
+   void ResampleForSpeed(float speed);
    int NumBars() const { return mNumBars; }
    int GetRecorderNumBars() const;
    void SetNumBars(int numBars);
-   void SetSpeed(float speed) { mSpeed = speed; }
    void RecalcLoopLength() { UpdateNumBars(mNumBars); }
    void DoubleNumBars() { mNumBars *= 2; }
    void HalveNumBars();
@@ -64,6 +63,7 @@ public:
    float* GetLoopPosVar() { return &mLoopPos; }
    int GetLoopLength() { return mLoopLength; }
    void SetGranulator(LooperGranulator* granulator) { mGranulator = granulator; }
+   double GetPlaybackSpeed() const;
    
    void Poll() override;
    void Exit() override;
@@ -119,7 +119,6 @@ private:
    void DrawBeatwheel();
    float GetActualLoopPos(int samplesIn) const;
    int GetBeatwheelDepthLevel() const;
-   double GetPlaybackSpeed() const;
    
    //IDrawableModule
    void DrawModule() override;
