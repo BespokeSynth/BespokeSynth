@@ -258,7 +258,7 @@ void Looper::Process(double time)
    ComputeSliders(0);
    int numChannels = MAX(GetBuffer()->NumActiveChannels(), mBuffer->NumActiveChannels());
    if (mRecorder)
-      numChannels = MAX(numChannels, mRecorder->GetBuffer()->NumActiveChannels());
+      numChannels = MAX(numChannels, mRecorder->GetRecordBuffer()->NumChannels());
    GetBuffer()->SetNumActiveChannels(numChannels);
    SyncBuffers();
    mBuffer->SetNumActiveChannels(GetBuffer()->NumActiveChannels());
