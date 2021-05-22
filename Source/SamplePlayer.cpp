@@ -336,16 +336,19 @@ void SamplePlayer::PlayNote(double time, int pitch, int velocity, int voiceIdx /
 
 void SamplePlayer::PlayCuePoint(double time, int index, int velocity, float speedMult, float startOffsetSeconds)
 {
-   float startSeconds, lengthSeconds, speed;
-   GetPlayInfoForPitch(index, startSeconds, lengthSeconds, speed);
-   mSample->SetPlayPosition(((gTime - time) / 1000 + startSeconds + startOffsetSeconds) * gSampleRate * mSample->GetSampleRateRatio());
-   mPlay = true;
-   mSpeed = speed * speedMult;
-   mAdsr.Clear();
-   mAdsr.Start(time, velocity / 127.0f);
-   if (lengthSeconds > 0)
-      mAdsr.Stop(time + lengthSeconds * 1000 / speed);
-   SwitchAndRamp();
+   if (mSample != nullptr)
+   {
+      float startSeconds, lengthSeconds, speed;
+      GetPlayInfoForPitch(index, startSeconds, lengthSeconds, speed);
+      mSample->SetPlayPosition(((gTime - time) / 1000 + startSeconds + startOffsetSeconds) * gSampleRate * mSample->GetSampleRateRatio());
+      mPlay = true;
+      mSpeed = speed * speedMult;
+      mAdsr.Clear();
+      mAdsr.Start(time, velocity / 127.0f);
+      if (lengthSeconds > 0)
+         mAdsr.Stop(time + lengthSeconds * 1000 / speed);
+      SwitchAndRamp();
+   }
 }
 
 void SamplePlayer::SwitchAndRamp()
@@ -481,7 +484,7 @@ void SamplePlayer::ButtonClicked(ClickButton *button)
       DownloadYoutube("https://www.youtube.com/watch?v="+mYoutubeId, mYoutubeId);
    if (button == mLoadFileButton)
       LoadFile();
-   if (button == mTrimToZoomButton)
+   if (button == mTrimToZoomButton && mSample != nullptr)
    {
       Sample* sample = new Sample();
       sample->Create(GetZoomEndSample() - GetZoomStartSample());
@@ -617,9 +620,9 @@ void SamplePlayer::DownloadYoutube(string url, string title)
 
 void SamplePlayer::OnYoutubeDownloadComplete(string filename, string title)
 {
-   Sample* sample = new Sample();
    if (juce::File(ofToDataPath(filename)).existsAsFile())
    {
+      Sample* sample = new Sample();
       sample->Read(ofToDataPath(filename).c_str(), false, Sample::ReadType::Async);
       sample->SetName(title);
       UpdateSample(sample, true);

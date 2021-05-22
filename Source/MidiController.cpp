@@ -2320,7 +2320,7 @@ void UIControlConnection::PreDraw()
       {
          StringCopy(mUIControlPathInput, ("hotbind" + ofToString(mSpecialBinding - kSpecialBinding_HotBind0)).c_str(), MAX_TEXTENTRY_LENGTH);
       }
-      else
+      else if (mUIControl != nullptr)
       {
          StringCopy(mUIControlPathInput, mUIControl->Path().c_str(), MAX_TEXTENTRY_LENGTH);
          if (mUIOwner->GetLayoutControl(mControl, mMessageType).mControlCable)

@@ -153,7 +153,7 @@ void Vocoder::Process(double time)
 
       //cartesian to polar
       float amp = 2.*sqrtf(real*real + imag*imag);
-      float phase = atan2(imag,real);
+      //float phase = atan2(imag,real);
 
       float carrierReal = mCarrierFFTData.mRealValues[i];
       float carrierImag = mCarrierFFTData.mImaginaryValues[i];
@@ -163,7 +163,7 @@ void Vocoder::Process(double time)
       float carrierPhase = atan2(carrierImag,carrierReal);
 
       amp *= carrierAmp;
-      phase = carrierPhase;
+      float phase = carrierPhase;
 
       phase += ofRandom(mWhisper*FTWO_PI);
       mPhaseOffsetSlider->Compute();

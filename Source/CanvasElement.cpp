@@ -534,7 +534,7 @@ void SampleCanvasElement::DrawContents(bool clamp, bool wrapped, ofVec2f offset)
       rect.set(rect.x + rect.width, rect.y, -rect.width, rect.height);
 
    SampleCanvas* sampleCanvas = dynamic_cast<SampleCanvas*>(mCanvas->GetParent());
-   if (sampleCanvas != nullptr)
+   if (sampleCanvas != nullptr && mSample != nullptr)
    {
       float lengthMs = mSample->LengthInSamples() / mSample->GetSampleRateRatio() / gSampleRateMs;
       float lengthOriginalSpeed = lengthMs / TheTransport->GetDuration(sampleCanvas->GetInterval());

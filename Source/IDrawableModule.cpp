@@ -1172,14 +1172,20 @@ void IDrawableModule::LoadState(FileStreamIn& in)
    {
       int numPatchCableSources;
       in >> numPatchCableSources;
-      PatchCableSource* dummy = new PatchCableSource(this, kConnectionType_Special);
+      PatchCableSource* dummy = nullptr;
       for (int i=0; i<numPatchCableSources; ++i)
       {
          PatchCableSource* readIn;
          if (i < mPatchCableSources.size())
+         {
             readIn = mPatchCableSources[i];
+         }
          else
+         {
+            if (dummy == nullptr)
+               dummy = new PatchCableSource(this, kConnectionType_Special);
             readIn = dummy;
+         }
          readIn->LoadState(in);
       }
    }

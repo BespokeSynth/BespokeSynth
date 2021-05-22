@@ -115,7 +115,7 @@ float PitchDetector::DetectPitch(float* buffer, int bufferSize)
    Nf = mcorrsize;
    fs = mfs;
    
-   float inpitch;
+   float inpitch = 0;
    float conf = mconf;
    
    

@@ -1326,7 +1326,7 @@ void ModularSynth::AudioOut(float** output, int bufferSize, int nChannels)
 {
    PROFILER(audioOut_total);
    
-   bool sFirst = true;
+   static bool sFirst = true;
    if (sFirst)
    {
       FloatVectorOperations::disableDenormalisedNumberSupport();

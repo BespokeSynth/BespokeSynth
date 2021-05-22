@@ -780,7 +780,9 @@ void BeatBloks::DrawModule()
    ofPushStyle();
    ofFill();
    ofTranslate(mBufferX, mRemixBufferY);
-   int sourceSampleLength = MAX(1,mSample->LengthInSamples());
+   int sourceSampleLength = 1;
+   if (mSample != nullptr)
+      sourceSampleLength = MAX(1,mSample->LengthInSamples());
    ofPushMatrix();
    int count = 0;
    int i=0;
