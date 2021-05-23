@@ -1501,7 +1501,7 @@ notefilter~only allow a certain pitches through
 
 
 noteduration~sets the length a note will play, ignoring the note-off message
-~duration~length of the note in milliseconds
+~duration~length of the note in measures
 
 
 
