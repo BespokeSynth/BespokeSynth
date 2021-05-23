@@ -16,8 +16,9 @@
 #include "Slider.h"
 #include "Transport.h"
 #include "DropdownList.h"
+#include "IPulseReceiver.h"
 
-class NoteChainNode : public IDrawableModule, public INoteSource, public IButtonListener, public ITextEntryListener, public IFloatSliderListener, public IAudioPoller, public IDropdownListener, public ITimeListener
+class NoteChainNode : public IDrawableModule, public INoteSource, public IButtonListener, public ITextEntryListener, public IFloatSliderListener, public IAudioPoller, public IDropdownListener, public ITimeListener, public IPulseSource, public IPulseReceiver
 {
 public:
    NoteChainNode();
@@ -29,7 +30,8 @@ public:
    
    void SetEnabled(bool enabled) override { mEnabled = enabled; }
    
-   void TriggerNote();
+   //IPulseReceiver
+   void OnPulse(double time, float velocity, int flags) override;
    
    void OnTimeEvent(double time) override;
    void OnTransportAdvanced(float amount) override;
@@ -51,6 +53,8 @@ private:
    bool Enabled() const override { return mEnabled; }
    void GetModuleDimensions(float& w, float& h) override { w=110; h=76; }
    
+   void TriggerNote(double time);
+   
    ClickButton* mTriggerButton;
    TextEntry* mPitchEntry;
    FloatSlider* mVelocitySlider;
@@ -59,6 +63,7 @@ private:
    int mPitch;
    float mVelocity;
    float mDuration;
+   float mDurationMs;
    NoteInterval mNextInterval;
    float mNext;
    double mStartTime;

@@ -18,7 +18,7 @@ NoteChainNode::NoteChainNode()
 : mTriggerButton(nullptr)
 , mPitch(48)
 , mVelocity(1)
-, mDuration(100)
+, mDuration(.25f)
 , mPitchEntry(nullptr)
 , mVelocitySlider(nullptr)
 , mStartTime(0)
@@ -43,7 +43,7 @@ void NoteChainNode::CreateUIControls()
    mPitchEntry = new TextEntry(this,"pitch",5,3,3,&mPitch,0,127);
    mTriggerButton = new ClickButton(this,"trigger",50,3);
    mVelocitySlider = new FloatSlider(this,"velocity",5,21,100,15,&mVelocity,0,1);
-   mDurationSlider = new FloatSlider(this,"duration",5,39,100,15,&mDuration,1,1000);
+   mDurationSlider = new FloatSlider(this,"duration",5,39,100,15,&mDuration,0.01f,4,4);
    mNextSelector = new DropdownList(this,"next",5,57,(int*)(&mNextInterval));
    
    mNextSelector->AddLabel("1n", kInterval_1n);
@@ -57,10 +57,8 @@ void NoteChainNode::CreateUIControls()
    mNextSelector->AddLabel("32n", kInterval_32n);
    mNextSelector->AddLabel("64n", kInterval_64n);
    
-   mNextNodeCable = new PatchCableSource(this, kConnectionType_Special);
-   mNextNodeCable->AddTypeFilter("notechain");
+   mNextNodeCable = new PatchCableSource(this, kConnectionType_Pulse);
    mNextNodeCable->SetManualPosition(100, 10);
-   mNextNodeCable->SetAllowMultipleTargets(true);
    AddPatchCableSource(mNextNodeCable);
 }
 
@@ -80,28 +78,23 @@ void NoteChainNode::OnTimeEvent(double time)
 {
    if (mQueueTrigger)
    {
-      TriggerNote();
+      TriggerNote(time);
       mQueueTrigger = false;
    }
 }
 
 void NoteChainNode::OnTransportAdvanced(float amount)
 {
-   if (mNoteOn && gTime > mStartTime + mDuration)
+   if (mNoteOn && gTime + gBufferSizeMs > mStartTime + mDurationMs)
    {
       mNoteOn = false;
-      mNoteOutput.Flush(gTime);
+      mNoteOutput.Flush(mStartTime + mDurationMs);
    }
    
-   if (mWaitingToTrigger && gTime > mStartTime + mNext)
+   if (mWaitingToTrigger && gTime + gBufferSizeMs > mStartTime + mNext)
    {
       mWaitingToTrigger = false;
-      for (auto* cable : mNextNodeCable->GetPatchCables())
-      {
-         NoteChainNode* node = dynamic_cast<NoteChainNode*>(cable->GetTarget());
-         if (node)
-            node->TriggerNote();
-      }
+      DispatchPulse(mNextNodeCable, mStartTime + mNext, 1, 0);
    }
 }
 
@@ -109,15 +102,21 @@ void NoteChainNode::PostRepatch(PatchCableSource* cableSource, bool fromUserClic
 {
 }
 
-void NoteChainNode::TriggerNote()
+void NoteChainNode::OnPulse(double time, float velocity, int flags)
+{
+   TriggerNote(time);
+}
+
+void NoteChainNode::TriggerNote(double time)
 {
    if (mEnabled)
    {
       mNoteOn = true;
       mWaitingToTrigger = true;
-      mStartTime = gTime;
+      mStartTime = time;
+      mDurationMs = mDuration / (float(TheTransport->GetTimeSigTop()) / TheTransport->GetTimeSigBottom()) * TheTransport->MsPerBar();
       mNext = TheTransport->GetDuration(mNextInterval);
-      PlayNoteOutput(gTime, mPitch, mVelocity*127);
+      PlayNoteOutput(time, mPitch, mVelocity*127);
    }
 }
 
