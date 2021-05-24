@@ -1067,6 +1067,7 @@ sampleplayer~sample playback with triggerable cue points, clip extraction, and y
 ~stop~stop playing and reset playhead
 ~loop~wrap playhead to beginning when it reaches end
 ~load~show a file chooser to load a sample
+~record~record audio input into our sample buffer. clears the current sample.
 ~trim~discard all audio outside the current zoom range
 ~youtube~download the audio of the youtube URL currently on your clipboard
 ~cue start~start point in seconds of the current cue

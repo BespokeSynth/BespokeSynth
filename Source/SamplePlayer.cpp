@@ -20,8 +20,15 @@
 #include "Scale.h"
 #include "UIControlMacros.h"
 
+namespace
+{
+   const int kRecordingChunkSize = 48000 * 5;
+   const int kMinRecordingChunks = 2;
+};
+
 SamplePlayer::SamplePlayer()
-: mVolume(1)
+: IAudioProcessor(gBufferSize)
+, mVolume(1)
 , mVolumeSlider(nullptr)
 , mSpeed(1)
 , mSpeedSlider(nullptr)
@@ -30,6 +37,7 @@ SamplePlayer::SamplePlayer()
 , mSampleList(nullptr)
 , mPlay(false)
 , mLoop(false)
+, mRecord(false)
 , mLoopCheckbox(nullptr)
 , mBank(nullptr)
 , mSampleBankCable(nullptr)
@@ -61,6 +69,8 @@ SamplePlayer::SamplePlayer()
 , mIsLoadingSample(false)
 , mLastOutputSample(1)
 , mSwitchAndRampVal(1)
+, mDoRecording(false)
+, mRecordingLength(0)
 {
    mYoutubeSearch[0] = 0;
 }
@@ -82,6 +92,7 @@ void SamplePlayer::CreateUIControls()
    CHECKBOX(mLoopCheckbox,"loop",&mLoop); UIBLOCK_SHIFTRIGHT();
    UIBLOCK_SHIFTX(30);
    BUTTON(mLoadFileButton,"load"); UIBLOCK_SHIFTRIGHT();
+   CHECKBOX(mRecordCheckbox,"record",&mRecord); UIBLOCK_SHIFTRIGHT();
    BUTTON(mTrimToZoomButton, "trim"); UIBLOCK_SHIFTRIGHT();
    BUTTON(mDownloadYoutubeButton,"youtube");
    UIBLOCK_SHIFTX(90);
@@ -122,6 +133,8 @@ SamplePlayer::~SamplePlayer()
 {
    if (mOwnsSample)
       delete mSample;
+   for (size_t i=0; i<mRecordChunks.size(); ++i)
+      delete mRecordChunks[i];
 }
 
 void SamplePlayer::Init()
@@ -238,6 +251,16 @@ void SamplePlayer::Poll()
          UpdateActiveCuePoint();
       }
    }
+   
+   if (mDoRecording)
+   {
+      int chunkIndex = mRecordingLength / kRecordingChunkSize;
+      if (chunkIndex >= (int)mRecordChunks.size() - 1)
+      {
+         mRecordChunks.push_back(new ChannelBuffer(kRecordingChunkSize));
+         mRecordChunks[mRecordChunks.size()-1]->GetChannel(0); //set up buffer
+      }
+   }
 }
 
 void SamplePlayer::Process(double time)
@@ -245,65 +268,81 @@ void SamplePlayer::Process(double time)
    PROFILER(SamplePlayer);
    
    IAudioReceiver* target = GetTarget();
-
-   if (!mEnabled || target == nullptr || mSample == nullptr)
-      return;
    
-   mNoteInputBuffer.Process(time);
-   
-   ComputeSliders(0);
-   SyncOutputBuffer(mSample->NumChannels());
-   
-   int bufferSize = target->GetBuffer()->BufferSize();
-   assert(bufferSize == gBufferSize);
-   
-   float volSq = mVolume * mVolume;
-   
-   const float kBlendSpeed = 1;
-   if (mOscWheelGrabbed)
+   if (mDoRecording)
    {
-      mPlaySpeed = ofLerp(mPlaySpeed, mOscWheelSpeed, kBlendSpeed);
-      mPlaySpeed = ofClamp(mPlaySpeed, -5, 5);
+      for (int i=0; i<GetBuffer()->BufferSize(); ++i)
+      {
+         int chunkIndex = mRecordingLength / kRecordingChunkSize;
+         int chunkPos = mRecordingLength % kRecordingChunkSize;
+         mRecordChunks[chunkIndex]->SetNumActiveChannels(GetBuffer()->NumActiveChannels());
+         for (int ch=0; ch<GetBuffer()->NumActiveChannels(); ++ch)
+            mRecordChunks[chunkIndex]->GetChannel(ch)[chunkPos] = GetBuffer()->GetChannel(ch)[i];
+         ++mRecordingLength;
+      }
    }
-   else
-   {
-      mPlaySpeed = ofLerp(mPlaySpeed, mSpeed, kBlendSpeed);
-   }
-   mSample->SetRate(mPlaySpeed);
-   
-   gWorkChannelBuffer.SetNumActiveChannels(mSample->NumChannels());
-   mLastOutputSample.SetNumActiveChannels(mSample->NumChannels());
-   mSwitchAndRampVal.SetNumActiveChannels(mSample->NumChannels());
 
-   if (mPlay && mSample->ConsumeData(time, &gWorkChannelBuffer, bufferSize, true))
+   if (mEnabled && target != nullptr && mSample != nullptr)
    {
+      mNoteInputBuffer.Process(time);
+      
+      ComputeSliders(0);
+      SyncBuffers(mSample->NumChannels());
+      
+      int bufferSize = target->GetBuffer()->BufferSize();
+      assert(bufferSize == gBufferSize);
+      
+      float volSq = mVolume * mVolume;
+      
+      const float kBlendSpeed = 1;
+      if (mOscWheelGrabbed)
+      {
+         mPlaySpeed = ofLerp(mPlaySpeed, mOscWheelSpeed, kBlendSpeed);
+         mPlaySpeed = ofClamp(mPlaySpeed, -5, 5);
+      }
+      else
+      {
+         mPlaySpeed = ofLerp(mPlaySpeed, mSpeed, kBlendSpeed);
+      }
+      mSample->SetRate(mPlaySpeed);
+      
+      gWorkChannelBuffer.SetNumActiveChannels(mSample->NumChannels());
+      mLastOutputSample.SetNumActiveChannels(mSample->NumChannels());
+      mSwitchAndRampVal.SetNumActiveChannels(mSample->NumChannels());
+
+      if (mPlay && mSample->ConsumeData(time, &gWorkChannelBuffer, bufferSize, true))
+      {
+         for (int ch = 0; ch < gWorkChannelBuffer.NumActiveChannels(); ++ch)
+         {
+            for (int i = 0; i < bufferSize; ++i)
+               gWorkChannelBuffer.GetChannel(ch)[i] *= volSq * mAdsr.Value(time + i * gInvSampleRateMs);
+         }
+      }
+      else
+      {
+         gWorkChannelBuffer.Clear();
+         mPlay = false;
+         mSample->SetPlayPosition(0);
+         mAdsr.Stop(time);
+      }
+
       for (int ch = 0; ch < gWorkChannelBuffer.NumActiveChannels(); ++ch)
       {
          for (int i = 0; i < bufferSize; ++i)
-            gWorkChannelBuffer.GetChannel(ch)[i] *= volSq * mAdsr.Value(time + i * gInvSampleRateMs);
+         {
+            gWorkChannelBuffer.GetChannel(ch)[i] += mSwitchAndRampVal.GetChannel(ch)[0];
+            mSwitchAndRampVal.GetChannel(ch)[0] *= .999f;
+            if (mSwitchAndRampVal.GetChannel(ch)[0] < .0001f && mSwitchAndRampVal.GetChannel(ch)[0] > -.0001f)
+               mSwitchAndRampVal.GetChannel(ch)[0] = 0;
+         }
+
+         Add(target->GetBuffer()->GetChannel(ch), gWorkChannelBuffer.GetChannel(ch), bufferSize);
+         GetVizBuffer()->WriteChunk(gWorkChannelBuffer.GetChannel(ch), bufferSize, ch);
+         mLastOutputSample.GetChannel(ch)[0] = gWorkChannelBuffer.GetChannel(ch)[bufferSize-1];
       }
    }
-   else
-   {
-      gWorkChannelBuffer.Clear();
-      mPlay = false;
-      mAdsr.Stop(time);
-   }
-
-   for (int ch = 0; ch < gWorkChannelBuffer.NumActiveChannels(); ++ch)
-   {
-      for (int i = 0; i < bufferSize; ++i)
-      {
-         gWorkChannelBuffer.GetChannel(ch)[i] += mSwitchAndRampVal.GetChannel(ch)[0];
-         mSwitchAndRampVal.GetChannel(ch)[0] *= .999f;
-         if (mSwitchAndRampVal.GetChannel(ch)[0] < .0001f && mSwitchAndRampVal.GetChannel(ch)[0] > -.0001f)
-            mSwitchAndRampVal.GetChannel(ch)[0] = 0;
-      }
-
-      Add(target->GetBuffer()->GetChannel(ch), gWorkChannelBuffer.GetChannel(ch), bufferSize);
-      GetVizBuffer()->WriteChunk(gWorkChannelBuffer.GetChannel(ch), bufferSize, ch);
-      mLastOutputSample.GetChannel(ch)[0] = gWorkChannelBuffer.GetChannel(ch)[bufferSize-1];
-   }
+   
+   GetBuffer()->Reset();
 }
 
 void SamplePlayer::PostRepatch(PatchCableSource* cableSource, bool fromUserClick)
@@ -460,20 +499,27 @@ void SamplePlayer::UpdateSample(Sample* sample, bool ownsSample)
 
 void SamplePlayer::ButtonClicked(ClickButton *button)
 {
-   if (mSample)
+   if (button == mPlayButton && mSample != nullptr)
    {
-      if (button == mPlayButton)
+      if (mRecord == false)
       {
          mPlay = true;
          mAdsr.Clear();
          mAdsr.Start(gTime + gBufferSize*gInvSampleRateMs, 1);
       }
-      if (button == mPauseButton)
+   }
+   if (button == mPauseButton && mSample != nullptr)
+   {
+      mPlay = false;
+      SwitchAndRamp();
+   }
+   if (button == mStopButton)
+   {
+      if (mRecord)
       {
-         mPlay = false;
-         SwitchAndRamp();
+         StopRecording();
       }
-      if (button == mStopButton)
+      else if (mSample != nullptr)
       {
          mPlay = false;
          mSample->SetPlayPosition(0);
@@ -863,6 +909,7 @@ void SamplePlayer::DrawModule()
    mDownloadYoutubeButton->Draw();
    mDownloadYoutubeSearch->Draw();
    mLoadFileButton->Draw();
+   mRecordCheckbox->Draw();
    mCuePointSelector->Draw();
    mSetCuePointCheckbox->Draw();
    mSelectPlayedCuePointCheckbox->Draw();
@@ -914,7 +961,21 @@ void SamplePlayer::DrawModule()
 
    ofPushMatrix();
    ofTranslate(5,58);
-   if (mRunningProcess != nullptr || (mSample && mSample->IsSampleLoading()))
+   if (mDoRecording)
+   {
+      ofPushMatrix();
+      float sampleWidth = mWidth - 10;
+      
+      int numChunks = mRecordingLength / kRecordingChunkSize + 1;
+      float chunkWidth = sampleWidth / numChunks;
+      for (int i=0; i<numChunks; ++i)
+      {
+         DrawAudioBuffer(chunkWidth, mHeight - 65, mRecordChunks[i], 0, kRecordingChunkSize, -1);
+         ofTranslate(chunkWidth, 0);
+      }
+      ofPopMatrix();
+   }
+   else if (mRunningProcess != nullptr || (mSample && mSample->IsSampleLoading()))
    {
       const int kNumDots = 8;
       const float kCircleRadius = 20;
@@ -1141,6 +1202,58 @@ void SamplePlayer::CheckboxUpdated(Checkbox* checkbox)
    {
       if (mSample != nullptr)
          mSample->SetLooping(mLoop);
+   }
+   if (checkbox == mRecordCheckbox)
+   {
+      mPlay = false;
+      if (mRecord)
+      {
+         mRecordingLength = 0;
+         
+         for (size_t i=mRecordChunks.size(); i<kMinRecordingChunks; ++i)
+         {
+            mRecordChunks.push_back(new ChannelBuffer(kRecordingChunkSize));
+            mRecordChunks[i]->GetChannel(0); //set up buffer
+         }
+         
+         for (size_t i=0; i<mRecordChunks.size(); ++i)
+            mRecordChunks[i]->Clear();
+         
+         mDoRecording = true;
+      }
+      else if (mRecordingLength > 0)
+      {
+         StopRecording();
+      }
+   }
+}
+
+void SamplePlayer::StopRecording()
+{
+   if (mDoRecording)
+   {
+      mRecord = false;
+      mDoRecording = false;
+      
+      Sample* sample = new Sample();
+      sample->Create(mRecordingLength);
+      ChannelBuffer* data = sample->Data();
+      int channelCount = mRecordChunks[0]->NumActiveChannels();
+      data->SetNumActiveChannels(channelCount);
+      
+      int numChunks = mRecordingLength / kRecordingChunkSize + 1;
+      for (int i=0; i<numChunks; ++i)
+      {
+         int samplesLeftToRecord = mRecordingLength - i*kRecordingChunkSize;
+         int samplesToCopy;
+         if (samplesLeftToRecord > kRecordingChunkSize)
+            samplesToCopy = kRecordingChunkSize;
+         else
+            samplesToCopy = samplesLeftToRecord;
+         for (int ch=0; ch<channelCount; ++ch)
+            BufferCopy(data->GetChannel(ch)+i*kRecordingChunkSize, mRecordChunks[i]->GetChannel(ch), samplesToCopy);
+      }
+      UpdateSample(sample, true);
    }
 }
 

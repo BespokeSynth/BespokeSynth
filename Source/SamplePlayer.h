@@ -11,7 +11,7 @@
 #pragma once
 
 #include <iostream>
-#include "IAudioSource.h"
+#include "IAudioProcessor.h"
 #include "EnvOscillator.h"
 #include "INoteReceiver.h"
 #include "IDrawableModule.h"
@@ -25,7 +25,7 @@
 class SampleBank;
 class Sample;
 
-class SamplePlayer : public IAudioSource, public IDrawableModule, public INoteReceiver, public IFloatSliderListener, public IIntSliderListener, public IDropdownListener, public IButtonListener, public IRadioButtonListener, public ITextEntryListener, private OSCReceiver, private OSCReceiver::Listener<OSCReceiver::RealtimeCallback>
+class SamplePlayer : public IAudioProcessor, public IDrawableModule, public INoteReceiver, public IFloatSliderListener, public IIntSliderListener, public IDropdownListener, public IButtonListener, public IRadioButtonListener, public ITextEntryListener, private OSCReceiver, private OSCReceiver::Listener<OSCReceiver::RealtimeCallback>
 {
 public:
    SamplePlayer();
@@ -95,6 +95,7 @@ private:
    void PlayCuePoint(double time, int index, int velocity, float speedMult, float startOffsetSeconds);
    void RunProcess(const StringArray& args);
    void AutoSlice(NoteInterval interval);
+   void StopRecording();
    
    //IDrawableModule
    void DrawModule() override;
@@ -124,7 +125,9 @@ private:
    ClickButton* mStopButton;
    bool mPlay;
    bool mLoop;
+   bool mRecord;
    Checkbox* mLoopCheckbox;
+   Checkbox* mRecordCheckbox;
    PatchCableSource* mSampleBankCable;
    bool mScrubbingSample;
    string mYoutubeId;
@@ -196,5 +199,9 @@ private:
 
    ChannelBuffer mLastOutputSample;
    ChannelBuffer mSwitchAndRampVal;
+   
+   vector<ChannelBuffer*> mRecordChunks;
+   bool mDoRecording;   //separate this out from mRecord to allow setup in main thread before audio thread starts recording
+   int mRecordingLength;
 };
 
