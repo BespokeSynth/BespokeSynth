@@ -22,6 +22,7 @@
 #include "nanovg/nanovg_gl.h"
 #include "ModularSynth.h"
 #include "Push2Control.h"
+#include "UserData.h"
 
 ofColor ofColor::black(0,0,0);
 ofColor ofColor::white(255,255,255);
@@ -75,34 +76,50 @@ string ofToDataPath(string path, bool makeAbsolute)
    if (sDataDir == "")
    {
       //look for a "data" folder in the current working directory
-      //failing that, look for ~/.config/BespokeSynth/data
-      //failing that, look for /usr/share/BespokeSynth/data
       //failing that, look in the OSX folder, which is my shared data folder for development
+      //failing that, look for /usr/share/BespokeSynth/data and update ~/.config/BespokeSynth/data
+      //failing that, look for ~/.config/BespokeSynth/data and warning
+      //falling that - exit
       string localDataDir = File::getCurrentWorkingDirectory().getChildFile("data").getFullPathName().toStdString();
       if (juce::File(localDataDir).exists())
       {
+         DBG ("Use bundled data");
          sDataDir = localDataDir;
       }
       else
       {
-         string localDataDir = File::getSpecialLocation(File::userApplicationDataDirectory).getChildFile("BespokeSynth/data").getFullPathName().toStdString();
+         string localDataDir = File::getCurrentWorkingDirectory().getChildFile("../../MacOSX/build/Release/data").getFullPathName().toStdString();
          if (juce::File(localDataDir).exists())
          {
+            DBG ("Use develop branch source data");
             sDataDir = localDataDir;
          }
+      
          else
          {
-            sDataDir = File::getSpecialLocation(File::globalApplicationsDirectory).getChildFile("share/BespokeSynth/data").getFullPathName().toStdString();
-            if (juce::File(localDataDir).exists())
-            {
-               sDataDir = localDataDir;
-            }
-            else
-            {
-               sDataDir = File::getCurrentWorkingDirectory().getChildFile("../../MacOSX/build/Release/data").getFullPathName().toStdString();
-            }
+             sDataDir = File::getSpecialLocation(File::globalApplicationsDirectory).getChildFile("share/BespokeSynth/data").getFullPathName().toStdString();
+             string localDataDir = File::getSpecialLocation(File::userApplicationDataDirectory).getChildFile("BespokeSynth/data").getFullPathName().toStdString();
+             if (juce::File(sDataDir).exists())
+             {
+                DBG ("Updating user's home data");
+                updateUserData();
+                sDataDir = localDataDir;
+             }
+             else
+             {
+                 if (juce::File(localDataDir).exists())
+                 {
+                    DBG ("Warning, no sData found, only user's home data");
+                    sDataDir = localDataDir;
+                 }
+                 else 
+                 {
+                 DBG ("Error, no sData found");
+                 JUCEApplicationBase::quit();
+                 }
+             }
          }
-      }
+       }
    }
 
 
