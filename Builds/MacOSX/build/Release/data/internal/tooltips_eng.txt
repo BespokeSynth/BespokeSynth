@@ -473,12 +473,12 @@ notecounter~advance through pitches sequentially. useful for driving the "notese
 
 
 
-notechain~[no tooltip]
-~pitch~[no tooltip]
-~trigger~[no tooltip]
-~velocity~[no tooltip]
-~duration~[no tooltip]
-~next~[no tooltip]
+notechain~trigger a note, followed by a pulse to trigger another note after a delay
+~pitch~pitch to play
+~trigger~play note for this chain node
+~velocity~velocity for note
+~duration~duration of note, in measures
+~next~interval until sending pulse
 
 
 
@@ -1501,7 +1501,7 @@ notefilter~only allow a certain pitches through
 
 
 noteduration~sets the length a note will play, ignoring the note-off message
-~duration~length of the note in milliseconds
+~duration~length of the note in measures
 
 
 

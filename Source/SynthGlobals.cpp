@@ -132,15 +132,12 @@ void DrawAudioBuffer(float width, float height, const float* buffer, float start
    if (length > 0)
    {
       const float kStepSize = 3;
-      float step = kStepSize;
-      if (width < 0)
-         step *= -1;
       float samplesPerStep = length / abs(width) * kStepSize;
       start = start - (int(start) % int(samplesPerStep));
       
       if (buffer && length > 0)
       {
-         float step = width > 0 ? 3 : -3;
+         float step = width > 0 ? kStepSize : -kStepSize;
          float samplesPerStep = length / width * step;
          
          for (float i = 0; abs(i) < abs(width); i+=step)

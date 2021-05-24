@@ -155,7 +155,8 @@ void OscController::oscMessageReceived(const OSCMessage& msg)
       }
    }
 
-   mListener->OnMidiControl(control);
+   if (mListener != nullptr)
+      mListener->OnMidiControl(control);
 }
 
 int OscController::FindControl(string address)

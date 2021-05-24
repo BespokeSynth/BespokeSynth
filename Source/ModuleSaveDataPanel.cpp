@@ -149,7 +149,8 @@ void ModuleSaveDataPanel::ReloadSaveData()
          prevTextEntry = textEntry;
       }
       
-      control->SetNoHover(true);
+      if (control != nullptr)
+         control->SetNoHover(true);
       mSaveDataControls.push_back(control);
       y += itemSpacing;
    }

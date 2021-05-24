@@ -588,11 +588,14 @@ void DrumPlayer::SampleDropped(int x, int y, Sample* sample)
 
 void DrumPlayer::ImportSampleCuePoint(SamplePlayer* player, int sourceCueIndex, int destHitIndex)
 {
-   ChannelBuffer* data = player->GetCueSampleData(sourceCueIndex);
-   Sample sample;
-   sample.Create(data);
-   SetHitSample(destHitIndex, &sample);
-   delete data;
+   if (player != nullptr)
+   {
+      ChannelBuffer* data = player->GetCueSampleData(sourceCueIndex);
+      Sample sample;
+      sample.Create(data);
+      SetHitSample(destHitIndex, &sample);
+      delete data;
+   }
 }
 
 void DrumPlayer::SetHitSample(int sampleIndex, Sample* sample)

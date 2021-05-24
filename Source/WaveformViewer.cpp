@@ -125,12 +125,9 @@ void WaveformViewer::DrawModule()
    float w,h;
    GetDimensions(w,h);
    int lengthSamples = MIN(mLengthSamples, BUFFER_VIZ_SIZE);
-   int phaseStart = 0;
-   int end = lengthSamples - 1;
-
    float vizPhaseInc = GetPhaseInc(mDisplayFreq/2);
-   phaseStart = (FTWO_PI - mVizPhase[mDoubleBufferFlip]) / vizPhaseInc;
-   end = lengthSamples -(FTWO_PI/vizPhaseInc);
+   float phaseStart = (FTWO_PI - mVizPhase[mDoubleBufferFlip]) / vizPhaseInc;
+   float end = lengthSamples -(FTWO_PI/vizPhaseInc);
    
    if (mDrawWaveform)
    {
