@@ -1,0 +1,14 @@
+{
+   "samplerate" : 44100,
+   "buffersize" : 128,
+   "audio_output_device" : "auto",
+   "audio_input_device" : "none",
+   "height" : 1100,
+   "width" : 1700,
+   "layout" : "layouts/blank.json",
+   "scroll_multiplier_horizontal" : 1,
+   "scroll_multiplier_vertical" : 1,
+   "vstsearchdirs" : [ "~/.vst", "/usr/lib64/vst", "/usr/lib64/vst3", "/usr/lib/lxvst" ],
+   "youtube-dl_path" : "/usr/bin/youtube-dl",
+   "ffmpeg_path" : "/usr/bin/ffmpeg"
+}
