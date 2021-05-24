@@ -1347,7 +1347,7 @@
     <MODULE id="juce_video" showAllCode="1" useLocalCopy="0" useGlobalPath="1"/>
   </MODULES>
   <JUCEOPTIONS JUCE_PLUGINHOST_VST3="1" JUCE_PLUGINHOST_VST="1" JUCE_WEB_BROWSER="0"
-               JUCE_USE_MP3AUDIOFORMAT="1"/>
+               JUCE_USE_MP3AUDIOFORMAT="1" JUCE_JACK="1" JUCE_USE_CURL="0"/>
   <LIVE_SETTINGS>
     <OSX headerPath="" systemHeaderPath=""/>
     <WINDOWS headerPath="" systemHeaderPath="&#10;"/>
