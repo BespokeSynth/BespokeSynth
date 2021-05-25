@@ -1224,6 +1224,7 @@
       <FILE id="n8yIX1" name="SynthGlobals.h" compile="0" resource="0" file="Source/SynthGlobals.h"/>
       <FILE id="K39ITT" name="TriggerDetector.cpp" compile="1" resource="0"
             file="Source/TriggerDetector.cpp"/>
+      <FILE id="P8YYXN" name="UserData.cpp" compile="1" resource="0" file="Source/UserData.cpp"/>
       <FILE id="EghI3J" name="TriggerDetector.h" compile="0" resource="0"
             file="Source/TriggerDetector.h"/>
       <FILE id="SabGSz" name="UIGrid.cpp" compile="1" resource="0" file="Source/UIGrid.cpp"/>
