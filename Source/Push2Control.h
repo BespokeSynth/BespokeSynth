@@ -71,6 +71,8 @@ private:
    void UpdateControlList();
    void AddFavoriteControl(IUIControl* control);
    void RemoveFavoriteControl(IUIControl* control);
+   void BookmarkModuleToSlot(int slotIndex, IDrawableModule* module);
+   void SwitchToBookmarkedModule(int slotIndex);
    int GetColorForType(ModuleType type);
    bool GetGridIndex(int gridX, int gridY, int& gridIndex) { gridIndex = gridX + gridY * 8; return gridX >= 0 && gridX < 8 && gridY >= 0 && gridY < 8; }
    bool IsIgnorableModule(IDrawableModule* module);
@@ -112,11 +114,13 @@ private:
    bool mNewButtonHeld;
    bool mDeleteButtonHeld;
    bool mModulationButtonHeld;
-   bool mNoteHeldState[128];
+   bool mAddModuleBookmarkButtonHeld;
+   std::array<bool,128> mNoteHeldState;
    IDrawableModule* mHeldModule;
    bool mAllowRepatch;
    vector<IDrawableModule*> mModuleHistory;
    int mModuleHistoryPosition;
+   vector<IDrawableModule*> mBookmarkSlots;
    
    enum class ScreenDisplayMode
    {

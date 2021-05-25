@@ -58,6 +58,9 @@ namespace
    const int kSessionButton = 51;
    const int kPageLeftButton = 62;
    const int kPageRightButton = 63;
+   const int kMasterButton = 28;
+   const int kQuantizeButtonSection = 36;
+   const int kNumQuantizeButtons = 8;
 }
 #include "leathers/pop"
 
@@ -72,6 +75,7 @@ Push2Control::Push2Control()
 , mNewButtonHeld(false)
 , mDeleteButtonHeld(false)
 , mModulationButtonHeld(false)
+, mAddModuleBookmarkButtonHeld(false)
 , mHeldModule(nullptr)
 , mAllowRepatch(false)
 , mModuleHistoryPosition(-1)
@@ -97,6 +101,8 @@ Push2Control::Push2Control()
       mModuleGrid[i] = nullptr;
    for (int i=0; i<128; ++i)
       mNoteHeldState[i] = 0;
+   for (int i = 0; i < kNumQuantizeButtons; ++i)
+      mBookmarkSlots.push_back(nullptr);
 }
 
 Push2Control::~Push2Control()
@@ -325,6 +331,8 @@ void Push2Control::DrawToFramebuffer(NVGcontext* vg, NVGLUframebuffer* fb, float
          stateInfo = "tap control to remove favorite...";
       if (mModulationButtonHeld)
          stateInfo = "tap a control to add/edit LFO...";
+      if (mAddModuleBookmarkButtonHeld)
+         stateInfo = "tap a button below this one to bookmark the current module...";
 
       if (stateInfo != "")
       {
@@ -372,6 +380,7 @@ void Push2Control::DrawToFramebuffer(NVGcontext* vg, NVGLUframebuffer* fb, float
    SetLed(kMidiMessage_Control, kNewButton, 127, mNewButtonHeld ? 0 : -1);
    SetLed(kMidiMessage_Control, kDeleteButton, 127, mDeleteButtonHeld ? 0 : -1);
    SetLed(kMidiMessage_Control, kAutomateButton, 126, mModulationButtonHeld ? 0 : -1);
+   SetLed(kMidiMessage_Control, kMasterButton, 127, mAddModuleBookmarkButtonHeld ? 0 : -1);
    SetLed(kMidiMessage_Control, kCircleButton, 8, mAllowRepatch ? 11 : -1);
    SetLed(kMidiMessage_Control, kAddDeviceButton, 127, mScreenDisplayMode == ScreenDisplayMode::kAddModule ? 0 : -1);
    SetLed(kMidiMessage_Control, kUpButton, 127);
@@ -389,6 +398,13 @@ void Push2Control::DrawToFramebuffer(NVGcontext* vg, NVGLUframebuffer* fb, float
    {
       SetLed(kMidiMessage_Control, kNoteButton, mDisplayModuleCanControlGrid ? 10 : 0);
       SetLed(kMidiMessage_Control, kSessionButton, 127);
+   }
+   for (int i = 0; i < kNumQuantizeButtons; ++i)
+   {
+      int color = 0;
+      if (mBookmarkSlots[i] != nullptr && !mBookmarkSlots[i]->IsDeleted())
+         color = GetColorForType(mBookmarkSlots[i]->GetModuleType());
+      SetLed(kMidiMessage_Control, kQuantizeButtonSection + i, color);
    }
    
    //test led colors
@@ -798,6 +814,18 @@ void Push2Control::RemoveFavoriteControl(IUIControl* control)
    }
 }
 
+void Push2Control::BookmarkModuleToSlot(int slotIndex, IDrawableModule* module)
+{
+   mBookmarkSlots[slotIndex] = module;
+   mAddModuleBookmarkButtonHeld = false;
+}
+
+void Push2Control::SwitchToBookmarkedModule(int slotIndex)
+{
+   if (mBookmarkSlots[slotIndex] != nullptr && !mBookmarkSlots[slotIndex]->IsDeleted())
+      SetDisplayModule(mBookmarkSlots[slotIndex], true);
+}
+
 void Push2Control::SetLed(MidiMessageType type, int index, int color, int flashColor /*=-1*/)
 {
    if (type == kMidiMessage_Control)
@@ -996,6 +1024,10 @@ void Push2Control::OnMidiControl(MidiControl& control)
    {
       mModulationButtonHeld = control.mValue > 0;
    }
+   else if (control.mControl == kMasterButton)
+   {
+      mAddModuleBookmarkButtonHeld = control.mValue > 0;
+   }
    else if (control.mControl == kCircleButton)
    {
       if (control.mValue > 0)
@@ -1089,6 +1121,19 @@ void Push2Control::OnMidiControl(MidiControl& control)
    {
       if (control.mValue > 0)
          mGridControlModule = nullptr;
+   }
+   else if (control.mControl >= kQuantizeButtonSection && control.mControl < kQuantizeButtonSection + kNumQuantizeButtons)  //quantization level buttons to the right of the main grid, used to bookmark modules
+   {
+      if (control.mValue > 0)
+      {
+         int i = control.mControl - kQuantizeButtonSection;
+         if (mAddModuleBookmarkButtonHeld)
+            BookmarkModuleToSlot(i, mDisplayModule);
+         if (mDeleteButtonHeld)
+            BookmarkModuleToSlot(i, nullptr);
+         else
+            SwitchToBookmarkedModule(i);
+      }
    }
    else
    {
