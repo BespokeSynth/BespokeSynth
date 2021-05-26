@@ -84,7 +84,7 @@ IDrawableModule* SpawnList::Spawn()
    {
       if (mSpawnables[mSpawnIndex] == kRescanPluginsLabel)
       {
-         mListManager->SetUpVstDropdown(true);
+         TheTitleBar->RescanVSTs();
          return nullptr;
       }
    }
@@ -136,6 +136,7 @@ TitleBar::TitleBar()
 , mLoadLayoutDropdown(nullptr)
 , mLoadLayoutIndex(-1)
 , mSpawnLists(this)
+, mVstRescanCountdown(0)
 {
    assert(TheTitleBar == nullptr);
    TheTitleBar = this;
@@ -172,6 +173,16 @@ TitleBar::~TitleBar()
 {
    assert(TheTitleBar == this);
    TheTitleBar = nullptr;
+}
+
+void TitleBar::Poll()
+{
+   if (mVstRescanCountdown > 0)
+   {
+      --mVstRescanCountdown;
+      if (mVstRescanCountdown == 0)
+         mSpawnLists.SetUpVstDropdown(true);
+   }
 }
 
 SpawnListManager::SpawnListManager(IDropdownListener* owner)
@@ -356,6 +367,21 @@ void TitleBar::DrawModule()
 
 void TitleBar::DrawModuleUnclipped()
 {
+   if (mVstRescanCountdown > 0)
+   {
+      ofPushStyle();
+      ofSetColor(255, 255, 255);
+      string text = "scanning VSTs, please wait...";
+      float size = 50;
+      float titleBarWidth, titleBarHeight;
+      TheTitleBar->GetDimensions(titleBarWidth, titleBarHeight);
+      float x = 100;
+      float y = 40 + titleBarHeight;
+      gFontBold.DrawString(text, size, x, y);
+      ofPopStyle();
+      return;
+   }
+
    if (HiddenByZoom())
       return;
 

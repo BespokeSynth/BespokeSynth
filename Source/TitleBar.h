@@ -76,11 +76,13 @@ public:
    bool HasTitleBar() const override { return false; }
    bool AlwaysOnTop() override { return true; }
    bool IsSingleton() const override { return true; }
+   void Poll();
    
    HelpDisplay* GetHelpDisplay() { return mHelpDisplay; }
 
    void SetModuleFactory(ModuleFactory* factory) { mSpawnLists.SetModuleFactory(factory); }
    void ListLayouts();
+   void RescanVSTs() { mVstRescanCountdown = 5; }
    
    bool IsSaveable() override { return false; }
    
@@ -115,6 +117,7 @@ private:
    HelpDisplay* mHelpDisplay;
    
    SpawnListManager mSpawnLists;
+   int mVstRescanCountdown;
 };
 
 extern TitleBar* TheTitleBar;
