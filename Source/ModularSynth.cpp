@@ -188,20 +188,21 @@ void ModularSynth::InitIOBuffers(int inputChannelCount, int outputChannelCount)
 //static
 string ModularSynth::GetUserPrefsPath(bool relative)
 {
+   string filename = "userprefs.json";
    if (JUCEApplication::getCommandLineParameterArray().size() > 0)
    {
-      string path = ofToDataPath(JUCEApplication::getCommandLineParameterArray()[0].toStdString());
-      if (!juce::File(path).existsAsFile())
-         TheSynth->SetFatalError("couldn't find command-line-specified userprefs file at " + path);
-      
-      if (relative)
-         return JUCEApplication::getCommandLineParameterArray()[0].toStdString();
-      return path;
+      juce::String specified = JUCEApplication::getCommandLineParameterArray()[0];
+      if (specified.endsWith(".json"))
+      {
+         filename = specified.toStdString();
+         if (!juce::File(ofToDataPath(filename)).existsAsFile())
+             TheSynth->SetFatalError("couldn't find command-line-specified userprefs file at " + ofToDataPath(filename));
+      }
    }
    
    if (relative)
-      return "userprefs.json";
-   return ofToDataPath("userprefs.json");
+      return filename;
+   return ofToDataPath(filename);
 }
 
 static int sFrameCount = 0;
