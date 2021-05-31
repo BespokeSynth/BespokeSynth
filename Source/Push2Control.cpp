@@ -258,8 +258,8 @@ NBase::Result Push2Control::Initialize()
    
    mPixels = new unsigned char[3 * (width * kPixelRatio) * (height * kPixelRatio)];
    
-   mFontHandle = nvgCreateFont(sVG, ofToDataPath("frabk.ttf").c_str(), ofToDataPath("frabk.ttf").c_str());
-   mFontHandleBold = nvgCreateFont(sVG, ofToDataPath("frabk_m.ttf").c_str(), ofToDataPath("frabk_m.ttf").c_str());
+   mFontHandle = nvgCreateFont(sVG, ofToResourcePath("frabk.ttf").c_str(), ofToResourcePath("frabk.ttf").c_str());
+   mFontHandleBold = nvgCreateFont(sVG, ofToResourcePath("frabk_m.ttf").c_str(), ofToResourcePath("frabk_m.ttf").c_str());
    
    const std::vector<string>& devices = mDevice.GetPortList(false);
    for (int i=0; i<devices.size(); ++i)

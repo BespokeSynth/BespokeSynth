@@ -268,6 +268,7 @@ struct ofEventArgs
 typedef ofVec2f ofPoint;
 
 string ofToDataPath(string path, bool makeAboslute = false);
+string ofToResourcePath(string path, bool makeAboslute = false);
 void ofPushStyle();
 void ofPopStyle();
 void ofPushMatrix();

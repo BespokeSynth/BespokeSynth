@@ -159,7 +159,7 @@ namespace
 void DrumPlayer::SetUpHitDirectories()
 {
    sHitDirectories.clear();
-   File parentDirectory(ofToDataPath("drums/hits"));
+   File parentDirectory(ofToDataPath("drums"));
    Array<File> hitDirs;
    parentDirectory.findChildFiles(hitDirs, File::findDirectories, true);
    for (auto dir : hitDirs)
@@ -198,7 +198,7 @@ void DrumPlayer::SetUpNewDrumPlayer()
    for (int i = 0; i < NUM_DRUM_HITS; ++i)
    {
       string category = categories[i % categories.size()];
-      File dir(ofToDataPath("drums/hits/" + category));
+      File dir(ofToDataPath("drums/" + category));
       if (dir.exists())
       {
          mDrumHits[i].mHitCategory = category;
@@ -632,7 +632,7 @@ void DrumPlayer::OnClicked(int x, int y, bool right)
       if (sampleIdx != -1)
       {
          mSelectedHitIdx = sampleIdx;
-         mAuditionDir = ofToDataPath("drums/hits/"+mDrumHits[sampleIdx].mHitCategory);
+         mAuditionDir = ofToDataPath("drums/"+mDrumHits[sampleIdx].mHitCategory);
          UpdateVisibleControls();
       }
    }
@@ -1029,7 +1029,7 @@ void DrumPlayer::ButtonClicked(ClickButton* button)
 
 void DrumPlayer::DrumHit::LoadRandomSample()
 {
-   File dir(ofToDataPath("drums/hits/"+mHitCategory));
+   File dir(ofToDataPath("drums/"+mHitCategory));
    Array<File> files;
    for (auto file : dir.findChildFiles(File::findFiles, false))
    {

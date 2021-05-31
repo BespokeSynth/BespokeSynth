@@ -52,8 +52,8 @@ public:
          ofLog() << "pixel ratio: " << mPixelRatio << " screen width: " << screenWidth << " screen height: " << screenHeight;
       }
       
-      int width = 800;
-      int height = 400;
+      int width = 1700;
+      int height = 1100;
       mDesiredInitialPosition.setXY(INT_MAX, INT_MAX);
       ofxJSONElement userPrefs;
       bool loaded = userPrefs.open(ModularSynth::GetUserPrefsPath(false));
@@ -189,9 +189,9 @@ public:
       const string kAutoDevice = "auto";
       const string kNoneDevice = "none";
       string outputDevice = kAutoDevice;
-      string inputDevice = kAutoDevice;
+      string inputDevice = kNoneDevice;
       int sampleRate = 44100;
-      int bufferSize = 256;
+      int bufferSize = 128;
       bool loaded = userPrefs.open(ModularSynth::GetUserPrefsPath(false));
       if (loaded)
       {

@@ -41,7 +41,7 @@ HelpDisplay::~HelpDisplay()
 
 void HelpDisplay::LoadHelp()
 {
-   File file(ofToDataPath("help.txt").c_str());
+   File file(ofToResourcePath("help.txt").c_str());
    if (file.existsAsFile())
    {
       string help = file.loadFileAsString().toStdString();
@@ -92,9 +92,9 @@ void HelpDisplay::LoadTooltips()
 {
    string tooltipsPath;
    if (TheSynth->GetUserPrefs()["tooltips"].isNull())
-      tooltipsPath = ofToDataPath("internal/tooltips_eng.txt");
+      tooltipsPath = ofToResourcePath("internal/tooltips_eng.txt");
    else
-      tooltipsPath = ofToDataPath(TheSynth->GetUserPrefs()["tooltips"].asString());
+      tooltipsPath = ofToResourcePath(TheSynth->GetUserPrefs()["tooltips"].asString());
 
    mTooltips.clear();
 

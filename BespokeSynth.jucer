@@ -1008,9 +1008,6 @@
             file="Source/ArrangementMaster.cpp"/>
       <FILE id="SviADL" name="ArrangementMaster.h" compile="0" resource="0"
             file="Source/ArrangementMaster.h"/>
-      <FILE id="mcg8a4" name="ChannelBuffer.cpp" compile="1" resource="0"
-            file="Source/ChannelBuffer.cpp"/>
-      <FILE id="IgwkEU" name="ChannelBuffer.h" compile="0" resource="0" file="Source/ChannelBuffer.h"/>
       <FILE id="ev4J6H" name="Bespoke_Platform.cpp" compile="1" resource="0"
             file="Source/Bespoke_Platform.cpp"/>
       <FILE id="VZwfve" name="BiquadFilter.cpp" compile="1" resource="0"
@@ -1033,6 +1030,9 @@
             file="Source/CanvasTimeline.cpp"/>
       <FILE id="K5PM3N" name="CanvasTimeline.h" compile="0" resource="0"
             file="Source/CanvasTimeline.h"/>
+      <FILE id="mcg8a4" name="ChannelBuffer.cpp" compile="1" resource="0"
+            file="Source/ChannelBuffer.cpp"/>
+      <FILE id="IgwkEU" name="ChannelBuffer.h" compile="0" resource="0" file="Source/ChannelBuffer.h"/>
       <FILE id="irjm4P" name="Chord.cpp" compile="1" resource="0" file="Source/Chord.cpp"/>
       <FILE id="ROjCRz" name="Chord.h" compile="0" resource="0" file="Source/Chord.h"/>
       <FILE id="oMAiEw" name="ChordDatabase.cpp" compile="1" resource="0"
@@ -1224,11 +1224,12 @@
       <FILE id="n8yIX1" name="SynthGlobals.h" compile="0" resource="0" file="Source/SynthGlobals.h"/>
       <FILE id="K39ITT" name="TriggerDetector.cpp" compile="1" resource="0"
             file="Source/TriggerDetector.cpp"/>
-      <FILE id="P8YYXN" name="UserData.cpp" compile="1" resource="0" file="Source/UserData.cpp"/>
       <FILE id="EghI3J" name="TriggerDetector.h" compile="0" resource="0"
             file="Source/TriggerDetector.h"/>
       <FILE id="SabGSz" name="UIGrid.cpp" compile="1" resource="0" file="Source/UIGrid.cpp"/>
       <FILE id="zlGPeN" name="UIGrid.h" compile="0" resource="0" file="Source/UIGrid.h"/>
+      <FILE id="P8YYXN" name="UserData.cpp" compile="1" resource="0" file="Source/UserData.cpp"/>
+      <FILE id="SW5jcc" name="UserData.h" compile="0" resource="0" file="Source/UserData.h"/>
       <FILE id="SFkRyV" name="VSTPlayhead.cpp" compile="1" resource="0" file="Source/VSTPlayhead.cpp"/>
       <FILE id="TMPyxQ" name="VSTPlayhead.h" compile="0" resource="0" file="Source/VSTPlayhead.h"/>
       <FILE id="IaJePG" name="VSTWindow.cpp" compile="1" resource="0" file="Source/VSTWindow.cpp"/>

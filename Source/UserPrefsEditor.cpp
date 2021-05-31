@@ -62,8 +62,14 @@ void UserPrefsEditor::CreateUIControls()
 void UserPrefsEditor::Show()
 {
    SetShowing(true);
-   mWindowWidth = TheSynth->GetUserPrefs()["width"].asInt();
-   mWindowHeight = TheSynth->GetUserPrefs()["height"].asInt();
+   if (TheSynth->GetUserPrefs()["width"].isNull())
+      mWindowWidth = 1700;
+   else
+      mWindowWidth = TheSynth->GetUserPrefs()["width"].asInt();
+   if (TheSynth->GetUserPrefs()["height"].isNull())
+      mWindowHeight = 1100;
+   else
+      mWindowHeight = TheSynth->GetUserPrefs()["height"].asInt();
    mSetWindowPosition = !TheSynth->GetUserPrefs()["position_x"].isNull();
    if (mSetWindowPosition)
    {
@@ -107,12 +113,28 @@ void UserPrefsEditor::Show()
       mDefaultLayoutPath = TheSynth->GetUserPrefs()["layout"].asString();
 
    if (TheSynth->GetUserPrefs()["youtube-dl_path"].isNull())
+   {
+#if BESPOKE_MAC
+      mYoutubeDlPath = "/opt/local/bin/youtube-dl";
+#elif BESPOKE_LINUX
+      mYoutubeDlPath = "/usr/bin/youtube-dl";
+#else
       mYoutubeDlPath = "c:/youtube-dl/bin/youtube-dl.exe";
+#endif
+   }
    else
       mYoutubeDlPath = TheSynth->GetUserPrefs()["youtube-dl_path"].asString();
 
    if (TheSynth->GetUserPrefs()["ffmpeg_path"].isNull())
+   {
+#if BESPOKE_MAC
+      mFfmpegPath = "/opt/local/bin/ffmpeg";
+#elif BESPOKE_LINUX
+      mFfmpegPath = "/usr/bin/ffmpeg";
+#else
       mFfmpegPath = "c:/ffmpeg/bin/ffmpeg.exe";
+#endif
+   }
    else
       mFfmpegPath = TheSynth->GetUserPrefs()["ffmpeg_path"].asString();
    
@@ -121,7 +143,7 @@ void UserPrefsEditor::Show()
 #if BESPOKE_MAC
       mVstSearchDirs = "/Library/Audio/Plug-Ins/VST3, /Library/Audio/Plug-Ins/VST";
 #elif BESPOKE_LINUX
-      mVstSearchDirs = "~/.vst/";
+      mVstSearchDirs = "~/.vst/, /usr/lib64/vst, /usr/lib64/vst3, /usr/lib/lxvst";
 #else
       mVstSearchDirs = "C:/Program Files/Common Files/VST2, C:/Program Files/Common Files/VST3, C:/Program Files/Steinberg/VSTPlugins";
 #endif
@@ -196,6 +218,8 @@ void UserPrefsEditor::UpdateDropdowns(vector<DropdownList*> toUpdate)
    if (toUpdate.empty() || VectorContains(mAudioInputDeviceDropdown, toUpdate))
    {
       mAudioInputDeviceIndex = -1;
+      if (TheSynth->GetUserPrefs()["audio_input_device"].isNull())
+         mAudioInputDeviceIndex = -2;  //default to "none"
       mAudioInputDeviceDropdown->Clear();
       mAudioInputDeviceDropdown->AddLabel("none", -2);
       mAudioInputDeviceDropdown->AddLabel("auto", -1);
@@ -208,7 +232,7 @@ void UserPrefsEditor::UpdateDropdowns(vector<DropdownList*> toUpdate)
          ++i;
       }
 
-      if (mAudioInputDeviceIndex == -1)   //update dropdown to match requested value, in case audio system failed to start
+      if (mAudioInputDeviceIndex < 0)   //update dropdown to match requested value, in case audio system failed to start
       {
          for (int j = -2; j < i; ++j)
          {

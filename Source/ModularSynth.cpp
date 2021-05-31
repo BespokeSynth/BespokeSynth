@@ -40,7 +40,7 @@
 ModularSynth* TheSynth = nullptr;
 
 //static
-bool ModularSynth::sShouldAutosave = true;
+bool ModularSynth::sShouldAutosave = false;
 float ModularSynth::sBackgroundLissajousR = 0.408f;
 float ModularSynth::sBackgroundLissajousG = 0.245f;
 float ModularSynth::sBackgroundLissajousB = 0.418f;
@@ -109,6 +109,7 @@ void ModularSynth::Setup(GlobalManagers* globalManagers, juce::Component* mainCo
 {
    mGlobalManagers = globalManagers;
    mMainComponent = mainComponent;
+   int recordBufferLengthMinutes = 30;
    
    bool loaded = mUserPrefs.open(GetUserPrefsPath(false));
    if (loaded)
@@ -120,22 +121,10 @@ void ModularSynth::Setup(GlobalManagers* globalManagers, juce::Component* mainCo
       if (!mUserPrefs["scroll_multiplier_vertical"].isNull())
          mScrollMultiplierVertical = mUserPrefs["scroll_multiplier_vertical"].asDouble();
 
-      int recordBufferLengthMinutes = 30;
       if (!mUserPrefs["record_buffer_length_minutes"].isNull())
          recordBufferLengthMinutes = mUserPrefs["record_buffer_length_minutes"].asDouble();
-      mGlobalRecordBuffer = new RollingBuffer(recordBufferLengthMinutes * 60 * gSampleRate);
-      mGlobalRecordBuffer->SetNumChannels(2);
-      mSaveOutputBuffer[0] = new float[mGlobalRecordBuffer->Size()];
-      mSaveOutputBuffer[1] = new float[mGlobalRecordBuffer->Size()];
-
-      juce::File(ofToDataPath("savestate")).createDirectory();
-      juce::File(ofToDataPath("savestate/autosave")).createDirectory();
-      juce::File(ofToDataPath("recordings")).createDirectory();
-      juce::File(ofToDataPath("internal")).createDirectory();
-      juce::File(ofToDataPath("samples")).createDirectory();
-      juce::File(ofToDataPath("scripts")).createDirectory();
    }
-   else
+   /*else
    {
       mFatalError = "couldn't find or load data/"+GetUserPrefsPath(true);
 #if BESPOKE_MAC
@@ -143,9 +132,21 @@ void ModularSynth::Setup(GlobalManagers* globalManagers, juce::Component* mainCo
          mFatalError += "\nplease install to /Applications/BespokeSynth or launch via run_bespoke.command";
 #endif
       LogEvent("couldn't find or load userprefs.json", kLogEventType_Error);
-   }
+   }*/
 
    mIOBufferSize = gBufferSize;
+   
+   mGlobalRecordBuffer = new RollingBuffer(recordBufferLengthMinutes * 60 * gSampleRate);
+   mGlobalRecordBuffer->SetNumChannels(2);
+   mSaveOutputBuffer[0] = new float[mGlobalRecordBuffer->Size()];
+   mSaveOutputBuffer[1] = new float[mGlobalRecordBuffer->Size()];
+   
+   juce::File(ofToDataPath("savestate")).createDirectory();
+   juce::File(ofToDataPath("savestate/autosave")).createDirectory();
+   juce::File(ofToDataPath("recordings")).createDirectory();
+   juce::File(ofToDataPath("vst")).createDirectory();
+   juce::File(ofToDataPath("samples")).createDirectory();
+   juce::File(ofToDataPath("scripts")).createDirectory();
    
    SynthInit();
 
@@ -208,15 +209,19 @@ void ModularSynth::Poll()
 {
    if (mFatalError == "")
    {
+      string defaultLayout = "layouts/blank.json";
+      if (!mUserPrefs["layout"].isNull())
+         defaultLayout = mUserPrefs["layout"].asString();
+      
       if (!mInitialized && sFrameCount > 3) //let some frames render before blocking for a load
       {
-         LoadLayoutFromFile(ofToDataPath(mUserPrefs["layout"].asString()));
+         LoadLayoutFromFile(ofToDataPath(defaultLayout));
          mInitialized = true;
       }
 
       if (mWantReloadInitialLayout)
       {
-         LoadLayoutFromFile(ofToDataPath(TheSynth->GetUserPrefs()["layout"].asString()));
+         LoadLayoutFromFile(ofToDataPath(defaultLayout));
          mWantReloadInitialLayout = false;
       }
    }
@@ -1586,7 +1591,7 @@ void ModularSynth::ResetLayout()
    mUserPrefsEditor->SetName("userprefseditor");
    mUserPrefsEditor->CreateUIControls();
    mUserPrefsEditor->Init();
-   mUserPrefsEditor->SetPosition(300, 300);
+   mUserPrefsEditor->SetPosition(100, 250);
    mUserPrefsEditor->SetShowing(false);
    mModuleContainer.AddModule(mUserPrefsEditor);
    if (mFatalError != "")
@@ -1857,7 +1862,7 @@ void ModularSynth::LogEvent(string event, LogEventType type)
 IDrawableModule* ModularSynth::DuplicateModule(IDrawableModule* module)
 {
    {
-      FileStreamOut out(ofToDataPath("tmp").c_str());
+      FileStreamOut out(ofToResourcePath("tmp").c_str());
       module->SaveState(out);
    }
    
@@ -1878,7 +1883,7 @@ IDrawableModule* ModularSynth::DuplicateModule(IDrawableModule* module)
    newModule->SetName(module->Name()); //temporarily rename to the same as what we duplicated, so we can load state properly
    
    {
-      FileStreamIn in(ofToDataPath("tmp").c_str());
+      FileStreamIn in(ofToResourcePath("tmp").c_str());
       mIsLoadingModule = true;
       newModule->LoadState(in);
       mIsLoadingModule = false;

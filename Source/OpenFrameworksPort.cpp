@@ -58,95 +58,72 @@ string ofToDataPath(string path, bool makeAbsolute)
    }
    sWorkingDirectory.setAsCurrentWorkingDirectory(); //restore working directory, in case a VST plugin changed it (ROLI Studio Drums does this!)
    
-#if JUCE_WINDOWS
    static string sDataDir = "";
    if (sDataDir == "")
    {
-      string localDataDir = File::getCurrentWorkingDirectory().getChildFile("data").getFullPathName().toStdString();
-      if (juce::File(localDataDir).exists())
-         sDataDir = localDataDir;
-      else
-         sDataDir = File::getCurrentWorkingDirectory().getChildFile("../MacOSX/build/Release/data").getFullPathName().toStdString();   //fall back to looking at OSX dir in dev environment
-      ofStringReplace(sDataDir, "\\", "/");
-   }
-
-   return sDataDir + "/" + path;
-#elif JUCE_LINUX
-   static string sDataDir = "";
-   if (sDataDir == "")
-   {
-      //look for a "data" folder in the current working directory
-      //failing that, look in the OSX folder, which is my shared data folder for development
-      //failing that, look for /usr/share/BespokeSynth/data and update ~/.config/BespokeSynth/data
-      //failing that, look for ~/.config/BespokeSynth/data and warning
-      //falling that - exit
-      string localDataDir = File::getCurrentWorkingDirectory().getChildFile("data").getFullPathName().toStdString();
-      if (juce::File(localDataDir).exists())
-      {
-         DBG ("Use bundled data");
-         sDataDir = localDataDir;
-      }
-      else
-      {
-         string localDataDir = File::getCurrentWorkingDirectory().getChildFile("../../MacOSX/build/Release/data").getFullPathName().toStdString();
-         if (juce::File(localDataDir).exists())
-         {
-            DBG ("Use develop branch source data");
-            sDataDir = localDataDir;
-         }
-      
-         else
-         {
-             sDataDir = File::getSpecialLocation(File::globalApplicationsDirectory).getChildFile("share/BespokeSynth/data").getFullPathName().toStdString();
-             string localDataDir = File::getSpecialLocation(File::userApplicationDataDirectory).getChildFile("BespokeSynth/data").getFullPathName().toStdString();
-             if (juce::File(sDataDir).exists())
-             {
-                DBG ("Updating user's home data");
-                updateUserData();
-                sDataDir = localDataDir;
-             }
-             else
-             {
-                 if (juce::File(localDataDir).exists())
-                 {
-                    DBG ("Warning, no sData found, only user's home data");
-                    sDataDir = localDataDir;
-                 }
-                 else 
-                 {
-                 DBG ("Error, no sData found");
-                 JUCEApplicationBase::quit();
-                 }
-             }
-         }
-       }
-   }
-
-
-   return sDataDir + "/" + path;
-#else
-   static string sDataDir = "";
-   if (sDataDir == "")
-   {
-      #if DEBUG
-         string relative = "../Release/data";
-      #else
-         string relative = "data";
-      #endif
-      
-      string localDataDir = File::getCurrentWorkingDirectory().getChildFile(relative).getFullPathName().toStdString();
-      if (juce::File(localDataDir).exists())
-      {
-         sDataDir = localDataDir;
-      }
-      else
-      {
-         sDataDir = "/Applications/BespokeSynth/data";
-      }
+      string dataDir = File::getSpecialLocation(File::userDocumentsDirectory).getChildFile("BespokeSynth").getFullPathName().toStdString();
+      UpdateUserData(dataDir);
+      sDataDir = dataDir;
    }
    
    return sDataDir + "/" + path;
+}
+
+string ofToResourcePath(string path, bool makeAbsolute)
+{
+   if (path.empty() == false && path[0] == '.')
+      return path;
+   if (path.empty() == false && path[0] == '/')
+      return path;
+   if (path.empty() == false && path[1] == ':')
+      return path;
+   
+   static juce::File sWorkingDirectory;
+   static bool sFirstTime = true;
+   if (sFirstTime)
+   {
+      sFirstTime = false;
+      sWorkingDirectory = juce::File::getCurrentWorkingDirectory();
+   }
+   sWorkingDirectory.setAsCurrentWorkingDirectory(); //restore working directory, in case a VST plugin changed it (ROLI Studio Drums does this!)
+   
+   static string sResourceDir = "";
+   if (sResourceDir == "")
+   {
+#if JUCE_WINDOWS
+      string localResourceDir = File::getCurrentWorkingDirectory().getChildFile("resource").getFullPathName().toStdString();
+      if (juce::File(localResourceDir).exists())
+         sResourceDir = localResourceDir;
+      else
+         sResourceDir = File::getCurrentWorkingDirectory().getChildFile("../MacOSX/build/Release/resource").getFullPathName().toStdString();   //fall back to looking at OSX dir in dev environment
+
+#elif JUCE_LINUX
+      string localResourceDir = File::getCurrentWorkingDirectory().getChildFile("resource").getFullPathName().toStdString();
+      if (juce::File(localResourceDir).exists())
+         sResourceDir = localResourceDir;
+      else
+         sResourceDir = File::getCurrentWorkingDirectory().getChildFile("../../MacOSX/build/Release/resource").getFullPathName().toStdString();   //fall back to looking at OSX dir in dev environment
+   
+#else
+      #if DEBUG
+         string relative = "../Release/resource";
+      #else
+         string relative = "resource";
+      #endif
+      
+      string localResourceDir = File::getCurrentWorkingDirectory().getChildFile(relative).getFullPathName().toStdString();
+      if (juce::File(localResourceDir).exists())
+      {
+         sResourceDir = localResourceDir;
+      }
+      else
+      {
+         sResourceDir = "/Applications/BespokeSynth/resource";
+      }
 #endif
+   }
+   
+   return sResourceDir + "/" + path;
 }
 
 struct StyleStack
@@ -226,7 +203,7 @@ void ofSetColor(float r, float g, float b, float a)
    }
    static int sImage = -1;
    if (sImage == -1)
-      sImage = nvgCreateImage(gNanoVG, ofToDataPath("noise.jpg").c_str(), NVG_IMAGE_REPEATX | NVG_IMAGE_REPEATY);
+      sImage = nvgCreateImage(gNanoVG, ofToResourcePath("noise.jpg").c_str(), NVG_IMAGE_REPEATX | NVG_IMAGE_REPEATY);
    NVGpaint pattern = nvgImagePattern(gNanoVG, ofRandom(0,10), ofRandom(0,10), 300 / gDrawScale / TheSynth->GetPixelRatio(), 300 / gDrawScale / TheSynth->GetPixelRatio(), ofRandom(0,10), sImage, a);
    pattern.innerColor = nvgRGBA(r, g, b, a);
    pattern.outerColor = nvgRGBA(r, g, b, a);

@@ -1,0 +1,170 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<KNOWNPLUGINS>
+  <PLUGIN name="VitalFX" format="VST3" category="Fx" manufacturer="Matt Tytel"
+          version="0.4.6" file="/Library/Audio/Plug-Ins/VST3/VitalFX3.vst/VitalFX.vst3"
+          uid="1da29922" isInstrument="0" fileTime="16dfb4393c8" infoUpdateTime="1794a0089bb"
+          numInputs="0" numOutputs="0" isShell="0"/>
+  <PLUGIN name="ROLI Studio Drums" format="VST3" category="Instrument|Synth"
+          manufacturer="ROLI" version="1.2.2" file="/Library/Audio/Plug-Ins/VST3/ROLI Studio Drums.vst3"
+          uid="575166f0" isInstrument="1" fileTime="17336310e42" infoUpdateTime="1794a008764"
+          numInputs="0" numOutputs="2" isShell="0"/>
+  <PLUGIN name="SSDSampler5" format="VST3" category="Instrument|Synth"
+          manufacturer="Steven Slate" version="1.2.4" file="/Library/Audio/Plug-Ins/VST3/SSDSampler5.vst3"
+          uid="dac6e281" isInstrument="1" fileTime="178ad8e85b0" infoUpdateTime="1794a00845b"
+          numInputs="0" numOutputs="48" isShell="0"/>
+  <PLUGIN name="Equator" format="VST3" category="Instrument|Synth" manufacturer="ROLI"
+          version="1.13.0" file="/Library/Audio/Plug-Ins/VST3/Equator.vst3"
+          uid="27b4cd7e" isInstrument="1" fileTime="170e2f83be0" infoUpdateTime="1794a007f5f"
+          numInputs="0" numOutputs="2" isShell="0"/>
+  <PLUGIN name="Endlesss Studio" format="VST3" category="Instrument" manufacturer="Endlesss"
+          version="1.2.0" file="/Library/Audio/Plug-Ins/VST3/Endlesss.vst3"
+          uid="70058c18" isInstrument="1" fileTime="1766bd9d270" infoUpdateTime="1794a006e26"
+          numInputs="4" numOutputs="2" isShell="0"/>
+  <PLUGIN name="ValhallaVintageVerb" format="VST3" category="Fx|Reverb"
+          manufacturer="Valhalla DSP, LLC" version="2.0.2" file="/Library/Audio/Plug-Ins/VST3/ValhallaVintageVerb.vst3"
+          uid="24413dfb" isInstrument="0" fileTime="16b587baa60" infoUpdateTime="1794a006c77"
+          numInputs="0" numOutputs="0" isShell="0"/>
+  <PLUGIN name="Vital" format="VST3" category="Instrument|Synth" manufacturer="Matt Tytel"
+          version="0.4.6" file="/Library/Audio/Plug-Ins/VST3/Vital.vst3"
+          uid="ebf16db5" isInstrument="1" fileTime="16fbb1531b0" infoUpdateTime="1794a006b92"
+          numInputs="0" numOutputs="0" isShell="0"/>
+  <PLUGIN name="Komplete Kontrol" format="VST" category="Synth" manufacturer="Native Instruments GmbH"
+          version="1.73.1.760" file="/Library/Audio/Plug-Ins/VST/Komplete Kontrol.vst"
+          uid="4e694b4b" isInstrument="1" fileTime="15ab2fc7188" infoUpdateTime="1794a006859"
+          numInputs="0" numOutputs="32" isShell="0"/>
+  <PLUGIN name="Voxengo SPAN" descriptiveName="SPAN" format="VST" category="Analysis"
+          manufacturer="Voxengo" version="3.1.0.0" file="/Library/Audio/Plug-Ins/VST/SPAN.vst"
+          uid="34766f36" isInstrument="0" fileTime="15a6183c4f0" infoUpdateTime="1794a005e0a"
+          numInputs="1" numOutputs="1" isShell="0"/>
+  <PLUGIN name="Kontakt 5 16out" descriptiveName="Kontakt 5" format="VST"
+          category="Synth" manufacturer="Native Instruments GmbH" version="8.42.81.344"
+          file="/Library/Audio/Plug-Ins/VST/Kontakt 5 16out.vst" uid="4e694f37"
+          isInstrument="1" fileTime="15bf79eef40" infoUpdateTime="1794a0034cf"
+          numInputs="0" numOutputs="16" isShell="0"/>
+  <PLUGIN name="Guitar Rig 5" format="VST" category="Effect" manufacturer="Native Instruments GmbH"
+          version="8.40.17.664" file="/Library/Audio/Plug-Ins/VST/Guitar Rig 5.vst"
+          uid="4e694735" isInstrument="0" fileTime="15507e0f030" infoUpdateTime="1794a00272c"
+          numInputs="4" numOutputs="2" isShell="0"/>
+  <PLUGIN name="ValhallaRoom" format="VST" category="Effect" manufacturer="Valhalla DSP, LLC"
+          version="0.1.5.1" file="/Library/Audio/Plug-Ins/VST/ValhallaRoom_x64.vst"
+          uid="5275756d" isInstrument="0" fileTime="15bbc8a7be0" infoUpdateTime="1794a001fe4"
+          numInputs="2" numOutputs="2" isShell="0"/>
+  <PLUGIN name="Kontakt 5 8out" descriptiveName="Kontakt 5" format="VST"
+          category="Synth" manufacturer="Native Instruments GmbH" version="8.42.81.344"
+          file="/Library/Audio/Plug-Ins/VST/Kontakt 5 8out.vst" uid="4e694f36"
+          isInstrument="1" fileTime="15bf79eef40" infoUpdateTime="17949fff7be"
+          numInputs="0" numOutputs="8" isShell="0"/>
+  <PLUGIN name="ValhallaUberMod" format="VST" category="Effect" manufacturer="Valhalla DSP, LLC"
+          version="0.1.0.2" file="/Library/Audio/Plug-Ins/VST/ValhallaUberMod_x64.vst"
+          uid="75626572" isInstrument="0" fileTime="14b57e59270" infoUpdateTime="17949ffebf9"
+          numInputs="2" numOutputs="2" isShell="0"/>
+  <PLUGIN name="AGML2" descriptiveName="Ample Guitar M II Lite" format="VST"
+          category="Synth" manufacturer="Ample Sound" version="2.3.16.0"
+          file="/Library/Audio/Plug-Ins/VST/AGML2.vst" uid="416d6c73" isInstrument="1"
+          fileTime="154194efe80" infoUpdateTime="17949ffe6b0" numInputs="0"
+          numOutputs="2" isShell="0"/>
+  <PLUGIN name="MT-PowerDrumKit" format="VST" category="Synth" manufacturer="MANDA AUDIO"
+          version="2.0.9.0" file="/Library/Audio/Plug-Ins/VST/MT-PowerDrumKit.vst"
+          uid="4d545044" isInstrument="1" fileTime="16e36edde88" infoUpdateTime="17949ffe42f"
+          numInputs="0" numOutputs="16" isShell="0"/>
+  <PLUGIN name="Lekko" format="VST" category="Synth" manufacturer="Felt Instruments"
+          version="1.2.5.0" file="/Library/Audio/Plug-Ins/VST/Lekko.vst"
+          uid="4c656b6b" isInstrument="1" fileTime="16f57277000" infoUpdateTime="17949ffd9dc"
+          numInputs="0" numOutputs="6" isShell="0"/>
+  <PLUGIN name="Wolno" format="VST" category="Synth" manufacturer="Felt Instruments"
+          version="1.2.5.0" file="/Library/Audio/Plug-Ins/VST/Wolno.vst"
+          uid="576f6c6e" isInstrument="1" fileTime="16f57208a60" infoUpdateTime="17949ffc10d"
+          numInputs="0" numOutputs="6" isShell="0"/>
+  <PLUGIN name="ValhallaSupermassive" format="VST" category="Effect" manufacturer="Valhalla DSP, LLC"
+          version="1.0.0.0" file="/Library/Audio/Plug-Ins/VST/ValhallaSupermassive.vst"
+          uid="734d6173" isInstrument="0" fileTime="171f660a8b0" infoUpdateTime="17949ffaa80"
+          numInputs="2" numOutputs="2" isShell="0"/>
+  <PLUGIN name="Cypher2" format="VST" category="Synth" manufacturer="FXpansion"
+          version="2.5.1.2" file="/Library/Audio/Plug-Ins/VST/Cypher2.vst"
+          uid="49756f78" isInstrument="1" fileTime="166e1e0f3a0" infoUpdateTime="17949ffa1f6"
+          numInputs="2" numOutputs="2" isShell="0"/>
+  <PLUGIN name="ROLI Studio Drums" format="VST" category="Synth" manufacturer="ROLI"
+          version="1.2.2.0" file="/Library/Audio/Plug-Ins/VST/ROLI Studio Drums.vst"
+          uid="52534472" isInstrument="1" fileTime="17336310cf7" infoUpdateTime="17949ff9953"
+          numInputs="0" numOutputs="2" isShell="0"/>
+  <PLUGIN name="ValhallaShimmer" format="VST" category="Effect" manufacturer="Valhalla DSP, LLC"
+          version="0.1.0.3" file="/Library/Audio/Plug-Ins/VST/ValhallaShimmer_x64.vst"
+          uid="73686d72" isInstrument="0" fileTime="14c295c2940" infoUpdateTime="17949ff9684"
+          numInputs="2" numOutputs="2" isShell="0"/>
+  <PLUGIN name="Massive" format="VST" category="Synth" manufacturer="Native Instruments GmbH"
+          version="1.71.5.152" file="/Library/Audio/Plug-Ins/VST/Massive.vst"
+          uid="4e694d61" isInstrument="1" fileTime="150aa32bb98" infoUpdateTime="17949ff95e1"
+          numInputs="0" numOutputs="2" isShell="0"/>
+  <PLUGIN name="Jasno" format="VST" category="Synth" manufacturer="Felt Instruments"
+          version="1.0.1.0" file="/Library/Audio/Plug-Ins/VST/Jasno.vst"
+          uid="4a61736e" isInstrument="1" fileTime="16fbf67d290" infoUpdateTime="17949ff8bf3"
+          numInputs="0" numOutputs="6" isShell="0"/>
+  <PLUGIN name="ValhallaPlate" format="VST" category="Effect" manufacturer="Valhalla DSP, LLC"
+          version="0.1.5.0" file="/Library/Audio/Plug-Ins/VST/ValhallaPlate.vst"
+          uid="706c6174" isInstrument="0" fileTime="152332978f0" infoUpdateTime="17949ff6e3a"
+          numInputs="2" numOutputs="2" isShell="0"/>
+  <PLUGIN name="Serum" format="VST" category="Synth" manufacturer="Xfer Records"
+          version="1.2.4.5" file="/Library/Audio/Plug-Ins/VST/Serum.vst"
+          uid="58667358" isInstrument="1" fileTime="169c8815910" infoUpdateTime="17949ff6d56"
+          numInputs="0" numOutputs="2" isShell="0"/>
+  <PLUGIN name="ValhallaSpaceModulator" format="VST" category="Effect"
+          manufacturer="Valhalla DSP, LLC" version="0.1.0.7" file="/Library/Audio/Plug-Ins/VST/ValhallaSpaceModulator.vst"
+          uid="53704d64" isInstrument="0" fileTime="15554b618e0" infoUpdateTime="17949ff6c50"
+          numInputs="2" numOutputs="2" isShell="0"/>
+  <PLUGIN name="Maschine 2 FX" descriptiveName="Maschine 2" format="VST"
+          category="Effect" manufacturer="Native Instruments GmbH" version="3.39.48.928"
+          file="/Library/Audio/Plug-Ins/VST/Maschine 2 FX.vst" uid="4e694d3c"
+          isInstrument="0" fileTime="15ad1a2d938" infoUpdateTime="17949ff6a20"
+          numInputs="8" numOutputs="32" isShell="0"/>
+  <PLUGIN name="Maschine 2" format="VST" category="Synth" manufacturer="Native Instruments GmbH"
+          version="3.39.48.928" file="/Library/Audio/Plug-Ins/VST/Maschine 2.vst"
+          uid="4e694d32" isInstrument="1" fileTime="15ad1a2d938" infoUpdateTime="17949ff5a89"
+          numInputs="8" numOutputs="32" isShell="0"/>
+  <PLUGIN name="ValhallaFreqEcho" format="VST" category="Effect" manufacturer="Valhalla DSP, LLC"
+          version="0.1.0.5" file="/Library/Audio/Plug-Ins/VST/ValhallaFreqEcho.vst"
+          uid="46714568" isInstrument="0" fileTime="14a5a7eb508" infoUpdateTime="17949ff360b"
+          numInputs="2" numOutputs="2" isShell="0"/>
+  <PLUGIN name="Vital" format="VST" category="Synth" manufacturer="Matt Tytel"
+          version="0.4.6.0" file="/Library/Audio/Plug-Ins/VST/Vital.vst"
+          uid="56697461" isInstrument="1" fileTime="16fbb1531b0" infoUpdateTime="17949ff353f"
+          numInputs="0" numOutputs="2" isShell="0"/>
+  <PLUGIN name="imagiro piano" format="VST" category="Synth" manufacturer="imagiro"
+          version="1.0.0.0" file="/Library/Audio/Plug-Ins/VST/imagiro piano.vst"
+          uid="41626364" isInstrument="1" fileTime="1720b187a08" infoUpdateTime="17949ff339c"
+          numInputs="0" numOutputs="2" isShell="0"/>
+  <PLUGIN name="Equator" format="VST" category="Synth" manufacturer="ROLI"
+          version="1.13.0.0" file="/Library/Audio/Plug-Ins/VST/Equator.vst"
+          uid="45717472" isInstrument="1" fileTime="170e2f83be0" infoUpdateTime="17949ff2dc8"
+          numInputs="0" numOutputs="2" isShell="0"/>
+  <PLUGIN name="Kontakt 5" format="VST" category="Synth" manufacturer="Native Instruments GmbH"
+          version="8.42.81.344" file="/Library/Audio/Plug-Ins/VST/Kontakt 5.vst"
+          uid="4e694f35" isInstrument="1" fileTime="15bf79eef40" infoUpdateTime="17949ff19f1"
+          numInputs="0" numOutputs="64" isShell="0"/>
+  <PLUGIN name="Strobe2" format="VST" category="Synth" manufacturer="FXpansion"
+          version="2.5.1.2" file="/Library/Audio/Plug-Ins/VST/Strobe2.vst"
+          uid="45716d42" isInstrument="1" fileTime="166a9358930" infoUpdateTime="17949feff52"
+          numInputs="2" numOutputs="2" isShell="0"/>
+  <PLUGIN name="ValhallaVintageVerb" format="VST" category="Effect" manufacturer="Valhalla DSP, LLC"
+          version="0.2.0.2" file="/Library/Audio/Plug-Ins/VST/ValhallaVintageVerb_x64.vst"
+          uid="76656533" isInstrument="0" fileTime="16b58a72348" infoUpdateTime="17949fefb1c"
+          numInputs="2" numOutputs="2" isShell="0"/>
+  <PLUGIN name="SSDSampler5" format="VST" category="Synth" manufacturer="Steven Slate"
+          version="1.1.0.0" file="/Library/Audio/Plug-Ins/VST/SSDSampler5.vst"
+          uid="53534435" isInstrument="1" fileTime="178ad8e3b78" infoUpdateTime="17949fef986"
+          numInputs="0" numOutputs="48" isShell="0"/>
+  <PLUGIN name="Tal-Reverb-2" descriptiveName="TAL Reverb II Plugin" format="VST"
+          category="Effect" manufacturer="TAL-Togu Audio Line" version="2.0.1.0"
+          file="/Library/Audio/Plug-Ins/VST/TAL-Reverb-2.vst" uid="35386838"
+          isInstrument="0" fileTime="15b2bc3bd60" infoUpdateTime="17949fef511"
+          numInputs="2" numOutputs="2" isShell="0"/>
+  <PLUGIN name="ABPL2" descriptiveName="Ample Bass P Lite II" format="VST"
+          category="Synth" manufacturer="Ample Sound" version="2.3.1.0"
+          file="/Library/Audio/Plug-Ins/VST/ABPL2.vst" uid="61706c73" isInstrument="1"
+          fileTime="1547b35b148" infoUpdateTime="17949fef314" numInputs="0"
+          numOutputs="2" isShell="0"/>
+  <PLUGIN name="VitalFX" format="VST" category="Effect" manufacturer="Matt Tytel"
+          version="0.4.6.0" file="/Library/Audio/Plug-Ins/VST/VitalFX.vst"
+          uid="56694678" isInstrument="0" fileTime="16fbb153598" infoUpdateTime="17949fef121"
+          numInputs="2" numOutputs="2" isShell="0"/>
+</KNOWNPLUGINS>

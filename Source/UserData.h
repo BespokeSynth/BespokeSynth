@@ -1,11 +1,6 @@
 #pragma once
 
-#include "../JuceLibraryCode/JuceHeader.h"
+#include "SynthGlobals.h"
 
-//class UserData
-//{
-
-//public:
-bool updateUserData();
-
-//};
+string GetBundledUserDataPath();
+void UpdateUserData(string destDirPath);

@@ -75,10 +75,10 @@ void SynthInit()
 
 void LoadGlobalResources()
 {
-   gFont.LoadFont(ofToDataPath("frabk.ttf"));
-   gFontBold.LoadFont(ofToDataPath("frabk_m.ttf"));
-   gFontFixedWidth.LoadFont(ofToDataPath("iosevka-type-light.ttf"));
-   //gModuleShader.load(ofToDataPath("shaders/module.vert"), ofToDataPath("shaders/module.frag"));
+   gFont.LoadFont(ofToResourcePath("frabk.ttf"));
+   gFontBold.LoadFont(ofToResourcePath("frabk_m.ttf"));
+   gFontFixedWidth.LoadFont(ofToResourcePath("iosevka-type-light.ttf"));
+   //gModuleShader.load(ofToResourcePath("shaders/module.vert"), ofToResourcePath("shaders/module.frag"));
 }
 
 void SetGlobalSampleRateAndBufferSize(int rate, int size)

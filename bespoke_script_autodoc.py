@@ -105,7 +105,7 @@ docFile = open("scripting_reference.txt", "w+")
 docFile.writelines(docOutput)
 
 for key in stubOutput.keys():
-   dir = "Builds/MacOSX/build/Release/data/internal/python_stubs/"+key+"/"
+   dir = "Builds/MacOSX/build/Release/resource/internal/python_stubs/"+key+"/"
    if not os.path.exists(dir):
       os.mkdir(dir)
    stubFile = open(dir+"__init__.pyi", "w+")

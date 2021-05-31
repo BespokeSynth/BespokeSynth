@@ -36,7 +36,7 @@ namespace VSTLookup
       if (rescan)
       {
          sPluginList.clear();
-         juce::File deadMansPedalFile(ofToDataPath("internal/deadmanspedal.txt"));
+         juce::File deadMansPedalFile(ofToDataPath("vst/deadmanspedal.txt"));
          juce::FileSearchPath searchPath;
          for (int i = 0; i < TheSynth->GetUserPrefs()["vstsearchdirs"].size(); ++i)
             searchPath.add(juce::File(TheSynth->GetUserPrefs()["vstsearchdirs"][i].asString()));
@@ -49,11 +49,11 @@ namespace VSTLookup
                ofLog() << "scanning " + nameOfPluginBeingScanned;
             }
          }
-         sPluginList.createXml()->writeTo(juce::File(ofToDataPath("internal/found_vsts.xml")));
+         sPluginList.createXml()->writeTo(juce::File(ofToDataPath("vst/found_vsts.xml")));
       }
       else
       {
-         auto file = juce::File(ofToDataPath("internal/found_vsts.xml"));
+         auto file = juce::File(ofToDataPath("vst/found_vsts.xml"));
          if (file.existsAsFile())
          {
             auto xml = juce::parseXML(file);
@@ -69,7 +69,7 @@ namespace VSTLookup
       std::map<string, double> lastUsedTimes;
       
       ofxJSONElement root;
-      root.open(ofToDataPath("internal/used_vsts.json"));
+      root.open(ofToDataPath("vst/used_vsts.json"));
       ofxJSONElement jsonList = root["vsts"];
 
       for (auto it = jsonList.begin(); it != jsonList.end(); ++it)
@@ -199,12 +199,12 @@ void VSTPlugin::SetVST(string vstName)
    //mark VST as used
    {
       ofxJSONElement root;
-      root.open(ofToDataPath("internal/used_vsts.json"));
+      root.open(ofToDataPath("vst/used_vsts.json"));
       
       Time time = Time::getCurrentTime();
       root["vsts"][path] = (double)time.currentTimeMillis();
 
-      root.save(ofToDataPath("internal/used_vsts.json"), true);
+      root.save(ofToDataPath("vst/used_vsts.json"), true);
    }
    
    if (mPlugin != nullptr && dynamic_cast<juce::AudioPluginInstance*>(mPlugin.get())->getPluginDescription().fileOrIdentifier.toStdString() == path)
