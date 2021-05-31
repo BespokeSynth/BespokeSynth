@@ -191,12 +191,12 @@ string ModularSynth::GetUserPrefsPath(bool relative)
    if (JUCEApplication::getCommandLineParameterArray().size() > 0)
    {
       string path = ofToDataPath(JUCEApplication::getCommandLineParameterArray()[0].toStdString());
-      if (juce::File(path).existsAsFile())
-      {
-         if (relative)
-            return JUCEApplication::getCommandLineParameterArray()[0].toStdString();
-         return path;
-      }
+      if (!juce::File(path).existsAsFile())
+         TheSynth->SetFatalError("couldn't find command-line-specified userprefs file at " + path);
+      
+      if (relative)
+         return JUCEApplication::getCommandLineParameterArray()[0].toStdString();
+      return path;
    }
    
    if (relative)
