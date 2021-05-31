@@ -98,11 +98,15 @@ string ofToResourcePath(string path, bool makeAbsolute)
          sResourceDir = File::getCurrentWorkingDirectory().getChildFile("../MacOSX/build/Release/resource").getFullPathName().toStdString();   //fall back to looking at OSX dir in dev environment
 
 #elif JUCE_LINUX
-      string localResourceDir = File::getCurrentWorkingDirectory().getChildFile("resource").getFullPathName().toStdString();
-      if (juce::File(localResourceDir).exists())
-         sResourceDir = localResourceDir;
-      else
-         sResourceDir = File::getCurrentWorkingDirectory().getChildFile("../../MacOSX/build/Release/resource").getFullPathName().toStdString();   //fall back to looking at OSX dir in dev environment
+      string localDataDir = File::getCurrentWorkingDirectory().getChildFile("resource").getFullPathName().toStdString();
+      string developmentDataDir = File::getCurrentWorkingDirectory().getChildFile("../../MacOSX/build/Release/resource").getFullPathName().toStdString();   //OSX dir in dev environment
+      string installedDataDir = File::getSpecialLocation(File::globalApplicationsDirectory).getChildFile("share/BespokeSynth/resource").getFullPathName().toStdString(); // /usr/share/BespokeSynth/resource
+      if (juce::File(localDataDir).exists())
+         sResourceDir = localDataDir;
+      else if (juce::File(developmentDataDir).exists())
+         sResourceDir = developmentDataDir;
+      else if (juce::File(installedDataDir).exists())
+         sResourceDir = installedDataDir;
    
 #else
       #if DEBUG
