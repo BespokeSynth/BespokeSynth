@@ -84,7 +84,7 @@ private:
    ClickButton* mAdvanceBackwardButton;
    ClickButton* mAdvanceForwardButton;
    
-   static const int kIndividualStepCables = 16;
+   static const int kIndividualStepCables = kMaxSteps;
    PatchCableSource* mStepCables[kIndividualStepCables];
    
    UIGrid* mVelocityGrid;
