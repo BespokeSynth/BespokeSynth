@@ -190,8 +190,8 @@ public:
       const string kNoneDevice = "none";
       string outputDevice = kAutoDevice;
       string inputDevice = kNoneDevice;
-      int sampleRate = 44100;
-      int bufferSize = 128;
+      int sampleRate = 48000;
+      int bufferSize = 256;
       bool loaded = userPrefs.open(ModularSynth::GetUserPrefsPath(false));
       if (loaded)
       {
