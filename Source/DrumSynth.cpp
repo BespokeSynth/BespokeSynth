@@ -20,8 +20,10 @@
 DrumSynth::DrumSynth()
 : mVolume(1)
 , mVolSlider(nullptr)
-, mEditMode(false)
+, mEditMode(true)
 , mEditCheckbox(nullptr)
+, mUseIndividualOuts(false)
+, mMonoOutput(false)
 {
    mOutputBuffer = new float[gBufferSize];
    
@@ -37,7 +39,7 @@ void DrumSynth::CreateUIControls()
 {
    IDrawableModule::CreateUIControls();
    mVolSlider = new FloatSlider(this,"vol",4,4,100,15,&mVolume,0,2);
-   mEditCheckbox = new Checkbox(this,"edit",73,20,&mEditMode);
+   //mEditCheckbox = new Checkbox(this,"edit",73,20,&mEditMode);
    
    for (size_t i=0; i<mHits.size(); ++i)
       mHits[i]->CreateUIControls();
@@ -55,29 +57,54 @@ void DrumSynth::Process(double time)
    PROFILER(DrumSynth);
    
    IAudioReceiver* target = GetTarget();
-   if (!mEnabled || target == nullptr)
+   if (!mEnabled || (target == nullptr && !mUseIndividualOuts))
       return;
    
-   ComputeSliders(0);
+   int numChannels = mMonoOutput ? 1 : 2;
    
-   int bufferSize = target->GetBuffer()->BufferSize();
-   float* out = target->GetBuffer()->GetChannel(0);
-   assert(bufferSize == gBufferSize);
+   ComputeSliders(0);
+   SyncOutputBuffer(numChannels);
+   
+   int bufferSize = gBufferSize;
+   ChannelBuffer* out = target ? target->GetBuffer() : nullptr;
    
    float volSq = mVolume * mVolume;
    
-   Clear(mOutputBuffer, bufferSize);
-   
-   for (size_t i=0; i<mHits.size(); ++i)
+   if (mUseIndividualOuts)
    {
-      mHits[i]->Process(time, mOutputBuffer, bufferSize);
+      for (int i=0; i<(int)mHits.size(); ++i)
+      {
+         if (GetTarget(i+1) != nullptr)
+         {
+            Clear(mOutputBuffer, bufferSize);
+         
+            mHits[i]->Process(time, mOutputBuffer, bufferSize);
+         
+            Mult(mOutputBuffer, volSq, bufferSize);
+            out = GetTarget(i+1)->GetBuffer();
+            mHits[i]->mIndividualOutput->mVizBuffer->SetNumChannels(numChannels);
+            for (int ch=0; ch<numChannels; ++ch)
+            {
+               mHits[i]->mIndividualOutput->mVizBuffer->WriteChunk(mOutputBuffer, bufferSize, ch);
+               Add(out->GetChannel(ch), mOutputBuffer, bufferSize);
+            }
+         }
+      }
    }
-   
-   Mult(mOutputBuffer, volSq, bufferSize);
-   
-   GetVizBuffer()->WriteChunk(mOutputBuffer, bufferSize, 0);
-   
-   Add(out, mOutputBuffer, bufferSize);
+   else
+   {
+      Clear(mOutputBuffer, bufferSize);
+      
+      for (size_t i=0; i<mHits.size(); ++i)
+         mHits[i]->Process(time, mOutputBuffer, bufferSize);
+      
+      Mult(mOutputBuffer, volSq, bufferSize);
+      for (int ch=0; ch<numChannels; ++ch)
+      {
+         GetVizBuffer()->WriteChunk(mOutputBuffer, bufferSize, ch);
+         Add(out->GetChannel(ch), mOutputBuffer, bufferSize);
+      }
+   }
 }
 
 void DrumSynth::PlayNote(double time, int pitch, int velocity, int voiceIdx, ModulationParameters modulation)
@@ -122,7 +149,7 @@ void DrumSynth::DrawModule()
       return;
    
    mVolSlider->Draw();
-   mEditCheckbox->Draw();
+   //mEditCheckbox->Draw();
    
    if (mEditMode)
    {
@@ -144,7 +171,7 @@ void DrumSynth::DrawModule()
          ofSetColor(255,255,255,gModuleDrawAlpha);
          
          string name = ofToString(i);
-         DrawTextNormal(name,mHits[i]->mX+5,mHits[i]->mY+10);
+         DrawTextNormal(name,mHits[i]->mX+5,mHits[i]->mY+12);
          
          mHits[i]->Draw();
       }
@@ -188,10 +215,6 @@ void DrumSynth::DropdownUpdated(DropdownList* list, int oldVal)
 
 void DrumSynth::CheckboxUpdated(Checkbox* checkbox)
 {
-   if (checkbox == mEditCheckbox)
-   {
-      TheSynth->MoveToFront(this);
-   }
 }
 
 void DrumSynth::ButtonClicked(ClickButton *button)
@@ -209,6 +232,8 @@ void DrumSynth::TextEntryComplete(TextEntry* entry)
 void DrumSynth::LoadLayout(const ofxJSONElement& moduleInfo)
 {
    mModuleSaveData.LoadString("target", moduleInfo);
+   mModuleSaveData.LoadBool("individual_outs", moduleInfo, false);
+   mModuleSaveData.LoadBool("mono", moduleInfo, false);
    
    SetUpFromSaveData();
 }
@@ -216,6 +241,20 @@ void DrumSynth::LoadLayout(const ofxJSONElement& moduleInfo)
 void DrumSynth::SetUpFromSaveData()
 {
    SetTarget(TheSynth->FindModule(mModuleSaveData.GetString("target")));
+   bool useIndividualOuts = mModuleSaveData.GetBool("individual_outs");
+   if (useIndividualOuts)
+   {
+      for (size_t i=0; i<mHits.size(); ++i)
+      {
+         if (mHits[i]->mIndividualOutput == nullptr)
+            mHits[i]->mIndividualOutput = new IndividualOutput(mHits[i]);
+      }
+   }
+   GetPatchCableSource()->SetShowing(!useIndividualOuts);
+   
+   mUseIndividualOuts = useIndividualOuts;
+   
+   mMonoOutput = mModuleSaveData.GetBool("mono");
 }
 
 DrumSynth::DrumSynthHit::DrumSynthHit(DrumSynth* parent, int index, int x, int y)
@@ -232,9 +271,15 @@ DrumSynth::DrumSynthHit::DrumSynthHit(DrumSynth* parent, int index, int x, int y
 , mIndex(index)
 , mX(x)
 , mY(y)
+, mIndividualOutput(nullptr)
 {
    mFilter.SetFilterType(kFilterType_Lowpass);
    mFilter.SetFilterParams(1000, sqrt(2)/2);
+}
+
+DrumSynth::DrumSynthHit::~DrumSynthHit()
+{
+   delete mIndividualOutput;
 }
 
 void DrumSynth::DrumSynthHit::CreateUIControls()

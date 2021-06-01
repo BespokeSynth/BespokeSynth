@@ -48,6 +48,7 @@ public:
    //IAudioSource
    void Process(double time) override;
    void SetEnabled(bool enabled) override { mEnabled = enabled; }
+   int GetNumTargets() override { return mUseIndividualOuts ? (int)mHits.size() + 1 : 1; }
    
    //INoteReceiver
    void PlayNote(double time, int pitch, int velocity, int voiceIdx = -1, ModulationParameters modulation = ModulationParameters()) override;
@@ -82,10 +83,13 @@ private:
       float mQ;
    };
    
+   struct IndividualOutput;
+   
    class DrumSynthHit
    {
    public:
       DrumSynthHit(DrumSynth* parent, int index, int x, int y);
+      ~DrumSynthHit();
       
       void CreateUIControls();
       void Play(double time, float velocity);
@@ -114,6 +118,33 @@ private:
       int mX;
       int mY;
       BiquadFilter mFilter;
+      
+      IndividualOutput* mIndividualOutput;
+   };
+   
+   struct IndividualOutput
+   {
+      IndividualOutput(DrumSynthHit* owner)
+      : mHit(owner)
+      , mVizBuffer(nullptr)
+      , mPatchCableSource(nullptr)
+      {
+         mVizBuffer = new RollingBuffer(VIZ_BUFFER_SECONDS*gSampleRate);
+         mPatchCableSource = new PatchCableSource(owner->mParent, kConnectionType_Audio);
+         
+         mPatchCableSource->SetOverrideVizBuffer(mVizBuffer);
+         mPatchCableSource->SetManualSide(PatchCableSource::Side::kRight);
+         owner->mParent->AddPatchCableSource(mPatchCableSource);
+         
+         mPatchCableSource->SetManualPosition(mHit->mX + 30, mHit->mY + 8);
+      }
+      ~IndividualOutput()
+      {
+         delete mVizBuffer;
+      }
+      DrumSynthHit* mHit;
+      RollingBuffer* mVizBuffer;
+      PatchCableSource* mPatchCableSource;
    };
    
    int GetAssociatedSampleIndex(int x, int y);
@@ -132,6 +163,8 @@ private:
    FloatSlider* mVolSlider;
    bool mEditMode;
    Checkbox* mEditCheckbox;
+   bool mUseIndividualOuts;
+   bool mMonoOutput;
 };
 
 #endif /* defined(__Bespoke__DrumSynth__) */

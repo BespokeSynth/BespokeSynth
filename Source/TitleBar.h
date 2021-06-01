@@ -76,7 +76,7 @@ public:
    bool HasTitleBar() const override { return false; }
    bool AlwaysOnTop() override { return true; }
    bool IsSingleton() const override { return true; }
-   void Poll();
+   void Poll() override;
    
    HelpDisplay* GetHelpDisplay() { return mHelpDisplay; }
 

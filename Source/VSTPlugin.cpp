@@ -73,14 +73,17 @@ namespace VSTLookup
       
       std::map<string, double> lastUsedTimes;
       
-      ofxJSONElement root;
-      root.open(ofToDataPath("vst/used_vsts.json"));
-      ofxJSONElement jsonList = root["vsts"];
-
-      for (auto it = jsonList.begin(); it != jsonList.end(); ++it)
+      if (juce::File(ofToDataPath("vst/used_vsts.json")).existsAsFile())
       {
-         string key = it.key().asString();
-         lastUsedTimes[key] = jsonList[key].asDouble();
+         ofxJSONElement root;
+         root.open(ofToDataPath("vst/used_vsts.json"));
+         ofxJSONElement jsonList = root["vsts"];
+
+         for (auto it = jsonList.begin(); it != jsonList.end(); ++it)
+         {
+            string key = it.key().asString();
+            lastUsedTimes[key] = jsonList[key].asDouble();
+         }
       }
       
       std::sort(vsts.begin(), vsts.end(), [lastUsedTimes](string a, string b) {
