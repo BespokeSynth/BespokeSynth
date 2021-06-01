@@ -22,6 +22,9 @@ namespace
    const int kGlobalModulationIdx = 16;
 }
 
+//static
+bool VSTPlugin::sIsRescanningVsts = false;
+
 namespace VSTLookup
 {
    static juce::AudioPluginFormatManager sFormatManager;
@@ -35,6 +38,7 @@ namespace VSTLookup
 
       if (rescan)
       {
+         VSTPlugin::sIsRescanningVsts = true;
          sPluginList.clear();
          juce::File deadMansPedalFile(ofToDataPath("vst/deadmanspedal.txt"));
          juce::FileSearchPath searchPath;
@@ -50,6 +54,7 @@ namespace VSTLookup
             }
          }
          sPluginList.createXml()->writeTo(juce::File(ofToDataPath("vst/found_vsts.xml")));
+         VSTPlugin::sIsRescanningVsts = false;
       }
       else
       {

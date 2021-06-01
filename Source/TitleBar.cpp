@@ -367,7 +367,7 @@ void TitleBar::DrawModule()
 
 void TitleBar::DrawModuleUnclipped()
 {
-   if (mVstRescanCountdown > 0)
+   if (mVstRescanCountdown > 0 || VSTPlugin::sIsRescanningVsts)
    {
       ofPushStyle();
       ofSetColor(255, 255, 255);

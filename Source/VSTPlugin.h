@@ -72,6 +72,8 @@ public:
    void SaveState(FileStreamOut& out) override;
    void LoadState(FileStreamIn& in) override;
    
+   static bool sIsRescanningVsts;
+   
 private:
    //IDrawableModule
    void PreDrawModule() override;
