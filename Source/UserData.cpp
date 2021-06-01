@@ -3,39 +3,8 @@
 
 string GetBundledUserDataPath()
 {
-   string bundledUserDataDir;
-#if JUCE_WINDOWS
-   string localDataDir = File::getCurrentWorkingDirectory().getChildFile("data").getFullPathName().toStdString();
-   if (juce::File(localDataDir).exists())
-      bundledUserDataDir = localDataDir;
-   else
-      bundledUserDataDir = File::getCurrentWorkingDirectory().getChildFile("../MacOSX/build/Release/data").getFullPathName().toStdString();   //fall back to looking at OSX dir in dev environment
+   string bundledUserDataDir = ofToResourcePath("userdata_original");
    ofStringReplace(bundledUserDataDir, "\\", "/");
-   
-#elif JUCE_LINUX
-   string localDataDir = File::getCurrentWorkingDirectory().getChildFile("data").getFullPathName().toStdString();
-   string developmentDataDir = File::getCurrentWorkingDirectory().getChildFile("../../MacOSX/build/Release/data").getFullPathName().toStdString();   //OSX dir in dev environment
-   string installedDataDir = File::getSpecialLocation(File::globalApplicationsDirectory).getChildFile("share/BespokeSynth/data").getFullPathName().toStdString(); // /usr/share/BespokeSynth/data
-   if (juce::File(localDataDir).exists())
-      bundledUserDataDir = localDataDir;
-   else if (juce::File(developmentDataDir).exists())
-      bundledUserDataDir = developmentDataDir;
-   else if (juce::File(installedDataDir).exists())
-      bundledUserDataDir = installedDataDir;
-   
-#else
-   #if DEBUG
-      string relative = "../Release/data";
-   #else
-      string relative = "data";
-   #endif
-   
-   string localDataDir = File::getCurrentWorkingDirectory().getChildFile(relative).getFullPathName().toStdString();
-   if (juce::File(localDataDir).exists())
-      bundledUserDataDir = localDataDir;
-   else
-      bundledUserDataDir = "/Applications/BespokeSynth/data";
-#endif
    
    return bundledUserDataDir;
 }
