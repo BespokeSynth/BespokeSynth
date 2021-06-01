@@ -286,10 +286,18 @@ void PatchCable::Render()
          bool warn = false;
          
          if (vizBuff->NumChannels() > 1 && mAudioReceiverTarget && mAudioReceiverTarget->GetInputMode() == IAudioReceiver::kInputMode_Mono)
+         {
             warn = true; //warn that the multichannel audio is being crunched to mono
+            if (mHovered)
+               TheSynth->SetNextDrawTooltip("warning: multichannel audio is being squashed to mono");
+         }
          
          if (vizBuff->NumChannels() == 1 && mAudioReceiverTarget && mAudioReceiverTarget->GetBuffer()->RecentNumActiveChannels() > 1)
+         {
             warn = true; //warn that the target expects multichannel audio but we're not filling all of the channels
+            if (mHovered)
+               TheSynth->SetNextDrawTooltip("warning: target expects multichannel audio, but is only getting mono");
+         }
          
          if (warn)
          {

@@ -453,9 +453,10 @@ void ModularSynth::Draw(void* vg)
    ofCircle(GetMouseX(), GetMouseY(), 30 + (TheTransport->GetMeasurePos() * 20));
    ofPopStyle();*/
 
+   string tooltip = "";
+   
    if (HelpDisplay::sShowTooltips)
    {
-      string tooltip = "";
       HelpDisplay* helpDisplay = TheTitleBar->GetHelpDisplay();
 
       if (gHoveredUIControl && string(gHoveredUIControl->Name()) != "enabled")
@@ -490,33 +491,37 @@ void ModularSynth::Draw(void* vg)
             tooltip = helpDisplay->GetModuleTooltip(gHoveredModule);
          }
       }
+   }
+   
+   if (mNextDrawTooltip != "")
+      tooltip = mNextDrawTooltip;
+   mNextDrawTooltip = "";
+   
+   if (tooltip != "")
+   {
+      float x = GetMouseX() + 25;
+      float y = GetMouseY() + 7;
+      float maxWidth = 300;
 
-      if (tooltip != "")
-      {
-         float x = GetMouseX() + 25;
-         float y = GetMouseY() + 7;
-         float maxWidth = 300;
+      float fontSize = 15;
+      nvgFontFaceId(gNanoVG, gFont.GetFontHandle());
+      nvgFontSize(gNanoVG, fontSize);
+      float bounds[4];
+      nvgTextBoxBounds(gNanoVG, x, y, maxWidth, tooltip.c_str(), nullptr, bounds);
+      float padding = 3;
+      ofRectangle rect(bounds[0]-padding, bounds[1] - padding, bounds[2] - bounds[0] + padding*2, bounds[3] - bounds[1] + padding*2);
 
-         float fontSize = 15;
-         nvgFontFaceId(gNanoVG, gFont.GetFontHandle());
-         nvgFontSize(gNanoVG, fontSize);
-         float bounds[4];
-         nvgTextBoxBounds(gNanoVG, x, y, maxWidth, tooltip.c_str(), nullptr, bounds);
-         float padding = 3;
-         ofRectangle rect(bounds[0]-padding, bounds[1] - padding, bounds[2] - bounds[0] + padding*2, bounds[3] - bounds[1] + padding*2);
+      ofFill();
+      ofSetColor(50, 50, 50);
+      ofRect(rect.x, rect.y, rect.width, rect.height);
 
-         ofFill();
-         ofSetColor(50, 50, 50);
-         ofRect(rect.x, rect.y, rect.width, rect.height);
+      ofNoFill();
+      ofSetColor(255, 255, 255);
+      ofRect(rect.x, rect.y, rect.width, rect.height);
 
-         ofNoFill();
-         ofSetColor(255, 255, 255);
-         ofRect(rect.x, rect.y, rect.width, rect.height);
-
-         ofSetColor(255, 255, 255);
-         //DrawTextNormal(tooltip, x + 5, y + 12);
-         gFont.DrawStringWrap(tooltip, fontSize, x, y, maxWidth);
-      }
+      ofSetColor(255, 255, 255);
+      //DrawTextNormal(tooltip, x + 5, y + 12);
+      gFont.DrawStringWrap(tooltip, fontSize, x, y, maxWidth);
    }
    
    ofPopMatrix();

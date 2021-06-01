@@ -112,6 +112,7 @@ public:
    bool IsModalFocusItem(IDrawableModule* item) const;
    
    void LogEvent(string event, LogEventType type);
+   void SetNextDrawTooltip(string tooltip) { mNextDrawTooltip = tooltip; }
    
    bool LoadLayoutFromFile(string jsonFile, bool makeDefaultLayout = true);
    bool LoadLayoutFromString(string jsonString);
@@ -306,6 +307,7 @@ private:
    vector< pair<int,bool> > mQueuedKeyInput;
    
    ofVec2f mMousePos;
+   string mNextDrawTooltip;
    
    GlobalManagers* mGlobalManagers;
    juce::Component* mMainComponent;
