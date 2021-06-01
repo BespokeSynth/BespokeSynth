@@ -346,27 +346,16 @@ paket-files/
 __pycache__/
 *.pyc
 Builds/VisualStudio2015/data/tmp
-Builds/MacOSX/build/Release/data/recordings
 Builds/MacOSX/build/Bespoke
 Bespoke.zip
 Builds/VisualStudio2015/
-Builds/MacOSX/build/Release/data/internal/deadmanspedal.txt
-Builds/MacOSX/build/Release/data/internal/found_vsts.xml
 
 Builds/LinuxMakefile/build/BespokeSynth
 
-Builds/MacOSX/build/Release/data/internal/used_vsts.json
-
 Builds/MacOSX/build/BespokeSynth/
-
-Builds/MacOSX/build/Release/data/savestate_mac/
-
-Builds/MacOSX/build/Release/data/youtube_temp/
 
 # explicitly allow spacemouse lib, so it doesn't get excluded by *.lib above
 !*/3DxWare/Lib/**
-
-Builds/MacOSX/build/Release/data/internal/python_installed
 
 Builds/MacOSX/BespokeSynth.xcodeproj/
 
@@ -375,3 +364,5 @@ Builds/MacOSX/Icon.icns
 Builds/MacOSX/Info-App.plist
 
 Builds/LinuxMakefile/Makefile
+
+Builds/MacOSX/build/Bespoke-Mac.dmg
