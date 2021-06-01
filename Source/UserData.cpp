@@ -1,17 +1,9 @@
 #include "UserData.h"
 #include "OpenFrameworksPort.h"
 
-string GetBundledUserDataPath()
-{
-   string bundledUserDataDir = ofToResourcePath("userdata_original");
-   ofStringReplace(bundledUserDataDir, "\\", "/");
-   
-   return bundledUserDataDir;
-}
-
 void UpdateUserData(string destDirPath)
 {
-   juce::File bundledDataDir(GetBundledUserDataPath());
+   juce::File bundledDataDir(ofToResourcePath("userdata_original"));
    juce::File destDataDir(destDirPath);
    juce::File bundledDataVersionFile(bundledDataDir.getChildFile("userdata_version.txt"));
    juce::File destDataVersionFile(destDataDir.getChildFile("userdata_version.txt"));

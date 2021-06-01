@@ -62,6 +62,7 @@ string ofToDataPath(string path, bool makeAbsolute)
    if (sDataDir == "")
    {
       string dataDir = File::getSpecialLocation(File::userDocumentsDirectory).getChildFile("BespokeSynth").getFullPathName().toStdString();
+      ofStringReplace(dataDir, "\\", "/");
       UpdateUserData(dataDir);
       sDataDir = dataDir;
    }
@@ -96,6 +97,7 @@ string ofToResourcePath(string path, bool makeAbsolute)
          sResourceDir = localResourceDir;
       else
          sResourceDir = File::getCurrentWorkingDirectory().getChildFile("../MacOSX/build/Release/resource").getFullPathName().toStdString();   //fall back to looking at OSX dir in dev environment
+      ofStringReplace(sResourceDir, "\\", "/");
 
 #elif JUCE_LINUX
       string localDataDir = File::getCurrentWorkingDirectory().getChildFile("resource").getFullPathName().toStdString();
