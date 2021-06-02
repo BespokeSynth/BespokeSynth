@@ -41,6 +41,7 @@ public:
    void SetText(string text) { UpdateString(text); }
    void SetError(bool error, int errorLine = -1);
    void SetDoSyntaxHighlighting(bool highlight) { mDoSyntaxHighlighting = highlight; }
+   static bool HasJediNotInstalledWarning() { return sWarnJediNotInstalled; }
    
    static void OnPythonInit();
    
@@ -90,6 +91,8 @@ private:
    void OnClicked(int x, int y, bool right) override;
    bool MouseMoved(float x, float y) override;
    bool MouseScrolled(int x, int y, float scrollX, float scrollY) override;
+   
+   static bool sWarnJediNotInstalled;
    
    struct UndoBufferEntry
    {

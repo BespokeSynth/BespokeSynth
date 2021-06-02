@@ -28,6 +28,9 @@
 
 namespace py = pybind11;
 
+//static
+bool CodeEntry::sWarnJediNotInstalled = false;
+
 namespace
 {
    const float kFontSize = 14;
@@ -665,6 +668,7 @@ void CodeEntry::OnPythonInit()
    {
       ofLog() << "autocomplete initialization exception: " << e.what();
       ofLog() << "maybe jedi is not installed? if you want autocompletion, use \"python -m pip install jedi\" in your system console to install";
+      sWarnJediNotInstalled = true;
    }
 }
 

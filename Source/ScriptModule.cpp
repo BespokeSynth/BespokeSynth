@@ -64,6 +64,7 @@ ScriptModule::ScriptModule()
 , mNextLineToExecute(-1)
 , mInitExecutePriority(0)
 , mOscInputPort(-1)
+, mShowJediWarning(false)
 {
    CheckIfPythonEverSuccessfullyInitialized();
    if (TheSynth->IsLoadingState() && sHasPythonEverSuccessfullyInitialized)
@@ -247,8 +248,24 @@ void ScriptModule::DrawModule()
          mUIControlModifications[i].time = -1;
       }
    }
-   
    ofPopStyle();
+   
+   if (CodeEntry::HasJediNotInstalledWarning())
+   {
+      ofPushStyle();
+      ofRectangle buttonRect = mSaveScriptButton->GetRect(true);
+      ofFill();
+      ofSetColor(255, 255, 0);
+      float x = buttonRect.getMaxX() + 10;
+      float y = buttonRect.getCenter().y;
+      ofCircle(x, y, 6);
+      ofSetColor(0, 0, 0);
+      DrawTextBold("!", x-1, y+5, 17);
+      ofPopStyle();
+      
+      if (mShowJediWarning)
+         TheSynth->SetNextDrawTooltip("warning: jedi is not installed, so scripting autocomplete will not work. to add autocomplete functionality, install jedi, which you can likely do with the command 'pip install jedi' in a terminal window");
+   }
 }
 
 void ScriptModule::DrawModuleUnclipped()
@@ -349,6 +366,22 @@ void ScriptModule::DrawModuleUnclipped()
    }
 
    ofPopStyle();
+}
+
+bool ScriptModule::MouseMoved(float x, float y)
+{
+   if (CodeEntry::HasJediNotInstalledWarning())
+   {
+      ofRectangle buttonRect = mSaveScriptButton->GetRect(true);
+      float warningX = buttonRect.getMaxX() + 10;
+      float warningY = buttonRect.getCenter().y;
+      if (ofDistSquared(x, y, warningX, warningY) <= 6*6)
+         mShowJediWarning = true;
+      else
+         mShowJediWarning = false;
+   }
+   
+   return IDrawableModule::MouseMoved(x, y);
 }
 
 void ScriptModule::DrawTimer(int lineNum, double startTime, double endTime, ofColor color, bool filled)

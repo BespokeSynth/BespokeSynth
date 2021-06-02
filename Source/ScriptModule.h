@@ -122,6 +122,7 @@ private:
    bool IsResizable() const override { return true; }
    void Resize(float w, float h) override;
    void OnClicked(int x, int y, bool right) override;
+   bool MouseMoved(float x, float y) override;
    
    DropdownList* mLoadScriptSelector;
    ClickButton* mLoadScriptButton;
@@ -251,4 +252,6 @@ private:
    std::array<ModulationChain, 128> mPressures;
    std::list<string> mMidiMessageQueue;
    ofMutex mMidiMessageQueueMutex;
+   
+   bool mShowJediWarning;
 };
