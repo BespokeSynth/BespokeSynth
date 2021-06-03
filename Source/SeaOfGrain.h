@@ -10,7 +10,7 @@
 #define __Bespoke__SeaOfGrain__
 
 #include <iostream>
-#include "IAudioSource.h"
+#include "IAudioProcessor.h"
 #include "EnvOscillator.h"
 #include "IDrawableModule.h"
 #include "Checkbox.h"
@@ -23,7 +23,7 @@
 
 class Sample;
 
-class SeaOfGrain : public IAudioSource, public IDrawableModule, public IFloatSliderListener, public IIntSliderListener, public IDropdownListener, public IButtonListener, public INoteReceiver
+class SeaOfGrain : public IAudioProcessor, public IDrawableModule, public IFloatSliderListener, public IIntSliderListener, public IDropdownListener, public IButtonListener, public INoteReceiver
 {
 public:
    SeaOfGrain();
@@ -79,11 +79,16 @@ private:
    bool Enabled() const override { return mEnabled; }
    void GetModuleDimensions(float& width, float& height) override;
    void OnClicked(int x, int y, bool right) override;
+
+   ChannelBuffer* GetSourceBuffer();
+   float GetSourceStartSample();
+   float GetSourceEndSample();
+   float GetSourceBufferOffset();
    
    struct GrainMPEVoice
    {
       GrainMPEVoice();
-      void Process(ChannelBuffer* output, int bufferSize, ChannelBuffer* source);
+      void Process(ChannelBuffer* output, int bufferSize);
       void Draw(float w, float h);
       
       float mPlay;
@@ -102,11 +107,12 @@ private:
    struct GrainManualVoice
    {
       GrainManualVoice();
-      void Process(ChannelBuffer* output, int bufferSize, ChannelBuffer* source);
+      void Process(ChannelBuffer* output, int bufferSize);
       void Draw(float w, float h);
       
       float mGain;
       float mPosition;
+      float mPan;
       
       Granulator mGranulator;
       SeaOfGrain* mOwner;
@@ -121,6 +127,7 @@ private:
       FloatSlider* mSpacingRandomizeSlider;
       Checkbox* mOctaveCheckbox;
       FloatSlider* mWidthSlider;
+      FloatSlider* mPanSlider;
    };
    
    static const int kNumMPEVoices = 16;
@@ -129,8 +136,12 @@ private:
    GrainManualVoice mManualVoices[kNumManualVoices];
    
    Sample* mSample;
+   RollingBuffer mRecordBuffer;
    
    ClickButton* mLoadButton;
+   bool mRecordInput;
+   Checkbox* mRecordInputCheckbox;
+   bool mHasRecordedInput;
    float mVolume;
    FloatSlider* mVolumeSlider;
    bool mLoading;
