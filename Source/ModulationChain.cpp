@@ -87,7 +87,8 @@ void ModulationChain::CreateBuffer()
 
 void ModulationChain::FillBuffer(float* buffer)
 {
-   BufferCopy(mBuffer, buffer, gBufferSize);
+   if (mBuffer != nullptr)
+      BufferCopy(mBuffer, buffer, gBufferSize);
 }
 
 float ModulationChain::GetBufferValue(int sampleIdx)
