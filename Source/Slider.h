@@ -68,7 +68,7 @@ public:
    bool CheckNeedsDraw() override;
 
    //IUIControl
-   void SetFromMidiCC(float slider) override;
+   void SetFromMidiCC(float slider, bool setViaModulator = false) override;
    float GetValueForMidiCC(float slider) const override;
    void SetValue(float value) override;
    float GetValue() const override;
@@ -175,7 +175,7 @@ public:
    bool CheckNeedsDraw() override;
 
    //IUIControl
-   void SetFromMidiCC(float slider) override;
+   void SetFromMidiCC(float slider, bool setViaModulator = false) override;
    float GetValueForMidiCC(float slider) const override;
    void SetValue(float value) override;
    float GetValue() const override;

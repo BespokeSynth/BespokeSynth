@@ -90,6 +90,9 @@ void InputChannel::Process(double time)
 void InputChannel::DrawModule()
 {
    mChannelSelector->Draw();
+
+   if (gHoveredUIControl == mChannelSelector && TheSynth->GetNumInputChannels() == 0)
+      TheSynth->SetNextDrawTooltip("selected input device has zero channels. choose a new audio_input_device in 'settings'.");
 }
 
 void InputChannel::LoadLayout(const ofxJSONElement& moduleInfo)

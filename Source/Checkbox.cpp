@@ -141,7 +141,7 @@ bool Checkbox::MouseMoved(float x, float y)
    return false;
 }
 
-void Checkbox::SetFromMidiCC(float slider)
+void Checkbox::SetFromMidiCC(float slider, bool setViaModulator /*= false*/)
 {
    slider = ofClamp(slider,0,1);
    mSliderVal = slider;

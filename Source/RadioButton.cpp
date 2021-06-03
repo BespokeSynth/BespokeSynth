@@ -220,7 +220,7 @@ void RadioButton::SetIndex(int i)
    }
 }
 
-void RadioButton::SetFromMidiCC(float slider)
+void RadioButton::SetFromMidiCC(float slider, bool setViaModulator /*= false*/)
 {
    slider = ofClamp(slider,0,1);
    SetIndex(int(slider*mElements.size()));

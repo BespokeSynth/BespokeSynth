@@ -49,7 +49,7 @@ public:
    void SetDimensions(float width, float height);
 
    //IUIControl
-   void SetFromMidiCC(float slider) override {}
+   void SetFromMidiCC(float slider, bool setViaModulator = false) override {}
    void SetValue(float value) override {}
    void SaveState(FileStreamOut& out) override;
    void LoadState(FileStreamIn& in, bool shouldSetValue = true) override;

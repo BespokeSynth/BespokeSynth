@@ -22,7 +22,7 @@ public:
    void SetDimensions(float width, float height) { mWidth = width; mHeight = height; }
 
    //IUIControl
-   void SetFromMidiCC(float slider) override {}
+   void SetFromMidiCC(float slider, bool setViaModulator = false) override {}
    void SetValue(float value) override {}
    void KeyPressed(int key, bool isRepeat) override {}
    void SaveState(FileStreamOut& out) override;

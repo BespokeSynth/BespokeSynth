@@ -36,7 +36,7 @@ public:
    void SetShowing(bool showing) override { IUIControl::SetShowing(showing); UpdateSliderVisibility(); }
    
    //IUIControl
-   void SetFromMidiCC(float slider) override {}
+   void SetFromMidiCC(float slider, bool setViaModulator = false) override {}
    void SetValue(float value) override {}
    bool CanBeTargetedBy(PatchCableSource* source) const override { return false; }
    void SaveState(FileStreamOut& out) override;

@@ -438,7 +438,7 @@ void FloatSlider::SmoothUpdated()
    }
 }
 
-void FloatSlider::SetFromMidiCC(float slider)
+void FloatSlider::SetFromMidiCC(float slider, bool setViaModulator /*= false*/)
 {
    SetValue(GetValueForMidiCC(slider));
 }
@@ -1074,7 +1074,7 @@ void IntSlider::SetValueForMouse(int x, int y)
    }
 }
 
-void IntSlider::SetFromMidiCC(float slider)
+void IntSlider::SetFromMidiCC(float slider, bool setViaModulator /*= false*/)
 {
    slider = ofClamp(slider,0,1);
    SetValue(GetValueForMidiCC(slider));

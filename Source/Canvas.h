@@ -103,7 +103,7 @@ public:
    ofVec2f RescaleForZoom(float x, float y) const;
    
    //IUIControl
-   void SetFromMidiCC(float slider) override {}
+   void SetFromMidiCC(float slider, bool setViaModulator = false) override {}
    void SetValue(float value) override {}
    void KeyPressed(int key, bool isRepeat) override;
    void SaveState(FileStreamOut& out) override;

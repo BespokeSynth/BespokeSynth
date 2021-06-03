@@ -33,7 +33,7 @@ public:
    void SetDimensions(float width, float height) { mWidth = width; mHeight = height; }
 
    //IUIControl
-   void SetFromMidiCC(float slider) override;
+   void SetFromMidiCC(float slider, bool setViaModulator = false) override;
    void SetValue(float value) override;
    float GetValue() const override { return GetMidiValue(); }
    float GetMidiValue() const override;

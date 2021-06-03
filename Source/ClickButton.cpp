@@ -98,7 +98,7 @@ bool ClickButton::MouseMoved(float x, float y)
    return false;
 }
 
-void ClickButton::SetFromMidiCC(float slider)
+void ClickButton::SetFromMidiCC(float slider, bool setViaModulator /*= false*/)
 {
    if (slider > 0)
       OnClicked(0,0,false);

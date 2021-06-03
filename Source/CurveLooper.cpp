@@ -88,7 +88,7 @@ void CurveLooper::OnTransportAdvanced(float amount)
       mAdsr.Clear();
       mAdsr.Start(0,1);
       mAdsr.Stop(kAdsrTime);
-      mUIControl->SetFromMidiCC(mAdsr.Value(GetPlaybackPosition() * kAdsrTime));
+      mUIControl->SetFromMidiCC(mAdsr.Value(GetPlaybackPosition() * kAdsrTime), true);
    }
 }
 

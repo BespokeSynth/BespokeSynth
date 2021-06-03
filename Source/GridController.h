@@ -72,7 +72,7 @@ public:
    bool IsConnected() { return mController != nullptr; }
    
    //IUIControl
-   void SetFromMidiCC(float slider) override {}
+   void SetFromMidiCC(float slider, bool setViaModulator = false) override {}
    void SetValue(float value) override {}
    bool CanBeTargetedBy(PatchCableSource* source) const override;
    void SaveState(FileStreamOut& out) override;

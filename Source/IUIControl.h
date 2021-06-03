@@ -32,7 +32,7 @@ public:
    void Delete() { delete this; }
    void AddRemoteController() { ++mRemoteControlCount; }
    void RemoveRemoteController() { --mRemoteControlCount; }
-   virtual void SetFromMidiCC(float slider) = 0;
+   virtual void SetFromMidiCC(float slider, bool setViaModulator = false) = 0;
    virtual float GetValueForMidiCC(float slider) const { return 0; }
    virtual void SetValue(float value) = 0;
    virtual void SetValueDirect(float value) { SetValue(value); } //override if you need special control here

@@ -263,14 +263,15 @@ void DropdownList::Clear()
    mHeight = itemSpacing;
 }
 
-void DropdownList::SetFromMidiCC(float slider)
+void DropdownList::SetFromMidiCC(float slider, bool setViaModulator /*= false*/)
 {
    slider = ofClamp(slider,0,1);
    SetIndex(int(slider*mElements.size()));
    mSliderVal = slider;
    mLastSetValue = *mVar;
    
-   mLastScrolledTime = gTime;
+   if (!setViaModulator)
+      mLastScrolledTime = gTime; //don't do scrolling display if a modulator is changing our value
 }
 
 float DropdownList::GetValueForMidiCC(float slider) const

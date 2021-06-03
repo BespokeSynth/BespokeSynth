@@ -96,7 +96,7 @@ void ControlSequencer::OnTimeEvent(double time)
    
    if (mUIControl && mEnabled)
    {
-      mUIControl->SetFromMidiCC(mGrid->GetVal(step, 0));
+      mUIControl->SetFromMidiCC(mGrid->GetVal(step, 0), true);
       mControlCable->AddHistoryEvent(gTime, true);
       mControlCable->AddHistoryEvent(gTime + 15, false);
    }
