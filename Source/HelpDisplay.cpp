@@ -57,6 +57,8 @@ void HelpDisplay::DrawModule()
    ofFill();
    ofRect(0,0,mWidth,mHeight);
    ofPopStyle();
+
+   DrawTextLeftJustify(string(__DATE__) + " " + string(__TIME__), mWidth-5, 12);
    
    mShowTooltipsCheckbox->Draw();
    mDumpModuleInfo->SetShowing(GetKeyModifiers() == kModifier_Shift);
