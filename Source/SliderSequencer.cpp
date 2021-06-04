@@ -40,9 +40,9 @@ SliderSequencer::~SliderSequencer()
       delete mSliderLines[i];
 }
 
-float SliderSequencer::MeasurePos()
+float SliderSequencer::MeasurePos(double time)
 {
-   float pos = TheTransport->GetMeasurePos(gTime) * mDivision;
+   float pos = TheTransport->GetMeasurePos(time) * mDivision;
    while (pos > 1)
       pos -= 1;
    
@@ -58,7 +58,7 @@ void SliderSequencer::OnTransportAdvanced(float amount)
    
    ComputeSliders(0);
    
-   float current = MeasurePos();
+   float current = MeasurePos(gTime + gBufferSize);
    
    for (int i=0; i<mSliderLines.size(); ++i)
    {
@@ -67,7 +67,12 @@ void SliderSequencer::OnTransportAdvanced(float amount)
       
       if ((mSliderLines[i]->mPoint > mLastMeasurePos || mLastMeasurePos > current) && mSliderLines[i]->mPoint <= current)
       {
-         PlayNoteOutput(gTime, mSliderLines[i]->mNote, mSliderLines[i]->mVelocity * 127, -1);
+         double remainder = current - mSliderLines[i]->mPoint;
+         FloatWrap(remainder, 1);
+         double remainderMs = TheTransport->MsPerBar() * remainder;
+         double time = gTime + gBufferSize - remainderMs;
+         PlayNoteOutput(time, mSliderLines[i]->mPitch, mSliderLines[i]->mVelocity * 127, -1);
+         PlayNoteOutput(time + TheTransport->GetDuration(kInterval_16n), mSliderLines[i]->mPitch, 0, -1);
          mSliderLines[i]->mPlayTime = gTime;
       }
       
@@ -79,7 +84,6 @@ void SliderSequencer::OnTransportAdvanced(float amount)
 
 void SliderSequencer::DrawModule()
 {
-
    if (Minimized() || IsVisible() == false)
       return;
    
@@ -93,7 +97,7 @@ void SliderSequencer::DrawModule()
       ofSetLineWidth(1);
       ofSetColor(0,255,0);
       ofFill();
-      ofRect(10+180*MeasurePos(), 40, 1, 120);
+      ofRect(10+180*MeasurePos(gTime), 40, 1, 120);
       ofPopStyle();
    }
 }
@@ -132,7 +136,7 @@ SliderLine::SliderLine(SliderSequencer* owner, int x, int y, int index)
 , mPoint(0)
 , mVelocity(0)
 , mVelocitySlider(nullptr)
-, mNote(0)
+, mPitch(0)
 , mNoteSelector(nullptr)
 , mPlayTime(0)
 , mPlaying(false)
@@ -148,7 +152,7 @@ void SliderLine::CreateUIControls()
 {
    mSlider = new FloatSlider(mOwner,("time"+ofToString(mIndex)).c_str(),mX,mY,180,15,&mPoint,0,1);
    mVelocitySlider = new FloatSlider(mOwner,("vel"+ofToString(mIndex)).c_str(),mX+185,mY,80,15,&mVelocity,0,.99f,2);
-   mNoteSelector = new TextEntry(mOwner,("note"+ofToString(mIndex)).c_str(),mX+270,mY,4,&mNote,0,127);
+   mNoteSelector = new TextEntry(mOwner,("note"+ofToString(mIndex)).c_str(),mX+270,mY,4,&mPitch,0,127);
    mPlayingCheckbox = new Checkbox(mOwner,("playing"+ofToString(mIndex)).c_str(),HIDDEN_UICONTROL,HIDDEN_UICONTROL,&mPlaying);
 }
 

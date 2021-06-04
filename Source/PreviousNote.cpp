@@ -10,7 +10,7 @@
 #include "SynthGlobals.h"
 
 PreviousNote::PreviousNote()
-: mNote(-1)
+: mPitch(-1)
 , mVelocity(0)
 {
 }
@@ -31,12 +31,12 @@ void PreviousNote::PlayNote(double time, int pitch, int velocity, int voiceIdx, 
    
    if (velocity > 0)
    {
-      if (mNote != -1)
+      if (mPitch != -1)
       {
-         PlayNoteOutput(time, mNote, mVelocity, voiceIdx, modulation);
+         PlayNoteOutput(time, mPitch, mVelocity, voiceIdx, modulation);
       }
       
-      mNote = pitch;
+      mPitch = pitch;
       mVelocity = velocity;
    }
    else

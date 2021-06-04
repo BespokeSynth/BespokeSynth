@@ -34,7 +34,7 @@ private:
    void GetModuleDimensions(float& width, float& height) override { width = 110; height = 22; }
    bool Enabled() const override { return mEnabled; }
    
-   int mNote;
+   int mPitch;
    int mVelocity;
 };
 

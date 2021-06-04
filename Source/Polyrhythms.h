@@ -38,7 +38,7 @@ public:
    UIGrid* mGrid;
    int mLength;
    DropdownList* mLengthSelector;
-   int mNote;
+   int mPitch;
    TextEntry* mNoteSelector;
    Polyrhythms* mOwner;
 };

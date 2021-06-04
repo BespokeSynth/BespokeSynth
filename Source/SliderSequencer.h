@@ -32,7 +32,7 @@ public:
    FloatSlider* mSlider;
    float mVelocity;
    FloatSlider* mVelocitySlider;
-   int mNote;
+   int mPitch;
    TextEntry* mNoteSelector;
    double mPlayTime;
    bool mPlaying;
@@ -52,6 +52,8 @@ public:
    
    string GetTitleLabel() override { return "slider sequencer"; }
    void CreateUIControls() override;
+
+   void SetEnabled(bool on) override { mEnabled = on; }
    
    //IAudioPoller
    void OnTransportAdvanced(float amount) override;
@@ -65,11 +67,12 @@ public:
    virtual void LoadLayout(const ofxJSONElement& moduleInfo) override;
    virtual void SetUpFromSaveData() override;
 private:
-   float MeasurePos();
+   float MeasurePos(double time);
    
    //IDrawableModule
    void DrawModule() override;
    void GetModuleDimensions(float& width, float& height) override { width=320; height=165; }
+   bool Enabled() const override { return mEnabled; }
    
    float mLastMeasurePos;
    std::vector<SliderLine*> mSliderLines;

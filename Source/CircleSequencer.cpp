@@ -125,11 +125,44 @@ void CircleSequencer::SetUpFromSaveData()
    SetUpPatchCables(mModuleSaveData.GetString("target"));
 }
 
+namespace
+{
+   const int kSaveStateRev = 1;
+}
+
+void CircleSequencer::SaveState(FileStreamOut& out)
+{
+   IDrawableModule::SaveState(out);
+
+   out << kSaveStateRev;
+
+   out << (int)mCircleSequencerRings.size();
+   for (size_t i = 0; i < mCircleSequencerRings.size(); ++i)
+      mCircleSequencerRings[i]->SaveState(out);
+}
+
+void CircleSequencer::LoadState(FileStreamIn& in)
+{
+   IDrawableModule::LoadState(in);
+
+   if (!ModuleContainer::DoesModuleHaveMoreSaveData(in))
+      return;  //this was saved before we added versioning, bail out
+
+   int rev;
+   in >> rev;
+   LoadStateValidate(rev <= kSaveStateRev);
+
+   int numRings;
+   in >> numRings;
+   for (size_t i = 0; i < mCircleSequencerRings.size() && i < numRings; ++i)
+      mCircleSequencerRings[i]->LoadState(in);
+}
+
 
 CircleSequencerRing::CircleSequencerRing(CircleSequencer* owner, int index)
 : mLength(4)
 , mLengthSelector(nullptr)
-, mNote(index)
+, mPitch(index)
 , mNoteSelector(nullptr)
 , mOwner(owner)
 , mIndex(index)
@@ -138,14 +171,14 @@ CircleSequencerRing::CircleSequencerRing(CircleSequencer* owner, int index)
 , mCurrentlyClickedStepIdx(-1)
 , mHighlightStepIdx(-1)
 {
-   bzero(mSteps,sizeof(float)*CIRCLE_SEQUENCER_MAX_STEPS);
+   mSteps.fill(0);
 }
 
 void CircleSequencerRing::CreateUIControls()
 {
    int y = mIndex*20+20;
    mLengthSelector = new DropdownList(mOwner,("length"+ofToString(mIndex)).c_str(),220,y,&mLength);
-   mNoteSelector = new TextEntry(mOwner,("note"+ofToString(mIndex)).c_str(),260,y,4,&mNote,0,127);
+   mNoteSelector = new TextEntry(mOwner,("note"+ofToString(mIndex)).c_str(),260,y,4,&mPitch,0,127);
    mOffsetSlider = new FloatSlider(mOwner,("offset"+ofToString(mIndex)).c_str(),300,y,90,15,&mOffset,-.25f,.25f,2);
    
    for (int i=0; i<CIRCLE_SEQUENCER_MAX_STEPS; ++i)
@@ -155,6 +188,23 @@ void CircleSequencerRing::CreateUIControls()
 void CircleSequencerRing::Draw()
 {
    ofPushStyle();
+
+   switch (mIndex)
+   {
+   case 0:
+      ofSetColor(255, 150, 150);
+      break;
+   case 1:
+      ofSetColor(255, 255, 150);
+      break;
+   case 2:
+      ofSetColor(150, 255, 255);
+      break;
+   case 3:
+      ofSetColor(150, 150, 255);
+      break;
+   }
+
    ofSetCircleResolution(40);
    ofNoFill();
    ofCircle(100,100,GetRadius());
@@ -245,17 +295,31 @@ void CircleSequencerRing::OnTransportAdvanced(float amount)
 {
    PROFILER(CircleSequencerRing);
    
-   float pos = TheTransport->GetMeasurePos(gTime) - mOffset;
-   FloatWrap(pos,1);
-   int oldQuantized;
-   if (amount > pos)
-      oldQuantized = -1;
-   else
-      oldQuantized = int((pos-amount) * mLength);
-   int quantized = int(pos * mLength);
-   
-   if (quantized != oldQuantized && mSteps[quantized] > 0)
+   TransportListenerInfo info(nullptr, kInterval_CustomDivisor, OffsetInfo(mOffset, false), false);
+   info.mCustomDivisor = mLength;
+
+   double remainderMs;
+   int oldStep = TheTransport->GetQuantized(gTime, &info);
+   int newStep = TheTransport->GetQuantized(gTime + gBufferSizeMs, &info, &remainderMs);
+   if (oldStep != newStep && mSteps[newStep] > 0)
    {
-      mOwner->PlayNoteOutput(gTime, mNote, mSteps[quantized] * 127, -1);
+      double time = gTime + gBufferSizeMs - remainderMs;
+      mOwner->PlayNoteOutput(time, mPitch, mSteps[newStep] * 127, -1);
+      mOwner->PlayNoteOutput(time + TheTransport->GetDuration(kInterval_16n), mPitch, 0, -1);
    }
+}
+
+void CircleSequencerRing::SaveState(FileStreamOut& out)
+{
+   out << (int)mSteps.size();
+   for (size_t i = 0; i < mSteps.size(); ++i)
+      out << mSteps[i];
+}
+
+void CircleSequencerRing::LoadState(FileStreamIn& in)
+{
+   int numSteps;
+   in >> numSteps;
+   for (size_t i = 0; i < mSteps.size() && i < numSteps; ++i)
+      in >> mSteps[i];
 }

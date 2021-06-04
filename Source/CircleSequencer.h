@@ -34,16 +34,18 @@ public:
    void MouseMoved(float x, float y);
    void CreateUIControls();
    void OnTransportAdvanced(float amount);
+   void SaveState(FileStreamOut& out);
+   void LoadState(FileStreamIn& in);
 private:
    float GetRadius() { return 90-mIndex*15; }
    int GetStepIndex(int x, int y, float& radiusOut);
    int mLength;
    DropdownList* mLengthSelector;
-   int mNote;
+   int mPitch;
    TextEntry* mNoteSelector;
    CircleSequencer* mOwner;
    int mIndex;
-   float mSteps[CIRCLE_SEQUENCER_MAX_STEPS];
+   std::array<float, CIRCLE_SEQUENCER_MAX_STEPS> mSteps;
    float mOffset;
    FloatSlider* mOffsetSlider;
    int mCurrentlyClickedStepIdx;
@@ -75,6 +77,8 @@ public:
    void DropdownUpdated(DropdownList* list, int oldVal) override;
    void TextEntryComplete(TextEntry* entry) override {}
    
+   void SaveState(FileStreamOut& out) override;
+   void LoadState(FileStreamIn& in) override;
    virtual void LoadLayout(const ofxJSONElement& moduleInfo) override;
    virtual void SetUpFromSaveData() override;
 private:
@@ -82,6 +86,7 @@ private:
    void DrawModule() override;
    void GetModuleDimensions(float& width, float& height) override { width=400; height=200; }
    void OnClicked(int x, int y, bool right) override;
+   bool Enabled() const override { return mEnabled; }
    
    std::vector<CircleSequencerRing*> mCircleSequencerRings;
 };

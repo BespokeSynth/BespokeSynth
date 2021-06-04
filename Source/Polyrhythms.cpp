@@ -57,7 +57,7 @@ void Polyrhythms::OnTransportAdvanced(float amount)
 
       if (quantized != oldQuantized && mRhythmLines[i]->mGrid->GetValRefactor(0,quantized) > 0)
       {
-         PlayNoteOutput(gTime, mRhythmLines[i]->mNote, 127, -1);
+         PlayNoteOutput(gTime, mRhythmLines[i]->mPitch, 127, -1);
       }
 
       mRhythmLines[i]->mGrid->SetHighlightCol(gTime, quantized);
@@ -132,7 +132,7 @@ RhythmLine::RhythmLine(Polyrhythms* owner, int index)
 , mGrid(nullptr)
 , mLength(4)
 , mLengthSelector(nullptr)
-, mNote(index)
+, mPitch(index)
 , mNoteSelector(nullptr)
 , mOwner(owner)
 {
@@ -142,7 +142,7 @@ void RhythmLine::CreateUIControls()
 {
    mGrid = new UIGrid(4,4+mIndex*17,100,15,4,1, mOwner);
    mLengthSelector = new DropdownList(mOwner,("length"+ofToString(mIndex)).c_str(),-1,-1,&mLength);
-   mNoteSelector = new TextEntry(mOwner,("note"+ofToString(mIndex)).c_str(),-1,-1,4,&mNote,0,127);
+   mNoteSelector = new TextEntry(mOwner,("note"+ofToString(mIndex)).c_str(),-1,-1,4,&mPitch,0,127);
    
    mLengthSelector->AddLabel("3", 3);
    mLengthSelector->AddLabel("4", 4);
