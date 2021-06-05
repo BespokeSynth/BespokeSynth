@@ -39,7 +39,7 @@ bool KarplusStrongVoice::IsDone(double time)
    return !mActive || mMuteRamp.Value(time) == 0;
 }
 
-bool KarplusStrongVoice::Process(double time, ChannelBuffer* out)
+bool KarplusStrongVoice::Process(double time, ChannelBuffer* out, int oversampling)
 {
    PROFILER(KarplusStrongVoice);
 

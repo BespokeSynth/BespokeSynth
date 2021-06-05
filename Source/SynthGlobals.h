@@ -67,7 +67,7 @@ class ChannelBuffer;
 
 typedef map<string,int> EnumMap;
 
-const int kWorkBufferSize = 4096; //larger than the audio buffer size would ever be
+const int kWorkBufferSize = 1024*8; //larger than the audio buffer size would ever be (even oversampled)
 
 const int kNumVoices = 16;
 
@@ -86,9 +86,9 @@ extern RetinaTrueTypeFont gFont;
 extern RetinaTrueTypeFont gFontBold;
 extern RetinaTrueTypeFont gFontFixedWidth;
 extern float gModuleDrawAlpha;
-extern float gNullBuffer[4096];
-extern float gZeroBuffer[4096];
-extern float gWorkBuffer[4096];  //scratch buffer for doing work in
+extern float gNullBuffer[kWorkBufferSize];
+extern float gZeroBuffer[kWorkBufferSize];
+extern float gWorkBuffer[kWorkBufferSize];  //scratch buffer for doing work in
 extern ChannelBuffer gWorkChannelBuffer;
 extern IDrawableModule* gHoveredModule;
 extern IUIControl* gHoveredUIControl;

@@ -28,7 +28,7 @@ bool SampleVoice::IsDone(double time)
    return mAdsr.IsDone(time);
 }
 
-bool SampleVoice::Process(double time, ChannelBuffer* out)
+bool SampleVoice::Process(double time, ChannelBuffer* out, int oversampling)
 {
    PROFILER(SampleVoice);
 

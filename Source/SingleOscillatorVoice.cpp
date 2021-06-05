@@ -28,7 +28,7 @@ bool SingleOscillatorVoice::IsDone(double time)
    return mAdsr.IsDone(time);
 }
 
-bool SingleOscillatorVoice::Process(double time, ChannelBuffer* out)
+bool SingleOscillatorVoice::Process(double time, ChannelBuffer* out, int oversampling)
 {
    PROFILER(SingleOscillatorVoice);
 

@@ -24,7 +24,7 @@ public:
    void SetModulators(ModulationParameters modulators) { mModulators = modulators; }
    virtual void Start(double time, float amount) = 0;
    virtual void Stop(double time) = 0;
-   virtual bool Process(double time, ChannelBuffer* out) = 0;
+   virtual bool Process(double time, ChannelBuffer* out, int oversampling) = 0;
    virtual bool IsDone(double time) = 0;
    virtual void SetVoiceParams(IVoiceParams* params) = 0;
    void SetPan(float pan) { assert(pan >= -1 && pan <= 1); mPan = pan; }

@@ -16,6 +16,8 @@
 
 const int kVoiceFadeSamples = 50;
 
+extern ChannelBuffer gMidiVoiceWorkChannelBuffer;
+
 class IMidiVoice;
 class IVoiceParams;
 class IDrawableModule;
@@ -54,6 +56,7 @@ public:
    void DrawDebug(float x, float y);
    void SetVoiceLimit(int limit) { mVoiceLimit = limit; }
    void KillAll();
+   void SetOversampling(int oversampling) { mOversampling = oversampling; }
 private:
    VoiceInfo mVoices[kNumVoices];
    bool mAllowStealing;
@@ -64,6 +67,7 @@ private:
    int mFadeOutBufferPos;
    IDrawableModule* mOwner;
    int mVoiceLimit;
+   int mOversampling;
 };
 
 #endif /* defined(__additiveSynth__PolyphonyMgr__) */

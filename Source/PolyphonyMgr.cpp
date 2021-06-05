@@ -15,6 +15,8 @@
 #include "SynthGlobals.h"
 #include "Profiler.h"
 
+ChannelBuffer gMidiVoiceWorkChannelBuffer(kWorkBufferSize);
+
 PolyphonyMgr::PolyphonyMgr(IDrawableModule* owner)
    : mAllowStealing(true)
    , mLastVoice(-1)
@@ -23,6 +25,7 @@ PolyphonyMgr::PolyphonyMgr(IDrawableModule* owner)
    , mFadeOutBuffer(kVoiceFadeSamples)
    , mFadeOutWorkBuffer(kVoiceFadeSamples)
    , mVoiceLimit(kNumVoices)
+   , mOversampling(1)
 {
 }
 
@@ -133,7 +136,7 @@ void PolyphonyMgr::Start(double time, int pitch, float amount, int voiceIdx, Mod
    {
       //ofLog() << "fading stolen voice " << voiceIdx << " at " << time;
       mFadeOutWorkBuffer.Clear();
-      voice->Process(time, &mFadeOutWorkBuffer);
+      voice->Process(time, &mFadeOutWorkBuffer, mOversampling);
       for (int i=0; i<kVoiceFadeSamples; ++i)
       {
          float fade = 1 - (float(i) / kVoiceFadeSamples);
@@ -184,7 +187,7 @@ void PolyphonyMgr::Process(double time, ChannelBuffer* out, int bufferSize)
 
    for (int i=0; i<mVoiceLimit; ++i)
    {
-      mVoices[i].mVoice->Process(time, out);
+      mVoices[i].mVoice->Process(time, out, mOversampling);
       
       if (mVoices[i].mPitch != -1 && !mVoices[i].mNoteOn && mVoices[i].mVoice->IsDone(time))
          mVoices[i].mPitch = -1;

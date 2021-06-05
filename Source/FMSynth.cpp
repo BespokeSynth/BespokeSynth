@@ -267,6 +267,12 @@ void FMSynth::LoadLayout(const ofxJSONElement& moduleInfo)
 {
    mModuleSaveData.LoadString("target", moduleInfo);
    mModuleSaveData.LoadInt("voicelimit", moduleInfo, -1, -1, kNumVoices);
+   EnumMap oversamplingMap;
+   oversamplingMap["1"] = 1;
+   oversamplingMap["2"] = 2;
+   oversamplingMap["4"] = 4;
+   oversamplingMap["8"] = 8;
+   mModuleSaveData.LoadEnum<int>("oversampling", moduleInfo, 1, nullptr, &oversamplingMap);
    mModuleSaveData.LoadBool("mono", moduleInfo, false);
 
    SetUpFromSaveData();
@@ -282,6 +288,9 @@ void FMSynth::SetUpFromSaveData()
 
    bool mono = mModuleSaveData.GetBool("mono");
    mWriteBuffer.SetNumActiveChannels(mono ? 1 : 2);
+
+   int oversampling = mModuleSaveData.GetEnum<int>("oversampling");
+   mPolyMgr.SetOversampling(oversampling);
 }
 
 

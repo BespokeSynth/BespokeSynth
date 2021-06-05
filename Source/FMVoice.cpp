@@ -12,6 +12,7 @@
 #include "Scale.h"
 #include "Profiler.h"
 #include "ChannelBuffer.h"
+#include "PolyphonyMgr.h"
 
 FMVoice::FMVoice(IDrawableModule* owner)
 : mOscPhase(0)
@@ -33,52 +34,84 @@ bool FMVoice::IsDone(double time)
    return mOsc.GetADSR()->IsDone(time);
 }
 
-bool FMVoice::Process(double time, ChannelBuffer* out)
+bool FMVoice::Process(double time, ChannelBuffer* out, int oversampling)
 {
    PROFILER(FMVoice);
 
    if (IsDone(time))
       return false;
 
-   for (int pos=0; pos<out->BufferSize(); ++pos)
+   int bufferSize = out->BufferSize();
+   int channels = out->NumActiveChannels();
+   double sampleIncrementMs = gInvSampleRateMs;
+   ChannelBuffer* destBuffer = out;
+
+   if (oversampling != 1)
+   {
+      gMidiVoiceWorkChannelBuffer.SetNumActiveChannels(channels);
+      destBuffer = &gMidiVoiceWorkChannelBuffer;
+      gMidiVoiceWorkChannelBuffer.Clear();
+      bufferSize *= oversampling;
+      sampleIncrementMs /= oversampling;
+   }
+
+   for (int pos=0; pos<bufferSize; ++pos)
    {
       if (mOwner)
-         mOwner->ComputeSliders(pos);
+         mOwner->ComputeSliders(pos/oversampling);
       
-      float oscFreq = TheScale->PitchToFreq(GetPitch(pos));
+      float oscFreq = TheScale->PitchToFreq(GetPitch(pos/oversampling));
       float harmFreq = oscFreq * mHarm.GetADSR()->Value(time) * mVoiceParams->mHarmRatio;
       float harmFreq2 = harmFreq * mHarm2.GetADSR()->Value(time) * mVoiceParams->mHarmRatio2;
       
-      float harmPhaseInc2 = GetPhaseInc(harmFreq2);
+      float harmPhaseInc2 = GetPhaseInc(harmFreq2) / oversampling;
       
       mHarmPhase2 += harmPhaseInc2;
       while (mHarmPhase2 > FTWO_PI) { mHarmPhase2 -= FTWO_PI; }
       
       float modHarmFreq = harmFreq + mHarm2.Audio(time, mHarmPhase2 + mVoiceParams->mPhaseOffset2) * harmFreq2 * mModIdx2.Value(time) * mVoiceParams->mModIdx2;
       
-      float harmPhaseInc = GetPhaseInc(modHarmFreq);
+      float harmPhaseInc = GetPhaseInc(modHarmFreq) / oversampling;
       
       mHarmPhase += harmPhaseInc;
       while (mHarmPhase > FTWO_PI) { mHarmPhase -= FTWO_PI; }
 
       float modOscFreq = oscFreq + mHarm.Audio(time, mHarmPhase + mVoiceParams->mPhaseOffset1) * harmFreq * mModIdx.Value(time) * mVoiceParams->mModIdx;
-      float oscPhaseInc = GetPhaseInc(modOscFreq);
+      float oscPhaseInc = GetPhaseInc(modOscFreq) / oversampling;
 
       mOscPhase += oscPhaseInc;
       while (mOscPhase > FTWO_PI) { mOscPhase -= FTWO_PI; }
 
       float sample = mOsc.Audio(time, mOscPhase + mVoiceParams->mPhaseOffset0) * mVoiceParams->mVol/20.0f;
-      if (out->NumActiveChannels() == 1)
+      if (channels == 1)
       {
-         out->GetChannel(0)[pos] += sample;
+         destBuffer->GetChannel(0)[pos] += sample;
       }
       else
       {
-         out->GetChannel(0)[pos] += sample * GetLeftPanGain(GetPan());
-         out->GetChannel(1)[pos] += sample * GetRightPanGain(GetPan());
+         destBuffer->GetChannel(0)[pos] += sample * GetLeftPanGain(GetPan());
+         destBuffer->GetChannel(1)[pos] += sample * GetRightPanGain(GetPan());
       }
 
-      time += gInvSampleRateMs;
+      time += sampleIncrementMs;
+   }
+
+   if (oversampling != 1)
+   {
+      //assume power-of-two
+      while (oversampling > 1)
+      {
+         for (int i = 0; i < bufferSize; ++i)
+         {
+            for (int ch = 0; ch < channels; ++ch)
+               destBuffer->GetChannel(ch)[i] = (destBuffer->GetChannel(ch)[i * 2] + destBuffer->GetChannel(ch)[i * 2 + 1]) / 2;
+         }
+         oversampling /= 2;
+         bufferSize /= 2;
+      }
+
+      for (int ch = 0; ch < channels; ++ch)
+         Add(out->GetChannel(ch), destBuffer->GetChannel(ch), bufferSize);
    }
    
    return true;
