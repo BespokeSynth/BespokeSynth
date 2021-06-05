@@ -1,9 +1,15 @@
-the script module takes python code as input. any python code and imports should work fine. this document describes the specific calls you get from bespoke and can make into bespoke.
+the script module takes python code as input. any python code and imports should work fine.
+this document describes the specific calls you get from bespoke and can make into bespoke.
+
+if you have jedi installed, python autocomplete is supported.
+the typical way to install jedi on your system is to enter 'pip install jedi' into your system's terminal.
 
 script module inputs:
    on_pulse(): called by pulse input
    on_note(pitch, velocity): called by note input
    on_grid_button(col, row, velocity): called by grid input
+   on_osc(message): called by external osc source, after registering with me.connect_osc_input(port)
+   on_midi(messageType, control, value, channel): called by midicontroller, after registering with add_script_listener(me.me())
 
 
 globals:

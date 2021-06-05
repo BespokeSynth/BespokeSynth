@@ -127,6 +127,7 @@ private:
    DropdownList* mLoadScriptSelector;
    ClickButton* mLoadScriptButton;
    ClickButton* mSaveScriptButton;
+   ClickButton* mShowReferenceButton;
    CodeEntry* mCodeEntry;
    ClickButton* mRunButton;
    ClickButton* mStopButton;
@@ -254,4 +255,30 @@ private:
    ofMutex mMidiMessageQueueMutex;
    
    bool mShowJediWarning;
+};
+
+class ScriptReferenceDisplay : public IDrawableModule, public IButtonListener
+{
+public:
+   ScriptReferenceDisplay();
+   virtual ~ScriptReferenceDisplay();
+   static IDrawableModule* Create() { return new ScriptReferenceDisplay(); }
+
+   string GetTitleLabel() override { return "script reference"; }
+   void CreateUIControls() override;
+
+   void ButtonClicked(ClickButton* button) override;
+
+private:
+   //IDrawableModule
+   void DrawModule() override;
+   bool Enabled() const override { return true; }
+   void GetModuleDimensions(float& w, float& h) override;
+
+   void LoadText();
+
+   vector<string> mText;
+   ClickButton* mCloseButton;
+   float mWidth;
+   float mHeight;
 };

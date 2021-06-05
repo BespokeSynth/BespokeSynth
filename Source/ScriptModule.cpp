@@ -91,7 +91,8 @@ void ScriptModule::CreateUIControls()
    UIBLOCK0();
    DROPDOWN(mLoadScriptSelector, "loadscript", &mLoadScriptIndex, 120); UIBLOCK_SHIFTRIGHT();
    BUTTON(mLoadScriptButton,"load"); UIBLOCK_SHIFTRIGHT();
-   BUTTON(mSaveScriptButton,"save as"); UIBLOCK_NEWLINE();
+   BUTTON(mSaveScriptButton,"save as"); UIBLOCK_SHIFTRIGHT();
+   BUTTON(mShowReferenceButton, "?"); UIBLOCK_NEWLINE();
    UICONTROL_CUSTOM(mCodeEntry, new CodeEntry(UICONTROL_BASICS("code"),500,300));
    BUTTON(mRunButton, "run"); UIBLOCK_SHIFTRIGHT();
    BUTTON(mStopButton, "stop"); UIBLOCK_NEWLINE();
@@ -168,6 +169,7 @@ void ScriptModule::DrawModule()
    mLoadScriptSelector->Draw();
    mLoadScriptButton->Draw();
    mSaveScriptButton->Draw();
+   mShowReferenceButton->Draw();
    mCodeEntry->Draw();
    mRunButton->Draw();
    mStopButton->Draw();
@@ -253,7 +255,7 @@ void ScriptModule::DrawModule()
    if (CodeEntry::HasJediNotInstalledWarning())
    {
       ofPushStyle();
-      ofRectangle buttonRect = mSaveScriptButton->GetRect(true);
+      ofRectangle buttonRect = mShowReferenceButton->GetRect(true);
       ofFill();
       ofSetColor(255, 255, 0);
       float x = buttonRect.getMaxX() + 10;
@@ -372,7 +374,7 @@ bool ScriptModule::MouseMoved(float x, float y)
 {
    if (CodeEntry::HasJediNotInstalledWarning())
    {
-      ofRectangle buttonRect = mSaveScriptButton->GetRect(true);
+      ofRectangle buttonRect = mShowReferenceButton->GetRect(true);
       float warningX = buttonRect.getMaxX() + 10;
       float warningY = buttonRect.getCenter().y;
       if (ofDistSquared(x, y, warningX, warningY) <= 6*6)
@@ -842,6 +844,14 @@ void ScriptModule::ButtonClicked(ClickButton* button)
              
          mCodeEntry->SetText(input->readString().toStdString());
       }
+   }
+
+   if (button == mShowReferenceButton)
+   {
+      float moduleX, moduleY, moduleW, moduleH;
+      GetPosition(moduleX, moduleY);
+      GetDimensions(moduleW, moduleH);
+      TheSynth->SpawnModuleOnTheFly("scriptingreference", moduleX + moduleW, moduleY, true);
    }
 }
 
@@ -1357,4 +1367,57 @@ void ScriptModule::LineEventTracker::Draw(CodeEntry* codeEntry, int style, ofCol
       }
    }
    ofPopStyle();
+}
+
+ScriptReferenceDisplay::ScriptReferenceDisplay()
+   : mWidth(750)
+   , mHeight(700)
+{
+   LoadText();
+}
+
+void ScriptReferenceDisplay::CreateUIControls()
+{
+   IDrawableModule::CreateUIControls();
+
+   mCloseButton = new ClickButton(this, "close", 3, 3);
+}
+
+ScriptReferenceDisplay::~ScriptReferenceDisplay()
+{
+}
+
+void ScriptReferenceDisplay::LoadText()
+{
+   File file(ofToResourcePath("scripting_reference.txt").c_str());
+   if (file.existsAsFile())
+   {
+      string text = file.loadFileAsString().toStdString();
+      ofStringReplace(text, "\r", "");
+      mText = ofSplitString(text, "\n");
+   }
+}
+
+void ScriptReferenceDisplay::DrawModule()
+{
+   mCloseButton->Draw();
+
+   mHeight = 34;
+   for (size_t i = 0; i < mText.size(); ++i)
+   {
+      DrawTextNormal(mText[i], 4, mHeight);
+      mHeight += 14;
+   }
+}
+
+void ScriptReferenceDisplay::GetModuleDimensions(float& w, float& h)
+{
+   w = mWidth;
+   h = mHeight;
+}
+
+void ScriptReferenceDisplay::ButtonClicked(ClickButton* button)
+{
+   if (button == mCloseButton)
+      GetOwningContainer()->DeleteModule(this);
 }

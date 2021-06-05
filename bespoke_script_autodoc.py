@@ -24,11 +24,14 @@ def stubLine(module, line):
 def replaceInStubLine(module, lineIndex, fromStr, toStr):
    stubOutput[module][lineIndex] = stubOutput[module][lineIndex].replace(fromStr, toStr)
 
-docLine("the script module takes python code as input. any python code and imports should work fine. this document describes the specific calls you get from bespoke and can make into bespoke.\n")
+docLine("the script module takes python code as input. any python code and imports should work fine.\nthis document describes the specific calls you get from bespoke and can make into bespoke.\n")
+docLine("if you have jedi installed, python autocomplete is supported.\nthe typical way to install jedi on your system is to enter 'pip install jedi' into your system's terminal.\n")
 docLine("script module inputs:")
 docLine("   on_pulse(): called by pulse input")
 docLine("   on_note(pitch, velocity): called by note input")
 docLine("   on_grid_button(col, row, velocity): called by grid input")
+docLine("   on_osc(message): called by external osc source, after registering with me.connect_osc_input(port)")
+docLine("   on_midi(messageType, control, value, channel): called by midicontroller, after registering with add_script_listener(me.me())")
 
 currentModule = ""
 inStaticMethods = True
@@ -101,7 +104,7 @@ for line in lines:
                if defaultList != []:
                   docLine(tab+"   optional: "+", ".join(defaultList))
 
-docFile = open("scripting_reference.txt", "w+")
+docFile = open("Builds/MacOSX/build/Release/resource/scripting_reference.txt", "w+")
 docFile.writelines(docOutput)
 
 for key in stubOutput.keys():

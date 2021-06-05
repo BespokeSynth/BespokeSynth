@@ -429,6 +429,7 @@ ModuleFactory::ModuleFactory()
    REGISTER_HIDDEN(LFOController, lfocontroller, kModuleType_Other); //old, probably irrelevant
    REGISTER_HIDDEN(Razor, razor, kModuleType_Synth);
    REGISTER_HIDDEN(MidiCapturer, midicapturer, kModuleType_Note);
+   REGISTER_HIDDEN(ScriptReferenceDisplay, scriptingreference, kModuleType_Other);
 }
 
 void ModuleFactory::Register(string type, CreateModuleFn creator, CanCreateModuleFn canCreate, ModuleType moduleType, bool hidden, bool experimental)
