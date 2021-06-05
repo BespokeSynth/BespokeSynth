@@ -486,7 +486,7 @@ notecanvas~looping note roll
 ~quantize~quantize selected notes to interval
 ~play~play notes on canvas
 ~rec~record input notes to canvas
-~free rec~[no tooltip]
+~free rec~enable record mode, and extend canvas if we reach the end
 ~measures~loop length
 ~show chord intervals~show brackets to indicate chord relationships
 ~interval~interval to quantize to
@@ -1040,6 +1040,7 @@ seaofgrain~granular synth, playable with sliders or MPE input
 ~spacing r*~randomization of time between grains
 ~octaves *~should we add octaves and fifths?
 ~width *~stereo width of grain placement
+~pan *~stereo panorama of grain placement
 
 
 
@@ -1581,21 +1582,8 @@ capo~shifts incoming notes by semitones
 
 arpeggiator~arpeggiates held notes. there are several vestigial features in this module that should be cleaned up.
 ~interval~arpeggiation rate
-~use held~base arpeggiation upon input notes
-~restart~restart pattern on new input note
-~arpentry~input a pattern of pitches
-~easy~generate a random pattern
-~repeat~if we should repeat notes, or just hold
-~r len~[no tooltip]
-~r range~[no tooltip]
-~r rests~[no tooltip]
-~r holds~[no tooltip]
-~step~[no tooltip]
-~octaves~[no tooltip]
-~downbeat~[no tooltip]
-~view grid~[no tooltip]
-~upbeats~[no tooltip]
-~scale~[no tooltip]
+~step~direction and distance to step through arpeggiation. a value of zero is "pingpong".
+~octaves~how many octaves to step through
 
 
 
