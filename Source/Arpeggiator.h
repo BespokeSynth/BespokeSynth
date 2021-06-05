@@ -15,14 +15,13 @@
 #include "Transport.h"
 #include "Checkbox.h"
 #include "DropdownList.h"
-#include "TextEntry.h"
 #include "ClickButton.h"
 #include "Slider.h"
 #include "UIGrid.h"
 #include "Scale.h"
 #include "ModulationChain.h"
 
-class Arpeggiator : public NoteEffectBase, public IDrawableModule, public ITimeListener, public ITextEntryListener, public IButtonListener, public IDropdownListener, public IIntSliderListener, public IFloatSliderListener, public IScaleListener
+class Arpeggiator : public NoteEffectBase, public IDrawableModule, public ITimeListener, public IButtonListener, public IDropdownListener, public IIntSliderListener, public IFloatSliderListener, public IScaleListener
 {
 public:
    Arpeggiator();
@@ -48,9 +47,6 @@ public:
    
    //IScaleListener
    void OnScaleChanged() override;
-   
-   //ITextEntryListener
-   void TextEntryComplete(TextEntry* entry) override;
 
    //IButtonListener
    void ButtonClicked(ClickButton* button) override;
@@ -69,14 +65,11 @@ public:
 private:
    //IDrawableModule
    void DrawModule() override;
-   void GetModuleDimensions(float& width, float& height) override { width = 240; height = mViewGrid ? 225 : 120; }
+   void GetModuleDimensions(float& width, float& height) override { width = mWidth; height = mHeight; }
    bool Enabled() const override { return mEnabled; }
    void OnClicked(int x, int y, bool right) override;
    
-   void GenerateRandomArpeggio();
-   void SyncGridToArp();
-   string GetArpNoteDisplay(int note);
-   
+   string GetArpNoteDisplay(int pitch);
    void UpdateInterval();
    
    struct ArpNote
@@ -88,47 +81,23 @@ private:
       ModulationParameters modulation;
    };
    vector<ArpNote> mChord;
+
+   float mWidth;
+   float mHeight;
    
-   bool mUseHeldNotes;
    NoteInterval mInterval;
-   int mUserPitch;
    int mLastPitch;
    int mArpIndex;
-   bool mRestartOnPress;
    char mArpString[MAX_TEXTENTRY_LENGTH];
-   bool mPlayOnlyScaleNotes;
-   Checkbox* mPlayOnlyScaleNotesCheckbox;
    
    DropdownList* mIntervalSelector;
-   Checkbox* mUseHeldNotesCheckbox;
-   TextEntry* mArpEntry;
-   ClickButton* mEasyButton;
-   bool mRepeat;
-   Checkbox* mRepeatCheckbox;
-   Checkbox* mRestartOnPressCheckbox;
    int mArpStep;
    int mArpPingPongDirection;
    IntSlider* mArpStepSlider;
-   bool mResetOnDownbeat;
-   Checkbox* mResetOnDownbeatCheckbox;
-   bool mViewGrid;
-   UIGrid* mGrid;
-   Checkbox* mViewGridCheckbox;
    
-   int mRandomLength;
-   IntSlider* mRandomLengthSlider;
-   int mRandomRange;
-   IntSlider* mRandomRangeSlider;
-   bool mRandomRest;
-   Checkbox* mRandomRestCheckbox;
-   bool mRandomHold;
-   Checkbox* mRandomHoldCheckbox;
    int mCurrentOctaveOffset;
    int mOctaveRepeats;
    IntSlider* mOctaveRepeatsSlider;
-   
-   bool mUpbeats;
-   Checkbox* mUpbeatsCheckbox;
 
    ofMutex mChordMutex;
 
