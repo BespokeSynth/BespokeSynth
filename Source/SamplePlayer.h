@@ -21,6 +21,7 @@
 #include "ClickButton.h"
 #include "TextEntry.h"
 #include "RadioButton.h"
+#include "GateEffect.h"
 
 class SampleBank;
 class Sample;
@@ -83,6 +84,7 @@ private:
    void DownloadYoutube(string url, string titles);
    void SearchYoutube(string searchTerm);
    void LoadFile();
+   void SaveFile();
    void OnYoutubeSearchComplete(string searchTerm, double searchStartTime);
    void OnYoutubeDownloadComplete(string filename, string title);
    void SwitchAndRamp();
@@ -135,6 +137,7 @@ private:
    TextEntry* mDownloadYoutubeSearch;
    char mYoutubeSearch[MAX_TEXTENTRY_LENGTH];
    ClickButton* mLoadFileButton;
+   ClickButton* mSaveFileButton;
    bool mIsLoadingSample;
    float mZoomLevel;
    float mZoomOffset;
@@ -203,5 +206,9 @@ private:
    vector<ChannelBuffer*> mRecordChunks;
    bool mDoRecording;   //separate this out from mRecord to allow setup in main thread before audio thread starts recording
    int mRecordingLength;
+   bool mRecordAsClips;
+   Checkbox* mRecordAsClipsCheckbox;
+   GateEffect mRecordGate;
+   int mRecordAsClipsCueIndex;
 };
 

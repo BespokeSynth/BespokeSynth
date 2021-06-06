@@ -77,7 +77,6 @@ void GateEffect::ProcessAudio(double time, ChannelBuffer* buffer)
 
 void GateEffect::DrawModule()
 {
-   
    mThresholdSlider->Draw();
    mAttackSlider->Draw();
    mReleaseSlider->Draw();

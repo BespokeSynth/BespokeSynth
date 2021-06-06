@@ -555,7 +555,7 @@ helpdisplay~displays help information
 ~help page~which page of help information to show
 
 
-circlesequencer~sequencer that views a loop as a circle
+circlesequencer~polyrhythmic sequencer that displays a loop as a circle
 ~length*~number of steps in this ring
 ~note*~pitch to use for this ring
 ~offset*~timing offset for this ring

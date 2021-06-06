@@ -22,6 +22,10 @@ public:
    
    string GetTitleLabel() override { return "gate"; }
    void CreateUIControls() override;
+   
+   void SetAttack(float ms) { mAttackTime = ms; }
+   void SetRelease(float ms) { mReleaseTime = ms; }
+   bool IsGateOpen() const { return mEnvelope > 0; }
 
    //IAudioEffect
    void ProcessAudio(double time, ChannelBuffer* buffer) override;

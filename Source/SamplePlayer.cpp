@@ -71,6 +71,8 @@ SamplePlayer::SamplePlayer()
 , mSwitchAndRampVal(1)
 , mDoRecording(false)
 , mRecordingLength(0)
+, mRecordAsClips(false)
+, mRecordAsClipsCueIndex(0)
 {
    mYoutubeSearch[0] = 0;
 }
@@ -81,7 +83,9 @@ void SamplePlayer::CreateUIControls()
    UIBLOCK0();
    UIBLOCK_SHIFTX(20);
    FLOATSLIDER(mVolumeSlider, "volume",&mVolume,0,2); UIBLOCK_SHIFTRIGHT();
-   FLOATSLIDER(mSpeedSlider,"speed",&mSpeed,-2,2); UIBLOCK_NEWLINE();
+   FLOATSLIDER(mSpeedSlider,"speed",&mSpeed,-2,2); UIBLOCK_SHIFTRIGHT();
+   BUTTON(mTrimToZoomButton, "trim"); UIBLOCK_SHIFTRIGHT();
+   BUTTON(mDownloadYoutubeButton,"youtube"); UIBLOCK_NEWLINE();
    DROPDOWN(mSampleList,"samples",&mSampleIndex, 100); UIBLOCK_SHIFTRIGHT();
    TEXTENTRY(mDownloadYoutubeSearch,"yt:",30,mYoutubeSearch); UIBLOCK_NEWLINE();
    mDownloadYoutubeSearch->DrawLabel(true);
@@ -92,13 +96,12 @@ void SamplePlayer::CreateUIControls()
    CHECKBOX(mLoopCheckbox,"loop",&mLoop); UIBLOCK_SHIFTRIGHT();
    UIBLOCK_SHIFTX(30);
    BUTTON(mLoadFileButton,"load"); UIBLOCK_SHIFTRIGHT();
+   BUTTON(mSaveFileButton,"save"); UIBLOCK_SHIFTRIGHT();
    CHECKBOX(mRecordCheckbox,"record",&mRecord); UIBLOCK_SHIFTRIGHT();
-   BUTTON(mTrimToZoomButton, "trim"); UIBLOCK_SHIFTRIGHT();
-   BUTTON(mDownloadYoutubeButton,"youtube");
-   UIBLOCK_SHIFTX(90);
+   UIBLOCK_SHIFTX(30);
    UIBLOCK_NEWCOLUMN();
    FLOATSLIDER_DIGITS(mCuePointStartSlider, "cue start", &mSampleCuePoints[0].startSeconds, 0, 100, 3);
-   FLOATSLIDER_DIGITS(mCuePointLengthSlider, "cue length", &mSampleCuePoints[0].lengthSeconds, 0, 100, 3);
+   FLOATSLIDER_DIGITS(mCuePointLengthSlider, "cue len", &mSampleCuePoints[0].lengthSeconds, 0, 100, 3);
    FLOATSLIDER(mCuePointSpeedSlider, "cue speed", &mSampleCuePoints[0].speed, 0, 2);
    UIBLOCK_NEWCOLUMN();
    DROPDOWN(mCuePointSelector, "cuepoint", &mActiveCuePointIndex, 40);
@@ -109,7 +112,10 @@ void SamplePlayer::CreateUIControls()
    CHECKBOX(mShowGridCheckbox, "show grid", &mShowGrid);
    BUTTON(mAutoSlice4n, "4n"); UIBLOCK_SHIFTRIGHT();
    BUTTON(mAutoSlice8n, "8n"); UIBLOCK_SHIFTRIGHT();
-   BUTTON(mAutoSlice16n, "16n"); UIBLOCK_SHIFTRIGHT();
+   BUTTON(mAutoSlice16n, "16n");
+   UIBLOCK_SHIFTX(100);
+   UIBLOCK_NEWCOLUMN();
+   CHECKBOX(mRecordAsClipsCheckbox, "record as clips", &mRecordAsClips);
    ENDUIBLOCK0();
 
    UIBLOCK(0, 65);
@@ -127,6 +133,14 @@ void SamplePlayer::CreateUIControls()
    mSampleBankCable->SetManualPosition(8, 8);
    mSampleBankCable->AddTypeFilter("samplebank");
    AddPatchCableSource(mSampleBankCable);
+   
+   AddChild(&mRecordGate);
+   mRecordGate.SetPosition(mRecordAsClipsCheckbox->GetRect().getMaxX()+3,-1);
+   mRecordGate.SetEnabled(mRecordAsClips);
+   mRecordGate.SetAttack(1);
+   mRecordGate.SetRelease(100);
+   mRecordGate.SetName("gate");
+   mRecordGate.CreateUIControls();
 }
 
 SamplePlayer::~SamplePlayer()
@@ -269,16 +283,50 @@ void SamplePlayer::Process(double time)
    
    IAudioReceiver* target = GetTarget();
    
+   //recording input gate processing
+   bool gateWasOpen = false;
+   bool gateIsOpen = false;
+   if (mRecordAsClips)
+   {
+      gateWasOpen = mRecordGate.IsGateOpen();
+      mRecordGate.ProcessAudio(time, GetBuffer());
+      gateIsOpen = mRecordGate.IsGateOpen();
+   }
+   
    if (mDoRecording)
    {
-      for (int i=0; i<GetBuffer()->BufferSize(); ++i)
+      bool acceptInput = true;
+      if (mRecordAsClips)
       {
-         int chunkIndex = mRecordingLength / kRecordingChunkSize;
-         int chunkPos = mRecordingLength % kRecordingChunkSize;
-         mRecordChunks[chunkIndex]->SetNumActiveChannels(GetBuffer()->NumActiveChannels());
-         for (int ch=0; ch<GetBuffer()->NumActiveChannels(); ++ch)
-            mRecordChunks[chunkIndex]->GetChannel(ch)[chunkPos] = GetBuffer()->GetChannel(ch)[i];
-         ++mRecordingLength;
+         acceptInput = gateIsOpen;
+         
+         if (gateIsOpen && !gateWasOpen)
+         {
+            if (mRecordAsClipsCueIndex < (int)mSampleCuePoints.size())
+            {
+               SetCuePoint(mRecordAsClipsCueIndex, mRecordingLength / (gSampleRate * mSample->GetSampleRateRatio()), 0, 1);
+            }
+         }
+         
+         if (!gateIsOpen && gateWasOpen)
+         {
+            if (mRecordAsClipsCueIndex < (int)mSampleCuePoints.size())
+               mSampleCuePoints[mRecordAsClipsCueIndex].lengthSeconds = (mRecordingLength / (gSampleRate * mSample->GetSampleRateRatio())) - mSampleCuePoints[mRecordAsClipsCueIndex].startSeconds;
+            ++mRecordAsClipsCueIndex;
+         }
+      }
+      
+      if (acceptInput)
+      {
+         for (int i=0; i<GetBuffer()->BufferSize(); ++i)
+         {
+            int chunkIndex = mRecordingLength / kRecordingChunkSize;
+            int chunkPos = mRecordingLength % kRecordingChunkSize;
+            mRecordChunks[chunkIndex]->SetNumActiveChannels(GetBuffer()->NumActiveChannels());
+            for (int ch=0; ch<GetBuffer()->NumActiveChannels(); ++ch)
+               mRecordChunks[chunkIndex]->GetChannel(ch)[chunkPos] = GetBuffer()->GetChannel(ch)[i];
+            ++mRecordingLength;
+         }
       }
    }
 
@@ -530,6 +578,8 @@ void SamplePlayer::ButtonClicked(ClickButton *button)
       DownloadYoutube("https://www.youtube.com/watch?v="+mYoutubeId, mYoutubeId);
    if (button == mLoadFileButton)
       LoadFile();
+   if (button == mSaveFileButton)
+      SaveFile();
    if (button == mTrimToZoomButton && mSample != nullptr)
    {
       Sample* sample = new Sample();
@@ -751,6 +801,17 @@ void SamplePlayer::LoadFile()
    }
 }
 
+void SamplePlayer::SaveFile()
+{
+   FileChooser chooser("Save sample", File(ofToDataPath("samples")),
+                       "*.wav", true, false, TheSynth->GetMainComponent()->getTopLevelComponent());
+   if (chooser.browseForFileToSave(true))
+   {
+      auto file = chooser.getResult();
+      Sample::WriteDataToFile(file.getFullPathName().toStdString().c_str(), mSample->Data(), mSample->LengthInSamples());
+   }
+}
+
 void SamplePlayer::FillData(vector<float> data)
 {
    Sample* sample = new Sample();
@@ -909,6 +970,7 @@ void SamplePlayer::DrawModule()
    mDownloadYoutubeButton->Draw();
    mDownloadYoutubeSearch->Draw();
    mLoadFileButton->Draw();
+   mSaveFileButton->Draw();
    mRecordCheckbox->Draw();
    mCuePointSelector->Draw();
    mSetCuePointCheckbox->Draw();
@@ -921,6 +983,8 @@ void SamplePlayer::DrawModule()
    mAutoSlice4n->Draw();
    mAutoSlice8n->Draw();
    mAutoSlice16n->Draw();
+   mRecordAsClipsCheckbox->Draw();
+   mRecordGate.Draw();
 
    //draw grabbable clip for cue
    if (mSample != nullptr)
@@ -961,10 +1025,10 @@ void SamplePlayer::DrawModule()
 
    ofPushMatrix();
    ofTranslate(5,58);
+   float sampleWidth = mWidth - 10;
    if (mDoRecording)
    {
       ofPushMatrix();
-      float sampleWidth = mWidth - 10;
       
       int numChunks = mRecordingLength / kRecordingChunkSize + 1;
       float chunkWidth = sampleWidth / numChunks;
@@ -1024,7 +1088,6 @@ void SamplePlayer::DrawModule()
          mDrawBuffer.CopyFrom(mSample->Data());
       }
 
-      float sampleWidth = mWidth - 10;
       DrawAudioBuffer(sampleWidth, mHeight - 65, &mDrawBuffer, GetZoomStartSample(), GetZoomEndSample(), mSample->GetPlayPosition());
       
       ofPushStyle();
@@ -1057,6 +1120,23 @@ void SamplePlayer::DrawModule()
          }
       }
 
+      ofPopStyle();
+   }
+   else
+   {
+      ofPushStyle();
+      ofFill();
+      ofSetColor(255,255,255,50);
+      ofRect(0, 0, mWidth-10, mHeight - 65);
+      ofSetColor(40,40,40);
+      DrawTextNormal("drag and drop a sample here...", 10, 10, 10);
+      ofPopStyle();
+   }
+   
+   if ((mSample && mSample->LengthInSamples() > 0) || mDoRecording)
+   {
+      ofPushStyle();
+      ofFill();
       for (size_t i=0; i<mSampleCuePoints.size(); ++i)
       {
          if (i == 0 || mSampleCuePoints[i].startSeconds != mSampleCuePoints[i-1].startSeconds)
@@ -1077,19 +1157,9 @@ void SamplePlayer::DrawModule()
             DrawTextNormal(ofToString((int)i), x+2, 8, 11);
          }
       }
-
       ofPopStyle();
    }
-   else
-   {
-      ofPushStyle();
-      ofFill();
-      ofSetColor(255,255,255,50);
-      ofRect(0, 0, mWidth-10, mHeight - 65);
-      ofSetColor(40,40,40);
-      DrawTextNormal("drag and drop a sample here...", 10, 10, 10);
-      ofPopStyle();
-   }
+   
    ofPopMatrix();
 
    if (mZoomLevel != 1)
@@ -1103,6 +1173,8 @@ void SamplePlayer::DrawModule()
 
 int SamplePlayer::GetZoomStartSample() const
 {
+   if (mDoRecording)
+      return 0;
    if (mSample == nullptr)
       return 0;
    return (int)ofClamp(mSample->LengthInSamples() * mZoomOffset, 0, mSample->LengthInSamples());
@@ -1110,6 +1182,11 @@ int SamplePlayer::GetZoomStartSample() const
 
 int SamplePlayer::GetZoomEndSample() const
 {
+   if (mDoRecording)
+   {
+      int numChunks = mRecordingLength / kRecordingChunkSize + 1;
+      return (numChunks * kRecordingChunkSize);
+   }
    if (mSample == nullptr)
       return 1;
    return (int)ofClamp(GetZoomStartSample() + mSample->LengthInSamples() / mZoomLevel, 1, mSample->LengthInSamples());
@@ -1117,6 +1194,8 @@ int SamplePlayer::GetZoomEndSample() const
 
 float SamplePlayer::GetZoomStartSeconds() const
 {
+   if (mDoRecording)
+      return 0;
    if (mSample == nullptr)
       return 0;
    return GetZoomStartSample() / (gSampleRate * mSample->GetSampleRateRatio());
@@ -1124,6 +1203,8 @@ float SamplePlayer::GetZoomStartSeconds() const
 
 float SamplePlayer::GetZoomEndSeconds() const
 {
+   if (mDoRecording)
+      GetZoomEndSample() / gSampleRate;
    if (mSample == nullptr)
       return 1;
    return GetZoomEndSample() / (gSampleRate * mSample->GetSampleRateRatio());
@@ -1219,6 +1300,10 @@ void SamplePlayer::CheckboxUpdated(Checkbox* checkbox)
          for (size_t i=0; i<mRecordChunks.size(); ++i)
             mRecordChunks[i]->Clear();
          
+         mRecordAsClipsCueIndex = 0;
+         for (int i=0; i<(int)mSampleCuePoints.size(); ++i)
+            SetCuePoint(i, 0, 0, 1);
+         
          mDoRecording = true;
       }
       else if (mRecordingLength > 0)
@@ -1226,6 +1311,8 @@ void SamplePlayer::CheckboxUpdated(Checkbox* checkbox)
          StopRecording();
       }
    }
+   if (checkbox == mRecordAsClipsCheckbox)
+      mRecordGate.SetEnabled(mRecordAsClips);
 }
 
 void SamplePlayer::StopRecording()
@@ -1358,6 +1445,7 @@ vector<IUIControl*> SamplePlayer::ControlsToIgnoreInSaveState() const
    vector<IUIControl*> ignore;
    ignore.push_back(mDownloadYoutubeSearch);
    ignore.push_back(mLoadFileButton);
+   ignore.push_back(mSaveFileButton);
    for (size_t i = 0; i < mSearchResultButtons.size(); ++i)
       ignore.push_back(mSearchResultButtons[i]);
    return ignore;
