@@ -71,6 +71,7 @@ SamplePlayer::SamplePlayer()
 , mSwitchAndRampVal(1)
 , mDoRecording(false)
 , mRecordingLength(0)
+, mRecordingAppendMode(false)
 , mRecordAsClips(false)
 , mRecordAsClipsCueIndex(0)
 {
@@ -115,6 +116,7 @@ void SamplePlayer::CreateUIControls()
    BUTTON(mAutoSlice16n, "16n");
    UIBLOCK_SHIFTX(-52);
    UIBLOCK_NEWCOLUMN();
+   CHECKBOX(mRecordingAppendModeCheckbox, "append to rec", &mRecordingAppendMode)
    CHECKBOX(mRecordAsClipsCheckbox, "record as clips", &mRecordAsClips);
    ENDUIBLOCK0();
 
@@ -552,6 +554,7 @@ void SamplePlayer::UpdateSample(Sample* sample, bool ownsSample)
    mOwnsSample = ownsSample;   
    mZoomLevel = 1;
    mZoomOffset = 0;
+   mRecordingLength = 0;
 
    mErrorString = "";
 
@@ -1018,6 +1021,7 @@ void SamplePlayer::DrawModule()
    mAutoSlice4n->Draw();
    mAutoSlice8n->Draw();
    mAutoSlice16n->Draw();
+   mRecordingAppendModeCheckbox->Draw();
    mRecordAsClipsCheckbox->Draw();
    mRecordGate.Draw();
 
@@ -1344,20 +1348,23 @@ void SamplePlayer::CheckboxUpdated(Checkbox* checkbox)
       mPlay = false;
       if (mRecord)
       {
-         mRecordingLength = 0;
-         
-         for (size_t i=mRecordChunks.size(); i<kMinRecordingChunks; ++i)
+         if (!mRecordingAppendMode || mRecordingLength == 0)
          {
-            mRecordChunks.push_back(new ChannelBuffer(kRecordingChunkSize));
-            mRecordChunks[i]->GetChannel(0); //set up buffer
+            mRecordingLength = 0;
+            
+            for (size_t i=mRecordChunks.size(); i<kMinRecordingChunks; ++i)
+            {
+               mRecordChunks.push_back(new ChannelBuffer(kRecordingChunkSize));
+               mRecordChunks[i]->GetChannel(0); //set up buffer
+            }
+            
+            for (size_t i=0; i<mRecordChunks.size(); ++i)
+               mRecordChunks[i]->Clear();
+            
+            mRecordAsClipsCueIndex = 0;
+            for (int i=0; i<(int)mSampleCuePoints.size(); ++i)
+               SetCuePoint(i, 0, 0, 1);
          }
-         
-         for (size_t i=0; i<mRecordChunks.size(); ++i)
-            mRecordChunks[i]->Clear();
-         
-         mRecordAsClipsCueIndex = 0;
-         for (int i=0; i<(int)mSampleCuePoints.size(); ++i)
-            SetCuePoint(i, 0, 0, 1);
          
          mDoRecording = true;
       }
@@ -1395,7 +1402,9 @@ void SamplePlayer::StopRecording()
          for (int ch=0; ch<channelCount; ++ch)
             BufferCopy(data->GetChannel(ch)+i*kRecordingChunkSize, mRecordChunks[i]->GetChannel(ch), samplesToCopy);
       }
+      int recordedLength = mRecordingLength;
       UpdateSample(sample, true);
+      mRecordingLength = recordedLength;
    }
 }
 

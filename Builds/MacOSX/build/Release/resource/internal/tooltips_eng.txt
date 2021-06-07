@@ -1084,6 +1084,7 @@ sampleplayer~sample playback with triggerable cue points, clip extraction, and y
 ~8n~auto-slice 8 eighth notes, starting from the current cue
 ~16n~auto-slice 16 sixteenth notes, starting from the current cue
 ~searchresult*~click to download this youtube search result. downloading long videos may take a while.
+~append to rec~when recording, append to the previous recording, rather than clearing the sample first
 ~record as clips~when recording, only record when there is enough input to open the gate, and mark up each recorded segment with cue points
 ~threshold~volume threshold to open up the gate for recording
 ~attack~speed at which gate blends open

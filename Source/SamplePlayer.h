@@ -209,6 +209,8 @@ private:
    vector<ChannelBuffer*> mRecordChunks;
    bool mDoRecording;   //separate this out from mRecord to allow setup in main thread before audio thread starts recording
    int mRecordingLength;
+   bool mRecordingAppendMode;
+   Checkbox* mRecordingAppendModeCheckbox;
    bool mRecordAsClips;
    Checkbox* mRecordAsClipsCheckbox;
    GateEffect mRecordGate;
