@@ -20,16 +20,26 @@ public:
    virtual void ButtonClicked(ClickButton* button) = 0;
 };
 
+enum class ButtonDisplayStyle
+{
+   kText,
+   kNoLabel,
+   kPlay,
+   kPause,
+   kStop,
+   kGrabSample
+};
+
 class ClickButton : public IUIControl
 {
 public:
-   ClickButton(IButtonListener* owner, const char* label, int x, int y);
-   ClickButton(IButtonListener* owner, const char* label, IUIControl* anchor, AnchorDirection anchorDirection);
+   ClickButton(IButtonListener* owner, const char* label, int x, int y, ButtonDisplayStyle displayStyle = ButtonDisplayStyle::kText);
+   ClickButton(IButtonListener* owner, const char* label, IUIControl* anchor, AnchorDirection anchorDirection, ButtonDisplayStyle displayStyle = ButtonDisplayStyle::kText);
    void SetLabel(const char* label);
    void Render() override;
    void MouseReleased() override;
    bool MouseMoved(float x, float y) override;
-   void SetDisplayText(bool display) { mDisplayText = display; }
+   void SetDisplayText(bool display) { mDisplayStyle = ButtonDisplayStyle::kNoLabel; }
    void SetDimensions(float width, float height) { mWidth = width; mHeight = height; }
 
    //IUIControl
@@ -56,7 +66,7 @@ private:
    float mHeight;
    double mClickTime;
    IButtonListener* mOwner;
-   bool mDisplayText;
+   ButtonDisplayStyle mDisplayStyle;
 };
 
 #endif /* defined(__modularSynth__ClickButton__) */

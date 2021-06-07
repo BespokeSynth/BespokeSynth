@@ -57,6 +57,7 @@
 #define DROPDOWN(dropdown,name,var,width) dropdown = new DropdownList(UICONTROL_BASICS(name),var,width); lastUIControl = dropdown; UIBLOCK_SHIFTDOWN(); UIBLOCK_UPDATEEXTENTS();
 
 #define BUTTON(button,name) button = new ClickButton(UICONTROL_BASICS(name)); lastUIControl = button; UIBLOCK_SHIFTDOWN(); UIBLOCK_UPDATEEXTENTS();
+#define BUTTON_STYLE(button,name,style) button = new ClickButton(UICONTROL_BASICS(name), style); lastUIControl = button; UIBLOCK_SHIFTDOWN(); UIBLOCK_UPDATEEXTENTS();
 
 #define TEXTENTRY(entry,name,length,var) entry = new TextEntry(UICONTROL_BASICS(name),length,var); lastUIControl = entry; UIBLOCK_SHIFTDOWN(); UIBLOCK_UPDATEEXTENTS();
 #define TEXTENTRY_NUM(entry,name,length,var,min,max) entry = new TextEntry(UICONTROL_BASICS(name),length,var,min,max); lastUIControl = entry; UIBLOCK_SHIFTDOWN(); UIBLOCK_UPDATEEXTENTS();

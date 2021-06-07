@@ -80,6 +80,7 @@ private:
    void UpdateSample(Sample* sample, bool ownsSample);
    void UpdateSampleList();
    float GetPlayPositionForMouse(float mouseX) const;
+   float GetSecondsForMouse(float mouseX) const;
    void GetPlayInfoForPitch(int pitch, float& startSeconds, float& lengthSeconds, float& speed) const;
    void DownloadYoutube(string url, string titles);
    void SearchYoutube(string searchTerm);
@@ -165,6 +166,7 @@ private:
    FloatSlider* mCuePointLengthSlider;
    FloatSlider* mCuePointSpeedSlider;
    int mActiveCuePointIndex;
+   int mHoveredCuePointIndex;
    bool mSetCuePoint;
    Checkbox* mSetCuePointCheckbox;
    bool mSelectPlayedCuePoint;
@@ -173,10 +175,11 @@ private:
    ClickButton* mPlayCurrentCuePointButton;
    bool mShowGrid;
    Checkbox* mShowGridCheckbox;
-   ofRectangle mCueClipGrabRect;
    ClickButton* mAutoSlice4n;
    ClickButton* mAutoSlice8n;
    ClickButton* mAutoSlice16n;
+   ClickButton* mPlayHoveredClipButton;
+   ClickButton* mGrabHoveredClipButton;
 
    string mErrorString;
 

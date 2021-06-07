@@ -29,7 +29,7 @@ void SampleCapturer::CreateUIControls()
 
    UIBLOCK0();
    CHECKBOX(mWantRecordCheckbox, "record", &mWantRecord);
-   BUTTON(mPlayButton, "play");
+   BUTTON_STYLE(mPlayButton, "play", ButtonDisplayStyle::kPlay);
    BUTTON(mSaveButton, "save");
    BUTTON(mDeleteButton, "delete");
    ENDUIBLOCK0();

@@ -1068,6 +1068,7 @@ sampleplayer~sample playback with triggerable cue points, clip extraction, and y
 ~stop~stop playing and reset playhead
 ~loop~wrap playhead to beginning when it reaches end
 ~load~show a file chooser to load a sample
+~save~save this sample to a file
 ~record~record audio input into our sample buffer. clears the current sample.
 ~trim~discard all audio outside the current zoom range
 ~youtube~download the audio of the youtube URL currently on your clipboard
@@ -1083,6 +1084,12 @@ sampleplayer~sample playback with triggerable cue points, clip extraction, and y
 ~8n~auto-slice 8 eighth notes, starting from the current cue
 ~16n~auto-slice 16 sixteenth notes, starting from the current cue
 ~searchresult*~click to download this youtube search result. downloading long videos may take a while.
+~record as clips~when recording, only record when there is enough input to open the gate, and mark up each recorded segment with cue points
+~threshold~volume threshold to open up the gate for recording
+~attack~speed at which gate blends open
+~release~speed at which gate blends closed
+~playhovered~play this cue
+~grabhovered~grab a sample of this cue to drop onto another module
 
 
 

@@ -10,12 +10,12 @@
 #include "IDrawableModule.h"
 #include "SynthGlobals.h"
 
-ClickButton::ClickButton(IButtonListener* owner, const char* label, int x, int y)
-: mWidth(40)
+ClickButton::ClickButton(IButtonListener* owner, const char* label, int x, int y, ButtonDisplayStyle displayStyle /*= ButtonDisplayStyle::kText*/)
+: mWidth(20)
 , mHeight(15)
 , mClickTime(-9999)
 , mOwner(owner)
-, mDisplayText(true)
+, mDisplayStyle(displayStyle)
 {
    assert(owner);
    SetLabel(label);
@@ -24,8 +24,8 @@ ClickButton::ClickButton(IButtonListener* owner, const char* label, int x, int y
    SetParent(dynamic_cast<IClickable*>(owner));
 }
 
-ClickButton::ClickButton(IButtonListener* owner, const char* label, IUIControl* anchor, AnchorDirection anchorDirection)
-: ClickButton(owner, label, -1, -1)
+ClickButton::ClickButton(IButtonListener* owner, const char* label, IUIControl* anchor, AnchorDirection anchorDirection, ButtonDisplayStyle displayStyle /*= ButtonDisplayStyle::kText*/)
+: ClickButton(owner, label, -1, -1, displayStyle)
 {
    PositionTo(anchor, anchorDirection);
 }
@@ -37,7 +37,8 @@ ClickButton::~ClickButton()
 void ClickButton::SetLabel(const char* label)
 {
    SetName(label);
-   mWidth = GetStringWidth(label) + 3 + .25f * strnlen(label, 50);
+   if (mDisplayStyle == ButtonDisplayStyle::kText)
+      mWidth = GetStringWidth(label) + 3 + .25f * strnlen(label, 50);
 }
 
 void ClickButton::Render()
@@ -60,12 +61,40 @@ void ClickButton::Render()
    color.b = ofLerp(color.b, 0, press);
    ofSetColor(color);
    ofRect(mX,mY,w,h);
-   ofNoFill();
 
-   if (mDisplayText)
+   if (mDisplayStyle == ButtonDisplayStyle::kText)
    {
       ofSetColor(textColor);
       DrawTextNormal(Name(), mX + 2, mY + 12);
+   }
+   else if (mDisplayStyle == ButtonDisplayStyle::kPlay)
+   {
+      ofSetColor(textColor);
+      ofFill();
+      ofTriangle(mX+5, mY+2, mX+5, mY+12, mX+15, mY+7);
+   }
+   else if (mDisplayStyle == ButtonDisplayStyle::kPause)
+   {
+      ofSetColor(textColor);
+      ofFill();
+      ofRect(mX+5,mY+2,4,10,0);
+      ofRect(mX+11,mY+2,4,10,0);
+   }
+   else if (mDisplayStyle == ButtonDisplayStyle::kStop)
+   {
+      ofSetColor(textColor);
+      ofFill();
+      ofRect(mX+5,mY+2,10,10,0);
+   }
+   else if (mDisplayStyle == ButtonDisplayStyle::kGrabSample)
+   {
+      ofSetColor(textColor);
+      for (int i=0; i<5; ++i)
+      {
+         float height = (i % 2 == 0) ? 6 : 10;
+         float x = mX+4+i*3;
+         ofLine(x, mY+7-height/2, x, mY+7+height/2);
+      }
    }
    
    ofPopStyle();

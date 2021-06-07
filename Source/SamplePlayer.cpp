@@ -51,18 +51,18 @@ SamplePlayer::SamplePlayer()
 , mOscWheelGrabbed(false)
 , mOscWheelSpeed(0)
 , mPlaySpeed(1)
-, mWidth(707)
+, mWidth(608)
 , mHeight(150)
 , mNoteInputBuffer(this)
 , mAdsr(10,1,1,10)
 , mZoomLevel(1)
 , mZoomOffset(0)
 , mActiveCuePointIndex(0)
+, mHoveredCuePointIndex(-1)
 , mSetCuePoint(false)
 , mSelectPlayedCuePoint(false)
 , mRecentPlayedCuePoint(-1)
 , mShowGrid(false)
-, mCueClipGrabRect(-100,100,1,1)
 , mRunningProcessType(RunningProcessType::None)
 , mRunningProcess(nullptr)
 , mOnRunningProcessComplete(nullptr)
@@ -90,30 +90,30 @@ void SamplePlayer::CreateUIControls()
    TEXTENTRY(mDownloadYoutubeSearch,"yt:",30,mYoutubeSearch); UIBLOCK_NEWLINE();
    mDownloadYoutubeSearch->DrawLabel(true);
    mDownloadYoutubeSearch->SetRequireEnter(true);
-   BUTTON(mPlayButton,"play"); UIBLOCK_SHIFTRIGHT();
-   BUTTON(mPauseButton,"pause"); UIBLOCK_SHIFTRIGHT();
-   BUTTON(mStopButton,"stop"); UIBLOCK_SHIFTRIGHT();
+   BUTTON_STYLE(mPlayButton,"play",ButtonDisplayStyle::kPlay); UIBLOCK_SHIFTRIGHT();
+   BUTTON_STYLE(mPauseButton,"pause",ButtonDisplayStyle::kPause); UIBLOCK_SHIFTRIGHT();
+   BUTTON_STYLE(mStopButton,"stop",ButtonDisplayStyle::kStop); UIBLOCK_SHIFTRIGHT();
    CHECKBOX(mLoopCheckbox,"loop",&mLoop); UIBLOCK_SHIFTRIGHT();
    UIBLOCK_SHIFTX(30);
    BUTTON(mLoadFileButton,"load"); UIBLOCK_SHIFTRIGHT();
    BUTTON(mSaveFileButton,"save"); UIBLOCK_SHIFTRIGHT();
    CHECKBOX(mRecordCheckbox,"record",&mRecord); UIBLOCK_SHIFTRIGHT();
-   UIBLOCK_SHIFTX(30);
+   UIBLOCK_SHIFTX(50);
    UIBLOCK_NEWCOLUMN();
    FLOATSLIDER_DIGITS(mCuePointStartSlider, "cue start", &mSampleCuePoints[0].startSeconds, 0, 100, 3);
    FLOATSLIDER_DIGITS(mCuePointLengthSlider, "cue len", &mSampleCuePoints[0].lengthSeconds, 0, 100, 3);
    FLOATSLIDER(mCuePointSpeedSlider, "cue speed", &mSampleCuePoints[0].speed, 0, 2);
    UIBLOCK_NEWCOLUMN();
    DROPDOWN(mCuePointSelector, "cuepoint", &mActiveCuePointIndex, 40);
-   CHECKBOX(mSetCuePointCheckbox, "click sets cue", &mSetCuePoint);
+   BUTTON(mPlayCurrentCuePointButton, "play cue");
    CHECKBOX(mSelectPlayedCuePointCheckbox, "select played", &mSelectPlayedCuePoint);
    UIBLOCK_NEWCOLUMN();
-   BUTTON(mPlayCurrentCuePointButton, "play cue");
+   CHECKBOX(mSetCuePointCheckbox, "click sets cue", &mSetCuePoint);
    CHECKBOX(mShowGridCheckbox, "show grid", &mShowGrid);
    BUTTON(mAutoSlice4n, "4n"); UIBLOCK_SHIFTRIGHT();
    BUTTON(mAutoSlice8n, "8n"); UIBLOCK_SHIFTRIGHT();
    BUTTON(mAutoSlice16n, "16n");
-   UIBLOCK_SHIFTX(100);
+   UIBLOCK_SHIFTX(-52);
    UIBLOCK_NEWCOLUMN();
    CHECKBOX(mRecordAsClipsCheckbox, "record as clips", &mRecordAsClips);
    ENDUIBLOCK0();
@@ -125,6 +125,11 @@ void SamplePlayer::CreateUIControls()
       mSearchResultButtons[i]->SetShowing(false);
    }
    ENDUIBLOCK0();
+   
+   mPlayHoveredClipButton = new ClickButton(this, "playhovered", -1, -1, ButtonDisplayStyle::kPlay);
+   mGrabHoveredClipButton = new ClickButton(this, "grabhovered", -1, -1, ButtonDisplayStyle::kGrabSample);
+   mPlayHoveredClipButton->SetShowing(false);
+   mGrabHoveredClipButton->SetShowing(false);
 
    for (int i = 0; i < (int)mSampleCuePoints.size(); ++i)
       mCuePointSelector->AddLabel(ofToString(i).c_str(), i);
@@ -304,14 +309,15 @@ void SamplePlayer::Process(double time)
          {
             if (mRecordAsClipsCueIndex < (int)mSampleCuePoints.size())
             {
-               SetCuePoint(mRecordAsClipsCueIndex, mRecordingLength / (gSampleRate * mSample->GetSampleRateRatio()), 0, 1);
+               SetCuePoint(mRecordAsClipsCueIndex, float(mRecordingLength) / gSampleRate, 0, 1);
             }
          }
          
          if (!gateIsOpen && gateWasOpen)
          {
             if (mRecordAsClipsCueIndex < (int)mSampleCuePoints.size())
-               mSampleCuePoints[mRecordAsClipsCueIndex].lengthSeconds = (mRecordingLength / (gSampleRate * mSample->GetSampleRateRatio())) - mSampleCuePoints[mRecordAsClipsCueIndex].startSeconds;
+               mSampleCuePoints[mRecordAsClipsCueIndex].lengthSeconds = (float(mRecordingLength) / gSampleRate) - mSampleCuePoints[mRecordAsClipsCueIndex].startSeconds;
+            mRecordingLength += 200; //add silence gap
             ++mRecordAsClipsCueIndex;
          }
       }
@@ -358,20 +364,27 @@ void SamplePlayer::Process(double time)
       mLastOutputSample.SetNumActiveChannels(mSample->NumChannels());
       mSwitchAndRampVal.SetNumActiveChannels(mSample->NumChannels());
 
-      if (mPlay && mSample->ConsumeData(time, &gWorkChannelBuffer, bufferSize, true))
+      if (mPlay)
       {
-         for (int ch = 0; ch < gWorkChannelBuffer.NumActiveChannels(); ++ch)
+         if (mSample->ConsumeData(time, &gWorkChannelBuffer, bufferSize, true))
          {
-            for (int i = 0; i < bufferSize; ++i)
-               gWorkChannelBuffer.GetChannel(ch)[i] *= volSq * mAdsr.Value(time + i * gInvSampleRateMs);
+            for (int ch = 0; ch < gWorkChannelBuffer.NumActiveChannels(); ++ch)
+            {
+               for (int i = 0; i < bufferSize; ++i)
+                  gWorkChannelBuffer.GetChannel(ch)[i] *= volSq * mAdsr.Value(time + i * gInvSampleRateMs);
+            }
+         }
+         else
+         {
+            gWorkChannelBuffer.Clear();
+            mPlay = false;
+            mSample->SetPlayPosition(0);
+            mAdsr.Stop(time);
          }
       }
       else
       {
          gWorkChannelBuffer.Clear();
-         mPlay = false;
-         mSample->SetPlayPosition(0);
-         mAdsr.Stop(time);
       }
 
       for (int ch = 0; ch < gWorkChannelBuffer.NumActiveChannels(); ++ch)
@@ -514,9 +527,12 @@ void SamplePlayer::FilesDropped(vector<string> files, int x, int y)
 
 void SamplePlayer::SampleDropped(int x, int y, Sample* sample)
 {
-   Sample* copy = new Sample();
-   copy->CopyFrom(sample);
-   UpdateSample(copy, true);
+   if (gHoveredUIControl == nullptr)   //avoid problem of grabbing a clip via the clip grab button and immediately dropping it onto this sampleplayer by accident
+   {
+      Sample* copy = new Sample();
+      copy->CopyFrom(sample);
+      UpdateSample(copy, true);
+   }
 }
 
 void SamplePlayer::UpdateSample(Sample* sample, bool ownsSample)
@@ -617,6 +633,15 @@ void SamplePlayer::ButtonClicked(ClickButton *button)
       AutoSlice(kInterval_8n);
    if (button == mAutoSlice16n)
       AutoSlice(kInterval_16n);
+   
+   if (button == mPlayHoveredClipButton)
+      PlayCuePoint(gTime, mHoveredCuePointIndex, 127, 1, 0);
+   if (button == mGrabHoveredClipButton)
+   {
+      ChannelBuffer* data = GetCueSampleData(mHoveredCuePointIndex);
+      TheSynth->GrabSample(data, false, 1);
+      delete data;
+   }
 }
 
 void SamplePlayer::TextEntryComplete(TextEntry* entry)
@@ -829,23 +854,10 @@ void SamplePlayer::OnClicked(int x, int y, bool right)
    if (right)
       return;
 
-   if (mSample != nullptr)
-   {
-      float startSeconds, lengthSeconds, speed;
-      GetPlayInfoForPitch(mActiveCuePointIndex, startSeconds, lengthSeconds, speed);
-
-      if (lengthSeconds > 0 && mCueClipGrabRect.contains(x,y))
-      {
-         ChannelBuffer* data = GetCueSampleData(mActiveCuePointIndex);
-         TheSynth->GrabSample(data, false, 1);
-         delete data;
-      }
-   }
-
    if (mYoutubeSearchResults.size() > 0)
       return;
    
-   if (y > 60 && y < mHeight - 20 && mSample != nullptr)
+   if (y > 60 && y < mHeight - 20 && mSample != nullptr && gHoveredUIControl == nullptr)
    {
       SwitchAndRamp();
       mPlay = true;
@@ -904,6 +916,26 @@ bool SamplePlayer::MouseMoved(float x, float y)
       if (mSetCuePoint)
          SetCuePointForX(x);
    }
+   
+   mHoveredCuePointIndex = -1;
+   if (y > 60 && y < mHeight - 20 && mSample != nullptr)
+   {
+      for (size_t i=0; i<mSampleCuePoints.size(); ++i)
+      {
+         if (mSampleCuePoints[i].lengthSeconds > 0)
+         {
+            float seconds = GetSecondsForMouse(x);
+            if (seconds >= mSampleCuePoints[i].startSeconds && seconds <= mSampleCuePoints[i].startSeconds + mSampleCuePoints[i].lengthSeconds)
+            {
+               mHoveredCuePointIndex = (int)i;
+               mActiveCuePointIndex = (int)i;
+               UpdateActiveCuePoint();
+               break;
+            }
+         }
+      }
+   }
+   
    return true;
 }
 
@@ -921,9 +953,12 @@ void SamplePlayer::MouseReleased()
 
 float SamplePlayer::GetPlayPositionForMouse(float mouseX) const
 {
-   if (mSample != nullptr)
-      return ofMap(mouseX, 5, mWidth-5, GetZoomStartSample(), GetZoomEndSample(), true);
-   return 0;
+   return ofMap(mouseX, 5, mWidth-5, GetZoomStartSample(), GetZoomEndSample(), true);
+}
+
+float SamplePlayer::GetSecondsForMouse(float mouseX) const
+{
+   return ofMap(mouseX, 5, mWidth-5, GetZoomStartSeconds(), GetZoomEndSeconds(), true);
 }
 
 void SamplePlayer::GetPlayInfoForPitch(int pitch, float& startSeconds, float& lengthSeconds, float& speed) const
@@ -985,23 +1020,6 @@ void SamplePlayer::DrawModule()
    mAutoSlice16n->Draw();
    mRecordAsClipsCheckbox->Draw();
    mRecordGate.Draw();
-
-   //draw grabbable clip for cue
-   if (mSample != nullptr)
-   {
-      float startSeconds, lengthSeconds, speed;
-      GetPlayInfoForPitch(mActiveCuePointIndex, startSeconds, lengthSeconds, speed);
-
-      if (lengthSeconds > 0)
-      {
-         ofPushMatrix();
-         ofRectangle rect = mAutoSlice16n->GetRect(true);
-         mCueClipGrabRect.set(rect.getMaxX() + 3, 3, 150, 52);
-         ofTranslate(mCueClipGrabRect.x, mCueClipGrabRect.y);
-         DrawAudioBuffer(mCueClipGrabRect.width, mCueClipGrabRect.height, mSample->Data(), startSeconds * gSampleRate * mSample->GetSampleRateRatio(), (startSeconds + lengthSeconds) * gSampleRate * mSample->GetSampleRateRatio(), -1);
-         ofPopMatrix();
-      }
-   }
 
    for (size_t i = 0; i < mSearchResultButtons.size(); ++i)
    {
@@ -1088,7 +1106,10 @@ void SamplePlayer::DrawModule()
          mDrawBuffer.CopyFrom(mSample->Data());
       }
 
-      DrawAudioBuffer(sampleWidth, mHeight - 65, &mDrawBuffer, GetZoomStartSample(), GetZoomEndSample(), mSample->GetPlayPosition());
+      int playPosition = mSample->GetPlayPosition();
+      if (mAdsr.Value(gTime) == 0)
+         playPosition = -1;
+      DrawAudioBuffer(sampleWidth, mHeight - 65, &mDrawBuffer, GetZoomStartSample(), GetZoomEndSample(), playPosition);
       
       ofPushStyle();
       ofFill();
@@ -1096,8 +1117,11 @@ void SamplePlayer::DrawModule()
       ofSetColor(255, 255, 255);
       DrawTextNormal(mSample->Name(), 5, 27);
 
-      float x = ofMap(mSample->GetPlayPosition(), GetZoomStartSample(), GetZoomEndSample(), 0, sampleWidth);
-      DrawTextNormal(ofToString(mSample->GetPlayPosition() / (gSampleRate * mSample->GetSampleRateRatio()), 1), x + 2, mHeight - 65, 11);
+      if (playPosition >= 0)
+      {
+         float x = ofMap(playPosition, GetZoomStartSample(), GetZoomEndSample(), 0, sampleWidth);
+         DrawTextNormal(ofToString(playPosition / (gSampleRate * mSample->GetSampleRateRatio()), 1), x + 2, mHeight - 65, 11);
+      }
 
       if (mShowGrid)
       {
@@ -1139,12 +1163,12 @@ void SamplePlayer::DrawModule()
       ofFill();
       for (size_t i=0; i<mSampleCuePoints.size(); ++i)
       {
-         if (i == 0 || mSampleCuePoints[i].startSeconds != mSampleCuePoints[i-1].startSeconds)
+         if (mSampleCuePoints[i].lengthSeconds > 0 || mSampleCuePoints[i].startSeconds > 0)
          {
             float x = ofMap(mSampleCuePoints[i].startSeconds, GetZoomStartSeconds(), GetZoomEndSeconds(), 0, sampleWidth);
             float xEnd = ofMap(mSampleCuePoints[i].startSeconds + mSampleCuePoints[i].lengthSeconds, GetZoomStartSeconds(), GetZoomEndSeconds(), 0, sampleWidth);
             ofSetColor(0, 0, 0, 100);
-            ofRect(x, 0, (xEnd - x) + 10, 10);
+            ofRect(x, 0, MAX((xEnd - x), 10), 10);
             ofRect(x, 0, 15, 10);
             ofSetColor(255, 255, 255);
             ofRect(x, 0, 1, 20, 1);
@@ -1155,6 +1179,12 @@ void SamplePlayer::DrawModule()
                ofFill();
             }
             DrawTextNormal(ofToString((int)i), x+2, 8, 11);
+            
+            if (i == mHoveredCuePointIndex)
+            {
+               ofSetColor(255,255,255,50);
+               ofRect(x, 0, (xEnd-x), mHeight-65);
+            }
          }
       }
       ofPopStyle();
@@ -1168,6 +1198,31 @@ void SamplePlayer::DrawModule()
       ofRect(5, mHeight - 7, mWidth-10, 7);
       ofFill();
       ofRect(mZoomOffset*(mWidth-10)+5, mHeight - 7, (mWidth-10)/mZoomLevel, 7);
+   }
+   
+   if (mHoveredCuePointIndex != -1 && mSample && mSample->LengthInSamples() > 0)
+   {
+      float x = ofMap(mSampleCuePoints[mHoveredCuePointIndex].startSeconds, GetZoomStartSeconds(), GetZoomEndSeconds(), 0, sampleWidth);
+      float xEnd = ofMap(mSampleCuePoints[mHoveredCuePointIndex].startSeconds + mSampleCuePoints[mHoveredCuePointIndex].lengthSeconds, GetZoomStartSeconds(), GetZoomEndSeconds(), 0, sampleWidth);
+      if (xEnd - x > 45)
+      {
+         mPlayHoveredClipButton->SetPosition(x+5, 72);
+         mGrabHoveredClipButton->SetPosition(x+28, 72);
+         mPlayHoveredClipButton->SetShowing(true);
+         mGrabHoveredClipButton->SetShowing(true);
+         mPlayHoveredClipButton->Draw();
+         mGrabHoveredClipButton->Draw();
+      }
+      else
+      {
+         mPlayHoveredClipButton->SetShowing(false);
+         mGrabHoveredClipButton->SetShowing(false);
+      }
+   }
+   else
+   {
+      mPlayHoveredClipButton->SetShowing(false);
+      mGrabHoveredClipButton->SetShowing(false);
    }
 }
 
@@ -1204,7 +1259,7 @@ float SamplePlayer::GetZoomStartSeconds() const
 float SamplePlayer::GetZoomEndSeconds() const
 {
    if (mDoRecording)
-      GetZoomEndSample() / gSampleRate;
+      return float(GetZoomEndSample()) / gSampleRate;
    if (mSample == nullptr)
       return 1;
    return GetZoomEndSample() / (gSampleRate * mSample->GetSampleRateRatio());
