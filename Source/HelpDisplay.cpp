@@ -14,12 +14,13 @@
 #include "EffectChain.h"
 
 bool HelpDisplay::sShowTooltips = false;
+bool HelpDisplay::sTooltipsLoaded = false;
+list<HelpDisplay::ModuleTooltipInfo> HelpDisplay::sTooltips;
 
 HelpDisplay::HelpDisplay()
 : mShowTooltipsCheckbox(nullptr)
 , mWidth(700)
 , mHeight(700)
-, mTooltipsLoaded(false)
 {
    LoadHelp();
 }
@@ -98,7 +99,7 @@ void HelpDisplay::LoadTooltips()
    else
       tooltipsPath = ofToResourcePath(TheSynth->GetUserPrefs()["tooltips"].asString());
 
-   mTooltips.clear();
+   sTooltips.clear();
 
    ModuleTooltipInfo moduleInfo;
    UIControlTooltipInfo controlInfo;
@@ -118,7 +119,7 @@ void HelpDisplay::LoadTooltips()
             if (tokens.size() == 2)
             {
                if (!moduleInfo.module.empty())
-                  mTooltips.push_back(moduleInfo); //add this one and start a new one
+                  sTooltips.push_back(moduleInfo); //add this one and start a new one
                moduleInfo.module = tokens[0];
                moduleInfo.tooltip = tokens[1];
                moduleInfo.controlTooltips.clear();
@@ -133,14 +134,14 @@ void HelpDisplay::LoadTooltips()
       }
    }
 
-   mTooltips.push_back(moduleInfo); //get the last one
+   sTooltips.push_back(moduleInfo); //get the last one
 
-   mTooltipsLoaded = true;
+   sTooltipsLoaded = true;
 }
 
 HelpDisplay::ModuleTooltipInfo* HelpDisplay::FindModuleInfo(string moduleTypeName)
 {
-   for (auto& info : mTooltips)
+   for (auto& info : sTooltips)
    {
       if (info.module == moduleTypeName)
          return &info;

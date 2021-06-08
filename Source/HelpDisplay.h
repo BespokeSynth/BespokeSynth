@@ -65,8 +65,8 @@ private:
    ClickButton* mTutorialVideoLinkButton;
    float mWidth;
    float mHeight;
-   bool mTooltipsLoaded;
-   list<ModuleTooltipInfo> mTooltips;
+   static bool sTooltipsLoaded;
+   static list<ModuleTooltipInfo> sTooltips;
 };
 
 #endif /* defined(__Bespoke__HelpDisplay__) */
