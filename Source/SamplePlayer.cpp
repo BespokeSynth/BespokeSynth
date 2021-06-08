@@ -1204,7 +1204,7 @@ void SamplePlayer::DrawModule()
       ofRect(mZoomOffset*(mWidth-10)+5, mHeight - 7, (mWidth-10)/mZoomLevel, 7);
    }
    
-   if (mHoveredCuePointIndex != -1 && mSample && mSample->LengthInSamples() > 0)
+   if (mHoveredCuePointIndex != -1 && mSample && mSample->LengthInSamples() > 0 && !mRecord)
    {
       float x = ofMap(mSampleCuePoints[mHoveredCuePointIndex].startSeconds, GetZoomStartSeconds(), GetZoomEndSeconds(), 0, sampleWidth);
       float xEnd = ofMap(mSampleCuePoints[mHoveredCuePointIndex].startSeconds + mSampleCuePoints[mHoveredCuePointIndex].lengthSeconds, GetZoomStartSeconds(), GetZoomEndSeconds(), 0, sampleWidth);
