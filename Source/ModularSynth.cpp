@@ -36,6 +36,7 @@
 #include "UserPrefsEditor.h"
 #include "Canvas.h"
 #include "EffectChain.h"
+#include "ClickButton.h"
 
 ModularSynth* TheSynth = nullptr;
 
@@ -1105,6 +1106,7 @@ void ModularSynth::MouseScrolled(float x, float y, bool canZoomCanvas)
       float movementScale = 3;
       FloatSlider* floatSlider = dynamic_cast<FloatSlider*>(gHoveredUIControl);
       IntSlider* intSlider = dynamic_cast<IntSlider*>(gHoveredUIControl);
+      ClickButton* clickButton = dynamic_cast<ClickButton*>(gHoveredUIControl);
       if (floatSlider || intSlider)
       {
          float w,h;
@@ -1114,6 +1116,9 @@ void ModularSynth::MouseScrolled(float x, float y, bool canZoomCanvas)
          if (GetKeyModifiers() & kModifier_Shift)
             movementScale *= .01f;
       }
+
+      if (clickButton)
+         return;
          
       float change = y/100 * movementScale;
          
