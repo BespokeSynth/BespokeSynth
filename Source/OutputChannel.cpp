@@ -40,10 +40,12 @@ void OutputChannel::CreateUIControls()
 
 void OutputChannel::Process(double time)
 {
-   SyncBuffers();
+   int numChannels = mChannelSelectionIndex < mStereoSelectionOffset ? 1 : 2;
+
+   SyncBuffers(numChannels);
 
    int channelSelectionIndex = mChannelSelectionIndex;
-   if (mChannelSelectionIndex < mStereoSelectionOffset)  //mono
+   if (numChannels == 1)
    {
       int channel = channelSelectionIndex;
       if (channel >= 0 && channel < TheSynth->GetNumOutputChannels())
@@ -59,10 +61,11 @@ void OutputChannel::Process(double time)
          GetVizBuffer()->WriteChunk(GetBuffer()->GetChannel(0), gBufferSize, 0);
       }
       int channel2 = channel1 + 1;
+      int inputChannel2 = (GetBuffer()->NumActiveChannels() >= 2) ? 1 : 0;
       if (channel2 >= 0 && channel2 < TheSynth->GetNumOutputChannels())
       {
-         Add(TheSynth->GetOutputBuffer(channel2), GetBuffer()->GetChannel(1), gBufferSize);
-         GetVizBuffer()->WriteChunk(GetBuffer()->GetChannel(1), gBufferSize, 1);
+         Add(TheSynth->GetOutputBuffer(channel2), GetBuffer()->GetChannel(inputChannel2), gBufferSize);
+         GetVizBuffer()->WriteChunk(GetBuffer()->GetChannel(inputChannel2), gBufferSize, 1);
       }
    }
 
