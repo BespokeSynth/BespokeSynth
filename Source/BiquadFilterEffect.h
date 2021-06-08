@@ -33,6 +33,7 @@ public:
    
    void SetFilterType(FilterType type) { mBiquad[0].SetFilterType(type); }
    void SetFilterParams(float f, float q) { mBiquad[0].SetFilterParams(f, q); }
+   void Clear();
    
    //IAudioEffect
    void ProcessAudio(double time, ChannelBuffer* buffer) override;

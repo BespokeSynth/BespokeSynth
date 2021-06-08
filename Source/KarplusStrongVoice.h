@@ -32,14 +32,13 @@ class KarplusStrongVoiceParams : public IVoiceParams
 {
 public:
    KarplusStrongVoiceParams()
-   : mFilter(.6f)
+   : mFilter(1)
    , mVol(1.0f)
-   , mFeedback(.998f)
+   , mFeedback(.98f)
    , mSourceType(kSourceTypeMix)
    , mInvert(false)
-   , mStretch(false)
    , mExciterFreq(100)
-   , mExciterAttack(3)
+   , mExciterAttack(1)
    , mExciterDecay(3)
    , mExcitation(0)
    {}
@@ -48,7 +47,6 @@ public:
    float mFeedback;
    KarplusStrongSourceType mSourceType;
    bool mInvert;
-   bool mStretch;
    float mExciterFreq;
    float mExciterAttack;
    float mExciterDecay;
@@ -74,7 +72,7 @@ private:
    ::ADSR mEnv;
    KarplusStrongVoiceParams* mVoiceParams;
    RollingBuffer mBuffer;
-   float mFilterSample;
+   float mFilteredSample;
    Ramp mMuteRamp;
    float mLastBufferSample;
    bool mActive;

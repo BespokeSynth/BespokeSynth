@@ -42,7 +42,7 @@ public:
 
    void DropdownUpdated(DropdownList* list, int oldVal) override;
    void FloatSliderUpdated(FloatSlider* slider, float oldVal) override;
-   void CheckboxUpdated(Checkbox* checkbox) override {}
+   void CheckboxUpdated(Checkbox* checkbox) override;
 
    bool HasDebugDraw() const override { return true; }
    

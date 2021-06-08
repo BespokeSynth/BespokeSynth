@@ -146,15 +146,23 @@ void BiquadFilterEffect::GetModuleDimensions(float& width, float& height)
    height = 69;
 }
 
+void BiquadFilterEffect::Clear()
+{
+   for (int i = 0; i < ChannelBuffer::kMaxNumChannels; ++i)
+      mBiquad[i].Clear();
+}
+
 void BiquadFilterEffect::ResetFilter()
 {
    if (mBiquad[0].mType == kFilterType_Lowpass)
       mBiquad[0].SetFilterParams(mFSlider->GetMax(), sqrt(2) / 2);
    if (mBiquad[0].mType == kFilterType_Highpass)
       mBiquad[0].SetFilterParams(mFSlider->GetMin(), sqrt(2) / 2);
+
+   for (int ch = 1; ch < ChannelBuffer::kMaxNumChannels; ++ch)
+      mBiquad[ch].CopyCoeffFrom(mBiquad[0]);
    
-   for (int i=0; i<ChannelBuffer::kMaxNumChannels; ++i)
-      mBiquad[i].Clear();
+   Clear();
 }
 
 void BiquadFilterEffect::DropdownUpdated(DropdownList* list, int oldVal)

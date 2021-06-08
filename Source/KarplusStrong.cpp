@@ -33,7 +33,7 @@ KarplusStrong::KarplusStrong()
    mBiquad.SetPosition(150,15);
    mBiquad.SetEnabled(true);
    mBiquad.SetFilterType(kFilterType_Lowpass);
-   mBiquad.SetFilterParams(1600, sqrt(2)/2);
+   mBiquad.SetFilterParams(3000, sqrt(2)/2);
    mBiquad.SetName("biquad");
    
    for (int i=0; i<ChannelBuffer::kMaxNumChannels; ++i)
@@ -49,12 +49,12 @@ void KarplusStrong::CreateUIControls()
    IDrawableModule::CreateUIControls();
    mVolSlider = new FloatSlider(this,"vol",3,2,80,15,&mVoiceParams.mVol,0,2);
    mInvertCheckbox = new Checkbox(this,"invert",mVolSlider,kAnchor_Right,&mVoiceParams.mInvert);
-   mFilterSlider = new FloatSlider(this,"filter",mVolSlider,kAnchor_Below,140,15,&mVoiceParams.mFilter,0,1.2f);
+   mFilterSlider = new FloatSlider(this,"filter",mVolSlider,kAnchor_Below,140,15,&mVoiceParams.mFilter,0,5);
    mFeedbackSlider = new FloatSlider(this,"feedback",mFilterSlider,kAnchor_Below,140,15,&mVoiceParams.mFeedback,.9f,.9999f,4);
    mSourceDropdown = new DropdownList(this,"source type",mFeedbackSlider,kAnchor_Below,(int*)&mVoiceParams.mSourceType,45);
    mExciterFreqSlider = new FloatSlider(this,"x freq",mSourceDropdown,kAnchor_Right,92,15,&mVoiceParams.mExciterFreq,10,4000);
-   mExciterAttackSlider = new FloatSlider(this,"x att",mSourceDropdown,kAnchor_Below,69,15,&mVoiceParams.mExciterAttack,0,40);
-   mExciterDecaySlider = new FloatSlider(this,"x dec",mExciterAttackSlider,kAnchor_Right,68,15,&mVoiceParams.mExciterDecay,0,40);
+   mExciterAttackSlider = new FloatSlider(this,"x att",mSourceDropdown,kAnchor_Below,69,15,&mVoiceParams.mExciterAttack,0.01f,40);
+   mExciterDecaySlider = new FloatSlider(this,"x dec",mExciterAttackSlider,kAnchor_Right,68,15,&mVoiceParams.mExciterDecay,0.01f,40);
    //mStretchCheckbox = new Checkbox(this,"stretch",mVolSlider,kAnchor_Right,&mVoiceParams.mStretch);
    
    mSourceDropdown->AddLabel("sin", kSourceTypeSin);
@@ -62,6 +62,7 @@ void KarplusStrong::CreateUIControls()
    mSourceDropdown->AddLabel("mix", kSourceTypeMix);
    mSourceDropdown->AddLabel("saw", kSourceTypeSaw);
    
+   mFilterSlider->SetMode(FloatSlider::kSquare);
    mExciterFreqSlider->SetMode(FloatSlider::kSquare);
    mExciterAttackSlider->SetMode(FloatSlider::kSquare);
    mExciterDecaySlider->SetMode(FloatSlider::kSquare);
@@ -140,6 +141,8 @@ void KarplusStrong::DrawModule()
    mVolSlider->Draw();
    mSourceDropdown->Draw();
    mInvertCheckbox->Draw();
+
+   mExciterFreqSlider->SetShowing(mVoiceParams.mSourceType != kSourceTypeNoise);
    
    //mStretchCheckbox->Draw();
    mExciterFreqSlider->Draw();
@@ -165,10 +168,27 @@ void KarplusStrong::FloatSliderUpdated(FloatSlider* slider, float oldVal)
 {
 }
 
+void KarplusStrong::CheckboxUpdated(Checkbox* checkbox)
+{
+   if (checkbox == mEnabledCheckbox)
+   {
+      mPolyMgr.KillAll();
+      for (int ch = 0; ch < ChannelBuffer::kMaxNumChannels; ++ch)
+         mDCRemover[ch].Clear();
+      mBiquad.Clear();
+   }
+}
+
 void KarplusStrong::LoadLayout(const ofxJSONElement& moduleInfo)
 {
    mModuleSaveData.LoadString("target", moduleInfo);
    mModuleSaveData.LoadInt("voicelimit", moduleInfo, -1, -1, kNumVoices);
+   EnumMap oversamplingMap;
+   oversamplingMap["1"] = 1;
+   oversamplingMap["2"] = 2;
+   oversamplingMap["4"] = 4;
+   oversamplingMap["8"] = 8;
+   mModuleSaveData.LoadEnum<int>("oversampling", moduleInfo, 1, nullptr, &oversamplingMap);
    mModuleSaveData.LoadBool("mono", moduleInfo, false);
 
    SetUpFromSaveData();
@@ -184,6 +204,9 @@ void KarplusStrong::SetUpFromSaveData()
 
    bool mono = mModuleSaveData.GetBool("mono");
    mWriteBuffer.SetNumActiveChannels(mono ? 1 : 2);
+
+   int oversampling = mModuleSaveData.GetEnum<int>("oversampling");
+   mPolyMgr.SetOversampling(oversampling);
 }
 
 
