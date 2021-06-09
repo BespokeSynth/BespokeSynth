@@ -124,10 +124,6 @@ bool KarplusStrongVoice::Process(double time, ChannelBuffer* out, int oversampli
       FIX_DENORMAL(sample);
 
       mBuffer.Write(sample, 0);
-
-      float output = sample * mVoiceParams->mVol/10.0f;// * (1 + GetPressure(pos*renderRatio));
-      FIX_DENORMAL(output);
-      AssertIfDenormal(output);
       
       if (channels == 1)
       {

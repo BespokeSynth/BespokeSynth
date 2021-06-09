@@ -33,7 +33,6 @@ class KarplusStrongVoiceParams : public IVoiceParams
 public:
    KarplusStrongVoiceParams()
    : mFilter(1)
-   , mVol(1.0f)
    , mFeedback(.98f)
    , mSourceType(kSourceTypeMix)
    , mInvert(false)
@@ -43,7 +42,6 @@ public:
    , mExcitation(0)
    {}
    float mFilter;
-   float mVol;
    float mFeedback;
    KarplusStrongSourceType mSourceType;
    bool mInvert;

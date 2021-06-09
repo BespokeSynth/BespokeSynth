@@ -61,6 +61,7 @@ private:
    KarplusStrongVoiceParams mVoiceParams;
    FloatSlider* mFilterSlider;
    FloatSlider* mFeedbackSlider;
+   float mVolume;
    FloatSlider* mVolSlider;
    DropdownList* mSourceDropdown;
    Checkbox* mInvertCheckbox;

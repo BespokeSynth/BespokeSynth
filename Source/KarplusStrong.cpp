@@ -16,6 +16,7 @@
 KarplusStrong::KarplusStrong()
 : mFilterSlider(nullptr)
 , mFeedbackSlider(nullptr)
+, mVolume(1)
 , mVolSlider(nullptr)
 , mSourceDropdown(nullptr)
 , mInvertCheckbox(nullptr)
@@ -47,7 +48,7 @@ KarplusStrong::KarplusStrong()
 void KarplusStrong::CreateUIControls()
 {
    IDrawableModule::CreateUIControls();
-   mVolSlider = new FloatSlider(this,"vol",3,2,80,15,&mVoiceParams.mVol,0,2);
+   mVolSlider = new FloatSlider(this,"vol",3,2,80,15,&mVolume,0,2);
    mInvertCheckbox = new Checkbox(this,"invert",mVolSlider,kAnchor_Right,&mVoiceParams.mInvert);
    mFilterSlider = new FloatSlider(this,"filter",mVolSlider,kAnchor_Below,140,15,&mVoiceParams.mFilter,0,5);
    mFeedbackSlider = new FloatSlider(this,"feedback",mFilterSlider,kAnchor_Below,140,15,&mVoiceParams.mFeedback,.9f,.9999f,4);
@@ -93,9 +94,10 @@ void KarplusStrong::Process(double time)
    mWriteBuffer.Clear();
    mPolyMgr.Process(time, &mWriteBuffer, bufferSize);
    
-   if (!mVoiceParams.mInvert)  //unnecessary if inversion is eliminating dc offset
+   for (int ch = 0; ch < mWriteBuffer.NumActiveChannels(); ++ch)
    {
-      for (int ch=0; ch<mWriteBuffer.NumActiveChannels(); ++ch)
+      Mult(mWriteBuffer.GetChannel(ch), mVolume, bufferSize);
+      if (!mVoiceParams.mInvert)  //unnecessary if inversion is eliminating dc offset
          mDCRemover[ch].Filter(mWriteBuffer.GetChannel(ch), bufferSize);
    }
 
