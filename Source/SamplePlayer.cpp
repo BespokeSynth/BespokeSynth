@@ -921,7 +921,8 @@ bool SamplePlayer::MouseMoved(float x, float y)
    }
    
    mHoveredCuePointIndex = -1;
-   if (y > 60 && y < mHeight - 20 && mSample != nullptr)
+   if (y > 60 && y < mHeight - 20 && mSample != nullptr &&
+       gHoveredUIControl == nullptr)   //make sure we don't update our hover while dragging a slider
    {
       for (size_t i=0; i<mSampleCuePoints.size(); ++i)
       {
