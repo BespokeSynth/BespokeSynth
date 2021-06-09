@@ -920,21 +920,23 @@ bool SamplePlayer::MouseMoved(float x, float y)
          SetCuePointForX(x);
    }
    
-   mHoveredCuePointIndex = -1;
-   if (y > 60 && y < mHeight - 20 && mSample != nullptr &&
-       gHoveredUIControl == nullptr)   //make sure we don't update our hover while dragging a slider
+   if (gHoveredUIControl == nullptr)    //make sure we don't update our hover while dragging a slider
    {
-      for (size_t i=0; i<mSampleCuePoints.size(); ++i)
+      mHoveredCuePointIndex = -1;
+      if (y > 60 && y < mHeight - 20 && mSample != nullptr)
       {
-         if (mSampleCuePoints[i].lengthSeconds > 0)
+         for (size_t i = 0; i < mSampleCuePoints.size(); ++i)
          {
-            float seconds = GetSecondsForMouse(x);
-            if (seconds >= mSampleCuePoints[i].startSeconds && seconds <= mSampleCuePoints[i].startSeconds + mSampleCuePoints[i].lengthSeconds)
+            if (mSampleCuePoints[i].lengthSeconds > 0)
             {
-               mHoveredCuePointIndex = (int)i;
-               mActiveCuePointIndex = (int)i;
-               UpdateActiveCuePoint();
-               break;
+               float seconds = GetSecondsForMouse(x);
+               if (seconds >= mSampleCuePoints[i].startSeconds && seconds <= mSampleCuePoints[i].startSeconds + mSampleCuePoints[i].lengthSeconds)
+               {
+                  mHoveredCuePointIndex = (int)i;
+                  mActiveCuePointIndex = (int)i;
+                  UpdateActiveCuePoint();
+                  break;
+               }
             }
          }
       }
