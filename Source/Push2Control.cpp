@@ -323,8 +323,10 @@ void Push2Control::DrawToFramebuffer(NVGcontext* vg, NVGLUframebuffer* fb, float
       DrawDisplayModuleControls();
 
       string stateInfo = "";
-      if (mAllowRepatch)
-         stateInfo = "repatch mode: hold a source module and tap the target module";
+      if (mAllowRepatch && mHeldModule == nullptr)
+         stateInfo = "repatch mode: hold a source module and tap the destination module";
+      if (mAllowRepatch && mHeldModule != nullptr)
+         stateInfo = "repatch mode: now tap destination for " + string(mHeldModule->Name());
       if (mNewButtonHeld)
          stateInfo = "tap control to add favorite...";
       if (mDeleteButtonHeld)
@@ -917,7 +919,7 @@ void Push2Control::OnMidiNote(MidiNote& note)
          
          if (mHeldModule != nullptr)
          {
-            if (mHeldModule->GetPatchCableSource() != nullptr)
+            if (mAllowRepatch && mHeldModule->GetPatchCableSource() != nullptr)
             {
                mHeldModule->GetPatchCableSource()->FindValidTargets();
                if (mHeldModule->GetPatchCableSource()->IsValidTarget(mModuleGrid[gridIndex]))
