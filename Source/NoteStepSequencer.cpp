@@ -26,6 +26,7 @@ NoteStepSequencer::NoteStepSequencer()
 , mGrid(nullptr)
 , mLastPitch(-1)
 , mLastVel(0)
+, mLastStepIndex(-1)
 , mOctave(3)
 , mOctaveSlider(nullptr)
 , mNoteMode(kNoteMode_Scale)
@@ -446,7 +447,7 @@ void NoteStepSequencer::OnTransportAdvanced(float amount)
       if (gTime > mLastNoteEndTime)
       {
          PlayNoteOutput(gTime, mLastPitch, 0);
-         if (mShowStepControls && mLastStepIndex < (int)mStepCables.size())
+         if (mShowStepControls && mLastStepIndex < (int)mStepCables.size() && mLastStepIndex != -1)
             SendNoteToCable(mLastStepIndex, gTime, mLastPitch, 0);
          mAlreadyDidNoteOff = true;
       }
@@ -523,7 +524,7 @@ void NoteStepSequencer::Step(double time, float velocity, int pulseFlags)
       if (mLastPitch == outPitch && !mAlreadyDidNoteOff)   //same note, play noteoff first
       {
          PlayNoteOutput(time, mLastPitch, 0, -1);
-         if (mShowStepControls && mLastStepIndex < (int)mStepCables.size())
+         if (mShowStepControls && mLastStepIndex < (int)mStepCables.size() && mLastStepIndex != -1)
             SendNoteToCable(mLastStepIndex, time, mLastPitch, 0);
          mAlreadyDidNoteOff = true;
          offPitch = -1;
