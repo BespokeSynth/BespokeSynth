@@ -126,25 +126,6 @@ void DrumPlayer::DrumHit::CreateUIControls(DrumPlayer* owner, int index)
    mTestButton = new ClickButton(owner,("test "+ofToString(index)).c_str(),x+5,y+40);
    mRandomButton = new ClickButton(owner,("random "+ofToString(index)).c_str(),x+5,y+53);
    
-   string hitCategory = "Percussion";
-   if (index == 0)
-      hitCategory = "Kick";
-   if (index == 1)
-      hitCategory = "Snare";
-   if (index == 2 || index == 6)
-      hitCategory = "Hihat";
-   if (index == 3)
-      hitCategory = "Ride";
-   if (index == 4)
-      hitCategory = "Shaker";
-   if (index == 5)
-      hitCategory = "Crash";
-   if (index == 6)
-      hitCategory = "Percussion";
-   if (index == 7)
-      hitCategory = "Clap";
-   mHitCategory = hitCategory;
-   
    UpdateHitDirectoryDropdown();
    
    mOwner = owner;
@@ -194,7 +175,14 @@ void DrumPlayer::Poll()
 
 void DrumPlayer::SetUpNewDrumPlayer()
 {
-   array<string, 8> categories = { "808kit/Kick", "808kit/Snare", "808kit/HatClosed", "808kit/HatOpen", "808kit/Kick", "808kit/Clap", "808kit/HatClosed", "808kit/Perc"};
+   ofxJSONElement root;
+   root.open(ofToDataPath("drums/drums.json"));
+
+   array<string, NUM_DRUM_HITS> categories = { "808kit/Kick", "808kit/Snare", "808kit/HatClosed", "808kit/HatOpen", "808kit/Kick", "808kit/Clap", "808kit/HatClosed", "808kit/Perc",
+                                               "808kit/Kick", "808kit/Snare", "808kit/HatClosed", "808kit/HatOpen", "808kit/Kick", "808kit/Clap", "808kit/HatClosed", "808kit/Perc" };
+   for (size_t i = 0; i < root["directories"].size() && i < categories.size(); ++i)
+      categories[i] = root["directories"][i].asString();
+
    for (int i = 0; i < NUM_DRUM_HITS; ++i)
    {
       string category = categories[i % categories.size()];
@@ -853,13 +841,13 @@ void DrumPlayer::SaveKits()
       kit["name"] = mKits[i].mName;
    }
 
-   root.save(ofToDataPath("drums/drums.json"), true);
+   root.save(ofToDataPath("drums/drumkits.json"), true);
 }
 
 void DrumPlayer::ReadKits()
 {
    ofxJSONElement root;
-   root.open(ofToDataPath("drums/drums.json"));
+   root.open(ofToDataPath("drums/drumkits.json"));
 
    Json::Value& kits = root["kits"];
    mKits.resize(kits.size());
