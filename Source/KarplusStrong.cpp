@@ -14,7 +14,8 @@
 #include "Profiler.h"
 
 KarplusStrong::KarplusStrong()
-: mFilterSlider(nullptr)
+: IAudioProcessor(gBufferSize)
+, mFilterSlider(nullptr)
 , mFeedbackSlider(nullptr)
 , mVolume(1)
 , mVolSlider(nullptr)
@@ -62,6 +63,7 @@ void KarplusStrong::CreateUIControls()
    mSourceDropdown->AddLabel("white", kSourceTypeNoise);
    mSourceDropdown->AddLabel("mix", kSourceTypeMix);
    mSourceDropdown->AddLabel("saw", kSourceTypeSaw);
+   mSourceDropdown->AddLabel("input", kSourceTypeInput);
    
    mFilterSlider->SetMode(FloatSlider::kSquare);
    mExciterFreqSlider->SetMode(FloatSlider::kSquare);
@@ -84,6 +86,8 @@ void KarplusStrong::Process(double time)
    if (!mEnabled || target == nullptr)
       return;
    
+   SyncBuffers(2);
+
    mNoteInputBuffer.Process(time);
 
    ComputeSliders(0);
@@ -109,6 +113,8 @@ void KarplusStrong::Process(double time)
       GetVizBuffer()->WriteChunk(mWriteBuffer.GetChannel(ch),mWriteBuffer.BufferSize(), ch);
       Add(target->GetBuffer()->GetChannel(ch), mWriteBuffer.GetChannel(ch), gBufferSize);
    }
+
+   GetBuffer()->Reset();
 }
 
 void KarplusStrong::PlayNote(double time, int pitch, int velocity, int voiceIdx, ModulationParameters modulation)
@@ -144,7 +150,7 @@ void KarplusStrong::DrawModule()
    mSourceDropdown->Draw();
    mInvertCheckbox->Draw();
 
-   mExciterFreqSlider->SetShowing(mVoiceParams.mSourceType != kSourceTypeNoise);
+   mExciterFreqSlider->SetShowing(mVoiceParams.mSourceType == kSourceTypeSin || mVoiceParams.mSourceType == kSourceTypeSin || mVoiceParams.mSourceType == kSourceTypeMix);
    
    //mStretchCheckbox->Draw();
    mExciterFreqSlider->Draw();

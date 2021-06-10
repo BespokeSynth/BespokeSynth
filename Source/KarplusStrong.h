@@ -10,7 +10,7 @@
 #define __modularSynth__KarplusStrong__
 
 #include <iostream>
-#include "IAudioSource.h"
+#include "IAudioProcessor.h"
 #include "PolyphonyMgr.h"
 #include "KarplusStrongVoice.h"
 #include "ADSR.h"
@@ -22,7 +22,7 @@
 #include "BiquadFilterEffect.h"
 #include "ChannelBuffer.h"
 
-class KarplusStrong : public IAudioSource, public INoteReceiver, public IDrawableModule, public IDropdownListener, public IFloatSliderListener
+class KarplusStrong : public IAudioProcessor, public INoteReceiver, public IDrawableModule, public IDropdownListener, public IFloatSliderListener
 {
 public:
    KarplusStrong();

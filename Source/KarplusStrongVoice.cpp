@@ -7,6 +7,7 @@
 //
 
 #include "KarplusStrongVoice.h"
+#include "KarplusStrong.h"
 #include "EnvOscillator.h"
 #include "SynthGlobals.h"
 #include "Scale.h"
@@ -29,6 +30,8 @@ KarplusStrongVoice::KarplusStrongVoice(IDrawableModule* owner)
    mEnv.GetStageData(1).target = 0;
    mEnv.GetStageData(1).time = 3;
    ClearVoice();
+
+   mKarplusStrongModule = dynamic_cast<KarplusStrong*>(mOwner);
 }
 
 KarplusStrongVoice::~KarplusStrongVoice()
@@ -83,18 +86,18 @@ bool KarplusStrongVoice::Process(double time, ChannelBuffer* out, int oversampli
          mOsc.SetType(kOsc_Sin);
       mOscPhase += oscPhaseInc;
       float sample = 0;
-      float sinSample = mOsc.Audio(time, mOscPhase);
+      float oscSample = mOsc.Audio(time, mOscPhase);
       float noiseSample = RandomSample();
       float pitchBlend = ofClamp((pitch - 40) / 60.0f,0,1);
       pitchBlend *= pitchBlend;
-      if (mVoiceParams->mSourceType == kSourceTypeSin)
-         sample = sinSample;
+      if (mVoiceParams->mSourceType == kSourceTypeSin || mVoiceParams->mSourceType == kSourceTypeSaw)
+         sample = oscSample;
       else if (mVoiceParams->mSourceType == kSourceTypeNoise)
          sample = noiseSample;
       else if (mVoiceParams->mSourceType == kSourceTypeMix)
-         sample = noiseSample*pitchBlend + sinSample*(1-pitchBlend);
-      else if (mVoiceParams->mSourceType == kSourceTypeSaw)
-         sample = mOsc.Audio(time, mOscPhase) / (1+pitchBlend*6);   //quieter at higher pitches
+         sample = noiseSample * pitchBlend + oscSample * (1 - pitchBlend);
+      else if (mVoiceParams->mSourceType == kSourceTypeInput)
+         sample = mKarplusStrongModule->GetBuffer()->GetChannel(0)[pos / oversampling];
       sample *= mEnv.Value(time) + mVoiceParams->mExcitation;
 
       float samplesAgo = sampleRate / freq;

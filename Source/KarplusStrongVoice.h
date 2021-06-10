@@ -19,13 +19,15 @@
 #include "Ramp.h"
 
 class IDrawableModule;
+class KarplusStrong;
 
 enum KarplusStrongSourceType
 {
    kSourceTypeSin,
    kSourceTypeNoise,
    kSourceTypeMix,
-   kSourceTypeSaw
+   kSourceTypeSaw,
+   kSourceTypeInput
 };
 
 class KarplusStrongVoiceParams : public IVoiceParams
@@ -75,6 +77,7 @@ private:
    float mLastBufferSample;
    bool mActive;
    IDrawableModule* mOwner;
+   KarplusStrong* mKarplusStrongModule;
 };
 
 #endif /* defined(__modularSynth__KarplusStrongVoice__) */
