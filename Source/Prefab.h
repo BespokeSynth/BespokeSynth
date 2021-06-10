@@ -45,6 +45,9 @@ public:
    void PostRepatch(PatchCableSource* cableSource, bool fromUserClick) override;
    
    void LoadPrefab(string loadPath);
+
+   static bool sSavingPrefab;
+   static bool sLoadingPrefab;
    
 private:
    //IDrawableModule

@@ -17,6 +17,7 @@
 #include "Scale.h"
 #include "UIControlMacros.h"
 #include "PatchCableSource.h"
+#include "Prefab.h"
 #if BESPOKE_WINDOWS
 #undef ssize_t
 #endif
@@ -67,7 +68,7 @@ ScriptModule::ScriptModule()
 , mShowJediWarning(false)
 {
    CheckIfPythonEverSuccessfullyInitialized();
-   if (TheSynth->IsLoadingState() && sHasPythonEverSuccessfullyInitialized)
+   if ((TheSynth->IsLoadingState() || Prefab::sLoadingPrefab) && sHasPythonEverSuccessfullyInitialized)
       InitializePythonIfNecessary();
 
    Reset();
@@ -1196,6 +1197,19 @@ bool ScriptModule::IsNonWhitespace(string line)
          return true;
    }
    return false;
+}
+
+static string sContextToRestore = "";
+void ScriptModule::SetContext()
+{
+   sContextToRestore = IClickable::sLoadContext;
+   if (GetOwningContainer()->GetOwner() != nullptr)
+      IClickable::SetLoadContext(GetOwningContainer()->GetOwner());
+}
+
+void ScriptModule::ClearContext()
+{
+   IClickable::sLoadContext = sContextToRestore;
 }
 
 void ScriptModule::OnModuleReferenceBound(IDrawableModule* target)

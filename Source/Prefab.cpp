@@ -12,6 +12,9 @@
 #include "ModularSynth.h"
 #include "PatchCableSource.h"
 
+//static
+bool Prefab::sLoadingPrefab = false;
+
 Prefab::Prefab()
 {
    mModuleContainer.SetOwner(this);
@@ -207,6 +210,8 @@ void Prefab::SavePrefab(string savePath)
 
 void Prefab::LoadPrefab(string loadPath)
 {
+   sLoadingPrefab = true;
+
    ScopedMutex mutex(TheSynth->GetAudioMutex(), "LoadPrefab()");
    ScopedLock renderLock(*TheSynth->GetRenderLock());
    
@@ -233,6 +238,8 @@ void Prefab::LoadPrefab(string loadPath)
    mModuleContainer.LoadModules(root["modules"]);
    
    mModuleContainer.LoadState(in);
+
+   sLoadingPrefab = false;
 }
 
 void Prefab::UpdatePrefabName(string path)

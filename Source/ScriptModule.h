@@ -51,6 +51,8 @@ public:
    void ConnectOscInput(int port);
    void MidiReceived(MidiMessageType messageType, int control, float value, int channel);
    void OnModuleReferenceBound(IDrawableModule* target);
+   void SetContext();
+   void ClearContext();
    
    void RunCode(double time, string code);
    

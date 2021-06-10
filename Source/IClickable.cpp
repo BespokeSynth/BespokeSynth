@@ -9,6 +9,7 @@
 #include "IClickable.h"
 #include "SynthGlobals.h"
 #include "IDrawableModule.h"
+#include "Prefab.h"
 
 string IClickable::sLoadContext = "";
 string IClickable::sSaveContext = "";
@@ -139,9 +140,16 @@ string IClickable::Path(bool ignoreContext)
       if (sLoadContext != "")
       {
          if (path[0] == '$')
-            path = path.substr(1, path.length()-1);
+         {
+            if (Prefab::sLoadingPrefab)
+               path = "";
+            else
+               path = path.substr(1, path.length() - 1);
+         }
          else
+         {
             path = sLoadContext + path;
+         }
       }
       if (sSaveContext != "")
       {

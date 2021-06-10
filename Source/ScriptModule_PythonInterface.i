@@ -214,8 +214,10 @@ PYBIND11_EMBEDDED_MODULE(notesequencer, m)
 {
    m.def("get", [](string path)
    {
+      ScriptModule::sMostRecentLineExecutedModule->SetContext();
       auto* ret = dynamic_cast<NoteStepSequencer*>(TheSynth->FindModule(path));
       ScriptModule::sMostRecentLineExecutedModule->OnModuleReferenceBound(ret);
+      ScriptModule::sMostRecentLineExecutedModule->ClearContext();
       return ret;
    }, py::return_value_policy::reference);
    py::class_<NoteStepSequencer, IDrawableModule>(m, "notesequencer")
@@ -229,8 +231,10 @@ PYBIND11_EMBEDDED_MODULE(drumsequencer, m)
 {
    m.def("get", [](string path)
    {
+      ScriptModule::sMostRecentLineExecutedModule->SetContext();
       auto* ret = dynamic_cast<StepSequencer*>(TheSynth->FindModule(path));
       ScriptModule::sMostRecentLineExecutedModule->OnModuleReferenceBound(ret);
+      ScriptModule::sMostRecentLineExecutedModule->ClearContext();
       return ret;
    }, py::return_value_policy::reference);
    py::class_<StepSequencer, IDrawableModule>(m, "drumsequencer")
@@ -248,8 +252,10 @@ PYBIND11_EMBEDDED_MODULE(grid, m)
 {
    m.def("get", [](string path)
    {
+      ScriptModule::sMostRecentLineExecutedModule->SetContext();
       auto* ret = dynamic_cast<GridModule*>(TheSynth->FindModule(path));
       ScriptModule::sMostRecentLineExecutedModule->OnModuleReferenceBound(ret);
+      ScriptModule::sMostRecentLineExecutedModule->ClearContext();
       return ret;
    }, py::return_value_policy::reference);
    ///example: g = grid.get("grid")  #assuming there's a grid called "grid" somewhere in the layout
@@ -310,8 +316,10 @@ PYBIND11_EMBEDDED_MODULE(notecanvas, m)
 {
    m.def("get", [](string path)
    {
+      ScriptModule::sMostRecentLineExecutedModule->SetContext();
       auto* ret = dynamic_cast<NoteCanvas*>(TheSynth->FindModule(path));
       ScriptModule::sMostRecentLineExecutedModule->OnModuleReferenceBound(ret);
+      ScriptModule::sMostRecentLineExecutedModule->ClearContext();
       return ret;
    }, py::return_value_policy::reference);
    py::class_<NoteCanvas, IDrawableModule>(m, "notecanvas")
@@ -329,8 +337,10 @@ PYBIND11_EMBEDDED_MODULE(sampleplayer, m)
 {
    m.def("get", [](string path)
    {
+      ScriptModule::sMostRecentLineExecutedModule->SetContext();
       auto* ret = dynamic_cast<SamplePlayer*>(TheSynth->FindModule(path));
       ScriptModule::sMostRecentLineExecutedModule->OnModuleReferenceBound(ret);
+      ScriptModule::sMostRecentLineExecutedModule->ClearContext();
       return ret;
    }, py::return_value_policy::reference);
    py::class_<SamplePlayer, IDrawableModule>(m, "sampleplayer")
@@ -359,17 +369,21 @@ PYBIND11_EMBEDDED_MODULE(midicontroller, m)
 {
    m.def("get", [](string path)
    {
+      ScriptModule::sMostRecentLineExecutedModule->SetContext();
       auto* ret = dynamic_cast<MidiController*>(TheSynth->FindModule(path));
       ScriptModule::sMostRecentLineExecutedModule->OnModuleReferenceBound(ret);
+      ScriptModule::sMostRecentLineExecutedModule->ClearContext();
       return ret;
    }, py::return_value_policy::reference);
    py::class_<MidiController, IDrawableModule> midiControllerClass(m, "midicontroller");
    midiControllerClass
       .def("set_connection", [](MidiController& midicontroller, MidiMessageType messageType, int control, int channel, string controlPath)
       {
+         ScriptModule::sMostRecentLineExecutedModule->SetContext();
          IUIControl* uicontrol = TheSynth->FindUIControl(controlPath.c_str());
          if (uicontrol != nullptr)
             midicontroller.AddControlConnection(messageType, control, channel, uicontrol);
+         ScriptModule::sMostRecentLineExecutedModule->ClearContext();
       })
       .def("send_note", [](MidiController& midicontroller, int pitch, int velocity, bool forceNoteOn, int channel, int page)
       {
@@ -403,8 +417,10 @@ PYBIND11_EMBEDDED_MODULE(linnstrument, m)
 {
    m.def("get", [](string path)
    {
+      ScriptModule::sMostRecentLineExecutedModule->SetContext();
       auto* ret = dynamic_cast<LinnstrumentControl*>(TheSynth->FindModule(path));
       ScriptModule::sMostRecentLineExecutedModule->OnModuleReferenceBound(ret);
+      ScriptModule::sMostRecentLineExecutedModule->ClearContext();
       return ret;
    }, py::return_value_policy::reference);
    py::class_<LinnstrumentControl, IDrawableModule> linnClass(m, "linnstrumentcontrol");
@@ -433,16 +449,19 @@ PYBIND11_EMBEDDED_MODULE(osccontroller, m)
 {
    m.def("get", [](string path)
    {
+      ScriptModule::sMostRecentLineExecutedModule->SetContext();
       MidiController* midicontroller = dynamic_cast<MidiController*>(TheSynth->FindModule(path));
       if (midicontroller)
       {
          auto* ret = dynamic_cast<OscController*>(midicontroller->GetNonstandardController());
          if (ret != nullptr)
             ScriptModule::sMostRecentLineExecutedModule->OnModuleReferenceBound(midicontroller);
+         ScriptModule::sMostRecentLineExecutedModule->ClearContext();
          return ret;
       }
       else
       {
+         ScriptModule::sMostRecentLineExecutedModule->ClearContext();
          return (OscController*)nullptr;
       }
    }, py::return_value_policy::reference);
@@ -457,8 +476,10 @@ PYBIND11_EMBEDDED_MODULE(oscoutput, m)
 {
    m.def("get", [](string path)
    {
+      ScriptModule::sMostRecentLineExecutedModule->SetContext();
       auto* ret = dynamic_cast<OSCOutput*>(TheSynth->FindModule(path));
       ScriptModule::sMostRecentLineExecutedModule->OnModuleReferenceBound(ret);
+      ScriptModule::sMostRecentLineExecutedModule->ClearContext();
       return ret;
    }, py::return_value_policy::reference);
    py::class_<OSCOutput, IDrawableModule>(m, "oscoutput")
@@ -496,8 +517,10 @@ PYBIND11_EMBEDDED_MODULE(envelope, m)
 {
    m.def("get", [](string path)
    {
+      ScriptModule::sMostRecentLineExecutedModule->SetContext();
       auto* ret = dynamic_cast<EnvelopeModulator*>(TheSynth->FindModule(path));
       ScriptModule::sMostRecentLineExecutedModule->OnModuleReferenceBound(ret);
+      ScriptModule::sMostRecentLineExecutedModule->ClearContext();
       return ret;
    }, py::return_value_policy::reference);
    py::class_<EnvelopeModulator, IDrawableModule>(m, "envelope")
@@ -517,8 +540,10 @@ PYBIND11_EMBEDDED_MODULE(drumplayer, m)
 {
    m.def("get", [](string path)
    {
+      ScriptModule::sMostRecentLineExecutedModule->SetContext();
       auto* ret = dynamic_cast<DrumPlayer*>(TheSynth->FindModule(path));
       ScriptModule::sMostRecentLineExecutedModule->OnModuleReferenceBound(ret);
+      ScriptModule::sMostRecentLineExecutedModule->ClearContext();
       return ret;
    }, py::return_value_policy::reference);
    py::class_<DrumPlayer, IDrawableModule>(m, "drumplayer")
@@ -532,8 +557,10 @@ PYBIND11_EMBEDDED_MODULE(module, m)
 {
    m.def("get", [](string path)
    {
+      ScriptModule::sMostRecentLineExecutedModule->SetContext();
       auto* ret = TheSynth->FindModule(path);
       ScriptModule::sMostRecentLineExecutedModule->OnModuleReferenceBound(ret);
+      ScriptModule::sMostRecentLineExecutedModule->ClearContext();
       return ret;
    }, py::return_value_policy::reference);
    m.def("create", [](string moduleType, int x, int y)
@@ -555,7 +582,9 @@ PYBIND11_EMBEDDED_MODULE(module, m)
       })
       .def("set", [](IDrawableModule& module, string path, float value)
       {
+         ScriptModule::sMostRecentLineExecutedModule->SetContext();
          IUIControl* control = module.FindUIControl(path.c_str(), false);
+         ScriptModule::sMostRecentLineExecutedModule->ClearContext();
          if (control != nullptr)
          {
             control->SetValue(value);
@@ -563,14 +592,18 @@ PYBIND11_EMBEDDED_MODULE(module, m)
       })
       .def("get", [](IDrawableModule& module, string path)
       {
+         ScriptModule::sMostRecentLineExecutedModule->SetContext();
          IUIControl* control = module.FindUIControl(path.c_str(), false);
+         ScriptModule::sMostRecentLineExecutedModule->ClearContext();
          if (control != nullptr)
             return control->GetValue();
          return 0.0f;
       })
       .def("adjust", [](IDrawableModule& module, string path, float amount)
       {
+         ScriptModule::sMostRecentLineExecutedModule->SetContext();
          IUIControl* control = module.FindUIControl(path.c_str(), false);
+         ScriptModule::sMostRecentLineExecutedModule->ClearContext();
          if (control != nullptr)
          {
             float min, max;

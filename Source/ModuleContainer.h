@@ -23,6 +23,7 @@ public:
    const vector<IDrawableModule*>& GetModules() const { return mModules; }
    
    void SetOwner(IDrawableModule* owner) { mOwner = owner; }
+   IDrawableModule* GetOwner() const { return mOwner; }
    void Draw();
    void DrawPatchCables();
    void DrawUnclipped();
