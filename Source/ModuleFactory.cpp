@@ -556,5 +556,8 @@ string ModuleFactory::FixUpTypeName(string name)
    if (name == "eqmodule")
       return "eq";
 
+   if (name == "bandvocoder")
+      return "vocoder";
+
    return name;
 }

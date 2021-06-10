@@ -515,6 +515,9 @@ void ModuleContainer::SaveState(FileStreamOut& out)
    }
    
    out << savedModules;
+
+   if (mOwner)
+      IClickable::SetSaveContext(mOwner);
    
    for (auto* module : mModules)
    {
@@ -527,6 +530,8 @@ void ModuleContainer::SaveState(FileStreamOut& out)
             out << GetModuleSeparator()[i];
       }
    }
+
+   IClickable::ClearSaveContext();
 }
 
 void ModuleContainer::LoadState(FileStreamIn& in)
@@ -537,6 +542,9 @@ void ModuleContainer::LoadState(FileStreamIn& in)
    
    int savedModules;
    in >> savedModules;
+
+   if (mOwner)
+      IClickable::SetLoadContext(mOwner);
    
    for (int i=0; i<savedModules; ++i)
    {
@@ -544,9 +552,11 @@ void ModuleContainer::LoadState(FileStreamIn& in)
       in >> moduleName;
       //ofLog() << "Loading " << moduleName;
       IDrawableModule* module = FindModule(moduleName, false);
-      assert(module);
       try
       {
+         if (module == nullptr)
+            throw LoadStateException();
+
          module->LoadState(in);
          
          for (int j=0; j<GetModuleSeparatorLength(); ++j)
@@ -595,6 +605,8 @@ void ModuleContainer::LoadState(FileStreamIn& in)
    
    for (auto module : mModules)
       module->PostLoadState();
+
+   IClickable::ClearLoadContext();
 }
 
 //static

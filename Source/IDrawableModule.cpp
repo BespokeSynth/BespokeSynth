@@ -1156,7 +1156,7 @@ void IDrawableModule::LoadState(FileStreamIn& in)
    
    int numChildren;
    in >> numChildren;
-   LoadStateValidate(numChildren == mChildren.size());
+   LoadStateValidate(numChildren <= mChildren.size());
    
    for (int i=0; i<numChildren; ++i)
    {

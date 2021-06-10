@@ -130,6 +130,7 @@ public:
    virtual vector<IUIControl*> ControlsToIgnoreInSaveState() const;
    virtual void UpdateOldControlName(string& oldName) {}
    virtual bool CanSaveState() const { return true; }
+   virtual size_t GetExpectedSaveStateNumChildren() const { return mChildren.size(); }
    virtual bool HasDebugDraw() const { return false; }
    virtual bool HasPush2OverrideControls() const { return false; }
    virtual void GetPush2OverrideControls(vector<IUIControl*>& controls) const { }
