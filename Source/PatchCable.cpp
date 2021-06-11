@@ -132,6 +132,7 @@ void PatchCable::Render()
    
    ofPushMatrix();
    ofPushStyle();
+   ofNoFill();
    
    ConnectionType type = mOwner->GetConnectionType();
    ofColor lineColor = mOwner->GetColor();

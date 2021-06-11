@@ -227,41 +227,30 @@ void PatchCableSource::Render()
    if (!Enabled())
       return;
 
-   if (mDrawPass == DrawPass::kCables)
-   {
-      if (mPatchCableDrawMode != kPatchCableDrawMode_CablesOnHoverOnly || mHoverIndex != -1)
-      {
-         for (auto cable : mPatchCables)
-            cable->Draw();
-      }
-   }
-   
-   if (mDrawPass == DrawPass::kSource)
-   {
-      ofPushStyle();
-      float cableX = mX;
-      float cableY = mY;
-      if (mOwner->GetOwningContainer() != nullptr)
-      {
-         cableX -= mOwner->GetOwningContainer()->GetOwnerPosition().x;
-         cableY -= mOwner->GetOwningContainer()->GetOwnerPosition().y;
-      }
-      for (int i = 0; i < (int)mPatchCables.size() || i == 0; ++i)
-      {
-         if (i < mPatchCables.size())
-            mPatchCables[i]->SetSourceIndex(i);
+   ofPushStyle();
 
-         if (mPatchCableDrawMode != kPatchCableDrawMode_SourceOnHoverOnly || mHoverIndex != -1)
-         {
-            ofSetLineWidth(0);
-            ofSetColor(mColor);
-            ofFill();
-            ofCircle(cableX, cableY, kPatchCableSourceRadius);
-         }
+   float cableX = mX;
+   float cableY = mY;
+   if (mOwner->GetOwningContainer() != nullptr)
+   {
+      cableX -= mOwner->GetOwningContainer()->GetOwnerPosition().x;
+      cableY -= mOwner->GetOwningContainer()->GetOwnerPosition().y;
+   }
+
+   for (int i = 0; i < (int)mPatchCables.size() || i==0; ++i)
+   {
+      if (i < (int)mPatchCables.size())
+         mPatchCables[i]->SetSourceIndex(i);
+
+      if (mDrawPass == DrawPass::kCables && (mPatchCableDrawMode != kPatchCableDrawMode_CablesOnHoverOnly || mHoverIndex != -1))
+      {
+         if (i < (int)mPatchCables.size())
+            mPatchCables[i]->Draw();
 
          if (mHoverIndex == i)
          {
             ofSetColor(ofColor::white);
+            ofFill();
             ofCircle(cableX, cableY, kPatchCableSourceRadius - 2);
             if (InAddCableMode())
             {
@@ -271,16 +260,25 @@ void PatchCableSource::Render()
                ofLine(cableX - (kPatchCableSourceRadius - 1), cableY, cableX + (kPatchCableSourceRadius - 1), cableY);
             }
          }
-
-         if (mSide == Side::kBottom)
-            cableY += kPatchCableSpacing;
-         else if (mSide == Side::kLeft)
-            cableX -= kPatchCableSpacing;
-         else if (mSide == Side::kRight)
-            cableX += kPatchCableSpacing;
       }
-      ofPopStyle();
+
+      if (mDrawPass == DrawPass::kSource && (mPatchCableDrawMode != kPatchCableDrawMode_SourceOnHoverOnly || mHoverIndex != -1))
+      {
+         ofSetLineWidth(0);
+         ofSetColor(mColor);
+         ofFill();
+         ofCircle(cableX, cableY, kPatchCableSourceRadius);
+      }
+
+      if (mSide == Side::kBottom)
+         cableY += kPatchCableSpacing;
+      else if (mSide == Side::kLeft)
+         cableX -= kPatchCableSpacing;
+      else if (mSide == Side::kRight)
+         cableX += kPatchCableSpacing;
    }
+
+   ofPopStyle();
 }
 
 ofVec2f PatchCableSource::GetCableStart(int index) const
