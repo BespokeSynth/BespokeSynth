@@ -27,7 +27,8 @@ enum KarplusStrongSourceType
    kSourceTypeNoise,
    kSourceTypeMix,
    kSourceTypeSaw,
-   kSourceTypeInput
+   kSourceTypeInput,
+   kSourceTypeInputNoEnvelope
 };
 
 class KarplusStrongVoiceParams : public IVoiceParams

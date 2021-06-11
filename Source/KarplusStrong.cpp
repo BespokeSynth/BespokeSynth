@@ -53,8 +53,8 @@ void KarplusStrong::CreateUIControls()
    mInvertCheckbox = new Checkbox(this,"invert",mVolSlider,kAnchor_Right,&mVoiceParams.mInvert);
    mFilterSlider = new FloatSlider(this,"filter",mVolSlider,kAnchor_Below,140,15,&mVoiceParams.mFilter,0,5);
    mFeedbackSlider = new FloatSlider(this,"feedback",mFilterSlider,kAnchor_Below,140,15,&mVoiceParams.mFeedback,.9f,.9999f,4);
-   mSourceDropdown = new DropdownList(this,"source type",mFeedbackSlider,kAnchor_Below,(int*)&mVoiceParams.mSourceType,45);
-   mExciterFreqSlider = new FloatSlider(this,"x freq",mSourceDropdown,kAnchor_Right,92,15,&mVoiceParams.mExciterFreq,10,4000);
+   mSourceDropdown = new DropdownList(this,"source type",mFeedbackSlider,kAnchor_Below,(int*)&mVoiceParams.mSourceType,52);
+   mExciterFreqSlider = new FloatSlider(this,"x freq",mSourceDropdown,kAnchor_Right,85,15,&mVoiceParams.mExciterFreq,10,4000);
    mExciterAttackSlider = new FloatSlider(this,"x att",mSourceDropdown,kAnchor_Below,69,15,&mVoiceParams.mExciterAttack,0.01f,40);
    mExciterDecaySlider = new FloatSlider(this,"x dec",mExciterAttackSlider,kAnchor_Right,68,15,&mVoiceParams.mExciterDecay,0.01f,40);
    //mStretchCheckbox = new Checkbox(this,"stretch",mVolSlider,kAnchor_Right,&mVoiceParams.mStretch);
@@ -64,6 +64,7 @@ void KarplusStrong::CreateUIControls()
    mSourceDropdown->AddLabel("mix", kSourceTypeMix);
    mSourceDropdown->AddLabel("saw", kSourceTypeSaw);
    mSourceDropdown->AddLabel("input", kSourceTypeInput);
+   mSourceDropdown->AddLabel("input*", kSourceTypeInputNoEnvelope);
    
    mFilterSlider->SetMode(FloatSlider::kSquare);
    mExciterFreqSlider->SetMode(FloatSlider::kSquare);
@@ -150,7 +151,9 @@ void KarplusStrong::DrawModule()
    mSourceDropdown->Draw();
    mInvertCheckbox->Draw();
 
-   mExciterFreqSlider->SetShowing(mVoiceParams.mSourceType == kSourceTypeSin || mVoiceParams.mSourceType == kSourceTypeSin || mVoiceParams.mSourceType == kSourceTypeMix);
+   mExciterFreqSlider->SetShowing(mVoiceParams.mSourceType == kSourceTypeSin || mVoiceParams.mSourceType == kSourceTypeSaw || mVoiceParams.mSourceType == kSourceTypeMix);
+   mExciterAttackSlider->SetShowing(mVoiceParams.mSourceType != kSourceTypeInputNoEnvelope);
+   mExciterDecaySlider->SetShowing(mVoiceParams.mSourceType != kSourceTypeInputNoEnvelope);
    
    //mStretchCheckbox->Draw();
    mExciterFreqSlider->Draw();

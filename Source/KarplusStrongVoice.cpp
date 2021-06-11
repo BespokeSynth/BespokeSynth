@@ -96,9 +96,11 @@ bool KarplusStrongVoice::Process(double time, ChannelBuffer* out, int oversampli
          sample = noiseSample;
       else if (mVoiceParams->mSourceType == kSourceTypeMix)
          sample = noiseSample * pitchBlend + oscSample * (1 - pitchBlend);
-      else if (mVoiceParams->mSourceType == kSourceTypeInput)
+      else if (mVoiceParams->mSourceType == kSourceTypeInput || mVoiceParams->mSourceType == kSourceTypeInputNoEnvelope)
          sample = mKarplusStrongModule->GetBuffer()->GetChannel(0)[pos / oversampling];
-      sample *= mEnv.Value(time) + mVoiceParams->mExcitation;
+
+      if (mVoiceParams->mSourceType != kSourceTypeInputNoEnvelope)
+         sample *= mEnv.Value(time) + mVoiceParams->mExcitation;
 
       float samplesAgo = sampleRate / freq;
       AssertIfDenormal(samplesAgo);
