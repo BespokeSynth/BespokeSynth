@@ -1288,6 +1288,11 @@ void ModularSynth::MouseReleased(int intX, int intY, int button)
    {
       GetTopModalFocusItem()->MouseReleased();
    }
+   
+   if (mResizeModule)
+      mResizeModule = nullptr;
+
+   mModuleContainer.MouseReleased();
 
    if (mMoveModule)
    {
@@ -1295,11 +1300,6 @@ void ModularSynth::MouseReleased(int intX, int intY, int button)
       mMoveModule->GetPosition(moduleX, moduleY);
       mMoveModule = nullptr;
    }
-   
-   if (mResizeModule)
-      mResizeModule = nullptr;
-
-   mModuleContainer.MouseReleased();
    
    if (mHeldSample)
    {

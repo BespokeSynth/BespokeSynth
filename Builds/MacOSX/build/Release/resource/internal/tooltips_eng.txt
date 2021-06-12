@@ -62,7 +62,7 @@ presets~save and restore sets of values. connect the grey circle to modules to a
 
 
 
-prefab~create a collection of modules that can be loaded from the "prefabs" menu. to add a module, drag the grey circle to the module. to add a bunch of modules, lasso-select all of them, including this, and type '+'
+prefab~create a collection of modules that can be loaded from the "prefabs" menu. drag and drop modules onto here to add them to the prefab. drag the grey cable to any modules you want to remove from the prefab.
 ~save~save as a .pfb file
 ~load~load a .pfb
 ~disband~free all modules from this prefab

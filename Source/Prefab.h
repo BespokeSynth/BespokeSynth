@@ -30,7 +30,6 @@ public:
    ModuleContainer* GetContainer() override { return &mModuleContainer; }
    
    void Poll() override;
-   void KeyPressed(int key, bool isRepeat) override;
    bool ShouldClipContents() override { return false; }
    
    void ButtonClicked(ClickButton* button) override;
@@ -55,12 +54,15 @@ private:
    bool Enabled() const override { return mEnabled; }
    void GetModuleDimensions(float& width, float& height) override;
    void OnClicked(int x, int y, bool right) override;
+   void MouseReleased() override;
+
+   bool CanAddDropModules();
+   bool IsMouseHovered();
    
-   bool CanAddGroup();
    void SavePrefab(string savePath);
    void UpdatePrefabName(string path);
    
-   PatchCableSource* mModuleCable;
+   PatchCableSource* mRemoveModuleCable;
    ClickButton* mSaveButton;
    ClickButton* mLoadButton;
    ClickButton* mDisbandButton;

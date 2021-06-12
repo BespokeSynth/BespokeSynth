@@ -33,9 +33,9 @@ void Prefab::CreateUIControls()
    mLoadButton = new ClickButton(this, "load", mSaveButton, kAnchor_Right);
    mDisbandButton = new ClickButton(this, "disband", mLoadButton, kAnchor_Right);
    
-   mModuleCable = new PatchCableSource(this, kConnectionType_Special);
-   mModuleCable->SetManualPosition(10, 10);
-   AddPatchCableSource(mModuleCable);
+   mRemoveModuleCable = new PatchCableSource(this, kConnectionType_Special);
+   mRemoveModuleCable->SetManualPosition(10, 10);
+   AddPatchCableSource(mRemoveModuleCable);
 }
 
 string Prefab::GetTitleLabel()
@@ -64,12 +64,52 @@ void Prefab::Poll()
       SetPosition(xMin, yMin);
 }
 
+bool Prefab::IsMouseHovered()
+{
+   return GetRect(false).contains(TheSynth->GetMouseX(), TheSynth->GetMouseY());
+}
+
+bool Prefab::CanAddDropModules()
+{
+   if (IsMouseHovered())
+   {
+      if (TheSynth->GetMoveModule() != nullptr && !VectorContains(TheSynth->GetMoveModule(), mModuleContainer.GetModules()))
+         return true;
+      if (!TheSynth->GetGroupSelectedModules().empty())
+      {
+         for (auto* module : TheSynth->GetGroupSelectedModules())
+         {
+            if (!VectorContains(module, mModuleContainer.GetModules()))
+               return true;
+         }
+      }
+   }
+   return false;
+}
+
 void Prefab::OnClicked(int x, int y, bool right)
 {
    IDrawableModule::OnClicked(x, y, right);
    
    if (y > 0 && !right)
       TheSynth->SetGroupSelectContext(&mModuleContainer);
+}
+
+void Prefab::MouseReleased()
+{
+   IDrawableModule::MouseReleased();
+
+   if (CanAddDropModules())
+   {
+      if (TheSynth->GetMoveModule() != nullptr && !VectorContains(TheSynth->GetMoveModule(), mModuleContainer.GetModules()))
+         mModuleContainer.TakeModule(TheSynth->GetMoveModule());
+
+      for(auto* module : TheSynth->GetGroupSelectedModules())
+      {
+         if (!VectorContains(module, mModuleContainer.GetModules()))
+            mModuleContainer.TakeModule(module);
+      }
+   }
 }
 
 namespace
@@ -83,33 +123,38 @@ void Prefab::DrawModule()
    if (Minimized() || IsVisible() == false)
       return;
 
+   if (CanAddDropModules() && TheSynth->IsMouseButtonHeld(1))
+   {
+      ofPushStyle();
+      ofSetColor(255, 255, 255, 80);
+      ofFill();
+      ofRect(0,0,GetRect().width,GetRect().height);
+      ofPopStyle();
+   }
+
    mSaveButton->Draw();
    mLoadButton->Draw();
    mDisbandButton->Draw();
-   DrawTextNormal("add/remove", 18, 14);
-
-   if (CanAddGroup())
-      DrawTextNormal("type + to add group", 3, 34);
+   DrawTextNormal("remove", 18, 14);
    
    mModuleContainer.Draw();
 }
 
-bool Prefab::CanAddGroup()
-{
-   return !TheSynth->GetGroupSelectedModules().empty() && VectorContains(static_cast<IDrawableModule*>(this), TheSynth->GetGroupSelectedModules());
-}
-
 void Prefab::PostRepatch(PatchCableSource* cableSource, bool fromUserClick)
 {
-   IDrawableModule* module = dynamic_cast<IDrawableModule*>(cableSource->GetTarget());
-   if (module)
+   if (cableSource == mRemoveModuleCable)
    {
-      if (!VectorContains(module, mModuleContainer.GetModules()))
-         mModuleContainer.TakeModule(module);
-      else
-         GetOwningContainer()->TakeModule(module);
+      IDrawableModule* module = dynamic_cast<IDrawableModule*>(cableSource->GetTarget());
+      if (module)
+      {
+         if (VectorContains(module, mModuleContainer.GetModules()))
+         {
+            GetOwningContainer()->TakeModule(module);
+            GetOwningContainer()->MoveToFront(this);
+         }
+      }
+      cableSource->Clear();
    }
-   cableSource->Clear();
 }
 
 void Prefab::GetModuleDimensions(float& width, float& height)
@@ -160,21 +205,6 @@ void Prefab::ButtonClicked(ClickButton* button)
       for (auto* module : modules)
          GetOwningContainer()->TakeModule(module);
       GetOwningContainer()->DeleteModule(this);
-   }
-}
-
-void Prefab::KeyPressed(int key, bool isRepeat)
-{
-   if (key == '=')
-   {
-      if (CanAddGroup())
-      {
-         for (auto* module : TheSynth->GetGroupSelectedModules())
-         {
-            if (module != this && !VectorContains(module, mModuleContainer.GetModules()))
-               mModuleContainer.TakeModule(module);
-         }
-      }
    }
 }
 
