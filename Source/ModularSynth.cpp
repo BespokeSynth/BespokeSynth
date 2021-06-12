@@ -397,7 +397,7 @@ void ModularSynth::Draw(void* vg)
    TheSaveDataPanel->UpdatePosition();
    
    mModuleContainer.Draw();
-   mModuleContainer.DrawPatchCables();
+   mModuleContainer.DrawPatchCables(false);
    mModuleContainer.DrawUnclipped();
    
    for (auto* modal : mModalFocusItemStack)

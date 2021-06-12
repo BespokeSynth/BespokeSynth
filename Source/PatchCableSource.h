@@ -79,7 +79,7 @@ public:
    IDrawableModule* GetOwner() const { return mOwner; }
    void SetOverrideVizBuffer(RollingBuffer* viz) { mOverrideVizBuffer = viz; }
    RollingBuffer* GetOverrideVizBuffer() const { return mOverrideVizBuffer; }
-   void UpdatePosition();
+   void UpdatePosition(bool parentMinimized);
    void SetManualPosition(int x, int y) { mManualPositionX = x; mManualPositionY = y; mAutomaticPositioning = false; }
    void RemovePatchCable(PatchCable* cable);
    void ClearPatchCables();
@@ -111,7 +111,7 @@ public:
    NoteHistory& GetHistory() { return mNoteHistory; }
    
    void DrawSource();
-   void DrawCables();
+   void DrawCables(bool parentMinimized);
    void Render() override;
    bool TestClick(int x, int y, bool right, bool testOnly = false) override;
    bool MouseMoved(float x, float y) override;
@@ -166,6 +166,7 @@ private:
       kCables
    };
    DrawPass mDrawPass;
+   bool mParentMinimized;
 };
 
 #endif /* defined(__Bespoke__PatchCableSource__) */

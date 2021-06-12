@@ -38,6 +38,7 @@ PatchCableSource::PatchCableSource(IDrawableModule* owner, ConnectionType type)
 , mHasOverrideCableDir(false)
 , mModulatorOwner(nullptr)
 , mDrawPass(DrawPass::kSource)
+, mParentMinimized(false)
 {
    mAllowMultipleTargets = (mType == kConnectionType_Note || mType == kConnectionType_Pulse);
    
@@ -132,15 +133,21 @@ void PatchCableSource::Clear()
    mPatchCables.clear();
 }
 
-void PatchCableSource::UpdatePosition()
+void PatchCableSource::UpdatePosition(bool parentMinimized)
 {
-   if (mAutomaticPositioning)
+   if (mAutomaticPositioning || parentMinimized)
    {
       float x,y,w,h;
       mOwner->GetPosition(x, y);
       mOwner->GetDimensions(w, h);
+
+      if (parentMinimized)
+      {
+         mOwner->GetParent()->GetPosition(x, y);
+         mOwner->GetParent()->GetDimensions(w, h);
+      }
       
-      if (mManualSide == Side::kNone)
+      if (mManualSide == Side::kNone || parentMinimized)
       {
          ofVec2f centerOfMass;
          int count = 0;
@@ -216,9 +223,10 @@ void PatchCableSource::DrawSource()
    Draw();
 }
 
-void PatchCableSource::DrawCables()
+void PatchCableSource::DrawCables(bool parentMinimized)
 {
    mDrawPass = DrawPass::kCables;
+   mParentMinimized = parentMinimized;
    Draw();
 }
 
@@ -240,7 +248,15 @@ void PatchCableSource::Render()
    for (int i = 0; i < (int)mPatchCables.size() || i==0; ++i)
    {
       if (i < (int)mPatchCables.size())
+      {
          mPatchCables[i]->SetSourceIndex(i);
+
+         if (mParentMinimized)
+         {
+            if (mPatchCables[i]->GetOwningModule() != nullptr && mPatchCables[i]->GetTarget() != nullptr && mPatchCables[i]->GetOwningModule()->GetParent() == mPatchCables[i]->GetTarget()->GetParent())
+               continue;   //this is an internally-patched cable in a minimized module
+         }
+      }
 
       if (mDrawPass == DrawPass::kCables && (mPatchCableDrawMode != kPatchCableDrawMode_CablesOnHoverOnly || mHoverIndex != -1))
       {

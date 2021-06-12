@@ -426,7 +426,7 @@ void IDrawableModule::Render()
 
    for (auto source : mPatchCableSources)
    {
-      source->UpdatePosition();
+      source->UpdatePosition(false);
       source->DrawSource();
    }
 }
@@ -449,12 +449,12 @@ void IDrawableModule::RenderUnclipped()
    ofPopStyle();
 }
 
-void IDrawableModule::DrawPatchCables()
+void IDrawableModule::DrawPatchCables(bool parentMinimized)
 {
    for (auto source : mPatchCableSources)
    {
-      source->UpdatePosition();
-      source->DrawCables();
+      source->UpdatePosition(parentMinimized);
+      source->DrawCables(parentMinimized);
    }
 }
 

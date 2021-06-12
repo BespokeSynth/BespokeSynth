@@ -25,7 +25,7 @@ public:
    void SetOwner(IDrawableModule* owner) { mOwner = owner; }
    IDrawableModule* GetOwner() const { return mOwner; }
    void Draw();
-   void DrawPatchCables();
+   void DrawPatchCables(bool parentMinimized);
    void DrawUnclipped();
    void PostRender();
    void Poll();
