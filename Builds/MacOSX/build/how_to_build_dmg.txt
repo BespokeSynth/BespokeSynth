@@ -1,3 +1,0 @@
-if appdmg is installed via: npm install -g appdmg
-
-appdmg bespoke_dmg.json Bespoke.dmg
