@@ -108,8 +108,8 @@ void SeaOfGrain::Process(double time)
       return;
    
    ComputeSliders(0);
-   SyncOutputBuffer(mSample->NumChannels());
-   SyncBuffers();
+   int numChannels = mHasRecordedInput ? GetBuffer()->NumActiveChannels() : mSample->NumChannels();
+   SyncBuffers(numChannels);
    mRecordBuffer.SetNumChannels(GetBuffer()->NumActiveChannels());
    
    int bufferSize = target->GetBuffer()->BufferSize();
@@ -118,17 +118,17 @@ void SeaOfGrain::Process(double time)
 
    if (mRecordInput)
    {
-      for (int ch = 0; ch < GetBuffer()->NumActiveChannels(); ++ch)
+      for (int ch = 0; ch < numChannels; ++ch)
          mRecordBuffer.WriteChunk(GetBuffer()->GetChannel(ch), bufferSize, ch);
    }
    
-   gWorkChannelBuffer.SetNumActiveChannels(out->NumActiveChannels());
+   gWorkChannelBuffer.SetNumActiveChannels(numChannels);
    gWorkChannelBuffer.Clear();
    for (int i=0; i<kNumMPEVoices; ++i)
       mMPEVoices[i].Process(&gWorkChannelBuffer, bufferSize);
    for (int i=0; i<kNumManualVoices; ++i)
       mManualVoices[i].Process(&gWorkChannelBuffer, bufferSize);
-   for (int ch = 0; ch < out->NumActiveChannels(); ++ch)
+   for (int ch = 0; ch < numChannels; ++ch)
    {
       Mult(gWorkChannelBuffer.GetChannel(ch), mVolume, bufferSize);
       GetVizBuffer()->WriteChunk(gWorkChannelBuffer.GetChannel(ch), bufferSize, ch);
