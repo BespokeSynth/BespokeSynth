@@ -30,7 +30,8 @@ void HelpDisplay::CreateUIControls()
    IDrawableModule::CreateUIControls();
    
    mShowTooltipsCheckbox = new Checkbox(this, "show tooltips", 3, 22, &sShowTooltips);
-   mDumpModuleInfo = new ClickButton(this, "dump module info", 110, 22);
+   mDumpModuleInfoButton = new ClickButton(this, "dump module info", 110, 22);
+   mDoModuleScreenshotsButton = new ClickButton(this, "do screenshots", mDumpModuleInfoButton, kAnchor_Right);
    mTutorialVideoLinkButton = new ClickButton(this, "youtu.be/SYBc8X2IxqM", 160, 63);
 
    //mDumpModuleInfo->SetShowing(false);
@@ -62,8 +63,10 @@ void HelpDisplay::DrawModule()
    DrawTextLeftJustify(string(__DATE__) + " " + string(__TIME__), mWidth-5, 12);
    
    mShowTooltipsCheckbox->Draw();
-   mDumpModuleInfo->SetShowing(GetKeyModifiers() == kModifier_Shift);
-   mDumpModuleInfo->Draw();
+   mDumpModuleInfoButton->SetShowing(GetKeyModifiers() == kModifier_Shift);
+   mDumpModuleInfoButton->Draw();
+   mDoModuleScreenshotsButton->SetShowing(GetKeyModifiers() == kModifier_Shift);
+   mDoModuleScreenshotsButton->Draw();
    
    DrawTextNormal("video overview available at:", 4, 75);
    mTutorialVideoLinkButton->Draw();
@@ -73,6 +76,39 @@ void HelpDisplay::DrawModule()
    {
       DrawTextNormal(mHelpText[i], 4, mHeight);
       mHeight += 14;
+   }
+
+   static int sScreenshotDelay = 0;
+   if (sScreenshotDelay <= 0)
+   {
+      static IDrawableModule* sScreenshotModule = nullptr;
+      if (sScreenshotModule != nullptr)
+      {
+         ofRectangle rect = sScreenshotModule->GetRect();
+         rect.y -= IDrawableModule::TitleBarHeight();
+         rect.height += IDrawableModule::TitleBarHeight();
+         rect.grow(10);
+         RenderScreenshot(rect.x, rect.y, rect.width, rect.height, mScreenshotsToProcess.front() + ".png");
+
+         mScreenshotsToProcess.pop_front();
+         sScreenshotModule->GetOwningContainer()->DeleteModule(sScreenshotModule);
+         sScreenshotModule = nullptr;
+
+         sScreenshotDelay = 10;
+      }
+      else if (!mScreenshotsToProcess.empty())
+      {
+         sScreenshotModule = TheSynth->SpawnModuleOnTheFly(mScreenshotsToProcess.front(), 100, 300);
+
+         if (mScreenshotsToProcess.front() == "drumplayer")
+            sScreenshotModule->FindUIControl("edit")->SetValue(1);
+
+         sScreenshotDelay = 10;
+      }
+   }
+   else
+   {
+      --sScreenshotDelay;
    }
 }
 
@@ -288,7 +324,7 @@ void HelpDisplay::ButtonClicked(ClickButton* button)
    {
       URL("https://youtu.be/SYBc8X2IxqM").launchInDefaultBrowser();
    }
-   if (button == mDumpModuleInfo)
+   if (button == mDumpModuleInfoButton)
    {
       LoadTooltips();
 
@@ -374,4 +410,74 @@ void HelpDisplay::ButtonClicked(ClickButton* button)
       File moduleDump(ofToDataPath("module_dump.txt"));
       moduleDump.replaceWithText(output);
    }
+   if (button == mDoModuleScreenshotsButton)
+   {
+      /*mScreenshotsToProcess.push_back("sampleplayer");
+      mScreenshotsToProcess.push_back("drumplayer");
+      mScreenshotsToProcess.push_back("notesequencer");*/
+
+      vector<ModuleType> moduleTypes = {
+                                          kModuleType_Note,
+                                          kModuleType_Synth,
+                                          kModuleType_Audio,
+                                          kModuleType_Instrument,
+                                          kModuleType_Processor,
+                                          kModuleType_Modulator,
+                                          kModuleType_Pulse,
+                                          kModuleType_Other
+      };
+      for (auto type : moduleTypes)
+      {
+         vector<string> spawnable = TheSynth->GetModuleFactory()->GetSpawnableModules(type);
+         for (auto toSpawn : spawnable)
+            mScreenshotsToProcess.push_back(toSpawn);
+      }
+   }
+}
+
+void HelpDisplay::RenderScreenshot(int x, int y, int width, int height, string filename)
+{
+   float scale = gDrawScale * TheSynth->GetPixelRatio();
+   x = (x + TheSynth->GetDrawOffset().x) * scale;
+   y = (y + TheSynth->GetDrawOffset().y) * scale;
+   width = width * scale;
+   height = height * scale;
+
+   unsigned char* pixels = new unsigned char[3 * (width) * (height)];
+
+   glReadBuffer(GL_BACK);
+   int oldAlignment;
+   glGetIntegerv(GL_PACK_ALIGNMENT, &oldAlignment);
+   glPixelStorei(GL_PACK_ALIGNMENT, 1);   //tight packing
+   glReadPixels(x, ofGetHeight()*scale-y-height, width, height, GL_RGB, GL_UNSIGNED_BYTE, pixels);
+   glPixelStorei(GL_PACK_ALIGNMENT, oldAlignment);
+
+   Image image(Image::RGB, width, height, true);
+   for (int x = 0; x < width; ++x)
+   {
+      for (int y = 0; y < height; ++y)
+      {
+         int pos = (x + (height - 1 - y) * width) * 3;
+         image.setPixelAt(x, y, juce::Colour(pixels[pos], pixels[pos + 1], pixels[pos + 2]));
+      }
+   }
+
+   {
+      juce::File(ofToDataPath("screenshots")).createDirectory();
+      juce::File pngFile(ofToDataPath("screenshots/"+filename));
+      if (pngFile.existsAsFile())
+         pngFile.deleteFile();
+      FileOutputStream stream(pngFile);
+      PNGImageFormat pngWriter;
+      pngWriter.writeImageToStream(image, stream);
+   }
+
+   /*{
+      juce::File rawFile(ofToDataPath("screenshot.txt"));
+      if (rawFile.existsAsFile())
+         rawFile.deleteFile();
+      FileOutputStream stream(rawFile);
+      for (int i = 0; i < width*height * 3; ++i)
+         stream << pixels[i] << ' ';
+   }*/
 }

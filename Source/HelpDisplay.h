@@ -40,6 +40,8 @@ private:
    void DrawModule() override;
    bool Enabled() const override { return true; }
    void GetModuleDimensions(float& w, float& h) override;
+
+   void RenderScreenshot(int x, int y, int width, int height, string filename);
    
    struct UIControlTooltipInfo
    {
@@ -61,12 +63,15 @@ private:
    
    vector<string> mHelpText;
    Checkbox* mShowTooltipsCheckbox;
-   ClickButton* mDumpModuleInfo;
+   ClickButton* mDumpModuleInfoButton;
+   ClickButton* mDoModuleScreenshotsButton;
    ClickButton* mTutorialVideoLinkButton;
    float mWidth;
    float mHeight;
    static bool sTooltipsLoaded;
    static list<ModuleTooltipInfo> sTooltips;
+
+   list<string> mScreenshotsToProcess;
 };
 
 #endif /* defined(__Bespoke__HelpDisplay__) */
