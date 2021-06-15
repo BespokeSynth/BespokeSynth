@@ -7,7 +7,7 @@
 //
 
 #include "ClipArranger.h"
-#include "ArrangementMaster.h"
+#include "ArrangementController.h"
 #include "ModularSynth.h"
 
 ClipArranger::ClipArranger()
@@ -37,7 +37,7 @@ void ClipArranger::Process(double time, float* left, float* right, int bufferSiz
    if (mEnabled == false)
       return;
    
-   if (ArrangementMaster::mPlay)
+   if (ArrangementController::mPlay)
    {
       for (int i=0; i<MAX_CLIPS; ++i)
          mClips[i].Process(left, right, bufferSize);
@@ -192,7 +192,7 @@ void ClipArranger::AddSample(Sample* sample, int x, int y)
    Clip* clip = GetEmptyClip();
    clip->mSample = sample;
    clip->mStartSample = MouseXToSample(x);
-   clip->mEndSample = MIN(clip->mStartSample + clip->mSample->LengthInSamples(), ArrangementMaster::mSampleLength);
+   clip->mEndSample = MIN(clip->mStartSample + clip->mSample->LengthInSamples(), ArrangementController::mSampleLength);
 }
 
 float ClipArranger::MouseXToBufferPos(float mouseX)
@@ -202,12 +202,12 @@ float ClipArranger::MouseXToBufferPos(float mouseX)
 
 int ClipArranger::MouseXToSample(float mouseX)
 {
-   return MouseXToBufferPos(mouseX) * ArrangementMaster::mSampleLength;
+   return MouseXToBufferPos(mouseX) * ArrangementController::mSampleLength;
 }
 
 float ClipArranger::SampleToX(int sample)
 {
-   return float(sample)/ArrangementMaster::mSampleLength * mBufferWidth + BUFFER_MARGIN_X;
+   return float(sample)/ArrangementController::mSampleLength * mBufferWidth + BUFFER_MARGIN_X;
 }
 
 ClipArranger::Clip* ClipArranger::GetEmptyClip()
@@ -252,7 +252,7 @@ void ClipArranger::Clip::Process(float* left, float* right, int bufferSize)
    
    for (int i=0; i<bufferSize; ++i)
    {
-      int playhead = ArrangementMaster::mPlayhead + i;
+      int playhead = ArrangementController::mPlayhead + i;
       
       if (playhead >= mStartSample &&
           playhead < mEndSample)

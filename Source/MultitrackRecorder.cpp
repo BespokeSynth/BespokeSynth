@@ -13,7 +13,7 @@
 #include "Transport.h"
 #include "Scale.h"
 #include "Sample.h"
-#include "ArrangementMaster.h"
+#include "ArrangementController.h"
 
 MultitrackRecorder* TheMultitrackRecorder = nullptr;
 
@@ -53,7 +53,7 @@ void MultitrackRecorder::CreateUIControls()
 {
    IDrawableModule::CreateUIControls();
    mRecordCheckbox = new Checkbox(this,"rec",100,2,&mRecording);
-   mPlayCheckbox = new Checkbox(this,"play",140,2,&ArrangementMaster::mPlay);
+   mPlayCheckbox = new Checkbox(this,"play",140,2,&ArrangementController::mPlay);
    mAddTrackButton = new ClickButton(this,"add",200,2);
    mResetPlayheadButton = new ClickButton(this,"reset",230,2);
    mFixLengthsButton = new ClickButton(this,"fix lengths",270,2);
@@ -76,7 +76,7 @@ MultitrackRecorder::~MultitrackRecorder()
 void MultitrackRecorder::Poll()
 {
    int reallocDist = gSampleRate; //1 second from the end
-   ArrangementMaster::mSampleLength = mRecordingLength;
+   ArrangementController::mSampleLength = mRecordingLength;
    
    float cW, cH;
    mClipArranger[0].GetDimensions(cW, cH);
@@ -84,7 +84,7 @@ void MultitrackRecorder::Poll()
       mClipArranger[i].SetPosition(0, 25 + mBufferHeight * mRecordBuffers.size() + i*cH);
    
    if (mRecording &&
-       ArrangementMaster::mPlayhead > mRecordingLength - reallocDist)  //we're a second from the end
+       ArrangementController::mPlayhead > mRecordingLength - reallocDist)  //we're a second from the end
    {
       int newChunk = RECORD_CHUNK_SIZE;
       int newLength = mRecordingLength + newChunk;
@@ -131,7 +131,7 @@ void MultitrackRecorder::Process(double time, float* left, float* right, int buf
    
    mMutex.Lock("audio thread");
    
-   if (mRecording || ArrangementMaster::mPlay)
+   if (mRecording || ArrangementController::mPlay)
    {
       for (int i=0; i<bufferSize; ++i)
       {
@@ -144,24 +144,24 @@ void MultitrackRecorder::Process(double time, float* left, float* right, int buf
          
          if (mRecording)
          {
-            mRecordBuffers[recordIdx]->mLeft[ArrangementMaster::mPlayhead] = left[i];
-            mRecordBuffers[recordIdx]->mRight[ArrangementMaster::mPlayhead] = right[i];
+            mRecordBuffers[recordIdx]->mLeft[ArrangementController::mPlayhead] = left[i];
+            mRecordBuffers[recordIdx]->mRight[ArrangementController::mPlayhead] = right[i];
          }
          
          for (int j=0; j<mRecordBuffers.size(); ++j)
          {
             if (j != recordIdx &&
                 mRecordBuffers[j]->mControls.mMute == false &&
-                ArrangementMaster::mPlayhead < mRecordBuffers[j]->mLength)
+                ArrangementController::mPlayhead < mRecordBuffers[j]->mLength)
             {
                float volSq = mRecordBuffers[j]->mControls.mVol * mRecordBuffers[j]->mControls.mVol;
-               left[i] += mRecordBuffers[j]->mLeft[ArrangementMaster::mPlayhead] * volSq;
-               right[i] += mRecordBuffers[j]->mRight[ArrangementMaster::mPlayhead] * volSq;
+               left[i] += mRecordBuffers[j]->mLeft[ArrangementController::mPlayhead] * volSq;
+               right[i] += mRecordBuffers[j]->mRight[ArrangementController::mPlayhead] * volSq;
             }
          }
          
-         if (ArrangementMaster::mPlayhead < mRecordingLength - 1)
-            ++ArrangementMaster::mPlayhead;
+         if (ArrangementController::mPlayhead < mRecordingLength - 1)
+            ++ArrangementController::mPlayhead;
       }
    }
    
@@ -189,9 +189,9 @@ void MultitrackRecorder::DrawModule()
    for (int i=0; i<mRecordBuffers.size(); ++i)
    {
       ofPushMatrix();
-      DrawAudioBuffer(mBufferWidth * mRecordBuffers[i]->mLength/mRecordingLength,mBufferHeight*.45f,mRecordBuffers[i]->mLeft,0,mRecordBuffers[i]->mLength,ArrangementMaster::mPlayhead);
+      DrawAudioBuffer(mBufferWidth * mRecordBuffers[i]->mLength/mRecordingLength,mBufferHeight*.45f,mRecordBuffers[i]->mLeft,0,mRecordBuffers[i]->mLength,ArrangementController::mPlayhead);
       ofTranslate(0,mBufferHeight*.47f);
-      DrawAudioBuffer(mBufferWidth * mRecordBuffers[i]->mLength/mRecordingLength,mBufferHeight*.45f,mRecordBuffers[i]->mRight,0,mRecordBuffers[i]->mLength,ArrangementMaster::mPlayhead);
+      DrawAudioBuffer(mBufferWidth * mRecordBuffers[i]->mLength/mRecordingLength,mBufferHeight*.45f,mRecordBuffers[i]->mRight,0,mRecordBuffers[i]->mLength,ArrangementController::mPlayhead);
       ofTranslate(0,mBufferHeight*.53f);
       ofPopMatrix();
       
@@ -259,17 +259,17 @@ void MultitrackRecorder::DrawModule()
 
 bool MultitrackRecorder::IsRecordingStructure()
 {
-   return mRecording && ArrangementMaster::mPlayhead > mMaxRecordedLength;
+   return mRecording && ArrangementController::mPlayhead > mMaxRecordedLength;
 }
 
 void MultitrackRecorder::RecordStructure(int offset)
 {
-   mMeasurePos[ArrangementMaster::mPlayhead] = TheTransport->GetMeasurePos(gTime + offset * gInvSampleRateMs);
-   mMaxRecordedLength = MAX(ArrangementMaster::mPlayhead, mMaxRecordedLength);
+   mMeasurePos[ArrangementController::mPlayhead] = TheTransport->GetMeasurePos(gTime + offset * gInvSampleRateMs);
+   mMaxRecordedLength = MAX(ArrangementController::mPlayhead, mMaxRecordedLength);
    
-   if (ArrangementMaster::mPlayhead == 0 || mMeasurePos[ArrangementMaster::mPlayhead-1] > mMeasurePos[ArrangementMaster::mPlayhead])
+   if (ArrangementController::mPlayhead == 0 || mMeasurePos[ArrangementController::mPlayhead-1] > mMeasurePos[ArrangementController::mPlayhead])
    {
-      mMeasures[mNumMeasures] = ArrangementMaster::mPlayhead;
+      mMeasures[mNumMeasures] = ArrangementController::mPlayhead;
       ++mNumMeasures;
    }
    
@@ -295,7 +295,7 @@ void MultitrackRecorder::RecordStructure(int offset)
    if (needToRecord)
    {
       StructureInfo structure;
-      structure.mSample = ArrangementMaster::mPlayhead;
+      structure.mSample = ArrangementController::mPlayhead;
       structure.mScaleRoot = TheScale->ScaleRoot();
       structure.mScaleType = TheScale->GetType();
       structure.mTimeSigTop = TheTransport->GetTimeSigTop();
@@ -310,15 +310,15 @@ void MultitrackRecorder::RecordStructure(int offset)
 
 void MultitrackRecorder::ApplyStructure()
 {
-   if (mMeasurePos[ArrangementMaster::mPlayhead] != 0)
-      TheTransport->SetMeasurePos(mMeasurePos[ArrangementMaster::mPlayhead]);
+   if (mMeasurePos[ArrangementController::mPlayhead] != 0)
+      TheTransport->SetMeasurePos(mMeasurePos[ArrangementController::mPlayhead]);
    
    if (mStructureInfoPoints.empty())
       return;
    
    if (mActiveStructureIdx == -1 ||
        (mActiveStructureIdx < mStructureInfoPoints.size()-1 &&
-       mStructureInfoPoints[mActiveStructureIdx+1].mSample <= ArrangementMaster::mPlayhead))
+       mStructureInfoPoints[mActiveStructureIdx+1].mSample <= ArrangementController::mPlayhead))
    {
       ++mActiveStructureIdx;
       const StructureInfo& structure = mStructureInfoPoints[mActiveStructureIdx];
@@ -420,7 +420,7 @@ void MultitrackRecorder::ResetAll()
    mNumMeasures = 0;
    mRecording = false;
    mRecordIdx = 0;
-   ArrangementMaster::mPlayhead = 0;
+   ArrangementController::mPlayhead = 0;
 }
 
 void MultitrackRecorder::OnClicked(int x, int y, bool right)
@@ -480,7 +480,7 @@ void MultitrackRecorder::OnClicked(int x, int y, bool right)
       }
       else
       {
-         ArrangementMaster::mPlayhead = ofClamp(clickPos * mRecordingLength,0,mRecordingLength-1);
+         ArrangementController::mPlayhead = ofClamp(clickPos * mRecordingLength,0,mRecordingLength-1);
          if (clickedIdx != mRecordIdx)
          {
             mRecordIdx = clickedIdx;
@@ -578,7 +578,7 @@ void MultitrackRecorder::ButtonClicked(ClickButton* button)
    if (button == mAddTrackButton)
       AddRecordBuffer();
    if (button == mResetPlayheadButton)
-      ArrangementMaster::mPlayhead = 0;
+      ArrangementController::mPlayhead = 0;
    if (button == mFixLengthsButton)
       FixLengths();
    if (button == mUndoRecordButton)
@@ -592,7 +592,7 @@ void MultitrackRecorder::CheckboxUpdated(Checkbox* checkbox)
 {
    if (checkbox == mRecordCheckbox)
    {
-      if (mRecordIdx == 0 && ArrangementMaster::mPlayhead == 0)
+      if (mRecordIdx == 0 && ArrangementController::mPlayhead == 0)
          TheTransport->Reset();
       CopyRecordBufferContents(mUndoBuffer, mRecordBuffers[mRecordIdx]);
    }

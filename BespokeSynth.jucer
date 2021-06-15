@@ -1004,10 +1004,10 @@
       <FILE id="mTZDPv" name="ADSR.h" compile="0" resource="0" file="Source/ADSR.h"/>
       <FILE id="ARwlVx" name="ADSRDisplay.cpp" compile="1" resource="0" file="Source/ADSRDisplay.cpp"/>
       <FILE id="CnEwA5" name="ADSRDisplay.h" compile="0" resource="0" file="Source/ADSRDisplay.h"/>
-      <FILE id="Zpvqr5" name="ArrangementMaster.cpp" compile="1" resource="0"
-            file="Source/ArrangementMaster.cpp"/>
-      <FILE id="SviADL" name="ArrangementMaster.h" compile="0" resource="0"
-            file="Source/ArrangementMaster.h"/>
+      <FILE id="Zpvqr5" name="ArrangementController.cpp" compile="1" resource="0"
+            file="Source/ArrangementController.cpp"/>
+      <FILE id="SviADL" name="ArrangementController.h" compile="0" resource="0"
+            file="Source/ArrangementController.h"/>
       <FILE id="ev4J6H" name="Bespoke_Platform.cpp" compile="1" resource="0"
             file="Source/Bespoke_Platform.cpp"/>
       <FILE id="VZwfve" name="BiquadFilter.cpp" compile="1" resource="0"
