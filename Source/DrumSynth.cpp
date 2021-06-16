@@ -32,6 +32,8 @@ DrumSynth::DrumSynth()
       int x = (i % DRUMSYNTH_PADS_HORIZONTAL)*DRUMSYNTH_PAD_WIDTH + 5;
       int y = (1-(i/ DRUMSYNTH_PADS_HORIZONTAL))*DRUMSYNTH_PAD_HEIGHT + 50;
       mHits[i] = new DrumSynthHit(this, i,  x, y);
+      if (i == 0)
+         mHits[i]->mData.mVol = .5f;
    }
 }
 
