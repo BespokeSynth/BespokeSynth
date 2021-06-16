@@ -366,3 +366,5 @@ Builds/MacOSX/Info-App.plist
 Builds/LinuxMakefile/Makefile
 
 Builds/MacOSX/build/Bespoke-Mac.dmg
+
+autodoc/bespokesynth.com/

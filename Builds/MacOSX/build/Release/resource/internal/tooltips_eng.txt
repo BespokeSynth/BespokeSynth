@@ -373,21 +373,21 @@ addcentered~outputs the result of value 1 plus value 2, multiplied by range 2. o
 
 
 add~outputs the result of value 1 plus value 2. value 1 and value 2 are intended to be patch targets for modulators.
-~value 1~
-~value 2~
+~value 1~value to sum
+~value 2~value to sum
 
 
 
-slidersequencer~[abandoned module, likely broken]
-~division~[todo]
-~time*~[todo]
-~vel*~[todo]
-~note*~[todo]
-~playing*~[todo]
+slidersequencer~trigger notes along a continuous timeline
+~division~rate to progress
+~time*~time to trigger this element
+~vel*~velocity of this element
+~note*~pitch for this element
+~playing*~is this element playing?
 
 
 
-randomnote~play the note at a given interval with a random chance
+randomnote~play a note at a given interval with a random chance
 ~interval~the note length
 ~probability~the chance that a note will play each interval
 ~pitch~the pitch to use
@@ -501,7 +501,7 @@ notecanvas~looping note roll
 
 
 
-midicontroller~get midi input from external devices
+midicontroller~get midi input from external devices. to get a nice display in the "layout" view, create a .json file with the same name as your controller to describe your controller's layout, and place it in your "data/controllers" directory. look at the other files in that directory for examples.
 ~controller~midi device to use
 ~mappingdisplay~which mapping view to see
 ~bind (hold shift)~when this is enabled, you can map a midi input to a UI control by hovering over a UI control, holding shift, and then using desired midi input
@@ -521,7 +521,7 @@ gridkeyboard~grid-based keyboard, intended primarily for 64-pad grid controllers
 ~latch~latch key presses, so you press once to play a note, and press again to release a note
 ~arrangement~what style of layout should we use?
 ~ch.latch~latch chord button presses
-~p.root~for chorder, make root not always play
+~p.root~for chorder, make root note always play
 ~grid~which grid to use
 
 

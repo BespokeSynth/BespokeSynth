@@ -21,6 +21,7 @@ HelpDisplay::HelpDisplay()
 : mShowTooltipsCheckbox(nullptr)
 , mWidth(700)
 , mHeight(700)
+, mScreenshotModule(nullptr)
 {
    LoadHelp();
 }
@@ -32,6 +33,7 @@ void HelpDisplay::CreateUIControls()
    mShowTooltipsCheckbox = new Checkbox(this, "show tooltips", 3, 22, &sShowTooltips);
    mDumpModuleInfoButton = new ClickButton(this, "dump module info", 110, 22);
    mDoModuleScreenshotsButton = new ClickButton(this, "do screenshots", mDumpModuleInfoButton, kAnchor_Right);
+   mDoModuleDocumentationButton = new ClickButton(this, "do documentation", mDoModuleScreenshotsButton, kAnchor_Right);
    mTutorialVideoLinkButton = new ClickButton(this, "youtu.be/SYBc8X2IxqM", 160, 63);
 
    //mDumpModuleInfo->SetShowing(false);
@@ -67,6 +69,8 @@ void HelpDisplay::DrawModule()
    mDumpModuleInfoButton->Draw();
    mDoModuleScreenshotsButton->SetShowing(GetKeyModifiers() == kModifier_Shift);
    mDoModuleScreenshotsButton->Draw();
+   mDoModuleDocumentationButton->SetShowing(GetKeyModifiers() == kModifier_Shift);
+   mDoModuleDocumentationButton->Draw();
    
    DrawTextNormal("video overview available at:", 4, 75);
    mTutorialVideoLinkButton->Draw();
@@ -81,27 +85,33 @@ void HelpDisplay::DrawModule()
    static int sScreenshotDelay = 0;
    if (sScreenshotDelay <= 0)
    {
-      static IDrawableModule* sScreenshotModule = nullptr;
-      if (sScreenshotModule != nullptr)
+      if (mScreenshotModule != nullptr)
       {
-         ofRectangle rect = sScreenshotModule->GetRect();
+         string typeName = mScreenshotModule->GetTypeName();
+         if (!mScreenshotsToProcess.empty())
+         {
+            typeName = *mScreenshotsToProcess.begin();
+            ofStringReplace(typeName, " " + string(ModuleFactory::kEffectChainSuffix), "");   //strip this suffix if it's there
+            mScreenshotsToProcess.pop_front();
+         }
+
+         ofRectangle rect = mScreenshotModule->GetRect();
          rect.y -= IDrawableModule::TitleBarHeight();
          rect.height += IDrawableModule::TitleBarHeight();
          rect.grow(10);
-         RenderScreenshot(rect.x, rect.y, rect.width, rect.height, mScreenshotsToProcess.front() + ".png");
+         RenderScreenshot(rect.x, rect.y, rect.width, rect.height, typeName + ".png");
 
-         mScreenshotsToProcess.pop_front();
-         sScreenshotModule->GetOwningContainer()->DeleteModule(sScreenshotModule);
-         sScreenshotModule = nullptr;
+         mScreenshotModule->GetOwningContainer()->DeleteModule(mScreenshotModule);
+         mScreenshotModule = nullptr;
 
          sScreenshotDelay = 10;
       }
       else if (!mScreenshotsToProcess.empty())
       {
-         sScreenshotModule = TheSynth->SpawnModuleOnTheFly(mScreenshotsToProcess.front(), 100, 300);
+         mScreenshotModule = TheSynth->SpawnModuleOnTheFly(mScreenshotsToProcess.front(), 100, 300);
 
          if (mScreenshotsToProcess.front() == "drumplayer")
-            sScreenshotModule->FindUIControl("edit")->SetValue(1);
+            mScreenshotModule->FindUIControl("edit")->SetValue(1);
 
          sScreenshotDelay = 10;
       }
@@ -191,7 +201,7 @@ namespace
    {
       /*if (pattern.endsWithChar('*'))
       {
-         pattern = pattern.removeCharacters("*");
+         ppattern = pattern.removeCharacters("*");
          return target.startsWith(pattern);
       }
       else
@@ -426,13 +436,89 @@ void HelpDisplay::ButtonClicked(ClickButton* button)
                                           kModuleType_Pulse,
                                           kModuleType_Other
       };
-      for (auto type : moduleTypes)
+      /*for (auto type : moduleTypes)
       {
          vector<string> spawnable = TheSynth->GetModuleFactory()->GetSpawnableModules(type);
          for (auto toSpawn : spawnable)
             mScreenshotsToProcess.push_back(toSpawn);
-      }
+      }*/
+
+      for (auto effect : TheSynth->GetEffectFactory()->GetSpawnableEffects())
+         mScreenshotsToProcess.push_back(effect + " " + ModuleFactory::kEffectChainSuffix);
    }
+   if (button == mDoModuleDocumentationButton)
+   {
+      ofxJSONElement docs;
+
+      LoadTooltips();
+      for (auto moduleType : sTooltips)
+      {
+         docs[moduleType.module]["description"] = moduleType.tooltip;
+         for (auto control : moduleType.controlTooltips)
+         {
+            docs[moduleType.module]["controls"][control.controlName] = control.tooltip;
+         }
+
+         string typeName = "unknown";
+         if (moduleType.module == "scale" || moduleType.module == "transport" || moduleType.module == "vstplugin")
+            typeName = "other";
+
+         docs[moduleType.module]["type"] = typeName;
+         docs[moduleType.module]["canReceiveAudio"] = false;
+         docs[moduleType.module]["canReceiveNote"] = false;
+         docs[moduleType.module]["canReceivePulses"] = false;
+      }
+
+      vector<ModuleType> moduleTypes = {
+                                          kModuleType_Note,
+                                          kModuleType_Synth,
+                                          kModuleType_Audio,
+                                          kModuleType_Instrument,
+                                          kModuleType_Processor,
+                                          kModuleType_Modulator,
+                                          kModuleType_Pulse,
+                                          kModuleType_Other
+      };
+      for (auto type : moduleTypes)
+      {
+         vector<string> spawnable = TheSynth->GetModuleFactory()->GetSpawnableModules(type);
+         for (auto toSpawn : spawnable)
+         {
+            IDrawableModule* module = TheSynth->SpawnModuleOnTheFly(toSpawn, 100, 300);
+
+            string moduleType;
+            switch (module->GetModuleType())
+            {
+               case kModuleType_Note: moduleType = "note effects"; break;
+               case kModuleType_Synth: moduleType = "synths"; break;
+               case kModuleType_Audio: moduleType = "audio effects"; break;
+               case kModuleType_Instrument: moduleType = "instruments"; break;
+               case kModuleType_Processor: moduleType = "effect chain"; break;
+               case kModuleType_Modulator: moduleType = "modulators"; break;
+               case kModuleType_Pulse: moduleType = "pulse"; break;
+               case kModuleType_Other: moduleType = "other"; break;
+               case kModuleType_Unknown: moduleType = "unknown"; break;
+            }
+
+            docs[toSpawn]["type"] = moduleType;
+            docs[toSpawn]["canReceiveAudio"] = module->CanReceiveAudio();
+            docs[toSpawn]["canReceiveNote"] = module->CanReceiveNotes();
+            docs[toSpawn]["canReceivePulses"] = module->CanReceivePulses();
+
+            module->GetOwningContainer()->DeleteModule(module);
+         }
+      }
+
+      for (auto effect : TheSynth->GetEffectFactory()->GetSpawnableEffects())
+         docs[effect]["type"] = "effect chain";
+
+      docs.save(ofToDataPath("module_documentation.json"), true);
+   }
+}
+
+void HelpDisplay::ScreenshotModule(IDrawableModule* module)
+{
+   mScreenshotModule = module;
 }
 
 void HelpDisplay::RenderScreenshot(int x, int y, int width, int height, string filename)

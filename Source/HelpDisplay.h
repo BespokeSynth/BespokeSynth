@@ -33,6 +33,8 @@ public:
    void RadioButtonUpdated(RadioButton* radio, int oldVal) override {}
    void ButtonClicked(ClickButton* button) override;
 
+   void ScreenshotModule(IDrawableModule* module);
+
    static bool sShowTooltips;
 
 private:
@@ -65,6 +67,7 @@ private:
    Checkbox* mShowTooltipsCheckbox;
    ClickButton* mDumpModuleInfoButton;
    ClickButton* mDoModuleScreenshotsButton;
+   ClickButton* mDoModuleDocumentationButton;
    ClickButton* mTutorialVideoLinkButton;
    float mWidth;
    float mHeight;
@@ -72,6 +75,7 @@ private:
    static list<ModuleTooltipInfo> sTooltips;
 
    list<string> mScreenshotsToProcess;
+   IDrawableModule* mScreenshotModule;
 };
 
 #endif /* defined(__Bespoke__HelpDisplay__) */

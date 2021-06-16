@@ -2181,6 +2181,10 @@ void ModularSynth::OnConsoleInput()
       {
          ofLog() << "pos:(" << mMainComponent->getTopLevelComponent()->getPosition().x << ", " << mMainComponent->getTopLevelComponent()->getPosition().y << ") size:(" << ofGetWidth() << ", " << ofGetHeight() << ")";
       }
+      else if (tokens[0] == "screenshotmodule")
+      {
+         TheTitleBar->GetHelpDisplay()->ScreenshotModule(mModuleContainer.GetModules()[0]);
+      }
       else
       {
          ofLog() << "Creating: " << mConsoleText;
