@@ -103,7 +103,7 @@ void UserPrefsEditor::Show()
       mRecordBufferLengthMinutes = TheSynth->GetUserPrefs()["record_buffer_length_minutes"].asDouble();
 
    if (TheSynth->GetUserPrefs()["tooltips"].isNull())
-      mTooltipsFilePath = "internal/tooltips_eng.txt";
+      mTooltipsFilePath = "tooltips_eng.txt";
    else
       mTooltipsFilePath = TheSynth->GetUserPrefs()["tooltips"].asString();
 

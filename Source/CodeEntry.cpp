@@ -655,9 +655,9 @@ void CodeEntry::OnPythonInit()
       {
          //py::exec("jedi.preload_module(['bespoke','module','scriptmodule','random','math'])", py::globals());
          py::exec("jediProject = jedi.get_default_project()", py::globals());
-         py::exec("jediProject.added_sys_path = [\"" + ofToResourcePath("internal/python_stubs") + "\"]", py::globals());
-         //py::eval_file(ofToResourcePath("internal/bespoke_stubs.pyi"), py::globals());
-         //py::exec("import sys;sys.path.append(\""+ ofToResourcePath("internal/python_stubs")+"\")", py::globals());
+         py::exec("jediProject.added_sys_path = [\"" + ofToResourcePath("python_stubs") + "\"]", py::globals());
+         //py::eval_file(ofToResourcePath("bespoke_stubs.pyi"), py::globals());
+         //py::exec("import sys;sys.path.append(\""+ ofToResourcePath("python_stubs")+"\")", py::globals());
       }
       catch (const std::exception &e)
       {

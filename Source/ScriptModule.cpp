@@ -129,7 +129,7 @@ void ScriptModule::InitializePythonIfNecessary()
 
    if (!sHasPythonEverSuccessfullyInitialized)
    {
-      File(ofToResourcePath("internal/" + kPythonIsInstalledMarkerFile)).create();
+      File(ofToDataPath("internal/" + kPythonIsInstalledMarkerFile)).create();
       sHasPythonEverSuccessfullyInitialized = true;
    }
 }
@@ -139,7 +139,7 @@ void ScriptModule::CheckIfPythonEverSuccessfullyInitialized()
 {
    if (!sHasPythonEverSuccessfullyInitialized)
    {
-      if (File(ofToResourcePath("internal/"+kPythonIsInstalledMarkerFile)).existsAsFile())
+      if (File(ofToDataPath("internal/"+kPythonIsInstalledMarkerFile)).existsAsFile())
          sHasPythonEverSuccessfullyInitialized = true;
    }
 }

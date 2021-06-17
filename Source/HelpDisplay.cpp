@@ -141,7 +141,7 @@ void HelpDisplay::LoadTooltips()
 {
    string tooltipsPath;
    if (TheSynth->GetUserPrefs()["tooltips"].isNull())
-      tooltipsPath = ofToResourcePath("internal/tooltips_eng.txt");
+      tooltipsPath = ofToResourcePath("tooltips_eng.txt");
    else
       tooltipsPath = ofToResourcePath(TheSynth->GetUserPrefs()["tooltips"].asString());
 
