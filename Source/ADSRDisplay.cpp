@@ -206,13 +206,30 @@ void ADSRDisplay::SetADSR(::ADSR* adsr)
 
 void ADSRDisplay::UpdateSliderVisibility()
 {
-   bool slidersActive = (sDisplayMode == kDisplaySliders) && mAdsr != nullptr && mAdsr->IsStandardADSR() && IsShowing();
+   bool slidersActive = (sDisplayMode == kDisplaySliders) && mAdsr != nullptr && IsShowing();
    if (mASlider)
    {
-      mASlider->SetShowing(slidersActive);
-      mDSlider->SetShowing(slidersActive);
-      mSSlider->SetShowing(slidersActive);
-      mRSlider->SetShowing(slidersActive);
+      if (mAdsr->IsStandardADSR())
+      {
+         mASlider->SetShowing(slidersActive);
+         mDSlider->SetShowing(slidersActive);
+         mSSlider->SetShowing(slidersActive);
+         mRSlider->SetShowing(slidersActive);
+      }
+      if (mAdsr->GetNumStages() == 3 && !mAdsr->GetHasSustainStage())
+      {
+         mASlider->SetShowing(slidersActive);
+         mDSlider->SetShowing(slidersActive);
+         mSSlider->SetShowing(false);
+         mRSlider->SetShowing(slidersActive);
+      }
+      if (mAdsr->GetNumStages() == 2 && !mAdsr->GetHasSustainStage())
+      {
+         mASlider->SetShowing(slidersActive);
+         mDSlider->SetShowing(slidersActive);
+         mSSlider->SetShowing(false);
+         mRSlider->SetShowing(false);
+      }
    }
 }
 
