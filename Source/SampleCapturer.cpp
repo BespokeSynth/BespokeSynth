@@ -222,7 +222,7 @@ void SampleCapturer::OnClicked(int x, int y, bool right)
             grab.SetNumActiveChannels(mSamples[i].mBuffer.NumActiveChannels());
             for (int ch = 0; ch < grab.NumActiveChannels(); ++ch)
                BufferCopy(grab.GetChannel(ch), mSamples[i].mBuffer.GetChannel(ch), mSamples[i].mRecordingLength);
-            TheSynth->GrabSample(&grab, false, 1);
+            TheSynth->GrabSample(&grab, false);
          }
       }
    }

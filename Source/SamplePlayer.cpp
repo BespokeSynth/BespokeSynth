@@ -642,7 +642,7 @@ void SamplePlayer::ButtonClicked(ClickButton *button)
    if (button == mGrabHoveredClipButton)
    {
       ChannelBuffer* data = GetCueSampleData(mHoveredCuePointIndex);
-      TheSynth->GrabSample(data, false, 1);
+      TheSynth->GrabSample(data, false);
       delete data;
    }
 }
