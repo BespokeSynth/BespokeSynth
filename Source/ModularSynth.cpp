@@ -1950,7 +1950,7 @@ void ModularSynth::SaveStatePopup()
 {
    FileChooser chooser("Save current state as...", File(ofToDataPath(ofGetTimestampString("savestate/%Y-%m-%d_%H-%M.bsk"))), "*.bsk", true, false, mMainComponent->getTopLevelComponent());
    if (chooser.browseForFileToSave(true))
-      SaveState(chooser.getResult().getRelativePathFrom(File(ofToDataPath(""))).toStdString());
+      SaveState(chooser.getResult().getFullPathName().toStdString());
 }
 
 void ModularSynth::LoadStatePopup()
@@ -1962,14 +1962,14 @@ void ModularSynth::LoadStatePopupImp()
 {
    FileChooser chooser("Load state", File(ofToDataPath("savestate")), "*.bsk", true, false, mMainComponent->getTopLevelComponent());
    if (chooser.browseForFileToOpen())
-      LoadState(chooser.getResult().getRelativePathFrom(File(ofToDataPath(""))).toStdString());
+      LoadState(chooser.getResult().getFullPathName().toStdString());
 }
 
 void ModularSynth::SaveState(string file)
 {
    mAudioThreadMutex.Lock("SaveState()");
    
-   FileStreamOut out(ofToDataPath(file).c_str());
+   FileStreamOut out(file.c_str());
    
    out << GetLayout().getRawString(true);
    mModuleContainer.SaveState(out);
@@ -1979,11 +1979,11 @@ void ModularSynth::SaveState(string file)
 
 void ModularSynth::LoadState(string file)
 {
-   ofLog() << "LoadState() " << ofToDataPath(file);
+   ofLog() << "LoadState() " << file;
 
-   if (!juce::File(ofToDataPath(file)).existsAsFile())
+   if (!juce::File(file).existsAsFile())
    {
-      LogEvent("couldn't find file " + ofToDataPath(file), kLogEventType_Error);
+      LogEvent("couldn't find file " + file, kLogEventType_Error);
       return;
    }
 
@@ -2163,20 +2163,20 @@ void ModularSynth::OnConsoleInput()
       else if (tokens[0] == "savestate")
       {
          if (tokens.size() >= 2)
-            SaveState("savestate/"+tokens[1]);
+            SaveState(ofToDataPath("savestate/"+tokens[1]));
       }
       else if (tokens[0] == "loadstate")
       {
          if (tokens.size() >= 2)
-            LoadState("savestate/"+tokens[1]);
+            LoadState(ofToDataPath("savestate/"+tokens[1]));
       }
       else if (tokens[0] == "s")
       {
-         SaveState("savestate/quicksave.bsk");
+         SaveState(ofToDataPath("savestate/quicksave.bsk"));
       }
       else if (tokens[0] == "l")
       {
-         LoadState("savestate/quicksave.bsk");
+         LoadState(ofToDataPath("savestate/quicksave.bsk"));
       }
       else if (tokens[0] == "getwindowinfo")
       {
@@ -2229,7 +2229,7 @@ void ModularSynth::DoAutosave()
          autosaveFiles[i].deleteFile();
    }
 
-   SaveState(ofGetTimestampString("savestate/autosave/autosave_%Y-%m-%d_%H-%M-%S.bsk"));
+   SaveState(ofToDataPath(ofGetTimestampString("savestate/autosave/autosave_%Y-%m-%d_%H-%M-%S.bsk")));
 }
 
 IDrawableModule* ModularSynth::SpawnModuleOnTheFly(string moduleName, float x, float y, bool addToContainer)
