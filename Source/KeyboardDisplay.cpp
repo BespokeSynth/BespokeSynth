@@ -23,6 +23,8 @@ KeyboardDisplay::KeyboardDisplay()
 , mNumOctaves(3)
 , mPlayingMousePitch(-1)
 , mTypingInput(false)
+, mLatch(false)
+, mShowScale(false)
 {   
    for (int i = 0; i < 128; ++i)
    {
@@ -121,18 +123,28 @@ int KeyboardDisplay::NumKeys() const
    return TheScale->GetTet() * mNumOctaves + 1;
 }
 
-namespace
+void KeyboardDisplay::SetPitchColor(int pitch)
 {
-   void SetPitchColor(int pitch)
+   if (mShowScale)
    {
       if (TheScale->IsRoot(pitch))
-         ofSetColor(0,200,0);
+         ofSetColor(0, 200, 0);
       else if (TheScale->IsInPentatonic(pitch))
-         ofSetColor(255,128,0);
+         ofSetColor(255, 128, 0);
       else if (TheScale->IsInScale(pitch))
-         ofSetColor(180,80,0);
+         ofSetColor(180, 80, 0);
       else
-         ofSetColor(50,50,50);
+         ofSetColor(50, 50, 50);
+   }
+   else
+   {
+      pitch %= 12;
+      ofColor color;
+      if (pitch == 0 || pitch == 2 || pitch == 4 || pitch == 5 || pitch == 7 || pitch == 9 || pitch == 11)
+         color.setHsb(240, 145, 200);
+      else
+         color.setHsb(240, 145, 120);
+      ofSetColor(color);
    }
 }
 
@@ -283,6 +295,7 @@ void KeyboardDisplay::LoadLayout(const ofxJSONElement& moduleInfo)
    mModuleSaveData.LoadInt("num_octaves", moduleInfo, 3, 0, 10, K(isTextField));
    mModuleSaveData.LoadBool("typing_control", moduleInfo, false);
    mModuleSaveData.LoadBool("latch", moduleInfo, false);
+   mModuleSaveData.LoadBool("show_scale", moduleInfo, false);
    
    SetUpFromSaveData();
 }
@@ -294,6 +307,7 @@ void KeyboardDisplay::SetUpFromSaveData()
    mNumOctaves = mModuleSaveData.GetInt("num_octaves");
    mTypingInput = mModuleSaveData.GetBool("typing_control");
    mLatch = mModuleSaveData.GetBool("latch");
+   mShowScale = mModuleSaveData.GetBool("show_scale");
 }
 
 namespace

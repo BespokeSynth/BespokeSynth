@@ -45,6 +45,7 @@ private:
    void Resize(float w, float h) override { mWidth = w; mHeight = h; }
    
    void DrawKeyboard(int x, int y, int w, int h);
+   void SetPitchColor(int pitch);
    ofRectangle GetKeyboardKeyRect(int pitch, int w, int h, bool& isBlackKey) const;
    
    int RootKey() const;
@@ -58,6 +59,7 @@ private:
    int mPlayingMousePitch;
    bool mTypingInput;
    bool mLatch;
+   bool mShowScale;
    std::array<float, 128> mLastOnTime{};
    std::array<float, 128> mLastOffTime{};
 };
