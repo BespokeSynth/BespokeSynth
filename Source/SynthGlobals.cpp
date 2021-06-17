@@ -139,6 +139,8 @@ void DrawAudioBuffer(float width, float height, const float* buffer, float start
       {
          float step = width > 0 ? kStepSize : -kStepSize;
          float samplesPerStep = length / width * step;
+
+         ofSetColor(color);
          
          for (float i = 0; abs(i) < abs(width); i+=step)
          {
@@ -156,17 +158,16 @@ void DrawAudioBuffer(float width, float height, const float* buffer, float start
                   sampleIdx %= bufferSize;
                mag = MAX(mag, fabsf(buffer[sampleIdx]));
             }
-            mag = sqrt(mag);
-            mag = sqrt(mag);
+            mag = pow(mag, .25f);
             mag *= height/2 * vol;
             if (mag > height/2)
             {
-               ofSetColor(255,0,0);
+               //ofSetColor(255,0,0);
                mag = height/2;
             }
             else
             {
-               ofSetColor(color);
+               //ofSetColor(color);
             }
             if (mag == 0)
                mag = .1f;
