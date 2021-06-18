@@ -11,6 +11,7 @@
 #include "IDrawableModule.h"
 #include "ModularSynth.h"
 #include "EnvelopeEditor.h"
+#include "PatchCable.h"
 
 ADSRDisplay::DisplayMode ADSRDisplay::sDisplayMode = ADSRDisplay::kDisplayEnvelope;
 
@@ -206,7 +207,16 @@ void ADSRDisplay::SetADSR(::ADSR* adsr)
 
 void ADSRDisplay::UpdateSliderVisibility()
 {
-   bool slidersActive = (sDisplayMode == kDisplaySliders) && mAdsr != nullptr && IsShowing();
+   bool slidersActive = (sDisplayMode == kDisplaySliders || (PatchCable::sActivePatchCable != nullptr && PatchCable::sActivePatchCable->GetConnectionType() == kConnectionType_UIControl)) &&
+                        mAdsr != nullptr && IsShowing();
+   if (mASlider && mASlider->GetModulator() != nullptr)
+      slidersActive = true;
+   if (mDSlider && mDSlider->GetModulator() != nullptr)
+      slidersActive = true;
+   if (mSSlider && mSSlider->GetModulator() != nullptr)
+      slidersActive = true;
+   if (mRSlider && mRSlider->GetModulator() != nullptr)
+      slidersActive = true;
    if (mASlider)
    {
       if (mAdsr->IsStandardADSR())
