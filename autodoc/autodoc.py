@@ -49,13 +49,16 @@ html.write(before)
 html.write('''
          <nav class="menu">
             
-            <ul></br>Bespoke Synth Reference</br></br>''')
+            <ul></br>Bespoke Synth Reference</br></br>
+            <a href="#basics">basics</a>''')
 for moduleType in moduleTypes:
    html.write('''
                <input type="checkbox" name="menu" id="'''+moduleType.replace(" ","")+'''">
                <li>
                   <label for="'''+moduleType.replace(" ","")+'''" class="title">'''+moduleType+'''</label>''')
    for entry in modulesByType[moduleType]:
+      if documentation[entry]["description"][0] == '[':
+         continue
       html.write('''
                   <a href="#'''+entry+'''">'''+entry+'''</a>''')
    html.write('''
@@ -66,16 +69,28 @@ html.write('''
          </nav>''')
 
 html.write('''
-      <main class="main">''')
+      <main class="main">
+         <a name=basics></a></br>
+         <h1>Bespoke Synth Reference</h1>
+         <h2>basics</h2>
+         <p>''')
+html.write(open("../Builds/MacOSX/build/Release/resource/help.txt","r").read())
+html.write('''
+         </p>''')
 for moduleType in moduleTypes:
+   html.write('''
+         <h2>'''+moduleType+'''</h2>''')
    for module in modulesByType[moduleType]:
-      html.write('''<a name='''+module+'''></a></br>
-      <b>'''+module+'''</b></br>
-      <img src="screenshots/'''+module+'''.png">
-      </br>
-      <span style="display:inline-block;margin-left:50px;">
-      ''')
       moduleInfo = documentation[module]
+      if moduleInfo["description"][0] == '[':
+         continue
+      html.write('''
+         <a name='''+module+'''></a></br>
+         <b>'''+module+'''</b></br>
+         <img src="screenshots/'''+module+'''.png">
+         </br>
+         <span style="display:inline-block;margin-left:50px;">
+         ''')
       if "description" in moduleInfo:
          html.write(moduleInfo["description"]+"<br/><br/>")
       if "controls" in moduleInfo:

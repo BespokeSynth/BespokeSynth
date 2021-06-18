@@ -1,5 +1,5 @@
 
-navigation:
+navigation
    * space bar + move mouse to pan, or right-click drag in empty space
    * space bar + mousewheel/trackpad-scroll to zoom, or scroll in empty space
    * if you get lost, press tab and type "home" into the console to reset to the initial position and zoom

@@ -407,7 +407,7 @@ polyrhythms~looping sequence with lines on different divisions
 
 
 
-playsequencer~drum sequencer that allows you to punch in to record and overdub steps, inspired by the pulsar–23 drum machine
+playsequencer~drum sequencer that allows you to punch in to record and overdub steps, inspired by the pulsar-23 drum machine
 ~grid~[none]
 ~interval~the step size
 ~measures~the loop length
