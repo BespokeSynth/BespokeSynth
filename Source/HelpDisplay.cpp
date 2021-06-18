@@ -140,7 +140,7 @@ void HelpDisplay::CheckboxUpdated(Checkbox* checkbox)
 void HelpDisplay::LoadTooltips()
 {
    string tooltipsPath;
-   if (TheSynth->GetUserPrefs()["tooltips"].isNull())
+   if (TheSynth->GetUserPrefs()["tooltips"].isNull() || !juce::File(ofToResourcePath(TheSynth->GetUserPrefs()["tooltips"].asString())).existsAsFile())
       tooltipsPath = ofToResourcePath("tooltips_eng.txt");
    else
       tooltipsPath = ofToResourcePath(TheSynth->GetUserPrefs()["tooltips"].asString());
