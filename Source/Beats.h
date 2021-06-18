@@ -47,6 +47,8 @@ public:
    void AddBeat(Sample* sample);
    void Process(double time, ChannelBuffer* buffer, int bufferSize);
    int GetNumSamples() { return (int)mSamples.size(); }
+   void SaveState(FileStreamOut& out);
+   void LoadState(FileStreamIn& in);
    
    void RadioButtonUpdated(RadioButton* list, int oldVal);
    
@@ -107,6 +109,8 @@ public:
    void LoadLayout(const ofxJSONElement& moduleInfo) override;
    void SaveLayout(ofxJSONElement& moduleInfo) override;
    void SetUpFromSaveData() override;
+   void SaveState(FileStreamOut& out) override;
+   void LoadState(FileStreamIn& in) override;
    
 private:
    //IDrawableModule

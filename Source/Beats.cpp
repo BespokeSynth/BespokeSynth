@@ -139,7 +139,7 @@ void Beats::GetModuleDimensions(float& width, float& height)
    width = BEAT_COLUMN_WIDTH * (int)mBeatColumns.size();
    height = 0;
    for (size_t i=0; i < mBeatColumns.size(); ++i)
-      height = MAX(height, 132+15*MAX(mBeatColumns[i]->GetNumSamples(),1));
+      height = MAX(height, 132+15*(mBeatColumns[i]->GetNumSamples() + 1));
 }
 
 void Beats::FloatSliderUpdated(FloatSlider* slider, float oldVal)
@@ -167,6 +167,37 @@ void Beats::SetUpFromSaveData()
    SetTarget(TheSynth->FindModule(mModuleSaveData.GetString("target")));
 }
 
+namespace
+{
+   const int kSaveStateRev = 1;
+}
+
+void Beats::SaveState(FileStreamOut& out)
+{
+   IDrawableModule::SaveState(out);
+
+   out << kSaveStateRev;
+
+   out << (int)mBeatColumns.size();
+   for (size_t i = 0; i < mBeatColumns.size(); ++i)
+      mBeatColumns[i]->SaveState(out);
+}
+
+void Beats::LoadState(FileStreamIn& in)
+{
+   IDrawableModule::LoadState(in);
+
+   int rev;
+   in >> rev;
+   LoadStateValidate(rev <= kSaveStateRev);
+
+   int numColumns;
+   in >> numColumns;
+   LoadStateValidate(numColumns == (int)mBeatColumns.size());
+   for (size_t i = 0; i < mBeatColumns.size(); ++i)
+      mBeatColumns[i]->LoadState(in);
+}
+
 void BeatData::LoadBeat(Sample* sample)
 {
    mBeat = sample;
@@ -188,7 +219,7 @@ void BeatData::RecalcPos(double time, bool doubleTime, int numBars)
 BeatColumn::BeatColumn(Beats* owner, int index)
 : mOwner(owner)
 , mVolume(0)
-, mSampleIndex(0)
+, mSampleIndex(-1)
 , mIndex(index)
 , mFilter(0)
 , mDoubleTime(false)
@@ -212,7 +243,7 @@ BeatColumn::~BeatColumn()
 void BeatColumn::Process(double time, ChannelBuffer* buffer, int bufferSize)
 {
    Sample* beat = mBeatData.mBeat;
-   if (beat)
+   if (beat && mSampleIndex != -1)
    {
       float volSq = mVolume * mVolume * .25f;
       
@@ -263,7 +294,7 @@ void BeatColumn::Process(double time, ChannelBuffer* buffer, int bufferSize)
 
 void BeatColumn::Draw(int x, int y)
 {
-   if (mBeatData.mBeat)
+   if (mBeatData.mBeat && mSampleIndex != -1)
    {
       int w = BEAT_COLUMN_WIDTH - 6;
       int h = 35;
@@ -337,28 +368,53 @@ void BeatColumn::CreateUIControls()
    mSelector = new RadioButton(mOwner, ("selector" + ofToString(mIndex)).c_str(), 0, 0, &mSampleIndex);
    
    mSelector->SetForcedWidth(controlWidth);
-   mSelector->AddLabel("none", 0);
+   mSelector->AddLabel("none", -1);
 }
 
 void BeatColumn::AddBeat(Sample* sample)
 {
-   if (mSamples.size() == 0)
-      mSelector->Clear();
-
-   mSelector->AddLabel(sample->Name().c_str(), mSelector->GetNumValues());
+   mSelector->AddLabel(sample->Name().c_str(), mSelector->GetNumValues()-1);
    Sample* newSample = new Sample();
    newSample->CopyFrom(sample);
    mSamples.push_back(newSample);
-
-   if (mSamples.size() == 1)
-      mBeatData.LoadBeat(mSamples[0]);
 }
 
 void BeatColumn::RadioButtonUpdated(RadioButton* list, int oldVal)
 {
    if (list == mSelector)
    {
-      mBeatData.LoadBeat(mSamples[mSampleIndex]);
+      if (mSampleIndex != -1 && mSampleIndex < (int)mSamples.size())
+         mBeatData.LoadBeat(mSamples[mSampleIndex]);
    }
+}
+
+void BeatColumn::SaveState(FileStreamOut& out)
+{
+   out << (int)mSamples.size();
+   for (size_t i = 0; i < mSamples.size(); ++i)
+      mSamples[i]->SaveState(out);
+   out << mSampleIndex;
+}
+
+void BeatColumn::LoadState(FileStreamIn& in)
+{
+   int numSamples;
+   in >> numSamples;
+   mSamples.resize(numSamples);
+   if (numSamples > 0)
+   {
+      mSelector->Clear();
+      mSelector->AddLabel("none", -1);
+   }
+   for (size_t i = 0; i < mSamples.size(); ++i)
+   {
+      mSamples[i] = new Sample();
+      mSamples[i]->LoadState(in);
+      mSelector->AddLabel(mSamples[i]->Name().c_str(), mSelector->GetNumValues()-1);
+   }
+   in >> mSampleIndex;
+
+   if (mSampleIndex >= 0 && mSampleIndex < (int)mSamples.size())
+      mBeatData.LoadBeat(mSamples[mSampleIndex]);
 }
 
