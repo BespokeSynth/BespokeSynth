@@ -20,22 +20,20 @@
 #include "ClickButton.h"
 #include "RadioButton.h"
 #include "OpenFrameworksPort.h"
-#include "SampleBank.h"
 #include "BiquadFilter.h"
 #include "Ramp.h"
+#include "ChannelBuffer.h"
 
 class Beats;
-struct SampleInfo;
 
-#define BEAT_COLUMN_WIDTH 110
+#define BEAT_COLUMN_WIDTH 150
 
 struct BeatData
 {
    BeatData() : mBeat(nullptr) {}
-   void LoadBeat(const SampleInfo* info);
-   void RecalcPos(double time, bool doubleTime);
+   void LoadBeat(Sample* sample);
+   void RecalcPos(double time, bool doubleTime, int numBars);
    
-   int mNumBars;
    Sample* mBeat;
 };
 
@@ -47,7 +45,8 @@ public:
    void Draw(int x, int y);
    void CreateUIControls();
    void AddBeat(Sample* sample);
-   void Process(double time, float* buffer, int bufferSize);
+   void Process(double time, ChannelBuffer* buffer, int bufferSize);
+   int GetNumSamples() { return (int)mSamples.size(); }
    
    void RadioButtonUpdated(RadioButton* list, int oldVal);
    
@@ -60,19 +59,24 @@ private:
    int mIndex;
    float mFilter;
    FloatSlider* mFilterSlider;
-   BiquadFilter mLowpass;
-   BiquadFilter mHighpass;
+   std::array<BiquadFilter,2> mLowpass;
+   std::array<BiquadFilter,2> mHighpass;
    Beats* mOwner;
    Ramp mFilterRamp;
    bool mDoubleTime;
    Checkbox* mDoubleTimeCheckbox;
+   int mNumBars;
+   IntSlider* mNumBarsSlider;
+   vector<Sample*> mSamples;
+   float mPan;
+   FloatSlider* mPanSlider;
 };
 
-class Beats : public IAudioSource, public IDrawableModule, public IFloatSliderListener, public IIntSliderListener, public IDropdownListener, public ITimeListener, public IButtonListener, public IRadioButtonListener, public ISampleBankListener
+class Beats : public IAudioSource, public IDrawableModule, public IFloatSliderListener, public IIntSliderListener, public IDropdownListener, public ITimeListener, public IButtonListener, public IRadioButtonListener
 {
 public:
    Beats();
-   ~Beats();
+   virtual ~Beats();
    static IDrawableModule* Create() { return new Beats(); }
    
    string GetTitleLabel() override { return "beats"; }
@@ -80,16 +84,14 @@ public:
    
    void Init() override;
    
-   const SampleInfo* GetSampleInfo(int columnIdx, int sampleIdx);
-   
-   //SampleBankListener
-   void OnSamplesLoaded(SampleBank* bank) override;
-   
    //IAudioSource
    void Process(double time) override;
    void SetEnabled(bool enabled) override { mEnabled = enabled; }
    
-   void PostRepatch(PatchCableSource* cableSource, bool fromUserClick) override;
+   //IDrawableModule
+   void FilesDropped(vector<string> files, int x, int y) override;
+   void SampleDropped(int x, int y, Sample* sample) override;
+   bool CanDropSample() const override { return true; }
    
    void CheckboxUpdated(Checkbox* checkbox) override;
    void FloatSliderUpdated(FloatSlider* slider, float oldVal) override;
@@ -112,12 +114,9 @@ private:
    bool Enabled() const override { return mEnabled; }
    void GetModuleDimensions(float& width, float& height) override;
    
-   SampleBank* mBank;
-   
-   float* mWriteBuffer;
-   vector<BeatColumn*> mBeatColumns;
+   ChannelBuffer mWriteBuffer;
+   std::array<BeatColumn*, 4> mBeatColumns;
    int mRows;
-   PatchCableSource* mSampleBankCable;
 };
 
 #endif /* defined(__modularSynth__Beats__) */

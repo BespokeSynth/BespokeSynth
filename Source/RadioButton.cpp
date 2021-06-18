@@ -28,6 +28,7 @@ RadioButton::RadioButton(IRadioButtonListener* owner, const char* name, int x, i
 , mDirection(direction)
 , mElementWidth(8)
 , mSliderVal(0)
+, mForcedWidth(-1)
 {
    assert(owner);
    SetName(name);
@@ -94,6 +95,9 @@ void RadioButton::UpdateDimensions()
       mWidth = mElementWidth * (int)mElements.size();
       mHeight = radioSpacing;
    }
+
+   if (mForcedWidth != -1)
+      mWidth = mForcedWidth;
 }
 
 void RadioButton::Clear()
@@ -101,6 +105,9 @@ void RadioButton::Clear()
    mElements.clear();
    mWidth = 40;
    mHeight = 15;
+
+   if (mForcedWidth != -1)
+      mWidth = mForcedWidth;
 }
 
 void RadioButton::Poll()
@@ -120,6 +127,8 @@ void RadioButton::Render()
    ofFill();
    ofSetColor(0, 0, 0, gModuleDrawAlpha * .5f);
    ofRect(mX+1,mY+1,mWidth,mHeight);
+   ofPushMatrix();
+   ofClipWindow(mX, mY, mWidth, mHeight, true);
    for (int i=0; i<mElements.size(); ++i)
    {
       ofColor color,textColor;
@@ -168,7 +177,7 @@ void RadioButton::Render()
       //ofRect(mX,mY+i*radioSpacing,w,15);
       DrawTextNormal(mElements[i].mLabel, x+2, y+12);
    }
-
+   ofPopMatrix();
    ofPopStyle();
    
    DrawHover();

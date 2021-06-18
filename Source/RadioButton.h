@@ -43,6 +43,7 @@ public:
    void SetMultiSelect(bool on) { mMultiSelect = on; }
    void Clear();
    EnumMap GetEnumMap();
+   void SetForcedWidth(int width) { mForcedWidth = width; }
    
    bool MouseMoved(float x, float y) override;
    
@@ -88,6 +89,7 @@ private:
    RadioDirection mDirection;
    float mSliderVal;
    int mLastSetValue;
+   int mForcedWidth;
 };
 
 #endif /* defined(__modularSynth__RadioButton__) */
