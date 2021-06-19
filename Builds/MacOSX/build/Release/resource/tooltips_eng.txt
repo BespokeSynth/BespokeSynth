@@ -1279,7 +1279,13 @@ drumplayer~sample player intended for drum playback
 
 
 
-beats~[abandoned module, possibly broken] multi-loop player
+beats~multi-loop player, for mixing sample layers together
+~volume*~layer volume
+~filter*~layer filter. negative values bring in a low pass, positive values bring in a high pass.
+~pan*~layer panorama
+~double*~enable this to play at double speed
+~bars*~how many measures long are the samples in this slot?
+~selector*~which sample should we play in this slot? drag samples onto here to add them to this slot.
 
 
 
