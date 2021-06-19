@@ -27,8 +27,6 @@
 #ifdef BESPOKE_MAC
 #include "PSMoveController.h"
 #endif
-#include "SampleBank.h"
-#include "SampleEditor.h"
 #include "Autotalent.h"
 #include "ScaleDetect.h"
 #include "KarplusStrong.h"
@@ -234,8 +232,6 @@ ModuleFactory::ModuleFactory()
    REGISTER(LaunchpadKeyboard, gridkeyboard, kModuleType_Instrument);
    REGISTER(FMSynth, fmsynth, kModuleType_Synth);
    REGISTER(MidiController, midicontroller, kModuleType_Instrument);
-   REGISTER(SampleBank, samplebank, kModuleType_Other);
-   REGISTER(SampleEditor, sampleeditor, kModuleType_Synth);
    REGISTER(Autotalent, autotalent, kModuleType_Audio);
    REGISTER(ScaleDetect, scaledetect, kModuleType_Note);
    REGISTER(KarplusStrong, karplusstrong, kModuleType_Synth);

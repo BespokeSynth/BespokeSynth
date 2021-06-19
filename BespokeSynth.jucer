@@ -728,10 +728,6 @@
               file="Source/NoteTransformer.h"/>
         <FILE id="XHzTDN" name="NoteVibrato.cpp" compile="1" resource="0" file="Source/NoteVibrato.cpp"/>
         <FILE id="kU7XBx" name="NoteVibrato.h" compile="0" resource="0" file="Source/NoteVibrato.h"/>
-        <FILE id="mKSMoB" name="OneShotLauncher.cpp" compile="1" resource="0"
-              file="Source/OneShotLauncher.cpp"/>
-        <FILE id="yRtCv4" name="OneShotLauncher.h" compile="0" resource="0"
-              file="Source/OneShotLauncher.h"/>
         <FILE id="jIqz03" name="OSCOutput.cpp" compile="1" resource="0" file="Source/OSCOutput.cpp"/>
         <FILE id="djmOEW" name="OSCOutput.h" compile="0" resource="0" file="Source/OSCOutput.h"/>
         <FILE id="i6ONR2" name="OutputChannel.cpp" compile="1" resource="0"
@@ -831,8 +827,6 @@
         <FILE id="QgGXc9" name="RingModulator.cpp" compile="1" resource="0"
               file="Source/RingModulator.cpp"/>
         <FILE id="Dl3D81" name="RingModulator.h" compile="0" resource="0" file="Source/RingModulator.h"/>
-        <FILE id="bqiQ8T" name="SampleBank.cpp" compile="1" resource="0" file="Source/SampleBank.cpp"/>
-        <FILE id="dGHX74" name="SampleBank.h" compile="0" resource="0" file="Source/SampleBank.h"/>
         <FILE id="cI0jsx" name="SampleCanvas.cpp" compile="1" resource="0"
               file="Source/SampleCanvas.cpp"/>
         <FILE id="AIUzeX" name="SampleCanvas.h" compile="0" resource="0" file="Source/SampleCanvas.h"/>
@@ -840,9 +834,6 @@
               file="Source/SampleCapturer.cpp"/>
         <FILE id="yuzUvU" name="SampleCapturer.h" compile="0" resource="0"
               file="Source/SampleCapturer.h"/>
-        <FILE id="TLm9ej" name="SampleEditor.cpp" compile="1" resource="0"
-              file="Source/SampleEditor.cpp"/>
-        <FILE id="QOPRdO" name="SampleEditor.h" compile="0" resource="0" file="Source/SampleEditor.h"/>
         <FILE id="Yr6QsW" name="SampleFinder.cpp" compile="1" resource="0"
               file="Source/SampleFinder.cpp"/>
         <FILE id="oW3Axq" name="SampleFinder.h" compile="0" resource="0" file="Source/SampleFinder.h"/>

@@ -23,7 +23,6 @@
 #include "RadioButton.h"
 #include "GateEffect.h"
 
-class SampleBank;
 class Sample;
 
 class SamplePlayer : public IAudioProcessor, public IDrawableModule, public INoteReceiver, public IFloatSliderListener, public IIntSliderListener, public IDropdownListener, public IButtonListener, public IRadioButtonListener, public ITextEntryListener, private OSCReceiver, private OSCReceiver::Listener<OSCReceiver::RealtimeCallback>
@@ -37,8 +36,6 @@ public:
    void CreateUIControls() override;
    void Init() override;
    void Poll() override;
-   
-   void PostRepatch(PatchCableSource* cableSource, bool fromUserClick) override;
    
    void PlayNote(double time, int pitch, int velocity, int voiceIdx = -1, ModulationParameters modulation = ModulationParameters()) override;
    void SendCC(int control, int value, int voiceIdx = -1) override {}
@@ -78,7 +75,6 @@ public:
    
 private:
    void UpdateSample(Sample* sample, bool ownsSample);
-   void UpdateSampleList();
    float GetPlayPositionForMouse(float mouseX) const;
    float GetSecondsForMouse(float mouseX) const;
    void GetPlayInfoForPitch(int pitch, float& startSeconds, float& lengthSeconds, float& speed) const;
@@ -112,7 +108,6 @@ private:
    float mWidth;
    float mHeight;
    
-   SampleBank* mBank;
    Sample* mSample;
    bool mOwnsSample;
    
@@ -121,8 +116,6 @@ private:
    float mSpeed;
    float mPlaySpeed;
    FloatSlider* mSpeedSlider;
-   int mSampleIndex;
-   DropdownList* mSampleList;
    ClickButton* mPlayButton;
    ClickButton* mPauseButton;
    ClickButton* mStopButton;
@@ -131,7 +124,6 @@ private:
    bool mRecord;
    Checkbox* mLoopCheckbox;
    Checkbox* mRecordCheckbox;
-   PatchCableSource* mSampleBankCable;
    bool mScrubbingSample;
    string mYoutubeId;
    ClickButton* mDownloadYoutubeButton;

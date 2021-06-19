@@ -9,7 +9,6 @@
 #include "ClipLauncher.h"
 #include "IAudioReceiver.h"
 #include "Sample.h"
-#include "SampleBank.h"
 #include "SynthGlobals.h"
 #include "ModularSynth.h"
 #include "Profiler.h"

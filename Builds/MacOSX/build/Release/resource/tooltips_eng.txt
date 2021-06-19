@@ -43,11 +43,6 @@ script~python scripting for livecoding notes and module control
 
 
 
-samplebank~[abandoned module, probably broken]point to a collection of samples to be used by other modules
-~sample~[todo]
-
-
-
 radiosequencer~sequence to only enable one value at a time. patch it to the "enabled" checkbox on several modules to only enable one module at a time. works well in conjunction with "groupcontrol" module.
 ~interval~rate to advance
 ~length~length of sequence
@@ -1058,10 +1053,9 @@ sampler~very basic polyphonic pitched sample player and recorder. send audio in,
 
 
 
-sampleplayer~sample playback with triggerable cue points, clip extraction, and youtube search/download functionality. if you have a youtube URL in your clipboard, a button will appear to allow you to download the audio.
+sampleplayer~sample playback with triggerable cue points, clip extraction, and youtube search/download functionality. resize this module larger to access additional features. if you have a youtube URL in your clipboard, a button will appear to allow you to download the audio.
 ~volume~output gain
 ~speed~current playback speed
-~samples~select a sample from the current sample bank [sample banks not currently well-supported]
 ~yt:~search youtube for this string
 ~play~start playing from the current playhead
 ~pause~pause playing and leave playhead where it is
@@ -1091,24 +1085,6 @@ sampleplayer~sample playback with triggerable cue points, clip extraction, and y
 ~release~speed at which gate blends closed
 ~playhovered~play this cue
 ~grabhovered~grab a sample of this cue to drop onto another module
-
-
-
-sampleeditor~[abandoned work in progress, possibly broken] sample editor for creating loops
-~volume~[todo]
-~samples~[todo]
-~play~[todo]
-~loop~[todo]
-~edit~[todo]
-~start~[todo]
-~end~[todo]
-~num bars~[todo]
-~off~[todo]
-~quickstart~[todo]
-~pad end~[todo]
-~write~[todo]
-~keep pitch~[todo]
-~pitch shift~[todo]
 
 
 

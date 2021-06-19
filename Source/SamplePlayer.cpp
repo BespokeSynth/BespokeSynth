@@ -11,7 +11,6 @@
 #include "SamplePlayer.h"
 #include "IAudioReceiver.h"
 #include "Sample.h"
-#include "SampleBank.h"
 #include "SynthGlobals.h"
 #include "ModularSynth.h"
 #include "Profiler.h"
@@ -33,14 +32,10 @@ SamplePlayer::SamplePlayer()
 , mSpeed(1)
 , mSpeedSlider(nullptr)
 , mSample(nullptr)
-, mSampleIndex(-1)
-, mSampleList(nullptr)
 , mPlay(false)
 , mLoop(false)
 , mRecord(false)
 , mLoopCheckbox(nullptr)
-, mBank(nullptr)
-, mSampleBankCable(nullptr)
 , mDrawBuffer(0)
 , mPlayButton(nullptr)
 , mPauseButton(nullptr)
@@ -82,12 +77,10 @@ void SamplePlayer::CreateUIControls()
 {
    IDrawableModule::CreateUIControls();
    UIBLOCK0();
-   UIBLOCK_SHIFTX(20);
    FLOATSLIDER(mVolumeSlider, "volume",&mVolume,0,2); UIBLOCK_SHIFTRIGHT();
    FLOATSLIDER(mSpeedSlider,"speed",&mSpeed,-2,2); UIBLOCK_SHIFTRIGHT();
    BUTTON(mTrimToZoomButton, "trim"); UIBLOCK_SHIFTRIGHT();
    BUTTON(mDownloadYoutubeButton,"youtube"); UIBLOCK_NEWLINE();
-   DROPDOWN(mSampleList,"samples",&mSampleIndex, 100); UIBLOCK_SHIFTRIGHT();
    TEXTENTRY(mDownloadYoutubeSearch,"yt:",30,mYoutubeSearch); UIBLOCK_NEWLINE();
    mDownloadYoutubeSearch->DrawLabel(true);
    mDownloadYoutubeSearch->SetRequireEnter(true);
@@ -98,8 +91,7 @@ void SamplePlayer::CreateUIControls()
    UIBLOCK_SHIFTX(30);
    BUTTON(mLoadFileButton,"load"); UIBLOCK_SHIFTRIGHT();
    BUTTON(mSaveFileButton,"save"); UIBLOCK_SHIFTRIGHT();
-   CHECKBOX(mRecordCheckbox,"record",&mRecord); UIBLOCK_SHIFTRIGHT();
-   UIBLOCK_SHIFTX(50);
+   CHECKBOX(mRecordCheckbox,"record",&mRecord);
    UIBLOCK_NEWCOLUMN();
    FLOATSLIDER_DIGITS(mCuePointStartSlider, "cue start", &mSampleCuePoints[0].startSeconds, 0, 100, 3);
    FLOATSLIDER_DIGITS(mCuePointLengthSlider, "cue len", &mSampleCuePoints[0].lengthSeconds, 0, 100, 3);
@@ -135,11 +127,6 @@ void SamplePlayer::CreateUIControls()
 
    for (int i = 0; i < (int)mSampleCuePoints.size(); ++i)
       mCuePointSelector->AddLabel(ofToString(i).c_str(), i);
-   
-   mSampleBankCable = new PatchCableSource(this, kConnectionType_Special);
-   mSampleBankCable->SetManualPosition(8, 8);
-   mSampleBankCable->AddTypeFilter("samplebank");
-   AddPatchCableSource(mSampleBankCable);
    
    AddChild(&mRecordGate);
    mRecordGate.SetPosition(mRecordAsClipsCheckbox->GetRect().getMaxX()+3,-1);
@@ -408,16 +395,6 @@ void SamplePlayer::Process(double time)
    GetBuffer()->Reset();
 }
 
-void SamplePlayer::PostRepatch(PatchCableSource* cableSource, bool fromUserClick)
-{
-   if (cableSource == mSampleBankCable)
-   {
-      mBank = dynamic_cast<SampleBank*>(mSampleBankCable->GetTarget());
-      
-      UpdateSampleList();
-   }
-}
-
 void SamplePlayer::PlayNote(double time, int pitch, int velocity, int voiceIdx /*= -1*/, ModulationParameters modulation /*= ModulationParameters()*/)
 {
    if (!mEnabled)
@@ -459,33 +436,12 @@ void SamplePlayer::SwitchAndRamp()
       mSwitchAndRampVal.GetChannel(ch)[0] = mLastOutputSample.GetChannel(ch)[0];
 }
 
-void SamplePlayer::UpdateSampleList()
-{
-   if (mBank == nullptr)
-      return;
-   
-   mSampleList->Clear();
-   vector<SampleInfo> samples = mBank->GetSamples();
-   for (int i=0; i<samples.size(); ++i)
-   {
-      mSampleList->AddLabel(samples[i].mSample->Name(), i);
-   }
-}
-
 void SamplePlayer::DropdownClicked(DropdownList* list)
 {
-   if (list == mSampleList)
-   {
-      UpdateSampleList();
-   }
 }
 
 void SamplePlayer::DropdownUpdated(DropdownList* list, int oldVal)
 {
-   if (list == mSampleList)
-   {
-      UpdateSample(mBank->GetSampleInfo(mSampleIndex).mSample, false);
-   }
    if (list == mCuePointSelector)
       UpdateActiveCuePoint();
 }
@@ -1002,7 +958,6 @@ void SamplePlayer::DrawModule()
    
    mVolumeSlider->Draw();
    mSpeedSlider->Draw();
-   mSampleList->Draw();
    mLoopCheckbox->Draw();
    mPlayButton->Draw();
    mPauseButton->Draw();
@@ -1428,7 +1383,6 @@ void SamplePlayer::IntSliderUpdated(IntSlider* slider, int oldVal)
 void SamplePlayer::LoadLayout(const ofxJSONElement& moduleInfo)
 {
    mModuleSaveData.LoadString("target", moduleInfo);
-   mModuleSaveData.LoadString("samplebank", moduleInfo,"",FillDropdown<SampleBank*>);
    mModuleSaveData.LoadFloat("width", moduleInfo, mWidth);
    mModuleSaveData.LoadFloat("height", moduleInfo, mHeight);
    mModuleSaveData.LoadBool("show_youtube_process_output", moduleInfo, false);
@@ -1439,7 +1393,6 @@ void SamplePlayer::LoadLayout(const ofxJSONElement& moduleInfo)
 void SamplePlayer::SaveLayout(ofxJSONElement& moduleInfo)
 {
    IDrawableModule::SaveLayout(moduleInfo);
-   moduleInfo["samplebank"] = mBank ? mBank->Name() : "";
    moduleInfo["width"] = mWidth;
    moduleInfo["height"] = mHeight;
 }
@@ -1447,7 +1400,6 @@ void SamplePlayer::SaveLayout(ofxJSONElement& moduleInfo)
 void SamplePlayer::SetUpFromSaveData()
 {
    SetTarget(TheSynth->FindModule(mModuleSaveData.GetString("target")));
-   mSampleBankCable->SetTarget(TheSynth->FindModule(mModuleSaveData.GetString("samplebank"),false));
    Resize(mModuleSaveData.GetFloat("width"), mModuleSaveData.GetFloat("height"));
 }
 
