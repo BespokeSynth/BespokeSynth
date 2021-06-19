@@ -33,7 +33,7 @@ public:
    
    void Clear();
    void SetFilterType(FilterType type) { if (type != mType) { mType = type; Clear(); } }
-   void SetFilterParams(double f, double q) { mF = f; mQ = q; UpdateFilterCoeff(); }
+   void SetFilterParams(double f, double q);
    void UpdateFilterCoeff();
    void CopyCoeffFrom(BiquadFilter& other);
    bool UsesGain() { return mType == kFilterType_Peak || mType == kFilterType_HighShelf || mType == kFilterType_LowShelf; }

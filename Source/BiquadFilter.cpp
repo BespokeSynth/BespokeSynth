@@ -25,6 +25,16 @@ void BiquadFilter::Clear()
    mZ2 = 0;
 }
 
+void BiquadFilter::SetFilterParams(double f, double q)
+{
+   if (mF != f || mQ != q)
+   {
+      mF = f;
+      mQ = q;
+      UpdateFilterCoeff();
+   }
+}
+
 void BiquadFilter::UpdateFilterCoeff()
 {
    if (mF <= 0 || mF != mF)
