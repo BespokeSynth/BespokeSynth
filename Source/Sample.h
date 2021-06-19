@@ -37,7 +37,7 @@ public:
    int NumChannels() const { return mData.NumActiveChannels(); }
    ChannelBuffer* Data() { return &mData; }
    int GetPlayPosition() const { return mOffset; }
-   void SetPlayPosition(int sample) { mOffset = sample; }
+   void SetPlayPosition(double sample) { mOffset = sample; }
    float GetSampleRateRatio() const { return mSampleRateRatio; }
    void Reset() { mOffset = mNumSamples; }
    void SetStopPoint(int stopPoint) { mStopPoint = stopPoint; }

@@ -107,9 +107,12 @@ void Beats::DrawModule()
 
 void Beats::FilesDropped(vector<string> files, int x, int y)
 {
-   Sample* sample = new Sample();
-   sample->Read(files[0].c_str());
-   SampleDropped(x, y, sample);
+   for (auto file : files)
+   {
+      Sample* sample = new Sample();
+      sample->Read(file.c_str());
+      SampleDropped(x, y, sample);
+   }
 }
 
 void Beats::SampleDropped(int x, int y, Sample* sample)
@@ -213,7 +216,7 @@ void BeatData::RecalcPos(double time, bool doubleTime, int numBars)
       if (pos >= mBeat->LengthInSamples())
          pos -= mBeat->LengthInSamples();
    }
-   mBeat->SetPlayPosition((int)pos);
+   mBeat->SetPlayPosition(pos);
 }
 
 BeatColumn::BeatColumn(Beats* owner, int index)
@@ -223,7 +226,7 @@ BeatColumn::BeatColumn(Beats* owner, int index)
 , mIndex(index)
 , mFilter(0)
 , mDoubleTime(false)
-, mNumBars(1)
+, mNumBars(4)
 , mPan(0)
 {
    for (size_t i=0; i<mLowpass.size(); ++i)
@@ -247,7 +250,7 @@ void BeatColumn::Process(double time, ChannelBuffer* buffer, int bufferSize)
    {
       float volSq = mVolume * mVolume * .25f;
       
-      float speed = beat->LengthInSamples() * gInvSampleRateMs / TheTransport->MsPerBar() / mNumBars;
+      float speed = (beat->LengthInSamples() / beat->GetSampleRateRatio()) * gInvSampleRateMs / TheTransport->MsPerBar() / mNumBars;
       if (mDoubleTime)
          speed *= 2;
       mBeatData.RecalcPos(time, mDoubleTime, mNumBars);
