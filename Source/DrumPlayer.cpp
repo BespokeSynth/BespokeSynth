@@ -123,7 +123,7 @@ void DrumPlayer::DrumHit::CreateUIControls(DrumPlayer* owner, int index)
    
    int x = 5 + (index % 4) * 70;
    int y = 70 + (3-(index / 4)) * 70;
-   mTestButton = new ClickButton(owner,("test "+ofToString(index)).c_str(),x+5,y+40);
+   mTestButton = new ClickButton(owner,("test "+ofToString(index)).c_str(),x+5,y+38,ButtonDisplayStyle::kPlay);
    mRandomButton = new ClickButton(owner,("random "+ofToString(index)).c_str(),x+5,y+53);
    
    UpdateHitDirectoryDropdown();
