@@ -124,6 +124,7 @@ public:
    bool IsLissajousDrawer(IDrawableModule* module) { return VectorContains(module, mLissajousDrawers); }
    
    void GrabSample(ChannelBuffer* data, bool window = false, int numBars = -1);
+   void GrabSample(string filePath);
    Sample* GetHeldSample() const { return mHeldSample; }
    void ClearHeldSample();
    

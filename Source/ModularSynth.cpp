@@ -1856,6 +1856,13 @@ void ModularSynth::GrabSample(ChannelBuffer* data, bool window, int numBars)
    }
 }
 
+void ModularSynth::GrabSample(string filePath)
+{
+   delete mHeldSample;
+   mHeldSample = new Sample();
+   mHeldSample->Read(filePath.c_str());
+}
+
 void ModularSynth::ClearHeldSample()
 {
    delete mHeldSample;

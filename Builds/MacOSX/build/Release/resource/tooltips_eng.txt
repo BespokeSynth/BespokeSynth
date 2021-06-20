@@ -1535,6 +1535,10 @@ midioutput~send midi to an external destination
 
 
 
+samplebrowser~browse your system for samples. drag samples from here to your desired targets (sampleplayer, drumplayer, seaofgrain, etc)
+
+
+
 linnstrumentcontrol~[work in progress]control the lights of a linnstrument controller in various ways
 ~controller~midicontroller with the linnstrument
 ~decay~amount of time it takes for lit key to die off

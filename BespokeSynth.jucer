@@ -827,6 +827,9 @@
         <FILE id="QgGXc9" name="RingModulator.cpp" compile="1" resource="0"
               file="Source/RingModulator.cpp"/>
         <FILE id="Dl3D81" name="RingModulator.h" compile="0" resource="0" file="Source/RingModulator.h"/>
+        <FILE id="aSbZVa" name="SampleBrowser.cpp" compile="1" resource="0"
+              file="Source/SampleBrowser.cpp"/>
+        <FILE id="xreOjB" name="SampleBrowser.h" compile="0" resource="0" file="Source/SampleBrowser.h"/>
         <FILE id="cI0jsx" name="SampleCanvas.cpp" compile="1" resource="0"
               file="Source/SampleCanvas.cpp"/>
         <FILE id="AIUzeX" name="SampleCanvas.h" compile="0" resource="0" file="Source/SampleCanvas.h"/>
