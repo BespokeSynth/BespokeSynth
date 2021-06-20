@@ -27,7 +27,9 @@ enum class ButtonDisplayStyle
    kPlay,
    kPause,
    kStop,
-   kGrabSample
+   kGrabSample,
+   kSampleIcon,
+   kFolderIcon
 };
 
 class ClickButton : public IUIControl
@@ -40,6 +42,7 @@ public:
    void MouseReleased() override;
    bool MouseMoved(float x, float y) override;
    void SetDisplayText(bool display) { mDisplayStyle = ButtonDisplayStyle::kNoLabel; }
+   void SetDisplayStyle(ButtonDisplayStyle style) { mDisplayStyle = style; }
    void SetDimensions(float width, float height) { mWidth = width; mHeight = height; }
 
    //IUIControl

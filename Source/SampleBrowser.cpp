@@ -89,6 +89,27 @@ void SampleBrowser::ButtonClicked(ClickButton* button)
    }
 }
 
+namespace
+{
+   int CompareDirectoryListing(const String& text, const String& other)
+   {
+      if (text == other)
+         return 0;
+      bool isDir = text == ".." || !text.contains(".");
+      bool isOtherDir = other == ".." || !other.contains(".");
+      if (isDir && !isOtherDir)
+         return -1;
+      if (!isDir && isOtherDir)
+         return 1;
+      return text.compareIgnoreCase(other);
+   }
+
+   void SortDirectoryListing(StringArray& listing)
+   {
+      std::sort(listing.begin(), listing.end(), [](const String& a, const String& b) { return CompareDirectoryListing(a, b) < 0; });
+   }
+}
+
 void SampleBrowser::SetDirectory(String dirPath)
 {
    mCurrentDirectory = dirPath;
@@ -126,7 +147,7 @@ void SampleBrowser::SetDirectory(String dirPath)
       if (include)
          mDirectoryListing.add(file.getFileName());
    }
-   mDirectoryListing.sort(true);
+   SortDirectoryListing(mDirectoryListing);
             
    ShowPage(0);
 }
@@ -141,6 +162,10 @@ void SampleBrowser::ShowPage(int page)
       if (i+offset < (int)mDirectoryListing.size())
       {
          mButtons[i]->SetShowing(true);
+         if (mDirectoryListing[i + offset] == ".." || !mDirectoryListing[i + offset].contains("."))
+            mButtons[i]->SetDisplayStyle(ButtonDisplayStyle::kFolderIcon);
+         else
+            mButtons[i]->SetDisplayStyle(ButtonDisplayStyle::kSampleIcon);
          mButtons[i]->SetLabel(mDirectoryListing[i+offset].toStdString().c_str());
       }
       else

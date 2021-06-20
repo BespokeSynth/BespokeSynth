@@ -442,8 +442,13 @@ void ModularSynth::Draw(void* vg)
    if (mHeldSample)
    {
       ofPushMatrix();
+      ofPushStyle();
       ofTranslate(GetMouseX(), GetMouseY());
-      DrawAudioBuffer(100, 70, mHeldSample->Data(), 0, mHeldSample->LengthInSamples(), -1);
+      ofClipWindow(0, 0, 120, 70, true);
+      DrawAudioBuffer(120, 70, mHeldSample->Data(), 0, mHeldSample->LengthInSamples(), -1);
+      ofSetColor(255,255,255);
+      DrawTextNormal(mHeldSample->Name(), 0, 13);
+      ofPopStyle();
       ofPopMatrix();
    }
    

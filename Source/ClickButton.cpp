@@ -37,8 +37,12 @@ ClickButton::~ClickButton()
 void ClickButton::SetLabel(const char* label)
 {
    SetName(label);
-   if (mDisplayStyle == ButtonDisplayStyle::kText)
+   if (mDisplayStyle == ButtonDisplayStyle::kText || mDisplayStyle == ButtonDisplayStyle::kSampleIcon || mDisplayStyle == ButtonDisplayStyle::kFolderIcon)
+   {
       mWidth = GetStringWidth(label) + 3 + .25f * strnlen(label, 50);
+      if (mDisplayStyle == ButtonDisplayStyle::kSampleIcon || mDisplayStyle == ButtonDisplayStyle::kFolderIcon)
+         mWidth += 20;
+   }
 }
 
 void ClickButton::Render()
@@ -95,6 +99,25 @@ void ClickButton::Render()
          float x = mX+4+i*3;
          ofLine(x, mY+7-height/2, x, mY+7+height/2);
       }
+   }
+   else if (mDisplayStyle == ButtonDisplayStyle::kSampleIcon)
+   {
+      ofSetColor(textColor);
+      for (int i = 0; i < 5; ++i)
+      {
+         float height = (i % 2 == 0) ? 6 : 10;
+         float x = mX + 4 + i * 3;
+         ofLine(x, mY + 7 - height / 2, x, mY + 7 + height / 2);
+      }
+      DrawTextNormal(Name(), mX + 22, mY + 12);
+   }
+   else if (mDisplayStyle == ButtonDisplayStyle::kFolderIcon)
+   {
+      ofSetColor(textColor);
+      ofFill();
+      ofRect(mX + 2, mY + 2, 7, 5, 2);
+      ofRect(mX + 2, mY + 4, 16, 9, 2);
+      DrawTextNormal(Name(), mX + 22, mY + 12);
    }
    
    ofPopStyle();

@@ -544,6 +544,9 @@ void DrumPlayer::FilesDropped(vector<string> files, int x, int y)
                mDrumHits[sampleIdx].mSpeed = 1;
                mDrumHits[sampleIdx].mPan = 0;
                mDrumHits[sampleIdx].mEnvelopeLength = mDrumHits[sampleIdx].mSample.LengthInSamples() * gInvSampleRateMs;
+
+               mSelectedHitIdx = sampleIdx;
+               UpdateVisibleControls();
             }
          }
       }
@@ -570,7 +573,12 @@ void DrumPlayer::SampleDropped(int x, int y, Sample* sample)
    {
       int sampleIdx = GetAssociatedSampleIndex(x,y);
       if (sampleIdx != -1)
+      {
          SetHitSample(sampleIdx, sample);
+
+         mSelectedHitIdx = sampleIdx;
+         UpdateVisibleControls();
+      }
    }
 }
 
