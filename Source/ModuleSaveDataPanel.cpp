@@ -158,7 +158,7 @@ void ModuleSaveDataPanel::ReloadSaveData()
    y += 6;
    mApplyButton = new ClickButton(this,"apply",x,y);
    mSaveDataControls.push_back(mApplyButton);
-   if (!mSaveModule->IsSingleton())
+   if (mSaveModule->CanBeDeleted())
    {
       mDeleteButton = new ClickButton(this,"delete module",x+50,y);
       mSaveDataControls.push_back(mDeleteButton);

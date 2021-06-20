@@ -271,7 +271,7 @@ void ModuleContainer::TakeModule(IDrawableModule* module)
 
 void ModuleContainer::DeleteModule(IDrawableModule* module)
 {
-   if (module->IsSingleton())
+   if (!module->CanBeDeleted())
       return;
    
    RemoveFromVector(module, mModules, K(fail));

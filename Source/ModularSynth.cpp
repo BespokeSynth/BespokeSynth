@@ -1250,7 +1250,7 @@ void ModularSynth::MoveToFront(IDrawableModule* module)
 
 void ModularSynth::OnModuleDeleted(IDrawableModule* module)
 {
-   if (module->IsSingleton())
+   if (!module->CanBeDeleted())
       return;
    
    mDeletedModules.push_back(module);

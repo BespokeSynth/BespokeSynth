@@ -58,6 +58,7 @@ public:
    static IDrawableModule* Create() { return new FloatSliderLFOControl(); }
    void Delete() { delete this; }
    void DrawModule() override;
+   bool CanBeDeleted() const override { return false; }
 
    const LFOSettings& GetSettings() { return mLFOSettings; }
    void Load(LFOSettings settings);
