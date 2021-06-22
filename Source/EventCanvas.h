@@ -30,6 +30,7 @@ public:
    
    string GetTitleLabel() override { return "event canvas"; }
    void CreateUIControls() override;
+   void Init() override;
    
    IUIControl* GetUIControlForRow(int row);
    ofColor GetRowColor(int row) const;

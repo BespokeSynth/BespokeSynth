@@ -30,8 +30,14 @@ Stutter::Stutter()
 , mFreeStutterLength(.1f)
 , mFreeStutterSpeed(1)
 {
-   TheTransport->AddListener(this, kInterval_16n, OffsetInfo(0, true), false);
    mBlendRamp.SetValue(0);
+}
+
+void Stutter::Init()
+{
+   IDrawableModule::Init();
+
+   TheTransport->AddListener(this, kInterval_16n, OffsetInfo(0, true), false);
 }
 
 void Stutter::CreateUIControls()

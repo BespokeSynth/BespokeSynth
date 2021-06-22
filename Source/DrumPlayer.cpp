@@ -45,11 +45,17 @@ DrumPlayer::DrumPlayer()
 , mNoteRepeat(false)
 , mQuantizeInterval(kInterval_None)
 {
-   TheTransport->AddListener(this, mQuantizeInterval, OffsetInfo(0, true), false);
 
    ReadKits();
    
    strcpy(mNewKitName, "new");
+}
+
+void DrumPlayer::Init()
+{
+   IDrawableModule::Init();
+
+   TheTransport->AddListener(this, mQuantizeInterval, OffsetInfo(0, true), false);
 }
 
 DrumPlayer::~DrumPlayer()

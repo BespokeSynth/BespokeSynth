@@ -49,8 +49,6 @@ NoteStepSequencer::NoteStepSequencer()
 , mLoopResetPointSlider(nullptr)
 , mHasExternalPulseSource(false)
 {
-   mTransportListenerInfo = TheTransport->AddListener(this, mInterval, OffsetInfo(0, true), true);
-   TheTransport->AddAudioPoller(this);
    
    for (int i=0;i<NSS_MAX_STEPS;++i)
    {
@@ -164,6 +162,8 @@ void NoteStepSequencer::Init()
    IDrawableModule::Init();
    
    SyncGridToSeq();
+   mTransportListenerInfo = TheTransport->AddListener(this, mInterval, OffsetInfo(0, true), true);
+   TheTransport->AddAudioPoller(this);
 }
 
 void NoteStepSequencer::DrawModule()

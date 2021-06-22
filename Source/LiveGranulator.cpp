@@ -36,6 +36,12 @@ LiveGranulator::LiveGranulator()
    mGranulator.mGrainOverlap = 12;
    mGranulator.mGrainLengthMs = 300;
    
+}
+
+void LiveGranulator::Init()
+{
+   IDrawableModule::Init();
+
    TheTransport->AddListener(this, kInterval_None, OffsetInfo(0, true), false);
 }
 

@@ -19,10 +19,16 @@ Beats::Beats()
 : mRows(4)
 , mWriteBuffer(gBufferSize)
 {
-   TheTransport->AddListener(this, kInterval_1n, OffsetInfo(0, true), false);
 
    for (size_t i = 0; i < mBeatColumns.size(); ++i)
       mBeatColumns[i] = new BeatColumn(this, (int)i);
+}
+
+void Beats::Init()
+{
+   IDrawableModule::Init();
+
+   TheTransport->AddListener(this, kInterval_1n, OffsetInfo(0, true), false);
 }
 
 void Beats::CreateUIControls()
@@ -66,11 +72,6 @@ void Beats::Process(double time)
       GetVizBuffer()->WriteChunk(mWriteBuffer.GetChannel(ch), mWriteBuffer.BufferSize(), ch);
       Add(target->GetBuffer()->GetChannel(ch), mWriteBuffer.GetChannel(ch), gBufferSize);
    }
-}
-
-void Beats::Init()
-{
-   IDrawableModule::Init();
 }
 
 void Beats::DropdownClicked(DropdownList* list)

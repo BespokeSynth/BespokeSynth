@@ -52,6 +52,7 @@ public:
    
    string GetTitleLabel() override { return "slider sequencer"; }
    void CreateUIControls() override;
+   void Init() override;
 
    void SetEnabled(bool on) override { mEnabled = on; }
    

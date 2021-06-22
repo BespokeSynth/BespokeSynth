@@ -33,6 +33,7 @@ public:
    
    string GetTitleLabel() override { return "clip launcher"; }
    void CreateUIControls() override;
+   void Init() override;
    
    int GetRowY(int idx);
    

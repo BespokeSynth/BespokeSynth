@@ -18,10 +18,16 @@ UnstablePressure::UnstablePressure()
    , mModulation(false)
    , mVoiceRoundRobin(0)
 {
-   TheTransport->AddAudioPoller(this);
 
    for (int voice = 0; voice < kNumVoices; ++voice)
       mModulation.GetPressure(voice)->CreateBuffer();
+}
+
+void UnstablePressure::Init()
+{
+   IDrawableModule::Init();
+
+   TheTransport->AddAudioPoller(this);
 }
 
 UnstablePressure::~UnstablePressure()

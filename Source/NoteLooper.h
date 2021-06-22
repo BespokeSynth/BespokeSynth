@@ -30,6 +30,7 @@ public:
    
    string GetTitleLabel() override { return "note looper"; }
    void CreateUIControls() override;
+   void Init() override;
    void SetEnabled(bool enabled) override { mEnabled = enabled; }
    bool IsResizable() const override { return true; }
    void Resize(float w, float h) override;

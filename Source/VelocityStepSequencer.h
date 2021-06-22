@@ -33,6 +33,7 @@ public:
    
    string GetTitleLabel() override { return "velocity seq"; }
    void CreateUIControls() override;
+   void Init() override;
    
    void SetMidiController(string name);
    

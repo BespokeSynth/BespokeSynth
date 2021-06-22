@@ -27,6 +27,12 @@ RandomNoteGenerator::RandomNoteGenerator()
 , mSkipSlider(nullptr)
 , mSkipCount(0)
 {
+}
+
+void RandomNoteGenerator::Init()
+{
+   IDrawableModule::Init();
+
    TheTransport->AddListener(this, mInterval, OffsetInfo(0, true), true);
 }
 

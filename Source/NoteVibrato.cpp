@@ -17,6 +17,12 @@ NoteVibrato::NoteVibrato()
 , mVibratoSlider(nullptr)
 , mModulation(true)
 {
+}
+
+void NoteVibrato::Init()
+{
+   IDrawableModule::Init();
+
    TheTransport->AddAudioPoller(this);
 }
 

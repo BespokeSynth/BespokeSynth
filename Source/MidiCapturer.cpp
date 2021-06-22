@@ -47,6 +47,12 @@ MidiCapturer::MidiCapturer()
    for (int i=0; i<kRingBufferLength; ++i)
       mMessages[i].setTimeStamp(-1);
    
+}
+
+void MidiCapturer::Init()
+{
+   IDrawableModule::Init();
+
    TheTransport->AddAudioPoller(this);
 }
 

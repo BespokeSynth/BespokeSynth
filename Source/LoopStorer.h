@@ -32,6 +32,7 @@ public:
    
    string GetTitleLabel() override { return "loop storer"; }
    void CreateUIControls() override;
+   void Init() override;
    
    void Poll() override;
    void PostRepatch(PatchCableSource* cableSource, bool fromUserClick) override;

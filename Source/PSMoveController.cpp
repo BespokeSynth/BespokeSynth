@@ -39,6 +39,12 @@ PSMoveController::PSMoveController()
 
    mVibration.SetValue(0);
 
+}
+
+void PSMoveController::Init()
+{
+   IDrawableModule::Init();
+
    mTransportListenerInfo = TheTransport->AddListener(this, kInterval_4n, OffsetInfo(mMetronomeLagOffset, false), false);
 }
 

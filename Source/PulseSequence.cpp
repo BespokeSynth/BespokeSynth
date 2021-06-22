@@ -28,6 +28,12 @@ PulseSequence::PulseSequence()
    for (int i=0; i<kMaxSteps; ++i)
       mVels[i] = 1;
    
+}
+
+void PulseSequence::Init()
+{
+   IDrawableModule::Init();
+
    mTransportListenerInfo = TheTransport->AddListener(this, mInterval, OffsetInfo(0, true), false);
    TheTransport->AddAudioPoller(this);
 }

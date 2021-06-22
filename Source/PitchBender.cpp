@@ -18,6 +18,12 @@ PitchBender::PitchBender()
 , mModulation(true)
 {
    //mBendSlider->SetRelative(true);
+}
+
+void PitchBender::Init()
+{
+   IDrawableModule::Init();
+
    TheTransport->AddAudioPoller(this);
 }
 

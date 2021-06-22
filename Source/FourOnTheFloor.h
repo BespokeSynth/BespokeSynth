@@ -24,6 +24,7 @@ public:
    
    string GetTitleLabel() override { return "four on the floor"; }
    void CreateUIControls() override;
+   void Init() override;
    
    void SetEnabled(bool enabled) override { mEnabled = enabled; }
    

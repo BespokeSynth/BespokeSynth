@@ -23,6 +23,7 @@ public:
    virtual ~NoteQuantizer();
    static IDrawableModule* Create() { return new NoteQuantizer(); }
    void CreateUIControls() override;
+   void Init() override;
 
    string GetTitleLabel() override { return "quantizer"; }
 

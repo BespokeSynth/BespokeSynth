@@ -34,6 +34,7 @@ public:
    
    string GetTitleLabel() override;
    void CreateUIControls() override;
+   void Init() override;
 
    //IAudioReceiver
    InputMode GetInputMode() override { return kInputMode_Mono; }

@@ -18,10 +18,16 @@ UnstablePitch::UnstablePitch()
    , mModulation(false)
    , mVoiceRoundRobin(0)
 {
-   TheTransport->AddAudioPoller(this);
 
    for (int voice = 0; voice < kNumVoices; ++voice)
       mModulation.GetPitchBend(voice)->CreateBuffer();
+}
+
+void UnstablePitch::Init()
+{
+   IDrawableModule::Init();
+
+   TheTransport->AddAudioPoller(this);
 }
 
 UnstablePitch::~UnstablePitch()

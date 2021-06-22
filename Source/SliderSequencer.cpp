@@ -17,10 +17,16 @@ SliderSequencer::SliderSequencer()
 , mDivision(1)
 , mDivisionSlider(nullptr)
 {
-   TheTransport->AddAudioPoller(this);
    
    for (int i=0; i<8; ++i)
       mSliderLines.push_back(new SliderLine(this,10,40+i*15,i));
+}
+
+void SliderSequencer::Init()
+{
+   IDrawableModule::Init();
+
+   TheTransport->AddAudioPoller(this);
 }
 
 void SliderSequencer::CreateUIControls()

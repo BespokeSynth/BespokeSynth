@@ -41,6 +41,7 @@ public:
    
    string GetTitleLabel() override { return "drumplayer"; }
    void CreateUIControls() override;
+   void Init() override;
    
    void Poll() override;
    

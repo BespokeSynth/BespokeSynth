@@ -62,6 +62,7 @@ public:
    
    string GetTitleLabel() override { return "circle sequencer"; }
    void CreateUIControls() override;
+   void Init() override;
    
    void SetEnabled(bool on) override { mEnabled = on; }
    

@@ -47,7 +47,6 @@ LaunchpadKeyboard::LaunchpadKeyboard()
    
    TheScale->AddListener(this);
 
-   TheTransport->AddListener(this, kInterval_8n, OffsetInfo(0, true), false);
 
    mHeldChordTones.push_back(0);
    
@@ -124,6 +123,13 @@ LaunchpadKeyboard::LaunchpadKeyboard()
    chord.push_back(28);
    mChords.push_back(chord);
    chord.clear();
+}
+
+void LaunchpadKeyboard::Init()
+{
+   IDrawableModule::Init();
+
+   TheTransport->AddListener(this, kInterval_8n, OffsetInfo(0, true), false);
 }
 
 void LaunchpadKeyboard::CreateUIControls()

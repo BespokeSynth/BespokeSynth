@@ -25,6 +25,7 @@ public:
    
    string GetTitleLabel() override { return "note delayer"; }
    void CreateUIControls() override;
+   void Init() override;
    
    void SetEnabled(bool enabled) override { mEnabled = enabled; }
    

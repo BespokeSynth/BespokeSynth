@@ -16,6 +16,12 @@ FourOnTheFloor::FourOnTheFloor()
 : mTwoOnTheFloor(false)
 , mTwoOnTheFloorCheckbox(nullptr)
 {
+}
+
+void FourOnTheFloor::Init()
+{
+   IDrawableModule::Init();
+
    TheTransport->AddListener(this, kInterval_4n, OffsetInfo(0, true), true);
 }
 

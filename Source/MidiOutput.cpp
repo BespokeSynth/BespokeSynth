@@ -30,8 +30,6 @@ MidiOutputModule::MidiOutputModule()
 , mUseVoiceAsChannel(false)
 {
    mChannelModulations.resize(kGlobalModulationIdx+1);
-   
-   TheTransport->AddAudioPoller(this);
 }
 
 MidiOutputModule::~MidiOutputModule()
@@ -50,6 +48,8 @@ void MidiOutputModule::Init()
    IDrawableModule::Init();
    
    InitController();
+
+   TheTransport->AddAudioPoller(this);
 }
 
 void MidiOutputModule::InitController()

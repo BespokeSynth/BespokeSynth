@@ -29,6 +29,7 @@ public:
    
    string GetTitleLabel() override { return "ps move"; }
    void CreateUIControls() override;
+   void Init() override;
    
    void SetEnabled(bool enabled) override { mEnabled = enabled; }
    

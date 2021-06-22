@@ -16,6 +16,12 @@ NoteQuantizer::NoteQuantizer()
 , mQuantizeInterval(kInterval_16n)
 , mHasReceivedPulse(false)
 {
+}
+
+void NoteQuantizer::Init()
+{
+   IDrawableModule::Init();
+
    TheTransport->AddListener(this, mQuantizeInterval, OffsetInfo(0, true), false);
 }
 

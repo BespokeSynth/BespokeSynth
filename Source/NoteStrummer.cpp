@@ -17,6 +17,12 @@ NoteStrummer::NoteStrummer()
 , mLastStrumPos(0)
 , mStrumSlider(nullptr)
 {
+}
+
+void NoteStrummer::Init()
+{
+   IDrawableModule::Init();
+
    TheTransport->AddAudioPoller(this);
 }
 

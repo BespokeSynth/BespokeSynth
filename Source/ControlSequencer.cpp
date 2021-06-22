@@ -22,9 +22,15 @@ ControlSequencer::ControlSequencer()
 , mControlCable(nullptr)
 , mRandomize(nullptr)
 {
-   mTransportListenerInfo = TheTransport->AddListener(this, mInterval, OffsetInfo(0, true), false);
    
    sControlSequencers.push_back(this);
+}
+
+void ControlSequencer::Init()
+{
+   IDrawableModule::Init();
+
+   mTransportListenerInfo = TheTransport->AddListener(this, mInterval, OffsetInfo(0, true), false);
 }
 
 ControlSequencer::~ControlSequencer()
@@ -77,11 +83,6 @@ void ControlSequencer::CreateUIControls()
    mLengthSelector->AddLabel("32", 128);
    mLengthSelector->AddLabel("64", 256);
    mLengthSelector->AddLabel("128", 512);
-}
-
-void ControlSequencer::Init()
-{
-   IDrawableModule::Init();
 }
 
 void ControlSequencer::Poll()

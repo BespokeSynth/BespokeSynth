@@ -28,6 +28,7 @@ public:
    
    string GetTitleLabel() override { return "control sequencer"; }
    void CreateUIControls() override;
+   void Init() override;
    
    IUIControl* GetUIControl() const { return mUIControl; }
    
@@ -35,7 +36,6 @@ public:
    void GridUpdated(UIGrid* grid, int col, int row, float value, float oldValue) override;
    
    //IDrawableModule
-   void Init() override;
    void Poll() override;
    bool IsResizable() const override { return true; }
    void Resize(float w, float h) override;

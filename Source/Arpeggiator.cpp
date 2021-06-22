@@ -25,10 +25,16 @@ Arpeggiator::Arpeggiator()
 , mOctaveRepeats(1)
 , mOctaveRepeatsSlider(nullptr)
 {
-   mTransportListenerInfo = TheTransport->AddListener(this, mInterval, OffsetInfo(0, true), true);
    TheScale->AddListener(this);
    
    bzero(mArpString, MAX_TEXTENTRY_LENGTH);
+}
+
+void Arpeggiator::Init()
+{
+   IDrawableModule::Init();
+
+   mTransportListenerInfo = TheTransport->AddListener(this, mInterval, OffsetInfo(0, true), true);
 }
 
 void Arpeggiator::CreateUIControls()
@@ -57,11 +63,6 @@ Arpeggiator::~Arpeggiator()
 {
    TheTransport->RemoveListener(this);
    TheScale->RemoveListener(this);
-}
-
-void Arpeggiator::Init()
-{
-   IDrawableModule::Init();
 }
 
 void Arpeggiator::DrawModule()

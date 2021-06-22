@@ -31,6 +31,7 @@ public:
    
    string GetTitleLabel() override { return "granulator"; }
    void CreateUIControls() override;
+   void Init() override;
    
    //IAudioEffect
    void ProcessAudio(double time, ChannelBuffer* buffer) override;

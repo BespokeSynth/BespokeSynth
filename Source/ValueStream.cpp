@@ -24,6 +24,12 @@ ValueStream::ValueStream()
    , mSpeed(1)
    , mValueDisplayPointer(0)
 {
+}
+
+void ValueStream::Init()
+{
+   IDrawableModule::Init();
+
    TheTransport->AddAudioPoller(this);
 }
 
@@ -41,11 +47,6 @@ void ValueStream::CreateUIControls()
    ENDUIBLOCK0();
    mControlCable = new PatchCableSource(this, kConnectionType_UIControl);
    AddPatchCableSource(mControlCable);
-}
-
-void ValueStream::Init()
-{
-   IDrawableModule::Init();
 }
 
 void ValueStream::Poll()

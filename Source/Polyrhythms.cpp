@@ -17,6 +17,12 @@ Polyrhythms::Polyrhythms()
 , mWidth(350)
 , mHeight(mNumLines * 17 + 26)
 {
+}
+
+void Polyrhythms::Init()
+{
+   IDrawableModule::Init();
+
    TheTransport->AddAudioPoller(this);
 }
 

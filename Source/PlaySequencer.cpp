@@ -30,10 +30,16 @@ PlaySequencer::PlaySequencer()
    , mVelocityMed(.5f)
    , mVelocityLight(.25f)
 {
-   mTransportListenerInfo = TheTransport->AddListener(this, mInterval, OffsetInfo(0, true), false);
-   TheTransport->AddListener(&mNoteOffScheduler, mInterval, OffsetInfo(TheTransport->GetMeasureFraction(mInterval) * .5f, false), false);
 
    mNoteOffScheduler.mOwner = this;
+}
+
+void PlaySequencer::Init()
+{
+   IDrawableModule::Init();
+
+   mTransportListenerInfo = TheTransport->AddListener(this, mInterval, OffsetInfo(0, true), false);
+   TheTransport->AddListener(&mNoteOffScheduler, mInterval, OffsetInfo(TheTransport->GetMeasureFraction(mInterval) * .5f, false), false);
 }
 
 void PlaySequencer::CreateUIControls()
@@ -97,11 +103,6 @@ PlaySequencer::~PlaySequencer()
 {
    TheTransport->RemoveListener(this);
    TheTransport->RemoveListener(&mNoteOffScheduler);
-}
-
-void PlaySequencer::Init()
-{
-   IDrawableModule::Init();
 }
 
 void PlaySequencer::DrawModule()

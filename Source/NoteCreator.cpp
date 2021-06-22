@@ -26,6 +26,12 @@ NoteCreator::NoteCreator()
 , mNoteOnByTrigger(false)
 , mVoiceIndex(-1)
 {
+}
+
+void NoteCreator::Init()
+{
+   IDrawableModule::Init();
+
    TheTransport->AddAudioPoller(this);
 }
 

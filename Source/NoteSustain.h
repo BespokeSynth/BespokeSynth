@@ -23,6 +23,7 @@ public:
    
    string GetTitleLabel() override { return "note duration"; }
    void CreateUIControls() override;
+   void Init() override;
    
    void SetEnabled(bool enabled) override { mEnabled = enabled; mNoteOutput.Flush(gTime); }
    

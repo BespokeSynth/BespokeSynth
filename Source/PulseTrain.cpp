@@ -26,6 +26,12 @@ PulseTrain::PulseTrain()
    for (int i=0; i<kMaxSteps; ++i)
       mVels[i] = 1;
    
+}
+
+void PulseTrain::Init()
+{
+   IDrawableModule::Init();
+
    TheTransport->AddListener(this, mInterval, OffsetInfo(0, true), false);
    TheTransport->AddAudioPoller(this);
 }

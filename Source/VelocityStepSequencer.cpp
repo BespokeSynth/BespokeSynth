@@ -30,6 +30,12 @@ VelocityStepSequencer::VelocityStepSequencer()
 , mCurrentVelocity(80)
 , mController(nullptr)
 {
+}
+
+void VelocityStepSequencer::Init()
+{
+   IDrawableModule::Init();
+
    mTransportListenerInfo = TheTransport->AddListener(this, mInterval, OffsetInfo(-.1f, true), false);
 }
 

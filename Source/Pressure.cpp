@@ -15,6 +15,12 @@ Pressure::Pressure()
 , mPressureSlider(nullptr)
 , mModulation(true)
 {
+}
+
+void Pressure::Init()
+{
+   IDrawableModule::Init();
+
    TheTransport->AddAudioPoller(this);
 }
 

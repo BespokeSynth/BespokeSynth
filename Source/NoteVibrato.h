@@ -26,6 +26,7 @@ public:
    
    string GetTitleLabel() override { return "vibrato"; }
    void CreateUIControls() override;
+   void Init() override;
    void SetEnabled(bool enabled) override { mEnabled = enabled; }
    
    void OnTransportAdvanced(float amount) override;

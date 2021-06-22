@@ -18,10 +18,16 @@ UnstableModWheel::UnstableModWheel()
    , mModulation(false)
    , mVoiceRoundRobin(0)
 {
-   TheTransport->AddAudioPoller(this);
 
    for (int voice = 0; voice < kNumVoices; ++voice)
       mModulation.GetModWheel(voice)->CreateBuffer();
+}
+
+void UnstableModWheel::Init()
+{
+   IDrawableModule::Init();
+
+   TheTransport->AddAudioPoller(this);
 }
 
 UnstableModWheel::~UnstableModWheel()

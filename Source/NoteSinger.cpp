@@ -18,13 +18,19 @@ NoteSinger::NoteSinger()
 , mOctaveSlider(nullptr)
 , mNumBuckets(28)
 {
-   TheTransport->AddAudioPoller(this);
    TheScale->AddListener(this);
    
    mWorkBuffer = new float[GetBuffer()->BufferSize()];
    Clear(mWorkBuffer, GetBuffer()->BufferSize());
    
    OnScaleChanged();
+}
+
+void NoteSinger::Init()
+{
+   IDrawableModule::Init();
+
+   TheTransport->AddAudioPoller(this);
 }
 
 void NoteSinger::CreateUIControls()

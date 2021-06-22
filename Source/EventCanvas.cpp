@@ -32,7 +32,6 @@ EventCanvas::EventCanvas()
 , mRecordCheckbox(nullptr)
 , mPreviousPosition(0)
 {
-   TheTransport->AddAudioPoller(this);
    SetEnabled(true);
    
    mRowColors.push_back(ofColor::red);
@@ -49,6 +48,13 @@ EventCanvas::EventCanvas()
    }
    
    mRowConnections.resize(kMaxEventRows);
+}
+
+void EventCanvas::Init()
+{
+   IDrawableModule::Init();
+
+   TheTransport->AddAudioPoller(this);
 }
 
 void EventCanvas::CreateUIControls()

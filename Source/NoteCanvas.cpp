@@ -41,9 +41,15 @@ NoteCanvas::NoteCanvas()
 , mClipButton(nullptr)
 , mShowIntervals(false)
 {
-   TheTransport->AddAudioPoller(this);
    SetEnabled(true);
    mVoiceModulations.resize(kNumVoices+1);
+}
+
+void NoteCanvas::Init()
+{
+   IDrawableModule::Init();
+
+   TheTransport->AddAudioPoller(this);
 }
 
 void NoteCanvas::CreateUIControls()

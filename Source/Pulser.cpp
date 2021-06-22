@@ -31,6 +31,12 @@ Pulser::Pulser()
 , mResetLength(8)
 , mCustomDivisor(8)
 {
+}
+
+void Pulser::Init()
+{
+   IDrawableModule::Init();
+
    mTransportListenerInfo = TheTransport->AddListener(this, mInterval, OffsetInfo(0, true), true);
    TheTransport->AddAudioPoller(this);
 }

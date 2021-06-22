@@ -28,6 +28,12 @@ NoteChainNode::NoteChainNode()
 , mNextInterval(kInterval_8n)
 , mQueueTrigger(false)
 {
+}
+
+void NoteChainNode::Init()
+{
+   IDrawableModule::Init();
+
    TheTransport->AddAudioPoller(this);
    TheTransport->AddListener(this, kInterval_8n, OffsetInfo(0, true), false);
 }

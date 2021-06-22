@@ -15,6 +15,12 @@ ModWheel::ModWheel()
 , mModWheelSlider(nullptr)
 , mModulation(true)
 {
+}
+
+void ModWheel::Init()
+{
+   IDrawableModule::Init();
+
    TheTransport->AddAudioPoller(this);
 }
 

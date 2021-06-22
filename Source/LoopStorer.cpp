@@ -29,6 +29,12 @@ LoopStorer::LoopStorer()
 , mClearButton(nullptr)
 , mLooperCable(nullptr)
 {
+}
+
+void LoopStorer::Init()
+{
+   IDrawableModule::Init();
+
    TheTransport->AddListener(this, kInterval_None, OffsetInfo(0, true), false);
 }
 

@@ -26,6 +26,7 @@ public:
    
    string GetTitleLabel() override { return "note creator"; }
    void CreateUIControls() override;
+   void Init() override;
    
    void SetEnabled(bool enabled) override { mEnabled = enabled; }
    

@@ -13,6 +13,12 @@ NoteSustain::NoteSustain()
 : mSustain(.25f)
 , mSustainSlider(nullptr)
 {
+}
+
+void NoteSustain::Init()
+{
+   IDrawableModule::Init();
+
    TheTransport->AddAudioPoller(this);
 }
 

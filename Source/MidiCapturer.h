@@ -42,6 +42,7 @@ public:
    static IDrawableModule* Create() { return new MidiCapturer(); }
    
    string GetTitleLabel() override { return "midi capturer"; }
+   void Init() override;
    
    void AddDummyController(MidiCapturerDummyController* controller);
    

@@ -24,7 +24,6 @@ Presets::Presets()
 , mCurrentPreset(-1)
 , mCurrentPresetSelector(nullptr)
 {
-   TheTransport->AddAudioPoller(this);
 }
 
 Presets::~Presets()
@@ -65,6 +64,8 @@ void Presets::Init()
    int defaultPreset = mModuleSaveData.GetInt("defaultpreset");
    if (defaultPreset != -1)
       SetPreset(defaultPreset);
+
+   TheTransport->AddAudioPoller(this);
 }
 
 void Presets::Poll()

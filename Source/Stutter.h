@@ -56,6 +56,7 @@ public:
    
    string GetTitleLabel() override { return "stutter"; }
    void CreateUIControls() override;
+   void Init() override;
    
    void DrawStutterBuffer(float x, float y, float width, float height);
    void StartStutter(double time, StutterParams stutter);

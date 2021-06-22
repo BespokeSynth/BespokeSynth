@@ -18,6 +18,12 @@ Metronome::Metronome()
 , mVolume(.5f)
 , mVolumeSlider(nullptr)
 {
+}
+
+void Metronome::Init()
+{
+   IDrawableModule::Init();
+
    mTransportListenerInfo = TheTransport->AddListener(this, kInterval_4n, OffsetInfo(0, true), false);
 }
 

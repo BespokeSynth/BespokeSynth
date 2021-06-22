@@ -20,6 +20,12 @@ ModulatorSmoother::ModulatorSmoother()
 , mInputSlider(nullptr)
 , mSmoothSlider(nullptr)
 {
+}
+
+void ModulatorSmoother::Init()
+{
+   IDrawableModule::Init();
+
    TheTransport->AddAudioPoller(this);
 }
 

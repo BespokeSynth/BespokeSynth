@@ -28,6 +28,12 @@ NoteLooper::NoteLooper()
 , mDeleteOrMuteCheckbox(nullptr)
 , mVoiceRoundRobin(kNumVoices-1)
 {
+}
+
+void NoteLooper::Init()
+{
+   IDrawableModule::Init();
+
    TheTransport->AddAudioPoller(this);
 }
 

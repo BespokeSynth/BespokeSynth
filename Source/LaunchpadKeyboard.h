@@ -33,6 +33,7 @@ public:
    
    string GetTitleLabel() override { return "gridkeyboard"; }
    void CreateUIControls() override;
+   void Init() override;
 
    void SetDisplayer(LaunchpadNoteDisplayer* displayer) { mDisplayer = displayer; }
    void DisplayNote(int pitch, int velocity);

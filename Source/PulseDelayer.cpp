@@ -20,6 +20,12 @@ PulseDelayer::PulseDelayer()
 , mConsumeIndex(0)
 , mAppendIndex(0)
 {
+}
+
+void PulseDelayer::Init()
+{
+   IDrawableModule::Init();
+
    TheTransport->AddAudioPoller(this);
 }
 

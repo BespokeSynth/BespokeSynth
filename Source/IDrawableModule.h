@@ -75,6 +75,7 @@ public:
    virtual void GetModuleDimensions(float& width, float& height) { width = 10; height = 10; }
    virtual void Init();
    virtual void Exit();
+   bool IsInitialized() const { return mInitialized; }
    bool Minimized() const { return mMinimizeAnimation > 0; }
    virtual void MouseReleased() override;
    virtual void FilesDropped(vector<string> files, int x, int y) {}

@@ -24,6 +24,12 @@ RadioSequencer::RadioSequencer()
 , mLength(4)
 , mLengthSelector(nullptr)
 {
+}
+
+void RadioSequencer::Init()
+{
+   IDrawableModule::Init();
+
    mTransportListenerInfo = TheTransport->AddListener(this, mInterval, OffsetInfo(kEarlyOffsetMs, true), false);
 }
 
@@ -71,11 +77,6 @@ void RadioSequencer::CreateUIControls()
    mGridController->PositionTo(mLengthSelector, kAnchor_Right);
    
    SyncControlCablesToGrid();
-}
-
-void RadioSequencer::Init()
-{
-   IDrawableModule::Init();
 }
 
 void RadioSequencer::Poll()

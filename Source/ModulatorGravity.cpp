@@ -25,6 +25,12 @@ ModulatorGravity::ModulatorGravity()
 , mDragSlider(nullptr)
 , mKickButton(nullptr)
 {
+}
+
+void ModulatorGravity::Init()
+{
+   IDrawableModule::Init();
+
    TheTransport->AddAudioPoller(this);
 }
 

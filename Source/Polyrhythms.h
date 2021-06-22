@@ -52,6 +52,7 @@ public:
    
    string GetTitleLabel() override { return "polyrhythms"; }
    void CreateUIControls() override;
+   void Init() override;
    bool IsResizable() const override { return true; }
    void Resize(float w, float h) override;
 

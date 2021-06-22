@@ -26,6 +26,7 @@ public:
    
    string GetTitleLabel() override { return "metronome"; }
    void CreateUIControls() override;
+   void Init() override;
 
    //IAudioSource
    void Process(double time) override;

@@ -47,12 +47,18 @@ StepSequencer::StepSequencer()
 , mHasExternalPulseSource(false)
 , mPush2Connected(false)
 {
-   mTransportListenerInfo = TheTransport->AddListener(this, mStepInterval, OffsetInfo(0, true), true);
    mFlusher.SetInterval(mStepInterval);
    
    mMetaStepMasks = new uint32[META_STEP_MAX * NUM_STEPSEQ_ROWS];
    for (int i=0; i<META_STEP_MAX * NUM_STEPSEQ_ROWS; ++i)
       mMetaStepMasks[i] = 0xff;
+}
+
+void StepSequencer::Init()
+{
+   IDrawableModule::Init();
+
+   mTransportListenerInfo = TheTransport->AddListener(this, mStepInterval, OffsetInfo(0, true), true);
 }
 
 void StepSequencer::CreateUIControls()
@@ -135,11 +141,6 @@ StepSequencer::~StepSequencer()
    }
    
    delete[] mMetaStepMasks;
-}
-
-void StepSequencer::Init()
-{
-   IDrawableModule::Init();
 }
 
 void StepSequencer::Poll()

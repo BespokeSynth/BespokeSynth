@@ -22,6 +22,12 @@ Ramper::Ramper()
 , mTargetValue(0)
 , mTargetValueSlider(nullptr)
 {
+}
+
+void Ramper::Init()
+{
+   IDrawableModule::Init();
+
    TheTransport->AddAudioPoller(this);
 }
 

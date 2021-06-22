@@ -24,6 +24,12 @@ NoteCounter::NoteCounter()
 , mCustomDivisor(8)
 , mRandom(false)
 {
+}
+
+void NoteCounter::Init()
+{
+   IDrawableModule::Init();
+
    mTransportListenerInfo = TheTransport->AddListener(this, mInterval, OffsetInfo(0, true), true);
 }
 

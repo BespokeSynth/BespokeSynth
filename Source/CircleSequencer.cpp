@@ -29,10 +29,16 @@ namespace
 
 CircleSequencer::CircleSequencer()
 {
-   TheTransport->AddAudioPoller(this);
    
    for (int i=0; i<4; ++i)
       mCircleSequencerRings.push_back(new CircleSequencerRing(this,i));
+}
+
+void CircleSequencer::Init()
+{
+   IDrawableModule::Init();
+
+   TheTransport->AddAudioPoller(this);
 }
 
 void CircleSequencer::CreateUIControls()

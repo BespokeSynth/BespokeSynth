@@ -19,6 +19,12 @@ ClipLauncher::ClipLauncher()
 : mVolume(1)
 , mVolumeSlider(nullptr)
 {
+}
+
+void ClipLauncher::Init()
+{
+   IDrawableModule::Init();
+
    TheTransport->AddListener(this, kInterval_1n, OffsetInfo(0, true), false);
 }
 

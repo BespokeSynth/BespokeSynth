@@ -29,6 +29,7 @@ public:
    
    string GetTitleLabel() override { return "ramper"; }
    void CreateUIControls() override;
+   void Init() override;
    
    IUIControl* GetUIControl() const { return mUIControl; }
    

@@ -38,6 +38,12 @@ CurveLooper::CurveLooper()
    mAdsr.GetStageData(1).target = .5f;
    mAdsr.GetStageData(1).time = kAdsrTime*.8f;
    
+}
+
+void CurveLooper::Init()
+{
+   IDrawableModule::Init();
+
    TheTransport->AddAudioPoller(this);
 }
 
@@ -70,11 +76,6 @@ void CurveLooper::CreateUIControls()
    mLengthSelector->AddLabel("128", 128);
    
    mRandomizeButton->PositionTo(mLengthSelector, kAnchor_Right);
-}
-
-void CurveLooper::Init()
-{
-   IDrawableModule::Init();
 }
 
 void CurveLooper::Poll()

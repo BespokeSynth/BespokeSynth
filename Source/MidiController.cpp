@@ -70,9 +70,7 @@ MidiController::MidiController()
 , mLayoutWidth(0)
 , mLayoutHeight(0)
 {
-   mListeners.resize(MAX_MIDI_PAGES);
-   
-   TheTransport->AddAudioPoller(this);
+   mListeners.resize(MAX_MIDI_PAGES);  
 }
 
 void MidiController::CreateUIControls()
@@ -116,6 +114,8 @@ void MidiController::Init()
    mHasCreatedConnectionUIControls = false;
    for (int i=0; i<mConnectionsJson.size(); ++i)
       AddControlConnection(mConnectionsJson[i]);
+
+   TheTransport->AddAudioPoller(this);
 }
 
 void MidiController::AddListener(MidiDeviceListener* listener, int page)

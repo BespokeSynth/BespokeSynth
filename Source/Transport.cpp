@@ -246,6 +246,13 @@ void Transport::ButtonClicked(ClickButton *button)
 
 TransportListenerInfo* Transport::AddListener(ITimeListener* listener, NoteInterval interval, OffsetInfo offsetInfo, bool useEventLookahead)
 {
+#if DEBUG
+   IDrawableModule* module = dynamic_cast<IDrawableModule*>(listener);
+
+   if (module != nullptr)
+      assert(module->IsInitialized());
+#endif
+
    //try to update first in case we already point to this
    TransportListenerInfo* info = GetListenerInfo(listener);
    if (info != nullptr)
@@ -287,6 +294,13 @@ void Transport::RemoveListener(ITimeListener* listener)
 
 void Transport::AddAudioPoller(IAudioPoller* poller)
 {
+#if DEBUG
+   IDrawableModule* module = dynamic_cast<IDrawableModule*>(poller);
+
+   if (module != nullptr)
+      assert(module->IsInitialized());
+#endif
+
    if (!ListContains(poller, mAudioPollers))
       mAudioPollers.push_front(poller);
 }
