@@ -46,57 +46,39 @@ struct StutterParams
    float speedBlendTime;
 };
 
-class Stutter : public IAudioEffect, public ITimeListener, public IIntSliderListener
+class Stutter : public ITimeListener
 {
 public:
    Stutter();
    ~Stutter();
    
-   static IAudioEffect* Create() { return new Stutter(); }
-   
-   string GetTitleLabel() override { return "stutter"; }
-   void CreateUIControls() override;
-   void Init() override;
+   void Init();
    
    void DrawStutterBuffer(float x, float y, float width, float height);
    void StartStutter(double time, StutterParams stutter);
    void EndStutter(double time, StutterParams stutter);
+   void SetEnabled(bool enabled);
    
    //IAudioEffect
-   void ProcessAudio(double time, ChannelBuffer* buffer) override;
-   void SetEnabled(bool enabled) override { mEnabled = enabled; }
-   float GetEffectAmount() override;
-   string GetType() override { return "stutter"; }
+   void ProcessAudio(double time, ChannelBuffer* buffer);
    
    //ITimeListener
    void OnTimeEvent(double time) override;
 
-   void CheckboxUpdated(Checkbox* checkbox) override;
-   void IntSliderUpdated(IntSlider* slider, int oldVal) override;
-   
-   void LoadLayout(const ofxJSONElement& info) override;
-   void SetUpFromSaveData() override;
-   void SaveLayout(ofxJSONElement& info) override;
-   
    float mFreeStutterLength;
    float mFreeStutterSpeed;
    
 private:
    void DoCapture();
-   void UpdateEnabled();
    float GetStutterSampleWithWraparoundBlend(int pos, int ch);
    void DoStutter(double time, StutterParams stutter);
    void StopStutter(double time);
    float GetBufferReadPos(float stutterPos);
-
-   //IDrawableModule
-   void GetModuleDimensions(float& width, float& height) override;
-   void DrawModule() override;
-   bool Enabled() const override { return mEnabled; }
    
    RollingBuffer mRecordBuffer;
    ChannelBuffer mStutterBuffer;
    
+   bool mEnabled;
    bool mStuttering;
    int mCaptureLength;
    int mStutterLength;

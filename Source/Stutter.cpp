@@ -19,6 +19,7 @@ int Stutter::sStutterSubdivide = 1;
 Stutter::Stutter()
 : mRecordBuffer(STUTTER_BUFFER_SIZE)
 , mStutterBuffer(STUTTER_BUFFER_SIZE)
+, mEnabled(true)
 , mStuttering(false)
 , mAutoStutter(false)
 , mAutoCheckbox(nullptr)
@@ -35,17 +36,7 @@ Stutter::Stutter()
 
 void Stutter::Init()
 {
-   IDrawableModule::Init();
-
    TheTransport->AddListener(this, kInterval_16n, OffsetInfo(0, true), false);
-}
-
-void Stutter::CreateUIControls()
-{
-   IDrawableModule::CreateUIControls();
-   mAutoCheckbox = new Checkbox(this,"auto",4,25,&mAutoStutter);
-   mFadeCheckbox = new Checkbox(this,"fade",4,4,&mFadeStutter);
-   mSubdivideSlider = new IntSlider(this,"sub",45,25,50,15,&sStutterSubdivide,1,8);
 }
 
 Stutter::~Stutter()
@@ -246,18 +237,6 @@ void Stutter::DoStutter(double time, StutterParams stutter)
    mStutterLengthRamp.SetValue(mStutterLength);
 }
 
-void Stutter::DrawModule()
-{
-   if (!mEnabled)
-      return;
-   
-   mAutoCheckbox->Draw();
-   mFadeCheckbox->Draw();
-   mSubdivideSlider->Draw();
-
-   DrawStutterBuffer(4, 3, 90, 35);
-}
-
 void Stutter::DrawStutterBuffer(float x, float y, float width, float height)
 {
    ofPushMatrix();
@@ -267,27 +246,6 @@ void Stutter::DrawStutterBuffer(float x, float y, float width, float height)
    ofPopMatrix();
 }
 
-void Stutter::GetModuleDimensions(float& width, float& height)
-{
-   if (mEnabled)
-   {
-      width = 98;
-      height = 40;
-   }
-   else
-   {
-      width = 98;
-      height = 0;
-   }
-}
-
-float Stutter::GetEffectAmount()
-{
-   if ((mAutoStutter && mEnabled) || mStuttering)
-      return 1;
-   return 0;
-}
-
 void Stutter::DoCapture()
 {
    mCaptureLength = int(TheTransport->GetDuration(mCurrentStutter.interval) / 1000 * gSampleRate);
@@ -295,35 +253,6 @@ void Stutter::DoCapture()
    mCaptureLength /= sStutterSubdivide;
    for (int ch=0; ch<mStutterBuffer.NumActiveChannels(); ++ch)
       mRecordBuffer.ReadChunk(mStutterBuffer.GetChannel(ch), mCaptureLength, 0, ch);
-}
-
-void Stutter::CheckboxUpdated(Checkbox* checkbox)
-{
-   if (checkbox == mEnabledCheckbox)
-      UpdateEnabled();
-   if (checkbox == mAutoCheckbox)
-   {
-      if (!mAutoStutter)
-      {
-         mMutex.lock();
-         mStutterStack.clear();
-         mMutex.unlock();
-         StopStutter(gTime + gBufferSizeMs);
-         TransportListenerInfo* transportListenerInfo = TheTransport->GetListenerInfo(this);
-         if (transportListenerInfo != nullptr)
-            transportListenerInfo->mInterval = kInterval_16n;
-      }
-      else
-      {
-         TransportListenerInfo* transportListenerInfo = TheTransport->GetListenerInfo(this);
-         if (transportListenerInfo != nullptr)
-            transportListenerInfo->mInterval = kInterval_8n;
-      }
-   }
-}
-
-void Stutter::IntSliderUpdated(IntSlider* slider, int oldVal)
-{
 }
 
 void Stutter::OnTimeEvent(double time)
@@ -363,27 +292,18 @@ void Stutter::OnTimeEvent(double time)
    }
 }
 
-void Stutter::UpdateEnabled()
+void Stutter::SetEnabled(bool enabled)
 {
-   if (!mEnabled)
+   if (enabled != mEnabled)
    {
-      mMutex.lock();
-      mStutterStack.clear();
-      mMutex.unlock();
-      StopStutter(gTime + gBufferSizeMs);
+      mEnabled = enabled;
+      if (!mEnabled)
+      {
+         mMutex.lock();
+         mStutterStack.clear();
+         mMutex.unlock();
+         StopStutter(gTime + gBufferSizeMs);
+      }
    }
-}
-
-void Stutter::LoadLayout(const ofxJSONElement& info)
-{
-}
-
-void Stutter::SetUpFromSaveData()
-{
-}
-
-void Stutter::SaveLayout(ofxJSONElement& info)
-{
-   mModuleSaveData.Save(info);
 }
 

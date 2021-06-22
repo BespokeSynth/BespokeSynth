@@ -45,6 +45,13 @@ void StutterControl::CreateUIControls()
    mFreeSpeedSlider = new FloatSlider(this,"free speed",mFreeLengthSlider,kAnchor_Below,102,15,&mStutterProcessor.mFreeStutterSpeed,0,2);
 }
 
+void StutterControl::Init()
+{
+   IDrawableModule::Init();
+
+   mStutterProcessor.Init();
+}
+
 StutterControl::~StutterControl()
 {
 }
@@ -187,6 +194,9 @@ StutterParams StutterControl::GetStutter(StutterControl::StutterType type)
 
 void StutterControl::CheckboxUpdated(Checkbox* checkbox)
 {
+   if (checkbox == mEnabledCheckbox)
+      mStutterProcessor.SetEnabled(Enabled());
+
    double time = gTime + gBufferSizeMs;
    for (int i=0; i<kNumStutterTypes; ++i)
    {
