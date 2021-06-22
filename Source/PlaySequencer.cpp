@@ -284,7 +284,7 @@ void PlaySequencer::NoteOffScheduler::OnTimeEvent(double time)
 
 int PlaySequencer::GetStep(double time)
 {
-   int step = TheTransport->GetSyncedStep(time, this, mTransportListenerInfo);
+   int step = TheTransport->GetSyncedStep(time, this, mTransportListenerInfo, mGrid->GetCols());
    return step;
 }
 
