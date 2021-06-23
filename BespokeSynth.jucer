@@ -1270,11 +1270,11 @@
             smallIcon="h1Eo7f" bigIcon="h1Eo7f" externalLibraries="siapp.lib">
       <CONFIGURATIONS>
         <CONFIGURATION name="Debug" winWarningLevel="2" generateManifest="1" winArchitecture="x64"
-                       isDebug="1" optimisation="1" targetName="BespokeSynth" headerPath="../../Source/json/include&#10;../../Source/glew/include&#10;../../Source/push2/&#10;../../Source/push2/libusb&#10;../../Source/push2/modules/libusb&#10;C:\Python38\include"
+                       isDebug="1" optimisation="1" targetName="BespokeSynth" headerPath="../../Source/json/include&#10;../../Source/glew/include&#10;../../Source/push2/&#10;../../Source/push2/libusb&#10;../../Source/push2/modules/libusb&#10;C:\Python38\include&#10;C:\ASIO_SDK"
                        fastMath="0" debugInformationFormat="ProgramDatabase" enablePluginBinaryCopyStep="0"
                        libraryPath="C:\Python38\libs&#10;../../Source/3DxWare/Lib/x64"/>
         <CONFIGURATION name="Release" winWarningLevel="2" generateManifest="1" winArchitecture="x64"
-                       isDebug="0" optimisation="3" targetName="BespokeSynth" headerPath="../../Source/json/include&#10;../../Source/glew/include&#10;../../Source/push2/&#10;../../Source/push2/libusb&#10;../../Source/push2/modules/libusb&#10;C:\Python38\include"
+                       isDebug="0" optimisation="3" targetName="BespokeSynth" headerPath="../../Source/json/include&#10;../../Source/glew/include&#10;../../Source/push2/&#10;../../Source/push2/libusb&#10;../../Source/push2/modules/libusb&#10;C:\Python38\include&#10;C:\ASIO_SDK"
                        debugInformationFormat="ProgramDatabase" enablePluginBinaryCopyStep="0"
                        linkTimeOptimisation="1" libraryPath="C:\Python38\libs&#10;../../Source/3DxWare/Lib/x64"/>
       </CONFIGURATIONS>
@@ -1343,7 +1343,7 @@
     <MODULE id="juce_video" showAllCode="1" useLocalCopy="0" useGlobalPath="1"/>
   </MODULES>
   <JUCEOPTIONS JUCE_PLUGINHOST_VST3="1" JUCE_PLUGINHOST_VST="1" JUCE_WEB_BROWSER="0"
-               JUCE_USE_MP3AUDIOFORMAT="1" JUCE_JACK="1" JUCE_USE_CURL="0"/>
+               JUCE_USE_MP3AUDIOFORMAT="1" JUCE_JACK="1" JUCE_USE_CURL="0" JUCE_ASIO="1"/>
   <LIVE_SETTINGS>
     <OSX headerPath="" systemHeaderPath=""/>
     <WINDOWS headerPath="" systemHeaderPath="&#10;"/>
