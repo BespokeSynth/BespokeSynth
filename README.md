@@ -3,6 +3,9 @@ A software modular synth that I'm building for myself, and you can use it if you
 
 You can find the most recent builds for Mac/Windows/Linux at https://github.com/awwbees/BespokeSynth/releases. To find the download, expand the "Assets" dropdown under the latest release.
 
+**Heads up that a new release is imminent! You can get access to a prerelease build by joining the [Bespoke Discord](https://discord.gg/YdTMkvvpZZ)**
+
+## Screenshot
 ![screenshot](screenshot-1.png)
 
 ## Basic Overview/Tutorial Video
