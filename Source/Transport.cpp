@@ -443,16 +443,22 @@ int Transport::GetStepsPerMeasure(ITimeListener* listener)
 
 int Transport::GetSyncedStep(double time, ITimeListener* listener, const TransportListenerInfo* listenerInfo, int length)
 {
+   double offsetMs;
+   if (listenerInfo->mOffsetInfo.mOffsetIsInMs)
+      offsetMs = listenerInfo->mOffsetInfo.mOffset;
+   else
+      offsetMs = listenerInfo->mOffsetInfo.mOffset*MsPerBar();
+   
    int step;
    if (GetMeasureFraction(listenerInfo->mInterval) < 1)
    {
       int stepsPerMeasure = GetStepsPerMeasure(listener);
-      int measure = GetMeasure(time);
-      step = GetQuantized(time, listenerInfo) + measure * stepsPerMeasure;
+      int measure = GetMeasure(time + offsetMs);
+      step = GetQuantized(time, listenerInfo) + measure * stepsPerMeasure; //GetQuantized() handles offset internally
    }
    else
    {
-      int measure = GetMeasure(time);
+      int measure = GetMeasure(time + offsetMs);
       step = int(measure / GetMeasureFraction(listenerInfo->mInterval));
    }
 
