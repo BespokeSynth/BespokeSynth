@@ -132,6 +132,37 @@ void Polyrhythms::SetUpFromSaveData()
    mNumLines = mModuleSaveData.GetInt("lines");
 }
 
+namespace
+{
+   const int kSaveStateRev = 1;
+}
+
+void Polyrhythms::SaveState(FileStreamOut& out)
+{
+   IDrawableModule::SaveState(out);
+
+   out << kSaveStateRev;
+
+   out << (int)mRhythmLines.size();
+   for (size_t i = 0; i < mRhythmLines.size(); ++i)
+      mRhythmLines[i]->mGrid->SaveState(out);
+}
+
+void Polyrhythms::LoadState(FileStreamIn& in)
+{
+   IDrawableModule::LoadState(in);
+
+   int rev;
+   in >> rev;
+   LoadStateValidate(rev <= kSaveStateRev);
+
+   int size;
+   in >> size;
+   LoadStateValidate(size == (int)mRhythmLines.size());
+   for (size_t i = 0; i < mRhythmLines.size(); ++i)
+      mRhythmLines[i]->mGrid->LoadState(in);
+}
+
 
 RhythmLine::RhythmLine(Polyrhythms* owner, int index)
 : mIndex(index)

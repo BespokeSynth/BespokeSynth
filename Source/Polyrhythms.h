@@ -70,6 +70,8 @@ public:
    
    virtual void LoadLayout(const ofxJSONElement& moduleInfo) override;
    virtual void SetUpFromSaveData() override;
+   virtual void LoadState(FileStreamIn& in) override;
+   virtual void SaveState(FileStreamOut& out) override;
 private:
    //IDrawableModule
    void DrawModule() override;
