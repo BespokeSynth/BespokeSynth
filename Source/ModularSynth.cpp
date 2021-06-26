@@ -69,6 +69,7 @@ ModularSynth::ModularSynth()
 , mGroupSelectContext(nullptr)
 , mResizeModule(nullptr)
 , mShowLoadStatePopup(false)
+, mLastSaveTime(-9999)
 , mHasDuplicatedDuringDrag(false)
 , mFrameRate(0)
 , mQuickSpawn(nullptr)
@@ -765,7 +766,16 @@ void ModularSynth::KeyPressed(int key, bool isRepeat)
    
    if (key == 'p' && GetKeyModifiers() == kModifier_Shift && !isRepeat)
       mAudioPaused = !mAudioPaused;
+
+   if (key == 's' && GetKeyModifiers() == kModifier_Command && !isRepeat)
+      SaveCurrentState();
    
+   if (key == 's' && GetKeyModifiers() == (kModifier_Command | kModifier_Shift) && !isRepeat)
+      SaveStatePopup();
+
+   if (key == 'l' && GetKeyModifiers() == kModifier_Command && !isRepeat)
+      LoadStatePopup();
+
    //if (key == 'c' && !isRepeat)
    //   mousePressed(GetMouseX(), GetMouseY(), 0);
    
@@ -1958,6 +1968,17 @@ void ModularSynth::SaveLayoutAsPopup()
       SaveLayout(chooser.getResult().getRelativePathFrom(File(ofToDataPath(""))).toStdString());
 }
 
+void ModularSynth::SaveCurrentState()
+{
+   if (mCurrentSaveStatePath.empty())
+   {
+      SaveStatePopup();
+      return;
+   }
+
+   SaveState(mCurrentSaveStatePath);
+}
+
 void ModularSynth::SaveStatePopup()
 {
    FileChooser chooser("Save current state as...", File(ofToDataPath(ofGetTimestampString("savestate/%Y-%m-%d_%H-%M.bsk"))), "*.bsk", true, false, mMainComponent->getTopLevelComponent());
@@ -1979,6 +2000,9 @@ void ModularSynth::LoadStatePopupImp()
 
 void ModularSynth::SaveState(string file)
 {
+   mCurrentSaveStatePath = file;
+   mLastSaveTime = gTime;
+
    mAudioThreadMutex.Lock("SaveState()");
    
    FileStreamOut out(file.c_str());
@@ -1991,6 +2015,8 @@ void ModularSynth::SaveState(string file)
 
 void ModularSynth::LoadState(string file)
 {
+   mCurrentSaveStatePath = file;
+
    ofLog() << "LoadState() " << file;
 
    if (!juce::File(file).existsAsFile())

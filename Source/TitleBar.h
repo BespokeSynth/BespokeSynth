@@ -105,6 +105,7 @@ private:
    ClickButton* mSaveLayoutButton;
    ClickButton* mResetLayoutButton;
    ClickButton* mSaveStateButton;
+   ClickButton* mSaveStateAsButton;
    ClickButton* mLoadStateButton;
    ClickButton* mWriteAudioButton;
    DropdownList* mLoadLayoutDropdown;

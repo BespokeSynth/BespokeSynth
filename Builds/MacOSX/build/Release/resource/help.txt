@@ -47,3 +47,9 @@ saving
    * "load state" button: load previously saved layouts
    * tab+'s'+enter: quicksave
    * tab+'l'+enter: quickload
+
+key commands
+   * ctrl/command-'s': save
+   * ctrl/command-'l': load
+   * shift-'p': pause audio processing. this will stop all audio output. press shift-'p' again to resume
+   * ` (backtick, aka the tilde key): display all ADSR controls as sliders

@@ -131,6 +131,7 @@ TitleBar::TitleBar()
 : mSaveLayoutButton(nullptr)
 , mResetLayoutButton(nullptr)
 , mSaveStateButton(nullptr)
+, mSaveStateAsButton(nullptr)
 , mLoadStateButton(nullptr)
 , mWriteAudioButton(nullptr)
 , mLoadLayoutDropdown(nullptr)
@@ -151,8 +152,9 @@ void TitleBar::CreateUIControls()
 {
    IDrawableModule::CreateUIControls();
    mSaveLayoutButton = new ClickButton(this,"save layout",280,19);
-   mLoadStateButton = new ClickButton(this,"load state",140,1);
-   mSaveStateButton = new ClickButton(this,"save state",205,1);
+   mLoadStateButton = new ClickButton(this,"load",140,1);
+   mSaveStateButton = new ClickButton(this,"save",172,1);
+   mSaveStateAsButton = new ClickButton(this, "save as", 205, 1);
    mResetLayoutButton = new ClickButton(this,"reset layout",140,19);
    mWriteAudioButton = new ClickButton(this,"write audio",280,1);
    mDisplayHelpButton = new ClickButton(this," ? ",380,1);
@@ -286,6 +288,7 @@ void TitleBar::DrawModule()
    
    mSaveLayoutButton->Draw();
    mSaveStateButton->Draw();
+   mSaveStateAsButton->Draw();
    mLoadStateButton->Draw();
    mWriteAudioButton->Draw();
    mLoadLayoutDropdown->Draw();
@@ -371,15 +374,26 @@ void TitleBar::DrawModuleUnclipped()
    {
       ofPushStyle();
       ofSetColor(255, 255, 255);
-      string text = "scanning VSTs, please wait...";
-      float size = 50;
       float titleBarWidth, titleBarHeight;
       TheTitleBar->GetDimensions(titleBarWidth, titleBarHeight);
       float x = 100;
       float y = 40 + titleBarHeight;
-      gFontBold.DrawString(text, size, x, y);
+      gFontBold.DrawString("scanning VSTs, please wait...", 50, x, y);
       ofPopStyle();
       return;
+   }
+
+   float saveCooldown = 1 - ofClamp((gTime - TheSynth->GetLastSaveTime()) / 1000, 0, 1);
+   if (saveCooldown > 0)
+   {
+      ofPushStyle();
+      ofSetColor(255, 255, 255, saveCooldown * 255);
+      float titleBarWidth, titleBarHeight;
+      TheTitleBar->GetDimensions(titleBarWidth, titleBarHeight);
+      float x = 100;
+      float y = 40 + titleBarHeight;
+      gFontBold.DrawString("saved!", 50, x, y);
+      ofPopStyle();
    }
 
    if (HiddenByZoom())
@@ -461,6 +475,8 @@ void TitleBar::ButtonClicked(ClickButton* button)
          TheSynth->SaveLayout();
    }
    if (button == mSaveStateButton)
+      TheSynth->SaveCurrentState();
+   if (button == mSaveStateAsButton)
       TheSynth->SaveStatePopup();
    if (button == mLoadStateButton)
       TheSynth->LoadStatePopup();

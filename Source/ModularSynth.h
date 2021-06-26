@@ -190,8 +190,10 @@ public:
    void SaveOutput();
    void SaveState(string file);
    void LoadState(string file);
+   void SaveCurrentState();
    void SaveStatePopup();
    void LoadStatePopup();
+   double GetLastSaveTime() { return mLastSaveTime; }
 
    ofxJSONElement GetUserPrefs() { return mUserPrefs; }
    UserPrefsEditor* GetUserPrefsEditor() { return mUserPrefsEditor; }
@@ -282,6 +284,8 @@ private:
    
    string mLoadedLayoutPath;
    bool mWantReloadInitialLayout;
+   string mCurrentSaveStatePath;
+   double mLastSaveTime;
    
    Sample* mHeldSample;
    

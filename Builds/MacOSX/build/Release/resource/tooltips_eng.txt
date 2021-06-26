@@ -702,7 +702,7 @@ looperrewriter~rewrites the contents of a looper with received input, to help yo
 
 
 
-looperrecorder~command center to manage recording into multiple loopers, and allow loop capture in an "always recording" fashion
+looperrecorder~command center to manage recording into multiple loopers, and allow retroactive loop capture (i.e., always-on recording)
 ~1~capture the last measure to the currently-targeted looper
 ~2~capture the last 2 measures to the currently-targeted looper
 ~4~capture the last 4 measures to the currently-targeted looper
@@ -1583,8 +1583,9 @@ arpeggiator~arpeggiates held notes. there are several vestigial features in this
 
 titlebar~
 ~save layout~[none]
-~load state~load a saved .bsk file to restore state
-~save state~save current state as .bsk file, to be restored later
+~load~load a saved .bsk file to restore state
+~save~save current state as .bsk file, to be restored later
+~save as~save current state as a new .bsk file
 ~reset layout~reset to the layout specified in "layout" in userprefs.json
 ~write audio~write the last 30 minutes of audio to data/recordings/
 ~ ? ~
