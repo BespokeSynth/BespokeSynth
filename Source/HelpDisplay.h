@@ -69,6 +69,8 @@ private:
    ClickButton* mDoModuleScreenshotsButton;
    ClickButton* mDoModuleDocumentationButton;
    ClickButton* mTutorialVideoLinkButton;
+   ClickButton* mDocsLinkButton;
+   ClickButton* mDiscordLinkButton;
    float mWidth;
    float mHeight;
    static bool sTooltipsLoaded;

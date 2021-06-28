@@ -34,7 +34,9 @@ void HelpDisplay::CreateUIControls()
    mDumpModuleInfoButton = new ClickButton(this, "dump module info", 110, 22);
    mDoModuleScreenshotsButton = new ClickButton(this, "do screenshots", mDumpModuleInfoButton, kAnchor_Right);
    mDoModuleDocumentationButton = new ClickButton(this, "do documentation", mDoModuleScreenshotsButton, kAnchor_Right);
-   mTutorialVideoLinkButton = new ClickButton(this, "youtu.be/SYBc8X2IxqM", 160, 63);
+   mTutorialVideoLinkButton = new ClickButton(this, "youtu.be/SYBc8X2IxqM", 160, 61);
+   mDocsLinkButton = new ClickButton(this, "bespokesynth.com/docs", 95, 80);
+   mDiscordLinkButton = new ClickButton(this, "bespoke discord", 304, 80);
 
    //mDumpModuleInfo->SetShowing(false);
 }
@@ -72,8 +74,12 @@ void HelpDisplay::DrawModule()
    mDoModuleDocumentationButton->SetShowing(GetKeyModifiers() == kModifier_Shift);
    mDoModuleDocumentationButton->Draw();
    
-   DrawTextNormal("video overview available at:", 4, 75);
+   DrawTextNormal("video overview available at:", 4, 73);
    mTutorialVideoLinkButton->Draw();
+   DrawTextNormal("documentation:", 4, 92);
+   mDocsLinkButton->Draw();
+   DrawTextNormal("join the ", 260, 92);
+   mDiscordLinkButton->Draw();
    
    mHeight = 100;
    for (size_t i = 0; i < mHelpText.size(); ++i)
@@ -333,6 +339,14 @@ void HelpDisplay::ButtonClicked(ClickButton* button)
    if (button == mTutorialVideoLinkButton)
    {
       URL("https://youtu.be/SYBc8X2IxqM").launchInDefaultBrowser();
+   }
+   if (button == mDocsLinkButton)
+   {
+      URL("http://bespokesynth.com/docs").launchInDefaultBrowser();
+   }
+   if (button == mDiscordLinkButton)
+   {
+      URL("https://discord.gg/YdTMkvvpZZ").launchInDefaultBrowser();
    }
    if (button == mDumpModuleInfoButton)
    {
