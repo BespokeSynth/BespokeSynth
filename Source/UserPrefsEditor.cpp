@@ -336,6 +336,17 @@ void UserPrefsEditor::DrawModule()
       else
          DrawRightLabel(mBufferSizeDropdown, "he couldn't find any buffer sizes for this device, for some reason (is it plugged in?)", ofColor::yellow);
    }
+
+   DrawRightLabel(mWindowWidthEntry, "(currently: " + ofToString(ofGetWidth()) + ")", ofColor::white);
+   DrawRightLabel(mWindowHeightEntry, "(currently: " + ofToString(ofGetHeight()) + ")", ofColor::white);
+   if (mSetWindowPosition)
+   {
+      auto pos = TheSynth->GetMainComponent()->getTopLevelComponent()->getScreenPosition();
+
+      DrawRightLabel(mWindowPositionXEntry, "(currently: " + ofToString(pos.x) + ")", ofColor::white);
+      DrawRightLabel(mWindowPositionYEntry, "(currently: " + ofToString(pos.y) + ")", ofColor::white);
+   }
+   DrawRightLabel(mZoomSlider, "(currently: " + ofToString(gDrawScale) + ")", ofColor::white);
 }
 
 void UserPrefsEditor::DrawRightLabel(IUIControl* control, string text, ofColor color)
