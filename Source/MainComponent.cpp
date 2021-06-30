@@ -210,6 +210,9 @@ public:
       SetGlobalSampleRateAndBufferSize(sampleRate, bufferSize);
       
       mSynth.Setup(&mGlobalManagers, this);
+
+      if (!mGlobalManagers.mDeviceManager.getCurrentDeviceTypeObject()->hasSeparateInputsAndOutputs())
+         inputDevice = outputDevice;    //asio must have identical input and output
       
       AudioDeviceManager::AudioDeviceSetup preferredSetupOptions;
       preferredSetupOptions.sampleRate = gSampleRate;

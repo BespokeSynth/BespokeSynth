@@ -249,19 +249,36 @@ void UserPrefsEditor::UpdateDropdowns(vector<DropdownList*> toUpdate)
       outputDeviceName = selectedDeviceType->getDeviceNames()[selectedDeviceType->getDefaultDeviceIndex(false)];
 
    String inputDeviceName;
-   if (mAudioInputDeviceIndex >= 0)
-      inputDeviceName = selectedDeviceType->getDeviceNames(true)[mAudioInputDeviceIndex];
-   else if (mAudioInputDeviceIndex == -1)
-      inputDeviceName = selectedDeviceType->getDeviceNames()[selectedDeviceType->getDefaultDeviceIndex(true)];
+   if (selectedDeviceType->hasSeparateInputsAndOutputs())
+   {
+      if (mAudioInputDeviceIndex >= 0)
+         inputDeviceName = selectedDeviceType->getDeviceNames(true)[mAudioInputDeviceIndex];
+      else if (mAudioInputDeviceIndex == -1)
+         inputDeviceName = selectedDeviceType->getDeviceNames()[selectedDeviceType->getDefaultDeviceIndex(true)];
+   }
+   else
+   {
+      inputDeviceName = outputDeviceName;
+   }
 
-   auto* selectedDevice = selectedDeviceType->createDevice(outputDeviceName, inputDeviceName);
+   static auto* sSelectedDevice = deviceManager.getCurrentAudioDevice();
+   static String sOutputDeviceName = deviceManager.getAudioDeviceSetup().outputDeviceName;
+   static String sInputDeviceName = deviceManager.getAudioDeviceSetup().inputDeviceName;
+   if (sSelectedDevice->getTypeName() != selectedDeviceType->getTypeName() || sOutputDeviceName != outputDeviceName || sInputDeviceName != inputDeviceName)
+   {
+      if (sSelectedDevice != deviceManager.getCurrentAudioDevice())
+         delete sSelectedDevice;
+      sSelectedDevice = selectedDeviceType->createDevice(outputDeviceName, inputDeviceName);
+      sOutputDeviceName = outputDeviceName;
+      sInputDeviceName = inputDeviceName;
+   }
    
    if (toUpdate.empty() || VectorContains(mSampleRateDropdown, toUpdate))
    {
       mSampleRateIndex = -1;
       mSampleRateDropdown->Clear();
       i = 0;
-      for (auto rate : selectedDevice->getAvailableSampleRates())
+      for (auto rate : sSelectedDevice->getAvailableSampleRates())
       {
          mSampleRateDropdown->AddLabel(ofToString(rate), i);
          if (rate == gSampleRate)
@@ -275,7 +292,7 @@ void UserPrefsEditor::UpdateDropdowns(vector<DropdownList*> toUpdate)
       mBufferSizeIndex = -1;
       mBufferSizeDropdown->Clear();
       i = 0;
-      for (auto bufferSize : selectedDevice->getAvailableBufferSizes())
+      for (auto bufferSize : sSelectedDevice->getAvailableBufferSizes())
       {
          mBufferSizeDropdown->AddLabel(ofToString(bufferSize), i);
          if (bufferSize == gBufferSize)
@@ -290,6 +307,10 @@ void UserPrefsEditor::DrawModule()
    DrawTextNormal("editor for userprefs.json file", 3, 15);
    DrawTextNormal("any changes will not take effect until bespoke is restarted", 3, 35);
 
+   AudioDeviceManager& deviceManager = TheSynth->GetGlobalManagers()->mDeviceManager;    
+   auto* selectedDeviceType = mDeviceTypeIndex != -1 ? deviceManager.getAvailableDeviceTypes()[mDeviceTypeIndex] : deviceManager.getCurrentDeviceTypeObject();
+   mAudioInputDeviceDropdown->SetShowing(selectedDeviceType->hasSeparateInputsAndOutputs());
+
    for (auto* control : GetUIControls())
    {
       if (control->IsShowing() && control != mSaveButton && control != mCancelButton)
@@ -301,10 +322,20 @@ void UserPrefsEditor::DrawModule()
       DrawRightLabel(mDeviceTypeDropdown, "warning: DirectSound can cause crackle and strange behavior for some sample rates and buffer sizes", ofColor::yellow);
 
    if (mSampleRateDropdown->GetNumValues() == 0)
-      DrawRightLabel(mSampleRateDropdown, "couldn't find a sample rate compatible between these output and input devices", ofColor::yellow);
+   {
+      if (selectedDeviceType->hasSeparateInputsAndOutputs())
+         DrawRightLabel(mSampleRateDropdown, "couldn't find a sample rate compatible between these output and input devices", ofColor::yellow);
+      else
+         DrawRightLabel(mSampleRateDropdown, "he couldn't find any sample rates for this device, for some reason (is it plugged in?)", ofColor::yellow);
+   }
 
    if (mBufferSizeDropdown->GetNumValues() == 0)
-      DrawRightLabel(mBufferSizeDropdown, "couldn't find a buffer size compatible between these output and input devices", ofColor::yellow);
+   {
+      if (selectedDeviceType->hasSeparateInputsAndOutputs())
+         DrawRightLabel(mBufferSizeDropdown, "couldn't find a buffer size compatible between these output and input devices", ofColor::yellow);
+      else
+         DrawRightLabel(mBufferSizeDropdown, "he couldn't find any buffer sizes for this device, for some reason (is it plugged in?)", ofColor::yellow);
+   }
 }
 
 void UserPrefsEditor::DrawRightLabel(IUIControl* control, string text, ofColor color)
