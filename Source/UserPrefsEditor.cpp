@@ -264,7 +264,7 @@ void UserPrefsEditor::UpdateDropdowns(vector<DropdownList*> toUpdate)
    static auto* sSelectedDevice = deviceManager.getCurrentAudioDevice();
    static String sOutputDeviceName = deviceManager.getAudioDeviceSetup().outputDeviceName;
    static String sInputDeviceName = deviceManager.getAudioDeviceSetup().inputDeviceName;
-   if (sSelectedDevice->getTypeName() != selectedDeviceType->getTypeName() || sOutputDeviceName != outputDeviceName || sInputDeviceName != inputDeviceName)
+   if (sSelectedDevice == nullptr || sSelectedDevice->getTypeName() != selectedDeviceType->getTypeName() || sOutputDeviceName != outputDeviceName || sInputDeviceName != inputDeviceName)
    {
       if (sSelectedDevice != deviceManager.getCurrentAudioDevice())
          delete sSelectedDevice;
