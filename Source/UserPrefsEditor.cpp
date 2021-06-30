@@ -261,24 +261,17 @@ void UserPrefsEditor::UpdateDropdowns(vector<DropdownList*> toUpdate)
       inputDeviceName = outputDeviceName;
    }
 
-   static auto* sSelectedDevice = deviceManager.getCurrentAudioDevice();
-   static String sOutputDeviceName = deviceManager.getAudioDeviceSetup().outputDeviceName;
-   static String sInputDeviceName = deviceManager.getAudioDeviceSetup().inputDeviceName;
-   if (sSelectedDevice == nullptr || sSelectedDevice->getTypeName() != selectedDeviceType->getTypeName() || sOutputDeviceName != outputDeviceName || sInputDeviceName != inputDeviceName)
-   {
-      if (sSelectedDevice != deviceManager.getCurrentAudioDevice())
-         delete sSelectedDevice;
-      sSelectedDevice = selectedDeviceType->createDevice(outputDeviceName, inputDeviceName);
-      sOutputDeviceName = outputDeviceName;
-      sInputDeviceName = inputDeviceName;
-   }
+   auto* selectedDevice = deviceManager.getCurrentAudioDevice();
+   auto setup = deviceManager.getAudioDeviceSetup();
+   if (selectedDevice == nullptr || selectedDevice->getTypeName() != selectedDeviceType->getTypeName() || setup.outputDeviceName != outputDeviceName || setup.inputDeviceName != inputDeviceName)
+      selectedDevice = selectedDeviceType->createDevice(outputDeviceName, inputDeviceName);
    
    if (toUpdate.empty() || VectorContains(mSampleRateDropdown, toUpdate))
    {
       mSampleRateIndex = -1;
       mSampleRateDropdown->Clear();
       i = 0;
-      for (auto rate : sSelectedDevice->getAvailableSampleRates())
+      for (auto rate : selectedDevice->getAvailableSampleRates())
       {
          mSampleRateDropdown->AddLabel(ofToString(rate), i);
          if (rate == gSampleRate)
@@ -292,7 +285,7 @@ void UserPrefsEditor::UpdateDropdowns(vector<DropdownList*> toUpdate)
       mBufferSizeIndex = -1;
       mBufferSizeDropdown->Clear();
       i = 0;
-      for (auto bufferSize : sSelectedDevice->getAvailableBufferSizes())
+      for (auto bufferSize : selectedDevice->getAvailableBufferSizes())
       {
          mBufferSizeDropdown->AddLabel(ofToString(bufferSize), i);
          if (bufferSize == gBufferSize)
@@ -300,6 +293,9 @@ void UserPrefsEditor::UpdateDropdowns(vector<DropdownList*> toUpdate)
          ++i;
       }
    }
+
+   if (selectedDevice != deviceManager.getCurrentAudioDevice())
+      delete selectedDevice;
 }
 
 void UserPrefsEditor::DrawModule()
@@ -326,7 +322,7 @@ void UserPrefsEditor::DrawModule()
       if (selectedDeviceType->hasSeparateInputsAndOutputs())
          DrawRightLabel(mSampleRateDropdown, "couldn't find a sample rate compatible between these output and input devices", ofColor::yellow);
       else
-         DrawRightLabel(mSampleRateDropdown, "he couldn't find any sample rates for this device, for some reason (is it plugged in?)", ofColor::yellow);
+         DrawRightLabel(mSampleRateDropdown, "couldn't find any sample rates for this device, for some reason (is it plugged in?)", ofColor::yellow);
    }
 
    if (mBufferSizeDropdown->GetNumValues() == 0)
@@ -334,7 +330,7 @@ void UserPrefsEditor::DrawModule()
       if (selectedDeviceType->hasSeparateInputsAndOutputs())
          DrawRightLabel(mBufferSizeDropdown, "couldn't find a buffer size compatible between these output and input devices", ofColor::yellow);
       else
-         DrawRightLabel(mBufferSizeDropdown, "he couldn't find any buffer sizes for this device, for some reason (is it plugged in?)", ofColor::yellow);
+         DrawRightLabel(mBufferSizeDropdown, "couldn't find any buffer sizes for this device, for some reason (is it plugged in?)", ofColor::yellow);
    }
 
    DrawRightLabel(mWindowWidthEntry, "(currently: " + ofToString(ofGetWidth()) + ")", ofColor::white);
