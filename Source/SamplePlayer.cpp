@@ -1008,6 +1008,9 @@ void SamplePlayer::DrawModule()
    float sampleWidth = mWidth - 10;
    if (mDoRecording)
    {
+      ofSetColor(255, 0, 0, 100);
+      ofRect(0, 0, mWidth - 10, mHeight - 65);
+
       ofPushMatrix();
       
       int numChunks = mRecordingLength / kRecordingChunkSize + 1;
