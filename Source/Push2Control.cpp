@@ -359,7 +359,10 @@ void Push2Control::DrawToFramebuffer(NVGcontext* vg, NVGLUframebuffer* fb, float
          string text = "choose a module, then tap a grid square";
          string moduleTypeToSpawn = GetModuleTypeToSpawn();
          if (moduleTypeToSpawn != "")
+         {
+            ofSetColor(IDrawableModule::GetColor(TheSynth->GetModuleFactory()->GetModuleType(moduleTypeToSpawn)));
             text = "\ntap grid to spawn " + moduleTypeToSpawn;
+         }
          DrawTextBold(text, 5, 80, 20);
       
          ofSetColor(IDrawableModule::GetColor(kModuleType_Other));
@@ -385,7 +388,7 @@ void Push2Control::DrawToFramebuffer(NVGcontext* vg, NVGLUframebuffer* fb, float
             int y = (i / 8) * boxHeight + 10;
             ofPushMatrix();
             ofClipWindow(x, y, boxWidth, boxHeight, false);
-            ofSetColor(GetSpawnGridColor(i));
+            ofSetColor(GetSpawnGridColor(i, GetModuleTypeForSpawnList(list)));
             ofRect(x, y, boxWidth, boxHeight);
             ofSetColor(255, 255, 255);
             DrawTextBold(list->GetLabel(i), x+4, y+12);
@@ -449,20 +452,54 @@ void Push2Control::DrawToFramebuffer(NVGcontext* vg, NVGLUframebuffer* fb, float
    nvgluBindFramebuffer(NULL);
 }
 
-ofColor Push2Control::GetSpawnGridColor(int index) const
+ofColor Push2Control::GetSpawnGridColor(int index, ModuleType moduleType) const
 {
+   bool bright = false;
    if ((index / 4) % 4 == 0 || (index / 4) % 4 == 3)
-      return ofColor(0, 0, 100);
+      bright = true;
+
+   ofColor color = IDrawableModule::GetColor(moduleType);
+   if (bright)
+      color = color * .8f;
    else
-      return ofColor(0, 100, 0);
+      color = color * .4f;
+
+   return color;
 }
 
-int Push2Control::GetSpawnGridPadColor(int index) const
+int Push2Control::GetSpawnGridPadColor(int index, ModuleType moduleType) const
 {
+   bool bright = false;
    if ((index / 4) % 4 == 0 || (index / 4) % 4 == 3)
-      return 20;
-   else
-      return 11;
+      bright = true;
+
+   int color;
+   switch (moduleType)
+   {
+   case kModuleType_Instrument:
+      color = bright ? 26 : 116;
+      break;
+   case kModuleType_Note:
+      color = bright ? 8 : 80;
+      break;
+   case kModuleType_Synth:
+      color = bright ? 11 : 86;
+      break;
+   case kModuleType_Audio:
+      color = bright ? 18 : 96;
+      break;
+   case kModuleType_Modulator:
+      color = bright ? 22 : 112;
+      break;
+   case kModuleType_Pulse:
+      color = bright ? 9 : 82;
+      break;
+   default:
+      color = bright ? 118 : 124;
+      break;
+   }
+
+   return color;
 }
 
 void Push2Control::SetModuleGridLights()
@@ -492,7 +529,7 @@ void Push2Control::SetModuleGridLights()
    
    for (int i=0; i<mModules.size(); ++i)
    {
-      ofVec2f pos = mModules[i]->GetRect().getCenter();
+      ofVec2f pos = mModules[i]->GetPosition();
       int gridX = (pos.x - minX) / (maxX - minX) * 8;
       int gridY = (pos.y - minY) / (maxY - minY) * 8;
       while (gridX < 8 && gridY < 8)
@@ -526,7 +563,7 @@ void Push2Control::SetModuleGridLights()
          int gridY = i / 8;
          int gridIndex = gridX + (7 - gridY) * 8 + 36;
          if (i < list->GetNumValues())
-            SetLed(kMidiMessage_Note, gridIndex, GetSpawnGridPadColor(i));
+            SetLed(kMidiMessage_Note, gridIndex, GetSpawnGridPadColor(i, GetModuleTypeForSpawnList(list)));
          else
             SetLed(kMidiMessage_Note, gridIndex, 0);
       }
@@ -641,7 +678,7 @@ int Push2Control::GetPadColorForType(ModuleType type)
    switch (type)
    {
       case kModuleType_Instrument:
-         color = 115;
+         color = 26;
          break;
       case kModuleType_Note:
          color = 8;
@@ -650,7 +687,7 @@ int Push2Control::GetPadColorForType(ModuleType type)
          color = 11;
          break;
       case kModuleType_Audio:
-         color = 20;
+         color = 18;
          break;
       case kModuleType_Modulator:
          color = 22;
@@ -659,7 +696,7 @@ int Push2Control::GetPadColorForType(ModuleType type)
          color = 9;
          break;
       default:
-         color = 123;
+         color = 118;
          break;
    }
    return color;
@@ -760,7 +797,7 @@ void Push2Control::Poll()
       int gridIndex = mPendingSpawnPitch - 36;
       int gridX = gridIndex % 8;
       int gridY = gridIndex / 8;
-      ofVec2f newModuleCenter = ofVec2f(ofMap(gridX, 0, 7, mModuleGridRect.getMinX(), mModuleGridRect.getMaxX()), ofMap(gridY, 7, 0, mModuleGridRect.getMinY(), mModuleGridRect.getMaxY()));
+      ofVec2f newModulePos = ofVec2f(ofMap(gridX, 0, 7, mModuleGridRect.getMinX(), mModuleGridRect.getMaxX()), ofMap(gridY, 7, 0, mModuleGridRect.getMinY(), mModuleGridRect.getMaxY()));
       
       for (int i=0; i<mSpawnLists.GetDropdowns().size(); ++i)
       {
@@ -768,7 +805,7 @@ void Push2Control::Poll()
          {
             IDrawableModule* module = mSpawnLists.GetDropdowns()[i]->Spawn();
             ofRectangle rect = module->GetRect();
-            module->SetPosition(newModuleCenter.x-rect.width/2, newModuleCenter.y-rect.height/2);
+            module->SetPosition(newModulePos.x, newModulePos.y);
             mSpawnLists.GetDropdowns()[i]->GetList()->SetValue(-1);
             mScreenDisplayMode = ScreenDisplayMode::kNormal;
             SetDisplayModule(module, true);
@@ -1094,6 +1131,9 @@ void Push2Control::OnMidiControl(MidiControl& control)
                mSelectedGridSpawnListIndex = controlIndex;
             else
                mSelectedGridSpawnListIndex = -1;
+
+            for (int i = 0; i < mSpawnLists.GetDropdowns().size(); ++i)
+               mSpawnLists.GetDropdowns()[i]->GetList()->SetValue(-1);
          }
       }
    }

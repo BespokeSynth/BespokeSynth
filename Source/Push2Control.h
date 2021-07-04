@@ -81,8 +81,8 @@ private:
    void DrawDisplayModuleRect(ofRectangle rect);
    string GetModuleTypeToSpawn();
    ModuleType GetModuleTypeForSpawnList(IUIControl* control);
-   ofColor GetSpawnGridColor(int index) const;
-   int GetSpawnGridPadColor(int index) const;
+   ofColor GetSpawnGridColor(int index, ModuleType moduleType) const;
+   int GetSpawnGridPadColor(int index, ModuleType moduleType) const;
    
    bool mDisplayInitialized;
    
