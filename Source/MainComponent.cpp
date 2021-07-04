@@ -40,6 +40,8 @@ public:
    {
       openGLContext.setOpenGLVersionRequired(juce::OpenGLContext::openGL3_2);
       openGLContext.setContinuousRepainting(false);
+
+      SystemStats::setApplicationCrashHandler(CrashHandler);
       
       int screenWidth, screenHeight;
       {
@@ -86,6 +88,12 @@ public:
       shutdownAudio();
    }
    
+   static void CrashHandler(void*)
+   {
+      juce::File log(ofToDataPath(ofGetTimestampString("crash_%Y-%m-%d_%H-%M.txt")));
+      log.appendText(juce::SystemStats::getStackBacktrace());
+   }
+
    void timerCallback() override
    {
       static int sRenderFrame = 0;

@@ -2225,6 +2225,11 @@ void ModularSynth::OnConsoleInput()
       {
          TheTitleBar->GetHelpDisplay()->ScreenshotModule(mModuleContainer.GetModules()[0]);
       }
+      else if (tokens[0] == "forcecrash")
+      {
+         Sample* nullPointer = nullptr;
+         ofLog() << ofToString(nullPointer->Data()->GetChannel(0)[0]);
+      }
       else
       {
          ofLog() << "Creating: " << mConsoleText;
