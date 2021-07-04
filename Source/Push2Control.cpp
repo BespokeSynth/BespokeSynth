@@ -861,7 +861,7 @@ void Push2Control::UpdateControlList()
    {
       if (controls[i]->IsSliderControl() && controls[i]->GetShouldSaveState())
          mSliderControls.push_back(controls[i]);
-      if (controls[i]->IsButtonControl() && controls[i]->GetShouldSaveState())
+      if (controls[i]->IsButtonControl() && (controls[i]->GetShouldSaveState() || dynamic_cast<ClickButton*>(controls[i]) != nullptr))
          mButtonControls.push_back(controls[i]);
    }
    mDisplayedControls = controls;
