@@ -188,12 +188,13 @@ public:
    ofxJSONElement GetLayout();
    void SaveLayoutAsPopup();
    void SaveOutput();
-   void SaveState(string file);
+   void SaveState(string file, bool autosave);
    void LoadState(string file);
    void SaveCurrentState();
    void SaveStatePopup();
    void LoadStatePopup();
    double GetLastSaveTime() { return mLastSaveTime; }
+   string GetLastSavePath() { return mCurrentSaveStatePath; }
 
    ofxJSONElement GetUserPrefs() { return mUserPrefs; }
    UserPrefsEditor* GetUserPrefsEditor() { return mUserPrefsEditor; }

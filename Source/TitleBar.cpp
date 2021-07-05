@@ -392,7 +392,8 @@ void TitleBar::DrawModuleUnclipped()
       TheTitleBar->GetDimensions(titleBarWidth, titleBarHeight);
       float x = 100;
       float y = 40 + titleBarHeight;
-      gFontBold.DrawString("saved!", 50, x, y);
+      string filename = File(TheSynth->GetLastSavePath()).getFileName().toStdString();
+      gFontBold.DrawString("saved "+filename, 50, x, y);
       ofPopStyle();
    }
 
