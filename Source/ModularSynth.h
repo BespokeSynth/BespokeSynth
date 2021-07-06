@@ -183,6 +183,8 @@ public:
    bool IsLoadingModule() const { return mIsLoadingModule; }
    
    static string GetUserPrefsPath(bool relative);
+   static void CrashHandler(void*);
+   static void DumpStats(bool isCrash);
    
    void SaveLayout(string jsonFile = "", bool makeDefaultLayout = true);
    ofxJSONElement GetLayout();

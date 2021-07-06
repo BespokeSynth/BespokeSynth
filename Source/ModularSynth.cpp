@@ -102,6 +102,40 @@ ModularSynth::~ModularSynth()
    ScriptModule::UninitializePython();
 }
 
+void ModularSynth::CrashHandler(void*)
+{
+   DumpStats(true);
+}
+
+void ModularSynth::DumpStats(bool isCrash)
+{
+   string filename;
+   if (isCrash)
+      filename = ofToDataPath(ofGetTimestampString("crash_%Y-%m-%d_%H-%M.txt"));
+   else
+      filename = ofToDataPath(ofGetTimestampString("stats_%Y-%m-%d_%H-%M.txt"));
+   juce::File log(filename);
+   log.appendText("OS: " + juce::SystemStats::getOperatingSystemName()+"\n");
+   log.appendText("CPU vendor: " + juce::SystemStats::getCpuVendor() + "\n");
+   log.appendText("CPU model: " + juce::SystemStats::getCpuModel() + "\n");
+   log.appendText("CPU speed: " + ofToString(juce::SystemStats::getCpuSpeedInMegahertz()) + " MHz\n");
+   log.appendText("num cores: " + ofToString(juce::SystemStats::getNumCpus()) + "\n");
+   log.appendText("num CPUs: " + ofToString(juce::SystemStats::getNumPhysicalCpus()) + "\n");
+   log.appendText("RAM: " + ofToString(juce::SystemStats::getMemorySizeInMegabytes()) + " MB\n");
+   log.appendText("computer: " + juce::SystemStats::getComputerName() + "\n");
+   log.appendText("language: " + juce::SystemStats::getUserLanguage() + "\n");
+   log.appendText("region: " + juce::SystemStats::getUserRegion() + "\n");
+   log.appendText("display language: " + juce::SystemStats::getDisplayLanguage() + "\n");
+   log.appendText("description: " + juce::SystemStats::getDeviceDescription() + "\n");
+   log.appendText("manufacturer: " + juce::SystemStats::getDeviceManufacturer() + "\n");
+
+   if (isCrash)
+   {
+      log.appendText("\n\n\n");
+      log.appendText(juce::SystemStats::getStackBacktrace());
+   }
+}
+
 bool ModularSynth::IsReady()
 {
    return gTime > 100;
@@ -2236,6 +2270,10 @@ void ModularSynth::OnConsoleInput()
       {
          Sample* nullPointer = nullptr;
          ofLog() << ofToString(nullPointer->Data()->GetChannel(0)[0]);
+      }
+      else if (tokens[0] == "dumpstats")
+      {
+         DumpStats(false);
       }
       else
       {
