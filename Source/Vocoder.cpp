@@ -38,6 +38,7 @@ Vocoder::Vocoder()
 , mPhaseOffsetSlider(nullptr)
 , mCut(1)
 , mCutSlider(nullptr)
+, mCarrierDataSet(false)
 {
    // Generate a window with a single raised cosine from N/4 to 3N/4
    mWindower = new float[VOCODER_WINDOW_SIZE];
@@ -77,6 +78,7 @@ void Vocoder::SetCarrierBuffer(float *carrier, int bufferSize)
 {
    assert(bufferSize == GetBuffer()->BufferSize());
    BufferCopy(mCarrierInputBuffer, carrier, bufferSize);
+   mCarrierDataSet = true;
 }
 
 void Vocoder::Process(double time)
@@ -206,10 +208,16 @@ void Vocoder::Process(double time)
 
 void Vocoder::DrawModule()
 {
-
    if (Minimized() || IsVisible() == false)
       return;
 
+   if (!mCarrierDataSet)
+   {
+      ofPushStyle();
+      ofSetColor(255, 0, 0);
+      DrawTextNormal("no vocodercarrier!", 5, 15);
+      ofPopStyle();
+   }
    
    mInputSlider->Draw();
    mCarrierSlider->Draw();

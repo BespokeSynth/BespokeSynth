@@ -34,6 +34,7 @@ BandVocoder::BandVocoder()
 , mMaxBand(1.0f)
 , mMaxBandSlider(nullptr)
 , mSpacingStyle(0)
+, mCarrierDataSet(false)
 {
    mCarrierInputBuffer = new float[GetBuffer()->BufferSize()];
    Clear(mCarrierInputBuffer, GetBuffer()->BufferSize());
@@ -86,6 +87,7 @@ void BandVocoder::SetCarrierBuffer(float *carrier, int bufferSize)
 {
    assert(bufferSize == GetBuffer()->BufferSize());
    BufferCopy(mCarrierInputBuffer, carrier, bufferSize);
+   mCarrierDataSet = true;
 }
 
 void BandVocoder::Process(double time)
@@ -195,6 +197,14 @@ void BandVocoder::DrawModule()
          }
       }
       ofEndShape(false);
+   }
+
+   if (!mCarrierDataSet)
+   {
+      ofPushStyle();
+      ofSetColor(255, 0, 0);
+      DrawTextNormal("no vocodercarrier!", 5, h-5);
+      ofPopStyle();
    }
 }
 

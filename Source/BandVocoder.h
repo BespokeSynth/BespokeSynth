@@ -89,6 +89,8 @@ private:
    BiquadFilter mBiquadOut[VOCODER_MAX_BANDS];
    PeakTracker mPeaks[VOCODER_MAX_BANDS];
    PeakTracker mOutputPeaks[VOCODER_MAX_BANDS];
+
+   bool mCarrierDataSet;
 };
 
 

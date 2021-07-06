@@ -46,6 +46,7 @@ private:
    bool Enabled() const override { return true; }
 
    VocoderBase* mVocoder;
+   IAudioReceiver* mVocoderTarget;
 };
 
 

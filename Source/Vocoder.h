@@ -88,6 +88,8 @@ private:
    IntSlider* mCutSlider;
 
    GateEffect mGate;
+
+   bool mCarrierDataSet;
 };
 
 

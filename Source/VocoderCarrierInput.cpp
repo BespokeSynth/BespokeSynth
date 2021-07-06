@@ -16,6 +16,7 @@
 VocoderCarrierInput::VocoderCarrierInput()
 : IAudioProcessor(gBufferSize)
 , mVocoder(nullptr)
+, mVocoderTarget(nullptr)
 {
 }
 
@@ -38,8 +39,11 @@ void VocoderCarrierInput::Process(double time)
    if (GetTarget() == nullptr)
       return;
 
-   if (mVocoder == nullptr)
+   if (mVocoder == nullptr || GetTarget() != mVocoderTarget)
+   {
       mVocoder = dynamic_cast<VocoderBase*>(GetTarget());
+      mVocoderTarget = GetTarget();
+   }
 
    if (mVocoder == nullptr)
       return;
