@@ -79,11 +79,21 @@ void SampleBrowser::ButtonClicked(ClickButton* button)
          {
             String clicked = mDirectoryListing[entryIndex];
             if (clicked == "..")
-               SetDirectory(File(mCurrentDirectory).getParentDirectory().getFullPathName());
-            else if (!clicked.contains("."))
-               SetDirectory(File(mCurrentDirectory).getChildFile(clicked).getFullPathName());
+            {
+               File dir(mCurrentDirectory);
+               if (dir.getParentDirectory().getFullPathName() != dir.getFullPathName())
+                  SetDirectory(File(mCurrentDirectory).getParentDirectory().getFullPathName());
+               else
+                  SetDirectory("");
+            }
+            else if (File(clicked).isDirectory())
+            {
+               SetDirectory(clicked);
+            }
             else
-               TheSynth->GrabSample(File(mCurrentDirectory).getChildFile(clicked).getFullPathName().toStdString());
+            {
+               TheSynth->GrabSample(clicked.toStdString());
+            }
          }
       }
    }
@@ -95,8 +105,8 @@ namespace
    {
       if (text == other)
          return 0;
-      bool isDir = text == ".." || !text.contains(".");
-      bool isOtherDir = other == ".." || !other.contains(".");
+      bool isDir = text == ".." || File(text).isDirectory();
+      bool isOtherDir = other == ".." || File(other).isDirectory();
       if (isDir && !isOtherDir)
          return -1;
       if (!isDir && isOtherDir)
@@ -116,36 +126,46 @@ void SampleBrowser::SetDirectory(String dirPath)
    
    mDirectoryListing.clear();
    
-   String matcher = TheSynth->GetGlobalManagers()->mAudioFormatManager.getWildcardForAllFormats();
-   
-   StringArray wildcards;
-   wildcards.addTokens(matcher, ";,", "\"'");
-   wildcards.trim();
-   wildcards.removeEmptyStrings();
-   
-   File dir(ofToDataPath(dirPath.toStdString()));
-   if (dir.getParentDirectory().getFullPathName() != dir.getFullPathName())
-      mDirectoryListing.add("..");
-   for (auto file : dir.findChildFiles(File::findFilesAndDirectories|File::ignoreHiddenFiles, false))
+   if (dirPath != "")
    {
-      bool include = false;
-      if (file.isDirectory())
+      String matcher = TheSynth->GetGlobalManagers()->mAudioFormatManager.getWildcardForAllFormats();
+
+      StringArray wildcards;
+      wildcards.addTokens(matcher, ";,", "\"'");
+      wildcards.trim();
+      wildcards.removeEmptyStrings();
+
+      mDirectoryListing.add("..");
+
+      File dir(ofToDataPath(dirPath.toStdString()));
+      for (auto file : dir.findChildFiles(File::findFilesAndDirectories | File::ignoreHiddenFiles, false))
       {
-         include = true;
-      }
-      else
-      {
-         for (auto& w : wildcards)
+         bool include = false;
+         if (file.isDirectory())
          {
-             if (file.getFileName().matchesWildcard (w, !File::areFileNamesCaseSensitive()))
-             {
-                include = true;
-                break;
-             }
+            include = true;
          }
+         else
+         {
+            for (auto& w : wildcards)
+            {
+               if (file.getFileName().matchesWildcard(w, !File::areFileNamesCaseSensitive()))
+               {
+                  include = true;
+                  break;
+               }
+            }
+         }
+         if (include)
+            mDirectoryListing.add(file.getFullPathName());
       }
-      if (include)
-         mDirectoryListing.add(file.getFileName());
+   }
+   else
+   {
+      Array<File> roots;
+      File::findFileSystemRoots(roots);
+      for (auto root : roots)
+         mDirectoryListing.add(root.getFullPathName());
    }
    SortDirectoryListing(mDirectoryListing);
             
@@ -162,11 +182,15 @@ void SampleBrowser::ShowPage(int page)
       if (i+offset < (int)mDirectoryListing.size())
       {
          mButtons[i]->SetShowing(true);
-         if (mDirectoryListing[i + offset] == ".." || !mDirectoryListing[i + offset].contains("."))
+         if (mDirectoryListing[i + offset] == ".." || File(mDirectoryListing[i + offset]).isDirectory())
             mButtons[i]->SetDisplayStyle(ButtonDisplayStyle::kFolderIcon);
          else
             mButtons[i]->SetDisplayStyle(ButtonDisplayStyle::kSampleIcon);
-         mButtons[i]->SetLabel(mDirectoryListing[i+offset].toStdString().c_str());
+
+         if (mDirectoryListing[i + offset] == "..")
+            mButtons[i]->SetLabel("..");
+         else
+            mButtons[i]->SetLabel(File(mDirectoryListing[i+offset]).getFileName().toStdString().c_str());
       }
       else
       {
