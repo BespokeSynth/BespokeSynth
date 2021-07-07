@@ -401,14 +401,6 @@ private:
    
    void mouseMove(const MouseEvent& e) override
    {
-      //seems like I need to set the title via the message thread, and the constructor is apparently too early. I guess this works?
-      static bool sFirst = true;
-      if (sFirst)
-      {
-         sFirst = false;
-         getTopLevelComponent()->setName("Bespoke Synth");
-      }
-      
       //Don't do mouse move in here, it really slows UI responsiveness in some scenarios. We do it when we render instead.
       //mSynth.MouseMoved(e.getPosition().x, e.getPosition().y);
    }

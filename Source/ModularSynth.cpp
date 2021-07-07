@@ -2040,7 +2040,7 @@ void ModularSynth::SaveState(string file, bool autosave)
       mCurrentSaveStatePath = file;
       mLastSaveTime = gTime;
       string filename = File(mCurrentSaveStatePath).getFileName().toStdString();
-      mMainComponent->getTopLevelComponent()->setName("Bespoke Synth - "+filename);
+      mMainComponent->getTopLevelComponent()->setName("bespoke synth - "+filename);
    }
 
    mAudioThreadMutex.Lock("SaveState()");
@@ -2057,7 +2057,7 @@ void ModularSynth::LoadState(string file)
 {
    mCurrentSaveStatePath = file;
    string filename = File(mCurrentSaveStatePath).getFileName().toStdString();
-   mMainComponent->getTopLevelComponent()->setName("Bespoke Synth - " + filename);
+   mMainComponent->getTopLevelComponent()->setName("bespoke synth - " + filename);
 
    ofLog() << "LoadState() " << file;
 

@@ -28,7 +28,7 @@ public:
    {
       // This method is where you should put your application's initialisation code..
       
-      mainWindow = new MainWindow (getApplicationName());
+      mainWindow = new MainWindow ("bespoke synth");
    }
    
    void shutdown() override
