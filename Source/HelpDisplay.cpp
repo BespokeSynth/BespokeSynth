@@ -24,6 +24,10 @@ HelpDisplay::HelpDisplay()
 , mScreenshotModule(nullptr)
 {
    LoadHelp();
+
+   sShowTooltips = TheSynth->GetUserPrefs()["show_tooltips_on_load"].isNull() ? true : (TheSynth->GetUserPrefs()["show_tooltips_on_load"].asInt() > 0);
+   if (sShowTooltips)
+      LoadTooltips();
 }
 
 void HelpDisplay::CreateUIControls()

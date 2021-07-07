@@ -84,6 +84,8 @@ private:
    float mScrollMultiplierHorizontal;
    Checkbox* mAutosaveCheckbox;
    bool mAutosave;
+   TextEntry* mRecordingsPathEntry;
+   string mRecordingsPath;
    TextEntry* mRecordBufferLengthEntry;
    float mRecordBufferLengthMinutes;
    TextEntry* mTooltipsFilePathEntry;
@@ -96,6 +98,8 @@ private:
    string mFfmpegPath;
    TextEntry* mVstSearchDirsEntry;
    string mVstSearchDirs;
+   Checkbox* mShowTooltipsOnLoadCheckbox;
+   bool mShowTooltipsOnLoad;
    ClickButton* mSaveButton;
    ClickButton* mCancelButton;
 

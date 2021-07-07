@@ -40,12 +40,14 @@ void UserPrefsEditor::CreateUIControls()
    FLOATSLIDER(mScrollMultiplierVerticalSlider, "scroll_multiplier_vertical", &mScrollMultiplierVertical, -2, 2);
    FLOATSLIDER(mScrollMultiplierHorizontalSlider, "scroll_multiplier_horizontal", &mScrollMultiplierHorizontal, -2, 2);
    CHECKBOX(mAutosaveCheckbox, "autosave", &mAutosave);
+   TEXTENTRY(mRecordingsPathEntry, "recordings_path", 70, &mRecordingsPath);
    TEXTENTRY_NUM(mRecordBufferLengthEntry, "record_buffer_length_minutes", 5, &mRecordBufferLengthMinutes, 1, 120);
    TEXTENTRY(mTooltipsFilePathEntry, "tooltips", 100, &mTooltipsFilePath);
    TEXTENTRY(mDefaultLayoutPathEntry, "layout", 100, &mDefaultLayoutPath);
    TEXTENTRY(mYoutubeDlPathEntry, "youtube-dl_path", 100, &mYoutubeDlPath);
    TEXTENTRY(mFfmpegPathEntry, "ffmpeg_path", 100, &mFfmpegPath);
    TEXTENTRY(mVstSearchDirsEntry, "vstsearchdirs", 1000, &mVstSearchDirs);
+   CHECKBOX(mShowTooltipsOnLoadCheckbox, "show_tooltips_on_load", &mShowTooltipsOnLoad);
    UIBLOCK_SHIFTDOWN();
    BUTTON(mSaveButton, "save and exit bespoke");
    BUTTON(mCancelButton, "cancel");
@@ -96,6 +98,16 @@ void UserPrefsEditor::Show()
       mScrollMultiplierHorizontal = 1;
    else
       mScrollMultiplierHorizontal = TheSynth->GetUserPrefs()["scroll_multiplier_horizontal"].asDouble();
+
+   if (TheSynth->GetUserPrefs()["recordings_path"].isNull())
+      mRecordingsPath = "recordings/";
+   else
+      mRecordingsPath = TheSynth->GetUserPrefs()["recordings_path"].asString();
+
+   if (TheSynth->GetUserPrefs()["autosave"].isNull())
+      mAutosave = false;
+   else
+      mAutosave = TheSynth->GetUserPrefs()["autosave"].asBool();
 
    if (TheSynth->GetUserPrefs()["record_buffer_length_minutes"].isNull())
       mRecordBufferLengthMinutes = 30;
@@ -159,6 +171,11 @@ void UserPrefsEditor::Show()
             mVstSearchDirs += ", ";
       }
    }
+
+   if (TheSynth->GetUserPrefs()["show_tooltips_on_load"].isNull())
+      mShowTooltipsOnLoad = true;
+   else
+      mShowTooltipsOnLoad = TheSynth->GetUserPrefs()["show_tooltips_on_load"].asBool();
 
    mWindowPositionXEntry->SetShowing(mSetWindowPosition);
    mWindowPositionYEntry->SetShowing(mSetWindowPosition);
@@ -343,6 +360,7 @@ void UserPrefsEditor::DrawModule()
       DrawRightLabel(mWindowPositionYEntry, "(currently: " + ofToString(pos.y) + ")", ofColor::white);
    }
    DrawRightLabel(mZoomSlider, "(currently: " + ofToString(gDrawScale) + ")", ofColor::white);
+   DrawRightLabel(mRecordingsPathEntry, "(default: recordings/)", ofColor::white);
 }
 
 void UserPrefsEditor::DrawRightLabel(IUIControl* control, string text, ofColor color)
@@ -445,6 +463,7 @@ void UserPrefsEditor::ButtonClicked(ClickButton* button)
       UpdatePrefFloat(userPrefs, "scroll_multiplier_vertical", mScrollMultiplierVertical);
       UpdatePrefFloat(userPrefs, "scroll_multiplier_horizontal", mScrollMultiplierHorizontal);
       UpdatePrefBool(userPrefs, "autosave", mAutosave);
+      UpdatePrefStr(userPrefs, "recordings_path", mRecordingsPath);
       UpdatePrefFloat(userPrefs, "record_buffer_length_minutes", mRecordBufferLengthMinutes);
       UpdatePrefStr(userPrefs, "tooltips", mTooltipsFilePath);
       UpdatePrefStr(userPrefs, "layout", mDefaultLayoutPath);
@@ -453,6 +472,8 @@ void UserPrefsEditor::ButtonClicked(ClickButton* button)
       string vstSearchDirs = mVstSearchDirs;
       ofStringReplace(vstSearchDirs, ", ", ",");
       UpdatePrefStrArray(userPrefs, "vstsearchdirs", ofSplitString(vstSearchDirs, ","));
+      UpdatePrefBool(userPrefs, "show_tooltips_on_load", mShowTooltipsOnLoad);
+
       string output = userPrefs.getRawString(true);
       CleanUpSave(output);
 

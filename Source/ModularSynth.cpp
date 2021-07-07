@@ -2487,7 +2487,11 @@ void ModularSynth::SaveOutput()
 {
    ScopedMutex mutex(&mAudioThreadMutex, "SaveOutput()");
 
-   string filename = ofGetTimestampString("recordings/recording_%Y-%m-%d_%H-%M.wav");
+   string recordingsPath = "recordings/";
+   if (!mUserPrefs["recordings_path"].isNull())
+      recordingsPath = mUserPrefs["recordings_path"].asString();
+   
+   string filename = ofGetTimestampString(recordingsPath + "recording_%Y-%m-%d_%H-%M.wav");
    //string filenamePos = ofGetTimestampString("recordings/pos_%Y-%m-%d_%H-%M.wav");
 
    assert(mRecordingLength <= mGlobalRecordBuffer->Size());

@@ -546,7 +546,7 @@ drumsequencer~step sequencer intended for drums. hold shift when dragging on the
 
 
 helpdisplay~displays help information
-~show tooltips~displays these tooltips
+~show tooltips~displays these tooltips. you can turn these on or off by default in the "settings" menu.
 ~help page~which page of help information to show
 
 
@@ -1148,6 +1148,7 @@ karplusstrong~polyphonic plucked string physical modeling synth
 ~x freq~frequency of excitation audio
 ~x att~fade in time for excitation audio
 ~x dec~fade out time for excitation audio
+~pitchtone~adjust how pitch influences filter amount. a value of zero gives even filtering across the entire pitch range, higher values filter high pitches less, low values filter low pitches less.
 
 
 
@@ -1587,7 +1588,7 @@ titlebar~
 ~save~save current state as .bsk file, to be restored later
 ~save as~save current state as a new .bsk file
 ~reset layout~reset to the layout specified in "layout" in userprefs.json
-~write audio~write the last 30 minutes of audio to data/recordings/
+~write audio~write the last 30 minutes of audio to your specified recordings_path
 ~ ? ~
 ~settings~adjust preferences, saved as userprefs.json
 ~load layout~[none]
