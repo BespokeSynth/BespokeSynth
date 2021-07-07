@@ -76,7 +76,7 @@ bool KarplusStrongVoice::Process(double time, ChannelBuffer* out, int oversampli
          pitch += 12;   //inverting the pitch gives an octave down sound by halving the resonating frequency, so correct for that
       
       float freq = TheScale->PitchToFreq(pitch);
-      float filterRate = mVoiceParams->mFilter * freq/300;
+      float filterRate = mVoiceParams->mFilter * pow(freq/300, exp2(mVoiceParams->mPitchTone));
       float filterLerp = ofClamp(exp2(-filterRate / oversampling), 0, 1);
       
       float oscPhaseInc = GetPhaseInc(mVoiceParams->mExciterFreq) / oversampling;

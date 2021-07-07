@@ -43,6 +43,7 @@ public:
    , mExciterAttack(1)
    , mExciterDecay(3)
    , mExcitation(0)
+   , mPitchTone(0)
    {}
    float mFilter;
    float mFeedback;
@@ -52,6 +53,7 @@ public:
    float mExciterAttack;
    float mExciterDecay;
    float mExcitation;
+   float mPitchTone;
 };
 
 class KarplusStrongVoice : public IMidiVoice
