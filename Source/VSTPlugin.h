@@ -107,6 +107,7 @@ private:
       FloatSlider* mSlider;
       AudioProcessorParameter* mParameter;
       bool mShowing;
+      bool mInSelectorList;
    };
    
    vector<ParameterSlider> mParameterSliders;
@@ -140,6 +141,7 @@ private:
    DisplayMode mDisplayMode;
    int mShowParameterIndex;
    DropdownList* mShowParameterDropdown;
+   int mTemporarilyDisplayedParamIndex;
 };
 
 #endif /* defined(__Bespoke__VSTPlugin__) */

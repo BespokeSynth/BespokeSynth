@@ -60,6 +60,7 @@ public:
    DropdownList(IDropdownListener* owner, const char* name, int x, int y, int* var, float width = -1);
    DropdownList(IDropdownListener* owner, const char* name, IUIControl* anchor, AnchorDirection anchorDirection, int* var, float width = -1);
    void AddLabel(string label, int value);
+   void RemoveLabel(int value);
    string GetLabel(int val) const;
    void Render() override;
    bool MouseMoved(float x, float y) override;

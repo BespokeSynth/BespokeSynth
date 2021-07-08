@@ -144,6 +144,7 @@ VSTPlugin::VSTPlugin()
 //, mWindowOverlay(nullptr)
 , mDisplayMode(kDisplayMode_Sliders)
 , mShowParameterIndex(-1)
+, mTemporarilyDisplayedParamIndex(-1)
 {
    if (VSTLookup::sFormatManager.getNumFormats() == 0)
       VSTLookup::sFormatManager.addDefaultFormats();
@@ -320,7 +321,7 @@ void VSTPlugin::CreateParameterSliders()
    
    const auto& parameters = mPlugin->getParameters();
    
-   int numParameters = MIN(100, parameters.size());
+   int numParameters = parameters.size();
    mParameterSliders.resize(numParameters);
    for (int i=0; i<numParameters; ++i)
    {
@@ -343,7 +344,15 @@ void VSTPlugin::CreateParameterSliders()
       mParameterSliders[i].mSlider = new FloatSlider(this, label.c_str(), -1, -1, 200, 15, &mParameterSliders[i].mValue, 0, 1);
       mParameterSliders[i].mParameter = parameters[i];
       mParameterSliders[i].mShowing = false;
-      mShowParameterDropdown->AddLabel(label.c_str(), i);
+      if (numParameters <= 20)   //only show parameters in list if there are a small number. if there are many, make the user adjust them in the VST before they can be controlled
+      {
+         mShowParameterDropdown->AddLabel(label.c_str(), i);
+         mParameterSliders[i].mInSelectorList = true;
+      }
+      else
+      {
+         mParameterSliders[i].mInSelectorList = false;
+      }
    }
 }
 
@@ -353,7 +362,18 @@ void VSTPlugin::Poll()
    {
       for (int i=0; i<mParameterSliders.size(); ++i)
       {
-         mParameterSliders[i].mValue = mParameterSliders[i].mParameter->getValue();
+         float value = mParameterSliders[i].mParameter->getValue();
+         if (mParameterSliders[i].mValue != value)
+         {
+            mParameterSliders[i].mValue = value;
+            if (!mParameterSliders[i].mInSelectorList && mTemporarilyDisplayedParamIndex != i)
+            {
+               if (mTemporarilyDisplayedParamIndex != -1)
+                  mShowParameterDropdown->RemoveLabel(mTemporarilyDisplayedParamIndex);
+               mTemporarilyDisplayedParamIndex = i;
+               mShowParameterDropdown->AddLabel(mParameterSliders[i].mSlider->Name(), i);
+            }
+         }
       }
    }
 }
@@ -619,7 +639,9 @@ void VSTPlugin::DropdownUpdated(DropdownList* list, int oldVal)
    if (list == mShowParameterDropdown)
    {
       mParameterSliders[mShowParameterIndex].mShowing = true;
+      mParameterSliders[mShowParameterIndex].mInSelectorList = true;
       mShowParameterIndex = -1;
+      mTemporarilyDisplayedParamIndex = -1;
    }
 }
 

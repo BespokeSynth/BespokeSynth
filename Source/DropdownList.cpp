@@ -71,6 +71,23 @@ void DropdownList::AddLabel(string label, int value)
    CalcSliderVal();
 }
 
+void DropdownList::RemoveLabel(int value)
+{
+   for (auto iter = mElements.begin(); iter != mElements.end(); ++iter)
+   {
+      if (iter->mValue == value)
+      {
+         mElements.erase(iter);
+         
+         CalculateWidth();
+         mHeight = itemSpacing;
+         
+         CalcSliderVal();
+         break;
+      }
+   }
+}
+
 void DropdownList::CalculateWidth()
 {
    mModalWidth = mWidth;
