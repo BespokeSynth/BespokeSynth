@@ -401,6 +401,7 @@ private:
    int mLayoutWidth;
    int mLayoutHeight;
    vector<GridLayout*> mGrids;
+   bool mFoundLayoutFile;
    
    ofMutex mQueuedMessageMutex;
 };

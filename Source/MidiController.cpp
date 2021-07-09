@@ -69,6 +69,7 @@ MidiController::MidiController()
 , mHoveredLayoutElement(-1)
 , mLayoutWidth(0)
 , mLayoutHeight(0)
+, mFoundLayoutFile(false)
 {
    mListeners.resize(MAX_MIDI_PAGES);  
 }
@@ -1064,6 +1065,14 @@ void MidiController::DrawModule()
       ofRect(kLayoutControlsX,kLayoutControlsY,235,140);
       ofPopStyle();
       
+      if (!mFoundLayoutFile)
+      {
+         string filename = mDeviceIn + ".json";
+         ofStringReplace(filename, "/", "");
+         filename = ofToDataPath("controllers/"+filename);
+         gFont.DrawStringWrap("couldn't find layout file at "+filename+", using the default layout instead", 15, 3, kLayoutControlsY + 160, 235);
+      }
+      
       if (mHighlightedLayoutElement != -1)
       {
          UIControlConnection* connection = GetConnectionForControl(mLayoutControls[mHighlightedLayoutElement].mType, mLayoutControls[mHighlightedLayoutElement].mControl);
@@ -1440,6 +1449,7 @@ void MidiController::OnDeviceChanged()
    bool loaded = layout.open(ofToDataPath("controllers/"+filename));
    if (loaded)
    {
+      mFoundLayoutFile = true;
       if (!layout["outchannel"].isNull())
       {
          mOutChannel = layout["outchannel"].asInt();
@@ -1579,6 +1589,10 @@ void MidiController::OnDeviceChanged()
             }
          }
       }
+   }
+   else
+   {
+      mFoundLayoutFile = false;
    }
    
    if (useDefaultLayout)
