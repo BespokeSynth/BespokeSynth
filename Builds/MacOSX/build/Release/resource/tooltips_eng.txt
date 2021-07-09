@@ -1621,7 +1621,7 @@ vstplugin~a VST plugin instance
 ~vol~adjust the output volume
 ~program change~send a program change message to the VST instance
 ~open~show the plugin window
-~show parameter~select parameters to display them, so they can be adjusted from within bespoke's interface
+~show parameter~select parameters to display them, so they can be adjusted from within bespoke's interface. if a VST has more than 20 parameters, this list will initially be empty. in that case, to make a parameter appear in this list, wiggle it within the VST's interface.
 
 
 
