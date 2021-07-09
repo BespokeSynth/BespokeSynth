@@ -33,6 +33,9 @@ public:
 class IPulseSource
 {
 public:
+   IPulseSource() : mLastPulseTime(0) {}
    virtual ~IPulseSource() {}
    void DispatchPulse(PatchCableSource* destination, double time, float velocity, int flags);
+private:
+   double mLastPulseTime;
 };

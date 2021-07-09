@@ -21,7 +21,7 @@ class INoteSource;
 class NoteOutput : public INoteReceiver
 {
 public:
-   NoteOutput(INoteSource* source) : mNoteSource(source) { bzero(mNotes, 128*sizeof(bool)); bzero(mNoteOnTimes, 128*sizeof(double)); }
+   NoteOutput(INoteSource* source) : mNoteSource(source), mStackDepth(0) { bzero(mNotes, 128*sizeof(bool)); bzero(mNoteOnTimes, 128*sizeof(double)); }
    
    void Flush(double time);
    void FlushTarget(double time, INoteReceiver* target);
@@ -32,6 +32,7 @@ public:
    void SendCC(int control, int value, int voiceIdx = -1) override;
    void SendMidi(const MidiMessage& message) override;
 
+   void ResetStackDepth() { mStackDepth = 0; }
    bool* GetNotes() { return mNotes; }
    bool HasHeldNotes();
    list<int> GetHeldNotesList();
@@ -39,14 +40,14 @@ private:
    bool mNotes[128];
    double mNoteOnTimes[128];
    INoteSource* mNoteSource;
+   int mStackDepth;
 };
 
 class INoteSource : public virtual IPatchable
 {
 public:
-   INoteSource() : mNoteOutput(this) {}
+   INoteSource() : mNoteOutput(this), mInNoteOutput(false) {}
    virtual ~INoteSource() {}
-   NoteOutput* GetNoteOutput() { return &mNoteOutput; }
    void PlayNoteOutput(double time, int pitch, int velocity, int voiceIdx = -1, ModulationParameters modulation = ModulationParameters());
    void SendCCOutput(int control, int value, int voiceIdx = -1);
    
@@ -54,6 +55,7 @@ public:
    void PreRepatch(PatchCableSource* cableSource) override;
 protected:
    NoteOutput mNoteOutput;
+   bool mInNoteOutput;
 };
 
 #endif

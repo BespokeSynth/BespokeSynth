@@ -16,6 +16,14 @@
 
 void NoteOutput::PlayNote(double time, int pitch, int velocity, int voiceIdx, ModulationParameters modulation)
 {
+   const int kMaxDepth = 100;
+   if (mStackDepth > kMaxDepth)
+   {
+      TheSynth->LogEvent("note chain hit max stack depth", kLogEventType_Error);
+      return;  //avoid stack overflow
+   }
+   ++mStackDepth;
+   
    if (pitch >= 0 && pitch <= 127)
    {
       for (auto noteReceiver : mNoteSource->GetPatchCableSource()->GetNoteReceivers())
@@ -115,7 +123,11 @@ void INoteSource::PlayNoteOutput(double time, int pitch, int velocity, int voice
    if (time < gTime)
       ofLog() << "Calling PlayNoteOutput() with a time in the past!  " << ofToString(time/1000) << " < " << ofToString(gTime/1000);
    
+   if (!mInNoteOutput)
+      mNoteOutput.ResetStackDepth();
+   mInNoteOutput = true;
    mNoteOutput.PlayNote(time, pitch, velocity, voiceIdx, modulation);
+   mInNoteOutput = false;
 }
 
 void INoteSource::SendCCOutput(int control, int value, int voiceIdx /*=-1*/)

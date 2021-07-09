@@ -13,6 +13,10 @@
 
 void IPulseSource::DispatchPulse(PatchCableSource* destination, double time, float velocity, int flags)
 {
+   if (time == mLastPulseTime)   //avoid stack overflow
+      return;
+   mLastPulseTime = time;
+   
    const vector<IPulseReceiver*>& receivers = destination->GetPulseReceivers();
    destination->AddHistoryEvent(time, true);
    destination->AddHistoryEvent(time + 15, false);
