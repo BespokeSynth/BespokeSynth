@@ -41,20 +41,20 @@ bool SingleOscillatorVoice::Process(double time, ChannelBuffer* out, int oversam
    bool mono = (out->NumActiveChannels() == 1);
       
    float syncPhaseInc = GetPhaseInc(mVoiceParams->mSyncFreq);
+   
+   float pitch;
+   float freq;
+   float vol;
+   
+   if (mVoiceParams->mLiteCPUMode)
+      DoParameterUpdate(0, pitch, freq, vol);
+   
    for (int pos=0; pos<out->BufferSize(); ++pos)
    {
-      //PROFILER(SingleOscillatorVoice_CalcSample);
-      
-      {
-         //PROFILER(SingleOscillatorVoice_ComputeSliders);
-         if (mOwner)
-            mOwner->ComputeSliders(pos);
-      }
+      if (!mVoiceParams->mLiteCPUMode)
+         DoParameterUpdate(pos, pitch, freq, vol);
       
       float adsrVal = mAdsr.Value(time);
-      float pitch = GetPitch(pos);
-      float freq = TheScale->PitchToFreq(pitch) * mVoiceParams->mMult;
-      float vol = mVoiceParams->mVol * .4f / mVoiceParams->mUnison;
       
       float summedLeft = 0;
       float summedRight = 0;
@@ -64,15 +64,12 @@ bool SingleOscillatorVoice::Process(double time, ChannelBuffer* out, int oversam
          mOscData[u].mOsc.SetShuffle(mVoiceParams->mShuffle);
          mOscData[u].mOsc.SetSoften(mVoiceParams->mSoften);
          
-         float detune = exp2(mVoiceParams->mDetune * mOscData[u].mDetuneFactor * (1 - GetPressure(pos)));
-         float phaseInc = GetPhaseInc(freq * detune);
-         
          {
             //PROFILER(SingleOscillatorVoice_UpdatePhase);
-            mOscData[u].mPhase += phaseInc;
+            mOscData[u].mPhase += mOscData[u].mCurrentPhaseInc;
             if (mOscData[u].mPhase == INFINITY)
             {
-               ofLog() << "Infinite phase. phaseInc:" + ofToString(phaseInc) + " detune:" + ofToString(mVoiceParams->mDetune) + " freq:" + ofToString(freq) + " pitch:" + ofToString(pitch) + " getpitch:" + ofToString(GetPitch(pos));
+               ofLog() << "Infinite phase. phaseInc:" + ofToString(mOscData[u].mCurrentPhaseInc) + " detune:" + ofToString(mVoiceParams->mDetune) + " freq:" + ofToString(freq) + " pitch:" + ofToString(pitch) + " getpitch:" + ofToString(GetPitch(pos));
             }
             else
             {
@@ -151,6 +148,25 @@ bool SingleOscillatorVoice::Process(double time, ChannelBuffer* out, int oversam
    }
    
    return true;
+}
+
+void SingleOscillatorVoice::DoParameterUpdate(int samplesIn,
+                                              float& pitch,
+                                              float& freq,
+                                              float& vol)
+{
+   if (mOwner)
+      mOwner->ComputeSliders(samplesIn);
+   
+   pitch = GetPitch(samplesIn);
+   freq = TheScale->PitchToFreq(pitch) * mVoiceParams->mMult;
+   vol = mVoiceParams->mVol * .4f / mVoiceParams->mUnison;
+   
+   for (int u=0; u<mVoiceParams->mUnison && u<kMaxUnison; ++u)
+   {
+      float detune = exp2(mVoiceParams->mDetune * mOscData[u].mDetuneFactor * (1 - GetPressure(samplesIn)));
+      mOscData[u].mCurrentPhaseInc = GetPhaseInc(freq * detune);
+   }
 }
 
 //static

@@ -1131,6 +1131,7 @@ oscillator~polyphonic enveloped oscillator. modulations (with MPE support): modw
 ~q~resonance of lowpass filter
 ~vel2vol~how much should the input velocity affect the output volume?
 ~vel2env~how much should the input velocity affect the speed of the volume and filter envelopes?
+~lite cpu~only recalculate some parameters once per buffer, to reduce CPU load. can make pitch bends and rapid modulation sound worse in some scenarios.
 
 
 

@@ -44,6 +44,8 @@ public:
 
    float mVelToVolume;
    float mVelToEnvelope;
+   
+   bool mLiteCPUMode;
 };
 
 class SingleOscillatorVoice : public IMidiVoice
@@ -64,6 +66,11 @@ public:
    
    static const int kMaxUnison = 8;
 private:
+   void DoParameterUpdate(int samplesIn,
+                          float& pitch,
+                          float& freq,
+                          float& vol);
+   
    struct OscData
    {
       OscData() : mPhase(0), mSyncPhase(0), mOsc(kOsc_Square), mDetuneFactor(0) {}
@@ -71,6 +78,7 @@ private:
       float mSyncPhase;
       Oscillator mOsc;
       float mDetuneFactor;
+      float mCurrentPhaseInc;
    };
    OscData mOscData[kMaxUnison];
    ::ADSR mAdsr;

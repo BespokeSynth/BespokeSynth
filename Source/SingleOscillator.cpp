@@ -90,6 +90,7 @@ void SingleOscillator::CreateUIControls()
    INTSLIDER(mUnisonSlider, "unison", &mVoiceParams.mUnison, 1, SingleOscillatorVoice::kMaxUnison);
    FLOATSLIDER(mUnisonWidthSlider, "width", &mVoiceParams.mUnisonWidth, 0, 1);
    FLOATSLIDER_DIGITS(mLengthMultiplierSlider, "adsr len", &mLengthMultiplier, .01f, 10, 1);
+   CHECKBOX(mLiteCPUModeCheckbox, "lite cpu", &mVoiceParams.mLiteCPUMode);
    ENDUIBLOCK(width, height);
    mWidth = MAX(width, mWidth);
    mHeight = MAX(height, mHeight);
@@ -253,6 +254,7 @@ void SingleOscillator::DrawModule()
    mADSRDisplay->Draw();
    mMultSelector->Draw();
    mSoftenSlider->Draw();
+   mLiteCPUModeCheckbox->Draw();
    
    {
       ofPushStyle();

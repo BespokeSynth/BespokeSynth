@@ -88,6 +88,7 @@ private:
    FloatSlider* mLengthMultiplierSlider;
    FloatSlider* mVelToVolumeSlider;
    FloatSlider* mVelToEnvelopeSlider;
+   Checkbox* mLiteCPUModeCheckbox;
    
    FloatSlider* mFilterCutoffMaxSlider;
    FloatSlider* mFilterCutoffMinSlider;
