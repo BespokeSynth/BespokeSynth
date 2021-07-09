@@ -1153,6 +1153,24 @@ karplusstrong~polyphonic plucked string physical modeling synth
 
 
 
+lfo~modulates a slider with a low-frequency oscillator
+~enable~turn on/off modulation
+~pin~make LFO window remain visible
+~interval~length of oscillation period
+~osc~type of oscillation waveform
+~offset~phase offset, to make oscillation earlier/later
+~free rate~rate of oscillator running in non-clock-synced time
+~low~output value at waveform's low point
+~high~output value at waveform's high point
+~spread~spread the waveform out to be closer to the low and high points
+~bias~bias the waveform towards the low or high point
+~length~proportion of time that should be spent on the waveform cycle
+~shuffle~adjust the waveoform to have a fast and slow cycle
+~soften~smooth out the hard edges of square and saw waveforms
+~lite cpu~only recalculate some parameters once per buffer, to reduce CPU load. can sound worse in some scenarios, especially with rapid modulation.
+
+
+
 fmsynth~polyphonic fm synthesis
 ~adsrosc~
 ~adsroscA~
