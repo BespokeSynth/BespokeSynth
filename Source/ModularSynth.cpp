@@ -528,7 +528,7 @@ void ModularSynth::Draw(void* vg)
                tooltip = helpDisplay->GetModuleTooltipFromName(effectName);
             }
          }
-         else
+         else if (GetMouseY() < gHoveredModule->GetPosition().y)  //this means we're hovering over the module's title bar
          {
             tooltip = helpDisplay->GetModuleTooltip(gHoveredModule);
          }
