@@ -73,6 +73,7 @@ private:
    FloatSlider* mExciterAttackSlider;
    FloatSlider* mExciterDecaySlider;
    FloatSlider* mPitchToneSlider;
+   Checkbox* mLiteCPUModeCheckbox;
 
    ChannelBuffer mWriteBuffer;
 };

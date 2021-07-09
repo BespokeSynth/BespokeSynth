@@ -54,7 +54,7 @@ void FloatSliderLFOControl::CreateUIControls()
    FLOATSLIDER(mLengthSlider, "length", &mLFOSettings.mLength, 0, 1);
    FLOATSLIDER(mShuffleSlider, "shuffle", &mLFOSettings.mShuffle, 0, 1);
    FLOATSLIDER(mSoftenSlider,"soften",&mLFOSettings.mSoften,0,1);
-   CHECKBOX(mLowResModeCheckbox, "low res", &mLFOSettings.mLowResMode);
+   CHECKBOX(mLowResModeCheckbox, "lite cpu", &mLFOSettings.mLowResMode);
    ENDUIBLOCK(mWidth,mHeight);
    
    mIntervalSelector->AddLabel("free", kInterval_Free);

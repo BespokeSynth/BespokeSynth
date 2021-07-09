@@ -1149,6 +1149,7 @@ karplusstrong~polyphonic plucked string physical modeling synth
 ~x att~fade in time for excitation audio
 ~x dec~fade out time for excitation audio
 ~pitchtone~adjust how pitch influences filter amount. a value of zero gives even filtering across the entire pitch range, higher values filter high pitches less, low values filter low pitches less.
+~lite cpu~only recalculate some parameters once per buffer, to reduce CPU load. can make pitch bends and rapid modulation sound worse in some scenarios.
 
 
 

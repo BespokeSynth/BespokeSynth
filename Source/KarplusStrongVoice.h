@@ -44,6 +44,7 @@ public:
    , mExciterDecay(3)
    , mExcitation(0)
    , mPitchTone(0)
+   , mLiteCPUMode(false)
    {}
    float mFilter;
    float mFeedback;
@@ -54,6 +55,7 @@ public:
    float mExciterDecay;
    float mExcitation;
    float mPitchTone;
+   bool mLiteCPUMode;
 };
 
 class KarplusStrongVoice : public IMidiVoice
@@ -70,6 +72,14 @@ public:
    void SetVoiceParams(IVoiceParams* params) override;
    bool IsDone(double time) override;
 private:
+   void DoParameterUpdate(int samplesIn,
+                          int oversampling,
+                          float& pitch,
+                          float& freq,
+                          float& filterRate,
+                          float& filterLerp,
+                          float& oscPhaseInc);
+   
    float mOscPhase;
    EnvOscillator mOsc;
    ::ADSR mEnv;

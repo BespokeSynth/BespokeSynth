@@ -58,6 +58,7 @@ void KarplusStrong::CreateUIControls()
    mExciterAttackSlider = new FloatSlider(this,"x att",mSourceDropdown,kAnchor_Below,69,15,&mVoiceParams.mExciterAttack,0.01f,40);
    mExciterDecaySlider = new FloatSlider(this,"x dec",mExciterAttackSlider,kAnchor_Right,68,15,&mVoiceParams.mExciterDecay,0.01f,40);
    mPitchToneSlider = new FloatSlider(this, "pitchtone", mExciterAttackSlider, kAnchor_Below, 140, 15, &mVoiceParams.mPitchTone, -2, 2);
+   mLiteCPUModeCheckbox = new Checkbox(this, "lite cpu", mPitchToneSlider, kAnchor_Right, &mVoiceParams.mLiteCPUMode);
    //mStretchCheckbox = new Checkbox(this,"stretch",mVolSlider,kAnchor_Right,&mVoiceParams.mStretch);
    
    mSourceDropdown->AddLabel("sin", kSourceTypeSin);
@@ -152,6 +153,7 @@ void KarplusStrong::DrawModule()
    mSourceDropdown->Draw();
    mInvertCheckbox->Draw();
    mPitchToneSlider->Draw();
+   mLiteCPUModeCheckbox->Draw();
 
    mExciterFreqSlider->SetShowing(mVoiceParams.mSourceType == kSourceTypeSin || mVoiceParams.mSourceType == kSourceTypeSaw || mVoiceParams.mSourceType == kSourceTypeMix);
    mExciterAttackSlider->SetShowing(mVoiceParams.mSourceType != kSourceTypeInputNoEnvelope);

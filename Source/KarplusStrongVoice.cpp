@@ -66,20 +66,20 @@ bool KarplusStrongVoice::Process(double time, ChannelBuffer* out, int oversampli
       sampleRate *= oversampling;
    }
    
+   float freq;
+   float filterRate;
+   float filterLerp;
+   float pitch;
+   float oscPhaseInc;
+   
+   if (mVoiceParams->mLiteCPUMode)
+      DoParameterUpdate(0, oversampling, pitch, freq, filterRate, filterLerp, oscPhaseInc);
+   
    for (int pos=0; pos < bufferSize; ++pos)
    {
-      if (mOwner)
-         mOwner->ComputeSliders(pos/oversampling);
+      if (!mVoiceParams->mLiteCPUMode)
+         DoParameterUpdate(pos/oversampling, oversampling, pitch, freq, filterRate, filterLerp, oscPhaseInc);
       
-      float pitch = GetPitch(pos/oversampling);
-      if (mVoiceParams->mInvert)
-         pitch += 12;   //inverting the pitch gives an octave down sound by halving the resonating frequency, so correct for that
-      
-      float freq = TheScale->PitchToFreq(pitch);
-      float filterRate = mVoiceParams->mFilter * pow(freq/300, exp2(mVoiceParams->mPitchTone));
-      float filterLerp = ofClamp(exp2(-filterRate / oversampling), 0, 1);
-      
-      float oscPhaseInc = GetPhaseInc(mVoiceParams->mExciterFreq) / oversampling;
       if (mVoiceParams->mSourceType == kSourceTypeSaw)
          mOsc.SetType(kOsc_Saw);
       else
@@ -162,6 +162,28 @@ bool KarplusStrongVoice::Process(double time, ChannelBuffer* out, int oversampli
    }
    
    return true;
+}
+
+void KarplusStrongVoice::DoParameterUpdate(int samplesIn,
+                                           int oversampling,
+                                           float& pitch,
+                                           float& freq,
+                                           float& filterRate,
+                                           float& filterLerp,
+                                           float& oscPhaseInc)
+{
+   if (mOwner)
+      mOwner->ComputeSliders(samplesIn);
+   
+   pitch = GetPitch(samplesIn);
+   if (mVoiceParams->mInvert)
+      pitch += 12;   //inverting the pitch gives an octave down sound by halving the resonating frequency, so correct for that
+   
+   freq = TheScale->PitchToFreq(pitch);
+   filterRate = mVoiceParams->mFilter * pow(freq/300, exp2(mVoiceParams->mPitchTone));
+   filterLerp = ofClamp(exp2(-filterRate / oversampling), 0, 1);
+   
+   oscPhaseInc = GetPhaseInc(mVoiceParams->mExciterFreq) / oversampling;
 }
 
 void KarplusStrongVoice::Start(double time, float target)
