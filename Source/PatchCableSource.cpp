@@ -135,7 +135,7 @@ void PatchCableSource::Clear()
 
 void PatchCableSource::UpdatePosition(bool parentMinimized)
 {
-   if (mAutomaticPositioning || parentMinimized)
+   if ((mAutomaticPositioning || parentMinimized) && mOwner != nullptr)
    {
       float x,y,w,h;
       mOwner->GetPosition(x, y);

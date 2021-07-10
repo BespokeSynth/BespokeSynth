@@ -59,6 +59,7 @@ public:
    ~GridController() {}
    
    void Render() override;
+   static void DrawGridIcon(float x, float y);
    
    void SetUp(GridLayout* layout, int page, MidiController* controller);
    void UnhookController();

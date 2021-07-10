@@ -1049,9 +1049,13 @@ void MidiController::DrawModule()
          }
       }
       
-      for (auto grid : mGrids)
+      for (auto* grid : mGrids)
       {
          ofRect(grid->mPosition.x, grid->mPosition.y, grid->mDimensions.x, grid->mDimensions.y);
+         ofPushStyle();
+         ofSetColor(IDrawableModule::GetColor(kModuleType_Other));
+         GridController::DrawGridIcon(grid->mPosition.x + 6, grid->mPosition.y - 6);
+         ofPopStyle();
       }
       
       ofPopStyle();
@@ -1140,6 +1144,11 @@ void MidiController::DrawModule()
    }
 }
 
+namespace
+{
+   const int kHoveredLayoutElement_GridOffset = 1000;
+}
+
 void MidiController::DrawModuleUnclipped()
 {
    const float kDisplayMs = 500;
@@ -1181,11 +1190,22 @@ void MidiController::DrawModuleUnclipped()
 
    if (mHoveredLayoutElement != -1)
    {
-      string tooltip = GetLayoutTooltip(mHoveredLayoutElement);
-
-      ofVec2f pos = mLayoutControls[mHoveredLayoutElement].mPosition;
-      pos.x += mLayoutControls[mHoveredLayoutElement].mDimensions.x + 3;
-      pos.y += mLayoutControls[mHoveredLayoutElement].mDimensions.y / 2;
+      string tooltip;
+      ofVec2f pos;
+      if (mHoveredLayoutElement < kHoveredLayoutElement_GridOffset)
+      {
+         tooltip = GetLayoutTooltip(mHoveredLayoutElement);
+         pos = mLayoutControls[mHoveredLayoutElement].mPosition;
+         pos.x += mLayoutControls[mHoveredLayoutElement].mDimensions.x + 3;
+         pos.y += mLayoutControls[mHoveredLayoutElement].mDimensions.y / 2;
+      }
+      else
+      {
+         tooltip = "grid";
+         auto* grid = mGrids[mHoveredLayoutElement - kHoveredLayoutElement_GridOffset];
+         pos = grid->mPosition;
+         pos.x += 18;
+      }
 
       float width = GetStringWidth(tooltip);
 
@@ -1277,6 +1297,15 @@ bool MidiController::MouseMoved(float x, float y)
                control.mControlCable->SetPatchCableDrawMode(kPatchCableDrawMode_SourceOnHoverOnly);
             }
          }
+      }
+      
+      int i = 0;
+      for (auto* grid : mGrids)
+      {
+         ofRectangle controlRect(grid->mPosition.x - 5, grid->mPosition.y - 5, 10, 10);
+         if (controlRect.contains(x, y))
+            mHoveredLayoutElement = i + kHoveredLayoutElement_GridOffset;
+         ++i;
       }
    }
 

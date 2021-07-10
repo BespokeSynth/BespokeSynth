@@ -38,15 +38,23 @@ void GridController::Render()
    ofSetColor(200,200,200,gModuleDrawAlpha);
    ofCircle(mX+6,mY+8,5);
    
-   ofSetLineWidth(1);
-   float gridOffsetX = 15;
-   float gridOffsetY = 2;
-   float gridSize = 12;
-   ofRect(mX+gridOffsetX, mY+gridOffsetY, gridSize, gridSize, 0);
-   ofRect(mX+gridOffsetX+gridSize/3, mY+gridOffsetY, gridSize/3, 12, 0);
-   ofRect(mX+gridOffsetX, mY+gridOffsetY+gridSize/3, 12, gridSize/3, 0);
+   DrawGridIcon(mX + 15, mY + 2);
    
    DrawPatchCableHover();
+   
+   ofPopStyle();
+}
+
+//static
+void GridController::DrawGridIcon(float x, float y)
+{
+   ofPushStyle();
+   
+   ofSetLineWidth(1);
+   float gridSize = 12;
+   ofRect(x, y, gridSize, gridSize, 0);
+   ofRect(x+gridSize/3, y, gridSize/3, 12, 0);
+   ofRect(x, y+gridSize/3, 12, gridSize/3, 0);
    
    ofPopStyle();
 }
