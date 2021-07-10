@@ -51,6 +51,7 @@ public:
 private:
    //IDrawableModule
    void DrawModule() override;
+   void DrawModuleUnclipped() override;
    bool Enabled() const override { return mEnabled; }
    void GetModuleDimensions(float& width, float& height) override;
    void OnClicked(int x, int y, bool right) override;

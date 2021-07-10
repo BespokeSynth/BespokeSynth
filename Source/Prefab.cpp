@@ -140,6 +140,11 @@ void Prefab::DrawModule()
    mModuleContainer.Draw();
 }
 
+void Prefab::DrawModuleUnclipped()
+{
+   mModuleContainer.DrawUnclipped();
+}
+
 void Prefab::PostRepatch(PatchCableSource* cableSource, bool fromUserClick)
 {
    if (cableSource == mRemoveModuleCable)
