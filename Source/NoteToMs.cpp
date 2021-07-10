@@ -26,7 +26,7 @@ NoteToMs::~NoteToMs()
 void NoteToMs::CreateUIControls()
 {
    IDrawableModule::CreateUIControls();
-   mTargetCable = new PatchCableSource(this, kConnectionType_UIControl);
+   mTargetCable = new PatchCableSource(this, kConnectionType_Modulator);
    mTargetCable->SetModulatorOwner(this);
    AddPatchCableSource(mTargetCable);
 }

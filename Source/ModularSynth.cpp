@@ -71,6 +71,7 @@ ModularSynth::ModularSynth()
 , mShowLoadStatePopup(false)
 , mLastSaveTime(-9999)
 , mHasDuplicatedDuringDrag(false)
+, mHasAutopatchedToTargetDuringDrag(false)
 , mFrameRate(0)
 , mQuickSpawn(nullptr)
 , mScheduledEnvelopeEditorSpawnDisplay(nullptr)
@@ -919,22 +920,33 @@ void ModularSynth::MouseMoved(int intX, int intY )
                }
             }
             
-            if (mMoveModule->GetPatchCableSource() && mMoveModule->GetPatchCableSource()->GetTarget() == nullptr && module->HasTitleBar())
+            if (!mHasAutopatchedToTargetDuringDrag)
             {
-               ofRectangle titleBarRect(module->GetPosition().x, module->GetPosition().y - IDrawableModule::TitleBarHeight(), module->IClickable::GetDimensions().x, IDrawableModule::TitleBarHeight());
-               if (titleBarRect.contains(mMoveModule->GetPatchCableSource()->GetPosition().x, mMoveModule->GetPatchCableSource()->GetPosition().y))
+               for (auto* patchCableSource : mMoveModule->GetPatchCableSources())
                {
-                  mMoveModule->GetPatchCableSource()->FindValidTargets();
-                  if (mMoveModule->GetPatchCableSource()->IsValidTarget(module))
+                  if (patchCableSource && patchCableSource->GetTarget() == nullptr && module->HasTitleBar())
                   {
-                     PatchCableSource::sAllowInsert = false;
-                     mMoveModule->SetTarget(module);
-                     PatchCableSource::sAllowInsert = true;
-                     break;
+                     ofRectangle titleBarRect(module->GetPosition().x, module->GetPosition().y - IDrawableModule::TitleBarHeight(), module->IClickable::GetDimensions().x, IDrawableModule::TitleBarHeight());
+                     if (titleBarRect.contains(patchCableSource->GetPosition().x, patchCableSource->GetPosition().y))
+                     {
+                        patchCableSource->FindValidTargets();
+                        if (patchCableSource->IsValidTarget(module))
+                        {
+                           PatchCableSource::sAllowInsert = false;
+                           patchCableSource->SetTarget(module);
+                           mHasAutopatchedToTargetDuringDrag = true;
+                           PatchCableSource::sAllowInsert = true;
+                           break;
+                        }
+                     }
                   }
                }
             }
          }
+      }
+      else
+      {
+         mHasAutopatchedToTargetDuringDrag = false;
       }
       
       return;

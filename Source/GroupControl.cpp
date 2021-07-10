@@ -48,7 +48,7 @@ void GroupControl::PostRepatch(PatchCableSource* cableSource, bool fromUserClick
          {
             if (cableSource->GetTarget())
             {
-               PatchCableSource* cable = new PatchCableSource(this, kConnectionType_UIControl);
+               PatchCableSource* cable = new PatchCableSource(this, kConnectionType_Modulator);
                AddPatchCableSource(cable);
                mControlCables.push_back(cable);
             }
@@ -110,14 +110,14 @@ void GroupControl::LoadLayout(const ofxJSONElement& moduleInfo)
       IUIControl* control = nullptr;
       if (!controlPath.empty())
          control = TheSynth->FindUIControl(controlPath);
-      PatchCableSource* cable = new PatchCableSource(this, kConnectionType_UIControl);
+      PatchCableSource* cable = new PatchCableSource(this, kConnectionType_Modulator);
       AddPatchCableSource(cable);
       cable->SetTarget(control);
       mControlCables.push_back(cable);
    }
    
    //add extra cable
-   PatchCableSource* cable = new PatchCableSource(this, kConnectionType_UIControl);
+   PatchCableSource* cable = new PatchCableSource(this, kConnectionType_Modulator);
    AddPatchCableSource(cable);
    mControlCables.push_back(cable);
    

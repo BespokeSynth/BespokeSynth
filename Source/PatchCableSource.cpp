@@ -13,6 +13,8 @@
 #include "INoteReceiver.h"
 #include "GridController.h"
 #include "IPulseReceiver.h"
+#include "AudioSend.h"
+#include "MacroSlider.h"
 
 namespace
 {
@@ -40,13 +42,13 @@ PatchCableSource::PatchCableSource(IDrawableModule* owner, ConnectionType type)
 , mDrawPass(DrawPass::kSource)
 , mParentMinimized(false)
 {
-   mAllowMultipleTargets = (mType == kConnectionType_Note || mType == kConnectionType_Pulse);
+   mAllowMultipleTargets = (mType == kConnectionType_Note || mType == kConnectionType_Pulse || mType == kConnectionType_Audio || mType == kConnectionType_Modulator);
    
    if (mType == kConnectionType_Note)
       mColor = IDrawableModule::GetColor(kModuleType_Note);
    else if (mType == kConnectionType_Audio)
       mColor = IDrawableModule::GetColor(kModuleType_Audio);
-   else if (mType == kConnectionType_UIControl)
+   else if (mType == kConnectionType_Modulator)
       mColor = IDrawableModule::GetColor(kModuleType_Modulator);
    else if (mType == kConnectionType_Pulse)
       mColor = IDrawableModule::GetColor(kModuleType_Pulse);
@@ -416,8 +418,31 @@ bool PatchCableSource::TestClick(int x, int y, bool right, bool testOnly /* = fa
       {
          if (mPatchCables.empty() || InAddCableMode())
          {
-            PatchCable* newCable = AddPatchCable(nullptr);
-            newCable->Grab();
+            if (mPatchCables.empty() ||
+                mType == kConnectionType_Note ||
+                mType == kConnectionType_Pulse)
+            {
+               PatchCable* newCable = AddPatchCable(nullptr);
+               newCable->Grab();
+            }
+            else if (mType == kConnectionType_Audio)
+            {
+               ofVec2f spawnOffset(-20, 10);
+               AudioSend* send = dynamic_cast<AudioSend*>(TheSynth->SpawnModuleOnTheFly("send", x + spawnOffset.x, y + spawnOffset.y));
+               send->SetTarget(GetTarget());
+               SetTarget(send);
+               send->SetSend(1, false);
+               TheSynth->SetMoveModule(send, spawnOffset.x, spawnOffset.y);
+            }
+            else if (mType == kConnectionType_Modulator)
+            {
+               ofVec2f spawnOffset(-20, 10);
+               MacroSlider* macroSlider = dynamic_cast<MacroSlider*>(TheSynth->SpawnModuleOnTheFly("macroslider", x + spawnOffset.x, y + spawnOffset.y));
+               IUIControl* currentTarget = dynamic_cast<IUIControl*>(GetTarget());
+               SetTarget(macroSlider->GetSlider());
+               macroSlider->SetOutputTarget(0, currentTarget);
+               TheSynth->SetMoveModule(macroSlider, spawnOffset.x, spawnOffset.y);
+            }
          }
          else
          {
@@ -496,7 +521,7 @@ void PatchCableSource::FindValidTargets()
    TheSynth->GetAllModules(allModules);
    for (auto module : allModules)
    {
-      if ((mType == kConnectionType_UIControl || mType == kConnectionType_Grid) && module != TheTitleBar)
+      if ((mType == kConnectionType_Modulator || mType == kConnectionType_UIControl || mType == kConnectionType_Grid) && module != TheTitleBar)
       {
          for (auto uicontrol : module->GetUIControls())
          {

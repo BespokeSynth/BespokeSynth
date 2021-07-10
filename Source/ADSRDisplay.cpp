@@ -207,8 +207,15 @@ void ADSRDisplay::SetADSR(::ADSR* adsr)
 
 void ADSRDisplay::UpdateSliderVisibility()
 {
-   bool slidersActive = (sDisplayMode == kDisplaySliders || (PatchCable::sActivePatchCable != nullptr && PatchCable::sActivePatchCable->GetConnectionType() == kConnectionType_UIControl)) &&
-                        mAdsr != nullptr && IsShowing();
+   bool slidersActive = false;
+   if (mAdsr != nullptr && IsShowing())
+   {
+      if (sDisplayMode == kDisplaySliders)
+          slidersActive = true;
+      if (PatchCable::sActivePatchCable != nullptr &&
+          (PatchCable::sActivePatchCable->GetConnectionType() == kConnectionType_Modulator || PatchCable::sActivePatchCable->GetConnectionType() == kConnectionType_UIControl))
+         slidersActive = true;
+   }
    if (mASlider && mASlider->GetModulator() != nullptr)
       slidersActive = true;
    if (mDSlider && mDSlider->GetModulator() != nullptr)

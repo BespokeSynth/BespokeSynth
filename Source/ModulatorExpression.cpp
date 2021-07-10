@@ -54,7 +54,7 @@ void ModulatorExpression::CreateUIControls()
    mDSlider = new FloatSlider(this,"d",mCSlider,kAnchor_Below,110,15,&mD,-10,10,4);
    mESlider = new FloatSlider(this,"e",mDSlider,kAnchor_Below,110,15,&mE,-10,10,4);
    
-   mTargetCable = new PatchCableSource(this, kConnectionType_UIControl);
+   mTargetCable = new PatchCableSource(this, kConnectionType_Modulator);
    mTargetCable->SetModulatorOwner(this);
    AddPatchCableSource(mTargetCable);
    

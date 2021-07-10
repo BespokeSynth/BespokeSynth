@@ -58,7 +58,7 @@ void CurveLooper::CreateUIControls()
    mLengthSelector = new DropdownList(this,"length",5,3,(int*)(&mLength));
    mRandomizeButton = new ClickButton(this,"randomize",-1,-1);
    
-   mControlCable = new PatchCableSource(this, kConnectionType_UIControl);
+   mControlCable = new PatchCableSource(this, kConnectionType_Modulator);
    //mControlCable->SetManualPosition(86, 10);
    AddPatchCableSource(mControlCable);
    

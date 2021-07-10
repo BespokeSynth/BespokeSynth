@@ -304,6 +304,7 @@ private:
    vector<IDrawableModule*> mGroupSelectedModules;
    ModuleContainer* mGroupSelectContext;
    bool mHasDuplicatedDuringDrag;
+   bool mHasAutopatchedToTargetDuringDrag;
    
    IDrawableModule* mResizeModule;
    

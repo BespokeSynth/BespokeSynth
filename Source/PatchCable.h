@@ -32,7 +32,8 @@ enum ConnectionType
    kConnectionType_UIControl,
    kConnectionType_Grid,
    kConnectionType_Special,
-   kConnectionType_Pulse
+   kConnectionType_Pulse,
+   kConnectionType_Modulator
 };
 
 class PatchCable : public IClickable

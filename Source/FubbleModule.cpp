@@ -68,9 +68,9 @@ void FubbleModule::CreateUIControls()
    BUTTON(mUpdatePerlinSeedButton, "reseed");
    ENDUIBLOCK0();
    
-   mAxisH.SetCableSource(new PatchCableSource(this, kConnectionType_UIControl));
+   mAxisH.SetCableSource(new PatchCableSource(this, kConnectionType_Modulator));
    AddPatchCableSource(mAxisH.GetCableSource());
-   mAxisV.SetCableSource(new PatchCableSource(this, kConnectionType_UIControl));
+   mAxisV.SetCableSource(new PatchCableSource(this, kConnectionType_Modulator));
    AddPatchCableSource(mAxisV.GetCableSource());
    
    mQuantizeLengthSelector->AddLabel("8n", kInterval_8n);

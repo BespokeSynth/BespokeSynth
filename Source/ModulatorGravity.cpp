@@ -45,7 +45,7 @@ void ModulatorGravity::CreateUIControls()
    BUTTON(mKickButton, "kick");
    ENDUIBLOCK(mWidth, mHeight);
    
-   mTargetCable = new PatchCableSource(this, kConnectionType_UIControl);
+   mTargetCable = new PatchCableSource(this, kConnectionType_Modulator);
    mTargetCable->SetModulatorOwner(this);
    AddPatchCableSource(mTargetCable);
 }

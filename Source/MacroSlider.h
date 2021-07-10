@@ -34,6 +34,8 @@ public:
    void PostRepatch(PatchCableSource* cableSource, bool fromUserClick) override;
    
    float GetValue() const { return mValue; }
+   FloatSlider* GetSlider() { return mSlider; }
+   void SetOutputTarget(int index, IUIControl* target);
    
    void SaveLayout(ofxJSONElement& moduleInfo) override;
    void LoadLayout(const ofxJSONElement& moduleInfo) override;

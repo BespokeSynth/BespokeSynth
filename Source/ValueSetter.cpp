@@ -34,7 +34,7 @@ void ValueSetter::CreateUIControls()
    UICONTROL_CUSTOM(mButton, new ClickButton(UICONTROL_BASICS("set")));
    ENDUIBLOCK(mWidth, mHeight);
    
-   mControlCable = new PatchCableSource(this, kConnectionType_UIControl);
+   mControlCable = new PatchCableSource(this, kConnectionType_Modulator);
    AddPatchCableSource(mControlCable);
 }
 

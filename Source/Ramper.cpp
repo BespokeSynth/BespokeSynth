@@ -43,7 +43,7 @@ void Ramper::CreateUIControls()
    mTriggerButton = new ClickButton(this,"start",67,3);
    mTargetValueSlider = new FloatSlider(this,"target",3,20,94,15,&mTargetValue,0,1);
    
-   mControlCable = new PatchCableSource(this, kConnectionType_UIControl);
+   mControlCable = new PatchCableSource(this, kConnectionType_Modulator);
    //mControlCable->SetManualPosition(86, 10);
    AddPatchCableSource(mControlCable);
    

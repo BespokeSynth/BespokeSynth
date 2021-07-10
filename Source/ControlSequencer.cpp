@@ -48,7 +48,7 @@ void ControlSequencer::CreateUIControls()
    mLengthSelector = new DropdownList(this,"length",mIntervalSelector,kAnchor_Right,(int*)(&mLength));
    mRandomize = new ClickButton(this,"random",mLengthSelector,kAnchor_Right);
    
-   mControlCable = new PatchCableSource(this, kConnectionType_UIControl);
+   mControlCable = new PatchCableSource(this, kConnectionType_Modulator);
    //mControlCable->SetManualPosition(86, 10);
    AddPatchCableSource(mControlCable);
    

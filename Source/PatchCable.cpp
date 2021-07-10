@@ -72,6 +72,7 @@ void PatchCable::Render()
       if (GetConnectionType() == kConnectionType_Note ||
           GetConnectionType() == kConnectionType_Grid ||
           GetConnectionType() == kConnectionType_Pulse ||
+          GetConnectionType() == kConnectionType_Modulator ||
           GetConnectionType() == kConnectionType_UIControl)
       {
          bool hasNote = false;
@@ -160,6 +161,7 @@ void PatchCable::Render()
       if (type == kConnectionType_Note ||
           type == kConnectionType_Grid ||
           type == kConnectionType_Pulse ||
+          type == kConnectionType_Modulator ||
           type == kConnectionType_UIControl)
       {
          ofSetLineWidth(lineWidth);
@@ -335,7 +337,7 @@ void PatchCable::Render()
 
 bool PatchCable::MouseMoved(float x, float y)
 {
-   if (GetConnectionType() == kConnectionType_UIControl) //no repatching UI control cables by the plug
+   if (GetConnectionType() == kConnectionType_Modulator || GetConnectionType() == kConnectionType_UIControl) //no repatching UI control cables by the plug
       return false;
    
    x = TheSynth->GetMouseX();
@@ -356,7 +358,7 @@ void PatchCable::MouseReleased()
       {
          PatchCablePos cable = GetPatchCablePos();
          IClickable* potentialTarget = TheSynth->GetModuleAt(cable.end.x, cable.end.y);
-         if (potentialTarget && (GetConnectionType() == kConnectionType_UIControl || GetConnectionType() == kConnectionType_Grid))
+         if (potentialTarget && (GetConnectionType() == kConnectionType_Modulator || GetConnectionType() == kConnectionType_Grid || GetConnectionType() == kConnectionType_UIControl))
          {
             const auto& uicontrols = (static_cast<IDrawableModule*>(potentialTarget))->GetUIControls();
             for (auto uicontrol : uicontrols)

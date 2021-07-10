@@ -510,7 +510,7 @@ void EnvelopeEditor::Pin()
    mPinned = true;
    if (mTargetCable == nullptr)
    {
-      mTargetCable = new PatchCableSource(this, kConnectionType_UIControl);
+      mTargetCable = new PatchCableSource(this, kConnectionType_Modulator);
       AddPatchCableSource(mTargetCable);
       mTargetCable->SetTarget(mADSRDisplay);
       mTargetCable->SetClickable(false);
