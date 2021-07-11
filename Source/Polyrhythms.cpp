@@ -13,10 +13,9 @@
 #include "DrumPlayer.h"
 
 Polyrhythms::Polyrhythms()
-: mNumLines(4)
-, mWidth(350)
-, mHeight(mNumLines * 17 + 26)
 {
+   mWidth = 350;
+   mHeight = mRhythmLines.size() * 17 + 5;
 }
 
 void Polyrhythms::Init()
@@ -29,9 +28,9 @@ void Polyrhythms::Init()
 void Polyrhythms::CreateUIControls()
 {
    IDrawableModule::CreateUIControls();
-   for (int i=0; i<mNumLines; ++i)
+   for (int i=0; i<(int)mRhythmLines.size(); ++i)
    {
-      mRhythmLines.push_back(new RhythmLine(this,i));
+      mRhythmLines[i] = new RhythmLine(this,i);
       mRhythmLines[i]->CreateUIControls();
    }
 }
@@ -60,10 +59,11 @@ void Polyrhythms::OnTransportAdvanced(float amount)
       else
          oldQuantized = int((TheTransport->GetMeasurePos(gTime)-amount) * beats);
       int quantized = int(TheTransport->GetMeasurePos(gTime) * beats);
+      float val = mRhythmLines[i]->mGrid->GetValRefactor(0,quantized);
 
-      if (quantized != oldQuantized && mRhythmLines[i]->mGrid->GetValRefactor(0,quantized) > 0)
+      if (quantized != oldQuantized && val > 0)
       {
-         PlayNoteOutput(gTime, mRhythmLines[i]->mPitch, 127, -1);
+         PlayNoteOutput(gTime, mRhythmLines[i]->mPitch, val*127, -1);
       }
 
       mRhythmLines[i]->mGrid->SetHighlightCol(gTime, quantized);
@@ -82,7 +82,7 @@ void Polyrhythms::DrawModule()
 void Polyrhythms::Resize(float w, float h)
 {
    mWidth = MAX(150,w);
-   mHeight = mRhythmLines.size() * 17 + 26;
+   mHeight = mRhythmLines.size() * 17 + 5;
    for (int i=0; i<mRhythmLines.size(); ++i)
       mRhythmLines[i]->OnResize();
 }
@@ -121,7 +121,6 @@ void Polyrhythms::DropdownUpdated(DropdownList* list, int oldVal)
 void Polyrhythms::LoadLayout(const ofxJSONElement& moduleInfo)
 {
    mModuleSaveData.LoadString("target", moduleInfo);
-   mModuleSaveData.LoadInt("lines", moduleInfo, 4, 1, 16, K(isTextField));
 
    SetUpFromSaveData();
 }
@@ -129,7 +128,6 @@ void Polyrhythms::LoadLayout(const ofxJSONElement& moduleInfo)
 void Polyrhythms::SetUpFromSaveData()
 {
    SetUpPatchCables(mModuleSaveData.GetString("target"));
-   mNumLines = mModuleSaveData.GetInt("lines");
 }
 
 namespace
@@ -195,6 +193,9 @@ void RhythmLine::CreateUIControls()
    mLengthSelector->AddLabel("7x4", 28);
    mLengthSelector->AddLabel("8x4", 32);
    mLengthSelector->AddLabel("9x4", 36);
+   
+   mGrid->SetGridMode(UIGrid::kMultisliderBipolar);
+   mGrid->SetRequireShiftForMultislider(true);
    
    OnResize();
 }

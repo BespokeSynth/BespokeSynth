@@ -77,11 +77,12 @@ private:
    void DrawModule() override;
    void GetModuleDimensions(float& width, float& height) override { width=mWidth; height=mHeight; }
    void OnClicked(int x, int y, bool right) override;
+   bool Enabled() const override { return mEnabled; }
    
    int mNumLines;
    float mWidth;
    float mHeight;
-   std::vector<RhythmLine*> mRhythmLines;
+   std::array<RhythmLine*,8> mRhythmLines;
 };
 
 #endif /* defined(__modularSynth__Polyrhythms__) */
