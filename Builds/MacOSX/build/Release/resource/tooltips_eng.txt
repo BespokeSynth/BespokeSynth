@@ -435,6 +435,7 @@ notesequencer~looping sequence of notes at an interval. pair with a "pulser" mod
 ~tone*~pitch for this column
 ~vel*~velocity for this column
 ~len*~length for this column
+~grid~control pitches with a grid controller
 
 
 

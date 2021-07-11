@@ -23,12 +23,13 @@
 #include "MidiController.h"
 #include "Scale.h"
 #include "IPulseReceiver.h"
+#include "GridController.h"
 
 #define NSS_MAX_STEPS 32
 
 class PatchCableSource;
 
-class NoteStepSequencer : public IDrawableModule, public ITimeListener, public INoteSource, public IButtonListener, public IDropdownListener, public IIntSliderListener, public IFloatSliderListener, public MidiDeviceListener, public UIGridListener, public IAudioPoller, public IScaleListener, public INoteReceiver, public IPulseReceiver
+class NoteStepSequencer : public IDrawableModule, public ITimeListener, public INoteSource, public IButtonListener, public IDropdownListener, public IIntSliderListener, public IFloatSliderListener, public MidiDeviceListener, public UIGridListener, public IAudioPoller, public IScaleListener, public INoteReceiver, public IPulseReceiver, public IGridControllerListener
 {
 public:
    NoteStepSequencer();
@@ -81,6 +82,10 @@ public:
    void PlayNote(double time, int pitch, int velocity, int voiceIdx = -1, ModulationParameters modulation = ModulationParameters()) override;
    void SendCC(int control, int value, int voiceIdx = -1) override {}
    
+   //IGridControllerListener
+   void OnControllerPageSelected() override;
+   void OnGridButton(int x, int y, float velocity, IGridController* grid) override;
+   
    void ButtonClicked(ClickButton* button) override;
    void CheckboxUpdated(Checkbox* checkbox) override;
    void DropdownUpdated(DropdownList* list, int oldVal) override;
@@ -99,6 +104,7 @@ private:
    void GetModuleDimensions(float& width, float& height) override;
    bool Enabled() const override { return mEnabled; }
    void OnClicked(int x, int y, bool right) override;
+   void UpdateGridControllerLights(bool force);
    
    int ButtonToStep(int button);
    int StepToButton(int step);
@@ -172,6 +178,7 @@ private:
    std::array<PatchCableSource*, NSS_MAX_STEPS> mStepCables;
 
    TransportListenerInfo* mTransportListenerInfo;
+   GridController* mGridController;
 };
 
 

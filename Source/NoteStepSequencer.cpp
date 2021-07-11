@@ -66,10 +66,12 @@ void NoteStepSequencer::CreateUIControls()
    IDrawableModule::CreateUIControls();
    UIBLOCK(130);
    DROPDOWN(mIntervalSelector,"interval",(int*)(&mInterval), 40);   UIBLOCK_SHIFTRIGHT();
-   UIBLOCK_SHIFTX(93);
+   UIBLOCK_SHIFTX(58);
    BUTTON(mRandomizePitchButton, "pitch"); UIBLOCK_SHIFTRIGHT();
    BUTTON(mRandomizeVelocityButton, "vel"); UIBLOCK_SHIFTRIGHT();
-   BUTTON(mRandomizeLengthButton, "len"); UIBLOCK_NEWLINE();
+   BUTTON(mRandomizeLengthButton, "len"); UIBLOCK_SHIFTRIGHT();
+   UIBLOCK_SHIFTX(5);
+   UICONTROL_CUSTOM(mGridController, new GridController(UICONTROL_BASICS("grid"))); UIBLOCK_NEWLINE();
    UIBLOCK_PUSHSLIDERWIDTH(150);
    INTSLIDER(mLengthSlider, "length", &mLength, 1, NSS_MAX_STEPS); UIBLOCK_SHIFTRIGHT();
    BUTTON(mShiftBackButton, "<"); UIBLOCK_SHIFTRIGHT();
@@ -186,6 +188,7 @@ void NoteStepSequencer::DrawModule()
    mRandomizeLengthButton->Draw();
    mRandomizeVelocityButton->Draw();
    mLoopResetPointSlider->Draw();
+   mGridController->Draw();
    
    mGrid->Draw();
    mVelocityGrid->Draw();
@@ -200,7 +203,7 @@ void NoteStepSequencer::DrawModule()
    }
    ofPopStyle();
    
-   DrawTextLeftJustify("randomize:", 138, 14);
+   DrawTextLeftJustify("random:", 102, 14);
    
    ofPushStyle();
    ofFill();
@@ -561,6 +564,7 @@ void NoteStepSequencer::Step(double time, float velocity, int pulseFlags)
    mVelocityGrid->SetHighlightCol(time, mArpIndex);
    
    UpdateLights();
+   UpdateGridControllerLights(false);
 }
 
 void NoteStepSequencer::SendNoteToCable(int index, double time, int pitch, int velocity)
@@ -724,6 +728,52 @@ void NoteStepSequencer::ShiftSteps(int amount)
    memcpy(mVels, newVels, NSS_MAX_STEPS*sizeof(int));
    memcpy(mNoteLengths, newLengths, NSS_MAX_STEPS*sizeof(float));
    SyncGridToSeq();
+}
+
+void NoteStepSequencer::UpdateGridControllerLights(bool force)
+{
+   if (mGridController)
+   {
+      for (int x=0; x<mGridController->NumCols(); ++x)
+      {
+         for (int y=0; y<mGridController->NumRows(); ++y)
+         {
+            GridColor color = GridColor::kGridColorOff;
+            if (x == mArpIndex)
+               color = GridColor::kGridColor2Dim;
+            if (x < mLength)
+            {
+               if (mTones[x] == mGridController->NumRows() - 1 - y && mVels[x] > 0)
+                  color = GridColor::kGridColor1Bright;
+            }
+            mGridController->SetLight(x, y, color, force);
+         }
+      }
+   }
+}
+
+void NoteStepSequencer::OnControllerPageSelected()
+{
+   UpdateGridControllerLights(true);
+}
+
+void NoteStepSequencer::OnGridButton(int x, int y, float velocity, IGridController* grid)
+{
+   if (grid == mGridController && x < mLength && velocity > 0)
+   {
+      int tone = mGridController->NumRows() - 1 -  y;
+      if (mTones[x] == tone && mVels[x] > 0)
+      {
+         mVels[x] = 0;
+      }
+      else
+      {
+         mTones[x] = tone;
+         mVels[x] = velocity * 127;
+      }
+      SyncGridToSeq();
+      UpdateGridControllerLights(false);
+   }
 }
 
 void NoteStepSequencer::ButtonClicked(ClickButton* button)
