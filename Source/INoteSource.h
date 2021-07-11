@@ -31,6 +31,8 @@ public:
    void SendPressure(int pitch, int pressure) override;
    void SendCC(int control, int value, int voiceIdx = -1) override;
    void SendMidi(const MidiMessage& message) override;
+   
+   void PlayNoteInternal(double time, int pitch, int velocity, int voiceIdx = -1, ModulationParameters modulation = ModulationParameters());
 
    void ResetStackDepth() { mStackDepth = 0; }
    bool* GetNotes() { return mNotes; }

@@ -16,6 +16,12 @@
 
 void NoteOutput::PlayNote(double time, int pitch, int velocity, int voiceIdx, ModulationParameters modulation)
 {
+   ResetStackDepth();
+   PlayNoteInternal(time, pitch, velocity, voiceIdx, modulation);
+}
+
+void NoteOutput::PlayNoteInternal(double time, int pitch, int velocity, int voiceIdx, ModulationParameters modulation)
+{
    const int kMaxDepth = 100;
    if (mStackDepth > kMaxDepth)
    {
@@ -126,7 +132,7 @@ void INoteSource::PlayNoteOutput(double time, int pitch, int velocity, int voice
    if (!mInNoteOutput)
       mNoteOutput.ResetStackDepth();
    mInNoteOutput = true;
-   mNoteOutput.PlayNote(time, pitch, velocity, voiceIdx, modulation);
+   mNoteOutput.PlayNoteInternal(time, pitch, velocity, voiceIdx, modulation);
    mInNoteOutput = false;
 }
 
