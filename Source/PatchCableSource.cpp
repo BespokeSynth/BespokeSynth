@@ -535,7 +535,7 @@ void PatchCableSource::FindValidTargets()
          for (auto uicontrol : module->GetUIControls())
          {
             if (uicontrol->IsShowing() &&
-                uicontrol->GetShouldSaveState() &&
+                (uicontrol->GetShouldSaveState() || dynamic_cast<ClickButton*>(uicontrol) != nullptr) &&
                 uicontrol->CanBeTargetedBy(this))
                mValidTargets.push_back(uicontrol);
          }
