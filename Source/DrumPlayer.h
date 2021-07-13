@@ -140,7 +140,7 @@ private:
    int mSelectedHitIdx;
    bool mMonoOutput;
    Checkbox* mMonoCheckbox;
-   GridController* mGridController;
+   GridControlTarget* mGridControlTarget;
    NoteInputBuffer mNoteInputBuffer;
    bool mNeedSetup;
    bool mNoteRepeat;

@@ -71,7 +71,7 @@ void NoteStepSequencer::CreateUIControls()
    BUTTON(mRandomizeVelocityButton, "vel"); UIBLOCK_SHIFTRIGHT();
    BUTTON(mRandomizeLengthButton, "len"); UIBLOCK_SHIFTRIGHT();
    UIBLOCK_SHIFTX(5);
-   UICONTROL_CUSTOM(mGridController, new GridController(UICONTROL_BASICS("grid"))); UIBLOCK_NEWLINE();
+   UICONTROL_CUSTOM(mGridControlTarget, new GridControlTarget(UICONTROL_BASICS("grid"))); UIBLOCK_NEWLINE();
    UIBLOCK_PUSHSLIDERWIDTH(150);
    INTSLIDER(mLengthSlider, "length", &mLength, 1, NSS_MAX_STEPS); UIBLOCK_SHIFTRIGHT();
    BUTTON(mShiftBackButton, "<"); UIBLOCK_SHIFTRIGHT();
@@ -188,7 +188,7 @@ void NoteStepSequencer::DrawModule()
    mRandomizeLengthButton->Draw();
    mRandomizeVelocityButton->Draw();
    mLoopResetPointSlider->Draw();
-   mGridController->Draw();
+   mGridControlTarget->Draw();
    
    mGrid->Draw();
    mVelocityGrid->Draw();
@@ -732,21 +732,21 @@ void NoteStepSequencer::ShiftSteps(int amount)
 
 void NoteStepSequencer::UpdateGridControllerLights(bool force)
 {
-   if (mGridController)
+   if (mGridControlTarget->GetGridController())
    {
-      for (int x=0; x<mGridController->NumCols(); ++x)
+      for (int x=0; x<mGridControlTarget->GetGridController()->NumCols(); ++x)
       {
-         for (int y=0; y<mGridController->NumRows(); ++y)
+         for (int y=0; y<mGridControlTarget->GetGridController()->NumRows(); ++y)
          {
             GridColor color = GridColor::kGridColorOff;
             if (x == mArpIndex)
                color = GridColor::kGridColor2Dim;
             if (x < mLength)
             {
-               if (mTones[x] == mGridController->NumRows() - 1 - y && mVels[x] > 0)
+               if (mTones[x] == mGridControlTarget->GetGridController()->NumRows() - 1 - y && mVels[x] > 0)
                   color = GridColor::kGridColor1Bright;
             }
-            mGridController->SetLight(x, y, color, force);
+            mGridControlTarget->GetGridController()->SetLight(x, y, color, force);
          }
       }
    }
@@ -759,9 +759,9 @@ void NoteStepSequencer::OnControllerPageSelected()
 
 void NoteStepSequencer::OnGridButton(int x, int y, float velocity, IGridController* grid)
 {
-   if (grid == mGridController && x < mLength && velocity > 0)
+   if (grid == mGridControlTarget->GetGridController() && x < mLength && velocity > 0)
    {
-      int tone = mGridController->NumRows() - 1 -  y;
+      int tone = mGridControlTarget->GetGridController()->NumRows() - 1 -  y;
       if (mTones[x] == tone && mVels[x] > 0)
       {
          mVels[x] = 0;

@@ -214,9 +214,9 @@ private:
    IntSlider* mNumMeasuresSlider;
    NoteInterval mStepInterval;
    DropdownList* mStepIntervalDropdown;
-   GridController* mGridController;
-   GridController* mVelocityGridController;
-   GridController* mMetaStepGridController;
+   GridControlTarget* mGridControlTarget;
+   GridControlTarget* mVelocityGridController;
+   GridControlTarget* mMetaStepGridController;
    int mCurrentColumn;
    IntSlider* mCurrentColumnSlider;
    StepSequencerNoteFlusher mFlusher;

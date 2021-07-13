@@ -81,7 +81,7 @@ private:
    int mLength;
    DropdownList* mLengthSelector;
    vector<PatchCableSource*> mControlCables;
-   GridController* mGridController;
+   GridControlTarget* mGridControlTarget;
 
    TransportListenerInfo* mTransportListenerInfo;
 };

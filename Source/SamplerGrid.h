@@ -116,7 +116,7 @@ private:
    bool mDuplicate;
    Checkbox* mDuplicateCheckbox;
    
-   GridController* mGridController;
+   GridControlTarget* mGridControlTarget;
    int mCols;
    int mRows;
    bool mLastColumnIsGroup;

@@ -23,7 +23,7 @@
 
 LaunchpadKeyboard::LaunchpadKeyboard()
 : mRootNote(4) //4 = E
-, mGridController(nullptr)
+, mGridControlTarget(nullptr)
 , mTestKeyHeld(false)
 , mLayout(kChromatic)
 , mLayoutDropdown(nullptr)
@@ -141,7 +141,7 @@ void LaunchpadKeyboard::CreateUIControls()
    mArrangementModeDropdown = new DropdownList(this,"arrangement",6,4,((int*)(&mArrangementMode)));
    mLatchChordsCheckbox = new Checkbox(this,"ch.latch",55,59,&mLatchChords);
    mPreserveChordRootCheckbox = new Checkbox(this,"p.root",70,4,&mPreserveChordRoot);
-   mGridController = new GridController(this, "grid", 90, 22);
+   mGridControlTarget = new GridControlTarget(this, "grid", 90, 22);
    
    mLayoutDropdown->AddLabel("chromatic", kChromatic);
    mLayoutDropdown->AddLabel("diatonic", kDiatonic);
@@ -433,7 +433,7 @@ void LaunchpadKeyboard::DrawModule()
    mLatchChordsCheckbox->Draw();
    mArrangementModeDropdown->Draw();
    mPreserveChordRootCheckbox->Draw();
-   mGridController->Draw();
+   mGridControlTarget->Draw();
 }
 
 int LaunchpadKeyboard::GridToPitch(int x, int y)
@@ -582,8 +582,8 @@ void LaunchpadKeyboard::UpdateLights(bool force)
       {
          GridColor color = GetGridSquareColor(x, y);
          
-         if (mGridController)
-            mGridController->SetLight(x, y, color, force);
+         if (mGridControlTarget->GetGridController())
+            mGridControlTarget->GetGridController()->SetLight(x, y, color, force);
       }
    }
 }
@@ -698,7 +698,7 @@ void LaunchpadKeyboard::KeyPressed(int key, bool isRepeat)
    if (key == 'e' && !mTestKeyHeld && GetKeyModifiers() == kModifier_None)
    {
       mTestKeyHeld = true;
-      OnGridButton(3,3,1,mGridController);
+      OnGridButton(3,3,1,mGridControlTarget->GetGridController());
    }
 }
 
@@ -707,7 +707,7 @@ void LaunchpadKeyboard::KeyReleased(int key)
    if (key == 'e' && GetKeyModifiers() == kModifier_None)
    {
       mTestKeyHeld = false;
-      OnGridButton(3,3,0,mGridController);
+      OnGridButton(3,3,0,mGridControlTarget->GetGridController());
    }
 }
 
@@ -762,8 +762,8 @@ void LaunchpadKeyboard::FloatSliderUpdated(FloatSlider* slider, float oldVal)
 void LaunchpadKeyboard::Exit()
 {
    IDrawableModule::Exit();
-   if (mGridController)
-      mGridController->ResetLights();
+   if (mGridControlTarget->GetGridController())
+      mGridControlTarget->GetGridController()->ResetLights();
 }
 
 void LaunchpadKeyboard::DropdownUpdated(DropdownList* list, int oldVal)

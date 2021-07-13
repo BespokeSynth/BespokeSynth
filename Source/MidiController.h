@@ -71,7 +71,7 @@ namespace Json
 
 class Monome;
 class MidiController;
-class GridController;
+class GridControlTarget;
 class INonstandardController;
 class ScriptModule;
 
@@ -219,7 +219,7 @@ struct ControlLayoutElement
 
 struct GridLayout
 {
-   GridLayout() : mGridCable(nullptr) { for (int i=0; i<MAX_MIDI_PAGES; ++i) { mGridController[i] = nullptr; } }
+   GridLayout() : mGridCable(nullptr) { for (int i=0; i<MAX_MIDI_PAGES; ++i) { mGridControlTarget[i] = nullptr; } }
    
    int mRows;
    int mCols;
@@ -230,7 +230,7 @@ struct GridLayout
    vector<int> mColors;
    
    PatchCableSource* mGridCable;
-   GridController* mGridController[MAX_MIDI_PAGES];
+   GridControlTarget* mGridControlTarget[MAX_MIDI_PAGES];
 };
 
 #define NUM_LAYOUT_CONTROLS 128+128+1+1 //128 notes, 128 ccs, 1 pitch bend, 1 dummy

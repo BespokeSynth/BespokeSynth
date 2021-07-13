@@ -121,7 +121,7 @@ private:
    bool mWasChorderEnabled;
    bool mPreserveChordRoot;
    Checkbox* mPreserveChordRootCheckbox;
-   GridController* mGridController;
+   GridControlTarget* mGridControlTarget;
 };
 
 #endif /* defined(__modularSynth__LaunchpadKeyboard__) */

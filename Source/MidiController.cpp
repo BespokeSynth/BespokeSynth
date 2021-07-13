@@ -573,14 +573,14 @@ void MidiController::MidiReceived(MidiMessageType messageType, int control, floa
    
    for (auto* grid : mGrids)
    {
-      if (grid->mType == messageType && grid->mGridController[mControllerPage] != nullptr)
+      if (grid->mType == messageType && grid->mGridControlTarget[mControllerPage] != nullptr && grid->mGridControlTarget[mControllerPage]->GetGridController() != nullptr)
       {
          for (int i=0; i<grid->mControls.size(); ++i)
          {
             if (grid->mControls[i] == control)
             {
-               grid->mGridController[mControllerPage]->OnInput(control, value);
-               grid->mGridCable->AddHistoryEvent(gTime, grid->mGridController[mControllerPage]->HasInput());
+               dynamic_cast<GridControllerMidi*>(grid->mGridControlTarget[mControllerPage]->GetGridController())->OnInput(control, value);
+               grid->mGridCable->AddHistoryEvent(gTime, grid->mGridControlTarget[mControllerPage]->GetGridController()->HasInput());
                break;
             }
          }
@@ -655,8 +655,8 @@ void MidiController::Poll()
 
                for (auto* grid : mGrids)
                {
-                  if (grid->mGridController[mControllerPage] != nullptr)
-                     grid->mGridController[mControllerPage]->OnControllerPageSelected();
+                  if (grid->mGridControlTarget[mControllerPage] != nullptr && grid->mGridControlTarget[mControllerPage]->GetGridController() != nullptr)
+                     dynamic_cast<GridControllerMidi*>(grid->mGridControlTarget[mControllerPage]->GetGridController())->OnControllerPageSelected();
                }
             }
          }
@@ -1050,13 +1050,7 @@ void MidiController::DrawModule()
       }
       
       for (auto* grid : mGrids)
-      {
          ofRect(grid->mPosition.x, grid->mPosition.y, grid->mDimensions.x, grid->mDimensions.y);
-         ofPushStyle();
-         ofSetColor(IDrawableModule::GetColor(kModuleType_Other));
-         GridController::DrawGridIcon(grid->mPosition.x + 6, grid->mPosition.y - 6);
-         ofPopStyle();
-      }
       
       ofPopStyle();
       
@@ -1712,10 +1706,10 @@ void MidiController::DropdownUpdated(DropdownList* list, int oldVal)
       }
       for (auto* grid : mGrids)
       {
-         if (grid->mGridController[mControllerPage] != nullptr)
+         if (grid->mGridControlTarget[mControllerPage] != nullptr)
          {
-            grid->mGridController[mControllerPage]->OnControllerPageSelected();
-            grid->mGridCable->SetTarget(grid->mGridController[mControllerPage]);
+            dynamic_cast<GridControllerMidi*>(grid->mGridControlTarget[mControllerPage]->GetGridController())->OnControllerPageSelected();
+            grid->mGridCable->SetTarget(grid->mGridControlTarget[mControllerPage]);
          }
          else
          {
@@ -1799,9 +1793,9 @@ void MidiController::PreRepatch(PatchCableSource* cableSource)
    {
       if (cableSource == grid->mGridCable)
       {
-         grid->mGridController[mControllerPage] = dynamic_cast<GridController*>(cableSource->GetTarget());
-         if (grid->mGridController[mControllerPage])
-            grid->mGridController[mControllerPage]->UnhookController();
+         grid->mGridControlTarget[mControllerPage] = dynamic_cast<GridControlTarget*>(cableSource->GetTarget());
+         if (grid->mGridControlTarget[mControllerPage] && grid->mGridControlTarget[mControllerPage]->GetGridController())
+            dynamic_cast<GridControllerMidi*>(grid->mGridControlTarget[mControllerPage]->GetGridController())->UnhookController();
          return;
       }
    }
@@ -1813,9 +1807,13 @@ void MidiController::PostRepatch(PatchCableSource* cableSource, bool fromUserCli
    {
       if (cableSource == grid->mGridCable)
       {
-         grid->mGridController[mControllerPage] = dynamic_cast<GridController*>(cableSource->GetTarget());
-         if (grid->mGridController[mControllerPage])
-            grid->mGridController[mControllerPage]->SetUp(grid, mControllerPage, this);
+         grid->mGridControlTarget[mControllerPage] = dynamic_cast<GridControlTarget*>(cableSource->GetTarget());
+         if (grid->mGridControlTarget[mControllerPage])
+         {
+            GridControllerMidi* gridController = new GridControllerMidi();
+            grid->mGridControlTarget[mControllerPage]->SetGridController(gridController);
+            gridController->SetUp(grid, mControllerPage, this);
+         }
          return;
       }
    }

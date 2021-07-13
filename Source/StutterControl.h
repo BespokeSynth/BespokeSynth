@@ -84,7 +84,7 @@ private:
    bool mStutter[kNumStutterTypes];
    FloatSlider* mFreeLengthSlider;
    FloatSlider* mFreeSpeedSlider;
-   GridController* mGridController;
+   GridControlTarget* mGridControlTarget;
 };
 
 #endif /* defined(__Bespoke__StutterControl__) */

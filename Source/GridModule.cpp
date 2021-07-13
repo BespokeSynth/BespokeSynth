@@ -16,10 +16,13 @@
 #include "Profiler.h"
 #include "MidiController.h"
 #include "ScriptModule.h"
+#include "PatchCableSource.h"
 
 GridModule::GridModule()
-: mGridController(nullptr)
+: mGridControlTarget(nullptr)
 , mGrid(nullptr)
+, mGridControllerOwner(nullptr)
+, mMomentary(false)
 {
    for (size_t i=0; i<mHighlightCells.size(); ++i)
       mHighlightCells[i].time = -1;
@@ -36,10 +39,19 @@ GridModule::GridModule()
 void GridModule::CreateUIControls()
 {
    IDrawableModule::CreateUIControls();
+   
+   mMomentaryCheckbox = new Checkbox(this, "momentary", 40, 3, &mMomentary);
+   
    mGrid = new UIGrid(40, 22, 90, 90, 8, 8, this);
    mGrid->SetListener(this);
-   mGrid->SetFlip(true);
-   mGridController = new GridController(this, "grid", 4, 4);
+   mGridControlTarget = new GridControlTarget(this, "grid", 4, 4);
+   
+   GetPatchCableSource()->SetEnabled(false);
+   
+   mGridOutputCable = new PatchCableSource(this, kConnectionType_Grid);
+   mGridOutputCable->SetManualPosition(10, 30);
+   mGridOutputCable->AddTypeFilter("gridcontroller");
+   AddPatchCableSource(mGridOutputCable);
 }
 
 GridModule::~GridModule()
@@ -55,14 +67,15 @@ void GridModule::Init()
 
 void GridModule::OnControllerPageSelected()
 {
-   mGridController->ResetLights();
+   if (mGridControlTarget->GetGridController())
+      mGridControlTarget->GetGridController()->ResetLights();
    
    UpdateLights();
 }
 
 void GridModule::GridUpdated(UIGrid* grid, int col, int row, float value, float oldValue)
 {
-   OnGridButton(col, GetRows() - 1 - row, value, nullptr);
+   OnGridButton(col, row, value, nullptr);
 }
 
 void GridModule::OnGridButton(int x, int y, float velocity, IGridController* grid)
@@ -70,7 +83,10 @@ void GridModule::OnGridButton(int x, int y, float velocity, IGridController* gri
    if (y < GetRows() && x < GetCols())
    {
       for (auto listener : mScriptListeners)
-         listener->RunCode(gTime, "on_grid_button("+ofToString(x)+", "+ofToString(GetRows() - 1 - y)+", "+ofToString(velocity)+")");
+         listener->RunCode(gTime, "on_grid_button("+ofToString(x)+", "+ofToString(y)+", "+ofToString(velocity)+")");
+      
+      if (mGridControllerOwner)
+         mGridControllerOwner->OnGridButton(x, y, velocity, this);
    }
    
    UpdateLights();
@@ -78,19 +94,20 @@ void GridModule::OnGridButton(int x, int y, float velocity, IGridController* gri
 
 void GridModule::PlayNote(double time, int pitch, int velocity, int voiceIdx, ModulationParameters modulation)
 {
-   OnGridButton(pitch % GetCols(), GetRows() - 1 - ((pitch / GetCols()) % GetRows()), velocity / 127.0f, nullptr);
+   OnGridButton(pitch % GetCols(), ((pitch / GetCols()) % GetRows()), velocity / 127.0f, nullptr);
 }
 
 void GridModule::UpdateLights()
 {
-   if (!mGridController)
+   if (!mGridControlTarget)
       return;
    
    for (int x=0; x<GetCols(); ++x)
    {
       for (int y=0; y<GetRows(); ++y)
       {
-         mGridController->SetLight(x, GetRows() - 1 - y, Get(x,y) > 0 ? kGridColor1Bright : kGridColorOff);
+         if (mGridControlTarget->GetGridController())
+            mGridControlTarget->GetGridController()->SetLight(x, y, Get(x,y) > 0 ? kGridColor1Bright : kGridColorOff);
       }
    }
 }
@@ -100,9 +117,11 @@ void GridModule::DrawModule()
    if (Minimized() || IsVisible() == false)
       return;
    
+   mMomentaryCheckbox->Draw();
+   
    ofSetColor(150,150,150,255);
    mGrid->Draw();
-   mGridController->Draw();
+   mGridControlTarget->Draw();
    
    ofPushStyle();
    ofSetColor(128, 128, 128, gModuleDrawAlpha * .8f);
@@ -243,6 +262,46 @@ void GridModule::MouseReleased()
    mGrid->MouseReleased();
 }
 
+void GridModule::SetLight(int x, int y, GridColor color, bool force)
+{
+   if (x >= GetCols() || y >= GetRows())
+      return;
+   
+   int colorIdx = (int)color;
+   
+   SetLightDirect(x, y, colorIdx, force);
+}
+
+void GridModule::SetLightDirect(int x, int y, int color, bool force)
+{
+   if (mGridControlTarget->GetGridController())
+      mGridControlTarget->GetGridController()->SetLightDirect(x, y, color, force);
+   SetCellColor(x, y, color);
+   mGrid->SetVal(x, y, color > 0 ? 1 : 0, false);
+}
+
+void GridModule::ResetLights()
+{
+   if (mGridControlTarget->GetGridController())
+      mGridControlTarget->GetGridController()->ResetLights();
+   Clear();
+}
+
+bool GridModule::HasInput() const
+{
+   return false;
+}
+
+void GridModule::PostRepatch(PatchCableSource* cableSource, bool fromUserClick)
+{
+   if (cableSource == mGridOutputCable)
+   {
+      auto* target = dynamic_cast<GridControlTarget*>(cableSource->GetTarget());
+      if (target)
+         target->SetGridController(this);
+   }
+}
+
 void GridModule::LoadLayout(const ofxJSONElement& moduleInfo)
 {
    SetUpFromSaveData();
@@ -254,6 +313,8 @@ void GridModule::SetUpFromSaveData()
 
 void GridModule::CheckboxUpdated(Checkbox* checkbox)
 {
+   if (checkbox == mMomentaryCheckbox)
+      mGrid->SetMomentary(mMomentary);
 }
 
 namespace

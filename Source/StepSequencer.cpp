@@ -22,7 +22,7 @@ StepSequencer::StepSequencer()
 : mGrid(nullptr)
 , mStrength(1)
 , mStrengthSlider(nullptr)
-, mGridController(nullptr)
+, mGridControlTarget(nullptr)
 , mPreset(-1)
 , mPresetDropdown(nullptr)
 , mColorOffset(3)
@@ -76,9 +76,9 @@ void StepSequencer::CreateUIControls()
    mCurrentColumnSlider = new IntSlider(this,"column",HIDDEN_UICONTROL,HIDDEN_UICONTROL,100,15,&mCurrentColumn,0,15);
    mShiftLeftButton = new ClickButton(this,"<",80,4);
    mShiftRightButton = new ClickButton(this,">",100,4);
-   mGridController = new GridController(this,"grid",240,4);
-   mVelocityGridController = new GridController(this,"velocity",240,16);
-   mMetaStepGridController = new GridController(this,"metastep",240,28);
+   mGridControlTarget = new GridControlTarget(this,"grid",240,4);
+   mVelocityGridController = new GridControlTarget(this,"velocity",240,16);
+   mMetaStepGridController = new GridControlTarget(this,"metastep",240,28);
    
    mGrid->SetMajorColSize(4);
    mGrid->SetFlip(true);
@@ -168,23 +168,23 @@ namespace
 
 void StepSequencer::UpdateLights()
 {
-   if (!HasGridController())
+   if (!HasGridController() || mGridControlTarget->GetGridController() == nullptr)
       return;
    
-   for (int x=0; x<mGridController->NumCols(); ++x)
+   for (int x=0; x<mGridControlTarget->GetGridController()->NumCols(); ++x)
    {
-      for (int y=0; y<mGridController->NumRows(); ++y)
+      for (int y=0; y<mGridControlTarget->GetGridController()->NumRows(); ++y)
       {
-         if (mGridController->IsMultisliderGrid())
+         if (mGridControlTarget->GetGridController()->IsMultisliderGrid())
          {
             Vec2i gridPos = ControllerToGrid(Vec2i(x,y));
-            mGridController->SetLightDirect(x, y, (int)(mGrid->GetVal(gridPos.x,gridPos.y)*127));
+            mGridControlTarget->GetGridController()->SetLightDirect(x, y, (int)(mGrid->GetVal(gridPos.x,gridPos.y)*127));
          }
          else
          {
             GridColor color = GetGridColor(x, y);
             
-            mGridController->SetLight(x, y, color);
+            mGridControlTarget->GetGridController()->SetLight(x, y, color);
          }
       }
    }
@@ -222,16 +222,16 @@ GridColor StepSequencer::GetGridColor(int x, int y)
 
 void StepSequencer::UpdateVelocityLights()
 {
-   if (mVelocityGridController == nullptr)
+   if (mVelocityGridController->GetGridController() == nullptr)
       return;
    
    float stepVelocity = 0;
    if (mHeldButtons.size() > 0)
       stepVelocity = mGrid->GetVal(mHeldButtons.begin()->mCol, mHeldButtons.begin()->mRow);
    
-   for (int x=0; x<mVelocityGridController->NumCols(); ++x)
+   for (int x=0; x<mVelocityGridController->GetGridController()->NumCols(); ++x)
    {
-      for (int y=0; y<mVelocityGridController->NumRows(); ++y)
+      for (int y=0; y<mVelocityGridController->GetGridController()->NumRows(); ++y)
       {
          GridColor color;
          if (stepVelocity >= (8 - y) / 8.0f)
@@ -239,14 +239,14 @@ void StepSequencer::UpdateVelocityLights()
          else
             color = kGridColorOff;
          
-         mVelocityGridController->SetLight(x, y, color);
+         mVelocityGridController->GetGridController()->SetLight(x, y, color);
       }
    }
 }
 
 void StepSequencer::UpdateMetaLights()
 {
-   if (mMetaStepGridController == nullptr)
+   if (mMetaStepGridController->GetGridController() == nullptr)
       return;
    
    bool hasHeldButtons = mHeldButtons.size() > 0;
@@ -254,9 +254,9 @@ void StepSequencer::UpdateMetaLights()
    if (hasHeldButtons)
       metaStepMask = mMetaStepMasks[GetMetaStepMaskIndex(mHeldButtons.begin()->mCol, mHeldButtons.begin()->mRow)];
    
-   for (int x=0; x<mMetaStepGridController->NumCols(); ++x)
+   for (int x=0; x<mMetaStepGridController->GetGridController()->NumCols(); ++x)
    {
-      for (int y=0; y<mMetaStepGridController->NumRows(); ++y)
+      for (int y=0; y<mMetaStepGridController->GetGridController()->NumRows(); ++y)
       {
          GridColor color;
          if (hasHeldButtons && (metaStepMask & (1 << x)))
@@ -266,7 +266,7 @@ void StepSequencer::UpdateMetaLights()
          else
             color = kGridColorOff;
          
-         mMetaStepGridController->SetLight(x, y, color);
+         mMetaStepGridController->GetGridController()->SetLight(x, y, color);
       }
    }
 }
@@ -278,7 +278,7 @@ void StepSequencer::OnControllerPageSelected()
 
 void StepSequencer::OnGridButton(int x, int y, float velocity, IGridController* grid)
 {
-   if (grid == mGridController)
+   if (grid == mGridControlTarget->GetGridController())
    {
       bool press = velocity > 0;
       if (x>=0 && y>=0)
@@ -344,7 +344,7 @@ void StepSequencer::OnGridButton(int x, int y, float velocity, IGridController* 
       }
    }
    
-   if (grid == mVelocityGridController)
+   if (grid == mVelocityGridController->GetGridController())
    {
       if (velocity > 0)
       {
@@ -357,7 +357,7 @@ void StepSequencer::OnGridButton(int x, int y, float velocity, IGridController* 
       }
    }
    
-   if (grid == mMetaStepGridController)
+   if (grid == mMetaStepGridController->GetGridController())
    {
       if (velocity > 0)
       {
@@ -389,7 +389,7 @@ Vec2i StepSequencer::ControllerToGrid(const Vec2i& controller)
    
    int numChunks = GetNumControllerChunks();
    int chunkSize = mGrid->GetRows() / numChunks;
-   int col = controller.x + (controller.y/chunkSize)*mGridController->NumCols();
+   int col = controller.x + (controller.y/chunkSize)*mGridControlTarget->GetGridController()->NumCols();
    int row = (chunkSize-1)-(controller.y%chunkSize)+mGridYOff*chunkSize;
    return Vec2i(col,row);
 }
@@ -399,8 +399,8 @@ int StepSequencer::GetNumControllerChunks()
    if (!HasGridController())
       return 1;
    
-   int numBreaks = int((mGrid->GetCols() / MAX(1.0f,mGridController->NumCols())) + .5f);
-   int numChunks = int(mGrid->GetRows() / MAX(1.0f,(mGridController->NumRows() / MAX(1,numBreaks)))+.5f);
+   int numBreaks = int((mGrid->GetCols() / MAX(1.0f,mGridControlTarget->GetGridController()->NumCols())) + .5f);
+   int numChunks = int(mGrid->GetRows() / MAX(1.0f,(mGridControlTarget->GetGridController()->NumRows() / MAX(1,numBreaks)))+.5f);
    return numChunks;
 }
 
@@ -425,7 +425,7 @@ void StepSequencer::DrawModule()
    mStepIntervalDropdown->Draw();
    mShiftLeftButton->Draw();
    mShiftRightButton->Draw();
-   mGridController->Draw();
+   mGridControlTarget->Draw();
    mVelocityGridController->Draw();
    mMetaStepGridController->Draw();
    
@@ -465,7 +465,7 @@ void StepSequencer::DrawModule()
       float squareh = float(mGrid->GetHeight())/mNumRows;
       float squarew = float(mGrid->GetWidth())/GetNumSteps(mStepInterval);
       int chunkSize = mGrid->GetRows() / GetNumControllerChunks();
-      float width = MIN(mGrid->GetWidth(), squarew * mGridController->NumCols() * GetNumControllerChunks());
+      float width = MIN(mGrid->GetWidth(), squarew * mGridControlTarget->GetGridController()->NumCols() * GetNumControllerChunks());
       ofRect(gridX,gridY+squareh*(mNumRows-chunkSize)-squareh*mGridYOff*chunkSize,width,squareh*chunkSize);
       ofPopStyle();
    }
@@ -562,7 +562,7 @@ bool StepSequencer::OnPush2Control(MidiMessageType type, int controlIndex, float
          int gridIndex = controlIndex - 36;
          int gridX = gridIndex % 8;
          int gridY = 7 - gridIndex / 8;
-         OnGridButton(gridX, gridY, midiValue/127, mGridController);
+         OnGridButton(gridX, gridY, midiValue/127, mGridControlTarget->GetGridController());
          return true;
       }
       if (controlIndex == 12) //touching pitchbend
@@ -740,8 +740,8 @@ void StepSequencer::SendPressure(int pitch, int pressure)
 void StepSequencer::Exit()
 {
    IDrawableModule::Exit();
-   if (!mGridController->IsConnected())
-      mGridController->ResetLights();
+   if (mGridControlTarget->GetGridController() != nullptr && !mGridControlTarget->GetGridController()->IsConnected())
+      mGridControlTarget->GetGridController()->ResetLights();
 }
 
 void StepSequencer::SetPreset(int preset)
@@ -837,7 +837,7 @@ bool StepSequencer::HasGridController()
 {
    if (mPush2Connected)
       return true;
-   return mGridController->IsConnected();
+   return mGridControlTarget->GetGridController() != nullptr && mGridControlTarget->GetGridController()->IsConnected();
 }
 
 void StepSequencer::CheckboxUpdated(Checkbox* checkbox)

@@ -29,7 +29,7 @@ SamplerGrid::SamplerGrid()
 , mCols(8)
 , mRows(8)
 , mGridSamples(nullptr)
-, mGridController(nullptr)
+, mGridControlTarget(nullptr)
 , mEditMode(false)
 , mEditCheckbox(nullptr)
 , mEditSampleX(2)
@@ -59,8 +59,8 @@ void SamplerGrid::CreateUIControls()
    mDuplicateCheckbox = new Checkbox(this,"duplicate",mEditCheckbox, kAnchor_Below,&mDuplicate);
    mEditStartSlider = new IntSlider(this,"start",mEditSampleX,mEditSampleY+mEditSampleHeight+1,mEditSampleWidth,15,&mDummyInt,0,1);
    mEditEndSlider = new IntSlider(this,"end",mEditStartSlider,kAnchor_Below,mEditSampleWidth,15,&mDummyInt,0,1);
-   mGridController = new GridController(this, "grid", 4, 4);
-   mGridController->PositionTo(mClearCheckbox, kAnchor_Right);
+   mGridControlTarget = new GridControlTarget(this, "grid", 4, 4);
+   mGridControlTarget->PositionTo(mClearCheckbox, kAnchor_Right);
    
    InitGrid();
 }
@@ -150,7 +150,8 @@ void SamplerGrid::Process(double time)
 
 void SamplerGrid::OnControllerPageSelected()
 {
-   mGridController->ResetLights();
+   if (mGridControlTarget->GetGridController())
+      mGridControlTarget->GetGridController()->ResetLights();
    
    /*delete[] mGridSamples;
    
@@ -267,24 +268,24 @@ void SamplerGrid::SetEditSample(SamplerGrid::GridSample* sample)
 
 void SamplerGrid::UpdateLights()
 {
-   if (!mGridController)
+   if (!mGridControlTarget->GetGridController())
       return;
    
    //clear lights
    for (int x=0; x<mCols; ++x)
    {
-      mGridController->SetLight(x,mRows,mClear?kGridColor1Bright:kGridColorOff);
+      mGridControlTarget->GetGridController()->SetLight(x,mRows,mClear?kGridColor1Bright:kGridColorOff);
       for (int y=0; y<mRows; ++y)
       {
          int idx = GridToIdx(x, y);
-         mGridController->SetLight(x,y,mGridSamples[idx].mHasSample?kGridColor2Bright:kGridColorOff);
+         mGridControlTarget->GetGridController()->SetLight(x,y,mGridSamples[idx].mHasSample?kGridColor2Bright:kGridColorOff);
       }
    }
    for (int y=0; y<mRows; ++y)
    {
-      mGridController->SetLight(mCols,y,kGridColor1Bright);
+      mGridControlTarget->GetGridController()->SetLight(mCols,y,kGridColor1Bright);
    }
-   mGridController->SetLight(mCols,mRows,mClear?kGridColor1Bright:kGridColorOff);
+   mGridControlTarget->GetGridController()->SetLight(mCols,mRows,mClear?kGridColor1Bright:kGridColorOff);
 }
 
 void SamplerGrid::SetEnabled(bool enabled)
@@ -303,7 +304,7 @@ void SamplerGrid::DrawModule()
    mEditCheckbox->Draw();
    mClearCheckbox->Draw();
    mGrid->Draw();
-   mGridController->Draw();
+   mGridControlTarget->Draw();
    
    ofPushStyle();
    ofSetColor(255, 255, 255, 100);

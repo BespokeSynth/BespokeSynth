@@ -13,6 +13,7 @@
 ComboGridController::ComboGridController()
 : mRows(0)
 , mCols(0)
+, mOwner(nullptr)
 {
    assert(false);
 }

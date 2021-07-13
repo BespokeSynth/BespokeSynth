@@ -11,25 +11,17 @@
 #include "FillSaveDropdown.h"
 #include "PatchCableSource.h"
 
-GridController::GridController(IGridControllerListener* owner, const char* name, int x, int y)
-: mMessageType(kMidiMessage_Note)
-, mController(nullptr)
-, mControllerPage(0)
-, mRows(8)
-, mCols(8)
-, mOwner(owner)
+GridControlTarget::GridControlTarget(IGridControllerListener* owner, const char* name, int x, int y)
+: mOwner(owner)
+, mGridController(nullptr)
 {
    SetName(name);
    SetPosition(x,y);
    dynamic_cast<IDrawableModule*>(owner)->AddUIControl(this);
    SetParent(dynamic_cast<IClickable*>(owner));
-   
-   bzero(mControls, sizeof(int)*MAX_GRIDCONTROLLER_ROWS*MAX_GRIDCONTROLLER_COLS);
-   bzero(mInput, sizeof(float)*MAX_GRIDCONTROLLER_ROWS*MAX_GRIDCONTROLLER_COLS);
-   bzero(mLights, sizeof(int)*MAX_GRIDCONTROLLER_ROWS*MAX_GRIDCONTROLLER_COLS);
 }
 
-void GridController::Render()
+void GridControlTarget::Render()
 {
    ofPushStyle();
    
@@ -46,7 +38,7 @@ void GridController::Render()
 }
 
 //static
-void GridController::DrawGridIcon(float x, float y)
+void GridControlTarget::DrawGridIcon(float x, float y)
 {
    ofPushStyle();
    
@@ -59,7 +51,50 @@ void GridController::DrawGridIcon(float x, float y)
    ofPopStyle();
 }
 
-void GridController::OnControllerPageSelected()
+bool GridControlTarget::CanBeTargetedBy(PatchCableSource* source) const
+{
+   return source->GetConnectionType() == kConnectionType_Grid;
+}
+
+bool GridControlTarget::MouseMoved(float x, float y)
+{
+   CheckHover(x, y);
+   return false;
+}
+
+namespace
+{
+   const int kSaveStateRev = 1;
+}
+
+void GridControlTarget::SaveState(FileStreamOut& out)
+{
+   out << kSaveStateRev;
+}
+
+void GridControlTarget::LoadState(FileStreamIn& in, bool shouldSetValue)
+{
+   int rev;
+   in >> rev;
+   LoadStateValidate(rev <= kSaveStateRev);
+}
+
+//----------------
+
+GridControllerMidi::GridControllerMidi()
+: mMessageType(kMidiMessage_Note)
+, mMidiController(nullptr)
+, mControllerPage(0)
+, mRows(8)
+, mCols(8)
+, mOwner(nullptr)
+{
+   bzero(mControls, sizeof(int)*MAX_GRIDCONTROLLER_ROWS*MAX_GRIDCONTROLLER_COLS);
+   bzero(mInput, sizeof(float)*MAX_GRIDCONTROLLER_ROWS*MAX_GRIDCONTROLLER_COLS);
+   bzero(mLights, sizeof(int)*MAX_GRIDCONTROLLER_ROWS*MAX_GRIDCONTROLLER_COLS);
+}
+
+void GridControllerMidi::OnControllerPageSelected()
 {
    mOwner->OnControllerPageSelected();
    
@@ -72,7 +107,7 @@ void GridController::OnControllerPageSelected()
    }
 }
 
-void GridController::OnInput(int control, float velocity)
+void GridControllerMidi::OnInput(int control, float velocity)
 {
    int x;
    int y;
@@ -100,7 +135,7 @@ void GridController::OnInput(int control, float velocity)
    }
 }
 
-bool GridController::HasInput() const
+bool GridControllerMidi::HasInput() const
 {
    for (int i=0; i<mCols; ++i)
    {
@@ -116,7 +151,7 @@ bool GridController::HasInput() const
    return false;
 }
 
-void GridController::SetLight(int x, int y, GridColor color, bool force)
+void GridControllerMidi::SetLight(int x, int y, GridColor color, bool force)
 {
    if (x >= mCols || y >= mRows)
       return;
@@ -142,22 +177,22 @@ void GridController::SetLight(int x, int y, GridColor color, bool force)
    SetLightDirect(x, y, rawColor, force);
 }
 
-void GridController::SetLightDirect(int x, int y, int color, bool force)
+void GridControllerMidi::SetLightDirect(int x, int y, int color, bool force)
 {
    if (mLights[x][y] != color || force)
    {
-      if (mController)
+      if (mMidiController)
       {
          if (mMessageType == kMidiMessage_Note)
-            mController->SendNote(mControllerPage, mControls[x][y], color);
+            mMidiController->SendNote(mControllerPage, mControls[x][y], color);
          else if (mMessageType == kMidiMessage_Control)
-            mController->SendCC(mControllerPage, mControls[x][y], color);
+            mMidiController->SendCC(mControllerPage, mControls[x][y], color);
       }
       mLights[x][y] = color;
    }
 }
 
-void GridController::ResetLights()
+void GridControllerMidi::ResetLights()
 {
    for (int i=0; i<mCols; ++i)
    {
@@ -168,7 +203,7 @@ void GridController::ResetLights()
    }
 }
 
-void GridController::SetUp(GridLayout* layout, int page, MidiController* controller)
+void GridControllerMidi::SetUp(GridLayout* layout, int page, MidiController* controller)
 {
    mRows = layout->mRows;
    mCols = layout->mCols;
@@ -185,41 +220,13 @@ void GridController::SetUp(GridLayout* layout, int page, MidiController* control
    
    mMessageType = layout->mType;
    
-   mController = controller;
+   mMidiController = controller;
    mControllerPage = page;
    
    OnControllerPageSelected();
 }
 
-void GridController::UnhookController()
+void GridControllerMidi::UnhookController()
 {
-   mController = nullptr;
-}
-
-bool GridController::CanBeTargetedBy(PatchCableSource* source) const
-{
-   return source->GetConnectionType() == kConnectionType_Grid;
-}
-
-bool GridController::MouseMoved(float x, float y)
-{
-   CheckHover(x, y);
-   return false;
-}
-
-namespace
-{
-   const int kSaveStateRev = 1;
-}
-
-void GridController::SaveState(FileStreamOut& out)
-{
-   out << kSaveStateRev;
-}
-
-void GridController::LoadState(FileStreamIn& in, bool shouldSetValue)
-{
-   int rev;
-   in >> rev;
-   LoadStateValidate(rev <= kSaveStateRev);
+   mMidiController = nullptr;
 }

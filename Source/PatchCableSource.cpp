@@ -286,6 +286,15 @@ void PatchCableSource::Render()
          ofSetColor(mColor);
          ofFill();
          ofCircle(cableX, cableY, kPatchCableSourceRadius);
+         
+         if (mType == kConnectionType_Grid)
+         {
+            ofPushStyle();
+            ofNoFill();
+            ofSetColor(IDrawableModule::GetColor(kModuleType_Other));
+            GridControlTarget::DrawGridIcon(mX + 7, mY - 6);
+            ofPopStyle();
+         }
       }
 
       if (mSide == Side::kBottom)

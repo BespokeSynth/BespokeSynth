@@ -13,7 +13,7 @@
 
 StutterControl::StutterControl()
 : IAudioProcessor(gBufferSize)
-, mGridController(nullptr)
+, mGridControlTarget(nullptr)
 {
    for (int i=0; i<kNumStutterTypes; ++i)
       mStutter[i] = false;
@@ -23,7 +23,7 @@ void StutterControl::CreateUIControls()
 {
    IDrawableModule::CreateUIControls();
    
-   mGridController = new GridController(this, "grid", 5, 145);
+   mGridControlTarget = new GridControlTarget(this, "grid", 5, 145);
    
    mStutterCheckboxes[kHalf] = new Checkbox(this,"half note",4,3,&mStutter[kHalf]);
    mStutterCheckboxes[kQuarter] = new Checkbox(this,"quarter",mStutterCheckboxes[kHalf],kAnchor_Below,&mStutter[kQuarter]);
@@ -94,7 +94,7 @@ void StutterControl::DrawModule()
       mStutterCheckboxes[i]->Draw();
    mFreeLengthSlider->Draw();
    mFreeSpeedSlider->Draw();
-   mGridController->Draw();
+   mGridControlTarget->Draw();
 }
 
 void StutterControl::SendStutter(double time, StutterParams stutter, bool on)
@@ -236,12 +236,12 @@ void StutterControl::PlayNote(double time, int pitch, int velocity, int voiceIdx
 
 void StutterControl::UpdateGridLights()
 {
-   if (mGridController == nullptr)
+   if (mGridControlTarget == nullptr)
       return;
    
    for (int i=0; i<kNumStutterTypes; ++i)
    {
-      mGridController->SetLight(i % mGridController->NumCols(), i / mGridController->NumCols(), mStutter[i] ? kGridColor1Bright : kGridColor1Dim);
+      mGridControlTarget->GetGridController()->SetLight(i % mGridControlTarget->GetGridController()->NumCols(), i / mGridControlTarget->GetGridController()->NumCols(), mStutter[i] ? kGridColor1Bright : kGridColor1Dim);
    }
 }
 

@@ -178,7 +178,7 @@ private:
    std::array<PatchCableSource*, NSS_MAX_STEPS> mStepCables;
 
    TransportListenerInfo* mTransportListenerInfo;
-   GridController* mGridController;
+   GridControlTarget* mGridControlTarget;
 };
 
 

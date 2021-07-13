@@ -22,7 +22,7 @@
 
 class ScriptModule;
 
-class GridModule : public IDrawableModule, public IGridControllerListener, public UIGridListener, public INoteReceiver
+class GridModule : public IDrawableModule, public IGridControllerListener, public UIGridListener, public INoteReceiver, public IGridController
 {
 public:
    GridModule();
@@ -60,6 +60,16 @@ public:
    //UIGridListener
    void GridUpdated(UIGrid* grid, int col, int row, float value, float oldValue) override;
    
+   //IGridController
+   void SetGridControllerOwner(IGridControllerListener* owner) override { mGridControllerOwner = owner; }
+   void SetLight(int x, int y, GridColor color, bool force = false) override;
+   void SetLightDirect(int x, int y, int color, bool force = false) override;
+   void ResetLights() override;
+   int NumCols() override { return GetCols(); }
+   int NumRows() override { return GetRows(); }
+   bool HasInput() const override;
+   bool IsConnected() const override { return true; }
+   
    void CheckboxUpdated(Checkbox* checkbox) override;
    
    virtual void LoadLayout(const ofxJSONElement& moduleInfo) override;
@@ -76,11 +86,14 @@ private:
    void MouseReleased() override;
    bool IsResizable() const override { return true; }
    void Resize(float w, float h) override;
-   ofColor GetColor(int colorIndex) const;
+   void PostRepatch(PatchCableSource* cableSource, bool fromUserClick) override;
    
+   ofColor GetColor(int colorIndex) const;
    void UpdateLights();
    
-   GridController* mGridController;
+   GridControlTarget* mGridControlTarget;
+   PatchCableSource* mGridOutputCable;
+   IGridControllerListener* mGridControllerOwner;
    
    UIGrid* mGrid;
    vector<string> mLabels;
@@ -99,5 +112,8 @@ private:
    std::array<int, kGridOverlayMaxDim*kGridOverlayMaxDim> mGridOverlay;
    
    std::list<ScriptModule*> mScriptListeners;
+   
+   Checkbox* mMomentaryCheckbox;
+   bool mMomentary;
 };
 

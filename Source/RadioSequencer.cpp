@@ -44,7 +44,7 @@ void RadioSequencer::CreateUIControls()
    mGrid = new UIGrid(5,23,200,170,mLength,8, this);
    mIntervalSelector = new DropdownList(this,"interval",5,3,(int*)(&mInterval));
    mLengthSelector = new DropdownList(this,"length",-1,-1,(int*)(&mLength));
-   mGridController = new GridController(this, "grid", -1, -1);
+   mGridControlTarget = new GridControlTarget(this, "grid", -1, -1);
    
    mGrid->SetHighlightCol(gTime, -1);
    mGrid->SetSingleColumnMode(true);
@@ -74,7 +74,7 @@ void RadioSequencer::CreateUIControls()
    mLengthSelector->AddLabel("128", 128);
    
    mLengthSelector->PositionTo(mIntervalSelector, kAnchor_Right);
-   mGridController->PositionTo(mLengthSelector, kAnchor_Right);
+   mGridControlTarget->PositionTo(mLengthSelector, kAnchor_Right);
    
    SyncControlCablesToGrid();
 }
@@ -97,16 +97,19 @@ void RadioSequencer::OnGridButton(int x, int y, float velocity, IGridController*
 
 void RadioSequencer::UpdateGridLights()
 {
-   for (int row=0; row<mGrid->GetRows(); ++row)
+   if (mGridControlTarget->GetGridController())
    {
-      for (int col=0; col<mGrid->GetCols(); ++col)
+      for (int row=0; row<mGrid->GetRows(); ++row)
       {
-         if (mGrid->GetVal(col, row) == 1)
-            mGridController->SetLight(col, row, GridColor::kGridColor1Bright);
-         else if (col == mGrid->GetHighlightCol(gTime))
-            mGridController->SetLight(col, row, GridColor::kGridColor1Dim);
-         else
-            mGridController->SetLight(col, row, GridColor::kGridColorOff);
+         for (int col=0; col<mGrid->GetCols(); ++col)
+         {
+            if (mGrid->GetVal(col, row) == 1)
+               mGridControlTarget->GetGridController()->SetLight(col, row, GridColor::kGridColor1Bright);
+            else if (col == mGrid->GetHighlightCol(gTime+gBufferSizeMs+TheTransport->GetEventLookaheadMs()))
+               mGridControlTarget->GetGridController()->SetLight(col, row, GridColor::kGridColor1Dim);
+            else
+               mGridControlTarget->GetGridController()->SetLight(col, row, GridColor::kGridColorOff);
+         }
       }
    }
 }
@@ -149,7 +152,7 @@ void RadioSequencer::DrawModule()
    mGrid->Draw();
    mIntervalSelector->Draw();
    mLengthSelector->Draw();
-   mGridController->Draw();
+   mGridControlTarget->Draw();
    
    for (int i=0; i<mControlCables.size(); ++i)
    {

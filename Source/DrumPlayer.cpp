@@ -39,7 +39,7 @@ DrumPlayer::DrumPlayer()
 , mOutputBuffer(gBufferSize)
 , mMonoOutput(false)
 , mMonoCheckbox(nullptr)
-, mGridController(nullptr)
+, mGridControlTarget(nullptr)
 , mNoteInputBuffer(this)
 , mNeedSetup(true)
 , mNoteRepeat(false)
@@ -80,7 +80,7 @@ void DrumPlayer::CreateUIControls()
    mAuditionSlider = new FloatSlider(this,"aud",140,50,40,15,&mAuditionInc,-1,1,0);
    mMonoCheckbox = new Checkbox(this,"mono",mVolSlider,kAnchor_Right_Padded,&mMonoOutput);
    mShuffleButton = new ClickButton(this,"shuffle",140,34);
-   mGridController = new GridController(this, "grid", 4, 50);
+   mGridControlTarget = new GridControlTarget(this, "grid", 4, 50);
    mQuantizeIntervalSelector = new DropdownList(this, "quantize", 200, 4, (int*)(&mQuantizeInterval));
    mNoteRepeatCheckbox = new Checkbox(this, "repeat", 200, 22, &mNoteRepeat);
 
@@ -685,7 +685,7 @@ void DrumPlayer::DrawModule()
    mSpeedRandomizationSlider->Draw();
    mKitSelector->Draw();
    mEditCheckbox->Draw();
-   mGridController->Draw();
+   mGridControlTarget->Draw();
 
    if (mEditMode)
    {
@@ -761,12 +761,15 @@ void DrumPlayer::UpdateLights()
          Sample* sample = nullptr;
          if (sampleIdx != -1)
             sample = &(mDrumHits[sampleIdx].mSample);
-         if (mDrumHits[sampleIdx].GetPlayProgress(gTime) < .75f)
-            mGridController->SetLight(x,y,kGridColor3Bright);
-         else if (sample)
-            mGridController->SetLight(x,y,kGridColor3Dim);
-         else
-            mGridController->SetLight(x,y,kGridColorOff);
+         if (mGridControlTarget->GetGridController())
+         {
+            if (mDrumHits[sampleIdx].GetPlayProgress(gTime) < .75f)
+               mGridControlTarget->GetGridController()->SetLight(x,y,kGridColor3Bright);
+            else if (sample)
+               mGridControlTarget->GetGridController()->SetLight(x,y,kGridColor3Dim);
+            else
+               mGridControlTarget->GetGridController()->SetLight(x,y,kGridColorOff);
+         }
       }
    }
 }

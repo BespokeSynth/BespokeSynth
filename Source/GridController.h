@@ -43,6 +43,7 @@ class IGridController
 {
 public:
    virtual ~IGridController() {}
+   virtual void SetGridControllerOwner(IGridControllerListener* owner) = 0;
    virtual void SetLight(int x, int y, GridColor color, bool force = false) = 0;
    virtual void SetLightDirect(int x, int y, int color, bool force = false) = 0;
    virtual void ResetLights() = 0;
@@ -50,27 +51,20 @@ public:
    virtual int NumRows() = 0;
    virtual bool HasInput() const = 0;
    virtual bool IsMultisliderGrid() const { return false; }
+   virtual bool IsConnected() const = 0;
 };
 
-class GridController : public IUIControl, public IGridController
+class GridControlTarget : public IUIControl
 {
 public:
-   GridController(IGridControllerListener* owner, const char* name, int x, int y);
-   ~GridController() {}
+   GridControlTarget(IGridControllerListener* owner, const char* name, int x, int y);
+   virtual ~GridControlTarget() {}
    
    void Render() override;
    static void DrawGridIcon(float x, float y);
    
-   void SetUp(GridLayout* layout, int page, MidiController* controller);
-   void UnhookController();
-   void SetLight(int x, int y, GridColor color, bool force = false) override;
-   void SetLightDirect(int x, int y, int color, bool force = false) override;
-   void ResetLights() override;
-   int NumCols() override { return mCols; }
-   int NumRows() override { return mRows; }
-   bool HasInput() const override;
-   //bool IsMultisliderGrid() const override { return mColors.empty(); }   //commented out... don't remember what types of grids this is supposed to be for
-   bool IsConnected() { return mController != nullptr; }
+   void SetGridController(IGridController* gridController) { mGridController = gridController; gridController->SetGridControllerOwner(mOwner); }
+   IGridController* GetGridController() { return mGridController; }
    
    //IUIControl
    void SetFromMidiCC(float slider, bool setViaModulator = false) override {}
@@ -80,14 +74,38 @@ public:
    void LoadState(FileStreamIn& in, bool shouldSetValue = true) override;
    bool IsSliderControl() override { return false; }
    bool IsButtonControl() override { return false; }
-
-   void OnControllerPageSelected();
-   void OnInput(int control, float velocity);
-   
 private:
    void GetDimensions(float& width, float& height) override { width = 30; height = 15; }
    bool MouseMoved(float x, float y) override;
    
+   IGridControllerListener* mOwner;
+   IGridController* mGridController;
+};
+
+class GridControllerMidi : public IGridController
+{
+public:
+   GridControllerMidi();
+   virtual ~GridControllerMidi() {}
+   
+   void SetUp(GridLayout* layout, int page, MidiController* controller);
+   void UnhookController();
+   
+   //IGridController
+   void SetGridControllerOwner(IGridControllerListener* owner) override { mOwner = owner; }
+   void SetLight(int x, int y, GridColor color, bool force = false) override;
+   void SetLightDirect(int x, int y, int color, bool force = false) override;
+   void ResetLights() override;
+   int NumCols() override { return mCols; }
+   int NumRows() override { return mRows; }
+   bool HasInput() const override;
+   //bool IsMultisliderGrid() const override { return mColors.empty(); }   //commented out... don't remember what types of grids this is supposed to be for
+   bool IsConnected() const override { return mMidiController != nullptr; }
+   
+   void OnControllerPageSelected();
+   void OnInput(int control, float velocity);
+   
+private:
    unsigned int mRows;
    unsigned int mCols;
    int mControls[MAX_GRIDCONTROLLER_COLS][MAX_GRIDCONTROLLER_ROWS];
@@ -95,7 +113,7 @@ private:
    int mLights[MAX_GRIDCONTROLLER_COLS][MAX_GRIDCONTROLLER_ROWS];
    vector<int> mColors;
    MidiMessageType mMessageType;
-   MidiController* mController;
+   MidiController* mMidiController;
    int mControllerPage;
    IGridControllerListener* mOwner;
 };

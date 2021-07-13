@@ -46,7 +46,7 @@ void PlaySequencer::CreateUIControls()
 {
    IDrawableModule::CreateUIControls();
 
-   mGridController = new GridController(this, "grid", mWidth - 50, 4);
+   mGridControlTarget = new GridControlTarget(this, "grid", mWidth - 50, 4);
 
    float width, height;
    UIBLOCK0();
@@ -110,7 +110,7 @@ void PlaySequencer::DrawModule()
    if (Minimized() || IsVisible() == false)
       return;
 
-   mGridController->Draw();
+   mGridControlTarget->Draw();
    mIntervalSelector->Draw();
    mWriteCheckbox->Draw();
    mNoteRepeatCheckbox->Draw();
@@ -332,41 +332,43 @@ void PlaySequencer::UpdateNumMeasures(int oldNumMeasures)
 
 void PlaySequencer::UpdateLights(bool betweener)
 {
-   if (mGridController == nullptr)
+   if (mGridControlTarget->GetGridController() == nullptr)
       return;
+   
+   IGridController* gridController = mGridControlTarget->GetGridController();
 
    for (int i = 0; i < 4; ++i)
-      mGridController->SetLight(i, 0, mWrite ? kGridColor2Bright : kGridColorOff);
+      gridController->SetLight(i, 0, mWrite ? kGridColor2Bright : kGridColorOff);
 
    for (int i = 0; i < 3; ++i)
-      mGridController->SetLight(i, 1, mNoteRepeat && !betweener ? kGridColor2Bright : kGridColorOff);
+      gridController->SetLight(i, 1, mNoteRepeat && !betweener ? kGridColor2Bright : kGridColorOff);
 
-   mGridController->SetLight(3, 1, mLinkColumns ? kGridColor2Bright : kGridColorOff);
+   gridController->SetLight(3, 1, mLinkColumns ? kGridColor2Bright : kGridColorOff);
 
-   mGridController->SetLight(0, 2, mNumMeasures == 1 ? kGridColor3Bright : kGridColorOff);
-   mGridController->SetLight(1, 2, mNumMeasures == 2 ? kGridColor3Bright : kGridColorOff);
-   mGridController->SetLight(2, 2, mNumMeasures == 4 ? kGridColor3Bright : kGridColorOff);
-   mGridController->SetLight(3, 2, mNumMeasures == 8 ? kGridColor3Bright : kGridColorOff);
+   gridController->SetLight(0, 2, mNumMeasures == 1 ? kGridColor3Bright : kGridColorOff);
+   gridController->SetLight(1, 2, mNumMeasures == 2 ? kGridColor3Bright : kGridColorOff);
+   gridController->SetLight(2, 2, mNumMeasures == 4 ? kGridColor3Bright : kGridColorOff);
+   gridController->SetLight(3, 2, mNumMeasures == 8 ? kGridColor3Bright : kGridColorOff);
 
-   mGridController->SetLight(0, 3, GetVelocityLevel() == 1 || GetVelocityLevel() == 3 ? kGridColor2Bright : kGridColorOff);
-   mGridController->SetLight(1, 3, GetVelocityLevel() == 2 || GetVelocityLevel() == 3 ? kGridColor2Bright : kGridColorOff);
+   gridController->SetLight(0, 3, GetVelocityLevel() == 1 || GetVelocityLevel() == 3 ? kGridColor2Bright : kGridColorOff);
+   gridController->SetLight(1, 3, GetVelocityLevel() == 2 || GetVelocityLevel() == 3 ? kGridColor2Bright : kGridColorOff);
 
-   mGridController->SetLight(3, 3, mClearLane ? kGridColor1Bright : kGridColorOff);
+   gridController->SetLight(3, 3, mClearLane ? kGridColor1Bright : kGridColorOff);
 
    int step = GetStep(gTime);
    for (int i = 0; i < 16; ++i)
    {
       int x = (i / 4) % 4 + 4;
       int y = i % 4;
-      mGridController->SetLight(x, y, step % 16 == i ? kGridColor3Bright : kGridColorOff);
+      gridController->SetLight(x, y, step % 16 == i ? kGridColor3Bright : kGridColorOff);
    }
 
    for (int i = 0; i < (int)mLanes.size(); ++i)
    {
       int x = i % 4 * 2;
       int y = 7 - i / 4;
-      mGridController->SetLight(x, y, mLanes[i].mIsPlaying ? kGridColor2Bright : kGridColorOff);
-      mGridController->SetLight(x + 1, y, mLanes[i].mMuteOrErase ? kGridColorOff : kGridColor1Bright);
+      gridController->SetLight(x, y, mLanes[i].mIsPlaying ? kGridColor2Bright : kGridColorOff);
+      gridController->SetLight(x + 1, y, mLanes[i].mMuteOrErase ? kGridColorOff : kGridColor1Bright);
    }
 }
 
@@ -388,7 +390,7 @@ void PlaySequencer::OnControllerPageSelected()
 
 void PlaySequencer::OnGridButton(int x, int y, float velocity, IGridController* grid)
 {
-   if (grid == mGridController)
+   if (grid == mGridControlTarget->GetGridController())
    {
       bool press = velocity > 0;
       if (x >= 0 && y >= 0)

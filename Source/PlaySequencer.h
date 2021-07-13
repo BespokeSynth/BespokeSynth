@@ -109,7 +109,7 @@ private:
    Checkbox* mLinkColumnsCheckbox;
    DropdownList* mNumMeasuresSelector;
    UIGrid* mGrid;
-   GridController* mGridController;
+   GridControlTarget* mGridControlTarget;
    NoteOffScheduler mNoteOffScheduler;
 
    struct PlayLane
