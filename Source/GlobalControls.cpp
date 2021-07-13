@@ -39,6 +39,11 @@ void GlobalControls::CreateUIControls()
    ENDUIBLOCK(mWidth, mHeight);
 }
 
+void GlobalControls::Poll()
+{
+   ComputeSliders(0);
+}
+
 void GlobalControls::DrawModule()
 {
    if (Minimized() || IsVisible() == false)

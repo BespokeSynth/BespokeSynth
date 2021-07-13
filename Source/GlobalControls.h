@@ -23,6 +23,7 @@ public:
 
    string GetTitleLabel() override { return "global controls"; }
    void CreateUIControls() override;
+   void Poll() override;
 
    void FloatSliderUpdated(FloatSlider* slider, float oldVal) override;
 
