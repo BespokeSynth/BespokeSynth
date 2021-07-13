@@ -148,4 +148,5 @@ private:
    ofVec2f mAutocompleteCaretCoords;
    bool mWantToShowAutocomplete;
    int mAutocompleteHighlightIndex;
+   bool mCodeUpdated;
 };

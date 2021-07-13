@@ -53,6 +53,7 @@ CodeEntry::CodeEntry(ICodeEntryListener* owner, const char* name, int x, int y, 
 , mAutocompleteUpdateTimer(0)
 , mWantToShowAutocomplete(false)
 , mAutocompleteHighlightIndex(0)
+, mCodeUpdated(false)
 {
    mCaretBlink = true;
    mCaretBlinkTimer = 0;
@@ -74,6 +75,32 @@ CodeEntry::~CodeEntry()
 
 void CodeEntry::Poll()
 {
+   if (mCodeUpdated)
+   {
+      if (mDoSyntaxHighlighting)
+      {
+         try
+         {
+            py::globals()["syntax_highlight_code"] = GetVisibleCode();
+            py::object ret = py::eval("syntax_highlight_basic()", py::globals());
+            mSyntaxHighlightMapping = ret.cast< std::vector<int> >();
+         }
+         catch (const std::exception &e)
+         {
+            ofLog() << "syntax highlight execution exception: " << e.what();
+         }
+      }
+      else
+      {
+         mSyntaxHighlightMapping.clear();
+      }
+
+      if (mListener)
+         mListener->OnCodeUpdated();
+      
+      mCodeUpdated = false;
+   }
+   
    if (mAutocompleteUpdateTimer > 0)
    {
       mAutocompleteUpdateTimer -= 1.0 / ofGetFrameRate();
@@ -674,26 +701,7 @@ void CodeEntry::OnPythonInit()
 
 void CodeEntry::OnCodeUpdated()
 {
-   if (mDoSyntaxHighlighting)
-   {
-      try
-      {
-         py::globals()["syntax_highlight_code"] = GetVisibleCode();
-         py::object ret = py::eval("syntax_highlight_basic()", py::globals());
-         mSyntaxHighlightMapping = ret.cast< std::vector<int> >();
-      }
-      catch (const std::exception &e)
-      {
-         ofLog() << "syntax highlight execution exception: " << e.what();
-      }
-   }
-   else
-   {
-      mSyntaxHighlightMapping.clear();
-   }
-
-   if (mListener)
-      mListener->OnCodeUpdated();
+   mCodeUpdated = true;
 }
 
 bool CodeEntry::IsAutocompleteShowing()
