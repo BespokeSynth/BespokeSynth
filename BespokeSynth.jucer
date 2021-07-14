@@ -1235,9 +1235,9 @@
   <EXPORTFORMATS>
     <XCODE_MAC targetFolder="Builds/MacOSX" vstFolder="~/SDKs/vstsdk2.4" extraDefs="BESPOKE_MAC"
                microphonePermissionNeeded="1" vstLegacyFolder="~/SDKs/VST_SDK/VST2_SDK"
-               extraLinkerFlags="-L/System/Library/Frameworks/Python.framework/Versions/2.7/lib/python2.7/config -lpython2.7 -ldl -framework CoreFoundation"
-               extraCompilerFlags="-iwithsysroot /System/Library/Frameworks/Python.framework/Versions/2.7/include/python2.7"
-               extraFrameworks="Python" smallIcon="h1Eo7f" bigIcon="h1Eo7f">
+               extraLinkerFlags="-L/Library/Frameworks/Python.framework/Versions/3.8/lib/python3.8/config-3.8-darwin -lpython3.8 -ldl -framework CoreFoundation"
+               extraCompilerFlags="-I/Library/Frameworks/Python.framework/Versions/3.8/include/python3.8"
+               smallIcon="h1Eo7f" bigIcon="h1Eo7f" extraCustomFrameworks="/Library/Frameworks/Python.framework">
       <CONFIGURATIONS>
         <CONFIGURATION name="Debug" isDebug="1" optimisation="1" targetName="Bespoke"
                        headerPath="../../Source/json/include&#10;../../Source/push2/&#10;../../Source/push2/libusb&#10;../../Source/push2/modules/libusb"
