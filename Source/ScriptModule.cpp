@@ -1384,8 +1384,9 @@ void ScriptModule::LineEventTracker::Draw(CodeEntry* codeEntry, int style, ofCol
 }
 
 ScriptReferenceDisplay::ScriptReferenceDisplay()
-   : mWidth(750)
-   , mHeight(700)
+: mWidth(750)
+, mHeight(335)
+, mMaxScrollAmount(0)
 {
    LoadText();
 }
@@ -1410,18 +1411,26 @@ void ScriptReferenceDisplay::LoadText()
       ofStringReplace(text, "\r", "");
       mText = ofSplitString(text, "\n");
    }
+   
+   mMaxScrollAmount = (int)mText.size() * 14;
 }
 
 void ScriptReferenceDisplay::DrawModule()
 {
    mCloseButton->Draw();
 
-   mHeight = 34;
+   float y = 34;
    for (size_t i = 0; i < mText.size(); ++i)
    {
-      DrawTextNormal(mText[i], 4, mHeight);
-      mHeight += 14;
+      DrawTextNormal(mText[i], 4-mScrollOffset.x, y-mScrollOffset.y);
+      y += 14;
    }
+}
+
+bool ScriptReferenceDisplay::MouseScrolled(int x, int y, float scrollX, float scrollY)
+{
+   mScrollOffset.y = ofClamp(mScrollOffset.y - scrollY * 10, 0, mMaxScrollAmount);
+   return true;
 }
 
 void ScriptReferenceDisplay::GetModuleDimensions(float& w, float& h)

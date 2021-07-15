@@ -276,6 +276,9 @@ private:
    void DrawModule() override;
    bool Enabled() const override { return true; }
    void GetModuleDimensions(float& w, float& h) override;
+   bool IsResizable() const override { return true; }
+   void Resize(float w, float h) override { mWidth = w; mHeight = h; }
+   bool MouseScrolled(int x, int y, float scrollX, float scrollY) override;
 
    void LoadText();
 
@@ -283,4 +286,6 @@ private:
    ClickButton* mCloseButton;
    float mWidth;
    float mHeight;
+   ofVec2f mScrollOffset;
+   float mMaxScrollAmount;
 };
