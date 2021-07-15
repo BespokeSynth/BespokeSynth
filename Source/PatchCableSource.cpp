@@ -129,9 +129,10 @@ void PatchCableSource::SetPatchCableTarget(PatchCable* cable, IClickable* target
 }
 
 void PatchCableSource::Clear()
-{ 
-   for (auto cable : mPatchCables)
-      delete cable;
+{
+   auto cablesToRemove = mPatchCables; //make copy of list
+   for (auto cable : cablesToRemove)
+      RemovePatchCable(cable);
    mPatchCables.clear();
 }
 
