@@ -177,6 +177,7 @@ VSTPlugin::~VSTPlugin()
 
 void VSTPlugin::Exit()
 {
+   IDrawableModule::Exit();
    if (mWindow)
    {
       VSTWindow* window = mWindow.release();

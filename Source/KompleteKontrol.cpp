@@ -42,6 +42,7 @@ KompleteKontrol::~KompleteKontrol()
 
 void KompleteKontrol::Exit()
 {
+   IDrawableModule::Exit();
    mKontrol.Exit();
 }
 
