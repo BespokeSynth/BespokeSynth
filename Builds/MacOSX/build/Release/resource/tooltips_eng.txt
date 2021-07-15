@@ -1643,6 +1643,12 @@ transport~controls tempo and current time position
 
 
 
+transposefrom~transpose input from a specified root to the root of the current scale. the primary usage of this would be to allow you to play a keyboard in C, but it gets transposed to the current scale.
+~root~root to transpose from
+~retrigger~immediately replay current notes when changing the transpose root or the scale
+
+
+
 splitter~splits a stereo signal into two mono signals, or duplicates a mono signal
 
 
