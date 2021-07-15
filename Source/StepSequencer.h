@@ -175,6 +175,8 @@ private:
    GridColor GetGridColor(int x, int y);
    void Step(double time, float velocity, int pulseFlags);
    bool HasGridController();
+   int GetGridControllerRows();
+   int GetGridControllerCols();
    
    struct HeldButton
    {

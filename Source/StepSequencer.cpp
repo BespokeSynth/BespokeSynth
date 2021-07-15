@@ -171,9 +171,9 @@ void StepSequencer::UpdateLights()
    if (!HasGridController() || mGridControlTarget->GetGridController() == nullptr)
       return;
    
-   for (int x=0; x<mGridControlTarget->GetGridController()->NumCols(); ++x)
+   for (int x=0; x<GetGridControllerCols(); ++x)
    {
-      for (int y=0; y<mGridControlTarget->GetGridController()->NumRows(); ++y)
+      for (int y=0; y<GetGridControllerRows(); ++y)
       {
          if (mGridControlTarget->GetGridController()->IsMultisliderGrid())
          {
@@ -278,14 +278,14 @@ void StepSequencer::OnControllerPageSelected()
 
 void StepSequencer::OnGridButton(int x, int y, float velocity, IGridController* grid)
 {
-   if (grid == mGridControlTarget->GetGridController())
+   if (mPush2Connected || grid == mGridControlTarget->GetGridController())
    {
       bool press = velocity > 0;
       if (x>=0 && y>=0)
       {
          Vec2i gridPos = ControllerToGrid(Vec2i(x,y));
          
-         if (grid->IsMultisliderGrid())
+         if (grid != nullptr && grid->IsMultisliderGrid())
          {
             mGrid->SetVal(gridPos.x, gridPos.y, velocity);
          }
@@ -343,8 +343,7 @@ void StepSequencer::OnGridButton(int x, int y, float velocity, IGridController* 
          UpdateMetaLights();
       }
    }
-   
-   if (grid == mVelocityGridController->GetGridController())
+   else if (grid == mVelocityGridController->GetGridController())
    {
       if (velocity > 0)
       {
@@ -356,8 +355,7 @@ void StepSequencer::OnGridButton(int x, int y, float velocity, IGridController* 
          UpdateVelocityLights();
       }
    }
-   
-   if (grid == mMetaStepGridController->GetGridController())
+   else if (grid == mMetaStepGridController->GetGridController())
    {
       if (velocity > 0)
       {
@@ -382,15 +380,36 @@ void StepSequencer::SetStep(int step, int pitch, int velocity)
    UpdateLights();
 }
 
+int StepSequencer::GetGridControllerRows()
+{
+   if (mPush2Connected)
+      return 8;
+   if (mGridControlTarget->GetGridController())
+      return mGridControlTarget->GetGridController()->NumRows();
+   return 8;
+}
+
+int StepSequencer::GetGridControllerCols()
+{
+   if (mPush2Connected)
+      return 8;
+   if (mGridControlTarget->GetGridController())
+      return mGridControlTarget->GetGridController()->NumCols();
+   return 8;
+}
+
 Vec2i StepSequencer::ControllerToGrid(const Vec2i& controller)
 {
    if (!HasGridController())
       return Vec2i(0,0);
    
+   int rows = GetGridControllerRows();
+   int cols = GetGridControllerCols();
+
    int numChunks = GetNumControllerChunks();
    int chunkSize = mGrid->GetRows() / numChunks;
-   int col = controller.x + (controller.y/chunkSize)*mGridControlTarget->GetGridController()->NumCols();
-   int row = (chunkSize-1)-(controller.y%chunkSize)+mGridYOff*chunkSize;
+   int col = controller.x + (controller.y/chunkSize) * cols;
+   int row = (chunkSize-1)-(controller.y%chunkSize) + mGridYOff*chunkSize;
    return Vec2i(col,row);
 }
 
@@ -399,8 +418,11 @@ int StepSequencer::GetNumControllerChunks()
    if (!HasGridController())
       return 1;
    
-   int numBreaks = int((mGrid->GetCols() / MAX(1.0f,mGridControlTarget->GetGridController()->NumCols())) + .5f);
-   int numChunks = int(mGrid->GetRows() / MAX(1.0f,(mGridControlTarget->GetGridController()->NumRows() / MAX(1,numBreaks)))+.5f);
+   int rows = GetGridControllerRows();
+   int cols = GetGridControllerCols();
+
+   int numBreaks = int((mGrid->GetCols() / MAX(1.0f, cols)) + .5f);
+   int numChunks = int(mGrid->GetRows() / MAX(1.0f,(rows / MAX(1,numBreaks)))+.5f);
    return numChunks;
 }
 
@@ -465,7 +487,7 @@ void StepSequencer::DrawModule()
       float squareh = float(mGrid->GetHeight())/mNumRows;
       float squarew = float(mGrid->GetWidth())/GetNumSteps(mStepInterval);
       int chunkSize = mGrid->GetRows() / GetNumControllerChunks();
-      float width = MIN(mGrid->GetWidth(), squarew * mGridControlTarget->GetGridController()->NumCols() * GetNumControllerChunks());
+      float width = MIN(mGrid->GetWidth(), squarew * GetGridControllerCols() * GetNumControllerChunks());
       ofRect(gridX,gridY+squareh*(mNumRows-chunkSize)-squareh*mGridYOff*chunkSize,width,squareh*chunkSize);
       ofPopStyle();
    }
