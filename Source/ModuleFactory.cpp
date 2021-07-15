@@ -368,7 +368,7 @@ ModuleFactory::ModuleFactory()
    REGISTER(NotePanRandom, notepanrandom, kModuleType_Note);
    REGISTER(PulseGate, pulsegate, kModuleType_Pulse);
    REGISTER(PulseHocket, pulsehocket, kModuleType_Pulse);
-   REGISTER(Push2Control, push2control, kModuleType_Instrument);
+   REGISTER(Push2Control, push2control, kModuleType_Other);
    REGISTER(PulseTrain, pulsetrain, kModuleType_Pulse);
    REGISTER(NoteLatch, notelatch, kModuleType_Note);
    REGISTER(ScriptModule, script, kModuleType_Other);
