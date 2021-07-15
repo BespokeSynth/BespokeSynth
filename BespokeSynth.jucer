@@ -914,6 +914,9 @@
         <FILE id="fQnkwG" name="TitleBar.h" compile="0" resource="0" file="Source/TitleBar.h"/>
         <FILE id="KgrIUI" name="Transport.cpp" compile="1" resource="0" file="Source/Transport.cpp"/>
         <FILE id="Dk0alc" name="Transport.h" compile="0" resource="0" file="Source/Transport.h"/>
+        <FILE id="Vw23Xt" name="TransposeFrom.cpp" compile="1" resource="0"
+              file="Source/TransposeFrom.cpp"/>
+        <FILE id="sREfoy" name="TransposeFrom.h" compile="0" resource="0" file="Source/TransposeFrom.h"/>
         <FILE id="RJM2hd" name="UnstableModWheel.cpp" compile="1" resource="0"
               file="Source/UnstableModWheel.cpp"/>
         <FILE id="AtPBmi" name="UnstableModWheel.h" compile="0" resource="0"

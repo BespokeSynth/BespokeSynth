@@ -215,6 +215,7 @@
 #include "PitchRemap.h"
 #include "ModulatorExpression.h"
 #include "SampleBrowser.h"
+#include "TransposeFrom.h"
 
 #define REGISTER(class,name,type) Register(#name, &(class::Create), &(class::CanCreate), type, false, false);
 #define REGISTER_HIDDEN(class,name,type) Register(#name, &(class::Create), &(class::CanCreate), type, true, false);
@@ -395,6 +396,7 @@ ModuleFactory::ModuleFactory()
    REGISTER(ModulatorExpression, expression, kModuleType_Modulator);
    REGISTER(SampleCanvas, samplecanvas, kModuleType_Synth);
    REGISTER(SampleBrowser, samplebrowser, kModuleType_Other);
+   REGISTER(TransposeFrom, transposefrom, kModuleType_Note);
 
    //REGISTER_EXPERIMENTAL(MidiPlayer, midiplayer, kModuleType_Instrument);
    REGISTER_EXPERIMENTAL(LoopStorer, loopstorer, kModuleType_Other);
