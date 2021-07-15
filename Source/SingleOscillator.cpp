@@ -55,6 +55,7 @@ SingleOscillator::SingleOscillator()
    mVoiceParams.mVelToVolume = .5f;
    mVoiceParams.mVelToEnvelope = .5f;
    mVoiceParams.mSoften = 0;
+   mVoiceParams.mLiteCPUMode = false;
    
    mPolyMgr.Init(kVoiceType_SingleOscillator, &mVoiceParams);
 }
