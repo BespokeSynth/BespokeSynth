@@ -44,16 +44,21 @@ private:
       bool mOn;
       int mVelocity;
       int mVoiceIdx;
+      int mOutputPitch;
    };
    
    //IDrawableModule
    void DrawModule() override;
-   void GetModuleDimensions(float& width, float& height) override { width = 110; height = 22; }
+   void GetModuleDimensions(float& width, float& height) override { width = mWidth; height = mHeight; }
    bool Enabled() const override { return mEnabled; }
    
+   float mWidth;
+   float mHeight;
    int mCapo;
    IntSlider* mCapoSlider;
    std::array<NoteInfo, 128> mInputNotes;
+   Checkbox* mRetriggerCheckbox;
+   bool mRetrigger;
 };
 
 

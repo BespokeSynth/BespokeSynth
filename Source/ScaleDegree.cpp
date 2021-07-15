@@ -10,17 +10,22 @@
 #include "OpenFrameworksPort.h"
 #include "Scale.h"
 #include "ModularSynth.h"
+#include "UIControlMacros.h"
 
 ScaleDegree::ScaleDegree()
 : mScaleDegree(0)
 , mScaleDegreeSelector(nullptr)
+, mRetrigger(false)
 {
 }
 
 void ScaleDegree::CreateUIControls()
 {
    IDrawableModule::CreateUIControls();
-   mScaleDegreeSelector = new DropdownList(this,"degree",5,2,&mScaleDegree);
+   UIBLOCK0();
+   DROPDOWN(mScaleDegreeSelector,"degree",&mScaleDegree,50);
+   CHECKBOX(mRetriggerCheckbox,"retrigger",&mRetrigger);
+   ENDUIBLOCK(mWidth, mHeight);
    
    mScaleDegreeSelector->AddLabel("-I", -7);
    mScaleDegreeSelector->AddLabel("-II", -6);
@@ -45,6 +50,7 @@ void ScaleDegree::DrawModule()
       return;
    
    mScaleDegreeSelector->Draw();
+   mRetriggerCheckbox->Draw();
 }
 
 void ScaleDegree::CheckboxUpdated(Checkbox *checkbox)
@@ -61,46 +67,22 @@ void ScaleDegree::PlayNote(double time, int pitch, int velocity, int voiceIdx, M
       return;
    }
    
-   if (velocity > 0)
+   if (pitch >= 0 && pitch < 128)
    {
-      bool found = false;
-      for (list<NoteInfo>::iterator iter = mInputNotes.begin(); iter != mInputNotes.end(); ++iter)
+      if (velocity > 0)
       {
-         if ((*iter).mPitch == pitch)
-         {
-            (*iter).mVelocity = velocity;
-            (*iter).mVoiceIdx = voiceIdx;
-            found = true;
-            break;
-         }
+         mInputNotes[pitch].mOn = true;
+         mInputNotes[pitch].mVelocity = velocity;
+         mInputNotes[pitch].mVoiceIdx = voiceIdx;
+         mInputNotes[pitch].mOutputPitch = TransformPitch(pitch);
       }
-      if (!found)
+      else
       {
-         mNotesMutex.lock();
-         NoteInfo note;
-         note.mPitch = pitch;
-         note.mVelocity = velocity;
-         note.mVoiceIdx = voiceIdx;
-         mInputNotes.push_back(note);
-         mNotesMutex.unlock();
+         mInputNotes[pitch].mOn = false;
       }
+      
+      PlayNoteOutput(time, mInputNotes[pitch].mOutputPitch, velocity, mInputNotes[pitch].mVoiceIdx, modulation);
    }
-   else
-   {
-      for (list<NoteInfo>::iterator iter = mInputNotes.begin(); iter != mInputNotes.end(); ++iter)
-      {
-         if ((*iter).mPitch == pitch)
-         {
-            mNotesMutex.lock();
-            mInputNotes.erase(iter);
-            mNotesMutex.unlock();
-            break;
-         }
-      }
-   }
-   
-   pitch = TransformPitch(pitch);
-   PlayNoteOutput(time, pitch, velocity, voiceIdx, modulation);
 }
 
 int ScaleDegree::TransformPitch(int pitch)
@@ -112,31 +94,24 @@ int ScaleDegree::TransformPitch(int pitch)
 
 void ScaleDegree::DropdownUpdated(DropdownList* slider, int oldVal)
 {
-   if (slider == mScaleDegreeSelector && mEnabled)
+   if (slider == mScaleDegreeSelector && mEnabled && mRetrigger)
    {
-      /*list<int> heldNotes = mNoteOutput.GetHeldNotesList();
-      
-      mNotesMutex.lock();
-      for (list<NoteInfo>::iterator iter = mInputNotes.begin(); iter != mInputNotes.end(); ++iter)
+      double time = gTime + gBufferSizeMs;
+      for (int pitch=0; pitch<128; ++pitch)
       {
-         const NoteInfo& note = *iter;
-         int pitch = TransformPitch(note.mPitch);
-         //PlayNoteOutput fix
-         PlayNoteOutput(gTime, pitch, note.mVelocity, note.mVoiceIdx);
-         heldNotes.remove(pitch);
+         if (mInputNotes[pitch].mOn)
+         {
+            PlayNoteOutput(time+.01, mInputNotes[pitch].mOutputPitch, 0, mInputNotes[pitch].mVoiceIdx, ModulationParameters());
+            mInputNotes[pitch].mOutputPitch = TransformPitch(pitch);
+            PlayNoteOutput(time, mInputNotes[pitch].mOutputPitch, mInputNotes[pitch].mVelocity, mInputNotes[pitch].mVoiceIdx, ModulationParameters());
+         }
       }
-      mNotesMutex.unlock();
-      
-      for (list<int>::iterator iter = heldNotes.begin(); iter != heldNotes.end(); ++iter)
-         PlayNoteOutput(gTime,*iter,0,-1);*/
-      mNoteOutput.Flush(gTime);
    }
 }
 
 void ScaleDegree::LoadLayout(const ofxJSONElement& moduleInfo)
 {
    mModuleSaveData.LoadString("target", moduleInfo);
-   mModuleSaveData.LoadInt("degree", moduleInfo, 0, -7, 7);
    
    SetUpFromSaveData();
 }
@@ -144,5 +119,4 @@ void ScaleDegree::LoadLayout(const ofxJSONElement& moduleInfo)
 void ScaleDegree::SetUpFromSaveData()
 {
    SetUpPatchCables(mModuleSaveData.GetString("target"));
-   mScaleDegree = mModuleSaveData.GetInt("degree");
 }

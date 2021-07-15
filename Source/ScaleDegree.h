@@ -37,22 +37,27 @@ public:
 private:
    struct NoteInfo
    {
-      int mPitch;
+      NoteInfo() : mOn(false), mVelocity(0), mVoiceIdx(-1) {}
+      int mOn;
       int mVelocity;
       int mVoiceIdx;
+      int mOutputPitch;
    };
    
    int TransformPitch(int pitch);
    
    //IDrawableModule
    void DrawModule() override;
-   void GetModuleDimensions(float& width, float& height) override { width = 110; height = 22; }
+   void GetModuleDimensions(float& width, float& height) override { width = mWidth; height = mHeight; }
    bool Enabled() const override { return mEnabled; }
    
+   float mWidth;
+   float mHeight;
    int mScaleDegree;
    DropdownList* mScaleDegreeSelector;
-   std::list<NoteInfo> mInputNotes;
-   ofMutex mNotesMutex;
+   std::array<NoteInfo, 128> mInputNotes;
+   Checkbox* mRetriggerCheckbox;
+   bool mRetrigger;
 };
 
 #endif /* defined(__Bespoke__ScaleDegree__) */

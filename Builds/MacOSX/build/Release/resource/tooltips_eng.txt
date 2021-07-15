@@ -1365,6 +1365,7 @@ scaledetect~detect which scales fit a collection of entered notes. the last play
 
 scaledegree~transpose input based on current scale
 ~degree~amount to transpose
+~retrigger~immediately replay current notes when changing the transpose amount
 
 
 
@@ -1593,6 +1594,7 @@ chorddisplayer~display which chord is playing, in the context of the current sca
 
 capo~shifts incoming notes by semitones
 ~capo~number of semitones to shift
+~retrigger~immediately replay current notes when changing the capo amount
 
 
 
