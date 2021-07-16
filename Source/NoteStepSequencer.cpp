@@ -117,6 +117,7 @@ void NoteStepSequencer::CreateUIControls()
    
    mNoteModeSelector->AddLabel("scale", kNoteMode_Scale);
    mNoteModeSelector->AddLabel("chromatic", kNoteMode_Chromatic);
+   mNoteModeSelector->AddLabel("pentatonic", kNoteMode_Pentatonic);
    mNoteModeSelector->AddLabel("5ths", kNoteMode_Fifths);
    
    mGrid->SetSingleColumnMode(true);
@@ -404,6 +405,18 @@ int NoteStepSequencer::RowToPitch(int row)
          return TheScale->GetPitchFromTone(row+mOctave*numPitchesInScale+TheScale->GetScaleDegree());
       case kNoteMode_Chromatic:
          return row + mOctave * TheScale->GetTet();
+      case kNoteMode_Pentatonic:
+      {
+         bool isMinor = TheScale->IsInScale(TheScale->ScaleRoot() + 3);
+         const int minorPentatonic[5] = { 0, 3, 5, 7, 10 };
+         const int majorPentatonic[5] = { 0, 2, 4, 7, 9 };
+
+         if (isMinor)
+            return TheScale->ScaleRoot() + (row / 5 + mOctave) * TheScale->GetTet() + minorPentatonic[row % 5];
+         else
+            return TheScale->ScaleRoot() + (row / 5 + mOctave) * TheScale->GetTet() + majorPentatonic[row % 5];
+
+      }
       case kNoteMode_Fifths:
       {
          int oct = (row/2)*numPitchesInScale;

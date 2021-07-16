@@ -123,6 +123,7 @@ private:
    {
       kNoteMode_Scale,
       kNoteMode_Chromatic,
+      kNoteMode_Pentatonic,
       kNoteMode_Fifths
    };
    
