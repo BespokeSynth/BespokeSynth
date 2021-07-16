@@ -744,7 +744,10 @@ void Push2Control::DrawControls(vector<IUIControl*> controls, bool sliders, floa
       ModuleType moduleType = controls[i]->GetModuleParent()->GetModuleType();
       if (mScreenDisplayMode == ScreenDisplayMode::kAddModule)
          moduleType = GetModuleTypeForSpawnList(controls[i]);
-      ofSetColor(IDrawableModule::GetColor(moduleType));
+      if (controls[i]->IsShowing())
+         ofSetColor(IDrawableModule::GetColor(moduleType));
+      else
+         ofSetColor(100, 100, 100);
       
       if (mDisplayModule == this)
          DrawTextBold(juce::String(controls[i]->Path()).replace("~","\n").toRawUTF8(), kColumnSpacing * i + 3, yPos-12, 10);
