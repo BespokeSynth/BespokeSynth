@@ -1649,6 +1649,13 @@ transposefrom~transpose input from a specified root to the root of the current s
 
 
 
+
+notestepper~output notes through a round robin of patch cables, to create sequential variety
+~length~length of the sequence
+
+
+
+
 splitter~splits a stereo signal into two mono signals, or duplicates a mono signal
 
 
