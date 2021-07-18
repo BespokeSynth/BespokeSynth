@@ -13,8 +13,15 @@
 
 OutputChannel::OutputChannel()
 : IAudioProcessor(gBufferSize)
+, mWidth(64)
+, mHeight(40)
 , mChannelSelectionIndex(0)
 {
+   for (size_t i=0; i<mLevelMeters.size(); ++i)
+   {
+      mLevelMeters[i].mPeakTrackerSlow.SetDecayTime(3);
+      mLevelMeters[i].mPeakTrackerSlow.SetLimit(1);
+   }
 }
 
 OutputChannel::~OutputChannel()
@@ -40,7 +47,7 @@ void OutputChannel::CreateUIControls()
 
 void OutputChannel::Process(double time)
 {
-   int numChannels = mChannelSelectionIndex < mStereoSelectionOffset ? 1 : 2;
+   int numChannels = GetNumChannels();
 
    SyncBuffers(numChannels);
 
@@ -51,6 +58,9 @@ void OutputChannel::Process(double time)
       if (channel >= 0 && channel < TheSynth->GetNumOutputChannels())
          Add(TheSynth->GetOutputBuffer(channel), GetBuffer()->GetChannel(0), gBufferSize);
       GetVizBuffer()->WriteChunk(GetBuffer()->GetChannel(0), gBufferSize, 0);
+      
+      mLevelMeters[0].mPeakTracker.Process(TheSynth->GetOutputBuffer(channel), gBufferSize);
+      mLevelMeters[0].mPeakTrackerSlow.Process(TheSynth->GetOutputBuffer(channel), gBufferSize);
    }
    else  //stereo
    {
@@ -67,6 +77,11 @@ void OutputChannel::Process(double time)
          Add(TheSynth->GetOutputBuffer(channel2), GetBuffer()->GetChannel(inputChannel2), gBufferSize);
          GetVizBuffer()->WriteChunk(GetBuffer()->GetChannel(inputChannel2), gBufferSize, 1);
       }
+      
+      mLevelMeters[0].mPeakTracker.Process(TheSynth->GetOutputBuffer(channel1), gBufferSize);
+      mLevelMeters[0].mPeakTrackerSlow.Process(TheSynth->GetOutputBuffer(channel1), gBufferSize);
+      mLevelMeters[1].mPeakTracker.Process(TheSynth->GetOutputBuffer(channel2), gBufferSize);
+      mLevelMeters[1].mPeakTrackerSlow.Process(TheSynth->GetOutputBuffer(channel2), gBufferSize);
    }
 
    GetBuffer()->Reset();
@@ -75,6 +90,41 @@ void OutputChannel::Process(double time)
 void OutputChannel::DrawModule()
 {
    mChannelSelector->Draw();
+   
+   if (GetNumChannels() == 1)
+      mHeight = 30;
+   else
+      mHeight = 40;
+   
+   for (int i=0; i<GetNumChannels(); ++i)
+   {
+      const int kNumSegments = 20;
+      const int kPaddingOutside = 3;
+      const int kPaddingBetween = 1;
+      const int kBarHeight = 8;
+      const float kSegmentWidth = (mWidth - kPaddingOutside*2) / kNumSegments;
+      for (int j=0; j<kNumSegments; ++j)
+      {
+         ofPushStyle();
+         ofFill();
+         float level = mLevelMeters[i].mPeakTracker.GetPeak();
+         float slowLevel = mLevelMeters[i].mPeakTrackerSlow.GetPeak();
+         ofColor color(0, 255, 0);
+         if (j > kNumSegments - 3)
+            color.set(255, 0, 0);
+         else if (j > kNumSegments - 6)
+            color.set(255, 255, 0);
+         
+         if (slowLevel > 0 && ofClamp(int(slowLevel * kNumSegments), 0, kNumSegments-1) == j)
+            ofSetColor(color);
+         else if (level > 0 && level >= j/(float)kNumSegments)
+            ofSetColor(color * .9f);
+         else
+            ofSetColor(color * .5f);
+         ofRect(kPaddingOutside+kSegmentWidth*j, 20+i*(kBarHeight+2), kSegmentWidth-kPaddingBetween, kBarHeight, 0);
+         ofPopStyle();
+      }
+   }
 }
 
 void OutputChannel::LoadLayout(const ofxJSONElement& moduleInfo)

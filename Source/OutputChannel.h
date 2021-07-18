@@ -13,6 +13,7 @@
 #include "IAudioProcessor.h"
 #include "IDrawableModule.h"
 #include "DropdownList.h"
+#include "PeakTracker.h"
 
 class OutputChannel : public IAudioProcessor, public IDrawableModule, public IDropdownListener
 {
@@ -38,12 +39,26 @@ public:
 private:
    //IDrawableModule
    void DrawModule() override;
-   void GetModuleDimensions(float& width, float& height) override { width=64; height=20; }
+   void GetModuleDimensions(float& width, float& height) override { width=mWidth; height=mHeight; }
    bool Enabled() const override { return true; }
    
+   int GetNumChannels() const { return mChannelSelectionIndex < mStereoSelectionOffset ? 1 : 2; }
+   
+   float mWidth;
+   float mHeight;
    DropdownList* mChannelSelector;
    int mChannelSelectionIndex;
    int mStereoSelectionOffset;
+   
+   struct LevelMeter
+   {
+      float mLevel;
+      float mMaxLevel;
+      PeakTracker mPeakTracker;
+      PeakTracker mPeakTrackerSlow;
+   };
+   
+   std::array<LevelMeter,2> mLevelMeters;
 };
 
 #endif /* defined(__modularSynth__OutputChannel__) */
