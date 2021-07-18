@@ -86,6 +86,8 @@ void IDrawableModule::CreateUIControls()
       mMainPatchCableSource = new PatchCableSource(this, type);
       mPatchCableSources.push_back(mMainPatchCableSource);
    }
+   
+   GetMinimizedWidth(); //update cached width
 }
 
 void IDrawableModule::Init()
