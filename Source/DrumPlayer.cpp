@@ -281,7 +281,7 @@ void DrumPlayer::Process(double time)
    
    int bufferSize = gBufferSize;
    
-   float volSq = mVolume * mVolume;
+   float volSq = mVolume * mVolume * .5f;
    
    mOutputBuffer.Clear();
    
