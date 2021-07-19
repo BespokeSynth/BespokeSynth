@@ -1123,12 +1123,12 @@ void Looper::FloatSliderUpdated(FloatSlider* slider, float oldVal)
 {
    if (slider == mScratchSpeedSlider)
    {
-      if (!mAllowScratch)
+      if (!mAllowScratch && !TheSynth->IsLoadingState())
          mScratchSpeed = 1;
    }
    if (slider == mFourTetSlider)
    {
-      if (mFourTet == 0)
+      if (mFourTet == 0 && !TheSynth->IsLoadingState())
          mLoopPosOffset = 0;
    }
    if (slider == mVolSlider)
