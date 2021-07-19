@@ -1888,7 +1888,15 @@ MidiController* ModularSynth::FindMidiController(string name, bool fail)
 
 IUIControl* ModularSynth::FindUIControl(string path)
 {
-   return mModuleContainer.FindUIControl(path);
+   if (path == "")
+      return nullptr;
+   if (path[0] == '$')
+   {
+      if (Prefab::sLoadingPrefab)
+         return nullptr;
+      return mModuleContainer.FindUIControl(path.substr(1, path.length() - 1));
+   }
+   return mModuleContainer.FindUIControl(IClickable::sLoadContext+path);
 }
 
 void ModularSynth::GrabSample(ChannelBuffer* data, bool window, int numBars)

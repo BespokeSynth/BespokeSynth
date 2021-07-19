@@ -184,7 +184,7 @@ void FloatSliderLFOControl::DrawModule()
 
 void FloatSliderLFOControl::SetLFOEnabled(bool enabled)
 {
-   if (enabled && !mEnabled)  //if turning on
+   if (enabled && !mEnabled && !TheSynth->IsLoadingState())  //if turning on
    {
       if (mTarget)
       {

@@ -836,7 +836,7 @@ void FloatSlider::LoadState(FileStreamIn& in, bool shouldSetValue)
       }
    }
    
-   if (shouldSetValue)
+   if (shouldSetValue && (mModulator == nullptr || !mModulator->Active()))
       SetValueDirect(var);
 }
 

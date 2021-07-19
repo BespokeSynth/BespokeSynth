@@ -83,31 +83,34 @@ void IModulator::InitializeRange()
 {
    if (mTarget != nullptr)
    {
-      if (!TheSynth->IsLoadingModule())
+      if (!TheSynth->IsLoadingState())
       {
-         if (InitializeWithZeroRange())
+         if (!TheSynth->IsLoadingModule())
          {
-            GetMin() = mTarget->GetValue();
-            GetMax() = mTarget->GetValue();
+            if (InitializeWithZeroRange())
+            {
+               GetMin() = mTarget->GetValue();
+               GetMax() = mTarget->GetValue();
+            }
+            else
+            {
+               GetMin() = mTarget->GetMin();
+               GetMax() = mTarget->GetMax();
+            }
          }
-         else
+         
+         if (mMinSlider)
          {
-            GetMin() = mTarget->GetMin();
-            GetMax() = mTarget->GetMax();
+            mMinSlider->SetExtents(mTarget->GetMin(), mTarget->GetMax());
+            mMinSlider->SetMode(mTarget->GetMode());
+            mMinSlider->SetVar(&GetMin());
          }
-      }
-      
-      if (mMinSlider)
-      {
-         mMinSlider->SetExtents(mTarget->GetMin(), mTarget->GetMax());
-         mMinSlider->SetMode(mTarget->GetMode());
-         mMinSlider->SetVar(&GetMin());
-      }
-      if (mMaxSlider)
-      {
-         mMaxSlider->SetExtents(mTarget->GetMin(), mTarget->GetMax());
-         mMaxSlider->SetMode(mTarget->GetMode());
-         mMaxSlider->SetVar(&GetMax());
+         if (mMaxSlider)
+         {
+            mMaxSlider->SetExtents(mTarget->GetMin(), mTarget->GetMax());
+            mMaxSlider->SetMode(mTarget->GetMode());
+            mMaxSlider->SetVar(&GetMax());
+         }
       }
    }
 }

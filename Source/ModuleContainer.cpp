@@ -536,6 +536,9 @@ void ModuleContainer::SaveState(FileStreamOut& out)
 
 void ModuleContainer::LoadState(FileStreamIn& in)
 {
+   bool wasLoadingState = TheSynth->IsLoadingState();
+   TheSynth->SetIsLoadingState(true);
+   
    int header;
    in >> header;
    assert(header == kSaveStateRev);
@@ -607,6 +610,7 @@ void ModuleContainer::LoadState(FileStreamIn& in)
       module->PostLoadState();
 
    IClickable::ClearLoadContext();
+   TheSynth->SetIsLoadingState(wasLoadingState);
 }
 
 //static

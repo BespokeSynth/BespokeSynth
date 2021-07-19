@@ -181,6 +181,7 @@ public:
    
    bool IsLoadingState() const { return mIsLoadingState; }
    bool IsLoadingModule() const { return mIsLoadingModule; }
+   void SetIsLoadingState(bool loading) { mIsLoadingState = loading; }
    
    static string GetUserPrefsPath(bool relative);
    static void CrashHandler(void*);
