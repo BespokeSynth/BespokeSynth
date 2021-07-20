@@ -432,6 +432,10 @@ PatchCablePos PatchCable::GetPatchCablePos()
       mTarget->GetPosition(xThat,yThat);
       
       IDrawableModule* targetModuleParent = dynamic_cast<IDrawableModule*>(mTarget->GetParent());
+      ModuleContainer* targetModuleParentContainer = targetModuleParent ? targetModuleParent->GetOwningContainer() : nullptr;
+      IDrawableModule* targetModuleParentContainerModule = targetModuleParentContainer ? targetModuleParentContainer->GetOwner() : nullptr;
+      if (targetModuleParentContainerModule && targetModuleParentContainerModule->Minimized())
+         targetModuleParent = targetModuleParentContainerModule;
       if (targetModuleParent && (targetModuleParent->Minimized() || mTarget->IsShowing() == false))
       {
          targetModuleParent->GetPosition(xThat, yThat);

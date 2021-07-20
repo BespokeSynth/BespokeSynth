@@ -256,8 +256,15 @@ void PatchCableSource::Render()
 
          if (mParentMinimized)
          {
-            if (mPatchCables[i]->GetOwningModule() != nullptr && mPatchCables[i]->GetTarget() != nullptr && mPatchCables[i]->GetOwningModule()->GetParent() == mPatchCables[i]->GetTarget()->GetParent())
-               continue;   //this is an internally-patched cable in a minimized module
+            IDrawableModule* owningModule = mPatchCables[i]->GetOwningModule();
+            IClickable* target = mPatchCables[i]->GetTarget();
+            if (owningModule != nullptr && target != nullptr)
+            {
+               ModuleContainer* owningModuleContainer = owningModule->GetOwningContainer();
+               ModuleContainer* targetContainer = target->GetModuleParent()->GetOwningContainer();
+               if (owningModuleContainer == targetContainer)
+                  continue;   //this is an internally-patched cable in a minimized module
+            }
          }
       }
 
