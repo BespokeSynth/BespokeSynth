@@ -59,7 +59,7 @@ void PatchCable::Render()
    
    float lineWidth = 1;
    float plugWidth = 4;
-   int lineAlpha = 100;
+   float lineAlpha = .4f;
    
    bool fatCable = false;
    
@@ -125,7 +125,7 @@ void PatchCable::Render()
    {
       lineWidth = 1;
       plugWidth = 5;
-      lineAlpha = 255;
+      lineAlpha = 1;
    }
    
    if (mHovered || mDragging)
@@ -140,7 +140,7 @@ void PatchCable::Render()
    if (mHoveringOnSource)
       lineColor = ofColor::lerp(lineColor, ofColor::white, .5f);
    ofColor lineColorAlphaed = lineColor;
-   lineColorAlphaed.a = lineAlpha;
+   lineColorAlphaed.a *= lineAlpha;
    
    float wThis,hThis,xThis,yThis;
    GetDimensions(wThis,hThis);

@@ -2542,5 +2542,8 @@ void ControlLayoutElement::Setup(MidiController* owner, MidiMessageType type, in
       mControlCable = new PatchCableSource(owner, kConnectionType_UIControl);
       owner->AddPatchCableSource(mControlCable);
       mControlCable->SetPatchCableDrawMode(kPatchCableDrawMode_SourceOnHoverOnly);
+      ofColor color = mControlCable->GetColor();
+      color.a *= .2f;
+      mControlCable->SetColor(color);
    }
 }
