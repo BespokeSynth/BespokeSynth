@@ -1302,9 +1302,9 @@
       </MODULEPATHS>
     </VS2015>
     <LINUX_MAKE targetFolder="Builds/LinuxMakefile" extraDefs="GLEW_STATIC&#10;GL_GLEXT_PROTOTYPES&#10;BESPOKE_LINUX"
-                externalLibraries="usb-1.0" extraCompilerFlags="&#96;python-config --cflags&#96; -fvisibility=hidden"
-                extraLinkerFlags="&#96;python-config --ldflags&#96;" smallIcon="h1Eo7f"
-                bigIcon="h1Eo7f">
+                externalLibraries="usb-1.0" extraCompilerFlags="&#96;python3-config --cflags&#96; -fvisibility=hidden -fPIE"
+                extraLinkerFlags="&#96;python3-config --ldflags --embed&#96;"
+                smallIcon="h1Eo7f" bigIcon="h1Eo7f">
       <CONFIGURATIONS>
         <CONFIGURATION isDebug="1" name="Debug" headerPath="../../Source/json/include&#10;../../Source/glew/include&#10;../../Source/push2/&#10;../../Source/push2/libusb&#10;../../Source/push2/modules/libusb"
                        libraryPath="/usr/lib/x86_64-linux-gnu/"/>
