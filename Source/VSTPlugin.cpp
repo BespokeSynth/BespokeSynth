@@ -391,7 +391,6 @@ void VSTPlugin::Process(double time)
    int inputChannels = MAX(2, mNumInputs);
    GetBuffer()->SetNumActiveChannels(inputChannels);
    
-   ComputeSliders(0);
    SyncBuffers();
    
    const int kSafetyMaxChannels = 16; //hitting a crazy issue (memory stomp?) where numchannels is getting blown out sometimes
@@ -408,6 +407,9 @@ void VSTPlugin::Process(double time)
    if (mEnabled && mPlugin != nullptr)
    {
       mVSTMutex.lock();
+
+      ComputeSliders(0);
+
       {
          const juce::ScopedLock lock(mMidiInputLock);
          
