@@ -10,6 +10,7 @@
 #include "OpenFrameworksPort.h"
 #include "SynthGlobals.h"
 #include "Profiler.h"
+#include "UIControlMacros.h"
 
 DistortionEffect::DistortionEffect()
 : mType(kClean)
@@ -17,7 +18,8 @@ DistortionEffect::DistortionEffect()
 , mClipSlider(nullptr)
 , mPreamp(1.0f)
 , mPreampSlider(nullptr)
-, mDCAdjust(0)
+, mFuzzAmount(0)
+, mRemoveInputDC(true)
 {
    SetClip(.5f);
    
@@ -26,15 +28,21 @@ DistortionEffect::DistortionEffect()
       mDCRemover[i].SetFilterParams(10, sqrt(2)/2);
       mDCRemover[i].SetFilterType(kFilterType_Highpass);
       mDCRemover[i].UpdateFilterCoeff();
+
+      mPeakTracker[i].SetDecayTime(.1f);
    }
 }
 
 void DistortionEffect::CreateUIControls()
 {
    IDrawableModule::CreateUIControls();
-   mTypeDropdown = new DropdownList(this,"type", 5, 40, (int*)(&mType));
-   mClipSlider = new FloatSlider(this,"clip",5,20,80,15,&mClip,0.001f,1);
-   mPreampSlider = new FloatSlider(this,"preamp",5,4,80,15,&mPreamp,1,10);
+   UIBLOCK0();
+   DROPDOWN(mTypeDropdown, "type", (int*)(&mType), 50);
+   FLOATSLIDER(mClipSlider, "clip", &mClip, 0.001f, 1);
+   FLOATSLIDER(mPreampSlider, "preamp", &mPreamp, 1, 10);
+   FLOATSLIDER(mFuzzAmountSlider, "fuzz", &mFuzzAmount, -1, 1);
+   CHECKBOX(mRemoveInputDCCheckbox, "center input", &mRemoveInputDC);
+   ENDUIBLOCK(mWidth, mHeight);
    
    mTypeDropdown->AddLabel("clean", kClean);
    mTypeDropdown->AddLabel("warm", kWarm);
@@ -58,34 +66,37 @@ void DistortionEffect::ProcessAudio(double time, ChannelBuffer* buffer)
    
    for (int ch=0; ch<buffer->NumActiveChannels(); ++ch)
    {
-      mDCRemover[ch].Filter(buffer->GetChannel(ch), bufferSize);
+      if (mRemoveInputDC)
+         mDCRemover[ch].Filter(buffer->GetChannel(ch), bufferSize);
+
+      mPeakTracker[ch].Process(buffer->GetChannel(ch), bufferSize);
       
       if (mType == kDirty)
       {
          for (int i=0; i<bufferSize; ++i)
          {
-            buffer->GetChannel(ch)[i] = (ofClamp((buffer->GetChannel(ch)[i]+mDCAdjust) * mPreamp * mGain, -1, 1)) / mGain;
+            buffer->GetChannel(ch)[i] = (ofClamp((buffer->GetChannel(ch)[i] + mFuzzAmount * mPeakTracker[ch].GetPeak()) * mPreamp * mGain, -1, 1)) / mGain;
          }
       }
       else if (mType == kClean)
       {
          for (int i=0; i<bufferSize; ++i)
          {
-            buffer->GetChannel(ch)[i] = tanh((buffer->GetChannel(ch)[i]+mDCAdjust) * mPreamp * mGain) / mGain;
+            buffer->GetChannel(ch)[i] = tanh((buffer->GetChannel(ch)[i] + mFuzzAmount * mPeakTracker[ch].GetPeak()) * mPreamp * mGain) / mGain;
          }
       }
       else if (mType == kWarm)
       {
          for (int i=0; i<bufferSize; ++i)
          {
-            buffer->GetChannel(ch)[i] = sin((buffer->GetChannel(ch)[i]+mDCAdjust) * mPreamp * mGain) / mGain;
+            buffer->GetChannel(ch)[i] = sin((buffer->GetChannel(ch)[i] + mFuzzAmount * mPeakTracker[ch].GetPeak()) * mPreamp * mGain) / mGain;
          }
       }
       else if (mType == kGrungy)
       {
          for (int i = 0; i < bufferSize; ++i)
          {
-            buffer->GetChannel(ch)[i] = asin(ofClamp((buffer->GetChannel(ch)[i] + mDCAdjust) * mPreamp * mGain, -1, 1)) / mGain;
+            buffer->GetChannel(ch)[i] = asin(ofClamp((buffer->GetChannel(ch)[i] +  mFuzzAmount * mPeakTracker[ch].GetPeak()) * mPreamp * mGain, -1, 1)) / mGain;
          }
       }
       //soft and asymmetric from http://www.music.mcgill.ca/~gary/courses/projects/618_2009/NickDonaldson/#Distortion
@@ -93,7 +104,7 @@ void DistortionEffect::ProcessAudio(double time, ChannelBuffer* buffer)
       {
          for (int i=0; i<bufferSize; ++i)
          {
-            float sample = (buffer->GetChannel(ch)[i]+mDCAdjust) * mPreamp * mGain;
+            float sample = (buffer->GetChannel(ch)[i] + mFuzzAmount * mPeakTracker[ch].GetPeak()) * mPreamp * mGain;
             if (sample > 1)
                sample = .66666f;
             else if (sample < -1)
@@ -107,7 +118,7 @@ void DistortionEffect::ProcessAudio(double time, ChannelBuffer* buffer)
       {
          for (int i=0; i<bufferSize; ++i)
          {
-            float sample = (buffer->GetChannel(ch)[i]*.5f+mDCAdjust) * mPreamp * mGain;
+            float sample = (buffer->GetChannel(ch)[i]*.5f+ mFuzzAmount * mPeakTracker[ch].GetPeak()) * mPreamp * mGain;
             if (sample >= .320018f)
                sample = .630035f;
             else if (sample >= -.08905f)
@@ -123,7 +134,7 @@ void DistortionEffect::ProcessAudio(double time, ChannelBuffer* buffer)
       {
          for (int i=0; i<bufferSize; ++i)
          {
-            float sample = ofClamp((buffer->GetChannel(ch)[i]*.5f+mDCAdjust) * mPreamp * mGain, -100, 100);
+            float sample = ofClamp((buffer->GetChannel(ch)[i]*.5f+ mFuzzAmount * mPeakTracker[ch].GetPeak()) * mPreamp * mGain, -100, 100);
             while (sample > 1 || sample < -1)
             {
                if (sample > 1)
@@ -145,16 +156,8 @@ void DistortionEffect::SetClip(float amount)
 
 void DistortionEffect::GetModuleDimensions(float& width, float& height)
 {
-   if (mEnabled)
-   {
-      width = 90;
-      height = 60;
-   }
-   else
-   {
-      width = 90;
-      height = 0;
-   }
+   width = mWidth;
+   height = mHeight;
 }
 
 void DistortionEffect::DrawModule()
@@ -165,6 +168,8 @@ void DistortionEffect::DrawModule()
    mClipSlider->Draw();
    mTypeDropdown->Draw();
    mPreampSlider->Draw();
+   mRemoveInputDCCheckbox->Draw();
+   mFuzzAmountSlider->Draw();
 }
 
 float DistortionEffect::GetEffectAmount()

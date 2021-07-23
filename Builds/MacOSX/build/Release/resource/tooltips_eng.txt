@@ -870,6 +870,8 @@ distortion~waveshaping distortion
 ~type~style of distortion to apply
 ~clip~cutoff point of distortion, lower values result in more extreme distortion
 ~preamp~signal gain before feeding into distortion
+~fuzz~push input signal off-center to distort asymmetrically
+~center input~remove dc offset from input signal to distort in a more controlled way
 
 
 

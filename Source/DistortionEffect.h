@@ -15,6 +15,7 @@
 #include "Slider.h"
 #include "DropdownList.h"
 #include "BiquadFilter.h"
+#include "PeakTracker.h"
 
 class DistortionEffect : public IAudioEffect, public IFloatSliderListener, public IDropdownListener
 {
@@ -53,19 +54,24 @@ private:
    void GetModuleDimensions(float& width, float& height) override;
    void DrawModule() override;
    bool Enabled() const override { return mEnabled; }
-   
+
+   float mWidth;
+   float mHeight;
    
    DistortionType mType;
    float mClip;
    float mGain;
    float mPreamp;
-   float mDCAdjust;
-   
+   float mFuzzAmount;
+   bool mRemoveInputDC;
    
    DropdownList* mTypeDropdown;
    FloatSlider* mClipSlider;
    FloatSlider* mPreampSlider;
+   Checkbox* mRemoveInputDCCheckbox;
+   FloatSlider* mFuzzAmountSlider;
    BiquadFilter mDCRemover[ChannelBuffer::kMaxNumChannels];
+   PeakTracker mPeakTracker[ChannelBuffer::kMaxNumChannels];
 };
 
 #endif /* defined(__modularSynth__DistortionEffect__) */
