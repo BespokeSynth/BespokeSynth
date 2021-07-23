@@ -129,24 +129,31 @@ bool Arpeggiator::MouseMoved(float x, float y)
 void Arpeggiator::CheckboxUpdated(Checkbox* checkbox)
 {
    if (checkbox == mEnabledCheckbox)
+   {
+      mChordMutex.lock();
+      mChord.clear();
+      mChordMutex.unlock();
+
       mNoteOutput.Flush(gTime);
+   }
 }
 
 void Arpeggiator::PlayNote(double time, int pitch, int velocity, int voiceIdx, ModulationParameters modulation)
 {
-   if (!mEnabled)
+   if (!mEnabled || pitch < 0 || pitch >= 128)
    {
       PlayNoteOutput(time, pitch, velocity, voiceIdx, modulation);
       return;
    }
    
-   if (velocity > 0)
+   if (velocity > 0 && !mInputNotes[pitch])
    {
       mChordMutex.lock();
       mChord.push_back(ArpNote(pitch,velocity, voiceIdx, modulation));
       mChordMutex.unlock();
    }
-   else
+   
+   if (velocity == 0 && mInputNotes[pitch])
    {
       mChordMutex.lock();
       for (auto iter = mChord.begin(); iter != mChord.end(); ++iter)
@@ -158,7 +165,9 @@ void Arpeggiator::PlayNote(double time, int pitch, int velocity, int voiceIdx, M
          }
       }
       mChordMutex.unlock();
-   } 
+   }
+
+   mInputNotes[pitch] = velocity > 0;
 }
 
 void Arpeggiator::OnTimeEvent(double time)

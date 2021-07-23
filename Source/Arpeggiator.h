@@ -99,6 +99,7 @@ private:
    int mOctaveRepeats;
    IntSlider* mOctaveRepeatsSlider;
 
+   std::array<bool, 128> mInputNotes{ false };
    ofMutex mChordMutex;
 
    TransportListenerInfo* mTransportListenerInfo;
