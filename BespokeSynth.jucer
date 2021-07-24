@@ -1125,6 +1125,9 @@
             file="Source/LocationZoomer.cpp"/>
       <FILE id="Ay5Xy4" name="LocationZoomer.h" compile="0" resource="0"
             file="Source/LocationZoomer.h"/>
+      <FILE id="pRnNvH" name="M185Sequencer.cpp" compile="1" resource="0"
+            file="Source/M185Sequencer.cpp"/>
+      <FILE id="kS5eYF" name="M185Sequencer.h" compile="0" resource="0" file="Source/M185Sequencer.h"/>
       <FILE id="mMQQPx" name="Main.cpp" compile="1" resource="0" file="Source/Main.cpp"/>
       <FILE id="qVhzmD" name="MainComponent.cpp" compile="1" resource="0"
             file="Source/MainComponent.cpp"/>
