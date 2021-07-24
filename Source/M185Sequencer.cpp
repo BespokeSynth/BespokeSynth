@@ -20,6 +20,7 @@ M185Sequencer::M185Sequencer()
 , mLastPitch(0)
 , mInterval(kInterval_8n)
 , mIntervalSelector(nullptr)
+, mResetStepButton(nullptr)
 {
 }
 
@@ -35,7 +36,8 @@ void M185Sequencer::CreateUIControls()
    IDrawableModule::CreateUIControls();
 
    UIBLOCK2(10, 0);
-   DROPDOWN(mIntervalSelector,"interval",(int*)(&mInterval), 40); UIBLOCK_NEWLINE();
+   BUTTON(mResetStepButton,"reset step");
+   DROPDOWN(mIntervalSelector,"interval",(int*)(&mInterval), 40);
    int i=0;
    for (auto& step : mSteps)
    {
@@ -51,7 +53,7 @@ void M185Sequencer::CreateUIControls()
       step.mGateSelector->AddLabel("once", GateType::kGate_Once);
       step.mGateSelector->AddLabel("hold", GateType::kGate_Hold);
       step.mGateSelector->AddLabel("rest", GateType::kGate_Rest);
-      
+
       ++i;
    }
    mWidth = UIBLOCKWIDTH();
@@ -83,7 +85,7 @@ void M185Sequencer::DrawModule()
 {
    if (Minimized() || IsVisible() == false)
       return;
-   
+
    int totalSteps = 0;
    for (auto& step : mSteps)
       totalSteps += step.mPulseCount;
@@ -100,6 +102,7 @@ void M185Sequencer::DrawModule()
    }
    ofPopStyle();
 
+   mResetStepButton->Draw();
    mIntervalSelector->Draw();
    for (auto& step : mSteps)
    {
@@ -125,27 +128,32 @@ void M185Sequencer::OnPulse(double time, float velocity, int flags)
 
 void M185Sequencer::StepBy(double time, float velocity, int flags)
 {
-   if (!mEnabled)
-      return;
+   if (mEnabled)
+   {
+      bool stopPrevNote =
+         mStepPulseIdx == 0 ||
+         mSteps[mStepIdx].mGate == GateType::kGate_Repeat ||
+         (mStepPulseIdx > 0 && mSteps[mStepIdx].mGate == GateType::kGate_Once);
+      bool playNextNote =
+         (mStepPulseIdx == 0 &&
+          (mSteps[mStepIdx].mGate == GateType::kGate_Once ||
+           mSteps[mStepIdx].mGate == GateType::kGate_Hold)) ||
+         mSteps[mStepIdx].mGate == GateType::kGate_Repeat;
 
-   bool stopPrevNote =
-      mStepPulseIdx == 0 ||
-      mSteps[mStepIdx].mGate == GateType::kGate_Repeat ||
-      (mStepPulseIdx > 0 && mSteps[mStepIdx].mGate == GateType::kGate_Once);
-   bool playNextNote =
-      (mStepPulseIdx == 0 &&
-       (mSteps[mStepIdx].mGate == GateType::kGate_Once ||
-        mSteps[mStepIdx].mGate == GateType::kGate_Hold)) ||
-      mSteps[mStepIdx].mGate == GateType::kGate_Repeat;
-
-   if (stopPrevNote)
+      if (stopPrevNote && mLastPitch >= 0)
+      {
+         PlayNoteOutput(time, mLastPitch, 0, -1);
+         mLastPitch = -1;
+      }
+      if (playNextNote)
+      {
+         PlayNoteOutput(time, mSteps[mStepIdx].mPitch, velocity*127, -1);
+         mLastPitch = mSteps[mStepIdx].mPitch;
+      }
+   } else if (mLastPitch >= 0)
    {
       PlayNoteOutput(time, mLastPitch, 0, -1);
-   }
-   if (playNextNote)
-   {
-      PlayNoteOutput(time, mSteps[mStepIdx].mPitch, velocity*127, -1);
-      mLastPitch = mSteps[mStepIdx].mPitch;
+      mLastPitch = -1;
    }
 
    // Update step/pulse
@@ -161,6 +169,14 @@ void M185Sequencer::GetModuleDimensions(float& width, float& height)
 {
    width = mWidth;
    height = mHeight;
+}
+
+void M185Sequencer::ButtonClicked(ClickButton* button)
+{
+   if (mResetStepButton == button) {
+      mStepIdx = 0;
+      mStepPulseIdx = 0;
+   }
 }
 
 void M185Sequencer::DropdownUpdated(DropdownList* list, int oldVal)
