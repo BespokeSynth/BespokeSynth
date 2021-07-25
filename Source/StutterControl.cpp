@@ -236,7 +236,7 @@ void StutterControl::PlayNote(double time, int pitch, int velocity, int voiceIdx
 
 void StutterControl::UpdateGridLights()
 {
-   if (mGridControlTarget == nullptr)
+   if (mGridControlTarget == nullptr || mGridControlTarget->GetGridController() == nullptr)
       return;
    
    for (int i=0; i<kNumStutterTypes; ++i)
