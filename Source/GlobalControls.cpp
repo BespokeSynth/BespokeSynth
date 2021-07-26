@@ -65,7 +65,7 @@ void GlobalControls::FloatSliderUpdated(FloatSlider* slider, float oldVal)
    {
       //zoom in on center of screen
       float zoomAmount = (gDrawScale - oldVal) / oldVal;
-      ofVec2f zoomCenter = ofVec2f(TheSynth->GetMouseX(), TheSynth->GetMouseY()) + TheSynth->GetDrawOffset();
+      ofVec2f zoomCenter = ofVec2f(TheSynth->GetMouseX(GetOwningContainer()), TheSynth->GetMouseY(GetOwningContainer())) + TheSynth->GetDrawOffset();
       TheSynth->GetDrawOffset() -= zoomCenter * zoomAmount;
    }
 

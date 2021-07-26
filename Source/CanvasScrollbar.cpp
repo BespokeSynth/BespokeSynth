@@ -10,6 +10,7 @@
 
 #include "CanvasScrollbar.h"
 #include "Canvas.h"
+#include "ModularSynth.h"
 
 CanvasScrollbar::CanvasScrollbar(Canvas* canvas, string name, Style style)
    : mClick(false)
@@ -80,7 +81,7 @@ float CanvasScrollbar::GetBarEnd() const
 
 void CanvasScrollbar::OnClicked(int x, int y, bool right)
 {
-   mClickMousePos.set(ofGetMouseX(), ofGetMouseY());
+   mClickMousePos.set(TheSynth->GetRawMouseX(), TheSynth->GetRawMouseY());
    mDragOffset.set(0, 0);
    mClick = true;
    if (mStyle == Style::kHorizontal)
@@ -100,7 +101,7 @@ bool CanvasScrollbar::MouseMoved(float x, float y)
 
    if (mClick)
    {
-      mDragOffset = (ofVec2f(ofGetMouseX(), ofGetMouseY()) - mClickMousePos) / gDrawScale;
+      mDragOffset = (ofVec2f(TheSynth->GetRawMouseX(), TheSynth->GetRawMouseY()) - mClickMousePos) / gDrawScale;
       if (mStyle == Style::kHorizontal)
       {
          float viewLength = mCanvas->mViewEnd - mCanvas->mViewStart;

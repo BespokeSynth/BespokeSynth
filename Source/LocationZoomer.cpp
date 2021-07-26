@@ -22,6 +22,7 @@ void LocationZoomer::Init()
    mStart = mHome;
    mDestination = mHome;
    mCurrentProgress = 1;
+   gDrawScale = mHome.mZoomLevel;
 }
 
 void LocationZoomer::Update()

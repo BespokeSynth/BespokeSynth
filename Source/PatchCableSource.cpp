@@ -158,8 +158,8 @@ void PatchCableSource::UpdatePosition(bool parentMinimized)
          {
             if (cable->IsDragging())
             {
-               centerOfMass.x += TheSynth->GetMouseX();
-               centerOfMass.y += TheSynth->GetMouseY();
+               centerOfMass.x += TheSynth->GetMouseX(mOwner->GetOwningContainer());
+               centerOfMass.y += TheSynth->GetMouseY(mOwner->GetOwningContainer());
                ++count;
             }
             else if (cable->GetTarget())
@@ -399,8 +399,8 @@ bool PatchCableSource::MouseMoved(float x, float y)
    if (!mClickable)
       return false;
    
-   x = TheSynth->GetMouseX();
-   y = TheSynth->GetMouseY();
+   x = TheSynth->GetMouseX(mOwner->GetOwningContainer());
+   y = TheSynth->GetMouseY(mOwner->GetOwningContainer());
    
    mHoverIndex = GetHoverIndex(x, y);
    

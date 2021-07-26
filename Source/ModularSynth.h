@@ -102,13 +102,13 @@ public:
    IUIControl* FindUIControl(string path);
    MidiController* FindMidiController(string name, bool fail = false);
    void MoveToFront(IDrawableModule* module);
-   IDrawableModule* GetModuleAt(int x, int y);
    bool InMidiMapMode();
    void GetAllModules(vector<IDrawableModule*>& out) { mModuleContainer.GetAllModules(out); }
    
    void PushModalFocusItem(IDrawableModule* item);
    void PopModalFocusItem();
    IDrawableModule* GetTopModalFocusItem() const;
+   vector<IDrawableModule*> GetModalFocusItemStack() const { return mModalFocusItemStack; }
    bool IsModalFocusItem(IDrawableModule* item) const;
    
    void LogEvent(string event, LogEventType type);
@@ -130,15 +130,16 @@ public:
    
    float GetRawMouseX() { return mMousePos.x; }
    float GetRawMouseY() { return mMousePos.y; }
-   float GetMouseX(float rawX = FLT_MAX);
-   float GetMouseY(float rawY = FLT_MAX);
+   float GetMouseX(ModuleContainer* context, float rawX = FLT_MAX);
+   float GetMouseY(ModuleContainer* context, float rawY = FLT_MAX);
    bool IsMouseButtonHeld(int button);
-   ofVec2f& GetDrawOffset() { return mDrawOffset; }
-   void SetDrawOffset(ofVec2f offset) { mDrawOffset = offset; }
+   ofVec2f& GetDrawOffset() { return mModuleContainer.GetDrawOffsetRef(); }
+   void SetDrawOffset(ofVec2f offset) { mModuleContainer.SetDrawOffset(offset); }
    const ofRectangle& GetDrawRect() const { return mDrawRect; }
    void SetPixelRatio(double ratio) { mPixelRatio = ratio; }
    double GetPixelRatio() const { return mPixelRatio; }
    long GetFrameCount() { return mFrameCount; }
+   ModuleContainer* GetRootContainer() { return &mModuleContainer; }
 
    void ZoomView(float zoomAmount, bool fromMouse);
    void PanView(float x, float y);
@@ -220,6 +221,7 @@ private:
    void DeleteAllModules();
    void TriggerClapboard();
    void DoAutosave();
+   IDrawableModule* GetModuleAtCursor();
    
    ofSoundStream mSoundStream;
    int mIOBufferSize;
@@ -273,8 +275,6 @@ private:
    std::list<LogEventItem> mEvents;
    std::list<string> mErrors;
    
-   ofVec2f mDrawOffset;
-   
    NamedMutex mAudioThreadMutex;
    
    bool mAudioPaused;
@@ -327,6 +327,7 @@ private:
    long mFrameCount;
    
    ModuleContainer mModuleContainer;
+   ModuleContainer mUILayerModuleContainer;
    
    ADSRDisplay* mScheduledEnvelopeEditorSpawnDisplay;
    

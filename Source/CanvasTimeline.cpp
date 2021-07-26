@@ -10,6 +10,7 @@
 
 #include "CanvasTimeline.h"
 #include "Canvas.h"
+#include "ModularSynth.h"
 
 CanvasTimeline::CanvasTimeline(Canvas* canvas, string name)
    : mClick(false)
@@ -119,7 +120,7 @@ float CanvasTimeline::GetQuantizedForX(float posX, HoverMode clampSide)
 
 void CanvasTimeline::OnClicked(int x, int y, bool right)
 {
-   mClickMousePos.set(ofGetMouseX(), ofGetMouseY());
+   mClickMousePos.set(TheSynth->GetRawMouseX(), TheSynth->GetRawMouseY());
    mDragOffset.set(0, 0);
    mClick = true;
 }
@@ -178,7 +179,7 @@ bool CanvasTimeline::MouseMoved(float x, float y)
    }
    else
    {
-      mDragOffset = (ofVec2f(ofGetMouseX(), ofGetMouseY()) - mClickMousePos) / gDrawScale;
+      mDragOffset = (ofVec2f(TheSynth->GetRawMouseX(), TheSynth->GetRawMouseY()) - mClickMousePos) / gDrawScale;
    }
 
    return false;

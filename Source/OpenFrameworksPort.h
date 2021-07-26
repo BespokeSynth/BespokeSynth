@@ -292,8 +292,6 @@ float ofGetLastFrameTime();
 int ofToInt(const string& intString);
 float ofToFloat(const string& floatString);
 int ofHexToInt(const string& hexString);
-float ofGetMouseX();
-float ofGetMouseY();
 void ofLine(float x1, float y1, float x2, float y2);
 void ofLine(ofVec2f v1, ofVec2f v2);
 void ofSetLineWidth(float width);

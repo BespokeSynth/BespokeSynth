@@ -20,6 +20,7 @@
 
 ModuleContainer::ModuleContainer()
 : mOwner(nullptr)
+, mDrawScale(1)
 {
    
 }
@@ -175,6 +176,13 @@ void ModuleContainer::MouseReleased()
 
 IDrawableModule* ModuleContainer::GetModuleAt(float x, float y)
 {
+   const auto& modalItems = TheSynth->GetModalFocusItemStack();
+   for (int i=(int)modalItems.size()-1; i>=0; --i)
+   {
+      if (modalItems[i]->GetOwningContainer() == this && modalItems[i]->TestClick(x,y,false,true))
+         return modalItems[i];
+   }
+   
    for (int i=0; i<mModules.size(); ++i)
    {
       if (mModules[i]->AlwaysOnTop() && mModules[i]->TestClick(x,y,false,true))
@@ -184,7 +192,9 @@ IDrawableModule* ModuleContainer::GetModuleAt(float x, float y)
          {
             IDrawableModule* contained = subcontainer->GetModuleAt(x - subcontainer->GetOwnerPosition().x, y - subcontainer->GetOwnerPosition().y);
             if (contained)
+            {
                return contained;
+            }
          }
          return mModules[i];
       }
@@ -198,12 +208,28 @@ IDrawableModule* ModuleContainer::GetModuleAt(float x, float y)
          {
             IDrawableModule* contained = subcontainer->GetModuleAt(x - subcontainer->GetOwnerPosition().x, y - subcontainer->GetOwnerPosition().y);
             if (contained)
+            {
                return contained;
+            }
          }
          return mModules[i];
       }
    }
    return nullptr;
+}
+
+ofVec2f ModuleContainer::GetDrawOffset()
+{
+   if (mOwner != nullptr)
+      return mDrawOffset + mOwner->GetOwningContainer()->GetDrawOffset();
+   return mDrawOffset;
+}
+
+float ModuleContainer::GetDrawScale() const
+{
+   if (mOwner != nullptr)
+      return mDrawScale * mOwner->GetOwningContainer()->GetDrawScale();
+   return mDrawScale;
 }
 
 void ModuleContainer::GetModulesWithinRect(ofRectangle rect, vector<IDrawableModule*>& output)

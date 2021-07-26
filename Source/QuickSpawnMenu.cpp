@@ -50,9 +50,6 @@ void QuickSpawnMenu::KeyPressed(int key, bool isRepeat)
       if (mElements.size() > 0)
       {
          mCurrentMenuChar = (char)key;
-         
-         if (TheSynth->GetTopModalFocusItem() == this)
-            TheSynth->PopModalFocusItem();
 
          float width = 150;
          for (auto element : mElements)
@@ -63,8 +60,7 @@ void QuickSpawnMenu::KeyPressed(int key, bool isRepeat)
          }
          
          SetDimensions(width, (int)mElements.size() * itemSpacing);
-         SetPosition(TheSynth->GetMouseX()-mWidth/2, TheSynth->GetMouseY()-mHeight/2);
-         TheSynth->PushModalFocusItem(this);
+         SetPosition(TheSynth->GetMouseX(GetOwningContainer())-mWidth/2, TheSynth->GetMouseY(GetOwningContainer())-mHeight/2);
          SetShowing(true);
       }
    }
@@ -72,18 +68,16 @@ void QuickSpawnMenu::KeyPressed(int key, bool isRepeat)
 
 void QuickSpawnMenu::KeyReleased(int key)
 {
-   if (key == mCurrentMenuChar && TheSynth->GetTopModalFocusItem() == this)
+   if (key == mCurrentMenuChar)
    {
-      TheSynth->PopModalFocusItem();
       SetShowing(false);
    }
 }
 
 void QuickSpawnMenu::MouseReleased()
 {
-   if (TheSynth->GetTopModalFocusItem() != this && IsShowing())
+   if (IsShowing())
    {
-      TheSynth->PopModalFocusItem();
       SetShowing(false);
    }
 }
@@ -93,8 +87,8 @@ void QuickSpawnMenu::DrawModule()
    ofPushStyle();
    
    int highlightIndex = -1;
-   if (TheSynth->GetMouseY() > GetPosition().y)
-      highlightIndex = (TheSynth->GetMouseY() - GetPosition().y)/itemSpacing;
+   if (TheSynth->GetMouseY(GetOwningContainer()) > GetPosition().y)
+      highlightIndex = (TheSynth->GetMouseY(GetOwningContainer()) - GetPosition().y)/itemSpacing;
    
    ofSetColor(50,50,50,100);
    ofFill();
@@ -128,11 +122,10 @@ void QuickSpawnMenu::OnClicked(int x, int y, bool right)
    string moduleTypeName = GetModuleTypeNameAt(x, y);
    if (moduleTypeName != "")
    {
-      IDrawableModule* module = TheSynth->SpawnModuleOnTheFly(moduleTypeName, TheSynth->GetMouseX() + moduleGrabOffset.x, TheSynth->GetMouseY() + moduleGrabOffset.y);
+      IDrawableModule* module = TheSynth->SpawnModuleOnTheFly(moduleTypeName, TheSynth->GetMouseX(GetOwningContainer()) + moduleGrabOffset.x, TheSynth->GetMouseY(GetOwningContainer()) + moduleGrabOffset.y);
       TheSynth->SetMoveModule(module, moduleGrabOffset.x, moduleGrabOffset.y);
    }
    
-   TheSynth->PopModalFocusItem();
    SetShowing(false);
 }
 

@@ -32,6 +32,11 @@ public:
    void Clear();
    void Exit();
    ofVec2f GetOwnerPosition() const;
+   ofVec2f GetDrawOffset();
+   ofVec2f& GetDrawOffsetRef() { return mDrawOffset; }
+   void SetDrawOffset(ofVec2f offset) { mDrawOffset = offset; }
+   float GetDrawScale() const;
+   void SetDrawScale(float scale) { mDrawScale = scale; }
    
    void KeyPressed(int key, bool isRepeat);
    void KeyReleased(int key);
@@ -71,6 +76,9 @@ public:
 private:   
    vector<IDrawableModule*> mModules;
    IDrawableModule* mOwner;
+
+   ofVec2f mDrawOffset;
+   float mDrawScale;
 };
 
 #endif  // MODULECONTAINER_H_INCLUDED

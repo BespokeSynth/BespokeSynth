@@ -340,8 +340,8 @@ bool PatchCable::MouseMoved(float x, float y)
    if (GetConnectionType() == kConnectionType_Modulator || GetConnectionType() == kConnectionType_UIControl) //no repatching UI control cables by the plug
       return false;
    
-   x = TheSynth->GetMouseX();
-   y = TheSynth->GetMouseY();
+   x = TheSynth->GetMouseX(GetOwningModule()->GetOwningContainer());
+   y = TheSynth->GetMouseY(GetOwningModule()->GetOwningContainer());
    
    PatchCablePos cable = GetPatchCablePos();
    mHovered = DistSqToLine(ofVec2f(x,y),cable.plug,cable.end) < 25;
@@ -353,11 +353,11 @@ void PatchCable::MouseReleased()
 {
    if (mDragging)
    {
-      ofVec2f mousePos(ofGetMouseX(), ofGetMouseY());
+      ofVec2f mousePos(TheSynth->GetRawMouseX(), TheSynth->GetRawMouseY());
       if ((mousePos - mGrabPos).distanceSquared() > 3)
       {
          PatchCablePos cable = GetPatchCablePos();
-         IClickable* potentialTarget = TheSynth->GetModuleAt(cable.end.x, cable.end.y);
+         IClickable* potentialTarget = TheSynth->GetRootContainer()->GetModuleAt(cable.end.x, cable.end.y);
          if (potentialTarget && (GetConnectionType() == kConnectionType_Modulator || GetConnectionType() == kConnectionType_Grid || GetConnectionType() == kConnectionType_UIControl))
          {
             const auto& uicontrols = (static_cast<IDrawableModule*>(potentialTarget))->GetUIControls();
@@ -419,8 +419,8 @@ PatchCablePos PatchCable::GetPatchCablePos()
    
    if (mDragging)
    {
-      int mouseX = TheSynth->GetMouseX();
-      int mouseY = TheSynth->GetMouseY();
+      int mouseX = TheSynth->GetMouseX(GetOwningModule()->GetOwningContainer());
+      int mouseY = TheSynth->GetMouseY(GetOwningModule()->GetOwningContainer());
       wThat = 0;
       hThat = 0;
       xThat = mouseX;
@@ -521,7 +521,7 @@ void PatchCable::Grab()
    {
       mDragging = true;
       sActivePatchCable = this;
-      mGrabPos.set(ofGetMouseX(), ofGetMouseY());
+      mGrabPos.set(TheSynth->GetRawMouseX(), TheSynth->GetRawMouseY());
       mOwner->CableGrabbed();
    }
 }

@@ -314,16 +314,6 @@ int ofHexToInt(const string& hexString)
    return str.getHexValue32();
 }
 
-float ofGetMouseX()
-{
-   return TheSynth->GetRawMouseX();
-}
-
-float ofGetMouseY()
-{
-   return TheSynth->GetRawMouseY();
-}
-
 void ofLine(float x1, float y1, float x2, float y2)
 {
    nvgBeginPath(gNanoVG);

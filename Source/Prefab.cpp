@@ -66,7 +66,7 @@ void Prefab::Poll()
 
 bool Prefab::IsMouseHovered()
 {
-   return GetRect(false).contains(TheSynth->GetMouseX(), TheSynth->GetMouseY());
+   return GetRect(false).contains(TheSynth->GetMouseX(GetOwningContainer()), TheSynth->GetMouseY(GetOwningContainer()));
 }
 
 bool Prefab::CanAddDropModules()

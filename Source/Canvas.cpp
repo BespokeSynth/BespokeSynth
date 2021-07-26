@@ -102,7 +102,7 @@ void Canvas::Render()
       {
          ofVec2f offset(0, 0);
          if (mClick && mClickedElement != nullptr && mElements[i]->GetHighlighted() && mDragEnd == kHighlightEnd_None)
-            offset = (ofVec2f(ofGetMouseX(), ofGetMouseY()) - mClickedElementStartMousePos) / gDrawScale;
+            offset = (ofVec2f(TheSynth->GetRawMouseX(), TheSynth->GetRawMouseY()) - mClickedElementStartMousePos) / gDrawScale;
          mElements[i]->Draw(offset);
       }
       
@@ -233,7 +233,7 @@ void Canvas::OnClicked(int x, int y, bool right)
             SelectElement(mElements[i]);
             clickedElement = true;
             if (mClickedElement)
-               mClickedElementStartMousePos.set(ofGetMouseX(), ofGetMouseY());
+               mClickedElementStartMousePos.set(TheSynth->GetRawMouseX(), TheSynth->GetRawMouseY());
 
             break;
          }
@@ -249,12 +249,12 @@ void Canvas::OnClicked(int x, int y, bool right)
             AddElement(element);
             SelectElement(element);
             mHasDuplicatedThisDrag = true;   //to prevent a duplicate from being made
-            mClickedElementStartMousePos.set(ofGetMouseX(), ofGetMouseY());
+            mClickedElementStartMousePos.set(TheSynth->GetRawMouseX(), TheSynth->GetRawMouseY());
          }
          else if (GetKeyModifiers() & kModifier_Alt)
          {
             mDragCanvasMoving = true;
-            mDragCanvasStartMousePos.set(ofGetMouseX(), ofGetMouseY());
+            mDragCanvasStartMousePos.set(TheSynth->GetRawMouseX(), TheSynth->GetRawMouseY());
             mDragCanvasStartCanvasPos.set(mViewStart, mRowOffset);
          }
          else if (GetKeyModifiers() & kModifier_Command)
@@ -332,7 +332,7 @@ bool Canvas::MouseMoved(float x, float y)
       {
          if (mClickedElement != nullptr)
          {
-            ofVec2f dragOffset = (ofVec2f(ofGetMouseX(), ofGetMouseY()) - mClickedElementStartMousePos) / gDrawScale;
+            ofVec2f dragOffset = (ofVec2f(TheSynth->GetRawMouseX(), TheSynth->GetRawMouseY()) - mClickedElementStartMousePos) / gDrawScale;
 
             if (GetKeyModifiers() & kModifier_Shift && !mHasDuplicatedThisDrag && dragOffset.distanceSquared() > 9)
             {
@@ -388,7 +388,7 @@ bool Canvas::MouseMoved(float x, float y)
    if (mDragCanvasMoving && (GetKeyModifiers() & kModifier_Alt))
    {
       
-      ofVec2f mousePos(ofGetMouseX(), ofGetMouseY());
+      ofVec2f mousePos(TheSynth->GetRawMouseX(), TheSynth->GetRawMouseY());
       ofVec2f delta = (mousePos - mDragCanvasStartMousePos) / gDrawScale;
 
       float viewLength = mViewEnd - mViewStart;
@@ -440,7 +440,7 @@ void Canvas::MouseReleased()
       for (auto* element : mElements)
       {
          if (element->GetHighlighted())
-            element->MoveElementByDrag((ofVec2f(ofGetMouseX(), ofGetMouseY()) - mClickedElementStartMousePos) / gDrawScale);
+            element->MoveElementByDrag((ofVec2f(TheSynth->GetRawMouseX(), TheSynth->GetRawMouseY()) - mClickedElementStartMousePos) / gDrawScale);
       }
 
       if (mListener)

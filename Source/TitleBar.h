@@ -101,6 +101,9 @@ private:
    void GetModuleDimensions(float& width, float& height) override;
    
    bool HiddenByZoom() const;
+   float GetPixelWidth() const;
+
+   float mTitleBarScale;
    
    ClickButton* mSaveLayoutButton;
    ClickButton* mResetLayoutButton;

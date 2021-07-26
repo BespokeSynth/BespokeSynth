@@ -1839,7 +1839,7 @@ void MidiController::PostRepatch(PatchCableSource* cableSource, bool fromUserCli
             connection->mType = kControlType_SetValue;
             float closestSq = FLT_MAX;
             int closestIdx = 0;
-            ofVec2f mousePos(ofGetMouseX(), ofGetMouseY());
+            ofVec2f mousePos(TheSynth->GetRawMouseX(), TheSynth->GetRawMouseY());
             for (int i=0; i<radioButton->GetNumValues(); ++i)
             {
                float distSq = (mousePos - radioButton->GetOptionPosition(i)).distanceSquared();

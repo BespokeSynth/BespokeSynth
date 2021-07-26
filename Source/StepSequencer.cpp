@@ -977,7 +977,7 @@ void StepSequencer::KeyPressed(int key, bool isRepeat)
 {
    IDrawableModule::KeyPressed(key, isRepeat);
    
-   ofVec2f mousePos(TheSynth->GetMouseX(), TheSynth->GetMouseY());
+   ofVec2f mousePos(TheSynth->GetMouseX(GetOwningContainer()), TheSynth->GetMouseY(GetOwningContainer()));
    if (key >= '1' && key <= '8' && mGrid->GetRect().contains(mousePos.x, mousePos.y))
    {
       int metaStep = key - '1';

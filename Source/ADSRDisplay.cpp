@@ -266,6 +266,7 @@ void ADSRDisplay::SpawnEnvelopeEditor()
    if (!mEditor->IsPinned())
    {
       mEditor->SetPosition(GetPosition().x+mWidth, GetPosition().y);
+      mEditor->SetOwningContainer(GetModuleParent()->GetOwningContainer());
       TheSynth->PushModalFocusItem(mEditor);
    }
 }

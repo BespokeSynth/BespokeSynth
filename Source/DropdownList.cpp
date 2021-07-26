@@ -245,6 +245,7 @@ void DropdownList::OnClicked(int x, int y, bool right)
       return;
 
    UpdateModalListPosition();
+   mModalList.SetOwningContainer(GetModuleParent()->GetOwningContainer());
    TheSynth->PushModalFocusItem(&mModalList);
 }
 

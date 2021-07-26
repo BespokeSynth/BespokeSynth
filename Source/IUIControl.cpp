@@ -44,7 +44,7 @@ bool IUIControl::TestHover(int x, int y)
       GetPosition(thisX, thisY);
       x += thisX;
       y += thisY;
-      if (TheSynth->GetModuleAt(x,y) == moduleParent)
+      if (moduleParent->GetOwningContainer()->GetModuleAt(x,y) == moduleParent)
       {
          float localX,localY;
          GetPosition(localX, localY, K(localOnly));
