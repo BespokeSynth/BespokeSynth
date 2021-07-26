@@ -133,7 +133,10 @@ VSTPlugin::VSTPlugin()
 : IAudioProcessor(gBufferSize)
 , mVol(1)
 , mVolSlider(nullptr)
+, mPluginReady(false)
 , mPlugin(nullptr)
+, mNumInputs(2)
+, mNumOutputs(2)
 , mChannel(1)
 , mPitchBendRange(2)
 , mModwheelCC(1)  //or 74 in Multidimensional Polyphonic Expression (MPE) spec
@@ -260,6 +263,8 @@ void VSTPlugin::SetVST(string vstName)
 
 void VSTPlugin::LoadVST(juce::PluginDescription desc)
 {
+   mPluginReady = false;
+   
    /*auto completionCallback = [this, &callbackDone] (std::unique_ptr<juce::AudioPluginInstance> instance, const String& error)
          {
             if (instance == nullptr)
@@ -298,6 +303,8 @@ void VSTPlugin::LoadVST(juce::PluginDescription desc)
       ofLog() << "vst inputs: " << mNumInputs << "  vst outputs: " << mNumOutputs;
 
       CreateParameterSliders();
+      
+      mPluginReady = true;
    }
    else
    {
@@ -381,6 +388,9 @@ void VSTPlugin::Poll()
 
 void VSTPlugin::Process(double time)
 {
+   if (!mPluginReady)
+      return;
+   
 #if BESPOKE_LINUX //HACK: weird race condition, which this seems to fix for now
    if (mPlugin == nullptr)
       return;
@@ -488,7 +498,7 @@ void VSTPlugin::Process(double time)
 
 void VSTPlugin::PlayNote(double time, int pitch, int velocity, int voiceIdx, ModulationParameters modulation)
 {
-   if (mPlugin == nullptr)
+   if (!mPluginReady || mPlugin == nullptr)
       return;
 
    if (!mEnabled)
@@ -526,7 +536,7 @@ void VSTPlugin::PlayNote(double time, int pitch, int velocity, int voiceIdx, Mod
 
 void VSTPlugin::SendCC(int control, int value, int voiceIdx /*=-1*/)
 {
-   if (mPlugin == nullptr)
+   if (!mPluginReady || mPlugin == nullptr)
       return;
    
    if (control < 0 || control > 127)

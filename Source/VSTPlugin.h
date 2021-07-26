@@ -93,6 +93,7 @@ private:
    int mOverlayWidth;
    int mOverlayHeight;
    
+   bool mPluginReady;
    std::unique_ptr<AudioProcessor> mPlugin;
    juce::ScopedPointer<VSTWindow> mWindow;
    juce::MidiBuffer mMidiBuffer;
