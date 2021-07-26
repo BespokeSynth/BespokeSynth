@@ -50,6 +50,7 @@ private:
    int mLastVelocity;
    float mWidth;
    float mHeight;
+   int mVoiceIdx;
    
    bool mRequireHeldNote;
    Checkbox* mRequireHeldNoteCheckbox;

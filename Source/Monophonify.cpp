@@ -15,6 +15,7 @@ Monophonify::Monophonify()
 : mInitialPitch(-1)
 , mLastPlayedPitch(-1)
 , mLastVelocity(0)
+, mVoiceIdx(0)
 , mRequireHeldNote(false)
 , mGlideTime(0)
 , mGlideSlider(nullptr)
@@ -57,7 +58,7 @@ void Monophonify::PlayNote(double time, int pitch, int velocity, int voiceIdx, M
    mPitchBend.AppendTo(modulation.pitchBend);
    modulation.pitchBend = &mPitchBend;
 
-   voiceIdx = 0;
+   voiceIdx = mVoiceIdx;
    
    if (velocity > 0)
    {
@@ -156,6 +157,7 @@ void Monophonify::FloatSliderUpdated(FloatSlider* slider, float oldVal)
 void Monophonify::LoadLayout(const ofxJSONElement& moduleInfo)
 {
    mModuleSaveData.LoadString("target", moduleInfo);
+   mModuleSaveData.LoadInt("voice_idx", moduleInfo, 0, 0, kNumVoices-1);
 
    SetUpFromSaveData();
 }
@@ -163,5 +165,6 @@ void Monophonify::LoadLayout(const ofxJSONElement& moduleInfo)
 void Monophonify::SetUpFromSaveData()
 {
    SetUpPatchCables(mModuleSaveData.GetString("target"));
+   mVoiceIdx = mModuleSaveData.GetInt("voice_idx");
 }
 
