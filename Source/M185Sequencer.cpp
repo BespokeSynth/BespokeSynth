@@ -36,20 +36,23 @@ void M185Sequencer::CreateUIControls()
 
    UIBLOCK2(10, 0);
    DROPDOWN(mIntervalSelector,"interval",(int*)(&mInterval), 40); UIBLOCK_NEWLINE();
+   int i=0;
    for (auto& step : mSteps)
    {
       UIBLOCK_NEWLINE();
       step.xPos = 0;
       step.yPos = yPos;
 
-      INTSLIDER(step.mPitchSlider,"pitch",&step.mPitch,0,127); UIBLOCK_SHIFTRIGHT();
-      INTSLIDER(step.mPulseCountSlider,"pulses",&step.mPulseCount,1,8); UIBLOCK_SHIFTRIGHT();
-      DROPDOWN(step.mGateSelector,"gate", (int*)(&step.mGate), 60);
+      INTSLIDER(step.mPitchSlider,("pitch"+ofToString(i)).c_str(),&step.mPitch,0,127); UIBLOCK_SHIFTRIGHT();
+      INTSLIDER(step.mPulseCountSlider,("pulses"+ofToString(i)).c_str(),&step.mPulseCount,1,8); UIBLOCK_SHIFTRIGHT();
+      DROPDOWN(step.mGateSelector,("gate"+ofToString(i)).c_str(), (int*)(&step.mGate), 60);
 
       step.mGateSelector->AddLabel("Open", GateType::kGate_Open);
       step.mGateSelector->AddLabel("Once", GateType::kGate_Once);
       step.mGateSelector->AddLabel("Hold", GateType::kGate_Hold);
       step.mGateSelector->AddLabel("Rest", GateType::kGate_Rest);
+      
+      ++i;
    }
    mWidth = UIBLOCKWIDTH();
    mHeight = UIBLOCKHEIGHT();
