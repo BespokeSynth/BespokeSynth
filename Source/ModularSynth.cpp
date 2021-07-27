@@ -129,6 +129,7 @@ void ModularSynth::DumpStats(bool isCrash)
    log.appendText("display language: " + juce::SystemStats::getDisplayLanguage() + "\n");
    log.appendText("description: " + juce::SystemStats::getDeviceDescription() + "\n");
    log.appendText("manufacturer: " + juce::SystemStats::getDeviceManufacturer() + "\n");
+   log.appendText("build date: " + string(__DATE__) + " " + string(__TIME__) + "\n");
 
    if (isCrash)
    {
