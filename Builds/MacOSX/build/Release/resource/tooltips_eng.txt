@@ -1651,6 +1651,15 @@ transposefrom~transpose input from a specified root to the root of the current s
 
 
 
+m185sequencer~sequencer using the unique paradigm of the the m185 or intellijel metropolis
+~interval~interval per step
+~pitch*~pitch to use for this row
+~pulses*~number of steps this row should last
+~gate*~behavior for each row: "repeat" plays every step, "once" plays just the first step, "hold" holds across all steps, "rest" plays no steps
+
+
+
+
 
 notestepper~output notes through a round robin of patch cables, to create sequential variety
 ~length~length of the sequence
