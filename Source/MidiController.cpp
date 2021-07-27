@@ -525,6 +525,8 @@ void MidiController::MidiReceived(MidiMessageType messageType, int control, floa
             {
                if (connection->mMessageType == kMidiMessage_Note)
                   value = value>0 ? 1 : 0;
+               if (connection->mMidiOffValue != 0 || connection->mMidiOnValue != 127)
+                  value = ofLerp(connection->mMidiOffValue/127.0f, connection->mMidiOnValue/127.0f, value);
                uicontrol->SetFromMidiCC(value);
             }
             uicontrol->StartBeacon();
