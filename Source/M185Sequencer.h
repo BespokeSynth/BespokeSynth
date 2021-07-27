@@ -59,7 +59,7 @@ private:
 
    enum GateType
    {
-      kGate_Open,
+      kGate_Repeat,
       kGate_Once,
       kGate_Hold,
       kGate_Rest,
@@ -70,7 +70,7 @@ private:
       Step()
       : mPitch(0)
       , mPulseCount(1)
-      , mGate(kGate_Open)
+      , mGate(kGate_Repeat)
       , xPos(0)
       , yPos(0)
       , mPitchSlider(nullptr)

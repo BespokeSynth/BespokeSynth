@@ -47,10 +47,10 @@ void M185Sequencer::CreateUIControls()
       INTSLIDER(step.mPulseCountSlider,("pulses"+ofToString(i)).c_str(),&step.mPulseCount,1,8); UIBLOCK_SHIFTRIGHT();
       DROPDOWN(step.mGateSelector,("gate"+ofToString(i)).c_str(), (int*)(&step.mGate), 60);
 
-      step.mGateSelector->AddLabel("Open", GateType::kGate_Open);
-      step.mGateSelector->AddLabel("Once", GateType::kGate_Once);
-      step.mGateSelector->AddLabel("Hold", GateType::kGate_Hold);
-      step.mGateSelector->AddLabel("Rest", GateType::kGate_Rest);
+      step.mGateSelector->AddLabel("repeat", GateType::kGate_Repeat);
+      step.mGateSelector->AddLabel("once", GateType::kGate_Once);
+      step.mGateSelector->AddLabel("hold", GateType::kGate_Hold);
+      step.mGateSelector->AddLabel("rest", GateType::kGate_Rest);
       
       ++i;
    }
@@ -83,6 +83,11 @@ void M185Sequencer::DrawModule()
 {
    if (Minimized() || IsVisible() == false)
       return;
+   
+   int totalSteps = 0;
+   for (auto& step : mSteps)
+      totalSteps += step.mPulseCount;
+   DrawTextNormal("total steps: "+ofToString(totalSteps), 55, 13);
 
    ofPushStyle();
    for (int i = 0; i < mSteps.size(); i++)
@@ -125,13 +130,13 @@ void M185Sequencer::StepBy(double time, float velocity, int flags)
 
    bool stopPrevNote =
       mStepPulseIdx == 0 ||
-      mSteps[mStepIdx].mGate == GateType::kGate_Open ||
+      mSteps[mStepIdx].mGate == GateType::kGate_Repeat ||
       (mStepPulseIdx > 0 && mSteps[mStepIdx].mGate == GateType::kGate_Once);
    bool playNextNote =
       (mStepPulseIdx == 0 &&
        (mSteps[mStepIdx].mGate == GateType::kGate_Once ||
         mSteps[mStepIdx].mGate == GateType::kGate_Hold)) ||
-      mSteps[mStepIdx].mGate == GateType::kGate_Open;
+      mSteps[mStepIdx].mGate == GateType::kGate_Repeat;
 
    if (stopPrevNote)
    {
@@ -139,7 +144,7 @@ void M185Sequencer::StepBy(double time, float velocity, int flags)
    }
    if (playNextNote)
    {
-      PlayNoteOutput(time, mSteps[mStepIdx].mPitch, velocity, -1);
+      PlayNoteOutput(time, mSteps[mStepIdx].mPitch, velocity*127, -1);
       mLastPitch = mSteps[mStepIdx].mPitch;
    }
 
