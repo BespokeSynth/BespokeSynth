@@ -61,6 +61,7 @@ public:
    void PlayNote(double time, int pitch, int velocity, int voiceIdx = -1, ModulationParameters modulation = ModulationParameters()) override;
    void SendCC(int control, int value, int voiceIdx = -1) override;
    
+   void DropdownClicked(DropdownList* list) override;
    void DropdownUpdated(DropdownList* list, int oldVal) override;
    void FloatSliderUpdated(FloatSlider* slider, float oldVal) override;
    void IntSliderUpdated(IntSlider* slider, int oldVal) override;
@@ -71,6 +72,7 @@ public:
    virtual void SetUpFromSaveData() override;
    void SaveState(FileStreamOut& out) override;
    void LoadState(FileStreamIn& in) override;
+   vector<IUIControl*> ControlsToIgnoreInSaveState() const override;
    
    static bool sIsRescanningVsts;
    
@@ -84,11 +86,14 @@ private:
    
    string GetPluginName();
    void CreateParameterSliders();
+   void RefreshPresetFiles();
    
    float mVol;
    FloatSlider* mVolSlider;
-   int mProgramChange;
-   DropdownList* mProgramChangeSelector;
+   int mPresetFileIndex;
+   DropdownList* mPresetFileSelector;
+   ClickButton* mSavePresetFileButton;
+   vector<string> mPresetFilePaths;
    ClickButton* mOpenEditorButton;
    int mOverlayWidth;
    int mOverlayHeight;

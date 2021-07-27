@@ -181,7 +181,6 @@ void ModularSynth::Setup(GlobalManagers* globalManagers, juce::Component* mainCo
    juce::File(ofToDataPath("savestate")).createDirectory();
    juce::File(ofToDataPath("savestate/autosave")).createDirectory();
    juce::File(ofToDataPath("recordings")).createDirectory();
-   juce::File(ofToDataPath("vst")).createDirectory();
    juce::File(ofToDataPath("samples")).createDirectory();
    juce::File(ofToDataPath("scripts")).createDirectory();
    juce::File(ofToDataPath("internal")).createDirectory();

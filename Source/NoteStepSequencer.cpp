@@ -954,7 +954,7 @@ void NoteStepSequencer::SetUpStepControls()
    for (int i=0; i<NSS_MAX_STEPS; ++i)
    {
       mToneDropdowns[i]->Clear();
-      for (int j=14; j>=0; --j)
+      for (int j=0; j<mNoteRange; ++j)
          mToneDropdowns[i]->AddLabel(NoteName(RowToPitch(j), false, true), j);
    }
 }
@@ -990,6 +990,7 @@ void NoteStepSequencer::SetUpFromSaveData()
    mShowStepControls = mModuleSaveData.GetBool("stepcontrols");
    UpdateVelocityGridPos();
    SyncGridToSeq();
+   SetUpStepControls();
 }
 
 namespace

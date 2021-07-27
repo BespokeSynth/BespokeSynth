@@ -141,14 +141,17 @@ VSTPlugin::VSTPlugin()
 , mPitchBendRange(2)
 , mModwheelCC(1)  //or 74 in Multidimensional Polyphonic Expression (MPE) spec
 , mUseVoiceAsChannel(false)
-, mProgramChangeSelector(nullptr)
-, mProgramChange(0)
+, mPresetFileSelector(nullptr)
+, mPresetFileIndex(-1)
 , mOpenEditorButton(nullptr)
 //, mWindowOverlay(nullptr)
 , mDisplayMode(kDisplayMode_Sliders)
 , mShowParameterIndex(-1)
 , mTemporarilyDisplayedParamIndex(-1)
 {
+   juce::File(ofToDataPath("vst")).createDirectory();
+   juce::File(ofToDataPath("vst/presets")).createDirectory();
+   
    if (VSTLookup::sFormatManager.getNumFormats() == 0)
       VSTLookup::sFormatManager.addDefaultFormats();
    
@@ -159,12 +162,13 @@ void VSTPlugin::CreateUIControls()
 {
    IDrawableModule::CreateUIControls();
    mVolSlider = new FloatSlider(this,"vol",3,3,80,15,&mVol,0,4);
-   mProgramChangeSelector = new DropdownList(this,"program change",100,3,&mProgramChange);
-   mOpenEditorButton = new ClickButton(this, "open", 150, 3);
-   mShowParameterDropdown = new DropdownList(this,"show parameter",3,20,&mShowParameterIndex);
+   mOpenEditorButton = new ClickButton(this, "open", mVolSlider, kAnchor_Right_Padded);
+   mPresetFileSelector = new DropdownList(this,"preset",3,21,&mPresetFileIndex,110);
+   mSavePresetFileButton = new ClickButton(this,"save as",-1,-1);
+   mShowParameterDropdown = new DropdownList(this,"show parameter",3,38,&mShowParameterIndex);
    
-   for (int i=0; i<128; ++i)
-      mProgramChangeSelector->AddLabel(ofToString(i), i);
+   mPresetFileSelector->DrawLabel(true);
+   mSavePresetFileButton->PositionTo(mPresetFileSelector,kAnchor_Right);
    
    if (mPlugin)
    {
@@ -579,10 +583,9 @@ void VSTPlugin::DrawModule()
    if (Minimized() || IsVisible() == false)
       return;
    
-   DrawTextNormal(GetPluginName(), 3, 49);
-   
    mVolSlider->Draw();
-   mProgramChangeSelector->Draw();
+   mPresetFileSelector->Draw();
+   mSavePresetFileButton->Draw();
    mOpenEditorButton->Draw();
    mShowParameterDropdown->Draw();
    
@@ -597,7 +600,7 @@ void VSTPlugin::DrawModule()
             if (slider.mShowing)
             {
                const int kRows = 20;
-               slider.mSlider->SetPosition(3 + (slider.mSlider->GetRect().width + 2) * (sliderCount / kRows), 52 + (17 * (sliderCount % kRows)));
+               slider.mSlider->SetPosition(3 + (slider.mSlider->GetRect().width + 2) * (sliderCount / kRows), 60 + (17 * (sliderCount % kRows)));
                
                slider.mSlider->Draw();
                
@@ -626,7 +629,7 @@ void VSTPlugin::GetModuleDimensions(float& width, float& height)
    else
    {
       width = 206;
-      height = 40;
+      height = 58;
       for (auto slider : mParameterSliders)
       {
          if (slider.mSlider && slider.mShowing)
@@ -643,12 +646,42 @@ void VSTPlugin::OnVSTWindowClosed()
    mWindow.release();
 }
 
+vector<IUIControl*> VSTPlugin::ControlsToIgnoreInSaveState() const
+{
+   vector<IUIControl*> ignore;
+   ignore.push_back(mPresetFileSelector);
+   return ignore;
+}
+
 void VSTPlugin::DropdownUpdated(DropdownList* list, int oldVal)
 {
-   if (list == mProgramChangeSelector)
+   if (list == mPresetFileSelector)
    {
-      mMidiBuffer.addEvent(juce::MidiMessage::programChange(1, mProgramChange), 0);
+      if (mPresetFileIndex >= 0 && mPresetFileIndex < (int)mPresetFilePaths.size())
+      {
+         File resourceFile = File(mPresetFilePaths[mPresetFileIndex]);
+         
+         if (!resourceFile.existsAsFile())
+         {
+            DBG("File doesn't exist ...");
+            return;
+         }
+
+         unique_ptr<FileInputStream> input(resourceFile.createInputStream());
+
+         if (!input->openedOk())
+         {
+            DBG("Failed to open file");
+            return;
+         }
+             
+         int64 size = input->readInt64();
+         char* data = new char[size];
+         input->read(data, size);
+         mPlugin->setStateInformation(data, size);
+      }
    }
+   
    if (list == mShowParameterDropdown)
    {
       mParameterSliders[mShowParameterIndex].mShowing = true;
@@ -692,7 +725,88 @@ void VSTPlugin::ButtonClicked(ClickButton* button)
       //if (mWindow->GetNSViewComponent())
       //   mWindowOverlay = new NSWindowOverlay(mWindow->GetNSViewComponent()->getView());
    }
+   
+   if (button == mSavePresetFileButton && mPlugin != nullptr)
+   {
+      juce::File(ofToDataPath("vst/presets/"+GetPluginName())).createDirectory();
+      FileChooser chooser("Save preset as...", File(ofToDataPath("vst/presets/"+GetPluginName()+"/preset.vstp")), "*.vstp", true, false, TheSynth->GetMainComponent()->getTopLevelComponent());
+      if (chooser.browseForFileToSave(true))
+      {
+         string path = chooser.getResult().getFullPathName().toStdString();
+         
+         File resourceFile (path);
+         TemporaryFile tempFile (resourceFile);
+
+         {
+            FileOutputStream output(tempFile.getFile());
+
+            if (!output.openedOk())
+            {
+               DBG("FileOutputStream didn't open correctly ...");
+               return;
+            }
+
+            juce::MemoryBlock vstState;
+            mPlugin->getStateInformation(vstState);
+            
+            output.writeInt64(vstState.getSize());
+            output.write(vstState.getData(), vstState.getSize());
+            output.flush(); // (called explicitly to force an fsync on posix)
+
+            if (output.getStatus().failed())
+            {
+               DBG("An error occurred in the FileOutputStream");
+               return;
+            }
+         }
+
+         bool success = tempFile.overwriteTargetFileWithTemporary();
+         if (!success)
+         {
+            DBG("An error occurred writing the file");
+            return;
+         }
+         
+         RefreshPresetFiles();
+         
+         for (size_t i=0; i<mPresetFilePaths.size(); ++i)
+         {
+            if (mPresetFilePaths[i] == path)
+            {
+               mPresetFileIndex = (int)i;
+               break;
+            }
+         }
+      }
+   }
 }
+
+void VSTPlugin::DropdownClicked(DropdownList* list)
+{
+   if (list == mPresetFileSelector)
+      RefreshPresetFiles();
+}
+
+void VSTPlugin::RefreshPresetFiles()
+{
+   if (mPlugin == nullptr)
+      return;
+   
+   juce::File(ofToDataPath("vst/presets/"+GetPluginName())).createDirectory();
+   DirectoryIterator dir(File(ofToDataPath("vst/presets/"+GetPluginName())), false);
+   mPresetFilePaths.clear();
+   mPresetFileSelector->Clear();
+   while(dir.next())
+   {
+      File file = dir.getFile();
+      if (file.getFileExtension() ==  ".vstp")
+      {
+         mPresetFileSelector->AddLabel(file.getFileName().toStdString(), (int)mPresetFilePaths.size());
+         mPresetFilePaths.push_back(file.getFullPathName().toStdString());
+      }
+   }
+}
+
 
 void VSTPlugin::LoadLayout(const ofxJSONElement& moduleInfo)
 {
