@@ -97,6 +97,8 @@ extern float gControlTactileFeedback;
 extern float gDrawScale;
 extern bool gShowDevModules;
 extern float gCornerRoundness;
+extern std::random_device gRandomDevice;
+extern std::mt19937 gRandom;
 
 struct GlobalManagers
 {
@@ -193,7 +195,7 @@ bool EvaluateExpression(string expression, float currentValue, float& output);
 
 inline static float RandomSample()
 {
-   return (float(rand())/RAND_MAX) * 2.0f - 1.0f;
+   return (float(gRandom())/gRandom.max()) * 2.0f - 1.0f;
 }
 
 inline static string GetPathSeparator()

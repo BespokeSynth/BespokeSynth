@@ -113,9 +113,9 @@ void ChaosEngine::Poll()
       if (chaosTimeLeft > ofRandom(-1000,3000))
       {
          if (mTotalChaos)
-            TheTransport->SetTimeSignature(rand()%8+2, (int)powf(2,rand()%3+2));
+            TheTransport->SetTimeSignature(gRandom()%8+2, (int)powf(2,gRandom()%3+2));
          
-         TheScale->SetRoot(rand()%TheScale->GetTet());
+         TheScale->SetRoot(gRandom()%TheScale->GetTet());
          TheScale->SetRandomSeptatonicScale();
          float bias = ofRandom(0,1);
          bias *= bias;
@@ -621,17 +621,17 @@ void ChaosEngine::GenerateRandomProgression()
    TheScale->SetAccidentals(none);
    
    mChordProgression.clear();
-   int length = (rand() % 3) + 3;
+   int length = (gRandom() % 3) + 3;
    mChordProgression.push_back(ProgressionChord(0));
    int beatsPerBar = TheTransport->GetTimeSigTop();
    int beatsLeft = beatsPerBar;
    for (int i=1; i<length;)
    {
-      int degree = (rand()%6)+1;
+      int degree = (gRandom()%6)+1;
       Chord chord;
       int rootPitch = TheScale->GetPitchFromTone(degree);
       if (ofRandom(1) < .5f && (degree == 3 || degree == 4)) //chance we do a non-diatonic
-         chord = Chord(rootPitch, (rand()%2) ? kChord_Maj : kChord_Min);
+         chord = Chord(rootPitch, (gRandom()%2) ? kChord_Maj : kChord_Min);
       else
          chord.SetFromDegreeAndScale(degree, TheScale->GetScalePitches());
       
@@ -640,7 +640,7 @@ void ChaosEngine::GenerateRandomProgression()
       
       int beats = beatsLeft;
       if (ofRandom(1) < .2f) //small chance we do less than a bar
-         beats = (rand() % beatsLeft) + 1;
+         beats = (gRandom() % beatsLeft) + 1;
       
       ProgressionChord progressionChord(degree, accidentals, beats);
       
@@ -648,7 +648,7 @@ void ChaosEngine::GenerateRandomProgression()
       if (progressionChord.SameChord(lastChord))   //two in a row
          continue;
       
-      progressionChord.mInversion = rand() % 3;
+      progressionChord.mInversion = gRandom() % 3;
       
       mChordProgression.push_back(progressionChord);
       beatsLeft -= beats;

@@ -93,7 +93,7 @@ void NoteCounter::OnTimeEvent(double time)
    
    mNoteOutput.Flush(time);
    if (mRandom)
-      PlayNoteOutput(time, rand() % mLength + mStart, 127, -1);
+      PlayNoteOutput(time, gRandom() % mLength + mStart, 127, -1);
    else
       PlayNoteOutput(time, mStep + mStart, 127, -1);
 }

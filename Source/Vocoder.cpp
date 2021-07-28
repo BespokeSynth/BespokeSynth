@@ -136,7 +136,7 @@ void Vocoder::Process(double time)
       //use noise as carrier signal if it's a fricative
       //but make the noise the same-ish volume as input carrier
       for (int i=0; i<bufferSize; ++i)
-         mRollingCarrierBuffer.Write(mCarrierInputBuffer[rand()%bufferSize]*2, 0);
+         mRollingCarrierBuffer.Write(mCarrierInputBuffer[gRandom()%bufferSize]*2, 0);
    }
 
    //copy rolling carrier buffer into working buffer and window it

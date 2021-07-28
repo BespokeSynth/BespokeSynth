@@ -107,7 +107,7 @@ void Scale::Init()
       mScales[0].mPitches = vector<int>{0,2,4,5,7,9,11};
    }
    
-   SetRoot(rand()%TheScale->GetTet());
+   SetRoot(gRandom()%TheScale->GetTet());
    SetRandomSeptatonicScale();
 }
 
@@ -248,7 +248,7 @@ void Scale::SetScaleType(string type, bool force)
 
 void Scale::SetRandomSeptatonicScale()
 {
-   mScaleIndex = rand()%mNumSeptatonicScales;
+   mScaleIndex = gRandom()%mNumSeptatonicScales;
    mScale.SetScaleType(mScales[mScaleIndex].mName);
 }
 

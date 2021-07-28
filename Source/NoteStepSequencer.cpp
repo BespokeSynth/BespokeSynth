@@ -503,7 +503,7 @@ void NoteStepSequencer::Step(double time, float velocity, int pulseFlags)
    if (pulseFlags & kPulseFlag_Reset)
       mArpIndex = 0;
    else if (pulseFlags & kPulseFlag_Random)
-      mArpIndex = rand() % mLength;
+      mArpIndex = gRandom() % mLength;
    
    if (!mHasExternalPulseSource || (pulseFlags & kPulseFlag_SyncToTransport))
    {
@@ -816,7 +816,7 @@ void NoteStepSequencer::ButtonClicked(ClickButton* button)
    {
       for (int i=0; i < mLength; ++i)
       {
-         switch (rand() % 5)
+         switch (gRandom() % 5)
          {
             case 0:
                mVels[i] = 0;
@@ -845,7 +845,7 @@ void NoteStepSequencer::RandomizePitches(bool fifths)
    {
       for (int i=0; i < mLength; ++i)
       {
-         switch (rand() % 5)
+         switch (gRandom() % 5)
          {
             case 0:
                mTones[i] = 0;
@@ -868,7 +868,7 @@ void NoteStepSequencer::RandomizePitches(bool fifths)
    else
    {
       for (int i=0; i < mLength; ++i)
-         mTones[i] = rand() % mNoteRange;
+         mTones[i] = gRandom() % mNoteRange;
    }
 }
 
@@ -910,7 +910,7 @@ void NoteStepSequencer::IntSliderUpdated(IntSlider* slider, int oldVal)
    {
       mLength = MIN(mLength, NSS_MAX_STEPS);
       for (int i = oldVal; i < mLength; ++i)
-         mTones[i] = rand() % mNoteRange;
+         mTones[i] = gRandom() % mNoteRange;
       mGrid->SetGrid(mLength, mNoteRange);
       mVelocityGrid->SetGrid(mLength, 1);
       mLoopResetPointSlider->SetExtents(0, mLength);

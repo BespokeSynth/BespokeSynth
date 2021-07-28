@@ -378,7 +378,7 @@ float ofMap(float val, float fromStart, float fromEnd, float toStart, float toEn
 
 float ofRandom(float max)
 {
-   return max * rand() / (RAND_MAX + 1.0f);
+   return max * float(gRandom()) / gRandom.max();
 }
 
 float ofRandom(float x, float y)
@@ -390,7 +390,7 @@ float ofRandom(float x, float y)
    if (x == y) return x; 			// float == ?, wise? epsilon?
    high = MAX(x,y);
    low = MIN(x,y);
-   randNum = low + ((high-low) * rand()/(RAND_MAX + 1.0f));
+   randNum = low + ((high-low) * float(gRandom()) / gRandom.max());
    return randNum;
 }
 

@@ -63,7 +63,7 @@ private:
    bool IsHovered();
    void Clear();
    float GetPerlinNoiseValue(double time, float x, float y, bool horizontal);
-   void UpdatePerlinSeed() { mPerlinSeed = rand() % 1000; }
+   void UpdatePerlinSeed() { mPerlinSeed = gRandom() % 1000; }
    
    //IDrawableModule
    void DrawModule() override;

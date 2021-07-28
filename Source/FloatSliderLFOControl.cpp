@@ -216,7 +216,7 @@ void FloatSliderLFOControl::SetOwner(FloatSlider* owner)
 
 void FloatSliderLFOControl::RandomizeSettings()
 {
-   switch (rand() % 8)
+   switch (gRandom() % 8)
    {
       case 0: mLFOSettings.mInterval = kInterval_2; break;
       case 1: mLFOSettings.mInterval = kInterval_1n; break;

@@ -155,7 +155,7 @@ void LFO::SetType(OscillatorType type)
       TheTransport->RemoveListener(this);
 
    if (type == kOsc_Perlin)
-      mPerlinSeed = rand() % 10000;
+      mPerlinSeed = gRandom() % 10000;
    
    if (mOsc.GetType() == kOsc_Drunk || mOsc.GetType() == kOsc_Perlin || mPeriod == kInterval_Free)
       TheTransport->AddAudioPoller(this);

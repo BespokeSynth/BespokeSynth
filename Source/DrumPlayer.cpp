@@ -1044,7 +1044,7 @@ void DrumPlayer::DrumHit::LoadRandomSample()
 
    if (files.size() > 0)
    {
-      string file = files[rand() % files.size()].getFullPathName().toStdString();
+      string file = files[gRandom() % files.size()].getFullPathName().toStdString();
       
       mOwner->LoadSampleLock();
       mSample.Read(file.c_str());

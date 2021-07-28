@@ -56,12 +56,14 @@ float gDrawScale = 1;
 bool gShowDevModules = false;
 float gCornerRoundness = 1;
 
+std::random_device gRandomDevice;
+std::mt19937 gRandom(gRandomDevice());
+
 void SynthInit()
 {
-   srand((unsigned int)time(nullptr));
    std::locale::global(std::locale::classic());
    
-   gDefaultTempo = rand() % 80 + 75;
+   gDefaultTempo = gRandom() % 80 + 75;
    
    Clear(gZeroBuffer, kWorkBufferSize);
    

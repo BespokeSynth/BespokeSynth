@@ -118,7 +118,7 @@ void LocationZoomer::PickNewVanityPanningDestination()
    int attempts = 0;
    for (int i=0; i<kRandomChoices; ++i)
    {
-      int choice = rand() % ((int)modules.size());
+      int choice = gRandom() % ((int)modules.size());
       if (modules[choice]->IsShowing() && !modules[choice]->Minimized())
       {
          ofVec2f modulePos = modules[choice]->GetRect().getCenter();

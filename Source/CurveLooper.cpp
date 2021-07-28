@@ -183,7 +183,7 @@ void CurveLooper::ButtonClicked(ClickButton* button)
 {
    if (button == mRandomizeButton)
    {
-      mAdsr.SetNumStages(rand() % 6 + 2);
+      mAdsr.SetNumStages(gRandom() % 6 + 2);
       std::vector<float> times;
       for (int i=0; i<mAdsr.GetNumStages(); ++i)
          times.push_back(ofRandom(1,kAdsrTime-1));

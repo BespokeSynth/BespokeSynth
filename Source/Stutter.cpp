@@ -261,7 +261,7 @@ void Stutter::OnTimeEvent(double time)
    {
       if (mAutoStutter && TheTransport->GetMeasurePos(time) > .001f)  //don't auto-stutter downbeat
       {
-         if (rand() % 4 == 0)
+         if (gRandom() % 4 == 0)
          {
             const StutterParams randomStutters[] = {StutterParams(kInterval_2n, 1),
                                                     StutterParams(kInterval_4n, 1),
@@ -272,7 +272,7 @@ void Stutter::OnTimeEvent(double time)
                                                     StutterParams(kInterval_2n, -1),
                                                     StutterParams(kInterval_8n, .5f),
                                                     StutterParams(kInterval_8n, 2)};
-            DoStutter(time, randomStutters[rand() % 9]);
+            DoStutter(time, randomStutters[gRandom() % 9]);
          }
          else
          {

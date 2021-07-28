@@ -683,7 +683,7 @@ void StepSequencer::Step(double time, float velocity, int pulseFlags)
    if (pulseFlags & kPulseFlag_Reset)
       mCurrentColumn = 0;
    else if (pulseFlags & kPulseFlag_Random)
-      mCurrentColumn = rand() % GetNumSteps(mStepInterval);
+      mCurrentColumn = gRandom() % GetNumSteps(mStepInterval);
 
    if (!mHasExternalPulseSource || (pulseFlags & kPulseFlag_SyncToTransport))
       mCurrentColumn = GetStepNum(time);

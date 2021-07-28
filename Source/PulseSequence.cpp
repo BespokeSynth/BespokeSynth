@@ -150,7 +150,7 @@ void PulseSequence::Step(double time, float velocity, int flags)
    if (flags & kPulseFlag_Reset)
       mStep = 0;
    else if (flags & kPulseFlag_Random)
-      mStep = rand() % mLength;
+      mStep = gRandom() % mLength;
 
    if (flags & kPulseFlag_SyncToTransport)
    {
