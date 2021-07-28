@@ -507,7 +507,14 @@ void ModularSynth::Draw(void* vg)
 
    ofPushMatrix();
    {
-      ofScale(mUILayerModuleContainer.GetDrawScale(), mUILayerModuleContainer.GetDrawScale(), mUILayerModuleContainer.GetDrawScale());
+      float uiScale = mUILayerModuleContainer.GetDrawScale();
+      if (uiScale == 0)
+      {
+         //wtf? this is sometimes going to zero somehow. here's a bandaid to prevent that catastrophic situation.
+         mUILayerModuleContainer.SetDrawScale(1);
+         uiScale = mUILayerModuleContainer.GetDrawScale();
+      }
+      ofScale(uiScale, uiScale, uiScale);
       ofTranslate(mUILayerModuleContainer.GetDrawOffset().x, mUILayerModuleContainer.GetDrawOffset().y);
       
       mUILayerModuleContainer.Draw();
