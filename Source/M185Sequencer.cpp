@@ -16,6 +16,7 @@ M185Sequencer::M185Sequencer()
 , mHeight(0)
 , mHasExternalPulseSource(false)
 , mStepIdx(0)
+, mLastPlayedStepIdx(0)
 , mStepPulseIdx(0)
 , mLastPitch(0)
 , mInterval(kInterval_8n)
@@ -36,8 +37,8 @@ void M185Sequencer::CreateUIControls()
    IDrawableModule::CreateUIControls();
 
    UIBLOCK2(10, 0);
+   DROPDOWN(mIntervalSelector,"interval",(int*)(&mInterval), 40); UIBLOCK_SHIFTRIGHT();
    BUTTON(mResetStepButton,"reset step");
-   DROPDOWN(mIntervalSelector,"interval",(int*)(&mInterval), 40);
    int i=0;
    for (auto& step : mSteps)
    {
@@ -89,13 +90,13 @@ void M185Sequencer::DrawModule()
    int totalSteps = 0;
    for (auto& step : mSteps)
       totalSteps += step.mPulseCount;
-   DrawTextNormal("total steps: "+ofToString(totalSteps), 55, 13);
+   DrawTextNormal("total steps: "+ofToString(totalSteps), 120, 13);
 
    ofPushStyle();
    for (int i = 0; i < mSteps.size(); i++)
    {
       ofFill();
-      ofSetColor(0,i == mStepIdx ? 255 : 0,0,gModuleDrawAlpha*.4f);
+      ofSetColor(0,i == mLastPlayedStepIdx ? 255 : 0,0,gModuleDrawAlpha*.4f);
       ofRect(mSteps[i].xPos,
              mSteps[i].yPos,
              10, 10);
@@ -128,6 +129,9 @@ void M185Sequencer::OnPulse(double time, float velocity, int flags)
 
 void M185Sequencer::StepBy(double time, float velocity, int flags)
 {
+   if (flags & kPulseFlag_Reset)
+      ResetStep();
+   
    if (mEnabled)
    {
       bool stopPrevNote =
@@ -150,11 +154,14 @@ void M185Sequencer::StepBy(double time, float velocity, int flags)
          PlayNoteOutput(time, mSteps[mStepIdx].mPitch, velocity*127, -1);
          mLastPitch = mSteps[mStepIdx].mPitch;
       }
-   } else if (mLastPitch >= 0)
+   }
+   else if (mLastPitch >= 0)
    {
       PlayNoteOutput(time, mLastPitch, 0, -1);
       mLastPitch = -1;
    }
+   
+   mLastPlayedStepIdx = mStepIdx;
 
    // Update step/pulse
    mStepPulseIdx++;
@@ -165,6 +172,12 @@ void M185Sequencer::StepBy(double time, float velocity, int flags)
    }
 }
 
+void M185Sequencer::ResetStep()
+{
+   mStepIdx = 0;
+   mStepPulseIdx = 0;
+}
+
 void M185Sequencer::GetModuleDimensions(float& width, float& height)
 {
    width = mWidth;
@@ -173,10 +186,8 @@ void M185Sequencer::GetModuleDimensions(float& width, float& height)
 
 void M185Sequencer::ButtonClicked(ClickButton* button)
 {
-   if (mResetStepButton == button) {
-      mStepIdx = 0;
-      mStepPulseIdx = 0;
-   }
+   if (mResetStepButton == button)
+      ResetStep();
 }
 
 void M185Sequencer::DropdownUpdated(DropdownList* list, int oldVal)

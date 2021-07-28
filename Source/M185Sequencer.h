@@ -60,6 +60,7 @@ private:
    bool Enabled() const override { return mEnabled; }
 
    void StepBy(double time, float velocity, int flags);
+   void ResetStep();
 
    enum GateType
    {
@@ -100,6 +101,7 @@ private:
 
    // Going through 0..(mSteps.size() - 1)
    int mStepIdx;
+   int mLastPlayedStepIdx;
 
    // Going through 0..(mSteps[X].mPulseCount - 1)
    int mStepPulseIdx;
