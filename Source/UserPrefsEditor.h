@@ -78,6 +78,8 @@ private:
    int mWindowPositionY;
    FloatSlider* mZoomSlider;
    float mZoom;
+   FloatSlider* mUIScaleSlider;
+   float mUIScale;
    FloatSlider* mScrollMultiplierVerticalSlider;
    float mScrollMultiplierVertical;
    FloatSlider* mScrollMultiplierHorizontalSlider;

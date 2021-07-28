@@ -139,6 +139,7 @@ public:
    void SetPixelRatio(double ratio) { mPixelRatio = ratio; }
    double GetPixelRatio() const { return mPixelRatio; }
    long GetFrameCount() { return mFrameCount; }
+   void SetUIScale(float scale) { mUILayerModuleContainer.SetDrawScale(scale); }
    ModuleContainer* GetRootContainer() { return &mModuleContainer; }
 
    void ZoomView(float zoomAmount, bool fromMouse);

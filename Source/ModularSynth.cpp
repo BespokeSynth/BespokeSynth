@@ -506,10 +506,16 @@ void ModularSynth::Draw(void* vg)
    ofPopMatrix();
 
    ofPushMatrix();
-   ofScale(mUILayerModuleContainer.GetDrawScale(), mUILayerModuleContainer.GetDrawScale(), mUILayerModuleContainer.GetDrawScale());
-   ofTranslate(mUILayerModuleContainer.GetDrawOffset().x, mUILayerModuleContainer.GetDrawOffset().y);
-   mUILayerModuleContainer.Draw();
-   mUILayerModuleContainer.DrawUnclipped();
+   {
+      ofScale(mUILayerModuleContainer.GetDrawScale(), mUILayerModuleContainer.GetDrawScale(), mUILayerModuleContainer.GetDrawScale());
+      ofTranslate(mUILayerModuleContainer.GetDrawOffset().x, mUILayerModuleContainer.GetDrawOffset().y);
+      
+      mUILayerModuleContainer.Draw();
+      mUILayerModuleContainer.DrawUnclipped();
+      
+      Profiler::Draw();
+      DrawConsole();
+   }
    ofPopMatrix();
    
    for (auto* modal : mModalFocusItemStack)
@@ -607,10 +613,6 @@ void ModularSynth::Draw(void* vg)
       ofPopMatrix();
    }
 
-   Profiler::Draw();
-
-   DrawConsole();
-
    ofPushStyle();
    ofNoFill();
    float centerX = ofGetWidth() * .5f;
@@ -668,7 +670,7 @@ void ModularSynth::DrawConsole()
       ofPopStyle();
    }
    
-   float consoleY = 51;
+   float consoleY = TheTitleBar->GetRect().height + 15;
    
    if (IKeyboardFocusListener::GetActiveKeyboardFocus() == mConsoleEntry)
    {
@@ -1745,7 +1747,11 @@ void ModularSynth::ResetLayout()
    }
    
    GetDrawOffset().set(0,0);
-   mUILayerModuleContainer.SetDrawScale(gDrawScale);
+   
+   float uiScale = 1;
+   if (!mUserPrefs["ui_scale"].isNull())
+      uiScale = mUserPrefs["ui_scale"].asDouble();
+   SetUIScale(uiScale);
 }
 
 bool ModularSynth::LoadLayoutFromFile(string jsonFile, bool makeDefaultLayout /*= true*/)

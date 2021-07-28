@@ -141,8 +141,6 @@ TitleBar::TitleBar()
 {
    assert(TheTitleBar == nullptr);
    TheTitleBar = this;
-
-   mTitleBarScale = gDrawScale;
    
    mHelpDisplay = dynamic_cast<HelpDisplay*>(HelpDisplay::Create());
    mHelpDisplay->SetTypeName("helpdisplay");
@@ -267,7 +265,7 @@ namespace
 
 float TitleBar::GetPixelWidth() const
 {
-   return ofGetWidth() / mTitleBarScale;
+   return ofGetWidth() / GetOwningContainer()->GetDrawScale();
 }
 
 void TitleBar::DrawModule()
@@ -361,8 +359,8 @@ void TitleBar::DrawModule()
       ofSetColor(255,150,150);
    else
       ofSetColor(255,255,255);
-   DrawTextLeftJustify(stats, ofGetWidth()/mTitleBarScale - 5, 33);
-   mDisplayHelpButton->SetPosition(ofGetWidth()/mTitleBarScale - 20, 4);
+   DrawTextLeftJustify(stats, ofGetWidth()/GetOwningContainer()->GetDrawScale() - 5, 33);
+   mDisplayHelpButton->SetPosition(ofGetWidth()/GetOwningContainer()->GetDrawScale() - 20, 4);
    mDisplayHelpButton->Draw();
    mDisplayUserPrefsEditorButton->SetPosition(mDisplayHelpButton->GetPosition(true).x - 55, 4);
    mDisplayUserPrefsEditorButton->Draw();
@@ -413,19 +411,20 @@ void TitleBar::DrawModuleUnclipped()
       ofRectangle helpButtonRect = mDisplayHelpButton->GetRect(true);
       float x = helpButtonRect.getCenter().x;
       float y = helpButtonRect.getCenter().y + 15 + titleBarHeight;
-      gFontBold.DrawString(text, size, x - gFontBold.GetStringWidth(text, size, K(isRenderThread)) - 15 * mTitleBarScale, y);
+      gFontBold.DrawString(text, size, x - gFontBold.GetStringWidth(text, size, K(isRenderThread)) - 15 * GetOwningContainer()->GetDrawScale(), y);
       ofSetLineWidth(2);
-      ofLine(x - 10, y - 6 * mTitleBarScale, x, y - 6 * mTitleBarScale);
-      ofLine(x, y - 6 * mTitleBarScale, x, y - 18 * mTitleBarScale);
-      ofLine(x - 3 * mTitleBarScale, y - 15 * mTitleBarScale, x, y - 18 * mTitleBarScale);
-      ofLine(x + 3 * mTitleBarScale, y - 15 * mTitleBarScale, x, y - 18 * mTitleBarScale);
+      float scale = GetOwningContainer()->GetDrawScale();
+      ofLine(x - 10, y - 6 * scale, x, y - 6 * scale);
+      ofLine(x, y - 6 * scale, x, y - 18 * scale);
+      ofLine(x - 3 * scale, y - 15 * scale, x, y - 18 * scale);
+      ofLine(x + 3 * scale, y - 15 * scale, x, y - 18 * scale);
       ofPopStyle();
    }
 }
 
 bool TitleBar::HiddenByZoom() const
 {
-   return ofGetWidth() / mTitleBarScale < 620;
+   return false; //ofGetWidth() / GetOwningContainer()->GetDrawScale() < 620;
 }
 
 void TitleBar::GetModuleDimensions(float& width, float& height)
@@ -437,7 +436,7 @@ void TitleBar::GetModuleDimensions(float& width, float& height)
       return;
    }
    
-   width = ofGetWidth() / mTitleBarScale + 5;
+   width = ofGetWidth() / GetOwningContainer()->GetDrawScale() + 5;
    if (GetPixelWidth() < kDoubleHeightThreshold)
       height = 36 * 2;
    else

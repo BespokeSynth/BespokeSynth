@@ -36,7 +36,8 @@ void UserPrefsEditor::CreateUIControls()
    CHECKBOX(mSetWindowPositionCheckbox, "set position", &mSetWindowPosition);
    TEXTENTRY_NUM(mWindowPositionXEntry, "position_x", 5, &mWindowPositionX, -10000, 10000);
    TEXTENTRY_NUM(mWindowPositionYEntry, "position_y", 5, &mWindowPositionY, -10000, 10000);
-   FLOATSLIDER(mZoomSlider, "zoom", &mZoom, .1f, 4);
+   FLOATSLIDER(mZoomSlider, "zoom", &mZoom, .25f, 2);
+   FLOATSLIDER(mUIScaleSlider, "ui_scale", &mUIScale, .25f, 2);
    FLOATSLIDER(mScrollMultiplierVerticalSlider, "scroll_multiplier_vertical", &mScrollMultiplierVertical, -2, 2);
    FLOATSLIDER(mScrollMultiplierHorizontalSlider, "scroll_multiplier_horizontal", &mScrollMultiplierHorizontal, -2, 2);
    CHECKBOX(mAutosaveCheckbox, "autosave", &mAutosave);
@@ -56,6 +57,7 @@ void UserPrefsEditor::CreateUIControls()
 
 
    mZoomSlider->SetShowName(false);
+   mUIScaleSlider->SetShowName(false);
    mScrollMultiplierVerticalSlider->SetShowName(false);
    mScrollMultiplierHorizontalSlider->SetShowName(false);
    mVstSearchDirsEntry->SetFlexibleWidth(true);
@@ -88,6 +90,11 @@ void UserPrefsEditor::Show()
       mZoom = 1;
    else
       mZoom = TheSynth->GetUserPrefs()["zoom"].asDouble();
+   
+   if (TheSynth->GetUserPrefs()["ui_scale"].isNull())
+      mUIScale = 1;
+   else
+      mUIScale = TheSynth->GetUserPrefs()["ui_scale"].asDouble();
 
    if (TheSynth->GetUserPrefs()["scroll_multiplier_vertical"].isNull())
       mScrollMultiplierVertical = 1;
@@ -460,6 +467,7 @@ void UserPrefsEditor::ButtonClicked(ClickButton* button)
          userPrefs.removeMember("position_y");
       }
       UpdatePrefFloat(userPrefs, "zoom", mZoom);
+      UpdatePrefFloat(userPrefs, "ui_scale", mUIScale);
       UpdatePrefFloat(userPrefs, "scroll_multiplier_vertical", mScrollMultiplierVertical);
       UpdatePrefFloat(userPrefs, "scroll_multiplier_horizontal", mScrollMultiplierHorizontal);
       UpdatePrefBool(userPrefs, "autosave", mAutosave);
@@ -498,6 +506,8 @@ void UserPrefsEditor::CheckboxUpdated(Checkbox* checkbox)
 
 void UserPrefsEditor::FloatSliderUpdated(FloatSlider* slider, float oldVal)
 {
+   if (mUIScaleSlider)
+      TheSynth->SetUIScale(mUIScale);
 }
 
 void UserPrefsEditor::IntSliderUpdated(IntSlider* slider, int oldVal)
