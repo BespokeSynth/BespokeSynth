@@ -161,6 +161,7 @@ public:
    EffectFactory* GetEffectFactory() { return &mEffectFactory; }
    const vector<IDrawableModule*>& GetGroupSelectedModules() const { return mGroupSelectedModules; }
    bool ShouldAccentuateActiveModules() const;
+   LocationZoomer* GetLocationZoomer() { return &mZoomer; }
    
    void RegisterPatchCable(PatchCable* cable);
    void UnregisterPatchCable(PatchCable* cable);

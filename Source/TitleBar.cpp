@@ -138,6 +138,7 @@ TitleBar::TitleBar()
 , mLoadLayoutIndex(-1)
 , mSpawnLists(this)
 , mVstRescanCountdown(0)
+, mLeftCornerHovered(false)
 {
    assert(TheTitleBar == nullptr);
    TheTitleBar = this;
@@ -258,6 +259,26 @@ void TitleBar::ListLayouts()
    mSaveLayoutButton->PositionTo(mLoadLayoutDropdown, kAnchor_Right);
 }
 
+void TitleBar::OnClicked(int x, int y, bool right)
+{
+   IDrawableModule::OnClicked(x,y,right);
+   
+   if (mLeftCornerHovered)
+      TheSynth->GetLocationZoomer()->EnterVanityPanningMode();
+}
+
+bool TitleBar::MouseMoved(float x, float y)
+{
+   IDrawableModule::MouseMoved(x,y);
+   
+   if (x < 130)
+      mLeftCornerHovered = true;
+   else
+      mLeftCornerHovered = false;
+   
+   return false;
+}
+
 namespace
 {
    const float kDoubleHeightThreshold = 1200;
@@ -274,7 +295,12 @@ void TitleBar::DrawModule()
       return;
    
    ofSetColor(255,255,255);
+   
+   ofPushStyle();
+   if (gHoveredModule == this && mLeftCornerHovered)
+      ofSetColor(ofColor::lerp(ofColor::black, ofColor::white, ofMap(sin(gTime / 1000 * PI * 2),-1,1,.7f,.9f)));
    DrawTextBold("bespoke", 2, 28, 36);
+   ofPopStyle();
    
    string info;
    if (TheSynth->GetMoveModule())

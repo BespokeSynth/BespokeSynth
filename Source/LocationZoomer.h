@@ -23,9 +23,12 @@ public:
    void GoHome();
    ofxJSONElement GetSaveData();
    void LoadFromSaveData(const ofxJSONElement& saveData);
+   void EnterVanityPanningMode();
+   void ExitVanityPanningMode();
 private:
    void WriteCurrentLocation(char key);
    void MoveToLocation(char key);
+   void PickNewVanityPanningDestination();
    
    struct Location
    {
@@ -37,7 +40,10 @@ private:
    Location mStart;
    Location mDestination;
    float mCurrentProgress;
+   float mSpeed;
    Location mHome;
+   
+   bool mInVanityPanningMode;
 };
 
 #endif /* defined(__Bespoke__LocationZoomer__) */

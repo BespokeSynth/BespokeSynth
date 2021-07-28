@@ -1108,6 +1108,8 @@ void ModularSynth::MouseDragged(int intX, int intY, int button)
 
 void ModularSynth::MousePressed(int intX, int intY, int button)
 {
+   mZoomer.ExitVanityPanningMode();
+   
    if (PatchCable::sActivePatchCable != nullptr)
       return;
    
