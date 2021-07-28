@@ -10,6 +10,7 @@
 #define __modularSynth__M185Sequencer__
 
 #include <iostream>
+#include "ClickButton.h"
 #include "IDrawableModule.h"
 #include "INoteReceiver.h"
 #include "INoteSource.h"
@@ -18,7 +19,7 @@
 
 #define NUM_M185SEQUENCER_STEPS 8
 
-class M185Sequencer : public IDrawableModule, public IDropdownListener, public IIntSliderListener, public ITimeListener, public IPulseReceiver, public INoteSource
+class M185Sequencer : public IDrawableModule, public IButtonListener, public IDropdownListener, public IIntSliderListener, public ITimeListener, public IPulseReceiver, public INoteSource
 {
 public:
    M185Sequencer();
@@ -28,6 +29,9 @@ public:
    string GetTitleLabel() override { return "m185 sequencer"; }
    void CreateUIControls() override;
    void Init() override;
+
+   //IButtonListener
+   void ButtonClicked(ClickButton* button) override;
 
    //IDrawableModule
    void SetEnabled(bool enabled) override { mEnabled = enabled; }
@@ -105,6 +109,8 @@ private:
    NoteInterval mInterval;
 
    DropdownList* mIntervalSelector;
+
+   ClickButton* mResetStepButton;
 };
 
 #endif /* defined(__modularSynth__M185Sequencer__) */
