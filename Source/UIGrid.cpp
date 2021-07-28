@@ -463,16 +463,19 @@ int UIGrid::GetHighlightCol(double time) const
 
 namespace
 {
-   const int kSaveStateRev = 1;
+   const int kSaveStateRev = 2;
 }
 
 void UIGrid::SaveState(FileStreamOut& out)
 {
    out << kSaveStateRev;
    
-   for (int i=0; i<MAX_GRID_SIZE*MAX_GRID_SIZE; ++i)
+   out << mCols;
+   out << mRows;
+   for (int col=0; col<mCols; ++col)
    {
-      out << mData[i];
+      for (int row=0; row<mRows; ++row)
+         out << mData[GetDataIndex(col, row)];
    }
 }
 
@@ -482,20 +485,32 @@ void UIGrid::LoadState(FileStreamIn& in, bool shouldSetValue)
    in >> rev;
    LoadStateValidate(rev <= kSaveStateRev);
    
-   int gridSize = MAX_GRID_SIZE;
+   int cols = MAX_GRID_SIZE;
+   int rows = MAX_GRID_SIZE;
    
    if (rev < 1)
-      gridSize = 100;
-   
-   for (int i=0; i<gridSize; ++i)
    {
-      for (int j=0; j<gridSize; ++j)
+      cols = 100;
+      rows = 100;
+   }
+   
+   if (rev >= 2)
+   {
+      in >> mCols;
+      in >> mRows;
+      cols = mCols;
+      rows = mRows;
+   }
+   
+   for (int col=0; col<mCols; ++col)
+   {
+      for (int row=0; row<mRows; ++row)
       {
-         int dataIndex = GetDataIndex(j, i);
+         int dataIndex = GetDataIndex(col, row);
          float oldVal = mData[dataIndex];
          in >> mData[dataIndex];
          if (mListener)
-            mListener->GridUpdated(this, j, i, mData[dataIndex], oldVal);
+            mListener->GridUpdated(this, col, row, mData[dataIndex], oldVal);
       }
    }
 }
