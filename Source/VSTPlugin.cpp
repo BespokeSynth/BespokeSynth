@@ -206,6 +206,16 @@ string VSTPlugin::GetPluginName()
    return "no plugin loaded";
 }
 
+string VSTPlugin::GetPluginId()
+{
+   if (mPlugin)
+   {
+      const auto& desc = dynamic_cast<juce::AudioPluginInstance*>(mPlugin.get())->getPluginDescription();
+      return mPlugin->getName().toStdString() + "_" + ofToString(desc.uid);
+   }
+   return "no plugin loaded";
+}
+
 void VSTPlugin::SetVST(string vstName)
 {
    ofLog() << "loading VST: " << vstName;
@@ -653,6 +663,11 @@ vector<IUIControl*> VSTPlugin::ControlsToIgnoreInSaveState() const
    return ignore;
 }
 
+namespace
+{
+   const int kSaveStateRev = 1;
+}
+
 void VSTPlugin::DropdownUpdated(DropdownList* list, int oldVal)
 {
    if (list == mPresetFileSelector)
@@ -675,10 +690,20 @@ void VSTPlugin::DropdownUpdated(DropdownList* list, int oldVal)
             return;
          }
              
-         int64 size = input->readInt64();
-         char* data = new char[size];
-         input->read(data, size);
-         mPlugin->setStateInformation(data, size);
+         int rev = input->readInt();
+
+         int64 vstStateSize = input->readInt64();
+         char* vstState = new char[vstStateSize];
+         input->read(vstState, vstStateSize);
+         mPlugin->setStateInformation(vstState, vstStateSize);
+
+         int64 vstProgramStateSize = input->readInt64();
+         if (vstProgramStateSize > 0)
+         {
+            char* vstProgramState = new char[vstProgramStateSize];
+            input->read(vstProgramState, vstProgramStateSize);
+            mPlugin->setCurrentProgramStateInformation(vstProgramState, vstProgramStateSize);
+         }
       }
    }
    
@@ -728,8 +753,8 @@ void VSTPlugin::ButtonClicked(ClickButton* button)
    
    if (button == mSavePresetFileButton && mPlugin != nullptr)
    {
-      juce::File(ofToDataPath("vst/presets/"+GetPluginName())).createDirectory();
-      FileChooser chooser("Save preset as...", File(ofToDataPath("vst/presets/"+GetPluginName()+"/preset.vstp")), "*.vstp", true, false, TheSynth->GetMainComponent()->getTopLevelComponent());
+      juce::File(ofToDataPath("vst/presets/"+GetPluginId())).createDirectory();
+      FileChooser chooser("Save preset as...", File(ofToDataPath("vst/presets/"+ GetPluginId()+"/preset.vstp")), "*.vstp", true, false, TheSynth->GetMainComponent()->getTopLevelComponent());
       if (chooser.browseForFileToSave(true))
       {
          string path = chooser.getResult().getFullPathName().toStdString();
@@ -748,9 +773,15 @@ void VSTPlugin::ButtonClicked(ClickButton* button)
 
             juce::MemoryBlock vstState;
             mPlugin->getStateInformation(vstState);
+            juce::MemoryBlock vstProgramState;
+            mPlugin->getCurrentProgramStateInformation(vstProgramState);
             
+            output.writeInt(kSaveStateRev);
             output.writeInt64(vstState.getSize());
             output.write(vstState.getData(), vstState.getSize());
+            output.writeInt64(vstProgramState.getSize());
+            if (vstProgramState.getSize() > 0)
+               output.write(vstProgramState.getData(), vstProgramState.getSize());
             output.flush(); // (called explicitly to force an fsync on posix)
 
             if (output.getStatus().failed())
@@ -792,8 +823,8 @@ void VSTPlugin::RefreshPresetFiles()
    if (mPlugin == nullptr)
       return;
    
-   juce::File(ofToDataPath("vst/presets/"+GetPluginName())).createDirectory();
-   DirectoryIterator dir(File(ofToDataPath("vst/presets/"+GetPluginName())), false);
+   juce::File(ofToDataPath("vst/presets/"+ GetPluginId())).createDirectory();
+   DirectoryIterator dir(File(ofToDataPath("vst/presets/"+ GetPluginId())), false);
    mPresetFilePaths.clear();
    mPresetFileSelector->Clear();
    while(dir.next())
@@ -836,11 +867,6 @@ void VSTPlugin::SetUpFromSaveData()
    mModwheelCC = mModuleSaveData.GetInt("modwheelcc(1or74)");
 }
 
-namespace
-{
-   const int kSaveStateRev = 0;
-}
-
 void VSTPlugin::SaveState(FileStreamOut& out)
 {
    IDrawableModule::SaveState(out);
@@ -854,6 +880,12 @@ void VSTPlugin::SaveState(FileStreamOut& out)
       mPlugin->getStateInformation(vstState);
       out << (int)vstState.getSize();
       out.WriteGeneric(vstState.getData(), (int)vstState.getSize());
+
+      juce::MemoryBlock vstProgramState;
+      mPlugin->getCurrentProgramStateInformation(vstProgramState);
+      out << (int)vstProgramState.getSize();
+      if (vstProgramState.getSize() > 0)
+         out.WriteGeneric(vstProgramState.getData(), (int)vstProgramState.getSize());
    }
    else
    {
@@ -867,20 +899,31 @@ void VSTPlugin::LoadState(FileStreamIn& in)
    
    int rev;
    in >> rev;
-   LoadStateValidate(rev == kSaveStateRev);
+   LoadStateValidate(rev <= kSaveStateRev);
    
    bool hasPlugin;
    in >> hasPlugin;
    if (hasPlugin)
    {
-      int size;
-      in >> size;
-      char* data = new char[size];
-      in.ReadGeneric(data, size);
+      int vstStateSize;
+      in >> vstStateSize;
+      char* vstState = new char[vstStateSize];
+      in.ReadGeneric(vstState, vstStateSize);
+
+      int vstProgramStateSize;
+      if (rev >= 1)
+         in >> vstProgramStateSize;
+      char* vstProgramState = new char[vstProgramStateSize];
+      if (rev >= 1 && vstProgramStateSize > 0)
+         in.ReadGeneric(vstProgramState, vstProgramStateSize);
+
       if (mPlugin != nullptr)
       {
          ofLog() << "loading vst state for " << mPlugin->getName();
-         mPlugin->setStateInformation(data, size);
+
+         mPlugin->setStateInformation(vstState, vstStateSize);
+         if (rev >= 1 && vstProgramStateSize > 0)
+            mPlugin->setCurrentProgramStateInformation(vstProgramState, vstProgramStateSize);
       }
       else
       {

@@ -85,6 +85,7 @@ private:
    void LoadVST(juce::PluginDescription desc);
    
    string GetPluginName();
+   string GetPluginId();
    void CreateParameterSliders();
    void RefreshPresetFiles();
    
