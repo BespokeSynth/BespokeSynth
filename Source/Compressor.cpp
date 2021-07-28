@@ -54,7 +54,7 @@ void Compressor::CreateUIControls()
    UIBLOCK0();
    FLOATSLIDER(mMixSlider, "mix",&mMix,0,1);
    FLOATSLIDER(mThresholdSlider, "threshold",&mThreshold,-70,0);
-   FLOATSLIDER(mRatioSlider, "ratio",&mRatio,1,20);
+   FLOATSLIDER(mRatioSlider, "ratio",&mRatio,1,40);
    FLOATSLIDER(mAttackSlider, "attack",&mAttack,.1f,kMaxLookaheadMs);
    FLOATSLIDER(mReleaseSlider, "release",&mRelease,.1f,500);
    FLOATSLIDER(mLookaheadSlider, "lookahead",&mLookahead,0,kMaxLookaheadMs);
@@ -128,7 +128,7 @@ void Compressor::ProcessAudio(double time, ChannelBuffer* buffer)
       for (int ch=0; ch<buffer->NumActiveChannels(); ++ch)
       {
          mDelayBuffer.Write(buffer->GetChannel(ch)[i], ch);
-         buffer->GetChannel(ch)[i] = mDelayBuffer.GetSample(int(mLookahead * gSampleRateMs)+1, ch) * mOutputGain;	// apply gain reduction to input
+         buffer->GetChannel(ch)[i] = mDelayBuffer.GetSample(ofClamp(int(mLookahead * gSampleRateMs)+1, 1, mDelayBuffer.Size()-1), ch) * mOutputGain;	// apply gain reduction to input
       }
    }
 }
