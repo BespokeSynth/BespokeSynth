@@ -13,6 +13,7 @@
 #include "IAudioEffect.h"
 #include "Slider.h"
 #include "Checkbox.h"
+#include "RollingBuffer.h"
 
 //-------------------------------------------------------------
 // DC offset (to prevent denormal)
@@ -117,16 +118,19 @@ private:
    void GetModuleDimensions(float& width, float& height) override { width=mWidth; height=mHeight; }
    bool Enabled() const override { return mEnabled; }
 
-   
+   float mMix;
    float mThreshold;
    float mRatio;
    float mAttack;
    float mRelease;
+   float mLookahead;
    float mOutputAdjust;
+   FloatSlider* mMixSlider;
    FloatSlider* mThresholdSlider;
    FloatSlider* mRatioSlider;
    FloatSlider* mAttackSlider;
    FloatSlider* mReleaseSlider;
+   FloatSlider* mLookaheadSlider;
    FloatSlider* mOutputAdjustSlider;
    
    double mCurrentInputDb;
@@ -138,6 +142,8 @@ private:
    double envdB_;			// over-threshold envelope (dB)
 
    AttRelEnvelope mEnv;
+   
+   RollingBuffer mDelayBuffer;
 };
 
 #endif /* defined(__modularSynth__Compressor__) */

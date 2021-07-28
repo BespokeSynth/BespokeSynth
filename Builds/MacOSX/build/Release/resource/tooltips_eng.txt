@@ -842,10 +842,12 @@ butterworth~filter using the butterworth formula
 
 
 compressor~try to keep volume at a certain level
+~mix~amount of compression. lower this value for a "parallel compression" effect. you should use this mix slider instead of the effectchain's mix slider, to compensate for lookahead.
 ~threshold~threshold where gain should start to be reduced
 ~ratio~how much gain reduction to apply when the single passes the threshold
 ~attack~speed to apply gain reduction
 ~release~speed to remove gain reduction
+~lookahead~how much time to "look ahead" to adjust the compression envelope. this necessarily introduces a delay into your output, which could be compensated for by running sequencers slightly early.
 ~output~makeup gain, to increase volume
 
 

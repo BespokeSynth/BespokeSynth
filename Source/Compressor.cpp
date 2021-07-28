@@ -12,23 +12,30 @@
 #include "Profiler.h"
 #include "UIControlMacros.h"
 
-static double lin2dB( double lin )
+namespace
 {
-   static const double LOG_2_DB = 8.6858896380650365530225783783321;	// 20 / ln( 10 )
-   return log( lin ) * LOG_2_DB;
-}
+   static double lin2dB( double lin )
+   {
+      static const double LOG_2_DB = 8.6858896380650365530225783783321;	// 20 / ln( 10 )
+      return log( lin ) * LOG_2_DB;
+   }
 
-static double dB2lin( double dB )
-{
-   static const double DB_2_LOG = 0.11512925464970228420089957273422;	// ln( 10 ) / 20
-   return exp( dB * DB_2_LOG );
+   static double dB2lin( double dB )
+   {
+      static const double DB_2_LOG = 0.11512925464970228420089957273422;	// ln( 10 ) / 20
+      return exp( dB * DB_2_LOG );
+   }
+
+   const float kMaxLookaheadMs = 50;
 }
 
 Compressor::Compressor()
-: mThreshold(-24)
+: mMix(1)
+, mThreshold(-24)
 , mRatio(4)
 , mAttack(.1f)
 , mRelease(100)
+, mLookahead(3)
 , mOutputAdjust(1)
 , mThresholdSlider(nullptr)
 , mRatioSlider(nullptr)
@@ -36,6 +43,7 @@ Compressor::Compressor()
 , mReleaseSlider(nullptr)
 , mCurrentInputDb(0)
 , mOutputGain(1)
+, mDelayBuffer(kMaxLookaheadMs * gSampleRateMs)
 {
    envdB_ = DC_OFFSET;
 }
@@ -44,16 +52,19 @@ void Compressor::CreateUIControls()
 {
    IDrawableModule::CreateUIControls();
    UIBLOCK0();
+   FLOATSLIDER(mMixSlider, "mix",&mMix,0,1);
    FLOATSLIDER(mThresholdSlider, "threshold",&mThreshold,-70,0);
    FLOATSLIDER(mRatioSlider, "ratio",&mRatio,1,20);
-   FLOATSLIDER(mAttackSlider, "attack",&mAttack,.1f,50);
+   FLOATSLIDER(mAttackSlider, "attack",&mAttack,.1f,kMaxLookaheadMs);
    FLOATSLIDER(mReleaseSlider, "release",&mRelease,.1f,500);
+   FLOATSLIDER(mLookaheadSlider, "lookahead",&mLookahead,0,kMaxLookaheadMs);
    FLOATSLIDER(mOutputAdjustSlider, "output",&mOutputAdjust,0,2);
    ENDUIBLOCK(mWidth, mHeight);
 
    mRatioSlider->SetMode(FloatSlider::kSquare);
    mAttackSlider->SetMode(FloatSlider::kSquare);
    mReleaseSlider->SetMode(FloatSlider::kSquare);
+   mLookaheadSlider->SetMode(FloatSlider::kSquare);
    mOutputAdjustSlider->SetMode(FloatSlider::kSquare);
    
    mEnv.setAttack(mAttack);
@@ -67,12 +78,13 @@ void Compressor::ProcessAudio(double time, ChannelBuffer* buffer)
    if (!mEnabled)
       return;
    
-   float bufferSize = buffer->BufferSize();
-
-   ComputeSliders(0);
+   int bufferSize = buffer->BufferSize();
+   mDelayBuffer.SetNumChannels(buffer->NumActiveChannels());
 
    for (int i=0; i<bufferSize; ++i)
    {
+      ComputeSliders(i);
+      
       // create sidechain
 
       float input = 0;
@@ -110,20 +122,25 @@ void Compressor::ProcessAudio(double time, ChannelBuffer* buffer)
       // transfer function
       double reduction = overdB * ( invRatio - 1.0 );	// gain reduction (dB)
       double makeup = (-mThreshold * .5) * (1.0 - invRatio);
-      mOutputGain = dB2lin( reduction + makeup ) * mOutputAdjust;
+      mOutputGain = ofLerp(1, dB2lin( reduction + makeup ) * mOutputAdjust, mMix);
 
       // output gain
       for (int ch=0; ch<buffer->NumActiveChannels(); ++ch)
-         buffer->GetChannel(ch)[i] *= mOutputGain;	// apply gain reduction to input
+      {
+         mDelayBuffer.Write(buffer->GetChannel(ch)[i], ch);
+         buffer->GetChannel(ch)[i] = mDelayBuffer.GetSample(int(mLookahead * gSampleRateMs)+1, ch) * mOutputGain;	// apply gain reduction to input
+      }
    }
 }
 
 void Compressor::DrawModule()
 {
+   mMixSlider->Draw();
    mThresholdSlider->Draw();
    mRatioSlider->Draw();
    mAttackSlider->Draw();
    mReleaseSlider->Draw();
+   mLookaheadSlider->Draw();
    mOutputAdjustSlider->Draw();
    
    ofPushStyle();
@@ -153,9 +170,9 @@ void Compressor::CheckboxUpdated(Checkbox* checkbox)
 void Compressor::FloatSliderUpdated(FloatSlider* slider, float oldVal)
 {
    if (slider == mAttackSlider)
-      mEnv.setAttack(mAttack);
+      mEnv.setAttack(MAX(.1f,mAttack));
    if (slider == mReleaseSlider)
-      mEnv.setRelease(mRelease);
+      mEnv.setRelease(MAX(.1f,mRelease));
 }
 
 //-------------------------------------------------------------
