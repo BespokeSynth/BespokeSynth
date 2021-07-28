@@ -508,9 +508,10 @@ void ModularSynth::Draw(void* vg)
    ofPushMatrix();
    {
       float uiScale = mUILayerModuleContainer.GetDrawScale();
-      if (uiScale == 0)
+      if (uiScale < .01f)
       {
-         //wtf? this is sometimes going to zero somehow. here's a bandaid to prevent that catastrophic situation.
+         //safety check in case anything ever make the UI inaccessible
+         LogEvent("correcting UI scale", kLogEventType_Error);
          mUILayerModuleContainer.SetDrawScale(1);
          uiScale = mUILayerModuleContainer.GetDrawScale();
       }

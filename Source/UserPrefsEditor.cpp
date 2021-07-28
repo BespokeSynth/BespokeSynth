@@ -506,7 +506,7 @@ void UserPrefsEditor::CheckboxUpdated(Checkbox* checkbox)
 
 void UserPrefsEditor::FloatSliderUpdated(FloatSlider* slider, float oldVal)
 {
-   if (mUIScaleSlider)
+   if (mUIScaleSlider && !TheSynth->IsLoadingState())
       TheSynth->SetUIScale(mUIScale);
 }
 
