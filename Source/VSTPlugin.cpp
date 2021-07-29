@@ -665,7 +665,7 @@ vector<IUIControl*> VSTPlugin::ControlsToIgnoreInSaveState() const
 
 namespace
 {
-   const int kSaveStateRev = 1;
+   const int kSaveStateRev = 2;
 }
 
 void VSTPlugin::DropdownUpdated(DropdownList* list, int oldVal)
@@ -703,6 +703,19 @@ void VSTPlugin::DropdownUpdated(DropdownList* list, int oldVal)
             char* vstProgramState = new char[vstProgramStateSize];
             input->read(vstProgramState, vstProgramStateSize);
             mPlugin->setCurrentProgramStateInformation(vstProgramState, vstProgramStateSize);
+         }
+         
+         if (rev >= 2)
+         {
+            int numParamsShowing = input->readInt();
+            for (auto& param : mParameterSliders)
+               param.mShowing = false;
+            for (int i=0; i<numParamsShowing; ++i)
+            {
+               int index = input->readInt();
+               if (index < mParameterSliders.size())
+                  mParameterSliders[index].mShowing = true;
+            }
          }
       }
    }
@@ -782,6 +795,17 @@ void VSTPlugin::ButtonClicked(ClickButton* button)
             output.writeInt64(vstProgramState.getSize());
             if (vstProgramState.getSize() > 0)
                output.write(vstProgramState.getData(), vstProgramState.getSize());
+            
+            vector<int> exposedParams;
+            for (int i=0; i<(int)mParameterSliders.size(); ++i)
+            {
+               if (mParameterSliders[i].mShowing)
+                  exposedParams.push_back(i);
+            }
+            output.writeInt((int)exposedParams.size());
+            for (int i : exposedParams)
+               output.writeInt(i);
+            
             output.flush(); // (called explicitly to force an fsync on posix)
 
             if (output.getStatus().failed())
@@ -886,6 +910,16 @@ void VSTPlugin::SaveState(FileStreamOut& out)
       out << (int)vstProgramState.getSize();
       if (vstProgramState.getSize() > 0)
          out.WriteGeneric(vstProgramState.getData(), (int)vstProgramState.getSize());
+      
+      vector<int> exposedParams;
+      for (int i=0; i<(int)mParameterSliders.size(); ++i)
+      {
+         if (mParameterSliders[i].mShowing)
+            exposedParams.push_back(i);
+      }
+      out << (int)exposedParams.size();
+      for (int i : exposedParams)
+         out << i;
    }
    else
    {
@@ -924,6 +958,21 @@ void VSTPlugin::LoadState(FileStreamIn& in)
          mPlugin->setStateInformation(vstState, vstStateSize);
          if (rev >= 1 && vstProgramStateSize > 0)
             mPlugin->setCurrentProgramStateInformation(vstProgramState, vstProgramStateSize);
+         
+         if (rev >= 2)
+         {
+            int numParamsShowing;
+            in >> numParamsShowing;
+            for (auto& param : mParameterSliders)
+               param.mShowing = false;
+            for (int i=0; i<numParamsShowing; ++i)
+            {
+               int index;
+               in >> index;
+               if (index < mParameterSliders.size())
+                  mParameterSliders[index].mShowing = true;
+            }
+         }
       }
       else
       {
