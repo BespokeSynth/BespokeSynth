@@ -502,9 +502,9 @@ void UIGrid::LoadState(FileStreamIn& in, bool shouldSetValue)
       rows = mRows;
    }
    
-   for (int col=0; col<mCols; ++col)
+   for (int col=0; col<cols; ++col)
    {
-      for (int row=0; row<mRows; ++row)
+      for (int row=0; row<rows; ++row)
       {
          int dataIndex = GetDataIndex(col, row);
          float oldVal = mData[dataIndex];
