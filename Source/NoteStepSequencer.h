@@ -168,6 +168,12 @@ private:
    ClickButton* mRandomizePitchButton;
    ClickButton* mRandomizeLengthButton;
    ClickButton* mRandomizeVelocityButton;
+   float mRandomizePitchChance;
+   float mRandomizePitchRange;
+   float mRandomizeLengthChance;
+   float mRandomizeLengthRange;
+   float mRandomizeVelocityChance;
+   float mRandomizeVelocityRange;
    
    std::array<double, NSS_MAX_STEPS> mLastStepPlayTime;
    std::array<DropdownList*, NSS_MAX_STEPS> mToneDropdowns;

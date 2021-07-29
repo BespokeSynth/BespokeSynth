@@ -48,6 +48,12 @@ NoteStepSequencer::NoteStepSequencer()
 , mLoopResetPoint(0)
 , mLoopResetPointSlider(nullptr)
 , mHasExternalPulseSource(false)
+, mRandomizePitchChance(1)
+, mRandomizePitchRange(1)
+, mRandomizeLengthChance(1)
+, mRandomizeLengthRange(1)
+, mRandomizeVelocityChance(1)
+, mRandomizeVelocityRange(1)
 {
    
    for (int i=0;i<NSS_MAX_STEPS;++i)
@@ -809,30 +815,42 @@ void NoteStepSequencer::ButtonClicked(ClickButton* button)
    if (button == mRandomizeLengthButton)
    {
       for (int i=0; i < mLength; ++i)
-         mNoteLengths[i] = ofClamp(ofRandom(2), FLT_EPSILON, 1);
+      {
+         if (ofRandom(1) <= mRandomizeLengthChance)
+         {
+            float newLength = ofClamp(ofRandom(2), FLT_EPSILON, 1);
+            mNoteLengths[i] = ofLerp(mNoteLengths[i], newLength, mRandomizeLengthRange);
+         }
+      }
       SyncGridToSeq();
    }
    if (button == mRandomizeVelocityButton)
    {
       for (int i=0; i < mLength; ++i)
       {
-         switch (gRandom() % 5)
+         if (ofRandom(1) <= mRandomizeVelocityChance)
          {
-            case 0:
-               mVels[i] = 0;
-               break;
-            case 1:
-               mVels[i] = 50;
-               break;
-            case 2:
-               mVels[i] = 80;
-               break;
-            case 3:
-               mVels[i] = 110;
-               break;
-            case 4:
-               mVels[i] = 127;
-               break;
+            int newVelocity;
+            switch (gRandom() % 5)
+            {
+               case 0:
+                  newVelocity = 0;
+                  break;
+               case 1:
+                  newVelocity = 50;
+                  break;
+               case 2:
+                  newVelocity = 80;
+                  break;
+               case 3:
+                  newVelocity = 110;
+                  break;
+               default:
+                  newVelocity = 127;
+                  break;
+            }
+            
+            mVels[i] = int(ofLerp(mVels[i], newVelocity, mRandomizeVelocityRange) + .5f);
          }
       }
       SyncGridToSeq();
@@ -845,30 +863,39 @@ void NoteStepSequencer::RandomizePitches(bool fifths)
    {
       for (int i=0; i < mLength; ++i)
       {
-         switch (gRandom() % 5)
+         if (ofRandom(1) <= mRandomizePitchChance)
          {
-            case 0:
-               mTones[i] = 0;
-               break;
-            case 1:
-               mTones[i] = 4;
-               break;
-            case 2:
-               mTones[i] = 7;
-               break;
-            case 3:
-               mTones[i] = 11;
-               break;
-            case 4:
-               mTones[i] = 14;
-               break;
+            switch (gRandom() % 5)
+            {
+               case 0:
+                  mTones[i] = 0;
+                  break;
+               case 1:
+                  mTones[i] = 4;
+                  break;
+               case 2:
+                  mTones[i] = 7;
+                  break;
+               case 3:
+                  mTones[i] = 11;
+                  break;
+               case 4:
+                  mTones[i] = 14;
+                  break;
+            }
          }
       }
    }
    else
    {
       for (int i=0; i < mLength; ++i)
-         mTones[i] = gRandom() % mNoteRange;
+      {
+         if (ofRandom(1) <= mRandomizePitchChance)
+         {
+            int newRow = gRandom() % mNoteRange;
+            mTones[i] = int(ofLerp(mTones[i], newRow, mRandomizePitchRange) + .5f);
+         }
+      }
    }
 }
 
@@ -977,6 +1004,12 @@ void NoteStepSequencer::LoadLayout(const ofxJSONElement& moduleInfo)
    mModuleSaveData.LoadInt("gridrows", moduleInfo, 15, 1, 127, K(isTextField));
    mModuleSaveData.LoadInt("gridsteps", moduleInfo, 8, 1, NSS_MAX_STEPS, K(isTextField));
    mModuleSaveData.LoadBool("stepcontrols", moduleInfo, false);
+   mModuleSaveData.LoadFloat("random_pitch_chance", moduleInfo, 1.0f, 0.0f, 1.0f);
+   mModuleSaveData.LoadFloat("random_pitch_range", moduleInfo, 1.0f, 0.0f, 1.0f);
+   mModuleSaveData.LoadFloat("random_length_chance", moduleInfo, 1.0f, 0.0f, 1.0f);
+   mModuleSaveData.LoadFloat("random_length_range", moduleInfo, 1.0f, 0.0f, 1.0f);
+   mModuleSaveData.LoadFloat("random_velocity_chance", moduleInfo, 1.0f, 0.0f, 1.0f);
+   mModuleSaveData.LoadFloat("random_velocity_range", moduleInfo, 1.0f, 0.0f, 1.0f);
 
    SetUpFromSaveData();
 }
@@ -988,6 +1021,12 @@ void NoteStepSequencer::SetUpFromSaveData()
    mGrid->SetDimensions(mModuleSaveData.GetInt("gridwidth"), mModuleSaveData.GetInt("gridheight"));
    mNoteRange = mModuleSaveData.GetInt("gridrows");
    mShowStepControls = mModuleSaveData.GetBool("stepcontrols");
+   mRandomizePitchChance = mModuleSaveData.GetFloat("random_pitch_chance");
+   mRandomizePitchRange = mModuleSaveData.GetFloat("random_pitch_range");
+   mRandomizeLengthChance = mModuleSaveData.GetFloat("random_length_chance");
+   mRandomizeLengthRange = mModuleSaveData.GetFloat("random_length_range");
+   mRandomizeVelocityChance = mModuleSaveData.GetFloat("random_velocity_chance");
+   mRandomizeVelocityRange = mModuleSaveData.GetFloat("random_velocity_range");
    UpdateVelocityGridPos();
    SyncGridToSeq();
    SetUpStepControls();
