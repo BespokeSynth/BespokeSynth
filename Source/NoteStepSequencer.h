@@ -182,7 +182,7 @@ private:
    
    bool mHasExternalPulseSource;
 
-   std::array<PatchCableSource*, NSS_MAX_STEPS> mStepCables;
+   std::array<AdditionalNoteCable*, NSS_MAX_STEPS> mStepCables;
 
    TransportListenerInfo* mTransportListenerInfo;
    GridControlTarget* mGridControlTarget;

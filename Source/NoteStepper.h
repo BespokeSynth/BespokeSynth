@@ -43,7 +43,7 @@ private:
    void SendNoteToIndex(int index, double time, int pitch, int velocity, int voiceIdx, ModulationParameters modulation);
 
    static const int kMaxDestinations = 16;
-   std::array<PatchCableSource*, kMaxDestinations> mDestinationCables;
+   std::array<AdditionalNoteCable*, kMaxDestinations> mDestinationCables;
    float mWidth;
    float mHeight;
    std::array<int, 128> mLastNoteDestinations;

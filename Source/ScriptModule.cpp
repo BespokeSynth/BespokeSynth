@@ -709,10 +709,7 @@ void ScriptModule::SendNoteToIndex(int index, double time, int pitch, int veloci
    
    if (index-1 < (int)mExtraNoteOutputs.size())
    {
-      const vector<INoteReceiver*>& receivers = mExtraNoteOutputs[index-1]->GetNoteReceivers();
-      mExtraNoteOutputs[index-1]->AddHistoryEvent(time, velocity > 0);
-      for (auto* receiver : receivers)
-         receiver->PlayNote(time, pitch, velocity, voiceIdx, modulation);
+      mExtraNoteOutputs[index-1]->PlayNoteOutput(time, pitch, velocity, voiceIdx, modulation);
    }
 }
 
@@ -720,11 +717,12 @@ void ScriptModule::SetNumNoteOutputs(int num)
 {
    while (num - 1 > (int)mExtraNoteOutputs.size())
    {
-      auto cableSource = new PatchCableSource(this, kConnectionType_Note);
-      cableSource->SetOverrideCableDir(ofVec2f(-1,0));
-      AddPatchCableSource(cableSource);
-      cableSource->SetManualPosition(0, 30+20*(int)mExtraNoteOutputs.size());
-      mExtraNoteOutputs.push_back(cableSource);
+      auto noteCable = new AdditionalNoteCable();
+      noteCable->SetPatchCableSource(new PatchCableSource(this, kConnectionType_Note));
+      noteCable->GetPatchCableSource()->SetOverrideCableDir(ofVec2f(-1,0));
+      AddPatchCableSource(noteCable->GetPatchCableSource());
+      noteCable->GetPatchCableSource()->SetManualPosition(0, 30+20*(int)mExtraNoteOutputs.size());
+      mExtraNoteOutputs.push_back(noteCable);
    }
 }
 

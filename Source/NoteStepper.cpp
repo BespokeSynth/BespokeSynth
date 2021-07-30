@@ -35,10 +35,11 @@ void NoteStepper::CreateUIControls()
    
    for (int i=0; i<kMaxDestinations; ++i)
    {
-      mDestinationCables[i] = new PatchCableSource(this, kConnectionType_Note);
-      mDestinationCables[i]->SetOverrideCableDir(ofVec2f(0,1));
-      AddPatchCableSource(mDestinationCables[i]);
-      mDestinationCables[i]->SetManualPosition(10+i*15, mHeight-8);
+      mDestinationCables[i] = new AdditionalNoteCable();
+      mDestinationCables[i]->SetPatchCableSource(new PatchCableSource(this, kConnectionType_Note));
+      mDestinationCables[i]->GetPatchCableSource()->SetOverrideCableDir(ofVec2f(0,1));
+      AddPatchCableSource(mDestinationCables[i]->GetPatchCableSource());
+      mDestinationCables[i]->GetPatchCableSource()->SetManualPosition(10+i*15, mHeight-8);
    }
    
    GetPatchCableSource()->SetEnabled(false);
@@ -53,7 +54,7 @@ void NoteStepper::DrawModule()
    
    for (int i=0; i<kMaxDestinations; ++i)
    {
-      mDestinationCables[i]->SetEnabled(i < mLength);
+      mDestinationCables[i]->GetPatchCableSource()->SetEnabled(i < mLength);
       if (i == mCurrentDestinationIndex)
       {
          ofPushStyle();
@@ -92,10 +93,7 @@ void NoteStepper::PlayNote(double time, int pitch, int velocity, int voiceIdx, M
 
 void NoteStepper::SendNoteToIndex(int index, double time, int pitch, int velocity, int voiceIdx, ModulationParameters modulation)
 {
-   const vector<INoteReceiver*>& receivers = mDestinationCables[index]->GetNoteReceivers();
-   mDestinationCables[index]->AddHistoryEvent(gTime, velocity > 0);
-   for (auto* receiver : receivers)
-      receiver->PlayNote(time, pitch, velocity, voiceIdx, modulation);
+   mDestinationCables[index]->PlayNoteOutput(time, pitch, velocity, voiceIdx, modulation);
 }
 
 void NoteStepper::SendCC(int control, int value, int voiceIdx)

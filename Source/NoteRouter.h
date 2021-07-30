@@ -26,9 +26,11 @@ public:
 
    void PostRepatch(PatchCableSource* cableSource, bool fromUserClick) override;
    
-   void AddReceiver(INoteReceiver* receiver, const char* name);
    void SetActiveIndex(int index) { mRouteMask = 1 << index; }
    void SetSelectedMask(int mask);
+   
+   //INoteReceiver
+   void PlayNote(double time, int pitch, int velocity, int voiceIdx = -1, ModulationParameters modulation = ModulationParameters()) override;
 
    //IRadioButtonListener
    void RadioButtonUpdated(RadioButton* radio, int oldVal) override;
@@ -39,13 +41,12 @@ public:
 private:
    //IDrawableModule
    void DrawModule() override;
-   void DrawModuleUnclipped() override;
    void GetModuleDimensions(float& width, float& height) override;
    bool Enabled() const override { return true; }
 
    int mRouteMask;
    RadioButton* mRouteSelector;
-   vector<INoteReceiver*> mReceivers;
+   vector<AdditionalNoteCable*> mDestinationCables;
    bool mRadioButtonMode;
 };
 

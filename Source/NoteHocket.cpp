@@ -32,11 +32,12 @@ void NoteHocket::CreateUIControls()
    for (int i=0; i<kMaxDestinations; ++i)
    {
       FLOATSLIDER(mWeightSlider[i],("weight "+ofToString(i)).c_str(),&mWeight[i],0,1);
-      mDestinationCables[i] = new PatchCableSource(this, kConnectionType_Note);
-      mDestinationCables[i]->SetOverrideCableDir(ofVec2f(1,0));
-      AddPatchCableSource(mDestinationCables[i]);
+      mDestinationCables[i] = new AdditionalNoteCable();
+      mDestinationCables[i]->SetPatchCableSource(new PatchCableSource(this, kConnectionType_Note));
+      mDestinationCables[i]->GetPatchCableSource()->SetOverrideCableDir(ofVec2f(1,0));
+      AddPatchCableSource(mDestinationCables[i]->GetPatchCableSource());
       ofRectangle rect = mWeightSlider[i]->GetRect(true);
-      mDestinationCables[i]->SetManualPosition(rect.getMaxX() + 10, rect.y + rect.height/2);
+      mDestinationCables[i]->GetPatchCableSource()->SetManualPosition(rect.getMaxX() + 10, rect.y + rect.height/2);
    }
    ENDUIBLOCK(mWidth,mHeight);
    mWidth += 20;
@@ -89,10 +90,7 @@ void NoteHocket::PlayNote(double time, int pitch, int velocity, int voiceIdx, Mo
 
 void NoteHocket::SendNoteToIndex(int index, double time, int pitch, int velocity, int voiceIdx, ModulationParameters modulation)
 {
-   const vector<INoteReceiver*>& receivers = mDestinationCables[index]->GetNoteReceivers();
-   mDestinationCables[index]->AddHistoryEvent(gTime, velocity > 0);
-   for (auto* receiver : receivers)
-      receiver->PlayNote(time, pitch, velocity, voiceIdx, modulation);
+   mDestinationCables[index]->PlayNoteOutput(time, pitch, velocity, voiceIdx, modulation);
 }
 
 void NoteHocket::SendCC(int control, int value, int voiceIdx)

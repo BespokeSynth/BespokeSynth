@@ -39,6 +39,7 @@ public:
    RadioButton(IRadioButtonListener* owner, const char* name, IUIControl* anchor, AnchorDirection anchorDirection, int* var, RadioDirection direction = kRadioVertical);
    void AddLabel(const char* label, int value);
    void SetLabel(const char* label, int value);
+   void RemoveLabel(int value);
    void Render() override;
    void SetMultiSelect(bool on) { mMultiSelect = on; }
    void Clear();

@@ -71,6 +71,20 @@ void RadioButton::SetLabel(const char* label, int value)
    UpdateDimensions();
 }
 
+void RadioButton::RemoveLabel(int value)
+{
+   for (auto iter = mElements.begin(); iter != mElements.end(); ++iter)
+   {
+      if (iter->mValue == value)
+      {
+         mElements.erase(iter);
+         break;
+      }
+   }
+   
+   UpdateDimensions();
+}
+
 void RadioButton::UpdateDimensions()
 {
    if (mDirection == kRadioVertical)

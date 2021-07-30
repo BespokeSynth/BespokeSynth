@@ -141,9 +141,10 @@ void NoteStepSequencer::CreateUIControls()
 
    for (int i = 0; i < NSS_MAX_STEPS; ++i)
    {
-      mStepCables[i] = new PatchCableSource(this, kConnectionType_Note);
-      mStepCables[i]->SetOverrideCableDir(ofVec2f(0, 1));
-      AddPatchCableSource(mStepCables[i]);
+      mStepCables[i] = new AdditionalNoteCable();
+      mStepCables[i]->SetPatchCableSource(new PatchCableSource(this, kConnectionType_Note));
+      mStepCables[i]->GetPatchCableSource()->SetOverrideCableDir(ofVec2f(0, 1));
+      AddPatchCableSource(mStepCables[i]->GetPatchCableSource());
    }
 }
 
@@ -318,12 +319,12 @@ void NoteStepSequencer::DrawModule()
          ofVec2f pos = mVelocityGrid->GetCellPosition(i, 0) + mVelocityGrid->GetPosition(true);
          pos.x += mVelocityGrid->GetWidth() / float(mLength) * .5f;
          pos.y = moduleHeight - 7;
-         mStepCables[i]->SetManualPosition(pos.x, pos.y);
-         mStepCables[i]->SetEnabled(true);
+         mStepCables[i]->GetPatchCableSource()->SetManualPosition(pos.x, pos.y);
+         mStepCables[i]->GetPatchCableSource()->SetEnabled(true);
       }
       else
       {
-         mStepCables[i]->SetEnabled(false);
+         mStepCables[i]->GetPatchCableSource()->SetEnabled(false);
       }
    }
    
@@ -588,10 +589,7 @@ void NoteStepSequencer::Step(double time, float velocity, int pulseFlags)
 
 void NoteStepSequencer::SendNoteToCable(int index, double time, int pitch, int velocity)
 {
-   const vector<INoteReceiver*>& receivers = mStepCables[index]->GetNoteReceivers();
-   mStepCables[index]->AddHistoryEvent(gTime, velocity > 0);
-   for (auto* receiver : receivers)
-      receiver->PlayNote(time, pitch, velocity);
+   mStepCables[index]->PlayNoteOutput(time, pitch, velocity);
 }
 
 void NoteStepSequencer::UpdateLights()

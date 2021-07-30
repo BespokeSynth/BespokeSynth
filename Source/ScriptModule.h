@@ -249,7 +249,7 @@ private:
    
    std::vector<string> mScriptFilePaths;
    
-   std::vector<PatchCableSource*> mExtraNoteOutputs;
+   std::vector<AdditionalNoteCable*> mExtraNoteOutputs;
    std::array<ModulationChain, 128> mPitchBends;
    std::array<ModulationChain, 128> mModWheels;
    std::array<ModulationChain, 128> mPressures;

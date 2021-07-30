@@ -60,4 +60,14 @@ protected:
    bool mInNoteOutput;
 };
 
+class AdditionalNoteCable : public INoteSource
+{
+public:
+   void SetPatchCableSource(PatchCableSource* cable) { mCable = cable; }
+   PatchCableSource* GetPatchCableSource(int index=0) override { return mCable; }
+   void Flush(double time) { mNoteOutput.Flush(time); }
+private:
+   PatchCableSource* mCable;
+};
+
 #endif
