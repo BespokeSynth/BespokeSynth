@@ -57,6 +57,12 @@ void NoteChance::DrawModule()
 
 void NoteChance::PlayNote(double time, int pitch, int velocity, int voiceIdx, ModulationParameters modulation)
 {
+   if (!mEnabled)
+   {
+      PlayNoteOutput(time, pitch, velocity, voiceIdx, modulation);
+      return;
+   }
+   
    if (velocity > 0)
       ComputeSliders(0);
    
