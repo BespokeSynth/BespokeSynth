@@ -117,6 +117,7 @@ void DrumPlayer::DrumHit::CreateUIControls(DrumPlayer* owner, int index)
    FLOATSLIDER_DIGITS(mSpeedSlider, ("speed "+ofToString(index)).c_str(),&mSpeed,.2f,3,2);
    FLOATSLIDER(mPanSlider, ("pan "+ofToString(index)).c_str(),&mPan,-1,1);
    INTSLIDER(mWidenSlider, ("widen "+ofToString(index)).c_str(),&mWiden,-150,150);
+   FLOATSLIDER(mStartOffsetSlider, ("start "+ofToString(index)).c_str(),&mStartOffset,0,1);
    CHECKBOX(mIndividualOutputCheckbox, ("single out "+ofToString(index)).c_str(),&mHasIndividualOutput);
    INTSLIDER(mLinkIdSlider, ("linkid " + ofToString(index)).c_str(), &mLinkId, -1, 5);
    CHECKBOX(mUseEnvelopeCheckbox, ("envelope "+ofToString(index)).c_str(),&mUseEnvelope);
@@ -221,6 +222,7 @@ void DrumPlayer::DrumHit::SetUIControlsShowing(bool showing)
    mEnvelopeDisplay->SetShowing(showing);
    mPanSlider->SetShowing(showing && mOwner->mMonoOutput == false);
    mWidenSlider->SetShowing(showing && mOwner->mMonoOutput == false);
+   mStartOffsetSlider->SetShowing(showing);
    mIndividualOutputCheckbox->SetShowing(showing);
    mLinkIdSlider->SetShowing(showing);
    mEnvelopeLengthSlider->SetShowing(showing);
@@ -506,9 +508,9 @@ void DrumPlayer::PlayNote(double time, int pitch, int velocity, int voiceIdx, Mo
          mDrumHits[pitch].mVelocity = velocity / 127.0f;
          mDrumHits[pitch].mPanInput = modulation.pan;
          mDrumHits[pitch].mPitchBend = modulation.pitchBend;
-         float startOffsetPercent = 0;
+         float startOffsetPercent = mDrumHits[pitch].mStartOffset;
          if (modulation.modWheel != nullptr)
-            startOffsetPercent = modulation.modWheel->GetValue(0);
+            startOffsetPercent += modulation.modWheel->GetValue(0);
          mDrumHits[pitch].StartPlayhead(time, startOffsetPercent, velocity/127.0f);
       }
    }
@@ -789,7 +791,7 @@ void DrumPlayer::DrumHit::DrawUIControls()
    if (!mOwner->mLoadingSamples)
    {
       mOwner->mLoadSamplesDrawMutex.lock();
-      DrawAudioBuffer(135, 100, mSample.Data(), 0, displayLength, mSample.GetPlayPosition());
+      DrawAudioBuffer(135, 100, mSample.Data(), mStartOffset*displayLength, displayLength, mSample.GetPlayPosition());
       mOwner->mLoadSamplesDrawMutex.unlock();
    }
    ofPopMatrix();
@@ -802,6 +804,7 @@ void DrumPlayer::DrumHit::DrawUIControls()
    mHitCategoryDropdown->Draw();
    mPanSlider->Draw();
    mWidenSlider->Draw();
+   mStartOffsetSlider->Draw();
    mIndividualOutputCheckbox->Draw();
    mUseEnvelopeCheckbox->Draw();
    if (mUseEnvelope)

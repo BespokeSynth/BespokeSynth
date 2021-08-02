@@ -240,6 +240,7 @@ private:
       float mSpeed;
       float mVelocity;
       float mPanInput;
+      float mStartOffset;
       ModulationChain* mPitchBend;
       
       bool mUseEnvelope;
@@ -264,6 +265,7 @@ private:
       FloatSlider* mEnvelopeLengthSlider;
       IntSlider* mLinkIdSlider;
       DropdownList* mHitCategoryDropdown;
+      FloatSlider* mStartOffsetSlider;
       int mHitCategoryIndex;
       string mHitCategory;
       RollingBuffer mWidenerBuffer;

@@ -1266,6 +1266,7 @@ drumplayer~sample player intended for drum playback
 ~speed *~speed of sample
 ~pan *~stereo pan position of sample
 ~widen *~stereo delay of sample to create width
+~start *~start offset percentage of sample
 ~single out *~should the sample have its own individual output?
 ~linkid *~if linkid is not -1, silence any other sample with a matching linkid (useful for linking open and closed hats)
 ~envelope *~should we apply a volume envelope to the sample?
