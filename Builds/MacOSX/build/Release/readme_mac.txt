@@ -1,9 +1,9 @@
 install to /Applications/BespokeSynth/ to run
 
-if OSX complains that it can't open because bespoke is from an "unidentified developer":
- 1. open system preferences
- 2. navigate to the security and privacy menu
- 3. under the general tab, you'll see bespoke in the text at the bottom. next to it, select "open anyway"
+if macOS complains that bespoke can't open because it can't verify the developer:
+ 1. right click bespoke
+ 2. select "open"
+ 3. in the resulting popup, click "open"
 
  very brief "getting started" guide:
  * hold the 'o' key and choose "oscillator"
