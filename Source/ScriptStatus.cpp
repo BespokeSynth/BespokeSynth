@@ -16,6 +16,7 @@
 #include "ModularSynth.h"
 #include "UIControlMacros.h"
 #include "ScriptModule.h"
+#include "Prefab.h"
 #if BESPOKE_WINDOWS
 #undef ssize_t
 #endif
@@ -31,7 +32,9 @@ namespace py = pybind11;
 ScriptStatus::ScriptStatus()
 : mNextUpdateTime(0)
 {
-   ScriptModule::InitializePythonIfNecessary();
+   ScriptModule::CheckIfPythonEverSuccessfullyInitialized();
+   if ((TheSynth->IsLoadingState() || Prefab::sLoadingPrefab) && ScriptModule::sHasPythonEverSuccessfullyInitialized)
+      ScriptModule::InitializePythonIfNecessary();
 }
 
 ScriptStatus::~ScriptStatus()
@@ -52,6 +55,12 @@ void ScriptStatus::CreateUIControls()
 
 void ScriptStatus::Poll()
 {
+   if (ScriptModule::sHasPythonEverSuccessfullyInitialized)
+      ScriptModule::InitializePythonIfNecessary();
+
+   if (!ScriptModule::sPythonInitialized)
+      return;
+   
    if (gTime > mNextUpdateTime)
    {
       mStatus = py::str(py::globals());
@@ -65,9 +74,27 @@ void ScriptStatus::DrawModule()
    if (Minimized() || IsVisible() == false)
       return;
    
+   if (!ScriptModule::sHasPythonEverSuccessfullyInitialized)
+   {
+      DrawTextNormal("please ensure that you have Python 3.8 installed\nif you do not have Python 3.8 installed, Bespoke may crash\n\nclick to continue...", 20, 20);
+      return;
+   }
+   
    mResetAll->Draw();
    
    DrawTextNormal(mStatus, 3, 35);
+}
+
+void ScriptStatus::OnClicked(int x, int y, bool right)
+{
+   if (!ScriptModule::sHasPythonEverSuccessfullyInitialized)
+   {
+      ScriptModule::InitializePythonIfNecessary();
+   }
+   else
+   {
+      IDrawableModule::OnClicked(x, y, right);
+   }
 }
 
 void ScriptStatus::ButtonClicked(ClickButton *button)

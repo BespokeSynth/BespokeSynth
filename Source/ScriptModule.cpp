@@ -49,9 +49,10 @@ string ScriptModule::sBackgroundTextString = "";
 float ScriptModule::sBackgroundTextSize = 30;
 //static
 ofColor ScriptModule::sBackgroundTextColor = ofColor::white;
-
-static bool sPythonInitialized = false;
-static bool sHasPythonEverSuccessfullyInitialized = false;
+//static
+bool ScriptModule::sPythonInitialized = false;
+//static
+bool ScriptModule::sHasPythonEverSuccessfullyInitialized = false;
 
 ScriptModule::ScriptModule()
 : mCodeEntry(nullptr)
@@ -116,6 +117,7 @@ namespace
    string kPythonIsInstalledMarkerFile = "python_installed";
 }
 
+//static
 void ScriptModule::InitializePythonIfNecessary()
 {
    if (!sPythonInitialized)

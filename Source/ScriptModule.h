@@ -32,6 +32,7 @@ public:
    
    static void UninitializePython();
    static void InitializePythonIfNecessary();
+   static void CheckIfPythonEverSuccessfullyInitialized();
    
    string GetTitleLabel() override { return "script"; }
    void CreateUIControls() override;
@@ -90,6 +91,8 @@ public:
    static string sBackgroundTextString;
    static float sBackgroundTextSize;
    static ofColor sBackgroundTextColor;
+   static bool sPythonInitialized;
+   static bool sHasPythonEverSuccessfullyInitialized;
 
    ModulationChain* GetPitchBend(int pitch) { return &mPitchBends[pitch]; }
    ModulationChain* GetModWheel(int pitch) { return &mModWheels[pitch]; }
@@ -113,8 +116,6 @@ private:
    void DrawTimer(int lineNum, double startTime, double endTime, ofColor color, bool filled);
    void RefreshScriptFiles();
    void Reset();
-
-   static void CheckIfPythonEverSuccessfullyInitialized();
    
    //IDrawableModule
    void DrawModule() override;
