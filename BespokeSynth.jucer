@@ -586,6 +586,10 @@
               file="Source/ModulationVisualizer.cpp"/>
         <FILE id="UMwE0t" name="ModulationVisualizer.h" compile="0" resource="0"
               file="Source/ModulationVisualizer.h"/>
+        <FILE id="jk9m8Q" name="ModulatorAccum.cpp" compile="1" resource="0"
+              file="Source/ModulatorAccum.cpp"/>
+        <FILE id="rQSb9V" name="ModulatorAccum.h" compile="0" resource="0"
+              file="Source/ModulatorAccum.h"/>
         <FILE id="QKqgG5" name="ModulatorAdd.cpp" compile="1" resource="0"
               file="Source/ModulatorAdd.cpp"/>
         <FILE id="w57dZM" name="ModulatorAdd.h" compile="0" resource="0" file="Source/ModulatorAdd.h"/>

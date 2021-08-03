@@ -235,6 +235,7 @@
 #include "TransposeFrom.h"
 #include "NoteStepper.h"
 #include "M185Sequencer.h"
+#include "ModulatorAccum.h"
 
 #define REGISTER(class,name,type) Register(#name, &(class::Create), &(class::CanCreate), type, false, false);
 #define REGISTER_HIDDEN(class,name,type) Register(#name, &(class::Create), &(class::CanCreate), type, true, false);
@@ -418,6 +419,7 @@ ModuleFactory::ModuleFactory()
    REGISTER(TransposeFrom, transposefrom, kModuleType_Note);
    REGISTER(NoteStepper, notestepper, kModuleType_Note);
    REGISTER(M185Sequencer, m185sequencer, kModuleType_Instrument);
+   REGISTER(ModulatorAccum, accum, kModuleType_Modulator);
 
    //REGISTER_EXPERIMENTAL(MidiPlayer, midiplayer, kModuleType_Instrument);
    REGISTER_EXPERIMENTAL(LoopStorer, loopstorer, kModuleType_Other);
