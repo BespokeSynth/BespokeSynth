@@ -707,6 +707,8 @@
         <FILE id="qQmpNv" name="NoteRouter.h" compile="0" resource="0" file="Source/NoteRouter.h"/>
         <FILE id="IGmN6O" name="NoteSinger.cpp" compile="1" resource="0" file="Source/NoteSinger.cpp"/>
         <FILE id="uWOTxD" name="NoteSinger.h" compile="0" resource="0" file="Source/NoteSinger.h"/>
+        <FILE id="zOysIi" name="NoteSorter.cpp" compile="1" resource="0" file="Source/NoteSorter.cpp"/>
+        <FILE id="dv1g21" name="NoteSorter.h" compile="0" resource="0" file="Source/NoteSorter.h"/>
         <FILE id="FyLhc3" name="NoteStepper.cpp" compile="1" resource="0" file="Source/NoteStepper.cpp"/>
         <FILE id="cAS91x" name="NoteStepper.h" compile="0" resource="0" file="Source/NoteStepper.h"/>
         <FILE id="xORArp" name="NoteStepSequencer.cpp" compile="1" resource="0"
