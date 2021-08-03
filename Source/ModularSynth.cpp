@@ -538,7 +538,7 @@ void ModularSynth::Draw(void* vg)
    }
    
    string tooltip = "";
-   ModuleContainer* tooltipContainer;
+   ModuleContainer* tooltipContainer = nullptr;
    if (HelpDisplay::sShowTooltips)
    {
       HelpDisplay* helpDisplay = TheTitleBar->GetHelpDisplay();
@@ -583,10 +583,13 @@ void ModularSynth::Draw(void* vg)
    }
    
    if (mNextDrawTooltip != "")
+   {
       tooltip = mNextDrawTooltip;
+      tooltipContainer = &mModuleContainer;
+   }
    mNextDrawTooltip = "";
    
-   if (tooltip != "")
+   if (tooltip != "" && tooltipContainer != nullptr)
    {
       ofPushMatrix();
       float scale = tooltipContainer->GetDrawScale();

@@ -237,14 +237,14 @@ IDrawableModule* ModuleContainer::GetModuleAt(float x, float y)
 
 ofVec2f ModuleContainer::GetDrawOffset()
 {
-   if (mOwner != nullptr)
+   if (mOwner != nullptr && mOwner->GetOwningContainer() != nullptr)
       return mDrawOffset + mOwner->GetOwningContainer()->GetDrawOffset();
    return mDrawOffset;
 }
 
 float ModuleContainer::GetDrawScale() const
 {
-   if (mOwner != nullptr)
+   if (mOwner != nullptr && mOwner->GetOwningContainer() != nullptr)
       return mDrawScale * mOwner->GetOwningContainer()->GetDrawScale();
    return mDrawScale;
 }
@@ -261,7 +261,7 @@ void ModuleContainer::GetModulesWithinRect(ofRectangle rect, vector<IDrawableMod
 
 void ModuleContainer::MoveToFront(IDrawableModule* module)
 {
-   if (mOwner)
+   if (mOwner && mOwner->GetOwningContainer() != nullptr)
       mOwner->GetOwningContainer()->MoveToFront(mOwner);
    
    for (int i=0; i<mModules.size(); ++i)
