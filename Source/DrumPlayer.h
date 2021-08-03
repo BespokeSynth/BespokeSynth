@@ -221,6 +221,7 @@ private:
       , mSpeed(1)
       , mVelocity(1)
       , mPanInput(0)
+      , mStartOffset(0)
       , mPitchBend(nullptr)
       , mUseEnvelope(false)
       , mEnvelopeLength(200)
