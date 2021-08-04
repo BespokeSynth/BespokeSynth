@@ -236,6 +236,7 @@
 #include "NoteStepper.h"
 #include "M185Sequencer.h"
 #include "ModulatorAccum.h"
+#include "NoteRatchet.h"
 #include "NoteSorter.h"
 
 #define REGISTER(class,name,type) Register(#name, &(class::Create), &(class::CanCreate), type, false, false);
@@ -422,6 +423,7 @@ ModuleFactory::ModuleFactory()
    REGISTER(M185Sequencer, m185sequencer, kModuleType_Instrument);
    REGISTER(ModulatorAccum, accum, kModuleType_Modulator);
    REGISTER(NoteSorter, notesorter, kModuleType_Note);
+   REGISTER(NoteRatchet, noteratchet, kModuleType_Note);
 
    //REGISTER_EXPERIMENTAL(MidiPlayer, midiplayer, kModuleType_Instrument);
    REGISTER_EXPERIMENTAL(LoopStorer, loopstorer, kModuleType_Other);

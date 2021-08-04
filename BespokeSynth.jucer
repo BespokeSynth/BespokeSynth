@@ -703,6 +703,8 @@
               file="Source/NoteRangeFilter.cpp"/>
         <FILE id="VYx64K" name="NoteRangeFilter.h" compile="0" resource="0"
               file="Source/NoteRangeFilter.h"/>
+        <FILE id="Qg2GIk" name="NoteRatchet.cpp" compile="1" resource="0" file="Source/NoteRatchet.cpp"/>
+        <FILE id="M8tUxT" name="NoteRatchet.h" compile="0" resource="0" file="Source/NoteRatchet.h"/>
         <FILE id="xSRCdF" name="NoteRouter.cpp" compile="1" resource="0" file="Source/NoteRouter.cpp"/>
         <FILE id="qQmpNv" name="NoteRouter.h" compile="0" resource="0" file="Source/NoteRouter.h"/>
         <FILE id="IGmN6O" name="NoteSinger.cpp" compile="1" resource="0" file="Source/NoteSinger.cpp"/>
