@@ -193,6 +193,14 @@ void ModuleContainer::MouseReleased()
 
 IDrawableModule* ModuleContainer::GetModuleAt(float x, float y)
 {
+   if (mOwner != nullptr)
+   {
+      float ownerX, ownerY;
+      mOwner->GetPosition(ownerX, ownerY);
+      x -= ownerX;
+      y -= ownerY;
+   }
+   
    const auto& modalItems = TheSynth->GetModalFocusItemStack();
    for (int i=(int)modalItems.size()-1; i>=0; --i)
    {
