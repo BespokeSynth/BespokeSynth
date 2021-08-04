@@ -75,7 +75,6 @@ public:
    static IDrawableModule* Create() { return new FloatSliderLFOControl(); }
    void Delete() { delete this; }
    void DrawModule() override;
-   bool CanBeDeleted() const override { return false; }
 
    const LFOSettings& GetSettings() { return mLFOSettings; }
    void Load(LFOSettings settings);
@@ -95,6 +94,8 @@ public:
    bool IsPinned() const { return mPinned; }
    void RandomizeSettings();
    bool InLowResMode() const { return mLFOSettings.mLowResMode; }
+   bool HasSpecialDelete() const { return true; }
+   void DoSpecialDelete() override;
    
    //IModulator
    float Value(int samplesIn = 0) override;

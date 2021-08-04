@@ -57,8 +57,8 @@ void ModuleSaveDataPanel::SetModule(IDrawableModule* module)
    if (mSaveModule == module)
       return;
    
-   if (mSaveModule)
-      assert(mSaveModule->IsSaveable());
+   if (module)
+      assert(module->IsSaveable());
    
    mSaveModule = module;
    mAppearAmount = 0;

@@ -327,6 +327,12 @@ void FloatSliderLFOControl::SetRate(NoteInterval rate)
    mLFO.SetPeriod(mLFOSettings.mInterval);
 }
 
+void FloatSliderLFOControl::DoSpecialDelete()
+{
+   mEnabled = false;
+   mPinned = false;
+}
+
 void FloatSliderLFOControl::RadioButtonUpdated(RadioButton* radio, int oldVal)
 {
 }

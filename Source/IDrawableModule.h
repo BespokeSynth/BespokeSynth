@@ -120,6 +120,8 @@ public:
    ModuleType GetModuleType() const { return mModuleType; }
    virtual bool IsSingleton() const { return false; }
    virtual bool CanBeDeleted() const { return (IsSingleton() ? false : true); }
+   virtual bool HasSpecialDelete() const { return false; }
+   virtual void DoSpecialDelete() {}
    void ComputeSliders(int samplesIn);
    void SetOwningContainer(ModuleContainer* container) { mOwningContainer = container; }
    ModuleContainer* GetOwningContainer() const { return mOwningContainer; }

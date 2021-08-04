@@ -317,6 +317,13 @@ void ModuleContainer::DeleteModule(IDrawableModule* module)
    if (!module->CanBeDeleted())
       return;
    
+   if (module->HasSpecialDelete())
+   {
+      module->DoSpecialDelete();
+      RemoveFromVector(module, mModules, K(fail));
+      return;
+   }
+   
    RemoveFromVector(module, mModules, K(fail));
    for (auto iter : mModules)
    {
