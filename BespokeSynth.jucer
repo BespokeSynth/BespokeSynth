@@ -639,6 +639,8 @@
               file="Source/ModwheelToVibrato.h"/>
         <FILE id="D0JN9D" name="Monophonify.cpp" compile="1" resource="0" file="Source/Monophonify.cpp"/>
         <FILE id="rkM42v" name="Monophonify.h" compile="0" resource="0" file="Source/Monophonify.h"/>
+        <FILE id="TfCvFG" name="MPESmoother.cpp" compile="1" resource="0" file="Source/MPESmoother.cpp"/>
+        <FILE id="P68wP2" name="MPESmoother.h" compile="0" resource="0" file="Source/MPESmoother.h"/>
         <FILE id="U4pMmX" name="MultibandCompressor.cpp" compile="1" resource="0"
               file="Source/MultibandCompressor.cpp"/>
         <FILE id="vJgslt" name="MultibandCompressor.h" compile="0" resource="0"
