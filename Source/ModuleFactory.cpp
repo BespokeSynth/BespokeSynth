@@ -239,6 +239,7 @@
 #include "NoteRatchet.h"
 #include "NoteSorter.h"
 #include "MPESmoother.h"
+#include "MidiControlChange.h"
 
 #define REGISTER(class,name,type) Register(#name, &(class::Create), &(class::CanCreate), type, false, false);
 #define REGISTER_HIDDEN(class,name,type) Register(#name, &(class::Create), &(class::CanCreate), type, true, false);
@@ -426,6 +427,7 @@ ModuleFactory::ModuleFactory()
    REGISTER(NoteSorter, notesorter, kModuleType_Note);
    REGISTER(NoteRatchet, noteratchet, kModuleType_Note);
    REGISTER(MPESmoother, mpesmoother, kModuleType_Note);
+   REGISTER(MidiControlChange, midicc, kModuleType_Note);
 
    //REGISTER_EXPERIMENTAL(MidiPlayer, midiplayer, kModuleType_Instrument);
    REGISTER_EXPERIMENTAL(LoopStorer, loopstorer, kModuleType_Other);

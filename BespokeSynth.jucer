@@ -576,6 +576,10 @@
         <FILE id="JzszH3" name="MidiCapturer.cpp" compile="1" resource="0"
               file="Source/MidiCapturer.cpp"/>
         <FILE id="F6XNXz" name="MidiCapturer.h" compile="0" resource="0" file="Source/MidiCapturer.h"/>
+        <FILE id="zDKmgs" name="MidiControlChange.cpp" compile="1" resource="0"
+              file="Source/MidiControlChange.cpp"/>
+        <FILE id="qu15Yd" name="MidiControlChange.h" compile="0" resource="0"
+              file="Source/MidiControlChange.h"/>
         <FILE id="gdpZuQ" name="MidiController.cpp" compile="1" resource="0"
               file="Source/MidiController.cpp"/>
         <FILE id="FdjFi9" name="MidiController.h" compile="0" resource="0"
