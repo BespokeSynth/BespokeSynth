@@ -961,7 +961,7 @@ void VSTPlugin::LoadState(FileStreamIn& in)
       char* vstState = new char[vstStateSize];
       in.ReadGeneric(vstState, vstStateSize);
 
-      int vstProgramStateSize;
+      int vstProgramStateSize = 0;
       if (rev >= 1)
          in >> vstProgramStateSize;
       char* vstProgramState = new char[vstProgramStateSize];

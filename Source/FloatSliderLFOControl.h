@@ -94,7 +94,7 @@ public:
    bool IsPinned() const { return mPinned; }
    void RandomizeSettings();
    bool InLowResMode() const { return mLFOSettings.mLowResMode; }
-   bool HasSpecialDelete() const { return true; }
+   bool HasSpecialDelete() const override { return true; }
    void DoSpecialDelete() override;
    
    //IModulator

@@ -57,7 +57,7 @@ private:
    void DrawModule() override;
    bool Enabled() const override { return true; }
    void GetModuleDimensions(float& width, float& height) override { width = mWidth; height = mHeight; }
-   void OnClicked(int x, int y, bool right);
+   void OnClicked(int x, int y, bool right) override;
    bool IsResizable() const override { return true; }
    void Resize(float w, float h) override { mWidth = w; mHeight = h; }
    
