@@ -38,7 +38,7 @@ DistortionEffect::DistortionEffect()
 , mFuzzAmount(0)
 , mRemoveInputDC(true)
 {
-   SetClip(.5f);
+   SetClip(1);
    
    for (int i=0; i<ChannelBuffer::kMaxNumChannels; ++i)
    {
@@ -78,8 +78,6 @@ void DistortionEffect::ProcessAudio(double time, ChannelBuffer* buffer)
       return;
    
    float bufferSize = buffer->BufferSize();
-
-   ComputeSliders(0);
    
    for (int ch=0; ch<buffer->NumActiveChannels(); ++ch)
    {
@@ -92,6 +90,7 @@ void DistortionEffect::ProcessAudio(double time, ChannelBuffer* buffer)
       {
          for (int i=0; i<bufferSize; ++i)
          {
+            ComputeSliders(i);
             buffer->GetChannel(ch)[i] = (ofClamp((buffer->GetChannel(ch)[i] + mFuzzAmount * mPeakTracker[ch].GetPeak()) * mPreamp * mGain, -1, 1)) / mGain;
          }
       }
@@ -99,6 +98,7 @@ void DistortionEffect::ProcessAudio(double time, ChannelBuffer* buffer)
       {
          for (int i=0; i<bufferSize; ++i)
          {
+            ComputeSliders(i);
             buffer->GetChannel(ch)[i] = tanh((buffer->GetChannel(ch)[i] + mFuzzAmount * mPeakTracker[ch].GetPeak()) * mPreamp * mGain) / mGain;
          }
       }
@@ -106,6 +106,7 @@ void DistortionEffect::ProcessAudio(double time, ChannelBuffer* buffer)
       {
          for (int i=0; i<bufferSize; ++i)
          {
+            ComputeSliders(i);
             buffer->GetChannel(ch)[i] = sin((buffer->GetChannel(ch)[i] + mFuzzAmount * mPeakTracker[ch].GetPeak()) * mPreamp * mGain) / mGain;
          }
       }
@@ -113,6 +114,7 @@ void DistortionEffect::ProcessAudio(double time, ChannelBuffer* buffer)
       {
          for (int i = 0; i < bufferSize; ++i)
          {
+            ComputeSliders(i);
             buffer->GetChannel(ch)[i] = asin(ofClamp((buffer->GetChannel(ch)[i] +  mFuzzAmount * mPeakTracker[ch].GetPeak()) * mPreamp * mGain, -1, 1)) / mGain;
          }
       }
@@ -121,6 +123,7 @@ void DistortionEffect::ProcessAudio(double time, ChannelBuffer* buffer)
       {
          for (int i=0; i<bufferSize; ++i)
          {
+            ComputeSliders(i);
             float sample = (buffer->GetChannel(ch)[i] + mFuzzAmount * mPeakTracker[ch].GetPeak()) * mPreamp * mGain;
             if (sample > 1)
                sample = .66666f;
@@ -135,6 +138,7 @@ void DistortionEffect::ProcessAudio(double time, ChannelBuffer* buffer)
       {
          for (int i=0; i<bufferSize; ++i)
          {
+            ComputeSliders(i);
             float sample = (buffer->GetChannel(ch)[i]*.5f+ mFuzzAmount * mPeakTracker[ch].GetPeak()) * mPreamp * mGain;
             if (sample >= .320018f)
                sample = .630035f;
@@ -151,6 +155,7 @@ void DistortionEffect::ProcessAudio(double time, ChannelBuffer* buffer)
       {
          for (int i=0; i<bufferSize; ++i)
          {
+            ComputeSliders(i);
             float sample = ofClamp((buffer->GetChannel(ch)[i]*.5f+ mFuzzAmount * mPeakTracker[ch].GetPeak()) * mPreamp * mGain, -100, 100);
             while (sample > 1 || sample < -1)
             {
