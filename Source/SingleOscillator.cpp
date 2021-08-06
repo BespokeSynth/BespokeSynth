@@ -70,7 +70,7 @@ SingleOscillator::SingleOscillator()
    mVoiceParams.mUnison = 1;
    mVoiceParams.mUnisonWidth = 0;
    mVoiceParams.mVelToVolume = .5f;
-   mVoiceParams.mVelToEnvelope = .5f;
+   mVoiceParams.mVelToEnvelope = 0;
    mVoiceParams.mSoften = 0;
    mVoiceParams.mLiteCPUMode = false;
    
@@ -119,7 +119,7 @@ void SingleOscillator::CreateUIControls()
    FLOATSLIDER(mFilterCutoffMinSlider, "fmin", &mVoiceParams.mFilterCutoffMin, 10, SINGLEOSCILLATOR_NO_CUTOFF);
    FLOATSLIDER(mFilterQSlider, "q", &mVoiceParams.mFilterQ, .1, 20);
    FLOATSLIDER(mVelToVolumeSlider, "vel2vol", &mVoiceParams.mVelToVolume, 0, 1);
-   FLOATSLIDER(mVelToEnvelopeSlider, "vel2env", &mVoiceParams.mVelToEnvelope, 0, 1);
+   FLOATSLIDER(mVelToEnvelopeSlider, "vel2env", &mVoiceParams.mVelToEnvelope, -1, 1);
    ENDUIBLOCK(width, height);
    mWidth = MAX(width, mWidth);
    mHeight = MAX(height, mHeight);

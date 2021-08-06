@@ -165,14 +165,23 @@ float ::ADSR::Value(double time) const
    else
       stageStartValue = mStages[stage-1].target * e->mMult;
    
-   if (mHasSustainStage && stage == mSustainStage && time > stageStartTime + (mStages[mSustainStage].time * mTimeScale))
+   if (mHasSustainStage && stage == mSustainStage && time > stageStartTime + (mStages[mSustainStage].time * GetStageTimeScale(mSustainStage)))
       return mStages[mSustainStage].target * e->mMult;
    
-   float lerp = ofClamp((time - stageStartTime) / (mStages[stage].time * mTimeScale), 0, 1);
+   float stageTimeScale = GetStageTimeScale(stage);
+
+   float lerp = ofClamp((time - stageStartTime) / (mStages[stage].time * stageTimeScale), 0, 1);
    if (mStages[stage].curve != 0)
       lerp = MathUtils::Curve(lerp, mStages[stage].curve * ((stageStartValue < mStages[stage].target*e->mMult) ? 1 : -1));
    
    return ofLerp(stageStartValue, mStages[stage].target * e->mMult, lerp);
+}
+
+float ::ADSR::GetStageTimeScale(int stage) const
+{
+   if (stage >= mNumStages - 1)
+      return 1;
+   return mTimeScale;
 }
 
 int ::ADSR::GetStage(double time, double& stageStartTimeOut) const
@@ -193,9 +202,9 @@ int ::ADSR::GetStage(double time, double& stageStartTimeOut) const
          stageStartTimeOut = e->mStopTime;
       }
       
-      while (time > mStages[stage].time * mTimeScale + stageStartTimeOut && stage < mNumStages)
+      while (time > mStages[stage].time * GetStageTimeScale(stage) + stageStartTimeOut && stage < mNumStages)
       {
-         stageStartTimeOut += mStages[stage].time * mTimeScale;
+         stageStartTimeOut += mStages[stage].time * GetStageTimeScale(stage);
          ++stage;
          if (mHasSustainStage && stage == mSustainStage)
             break;

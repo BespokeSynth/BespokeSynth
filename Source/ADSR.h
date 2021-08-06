@@ -96,6 +96,7 @@ private:
 
    EventInfo* GetEvent(double time);
    const EventInfo* GetEventConst(double time) const;
+   float GetStageTimeScale(int stage) const;
    
    std::array<EventInfo, 5> mEvents;
    int mNextEventPointer;
