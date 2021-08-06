@@ -208,6 +208,17 @@ void MidiDevice::SendAftertouch(int pressure, int channel /* = -1*/)
    }
 }
 
+void MidiDevice::SendProgramChange(int program, int channel /* = -1*/)
+{
+   if (mMidiOut)
+   {
+      if (channel == -1)
+         channel = mOutputChannel;
+      
+      mMidiOut->sendMessageNow(MidiMessage::programChange(channel, program));
+   }
+}
+
 void MidiDevice::SendPitchBend(int bend, int channel /* = -1*/)
 {
    if (mMidiOut)

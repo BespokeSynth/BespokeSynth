@@ -126,6 +126,8 @@ import midicontroller
          optional: forceNoteOn = false, channel = -1, page = 0
       m.send_cc(ctl, value, channel, page)
          optional: channel = -1, page = 0
+      m.send_program_change(program, channel, page)
+         optional: channel = -1, page = 0
       m.send_pitchbend(bend, channel, page)
          optional: channel = -1, page = 0
       m.send_data(a, b, c, page)

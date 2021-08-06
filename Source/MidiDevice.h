@@ -103,6 +103,7 @@ public:
    void SendNote(double time, int pitch, int velocity, bool forceNoteOn, int channel);
    void SendCC(int ctl, int value, int channel = -1);
    void SendAftertouch(int pressure, int channel = -1);
+   void SendProgramChange(int program, int channel = -1);
    void SendPitchBend(int bend, int channel = -1);
    void SendData(unsigned char a, unsigned char b, unsigned char c);
    

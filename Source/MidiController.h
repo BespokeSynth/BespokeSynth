@@ -284,6 +284,7 @@ public:
    
    void SendNote(int page, int pitch, int velocity, bool forceNoteOn = false, int channel = -1);
    void SendCC(int page, int ctl, int value, int channel = -1);
+   void SendProgramChange(int page, int program, int channel = -1);
    void SendPitchBend(int page, int bend, int channel = -1);
    void SendData(int page, unsigned char a, unsigned char b, unsigned char c);
 

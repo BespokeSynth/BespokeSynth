@@ -13,6 +13,9 @@ class midicontroller:
    def send_cc(this, ctl, value, channel = -1, page = 0):
       pass
 
+   def send_program_change(this, program, channel = -1, page = 0):
+      pass
+
    def send_pitchbend(this, bend, channel = -1, page = 0):
       pass
 

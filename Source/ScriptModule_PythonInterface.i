@@ -410,6 +410,10 @@ PYBIND11_EMBEDDED_MODULE(midicontroller, m)
       {
          midicontroller.SendCC(page, ctl, value, channel);
       }, "ctl"_a, "value"_a, "channel"_a = -1, "page"_a = 0)
+      .def("send_program_change", [](MidiController& midicontroller, int program, int channel, int page)
+      {
+         midicontroller.SendProgramChange(page, program, channel);
+      }, "program"_a, "channel"_a = -1, "page"_a = 0)
       .def("send_pitchbend", [](MidiController& midicontroller, int bend, int channel, int page)
       {
          midicontroller.SendPitchBend(page, bend, channel);

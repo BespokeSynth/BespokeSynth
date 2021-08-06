@@ -1427,6 +1427,17 @@ void MidiController::SendCC(int page, int ctl, int value, int channel /*= -1*/)
    }
 }
 
+void MidiController::SendProgramChange(int page, int program, int channel /*= -1*/)
+{
+   if (channel == -1)
+      channel = mOutChannel;
+
+   if (page == mControllerPage)
+   {
+      mDevice.SendProgramChange(program, channel);
+   }
+}
+
 void MidiController::SendPitchBend(int page, int bend, int channel /*= -1*/)
 {
    if (channel == -1)
