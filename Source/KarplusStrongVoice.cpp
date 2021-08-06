@@ -31,6 +31,7 @@
 #include "Profiler.h"
 #include "ChannelBuffer.h"
 #include "PolyphonyMgr.h"
+#include "SingleOscillatorVoice.h"
 
 KarplusStrongVoice::KarplusStrongVoice(IDrawableModule* owner)
 : mOscPhase(0)
@@ -139,7 +140,8 @@ bool KarplusStrongVoice::Process(double time, ChannelBuffer* out, int oversampli
       mFilteredSample = ofLerp(feedbackSample, mFilteredSample, filterLerp);
       FIX_DENORMAL(mFilteredSample);
       //sample += mFeedbackRamp.Value(time) * mFilterSample;
-      float feedback = mFilteredSample * sqrtf(mVoiceParams->mFeedback) * mMuteRamp.Value(time);
+      float pressure = GetPressure(pos) - .5f;
+      float feedback = mFilteredSample * sqrtf(mVoiceParams->mFeedback + pressure * .02f) * mMuteRamp.Value(time);
       if (mVoiceParams->mInvert)
          feedback *= -1;
       sample += feedback;
@@ -197,7 +199,8 @@ void KarplusStrongVoice::DoParameterUpdate(int samplesIn,
       pitch += 12;   //inverting the pitch gives an octave down sound by halving the resonating frequency, so correct for that
    
    freq = TheScale->PitchToFreq(pitch);
-   filterRate = mVoiceParams->mFilter * pow(freq/300, exp2(mVoiceParams->mPitchTone));
+   float modWheel = GetModWheel(samplesIn) - .5f;
+   filterRate = mVoiceParams->mFilter * pow(freq/300, exp2(mVoiceParams->mPitchTone)) * (1 + modWheel);
    filterLerp = ofClamp(exp2(-filterRate / oversampling), 0, 1);
    
    oscPhaseInc = GetPhaseInc(mVoiceParams->mExciterFreq) / oversampling;
@@ -205,11 +208,14 @@ void KarplusStrongVoice::DoParameterUpdate(int samplesIn,
 
 void KarplusStrongVoice::Start(double time, float target)
 {
+   float volume = ofLerp((1 - mVoiceParams->mVelToVolume), 1, target);
+   float envScale = SingleOscillatorVoice::GetADSRScale(target, -mVoiceParams->mVelToEnvelope);
+
    mOscPhase = FPI/2;   //magic number that seems to keep things DC centered ok
    mEnv.Clear();
-   mEnv.GetStageData(0).time = mVoiceParams->mExciterAttack;
+   mEnv.GetStageData(0).time = mVoiceParams->mExciterAttack * envScale;
    mEnv.GetStageData(1).time = mVoiceParams->mExciterDecay;
-   mEnv.Start(time, target);
+   mEnv.Start(time, volume);
    mEnv.SetMaxSustain(10);
    mMuteRamp.SetValue(1);
    mActive = true;

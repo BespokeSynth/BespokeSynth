@@ -1494,6 +1494,9 @@ void MidiController::OnDeviceChanged()
       delete grid;
    }
    mGrids.clear();
+
+   mModulation.GetModWheel(-1)->SetValue(.5f);
+   mModulation.GetPressure(-1)->SetValue(.5f);
    
    bool useDefaultLayout = true;
    ofxJSONElement layout;

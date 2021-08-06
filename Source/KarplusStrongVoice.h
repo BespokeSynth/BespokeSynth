@@ -61,6 +61,8 @@ public:
    , mExciterDecay(3)
    , mExcitation(0)
    , mPitchTone(0)
+   , mVelToVolume(.5f)
+   , mVelToEnvelope(.5f)
    , mLiteCPUMode(false)
    {}
    float mFilter;
@@ -72,6 +74,8 @@ public:
    float mExciterDecay;
    float mExcitation;
    float mPitchTone;
+   float mVelToVolume;
+   float mVelToEnvelope;
    bool mLiteCPUMode;
 };
 

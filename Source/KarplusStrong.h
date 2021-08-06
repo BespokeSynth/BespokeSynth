@@ -70,7 +70,7 @@ private:
    //IDrawableModule
    void DrawModule() override;
    void DrawModuleUnclipped() override;
-   void GetModuleDimensions(float& width, float& height) override { width = 275; height = 108; }
+   void GetModuleDimensions(float& width, float& height) override { width = 275; height = 126; }
    bool Enabled() const override { return mEnabled; }
 
    PolyphonyMgr mPolyMgr;
@@ -90,6 +90,8 @@ private:
    FloatSlider* mExciterAttackSlider;
    FloatSlider* mExciterDecaySlider;
    FloatSlider* mPitchToneSlider;
+   FloatSlider* mVelToVolumeSlider;
+   FloatSlider* mVelToEnvelopeSlider;
    Checkbox* mLiteCPUModeCheckbox;
 
    ChannelBuffer mWriteBuffer;
