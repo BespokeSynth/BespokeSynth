@@ -31,9 +31,9 @@
 #include "UIControlMacros.h"
 
 MPESmoother::MPESmoother()
-: mPitchSmooth(0)
-, mPressureSmooth(0)
-, mModWheelSmooth(0)
+: mPitchSmooth(0.02f)
+, mPressureSmooth(0.02f)
+, mModWheelSmooth(0.02f)
 {
 }
 
@@ -58,6 +58,10 @@ void MPESmoother::CreateUIControls()
    FLOATSLIDER(mPressureSmoothSlider, "pressure", &mPressureSmooth, 0, 1);
    FLOATSLIDER(mModWheelSmoothSlider, "modwheel", &mModWheelSmooth, 0, 1);
    ENDUIBLOCK(mWidth, mHeight);
+
+   mPitchSmoothSlider->SetMode(FloatSlider::kSquare);
+   mPressureSmoothSlider->SetMode(FloatSlider::kSquare);
+   mModWheelSmoothSlider->SetMode(FloatSlider::kSquare);
 }
 
 void MPESmoother::DrawModule()
