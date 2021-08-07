@@ -76,7 +76,7 @@ void KarplusStrong::CreateUIControls()
    mExciterDecaySlider = new FloatSlider(this,"x dec",mExciterAttackSlider,kAnchor_Right,68,15,&mVoiceParams.mExciterDecay,0.01f,40);
    mVelToVolumeSlider = new FloatSlider(this, "vel2vol", mExciterAttackSlider, kAnchor_Below, 140, 15, &mVoiceParams.mVelToVolume, 0, 1);
    mVelToEnvelopeSlider = new FloatSlider(this, "vel2env", mVelToVolumeSlider, kAnchor_Below, 140, 15, &mVoiceParams.mVelToEnvelope, -1, 1);
-   mPitchToneSlider = new FloatSlider(this, "pitchtone", mVelToVolumeSlider, kAnchor_Right, 140, 15, &mVoiceParams.mPitchTone, -2, 2);
+   mPitchToneSlider = new FloatSlider(this, "pitchtone", mVelToVolumeSlider, kAnchor_Right, 125, 15, &mVoiceParams.mPitchTone, -2, 2);
    mLiteCPUModeCheckbox = new Checkbox(this, "lite cpu", mPitchToneSlider, kAnchor_Below, &mVoiceParams.mLiteCPUMode);
    //mStretchCheckbox = new Checkbox(this,"stretch",mVolSlider,kAnchor_Right,&mVoiceParams.mStretch);
    
