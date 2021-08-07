@@ -645,6 +645,8 @@
         <FILE id="rkM42v" name="Monophonify.h" compile="0" resource="0" file="Source/Monophonify.h"/>
         <FILE id="TfCvFG" name="MPESmoother.cpp" compile="1" resource="0" file="Source/MPESmoother.cpp"/>
         <FILE id="P68wP2" name="MPESmoother.h" compile="0" resource="0" file="Source/MPESmoother.h"/>
+        <FILE id="pqbQHu" name="MPETweaker.cpp" compile="1" resource="0" file="Source/MPETweaker.cpp"/>
+        <FILE id="FatRw3" name="MPETweaker.h" compile="0" resource="0" file="Source/MPETweaker.h"/>
         <FILE id="U4pMmX" name="MultibandCompressor.cpp" compile="1" resource="0"
               file="Source/MultibandCompressor.cpp"/>
         <FILE id="vJgslt" name="MultibandCompressor.h" compile="0" resource="0"
