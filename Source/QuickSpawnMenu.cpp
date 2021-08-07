@@ -28,6 +28,7 @@
 #include "QuickSpawnMenu.h"
 #include "ModularSynth.h"
 #include "ModuleFactory.h"
+#include "TitleBar.h"
 
 QuickSpawnMenu* TheQuickSpawnMenu = nullptr;
 
@@ -77,7 +78,12 @@ void QuickSpawnMenu::KeyPressed(int key, bool isRepeat)
          }
          
          SetDimensions(width, (int)mElements.size() * itemSpacing);
-         SetPosition(TheSynth->GetMouseX(GetOwningContainer())-mWidth/2, TheSynth->GetMouseY(GetOwningContainer())-mHeight/2);
+         float minX = 5;
+         float maxX = ofGetWidth() / GetOwningContainer()->GetDrawScale() - mWidth- 5;
+         float minY = TheTitleBar->GetRect().height + 5;
+         float maxY = ofGetHeight() / GetOwningContainer()->GetDrawScale() - mHeight - 5;
+         SetPosition(ofClamp(TheSynth->GetMouseX(GetOwningContainer()) - mWidth / 2, minX, maxX),
+                     ofClamp(TheSynth->GetMouseY(GetOwningContainer()) - mHeight / 2, minY, maxY));
          SetShowing(true);
       }
    }
