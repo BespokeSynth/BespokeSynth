@@ -86,7 +86,7 @@ void StepSequencer::CreateUIControls()
    mUseStrengthSliderCheckbox = new Checkbox(this,"use str",139,22,&mUseStrengthSlider);
    mNumMeasuresSlider = new IntSlider(this, "measures", 5, 22, 80, 15, &mNumMeasures, 1, 4);
    mPresetDropdown = new DropdownList(this,"preset",5,4,&mPreset);
-   mGridYOffDropdown = new DropdownList(this,"yoff",288,4,&mGridYOff);
+   mGridYOffDropdown = new DropdownList(this,"yoff",240,20,&mGridYOff);
    mAdjustOffsetsCheckbox = new Checkbox(this,"offsets",175,4,&mAdjustOffsets);
    mRepeatRateDropdown = new DropdownList(this,"repeat",155,22,(int*)(&mRepeatRate));
    mStepIntervalDropdown = new DropdownList(this,"step",133,4,(int*)(&mStepInterval));
@@ -113,6 +113,9 @@ void StepSequencer::CreateUIControls()
    mGridYOffDropdown->AddLabel("1", 1);
    mGridYOffDropdown->AddLabel("2", 2);
    mGridYOffDropdown->AddLabel("3", 3);
+   
+   mVelocityGridController->SetShowing(false);
+   mMetaStepGridController->SetShowing(false);
    
    for (int i=0; i<NUM_STEPSEQ_ROWS; ++i)
    {
