@@ -71,6 +71,8 @@ NoteStepSequencer::NoteStepSequencer()
 , mRandomizeLengthRange(1)
 , mRandomizeVelocityChance(1)
 , mRandomizeVelocityRange(1)
+, mGridControlOffsetX(0)
+, mGridControlOffsetY(0)
 {
    
    for (int i=0;i<NSS_MAX_STEPS;++i)
@@ -94,7 +96,11 @@ void NoteStepSequencer::CreateUIControls()
    BUTTON(mRandomizeVelocityButton, "vel"); UIBLOCK_SHIFTRIGHT();
    BUTTON(mRandomizeLengthButton, "len"); UIBLOCK_SHIFTRIGHT();
    UIBLOCK_SHIFTX(5);
-   UICONTROL_CUSTOM(mGridControlTarget, new GridControlTarget(UICONTROL_BASICS("grid"))); UIBLOCK_NEWLINE();
+   UICONTROL_CUSTOM(mGridControlTarget, new GridControlTarget(UICONTROL_BASICS("grid"))); UIBLOCK_SHIFTRIGHT();
+   INTSLIDER(mGridControlOffsetXSlider, "x offset", &mGridControlOffsetX, 0, 16);
+   INTSLIDER(mGridControlOffsetYSlider, "y offset", &mGridControlOffsetY, 0, 16);
+   UIBLOCK_SHIFTUP();
+   UIBLOCK_NEWLINE();
    UIBLOCK_PUSHSLIDERWIDTH(150);
    INTSLIDER(mLengthSlider, "length", &mLength, 1, NSS_MAX_STEPS); UIBLOCK_SHIFTRIGHT();
    BUTTON(mShiftBackButton, "<"); UIBLOCK_SHIFTRIGHT();
@@ -201,6 +207,8 @@ void NoteStepSequencer::DrawModule()
    ofSetColor(255,255,255,gModuleDrawAlpha);
    
    mLoopResetPointSlider->SetShowing(mHasExternalPulseSource);
+   mGridControlOffsetXSlider->SetShowing(mGridControlTarget->GetGridController() != nullptr && mLength > mGridControlTarget->GetGridController()->NumCols());
+   mGridControlOffsetYSlider->SetShowing(mGridControlTarget->GetGridController() != nullptr && mNoteRange > mGridControlTarget->GetGridController()->NumRows());
    
    mIntervalSelector->Draw();
    mLengthSlider->Draw();
@@ -214,6 +222,8 @@ void NoteStepSequencer::DrawModule()
    mRandomizeVelocityButton->Draw();
    mLoopResetPointSlider->Draw();
    mGridControlTarget->Draw();
+   mGridControlOffsetXSlider->Draw();
+   mGridControlOffsetYSlider->Draw();
    
    mGrid->Draw();
    mVelocityGrid->Draw();
@@ -227,6 +237,25 @@ void NoteStepSequencer::DrawModule()
       DrawTextNormal(NoteName(RowToPitch(i),false,true) + "("+ ofToString(RowToPitch(i)) + ")", pos.x + 1, pos.y - (scale/8) + 1, scale);
    }
    ofPopStyle();
+   
+   if (mGridControlTarget->GetGridController())
+   {
+      int controllerCols = mGridControlTarget->GetGridController()->NumCols();
+      int controllerRows = mGridControlTarget->GetGridController()->NumRows();
+      
+      ofPushStyle();
+      ofNoFill();
+      ofSetLineWidth(4);
+      ofSetColor(255,0,0,50);
+      float squareh = float(mGrid->GetHeight())/mNoteRange;
+      float squarew = float(mGrid->GetWidth())/mLength;
+      ofRectangle gridRect = mGrid->GetRect(K(local));
+      ofRect(gridRect.x + squarew * mGridControlOffsetX,
+             gridRect.y + gridRect.height - squareh * (mGridControlOffsetY + mNoteRange - controllerRows + 1),
+             squarew * controllerCols,
+             squareh * controllerRows);
+      ofPopStyle();
+   }
    
    DrawTextLeftJustify("random:", 102, 14);
    
@@ -772,12 +801,15 @@ void NoteStepSequencer::UpdateGridControllerLights(bool force)
       {
          for (int y=0; y<mGridControlTarget->GetGridController()->NumRows(); ++y)
          {
+            int column = x + mGridControlOffsetX;
+            int row = y - mGridControlOffsetY;
+            
             GridColor color = GridColor::kGridColorOff;
-            if (x == mGrid->GetHighlightCol(gTime+gBufferSizeMs+TheTransport->GetEventLookaheadMs()))
+            if (column == mGrid->GetHighlightCol(gTime+gBufferSizeMs+TheTransport->GetEventLookaheadMs()))
                color = GridColor::kGridColor2Dim;
-            if (x < mLength)
+            if (column < mLength)
             {
-               if (mTones[x] == mGridControlTarget->GetGridController()->NumRows() - 1 - y && mVels[x] > 0)
+               if (mTones[column] == mGridControlTarget->GetGridController()->NumRows() - 1 - row && mVels[column] > 0)
                   color = GridColor::kGridColor1Bright;
             }
             mGridControlTarget->GetGridController()->SetLight(x, y, color, force);
@@ -793,17 +825,19 @@ void NoteStepSequencer::OnControllerPageSelected()
 
 void NoteStepSequencer::OnGridButton(int x, int y, float velocity, IGridController* grid)
 {
-   if (grid == mGridControlTarget->GetGridController() && x < mLength && velocity > 0)
+   int col = x + mGridControlOffsetX;
+   int row = y - mGridControlOffsetY;
+   if (grid == mGridControlTarget->GetGridController() && col >= 0 && col < mLength && velocity > 0)
    {
-      int tone = mGridControlTarget->GetGridController()->NumRows() - 1 -  y;
-      if (mTones[x] == tone && mVels[x] > 0)
+      int tone = mGridControlTarget->GetGridController()->NumRows() - 1 - row;
+      if (mTones[col] == tone && mVels[col] > 0)
       {
-         mVels[x] = 0;
+         mVels[col] = 0;
       }
       else
       {
-         mTones[x] = tone;
-         mVels[x] = velocity * 127;
+         mTones[col] = tone;
+         mVels[col] = velocity * 127;
       }
       SyncGridToSeq();
       UpdateGridControllerLights(false);
@@ -995,6 +1029,8 @@ void NoteStepSequencer::IntSliderUpdated(IntSlider* slider, int oldVal)
       if (slider == mVelocitySliders[i])
          SyncGridToSeq();
    }
+   if (slider == mGridControlOffsetXSlider || slider == mGridControlOffsetYSlider)
+      UpdateGridControllerLights(false);
 }
 
 void NoteStepSequencer::SyncGridToSeq()
@@ -1011,6 +1047,18 @@ void NoteStepSequencer::SyncGridToSeq()
    }
    mGrid->SetGrid(mLength, mNoteRange);
    mVelocityGrid->SetGrid(mLength, 1);
+   if (mGridControlTarget->GetGridController())
+   {
+      int maxXOffset = mLength - mGridControlTarget->GetGridController()->NumCols();
+      if (maxXOffset >= 0)
+         mGridControlOffsetXSlider->SetExtents(0, maxXOffset);
+      int maxYOffset = mNoteRange - mGridControlTarget->GetGridController()->NumRows();
+      if (maxYOffset >= 0)
+         mGridControlOffsetYSlider->SetExtents(0, maxYOffset);
+      
+      mGridControlOffsetX = MAX(MIN(mGridControlOffsetX, maxXOffset), 0);
+      mGridControlOffsetY = MAX(MIN(mGridControlOffsetY, maxYOffset), 0);
+   }
 }
 
 void NoteStepSequencer::OnScaleChanged()

@@ -203,6 +203,10 @@ private:
 
    TransportListenerInfo* mTransportListenerInfo;
    GridControlTarget* mGridControlTarget;
+   int mGridControlOffsetX;
+   int mGridControlOffsetY;
+   IntSlider* mGridControlOffsetXSlider;
+   IntSlider* mGridControlOffsetYSlider;
 };
 
 
