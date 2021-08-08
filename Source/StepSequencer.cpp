@@ -341,18 +341,19 @@ void StepSequencer::OnGridButton(int x, int y, float velocity, IGridController* 
                {
                   if (mUseStrengthSlider)
                   {
-                     mGrid->SetVal(gridPos.x,gridPos.y,mStrength);
+                     float val = mGrid->GetVal(gridPos.x,gridPos.y);
+                     if (val == mStrength)
+                        mGrid->SetVal(gridPos.x,gridPos.y,0);
+                     else
+                        mGrid->SetVal(gridPos.x,gridPos.y,mStrength);
                   }
                   else
                   {
                      float val = mGrid->GetVal(gridPos.x,gridPos.y);
-                     if (val > kMidwayVelocity)
-                        mGrid->SetVal(gridPos.x,gridPos.y,kMidwayVelocity);
-                     else if (val > 0)
+                     if (val > 0)
                         mGrid->SetVal(gridPos.x,gridPos.y,0);
                      else
                         mGrid->SetVal(gridPos.x,gridPos.y,1);
-                     //mGrid->SetVal(gridPos.x, gridPos.y, val > 0 ? 0 : 1);
                   }
                }
             }
