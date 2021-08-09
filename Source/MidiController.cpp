@@ -181,15 +181,20 @@ UIControlConnection* MidiController::AddControlConnection(MidiMessageType messag
 
 void MidiController::AddControlConnection(const ofxJSONElement& connection)
 {
-   if (connection.isMember("grid"))
+   if (connection.isMember("grid_index"))
    {
       int index = connection["grid_index"].asInt();
-      string path = connection["grid"].asString();
       if (index < (int)mGrids.size())
       {
          GridLayout* grid = mGrids[index];
-         if (path.length() > 0)
-            grid->mGridCable->SetTarget(GetOwningContainer()->FindUIControl(path));
+         for (int page=0; page<connection["grid_pages"].size(); ++page)
+         {
+            string path = connection["grid_pages"][page].asString();
+            if (path.length() > 0)
+               grid->mGridControlTarget[page] = dynamic_cast<GridControlTarget*>(GetOwningContainer()->FindUIControl(path));
+            else
+               grid->mGridControlTarget[page] = nullptr;
+         }
       }
       return;
    }
@@ -1741,7 +1746,6 @@ void MidiController::DropdownUpdated(DropdownList* list, int oldVal)
       {
          if (grid->mGridControlTarget[mControllerPage] != nullptr)
          {
-            dynamic_cast<GridControllerMidi*>(grid->mGridControlTarget[mControllerPage]->GetGridController())->OnControllerPageSelected();
             grid->mGridCable->SetTarget(grid->mGridControlTarget[mControllerPage]);
          }
          else
@@ -2196,15 +2200,20 @@ void MidiController::SaveLayout(ofxJSONElement& moduleInfo)
 
       ++i;
    }
-      
+   
    int gridIndex = 0;
    for (auto* grid : mGrids)
    {
-      mConnectionsJson[i]["gridIndex"] = gridIndex;
-      if (grid->mGridCable->GetTarget())
-         mConnectionsJson[i]["grid"] = grid->mGridCable->GetTarget()->Path();
-      else
-         mConnectionsJson[i]["grid"] = "";
+      mConnectionsJson[i]["grid_index"] = gridIndex;
+      mConnectionsJson[i]["grid_pages"].resize(MAX_MIDI_PAGES);
+      for (int page=0; page<MAX_MIDI_PAGES; ++page)
+      {
+         auto* target = grid->mGridControlTarget[page];
+         if (target != nullptr)
+            mConnectionsJson[i]["grid_pages"][page] = target->Path();
+         else
+            mConnectionsJson[i]["grid_pages"][page] = "";
+      }
       ++i;
       ++gridIndex;
    }
