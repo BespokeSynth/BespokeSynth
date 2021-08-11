@@ -115,6 +115,7 @@ import sampleplayer
       s.fill(data)
       s.play_cue(cue, speedMult, startOffsetSeconds)
          optional: speedMult = 1, startOffsetSeconds = 0
+      s.get_length_seconds()
 
 
 import midicontroller

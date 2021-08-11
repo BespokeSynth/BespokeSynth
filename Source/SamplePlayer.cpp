@@ -1208,6 +1208,13 @@ void SamplePlayer::DrawModule()
    }
 }
 
+float SamplePlayer::GetLengthInSeconds() const
+{
+   if (mSample != nullptr)
+      return mSample->LengthInSamples() / (gSampleRate * mSample->GetSampleRateRatio());
+   return 0;
+}
+
 int SamplePlayer::GetZoomStartSample() const
 {
    if (mDoRecording)

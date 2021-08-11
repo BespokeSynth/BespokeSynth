@@ -13,3 +13,6 @@ class sampleplayer:
    def play_cue(this, cue, speedMult = 1, startOffsetSeconds = 0):
       pass
 
+   def get_length_seconds(this, ):
+      pass
+

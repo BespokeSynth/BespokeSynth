@@ -379,7 +379,11 @@ PYBIND11_EMBEDDED_MODULE(sampleplayer, m)
          modulation.modWheel = scriptModule->GetModWheel(cue);
          modulation.modWheel->SetValue(startOffsetSeconds);
          player.PlayNote(time, cue, 127, -1, modulation);
-      }, "cue"_a, "speedMult"_a = 1, "startOffsetSeconds"_a = 0);
+      }, "cue"_a, "speedMult"_a = 1, "startOffsetSeconds"_a = 0)
+      .def("get_length_seconds", [](SamplePlayer& player)
+      {
+         return player.GetLengthInSeconds();
+      });
 }
 
 PYBIND11_EMBEDDED_MODULE(midicontroller, m)

@@ -70,6 +70,7 @@ public:
    void SetCuePoint(int pitch, float startSeconds, float lengthSeconds, float speed);
    void FillData(vector<float> data);
    ChannelBuffer* GetCueSampleData(int cueIndex);
+   float GetLengthInSeconds() const;
    
    void oscMessageReceived(const OSCMessage& msg) override;
    void oscBundleReceived(const OSCBundle& bundle) override;
