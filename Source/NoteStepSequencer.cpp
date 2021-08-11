@@ -251,7 +251,7 @@ void NoteStepSequencer::DrawModule()
       float squarew = float(mGrid->GetWidth())/mLength;
       ofRectangle gridRect = mGrid->GetRect(K(local));
       ofRect(gridRect.x + squarew * mGridControlOffsetX,
-             gridRect.y + gridRect.height - squareh * (mGridControlOffsetY + mNoteRange - controllerRows + 1),
+             gridRect.y + gridRect.height - squareh * (mGridControlOffsetY + controllerRows),
              squarew * controllerCols,
              squareh * controllerRows);
       ofPopStyle();
