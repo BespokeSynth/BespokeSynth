@@ -111,7 +111,7 @@ private:
    void UpdateActiveCuePoint();
    void PlayCuePoint(double time, int index, int velocity, float speedMult, float startOffsetSeconds);
    void RunProcess(const StringArray& args);
-   void AutoSlice(NoteInterval interval);
+   void AutoSlice(int slices);
    void StopRecording();
    
    //IDrawableModule
@@ -185,9 +185,10 @@ private:
    ClickButton* mPlayCurrentCuePointButton;
    bool mShowGrid;
    Checkbox* mShowGridCheckbox;
-   ClickButton* mAutoSlice4n;
-   ClickButton* mAutoSlice8n;
-   ClickButton* mAutoSlice16n;
+   ClickButton* mAutoSlice4;
+   ClickButton* mAutoSlice8;
+   ClickButton* mAutoSlice16;
+   ClickButton* mAutoSlice32;
    ClickButton* mPlayHoveredClipButton;
    ClickButton* mGrabHoveredClipButton;
 

@@ -1079,9 +1079,10 @@ sampleplayer~sample playback with triggerable cue points, clip extraction, and y
 ~select played~when true, any cue point played via incoming notes will become the current cue
 ~play cue~play the current cue
 ~show grid~show a quarter note grid (when zoomed in far enough)
-~4n~auto-slice 4 quarter notes, starting from the current cue
-~8n~auto-slice 8 eighth notes, starting from the current cue
-~16n~auto-slice 16 sixteenth notes, starting from the current cue
+~4~auto-slice 4 slices
+~8~auto-slice 8 slices
+~16~auto-slice 16 slices
+~32~auto-slice 32 slices
 ~searchresult*~click to download this youtube search result. downloading long videos may take a while.
 ~append to rec~when recording, append to the previous recording, rather than clearing the sample first
 ~record as clips~when recording, only record when there is enough input to open the gate, and mark up each recorded segment with cue points

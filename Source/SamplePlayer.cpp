@@ -120,10 +120,11 @@ void SamplePlayer::CreateUIControls()
    UIBLOCK_NEWCOLUMN();
    CHECKBOX(mSetCuePointCheckbox, "click sets cue", &mSetCuePoint);
    CHECKBOX(mShowGridCheckbox, "show grid", &mShowGrid);
-   BUTTON(mAutoSlice4n, "4n"); UIBLOCK_SHIFTRIGHT();
-   BUTTON(mAutoSlice8n, "8n"); UIBLOCK_SHIFTRIGHT();
-   BUTTON(mAutoSlice16n, "16n");
-   UIBLOCK_SHIFTX(-52);
+   BUTTON(mAutoSlice4, "4"); UIBLOCK_SHIFTRIGHT();
+   BUTTON(mAutoSlice8, "8"); UIBLOCK_SHIFTRIGHT();
+   BUTTON(mAutoSlice16, "16"); UIBLOCK_SHIFTRIGHT();
+   BUTTON(mAutoSlice32, "32");
+   UIBLOCK_SHIFTX(-45);
    UIBLOCK_NEWCOLUMN();
    CHECKBOX(mRecordingAppendModeCheckbox, "append to rec", &mRecordingAppendMode)
    CHECKBOX(mRecordAsClipsCheckbox, "record as clips", &mRecordAsClips);
@@ -478,17 +479,21 @@ void SamplePlayer::UpdateActiveCuePoint()
    }
 }
 
-void SamplePlayer::AutoSlice(NoteInterval interval)
+void SamplePlayer::AutoSlice(int slices)
 {
-   int count = TheTransport->CountInStandardMeasure(interval);
-   float sliceLengthSeconds = TheTransport->GetDuration(kInterval_1n) / count / 1000.0f * mSampleCuePoints[mActiveCuePointIndex].speed;
-   for (int i = 0; i < count; ++i)
+   float sliceLengthSeconds = GetLengthInSeconds() / slices;
+   for (int i = 0; i < (int)mSampleCuePoints.size(); ++i)
    {
-      if (mActiveCuePointIndex + i < mSampleCuePoints.size())
+      if (i < slices)
       {
-         mSampleCuePoints[mActiveCuePointIndex + i].startSeconds = mSampleCuePoints[mActiveCuePointIndex].startSeconds + sliceLengthSeconds *i;
-         mSampleCuePoints[mActiveCuePointIndex + i].lengthSeconds = sliceLengthSeconds;
-         mSampleCuePoints[mActiveCuePointIndex + i].speed = mSampleCuePoints[mActiveCuePointIndex].speed;
+         mSampleCuePoints[i].startSeconds = sliceLengthSeconds *i;
+         mSampleCuePoints[i].lengthSeconds = sliceLengthSeconds;
+         mSampleCuePoints[i].speed = mSpeed;
+      }
+      else
+      {
+         mSampleCuePoints[i].startSeconds = 0;
+         mSampleCuePoints[i].lengthSeconds = 0;
       }
    }
 }
@@ -603,12 +608,14 @@ void SamplePlayer::ButtonClicked(ClickButton *button)
    if (button == mPlayCurrentCuePointButton)
       PlayCuePoint(gTime, mActiveCuePointIndex, 127, 1, 0);
 
-   if (button == mAutoSlice4n)
-      AutoSlice(kInterval_4n);
-   if (button == mAutoSlice8n)
-      AutoSlice(kInterval_8n);
-   if (button == mAutoSlice16n)
-      AutoSlice(kInterval_16n);
+   if (button == mAutoSlice4)
+      AutoSlice(4);
+   if (button == mAutoSlice8)
+      AutoSlice(8);
+   if (button == mAutoSlice16)
+      AutoSlice(16);
+   if (button == mAutoSlice32)
+      AutoSlice(32);
    
    if (button == mPlayHoveredClipButton)
       PlayCuePoint(gTime, mHoveredCuePointIndex, 127, 1, 0);
@@ -993,9 +1000,10 @@ void SamplePlayer::DrawModule()
    mCuePointSpeedSlider->Draw();
    mPlayCurrentCuePointButton->Draw();
    mShowGridCheckbox->Draw();
-   mAutoSlice4n->Draw();
-   mAutoSlice8n->Draw();
-   mAutoSlice16n->Draw();
+   mAutoSlice4->Draw();
+   mAutoSlice8->Draw();
+   mAutoSlice16->Draw();
+   mAutoSlice32->Draw();
    mRecordingAppendModeCheckbox->Draw();
    mRecordAsClipsCheckbox->Draw();
    mRecordGate.Draw();
