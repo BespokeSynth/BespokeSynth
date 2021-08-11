@@ -516,6 +516,8 @@
               file="Source/GridController.h"/>
         <FILE id="kLDNXp" name="GridModule.cpp" compile="1" resource="0" file="Source/GridModule.cpp"/>
         <FILE id="N725Dx" name="GridModule.h" compile="0" resource="0" file="Source/GridModule.h"/>
+        <FILE id="fC394D" name="GridSliders.cpp" compile="1" resource="0" file="Source/GridSliders.cpp"/>
+        <FILE id="q2ML6f" name="GridSliders.h" compile="0" resource="0" file="Source/GridSliders.h"/>
         <FILE id="UgXfjY" name="GroupControl.cpp" compile="1" resource="0"
               file="Source/GroupControl.cpp"/>
         <FILE id="hf7cqG" name="GroupControl.h" compile="0" resource="0" file="Source/GroupControl.h"/>
