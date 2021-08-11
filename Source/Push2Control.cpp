@@ -1330,13 +1330,16 @@ vector<IDrawableModule*> Push2Control::SortModules(vector<IDrawableModule*> modu
    vector<IDrawableModule*> output;
     
    for (int i=0; i<modules.size(); ++i)
-      AddModuleChain(modules[i], modules, output);
+      AddModuleChain(modules[i], modules, output, 0);
    
    return output;
 }
 
-void Push2Control::AddModuleChain(IDrawableModule* module, vector<IDrawableModule*>& modules, vector<IDrawableModule*>& output)
+void Push2Control::AddModuleChain(IDrawableModule* module, vector<IDrawableModule*>& modules, vector<IDrawableModule*>& output, int depth)
 {
+   if (depth > 100)  //avoid infinite recursion if there's a patching loop
+      return;
+
    if (!VectorContains(module, output))
    {
       //look for parents
@@ -1348,7 +1351,7 @@ void Push2Control::AddModuleChain(IDrawableModule* module, vector<IDrawableModul
          if (target != nullptr &&
              target == dynamic_cast<IClickable*>(module))
          {
-            AddModuleChain(modules[i], modules, output);
+            AddModuleChain(modules[i], modules, output, depth+1);
          }
       }
       
@@ -1366,7 +1369,7 @@ void Push2Control::AddModuleChain(IDrawableModule* module, vector<IDrawableModul
          if (target != nullptr &&
              target == dynamic_cast<IClickable*>(modules[i]))
          {
-            AddModuleChain(modules[i], modules, output);
+            AddModuleChain(modules[i], modules, output, depth+1);
          }
       }
    }

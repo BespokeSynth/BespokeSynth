@@ -94,7 +94,7 @@ private:
    bool GetGridIndex(int gridX, int gridY, int& gridIndex) { gridIndex = gridX + gridY * 8; return gridX >= 0 && gridX < 8 && gridY >= 0 && gridY < 8; }
    bool IsIgnorableModule(IDrawableModule* module);
    vector<IDrawableModule*> SortModules(vector<IDrawableModule*> modules);
-   void AddModuleChain(IDrawableModule* module, vector<IDrawableModule*>& modules, vector<IDrawableModule*>& output);
+   void AddModuleChain(IDrawableModule* module, vector<IDrawableModule*>& modules, vector<IDrawableModule*>& output, int depth);
    void DrawDisplayModuleRect(ofRectangle rect);
    string GetModuleTypeToSpawn();
    ModuleType GetModuleTypeForSpawnList(IUIControl* control);
