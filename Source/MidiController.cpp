@@ -55,7 +55,7 @@ MidiController::MidiController()
 , mBindMode(false)
 , mBindCheckbox(nullptr)
 , mTwoWay(true)
-, mSendTwoWayOnChange(false)
+, mSendTwoWayOnChange(true)
 , mControllerIndex(-1)
 , mLastActivityTime(-9999)
 , mLastConnectedActivityTime(-9999)
@@ -2087,7 +2087,7 @@ void MidiController::LoadLayout(const ofxJSONElement& moduleInfo)
    
    mModuleSaveData.LoadBool("negativeedge",moduleInfo,false);
    mModuleSaveData.LoadBool("incrementalsliders", moduleInfo, false);
-   mModuleSaveData.LoadBool("twoway_on_change", moduleInfo, false);
+   mModuleSaveData.LoadBool("twoway_on_change", moduleInfo, true);
    
    mConnectionsJson = moduleInfo["connections"];
 
