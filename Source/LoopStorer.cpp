@@ -346,7 +346,7 @@ LoopStorer::SampleData::SampleData()
 LoopStorer::SampleData::~SampleData()
 {
    if (mIsCurrentBuffer == false)
-      delete[] mBuffer;
+      delete mBuffer;
    if (mSelectCheckbox)
    {
       mLoopStorer->RemoveUIControl(mSelectCheckbox);
@@ -360,7 +360,7 @@ void LoopStorer::SampleData::Init(LoopStorer* storer, int index)
    mIndex = index;
    
    if (mIsCurrentBuffer == false)
-      delete[] mBuffer;
+      delete mBuffer;
    
    if (index == 0)//we're the first one, grab our buffer from the looper
    {
