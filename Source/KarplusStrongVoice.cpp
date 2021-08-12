@@ -140,8 +140,7 @@ bool KarplusStrongVoice::Process(double time, ChannelBuffer* out, int oversampli
       mFilteredSample = ofLerp(feedbackSample, mFilteredSample, filterLerp);
       FIX_DENORMAL(mFilteredSample);
       //sample += mFeedbackRamp.Value(time) * mFilterSample;
-      float pressure = GetPressure(pos) - .5f;
-      float feedback = mFilteredSample * sqrtf(mVoiceParams->mFeedback + pressure * .02f) * mMuteRamp.Value(time);
+      float feedback = mFilteredSample * sqrtf(mVoiceParams->mFeedback + GetPressure(pos) * .02f) * mMuteRamp.Value(time);
       if (mVoiceParams->mInvert)
          feedback *= -1;
       sample += feedback;
@@ -199,8 +198,7 @@ void KarplusStrongVoice::DoParameterUpdate(int samplesIn,
       pitch += 12;   //inverting the pitch gives an octave down sound by halving the resonating frequency, so correct for that
    
    freq = TheScale->PitchToFreq(pitch);
-   float modWheel = GetModWheel(samplesIn) - .5f;
-   filterRate = mVoiceParams->mFilter * pow(freq/300, exp2(mVoiceParams->mPitchTone)) * (1 + modWheel);
+   filterRate = mVoiceParams->mFilter * pow(freq/300, exp2(mVoiceParams->mPitchTone)) * (1 + GetModWheel(samplesIn));
    filterLerp = ofClamp(exp2(-filterRate / oversampling), 0, 1);
    
    oscPhaseInc = GetPhaseInc(mVoiceParams->mExciterFreq) / oversampling;

@@ -366,6 +366,8 @@ private:
    int mNoteOffset;
    float mPitchBendRange;
    int mModwheelCC;
+   float mModWheelOffset;
+   float mPressureOffset;
 
    Modulations mModulation;
 

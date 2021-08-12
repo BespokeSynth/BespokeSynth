@@ -137,7 +137,7 @@ bool SingleOscillatorVoice::Process(double time, ChannelBuffer* out, int oversam
       if (mUseFilter)
       {
          //PROFILER(SingleOscillatorVoice_filter);
-         float f = ofLerp(mVoiceParams->mFilterCutoffMin, mVoiceParams->mFilterCutoffMax, mFilterAdsr.Value(time)) * (1 - (GetModWheel(pos) - .5f) * .9f);
+         float f = ofLerp(mVoiceParams->mFilterCutoffMin, mVoiceParams->mFilterCutoffMax, mFilterAdsr.Value(time)) * (1 - GetModWheel(pos) * .9f);
          float q = mVoiceParams->mFilterQ;
          if (f != mFilterLeft.mF || q != mFilterLeft.mQ)
             mFilterLeft.SetFilterParams(f, q);
@@ -181,7 +181,7 @@ void SingleOscillatorVoice::DoParameterUpdate(int samplesIn,
    
    for (int u=0; u<mVoiceParams->mUnison && u<kMaxUnison; ++u)
    {
-      float detune = exp2(mVoiceParams->mDetune * mOscData[u].mDetuneFactor * (1 - (GetPressure(samplesIn) - .5f)));
+      float detune = exp2(mVoiceParams->mDetune * mOscData[u].mDetuneFactor * (1 - GetPressure(samplesIn)));
       mOscData[u].mCurrentPhaseInc = GetPhaseInc(freq * detune);
    }
 }

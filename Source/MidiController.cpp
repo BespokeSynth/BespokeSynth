@@ -1499,9 +1499,6 @@ void MidiController::OnDeviceChanged()
       delete grid;
    }
    mGrids.clear();
-
-   mModulation.GetModWheel(-1)->SetValue(.5f);
-   mModulation.GetPressure(-1)->SetValue(.5f);
    
    bool useDefaultLayout = true;
    ofxJSONElement layout;
@@ -1537,6 +1534,16 @@ void MidiController::OnDeviceChanged()
       {
          mModwheelCC = layout["modwheelcc"].asInt();
          mModuleSaveData.SetInt("modwheelcc(1or74)", mModwheelCC);
+      }
+      if (!layout["modwheeloffset"].isNull())
+      {
+         mModWheelOffset = layout["modwheeloffset"].asDouble();
+         mModuleSaveData.SetFloat("modwheeloffset", mModWheelOffset);
+      }
+      if (!layout["pressureoffset"].isNull())
+      {
+         mPressureOffset = layout["pressureoffset"].asDouble();
+         mModuleSaveData.SetFloat("pressureoffset", mPressureOffset);
       }
       if (!layout["twoway_on_change"].isNull())
       {
@@ -1683,6 +1690,9 @@ void MidiController::OnDeviceChanged()
          mLayoutHeight = MAX(mLayoutHeight, mLayoutControls[i].mPosition.y + mLayoutControls[i].mDimensions.y + 20);
       }
    }
+
+   mModulation.GetModWheel(-1)->SetValue(mModWheelOffset);
+   mModulation.GetPressure(-1)->SetValue(mPressureOffset);
 }
 
 void MidiController::CheckboxUpdated(Checkbox* checkbox)
@@ -2082,6 +2092,8 @@ void MidiController::LoadLayout(const ofxJSONElement& moduleInfo)
    mModuleSaveData.LoadInt("noteoffset",moduleInfo,0,-999,999,K(isTextField));
    mModuleSaveData.LoadFloat("pitchbendrange",moduleInfo,2,1,96,K(isTextField));
    mModuleSaveData.LoadInt("modwheelcc(1or74)",moduleInfo,1,0,127,K(isTextField));
+   mModuleSaveData.LoadFloat("modwheeloffset", moduleInfo, 0, 0, 1, K(isTextField));
+   mModuleSaveData.LoadFloat("pressureoffset", moduleInfo, 0, 0, 1, K(isTextField));
    
    mModuleSaveData.LoadInt("outchannel", moduleInfo, 1, 1, 16);
    
@@ -2104,6 +2116,10 @@ void MidiController::SetUpFromSaveData()
    SetPitchBendRange(mModuleSaveData.GetFloat("pitchbendrange"));
    
    mModwheelCC = mModuleSaveData.GetInt("modwheelcc(1or74)");
+   mModWheelOffset = mModuleSaveData.GetFloat("modwheeloffset");
+   mPressureOffset = mModuleSaveData.GetFloat("pressureoffset");
+   mModulation.GetModWheel(-1)->SetValue(mModWheelOffset);
+   mModulation.GetPressure(-1)->SetValue(mPressureOffset);
    
    mDeviceIn = mModuleSaveData.GetString("devicein");
    mDeviceOut = mModuleSaveData.GetString("deviceout");
