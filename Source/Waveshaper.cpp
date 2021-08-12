@@ -53,13 +53,13 @@ Waveshaper::Waveshaper()
 , mESlider(nullptr)
 , mExpressionValid(false)
 {
-   strcpy(mEntryString, "x");
+   mEntryString = "x";
 }
 
 void Waveshaper::CreateUIControls()
 {
    IDrawableModule::CreateUIControls();
-   mTextEntry = new TextEntry(this,"y=",2,2,MAX_TEXTENTRY_LENGTH-1,mEntryString);
+   mTextEntry = new TextEntry(this,"y=",2,2,MAX_TEXTENTRY_LENGTH-1,&mEntryString);
    mTextEntry->SetFlexibleWidth(true);
    mTextEntry->DrawLabel(true);
    mRescaleSlider = new FloatSlider(this,"rescale",mTextEntry,kAnchor_Below,110,15,&mRescale,.1f,10);
@@ -224,7 +224,7 @@ void Waveshaper::DrawModule()
 
 void Waveshaper::GetModuleDimensions(float& w, float& h)
 {
-   w = MAX(kGraphX + kGraphWidth + 2, 4 + mTextEntry->GetRect().width);
+   w = MAX(kGraphX + kGraphWidth + 2, 4 + strlen(mTextEntry->GetText()) * 7);
    h = kGraphY + kGraphHeight;
 }
 

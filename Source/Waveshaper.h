@@ -76,7 +76,7 @@ private:
    float mE;
    FloatSlider* mESlider;
    
-   char mEntryString[MAX_TEXTENTRY_LENGTH];
+   string mEntryString;
    TextEntry* mTextEntry;
    exprtk::symbol_table<float> mSymbolTable;
    exprtk::expression<float> mExpression;

@@ -55,13 +55,13 @@ ModulatorExpression::ModulatorExpression()
 , mLastDrawMinOutput(0)
 , mLastDrawMaxOutput(1)
 {
-   strcpy(mEntryString, "x");
+   mEntryString = "x";
 }
 
 void ModulatorExpression::CreateUIControls()
 {
    IDrawableModule::CreateUIControls();
-   mTextEntry = new TextEntry(this,"y=",2,2,MAX_TEXTENTRY_LENGTH-1,mEntryString);
+   mTextEntry = new TextEntry(this,"y=",2,2,MAX_TEXTENTRY_LENGTH-1,&mEntryString);
    mTextEntry->SetFlexibleWidth(true);
    mTextEntry->DrawLabel(true);
    mExpressionInputSlider = new FloatSlider(this,"input",mTextEntry,kAnchor_Below,110,15,&mExpressionInput,0,1);
@@ -215,7 +215,7 @@ void ModulatorExpression::DrawModule()
 
 void ModulatorExpression::GetModuleDimensions(float& w, float& h)
 {
-   w = MAX(kGraphX + kGraphWidth + 2, 4 + mTextEntry->GetRect().width);
+   w = MAX(kGraphX + kGraphWidth + 2, 4 + strlen(mTextEntry->GetText()) * 7);
    h = kGraphY + kGraphHeight;
 }
 
