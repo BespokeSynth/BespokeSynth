@@ -211,10 +211,10 @@ void MidiController::AddControlConnection(const ofxJSONElement& connection)
    {
       msgType = kMidiMessage_Note;
    }
-   /*else if (type == "program")
+   else if (type == "program")
    {
       msgType = kMidiMessage_Program;
-   }*/
+   }
    else if (type == "pitchbend")
    {
       msgType = kMidiMessage_PitchBend;
@@ -420,7 +420,7 @@ void MidiController::OnMidiProgramChange(MidiProgramChange& program)
    if (!mEnabled || (mChannelFilter != ChannelFilter::kAny && program.mChannel != (int)mChannelFilter))
       return;
    
-   MidiReceived(kMidiMessage_Program, program.mProgram, program.mChannel);
+   MidiReceived(kMidiMessage_Program, program.mProgram, 1, program.mChannel);
    
    mQueuedMessageMutex.lock();
    mQueuedProgramChanges.push_back(program);
@@ -1257,8 +1257,12 @@ string MidiController::GetDefaultTooltip(MidiMessageType type, int control)
    string str;
    if (type == kMidiMessage_Note)
       str = "note ";
-   else
+   else if (type == kMidiMessage_Control)
       str = "cc ";
+   else if (type == kMidiMessage_PitchBend)
+      return "pitchbend";
+   else if (type == kMidiMessage_Program)
+      str = "program ";
    return str + ofToString(control);
 }
 
@@ -1573,6 +1577,8 @@ void MidiController::OnDeviceChanged()
                messageType = kMidiMessage_Note;
             if (layout["groups"][group]["messageType"] == "pitchbend")
                messageType = kMidiMessage_PitchBend;
+            if (layout["groups"][group]["messageType"] == "program")
+               messageType = kMidiMessage_Program;
             ControlDrawType drawType;
             if (layout["groups"][group]["drawType"] == "button")
                drawType = kDrawType_Button;
@@ -2363,7 +2369,7 @@ void UIControlConnection::CreateUIControls(int index)
    
    mMessageTypeDropdown->AddLabel("note", kMidiMessage_Note);
    mMessageTypeDropdown->AddLabel("cc", kMidiMessage_Control);
-   //mMessageTypeDropdown->AddLabel("prgm", kMidiMessage_Program);
+   mMessageTypeDropdown->AddLabel("prgm", kMidiMessage_Program);
    mMessageTypeDropdown->AddLabel("bend", kMidiMessage_PitchBend);
    
    mChannelDropdown->AddLabel("any", -1);
