@@ -46,7 +46,7 @@ GridSliders::~GridSliders()
 void GridSliders::CreateUIControls()
 {
    IDrawableModule::CreateUIControls();
-   mDirectionSelector = new DropdownList(this, "interval", 40, 3, (int*)(&mDirection));
+   mDirectionSelector = new DropdownList(this, "direction", 40, 3, (int*)(&mDirection));
    mGridControlTarget = new GridControlTarget(this, "grid", 3, 3);
 
    mDirectionSelector->AddLabel("vertical", (int)Direction::kVertical);

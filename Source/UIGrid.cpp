@@ -47,7 +47,7 @@ UIGrid::UIGrid(int x, int y, int w, int h, int cols, int rows, IClickable* paren
 , mShouldDrawValue(false)
 , mMomentary(false)
 {
-   SetName("grid");
+   SetName("uigrid");
    SetPosition(x,y);
    SetGrid(cols,rows);
    Clear();

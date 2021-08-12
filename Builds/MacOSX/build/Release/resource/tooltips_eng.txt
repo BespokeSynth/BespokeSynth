@@ -33,6 +33,7 @@ script~python scripting for livecoding notes and module control
 ~loadscript~choose a script from here, then press "load"
 ~load~load selected script
 ~save as~save the current script
+~?~show scripting reference
 ~code~write code here. press ctrl-R to execute the code, or ctrl-shift-R to just execute the current block.
 ~run~click here to execute the code, or press ctrl-R
 ~stop~cancel any events scheduled by this script
@@ -46,7 +47,7 @@ script~python scripting for livecoding notes and module control
 radiosequencer~sequence to only enable one value at a time. patch it to the "enabled" checkbox on several modules to only enable one module at a time. works well in conjunction with "groupcontrol" module.
 ~interval~rate to advance
 ~length~length of sequence
-~grid~[none]
+~grid~patch a grid in here from a "midicontroller" module
 
 
 
@@ -103,6 +104,7 @@ groupcontrol~connect to several checkboxes, and control them all with one checkb
 
 grid~generic grid, to be used by "script" module, to assist in writing scripts that use grid-based midi controllers
 ~grid~patch a grid in here, from a "midicontroller" module
+~momentary~should clicks be treated as momentary inputs?
 
 
 
@@ -287,6 +289,12 @@ leveltocv~output a modulation value based on the level of incoming audio
 
 
 
+gridsliders~use a grid controller to control multiple sliders
+~direction~should the grid display the sliders vertically, or horizontally?
+~grid~patch a grid in here from a "midicontroller" module
+
+
+
 gravity~make a modulation value rise and fall with physics
 ~gravity~the gravitational force to apply downwards
 ~kick amt~the amount of upward force to apply when kicking
@@ -373,6 +381,12 @@ add~outputs the result of value 1 plus value 2. value 1 and value 2 are intended
 
 
 
+accum~accumulate a value over time
+~value~output value
+~velocity~amount to accumulate
+
+
+
 slidersequencer~trigger notes along a continuous timeline
 ~division~rate to progress
 ~time*~time to trigger this element
@@ -403,7 +417,7 @@ polyrhythms~looping sequence with lines on different divisions
 
 
 playsequencer~drum sequencer that allows you to punch in to record and overdub steps, inspired by the pulsar-23 drum machine
-~grid~[none]
+~grid~patch a grid in here from a "midicontroller" module
 ~interval~the step size
 ~measures~the loop length
 ~write~if the current input should be written to the sequence. this will also delete steps if mute/delete is enabled for this row
@@ -435,7 +449,9 @@ notesequencer~looping sequence of notes at an interval. pair with a "pulser" mod
 ~tone*~pitch for this column
 ~vel*~velocity for this column
 ~len*~length for this column
-~grid~control pitches with a grid controller
+~grid~patch a grid in here from a "midicontroller" module
+~x offset~x offset of attached grid controller
+~y offset~y offset of attached grid controller
 
 
 
@@ -518,7 +534,7 @@ gridkeyboard~grid-based keyboard, intended primarily for 64-pad grid controllers
 ~arrangement~what style of layout should we use?
 ~ch.latch~latch chord button presses
 ~p.root~for chorder, make root note always play
-~grid~which grid to use
+~grid~patch a grid in here from a "midicontroller" module
 
 
 
@@ -539,7 +555,7 @@ drumsequencer~step sequencer intended for drums. hold shift when dragging on the
 ~column~current column, to use for visualizing the step on a midi controller
 ~<~shift whole pattern one step earlier
 ~>~shift whole pattern one step later
-~grid~patch a grid in here from a "midicontroller" module to control the grid
+~grid~patch a grid in here from a "midicontroller" module
 ~velocity~patch a grid in here from a "midicontroller" module to control the velocity
 ~metastep~patch a grid in here from a "midicontroller" module to control the "meta step". I forget what this does. oops.
 ~rowpitch*~output pitch for this row
@@ -601,7 +617,7 @@ takerecorder~[abandoned module, possibly broken]
 
 
 stutter~captures and stutters input
-~grid~[none]
+~grid~patch a grid in here from a "midicontroller" module
 ~half note~half note stutter
 ~quarter~quarter note stutter
 ~8th~8th note stutter
@@ -651,7 +667,7 @@ samplergrid~record input onto pads, and play back the pads. intended to be used 
 ~duplicate~what enabled, duplicates last pressed sample onto any pressed grid squares
 ~start~sample start
 ~end~sample end
-~grid~[none]
+~grid~patch a grid in here from a "midicontroller" module
 
 
 
@@ -816,7 +832,6 @@ effectchain~container to hold a list of effects, applied in series. the effects 
 
 
 basiceq~simple multiband EQ
-~grid~controls the level of each band
 ~even~reset EQ
 
 
@@ -1072,7 +1087,7 @@ sampleplayer~sample playback with triggerable cue points, clip extraction, and y
 ~trim~discard all audio outside the current zoom range
 ~youtube~download the audio of the youtube URL currently on your clipboard
 ~cue start~start point in seconds of the current cue
-~cue length~length in seconds of the current cue. a value of zero will play to the end of the sample.
+~cue len~length in seconds of the current cue. a value of zero will play to the end of the sample.
 ~cue speed~playback speed of the current cue
 ~cuepoint~sets the current cue to edit
 ~click sets cue~when true, clicking on the waveform will set the start position of the current cue
@@ -1155,6 +1170,8 @@ karplusstrong~polyphonic plucked string physical modeling synth
 ~x freq~frequency of excitation audio
 ~x att~fade in time for excitation audio
 ~x dec~fade out time for excitation audio
+~vel2vol~how much velocity should affect voice volume
+~vel2env~how much velocity should affect excitation attack time
 ~pitchtone~adjust how pitch influences filter amount. a value of zero gives even filtering across the entire pitch range, higher values filter high pitches less, low values filter low pitches less.
 ~lite cpu~only recalculate some parameters once per buffer, to reduce CPU load. can make pitch bends and rapid modulation sound worse in some scenarios.
 
@@ -1260,7 +1277,7 @@ drumplayer~sample player intended for drum playback
 ~aud~scroll to audition samples in the current pad's head category, or a directory last dropped onto a pad
 ~mono~force output to mono
 ~shuffle~random is samples, speeds, and pans
-~grid~[none]
+~grid~patch a grid in here from a "midicontroller" module
 ~quantize~quantize input to this interval
 ~repeat~if quantizing, should held notes repeat at that interval?
 ~vol *~volume of sample 
@@ -1450,8 +1467,19 @@ notestream~view are stream of notes as they're played
 
 
 
+notesorter~separate notes by pitch. any unmapped pitches go through the standard outlet.
+~pitch *~pitch to use for this outlet
+
+
+
 noterouter~allows you to control where notes are routed to using a UI control. to add destinations to the list, patch them as a target
 ~route~the noterouter's destination module
+
+
+
+noteratchet~rapidly repeat an input note over a duration
+~duration~total length of time repeats should last
+~subdivision~length of each repeat
 
 
 
@@ -1540,6 +1568,23 @@ notechance~randomly allow notes through
 
 
 
+mpetweaker~adjust incoming MPE modulation values
+~pitchbend mult~amount to multiply incoming pitchbend
+~pitchbend offset~amount to offset incoming pitchbend
+~pressure mult~amount to multiply incoming pressure
+~pressure offset~amount to offset incoming pressure
+~modwheel mult~amount to multiply incoming modwheel
+~modwheel offset~amount to offset incoming modwheel
+
+
+
+mpesmoother~[no tooltip]
+~pitch~amount to smooth incoming pitchbend
+~pressure~amount to smooth incoming pressure
+~modwheel~amount to smooth incoming modwheel
+
+
+
 modwheeltovibrato~convert note mod wheel input rhythmic pitch bend
 ~vibrato~amount of pitch bend
 ~vibinterval~rate of vibrato
@@ -1559,12 +1604,20 @@ modulationvizualizer~display MPE modulation values for notes
 
 
 
-midioutput~send midi to an external destination
+midioutput~send midi to an external destination, such as hardware or other software
 ~controller~where to send midi to
 
 
 
+midicc~outputs midi control change messages to route to a "midioutput" module
+~control~CC control number
+~value~outputs a CC value when this changes
+
+
+
 samplebrowser~browse your system for samples. drag samples from here to your desired targets (sampleplayer, drumplayer, seaofgrain, etc)
+~ < ~previous page
+~ > ~next page
 
 
 
@@ -1657,6 +1710,7 @@ transposefrom~transpose input from a specified root to the root of the current s
 
 m185sequencer~sequencer using the unique paradigm of the the m185 or intellijel metropolis
 ~interval~interval per step
+~reset step~resets counter to first step
 ~pitch*~pitch to use for this row
 ~pulses*~number of steps this row should last
 ~gate*~behavior for each row: "repeat" plays every step, "once" plays just the first step, "hold" holds across all steps, "rest" plays no steps
