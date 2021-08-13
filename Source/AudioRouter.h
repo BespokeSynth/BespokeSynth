@@ -30,6 +30,7 @@
 #include "IAudioProcessor.h"
 #include "IDrawableModule.h"
 #include "RadioButton.h"
+#include "Ramp.h"
 
 class AudioRouter : public IAudioProcessor, public IDrawableModule, public IRadioButtonListener
 {
@@ -67,6 +68,9 @@ private:
    RadioButton* mRouteSelector;
    vector<PatchCableSource*> mDestinationCables;
    RollingBuffer mBlankVizBuffer;
+   
+   array<Ramp,16> mSwitchAndRampIn;
+   int mLastProcessedRouteIndex;
 };
 
 
