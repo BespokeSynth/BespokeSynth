@@ -32,6 +32,7 @@ AudioRouter::AudioRouter()
 : IAudioProcessor(gBufferSize)
 , mRouteIndex(0)
 , mRouteSelector(nullptr)
+, mBlankVizBuffer(VIZ_BUFFER_SECONDS*gSampleRate)
 {
 }
 
@@ -39,31 +40,32 @@ void AudioRouter::CreateUIControls()
 {
    IDrawableModule::CreateUIControls();
    mRouteSelector = new RadioButton(this,"route",5,3,&mRouteIndex);
+   
+   GetPatchCableSource()->SetEnabled(false);
 }
 
 AudioRouter::~AudioRouter()
 {
 }
 
-void AudioRouter::AddReceiver(IAudioReceiver* receiver, const char* name)
-{
-   if (receiver)
-   {
-      mReceivers.push_back(receiver);
-      mRouteSelector->AddLabel(name, (int)mReceivers.size() - 1);
-      mModuleSaveData.UpdatePropertyMax("initialtarget",mReceivers.size()-1);
-   }
-}
-
 void AudioRouter::Process(double time)
 {
    PROFILER(AudioRouter);
 
-   IAudioReceiver* target = GetTarget();
+   SyncBuffers();
+   mBlankVizBuffer.SetNumChannels(GetBuffer()->NumActiveChannels());
+   
+   for (size_t i=0; i<mDestinationCables.size(); ++i)
+   {
+      if ((int)i == mRouteIndex)
+         mDestinationCables[i]->SetOverrideVizBuffer(nullptr);
+      else
+         mDestinationCables[i]->SetOverrideVizBuffer(&mBlankVizBuffer);
+   }
+   
+   IAudioReceiver* target = GetTarget(mRouteIndex+1);
    if (target == nullptr)
       return;
-
-   SyncBuffers();
 
    for (int ch=0; ch<GetBuffer()->NumActiveChannels(); ++ch)
    {
@@ -76,22 +78,30 @@ void AudioRouter::Process(double time)
 
 void AudioRouter::DrawModule()
 {
-
    if (Minimized() || IsVisible() == false)
       return;
 
    mRouteSelector->Draw();
+   
+   for (int i=0; i<(int)mDestinationCables.size(); ++i)
+   {
+      ofVec2f pos = mRouteSelector->GetOptionPosition(i) - mRouteSelector->GetPosition();
+      mDestinationCables[i]->SetManualPosition(pos.x + 10, pos.y + 4);
+   }
 }
 
 void AudioRouter::PostRepatch(PatchCableSource* cableSource, bool fromUserClick)
 {
-   IAudioReceiver* target = GetPatchCableSource()->GetAudioReceiver();
-   if (target && !VectorContains(target, mReceivers))
-      AddReceiver(target, dynamic_cast<IClickable*>(target)->Name());
-   for (int i=0; i<mReceivers.size(); ++i)
+   IAudioSource::PostRepatch(cableSource, fromUserClick);
+   
+   for (int i=0; i<(int)mDestinationCables.size(); ++i)
    {
-      if (mReceivers[i] == target)
-         SetActiveIndex(i);
+      if (cableSource == mDestinationCables[i])
+      {
+         IClickable* target = cableSource->GetTarget();
+         string name = target ? target->Name() : "                      ";
+         mRouteSelector->SetLabel(name.c_str(), i);
+      }
    }
 }
 
@@ -107,45 +117,45 @@ void AudioRouter::RadioButtonUpdated(RadioButton* radio, int oldVal)
 {
    if (radio == mRouteSelector)
    {
-      GetPatchCableSource()->SetTarget(dynamic_cast<IClickable*>(mReceivers[mRouteIndex]));
-      TheSynth->ArrangeAudioSourceDependencies();
    }
 }
 
 void AudioRouter::LoadLayout(const ofxJSONElement& moduleInfo)
 {
-   mModuleSaveData.LoadString("target", moduleInfo);
-   
-   const Json::Value& targets = moduleInfo["targets"];
-   for (int i=0; i<targets.size(); ++i)
-   {
-      string target = targets[i].asString();
-      IAudioReceiver* receiver = TheSynth->FindAudioReceiver(target.c_str());
-      AddReceiver(receiver, target.c_str());
-   }
-   
-   mModuleSaveData.LoadInt("initialtarget", moduleInfo, 0, 0, targets.size()-1);
+   mModuleSaveData.LoadInt("num_items",moduleInfo,2,1,99,K(isTextField));
    
    SetUpFromSaveData();
 }
 
 void AudioRouter::SetUpFromSaveData()
 {
-   int initialTarget = mModuleSaveData.GetInt("initialtarget");
-   SetActiveIndex(initialTarget);
-   if (mReceivers.size() > initialTarget)
-      GetPatchCableSource()->SetTarget(dynamic_cast<IClickable*>(mReceivers[initialTarget]));
+   int numItems = mModuleSaveData.GetInt("num_items");
+   int oldNumItems = (int)mDestinationCables.size();
+   if (numItems > oldNumItems)
+   {
+      for (int i=oldNumItems; i<numItems; ++i)
+      {
+         mRouteSelector->AddLabel("                      ", i);
+         auto* additionalCable = new PatchCableSource(this, kConnectionType_Audio);
+         AddPatchCableSource(additionalCable);
+         mDestinationCables.push_back(additionalCable);
+      }
+   }
+   else if (numItems < oldNumItems)
+   {
+      for (int i=oldNumItems-1; i>=numItems; --i)
+      {
+         mRouteSelector->RemoveLabel(i);
+         RemovePatchCableSource(mDestinationCables[i]);
+      }
+      mDestinationCables.resize(numItems);
+   }
 }
 
 void AudioRouter::SaveLayout(ofxJSONElement& moduleInfo)
 {
    IDrawableModule::SaveLayout(moduleInfo);
    
-   moduleInfo["targets"].resize((unsigned int)mReceivers.size());
-   for (int i=0; i<mReceivers.size(); ++i)
-   {
-      IDrawableModule* module = dynamic_cast<IDrawableModule*>(mReceivers[i]);
-      moduleInfo["targets"][i] = module->Name();
-   }
+   moduleInfo["num_items"] = (int)mDestinationCables.size();
 }
 

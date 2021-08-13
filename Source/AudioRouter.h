@@ -38,14 +38,14 @@ public:
    virtual ~AudioRouter();
    static IDrawableModule* Create() { return new AudioRouter(); }
    
-   string GetTitleLabel() override { return "router"; }
+   string GetTitleLabel() override { return "audio router"; }
    void CreateUIControls() override;
 
-   void AddReceiver(IAudioReceiver* receiver, const char* name);
    void SetActiveIndex(int index) { mRouteIndex = index; }
 
    //IAudioSource
    void Process(double time) override;
+   int GetNumTargets() override { return (int)mDestinationCables.size() + 1; }
    
    //IPatchable
    void PostRepatch(PatchCableSource* cableSource, bool fromUserClick) override;
@@ -65,7 +65,8 @@ private:
 
    int mRouteIndex;
    RadioButton* mRouteSelector;
-   vector<IAudioReceiver*> mReceivers;
+   vector<PatchCableSource*> mDestinationCables;
+   RollingBuffer mBlankVizBuffer;
 };
 
 

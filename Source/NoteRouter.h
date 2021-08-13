@@ -38,7 +38,7 @@ public:
    NoteRouter();
    static IDrawableModule* Create() { return new NoteRouter(); }
    
-   string GetTitleLabel() override { return "router"; }
+   string GetTitleLabel() override { return "note router"; }
    void CreateUIControls() override;
 
    void PostRepatch(PatchCableSource* cableSource, bool fromUserClick) override;
