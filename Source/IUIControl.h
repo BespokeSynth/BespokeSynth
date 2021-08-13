@@ -46,7 +46,7 @@ class IUIControl : public IClickable
 {
 public:
    IUIControl() : mRemoteControlCount(0), mNoHover(false), mShouldSaveState(true) {}
-   void Delete() { delete this; }
+   virtual void Delete() { delete this; }
    void AddRemoteController() { ++mRemoteControlCount; }
    void RemoveRemoteController() { --mRemoteControlCount; }
    virtual void SetFromMidiCC(float slider, bool setViaModulator = false) = 0;

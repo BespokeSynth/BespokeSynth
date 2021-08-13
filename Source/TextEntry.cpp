@@ -113,6 +113,13 @@ TextEntry::~TextEntry()
 {
 }
 
+void TextEntry::Delete()
+{
+   if (IKeyboardFocusListener::GetActiveKeyboardFocus() == this)
+      IKeyboardFocusListener::ClearActiveKeyboardFocus(false);
+   delete this;
+}
+
 void TextEntry::Render()
 {
    ofPushStyle();

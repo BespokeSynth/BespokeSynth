@@ -72,6 +72,7 @@ public:
    TextEntry(ITextEntryListener* owner, const char* name, int x, int y, int charWidth, float* var, float min, float max);
    void OnKeyPressed(int key, bool isRepeat) override;
    void Render() override;
+   void Delete() override;
    
    void MakeActiveTextEntry(bool setCaretToEnd);
    
