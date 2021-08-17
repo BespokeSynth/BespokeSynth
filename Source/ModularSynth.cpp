@@ -1790,9 +1790,9 @@ bool ModularSynth::LoadLayoutFromFile(string jsonFile, bool makeDefaultLayout /*
       IDrawableModule* splitter = FindModule("splitter");
       IDrawableModule* output1 = FindModule("output 1");
       IDrawableModule* output2 = FindModule("output 2");
-      if (output1 != nullptr && output1->GetPosition().y > ofGetHeight() - 20)
+      if (output1 != nullptr && output1->GetPosition().y > ofGetHeight() - 40)
       {
-         float offset = ofGetHeight() - output1->GetPosition().y - 20;
+         float offset = ofGetHeight() - output1->GetPosition().y - 40;
          if (gain != nullptr)
             gain->SetPosition(gain->GetPosition().x, gain->GetPosition().y + offset);
          if (splitter != nullptr)

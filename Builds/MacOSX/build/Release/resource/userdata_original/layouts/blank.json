@@ -2,37 +2,37 @@
    "modules" : [
       {
          "name" : "gain",
-         "position" : [ 44.0, 926.0 ],
+         "position" : [ 44.0, 916.0 ],
          "target" : "splitter",
          "type" : "gain"
       },
       {
          "channels" : 0,
          "name" : "output 1",
-         "position" : [ 30.0, 1062.0 ],
+         "position" : [ 30.0, 1052.0 ],
          "type" : "output"
       },
       {
          "channels" : 1,
          "name" : "output 2",
-         "position" : [ 119.0, 1062.0 ],
+         "position" : [ 119.0, 1052.0 ],
          "type" : "output"
       },
       {
          "name" : "scale",
-         "position" : [ 148.0, 95.0 ],
+         "position" : [ 158.0, 95.0 ],
          "type" : "scale"
       },
       {
          "name" : "splitter",
-         "position" : [ 64.0, 1000.0 ],
+         "position" : [ 64.0, 990.0 ],
          "target" : "output 1",
          "target2" : "output 2",
          "type" : "splitter"
       },
       {
          "name" : "transport",
-         "position" : [ 4.0, 95.0 ],
+         "position" : [ 14.0, 95.0 ],
          "type" : "transport"
       }
    ],
