@@ -175,7 +175,7 @@ void TitleBar::CreateUIControls()
    BUTTON(mLoadStateButton, "load"); UIBLOCK_SHIFTRIGHT();
    BUTTON(mSaveStateButton,"save"); UIBLOCK_SHIFTRIGHT();
    BUTTON(mSaveStateAsButton, "save as"); UIBLOCK_SHIFTRIGHT(); UIBLOCK_SHIFTX(10);
-   BUTTON(mWriteAudioButton, "write audio", 280, 1);
+   BUTTON(mWriteAudioButton, "write audio");
    UIBLOCK_NEWLINE();
    BUTTON(mResetLayoutButton,"reset layout"); UIBLOCK_SHIFTRIGHT();
    CHECKBOX(mEventLookaheadCheckbox, "lookahead (exp.)", &Transport::sDoEventLookahead); UIBLOCK_SHIFTRIGHT();
