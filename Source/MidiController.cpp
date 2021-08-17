@@ -973,6 +973,7 @@ void MidiController::DrawModule()
             {
                control.mControlCable->SetEnabled(UIControlConnection::sDrawCables);
                control.mControlCable->SetManualPosition(center.x, center.y);
+               control.mControlCable->SetPatchCableDrawMode(kPatchCableDrawMode_SourceOnHoverOnly);
                
                UIControlConnection* connection = GetConnectionForControl(control.mType, control.mControl);
                if (connection)
@@ -1157,6 +1158,21 @@ void MidiController::DrawModule()
             next = *iter;
          connection->SetNext(next);
          connection->DrawList(i);
+
+         ControlLayoutElement& control = GetLayoutControl(connection->mControl, connection->mMessageType);
+         if (control.mControlCable)
+         {
+            int x = 356;
+            int y = 59 + 20 * i;
+
+            control.mControlCable->SetEnabled(UIControlConnection::sDrawCables);
+            control.mControlCable->SetManualPosition(x, y);
+            control.mControlCable->SetPatchCableDrawMode(kPatchCableDrawMode_Normal);
+
+            control.mControlCable->SetTarget(connection->mUIControl);
+            if (connection->mUIControl)
+               control.mControlCable->GetPatchCables()[0]->SetUIControlConnection(connection);
+         }
          ++i;
       }
    }
@@ -1385,7 +1401,7 @@ void MidiController::GetModuleDimensions(float& width, float& height)
 {
    if (mMappingDisplayMode == kList)
    {
-      width = 830;
+      width = 835;
       height = 72 + 20 * GetNumConnectionsOnPage(mControllerPage);
    }
    else if (mMappingDisplayMode == kLayout)
@@ -2605,7 +2621,6 @@ void ControlLayoutElement::Setup(MidiController* owner, MidiMessageType type, in
    {
       mControlCable = new PatchCableSource(owner, kConnectionType_UIControl);
       owner->AddPatchCableSource(mControlCable);
-      mControlCable->SetPatchCableDrawMode(kPatchCableDrawMode_SourceOnHoverOnly);
       ofColor color = mControlCable->GetColor();
       color.a *= .2f;
       mControlCable->SetColor(color);
