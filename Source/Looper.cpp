@@ -1184,9 +1184,15 @@ void Looper::CheckboxUpdated(Checkbox* checkbox)
    if (checkbox == mWriteInputCheckbox)
    {
       if (mWriteInput)
-         mWriteInputRamp.Start(gTime, 1, gTime+10);
+      {
+         if (mBufferTempo != TheTransport->GetTempo())
+            ResampleForSpeed(GetPlaybackSpeed());
+         mWriteInputRamp.Start(gTime, 1, gTime + 10);
+      }
       else
-         mWriteInputRamp.Start(gTime, 0, gTime+10);
+      {
+         mWriteInputRamp.Start(gTime, 0, gTime + 10);
+      }
    }
 }
 
