@@ -122,6 +122,7 @@ private:
    bool HiddenByZoom() const;
    float GetPixelWidth() const;
    
+   ClickButton* mPlayPauseButton;
    ClickButton* mSaveLayoutButton;
    ClickButton* mResetLayoutButton;
    ClickButton* mSaveStateButton;

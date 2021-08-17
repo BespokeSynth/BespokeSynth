@@ -85,6 +85,8 @@ public:
    void ClearConsoleInput();
    
    bool IsReady();
+   bool IsAudioPaused() const { return mAudioPaused; }
+   void ToggleAudioPaused() { mAudioPaused = !mAudioPaused; }
    
    void AddMidiDevice(MidiDevice* device);
    void ArrangeAudioSourceDependencies();

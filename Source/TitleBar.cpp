@@ -33,6 +33,7 @@
 #include "VSTPlugin.h"
 #include "Prefab.h"
 #include "UserPrefsEditor.h"
+#include "UIControlMacros.h"
 
 TitleBar* TheTitleBar = nullptr;
 
@@ -169,17 +170,22 @@ TitleBar::TitleBar()
 void TitleBar::CreateUIControls()
 {
    IDrawableModule::CreateUIControls();
-   mSaveLayoutButton = new ClickButton(this,"save layout",280,19);
-   mLoadStateButton = new ClickButton(this,"load",140,1);
-   mSaveStateButton = new ClickButton(this,"save",172,1);
-   mSaveStateAsButton = new ClickButton(this, "save as", 205, 1);
-   mResetLayoutButton = new ClickButton(this,"reset layout",140,19);
-   mWriteAudioButton = new ClickButton(this,"write audio",280,1);
+   UIBLOCK(140, 1);
+   BUTTON_STYLE(mPlayPauseButton, "play/pause", ButtonDisplayStyle::kPause); UIBLOCK_SHIFTRIGHT(); UIBLOCK_SHIFTX(10);
+   BUTTON(mLoadStateButton, "load"); UIBLOCK_SHIFTRIGHT();
+   BUTTON(mSaveStateButton,"save"); UIBLOCK_SHIFTRIGHT();
+   BUTTON(mSaveStateAsButton, "save as"); UIBLOCK_SHIFTRIGHT(); UIBLOCK_SHIFTX(10);
+   BUTTON(mWriteAudioButton, "write audio", 280, 1);
+   UIBLOCK_NEWLINE();
+   BUTTON(mResetLayoutButton,"reset layout"); UIBLOCK_SHIFTRIGHT();
+   CHECKBOX(mEventLookaheadCheckbox, "lookahead (exp.)", &Transport::sDoEventLookahead); UIBLOCK_SHIFTRIGHT();
+   CHECKBOX(mShouldAutosaveCheckbox, "autosave", &ModularSynth::sShouldAutosave);
+   ENDUIBLOCK0();
+
    mDisplayHelpButton = new ClickButton(this," ? ",380,1);
-   mDisplayUserPrefsEditorButton = new ClickButton(this, "settings", 330, 1);
+   mDisplayUserPrefsEditorButton = new ClickButton(this, "settings", 330, 1);   
    mLoadLayoutDropdown = new DropdownList(this, "load layout", 140, 20, &mLoadLayoutIndex);
-   mEventLookaheadCheckbox = new Checkbox(this, "lookahead (exp.)", mResetLayoutButton, kAnchor_Right, &Transport::sDoEventLookahead);
-   mShouldAutosaveCheckbox = new Checkbox(this, "autosave", mEventLookaheadCheckbox, kAnchor_Right_Padded, &ModularSynth::sShouldAutosave);
+   mSaveLayoutButton = new ClickButton(this, "save layout", 280, 19);
    
    mLoadLayoutDropdown->SetShowing(false);
    mSaveLayoutButton->SetShowing(false);
@@ -336,6 +342,11 @@ void TitleBar::DrawModule()
    mWriteAudioButton->Draw();
    mLoadLayoutDropdown->Draw();
    mResetLayoutButton->Draw();
+   if (TheSynth->IsAudioPaused())
+      mPlayPauseButton->SetDisplayStyle(ButtonDisplayStyle::kPlay);
+   else
+      mPlayPauseButton->SetDisplayStyle(ButtonDisplayStyle::kPause);
+   mPlayPauseButton->Draw();
 
    float startX = 400;
    float startY = 2;
@@ -542,6 +553,8 @@ void TitleBar::ButtonClicked(ClickButton* button)
       TheSynth->GetUserPrefsEditor()->Show();
    if (button == mResetLayoutButton)
       TheSynth->ReloadInitialLayout();
+   if (button == mPlayPauseButton)
+      TheSynth->ToggleAudioPaused();
 }
 
 
