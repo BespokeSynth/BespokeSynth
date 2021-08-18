@@ -13,7 +13,7 @@ sudo apt-get -y install libxcomposite-dev
 sudo apt-get -y install libcurl4
 sudo apt-get -y install libusb-1.0-0-dev
 sudo apt-get -y install libgtk-3-dev
-sudo apt-get -y install python-dev
+sudo apt-get -y install python3-dev
 sudo apt-get -y install libcurl4-openssl-dev
 sudo apt-get -y install libwebkit2gtk-4.0-dev
 sudo apt-get -y install libjack-dev
