@@ -333,6 +333,8 @@ void VSTPlugin::LoadVST(juce::PluginDescription desc)
       mNumOutputs = MIN(mPlugin->getTotalNumOutputChannels(), 4);
       ofLog() << "vst inputs: " << mNumInputs << "  vst outputs: " << mNumOutputs;
 
+      mPluginName = mPlugin->getName().toStdString();
+
       CreateParameterSliders();
       
       mPluginReady = true;
