@@ -219,7 +219,7 @@ string VSTPlugin::GetTitleLabel()
 string VSTPlugin::GetPluginName()
 {
    if (mPlugin)
-      return mPlugin->getName().toStdString();
+      return mPluginName;
    return "no plugin loaded";
 }
 
@@ -228,7 +228,7 @@ string VSTPlugin::GetPluginId()
    if (mPlugin)
    {
       const auto& desc = dynamic_cast<juce::AudioPluginInstance*>(mPlugin.get())->getPluginDescription();
-      return mPlugin->getName().toStdString() + "_" + ofToString(desc.uid);
+      return GetPluginName() + "_" + ofToString(desc.uid);
    }
    return "no plugin loaded";
 }
@@ -971,6 +971,8 @@ void VSTPlugin::LoadState(FileStreamIn& in)
       if (mPlugin != nullptr)
       {
          ofLog() << "loading vst state for " << mPlugin->getName();
+         
+         mPluginName = mPlugin->getName().toStdString();
 
          mPlugin->setStateInformation(vstState, vstStateSize);
          if (rev >= 1 && vstProgramStateSize > 0)

@@ -118,6 +118,7 @@ private:
    
    bool mPluginReady;
    std::unique_ptr<AudioProcessor> mPlugin;
+   string mPluginName;
    juce::ScopedPointer<VSTWindow> mWindow;
    juce::MidiBuffer mMidiBuffer;
    juce::MidiBuffer mFutureMidiBuffer;
