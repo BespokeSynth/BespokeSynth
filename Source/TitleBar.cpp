@@ -294,7 +294,7 @@ bool TitleBar::MouseMoved(float x, float y)
 {
    IDrawableModule::MouseMoved(x,y);
    
-   if (x < 130)
+   if (x < 130 && y < 36)
       mLeftCornerHovered = true;
    else
       mLeftCornerHovered = false;
