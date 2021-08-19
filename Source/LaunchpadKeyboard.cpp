@@ -593,14 +593,15 @@ int LaunchpadKeyboard::GridToPitchChordSection(int x, int y)
 
 void LaunchpadKeyboard::UpdateLights(bool force)
 {
-   for (int x=0; x<8; ++x)
+   if (mGridControlTarget->GetGridController())
    {
-      for (int y=0; y<8; ++y)
+      for (int x=0; x<mGridControlTarget->GetGridController()->NumCols(); ++x)
       {
-         GridColor color = GetGridSquareColor(x, y);
-         
-         if (mGridControlTarget->GetGridController())
+         for (int y=0; y<mGridControlTarget->GetGridController()->NumRows(); ++y)
+         {
+            GridColor color = GetGridSquareColor(x, y);
             mGridControlTarget->GetGridController()->SetLight(x, y, color, force);
+         }
       }
    }
 }
