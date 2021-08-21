@@ -1,0 +1,1 @@
+xcrun altool --notarize-app --primary-bundle-id "com.ryanchallinor.bespokesynth" -u "awwbees@gmail.com" -p "@keychain:Bespoke app-specific password" -t osx -f Bespoke-Mac.dmg

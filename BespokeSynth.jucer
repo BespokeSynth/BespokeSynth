@@ -1263,7 +1263,8 @@
                microphonePermissionNeeded="1" vstLegacyFolder="~/SDKs/VST_SDK/VST2_SDK"
                extraLinkerFlags="-L/Library/Frameworks/Python.framework/Versions/3.8/lib/python3.8/config-3.8-darwin -lpython3.8 -ldl -framework CoreFoundation"
                extraCompilerFlags="-I/Library/Frameworks/Python.framework/Versions/3.8/include/python3.8"
-               smallIcon="h1Eo7f" bigIcon="h1Eo7f">
+               smallIcon="h1Eo7f" bigIcon="h1Eo7f" iosDevelopmentTeamID="J5RJ562GN5"
+               bundleIdentifier="com.ryanchallinor.bespokesynth">
       <CONFIGURATIONS>
         <CONFIGURATION name="Debug" isDebug="1" optimisation="1" targetName="Bespoke"
                        headerPath="../../Source/json/include&#10;../../Source/push2/&#10;../../Source/push2/libusb&#10;../../Source/push2/modules/libusb"
