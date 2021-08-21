@@ -713,20 +713,11 @@ void LaunchpadKeyboard::OnScaleChanged()
 void LaunchpadKeyboard::KeyPressed(int key, bool isRepeat)
 {
    IDrawableModule::KeyPressed(key, isRepeat);
-   if (key == 'e' && !mTestKeyHeld && GetKeyModifiers() == kModifier_None)
-   {
-      mTestKeyHeld = true;
-      OnGridButton(3,3,1,mGridControlTarget->GetGridController());
-   }
 }
 
 void LaunchpadKeyboard::KeyReleased(int key)
 {
-   if (key == 'e' && GetKeyModifiers() == kModifier_None)
-   {
-      mTestKeyHeld = false;
-      OnGridButton(3,3,0,mGridControlTarget->GetGridController());
-   }
+   IDrawableModule::KeyReleased(key);
 }
 
 void LaunchpadKeyboard::Poll()
