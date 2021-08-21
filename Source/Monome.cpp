@@ -29,8 +29,9 @@
 Monome::Monome(MidiDeviceListener* listener)
 : mIsOscSetUp(false)
 , mHasMonome(false)
-, mMaxColumns(8)
-, mGridRotation(3)
+, mMaxColumns(16)
+, mGridRotation(0)
+, mPrefix("monome")
 , mListener(listener)
 {
    Connect();
@@ -78,23 +79,23 @@ void Monome::Connect()
    assert(written);
 }
 
-void Monome::SetLightInternal(int x, int y, bool on)
+void Monome::SetLightInternal(int x, int y, float value)
 {
    if (!mHasMonome)
       return;
    
-   OSCMessage lightMsg("/monome/grid/led/set");
+   OSCMessage lightMsg("/"+mPrefix+"/grid/led/level/set");
    Vec2i pos = Rotate(x, y, mGridRotation);
    lightMsg.addInt32(pos.x);
    lightMsg.addInt32(pos.y);
-   lightMsg.addInt32(on ? 1 : 0);
+   lightMsg.addInt32(value*16);
    bool written = mToMonome.send(lightMsg);
    assert(written);
 }
 
-void Monome::SetLight(int x, int y, bool on)
+void Monome::SetLight(int x, int y, float value)
 {
-   SetLightInternal(x, y, on);
+   SetLightInternal(x, y, value);
 }
 
 void Monome::SetLightFlicker(int x, int y, float intensity)
@@ -114,8 +115,16 @@ void Monome::SetLightFlicker(int x, int y, float intensity)
 string Monome::GetControlTooltip(MidiMessageType type, int control)
 {
    if (type == kMidiMessage_Note)
-      return "(" + ofToString(control % 8) + ", " + ofToString(control/8) + ")";
+      return "(" + ofToString(control % mMaxColumns) + ", " + ofToString(control/mMaxColumns) + ")";
    return MidiController::GetDefaultTooltip(type, control);
+}
+
+void Monome::SetLayoutData(ofxJSONElement& layout)
+{
+   if (!layout["monome_rotation"].isNull())
+      mGridRotation = layout["monome_rotation"].asInt();
+   if (!layout["monome_prefix"].isNull())
+      mPrefix = layout["monome_prefix"].asString();
 }
 
 void Monome::oscMessageReceived(const OSCMessage& msg)
@@ -125,8 +134,6 @@ void Monome::oscMessageReceived(const OSCMessage& msg)
    if (label == "/serialosc/device")
    {
       ofLog() << "Monome connected: " << msg[0].getString().toRawUTF8() << " " << msg[1].getString().toRawUTF8();
-      
-      //TODO(Ryan) set rows and columns here based on monome size
       
       mToMonome.connect(HOST, msg[2].getInt32());
       mHasMonome = true;
@@ -142,16 +149,24 @@ void Monome::oscMessageReceived(const OSCMessage& msg)
       assert(written);
       
       OSCMessage setPrefixMsg("/sys/prefix");
-      setPrefixMsg.addString("monome");
+      setPrefixMsg.addString(mPrefix);
       written = mToMonome.send(setPrefixMsg);
       assert(written);
       
-      /*OSCMessage setTiltMsg("/monome/tilt/set");
+      OSCMessage sysInfoMsg("/sys/info");
+      written = mToMonome.send(sysInfoMsg);
+      assert(written);
+      
+      /*OSCMessage setTiltMsg("/"+mPrefix+"/tilt/set");
       setTiltMsg.addInt32(0);
       setTiltMsg.addInt32(1);
       mToMonome.send(setTiltMsg);*/
    }
-   else if (label == "/monome/grid/key")
+   else if (label == "/sys/size")
+   {
+      mMaxColumns = msg[0].getInt32();
+   }
+   else if (label == "/"+mPrefix+"/grid/key")
    {
       Vec2i pos = Rotate(msg[0].getInt32(), msg[1].getInt32(), -mGridRotation);
       int val = msg[2].getInt32();
@@ -160,10 +175,10 @@ void Monome::oscMessageReceived(const OSCMessage& msg)
       note.mPitch = pos.x + pos.y*mMaxColumns;
       note.mVelocity = val * 127.0f;
       note.mChannel = 0;
-      note.mDeviceName = "monome";
+      note.mDeviceName = mPrefix.toUTF8();
       mListener->OnMidiNote(note);
    }
-   else if (label == "/monome/tilt")
+   else if (label == "/"+mPrefix+"/tilt")
    {
       /*MidiControl updown;
       updown.mControl = 1;
@@ -180,7 +195,7 @@ void Monome::oscMessageReceived(const OSCMessage& msg)
 void Monome::SendValue(int page, int control, float value, bool forceNoteOn /*= false*/, int channel /*= -1*/)
 {
    //SetLightFlicker(control%8,control/8,value);
-   SetLight(control%mMaxColumns,control/mMaxColumns,value>0);
+   SetLight(control%mMaxColumns,control/mMaxColumns,value);
 }
 
 Vec2i Monome::Rotate(int x, int y, int rotations)

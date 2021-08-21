@@ -36,7 +36,7 @@
 #define SERIAL_OSC_PORT 12002
 #define MONOME_RECEIVE_PORT 13338
 
-#define NUM_MONOME_BUTTONS 64
+#define NUM_MONOME_BUTTONS 128
 
 class Monome : public INonstandardController,
                private OSCReceiver,
@@ -48,9 +48,10 @@ public:
    
    bool SetUpOsc();
    void Connect();
-   void SetLight(int x, int y, bool on);
+   void SetLight(int x, int y, float value);
    void SetLightFlicker(int x, int y, float flickerMs);
    string GetControlTooltip(MidiMessageType type, int control) override;
+   void SetLayoutData(ofxJSONElement& layout) override;
    
    void oscMessageReceived(const OSCMessage& msg) override;
    
@@ -63,7 +64,7 @@ public:
    void LoadState(FileStreamIn& in) override;
 
 private:
-   void SetLightInternal(int x, int y, bool on);
+   void SetLightInternal(int x, int y, float value);
    Vec2i Rotate(int x, int y, int rotations);
    
    OSCSender mToSerialOsc;
@@ -72,6 +73,7 @@ private:
    bool mHasMonome;
    int mMaxColumns;
    int mGridRotation;
+   String mPrefix;
    
    MidiDeviceListener* mListener;
 };

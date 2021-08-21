@@ -1521,115 +1521,117 @@ void MidiController::OnDeviceChanged()
    mGrids.clear();
    
    bool useDefaultLayout = true;
-   ofxJSONElement layout;
    string filename = mDeviceIn + ".json";
    ofStringReplace(filename, "/", "");
-   bool loaded = layout.open(ofToDataPath("controllers/"+filename));
+   bool loaded = mLayoutData.open(ofToDataPath("controllers/"+filename));
    if (loaded)
    {
+      if (mNonstandardController != nullptr)
+         mNonstandardController->SetLayoutData(mLayoutData);
+      
       mFoundLayoutFile = true;
-      if (!layout["outchannel"].isNull())
+      if (!mLayoutData["outchannel"].isNull())
       {
-         mOutChannel = layout["outchannel"].asInt();
+         mOutChannel = mLayoutData["outchannel"].asInt();
          mModuleSaveData.SetInt("outchannel", mOutChannel);
       }
-      if (!layout["outdevice"].isNull())
+      if (!mLayoutData["outdevice"].isNull())
       {
-         mDeviceOut = layout["outdevice"].asString();
+         mDeviceOut = mLayoutData["outdevice"].asString();
          mModuleSaveData.SetString("deviceout", mDeviceOut);
          mTwoWay = true;
          mDevice.ConnectOutput(mDeviceOut.c_str(), mOutChannel);
       }
-      if (!layout["usechannelasvoice"].isNull())
+      if (!mLayoutData["usechannelasvoice"].isNull())
       {
-         SetUseChannelAsVoice(layout["usechannelasvoice"].asBool());
+         SetUseChannelAsVoice(mLayoutData["usechannelasvoice"].asBool());
          mModuleSaveData.SetBool("usechannelasvoice", mUseChannelAsVoice);
       }
-      if (!layout["pitchbendrange"].isNull())
+      if (!mLayoutData["pitchbendrange"].isNull())
       {
-         SetPitchBendRange(layout["pitchbendrange"].asInt());
+         SetPitchBendRange(mLayoutData["pitchbendrange"].asInt());
          mModuleSaveData.SetFloat("pitchbendrange", mPitchBendRange);
       }
-      if (!layout["modwheelcc"].isNull())
+      if (!mLayoutData["modwheelcc"].isNull())
       {
-         mModwheelCC = layout["modwheelcc"].asInt();
+         mModwheelCC = mLayoutData["modwheelcc"].asInt();
          mModuleSaveData.SetInt("modwheelcc(1or74)", mModwheelCC);
       }
-      if (!layout["modwheeloffset"].isNull())
+      if (!mLayoutData["modwheeloffset"].isNull())
       {
-         mModWheelOffset = layout["modwheeloffset"].asDouble();
+         mModWheelOffset = mLayoutData["modwheeloffset"].asDouble();
          mModuleSaveData.SetFloat("modwheeloffset", mModWheelOffset);
       }
-      if (!layout["pressureoffset"].isNull())
+      if (!mLayoutData["pressureoffset"].isNull())
       {
-         mPressureOffset = layout["pressureoffset"].asDouble();
+         mPressureOffset = mLayoutData["pressureoffset"].asDouble();
          mModuleSaveData.SetFloat("pressureoffset", mPressureOffset);
       }
-      if (!layout["twoway_on_change"].isNull())
+      if (!mLayoutData["twoway_on_change"].isNull())
       {
-         mSendTwoWayOnChange = layout["twoway_on_change"].asBool();
+         mSendTwoWayOnChange = mLayoutData["twoway_on_change"].asBool();
          mModuleSaveData.SetBool("twoway_on_change", mSendTwoWayOnChange);
       }
-      if (!layout["groups"].isNull())
+      if (!mLayoutData["groups"].isNull())
       {
          useDefaultLayout = false;
-         for (int group = 0; group < layout["groups"].size(); ++group)
+         for (int group = 0; group < mLayoutData["groups"].size(); ++group)
          {
-            int rows = layout["groups"][group]["rows"].asInt();
-            int cols = layout["groups"][group]["cols"].asInt();
+            int rows = mLayoutData["groups"][group]["rows"].asInt();
+            int cols = mLayoutData["groups"][group]["cols"].asInt();
             ofVec2f pos;
-            pos.x = (layout["groups"][group]["position"])[0u].asDouble();
-            pos.y = (layout["groups"][group]["position"])[1u].asDouble();
+            pos.x = (mLayoutData["groups"][group]["position"])[0u].asDouble();
+            pos.y = (mLayoutData["groups"][group]["position"])[1u].asDouble();
             ofVec2f dim;
-            dim.x = (layout["groups"][group]["dimensions"])[0u].asDouble();
-            dim.y = (layout["groups"][group]["dimensions"])[1u].asDouble();
+            dim.x = (mLayoutData["groups"][group]["dimensions"])[0u].asDouble();
+            dim.y = (mLayoutData["groups"][group]["dimensions"])[1u].asDouble();
             ofVec2f spacing;
-            spacing.x = (layout["groups"][group]["spacing"])[0u].asDouble();
-            spacing.y = (layout["groups"][group]["spacing"])[1u].asDouble();
+            spacing.x = (mLayoutData["groups"][group]["spacing"])[0u].asDouble();
+            spacing.y = (mLayoutData["groups"][group]["spacing"])[1u].asDouble();
             MidiMessageType messageType;
-            if (layout["groups"][group]["messageType"] == "control")
+            if (mLayoutData["groups"][group]["messageType"] == "control")
                messageType = kMidiMessage_Control;
-            if (layout["groups"][group]["messageType"] == "note")
+            if (mLayoutData["groups"][group]["messageType"] == "note")
                messageType = kMidiMessage_Note;
-            if (layout["groups"][group]["messageType"] == "pitchbend")
+            if (mLayoutData["groups"][group]["messageType"] == "pitchbend")
                messageType = kMidiMessage_PitchBend;
-            if (layout["groups"][group]["messageType"] == "program")
+            if (mLayoutData["groups"][group]["messageType"] == "program")
                messageType = kMidiMessage_Program;
             ControlDrawType drawType;
-            if (layout["groups"][group]["drawType"] == "button")
+            if (mLayoutData["groups"][group]["drawType"] == "button")
                drawType = kDrawType_Button;
-            if (layout["groups"][group]["drawType"] == "knob")
+            if (mLayoutData["groups"][group]["drawType"] == "knob")
                drawType = kDrawType_Knob;
-            if (layout["groups"][group]["drawType"] == "slider")
+            if (mLayoutData["groups"][group]["drawType"] == "slider")
                drawType = kDrawType_Slider;
             bool incremental = false;
-            if (!layout["groups"][group]["incremental"].isNull())
-               incremental = layout["groups"][group]["incremental"].asBool();
+            if (!mLayoutData["groups"][group]["incremental"].isNull())
+               incremental = mLayoutData["groups"][group]["incremental"].asBool();
             int offVal = 0;
             int onVal = 127;
-            if (!layout["groups"][group]["colors"].isNull() &&
-               layout["groups"][group]["colors"].size() > 1)
+            if (!mLayoutData["groups"][group]["colors"].isNull() &&
+               mLayoutData["groups"][group]["colors"].size() > 1)
             {
-               offVal = layout["groups"][group]["colors"][0u].asInt();
-               onVal = layout["groups"][group]["colors"][1u].asInt();
+               offVal = mLayoutData["groups"][group]["colors"][0u].asInt();
+               onVal = mLayoutData["groups"][group]["colors"][1u].asInt();
             }
             ControlType connectionType = kControlType_Slider;
-            if (layout["groups"][group]["connection_type"] == "slider")
+            if (mLayoutData["groups"][group]["connection_type"] == "slider")
                connectionType = kControlType_Slider;
-            if (layout["groups"][group]["connection_type"] == "set")
+            if (mLayoutData["groups"][group]["connection_type"] == "set")
                connectionType = kControlType_SetValue;
-            if (layout["groups"][group]["connection_type"] == "release")
+            if (mLayoutData["groups"][group]["connection_type"] == "release")
                connectionType = kControlType_SetValueOnRelease;
-            if (layout["groups"][group]["connection_type"] == "toggle")
+            if (mLayoutData["groups"][group]["connection_type"] == "toggle")
                connectionType = kControlType_Toggle;
-            if (layout["groups"][group]["connection_type"] == "direct")
+            if (mLayoutData["groups"][group]["connection_type"] == "direct")
                connectionType = kControlType_Direct;
             for (int row = 0; row < rows; ++row)
             {
                for (int col = 0; col < cols; ++col)
                {
                   int index = col + row * cols;
-                  int control = layout["groups"][group]["controls"][index].asInt();
+                  int control = mLayoutData["groups"][group]["controls"][index].asInt();
                   GetLayoutControl(control, messageType).Setup(this, messageType, control, drawType, incremental, offVal, onVal, connectionType, pos.x + kLayoutButtonsX + spacing.x*col, pos.y + kLayoutButtonsY + spacing.y*row, dim.x, dim.y);
 
                   //clear out values on controllers
@@ -1658,16 +1660,16 @@ void MidiController::OnDeviceChanged()
                   for (int col = 0; col < cols; ++col)
                   {
                      int index = col + row * cols;
-                     int control = layout["groups"][group]["controls"][index].asInt();
+                     int control = mLayoutData["groups"][group]["controls"][index].asInt();
                      grid->mControls.push_back(control);
                   }
                }
 
-               if (!layout["groups"][group]["colors"].isNull() &&
-                  layout["groups"][group]["colors"].size() > 0)
+               if (!mLayoutData["groups"][group]["colors"].isNull() &&
+                  mLayoutData["groups"][group]["colors"].size() > 0)
                {
-                  for (int i = 0; i < layout["groups"][group]["colors"].size(); ++i)
-                     grid->mColors.push_back(layout["groups"][group]["colors"][i].asInt());
+                  for (int i = 0; i < mLayoutData["groups"][group]["colors"].size(); ++i)
+                     grid->mColors.push_back(mLayoutData["groups"][group]["colors"][i].asInt());
                }
                else
                {
@@ -1683,6 +1685,7 @@ void MidiController::OnDeviceChanged()
    else
    {
       mFoundLayoutFile = false;
+      mLayoutData.clear();
    }
    
    if (useDefaultLayout)
@@ -2081,6 +2084,9 @@ void MidiController::ConnectDevice()
       mTwoWay = true;
       mDevice.ConnectOutput(mDeviceOut.c_str(), mOutChannel);
    }
+   
+   if (mNonstandardController != nullptr)
+      mNonstandardController->SetLayoutData(mLayoutData);
 
    mIsConnected = IsInputConnected(K(immediate));
 }

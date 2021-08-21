@@ -38,6 +38,7 @@ public:
    virtual bool IsInputConnected() { return true; }
    virtual bool Reconnect() { return true; }
    virtual string GetControlTooltip(MidiMessageType type, int control) { return MidiController::GetDefaultTooltip(type, control); }
+   virtual void SetLayoutData(ofxJSONElement& layout) {}
    virtual void SaveState(FileStreamOut& out) = 0;
    virtual void LoadState(FileStreamIn& in) = 0;
 };

@@ -414,6 +414,7 @@ private:
    bool mHasCreatedConnectionUIControls;
    float mReconnectWaitTimer;
    ChannelFilter mChannelFilter;
+   ofxJSONElement mLayoutData;
    
    std::array<ControlLayoutElement, NUM_LAYOUT_CONTROLS> mLayoutControls;
    int mHighlightedLayoutElement;
