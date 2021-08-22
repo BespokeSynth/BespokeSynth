@@ -61,8 +61,8 @@ void ControlSequencer::CreateUIControls()
 {
    IDrawableModule::CreateUIControls();
    mGrid = new UIGrid(5,23,130,40,16,1, this);
-   mIntervalSelector = new DropdownList(this,"interval",5,3,(int*)(&mInterval));
-   mLengthSelector = new DropdownList(this,"length",mIntervalSelector,kAnchor_Right,(int*)(&mLength));
+   mIntervalSelector = new DropdownList(this,"interval",5,3,(int*)(&mInterval),40);
+   mLengthSelector = new DropdownList(this,"length",mIntervalSelector,kAnchor_Right,(int*)(&mLength),40);
    mRandomize = new ClickButton(this,"random",mLengthSelector,kAnchor_Right);
    
    mControlCable = new PatchCableSource(this, kConnectionType_Modulator);
