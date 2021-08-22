@@ -116,6 +116,15 @@ void UIGrid::Render()
                float fadeAmount = ofClamp(ofLerp(.5f, 1, data), 0, 1);
                ofSetColor(255 * fadeAmount, 255 * fadeAmount, 255 * fadeAmount, gModuleDrawAlpha);
                ofRect(x, y + ysize * (.5f - sliderFillAmount/2), xsize, ysize * sliderFillAmount);
+               
+               if (mClick && mHoldVal != 0 && CanAdjustMultislider())
+               {
+                  if (j == mHoldRow)
+                  {
+                     ofSetColor(0,255,0,gModuleDrawAlpha);
+                     ofRect(x+.5f, y+.5f+(ysize*(1- sliderFillAmount)), xsize-1, 2, 0);
+                  }
+               }
             }
          }
       }
@@ -313,22 +322,23 @@ bool UIGrid::MouseMoved(float x, float y)
    
    float clickHeight, clickWidth;
    GridCell cell = GetGridCellAt(x, y, &clickHeight, &clickWidth);
+   
+   if (mRestrictDragToRow)
+   {
+      if (cell.mRow > mHoldRow)
+         clickHeight = mFlip ? 1 : 0;
+      if (cell.mRow < mHoldRow)
+         clickHeight = mFlip ? 0 : 1;
+      cell.mRow = mHoldRow;
+   }
+   
    if (isMouseOver)
       mCurrentHover = cell.mCol + cell.mRow * mCols;
-   else
+   else if (!mClick)
       mCurrentHover = -1;
 
    if (mClick && !mMomentary)
    {
-      if (mRestrictDragToRow)
-      {
-         if (cell.mRow > mHoldRow)
-            clickHeight = mFlip ? 1 : 0;
-         if (cell.mRow < mHoldRow)
-            clickHeight = mFlip ? 0 : 1;
-         cell.mRow = mHoldRow;
-      }
-      
       int dataIndex = GetDataIndex(cell.mCol, cell.mRow);
       float oldValue = mData[dataIndex];
       
