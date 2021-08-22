@@ -40,6 +40,7 @@ GridModule::GridModule()
 , mGrid(nullptr)
 , mGridControllerOwner(nullptr)
 , mMomentary(false)
+, mDirectColorMode(true)
 {
    for (size_t i=0; i<mHighlightCells.size(); ++i)
       mHighlightCells[i].time = -1;
@@ -124,7 +125,12 @@ void GridModule::UpdateLights()
       for (int y=0; y<GetRows(); ++y)
       {
          if (mGridControlTarget->GetGridController())
-            mGridControlTarget->GetGridController()->SetLight(x, y, Get(x,y) > 0 ? kGridColor1Bright : kGridColorOff);
+         {
+            if (mDirectColorMode)
+               mGridControlTarget->GetGridController()->SetLightDirect(x, y, Get(x,y) * 127);
+            else
+               mGridControlTarget->GetGridController()->SetLight(x, y, Get(x,y) > 0 ? kGridColor1Bright : kGridColorOff);
+         }
       }
    }
 }
@@ -321,11 +327,14 @@ void GridModule::PostRepatch(PatchCableSource* cableSource, bool fromUserClick)
 
 void GridModule::LoadLayout(const ofxJSONElement& moduleInfo)
 {
+   mModuleSaveData.LoadBool("direct_color_mode", moduleInfo, true);
+   
    SetUpFromSaveData();
 }
 
 void GridModule::SetUpFromSaveData()
 {
+   mDirectColorMode = mModuleSaveData.GetBool("direct_color_mode");
 }
 
 void GridModule::CheckboxUpdated(Checkbox* checkbox)

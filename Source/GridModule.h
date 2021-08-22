@@ -132,5 +132,6 @@ private:
    
    Checkbox* mMomentaryCheckbox;
    bool mMomentary;
+   bool mDirectColorMode;
 };
 
