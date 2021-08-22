@@ -43,7 +43,7 @@ bool UIControlConnection::sDrawCables = true;
 namespace
 {
    const int kLayoutControlsX = 5;
-   const int kLayoutControlsY = 100;
+   const int kLayoutControlsY = 110;
    const int kLayoutButtonsX = 250;
    const int kLayoutButtonsY = 10;
 }
@@ -82,6 +82,7 @@ MidiController::MidiController()
 , mMappingDisplayMode(kHide)
 , mMappingDisplayModeSelector(nullptr)
 , mOscInPort(8000)
+, mMonomeDeviceIndex(-1)
 , mHighlightedLayoutElement(-1)
 , mHoveredLayoutElement(-1)
 , mLayoutWidth(0)
@@ -99,8 +100,9 @@ void MidiController::CreateUIControls()
    mBindCheckbox = new Checkbox(this,"bind (hold shift)",mMappingDisplayModeSelector,kAnchor_Below,&mBindMode);
    mPageSelector = new DropdownList(this,"page",mBindCheckbox,kAnchor_Right,&mControllerPage);
    mAddConnectionButton = new ClickButton(this,"add",12,300);
-   mOscInPortEntry = new TextEntry(this, "osc input port", 3, 70, 6, &mOscInPort, 0, 99999);
-   mMonomeDeviceDropdown = new DropdownList(this, "monome", 3, 70, &mMonomeDeviceIndex);
+   mLayoutFileDropdown = new DropdownList(this, "layout", 3, 70, &mLayoutFileIndex);
+   mOscInPortEntry = new TextEntry(this, "osc input port", 3, 88, 6, &mOscInPort, 0, 99999);
+   mMonomeDeviceDropdown = new DropdownList(this, "monome", 3, 88, &mMonomeDeviceIndex);
    
    //mDrawCablesCheckbox = new Checkbox(this,"draw cables",200,26,&UIControlConnection::sDrawCables);
    
@@ -111,7 +113,14 @@ void MidiController::CreateUIControls()
    mMappingDisplayModeSelector->AddLabel("layout", kLayout);
    mMappingDisplayModeSelector->AddLabel("list", kList);
 
+   mLayoutFileDropdown->DrawLabel(true);
    mOscInPortEntry->DrawLabel(true);
+   mMonomeDeviceDropdown->DrawLabel(true);
+   
+   mLayoutFileDropdown->AddLabel("default", 0);
+   File dir(ofToDataPath("controllers"));
+   for (auto file : dir.findChildFiles(File::findFiles, false, "*.json"))
+      mLayoutFileDropdown->AddLabel(file.getFileName().toStdString(), mLayoutFileDropdown->GetNumValues());
 }
 
 MidiController::~MidiController()
@@ -669,7 +678,7 @@ void MidiController::Poll()
    
    if (IsInputConnected(!K(immediate)) || mReconnectWaitTimer > 0)
    {
-      if (!mIsConnected)
+      if (!mIsConnected && gTime - mInitialConnectionTime > 1000)
       {
          if (mNonstandardController)
          {
@@ -896,6 +905,8 @@ void MidiController::DrawModule()
    mBindCheckbox->Draw();
    mPageSelector->Draw();
    //mDrawCablesCheckbox->Draw();
+   mLayoutFileDropdown->SetShowing(mMappingDisplayMode == kLayout);
+   mLayoutFileDropdown->Draw();
    mOscInPortEntry->SetShowing(mDeviceIn == "osccontroller" && mMappingDisplayMode == kLayout);
    mOscInPortEntry->Draw();
    mMonomeDeviceDropdown->SetShowing(mDeviceIn == "monome" && mMappingDisplayMode == kLayout);
@@ -1092,12 +1103,7 @@ void MidiController::DrawModule()
       ofPopStyle();
       
       if (!mFoundLayoutFile)
-      {
-         string filename = mDeviceIn + ".json";
-         ofStringReplace(filename, "/", "");
-         filename = ofToDataPath("controllers/"+filename);
-         gFont.DrawStringWrap("couldn't find layout file at "+filename+", using the default layout instead", 15, 3, kLayoutControlsY + 160, 235);
-      }
+         gFont.DrawStringWrap("couldn't load layout file at "+mLastLoadedLayoutFile+", using the default layout instead", 15, 3, kLayoutControlsY + 160, 235);
       
       if (mHighlightedLayoutElement != -1)
       {
@@ -1508,8 +1514,10 @@ ControlLayoutElement& MidiController::GetLayoutControl(int control, MidiMessageT
    return mLayoutControls[index];
 }
 
-void MidiController::OnDeviceChanged()
+void MidiController::LoadLayout(string filename)
 {
+   mLastLoadedLayoutFile = ofToDataPath("controllers/"+filename);
+   
    for (int i = 0; i < NUM_LAYOUT_CONTROLS; ++i)
    {
       mLayoutControls[i].mActive = false;
@@ -1524,9 +1532,7 @@ void MidiController::OnDeviceChanged()
    mGrids.clear();
    
    bool useDefaultLayout = true;
-   string filename = mDeviceIn + ".json";
-   ofStringReplace(filename, "/", "");
-   bool loaded = mLayoutData.open(ofToDataPath("controllers/"+filename));
+   bool loaded = mLayoutData.open(mLastLoadedLayoutFile);
    if (loaded)
    {
       if (mNonstandardController != nullptr)
@@ -1697,7 +1703,7 @@ void MidiController::OnDeviceChanged()
       const float kSpacingY = 20;
 
       for (int i=0; i<128; ++i)
-      {      
+      {
          GetLayoutControl(i, kMidiMessage_Control).
             Setup(this, kMidiMessage_Control, i, kDrawType_Slider, false, 0, 127, kControlType_Slider, i%8 * kSpacingX + kLayoutButtonsX + 9, i/8 * kSpacingY + kLayoutButtonsY, kSpacingX * .666f, kSpacingY * .93f);
          GetLayoutControl(i, kMidiMessage_Note).
@@ -1718,6 +1724,13 @@ void MidiController::OnDeviceChanged()
          mLayoutHeight = MAX(mLayoutHeight, mLayoutControls[i].mPosition.y + mLayoutControls[i].mDimensions.y + 20);
       }
    }
+}
+
+void MidiController::OnDeviceChanged()
+{
+   string filename = mDeviceIn + ".json";
+   ofStringReplace(filename, "/", "");
+   LoadLayout(filename);
 
    mModulation.GetModWheel(-1)->SetValue(mModWheelOffset);
    mModulation.GetPressure(-1)->SetValue(mPressureOffset);
@@ -1811,6 +1824,10 @@ void MidiController::DropdownUpdated(DropdownList* list, int oldVal)
       Monome* monome = dynamic_cast<Monome*>(mNonstandardController);
       if (monome)
          monome->ConnectToDevice(mMonomeDeviceDropdown->GetLabel(mMonomeDeviceIndex));
+   }
+   if (list == mLayoutFileDropdown)
+   {
+      LoadLayout(mLayoutFileDropdown->GetLabel(mLayoutFileIndex));
    }
 }
 
@@ -2099,6 +2116,8 @@ void MidiController::ConnectDevice()
       mNonstandardController->SetLayoutData(mLayoutData);
 
    mIsConnected = IsInputConnected(K(immediate));
+   
+   mInitialConnectionTime = gTime;
 }
 
 void MidiController::LoadLayout(const ofxJSONElement& moduleInfo)

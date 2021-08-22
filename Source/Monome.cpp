@@ -50,7 +50,6 @@ Monome::~Monome()
 void Monome::UpdateDeviceList(DropdownList* list)
 {
    mListForMidiController = list;
-   list->Clear();
    ListMonomes();
 }
 

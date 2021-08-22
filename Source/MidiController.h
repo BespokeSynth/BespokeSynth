@@ -359,6 +359,7 @@ private:
    int GetLayoutControlIndexForMidi(MidiMessageType type, int control) const;
    string GetLayoutTooltip(int controlIndex);
    void UpdateControllerIndex();
+   void LoadLayout(string filename);
    
    float mVelocityMult;
    bool mUseChannelAsVoice;
@@ -375,6 +376,7 @@ private:
    string mDeviceOut;
    int mOutChannel;
    MidiDevice mDevice;
+   double mInitialConnectionTime;
    ofxJSONElement mConnectionsJson;
    list<UIControlConnection*> mConnections;
    bool mUseNegativeEdge;  //for midi toggle, accept on or off as a button press
@@ -392,6 +394,8 @@ private:
    Checkbox* mDrawCablesCheckbox;
    MappingDisplayMode mMappingDisplayMode;
    RadioButton* mMappingDisplayModeSelector;
+   int mLayoutFileIndex;
+   DropdownList* mLayoutFileDropdown;
    int mOscInPort;
    TextEntry* mOscInPortEntry;
    int mMonomeDeviceIndex;
@@ -416,6 +420,7 @@ private:
    bool mHasCreatedConnectionUIControls;
    float mReconnectWaitTimer;
    ChannelFilter mChannelFilter;
+   string mLastLoadedLayoutFile;
    ofxJSONElement mLayoutData;
    
    std::array<ControlLayoutElement, NUM_LAYOUT_CONTROLS> mLayoutControls;
