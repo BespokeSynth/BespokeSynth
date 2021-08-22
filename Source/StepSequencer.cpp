@@ -83,7 +83,7 @@ void StepSequencer::Init()
 void StepSequencer::CreateUIControls()
 {
    IDrawableModule::CreateUIControls();
-   mGrid = new UIGrid(40,45,180,150,16,NUM_STEPSEQ_ROWS, this);
+   mGrid = new UIGrid(40,45,250,150,16,NUM_STEPSEQ_ROWS, this);
    mStrengthSlider = new FloatSlider(this,"str",87,22,50,15,&mStrength,0,1,2);
    mUseStrengthSliderCheckbox = new Checkbox(this,"use str",139,22,&mUseStrengthSlider);
    mRandomizeButton = new ClickButton(this, "randomize", 160, 22);
@@ -1034,16 +1034,11 @@ void StepSequencer::KeyPressed(int key, bool isRepeat)
 void StepSequencer::SaveLayout(ofxJSONElement& moduleInfo)
 {
    IDrawableModule::SaveLayout(moduleInfo);
-   
-   moduleInfo["gridwidth"] = mGrid->GetWidth();
-   moduleInfo["gridheight"] = mGrid->GetHeight();
 }
 
 void StepSequencer::LoadLayout(const ofxJSONElement& moduleInfo)
 {
    mModuleSaveData.LoadString("target", moduleInfo);
-   mModuleSaveData.LoadInt("gridwidth", moduleInfo, 250, 150, 2000, true);
-   mModuleSaveData.LoadInt("gridheight", moduleInfo, 150, 150, 2000, true);
    mModuleSaveData.LoadInt("gridrows", moduleInfo, 8, 1, NUM_STEPSEQ_ROWS);
    mModuleSaveData.LoadInt("gridmeasures", moduleInfo, 1, 1, 16);
    mModuleSaveData.LoadBool("multislider_mode", moduleInfo, true);
@@ -1059,7 +1054,6 @@ void StepSequencer::LoadLayout(const ofxJSONElement& moduleInfo)
 void StepSequencer::SetUpFromSaveData()
 {
    SetUpPatchCables(mModuleSaveData.GetString("target"));
-   mGrid->SetDimensions(mModuleSaveData.GetInt("gridwidth"), mModuleSaveData.GetInt("gridheight"));
    mNumRows = mModuleSaveData.GetInt("gridrows");
    mGrid->SetGrid(GetNumSteps(mStepInterval), mNumRows);
    
@@ -1078,7 +1072,7 @@ void StepSequencer::SetUpFromSaveData()
 
 namespace
 {
-   const int kSaveStateRev = 2;
+   const int kSaveStateRev = 3;
 }
 
 void StepSequencer::SaveState(FileStreamOut& out)
@@ -1094,6 +1088,9 @@ void StepSequencer::SaveState(FileStreamOut& out)
    for (int i=0; i<numMetaStepMasks; ++i)
       out << mMetaStepMasks[i];
    out << mHasExternalPulseSource;
+   
+   out << mGrid->GetWidth();
+   out << mGrid->GetHeight();
 }
 
 void StepSequencer::LoadState(FileStreamIn& in)
@@ -1115,6 +1112,13 @@ void StepSequencer::LoadState(FileStreamIn& in)
    }
    if (rev >= 2)
       in >> mHasExternalPulseSource;
+   if (rev >= 3)
+   {
+      float gridWidth, gridHeight;
+      in >> gridWidth;
+      in >> gridHeight;
+      mGrid->SetDimensions(gridWidth, gridHeight);
+   }
 }
 
 StepSequencerRow::StepSequencerRow(StepSequencer* seq, UIGrid* grid, int row)
