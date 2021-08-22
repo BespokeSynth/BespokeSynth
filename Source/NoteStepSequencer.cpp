@@ -70,7 +70,7 @@ NoteStepSequencer::NoteStepSequencer()
 , mRandomizeLengthChance(1)
 , mRandomizeLengthRange(1)
 , mRandomizeVelocityChance(1)
-, mRandomizeVelocityRange(1)
+, mRandomizeVelocityDensity(1)
 , mGridControlOffsetX(0)
 , mGridControlOffsetY(0)
 {
@@ -879,27 +879,27 @@ void NoteStepSequencer::ButtonClicked(ClickButton* button)
       {
          if (ofRandom(1) <= mRandomizeVelocityChance)
          {
-            int newVelocity;
-            switch (gRandom() % 5)
+            int newVelocity = 0;
+            if (ofRandom(1) < mRandomizeVelocityDensity)
             {
-               case 0:
-                  newVelocity = 0;
-                  break;
-               case 1:
-                  newVelocity = 50;
-                  break;
-               case 2:
-                  newVelocity = 80;
-                  break;
-               case 3:
-                  newVelocity = 110;
-                  break;
-               default:
-                  newVelocity = 127;
-                  break;
+               switch (gRandom() % 4)
+               {
+                  case 0:
+                     newVelocity = 50;
+                     break;
+                  case 1:
+                     newVelocity = 80;
+                     break;
+                  case 2:
+                     newVelocity = 110;
+                     break;
+                  default:
+                     newVelocity = 127;
+                     break;
+               }
             }
             
-            mVels[i] = int(ofLerp(mVels[i], newVelocity, mRandomizeVelocityRange) + .5f);
+            mVels[i] = newVelocity;
          }
       }
       SyncGridToSeq();
@@ -1102,7 +1102,7 @@ void NoteStepSequencer::LoadLayout(const ofxJSONElement& moduleInfo)
    mModuleSaveData.LoadFloat("random_length_chance", moduleInfo, 1.0f, 0.0f, 1.0f);
    mModuleSaveData.LoadFloat("random_length_range", moduleInfo, 1.0f, 0.0f, 1.0f);
    mModuleSaveData.LoadFloat("random_velocity_chance", moduleInfo, 1.0f, 0.0f, 1.0f);
-   mModuleSaveData.LoadFloat("random_velocity_range", moduleInfo, 1.0f, 0.0f, 1.0f);
+   mModuleSaveData.LoadFloat("random_velocity_density", moduleInfo, 0.5f, 0.0f, 1.0f);
 
    SetUpFromSaveData();
 }
@@ -1119,7 +1119,7 @@ void NoteStepSequencer::SetUpFromSaveData()
    mRandomizeLengthChance = mModuleSaveData.GetFloat("random_length_chance");
    mRandomizeLengthRange = mModuleSaveData.GetFloat("random_length_range");
    mRandomizeVelocityChance = mModuleSaveData.GetFloat("random_velocity_chance");
-   mRandomizeVelocityRange = mModuleSaveData.GetFloat("random_velocity_range");
+   mRandomizeVelocityDensity = mModuleSaveData.GetFloat("random_velocity_density");
    UpdateVelocityGridPos();
    SyncGridToSeq();
    SetUpStepControls();

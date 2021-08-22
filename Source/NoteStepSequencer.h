@@ -190,7 +190,7 @@ private:
    float mRandomizeLengthChance;
    float mRandomizeLengthRange;
    float mRandomizeVelocityChance;
-   float mRandomizeVelocityRange;
+   float mRandomizeVelocityDensity;
    
    std::array<double, NSS_MAX_STEPS> mLastStepPlayTime;
    std::array<DropdownList*, NSS_MAX_STEPS> mToneDropdowns;
