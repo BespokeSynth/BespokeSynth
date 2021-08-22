@@ -34,9 +34,10 @@
 
 #define HOST "127.0.0.1"
 #define SERIAL_OSC_PORT 12002
-#define MONOME_RECEIVE_PORT 13338
 
 #define NUM_MONOME_BUTTONS 128
+
+class DropdownList;
 
 class Monome : public INonstandardController,
                private OSCReceiver,
@@ -47,18 +48,20 @@ public:
    ~Monome();
    
    bool SetUpOsc();
-   void Connect();
+   void ListMonomes();
    void SetLight(int x, int y, float value);
    void SetLightFlicker(int x, int y, float flickerMs);
    string GetControlTooltip(MidiMessageType type, int control) override;
    void SetLayoutData(ofxJSONElement& layout) override;
+   void ConnectToDevice(string deviceDesc);
+   void UpdateDeviceList(DropdownList* list);
    
    void oscMessageReceived(const OSCMessage& msg) override;
    
    void SendValue(int page, int control, float value, bool forceNoteOn = false, int channel = -1)override;
    
    bool IsInputConnected() override { return mHasMonome; }
-   bool Reconnect() override { Connect(); return mHasMonome; }
+   bool Reconnect() override;
 
    void SaveState(FileStreamOut& out) override;
    void LoadState(FileStreamIn& in) override;
@@ -67,15 +70,32 @@ private:
    void SetLightInternal(int x, int y, float value);
    Vec2i Rotate(int x, int y, int rotations);
    
+   static int sNextMonomeReceivePort;
+   
    OSCSender mToSerialOsc;
    OSCSender mToMonome;
+   int mMonomeReceivePort;
    bool mIsOscSetUp;
    bool mHasMonome;
    int mMaxColumns;
    int mGridRotation;
    String mPrefix;
+   bool mJustRequestedDeviceList;
+   string mPendingDeviceDesc;
+   
+   struct MonomeDevice
+   {
+      string id;
+      string product;
+      int port;
+      string GetDescription() { return id + " " + product; }
+   };
+   
+   vector<MonomeDevice> mConnectedDeviceList;
    
    MidiDeviceListener* mListener;
+   DropdownList* mListForMidiController;
+   MonomeDevice* mLastConnectedDevice;
 };
 
 #endif /* defined(__modularSynth__Monome__) */

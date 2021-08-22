@@ -26,15 +26,21 @@
 #include "Monome.h"
 #include "Profiler.h"
 
+//static
+int Monome::sNextMonomeReceivePort = 13338;
+
 Monome::Monome(MidiDeviceListener* listener)
-: mIsOscSetUp(false)
+: mMonomeReceivePort(-1)
+, mIsOscSetUp(false)
 , mHasMonome(false)
 , mMaxColumns(16)
 , mGridRotation(0)
 , mPrefix("monome")
+, mJustRequestedDeviceList(false)
 , mListener(listener)
+, mListForMidiController(nullptr)
+, mLastConnectedDevice(nullptr)
 {
-   Connect();
 }
 
 Monome::~Monome()
@@ -42,11 +48,45 @@ Monome::~Monome()
    OSCReceiver::disconnect();
 }
 
+void Monome::UpdateDeviceList(DropdownList* list)
+{
+   mListForMidiController = list;
+   list->Clear();
+   ListMonomes();
+}
+
+void Monome::ListMonomes()
+{
+   if (mHasMonome)
+      return;
+
+   if (mMonomeReceivePort == -1)
+   {
+      mMonomeReceivePort = sNextMonomeReceivePort;
+      ++sNextMonomeReceivePort;
+   }
+   
+   if (!mIsOscSetUp)
+   {
+      bool success = SetUpOsc();
+      if (!success)
+         return;
+   }
+   
+   mJustRequestedDeviceList = true;
+   
+   OSCMessage listMsg("/serialosc/list");
+   listMsg.addString("localhost");
+   listMsg.addInt32(mMonomeReceivePort);
+   bool written = mToSerialOsc.send(listMsg);
+   assert(written);
+}
+
 bool Monome::SetUpOsc()
 {
    assert(!mIsOscSetUp);
    
-   bool connected = OSCReceiver::connect(MONOME_RECEIVE_PORT);
+   bool connected = OSCReceiver::connect(mMonomeReceivePort);
    if (!connected)
       return false;
    
@@ -58,25 +98,6 @@ bool Monome::SetUpOsc()
    
    mIsOscSetUp = true;
    return true;
-}
-
-void Monome::Connect()
-{
-   if (mHasMonome)
-      return;
-
-   if (!mIsOscSetUp)
-   {
-      bool success = SetUpOsc();
-      if (!success)
-         return;
-   }
-   
-   OSCMessage listMsg("/serialosc/list");
-   listMsg.addString("localhost");
-   listMsg.addInt32(MONOME_RECEIVE_PORT);
-   bool written = mToSerialOsc.send(listMsg);
-   assert(written);
 }
 
 void Monome::SetLightInternal(int x, int y, float value)
@@ -123,8 +144,59 @@ void Monome::SetLayoutData(ofxJSONElement& layout)
 {
    if (!layout["monome_rotation"].isNull())
       mGridRotation = layout["monome_rotation"].asInt();
-   if (!layout["monome_prefix"].isNull())
-      mPrefix = layout["monome_prefix"].asString();
+}
+
+void Monome::ConnectToDevice(string deviceDesc)
+{
+   MonomeDevice* device = nullptr;
+   for (size_t i=0; i<mConnectedDeviceList.size(); ++i)
+   {
+      if (mConnectedDeviceList[i].GetDescription() == deviceDesc)
+         device = &mConnectedDeviceList[i];
+   }
+   
+   if (device == nullptr)
+   {
+      TheSynth->LogEvent("couldn't find monome device "+deviceDesc, kLogEventType_Error);
+      return;
+   }
+   
+   mPrefix = device->id;
+   mLastConnectedDevice = device;
+   
+   mToMonome.connect(HOST, device->port);
+   mHasMonome = true;
+   
+   OSCMessage setPortMsg("/sys/port");
+   setPortMsg.addInt32(mMonomeReceivePort);
+   bool written = mToMonome.send(setPortMsg);
+   assert(written);
+   
+   OSCMessage setHostMsg("/sys/host");
+   setHostMsg.addString(HOST);
+   written = mToMonome.send(setHostMsg);
+   assert(written);
+   
+   OSCMessage setPrefixMsg("/sys/prefix");
+   setPrefixMsg.addString(mPrefix);
+   written = mToMonome.send(setPrefixMsg);
+   assert(written);
+   
+   OSCMessage sysInfoMsg("/sys/info");
+   written = mToMonome.send(sysInfoMsg);
+   assert(written);
+   
+   /*OSCMessage setTiltMsg("/"+mPrefix+"/tilt/set");
+   setTiltMsg.addInt32(0);
+   setTiltMsg.addInt32(1);
+   mToMonome.send(setTiltMsg);*/
+}
+
+bool Monome::Reconnect()
+{
+   if (mLastConnectedDevice != nullptr)
+      ConnectToDevice(mLastConnectedDevice->GetDescription());
+   return mHasMonome;
 }
 
 void Monome::oscMessageReceived(const OSCMessage& msg)
@@ -133,38 +205,39 @@ void Monome::oscMessageReceived(const OSCMessage& msg)
    
    if (label == "/serialosc/device")
    {
-      ofLog() << "Monome connected: " << msg[0].getString().toRawUTF8() << " " << msg[1].getString().toRawUTF8();
+      MonomeDevice device;
+      device.id = msg[0].getString().toStdString();
+      device.product = msg[1].getString().toStdString();
+      device.port = msg[2].getInt32();
       
-      mToMonome.connect(HOST, msg[2].getInt32());
-      mHasMonome = true;
+      mConnectedDeviceList.push_back(device);
       
-      OSCMessage setPortMsg("/sys/port");
-      setPortMsg.addInt32(MONOME_RECEIVE_PORT);
-      bool written = mToMonome.send(setPortMsg);
-      assert(written);
+      if (mListForMidiController != nullptr)
+      {
+         if (mJustRequestedDeviceList)
+            mListForMidiController->Clear();
+         
+         mListForMidiController->AddLabel(device.GetDescription(), mListForMidiController->GetNumValues());
+         
+         if (mPendingDeviceDesc != "")
+         {
+            ofLog() << mPendingDeviceDesc;
+            if (mPendingDeviceDesc == device.GetDescription())
+            {
+               mPendingDeviceDesc = "";
+               ConnectToDevice(device.GetDescription());
+            }
+         }
+      }
       
-      OSCMessage setHostMsg("/sys/host");
-      setHostMsg.addString(HOST);
-      written = mToMonome.send(setHostMsg);
-      assert(written);
-      
-      OSCMessage setPrefixMsg("/sys/prefix");
-      setPrefixMsg.addString(mPrefix);
-      written = mToMonome.send(setPrefixMsg);
-      assert(written);
-      
-      OSCMessage sysInfoMsg("/sys/info");
-      written = mToMonome.send(sysInfoMsg);
-      assert(written);
-      
-      /*OSCMessage setTiltMsg("/"+mPrefix+"/tilt/set");
-      setTiltMsg.addInt32(0);
-      setTiltMsg.addInt32(1);
-      mToMonome.send(setTiltMsg);*/
+      mJustRequestedDeviceList = false;
    }
    else if (label == "/sys/size")
    {
-      mMaxColumns = msg[0].getInt32();
+      if (mGridRotation % 2 == 0)
+         mMaxColumns = msg[0].getInt32();
+      else
+         mMaxColumns = msg[1].getInt32();
    }
    else if (label == "/"+mPrefix+"/grid/key")
    {
@@ -215,12 +288,17 @@ Vec2i Monome::Rotate(int x, int y, int rotations)
 
 namespace
 {
-   const int kSaveStateRev = 1;
+   const int kSaveStateRev = 2;
 }
 
 void Monome::SaveState(FileStreamOut& out)
 {
    out << kSaveStateRev;
+   
+   string connectedDeviceDesc = "";
+   if (mLastConnectedDevice != nullptr)
+      connectedDeviceDesc = mLastConnectedDevice->GetDescription();
+   out << connectedDeviceDesc;
 }
 
 void Monome::LoadState(FileStreamIn& in)
@@ -228,4 +306,6 @@ void Monome::LoadState(FileStreamIn& in)
    int rev;
    in >> rev;
    LoadStateValidate(rev == kSaveStateRev);
+   
+   in >> mPendingDeviceDesc;
 }

@@ -394,6 +394,8 @@ private:
    RadioButton* mMappingDisplayModeSelector;
    int mOscInPort;
    TextEntry* mOscInPortEntry;
+   int mMonomeDeviceIndex;
+   DropdownList* mMonomeDeviceDropdown;
 
    int mControllerIndex;
    double mLastActivityTime;

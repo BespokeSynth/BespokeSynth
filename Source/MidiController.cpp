@@ -100,6 +100,7 @@ void MidiController::CreateUIControls()
    mPageSelector = new DropdownList(this,"page",mBindCheckbox,kAnchor_Right,&mControllerPage);
    mAddConnectionButton = new ClickButton(this,"add",12,300);
    mOscInPortEntry = new TextEntry(this, "osc input port", 3, 70, 6, &mOscInPort, 0, 99999);
+   mMonomeDeviceDropdown = new DropdownList(this, "monome", 3, 70, &mMonomeDeviceIndex);
    
    //mDrawCablesCheckbox = new Checkbox(this,"draw cables",200,26,&UIControlConnection::sDrawCables);
    
@@ -897,6 +898,8 @@ void MidiController::DrawModule()
    //mDrawCablesCheckbox->Draw();
    mOscInPortEntry->SetShowing(mDeviceIn == "osccontroller" && mMappingDisplayMode == kLayout);
    mOscInPortEntry->Draw();
+   mMonomeDeviceDropdown->SetShowing(mDeviceIn == "monome" && mMappingDisplayMode == kLayout);
+   mMonomeDeviceDropdown->Draw();
    
    for (int i=0; i<NUM_LAYOUT_CONTROLS; ++i)
    {
@@ -1803,6 +1806,12 @@ void MidiController::DropdownUpdated(DropdownList* list, int oldVal)
          UpdateControllerIndex();
       }
    }
+   if (list == mMonomeDeviceDropdown)
+   {
+      Monome* monome = dynamic_cast<Monome*>(mNonstandardController);
+      if (monome)
+         monome->ConnectToDevice(mMonomeDeviceDropdown->GetLabel(mMonomeDeviceIndex));
+   }
 }
 
 void MidiController::DropdownClicked(DropdownList* list)
@@ -2049,6 +2058,7 @@ void MidiController::ConnectDevice()
       if (dynamic_cast<Monome*>(mNonstandardController) == nullptr)
       {
          Monome* monome = new Monome(this);
+         monome->UpdateDeviceList(mMonomeDeviceDropdown);
          mNonstandardController = monome;
       }
    }
