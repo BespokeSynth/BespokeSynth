@@ -85,6 +85,7 @@ private:
    
    struct MonomeDevice
    {
+      void CopyFrom(MonomeDevice& other) { id = other.id; product = other.product; port = other.port; }
       string id;
       string product;
       int port;
@@ -95,7 +96,7 @@ private:
    
    MidiDeviceListener* mListener;
    DropdownList* mListForMidiController;
-   MonomeDevice* mLastConnectedDevice;
+   MonomeDevice mLastConnectedDeviceInfo;
 };
 
 #endif /* defined(__modularSynth__Monome__) */

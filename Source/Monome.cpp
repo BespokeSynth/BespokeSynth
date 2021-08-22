@@ -39,7 +39,6 @@ Monome::Monome(MidiDeviceListener* listener)
 , mJustRequestedDeviceList(false)
 , mListener(listener)
 , mListForMidiController(nullptr)
-, mLastConnectedDevice(nullptr)
 {
 }
 
@@ -162,7 +161,16 @@ void Monome::ConnectToDevice(string deviceDesc)
    }
    
    mPrefix = device->id;
-   mLastConnectedDevice = device;
+   mLastConnectedDeviceInfo.CopyFrom(*device);
+   
+   if (mListForMidiController != nullptr)
+   {
+      for (int i=0; i<mListForMidiController->GetNumValues(); ++i)
+      {
+         if (mListForMidiController->GetLabel(i) == device->GetDescription())
+            mListForMidiController->SetValueDirect(i);
+      }
+   }
    
    mToMonome.connect(HOST, device->port);
    mHasMonome = true;
@@ -194,8 +202,8 @@ void Monome::ConnectToDevice(string deviceDesc)
 
 bool Monome::Reconnect()
 {
-   if (mLastConnectedDevice != nullptr)
-      ConnectToDevice(mLastConnectedDevice->GetDescription());
+   if (mLastConnectedDeviceInfo.id != "")
+      ConnectToDevice(mLastConnectedDeviceInfo.GetDescription());
    return mHasMonome;
 }
 
@@ -296,8 +304,8 @@ void Monome::SaveState(FileStreamOut& out)
    out << kSaveStateRev;
    
    string connectedDeviceDesc = "";
-   if (mLastConnectedDevice != nullptr)
-      connectedDeviceDesc = mLastConnectedDevice->GetDescription();
+   if (mLastConnectedDeviceInfo.id != "")
+      connectedDeviceDesc = mLastConnectedDeviceInfo.GetDescription();
    out << connectedDeviceDesc;
 }
 
