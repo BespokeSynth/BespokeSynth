@@ -247,6 +247,11 @@ private:
    NoteInputMode mNoteInputMode;
    bool mHasExternalPulseSource;
    bool mPush2Connected;
+   float mRandomizationAmount;
+   FloatSlider* mRandomizationAmountSlider;
+   float mRandomizationDensity;
+   FloatSlider* mRandomizationDensitySlider;
+   ClickButton* mRandomizeButton;
 
    TransportListenerInfo* mTransportListenerInfo;
 };

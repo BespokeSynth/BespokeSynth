@@ -535,6 +535,8 @@ midicontroller~get midi input from external devices. to get a nice display in th
 ~pageless~should this connection work across all pages of the midicontroller?
 ~ x ~delete this connection
 ~copy~duplicate this connection
+~layout~which layout file should we use for this controller? these can be created in your Documents/BespokeSynth/controllers folder.
+~monome~which monome should we use?
 
 
 
@@ -575,6 +577,9 @@ drumsequencer~step sequencer intended for drums. hold shift when dragging on the
 ~metastep~patch a grid in here from a "midicontroller" module to control the "meta step". I forget what this does. oops.
 ~rowpitch*~output pitch for this row
 ~offset*~shift row forward/backward in time. try making your snares a little early, your hats a little late, etc.
+~randomize~randomize the sequence
+~r den~density of the randomizer output. the higher this is, the busier the random output will be.
+~r amt~the chance that each step will change when being randomized. low values will only change a small amount of the sequence, high values will replace more of the sequence.
 
 
 helpdisplay~displays help information

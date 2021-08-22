@@ -63,6 +63,8 @@ StepSequencer::StepSequencer()
 , mNoteInputMode(NoteInputMode::PlayStepIndex)
 , mHasExternalPulseSource(false)
 , mPush2Connected(false)
+, mRandomizationAmount(1)
+, mRandomizationDensity(.25f)
 {
    mFlusher.SetInterval(mStepInterval);
    
@@ -84,6 +86,9 @@ void StepSequencer::CreateUIControls()
    mGrid = new UIGrid(40,45,180,150,16,NUM_STEPSEQ_ROWS, this);
    mStrengthSlider = new FloatSlider(this,"str",87,22,50,15,&mStrength,0,1,2);
    mUseStrengthSliderCheckbox = new Checkbox(this,"use str",139,22,&mUseStrengthSlider);
+   mRandomizeButton = new ClickButton(this, "randomize", 160, 22);
+   mRandomizationDensitySlider = new FloatSlider(this, "r den", mRandomizeButton, kAnchor_Right, 65, 15, &mRandomizationDensity, 0, 1, 2);
+   mRandomizationAmountSlider = new FloatSlider(this, "r amt", mRandomizationDensitySlider, kAnchor_Right, 65, 15, &mRandomizationAmount, 0, 1, 2);
    mNumMeasuresSlider = new IntSlider(this, "measures", 5, 22, 80, 15, &mNumMeasures, 1, 4);
    mPresetDropdown = new DropdownList(this,"preset",5,4,&mPreset);
    mGridYOffDropdown = new DropdownList(this,"yoff",240,20,&mGridYOff);
@@ -471,6 +476,9 @@ void StepSequencer::DrawModule()
    mGridControlTarget->Draw();
    mVelocityGridController->Draw();
    mMetaStepGridController->Draw();
+   mRandomizationAmountSlider->Draw();
+   mRandomizationDensitySlider->Draw();
+   mRandomizeButton->Draw();
    
    float gridX, gridY;
    mGrid->GetPosition(gridX, gridY, true);
@@ -569,7 +577,7 @@ void StepSequencer::Resize(float w, float h)
    float extraH = 50;
    if (mAdjustOffsets)
       extraW += 100;
-   mGrid->SetDimensions(MAX(w - extraW, 185), MAX(h - extraH, 150));
+   mGrid->SetDimensions(MAX(w - extraW, 185), MAX(h - extraH, 46 + 13 * mNumRows));
 }
 
 void StepSequencer::OnClicked(int x, int y, bool right)
@@ -953,6 +961,22 @@ void StepSequencer::ButtonClicked(ClickButton* button)
          for (int col=start; col != end; col-=shift)
             mGrid->SetVal(col, row, mGrid->GetVal(col-shift,row));
          mGrid->SetVal(end, row, startVal);
+      }
+   }
+   if (button == mRandomizeButton)
+   {
+      for (int row=0; row < mGrid->GetRows(); ++row)
+      {
+         for (int col=0; col < mGrid->GetCols(); ++col)
+         {
+            if (ofRandom(1) < mRandomizationAmount)
+            {
+               float value = 0;
+               if (ofRandom(1) < mRandomizationDensity)
+                  value = ofRandom(1);
+               mGrid->SetVal(col, row, value);
+            }
+         }
       }
    }
 }
