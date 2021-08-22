@@ -84,7 +84,7 @@ PatchCable* PatchCableSource::AddPatchCable(IClickable* target)
 {
    for (auto cable : mPatchCables)
    {
-      if (cable->GetTarget() == target)
+      if (cable != nullptr && cable->GetTarget() == target)
          return nullptr;
    }
    
@@ -173,20 +173,23 @@ void PatchCableSource::UpdatePosition(bool parentMinimized)
          int count = 0;
          for (auto cable : mPatchCables)
          {
-            if (cable->IsDragging())
+            if (cable != nullptr)
             {
-               centerOfMass.x += TheSynth->GetMouseX(mOwner->GetOwningContainer());
-               centerOfMass.y += TheSynth->GetMouseY(mOwner->GetOwningContainer());
-               ++count;
-            }
-            else if (cable->GetTarget())
-            {
-               float targetX,targetY,targetW,targetH;
-               cable->GetTarget()->GetPosition(targetX, targetY);
-               cable->GetTarget()->GetDimensions(targetW, targetH);
-               centerOfMass.x += targetX + targetW / 2;
-               centerOfMass.y += targetY + targetH / 2;
-               ++count;
+               if (cable->IsDragging())
+               {
+                  centerOfMass.x += TheSynth->GetMouseX(mOwner->GetOwningContainer());
+                  centerOfMass.y += TheSynth->GetMouseY(mOwner->GetOwningContainer());
+                  ++count;
+               }
+               else if (cable->GetTarget())
+               {
+                  float targetX,targetY,targetW,targetH;
+                  cable->GetTarget()->GetPosition(targetX, targetY);
+                  cable->GetTarget()->GetDimensions(targetW, targetH);
+                  centerOfMass.x += targetX + targetW / 2;
+                  centerOfMass.y += targetY + targetH / 2;
+                  ++count;
+               }
             }
          }
          centerOfMass.x /= count;
@@ -267,7 +270,7 @@ void PatchCableSource::Render()
 
    for (int i = 0; i < (int)mPatchCables.size() || i==0; ++i)
    {
-      if (i < (int)mPatchCables.size())
+      if (i < (int)mPatchCables.size() && mPatchCables[i] != nullptr)
       {
          mPatchCables[i]->SetSourceIndex(i);
 
@@ -287,7 +290,7 @@ void PatchCableSource::Render()
 
       if (mDrawPass == DrawPass::kCables && (mPatchCableDrawMode != kPatchCableDrawMode_CablesOnHoverOnly || mHoverIndex != -1))
       {
-         if (i < (int)mPatchCables.size())
+         if (i < (int)mPatchCables.size() && mPatchCables[i] != nullptr)
             mPatchCables[i]->Draw();
 
          if (mHoverIndex == i)
@@ -423,8 +426,11 @@ bool PatchCableSource::MouseMoved(float x, float y)
    
    for (size_t i=0; i<mPatchCables.size(); ++i)
    {
-      mPatchCables[i]->SetHoveringOnSource(i == mHoverIndex);
-      mPatchCables[i]->NotifyMouseMoved(x, y);
+      if (mPatchCables[i] != nullptr)
+      {
+         mPatchCables[i]->SetHoveringOnSource(i == mHoverIndex);
+         mPatchCables[i]->NotifyMouseMoved(x, y);
+      }
    }
    
    return false;
@@ -480,7 +486,8 @@ bool PatchCableSource::TestClick(int x, int y, bool right, bool testOnly /* = fa
          }
          else
          {
-            mPatchCables[mHoverIndex]->Grab();
+            if (mPatchCables[mHoverIndex] != nullptr)
+               mPatchCables[mHoverIndex]->Grab();
          }
       }
       return true;
@@ -597,7 +604,7 @@ void PatchCableSource::KeyPressed(int key, bool isRepeat)
    {
       for (auto cable : mPatchCables)
       {
-         if (cable == PatchCable::sActivePatchCable)
+         if (cable != nullptr && cable == PatchCable::sActivePatchCable)
          {
             RemovePatchCable(cable);
             break;
@@ -610,8 +617,11 @@ void PatchCableSource::RemovePatchCable(PatchCable* cable)
 {
    mOwner->PreRepatch(this);
    mAudioReceiver = nullptr;
-   RemoveFromVector(dynamic_cast<INoteReceiver*>(cable->GetTarget()), mNoteReceivers);
-   RemoveFromVector(dynamic_cast<IPulseReceiver*>(cable->GetTarget()), mPulseReceivers);
+   if (cable != nullptr)
+   {
+      RemoveFromVector(dynamic_cast<INoteReceiver*>(cable->GetTarget()), mNoteReceivers);
+      RemoveFromVector(dynamic_cast<IPulseReceiver*>(cable->GetTarget()), mPulseReceivers);
+   }
    RemoveFromVector(cable, mPatchCables);
    mOwner->PostRepatch(this, false);
    delete cable;
@@ -629,7 +639,7 @@ void PatchCableSource::SetTarget(IClickable* target)
    {
       if (mPatchCables.empty())
          AddPatchCable(target);
-      else if (mPatchCables[0]->GetTarget() != target)
+      else if (mPatchCables[0] != nullptr && mPatchCables[0]->GetTarget() != target)
          SetPatchCableTarget(mPatchCables[0], target, false);
    }
    else
@@ -642,7 +652,7 @@ void PatchCableSource::SetTarget(IClickable* target)
 
 IClickable* PatchCableSource::GetTarget() const
 {
-   if (mPatchCables.empty())
+   if (mPatchCables.empty() || mPatchCables[0] == nullptr)
       return nullptr;
    else
       return mPatchCables[0]->GetTarget();
