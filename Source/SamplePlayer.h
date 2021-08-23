@@ -133,6 +133,7 @@ private:
    FloatSlider* mVolumeSlider;
    float mSpeed;
    float mPlaySpeed;
+   float mCuePointSpeed;
    FloatSlider* mSpeedSlider;
    ClickButton* mPlayButton;
    ClickButton* mPauseButton;

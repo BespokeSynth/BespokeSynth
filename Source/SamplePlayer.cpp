@@ -363,7 +363,7 @@ void SamplePlayer::Process(double time)
       }
       else
       {
-         mPlaySpeed = ofLerp(mPlaySpeed, mSpeed, kBlendSpeed);
+         mPlaySpeed = ofLerp(mPlaySpeed, mSpeed * mCuePointSpeed, kBlendSpeed);
       }
       mSample->SetRate(mPlaySpeed);
       
@@ -438,8 +438,8 @@ void SamplePlayer::PlayCuePoint(double time, int index, int velocity, float spee
       float startSeconds, lengthSeconds, speed;
       GetPlayInfoForPitch(index, startSeconds, lengthSeconds, speed);
       mSample->SetPlayPosition(((gTime - time) / 1000 + startSeconds + startOffsetSeconds) * gSampleRate * mSample->GetSampleRateRatio());
+      mCuePointSpeed = speed * speedMult;
       mPlay = true;
-      mSpeed = speed * speedMult;
       mAdsr.Clear();
       mAdsr.Start(time, velocity / 127.0f);
       if (lengthSeconds > 0)
@@ -488,7 +488,7 @@ void SamplePlayer::AutoSlice(int slices)
       {
          mSampleCuePoints[i].startSeconds = sliceLengthSeconds *i;
          mSampleCuePoints[i].lengthSeconds = sliceLengthSeconds;
-         mSampleCuePoints[i].speed = mSpeed;
+         mSampleCuePoints[i].speed = 1;
       }
       else
       {
@@ -548,6 +548,7 @@ void SamplePlayer::ButtonClicked(ClickButton *button)
    {
       if (mRecord == false)
       {
+         mCuePointSpeed = 1;
          mPlay = true;
          mAdsr.Clear();
          mAdsr.Start(gTime + gBufferSize*gInvSampleRateMs, 1);
@@ -843,6 +844,7 @@ void SamplePlayer::OnClicked(int x, int y, bool right)
    if (y > 60 && y < mHeight - 20 && mSample != nullptr && gHoveredUIControl == nullptr)
    {
       SwitchAndRamp();
+      mCuePointSpeed = 1;
       mPlay = true;
       mAdsr.Clear();
       mAdsr.Start(gTime + gBufferSizeMs, 1);
@@ -928,7 +930,7 @@ bool SamplePlayer::MouseMoved(float x, float y)
 void SamplePlayer::SetCuePointForX(float mouseX)
 {
    mSampleCuePoints[mActiveCuePointIndex].startSeconds = GetPlayPositionForMouse(mouseX) / (gSampleRate * mSample->GetSampleRateRatio());
-   mSampleCuePoints[mActiveCuePointIndex].speed = mSpeed;
+   mSampleCuePoints[mActiveCuePointIndex].speed = 1;
 }
 
 void SamplePlayer::MouseReleased()
