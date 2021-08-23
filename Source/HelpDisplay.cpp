@@ -85,7 +85,7 @@ void HelpDisplay::DrawModule()
    ofRect(0,0,mWidth,mHeight);
    ofPopStyle();
 
-   DrawTextLeftJustify(string(__DATE__) + " " + string(__TIME__), mWidth-5, 12);
+   DrawTextLeftJustify(JUCEApplication::getInstance()->getApplicationVersion().toStdString() + " (" + string(__DATE__) + " " + string(__TIME__) + ")", mWidth-5, 12);
    
    mShowTooltipsCheckbox->Draw();
    mDumpModuleInfoButton->SetShowing(GetKeyModifiers() == kModifier_Shift);

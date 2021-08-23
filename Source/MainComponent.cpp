@@ -38,6 +38,8 @@ public:
    , mSpaceMouseReader(&mSynth)
 #endif
    {
+      ofLog() << "bespoke synth " << JUCEApplication::getInstance()->getApplicationVersion();
+      
       openGLContext.setOpenGLVersionRequired(juce::OpenGLContext::openGL3_2);
       openGLContext.setContinuousRepainting(false);
 
