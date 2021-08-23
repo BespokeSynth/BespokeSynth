@@ -260,7 +260,6 @@ ModuleFactory::ModuleFactory()
    REGISTER(LaunchpadKeyboard, gridkeyboard, kModuleType_Instrument);
    REGISTER(FMSynth, fmsynth, kModuleType_Synth);
    REGISTER(MidiController, midicontroller, kModuleType_Instrument);
-   REGISTER(Autotalent, autotalent, kModuleType_Audio);
    REGISTER(ScaleDetect, scaledetect, kModuleType_Note);
    REGISTER(KarplusStrong, karplusstrong, kModuleType_Synth);
    REGISTER(WhiteKeys, whitekeys, kModuleType_Note);
@@ -341,7 +340,6 @@ ModuleFactory::ModuleFactory()
    REGISTER(ScaleDegree, scaledegree, kModuleType_Note);
    REGISTER(NoteChainNode, notechain, kModuleType_Instrument);
    REGISTER(NoteDelayer, notedelayer, kModuleType_Note);
-   REGISTER(TimelineControl, timelinecontrol, kModuleType_Other);
    REGISTER(VelocityScaler, velocityscaler, kModuleType_Note);
    REGISTER(KeyboardDisplay, keyboarddisplay, kModuleType_Instrument);
    REGISTER(Ramper, ramper, kModuleType_Modulator);
@@ -350,7 +348,6 @@ ModuleFactory::ModuleFactory()
    REGISTER(NoteHumanizer, notehumanizer, kModuleType_Note);
    REGISTER(VolcaBeatsControl, volcabeatscontrol, kModuleType_Note);
    REGISTER(RadioSequencer, radiosequencer, kModuleType_Other);
-   REGISTER(TakeRecorder, takerecorder, kModuleType_Audio);
    REGISTER(Splitter, splitter, kModuleType_Audio);
    REGISTER(Panner, panner, kModuleType_Audio);
    REGISTER(SamplePlayer, sampleplayer, kModuleType_Synth);
@@ -434,9 +431,11 @@ ModuleFactory::ModuleFactory()
    REGISTER(GridSliders, gridsliders, kModuleType_Modulator);
 
    //REGISTER_EXPERIMENTAL(MidiPlayer, midiplayer, kModuleType_Instrument);
-   REGISTER_EXPERIMENTAL(LoopStorer, loopstorer, kModuleType_Other);
-   REGISTER_EXPERIMENTAL(PitchChorus, pitchchorus, kModuleType_Audio);
-
+   REGISTER_HIDDEN(Autotalent, autotalent, kModuleType_Audio);
+   REGISTER_HIDDEN(TakeRecorder, takerecorder, kModuleType_Audio);
+   REGISTER_HIDDEN(LoopStorer, loopstorer, kModuleType_Other);
+   REGISTER_HIDDEN(PitchChorus, pitchchorus, kModuleType_Audio);
+   REGISTER_HIDDEN(TimelineControl, timelinecontrol, kModuleType_Other);
    REGISTER_HIDDEN(ComboGridController, combogrid, kModuleType_Other);
    REGISTER_HIDDEN(VSTPlugin, vstplugin, kModuleType_Synth);
    REGISTER_HIDDEN(SampleFinder, samplefinder, kModuleType_Audio);
