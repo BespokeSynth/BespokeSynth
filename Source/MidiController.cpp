@@ -1513,8 +1513,10 @@ ControlLayoutElement& MidiController::GetLayoutControl(int control, MidiMessageT
       index = control;
    else if (type == kMidiMessage_Note)
       index = control + 128;
+   else if (type == kMidiMessage_Program)
+      index = control + 128 + 128;
    else if (type == kMidiMessage_PitchBend)
-      index = 128 + 128;
+      index = 128 + 128 + 128;
    return mLayoutControls[index];
 }
 
