@@ -1521,6 +1521,11 @@ ControlLayoutElement& MidiController::GetLayoutControl(int control, MidiMessageT
 void MidiController::LoadLayout(string filename)
 {
    mLastLoadedLayoutFile = ofToDataPath("controllers/"+filename);
+   for (int i = 0; i < mLayoutFileDropdown->GetNumValues(); ++i)
+   {
+      if (filename == mLayoutFileDropdown->GetLabel(i))
+         mLayoutFileIndex = i;
+   }
    
    for (int i = 0; i < NUM_LAYOUT_CONTROLS; ++i)
    {
