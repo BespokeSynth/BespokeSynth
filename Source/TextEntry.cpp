@@ -392,6 +392,21 @@ void TextEntry::UpdateDisplayString()
       StringCopy(mString, ofToString(*mVarFloat).c_str(), MAX_TEXTENTRY_LENGTH);
 }
 
+void TextEntry::SetValue(float value)
+{
+   if (mType == kTextEntry_Int)
+   {
+      *mVarInt = value;
+      UpdateDisplayString();
+   }
+
+   if (mType == kTextEntry_Float)
+   {
+      *mVarFloat = value;
+      UpdateDisplayString();
+   }
+}
+
 void TextEntry::AcceptEntry(bool pressedEnter)
 {
    if (!pressedEnter && mRequireEnterToAccept)

@@ -250,7 +250,7 @@ struct GridLayout
    GridControlTarget* mGridControlTarget[MAX_MIDI_PAGES];
 };
 
-#define NUM_LAYOUT_CONTROLS 128+128+1+1 //128 notes, 128 ccs, 1 pitch bend, 1 dummy
+#define NUM_LAYOUT_CONTROLS 128+128+128+1+1 //128 notes, 128 ccs, 128 program change, 1 pitch bend, 1 dummy
 
 class MidiController : public MidiDeviceListener, public IDrawableModule, public IButtonListener, public IDropdownListener, public IRadioButtonListener, public IAudioPoller, public ITextEntryListener, public INoteSource
 {
@@ -385,6 +385,7 @@ private:
    Checkbox* mBindCheckbox;
    bool mTwoWay;
    bool mSendTwoWayOnChange;
+   bool mResendFeedbackOnRelease;
    ClickButton* mAddConnectionButton;
    std::list<MidiNote> mQueuedNotes;
    std::list<MidiControl> mQueuedControls;

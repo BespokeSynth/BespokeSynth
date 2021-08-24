@@ -56,6 +56,7 @@ MidiController::MidiController()
 , mBindCheckbox(nullptr)
 , mTwoWay(true)
 , mSendTwoWayOnChange(true)
+, mResendFeedbackOnRelease(false)
 , mControllerIndex(-1)
 , mLastActivityTime(-9999)
 , mLastConnectedActivityTime(-9999)
@@ -606,6 +607,9 @@ void MidiController::MidiReceived(MidiMessageType messageType, int control, floa
 
          if (!mSendTwoWayOnChange)
             connection->mLastControlValue = int(uicontrol->GetMidiValue() * 127);   //set expected value here, so we don't send the value. otherwise, this will send the input value right back as output. (although, this behavior is desirable for some controllers, hence mSendTwoWayOnChange)
+
+         if (mResendFeedbackOnRelease && value == 0)
+            connection->mLastControlValue = -999;  //force feedback update on release
       }
    }
    
@@ -1513,14 +1517,21 @@ ControlLayoutElement& MidiController::GetLayoutControl(int control, MidiMessageT
       index = control;
    else if (type == kMidiMessage_Note)
       index = control + 128;
+   else if (type == kMidiMessage_Program)
+      index = control + 128 + 128;
    else if (type == kMidiMessage_PitchBend)
-      index = 128 + 128;
+      index = 128 + 128 + 128;
    return mLayoutControls[index];
 }
 
 void MidiController::LoadLayout(string filename)
 {
    mLastLoadedLayoutFile = ofToDataPath("controllers/"+filename);
+   for (int i = 0; i < mLayoutFileDropdown->GetNumValues(); ++i)
+   {
+      if (filename == mLayoutFileDropdown->GetLabel(i))
+         mLayoutFileIndex = i;
+   }
    
    for (int i = 0; i < NUM_LAYOUT_CONTROLS; ++i)
    {
@@ -1584,6 +1595,11 @@ void MidiController::LoadLayout(string filename)
       {
          mSendTwoWayOnChange = mLayoutData["twoway_on_change"].asBool();
          mModuleSaveData.SetBool("twoway_on_change", mSendTwoWayOnChange);
+      }
+      if (!mLayoutData["resend_feedback_on_release"].isNull())
+      {
+         mResendFeedbackOnRelease = mLayoutData["resend_feedback_on_release"].asBool();
+         mModuleSaveData.SetBool("resend_feedback_on_release", mResendFeedbackOnRelease);
       }
       if (!mLayoutData["groups"].isNull())
       {
@@ -2161,6 +2177,7 @@ void MidiController::LoadLayout(const ofxJSONElement& moduleInfo)
    mModuleSaveData.LoadBool("negativeedge",moduleInfo,false);
    mModuleSaveData.LoadBool("incrementalsliders", moduleInfo, false);
    mModuleSaveData.LoadBool("twoway_on_change", moduleInfo, true);
+   mModuleSaveData.LoadBool("resend_feedback_on_release", moduleInfo, false);
    
    mConnectionsJson = moduleInfo["connections"];
 
@@ -2190,6 +2207,7 @@ void MidiController::SetUpFromSaveData()
    UseNegativeEdge(mModuleSaveData.GetBool("negativeedge"));
    mSlidersDefaultToIncremental = mModuleSaveData.GetBool("incrementalsliders");
    mSendTwoWayOnChange = mModuleSaveData.GetBool("twoway_on_change");
+   mResendFeedbackOnRelease = mModuleSaveData.GetBool("resend_feedback_on_release");
    
    BuildControllerList();
    
