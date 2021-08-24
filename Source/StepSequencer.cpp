@@ -408,19 +408,19 @@ void StepSequencer::SetStep(int step, int pitch, int velocity)
 
 int StepSequencer::GetGridControllerRows()
 {
-   if (mPush2Connected)
-      return 8;
    if (mGridControlTarget->GetGridController())
       return mGridControlTarget->GetGridController()->NumRows();
+   if (mPush2Connected)
+      return 8;
    return 8;
 }
 
 int StepSequencer::GetGridControllerCols()
 {
-   if (mPush2Connected)
-      return 8;
    if (mGridControlTarget->GetGridController())
       return mGridControlTarget->GetGridController()->NumCols();
+   if (mPush2Connected)
+      return 8;
    return 8;
 }
 
