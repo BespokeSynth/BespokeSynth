@@ -1044,7 +1044,11 @@ void MidiController::DrawModule()
             {
                ofRect(control.mPosition.x, control.mPosition.y, control.mDimensions.x, control.mDimensions.y, 4);
                
-               if (control.mLastValue > 0)
+               bool on = control.mLastValue > 0;
+               if (control.mType == kMidiMessage_Program)
+                  on = control.mLastValue > 0 && (gTime - control.mLastActivityTime < 250);
+
+               if (on)
                {
                   float fadeAmount = ofClamp(ofLerp(.5f, 1, control.mLastValue), 0, 1);
                   ofPushStyle();
