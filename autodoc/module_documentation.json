@@ -1,4 +1,15 @@
 {
+   "accum" : {
+      "canReceiveAudio" : false,
+      "canReceiveNote" : false,
+      "canReceivePulses" : false,
+      "controls" : {
+         "value" : "output value",
+         "velocity" : "amount to accumulate"
+      },
+      "description" : "accumulate a value over time",
+      "type" : "modulators"
+   },
    "add" : {
       "canReceiveAudio" : false,
       "canReceiveNote" : false,
@@ -78,8 +89,8 @@
       "type" : "pulse"
    },
    "autotalent" : {
-      "canReceiveAudio" : true,
-      "canReceiveNote" : true,
+      "canReceiveAudio" : false,
+      "canReceiveNote" : false,
       "canReceivePulses" : false,
       "controls" : {
          "A" : "[todo]",
@@ -109,15 +120,14 @@
          "smooth" : "[todo]"
       },
       "description" : "[abandoned module, possibly broken]autotune using the \"autotalent\" code",
-      "type" : "audio effects"
+      "type" : "unknown"
    },
    "basiceq" : {
       "canReceiveAudio" : false,
       "canReceiveNote" : false,
       "canReceivePulses" : false,
       "controls" : {
-         "even" : "reset EQ",
-         "grid" : "controls the level of each band"
+         "even" : "reset EQ"
       },
       "description" : "simple multiband EQ",
       "type" : "effect chain"
@@ -177,7 +187,8 @@
       "canReceiveNote" : true,
       "canReceivePulses" : false,
       "controls" : {
-         "capo" : "number of semitones to shift"
+         "capo" : "number of semitones to shift",
+         "retrigger" : "immediately replay current notes when changing the capo amount"
       },
       "description" : "shifts incoming notes by semitones",
       "type" : "note effects"
@@ -240,6 +251,8 @@
       "canReceivePulses" : false,
       "controls" : {
          "attack" : "speed to apply gain reduction",
+         "lookahead" : "how much time to \"look ahead\" to adjust the compression envelope. this necessarily introduces a delay into your output, which could be compensated for by running sequencers slightly early.",
+         "mix" : "amount of compression. lower this value for a \"parallel compression\" effect. you should use this mix slider instead of the effectchain's mix slider, to compensate for lookahead.",
          "output" : "makeup gain, to increase volume",
          "ratio" : "how much gain reduction to apply when the single passes the threshold",
          "release" : "speed to remove gain reduction",
@@ -320,7 +333,9 @@
       "canReceiveNote" : false,
       "canReceivePulses" : false,
       "controls" : {
+         "center input" : "remove dc offset from input signal to distort in a more controlled way",
          "clip" : "cutoff point of distortion, lower values result in more extreme distortion",
+         "fuzz" : "push input signal off-center to distort asymmetrically",
          "preamp" : "signal gain before feeding into distortion",
          "type" : "style of distortion to apply"
       },
@@ -340,7 +355,7 @@
          "envelopedisplay *D" : "envelope decay",
          "envelopedisplay *R" : "envelope release",
          "envelopedisplay *S" : "envelope sustain",
-         "grid" : "[none]",
+         "grid" : "patch a grid in here from a \"midicontroller\" module",
          "hitcategory*" : "folder to choose from, when clicking the \"random\" button. these folders are found in the data/drums/hits/ directory",
          "kit" : "[none]",
          "linkid *" : "if linkid is not -1, silence any other sample with a matching linkid (useful for linking open and closed hats)",
@@ -354,6 +369,7 @@
          "speed" : "global sample speed multiplier",
          "speed *" : "speed of sample",
          "speed rnd" : "global sample speed randomization amount",
+         "start *" : "start offset percentage of sample",
          "test *" : "play this sample",
          "view ms *" : "envelope view length in milliseconds",
          "vol" : "the output volume",
@@ -371,12 +387,15 @@
          "<" : "shift whole pattern one step earlier",
          ">" : "shift whole pattern one step later",
          "column" : "current column, to use for visualizing the step on a midi controller",
-         "grid" : "patch a grid in here from a \"midicontroller\" module to control the grid",
+         "grid" : "patch a grid in here from a \"midicontroller\" module",
          "measures" : "length of the sequence in measures",
          "metastep" : "patch a grid in here from a \"midicontroller\" module to control the \"meta step\". I forget what this does. oops.",
          "offset*" : "shift row forward/backward in time. try making your snares a little early, your hats a little late, etc.",
          "offsets" : "show \"offsets\" sliders",
          "preset" : "select a pattern preset",
+         "r amt" : "the chance that each step will change when being randomized. low values will only change a small amount of the sequence, high values will replace more of the sequence.",
+         "r den" : "density of the randomizer output. the higher this is, the busier the random output will be.",
+         "randomize" : "randomize the sequence",
          "repeat" : "repeat input notes at this rate",
          "rowpitch*" : "output pitch for this row",
          "step" : "length of each step",
@@ -600,7 +619,7 @@
          "u" : "[todo]"
       },
       "description" : "[unfinished, broken]filter focused on controlling formants",
-      "type" : "effect chain"
+      "type" : "unknown"
    },
    "fouronthefloor" : {
       "canReceiveAudio" : false,
@@ -741,7 +760,8 @@
       "canReceiveNote" : true,
       "canReceivePulses" : false,
       "controls" : {
-         "grid" : "patch a grid in here, from a \"midicontroller\" module"
+         "grid" : "patch a grid in here, from a \"midicontroller\" module",
+         "momentary" : "should clicks be treated as momentary inputs?"
       },
       "description" : "generic grid, to be used by \"script\" module, to assist in writing scripts that use grid-based midi controllers",
       "type" : "other"
@@ -753,7 +773,7 @@
       "controls" : {
          "arrangement" : "what style of layout should we use?",
          "ch.latch" : "latch chord button presses",
-         "grid" : "which grid to use",
+         "grid" : "patch a grid in here from a \"midicontroller\" module",
          "latch" : "latch key presses, so you press once to play a note, and press again to release a note",
          "layout" : "keyboard style",
          "octave" : "base octave",
@@ -768,6 +788,17 @@
       "canReceivePulses" : false,
       "description" : "use with a gridkeyboard to display currently playing notes, to visualize chords, arpeggiation, etc.",
       "type" : "note effects"
+   },
+   "gridsliders" : {
+      "canReceiveAudio" : false,
+      "canReceiveNote" : false,
+      "canReceivePulses" : false,
+      "controls" : {
+         "direction" : "should the grid display the sliders vertically, or horizontally?",
+         "grid" : "patch a grid in here from a \"midicontroller\" module"
+      },
+      "description" : "use a grid controller to control multiple sliders",
+      "type" : "modulators"
    },
    "groupcontrol" : {
       "canReceiveAudio" : false,
@@ -785,7 +816,7 @@
       "canReceivePulses" : false,
       "controls" : {
          "help page" : "which page of help information to show",
-         "show tooltips" : "displays these tooltips"
+         "show tooltips" : "displays these tooltips. you can turn these on or off by default in the \"settings\" menu."
       },
       "description" : "displays help information",
       "type" : "unknown"
@@ -815,7 +846,11 @@
          "feedback" : "amount of feedback for resonance",
          "filter" : "amount to filter resonance",
          "invert" : "should the feedback invert?",
+         "lite cpu" : "only recalculate some parameters once per buffer, to reduce CPU load. can make pitch bends and rapid modulation sound worse in some scenarios.",
+         "pitchtone" : "adjust how pitch influences filter amount. a value of zero gives even filtering across the entire pitch range, higher values filter high pitches less, low values filter low pitches less.",
          "source type" : "audio to use for excitation",
+         "vel2env" : "how much velocity should affect excitation attack time",
+         "vel2vol" : "how much velocity should affect voice volume",
          "vol" : "output volume",
          "x att" : "fade in time for excitation audio",
          "x dec" : "fade out time for excitation audio",
@@ -844,6 +879,29 @@
       },
       "description" : "output a modulation value based on the level of incoming audio",
       "type" : "modulators"
+   },
+   "lfo" : {
+      "canReceiveAudio" : false,
+      "canReceiveNote" : false,
+      "canReceivePulses" : false,
+      "controls" : {
+         "bias" : "bias the waveform towards the low or high point",
+         "enable" : "turn on/off modulation",
+         "free rate" : "rate of oscillator running in non-clock-synced time",
+         "high" : "output value at waveform's high point",
+         "interval" : "length of oscillation period",
+         "length" : "proportion of time that should be spent on the waveform cycle",
+         "lite cpu" : "only recalculate some parameters once per buffer, to reduce CPU load. can sound worse in some scenarios, especially with rapid modulation.",
+         "low" : "output value at waveform's low point",
+         "offset" : "phase offset, to make oscillation earlier/later",
+         "osc" : "type of oscillation waveform",
+         "pin" : "make LFO window remain visible",
+         "shuffle" : "adjust the waveoform to have a fast and slow cycle",
+         "soften" : "smooth out the hard edges of square and saw waveforms",
+         "spread" : "spread the waveform out to be closer to the low and high points"
+      },
+      "description" : "modulates a slider with a low-frequency oscillator",
+      "type" : "unknown"
    },
    "linnstrumentcontrol" : {
       "canReceiveAudio" : false,
@@ -951,7 +1009,7 @@
          "snap to pitch" : "snap tempo to nearest value that matches a key",
          "target" : "looper to commit audio to when using the on-buffer capture buttons to the left"
       },
-      "description" : "command center to manage recording into multiple loopers, and allow loop capture in an \"always recording\" fashion",
+      "description" : "command center to manage recording into multiple loopers, and allow retroactive loop capture (i.e., always-on recording)",
       "type" : "audio effects"
    },
    "looperrewriter" : {
@@ -976,7 +1034,21 @@
          "select *" : "[todo]"
       },
       "description" : "[abandoned module, probably broken]store a looper's loops to swap them in and out",
-      "type" : "other"
+      "type" : "unknown"
+   },
+   "m185sequencer" : {
+      "canReceiveAudio" : false,
+      "canReceiveNote" : false,
+      "canReceivePulses" : true,
+      "controls" : {
+         "gate*" : "behavior for each row: \"repeat\" plays every step, \"once\" plays just the first step, \"hold\" holds across all steps, \"rest\" plays no steps",
+         "interval" : "interval per step",
+         "pitch*" : "pitch to use for this row",
+         "pulses*" : "number of steps this row should last",
+         "reset step" : "resets counter to first step"
+      },
+      "description" : "sequencer using the unique paradigm of the the m185 or intellijel metropolis",
+      "type" : "instruments"
    },
    "macroslider" : {
       "canReceiveAudio" : false,
@@ -1000,17 +1072,45 @@
       "description" : "beeps to the beat",
       "type" : "synths"
    },
+   "midicc" : {
+      "canReceiveAudio" : false,
+      "canReceiveNote" : true,
+      "canReceivePulses" : false,
+      "controls" : {
+         "control" : "CC control number",
+         "value" : "outputs a CC value when this changes"
+      },
+      "description" : "outputs midi control change messages to route to a \"midioutput\" module",
+      "type" : "note effects"
+   },
    "midicontroller" : {
       "canReceiveAudio" : false,
       "canReceiveNote" : false,
       "canReceivePulses" : false,
       "controls" : {
+         " x " : "delete this connection",
          "add" : "add a mapping manually",
          "bind (hold shift)" : "when this is enabled, you can map a midi input to a UI control by hovering over a UI control, holding shift, and then using desired midi input",
+         "blink" : "when the targeted control is enabled, send alternating on/off messages, to blink the associated LED",
+         "channel" : "which channel to pay attention to",
+         "control" : "pitch or control to refer to",
          "controller" : "midi device to use",
+         "controltype" : "how this control should modify the target.\n -slider: set the value interpolated between \"midi off\" and \"midi on\" to the slider's value\n -set: set the specified value directly when this button is pressed\n -release: set the specified value directly when this button is released\n -toggle: toggle the control's value to on/off when this button is pressed\n -direct: set the control to the literal midi input value",
+         "copy" : "duplicate this connection",
+         "feedback" : "which cc or note should we send the feedback to?",
+         "increment" : "when \"controltype\" is \"set\" or \"release\", the targeted control is incremented by this amount (and the \"value\" field is ignored). when \"controltype\" is \"slider\", the targeted control is changed by this amount in the direction the control was changed (this setting is useful for \"infinite encoders\")",
+         "layout" : "which layout file should we use for this controller? these can be created in your Documents/BespokeSynth/controllers folder.",
          "mappingdisplay" : "which mapping view to see",
+         "messagetype" : "type of midi message",
+         "midi off" : "the lower end of the midi range. send this value when the targeted control is off. this also controls the lower end of the slider range. set midi off to be higher than midi on to reverse a slider's direction.",
+         "midi on" : "the upper end of the midi range. send this value when the targeted control is on. this also controls the upper end of the slider range. set midi off to be higher than midi on to reverse a slider's direction.",
+         "monome" : "which monome should we use?",
          "osc input port" : "port to use for osccontroller input",
-         "page" : "select which page of midi controls to use. each page acts like an independent midi controller, so you can use pages to allow one midi controller to switch between controlling many things"
+         "page" : "select which page of midi controls to use. each page acts like an independent midi controller, so you can use pages to allow one midi controller to switch between controlling many things",
+         "pageless" : "should this connection work across all pages of the midicontroller?",
+         "path" : "path to the control that should be affected",
+         "twoway" : "should we send feedback to the controller? (to control the LEDs associated with the button/knob)",
+         "value" : "the value to set"
       },
       "description" : "get midi input from external devices. to get a nice display in the \"layout\" view, create a .json file with the same name as your controller to describe your controller's layout, and place it in your \"data/controllers\" directory. look at the other files in that directory for examples.",
       "type" : "instruments"
@@ -1022,7 +1122,7 @@
       "controls" : {
          "controller" : "where to send midi to"
       },
-      "description" : "send midi to an external destination",
+      "description" : "send midi to an external destination, such as hardware or other software",
       "type" : "note effects"
    },
    "modulationvizualizer" : {
@@ -1069,6 +1169,33 @@
          "vibrato" : "amount of pitch bend"
       },
       "description" : "convert note mod wheel input rhythmic pitch bend",
+      "type" : "note effects"
+   },
+   "mpesmoother" : {
+      "canReceiveAudio" : false,
+      "canReceiveNote" : true,
+      "canReceivePulses" : false,
+      "controls" : {
+         "modwheel" : "amount to smooth incoming modwheel",
+         "pitch" : "amount to smooth incoming pitchbend",
+         "pressure" : "amount to smooth incoming pressure"
+      },
+      "description" : "[no tooltip]",
+      "type" : "note effects"
+   },
+   "mpetweaker" : {
+      "canReceiveAudio" : false,
+      "canReceiveNote" : true,
+      "canReceivePulses" : false,
+      "controls" : {
+         "modwheel mult" : "amount to multiply incoming modwheel",
+         "modwheel offset" : "amount to offset incoming modwheel",
+         "pitchbend mult" : "amount to multiply incoming pitchbend",
+         "pitchbend offset" : "amount to offset incoming pitchbend",
+         "pressure mult" : "amount to multiply incoming pressure",
+         "pressure offset" : "amount to offset incoming pressure"
+      },
+      "description" : "adjust incoming MPE modulation values",
       "type" : "note effects"
    },
    "mult" : {
@@ -1358,6 +1485,17 @@
       "description" : "only allows notes through within a certain pitch range",
       "type" : "note effects"
    },
+   "noteratchet" : {
+      "canReceiveAudio" : false,
+      "canReceiveNote" : true,
+      "canReceivePulses" : false,
+      "controls" : {
+         "duration" : "total length of time repeats should last",
+         "subdivision" : "length of each repeat"
+      },
+      "description" : "rapidly repeat an input note over a duration",
+      "type" : "note effects"
+   },
    "noterouter" : {
       "canReceiveAudio" : false,
       "canReceiveNote" : true,
@@ -1376,6 +1514,7 @@
          "<" : "shift the sequence to the left",
          ">" : "shift the sequence to the right",
          "clear" : "clear all steps",
+         "grid" : "patch a grid in here from a \"midicontroller\" module",
          "interval" : "note length",
          "len" : "randomize the length of each step's note.",
          "len*" : "length for this column",
@@ -1386,7 +1525,9 @@
          "pitch" : "randomize pitches in the sequence. hold shift to constrain the randomization to only pick roots and fifths.",
          "tone*" : "pitch for this column",
          "vel" : "randomize the velocity of each step's note.",
-         "vel*" : "velocity for this column"
+         "vel*" : "velocity for this column",
+         "x offset" : "x offset of attached grid controller",
+         "y offset" : "y offset of attached grid controller"
       },
       "description" : "looping sequence of notes at an interval. pair with a \"pulser\" module for more interesting step control. hold \"shift\" to adjust step length.",
       "type" : "instruments"
@@ -1400,6 +1541,26 @@
       },
       "description" : "output a note based on a detected pitch",
       "type" : "instruments"
+   },
+   "notesorter" : {
+      "canReceiveAudio" : false,
+      "canReceiveNote" : true,
+      "canReceivePulses" : false,
+      "controls" : {
+         "pitch *" : "pitch to use for this outlet"
+      },
+      "description" : "separate notes by pitch. any unmapped pitches go through the standard outlet.",
+      "type" : "note effects"
+   },
+   "notestepper" : {
+      "canReceiveAudio" : false,
+      "canReceiveNote" : true,
+      "canReceivePulses" : false,
+      "controls" : {
+         "length" : "length of the sequence"
+      },
+      "description" : "output notes through a round robin of patch cables, to create sequential variety",
+      "type" : "note effects"
    },
    "notestream" : {
       "canReceiveAudio" : false,
@@ -1472,6 +1633,7 @@
          "envfilterS" : "filter envelope sustain",
          "fmax" : "frequency cutoff of lowpass filter at the max of the envelope. set this slider to the max to disable the filter",
          "fmin" : "frequency cutoff of lowpass filter at the min of the envelope",
+         "lite cpu" : "only recalculate some parameters once per buffer, to reduce CPU load. can make pitch bends and rapid modulation sound worse in some scenarios.",
          "mult" : "multiply frequency of incoming pitch",
          "osc" : "oscillator type",
          "phase" : "phase offset of oscillator, and phase offset between unison voices. useful to patch into with a very fast modulator, to achieve phase modulation.",
@@ -1536,14 +1698,14 @@
       "type" : "note effects"
    },
    "pitchchorus" : {
-      "canReceiveAudio" : true,
-      "canReceiveNote" : true,
+      "canReceiveAudio" : false,
+      "canReceiveNote" : false,
       "canReceivePulses" : false,
       "controls" : {
          "passthrough" : "should the original audio pass through?"
       },
       "description" : "output pitch-shifted version of input audio, based on input midi notes. pitch 60 is the reference pitch used.",
-      "type" : "audio effects"
+      "type" : "unknown"
    },
    "pitchdive" : {
       "canReceiveAudio" : false,
@@ -1625,7 +1787,7 @@
       "canReceiveNote" : true,
       "canReceivePulses" : false,
       "controls" : {
-         "grid" : "[none]",
+         "grid" : "patch a grid in here from a \"midicontroller\" module",
          "interval" : "the step size",
          "link columns" : "if the mute/delete control should be shared across the entire column",
          "load*" : "load the sequence stored in this slot",
@@ -1839,7 +2001,7 @@
       "canReceiveNote" : false,
       "canReceivePulses" : false,
       "description" : "use an ableton push 2 to control bespoke's interface",
-      "type" : "instruments"
+      "type" : "other"
    },
    "quantizer" : {
       "canReceiveAudio" : false,
@@ -1857,7 +2019,7 @@
       "canReceiveNote" : false,
       "canReceivePulses" : false,
       "controls" : {
-         "grid" : "[none]",
+         "grid" : "patch a grid in here from a \"midicontroller\" module",
          "interval" : "rate to advance",
          "length" : "length of sequence"
       },
@@ -1904,14 +2066,15 @@
       "description" : "modulate a signal's amplitude at a frequency",
       "type" : "audio effects"
    },
-   "samplebank" : {
+   "samplebrowser" : {
       "canReceiveAudio" : false,
       "canReceiveNote" : false,
       "canReceivePulses" : false,
       "controls" : {
-         "sample" : "[todo]"
+         " < " : "previous page",
+         " > " : "next page"
       },
-      "description" : "[abandoned module, probably broken]point to a collection of samples to be used by other modules",
+      "description" : "browse your system for samples. drag samples from here to your desired targets (sampleplayer, drumplayer, seaofgrain, etc)",
       "type" : "other"
    },
    "samplecanvas" : {
@@ -1946,41 +2109,19 @@
       "description" : "[work in progress]record audio to short clips. recording starts when audio passes a threshold.",
       "type" : "audio effects"
    },
-   "sampleeditor" : {
-      "canReceiveAudio" : false,
-      "canReceiveNote" : true,
-      "canReceivePulses" : false,
-      "controls" : {
-         "edit" : "[todo]",
-         "end" : "[todo]",
-         "keep pitch" : "[todo]",
-         "loop" : "[todo]",
-         "num bars" : "[todo]",
-         "off" : "[todo]",
-         "pad end" : "[todo]",
-         "pitch shift" : "[todo]",
-         "play" : "[todo]",
-         "quickstart" : "[todo]",
-         "samples" : "[todo]",
-         "start" : "[todo]",
-         "volume" : "[todo]",
-         "write" : "[todo]"
-      },
-      "description" : "[abandoned work in progress, possibly broken] sample editor for creating loops",
-      "type" : "synths"
-   },
    "sampleplayer" : {
       "canReceiveAudio" : true,
       "canReceiveNote" : true,
       "canReceivePulses" : false,
       "controls" : {
-         "16n" : "auto-slice 16 sixteenth notes, starting from the current cue",
-         "4n" : "auto-slice 4 quarter notes, starting from the current cue",
-         "8n" : "auto-slice 8 eighth notes, starting from the current cue",
+         "16" : "auto-slice 16 slices",
+         "32" : "auto-slice 32 slices",
+         "4" : "auto-slice 4 slices",
+         "8" : "auto-slice 8 slices",
          "append to rec" : "when recording, append to the previous recording, rather than clearing the sample first",
          "attack" : "speed at which gate blends open",
          "click sets cue" : "when true, clicking on the waveform will set the start position of the current cue",
-         "cue length" : "length in seconds of the current cue. a value of zero will play to the end of the sample.",
+         "cue len" : "length in seconds of the current cue. a value of zero will play to the end of the sample.",
          "cue speed" : "playback speed of the current cue",
          "cue start" : "start point in seconds of the current cue",
          "cuepoint" : "sets the current cue to edit",
@@ -1994,7 +2135,6 @@
          "record" : "record audio input into our sample buffer. clears the current sample.",
          "record as clips" : "when recording, only record when there is enough input to open the gate, and mark up each recorded segment with cue points",
          "release" : "speed at which gate blends closed",
-         "samples" : "select a sample from the current sample bank [sample banks not currently well-supported]",
          "save" : "save this sample to a file",
          "searchresult*" : "click to download this youtube search result. downloading long videos may take a while.",
          "select played" : "when true, any cue point played via incoming notes will become the current cue",
@@ -2007,7 +2147,7 @@
          "youtube" : "download the audio of the youtube URL currently on your clipboard",
          "yt:" : "search youtube for this string"
       },
-      "description" : "sample playback with triggerable cue points, clip extraction, and youtube search/download functionality. if you have a youtube URL in your clipboard, a button will appear to allow you to download the audio.",
+      "description" : "sample playback with triggerable cue points, clip extraction, and youtube search/download functionality. resize this module larger to access additional features. if you have a youtube URL in your clipboard, a button will appear to allow you to download the audio.",
       "type" : "synths"
    },
    "sampler" : {
@@ -2038,7 +2178,7 @@
          "duplicate" : "what enabled, duplicates last pressed sample onto any pressed grid squares",
          "edit" : "enable controls to adjust recorded sample for last pressed grid square",
          "end" : "sample end",
-         "grid" : "[none]",
+         "grid" : "patch a grid in here from a \"midicontroller\" module",
          "passthrough" : "should the incoming audio pass through to the output?",
          "start" : "sample start",
          "vol" : "the output volume"
@@ -2067,7 +2207,8 @@
       "canReceiveNote" : true,
       "canReceivePulses" : false,
       "controls" : {
-         "degree" : "amount to transpose"
+         "degree" : "amount to transpose",
+         "retrigger" : "immediately replay current notes when changing the transpose amount"
       },
       "description" : "transpose input based on current scale",
       "type" : "note effects"
@@ -2088,6 +2229,7 @@
       "canReceiveNote" : true,
       "canReceivePulses" : true,
       "controls" : {
+         "?" : "show scripting reference",
          "a" : "variable for the script to use, can be modulation by other sources",
          "b" : "variable for the script to use, can be modulation by other sources",
          "c" : "variable for the script to use, can be modulation by other sources",
@@ -2247,7 +2389,7 @@
          "free" : "stutter with the settings specified by the following sliders",
          "free length" : "length in seconds for \"free\" stutter mode",
          "free speed" : "rate for \"free\" stutter mode",
-         "grid" : "[none]",
+         "grid" : "patch a grid in here from a \"midicontroller\" module",
          "half note" : "half note stutter",
          "half speed" : "stutter at half speed, low pitched",
          "quarter" : "quarter note stutter",
@@ -2283,14 +2425,14 @@
       "type" : "note effects"
    },
    "takerecorder" : {
-      "canReceiveAudio" : true,
+      "canReceiveAudio" : false,
       "canReceiveNote" : false,
       "canReceivePulses" : false,
       "controls" : {
          "start" : "[todo]"
       },
       "description" : "[abandoned module, possibly broken]",
-      "type" : "audio effects"
+      "type" : "unknown"
    },
    "timelinecontrol" : {
       "canReceiveAudio" : false,
@@ -2303,7 +2445,7 @@
          "measure" : "[todo]"
       },
       "description" : "[abandoned module, possibly broken] global timeline control to position transport",
-      "type" : "other"
+      "type" : "unknown"
    },
    "timerdisplay" : {
       "canReceiveAudio" : false,
@@ -2322,14 +2464,16 @@
       "controls" : {
          " ? " : "",
          "autosave" : "every time a new module is added, trigger a save to data/savestate/autosave/, to help reload state in the event of a crash. can be quite slow if using modules with large samples.",
+         "load" : "load a saved .bsk file to restore state",
          "load layout" : "[none]",
-         "load state" : "load a saved .bsk file to restore state",
          "lookahead (exp.)" : "use lookahead scheduling, which is necessary for scriptmodule. gets automatically turned on when you use scriptmodule. so far, lookahead scheduling seems to not create any issues, but leaving this checkbox here just in case.",
+         "play/pause" : "stop all audio processing (shift-p)",
          "reset layout" : "reset to the layout specified in \"layout\" in userprefs.json",
+         "save" : "save current state as .bsk file, to be restored later",
+         "save as" : "save current state as a new .bsk file",
          "save layout" : "[none]",
-         "save state" : "save current state as .bsk file, to be restored later",
          "settings" : "adjust preferences, saved as userprefs.json",
-         "write audio" : "write the last 30 minutes of audio to data/recordings/"
+         "write audio" : "write the last 30 minutes of audio to your specified recordings_path"
       },
       "description" : "",
       "type" : "unknown"
@@ -2353,6 +2497,17 @@
       },
       "description" : "controls tempo and current time position",
       "type" : "other"
+   },
+   "transposefrom" : {
+      "canReceiveAudio" : false,
+      "canReceiveNote" : true,
+      "canReceivePulses" : false,
+      "controls" : {
+         "retrigger" : "immediately replay current notes when changing the transpose root or the scale",
+         "root" : "root to transpose from"
+      },
+      "description" : "transpose input from a specified root to the root of the current scale. the primary usage of this would be to allow you to play a keyboard in C, but it gets transposed to the current scale.",
+      "type" : "note effects"
    },
    "tremolo" : {
       "canReceiveAudio" : false,
@@ -2545,7 +2700,7 @@
       "controls" : {
          "open" : "show the plugin window",
          "program change" : "send a program change message to the VST instance",
-         "show parameter" : "select parameters to display them, so they can be adjusted from within bespoke's interface",
+         "show parameter" : "select parameters to display them, so they can be adjusted from within bespoke's interface. if a VST has more than 20 parameters, this list will initially be empty. in that case, to make a parameter appear in this list, wiggle it within the VST's interface.",
          "vol" : "adjust the output volume"
       },
       "description" : "a VST plugin instance",
