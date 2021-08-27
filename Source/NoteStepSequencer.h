@@ -191,6 +191,12 @@ private:
    float mRandomizeLengthRange;
    float mRandomizeVelocityChance;
    float mRandomizeVelocityDensity;
+   FloatSlider* mRandomizePitchChanceSlider;
+   FloatSlider* mRandomizePitchRangeSlider;
+   FloatSlider* mRandomizeLengthChanceSlider;
+   FloatSlider* mRandomizeLengthRangeSlider;
+   FloatSlider* mRandomizeVelocityChanceSlider;
+   FloatSlider* mRandomizeVelocityDensitySlider;
    
    std::array<double, NSS_MAX_STEPS> mLastStepPlayTime;
    std::array<DropdownList*, NSS_MAX_STEPS> mToneDropdowns;
