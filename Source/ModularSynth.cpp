@@ -803,7 +803,7 @@ void ModularSynth::KeyPressed(int key, bool isRepeat)
       {
          gHoveredUIControl->ResetToOriginal();
       }
-      else if (key != ' ' && key != OF_KEY_TAB && key != '`' && juce::CharacterFunctions::isPrintable((char)key))
+      else if (key != ' ' && key != OF_KEY_TAB && key != '`' && key < CHAR_MAX && juce::CharacterFunctions::isPrintable((char)key))
       {
          gHoveredUIControl->AttemptTextInput();
       }
@@ -838,6 +838,11 @@ void ModularSynth::KeyPressed(int key, bool isRepeat)
       mConsoleEntry->MakeActiveTextEntry(true);
    }
    
+   if (key == KeyPress::F1Key && !isRepeat)
+   {
+      HelpDisplay::sShowTooltips = !HelpDisplay::sShowTooltips;
+   }
+
    mZoomer.OnKeyPressed(key);
    
    if (CharacterFunctions::isDigit((char)key) && (GetKeyModifiers() == kModifier_Alt))

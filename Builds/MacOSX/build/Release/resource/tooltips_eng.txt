@@ -1548,7 +1548,7 @@ notehumanizer~add randomness to timing and velocity
 
 
 
-notehocket~sends notes to a random destinations
+notehocket~sends notes to random destinations
 ~weight *~chance that note goes to this destination
 
 

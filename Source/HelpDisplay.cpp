@@ -43,8 +43,7 @@ HelpDisplay::HelpDisplay()
    LoadHelp();
 
    sShowTooltips = TheSynth->GetUserPrefs()["show_tooltips_on_load"].isNull() ? true : (TheSynth->GetUserPrefs()["show_tooltips_on_load"].asInt() > 0);
-   if (sShowTooltips)
-      LoadTooltips();
+   LoadTooltips();
 }
 
 void HelpDisplay::CreateUIControls()

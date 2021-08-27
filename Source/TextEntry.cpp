@@ -359,7 +359,7 @@ void TextEntry::OnKeyPressed(int key, bool isRepeat)
    {
       mCaretPosition = (int)strlen(mString);
    }
-   else
+   else if (key < CHAR_MAX && juce::CharacterFunctions::isPrintable((char)key))
    {
       AddCharacter((char)key);
    }
