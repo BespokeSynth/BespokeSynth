@@ -598,7 +598,7 @@ void ModularSynth::Draw(void* vg)
       ofTranslate(offset.x, offset.y);
       
       float x = GetMouseX(tooltipContainer) + 25;
-      float y = GetMouseY(tooltipContainer) + 7;
+      float y = GetMouseY(tooltipContainer) + 30;
       float maxWidth = 300;
 
       float fontSize = 15;
@@ -608,18 +608,28 @@ void ModularSynth::Draw(void* vg)
       nvgTextBoxBounds(gNanoVG, x, y, maxWidth, tooltip.c_str(), nullptr, bounds);
       float padding = 3;
       ofRectangle rect(bounds[0]-padding, bounds[1] - padding, bounds[2] - bounds[0] + padding*2, bounds[3] - bounds[1] + padding*2);
+      
+      float minX = 5 - offset.x;
+      float maxX = ofGetWidth() / scale  - rect.width - 5 - offset.x;
+      float minY = 5 - offset.y;
+      float maxY = ofGetHeight() / scale - rect.height - 5 - offset.y;
+      
+      float onscreenRectX = ofClamp(rect.x, minX, maxX);
+      float onscreenRectY = ofClamp(rect.y, minY, maxY);
+      
+      float tooltipBackgroundAlpha = 180;
 
       ofFill();
-      ofSetColor(50, 50, 50);
-      ofRect(rect.x, rect.y, rect.width, rect.height);
+      ofSetColor(50, 50, 50, tooltipBackgroundAlpha);
+      ofRect(onscreenRectX, onscreenRectY, rect.width, rect.height);
 
       ofNoFill();
-      ofSetColor(255, 255, 255);
-      ofRect(rect.x, rect.y, rect.width, rect.height);
+      ofSetColor(255, 255, 255, tooltipBackgroundAlpha);
+      ofRect(onscreenRectX, onscreenRectY, rect.width, rect.height);
 
       ofSetColor(255, 255, 255);
       //DrawTextNormal(tooltip, x + 5, y + 12);
-      gFont.DrawStringWrap(tooltip, fontSize, x, y, maxWidth);
+      gFont.DrawStringWrap(tooltip, fontSize, x + (onscreenRectX - rect.x), y + (onscreenRectY - rect.y), maxWidth);
       
       ofPopMatrix();
    }
