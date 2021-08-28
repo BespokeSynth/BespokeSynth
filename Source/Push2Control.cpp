@@ -51,6 +51,7 @@ NVGcontext* Push2Control::sVG = nullptr;
 NVGLUframebuffer* Push2Control::sFB = nullptr;
 ableton::Push2DisplayBridge* Push2Control::sPush2Bridge = nullptr;
 ableton::Push2Display* Push2Control::sPush2Display = nullptr;
+IUIControl* Push2Control::sBindToUIControl = nullptr;
 
 //https://raw.githubusercontent.com/Ableton/push-interface/master/doc/MidiMapping.png
 
@@ -78,6 +79,8 @@ namespace
    const int kMasterButton = 28;
    const int kQuantizeButtonSection = 36;
    const int kNumQuantizeButtons = 8;
+   const int kSetupButton = 30;
+   const int kUserButton = 59;
 }
 #include "leathers/pop"
 
@@ -96,6 +99,7 @@ Push2Control::Push2Control()
 , mHeldModule(nullptr)
 , mAllowRepatch(false)
 , mModuleHistoryPosition(-1)
+, mInMidiControllerBindMode(false)
 , mScreenDisplayMode(ScreenDisplayMode::kNormal)
 , mGridControlModule(nullptr)
 , mDisplayModuleCanControlGrid(false)
@@ -343,16 +347,18 @@ void Push2Control::DrawToFramebuffer(NVGcontext* vg, NVGLUframebuffer* fb, float
       string stateInfo = "";
       if (mAllowRepatch && mHeldModule == nullptr)
          stateInfo = "repatch mode: hold a source module and tap the destination module";
-      if (mAllowRepatch && mHeldModule != nullptr)
+      else if (mAllowRepatch && mHeldModule != nullptr)
          stateInfo = "repatch mode: now tap destination for " + string(mHeldModule->Name());
-      if (mNewButtonHeld)
+      else if (mNewButtonHeld)
          stateInfo = "tap control to add favorite...";
-      if (mDeleteButtonHeld)
+      else if (mDeleteButtonHeld)
          stateInfo = "tap control to remove favorite...";
-      if (mModulationButtonHeld)
+      else if (mModulationButtonHeld)
          stateInfo = "tap a control to add/edit LFO...";
-      if (mAddModuleBookmarkButtonHeld)
+      else if (mAddModuleBookmarkButtonHeld)
          stateInfo = "tap a button in the column below this button to bookmark the current module...";
+      else if (mInMidiControllerBindMode)
+         stateInfo = "MIDI bind mode: hold a knob or button, then move/press a MIDI control to bind to that module control";
 
       if (stateInfo != "")
       {
@@ -425,7 +431,8 @@ void Push2Control::DrawToFramebuffer(NVGcontext* vg, NVGLUframebuffer* fb, float
       }
    }
    
-   SetLed(kMidiMessage_Control, kTapTempoButton, (gHoveredModule != mDisplayModule && gHoveredModule != nullptr) ? 127 : 0, 0);
+   bool isHoveringOverNewModule = (gHoveredModule != mDisplayModule && gHoveredModule != nullptr);
+   SetLed(kMidiMessage_Control, kTapTempoButton, isHoveringOverNewModule ? 127 : 0, isHoveringOverNewModule ? 32 : 0);
    SetLed(kMidiMessage_Control, kNewButton, 127, mNewButtonHeld ? 0 : -1);
    SetLed(kMidiMessage_Control, kDeleteButton, 127, mDeleteButtonHeld ? 0 : -1);
    SetLed(kMidiMessage_Control, kAutomateButton, 126, mModulationButtonHeld ? 0 : -1);
@@ -438,6 +445,7 @@ void Push2Control::DrawToFramebuffer(NVGcontext* vg, NVGLUframebuffer* fb, float
    SetLed(kMidiMessage_Control, kRightButton, 127);
    SetLed(kMidiMessage_Control, kPageLeftButton, mModuleHistoryPosition > 0 ? 127 : 0);
    SetLed(kMidiMessage_Control, kPageRightButton, mModuleHistoryPosition < mModuleHistory.size()-1 ? 127 : 0);
+   SetLed(kMidiMessage_Control, kSetupButton, mInMidiControllerBindMode ? 127 : 32, mInMidiControllerBindMode ? 0 : 32);
    if (mGridControlModule != nullptr)
    {
       SetLed(kMidiMessage_Control, kNoteButton, 127, 10);
@@ -998,25 +1006,41 @@ void Push2Control::OnMidiNote(MidiNote& note)
       if (mScreenDisplayMode == ScreenDisplayMode::kNormal)
       {
          int controlIndex = note.mPitch + mModuleColumnOffset;
-         if (note.mVelocity > 0 && controlIndex < mSliderControls.size())
+         if (controlIndex < mSliderControls.size())
          {
-            mSliderControls[controlIndex]->StartBeacon();
-            
-            if (mNewButtonHeld)
-               AddFavoriteControl(mSliderControls[controlIndex]);
-            if (mDeleteButtonHeld)
-               RemoveFavoriteControl(mSliderControls[controlIndex]);
-            if (mModulationButtonHeld)
+            if (note.mVelocity > 0)
             {
-               FloatSlider* slider = dynamic_cast<FloatSlider*>(mSliderControls[controlIndex]);
-               if (slider != nullptr)
+               mSliderControls[controlIndex]->StartBeacon();
+
+               if (mNewButtonHeld)
                {
-                  bool hadLFO = (slider->GetLFO() != nullptr);
-                  FloatSliderLFOControl* lfo = slider->AcquireLFO();
-                  if (!hadLFO)
-                     lfo->SetEnabled(true);
-                  SetDisplayModule(lfo, true);
+                  AddFavoriteControl(mSliderControls[controlIndex]);
                }
+               else if (mDeleteButtonHeld)
+               {
+                  RemoveFavoriteControl(mSliderControls[controlIndex]);
+               }
+               else if (mModulationButtonHeld)
+               {
+                  FloatSlider* slider = dynamic_cast<FloatSlider*>(mSliderControls[controlIndex]);
+                  if (slider != nullptr)
+                  {
+                     bool hadLFO = (slider->GetLFO() != nullptr);
+                     FloatSliderLFOControl* lfo = slider->AcquireLFO();
+                     if (!hadLFO)
+                        lfo->SetEnabled(true);
+                     SetDisplayModule(lfo, true);
+                  }
+               }
+               else if (mInMidiControllerBindMode)
+               {
+                  sBindToUIControl = mSliderControls[controlIndex];
+               }
+            }
+            else
+            {
+               if (sBindToUIControl == mSliderControls[controlIndex])
+                  sBindToUIControl = nullptr;
             }
          }
       }
@@ -1091,7 +1115,7 @@ void Push2Control::OnMidiNote(MidiNote& note)
    }
    else
    {
-      ofLog() << "note " << note.mPitch << " " << note.mVelocity;
+      //ofLog() << "note " << note.mPitch << " " << note.mVelocity;
    }
    
    mNoteHeldState[note.mPitch] = note.mVelocity > 0;
@@ -1122,23 +1146,35 @@ void Push2Control::OnMidiControl(MidiControl& control)
       int controlIndex = control.mControl - kAboveScreenButtonRow + mModuleColumnOffset;
       if (mScreenDisplayMode == ScreenDisplayMode::kNormal)
       {
-         if (control.mValue > 0 && controlIndex < mButtonControls.size())
+         if (controlIndex < mButtonControls.size())
          {
-            if (mNewButtonHeld)
+            if (control.mValue > 0)
             {
-               mButtonControls[controlIndex]->StartBeacon();
-               AddFavoriteControl(mButtonControls[controlIndex]);
-            }
-            else if (mDeleteButtonHeld)
-            {
-               mButtonControls[controlIndex]->StartBeacon();
-               RemoveFavoriteControl(mButtonControls[controlIndex]);
+               if (mNewButtonHeld)
+               {
+                  mButtonControls[controlIndex]->StartBeacon();
+                  AddFavoriteControl(mButtonControls[controlIndex]);
+               }
+               else if (mDeleteButtonHeld)
+               {
+                  mButtonControls[controlIndex]->StartBeacon();
+                  RemoveFavoriteControl(mButtonControls[controlIndex]);
+               }
+               else if (mInMidiControllerBindMode)
+               {
+                  sBindToUIControl = mButtonControls[controlIndex];
+               }
+               else
+               {
+                  float current = mButtonControls[controlIndex]->GetMidiValue();
+                  float newValue = current > 0 ? 0 : 1;
+                  mButtonControls[controlIndex]->SetFromMidiCC(newValue);
+               }
             }
             else
             {
-               float current = mButtonControls[controlIndex]->GetMidiValue();
-               float newValue = current > 0 ? 0 : 1;
-               mButtonControls[controlIndex]->SetFromMidiCC(newValue);
+               if (sBindToUIControl == mButtonControls[controlIndex])
+                  sBindToUIControl = nullptr;
             }
          }
       }
@@ -1175,6 +1211,10 @@ void Push2Control::OnMidiControl(MidiControl& control)
       {
          SetDisplayModule(mModules[moduleIndex], true);
       }
+   }
+   else if (control.mControl == kSetupButton && control.mValue > 0)
+   {
+      mInMidiControllerBindMode = !mInMidiControllerBindMode;
    }
    else if (control.mControl == kNewButton)
    {

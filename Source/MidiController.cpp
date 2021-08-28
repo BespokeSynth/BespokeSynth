@@ -37,6 +37,7 @@
 #include "GridController.h"
 #include "MidiCapturer.h"
 #include "ScriptModule.h"
+#include "Push2Control.h"
 
 bool UIControlConnection::sDrawCables = true;
 
@@ -513,6 +514,16 @@ void MidiController::MidiReceived(MidiMessageType messageType, int control, floa
       mLastBoundUIControl = gBindToUIControl;
       mLastBoundUIControl->StartBeacon();
       gBindToUIControl = nullptr;
+      return;
+   }
+
+   if (Push2Control::sBindToUIControl)
+   {
+      AddControlConnection(messageType, control, channel, Push2Control::sBindToUIControl);
+      mLastBoundControlTime = gTime;
+      mLastBoundUIControl = Push2Control::sBindToUIControl;
+      mLastBoundUIControl->StartBeacon();
+      Push2Control::sBindToUIControl = nullptr;
       return;
    }
 
