@@ -210,6 +210,11 @@ void NoteStepSequencer::Init()
    TheTransport->AddAudioPoller(this);
 }
 
+void NoteStepSequencer::Poll()
+{
+   UpdateGridControllerLights(false);
+}
+
 void NoteStepSequencer::DrawModule()
 {
    if (Minimized() || IsVisible() == false)
@@ -822,12 +827,18 @@ void NoteStepSequencer::UpdateGridControllerLights(bool force)
             int row = y - mGridControlOffsetY;
             
             GridColor color = GridColor::kGridColorOff;
-            if (column == mGrid->GetHighlightCol(gTime+gBufferSizeMs+TheTransport->GetEventLookaheadMs()))
+            bool isHighlightCol = (column == mGrid->GetHighlightCol(gTime+gBufferSizeMs+TheTransport->GetEventLookaheadMs()));
+            if (isHighlightCol)
                color = GridColor::kGridColor2Dim;
             if (column < mLength)
             {
                if (mTones[column] == mGridControlTarget->GetGridController()->NumRows() - 1 - row && mVels[column] > 0)
-                  color = GridColor::kGridColor1Bright;
+               {
+                  if (isHighlightCol)
+                     color = GridColor::kGridColor3Bright;
+                  else
+                     color = GridColor::kGridColor1Bright;
+               }
             }
             mGridControlTarget->GetGridController()->SetLight(x, y, color, force);
          }

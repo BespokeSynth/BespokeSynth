@@ -178,7 +178,7 @@ private:
    void Exit() override;
    void KeyPressed(int key, bool isRepeat) override;
    
-   void UpdateLights();
+   void UpdateLights(bool force = false);
    void UpdateVelocityLights();
    void UpdateMetaLights();
    

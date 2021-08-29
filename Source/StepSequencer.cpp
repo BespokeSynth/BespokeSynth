@@ -183,6 +183,8 @@ void StepSequencer::Poll()
          for (int i=0; i<numChunks; ++i)
             mGridYOffDropdown->AddLabel(ofToString(i).c_str(), i);
       }
+      
+      UpdateLights();
    }
 }
 
@@ -191,25 +193,26 @@ namespace
    const float kMidwayVelocity = .75f;
 }
 
-void StepSequencer::UpdateLights()
+void StepSequencer::UpdateLights(bool force /*=false*/)
 {
    if (!HasGridController() || mGridControlTarget->GetGridController() == nullptr)
       return;
+   
+   auto* gridController = mGridControlTarget->GetGridController();
    
    for (int x=0; x<GetGridControllerCols(); ++x)
    {
       for (int y=0; y<GetGridControllerRows(); ++y)
       {
-         if (mGridControlTarget->GetGridController()->IsMultisliderGrid())
+         if (gridController->IsMultisliderGrid())
          {
             Vec2i gridPos = ControllerToGrid(Vec2i(x,y));
-            mGridControlTarget->GetGridController()->SetLightDirect(x, y, (int)(mGrid->GetVal(gridPos.x,gridPos.y)*127));
+            gridController->SetLightDirect(x, y, (int)(mGrid->GetVal(gridPos.x,gridPos.y)*127), force);
          }
          else
          {
             GridColor color = GetGridColor(x, y);
-            
-            mGridControlTarget->GetGridController()->SetLight(x, y, color);
+            gridController->SetLight(x, y, color, force);
          }
       }
    }
@@ -298,7 +301,7 @@ void StepSequencer::UpdateMetaLights()
 
 void StepSequencer::OnControllerPageSelected()
 {
-   UpdateLights();
+   UpdateLights(true);
 }
 
 void StepSequencer::OnGridButton(int x, int y, float velocity, IGridController* grid)
