@@ -103,18 +103,41 @@ void Monome::SetLightInternal(int x, int y, float value)
    if (!mHasMonome)
       return;
    
-   OSCMessage lightMsg("/"+mPrefix+"/grid/led/level/set");
    Vec2i pos = Rotate(x, y, mGridRotation);
-   lightMsg.addInt32(pos.x);
-   lightMsg.addInt32(pos.y);
-   lightMsg.addInt32(value*16);
-   bool written = mToMonome.send(lightMsg);
-   assert(written);
+   int index = pos.x + pos.y * mMaxColumns;
+   mLights[index].mValue = value;
+   mLights[index].mLastUpdatedTime = gTime + gBufferSizeMs;
 }
 
 void Monome::SetLight(int x, int y, float value)
 {
    SetLightInternal(x, y, value);
+}
+
+void Monome::Poll()
+{
+   int updatedLightCount = 0;
+   for (int i=0; i<(int)mLights.size(); ++i)
+   {
+      int index = (i + TheSynth->GetFrameCount() * mMaxColumns) % (int)mLights.size();
+      
+      if (mLights[index].mLastUpdatedTime > mLights[index].mLastSentTime)
+      {
+         OSCMessage lightMsg("/"+mPrefix+"/grid/led/level/set");
+         lightMsg.addInt32(index % mMaxColumns);
+         lightMsg.addInt32(index / mMaxColumns);
+         lightMsg.addInt32(mLights[index].mValue*16);
+         bool written = mToMonome.send(lightMsg);
+         assert(written);
+         
+         mLights[index].mLastSentTime = gTime;
+         ++updatedLightCount;
+      }
+      
+      static float kRateLimit = 16;
+      if (updatedLightCount > kRateLimit)
+         break;
+   }
 }
 
 void Monome::SetLightFlicker(int x, int y, float intensity)
@@ -245,6 +268,8 @@ void Monome::oscMessageReceived(const OSCMessage& msg)
          mMaxColumns = msg[0].getInt32();
       else
          mMaxColumns = msg[1].getInt32();
+      
+      mLights.resize(msg[0].getInt32() * msg[1].getInt32());
    }
    else if (label == "/"+mPrefix+"/grid/key")
    {

@@ -47,6 +47,7 @@ public:
    Monome(MidiDeviceListener* listener);
    ~Monome();
    
+   void Poll() override;
    bool SetUpOsc();
    void ListMonomes();
    void SetLight(int x, int y, float value);
@@ -97,6 +98,16 @@ private:
    MidiDeviceListener* mListener;
    DropdownList* mListForMidiController;
    MonomeDevice mLastConnectedDeviceInfo;
+   
+   struct LightInfo
+   {
+      LightInfo() : mValue(0), mLastUpdatedTime(0), mLastSentTime(0) {}
+      float mValue;
+      double mLastUpdatedTime;
+      double mLastSentTime;
+   };
+   
+   vector<LightInfo> mLights;
 };
 
 #endif /* defined(__modularSynth__Monome__) */

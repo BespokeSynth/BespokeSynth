@@ -858,6 +858,9 @@ void MidiController::Poll()
          }
       }
    }
+   
+   if (mNonstandardController != nullptr)
+      mNonstandardController->Poll();
 }
 
 void MidiController::Exit()

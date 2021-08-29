@@ -37,6 +37,7 @@ public:
    virtual void SendValue(int page, int control, float value, bool forceNoteOn = false, int channel = -1) = 0;
    virtual bool IsInputConnected() { return true; }
    virtual bool Reconnect() { return true; }
+   virtual void Poll() {}
    virtual string GetControlTooltip(MidiMessageType type, int control) { return MidiController::GetDefaultTooltip(type, control); }
    virtual void SetLayoutData(ofxJSONElement& layout) {}
    virtual void SaveState(FileStreamOut& out) = 0;
