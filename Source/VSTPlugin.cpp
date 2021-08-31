@@ -979,25 +979,25 @@ void VSTPlugin::LoadState(FileStreamIn& in)
          mPlugin->setStateInformation(vstState, vstStateSize);
          if (rev >= 1 && vstProgramStateSize > 0)
             mPlugin->setCurrentProgramStateInformation(vstProgramState, vstProgramStateSize);
-         
-         if (rev >= 2)
-         {
-            int numParamsShowing;
-            in >> numParamsShowing;
-            for (auto& param : mParameterSliders)
-               param.mShowing = false;
-            for (int i=0; i<numParamsShowing; ++i)
-            {
-               int index;
-               in >> index;
-               if (index < mParameterSliders.size())
-                  mParameterSliders[index].mShowing = true;
-            }
-         }
       }
       else
       {
          TheSynth->LogEvent("Couldn't instantiate plugin to load state for "+mModuleSaveData.GetString("vst"), kLogEventType_Error);
+      }
+      
+      if (rev >= 2)
+      {
+         int numParamsShowing;
+         in >> numParamsShowing;
+         for (auto& param : mParameterSliders)
+            param.mShowing = false;
+         for (int i=0; i<numParamsShowing; ++i)
+         {
+            int index;
+            in >> index;
+            if (index < mParameterSliders.size())
+               mParameterSliders[index].mShowing = true;
+         }
       }
    }
 }
