@@ -143,10 +143,11 @@ bool ModularSynth::IsReady()
    return gTime > 100;
 }
 
-void ModularSynth::Setup(GlobalManagers* globalManagers, juce::Component* mainComponent)
+void ModularSynth::Setup(GlobalManagers* globalManagers, juce::Component* mainComponent, juce::OpenGLContext* openGLContext)
 {
    mGlobalManagers = globalManagers;
    mMainComponent = mainComponent;
+   mOpenGLContext = openGLContext;
    int recordBufferLengthMinutes = 30;
    
    bool loaded = mUserPrefs.open(GetUserPrefsPath(false));

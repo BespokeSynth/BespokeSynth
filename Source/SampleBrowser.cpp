@@ -62,7 +62,7 @@ void SampleBrowser::DrawModule()
       return;
    
    float fontSize = 15;
-   float stringWidth = gFont.GetStringWidth(mCurrentDirectory.toStdString(),fontSize,K(isRenderThread));
+   float stringWidth = gFont.GetStringWidth(mCurrentDirectory.toStdString(),fontSize);
    float moduleWidth, moduleHeight;
    GetModuleDimensions(moduleWidth, moduleHeight);
    float textX = 3;

@@ -242,8 +242,8 @@ public:
    void LoadFont(string path);
    void DrawString(string str, float size, float x, float y);
    ofRectangle DrawStringWrap(string str, float size, float x, float y, float width);
-   float GetStringWidth(string str, float size, bool isRenderThread = false);
-   float GetStringHeight(string str, float size, bool isRenderThread = false);
+   float GetStringWidth(string str, float size);
+   float GetStringHeight(string str, float size);
    bool IsLoaded() { return mLoaded; }
    int GetFontHandle() const { return mFontHandle; }
    string GetFontPath() const { return mFontPath; }

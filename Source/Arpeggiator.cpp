@@ -108,7 +108,7 @@ void Arpeggiator::DrawModule()
       }
       else
       {
-         float w = gFont.GetStringWidth(pad, 15, K(isRenderThread));
+         float w = gFont.GetStringWidth(pad, 15);
          DrawTextNormal(GetArpNoteDisplay(mChord[i].pitch),5+w+pad.length()/5.0f,16);
          break;
       }

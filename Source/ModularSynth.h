@@ -56,7 +56,7 @@ public:
    ModularSynth();
    virtual ~ModularSynth();
    
-   void Setup(GlobalManagers* globalManagers, juce::Component* mainComponent);
+   void Setup(GlobalManagers* globalManagers, juce::Component* mainComponent, juce::OpenGLContext* openGLContext);
    void LoadResources(void* nanoVG, void* fontBoundsNanoVG);
    void InitIOBuffers(int inputChannelCount, int outputChannelCount);
    void Poll();
@@ -159,6 +159,7 @@ public:
    ModuleFactory* GetModuleFactory() { return &mModuleFactory; }
    GlobalManagers* GetGlobalManagers() { return mGlobalManagers; }
    juce::Component* GetMainComponent() { return mMainComponent; }
+   juce::OpenGLContext* GetOpenGLContext() { return mOpenGLContext; }
    IDrawableModule* GetLastClickedModule() const;
    EffectFactory* GetEffectFactory() { return &mEffectFactory; }
    const vector<IDrawableModule*>& GetGroupSelectedModules() const { return mGroupSelectedModules; }
@@ -325,6 +326,7 @@ private:
    
    GlobalManagers* mGlobalManagers;
    juce::Component* mMainComponent;
+   juce::OpenGLContext* mOpenGLContext;
    
    CriticalSection mRenderLock;
    float mFrameRate;

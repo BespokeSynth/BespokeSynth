@@ -166,7 +166,7 @@ void TextEntry::Render()
             char beforeCaret[MAX_TEXTENTRY_LENGTH];
             strncpy(beforeCaret, mString, mCaretPosition);
             beforeCaret[mCaretPosition] = 0;
-            caretX += gFontFixedWidth.GetStringWidth(beforeCaret, 14, true);
+            caretX += gFontFixedWidth.GetStringWidth(beforeCaret, 14);
          }
          ofFill();
          ofRect(caretX, caretY, 1, 12, L(corner, 1));

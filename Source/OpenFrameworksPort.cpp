@@ -803,14 +803,14 @@ ofRectangle RetinaTrueTypeFont::DrawStringWrap(string str, float size, float x, 
    return rect;
 }
 
-float RetinaTrueTypeFont::GetStringWidth(string str, float size, bool isRenderThread /*false*/)
+float RetinaTrueTypeFont::GetStringWidth(string str, float size)
 {
    if (!mLoaded)
       return str.size() * 12;
       
    NVGcontext* vg;
    int handle;
-   if (isRenderThread)
+   if (TheSynth->GetOpenGLContext()->getCurrentContext() != nullptr)
    {
       vg = gNanoVG;
       handle = mFontHandle;
@@ -829,14 +829,14 @@ float RetinaTrueTypeFont::GetStringWidth(string str, float size, bool isRenderTh
    return width;
 }
 
-float RetinaTrueTypeFont::GetStringHeight(string str, float size, bool isRenderThread /*false*/)
+float RetinaTrueTypeFont::GetStringHeight(string str, float size)
 {
    if (!mLoaded)
       return str.size() * 12;
       
    NVGcontext* vg;
    int handle;
-   if (isRenderThread)
+   if (TheSynth->GetOpenGLContext()->getCurrentContext() != nullptr)
    {
       vg = gNanoVG;
       handle = mFontHandle;

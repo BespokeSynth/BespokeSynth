@@ -886,13 +886,13 @@ void MidiController::DrawModule()
       else
          ofSetColor(255,0,0,255*(1-(gTime - mLastActivityTime)/200));
       ofFill();
-      ofRect(30+gFont.GetStringWidth(Name(), 15, K(isRenderThread)),-11,10,10);
+      ofRect(30+gFont.GetStringWidth(Name(), 15),-11,10,10);
       ofPopStyle();
    }
    
    if (!mIsConnected)
    {
-      float xStart = 30+gFont.GetStringWidth(Name(), 15, K(isRenderThread));
+      float xStart = 30+gFont.GetStringWidth(Name(), 15);
       float yStart = -11;
       
       ofPushStyle();
