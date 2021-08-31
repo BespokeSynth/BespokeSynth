@@ -135,10 +135,12 @@ namespace VSTLookup
          return vstName;
       
       auto types = sPluginList.getTypes();
+      auto lastDot = juce::String(vstName).lastIndexOfChar ('.');
+      vstName = juce::String(vstName).substring(0, lastDot).toStdString();
       for (int i=0; i<types.size(); ++i)
       {
          juce::File vst(types[i].fileOrIdentifier);
-         if (vst.getFileName().toStdString() == vstName)
+         if (vst.getFileNameWithoutExtension().toStdString() == vstName)
             return types[i].fileOrIdentifier.toStdString();
       }
       
@@ -211,15 +213,15 @@ void VSTPlugin::Exit()
 
 string VSTPlugin::GetTitleLabel()
 {
-   if (mPlugin)
-      return "vst: "+GetPluginName();
-   return "vst";
+   return "vst: "+GetPluginName();
 }
 
 string VSTPlugin::GetPluginName()
 {
    if (mPlugin)
       return mPluginName;
+   if (mModuleSaveData.HasProperty("vst") && mModuleSaveData.GetString("vst").length() > 0)
+      return mModuleSaveData.GetString("vst") + " (not loaded)";
    return "no plugin loaded";
 }
 
