@@ -310,6 +310,7 @@ float ofLerp(float start, float stop, float amt);
 float ofDistSquared(float x1, float y1, float x2, float y2);
 vector<string> ofSplitString(string str, string splitter, bool ignoreEmpty = false, bool trim = false);
 bool ofIsStringInString(const string& haystack, const string& needle);
+String GetFileNameWithoutExtension(String fullPath);
 void ofScale(float x, float y, float z);
 void ofExit();
 void ofToggleFullscreen();

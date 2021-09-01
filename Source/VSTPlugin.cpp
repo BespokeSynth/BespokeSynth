@@ -134,9 +134,8 @@ namespace VSTLookup
       if (juce::String(vstName).contains("/") || juce::String(vstName).contains("\\"))  //already a path
          return vstName;
       
+      vstName = GetFileNameWithoutExtension(vstName).toStdString();
       auto types = sPluginList.getTypes();
-      auto lastDot = juce::String(vstName).lastIndexOfChar ('.');
-      vstName = juce::String(vstName).substring(0, lastDot).toStdString();
       for (int i=0; i<types.size(); ++i)
       {
          juce::File vst(types[i].fileOrIdentifier);
@@ -221,7 +220,7 @@ string VSTPlugin::GetPluginName()
    if (mPlugin)
       return mPluginName;
    if (mModuleSaveData.HasProperty("vst") && mModuleSaveData.GetString("vst").length() > 0)
-      return mModuleSaveData.GetString("vst") + " (not loaded)";
+      return GetFileNameWithoutExtension(mModuleSaveData.GetString("vst")).toStdString() + " (not loaded)";
    return "no plugin loaded";
 }
 
@@ -424,7 +423,19 @@ void VSTPlugin::Poll()
 void VSTPlugin::Process(double time)
 {
    if (!mPluginReady)
-      return;
+   {
+      //bypass
+      GetBuffer()->SetNumActiveChannels(2);
+      SyncBuffers();
+      for (int ch=0; ch<GetBuffer()->NumActiveChannels(); ++ch)
+      {
+         if (GetTarget())
+            Add(GetTarget()->GetBuffer()->GetChannel(ch), GetBuffer()->GetChannel(ch), GetBuffer()->BufferSize());
+         GetVizBuffer()->WriteChunk(GetBuffer()->GetChannel(ch),GetBuffer()->BufferSize(), ch);
+      }
+
+      GetBuffer()->Clear();
+   }
    
 #if BESPOKE_LINUX //HACK: weird race condition, which this seems to fix for now
    if (mPlugin == nullptr)

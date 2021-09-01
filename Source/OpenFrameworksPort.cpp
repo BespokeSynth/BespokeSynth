@@ -498,6 +498,19 @@ bool ofIsStringInString(const string& haystack, const string& needle)
    return ( strstr(haystack.c_str(), needle.c_str() ) != nullptr );
 }
 
+String GetFileNameWithoutExtension(String fullPath)
+{
+   auto lastSlash = fullPath.lastIndexOfChar('/') + 1;
+   if (lastSlash == 0)
+      lastSlash = fullPath.lastIndexOfChar('\\') + 1;
+   auto lastDot   = fullPath.lastIndexOfChar ('.');
+
+   if (lastDot > lastSlash)
+     return fullPath.substring (lastSlash, lastDot);
+
+   return fullPath.substring (lastSlash);
+}
+
 void ofScale(float x, float y, float z)
 {
    nvgScale(gNanoVG, x, y);
