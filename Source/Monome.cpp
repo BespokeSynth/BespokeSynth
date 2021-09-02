@@ -119,7 +119,7 @@ void Monome::Poll()
    int updatedLightCount = 0;
    for (int i=0; i<(int)mLights.size(); ++i)
    {
-      int index = (i + TheSynth->GetFrameCount() * mMaxColumns) % (int)mLights.size();
+      int index = (i * 13 + TheSynth->GetFrameCount() * 7) % (int)mLights.size();
       
       if (mLights[index].mLastUpdatedTime > mLights[index].mLastSentTime)
       {
