@@ -80,8 +80,8 @@ private:
       kTumbleDown,
       kHalfSpeed,
       kDoubleSpeed,
-      kQuarterTriplets,
       kDotted8th,
+      kQuarterTriplets,
       kFree,
       kNumStutterTypes
    };

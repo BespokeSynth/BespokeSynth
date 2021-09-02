@@ -55,9 +55,9 @@ void StutterControl::CreateUIControls()
    mStutterCheckboxes[kTumbleDown] = new Checkbox(this,"tumble down",mStutterCheckboxes[kTumbleUp],kAnchor_Below,&mStutter[kTumbleDown]);
    mStutterCheckboxes[kHalfSpeed] = new Checkbox(this,"half speed",mStutterCheckboxes[kTumbleDown],kAnchor_Below,&mStutter[kHalfSpeed]);
    mStutterCheckboxes[kDoubleSpeed] = new Checkbox(this,"double speed",mStutterCheckboxes[kHalfSpeed],kAnchor_Below,&mStutter[kDoubleSpeed]);
-   mStutterCheckboxes[kQuarterTriplets] = new Checkbox(this,"triplets",mStutterCheckboxes[kDoubleSpeed],kAnchor_Below,&mStutter[kQuarterTriplets]);
-   mStutterCheckboxes[kDotted8th] = new Checkbox(this,"dotted eighth",mStutterCheckboxes[kQuarterTriplets],kAnchor_Below,&mStutter[kDotted8th]);
-   mStutterCheckboxes[kFree] = new Checkbox(this,"free",mStutterCheckboxes[kDotted8th],kAnchor_Below,&mStutter[kFree]);
+   mStutterCheckboxes[kDotted8th] = new Checkbox(this,"dotted eighth",mStutterCheckboxes[kDoubleSpeed],kAnchor_Below,&mStutter[kDotted8th]);
+   mStutterCheckboxes[kQuarterTriplets] = new Checkbox(this,"triplets",mStutterCheckboxes[kDotted8th],kAnchor_Below,&mStutter[kQuarterTriplets]);
+   mStutterCheckboxes[kFree] = new Checkbox(this,"free",mStutterCheckboxes[kQuarterTriplets],kAnchor_Below,&mStutter[kFree]);
    mFreeLengthSlider = new FloatSlider(this,"free length",mStutterCheckboxes[kFree],kAnchor_Below,102,15,&mStutterProcessor.mFreeStutterLength,.005f,.25f);
    mFreeSpeedSlider = new FloatSlider(this,"free speed",mFreeLengthSlider,kAnchor_Below,102,15,&mStutterProcessor.mFreeStutterSpeed,0,2);
 }
@@ -152,9 +152,9 @@ StutterControl::StutterType StutterControl::GetStutterFromKey(int key)
    if (key == 'h')
       return kDoubleSpeed;
    if (key == 'j')
-      return kQuarterTriplets;
-   if (key == 'k')
       return kDotted8th;
+   if (key == 'k')
+      return kQuarterTriplets;
    if (key == 'l')
       return kFree;
    return kNumStutterTypes;
@@ -196,10 +196,10 @@ StutterParams StutterControl::GetStutter(StutterControl::StutterType type)
          return StutterParams(kInterval_8n, .5f);
       case kDoubleSpeed:
          return StutterParams(kInterval_8n, 2);
-      case kQuarterTriplets:
-         return StutterParams(kInterval_4nt, 1);
       case kDotted8th:
          return StutterParams(kInterval_8nd, 1);
+      case kQuarterTriplets:
+         return StutterParams(kInterval_4nt, 1);
       case kFree:
          return StutterParams(kInterval_None, 1);
       case kNumStutterTypes:
