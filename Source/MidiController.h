@@ -104,6 +104,7 @@ struct UIControlConnection
       mLastControlValue = -1;
       mMidiOnValue = 127;
       mMidiOffValue = 0;
+      mScaleOutput = false;
       mBlink = false;
       mIncrementAmount = 0;
       mTwoWay = true;
@@ -141,6 +142,7 @@ struct UIControlConnection
       connection->mLastControlValue = mLastControlValue;
       connection->mMidiOnValue = mMidiOnValue;
       connection->mMidiOffValue = mMidiOffValue;
+      connection->mScaleOutput = mScaleOutput;
       connection->mBlink = mBlink;
       connection->mIncrementAmount = mIncrementAmount;
       connection->mTwoWay = mTwoWay;
@@ -169,6 +171,7 @@ struct UIControlConnection
    float mValue;
    int mMidiOnValue;
    int mMidiOffValue;
+   bool mScaleOutput;
    bool mBlink;
    float mIncrementAmount;
    bool mTwoWay;
@@ -195,6 +198,7 @@ struct UIControlConnection
    TextEntry* mValueEntry;
    TextEntry* mMidiOffEntry;
    TextEntry* mMidiOnEntry;
+   Checkbox* mScaleOutputCheckbox;
    Checkbox* mBlinkCheckbox;
    TextEntry* mIncrementalEntry;
    Checkbox* mTwoWayCheckbox;
@@ -215,7 +219,7 @@ enum ControlDrawType
 struct ControlLayoutElement
 {
    ControlLayoutElement() : mActive(false), mControlCable(nullptr), mConnectionType(kControlType_Slider) {}
-   void Setup(MidiController* owner, MidiMessageType type, int control, ControlDrawType drawType, bool incremental, int offVal, int onVal, ControlType connectionType, float x, float y, float w, float h);
+   void Setup(MidiController* owner, MidiMessageType type, int control, ControlDrawType drawType, bool incremental, int offVal, int onVal, bool scaleOutput, ControlType connectionType, float x, float y, float w, float h);
    
    bool mActive;
    MidiMessageType mType;
@@ -226,6 +230,7 @@ struct ControlLayoutElement
    bool mIncremental;
    int mOffVal;
    int mOnVal;
+   bool mScaleOutput;
    ControlType mConnectionType;
    
    PatchCableSource* mControlCable;

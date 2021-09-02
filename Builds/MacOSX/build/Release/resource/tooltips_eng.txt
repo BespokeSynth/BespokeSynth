@@ -532,8 +532,9 @@ midicontroller~get midi input from external devices. to get a nice display in th
 ~path~path to the control that should be affected
 ~controltype~how this control should modify the target.\n -slider: set the value interpolated between "midi off" and "midi on" to the slider's value\n -set: set the specified value directly when this button is pressed\n -release: set the specified value directly when this button is released\n -toggle: toggle the control's value to on/off when this button is pressed\n -direct: set the control to the literal midi input value
 ~value~the value to set
-~midi off~the lower end of the midi range. send this value when the targeted control is off. this also controls the lower end of the slider range. set midi off to be higher than midi on to reverse a slider's direction.
-~midi on~the upper end of the midi range. send this value when the targeted control is on. this also controls the upper end of the slider range. set midi off to be higher than midi on to reverse a slider's direction.
+~midi off~the lower end of the midi range. send this value when the targeted control is off. if "scale" is enabled, this also controls the lower end of the slider range, and you can set midi off to be higher than midi on to reverse a slider's direction.
+~midi on~the upper end of the midi range. send this value when the targeted control is on. if "scale" is enabled, this also controls the upper end of the slider range, and you can set midi off to be higher than midi on to reverse a slider's direction.
+~scale~should the output of this midi slider be scaled between "midi off" and "midi on"?
 ~blink~when the targeted control is enabled, send alternating on/off messages, to blink the associated LED
 ~increment~when "controltype" is "set" or "release", the targeted control is incremented by this amount (and the "value" field is ignored). when "controltype" is "slider", the targeted control is changed by this amount in the direction the control was changed (this setting is useful for "infinite encoders")
 ~twoway~should we send feedback to the controller? (to control the LEDs associated with the button/knob)
