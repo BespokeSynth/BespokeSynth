@@ -175,6 +175,7 @@ UIControlConnection* MidiController::AddControlConnection(MidiMessageType messag
    connection->mUIControl = uicontrol;
    connection->mChannel = channel;
    connection->mPage = mControllerPage;
+   connection->mType = dynamic_cast<Checkbox*>(uicontrol) != nullptr ? kControlType_Toggle : kControlType_Slider;
    if (mSlidersDefaultToIncremental)
       connection->mIncrementAmount = 1;
 
@@ -185,7 +186,8 @@ UIControlConnection* MidiController::AddControlConnection(MidiMessageType messag
       connection->mMidiOffValue = mLayoutControls[layoutControl].mOffVal;
       connection->mMidiOnValue = mLayoutControls[layoutControl].mOnVal;
       connection->mScaleOutput = mLayoutControls[layoutControl].mScaleOutput;
-      connection->mType = mLayoutControls[layoutControl].mConnectionType;
+      if (mLayoutControls[layoutControl].mConnectionType != kControlType_Default)
+         connection->mType = mLayoutControls[layoutControl].mConnectionType;
    }
 
    connection->CreateUIControls((int)mConnections.size());
@@ -1663,7 +1665,7 @@ void MidiController::LoadLayout(string filename)
                offVal = mLayoutData["groups"][group]["colors"][0u].asInt();
                onVal = mLayoutData["groups"][group]["colors"][2u].asInt();
             }
-            ControlType connectionType = kControlType_Slider;
+            ControlType connectionType = kControlType_Default;
             if (mLayoutData["groups"][group]["connection_type"] == "slider")
                connectionType = kControlType_Slider;
             if (mLayoutData["groups"][group]["connection_type"] == "set")

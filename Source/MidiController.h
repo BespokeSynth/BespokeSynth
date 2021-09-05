@@ -57,7 +57,8 @@ enum ControlType
    kControlType_SetValue,
    kControlType_Toggle,
    kControlType_Direct,
-   kControlType_SetValueOnRelease
+   kControlType_SetValueOnRelease,
+   kControlType_Default
 };
 
 enum SpecialControlBinding
