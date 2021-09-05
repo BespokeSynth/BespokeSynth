@@ -175,7 +175,12 @@ UIControlConnection* MidiController::AddControlConnection(MidiMessageType messag
    connection->mUIControl = uicontrol;
    connection->mChannel = channel;
    connection->mPage = mControllerPage;
-   connection->mType = dynamic_cast<Checkbox*>(uicontrol) != nullptr ? kControlType_Toggle : kControlType_Slider;
+   if (dynamic_cast<Checkbox*>(uicontrol) != nullptr)
+      connection->mType = kControlType_Toggle;
+   else if (dynamic_cast<TextEntry*>(uicontrol) != nullptr)
+      connection->mType = kControlType_Direct;
+   else
+      connection->mType = kControlType_Slider;
    if (mSlidersDefaultToIncremental)
       connection->mIncrementAmount = 1;
 
