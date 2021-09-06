@@ -200,6 +200,8 @@ public:
    int GetNumValues() override { return mMax - mMin + 1; }
    string GetDisplayValue(float val) const override;
    void GetRange(int& min, int& max) { min = mMin; max = mMax; }
+   void Double() override;
+   void Halve() override;
    void Increment(float amount) override;
    void ResetToOriginal() override;
    void Poll() override;
