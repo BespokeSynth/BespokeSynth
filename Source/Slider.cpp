@@ -201,7 +201,7 @@ void FloatSlider::Render()
    
    DrawBeacon(screenPos, mY+mHeight/2);
    
-   DrawHover();
+   DrawHover(mX,mY,mWidth,mHeight);
 
    string display;
    float textSize = 15;
@@ -960,7 +960,7 @@ void IntSlider::Render()
    
    DrawBeacon(xpos, mY+mHeight/2);
    
-   DrawHover();
+   DrawHover(mX,mY,mWidth,mHeight);
 
    string display;
    if (mShowName)

@@ -133,7 +133,7 @@ void Checkbox::Render()
 
    ofPopStyle();
    
-   DrawHover();
+   DrawHover(mX, mY, mWidth, mHeight);
 }
 
 void Checkbox::OnClicked(int x, int y, bool right)

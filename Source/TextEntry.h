@@ -90,6 +90,7 @@ public:
    //IUIControl
    void SetFromMidiCC(float slider, bool setViaModulator = false) override {}
    void SetValue(float value) override;
+   void Increment(float amount) override;
    void SaveState(FileStreamOut& out) override;
    void LoadState(FileStreamIn& in, bool shouldSetValue = true) override;
    bool IsSliderControl() override { return false; }

@@ -540,7 +540,7 @@ void ModularSynth::Draw(void* vg)
    
    string tooltip = "";
    ModuleContainer* tooltipContainer = nullptr;
-   if (HelpDisplay::sShowTooltips)
+   if (HelpDisplay::sShowTooltips && !IUIControl::WasLastHoverSetViaTab())
    {
       HelpDisplay* helpDisplay = TheTitleBar->GetHelpDisplay();
 
@@ -825,23 +825,35 @@ void ModularSynth::KeyPressed(int key, bool isRepeat)
       mGroupSelectedModules.clear();
    }
    
+   if (key == KeyPress::F2Key && !isRepeat)
+   {
+      ADSRDisplay::ToggleDisplayMode();
+   }
+
    if (key == '`' && !isRepeat)
    {
       if (GetKeyModifiers() == kModifier_Shift)
+      {
          TriggerClapboard();
+      }
       else
-         ADSRDisplay::ToggleDisplayMode();
-   }
-
-   if (key == OF_KEY_TAB && !isRepeat)
-   {
-      bzero(mConsoleText, MAX_TEXTENTRY_LENGTH);
-      mConsoleEntry->MakeActiveTextEntry(true);
+      {
+         bzero(mConsoleText, MAX_TEXTENTRY_LENGTH);
+         mConsoleEntry->MakeActiveTextEntry(true);
+      }
    }
    
    if (key == KeyPress::F1Key && !isRepeat)
    {
       HelpDisplay::sShowTooltips = !HelpDisplay::sShowTooltips;
+   }
+   
+   if (key == OF_KEY_TAB)
+   {
+      if (GetKeyModifiers() == kModifier_Shift)
+         IUIControl::SetNewManualHover(-1);
+      else
+         IUIControl::SetNewManualHover(1);
    }
 
    mZoomer.OnKeyPressed(key);
@@ -1028,7 +1040,7 @@ void ModularSynth::MouseMoved(int intX, int intY )
       mUILayerModuleContainer.MouseMoved(x, y);
    }
    
-   if (gHoveredUIControl)
+   if (gHoveredUIControl && changed)
    {  
       if (!gHoveredUIControl->IsMouseDown())
       {
@@ -1245,7 +1257,7 @@ void ModularSynth::MouseScrolled(float x, float y, bool canZoomCanvas)
    x *= mScrollMultiplierHorizontal;
    y *= mScrollMultiplierVertical;
 
-   if (IsKeyHeld(' ') || GetModuleAtCursor() == nullptr)
+   if (IsKeyHeld(' ') || (GetModuleAtCursor() == nullptr && gHoveredUIControl == nullptr))
    {
       if (canZoomCanvas)
          ZoomView(y/50, true);
