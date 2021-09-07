@@ -1751,13 +1751,13 @@ void MidiController::LoadLayout(string filename)
       for (int i=0; i<128; ++i)
       {
          GetLayoutControl(i, kMidiMessage_Control).
-            Setup(this, kMidiMessage_Control, i, kDrawType_Slider, false, 0, 127, true, kControlType_Slider, i%8 * kSpacingX + kLayoutButtonsX + 9, i/8 * kSpacingY + kLayoutButtonsY, kSpacingX * .666f, kSpacingY * .93f);
+            Setup(this, kMidiMessage_Control, i, kDrawType_Slider, false, 0, 127, true, kControlType_Default, i%8 * kSpacingX + kLayoutButtonsX + 9, i/8 * kSpacingY + kLayoutButtonsY, kSpacingX * .666f, kSpacingY * .93f);
          GetLayoutControl(i, kMidiMessage_Note).
-            Setup(this, kMidiMessage_Note, i, kDrawType_Button, false, 0, 127, true, kControlType_Slider, i%8 * kSpacingX + 8 * kSpacingX + kLayoutButtonsX + 15, i/8 * kSpacingY + kLayoutButtonsY, kSpacingX * .93f, kSpacingY * .93f);
+            Setup(this, kMidiMessage_Note, i, kDrawType_Button, false, 0, 127, true, kControlType_Default, i%8 * kSpacingX + 8 * kSpacingX + kLayoutButtonsX + 15, i/8 * kSpacingY + kLayoutButtonsY, kSpacingX * .93f, kSpacingY * .93f);
       }
       
       GetLayoutControl(0, kMidiMessage_PitchBend).
-         Setup(this, kMidiMessage_PitchBend, 0, kDrawType_Slider, false, 0, 127, true, kControlType_Slider, kLayoutButtonsX + kSpacingX * 17, kLayoutButtonsY, 25, 100);
+         Setup(this, kMidiMessage_PitchBend, 0, kDrawType_Slider, false, 0, 127, true, kControlType_Default, kLayoutButtonsX + kSpacingX * 17, kLayoutButtonsY, 25, 100);
    }
    
    mLayoutWidth = 0;
