@@ -589,9 +589,24 @@ drumsequencer~step sequencer intended for drums. hold shift when dragging on the
 ~r amt~the chance that each step will change when being randomized. low values will only change a small amount of the sequence, high values will replace more of the sequence.
 
 
+
 helpdisplay~displays help information
 ~show tooltips~displays these tooltips. you can also toggle them with the F1 key, and you can turn these on or off by default in the "settings" menu.
 ~help page~which page of help information to show
+
+
+
+multitrackrecorder~record several synchronized tracks of audio, to write to disk for mixing in an external DAW
+~record~record input to the tracks
+~bounce~write the tracks to your recordings directory
+~add track~add an additional track
+~clear~clear the audio in the tracks
+
+
+
+multitrackrecordertrack~a track in a multitrack recorder
+~ X ~delete this track
+
 
 
 circlesequencer~polyrhythmic sequencer that displays a loop as a circle

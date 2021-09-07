@@ -23,141 +23,103 @@
 //
 //
 
-#ifndef __Bespoke__MultitrackRecorder__
-#define __Bespoke__MultitrackRecorder__
+#pragma once
 
 #include <iostream>
-#include "IAudioReceiver.h"
 #include "IDrawableModule.h"
 #include "Slider.h"
 #include "ClickButton.h"
 #include "RollingBuffer.h"
-#include "Ramp.h"
 #include "Checkbox.h"
-#include "NamedMutex.h"
-#include "ClipArranger.h"
+#include "IAudioProcessor.h"
+#include "ModuleContainer.h"
 
-#define RECORD_CHUNK_SIZE 10*gSampleRate
-#define MAX_NUM_MEASURES 1000
+class MultitrackRecorderTrack;
 
-class MultitrackRecorder : public IDrawableModule, public IFloatSliderListener, public IButtonListener
+class MultitrackRecorder : public IDrawableModule, public IButtonListener
 {
 public:
    MultitrackRecorder();
    virtual ~MultitrackRecorder();
    static IDrawableModule* Create() { return new MultitrackRecorder(); }
    
-   string GetTitleLabel() override { return "multitrack"; }
+   string GetTitleLabel() override { return "multitrack recorder"; }
    void CreateUIControls() override;
+   ModuleContainer* GetContainer() override { return &mModuleContainer; }
+   bool IsResizable() const override { return true; }
+   void Resize(float width, float height) override { mWidth = ofClamp(width, 210, 9999); }
    
-   void SetEnabled(bool enabled) override { mEnabled = enabled; }
-   
-   void Poll() override;
-   void Process(double time, float* left, float* right, int bufferSize);
-   
-   void MouseReleased() override;
-   bool MouseMoved(float x, float y) override;
-   
-   void FilesDropped(vector<string> files, int x, int y) override;
-   
-   void FloatSliderUpdated(FloatSlider* slider, float oldVal) override;
+   void RemoveTrack(MultitrackRecorderTrack* track);
+
    void ButtonClicked(ClickButton* button) override;
    void CheckboxUpdated(Checkbox* checkbox) override;
    
-   virtual void LoadLayout(const ofxJSONElement& moduleInfo) override;
-   virtual void SetUpFromSaveData() override;
+   void SaveLayout(ofxJSONElement& moduleInfo) override;
+   void LoadLayout(const ofxJSONElement& moduleInfo) override;
+   void SetUpFromSaveData() override;
+   void SaveState(FileStreamOut& out) override;
+   void LoadState(FileStreamIn& in) override;
    
 private:
-   static const int NUM_CLIP_ARRANGERS = 4;
-   
    //IDrawableModule
    void DrawModule() override;
-   void GetModuleDimensions(float& width, float& height) override;
-   bool Enabled() const override { return mEnabled; }
-   void OnClicked(int x, int y, bool right) override;
-   
-   struct BufferControls
-   {
-      BufferControls();
-      
-      float mVol;
-      FloatSlider* mVolSlider;
-      bool mMute;
-      Checkbox* mMuteCheckbox;
-   };
-   
-   struct RecordBuffer
-   {
-      RecordBuffer(int length);
-      ~RecordBuffer();
-      
-      float* mLeft;
-      float* mRight;
-      int mLength;
-      BufferControls mControls;
-   };
-   
-   void AddRecordBuffer();
-   int GetRecordIdx();
-   bool IsRecordingStructure();
-   void RecordStructure(int offset);
-   void ApplyStructure();
-   void ResetAll();
-   void FixLengths();
-   void DeleteBuffer(int idx);
-   void CopyRecordBufferContents(RecordBuffer* dst, RecordBuffer* src);
-   
-   float MeasureToPos(int measure);
-   int PosToMeasure(float pos);
-   float MouseXToBufferPos(float mouseX);
-   
-   
-   int mRecordingLength;
-   int mPlayhead;
-   bool mRecording;
-   
-   Checkbox* mRecordCheckbox;
-   Checkbox* mPlayCheckbox;
+   void GetModuleDimensions(float& width, float& height) { width = mWidth; height = mHeight; }
+
+   void AddTrack();
+   int GetRecordingLength();
+
+   float mWidth;
+   float mHeight;
+
+   ModuleContainer mModuleContainer;
+
    ClickButton* mAddTrackButton;
-   ClickButton* mResetPlayheadButton;
-   ClickButton* mFixLengthsButton;
-   float mBufferWidth;
-   float mBufferHeight;
-   int mRecordIdx;
-   int mMaxRecordedLength;
-   int mNumMeasures;
-   ClickButton* mUndoRecordButton;
-   
-   vector<RecordBuffer*> mRecordBuffers;
-   RecordBuffer* mUndoBuffer;
-   
-   float* mMeasurePos;
-   struct StructureInfo
-   {
-      int mSample;
-      
-      int mScaleRoot;
-      string mScaleType;
-      int mTimeSigTop;
-      int mTimeSigBottom;
-      float mTempo;
-      float mSwing;
-   };
-   vector<StructureInfo> mStructureInfoPoints;
-   int mActiveStructureIdx;
-   
-   int mMeasures[MAX_NUM_MEASURES];
-   bool mSelecting;
-   int mSelectedMeasureStart;
-   int mSelectedMeasureEnd;
-   int mMergeBufferIdx;
-   
-   NamedMutex mMutex;
-   
-   ClipArranger mClipArranger[NUM_CLIP_ARRANGERS];
+   Checkbox* mRecordCheckbox;
+   bool mRecord;
+   ClickButton* mBounceButton;
+   ClickButton* mClearButton;
+
+   vector<MultitrackRecorderTrack*> mTracks;
+   string mStatusString;
+   double mStatusStringTime;
 };
 
-extern MultitrackRecorder* TheMultitrackRecorder;
+class MultitrackRecorderTrack : public IAudioProcessor, public IDrawableModule, public IFloatSliderListener, public IButtonListener
+{
+public:
+   MultitrackRecorderTrack();
+   virtual ~MultitrackRecorderTrack();
+   static IDrawableModule* Create() { return new MultitrackRecorderTrack(); }
 
-#endif /* defined(__Bespoke__MultitrackRecorder__) */
+   string GetTitleLabel() override { return " "; }
+   void CreateUIControls() override;
+   bool HasTitleBar() const override { return false; }
 
+   void Poll();
+   void Process(double time);
+
+   void Setup(MultitrackRecorder* recorder, int minLength);
+   void SetRecording(bool record);
+   Sample* BounceRecording();
+   void Clear();
+   int GetRecordingLength() const { return mRecordingLength; }
+
+   void FloatSliderUpdated(FloatSlider* slider, float oldVal) override;
+   void CheckboxUpdated(Checkbox* checkbox) override;
+   void ButtonClicked(ClickButton* button) override;
+
+   void LoadLayout(const ofxJSONElement& moduleInfo) override;
+   void SetUpFromSaveData() override;
+
+private:
+   //IDrawableModule
+   void DrawModule() override;
+   void GetModuleDimensions(float& width, float& height);
+
+   MultitrackRecorder* mRecorder;
+
+   vector<ChannelBuffer*> mRecordChunks;
+   bool mDoRecording;
+   int mRecordingLength;
+   ClickButton* mDeleteButton;
+};

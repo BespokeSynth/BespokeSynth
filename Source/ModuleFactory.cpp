@@ -429,6 +429,7 @@ ModuleFactory::ModuleFactory()
    REGISTER(MidiControlChange, midicc, kModuleType_Note);
    REGISTER(MPETweaker, mpetweaker, kModuleType_Note);
    REGISTER(GridSliders, gridsliders, kModuleType_Modulator);
+   REGISTER(MultitrackRecorder, multitrackrecorder, kModuleType_Other);
 
    //REGISTER_EXPERIMENTAL(MidiPlayer, midiplayer, kModuleType_Instrument);
    REGISTER_HIDDEN(Autotalent, autotalent, kModuleType_Audio);
@@ -444,7 +445,6 @@ ModuleFactory::ModuleFactory()
    REGISTER_HIDDEN(MultibandCompressor, multiband, kModuleType_Audio);
    REGISTER_HIDDEN(ControllingSong, controllingsong, kModuleType_Synth);
    REGISTER_HIDDEN(PanicButton, panicbutton, kModuleType_Other);
-   REGISTER_HIDDEN(MultitrackRecorder, multitrackrecorder, kModuleType_Audio);
    REGISTER_HIDDEN(DebugAudioSource, debugaudiosource, kModuleType_Synth);
    REGISTER_HIDDEN(FollowingSong, followingsong, kModuleType_Synth);
    REGISTER_HIDDEN(BeatBloks, beatbloks, kModuleType_Synth);
@@ -464,6 +464,7 @@ ModuleFactory::ModuleFactory()
    REGISTER_HIDDEN(Razor, razor, kModuleType_Synth);
    REGISTER_HIDDEN(MidiCapturer, midicapturer, kModuleType_Note);
    REGISTER_HIDDEN(ScriptReferenceDisplay, scriptingreference, kModuleType_Other);
+   REGISTER_HIDDEN(MultitrackRecorderTrack, multitrackrecordertrack, kModuleType_Audio);
 }
 
 void ModuleFactory::Register(string type, CreateModuleFn creator, CanCreateModuleFn canCreate, ModuleType moduleType, bool hidden, bool experimental)

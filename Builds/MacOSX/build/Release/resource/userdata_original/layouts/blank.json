@@ -2,7 +2,7 @@
    "modules" : [
       {
          "name" : "gain",
-         "position" : [ 1525.0, 916.0 ],
+         "position" : [ 1525.0, 910.0 ],
          "target" : "splitter",
          "type" : "gain"
       },

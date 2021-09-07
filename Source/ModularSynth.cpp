@@ -13,7 +13,6 @@
 #include "ChaosEngine.h"
 #include "ModuleSaveDataPanel.h"
 #include "Profiler.h"
-#include "MultitrackRecorder.h"
 #include "Sample.h"
 #include "FloatSliderLFOControl.h"
 //#include <CoreServices/CoreServices.h>
@@ -1556,9 +1555,6 @@ void ModularSynth::AudioOut(float** output, int bufferSize, int nChannels)
       //put it into speakers
       for (int i = 0; i < nChannels; ++i)
          BufferCopy(output[i], mOutputBuffers[i], gBufferSize);
-      
-      if (TheMultitrackRecorder && mOutputBuffers.size() >= 2)
-         TheMultitrackRecorder->Process(gTime, mOutputBuffers[0], mOutputBuffers[1], gBufferSize);
    }
    
    if (gTime - mLastClapboardTime < 100)
