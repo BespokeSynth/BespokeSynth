@@ -231,7 +231,7 @@ IDrawableModule* ModuleContainer::GetModuleAt(float x, float y)
          ModuleContainer* subcontainer = mModules[i]->GetContainer();
          if (subcontainer)
          {
-            IDrawableModule* contained = subcontainer->GetModuleAt(x - subcontainer->GetOwnerPosition().x, y - subcontainer->GetOwnerPosition().y);
+            IDrawableModule* contained = subcontainer->GetModuleAt(x, y);
             if (contained)
             {
                return contained;
