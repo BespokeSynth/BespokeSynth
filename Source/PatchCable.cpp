@@ -431,6 +431,14 @@ PatchCablePos PatchCable::GetPatchCablePos()
    
    int yThatAdjust = 0;
    IDrawableModule* targetModule = dynamic_cast<IDrawableModule*>(mTarget);
+   IClickable* target = mTarget;
+
+   if (targetModule != nullptr && targetModule->IsDeleted())
+   {
+      targetModule = nullptr;
+      target = nullptr;
+   }
+
    if (targetModule && targetModule->HasTitleBar() && !mDragging)
       yThatAdjust = IDrawableModule::TitleBarHeight();
    
@@ -443,17 +451,17 @@ PatchCablePos PatchCable::GetPatchCablePos()
       xThat = mouseX;
       yThat = mouseY;
    }
-   else if (mTarget)
+   else if (target)
    {
-      mTarget->GetDimensions(wThat,hThat);
-      mTarget->GetPosition(xThat,yThat);
+      target->GetDimensions(wThat,hThat);
+      target->GetPosition(xThat,yThat);
       
-      IDrawableModule* targetModuleParent = dynamic_cast<IDrawableModule*>(mTarget->GetParent());
+      IDrawableModule* targetModuleParent = dynamic_cast<IDrawableModule*>(target->GetParent());
       ModuleContainer* targetModuleParentContainer = targetModuleParent ? targetModuleParent->GetOwningContainer() : nullptr;
       IDrawableModule* targetModuleParentContainerModule = targetModuleParentContainer ? targetModuleParentContainer->GetOwner() : nullptr;
       if (targetModuleParentContainerModule && targetModuleParentContainerModule->Minimized())
          targetModuleParent = targetModuleParentContainerModule;
-      if (targetModuleParent && (targetModuleParent->Minimized() || mTarget->IsShowing() == false))
+      if (targetModuleParent && (targetModuleParent->Minimized() || target->IsShowing() == false))
       {
          targetModuleParent->GetPosition(xThat, yThat);
          targetModuleParent->GetDimensions(wThat, hThat);
@@ -478,8 +486,8 @@ PatchCablePos PatchCable::GetPatchCablePos()
    
    if (mTargetRadioButton && mUIControlConnection && !mDragging)
    {
-      mTarget->GetDimensions(wThat,hThat);
-      mTarget->GetPosition(xThat,yThat);
+      target->GetDimensions(wThat,hThat);
+      target->GetPosition(xThat,yThat);
       end = mTargetRadioButton->GetOptionPosition(mUIControlConnection->mValue);
    }
    
@@ -488,7 +496,7 @@ PatchCablePos PatchCable::GetPatchCablePos()
    ofVec2f plug = end + endDirection * plugLength;
    
    PatchCablePos cable;
-   cable.start = start;
+   cable.start = start + startDirection * 4;
    cable.startDirection = startDirection;
    cable.end = end;
    cable.plug = plug;

@@ -255,7 +255,7 @@ void PatchCableSource::DrawCables(bool parentMinimized)
 
 void PatchCableSource::Render()
 {
-   if (!Enabled())
+   if (!Enabled() || mOwner->IsDeleted())
       return;
 
    ofPushStyle();
