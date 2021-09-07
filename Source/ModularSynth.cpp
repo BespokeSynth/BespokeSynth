@@ -1830,6 +1830,19 @@ bool ModularSynth::LoadLayoutFromFile(string jsonFile, bool makeDefaultLayout /*
          if (output2 != nullptr)
             output2->SetPosition(output2->GetPosition().x, output2->GetPosition().y + offset);
       }
+
+      if (output2 != nullptr && output2->GetPosition().x > ofGetWidth() - 100)
+      {
+         float offset = ofGetWidth() - output2->GetPosition().x - 100;
+         if (gain != nullptr)
+            gain->SetPosition(gain->GetPosition().x + offset, gain->GetPosition().y);
+         if (splitter != nullptr)
+            splitter->SetPosition(splitter->GetPosition().x + offset, splitter->GetPosition().y);
+         if (output1 != nullptr)
+            output1->SetPosition(output1->GetPosition().x + offset, output1->GetPosition().y);
+         if (output2 != nullptr)
+            output2->SetPosition(output2->GetPosition().x + offset, output2->GetPosition().y);
+      }
    }
    
    if (makeDefaultLayout)
