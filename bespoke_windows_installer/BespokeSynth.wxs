@@ -19,7 +19,7 @@
       <Condition Message="A newer version of this software is already installed.">NOT NEWERVERSIONDETECTED</Condition>
 
       <Directory Id="TARGETDIR" Name="SourceDir">
-         <Directory Id="ProgramFilesFolder">
+         <Directory Id="ProgramFiles64Folder">
             <Directory Id="INSTALLDIR" Name="BespokeSynth">
                <Component Id="ApplicationFiles" Guid="0a2563f0-5f49-4ae8-acda-143a019f73a2">
                   <File Id="MainExecutable" Source="..\Builds\VisualStudio2015\x64\Release\App\BespokeSynth.exe"/>
