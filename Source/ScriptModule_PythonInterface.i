@@ -397,15 +397,36 @@ PYBIND11_EMBEDDED_MODULE(midicontroller, m)
       return ret;
    }, py::return_value_policy::reference);
    py::class_<MidiController, IDrawableModule> midiControllerClass(m, "midicontroller");
+   py::enum_<MidiMessageType>(midiControllerClass, "MidiMessageType")
+      .value("Note", MidiMessageType::kMidiMessage_Note)
+      .value("Control", MidiMessageType::kMidiMessage_Control)
+      .value("Program", MidiMessageType::kMidiMessage_Program)
+      .value("PitchBend", MidiMessageType::kMidiMessage_PitchBend)
+      .export_values();
+   py::enum_<ControlType>(midiControllerClass, "ControlType")
+      .value("Slider", ControlType::kControlType_Slider)
+      .value("SetValue", ControlType::kControlType_SetValue)
+      .value("Toggle", ControlType::kControlType_Toggle)
+      .value("Direct", ControlType::kControlType_Direct)
+      .value("SetValueOnRelease", ControlType::kControlType_SetValueOnRelease)
+      .value("Default", ControlType::kControlType_Default)
+      .export_values();
    midiControllerClass
-      .def("set_connection", [](MidiController& midicontroller, MidiMessageType messageType, int control, int channel, string controlPath)
+      .def("set_connection", [](MidiController& midicontroller, MidiMessageType messageType, int control, string controlPath, ControlType controlType, int value, int channel, int page)
       {
          ScriptModule::sMostRecentLineExecutedModule->SetContext();
          IUIControl* uicontrol = TheSynth->FindUIControl(controlPath.c_str());
          if (uicontrol != nullptr)
-            midicontroller.AddControlConnection(messageType, control, channel, uicontrol);
+         {
+            auto* connection = midicontroller.AddControlConnection(messageType, control, channel, uicontrol);
+            if (controlType != kControlType_Default)
+               connection->mType = controlType;
+            connection->mValue = value;
+            connection->mPage = page;
+         }
          ScriptModule::sMostRecentLineExecutedModule->ClearContext();
-      })
+      }, "messageType"_a, "control"_a, "controlPath"_a, "controlType"_a = kControlType_Default, "value"_a = 0, "channel"_a = -1, "page"_a=0)
+      ///example: m.set_connection(m.Control, 32, "oscillator~pw"), or m.set_connection(m.Note, 10, "oscillator~osc", m.SetValue, 2)
       .def("send_note", [](MidiController& midicontroller, int pitch, int velocity, bool forceNoteOn, int channel, int page)
       {
          midicontroller.SendNote(page, pitch, velocity, forceNoteOn, channel);
@@ -430,12 +451,6 @@ PYBIND11_EMBEDDED_MODULE(midicontroller, m)
       {
          midicontroller.AddScriptListener(script);
       });
-   py::enum_<MidiMessageType>(midiControllerClass, "MidiMessageType")
-      .value("Note", MidiMessageType::kMidiMessage_Note)
-      .value("Control", MidiMessageType::kMidiMessage_Control)
-      .value("Program", MidiMessageType::kMidiMessage_Program)
-      .value("PitchBend", MidiMessageType::kMidiMessage_PitchBend)
-      .export_values();
 }
 
 PYBIND11_EMBEDDED_MODULE(linnstrument, m)
