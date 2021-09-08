@@ -18,6 +18,8 @@
 
 // (You can add your own code in this section, and the Projucer will not overwrite it)
 
+#define JUCE_JACK_CLIENT_NAME "BespokeSynth"
+
 // [END_USER_CODE_SECTION]
 
 /*

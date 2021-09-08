@@ -452,6 +452,12 @@ notesequencer~looping sequence of notes at an interval. pair with a "pulser" mod
 ~grid~patch a grid in here from a "midicontroller" module
 ~x offset~x offset of attached grid controller
 ~y offset~y offset of attached grid controller
+~rand pitch chance~when clicking the random pitch button, what is the chance that a step gets changed?
+~rand pitch range~when clicking the random pitch button, how far will the pitch change?
+~rand len chance~when clicking the random length button, what is the chance that a step gets changed?
+~rand len range~when clicking the random length button, how much will the length change?
+~rand vel chance~when clicking the random velocity button, what is the chance that a step gets changed?
+~rand vel density~when clicking the random velocity button, what are the chances that a step should have a note?
 
 
 
@@ -526,8 +532,9 @@ midicontroller~get midi input from external devices. to get a nice display in th
 ~path~path to the control that should be affected
 ~controltype~how this control should modify the target.\n -slider: set the value interpolated between "midi off" and "midi on" to the slider's value\n -set: set the specified value directly when this button is pressed\n -release: set the specified value directly when this button is released\n -toggle: toggle the control's value to on/off when this button is pressed\n -direct: set the control to the literal midi input value
 ~value~the value to set
-~midi off~the lower end of the midi range. send this value when the targeted control is off. this also controls the lower end of the slider range. set midi off to be higher than midi on to reverse a slider's direction.
-~midi on~the upper end of the midi range. send this value when the targeted control is on. this also controls the upper end of the slider range. set midi off to be higher than midi on to reverse a slider's direction.
+~midi off~the lower end of the midi range. send this value when the targeted control is off. if "scale" is enabled, this also controls the lower end of the slider range, and you can set midi off to be higher than midi on to reverse a slider's direction.
+~midi on~the upper end of the midi range. send this value when the targeted control is on. if "scale" is enabled, this also controls the upper end of the slider range, and you can set midi off to be higher than midi on to reverse a slider's direction.
+~scale~should the output of this midi slider be scaled between "midi off" and "midi on"?
 ~blink~when the targeted control is enabled, send alternating on/off messages, to blink the associated LED
 ~increment~when "controltype" is "set" or "release", the targeted control is incremented by this amount (and the "value" field is ignored). when "controltype" is "slider", the targeted control is changed by this amount in the direction the control was changed (this setting is useful for "infinite encoders")
 ~twoway~should we send feedback to the controller? (to control the LEDs associated with the button/knob)
@@ -582,9 +589,24 @@ drumsequencer~step sequencer intended for drums. hold shift when dragging on the
 ~r amt~the chance that each step will change when being randomized. low values will only change a small amount of the sequence, high values will replace more of the sequence.
 
 
+
 helpdisplay~displays help information
-~show tooltips~displays these tooltips. you can turn these on or off by default in the "settings" menu.
+~show tooltips~displays these tooltips. you can also toggle them with the F1 key, and you can turn these on or off by default in the "settings" menu.
 ~help page~which page of help information to show
+
+
+
+multitrackrecorder~record several synchronized tracks of audio, to write to disk for mixing in an external DAW
+~record~record input to the tracks
+~bounce~write the tracks to your recordings directory
+~add track~add an additional track
+~clear~clear the audio in the tracks
+
+
+
+multitrackrecordertrack~a track in a multitrack recorder
+~ X ~delete this track
+
 
 
 circlesequencer~polyrhythmic sequencer that displays a loop as a circle
@@ -1542,7 +1564,7 @@ notehumanizer~add randomness to timing and velocity
 
 
 
-notehocket~sends notes to a random destinations
+notehocket~sends notes to random destinations
 ~weight *~chance that note goes to this destination
 
 
@@ -1691,7 +1713,7 @@ titlebar~
 ~save as~save current state as a new .bsk file
 ~reset layout~reset to the layout specified in "layout" in userprefs.json
 ~write audio~write the last 30 minutes of audio to your specified recordings_path
-~ ? ~
+~ ? ~show help
 ~settings~adjust preferences, saved as userprefs.json
 ~load layout~[none]
 ~lookahead (exp.)~use lookahead scheduling, which is necessary for scriptmodule. gets automatically turned on when you use scriptmodule. so far, lookahead scheduling seems to not create any issues, but leaving this checkbox here just in case.
@@ -1705,6 +1727,8 @@ vstplugin~a VST plugin instance
 ~program change~send a program change message to the VST instance
 ~open~show the plugin window
 ~show parameter~select parameters to display them, so they can be adjusted from within bespoke's interface. if a VST has more than 20 parameters, this list will initially be empty. in that case, to make a parameter appear in this list, wiggle it within the VST's interface.
+~preset~choose from saved VST presets
+~save as~save the current VST settings as a preset to load again later
 
 
 

@@ -1,5 +1,6 @@
 {
-   "outchannel" : 16,
+   "outchannel" : 1,
+   "outdevice" : "nanoKONTROL2 CTRL",
    "groups" : [
       {
          "rows": 3,

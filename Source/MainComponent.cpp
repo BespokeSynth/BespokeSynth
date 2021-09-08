@@ -213,7 +213,7 @@ public:
 
       SetGlobalSampleRateAndBufferSize(sampleRate, bufferSize);
       
-      mSynth.Setup(&mGlobalManagers, this);
+      mSynth.Setup(&mGlobalManagers, this, &openGLContext);
 
       if (!mGlobalManagers.mDeviceManager.getCurrentDeviceTypeObject()->hasSeparateInputsAndOutputs())
          inputDevice = outputDevice;    //asio must have identical input and output

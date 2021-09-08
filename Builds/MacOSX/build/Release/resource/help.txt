@@ -2,7 +2,7 @@
 navigation
    * space bar + move mouse to pan, or right-click drag in empty space
    * space bar + mousewheel/trackpad-scroll to zoom, or scroll in empty space
-   * if you get lost, press tab and type "home" into the console to reset to the initial position and zoom
+   * if you get lost, press ~ to bring up the console, type "home", and press enter to reset to the initial position and zoom
 
 
 creating modules
@@ -43,13 +43,11 @@ ui controls
 saving
    * "write audio" button: write the last 30 minutes of audio to the /data/recordings folder, perfect for making sure you don't
        miss any cool moments
-   * "save state" button: save the current layout to a file
-   * "load state" button: load previously saved layouts
-   * tab+'s'+enter: quicksave
-   * tab+'l'+enter: quickload
+   * "save state" button: save the current layout to a file. shortcut: ctrl-s
+   * "load state" button: load previously saved layouts. shortcut: ctrl-l
 
 key commands
    * ctrl/command-'s': save
    * ctrl/command-'l': load
    * shift-'p': pause audio processing. this will stop all audio output. press shift-'p' again to resume
-   * ` (backtick, aka the tilde key): display all ADSR controls as sliders
+   * F2: toggle displaying all ADSR controls as sliders

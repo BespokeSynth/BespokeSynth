@@ -498,6 +498,19 @@ bool ofIsStringInString(const string& haystack, const string& needle)
    return ( strstr(haystack.c_str(), needle.c_str() ) != nullptr );
 }
 
+String GetFileNameWithoutExtension(String fullPath)
+{
+   auto lastSlash = fullPath.lastIndexOfChar('/') + 1;
+   if (lastSlash == 0)
+      lastSlash = fullPath.lastIndexOfChar('\\') + 1;
+   auto lastDot   = fullPath.lastIndexOfChar ('.');
+
+   if (lastDot > lastSlash)
+     return fullPath.substring (lastSlash, lastDot);
+
+   return fullPath.substring (lastSlash);
+}
+
 void ofScale(float x, float y, float z)
 {
    nvgScale(gNanoVG, x, y);
@@ -803,14 +816,14 @@ ofRectangle RetinaTrueTypeFont::DrawStringWrap(string str, float size, float x, 
    return rect;
 }
 
-float RetinaTrueTypeFont::GetStringWidth(string str, float size, bool isRenderThread /*false*/)
+float RetinaTrueTypeFont::GetStringWidth(string str, float size)
 {
    if (!mLoaded)
       return str.size() * 12;
       
    NVGcontext* vg;
    int handle;
-   if (isRenderThread)
+   if (TheSynth->GetOpenGLContext()->getCurrentContext() != nullptr)
    {
       vg = gNanoVG;
       handle = mFontHandle;
@@ -829,14 +842,14 @@ float RetinaTrueTypeFont::GetStringWidth(string str, float size, bool isRenderTh
    return width;
 }
 
-float RetinaTrueTypeFont::GetStringHeight(string str, float size, bool isRenderThread /*false*/)
+float RetinaTrueTypeFont::GetStringHeight(string str, float size)
 {
    if (!mLoaded)
       return str.size() * 12;
       
    NVGcontext* vg;
    int handle;
-   if (isRenderThread)
+   if (TheSynth->GetOpenGLContext()->getCurrentContext() != nullptr)
    {
       vg = gNanoVG;
       handle = mFontHandle;

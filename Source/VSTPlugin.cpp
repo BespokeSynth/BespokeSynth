@@ -134,11 +134,12 @@ namespace VSTLookup
       if (juce::String(vstName).contains("/") || juce::String(vstName).contains("\\"))  //already a path
          return vstName;
       
+      vstName = GetFileNameWithoutExtension(vstName).toStdString();
       auto types = sPluginList.getTypes();
       for (int i=0; i<types.size(); ++i)
       {
          juce::File vst(types[i].fileOrIdentifier);
-         if (vst.getFileName().toStdString() == vstName)
+         if (vst.getFileNameWithoutExtension().toStdString() == vstName)
             return types[i].fileOrIdentifier.toStdString();
       }
       
@@ -211,15 +212,15 @@ void VSTPlugin::Exit()
 
 string VSTPlugin::GetTitleLabel()
 {
-   if (mPlugin)
-      return "vst: "+GetPluginName();
-   return "vst";
+   return "vst: "+GetPluginName();
 }
 
 string VSTPlugin::GetPluginName()
 {
    if (mPlugin)
       return mPluginName;
+   if (mModuleSaveData.HasProperty("vst") && mModuleSaveData.GetString("vst").length() > 0)
+      return GetFileNameWithoutExtension(mModuleSaveData.GetString("vst")).toStdString() + " (not loaded)";
    return "no plugin loaded";
 }
 
@@ -422,7 +423,19 @@ void VSTPlugin::Poll()
 void VSTPlugin::Process(double time)
 {
    if (!mPluginReady)
-      return;
+   {
+      //bypass
+      GetBuffer()->SetNumActiveChannels(2);
+      SyncBuffers();
+      for (int ch=0; ch<GetBuffer()->NumActiveChannels(); ++ch)
+      {
+         if (GetTarget())
+            Add(GetTarget()->GetBuffer()->GetChannel(ch), GetBuffer()->GetChannel(ch), GetBuffer()->BufferSize());
+         GetVizBuffer()->WriteChunk(GetBuffer()->GetChannel(ch),GetBuffer()->BufferSize(), ch);
+      }
+
+      GetBuffer()->Clear();
+   }
    
 #if BESPOKE_LINUX //HACK: weird race condition, which this seems to fix for now
    if (mPlugin == nullptr)
@@ -979,25 +992,25 @@ void VSTPlugin::LoadState(FileStreamIn& in)
          mPlugin->setStateInformation(vstState, vstStateSize);
          if (rev >= 1 && vstProgramStateSize > 0)
             mPlugin->setCurrentProgramStateInformation(vstProgramState, vstProgramStateSize);
-         
-         if (rev >= 2)
-         {
-            int numParamsShowing;
-            in >> numParamsShowing;
-            for (auto& param : mParameterSliders)
-               param.mShowing = false;
-            for (int i=0; i<numParamsShowing; ++i)
-            {
-               int index;
-               in >> index;
-               if (index < mParameterSliders.size())
-                  mParameterSliders[index].mShowing = true;
-            }
-         }
       }
       else
       {
          TheSynth->LogEvent("Couldn't instantiate plugin to load state for "+mModuleSaveData.GetString("vst"), kLogEventType_Error);
+      }
+      
+      if (rev >= 2)
+      {
+         int numParamsShowing;
+         in >> numParamsShowing;
+         for (auto& param : mParameterSliders)
+            param.mShowing = false;
+         for (int i=0; i<numParamsShowing; ++i)
+         {
+            int index;
+            in >> index;
+            if (index < mParameterSliders.size())
+               mParameterSliders[index].mShowing = true;
+         }
       }
    }
 }

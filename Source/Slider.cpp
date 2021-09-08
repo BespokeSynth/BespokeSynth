@@ -201,7 +201,7 @@ void FloatSlider::Render()
    
    DrawBeacon(screenPos, mY+mHeight/2);
    
-   DrawHover();
+   DrawHover(mX,mY,mWidth,mHeight);
 
    string display;
    float textSize = 15;
@@ -960,7 +960,7 @@ void IntSlider::Render()
    
    DrawBeacon(xpos, mY+mHeight/2);
    
-   DrawHover();
+   DrawHover(mX,mY,mWidth,mHeight);
 
    string display;
    if (mShowName)
@@ -1131,6 +1131,20 @@ float IntSlider::GetMidiValue() const
 string IntSlider::GetDisplayValue(float val) const
 {
    return ofToString(val,0);
+}
+
+void IntSlider::Double()
+{
+   int doubl = *mVar * 2;
+   if (doubl >= mMin && doubl <= mMax)
+      SetValue(doubl);
+}
+
+void IntSlider::Halve()
+{
+   int half = *mVar / 2;
+   if (half >= mMin && half <= mMax)
+      SetValue(half);
 }
 
 void IntSlider::Increment(float amount)

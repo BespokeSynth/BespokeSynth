@@ -211,7 +211,7 @@ void RadioButton::Render()
    ofPopMatrix();
    ofPopStyle();
    
-   DrawHover();
+   DrawHover(mX, mY, w, h);
 }
 
 bool RadioButton::MouseMoved(float x, float y)

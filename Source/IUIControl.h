@@ -66,7 +66,7 @@ public:
    virtual bool IsBitmask() { return false; }
    bool TestHover(int x, int y);
    void CheckHover(int x, int y);
-   void DrawHover();
+   void DrawHover(float x, float y, float w, float h);
    void DrawPatchCableHover();
    virtual bool CanBeTargetedBy(PatchCableSource* source) const;
    virtual bool InvertScrollDirection() { return false; }
@@ -85,6 +85,9 @@ public:
    virtual bool IsMouseDown() const { return false; }
    virtual bool IsTextEntry() const { return false; }
    
+   static void SetNewManualHover(int direction);
+   static bool WasLastHoverSetViaTab() { return sLastUIHoverWasSetViaTab; }
+   
    virtual void SaveState(FileStreamOut& out) = 0;
    virtual void LoadState(FileStreamIn& in, bool shouldSetValue = true) = 0;
 protected:
@@ -93,6 +96,9 @@ protected:
    int mRemoteControlCount;
    bool mNoHover;
    bool mShouldSaveState;
+   
+   static IUIControl* sLastHoveredUIControl;
+   static bool sLastUIHoverWasSetViaTab;
 };
 
 #endif

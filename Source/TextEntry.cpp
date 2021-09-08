@@ -166,7 +166,7 @@ void TextEntry::Render()
             char beforeCaret[MAX_TEXTENTRY_LENGTH];
             strncpy(beforeCaret, mString, mCaretPosition);
             beforeCaret[mCaretPosition] = 0;
-            caretX += gFontFixedWidth.GetStringWidth(beforeCaret, 14, true);
+            caretX += gFontFixedWidth.GetStringWidth(beforeCaret, 14);
          }
          ofFill();
          ofRect(caretX, caretY, 1, 12, L(corner, 1));
@@ -189,6 +189,8 @@ void TextEntry::Render()
    }*/
 
    ofPopStyle();
+   
+   DrawHover(mX + xOffset, mY, w - xOffset, h);
 }
 
 void TextEntry::GetDimensions(float& width, float& height)
@@ -359,7 +361,7 @@ void TextEntry::OnKeyPressed(int key, bool isRepeat)
    {
       mCaretPosition = (int)strlen(mString);
    }
-   else
+   else if (key < CHAR_MAX && juce::CharacterFunctions::isPrintable((char)key))
    {
       AddCharacter((char)key);
    }
@@ -449,6 +451,30 @@ bool TextEntry::AllowCharacter(char c)
    if (mType == kTextEntry_Float)
       return CharacterFunctions::isDigit((char)c) || c == '.' || c == '-';
    return false;
+}
+
+void TextEntry::Increment(float amount)
+{
+   if (mType == kTextEntry_Float)
+   {
+      float newVal = *mVarFloat + amount;
+      if (newVal >= mFloatMin && newVal <= mFloatMax)
+      {
+         *mVarFloat = newVal;
+         UpdateDisplayString();
+         AcceptEntry(false);
+      }
+   }
+   if (mType == kTextEntry_Int)
+   {
+      int newVal = *mVarInt + (int)amount;
+      if (newVal >= mIntMin && newVal <= mIntMax)
+      {
+         *mVarInt = newVal;
+         UpdateDisplayString();
+         AcceptEntry(false);
+      }
+   }
 }
 
 void TextEntry::SetNextTextEntry(TextEntry* entry)

@@ -178,7 +178,7 @@ void DropdownList::Render()
 
    ofPopStyle();
    
-   DrawHover();
+   DrawHover(mX+xOffset, mY, w-xOffset, h);
    
    if (mLastScrolledTime + 300 > gTime && TheSynth->GetTopModalFocusItem() != &mModalList && !Push2Control::sDrawingPush2Display && mElements.size() < mMaxPerColumn)
    {

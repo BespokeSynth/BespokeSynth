@@ -215,7 +215,7 @@ void ModulatorExpression::DrawModule()
 
 void ModulatorExpression::GetModuleDimensions(float& w, float& h)
 {
-   w = MAX(kGraphX + kGraphWidth + 2, 4 + strlen(mTextEntry->GetText()) * 7);
+   w = MAX(kGraphX + kGraphWidth + 2, 4 + strlen(mTextEntry->GetText()) * 7); 
    h = kGraphY + kGraphHeight;
 }
 

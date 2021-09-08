@@ -42,5 +42,6 @@
        "messageType" : "control",
        "drawType" : "button"
     }
-   ]
+   ],
+   "resend_feedback_on_release" : true
 }

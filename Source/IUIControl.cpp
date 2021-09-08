@@ -31,6 +31,11 @@
 #include "Push2Control.h"
 #include "TextEntry.h"
 
+//static
+IUIControl* IUIControl::sLastHoveredUIControl = nullptr;
+//static
+bool IUIControl::sLastUIHoverWasSetViaTab = false;
+
 IUIControl::~IUIControl()
 {
    if (gHoveredUIControl == this)
@@ -81,46 +86,42 @@ void IUIControl::CheckHover(int x, int y)
    if (TheSynth->GetFrameCount() != sLastHoveredUIControlFrame && TestHover(x, y) && (gHoveredUIControl == nullptr || !gHoveredUIControl->IsMouseDown()))
    {
       gHoveredUIControl = this;
+      sLastHoveredUIControl = this;
+      sLastUIHoverWasSetViaTab = false;
       sLastHoveredUIControlFrame = TheSynth->GetFrameCount();
    }
 }
 
-void IUIControl::DrawHover()
+void IUIControl::DrawHover(float x, float y, float w, float h)
 {
    if (Push2Control::sDrawingPush2Display)
       return;
    
    if (gHoveredUIControl == this && IKeyboardFocusListener::GetActiveKeyboardFocus() == nullptr && TheSynth->GetGroupSelectedModules().empty())
    {
-      float w,h;
-      GetDimensions(w, h);
       ofPushStyle();
       ofNoFill();
-      ofSetColor(0,255,255);
-      ofRect(mX,mY,w,h,4);
+      ofSetColor(0,255,255,255);
+      ofRect(x,y,w,h,4);
       ofPopStyle();
    }
    
    if (mRemoteControlCount > 0 && TheSynth->InMidiMapMode())
    {
-      float w,h;
-      GetDimensions(w, h);
       ofPushStyle();
       ofFill();
       ofSetColor(255,0,255,100);
-      ofRect(mX,mY,w,h);
+      ofRect(x,y,w,h);
       ofPopStyle();
    }
    
    if (gBindToUIControl == this)
    {
-      float w,h;
-      GetDimensions(w, h);
       ofPushStyle();
       ofNoFill();
       ofSetLineWidth(5);
       ofSetColor(255,0,255,200);
-      ofRect(mX,mY,w,h);
+      ofRect(x,y,w,h);
       ofPopStyle();
    }
    
@@ -199,5 +200,44 @@ void IUIControl::GetColors(ofColor& color, ofColor& textColor)
    else
    {
       textColor.set(255,255,255,gModuleDrawAlpha);
+   }
+}
+
+//static
+void IUIControl::SetNewManualHover(int direction)
+{
+   if (gHoveredUIControl == nullptr)
+   {
+      gHoveredUIControl = sLastHoveredUIControl;
+      sLastUIHoverWasSetViaTab = true;
+   }
+   else
+   {
+      IDrawableModule* uiControlModule = gHoveredUIControl->GetModuleParent();
+      if (uiControlModule != nullptr)
+      {
+         const auto& controls = uiControlModule->GetUIControls();
+         int controlIndex = 0;
+         for (int i=0; i <(int)controls.size(); ++i)
+         {
+            if (controls[i] == gHoveredUIControl)
+            {
+               controlIndex = i;
+               break;
+            }
+         }
+         
+         for (int i=1; i <(int)controls.size(); ++i)
+         {
+            int newControlIndex = (controlIndex + i*direction + (int)controls.size()) % (int)controls.size();
+            if (controls[newControlIndex]->IsShowing())
+            {
+               gHoveredUIControl = controls[newControlIndex];
+               sLastHoveredUIControl = gHoveredUIControl;
+               sLastUIHoverWasSetViaTab = true;
+               break;
+            }
+         }
+      }
    }
 }

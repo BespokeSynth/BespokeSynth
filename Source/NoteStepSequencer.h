@@ -70,6 +70,7 @@ public:
    //IDrawableModule
    bool IsResizable() const override { return true; }
    void Resize(float w, float h) override;
+   void Poll();
 
    //IClickable
    void MouseReleased() override;
@@ -191,6 +192,12 @@ private:
    float mRandomizeLengthRange;
    float mRandomizeVelocityChance;
    float mRandomizeVelocityDensity;
+   FloatSlider* mRandomizePitchChanceSlider;
+   FloatSlider* mRandomizePitchRangeSlider;
+   FloatSlider* mRandomizeLengthChanceSlider;
+   FloatSlider* mRandomizeLengthRangeSlider;
+   FloatSlider* mRandomizeVelocityChanceSlider;
+   FloatSlider* mRandomizeVelocityDensitySlider;
    
    std::array<double, NSS_MAX_STEPS> mLastStepPlayTime;
    std::array<DropdownList*, NSS_MAX_STEPS> mToneDropdowns;

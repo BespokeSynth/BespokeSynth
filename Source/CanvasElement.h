@@ -189,6 +189,7 @@ private:
    TextEntry* mValueEntry;
    EventCanvas* mEventCanvas;
    bool mIsCheckbox;
+   bool mIsButton;
 };
 
 #endif /* defined(__Bespoke__CanvasElement__) */

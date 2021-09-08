@@ -99,10 +99,18 @@ for line in lines:
                for default in defaults:
                   m = re.match(".*\"(.*)\"_a(.*)", default)
                   if m and m.group(2) != "":
-                     defaultList.append(m.group(1)+m.group(2))
-                     replaceInStubLine(currentModule, -2, m.group(1), m.group(1)+m.group(2))
+                     defaultValue = m.group(2)
+                     if "_" in defaultValue:
+                        defaultValue = re.sub('^ = .*?_', ' = ', defaultValue)
+                     defaultList.append(m.group(1)+defaultValue)
+                     replaceInStubLine(currentModule, -2, m.group(1), m.group(1)+defaultValue)
                if defaultList != []:
                   docLine(tab+"   optional: "+", ".join(defaultList))
+            else:
+               m = re.match(".*\.value\(\"(.*)\"", line)
+               if m:
+                  stubLine(currentModule, "   "+m.group(1)+": ...")
+                  #   Note: ...
 
 docFile = open("Builds/MacOSX/build/Release/resource/scripting_reference.txt", "w+")
 docFile.writelines(docOutput)

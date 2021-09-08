@@ -140,7 +140,7 @@ void ClickButton::Render()
    
    ofPopStyle();
    
-   DrawHover();
+   DrawHover(mX, mY, w, h);
 }
 
 bool ClickButton::ButtonLit() const

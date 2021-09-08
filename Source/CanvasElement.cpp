@@ -635,9 +635,12 @@ EventCanvasElement::EventCanvasElement(Canvas* canvas, int col, int row, float o
    assert(mEventCanvas);
    mUIControl = mEventCanvas->GetUIControlForRow(row);
    mIsCheckbox = dynamic_cast<Checkbox*>(mUIControl) != nullptr;
+   mIsButton = dynamic_cast<ClickButton*>(mUIControl) != nullptr;
    
    if (mUIControl)
       mValue = mUIControl->GetValue();
+   if (mIsButton)
+      mValue = 1;
 }
 
 EventCanvasElement::~EventCanvasElement()
@@ -649,6 +652,7 @@ CanvasElement* EventCanvasElement::CreateDuplicate() const
    EventCanvasElement* element = new EventCanvasElement(mCanvas, mCol, mRow, mOffset);
    element->mUIControl = mUIControl;
    element->mIsCheckbox = mIsCheckbox;
+   element->mIsButton = mIsButton;
    element->mValue = mValue;
    return element;
 }
@@ -694,8 +698,11 @@ void EventCanvasElement::SetUIControl(IUIControl* control)
    bool hadUIControl = mUIControl != nullptr;
    mUIControl = dynamic_cast<IUIControl*>(control);
    mIsCheckbox = dynamic_cast<Checkbox*>(control) != nullptr;
+   mIsButton = dynamic_cast<ClickButton*>(control) != nullptr;
    if (mUIControl && !hadUIControl)
       mValue = mUIControl->GetValue();
+   if (mIsButton)
+      mValue = 1;
 }
 
 void EventCanvasElement::Trigger()

@@ -91,7 +91,7 @@ void StepSequencer::CreateUIControls()
    mRandomizationAmountSlider = new FloatSlider(this, "r amt", mRandomizationDensitySlider, kAnchor_Right, 65, 15, &mRandomizationAmount, 0, 1, 2);
    mNumMeasuresSlider = new IntSlider(this, "measures", 5, 22, 80, 15, &mNumMeasures, 1, 4);
    mPresetDropdown = new DropdownList(this,"preset",5,4,&mPreset);
-   mGridYOffDropdown = new DropdownList(this,"yoff",240,20,&mGridYOff);
+   mGridYOffDropdown = new DropdownList(this,"yoff",295,4,&mGridYOff);
    mAdjustOffsetsCheckbox = new Checkbox(this,"offsets",175,4,&mAdjustOffsets);
    mRepeatRateDropdown = new DropdownList(this,"repeat",155,22,(int*)(&mRepeatRate));
    mStepIntervalDropdown = new DropdownList(this,"step",133,4,(int*)(&mStepInterval));
@@ -183,6 +183,8 @@ void StepSequencer::Poll()
          for (int i=0; i<numChunks; ++i)
             mGridYOffDropdown->AddLabel(ofToString(i).c_str(), i);
       }
+      
+      UpdateLights();
    }
 }
 
@@ -191,25 +193,26 @@ namespace
    const float kMidwayVelocity = .75f;
 }
 
-void StepSequencer::UpdateLights()
+void StepSequencer::UpdateLights(bool force /*=false*/)
 {
    if (!HasGridController() || mGridControlTarget->GetGridController() == nullptr)
       return;
+   
+   auto* gridController = mGridControlTarget->GetGridController();
    
    for (int x=0; x<GetGridControllerCols(); ++x)
    {
       for (int y=0; y<GetGridControllerRows(); ++y)
       {
-         if (mGridControlTarget->GetGridController()->IsMultisliderGrid())
+         if (gridController->IsMultisliderGrid())
          {
             Vec2i gridPos = ControllerToGrid(Vec2i(x,y));
-            mGridControlTarget->GetGridController()->SetLightDirect(x, y, (int)(mGrid->GetVal(gridPos.x,gridPos.y)*127));
+            gridController->SetLightDirect(x, y, (int)(mGrid->GetVal(gridPos.x,gridPos.y)*127), force);
          }
          else
          {
             GridColor color = GetGridColor(x, y);
-            
-            mGridControlTarget->GetGridController()->SetLight(x, y, color);
+            gridController->SetLight(x, y, color, force);
          }
       }
    }
@@ -298,7 +301,7 @@ void StepSequencer::UpdateMetaLights()
 
 void StepSequencer::OnControllerPageSelected()
 {
-   UpdateLights();
+   UpdateLights(true);
 }
 
 void StepSequencer::OnGridButton(int x, int y, float velocity, IGridController* grid)

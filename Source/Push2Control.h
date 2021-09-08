@@ -66,6 +66,7 @@ public:
    static NVGcontext* sVG;
    static NVGLUframebuffer* sFB;
    static void CreateStaticFramebuffer(); //windows was having trouble creating a nanovg context and fbo on the fly
+   static IUIControl* sBindToUIControl;
    
 private:
    //IDrawableModule
@@ -141,6 +142,7 @@ private:
    vector<IDrawableModule*> mModuleHistory;
    int mModuleHistoryPosition;
    vector<IDrawableModule*> mBookmarkSlots;
+   bool mInMidiControllerBindMode;
    
    enum class ScreenDisplayMode
    {

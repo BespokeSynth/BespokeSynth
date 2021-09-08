@@ -117,7 +117,7 @@ void GridSliders::OnGridButton(int x, int y, float velocity, IGridController* gr
       if (mDirection == Direction::kVertical)
       {
          sliderIndex = x;
-         squareIndex = grid->NumCols() - y - 1;
+         squareIndex = grid->NumRows() - y - 1;
          length = mGridControlTarget->GetGridController()->NumRows();
       }
       else

@@ -255,7 +255,7 @@ void PatchCableSource::DrawCables(bool parentMinimized)
 
 void PatchCableSource::Render()
 {
-   if (!Enabled())
+   if (!Enabled() || mOwner->IsDeleted())
       return;
 
    ofPushStyle();
@@ -292,6 +292,14 @@ void PatchCableSource::Render()
       {
          if (i < (int)mPatchCables.size() && mPatchCables[i] != nullptr)
             mPatchCables[i]->Draw();
+      }
+
+      if (mDrawPass == DrawPass::kSource && (mPatchCableDrawMode != kPatchCableDrawMode_SourceOnHoverOnly || mHoverIndex != -1))
+      {
+         ofSetLineWidth(0);
+         ofSetColor(mColor);
+         ofFill();
+         ofCircle(cableX, cableY, kPatchCableSourceRadius);
 
          if (mHoverIndex == i)
          {
@@ -306,14 +314,6 @@ void PatchCableSource::Render()
                ofLine(cableX - (kPatchCableSourceRadius - 1), cableY, cableX + (kPatchCableSourceRadius - 1), cableY);
             }
          }
-      }
-
-      if (mDrawPass == DrawPass::kSource && (mPatchCableDrawMode != kPatchCableDrawMode_SourceOnHoverOnly || mHoverIndex != -1))
-      {
-         ofSetLineWidth(0);
-         ofSetColor(mColor);
-         ofFill();
-         ofCircle(cableX, cableY, kPatchCableSourceRadius);
          
          if (mType == kConnectionType_Grid)
          {

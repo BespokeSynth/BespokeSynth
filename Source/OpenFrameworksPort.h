@@ -242,8 +242,8 @@ public:
    void LoadFont(string path);
    void DrawString(string str, float size, float x, float y);
    ofRectangle DrawStringWrap(string str, float size, float x, float y, float width);
-   float GetStringWidth(string str, float size, bool isRenderThread = false);
-   float GetStringHeight(string str, float size, bool isRenderThread = false);
+   float GetStringWidth(string str, float size);
+   float GetStringHeight(string str, float size);
    bool IsLoaded() { return mLoaded; }
    int GetFontHandle() const { return mFontHandle; }
    string GetFontPath() const { return mFontPath; }
@@ -310,6 +310,7 @@ float ofLerp(float start, float stop, float amt);
 float ofDistSquared(float x1, float y1, float x2, float y2);
 vector<string> ofSplitString(string str, string splitter, bool ignoreEmpty = false, bool trim = false);
 bool ofIsStringInString(const string& haystack, const string& needle);
+String GetFileNameWithoutExtension(String fullPath);
 void ofScale(float x, float y, float z);
 void ofExit();
 void ofToggleFullscreen();

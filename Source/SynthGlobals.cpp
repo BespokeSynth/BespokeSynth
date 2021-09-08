@@ -383,7 +383,7 @@ void DrawTextNormal(string text, int x, int y, float size)
 
 void DrawTextLeftJustify(string text, int x, int y, float size)
 {
-   gFont.DrawString(text, size, x - gFont.GetStringWidth(text,size,K(isRenderThread)), y);
+   gFont.DrawString(text, size, x - gFont.GetStringWidth(text,size), y);
 }
 
 void DrawTextBold(string text, int x, int y, float size)

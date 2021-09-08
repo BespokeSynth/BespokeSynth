@@ -13,7 +13,6 @@
 #include "ChaosEngine.h"
 #include "ModuleSaveDataPanel.h"
 #include "Profiler.h"
-#include "MultitrackRecorder.h"
 #include "Sample.h"
 #include "FloatSliderLFOControl.h"
 //#include <CoreServices/CoreServices.h>
@@ -143,10 +142,11 @@ bool ModularSynth::IsReady()
    return gTime > 100;
 }
 
-void ModularSynth::Setup(GlobalManagers* globalManagers, juce::Component* mainComponent)
+void ModularSynth::Setup(GlobalManagers* globalManagers, juce::Component* mainComponent, juce::OpenGLContext* openGLContext)
 {
    mGlobalManagers = globalManagers;
    mMainComponent = mainComponent;
+   mOpenGLContext = openGLContext;
    int recordBufferLengthMinutes = 30;
    
    bool loaded = mUserPrefs.open(GetUserPrefsPath(false));
@@ -539,7 +539,7 @@ void ModularSynth::Draw(void* vg)
    
    string tooltip = "";
    ModuleContainer* tooltipContainer = nullptr;
-   if (HelpDisplay::sShowTooltips)
+   if (HelpDisplay::sShowTooltips && !IUIControl::WasLastHoverSetViaTab())
    {
       HelpDisplay* helpDisplay = TheTitleBar->GetHelpDisplay();
 
@@ -598,7 +598,7 @@ void ModularSynth::Draw(void* vg)
       ofTranslate(offset.x, offset.y);
       
       float x = GetMouseX(tooltipContainer) + 25;
-      float y = GetMouseY(tooltipContainer) + 7;
+      float y = GetMouseY(tooltipContainer) + 30;
       float maxWidth = 300;
 
       float fontSize = 15;
@@ -608,18 +608,28 @@ void ModularSynth::Draw(void* vg)
       nvgTextBoxBounds(gNanoVG, x, y, maxWidth, tooltip.c_str(), nullptr, bounds);
       float padding = 3;
       ofRectangle rect(bounds[0]-padding, bounds[1] - padding, bounds[2] - bounds[0] + padding*2, bounds[3] - bounds[1] + padding*2);
+      
+      float minX = 5 - offset.x;
+      float maxX = ofGetWidth() / scale  - rect.width - 5 - offset.x;
+      float minY = 5 - offset.y;
+      float maxY = ofGetHeight() / scale - rect.height - 5 - offset.y;
+      
+      float onscreenRectX = ofClamp(rect.x, minX, maxX);
+      float onscreenRectY = ofClamp(rect.y, minY, maxY);
+      
+      float tooltipBackgroundAlpha = 180;
 
       ofFill();
-      ofSetColor(50, 50, 50);
-      ofRect(rect.x, rect.y, rect.width, rect.height);
+      ofSetColor(50, 50, 50, tooltipBackgroundAlpha);
+      ofRect(onscreenRectX, onscreenRectY, rect.width, rect.height);
 
       ofNoFill();
-      ofSetColor(255, 255, 255);
-      ofRect(rect.x, rect.y, rect.width, rect.height);
+      ofSetColor(255, 255, 255, tooltipBackgroundAlpha);
+      ofRect(onscreenRectX, onscreenRectY, rect.width, rect.height);
 
       ofSetColor(255, 255, 255);
       //DrawTextNormal(tooltip, x + 5, y + 12);
-      gFont.DrawStringWrap(tooltip, fontSize, x, y, maxWidth);
+      gFont.DrawStringWrap(tooltip, fontSize, x + (onscreenRectX - rect.x), y + (onscreenRectY - rect.y), maxWidth);
       
       ofPopMatrix();
    }
@@ -793,7 +803,7 @@ void ModularSynth::KeyPressed(int key, bool isRepeat)
       {
          gHoveredUIControl->ResetToOriginal();
       }
-      else if (key != ' ' && key != OF_KEY_TAB && key != '`' && juce::CharacterFunctions::isPrintable((char)key))
+      else if (key != ' ' && key != OF_KEY_TAB && key != '`' && key < CHAR_MAX && juce::CharacterFunctions::isPrintable((char)key))
       {
          gHoveredUIControl->AttemptTextInput();
       }
@@ -814,20 +824,37 @@ void ModularSynth::KeyPressed(int key, bool isRepeat)
       mGroupSelectedModules.clear();
    }
    
+   if (key == KeyPress::F2Key && !isRepeat)
+   {
+      ADSRDisplay::ToggleDisplayMode();
+   }
+
    if (key == '`' && !isRepeat)
    {
       if (GetKeyModifiers() == kModifier_Shift)
+      {
          TriggerClapboard();
+      }
       else
-         ADSRDisplay::ToggleDisplayMode();
-   }
-
-   if (key == OF_KEY_TAB && !isRepeat)
-   {
-      bzero(mConsoleText, MAX_TEXTENTRY_LENGTH);
-      mConsoleEntry->MakeActiveTextEntry(true);
+      {
+         bzero(mConsoleText, MAX_TEXTENTRY_LENGTH);
+         mConsoleEntry->MakeActiveTextEntry(true);
+      }
    }
    
+   if (key == KeyPress::F1Key && !isRepeat)
+   {
+      HelpDisplay::sShowTooltips = !HelpDisplay::sShowTooltips;
+   }
+   
+   if (key == OF_KEY_TAB)
+   {
+      if (GetKeyModifiers() == kModifier_Shift)
+         IUIControl::SetNewManualHover(-1);
+      else
+         IUIControl::SetNewManualHover(1);
+   }
+
    mZoomer.OnKeyPressed(key);
    
    if (CharacterFunctions::isDigit((char)key) && (GetKeyModifiers() == kModifier_Alt))
@@ -1012,7 +1039,7 @@ void ModularSynth::MouseMoved(int intX, int intY )
       mUILayerModuleContainer.MouseMoved(x, y);
    }
    
-   if (gHoveredUIControl)
+   if (gHoveredUIControl && changed)
    {  
       if (!gHoveredUIControl->IsMouseDown())
       {
@@ -1229,7 +1256,7 @@ void ModularSynth::MouseScrolled(float x, float y, bool canZoomCanvas)
    x *= mScrollMultiplierHorizontal;
    y *= mScrollMultiplierVertical;
 
-   if (IsKeyHeld(' ') || GetModuleAtCursor() == nullptr)
+   if (IsKeyHeld(' ') || (GetModuleAtCursor() == nullptr && gHoveredUIControl == nullptr))
    {
       if (canZoomCanvas)
          ZoomView(y/50, true);
@@ -1528,9 +1555,6 @@ void ModularSynth::AudioOut(float** output, int bufferSize, int nChannels)
       //put it into speakers
       for (int i = 0; i < nChannels; ++i)
          BufferCopy(output[i], mOutputBuffers[i], gBufferSize);
-      
-      if (TheMultitrackRecorder && mOutputBuffers.size() >= 2)
-         TheMultitrackRecorder->Process(gTime, mOutputBuffers[0], mOutputBuffers[1], gBufferSize);
    }
    
    if (gTime - mLastClapboardTime < 100)
@@ -1801,6 +1825,19 @@ bool ModularSynth::LoadLayoutFromFile(string jsonFile, bool makeDefaultLayout /*
             output1->SetPosition(output1->GetPosition().x, output1->GetPosition().y + offset);
          if (output2 != nullptr)
             output2->SetPosition(output2->GetPosition().x, output2->GetPosition().y + offset);
+      }
+
+      if (output2 != nullptr && output2->GetPosition().x > ofGetWidth() - 100)
+      {
+         float offset = ofGetWidth() - output2->GetPosition().x - 100;
+         if (gain != nullptr)
+            gain->SetPosition(gain->GetPosition().x + offset, gain->GetPosition().y);
+         if (splitter != nullptr)
+            splitter->SetPosition(splitter->GetPosition().x + offset, splitter->GetPosition().y);
+         if (output1 != nullptr)
+            output1->SetPosition(output1->GetPosition().x + offset, output1->GetPosition().y);
+         if (output2 != nullptr)
+            output2->SetPosition(output2->GetPosition().x + offset, output2->GetPosition().y);
       }
    }
    

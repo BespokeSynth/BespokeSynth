@@ -88,38 +88,41 @@ void ChordHolder::PlayNote(double time, int pitch, int velocity, int voiceIdx, M
 {
    if (mEnabled)
    {
-      bool anyInputNotesHeld = false;
-      for (int i = 0; i < 128; ++i)
+      if (velocity > 0)
       {
-         if (mNoteInputHeld[i])
-            anyInputNotesHeld = true;
-      }
-
-      if (!anyInputNotesHeld) //new input, clear any existing output
-      {
+         bool anyInputNotesHeld = false;
          for (int i = 0; i < 128; ++i)
          {
-            if (mNotePlaying[i])
+            if (mNoteInputHeld[i])
+               anyInputNotesHeld = true;
+         }
+
+         if (!anyInputNotesHeld) //new input, clear any existing output
+         {
+            for (int i = 0; i < 128; ++i)
             {
-               PlayNoteOutput(time, i, 0, -1);
-               mNotePlaying[i] = false;
+               if (mNotePlaying[i])
+               {
+                  PlayNoteOutput(time, i, 0, -1);
+                  mNotePlaying[i] = false;
+               }
             }
          }
-      }
 
-      if (velocity > 0 && !mOnlyPlayWhenPulsed)
-      {
-         if (!mNotePlaying[pitch]) //don't replay already-sustained notes
-            PlayNoteOutput(time, pitch, velocity, voiceIdx, modulation);
-         mNotePlaying[pitch] = true;
-
-         //stop playing any voices in the chord that aren't being held anymore
-         for (int i = 0; i < 128; ++i)
+         if (!mOnlyPlayWhenPulsed)
          {
-            if (i != pitch && mNotePlaying[i] && !mNoteInputHeld[i])
+            if (!mNotePlaying[pitch]) //don't replay already-sustained notes
+               PlayNoteOutput(time, pitch, velocity, voiceIdx, modulation);
+            mNotePlaying[pitch] = true;
+
+            //stop playing any voices in the chord that aren't being held anymore
+            for (int i = 0; i < 128; ++i)
             {
-               PlayNoteOutput(time, i, 0, -1);
-               mNotePlaying[i] = false;
+               if (i != pitch && mNotePlaying[i] && !mNoteInputHeld[i])
+               {
+                  PlayNoteOutput(time, i, 0, -1);
+                  mNotePlaying[i] = false;
+               }
             }
          }
       }

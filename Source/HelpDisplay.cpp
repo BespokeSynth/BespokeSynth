@@ -43,8 +43,7 @@ HelpDisplay::HelpDisplay()
    LoadHelp();
 
    sShowTooltips = TheSynth->GetUserPrefs()["show_tooltips_on_load"].isNull() ? true : (TheSynth->GetUserPrefs()["show_tooltips_on_load"].asInt() > 0);
-   if (sShowTooltips)
-      LoadTooltips();
+   LoadTooltips();
 }
 
 void HelpDisplay::CreateUIControls()
@@ -151,8 +150,16 @@ void HelpDisplay::DrawModule()
 
 void HelpDisplay::GetModuleDimensions(float& w, float& h)
 {
-   w = mWidth;
-   h = mHeight;
+   if (mScreenshotsToProcess.size() > 0)
+   {
+      w = 10;
+      h = 10;
+   }
+   else
+   {
+      w = mWidth;
+      h = mHeight;
+   }
 }
 
 void HelpDisplay::CheckboxUpdated(Checkbox* checkbox)
@@ -471,12 +478,12 @@ void HelpDisplay::ButtonClicked(ClickButton* button)
                                           kModuleType_Pulse,
                                           kModuleType_Other
       };
-      /*for (auto type : moduleTypes)
+      for (auto type : moduleTypes)
       {
          vector<string> spawnable = TheSynth->GetModuleFactory()->GetSpawnableModules(type);
          for (auto toSpawn : spawnable)
             mScreenshotsToProcess.push_back(toSpawn);
-      }*/
+      }
 
       for (auto effect : TheSynth->GetEffectFactory()->GetSpawnableEffects())
          mScreenshotsToProcess.push_back(effect + " " + ModuleFactory::kEffectChainSuffix);

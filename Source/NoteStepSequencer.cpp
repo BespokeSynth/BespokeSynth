@@ -110,6 +110,17 @@ void NoteStepSequencer::CreateUIControls()
    INTSLIDER(mOctaveSlider,"octave",&mOctave,0,7); UIBLOCK_SHIFTRIGHT();
    DROPDOWN(mNoteModeSelector,"notemode",(int*)(&mNoteMode),80); UIBLOCK_NEWLINE();
    ENDUIBLOCK0();
+   
+   UIBLOCK(220,3,150);
+   FLOATSLIDER(mRandomizePitchChanceSlider, "rand pitch chance", &mRandomizePitchChance, 0, 1);
+   FLOATSLIDER(mRandomizePitchRangeSlider, "rand pitch range", &mRandomizePitchRange, 0, 1);
+   UIBLOCK_NEWCOLUMN();
+   FLOATSLIDER(mRandomizeLengthChanceSlider, "rand len chance", &mRandomizeLengthChance, 0, 1);
+   FLOATSLIDER(mRandomizeLengthRangeSlider, "rand len range", &mRandomizeLengthRange, 0, 1);
+   UIBLOCK_NEWCOLUMN();
+   FLOATSLIDER(mRandomizeVelocityChanceSlider, "rand vel chance", &mRandomizeVelocityChance, 0, 1);
+   FLOATSLIDER(mRandomizeVelocityDensitySlider, "rand vel density", &mRandomizeVelocityDensity, 0, 1);
+   ENDUIBLOCK0();
 
    mGrid = new UIGrid(5, 55, 200, 80, 8, 24, this);
    mVelocityGrid = new UIGrid(5, 117, 200, 45, 8, 1, this);
@@ -199,6 +210,11 @@ void NoteStepSequencer::Init()
    TheTransport->AddAudioPoller(this);
 }
 
+void NoteStepSequencer::Poll()
+{
+   UpdateGridControllerLights(false);
+}
+
 void NoteStepSequencer::DrawModule()
 {
    if (Minimized() || IsVisible() == false)
@@ -224,6 +240,12 @@ void NoteStepSequencer::DrawModule()
    mGridControlTarget->Draw();
    mGridControlOffsetXSlider->Draw();
    mGridControlOffsetYSlider->Draw();
+   mRandomizePitchChanceSlider->Draw();
+   mRandomizePitchRangeSlider->Draw();
+   mRandomizeLengthChanceSlider->Draw();
+   mRandomizeLengthRangeSlider->Draw();
+   mRandomizeVelocityChanceSlider->Draw();
+   mRandomizeVelocityDensitySlider->Draw();
    
    mGrid->Draw();
    mVelocityGrid->Draw();
@@ -805,12 +827,18 @@ void NoteStepSequencer::UpdateGridControllerLights(bool force)
             int row = y - mGridControlOffsetY;
             
             GridColor color = GridColor::kGridColorOff;
-            if (column == mGrid->GetHighlightCol(gTime+gBufferSizeMs+TheTransport->GetEventLookaheadMs()))
+            bool isHighlightCol = (column == mGrid->GetHighlightCol(gTime+gBufferSizeMs+TheTransport->GetEventLookaheadMs()));
+            if (isHighlightCol)
                color = GridColor::kGridColor2Dim;
             if (column < mLength)
             {
                if (mTones[column] == mGridControlTarget->GetGridController()->NumRows() - 1 - row && mVels[column] > 0)
-                  color = GridColor::kGridColor1Bright;
+               {
+                  if (isHighlightCol)
+                     color = GridColor::kGridColor3Bright;
+                  else
+                     color = GridColor::kGridColor1Bright;
+               }
             }
             mGridControlTarget->GetGridController()->SetLight(x, y, color, force);
          }
@@ -941,8 +969,10 @@ void NoteStepSequencer::RandomizePitches(bool fifths)
       {
          if (ofRandom(1) <= mRandomizePitchChance)
          {
-            int newRow = gRandom() % mNoteRange;
-            mTones[i] = int(ofLerp(mTones[i], newRow, mRandomizePitchRange) + .5f);
+            float minValue = MAX(0, mTones[i] - mNoteRange * mRandomizePitchRange);
+            float maxValue = MIN(mNoteRange, mTones[i] + mNoteRange * mRandomizePitchRange);
+            if (minValue != maxValue)
+               mTones[i] = ofClamp(int(ofRandom(minValue, maxValue) + .5f), 0, mNoteRange-1);
          }
       }
    }
@@ -1097,12 +1127,6 @@ void NoteStepSequencer::LoadLayout(const ofxJSONElement& moduleInfo)
    mModuleSaveData.LoadInt("gridrows", moduleInfo, 15, 1, 127, K(isTextField));
    mModuleSaveData.LoadInt("gridsteps", moduleInfo, 8, 1, NSS_MAX_STEPS, K(isTextField));
    mModuleSaveData.LoadBool("stepcontrols", moduleInfo, false);
-   mModuleSaveData.LoadFloat("random_pitch_chance", moduleInfo, 1.0f, 0.0f, 1.0f);
-   mModuleSaveData.LoadFloat("random_pitch_range", moduleInfo, 1.0f, 0.0f, 1.0f);
-   mModuleSaveData.LoadFloat("random_length_chance", moduleInfo, 1.0f, 0.0f, 1.0f);
-   mModuleSaveData.LoadFloat("random_length_range", moduleInfo, 1.0f, 0.0f, 1.0f);
-   mModuleSaveData.LoadFloat("random_velocity_chance", moduleInfo, 1.0f, 0.0f, 1.0f);
-   mModuleSaveData.LoadFloat("random_velocity_density", moduleInfo, 0.5f, 0.0f, 1.0f);
 
    SetUpFromSaveData();
 }
@@ -1114,12 +1138,6 @@ void NoteStepSequencer::SetUpFromSaveData()
    mGrid->SetDimensions(mModuleSaveData.GetInt("gridwidth"), mModuleSaveData.GetInt("gridheight"));
    mNoteRange = mModuleSaveData.GetInt("gridrows");
    mShowStepControls = mModuleSaveData.GetBool("stepcontrols");
-   mRandomizePitchChance = mModuleSaveData.GetFloat("random_pitch_chance");
-   mRandomizePitchRange = mModuleSaveData.GetFloat("random_pitch_range");
-   mRandomizeLengthChance = mModuleSaveData.GetFloat("random_length_chance");
-   mRandomizeLengthRange = mModuleSaveData.GetFloat("random_length_range");
-   mRandomizeVelocityChance = mModuleSaveData.GetFloat("random_velocity_chance");
-   mRandomizeVelocityDensity = mModuleSaveData.GetFloat("random_velocity_density");
    UpdateVelocityGridPos();
    SyncGridToSeq();
    SetUpStepControls();

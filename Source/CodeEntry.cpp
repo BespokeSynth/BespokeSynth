@@ -323,8 +323,8 @@ void CodeEntry::Render()
       ofFill();
    }
    
-   mCharWidth = gFontFixedWidth.GetStringWidth("x", kFontSize, K(isRenderThread));
-   mCharHeight = gFontFixedWidth.GetStringHeight("x", kFontSize, K(isRenderThread));
+   mCharWidth = gFontFixedWidth.GetStringWidth("x", kFontSize);
+   mCharHeight = gFontFixedWidth.GetStringHeight("x", kFontSize);
    
    if (mString != mPublishedString)
    {
@@ -462,7 +462,7 @@ void CodeEntry::RenderOverlay()
             ofSetColor(100, 100, 100);
          else
             ofSetColor(70, 70, 70);
-         ofRect(x, y - mCharHeight+2, gFontFixedWidth.GetStringWidth(mAutocompletes[i].autocompleteFull, kFontSize, K(isRenderThread)), mCharHeight);
+         ofRect(x, y - mCharHeight+2, gFontFixedWidth.GetStringWidth(mAutocompletes[i].autocompleteFull, kFontSize), mCharHeight);
 
          ofSetColor(200, 200, 200);
          gFontFixedWidth.DrawString(mAutocompletes[i].autocompleteFull, kFontSize, x, y);
@@ -508,7 +508,7 @@ void CodeEntry::RenderOverlay()
          float x = GetLinePos(mAutocompleteCaretCoords.y, K(end), !K(published)).x + 10;
          float y = caretPos.y + mCharHeight * (i + 1) - 2;
          ofSetColor(70, 70, 70);
-         ofRect(x, y-mCharHeight+2, gFontFixedWidth.GetStringWidth(params, kFontSize, K(isRenderThread)), mCharHeight+2);
+         ofRect(x, y-mCharHeight+2, gFontFixedWidth.GetStringWidth(params, kFontSize), mCharHeight+2);
          ofSetColor(170, 170, 255);
          gFontFixedWidth.DrawString(params, kFontSize, x, y);
          ofSetColor(230, 230, 255);

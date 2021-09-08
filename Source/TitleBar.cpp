@@ -465,7 +465,7 @@ void TitleBar::DrawModuleUnclipped()
       ofRectangle helpButtonRect = mDisplayHelpButton->GetRect(true);
       float x = helpButtonRect.getCenter().x;
       float y = helpButtonRect.getCenter().y + 15 + titleBarHeight;
-      gFontBold.DrawString(text, size, x - gFontBold.GetStringWidth(text, size, K(isRenderThread)) - 15 * GetOwningContainer()->GetDrawScale(), y);
+      gFontBold.DrawString(text, size, x - gFontBold.GetStringWidth(text, size) - 15 * GetOwningContainer()->GetDrawScale(), y);
       ofSetLineWidth(2);
       float scale = GetOwningContainer()->GetDrawScale();
       ofLine(x - 10, y - 6 * scale, x, y - 6 * scale);

@@ -28,580 +28,136 @@
 #include "Profiler.h"
 #include "SynthGlobals.h"
 #include "Transport.h"
-#include "Scale.h"
 #include "Sample.h"
-#include "ArrangementController.h"
-
-MultitrackRecorder* TheMultitrackRecorder = nullptr;
+#include "UIControlMacros.h"
+#include "PatchCableSource.h"
 
 MultitrackRecorder::MultitrackRecorder()
-: mRecordingLength(RECORD_CHUNK_SIZE)
-, mRecording(false)
-, mRecordCheckbox(nullptr)
-, mPlayCheckbox(nullptr)
-, mAddTrackButton(nullptr)
-, mResetPlayheadButton(nullptr)
-, mFixLengthsButton(nullptr)
-, mBufferWidth(800)
-, mBufferHeight(80)
-, mActiveStructureIdx(-1)
-, mRecordIdx(0)
-, mMaxRecordedLength(-1)
-, mNumMeasures(0)
-, mSelectedMeasureStart(-1)
-, mSelectedMeasureEnd(-1)
-, mMergeBufferIdx(-1)
-, mUndoBuffer(nullptr)
-, mUndoRecordButton(nullptr)
+: mRecord(false)
+, mWidth(700)
+, mHeight(142)
+, mStatusStringTime(-9999)
 {
-   TheMultitrackRecorder = this;
-   
-   mMeasurePos = new float[mRecordingLength];
-   bzero(mMeasurePos, sizeof(float)*mRecordingLength);
-   AddRecordBuffer();
-   
-   mUndoBuffer = new RecordBuffer(mRecordingLength);
-   
-   for (int i=0; i<NUM_CLIP_ARRANGERS; ++i)
-      AddChild(&mClipArranger[i]);
+   mModuleContainer.SetOwner(this);
 }
 
 void MultitrackRecorder::CreateUIControls()
 {
    IDrawableModule::CreateUIControls();
-   mRecordCheckbox = new Checkbox(this,"rec",100,2,&mRecording);
-   mPlayCheckbox = new Checkbox(this,"play",140,2,&ArrangementController::mPlay);
-   mAddTrackButton = new ClickButton(this,"add",200,2);
-   mResetPlayheadButton = new ClickButton(this,"reset",230,2);
-   mFixLengthsButton = new ClickButton(this,"fix lengths",270,2);
-   mUndoRecordButton = new ClickButton(this,"undo rec",450,2);
    
-   for (int i=0; i<NUM_CLIP_ARRANGERS; ++i)
-      mClipArranger[i].CreateUIControls();
+   UIBLOCK0();
+   CHECKBOX(mRecordCheckbox, "record", &mRecord); UIBLOCK_SHIFTRIGHT();
+   BUTTON(mClearButton, "clear"); UIBLOCK_NEWLINE();
+   BUTTON(mAddTrackButton, "add track"); UIBLOCK_SHIFTRIGHT();
+   BUTTON(mBounceButton, "bounce");
+   ENDUIBLOCK0();
 }
 
 MultitrackRecorder::~MultitrackRecorder()
 {
-   TheMultitrackRecorder = nullptr;
-   
-   for (int i=0; i<mRecordBuffers.size(); ++i)
-      delete mRecordBuffers[i];
-   
-   delete mUndoBuffer;
-}
-
-void MultitrackRecorder::Poll()
-{
-   int reallocDist = gSampleRate; //1 second from the end
-   ArrangementController::mSampleLength = mRecordingLength;
-   
-   float cW, cH;
-   mClipArranger[0].GetDimensions(cW, cH);
-   for (int i=0; i<NUM_CLIP_ARRANGERS; ++i)
-      mClipArranger[i].SetPosition(0, 25 + mBufferHeight * mRecordBuffers.size() + i*cH);
-   
-   if (mRecording &&
-       ArrangementController::mPlayhead > mRecordingLength - reallocDist)  //we're a second from the end
-   {
-      int newChunk = RECORD_CHUNK_SIZE;
-      int newLength = mRecordingLength + newChunk;
-      
-      float* newLeft = new float[newLength];
-      float* newRight = new float[newLength];
-      float* newMeasurePos = new float[newLength];
-      float* oldLeft = mRecordBuffers[mRecordIdx]->mLeft;
-      float* oldRight = mRecordBuffers[mRecordIdx]->mRight;
-      float* oldMeasurePos = mMeasurePos;
-      
-      BufferCopy(newLeft, oldLeft, mRecordingLength-reallocDist);
-      BufferCopy(newRight, oldRight, mRecordingLength-reallocDist);
-      BufferCopy(newMeasurePos, mMeasurePos, mRecordingLength-reallocDist);
-      Clear(newLeft+mRecordingLength, newChunk);
-      Clear(newRight+mRecordingLength, newChunk);
-      Clear(newMeasurePos+mRecordingLength, newChunk);
-      
-      mMutex.Lock("main thread");
-      BufferCopy(newLeft+(mRecordingLength-reallocDist), oldLeft+(mRecordingLength-reallocDist), reallocDist);
-      BufferCopy(newRight+(mRecordingLength-reallocDist), oldRight+(mRecordingLength-reallocDist), reallocDist);
-      BufferCopy(newMeasurePos+(mRecordingLength-reallocDist), mMeasurePos+(mRecordingLength-reallocDist), reallocDist);
-      mRecordBuffers[mRecordIdx]->mLeft = newLeft;
-      mRecordBuffers[mRecordIdx]->mRight = newRight;
-      mRecordBuffers[mRecordIdx]->mLength = newLength;
-      mMeasurePos = newMeasurePos;
-      mRecordingLength = newLength;
-      mMutex.Unlock();
-      
-      delete[] oldLeft;
-      delete[] oldRight;
-      delete[] oldMeasurePos;
-   }
-}
-
-void MultitrackRecorder::Process(double time, float* left, float* right, int bufferSize)
-{
-   PROFILER(MultitrackRecorder);
-   
-   if (!mEnabled)
-      return;
-   
-   ComputeSliders(0);
-   
-   mMutex.Lock("audio thread");
-   
-   if (mRecording || ArrangementController::mPlay)
-   {
-      for (int i=0; i<bufferSize; ++i)
-      {
-         int recordIdx = GetRecordIdx();
-         
-         if (IsRecordingStructure())
-            RecordStructure(i);
-         else
-            ApplyStructure();
-         
-         if (mRecording)
-         {
-            mRecordBuffers[recordIdx]->mLeft[ArrangementController::mPlayhead] = left[i];
-            mRecordBuffers[recordIdx]->mRight[ArrangementController::mPlayhead] = right[i];
-         }
-         
-         for (int j=0; j<mRecordBuffers.size(); ++j)
-         {
-            if (j != recordIdx &&
-                mRecordBuffers[j]->mControls.mMute == false &&
-                ArrangementController::mPlayhead < mRecordBuffers[j]->mLength)
-            {
-               float volSq = mRecordBuffers[j]->mControls.mVol * mRecordBuffers[j]->mControls.mVol;
-               left[i] += mRecordBuffers[j]->mLeft[ArrangementController::mPlayhead] * volSq;
-               right[i] += mRecordBuffers[j]->mRight[ArrangementController::mPlayhead] * volSq;
-            }
-         }
-         
-         if (ArrangementController::mPlayhead < mRecordingLength - 1)
-            ++ArrangementController::mPlayhead;
-      }
-   }
-   
-   for (int i=0; i<NUM_CLIP_ARRANGERS; ++i)
-      mClipArranger[i].Process(time, left, right, bufferSize);
-   
-   mMutex.Unlock();
 }
 
 void MultitrackRecorder::DrawModule()
 {
    if (Minimized() || IsVisible() == false)
       return;
-   
+
+   mAddTrackButton->SetShowing(!mRecord);
+   mBounceButton->SetShowing(!mRecord);
+
    mRecordCheckbox->Draw();
-   mPlayCheckbox->Draw();
+   mClearButton->Draw();
    mAddTrackButton->Draw();
-   mResetPlayheadButton->Draw();
-   mFixLengthsButton->Draw();
-   mUndoRecordButton->Draw();
-   
-   ofPushStyle();
-   ofPushMatrix();
-   ofTranslate(5,20);
-   for (int i=0; i<mRecordBuffers.size(); ++i)
+   mBounceButton->Draw();
+
+   if (mStatusStringTime + 5000 > gTime)
+      DrawTextNormal(mStatusString, 120, 33);
+
+   float posX = 5;
+   float posY = 42;
+   for (auto* track : mTracks)
    {
-      ofPushMatrix();
-      DrawAudioBuffer(mBufferWidth * mRecordBuffers[i]->mLength/mRecordingLength,mBufferHeight*.45f,mRecordBuffers[i]->mLeft,0,mRecordBuffers[i]->mLength,ArrangementController::mPlayhead);
-      ofTranslate(0,mBufferHeight*.47f);
-      DrawAudioBuffer(mBufferWidth * mRecordBuffers[i]->mLength/mRecordingLength,mBufferHeight*.45f,mRecordBuffers[i]->mRight,0,mRecordBuffers[i]->mLength,ArrangementController::mPlayhead);
-      ofTranslate(0,mBufferHeight*.53f);
-      ofPopMatrix();
-      
-      if (mRecordBuffers[i]->mControls.mMute)
-      {
-         ofFill();
-         ofSetColor(0, 0, 0, 100);
-         ofRect(0,0,mBufferWidth,mBufferHeight*.92f);
-      }
-      
-      if (i == mMergeBufferIdx)
-      {
-         ofFill();
-         ofSetColor(255,0,0,150);
-         ofRect(0,0,mBufferWidth,mBufferHeight*.92f);
-      }
-      
-      if (i == mRecordIdx)
-      {
-         if (mRecording && i == mRecordIdx)
-         {
-            ofNoFill();
-            ofSetColor(255,0,0);
-            ofRect(0,0,mBufferWidth,mBufferHeight*.92f);
-         }
-         else
-         {
-            ofNoFill();
-            ofSetColor(100,100,255);
-            ofRect(0,0,mBufferWidth,mBufferHeight*.92f);
-         }
-         
-         ofSetColor(255,255,0);
-         for (int j=0; j<mNumMeasures; ++j)
-         {
-            float pos = MeasureToPos(j)*mBufferWidth;
-            ofLine(pos,0,pos,mBufferHeight*.1f);
-         }
-         
-         if (mSelectedMeasureStart != -1)
-         {
-            float posStart = MeasureToPos(mSelectedMeasureStart)*mBufferWidth;
-            float posEnd = MeasureToPos(mSelectedMeasureEnd)*mBufferWidth;
-            ofSetColor(255,255,255,100);
-            ofFill();
-            ofRect(posStart,0,posEnd-posStart,mBufferHeight*.92f);
-         }
-      }
-      ofTranslate(0, mBufferHeight);
-      mRecordBuffers[i]->mControls.mVolSlider->SetPosition(mBufferWidth + 10, mBufferHeight*i+20);
-      mRecordBuffers[i]->mControls.mMuteCheckbox->SetPosition(mBufferWidth + 10, mBufferHeight*i+40);
+      track->SetPosition(posX, posY);
+      posY += 100;
    }
-   ofPopMatrix();
-   ofPopStyle();
-   
-   for (int i=0; i<mRecordBuffers.size(); ++i)
-   {
-      mRecordBuffers[i]->mControls.mVolSlider->Draw();
-      mRecordBuffers[i]->mControls.mMuteCheckbox->Draw();
-   }
-   
-   for (int i=0; i<NUM_CLIP_ARRANGERS; ++i)
-      mClipArranger[i].Draw();
+
+   mHeight = posY;
+
+   mModuleContainer.Draw();
 }
 
-bool MultitrackRecorder::IsRecordingStructure()
+void MultitrackRecorder::AddTrack()
 {
-   return mRecording && ArrangementController::mPlayhead > mMaxRecordedLength;
+   int recordingLength = GetRecordingLength();
+
+   MultitrackRecorderTrack* track = dynamic_cast<MultitrackRecorderTrack*>(TheSynth->SpawnModuleOnTheFly("multitrackrecordertrack", 0, 0, true));
+   track->Setup(this, recordingLength);
+   track->SetName(GetUniqueName("track", mModuleContainer.GetModuleNames<MultitrackRecorderTrack*>()).c_str());
+   mModuleContainer.TakeModule(track);
+   mTracks.push_back(track);
 }
 
-void MultitrackRecorder::RecordStructure(int offset)
+void MultitrackRecorder::RemoveTrack(MultitrackRecorderTrack* track)
 {
-   mMeasurePos[ArrangementController::mPlayhead] = TheTransport->GetMeasurePos(gTime + offset * gInvSampleRateMs);
-   mMaxRecordedLength = MAX(ArrangementController::mPlayhead, mMaxRecordedLength);
-   
-   if (ArrangementController::mPlayhead == 0 || mMeasurePos[ArrangementController::mPlayhead-1] > mMeasurePos[ArrangementController::mPlayhead])
+   if (!mRecord)
    {
-      mMeasures[mNumMeasures] = ArrangementController::mPlayhead;
-      ++mNumMeasures;
-   }
-   
-   bool needToRecord = false;
-   
-   if (mStructureInfoPoints.empty())
-   {
-      needToRecord = true;
-   }
-   else
-   {
-      const StructureInfo& lastStructure = *mStructureInfoPoints.rbegin();
-      
-      if (lastStructure.mScaleRoot != TheScale->ScaleRoot() ||
-          lastStructure.mScaleType != TheScale->GetType() ||
-          lastStructure.mTimeSigTop != TheTransport->GetTimeSigTop() ||
-          lastStructure.mTimeSigBottom != TheTransport->GetTimeSigBottom() ||
-          lastStructure.mTempo != TheTransport->GetTempo() ||
-          lastStructure.mSwing != TheTransport->GetSwing())
-         needToRecord = true;
-   }
-   
-   if (needToRecord)
-   {
-      StructureInfo structure;
-      structure.mSample = ArrangementController::mPlayhead;
-      structure.mScaleRoot = TheScale->ScaleRoot();
-      structure.mScaleType = TheScale->GetType();
-      structure.mTimeSigTop = TheTransport->GetTimeSigTop();
-      structure.mTimeSigBottom = TheTransport->GetTimeSigBottom();
-      structure.mTempo = TheTransport->GetTempo();
-      structure.mSwing = TheTransport->GetSwing();
-      mStructureInfoPoints.push_back(structure);
-      
-      mActiveStructureIdx = (int)mStructureInfoPoints.size() - 1;
+      RemoveFromVector(track, mTracks);
+      RemoveChild(track);
+      mModuleContainer.DeleteModule(track);
    }
 }
 
-void MultitrackRecorder::ApplyStructure()
+int MultitrackRecorder::GetRecordingLength()
 {
-   if (mMeasurePos[ArrangementController::mPlayhead] != 0)
-      TheTransport->SetMeasurePos(mMeasurePos[ArrangementController::mPlayhead]);
-   
-   if (mStructureInfoPoints.empty())
-      return;
-   
-   if (mActiveStructureIdx == -1 ||
-       (mActiveStructureIdx < mStructureInfoPoints.size()-1 &&
-       mStructureInfoPoints[mActiveStructureIdx+1].mSample <= ArrangementController::mPlayhead))
+   int recordingLength = 0;
+   for (auto* track : mTracks)
    {
-      ++mActiveStructureIdx;
-      const StructureInfo& structure = mStructureInfoPoints[mActiveStructureIdx];
-      TheScale->SetRoot(structure.mScaleRoot);
-      TheScale->SetScaleType(structure.mScaleType);
-      TheTransport->SetTimeSignature(structure.mTimeSigTop, structure.mTimeSigBottom);
-      TheTransport->SetTempo(structure.mTempo);
-      TheTransport->SetSwing(structure.mSwing);
+      if (track->GetRecordingLength() > recordingLength)
+         recordingLength = track->GetRecordingLength();
    }
-}
 
-void MultitrackRecorder::AddRecordBuffer()
-{
-   mMutex.Lock("main thread");
-   mRecordBuffers.push_back(new RecordBuffer(mRecordingLength));
-   mRecordIdx = (int)mRecordBuffers.size() - 1;
-   mMutex.Unlock();
-}
-
-int MultitrackRecorder::GetRecordIdx()
-{
-   if (!mRecording)
-      return -1;
-   return mRecordIdx;
-}
-
-float MultitrackRecorder::MeasureToPos(int measure)
-{
-   return (float)mMeasures[measure] / mRecordingLength;
-}
-
-int MultitrackRecorder::PosToMeasure(float pos)
-{
-   for (int i=0; i<mNumMeasures; ++i)
-   {
-      if (pos < MeasureToPos(i))
-         return i-1;
-   }
-   return -1;
-}
-
-float MultitrackRecorder::MouseXToBufferPos(float mouseX)
-{
-   return (mouseX-5)/mBufferWidth;
-}
-
-void MultitrackRecorder::FilesDropped(vector<string> files, int x, int y)
-{
-   bool droppedClip = false;
-   for (int i=0; i<NUM_CLIP_ARRANGERS; ++i)
-   {
-      if (mClipArranger[i].TestClick(x, y, false, true))
-      {
-         mClipArranger[i].FilesDropped(files, x, y);
-         droppedClip = true;
-      }
-   }
-   
-   if (droppedClip == false)
-   {
-      mMutex.Lock("main thread");
-      
-      ResetAll();
-      
-      Sample sample;
-      sample.Read(files[0].c_str());
-      
-      mRecordingLength = sample.LengthInSamples();
-      RecordBuffer* buffer = new RecordBuffer(mRecordingLength);
-      Mult(sample.Data()->GetChannel(0), .5f, mRecordingLength);
-      BufferCopy(buffer->mLeft, sample.Data()->GetChannel(0), mRecordingLength);
-      BufferCopy(buffer->mRight, sample.Data()->GetChannel(0), mRecordingLength);
-      mRecordBuffers.push_back(buffer);
-      
-      delete[] mMeasurePos;
-      mMeasurePos = new float[mRecordingLength];
-      bzero(mMeasurePos, sizeof(float)*mRecordingLength);
-      
-      mMutex.Unlock();
-   }
-}
-
-void MultitrackRecorder::GetModuleDimensions(float& width, float& height)
-{
-   float cW, cH;
-   mClipArranger[0].GetDimensions(cW, cH);
-   
-   width = mBufferWidth + 100;
-   height = 25 + mBufferHeight * mRecordBuffers.size() + cH*NUM_CLIP_ARRANGERS;
-}
-
-void MultitrackRecorder::ResetAll()
-{
-   for (int i=0; i<mRecordBuffers.size(); ++i)
-      delete mRecordBuffers[i];
-   mRecordBuffers.clear();
-   mRecordingLength = RECORD_CHUNK_SIZE;
-   mMaxRecordedLength = -1;
-   mNumMeasures = 0;
-   mRecording = false;
-   mRecordIdx = 0;
-   ArrangementController::mPlayhead = 0;
-}
-
-void MultitrackRecorder::OnClicked(int x, int y, bool right)
-{
-   IDrawableModule::OnClicked(x, y, right);
-   
-   for (int i=0; i<NUM_CLIP_ARRANGERS; ++i)
-   {
-      if (mClipArranger[i].TestClick(x, y, false, true))
-         return;
-   }
-   
-   if (y > 20 && x>5 && x<mBufferWidth+5)
-   {
-      int clickedIdx = ofClamp((y-20)/mBufferHeight,0,mRecordBuffers.size()-1);
-      float clickPos = MouseXToBufferPos(x);
-      
-      if (IsKeyHeld('x'))
-      {
-         mMutex.Lock("main thread");
-         
-         DeleteBuffer(clickedIdx);
-         
-         if (mRecordBuffers.empty())  //deleted the last one
-         {
-            ResetAll();
-            AddRecordBuffer();
-         }
-         
-         mMutex.Unlock();
-      }
-      else if (IsKeyHeld('s'))
-      {
-         mSelectedMeasureStart = PosToMeasure(clickPos);
-         mSelectedMeasureEnd = mSelectedMeasureStart+1;
-         mSelecting = true;
-      }
-      else if (IsKeyHeld('a'))
-      {
-         if (mMergeBufferIdx == clickedIdx)
-            mMergeBufferIdx = -1;
-         else
-            mMergeBufferIdx = clickedIdx;
-      }
-      else if (mMergeBufferIdx != -1)
-      {
-         if (mMergeBufferIdx != clickedIdx)
-         {
-            mMutex.Lock("main thread");
-            FixLengths();
-            Add(mRecordBuffers[clickedIdx]->mLeft, mRecordBuffers[mMergeBufferIdx]->mLeft, mRecordingLength);
-            Add(mRecordBuffers[clickedIdx]->mRight, mRecordBuffers[mMergeBufferIdx]->mRight, mRecordingLength);
-            DeleteBuffer(mMergeBufferIdx);
-            mMutex.Unlock();
-         }
-         mMergeBufferIdx = -1;
-      }
-      else
-      {
-         ArrangementController::mPlayhead = ofClamp(clickPos * mRecordingLength,0,mRecordingLength-1);
-         if (clickedIdx != mRecordIdx)
-         {
-            mRecordIdx = clickedIdx;
-            mRecording = false;
-         }
-         mActiveStructureIdx = -1;
-      }
-   }
-}
-
-void MultitrackRecorder::MouseReleased()
-{
-   IDrawableModule::MouseReleased();
-   if (mSelecting)
-      mSelecting = false;
-}
-
-bool MultitrackRecorder::MouseMoved(float x, float y)
-{
-   IDrawableModule::MouseMoved(x,y);
-   if (mSelecting)
-   {
-      float pos = MouseXToBufferPos(x);
-      int measure = PosToMeasure(pos);
-      if (measure != -1)
-      {
-         mSelectedMeasureStart = MIN(measure, mSelectedMeasureStart);
-         mSelectedMeasureEnd = MAX(measure+1, mSelectedMeasureEnd);
-      }
-   }
-   return false;
-}
-
-void MultitrackRecorder::FixLengths()
-{
-   mMutex.Lock("main thread");
-   for (int i=0; i<mRecordBuffers.size(); ++i)
-   {
-      if (mRecordBuffers[i]->mLength < mRecordingLength)
-      {
-         float* newLeft = new float[mRecordingLength];
-         float* newRight = new float[mRecordingLength];
-         float* oldLeft = mRecordBuffers[i]->mLeft;
-         float* oldRight = mRecordBuffers[i]->mRight;
-         int oldLength = mRecordBuffers[i]->mLength;
-         
-         BufferCopy(newLeft, oldLeft, oldLength);
-         BufferCopy(newRight, oldRight, oldLength);
-         Clear(newLeft+oldLength, mRecordingLength-oldLength);
-         Clear(newRight+oldLength, mRecordingLength-oldLength);
-         
-         mRecordBuffers[i]->mLeft = newLeft;
-         mRecordBuffers[i]->mRight = newRight;
-         mRecordBuffers[i]->mLength = mRecordingLength;
-         
-         delete[] oldLeft;
-         delete[] oldRight;
-      }
-   }
-   mMutex.Unlock();
-}
-
-void MultitrackRecorder::DeleteBuffer(int idx)
-{
-   mMutex.Lock("main thread");
-   auto iter = mRecordBuffers.begin();
-   for (int i=0; i<idx; ++i)
-      ++iter;
-   delete *iter;
-   mRecordBuffers.erase(iter);
-   mMutex.Unlock();
-}
-
-void MultitrackRecorder::CopyRecordBufferContents(RecordBuffer* dst, RecordBuffer* src)
-{
-   if (dst->mLength != src->mLength)
-   {
-      delete[] dst->mLeft;
-      delete[] dst->mRight;
-      dst->mLeft = new float[src->mLength];
-      dst->mRight = new float[src->mLength];
-      dst->mLength = src->mLength;
-   }
-   
-   BufferCopy(dst->mLeft, src->mLeft, src->mLength);
-   BufferCopy(dst->mRight, src->mRight, src->mLength);
-}
-
-void MultitrackRecorder::FloatSliderUpdated(FloatSlider* slider, float oldVal)
-{
+   return recordingLength;
 }
 
 void MultitrackRecorder::ButtonClicked(ClickButton* button)
 {
    if (button == mAddTrackButton)
-      AddRecordBuffer();
-   if (button == mResetPlayheadButton)
-      ArrangementController::mPlayhead = 0;
-   if (button == mFixLengthsButton)
-      FixLengths();
-   if (button == mUndoRecordButton)
    {
-      mRecording = false;
-      CopyRecordBufferContents(mRecordBuffers[mRecordIdx], mUndoBuffer);
+      AddTrack();
+   }
+
+   if (button == mBounceButton)
+   {
+      string recordingsPath = "recordings/";
+      if (!TheSynth->GetUserPrefs()["recordings_path"].isNull())
+         recordingsPath = TheSynth->GetUserPrefs()["recordings_path"].asString();
+
+      string filenamePrefix = ofGetTimestampString(recordingsPath + "multitrack_%Y-%m-%d_%H-%M_");
+
+      int numFiles = 0;
+      for (int i = 0; i < (int)mTracks.size(); ++i)
+      {
+         Sample* sample = mTracks[i]->BounceRecording();
+
+         if (sample)
+         {
+            string filename = filenamePrefix + ofToString(i+1) + ".wav";
+            sample->Write(filename.c_str());
+            ++numFiles;
+         }
+      }
+
+      if (numFiles > 0)
+      {
+         mStatusString = "wrote " + ofToString(numFiles) + " files to " + filenamePrefix + "*.wav";
+         mStatusStringTime = gTime;
+      }
+   }
+
+   if (button == mClearButton)
+   {
+      for (auto* track : mTracks)
+         track->Clear();
    }
 }
 
@@ -609,43 +165,318 @@ void MultitrackRecorder::CheckboxUpdated(Checkbox* checkbox)
 {
    if (checkbox == mRecordCheckbox)
    {
-      if (mRecordIdx == 0 && ArrangementController::mPlayhead == 0)
-         TheTransport->Reset();
-      CopyRecordBufferContents(mUndoBuffer, mRecordBuffers[mRecordIdx]);
+      for (auto* track : mTracks)
+         track->SetRecording(mRecord);
    }
+}
+
+void MultitrackRecorder::SaveLayout(ofxJSONElement& moduleInfo)
+{
+   IDrawableModule::SaveLayout(moduleInfo);
+   moduleInfo["modules"] = mModuleContainer.WriteModules();
 }
 
 void MultitrackRecorder::LoadLayout(const ofxJSONElement& moduleInfo)
 {
+   mModuleContainer.LoadModules(moduleInfo["modules"]);
+
+   for (auto* child : mModuleContainer.GetModules())
+   {
+      MultitrackRecorderTrack* track = dynamic_cast<MultitrackRecorderTrack*>(child);
+      if (!VectorContains(track, mTracks))
+      {
+         track->Setup(this, GetRecordingLength());
+         mTracks.push_back(track);
+      }
+   }
+
+   if (mTracks.size() == 0)
+      AddTrack();
+
    SetUpFromSaveData();
 }
 
 void MultitrackRecorder::SetUpFromSaveData()
 {
+   mRecord = false;
+   for (auto* track : mTracks)
+      track->SetRecording(false);
 }
 
-MultitrackRecorder::RecordBuffer::RecordBuffer(int length)
-: mLength(length)
+namespace
 {
-   mLeft = new float[length];
-   mRight = new float[length];
-   bzero(mLeft, sizeof(float)*length);
-   bzero(mRight, sizeof(float)*length);
-   mControls.mVolSlider = new FloatSlider(TheMultitrackRecorder,"vol",0,0,90,15,&mControls.mVol,0,2);
-   mControls.mMuteCheckbox = new Checkbox(TheMultitrackRecorder,"mute",0,0,&mControls.mMute);
+   const int kSaveStateRev = 0;
 }
 
-MultitrackRecorder::RecordBuffer::~RecordBuffer()
+void MultitrackRecorder::SaveState(FileStreamOut& out)
 {
-   delete[] mLeft;
-   delete[] mRight;
+   IDrawableModule::SaveState(out);
+
+   out << kSaveStateRev;
+
+   out << mWidth;
+
+   //preserve order
+   out << (int)mTracks.size();
+   for (auto* track : mTracks)
+      out << (string)track->Name();
 }
 
-MultitrackRecorder::BufferControls::BufferControls()
-: mVol(1)
-, mVolSlider(nullptr)
-, mMute(false)
-, mMuteCheckbox(nullptr)
+void MultitrackRecorder::LoadState(FileStreamIn& in)
+{
+   IDrawableModule::LoadState(in);
+
+   int rev;
+   in >> rev;
+   LoadStateValidate(rev <= kSaveStateRev);
+
+   in >> mWidth;
+
+   //preserve order
+   int numTracks;
+   in >> numTracks;
+   vector<string> sortOrder;
+   for (int i = 0; i < numTracks; ++i)
+   {
+      string name;
+      in >> name;
+      sortOrder.push_back(name);
+   }
+
+   vector<MultitrackRecorderTrack*> sortedTracks;
+   for (auto& name : sortOrder)
+   {
+      for (auto& track : mTracks)
+      {
+         if (track->Name() == name)
+         {
+            sortedTracks.push_back(track);
+            break;
+         }
+      }
+   }
+
+   mTracks = sortedTracks;
+}
+
+//////////////////////////////////////////////////////////////////////////////////////////////
+
+namespace
+{
+   const int kRecordingChunkSize = 48000 * 5;
+   const int kMinRecordingChunks = 2;
+};
+
+MultitrackRecorderTrack::MultitrackRecorderTrack()
+: IAudioProcessor(gBufferSize)
+, mRecorder(nullptr)
+, mDoRecording(false)
+, mRecordingLength(0)
+{
+
+}
+
+MultitrackRecorderTrack::~MultitrackRecorderTrack()
+{
+
+}
+
+void MultitrackRecorderTrack::CreateUIControls()
+{
+   IDrawableModule::CreateUIControls();
+
+   UIBLOCK0();
+   BUTTON(mDeleteButton, " X ");
+   ENDUIBLOCK0();
+
+   GetPatchCableSource()->SetManualSide(PatchCableSource::Side::kRight);
+}
+
+void MultitrackRecorderTrack::Process(double time)
+{
+   ComputeSliders(0);
+   SyncBuffers(GetBuffer()->NumActiveChannels());
+
+   if (mDoRecording)
+   {
+      for (int i = 0; i < GetBuffer()->BufferSize(); ++i)
+      {
+         int chunkIndex = mRecordingLength / kRecordingChunkSize;
+         int chunkPos = mRecordingLength % kRecordingChunkSize;
+         mRecordChunks[chunkIndex]->SetNumActiveChannels(GetBuffer()->NumActiveChannels());
+         for (int ch = 0; ch < GetBuffer()->NumActiveChannels(); ++ch)
+            mRecordChunks[chunkIndex]->GetChannel(ch)[chunkPos] = GetBuffer()->GetChannel(ch)[i];
+         ++mRecordingLength;
+      }
+   }
+
+   if (GetTarget())
+   {
+      for (int ch = 0; ch < GetBuffer()->NumActiveChannels(); ++ch)
+      {
+         float* buffer = GetBuffer()->GetChannel(ch);
+         Add(GetTarget()->GetBuffer()->GetChannel(ch), buffer, GetBuffer()->BufferSize());
+         GetVizBuffer()->WriteChunk(buffer, GetBuffer()->BufferSize(), ch);
+      }
+   }
+
+   GetBuffer()->Reset();
+}
+
+void MultitrackRecorderTrack::Poll()
+{
+   IDrawableModule::Poll();
+
+   int chunkIndex = mRecordingLength / kRecordingChunkSize;
+   if (chunkIndex >= (int)mRecordChunks.size() - 1)
+   {
+      mRecordChunks.push_back(new ChannelBuffer(kRecordingChunkSize));
+      mRecordChunks[mRecordChunks.size() - 1]->GetChannel(0); //set up buffer
+   }
+}
+
+void MultitrackRecorderTrack::DrawModule()
+{
+   mDeleteButton->Draw();
+
+   float width, height;
+   GetModuleDimensions(width, height);
+
+   ofPushMatrix();
+   ofTranslate(5, 3);
+   float sampleWidth = width - 10;
+   
+   ofSetColor(255, 255, 255, 30);
+   ofFill();
+   ofRect(0, 0, sampleWidth, height - 6);
+
+   if (mDoRecording)
+   {
+      ofSetColor(255, 0, 0, 100);
+      ofNoFill();
+      ofRect(0, 0, sampleWidth, height - 6);
+   }
+
+   ofPushMatrix();
+   int numChunks = mRecordingLength / kRecordingChunkSize + 1;
+   float chunkWidth = sampleWidth / numChunks;
+   for (int i = 0; i < numChunks; ++i)
+   {
+      if (i < (int)mRecordChunks.size())
+         DrawAudioBuffer(chunkWidth, height - 6, mRecordChunks[i], 0, kRecordingChunkSize, -1);
+      ofTranslate(chunkWidth, 0);
+   }
+   ofPopMatrix();
+
+   ofPopMatrix();
+}
+
+void MultitrackRecorderTrack::Setup(MultitrackRecorder* recorder, int minLength)
+{
+   mRecorder = recorder;
+   mRecordingLength = minLength;
+}
+
+void MultitrackRecorderTrack::SetRecording(bool record)
+{
+   if (record)
+   {
+      if (mRecordingLength == 0)
+      {
+         mRecordingLength = 0;
+
+         for (size_t i = mRecordChunks.size(); i < kMinRecordingChunks; ++i)
+         {
+            mRecordChunks.push_back(new ChannelBuffer(kRecordingChunkSize));
+            mRecordChunks[i]->GetChannel(0); //set up buffer
+         }
+
+         for (size_t i = 0; i < mRecordChunks.size(); ++i)
+            mRecordChunks[i]->Clear();
+      }
+
+      mDoRecording = true;
+   }
+   else
+   {
+      mDoRecording = false;
+   }
+}
+
+Sample* MultitrackRecorderTrack::BounceRecording()
+{
+   Sample* sample = nullptr;
+   if (mRecordingLength > 0)
+   {
+      sample = new Sample();
+      sample->Create(mRecordingLength);
+      ChannelBuffer* data = sample->Data();
+      int channelCount = mRecordChunks[0]->NumActiveChannels();
+      data->SetNumActiveChannels(channelCount);
+
+      int numChunks = mRecordingLength / kRecordingChunkSize + 1;
+      for (int i = 0; i < numChunks; ++i)
+      {
+         int samplesLeftToRecord = mRecordingLength - i * kRecordingChunkSize;
+         int samplesToCopy;
+         if (samplesLeftToRecord > kRecordingChunkSize)
+            samplesToCopy = kRecordingChunkSize;
+         else
+            samplesToCopy = samplesLeftToRecord;
+         for (int ch = 0; ch < channelCount; ++ch)
+            BufferCopy(data->GetChannel(ch) + i * kRecordingChunkSize, mRecordChunks[i]->GetChannel(ch), samplesToCopy);
+      }
+   }
+
+   return sample;
+}
+
+void MultitrackRecorderTrack::Clear()
+{
+   for (auto* recordChunk : mRecordChunks)
+      delete recordChunk;
+   mRecordChunks.clear();
+   mRecordingLength = 0;
+}
+
+void MultitrackRecorderTrack::FloatSliderUpdated(FloatSlider* slider, float oldVal)
+{
+
+}
+
+void MultitrackRecorderTrack::CheckboxUpdated(Checkbox* checkbox)
+{
+
+}
+
+void MultitrackRecorderTrack::ButtonClicked(ClickButton* button)
+{
+   if (button == mDeleteButton)
+      mRecorder->RemoveTrack(this);
+}
+
+void MultitrackRecorderTrack::LoadLayout(const ofxJSONElement& moduleInfo)
+{
+   SetUpFromSaveData();
+}
+
+void MultitrackRecorderTrack::SetUpFromSaveData()
 {
 }
 
+void MultitrackRecorderTrack::GetModuleDimensions(float& width, float& height)
+{
+   if (mRecorder)
+   {
+      float parentWidth, parentHeight;
+      mRecorder->GetDimensions(parentWidth, parentHeight);
+
+      width = parentWidth - 15;
+      height = 95;
+   }
+   else
+   {
+      width = 10;
+      height = 10;
+   }
+}
