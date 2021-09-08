@@ -1,5 +1,5 @@
 {
-   "outchannel" : 16,
+   "outchannel" : 1,
    "groups" : [
       {
          "rows": 3,
