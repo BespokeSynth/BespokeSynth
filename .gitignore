@@ -378,3 +378,5 @@ bespoke_windows_installer/BespokeSynth.wixpdb
 bespoke_windows_installer/HarvestedResourceDir.wixobj
 
 bespoke_windows_installer/HarvestedResourceDir.wxs
+
+Builds/LinuxMakefile/Bespoke-Linux.zip
