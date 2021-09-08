@@ -368,3 +368,13 @@ Builds/LinuxMakefile/Makefile
 Builds/MacOSX/build/Bespoke-Mac.dmg
 
 autodoc/bespokesynth.com/
+
+bespoke_windows_installer/BespokeSynth.msi
+
+bespoke_windows_installer/BespokeSynth.wixobj
+
+bespoke_windows_installer/BespokeSynth.wixpdb
+
+bespoke_windows_installer/HarvestedResourceDir.wixobj
+
+bespoke_windows_installer/HarvestedResourceDir.wxs
