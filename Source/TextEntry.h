@@ -27,6 +27,7 @@
 #define __modularSynth__TextEntry__
 
 #include <iostream>
+#include <climits>
 #include "IUIControl.h"
 #include "SynthGlobals.h"
 
