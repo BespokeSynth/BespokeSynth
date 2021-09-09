@@ -37,6 +37,12 @@
 #include "EffectChain.h"
 #include "ClickButton.h"
 
+#if BESPOKE_WINDOWS
+#include <Windows.h>
+#include <DbgHelp.h>
+#include <Winbase.h>
+#endif
+
 ModularSynth* TheSynth = nullptr;
 
 //static
@@ -44,6 +50,10 @@ bool ModularSynth::sShouldAutosave = false;
 float ModularSynth::sBackgroundLissajousR = 0.408f;
 float ModularSynth::sBackgroundLissajousG = 0.245f;
 float ModularSynth::sBackgroundLissajousB = 0.418f;
+
+#if BESPOKE_WINDOWS
+LONG WINAPI TopLevelExceptionHandler(PEXCEPTION_POINTERS pExceptionInfo);
+#endif
 
 void AtExit()
 {
@@ -84,6 +94,10 @@ ModularSynth::ModularSynth()
    mConsoleText[0] = 0;
    assert(TheSynth == nullptr);
    TheSynth = this;
+
+#if BESPOKE_WINDOWS
+   SetUnhandledExceptionFilter(TopLevelExceptionHandler);
+#endif
 }
 
 ModularSynth::~ModularSynth()
@@ -104,10 +118,19 @@ ModularSynth::~ModularSynth()
 
 void ModularSynth::CrashHandler(void*)
 {
-   DumpStats(true);
+   DumpStats(true, nullptr);
 }
 
-void ModularSynth::DumpStats(bool isCrash)
+#if BESPOKE_WINDOWS
+LONG WINAPI TopLevelExceptionHandler(PEXCEPTION_POINTERS pExceptionInfo)
+{
+   ModularSynth::DumpStats(true, pExceptionInfo);
+
+   return EXCEPTION_CONTINUE_SEARCH;
+}
+#endif
+
+void ModularSynth::DumpStats(bool isCrash, void* crashContext)
 {
    string filename;
    if (isCrash)
@@ -115,6 +138,78 @@ void ModularSynth::DumpStats(bool isCrash)
    else
       filename = ofToDataPath(ofGetTimestampString("stats_%Y-%m-%d_%H-%M.txt"));
    juce::File log(filename);
+
+   if (isCrash)
+   {
+#if BESPOKE_WINDOWS
+      if (crashContext != nullptr)
+      {
+         log.appendText("stack frame:\n");
+         PEXCEPTION_POINTERS pExceptionInfo = (PEXCEPTION_POINTERS)crashContext;
+
+         HANDLE process = GetCurrentProcess();
+         SymInitialize(process, NULL, TRUE);
+
+         // StackWalk64() may modify context record passed to it, so we will
+         // use a copy.
+         CONTEXT context_record = *pExceptionInfo->ContextRecord;
+         // Initialize stack walking.
+         STACKFRAME64 stack_frame;
+         memset(&stack_frame, 0, sizeof(stack_frame));
+#if defined(_WIN64)
+         int machine_type = IMAGE_FILE_MACHINE_AMD64;
+         stack_frame.AddrPC.Offset = context_record.Rip;
+         stack_frame.AddrFrame.Offset = context_record.Rbp;
+         stack_frame.AddrStack.Offset = context_record.Rsp;
+#else
+         int machine_type = IMAGE_FILE_MACHINE_I386;
+         stack_frame.AddrPC.Offset = context_record.Eip;
+         stack_frame.AddrFrame.Offset = context_record.Ebp;
+         stack_frame.AddrStack.Offset = context_record.Esp;
+#endif
+         stack_frame.AddrPC.Mode = AddrModeFlat;
+         stack_frame.AddrFrame.Mode = AddrModeFlat;
+         stack_frame.AddrStack.Mode = AddrModeFlat;
+
+         juce::HeapBlock<SYMBOL_INFO> symbol;
+         symbol.calloc(sizeof(SYMBOL_INFO) + 256, 1);
+         symbol->MaxNameLen = 255;
+         symbol->SizeOfStruct = sizeof(SYMBOL_INFO);
+
+         while (StackWalk64(machine_type,
+            GetCurrentProcess(),
+            GetCurrentThread(),
+            &stack_frame,
+            &context_record,
+            NULL,
+            &SymFunctionTableAccess64,
+            &SymGetModuleBase64,
+            NULL)) {
+
+            DWORD64 displacement = 0;
+
+            if (SymFromAddr(process, (DWORD64)stack_frame.AddrPC.Offset, &displacement, symbol))
+            {
+               IMAGEHLP_MODULE64 moduleInfo;
+               juce::zerostruct(moduleInfo);
+               moduleInfo.SizeOfStruct = sizeof(moduleInfo);
+
+               if (::SymGetModuleInfo64(process, symbol->ModBase, &moduleInfo))
+                  log.appendText(moduleInfo.ModuleName + String(": "));
+
+               log.appendText(symbol->Name + String(" + 0x") + String::toHexString((juce::int64)displacement) + "\n");
+            }
+
+         }
+         log.appendText("\n\n\n");
+#endif
+      }
+
+      log.appendText("backtrace:\n");
+      log.appendText(juce::SystemStats::getStackBacktrace());
+      log.appendText("\n\n\n");
+   }
+
    log.appendText("OS: " + juce::SystemStats::getOperatingSystemName()+"\n");
    log.appendText("CPU vendor: " + juce::SystemStats::getCpuVendor() + "\n");
    log.appendText("CPU model: " + juce::SystemStats::getCpuModel() + "\n");
@@ -128,13 +223,7 @@ void ModularSynth::DumpStats(bool isCrash)
    log.appendText("display language: " + juce::SystemStats::getDisplayLanguage() + "\n");
    log.appendText("description: " + juce::SystemStats::getDeviceDescription() + "\n");
    log.appendText("manufacturer: " + juce::SystemStats::getDeviceManufacturer() + "\n");
-   log.appendText("build: " + JUCEApplication::getInstance()->getApplicationVersion() + " (" + string(__DATE__) + " " + string(__TIME__) + ")\n");
-
-   if (isCrash)
-   {
-      log.appendText("\n\n\n");
-      log.appendText(juce::SystemStats::getStackBacktrace());
-   }
+   log.appendText("build: bespoke " + JUCEApplication::getInstance()->getApplicationVersion() + " (" + string(__DATE__) + " " + string(__TIME__) + ")\n");
 }
 
 bool ModularSynth::IsReady()
@@ -223,7 +312,7 @@ void ModularSynth::InitIOBuffers(int inputChannelCount, int outputChannelCount)
       mOutputBuffers.push_back(new float[gBufferSize]);
 }
 
-//static
+
 string ModularSynth::GetUserPrefsPath(bool relative)
 {
    string filename = "userprefs.json";
@@ -2419,7 +2508,7 @@ void ModularSynth::OnConsoleInput()
       }
       else if (tokens[0] == "dumpstats")
       {
-         DumpStats(false);
+         DumpStats(false, nullptr);
       }
       else
       {

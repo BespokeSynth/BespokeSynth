@@ -191,7 +191,7 @@ public:
    
    static string GetUserPrefsPath(bool relative);
    static void CrashHandler(void*);
-   static void DumpStats(bool isCrash);
+   static void DumpStats(bool isCrash, void* crashContext);
    
    void SaveLayout(string jsonFile = "", bool makeDefaultLayout = true);
    ofxJSONElement GetLayout();
