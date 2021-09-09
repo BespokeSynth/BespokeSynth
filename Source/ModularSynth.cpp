@@ -202,8 +202,8 @@ void ModularSynth::DumpStats(bool isCrash, void* crashContext)
 
          }
          log.appendText("\n\n\n");
-#endif
       }
+#endif
 
       log.appendText("backtrace:\n");
       log.appendText(juce::SystemStats::getStackBacktrace());
