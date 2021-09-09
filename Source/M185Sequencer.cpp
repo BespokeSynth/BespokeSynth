@@ -47,7 +47,7 @@ void M185Sequencer::CreateUIControls()
       step.yPos = yPos;
 
       INTSLIDER(step.mPitchSlider,("pitch"+ofToString(i)).c_str(),&step.mPitch,0,127); UIBLOCK_SHIFTRIGHT();
-      INTSLIDER(step.mPulseCountSlider,("pulses"+ofToString(i)).c_str(),&step.mPulseCount,1,8); UIBLOCK_SHIFTRIGHT();
+      INTSLIDER(step.mPulseCountSlider,("pulses"+ofToString(i)).c_str(),&step.mPulseCount,0,8); UIBLOCK_SHIFTRIGHT();
       DROPDOWN(step.mGateSelector,("gate"+ofToString(i)).c_str(), (int*)(&step.mGate), 60);
 
       step.mGateSelector->AddLabel("repeat", GateType::kGate_Repeat);
@@ -165,10 +165,14 @@ void M185Sequencer::StepBy(double time, float velocity, int flags)
 
    // Update step/pulse
    mStepPulseIdx++;
-   if (mStepPulseIdx >= mSteps[mStepIdx].mPulseCount)
+   int loopProtection = (int)mSteps.size() - 1;
+   while (mStepPulseIdx >= mSteps[mStepIdx].mPulseCount)
    {
       mStepPulseIdx = 0;
       mStepIdx = (mStepIdx + 1) % mSteps.size();
+      --loopProtection;
+      if (loopProtection < 0)
+         break;
    }
 }
 
