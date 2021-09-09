@@ -1,3 +1,5 @@
+#requires a midicontroller named "midicontroller"
+
 import midicontroller
 
 controller = midicontroller.get("midicontroller")

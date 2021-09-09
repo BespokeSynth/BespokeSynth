@@ -1,3 +1,5 @@
+#requires a drumsynth named "drumsynth"
+
 for i in range(8):
    if random.random() < .5:
       me.set("drumsynth~vol"+str(i), random.uniform(0,1))

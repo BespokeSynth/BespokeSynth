@@ -1,3 +1,5 @@
+#requires a drumsequencer named "drumsequencer"
+
 import drumsequencer
 
 d = drumsequencer.get("drumsequencer")
