@@ -897,7 +897,7 @@ void ScriptModule::RefreshScriptFiles()
 
 void ScriptModule::ExecuteCode()
 {
-   RunScript(gTime);
+   RunScript(gTime+gBufferSizeMs);
 }
 
 pair<int,int> ScriptModule::ExecuteBlock(int lineStart, int lineEnd)
