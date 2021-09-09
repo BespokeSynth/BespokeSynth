@@ -408,7 +408,7 @@ void CodeEntry::Render()
          int endLineNum = (int)round(coordsEnd.y);
          int startCol = (int)round(coordsStart.x);
          int endCol = (int)round(coordsEnd.x);
-         auto lines = GetLines();
+         auto lines = GetLines(false);
          for (int i=startLineNum; i<=endLineNum; ++i)
          {
             int begin = 0;
@@ -520,7 +520,7 @@ void CodeEntry::RenderOverlay()
 string CodeEntry::GetVisibleCode()
 {
    string visible;
-   vector<string> lines = GetLines();
+   vector<string> lines = GetLines(false);
    if (lines.empty())
       return "";
    
@@ -908,7 +908,7 @@ void CodeEntry::OnKeyPressed(int key, bool isRepeat)
 
          ofVec2f coords = GetCaretCoords(mCaretPosition);
          int lineNum = (int)round(coords.y);
-         auto lines = GetLines();
+         auto lines = GetLines(false);
          int numSpaces = 0;
          if (mCaretPosition > 0 && mString[mCaretPosition - 1] == ':') //auto-indent
             numSpaces += kTabSize;
@@ -1017,7 +1017,7 @@ void CodeEntry::Publish()
    mPublishedString = mString;
    mLastPublishTime = gTime;
    mLastPublishedLineStart = 0;
-   mLastPublishedLineEnd = (int)GetLines().size();
+   mLastPublishedLineEnd = (int)GetLines(true).size();
    OnCodeUpdated();
 }
 
@@ -1122,7 +1122,7 @@ void CodeEntry::ShiftLines(bool backwards)
    ofVec2f coordsStart = GetCaretCoords(caretStart);
    ofVec2f coordsEnd = GetCaretCoords(caretEnd);
    
-   auto lines = GetLines();
+   auto lines = GetLines(false);
    string newString = "";
    for (size_t i=0; i<lines.size(); ++i)
    {
@@ -1180,7 +1180,7 @@ void CodeEntry::MoveCaret(int pos, bool allowSelection /*=true*/)
 void CodeEntry::MoveCaretToStart()
 {
    ofVec2f coords = GetCaretCoords(mCaretPosition);
-   auto lines = GetLines();
+   auto lines = GetLines(false);
    int x = 0;
    if (coords.y < lines.size())
    {
@@ -1246,7 +1246,7 @@ void CodeEntry::SetDimensions(float width, float height)
 
 int CodeEntry::GetCaretPosition(int col, int row)
 {
-   auto lines = GetLines();
+   auto lines = GetLines(false);
    int caretPos = 0;
    for (size_t i=0; i<row && i<lines.size(); ++i)
       caretPos += lines[i].length() + 1;
@@ -1301,7 +1301,7 @@ ofVec2f CodeEntry::GetCaretCoords(int caret)
 {
    ofVec2f coords;
    int caretRemaining = caret;
-   auto lines = GetLines();
+   auto lines = GetLines(false);
    for (size_t i=0; i<lines.size(); ++i)
    {
       if (caretRemaining >= lines[i].length() + 1)

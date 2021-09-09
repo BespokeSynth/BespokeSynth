@@ -53,8 +53,8 @@ public:
    void Publish();
    
    void ClearInput() { mString = ""; mCaretPosition = 0; }
-   const string GetText() const { return mPublishedString; }
-   const vector<string> GetLines() const { return ofSplitString(mString, "\n"); }
+   const string GetText(bool published) const { return published ? mPublishedString : mString; }
+   const vector<string> GetLines(bool published) const { return ofSplitString(published ? mPublishedString : mString, "\n"); }
    void SetText(string text) { UpdateString(text); }
    void SetError(bool error, int errorLine = -1);
    void SetDoSyntaxHighlighting(bool highlight) { mDoSyntaxHighlighting = highlight; }

@@ -810,7 +810,7 @@ void ScriptModule::ButtonClicked(ClickButton* button)
                return;
             }
 
-            output.writeText(mCodeEntry->GetText(), false, false, nullptr);
+            output.writeText(mCodeEntry->GetText(false), false, false, nullptr);
             output.flush(); // (called explicitly to force an fsync on posix)
 
             if (output.getStatus().failed())
@@ -909,7 +909,7 @@ void ScriptModule::OnCodeUpdated()
 {
    if (mBoundModuleConnections.size() > 0)
    {
-      vector<string> lines = mCodeEntry->GetLines();
+      vector<string> lines = mCodeEntry->GetLines(false);
 
       for (size_t i = 0; i < mBoundModuleConnections.size(); ++i)
       {
@@ -975,7 +975,7 @@ pair<int,int> ScriptModule::RunScript(double time, int lineStart/*=-1*/, int lin
    }
 
    py::exec(GetThisName()+" = scriptmodule.get_me("+ofToString(mScriptModuleIndex)+")", py::globals());
-   string code = mCodeEntry->GetText();
+   string code = mCodeEntry->GetText(true);
    vector<string> lines = ofSplitString(code, "\n");
    
    size_t executionStartLine = 0;
@@ -1239,7 +1239,7 @@ void ScriptModule::OnModuleReferenceBound(IDrawableModule* target)
             return;
       }
 
-      string code = mCodeEntry->GetText();
+      string code = mCodeEntry->GetText(true);
       vector<string> lines = ofSplitString(code, "\n");
       if (mNextLineToExecute >= 0 && mNextLineToExecute < lines.size())
       {
