@@ -63,6 +63,9 @@ void Rewriter::CreateUIControls()
    mLooperCable = new PatchCableSource(this,kConnectionType_Special);
    mLooperCable->SetManualPosition(mWidth-10, 10);
    mLooperCable->AddTypeFilter("looper");
+   ofColor color = mLooperCable->GetColor();
+   color.a *= .3f;
+   mLooperCable->SetColor(color);
    AddPatchCableSource(mLooperCable);
 }
 

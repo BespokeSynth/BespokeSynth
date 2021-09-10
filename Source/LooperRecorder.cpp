@@ -280,6 +280,9 @@ void LooperRecorder::SyncCablesToLoopers()
          mLooperPatchCables[i]->SetTarget(looper);
          mLooperPatchCables[i]->SetManualPosition(160+i*12, 117);
          mLooperPatchCables[i]->SetOverrideCableDir(ofVec2f(0, 1));
+         ofColor color = mLooperPatchCables[i]->GetColor();
+         color.a *= .3f;
+         mLooperPatchCables[i]->SetColor(color);
          AddPatchCableSource(mLooperPatchCables[i]);
       }
    }
