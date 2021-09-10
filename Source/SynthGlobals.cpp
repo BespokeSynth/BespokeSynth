@@ -557,7 +557,7 @@ bool IsKeyHeld(int key, int modifiers)
 
 int KeyToLower(int key)
 {
-   if (CharacterFunctions::isLetter((char)key))
+   if (key < CHAR_MAX && CharacterFunctions::isLetter((char)key))
       return tolower(key);
    if (key == '!')
       return '1';

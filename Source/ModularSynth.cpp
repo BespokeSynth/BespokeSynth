@@ -946,7 +946,7 @@ void ModularSynth::KeyPressed(int key, bool isRepeat)
 
    mZoomer.OnKeyPressed(key);
    
-   if (CharacterFunctions::isDigit((char)key) && (GetKeyModifiers() == kModifier_Alt))
+   if (key < CHAR_MAX && CharacterFunctions::isDigit((char)key) && (GetKeyModifiers() == kModifier_Alt))
    {
       int num = key - '0';
       assert(num >= 0 && num <= 9);

@@ -999,7 +999,7 @@ void CodeEntry::OnKeyPressed(int key, bool isRepeat)
       mLastPublishedLineStart = ranLines.first;
       mLastPublishedLineEnd = ranLines.second;
    }
-   else
+   else if (key < CHAR_MAX)
    {
       AddCharacter((char)key);
    }
