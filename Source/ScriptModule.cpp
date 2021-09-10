@@ -65,6 +65,8 @@ string ScriptModule::sBackgroundTextString = "";
 //static
 float ScriptModule::sBackgroundTextSize = 30;
 //static
+ofVec2f ScriptModule::sBackgroundTextPos;
+//static
 ofColor ScriptModule::sBackgroundTextColor = ofColor::white;
 //static
 bool ScriptModule::sPythonInitialized = false;

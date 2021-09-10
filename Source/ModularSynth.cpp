@@ -485,16 +485,16 @@ void ModularSynth::Draw(void* vg)
       else
          DrawFallbackText(mFatalError.c_str(), 100, 100);
    }
-   
-   DrawLissajous(mGlobalRecordBuffer, 0, 0, ofGetWidth(), ofGetHeight(), sBackgroundLissajousR, sBackgroundLissajousG, sBackgroundLissajousB);
 
    if (ScriptModule::sBackgroundTextString != "")
    {
       ofPushStyle();
       ofSetColor(ScriptModule::sBackgroundTextColor);
-      DrawTextBold(ScriptModule::sBackgroundTextString, 150, 200 + ScriptModule::sBackgroundTextSize, ScriptModule::sBackgroundTextSize);
+      DrawTextBold(ScriptModule::sBackgroundTextString, ScriptModule::sBackgroundTextPos.x, ScriptModule::sBackgroundTextPos.y + ScriptModule::sBackgroundTextSize, ScriptModule::sBackgroundTextSize);
       ofPopStyle();
    }
+   
+   DrawLissajous(mGlobalRecordBuffer, 0, 0, ofGetWidth(), ofGetHeight(), sBackgroundLissajousR, sBackgroundLissajousG, sBackgroundLissajousB);
    
    if (gTime == 1 && mFatalError == "")
    {
@@ -1819,6 +1819,7 @@ void ModularSynth::ResetLayout()
    mMoveModule = nullptr;
    LFOPool::Shutdown();
    IKeyboardFocusListener::ClearActiveKeyboardFocus(!K(notifyListeners));
+   ScriptModule::sBackgroundTextString = "";
    
    mErrors.clear();
    

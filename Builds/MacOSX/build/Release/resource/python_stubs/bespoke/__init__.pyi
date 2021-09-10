@@ -45,6 +45,6 @@ def pitch_to_freq(pitch):
 def get_tempo():
    pass
 
-def set_background_text(text, size=50, red = 1, green = 1, blue = 1):
+def set_background_text(str, size=50, xPos = 150, yPos = 250, red = 1, green = 1, blue = 1):
    pass
 

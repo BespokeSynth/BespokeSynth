@@ -107,6 +107,7 @@ public:
    static float GetTimeSigRatio();
    static string sBackgroundTextString;
    static float sBackgroundTextSize;
+   static ofVec2f sBackgroundTextPos;
    static ofColor sBackgroundTextColor;
    static bool sPythonInitialized;
    static bool sHasPythonEverSuccessfullyInitialized;
