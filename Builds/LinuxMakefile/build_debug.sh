@@ -1,0 +1,1 @@
+make CONFIG=Debug -j`nproc`
