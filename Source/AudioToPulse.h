@@ -64,7 +64,8 @@ private:
 
    FloatSlider* mThresholdSlider;
    FloatSlider* mReleaseSlider;
-   float mVal;
+   float mPeak;
+   float mEnvelope;
    float mThreshold;
    float mRelease;
    float mReleaseFactor;

@@ -93,6 +93,7 @@ public:
    bool IsValidTarget(IClickable* target) const;
    void CableGrabbed();
    ConnectionType GetConnectionType() const { return mType; }
+   void SetConnectionType(ConnectionType type);
    IDrawableModule* GetOwner() const { return mOwner; }
    void SetOverrideVizBuffer(RollingBuffer* viz) { mOverrideVizBuffer = viz; }
    RollingBuffer* GetOverrideVizBuffer() const { return mOverrideVizBuffer; }

@@ -60,7 +60,19 @@ PatchCableSource::PatchCableSource(IDrawableModule* owner, ConnectionType type)
 , mParentMinimized(false)
 {
    mAllowMultipleTargets = (mType == kConnectionType_Note || mType == kConnectionType_Pulse || mType == kConnectionType_Audio || mType == kConnectionType_Modulator);
-   
+   SetConnectionType(type);
+}
+
+PatchCableSource::~PatchCableSource()
+{
+   for (auto cable : mPatchCables)
+      delete cable;
+}
+
+void PatchCableSource::SetConnectionType(ConnectionType type)
+{
+   mType = type;
+
    if (mType == kConnectionType_Note)
       mColor = IDrawableModule::GetColor(kModuleType_Note);
    else if (mType == kConnectionType_Audio)
@@ -72,12 +84,6 @@ PatchCableSource::PatchCableSource(IDrawableModule* owner, ConnectionType type)
    else
       mColor = IDrawableModule::GetColor(kModuleType_Other);
    mColor.setBrightness(mColor.getBrightness() * .8f);
-}
-
-PatchCableSource::~PatchCableSource()
-{
-   for (auto cable : mPatchCables)
-      delete cable;
 }
 
 PatchCable* PatchCableSource::AddPatchCable(IClickable* target)

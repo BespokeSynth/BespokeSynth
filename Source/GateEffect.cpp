@@ -45,6 +45,8 @@ void GateEffect::CreateUIControls()
    mThresholdSlider = new FloatSlider(this,"threshold",5,2,110,15,&mThreshold,0,1);
    mAttackSlider = new FloatSlider(this,"attack",5,18,110,15,&mAttackTime,.1f,500);
    mReleaseSlider = new FloatSlider(this,"release",5,34,110,15,&mReleaseTime,.1f,500);
+
+   mThresholdSlider->SetMode(FloatSlider::kSquare);
 }
 
 void GateEffect::ProcessAudio(double time, ChannelBuffer* buffer)
@@ -79,10 +81,9 @@ void GateEffect::ProcessAudio(double time, ChannelBuffer* buffer)
             mPeak = 0.0;
       }
 
-      float sqrtPeak = sqrtf(mPeak);
-      if (sqrtPeak >= mThreshold && mEnvelope < 1)
+      if (mPeak >= mThreshold && mEnvelope < 1)
          mEnvelope = MIN(1, mEnvelope+gInvSampleRateMs/mAttackTime );
-      if (sqrtPeak < mThreshold && mEnvelope > 0)
+      if (mPeak < mThreshold && mEnvelope > 0)
          mEnvelope = MAX(0, mEnvelope-gInvSampleRateMs/mReleaseTime );
 
       for (int ch=0; ch<buffer->NumActiveChannels(); ++ch)

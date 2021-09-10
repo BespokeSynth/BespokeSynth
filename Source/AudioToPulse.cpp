@@ -36,9 +36,10 @@ AudioToPulse::AudioToPulse()
 : IAudioProcessor(gBufferSize)
 , mThresholdSlider(nullptr)
 , mReleaseSlider(nullptr)
-, mVal(0)
+, mPeak(0)
+, mEnvelope(0)
 , mThreshold(.5f)
-, mRelease(750)
+, mRelease(150)
 {
 }
 
@@ -55,10 +56,13 @@ void AudioToPulse::CreateUIControls()
    FLOATSLIDER(mReleaseSlider, "release", &mRelease, .01f, 1000);
    ENDUIBLOCK(mWidth, mHeight);
    
+   mThresholdSlider->SetMode(FloatSlider::kSquare);
    mReleaseSlider->SetMode(FloatSlider::kSquare);
 
    //update mReleaseFactor
    FloatSliderUpdated(mReleaseSlider, 0);
+
+   GetPatchCableSource()->SetConnectionType(kConnectionType_Pulse);
 }
 
 void AudioToPulse::DrawModule()
@@ -71,9 +75,16 @@ void AudioToPulse::DrawModule()
 
    ofPushStyle();
    ofFill();
-   ofSetColor(255, 0, 0, gModuleDrawAlpha*.4f);
+   ofSetColor(0, 255, 0, gModuleDrawAlpha*.4f);
    ofRectangle rect = mThresholdSlider->GetRect(true);
-   rect.width *= ofClamp(mVal, 0, 1);
+   rect.width *= ofClamp(sqrtf(mPeak), 0, 1);
+   rect.height *= .5f;
+   ofRect(rect);
+   ofSetColor(255, 0, 0, gModuleDrawAlpha*.4f);
+   rect = mThresholdSlider->GetRect(true);
+   rect.width *= ofClamp(mEnvelope, 0, 1);
+   rect.height *= .5f;
+   rect.y += rect.height;
    ofRect(rect);
    ofPopStyle();
 }
@@ -88,8 +99,7 @@ void AudioToPulse::Process(double time)
    ComputeSliders(0);
    SyncBuffers();
 
-   const float kAttackTimeMs = 5;
-   const float kAttackFactor = powf(.01f, 1.0f / (kAttackTimeMs * gSampleRateMs));
+   const float kAttackTimeMs = 1;
 
    assert(GetBuffer()->BufferSize());
    Clear(gWorkBuffer, gBufferSize);
@@ -98,18 +108,31 @@ void AudioToPulse::Process(double time)
    Mult(gWorkBuffer, 1.0f / GetBuffer()->NumActiveChannels(), gBufferSize);
    for (int i = 0; i < gBufferSize; ++i)
    {
-      float sample = fabsf(gWorkBuffer[i]);
-      if (sample > mVal)
+      const float decayTime = .01f;
+      float scalar = powf(0.5f, 1.0f / (decayTime * gSampleRate));
+      float input = fabsf(gWorkBuffer[i]);
+
+      if (input >= mPeak)
       {
-         float oldVal = mVal;
-         mVal = kAttackFactor * (mVal - sample) + sample;
-         if (mVal >= mThreshold && oldVal < mThreshold)
-            DispatchPulse(GetPatchCableSource(), time + i * gInvSampleRateMs, 1, 0);
+         /* When we hit a peak, ride the peak to the top. */
+         mPeak = input;
       }
       else
       {
-         mVal = mReleaseFactor * (mVal - sample) + sample;
+         /* Exponential decay of output when signal is low. */
+         mPeak = mPeak * scalar;
+         if (mPeak < FLT_EPSILON)
+            mPeak = 0.0;
       }
+
+      float oldEnvelope = mEnvelope;
+      if (mPeak >= mThreshold && mEnvelope < 1)
+         mEnvelope = MIN(1, mEnvelope + gInvSampleRateMs / kAttackTimeMs);
+      if (mPeak < mThreshold && mEnvelope > 0)
+         mEnvelope = MAX(0, mEnvelope - gInvSampleRateMs / mRelease);
+
+      if (mEnvelope >= 0.01f && oldEnvelope < 0.01f)
+         DispatchPulse(GetPatchCableSource(), time + i * gInvSampleRateMs, 1, 0);
    }
 
    GetBuffer()->Reset();
