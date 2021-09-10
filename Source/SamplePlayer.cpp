@@ -214,7 +214,7 @@ void SamplePlayer::Poll()
 
       if (mRunningProcessType == RunningProcessType::SearchYoutube)
       {
-         string tempPath = ofToResourcePath("youtube_temp");
+         string tempPath = ofToDataPath("youtube_temp");
          auto dir = juce::File(tempPath);
          if (dir.exists())
          {
@@ -690,14 +690,14 @@ void SamplePlayer::DownloadYoutube(string url, string title)
 
    const char* tempDownloadName = "youtube.m4a";
    {
-      auto file = juce::File(ofToResourcePath(tempDownloadName));
+      auto file = juce::File(ofToDataPath(tempDownloadName));
       if (file.existsAsFile())
          file.deleteFile();
    }
 
    const char* tempConvertedName = "youtube.wav";
    {
-      auto file = juce::File(ofToResourcePath(tempConvertedName));
+      auto file = juce::File(ofToDataPath(tempConvertedName));
       if (file.existsAsFile())
          file.deleteFile();
    }
@@ -714,7 +714,7 @@ void SamplePlayer::DownloadYoutube(string url, string title)
    args.add("--ffmpeg-location");
    args.add(GetFfmpegPath());
    args.add("-o");
-   args.add(ofToResourcePath(tempDownloadName));
+   args.add(ofToDataPath(tempDownloadName));
    
    mRunningProcessType = RunningProcessType::DownloadYoutube;
 
@@ -725,10 +725,10 @@ void SamplePlayer::DownloadYoutube(string url, string title)
 
 void SamplePlayer::OnYoutubeDownloadComplete(string filename, string title)
 {
-   if (juce::File(ofToResourcePath(filename)).existsAsFile())
+   if (juce::File(ofToDataPath(filename)).existsAsFile())
    {
       Sample* sample = new Sample();
-      sample->Read(ofToResourcePath(filename).c_str(), false, Sample::ReadType::Async);
+      sample->Read(ofToDataPath(filename).c_str(), false, Sample::ReadType::Async);
       sample->SetName(title);
       UpdateSample(sample, true);
    }
@@ -756,7 +756,7 @@ void SamplePlayer::RunProcess(const StringArray& args)
 
 void SamplePlayer::SearchYoutube(string searchTerm)
 {
-   string tempPath = ofToResourcePath("youtube_temp");
+   string tempPath = ofToDataPath("youtube_temp");
    auto dir = juce::File(tempPath);
    if (dir.exists())
       dir.deleteRecursively();
