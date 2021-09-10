@@ -306,6 +306,9 @@ void UserPrefsEditor::UpdateDropdowns(vector<DropdownList*> toUpdate)
    auto setup = deviceManager.getAudioDeviceSetup();
    if (selectedDevice == nullptr || selectedDevice->getTypeName() != selectedDeviceType->getTypeName() || setup.outputDeviceName != outputDeviceName || setup.inputDeviceName != inputDeviceName)
       selectedDevice = selectedDeviceType->createDevice(outputDeviceName, inputDeviceName);
+
+   if (selectedDevice == nullptr)
+      return;
    
    if (toUpdate.empty() || VectorContains(mSampleRateDropdown, toUpdate))
    {
