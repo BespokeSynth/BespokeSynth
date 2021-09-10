@@ -1804,6 +1804,9 @@ void ModularSynth::ArrangeAudioSourceDependencies()
 
 void ModularSynth::ResetLayout()
 {
+   mMainComponent->getTopLevelComponent()->setName("bespoke synth");
+   mCurrentSaveStatePath = "";
+
    mModuleContainer.Clear();
    mUILayerModuleContainer.Clear();
    
@@ -2290,10 +2293,6 @@ void ModularSynth::SaveState(string file, bool autosave)
 
 void ModularSynth::LoadState(string file)
 {
-   mCurrentSaveStatePath = file;
-   string filename = File(mCurrentSaveStatePath).getFileName().toStdString();
-   mMainComponent->getTopLevelComponent()->setName("bespoke synth - " + filename);
-
    ofLog() << "LoadState() " << file;
 
    if (!juce::File(file).existsAsFile())
@@ -2327,7 +2326,10 @@ void ModularSynth::LoadState(string file)
       TheTransport->Reset();
    }
    
-   
+   mCurrentSaveStatePath = file;
+   string filename = File(mCurrentSaveStatePath).getFileName().toStdString();
+   mMainComponent->getTopLevelComponent()->setName("bespoke synth - " + filename);
+
    mAudioThreadMutex.Lock("LoadState()");
    LockRender(true);
    mAudioPaused = false;
