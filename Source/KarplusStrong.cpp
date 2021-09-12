@@ -108,7 +108,7 @@ void KarplusStrong::Process(double time)
    if (!mEnabled || target == nullptr)
       return;
    
-   SyncBuffers(2);
+   SyncBuffers(mWriteBuffer.NumActiveChannels());
 
    mNoteInputBuffer.Process(time);
 
@@ -129,7 +129,6 @@ void KarplusStrong::Process(double time)
 
    mBiquad.ProcessAudio(time, &mWriteBuffer);
 
-   SyncOutputBuffer(mWriteBuffer.NumActiveChannels());
    for (int ch=0; ch<mWriteBuffer.NumActiveChannels(); ++ch)
    {
       GetVizBuffer()->WriteChunk(mWriteBuffer.GetChannel(ch),mWriteBuffer.BufferSize(), ch);
