@@ -50,9 +50,7 @@ public:
 class IPulseSource
 {
 public:
-   IPulseSource() : mLastPulseTime(0) {}
+   IPulseSource() {}
    virtual ~IPulseSource() {}
    void DispatchPulse(PatchCableSource* destination, double time, float velocity, int flags);
-private:
-   double mLastPulseTime;
 };

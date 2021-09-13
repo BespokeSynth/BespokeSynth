@@ -125,8 +125,9 @@ public:
    void SetModulatorOwner(IModulator* modulator) { mModulatorOwner = modulator; }
    IModulator* GetModulatorOwner() const { return mModulatorOwner; }
    
-   void AddHistoryEvent(double time, bool on) { mNoteHistory.AddEvent(time, on); }
+   void AddHistoryEvent(double time, bool on) { mNoteHistory.AddEvent(time, on); if (on) { mLastOnEventTime = time; } }
    NoteHistory& GetHistory() { return mNoteHistory; }
+   double GetLastOnEventTime() const { return mLastOnEventTime; }
    
    void DrawSource();
    void DrawCables(bool parentMinimized);
@@ -175,6 +176,7 @@ private:
    vector<IClickable*> mValidTargets;
    
    NoteHistory mNoteHistory;
+   double mLastOnEventTime;
    
    IModulator* mModulatorOwner;
 
