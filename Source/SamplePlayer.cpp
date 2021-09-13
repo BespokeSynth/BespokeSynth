@@ -580,8 +580,12 @@ void SamplePlayer::ButtonClicked(ClickButton *button)
       SaveFile();
    if (button == mTrimToZoomButton && mSample != nullptr)
    {
+      for (auto& cuePoint : mSampleCuePoints)
+         cuePoint.startSeconds = MAX(0, cuePoint.startSeconds - GetZoomStartSeconds());
+
       Sample* sample = new Sample();
       sample->Create(GetZoomEndSample() - GetZoomStartSample());
+      sample->Data()->SetNumActiveChannels(mSample->NumChannels());
       for (int ch = 0; ch < mSample->NumChannels(); ++ch)
       {
          float* sampleData = sample->Data()->GetChannel(ch);
