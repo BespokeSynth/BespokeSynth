@@ -100,25 +100,25 @@ void NoteCounter::OnTimeEvent(double time)
       return;
    
    if (mSync)
-   {
       mStep = TheTransport->GetSyncedStep(time, this, mTransportListenerInfo, mLength);
-   }
-   else
-   {
-      mStep = (mStep + 1) % mLength;
-   }
    
    mNoteOutput.Flush(time);
    if (mRandom)
       PlayNoteOutput(time, gRandom() % mLength + mStart, 127, -1);
    else
       PlayNoteOutput(time, mStep + mStart, 127, -1);
+
+   if (!mSync)
+      mStep = (mStep + 1) % mLength;
 }
 
 void NoteCounter::CheckboxUpdated(Checkbox* checkbox)
 {
    if (checkbox == mEnabledCheckbox)
+   {
       mNoteOutput.Flush(gTime);
+      mStep = 0;
+   }
 }
 
 void NoteCounter::IntSliderUpdated(IntSlider* slider, int oldVal)
