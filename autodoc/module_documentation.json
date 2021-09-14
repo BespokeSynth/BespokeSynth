@@ -816,7 +816,7 @@
       "canReceivePulses" : false,
       "controls" : {
          "help page" : "which page of help information to show",
-         "show tooltips" : "displays these tooltips. you can turn these on or off by default in the \"settings\" menu."
+         "show tooltips" : "displays these tooltips. you can also toggle them with the F1 key, and you can turn these on or off by default in the \"settings\" menu."
       },
       "description" : "displays help information",
       "type" : "unknown"
@@ -1102,13 +1102,14 @@
          "layout" : "which layout file should we use for this controller? these can be created in your Documents/BespokeSynth/controllers folder.",
          "mappingdisplay" : "which mapping view to see",
          "messagetype" : "type of midi message",
-         "midi off" : "the lower end of the midi range. send this value when the targeted control is off. this also controls the lower end of the slider range. set midi off to be higher than midi on to reverse a slider's direction.",
-         "midi on" : "the upper end of the midi range. send this value when the targeted control is on. this also controls the upper end of the slider range. set midi off to be higher than midi on to reverse a slider's direction.",
+         "midi off" : "the lower end of the midi range. send this value when the targeted control is off. if \"scale\" is enabled, this also controls the lower end of the slider range, and you can set midi off to be higher than midi on to reverse a slider's direction.",
+         "midi on" : "the upper end of the midi range. send this value when the targeted control is on. if \"scale\" is enabled, this also controls the upper end of the slider range, and you can set midi off to be higher than midi on to reverse a slider's direction.",
          "monome" : "which monome should we use?",
          "osc input port" : "port to use for osccontroller input",
          "page" : "select which page of midi controls to use. each page acts like an independent midi controller, so you can use pages to allow one midi controller to switch between controlling many things",
          "pageless" : "should this connection work across all pages of the midicontroller?",
          "path" : "path to the control that should be affected",
+         "scale" : "should the output of this midi slider be scaled between \"midi off\" and \"midi on\"?",
          "twoway" : "should we send feedback to the controller? (to control the LEDs associated with the button/knob)",
          "value" : "the value to set"
       },
@@ -1223,6 +1224,29 @@
       },
       "description" : "delay with multiple tap points",
       "type" : "audio effects"
+   },
+   "multitrackrecorder" : {
+      "canReceiveAudio" : false,
+      "canReceiveNote" : false,
+      "canReceivePulses" : false,
+      "controls" : {
+         "add track" : "add an additional track",
+         "bounce" : "write the tracks to your recordings directory",
+         "clear" : "clear the audio in the tracks",
+         "record" : "record input to the tracks"
+      },
+      "description" : "record several synchronized tracks of audio, to write to disk for mixing in an external DAW",
+      "type" : "other"
+   },
+   "multitrackrecordertrack" : {
+      "canReceiveAudio" : false,
+      "canReceiveNote" : false,
+      "canReceivePulses" : false,
+      "controls" : {
+         " X " : "delete this track"
+      },
+      "description" : "a track in a multitrack recorder",
+      "type" : "unknown"
    },
    "muter" : {
       "canReceiveAudio" : false,
@@ -1394,7 +1418,7 @@
       "controls" : {
          "weight *" : "chance that note goes to this destination"
       },
-      "description" : "sends notes to a random destinations",
+      "description" : "sends notes to random destinations",
       "type" : "note effects"
    },
    "notehumanizer" : {
@@ -1523,6 +1547,12 @@
          "notemode" : "which set of pitches should the rows represent?",
          "octave" : "octave of the bottom pitch of this sequence",
          "pitch" : "randomize pitches in the sequence. hold shift to constrain the randomization to only pick roots and fifths.",
+         "rand len chance" : "when clicking the random length button, what is the chance that a step gets changed?",
+         "rand len range" : "when clicking the random length button, how much will the length change?",
+         "rand pitch chance" : "when clicking the random pitch button, what is the chance that a step gets changed?",
+         "rand pitch range" : "when clicking the random pitch button, how far will the pitch change?",
+         "rand vel chance" : "when clicking the random velocity button, what is the chance that a step gets changed?",
+         "rand vel density" : "when clicking the random velocity button, what are the chances that a step should have a note?",
          "tone*" : "pitch for this column",
          "vel" : "randomize the velocity of each step's note.",
          "vel*" : "velocity for this column",
@@ -2462,7 +2492,7 @@
       "canReceiveNote" : false,
       "canReceivePulses" : false,
       "controls" : {
-         " ? " : "",
+         " ? " : "show help",
          "autosave" : "every time a new module is added, trigger a save to data/savestate/autosave/, to help reload state in the event of a crash. can be quite slow if using modules with large samples.",
          "load" : "load a saved .bsk file to restore state",
          "load layout" : "[none]",
@@ -2699,7 +2729,9 @@
       "canReceivePulses" : false,
       "controls" : {
          "open" : "show the plugin window",
+         "preset" : "choose from saved VST presets",
          "program change" : "send a program change message to the VST instance",
+         "save as" : "save the current VST settings as a preset to load again later",
          "show parameter" : "select parameters to display them, so they can be adjusted from within bespoke's interface. if a VST has more than 20 parameters, this list will initially be empty. in that case, to make a parameter appear in this list, wiggle it within the VST's interface.",
          "vol" : "adjust the output volume"
       },
