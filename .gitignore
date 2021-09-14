@@ -380,3 +380,7 @@ bespoke_windows_installer/HarvestedResourceDir.wixobj
 bespoke_windows_installer/HarvestedResourceDir.wxs
 
 Builds/LinuxMakefile/Bespoke-Linux.zip
+
+bespoke_windows_installer/Bespoke-Windows.msi
+
+bespoke_windows_installer/Bespoke-Windows.wixpdb
