@@ -24,3 +24,6 @@ Join the [Bespoke Discord](https://discord.gg/YdTMkvvpZZ) for support and to dis
 
 ### Releases
 Sign up here to receive an email whenever I put out a new release: http://bespokesynth.substack.com/
+
+### Building
+Use the "Projucer" from https://juce.com/ to generate solutions/project files/makefiles for building on your platform.
