@@ -294,29 +294,38 @@ void MultitrackRecorderTrack::CreateUIControls()
 
 void MultitrackRecorderTrack::Process(double time)
 {
+   int numChannels = GetBuffer()->NumActiveChannels();
+   for (size_t i = 0; i < mRecordChunks.size(); ++i)
+   {
+      if (mRecordChunks[i]->NumActiveChannels() > numChannels)
+         numChannels = mRecordChunks[i]->NumActiveChannels();
+   }
+
    ComputeSliders(0);
-   SyncBuffers(GetBuffer()->NumActiveChannels());
+   SyncBuffers(numChannels);
 
    if (mDoRecording)
    {
+      for (size_t i = 0; i < mRecordChunks.size(); ++i)
+         mRecordChunks[i]->SetNumActiveChannels(numChannels);
+
       for (int i = 0; i < GetBuffer()->BufferSize(); ++i)
       {
          int chunkIndex = mRecordingLength / kRecordingChunkSize;
          int chunkPos = mRecordingLength % kRecordingChunkSize;
-         mRecordChunks[chunkIndex]->SetNumActiveChannels(GetBuffer()->NumActiveChannels());
-         for (int ch = 0; ch < GetBuffer()->NumActiveChannels(); ++ch)
-            mRecordChunks[chunkIndex]->GetChannel(ch)[chunkPos] = GetBuffer()->GetChannel(ch)[i];
+         for (int ch = 0; ch < numChannels; ++ch)
+            mRecordChunks[chunkIndex]->GetChannel(ch)[chunkPos] = GetBuffer()->GetChannel(MIN(ch, GetBuffer()->NumActiveChannels()-1))[i];
          ++mRecordingLength;
       }
    }
 
    if (GetTarget())
    {
-      for (int ch = 0; ch < GetBuffer()->NumActiveChannels(); ++ch)
+      for (int ch = 0; ch < GetTarget()->GetBuffer()->NumActiveChannels(); ++ch)
       {
-         float* buffer = GetBuffer()->GetChannel(ch);
+         float* buffer = GetBuffer()->GetChannel(MIN(ch, GetBuffer()->NumActiveChannels() - 1));
          Add(GetTarget()->GetBuffer()->GetChannel(ch), buffer, GetBuffer()->BufferSize());
-         GetVizBuffer()->WriteChunk(buffer, GetBuffer()->BufferSize(), ch);
+         GetVizBuffer()->WriteChunk(buffer, GetBuffer()->BufferSize(), MIN(ch, GetVizBuffer()->NumChannels() - 1));
       }
    }
 
