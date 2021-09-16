@@ -1599,7 +1599,7 @@
       "controls" : {
          "reset" : "reset the pitch range"
       },
-      "description" : "view are stream of notes as they're played",
+      "description" : "view a stream of notes as they're played",
       "type" : "note effects"
    },
    "notestrummer" : {
