@@ -367,7 +367,7 @@ Builds/LinuxMakefile/Makefile
 
 Builds/MacOSX/build/Bespoke-Mac.dmg
 
-autodoc/bespokesynth.com/
+autodoc/bespokesynth.com/docs/screenshots
 
 bespoke_windows_installer/BespokeSynth.msi
 

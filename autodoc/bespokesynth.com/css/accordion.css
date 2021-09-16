@@ -1,0 +1,101 @@
+@import url(https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css);
+@import url(https://fonts.googleapis.com/css?family=Montserrat:400,700|Open+Sans:400,300);
+
+* {
+	margin: 0;
+	padding: 0;
+	box-sizing: border-box;
+}
+body {
+	font-family: Montserrat,"Helvetica Neue",Helvetica,Arial,sans-serif;
+}
+.container {
+	width: 100%;
+	height: 100%;
+}
+nav {
+	position: fixed;
+	display: flex;
+	align-items: flex-start;
+	width: 15%;
+	height: 100%;
+   background-color: #111;
+   overflow: auto;
+}
+main {
+	position: fixed;
+	right: 0;
+	width: 85%;
+	height: 100%;
+	background-color: #111;
+	overflow: auto;
+   padding: 40px;
+   color: #fff;
+}
+h1 {
+	font-weight: bold;
+	margin-bottom: 50px;
+	font-size: 55px;
+	text-align: center;
+}
+p {
+	margin-bottom: 20px;
+   line-height: 26px;
+   white-space: pre-wrap; /* preserve WS, wrap as necessary, preserve LB */
+}
+li, ul label.title, ul, a {
+	width: 100%;
+	color: #FFF;
+	font-family: Montserrat,"Helvetica Neue",Helvetica,Arial,sans-serif;
+	display: block;
+	font-weight: bold;
+}
+ul label {
+	height: 35px;
+}
+ul li{
+	height: 35px;
+	overflow: hidden;
+	transition: all .3s;
+}
+li {
+	display: block;
+	background-color: #555555;
+}
+label.title {
+	font-size: 14px;
+	background: #2f2f2f;
+	padding: 10px 15px;
+	cursor: pointer;
+  transition: all .25s;
+}
+a{
+	font-size: 12px;
+	text-decoration: none;
+	color: #FFF;
+	display: block;
+	padding: 10px 25px;
+	transition: all .25s;
+}
+label:hover {
+	text-shadow: 0px 0px 10px #fff;
+}
+input[type="checkbox"] {
+	display: none;
+}
+#edit:checked + li, #archive:checked + li, #tools:checked + li, #preferences:checked + li, #instruments:checked + li, #noteeffects:checked + li, #synths:checked + li, #audioeffects:checked + li, #modulators:checked + li, #pulse:checked + li, #effectchain:checked + li, #other:checked + li {
+	height: 100%;
+}
+i {
+	margin-right: 12px;
+}
+@media screen and (max-width: 600px){
+	nav {
+		width: 100%;
+		position: relative;
+	}
+	main {
+		width: 100%;
+		position: relative;
+	}
+}

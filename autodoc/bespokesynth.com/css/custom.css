@@ -1,0 +1,159 @@
+.box {
+   width: 1100px;
+   margin: 50px auto;
+   position: relative;
+   /*left: -50px;*/
+ }
+
+ .table-footer {
+    color: #bbb;
+    font-size: 12px;
+ }
+ 
+ 
+ /* Services Col */
+ 
+ .services-table {
+   float: left;
+   margin-top: 156px;
+   z-index: 0;
+   margin-right: 1px;
+ }
+ 
+ .services-table tr {
+   height: 40px;
+   background: rgb(56, 56, 56);
+   border-bottom: 1px solid #5a5a5a;
+ }
+
+
+ .services-table tr:last-child {
+   border-bottom: none;
+ }
+ 
+ .services-table th.services {
+   color: #e4e4e4;
+   font-weight: 100;
+   min-width: 300px;
+   background: rgb(43, 43, 43);
+   padding-left: 10px
+ }
+ 
+ 
+ /* Entrepreneur and Business Pro Col */
+ 
+ table.price-matrix {
+   -webkit-box-shadow: 0 0 16px 0 rgba(0,0,0, 1);
+   box-shadow: 0 0 16px 0 rgba(0,0,0, 1);
+   float: left;
+ }
+ 
+ table.price-matrix tr {
+   height: 40px;
+   background: rgb(40, 40, 40);
+ }
+ 
+ 
+ /* Headers */
+ 
+ table.price-matrix th.header-free {
+   color: #707478;
+ }
+
+ table.price-matrix th.header-plus,
+ .paypal-price-plus {
+   color: #91979e;
+ }
+
+ table.price-matrix th.header-pro,
+ .paypal-price-pro {
+   color: #b6c2ce;
+ }
+
+ table.price-matrix th.header-free,
+ table.price-matrix th.header-plus,
+ table.price-matrix th.header-pro {
+   font-weight: 100;
+   font-size: 30px;
+   min-width: 230px;
+   text-align: center;
+   padding: 15px 0;
+   background: rgb(43, 43, 43);
+   border-right: 1px solid #464646;
+ }
+
+ table.price-matrix th:last-child {
+   border-right: none;
+ }
+ 
+ th.header-free hr,
+ th.header-plus hr,
+ th.header-pro hr {
+   width: 70%;
+   /*border-bottom: 1px solid;*/
+ }
+ 
+ 
+ /* Rows */
+ 
+ tr:nth-child(even) td {
+   background: #3d3d3d;
+ }
+ 
+ td.border {
+   border-right: 1px solid #464646;
+   text-align:center;
+ }
+
+ td.padded {
+   border-right: 1px solid #464646;
+   text-align:center;
+   padding-top: 10px;
+   padding-bottom: 10px;
+   padding-left: 20px;
+   padding-right: 20px;
+   position: relative;
+   z-index: 10;
+ }
+
+ td.paypal-td {
+   border-right: 1px solid #464646;
+   text-align:center;
+   padding-top: 10px;
+   padding-bottom: 10px;
+   padding-left: 20px;
+   padding-right: 20px;
+   color: #a0a0a0;
+   font-size: 10px;
+ }
+
+ td.paypal-td:last-child {
+   border-right: none;
+ }
+
+ .paypal-price-plus,
+ .paypal-price-pro {
+    font-size: 25px;
+ }
+ 
+ 
+ 
+ 
+ tr {
+   height: 40px;
+ }
+ 
+ 
+
+ .check {
+   --borderWidth: 5px;
+   --height: 24px;
+   --width: 12px;
+   --borderColor: #78b13f;
+   display: inline-block;
+   transform: rotate(45deg);
+   height: var(--height);
+   width: var(--width);
+   border-bottom: var(--borderWidth) solid var(--borderColor);
+   border-right: var(--borderWidth) solid var(--borderColor);
+ }
