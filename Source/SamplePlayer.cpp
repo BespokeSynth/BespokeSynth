@@ -1336,14 +1336,18 @@ bool SamplePlayer::MouseScrolled(int x, int y, float scrollX, float scrollY)
    //horizontal scroll
    mZoomOffset = ofClamp(mZoomOffset + scrollX*.005f, 0, 1);
 
-   //zoom scroll
+   // zoom scroll
    float oldZoomLevel = mZoomLevel;
-   mZoomLevel = ofClamp(mZoomLevel + scrollY*.2f, 1, 40);
+   if (scrollY > 0.)
+      mZoomLevel = ofClamp(mZoomLevel*scrollY, 1., 40.);
+   else
+      mZoomLevel = ofClamp(mZoomLevel/(-1. * scrollY), 1., 40.);
+
    float zoomAmount = (mZoomLevel - oldZoomLevel) / oldZoomLevel; //find actual adjusted amount
-   float zoomCenter = ofMap(x, 5, mWidth-10, 0, 1, true)/oldZoomLevel;
+   float zoomCenter = ofMap(x, 5., mWidth-10., 0., 1., true)/oldZoomLevel;
    mZoomOffset += zoomCenter * zoomAmount;
-   if (mZoomLevel == 1)
-      mZoomOffset = 0;
+   if (mZoomLevel == 1.)
+      mZoomOffset = 0.;
 
    return false;
 }
