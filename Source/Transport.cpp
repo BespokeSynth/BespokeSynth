@@ -339,7 +339,6 @@ int Transport::GetQuantized(double time, const TransportListenerInfo* listenerIn
    int measure = GetMeasure(time);
    double measurePos = GetMeasurePos(time);
    double pos = Swing(measurePos);
-   pos *= double(mTimeSigTop) / mTimeSigBottom;
    
    NoteInterval interval = listenerInfo->mInterval;
    switch (interval)
@@ -353,6 +352,7 @@ int Transport::GetQuantized(double time, const TransportListenerInfo* listenerIn
       case kInterval_32:
       case kInterval_64:
       {
+         pos *= double(mTimeSigTop) / mTimeSigBottom;
          int ret = measure / (int)GetMeasureFraction(interval);
          if (remainderMs != nullptr)
             *remainderMs = (pos + measure % (int)GetMeasureFraction(interval)) * MsPerBar();
@@ -373,6 +373,7 @@ int Transport::GetQuantized(double time, const TransportListenerInfo* listenerIn
       case kInterval_32nt:
       case kInterval_64n:
       {
+         pos *= double(mTimeSigTop) / mTimeSigBottom;
          double ret = pos * CountInStandardMeasure(interval);
          if (remainderMs != nullptr)
          {
