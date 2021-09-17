@@ -1,3 +1,4 @@
+#!/usr/bin/env bash
 #running this script to install these dependencies should allow you to both run and compile bespoke
 #getting all of these dependencies is definitely overkill if you only want to run the binary, and 
 #don't care about compiling, but I'm not good enough at linux to narrow it down for you

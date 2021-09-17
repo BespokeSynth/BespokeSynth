@@ -1,3 +1,5 @@
+#!/usr/bin/env bash
+
 rm -rf BespokeSynth/
 mkdir BespokeSynth
 cp build/BespokeSynth BespokeSynth/BespokeSynth

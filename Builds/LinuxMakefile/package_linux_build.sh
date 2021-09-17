@@ -1,3 +1,4 @@
+#!/usr/bin/env bash
 rm -f Bespoke-Linux.zip
 rm -rf BespokeSynth/
 mkdir BespokeSynth
