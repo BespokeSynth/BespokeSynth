@@ -1,3 +1,11 @@
 #!/usr/bin/env bash
 
-make CONFIG=Debug -j`nproc`
+if [ ! -f Makefile ]; then
+  
+  echo "No Makefile found. Please download Projucer and choose 'Save this exporter' for Linux Makefile."
+
+else
+
+    make CONFIG=Debug -j`nproc`
+
+fi
