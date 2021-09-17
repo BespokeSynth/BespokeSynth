@@ -50,6 +50,7 @@ html.write('''
          <nav class="menu">
             
             <ul></br>Bespoke Synth Reference</br></br>
+            <a href="#video">overview video</a>
             <a href="#basics">basics</a>''')
 for moduleType in moduleTypes:
    html.write('''
@@ -70,8 +71,16 @@ html.write('''
 
 html.write('''
       <main class="main">
-         <a name=basics></a></br>
+         <a name=video></a></br>
          <h1>Bespoke Synth Reference</h1>
+         <h2>overview video</h2>
+         <span style="display:inline-block;margin-left:15px;">
+         <p>Here is a video detailing basic usage of Bespoke, including a bunch of less-obvious shortcuts and workflow features.</p>
+         <p>There are some things in this video that are slightly out of date (I should make a new video!), but there is still plenty of useful information in there.</p>
+         <iframe width="1120" height="630" src="https://www.youtube.com/embed/SYBc8X2IxqM?rel=0" frameborder="0" allowfullscreen></iframe>
+         </span>
+         <br/><br/>
+         <a name=basics></a>
          <h2>basics</h2>
          <p>''')
 html.write(open("../Builds/MacOSX/build/Release/resource/help.txt","r").read())

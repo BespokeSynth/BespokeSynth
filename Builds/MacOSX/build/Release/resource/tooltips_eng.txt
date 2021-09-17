@@ -1,7 +1,7 @@
 
 
 
-valuestream~displays a control's value over time
+valuestream~displays a control's value over time. connect the cable to a UI control to see how it is changing.
 ~speed~how quickly display should scroll
 
 
@@ -1504,7 +1504,7 @@ notestrummer~send a chord into this, and move a slider to strum each note of the
 
 
 
-notestream~view are stream of notes as they're played
+notestream~view a stream of notes as they're played
 ~reset~reset the pitch range
 
 
