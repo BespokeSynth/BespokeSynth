@@ -5,6 +5,8 @@ You can find the most recent builds for Mac/Windows/Linux at http://bespokesynth
 
 Join the [Bespoke Discord](https://discord.gg/YdTMkvvpZZ) for support and to discuss with the community.
 
+<a href='https://ko-fi.com/awwbees' target='_blank'><img height='35' style='border:0px;height:46px;' src='https://az743702.vo.msecnd.net/cdn/kofi3.png?v=0' border='0' alt='Buy Me a Coffee at ko-fi.com' />
+
 ## Screenshot
 ![screenshot](screenshot-1.png)
 
