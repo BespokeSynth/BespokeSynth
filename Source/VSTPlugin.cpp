@@ -328,6 +328,15 @@ void VSTPlugin::LoadVST(juce::PluginDescription desc)
    if (mPlugin != nullptr)
    {
       mPlugin->enableAllBuses();
+
+      // DIsable all non-main output busses
+      auto layouts = mPlugin->getBusesLayout();
+
+      for (int busIndex = 1; busIndex < layouts.outputBuses.size(); ++busIndex)
+          layouts.outputBuses.getReference(busIndex) = AudioChannelSet::disabled();
+
+      mPlugin->setBusesLayout(layouts);
+
       mPlugin->prepareToPlay(gSampleRate, gBufferSize);
       mPlugin->setPlayHead(&mPlayhead);
       mNumInputs = MIN(mPlugin->getTotalNumInputChannels(), 4);
