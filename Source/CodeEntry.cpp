@@ -25,6 +25,7 @@
   ==============================================================================
 */
 
+#include "ModularSynth.h"
 #if BESPOKE_WINDOWS
 #define ssize_t ssize_t_undef_hack  //fixes conflict with ssize_t typedefs between python and juce
 #endif
@@ -933,7 +934,7 @@ void CodeEntry::OnKeyPressed(int key, bool isRepeat)
       if (mCaretPosition != mCaretPosition2)
          RemoveSelectedText();
       
-      juce::String clipboard = SystemClipboard::getTextFromClipboard();
+      juce::String clipboard = TheSynth->GetTextFromClipboard();
       AddString(clipboard.toStdString());
    }
    else if (toupper(key) == 'V' && (GetKeyModifiers() == (kModifier_Command | kModifier_Shift)))
@@ -958,7 +959,7 @@ void CodeEntry::OnKeyPressed(int key, bool isRepeat)
       {
          int caretStart = MIN(mCaretPosition, mCaretPosition2);
          int caretEnd = MAX(mCaretPosition, mCaretPosition2);
-         SystemClipboard::copyTextToClipboard(mString.substr(caretStart,caretEnd-caretStart));
+         TheSynth->CopyTextToClipboard(mString.substr(caretStart,caretEnd-caretStart));
          
          if (toupper(key) == 'X')
             RemoveSelectedText();

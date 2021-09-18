@@ -175,7 +175,7 @@ void SamplePlayer::Poll()
 {
    IDrawableModule::Poll();
    
-   juce::String clipboard = SystemClipboard::getTextFromClipboard();
+   const juce::String& clipboard = TheSynth->GetTextFromClipboard();
    if (clipboard.contains("youtube"))
    {
       juce::String clipId = clipboard.substring(clipboard.indexOf("v=")+2, clipboard.length());

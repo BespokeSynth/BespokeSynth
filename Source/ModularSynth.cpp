@@ -857,6 +857,11 @@ void ModularSynth::Exit()
    ofExit();
 }
 
+void ModularSynth::Focus()
+{
+   ReadClipboardTextFromSystem();
+}
+
 IDrawableModule* ModularSynth::GetLastClickedModule() const
 {
    return mLastClickedModule;
@@ -2747,6 +2752,19 @@ void ModularSynth::SaveOutput()
    
    mGlobalRecordBuffer->ClearBuffer();
    mRecordingLength = 0;
+}
+
+const String& ModularSynth::GetTextFromClipboard() const {
+   return clipboard;
+}
+
+void ModularSynth::CopyTextToClipboard(const String& text) {
+   clipboard = text;
+   SystemClipboard::copyTextToClipboard(text);
+}
+
+void ModularSynth::ReadClipboardTextFromSystem() {
+   clipboard = SystemClipboard::getTextFromClipboard();
 }
 
 void ModularSynth::SetFatalError(string error)

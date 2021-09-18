@@ -25,6 +25,7 @@
 //
 
 #include "TextEntry.h"
+#include "ModularSynth.h"
 #include "SynthGlobals.h"
 #include "IDrawableModule.h"
 #include "FileStream.h"
@@ -349,7 +350,7 @@ void TextEntry::OnKeyPressed(int key, bool isRepeat)
    }
    else if (toupper(key) == 'V' && GetKeyModifiers() == kModifier_Command)
    {
-      juce::String clipboard = SystemClipboard::getTextFromClipboard();
+      juce::String clipboard = TheSynth->GetTextFromClipboard();
       for (int i=0; i<clipboard.length(); ++i)
          AddCharacter(clipboard[i]);
    }
