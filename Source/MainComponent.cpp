@@ -390,17 +390,17 @@ public:
 private:
    void mouseDown(const MouseEvent& e) override
    {
-      mSynth.MousePressed(e.getMouseDownX(), e.getMouseDownY(), e.mods.isRightButtonDown() ? 2 : 1);
+      mSynth.MousePressed(e.getMouseDownX(), e.getMouseDownY(), e.mods.isPopupMenu() ? 2 : 1);
    }
    
    void mouseUp(const MouseEvent& e) override
    {
-      mSynth.MouseReleased(e.getPosition().x, e.getPosition().y, e.mods.isRightButtonDown() ? 2 : 1);
+      mSynth.MouseReleased(e.getPosition().x, e.getPosition().y, e.mods.isPopupMenu() ? 2 : 1);
    }
    
    void mouseDrag(const MouseEvent& e) override
    {
-      mSynth.MouseDragged(e.getPosition().x, e.getPosition().y, e.mods.isRightButtonDown() ? 2 : 1);
+      mSynth.MouseDragged(e.getPosition().x, e.getPosition().y, e.mods.isPopupMenu() ? 2 : 1);
    }
    
    void mouseMove(const MouseEvent& e) override
