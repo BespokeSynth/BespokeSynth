@@ -384,3 +384,6 @@ Builds/LinuxMakefile/Bespoke-Linux.zip
 bespoke_windows_installer/Bespoke-Windows.msi
 
 bespoke_windows_installer/Bespoke-Windows.wixpdb
+
+cmake-build*
+ignore/*

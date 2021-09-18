@@ -1,11 +1,16 @@
 #ifndef MAINCOMPONENT_H_INCLUDED
 #define MAINCOMPONENT_H_INCLUDED
 
+
 #ifdef BESPOKE_WINDOWS
-#include <GL/glew.h>
+// juce::gl supercedes this
+//#include <GL/glew.h>
 #endif
 
-#include "../JuceLibraryCode/JuceHeader.h"
+#include <JuceHeader.h>
+using namespace juce::gl;
+
+
 #include "nanovg/nanovg.h"
 #define NANOVG_GLES2_IMPLEMENTATION
 #include "nanovg/nanovg_gl.h"
@@ -164,7 +169,7 @@ public:
    void initialise() override
    {
 #ifdef JUCE_WINDOWS
-      glewInit();
+      // glewInit();
 #endif
       
       mVG = nvgCreateGLES2(NVG_ANTIALIAS | NVG_STENCIL_STROKES);

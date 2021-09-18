@@ -23,6 +23,7 @@
 //
 //
 
+#include <JuceHeader.h>
 #include "TitleBar.h"
 #include "ModularSynth.h"
 #include "SynthGlobals.h"

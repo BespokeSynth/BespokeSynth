@@ -23,6 +23,11 @@
 //
 //
 
+
+#if BESPOKE_MAC
+#include <CoreFoundation/CoreFoundation.h>
+#endif
+
 #include "ModuleFactory.h"
 
 #include "LaunchpadKeyboard.h"

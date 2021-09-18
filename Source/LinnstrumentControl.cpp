@@ -33,7 +33,7 @@
 #include "ModulationChain.h"
 #include "PolyphonyMgr.h"
 #include "MidiController.h"
-#ifdef BESPOKE_LINUX
+#if BESPOKE_LINUX | BESPOKE_MAC
 #include <unistd.h>
 #endif
 

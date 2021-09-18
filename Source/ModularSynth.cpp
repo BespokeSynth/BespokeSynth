@@ -23,7 +23,7 @@
 #include "FileStream.h"
 #include "PatchCable.h"
 #include "ADSRDisplay.h"
-#include "../JuceLibraryCode/JuceHeader.h"
+#include <JuceHeader.h>
 #include "QuickSpawnMenu.h"
 #include "AudioToCV.h"
 #include "ScriptModule.h"

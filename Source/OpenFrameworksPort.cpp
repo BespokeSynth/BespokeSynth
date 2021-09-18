@@ -26,9 +26,13 @@
  */
 
 #ifdef BESPOKE_WINDOWS
-#include <GL/glew.h>
+// juce now does this for us
+// #include <GL/glew.h>
 #include <Windows.h>
 #endif
+
+#include <JuceHeader.h>
+using namespace juce::gl;
 
 //#include <chrono>
 #include <time.h>
@@ -113,12 +117,12 @@ string ofToResourcePath(string path, bool makeAbsolute)
       if (juce::File(localResourceDir).exists())
          sResourceDir = localResourceDir;
       else
-         sResourceDir = File::getCurrentWorkingDirectory().getChildFile("../MacOSX/build/Release/resource").getFullPathName().toStdString();   //fall back to looking at OSX dir in dev environment
+         sResourceDir = File::getCurrentWorkingDirectory().getChildFile("../../../resource").getFullPathName().toStdString();   //fall back to looking at OSX dir in dev environment
       ofStringReplace(sResourceDir, "\\", "/");
 
 #elif JUCE_LINUX
       string localDataDir = File::getCurrentWorkingDirectory().getChildFile("resource").getFullPathName().toStdString();
-      string developmentDataDir = File::getCurrentWorkingDirectory().getChildFile("../../MacOSX/build/Release/resource").getFullPathName().toStdString();   //OSX dir in dev environment
+      string developmentDataDir = File::getCurrentWorkingDirectory().getChildFile("../../resource").getFullPathName().toStdString();   //OSX dir in dev environment
       string installedDataDir = File::getSpecialLocation(File::globalApplicationsDirectory).getChildFile("share/BespokeSynth/resource").getFullPathName().toStdString(); // /usr/share/BespokeSynth/resource
       if (juce::File(localDataDir).exists())
          sResourceDir = localDataDir;

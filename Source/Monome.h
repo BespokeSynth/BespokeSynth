@@ -26,7 +26,7 @@
 #ifndef __modularSynth__Monome__
 #define __modularSynth__Monome__
 
-#include "../JuceLibraryCode/JuceHeader.h"
+#include <JuceHeader.h>
 #include "OpenFrameworksPort.h"
 #include "MidiDevice.h"
 #include "INonstandardController.h"

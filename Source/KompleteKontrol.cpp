@@ -23,6 +23,10 @@
 //
 //
 
+#if BESPOKE_MAC
+#include <CoreFoundation/CoreFoundation.h>
+#endif
+
 #include "KompleteKontrol.h"
 #include "SynthGlobals.h"
 #include "ModularSynth.h"

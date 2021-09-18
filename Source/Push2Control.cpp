@@ -26,8 +26,12 @@
 */
 
 #ifdef BESPOKE_WINDOWS
-#include <GL/glew.h>
+// juce::gl supercedes this
+// #include <GL/glew.h>
 #endif
+
+#include <JuceHeader.h>
+using namespace juce::gl;
 
 #include "Push2Control.h"
 #include <cctype>
@@ -316,7 +320,7 @@ void Push2Control::DrawToFramebuffer(NVGcontext* vg, NVGLUframebuffer* fb, float
    nvgluBindFramebuffer(fb);
    glViewport(0, 0, fboWidth, fboHeight);
    glClearColor(0, 0, 0, 0);
-   glClear(GL_COLOR_BUFFER_BIT|GL_STENCIL_BUFFER_BIT);
+   glClear(juce::gl::GL_COLOR_BUFFER_BIT|GL_STENCIL_BUFFER_BIT);
    nvgBeginFrame(vg, winWidth, winHeight, pxRatio);
    
    nvgLineCap(vg, NVG_ROUND);
@@ -471,8 +475,8 @@ void Push2Control::DrawToFramebuffer(NVGcontext* vg, NVGLUframebuffer* fb, float
    nvgEndFrame(vg);
    
    glFinish();
-   glReadBuffer(GL_COLOR_ATTACHMENT0);
-   glReadPixels(0, 0, winWidth, winHeight, GL_RGB, GL_UNSIGNED_BYTE, mPixels);
+   glReadBuffer(juce::gl::GL_COLOR_ATTACHMENT0);
+   glReadPixels(0, 0, winWidth, winHeight, juce::gl::GL_RGB, GL_UNSIGNED_BYTE, mPixels);
    
    nvgluBindFramebuffer(NULL);
 }

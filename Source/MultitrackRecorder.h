@@ -63,7 +63,7 @@ public:
 private:
    //IDrawableModule
    void DrawModule() override;
-   void GetModuleDimensions(float& width, float& height) { width = mWidth; height = mHeight; }
+   void GetModuleDimensions(float& width, float& height) override { width = mWidth; height = mHeight; }
 
    void AddTrack();
    int GetRecordingLength();
@@ -95,8 +95,8 @@ public:
    void CreateUIControls() override;
    bool HasTitleBar() const override { return false; }
 
-   void Poll();
-   void Process(double time);
+   void Poll() override;
+   void Process(double time) override;
 
    void Setup(MultitrackRecorder* recorder, int minLength);
    void SetRecording(bool record);
@@ -114,7 +114,7 @@ public:
 private:
    //IDrawableModule
    void DrawModule() override;
-   void GetModuleDimensions(float& width, float& height);
+   void GetModuleDimensions(float& width, float& height) override;
 
    MultitrackRecorder* mRecorder;
 

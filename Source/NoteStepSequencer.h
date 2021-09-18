@@ -70,7 +70,7 @@ public:
    //IDrawableModule
    bool IsResizable() const override { return true; }
    void Resize(float w, float h) override;
-   void Poll();
+   void Poll() override;
 
    //IClickable
    void MouseReleased() override;

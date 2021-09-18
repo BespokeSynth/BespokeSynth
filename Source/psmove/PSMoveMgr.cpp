@@ -1,4 +1,7 @@
 #include "PSMoveMgr.h"
+#ifndef JUCE_WINDOWS
+#include <unistd.h>
+#endif
 
 //--------------------------------------------------------------
 void PSMoveMgr::Setup()
