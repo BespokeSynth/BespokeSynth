@@ -1478,9 +1478,10 @@ void ModularSynth::CheckClick(IDrawableModule* clickedModule, int x, int y, bool
    //check to see if we clicked in the move area
    float moduleX, moduleY;
    clickedModule->GetPosition(moduleX, moduleY);
+   int modulePosX = x - moduleX;
    int modulePosY = y - moduleY;
    
-   if (modulePosY < 0 && clickedModule != TheTitleBar)
+   if (modulePosY < 0 && clickedModule != TheTitleBar && (!clickedModule->HasEnableCheckbox() || modulePosX > 20))
    {
       mMoveModule = clickedModule;
       mMoveModuleOffsetX = moduleX - x;

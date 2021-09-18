@@ -128,6 +128,7 @@ public:
    virtual ModuleContainer* GetContainer() { return nullptr; }
    void SetShouldDrawOutline(bool should) { mShouldDrawOutline = should; }
    ofVec2f GetMinimumDimensions();
+   bool HasEnableCheckbox() const { return mEnabledCheckbox != nullptr; }
    void MarkAsDeleted() { mDeleted = true; }
    bool IsDeleted() const { return mDeleted; }
    virtual bool ShouldClipContents() { return true; }
