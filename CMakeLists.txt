@@ -5,7 +5,7 @@
 #   - BESPOKE_VST2_SDK_LOCATION (default to nothing) where you get your SDK if you want non-FOSS software
 #   - BESPOKE_ASIO_SDK_LOCATION (default to nothing) from https://www.steinberg.net/developers/
 
-cmake_minimum_required(VERSION 3.15)
+cmake_minimum_required(VERSION 3.16)
 cmake_policy(SET CMP0091 NEW)
 set(CMAKE_MSVC_RUNTIME_LIBRARY "MultiThreaded$<$<CONFIG:Debug>:Debug>")
 set(CMAKE_OSX_DEPLOYMENT_TARGET 10.11 CACHE STRING "Minimum macOS version")
@@ -17,23 +17,35 @@ endif ()
 
 project(BespokeSynth VERSION 0.9.0 LANGUAGES C CXX ASM)
 
+message(STATUS "Bespoke: Build Type: ${CMAKE_BUILD_TYPE}")
+
+message(STATUS "Bespoke: Configuring Python with PyBind")
+if (NOT DEFINED PYBIND11_FINDPYTHON)
+    if (WIN32)
+      message(STATUS "Bespoke: PYBIND11_FINDPYTHON is unset; defaulting to OFF on Win32")
+      set(PYBIND11_FINDPYTHON OFF)
+    else()
+      message(STATUS "Bespoke: PYBIND11_FINDPYTHON is unset; defaulting to ON")
+      set(PYBIND11_FINDPYTHON ON)
+    endif()  
+endif()
+add_subdirectory(libs/pybind11 CONFIG)
+
 if (NOT BESPOKE_JUCE_LOCATION)
     set(BESPOKE_JUCE_LOCATION "libs/JUCE" CACHE STRING "" FORCE)
 endif ()
+message( STATUS "Bespoke: Using Juce from ${BESPOKE_JUCE_LOCATION}")
 add_subdirectory(${BESPOKE_JUCE_LOCATION} ${CMAKE_BINARY_DIR}/JUCE EXCLUDE_FROM_ALL)
 
 if (BESPOKE_VST2_SDK_LOCATION)
     juce_set_vst2_sdk_path(${BESPOKE_VST2_SDK_LOCATION})
     set( BESPOKE_VST2 1 )
-    message( STATUS "Enabling VST2 - caution, non FOSS build" )
+    message( STATUS "Bespoke: Enabling VST2 - caution, non FOSS build" )
 else()
     set( BESPOKE_VST2 0 )
-    message( STATUS "No VST2 support" )
+    message( STATUS "Bespoke: No VST2 support" )
 endif()
 
-
-set(PYBIND11_FINDPYTHON ON)
-add_subdirectory(libs/pybind11 CONFIG)
 
 add_subdirectory(Source/freeverb)
 add_subdirectory(Source/json)
@@ -437,17 +449,17 @@ elseif (WIN32)
             )
 
     if (BESPOKE_ASIO_SDK_LOCATION)
-        message( STATUS "Including ASIO from ${BESPOKE_ASIO_SDK_LOCATION}")
+        message( STATUS "Bespoke: Including ASIO from ${BESPOKE_ASIO_SDK_LOCATION}")
         target_compile_definitions(BespokeSynth PUBLIC JUCE_ASIO=1)
         target_include_directories(BespokeSynth PRIVATE ${BESPOKE_ASIO_SDK_LOCATION}/common)
     endif()
 
     if (${CMAKE_SIZEOF_VOID_P} EQUAL 4)
-        message(STATUS "Linking With ${CMAKE_SOURCE_DIR}/Source/3DxWare/Lib/x86/siapp.lib")
+        message(STATUS "Bespoke: Linking With ${CMAKE_SOURCE_DIR}/Source/3DxWare/Lib/x86/siapp.lib")
         target_link_libraries(BespokeSynth PRIVATE
                 ${CMAKE_SOURCE_DIR}/Source/3dxWare/Lib/x86/siapp.lib)
     else ()
-        message(STATUS "Linking With ${CMAKE_SOURCE_DIR}/Source/3DxWare/Lib/x64/siapp.lib")
+        message(STATUS "Bespoke: Linking With ${CMAKE_SOURCE_DIR}/Source/3DxWare/Lib/x64/siapp.lib")
         target_link_libraries(BespokeSynth PRIVATE
                 ${CMAKE_SOURCE_DIR}/Source/3DxWare/Lib/x64/siapp.lib)
     endif ()
@@ -468,9 +480,9 @@ else ()
          /sw/lib
     )
     if (NOT LIBUSB_1_LIBRARY)
-       message(ERROR "Cannot resolve libusb. Did you install libusb-1.0.0-dev package?")
+       message(ERROR "Bespoke: Cannot resolve libusb. Did you install libusb-1.0.0-dev package?")
     endif()
-    message(STATUS "Using USB from ${LIBUSB_1_LIBRARY}")
+    message(STATUS "Bespoke: Using USB from ${LIBUSB_1_LIBRARY}")
 
     target_link_libraries(BespokeSynth PRIVATE ${LIBUSB_1_LIBRARY})
 
