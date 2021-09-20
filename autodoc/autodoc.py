@@ -77,13 +77,13 @@ html.write('''
          <span style="display:inline-block;margin-left:15px;">
          <p>Here is a video detailing basic usage of Bespoke, including a bunch of less-obvious shortcuts and workflow features.</p>
          <p>There are some things in this video that are slightly out of date (I should make a new video!), but there is still plenty of useful information in there.</p>
-         <iframe width="1120" height="630" src="https://www.youtube.com/embed/SYBc8X2IxqM?rel=0" frameborder="0" allowfullscreen></iframe>
+         <iframe width="1120" height="630" src="https://www.youtube-nocookie.com/embed/SYBc8X2IxqM?rel=0" frameborder="0" allowfullscreen></iframe>
          </span>
          <br/><br/>
          <a name=basics></a>
          <h2>basics</h2>
          <p>''')
-html.write(open("../Builds/MacOSX/build/Release/resource/help.txt","r").read())
+html.write(open("../resource/help.txt","r").read())
 html.write('''
          </p>''')
 for moduleType in moduleTypes:
