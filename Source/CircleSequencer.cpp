@@ -234,7 +234,7 @@ void CircleSequencerRing::Draw()
    ofFill();
    for (int i=0; i<mLength; ++i)
    {
-      float pos = float(i)/mLength + mOffset;
+      float pos = float(i)/mLength - mOffset;
       ofVec2f p1 = PolToCar(pos, GetRadius()-3);
       ofVec2f p2 = PolToCar(pos, GetRadius()+3);
       ofLine(p1.x+100,p1.y+100,p2.x+100,p2.y+100);
@@ -262,11 +262,11 @@ void CircleSequencerRing::Draw()
 int CircleSequencerRing::GetStepIndex(int x, int y, float &radiusOut)
 {
    ofVec2f polar = CarToPol(x-100,y-100);
-   float pos = polar.x - mOffset;
+   float pos = polar.x + mOffset;
    FloatWrap(pos,1);
    int idx = int(pos * mLength + .5f) % mLength;
    
-   ofVec2f stepPos = PolToCar(float(idx)/mLength + mOffset, GetRadius());
+   ofVec2f stepPos = PolToCar(float(idx)/mLength - mOffset, GetRadius());
    if (ofDistSquared(x, y, stepPos.x+100, stepPos.y+100) < 7*7)
    {
       radiusOut = polar.y;
