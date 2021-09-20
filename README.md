@@ -28,4 +28,22 @@ Join the [Bespoke Discord](https://discord.gg/YdTMkvvpZZ) for support and to dis
 Sign up here to receive an email whenever I put out a new release: http://bespokesynth.substack.com/
 
 ### Building
-Use the "Projucer" from https://juce.com/ to generate solutions/project files/makefiles for building on your platform.
+
+In mid-September 2021 Bespoke moved to CMake rather than Projucer for builds. The prescription to build 
+Bespoke on all platforms is
+
+```shell
+git clone https://github.com/awwbees/BespokeSynth   # replace this with your fork if you forked
+cd BespokeSynth
+git submodule update --init --recursive
+cmake -Bignore/build
+cmake --build ignore/build --parallel 4
+```
+
+This will produce a release build in `ignore/build/BespokeSynth_artefacts`.
+
+On Windows, the above cmake commands make Visual Studio project files in `ignore/build` which you can open and use directly
+rather than the last step. Some windows systems also require the `-A x64` argument to force 64 bit.
+On macOS if you would like to use Xcode, replace the second command with `cmake -Bignore/build -Gxcode` 
+and the ignore/build directory will contain xcode project files which you can use. Finally, the CMake file has a set
+of options to enable other build features which are documented in the file.
