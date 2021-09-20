@@ -1704,6 +1704,11 @@ void ModularSynth::TriggerClapboard()
    mLastClapboardTime = gTime; //for synchronizing internally recorded audio and externally recorded video
 }
 
+bool endsWith(std::string_view str, std::string_view suffix)
+{
+    return str.size() >= suffix.size() && 0 == str.compare(str.size() - suffix.size(), suffix.size(), suffix);
+}
+
 void ModularSynth::FilesDropped(vector<string> files, int intX, int intY)
 {
    if (files.size() > 0)
@@ -1712,6 +1717,11 @@ void ModularSynth::FilesDropped(vector<string> files, int intX, int intY)
       float y = GetMouseY(&mModuleContainer, intY);
       IDrawableModule* target = GetModuleAtCursor();
 
+      if (files.size() == 1 && endsWith(files[0], ".bsk"))
+      {
+          LoadState(files[0]);
+          return;
+      }
       if (target != nullptr)
       {
          float moduleX, moduleY;
