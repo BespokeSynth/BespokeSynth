@@ -31,6 +31,10 @@
 #include <Windows.h>
 #endif
 
+#if BESPOKE_MAC
+#include <CoreFoundation/CoreFoundation.h>
+#endif
+
 #include <JuceHeader.h>
 using namespace juce::gl;
 
@@ -131,22 +135,49 @@ string ofToResourcePath(string path, bool makeAbsolute)
       else if (juce::File(installedDataDir).exists())
          sResourceDir = installedDataDir;
    
+#elif BESPOKE_MAC
+      auto bundle = CFBundleGetMainBundle();
+      bool foundResources = false;
+      if (bundle)
+      {
+
+          auto url = CFBundleCopyResourcesDirectoryURL(bundle);
+
+          if (url)
+          {
+              char bResPath[PATH_MAX];
+              if (CFURLGetFileSystemRepresentation(url, true, (UInt8*)bResPath, PATH_MAX))
+              {
+                  std::string p = bResPath;
+                  p += "/resource";
+                  if (juce::File(p).exists()) {
+                      foundResources = true;
+                      sResourceDir = p;
+                      ofLog() << "macOS: Resource Bundle From [" << p << "]";
+                  }
+              }
+              CFRelease(url);
+          }
+      }
+
+      if (!foundResources) {
+          // Retain the old code for now just in case
+#if DEBUG
+          string relative = "../Release/resource";
 #else
-      #if DEBUG
-         string relative = "../Release/resource";
-      #else
-         string relative = "resource";
-      #endif
-      
-      string localResourceDir = File::getCurrentWorkingDirectory().getChildFile(relative).getFullPathName().toStdString();
-      if (juce::File(localResourceDir).exists())
-      {
-         sResourceDir = localResourceDir;
+          string relative = "resource";
+#endif
+
+          string localResourceDir = File::getCurrentWorkingDirectory().getChildFile(
+                  relative).getFullPathName().toStdString();
+          if (juce::File(localResourceDir).exists()) {
+              sResourceDir = localResourceDir;
+          } else {
+              sResourceDir = "/Applications/BespokeSynth/resource";
+          }
       }
-      else
-      {
-         sResourceDir = "/Applications/BespokeSynth/resource";
-      }
+#else
+#error Mac, Linux or Windows only supported at this time
 #endif
    }
    
