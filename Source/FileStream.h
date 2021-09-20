@@ -26,7 +26,7 @@
 #ifndef __Bespoke__FileStream__
 #define __Bespoke__FileStream__
 
-#include "../JuceLibraryCode/JuceHeader.h"
+#include <JuceHeader.h>
 #include "OpenFrameworksPort.h"
 
 class FileStreamOut

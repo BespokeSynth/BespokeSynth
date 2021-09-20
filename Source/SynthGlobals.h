@@ -29,7 +29,7 @@
  #pragma clang diagnostic ignored "-Wreorder"
 #endif
 
-#include "../JuceLibraryCode/JuceHeader.h"
+#include <JuceHeader.h>
 #include "OpenFrameworksPort.h"
 #include <map>
 #include <list>

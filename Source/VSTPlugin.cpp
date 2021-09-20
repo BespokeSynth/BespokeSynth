@@ -229,7 +229,7 @@ string VSTPlugin::GetPluginId()
    if (mPlugin)
    {
       const auto& desc = dynamic_cast<juce::AudioPluginInstance*>(mPlugin.get())->getPluginDescription();
-      return GetPluginName() + "_" + ofToString(desc.uid);
+      return GetPluginName() + "_" + ofToString(desc.uniqueId);
    }
    return "no plugin loaded";
 }

@@ -1,1 +1,0 @@
-xcrun stapler staple Bespoke-Mac.dmg

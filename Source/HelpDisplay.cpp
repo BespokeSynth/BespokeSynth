@@ -573,12 +573,12 @@ void HelpDisplay::RenderScreenshot(int x, int y, int width, int height, string f
 
    unsigned char* pixels = new unsigned char[3 * (width) * (height)];
 
-   glReadBuffer(GL_BACK);
+   juce::gl::glReadBuffer(juce::gl::GL_BACK);
    int oldAlignment;
-   glGetIntegerv(GL_PACK_ALIGNMENT, &oldAlignment);
-   glPixelStorei(GL_PACK_ALIGNMENT, 1);   //tight packing
-   glReadPixels(x, ofGetHeight()*scale-y-height, width, height, GL_RGB, GL_UNSIGNED_BYTE, pixels);
-   glPixelStorei(GL_PACK_ALIGNMENT, oldAlignment);
+   juce::gl::glGetIntegerv(juce::gl::GL_PACK_ALIGNMENT, &oldAlignment);
+   juce::gl::glPixelStorei(juce::gl::GL_PACK_ALIGNMENT, 1);   //tight packing
+   juce::gl::glReadPixels(x, ofGetHeight()*scale-y-height, width, height, juce::gl::GL_RGB, juce::gl::GL_UNSIGNED_BYTE, pixels);
+   juce::gl::glPixelStorei(juce::gl::GL_PACK_ALIGNMENT, oldAlignment);
 
    Image image(Image::RGB, width, height, true);
    for (int x = 0; x < width; ++x)

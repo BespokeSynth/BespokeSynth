@@ -1,7 +1,7 @@
 #ifndef _MODULAR_SYNTH
 #define _MODULAR_SYNTH
 
-#include "../JuceLibraryCode/JuceHeader.h"
+#include <JuceHeader.h>
 
 #undef LoadString //undo some junk from a windows define
 

@@ -26,7 +26,7 @@
 #ifndef __Bespoke__VSTWindow__
 #define __Bespoke__VSTWindow__
 
-#include "../JuceLibraryCode/JuceHeader.h"
+#include <JuceHeader.h>
 
 class VSTPlugin;
 
@@ -104,7 +104,7 @@ public:
    }
    
    void refresh() { }
-   void audioProcessorChanged (juce::AudioProcessor*) { }
+   void audioProcessorChanged (juce::AudioProcessor*, const juce::AudioProcessorListener::ChangeDetails &) { }
    void audioProcessorParameterChanged (juce::AudioProcessor*, int, float) { }
    
 private:

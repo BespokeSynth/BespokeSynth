@@ -26,6 +26,7 @@
 #ifndef __Bespoke__VSTPlugin__
 #define __Bespoke__VSTPlugin__
 
+#include <JuceHeader.h>
 #include "IAudioProcessor.h"
 #include "PolyphonyMgr.h"
 #include "INoteReceiver.h"
@@ -36,7 +37,7 @@
 #include "EnvOscillator.h"
 #include "Ramp.h"
 #include "ClickButton.h"
-#include "../JuceLibraryCode/JuceHeader.h"
+#include <JuceHeader.h>
 #include "VSTPlayhead.h"
 #include "VSTWindow.h"
 

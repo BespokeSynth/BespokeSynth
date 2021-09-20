@@ -1,0 +1,53 @@
+
+navigation
+   * space bar + move mouse to pan, or right-click drag in empty space
+   * space bar + mousewheel/trackpad-scroll to zoom, or scroll in empty space
+   * if you get lost, press ~ to bring up the console, type "home", and press enter to reset to the initial position and zoom
+
+
+creating modules
+   * drag items out of the top bar menus
+       OR
+   * hold the first letter of a module and drag them out of the popup menu
+   * to delete a module, lasso select + backspace OR use the triangle menu and choose "delete module"
+   * to duplicate a module, hold alt/option and drag from the title bar
+
+
+patching
+   * drag the circle from the bottom of a module to the target OR click the circle then click the target to patch
+   * drag a cable and press backspace to unpatch
+   * hold shift while grabbing a patch cable circle to split
+   * hold shift while releasing a patch cable on a target to insert
+   * drag a module by the title bar and touch its circle to another module, or the mouse pointer to another module's circle,
+       to quick patch
+
+
+ui controls
+   * click or drag a slider to adjust its value
+   * hold shift to fine-tune
+   * while hovered:
+         -use mousewheel/trackpad-scroll to adjust (shift to fine-tune)
+         -type a value into a slider (such as 1.5) and press enter
+         -type an expression into a slider (such as 1/16 or +=10) and press enter  
+         -press up or down to increase the value by 1 (hold shift for .01)
+         -press [ or ] to halve or double the value
+         -press \ to reset to the initial value
+   * hold alt/option and drag to adjust slew amount (smoothing)
+   * right click a slider to add an LFO
+         -click and drag a green modulated slider vertically to adjust the modulation min, and horizontally to adjust
+           the modulation max
+   * hold ctrl/command and click the lower or upper half of a slider to adjust that slider's minimum or maximum value, to
+       give it increased or reduced range   (warning! increasing range can lead to unpredictable behavior in some cases)
+
+
+saving
+   * "write audio" button: write the last 30 minutes of audio to the /data/recordings folder, perfect for making sure you don't
+       miss any cool moments
+   * "save state" button: save the current layout to a file. shortcut: ctrl-s
+   * "load state" button: load previously saved layouts. shortcut: ctrl-l
+
+key commands
+   * ctrl/command-'s': save
+   * ctrl/command-'l': load
+   * shift-'p': pause audio processing. this will stop all audio output. press shift-'p' again to resume
+   * F2: toggle displaying all ADSR controls as sliders
