@@ -117,7 +117,7 @@ string ofToResourcePath(string path, bool makeAbsolute)
       if (juce::File(localResourceDir).exists())
          sResourceDir = localResourceDir;
       else
-         sResourceDir = File::getCurrentWorkingDirectory().getChildFile("../../../resource").getFullPathName().toStdString();   //fall back to looking at OSX dir in dev environment
+         sResourceDir = File::getCurrentWorkingDirectory().getChildFile("../../../../resource").getFullPathName().toStdString();   //fall back to looking at OSX dir in dev environment
       ofStringReplace(sResourceDir, "\\", "/");
 
 #elif JUCE_LINUX
