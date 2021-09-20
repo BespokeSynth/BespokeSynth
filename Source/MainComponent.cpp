@@ -321,6 +321,10 @@ public:
       nvgDeleteGLES2(mVG);
       nvgDeleteGLES2(mFontBoundsVG);
    }
+
+   void setInitialState(const String& statePath) {
+       mSynth.SetInitialState(statePath.toStdString());
+   }
    
    void render() override
    {
@@ -530,6 +534,15 @@ private:
 
 // (This function is called by the app startup code to create our main component)
 Component* createMainContentComponent()     { return new MainContentComponent(); }
+
+// This function is called when opening the app with a state file.
+void setInitialState(const String& statePath, Component* component) {
+    auto* mainComponent = dynamic_cast<MainContentComponent*>(component);
+    if(mainComponent == nullptr){
+        ofLog() << "Non main component sent to setInitialState";
+    }
+    mainComponent->setInitialState(statePath);
+}
 
 
 #endif  // MAINCOMPONENT_H_INCLUDED

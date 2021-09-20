@@ -199,6 +199,8 @@ public:
    void SaveOutput();
    void SaveState(string file, bool autosave);
    void LoadState(string file);
+   // Set a state file to be loaded when the synth is initialized.
+   void SetInitialState(string file);
    void SaveCurrentState();
    void SaveStatePopup();
    void LoadStatePopup();
@@ -294,6 +296,7 @@ private:
    string mLoadedLayoutPath;
    bool mWantReloadInitialLayout;
    string mCurrentSaveStatePath;
+   string mInitialSaveStatePath;
    double mLastSaveTime;
    
    Sample* mHeldSample;

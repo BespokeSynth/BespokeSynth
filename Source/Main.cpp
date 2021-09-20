@@ -11,6 +11,7 @@
 #include <JuceHeader.h>
 
 Component* createMainContentComponent();
+void setInitialState(const String& statePath, Component* mainComponent);
 
 //==============================================================================
 class BespokeApplication  : public JUCEApplication
@@ -51,6 +52,11 @@ public:
       // When another instance of the app is launched while this one is running,
       // this method is invoked, and the commandLine parameter tells you what
       // the other instance's command-line arguments were.
+
+      // This is also called when opening the app with a file.
+      if(commandLine.isNotEmpty() && commandLine.endsWith(".bsk")) {
+        setInitialState(commandLine, mainWindow->getContentComponent());
+      }
    }
    
    //==============================================================================

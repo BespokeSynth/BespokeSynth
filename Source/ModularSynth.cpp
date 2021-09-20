@@ -343,7 +343,11 @@ void ModularSynth::Poll()
       
       if (!mInitialized && sFrameCount > 3) //let some frames render before blocking for a load
       {
-         LoadLayoutFromFile(ofToDataPath(defaultLayout));
+         if(!mInitialSaveStatePath.empty()) {
+             LoadState(mInitialSaveStatePath);
+         }else {
+            LoadLayoutFromFile(ofToDataPath(defaultLayout));
+         }
          mInitialized = true;
       }
 
@@ -2291,6 +2295,10 @@ void ModularSynth::SaveState(string file, bool autosave)
    mModuleContainer.SaveState(out);
    
    mAudioThreadMutex.Unlock();
+}
+
+void ModularSynth::SetInitialState(string file){
+    mInitialSaveStatePath = std::move(file);
 }
 
 void ModularSynth::LoadState(string file)
