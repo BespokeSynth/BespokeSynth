@@ -16,7 +16,7 @@ creating modules
 patching
    * drag the circle from the bottom of a module to the target OR click the circle then click the target to patch
    * drag a cable and press backspace to unpatch
-   * hold shift while grabbing a patch cable circle to split
+   * hold shift while grabbing a patch cable circle to split (audiocables are split with send module, modulators with macroslider module)
    * hold shift while releasing a patch cable on a target to insert
    * drag a module by the title bar and touch its circle to another module, or the mouse pointer to another module's circle,
        to quick patch
