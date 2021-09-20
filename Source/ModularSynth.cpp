@@ -1079,8 +1079,8 @@ void ModularSynth::MouseMoved(int intX, int intY )
                         mMoveModule->SetTarget(patchCableSource->GetTarget());
                         patchCableSource->SetTarget(mMoveModule);
                         PatchCableSource::sAllowInsert = true;
+                        break;
                      }
-                     break;
                   }
                }
             }
