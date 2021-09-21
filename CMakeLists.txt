@@ -30,6 +30,7 @@ if (NOT DEFINED PYBIND11_FINDPYTHON)
     endif()  
 endif()
 add_subdirectory(libs/pybind11 CONFIG)
+message(STATUS "Bespoke: Python Executable is ${PYTHON_EXECUTABLE}")
 
 if (NOT BESPOKE_JUCE_LOCATION)
     set(BESPOKE_JUCE_LOCATION "libs/JUCE" CACHE STRING "" FORCE)
@@ -438,6 +439,14 @@ if (APPLE)
             )
     target_link_libraries(BespokeSynth PRIVATE
             "-framework CoreAudioKit")
+
+    # Post install tasks - copy resources to the bundle
+    get_target_property(OUTDIR BespokeSynth RUNTIME_OUTPUT_DIRECTORY)
+    add_custom_command(TARGET BespokeSynth
+            POST_BUILD
+            WORKING_DIRECTORY ${CMAKE_SOURCE_DIR}
+            COMMAND ${CMAKE_COMMAND} -E  copy_directory resource ${OUTDIR}/BespokeSynth.app/Contents/Resources/resource)
+
 elseif (WIN32)
     target_compile_definitions(BespokeSynth PRIVATE
             BESPOKE_WINDOWS=1
@@ -463,6 +472,16 @@ elseif (WIN32)
         target_link_libraries(BespokeSynth PRIVATE
                 ${CMAKE_SOURCE_DIR}/Source/3DxWare/Lib/x64/siapp.lib)
     endif ()
+
+    # Post install tasks - copy resources to the exe output directory
+    set_target_properties(BespokeSynth PROPERTIES VS_DEBUGGER_WORKING_DIRECTORY "$<TARGET_FILE_DIR:BespokeSynth>"
+                                    VS_DEBUGGER_COMMAND           "$<TARGET_FILE:BespokeSynth>"
+                                    VS_DEBUGGER_ENVIRONMENT       "PATH=%PATH%;${CMAKE_PREFIX_PATH}/bin")
+    get_target_property(OUTDIR BespokeSynth RUNTIME_OUTPUT_DIRECTORY)
+    add_custom_command(TARGET BespokeSynth
+            POST_BUILD
+            WORKING_DIRECTORY ${CMAKE_SOURCE_DIR}
+            COMMAND ${CMAKE_COMMAND} -E  copy_directory resource ${OUTDIR}/resource)
 else ()
     target_compile_definitions(BespokeSynth PRIVATE
             BESPOKE_LINUX=1
@@ -485,6 +504,13 @@ else ()
     message(STATUS "Bespoke: Using USB from ${LIBUSB_1_LIBRARY}")
 
     target_link_libraries(BespokeSynth PRIVATE ${LIBUSB_1_LIBRARY})
+
+    # Ant put resources with the exe
+    get_target_property(OUTDIR BespokeSynth RUNTIME_OUTPUT_DIRECTORY)
+    add_custom_command(TARGET BespokeSynth
+            POST_BUILD
+            WORKING_DIRECTORY ${CMAKE_SOURCE_DIR}
+            COMMAND ${CMAKE_COMMAND} -E  copy_directory resource ${OUTDIR}/resource)
 
 endif ()
 
