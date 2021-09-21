@@ -474,6 +474,9 @@ elseif (WIN32)
     endif ()
 
     # Post install tasks - copy resources to the exe output directory
+    set_target_properties(BespokeSynth PROPERTIES VS_DEBUGGER_WORKING_DIRECTORY "$<TARGET_FILE_DIR:BespokeSynth>"
+                                    VS_DEBUGGER_COMMAND           "$<TARGET_FILE:BespokeSynth>"
+                                    VS_DEBUGGER_ENVIRONMENT       "PATH=%PATH%;${CMAKE_PREFIX_PATH}/bin")
     get_target_property(OUTDIR BespokeSynth RUNTIME_OUTPUT_DIRECTORY)
     add_custom_command(TARGET BespokeSynth
             POST_BUILD
