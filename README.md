@@ -44,6 +44,6 @@ This will produce a release build in `ignore/build/BespokeSynth_artefacts`.
 
 On Windows, the above cmake commands make Visual Studio project files in `ignore/build` which you can open and use directly
 rather than the last step. Some windows systems also require the `-A x64` argument to force 64 bit.
-On macOS if you would like to use Xcode, replace the second command with `cmake -Bignore/build -Gxcode` 
+On macOS if you would like to use Xcode, replace the second command with `cmake -Bignore/build -GXcode` 
 and the ignore/build directory will contain xcode project files which you can use. Finally, the CMake file has a set
 of options to enable other build features which are documented in the file.
