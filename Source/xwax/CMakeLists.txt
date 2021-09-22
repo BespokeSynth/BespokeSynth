@@ -1,8 +1,8 @@
-project(vinylcontrol VERSION 0.0.0 LANGUAGES CXX)
+project(xwax VERSION 0.0.0 LANGUAGES CXX)
 
 add_library(${PROJECT_NAME}
+        lut.c
         timecoder.c
-        vinylcontrol.cpp
         )
 
 if(WIN32)

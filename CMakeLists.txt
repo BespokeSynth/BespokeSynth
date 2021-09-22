@@ -51,7 +51,7 @@ endif()
 add_subdirectory(Source/freeverb)
 add_subdirectory(Source/json)
 add_subdirectory(Source/nanovg)
-add_subdirectory(Source/vinylcontrol)
+add_subdirectory(Source/xwax)
 
 set(BESPOKE_SOURCE_LIST
         Source/glew/Bespoke_glew.c
@@ -518,7 +518,7 @@ target_link_libraries(BespokeSynth PRIVATE
         bespoke::freeverb
         bespoke::json
         bespoke::nanovg
-        bespoke::vinylcontrol
+        bespoke::xwax
         pybind11::embed
         juce::juce_audio_basics
         juce::juce_audio_devices
