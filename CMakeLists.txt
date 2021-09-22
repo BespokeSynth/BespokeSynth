@@ -47,11 +47,12 @@ else()
     message( STATUS "Bespoke: No VST2 support" )
 endif()
 
+add_subdirectory(libs/xwax)
 
 add_subdirectory(Source/freeverb)
 add_subdirectory(Source/json)
 add_subdirectory(Source/nanovg)
-add_subdirectory(Source/xwax)
+
 
 set(BESPOKE_SOURCE_LIST
         Source/glew/Bespoke_glew.c
