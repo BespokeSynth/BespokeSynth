@@ -2755,16 +2755,16 @@ void ModularSynth::SaveOutput()
 }
 
 const String& ModularSynth::GetTextFromClipboard() const {
-   return clipboard;
+   return mClipboard;
 }
 
 void ModularSynth::CopyTextToClipboard(const String& text) {
-   clipboard = text;
+   mClipboard = text;
    SystemClipboard::copyTextToClipboard(text);
 }
 
 void ModularSynth::ReadClipboardTextFromSystem() {
-   clipboard = SystemClipboard::getTextFromClipboard();
+   mClipboard = SystemClipboard::getTextFromClipboard();
 }
 
 void ModularSynth::SetFatalError(string error)

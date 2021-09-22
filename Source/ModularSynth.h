@@ -360,7 +360,7 @@ private:
    vector<float*> mInputBuffers;
    vector<float*> mOutputBuffers;
 
-   String clipboard;
+   String mClipboard;
 };
 
 extern ModularSynth* TheSynth;
