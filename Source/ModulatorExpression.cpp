@@ -86,10 +86,6 @@ void ModulatorExpression::CreateUIControls()
    mExpression.register_symbol_table(mSymbolTable);
    
    mSymbolTableDraw.add_variable("x",mExpressionInputDraw);
-   mSymbolTableDraw.add_variable("x1",mExpressionInputDraw);
-   mSymbolTableDraw.add_variable("x2",mExpressionInputDraw);
-   mSymbolTableDraw.add_variable("y1",mExpressionInputDraw);
-   mSymbolTableDraw.add_variable("y2",mExpressionInputDraw);
    mSymbolTableDraw.add_variable("t",mT);
    mSymbolTableDraw.add_variable("a",mA);
    mSymbolTableDraw.add_variable("b",mB);

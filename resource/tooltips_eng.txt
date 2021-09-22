@@ -316,7 +316,7 @@ fubble~draw on an X/Y pad and replay the drawing to modulate values. based on a 
 
 
 expression~shape modulation with a text-based mathematical expression
-~y=~expression to modify input. try something like "x+sin(x*pi*a)". available variables: a,b,c,d,e = the slider + sin(s below. t = time. x1,x2,y1,y2 = biquad state storage.
+~y=~expression to modify input. try something like "x+sin(x*pi*a)". available variables: a,b,c,d,e = the sliders below. t = time.
 ~input~input to use as x variable
 ~a~variable to use in expressions
 ~b~variable to use in expressions
@@ -617,7 +617,7 @@ circlesequencer~polyrhythmic sequencer that displays a loop as a circle
 
 
 waveshaper~waveshaping with expressions
-~y=~waveshaping expression. try something like "x+sin(x*pi*a)". available variables: a,b,c,d,e = the slider + sin(s below. t = time. x1,x2,y1,y2 = biquad state storage.
+~y=~waveshaping expression. try something like "x+sin(x*pi*a)". available variables: a,b,c,d,e = the sliders below. t = time. x1,x2,y1,y2 = biquad state storage.
 ~rescale~rescales input before feeding it into expression
 ~a~variable to use in expressions
 ~b~variable to use in expressions
