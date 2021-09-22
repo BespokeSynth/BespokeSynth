@@ -30,11 +30,29 @@
 #include "IDrawableModule.h"
 #include "IAudioProcessor.h"
 #include "IModulator.h"
-#include "vinylcontrol/vinylcontrol.h"
+extern "C" {
+#include "xwax/timecoder.h"
+}
 
-class VinylTempoControl;
+class VinylProcessor
+{
+public:
+   VinylProcessor(int sampleRate);
+   ~VinylProcessor();
 
-extern VinylTempoControl* TheVinylTempoControl;
+   void Process(float* left, float* right, int numSamples);
+
+   float GetPitch() { return mPitch; }
+   bool GetStopped() { return mHasSignal == false; }
+
+private:
+   int mSampleRate;
+
+   float mPitch;
+   bool mHasSignal;
+
+   timecoder mTimecoder;
+};
 
 class VinylTempoControl : public IDrawableModule, public IAudioProcessor, public IModulator
 {
@@ -42,7 +60,6 @@ public:
    VinylTempoControl();
    ~VinylTempoControl();
    static IDrawableModule* Create() { return new VinylTempoControl(); }
-   static bool CanCreate() { return TheVinylTempoControl == nullptr; }
    
    string GetTitleLabel() override { return "vinylcontrol"; }
    
@@ -74,7 +91,7 @@ private:
    bool mUseVinylControl;
    Checkbox* mUseVinylControlCheckbox;
    float mReferencePitch;
-   vinylcontrol mVinylControl;
+   VinylProcessor mVinylProcessor;
    //float* mModulationBuffer;
    float mSpeed;
 };

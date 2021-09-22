@@ -34,7 +34,7 @@ VinylTempoControl* TheVinylTempoControl = nullptr;
 VinylTempoControl::VinylTempoControl()
 : IAudioProcessor(gBufferSize)
 , mReferencePitch(1)
-, mVinylControl(gSampleRate)
+, mVinylProcessor(gSampleRate)
 , mUseVinylControl(false)
 , mUseVinylControlCheckbox(nullptr)
 , mSpeed(1)
@@ -67,7 +67,7 @@ void VinylTempoControl::DrawModule()
    mUseVinylControlCheckbox->Draw();
    
    if (CanStartVinylControl())
-      DrawTextNormal(ofToString(mVinylControl.GetPitch(),2),60,14);
+      DrawTextNormal(ofToString(mVinylProcessor.GetPitch(),2),60,14);
 }
 
 void VinylTempoControl::Process(double time)
@@ -84,18 +84,18 @@ void VinylTempoControl::Process(double time)
 
    if (GetBuffer()->NumActiveChannels() >= 2)
    {
-      mVinylControl.Process(GetBuffer()->GetChannel(0), GetBuffer()->GetChannel(1), gBufferSize);
+      mVinylProcessor.Process(GetBuffer()->GetChannel(0), GetBuffer()->GetChannel(1), gBufferSize);
 
       if (mUseVinylControl)
       {
-         float speed = mVinylControl.GetPitch() / mReferencePitch;
-         if (speed == 0 || mVinylControl.GetStopped())
+         float speed = mVinylProcessor.GetPitch() / mReferencePitch;
+         if (speed == 0 || mVinylProcessor.GetStopped())
             speed = .0001f;
          mSpeed = speed;
       }
       else
       {
-         mReferencePitch = mVinylControl.GetPitch();
+         mReferencePitch = mVinylProcessor.GetPitch();
       }
    }
 
@@ -115,7 +115,7 @@ float VinylTempoControl::Value(int samplesIn)
 
 bool VinylTempoControl::CanStartVinylControl()
 {
-   return !mVinylControl.GetStopped() && fabsf(mVinylControl.GetPitch()) > .001f;
+   return !mVinylProcessor.GetStopped() && fabsf(mVinylProcessor.GetPitch()) > .001f;
 }
 
 void VinylTempoControl::CheckboxUpdated(Checkbox* checkbox)
@@ -147,4 +147,42 @@ void VinylTempoControl::LoadLayout(const ofxJSONElement& moduleInfo)
 
 void VinylTempoControl::SetUpFromSaveData()
 {
+}
+
+////////////////////////////////////////////////////////////////////////////////
+
+VinylProcessor::VinylProcessor(int sampleRate)
+: mSampleRate(sampleRate)
+{
+   struct timecode_def *def;
+
+   def = timecoder_find_definition("serato_2a");
+   assert(def != NULL);
+
+   timecoder_init(&mTimecoder, def, 1.0, gSampleRate, false);
+}
+
+VinylProcessor::~VinylProcessor()
+{
+   timecoder_clear(&mTimecoder);
+   timecoder_free_lookup();
+}
+
+void VinylProcessor::Process(float* left, float* right, int numSamples)
+{
+   float* in[2];
+   in[0] = left;
+   in[1] = right;
+   const float kConvert = (float)(1 << 15);
+   signed short data[8196];
+
+   for (int n = 0; n < numSamples; n++)
+   {
+      for (int ch = 0; ch < 2; ch++)
+         data[n * 2 + ch] = (signed short)(kConvert*(float)in[ch][n]);
+   }
+
+   timecoder_submit(&mTimecoder, data, numSamples);
+
+   mPitch = timecoder_get_pitch(&mTimecoder);
 }
