@@ -15,7 +15,7 @@ if (NOT CMAKE_BUILD_TYPE)
 endif ()
 
 
-project(BespokeSynth VERSION 0.9.0 LANGUAGES C CXX ASM)
+project(BespokeSynth VERSION 1.0.1 LANGUAGES C CXX ASM)
 
 message(STATUS "Bespoke: Build Type: ${CMAKE_BUILD_TYPE}")
 
@@ -52,6 +52,10 @@ add_subdirectory(Source/freeverb)
 add_subdirectory(Source/json)
 add_subdirectory(Source/nanovg)
 add_subdirectory(Source/vinylcontrol)
+
+# Generate build time info for the cpp
+configure_file(${CMAKE_SOURCE_DIR}/Source/VersionInfo.cpp.in
+        ${CMAKE_BINARY_DIR}/geninclude/VersionInfo.cpp)
 
 set(BESPOKE_SOURCE_LIST
         Source/glew/Bespoke_glew.c
@@ -380,6 +384,8 @@ set(BESPOKE_SOURCE_LIST
         Source/UserData.cpp
         Source/VSTPlayhead.cpp
         Source/VSTWindow.cpp
+
+        ${CMAKE_BINARY_DIR}/geninclude/VersionInfo.cpp
         )
 
 juce_add_gui_app(BespokeSynth
@@ -395,6 +401,7 @@ juce_add_gui_app(BespokeSynth
 juce_generate_juce_header(BespokeSynth)
 target_sources(BespokeSynth PRIVATE ${BESPOKE_SOURCE_LIST})
 target_include_directories(BespokeSynth PRIVATE
+        Source
         Source/glew/include
         Source/push2
         Source/push2/libusb
@@ -511,6 +518,10 @@ else ()
             POST_BUILD
             WORKING_DIRECTORY ${CMAKE_SOURCE_DIR}
             COMMAND ${CMAKE_COMMAND} -E  copy_directory resource ${OUTDIR}/resource)
+
+    # Finally provide install rules if folks want to install into CMAKE_INSTALL_PREFIX
+    install(TARGETS BespokeSynth DESTINATION bin)
+    install(DIRECTORY ${CMAKE_SOURCE_DIR}/resource DESTINATION share/BespokeSynth)
 
 endif ()
 
