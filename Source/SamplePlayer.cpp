@@ -175,7 +175,7 @@ void SamplePlayer::Poll()
 {
    IDrawableModule::Poll();
    
-   juce::String clipboard = SystemClipboard::getTextFromClipboard();
+   const juce::String& clipboard = TheSynth->GetTextFromClipboard();
    if (clipboard.contains("youtube"))
    {
       juce::String clipId = clipboard.substring(clipboard.indexOf("v=")+2, clipboard.length());
@@ -911,23 +911,36 @@ bool SamplePlayer::MouseMoved(float x, float y)
       mHoveredCuePointIndex = -1;
       if (y > 60 && y < mHeight - 20 && mSample != nullptr)
       {
+         float seconds = GetSecondsForMouse(x);
+
+         // find cue point closest to but not exceeding the cursor position
+         int bestCuePointIndex = -1;
+         float bestCuePointStart = 0.;
          for (size_t i = 0; i < mSampleCuePoints.size(); ++i)
          {
-            if (mSampleCuePoints[i].lengthSeconds > 0)
+            float startSeconds = mSampleCuePoints[i].startSeconds;
+            float lengthSeconds = mSampleCuePoints[i].lengthSeconds;
+
+            if (lengthSeconds > 0.)
             {
-               float seconds = GetSecondsForMouse(x);
-               if (seconds >= mSampleCuePoints[i].startSeconds && seconds <= mSampleCuePoints[i].startSeconds + mSampleCuePoints[i].lengthSeconds)
+               if (seconds >= startSeconds && seconds <= startSeconds + lengthSeconds &&
+                   startSeconds > bestCuePointStart)
                {
-                  mHoveredCuePointIndex = (int)i;
-                  mActiveCuePointIndex = (int)i;
-                  UpdateActiveCuePoint();
-                  break;
+                  bestCuePointIndex = i;
+                  bestCuePointStart = startSeconds;
                }
             }
          }
+
+         if (bestCuePointIndex != -1)
+         {
+            mHoveredCuePointIndex = bestCuePointIndex;
+            mActiveCuePointIndex = bestCuePointIndex;
+            UpdateActiveCuePoint();
+         }
       }
    }
-   
+
    return true;
 }
 

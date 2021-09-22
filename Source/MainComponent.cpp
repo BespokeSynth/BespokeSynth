@@ -464,7 +464,12 @@ private:
       }
       return true;
    }
-   
+
+   void focusGained(FocusChangeType cause) override
+   {
+      mSynth.Focus();
+   }
+
    bool isInterestedInFileDrag(const StringArray& files) override
    {
       //TODO_PORT(Ryan)

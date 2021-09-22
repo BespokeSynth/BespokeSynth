@@ -64,7 +64,9 @@ public:
    void PostRender();
    
    void Exit();
-   
+
+   void Focus();
+
    void KeyPressed(int key, bool isRepeat);
    void KeyReleased(int key);
    void MouseMoved(int x, int y );
@@ -207,6 +209,9 @@ public:
 
    ofxJSONElement GetUserPrefs() { return mUserPrefs; }
    UserPrefsEditor* GetUserPrefsEditor() { return mUserPrefsEditor; }
+
+   const String& GetTextFromClipboard() const;
+   void CopyTextToClipboard(const String& text);
    
    void SetFatalError(string error);
 
@@ -227,6 +232,8 @@ private:
    void TriggerClapboard();
    void DoAutosave();
    IDrawableModule* GetModuleAtCursor();
+
+   void ReadClipboardTextFromSystem();
    
    ofSoundStream mSoundStream;
    int mIOBufferSize;
@@ -352,6 +359,8 @@ private:
 
    vector<float*> mInputBuffers;
    vector<float*> mOutputBuffers;
+
+   String mClipboard;
 };
 
 extern ModularSynth* TheSynth;
