@@ -113,7 +113,8 @@ void ScriptModule::CreateUIControls()
    DROPDOWN(mLoadScriptSelector, "loadscript", &mLoadScriptIndex, 120); UIBLOCK_SHIFTRIGHT();
    BUTTON(mLoadScriptButton,"load"); UIBLOCK_SHIFTRIGHT();
    BUTTON(mSaveScriptButton,"save as"); UIBLOCK_SHIFTRIGHT();
-   BUTTON(mShowReferenceButton, "?"); UIBLOCK_NEWLINE();
+   BUTTON(mShowReferenceButton, "?"); UIBLOCK_SHIFTRIGHT();
+   DROPDOWN(mScriptStyleSelector, "style", &mScriptStyleIndex, 120); UIBLOCK_NEWLINE();
    UICONTROL_CUSTOM(mCodeEntry, new CodeEntry(UICONTROL_BASICS("code"),500,300));
    BUTTON(mRunButton, "run"); UIBLOCK_SHIFTRIGHT();
    BUTTON(mStopButton, "stop"); UIBLOCK_NEWLINE();
@@ -122,6 +123,8 @@ void ScriptModule::CreateUIControls()
    FLOATSLIDER(mCSlider, "c", &mC, 0, 1); UIBLOCK_SHIFTRIGHT();
    FLOATSLIDER(mDSlider, "d", &mD, 0, 1);
    ENDUIBLOCK(mWidth, mHeight);
+
+   RefreshStyleFiles();
 }
 
 void ScriptModule::UninitializePython()
@@ -192,6 +195,7 @@ void ScriptModule::DrawModule()
    mLoadScriptButton->Draw();
    mSaveScriptButton->Draw();
    mShowReferenceButton->Draw();
+   mScriptStyleSelector->Draw();
    mCodeEntry->Draw();
    mRunButton->Draw();
    mStopButton->Draw();
@@ -879,6 +883,33 @@ void ScriptModule::DropdownClicked(DropdownList* list)
 {
    if (list == mLoadScriptSelector)
       RefreshScriptFiles();
+}
+
+void ScriptModule::DropdownUpdated(DropdownList *list, int oldValue)
+{
+    if (list == mScriptStyleSelector)
+    {
+        int v = (int)list->GetValue();
+        if ( v >= 0 && v < mStyleJSON.size())
+            mCodeEntry->SetStyleFromJSON(mStyleJSON[v]);
+    }
+}
+
+void ScriptModule::RefreshStyleFiles()
+{
+    mScriptStyleSelector->Clear();
+    mStyleJSON.clear();
+    ofxJSONElement root;
+    if (File(ofToDataPath("script_styles.json")).existsAsFile())
+        root.open(ofToDataPath("script_styles.json"));
+    else
+        root.open(ofToResourcePath("userdata_original/script_styles.json"));
+
+    for(auto nm : root.getMemberNames())
+    {
+        mStyleJSON.emplace_back(root[nm]);
+        mScriptStyleSelector->AddLabel(nm, mStyleJSON.size()-1);
+    }
 }
 
 void ScriptModule::RefreshScriptFiles()
