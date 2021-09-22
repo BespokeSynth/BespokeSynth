@@ -30,7 +30,9 @@
 #include "IDrawableModule.h"
 #include "IAudioProcessor.h"
 #include "IModulator.h"
+extern "C" {
 #include "xwax/timecoder.h"
+}
 
 class VinylProcessor
 {
