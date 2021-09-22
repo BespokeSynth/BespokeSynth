@@ -86,6 +86,8 @@ void IUIControl::CheckHover(int x, int y)
    if (TheSynth->GetFrameCount() != sLastHoveredUIControlFrame && TestHover(x, y) && (gHoveredUIControl == nullptr || !gHoveredUIControl->IsMouseDown()))
    {
       gHoveredUIControl = this;
+      gHoveredUIControlIsHighlighted = true;
+      gHoveredUIControlFramesUntilExpiration = 0;
       sLastHoveredUIControl = this;
       sLastUIHoverWasSetViaTab = false;
       sLastHoveredUIControlFrame = TheSynth->GetFrameCount();
@@ -97,7 +99,7 @@ void IUIControl::DrawHover(float x, float y, float w, float h)
    if (Push2Control::sDrawingPush2Display)
       return;
    
-   if (gHoveredUIControl == this && IKeyboardFocusListener::GetActiveKeyboardFocus() == nullptr && TheSynth->GetGroupSelectedModules().empty())
+   if (gHoveredUIControl == this && gHoveredUIControlIsHighlighted && IKeyboardFocusListener::GetActiveKeyboardFocus() == nullptr && TheSynth->GetGroupSelectedModules().empty())
    {
       ofPushStyle();
       ofNoFill();

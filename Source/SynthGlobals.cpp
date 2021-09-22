@@ -67,6 +67,8 @@ float gWorkBuffer[kWorkBufferSize];
 ChannelBuffer gWorkChannelBuffer(kWorkBufferSize);
 IDrawableModule* gHoveredModule = nullptr;
 IUIControl* gHoveredUIControl = nullptr;
+bool gHoveredUIControlIsHighlighted = false;
+int gHoveredUIControlFramesUntilExpiration = 0;
 IUIControl* gHotBindUIControl[10];
 float gControlTactileFeedback = 0;
 float gDrawScale = 1;

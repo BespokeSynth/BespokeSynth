@@ -109,6 +109,8 @@ extern float gWorkBuffer[kWorkBufferSize];  //scratch buffer for doing work in
 extern ChannelBuffer gWorkChannelBuffer;
 extern IDrawableModule* gHoveredModule;
 extern IUIControl* gHoveredUIControl;
+extern bool gHoveredUIControlIsHighlighted;
+extern int gHoveredUIControlFramesUntilExpiration;
 extern IUIControl* gHotBindUIControl[10];
 extern float gControlTactileFeedback;
 extern float gDrawScale;

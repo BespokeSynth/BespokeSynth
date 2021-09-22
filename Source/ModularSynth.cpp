@@ -376,6 +376,12 @@ void ModularSynth::Poll()
       mScheduledEnvelopeEditorSpawnDisplay = nullptr;
    }
 
+   if (gHoveredUIControlFramesUntilExpiration > 0) {
+      gHoveredUIControlFramesUntilExpiration--;
+      if (gHoveredUIControlFramesUntilExpiration == 0)
+         gHoveredUIControl = nullptr;
+   }
+
    {
       static MouseCursor sCurrentCursor = MouseCursor::NormalCursor;
       MouseCursor desiredCursor;
@@ -1144,8 +1150,11 @@ void ModularSynth::MouseMoved(int intX, int intY )
          gHoveredUIControl->GetPosition(uiX, uiY);
          float w, h;
          gHoveredUIControl->GetDimensions(w, h);
-         if (x < uiX - 10 || y < uiY - 10 || x > uiX + w + 10 || y > uiY + h + 10)
-            gHoveredUIControl = nullptr;
+         if (x < uiX || y < uiY || x > uiX + w || y > uiY + h) {
+            gHoveredUIControlIsHighlighted = false;
+            if (gHoveredUIControlFramesUntilExpiration == 0)
+               gHoveredUIControlFramesUntilExpiration = 4;
+         }
       }
    }
    
