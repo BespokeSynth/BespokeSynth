@@ -169,15 +169,19 @@ bool Sample::Write(const char* path /*=nullptr*/)
 //static
 bool Sample::WriteDataToFile(const char *path, float **data, int numSamples, int channels)
 {
-   ScopedPointer<WavAudioFormat> wavFormat = new WavAudioFormat();
    File outputFile(ofToDataPath(path).c_str());
    outputFile.create();
-   auto outputTo = outputFile.createOutputStream();
+
+   // will be cleaned up by AudioFormatWriter
+   FileOutputStream* outputTo = outputFile.createOutputStream().release();
    assert(outputTo != nullptr);
-   bool b1 {false};
-   ScopedPointer<AudioFormatWriter> writer = wavFormat->createWriterFor(outputTo.get(), gSampleRate, channels, 16, b1, 0);
+
+   auto wavFormat = std::make_unique<WavAudioFormat>();
+
+   bool b1{false};
+   auto writer = std::unique_ptr<AudioFormatWriter>(wavFormat->createWriterFor(outputTo, gSampleRate, channels, 16, b1, 0));
    writer->writeFromFloatArrays(data, channels, numSamples);
-   
+
    return true;
 }
 
