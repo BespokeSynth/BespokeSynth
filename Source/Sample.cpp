@@ -170,8 +170,7 @@ bool Sample::Write(const char* path /*=nullptr*/)
 bool Sample::WriteDataToFile(const char *path, float **data, int numSamples, int channels)
 {
    ScopedPointer<WavAudioFormat> wavFormat = new WavAudioFormat();
-   string dataPath = ofToDataPath(string(path));
-   File outputFile(dataPath.c_str());
+   File outputFile(ofToDataPath(path).c_str());
    outputFile.create();
    auto outputTo = outputFile.createOutputStream();
    assert(outputTo != nullptr);
