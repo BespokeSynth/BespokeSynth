@@ -46,8 +46,13 @@ public:
    {
       ofLog() << "bespoke synth " << JUCEApplication::getInstance()->getApplicationVersion();
 
+      // sigh ofLog isn't a stream so std::hex doesn't work so
+      char jv[256];
+      snprintf(jv, 255, "%x", JUCE_VERSION);
+      ofLog() << "   juce version    : " << jv;
+      ofLog() << "   python version  : " << Bespoke::PYTHON_VERSION;
 #if BESPOKE_LINUX
-      ofLog() << "cmake install prefix '" << Bespoke::CMAKE_INSTALL_PREFIX << "'";
+      ofLog() << "   install prefix  : '" << Bespoke::CMAKE_INSTALL_PREFIX << "'";
 #endif
       
       openGLContext.setOpenGLVersionRequired(juce::OpenGLContext::openGL3_2);

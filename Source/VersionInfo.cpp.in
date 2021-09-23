@@ -4,5 +4,6 @@
 namespace Bespoke
 {
     const char* VERSION = "@CMAKE_PROJECT_VERSION@";
+    const char* PYTHON_VERSION ="@Python_VERSION@";
     const char* CMAKE_INSTALL_PREFIX = "@CMAKE_INSTALL_PREFIX@";
 }
