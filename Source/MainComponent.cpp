@@ -10,6 +10,7 @@
 #include <JuceHeader.h>
 using namespace juce::gl;
 
+#include "VersionInfo.h"
 
 #include "nanovg/nanovg.h"
 #define NANOVG_GLES2_IMPLEMENTATION
@@ -44,6 +45,10 @@ public:
 #endif
    {
       ofLog() << "bespoke synth " << JUCEApplication::getInstance()->getApplicationVersion();
+
+#if BESPOKE_LINUX
+      ofLog() << "cmake install prefix '" << Bespoke::CMAKE_INSTALL_PREFIX << "'";
+#endif
       
       openGLContext.setOpenGLVersionRequired(juce::OpenGLContext::openGL3_2);
       openGLContext.setContinuousRepainting(false);

@@ -37,6 +37,7 @@
 
 #include <JuceHeader.h>
 using namespace juce::gl;
+#include <VersionInfo.h>
 
 //#include <chrono>
 #include <time.h>
@@ -126,14 +127,17 @@ string ofToResourcePath(string path, bool makeAbsolute)
 
 #elif JUCE_LINUX
       string localDataDir = File::getCurrentWorkingDirectory().getChildFile("resource").getFullPathName().toStdString();
-      string developmentDataDir = File::getCurrentWorkingDirectory().getChildFile("../../resource").getFullPathName().toStdString();   //OSX dir in dev environment
+      string cmakeDataDir = File(Bespoke::CMAKE_INSTALL_PREFIX).getChildFile("share/BespokeSynth/resource").getFullPathName().toStdString();
       string installedDataDir = File::getSpecialLocation(File::globalApplicationsDirectory).getChildFile("share/BespokeSynth/resource").getFullPathName().toStdString(); // /usr/share/BespokeSynth/resource
       if (juce::File(localDataDir).exists())
          sResourceDir = localDataDir;
-      else if (juce::File(developmentDataDir).exists())
-         sResourceDir = developmentDataDir;
+      else if (getenv("BESPOKE_DATA_DIR") && juce::File(getenv("BESPOKE_DATA_DIR")).exists())
+          sResourceDir = getenv("BESPOKE_DATA_DIR");
+      else if (juce::File(cmakeDataDir).exists())
+         sResourceDir = cmakeDataDir;
       else if (juce::File(installedDataDir).exists())
          sResourceDir = installedDataDir;
+      ofLog() << "Resources directory is '" << sResourceDir << "'";
    
 #elif BESPOKE_MAC
       auto bundle = CFBundleGetMainBundle();
