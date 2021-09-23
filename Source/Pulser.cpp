@@ -63,7 +63,7 @@ void Pulser::CreateUIControls()
    IDrawableModule::CreateUIControls();
    mIntervalSelector = new DropdownList(this,"interval",75,2,(int*)(&mInterval));
    mTimeModeSelector = new DropdownList(this,"timemode",5,2,(int*)(&mTimeMode));
-   mFreeTimeSlider = new FloatSlider(this,"t",75,2,44,15,&mFreeTimeStep,0,1000,0);
+   mFreeTimeSlider = new FloatSlider(this,"t",75,2,44,15,&mFreeTimeStep,10,1000,0);
    mOffsetSlider = new FloatSlider(this,"offset",mTimeModeSelector,kAnchor_Below,113,15,&mOffset,-1,1);
    mRandomStepCheckbox = new Checkbox(this,"random",mOffsetSlider,kAnchor_Below,&mRandomStep);
    mResetLengthSlider = new IntSlider(this, "reset", mRandomStepCheckbox, kAnchor_Below, 113, 15, &mResetLength, 1, 16);
@@ -145,8 +145,8 @@ void Pulser::OnTransportAdvanced(float amount)
       mFreeTimeCounter += ms;
       if (mFreeTimeCounter > mFreeTimeStep)
       {
+         OnTimeEvent(gTime + (mFreeTimeCounter - mFreeTimeStep));
          mFreeTimeCounter -= mFreeTimeStep;
-         OnTimeEvent(0);
       }
    }
 }
