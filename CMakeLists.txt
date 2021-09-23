@@ -1,5 +1,8 @@
 # Bespoke CMake file
 #
+# This works well, but we are working on improving it still it so if you want to help, please hop
+# on our discord
+#
 # Options are
 #   - BESPOKE_JUCE_LOCATION (default libs/JUCE) where you get your juce
 #   - BESPOKE_VST2_SDK_LOCATION (default to nothing) where you get your SDK if you want non-FOSS software
@@ -19,18 +22,15 @@ project(BespokeSynth VERSION 1.0.1 LANGUAGES C CXX ASM)
 
 message(STATUS "Bespoke: Build Type: ${CMAKE_BUILD_TYPE}")
 
-message(STATUS "Bespoke: Configuring Python with PyBind")
-if (NOT DEFINED PYBIND11_FINDPYTHON)
-    if (WIN32)
-      message(STATUS "Bespoke: PYBIND11_FINDPYTHON is unset; defaulting to OFF on Win32")
-      set(PYBIND11_FINDPYTHON OFF)
-    else()
-      message(STATUS "Bespoke: PYBIND11_FINDPYTHON is unset; defaulting to ON")
-      set(PYBIND11_FINDPYTHON ON)
-    endif()  
-endif()
+find_package (Python COMPONENTS Interpreter Development)
+message(STATUS "Bespoke: Python Config")
+message(STATUS "       : Version is ${Python_VERSION}")
+message(STATUS "       : Executable is ${Python_EXECUTABLE}")
+message(STATUS "       : Library is ${Python_LIBRARIES}")
+
+message(STATUS "Bespoke: Configuring PyBind")
+set(PYBIND11_NOPYTHON TRUE)
 add_subdirectory(libs/pybind11 CONFIG)
-message(STATUS "Bespoke: Python Executable is ${PYTHON_EXECUTABLE}")
 
 if (NOT BESPOKE_JUCE_LOCATION)
     set(BESPOKE_JUCE_LOCATION "libs/JUCE" CACHE STRING "" FORCE)
@@ -455,6 +455,27 @@ if (APPLE)
             WORKING_DIRECTORY ${CMAKE_SOURCE_DIR}
             COMMAND ${CMAKE_COMMAND} -E  copy_directory resource ${OUTDIR}/BespokeSynth.app/Contents/Resources/resource)
 
+    get_filename_component(Python_FRAMEWORK_DIR ${Python_LIBRARY_DIRS} DIRECTORY)
+    if (EXISTS "${Python_FRAMEWORK_DIR}/Python")
+        set( Python_BIN "Python")
+    elseif(EXISTS "${Python_FRAMEWORK_DIR}/Python3.9")
+        set( Python_BIN "Python3.9")
+    elseif(EXISTS "${Python_FRAMEWORK_DIR}/Python3.8")
+        set( Python_BIN "Python3.8")
+    else()
+        message( ERROR "Cannot find python binary" )
+    endif()
+
+    message( STATUS "Bespoke: Mac Python Framework is ${Python_BIN} from ${Python_FRAMEWORK_DIR}")
+
+    add_custom_command(TARGET BespokeSynth
+            POST_BUILD
+            WORKING_DIRECTORY ${CMAKE_SOURCE_DIR}
+            COMMAND ${CMAKE_COMMAND} -E make_directory ${OUTDIR}/BespokeSynth.app/Contents/Frameworks/LocalPython
+            COMMAND ${CMAKE_COMMAND} -E copy ${Python_FRAMEWORK_DIR}/${Python_BIN} ${OUTDIR}/BespokeSynth.app/Contents/Frameworks/LocalPython
+            COMMAND install_name_tool -change "${Python_FRAMEWORK_DIR}/${Python_BIN}" "@executable_path/../Frameworks/LocalPython/${Python_BIN}" ${OUTDIR}/BespokeSynth.app/Contents/MacOS/BespokeSynth
+            )
+
 elseif (WIN32)
     target_compile_definitions(BespokeSynth PRIVATE
             BESPOKE_WINDOWS=1
@@ -526,12 +547,13 @@ else ()
 
 endif ()
 
+target_include_directories(BespokeSynth PRIVATE ${Python_INCLUDE_DIRS})
 target_link_libraries(BespokeSynth PRIVATE
         bespoke::freeverb
         bespoke::json
         bespoke::nanovg
         bespoke::xwax
-        pybind11::embed
+        pybind11::pybind11
         juce::juce_audio_basics
         juce::juce_audio_devices
         juce::juce_audio_formats
@@ -539,3 +561,5 @@ target_link_libraries(BespokeSynth PRIVATE
         juce::juce_opengl
         juce::juce_osc
         juce::juce_gui_basics)
+
+target_link_libraries(BespokeSynth PRIVATE ${Python_LIBRARIES})
