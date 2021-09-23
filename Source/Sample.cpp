@@ -175,7 +175,7 @@ bool Sample::WriteDataToFile(const char *path, float **data, int numSamples, int
    auto outputTo = outputFile.createOutputStream();
    assert(outputTo != nullptr);
    bool b1 {false};
-   ScopedPointer<AudioFormatWriter> writer = wavFormat->createWriterFor(outputTo.get(), gSampleRate, channels, 16, b1, 0);
+   ScopedPointer<AudioFormatWriter> writer = wavFormat->createWriterFor(outputTo.release(), gSampleRate, channels, 16, b1, 0);
    writer->writeFromFloatArrays(data, channels, numSamples);
    
    return true;
