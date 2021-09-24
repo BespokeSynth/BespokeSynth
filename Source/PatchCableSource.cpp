@@ -308,7 +308,7 @@ void PatchCableSource::Render()
          ofFill();
          ofCircle(cableX, cableY, kPatchCableSourceRadius);
 
-         if (mHoverIndex == i)
+         if (mHoverIndex == i && PatchCable::sActivePatchCable == nullptr && !TheSynth->IsGroupSelecting())
          {
             ofSetColor(ofColor::white);
             ofFill();

@@ -83,7 +83,10 @@ bool IUIControl::TestHover(int x, int y)
 void IUIControl::CheckHover(int x, int y)
 {
    static long sLastHoveredUIControlFrame = 0;
-   if (TheSynth->GetFrameCount() != sLastHoveredUIControlFrame && TestHover(x, y) && (gHoveredUIControl == nullptr || !gHoveredUIControl->IsMouseDown()))
+   if (TheSynth->GetFrameCount() != sLastHoveredUIControlFrame &&
+       !TheSynth->IsGroupSelecting() && PatchCable::sActivePatchCable == nullptr &&
+       TestHover(x, y) &&
+       (gHoveredUIControl == nullptr || !gHoveredUIControl->IsMouseDown()))
    {
       gHoveredUIControl = this;
       sLastHoveredUIControl = this;

@@ -628,16 +628,16 @@ void ModularSynth::Draw(void* vg)
    
    string tooltip = "";
    ModuleContainer* tooltipContainer = nullptr;
-   if (HelpDisplay::sShowTooltips && !IUIControl::WasLastHoverSetViaTab())
+   if (HelpDisplay::sShowTooltips && 
+       !IUIControl::WasLastHoverSetViaTab() &&
+       mGroupSelectContext == nullptr &&
+       PatchCable::sActivePatchCable == nullptr)
    {
       HelpDisplay* helpDisplay = TheTitleBar->GetHelpDisplay();
 
-      if (gHoveredUIControl && string(gHoveredUIControl->Name()) != "enabled")
-      {
-         tooltip = helpDisplay->GetUIControlTooltip(gHoveredUIControl);
-         tooltipContainer = gHoveredUIControl->GetModuleParent()->GetOwningContainer();
-      }
-      else if (gHoveredModule)
+      bool hasValidHoveredControl = gHoveredUIControl && string(gHoveredUIControl->Name()) != "enabled";
+      
+      if (gHoveredModule && (!hasValidHoveredControl || (gHoveredUIControl != nullptr && gHoveredUIControl->GetModuleParent() != gHoveredModule)))
       {
          if (gHoveredModule == mQuickSpawn)
          {
@@ -668,6 +668,11 @@ void ModularSynth::Draw(void* vg)
             tooltip = helpDisplay->GetModuleTooltip(gHoveredModule);
             tooltipContainer = gHoveredModule->GetOwningContainer();
          }
+      }
+      else if (hasValidHoveredControl) 
+      {
+         tooltip = helpDisplay->GetUIControlTooltip(gHoveredUIControl);
+         tooltipContainer = gHoveredUIControl->GetModuleParent()->GetOwningContainer();
       }
    }
    
@@ -1318,9 +1323,23 @@ void ModularSynth::MousePressed(int intX, int intY, int button)
    if (clicked == nullptr)
    {
       if (rightButton)
+      {
          mIsMousePanning = true;
+      }
       else
-         SetGroupSelectContext(&mModuleContainer);
+      {
+         bool beginGroupSelect = true;
+
+         //only start lassoing if we have a bit of space from a module, to avoid a common issue I'm seeing where people lasso accidentally
+         if (GetModuleAtCursor(7, 7) || GetModuleAtCursor(-7, 7) || GetModuleAtCursor(7, -7) || GetModuleAtCursor(-7, -7))
+            beginGroupSelect = false;
+
+         if (beginGroupSelect)
+         {
+            SetGroupSelectContext(&mModuleContainer);
+            gHoveredUIControl = nullptr;
+         }
+      }
    }
    if (clicked != nullptr && clicked != TheTitleBar)
       mLastClickedModule = clicked;
@@ -1462,16 +1481,16 @@ bool ModularSynth::IsModalFocusItem(IDrawableModule* item) const
    return std::find(mModalFocusItemStack.begin(), mModalFocusItemStack.end(), item) == mModalFocusItemStack.end();
 }
 
-IDrawableModule* ModularSynth::GetModuleAtCursor()
+IDrawableModule* ModularSynth::GetModuleAtCursor(int offsetX /*=0*/, int offsetY /*=0*/)
 {
-   float x = GetMouseX(&mUILayerModuleContainer);
-   float y = GetMouseY(&mUILayerModuleContainer);
+   float x = GetMouseX(&mUILayerModuleContainer) + offsetX;
+   float y = GetMouseY(&mUILayerModuleContainer) + offsetY;
    IDrawableModule* uiLayerModule = mUILayerModuleContainer.GetModuleAt(x, y);
    if (uiLayerModule)
       return uiLayerModule;
    
-   x = GetMouseX(&mModuleContainer);
-   y = GetMouseY(&mModuleContainer);
+   x = GetMouseX(&mModuleContainer) + offsetX;
+   y = GetMouseY(&mModuleContainer) + offsetY;
    return mModuleContainer.GetModuleAt(x, y);
 }
 
