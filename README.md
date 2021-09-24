@@ -1,3 +1,5 @@
+[![Build Status](https://dev.azure.com/awwbees/BespokeSynth/_apis/build/status/BespokeSynth.BespokeSynth?branchName=main)](https://dev.azure.com/awwbees/BespokeSynth/_build/latest?definitionId=1&branchName=main)
+
 # Bespoke Synth
 A software modular synth that I've been building for myself since 2011, and now you can use it!
 
