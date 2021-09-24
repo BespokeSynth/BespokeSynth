@@ -87,6 +87,7 @@ private:
    void SetTarget(IClickable* target);
    PatchCablePos GetPatchCablePos();
    ofVec2f FindClosestSide(int x, int y, int w, int h, ofVec2f start, ofVec2f startDirection, ofVec2f& endDirection);
+   IClickable* GetDropTarget();
    
    PatchCableSource* mOwner;
    IClickable* mTarget;
