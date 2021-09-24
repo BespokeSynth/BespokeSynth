@@ -151,6 +151,28 @@ void PatchCable::Render()
    ofPushMatrix();
    ofPushStyle();
    ofNoFill();
+
+   IClickable* dropTarget = GetDropTarget();
+   if (dropTarget)
+   {
+      ofPushStyle();
+
+      ofSetColor(255, 255, 255, 100);
+      ofSetLineWidth(.5f);
+      ofFill();
+      ofRectangle rect = dropTarget->GetRect();
+
+      IDrawableModule* dropTargetModule = dynamic_cast<IDrawableModule*>(dropTarget);
+      if (dropTargetModule && dropTargetModule->HasTitleBar())
+      {
+         rect.y -= IDrawableModule::TitleBarHeight();
+         rect.height += IDrawableModule::TitleBarHeight();
+      }
+
+      ofRect(rect);
+
+      ofPopStyle();
+   }
    
    ConnectionType type = mOwner->GetConnectionType();
    ofColor lineColor = mOwner->GetColor();
@@ -347,7 +369,7 @@ void PatchCable::Render()
          ofLine(cable.plug.x,cable.plug.y,cable.end.x,cable.end.y);
       }
    }
-   
+
    ofPopStyle();
    ofPopMatrix();
 }
@@ -373,28 +395,9 @@ void PatchCable::MouseReleased()
       ofVec2f mousePos(TheSynth->GetRawMouseX(), TheSynth->GetRawMouseY());
       if ((mousePos - mGrabPos).distanceSquared() > 3)
       {
-         PatchCablePos cable = GetPatchCablePos();
-         IClickable* potentialTarget = TheSynth->GetRootContainer()->GetModuleAt(cable.end.x, cable.end.y);
-         if (potentialTarget && (GetConnectionType() == kConnectionType_Modulator || GetConnectionType() == kConnectionType_Grid || GetConnectionType() == kConnectionType_UIControl))
-         {
-            const auto& uicontrols = (static_cast<IDrawableModule*>(potentialTarget))->GetUIControls();
-            for (auto uicontrol : uicontrols)
-            {
-               if (uicontrol->IsShowing() == false || !IsValidTarget(uicontrol))
-                  continue;
-               
-               float x,y,w,h;
-               uicontrol->GetPosition(x, y);
-               uicontrol->GetDimensions(w, h);
-               if (cable.end.x >= x && cable.end.y >= y && cable.end.x < x+w && cable.end.y < y+h)
-               {
-                  potentialTarget = uicontrol;
-                  break;
-               }
-            }
-         }
-         if (mOwner->IsValidTarget(potentialTarget))
-            mOwner->SetPatchCableTarget(this, potentialTarget, true);
+         IClickable* target = GetDropTarget();
+         if (target)
+            mOwner->SetPatchCableTarget(this, target, true);
          
          mDragging = false;
          mHovered = false;
@@ -405,6 +408,37 @@ void PatchCable::MouseReleased()
             Destroy();
       }
    }
+}
+
+IClickable* PatchCable::GetDropTarget()
+{
+   if (mDragging)
+   {
+      PatchCablePos cable = GetPatchCablePos();
+      IClickable* potentialTarget = TheSynth->GetRootContainer()->GetModuleAt(cable.end.x, cable.end.y);
+      if (potentialTarget && (GetConnectionType() == kConnectionType_Modulator || GetConnectionType() == kConnectionType_Grid || GetConnectionType() == kConnectionType_UIControl))
+      {
+         const auto& uicontrols = (static_cast<IDrawableModule*>(potentialTarget))->GetUIControls();
+         for (auto uicontrol : uicontrols)
+         {
+            if (uicontrol->IsShowing() == false || !IsValidTarget(uicontrol))
+               continue;
+
+            float x, y, w, h;
+            uicontrol->GetPosition(x, y);
+            uicontrol->GetDimensions(w, h);
+            if (cable.end.x >= x && cable.end.y >= y && cable.end.x < x + w && cable.end.y < y + h)
+            {
+               potentialTarget = uicontrol;
+               break;
+            }
+         }
+      }
+      if (mOwner->IsValidTarget(potentialTarget))
+         return potentialTarget;
+   }
+
+   return nullptr;
 }
 
 bool PatchCable::TestClick(int x, int y, bool right, bool testOnly /* = false */)
