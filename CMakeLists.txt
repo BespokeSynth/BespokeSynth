@@ -460,7 +460,7 @@ if (APPLE)
             COMMAND ${CMAKE_COMMAND} -E  copy_directory resource ${OUTDIR}/BespokeSynth.app/Contents/Resources/resource)
 
     get_filename_component(Python_FRAMEWORK_DIR ${Python_LIBRARY_DIRS} DIRECTORY)
-    foreach( PYCAND Python Python3.9 Python3.8 Python3)
+    foreach( ${PYCAND} Python Python3.9 Python3.8 Python3)
         if (EXISTS "${Python_FRAMEWORK_DIR}/Python")
             set( Python_BIN "${PYCAND}")
         endif()
