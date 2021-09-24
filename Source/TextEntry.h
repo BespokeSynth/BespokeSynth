@@ -76,7 +76,7 @@ public:
    void Delete() override;
    
    void MakeActiveTextEntry(bool setCaretToEnd);
-   
+   void RemoveSelectedText();
    void SetNextTextEntry(TextEntry* entry);
    void UpdateDisplayString();
    void SetInErrorMode(bool error) { mInErrorMode = error; }
@@ -108,7 +108,7 @@ private:
    bool AllowCharacter(char c);
    void AcceptEntry(bool pressedEnter) override;
    void CancelEntry() override;
-   
+   void MoveCaret(int pos, bool allowSelection = true);
    void OnClicked(int x, int y, bool right) override;
    bool MouseMoved(float x, float y) override;
    
@@ -124,6 +124,7 @@ private:
    float mFloatMin;
    float mFloatMax;
    int mCaretPosition;
+   int mCaretPosition2;
    float mCaretBlinkTimer;
    bool mCaretBlink;
    TextEntryType mType;
