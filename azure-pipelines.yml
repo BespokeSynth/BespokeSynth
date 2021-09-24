@@ -1,0 +1,102 @@
+# BespokeSynth Azure Pipelines script
+
+trigger:
+  - main
+
+pr:
+  - main
+
+jobs:
+  - job: Build
+    variables:
+    strategy:
+      matrix:
+        macOS-x64:
+          imageName: 'macos-10.15'
+          isMac: True
+          cmakeArguments: "-GXcode -DCMAKE_BUILD_TYPE=Debug -D\"CMAKE_OSX_ARCHITECTURES=x86_64\""
+          cmakeConfig: "Debug"
+        macOS-arm:
+          imageName: 'macos-10.15'
+          isMac: True
+          cmakeArguments: "-GXcode -DCMAKE_BUILD_TYPE=Debug -D\"CMAKE_OSX_ARCHITECTURES=arm64\""
+          cmakeConfig: "Debug"
+        windows-x64:
+          imageName: 'windows-2019'
+          isWindows: True
+          cmakeArguments: "-A x64 -DCMAKE_BUILD_TYPE=Debug"
+          cmakeConfig: "Debug"
+        linux-x64:
+          imageName: 'ubuntu-20.04'
+          isLinux: True
+          cmakeArguments: "-DCMAKE_BUILD_TYPE=Debug"
+          cmakeConfig: "Debug"
+
+    pool:
+      vmImage: $(imageName)
+
+    steps:
+      - checkout: self
+        fetchDepth: 1
+        # submodules: recursive # can't do submodules here b'cuz depth=1 fails with Github
+
+      - bash: |
+          echo "BUILD REASON   = " $BUILD_REASON
+          echo "cmakeArguments = " $(cmakeArguments)
+          echo "cmakeConfig    = " $(cmakeConfig)
+        displayName: all - details on build
+
+      - bash: |
+          git submodule update --init --recursive
+        displayName: all - submodule init
+
+
+      - bash: |
+          set -e
+
+          sudo apt-get update
+
+          sudo apt-get install -y \
+              devscripts \
+              libxcb-cursor-dev \
+              libxcb-keysyms1-dev \
+              libxcb-util-dev \
+              libxkbcommon-dev \
+              libxkbcommon-x11-dev \
+              ninja-build \
+              xcb
+
+            # These are the JUCE deps
+            sudo apt-get install -y libgtk-3-dev
+            sudo apt-get install -y libwebkit2gtk-4.0
+            sudo apt-get install -y libwebkit2gtk-4.0-dev
+            sudo apt-get install -y libcurl4-openssl-dev
+            sudo apt-get install -y alsa
+            sudo apt-get install -y alsa-tools
+            sudo apt-get install -y libasound2-dev
+            sudo apt-get install -y libjack-dev
+            sudo apt-get install -y libfreetype6-dev
+            sudo apt-get install -y libxinerama-dev
+            sudo apt-get install -y libxcb-xinerama0
+            sudo apt-get install -y libxinerama1
+            sudo apt-get install -y x11proto-xinerama-dev
+            sudo apt-get install -y libxrandr-dev
+            sudo apt-get install -y libgl1-mesa-dev
+            sudo apt-get install -y libxcursor-dev
+            sudo apt-get install -y libxcursor1
+            sudo apt-get install -y libxcb-cursor-dev
+            sudo apt-get install -y libxcb-cursor0
+            sudo apt-get install -y --fix-missing
+
+        condition: variables.isLinux
+        displayName: linux - run apt-get
+
+      - bash: |
+          set -e
+          cmake -Bbuild $(cmakeArguments)
+        displayName: all - configure with cmake
+
+      - bash: |
+          set -e
+          cmake --build build --config $(cmakeConfig) --parallel 8
+        displayName: all - build with cmake
