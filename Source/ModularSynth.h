@@ -155,6 +155,7 @@ public:
    void SetResizeModule(IDrawableModule* module) { mResizeModule = module; }
    
    void SetGroupSelectContext(ModuleContainer* context) { mGroupSelectContext = context; }
+   bool IsGroupSelecting() const { return mGroupSelectContext != nullptr; }
    
    bool HasNotMovedMouseSinceClick() { return mClickStartX < INT_MAX; }
    IDrawableModule* GetMoveModule() { return mMoveModule; }
@@ -231,7 +232,7 @@ private:
    void DeleteAllModules();
    void TriggerClapboard();
    void DoAutosave();
-   IDrawableModule* GetModuleAtCursor();
+   IDrawableModule* GetModuleAtCursor(int offsetX = 0, int offsetY = 0);
 
    void ReadClipboardTextFromSystem();
    

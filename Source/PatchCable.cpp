@@ -154,7 +154,7 @@ void PatchCable::Render()
    
    ConnectionType type = mOwner->GetConnectionType();
    ofColor lineColor = mOwner->GetColor();
-   if (mHoveringOnSource)
+   if (mHoveringOnSource && sActivePatchCable == nullptr && !TheSynth->IsGroupSelecting())
       lineColor = ofColor::lerp(lineColor, ofColor::white, .5f);
    ofColor lineColorAlphaed = lineColor;
    lineColorAlphaed.a *= lineAlpha;
@@ -546,6 +546,7 @@ void PatchCable::Grab()
    {
       mDragging = true;
       sActivePatchCable = this;
+      gHoveredUIControl = nullptr;
       mGrabPos.set(TheSynth->GetRawMouseX(), TheSynth->GetRawMouseY());
       mOwner->CableGrabbed();
    }
