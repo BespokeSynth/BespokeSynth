@@ -5,6 +5,7 @@
 #
 # Options are
 #   - BESPOKE_JUCE_LOCATION (default libs/JUCE) where you get your juce
+#   - BESPOKE_PYTHON_ROOT (default nothing; search path) Override path search for a python root
 #   - BESPOKE_VST2_SDK_LOCATION (default to nothing) where you get your SDK if you want non-FOSS software
 #   - BESPOKE_ASIO_SDK_LOCATION (default to nothing) from https://www.steinberg.net/developers/
 
@@ -22,6 +23,9 @@ project(BespokeSynth VERSION 1.0.1 LANGUAGES C CXX ASM)
 
 message(STATUS "Bespoke: Build Type: ${CMAKE_BUILD_TYPE}")
 
+if(DEFINED BESPOKE_PYTHON_ROOT)
+    set(Python_ROOT "${BESPOKE_PYTHON_ROOT}")
+endif()
 find_package (Python COMPONENTS Interpreter Development)
 message(STATUS "Bespoke: Python Config")
 message(STATUS "       : Version is ${Python_VERSION}")
@@ -456,17 +460,16 @@ if (APPLE)
             COMMAND ${CMAKE_COMMAND} -E  copy_directory resource ${OUTDIR}/BespokeSynth.app/Contents/Resources/resource)
 
     get_filename_component(Python_FRAMEWORK_DIR ${Python_LIBRARY_DIRS} DIRECTORY)
-    if (EXISTS "${Python_FRAMEWORK_DIR}/Python")
-        set( Python_BIN "Python")
-    elseif(EXISTS "${Python_FRAMEWORK_DIR}/Python3.9")
-        set( Python_BIN "Python3.9")
-    elseif(EXISTS "${Python_FRAMEWORK_DIR}/Python3.8")
-        set( Python_BIN "Python3.8")
-    else()
-        message( ERROR "Cannot find python binary" )
+    foreach( PYCAND Python Python3.9 Python3.8 Python3)
+        if (EXISTS "${Python_FRAMEWORK_DIR}/Python")
+            set( Python_BIN "${PYCAND}")
+        endif()
+    endforeach()
+    if (NOT DEFINED Python_BIN)
+        message( FATAL_ERROR "Bespoke: Cannot find python binary. Consider setting BESPOKE_PYTHON_ROOT" )
     endif()
 
-    message( STATUS "Bespoke: Mac Python Framework is ${Python_BIN} from ${Python_FRAMEWORK_DIR}")
+    message( STATUS "Bespoke: Mac Python Framework is '${Python_BIN}' from '${Python_FRAMEWORK_DIR}'")
 
     add_custom_command(TARGET BespokeSynth
             POST_BUILD
