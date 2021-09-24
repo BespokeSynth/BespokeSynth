@@ -461,7 +461,7 @@ if (APPLE)
 
     get_filename_component(Python_FRAMEWORK_DIR ${Python_LIBRARY_DIRS} DIRECTORY)
     foreach( ${PYCAND} Python Python3.9 Python3.8 Python3)
-        if (EXISTS "${Python_FRAMEWORK_DIR}/Python")
+        if (EXISTS "${Python_FRAMEWORK_DIR}/${PYCAND}")
             set( Python_BIN "${PYCAND}")
         endif()
     endforeach()
