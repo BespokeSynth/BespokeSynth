@@ -9,6 +9,7 @@ pr:
 jobs:
   - job: Build
     variables:
+      isBuild: True
     strategy:
       matrix:
         macOS-x64:
