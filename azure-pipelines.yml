@@ -15,13 +15,13 @@ jobs:
         macOS-x64:
           imageName: 'macos-10.15'
           isMac: True
-          cmakeArguments: "-GXcode -DCMAKE_BUILD_TYPE=Debug -D\"CMAKE_OSX_ARCHITECTURES=x86_64\""
+          cmakeArguments: "-DCMAKE_BUILD_TYPE=Debug -D\"CMAKE_OSX_ARCHITECTURES=x86_64\""
           cmakeConfig: "Debug"
-        macOS-arm:
-          imageName: 'macos-10.15'
-          isMac: True
-          cmakeArguments: "-GXcode -DCMAKE_BUILD_TYPE=Debug -D\"CMAKE_OSX_ARCHITECTURES=arm64\""
-          cmakeConfig: "Debug"
+        #macOS-arm:
+        #  imageName: 'macos-10.15'
+        #  isMac: True
+        #  cmakeArguments: "-DCMAKE_BUILD_TYPE=Debug -D\"CMAKE_OSX_ARCHITECTURES=arm64\""
+        #  cmakeConfig: "Debug"
         windows-x64:
           imageName: 'windows-2019'
           isWindows: True
@@ -87,6 +87,7 @@ jobs:
             sudo apt-get install -y libxcursor1
             sudo apt-get install -y libxcb-cursor-dev
             sudo apt-get install -y libxcb-cursor0
+            sudo apt-get install -y libusb-1.0.0-dev 
             sudo apt-get install -y --fix-missing
 
         condition: variables.isLinux
