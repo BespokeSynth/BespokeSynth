@@ -53,10 +53,10 @@ else()
 endif()
 
 add_subdirectory(libs/xwax)
-
-add_subdirectory(Source/freeverb)
-add_subdirectory(Source/json)
-add_subdirectory(Source/nanovg)
+add_subdirectory(libs/freeverb)
+add_subdirectory(libs/leathers)
+add_subdirectory(libs/json)
+add_subdirectory(libs/nanovg)
 
 
 # Generate build time info for the cpp
@@ -580,6 +580,7 @@ target_link_libraries(BespokeSynth PRIVATE
         bespoke::json
         bespoke::nanovg
         bespoke::xwax
+        bespoke::leathers
         pybind11::pybind11
         juce::juce_audio_basics
         juce::juce_audio_devices
