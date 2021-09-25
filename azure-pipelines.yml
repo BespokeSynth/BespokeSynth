@@ -15,7 +15,7 @@ jobs:
         macOS-x64:
           imageName: 'macos-10.15'
           isMac: True
-          cmakeArguments: "-DCMAKE_BUILD_TYPE=Debug -D\"CMAKE_OSX_ARCHITECTURES=x86_64\""
+          cmakeArguments: "-GXcode -DCMAKE_BUILD_TYPE=Debug -D\"CMAKE_OSX_ARCHITECTURES=x86_64\""
           cmakeConfig: "Debug"
         #macOS-arm:
         #  imageName: 'macos-10.15'
