@@ -28,6 +28,7 @@
 #include <iostream>
 #include <vector>
 #include <array>
+#include "OpenFrameworksPort.h"
 
 #define MAX_ADSR_STAGES 20
 
@@ -63,7 +64,7 @@ public:
    float GetStopTime(double time) const { return GetEventConst(time)->mStopTime; }
    
    int GetNumStages() const { return mNumStages; }
-   void SetNumStages(int num) { mNumStages = num; }
+   void SetNumStages(int num) { mNumStages = CLAMP(num, 1, MAX_ADSR_STAGES); }
    Stage& GetStageData(int stage) { return mStages[stage]; }
    int GetStageForTime(double time) const;
    int GetStage(double time, double& stageStartTimeOut) const;
