@@ -2,7 +2,7 @@
 Name=BespokeSynth
 GenericName=Software modular synth
 Comment=Software modular synth with controllers support, scripting and VST
-Exec=/usr/bin/BespokeSynth
+Exec=@CMAKE_INSTALL_PREFIX@/bin/BespokeSynth
 Icon=bespoke_icon
 Categories=AudioVideo;Audio;Music;Midi
 Terminal=false
