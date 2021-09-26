@@ -323,6 +323,7 @@ void TextEntry::OnKeyPressed(int key, bool isRepeat)
          for (int i=mCaretPosition-1; i<len; ++i)
             mString[i] = mString[i + 1];
          --mCaretPosition;
+         --mCaretPosition2;
       }
    }
    else if (key == KeyPress::deleteKey)
@@ -447,6 +448,8 @@ void TextEntry::OnKeyPressed(int key, bool isRepeat)
    }
    else if (key < CHAR_MAX && juce::CharacterFunctions::isPrintable((char)key))
    {
+      if (mCaretPosition != mCaretPosition2)
+          RemoveSelectedText();
       AddCharacter((char)key);
    }
 }
@@ -461,7 +464,9 @@ void TextEntry::AddCharacter(char c)
          for (int i=len; i>mCaretPosition; --i)
             mString[i] = mString[i-1];
          mString[mCaretPosition] = c;
+         mString[len + 1] = '\0';
          ++mCaretPosition;
+         ++mCaretPosition2;
       }
    }
 }
