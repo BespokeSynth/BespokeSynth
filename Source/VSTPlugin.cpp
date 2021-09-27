@@ -205,8 +205,7 @@ void VSTPlugin::Exit()
    IDrawableModule::Exit();
    if (mWindow)
    {
-      VSTWindow* window = mWindow.release();
-      delete window;
+      mWindow.reset();
    }
 }
 
@@ -797,7 +796,7 @@ void VSTPlugin::ButtonClicked(ClickButton* button)
       if (mPlugin != nullptr)
       {
          if (mWindow == nullptr)
-            mWindow = VSTWindow::CreateWindow(this, VSTWindow::Normal);
+            mWindow = std::unique_ptr<VSTWindow>(VSTWindow::CreateWindow(this, VSTWindow::Normal));
          mWindow->toFront (true);
       }
       
