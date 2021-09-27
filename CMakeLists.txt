@@ -570,12 +570,9 @@ else ()
             COMMAND ${CMAKE_COMMAND} -E  copy_directory resource ${OUTDIR}/resource)
 
     # Finally provide install rules if folks want to install into CMAKE_INSTALL_PREFIX
-    configure_file(${CMAKE_SOURCE_DIR}/scripts/installer_linux/BespokeSynth.desktop.in
-            ${CMAKE_BINARY_DIR}/BespokeSynth.desktop)
-
     install(TARGETS BespokeSynth DESTINATION bin)
     install(DIRECTORY ${CMAKE_SOURCE_DIR}/resource DESTINATION share/BespokeSynth)
-    install(FILES ${CMAKE_BINARY_DIR}/BespokeSynth.desktop DESTINATION share/applications)
+    install(FILES ${CMAKE_SOURCE_DIR}/scripts/installer_linux/BespokeSynth.desktop DESTINATION share/applications)
     install(FILES ${CMAKE_SOURCE_DIR}/bespoke_icon.png DESTINATION share/icons/hicolor/512x512/apps)
 
 endif ()
