@@ -335,6 +335,9 @@ void VSTPlugin::LoadVST(juce::PluginDescription desc)
       for (int busIndex = 1; busIndex < layouts.outputBuses.size(); ++busIndex)
           layouts.outputBuses.getReference(busIndex) = AudioChannelSet::disabled();
 
+      for (int busIndex = 1; busIndex < layouts.inputBuses.size(); ++busIndex)
+          layouts.inputBuses.getReference(busIndex) = AudioChannelSet::disabled();
+
       mPlugin->setBusesLayout(layouts);
 
       mPlugin->prepareToPlay(gSampleRate, gBufferSize);
