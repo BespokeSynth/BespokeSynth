@@ -96,7 +96,7 @@ void OscController::SendValue(int page, int control, float value, bool forceNote
    {
       if (control == mOscMap[i].mControl)// && mOscMap[i].mLastChangedTime + 50 < gTime)
       {
-         OSCMessage msg(mOscMap[i].mAddress.c_str());
+         juce::OSCMessage msg(mOscMap[i].mAddress.c_str());
 
          if (mOscMap[i].mIsFloat)
          {
@@ -115,7 +115,7 @@ void OscController::SendValue(int page, int control, float value, bool forceNote
    }
 }
 
-void OscController::oscMessageReceived(const OSCMessage& msg)
+void OscController::oscMessageReceived(const juce::OSCMessage& msg)
 {
    string address = msg.getAddressPattern().toString().toStdString();
 

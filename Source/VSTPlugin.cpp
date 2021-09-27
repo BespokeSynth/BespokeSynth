@@ -42,6 +42,8 @@ namespace
 //static
 bool VSTPlugin::sIsRescanningVsts = false;
 
+using namespace juce;
+
 namespace VSTLookup
 {
    static juce::AudioPluginFormatManager sFormatManager;
@@ -245,7 +247,7 @@ void VSTPlugin::SetVST(string vstName)
       ofxJSONElement root;
       root.open(ofToDataPath("vst/used_vsts.json"));
       
-      Time time = Time::getCurrentTime();
+      auto time = juce::Time::getCurrentTime();
       root["vsts"][path] = (double)time.currentTimeMillis();
 
       root.save(ofToDataPath("vst/used_vsts.json"), true);

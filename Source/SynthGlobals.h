@@ -29,7 +29,6 @@
  #pragma clang diagnostic ignored "-Wreorder"
 #endif
 
-#include <JuceHeader.h>
 #include "OpenFrameworksPort.h"
 #include <map>
 #include <list>
@@ -117,10 +116,13 @@ extern float gCornerRoundness;
 extern std::random_device gRandomDevice;
 extern std::mt19937 gRandom;
 
+#include "juce_audio_devices/juce_audio_devices.h"
+#include "juce_audio_formats/juce_audio_formats.h"
+
 struct GlobalManagers
 {
-   AudioDeviceManager mDeviceManager;
-   AudioFormatManager mAudioFormatManager;
+   juce::AudioDeviceManager mDeviceManager;
+   juce::AudioFormatManager mAudioFormatManager;
 };
 
 enum OscillatorType

@@ -23,7 +23,6 @@
 //
 //
 
-#include <JuceHeader.h>
 #include "TitleBar.h"
 #include "ModularSynth.h"
 #include "SynthGlobals.h"
@@ -35,6 +34,8 @@
 #include "Prefab.h"
 #include "UserPrefsEditor.h"
 #include "UIControlMacros.h"
+
+#include "juce_audio_devices/juce_audio_devices.h"
 
 TitleBar* TheTitleBar = nullptr;
 
@@ -264,16 +265,16 @@ void TitleBar::ListLayouts()
 {
    mLoadLayoutDropdown->Clear();
    
-   DirectoryIterator dir(File(ofToDataPath("layouts")), false);
+   juce::DirectoryIterator dir(juce::File(ofToDataPath("layouts")), false);
    int layoutIdx = 0;
    while (dir.next())
    {
-      File file = dir.getFile();
+      juce::File file = dir.getFile();
       if (file.getFileExtension() == ".json")
       {
          mLoadLayoutDropdown->AddLabel(file.getFileNameWithoutExtension().toRawUTF8(), layoutIdx);
          
-         if (file.getRelativePathFrom(File(ofToDataPath(""))).toStdString() == TheSynth->GetLoadedLayout())
+         if (file.getRelativePathFrom(juce::File(ofToDataPath(""))).toStdString() == TheSynth->GetLoadedLayout())
             mLoadLayoutIndex = layoutIdx;
          
          ++layoutIdx;
@@ -447,7 +448,7 @@ void TitleBar::DrawModuleUnclipped()
       TheTitleBar->GetDimensions(titleBarWidth, titleBarHeight);
       float x = 100;
       float y = 40 + titleBarHeight;
-      string filename = File(TheSynth->GetLastSavePath()).getFileName().toStdString();
+      string filename = juce::File(TheSynth->GetLastSavePath()).getFileName().toStdString();
       gFontBold.DrawString("saved "+filename, 50, x, y);
       ofPopStyle();
    }

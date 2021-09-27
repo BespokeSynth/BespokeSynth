@@ -67,7 +67,7 @@ void LocationZoomer::Update()
 
 void LocationZoomer::OnKeyPressed(char key)
 {
-   if (key < CHAR_MAX && CharacterFunctions::isDigit((char)key) && key != '0') //0 is reserved
+   if (key < CHAR_MAX && juce::CharacterFunctions::isDigit((char)key) && key != '0') //0 is reserved
    {
       if (GetKeyModifiers() == kModifier_Control)
          WriteCurrentLocation(key);

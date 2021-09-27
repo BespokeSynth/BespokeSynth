@@ -49,6 +49,7 @@
 #include "leathers/pop"
 
 namespace py = pybind11;
+using namespace juce;
 
 //static
 std::vector<ScriptModule*> ScriptModule::sScriptModules;

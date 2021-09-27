@@ -786,7 +786,7 @@ void CodeEntry::OnKeyPressed(int key, bool isRepeat)
             UpdateString(mString.substr(0, mCaretPosition));
       }
    }
-   else if (key == KeyPress::deleteKey)
+   else if (key == juce::KeyPress::deleteKey)
    {
       if (mCaretPosition != mCaretPosition2)
       {
@@ -978,11 +978,11 @@ void CodeEntry::OnKeyPressed(int key, bool isRepeat)
       mCaretPosition = 0;
       mCaretPosition2 = (int)mString.size();
    }
-   else if (key == KeyPress::endKey)
+   else if (key == juce::KeyPress::endKey)
    {
       MoveCaretToEnd();
    }
-   else if (key == KeyPress::homeKey)
+   else if (key == juce::KeyPress::homeKey)
    {
       MoveCaretToStart();
    }

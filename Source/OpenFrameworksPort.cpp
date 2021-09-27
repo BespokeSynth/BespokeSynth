@@ -35,8 +35,9 @@
 #include <CoreFoundation/CoreFoundation.h>
 #endif
 
-#include <JuceHeader.h>
+#include "juce_opengl/juce_opengl.h"
 using namespace juce::gl;
+using namespace juce;
 #include <VersionInfo.h>
 
 //#include <chrono>

@@ -30,6 +30,8 @@
 #include "SynthGlobals.h"
 #include "UIControlMacros.h"
 
+#include "juce_audio_devices/juce_audio_devices.h"
+
 UserPrefsEditor::UserPrefsEditor()
 {
 }
@@ -209,7 +211,7 @@ void UserPrefsEditor::Show()
 
 void UserPrefsEditor::UpdateDropdowns(vector<DropdownList*> toUpdate)
 {
-   AudioDeviceManager& deviceManager = TheSynth->GetGlobalManagers()->mDeviceManager;
+   auto& deviceManager = TheSynth->GetGlobalManagers()->mDeviceManager;
 
    int i;
 
@@ -283,13 +285,13 @@ void UserPrefsEditor::UpdateDropdowns(vector<DropdownList*> toUpdate)
       }
    }
 
-   String outputDeviceName;
+   juce::String outputDeviceName;
    if (mAudioOutputDeviceIndex >= 0)
       outputDeviceName = selectedDeviceType->getDeviceNames()[mAudioOutputDeviceIndex];
    else if (mAudioOutputDeviceIndex == -1)
       outputDeviceName = selectedDeviceType->getDeviceNames()[selectedDeviceType->getDefaultDeviceIndex(false)];
 
-   String inputDeviceName;
+   juce::String inputDeviceName;
    if (selectedDeviceType->hasSeparateInputsAndOutputs())
    {
       if (mAudioInputDeviceIndex >= 0)
@@ -347,7 +349,7 @@ void UserPrefsEditor::DrawModule()
    DrawTextNormal("editor for userprefs.json file", 3, 15);
    DrawTextNormal("any changes will not take effect until bespoke is restarted", 3, 35);
 
-   AudioDeviceManager& deviceManager = TheSynth->GetGlobalManagers()->mDeviceManager;    
+   auto& deviceManager = TheSynth->GetGlobalManagers()->mDeviceManager;
    auto* selectedDeviceType = mDeviceTypeIndex != -1 ? deviceManager.getAvailableDeviceTypes()[mDeviceTypeIndex] : deviceManager.getCurrentDeviceTypeObject();
    mAudioInputDeviceDropdown->SetShowing(selectedDeviceType->hasSeparateInputsAndOutputs());
 
@@ -505,11 +507,11 @@ void UserPrefsEditor::ButtonClicked(ClickButton* button)
       string output = userPrefs.getRawString(true);
       CleanUpSave(output);
 
-      File file(TheSynth->GetUserPrefsPath(false));
+      juce::File file(TheSynth->GetUserPrefsPath(false));
       file.create();
       file.replaceWithText(output);
 
-      JUCEApplicationBase::quit();
+      juce::JUCEApplicationBase::quit();
    }
    if (button == mCancelButton)
       SetShowing(false);

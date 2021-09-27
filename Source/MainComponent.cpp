@@ -7,8 +7,11 @@
 //#include <GL/glew.h>
 #endif
 
-#include <JuceHeader.h>
+#include "juce_audio_devices/juce_audio_devices.h"
+#include "juce_audio_formats/juce_audio_formats.h"
+#include "juce_opengl/juce_opengl.h"
 using namespace juce::gl;
+using namespace juce;
 
 #include "VersionInfo.h"
 

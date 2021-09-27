@@ -30,6 +30,9 @@
 #include "TitleBar.h"
 #include "EffectChain.h"
 
+#include "juce_gui_basics/juce_gui_basics.h"
+#include "juce_opengl/juce_opengl.h"
+
 bool HelpDisplay::sShowTooltips = false;
 bool HelpDisplay::sTooltipsLoaded = false;
 list<HelpDisplay::ModuleTooltipInfo> HelpDisplay::sTooltips;
@@ -67,7 +70,7 @@ HelpDisplay::~HelpDisplay()
 
 void HelpDisplay::LoadHelp()
 {
-   File file(ofToResourcePath("help.txt").c_str());
+   juce::File file(ofToResourcePath("help.txt").c_str());
    if (file.existsAsFile())
    {
       string help = file.loadFileAsString().toStdString();
@@ -84,7 +87,7 @@ void HelpDisplay::DrawModule()
    ofRect(0,0,mWidth,mHeight);
    ofPopStyle();
 
-   DrawTextLeftJustify(JUCEApplication::getInstance()->getApplicationVersion().toStdString() + " (" + string(__DATE__) + " " + string(__TIME__) + ")", mWidth-5, 12);
+   DrawTextLeftJustify(juce::JUCEApplication::getInstance()->getApplicationVersion().toStdString() + " (" + string(__DATE__) + " " + string(__TIME__) + ")", mWidth-5, 12);
    
    mShowTooltipsCheckbox->Draw();
    mDumpModuleInfoButton->SetShowing(GetKeyModifiers() == kModifier_Shift);
@@ -184,7 +187,7 @@ void HelpDisplay::LoadTooltips()
    ModuleTooltipInfo moduleInfo;
    UIControlTooltipInfo controlInfo;
 
-   File tooltipsFile(tooltipsPath);
+   juce::File tooltipsFile(tooltipsPath);
    if (tooltipsFile.existsAsFile())
    {
       juce::StringArray lines;
@@ -267,9 +270,9 @@ namespace
       for (int i = 1; i <= n; i++) {
          for (int j = 1; j <= m; j++) {
             // Two cases if we see a '*'
-            // a) We ignore ‘*’ character and move
+            // a) We ignore â€˜*â€™ character and move
             //    to next  character in the pattern,
-            //     i.e., ‘*’ indicates an empty sequence.
+            //     i.e., â€˜*â€™ indicates an empty sequence.
             // b) '*' character matches with ith
             //     character in input
             if (pattern[j - 1] == '*')
@@ -366,15 +369,15 @@ void HelpDisplay::ButtonClicked(ClickButton* button)
 {
    if (button == mTutorialVideoLinkButton)
    {
-      URL("https://youtu.be/SYBc8X2IxqM").launchInDefaultBrowser();
+      juce::URL("https://youtu.be/SYBc8X2IxqM").launchInDefaultBrowser();
    }
    if (button == mDocsLinkButton)
    {
-      URL("http://bespokesynth.com/docs").launchInDefaultBrowser();
+      juce::URL("http://bespokesynth.com/docs").launchInDefaultBrowser();
    }
    if (button == mDiscordLinkButton)
    {
-      URL("https://discord.gg/YdTMkvvpZZ").launchInDefaultBrowser();
+      juce::URL("https://discord.gg/YdTMkvvpZZ").launchInDefaultBrowser();
    }
    if (button == mDumpModuleInfoButton)
    {
@@ -459,7 +462,7 @@ void HelpDisplay::ButtonClicked(ClickButton* button)
          }
       }
 
-      File moduleDump(ofToDataPath("module_dump.txt"));
+      juce::File moduleDump(ofToDataPath("module_dump.txt"));
       moduleDump.replaceWithText(output);
    }
    if (button == mDoModuleScreenshotsButton)
@@ -580,7 +583,7 @@ void HelpDisplay::RenderScreenshot(int x, int y, int width, int height, string f
    juce::gl::glReadPixels(x, ofGetHeight()*scale-y-height, width, height, juce::gl::GL_RGB, juce::gl::GL_UNSIGNED_BYTE, pixels);
    juce::gl::glPixelStorei(juce::gl::GL_PACK_ALIGNMENT, oldAlignment);
 
-   Image image(Image::RGB, width, height, true);
+   juce::Image image(juce::Image::RGB, width, height, true);
    for (int x = 0; x < width; ++x)
    {
       for (int y = 0; y < height; ++y)
@@ -595,8 +598,8 @@ void HelpDisplay::RenderScreenshot(int x, int y, int width, int height, string f
       juce::File pngFile(ofToDataPath("screenshots/"+filename));
       if (pngFile.existsAsFile())
          pngFile.deleteFile();
-      FileOutputStream stream(pngFile);
-      PNGImageFormat pngWriter;
+      juce::FileOutputStream stream(pngFile);
+      juce::PNGImageFormat pngWriter;
       pngWriter.writeImageToStream(image, stream);
    }
 

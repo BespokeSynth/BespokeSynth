@@ -23,6 +23,14 @@ project(BespokeSynth VERSION 1.0.1 LANGUAGES C CXX ASM)
 
 message(STATUS "Bespoke: Build Type: ${CMAKE_BUILD_TYPE}")
 
+# Global compile options
+add_compile_options(
+    # Build with Multiple Processes on Visual Studio
+    $<$<CXX_COMPILER_ID:MSVC>:/MP>
+    # Set source and executable charsets to UTF-8. Required for building on CJK Windows.
+    $<$<CXX_COMPILER_ID:MSVC>:/utf-8>
+    )
+
 if(BESPOKE_PYTHON_ROOT)
     set(Python_ROOT "${BESPOKE_PYTHON_ROOT}")
     message( STATUS "Bespoke: Overriding Python_ROOT to ${Python_ROOT}")
@@ -404,7 +412,6 @@ juce_add_gui_app(BespokeSynth
         DOCUMENT_BROWSER_ENABLED        TRUE
         )
 
-juce_generate_juce_header(BespokeSynth)
 target_sources(BespokeSynth PRIVATE ${BESPOKE_SOURCE_LIST})
 target_include_directories(BespokeSynth PRIVATE
         Source

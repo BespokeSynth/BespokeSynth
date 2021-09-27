@@ -95,8 +95,8 @@ void KompleteKontrol::Poll()
          {
             mTextBoxes[i].slider = true;
             mTextBoxes[i].amount = uicontrol->GetMidiValue();
-            mTextBoxes[i].line1 = String(uicontrol->Name()).toUpperCase().toStdString();
-            mTextBoxes[i].line2 = String(uicontrol->GetDisplayValue(uicontrol->GetValue())).toUpperCase().toStdString();
+            mTextBoxes[i].line1 = juce::String(uicontrol->Name()).toUpperCase().toStdString();
+            mTextBoxes[i].line2 = juce::String(uicontrol->GetDisplayValue(uicontrol->GetValue())).toUpperCase().toStdString();
             if (mTextBoxes[i].line2.length() > 0 && mTextBoxes[i].line2[0] == '.')
                mTextBoxes[i].line2 = " "+mTextBoxes[i].line2; //can't have a period as the first character, so add a space
          }

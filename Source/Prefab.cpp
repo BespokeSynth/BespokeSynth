@@ -29,6 +29,8 @@
 #include "ModularSynth.h"
 #include "PatchCableSource.h"
 
+#include "juce_gui_basics/juce_gui_basics.h"
+
 //static
 bool Prefab::sLoadingPrefab = false;
 
@@ -201,6 +203,7 @@ void Prefab::GetModuleDimensions(float& width, float& height)
 
 void Prefab::ButtonClicked(ClickButton* button)
 {
+   using namespace juce;
    if (button == mSaveButton)
    {
       FileChooser chooser("Save prefab as...", File(ofToDataPath("prefabs/prefab.pfb")), "*.pfb", true, false, TheSynth->GetMainComponent()->getTopLevelComponent());
@@ -265,7 +268,7 @@ void Prefab::LoadPrefab(string loadPath)
    sLoadingPrefab = true;
 
    ScopedMutex mutex(TheSynth->GetAudioMutex(), "LoadPrefab()");
-   ScopedLock renderLock(*TheSynth->GetRenderLock());
+   juce::ScopedLock renderLock(*TheSynth->GetRenderLock());
    
    mModuleContainer.Clear();
    

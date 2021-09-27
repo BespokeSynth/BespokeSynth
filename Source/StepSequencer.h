@@ -242,7 +242,7 @@ private:
    ClickButton* mShiftLeftButton;
    ClickButton* mShiftRightButton;
    std::list<HeldButton> mHeldButtons;
-   uint32* mMetaStepMasks;
+   juce::uint32* mMetaStepMasks;
    bool mIsSetUp;
    NoteInputMode mNoteInputMode;
    bool mHasExternalPulseSource;

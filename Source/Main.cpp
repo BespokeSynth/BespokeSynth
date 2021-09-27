@@ -8,8 +8,12 @@
  ==============================================================================
  */
 
-#include <JuceHeader.h>
+#include "juce_gui_basics/juce_gui_basics.h"
 #include <memory>
+
+#include "VersionInfo.h"
+
+using namespace juce;
 
 Component* createMainContentComponent();
 
@@ -20,8 +24,8 @@ public:
    //==============================================================================
    BespokeApplication() {}
    
-   const String getApplicationName() override       { return ProjectInfo::projectName; }
-   const String getApplicationVersion() override    { return ProjectInfo::versionString; }
+   const String getApplicationName() override       { return Bespoke::APP_NAME; }
+   const String getApplicationVersion() override    { return Bespoke::VERSION; }
    bool moreThanOneInstanceAllowed() override       { return true; }
    
    //==============================================================================
