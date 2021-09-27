@@ -10,6 +10,8 @@
 #include "ofxJSONElement.h"
 #include "SynthGlobals.h"
 
+#include "juce_core/juce_core.h"
+
 using namespace Json;
 
 

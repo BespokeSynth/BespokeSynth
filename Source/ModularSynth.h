@@ -19,6 +19,8 @@
 #endif
 
 namespace juce {
+   class AudioDeviceManager;
+   class AudioFormatManager;
    class Component;
    class OpenGLContext;
 }
@@ -59,7 +61,7 @@ public:
    ModularSynth();
    virtual ~ModularSynth();
    
-   void Setup(GlobalManagers* globalManagers, juce::Component* mainComponent, juce::OpenGLContext* openGLContext);
+   void Setup(juce::AudioDeviceManager* globalAudioDeviceManager, juce::AudioFormatManager* globalAudioFormatManager, juce::Component* mainComponent, juce::OpenGLContext* openGLContext);
    void LoadResources(void* nanoVG, void* fontBoundsNanoVG);
    void InitIOBuffers(int inputChannelCount, int outputChannelCount);
    void Poll();
@@ -163,7 +165,8 @@ public:
    bool HasNotMovedMouseSinceClick() { return mClickStartX < INT_MAX; }
    IDrawableModule* GetMoveModule() { return mMoveModule; }
    ModuleFactory* GetModuleFactory() { return &mModuleFactory; }
-   GlobalManagers* GetGlobalManagers() { return mGlobalManagers; }
+   juce::AudioDeviceManager &GetAudioDeviceManager() { return *mGlobalAudioDeviceManager; }
+   juce::AudioFormatManager &GetAudioFormatManager() { return *mGlobalAudioFormatManager; }
    juce::Component* GetMainComponent() { return mMainComponent; }
    juce::OpenGLContext* GetOpenGLContext() { return mOpenGLContext; }
    IDrawableModule* GetLastClickedModule() const;
@@ -239,7 +242,6 @@ private:
 
    void ReadClipboardTextFromSystem();
    
-   ofSoundStream mSoundStream;
    int mIOBufferSize;
    
    vector<IAudioSource*> mSources;
@@ -335,7 +337,8 @@ private:
    ofVec2f mMousePos;
    string mNextDrawTooltip;
    
-   GlobalManagers* mGlobalManagers;
+   juce::AudioDeviceManager* mGlobalAudioDeviceManager;
+   juce::AudioFormatManager* mGlobalAudioFormatManager;
    juce::Component* mMainComponent;
    juce::OpenGLContext* mOpenGLContext;
    

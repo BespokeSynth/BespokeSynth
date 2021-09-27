@@ -40,6 +40,7 @@
 #include "exprtk/exprtk.hpp"
 
 #include "juce_audio_formats/juce_audio_formats.h"
+#include "juce_gui_basics/juce_gui_basics.h"
 
 #ifdef JUCE_MAC
 #import <execinfo.h>
@@ -91,7 +92,7 @@ void SynthInit()
    for (int i=0; i<10; ++i)
       gHotBindUIControl[i] = nullptr;
    
-   TheSynth->GetGlobalManagers()->mAudioFormatManager.registerBasicFormats();
+   TheSynth->GetAudioFormatManager().registerBasicFormats();
    
    assert(kNumVoices <= 16);  //assumption that we don't have more voices than midi channels
 }

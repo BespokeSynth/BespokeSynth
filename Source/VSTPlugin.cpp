@@ -37,6 +37,18 @@
 namespace
 {
    const int kGlobalModulationIdx = 16;
+   juce::String GetFileNameWithoutExtension(const juce::String &fullPath)
+   {
+       auto lastSlash = fullPath.lastIndexOfChar('/') + 1;
+       if (lastSlash == 0)
+           lastSlash = fullPath.lastIndexOfChar('\\') + 1;
+       auto lastDot   = fullPath.lastIndexOfChar ('.');
+
+       if (lastDot > lastSlash)
+           return fullPath.substring (lastSlash, lastDot);
+
+       return fullPath.substring (lastSlash);
+   }
 }
 
 //static

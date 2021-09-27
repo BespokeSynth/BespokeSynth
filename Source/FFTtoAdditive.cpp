@@ -218,7 +218,7 @@ void FFTtoAdditive::DrawViz()
       }
    }
 
-   bzero(mPeakHistory[mHistoryPtr], sizeof(float) * VIZ_WIDTH);
+   std::memset(mPeakHistory[mHistoryPtr], 0, sizeof(float) * VIZ_WIDTH);
    for (int i=1; i<=numPartials; ++i)
    {
       float height = mFFTData.mRealValues[i-1];

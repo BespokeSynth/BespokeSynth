@@ -407,7 +407,7 @@ void TitleBar::DrawModule()
    mSpawnLists.mPrefabs.Draw();
    mModuleType = type;
    
-   float usage = TheSynth->GetGlobalManagers()->mDeviceManager.getCpuUsage();
+   float usage = TheSynth->GetAudioDeviceManager().getCpuUsage();
    string stats;
    stats += "fps:" + ofToString(ofGetFrameRate(),0);
    stats += "  audio cpu:" + ofToString(usage * 100,1);

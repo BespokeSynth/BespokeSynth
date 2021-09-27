@@ -29,6 +29,8 @@
 #include "OpenFrameworksPort.h"
 #include "ChannelBuffer.h"
 
+#include "juce_events/juce_events.h"
+
 class FileStreamOut;
 class FileStreamIn;
 

@@ -149,7 +149,7 @@ void SampleBrowser::SetDirectory(String dirPath)
    
    if (dirPath != "")
    {
-      String matcher = TheSynth->GetGlobalManagers()->mAudioFormatManager.getWildcardForAllFormats();
+      String matcher = TheSynth->GetAudioFormatManager().getWildcardForAllFormats();
 
       StringArray wildcards;
       wildcards.addTokens(matcher, ";,", "\"'");

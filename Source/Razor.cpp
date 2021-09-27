@@ -74,9 +74,9 @@ Razor::Razor()
 , mModWheel(nullptr)
 , mPressure(nullptr)
 {
-   bzero(mAmp, sizeof(float) * NUM_PARTIALS);
-   bzero(mPeakHistory, sizeof(float) * (VIZ_WIDTH+1) * RAZOR_HISTORY);
-   bzero(mPhases, sizeof(float) * NUM_PARTIALS);
+   std::memset(mAmp, 0, sizeof(float) * NUM_PARTIALS);
+   std::memset(mPeakHistory, 0, sizeof(float) * (VIZ_WIDTH+1) * RAZOR_HISTORY);
+   std::memset(mPhases, 0, sizeof(float) * NUM_PARTIALS);
    
    for (int i=0; i<NUM_PARTIALS; ++i)
       mDetune[i] = 1;
@@ -273,7 +273,7 @@ void Razor::DrawViz()
       }
    }
 
-   bzero(mPeakHistory[mHistoryPtr], sizeof(float) * VIZ_WIDTH);
+   std::memset(mPeakHistory[mHistoryPtr], 0, sizeof(float) * VIZ_WIDTH);
    for (int i=1; i<=mUseNumPartials && i<=oscNyquistLimitIdx; ++i)
    {
       float height = mAdsr[i-1].Value(gTime)*mAmp[i-1];
@@ -342,7 +342,7 @@ void Razor::CalcAmp()
    float baseFreq = TheScale->PitchToFreq(mPitch);
    int oscNyquistLimitIdx = int(gNyquistLimit/baseFreq);
 
-   bzero(mAmp, sizeof(float)*NUM_PARTIALS);
+   std::memset(mAmp, 0, sizeof(float)*NUM_PARTIALS);
    for (int i=1; i<=mUseNumPartials && i<=oscNyquistLimitIdx; ++i)
    {
       if ((mHarmonicSelector == 0 && IsPrime(i)) ||
@@ -399,7 +399,7 @@ void Razor::IntSliderUpdated(IntSlider* slider, int oldVal)
 {
    if (slider == mNumPartialsSlider)
    {
-      bzero(mPhases, sizeof(float) * NUM_PARTIALS);
+      std::memset(mPhases, 0, sizeof(float) * NUM_PARTIALS);
    }
 }
 

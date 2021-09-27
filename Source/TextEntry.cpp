@@ -30,6 +30,8 @@
 #include "IDrawableModule.h"
 #include "FileStream.h"
 
+#include "juce_gui_basics/juce_gui_basics.h"
+
 IKeyboardFocusListener* IKeyboardFocusListener::sCurrentKeyboardFocus = nullptr;
 IKeyboardFocusListener* IKeyboardFocusListener::sKeyboardFocusBeforeClick = nullptr;
 
@@ -493,6 +495,12 @@ void TextEntry::UpdateDisplayString()
       StringCopy(mString, ofToString(*mVarInt).c_str(), MAX_TEXTENTRY_LENGTH);
    if (mVarFloat)
       StringCopy(mString, ofToString(*mVarFloat).c_str(), MAX_TEXTENTRY_LENGTH);
+}
+
+void TextEntry::ClearInput()
+{
+   std::memset(mString, 0, MAX_TEXTENTRY_LENGTH);
+   mCaretPosition = 0;
 }
 
 void TextEntry::SetValue(float value)

@@ -61,7 +61,7 @@ bool Sample::Read(const char* path, bool mono, ReadType readType)
    
    juce::File file(ofToDataPath(mReadPath));
    delete mReader;
-   mReader = TheSynth->GetGlobalManagers()->mAudioFormatManager.createReaderFor(file);
+   mReader = TheSynth->GetAudioFormatManager().createReaderFor(file);
    
    if (mReader != nullptr)
    {
