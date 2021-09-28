@@ -431,6 +431,7 @@ target_compile_definitions(BespokeSynth PUBLIC
 
         JUCE_ALSA=1
         JUCE_JACK=1
+        JUCE_JACK_CLIENT_NAME="BespokeSynth"
 
         JUCE_WASAPI=1
         JUCE_DIRECTSOUND=1
