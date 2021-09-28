@@ -586,38 +586,6 @@ void Scale::UpdateTuningTable()
    }
 }
 
-void Scale::LoadState(FileStreamIn &in) {
-    IDrawableModule::LoadState(in);
-
-    if (!ModuleContainer::DoesModuleHaveMoreSaveData(in))
-        return;  //this was saved before we added versioning, bail out
-
-    int rev;
-    in >> rev;
-    LoadStateValidate(rev == kStreamingRevision);
-    int inton;
-    in >> inton;
-    mIntonation = (Scale::IntonationMode)inton;
-    in >> mSclContents;
-    in >> mKbmContents;
-
-    if (! ( mSclContents.empty() && mKbmContents.empty()))
-    {
-        ofLog() << "Restoring SCL/KBM from streaming" ;
-        UpdateTuningTable();
-    }
-}
-
-void Scale::SaveState(FileStreamOut &out) {
-    IDrawableModule::SaveState(out);
-
-    out << kStreamingRevision;
-    out << mIntonation;
-    out << mSclContents;
-    out << mKbmContents;
-
-}
-
 float Scale::GetTuningTableRatio(int semitonesFromCenter)
 {
    return mTuningTable[CLAMP(128+semitonesFromCenter,0,255)];
@@ -677,6 +645,46 @@ void Scale::ButtonClicked(ClickButton *button)
             UpdateTuningTable();
         }
     }
+}
+
+namespace
+{
+   const int kSaveStateRev = 1;
+}
+
+void Scale::SaveState(FileStreamOut &out)
+{
+   IDrawableModule::SaveState(out);
+
+   out << kSaveStateRev;
+
+   out << mIntonation;
+   out << mSclContents;
+   out << mKbmContents;
+}
+
+void Scale::LoadState(FileStreamIn &in)
+{
+   IDrawableModule::LoadState(in);
+
+   if (!ModuleContainer::DoesModuleHaveMoreSaveData(in))
+      return;  //this was saved before we added versioning, bail out
+
+   int rev;
+   in >> rev;
+   LoadStateValidate(rev >= kSaveStateRev);
+
+   int inton;
+   in >> inton;
+   mIntonation = (Scale::IntonationMode)inton;
+   in >> mSclContents;
+   in >> mKbmContents;
+
+   if (!(mSclContents.empty() && mKbmContents.empty()))
+   {
+      ofLog() << "Restoring SCL/KBM from streaming";
+      UpdateTuningTable();
+   }
 }
 
 void ScalePitches::SetRoot(int root)

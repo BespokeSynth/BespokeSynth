@@ -121,11 +121,6 @@ public:
    int NumPitchesInScale() const { return mScale.NumPitchesInScale(); }
    int GetTet() const { return mTet; }
 
-   int kStreamingRevision{2}; // "1" was the "no streaming" of 1.0
-   void SaveState(FileStreamOut& out) override;
-   void LoadState(FileStreamIn& in) override;
-
-
    float PitchToFreq(float pitch);
    float FreqToPitch(float freq);
    
@@ -137,7 +132,10 @@ public:
    void CheckboxUpdated(Checkbox* checkbox) override;
    void TextEntryComplete(TextEntry* entry) override;
 
-    void ButtonClicked(ClickButton *button) override;
+   void ButtonClicked(ClickButton *button) override;
+
+   void SaveState(FileStreamOut& out) override;
+   void LoadState(FileStreamIn& in) override;
 
 private:
    struct ScaleInfo
