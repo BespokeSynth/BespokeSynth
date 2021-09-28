@@ -849,7 +849,9 @@ void CodeEntry::OnKeyPressed(int key, bool isRepeat)
       }
       else
       {
-         if (mCaretPosition > 0)
+         if (!(GetKeyModifiers() & kModifier_Shift) && mCaretPosition != mCaretPosition2) 
+            MoveCaret(MIN(mCaretPosition, mCaretPosition2));
+         else if (mCaretPosition > 0)
             MoveCaret(mCaretPosition - 1);
       }
    }
@@ -865,7 +867,9 @@ void CodeEntry::OnKeyPressed(int key, bool isRepeat)
       }
       else
       {
-         if (mCaretPosition < mString.length())
+         if (!(GetKeyModifiers() & kModifier_Shift) && mCaretPosition != mCaretPosition2) 
+            MoveCaret(MAX(mCaretPosition, mCaretPosition2));
+         else if (mCaretPosition < mString.length())
             MoveCaret(mCaretPosition + 1);
       }
    }
