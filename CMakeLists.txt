@@ -66,6 +66,8 @@ add_subdirectory(libs/leathers)
 add_subdirectory(libs/json)
 add_subdirectory(libs/nanovg)
 
+add_subdirectory(libs/tuning-library EXCLUDE_FROM_ALL)
+add_subdirectory(libs/oddsound-mts EXCLUDE_FROM_ALL)
 
 # Generate build time info for the cpp
 configure_file(${CMAKE_SOURCE_DIR}/Source/VersionInfo.cpp.in
@@ -592,13 +594,19 @@ target_link_libraries(BespokeSynth PRIVATE
         bespoke::nanovg
         bespoke::xwax
         bespoke::leathers
+
         pybind11::pybind11
+
+        tuning-library
+        oddsound-mts
+
         juce::juce_audio_basics
         juce::juce_audio_devices
         juce::juce_audio_formats
         juce::juce_audio_processors
         juce::juce_opengl
         juce::juce_osc
-        juce::juce_gui_basics)
+        juce::juce_gui_basics
+        )
 
 target_link_libraries(BespokeSynth PRIVATE ${Python_LIBRARIES})
