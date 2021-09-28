@@ -78,6 +78,7 @@ ScriptModule::ScriptModule()
 , mRunButton(nullptr)
 , mStopButton(nullptr)
 , mLoadScriptIndex(-1)
+, mScriptStyleIndex(0)
 , mA(0)
 , mB(0)
 , mC(0)
@@ -125,6 +126,9 @@ void ScriptModule::CreateUIControls()
    ENDUIBLOCK(mWidth, mHeight);
 
    RefreshStyleFiles();
+
+   if (!mStyleJSON.empty())
+      mCodeEntry->SetStyleFromJSON(mStyleJSON[0u]);
 }
 
 void ScriptModule::UninitializePython()
@@ -883,6 +887,8 @@ void ScriptModule::DropdownClicked(DropdownList* list)
 {
    if (list == mLoadScriptSelector)
       RefreshScriptFiles();
+   if (list == mScriptStyleSelector)
+      RefreshStyleFiles();
 }
 
 void ScriptModule::DropdownUpdated(DropdownList *list, int oldValue)
@@ -898,17 +904,16 @@ void ScriptModule::DropdownUpdated(DropdownList *list, int oldValue)
 void ScriptModule::RefreshStyleFiles()
 {
     mScriptStyleSelector->Clear();
-    mStyleJSON.clear();
     ofxJSONElement root;
     if (File(ofToDataPath("script_styles.json")).existsAsFile())
         root.open(ofToDataPath("script_styles.json"));
     else
         root.open(ofToResourcePath("userdata_original/script_styles.json"));
 
-    for(auto nm : root.getMemberNames())
+    mStyleJSON = root["styles"];
+    for (size_t i = 0; i < mStyleJSON.size(); ++i)
     {
-        mStyleJSON.emplace_back(root[nm]);
-        mScriptStyleSelector->AddLabel(nm, mStyleJSON.size()-1);
+        mScriptStyleSelector->AddLabel(mStyleJSON[i]["name"].asString(), i);
     }
 }
 

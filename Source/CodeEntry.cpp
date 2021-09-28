@@ -1365,7 +1365,5 @@ void CodeEntry::SetStyleFromJSON(const ofxJSONElement &vdict) {
     fromRGB( "op", opColor);
     fromRGB( "comma", commaColor);
     fromRGB( "comment", commentColor);
-
-    Render();
 }
 

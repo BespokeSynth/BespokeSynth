@@ -160,7 +160,7 @@ private:
    FloatSlider* mDSlider;
    int mLoadScriptIndex;
    int mScriptStyleIndex;
-   std::vector<ofxJSONElement> mStyleJSON;
+   ofxJSONElement mStyleJSON;
    float mA;
    float mB;
    float mC;
