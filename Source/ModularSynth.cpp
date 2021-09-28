@@ -1264,6 +1264,7 @@ void ModularSynth::MousePressed(int intX, int intY, int button)
    
    bool rightButton = button == 2;
 
+   IKeyboardFocusListener::sKeyboardFocusBeforeClick = IKeyboardFocusListener::GetActiveKeyboardFocus();
    IKeyboardFocusListener::ClearActiveKeyboardFocus(K(notifyListeners));
 
    if (GetTopModalFocusItem())
