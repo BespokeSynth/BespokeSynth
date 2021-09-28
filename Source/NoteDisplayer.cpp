@@ -28,7 +28,7 @@
 
 NoteDisplayer::NoteDisplayer()
 {
-   bzero(mVelocities, 127 * sizeof(int));
+   std::memset(mVelocities, 0, 127 * sizeof(int));
 }
 
 void NoteDisplayer::DrawModule()

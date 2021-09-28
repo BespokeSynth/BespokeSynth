@@ -31,6 +31,7 @@
 #include "UIControlMacros.h"
 
 #include "juce_audio_devices/juce_audio_devices.h"
+#include "juce_gui_basics/juce_gui_basics.h"
 
 UserPrefsEditor::UserPrefsEditor()
 {
@@ -211,7 +212,7 @@ void UserPrefsEditor::Show()
 
 void UserPrefsEditor::UpdateDropdowns(vector<DropdownList*> toUpdate)
 {
-   auto& deviceManager = TheSynth->GetGlobalManagers()->mDeviceManager;
+   auto& deviceManager = TheSynth->GetAudioDeviceManager();
 
    int i;
 
@@ -349,7 +350,7 @@ void UserPrefsEditor::DrawModule()
    DrawTextNormal("editor for userprefs.json file", 3, 15);
    DrawTextNormal("any changes will not take effect until bespoke is restarted", 3, 35);
 
-   auto& deviceManager = TheSynth->GetGlobalManagers()->mDeviceManager;
+   auto& deviceManager = TheSynth->GetAudioDeviceManager();
    auto* selectedDeviceType = mDeviceTypeIndex != -1 ? deviceManager.getAvailableDeviceTypes()[mDeviceTypeIndex] : deviceManager.getCurrentDeviceTypeObject();
    mAudioInputDeviceDropdown->SetShowing(selectedDeviceType->hasSeparateInputsAndOutputs());
 

@@ -8,8 +8,7 @@
 #include <vector>
 #include <list>
 #include <cmath>
-
-#include "juce_gui_basics/juce_gui_basics.h"
+#include <mutex>
 
 using namespace std;
 
@@ -144,19 +143,7 @@ struct ofRectangle
    float height;
 };
 
-class ofMutex
-{
-public:
-   void lock()
-   {
-      mCritSec.enter();
-   }
-   void unlock()
-   {
-      mCritSec.exit();
-   }
-   juce::CriticalSection mCritSec;
-};
+using ofMutex = std::recursive_mutex;
 
 #define CLAMP(v,a,b) (v<a ? a : (v>b ? b : v))
 
@@ -189,51 +176,6 @@ inline std::string ofToString(const T& value, int precision)
    return out.str();
 }
 
-namespace Poco
-{
-   namespace FastMutex
-   {
-      class ScopedLock
-      {
-      public:
-         ScopedLock(ofMutex& mutex)
-         : mMutex(&mutex)
-         {
-            mMutex->lock();
-         }
-         ~ScopedLock()
-         {
-            mMutex->unlock();
-         }
-      private:
-         ofMutex* mMutex;
-      };
-   }
-}
-
-
-
-struct ofDragInfo
-{
-   vector<string> files;
-};
-
-struct ofMessage
-{
-   
-};
-
-
-
-class ofSoundStream
-{
-public:
-   void setup(void*, int outChannels, int inChannels, int sampleRate, int bufferSize, int numBuffers) {}
-   int getTickCount() { return 0; }
-   int GetLastStarvationTick() { return 0; }
-   void stop() {}
-};
-
 #define PI 3.14159265358979323846
 #define TWO_PI 6.28318530717958647693
 
@@ -255,17 +197,6 @@ private:
    bool mLoaded;
    string mFontPath;
 };
-
-struct ofFileDialogResult
-{
-   bool bSuccess;
-   string filePath;
-};
-
-struct ofEventArgs
-{
-};
-
 
 typedef ofVec2f ofPoint;
 
@@ -312,7 +243,6 @@ float ofLerp(float start, float stop, float amt);
 float ofDistSquared(float x1, float y1, float x2, float y2);
 vector<string> ofSplitString(string str, string splitter, bool ignoreEmpty = false, bool trim = false);
 bool ofIsStringInString(const string& haystack, const string& needle);
-juce::String GetFileNameWithoutExtension(juce::String fullPath);
 void ofScale(float x, float y, float z);
 void ofExit();
 void ofToggleFullscreen();

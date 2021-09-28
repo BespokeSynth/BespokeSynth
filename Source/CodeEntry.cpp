@@ -44,6 +44,8 @@
    #include "pybind11/stl.h"
 #include "leathers/pop"
 
+#include "juce_gui_basics/juce_gui_basics.h"
+
 namespace py = pybind11;
 
 //static

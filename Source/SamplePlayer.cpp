@@ -807,7 +807,7 @@ void SamplePlayer::OnYoutubeSearchComplete(string searchTerm, double searchTime)
 void SamplePlayer::LoadFile()
 {
    FileChooser chooser("Load sample", File(ofToDataPath("samples")),
-                       TheSynth->GetGlobalManagers()->mAudioFormatManager.getWildcardForAllFormats(), true, false, TheSynth->GetMainComponent()->getTopLevelComponent());
+                       TheSynth->GetAudioFormatManager().getWildcardForAllFormats(), true, false, TheSynth->GetMainComponent()->getTopLevelComponent());
    if (chooser.browseForFileToOpen())
    {
       auto file = chooser.getResult();

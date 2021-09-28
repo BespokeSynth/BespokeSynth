@@ -232,9 +232,10 @@ bool ModularSynth::IsReady()
    return gTime > 100;
 }
 
-void ModularSynth::Setup(GlobalManagers* globalManagers, juce::Component* mainComponent, juce::OpenGLContext* openGLContext)
+void ModularSynth::Setup(juce::AudioDeviceManager* globalAudioDeviceManager, juce::AudioFormatManager* globalAudioFormatManager, juce::Component* mainComponent, juce::OpenGLContext* openGLContext)
 {
-   mGlobalManagers = globalManagers;
+   mGlobalAudioDeviceManager = globalAudioDeviceManager;
+   mGlobalAudioFormatManager = globalAudioFormatManager;
    mMainComponent = mainComponent;
    mOpenGLContext = openGLContext;
    int recordBufferLengthMinutes = 30;
@@ -857,7 +858,6 @@ void ModularSynth::Exit()
    mAudioThreadMutex.Lock("exiting");
    mAudioPaused = true;
    mAudioThreadMutex.Unlock();
-   mSoundStream.stop();
    mModuleContainer.Exit();
    DeleteAllModules();
    ofExit();
@@ -937,7 +937,7 @@ void ModularSynth::KeyPressed(int key, bool isRepeat)
       }
       else
       {
-         bzero(mConsoleText, MAX_TEXTENTRY_LENGTH);
+         std::memset(mConsoleText, 0, MAX_TEXTENTRY_LENGTH);
          mConsoleEntry->MakeActiveTextEntry(true);
       }
    }

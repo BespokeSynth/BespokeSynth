@@ -1,6 +1,8 @@
 #include "UserData.h"
 #include "OpenFrameworksPort.h"
 
+#include "juce_core/juce_core.h"
+
 void UpdateUserData(string destDirPath)
 {
    juce::File bundledDataDir(ofToResourcePath("userdata_original"));

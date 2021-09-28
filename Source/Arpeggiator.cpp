@@ -44,7 +44,7 @@ Arpeggiator::Arpeggiator()
 {
    TheScale->AddListener(this);
    
-   bzero(mArpString, MAX_TEXTENTRY_LENGTH);
+   std::memset(mArpString, 0, MAX_TEXTENTRY_LENGTH);
 }
 
 void Arpeggiator::Init()

@@ -41,7 +41,7 @@ MidiDevice::MidiDevice(MidiDeviceListener* listener)
 
 MidiDevice::~MidiDevice()
 {
-   auto& deviceManager = TheSynth->GetGlobalManagers()->mDeviceManager;
+   auto& deviceManager = TheSynth->GetAudioDeviceManager();
    deviceManager.removeMidiInputCallback(mDeviceNameIn, this);
    if (mMidiOut.get())
       mMidiOut->stopBackgroundThread();
@@ -53,7 +53,7 @@ bool MidiDevice::ConnectInput(const char* name)
    
    mDeviceNameIn = name;
    
-   auto& deviceManager = TheSynth->GetGlobalManagers()->mDeviceManager;
+   auto& deviceManager = TheSynth->GetAudioDeviceManager();
    deviceManager.setMidiInputEnabled(mDeviceNameIn, true);
    deviceManager.addMidiInputCallback(mDeviceNameIn, this);
    
@@ -105,7 +105,7 @@ void MidiDevice::ConnectOutput(int index, int channel /*= 1*/)
 
 void MidiDevice::DisconnectInput()
 {
-   auto& deviceManager = TheSynth->GetGlobalManagers()->mDeviceManager;
+   auto& deviceManager = TheSynth->GetAudioDeviceManager();
    deviceManager.setMidiInputEnabled(mDeviceNameIn, false);
    deviceManager.removeMidiInputCallback(mDeviceNameIn, this);
 }
@@ -142,7 +142,7 @@ bool MidiDevice::IsInputConnected(bool immediate)
    for (auto& device : sConnectedInputDevices)
    {
       if (device.name == mDeviceNameIn)
-         return TheSynth->GetGlobalManagers()->mDeviceManager.isMidiInputDeviceEnabled(device.identifier);
+         return TheSynth->GetAudioDeviceManager().isMidiInputDeviceEnabled(device.identifier);
    }
    return false;
 }

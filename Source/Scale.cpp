@@ -30,6 +30,8 @@
 #include "Tunings.h"
 #include "libMTSClient.h"
 
+#include "juce_gui_basics/juce_gui_basics.h"
+
 Scale* TheScale = nullptr;
 
 Scale::Scale()
