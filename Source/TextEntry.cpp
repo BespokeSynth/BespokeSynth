@@ -98,6 +98,8 @@ void TextEntry::Construct(ITextEntryListener* owner, const char* name, int x, in
    mFlexibleWidth = false;
    mHovered = false;
    mRequireEnterToAccept = false;
+   mCaretPosition = 0;
+   mCaretPosition2 = 0;
    
    UpdateDisplayString();
    
