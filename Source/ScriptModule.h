@@ -80,7 +80,7 @@ public:
    void ButtonClicked(ClickButton* button) override;
    void FloatSliderUpdated(FloatSlider* slider, float oldValue) override {}
    void DropdownClicked(DropdownList* list) override;
-   void DropdownUpdated(DropdownList* list, int oldValue) override {}
+   void DropdownUpdated(DropdownList* list, int oldValue) override;
  
    //ICodeEntryListener
    void ExecuteCode() override;
@@ -135,6 +135,7 @@ private:
    bool IsNonWhitespace(string line);
    void DrawTimer(int lineNum, double startTime, double endTime, ofColor color, bool filled);
    void RefreshScriptFiles();
+   void RefreshStyleFiles();
    void Reset();
    
    //IDrawableModule
@@ -148,6 +149,7 @@ private:
    bool MouseMoved(float x, float y) override;
    
    DropdownList* mLoadScriptSelector;
+   DropdownList* mScriptStyleSelector;
    ClickButton* mLoadScriptButton;
    ClickButton* mSaveScriptButton;
    ClickButton* mShowReferenceButton;
@@ -159,6 +161,8 @@ private:
    FloatSlider* mCSlider;
    FloatSlider* mDSlider;
    int mLoadScriptIndex;
+   int mScriptStyleIndex;
+   ofxJSONElement mStyleJSON;
    float mA;
    float mB;
    float mC;
