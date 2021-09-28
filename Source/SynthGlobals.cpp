@@ -39,9 +39,13 @@
 #include "IPulseReceiver.h"
 #include "exprtk/exprtk.hpp"
 
+#include "juce_audio_formats/juce_audio_formats.h"
+
 #ifdef JUCE_MAC
 #import <execinfo.h>
 #endif
+
+using namespace juce;
 
 int gBufferSize = -999; //values set in SetGlobalSampleRateAndBufferSize(), setting them to bad values here to highlight any bugs
 int gSampleRate = -999;

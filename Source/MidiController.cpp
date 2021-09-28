@@ -39,6 +39,8 @@
 #include "ScriptModule.h"
 #include "Push2Control.h"
 
+using namespace juce;
+
 bool UIControlConnection::sDrawCables = true;
 
 namespace

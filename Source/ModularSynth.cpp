@@ -23,7 +23,6 @@
 #include "FileStream.h"
 #include "PatchCable.h"
 #include "ADSRDisplay.h"
-#include <JuceHeader.h>
 #include "QuickSpawnMenu.h"
 #include "AudioToCV.h"
 #include "ScriptModule.h"
@@ -54,6 +53,8 @@ float ModularSynth::sBackgroundLissajousB = 0.418f;
 #if BESPOKE_WINDOWS
 LONG WINAPI TopLevelExceptionHandler(PEXCEPTION_POINTERS pExceptionInfo);
 #endif
+
+using namespace juce;
 
 void AtExit()
 {

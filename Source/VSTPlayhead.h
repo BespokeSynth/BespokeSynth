@@ -26,7 +26,7 @@
 #ifndef __Bespoke__VSTPlayhead__
 #define __Bespoke__VSTPlayhead__
 
-#include <JuceHeader.h>
+#include "juce_audio_basics/juce_audio_basics.h"
 
 class VSTPlayhead : public juce::AudioPlayHead
 {

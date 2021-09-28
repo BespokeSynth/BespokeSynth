@@ -26,9 +26,14 @@
 #ifndef __Bespoke__VSTWindow__
 #define __Bespoke__VSTWindow__
 
-#include <JuceHeader.h>
+#include "juce_audio_processors/juce_audio_processors.h"
+#include "juce_gui_basics/juce_gui_basics.h"
 
 class VSTPlugin;
+
+namespace juce {
+   class NSViewComponent;
+}
 
 //==============================================================================
 class VSTWindow  : public juce::DocumentWindow

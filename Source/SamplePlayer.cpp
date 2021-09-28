@@ -36,6 +36,11 @@
 #include "Scale.h"
 #include "UIControlMacros.h"
 
+#include "juce_gui_basics/juce_gui_basics.h"
+#include "juce_audio_formats/juce_audio_formats.h"
+
+using namespace juce;
+
 namespace
 {
    const int kRecordingChunkSize = 48000 * 5;

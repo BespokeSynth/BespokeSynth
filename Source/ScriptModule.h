@@ -38,9 +38,11 @@
 #include "ModulationChain.h"
 #include "MidiController.h"
 
+#include "juce_osc/juce_osc.h"
+
 class ScriptModule : public IDrawableModule, public IButtonListener, public NoteEffectBase, public IPulseReceiver, public ICodeEntryListener, public IFloatSliderListener, public IDropdownListener,
-                     private OSCReceiver,
-                     private OSCReceiver::Listener<OSCReceiver::MessageLoopCallback>
+                     private juce::OSCReceiver,
+                     private juce::OSCReceiver::Listener<juce::OSCReceiver::MessageLoopCallback>
 {
 public:
    ScriptModule();
@@ -89,7 +91,7 @@ public:
    void PlayNote(double time, int pitch, int velocity, int voiceIdx = -1, ModulationParameters modulation = ModulationParameters()) override;
 
    //OSCReceiver
-   void oscMessageReceived(const OSCMessage& msg) override;
+   void oscMessageReceived(const juce::OSCMessage& msg) override;
    
    bool HasDebugDraw() const override { return true; }
    

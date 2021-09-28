@@ -26,8 +26,9 @@
 #ifndef __Bespoke__FileStream__
 #define __Bespoke__FileStream__
 
-#include <JuceHeader.h>
 #include "OpenFrameworksPort.h"
+
+#include "juce_core/juce_core.h"
 
 class FileStreamOut
 {
@@ -44,7 +45,7 @@ public:
    void Write(const float* buffer, int size);
    void WriteGeneric(const void* buffer, int size);
 private:
-   FileOutputStream mStream;
+   juce::FileOutputStream mStream;
 };
 
 class FileStreamIn
@@ -66,7 +67,7 @@ public:
    
    bool Eof();
 private:
-   FileInputStream mStream;
+   juce::FileInputStream mStream;
 };
 
 #endif /* defined(__Bespoke__FileStream__) */

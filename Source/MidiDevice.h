@@ -29,6 +29,8 @@
 #include "OpenFrameworksPort.h"
 #include "ModularSynth.h"
 
+#include "juce_audio_devices/juce_audio_devices.h"
+
 struct MidiNote
 {
    const char* mDeviceName;
@@ -78,10 +80,10 @@ public:
    virtual void OnMidiProgramChange(MidiProgramChange& program) {}
    virtual void OnMidiPitchBend(MidiPitchBend& pitchBend) {}
    virtual void OnMidiPressure(MidiPressure& pressure) {}
-   virtual void OnMidi(const MidiMessage& message) {}
+   virtual void OnMidi(const juce::MidiMessage& message) {}
 };
 
-class MidiDevice : public MidiInputCallback
+class MidiDevice : public juce::MidiInputCallback
 {
 public:
    MidiDevice(MidiDeviceListener* listener);
@@ -107,15 +109,15 @@ public:
    void SendPitchBend(int bend, int channel = -1);
    void SendData(unsigned char a, unsigned char b, unsigned char c);
    
-   static void SendMidiMessage(MidiDeviceListener* listener, const char* deviceName, const MidiMessage& message);
+   static void SendMidiMessage(MidiDeviceListener* listener, const char* deviceName, const juce::MidiMessage& message);
    
 private:
-   void handleIncomingMidiMessage(MidiInput* source, const MidiMessage& message) override;
+   void handleIncomingMidiMessage(juce::MidiInput* source, const juce::MidiMessage& message) override;
    
    juce::String mDeviceNameIn;
    juce::String mDeviceNameOut;
    
-   unique_ptr<MidiOutput> mMidiOut;
+   unique_ptr<juce::MidiOutput> mMidiOut;
    MidiDeviceListener* mListener;
    int mOutputChannel;
    bool mIsInputEnabled;

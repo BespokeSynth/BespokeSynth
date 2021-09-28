@@ -73,7 +73,7 @@ void Monome::ListMonomes()
    
    mJustRequestedDeviceList = true;
    
-   OSCMessage listMsg("/serialosc/list");
+   juce::OSCMessage listMsg("/serialosc/list");
    listMsg.addString("localhost");
    listMsg.addInt32(mMonomeReceivePort);
    bool written = mToSerialOsc.send(listMsg);
@@ -123,7 +123,7 @@ void Monome::Poll()
       
       if (mLights[index].mLastUpdatedTime > mLights[index].mLastSentTime)
       {
-         OSCMessage lightMsg("/"+mPrefix+"/grid/led/level/set");
+         juce::OSCMessage lightMsg("/"+mPrefix+"/grid/led/level/set");
          lightMsg.addInt32(index % mMaxColumns);
          lightMsg.addInt32(index / mMaxColumns);
          lightMsg.addInt32(mLights[index].mValue*16);
@@ -197,22 +197,22 @@ void Monome::ConnectToDevice(string deviceDesc)
    mToMonome.connect(HOST, device->port);
    mHasMonome = true;
    
-   OSCMessage setPortMsg("/sys/port");
+   juce::OSCMessage setPortMsg("/sys/port");
    setPortMsg.addInt32(mMonomeReceivePort);
    bool written = mToMonome.send(setPortMsg);
    assert(written);
    
-   OSCMessage setHostMsg("/sys/host");
+   juce::OSCMessage setHostMsg("/sys/host");
    setHostMsg.addString(HOST);
    written = mToMonome.send(setHostMsg);
    assert(written);
    
-   OSCMessage setPrefixMsg("/sys/prefix");
+   juce::OSCMessage setPrefixMsg("/sys/prefix");
    setPrefixMsg.addString(mPrefix);
    written = mToMonome.send(setPrefixMsg);
    assert(written);
    
-   OSCMessage sysInfoMsg("/sys/info");
+   juce::OSCMessage sysInfoMsg("/sys/info");
    written = mToMonome.send(sysInfoMsg);
    assert(written);
    
@@ -229,9 +229,9 @@ bool Monome::Reconnect()
    return mHasMonome;
 }
 
-void Monome::oscMessageReceived(const OSCMessage& msg)
+void Monome::oscMessageReceived(const juce::OSCMessage& msg)
 {
-   String label = msg.getAddressPattern().toString();
+   juce::String label = msg.getAddressPattern().toString();
    
    if (label == "/serialosc/device")
    {

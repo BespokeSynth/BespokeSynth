@@ -8,7 +8,6 @@
  */
 
 #include "ofxJSONElement.h"
-#include <JuceHeader.h>
 #include "SynthGlobals.h"
 
 using namespace Json;
@@ -43,11 +42,11 @@ bool ofxJSONElement::parse(string jsonString)
 //--------------------------------------------------------------
 bool ofxJSONElement::open(string filename)
 {
-   File file(filename);
+   juce::File file(filename);
    
    if (file.exists())
    {
-      String str = file.loadFileAsString();
+      juce::String str = file.loadFileAsString();
       
       Reader reader;
       if(!reader.parse( str.toStdString(), *this ))
@@ -68,7 +67,7 @@ bool ofxJSONElement::open(string filename)
 bool ofxJSONElement::save(string filename, bool pretty)
 {
    filename = ofToDataPath(filename, true);
-   File file(filename);
+   juce::File file(filename);
    file.create();
    if (!file.exists()) {
       ofLog() << "Unable to create "+filename;

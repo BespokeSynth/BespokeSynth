@@ -26,7 +26,6 @@
 #ifndef __Bespoke__VSTPlugin__
 #define __Bespoke__VSTPlugin__
 
-#include <JuceHeader.h>
 #include "IAudioProcessor.h"
 #include "PolyphonyMgr.h"
 #include "INoteReceiver.h"
@@ -37,9 +36,10 @@
 #include "EnvOscillator.h"
 #include "Ramp.h"
 #include "ClickButton.h"
-#include <JuceHeader.h>
 #include "VSTPlayhead.h"
 #include "VSTWindow.h"
+
+#include "juce_audio_processors/juce_audio_processors.h"
 
 class ofxJSONElement;
 //class NSWindowOverlay;
@@ -118,7 +118,7 @@ private:
    int mOverlayHeight;
    
    bool mPluginReady;
-   std::unique_ptr<AudioProcessor> mPlugin;
+   std::unique_ptr<juce::AudioProcessor> mPlugin;
    string mPluginName;
    std::unique_ptr<VSTWindow> mWindow;
    juce::MidiBuffer mMidiBuffer;
@@ -131,7 +131,7 @@ private:
    {
       float mValue;
       FloatSlider* mSlider;
-      AudioProcessorParameter* mParameter;
+      juce::AudioProcessorParameter* mParameter;
       bool mShowing;
       bool mInSelectorList;
    };

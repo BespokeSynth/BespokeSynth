@@ -1,8 +1,6 @@
 #ifndef _MODULAR_SYNTH
 #define _MODULAR_SYNTH
 
-#include <JuceHeader.h>
-
 #undef LoadString //undo some junk from a windows define
 
 #include "SynthGlobals.h"
@@ -19,6 +17,11 @@
 #ifdef BESPOKE_LINUX
 #include <climits>
 #endif
+
+namespace juce {
+   class Component;
+   class OpenGLContext;
+}
 
 class IAudioSource;
 class IAudioReceiver;
@@ -177,7 +180,7 @@ public:
    void LockRender(bool lock) { if (lock) { mRenderLock.enter(); } else { mRenderLock.exit(); } }
    void UpdateFrameRate(float fps) { mFrameRate = fps; }
    float GetFrameRate() const { return mFrameRate; }
-   CriticalSection* GetRenderLock() { return &mRenderLock; }
+   juce::CriticalSection* GetRenderLock() { return &mRenderLock; }
    NamedMutex* GetAudioMutex() { return &mAudioThreadMutex; }
    
    IDrawableModule* CreateModule(const ofxJSONElement& moduleInfo);
@@ -211,8 +214,8 @@ public:
    ofxJSONElement GetUserPrefs() { return mUserPrefs; }
    UserPrefsEditor* GetUserPrefsEditor() { return mUserPrefsEditor; }
 
-   const String& GetTextFromClipboard() const;
-   void CopyTextToClipboard(const String& text);
+   const juce::String& GetTextFromClipboard() const;
+   void CopyTextToClipboard(const juce::String& text);
    
    void SetFatalError(string error);
 
@@ -336,7 +339,7 @@ private:
    juce::Component* mMainComponent;
    juce::OpenGLContext* mOpenGLContext;
    
-   CriticalSection mRenderLock;
+   juce::CriticalSection mRenderLock;
    float mFrameRate;
    long mFrameCount;
    
@@ -361,7 +364,7 @@ private:
    vector<float*> mInputBuffers;
    vector<float*> mOutputBuffers;
 
-   String mClipboard;
+   juce::String mClipboard;
 };
 
 extern ModularSynth* TheSynth;

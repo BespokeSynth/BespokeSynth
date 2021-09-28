@@ -30,6 +30,10 @@
 #include "ModularSynth.h"
 #include "UIControlMacros.h"
 
+#include "juce_audio_formats/juce_audio_formats.h"
+
+using namespace juce;
+
 SampleBrowser::SampleBrowser()
 {
    mCurrentDirectory = ofToDataPath("samples");

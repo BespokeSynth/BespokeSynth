@@ -27,6 +27,8 @@
 #include "VSTPlugin.h"
 #include "ModularSynth.h"
 
+#include "juce_gui_extra/juce_gui_extra.h"
+
 VSTWindow::VSTWindow (VSTPlugin* vst,
                       Component* const pluginEditor,
                       WindowFormatType t)
@@ -42,7 +44,7 @@ VSTWindow::VSTWindow (VSTPlugin* vst,
    
    setContentOwned (pluginEditor, true);
    
-   auto mainMon = Desktop::getInstance().getDisplays().findDisplayForRect(TheSynth->GetMainComponent()->getScreenBounds()).userArea;
+   auto mainMon = juce::Desktop::getInstance().getDisplays().findDisplayForRect(TheSynth->GetMainComponent()->getScreenBounds()).userArea;
 
    setTopLeftPosition(mainMon.getX() + mainMon.getWidth() / 4,
                       mainMon.getY() + mainMon.getHeight() / 4);

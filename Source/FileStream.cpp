@@ -28,7 +28,7 @@
 #include "SynthGlobals.h"
 
 FileStreamOut::FileStreamOut(const char* file)
-: mStream(File(file))
+: mStream(juce::File(file))
 {
    mStream.setPosition(0);
    mStream.truncate();
@@ -40,7 +40,7 @@ FileStreamOut::~FileStreamOut()
 }
 
 FileStreamIn::FileStreamIn(const char* file)
-: mStream(File(file))
+: mStream(juce::File(file))
 {
 }
 

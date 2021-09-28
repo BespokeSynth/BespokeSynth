@@ -297,7 +297,7 @@ void BeatBloks::FilesDropped(vector<string> files, int x, int y)
    string cachedFilename = tokens[tokens.size()-1].c_str();
    tokens = ofSplitString(cachedFilename, ".");
    cachedFilename = tokens[0]+".cached";
-   bool hasCached = File(ofToDataPath(cachedFilename)).existsAsFile();
+   bool hasCached = juce::File(ofToDataPath(cachedFilename)).existsAsFile();
    
    ofLog() << cachedFilename << " exists: " << (hasCached ? "true" : "false");
    

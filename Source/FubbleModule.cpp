@@ -403,7 +403,7 @@ void FubbleModule::MouseReleased()
       if (mQuantizeLength)
       {
          float quantizeResolution = TheTransport->GetMeasureFraction(mQuantizeInterval);
-         int quantizeIntervalSteps = roundToInt(mLength/quantizeResolution);
+         int quantizeIntervalSteps = juce::roundToInt(mLength/quantizeResolution);
          if (quantizeIntervalSteps <= 0)
             quantizeIntervalSteps = 1;
          float quantizedLength = quantizeResolution * quantizeIntervalSteps;

@@ -338,7 +338,7 @@ void TextEntry::OnKeyPressed(int key, bool isRepeat)
          --mCaretPosition2;
       }
    }
-   else if (key == KeyPress::deleteKey)
+   else if (key == juce::KeyPress::deleteKey)
    {
       int len = (int)strlen(mString);
       if (mCaretPosition != mCaretPosition2) 
@@ -450,11 +450,11 @@ void TextEntry::OnKeyPressed(int key, bool isRepeat)
       mCaretPosition = 0;
       mCaretPosition2 = len;
    }
-   else if (key == KeyPress::homeKey)
+   else if (key == juce::KeyPress::homeKey)
    {
       MoveCaret(0);
    }
-   else if (key == KeyPress::endKey)
+   else if (key == juce::KeyPress::endKey)
    {
       MoveCaret((int)strlen(mString));
    }
@@ -557,9 +557,9 @@ bool TextEntry::AllowCharacter(char c)
    if (mType == kTextEntry_Text)
       return juce::CharacterFunctions::isPrintable(c);
    if (mType == kTextEntry_Int)
-      return CharacterFunctions::isDigit((char)c) || c == '-';
+      return juce::CharacterFunctions::isDigit((char)c) || c == '-';
    if (mType == kTextEntry_Float)
-      return CharacterFunctions::isDigit((char)c) || c == '.' || c == '-';
+      return juce::CharacterFunctions::isDigit((char)c) || c == '.' || c == '-';
    return false;
 }
 
