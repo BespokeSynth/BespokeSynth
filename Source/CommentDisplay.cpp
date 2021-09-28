@@ -27,6 +27,8 @@
 #include "SynthGlobals.h"
 #include "ModularSynth.h"
 
+#include <cstring>
+
 CommentDisplay::CommentDisplay()
 : mCommentEntry(nullptr)
 {

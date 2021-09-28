@@ -30,6 +30,7 @@
 #include "Profiler.h"
 #include "UIControlMacros.h"
 #include "Sample.h"
+#include "Checkbox.h"
 
 #include "juce_gui_basics/juce_gui_basics.h"
 

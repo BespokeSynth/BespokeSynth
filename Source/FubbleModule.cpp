@@ -31,6 +31,8 @@
 #include "SynthGlobals.h"
 #include "UIControlMacros.h"
 
+#include "juce_core/juce_core.h"
+
 namespace
 {
 const int kTopControlHeight = 22;

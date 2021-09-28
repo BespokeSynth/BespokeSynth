@@ -27,6 +27,8 @@
 #include "ModularSynth.h"
 #include "Profiler.h"
 
+#include <cstring>
+
 namespace
 {
    const int fftWindowSize = 1024;

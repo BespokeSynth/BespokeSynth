@@ -268,7 +268,7 @@ void Prefab::LoadPrefab(string loadPath)
    sLoadingPrefab = true;
 
    ScopedMutex mutex(TheSynth->GetAudioMutex(), "LoadPrefab()");
-   juce::ScopedLock renderLock(*TheSynth->GetRenderLock());
+   std::lock_guard<std::recursive_mutex> renderLock(TheSynth->GetRenderLock());
    
    mModuleContainer.Clear();
    

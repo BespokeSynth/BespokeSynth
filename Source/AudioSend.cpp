@@ -29,6 +29,7 @@
 #include "ModularSynth.h"
 #include "Profiler.h"
 #include "PatchCableSource.h"
+#include "Checkbox.h"
 
 AudioSend::AudioSend()
 : IAudioProcessor(gBufferSize)
