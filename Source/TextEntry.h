@@ -58,6 +58,8 @@ public:
    static void ClearActiveKeyboardFocus(bool notifyListeners);
    
    virtual void OnKeyPressed(int key, bool isRepeat) = 0;
+
+   static IKeyboardFocusListener* sKeyboardFocusBeforeClick;
 private:
    virtual void AcceptEntry(bool pressedEnter) {}
    virtual void CancelEntry() {}

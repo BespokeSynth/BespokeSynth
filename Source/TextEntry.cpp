@@ -31,6 +31,7 @@
 #include "FileStream.h"
 
 IKeyboardFocusListener* IKeyboardFocusListener::sCurrentKeyboardFocus = nullptr;
+IKeyboardFocusListener* IKeyboardFocusListener::sKeyboardFocusBeforeClick = nullptr;
 
 //static
 void IKeyboardFocusListener::ClearActiveKeyboardFocus(bool notifyListeners)
@@ -181,11 +182,11 @@ void TextEntry::Render()
       }
    }
    
-   if (mCaretPosition != mCaretPosition2) 
+   if (mCaretPosition != mCaretPosition2 && isCurrent)
    {
       ofPushStyle();
       ofFill();
-      ofSetColor(255, 255, 255, 50);
+      ofSetColor(255, 255, 255, 90);
 
       int selStartX = mX+2+xOffset;
       int selEndX = mX+2+xOffset;
@@ -245,28 +246,37 @@ void TextEntry::OnClicked(int x, int y, bool right)
    if (mDrawLabel)
       xOffset += mLabelSize;
    
-   mCaretPosition = 0;
-   
-   char caretCheck[MAX_TEXTENTRY_LENGTH];
-   size_t checkLength = strnlen(mString, MAX_TEXTENTRY_LENGTH);
-   strncpy(caretCheck, mString, checkLength);
-   int lastSubstrWidth = gFontFixedWidth.GetStringWidth(caretCheck, 14);
-   for (int i=(int)checkLength-1; i >= 0; --i)
+   if (sKeyboardFocusBeforeClick != this)
    {
-      caretCheck[i] = 0;   //shorten string by one
-      
-      int substrWidth = gFontFixedWidth.GetStringWidth(caretCheck, 14);
-      //ofLog() << x << " " << i << " " << (xOffset + substrWidth);
-      if (x > xOffset + ((substrWidth + lastSubstrWidth) * .5f))
+      mCaretPosition = 0;
+      mCaretPosition2 = strnlen(mString, MAX_TEXTENTRY_LENGTH);
+   }
+   else
+   {
+      mCaretPosition = 0;
+
+      char caretCheck[MAX_TEXTENTRY_LENGTH];
+      size_t checkLength = strnlen(mString, MAX_TEXTENTRY_LENGTH);
+      strncpy(caretCheck, mString, checkLength);
+      int lastSubstrWidth = gFontFixedWidth.GetStringWidth(caretCheck, 14);
+      for (int i = (int)checkLength - 1; i >= 0; --i)
       {
-         mCaretPosition = i + 1;
-         break;
+         caretCheck[i] = 0;   //shorten string by one
+
+         int substrWidth = gFontFixedWidth.GetStringWidth(caretCheck, 14);
+         //ofLog() << x << " " << i << " " << (xOffset + substrWidth);
+         if (x > xOffset + ((substrWidth + lastSubstrWidth) * .5f))
+         {
+            mCaretPosition = i + 1;
+            break;
+         }
+
+         lastSubstrWidth = substrWidth;
       }
-      
-      lastSubstrWidth = substrWidth;
+
+      mCaretPosition2 = mCaretPosition;
    }
    
-   mCaretPosition2 = mCaretPosition;
    MakeActiveTextEntry(false);
 }
 
