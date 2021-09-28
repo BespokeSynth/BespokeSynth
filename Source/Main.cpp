@@ -9,6 +9,7 @@
  */
 
 #include <JuceHeader.h>
+#include <memory>
 
 Component* createMainContentComponent();
 
@@ -28,14 +29,13 @@ public:
    {
       // This method is where you should put your application's initialisation code..
       
-      mainWindow = new MainWindow ("bespoke synth");
+      mainWindow = std::make_unique<MainWindow>("bespoke synth");
    }
    
    void shutdown() override
    {
       // Add your application's shutdown code here..
-      
-      mainWindow = nullptr; // (deletes our window)
+      mainWindow.reset();
    }
    
    //==============================================================================
@@ -93,7 +93,7 @@ public:
    };
    
 private:
-   ScopedPointer<MainWindow> mainWindow;
+   std::unique_ptr<MainWindow> mainWindow;
 };
 
 //==============================================================================

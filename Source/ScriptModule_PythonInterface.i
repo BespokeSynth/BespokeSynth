@@ -545,10 +545,10 @@ namespace
       ::ADSR adsr;
       adsr.SetNumStages((int)stages.size());
       adsr.GetHasSustainStage() = false;
-      for (size_t i=0; i<stages.size(); ++i)
+      for (int i=0; i<adsr.GetNumStages() && i<(int)stages.size(); ++i)
       {
-         adsr.GetStageData((int)i).time = get<0>(stages[i]);
-         adsr.GetStageData((int)i).target = get<1>(stages[i]);
+         adsr.GetStageData(i).time = get<0>(stages[i]);
+         adsr.GetStageData(i).target = get<1>(stages[i]);
       }
       envelope.Start(time, adsr);
    }

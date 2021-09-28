@@ -23,8 +23,9 @@ project(BespokeSynth VERSION 1.0.1 LANGUAGES C CXX ASM)
 
 message(STATUS "Bespoke: Build Type: ${CMAKE_BUILD_TYPE}")
 
-if(DEFINED BESPOKE_PYTHON_ROOT)
+if(BESPOKE_PYTHON_ROOT)
     set(Python_ROOT "${BESPOKE_PYTHON_ROOT}")
+    message( STATUS "Bespoke: Overriding Python_ROOT to ${Python_ROOT}")
 endif()
 find_package (Python COMPONENTS Interpreter Development)
 message(STATUS "Bespoke: Python Config")
@@ -52,10 +53,10 @@ else()
 endif()
 
 add_subdirectory(libs/xwax)
-
-add_subdirectory(Source/freeverb)
-add_subdirectory(Source/json)
-add_subdirectory(Source/nanovg)
+add_subdirectory(libs/freeverb)
+add_subdirectory(libs/leathers)
+add_subdirectory(libs/json)
+add_subdirectory(libs/nanovg)
 
 
 # Generate build time info for the cpp
@@ -469,14 +470,38 @@ if (APPLE)
         message( FATAL_ERROR "Bespoke: Cannot find python binary. Consider setting BESPOKE_PYTHON_ROOT" )
     endif()
 
+    # Alright what is this doing? Well the python build hard-codes a reference to a python
+    # framework which means this executable wont even *start* on a machine which isn't
+    # configured the same as python. Our desired behavior is that the executable starts
+    # but python doesn't work. So copy the python framework build stub into the resources
+    # framework and repoint the python to it with install_name_tool.
+    #
+    # But also: If you have no python installed, or have BESPOKE_PYTHON_ROOT set oddly,
+    # you end up with a wierdo case where you use XCode python. We warn about that here
+    # but also do the couple of rpath changes just in case below, which deal with that
     message( STATUS "Bespoke: Mac Python Framework is '${Python_BIN}' from '${Python_FRAMEWORK_DIR}'")
+
+    string( FIND ${Python_FRAMEWORK_DIR} "Xcode.app" IS_PYTHON_XCODE)
+    if (${IS_PYTHON_XCODE} GREATER 0)
+        message( WARNING "Your python built environment came from Xcode.app. "
+                "This may not be what you want. Consider setting BESPOKE_PYTHON_ROOT to "
+                "a python install of your choosing. Especially, if you are on an M1 "
+                "mac and use homebrew, you may want to use something like "
+                "'-DBESPOKE_PYTHON_ROOT=/opt/homebrew/Cellar/python\@3.9/3.9.6'")
+    endif()
 
     add_custom_command(TARGET BespokeSynth
             POST_BUILD
             WORKING_DIRECTORY ${CMAKE_SOURCE_DIR}
             COMMAND ${CMAKE_COMMAND} -E make_directory ${OUTDIR}/BespokeSynth.app/Contents/Frameworks/LocalPython
             COMMAND ${CMAKE_COMMAND} -E copy ${Python_FRAMEWORK_DIR}/${Python_BIN} ${OUTDIR}/BespokeSynth.app/Contents/Frameworks/LocalPython
+            COMMAND codesign --remove-signature ${OUTDIR}/BespokeSynth.app/Contents/Frameworks/LocalPython/${Python_BIN}
+            COMMAND codesign -s - ${OUTDIR}/BespokeSynth.app/Contents/Frameworks/LocalPython/${Python_BIN}
+            # THis is the 'normal' case
             COMMAND install_name_tool -change "${Python_FRAMEWORK_DIR}/${Python_BIN}" "@executable_path/../Frameworks/LocalPython/${Python_BIN}" ${OUTDIR}/BespokeSynth.app/Contents/MacOS/BespokeSynth
+            # These are the 'got it from xcode by mistake' cases
+            COMMAND install_name_tool -change "@rpath/Python3.framework/Versions/3.8/Python3" "@executable_path/../Frameworks/LocalPython/${Python_BIN}" ${OUTDIR}/BespokeSynth.app/Contents/MacOS/BespokeSynth
+            COMMAND install_name_tool -change "@rpath/Python3.framework/Versions/3.9/Python3" "@executable_path/../Frameworks/LocalPython/${Python_BIN}" ${OUTDIR}/BespokeSynth.app/Contents/MacOS/BespokeSynth
             )
 
 elseif (WIN32)
@@ -547,6 +572,8 @@ else ()
     # Finally provide install rules if folks want to install into CMAKE_INSTALL_PREFIX
     install(TARGETS BespokeSynth DESTINATION bin)
     install(DIRECTORY ${CMAKE_SOURCE_DIR}/resource DESTINATION share/BespokeSynth)
+    install(FILES ${CMAKE_SOURCE_DIR}/scripts/installer_linux/BespokeSynth.desktop DESTINATION share/applications)
+    install(FILES ${CMAKE_SOURCE_DIR}/bespoke_icon.png DESTINATION share/icons/hicolor/512x512/apps)
 
 endif ()
 
@@ -556,6 +583,7 @@ target_link_libraries(BespokeSynth PRIVATE
         bespoke::json
         bespoke::nanovg
         bespoke::xwax
+        bespoke::leathers
         pybind11::pybind11
         juce::juce_audio_basics
         juce::juce_audio_devices

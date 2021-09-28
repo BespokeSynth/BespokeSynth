@@ -205,8 +205,7 @@ void VSTPlugin::Exit()
    IDrawableModule::Exit();
    if (mWindow)
    {
-      VSTWindow* window = mWindow.release();
-      delete window;
+      mWindow.reset();
    }
 }
 
@@ -334,6 +333,9 @@ void VSTPlugin::LoadVST(juce::PluginDescription desc)
 
       for (int busIndex = 1; busIndex < layouts.outputBuses.size(); ++busIndex)
           layouts.outputBuses.getReference(busIndex) = AudioChannelSet::disabled();
+
+      for (int busIndex = 1; busIndex < layouts.inputBuses.size(); ++busIndex)
+          layouts.inputBuses.getReference(busIndex) = AudioChannelSet::disabled();
 
       mPlugin->setBusesLayout(layouts);
 
@@ -797,7 +799,7 @@ void VSTPlugin::ButtonClicked(ClickButton* button)
       if (mPlugin != nullptr)
       {
          if (mWindow == nullptr)
-            mWindow = VSTWindow::CreateWindow(this, VSTWindow::Normal);
+            mWindow = std::unique_ptr<VSTWindow>(VSTWindow::CreateWindow(this, VSTWindow::Normal));
          mWindow->toFront (true);
       }
       
