@@ -28,7 +28,7 @@
 
 #include "juce_core/juce_core.h"
 
-FileStreamOut::FileStreamOut(const char* file)
+FileStreamOut::FileStreamOut(const std::string& file)
 : mStream(std::make_unique<juce::FileOutputStream>(juce::File{file}))
 {
    mStream->setPosition(0);
@@ -40,7 +40,7 @@ FileStreamOut::~FileStreamOut()
    mStream->flush();
 }
 
-FileStreamIn::FileStreamIn(const char* file)
+FileStreamIn::FileStreamIn(const std::string& file)
 : mStream(std::make_unique<juce::FileInputStream>(juce::File{file}))
 {
 }

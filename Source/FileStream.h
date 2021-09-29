@@ -38,7 +38,8 @@ namespace juce {
 class FileStreamOut
 {
 public:
-   explicit FileStreamOut(const char* file);
+   explicit FileStreamOut(const std::string& file);
+   FileStreamOut(const char*) = delete; // Hint: UTF-8 encoded std::string required
    ~FileStreamOut();
    FileStreamOut& operator<<(const int& var);
    FileStreamOut& operator<<(const std::uint32_t &var);
@@ -56,7 +57,8 @@ private:
 class FileStreamIn
 {
 public:
-   explicit FileStreamIn(const char* file);
+   explicit FileStreamIn(const std::string& file);
+   FileStreamIn(const char*) = delete; // Hint: UTF-8 encoded std::string required
    ~FileStreamIn();
    FileStreamIn& operator>>(int& var);
    FileStreamIn& operator>>(std::uint32_t &var);
