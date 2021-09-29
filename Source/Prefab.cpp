@@ -257,7 +257,7 @@ void Prefab::SavePrefab(string savePath)
    
    UpdatePrefabName(savePath);
    
-   FileStreamOut out(ofToDataPath(savePath).c_str());
+   FileStreamOut out(ofToDataPath(savePath));
    
    out << lines;
    mModuleContainer.SaveState(out);
@@ -272,7 +272,7 @@ void Prefab::LoadPrefab(string loadPath)
    
    mModuleContainer.Clear();
    
-   FileStreamIn in(ofToDataPath(loadPath).c_str());
+   FileStreamIn in(ofToDataPath(loadPath));
 
    assert(in.OpenedOk());
    

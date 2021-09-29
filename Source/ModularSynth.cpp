@@ -2208,7 +2208,7 @@ void ModularSynth::LogEvent(string event, LogEventType type)
 IDrawableModule* ModularSynth::DuplicateModule(IDrawableModule* module)
 {
    {
-      FileStreamOut out(ofToDataPath("tmp").c_str());
+      FileStreamOut out(ofToDataPath("tmp"));
       module->SaveState(out);
    }
    
@@ -2229,7 +2229,7 @@ IDrawableModule* ModularSynth::DuplicateModule(IDrawableModule* module)
    newModule->SetName(module->Name()); //temporarily rename to the same as what we duplicated, so we can load state properly
    
    {
-      FileStreamIn in(ofToDataPath("tmp").c_str());
+      FileStreamIn in(ofToDataPath("tmp"));
       mIsLoadingModule = true;
       newModule->LoadState(in);
       mIsLoadingModule = false;
@@ -2314,7 +2314,7 @@ void ModularSynth::SaveState(string file, bool autosave)
 
    mAudioThreadMutex.Lock("SaveState()");
    
-   FileStreamOut out(file.c_str());
+   FileStreamOut out(file);
    
    out << GetLayout().getRawString(true);
    mModuleContainer.SaveState(out);
@@ -2342,7 +2342,7 @@ void ModularSynth::LoadState(string file)
    LockRender(false);
    mAudioThreadMutex.Unlock();
    
-   FileStreamIn in(ofToDataPath(file).c_str());
+   FileStreamIn in(ofToDataPath(file));
    
    string jsonString;
    in >> jsonString;
