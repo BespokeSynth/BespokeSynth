@@ -35,6 +35,8 @@
 #include "SynthGlobals.h"
 #include "QuickSpawnMenu.h"
 
+#include "juce_core/juce_core.h"
+
 ModuleContainer::ModuleContainer()
 : mOwner(nullptr)
 , mDrawScale(1)

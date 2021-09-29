@@ -38,7 +38,7 @@ class INoteSource;
 class NoteOutput : public INoteReceiver
 {
 public:
-   NoteOutput(INoteSource* source) : mNoteSource(source), mStackDepth(0) { std::memset(mNotes, 0, 128*sizeof(bool)); std::memset(mNoteOnTimes, 0, 128*sizeof(double)); }
+   explicit NoteOutput(INoteSource* source) : mNoteSource(source), mStackDepth(0) {}
    
    void Flush(double time);
    void FlushTarget(double time, INoteReceiver* target);
@@ -56,8 +56,8 @@ public:
    bool HasHeldNotes();
    list<int> GetHeldNotesList();
 private:
-   bool mNotes[128];
-   double mNoteOnTimes[128];
+   bool mNotes[128]{};
+   double mNoteOnTimes[128]{};
    INoteSource* mNoteSource;
    int mStackDepth;
 };

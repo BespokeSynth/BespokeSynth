@@ -30,6 +30,8 @@
 #include "PolyphonyMgr.h"
 #include "ChordDatabase.h"
 
+#include <cstring>
+
 Chorder::Chorder()
 : mVelocity(0)
 , mDiatonic(false)

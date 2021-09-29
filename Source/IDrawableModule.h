@@ -29,11 +29,12 @@
 #include "IClickable.h"
 #include "IPollable.h"
 #include "ModuleSaveData.h"
-#include "Checkbox.h"
-#include "FileStream.h"
 #include "IPatchable.h"
 
+class Checkbox;
 class IUIControl;
+class FileStreamIn;
+class FileStreamOut;
 class FloatSlider;
 class RollingBuffer;
 class ofxJSONElement;

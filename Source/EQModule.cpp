@@ -29,6 +29,7 @@
 #include "ModularSynth.h"
 #include "Profiler.h"
 #include "UIControlMacros.h"
+#include "Checkbox.h"
 
 EQModule::EQModule()
    : IAudioProcessor(gBufferSize)

@@ -28,6 +28,8 @@
 #include "SpaceMouseControl.h"
 
 #ifdef BESPOKE_WINDOWS
+#include "juce_core/juce_core.h"
+
 SpaceMouseMessageWindow* SpaceMouseMessageWindow::sInstance = nullptr;
 
 SpaceMouseMessageWindow::SpaceMouseMessageWindow(ModularSynth* theSynth)

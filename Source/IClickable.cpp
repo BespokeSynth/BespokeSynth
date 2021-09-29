@@ -28,6 +28,8 @@
 #include "IDrawableModule.h"
 #include "Prefab.h"
 
+#include <cstring>
+
 string IClickable::sLoadContext = "";
 string IClickable::sSaveContext = "";
 

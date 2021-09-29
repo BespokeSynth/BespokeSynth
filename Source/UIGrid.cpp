@@ -27,6 +27,8 @@
 #include "SynthGlobals.h"
 #include "FileStream.h"
 
+#include <cstring>
+
 UIGrid::UIGrid(int x, int y, int w, int h, int cols, int rows, IClickable* parent)
 : mClick(false)
 , mWidth(w)

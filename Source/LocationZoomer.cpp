@@ -27,6 +27,8 @@
 #include "SynthGlobals.h"
 #include "ModularSynth.h"
 
+#include "juce_core/juce_core.h"
+
 LocationZoomer::LocationZoomer()
 : mCurrentProgress(1)
 , mSpeed(2)

@@ -29,6 +29,8 @@
 #include "Profiler.h"
 #include "UIControlMacros.h"
 
+#include "juce_core/juce_core.h"
+
 DelayEffect::DelayEffect()
 : mDelay(500)
 , mFeedback(0)

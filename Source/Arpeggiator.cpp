@@ -33,6 +33,7 @@
 Arpeggiator::Arpeggiator()
 : mInterval(kInterval_16n)
 , mArpIndex(-1)
+, mArpString()
 , mLastPitch(-1)
 , mIntervalSelector(nullptr)
 , mArpStep(1)
@@ -43,8 +44,6 @@ Arpeggiator::Arpeggiator()
 , mOctaveRepeatsSlider(nullptr)
 {
    TheScale->AddListener(this);
-   
-   std::memset(mArpString, 0, MAX_TEXTENTRY_LENGTH);
 }
 
 void Arpeggiator::Init()

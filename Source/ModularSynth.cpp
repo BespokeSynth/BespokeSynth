@@ -43,6 +43,9 @@
 #endif
 
 ModularSynth* TheSynth = nullptr;
+namespace {
+   juce::String TheClipboard;
+}
 
 //static
 bool ModularSynth::sShouldAutosave = false;
@@ -1991,7 +1994,7 @@ void ModularSynth::LoadLayout(ofxJSONElement json)
    //ofLoadURLAsync("http://bespoke.com/telemetry/"+jsonFile);
    
    ScopedMutex mutex(&mAudioThreadMutex, "LoadLayout()");
-   ScopedLock renderLock(mRenderLock);
+   std::lock_guard<recursive_mutex> renderLock(mRenderLock);
    
    ResetLayout();
    
@@ -2431,7 +2434,7 @@ void ModularSynth::OnConsoleInput()
       else if (tokens[0] == "clearall")
       {
          mAudioThreadMutex.Lock("clearall");
-         ScopedLock renderLock(mRenderLock);
+         std::lock_guard<std::recursive_mutex> renderLock(mRenderLock);
          ResetLayout();
          mAudioThreadMutex.Unlock();
       }
@@ -2777,16 +2780,16 @@ void ModularSynth::SaveOutput()
 }
 
 const String& ModularSynth::GetTextFromClipboard() const {
-   return mClipboard;
+   return TheClipboard;
 }
 
 void ModularSynth::CopyTextToClipboard(const String& text) {
-   mClipboard = text;
+   TheClipboard = text;
    SystemClipboard::copyTextToClipboard(text);
 }
 
 void ModularSynth::ReadClipboardTextFromSystem() {
-   mClipboard = SystemClipboard::getTextFromClipboard();
+   TheClipboard = SystemClipboard::getTextFromClipboard();
 }
 
 void ModularSynth::SetFatalError(string error)

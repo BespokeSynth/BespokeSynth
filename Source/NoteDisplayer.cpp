@@ -26,11 +26,6 @@
 #include "NoteDisplayer.h"
 #include "SynthGlobals.h"
 
-NoteDisplayer::NoteDisplayer()
-{
-   std::memset(mVelocities, 0, 127 * sizeof(int));
-}
-
 void NoteDisplayer::DrawModule()
 {
    if (Minimized() || IsVisible() == false)

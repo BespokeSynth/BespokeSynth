@@ -27,6 +27,7 @@
 #include "SynthGlobals.h"
 #include "Scale.h"
 #include "ModuleContainer.h"
+#include "FileStream.h"
 
 namespace
 {

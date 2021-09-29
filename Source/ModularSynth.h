@@ -4,7 +4,6 @@
 #undef LoadString //undo some junk from a windows define
 
 #include "SynthGlobals.h"
-#include "IAudioReceiver.h"
 #include "IDrawableModule.h"
 #include "TextEntry.h"
 #include "RollingBuffer.h"
@@ -23,6 +22,7 @@ namespace juce {
    class AudioFormatManager;
    class Component;
    class OpenGLContext;
+   class String;
 }
 
 class IAudioSource;
@@ -180,10 +180,10 @@ public:
    
    template<class T> vector<string> GetModuleNames() { return mModuleContainer.GetModuleNames<T>(); }
    
-   void LockRender(bool lock) { if (lock) { mRenderLock.enter(); } else { mRenderLock.exit(); } }
+   void LockRender(bool lock) { if (lock) { mRenderLock.lock(); } else { mRenderLock.unlock(); } }
    void UpdateFrameRate(float fps) { mFrameRate = fps; }
    float GetFrameRate() const { return mFrameRate; }
-   juce::CriticalSection* GetRenderLock() { return &mRenderLock; }
+   std::recursive_mutex& GetRenderLock() { return mRenderLock; }
    NamedMutex* GetAudioMutex() { return &mAudioThreadMutex; }
    
    IDrawableModule* CreateModule(const ofxJSONElement& moduleInfo);
@@ -342,7 +342,7 @@ private:
    juce::Component* mMainComponent;
    juce::OpenGLContext* mOpenGLContext;
    
-   juce::CriticalSection mRenderLock;
+   std::recursive_mutex mRenderLock;
    float mFrameRate;
    long mFrameCount;
    
@@ -366,8 +366,6 @@ private:
 
    vector<float*> mInputBuffers;
    vector<float*> mOutputBuffers;
-
-   juce::String mClipboard;
 };
 
 extern ModularSynth* TheSynth;

@@ -33,6 +33,8 @@
 #include "PolyphonyMgr.h"
 #include "SingleOscillatorVoice.h"
 
+#include "juce_core/juce_core.h"
+
 KarplusStrongVoice::KarplusStrongVoice(IDrawableModule* owner)
 : mOscPhase(0)
 , mOsc(kOsc_Sin)
