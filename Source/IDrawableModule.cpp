@@ -388,7 +388,7 @@ void IDrawableModule::Render()
    float titleBarHeight;
    float highlight;
    DrawFrame(w,h,true,titleBarHeight,highlight);
-   
+
    if (Minimized() || IsVisible() == false)
       DrawBeacon(30,-titleBarHeight/2);
 

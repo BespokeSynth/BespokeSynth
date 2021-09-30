@@ -119,6 +119,8 @@ private:
    string mVstSearchDirs;
    Checkbox* mShowTooltipsOnLoadCheckbox;
    bool mShowTooltipsOnLoad;
+   Checkbox* mShowMinimapCheckbox;
+   bool mShowMinimap;
    ClickButton* mSaveButton;
    ClickButton* mCancelButton;
 
