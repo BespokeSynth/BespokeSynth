@@ -85,7 +85,8 @@ namespace VSTLookup
       auto types = sPluginList.getTypes();
       for (int i=0; i<types.size(); ++i)
       {
-         vsts.push_back(types[i].fileOrIdentifier.toStdString());
+         //vsts.push_back(types[i].pluginFormatName.toStdString() + ": " + types[i].name.toStdString());
+         vsts.push_back(types[i].name.toStdString());
       }
       
       std::map<string, double> lastUsedTimes;
@@ -142,7 +143,7 @@ namespace VSTLookup
          if (vst.getFileNameWithoutExtension().toStdString() == vstName)
             return types[i].fileOrIdentifier.toStdString();
       }
-      
+      //return vstName;
       return "";
    }
 }
@@ -217,9 +218,7 @@ string VSTPlugin::GetTitleLabel()
 string VSTPlugin::GetPluginName()
 {
    if (mPlugin)
-      return mPluginName;
-   if (mModuleSaveData.HasProperty("vst") && mModuleSaveData.GetString("vst").length() > 0)
-      return GetFileNameWithoutExtension(mModuleSaveData.GetString("vst")).toStdString() + " (not loaded)";
+      return mPlugin->getName().toStdString();
    return "no plugin loaded";
 }
 
@@ -266,7 +265,8 @@ void VSTPlugin::SetVST(string vstName)
    bool found = false;
    for (int i=0; i<types.size(); ++i)
    {
-      if (path == types[i].fileOrIdentifier)
+      //if (path == types[i].fileOrIdentifier)
+       if(path == types[i].name)
       {
          found = true;
          PluginDescription desc = types[i];

@@ -521,11 +521,17 @@ vector<string> ModuleFactory::GetSpawnableModules(char c)
 
    vector<string> vsts;
    VSTLookup::GetAvailableVSTs(vsts, false);
-   for (auto vstFile : vsts)
+/*   for (auto vstFile : vsts)
    {
       string vstName = juce::File(vstFile).getFileName().toStdString();
       if (tolower(vstName[0]) == c)
          modules.push_back(vstName + " " + kVSTSuffix);
+   }
+   */
+     for (auto vstName : vsts)
+   {
+     if (tolower(vstName[0]) == c)
+        modules.push_back(vstName + " " + kVSTSuffix);
    }
 
    vector<string> prefabs;
