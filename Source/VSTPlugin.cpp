@@ -99,7 +99,6 @@ namespace VSTLookup
       auto types = sPluginList.getTypes();
       for (int i=0; i<types.size(); ++i)
       {
-         //vsts.push_back(types[i].pluginFormatName.toStdString() + ": " + types[i].name.toStdString());
          vsts.push_back(types[i].name.toStdString());
       }
       
@@ -146,19 +145,7 @@ namespace VSTLookup
    
    string GetVSTPath(string vstName)
    {
-      if (juce::String(vstName).contains("/") || juce::String(vstName).contains("\\"))  //already a path
-         return vstName;
-      
-      vstName = GetFileNameWithoutExtension(vstName).toStdString();
-      auto types = sPluginList.getTypes();
-      for (int i=0; i<types.size(); ++i)
-      {
-         juce::File vst(types[i].fileOrIdentifier);
-         if (vst.getFileNameWithoutExtension().toStdString() == vstName)
-            return types[i].fileOrIdentifier.toStdString();
-      }
-      //return vstName;
-      return "";
+      return vstName;
    }
 }
 
@@ -279,7 +266,6 @@ void VSTPlugin::SetVST(string vstName)
    bool found = false;
    for (int i=0; i<types.size(); ++i)
    {
-      //if (path == types[i].fileOrIdentifier)
        if(path == types[i].name)
       {
          found = true;
