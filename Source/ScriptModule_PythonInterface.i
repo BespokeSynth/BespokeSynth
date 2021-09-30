@@ -91,12 +91,12 @@ PYBIND11_EMBEDDED_MODULE(bespoke, m) {
    });
    m.def("get_scale", []()
    {
-      return TheScale->GetScalePitches().mScalePitches;
+      return TheScale->GetScalePitches().GetPitches();
    });
    m.def("get_scale_range", [](int octave, int count)
    {
       int root = TheScale->ScaleRoot();
-      auto scalePitches = TheScale->GetScalePitches().mScalePitches;
+      auto scalePitches = TheScale->GetScalePitches().GetPitches();
       size_t numPitches = scalePitches.size();
       vector<int> ret(count);
       for (int i=0; i<count; ++i)
