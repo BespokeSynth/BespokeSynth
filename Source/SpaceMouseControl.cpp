@@ -28,6 +28,8 @@
 #include "SpaceMouseControl.h"
 
 #ifdef BESPOKE_WINDOWS
+#include "juce_core/juce_core.h"
+
 SpaceMouseMessageWindow* SpaceMouseMessageWindow::sInstance = nullptr;
 
 SpaceMouseMessageWindow::SpaceMouseMessageWindow(ModularSynth* theSynth)
@@ -37,10 +39,10 @@ SpaceMouseMessageWindow::SpaceMouseMessageWindow(ModularSynth* theSynth)
 {
    sInstance = this;
 
-   String className("JUCE_");
-   className << String::toHexString(Time::getHighResolutionTicks());
+   juce::String className("JUCE_");
+   className << juce::String::toHexString(juce::Time::getHighResolutionTicks());
 
-   HMODULE moduleHandle = (HMODULE)Process::getCurrentModuleInstanceHandle();
+   HMODULE moduleHandle = (HMODULE)juce::Process::getCurrentModuleInstanceHandle();
 
    WNDCLASSEX wc = { 0 };
    wc.cbSize = sizeof(wc);
@@ -291,6 +293,11 @@ void SpaceMouseMessageWindow::Poll()
          break;
       }
    }
+}
+
+LPCTSTR SpaceMouseMessageWindow::getClassNameFromAtom() const noexcept
+{
+   return (LPCTSTR)(juce::pointer_sized_uint)atom;
 }
 
 #endif

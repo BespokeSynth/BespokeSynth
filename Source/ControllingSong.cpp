@@ -30,6 +30,7 @@
 #include "Transport.h"
 #include "Scale.h"
 #include "FollowingSong.h"
+#include "IAudioReceiver.h"
 
 ControllingSong::ControllingSong()
 : mVolume(.8f)

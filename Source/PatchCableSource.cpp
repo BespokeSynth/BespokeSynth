@@ -33,6 +33,8 @@
 #include "AudioSend.h"
 #include "MacroSlider.h"
 
+#include "juce_gui_basics/juce_gui_basics.h"
+
 namespace
 {
    const int kPatchCableSourceRadius = 5;

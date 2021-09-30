@@ -577,6 +577,7 @@ bool ModuleFactory::IsExperimental(string typeName)
 //static
 void ModuleFactory::GetPrefabs(vector<string>& prefabs)
 {
+   using namespace juce;
    File dir(ofToDataPath("prefabs"));
    Array<File> files;
    dir.findChildFiles(files, File::findFiles, false);

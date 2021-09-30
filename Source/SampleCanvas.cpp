@@ -24,6 +24,7 @@
 //
 
 #include "SampleCanvas.h"
+#include "IAudioReceiver.h"
 #include "IAudioSource.h"
 #include "SynthGlobals.h"
 #include "DrumPlayer.h"

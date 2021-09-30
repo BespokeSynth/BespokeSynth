@@ -26,11 +26,12 @@
 #ifndef __modularSynth__Monome__
 #define __modularSynth__Monome__
 
-#include <JuceHeader.h>
 #include "OpenFrameworksPort.h"
 #include "MidiDevice.h"
 #include "INonstandardController.h"
 #include "Oscillator.h"
+
+#include "juce_osc/juce_osc.h"
 
 #define HOST "127.0.0.1"
 #define SERIAL_OSC_PORT 12002
@@ -40,8 +41,8 @@
 class DropdownList;
 
 class Monome : public INonstandardController,
-               private OSCReceiver,
-               private OSCReceiver::Listener<OSCReceiver::MessageLoopCallback>
+               private juce::OSCReceiver,
+               private juce::OSCReceiver::Listener<juce::OSCReceiver::MessageLoopCallback>
 {
 public:
    Monome(MidiDeviceListener* listener);
@@ -57,7 +58,7 @@ public:
    void ConnectToDevice(string deviceDesc);
    void UpdateDeviceList(DropdownList* list);
    
-   void oscMessageReceived(const OSCMessage& msg) override;
+   void oscMessageReceived(const juce::OSCMessage& msg) override;
    
    void SendValue(int page, int control, float value, bool forceNoteOn = false, int channel = -1)override;
    
@@ -73,14 +74,14 @@ private:
    
    static int sNextMonomeReceivePort;
    
-   OSCSender mToSerialOsc;
-   OSCSender mToMonome;
+   juce::OSCSender mToSerialOsc;
+   juce::OSCSender mToMonome;
    int mMonomeReceivePort;
    bool mIsOscSetUp;
    bool mHasMonome;
    int mMaxColumns;
    int mGridRotation;
-   String mPrefix;
+   juce::String mPrefix;
    bool mJustRequestedDeviceList;
    string mPendingDeviceDesc;
    

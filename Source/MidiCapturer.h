@@ -42,7 +42,7 @@ public:
    
    void SendValue(int page, int control, float value, bool forceNoteOn = false, int channel = -1) override {}
    
-   void SendMidi(const MidiMessage& message);
+   void SendMidi(const juce::MidiMessage& message);
 
    void SaveState(FileStreamOut& out) override;
    void LoadState(FileStreamIn& in) override;
@@ -68,7 +68,7 @@ public:
    
    //INoteReceiver
    void PlayNote(double time, int pitch, int velocity, int voiceIdx = -1, ModulationParameters modulation = ModulationParameters()) override;
-   void SendMidi(const MidiMessage& message) override;
+   void SendMidi(const juce::MidiMessage& message) override;
    
    void LoadLayout(const ofxJSONElement& moduleInfo) override;
    void SetUpFromSaveData() override;
@@ -81,7 +81,7 @@ private:
    
    static const int kRingBufferLength = 1000;
    int mRingBufferPos;
-   MidiMessage mMessages[kRingBufferLength];
+   juce::MidiMessage mMessages[kRingBufferLength];
    list<MidiCapturerDummyController*> mDummyControllers;
    int mPlayhead;
 };

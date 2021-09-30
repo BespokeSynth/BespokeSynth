@@ -27,6 +27,8 @@
 #include "SynthGlobals.h"
 #include "Profiler.h"
 
+#include <cstring>
+
 PitchShifter::PitchShifter(int fftBins)
 : mFFTBins(fftBins)
 , mFFT(mFFTBins)

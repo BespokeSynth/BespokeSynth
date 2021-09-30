@@ -106,9 +106,9 @@ GridControllerMidi::GridControllerMidi()
 , mCols(8)
 , mOwner(nullptr)
 {
-   bzero(mControls, sizeof(int)*MAX_GRIDCONTROLLER_ROWS*MAX_GRIDCONTROLLER_COLS);
-   bzero(mInput, sizeof(float)*MAX_GRIDCONTROLLER_ROWS*MAX_GRIDCONTROLLER_COLS);
-   bzero(mLights, sizeof(int)*MAX_GRIDCONTROLLER_ROWS*MAX_GRIDCONTROLLER_COLS);
+   std::memset(mControls, 0, sizeof(int)*MAX_GRIDCONTROLLER_ROWS*MAX_GRIDCONTROLLER_COLS);
+   std::memset(mInput, 0, sizeof(float)*MAX_GRIDCONTROLLER_ROWS*MAX_GRIDCONTROLLER_COLS);
+   std::memset(mLights, 0, sizeof(int)*MAX_GRIDCONTROLLER_ROWS*MAX_GRIDCONTROLLER_COLS);
 }
 
 void GridControllerMidi::OnControllerPageSelected()

@@ -62,12 +62,7 @@ struct FFTData
       delete[] mTimeDomain;
    }
 
-   void Clear()
-   {
-      bzero(mRealValues, mFreqDomainSize * sizeof(float));
-      bzero(mImaginaryValues, mFreqDomainSize * sizeof(float));
-      bzero(mTimeDomain, mWindowSize * sizeof(float));
-   }
+   void Clear();
 
    int mWindowSize;
    int mFreqDomainSize;

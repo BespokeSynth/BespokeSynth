@@ -35,7 +35,7 @@ MidiCapturerDummyController::MidiCapturerDummyController(MidiDeviceListener* lis
    dynamic_cast<MidiCapturer*>(TheSynth->FindModule("midicapturer"))->AddDummyController(this);
 }
 
-void MidiCapturerDummyController::SendMidi(const MidiMessage& message)
+void MidiCapturerDummyController::SendMidi(const juce::MidiMessage& message)
 {
    MidiDevice::SendMidiMessage(mListener, "midicapturer", message);
 }
@@ -101,10 +101,10 @@ void MidiCapturer::AddDummyController(MidiCapturerDummyController* controller)
    mDummyControllers.push_back(controller);
 }
 
-void MidiCapturer::SendMidi(const MidiMessage& message)
+void MidiCapturer::SendMidi(const juce::MidiMessage& message)
 {
    //ofLog() << message.getDescription();
-   MidiMessage copy = message;
+   auto copy = message;
    copy.setTimeStamp(TheTransport->GetMeasureTime(gTime));
    mMessages[mRingBufferPos] = copy;
    mRingBufferPos = (mRingBufferPos + 1) % kRingBufferLength;

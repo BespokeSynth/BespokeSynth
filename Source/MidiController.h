@@ -310,7 +310,7 @@ public:
    void OnMidiPressure(MidiPressure& pressure) override;
    void OnMidiProgramChange(MidiProgramChange& program) override;
    void OnMidiPitchBend(MidiPitchBend& pitchBend) override;
-   void OnMidi(const MidiMessage& message) override;
+   void OnMidi(const juce::MidiMessage& message) override;
    
    void OnTransportAdvanced(float amount) override;
 

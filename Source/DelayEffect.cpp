@@ -29,6 +29,8 @@
 #include "Profiler.h"
 #include "UIControlMacros.h"
 
+#include "juce_core/juce_core.h"
+
 DelayEffect::DelayEffect()
 : mDelay(500)
 , mFeedback(0)
@@ -123,7 +125,7 @@ void DelayEffect::ProcessAudio(double time, ChannelBuffer* buffer)
             mDelayBuffer.Write(buffer->GetChannel(ch)[i], ch);
 
          float delayInput = delayedSample * mFeedback * (mInvert ? -1 : 1);
-         FIX_DENORMAL(delayInput);
+         JUCE_UNDENORMALISE(delayInput);
          if (delayInput == delayInput) //filter NaNs
             buffer->GetChannel(ch)[i] += delayInput;
 

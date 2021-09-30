@@ -31,6 +31,7 @@
 #include "MidiController.h"
 #include "Profiler.h"
 #include "UIControlMacros.h"
+#include "IAudioReceiver.h"
 
 #define DRUMSYNTH_NO_CUTOFF 10000
 

@@ -21,7 +21,6 @@
 #pragma once
 
 #include "Push2-Display.h"
-#include <JuceHeader.h>
 
 namespace ableton
 {

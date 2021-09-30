@@ -4,3 +4,9 @@
 [submodule "libs/pybind11"]
 	path = libs/pybind11
 	url = https://github.com/pybind/pybind11
+[submodule "libs/tuning-library"]
+	path = libs/tuning-library
+	url = https://github.com/surge-synthesizer/tuning-library
+[submodule "libs/oddsound-mts/MTS-ESP"]
+	path = libs/oddsound-mts/MTS-ESP
+	url = https://github.com/ODDSound/MTS-ESP

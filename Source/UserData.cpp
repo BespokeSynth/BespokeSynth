@@ -1,6 +1,8 @@
 #include "UserData.h"
 #include "OpenFrameworksPort.h"
 
+#include "juce_core/juce_core.h"
+
 void UpdateUserData(string destDirPath)
 {
    juce::File bundledDataDir(ofToResourcePath("userdata_original"));
@@ -19,8 +21,8 @@ void UpdateUserData(string destDirPath)
    }
    else
    {
-      StringArray bundledVersionLines;
-      StringArray destVersionLines;
+      juce::StringArray bundledVersionLines;
+      juce::StringArray destVersionLines;
       bundledDataVersionFile.readLines(bundledVersionLines);
       destDataVersionFile.readLines(destVersionLines);
       if (bundledVersionLines.isEmpty())
@@ -43,14 +45,14 @@ void UpdateUserData(string destDirPath)
       ofLog() << "copying data from "+bundledDataDir.getFullPathName().toStdString()+" to "+destDirPath;
       destDataDir.createDirectory();
       
-      DirectoryIterator directories(bundledDataDir, true, "*", File::findDirectories);
+      juce::DirectoryIterator directories(bundledDataDir, true, "*", juce::File::findDirectories);
       while (directories.next())
       {
          juce::String destDirName = juce::String(destDirPath) + "/" + directories.getFile().getRelativePathFrom(bundledDataDir);
          juce::File(destDirName).createDirectory();
       }
 
-      DirectoryIterator entry(bundledDataDir, true);
+      juce::DirectoryIterator entry(bundledDataDir, true);
       while (entry.next())
       {
          juce::String sourceFileName = entry.getFile().getFullPathName();

@@ -87,7 +87,7 @@ public:
    
    struct SaveVal
    {
-      SaveVal(string prop) : mProperty(prop), mMin(0), mMax(10), mIsTextField(false), mFillDropdownFn(nullptr) { bzero(mString,MAX_TEXTENTRY_LENGTH); }
+      explicit SaveVal(string prop) : mProperty(std::move(prop)), mString(), mMin(0), mMax(10), mIsTextField(false), mFillDropdownFn(nullptr) {}
       
       string mProperty;
       Type mType;

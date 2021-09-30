@@ -31,6 +31,9 @@
 #include "Profiler.h"
 #include "ModulationChain.h"
 
+#include "juce_audio_formats/juce_audio_formats.h"
+#include "juce_gui_basics/juce_gui_basics.h"
+
 const float mBufferX = 5;
 const float mBufferY = 100;
 const float mBufferW = 800;
@@ -304,8 +307,9 @@ void SeaOfGrain::UpdateDisplaySamples()
 
 void SeaOfGrain::LoadFile()
 {
+   using namespace juce;
    FileChooser chooser("Load sample", File(ofToDataPath("samples")),
-                       TheSynth->GetGlobalManagers()->mAudioFormatManager.getWildcardForAllFormats(), true, false, TheSynth->GetMainComponent()->getTopLevelComponent());
+                       TheSynth->GetAudioFormatManager().getWildcardForAllFormats(), true, false, TheSynth->GetMainComponent()->getTopLevelComponent());
    if (chooser.browseForFileToOpen())
    {
       auto file = chooser.getResult();
