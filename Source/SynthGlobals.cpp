@@ -39,9 +39,14 @@
 #include "IPulseReceiver.h"
 #include "exprtk/exprtk.hpp"
 
+#include "juce_audio_formats/juce_audio_formats.h"
+#include "juce_gui_basics/juce_gui_basics.h"
+
 #ifdef JUCE_MAC
 #import <execinfo.h>
 #endif
+
+using namespace juce;
 
 int gBufferSize = -999; //values set in SetGlobalSampleRateAndBufferSize(), setting them to bad values here to highlight any bugs
 int gSampleRate = -999;
@@ -87,7 +92,7 @@ void SynthInit()
    for (int i=0; i<10; ++i)
       gHotBindUIControl[i] = nullptr;
    
-   TheSynth->GetGlobalManagers()->mAudioFormatManager.registerBasicFormats();
+   TheSynth->GetAudioFormatManager().registerBasicFormats();
    
    assert(kNumVoices <= 16);  //assumption that we don't have more voices than midi channels
 }

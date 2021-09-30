@@ -32,7 +32,7 @@
 class NoteDisplayer : public NoteEffectBase, public IDrawableModule
 {
 public:
-   NoteDisplayer();
+   NoteDisplayer() = default;
    static IDrawableModule* Create() { return new NoteDisplayer(); }
    
    string GetTitleLabel() override { return "notedisplayer"; }
@@ -51,7 +51,7 @@ private:
    
    void DrawNoteName(int pitch, float y) const;
    
-   int mVelocities[127];
+   int mVelocities[127]{};
 };
 
 #endif /* defined(__Bespoke__NoteDisplayer__) */

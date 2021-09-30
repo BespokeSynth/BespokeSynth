@@ -25,114 +25,117 @@
 
 #include "FileStream.h"
 #include "ModularSynth.h"
-#include "SynthGlobals.h"
 
-FileStreamOut::FileStreamOut(const char* file)
-: mStream(File(file))
+#include "juce_core/juce_core.h"
+
+FileStreamOut::FileStreamOut(const std::string& file)
+: mStream(std::make_unique<juce::FileOutputStream>(juce::File{file}))
 {
-   mStream.setPosition(0);
-   mStream.truncate();
+   mStream->setPosition(0);
+   mStream->truncate();
 }
 
 FileStreamOut::~FileStreamOut()
 {
-   mStream.flush();
+   mStream->flush();
 }
 
-FileStreamIn::FileStreamIn(const char* file)
-: mStream(File(file))
+FileStreamIn::FileStreamIn(const std::string& file)
+: mStream(std::make_unique<juce::FileInputStream>(juce::File{file}))
 {
 }
+
+FileStreamIn::~FileStreamIn() = default;
 
 FileStreamOut& FileStreamOut::operator<<(const int &var)
 {
-   mStream.write((const void*)&var, sizeof(int));
+   mStream->write(&var, sizeof(int));
    return *this;
 }
 
 FileStreamOut& FileStreamOut::operator<<(const uint32_t &var)
 {
-   mStream.write((const void*)&var, sizeof(uint32_t));
+   mStream->write(&var, sizeof(uint32_t));
    return *this;
 }
 
 FileStreamOut& FileStreamOut::operator<<(const bool &var)
 {
-   mStream.write((const void*)&var, sizeof(bool));
+   mStream->write(&var, sizeof(bool));
    return *this;
 }
 
 FileStreamOut& FileStreamOut::operator<<(const float &var)
 {
-   mStream.write((const void*)&var, sizeof(float));
+   mStream->write(&var, sizeof(float));
    return *this;
 }
 
 FileStreamOut& FileStreamOut::operator<<(const double &var)
 {
-   mStream.write((const void*)&var, sizeof(double));
+   mStream->write(&var, sizeof(double));
    return *this;
 }
 
-FileStreamOut& FileStreamOut::operator<<(const string &var)
+FileStreamOut& FileStreamOut::operator<<(const std::string &var)
 {
    size_t len = var.length();
-   mStream.write((const void*)&len, sizeof(size_t));
+   mStream->write(&len, sizeof(size_t));
    for (int i=0; i<len; ++i)
-      mStream.write((const void*)&var[i], sizeof(char));
+      mStream->write(&var[i], sizeof(char));
    return *this;
 }
 
 FileStreamOut& FileStreamOut::operator<<(const char &var)
 {
-   mStream.write(&var, sizeof(char));
+   mStream->write(&var, sizeof(char));
    return *this;
 }
 
 void FileStreamOut::Write(const float* buffer, int size)
 {
-   mStream.write((const void*)buffer, sizeof(float)*size);
+   mStream->write(buffer, sizeof(float)*size);
 }
 
 void FileStreamOut::WriteGeneric(const void* buffer, int size)
 {
-   mStream.write((const void*)buffer, size);
+   mStream->write(buffer, size);
 }
 
 FileStreamIn& FileStreamIn::operator>>(int &var)
 {
-   mStream.read((void*)&var, sizeof(int));
+   mStream->read(&var, sizeof(int));
    return *this;
 }
 
 FileStreamIn& FileStreamIn::operator>>(uint32_t &var)
 {
-   mStream.read((void*)&var, sizeof(uint32_t));
+   mStream->read(&var, sizeof(uint32_t));
    return *this;
 }
 
 FileStreamIn& FileStreamIn::operator>>(bool &var)
 {
-   mStream.read((void*)&var, sizeof(bool));
+   mStream->read(&var, sizeof(bool));
    return *this;
 }
 
 FileStreamIn& FileStreamIn::operator>>(float &var)
 {
-   mStream.read((void*)&var, sizeof(float));
+   mStream->read(&var, sizeof(float));
    return *this;
 }
 
 FileStreamIn& FileStreamIn::operator>>(double &var)
 {
-   mStream.read((void*)&var, sizeof(double));
+   mStream->read(&var, sizeof(double));
    return *this;
 }
 
-FileStreamIn& FileStreamIn::operator>>(string &var)
+FileStreamIn& FileStreamIn::operator>>(std::string &var)
 {
    size_t len;
-   mStream.read((void*)&len, sizeof(size_t));
+   mStream->read(&len, sizeof(size_t));
    
    if (TheSynth->IsLoadingModule())
       LoadStateValidate(len < 99999);   //probably garbage beyond this point
@@ -141,39 +144,44 @@ FileStreamIn& FileStreamIn::operator>>(string &var)
    
    var.resize(len);
    for (int i=0; i<len; ++i)
-      mStream.read((void*)&var[i], sizeof(char));
+      mStream->read(&var[i], sizeof(char));
    return *this;
 }
 
 FileStreamIn& FileStreamIn::operator>>(char &var)
 {
-   mStream.read(&var, sizeof(char));
+   mStream->read(&var, sizeof(char));
    return *this;
 }
 
 void FileStreamIn::Read(float* buffer, int size)
 {
-   mStream.read((void*)buffer, sizeof(float)*size);
+   mStream->read(buffer, sizeof(float)*size);
 }
 
 void FileStreamIn::ReadGeneric(void* buffer, int size)
 {
-   mStream.read((void*)buffer, size);
+   mStream->read(buffer, size);
 }
                         
 void FileStreamIn::Peek(void* buffer, int size)
 {
-   auto pos = mStream.getPosition();
-   mStream.read((void*)buffer, size);
-   mStream.setPosition(pos);
+   auto pos = mStream->getPosition();
+   mStream->read(buffer, size);
+   mStream->setPosition(pos);
 }
 
-bool FileStreamIn::Eof()
+bool FileStreamIn::Eof() const
 {
-   return mStream.isExhausted();
+   return mStream->isExhausted();
 }
 
-int FileStreamIn::GetFilePosition()
+int FileStreamIn::GetFilePosition() const
 {
-   return (int)mStream.getPosition();
+   return int(mStream->getPosition());
+}
+
+bool FileStreamIn::OpenedOk() const
+{
+   return mStream->openedOk();
 }

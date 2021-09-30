@@ -30,7 +30,7 @@ jobs:
         linux-x64:
           imageName: 'ubuntu-20.04'
           isLinux: True
-          cmakeArguments: "-DCMAKE_BUILD_TYPE=Debug"
+          cmakeArguments: "-GNinja -DCMAKE_BUILD_TYPE=Debug"
           cmakeConfig: "Debug"
 
     pool:
@@ -65,30 +65,27 @@ jobs:
               libxkbcommon-dev \
               libxkbcommon-x11-dev \
               ninja-build \
-              xcb
-
-            # These are the JUCE deps
-            sudo apt-get install -y libgtk-3-dev
-            sudo apt-get install -y libwebkit2gtk-4.0
-            sudo apt-get install -y libwebkit2gtk-4.0-dev
-            sudo apt-get install -y libcurl4-openssl-dev
-            sudo apt-get install -y alsa
-            sudo apt-get install -y alsa-tools
-            sudo apt-get install -y libasound2-dev
-            sudo apt-get install -y libjack-dev
-            sudo apt-get install -y libfreetype6-dev
-            sudo apt-get install -y libxinerama-dev
-            sudo apt-get install -y libxcb-xinerama0
-            sudo apt-get install -y libxinerama1
-            sudo apt-get install -y x11proto-xinerama-dev
-            sudo apt-get install -y libxrandr-dev
-            sudo apt-get install -y libgl1-mesa-dev
-            sudo apt-get install -y libxcursor-dev
-            sudo apt-get install -y libxcursor1
-            sudo apt-get install -y libxcb-cursor-dev
-            sudo apt-get install -y libxcb-cursor0
-            sudo apt-get install -y libusb-1.0.0-dev 
-            sudo apt-get install -y --fix-missing
+              xcb \
+              libgtk-3-dev \
+              libwebkit2gtk-4.0 \
+              libwebkit2gtk-4.0-dev \
+              libcurl4-openssl-dev \
+              alsa \
+              alsa-tools \
+              libasound2-dev \
+              libjack-dev \
+              libfreetype6-dev \
+              libxinerama-dev \
+              libxcb-xinerama0 \
+              libxinerama1 \
+              x11proto-xinerama-dev \
+              libxrandr-dev \
+              libgl1-mesa-dev \
+              libxcursor-dev \
+              libxcursor1 \
+              libxcb-cursor-dev \
+              libxcb-cursor0 \
+              libusb-1.0.0-dev
 
         condition: variables.isLinux
         displayName: linux - run apt-get
@@ -100,5 +97,5 @@ jobs:
 
       - bash: |
           set -e
-          cmake --build build --config $(cmakeConfig) --parallel 8
+          cmake --build build --config $(cmakeConfig)
         displayName: all - build with cmake

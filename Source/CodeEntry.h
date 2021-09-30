@@ -77,6 +77,8 @@ public:
    ofVec2f GetLinePos(int lineNum, bool end, bool published = true);
    float GetCharHeight() const { return mCharHeight; }
    float GetCharWidth() const { return mCharWidth; }
+
+   void SetStyleFromJSON(const ofxJSONElement &vdict);
    
 protected:
    ~CodeEntry();   //protected so that it can't be created on the stack
@@ -166,4 +168,24 @@ private:
    bool mWantToShowAutocomplete;
    int mAutocompleteHighlightIndex;
    bool mCodeUpdated;
+
+
+   // Style Sheet
+   ofColor currentBg{60,60,60}, publishedBg{25,35,25}, unpublishedBg{35,35,35};
+   ofColor stringColor{(int)(0.9*255), (int)(0.7*255), (int)(0.6*255), 255};
+   ofColor numberColor{(int)(0.9*255), (int)(0.9*255), (int)(1.0*255), 255};
+   ofColor name1Color{(int)(0.4*255), (int)(0.9*255), (int)(0.8*255), 255};
+   ofColor name2Color{(int)(0.7*255), (int)(0.9*255), (int)(0.3*255), 255};
+   ofColor name3Color{(int)(0.3*255), (int)(0.9*255), (int)(0.4*255), 255};
+   ofColor definedColor{(int)(0.6*255), (int)(1.0*255), (int)(0.9*255), 255};
+   ofColor equalsColor{(int)(0.9*255), (int)(0.7*255), (int)(0.6*255), 255};
+   ofColor parenColor{(int)(0.6*255), (int)(0.5*255), (int)(0.9*255), 255};
+   ofColor braceColor{(int)(0.4*255), (int)(0.5*255), (int)(0.7*255), 255};
+   ofColor bracketColor{(int)(0.5*255), (int)(0.8*255), (int)(0.7*255), 255};
+   ofColor opColor{(int)(0.9*255), (int)(0.3*255), (int)(0.6*255), 255};
+   ofColor commaColor{(int)(0.5*255), (int)(0.6*255), (int)(0.5*255), 255};
+   ofColor commentColor{(int)(0.5*255), (int)(0.5*255), (int)(0.5*255), 255};
+   ofColor unknownColor = ofColor::white;
+
+   float mFontSize = 14;
 };

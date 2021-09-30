@@ -30,6 +30,8 @@
 #include "PolyphonyMgr.h"
 #include "ChordDatabase.h"
 
+#include <cstring>
+
 Chorder::Chorder()
 : mVelocity(0)
 , mDiatonic(false)
@@ -39,8 +41,8 @@ Chorder::Chorder()
 , mChordIndex(0)
 , mInversion(0)
 {
-   bzero(mHeldCount, TOTAL_NUM_NOTES*sizeof(int));
-   bzero(mInputNotes, TOTAL_NUM_NOTES*sizeof(bool));
+   std::memset(mHeldCount, 0, TOTAL_NUM_NOTES*sizeof(int));
+   std::memset(mInputNotes, 0, TOTAL_NUM_NOTES*sizeof(bool));
 }
 
 void Chorder::CreateUIControls()
@@ -151,8 +153,8 @@ void Chorder::CheckboxUpdated(Checkbox *checkbox)
    if (checkbox == mEnabledCheckbox)
    {
       mNoteOutput.Flush(gTime + gBufferSizeMs);
-      bzero(mHeldCount,TOTAL_NUM_NOTES*sizeof(int));
-      bzero(mInputNotes, TOTAL_NUM_NOTES*sizeof(bool));
+      std::memset(mHeldCount, 0, TOTAL_NUM_NOTES*sizeof(int));
+      std::memset(mInputNotes, 0, TOTAL_NUM_NOTES*sizeof(bool));
    }
    
    if (checkbox == mDiatonicCheckbox)

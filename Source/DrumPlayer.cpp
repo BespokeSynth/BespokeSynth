@@ -34,6 +34,8 @@
 #include "UIControlMacros.h"
 #include "SamplePlayer.h"
 
+using namespace juce;
+
 DrumPlayer::DrumPlayer()
 : mSpeed(1)
 , mSpeedRandomization(0)

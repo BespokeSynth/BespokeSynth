@@ -27,6 +27,8 @@
 #include "SynthGlobals.h"
 #include "FileStream.h"
 
+#include <cstring>
+
 UIGrid::UIGrid(int x, int y, int w, int h, int cols, int rows, IClickable* parent)
 : mClick(false)
 , mWidth(w)
@@ -52,7 +54,7 @@ UIGrid::UIGrid(int x, int y, int w, int h, int cols, int rows, IClickable* paren
    SetGrid(cols,rows);
    Clear();
    SetParent(parent);
-   bzero(mDrawOffset, MAX_GRID_SIZE*sizeof(float));
+   std::memset(mDrawOffset, 0, MAX_GRID_SIZE*sizeof(float));
 }
 
 UIGrid::~UIGrid()
@@ -67,7 +69,7 @@ void UIGrid::Init(int x, int y, int w, int h, int cols, int rows, IClickable* pa
    SetGrid(cols,rows);
    Clear();
    SetParent(parent);
-   bzero(mDrawOffset, MAX_GRID_SIZE*sizeof(float));
+   std::memset(mDrawOffset, 0, MAX_GRID_SIZE*sizeof(float));
 }
 
 void UIGrid::Render()

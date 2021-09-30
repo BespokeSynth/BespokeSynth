@@ -23,6 +23,14 @@ project(BespokeSynth VERSION 1.0.1 LANGUAGES C CXX ASM)
 
 message(STATUS "Bespoke: Build Type: ${CMAKE_BUILD_TYPE}")
 
+# Global compile options
+add_compile_options(
+    # Build with Multiple Processes on Visual Studio
+    $<$<CXX_COMPILER_ID:MSVC>:/MP>
+    # Set source and executable charsets to UTF-8. Required for building on CJK Windows.
+    $<$<CXX_COMPILER_ID:MSVC>:/utf-8>
+    )
+
 if(BESPOKE_PYTHON_ROOT)
     set(Python_ROOT "${BESPOKE_PYTHON_ROOT}")
     message( STATUS "Bespoke: Overriding Python_ROOT to ${Python_ROOT}")
@@ -58,6 +66,8 @@ add_subdirectory(libs/leathers)
 add_subdirectory(libs/json)
 add_subdirectory(libs/nanovg)
 
+add_subdirectory(libs/tuning-library EXCLUDE_FROM_ALL)
+add_subdirectory(libs/oddsound-mts EXCLUDE_FROM_ALL)
 
 # Generate build time info for the cpp
 configure_file(${CMAKE_SOURCE_DIR}/Source/VersionInfo.cpp.in
@@ -404,7 +414,6 @@ juce_add_gui_app(BespokeSynth
         DOCUMENT_BROWSER_ENABLED        TRUE
         )
 
-juce_generate_juce_header(BespokeSynth)
 target_sources(BespokeSynth PRIVATE ${BESPOKE_SOURCE_LIST})
 target_include_directories(BespokeSynth PRIVATE
         Source
@@ -585,13 +594,19 @@ target_link_libraries(BespokeSynth PRIVATE
         bespoke::nanovg
         bespoke::xwax
         bespoke::leathers
+
         pybind11::pybind11
+
+        tuning-library
+        oddsound-mts
+
         juce::juce_audio_basics
         juce::juce_audio_devices
         juce::juce_audio_formats
         juce::juce_audio_processors
         juce::juce_opengl
         juce::juce_osc
-        juce::juce_gui_basics)
+        juce::juce_gui_basics
+        )
 
 target_link_libraries(BespokeSynth PRIVATE ${Python_LIBRARIES})

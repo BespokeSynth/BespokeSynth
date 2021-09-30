@@ -30,6 +30,8 @@
 #include "INoteReceiver.h"
 #include "ModuleContainer.h"
 
+#include <cstring>
+
 ModuleSaveDataPanel* TheSaveDataPanel = nullptr;
 
 const float itemSpacing = 20;

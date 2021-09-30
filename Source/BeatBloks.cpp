@@ -30,6 +30,11 @@
 #include "ModularSynth.h"
 #include "Profiler.h"
 
+#ifdef _WIN32
+#define popen _popen
+#define pclose _pclose
+#endif
+
 const float mBufferX = 5;
 const float mBufferY = 80;
 const float mBufferW = 900;
@@ -297,7 +302,7 @@ void BeatBloks::FilesDropped(vector<string> files, int x, int y)
    string cachedFilename = tokens[tokens.size()-1].c_str();
    tokens = ofSplitString(cachedFilename, ".");
    cachedFilename = tokens[0]+".cached";
-   bool hasCached = File(ofToDataPath(cachedFilename)).existsAsFile();
+   bool hasCached = juce::File(ofToDataPath(cachedFilename)).existsAsFile();
    
    ofLog() << cachedFilename << " exists: " << (hasCached ? "true" : "false");
    
@@ -316,8 +321,7 @@ void BeatBloks::FilesDropped(vector<string> files, int x, int y)
    }
    
    char c;
-   char line[512];
-   bzero(line,512);
+   char line[512]{};
    int linepos = 0;
    do
    {
@@ -330,7 +334,7 @@ void BeatBloks::FilesDropped(vector<string> files, int x, int y)
          ReadEchonestLine(line);
          
          linepos = 0;
-         bzero(line,512);
+         std::memset(line, 0, sizeof(line));
       }
       else
       {

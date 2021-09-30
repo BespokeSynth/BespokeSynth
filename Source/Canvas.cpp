@@ -603,8 +603,9 @@ void Canvas::SetRowColor(int row, ofColor color)
       mRowColors[row] = color;
 }
 
-MouseCursor Canvas::GetMouseCursorType()
+juce::MouseCursor Canvas::GetMouseCursorType()
 {
+   using juce::MouseCursor;
    if (GetKeyModifiers() & kModifier_Shift)
       return MouseCursor::CopyingCursor;
    if (GetKeyModifiers() & kModifier_Alt)

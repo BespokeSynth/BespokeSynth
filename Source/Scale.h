@@ -79,10 +79,15 @@ struct ScalePitches
    int NumPitchesInScale() const { return (int)mScalePitches.size(); }
 };
 
-class Scale : public IDrawableModule, public IDropdownListener, public IFloatSliderListener, public IIntSliderListener, public ITextEntryListener
+class MTSClient;
+
+class Scale : public IDrawableModule, public IDropdownListener,
+        public IFloatSliderListener, public IIntSliderListener, public ITextEntryListener,
+        public IButtonListener
 {
 public:
    Scale();
+   ~Scale();
    void Init() override;
    
    string GetTitleLabel() override { return "scale"; }
@@ -115,7 +120,7 @@ public:
    string GetScaleName(int index) { return mScales[index].mName; }
    int NumPitchesInScale() const { return mScale.NumPitchesInScale(); }
    int GetTet() const { return mTet; }
-   
+
    float PitchToFreq(float pitch);
    float FreqToPitch(float freq);
    
@@ -127,6 +132,11 @@ public:
    void CheckboxUpdated(Checkbox* checkbox) override;
    void TextEntryComplete(TextEntry* entry) override;
 
+   void ButtonClicked(ClickButton *button) override;
+
+   void SaveState(FileStreamOut& out) override;
+   void LoadState(FileStreamIn& in) override;
+
 private:
    struct ScaleInfo
    {
@@ -136,7 +146,7 @@ private:
    
    //IDrawableModule
    void DrawModule() override;
-   void GetModuleDimensions(float& width, float& height) override { width = 164; height = 62; }
+   void GetModuleDimensions(float& width, float& height) override { width = 164; height = 82; }
    bool Enabled() const override { return true; }
    
    void NotifyListeners();
@@ -151,7 +161,9 @@ private:
       kIntonation_Just,
       kIntonation_Pythagorean,
       kIntonation_Meantone,
-      kIntonation_Rational
+      kIntonation_Rational,
+      kIntonation_SCLKBM,
+      kIntonation_ODDSOUNDMTS
    };
    
    ScalePitches mScale;
@@ -160,6 +172,9 @@ private:
    DropdownList* mScaleSelector;
    IntSlider* mScaleDegreeSlider;
    int mScaleDegree;
+
+   ClickButton* mLoadSCL{nullptr};
+   ClickButton* mLoadKBM{nullptr};
    
    vector<ScaleInfo> mScales;
    int mNumSeptatonicScales;
@@ -177,6 +192,10 @@ private:
    float mTuningTable[256];
    
    ChordDatabase mChordDatabase;
+
+   MTSClient *oddsound_mts_client{nullptr};
+
+   std::string mSclContents, mKbmContents;
 };
 
 extern Scale* TheScale;

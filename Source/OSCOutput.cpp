@@ -106,7 +106,7 @@ void OSCOutput::PlayNote(double time, int pitch, int velocity, int voiceIdx, Mod
 {
    if (mNoteOutLabel.size() > 0)
    {
-      OSCMessage msg(("/bespoke/"+mNoteOutLabel).c_str());
+      juce::OSCMessage msg(("/bespoke/"+mNoteOutLabel).c_str());
       float pitchOut = pitch;
       if (modulation.pitchBend != nullptr)
          pitchOut += modulation.pitchBend->GetValue(0);
@@ -118,21 +118,21 @@ void OSCOutput::PlayNote(double time, int pitch, int velocity, int voiceIdx, Mod
 
 void OSCOutput::SendFloat(string address, float val)
 {
-   OSCMessage msg(address.c_str());
+   juce::OSCMessage msg(address.c_str());
    msg.addFloat32(val);
    mOscOut.send(msg);
 }
 
 void OSCOutput::SendInt(string address, int val)
 {
-   OSCMessage msg(address.c_str());
+   juce::OSCMessage msg(address.c_str());
    msg.addInt32(val);
    mOscOut.send(msg);
 }
 
 void OSCOutput::SendString(string address, string val)
 {
-   OSCMessage msg(address.c_str());
+   juce::OSCMessage msg(address.c_str());
    msg.addString(val);
    mOscOut.send(msg);
 }
@@ -149,7 +149,7 @@ void OSCOutput::FloatSliderUpdated(FloatSlider* slider, float oldVal)
    address[0] = 0;
    strcat(address, "/bespoke/");
    strcat(address, slider->Name());
-   OSCMessage msg(address);
+   juce::OSCMessage msg(address);
    msg.addFloat32(slider->GetValue());
    mOscOut.send(msg);
 }

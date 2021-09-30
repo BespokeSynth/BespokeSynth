@@ -34,6 +34,8 @@
 #include "Slider.h"
 #include "INoteReceiver.h"
 
+#include "juce_osc/juce_osc.h"
+
 #define OSC_OUTPUT_MAX_PARAMS 50
 
 class OSCOutput : public IDrawableModule, public ITextEntryListener, public IFloatSliderListener, public INoteReceiver
@@ -82,7 +84,7 @@ private:
    string mNoteOutLabel;
    TextEntry* mNoteOutLabelEntry;
    
-   OSCSender mOscOut;
+   juce::OSCSender mOscOut;
 
    float mWidth;
    float mHeight;

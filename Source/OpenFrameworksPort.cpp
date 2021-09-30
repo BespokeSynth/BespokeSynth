@@ -35,8 +35,9 @@
 #include <CoreFoundation/CoreFoundation.h>
 #endif
 
-#include <JuceHeader.h>
+#include "juce_opengl/juce_opengl.h"
 using namespace juce::gl;
+using namespace juce;
 #include <VersionInfo.h>
 
 //#include <chrono>
@@ -535,19 +536,6 @@ vector<string> ofSplitString(string str, string splitter, bool ignoreEmpty, bool
 bool ofIsStringInString(const string& haystack, const string& needle)
 {
    return ( strstr(haystack.c_str(), needle.c_str() ) != nullptr );
-}
-
-String GetFileNameWithoutExtension(String fullPath)
-{
-   auto lastSlash = fullPath.lastIndexOfChar('/') + 1;
-   if (lastSlash == 0)
-      lastSlash = fullPath.lastIndexOfChar('\\') + 1;
-   auto lastDot   = fullPath.lastIndexOfChar ('.');
-
-   if (lastDot > lastSlash)
-     return fullPath.substring (lastSlash, lastDot);
-
-   return fullPath.substring (lastSlash);
 }
 
 void ofScale(float x, float y, float z)

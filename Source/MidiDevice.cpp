@@ -29,6 +29,8 @@
 
 #include <string.h>
 
+using namespace juce;
+
 MidiDevice::MidiDevice(MidiDeviceListener* listener)
    : mListener(listener)
    , mMidiOut(nullptr)
@@ -39,7 +41,7 @@ MidiDevice::MidiDevice(MidiDeviceListener* listener)
 
 MidiDevice::~MidiDevice()
 {
-   AudioDeviceManager& deviceManager = TheSynth->GetGlobalManagers()->mDeviceManager;
+   auto& deviceManager = TheSynth->GetAudioDeviceManager();
    deviceManager.removeMidiInputCallback(mDeviceNameIn, this);
    if (mMidiOut.get())
       mMidiOut->stopBackgroundThread();
@@ -51,11 +53,11 @@ bool MidiDevice::ConnectInput(const char* name)
    
    mDeviceNameIn = name;
    
-   AudioDeviceManager& deviceManager = TheSynth->GetGlobalManagers()->mDeviceManager;
+   auto& deviceManager = TheSynth->GetAudioDeviceManager();
    deviceManager.setMidiInputEnabled(mDeviceNameIn, true);
    deviceManager.addMidiInputCallback(mDeviceNameIn, this);
    
-   mIsInputEnabled = TheSynth->GetGlobalManagers()->mDeviceManager.isMidiInputEnabled(mDeviceNameIn);
+   mIsInputEnabled = deviceManager.isMidiInputEnabled(mDeviceNameIn);
    
    TheSynth->AddMidiDevice(this);   //TODO(Ryan) need better place for this, but constructor is too early
    
@@ -103,7 +105,7 @@ void MidiDevice::ConnectOutput(int index, int channel /*= 1*/)
 
 void MidiDevice::DisconnectInput()
 {
-   AudioDeviceManager& deviceManager = TheSynth->GetGlobalManagers()->mDeviceManager;
+   auto& deviceManager = TheSynth->GetAudioDeviceManager();
    deviceManager.setMidiInputEnabled(mDeviceNameIn, false);
    deviceManager.removeMidiInputCallback(mDeviceNameIn, this);
 }
@@ -140,7 +142,7 @@ bool MidiDevice::IsInputConnected(bool immediate)
    for (auto& device : sConnectedInputDevices)
    {
       if (device.name == mDeviceNameIn)
-         return TheSynth->GetGlobalManagers()->mDeviceManager.isMidiInputDeviceEnabled(device.identifier);
+         return TheSynth->GetAudioDeviceManager().isMidiInputDeviceEnabled(device.identifier);
    }
    return false;
 }

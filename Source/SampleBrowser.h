@@ -56,12 +56,12 @@ private:
    bool Enabled() const override { return true; }
    void GetModuleDimensions(float& width, float& height) override { width=300; height=38+(int)mButtons.size()*17; }
    
-   void SetDirectory(String dirPath);
+   void SetDirectory(juce::String dirPath);
    int GetNumPages() const;
    void ShowPage(int page);
    
-   String mCurrentDirectory;
-   StringArray mDirectoryListing;
+   juce::String mCurrentDirectory;
+   juce::StringArray mDirectoryListing;
    std::array<ClickButton*, 30> mButtons;
    ClickButton* mBackButton;
    ClickButton* mForwardButton;

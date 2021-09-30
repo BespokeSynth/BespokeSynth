@@ -29,11 +29,11 @@
  #pragma clang diagnostic ignored "-Wreorder"
 #endif
 
-#include <JuceHeader.h>
 #include "OpenFrameworksPort.h"
 #include <map>
 #include <list>
 #include <vector>
+#include <algorithm>
 #include <array>
 #include <math.h>
 #include <cctype>
@@ -62,11 +62,6 @@ void* operator new[](std::size_t size, const char *file, int line) throw(std::ba
 #define FTWO_PI   6.28318530717958647693f
 
 #define USE_VECTOR_OPS
-
-#if JUCE_WINDOWS
-#define popen _popen
-#define pclose _pclose
-#endif
 
 //bool labeling technique that I stole from Ableton
 #define K(x) true
@@ -116,12 +111,6 @@ extern bool gShowDevModules;
 extern float gCornerRoundness;
 extern std::random_device gRandomDevice;
 extern std::mt19937 gRandom;
-
-struct GlobalManagers
-{
-   AudioDeviceManager mDeviceManager;
-   AudioFormatManager mAudioFormatManager;
-};
 
 enum OscillatorType
 {
@@ -266,15 +255,6 @@ struct Vec2i
    int x;
    int y;
 };
-
-#ifdef JUCE_WINDOWS
-inline void bzero(void* mem, size_t size)
-{
-   memset(mem, 0, size);
-}
-#endif
-
-#define FIX_DENORMAL(p) JUCE_UNDENORMALISE(p)
 
 class ofLog
 {

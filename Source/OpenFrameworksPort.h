@@ -1,6 +1,5 @@
 #pragma once
 
-#include <JuceHeader.h>
 #include <iostream>
 #include <sstream>
 #include <iomanip>
@@ -8,6 +7,8 @@
 #include <map>
 #include <vector>
 #include <list>
+#include <cmath>
+#include <mutex>
 
 using namespace std;
 
@@ -142,19 +143,7 @@ struct ofRectangle
    float height;
 };
 
-class ofMutex
-{
-public:
-   void lock()
-   {
-      mCritSec.enter();
-   }
-   void unlock()
-   {
-      mCritSec.exit();
-   }
-   CriticalSection mCritSec;
-};
+using ofMutex = std::recursive_mutex;
 
 #define CLAMP(v,a,b) (v<a ? a : (v>b ? b : v))
 
@@ -162,14 +151,14 @@ public:
 #define MAX(a,b) (a>b?a:b)
 #define MIN(a,b) (a<b?a:b)
 
-#define OF_KEY_RETURN KeyPress::returnKey
-#define OF_KEY_TAB KeyPress::tabKey
-#define OF_KEY_BACKSPACE KeyPress::backspaceKey
-#define OF_KEY_LEFT KeyPress::leftKey
-#define OF_KEY_RIGHT KeyPress::rightKey
-#define OF_KEY_ESC KeyPress::escapeKey
-#define OF_KEY_UP KeyPress::upKey
-#define OF_KEY_DOWN KeyPress::downKey
+#define OF_KEY_RETURN juce::KeyPress::returnKey
+#define OF_KEY_TAB juce::KeyPress::tabKey
+#define OF_KEY_BACKSPACE juce::KeyPress::backspaceKey
+#define OF_KEY_LEFT juce::KeyPress::leftKey
+#define OF_KEY_RIGHT juce::KeyPress::rightKey
+#define OF_KEY_ESC juce::KeyPress::escapeKey
+#define OF_KEY_UP juce::KeyPress::upKey
+#define OF_KEY_DOWN juce::KeyPress::downKey
 
 template <class T>
 inline std::string ofToString(const T& value)
@@ -186,51 +175,6 @@ inline std::string ofToString(const T& value, int precision)
    out << std::fixed << std::setprecision(precision) << value;
    return out.str();
 }
-
-namespace Poco
-{
-   namespace FastMutex
-   {
-      class ScopedLock
-      {
-      public:
-         ScopedLock(ofMutex& mutex)
-         : mMutex(&mutex)
-         {
-            mMutex->lock();
-         }
-         ~ScopedLock()
-         {
-            mMutex->unlock();
-         }
-      private:
-         ofMutex* mMutex;
-      };
-   }
-}
-
-
-
-struct ofDragInfo
-{
-   vector<string> files;
-};
-
-struct ofMessage
-{
-   
-};
-
-
-
-class ofSoundStream
-{
-public:
-   void setup(void*, int outChannels, int inChannels, int sampleRate, int bufferSize, int numBuffers) {}
-   int getTickCount() { return 0; }
-   int GetLastStarvationTick() { return 0; }
-   void stop() {}
-};
 
 #define PI 3.14159265358979323846
 #define TWO_PI 6.28318530717958647693
@@ -253,17 +197,6 @@ private:
    bool mLoaded;
    string mFontPath;
 };
-
-struct ofFileDialogResult
-{
-   bool bSuccess;
-   string filePath;
-};
-
-struct ofEventArgs
-{
-};
-
 
 typedef ofVec2f ofPoint;
 
@@ -310,7 +243,6 @@ float ofLerp(float start, float stop, float amt);
 float ofDistSquared(float x1, float y1, float x2, float y2);
 vector<string> ofSplitString(string str, string splitter, bool ignoreEmpty = false, bool trim = false);
 bool ofIsStringInString(const string& haystack, const string& needle);
-String GetFileNameWithoutExtension(String fullPath);
 void ofScale(float x, float y, float z);
 void ofExit();
 void ofToggleFullscreen();

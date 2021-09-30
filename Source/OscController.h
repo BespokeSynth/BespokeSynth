@@ -31,6 +31,8 @@
 #include "INonstandardController.h"
 #include "ofxJSONElement.h"
 
+#include "juce_osc/juce_osc.h"
+
 struct OscMap
 {
    int mControl;
@@ -42,15 +44,15 @@ struct OscMap
 };
 
 class OscController : public INonstandardController,
-                      private OSCReceiver,
-                      private OSCReceiver::Listener<OSCReceiver::MessageLoopCallback>
+                      private juce::OSCReceiver,
+                      private juce::OSCReceiver::Listener<juce::OSCReceiver::MessageLoopCallback>
 {
 public:
    OscController(MidiDeviceListener* listener, string outAddress, int outPort, int inPort);
    ~OscController();
    
    void Connect();
-   void oscMessageReceived(const OSCMessage& msg) override;
+   void oscMessageReceived(const juce::OSCMessage& msg) override;
    void SendValue(int page, int control, float value, bool forceNoteOn = false, int channel = -1) override;
    int AddControl(string address, bool isFloat);
    
@@ -71,7 +73,7 @@ private:
    string mOutAddress;
    int mOutPort;
    int mInPort;
-   OSCSender mOscOut;
+   juce::OSCSender mOscOut;
    bool mConnected;
    bool mOutputConnected;
    

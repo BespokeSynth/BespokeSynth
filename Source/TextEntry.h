@@ -85,7 +85,7 @@ public:
    void DrawLabel(bool draw) { mDrawLabel = draw; }
    void SetRequireEnter(bool require) { mRequireEnterToAccept = require; }
    void SetFlexibleWidth(bool flex) { mFlexibleWidth = flex; }
-   void ClearInput() { bzero(mString, MAX_TEXTENTRY_LENGTH); mCaretPosition = 0; }
+   void ClearInput();
    const char* GetText() const { return mString; }
    
    void GetDimensions(float& width, float& height) override;
