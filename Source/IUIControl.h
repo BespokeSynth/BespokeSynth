@@ -56,7 +56,7 @@ public:
    virtual float GetValue() const { return 0; }
    virtual float GetMidiValue() const { return 0; }
    virtual int GetNumValues() { return 0; } //the number of distinct values that you can have for this control, zero indicates infinite (like a float slider)
-   virtual string GetDisplayValue(float val) const { return "unimplemented"; }
+   virtual std::string GetDisplayValue(float val) const { return "unimplemented"; }
    virtual void Init() {}
    virtual void Poll() {}
    virtual void KeyPressed(int key, bool isRepeat) {}

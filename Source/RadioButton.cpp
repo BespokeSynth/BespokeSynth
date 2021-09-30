@@ -311,7 +311,7 @@ float RadioButton::GetMidiValue() const
    return mSliderVal;
 }
 
-string RadioButton::GetDisplayValue(float val) const
+std::string RadioButton::GetDisplayValue(float val) const
 {
    if (mMultiSelect)
       return "multiselect";

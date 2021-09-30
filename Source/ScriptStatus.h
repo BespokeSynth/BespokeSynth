@@ -41,7 +41,7 @@ public:
    
    void Poll() override;
    
-   string GetTitleLabel() override { return "script status"; }
+   std::string GetTitleLabel() override { return "script status"; }
    void CreateUIControls() override;
    
    void ButtonClicked(ClickButton* button) override;
@@ -63,7 +63,7 @@ private:
    
    ClickButton* mResetAll;
    
-   string mStatus;
+   std::string mStatus;
    double mNextUpdateTime;
    
    float mWidth;

@@ -49,7 +49,7 @@ public:
    ~NoteSinger();
    static IDrawableModule* Create() { return new NoteSinger(); }
    
-   string GetTitleLabel() override;
+   std::string GetTitleLabel() override;
    void CreateUIControls() override;
    void Init() override;
 

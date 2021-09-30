@@ -47,7 +47,7 @@ public:
    ~SampleFinder();
    static IDrawableModule* Create() { return new SampleFinder(); }
    
-   string GetTitleLabel() override { return "sample finder"; }
+   std::string GetTitleLabel() override { return "sample finder"; }
    void CreateUIControls() override;
    
    //INoteReceiver
@@ -59,7 +59,7 @@ public:
    void SetEnabled(bool enabled) override { mEnabled = enabled; }
    
    //IDrawableModule
-   void FilesDropped(vector<string> files, int x, int y) override;
+   void FilesDropped(std::vector<std::string> files, int x, int y) override;
    
    bool MouseScrolled(int x, int y, float scrollX, float scrollY) override;
    

@@ -100,7 +100,7 @@ public:
 
    const char* Name() { return mIsInputEnabled ? mDeviceNameIn.toRawUTF8() : mDeviceNameOut.toRawUTF8(); }
    
-   vector<string> GetPortList(bool forInput);
+   std::vector<std::string> GetPortList(bool forInput);
    
    void SendNote(double time, int pitch, int velocity, bool forceNoteOn, int channel);
    void SendCC(int ctl, int value, int channel = -1);
@@ -117,7 +117,7 @@ private:
    juce::String mDeviceNameIn;
    juce::String mDeviceNameOut;
    
-   unique_ptr<juce::MidiOutput> mMidiOut;
+   std::unique_ptr<juce::MidiOutput> mMidiOut;
    MidiDeviceListener* mListener;
    int mOutputChannel;
    bool mIsInputEnabled;

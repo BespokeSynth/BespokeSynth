@@ -94,7 +94,7 @@ void ModulatorAddCentered::SaveLayout(ofxJSONElement& moduleInfo)
 {
    IDrawableModule::SaveLayout(moduleInfo);
    
-   string targetPath = "";
+   std::string targetPath = "";
    if (mTarget)
       targetPath = mTarget->Path();
    

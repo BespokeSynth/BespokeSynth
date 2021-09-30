@@ -87,7 +87,7 @@ public:
    PatchCableSource(IDrawableModule* owner, ConnectionType type);
    virtual ~PatchCableSource();
    PatchCable* AddPatchCable(IClickable* target);
-   const vector<PatchCable*>& GetPatchCables() const { return mPatchCables; }
+   const std::vector<PatchCable*>& GetPatchCables() const { return mPatchCables; }
    void Clear();
    void FindValidTargets();
    bool IsValidTarget(IClickable* target) const;
@@ -102,8 +102,8 @@ public:
    void RemovePatchCable(PatchCable* cable);
    void ClearPatchCables();
    void SetPatchCableTarget(PatchCable* cable, IClickable* target, bool fromUserClick);
-   const vector<INoteReceiver*>& GetNoteReceivers() const { return mNoteReceivers; }
-   const vector<IPulseReceiver*>& GetPulseReceivers() const { return mPulseReceivers; }
+   const std::vector<INoteReceiver*>& GetNoteReceivers() const { return mNoteReceivers; }
+   const std::vector<IPulseReceiver*>& GetPulseReceivers() const { return mPulseReceivers; }
    IAudioReceiver* GetAudioReceiver() const { return mAudioReceiver; }
    IClickable* GetTarget() const;
    void SetTarget(IClickable* target);
@@ -114,7 +114,7 @@ public:
    ofColor GetColor() const { return mColor; }
    void SetEnabled(bool enabled) { mEnabled = enabled; }
    bool Enabled() const;
-   void AddTypeFilter(string type) { mTypeFilter.push_back(type); }
+   void AddTypeFilter(std::string type) { mTypeFilter.push_back(type); }
    void ClearTypeFilter() { mTypeFilter.clear(); }
    void SetManualSide(Side side) { mManualSide = side; }
    void SetClickable(bool clickable) { mClickable = clickable; }
@@ -149,7 +149,7 @@ private:
    bool InAddCableMode() const;
    int GetHoverIndex(float x, float y) const;
    
-   vector<PatchCable*> mPatchCables;
+   std::vector<PatchCable*> mPatchCables;
    int mHoverIndex; //-1 = not hovered
    ConnectionType mType;
    bool mAllowMultipleTargets;
@@ -168,12 +168,12 @@ private:
    bool mHasOverrideCableDir;
    ofVec2f mOverrideCableDir;
    
-   vector<INoteReceiver*> mNoteReceivers;
-   vector<IPulseReceiver*> mPulseReceivers;
+   std::vector<INoteReceiver*> mNoteReceivers;
+   std::vector<IPulseReceiver*> mPulseReceivers;
    IAudioReceiver* mAudioReceiver;
    
-   vector<string> mTypeFilter;
-   vector<IClickable*> mValidTargets;
+   std::vector<std::string> mTypeFilter;
+   std::vector<IClickable*> mValidTargets;
    
    NoteHistory mNoteHistory;
    double mLastOnEventTime;

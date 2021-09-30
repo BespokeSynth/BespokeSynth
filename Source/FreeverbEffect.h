@@ -40,14 +40,14 @@ public:
    
    static IAudioEffect* Create() { return new FreeverbEffect(); }
    
-   string GetTitleLabel() override { return "freeverb"; }
+   std::string GetTitleLabel() override { return "freeverb"; }
    void CreateUIControls() override;
    
    //IAudioEffect
    void ProcessAudio(double time, ChannelBuffer* buffer) override;
    void SetEnabled(bool enabled) override { mEnabled = enabled; }
    float GetEffectAmount() override;
-   string GetType() override { return "freeverb"; }
+   std::string GetType() override { return "freeverb"; }
    
    void CheckboxUpdated(Checkbox* checkbox) override;
    void FloatSliderUpdated(FloatSlider* slider, float oldVal) override;

@@ -45,7 +45,7 @@ public:
    ~SignalGenerator();
    static IDrawableModule* Create() { return new SignalGenerator(); }
    
-   string GetTitleLabel() override { return "sig gen"; }
+   std::string GetTitleLabel() override { return "sig gen"; }
    void CreateUIControls() override;
    
    void SetVol(float vol) { mVol = vol; }

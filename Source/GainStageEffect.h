@@ -36,13 +36,13 @@ public:
    GainStageEffect();
    static IAudioEffect* Create() { return new GainStageEffect(); }
    
-   string GetTitleLabel() override { return "gain stage"; }
+   std::string GetTitleLabel() override { return "gain stage"; }
    void CreateUIControls() override;
 
    //IAudioEffect
    void ProcessAudio(double time, ChannelBuffer* buffer) override;
    void SetEnabled(bool enabled) override { mEnabled = enabled; }
-   string GetType() override { return "gainstage"; }
+   std::string GetType() override { return "gainstage"; }
 
    void CheckboxUpdated(Checkbox* checkbox) override;
    void FloatSliderUpdated(FloatSlider* slider, float oldVal) override;

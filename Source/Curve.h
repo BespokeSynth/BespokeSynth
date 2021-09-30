@@ -68,7 +68,7 @@ protected:
 private:
    bool IsAtCapacity() { return mNumCurvePoints >= (int)mPoints.size(); }
    int FindIndexForTime(float time);
-   array<CurvePoint,5000> mPoints;
+   std::array<CurvePoint,5000> mPoints;
    int mNumCurvePoints;
    float mWidth;
    float mHeight;

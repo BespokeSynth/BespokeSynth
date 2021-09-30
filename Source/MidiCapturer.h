@@ -58,7 +58,7 @@ public:
    virtual ~MidiCapturer();
    static IDrawableModule* Create() { return new MidiCapturer(); }
    
-   string GetTitleLabel() override { return "midi capturer"; }
+   std::string GetTitleLabel() override { return "midi capturer"; }
    void Init() override;
    
    void AddDummyController(MidiCapturerDummyController* controller);
@@ -82,6 +82,6 @@ private:
    static const int kRingBufferLength = 1000;
    int mRingBufferPos;
    juce::MidiMessage mMessages[kRingBufferLength];
-   list<MidiCapturerDummyController*> mDummyControllers;
+   std::list<MidiCapturerDummyController*> mDummyControllers;
    int mPlayhead;
 };

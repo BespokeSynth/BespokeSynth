@@ -37,7 +37,7 @@ public:
    virtual ~PulseHocket();
    static IDrawableModule* Create() { return new PulseHocket(); }
    
-   string GetTitleLabel() override { return "pulse hocket"; }
+   std::string GetTitleLabel() override { return "pulse hocket"; }
    void CreateUIControls() override;
    
    void SetEnabled(bool enabled) override { mEnabled = enabled; }

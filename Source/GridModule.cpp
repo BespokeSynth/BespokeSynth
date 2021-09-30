@@ -222,7 +222,7 @@ void GridModule::SetCellColor(int col, int row, int colorIndex)
    
 }
 
-void GridModule::SetLabel(int row, string label)
+void GridModule::SetLabel(int row, std::string label)
 {
    if (row >= (int)mLabels.size())
       mLabels.resize(row+1);

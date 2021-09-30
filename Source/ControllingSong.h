@@ -47,7 +47,7 @@ public:
    ~ControllingSong();
    static IDrawableModule* Create() { return new ControllingSong(); }
    
-   string GetTitleLabel() override { return "controlling song"; }
+   std::string GetTitleLabel() override { return "controlling song"; }
    void CreateUIControls() override;
    
    void Init() override;
@@ -102,8 +102,8 @@ private:
    DropdownList* mSongSelector;
    ClickButton* mNextSongButton;
    int mShuffleIndex;
-   vector<int> mShuffleList;
-   vector<FollowingSong*> mFollowSongs;
+   std::vector<int> mShuffleList;
+   std::vector<FollowingSong*> mFollowSongs;
 };
 
 #endif /* defined(__Bespoke__ControllingSong__) */

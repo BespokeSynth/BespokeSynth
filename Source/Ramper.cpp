@@ -186,7 +186,7 @@ void Ramper::LoadLayout(const ofxJSONElement& moduleInfo)
 
 void Ramper::SetUpFromSaveData()
 {
-   string controlPath = mModuleSaveData.GetString("uicontrol");
+   std::string controlPath = mModuleSaveData.GetString("uicontrol");
    if (!controlPath.empty())
    {
       mUIControl = TheSynth->FindUIControl(controlPath);

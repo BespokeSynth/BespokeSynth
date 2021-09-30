@@ -39,7 +39,7 @@ public:
    NotePanner();
    static IDrawableModule* Create() { return new NotePanner(); }
    
-   string GetTitleLabel() override { return "note panner"; }
+   std::string GetTitleLabel() override { return "note panner"; }
    void CreateUIControls() override;
    
    void SetEnabled(bool enabled) override { mEnabled = enabled; }

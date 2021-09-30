@@ -72,12 +72,12 @@ EffectFactory::EffectFactory()
    Register("gainstage", &(GainStageEffect::Create));
 }
 
-void EffectFactory::Register(string type, CreateEffectFn creator)
+void EffectFactory::Register(std::string type, CreateEffectFn creator)
 {
    mFactoryMap[type] = creator;
 }
 
-IAudioEffect* EffectFactory::MakeEffect(string type)
+IAudioEffect* EffectFactory::MakeEffect(std::string type)
 {
    if (type == "eq") //fix up old save data
       type = "basiceq";
@@ -88,9 +88,9 @@ IAudioEffect* EffectFactory::MakeEffect(string type)
    return nullptr;
 }
 
-vector<string> EffectFactory::GetSpawnableEffects()
+std::vector<std::string> EffectFactory::GetSpawnableEffects()
 {
-   vector<string> effects;
+   std::vector<std::string> effects;
    for (auto iter = mFactoryMap.begin(); iter != mFactoryMap.end(); ++iter)
       effects.push_back(iter->first);
    sort(effects.begin(), effects.end());

@@ -41,7 +41,7 @@ public:
    virtual ~SpectralDisplay();
    static IDrawableModule* Create() { return new SpectralDisplay(); }
    
-   string GetTitleLabel() override { return "spectrum"; }
+   std::string GetTitleLabel() override { return "spectrum"; }
    void CreateUIControls() override;
    
    //IAudioSource

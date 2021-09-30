@@ -193,7 +193,7 @@ float ClickButton::GetMidiValue() const
    return 0;
 }
 
-string ClickButton::GetDisplayValue(float val) const
+std::string ClickButton::GetDisplayValue(float val) const
 {
    if (val > 0)
       return "click";

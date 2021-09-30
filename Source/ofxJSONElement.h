@@ -20,17 +20,17 @@ extern "C" size_t decode_html_entities_utf8(char *dest, const char *src);
 class ofxJSONElement: public Json::Value {
 public:
    ofxJSONElement() {};
-   ofxJSONElement(string jsonString);
+   ofxJSONElement(std::string jsonString);
    ofxJSONElement(const Json::Value& v);
    
-   bool parse(string jsonString);
-   bool open(string filename);
-   bool save(string filename, bool pretty=false);
-   string getRawString(bool pretty=true);
+   bool parse(std::string jsonString);
+   bool open(std::string filename);
+   bool save(std::string filename, bool pretty=false);
+   std::string getRawString(bool pretty=true);
    
    
    // static
-   static string decodeURL(string& str);
+   static std::string decodeURL(std::string& str);
    /*static string decodeEntities(string& str) {
       char dest[ str.length() ];
       decode_html_entities_utf8(dest, str.c_str());

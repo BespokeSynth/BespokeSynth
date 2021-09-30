@@ -83,7 +83,7 @@ public:
    ModulationChain* GetPressure(int voiceIdx);
 private:
    ModulationCollection mGlobalModulation;
-   vector<ModulationCollection> mVoiceModulations;
+   std::vector<ModulationCollection> mVoiceModulations;
 };
 
 #endif /* defined(__Bespoke__ModulationChain__) */

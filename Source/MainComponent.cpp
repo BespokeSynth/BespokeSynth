@@ -216,10 +216,10 @@ public:
       mGlobalManagers.mDeviceManager.getAvailableDeviceTypes();   //scans for device types ("Windows Audio", "DirectSound", etc)
 
       ofxJSONElement userPrefs;
-      const string kAutoDevice = "auto";
-      const string kNoneDevice = "none";
-      string outputDevice = kAutoDevice;
-      string inputDevice = kNoneDevice;
+      const std::string kAutoDevice = "auto";
+      const std::string kNoneDevice = "none";
+      std::string outputDevice = kAutoDevice;
+      std::string inputDevice = kNoneDevice;
       int sampleRate = 48000;
       int bufferSize = 256;
       bool loaded = userPrefs.open(ModularSynth::GetUserPrefsPath(false));
@@ -497,15 +497,15 @@ private:
    
    void filesDropped(const StringArray& files, int x, int y) override
    {
-      vector<string> strFiles;
+      std::vector<std::string> strFiles;
       for (auto file : files)
          strFiles.push_back(file.toStdString());
       mSynth.FilesDropped(strFiles, x, y);
    }
    
-   string GetAudioDevices()
+   std::string GetAudioDevices()
    {
-      string ret;
+      std::string ret;
       OwnedArray<AudioIODeviceType> types;
       mGlobalManagers.mDeviceManager.createAudioDeviceTypes(types);
       for (int i = 0; i < types.size(); ++i)
@@ -544,7 +544,7 @@ private:
    NVGcontext* mFontBoundsVG;
    int64 mLastFpsUpdateTime;
    int mFrameCountAccum;
-   list<int> mPressedKeys;
+   std::list<int> mPressedKeys;
    double mPixelRatio;
    juce::Point<int> mScreenPosition;
    juce::Point<int> mDesiredInitialPosition;

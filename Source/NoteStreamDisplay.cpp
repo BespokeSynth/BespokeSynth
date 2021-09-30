@@ -176,7 +176,7 @@ void NoteStreamDisplay::PlayNote(double time, int pitch, int velocity, int voice
    
    if (mDrawDebug)
    {
-      vector<string> lines = ofSplitString(mDebugLines, "\n");
+      std::vector<std::string> lines = ofSplitString(mDebugLines, "\n");
       mDebugLines = "";
       const int kNumDisplayLines = 35;
       for (int i=0; i<kNumDisplayLines-1; ++i)
@@ -185,7 +185,7 @@ void NoteStreamDisplay::PlayNote(double time, int pitch, int velocity, int voice
          if (lineIndex >= 0)
             mDebugLines += lines[lineIndex] + "\n";
       }
-      string line = "PlayNote(" + ofToString(time / 1000) + ", " + ofToString(pitch) + ", " + ofToString(velocity) + ", " + ofToString(voiceIdx) + ")";
+      std::string line = "PlayNote(" + ofToString(time / 1000) + ", " + ofToString(pitch) + ", " + ofToString(velocity) + ", " + ofToString(voiceIdx) + ")";
       mDebugLines += line;
       ofLog() << line;
    }

@@ -32,18 +32,18 @@ class NamedMutex
 {
 public:
    NamedMutex() : mLocker("<none>"), mExtraLockCount(0) {}
-   void Lock(string locker);
+   void Lock(std::string locker);
    void Unlock();
 private:
    ofMutex mMutex;
-   string mLocker;
+   std::string mLocker;
    int mExtraLockCount;
 };
 
 class ScopedMutex
 {
 public:
-   ScopedMutex(NamedMutex* mutex, string locker);
+   ScopedMutex(NamedMutex* mutex, std::string locker);
    ~ScopedMutex();
 private:
    NamedMutex* mMutex;

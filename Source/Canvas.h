@@ -96,11 +96,11 @@ public:
    void AddElement(CanvasElement* element);
    void RemoveElement(CanvasElement* element);
    void SelectElement(CanvasElement* element);
-   void SelectElements(vector<CanvasElement*> elements);
+   void SelectElements(std::vector<CanvasElement*> elements);
    void SetControls(CanvasControls* controls) { mControls = controls; }
    CanvasControls* GetControls() { return mControls; }
-   vector<CanvasElement*>& GetElements() { return mElements; }
-   void FillElementsAt(float pos, vector<CanvasElement*>& elements) const;
+   std::vector<CanvasElement*>& GetElements() { return mElements; }
+   void FillElementsAt(float pos, std::vector<CanvasElement*>& elements) const;
    void EraseElementsAt(float pos);
    CanvasElement* GetElementAt(float pos, int row);
    void SetCursorPos(float pos) { mCursorPos = pos; }
@@ -149,7 +149,7 @@ private:
    float mHeight;
    float mLength;
    ICanvasListener* mListener;
-   vector<CanvasElement*> mElements;
+   std::vector<CanvasElement*> mElements;
    CanvasControls* mControls;
    float mCursorPos;
    CreateCanvasElementFn mElementCreator;

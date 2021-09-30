@@ -35,7 +35,7 @@ public:
    KeyboardDisplay();
    static IDrawableModule* Create() { return new KeyboardDisplay(); }
    
-   string GetTitleLabel() override { return "keyboard"; }
+   std::string GetTitleLabel() override { return "keyboard"; }
    void CreateUIControls() override;
    
    void SetEnabled(bool enabled) override { mEnabled = enabled; }

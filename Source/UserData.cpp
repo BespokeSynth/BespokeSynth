@@ -3,7 +3,7 @@
 
 #include "juce_core/juce_core.h"
 
-void UpdateUserData(string destDirPath)
+void UpdateUserData(std::string destDirPath)
 {
    juce::File bundledDataDir(ofToResourcePath("userdata_original"));
    juce::File destDataDir(destDirPath);

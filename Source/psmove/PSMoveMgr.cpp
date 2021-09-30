@@ -204,9 +204,9 @@ void PSMoveMgr::Update()
    }
 }
 
-void PSMoveMgr::SendButtonMessage(int id, string button, int val)
+void PSMoveMgr::SendButtonMessage(int id, std::string button, int val)
 {
-   string address = "/" + ofToString(id) + "/button/" + button;
+   std::string address = "/" + ofToString(id) + "/button/" + button;
    //TheMessenger->SendIntMessage(address,val);
    
    if (mListener)

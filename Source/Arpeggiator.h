@@ -45,7 +45,7 @@ public:
    ~Arpeggiator();
    static IDrawableModule* Create() { return new Arpeggiator(); }
    
-   string GetTitleLabel() override { return "arpeggiator"; }
+   std::string GetTitleLabel() override { return "arpeggiator"; }
    void CreateUIControls() override;
    
    void Init() override;
@@ -86,7 +86,7 @@ private:
    bool Enabled() const override { return mEnabled; }
    void OnClicked(int x, int y, bool right) override;
    
-   string GetArpNoteDisplay(int pitch);
+   std::string GetArpNoteDisplay(int pitch);
    void UpdateInterval();
    
    struct ArpNote
@@ -97,7 +97,7 @@ private:
       int voiceIdx;
       ModulationParameters modulation;
    };
-   vector<ArpNote> mChord;
+   std::vector<ArpNote> mChord;
 
    float mWidth;
    float mHeight;

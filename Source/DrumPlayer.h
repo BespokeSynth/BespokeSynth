@@ -56,7 +56,7 @@ public:
    ~DrumPlayer();
    static IDrawableModule* Create() { return new DrumPlayer(); }
    
-   string GetTitleLabel() override { return "drumplayer"; }
+   std::string GetTitleLabel() override { return "drumplayer"; }
    void CreateUIControls() override;
    void Init() override;
    
@@ -76,7 +76,7 @@ public:
    void SendCC(int control, int value, int voiceIdx = -1) override {}
    
    //IDrawableModule
-   void FilesDropped(vector<string> files, int x, int y) override;
+   void FilesDropped(std::vector<std::string> files, int x, int y) override;
    void SampleDropped(int x, int y, Sample* sample) override;
    bool CanDropSample() const override { return true; }
    
@@ -103,8 +103,8 @@ private:
 
    struct StoredDrumKit
    {
-      string mName;
-      string mSampleFiles[NUM_DRUM_HITS];
+      std::string mName;
+      std::string mSampleFiles[NUM_DRUM_HITS];
       int mLinkIds[NUM_DRUM_HITS];
       float mVols[NUM_DRUM_HITS];
       float mSpeeds[NUM_DRUM_HITS];
@@ -128,7 +128,7 @@ private:
    void GetModuleDimensions(float& width, float& height) override;
    bool Enabled() const override { return mEnabled; }
    void OnClicked(int x, int y, bool right) override;
-   vector<IUIControl*> ControlsToNotSetDuringLoadState() const override;
+   std::vector<IUIControl*> ControlsToNotSetDuringLoadState() const override;
    
    ChannelBuffer mOutputBuffer;
    float mSpeed;
@@ -147,7 +147,7 @@ private:
    int mAuditionSampleIdx;
    float mAuditionInc;
    FloatSlider* mAuditionSlider;
-   string mAuditionDir;
+   std::string mAuditionDir;
    char mNewKitName[MAX_TEXTENTRY_LENGTH];
    TextEntry* mNewKitNameEntry;
    ofMutex mLoadSamplesAudioMutex;
@@ -267,7 +267,7 @@ private:
       float mPan;
       int mWiden;
       bool mHasIndividualOutput;
-      string mHitDirectory;
+      std::string mHitDirectory;
       int mButtonHeldVelocity;
       
       DrumPlayer* mOwner;
@@ -285,11 +285,11 @@ private:
       DropdownList* mHitCategoryDropdown;
       FloatSlider* mStartOffsetSlider;
       int mHitCategoryIndex;
-      string mHitCategory;
+      std::string mHitCategory;
       RollingBuffer mWidenerBuffer;
       int mSamplesRemainingToProcess;
 
-      array<Playhead,2> mPlayheads;
+      std::array<Playhead,2> mPlayheads;
       int mCurrentPlayheadIndex;
    };
    

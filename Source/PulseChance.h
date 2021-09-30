@@ -37,7 +37,7 @@ public:
    virtual ~PulseChance();
    static IDrawableModule* Create() { return new PulseChance(); }
    
-   string GetTitleLabel() override { return "pulse chance"; }
+   std::string GetTitleLabel() override { return "pulse chance"; }
    void CreateUIControls() override;
    
    void SetEnabled(bool enabled) override { mEnabled = enabled; }

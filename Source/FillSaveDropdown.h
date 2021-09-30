@@ -32,7 +32,7 @@
 template <class T> void FillDropdown(DropdownList* list)
 {
    assert(list);
-   vector<string> modules = TheSynth->GetModuleNames<T>();
+   std::vector<std::string> modules = TheSynth->GetModuleNames<T>();
    list->AddLabel("",-1);
    for (int i=0; i<modules.size(); ++i)
       list->AddLabel(modules[i].c_str(), i);

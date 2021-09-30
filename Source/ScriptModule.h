@@ -53,18 +53,18 @@ public:
    static void InitializePythonIfNecessary();
    static void CheckIfPythonEverSuccessfullyInitialized();
    
-   string GetTitleLabel() override { return "script"; }
+   std::string GetTitleLabel() override { return "script"; }
    void CreateUIControls() override;
    
    void Poll() override;
    
    void PlayNoteFromScript(float pitch, float velocity, float pan, int noteOutputIndex);
    void PlayNoteFromScriptAfterDelay(float pitch, float velocity, double delayMeasureTime, float pan, int noteOutputIndex);
-   void ScheduleMethod(string method, double delayMeasureTime);
+   void ScheduleMethod(std::string method, double delayMeasureTime);
    void ScheduleUIControlValue(IUIControl* control, float value, double delayMeasureTime);
    void HighlightLine(int lineNum, int scriptModuleIndex);
-   void PrintText(string text);
-   IUIControl* GetUIControl(string path);
+   void PrintText(std::string text);
+   IUIControl* GetUIControl(std::string path);
    void Stop();
    double GetScheduledTime(double delayMeasureTime);
    void SetNumNoteOutputs(int num);
@@ -74,7 +74,7 @@ public:
    void SetContext();
    void ClearContext();
    
-   void RunCode(double time, string code);
+   void RunCode(double time, std::string code);
    
    void OnPulse(double time, float velocity, int flags) override;
    void ButtonClicked(ClickButton* button) override;
@@ -84,7 +84,7 @@ public:
  
    //ICodeEntryListener
    void ExecuteCode() override;
-   pair<int,int> ExecuteBlock(int lineStart, int lineEnd) override;
+   std::pair<int,int> ExecuteBlock(int lineStart, int lineEnd) override;
    void OnCodeUpdated() override;
    
    //INoteReceiver
@@ -107,7 +107,7 @@ public:
    static ScriptModule* sPriorExecutedModule;
    static float GetScriptMeasureTime();
    static float GetTimeSigRatio();
-   static string sBackgroundTextString;
+   static std::string sBackgroundTextString;
    static float sBackgroundTextSize;
    static ofVec2f sBackgroundTextPos;
    static ofColor sBackgroundTextColor;
@@ -118,21 +118,21 @@ public:
    ModulationChain* GetModWheel(int pitch) { return &mModWheels[pitch]; }
    ModulationChain* GetPressure(int pitch) { return &mPressures[pitch]; }
 
-   static string GetBootstrapImportString() { return "import bespoke; import module; import scriptmodule; import random; import math"; }
+   static std::string GetBootstrapImportString() { return "import bespoke; import module; import scriptmodule; import random; import math"; }
    
 private:
    void PlayNote(double time, float pitch, float velocity, float pan, int noteOutputIndex, int lineNum);
    void AdjustUIControl(IUIControl* control, float value, int lineNum);
-   pair<int,int> RunScript(double time, int lineStart = -1, int lineEnd = -1);
-   void FixUpCode(string& code);
+   std::pair<int,int> RunScript(double time, int lineStart = -1, int lineEnd = -1);
+   void FixUpCode(std::string& code);
    void ScheduleNote(double time, float pitch, float velocity, float pan, int noteOutputIndex);
    void SendNoteToIndex(int index, double time, int pitch, int velocity, int voiceIdx, ModulationParameters modulation);
-   string GetThisName();
-   string GetIndentation(string line);
-   string GetMethodPrefix();
-   bool ShouldDisplayLineExecutionPre(string priorLine, string line);
-   void GetFirstAndLastCharacter(string line, char& first, char& last);
-   bool IsNonWhitespace(string line);
+   std::string GetThisName();
+   std::string GetIndentation(std::string line);
+   std::string GetMethodPrefix();
+   bool ShouldDisplayLineExecutionPre(std::string priorLine, std::string line);
+   void GetFirstAndLastCharacter(std::string line, char& first, char& last);
+   bool IsNonWhitespace(std::string line);
    void DrawTimer(int lineNum, double startTime, double endTime, ofColor color, bool filled);
    void RefreshScriptFiles();
    void RefreshStyleFiles();
@@ -172,9 +172,9 @@ private:
    float mHeight;
    std::array<double, 20> mScheduledPulseTimes;
    static double sMostRecentRunTime;
-   string mLastError;
+   std::string mLastError;
    size_t mScriptModuleIndex;
-   string mLastRunLiteralCode;
+   std::string mLastRunLiteralCode;
    int mNextLineToExecute;
    int mInitExecutePriority;
    int mOscInputPort;
@@ -195,7 +195,7 @@ private:
    {
       double startTime;
       double time;
-      string method;
+      std::string method;
       int lineNum;
    };
    std::array<ScheduledMethodCall, 50> mScheduledMethodCall;
@@ -221,7 +221,7 @@ private:
    struct PrintDisplay
    {
       double time;
-      string text;
+      std::string text;
       int lineNum;
    };
    std::array<PrintDisplay, 10> mPrintDisplay;
@@ -244,7 +244,7 @@ private:
             mTimes[i] = -999;
       }
       
-      void AddEvent(int lineNum, string text = "")
+      void AddEvent(int lineNum, std::string text = "")
       {
          if (lineNum >= 0 && lineNum < (int)mTimes.size())
          {
@@ -256,7 +256,7 @@ private:
       void Draw(CodeEntry* codeEntry, int style, ofColor color);
    private:
       std::array<double, 256> mTimes;
-      std::array<string, 256> mText;
+      std::array<std::string, 256> mText;
    };
    
    LineEventTracker mLineExecuteTracker;
@@ -267,18 +267,18 @@ private:
    struct BoundModuleConnection
    {
       int mLineIndex;
-      string mLineText;
+      std::string mLineText;
       IDrawableModule* mTarget;
    };
    std::vector<BoundModuleConnection> mBoundModuleConnections;
    
-   std::vector<string> mScriptFilePaths;
+   std::vector<std::string> mScriptFilePaths;
    
    std::vector<AdditionalNoteCable*> mExtraNoteOutputs;
    std::array<ModulationChain, 128> mPitchBends;
    std::array<ModulationChain, 128> mModWheels;
    std::array<ModulationChain, 128> mPressures;
-   std::list<string> mMidiMessageQueue;
+   std::list<std::string> mMidiMessageQueue;
    ofMutex mMidiMessageQueueMutex;
    
    bool mShowJediWarning;
@@ -291,7 +291,7 @@ public:
    virtual ~ScriptReferenceDisplay();
    static IDrawableModule* Create() { return new ScriptReferenceDisplay(); }
 
-   string GetTitleLabel() override { return "script reference"; }
+   std::string GetTitleLabel() override { return "script reference"; }
    void CreateUIControls() override;
 
    void ButtonClicked(ClickButton* button) override;
@@ -307,7 +307,7 @@ private:
 
    void LoadText();
 
-   vector<string> mText;
+   std::vector<std::string> mText;
    ClickButton* mCloseButton;
    float mWidth;
    float mHeight;

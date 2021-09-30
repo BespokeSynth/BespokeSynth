@@ -36,7 +36,7 @@ class ICodeEntryListener
 public:
    virtual ~ICodeEntryListener() {}
    virtual void ExecuteCode() = 0;
-   virtual pair<int,int> ExecuteBlock(int lineStart, int lineEnd) = 0;  //return start/end lines that actually ran
+   virtual std::pair<int,int> ExecuteBlock(int lineStart, int lineEnd) = 0;  //return start/end lines that actually ran
    virtual void OnCodeUpdated() {}
 };
 
@@ -53,9 +53,9 @@ public:
    void Publish();
    
    void ClearInput() { mString = ""; mCaretPosition = 0; }
-   const string GetText(bool published) const { return published ? mPublishedString : mString; }
-   const vector<string> GetLines(bool published) const { return ofSplitString(published ? mPublishedString : mString, "\n"); }
-   void SetText(string text) { UpdateString(text); }
+   const std::string GetText(bool published) const { return published ? mPublishedString : mString; }
+   const std::vector<std::string> GetLines(bool published) const { return ofSplitString(published ? mPublishedString : mString, "\n"); }
+   void SetText(std::string text) { UpdateString(text); }
    void SetError(bool error, int errorLine = -1);
    void SetDoSyntaxHighlighting(bool highlight) { mDoSyntaxHighlighting = highlight; }
    static bool HasJediNotInstalledWarning() { return sWarnJediNotInstalled; }
@@ -85,7 +85,7 @@ protected:
    
 private:
    void AddCharacter(char c);
-   void AddString(string s);
+   void AddString(std::string s);
    bool AllowCharacter(char c);
    int GetCaretPosition(int col, int row);
    int GetColForX(float x);
@@ -99,11 +99,11 @@ private:
    void MoveCaretToNextToken(bool backwards);
    void Undo();
    void Redo();
-   void UpdateString(string newString);
-   void DrawSyntaxHighlight(string input, ofColor color, std::vector<int> mapping, int filter1, int filter2);
-   string FilterText(string input, std::vector<int> mapping, int filter1, int filter2);
+   void UpdateString(std::string newString);
+   void DrawSyntaxHighlight(std::string input, ofColor color, std::vector<int> mapping, int filter1, int filter2);
+   std::string FilterText(std::string input, std::vector<int> mapping, int filter1, int filter2);
    void OnCodeUpdated();
-   string GetVisibleCode();
+   std::string GetVisibleCode();
    bool IsAutocompleteShowing();
    void AcceptAutocompletion();
    
@@ -116,7 +116,7 @@ private:
    struct UndoBufferEntry
    {
       UndoBufferEntry() : mCaretPos(0) {}
-      string mString;
+      std::string mString;
       int mCaretPos;
    };
 
@@ -124,15 +124,15 @@ private:
    {
       bool valid;
       int entryIndex;
-      vector<string> params;
+      std::vector<std::string> params;
       int caretPos;
    };
 
    struct AutocompleteInfo
    {
       bool valid;
-      string autocompleteFull;
-      string autocompleteRest;
+      std::string autocompleteFull;
+      std::string autocompleteRest;
    };
    
    ICodeEntryListener* mListener;
@@ -140,8 +140,8 @@ private:
    float mHeight;
    float mCharWidth;
    float mCharHeight;
-   string mString;
-   string mPublishedString;
+   std::string mString;
+   std::string mPublishedString;
    std::array<UndoBufferEntry, 50> mUndoBuffer;
    int mUndoBufferPos;
    int mUndosLeft;

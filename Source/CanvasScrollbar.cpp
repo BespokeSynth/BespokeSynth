@@ -29,7 +29,7 @@
 #include "Canvas.h"
 #include "ModularSynth.h"
 
-CanvasScrollbar::CanvasScrollbar(Canvas* canvas, string name, Style style)
+CanvasScrollbar::CanvasScrollbar(Canvas* canvas, std::string name, Style style)
    : mClick(false)
    , mStyle(style)
    , mAutoHide(true)

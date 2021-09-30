@@ -43,7 +43,7 @@ public:
    ~NoteHumanizer();
    static IDrawableModule* Create() { return new NoteHumanizer(); }
    
-   string GetTitleLabel() override { return "note humanizer"; }
+   std::string GetTitleLabel() override { return "note humanizer"; }
    void CreateUIControls() override;
    
    void SetEnabled(bool enabled) override { mEnabled = enabled; }

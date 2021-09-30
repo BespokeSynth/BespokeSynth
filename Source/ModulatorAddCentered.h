@@ -39,7 +39,7 @@ public:
    virtual ~ModulatorAddCentered();
    static IDrawableModule* Create() { return new ModulatorAddCentered(); }
    
-   string GetTitleLabel() override { return "add centered"; }
+   std::string GetTitleLabel() override { return "add centered"; }
    void CreateUIControls() override;
    
    void SetEnabled(bool enabled) override { mEnabled = enabled; }

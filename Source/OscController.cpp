@@ -26,7 +26,7 @@
 #include "OscController.h"
 #include "SynthGlobals.h"
 
-OscController::OscController(MidiDeviceListener* listener, string outAddress, int outPort, int inPort)
+OscController::OscController(MidiDeviceListener* listener, std::string outAddress, int outPort, int inPort)
 : mListener(listener)
 , mConnected(false)
 , mOutAddress(outAddress)
@@ -55,7 +55,7 @@ void OscController::Connect()
       
       mConnected = true;
    }
-   catch (exception e)
+   catch (std::exception e)
    {
    }
 }
@@ -80,7 +80,7 @@ bool OscController::SetInPort(int port)
    return false;
 }
 
-string OscController::GetControlTooltip(MidiMessageType type, int control)
+std::string OscController::GetControlTooltip(MidiMessageType type, int control)
 {
    if (type == kMidiMessage_Control && control >= 0 && control < mOscMap.size())
       return mOscMap[control].mAddress;
@@ -117,12 +117,12 @@ void OscController::SendValue(int page, int control, float value, bool forceNote
 
 void OscController::oscMessageReceived(const juce::OSCMessage& msg)
 {
-   string address = msg.getAddressPattern().toString().toStdString();
+   std::string address = msg.getAddressPattern().toString().toStdString();
 
    if (address == "/jockey/sync")
    {
-      string outputAddress = msg[0].getString().toStdString();
-      vector<string> tokens= ofSplitString(outputAddress, ":");
+      std::string outputAddress = msg[0].getString().toStdString();
+      std::vector<std::string> tokens= ofSplitString(outputAddress, ":");
       if (tokens.size() == 2)
       {
          mOutAddress = tokens[0];
@@ -176,7 +176,7 @@ void OscController::oscMessageReceived(const juce::OSCMessage& msg)
       mListener->OnMidiControl(control);
 }
 
-int OscController::FindControl(string address)
+int OscController::FindControl(std::string address)
 {
    for (int i = 0; i < mOscMap.size(); ++i)
    {
@@ -187,7 +187,7 @@ int OscController::FindControl(string address)
    return -1;
 }
 
-int OscController::AddControl(string address, bool isFloat)
+int OscController::AddControl(std::string address, bool isFloat)
 {
    int existing = FindControl(address);
    if (existing != -1)

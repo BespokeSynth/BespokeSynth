@@ -169,7 +169,7 @@ void Chorder::DropdownUpdated(DropdownList* dropdown, int oldVal)
 {
    if (dropdown == mChordDropdown || dropdown == mInversionDropdown)
    {
-      vector<int> chord = TheScale->GetChordDatabase().GetChord(mChordDropdown->GetLabel(mChordIndex), mInversion);
+      std::vector<int> chord = TheScale->GetChordDatabase().GetChord(mChordDropdown->GetLabel(mChordIndex), mInversion);
       mChordGrid->Clear();
       for (int val : chord)
       {

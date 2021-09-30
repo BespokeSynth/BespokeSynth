@@ -40,7 +40,7 @@ public:
    virtual ~PressureToVibrato();
    static IDrawableModule* Create() { return new PressureToVibrato(); }
    
-   string GetTitleLabel() override { return "pressure to vibrato"; }
+   std::string GetTitleLabel() override { return "pressure to vibrato"; }
    void CreateUIControls() override;
    void SetEnabled(bool enabled) override { mEnabled = enabled; }
    

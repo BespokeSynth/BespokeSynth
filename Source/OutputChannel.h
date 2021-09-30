@@ -39,7 +39,7 @@ public:
    virtual ~OutputChannel();
    static IDrawableModule* Create() { return new OutputChannel(); }
    
-   string GetTitleLabel() override { return "output"; }
+   std::string GetTitleLabel() override { return "output"; }
    void CreateUIControls() override;
    
    //IAudioReceiver

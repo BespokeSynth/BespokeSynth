@@ -39,7 +39,7 @@ public:
    ~NoteCounter();
    static IDrawableModule* Create() { return new NoteCounter(); }
    
-   string GetTitleLabel() override { return "note counter"; }
+   std::string GetTitleLabel() override { return "note counter"; }
    void CreateUIControls() override;
    void Init() override;
    

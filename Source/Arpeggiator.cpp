@@ -93,12 +93,12 @@ void Arpeggiator::DrawModule()
    mOctaveRepeatsSlider->Draw();
    
    ofSetColor(200,200,200,gModuleDrawAlpha);
-   string chord;
+   std::string chord;
    for (int i=0; i<mChord.size(); ++i)
       chord += GetArpNoteDisplay(mChord[i].pitch) + " ";
    DrawTextNormal(chord,5,16);
    ofSetColor(0,255,0,gModuleDrawAlpha);
-   string pad;
+   std::string pad;
    for (int i=0; i<mChord.size(); ++i)
    {
       if (i != mArpIndex)
@@ -121,7 +121,7 @@ void Arpeggiator::OnScaleChanged()
    mChordMutex.unlock();
 }
 
-string Arpeggiator::GetArpNoteDisplay(int pitch)
+std::string Arpeggiator::GetArpNoteDisplay(int pitch)
 {
    return NoteName(pitch, false, true);
 }

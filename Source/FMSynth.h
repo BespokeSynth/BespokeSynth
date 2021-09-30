@@ -44,7 +44,7 @@ public:
    ~FMSynth();
    static IDrawableModule* Create() { return new FMSynth(); }
    
-   string GetTitleLabel() override { return "FM"; }
+   std::string GetTitleLabel() override { return "FM"; }
    void CreateUIControls() override;
 
    //IAudioSource
@@ -100,7 +100,7 @@ private:
 
    ChannelBuffer mWriteBuffer;
 
-   string mDebugLines;
+   std::string mDebugLines;
 };
 
 #endif /* defined(__modularSynth__FMSynth__) */

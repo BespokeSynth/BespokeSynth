@@ -57,18 +57,18 @@ inline bool operator==(const Accidental& lhs, const Accidental& rhs)
 struct ScalePitches
 {
    int mScaleRoot;
-   string mScaleType;
-   vector<int> mScalePitches[2]; //double-buffered to avoid thread safety issues when modifying
+   std::string mScaleType;
+   std::vector<int> mScalePitches[2]; //double-buffered to avoid thread safety issues when modifying
    int mScalePitchesFlip{0};
    std::vector<Accidental> mAccidentals;
    
    void SetRoot(int root);
-   void SetScaleType(string type);
+   void SetScaleType(std::string type);
    void SetAccidentals(const std::vector<Accidental>& accidentals);
    
-   const vector<int>& GetPitches() const { return mScalePitches[mScalePitchesFlip]; }
+   const std::vector<int>& GetPitches() const { return mScalePitches[mScalePitchesFlip]; }
    int ScaleRoot() const { return mScaleRoot; }
-   string GetType() const { return mScaleType; }
+   std::string GetType() const { return mScaleType; }
    void GetChordDegreeAndAccidentals(const Chord& chord, int& degree, std::vector<Accidental>& accidentals) const;
    int GetScalePitch(int index) const;
    
@@ -92,7 +92,7 @@ public:
    ~Scale();
    void Init() override;
    
-   string GetTitleLabel() override { return "scale"; }
+   std::string GetTitleLabel() override { return "scale"; }
    void CreateUIControls() override;
    
    bool IsSingleton() const override { return true; }
@@ -103,11 +103,11 @@ public:
    bool IsInScale(int pitch);
    int GetPitchFromTone(int n);
    int GetToneFromPitch(int pitch);
-   void SetScale(int root, string type);
+   void SetScale(int root, std::string type);
    int ScaleRoot() { return mScale.mScaleRoot; }
-   string GetType() { return mScale.mScaleType; }
+   std::string GetType() { return mScale.mScaleType; }
    void SetRoot(int root, bool force = true);
-   void SetScaleType(string type, bool force = true);
+   void SetScaleType(std::string type, bool force = true);
    void AddListener(IScaleListener* listener);
    void RemoveListener(IScaleListener* listener);
    void Poll() override;
@@ -116,10 +116,10 @@ public:
    void SetAccidentals(const std::vector<Accidental>& accidentals);
    void GetChordDegreeAndAccidentals(const Chord& chord, int& degree, std::vector<Accidental>& accidentals);
    ScalePitches& GetScalePitches() { return mScale; }
-   vector<int> GetPitchesForScale(string type);
+   std::vector<int> GetPitchesForScale(std::string type);
    void SetRandomSeptatonicScale();
    int GetNumScaleTypes() { return (int)mScales.size(); }
-   string GetScaleName(int index) { return mScales[index].mName; }
+   std::string GetScaleName(int index) { return mScales[index].mName; }
    int NumPitchesInScale() const { return mScale.NumPitchesInScale(); }
    int GetTet() const { return mTet; }
 
@@ -142,8 +142,8 @@ public:
 private:
    struct ScaleInfo
    {
-      string mName;
-      vector<int> mPitches;
+      std::string mName;
+      std::vector<int> mPitches;
    };
    
    //IDrawableModule
@@ -169,7 +169,7 @@ private:
    };
    
    ScalePitches mScale;
-   list<IScaleListener*> mListeners;
+   std::list<IScaleListener*> mListeners;
    DropdownList* mRootSelector;
    DropdownList* mScaleSelector;
    IntSlider* mScaleDegreeSlider;
@@ -178,7 +178,7 @@ private:
    ClickButton* mLoadSCL{nullptr};
    ClickButton* mLoadKBM{nullptr};
    
-   vector<ScaleInfo> mScales;
+   std::vector<ScaleInfo> mScales;
    int mNumSeptatonicScales;
    int mScaleIndex;
    

@@ -38,7 +38,7 @@ public:
    NotePanRandom();
    static IDrawableModule* Create() { return new NotePanRandom(); }
    
-   string GetTitleLabel() override { return "note pan random"; }
+   std::string GetTitleLabel() override { return "note pan random"; }
    void CreateUIControls() override;
    
    void SetEnabled(bool enabled) override { mEnabled = enabled; }

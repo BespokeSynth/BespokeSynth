@@ -40,14 +40,14 @@ public:
    
    static IAudioEffect* Create() { return new TremoloEffect(); }
    
-   string GetTitleLabel() override { return "tremolo"; }
+   std::string GetTitleLabel() override { return "tremolo"; }
    void CreateUIControls() override;
 
    //IAudioEffect
    void ProcessAudio(double time, ChannelBuffer* buffer) override;
    void SetEnabled(bool enabled) override { mEnabled = enabled; }
    float GetEffectAmount() override;
-   string GetType() override { return "tremolo"; }
+   std::string GetType() override { return "tremolo"; }
 
    //IDropdownListener
    void DropdownUpdated(DropdownList* list, int oldVal) override;

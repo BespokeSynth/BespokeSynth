@@ -37,7 +37,7 @@ public:
    NoteFlusher();
    static IDrawableModule* Create() { return new NoteFlusher(); }
    
-   string GetTitleLabel() override { return "flusher"; }
+   std::string GetTitleLabel() override { return "flusher"; }
    void CreateUIControls() override;
    
    void ButtonClicked(ClickButton* button) override;

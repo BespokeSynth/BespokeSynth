@@ -83,7 +83,7 @@ void ControllingSong::Init()
    for (int i=0; i<mSongList["songs"].size(); ++i)
    {
       mShuffleList.push_back(i);
-      string title = mSongList["songs"][i]["name"].asString();
+      std::string title = mSongList["songs"][i]["name"].asString();
       if (mSongList["songs"][i]["keyroot"].asString() == "X")
          title = "X " + title;
       mSongSelector->AddLabel(title.c_str(), i);
@@ -146,7 +146,7 @@ void ControllingSong::LoadSong(int index)
       }
    }
    
-   string keyroot = mSongList["songs"][index]["keyroot"].asString();
+   std::string keyroot = mSongList["songs"][index]["keyroot"].asString();
    if (keyroot != "X" && keyroot != "")
    {
       TheScale->SetRoot(PitchFromNoteName(keyroot));
@@ -314,7 +314,7 @@ void ControllingSong::LoadLayout(const ofxJSONElement& moduleInfo)
    const Json::Value& follows = moduleInfo["followsongs"];
    for (int i=0; i<follows.size(); ++i)
    {
-      string follow = follows[i].asString();
+      std::string follow = follows[i].asString();
       FollowingSong* followSong = dynamic_cast<FollowingSong*>(TheSynth->FindModule(follow));
       if (followSong)
          mFollowSongs.push_back(followSong);

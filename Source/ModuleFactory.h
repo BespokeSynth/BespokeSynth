@@ -36,25 +36,25 @@ class ModuleFactory
 {
 public:
    ModuleFactory();
-   IDrawableModule* MakeModule(string type);
-   vector<string> GetSpawnableModules(ModuleType moduleType);
-   vector<string> GetSpawnableModules(char c);
-   ModuleType GetModuleType(string typeName);
-   bool IsExperimental(string typeName);
-   static void GetPrefabs(vector<string>& prefabs);
-   static string FixUpTypeName(string typeName);
+   IDrawableModule* MakeModule(std::string type);
+   std::vector<std::string> GetSpawnableModules(ModuleType moduleType);
+   std::vector<std::string> GetSpawnableModules(char c);
+   ModuleType GetModuleType(std::string typeName);
+   bool IsExperimental(std::string typeName);
+   static void GetPrefabs(std::vector<std::string>& prefabs);
+   static std::string FixUpTypeName(std::string typeName);
 
    static constexpr const char* kVSTSuffix = "[vst]";
    static constexpr const char* kPrefabSuffix = "[prefab]";
    static constexpr const char* kMidiControllerSuffix = "[midicontroller]";
    static constexpr const char* kEffectChainSuffix = "[effectchain]";
 private:
-   void Register(string type, CreateModuleFn creator, CanCreateModuleFn canCreate, ModuleType moduleType, bool hidden, bool experimental);
-   map<string, CreateModuleFn> mFactoryMap;
-   map<string, CanCreateModuleFn> mCanCreateMap;
-   map<string, ModuleType> mModuleTypeMap;
-   map<string, bool> mIsHiddenModuleMap;
-   map<string, bool> mIsExperimentalModuleMap;
+   void Register(std::string type, CreateModuleFn creator, CanCreateModuleFn canCreate, ModuleType moduleType, bool hidden, bool experimental);
+   std::map<std::string, CreateModuleFn> mFactoryMap;
+   std::map<std::string, CanCreateModuleFn> mCanCreateMap;
+   std::map<std::string, ModuleType> mModuleTypeMap;
+   std::map<std::string, bool> mIsHiddenModuleMap;
+   std::map<std::string, bool> mIsExperimentalModuleMap;
 };
 
 #endif /* defined(__modularSynth__ModuleFactory__) */

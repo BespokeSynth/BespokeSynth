@@ -41,7 +41,7 @@ public:
    virtual ~Waveshaper();
    static IDrawableModule* Create() { return new Waveshaper(); }
    
-   string GetTitleLabel() override { return "waveshaper"; }
+   std::string GetTitleLabel() override { return "waveshaper"; }
    void CreateUIControls() override;
    
    //IAudioSource
@@ -76,7 +76,7 @@ private:
    float mE;
    FloatSlider* mESlider;
    
-   string mEntryString;
+   std::string mEntryString;
    TextEntry* mTextEntry;
    exprtk::symbol_table<float> mSymbolTable;
    exprtk::expression<float> mExpression;

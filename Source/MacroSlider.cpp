@@ -79,7 +79,7 @@ void MacroSlider::SaveLayout(ofxJSONElement& moduleInfo)
    moduleInfo["num_mappings"] = (int)mMappings.size();
    for (int i=0; i<mMappings.size(); ++i)
    {
-      string targetPath = "";
+      std::string targetPath = "";
       if (mMappings[i]->GetCableSource()->GetTarget())
          targetPath = mMappings[i]->GetCableSource()->GetTarget()->Path();
       
@@ -97,7 +97,7 @@ void MacroSlider::LoadLayout(const ofxJSONElement& moduleInfo)
    const Json::Value& mappings = moduleInfo["mappings"];
    for (int i=0; i<mappings.size(); ++i)
    {
-      string target = mappings[i]["target"].asString();
+      std::string target = mappings[i]["target"].asString();
       Mapping* mapping = new Mapping(this, i);
       mapping->CreateUIControls();
       FloatSlider* slider = dynamic_cast<FloatSlider*>(TheSynth->FindUIControl(target));

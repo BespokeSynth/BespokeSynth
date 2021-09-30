@@ -128,11 +128,11 @@ void MultitrackRecorder::ButtonClicked(ClickButton* button)
 
    if (button == mBounceButton)
    {
-      string recordingsPath = "recordings/";
+      std::string recordingsPath = "recordings/";
       if (!TheSynth->GetUserPrefs()["recordings_path"].isNull())
          recordingsPath = TheSynth->GetUserPrefs()["recordings_path"].asString();
 
-      string filenamePrefix = ofGetTimestampString(recordingsPath + "multitrack_%Y-%m-%d_%H-%M_");
+      std::string filenamePrefix = ofGetTimestampString(recordingsPath + "multitrack_%Y-%m-%d_%H-%M_");
 
       int numFiles = 0;
       for (int i = 0; i < (int)mTracks.size(); ++i)
@@ -141,7 +141,7 @@ void MultitrackRecorder::ButtonClicked(ClickButton* button)
 
          if (sample)
          {
-            string filename = filenamePrefix + ofToString(i+1) + ".wav";
+            std::string filename = filenamePrefix + ofToString(i+1) + ".wav";
             sample->Write(filename.c_str());
             ++numFiles;
          }
@@ -219,7 +219,7 @@ void MultitrackRecorder::SaveState(FileStreamOut& out)
    //preserve order
    out << (int)mTracks.size();
    for (auto* track : mTracks)
-      out << (string)track->Name();
+      out << (std::string)track->Name();
 }
 
 void MultitrackRecorder::LoadState(FileStreamIn& in)
@@ -235,15 +235,15 @@ void MultitrackRecorder::LoadState(FileStreamIn& in)
    //preserve order
    int numTracks;
    in >> numTracks;
-   vector<string> sortOrder;
+   std::vector<std::string> sortOrder;
    for (int i = 0; i < numTracks; ++i)
    {
-      string name;
+      std::string name;
       in >> name;
       sortOrder.push_back(name);
    }
 
-   vector<MultitrackRecorderTrack*> sortedTracks;
+   std::vector<MultitrackRecorderTrack*> sortedTracks;
    for (auto& name : sortOrder)
    {
       for (auto& track : mTracks)

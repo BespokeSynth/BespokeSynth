@@ -39,7 +39,7 @@ public:
    virtual ~NoteToMs();
    static IDrawableModule* Create() { return new NoteToMs(); }
    
-   string GetTitleLabel() override { return "note to ms"; }
+   std::string GetTitleLabel() override { return "note to ms"; }
    void CreateUIControls() override;
    
    void SetEnabled(bool enabled) override { mEnabled = enabled; }

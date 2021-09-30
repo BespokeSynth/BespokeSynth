@@ -37,7 +37,7 @@ public:
    ModulationVisualizer();
    static IDrawableModule* Create() { return new ModulationVisualizer(); }
    
-   string GetTitleLabel() override { return "modulation visualizer"; }
+   std::string GetTitleLabel() override { return "modulation visualizer"; }
    
    void SetEnabled(bool enabled) override { mEnabled = enabled; }
    
@@ -56,13 +56,13 @@ private:
    struct VizVoice
    {
       VizVoice() : mActive(false) {}
-      string GetInfoString();
+      std::string GetInfoString();
       bool mActive;
       ModulationParameters mModulators;
    };
    
    VizVoice mGlobalModulation;
-   vector<VizVoice> mVoices;
+   std::vector<VizVoice> mVoices;
 };
 
 #endif /* defined(__Bespoke__ModulationVisualizer__) */

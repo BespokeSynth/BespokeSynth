@@ -46,7 +46,7 @@ public:
    virtual ~FFTtoAdditive();
    static IDrawableModule* Create() { return new FFTtoAdditive(); }
    
-   string GetTitleLabel() override { return "fft to additive"; }
+   std::string GetTitleLabel() override { return "fft to additive"; }
    void CreateUIControls() override;
 
    //IAudioReceiver

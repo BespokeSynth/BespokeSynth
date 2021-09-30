@@ -41,7 +41,7 @@ public:
    virtual ~MPESmoother();
    static IDrawableModule* Create() { return new MPESmoother(); }
    
-   string GetTitleLabel() override { return "mpe smoother"; }
+   std::string GetTitleLabel() override { return "mpe smoother"; }
    void CreateUIControls() override;
    void SetEnabled(bool enabled) override { mEnabled = enabled; }
    void Init() override;

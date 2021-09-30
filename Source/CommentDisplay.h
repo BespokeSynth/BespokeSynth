@@ -38,7 +38,7 @@ public:
    virtual ~CommentDisplay();
    static IDrawableModule* Create() { return new CommentDisplay(); }
    
-   string GetTitleLabel() override { return "comment"; }
+   std::string GetTitleLabel() override { return "comment"; }
    void CreateUIControls() override;
    
    void TextEntryComplete(TextEntry* entry) override;

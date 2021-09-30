@@ -39,7 +39,7 @@ public:
       kVertical
    };
 
-   CanvasScrollbar(Canvas* canvas, string name, Style style);
+   CanvasScrollbar(Canvas* canvas, std::string name, Style style);
    ~CanvasScrollbar() {}
 
    void SetDimensions(float width, float height) { mWidth = width; mHeight = height; }

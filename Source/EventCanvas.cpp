@@ -429,7 +429,7 @@ void EventCanvas::SaveState(FileStreamOut& out)
    out << (int)mControlCables.size();
    for (auto cable : mControlCables)
    {
-      string path = "";
+      std::string path = "";
       if (cable->GetTarget())
          path = cable->GetTarget()->Path();
       out << path;
@@ -451,7 +451,7 @@ void EventCanvas::LoadState(FileStreamIn& in)
    mControlCables.resize(size);
    for (auto cable : mControlCables)
    {
-      string path;
+      std::string path;
       in >> path;
       cable->SetTarget(TheSynth->FindUIControl(path));
    }
@@ -459,9 +459,9 @@ void EventCanvas::LoadState(FileStreamIn& in)
    mCanvas->LoadState(in);
 }
 
-vector<IUIControl*> EventCanvas::ControlsToIgnoreInSaveState() const
+std::vector<IUIControl*> EventCanvas::ControlsToIgnoreInSaveState() const
 {
-   vector<IUIControl*> ignore;
+   std::vector<IUIControl*> ignore;
    ignore.push_back(mCanvas);
    return ignore;
 }

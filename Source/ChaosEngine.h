@@ -50,7 +50,7 @@ public:
    static IDrawableModule* Create() { return new ChaosEngine(); }
    static bool CanCreate() { return TheChaosEngine == nullptr; }
    
-   string GetTitleLabel() override { return "CHAOS ENGINE"; }
+   std::string GetTitleLabel() override { return "CHAOS ENGINE"; }
    void CreateUIControls() override;
    
    void Init() override;
@@ -89,18 +89,18 @@ private:
    
    struct SongSection
    {
-      string mName;
+      std::string mName;
       std::vector<ProgressionChord> mChords;
    };
    
    struct Song
    {
-      string mName;
+      std::string mName;
       float mTempo;
       int mTimeSigTop;
       int mTimeSigBottom;
       int mScaleRoot;
-      string mScaleType;
+      std::string mScaleType;
       std::vector<SongSection> mSections;
    };
    
@@ -111,7 +111,7 @@ private:
    void ReadSongs();
    void UpdateProgression(int beat);
    void GenerateRandomProgression();
-   vector<int> GetCurrentChordPitches();
+   std::vector<int> GetCurrentChordPitches();
    ofRectangle GetKeyboardKeyRect(int pitch, bool& isBlackKey);
    
    //IDrawableModule
@@ -154,7 +154,7 @@ private:
    DropdownList* mChordTypeList;
    IntSlider* mInversionSlider;
    
-   vector<Chord> mInputChords;
+   std::vector<Chord> mInputChords;
    ClickButton* mAddChordButton;
    ClickButton* mRemoveChordButton;
    ClickButton* mSetProgressionButton;

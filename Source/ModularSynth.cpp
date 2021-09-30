@@ -136,7 +136,7 @@ LONG WINAPI TopLevelExceptionHandler(PEXCEPTION_POINTERS pExceptionInfo)
 
 void ModularSynth::DumpStats(bool isCrash, void* crashContext)
 {
-   string filename;
+   std::string filename;
    if (isCrash)
       filename = ofToDataPath(ofGetTimestampString("crash_%Y-%m-%d_%H-%M.txt"));
    else
@@ -227,7 +227,7 @@ void ModularSynth::DumpStats(bool isCrash, void* crashContext)
    log.appendText("display language: " + juce::SystemStats::getDisplayLanguage() + "\n");
    log.appendText("description: " + juce::SystemStats::getDeviceDescription() + "\n");
    log.appendText("manufacturer: " + juce::SystemStats::getDeviceManufacturer() + "\n");
-   log.appendText("build: bespoke " + JUCEApplication::getInstance()->getApplicationVersion() + " (" + string(__DATE__) + " " + string(__TIME__) + ")\n");
+   log.appendText("build: bespoke " + JUCEApplication::getInstance()->getApplicationVersion() + " (" + std::string(__DATE__) + " " + std::string(__TIME__) + ")\n");
 }
 
 bool ModularSynth::IsReady()
@@ -319,9 +319,9 @@ void ModularSynth::InitIOBuffers(int inputChannelCount, int outputChannelCount)
 }
 
 
-string ModularSynth::GetUserPrefsPath(bool relative)
+std::string ModularSynth::GetUserPrefsPath(bool relative)
 {
-   string filename = "userprefs.json";
+   std::string filename = "userprefs.json";
    if (JUCEApplication::getCommandLineParameterArray().size() > 0)
    {
       juce::String specified = JUCEApplication::getCommandLineParameterArray()[0];
@@ -343,7 +343,7 @@ void ModularSynth::Poll()
 {
    if (mFatalError == "")
    {
-      string defaultLayout = "layouts/blank.json";
+      std::string defaultLayout = "layouts/blank.json";
       if (!mUserPrefs["layout"].isNull())
          defaultLayout = mUserPrefs["layout"].asString();
       
@@ -504,14 +504,14 @@ void ModularSynth::Draw(void* vg)
    
    if (gTime == 1 && mFatalError == "")
    {
-      string loading("Bespoke is initializing audio...");
+      std::string loading("Bespoke is initializing audio...");
       DrawTextNormal(loading,ofGetWidth()/2-GetStringWidth(loading,30)/2,ofGetHeight()/2-6, 30);
       return;
    }
    
    if (!mInitialized && mFatalError == "")
    {
-      string loading("Bespoke is loading...");
+      std::string loading("Bespoke is loading...");
       DrawTextNormal(loading,ofGetWidth()/2-GetStringWidth(loading,30)/2,ofGetHeight()/2-6, 30);
       return;
    }
@@ -632,7 +632,7 @@ void ModularSynth::Draw(void* vg)
       ofPopMatrix();
    }
    
-   string tooltip = "";
+   std::string tooltip = "";
    ModuleContainer* tooltipContainer = nullptr;
    if (HelpDisplay::sShowTooltips && 
        !IUIControl::WasLastHoverSetViaTab() &&
@@ -641,14 +641,14 @@ void ModularSynth::Draw(void* vg)
    {
       HelpDisplay* helpDisplay = TheTitleBar->GetHelpDisplay();
 
-      bool hasValidHoveredControl = gHoveredUIControl && string(gHoveredUIControl->Name()) != "enabled";
+      bool hasValidHoveredControl = gHoveredUIControl && std::string(gHoveredUIControl->Name()) != "enabled";
       
       if (gHoveredModule && (!hasValidHoveredControl || (gHoveredUIControl != nullptr && gHoveredUIControl->GetModuleParent() != gHoveredModule)))
       {
          if (gHoveredModule == mQuickSpawn)
          {
-            string name = mQuickSpawn->GetHoveredModuleTypeName();
-            ofStringReplace(name, " " + string(ModuleFactory::kEffectChainSuffix), "");   //strip this suffix if it's there
+            std::string name = mQuickSpawn->GetHoveredModuleTypeName();
+            ofStringReplace(name, " " + std::string(ModuleFactory::kEffectChainSuffix), "");   //strip this suffix if it's there
             tooltip = helpDisplay->GetModuleTooltipFromName(name);
             tooltipContainer = mQuickSpawn->GetOwningContainer();
          }
@@ -657,14 +657,14 @@ void ModularSynth::Draw(void* vg)
             DropdownListModal* list = dynamic_cast<DropdownListModal*>(gHoveredModule);
             if (list->GetOwner()->GetModuleParent() == TheTitleBar)
             {
-               string moduleTypeName = dynamic_cast<DropdownListModal*>(gHoveredModule)->GetHoveredLabel();
+               std::string moduleTypeName = dynamic_cast<DropdownListModal*>(gHoveredModule)->GetHoveredLabel();
                ofStringReplace(moduleTypeName, " (exp.)", "");
                tooltip = helpDisplay->GetModuleTooltipFromName(moduleTypeName);
                tooltipContainer = &mUILayerModuleContainer;
             }
             else if (dynamic_cast<EffectChain*>(list->GetOwner()->GetParent()) != nullptr)
             {
-               string effectName = dynamic_cast<DropdownListModal*>(gHoveredModule)->GetHoveredLabel();
+               std::string effectName = dynamic_cast<DropdownListModal*>(gHoveredModule)->GetHoveredLabel();
                tooltip = helpDisplay->GetModuleTooltipFromName(effectName);
                tooltipContainer = list->GetModuleParent()->GetOwningContainer();
             }
@@ -836,7 +836,7 @@ void ModularSynth::DrawConsole()
          else
             ofSetColor(200, 200, 200);
          DrawTextNormal(it->text, 10, consoleY);
-         vector<string> lines = ofSplitString(it->text, "\n");
+         std::vector<std::string> lines = ofSplitString(it->text, "\n");
          ofPopStyle();
          consoleY += 15 * lines.size();
       }
@@ -849,7 +849,7 @@ void ModularSynth::DrawConsole()
          for (auto it = mErrors.begin(); it != mErrors.end(); ++it)
          {
             DrawTextNormal(*it, 600, consoleY);
-            vector<string> lines = ofSplitString(*it, "\n");
+            std::vector<std::string> lines = ofSplitString(*it, "\n");
             consoleY += 15 * lines.size();
          }
          ofPopStyle();
@@ -1188,8 +1188,8 @@ void ModularSynth::MouseDragged(int intX, int intY, int button)
    
    if (GetKeyModifiers() == kModifier_Alt && !mHasDuplicatedDuringDrag)
    {
-      vector<IDrawableModule*> newGroupSelectedModules;
-      map<IDrawableModule*, IDrawableModule*> oldToNewModuleMap;
+      std::vector<IDrawableModule*> newGroupSelectedModules;
+      std::map<IDrawableModule*, IDrawableModule*> oldToNewModuleMap;
       for (auto module : mGroupSelectedModules)
       {
          if (!module->IsSingleton())
@@ -1542,7 +1542,7 @@ void ModularSynth::OnModuleDeleted(IDrawableModule* module)
    
    mAudioThreadMutex.Lock("delete");
    
-   list<PatchCable*> cablesToRemove;
+   std::list<PatchCable*> cablesToRemove;
    for (auto* cable : mPatchCables)
    {
       if (cable->GetOwningModule() == module)
@@ -1730,7 +1730,7 @@ void ModularSynth::TriggerClapboard()
    mLastClapboardTime = gTime; //for synchronizing internally recorded audio and externally recorded video
 }
 
-void ModularSynth::FilesDropped(vector<string> files, int intX, int intY)
+void ModularSynth::FilesDropped(std::vector<std::string> files, int intX, int intY)
 {
    if (files.size() > 0)
    {
@@ -1753,14 +1753,14 @@ struct SourceDepInfo
 {
    SourceDepInfo(IAudioSource* me) : mMe(me) {}
    IAudioSource* mMe;
-   vector<IAudioSource*> mDeps;
+   std::vector<IAudioSource*> mDeps;
 };
 
 void ModularSynth::ArrangeAudioSourceDependencies()
 {
    //ofLog() << "Calculating audio source dependencies:";
    
-   vector<SourceDepInfo> deps;
+   std::vector<SourceDepInfo> deps;
    for (int i=0; i<mSources.size(); ++i)
       deps.push_back(SourceDepInfo(mSources[i]));
       
@@ -1854,7 +1854,7 @@ void ModularSynth::ResetLayout()
    
    mErrors.clear();
    
-   vector<PatchCable*> cablesToDelete = mPatchCables;
+   std::vector<PatchCable*> cablesToDelete = mPatchCables;
    for (auto cable : cablesToDelete)
       delete cable;
    assert(mPatchCables.size() == 0); //everything should have been cleared out by that
@@ -1915,7 +1915,7 @@ void ModularSynth::ResetLayout()
    SetUIScale(uiScale);
 }
 
-bool ModularSynth::LoadLayoutFromFile(string jsonFile, bool makeDefaultLayout /*= true*/)
+bool ModularSynth::LoadLayoutFromFile(std::string jsonFile, bool makeDefaultLayout /*= true*/)
 {
    ofLog() << "Loading layout: " << jsonFile;
    mLoadedLayoutPath = String(jsonFile).replace(ofToDataPath("").c_str(), "").toStdString();
@@ -1971,7 +1971,7 @@ bool ModularSynth::LoadLayoutFromFile(string jsonFile, bool makeDefaultLayout /*
    return true;
 }
 
-bool ModularSynth::LoadLayoutFromString(string jsonString)
+bool ModularSynth::LoadLayoutFromString(std::string jsonString)
 {
    ofxJSONElement root;
    bool loaded = root.parse(jsonString);
@@ -1995,7 +1995,7 @@ void ModularSynth::LoadLayout(ofxJSONElement json)
    //ofLoadURLAsync("http://bespoke.com/telemetry/"+jsonFile);
    
    ScopedMutex mutex(&mAudioThreadMutex, "LoadLayout()");
-   std::lock_guard<recursive_mutex> renderLock(mRenderLock);
+   std::lock_guard<std::recursive_mutex> renderLock(mRenderLock);
    
    ResetLayout();
    
@@ -2032,7 +2032,7 @@ IDrawableModule* ModularSynth::CreateModule(const ofxJSONElement& moduleInfo)
    if (moduleInfo["comment_out"].asBool()) //hack since json doesn't allow comments
       return nullptr;
 
-   string type = moduleInfo["type"].asString();
+   std::string type = moduleInfo["type"].asString();
    type = ModuleFactory::FixUpTypeName(type);
    
    try
@@ -2096,7 +2096,7 @@ void ModularSynth::ScheduleEnvelopeEditorSpawn(ADSRDisplay* adsrDisplay)
    mScheduledEnvelopeEditorSpawnDisplay = adsrDisplay;
 }
 
-IDrawableModule* ModularSynth::FindModule(string name, bool fail)
+IDrawableModule* ModularSynth::FindModule(std::string name, bool fail)
 {
    if (name[0] == '$')
    {
@@ -2111,7 +2111,7 @@ IDrawableModule* ModularSynth::FindModule(string name, bool fail)
    return mModuleContainer.FindModule(IClickable::sLoadContext+name, fail);
 }
 
-MidiController* ModularSynth::FindMidiController(string name, bool fail)
+MidiController* ModularSynth::FindMidiController(std::string name, bool fail)
 {
    if (name == "")
       return nullptr;
@@ -2136,7 +2136,7 @@ MidiController* ModularSynth::FindMidiController(string name, bool fail)
    return m;
 }
 
-IUIControl* ModularSynth::FindUIControl(string path)
+IUIControl* ModularSynth::FindUIControl(std::string path)
 {
    if (path == "")
       return nullptr;
@@ -2176,7 +2176,7 @@ void ModularSynth::GrabSample(ChannelBuffer* data, bool window, int numBars)
    }
 }
 
-void ModularSynth::GrabSample(string filePath)
+void ModularSynth::GrabSample(std::string filePath)
 {
    delete mHeldSample;
    mHeldSample = new Sample();
@@ -2189,7 +2189,7 @@ void ModularSynth::ClearHeldSample()
    mHeldSample = nullptr;
 }
 
-void ModularSynth::LogEvent(string event, LogEventType type)
+void ModularSynth::LogEvent(std::string event, LogEventType type)
 {
    if (type == kLogEventType_Warning)
    {
@@ -2215,9 +2215,9 @@ IDrawableModule* ModularSynth::DuplicateModule(IDrawableModule* module)
    
    ofxJSONElement layoutData;
    module->SaveLayout(layoutData);
-   vector<IDrawableModule*> allModules;
+   std::vector<IDrawableModule*> allModules;
    mModuleContainer.GetAllModules(allModules);
-   string newName = GetUniqueName(layoutData["name"].asString(), allModules);
+   std::string newName = GetUniqueName(layoutData["name"].asString(), allModules);
    layoutData["name"] = newName;
    
    IDrawableModule* newModule = CreateModule(layoutData);
@@ -2251,7 +2251,7 @@ ofxJSONElement ModularSynth::GetLayout()
    return root;
 }
 
-void ModularSynth::SaveLayout(string jsonFile, bool makeDefaultLayout /*= true*/)
+void ModularSynth::SaveLayout(std::string jsonFile, bool makeDefaultLayout /*= true*/)
 {
    if (jsonFile.empty())
       jsonFile = ofToDataPath(mLoadedLayoutPath);
@@ -2303,13 +2303,13 @@ void ModularSynth::LoadStatePopupImp()
       LoadState(chooser.getResult().getFullPathName().toStdString());
 }
 
-void ModularSynth::SaveState(string file, bool autosave)
+void ModularSynth::SaveState(std::string file, bool autosave)
 {
    if (!autosave)
    {
       mCurrentSaveStatePath = file;
       mLastSaveTime = gTime;
-      string filename = File(mCurrentSaveStatePath).getFileName().toStdString();
+      std::string filename = File(mCurrentSaveStatePath).getFileName().toStdString();
       mMainComponent->getTopLevelComponent()->setName("bespoke synth - "+filename);
    }
 
@@ -2323,7 +2323,7 @@ void ModularSynth::SaveState(string file, bool autosave)
    mAudioThreadMutex.Unlock();
 }
 
-void ModularSynth::LoadState(string file)
+void ModularSynth::LoadState(std::string file)
 {
    ofLog() << "LoadState() " << file;
 
@@ -2345,7 +2345,7 @@ void ModularSynth::LoadState(string file)
    
    FileStreamIn in(ofToDataPath(file));
    
-   string jsonString;
+   std::string jsonString;
    in >> jsonString;
    bool layoutLoaded = LoadLayoutFromString(jsonString);
    
@@ -2359,7 +2359,7 @@ void ModularSynth::LoadState(string file)
    }
    
    mCurrentSaveStatePath = file;
-   string filename = File(mCurrentSaveStatePath).getFileName().toStdString();
+   std::string filename = File(mCurrentSaveStatePath).getFileName().toStdString();
    mMainComponent->getTopLevelComponent()->setName("bespoke synth - " + filename);
 
    mAudioThreadMutex.Lock("LoadState()");
@@ -2370,7 +2370,7 @@ void ModularSynth::LoadState(string file)
    mAudioThreadMutex.Unlock();
 }
 
-IAudioReceiver* ModularSynth::FindAudioReceiver(string name, bool fail)
+IAudioReceiver* ModularSynth::FindAudioReceiver(std::string name, bool fail)
 {
    IAudioReceiver* a = nullptr;
    
@@ -2395,7 +2395,7 @@ IAudioReceiver* ModularSynth::FindAudioReceiver(string name, bool fail)
    return a;
 }
 
-INoteReceiver* ModularSynth::FindNoteReceiver(string name, bool fail)
+INoteReceiver* ModularSynth::FindNoteReceiver(std::string name, bool fail)
 {
    INoteReceiver* n = nullptr;
    
@@ -2422,7 +2422,7 @@ INoteReceiver* ModularSynth::FindNoteReceiver(string name, bool fail)
 
 void ModularSynth::OnConsoleInput()
 {
-   vector<string> tokens = ofSplitString(mConsoleText," ",true,true);
+   std::vector<std::string> tokens = ofSplitString(mConsoleText," ",true,true);
    if (tokens.size() > 0)
    {
       if (tokens[0] == "")
@@ -2469,7 +2469,7 @@ void ModularSynth::OnConsoleInput()
       }
       else if (tokens[0] == "minimizeall")
       {
-         const vector<IDrawableModule*> modules = mModuleContainer.GetModules();
+         const std::vector<IDrawableModule*> modules = mModuleContainer.GetModules();
          for (auto iter = modules.begin(); iter != modules.end(); ++iter)
          {
             (*iter)->SetMinimized(true);
@@ -2590,23 +2590,23 @@ void ModularSynth::DoAutosave()
    SaveState(ofToDataPath(ofGetTimestampString("savestate/autosave/autosave_%Y-%m-%d_%H-%M-%S.bsk")), true);
 }
 
-IDrawableModule* ModularSynth::SpawnModuleOnTheFly(string moduleName, float x, float y, bool addToContainer)
+IDrawableModule* ModularSynth::SpawnModuleOnTheFly(std::string moduleName, float x, float y, bool addToContainer)
 {
    if (mInitialized)
       TitleBar::sShowInitialHelpOverlay = false;  //don't show initial help popup
 
-   vector<string> tokens = ofSplitString(moduleName," ");
+   std::vector<std::string> tokens = ofSplitString(moduleName," ");
    if (tokens.size() == 0)
       return nullptr;
 
    if (sShouldAutosave)
       DoAutosave();
 
-   string moduleType = tokens[0];
+   std::string moduleType = tokens[0];
    
    moduleType = ModuleFactory::FixUpTypeName(moduleType);
 
-   string vstToSetUp = "";
+   std::string vstToSetUp = "";
    if (tokens.size() > 1 && tokens[tokens.size() - 1] == ModuleFactory::kVSTSuffix)
    {
       moduleType = "vstplugin";
@@ -2618,7 +2618,7 @@ IDrawableModule* ModularSynth::SpawnModuleOnTheFly(string moduleName, float x, f
       }
    }
 
-   string prefabToSetUp = "";
+   std::string prefabToSetUp = "";
    if (tokens.size() > 1 && tokens[tokens.size() - 1] == ModuleFactory::kPrefabSuffix)
    {
       moduleType = "prefab";
@@ -2630,7 +2630,7 @@ IDrawableModule* ModularSynth::SpawnModuleOnTheFly(string moduleName, float x, f
       }
    }
 
-   string midiControllerToSetUp = "";
+   std::string midiControllerToSetUp = "";
    if (tokens.size() > 1 && tokens[tokens.size() - 1] == ModuleFactory::kMidiControllerSuffix)
    {
       moduleType = "midicontroller";
@@ -2642,7 +2642,7 @@ IDrawableModule* ModularSynth::SpawnModuleOnTheFly(string moduleName, float x, f
       }
    }
 
-   string effectToSetUp = "";
+   std::string effectToSetUp = "";
    if (tokens.size() > 1 && tokens[tokens.size() - 1] == ModuleFactory::kEffectChainSuffix)
    {
       moduleType = "effectchain";
@@ -2656,7 +2656,7 @@ IDrawableModule* ModularSynth::SpawnModuleOnTheFly(string moduleName, float x, f
 
    ofxJSONElement dummy;
    dummy["type"] = moduleType;
-   vector<IDrawableModule*> allModules;
+   std::vector<IDrawableModule*> allModules;
    mModuleContainer.GetAllModules(allModules);
    dummy["name"] = GetUniqueName(moduleType, allModules);
    dummy["onthefly"] = true;
@@ -2756,11 +2756,11 @@ void ModularSynth::SaveOutput()
 {
    ScopedMutex mutex(&mAudioThreadMutex, "SaveOutput()");
 
-   string recordingsPath = "recordings/";
+   std::string recordingsPath = "recordings/";
    if (!mUserPrefs["recordings_path"].isNull())
       recordingsPath = mUserPrefs["recordings_path"].asString();
    
-   string filename = ofGetTimestampString(recordingsPath + "recording_%Y-%m-%d_%H-%M.wav");
+   std::string filename = ofGetTimestampString(recordingsPath + "recording_%Y-%m-%d_%H-%M.wav");
    //string filenamePos = ofGetTimestampString("recordings/pos_%Y-%m-%d_%H-%M.wav");
 
    assert(mRecordingLength <= mGlobalRecordBuffer->Size());
@@ -2793,7 +2793,7 @@ void ModularSynth::ReadClipboardTextFromSystem() {
    TheClipboard = SystemClipboard::getTextFromClipboard();
 }
 
-void ModularSynth::SetFatalError(string error)
+void ModularSynth::SetFatalError(std::string error)
 {
    if (mFatalError == "")
    {

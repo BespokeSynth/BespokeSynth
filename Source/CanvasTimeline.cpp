@@ -29,7 +29,7 @@
 #include "Canvas.h"
 #include "ModularSynth.h"
 
-CanvasTimeline::CanvasTimeline(Canvas* canvas, string name)
+CanvasTimeline::CanvasTimeline(Canvas* canvas, std::string name)
    : mClick(false)
    , mHoverMode(HoverMode::kNone)
    , mCanvas(canvas)

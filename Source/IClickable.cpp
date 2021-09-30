@@ -30,8 +30,8 @@
 
 #include <cstring>
 
-string IClickable::sLoadContext = "";
-string IClickable::sSaveContext = "";
+std::string IClickable::sLoadContext = "";
+std::string IClickable::sSaveContext = "";
 
 IClickable::IClickable()
 : mX(0)
@@ -145,12 +145,12 @@ IDrawableModule* IClickable::GetModuleParent()
    return dynamic_cast<IDrawableModule*>(parent);
 }
 
-string IClickable::Path(bool ignoreContext)
+std::string IClickable::Path(bool ignoreContext)
 {
    if (mName[0] == 0)  //must have a name
       return "";
    
-   string path = mName;
+   std::string path = mName;
    if (mParent != nullptr)
       path = mParent->Path(true) + "~" + mName;
    

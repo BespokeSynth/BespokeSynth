@@ -39,7 +39,7 @@ public:
    virtual ~SignalClamp();
    static IDrawableModule* Create() { return new SignalClamp(); }
    
-   string GetTitleLabel() override { return "signal clamp"; }
+   std::string GetTitleLabel() override { return "signal clamp"; }
    void CreateUIControls() override;
    
    //IAudioSource

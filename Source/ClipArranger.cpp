@@ -197,7 +197,7 @@ bool ClipArranger::IsMousePosWithinClip(int x, int y)
    return x >= 0 && x < w && y >= 0 && y < h;
 }
 
-void ClipArranger::FilesDropped(vector<string> files, int x, int y)
+void ClipArranger::FilesDropped(std::vector<std::string> files, int x, int y)
 {
    Sample* sample = new Sample();
    sample->Read(files[0].c_str());

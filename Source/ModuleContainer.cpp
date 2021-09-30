@@ -51,7 +51,7 @@ ofVec2f ModuleContainer::GetOwnerPosition() const
    return ofVec2f();
 }
 
-void ModuleContainer::GetAllModules(vector<IDrawableModule*>& out)
+void ModuleContainer::GetAllModules(std::vector<IDrawableModule*>& out)
 {
    out.insert(out.begin(), mModules.begin(), mModules.end());
    for (int i=0; i<mModules.size(); ++i)
@@ -124,7 +124,7 @@ void ModuleContainer::Poll()
 
 void ModuleContainer::Clear()
 {
-   vector<IDrawableModule*> modulesToDelete = mModules;
+   std::vector<IDrawableModule*> modulesToDelete = mModules;
    for (auto* module : modulesToDelete)
    {
       if (module->GetContainer())
@@ -259,7 +259,7 @@ float ModuleContainer::GetDrawScale() const
    return mDrawScale;
 }
 
-void ModuleContainer::GetModulesWithinRect(ofRectangle rect, vector<IDrawableModule*>& output)
+void ModuleContainer::GetModulesWithinRect(ofRectangle rect, std::vector<IDrawableModule*>& output)
 {
    output.clear();
    for (int i=0; i<mModules.size(); ++i)
@@ -339,7 +339,7 @@ void ModuleContainer::DeleteModule(IDrawableModule* module)
    {
       if (iter->GetPatchCableSource())
       {
-         vector<PatchCable*> cablesToDestroy;
+         std::vector<PatchCable*> cablesToDestroy;
          for (auto cable : iter->GetPatchCableSource()->GetPatchCables())
          {
             if (cable->GetTarget() == module)
@@ -364,7 +364,7 @@ void ModuleContainer::DeleteModule(IDrawableModule* module)
    TheSynth->OnModuleDeleted(module);
 }
 
-IDrawableModule* ModuleContainer::FindModule(string name, bool fail)
+IDrawableModule* ModuleContainer::FindModule(std::string name, bool fail)
 {
    /*string ownerPath = "";
    if (mOwner)
@@ -381,7 +381,7 @@ IDrawableModule* ModuleContainer::FindModule(string name, bool fail)
    {
       if (name == mModules[i]->Name())
          return mModules[i];
-      vector<string> tokens = ofSplitString(name, "~");
+      std::vector<std::string> tokens = ofSplitString(name, "~");
       if (mModules[i]->GetContainer())
       {
          if (tokens[0] == mModules[i]->Name())
@@ -410,7 +410,7 @@ IDrawableModule* ModuleContainer::FindModule(string name, bool fail)
    return nullptr;
 }
 
-IUIControl* ModuleContainer::FindUIControl(string path)
+IUIControl* ModuleContainer::FindUIControl(std::string path)
 {
    /*string ownerPath = "";
    if (mOwner)
@@ -423,9 +423,9 @@ IUIControl* ModuleContainer::FindUIControl(string path)
    if (path == "")
       return nullptr;
    
-   vector<string> tokens = ofSplitString(path,"~");
-   string control = tokens[tokens.size()-1];
-   string modulePath = path.substr(0, path.length() - (control.length() + 1));
+   std::vector<std::string> tokens = ofSplitString(path,"~");
+   std::string control = tokens[tokens.size()-1];
+   std::string modulePath = path.substr(0, path.length() - (control.length() + 1));
    IDrawableModule* module = FindModule(modulePath, false);
    
    if (module)
@@ -519,7 +519,7 @@ void ModuleContainer::LoadModules(const ofxJSONElement& modules)
          TimerInstance t("init", timer);
          for (int i=0; i<mModules.size(); ++i)
          {
-            TimerInstance t(string("init ")+mModules[i]->Name(), timer);
+            TimerInstance t(std::string("init ")+mModules[i]->Name(), timer);
             if (mModules[i]->IsSingleton() == false)
                mModules[i]->Init();
          }
@@ -531,7 +531,7 @@ void ModuleContainer::LoadModules(const ofxJSONElement& modules)
 
 bool ModuleSorter(const IDrawableModule* a, const IDrawableModule* b)
 {
-   return string(a->Name()) < string(b->Name());
+   return std::string(a->Name()) < std::string(b->Name());
 }
 
 ofxJSONElement ModuleContainer::WriteModules()
@@ -544,7 +544,7 @@ ofxJSONElement ModuleContainer::WriteModules()
    
    ofxJSONElement modules;
    
-   vector<IDrawableModule*> saveModules;
+   std::vector<IDrawableModule*> saveModules;
    for (int i=0; i<mModules.size(); ++i)
    {
       IDrawableModule* module = mModules[i];
@@ -593,7 +593,7 @@ void ModuleContainer::SaveState(FileStreamOut& out)
       if (module != TheSaveDataPanel && module != TheTitleBar)
       {
          //ofLog() << "Saving " << module->Name();
-         out << string(module->Name());
+         out << std::string(module->Name());
          module->SaveState(out);
          for (int i=0; i<GetModuleSeparatorLength(); ++i)
             out << GetModuleSeparator()[i];
@@ -620,7 +620,7 @@ void ModuleContainer::LoadState(FileStreamIn& in)
    
    for (int i=0; i<savedModules; ++i)
    {
-      string moduleName;
+      std::string moduleName;
       in >> moduleName;
       //ofLog() << "Loading " << moduleName;
       IDrawableModule* module = FindModule(moduleName, false);
@@ -641,7 +641,7 @@ void ModuleContainer::LoadState(FileStreamIn& in)
                //something went wrong, let's print some info to try to figure it out
                ofLog() << "Read char " + ofToString(separatorChar) + " but expected " + GetModuleSeparator()[j] + "!";
                ofLog() << "Save state file position is " + ofToString(in.GetFilePosition()) + ", EoF is " + (in.Eof() ? "true" : "false");
-               string nextFewChars = "Next 10 characters are:";
+               std::string nextFewChars = "Next 10 characters are:";
                for (int c=0;c<10;++c)
                {
                   char ch;

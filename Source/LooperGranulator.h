@@ -46,7 +46,7 @@ public:
    virtual ~LooperGranulator();
    static IDrawableModule* Create() { return new LooperGranulator(); }
 
-   string GetTitleLabel() override { return "looper granulator"; }
+   std::string GetTitleLabel() override { return "looper granulator"; }
    void CreateUIControls() override;
 
    void ProcessFrame(double time, float bufferOffset, float* output);

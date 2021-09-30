@@ -192,7 +192,7 @@ void ChaosEngine::UpdateProgression(int beat)
    mNoteOutput.Flush(gTime);
    if (mPlayChord)
    {
-      vector<int> pitches = GetCurrentChordPitches();
+      std::vector<int> pitches = GetCurrentChordPitches();
       for (int i=0; i<pitches.size(); ++i)
       {
          PlayNoteOutput(gTime, pitches[i], 127, -1);
@@ -200,7 +200,7 @@ void ChaosEngine::UpdateProgression(int beat)
    }
 }
 
-vector<int> ChaosEngine::GetCurrentChordPitches()
+std::vector<int> ChaosEngine::GetCurrentChordPitches()
 {
    ProgressionChord chord(0);
    if (mChordProgressionIdx != -1)
@@ -208,12 +208,12 @@ vector<int> ChaosEngine::GetCurrentChordPitches()
    
    int degree = TheScale->GetScaleDegree();
    
-   vector<int> tones;
+   std::vector<int> tones;
    tones.push_back(0+degree);
    tones.push_back(2+degree);
    tones.push_back(4+degree);
    
-   vector<int> pitches;
+   std::vector<int> pitches;
    for (int i=0; i<tones.size(); ++i)
    {
       int tone = tones[i];
@@ -273,7 +273,7 @@ void ChaosEngine::DrawModule()
       int degree;
       std::vector<Accidental> accidentals;
       TheScale->GetChordDegreeAndAccidentals(mInputChords[i], degree, accidentals);
-      string accidentalList;
+      std::string accidentalList;
       for (int i=0; i<accidentals.size(); ++i)
          accidentalList += ofToString(accidentals[i].mPitch) + (accidentals[i].mDirection == 1? "#" : "b") + " ";
       DrawTextNormal(mInputChords[i].Name(true,true), 400, 75+i*15);
@@ -311,7 +311,7 @@ void ChaosEngine::DrawModule()
       displayChord.mInversion = mChordProgression[i].mInversion;
       gFont.DrawString(displayChord.Name(true,false,&scale),48, x, y);
       
-      string accidentalList;
+      std::string accidentalList;
       for (int j=0; j<mChordProgression[i].mAccidentals.size(); ++j)
          accidentalList += ofToString(mChordProgression[i].mAccidentals[j].mPitch) + (mChordProgression[i].mAccidentals[j].mDirection == 1? "#" : "b") + "\n";
       DrawTextNormal(accidentalList, x+180, y-18);
@@ -421,7 +421,7 @@ void ChaosEngine::DrawKeyboard(float x, float y)
    ofFill();
    ofSetColor(255,255,255);
    ofSetLineWidth(2);
-   vector<int> chord = GetCurrentChordPitches();
+   std::vector<int> chord = GetCurrentChordPitches();
    sort(chord.begin(),chord.end());
    ofVec2f lastNoteConnector;
    for (int j=0; j<chord.size(); ++j)
@@ -591,7 +591,7 @@ void ChaosEngine::ReadSongs()
       mSongs[i].mTimeSigTop = song["timesig"][0u].asInt();
       mSongs[i].mTimeSigBottom = song["timesig"][1u].asInt();
       
-      string scaleRootName = song["scaleroot"].asString();
+      std::string scaleRootName = song["scaleroot"].asString();
       int j;
       for (j=0; j<12; ++j)
       {

@@ -11,7 +11,7 @@ class PSMoveListener
 {
 public:
    virtual ~PSMoveListener() {}
-   virtual void OnPSMoveButton(int id, string button, int val) = 0;
+   virtual void OnPSMoveButton(int id, std::string button, int val) = 0;
 };
 
 class PSMoveMgr
@@ -36,7 +36,7 @@ public:
    
 private:
    _PSMove* SetUpMove(int id);
-   void SendButtonMessage(int id, string button, int val);
+   void SendButtonMessage(int id, std::string button, int val);
 
    _PSMove* mMove[MAX_NUM_PS_MOVES];
    int mButtons[MAX_NUM_PS_MOVES];

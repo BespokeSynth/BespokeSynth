@@ -39,7 +39,7 @@ public:
    virtual ~NoteStrummer();
    static IDrawableModule* Create() { return new NoteStrummer(); }
    
-   string GetTitleLabel() override { return "note strummer"; }
+   std::string GetTitleLabel() override { return "note strummer"; }
    void CreateUIControls() override;
    void Init() override;
    
@@ -63,5 +63,5 @@ private:
    float mStrum;
    float mLastStrumPos;
    FloatSlider* mStrumSlider;
-   list<int> mNotes;
+   std::list<int> mNotes;
 };

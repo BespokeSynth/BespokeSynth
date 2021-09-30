@@ -933,7 +933,7 @@ void Autotalent::Process(double time)
    mLatency = (N-1);
 }
 
-string Autotalent::GetTitleLabel()
+std::string Autotalent::GetTitleLabel()
 {
    if (Minimized())
       return "autotalent";

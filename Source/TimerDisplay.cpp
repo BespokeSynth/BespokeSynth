@@ -60,11 +60,11 @@ void TimerDisplay::DrawModule()
    int mins = secs / 60;
    secs %= 60;
    
-   string zeroPadMins = "";
+   std::string zeroPadMins = "";
    if (mins < 10)
       zeroPadMins = "0";
    
-   string zeroPadSecs = "";
+   std::string zeroPadSecs = "";
    if (secs < 10)
       zeroPadSecs = "0";
    

@@ -37,7 +37,7 @@ public:
    ScaleDegree();
    static IDrawableModule* Create() { return new ScaleDegree(); }
    
-   string GetTitleLabel() override { return "scale degree"; }
+   std::string GetTitleLabel() override { return "scale degree"; }
    void CreateUIControls() override;
    
    void SetEnabled(bool enabled) override { mEnabled = enabled; }

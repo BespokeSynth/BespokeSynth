@@ -38,7 +38,7 @@ public:
    NoteRouter();
    static IDrawableModule* Create() { return new NoteRouter(); }
    
-   string GetTitleLabel() override { return "note router"; }
+   std::string GetTitleLabel() override { return "note router"; }
    void CreateUIControls() override;
 
    void PostRepatch(PatchCableSource* cableSource, bool fromUserClick) override;
@@ -63,7 +63,7 @@ private:
 
    int mRouteMask;
    RadioButton* mRouteSelector;
-   vector<AdditionalNoteCable*> mDestinationCables;
+   std::vector<AdditionalNoteCable*> mDestinationCables;
    bool mRadioButtonMode;
 };
 

@@ -265,7 +265,7 @@ void CanvasElement::AddElementUIControl(IUIControl* control)
    control->SetShowing(false);
 }
 
-void CanvasElement::CheckboxUpdated(string label, bool value)
+void CanvasElement::CheckboxUpdated(std::string label, bool value)
 {
    for (auto* control : mUIControls)
    {
@@ -274,7 +274,7 @@ void CanvasElement::CheckboxUpdated(string label, bool value)
    }
 }
 
-void CanvasElement::FloatSliderUpdated(string label, float oldVal, float newVal)
+void CanvasElement::FloatSliderUpdated(std::string label, float oldVal, float newVal)
 {
    for (auto* control : mUIControls)
    {
@@ -283,7 +283,7 @@ void CanvasElement::FloatSliderUpdated(string label, float oldVal, float newVal)
    }
 }
 
-void CanvasElement::IntSliderUpdated(string label, int oldVal, float newVal)
+void CanvasElement::IntSliderUpdated(std::string label, int oldVal, float newVal)
 {
    for (auto* control : mUIControls)
    {
@@ -292,7 +292,7 @@ void CanvasElement::IntSliderUpdated(string label, int oldVal, float newVal)
    }
 }
 
-void CanvasElement::ButtonClicked(string label)
+void CanvasElement::ButtonClicked(std::string label)
 {
 }
 
@@ -488,12 +488,12 @@ void SampleCanvasElement::SetSample(Sample* sample)
    mSample = sample;
 }
 
-void SampleCanvasElement::CheckboxUpdated(string label, bool value)
+void SampleCanvasElement::CheckboxUpdated(std::string label, bool value)
 {
    CanvasElement::CheckboxUpdated(label, value);
 }
 
-void SampleCanvasElement::ButtonClicked(string label)
+void SampleCanvasElement::ButtonClicked(std::string label)
 {
    CanvasElement::ButtonClicked(label);
    if (label == "split")
@@ -669,7 +669,7 @@ void EventCanvasElement::DrawContents(bool clamp, bool wrapped, ofVec2f offset)
    ofFill();
    ofRect(GetRect(clamp, wrapped, offset), 0);
    
-   string text;
+   std::string text;
    if (mIsCheckbox)
    {
       text = mUIControl->Name();
@@ -757,7 +757,7 @@ void EventCanvasElement::LoadState(FileStreamIn& in)
    in >> mValue;
    if (rev < 1)
    {
-      string dummy;
+      std::string dummy;
       in >> dummy;
    }
 }

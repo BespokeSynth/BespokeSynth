@@ -43,8 +43,8 @@ public:
    float GetBand(int idx);
    int NumBands() { return mNumBands; }
 private:
-   vector<CLinkwitzRiley_4thOrder> mBands;
-   vector<PeakTracker> mPeaks;
+   std::vector<CLinkwitzRiley_4thOrder> mBands;
+   std::vector<PeakTracker> mPeaks;
    int mNumBands;
    float mMinFreq;
    float mMaxFreq;

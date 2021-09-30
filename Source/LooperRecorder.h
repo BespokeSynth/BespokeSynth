@@ -48,7 +48,7 @@ public:
    ~LooperRecorder();
    static IDrawableModule* Create() { return new LooperRecorder(); }
    
-   string GetTitleLabel() override { return "looper recorder"; }
+   std::string GetTitleLabel() override { return "looper recorder"; }
    void CreateUIControls() override;
 
    void Init() override;
@@ -117,7 +117,7 @@ private:
    float mWidth;
    float mHeight;
    RollingBuffer mRecordBuffer;
-   vector<Looper*> mLoopers;
+   std::vector<Looper*> mLoopers;
    int mNumBars;
    DropdownList* mNumBarsSelector;
    float mSpeed;
@@ -144,7 +144,7 @@ private:
    FloatSlider* mCommitDelaySlider;
    ChannelBuffer mWriteBuffer;
    Looper* mCommitToLooper;
-   vector<PatchCableSource*> mLooperPatchCables;
+   std::vector<PatchCableSource*> mLooperPatchCables;
    ClickButton* mCommit1BarButton;
    ClickButton* mCommit2BarsButton;
    ClickButton* mCommit4BarsButton;

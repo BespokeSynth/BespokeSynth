@@ -32,7 +32,7 @@
 
 struct DropdownListElement
 {
-   string mLabel;
+   std::string mLabel;
    int mValue;
 };
 
@@ -53,12 +53,12 @@ public:
    void DrawModule() override;
    void SetDimensions(int w, int h) { mWidth = w; mHeight = h; }
    bool HasTitleBar() const override { return false; }
-   string GetTitleLabel() override { return ""; }
+   std::string GetTitleLabel() override { return ""; }
    void GetDimensions(float& width, float& height) override { width = mWidth; height = mHeight; }
    bool ShouldClipContents() override { return false; }
    DropdownList* GetOwner() const { return mOwner; }
    bool MouseMoved(float x, float y) override;
-   string GetHoveredLabel();
+   std::string GetHoveredLabel();
    float GetMouseX() { return mMouseX; }
    float GetMouseY() { return mMouseY; }
 private:
@@ -76,9 +76,9 @@ class DropdownList : public IUIControl
 public:
    DropdownList(IDropdownListener* owner, const char* name, int x, int y, int* var, float width = -1);
    DropdownList(IDropdownListener* owner, const char* name, IUIControl* anchor, AnchorDirection anchorDirection, int* var, float width = -1);
-   void AddLabel(string label, int value);
+   void AddLabel(std::string label, int value);
    void RemoveLabel(int value);
-   string GetLabel(int val) const;
+   std::string GetLabel(int val) const;
    void Render() override;
    bool MouseMoved(float x, float y) override;
    void MouseReleased() override;
@@ -88,7 +88,7 @@ public:
    void Clear();
    void SetVar(int* var) { mVar = var; }
    EnumMap GetEnumMap();
-   void SetUnknownItemString(string str) { mUnknownItemString = str; CalculateWidth(); }
+   void SetUnknownItemString(std::string str) { mUnknownItemString = str; CalculateWidth(); }
    void DrawLabel(bool draw) { mDrawLabel = draw; }
    void SetWidth(int width) { mWidth = width; }
    void SetDrawTriangle(bool draw) { mDrawTriangle = draw; }
@@ -105,7 +105,7 @@ public:
    float GetValue() const override;
    float GetMidiValue() const override;
    int GetNumValues() override { return (int)mElements.size(); }
-   string GetDisplayValue(float val) const override;
+   std::string GetDisplayValue(float val) const override;
    bool InvertScrollDirection() override { return true; }
    void Increment(float amount) override;
    void Poll() override;
@@ -130,11 +130,11 @@ private:
    int mModalWidth;
    int mColumns;
    int mMaxPerColumn;
-   vector<DropdownListElement> mElements;
+   std::vector<DropdownListElement> mElements;
    int* mVar;
    DropdownListModal mModalList;
    IDropdownListener* mOwner;
-   string mUnknownItemString;
+   std::string mUnknownItemString;
    bool mDrawLabel;
    float mLabelSize;
    float mSliderVal;

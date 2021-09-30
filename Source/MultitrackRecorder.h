@@ -43,7 +43,7 @@ public:
    virtual ~MultitrackRecorder();
    static IDrawableModule* Create() { return new MultitrackRecorder(); }
    
-   string GetTitleLabel() override { return "multitrack recorder"; }
+   std::string GetTitleLabel() override { return "multitrack recorder"; }
    void CreateUIControls() override;
    ModuleContainer* GetContainer() override { return &mModuleContainer; }
    bool IsResizable() const override { return true; }
@@ -79,8 +79,8 @@ private:
    ClickButton* mBounceButton;
    ClickButton* mClearButton;
 
-   vector<MultitrackRecorderTrack*> mTracks;
-   string mStatusString;
+   std::vector<MultitrackRecorderTrack*> mTracks;
+   std::string mStatusString;
    double mStatusStringTime;
 };
 
@@ -91,7 +91,7 @@ public:
    virtual ~MultitrackRecorderTrack();
    static IDrawableModule* Create() { return new MultitrackRecorderTrack(); }
 
-   string GetTitleLabel() override { return " "; }
+   std::string GetTitleLabel() override { return " "; }
    void CreateUIControls() override;
    bool HasTitleBar() const override { return false; }
 
@@ -118,7 +118,7 @@ private:
 
    MultitrackRecorder* mRecorder;
 
-   vector<ChannelBuffer*> mRecordChunks;
+   std::vector<ChannelBuffer*> mRecordChunks;
    bool mDoRecording;
    int mRecordingLength;
    ClickButton* mDeleteButton;

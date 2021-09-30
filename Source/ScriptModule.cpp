@@ -62,7 +62,7 @@ ScriptModule* ScriptModule::sPriorExecutedModule = nullptr;
 //static
 double ScriptModule::sMostRecentRunTime = 0;
 //static
-string ScriptModule::sBackgroundTextString = "";
+std::string ScriptModule::sBackgroundTextString = "";
 //static
 float ScriptModule::sBackgroundTextSize = 30;
 //static
@@ -141,7 +141,7 @@ void ScriptModule::UninitializePython()
 
 namespace
 {
-   string kPythonIsInstalledMarkerFile = "python_installed";
+   std::string kPythonIsInstalledMarkerFile = "python_installed";
 }
 
 //static
@@ -311,7 +311,7 @@ void ScriptModule::DrawModuleUnclipped()
    ofPushStyle();
    if (mDrawDebug)
    {
-      string debugText = mLastRunLiteralCode;
+      std::string debugText = mLastRunLiteralCode;
       
       for (size_t i=0; i<mScheduledNoteOutput.size(); ++i)
       {
@@ -331,11 +331,11 @@ void ScriptModule::DrawModuleUnclipped()
       {
          if (mScheduledUIControlValue[i].time != -1 &&
              gTime + 50 < mScheduledUIControlValue[i].time)
-            debugText += "\n"+ string(mScheduledUIControlValue[i].control->Name()) + ": " + ofToString(mScheduledUIControlValue[i].value) + ", " + ofToString(mScheduledUIControlValue[i].time) + " " + ofToString(mScheduledUIControlValue[i].startTime) + " " + ofToString(mScheduledUIControlValue[i].lineNum);
+            debugText += "\n"+ std::string(mScheduledUIControlValue[i].control->Name()) + ": " + ofToString(mScheduledUIControlValue[i].value) + ", " + ofToString(mScheduledUIControlValue[i].time) + " " + ofToString(mScheduledUIControlValue[i].startTime) + " " + ofToString(mScheduledUIControlValue[i].lineNum);
       }
       
-      string lineNumbers = "";
-      vector<string> lines = ofSplitString(mLastRunLiteralCode, "\n");
+      std::string lineNumbers = "";
+      std::vector<std::string> lines = ofSplitString(mLastRunLiteralCode, "\n");
       for (size_t i=0; i<lines.size(); ++i)
       {
          lineNumbers += ofToString(i+1)+"\n";
@@ -538,7 +538,7 @@ void ScriptModule::Poll()
    if (mMidiMessageQueue.size() > 0)
    {
       mMidiMessageQueueMutex.lock();
-      for (string& methodCall : mMidiMessageQueue)
+      for (std::string& methodCall : mMidiMessageQueue)
          RunCode(gTime, methodCall);
       mMidiMessageQueue.clear();
       mMidiMessageQueueMutex.unlock();
@@ -605,7 +605,7 @@ void ScriptModule::ScheduleNote(double time, float pitch, float velocity, float 
    }
 }
 
-void ScriptModule::ScheduleMethod(string method, double delayMeasureTime)
+void ScriptModule::ScheduleMethod(std::string method, double delayMeasureTime)
 {
    for (size_t i=0; i<mScheduledMethodCall.size(); ++i)
    {
@@ -652,7 +652,7 @@ void ScriptModule::HighlightLine(int lineNum, int scriptModuleIndex)
    sScriptModules[scriptModuleIndex]->mLineExecuteTracker.AddEvent(lineNum);
 }
 
-void ScriptModule::PrintText(string text)
+void ScriptModule::PrintText(std::string text)
 {
    for (size_t i=0; i<mPrintDisplay.size(); ++i)
    {
@@ -666,7 +666,7 @@ void ScriptModule::PrintText(string text)
    }
 }
 
-IUIControl* ScriptModule::GetUIControl(string path)
+IUIControl* ScriptModule::GetUIControl(std::string path)
 {
    IUIControl* control;
    if (ofIsStringInString(path, "~"))
@@ -768,8 +768,8 @@ void ScriptModule::ConnectOscInput(int port)
 
 void ScriptModule::oscMessageReceived(const OSCMessage& msg)
 {
-   string address = msg.getAddressPattern().toString().toStdString();
-   string messageString = address;
+   std::string address = msg.getAddressPattern().toString().toStdString();
+   std::string messageString = address;
 
    for (int i = 0; i < msg.size(); ++i)
    {
@@ -807,7 +807,7 @@ void ScriptModule::ButtonClicked(ClickButton* button)
       FileChooser chooser("Save script as...", File(ofToDataPath("scripts/script.py")), "*.py", true, false, TheSynth->GetMainComponent()->getTopLevelComponent());
       if (chooser.browseForFileToSave(true))
       {
-         string path = chooser.getResult().getFullPathName().toStdString();
+         std::string path = chooser.getResult().getFullPathName().toStdString();
          
          File resourceFile (path);
          TemporaryFile tempFile (resourceFile);
@@ -863,7 +863,7 @@ void ScriptModule::ButtonClicked(ClickButton* button)
             return;
          }
 
-         unique_ptr<FileInputStream> input(resourceFile.createInputStream());
+         std::unique_ptr<FileInputStream> input(resourceFile.createInputStream());
 
          if (!input->openedOk())
          {
@@ -935,7 +935,7 @@ void ScriptModule::ExecuteCode()
    RunScript(gTime+gBufferSizeMs);
 }
 
-pair<int,int> ScriptModule::ExecuteBlock(int lineStart, int lineEnd)
+std::pair<int,int> ScriptModule::ExecuteBlock(int lineStart, int lineEnd)
 {
    return RunScript(gTime, lineStart, lineEnd);
 }
@@ -944,7 +944,7 @@ void ScriptModule::OnCodeUpdated()
 {
    if (mBoundModuleConnections.size() > 0)
    {
-      vector<string> lines = mCodeEntry->GetLines(false);
+      std::vector<std::string> lines = mCodeEntry->GetLines(false);
 
       for (size_t i = 0; i < mBoundModuleConnections.size(); ++i)
       {
@@ -994,12 +994,12 @@ void ScriptModule::PlayNote(double time, int pitch, int velocity, int voiceIdx /
    }
 }
 
-string ScriptModule::GetThisName()
+std::string ScriptModule::GetThisName()
 {
    return "me__"+ofToString(mScriptModuleIndex);
 }
 
-pair<int,int> ScriptModule::RunScript(double time, int lineStart/*=-1*/, int lineEnd/*=-1*/)
+std::pair<int,int> ScriptModule::RunScript(double time, int lineStart/*=-1*/, int lineEnd/*=-1*/)
 {
    //should only be called from main thread
 
@@ -1010,8 +1010,8 @@ pair<int,int> ScriptModule::RunScript(double time, int lineStart/*=-1*/, int lin
    }
 
    py::exec(GetThisName()+" = scriptmodule.get_me("+ofToString(mScriptModuleIndex)+")", py::globals());
-   string code = mCodeEntry->GetText(true);
-   vector<string> lines = ofSplitString(code, "\n");
+   std::string code = mCodeEntry->GetText(true);
+   std::vector<std::string> lines = ofSplitString(code, "\n");
    
    size_t executionStartLine = 0;
    size_t executionEndLine = (int)lines.size();
@@ -1039,7 +1039,7 @@ pair<int,int> ScriptModule::RunScript(double time, int lineStart/*=-1*/, int lin
    code = "";
    for (size_t i=0; i<lines.size(); ++i)
    {
-      string prefix = "";
+      std::string prefix = "";
       if (i < executionStartLine || i > executionEndLine)
          prefix = "#";
       if (ShouldDisplayLineExecutionPre(i > 0 ? lines[i-1] : "", lines[i]))
@@ -1054,7 +1054,7 @@ pair<int,int> ScriptModule::RunScript(double time, int lineStart/*=-1*/, int lin
    return std::make_pair(executionStartLine, executionEndLine);
 }
 
-void ScriptModule::RunCode(double time, string code)
+void ScriptModule::RunCode(double time, std::string code)
 {
    //should only be called from main thread
    
@@ -1091,13 +1091,13 @@ void ScriptModule::RunCode(double time, string code)
       if (mNextLineToExecute == -1) //this script hasn't executed yet
          sMostRecentLineExecutedModule = this;
       
-      sMostRecentLineExecutedModule->mLastError = (string)py::str(e.type()) + ": "+ (string)py::str(e.value());
+      sMostRecentLineExecutedModule->mLastError = (std::string)py::str(e.type()) + ": "+ (std::string)py::str(e.value());
       
       int lineNumber = sMostRecentLineExecutedModule->mNextLineToExecute;
       if (lineNumber == -1)
       {
-         string errorString = (string)py::str(e.value());
-         const string lineTextLabel = " line ";
+         std::string errorString = (std::string)py::str(e.value());
+         const std::string lineTextLabel = " line ";
          const char* lineTextPos = strstr(errorString.c_str(), lineTextLabel.c_str());
          if (lineTextPos != nullptr)
          {
@@ -1105,11 +1105,11 @@ void ScriptModule::RunCode(double time, string code)
             {
                size_t start = lineTextPos + lineTextLabel.length() - errorString.c_str();
                size_t len = errorString.size() - 1 - start;
-               string lineNumberText = errorString.substr(start, len);
+               std::string lineNumberText = errorString.substr(start, len);
                int rawLineNumber = stoi(lineNumberText);
                int realLineNumber = rawLineNumber - 1;
                
-               vector<string> lines = ofSplitString(sMostRecentLineExecutedModule->mLastRunLiteralCode, "\n");
+               std::vector<std::string> lines = ofSplitString(sMostRecentLineExecutedModule->mLastRunLiteralCode, "\n");
                for (size_t i=0; i<lines.size() && i < rawLineNumber; ++i)
                {
                   if (ofIsStringInString(lines[i], "###instrumentation###"))
@@ -1165,16 +1165,16 @@ void ScriptModule::RunCode(double time, string code)
    }
 }
 
-string ScriptModule::GetMethodPrefix()
+std::string ScriptModule::GetMethodPrefix()
 {
-   string prefix = Path();
+   std::string prefix = Path();
    ofStringReplace(prefix, "~", "");
    return prefix;
 }
 
-void ScriptModule::FixUpCode(string& code)
+void ScriptModule::FixUpCode(std::string& code)
 {
-   string prefix = GetMethodPrefix();
+   std::string prefix = GetMethodPrefix();
    ofStringReplace(code, "on_pulse(", "on_pulse__"+ prefix +"(");
    ofStringReplace(code, "on_note(", "on_note__"+ prefix +"(");
    ofStringReplace(code, "on_grid_button(", "on_grid_button__"+ prefix +"(");
@@ -1184,7 +1184,7 @@ void ScriptModule::FixUpCode(string& code)
    ofStringReplace(code, "me.", GetThisName() + ".");
 }
 
-void ScriptModule::GetFirstAndLastCharacter(string line, char& first, char& last)
+void ScriptModule::GetFirstAndLastCharacter(std::string line, char& first, char& last)
 {
    bool hasFirstCharacter = false;
    first = 0;
@@ -1204,7 +1204,7 @@ void ScriptModule::GetFirstAndLastCharacter(string line, char& first, char& last
    }
 }
 
-bool ScriptModule::ShouldDisplayLineExecutionPre(string priorLine, string line)
+bool ScriptModule::ShouldDisplayLineExecutionPre(std::string priorLine, std::string line)
 {
    if (!IsNonWhitespace(line))
       return false;
@@ -1228,9 +1228,9 @@ bool ScriptModule::ShouldDisplayLineExecutionPre(string priorLine, string line)
    return true;
 }
 
-string ScriptModule::GetIndentation(string line)
+std::string ScriptModule::GetIndentation(std::string line)
 {
-   string ret;
+   std::string ret;
    for (size_t i = 0; i < line.length(); ++i)
    {
       if (line[i] == ' ')
@@ -1241,7 +1241,7 @@ string ScriptModule::GetIndentation(string line)
    return ret;
 }
 
-bool ScriptModule::IsNonWhitespace(string line)
+bool ScriptModule::IsNonWhitespace(std::string line)
 {
    for (size_t i = 0; i < line.length(); ++i)
    {
@@ -1251,7 +1251,7 @@ bool ScriptModule::IsNonWhitespace(string line)
    return false;
 }
 
-static string sContextToRestore = "";
+static std::string sContextToRestore = "";
 void ScriptModule::SetContext()
 {
    sContextToRestore = IClickable::sLoadContext;
@@ -1274,8 +1274,8 @@ void ScriptModule::OnModuleReferenceBound(IDrawableModule* target)
             return;
       }
 
-      string code = mCodeEntry->GetText(true);
-      vector<string> lines = ofSplitString(code, "\n");
+      std::string code = mCodeEntry->GetText(true);
+      std::vector<std::string> lines = ofSplitString(code, "\n");
       if (mNextLineToExecute >= 0 && mNextLineToExecute < lines.size())
       {
          BoundModuleConnection connection;
@@ -1459,7 +1459,7 @@ void ScriptReferenceDisplay::LoadText()
    File file(ofToResourcePath("scripting_reference.txt").c_str());
    if (file.existsAsFile())
    {
-      string text = file.loadFileAsString().toStdString();
+      std::string text = file.loadFileAsString().toStdString();
       ofStringReplace(text, "\r", "");
       mText = ofSplitString(text, "\n");
    }

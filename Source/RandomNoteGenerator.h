@@ -40,7 +40,7 @@ public:
    ~RandomNoteGenerator();
    static IDrawableModule* Create() { return new RandomNoteGenerator(); }
    
-   string GetTitleLabel() override { return "random note"; }
+   std::string GetTitleLabel() override { return "random note"; }
    void CreateUIControls() override;
    void Init() override;
    

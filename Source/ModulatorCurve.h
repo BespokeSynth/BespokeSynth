@@ -40,7 +40,7 @@ public:
    virtual ~ModulatorCurve();
    static IDrawableModule* Create() { return new ModulatorCurve(); }
    
-   string GetTitleLabel() override { return "curve"; }
+   std::string GetTitleLabel() override { return "curve"; }
    void CreateUIControls() override;
    
    void SetEnabled(bool enabled) override { mEnabled = enabled; }

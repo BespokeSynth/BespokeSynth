@@ -26,7 +26,7 @@
 #include "PerformanceTimer.h"
 #include "SynthGlobals.h"
 
-TimerInstance::TimerInstance(string name, PerformanceTimer& manager)
+TimerInstance::TimerInstance(std::string name, PerformanceTimer& manager)
 : mName(name)
 , mManager(manager)
 {
@@ -38,7 +38,7 @@ TimerInstance::~TimerInstance()
    mManager.RecordCost(mName, ofGetSystemTimeNanos() - mTimerStart);
 }
 
-void PerformanceTimer::RecordCost(string name, long cost)
+void PerformanceTimer::RecordCost(std::string name, long cost)
 {
    mCostTable.push_back(PerformanceTimer::Cost(name,cost));
 }

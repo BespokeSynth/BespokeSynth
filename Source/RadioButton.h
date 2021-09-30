@@ -30,7 +30,7 @@
 
 struct RadioButtonElement
 {
-   string mLabel;
+   std::string mLabel;
    int mValue;
 };
 
@@ -75,7 +75,7 @@ public:
    float GetValue() const override;
    float GetMidiValue() const override;
    int GetNumValues() override { return (int)mElements.size(); }
-   string GetDisplayValue(float val) const override;
+   std::string GetDisplayValue(float val) const override;
    bool IsBitmask() override { return mMultiSelect; }
    bool InvertScrollDirection() override { return mDirection == kRadioVertical; }
    void Increment(float amount) override;
@@ -100,7 +100,7 @@ private:
    int mWidth;
    int mHeight;
    float mElementWidth;
-   vector<RadioButtonElement> mElements;
+   std::vector<RadioButtonElement> mElements;
    int* mVar;
    IRadioButtonListener* mOwner;
    bool mMultiSelect; //makes this... not a radio button. mVar becomes a bitmask

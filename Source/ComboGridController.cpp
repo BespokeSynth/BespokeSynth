@@ -40,9 +40,9 @@ void ComboGridController::CreateUIControls()
    IDrawableModule::CreateUIControls();
 }
 
-string ComboGridController::GetTitleLabel()
+std::string ComboGridController::GetTitleLabel()
 {
-   string title = "combo:";
+   std::string title = "combo:";
    for (int i=0; i<mGrids.size(); ++i)
    {
       title += dynamic_cast<IClickable*>(mGrids[i])->Name();
@@ -215,7 +215,7 @@ void ComboGridController::LoadLayout(const ofxJSONElement& moduleInfo)
 void ComboGridController::SaveLayout(ofxJSONElement& moduleInfo)
 {
    IDrawableModule::SaveLayout(moduleInfo);
-   string grids = "";
+   std::string grids = "";
    for (int i=0; i<mGrids.size(); ++i)
    {
       IDrawableModule* grid = dynamic_cast<IDrawableModule*>(mGrids[i]);
@@ -231,8 +231,8 @@ void ComboGridController::SaveLayout(ofxJSONElement& moduleInfo)
 
 void ComboGridController::SetUpFromSaveData()
 {
-   string grids = mModuleSaveData.GetString("grids");
-   vector<string> gridVec = ofSplitString(grids, ",");
+   std::string grids = mModuleSaveData.GetString("grids");
+   std::vector<std::string> gridVec = ofSplitString(grids, ",");
    mGrids.clear();
    if (grids != "")
    {

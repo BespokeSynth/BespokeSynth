@@ -76,7 +76,7 @@ void EffectChain::Init()
    mInitialized = true;
 }
 
-void EffectChain::AddEffect(string type, bool onTheFly /*=false*/)
+void EffectChain::AddEffect(std::string type, bool onTheFly /*=false*/)
 {
    assert(mEffects.size() < MAX_EFFECTS_IN_CHAIN - 1);
  
@@ -84,10 +84,10 @@ void EffectChain::AddEffect(string type, bool onTheFly /*=false*/)
    if (effect == nullptr)
       throw UnknownEffectTypeException();
    assert(effect->GetType() == type);  //make sure things are named the same in code
-   vector<string> otherEffectNames;
+   std::vector<std::string> otherEffectNames;
    for (auto* e : mEffects)
       otherEffectNames.push_back(e->Name());
-   string name = GetUniqueName(type, otherEffectNames);
+   std::string name = GetUniqueName(type, otherEffectNames);
    effect->SetName(name.c_str());
    effect->SetTypeName(type);
    effect->SetParent(this);
@@ -193,7 +193,7 @@ void EffectChain::DrawModule()
    mEffectSpawnList->SetShowing(mShowSpawnList);
    mSpawnEffectButton->SetShowing(mShowSpawnList && mSpawnIndex != -1);
    if (mSpawnIndex != -1)
-      mSpawnEffectButton->SetLabel((string("spawn ") + mEffectSpawnList->GetLabel(mSpawnIndex)).c_str());
+      mSpawnEffectButton->SetLabel((std::string("spawn ") + mEffectSpawnList->GetLabel(mSpawnIndex)).c_str());
 
    for (int i=0; i<mEffects.size(); ++i)
    {
@@ -320,7 +320,7 @@ ofVec2f EffectChain::GetEffectPos(int index) const
    return ofVec2f(xPos, yPos);
 }
 
-void EffectChain::GetPush2OverrideControls(vector<IUIControl*>& controls) const
+void EffectChain::GetPush2OverrideControls(std::vector<IUIControl*>& controls) const
 {
    int effectIndex = -1;
    if (mPush2DisplayEffect != nullptr)
@@ -497,7 +497,7 @@ void EffectChain::ButtonClicked(ClickButton* button)
       if (button == mEffectControls[i].mPush2DisplayEffectButton)
       {
          mPush2DisplayEffect = mEffects[i];
-         mPush2ExitEffectButton->SetLabel((string("exit ") + mEffects[i]->Name()).c_str());
+         mPush2ExitEffectButton->SetLabel((std::string("exit ") + mEffects[i]->Name()).c_str());
       }
    }
 }
@@ -522,14 +522,14 @@ void EffectChain::DropdownUpdated(DropdownList* list, int oldVal)
    }
 }
 
-vector<IUIControl*> EffectChain::ControlsToIgnoreInSaveState() const
+std::vector<IUIControl*> EffectChain::ControlsToIgnoreInSaveState() const
 {
-   vector<IUIControl*> ignore;
+   std::vector<IUIControl*> ignore;
    ignore.push_back(mSpawnEffectButton);
    return ignore;
 }
 
-void EffectChain::UpdateOldControlName(string& oldName)
+void EffectChain::UpdateOldControlName(std::string& oldName)
 {
    IDrawableModule::UpdateOldControlName(oldName);
 
@@ -537,7 +537,7 @@ void EffectChain::UpdateOldControlName(string& oldName)
       ofStringReplace(oldName, "dw", "mix");
 }
 
-void EffectChain::LoadBasics(const ofxJSONElement& moduleInfo, string typeName)
+void EffectChain::LoadBasics(const ofxJSONElement& moduleInfo, std::string typeName)
 {
    IDrawableModule::LoadBasics(moduleInfo, typeName);
    
@@ -545,7 +545,7 @@ void EffectChain::LoadBasics(const ofxJSONElement& moduleInfo, string typeName)
    
    for (int i=0; i<effects.size(); ++i)
    {
-      string type = effects[i]["type"].asString();
+      std::string type = effects[i]["type"].asString();
       AddEffect(type);
    }
 }
@@ -561,7 +561,7 @@ void EffectChain::LoadLayout(const ofxJSONElement& moduleInfo)
    assert(mEffects.size() == effects.size());
    for (int i=0; i<mEffects.size(); ++i)
    {
-      string type = effects[i]["type"].asString();
+      std::string type = effects[i]["type"].asString();
       assert(mEffects[i]->GetType() == type);
       mEffects[i]->LoadLayout(effects[i]);
    }

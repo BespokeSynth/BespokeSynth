@@ -42,7 +42,7 @@ public:
    
    static IAudioEffect* Create() { return new FormantFilterEffect(); }
    
-   string GetTitleLabel() override { return "formant"; }
+   std::string GetTitleLabel() override { return "formant"; }
    void CreateUIControls() override;
    
    void Init() override;
@@ -51,7 +51,7 @@ public:
    void ProcessAudio(double time, ChannelBuffer* buffer) override;
    void SetEnabled(bool enabled) override { mEnabled = enabled; }
    float GetEffectAmount() override;
-   string GetType() override { return "formant"; }
+   std::string GetType() override { return "formant"; }
    
    void DropdownUpdated(DropdownList* list, int oldVal) override;
    void CheckboxUpdated(Checkbox* checkbox) override;
@@ -87,7 +87,7 @@ private:
    FloatSlider* mESlider;
    FloatSlider* mUSlider;
    FloatSlider* mASlider;
-   vector<FloatSlider*> mSliders;
+   std::vector<FloatSlider*> mSliders;
    bool mRescaling;
    float mWidth;
    float mHeight;
@@ -108,7 +108,7 @@ private:
       float mGains[NUM_FORMANT_BANDS];
    };
    
-   vector<Formants> mFormants;
+   std::vector<Formants> mFormants;
    float* mOutputBuffer;
 };
 

@@ -40,7 +40,7 @@ public:
    NoteStepper();
    static IDrawableModule* Create() { return new NoteStepper(); }
    
-   string GetTitleLabel() override { return "note stepper"; }
+   std::string GetTitleLabel() override { return "note stepper"; }
    void CreateUIControls() override;
    
    void PlayNote(double time, int pitch, int velocity, int voiceIdx, ModulationParameters modulation) override;

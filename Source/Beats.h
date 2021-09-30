@@ -86,7 +86,7 @@ private:
    Checkbox* mDoubleTimeCheckbox;
    int mNumBars;
    IntSlider* mNumBarsSlider;
-   vector<Sample*> mSamples;
+   std::vector<Sample*> mSamples;
    float mPan;
    FloatSlider* mPanSlider;
 };
@@ -98,7 +98,7 @@ public:
    virtual ~Beats();
    static IDrawableModule* Create() { return new Beats(); }
    
-   string GetTitleLabel() override { return "beats"; }
+   std::string GetTitleLabel() override { return "beats"; }
    void CreateUIControls() override;
    
    void Init() override;
@@ -108,7 +108,7 @@ public:
    void SetEnabled(bool enabled) override { mEnabled = enabled; }
    
    //IDrawableModule
-   void FilesDropped(vector<string> files, int x, int y) override;
+   void FilesDropped(std::vector<std::string> files, int x, int y) override;
    void SampleDropped(int x, int y, Sample* sample) override;
    bool CanDropSample() const override { return true; }
    

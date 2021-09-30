@@ -30,13 +30,11 @@
 #include <string>
 #include <map>
 
-using namespace std;
-
 class ListenPortCallback
 {
 public:
    virtual ~ListenPortCallback() {}
-   virtual CFDataRef OnMessageReceived(string portName, SInt32 msgid, CFDataRef data) = 0;
+   virtual CFDataRef OnMessageReceived(std::string portName, SInt32 msgid, CFDataRef data) = 0;
 };
 
 class ListenPort
@@ -48,7 +46,7 @@ public:
    CFDataRef OnMessageReceived(SInt32 msgid, CFDataRef data);
    void Close();
 private:
-   string mPortName;
+   std::string mPortName;
    CFMessagePortRef mReceivePort;
    CFRunLoopSourceRef mLoopSource;
    ListenPortCallback* mCallback;
@@ -62,7 +60,7 @@ public:
 private:
    static ListenPort* LookupPort(CFMessagePortRef portRef);
    
-   static map<CFMessagePortRef, ListenPort*> mPortMap;
+   static std::map<CFMessagePortRef, ListenPort*> mPortMap;
 };
 
 #endif /* defined(__NI_SoftwareSide__ListenPort__) */

@@ -44,7 +44,7 @@ public:
    virtual ~Presets();
    static IDrawableModule* Create() { return new Presets(); }
    
-   string GetTitleLabel() override { return "presets"; }
+   std::string GetTitleLabel() override { return "presets"; }
    void CreateUIControls() override;
    
    //IDrawableModule
@@ -65,9 +65,9 @@ public:
    void SetUpFromSaveData() override;
    void SaveState(FileStreamOut& out) override;
    void LoadState(FileStreamIn& in) override;
-   vector<IUIControl*> ControlsToNotSetDuringLoadState() const override;
+   std::vector<IUIControl*> ControlsToNotSetDuringLoadState() const override;
    
-   static vector<IUIControl*> sPresetHighlightControls;
+   static std::vector<IUIControl*> sPresetHighlightControls;
    
    //IPatchable
    void PostRepatch(PatchCableSource* cableSource, bool fromUserClick) override;
@@ -90,9 +90,9 @@ private:
    struct Preset
    {
       Preset() {}
-      Preset(string path, float val) : mControlPath(path), mValue(val), mHasLFO(false) {}
+      Preset(std::string path, float val) : mControlPath(path), mValue(val), mHasLFO(false) {}
       Preset(IUIControl* control);
-      string mControlPath;
+      std::string mControlPath;
       float mValue;
       bool mHasLFO;
       LFOSettings mLFOSettings;
@@ -101,7 +101,7 @@ private:
    struct PresetCollection
    {
       std::vector<Preset> mPresets;
-      string mDescription;
+      std::string mDescription;
    };
    
    struct ControlRamp
@@ -114,13 +114,13 @@ private:
    std::vector<PresetCollection> mPresetCollection;
    ClickButton* mSaveButton;
    int mDrawSetPresetsCountdown;
-   vector<IDrawableModule*> mPresetModules;
-   vector<IUIControl*> mPresetControls;
+   std::vector<IDrawableModule*> mPresetModules;
+   std::vector<IUIControl*> mPresetControls;
    bool mBlending;
    float mBlendTime;
    FloatSlider* mBlendTimeSlider;
    float mBlendProgress;
-   vector<ControlRamp> mBlendRamps;
+   std::vector<ControlRamp> mBlendRamps;
    ofMutex mRampMutex;
    int mCurrentPreset;
    DropdownList* mCurrentPresetSelector;

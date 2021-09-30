@@ -55,7 +55,7 @@ MessageIdToString MessageIdToStringTable[NUM_NI_MESSAGE_IDS] = {
    { 0x03564e66, "NIOctaveChangedMessage" },
 };
 
-string TypeForMessageID(uint32_t messageId)
+std::string TypeForMessageID(uint32_t messageId)
 {
    for (int i=0; i<NUM_NI_MESSAGE_IDS; ++i)
    {
@@ -64,10 +64,10 @@ string TypeForMessageID(uint32_t messageId)
    }
    char messageIdStr[16];
    sprintf(messageIdStr, "0x%08x", messageId);
-   return string("Unknown message type ")+messageIdStr;
+   return std::string("Unknown message type ")+messageIdStr;
 }
 
-uint32_t MessageIDForType(string type)
+uint32_t MessageIDForType(std::string type)
 {
    for (int i=0; i<NUM_NI_MESSAGE_IDS; ++i)
    {

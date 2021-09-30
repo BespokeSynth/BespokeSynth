@@ -39,7 +39,7 @@ public:
    ~FourOnTheFloor();
    static IDrawableModule* Create() { return new FourOnTheFloor(); }
    
-   string GetTitleLabel() override { return "four on the floor"; }
+   std::string GetTitleLabel() override { return "four on the floor"; }
    void CreateUIControls() override;
    void Init() override;
    

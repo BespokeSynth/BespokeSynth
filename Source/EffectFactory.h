@@ -36,11 +36,11 @@ class EffectFactory
 {
 public:
    EffectFactory();
-   IAudioEffect* MakeEffect(string type);
-   vector<string> GetSpawnableEffects();
+   IAudioEffect* MakeEffect(std::string type);
+   std::vector<std::string> GetSpawnableEffects();
 private:
-   void Register(string type, CreateEffectFn creator);
-   map<string, CreateEffectFn> mFactoryMap;
+   void Register(std::string type, CreateEffectFn creator);
+   std::map<std::string, CreateEffectFn> mFactoryMap;
 };
 
 #endif /* defined(__Bespoke__EffectFactory__) */

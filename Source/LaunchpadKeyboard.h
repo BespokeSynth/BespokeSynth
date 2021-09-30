@@ -48,7 +48,7 @@ public:
    ~LaunchpadKeyboard();
    static IDrawableModule* Create() { return new LaunchpadKeyboard(); }
    
-   string GetTitleLabel() override { return "gridkeyboard"; }
+   std::string GetTitleLabel() override { return "gridkeyboard"; }
    void CreateUIControls() override;
    void Init() override;
 
@@ -127,11 +127,11 @@ private:
    LaunchpadLayout mLayout;
    DropdownList* mLayoutDropdown;
    int mCurrentChord;
-   vector< vector<int> > mChords;
+   std::vector< std::vector<int> > mChords;
    LaunchpadNoteDisplayer* mDisplayer;
    ArrangementMode mArrangementMode;
    DropdownList* mArrangementModeDropdown;
-   list<int> mHeldChordTones;
+   std::list<int> mHeldChordTones;
    Chorder* mChorder;
    bool mLatchChords;
    Checkbox* mLatchChordsCheckbox;

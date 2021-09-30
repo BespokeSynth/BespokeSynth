@@ -50,7 +50,7 @@ public:
    ~Sampler();
    static IDrawableModule* Create() { return new Sampler(); }
    
-   string GetTitleLabel() override { return "sampler"; }
+   std::string GetTitleLabel() override { return "sampler"; }
    void CreateUIControls() override;
    
    void Poll() override;
@@ -66,7 +66,7 @@ public:
    void PlayNote(double time, int pitch, int velocity, int voiceIdx = -1, ModulationParameters modulation = ModulationParameters()) override;
    void SendCC(int control, int value, int voiceIdx = -1) override {}
    
-   void FilesDropped(vector<string> files, int x, int y) override;
+   void FilesDropped(std::vector<std::string> files, int x, int y) override;
    void SampleDropped(int x, int y, Sample* sample) override;
    bool CanDropSample() const override { return true; }
    
