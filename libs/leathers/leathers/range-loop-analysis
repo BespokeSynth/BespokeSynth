@@ -22,12 +22,3 @@
 #  pragma clang diagnostic ignored "-Wrange-loop-analysis"
 # endif
 #endif
-
-#if (__GNUC__)
-# pragma GCC diagnostic ignored "-Wrange-loop-analysis"
-#endif
-
-//unsure what the MSVC code is for this
-//#if (_MSC_VER)
-//# pragma warning(disable: 4XXX)
-//#endif

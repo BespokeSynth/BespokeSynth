@@ -265,20 +265,16 @@ void TitleBar::ListLayouts()
 {
    mLoadLayoutDropdown->Clear();
    
-   juce::DirectoryIterator dir(juce::File(ofToDataPath("layouts")), false);
    int layoutIdx = 0;
-   while (dir.next())
+   for (const auto& entry : juce::RangedDirectoryIterator{juce::File{ofToDataPath("layouts")}, false, "*.json"})
    {
-      juce::File file = dir.getFile();
-      if (file.getFileExtension() == ".json")
-      {
-         mLoadLayoutDropdown->AddLabel(file.getFileNameWithoutExtension().toRawUTF8(), layoutIdx);
-         
-         if (file.getRelativePathFrom(juce::File(ofToDataPath(""))).toStdString() == TheSynth->GetLoadedLayout())
-            mLoadLayoutIndex = layoutIdx;
-         
-         ++layoutIdx;
-      }
+      const auto& file = entry.getFile();
+      mLoadLayoutDropdown->AddLabel(file.getFileNameWithoutExtension().toRawUTF8(), layoutIdx);
+
+      if (file.getRelativePathFrom(juce::File{ofToDataPath("")}).toStdString() == TheSynth->GetLoadedLayout())
+         mLoadLayoutIndex = layoutIdx;
+
+      ++layoutIdx;
    }
    
    mSaveLayoutButton->PositionTo(mLoadLayoutDropdown, kAnchor_Right);

@@ -905,17 +905,13 @@ void VSTPlugin::RefreshPresetFiles()
       return;
    
    juce::File(ofToDataPath("vst/presets/"+ GetPluginId())).createDirectory();
-   DirectoryIterator dir(File(ofToDataPath("vst/presets/"+ GetPluginId())), false);
    mPresetFilePaths.clear();
    mPresetFileSelector->Clear();
-   while(dir.next())
+   for (const auto& entry : RangedDirectoryIterator{File{ofToDataPath("vst/presets/" + GetPluginId())}, false, "*.vstp"})
    {
-      File file = dir.getFile();
-      if (file.getFileExtension() ==  ".vstp")
-      {
-         mPresetFileSelector->AddLabel(file.getFileName().toStdString(), (int)mPresetFilePaths.size());
-         mPresetFilePaths.push_back(file.getFullPathName().toStdString());
-      }
+      const auto& file = entry.getFile();
+      mPresetFileSelector->AddLabel(file.getFileName().toStdString(), (int)mPresetFilePaths.size());
+      mPresetFilePaths.push_back(file.getFullPathName().toStdString());
    }
 }
 
