@@ -290,15 +290,18 @@ void TextEntry::MakeActiveTextEntry(bool setCaretToEnd)
    if (mListener)
       mListener->TextEntryActivated(this);
    if (setCaretToEnd)
+   {
       mCaretPosition = (int)strlen(mString);
+      mCaretPosition2 = mCaretPosition;
+   }
    mCaretBlink = true;
    mCaretBlinkTimer = 0;
 }
 
 void TextEntry::RemoveSelectedText()
 {
-   int caretStart = MIN(mCaretPosition, mCaretPosition2);
-   int caretEnd = MAX(mCaretPosition, mCaretPosition2);
+   int caretStart = MAX(0, MIN(mCaretPosition, mCaretPosition2));
+   int caretEnd = MIN(strlen(mString), MAX(mCaretPosition, mCaretPosition2));
    string newString = mString;
    strcpy(mString, (newString.substr(0, caretStart) + newString.substr(caretEnd)).c_str());
    MoveCaret(caretStart, false);
@@ -501,6 +504,7 @@ void TextEntry::ClearInput()
 {
    std::memset(mString, 0, MAX_TEXTENTRY_LENGTH);
    mCaretPosition = 0;
+   mCaretPosition2 = 0;
 }
 
 void TextEntry::SetValue(float value)
