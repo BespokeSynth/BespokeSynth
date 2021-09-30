@@ -1,12 +1,9 @@
 #ifndef _MODULAR_SYNTH
 #define _MODULAR_SYNTH
 
-#include <JuceHeader.h>
-
 #undef LoadString //undo some junk from a windows define
 
 #include "SynthGlobals.h"
-#include "IAudioReceiver.h"
 #include "IDrawableModule.h"
 #include "TextEntry.h"
 #include "RollingBuffer.h"
@@ -19,6 +16,14 @@
 #ifdef BESPOKE_LINUX
 #include <climits>
 #endif
+
+namespace juce {
+   class AudioDeviceManager;
+   class AudioFormatManager;
+   class Component;
+   class OpenGLContext;
+   class String;
+}
 
 class IAudioSource;
 class IAudioReceiver;
@@ -56,7 +61,7 @@ public:
    ModularSynth();
    virtual ~ModularSynth();
    
-   void Setup(GlobalManagers* globalManagers, juce::Component* mainComponent, juce::OpenGLContext* openGLContext);
+   void Setup(juce::AudioDeviceManager* globalAudioDeviceManager, juce::AudioFormatManager* globalAudioFormatManager, juce::Component* mainComponent, juce::OpenGLContext* openGLContext);
    void LoadResources(void* nanoVG, void* fontBoundsNanoVG);
    void InitIOBuffers(int inputChannelCount, int outputChannelCount);
    void Poll();
@@ -160,7 +165,8 @@ public:
    bool HasNotMovedMouseSinceClick() { return mClickStartX < INT_MAX; }
    IDrawableModule* GetMoveModule() { return mMoveModule; }
    ModuleFactory* GetModuleFactory() { return &mModuleFactory; }
-   GlobalManagers* GetGlobalManagers() { return mGlobalManagers; }
+   juce::AudioDeviceManager &GetAudioDeviceManager() { return *mGlobalAudioDeviceManager; }
+   juce::AudioFormatManager &GetAudioFormatManager() { return *mGlobalAudioFormatManager; }
    juce::Component* GetMainComponent() { return mMainComponent; }
    juce::OpenGLContext* GetOpenGLContext() { return mOpenGLContext; }
    IDrawableModule* GetLastClickedModule() const;
@@ -174,10 +180,10 @@ public:
    
    template<class T> vector<string> GetModuleNames() { return mModuleContainer.GetModuleNames<T>(); }
    
-   void LockRender(bool lock) { if (lock) { mRenderLock.enter(); } else { mRenderLock.exit(); } }
+   void LockRender(bool lock) { if (lock) { mRenderLock.lock(); } else { mRenderLock.unlock(); } }
    void UpdateFrameRate(float fps) { mFrameRate = fps; }
    float GetFrameRate() const { return mFrameRate; }
-   CriticalSection* GetRenderLock() { return &mRenderLock; }
+   std::recursive_mutex& GetRenderLock() { return mRenderLock; }
    NamedMutex* GetAudioMutex() { return &mAudioThreadMutex; }
    
    IDrawableModule* CreateModule(const ofxJSONElement& moduleInfo);
@@ -211,8 +217,8 @@ public:
    ofxJSONElement GetUserPrefs() { return mUserPrefs; }
    UserPrefsEditor* GetUserPrefsEditor() { return mUserPrefsEditor; }
 
-   const String& GetTextFromClipboard() const;
-   void CopyTextToClipboard(const String& text);
+   const juce::String& GetTextFromClipboard() const;
+   void CopyTextToClipboard(const juce::String& text);
    
    void SetFatalError(string error);
 
@@ -236,7 +242,6 @@ private:
 
    void ReadClipboardTextFromSystem();
    
-   ofSoundStream mSoundStream;
    int mIOBufferSize;
    
    vector<IAudioSource*> mSources;
@@ -332,11 +337,12 @@ private:
    ofVec2f mMousePos;
    string mNextDrawTooltip;
    
-   GlobalManagers* mGlobalManagers;
+   juce::AudioDeviceManager* mGlobalAudioDeviceManager;
+   juce::AudioFormatManager* mGlobalAudioFormatManager;
    juce::Component* mMainComponent;
    juce::OpenGLContext* mOpenGLContext;
    
-   CriticalSection mRenderLock;
+   std::recursive_mutex mRenderLock;
    float mFrameRate;
    long mFrameCount;
    
@@ -360,8 +366,6 @@ private:
 
    vector<float*> mInputBuffers;
    vector<float*> mOutputBuffers;
-
-   String mClipboard;
 };
 
 extern ModularSynth* TheSynth;

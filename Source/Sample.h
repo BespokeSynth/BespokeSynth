@@ -29,8 +29,16 @@
 #include "OpenFrameworksPort.h"
 #include "ChannelBuffer.h"
 
+#include "juce_events/juce_events.h"
+
 class FileStreamOut;
 class FileStreamIn;
+
+namespace juce {
+   class AudioFormatReader;
+   template <typename T> class AudioBuffer;
+   using AudioSampleBuffer = AudioBuffer<float>;
+}
 
 class Sample : public juce::Timer
 {
@@ -100,8 +108,8 @@ private:
    int mNumBars;
    float mVolume;
 
-   AudioFormatReader* mReader;
-   unique_ptr<AudioSampleBuffer> mReadBuffer;
+   juce::AudioFormatReader* mReader;
+   unique_ptr<juce::AudioSampleBuffer> mReadBuffer;
    int mSamplesLeftToRead;
 };
 

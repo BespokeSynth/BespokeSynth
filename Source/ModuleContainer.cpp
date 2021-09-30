@@ -35,6 +35,8 @@
 #include "SynthGlobals.h"
 #include "QuickSpawnMenu.h"
 
+#include "juce_core/juce_core.h"
+
 ModuleContainer::ModuleContainer()
 : mOwner(nullptr)
 , mDrawScale(1)
@@ -657,7 +659,7 @@ void ModuleContainer::LoadState(FileStreamIn& in)
          
          //read through the rest of the module until we find the spacer, so we can continue loading the next module
          int separatorProgress = 0;
-         uint64 safetyCheck = 0;
+         juce::uint64 safetyCheck = 0;
          while (!in.Eof() && safetyCheck < 1000000)
          {
             char val;

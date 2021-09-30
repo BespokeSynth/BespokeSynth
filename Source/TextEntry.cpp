@@ -30,6 +30,8 @@
 #include "IDrawableModule.h"
 #include "FileStream.h"
 
+#include "juce_gui_basics/juce_gui_basics.h"
+
 IKeyboardFocusListener* IKeyboardFocusListener::sCurrentKeyboardFocus = nullptr;
 IKeyboardFocusListener* IKeyboardFocusListener::sKeyboardFocusBeforeClick = nullptr;
 
@@ -338,7 +340,7 @@ void TextEntry::OnKeyPressed(int key, bool isRepeat)
          --mCaretPosition2;
       }
    }
-   else if (key == KeyPress::deleteKey)
+   else if (key == juce::KeyPress::deleteKey)
    {
       int len = (int)strlen(mString);
       if (mCaretPosition != mCaretPosition2) 
@@ -450,11 +452,11 @@ void TextEntry::OnKeyPressed(int key, bool isRepeat)
       mCaretPosition = 0;
       mCaretPosition2 = len;
    }
-   else if (key == KeyPress::homeKey)
+   else if (key == juce::KeyPress::homeKey)
    {
       MoveCaret(0);
    }
-   else if (key == KeyPress::endKey)
+   else if (key == juce::KeyPress::endKey)
    {
       MoveCaret((int)strlen(mString));
    }
@@ -493,6 +495,12 @@ void TextEntry::UpdateDisplayString()
       StringCopy(mString, ofToString(*mVarInt).c_str(), MAX_TEXTENTRY_LENGTH);
    if (mVarFloat)
       StringCopy(mString, ofToString(*mVarFloat).c_str(), MAX_TEXTENTRY_LENGTH);
+}
+
+void TextEntry::ClearInput()
+{
+   std::memset(mString, 0, MAX_TEXTENTRY_LENGTH);
+   mCaretPosition = 0;
 }
 
 void TextEntry::SetValue(float value)
@@ -557,9 +565,9 @@ bool TextEntry::AllowCharacter(char c)
    if (mType == kTextEntry_Text)
       return juce::CharacterFunctions::isPrintable(c);
    if (mType == kTextEntry_Int)
-      return CharacterFunctions::isDigit((char)c) || c == '-';
+      return juce::CharacterFunctions::isDigit((char)c) || c == '-';
    if (mType == kTextEntry_Float)
-      return CharacterFunctions::isDigit((char)c) || c == '.' || c == '-';
+      return juce::CharacterFunctions::isDigit((char)c) || c == '.' || c == '-';
    return false;
 }
 

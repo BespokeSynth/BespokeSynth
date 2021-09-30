@@ -50,15 +50,14 @@ private:
    
    struct Cost
    {
-      Cost() : mFrameCost(0), mHistoryIdx(0) { bzero(mHistory, sizeof(long)); }
       void EndFrame();
       unsigned long long MaxCost() const;
       
       string mName;
-      uint32_t mHash;
-      unsigned long long mFrameCost;
-      unsigned long long mHistory[PROFILER_HISTORY_LENGTH];
-      int mHistoryIdx;
+      uint32_t mHash{0};
+      unsigned long long mFrameCost{0};
+      unsigned long long mHistory[PROFILER_HISTORY_LENGTH]{};
+      int mHistoryIdx{0};
    };
    
    unsigned long long mTimerStart;

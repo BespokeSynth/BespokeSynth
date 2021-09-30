@@ -30,6 +30,8 @@
 #include "IUIControl.h"
 #include "CanvasElement.h"
 
+#include "juce_gui_basics/juce_gui_basics.h"
+
 #define MAX_CANVAS_MASK_ELEMENTS 128
 
 class Canvas;
@@ -116,7 +118,7 @@ public:
    DragMode GetDragMode() const { return mDragMode; }
    bool IsRowVisible(int row) const;
    void SetRowColor(int row, ofColor color);
-   MouseCursor GetMouseCursorType();
+   juce::MouseCursor GetMouseCursorType();
    ofVec2f RescaleForZoom(float x, float y) const;
    
    //IUIControl

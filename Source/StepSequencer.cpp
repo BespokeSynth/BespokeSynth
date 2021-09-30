@@ -68,7 +68,7 @@ StepSequencer::StepSequencer()
 {
    mFlusher.SetInterval(mStepInterval);
    
-   mMetaStepMasks = new uint32[META_STEP_MAX * NUM_STEPSEQ_ROWS];
+   mMetaStepMasks = new juce::uint32[META_STEP_MAX * NUM_STEPSEQ_ROWS];
    for (int i=0; i<META_STEP_MAX * NUM_STEPSEQ_ROWS; ++i)
       mMetaStepMasks[i] = 0xff;
 }
@@ -278,7 +278,7 @@ void StepSequencer::UpdateMetaLights()
       return;
    
    bool hasHeldButtons = mHeldButtons.size() > 0;
-   uint32 metaStepMask = 0;
+   juce::uint32 metaStepMask = 0;
    if (hasHeldButtons)
       metaStepMask = mMetaStepMasks[GetMetaStepMaskIndex(mHeldButtons.begin()->mCol, mHeldButtons.begin()->mRow)];
    
@@ -530,7 +530,7 @@ void StepSequencer::DrawModule()
    {
       for (int row = 0; row < mGrid->GetRows(); ++row)
       {
-         uint32 mask = mMetaStepMasks[GetMetaStepMaskIndex(col, row)];
+         auto mask = mMetaStepMasks[GetMetaStepMaskIndex(col, row)];
          ofVec2f pos = mGrid->GetCellPosition(col, row) + mGrid->GetPosition(true);
          float cellWidth = (float)mGrid->GetWidth() / mGrid->GetCols();
          float cellHeight = (float)mGrid->GetHeight() / mGrid->GetRows();

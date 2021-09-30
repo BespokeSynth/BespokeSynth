@@ -36,6 +36,11 @@
 #include "Scale.h"
 #include "UIControlMacros.h"
 
+#include "juce_gui_basics/juce_gui_basics.h"
+#include "juce_audio_formats/juce_audio_formats.h"
+
+using namespace juce;
+
 namespace
 {
    const int kRecordingChunkSize = 48000 * 5;
@@ -802,7 +807,7 @@ void SamplePlayer::OnYoutubeSearchComplete(string searchTerm, double searchTime)
 void SamplePlayer::LoadFile()
 {
    FileChooser chooser("Load sample", File(ofToDataPath("samples")),
-                       TheSynth->GetGlobalManagers()->mAudioFormatManager.getWildcardForAllFormats(), true, false, TheSynth->GetMainComponent()->getTopLevelComponent());
+                       TheSynth->GetAudioFormatManager().getWildcardForAllFormats(), true, false, TheSynth->GetMainComponent()->getTopLevelComponent());
    if (chooser.browseForFileToOpen())
    {
       auto file = chooser.getResult();

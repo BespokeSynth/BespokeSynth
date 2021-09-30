@@ -29,6 +29,7 @@
 #include "ofxJSONElement.h"
 #include "ModularSynth.h"
 #include "PatchCableSource.h"
+#include "Checkbox.h"
 
 namespace
 {

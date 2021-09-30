@@ -24,6 +24,7 @@
 //
 
 #include "FFT.h"
+#include <cstring>
 
 // Constructor for FFT routine
 FFT::FFT(int nfft)
@@ -514,3 +515,11 @@ void mayer_realifft(int n, REAL *real)
    }
    mayer_fht(real,n);
 }
+
+void FFTData::Clear()
+{
+   std::memset(mRealValues, 0, mFreqDomainSize * sizeof(float));
+   std::memset(mImaginaryValues, 0, mFreqDomainSize * sizeof(float));
+   std::memset(mTimeDomain, 0, mWindowSize * sizeof(float));
+}
+

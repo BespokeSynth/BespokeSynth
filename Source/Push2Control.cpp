@@ -30,7 +30,7 @@
 // #include <GL/glew.h>
 #endif
 
-#include <JuceHeader.h>
+#include "juce_opengl/juce_opengl.h"
 using namespace juce::gl;
 
 #include "Push2Control.h"

@@ -9,7 +9,7 @@
 #include "M185Sequencer.h"
 #include "SynthGlobals.h"
 #include "UIControlMacros.h"
-//#include "Transport.h"
+#include "FileStream.h"
 
 M185Sequencer::M185Sequencer()
 : mWidth(0)

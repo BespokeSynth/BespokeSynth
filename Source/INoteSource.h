@@ -38,7 +38,7 @@ class INoteSource;
 class NoteOutput : public INoteReceiver
 {
 public:
-   NoteOutput(INoteSource* source) : mNoteSource(source), mStackDepth(0) { bzero(mNotes, 128*sizeof(bool)); bzero(mNoteOnTimes, 128*sizeof(double)); }
+   explicit NoteOutput(INoteSource* source) : mNoteSource(source), mStackDepth(0) {}
    
    void Flush(double time);
    void FlushTarget(double time, INoteReceiver* target);
@@ -47,7 +47,7 @@ public:
    void PlayNote(double time, int pitch, int velocity, int voiceIdx = -1, ModulationParameters modulation = ModulationParameters()) override;
    void SendPressure(int pitch, int pressure) override;
    void SendCC(int control, int value, int voiceIdx = -1) override;
-   void SendMidi(const MidiMessage& message) override;
+   void SendMidi(const juce::MidiMessage& message) override;
    
    void PlayNoteInternal(double time, int pitch, int velocity, int voiceIdx = -1, ModulationParameters modulation = ModulationParameters());
 
@@ -56,8 +56,8 @@ public:
    bool HasHeldNotes();
    list<int> GetHeldNotesList();
 private:
-   bool mNotes[128];
-   double mNoteOnTimes[128];
+   bool mNotes[128]{};
+   double mNoteOnTimes[128]{};
    INoteSource* mNoteSource;
    int mStackDepth;
 };

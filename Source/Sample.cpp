@@ -30,6 +30,8 @@
 #include "ChannelBuffer.h"
 #include <memory>
 
+#include "juce_audio_formats/juce_audio_formats.h"
+
 Sample::Sample()
 : mData(0)
 , mNumSamples(0)
@@ -57,9 +59,9 @@ bool Sample::Read(const char* path, bool mono, ReadType readType)
    vector<string> tokens = ofSplitString(mReadPath, "/");
    mName = tokens[tokens.size()-1].c_str();
    
-   File file(ofToDataPath(mReadPath));
+   juce::File file(ofToDataPath(mReadPath));
    delete mReader;
-   mReader = TheSynth->GetGlobalManagers()->mAudioFormatManager.createReaderFor(file);
+   mReader = TheSynth->GetAudioFormatManager().createReaderFor(file);
    
    if (mReader != nullptr)
    {
@@ -74,7 +76,7 @@ bool Sample::Read(const char* path, bool mono, ReadType readType)
       mOffset = mNumSamples;
       mSampleRateRatio = float(mReader->sampleRate) / gSampleRate;
       
-      mReadBuffer = make_unique<AudioSampleBuffer>();
+      mReadBuffer = make_unique<juce::AudioSampleBuffer>();
       mReadBuffer->setSize(mReader->numChannels, mNumSamples);
       
       if (readType == ReadType::Sync)
@@ -170,13 +172,13 @@ bool Sample::Write(const char* path /*=nullptr*/)
 //static
 bool Sample::WriteDataToFile(const char *path, float **data, int numSamples, int channels)
 {
-   auto wavFormat = std::make_unique<WavAudioFormat>();
-   File outputFile(ofToDataPath(path).c_str());
+   auto wavFormat = std::make_unique<juce::WavAudioFormat>();
+   juce::File outputFile(ofToDataPath(path).c_str());
    outputFile.create();
    auto outputTo = outputFile.createOutputStream();
    assert(outputTo != nullptr);
    bool b1{false};
-   auto writer = std::unique_ptr<AudioFormatWriter>(
+   auto writer = std::unique_ptr<juce::AudioFormatWriter>(
        wavFormat->createWriterFor(outputTo.release(), gSampleRate, channels, 16, b1, 0));
    writer->writeFromFloatArrays(data, channels, numSamples);
 

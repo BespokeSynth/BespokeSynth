@@ -28,6 +28,7 @@
 #include "PulseGate.h"
 #include "SynthGlobals.h"
 #include "UIControlMacros.h"
+#include "Checkbox.h"
 
 PulseGate::PulseGate()
 : mAllow(true)

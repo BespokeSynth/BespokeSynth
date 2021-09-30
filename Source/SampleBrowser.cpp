@@ -30,6 +30,10 @@
 #include "ModularSynth.h"
 #include "UIControlMacros.h"
 
+#include "juce_audio_formats/juce_audio_formats.h"
+
+using namespace juce;
+
 SampleBrowser::SampleBrowser()
 {
    mCurrentDirectory = ofToDataPath("samples");
@@ -145,7 +149,7 @@ void SampleBrowser::SetDirectory(String dirPath)
    
    if (dirPath != "")
    {
-      String matcher = TheSynth->GetGlobalManagers()->mAudioFormatManager.getWildcardForAllFormats();
+      String matcher = TheSynth->GetAudioFormatManager().getWildcardForAllFormats();
 
       StringArray wildcards;
       wildcards.addTokens(matcher, ";,", "\"'");

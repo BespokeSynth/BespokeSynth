@@ -44,15 +44,13 @@
    #include "pybind11/stl.h"
 #include "leathers/pop"
 
+#include "juce_gui_basics/juce_gui_basics.h"
+
 namespace py = pybind11;
 
 //static
 bool CodeEntry::sWarnJediNotInstalled = false;
 
-namespace
-{
-   const float kFontSize = 14;
-}
 
 CodeEntry::CodeEntry(ICodeEntryListener* owner, const char* name, int x, int y, float w, float h)
 : mListener(owner)
@@ -278,14 +276,14 @@ void CodeEntry::Render()
    
    if (isCurrent)
    {
-      ofSetColor(60,60,60);
+      ofSetColor(currentBg);
    }
    else
    {
       if (mString != mPublishedString)
-         ofSetColor(25,35,25);
+         ofSetColor(publishedBg);
       else
-         ofSetColor(35,35,35);
+         ofSetColor(unpublishedBg);
    }
    ofRect(mX, mY, w, h);
    
@@ -324,35 +322,19 @@ void CodeEntry::Render()
       ofFill();
    }
    
-   mCharWidth = gFontFixedWidth.GetStringWidth("x", kFontSize);
-   mCharHeight = gFontFixedWidth.GetStringHeight("x", kFontSize);
+   mCharWidth = gFontFixedWidth.GetStringWidth("x", mFontSize);
+   mCharHeight = gFontFixedWidth.GetStringHeight("x", mFontSize);
    
    if (mString != mPublishedString)
    {
       ofSetColor(color, gModuleDrawAlpha * .05f);
-      gFontFixedWidth.DrawString(mPublishedString, kFontSize, mX+2 - mScroll.x, mY + mCharHeight - mScroll.y);
+      gFontFixedWidth.DrawString(mPublishedString, mFontSize, mX+2 - mScroll.x, mY + mCharHeight - mScroll.y);
    }
    
    ofSetColor(color, gModuleDrawAlpha);
    
    string drawString = GetVisibleCode();
-   
-   //syntax-highlighted text
-   static ofColor stringColor(0.9*255, 0.7*255, 0.6*255, 255);
-   static ofColor numberColor(0.9*255, 0.9*255, 1.0*255, 255);
-   static ofColor name1Color(0.4*255, 0.9*255, 0.8*255, 255);
-   static ofColor name2Color(0.7*255, 0.9*255, 0.3*255, 255);
-   static ofColor name3Color(0.3*255, 0.9*255, 0.4*255, 255);
-   static ofColor definedColor(0.6*255, 1.0*255, 0.9*255, 255);
-   static ofColor equalsColor(0.9*255, 0.7*255, 0.6*255, 255);
-   static ofColor parenColor(0.6*255, 0.5*255, 0.9*255, 255);
-   static ofColor braceColor(0.4*255, 0.5*255, 0.7*255, 255);
-   static ofColor bracketColor(0.5*255, 0.8*255, 0.7*255, 255);
-   static ofColor opColor(0.9*255, 0.3*255, 0.6*255, 255);
-   static ofColor commaColor(0.5*255, 0.6*255, 0.5*255, 255);
-   static ofColor commentColor(0.5*255, 0.5*255, 0.5*255, 255);
-   static ofColor unknownColor = ofColor::white;
-   
+
    ofPushStyle();
    const float dim = .7f;
    DrawSyntaxHighlight(drawString, stringColor * (isCurrent ? 1 : dim), mSyntaxHighlightMapping, 3, -1);
@@ -386,6 +368,7 @@ void CodeEntry::Render()
       if (mCaretBlink)
       {
          ofFill();
+
          ofRect(caretPos.x, caretPos.y, 1, mCharHeight, L(corner,1));
       }
       mCaretBlinkTimer += ofGetLastFrameTime();
@@ -463,15 +446,15 @@ void CodeEntry::RenderOverlay()
             ofSetColor(100, 100, 100);
          else
             ofSetColor(70, 70, 70);
-         ofRect(x, y - mCharHeight+2, gFontFixedWidth.GetStringWidth(mAutocompletes[i].autocompleteFull, kFontSize), mCharHeight);
+         ofRect(x, y - mCharHeight+2, gFontFixedWidth.GetStringWidth(mAutocompletes[i].autocompleteFull, mFontSize), mCharHeight);
 
          ofSetColor(200, 200, 200);
-         gFontFixedWidth.DrawString(mAutocompletes[i].autocompleteFull, kFontSize, x, y);
+         gFontFixedWidth.DrawString(mAutocompletes[i].autocompleteFull, mFontSize, x, y);
          ofSetColor(255, 255, 255);
          string prefix = "";
          for (size_t j = 0; j < charactersLeft; ++j)
             prefix += " ";
-         gFontFixedWidth.DrawString(prefix + mAutocompletes[i].autocompleteRest, kFontSize, x, y);
+         gFontFixedWidth.DrawString(prefix + mAutocompletes[i].autocompleteRest, mFontSize, x, y);
       }
    }
 
@@ -509,11 +492,11 @@ void CodeEntry::RenderOverlay()
          float x = GetLinePos(mAutocompleteCaretCoords.y, K(end), !K(published)).x + 10;
          float y = caretPos.y + mCharHeight * (i + 1) - 2;
          ofSetColor(70, 70, 70);
-         ofRect(x, y-mCharHeight+2, gFontFixedWidth.GetStringWidth(params, kFontSize), mCharHeight+2);
+         ofRect(x, y-mCharHeight+2, gFontFixedWidth.GetStringWidth(params, mFontSize), mCharHeight+2);
          ofSetColor(170, 170, 255);
-         gFontFixedWidth.DrawString(params, kFontSize, x, y);
+         gFontFixedWidth.DrawString(params, mFontSize, x, y);
          ofSetColor(230, 230, 255);
-         gFontFixedWidth.DrawString(highlightParamString, kFontSize, x, y);
+         gFontFixedWidth.DrawString(highlightParamString, mFontSize, x, y);
       }
    }
 }
@@ -564,7 +547,7 @@ void CodeEntry::DrawSyntaxHighlight(string input, ofColor color, std::vector<int
    float offsetX = ofRandom(-shake, shake);
    float offsetY = ofRandom(-shake, shake);
    
-   gFontFixedWidth.DrawString(filtered, kFontSize, mX+2 - mScroll.x + offsetX, mY + mCharHeight - mScroll.y + offsetY);
+   gFontFixedWidth.DrawString(filtered, mFontSize, mX+2 - mScroll.x + offsetX, mY + mCharHeight - mScroll.y + offsetY);
 }
 
 string CodeEntry::FilterText(string input, std::vector<int> mapping, int filter1, int filter2)
@@ -786,7 +769,7 @@ void CodeEntry::OnKeyPressed(int key, bool isRepeat)
             UpdateString(mString.substr(0, mCaretPosition));
       }
    }
-   else if (key == KeyPress::deleteKey)
+   else if (key == juce::KeyPress::deleteKey)
    {
       if (mCaretPosition != mCaretPosition2)
       {
@@ -982,11 +965,11 @@ void CodeEntry::OnKeyPressed(int key, bool isRepeat)
       mCaretPosition = 0;
       mCaretPosition2 = (int)mString.size();
    }
-   else if (key == KeyPress::endKey)
+   else if (key == juce::KeyPress::endKey)
    {
       MoveCaretToEnd();
    }
-   else if (key == KeyPress::homeKey)
+   else if (key == juce::KeyPress::homeKey)
    {
       MoveCaretToStart();
    }
@@ -1347,3 +1330,47 @@ void CodeEntry::LoadState(FileStreamIn& in, bool shouldSetValue)
    //if (mListener != nullptr)
    //   mListener->ExecuteCode(mString);
 }
+
+void CodeEntry::SetStyleFromJSON(const ofxJSONElement &vdict) {
+    auto fs = vdict.get("font-size", 14);
+    auto fsi = fs.asInt();
+    if (fsi > 2 && fsi < 200)
+        mFontSize = fsi;
+
+    auto fromRGB = [vdict](const std::string &key, ofColor &onto)
+    {
+        auto def = Json::Value(Json::arrayValue);
+        def[0u] = 255;
+        def[1u] = 0;
+        def[2u] = 0;
+        auto arr = vdict.get(key, def);
+        if (def.size() < 3)
+        {
+            onto.r = 255;
+            onto.g = 0;
+            onto.b = 0;
+        }
+        else
+        {
+            onto.r = arr[0u].asInt();
+            onto.g = arr[1u].asInt();
+            onto.b = arr[2u].asInt();
+        }
+    };
+    fromRGB( "currentBg", currentBg);
+    fromRGB("publishedBg", publishedBg);
+    fromRGB( "unpublishedBg", unpublishedBg);
+    fromRGB( "string", stringColor);
+    fromRGB( "number", numberColor);
+    fromRGB( "name1", name1Color);
+    fromRGB( "name2", name2Color);
+    fromRGB( "defined", definedColor);
+    fromRGB( "equals", equalsColor);
+    fromRGB( "paren", parenColor);
+    fromRGB( "brace", braceColor);
+    fromRGB( "bracket", bracketColor);
+    fromRGB( "op", opColor);
+    fromRGB( "comma", commaColor);
+    fromRGB( "comment", commentColor);
+}
+

@@ -29,6 +29,7 @@
 #include "Profiler.h"
 #include "Transport.h"
 #include "Scale.h"
+#include "IAudioReceiver.h"
 
 FollowingSong::FollowingSong()
 : mVolume(1)

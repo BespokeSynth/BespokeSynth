@@ -7,8 +7,11 @@
 //#include <GL/glew.h>
 #endif
 
-#include <JuceHeader.h>
+#include "juce_audio_devices/juce_audio_devices.h"
+#include "juce_audio_formats/juce_audio_formats.h"
+#include "juce_opengl/juce_opengl.h"
 using namespace juce::gl;
+using namespace juce;
 
 #include "VersionInfo.h"
 
@@ -230,7 +233,7 @@ public:
 
       SetGlobalSampleRateAndBufferSize(sampleRate, bufferSize);
       
-      mSynth.Setup(&mGlobalManagers, this, &openGLContext);
+      mSynth.Setup(&mGlobalManagers.mDeviceManager, &mGlobalManagers.mAudioFormatManager, this, &openGLContext);
 
       if (!mGlobalManagers.mDeviceManager.getCurrentDeviceTypeObject()->hasSeparateInputsAndOutputs())
          inputDevice = outputDevice;    //asio must have identical input and output
@@ -523,8 +526,12 @@ private:
       return ret;
    }
 
-   GlobalManagers mGlobalManagers;
-   
+   struct
+   {
+      juce::AudioDeviceManager mDeviceManager;
+      juce::AudioFormatManager mAudioFormatManager;
+   } mGlobalManagers;
+
    ModularSynth mSynth;
    
    NVGcontext* mVG;

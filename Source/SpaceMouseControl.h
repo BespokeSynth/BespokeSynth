@@ -73,6 +73,6 @@ private:
    bool mIsPanningOrZooming;
    bool mIsTwisting;
 
-   LPCTSTR getClassNameFromAtom() noexcept { return (LPCTSTR)(pointer_sized_uint)atom; }
+   LPCTSTR getClassNameFromAtom() const noexcept;
 };
 #endif

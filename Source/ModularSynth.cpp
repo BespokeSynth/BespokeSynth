@@ -23,7 +23,6 @@
 #include "FileStream.h"
 #include "PatchCable.h"
 #include "ADSRDisplay.h"
-#include <JuceHeader.h>
 #include "QuickSpawnMenu.h"
 #include "AudioToCV.h"
 #include "ScriptModule.h"
@@ -44,6 +43,9 @@
 #endif
 
 ModularSynth* TheSynth = nullptr;
+namespace {
+   juce::String TheClipboard;
+}
 
 //static
 bool ModularSynth::sShouldAutosave = false;
@@ -54,6 +56,8 @@ float ModularSynth::sBackgroundLissajousB = 0.418f;
 #if BESPOKE_WINDOWS
 LONG WINAPI TopLevelExceptionHandler(PEXCEPTION_POINTERS pExceptionInfo);
 #endif
+
+using namespace juce;
 
 void AtExit()
 {
@@ -231,9 +235,10 @@ bool ModularSynth::IsReady()
    return gTime > 100;
 }
 
-void ModularSynth::Setup(GlobalManagers* globalManagers, juce::Component* mainComponent, juce::OpenGLContext* openGLContext)
+void ModularSynth::Setup(juce::AudioDeviceManager* globalAudioDeviceManager, juce::AudioFormatManager* globalAudioFormatManager, juce::Component* mainComponent, juce::OpenGLContext* openGLContext)
 {
-   mGlobalManagers = globalManagers;
+   mGlobalAudioDeviceManager = globalAudioDeviceManager;
+   mGlobalAudioFormatManager = globalAudioFormatManager;
    mMainComponent = mainComponent;
    mOpenGLContext = openGLContext;
    int recordBufferLengthMinutes = 30;
@@ -274,6 +279,7 @@ void ModularSynth::Setup(GlobalManagers* globalManagers, juce::Component* mainCo
    juce::File(ofToDataPath("samples")).createDirectory();
    juce::File(ofToDataPath("scripts")).createDirectory();
    juce::File(ofToDataPath("internal")).createDirectory();
+   juce::File(ofToDataPath("vst")).createDirectory();
    
    SynthInit();
 
@@ -856,7 +862,6 @@ void ModularSynth::Exit()
    mAudioThreadMutex.Lock("exiting");
    mAudioPaused = true;
    mAudioThreadMutex.Unlock();
-   mSoundStream.stop();
    mModuleContainer.Exit();
    DeleteAllModules();
    ofExit();
@@ -936,7 +941,7 @@ void ModularSynth::KeyPressed(int key, bool isRepeat)
       }
       else
       {
-         bzero(mConsoleText, MAX_TEXTENTRY_LENGTH);
+         std::memset(mConsoleText, 0, MAX_TEXTENTRY_LENGTH);
          mConsoleEntry->MakeActiveTextEntry(true);
       }
    }
@@ -1990,7 +1995,7 @@ void ModularSynth::LoadLayout(ofxJSONElement json)
    //ofLoadURLAsync("http://bespoke.com/telemetry/"+jsonFile);
    
    ScopedMutex mutex(&mAudioThreadMutex, "LoadLayout()");
-   ScopedLock renderLock(mRenderLock);
+   std::lock_guard<recursive_mutex> renderLock(mRenderLock);
    
    ResetLayout();
    
@@ -2204,7 +2209,7 @@ void ModularSynth::LogEvent(string event, LogEventType type)
 IDrawableModule* ModularSynth::DuplicateModule(IDrawableModule* module)
 {
    {
-      FileStreamOut out(ofToDataPath("tmp").c_str());
+      FileStreamOut out(ofToDataPath("tmp"));
       module->SaveState(out);
    }
    
@@ -2225,7 +2230,7 @@ IDrawableModule* ModularSynth::DuplicateModule(IDrawableModule* module)
    newModule->SetName(module->Name()); //temporarily rename to the same as what we duplicated, so we can load state properly
    
    {
-      FileStreamIn in(ofToDataPath("tmp").c_str());
+      FileStreamIn in(ofToDataPath("tmp"));
       mIsLoadingModule = true;
       newModule->LoadState(in);
       mIsLoadingModule = false;
@@ -2310,7 +2315,7 @@ void ModularSynth::SaveState(string file, bool autosave)
 
    mAudioThreadMutex.Lock("SaveState()");
    
-   FileStreamOut out(file.c_str());
+   FileStreamOut out(file);
    
    out << GetLayout().getRawString(true);
    mModuleContainer.SaveState(out);
@@ -2338,7 +2343,7 @@ void ModularSynth::LoadState(string file)
    LockRender(false);
    mAudioThreadMutex.Unlock();
    
-   FileStreamIn in(ofToDataPath(file).c_str());
+   FileStreamIn in(ofToDataPath(file));
    
    string jsonString;
    in >> jsonString;
@@ -2430,7 +2435,7 @@ void ModularSynth::OnConsoleInput()
       else if (tokens[0] == "clearall")
       {
          mAudioThreadMutex.Lock("clearall");
-         ScopedLock renderLock(mRenderLock);
+         std::lock_guard<std::recursive_mutex> renderLock(mRenderLock);
          ResetLayout();
          mAudioThreadMutex.Unlock();
       }
@@ -2776,16 +2781,16 @@ void ModularSynth::SaveOutput()
 }
 
 const String& ModularSynth::GetTextFromClipboard() const {
-   return mClipboard;
+   return TheClipboard;
 }
 
 void ModularSynth::CopyTextToClipboard(const String& text) {
-   mClipboard = text;
+   TheClipboard = text;
    SystemClipboard::copyTextToClipboard(text);
 }
 
 void ModularSynth::ReadClipboardTextFromSystem() {
-   mClipboard = SystemClipboard::getTextFromClipboard();
+   TheClipboard = SystemClipboard::getTextFromClipboard();
 }
 
 void ModularSynth::SetFatalError(string error)

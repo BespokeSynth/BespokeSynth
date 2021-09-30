@@ -33,6 +33,8 @@
 #include "PolyphonyMgr.h"
 #include "SingleOscillatorVoice.h"
 
+#include "juce_core/juce_core.h"
+
 KarplusStrongVoice::KarplusStrongVoice(IDrawableModule* owner)
 : mOscPhase(0)
 , mOsc(kOsc_Sin)
@@ -134,17 +136,17 @@ bool KarplusStrongVoice::Process(double time, ChannelBuffer* out, int oversampli
             float nextSample = posNext >= mBuffer.Size() ? 0 : mBuffer.GetSample(posNext, 0);
             float a = samplesAgo - pos;
             feedbackSample = (1 - a)*sample + a * nextSample; //interpolate
-            FIX_DENORMAL(feedbackSample);
+            JUCE_UNDENORMALISE(feedbackSample);
          }
       }
       mFilteredSample = ofLerp(feedbackSample, mFilteredSample, filterLerp);
-      FIX_DENORMAL(mFilteredSample);
+      JUCE_UNDENORMALISE(mFilteredSample);
       //sample += mFeedbackRamp.Value(time) * mFilterSample;
       float feedback = mFilteredSample * sqrtf(mVoiceParams->mFeedback + GetPressure(pos) * .02f) * mMuteRamp.Value(time);
       if (mVoiceParams->mInvert)
          feedback *= -1;
       sample += feedback;
-      FIX_DENORMAL(sample);
+      JUCE_UNDENORMALISE(sample);
 
       mBuffer.Write(sample, 0);
       

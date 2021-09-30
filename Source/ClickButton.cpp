@@ -27,6 +27,8 @@
 #include "IDrawableModule.h"
 #include "SynthGlobals.h"
 
+#include <cstring>
+
 ClickButton::ClickButton(IButtonListener* owner, const char* label, int x, int y, ButtonDisplayStyle displayStyle /*= ButtonDisplayStyle::kText*/)
 : mWidth(20)
 , mHeight(15)

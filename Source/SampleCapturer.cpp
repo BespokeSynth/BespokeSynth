@@ -30,6 +30,9 @@
 #include "Profiler.h"
 #include "UIControlMacros.h"
 #include "Sample.h"
+#include "Checkbox.h"
+
+#include "juce_gui_basics/juce_gui_basics.h"
 
 SampleCapturer::SampleCapturer()
    : IAudioProcessor(gBufferSize)
@@ -195,6 +198,7 @@ void SampleCapturer::DrawModule()
 
 void SampleCapturer::ButtonClicked(ClickButton* button)
 {
+   using namespace juce;
    if (button == mPlayButton)
    {
       mSamples[mCurrentSampleIndex].mPlaybackPos = 0;

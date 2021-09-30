@@ -40,9 +40,11 @@
 #include "RadioButton.h"
 #include "GateEffect.h"
 
+#include "juce_osc/juce_osc.h"
+
 class Sample;
 
-class SamplePlayer : public IAudioProcessor, public IDrawableModule, public INoteReceiver, public IFloatSliderListener, public IIntSliderListener, public IDropdownListener, public IButtonListener, public IRadioButtonListener, public ITextEntryListener, private OSCReceiver, private OSCReceiver::Listener<OSCReceiver::RealtimeCallback>
+class SamplePlayer : public IAudioProcessor, public IDrawableModule, public INoteReceiver, public IFloatSliderListener, public IIntSliderListener, public IDropdownListener, public IButtonListener, public IRadioButtonListener, public ITextEntryListener, private juce::OSCReceiver, private juce::OSCReceiver::Listener<juce::OSCReceiver::RealtimeCallback>
 {
 public:
    SamplePlayer();
@@ -72,8 +74,8 @@ public:
    ChannelBuffer* GetCueSampleData(int cueIndex);
    float GetLengthInSeconds() const;
    
-   void oscMessageReceived(const OSCMessage& msg) override;
-   void oscBundleReceived(const OSCBundle& bundle) override;
+   void oscMessageReceived(const juce::OSCMessage& msg) override;
+   void oscBundleReceived(const juce::OSCBundle& bundle) override;
    
    void CheckboxUpdated(Checkbox* checkbox) override;
    void FloatSliderUpdated(FloatSlider* slider, float oldVal) override;
@@ -110,7 +112,7 @@ private:
    float GetZoomEndSeconds() const;
    void UpdateActiveCuePoint();
    void PlayCuePoint(double time, int index, int velocity, float speedMult, float startOffsetSeconds);
-   void RunProcess(const StringArray& args);
+   void RunProcess(const juce::StringArray& args);
    void AutoSlice(int slices);
    void StopRecording();
    
@@ -210,7 +212,7 @@ private:
       string youtubeId;
    };
    RunningProcessType mRunningProcessType;
-   ChildProcess* mRunningProcess;
+   juce::ChildProcess* mRunningProcess;
    std::function<void()> mOnRunningProcessComplete;
    vector<YoutubeSearchResult> mYoutubeSearchResults;
    std::array<ClickButton*, kMaxYoutubeSearchResults> mSearchResultButtons;
