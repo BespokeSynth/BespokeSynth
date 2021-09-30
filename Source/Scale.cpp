@@ -237,11 +237,11 @@ float Scale::FreqToPitch(float freq)
 int Scale::MakeDiatonic(int pitch)
 {
    assert(mScale.mScaleRoot >= 0 && mScale.mScaleRoot < mTet);
-   assert(mScale.mScalePitches.size());
+   assert(mScale.GetPitches().size());
    
    int pitchOut = (pitch - mScale.mScaleRoot) % mTet; //transform into 0-12 scale space
    
-   for (int i=(int)mScale.mScalePitches.size() - 1; i >= 0; --i)
+   for (int i=(int)mScale.GetPitches().size() - 1; i >= 0; --i)
    {
       if (mScale.GetScalePitch(i) <= pitchOut)
       {
@@ -698,7 +698,9 @@ void ScalePitches::SetRoot(int root)
 void ScalePitches::SetScaleType(string type)
 {
    mScaleType = type;
-   mScalePitches = TheScale->GetPitchesForScale(type);
+   int newFlip = (mScalePitchesFlip == 0) ? 1 : 0;
+   mScalePitches[newFlip] = TheScale->GetPitchesForScale(type);
+   mScalePitchesFlip = newFlip;
 }
 
 void ScalePitches::SetAccidentals(const std::vector<Accidental>& accidentals)
@@ -743,20 +745,20 @@ void ScalePitches::GetChordDegreeAndAccidentals(const Chord& chord, int& degree,
    for (int i=0; i<chordForm.size(); ++i)
    {
       int chordPitch = (chordForm[i]+pitch-mScaleRoot+TheScale->GetTet())%TheScale->GetTet();
-      if (!VectorContains(chordPitch, mScalePitches))
+      if (!VectorContains(chordPitch, mScalePitches[mScalePitchesFlip]))
       {
          if (type == kChord_Maj || type == kChord_Aug)
          {
-            if (VectorContains(chordPitch-1, mScalePitches))
+            if (VectorContains(chordPitch-1, mScalePitches[mScalePitchesFlip]))
                accidentals.push_back(Accidental(chordPitch-1, 1)); //sharpen
-            else if (VectorContains(chordPitch+1, mScalePitches))
+            else if (VectorContains(chordPitch+1, mScalePitches[mScalePitchesFlip]))
                accidentals.push_back(Accidental(chordPitch+1, -1)); //flatten
          }
          else if (type == kChord_Min || type == kChord_Dim)
          {
-            if (VectorContains(chordPitch+1, mScalePitches))
+            if (VectorContains(chordPitch+1, mScalePitches[mScalePitchesFlip]))
                accidentals.push_back(Accidental(chordPitch+1, -1)); //flatten
-            else if (VectorContains(chordPitch-1, mScalePitches))
+            else if (VectorContains(chordPitch-1, mScalePitches[mScalePitchesFlip]))
                accidentals.push_back(Accidental(chordPitch-1, 1)); //sharpen
          }
          else
@@ -769,7 +771,7 @@ void ScalePitches::GetChordDegreeAndAccidentals(const Chord& chord, int& degree,
 
 int ScalePitches::GetScalePitch(int index) const
 {
-   int pitch = mScalePitches[index];
+   int pitch = mScalePitches[mScalePitchesFlip][index];
    
    for (int i=0; i<mAccidentals.size(); ++i)
    {
@@ -816,7 +818,7 @@ bool ScalePitches::IsInScale(int pitch) const
       return false;
    pitch %= TheScale->GetTet();
    
-   for (int i=0; i<mScalePitches.size(); ++i)
+   for (int i=0; i<mScalePitches[mScalePitchesFlip].size(); ++i)
    {
       if (pitch == GetScalePitch(i))
          return true;
@@ -827,7 +829,7 @@ bool ScalePitches::IsInScale(int pitch) const
 
 int ScalePitches::GetPitchFromTone(int n) const
 {
-   int numTones = (int)mScalePitches.size();
+   int numTones = (int)mScalePitches[mScalePitchesFlip].size();
    assert(numTones > 0);
    int octave = n/numTones;
    while (n<0)
@@ -843,9 +845,9 @@ int ScalePitches::GetPitchFromTone(int n) const
 int ScalePitches::GetToneFromPitch(int pitch) const
 {
    assert(mScaleRoot >= 0 && mScaleRoot < TheScale->GetTet());
-   assert(mScalePitches.size());
+   assert(mScalePitches[mScalePitchesFlip].size());
    
-   int numTones = (int)mScalePitches.size();
+   int numTones = (int)mScalePitches[mScalePitchesFlip].size();
    int rootRel = pitch - mScaleRoot;
    while (rootRel < 0)
       rootRel += TheScale->GetTet();

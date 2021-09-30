@@ -58,13 +58,15 @@ struct ScalePitches
 {
    int mScaleRoot;
    string mScaleType;
-   vector<int> mScalePitches;
+   vector<int> mScalePitches[2]; //double-buffered to avoid thread safety issues when modifying
+   int mScalePitchesFlip{0};
    std::vector<Accidental> mAccidentals;
    
    void SetRoot(int root);
    void SetScaleType(string type);
    void SetAccidentals(const std::vector<Accidental>& accidentals);
    
+   const vector<int>& GetPitches() const { return mScalePitches[mScalePitchesFlip]; }
    int ScaleRoot() const { return mScaleRoot; }
    string GetType() const { return mScaleType; }
    void GetChordDegreeAndAccidentals(const Chord& chord, int& degree, std::vector<Accidental>& accidentals) const;
@@ -76,7 +78,7 @@ struct ScalePitches
    bool IsInScale(int pitch) const;
    int GetPitchFromTone(int n) const;
    int GetToneFromPitch(int pitch) const;
-   int NumPitchesInScale() const { return (int)mScalePitches.size(); }
+   int NumPitchesInScale() const { return (int)mScalePitches[mScalePitchesFlip].size(); }
 };
 
 class MTSClient;
