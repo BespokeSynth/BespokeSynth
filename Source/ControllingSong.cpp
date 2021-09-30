@@ -89,7 +89,7 @@ void ControllingSong::Init()
       mSongSelector->AddLabel(title.c_str(), i);
    }
    
-   random_shuffle(mShuffleList.begin(), mShuffleList.end());
+   std::shuffle(begin(mShuffleList), end(mShuffleList), std::mt19937(std::random_device()()));
 }
 
 void ControllingSong::Poll()
@@ -104,7 +104,7 @@ void ControllingSong::Poll()
          if (mShuffleIndex == mSongList["songs"].size())
          {
             mShuffleIndex = 0;
-            random_shuffle(mShuffleList.begin(), mShuffleList.end());
+            std::shuffle(begin(mShuffleList), end(mShuffleList), std::mt19937(std::random_device()()));
          }
       }
       else

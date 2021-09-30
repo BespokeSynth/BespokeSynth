@@ -43,12 +43,14 @@ VSTWindow::VSTWindow (VSTPlugin* vst,
    setSize (400, 300);
    
    setContentOwned (pluginEditor, true);
-   
-   auto mainMon = juce::Desktop::getInstance().getDisplays().findDisplayForRect(TheSynth->GetMainComponent()->getScreenBounds()).userArea;
 
-   setTopLeftPosition(mainMon.getX() + mainMon.getWidth() / 4,
-                      mainMon.getY() + mainMon.getHeight() / 4);
-   
+   if (const auto* dpy = juce::Desktop::getInstance().getDisplays().getDisplayForRect(TheSynth->GetMainComponent()->getScreenBounds()))
+   {
+      const auto& mainMon = dpy->userArea;
+      setTopLeftPosition(mainMon.getX() + mainMon.getWidth() / 4,
+                         mainMon.getY() + mainMon.getHeight() / 4);
+   }
+
    setVisible (true);
    
 #ifdef JUCE_MAC
@@ -74,7 +76,7 @@ VSTWindow* VSTWindow::CreateWindow(VSTPlugin* vst, WindowFormatType type)
    if (ui == nullptr)
    {
       if (type == Generic || type == Parameters)
-         ui = new juce::GenericAudioProcessorEditor (vst->GetAudioProcessor());
+         ui = new juce::GenericAudioProcessorEditor (*vst->GetAudioProcessor());
       else if (type == Programs)
          ui = new ProgramAudioProcessorEditor (vst->GetAudioProcessor());
    }

@@ -920,17 +920,13 @@ void ScriptModule::RefreshStyleFiles()
 
 void ScriptModule::RefreshScriptFiles()
 {
-   DirectoryIterator dir(File(ofToDataPath("scripts")), false);
    mScriptFilePaths.clear();
    mLoadScriptSelector->Clear();
-   while(dir.next())
+   for (const auto& entry : RangedDirectoryIterator{File{ofToDataPath("scripts")}, false, "*.py"})
    {
-      File file = dir.getFile();
-      if (file.getFileExtension() ==  ".py")
-      {
-         mLoadScriptSelector->AddLabel(file.getFileName().toStdString(), (int)mScriptFilePaths.size());
-         mScriptFilePaths.push_back(file.getFullPathName().toStdString());
-      }
+      const auto& file = entry.getFile();
+      mLoadScriptSelector->AddLabel(file.getFileName().toStdString(), (int)mScriptFilePaths.size());
+      mScriptFilePaths.push_back(file.getFullPathName().toStdString());
    }
 }
 

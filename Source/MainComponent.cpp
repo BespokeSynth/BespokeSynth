@@ -68,8 +68,11 @@ public:
       int screenWidth, screenHeight;
       {
          const MessageManagerLock lock;
-         mPixelRatio = Desktop::getInstance().getDisplays().getMainDisplay().scale;
-         TheSynth->SetPixelRatio(mPixelRatio);
+         if (const auto* dpy = Desktop::getInstance().getDisplays().getPrimaryDisplay())
+         {
+            mPixelRatio = dpy->scale;
+            TheSynth->SetPixelRatio(mPixelRatio);
+         }
          auto bounds = Desktop::getInstance().getDisplays().getTotalBounds(true);
          screenWidth = bounds.getWidth();
          screenHeight = bounds.getHeight();
@@ -137,8 +140,11 @@ public:
 
       if (sRenderFrame % 30 == 0)
       {
-         mPixelRatio = Desktop::getInstance().getDisplays().findDisplayForRect(getScreenBounds()).scale; //adjust pixel ratio based on which screen has the majority of the window
-         TheSynth->SetPixelRatio(mPixelRatio);
+         if (const auto* dpy = Desktop::getInstance().getDisplays().getDisplayForRect(getScreenBounds()))
+         {
+            mPixelRatio = dpy->scale; //adjust pixel ratio based on which screen has the majority of the window
+            TheSynth->SetPixelRatio(mPixelRatio);
+         }
       }
       
       mScreenPosition = getScreenPosition();
