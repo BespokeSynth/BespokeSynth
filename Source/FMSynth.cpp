@@ -188,7 +188,7 @@ void FMSynth::PlayNote(double time, int pitch, int velocity, int voiceIdx, Modul
 
    if (mDrawDebug)
    {
-      vector<string> lines = ofSplitString(mDebugLines, "\n");
+      std::vector<std::string> lines = ofSplitString(mDebugLines, "\n");
       mDebugLines = "";
       const int kNumDisplayLines = 10;
       for (int i = 0; i < kNumDisplayLines - 1; ++i)
@@ -197,7 +197,7 @@ void FMSynth::PlayNote(double time, int pitch, int velocity, int voiceIdx, Modul
          if (lineIndex >= 0)
             mDebugLines += lines[lineIndex] + "\n";
       }
-      string debugLine = "PlayNote(" + ofToString(time / 1000) + ", " + ofToString(pitch) + ", " + ofToString(velocity) + ", " + ofToString(voiceIdx) + ")";
+      std::string debugLine = "PlayNote(" + ofToString(time / 1000) + ", " + ofToString(pitch) + ", " + ofToString(velocity) + ", " + ofToString(voiceIdx) + ")";
       mDebugLines += debugLine;
       ofLog() << debugLine;
    }

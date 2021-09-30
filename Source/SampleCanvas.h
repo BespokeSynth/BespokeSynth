@@ -45,7 +45,7 @@ public:
    ~SampleCanvas();
    static IDrawableModule* Create() { return new SampleCanvas(); }
    
-   string GetTitleLabel() override { return "sample canvas"; }
+   std::string GetTitleLabel() override { return "sample canvas"; }
    void CreateUIControls() override;
    
    void SetEnabled(bool enabled) override { mEnabled = enabled; }
@@ -59,7 +59,7 @@ public:
    
    void OnClicked(int x, int y, bool right) override;
    
-   void FilesDropped(vector<string> files, int x, int y) override;
+   void FilesDropped(std::vector<std::string> files, int x, int y) override;
    void SampleDropped(int x, int y, Sample* sample) override;
    bool CanDropSample() const override { return true; }
    

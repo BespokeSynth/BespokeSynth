@@ -37,7 +37,7 @@ class ModuleContainer
 public:
    ModuleContainer();
    
-   const vector<IDrawableModule*>& GetModules() const { return mModules; }
+   const std::vector<IDrawableModule*>& GetModules() const { return mModules; }
    
    void SetOwner(IDrawableModule* owner) { mOwner = owner; }
    IDrawableModule* GetOwner() const { return mOwner; }
@@ -60,19 +60,19 @@ public:
    void MouseMoved(float x, float y);
    void MouseReleased();
    IDrawableModule* GetModuleAt(float x, float y);
-   void GetModulesWithinRect(ofRectangle rect, vector<IDrawableModule*>& output);
+   void GetModulesWithinRect(ofRectangle rect, std::vector<IDrawableModule*>& output);
    void MoveToFront(IDrawableModule* module);
    void AddModule(IDrawableModule* module);
    void TakeModule(IDrawableModule* module);
    void DeleteModule(IDrawableModule* module);
-   IDrawableModule* FindModule(string name, bool fail = true);
-   IUIControl* FindUIControl(string path);
+   IDrawableModule* FindModule(std::string name, bool fail = true);
+   IUIControl* FindUIControl(std::string path);
    bool IsHigherThan(IDrawableModule* checkFor, IDrawableModule* checkAgainst) const;
-   void GetAllModules(vector<IDrawableModule*>& out);
+   void GetAllModules(std::vector<IDrawableModule*>& out);
    
-   template<class T> vector<string> GetModuleNames()
+   template<class T> std::vector<std::string> GetModuleNames()
    {
-      vector<string> ret;
+      std::vector<std::string> ret;
       for (int i=0; i<mModules.size(); ++i)
       {
          if (dynamic_cast<T>(mModules[i]))
@@ -91,7 +91,7 @@ public:
    static bool DoesModuleHaveMoreSaveData(FileStreamIn& in);
    
 private:   
-   vector<IDrawableModule*> mModules;
+   std::vector<IDrawableModule*> mModules;
    IDrawableModule* mOwner;
 
    ofVec2f mDrawOffset;

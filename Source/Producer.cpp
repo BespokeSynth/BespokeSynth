@@ -159,7 +159,7 @@ void Producer::Process(double time)
    GetVizBuffer()->WriteChunk(out,bufferSize, 0);
 }
 
-void Producer::FilesDropped(vector<string> files, int x, int y)
+void Producer::FilesDropped(std::vector<std::string> files, int x, int y)
 {
    mSample->Reset();
    

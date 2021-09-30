@@ -50,7 +50,7 @@ public:
    void MouseReleased() override;
    bool MouseMoved(float x, float y) override;
    
-   void FilesDropped(vector<string> files, int x, int y) override;
+   void FilesDropped(std::vector<std::string> files, int x, int y) override;
    
    void FloatSliderUpdated(FloatSlider* slider, float oldVal) override;
    void ButtonClicked(ClickButton* button) override;

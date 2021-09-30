@@ -57,7 +57,7 @@ void Prefab::CreateUIControls()
    AddPatchCableSource(mRemoveModuleCable);
 }
 
-string Prefab::GetTitleLabel()
+std::string Prefab::GetTitleLabel()
 {
    if (mPrefabName != "")
       return "prefab: "+mPrefabName;
@@ -209,7 +209,7 @@ void Prefab::ButtonClicked(ClickButton* button)
       FileChooser chooser("Save prefab as...", File(ofToDataPath("prefabs/prefab.pfb")), "*.pfb", true, false, TheSynth->GetMainComponent()->getTopLevelComponent());
       if (chooser.browseForFileToSave(true))
       {
-         string savePath = chooser.getResult().getRelativePathFrom(File(ofToDataPath(""))).toStdString();
+         std::string savePath = chooser.getResult().getRelativePathFrom(File(ofToDataPath(""))).toStdString();
          SavePrefab(savePath);
       }
    }
@@ -219,7 +219,7 @@ void Prefab::ButtonClicked(ClickButton* button)
       FileChooser chooser("Load prefab...", File(ofToDataPath("prefabs")), "*.pfb", true, false, TheSynth->GetMainComponent()->getTopLevelComponent());
       if (chooser.browseForFileToOpen())
       {
-         string loadPath = chooser.getResult().getRelativePathFrom(File(ofToDataPath(""))).toStdString();
+         std::string loadPath = chooser.getResult().getRelativePathFrom(File(ofToDataPath(""))).toStdString();
          LoadPrefab(ofToDataPath(loadPath));
       }
    }
@@ -233,15 +233,15 @@ void Prefab::ButtonClicked(ClickButton* button)
    }
 }
 
-void Prefab::SavePrefab(string savePath)
+void Prefab::SavePrefab(std::string savePath)
 {
    ofxJSONElement root;
    
    root["modules"] = mModuleContainer.WriteModules();
    
-   stringstream ss(root.getRawString(true));
-   string line;
-   string lines;
+   std::stringstream ss(root.getRawString(true));
+   std::string line;
+   std::string lines;
    while (getline(ss,line,'\n'))
    {
       const char* pos = strstr(line.c_str(), " : \"$");
@@ -263,7 +263,7 @@ void Prefab::SavePrefab(string savePath)
    mModuleContainer.SaveState(out);
 }
 
-void Prefab::LoadPrefab(string loadPath)
+void Prefab::LoadPrefab(std::string loadPath)
 {
    sLoadingPrefab = true;
 
@@ -276,7 +276,7 @@ void Prefab::LoadPrefab(string loadPath)
 
    assert(in.OpenedOk());
    
-   string jsonString;
+   std::string jsonString;
    in >> jsonString;
    ofxJSONElement root;
    bool loaded = root.parse(jsonString);
@@ -297,9 +297,9 @@ void Prefab::LoadPrefab(string loadPath)
    sLoadingPrefab = false;
 }
 
-void Prefab::UpdatePrefabName(string path)
+void Prefab::UpdatePrefabName(std::string path)
 {
-   vector<string> tokens = ofSplitString(path, GetPathSeparator());
+   std::vector<std::string> tokens = ofSplitString(path, GetPathSeparator());
    mPrefabName = tokens[tokens.size() - 1];
    ofStringReplace(mPrefabName, ".pfb", "");
 }

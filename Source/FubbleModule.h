@@ -47,7 +47,7 @@ public:
    ~FubbleModule();
    static IDrawableModule* Create() { return new FubbleModule(); }
    
-   string GetTitleLabel() override { return "fubble"; }
+   std::string GetTitleLabel() override { return "fubble"; }
    void CreateUIControls() override;
    
    //IDrawableModule

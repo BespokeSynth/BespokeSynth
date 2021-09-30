@@ -118,13 +118,13 @@ public:
    
    static IAudioEffect* Create() { return new Compressor(); }
    
-   string GetTitleLabel() override { return "compressor"; }
+   std::string GetTitleLabel() override { return "compressor"; }
    void CreateUIControls() override;
 
    //IAudioEffect
    void ProcessAudio(double time, ChannelBuffer* buffer) override;
    void SetEnabled(bool enabled) override { mEnabled = enabled; }
-   string GetType() override { return "compressor"; }
+   std::string GetType() override { return "compressor"; }
 
    void CheckboxUpdated(Checkbox* checkbox) override;
    void FloatSliderUpdated(FloatSlider* slider, float oldVal) override;

@@ -105,7 +105,7 @@ void SampleCanvas::Process(double time)
    
    gWorkChannelBuffer.Clear();
    
-   const vector<CanvasElement*>& elements = mCanvas->GetElements();
+   const std::vector<CanvasElement*>& elements = mCanvas->GetElements();
    for (int elemIdx = 0; elemIdx < elements.size(); ++elemIdx)
    {
       SampleCanvasElement* element = static_cast<SampleCanvasElement*>(elements[elemIdx]);
@@ -191,7 +191,7 @@ void SampleCanvas::GetModuleDimensions(float& width, float& height)
    height = mCanvas->GetHeight() + extraH;
 }
 
-void SampleCanvas::FilesDropped(vector<string> files, int x, int y)
+void SampleCanvas::FilesDropped(std::vector<std::string> files, int x, int y)
 {
    Sample sample;
    sample.Read(files[0].c_str());

@@ -210,7 +210,7 @@ void UserPrefsEditor::Show()
    UpdateDropdowns({});
 }
 
-void UserPrefsEditor::UpdateDropdowns(vector<DropdownList*> toUpdate)
+void UserPrefsEditor::UpdateDropdowns(std::vector<DropdownList*> toUpdate)
 {
    auto& deviceManager = TheSynth->GetAudioDeviceManager();
 
@@ -393,7 +393,7 @@ void UserPrefsEditor::DrawModule()
    DrawRightLabel(mRecordingsPathEntry, "(default: recordings/)", ofColor::white);
 }
 
-void UserPrefsEditor::DrawRightLabel(IUIControl* control, string text, ofColor color)
+void UserPrefsEditor::DrawRightLabel(IUIControl* control, std::string text, ofColor color)
 {
    ofRectangle rect = control->GetRect(true);
    ofPushStyle();
@@ -409,52 +409,52 @@ void UserPrefsEditor::PrepareForSave()
 
 namespace
 {
-   string ToStringLeadingZeroes(int number) {
+   std::string ToStringLeadingZeroes(int number) {
       char buffer[9];
       snprintf(buffer, sizeof(buffer), "%08d", number);
       return buffer;
    }
 }
 
-void UserPrefsEditor::UpdatePrefStr(ofxJSONElement& userPrefs, string prefName, string value)
+void UserPrefsEditor::UpdatePrefStr(ofxJSONElement& userPrefs, std::string prefName, std::string value)
 {
    userPrefs.removeMember(prefName);
    userPrefs["**"+ ToStringLeadingZeroes(mSavePrefIndex) + "**"+prefName] = value;
    ++mSavePrefIndex;
 }
 
-void UserPrefsEditor::UpdatePrefStrArray(ofxJSONElement& userPrefs, string prefName, vector<string> value)
+void UserPrefsEditor::UpdatePrefStrArray(ofxJSONElement& userPrefs, std::string prefName, std::vector<std::string> value)
 {
    userPrefs.removeMember(prefName);
    ofxJSONElement strArray;
-   for (string str : value)
+   for (std::string str : value)
       strArray.append(str);
    userPrefs["**"+ ToStringLeadingZeroes(mSavePrefIndex) + "**"+prefName] = strArray;
    ++mSavePrefIndex;
 }
 
-void UserPrefsEditor::UpdatePrefInt(ofxJSONElement& userPrefs, string prefName, int value)
+void UserPrefsEditor::UpdatePrefInt(ofxJSONElement& userPrefs, std::string prefName, int value)
 {
    userPrefs.removeMember(prefName);
    userPrefs["**" + ToStringLeadingZeroes(mSavePrefIndex) + "**" + prefName] = value;
    ++mSavePrefIndex;
 }
 
-void UserPrefsEditor::UpdatePrefFloat(ofxJSONElement& userPrefs, string prefName, float value)
+void UserPrefsEditor::UpdatePrefFloat(ofxJSONElement& userPrefs, std::string prefName, float value)
 {
    userPrefs.removeMember(prefName);
    userPrefs["**" + ToStringLeadingZeroes(mSavePrefIndex) + "**" + prefName] = value;
    ++mSavePrefIndex;
 }
 
-void UserPrefsEditor::UpdatePrefBool(ofxJSONElement& userPrefs, string prefName, bool value)
+void UserPrefsEditor::UpdatePrefBool(ofxJSONElement& userPrefs, std::string prefName, bool value)
 {
    userPrefs.removeMember(prefName);
    userPrefs["**" + ToStringLeadingZeroes(mSavePrefIndex) + "**" + prefName] = value;
    ++mSavePrefIndex;
 }
 
-void UserPrefsEditor::CleanUpSave(string& json)
+void UserPrefsEditor::CleanUpSave(std::string& json)
 {
    for (int i = 0; i < mSavePrefIndex; ++i)
    {
@@ -500,12 +500,12 @@ void UserPrefsEditor::ButtonClicked(ClickButton* button)
       UpdatePrefStr(userPrefs, "layout", mDefaultLayoutPath);
       UpdatePrefStr(userPrefs, "youtube-dl_path", mYoutubeDlPath);
       UpdatePrefStr(userPrefs, "ffmpeg_path", mFfmpegPath);
-      string vstSearchDirs = mVstSearchDirs;
+      std::string vstSearchDirs = mVstSearchDirs;
       ofStringReplace(vstSearchDirs, ", ", ",");
       UpdatePrefStrArray(userPrefs, "vstsearchdirs", ofSplitString(vstSearchDirs, ","));
       UpdatePrefBool(userPrefs, "show_tooltips_on_load", mShowTooltipsOnLoad);
 
-      string output = userPrefs.getRawString(true);
+      std::string output = userPrefs.getRawString(true);
       CleanUpSave(output);
 
       juce::File file(TheSynth->GetUserPrefsPath(false));

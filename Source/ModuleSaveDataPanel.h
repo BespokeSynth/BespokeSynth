@@ -47,7 +47,7 @@ public:
    static IDrawableModule* Create() { return new ModuleSaveDataPanel(); }
    static bool CanCreate() { return TheSaveDataPanel == nullptr; }
    
-   string GetTitleLabel() override { return ""; }
+   std::string GetTitleLabel() override { return ""; }
    bool AlwaysOnTop() override { return true; }
    bool CanMinimize() override { return false; }
    bool IsSingleton() const override { return true; }
@@ -77,12 +77,12 @@ private:
    void GetModuleDimensions(float& width, float& height) override;
    
    IDrawableModule* mSaveModule;
-   vector<IUIControl*> mSaveDataControls;
-   vector<string> mLabels;
+   std::vector<IUIControl*> mSaveDataControls;
+   std::vector<std::string> mLabels;
    ClickButton* mApplyButton;
    ClickButton* mDeleteButton;
    Checkbox* mDrawDebugCheckbox;
-   map<DropdownList*,ModuleSaveData::SaveVal*> mStringDropdowns;
+   std::map<DropdownList*,ModuleSaveData::SaveVal*> mStringDropdowns;
 
    int mHeight;
    float mAppearAmount;

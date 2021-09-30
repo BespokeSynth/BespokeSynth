@@ -41,7 +41,7 @@ public:
    ~Metronome();
    static IDrawableModule* Create() { return new Metronome(); }
    
-   string GetTitleLabel() override { return "metronome"; }
+   std::string GetTitleLabel() override { return "metronome"; }
    void CreateUIControls() override;
    void Init() override;
 

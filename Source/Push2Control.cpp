@@ -287,7 +287,7 @@ NBase::Result Push2Control::Initialize()
    mFontHandle = nvgCreateFont(sVG, ofToResourcePath("frabk.ttf").c_str(), ofToResourcePath("frabk.ttf").c_str());
    mFontHandleBold = nvgCreateFont(sVG, ofToResourcePath("frabk_m.ttf").c_str(), ofToResourcePath("frabk_m.ttf").c_str());
    
-   const std::vector<string>& devices = mDevice.GetPortList(false);
+   const std::vector<std::string>& devices = mDevice.GetPortList(false);
    for (int i=0; i<devices.size(); ++i)
    {
 #if JUCE_WINDOWS
@@ -329,7 +329,7 @@ void Push2Control::DrawToFramebuffer(NVGcontext* vg, NVGLUframebuffer* fb, float
    nvgTextLetterSpacing(vg, sSpacing);
    
    mModules.clear();
-   vector<IDrawableModule*> modules;
+   std::vector<IDrawableModule*> modules;
    TheSynth->GetAllModules(modules);
    for (int i=0; i<modules.size(); ++i)
    {
@@ -348,11 +348,11 @@ void Push2Control::DrawToFramebuffer(NVGcontext* vg, NVGLUframebuffer* fb, float
       DrawLowerModuleSelector();
       DrawDisplayModuleControls();
 
-      string stateInfo = "";
+      std::string stateInfo = "";
       if (mAllowRepatch && mHeldModule == nullptr)
          stateInfo = "repatch mode: hold a source module and tap the destination module";
       else if (mAllowRepatch && mHeldModule != nullptr)
-         stateInfo = "repatch mode: now tap destination for " + string(mHeldModule->Name());
+         stateInfo = "repatch mode: now tap destination for " + std::string(mHeldModule->Name());
       else if (mNewButtonHeld)
          stateInfo = "tap control to add favorite...";
       else if (mDeleteButtonHeld)
@@ -383,8 +383,8 @@ void Push2Control::DrawToFramebuffer(NVGcontext* vg, NVGLUframebuffer* fb, float
       if (mSelectedGridSpawnListIndex == -1)
       {
          ofSetColor(255, 255, 255);
-         string text = "choose a module, then tap a grid square";
-         string moduleTypeToSpawn = GetModuleTypeToSpawn();
+         std::string text = "choose a module, then tap a grid square";
+         std::string moduleTypeToSpawn = GetModuleTypeToSpawn();
          if (moduleTypeToSpawn != "")
          {
             ofSetColor(IDrawableModule::GetColor(TheSynth->GetModuleFactory()->GetModuleType(moduleTypeToSpawn)));
@@ -755,7 +755,7 @@ ModuleType Push2Control::GetModuleTypeForSpawnList(IUIControl* control)
    return moduleType;
 }
 
-void Push2Control::DrawControls(vector<IUIControl*> controls, bool sliders, float yPos)
+void Push2Control::DrawControls(std::vector<IUIControl*> controls, bool sliders, float yPos)
 {
    for (int i=(int)controls.size()-1; i >= 0; --i)
    {
@@ -850,7 +850,7 @@ void Push2Control::Poll()
 
    if (mDisplayModule != nullptr && mDisplayModule->HasPush2OverrideControls())
    {
-      vector<IUIControl*> desiredControls;
+      std::vector<IUIControl*> desiredControls;
       mDisplayModule->GetPush2OverrideControls(desiredControls);
       bool changed = false;
       if (desiredControls.size() != mDisplayedControls.size())
@@ -874,7 +874,7 @@ void Push2Control::Poll()
    }
 }
 
-string Push2Control::GetModuleTypeToSpawn()
+std::string Push2Control::GetModuleTypeToSpawn()
 {
    for (int i = 0; i < mSpawnLists.GetDropdowns().size(); ++i)
    {
@@ -909,7 +909,7 @@ void Push2Control::UpdateControlList()
 {
    mSliderControls.clear();
    mButtonControls.clear();
-   vector<IUIControl*> controls;
+   std::vector<IUIControl*> controls;
    if (mScreenDisplayMode == ScreenDisplayMode::kAddModule)
    {
       controls = mSpawnModuleControls;
@@ -1369,9 +1369,9 @@ bool Push2Control::IsIgnorableModule(IDrawableModule* module)
    return module == TheTitleBar || module == TheSaveDataPanel || module == TheQuickSpawnMenu || module == TheSynth->GetUserPrefsEditor();
 }
 
-vector<IDrawableModule*> Push2Control::SortModules(vector<IDrawableModule*> modules)
+std::vector<IDrawableModule*> Push2Control::SortModules(std::vector<IDrawableModule*> modules)
 {
-   vector<IDrawableModule*> output;
+   std::vector<IDrawableModule*> output;
     
    for (int i=0; i<modules.size(); ++i)
       AddModuleChain(modules[i], modules, output, 0);
@@ -1379,7 +1379,7 @@ vector<IDrawableModule*> Push2Control::SortModules(vector<IDrawableModule*> modu
    return output;
 }
 
-void Push2Control::AddModuleChain(IDrawableModule* module, vector<IDrawableModule*>& modules, vector<IDrawableModule*>& output, int depth)
+void Push2Control::AddModuleChain(IDrawableModule* module, std::vector<IDrawableModule*>& modules, std::vector<IDrawableModule*>& output, int depth)
 {
    if (depth > 100)  //avoid infinite recursion if there's a patching loop
       return;

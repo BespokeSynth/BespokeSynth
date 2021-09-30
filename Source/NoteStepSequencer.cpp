@@ -189,7 +189,7 @@ NoteStepSequencer::~NoteStepSequencer()
    TheScale->RemoveListener(this);
 }
 
-void NoteStepSequencer::SetMidiController(string name)
+void NoteStepSequencer::SetMidiController(std::string name)
 {
    if (mController)
       mController->RemoveListener(this);

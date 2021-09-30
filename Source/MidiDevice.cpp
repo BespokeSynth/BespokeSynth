@@ -147,9 +147,9 @@ bool MidiDevice::IsInputConnected(bool immediate)
    return false;
 }
 
-vector<string> MidiDevice::GetPortList(bool forInput)
+std::vector<std::string> MidiDevice::GetPortList(bool forInput)
 {
-   vector<string> portList;
+   std::vector<std::string> portList;
    
    if (forInput)
    {

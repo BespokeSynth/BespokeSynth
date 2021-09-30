@@ -41,7 +41,7 @@ public:
    virtual ~UnstablePressure();
    static IDrawableModule* Create() { return new UnstablePressure(); }
 
-   string GetTitleLabel() override { return "unstable pressure"; }
+   std::string GetTitleLabel() override { return "unstable pressure"; }
    void CreateUIControls() override;
    void Init() override;
    void SetEnabled(bool enabled) override { mEnabled = enabled; }

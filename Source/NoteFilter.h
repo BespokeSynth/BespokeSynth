@@ -35,7 +35,7 @@ public:
    virtual ~NoteFilter();
    static IDrawableModule* Create() { return new NoteFilter(); }
    
-   string GetTitleLabel() override { return "note filter"; }
+   std::string GetTitleLabel() override { return "note filter"; }
    void CreateUIControls() override;
    
    void SetEnabled(bool enabled) override { mEnabled = enabled; }
@@ -52,9 +52,9 @@ private:
    void GetModuleDimensions(float& width, float& height) override;
    bool Enabled() const override { return mEnabled; }
    
-   array<bool, 128> mGate;
-   array<float, 128> mLastPlayTime;
-   vector<Checkbox*> mGateCheckboxes;
+   std::array<bool, 128> mGate;
+   std::array<float, 128> mLastPlayTime;
+   std::vector<Checkbox*> mGateCheckboxes;
    int mMinPitch;
    int mMaxPitch;
 };

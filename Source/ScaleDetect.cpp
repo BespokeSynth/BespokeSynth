@@ -74,8 +74,8 @@ void ScaleDetect::DrawModule()
    }
    
    {
-      string pitchString;
-      vector<int> rootRelative;
+      std::string pitchString;
+      std::vector<int> rootRelative;
       for (int i=0; i<128; ++i)
       {
          if (mPitchOn[i])
@@ -104,7 +104,7 @@ void ScaleDetect::PlayNote(double time, int pitch, int velocity, int voiceIdx, M
    }
 }
 
-bool ScaleDetect::ScaleSatisfied(int root, string type)
+bool ScaleDetect::ScaleSatisfied(int root, std::string type)
 {
    ScalePitches scale;
    scale.SetRoot(root);

@@ -97,7 +97,7 @@ void LinnstrumentControl::InitController()
 {
    BuildControllerList();
    
-   const std::vector<string>& devices = mDevice.GetPortList(false);
+   const std::vector<std::string>& devices = mDevice.GetPortList(false);
    for (int i=0; i<devices.size(); ++i)
    {
       if (strstr(devices[i].c_str(), "LinnStrument") != nullptr)
@@ -126,7 +126,7 @@ void LinnstrumentControl::DrawModule()
 void LinnstrumentControl::BuildControllerList()
 {
    mControllerList->Clear();
-   const std::vector<string>& devices = mDevice.GetPortList(false);
+   const std::vector<std::string>& devices = mDevice.GetPortList(false);
    for (int i=0; i<devices.size(); ++i)
       mControllerList->AddLabel(devices[i].c_str(), i);
 }

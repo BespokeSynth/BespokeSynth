@@ -254,7 +254,7 @@ float SeaOfGrain::GetSourceBufferOffset()
       return 0;
 }
 
-void SeaOfGrain::FilesDropped(vector<string> files, int x, int y)
+void SeaOfGrain::FilesDropped(std::vector<std::string> files, int x, int y)
 {
    mLoading = true;
    
@@ -314,7 +314,7 @@ void SeaOfGrain::LoadFile()
    {
       auto file = chooser.getResult();
 
-      vector<string> fileArray;
+      std::vector<std::string> fileArray;
       fileArray.push_back(file.getFullPathName().toStdString());
       FilesDropped(fileArray, 0, 0);
    }

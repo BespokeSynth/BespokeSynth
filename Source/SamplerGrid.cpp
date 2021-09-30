@@ -404,7 +404,7 @@ void SamplerGrid::MouseReleased()
    mGrid->MouseReleased();
 }
 
-void SamplerGrid::FilesDropped(vector<string> files, int x, int y)
+void SamplerGrid::FilesDropped(std::vector<std::string> files, int x, int y)
 {
    Sample sample;
    sample.Read(files[0].c_str());

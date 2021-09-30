@@ -119,7 +119,7 @@ void LocationZoomer::ExitVanityPanningMode()
 
 void LocationZoomer::PickNewVanityPanningDestination()
 {
-   vector<IDrawableModule*> modules;
+   std::vector<IDrawableModule*> modules;
    TheSynth->GetAllModules(modules);
    
    ofVec2f allModulesCenter;

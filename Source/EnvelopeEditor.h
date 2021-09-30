@@ -84,7 +84,7 @@ public:
    void SetEnabled(bool enabled) override {} //don't use this one
    bool Enabled() const override { return true; }
    bool HasTitleBar() const override { return mPinned; }
-   string GetTitleLabel() override { return mPinned ? "envelope editor" : ""; }
+   std::string GetTitleLabel() override { return mPinned ? "envelope editor" : ""; }
    bool IsSaveable() override { return mPinned; }
    void CreateUIControls() override;
    void MouseReleased() override;

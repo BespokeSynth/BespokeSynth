@@ -47,7 +47,7 @@ public:
    ~LoopStorer();
    static IDrawableModule* Create() { return new LoopStorer(); }
    
-   string GetTitleLabel() override { return "loop storer"; }
+   std::string GetTitleLabel() override { return "loop storer"; }
    void CreateUIControls() override;
    void Init() override;
    
@@ -112,7 +112,7 @@ private:
    ClickButton* mClearButton;
    ofMutex mLoadMutex;
    
-   vector<SampleData*> mSamples;
+   std::vector<SampleData*> mSamples;
    int mCurrentBufferIdx;
    
    PatchCableSource* mLooperCable;

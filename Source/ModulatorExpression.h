@@ -41,7 +41,7 @@ public:
    virtual ~ModulatorExpression();
    static IDrawableModule* Create() { return new ModulatorExpression(); }
    
-   string GetTitleLabel() override { return "expression"; }
+   std::string GetTitleLabel() override { return "expression"; }
    void CreateUIControls() override;
    
    //IModulator
@@ -79,7 +79,7 @@ private:
    float mE;
    FloatSlider* mESlider;
    
-   string mEntryString;
+   std::string mEntryString;
    TextEntry* mTextEntry;
    exprtk::symbol_table<float> mSymbolTable;
    exprtk::expression<float> mExpression;

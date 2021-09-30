@@ -27,7 +27,7 @@
 #include "ModularSynth.h"
 #include "PatchCableSource.h"
 
-list<ControlSequencer*> ControlSequencer::sControlSequencers;
+std::list<ControlSequencer*> ControlSequencer::sControlSequencers;
 
 ControlSequencer::ControlSequencer()
 : mGrid(nullptr)
@@ -168,7 +168,7 @@ void ControlSequencer::SetNumSteps(int numSteps, bool stretch)
    assert(oldNumSteps != 0);
    if (stretch)   //updated interval, stretch old pattern out to make identical pattern at higher res
    {              // abcd becomes aabbccdd
-      vector<float> pattern;
+      std::vector<float> pattern;
       pattern.resize(oldNumSteps);
       for (int i=0; i<oldNumSteps; ++i)
          pattern[i] = mGrid->GetVal(i,0);
@@ -295,7 +295,7 @@ void ControlSequencer::LoadLayout(const ofxJSONElement& moduleInfo)
 
 void ControlSequencer::SetUpFromSaveData()
 {
-   string controlPath = mModuleSaveData.GetString("uicontrol");
+   std::string controlPath = mModuleSaveData.GetString("uicontrol");
    if (!controlPath.empty())
    {
       mUIControl = TheSynth->FindUIControl(controlPath);

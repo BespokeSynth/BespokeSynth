@@ -139,7 +139,7 @@ void Profiler::Draw()
       long maxCost = cost.MaxCost();
       
       ofSetColor(255,255,255);
-      gFont.DrawString(string(sCosts[i].mName)+": "+ofToString(maxCost/1000), 15, 0, 0);
+      gFont.DrawString(std::string(sCosts[i].mName)+": "+ofToString(maxCost/1000), 15, 0, 0);
       
       if (maxCost > entireFrameUs)
          ofSetColor(255,0,0);

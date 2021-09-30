@@ -67,7 +67,7 @@ public:
    void SetValue(float value) override;
    float GetValue() const override { return GetMidiValue(); }
    float GetMidiValue() const override;
-   string GetDisplayValue(float val) const override;
+   std::string GetDisplayValue(float val) const override;
    int GetNumValues() override { return 2; }
    void GetDimensions(float& width, float& height) override { width = mWidth; height = mHeight; }
    void SaveState(FileStreamOut& out) override {}

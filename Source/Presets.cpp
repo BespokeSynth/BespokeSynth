@@ -29,7 +29,7 @@
 #include "ofxJSONElement.h"
 #include "PatchCableSource.h"
 
-vector<IUIControl*> Presets::sPresetHighlightControls;
+std::vector<IUIControl*> Presets::sPresetHighlightControls;
 
 Presets::Presets()
 : mGrid(nullptr)
@@ -260,7 +260,7 @@ void Presets::Store(int idx)
    }
    for (int i=0; i<mPresetModules.size(); ++i)
    {
-      vector<IUIControl*> controls = mPresetModules[i]->GetUIControls();
+      std::vector<IUIControl*> controls = mPresetModules[i]->GetUIControls();
       for (int j=0; j<controls.size(); ++j)
       {
          coll.mPresets.push_back(Preset(controls[j]));
@@ -312,7 +312,7 @@ void Presets::Load()
    mPresetCollection.clear();
    mPresetCollection.resize(maxGridSide * maxGridSide);
    
-   string presetsFile = mModuleSaveData.GetString("presetsfile");
+   std::string presetsFile = mModuleSaveData.GetString("presetsfile");
    if (!presetsFile.empty())
    {
       ofxJSONElement root;
@@ -472,7 +472,7 @@ void Presets::LoadState(FileStreamIn& in)
    
    UpdateGridValues();
    
-   string path;
+   std::string path;
    int size;
    in >> size;
    for (int i=0; i<size; ++i)
@@ -498,9 +498,9 @@ void Presets::LoadState(FileStreamIn& in)
    }
 }
 
-vector<IUIControl*> Presets::ControlsToNotSetDuringLoadState() const
+std::vector<IUIControl*> Presets::ControlsToNotSetDuringLoadState() const
 {
-   vector<IUIControl*> ignore;
+   std::vector<IUIControl*> ignore;
    ignore.push_back(mCurrentPresetSelector);
    return ignore;
 }

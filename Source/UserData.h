@@ -2,4 +2,4 @@
 
 #include "SynthGlobals.h"
 
-void UpdateUserData(string destDirPath);
+void UpdateUserData(std::string destDirPath);

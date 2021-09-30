@@ -44,7 +44,7 @@ public:
    
    static IAudioEffect* Create() { return new DelayEffect(); }
    
-   string GetTitleLabel() override { return "delay"; }
+   std::string GetTitleLabel() override { return "delay"; }
    void CreateUIControls() override;
    bool Enabled() const override { return mEnabled; }
 
@@ -59,7 +59,7 @@ public:
    void ProcessAudio(double time, ChannelBuffer* buffer) override;
    void SetEnabled(bool enabled) override;
    float GetEffectAmount() override;
-   string GetType() override { return "delay"; }
+   std::string GetType() override { return "delay"; }
 
    void CheckboxUpdated(Checkbox* checkbox) override;
    void FloatSliderUpdated(FloatSlider* slider, float oldVal) override;

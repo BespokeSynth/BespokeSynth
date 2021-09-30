@@ -47,12 +47,12 @@ public:
    
    void Init() override;
    void Poll() override;
-   string GetTitleLabel() override { return "osc output"; }
+   std::string GetTitleLabel() override { return "osc output"; }
    void CreateUIControls() override;
 
-   void SendFloat(string address, float val);
-   void SendInt(string address, int val);
-   void SendString(string address, string val);
+   void SendFloat(std::string address, float val);
+   void SendInt(std::string address, int val);
+   void SendString(std::string address, std::string val);
 
    //INoteReceiver
    void PlayNote(double time, int pitch, int velocity, int voiceIdx, ModulationParameters modulation) override;
@@ -72,16 +72,16 @@ private:
    void GetModuleDimensions(float& width, float& height) override;
    
    char* mLabels[OSC_OUTPUT_MAX_PARAMS];
-   list<TextEntry*> mLabelEntry;
+   std::list<TextEntry*> mLabelEntry;
    float mParams[OSC_OUTPUT_MAX_PARAMS];
-   list<FloatSlider*> mSliders;
+   std::list<FloatSlider*> mSliders;
 
-   string mOscOutAddress;
+   std::string mOscOutAddress;
    TextEntry* mOscOutAddressEntry;
    int mOscOutPort;
    TextEntry* mOscOutPortEntry;
 
-   string mNoteOutLabel;
+   std::string mNoteOutLabel;
    TextEntry* mNoteOutLabelEntry;
    
    juce::OSCSender mOscOut;

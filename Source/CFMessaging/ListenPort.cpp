@@ -47,7 +47,7 @@ void* SetupRunLoop(void* source)
 
 void ListenPort::CreateListener(const char* portName, ListenPortCallback* callback)
 {
-   cout << "Listening on port " << portName << endl;
+   std::cout << "Listening on port " << portName << std::endl;
    
    mPortName = portName;
    mCallback = callback;
@@ -86,7 +86,7 @@ void ListenPort::Close()
 }
 
 //static
-map<CFMessagePortRef, ListenPort*> ListenPortReceiver::mPortMap;
+std::map<CFMessagePortRef, ListenPort*> ListenPortReceiver::mPortMap;
 
 //static
 void ListenPortReceiver::RegisterPort(ListenPort* port, CFMessagePortRef portRef)

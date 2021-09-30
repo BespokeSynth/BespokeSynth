@@ -29,8 +29,6 @@
 #include <CoreFoundation/CoreFoundation.h>
 #include <string>
 
-using namespace std;
-
 class SendPort
 {
 public:
@@ -40,7 +38,7 @@ public:
    void SendData(uint32_t messageId, CFDataRef data, CFDataRef& replyData);
    void Close();
 private:
-   string mPortName;
+   std::string mPortName;
    CFMessagePortRef mSendPort;
 };
 

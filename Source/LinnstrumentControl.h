@@ -46,7 +46,7 @@ public:
    virtual ~LinnstrumentControl();
    static IDrawableModule* Create() { return new LinnstrumentControl(); }
    
-   string GetTitleLabel() override { return "linnstrument control"; }
+   std::string GetTitleLabel() override { return "linnstrument control"; }
    void CreateUIControls() override;
    
    void Init() override;
@@ -118,8 +118,8 @@ private:
    
    static const int kRows = 8;
    static const int kCols = 25;
-   array<LinnstrumentColor, kRows*kCols> mGridColorState;
-   array<NoteAge, 128> mNoteAge;
+   std::array<LinnstrumentColor, kRows*kCols> mGridColorState;
+   std::array<NoteAge, 128> mNoteAge;
    float mDecayMs;
    FloatSlider* mDecaySlider;
    bool mBlackout;
@@ -136,7 +136,7 @@ private:
    int mLastReceivedNRPNValueMSB;
    int mLastReceivedNRPNValueLSB;
    
-   array<ModulationParameters, kNumVoices> mModulators;
+   std::array<ModulationParameters, kNumVoices> mModulators;
    
    double mRequestedOctaveTime;
    

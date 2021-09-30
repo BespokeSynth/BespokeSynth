@@ -128,7 +128,7 @@ private:
    int mControls[MAX_GRIDCONTROLLER_COLS][MAX_GRIDCONTROLLER_ROWS];
    float mInput[MAX_GRIDCONTROLLER_COLS][MAX_GRIDCONTROLLER_ROWS];
    int mLights[MAX_GRIDCONTROLLER_COLS][MAX_GRIDCONTROLLER_ROWS];
-   vector<int> mColors;
+   std::vector<int> mColors;
    MidiMessageType mMessageType;
    MidiController* mMidiController;
    int mControllerPage;

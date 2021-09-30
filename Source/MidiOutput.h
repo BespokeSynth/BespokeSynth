@@ -42,7 +42,7 @@ public:
    virtual ~MidiOutputModule();
    static IDrawableModule* Create() { return new MidiOutputModule(); }
    
-   string GetTitleLabel() override { return mDevice.Name(); }
+   std::string GetTitleLabel() override { return mDevice.Name(); }
    void CreateUIControls() override;
    
    void Init() override;
@@ -86,7 +86,7 @@ private:
       float mLastPressure;
    };
    
-   vector<ChannelModulations> mChannelModulations;
+   std::vector<ChannelModulations> mChannelModulations;
 };
 
 #endif /* defined(__Bespoke__MidiOutput__) */

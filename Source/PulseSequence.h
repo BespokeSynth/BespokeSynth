@@ -47,7 +47,7 @@ public:
    virtual ~PulseSequence();
    static IDrawableModule* Create() { return new PulseSequence(); }
    
-   string GetTitleLabel() override { return "pulse sequence"; }
+   std::string GetTitleLabel() override { return "pulse sequence"; }
    void CreateUIControls() override;
    void Init() override;
    

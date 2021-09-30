@@ -41,7 +41,7 @@ public:
    
    static IAudioEffect* Create() { return new ButterworthFilterEffect(); }
    
-   string GetTitleLabel() override { return "butterworth"; }
+   std::string GetTitleLabel() override { return "butterworth"; }
    void CreateUIControls() override;
    
    void Init() override;
@@ -52,7 +52,7 @@ public:
    void ProcessAudio(double time, ChannelBuffer* buffer) override;
    void SetEnabled(bool enabled) override { mEnabled = enabled; }
    float GetEffectAmount() override;
-   string GetType() override { return "butterworth"; }
+   std::string GetType() override { return "butterworth"; }
    
    void DropdownUpdated(DropdownList* list, int oldVal) override;
    void CheckboxUpdated(Checkbox* checkbox) override;

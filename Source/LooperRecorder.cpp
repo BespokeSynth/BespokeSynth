@@ -360,9 +360,9 @@ void LooperRecorder::DrawModule()
       int pitch = int(rootPitch + .5f);
       int cents = (rootPitch - pitch) * 100;
       
-      string speed = "speed "+ofToString(mSpeed,2)+", ";
+      std::string speed = "speed "+ofToString(mSpeed,2)+", ";
       
-      string detune = NoteName(pitch);
+      std::string detune = NoteName(pitch);
       if (cents > 0)
          detune += " +" + ofToString(cents) + " cents";
       if (cents < 0)
@@ -805,7 +805,7 @@ void LooperRecorder::SaveLayout(ofxJSONElement& moduleInfo)
    moduleInfo["loopers"].resize((unsigned int)mLoopers.size());
    for (int i=0; i<mLoopers.size(); ++i)
    {
-      string name;
+      std::string name;
       if (mLoopers[i])
          name = mLoopers[i]->Name();
       moduleInfo["loopers"][i] = name;

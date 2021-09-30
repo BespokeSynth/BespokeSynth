@@ -33,19 +33,19 @@ class ChordDatabase
 {
 public:
    ChordDatabase();
-   string GetChordName(vector<int> pitches) const;
-   vector<int> GetChord(string name, int inversion) const;
-   vector<string> GetChordNames() const;
+   std::string GetChordName(std::vector<int> pitches) const;
+   std::vector<int> GetChord(std::string name, int inversion) const;
+   std::vector<std::string> GetChordNames() const;
 private:
    struct ChordShape
    {
-      ChordShape(string name, vector<int> elements)
+      ChordShape(std::string name, std::vector<int> elements)
       {
          mName = name;
          mElements = elements;
       }
-      string mName;
-      vector<int> mElements;
+      std::string mName;
+      std::vector<int> mElements;
    };
-   vector<ChordShape> mChordShapes;
+   std::vector<ChordShape> mChordShapes;
 };

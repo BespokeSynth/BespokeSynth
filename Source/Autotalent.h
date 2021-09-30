@@ -44,7 +44,7 @@ public:
    ~Autotalent();
    static IDrawableModule* Create() { return new Autotalent(); }
    
-   string GetTitleLabel() override;
+   std::string GetTitleLabel() override;
    void CreateUIControls() override;
 
    //IAudioReceiver

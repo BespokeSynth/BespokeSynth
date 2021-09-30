@@ -95,9 +95,9 @@ bool NoteOutput::HasHeldNotes()
    return false;
 }
 
-list<int> NoteOutput::GetHeldNotesList()
+std::list<int> NoteOutput::GetHeldNotesList()
 {
-   list<int> notes;
+   std::list<int> notes;
    for (int i=0; i<128; ++i)
    {
       if (mNotes[i])

@@ -95,7 +95,7 @@ class Transport : public IDrawableModule, public IButtonListener, public IFloatS
 public:
    Transport();
    
-   string GetTitleLabel() override { return "transport"; }
+   std::string GetTitleLabel() override { return "transport"; }
    void CreateUIControls() override;
 
    float GetTempo() { return mTempo; }
@@ -185,8 +185,8 @@ private:
    int mLoopStartMeasure;
    int mLoopEndMeasure;
 
-   list<TransportListenerInfo> mListeners;
-   list<IAudioPoller*> mAudioPollers;
+   std::list<TransportListenerInfo> mListeners;
+   std::list<IAudioPoller*> mAudioPollers;
 };
 
 extern Transport* TheTransport;

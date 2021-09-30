@@ -41,7 +41,7 @@ public:
    Chorder();
    static IDrawableModule* Create() { return new Chorder(); }
    
-   string GetTitleLabel() override { return "chorder"; }
+   std::string GetTitleLabel() override { return "chorder"; }
    void CreateUIControls() override;
    
    void AddTone(int tone, float velocity=1);

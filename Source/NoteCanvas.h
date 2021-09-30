@@ -47,7 +47,7 @@ public:
    ~NoteCanvas();
    static IDrawableModule* Create() { return new NoteCanvas(); }
    
-   string GetTitleLabel() override { return "note canvas"; }
+   std::string GetTitleLabel() override { return "note canvas"; }
    void CreateUIControls() override;
    void Init() override;
    
@@ -97,9 +97,9 @@ private:
    CanvasTimeline* mCanvasTimeline;
    CanvasScrollbar* mCanvasScrollbarHorizontal;
    CanvasScrollbar* mCanvasScrollbarVertical;
-   vector<CanvasElement*> mNoteChecker{128};
-   vector<NoteCanvasElement*> mInputNotes{128};
-   vector<NoteCanvasElement*> mCurrentNotes{128};
+   std::vector<CanvasElement*> mNoteChecker{128};
+   std::vector<NoteCanvasElement*> mInputNotes{128};
+   std::vector<NoteCanvasElement*> mCurrentNotes{128};
    IntSlider* mNumMeasuresSlider;
    int mNumMeasures;
    ClickButton* mQuantizeButton;
@@ -117,7 +117,7 @@ private:
    bool mShowIntervals;
    Checkbox* mShowIntervalsCheckbox;
    
-   vector<ModulationParameters> mVoiceModulations;
+   std::vector<ModulationParameters> mVoiceModulations;
 };
 
 #endif /* defined(__Bespoke__NoteCanvas__) */

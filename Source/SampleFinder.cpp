@@ -218,7 +218,7 @@ bool SampleFinder::MouseScrolled(int x, int y, float scrollX, float scrollY)
    return false;
 }
 
-void SampleFinder::FilesDropped(vector<string> files, int x, int y)
+void SampleFinder::FilesDropped(std::vector<std::string> files, int x, int y)
 {
    mSample->Reset();
    

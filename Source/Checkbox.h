@@ -52,7 +52,7 @@ public:
    float GetValue() const override;
    float GetMidiValue() const override;
    int GetNumValues() override { return 2; }
-   string GetDisplayValue(float val) const override;
+   std::string GetDisplayValue(float val) const override;
    void Increment(float amount) override;
    void Poll() override;
    void SaveState(FileStreamOut& out) override;

@@ -472,7 +472,7 @@ ModuleFactory::ModuleFactory()
    REGISTER_HIDDEN(MultitrackRecorderTrack, multitrackrecordertrack, kModuleType_Audio);
 }
 
-void ModuleFactory::Register(string type, CreateModuleFn creator, CanCreateModuleFn canCreate, ModuleType moduleType, bool hidden, bool experimental)
+void ModuleFactory::Register(std::string type, CreateModuleFn creator, CanCreateModuleFn canCreate, ModuleType moduleType, bool hidden, bool experimental)
 {
    mFactoryMap[type] = creator;
    mCanCreateMap[type] = canCreate;
@@ -481,7 +481,7 @@ void ModuleFactory::Register(string type, CreateModuleFn creator, CanCreateModul
    mIsExperimentalModuleMap[type] = experimental;
 }
 
-IDrawableModule* ModuleFactory::MakeModule(string type)
+IDrawableModule* ModuleFactory::MakeModule(std::string type)
 {
    auto canCreate = mCanCreateMap.find(type);
    if (canCreate != mCanCreateMap.end())
@@ -496,9 +496,9 @@ IDrawableModule* ModuleFactory::MakeModule(string type)
    return nullptr;
 }
 
-vector<string> ModuleFactory::GetSpawnableModules(ModuleType moduleType)
+std::vector<std::string> ModuleFactory::GetSpawnableModules(ModuleType moduleType)
 {
-   vector<string> modules;
+   std::vector<std::string> modules;
    for (auto iter = mFactoryMap.begin(); iter != mFactoryMap.end(); ++iter)
    {
       if (mModuleTypeMap[iter->first] == moduleType &&
@@ -509,9 +509,9 @@ vector<string> ModuleFactory::GetSpawnableModules(ModuleType moduleType)
    return modules;
 }
 
-vector<string> ModuleFactory::GetSpawnableModules(char c)
+std::vector<std::string> ModuleFactory::GetSpawnableModules(char c)
 {
-   vector<string> modules;
+   std::vector<std::string> modules;
    for (auto iter = mFactoryMap.begin(); iter != mFactoryMap.end(); ++iter)
    {
       if (iter->first[0] == c &&
@@ -519,16 +519,16 @@ vector<string> ModuleFactory::GetSpawnableModules(char c)
          modules.push_back(iter->first);
    }
 
-   vector<string> vsts;
+   std::vector<std::string> vsts;
    VSTLookup::GetAvailableVSTs(vsts, false);
    for (auto vstFile : vsts)
    {
-      string vstName = juce::File(vstFile).getFileName().toStdString();
+      std::string vstName = juce::File(vstFile).getFileName().toStdString();
       if (tolower(vstName[0]) == c)
          modules.push_back(vstName + " " + kVSTSuffix);
    }
 
-   vector<string> prefabs;
+   std::vector<std::string> prefabs;
    ModuleFactory::GetPrefabs(prefabs);
    for (auto prefab : prefabs)
    {
@@ -536,14 +536,14 @@ vector<string> ModuleFactory::GetSpawnableModules(char c)
          modules.push_back(prefab + " " + kPrefabSuffix);
    }
 
-   vector<string> midicontrollers = MidiController::GetAvailableInputDevices();
+   std::vector<std::string> midicontrollers = MidiController::GetAvailableInputDevices();
    for (auto midicontroller : midicontrollers)
    {
       if (tolower(midicontroller[0]) == c)
          modules.push_back(midicontroller + " " + kMidiControllerSuffix);
    }
 
-   vector<string> effects = TheSynth->GetEffectFactory()->GetSpawnableEffects();
+   std::vector<std::string> effects = TheSynth->GetEffectFactory()->GetSpawnableEffects();
    for (auto effect : effects)
    {
       if (tolower(effect[0]) == c)
@@ -554,7 +554,7 @@ vector<string> ModuleFactory::GetSpawnableModules(char c)
    return modules;
 }
 
-ModuleType ModuleFactory::GetModuleType(string typeName)
+ModuleType ModuleFactory::GetModuleType(std::string typeName)
 {
    if (mModuleTypeMap.find(typeName) != mModuleTypeMap.end())
       return mModuleTypeMap[typeName];
@@ -567,7 +567,7 @@ ModuleType ModuleFactory::GetModuleType(string typeName)
    return kModuleType_Other;
 }
 
-bool ModuleFactory::IsExperimental(string typeName)
+bool ModuleFactory::IsExperimental(std::string typeName)
 {
    if (mIsExperimentalModuleMap.find(typeName) != mIsExperimentalModuleMap.end())
       return mIsExperimentalModuleMap[typeName];
@@ -575,7 +575,7 @@ bool ModuleFactory::IsExperimental(string typeName)
 }
 
 //static
-void ModuleFactory::GetPrefabs(vector<string>& prefabs)
+void ModuleFactory::GetPrefabs(std::vector<std::string>& prefabs)
 {
    using namespace juce;
    File dir(ofToDataPath("prefabs"));
@@ -589,7 +589,7 @@ void ModuleFactory::GetPrefabs(vector<string>& prefabs)
 }
 
 //static
-string ModuleFactory::FixUpTypeName(string name)
+std::string ModuleFactory::FixUpTypeName(std::string name)
 {
    if (name == "siggen")
       return "signalgenerator";

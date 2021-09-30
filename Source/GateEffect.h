@@ -37,7 +37,7 @@ public:
    GateEffect();
    static IAudioEffect* Create() { return new GateEffect(); }
    
-   string GetTitleLabel() override { return "gate"; }
+   std::string GetTitleLabel() override { return "gate"; }
    void CreateUIControls() override;
    
    void SetAttack(float ms) { mAttackTime = ms; }
@@ -47,7 +47,7 @@ public:
    //IAudioEffect
    void ProcessAudio(double time, ChannelBuffer* buffer) override;
    void SetEnabled(bool enabled) override { mEnabled = enabled; }
-   string GetType() override { return "gate"; }
+   std::string GetType() override { return "gate"; }
 
    void CheckboxUpdated(Checkbox* checkbox) override;
    void IntSliderUpdated(IntSlider* slider, int oldVal) override;

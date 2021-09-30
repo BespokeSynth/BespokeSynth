@@ -67,7 +67,7 @@ LaunchpadKeyboard::LaunchpadKeyboard()
 
    mHeldChordTones.push_back(0);
    
-   vector<int> chord;
+   std::vector<int> chord;
    //triad
    chord.push_back(0);
    chord.push_back(4);

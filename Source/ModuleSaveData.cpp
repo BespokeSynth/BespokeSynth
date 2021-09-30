@@ -41,7 +41,7 @@ ModuleSaveData::~ModuleSaveData()
       delete *iter;
 }
 
-ModuleSaveData::SaveVal* ModuleSaveData::GetVal(string prop)
+ModuleSaveData::SaveVal* ModuleSaveData::GetVal(std::string prop)
 {
    for (auto iter = mValues.begin(); iter != mValues.end(); ++iter)
    {
@@ -79,14 +79,14 @@ void ModuleSaveData::Save(ofxJSONElement& moduleInfo)
    }
 }
 
-void ModuleSaveData::SetInt(string prop, int val)
+void ModuleSaveData::SetInt(std::string prop, int val)
 {
    SaveVal* save = GetVal(prop);
    assert(save && save->mType == kInt);
    save->mInt = val;
 }
 
-void ModuleSaveData::SetInt(string prop, int val, int min, int max, bool isTextField)
+void ModuleSaveData::SetInt(std::string prop, int val, int min, int max, bool isTextField)
 {
    SaveVal* save = GetVal(prop);
    assert(save);
@@ -97,14 +97,14 @@ void ModuleSaveData::SetInt(string prop, int val, int min, int max, bool isTextF
    save->mIsTextField = isTextField;
 }
 
-void ModuleSaveData::SetFloat(string prop, float val)
+void ModuleSaveData::SetFloat(std::string prop, float val)
 {
    SaveVal* save = GetVal(prop);
    assert(save && save->mType == kFloat);
    save->mFloat = val;
 }
 
-void ModuleSaveData::SetFloat(string prop, float val, float min, float max, bool isTextField)
+void ModuleSaveData::SetFloat(std::string prop, float val, float min, float max, bool isTextField)
 {
    SaveVal* save = GetVal(prop);
    assert(save);
@@ -115,7 +115,7 @@ void ModuleSaveData::SetFloat(string prop, float val, float min, float max, bool
    save->mIsTextField = isTextField;
 }
 
-void ModuleSaveData::SetBool(string prop, bool val)
+void ModuleSaveData::SetBool(std::string prop, bool val)
 {
    SaveVal* save = GetVal(prop);
    assert(save);
@@ -123,7 +123,7 @@ void ModuleSaveData::SetBool(string prop, bool val)
    save->mBool = val;
 }
 
-void ModuleSaveData::SetString(string prop, string val)
+void ModuleSaveData::SetString(std::string prop, std::string val)
 {
    SaveVal* save = GetVal(prop);
    assert(save);
@@ -131,7 +131,7 @@ void ModuleSaveData::SetString(string prop, string val)
    StringCopy(save->mString, val.c_str(), MAX_TEXTENTRY_LENGTH);
 }
 
-void ModuleSaveData::SetExtents(string prop, float min, float max)
+void ModuleSaveData::SetExtents(std::string prop, float min, float max)
 {
    SaveVal* save = GetVal(prop);
    assert(save);
@@ -139,7 +139,7 @@ void ModuleSaveData::SetExtents(string prop, float min, float max)
    save->mMax = max;
 }
 
-bool ModuleSaveData::HasProperty(string prop)
+bool ModuleSaveData::HasProperty(std::string prop)
 {
    for (auto i=mValues.begin(); i!=mValues.end(); ++i)
    {
@@ -149,7 +149,7 @@ bool ModuleSaveData::HasProperty(string prop)
    return false;
 }
 
-int ModuleSaveData::GetInt(string prop)
+int ModuleSaveData::GetInt(std::string prop)
 {
    const SaveVal* save = GetVal(prop);
    assert(save);
@@ -157,7 +157,7 @@ int ModuleSaveData::GetInt(string prop)
    return save->mInt;
 }
 
-float ModuleSaveData::GetFloat(string prop)
+float ModuleSaveData::GetFloat(std::string prop)
 {
    const SaveVal* save = GetVal(prop);
    assert(save);
@@ -165,7 +165,7 @@ float ModuleSaveData::GetFloat(string prop)
    return save->mFloat;
 }
 
-bool ModuleSaveData::GetBool(string prop)
+bool ModuleSaveData::GetBool(std::string prop)
 {
    const SaveVal* save = GetVal(prop);
    assert(save);
@@ -173,7 +173,7 @@ bool ModuleSaveData::GetBool(string prop)
    return save->mBool;
 }
 
-string ModuleSaveData::GetString(string prop)
+std::string ModuleSaveData::GetString(std::string prop)
 {
    const SaveVal* save = GetVal(prop);
    assert(save);
@@ -181,7 +181,7 @@ string ModuleSaveData::GetString(string prop)
    return save->mString;
 }
 
-int ModuleSaveData::LoadInt(string prop, const ofxJSONElement& moduleInfo, int defaultValue, int min, int max, bool isTextField)
+int ModuleSaveData::LoadInt(std::string prop, const ofxJSONElement& moduleInfo, int defaultValue, int min, int max, bool isTextField)
 {
    int val = defaultValue;
    if (!moduleInfo[prop].isNull())
@@ -190,7 +190,7 @@ int ModuleSaveData::LoadInt(string prop, const ofxJSONElement& moduleInfo, int d
    return val;
 }
 
-int ModuleSaveData::LoadInt(string prop, const ofxJSONElement& moduleInfo, int defaultValue, IntSlider* slider, bool isTextField)
+int ModuleSaveData::LoadInt(std::string prop, const ofxJSONElement& moduleInfo, int defaultValue, IntSlider* slider, bool isTextField)
 {
    int min=0;
    int max=10;
@@ -199,7 +199,7 @@ int ModuleSaveData::LoadInt(string prop, const ofxJSONElement& moduleInfo, int d
    return LoadInt(prop, moduleInfo, defaultValue, min, max, isTextField);
 }
 
-float ModuleSaveData::LoadFloat(string prop, const ofxJSONElement& moduleInfo, float defaultValue, float min, float max, bool isTextField)
+float ModuleSaveData::LoadFloat(std::string prop, const ofxJSONElement& moduleInfo, float defaultValue, float min, float max, bool isTextField)
 {
    float val = defaultValue;
    if (!moduleInfo[prop].isNull())
@@ -208,7 +208,7 @@ float ModuleSaveData::LoadFloat(string prop, const ofxJSONElement& moduleInfo, f
    return val;
 }
 
-float ModuleSaveData::LoadFloat(string prop, const ofxJSONElement& moduleInfo, float defaultValue, FloatSlider* slider, bool isTextField)
+float ModuleSaveData::LoadFloat(std::string prop, const ofxJSONElement& moduleInfo, float defaultValue, FloatSlider* slider, bool isTextField)
 {
    float min=0;
    float max=1;
@@ -217,7 +217,7 @@ float ModuleSaveData::LoadFloat(string prop, const ofxJSONElement& moduleInfo, f
    return LoadFloat(prop, moduleInfo, defaultValue, min, max, isTextField);
 }
 
-bool ModuleSaveData::LoadBool(string prop, const ofxJSONElement& moduleInfo, bool defaultValue)
+bool ModuleSaveData::LoadBool(std::string prop, const ofxJSONElement& moduleInfo, bool defaultValue)
 {
    bool val = defaultValue;
    if (!moduleInfo[prop].isNull())
@@ -226,9 +226,9 @@ bool ModuleSaveData::LoadBool(string prop, const ofxJSONElement& moduleInfo, boo
    return val;
 }
 
-string ModuleSaveData::LoadString(string prop, const ofxJSONElement& moduleInfo, string defaultValue, FillDropdownFn fillFn)
+std::string ModuleSaveData::LoadString(std::string prop, const ofxJSONElement& moduleInfo, std::string defaultValue, FillDropdownFn fillFn)
 {
-   string val = defaultValue;
+   std::string val = defaultValue;
    if (!moduleInfo[prop].isNull())
       val = moduleInfo[prop].asString();
    SetString(prop, val);
@@ -238,7 +238,7 @@ string ModuleSaveData::LoadString(string prop, const ofxJSONElement& moduleInfo,
    return val;
 }
 
-void ModuleSaveData::UpdatePropertyMax(string prop, float max)
+void ModuleSaveData::UpdatePropertyMax(std::string prop, float max)
 {
    if (HasProperty(prop))
    {
@@ -248,7 +248,7 @@ void ModuleSaveData::UpdatePropertyMax(string prop, float max)
    }
 }
 
-void ModuleSaveData::SetEnumMapFromList(string prop, IUIControl* list)
+void ModuleSaveData::SetEnumMapFromList(std::string prop, IUIControl* list)
 {
    SaveVal* save = GetVal(prop);
    assert(save);
@@ -260,7 +260,7 @@ void ModuleSaveData::SetEnumMapFromList(string prop, IUIControl* list)
       save->mEnumValues = radioButton->GetEnumMap();
 }
 
-void ModuleSaveData::SetEnumMap(string prop, EnumMap* map)
+void ModuleSaveData::SetEnumMap(std::string prop, EnumMap* map)
 {
    SaveVal* save = GetVal(prop);
    assert(save);

@@ -25,8 +25,6 @@
 #include "libusbi.h"
 #include "haiku_usb_raw.h"
 
-using namespace std;
-
 class USBDevice;
 class USBDeviceHandle;
 class USBTransfer;

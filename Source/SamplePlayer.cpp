@@ -189,7 +189,7 @@ void SamplePlayer::Poll()
    }
    else if (clipboard.contains("youtu.be"))
    {
-      vector<string> tokens = ofSplitString(clipboard.toStdString(), "/");
+      std::vector<std::string> tokens = ofSplitString(clipboard.toStdString(), "/");
       if (tokens.size() > 0)
       {
          mYoutubeId = tokens[tokens.size() - 1];
@@ -219,7 +219,7 @@ void SamplePlayer::Poll()
 
       if (mRunningProcessType == RunningProcessType::SearchYoutube)
       {
-         string tempPath = ofToDataPath("youtube_temp");
+         std::string tempPath = ofToDataPath("youtube_temp");
          auto dir = juce::File(tempPath);
          if (dir.exists())
          {
@@ -229,14 +229,14 @@ void SamplePlayer::Poll()
             {
                for (auto& result : results)
                {
-                  string file = result.getFileName().toStdString();
+                  std::string file = result.getFileName().toStdString();
                   ofStringReplace(file, ".info.json", "");
-                  vector<string> tokens = ofSplitString(file, "#");
+                  std::vector<std::string> tokens = ofSplitString(file, "#");
                   if (tokens.size() >= 3)
                   {
-                     string lengthStr = tokens[tokens.size() - 3];
-                     string id = tokens[tokens.size() - 2];
-                     string channel = tokens[tokens.size() - 1];
+                     std::string lengthStr = tokens[tokens.size() - 3];
+                     std::string id = tokens[tokens.size() - 2];
+                     std::string channel = tokens[tokens.size() - 1];
                      bool found = false;
                      for (auto& existing : mYoutubeSearchResults)
                      {
@@ -246,7 +246,7 @@ void SamplePlayer::Poll()
                      if (!found)
                      {
                         YoutubeSearchResult resultToAdd;
-                        string name = "";
+                        std::string name = "";
                         for (size_t i = 0; i < tokens.size() - 3; ++i)
                            name += tokens[i];
                         resultToAdd.name = name;
@@ -503,7 +503,7 @@ void SamplePlayer::AutoSlice(int slices)
    }
 }
 
-void SamplePlayer::FilesDropped(vector<string> files, int x, int y)
+void SamplePlayer::FilesDropped(std::vector<std::string> files, int x, int y)
 {
    Sample* sample = new Sample();
    sample->Read(files[0].c_str());
@@ -648,9 +648,9 @@ void SamplePlayer::TextEntryComplete(TextEntry* entry)
 
 namespace
 {
-   string GetYoutubeDlPath()
+   std::string GetYoutubeDlPath()
    {
-      static string sPath = "";
+      static std::string sPath = "";
       if (sPath == "")
       {
          if (TheSynth->GetUserPrefs()["youtube-dl_path"].isNull())
@@ -669,9 +669,9 @@ namespace
       return sPath;
    }
 
-   string GetFfmpegPath()
+   std::string GetFfmpegPath()
    {
-      static string sPath = "";
+      static std::string sPath = "";
       if (sPath == "")
       {
          if (TheSynth->GetUserPrefs()["ffmpeg_path"].isNull())
@@ -691,7 +691,7 @@ namespace
    }
 }
 
-void SamplePlayer::DownloadYoutube(string url, string title)
+void SamplePlayer::DownloadYoutube(std::string url, std::string title)
 {
    mPlay = false;
    if (mSample)
@@ -732,7 +732,7 @@ void SamplePlayer::DownloadYoutube(string url, string title)
    RunProcess(args);
 }
 
-void SamplePlayer::OnYoutubeDownloadComplete(string filename, string title)
+void SamplePlayer::OnYoutubeDownloadComplete(std::string filename, std::string title)
 {
    if (juce::File(ofToDataPath(filename)).existsAsFile())
    {
@@ -750,7 +750,7 @@ void SamplePlayer::OnYoutubeDownloadComplete(string filename, string title)
 
 void SamplePlayer::RunProcess(const StringArray& args)
 {
-   string command = "";
+   std::string command = "";
    for (auto& arg : args)
       command += arg.toStdString() + " ";
    ofLog() << "running " << command;
@@ -763,9 +763,9 @@ void SamplePlayer::RunProcess(const StringArray& args)
       ofLog() << "error running process from bespoke";
 }
 
-void SamplePlayer::SearchYoutube(string searchTerm)
+void SamplePlayer::SearchYoutube(std::string searchTerm)
 {
-   string tempPath = ofToDataPath("youtube_temp");
+   std::string tempPath = ofToDataPath("youtube_temp");
    auto dir = juce::File(tempPath);
    if (dir.exists())
       dir.deleteRecursively();
@@ -789,7 +789,7 @@ void SamplePlayer::SearchYoutube(string searchTerm)
    RunProcess(args);
 }
 
-void SamplePlayer::OnYoutubeSearchComplete(string searchTerm, double searchTime)
+void SamplePlayer::OnYoutubeSearchComplete(std::string searchTerm, double searchTime)
 {
    if (mYoutubeSearchResults.size() == 0)
    {
@@ -830,7 +830,7 @@ void SamplePlayer::SaveFile()
    }
 }
 
-void SamplePlayer::FillData(vector<float> data)
+void SamplePlayer::FillData(std::vector<float> data)
 {
    Sample* sample = new Sample();
    sample->Create((int)data.size());
@@ -1039,7 +1039,7 @@ void SamplePlayer::DrawModule()
          mSearchResultButtons[i]->SetShowing(true);
          int minutes = int(mYoutubeSearchResults[i].lengthSeconds / 60);
          int secondsRemainder = int(mYoutubeSearchResults[i].lengthSeconds) % 60;
-         string lengthStr = ofToString(minutes) + ":";
+         std::string lengthStr = ofToString(minutes) + ":";
          if (secondsRemainder < 10)
             lengthStr += "0";
          lengthStr += ofToString(secondsRemainder);
@@ -1518,9 +1518,9 @@ void SamplePlayer::LoadState(FileStreamIn& in)
    }
 }
 
-vector<IUIControl*> SamplePlayer::ControlsToIgnoreInSaveState() const
+std::vector<IUIControl*> SamplePlayer::ControlsToIgnoreInSaveState() const
 {
-   vector<IUIControl*> ignore;
+   std::vector<IUIControl*> ignore;
    ignore.push_back(mDownloadYoutubeSearch);
    ignore.push_back(mLoadFileButton);
    ignore.push_back(mSaveFileButton);

@@ -40,7 +40,7 @@ public:
    virtual ~FreqDelay();
    static IDrawableModule* Create() { return new FreqDelay(); }
    
-   string GetTitleLabel() override { return "freq delay"; }
+   std::string GetTitleLabel() override { return "freq delay"; }
    void CreateUIControls() override;
 
    //IAudioSource

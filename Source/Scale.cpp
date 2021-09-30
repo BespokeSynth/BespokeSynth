@@ -138,7 +138,7 @@ void Scale::Init()
       mScaleSelector->AddLabel("ionian", 0);
       mScales.resize(1);
       mScales[0].mName = "ionian";
-      mScales[0].mPitches = vector<int>{0,2,4,5,7,9,11};
+      mScales[0].mPitches = std::vector<int>{0,2,4,5,7,9,11};
    }
    
    SetRoot(gRandom()%TheScale->GetTet());
@@ -270,7 +270,7 @@ int Scale::GetToneFromPitch(int pitch)
    return mScale.GetToneFromPitch(pitch);
 }
 
-void Scale::SetScale(int root, string type)
+void Scale::SetScale(int root, std::string type)
 {
    SetRoot(root);
    SetScaleType(type);
@@ -286,7 +286,7 @@ void Scale::SetRoot(int root, bool force)
    NotifyListeners();
 }
 
-void Scale::SetScaleType(string type, bool force)
+void Scale::SetScaleType(std::string type, bool force)
 {
    int oldScaleIndex = mScaleIndex;
    
@@ -350,7 +350,7 @@ void Scale::RemoveListener(IScaleListener* listener)
 
 void Scale::NotifyListeners()
 {
-   for (list<IScaleListener*>::iterator i = mListeners.begin(); i != mListeners.end(); ++i)
+   for (std::list<IScaleListener*>::iterator i = mListeners.begin(); i != mListeners.end(); ++i)
    {
       (*i)->OnScaleChanged();
    }
@@ -380,7 +380,7 @@ void Scale::DrawModule()
    mLoadKBM->Draw();
 }
 
-vector<int> Scale::GetPitchesForScale(string type)
+std::vector<int> Scale::GetPitchesForScale(std::string type)
 {
    for (int i=0; i<mScales.size(); ++i)
    {
@@ -388,7 +388,7 @@ vector<int> Scale::GetPitchesForScale(string type)
          return mScales[i].mPitches;
    }
    assert(false);
-   return vector<int>();
+   return std::vector<int>();
 }
 
 void Scale::Poll()
@@ -695,7 +695,7 @@ void ScalePitches::SetRoot(int root)
    mScaleRoot = root % TheScale->GetTet();
 }
 
-void ScalePitches::SetScaleType(string type)
+void ScalePitches::SetScaleType(std::string type)
 {
    mScaleType = type;
    int newFlip = (mScalePitchesFlip == 0) ? 1 : 0;

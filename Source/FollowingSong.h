@@ -45,7 +45,7 @@ public:
    ~FollowingSong();
    static IDrawableModule* Create() { return new FollowingSong(); }
    
-   string GetTitleLabel() override { return "following song"; }
+   std::string GetTitleLabel() override { return "following song"; }
    void CreateUIControls() override;
    
    void LoadSample(const char* file);

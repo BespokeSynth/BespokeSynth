@@ -119,7 +119,7 @@ void AudioRouter::PostRepatch(PatchCableSource* cableSource, bool fromUserClick)
       if (cableSource == mDestinationCables[i])
       {
          IClickable* target = cableSource->GetTarget();
-         string name = target ? target->Name() : "                      ";
+         std::string name = target ? target->Name() : "                      ";
          mRouteSelector->SetLabel(name.c_str(), i);
       }
    }

@@ -523,7 +523,7 @@ void NoteCanvas::ClipNotes()
    bool anyHighlighted = false;
    float earliest = FLT_MAX;
    float latest = 0;
-   vector<CanvasElement*> toDelete;
+   std::vector<CanvasElement*> toDelete;
    for (auto* element : mCanvas->GetElements())
    {
       if (element->GetHighlighted())

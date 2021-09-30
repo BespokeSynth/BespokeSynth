@@ -54,7 +54,7 @@ public:
    ~Looper();
    static IDrawableModule* Create() { return new Looper(); }
    
-   string GetTitleLabel() override { return "looper"; }
+   std::string GetTitleLabel() override { return "looper"; }
    void CreateUIControls() override;
 
    void SetRecorder(LooperRecorder* recorder);
@@ -94,7 +94,7 @@ public:
    void SendCC(int control, int value, int voiceIdx = -1) override {}
    
    //IDrawableModule
-   void FilesDropped(vector<string> files, int x, int y) override;
+   void FilesDropped(std::vector<std::string> files, int x, int y) override;
 
    void MergeIn(Looper* otherLooper);
    void SwapBuffers(Looper* otherLooper);

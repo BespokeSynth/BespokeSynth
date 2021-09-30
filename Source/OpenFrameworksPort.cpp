@@ -67,7 +67,7 @@ ofColor ofColor::clear(0, 0, 0, 0);
 NVGcontext* gNanoVG = nullptr;
 NVGcontext* gFontBoundsNanoVG = nullptr;
 
-string ofToDataPath(string path, bool makeAbsolute)
+std::string ofToDataPath(std::string path, bool makeAbsolute)
 {
    if (path.empty() == false && path[0] == '.')
       return path;
@@ -85,10 +85,10 @@ string ofToDataPath(string path, bool makeAbsolute)
    }
    sWorkingDirectory.setAsCurrentWorkingDirectory(); //restore working directory, in case a VST plugin changed it (ROLI Studio Drums does this!)
    
-   static string sDataDir = "";
+   static std::string sDataDir = "";
    if (sDataDir == "")
    {
-      string dataDir = File::getSpecialLocation(File::userDocumentsDirectory).getChildFile("BespokeSynth").getFullPathName().toStdString();
+      std::string dataDir = File::getSpecialLocation(File::userDocumentsDirectory).getChildFile("BespokeSynth").getFullPathName().toStdString();
       ofStringReplace(dataDir, "\\", "/");
       UpdateUserData(dataDir);
       sDataDir = dataDir;
@@ -97,7 +97,7 @@ string ofToDataPath(string path, bool makeAbsolute)
    return sDataDir + "/" + path;
 }
 
-string ofToResourcePath(string path, bool makeAbsolute)
+std::string ofToResourcePath(std::string path, bool makeAbsolute)
 {
    if (path.empty() == false && path[0] == '.')
       return path;
@@ -115,11 +115,11 @@ string ofToResourcePath(string path, bool makeAbsolute)
    }
    sWorkingDirectory.setAsCurrentWorkingDirectory(); //restore working directory, in case a VST plugin changed it (ROLI Studio Drums does this!)
    
-   static string sResourceDir = "";
+   static std::string sResourceDir = "";
    if (sResourceDir == "")
    {
 #if JUCE_WINDOWS
-      string localResourceDir = File::getCurrentWorkingDirectory().getChildFile("resource").getFullPathName().toStdString();
+      std::string localResourceDir = File::getCurrentWorkingDirectory().getChildFile("resource").getFullPathName().toStdString();
       if (juce::File(localResourceDir).exists())
          sResourceDir = localResourceDir;
       else
@@ -127,9 +127,9 @@ string ofToResourcePath(string path, bool makeAbsolute)
       ofStringReplace(sResourceDir, "\\", "/");
 
 #elif JUCE_LINUX
-      string localDataDir = File::getCurrentWorkingDirectory().getChildFile("resource").getFullPathName().toStdString();
-      string cmakeDataDir = File(Bespoke::CMAKE_INSTALL_PREFIX).getChildFile("share/BespokeSynth/resource").getFullPathName().toStdString();
-      string installedDataDir = File::getSpecialLocation(File::globalApplicationsDirectory).getChildFile("share/BespokeSynth/resource").getFullPathName().toStdString(); // /usr/share/BespokeSynth/resource
+      std::string localDataDir = File::getCurrentWorkingDirectory().getChildFile("resource").getFullPathName().toStdString();
+      std::string cmakeDataDir = File(Bespoke::CMAKE_INSTALL_PREFIX).getChildFile("share/BespokeSynth/resource").getFullPathName().toStdString();
+      std::string installedDataDir = File::getSpecialLocation(File::globalApplicationsDirectory).getChildFile("share/BespokeSynth/resource").getFullPathName().toStdString(); // /usr/share/BespokeSynth/resource
       if (juce::File(localDataDir).exists())
          sResourceDir = localDataDir;
       else if (getenv("BESPOKE_DATA_DIR") && juce::File(getenv("BESPOKE_DATA_DIR")).exists())
@@ -168,12 +168,12 @@ string ofToResourcePath(string path, bool makeAbsolute)
       if (!foundResources) {
           // Retain the old code for now just in case
 #if DEBUG
-          string relative = "../Release/resource";
+          std::string relative = "../Release/resource";
 #else
-          string relative = "resource";
+          std::string relative = "resource";
 #endif
 
-          string localResourceDir = File::getCurrentWorkingDirectory().getChildFile(
+          std::string localResourceDir = File::getCurrentWorkingDirectory().getChildFile(
                   relative).getFullPathName().toStdString();
           if (juce::File(localResourceDir).exists()) {
               sResourceDir = localResourceDir;
@@ -204,7 +204,7 @@ struct StyleStack
    void Pop() { stack.pop_front(); }
    Style& GetStyle() { return *stack.begin(); }
    
-   list<Style> stack;
+   std::list<Style> stack;
 };
 
 static StyleStack sStyleStack;
@@ -353,19 +353,19 @@ float ofGetLastFrameTime()
    return .01666f;
 }
 
-int ofToInt(const string& intString)
+int ofToInt(const std::string& intString)
 {
    String str(intString);
    return str.getIntValue();
 }
 
-float ofToFloat(const string& floatString)
+float ofToFloat(const std::string& floatString)
 {
    String str(floatString);
    return str.getFloatValue();
 }
 
-int ofHexToInt(const string& hexString)
+int ofHexToInt(const std::string& hexString)
 {
    String str(hexString);
    return str.getHexValue32();
@@ -395,7 +395,7 @@ void ofSetLineWidth(float width)
 
 namespace
 {
-   vector<ofVec2f> gShapePoints;
+   std::vector<ofVec2f> gShapePoints;
 }
 
 void ofBeginShape()
@@ -514,7 +514,7 @@ float ofDistSquared(float x1, float y1, float x2, float y2)
    return ( (x1 - x2) * (x1 - x2) + (y1 - y2) * (y1 - y2) );
 }
 
-vector<string> ofSplitString(string str, string splitter, bool ignoreEmpty, bool trim)
+std::vector<std::string> ofSplitString(std::string str, std::string splitter, bool ignoreEmpty, bool trim)
 {
    StringArray tokens;
    
@@ -526,14 +526,14 @@ vector<string> ofSplitString(string str, string splitter, bool ignoreEmpty, bool
    if (trim)
       tokens.trim();
    
-   vector<string> ret;
+   std::vector<std::string> ret;
    for (auto s : tokens)
       ret.push_back(s.toStdString());
    
    return ret;
 }
 
-bool ofIsStringInString(const string& haystack, const string& needle)
+bool ofIsStringInString(const std::string& haystack, const std::string& needle)
 {
    return ( strstr(haystack.c_str(), needle.c_str() ) != nullptr );
 }
@@ -559,7 +559,7 @@ void ofToggleFullscreen()
 #endif
 }
 
-void ofStringReplace(string& input, string searchStr, string replaceStr, bool firstOnly /*= false*/)
+void ofStringReplace(std::string& input, std::string searchStr, std::string replaceStr, bool firstOnly /*= false*/)
 {
    size_t uPos = 0;
    size_t uFindLen = searchStr.length();
@@ -579,7 +579,7 @@ void ofStringReplace(string& input, string searchStr, string replaceStr, bool fi
 }
 
 //%Y-%m-%d-%H-%M-%S-%i
-string ofGetTimestampString(string in)
+std::string ofGetTimestampString(std::string in)
 {
    Time time = Time::getCurrentTime();
    ofStringReplace(in, "%Y", ofToString(time.getYear()));
@@ -784,7 +784,7 @@ ofColor ofColor::operator+(const ofColor& other)
    return ofColor(r+other.r, g+other.g, b+other.b, a+other.a);
 }
 
-void RetinaTrueTypeFont::LoadFont(string path)
+void RetinaTrueTypeFont::LoadFont(std::string path)
 {
    mFontPath = ofToDataPath(path);
    File file(mFontPath.c_str());
@@ -800,7 +800,7 @@ void RetinaTrueTypeFont::LoadFont(string path)
    }
 }
 
-void RetinaTrueTypeFont::DrawString(string str, float size, float x, float y)
+void RetinaTrueTypeFont::DrawString(std::string str, float size, float x, float y)
 {
    if (!mLoaded)
       return;
@@ -815,7 +815,7 @@ void RetinaTrueTypeFont::DrawString(string str, float size, float x, float y)
    }
    else
    {
-      vector<string> lines = ofSplitString(str, "\n");
+      std::vector<std::string> lines = ofSplitString(str, "\n");
       float bounds[4];
       nvgTextBounds(gNanoVG, 0, 0, str.c_str(), nullptr, bounds);
       float lineHeight = bounds[3] - bounds[1];
@@ -827,7 +827,7 @@ void RetinaTrueTypeFont::DrawString(string str, float size, float x, float y)
    }
 }
 
-ofRectangle RetinaTrueTypeFont::DrawStringWrap(string str, float size, float x, float y, float width)
+ofRectangle RetinaTrueTypeFont::DrawStringWrap(std::string str, float size, float x, float y, float width)
 {
    if (!mLoaded)
       return ofRectangle();
@@ -843,7 +843,7 @@ ofRectangle RetinaTrueTypeFont::DrawStringWrap(string str, float size, float x, 
    return rect;
 }
 
-float RetinaTrueTypeFont::GetStringWidth(string str, float size)
+float RetinaTrueTypeFont::GetStringWidth(std::string str, float size)
 {
    if (!mLoaded)
       return str.size() * 12;
@@ -869,7 +869,7 @@ float RetinaTrueTypeFont::GetStringWidth(string str, float size)
    return width;
 }
 
-float RetinaTrueTypeFont::GetStringHeight(string str, float size)
+float RetinaTrueTypeFont::GetStringHeight(std::string str, float size)
 {
    if (!mLoaded)
       return str.size() * 12;

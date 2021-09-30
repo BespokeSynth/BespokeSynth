@@ -59,7 +59,7 @@ public:
    ~DrumSynth();
    static IDrawableModule* Create() { return new DrumSynth(); }
    
-   string GetTitleLabel() override { return "drumsynth"; }
+   std::string GetTitleLabel() override { return "drumsynth"; }
    void CreateUIControls() override;
    
    //IAudioSource

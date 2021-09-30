@@ -46,7 +46,7 @@ public:
    
    static IAudioEffect* Create() { return new LiveGranulator(); }
    
-   string GetTitleLabel() override { return "granulator"; }
+   std::string GetTitleLabel() override { return "granulator"; }
    void CreateUIControls() override;
    void Init() override;
    
@@ -54,7 +54,7 @@ public:
    void ProcessAudio(double time, ChannelBuffer* buffer) override;
    void SetEnabled(bool enabled) override { mEnabled = enabled; }
    float GetEffectAmount() override;
-   string GetType() override { return "granulator"; }
+   std::string GetType() override { return "granulator"; }
    
    void OnTimeEvent(double time) override;
    

@@ -43,7 +43,7 @@ public:
    
    static IAudioEffect* Create() { return new BiquadFilterEffect(); }
    
-   string GetTitleLabel() override { return "biquad"; }
+   std::string GetTitleLabel() override { return "biquad"; }
    void CreateUIControls() override;
    
    void Init() override;
@@ -56,7 +56,7 @@ public:
    void ProcessAudio(double time, ChannelBuffer* buffer) override;
    void SetEnabled(bool enabled) override { mEnabled = enabled; }
    float GetEffectAmount() override;
-   string GetType() override { return "biquad"; }
+   std::string GetType() override { return "biquad"; }
    
    bool MouseMoved(float x, float y) override;
 

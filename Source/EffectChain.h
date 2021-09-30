@@ -46,13 +46,13 @@ public:
    virtual ~EffectChain();
    static IDrawableModule* Create() { return new EffectChain(); }
    
-   string GetTitleLabel() override { return "effect chain"; }
+   std::string GetTitleLabel() override { return "effect chain"; }
    void CreateUIControls() override;
    void SetEnabled(bool enabled) override { mEnabled = enabled; }
    
    void Init() override;
    void Poll() override;
-   void AddEffect(string type, bool onTheFly = false);
+   void AddEffect(std::string type, bool onTheFly = false);
    void SetWideCount(int count) { mNumFXWide = count; }
    
    //IAudioSource
@@ -62,25 +62,25 @@ public:
    void KeyReleased(int key) override;
 
    bool HasPush2OverrideControls() const override { return true; }
-   void GetPush2OverrideControls(vector<IUIControl*>& controls) const override;
+   void GetPush2OverrideControls(std::vector<IUIControl*>& controls) const override;
 
    void ButtonClicked(ClickButton* button) override;
    void CheckboxUpdated(Checkbox* checkbox) override;
    void FloatSliderUpdated(FloatSlider* slider, float oldVal) override;
    void DropdownUpdated(DropdownList* list, int oldVal) override;
    
-   virtual void LoadBasics(const ofxJSONElement& moduleInfo, string typeName) override;
+   virtual void LoadBasics(const ofxJSONElement& moduleInfo, std::string typeName) override;
    virtual void LoadLayout(const ofxJSONElement& moduleInfo) override;
    virtual void SetUpFromSaveData() override;
    virtual void SaveLayout(ofxJSONElement& moduleInfo) override;
-   virtual void UpdateOldControlName(string& oldName) override;
+   virtual void UpdateOldControlName(std::string& oldName) override;
    
 private:
    //IDrawableModule
    void DrawModule() override;
    void GetModuleDimensions(float& width, float& height) override;
    bool Enabled() const override { return mEnabled; }
-   vector<IUIControl*> ControlsToIgnoreInSaveState() const override;
+   std::vector<IUIControl*> ControlsToIgnoreInSaveState() const override;
    
    int GetRowHeight(int row) const;
    int NumRows() const;
@@ -98,9 +98,9 @@ private:
       ClickButton* mPush2DisplayEffectButton;
    };
    
-   vector<IAudioEffect*> mEffects;
+   std::vector<IAudioEffect*> mEffects;
    ChannelBuffer mDryBuffer;
-   vector<EffectControls> mEffectControls;
+   std::vector<EffectControls> mEffectControls;
    std::array<float, MAX_EFFECTS_IN_CHAIN> mDryWetLevels;
    
    double mSwapTime;
@@ -116,7 +116,7 @@ private:
    int mWantToDeleteEffectAtIndex;
    IAudioEffect* mPush2DisplayEffect;
    
-   std::vector<string> mEffectTypesToSpawn;
+   std::vector<std::string> mEffectTypesToSpawn;
    int mSpawnIndex;
    DropdownList* mEffectSpawnList;
    ClickButton* mSpawnEffectButton;

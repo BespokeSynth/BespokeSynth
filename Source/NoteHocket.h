@@ -40,7 +40,7 @@ public:
    NoteHocket();
    static IDrawableModule* Create() { return new NoteHocket(); }
    
-   string GetTitleLabel() override { return "hocket"; }
+   std::string GetTitleLabel() override { return "hocket"; }
    void CreateUIControls() override;
    
    void PlayNote(double time, int pitch, int velocity, int voiceIdx, ModulationParameters modulation) override;

@@ -85,7 +85,7 @@ public:
    void AddUIControl(IUIControl* control);
    void RemoveUIControl(IUIControl* control);
    IUIControl* FindUIControl(const char* name, bool fail = true) const;
-   vector<IUIControl*> GetUIControls() const;
+   std::vector<IUIControl*> GetUIControls() const;
    void AddChild(IDrawableModule* child);
    void RemoveChild(IDrawableModule* child);
    IDrawableModule* FindChild(const char* name) const;
@@ -96,8 +96,8 @@ public:
    bool IsInitialized() const { return mInitialized; }
    bool Minimized() const { return mMinimizeAnimation > 0; }
    virtual void MouseReleased() override;
-   virtual void FilesDropped(vector<string> files, int x, int y) {}
-   virtual string GetTitleLabel() { return "&&&fixme&&&"; }
+   virtual void FilesDropped(std::vector<std::string> files, int x, int y) {}
+   virtual std::string GetTitleLabel() { return "&&&fixme&&&"; }
    virtual bool HasTitleBar() const { return true; }
    static float TitleBarHeight() { return mTitleBarHeight; }
    static ofColor GetColor(ModuleType type);
@@ -108,16 +108,16 @@ public:
    void BasePoll();  //calls poll, using this to guarantee base poll is always called
    bool IsWithinRect(const ofRectangle& rect);
    bool IsVisible();
-   vector<IDrawableModule*> GetChildren() const { return mChildren; }
+   std::vector<IDrawableModule*> GetChildren() const { return mChildren; }
    virtual bool IsResizable() const { return false; }
    virtual void Resize(float width, float height) { assert(false); }
-   void SetTypeName(string type) { mTypeName = type; }
+   void SetTypeName(std::string type) { mTypeName = type; }
    void SetTarget(IClickable* target);
-   void SetUpPatchCables(string targets);
+   void SetUpPatchCables(std::string targets);
    void AddPatchCableSource(PatchCableSource* source);
    void RemovePatchCableSource(PatchCableSource* source);
    bool TestClick(int x, int y, bool right, bool testOnly = false) override;
-   string GetTypeName() const { return mTypeName; }
+   std::string GetTypeName() const { return mTypeName; }
    ModuleType GetModuleType() const { return mModuleType; }
    virtual bool IsSingleton() const { return false; }
    virtual bool CanBeDeleted() const { return (IsSingleton() ? false : true); }
@@ -139,7 +139,7 @@ public:
    
    virtual void CheckboxUpdated(Checkbox* checkbox) {}
    
-   virtual void LoadBasics(const ofxJSONElement& moduleInfo, string typeName);
+   virtual void LoadBasics(const ofxJSONElement& moduleInfo, std::string typeName);
    virtual void CreateUIControls();
    virtual void LoadLayout(const ofxJSONElement& moduleInfo) {}
    virtual void SaveLayout(ofxJSONElement& moduleInfo);
@@ -149,18 +149,18 @@ public:
    virtual void SaveState(FileStreamOut& out);
    virtual void LoadState(FileStreamIn& in);
    virtual void PostLoadState() {}
-   virtual vector<IUIControl*> ControlsToNotSetDuringLoadState() const;
-   virtual vector<IUIControl*> ControlsToIgnoreInSaveState() const;
-   virtual void UpdateOldControlName(string& oldName) {}
+   virtual std::vector<IUIControl*> ControlsToNotSetDuringLoadState() const;
+   virtual std::vector<IUIControl*> ControlsToIgnoreInSaveState() const;
+   virtual void UpdateOldControlName(std::string& oldName) {}
    virtual bool CanSaveState() const { return true; }
    virtual size_t GetExpectedSaveStateNumChildren() const { return mChildren.size(); }
    virtual bool HasDebugDraw() const { return false; }
    virtual bool HasPush2OverrideControls() const { return false; }
-   virtual void GetPush2OverrideControls(vector<IUIControl*>& controls) const { }
+   virtual void GetPush2OverrideControls(std::vector<IUIControl*>& controls) const { }
    
    //IPatchable
    PatchCableSource* GetPatchCableSource(int index=0) override { if (index == 0) return mMainPatchCableSource; else return mPatchCableSources[index]; }
-   vector<PatchCableSource*> GetPatchCableSources() { return mPatchCableSources; }
+   std::vector<PatchCableSource*> GetPatchCableSources() { return mPatchCableSources; }
    
    static void FindClosestSides(float xThis, float yThis, float wThis, float hThis, float xThat, float yThat, float wThat, float hThat, float& startX, float& startY, float& endX, float& endY, bool sidesOnly = false);
    
@@ -191,11 +191,11 @@ private:
    float GetMinimizedWidth();
    PatchCableOld GetPatchCableOld(IClickable* target);
 
-   vector<IUIControl*> mUIControls;
-   vector<IDrawableModule*> mChildren;
-   vector<FloatSlider*> mFloatSliders;
+   std::vector<IUIControl*> mUIControls;
+   std::vector<IDrawableModule*> mChildren;
+   std::vector<FloatSlider*> mFloatSliders;
    static const int mTitleBarHeight = 12;
-   string mTypeName;
+   std::string mTypeName;
    static const int sResizeCornerSize = 8;
    ModuleContainer* mOwningContainer;
 
@@ -204,7 +204,7 @@ private:
    float mMinimizeAnimation;
    bool mUIControlsCreated;
    bool mInitialized;
-   string mLastTitleLabel;
+   std::string mLastTitleLabel;
    float mTitleLabelWidth;
    bool mShouldDrawOutline;
    bool mHoveringOverResizeHandle;
@@ -216,7 +216,7 @@ private:
    ofMutex mSliderMutex;
    
    PatchCableSource* mMainPatchCableSource;
-   vector<PatchCableSource*> mPatchCableSources;
+   std::vector<PatchCableSource*> mPatchCableSources;
 };
 
 #endif

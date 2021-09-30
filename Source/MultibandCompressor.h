@@ -44,7 +44,7 @@ public:
    virtual ~MultibandCompressor();
    static IDrawableModule* Create() { return new MultibandCompressor(); }
    
-   string GetTitleLabel() override { return "multiband compressor"; }
+   std::string GetTitleLabel() override { return "multiband compressor"; }
    void CreateUIControls() override;
    
    //IAudioReceiver

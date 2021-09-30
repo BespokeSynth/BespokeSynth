@@ -85,17 +85,17 @@ void ModuleSaveDataPanel::ReloadSaveData()
    UpdateTarget(mSaveModule);
    
    int maxWidth = 40;
-   list<ModuleSaveData::SaveVal*> values = mSaveModule->GetSaveData().GetSavedValues();
+   std::list<ModuleSaveData::SaveVal*> values = mSaveModule->GetSaveData().GetSavedValues();
    for (auto iter = values.begin(); iter != values.end(); ++iter)
       mLabels.push_back((*iter)->mProperty);
    for (int i=0; i<mSaveModule->GetChildren().size(); ++i)
    {
       IDrawableModule* child = mSaveModule->GetChildren()[i];
-      list<ModuleSaveData::SaveVal*>& childValues = child->GetSaveData().GetSavedValues();
+      std::list<ModuleSaveData::SaveVal*>& childValues = child->GetSaveData().GetSavedValues();
       for (auto iter = childValues.begin(); iter != childValues.end(); ++iter)
       {
          values.push_back(*iter);
-         mLabels.push_back(string(child->Name()) + "." + (*iter)->mProperty);
+         mLabels.push_back(std::string(child->Name()) + "." + (*iter)->mProperty);
       }
    }
    for (auto iter = mLabels.begin(); iter != mLabels.end(); ++iter)

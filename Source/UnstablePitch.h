@@ -63,7 +63,7 @@ public:
    virtual ~UnstablePitch();
    static IDrawableModule* Create() { return new UnstablePitch(); }
 
-   string GetTitleLabel() override { return "unstable pitch"; }
+   std::string GetTitleLabel() override { return "unstable pitch"; }
    void CreateUIControls() override;
    void Init() override;
    void SetEnabled(bool enabled) override { mEnabled = enabled; }

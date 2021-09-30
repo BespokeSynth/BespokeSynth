@@ -38,7 +38,7 @@ public:
    ~NoteSustain();
    static IDrawableModule* Create() { return new NoteSustain(); }
    
-   string GetTitleLabel() override { return "note duration"; }
+   std::string GetTitleLabel() override { return "note duration"; }
    void CreateUIControls() override;
    void Init() override;
    
@@ -70,7 +70,7 @@ private:
    
    float mSustain;
    FloatSlider* mSustainSlider;
-   list<QueuedNoteOff> mNoteOffs;
+   std::list<QueuedNoteOff> mNoteOffs;
 };
 
 

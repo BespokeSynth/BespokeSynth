@@ -36,7 +36,7 @@ public:
    virtual ~NoteChance();
    static IDrawableModule* Create() { return new NoteChance(); }
    
-   string GetTitleLabel() override { return "note chance"; }
+   std::string GetTitleLabel() override { return "note chance"; }
    void CreateUIControls() override;
    
    void SetEnabled(bool enabled) override { mEnabled = enabled; }

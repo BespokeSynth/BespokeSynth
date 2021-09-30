@@ -279,7 +279,7 @@ void ClipLauncher::SampleData::Init(ClipLauncher* launcher, int index)
       mPlayCheckbox->Delete();
    }
    
-   string indexStr = ofToString(index + 1);
+   std::string indexStr = ofToString(index + 1);
    
    mSample = new Sample();
    mSample->SetLooping(true);

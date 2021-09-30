@@ -47,7 +47,7 @@ public:
    ~SeaOfGrain();
    static IDrawableModule* Create() { return new SeaOfGrain(); }
    
-   string GetTitleLabel() override { return "sea of grain"; }
+   std::string GetTitleLabel() override { return "sea of grain"; }
    void CreateUIControls() override;
    
    //INoteReceiver
@@ -59,7 +59,7 @@ public:
    void SetEnabled(bool enabled) override { mEnabled = enabled; }
    
    //IDrawableModule
-   void FilesDropped(vector<string> files, int x, int y) override;
+   void FilesDropped(std::vector<std::string> files, int x, int y) override;
    void SampleDropped(int x, int y, Sample* sample) override;
    bool CanDropSample() const override { return true; }
    void Poll() override;

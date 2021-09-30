@@ -40,8 +40,8 @@ struct SpawnListManager;
 class SpawnList
 {
 public:
-   SpawnList(IDropdownListener* owner, SpawnListManager* listManager, int x, int y, string label);
-   void SetList(vector<string> spawnables, string overrideModuleType);
+   SpawnList(IDropdownListener* owner, SpawnListManager* listManager, int x, int y, std::string label);
+   void SetList(std::vector<std::string> spawnables, std::string overrideModuleType);
    void OnSelection(DropdownList* list);
    void SetPosition(int x, int y);
    void SetPositionRelativeTo(SpawnList* list);
@@ -50,14 +50,14 @@ public:
    IDrawableModule* Spawn();
    
 private:
-   string mLabel;
-   std::vector<string> mSpawnables;
+   std::string mLabel;
+   std::vector<std::string> mSpawnables;
    int mSpawnIndex;
    DropdownList* mSpawnList;
    IDropdownListener* mOwner;
    SpawnListManager* mListManager;
    ofVec2f mPos;
-   string mOverrideModuleType;
+   std::string mOverrideModuleType;
 };
 
 struct SpawnListManager
@@ -66,7 +66,7 @@ struct SpawnListManager
    
    void SetModuleFactory(ModuleFactory* factory);
    void SetUpVstDropdown(bool rescan);
-   vector<SpawnList*> GetDropdowns() { return mDropdowns; }
+   std::vector<SpawnList*> GetDropdowns() { return mDropdowns; }
    
    SpawnList mInstrumentModules;
    SpawnList mNoteModules;
@@ -79,7 +79,7 @@ struct SpawnListManager
    SpawnList mPrefabs;
    
 private:
-   vector<SpawnList*> mDropdowns;
+   std::vector<SpawnList*> mDropdowns;
 };
 
 class TitleBar : public IDrawableModule, public IDropdownListener, public IButtonListener, public IFloatSliderListener
@@ -88,7 +88,7 @@ public:
    TitleBar();
    ~TitleBar();
    
-   string GetTitleLabel() override { return ""; }
+   std::string GetTitleLabel() override { return ""; }
    void CreateUIControls() override;
    bool HasTitleBar() const override { return false; }
    bool AlwaysOnTop() override { return true; }

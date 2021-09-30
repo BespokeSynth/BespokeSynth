@@ -237,7 +237,7 @@ void Sampler::GetModuleDimensions(float& width, float& height)
    height = 90;
 }
 
-void Sampler::FilesDropped(vector<string> files, int x, int y)
+void Sampler::FilesDropped(std::vector<std::string> files, int x, int y)
 {
    Sample sample;
    sample.Read(files[0].c_str());

@@ -44,7 +44,7 @@ public:
    virtual ~VocoderCarrierInput();
    static IDrawableModule* Create() { return new VocoderCarrierInput(); }
    
-   string GetTitleLabel() override { return "carrier"; }
+   std::string GetTitleLabel() override { return "carrier"; }
    void CreateUIControls() override;
 
    //IAudioProcessor

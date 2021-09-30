@@ -41,7 +41,7 @@ public:
    ~ValueStream();
    static IDrawableModule* Create() { return new ValueStream(); }
 
-   string GetTitleLabel() override { return "value stream"; }
+   std::string GetTitleLabel() override { return "value stream"; }
    void CreateUIControls() override;
 
    IUIControl* GetUIControl() const { return mUIControl; }
@@ -80,6 +80,6 @@ private:
    float mHeight;
    float mSpeed;
    FloatSlider* mSpeedSlider;
-   array<float, 100000> mValues;
+   std::array<float, 100000> mValues;
    int mValueDisplayPointer;
 };

@@ -35,9 +35,9 @@
 
 struct MatchingScale
 {
-   MatchingScale(int root, string type) : mRoot(root), mType(type) {}
+   MatchingScale(int root, std::string type) : mRoot(root), mType(type) {}
    int mRoot;
-   string mType;
+   std::string mType;
 };
 
 class ScaleDetect : public NoteEffectBase, public IDrawableModule, public IButtonListener, public IDropdownListener
@@ -46,7 +46,7 @@ public:
    ScaleDetect();
    static IDrawableModule* Create() { return new ScaleDetect(); }
    
-   string GetTitleLabel() override { return "detect"; }
+   std::string GetTitleLabel() override { return "detect"; }
    void CreateUIControls() override;
 
    //INoteReceiver
@@ -60,7 +60,7 @@ public:
    
    
 private:
-   bool ScaleSatisfied(int root, string type);
+   bool ScaleSatisfied(int root, std::string type);
 
    //IDrawableModule
    void DrawModule() override;

@@ -33,7 +33,7 @@ class Canvas;
 class CanvasTimeline : public IUIControl
 {
 public:
-   CanvasTimeline(Canvas* canvas, string name);
+   CanvasTimeline(Canvas* canvas, std::string name);
    ~CanvasTimeline() {}
 
    void SetDimensions(float width, float height) { mWidth = width; mHeight = height; }

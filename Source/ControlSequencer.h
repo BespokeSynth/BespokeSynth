@@ -43,7 +43,7 @@ public:
    ~ControlSequencer();
    static IDrawableModule* Create() { return new ControlSequencer(); }
    
-   string GetTitleLabel() override { return "control sequencer"; }
+   std::string GetTitleLabel() override { return "control sequencer"; }
    void CreateUIControls() override;
    void Init() override;
    
@@ -72,7 +72,7 @@ public:
    void SaveState(FileStreamOut& out) override;
    void LoadState(FileStreamIn& in) override;
    
-   static list<ControlSequencer*> sControlSequencers;
+   static std::list<ControlSequencer*> sControlSequencers;
    
    //IPatchable
    void PostRepatch(PatchCableSource* cableSource, bool fromUserClick) override;

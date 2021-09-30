@@ -46,7 +46,7 @@ public:
    ~KompleteKontrol();
    static IDrawableModule* Create() { return new KompleteKontrol(); }
    
-   string GetTitleLabel() override { return "komplete kontrol"; }
+   std::string GetTitleLabel() override { return "komplete kontrol"; }
    void CreateUIControls() override;
    
    void Poll() override;
@@ -75,8 +75,8 @@ private:
       TextBox() : slider(false), amount(0) {}
       bool slider;
       float amount;
-      string line1;
-      string line2;
+      std::string line1;
+      std::string line2;
    };
    
    void UpdateKeys();
@@ -91,7 +91,7 @@ private:
    bool mInitialized;
    int mKeyOffset;
    bool mNeedKeysUpdate;
-   string mCurrentText;
+   std::string mCurrentText;
    uint16_t mCurrentSliders[NUM_SLIDER_SEGMENTS];
    TextBox mTextBoxes[9];
    MidiController* mController;

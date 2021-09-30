@@ -41,7 +41,7 @@ public:
    
    static IAudioEffect* Create() { return new DistortionEffect(); }
    
-   string GetTitleLabel() override { return "distort"; }
+   std::string GetTitleLabel() override { return "distort"; }
    void CreateUIControls() override;
    
    void SetClip(float amount);
@@ -50,7 +50,7 @@ public:
    void ProcessAudio(double time, ChannelBuffer* buffer) override;
    void SetEnabled(bool enabled) override { mEnabled = enabled; }
    float GetEffectAmount() override;
-   string GetType() override { return "distortion"; }
+   std::string GetType() override { return "distortion"; }
    
    void CheckboxUpdated(Checkbox* checkbox) override;
    void FloatSliderUpdated(FloatSlider* slider, float oldVal) override;

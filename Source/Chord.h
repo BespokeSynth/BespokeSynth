@@ -43,14 +43,14 @@ enum ChordType
 struct Chord
 {
    Chord() {}
-   Chord(string name);
+   Chord(std::string name);
    Chord(int pitch, ChordType type, int inversion = 0) : mRootPitch(pitch), mType(type), mInversion(inversion) {}
    
    int mRootPitch;
    ChordType mType;
    int mInversion;
    
-   string Name(bool withDegree, bool withAccidentals, ScalePitches* scale = nullptr);
+   std::string Name(bool withDegree, bool withAccidentals, ScalePitches* scale = nullptr);
    void SetFromDegreeAndScale(int degree, const ScalePitches& scale, int inversion = 0);
 };
 

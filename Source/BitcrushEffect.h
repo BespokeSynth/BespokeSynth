@@ -38,14 +38,14 @@ public:
    
    static IAudioEffect* Create() { return new BitcrushEffect(); }
    
-   string GetTitleLabel() override { return "bitcrush"; }
+   std::string GetTitleLabel() override { return "bitcrush"; }
    void CreateUIControls() override;
    
    //IAudioEffect
    void ProcessAudio(double time, ChannelBuffer* buffer) override;
    void SetEnabled(bool enabled) override { mEnabled = enabled; }
    float GetEffectAmount() override;
-   string GetType() override { return "bitcrush"; }
+   std::string GetType() override { return "bitcrush"; }
 
    void CheckboxUpdated(Checkbox* checkbox) override;
    void IntSliderUpdated(IntSlider* slider, int oldVal) override;

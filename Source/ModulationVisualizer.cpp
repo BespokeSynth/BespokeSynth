@@ -80,9 +80,9 @@ void ModulationVisualizer::SetUpFromSaveData()
    SetUpPatchCables(mModuleSaveData.GetString("target"));
 }
 
-string ModulationVisualizer::VizVoice::GetInfoString()
+std::string ModulationVisualizer::VizVoice::GetInfoString()
 {
-   string info;
+   std::string info;
    if (mModulators.pitchBend)
       info += "bend:"+ofToString(mModulators.pitchBend->GetValue(0),2)+"  ";
    if (mModulators.modWheel)

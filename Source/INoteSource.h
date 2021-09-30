@@ -54,7 +54,7 @@ public:
    void ResetStackDepth() { mStackDepth = 0; }
    bool* GetNotes() { return mNotes; }
    bool HasHeldNotes();
-   list<int> GetHeldNotesList();
+   std::list<int> GetHeldNotesList();
 private:
    bool mNotes[128]{};
    double mNoteOnTimes[128]{};

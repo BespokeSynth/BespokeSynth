@@ -40,7 +40,7 @@ public:
    ~PulseDelayer();
    static IDrawableModule* Create() { return new PulseDelayer(); }
    
-   string GetTitleLabel() override { return "pulse delayer"; }
+   std::string GetTitleLabel() override { return "pulse delayer"; }
    void CreateUIControls() override;
    void Init() override;
    

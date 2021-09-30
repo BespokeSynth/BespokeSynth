@@ -40,7 +40,7 @@ public:
    virtual ~VelocityToCV();
    static IDrawableModule* Create() { return new VelocityToCV(); }
    
-   string GetTitleLabel() override { return "velocity to cv"; }
+   std::string GetTitleLabel() override { return "velocity to cv"; }
    void CreateUIControls() override;
    
    void SetEnabled(bool enabled) override { mEnabled = enabled; }

@@ -111,7 +111,7 @@ private:
    IntSlider* mSubdivideSlider;
    JumpBlender mJumpBlender[ChannelBuffer::kMaxNumChannels];
    int mNanopadScene;
-   list<StutterParams> mStutterStack;
+   std::list<StutterParams> mStutterStack;
    Ramp mStutterLengthRamp;
    bool mFadeStutter;
    Checkbox* mFadeCheckbox;

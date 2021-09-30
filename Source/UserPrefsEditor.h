@@ -41,7 +41,7 @@ public:
    static IDrawableModule* Create() { return new UserPrefsEditor(); }
 
    void CreateUIControls() override;
-   string GetTitleLabel() override { return "settings"; }
+   std::string GetTitleLabel() override { return "settings"; }
    bool AlwaysOnTop() override { return true; }
    bool CanMinimize() override { return false; }
    bool IsSingleton() const override { return true; }
@@ -63,15 +63,15 @@ private:
    bool Enabled() const override { return true; }
    void GetModuleDimensions(float& width, float& height) override { width = mWidth; height = mHeight; }
 
-   void UpdateDropdowns(vector<DropdownList*> toUpdate);
-   void DrawRightLabel(IUIControl* control, string text, ofColor color);
+   void UpdateDropdowns(std::vector<DropdownList*> toUpdate);
+   void DrawRightLabel(IUIControl* control, std::string text, ofColor color);
    void PrepareForSave();
-   void UpdatePrefStr(ofxJSONElement& userPrefs, string prefName, string value);
-   void UpdatePrefStrArray(ofxJSONElement& userPrefs, string prefName, vector<string> value);
-   void UpdatePrefInt(ofxJSONElement& userPrefs, string prefName, int value);
-   void UpdatePrefFloat(ofxJSONElement& userPrefs, string prefName, float value);
-   void UpdatePrefBool(ofxJSONElement& userPrefs, string prefName, bool value);
-   void CleanUpSave(string& json);
+   void UpdatePrefStr(ofxJSONElement& userPrefs, std::string prefName, std::string value);
+   void UpdatePrefStrArray(ofxJSONElement& userPrefs, std::string prefName, std::vector<std::string> value);
+   void UpdatePrefInt(ofxJSONElement& userPrefs, std::string prefName, int value);
+   void UpdatePrefFloat(ofxJSONElement& userPrefs, std::string prefName, float value);
+   void UpdatePrefBool(ofxJSONElement& userPrefs, std::string prefName, bool value);
+   void CleanUpSave(std::string& json);
 
    DropdownList* mDeviceTypeDropdown;
    int mDeviceTypeIndex;
@@ -104,19 +104,19 @@ private:
    Checkbox* mAutosaveCheckbox;
    bool mAutosave;
    TextEntry* mRecordingsPathEntry;
-   string mRecordingsPath;
+   std::string mRecordingsPath;
    TextEntry* mRecordBufferLengthEntry;
    float mRecordBufferLengthMinutes;
    TextEntry* mTooltipsFilePathEntry;
-   string mTooltipsFilePath;
+   std::string mTooltipsFilePath;
    TextEntry* mDefaultLayoutPathEntry;
-   string mDefaultLayoutPath;
+   std::string mDefaultLayoutPath;
    TextEntry* mYoutubeDlPathEntry;
-   string mYoutubeDlPath;
+   std::string mYoutubeDlPath;
    TextEntry* mFfmpegPathEntry;
-   string mFfmpegPath;
+   std::string mFfmpegPath;
    TextEntry* mVstSearchDirsEntry;
-   string mVstSearchDirs;
+   std::string mVstSearchDirs;
    Checkbox* mShowTooltipsOnLoadCheckbox;
    bool mShowTooltipsOnLoad;
    ClickButton* mSaveButton;

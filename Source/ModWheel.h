@@ -40,7 +40,7 @@ public:
    virtual ~ModWheel();
    static IDrawableModule* Create() { return new ModWheel(); }
    
-   string GetTitleLabel() override { return "modwheel"; }
+   std::string GetTitleLabel() override { return "modwheel"; }
    void CreateUIControls() override;
    void Init() override;
    void SetEnabled(bool enabled) override { mEnabled = enabled; }

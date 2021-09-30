@@ -53,7 +53,7 @@ TextEntry::TextEntry(ITextEntryListener* owner, const char* name, int x, int y, 
    Construct(owner, name, x, y, charWidth);
 }
 
-TextEntry::TextEntry(ITextEntryListener* owner, const char* name, int x, int y, int charWidth, string* var)
+TextEntry::TextEntry(ITextEntryListener* owner, const char* name, int x, int y, int charWidth, std::string* var)
 : mVarCString(nullptr)
 , mVarString(var)
 , mVarInt(nullptr)
@@ -302,7 +302,7 @@ void TextEntry::RemoveSelectedText()
 {
    int caretStart = MAX(0, MIN(mCaretPosition, mCaretPosition2));
    int caretEnd = MIN(strlen(mString), MAX(mCaretPosition, mCaretPosition2));
-   string newString = mString;
+   std::string newString = mString;
    strcpy(mString, (newString.substr(0, caretStart) + newString.substr(caretEnd)).c_str());
    MoveCaret(caretStart, false);
 }
@@ -432,7 +432,7 @@ void TextEntry::OnKeyPressed(int key, bool isRepeat)
          RemoveSelectedText();
       juce::String clipboard = TheSynth->GetTextFromClipboard();
       
-      string newString = mString;
+      std::string newString = mString;
       strcpy(mString, (newString.substr(0, mCaretPosition) + clipboard.toStdString() + newString.substr(mCaretPosition)).c_str());
       MoveCaret(mCaretPosition + clipboard.length());
    }
@@ -442,7 +442,7 @@ void TextEntry::OnKeyPressed(int key, bool isRepeat)
       {
          int caretStart = MIN(mCaretPosition, mCaretPosition2);
          int caretEnd = MAX(mCaretPosition, mCaretPosition2);
-         string tmpString(mString);
+         std::string tmpString(mString);
          TheSynth->CopyTextToClipboard(tmpString.substr(caretStart,caretEnd-caretStart));
          
          if (toupper(key) == 'X')
@@ -622,7 +622,7 @@ void TextEntry::SaveState(FileStreamOut& out)
 {
    out << kSaveStateRev;
    
-   out << string(mString);
+   out << std::string(mString);
 }
 
 void TextEntry::LoadState(FileStreamIn& in, bool shouldSetValue)
@@ -631,7 +631,7 @@ void TextEntry::LoadState(FileStreamIn& in, bool shouldSetValue)
    in >> rev;
    LoadStateValidate(rev == kSaveStateRev);
    
-   string var;
+   std::string var;
    in >> var;
    StringCopy(mString, var.c_str(), MAX_TEXTENTRY_LENGTH);
    AcceptEntry(false);

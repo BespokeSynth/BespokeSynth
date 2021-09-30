@@ -75,7 +75,7 @@ DropdownList::~DropdownList()
 {
 }
 
-void DropdownList::AddLabel(string label, int value)
+void DropdownList::AddLabel(std::string label, int value)
 {
    DropdownListElement element;
    element.mLabel = label;
@@ -122,7 +122,7 @@ void DropdownList::CalculateWidth()
    mModalList.SetDimensions(mModalWidth*mColumns, itemSpacing * MIN((int)mElements.size(), mMaxPerColumn));
 }
 
-string DropdownList::GetLabel(int val) const
+std::string DropdownList::GetLabel(int val) const
 {
    for (int i=0; i<mElements.size(); ++i)
    {
@@ -367,7 +367,7 @@ int DropdownList::FindItemIndex(float val) const
    return -1;
 }
 
-string DropdownList::GetDisplayValue(float val) const
+std::string DropdownList::GetDisplayValue(float val) const
 {
    int itemIndex = FindItemIndex(val);
    
@@ -428,7 +428,7 @@ void DropdownList::LoadState(FileStreamIn& in, bool shouldSetValue)
    }
    else
    {
-      string label;
+      std::string label;
       in >> label;
       if (shouldSetValue)
       {
@@ -449,7 +449,7 @@ void DropdownListModal::DrawModule()
    mOwner->DrawDropdown(mWidth, mHeight);
 }
 
-string DropdownListModal::GetHoveredLabel()
+std::string DropdownListModal::GetHoveredLabel()
 {
    int index = mOwner->GetItemIndex((int)mMouseX, (int)mMouseY);
    if (index >= 0 && index < mOwner->GetNumValues())

@@ -64,8 +64,8 @@ public:
    void SetClamped(bool clamped) { mClamped = clamped; }
    float GetMin() const { return mMin; }
    float GetMax() const { return mMax; }
-   void SetMaxValueDisplay(string display) { mMaxValueDisplay = display; }
-   void SetMinValueDisplay(string display) { mMinValueDisplay = display; }
+   void SetMaxValueDisplay(std::string display) { mMaxValueDisplay = display; }
+   void SetMinValueDisplay(std::string display) { mMinValueDisplay = display; }
    void SetLFO(FloatSliderLFOControl* lfo);
    void SetShowName(bool show) { mShowName = show; }
    void SetDimensions(int w, int h) { mWidth = w; mHeight = h; }
@@ -89,7 +89,7 @@ public:
    float GetValueForMidiCC(float slider) const override;
    void SetValue(float value) override;
    float GetValue() const override;
-   string GetDisplayValue(float val) const override;
+   std::string GetDisplayValue(float val) const override;
    float GetMidiValue() const override;
    void GetRange(float& min, float& max) override { min = mMin; max = mMax; }
    void Double() override;
@@ -140,8 +140,8 @@ private:
    bool mClamped;
    Mode mMode;
    float mOriginalValue;
-   string mMinValueDisplay;
-   string mMaxValueDisplay;
+   std::string mMinValueDisplay;
+   std::string mMaxValueDisplay;
    bool mShowName;
    float mBezierControl;
    float mSmooth;
@@ -198,7 +198,7 @@ public:
    float GetValue() const override;
    float GetMidiValue() const override;
    int GetNumValues() override { return mMax - mMin + 1; }
-   string GetDisplayValue(float val) const override;
+   std::string GetDisplayValue(float val) const override;
    void GetRange(int& min, int& max) { min = mMin; max = mMax; }
    void Double() override;
    void Halve() override;

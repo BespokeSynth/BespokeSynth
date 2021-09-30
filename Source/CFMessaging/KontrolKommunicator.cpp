@@ -59,21 +59,21 @@ void KontrolKommunicator::OutputRawData2(const uint8_t* data, size_t length)
 {
    for (int i=0; i<length; ++i)
    {
-      cout << ofToString(data[i]);
+      std::cout << ofToString(data[i]);
       if (i%4 == 3)
-         cout << " ";
+         std::cout << " ";
    }
-   cout << "\n";
+   std::cout << "\n";
    for (int i=0; i<length; ++i)
    {
-      cout << FormatString("%02x ", data[i]);
+      std::cout << FormatString("%02x ", data[i]);
       if (i%4 == 3)
-         cout << " ";
+         std::cout << " ";
    }
-   cout << "\n";
+   std::cout << "\n";
 }
 
-CFDataRef KontrolKommunicator::OnMessageReceived(string portname, SInt32 msgid, CFDataRef data)
+CFDataRef KontrolKommunicator::OnMessageReceived(std::string portname, SInt32 msgid, CFDataRef data)
 {
    vm_address_t vmData;
    vm_allocate(mach_task_self(),  &vmData, (vm_size_t)vm_page_size, TRUE);
@@ -120,7 +120,7 @@ CFDataRef KontrolKommunicator::OnMessageReceived(string portname, SInt32 msgid, 
    return reply;
 }
 
-CFDataRef KontrolKommunicator::ProcessIncomingMessage(string portName, char* data, size_t length)
+CFDataRef KontrolKommunicator::ProcessIncomingMessage(std::string portName, char* data, size_t length)
 {
    KDataArray input;
    input.resize(length);
@@ -203,7 +203,7 @@ uint16_t KontrolKommunicator::CharToSegments(char input)
 }
 
 //static
-KDataArray KontrolKommunicator::LettersToData(string input)
+KDataArray KontrolKommunicator::LettersToData(std::string input)
 {
    KDataArray data;
    data.resize(input.length()*2);
@@ -279,7 +279,7 @@ void KontrolKommunicator::Update()
    mMessageQueueMutex.unlock();
 }
 
-void KontrolKommunicator::SendMessage(string portName, KDataArray data)
+void KontrolKommunicator::SendMessage(std::string portName, KDataArray data)
 {
    if (mSendPorts.find(portName) == mSendPorts.end())
       CreateSender(portName.c_str());
@@ -322,7 +322,7 @@ void KontrolKommunicator::SendMessage(string portName, KDataArray data)
    }
 }
 
-void KontrolKommunicator::AddReply(string portName, string input, string reply)
+void KontrolKommunicator::AddReply(std::string portName, std::string input, std::string reply)
 {
    ReplyEntry entry;
    entry.mPort = portName;
@@ -331,7 +331,7 @@ void KontrolKommunicator::AddReply(string portName, string input, string reply)
    mReplies.push_back(entry);
 }
 
-void KontrolKommunicator::QueueMessage(string portName, KDataArray message)
+void KontrolKommunicator::QueueMessage(std::string portName, KDataArray message)
 {
    QueuedMessage entry;
    entry.mPort = portName;
@@ -341,10 +341,10 @@ void KontrolKommunicator::QueueMessage(string portName, KDataArray message)
    mMessageQueueMutex.unlock();
 }
 
-KDataArray KontrolKommunicator::RespondToMessage(string portName, KDataArray input)
+KDataArray KontrolKommunicator::RespondToMessage(std::string portName, KDataArray input)
 {
    uint32_t messageID = *((uint32_t*)input.data());
-   string type = TypeForMessageID(messageID);
+   std::string type = TypeForMessageID(messageID);
    
    //fake software responses
    if (portName == mNotificationPort)
@@ -391,7 +391,7 @@ int WordAlign(int input)
    return (input + 3) / 4 * 4;
 }
 
-void KontrolKommunicator::FollowUpToReply(string messageType, uint8_t* reply)
+void KontrolKommunicator::FollowUpToReply(std::string messageType, uint8_t* reply)
 {
    //fake software followups
    if (messageType == "NIGetServiceVersionMessage")
@@ -431,7 +431,7 @@ void KontrolKommunicator::FollowUpToReply(string messageType, uint8_t* reply)
    }
 }
 
-KDataArray KontrolKommunicator::CreateMessage(string type)
+KDataArray KontrolKommunicator::CreateMessage(std::string type)
 {
    uint32_t messageID = MessageIDForType(type);
    KDataArray ret(messageID);
@@ -483,23 +483,23 @@ KDataArray KontrolKommunicator::CreateMessage(string type)
    return ret;
 }
 
-void KontrolKommunicator::Output(string str)
+void KontrolKommunicator::Output(std::string str)
 {
    return;
    
-   cout << str;
+   std::cout << str;
 }
 
-string KontrolKommunicator::FormatString(string format, int number)
+std::string KontrolKommunicator::FormatString(std::string format, int number)
 {
    char buffer[100];
    sprintf(buffer, format.c_str(), number);
-   return (string)buffer;
+   return (std::string)buffer;
 }
 
-KDataArray KontrolKommunicator::StringToData(string input)
+KDataArray KontrolKommunicator::StringToData(std::string input)
 {
-   vector<string> tokens = ofSplitString(input, " ", true);
+   std::vector<std::string> tokens = ofSplitString(input, " ", true);
    size_t length = tokens.size();
    KDataArray data;
    data.resize(length);
@@ -580,7 +580,7 @@ void KontrolKommunicator::OutputRawData(const uint8_t* data, size_t length)
    Output("\n");
 }
 
-void KontrolKommunicator::SetDisplay(const uint16_t sliders[72], string display)
+void KontrolKommunicator::SetDisplay(const uint16_t sliders[72], std::string display)
 {
    KDataArray text(MessageIDForType("NIDisplayDrawMessage"));
    text += StringToData("00 00 00 00  00 00 00 00  03 00 48 00  b0 01 00 00");   //some sort of header
