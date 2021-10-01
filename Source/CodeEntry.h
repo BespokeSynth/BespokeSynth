@@ -158,8 +158,15 @@ private:
    int mErrorLine;
    ofVec2f mScroll;
    std::vector<int> mSyntaxHighlightMapping;
+
+   /*
+    * For syntax highlighting we have both a static (system wide) and mDo (per insdtance)
+    * control and then we use and
+    */
+   static bool sDoSyntaxHighlighting;
+   static bool sDoPythonAutocomplete;
    bool mDoSyntaxHighlighting;
-   bool mDoPythonAutocomplete;
+
    double mLastInputTime;
    std::array<AutocompleteSignatureInfo, 10> mAutocompleteSignatures;
    std::array<AutocompleteInfo, 10> mAutocompletes;
