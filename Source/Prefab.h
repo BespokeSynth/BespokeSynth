@@ -57,6 +57,8 @@ public:
    void SaveState(FileStreamOut& out) override;
    void LoadState(FileStreamIn& in) override;
 
+   void SetEnabled(bool enabled) override { mEnabled = enabled; }
+
    //IPatchable
    void PostRepatch(PatchCableSource* cableSource, bool fromUserClick) override;
    
@@ -72,6 +74,7 @@ private:
    bool Enabled() const override { return mEnabled; }
    void GetModuleDimensions(float& width, float& height) override;
    void OnClicked(int x, int y, bool right) override;
+   void CheckboxUpdated(Checkbox* checkbox) override;
    void MouseReleased() override;
 
    bool CanAddDropModules();

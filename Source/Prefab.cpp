@@ -233,6 +233,17 @@ void Prefab::ButtonClicked(ClickButton* button)
    }
 }
 
+void Prefab::CheckboxUpdated(Checkbox* checkbox)
+{
+   if (checkbox == mEnabledCheckbox)
+   {
+      bool enabled = mEnabledCheckbox->GetValue() >= 0.5;
+      auto modules = mModuleContainer.GetModules();
+      for (auto* module : modules)
+         module->SetEnabled(enabled);
+   }
+}
+
 void Prefab::SavePrefab(std::string savePath)
 {
    ofxJSONElement root;
