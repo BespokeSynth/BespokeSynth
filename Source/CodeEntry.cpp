@@ -382,7 +382,7 @@ void CodeEntry::Render()
       {
          ofPushStyle();
          ofFill();
-         ofSetColor(255, 255, 255, 50);
+         ofSetColor(selectedOverlay);
          int caretStart = MIN(mCaretPosition, mCaretPosition2);
          int caretEnd = MAX(mCaretPosition, mCaretPosition2);
          ofVec2f coordsStart = GetCaretCoords(caretStart);
@@ -443,14 +443,14 @@ void CodeEntry::RenderOverlay()
          float x = caretPos.x - charactersLeft * mCharWidth;
          float y = caretPos.y + mCharHeight * (i + 2) - 2;
          if (i == mAutocompleteHighlightIndex)
-            ofSetColor(100, 100, 100);
+            ofSetColor(jediIndexBg);
          else
-            ofSetColor(70, 70, 70);
+            ofSetColor(jediBg);
          ofRect(x, y - mCharHeight+2, gFontFixedWidth.GetStringWidth(mAutocompletes[i].autocompleteFull, mFontSize), mCharHeight);
 
-         ofSetColor(200, 200, 200);
+         ofSetColor(jediAutoComplete);
          gFontFixedWidth.DrawString(mAutocompletes[i].autocompleteFull, mFontSize, x, y);
-         ofSetColor(255, 255, 255);
+         ofSetColor(jediAutoCompleteRest);
          std::string prefix = "";
          for (size_t j = 0; j < charactersLeft; ++j)
             prefix += " ";
@@ -491,11 +491,11 @@ void CodeEntry::RenderOverlay()
          highlightParamString += " ";
          float x = GetLinePos(mAutocompleteCaretCoords.y, K(end), !K(published)).x + 10;
          float y = caretPos.y + mCharHeight * (i + 1) - 2;
-         ofSetColor(70, 70, 70);
+         ofSetColor(jediBg);
          ofRect(x, y-mCharHeight+2, gFontFixedWidth.GetStringWidth(params, mFontSize), mCharHeight+2);
-         ofSetColor(170, 170, 255);
+         ofSetColor(jediParams);
          gFontFixedWidth.DrawString(params, mFontSize, x, y);
-         ofSetColor(230, 230, 255);
+         ofSetColor(jediParamsHighlight);
          gFontFixedWidth.DrawString(highlightParamString, mFontSize, x, y);
       }
    }
@@ -1355,6 +1355,9 @@ void CodeEntry::SetStyleFromJSON(const ofxJSONElement &vdict) {
             onto.r = arr[0u].asInt();
             onto.g = arr[1u].asInt();
             onto.b = arr[2u].asInt();
+
+            if (def.size() > 3)
+                onto.a = arr[3u].asInt();
         }
     };
     fromRGB( "currentBg", currentBg);
@@ -1372,5 +1375,13 @@ void CodeEntry::SetStyleFromJSON(const ofxJSONElement &vdict) {
     fromRGB( "op", opColor);
     fromRGB( "comma", commaColor);
     fromRGB( "comment", commentColor);
+    fromRGB( "selectedOverlay", selectedOverlay);
+
+    fromRGB("jediBg", jediBg);
+    fromRGB("jediIndexBg", jediIndexBg);
+    fromRGB("jediAutoComplete", jediAutoComplete);
+    fromRGB("jediAutoCompleteRest", jediAutoCompleteRest);
+    fromRGB("jediParams", jediParams);
+    fromRGB("jediParamsHighlight", jediParamsHighlight);
 }
 
