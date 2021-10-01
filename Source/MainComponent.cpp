@@ -105,6 +105,7 @@ public:
       setSize(width, height);
       setWantsKeyboardFocus(true);
       Desktop::setScreenSaverEnabled(false);
+      mGlobalManagers.mDeviceManager.getAvailableDeviceTypes();   //scans for device types ("Windows Audio", "DirectSound", etc)
    }
    
    ~MainContentComponent()
@@ -212,8 +213,6 @@ public:
          for (auto output : deviceType->getDeviceNames(false))
             ofLog() << output.toStdString();
       }*/
-
-      mGlobalManagers.mDeviceManager.getAvailableDeviceTypes();   //scans for device types ("Windows Audio", "DirectSound", etc)
 
       ofxJSONElement userPrefs;
       const string kAutoDevice = "auto";
