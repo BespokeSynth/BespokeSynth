@@ -27,7 +27,7 @@
 
 #pragma once
 
-#include "push2/push2/JuceToPush2DisplayBridge.h"
+#include "push2/JuceToPush2DisplayBridge.h"
 #include "IDrawableModule.h"
 #include "MidiDevice.h"
 #include "MidiController.h"
