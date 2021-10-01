@@ -90,7 +90,7 @@ ScriptModule::ScriptModule()
 , mShowJediWarning(false)
 {
    CheckIfPythonEverSuccessfullyInitialized();
-   if ((TheSynth->IsLoadingState() || Prefab::sLoadingPrefab) && sHasPythonEverSuccessfullyInitialized)
+   if ((TheSynth->IsLoadingState() || Prefab::sLoadingPrefab) && !sHasPythonEverSuccessfullyInitialized)
       InitializePythonIfNecessary();
 
    Reset();
