@@ -27,12 +27,59 @@
 
 #include "SpaceMouseControl.h"
 
-#ifdef BESPOKE_WINDOWS
+#if BESPOKE_SPACEMOUSE_SUPPORT
+#include "OpenFrameworksPort.h"
+#include "ModularSynth.h"
+
+#include <Windows.h>
+
+#include "3dxware/spwmacro.h"  /* Common macros used by SpaceWare functions. */
+#include "3dxware/si.h"        /* Required for any SpaceWare support within an app.*/
+#include "3dxware/siapp.h"     /* Required for siapp.lib symbols */
+
 #include "juce_core/juce_core.h"
 
-SpaceMouseMessageWindow* SpaceMouseMessageWindow::sInstance = nullptr;
+#ifdef _MSC_VER
+#pragma warning(disable:4700)
+#endif
 
-SpaceMouseMessageWindow::SpaceMouseMessageWindow(ModularSynth* theSynth)
+struct SpaceMouseMessageWindow::Impl
+{
+   Impl(ModularSynth &synth);
+   ~Impl();
+
+   static LRESULT CALLBACK MyWndCBProc(HWND hwnd, UINT wm, WPARAM wParam, LPARAM lParam);
+
+   int SbInit(HWND hwndC);
+
+   void ApplyDeadZone(float &var, float deadzone);
+
+   void SbMotionEvent(SiSpwEvent *pEvent);
+   void SbZeroEvent();
+   void SbButtonPressEvent(int buttonnumber);
+   void SbButtonReleaseEvent(int buttonnumber);
+   void HandleDeviceChangeEvent(SiSpwEvent *pEvent);
+
+   LPCTSTR getClassNameFromAtom() const noexcept;
+
+   ATOM atom;
+   HWND hwnd;
+
+   SiHdl       devHdl;       /* Handle to 3D Mouse Device */
+   SiOpenData oData;
+   ModularSynth& mSynth;
+   bool mIsPanningOrZooming;
+   bool mIsTwisting;
+
+   static inline Impl *sInstance = nullptr;
+};
+
+SpaceMouseMessageWindow::SpaceMouseMessageWindow(ModularSynth& theSynth)
+   : d(std::make_unique<Impl>(theSynth))
+{
+}
+
+SpaceMouseMessageWindow::Impl::Impl(ModularSynth& theSynth)
    : mSynth(theSynth)
    , mIsPanningOrZooming(false)
    , mIsTwisting(false)
@@ -77,14 +124,14 @@ SpaceMouseMessageWindow::SpaceMouseMessageWindow(ModularSynth* theSynth)
    }*/
 }
 
-SpaceMouseMessageWindow::~SpaceMouseMessageWindow()
+SpaceMouseMessageWindow::Impl::~Impl()
 {
    DestroyWindow(hwnd);
    UnregisterClass(getClassNameFromAtom(), 0);
 }
 
 //static
-LRESULT CALLBACK SpaceMouseMessageWindow::MyWndCBProc(HWND hwnd, UINT wm, WPARAM wParam, LPARAM lParam)
+LRESULT CALLBACK SpaceMouseMessageWindow::Impl::MyWndCBProc(HWND hwnd, UINT wm, WPARAM wParam, LPARAM lParam)
 {
    SiSpwEvent     Event;    // SpaceWare Event
    SiGetEventData EData;    // SpaceWare Event Data
@@ -123,7 +170,7 @@ LRESULT CALLBACK SpaceMouseMessageWindow::MyWndCBProc(HWND hwnd, UINT wm, WPARAM
    return DefWindowProc(hwnd, wm, wParam, lParam);
 }
 
-int SpaceMouseMessageWindow::SbInit(HWND hwndC)
+int SpaceMouseMessageWindow::Impl::SbInit(HWND hwndC)
 {
    int res;                             /* result of SiOpen, to be returned  */
 
@@ -156,7 +203,7 @@ int SpaceMouseMessageWindow::SbInit(HWND hwndC)
    return res;
 }
 
-void SpaceMouseMessageWindow::ApplyDeadZone(float &var, float deadzone)
+void SpaceMouseMessageWindow::Impl::ApplyDeadZone(float &var, float deadzone)
 {
    if (abs(var) < deadzone)
       var = 0;
@@ -164,7 +211,7 @@ void SpaceMouseMessageWindow::ApplyDeadZone(float &var, float deadzone)
       var -= (var > 0 ? 1 : -1) * deadzone;
 }
 
-void SpaceMouseMessageWindow::SbMotionEvent(SiSpwEvent *pEvent) {
+void SpaceMouseMessageWindow::Impl::SbMotionEvent(SiSpwEvent *pEvent) {
    const float kMax = 2100.0f;
    float tx = ofClamp(pEvent->u.spwData.mData[SI_TX] / kMax, -1, 1);
    float ty = ofClamp(pEvent->u.spwData.mData[SI_TY] / kMax, -1, 1);
@@ -222,51 +269,51 @@ void SpaceMouseMessageWindow::SbMotionEvent(SiSpwEvent *pEvent) {
    bool usingTwist = false;
    if (rz != 0 || tx != 0 || rx != 0 || tz != 0)
    {
-      mSynth->PanView((rz + tx) * kPanScale, (rx - tz) * kPanScale);
+      mSynth.PanView((rz + tx) * kPanScale, (rx - tz) * kPanScale);
       usingPan = true;
       mIsPanningOrZooming = true;
    }
    if (ty != 0)
    {
-      mSynth->ZoomView(ty * kZoomScale, false);
+      mSynth.ZoomView(ty * kZoomScale, false);
       usingZoom = true;
       mIsPanningOrZooming = true;
    }
    if (ry != 0)
    {
-      mSynth->MouseScrolled(0, ry * kTwistScale, false);
+      mSynth.MouseScrolled(0, ry * kTwistScale, false);
       usingTwist = true;
       mIsTwisting = true;
    }
 
    if (!mIsTwisting)
    {
-      TheSynth->SetRawSpaceMouseTwist(0, false);
-      TheSynth->SetRawSpaceMouseZoom(rawZoom, usingZoom);
-      TheSynth->SetRawSpaceMousePan(rawPan.x, rawPan.y, usingPan);
+      mSynth.SetRawSpaceMouseTwist(0, false);
+      mSynth.SetRawSpaceMouseZoom(rawZoom, usingZoom);
+      mSynth.SetRawSpaceMousePan(rawPan.x, rawPan.y, usingPan);
    }
 
    if (!mIsPanningOrZooming)
    {
-      TheSynth->SetRawSpaceMouseTwist(rawTwist, usingTwist);
-      TheSynth->SetRawSpaceMouseZoom(0, false);
-      TheSynth->SetRawSpaceMousePan(0, 0, false);
+      mSynth.SetRawSpaceMouseTwist(rawTwist, usingTwist);
+      mSynth.SetRawSpaceMouseZoom(0, false);
+      mSynth.SetRawSpaceMousePan(0, 0, false);
    }
 }
-void SpaceMouseMessageWindow::SbZeroEvent() {
-   TheSynth->SetRawSpaceMouseTwist(0, false);
-   TheSynth->SetRawSpaceMouseZoom(0, false);
-   TheSynth->SetRawSpaceMousePan(0, 0, false);
+void SpaceMouseMessageWindow::Impl::SbZeroEvent() {
+   mSynth.SetRawSpaceMouseTwist(0, false);
+   mSynth.SetRawSpaceMouseZoom(0, false);
+   mSynth.SetRawSpaceMousePan(0, 0, false);
    mIsPanningOrZooming = false;
    mIsTwisting = false;
 }
-void SpaceMouseMessageWindow::SbButtonPressEvent(int buttonnumber) {
+void SpaceMouseMessageWindow::Impl::SbButtonPressEvent(int buttonnumber) {
    std::cout << "Buttonnumber : " << buttonnumber << std::endl;
 }
-void SpaceMouseMessageWindow::SbButtonReleaseEvent(int buttonnumber) {
+void SpaceMouseMessageWindow::Impl::SbButtonReleaseEvent(int buttonnumber) {
    std::cout << "Buttonnumber : " << buttonnumber << std::endl;
 }
-void SpaceMouseMessageWindow::HandleDeviceChangeEvent(SiSpwEvent *pEvent) {
+void SpaceMouseMessageWindow::Impl::HandleDeviceChangeEvent(SiSpwEvent *pEvent) {
    std::cout << "HandleDeviceChangeEvent : " << std::endl;
 
 }
@@ -295,9 +342,13 @@ void SpaceMouseMessageWindow::Poll()
    }
 }
 
-LPCTSTR SpaceMouseMessageWindow::getClassNameFromAtom() const noexcept
+LPCTSTR SpaceMouseMessageWindow::Impl::getClassNameFromAtom() const noexcept
 {
    return (LPCTSTR)(juce::pointer_sized_uint)atom;
 }
 
-#endif
+#else
+SpaceMouseMessageWindow::SpaceMouseMessageWindow(ModularSynth&) {}
+#endif // BESPOKE_SPACEMOUSE_SUPPORT
+
+SpaceMouseMessageWindow::~SpaceMouseMessageWindow() = default;

@@ -43,9 +43,7 @@ public:
    : mLastFpsUpdateTime(0)
    , mFrameCountAccum(0)
    , mPixelRatio(1)
-#if BESPOKE_WINDOWS
-   , mSpaceMouseReader(&mSynth)
-#endif
+   , mSpaceMouseReader(mSynth)
    {
       ofLog() << "bespoke synth " << JUCEApplication::getInstance()->getApplicationVersion();
 
@@ -150,9 +148,7 @@ public:
       
       mScreenPosition = getScreenPosition();
 
-#if BESPOKE_WINDOWS
       mSpaceMouseReader.Poll();
-#endif
    }
    
    //==============================================================================
@@ -547,10 +543,8 @@ private:
    double mPixelRatio;
    juce::Point<int> mScreenPosition;
    juce::Point<int> mDesiredInitialPosition;
-#if BESPOKE_WINDOWS
    SpaceMouseMessageWindow mSpaceMouseReader;
-#endif
-   
+
    JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (MainContentComponent)
 };
 
