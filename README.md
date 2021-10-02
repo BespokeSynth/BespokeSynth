@@ -35,7 +35,7 @@ In mid-September 2021 Bespoke moved to CMake rather than Projucer for builds. Th
 Bespoke on all platforms is
 
 ```shell
-git clone https://github.com/awwbees/BespokeSynth   # replace this with your fork if you forked
+git clone https://github.com/BespokeSynth/BespokeSynth   # replace this with your fork if you forked
 cd BespokeSynth
 git submodule update --init --recursive
 cmake -Bignore/build
