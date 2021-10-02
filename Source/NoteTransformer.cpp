@@ -91,7 +91,7 @@ void NoteTransformer::PlayNote(double time, int pitch, int velocity, int voiceId
       mLastTimeTonePlayed[tone%7] = time;
    int pitchOffset = pitch - TheScale->GetPitchFromTone(tone);
    
-   tone += mToneMod[tone % TheScale->NumPitchesInScale()];
+   tone += mToneMod[tone % TheScale->NumTonesInScale()];
    
    int outPitch = TheScale->GetPitchFromTone(tone) + pitchOffset;
    PlayNoteOutput(time, outPitch, velocity, voiceIdx, modulation);

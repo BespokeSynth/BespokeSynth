@@ -529,7 +529,7 @@ int LaunchpadKeyboard::GridToPitch(int x, int y)
          }
          else if (x == 3)
          {
-            if (TheScale->NumPitchesInScale() == 7)   //septatonic scales only
+            if (TheScale->NumTonesInScale() == 7)   //septatonic scales only
             {
                if (y%2 == 0)  // 7 or maj7
                {
@@ -554,7 +554,7 @@ int LaunchpadKeyboard::GridToPitch(int x, int y)
          }
       }
       
-      int numPitchesInScale = TheScale->NumPitchesInScale();
+      int numPitchesInScale = TheScale->NumTonesInScale();
       if (numPitchesInScale > 8)
          return INVALID_PITCH;
       
@@ -572,7 +572,7 @@ int LaunchpadKeyboard::GridToPitch(int x, int y)
 
 int LaunchpadKeyboard::GridToPitchChordSection(int x, int y)
 {
-   int numPitchesInScale = TheScale->NumPitchesInScale();
+   int numPitchesInScale = TheScale->NumTonesInScale();
    
    if (y<7 && y<numPitchesInScale)
    {

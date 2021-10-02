@@ -305,7 +305,7 @@ void NoteStepSequencer::DrawModule()
    {
       if (RowToPitch(i)%TheScale->GetTet() == TheScale->ScaleRoot()%TheScale->GetTet())
          ofSetColor(0,255,0,80);
-      else if (RowToPitch(i)%TheScale->GetTet() == (TheScale->ScaleRoot()+7)%TheScale->GetTet())
+      else if (TheScale->GetTet() == 12 && RowToPitch(i)%TheScale->GetTet() == (TheScale->ScaleRoot()+7)%TheScale->GetTet())
          ofSetColor(200,150,0,80);
       else if (mNoteMode == kNoteMode_Chromatic && TheScale->IsInScale(RowToPitch(i)))
          ofSetColor(100,75,0,80);
@@ -473,7 +473,7 @@ int NoteStepSequencer::RowToPitch(int row)
 {
    row += mRowOffset;
    
-   int numPitchesInScale = TheScale->NumPitchesInScale();
+   int numPitchesInScale = TheScale->NumTonesInScale();
    switch (mNoteMode)
    {
       case kNoteMode_Scale:
