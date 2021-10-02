@@ -26,14 +26,14 @@
 */
 
 #include "ModularSynth.h"
-#if BESPOKE_WINDOWS
+#ifdef _MSC_VER
 #define ssize_t ssize_t_undef_hack  //fixes conflict with ssize_t typedefs between python and juce
 #endif
 #include "IDrawableModule.h"
 #include "CodeEntry.h"
 #include "Transport.h"
 #include "ScriptModule.h"
-#if BESPOKE_WINDOWS
+#ifdef _MSC_VER
 #undef ssize_t
 #endif
 
