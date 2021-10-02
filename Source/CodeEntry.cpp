@@ -50,7 +50,8 @@ namespace py = pybind11;
 
 //static
 bool CodeEntry::sWarnJediNotInstalled = false;
-
+bool CodeEntry::sDoPythonAutocomplete = false;
+bool CodeEntry::sDoSyntaxHighlighting = false;
 
 CodeEntry::CodeEntry(ICodeEntryListener* owner, const char* name, int x, int y, float w, float h)
 : mListener(owner)
@@ -64,8 +65,7 @@ CodeEntry::CodeEntry(ICodeEntryListener* owner, const char* name, int x, int y, 
 , mLastPublishTime(-999)
 , mHasError(false)
 , mErrorLine(-1)
-, mDoSyntaxHighlighting(true)
-, mDoPythonAutocomplete(true)
+, mDoSyntaxHighlighting(false)
 , mAutocompleteUpdateTimer(0)
 , mWantToShowAutocomplete(false)
 , mAutocompleteHighlightIndex(0)
@@ -93,7 +93,7 @@ void CodeEntry::Poll()
 {
    if (mCodeUpdated)
    {
-      if (mDoSyntaxHighlighting)
+      if (mDoSyntaxHighlighting && sDoSyntaxHighlighting)
       {
          try
          {
@@ -122,7 +122,7 @@ void CodeEntry::Poll()
       mAutocompleteUpdateTimer -= 1.0 / ofGetFrameRate();
       if (mAutocompleteUpdateTimer <= 0)
       {
-         if (mDoPythonAutocomplete)
+         if (sDoPythonAutocomplete)
          {
             mAutocompleteCaretCoords = GetCaretCoords(mCaretPosition);
 
@@ -667,6 +667,7 @@ void CodeEntry::OnPythonInit()
    try
    {
       py::exec(syntaxHighlightCode, py::globals());
+      sDoSyntaxHighlighting = true;
    }
    catch (const std::exception &e)
    {
@@ -686,6 +687,7 @@ void CodeEntry::OnPythonInit()
          py::exec("jediProject.added_sys_path = [\"" + ofToResourcePath("python_stubs") + "\"]", py::globals());
          //py::eval_file(ofToResourcePath("bespoke_stubs.pyi"), py::globals());
          //py::exec("import sys;sys.path.append(\""+ ofToResourcePath("python_stubs")+"\")", py::globals());
+         sDoPythonAutocomplete = true;
       }
       catch (const std::exception &e)
       {
