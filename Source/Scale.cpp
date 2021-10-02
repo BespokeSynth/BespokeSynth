@@ -34,6 +34,12 @@
 
 Scale* TheScale = nullptr;
 
+namespace
+{
+   std::string kOddsoundScale = "oddsound";
+   std::string kSclFileScale = "custom";
+}
+
 Scale::Scale()
 : mRootSelector(nullptr)
 , mScaleSelector(nullptr)
@@ -56,10 +62,10 @@ Scale::Scale()
 
 Scale::~Scale()
 {
-    if (oddsound_mts_client)
+    if (mOddsoundMTSClient)
     {
-        MTS_DeregisterClient(oddsound_mts_client);
-        oddsound_mts_client = nullptr;
+        MTS_DeregisterClient(mOddsoundMTSClient);
+        mOddsoundMTSClient = nullptr;
     }
 }
 
@@ -73,8 +79,8 @@ void Scale::CreateUIControls()
    mTetEntry = new TextEntry(this,"tet",4,24,2,&mTet,0,99);
    mReferenceFreqEntry = new TextEntry(this,"tuning",4,43,3,&mReferenceFreq,1,999);
    mReferencePitchEntry = new TextEntry(this,"note",72,43,3,&mReferencePitch,0,127);
-   mLoadSCL = new ClickButton(this, "Load SCL", 4, 62);
-   mLoadKBM = new ClickButton(this, "Load KBM", 74, 62);
+   mLoadSCLButton = new ClickButton(this, "load SCL", 4, 24);
+   mLoadKBMButton = new ClickButton(this, "load KBM", 74, 24);
 
    mTetEntry->DrawLabel(true);
    mReferenceFreqEntry->DrawLabel(true);
@@ -98,8 +104,6 @@ void Scale::CreateUIControls()
    mIntonationSelector->AddLabel("just", kIntonation_Just);
    mIntonationSelector->AddLabel("pyth", kIntonation_Pythagorean);
    mIntonationSelector->AddLabel("mean", kIntonation_Meantone);
-   mIntonationSelector->AddLabel("sclkbm", kIntonation_SCLKBM);
-   mIntonationSelector->AddLabel("oddsound", kIntonation_ODDSOUNDMTS);
 }
 
 void Scale::Init()
@@ -140,6 +144,9 @@ void Scale::Init()
       mScales[0].mName = "ionian";
       mScales[0].mPitches = std::vector<int>{0,2,4,5,7,9,11};
    }
+
+   mScaleSelector->AddLabel(kOddsoundScale, mScaleSelector->GetNumValues());
+   mScaleSelector->AddLabel(kSclFileScale, mScaleSelector->GetNumValues());
    
    SetRoot(gRandom()%TheScale->GetTet());
    SetRandomSeptatonicScale();
@@ -147,6 +154,36 @@ void Scale::Init()
 
 float Scale::PitchToFreq(float pitch)
 {
+   if (IsUsingSclFileScale())
+   {
+      auto ip = (int)pitch + 128;
+      if (ip < 0 || ip > 256) return 440;
+
+      // Interpolate in log space
+      auto lt = mTuningTable[ip];
+      auto nt = mTuningTable[ip + ((ip != 255) ? 1 : 0)];
+      auto fp = (pitch + 128) - ip;
+      auto interplt = (1 - fp) * lt + fp * nt;
+
+      // Then pow2 it and multiply by freq0
+      return Pow2(interplt) * Tunings::MIDI_0_FREQ;
+   }
+   
+   if (IsUsingOddsoundScale())
+   {
+      if (mOddsoundMTSClient && MTS_HasMaster(mOddsoundMTSClient))
+      {
+         if (pitch < 0 || pitch > 127)
+            return Pow2((pitch - mReferencePitch) / mTet) * mReferenceFreq; // Improve this obviously
+         else
+            return MTS_NoteToFrequency(mOddsoundMTSClient, (int)pitch, 0);
+      }
+      else 
+      {
+         return Pow2((pitch - mReferencePitch) / mTet) * mReferenceFreq;
+      }
+   }
+
    switch (mIntonation)
    {
       case kIntonation_Equal:
@@ -186,33 +223,6 @@ float Scale::PitchToFreq(float pitch)
          
          break;
       }
-      case kIntonation_SCLKBM: {
-          auto ip = (int) pitch + 128;
-          if (ip < 0 || ip > 256) return 440;
-
-          // Interpolate in log space
-          auto lt = mTuningTable[ip];
-          auto nt = mTuningTable[ip+((ip != 255) ? 1 : 0 )];
-          auto fp = (pitch+128) - ip;
-          auto interplt = (1-fp) * lt + fp * nt;
-
-          // Then pow2 it and multiply by freq0
-          return Pow2(interplt) * Tunings::MIDI_0_FREQ;
-      }
-           break;
-      case kIntonation_ODDSOUNDMTS: {
-          if (oddsound_mts_client && MTS_HasMaster(oddsound_mts_client)) {
-              if (pitch < 0 || pitch > 127) {
-                  // Improve this obviously
-                  return Pow2((pitch - mReferencePitch) / mTet) * mReferenceFreq;
-              } else {
-                  return MTS_NoteToFrequency(oddsound_mts_client, (int) pitch, 0);
-              }
-          } else {
-              return Pow2((pitch - mReferencePitch) / mTet) * mReferenceFreq;
-          }
-      }
-           break;
       default:
          assert(false);
    }
@@ -303,6 +313,12 @@ void Scale::SetScaleType(std::string type, bool force)
       return;
    
    mScale.SetScaleType(type);
+
+   if (type == kSclFileScale || type == kOddsoundScale)
+   {
+      UpdateTuningTable();
+      SetRoot(0);
+   }
    
    NotifyListeners();
 }
@@ -370,21 +386,53 @@ void Scale::DrawModule()
    if (Minimized() || IsVisible() == false)
       return;
 
+   mRootSelector->SetShowing(!IsUsingSclFileScale() && !IsUsingOddsoundScale());
+   mTetEntry->SetShowing(!IsUsingSclFileScale() && !IsUsingOddsoundScale());
+   mReferenceFreqEntry->SetShowing(!IsUsingOddsoundScale() && (!IsUsingSclFileScale() || mKbmContents.empty()));
+   mReferencePitchEntry->SetShowing(!IsUsingOddsoundScale() && (!IsUsingSclFileScale() || mKbmContents.empty()));
+   mIntonationSelector->SetShowing(!IsUsingSclFileScale() && !IsUsingOddsoundScale());
+   mLoadSCLButton->SetShowing(IsUsingSclFileScale() && !IsUsingOddsoundScale());
+   mLoadKBMButton->SetShowing(IsUsingSclFileScale() && !IsUsingOddsoundScale());
+
    mRootSelector->Draw();
    mScaleSelector->Draw();
    mTetEntry->Draw();
    mReferenceFreqEntry->Draw();
    mReferencePitchEntry->Draw();
    mIntonationSelector->Draw();
-   mLoadSCL->Draw();
-   mLoadKBM->Draw();
+   mLoadSCLButton->Draw();
+   mLoadKBMButton->Draw();
+
+   if (IsUsingSclFileScale())
+      DrawTextNormal(mCustomScaleDescription, 5, 75);
+   if (IsUsingOddsoundScale())
+      DrawTextNormal(mCustomScaleDescription, 5, 45);
 }
 
-std::vector<int> Scale::GetPitchesForScale(std::string type)
+void Scale::GetModuleDimensions(float& width, float& height)
 {
+   width = 164;
+   height = IsUsingSclFileScale() ? 109  : 62;
+}
+
+bool Scale::IsUsingOddsoundScale() const
+{
+   return mScaleIndex == mScaleSelector->GetNumValues() - 2;
+}
+
+bool Scale::IsUsingSclFileScale() const
+{
+   return mScaleIndex == mScaleSelector->GetNumValues() - 1;
+}
+
+std::vector<int> Scale::GetPitchesForScale(std::string scaleType)
+{
+   if (scaleType == kSclFileScale || scaleType == kOddsoundScale)
+      return std::vector<int>();
+
    for (int i=0; i<mScales.size(); ++i)
    {
-      if (mScales[i].mName == type)
+      if (mScales[i].mName == scaleType)
          return mScales[i].mPitches;
    }
    assert(false);
@@ -456,16 +504,63 @@ float Scale::RationalizeNumber(float input)
 
 void Scale::UpdateTuningTable()
 {
-   if (mIntonation == kIntonation_Equal)
+   if (IsUsingOddsoundScale())
+   {
+       if (mOddsoundMTSClient == nullptr)
+       {
+           ofLog() << "Connecting to oddsound mts";
+           mOddsoundMTSClient = MTS_RegisterClient();
+           mCustomScaleDescription = "connected to oddsound";
+       }
+
+       if (mOddsoundMTSClient == nullptr)
+       {
+          mIntonation = kIntonation_Equal;
+          mCustomScaleDescription = "connection to oddsound failed";
+       }
+   }
+   else if (IsUsingSclFileScale())
+   {
+       try
+       {
+           Tunings::Scale scale;
+           Tunings::KeyboardMapping mapping;
+           if (mSclContents.empty())
+               scale = Tunings::evenTemperament12NoteScale();
+           else
+               scale = Tunings::parseSCLData(mSclContents);
+
+           mTet = scale.count;
+
+           if (mKbmContents.empty())
+               mapping = Tunings::startScaleOnAndTuneNoteTo(60, (int)mReferencePitch, mReferenceFreq);
+           else
+               mapping = Tunings::parseKBMData(mKbmContents);
+
+           auto tuning = Tunings::Tuning(scale, mapping);
+           for (int i=0; i<256; ++i)
+           {
+               mTuningTable[i] = tuning.logScaledFrequencyForMidiNote(i-128);
+           }
+
+           mCustomScaleDescription = "tet: " + ofToString(mTet) + "\nscale: " + scale.description + "\nmapping: " + mapping.rawText;
+       }
+       catch(const Tunings::TuningError &e)
+       {
+           mIntonation = kIntonation_Equal;
+           ofLog() << e.what();
+       }
+   }
+   else if (mIntonation == kIntonation_Equal)
    {
       //no table
    }
-   if (mIntonation == kIntonation_Rational)
+   else if (mIntonation == kIntonation_Rational)
    {
       for (int i=0; i<256; ++i)
          mTuningTable[i] = RationalizeNumber(Pow2(float(i-128)/mTet));
    }
-   if (mIntonation == kIntonation_Pythagorean ||
+   else if (mIntonation == kIntonation_Pythagorean ||
        mIntonation == kIntonation_Just ||
        mIntonation == kIntonation_Meantone)
    {
@@ -545,47 +640,6 @@ void Scale::UpdateTuningTable()
               mTuningTable[i] *= ratio;
       }
    }
-   if( mIntonation == kIntonation_ODDSOUNDMTS)
-   {
-       if (oddsound_mts_client == nullptr)
-       {
-           ofLog() << "Connecting to oddsound mts";
-           oddsound_mts_client = MTS_RegisterClient();
-       }
-
-       if (oddsound_mts_client == nullptr)
-       {
-           mIntonation = kIntonation_Equal;
-           return;
-       }
-   }
-   if (mIntonation== kIntonation_SCLKBM)
-   {
-       try {
-           Tunings::Scale scale;
-           Tunings::KeyboardMapping mapping;
-           if (mSclContents.empty())
-               scale = Tunings::evenTemperament12NoteScale();
-           else
-               scale = Tunings::parseSCLData(mSclContents);
-
-           if (mKbmContents.empty())
-               mapping = Tunings::startScaleOnAndTuneNoteTo(60, (int)mReferencePitch, mReferenceFreq);
-           else
-               mapping = Tunings::parseKBMData(mKbmContents);
-
-           auto tuning = Tunings::Tuning(scale, mapping);
-           for (int i=0; i<256; ++i)
-           {
-               mTuningTable[i] = tuning.logScaledFrequencyForMidiNote(i-128);
-           }
-       }
-       catch(const Tunings::TuningError &e)
-       {
-           mIntonation = kIntonation_Equal;
-           ofLog() << e.what();
-       }
-   }
 }
 
 float Scale::GetTuningTableRatio(int semitonesFromCenter)
@@ -598,7 +652,7 @@ void Scale::DropdownUpdated(DropdownList* list, int oldVal)
    if (list == mRootSelector)
       SetRoot(mScale.mScaleRoot, true);
    if (list == mScaleSelector)
-      SetScaleType(mScales[mScaleIndex].mName, true);
+      SetScaleType(list->GetLabel(mScaleIndex), true);
    if (list == mIntonationSelector)
       UpdateTuningTable();
 }
@@ -622,21 +676,23 @@ void Scale::TextEntryComplete(TextEntry* entry)
       UpdateTuningTable();
       NotifyListeners();
    }
+   if (entry == mReferenceFreqEntry || entry == mReferencePitchEntry)
+      UpdateTuningTable();
 }
 
 void Scale::ButtonClicked(ClickButton *button)
 {
-    if (button == mLoadSCL || button == mLoadKBM)
+    if (button == mLoadSCLButton || button == mLoadKBMButton)
     {
         std::string prompt = "Load ";
-        prompt += (button == mLoadSCL) ? "SCL" : "KBM";
-        std::string pat = (button == mLoadSCL) ? "*.scl" : "*.kbm";
-        juce::FileChooser chooser( prompt, juce::File(), pat, true, false, TheSynth->GetMainComponent()->getTopLevelComponent());
+        prompt += (button == mLoadSCLButton) ? "SCL" : "KBM";
+        std::string pat = (button == mLoadSCLButton) ? "*.scl" : "*.kbm";
+        juce::FileChooser chooser( prompt, juce::File(ofToDataPath("")), pat, true, false, TheSynth->GetMainComponent()->getTopLevelComponent());
         if (chooser.browseForFileToOpen())
         {
             auto file = chooser.getResult();
             std::cout << file.getFullPathName().toStdString() << std::endl;
-            if (button == mLoadSCL)
+            if (button == mLoadSCLButton)
             {
                 mSclContents = file.loadFileAsString().toStdString();
             }
@@ -698,9 +754,10 @@ void ScalePitches::SetRoot(int root)
 void ScalePitches::SetScaleType(std::string type)
 {
    mScaleType = type;
+
    int newFlip = (mScalePitchesFlip == 0) ? 1 : 0;
    mScalePitches[newFlip] = TheScale->GetPitchesForScale(type);
-   mScalePitchesFlip = newFlip;
+   mScalePitchesFlip = newFlip;   
 }
 
 void ScalePitches::SetAccidentals(const std::vector<Accidental>& accidentals)
@@ -769,8 +826,20 @@ void ScalePitches::GetChordDegreeAndAccidentals(const Chord& chord, int& degree,
    }
 }
 
+int ScalePitches::NumTonesInScale() const
+{
+   int numTones = (int)mScalePitches[mScalePitchesFlip].size();
+   if (numTones == 0)
+      numTones = TheScale->GetTet();
+   return numTones;
+}
+
 int ScalePitches::GetScalePitch(int index) const
 {
+   if (mScalePitches[mScalePitchesFlip].empty())
+      return index;
+
+   assert(index >= 0 && index < mScalePitches[mScalePitchesFlip].size());
    int pitch = mScalePitches[mScalePitchesFlip][index];
    
    for (int i=0; i<mAccidentals.size(); ++i)
@@ -812,6 +881,9 @@ bool ScalePitches::IsInPentatonic(int pitch) const
 
 bool ScalePitches::IsInScale(int pitch) const
 {
+   if (mScalePitches[mScalePitchesFlip].empty())
+      return true;
+
    pitch -= mScaleRoot;
    pitch += TheScale->GetTet();
    if (pitch < 0)
@@ -829,15 +901,15 @@ bool ScalePitches::IsInScale(int pitch) const
 
 int ScalePitches::GetPitchFromTone(int n) const
 {
-   int numTones = (int)mScalePitches[mScalePitchesFlip].size();
-   assert(numTones > 0);
-   int octave = n/numTones;
+   int numTones = NumTonesInScale();
+
+   int octave = n / numTones;
    while (n<0)
    {
-      n+=numTones;
+      n += numTones;
       --octave;
    }
-   int degree = n%numTones;
+   int degree = n % numTones;
    
    return GetScalePitch(degree) + TheScale->GetTet()*octave + mScaleRoot;
 }

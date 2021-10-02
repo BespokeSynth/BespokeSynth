@@ -583,7 +583,8 @@ void ChaosEngine::ReadSongs()
    
    const ofxJSONElement& songs = root["songs"];
    mSongs.resize(songs.size());
-   for (int i=0; i<songs.size(); ++i)
+   //TODO(Ryan) this is broken. but is it worth reviving?
+   /*for (int i=0; i<songs.size(); ++i)
    {
       const ofxJSONElement& song = songs[i];
       mSongs[i].mName = song["name"].asString();
@@ -624,7 +625,7 @@ void ChaosEngine::ReadSongs()
             mSongs[i].mSections[j].mChords.push_back(ProgressionChord(chordInfo,scale));
          }
       }
-   }
+   }*/
    
    for (int i=0; i<mSongs.size(); ++i)
       mSongDropdown->AddLabel(mSongs[i].mName.c_str(), i);

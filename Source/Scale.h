@@ -34,6 +34,7 @@
 #include "Chord.h"
 #include "TextEntry.h"
 #include "ChordDatabase.h"
+#include <atomic>
 
 class IScaleListener
 {
@@ -59,7 +60,7 @@ struct ScalePitches
    int mScaleRoot;
    std::string mScaleType;
    std::vector<int> mScalePitches[2]; //double-buffered to avoid thread safety issues when modifying
-   int mScalePitchesFlip{0};
+   std::atomic<int> mScalePitchesFlip{0};
    std::vector<Accidental> mAccidentals;
    
    void SetRoot(int root);
@@ -72,13 +73,12 @@ struct ScalePitches
    void GetChordDegreeAndAccidentals(const Chord& chord, int& degree, std::vector<Accidental>& accidentals) const;
    int GetScalePitch(int index) const;
    
-   int MakeDiatonic(int pitch) const;
    bool IsRoot(int pitch) const;
    bool IsInPentatonic(int pitch) const;
    bool IsInScale(int pitch) const;
    int GetPitchFromTone(int n) const;
    int GetToneFromPitch(int pitch) const;
-   int NumPitchesInScale() const { return (int)mScalePitches[mScalePitchesFlip].size(); }
+   int NumTonesInScale() const;
 };
 
 class MTSClient;
@@ -120,7 +120,7 @@ public:
    void SetRandomSeptatonicScale();
    int GetNumScaleTypes() { return (int)mScales.size(); }
    std::string GetScaleName(int index) { return mScales[index].mName; }
-   int NumPitchesInScale() const { return mScale.NumPitchesInScale(); }
+   int NumTonesInScale() const { return mScale.NumTonesInScale(); }
    int GetTet() const { return mTet; }
 
    float PitchToFreq(float pitch);
@@ -148,7 +148,7 @@ private:
    
    //IDrawableModule
    void DrawModule() override;
-   void GetModuleDimensions(float& width, float& height) override { width = 164; height = 82; }
+   void GetModuleDimensions(float& width, float& height) override;
    bool Enabled() const override { return true; }
    
    void NotifyListeners();
@@ -156,6 +156,9 @@ private:
    float RationalizeNumber(float input);
    void UpdateTuningTable();
    float GetTuningTableRatio(int semitonesFromCenter);
+   bool IsUsingOddsoundScale() const;
+   bool IsUsingSclFileScale() const;
+   bool IsUsingCustomScale() const { return IsUsingOddsoundScale() || IsUsingSclFileScale(); }
    
    enum IntonationMode
    {
@@ -163,9 +166,7 @@ private:
       kIntonation_Just,
       kIntonation_Pythagorean,
       kIntonation_Meantone,
-      kIntonation_Rational,
-      kIntonation_SCLKBM,
-      kIntonation_ODDSOUNDMTS
+      kIntonation_Rational
    };
    
    ScalePitches mScale;
@@ -175,8 +176,8 @@ private:
    IntSlider* mScaleDegreeSlider;
    int mScaleDegree;
 
-   ClickButton* mLoadSCL{nullptr};
-   ClickButton* mLoadKBM{nullptr};
+   ClickButton* mLoadSCLButton{nullptr};
+   ClickButton* mLoadKBMButton{nullptr};
    
    std::vector<ScaleInfo> mScales;
    int mNumSeptatonicScales;
@@ -195,9 +196,11 @@ private:
    
    ChordDatabase mChordDatabase;
 
-   MTSClient *oddsound_mts_client{nullptr};
+   MTSClient* mOddsoundMTSClient{nullptr};
 
-   std::string mSclContents, mKbmContents;
+   std::string mSclContents;
+   std::string mKbmContents;
+   std::string mCustomScaleDescription;
 };
 
 extern Scale* TheScale;
