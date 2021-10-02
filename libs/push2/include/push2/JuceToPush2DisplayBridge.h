@@ -20,10 +20,14 @@
 
 #pragma once
 
-#include "Push2-Display.h"
+#include "push2/Result.h"
+
+#include <memory>
 
 namespace ableton
 {
+  class Push2Display;
+
   /*!
    *  Implements a bridge between juce::Graphics and push2 display format.
    */
@@ -33,6 +37,7 @@ namespace ableton
   public:
 
     Push2DisplayBridge();
+    ~Push2DisplayBridge();
 
     /*!
      * Initialises the bridge
@@ -40,7 +45,13 @@ namespace ableton
      *  \return the result of the initialisation process
      */
 
-    NBase::Result Init(ableton::Push2Display& display);
+    NBase::Result Init();
+
+    /*!
+     *  \return true if this bridge is initialized
+     */
+
+    bool IsInitialized() const { return bool{push2Display_}; }
 
     /*!
      * Tells the bridge the drawing is done and the bitmap can be sent to
@@ -50,6 +61,6 @@ namespace ableton
     void Flip(unsigned char* pixels);
 
   private:
-    ableton::Push2Display* push2Display_;    /*< The push display the bridge works on */
+    std::unique_ptr<Push2Display> push2Display_;    /*< The push display the bridge works on */
   };
 }

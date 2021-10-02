@@ -20,8 +20,8 @@
 
 #pragma once
 
-#include "Result.h"
-#include "Push2-Bitmap.h"
+#include "push2/Result.h"
+#include "push2/Push2-Bitmap.h"
 
 #include <thread>
 #include <assert.h>

@@ -20,10 +20,9 @@
 
 #pragma once
 
+#include "push2/Push2-Bitmap.h"
 #include "push2/Result.h"
-#include "push2/Push2-UsbCommunicator.h"
-#include <memory>
-#include <atomic>
+#include "Push2-UsbCommunicator.h"
 
 namespace ableton
 {
@@ -34,20 +33,9 @@ namespace ableton
   public:
     using pixel_t = Push2DisplayBitmap::pixel_t;
 
-    Push2Display()
-    {
-      pixel_t* pData = dataSource_;
-      for (uint8_t line = 0; line < kDataSourceHeight; line++)
-      {
-        memset(pData, 0, kDataSourceWidth*sizeof(pixel_t));
-        pData += kDataSourceWidth;
-      }
-    }
+    static Push2Display *create();
 
-    NBase::Result Init()
-    {
-      return communicator_.Init(dataSource_);
-    }
+    NBase::Result Init();
 
     // Transfers the bitmap into the output buffer sent to
     // the push display. The push display buffer has a larger stride
@@ -71,10 +59,14 @@ namespace ableton
     }
 
   private:
+    Push2Display() = default;
+
     static const int kDataSourceWidth = 1024;
     static const int kDataSourceHeight = 160;
 
-    pixel_t dataSource_[kDataSourceWidth * kDataSourceHeight];
+    pixel_t dataSource_[kDataSourceWidth * kDataSourceHeight]{};
+#if BESPOKE_PUSH2_SUPPORT
     UsbCommunicator communicator_;
+#endif
   };
 }
