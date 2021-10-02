@@ -510,16 +510,6 @@ elseif (WIN32)
         target_include_directories(BespokeSynth PRIVATE ${BESPOKE_ASIO_SDK_LOCATION}/common)
     endif()
 
-    if (${CMAKE_SIZEOF_VOID_P} EQUAL 4)
-        message(STATUS "Bespoke: Linking With ${CMAKE_SOURCE_DIR}/Source/3DxWare/Lib/x86/siapp.lib")
-        target_link_libraries(BespokeSynth PRIVATE
-                ${CMAKE_SOURCE_DIR}/Source/3dxWare/Lib/x86/siapp.lib)
-    else ()
-        message(STATUS "Bespoke: Linking With ${CMAKE_SOURCE_DIR}/Source/3DxWare/Lib/x64/siapp.lib")
-        target_link_libraries(BespokeSynth PRIVATE
-                ${CMAKE_SOURCE_DIR}/Source/3DxWare/Lib/x64/siapp.lib)
-    endif ()
-
     # Post install tasks - copy resources to the exe output directory
     set_target_properties(BespokeSynth PROPERTIES VS_DEBUGGER_WORKING_DIRECTORY "$<TARGET_FILE_DIR:BespokeSynth>"
                                     VS_DEBUGGER_COMMAND           "$<TARGET_FILE:BespokeSynth>"
@@ -553,6 +543,7 @@ endif ()
 
 target_include_directories(BespokeSynth PRIVATE ${Python_INCLUDE_DIRS})
 target_link_libraries(BespokeSynth PRIVATE
+        bespoke::3dxware
         bespoke::freeverb
         bespoke::json
         bespoke::nanovg
