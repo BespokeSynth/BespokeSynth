@@ -257,7 +257,7 @@ void SpawnListManager::SetUpVstDropdown(bool rescan)
 {
    std::vector<std::string> vsts;
    VSTLookup::GetAvailableVSTs(vsts, rescan);
-   vsts.push_back(kRescanPluginsLabel);
+   vsts.insert(vsts.begin(), kRescanPluginsLabel);
    mVstPlugins.SetList(vsts, "vstplugin");
 }
 
