@@ -27,7 +27,6 @@
 
 #pragma once
 
-#include "push2/JuceToPush2DisplayBridge.h"
 #include "IDrawableModule.h"
 #include "MidiDevice.h"
 #include "MidiController.h"
@@ -77,7 +76,7 @@ private:
    void GetModuleDimensions(float& width, float& height) override { width = mWidth; height = mHeight; }
    void OnClicked(int x, int y, bool right) override;
    
-   NBase::Result Initialize();
+   bool Initialize();
    void DrawToFramebuffer(NVGcontext* vg, NVGLUframebuffer* fb, float t, float pxRatio);
    void RenderPush2Display();
    
@@ -102,10 +101,6 @@ private:
    ofColor GetSpawnGridColor(int index, ModuleType moduleType) const;
    int GetSpawnGridPadColor(int index, ModuleType moduleType) const;
    
-   bool mDisplayInitialized;
-   
-   static ableton::Push2DisplayBridge* sPush2Bridge;      /* The bridge allowing to use juce::graphics for push */
-   static ableton::Push2Display* sPush2Display;           /* The low-level push2 class */
    unsigned char* mPixels;
    const int kPixelRatio = 1;
    
@@ -161,6 +156,7 @@ private:
    SpawnListManager mSpawnLists;
    int mPendingSpawnPitch;
    int mSelectedGridSpawnListIndex;
+   std::string mPushBridgeInitErrMsg;
 };
 
 //https://raw.githubusercontent.com/Ableton/push-interface/master/doc/MidiMapping.png

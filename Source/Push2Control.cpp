@@ -49,13 +49,16 @@ using namespace juce::gl;
 #include "DropdownList.h"
 #include "FloatSliderLFOControl.h"
 #include "UserPrefsEditor.h"
+#include "push2/JuceToPush2DisplayBridge.h"
+#include "push2/Push2-Bitmap.h"
 
 bool Push2Control::sDrawingPush2Display = false;
 NVGcontext* Push2Control::sVG = nullptr;
 NVGLUframebuffer* Push2Control::sFB = nullptr;
-ableton::Push2DisplayBridge* Push2Control::sPush2Bridge = nullptr;
-ableton::Push2Display* Push2Control::sPush2Display = nullptr;
 IUIControl* Push2Control::sBindToUIControl = nullptr;
+namespace {
+   ableton::Push2DisplayBridge ThePushBridge; // The bridge allowing to use juce::graphics for push
+}
 
 //https://raw.githubusercontent.com/Ableton/push-interface/master/doc/MidiMapping.png
 
@@ -89,8 +92,7 @@ namespace
 #include "leathers/pop"
 
 Push2Control::Push2Control()
-: mDisplayInitialized(false)
-, mDisplayModule(nullptr)
+: mDisplayModule(nullptr)
 , mDevice(this)
 , mModuleColumnOffset(0)
 , mModuleColumnOffsetSmoothed(0)
@@ -110,17 +112,7 @@ Push2Control::Push2Control()
 , mSpawnLists(this)
 , mSelectedGridSpawnListIndex(-1)
 {
-   NBase::Result result = Initialize();
-   if (result.Succeeded())
-   {
-      ofLog() << "push 2 connected";
-      mDisplayInitialized = true;
-   }
-   else
-   {
-      ofLog() << "push 2 failed to connect";
-      mDisplayInitialized = false;
-   }
+   Initialize();
    for (int i=0; i<128*2; ++i)
       mLedState[i] = -1;
    for (int i=0; i<8*8; ++i)
@@ -171,10 +163,10 @@ void Push2Control::DrawModule()
    if (Minimized() || IsVisible() == false)
       return;
    
-   if (!mDisplayInitialized)
+   if (!ThePushBridge.IsInitialized())
    {
       ofSetColor(255, 0, 0, gModuleDrawAlpha);
-      DrawTextNormal("no push 2 found", 3, 15);
+      DrawTextNormal(mPushBridgeInitErrMsg, 3, 15);
    }
 }
 
@@ -208,7 +200,7 @@ void Push2Control::DrawDisplayModuleRect(ofRectangle rect)
  
 void Push2Control::PostRender()
 {
-   if (mDisplayInitialized)
+   if (ThePushBridge.IsInitialized())
       RenderPush2Display();
 }
 
@@ -216,19 +208,9 @@ void Push2Control::OnClicked(int x, int y, bool right)
 {
    IDrawableModule::OnClicked(x,y,right);
    
-   if (!mDisplayInitialized)
+   if (!ThePushBridge.IsInitialized())
    {
-      NBase::Result result = Initialize();
-      if (result.Succeeded())
-      {
-         ofLog() << "push 2 connected";
-         mDisplayInitialized = true;
-      }
-      else
-      {
-         ofLog() << "push 2 failed to connect";
-         mDisplayInitialized = false;
-      }
+      Initialize();
    }
 }
 
@@ -260,23 +242,16 @@ void Push2Control::CreateStaticFramebuffer()
    assert(sFB);
 }
 
-NBase::Result Push2Control::Initialize()
+bool Push2Control::Initialize()
 {
-   if (sPush2Display == nullptr)
+   if (!ThePushBridge.IsInitialized())
    {
-      ableton::Push2Display* push2Display = new ableton::Push2Display();
-      ableton::Push2DisplayBridge* push2Bridge = new ableton::Push2DisplayBridge();
-
-      // First we initialise the low level push2 object
-      NBase::Result result = push2Display->Init();
-      RETURN_IF_FAILED_MESSAGE(result, "Failed to init push2");
-
-      // Then we initialise the juce to push bridge
-      result = push2Bridge->Init(*push2Display);
-      RETURN_IF_FAILED_MESSAGE(result, "Failed to init bridge");
-
-      sPush2Display = push2Display;
-      sPush2Bridge = push2Bridge;
+      if (auto result = ThePushBridge.Init(); result.Failed()) {
+         mPushBridgeInitErrMsg = result.GetDescription();
+         ofLog() << mPushBridgeInitErrMsg;
+         return false;
+      }
+      ofLog() << "push 2 connected";
    }
    
    const auto width = ableton::Push2DisplayBitmap::kWidth;
@@ -302,7 +277,7 @@ NBase::Result Push2Control::Initialize()
       }
    }
 
-   return NBase::Result::NoError;
+   return true;
 }
 
 void Push2Control::DrawToFramebuffer(NVGcontext* vg, NVGLUframebuffer* fb, float t, float pxRatio)
@@ -819,7 +794,7 @@ void Push2Control::RenderPush2Display()
    gNanoVG = mainVG;
 
    // Tells the bridge we're done with drawing and the frame can be sent to the display
-   sPush2Bridge->Flip(mPixels);
+   ThePushBridge.Flip(mPixels);
 }
 
 void Push2Control::Poll()
