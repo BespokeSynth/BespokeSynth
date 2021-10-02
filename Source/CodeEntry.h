@@ -192,6 +192,13 @@ private:
    ofColor opColor{(int)(0.9*255), (int)(0.3*255), (int)(0.6*255), 255};
    ofColor commaColor{(int)(0.5*255), (int)(0.6*255), (int)(0.5*255), 255};
    ofColor commentColor{(int)(0.5*255), (int)(0.5*255), (int)(0.5*255), 255};
+   ofColor selectedOverlay{255,255,255,50};
+   ofColor jediBg{70,70,70};
+   ofColor jediIndexBg{100,100,100};
+   ofColor jediAutoComplete{200,200,200};
+   ofColor jediAutoCompleteRest{255,255,255};
+   ofColor jediParams{170,170,255};
+   ofColor jediParamsHighlight{230,230,255};
    ofColor unknownColor = ofColor::white;
 
    float mFontSize = 14;
