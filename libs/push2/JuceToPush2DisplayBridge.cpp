@@ -18,9 +18,8 @@
 // FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
 // DEALINGS IN THE SOFTWARE.
 
-#include "JuceToPush2DisplayBridge.h"
-#include "Push2-Bitmap.h"
-#include "Macros.h"
+#include "push2/JuceToPush2DisplayBridge.h"
+#include "push2/Push2-Bitmap.h"
 #include <assert.h>
 
 using namespace ableton;

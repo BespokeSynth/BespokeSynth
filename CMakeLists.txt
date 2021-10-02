@@ -43,9 +43,7 @@ message(STATUS "       : Version is ${Python_VERSION}")
 message(STATUS "       : Executable is ${Python_EXECUTABLE}")
 message(STATUS "       : Library is ${Python_LIBRARIES}")
 
-message(STATUS "Bespoke: Configuring PyBind")
-set(PYBIND11_NOPYTHON TRUE)
-add_subdirectory(libs/pybind11 CONFIG)
+add_subdirectory(libs)
 
 if (NOT BESPOKE_JUCE_LOCATION)
     set(BESPOKE_JUCE_LOCATION "libs/JUCE" CACHE STRING "" FORCE)
@@ -62,27 +60,12 @@ else()
     message( STATUS "Bespoke: No VST2 support" )
 endif()
 
-add_subdirectory(libs/xwax)
-add_subdirectory(libs/freeverb)
-add_subdirectory(libs/leathers)
-add_subdirectory(libs/json)
-add_subdirectory(libs/nanovg)
-
-add_subdirectory(libs/tuning-library EXCLUDE_FROM_ALL)
-add_subdirectory(libs/oddsound-mts EXCLUDE_FROM_ALL)
-
 # Generate build time info for the cpp
 configure_file(${CMAKE_SOURCE_DIR}/Source/VersionInfo.cpp.in
         ${CMAKE_BINARY_DIR}/geninclude/VersionInfo.cpp)
 
 set(BESPOKE_SOURCE_LIST
         Source/glew/Bespoke_glew.c
-
-
-        Source/push2/push2/JuceToPush2DisplayBridge.cpp
-        Source/push2/libusb/libusb_platform_wrapper.c
-        Source/push2/push2/Push2-Usb-Communicator.cpp
-        Source/push2/Result.cpp
 
         Source/PerlinNoise.cpp
         Source/BitcrushEffect.cpp
@@ -420,9 +403,7 @@ target_sources(BespokeSynth PRIVATE ${BESPOKE_SOURCE_LIST})
 target_include_directories(BespokeSynth PRIVATE
         Source
         Source/glew/include
-        Source/push2
-        Source/push2/libusb
-        Source/push2/modules/libusb)
+        )
 
 target_compile_definitions(BespokeSynth PUBLIC
         JUCE_MODAL_LOOPS_PERMITTED=1
@@ -521,9 +502,6 @@ elseif (WIN32)
             BESPOKE_WINDOWS=1
             GLEW_STATIC=0
             GL_GLEXT_PROTOTYPES=0
-            POLL_WINDOWS=0
-            THREADS_WINDOWS=0
-            HAVE_STRUCT_TIMESPEC
             )
 
     if (BESPOKE_ASIO_SDK_LOCATION)
@@ -558,22 +536,6 @@ else ()
             GL_GLEXT_PROTOTYPES=0
             )
 
-    find_library(LIBUSB_1_LIBRARY 
-       NAMES
-         usb-1.0 usb
-       PATHS
-         /usr/lib
-         /usr/local/lib
-         /opt/local/lib
-         /sw/lib
-    )
-    if (NOT LIBUSB_1_LIBRARY)
-       message(ERROR "Bespoke: Cannot resolve libusb. Did you install libusb-1.0.0-dev package?")
-    endif()
-    message(STATUS "Bespoke: Using USB from ${LIBUSB_1_LIBRARY}")
-
-    target_link_libraries(BespokeSynth PRIVATE ${LIBUSB_1_LIBRARY})
-
     # Ant put resources with the exe
     get_target_property(OUTDIR BespokeSynth RUNTIME_OUTPUT_DIRECTORY)
     add_custom_command(TARGET BespokeSynth
@@ -594,6 +556,7 @@ target_link_libraries(BespokeSynth PRIVATE
         bespoke::freeverb
         bespoke::json
         bespoke::nanovg
+        bespoke::push2
         bespoke::xwax
         bespoke::leathers
 

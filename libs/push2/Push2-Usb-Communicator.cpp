@@ -18,7 +18,7 @@
 // FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
 // DEALINGS IN THE SOFTWARE.
 
-#include "Push2-UsbCommunicator.h"
+#include "push2/Push2-UsbCommunicator.h"
 
 #include <cstdint>
 
@@ -33,7 +33,7 @@
 #pragma warning(disable:4200)
 #endif
 
-#include "../libusb/libusb.h"
+#include "libusb.h"
 
 //------------------------------------------------------------------------------
 

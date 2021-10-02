@@ -18,7 +18,7 @@
 // FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
 // DEALINGS IN THE SOFTWARE.
 
-#include "Result.h"
+#include "push2/Result.h"
 #include <assert.h>
 
 using namespace NBase;
