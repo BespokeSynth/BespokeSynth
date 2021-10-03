@@ -24,7 +24,7 @@ using namespace juce;
 #include "SpaceMouseControl.h"
 
 #ifdef JUCE_WINDOWS
-#include <Windows.h>
+#include <windows.h>
 #endif
 
 //==============================================================================

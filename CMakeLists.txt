@@ -563,6 +563,8 @@ target_link_libraries(BespokeSynth PRIVATE
         juce::juce_opengl
         juce::juce_osc
         juce::juce_gui_basics
+
+        $<$<BOOL:${MINGW}>:dbghelp>
         )
 
 target_link_libraries(BespokeSynth PRIVATE ${Python_LIBRARIES})

@@ -37,9 +37,9 @@
 #include "ClickButton.h"
 
 #if BESPOKE_WINDOWS
-#include <Windows.h>
-#include <DbgHelp.h>
-#include <Winbase.h>
+#include <windows.h>
+#include <dbghelp.h>
+#include <winbase.h>
 #endif
 
 ModularSynth* TheSynth = nullptr;
