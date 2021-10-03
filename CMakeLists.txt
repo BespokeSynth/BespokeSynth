@@ -310,7 +310,6 @@ set(BESPOKE_SOURCE_LIST
         Source/ADSR.cpp
         Source/ADSRDisplay.cpp
         Source/ArrangementController.cpp
-        Source/Bespoke_Platform.cpp
         Source/BiquadFilter.cpp
         Source/Canvas.cpp
         Source/CanvasControls.cpp
@@ -364,6 +363,8 @@ set(BESPOKE_SOURCE_LIST
         Source/OpenFrameworksPort.cpp
         Source/OscController.cpp
         Source/Oscillator.cpp
+        Source/PSMoveController.cpp
+        Source/PSMoveMgr.cpp
         Source/PatchCable.cpp
         Source/PatchCableSource.cpp
         Source/PeakTracker.cpp
@@ -441,7 +442,7 @@ if (APPLE)
             )
     target_sources(BespokeSynth PRIVATE
             Source/CFMessaging/Bespoke_CFMessaging.cpp
-            Source/psmove/Bespoke_PSMove.c
+            Source/KompleteKontrol.cpp
             )
     target_link_libraries(BespokeSynth PRIVATE
             "-framework CoreAudioKit")
@@ -547,6 +548,7 @@ target_link_libraries(BespokeSynth PRIVATE
         bespoke::freeverb
         bespoke::json
         bespoke::nanovg
+        bespoke::psmove
         bespoke::push2
         bespoke::xwax
         bespoke::leathers

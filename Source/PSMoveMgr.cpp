@@ -1,7 +1,6 @@
 #include "PSMoveMgr.h"
-#ifndef JUCE_WINDOWS
-#include <unistd.h>
-#endif
+#include <chrono>
+#include <thread>
 
 //--------------------------------------------------------------
 void PSMoveMgr::Setup()
@@ -42,16 +41,14 @@ _PSMove* PSMoveMgr::SetUpMove(int id)
          lastBTController = j;
       }
    }
-   
-#ifndef JUCE_WINDOWS
+
    for (int i=0; i<10; i++) {
       psmove_set_leds(move, 0, 255*(i%3==0), 0);
       //psmove_set_rumble(move, 255*(i%2));
       psmove_update_leds(move);
-      usleep(10000*(i%10));
+      std::this_thread::sleep_for(std::chrono::milliseconds{10 * (i % 10)});
    }
-#endif
-   
+
    for (int i=250; i>=0; i-=5) {
       psmove_set_leds(move, i, i, 0);
       psmove_set_rumble(move, 0);

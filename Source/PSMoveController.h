@@ -28,7 +28,7 @@
 
 #include <iostream>
 #include "IDrawableModule.h"
-#include "psmove/PSMoveMgr.h"
+#include "PSMoveMgr.h"
 #include "Checkbox.h"
 #include "ClickButton.h"
 #include "Ramp.h"

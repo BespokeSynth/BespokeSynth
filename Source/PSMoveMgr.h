@@ -1,7 +1,7 @@
 #pragma once
 
-#include "../OpenFrameworksPort.h"
-#include "psmove.h"
+#include "OpenFrameworksPort.h"
+#include "psmove/psmove.h"
 
 struct _PSMove;
 
