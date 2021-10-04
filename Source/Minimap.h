@@ -38,7 +38,7 @@ class Minimap : public IDrawableModule
     ~Minimap();
     void DrawModule() override;
     bool AlwaysOnTop() override;
-    string GetTitleLabel() override;
+    std::string GetTitleLabel() override;
     void GetDimensions(float & width, float & height) override;
   private:
     bool IsSingleton() const override;
