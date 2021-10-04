@@ -16,7 +16,7 @@ bool Minimap::IsSingleton() const { return true; }
 
 bool Minimap::HasTitleBar() const { return false; }
 
-string Minimap::GetTitleLabel() { return ""; }
+std::string Minimap::GetTitleLabel() { return ""; }
 
 void Minimap::GetDimensions(float& width, float& height)
 {
@@ -38,7 +38,7 @@ void Minimap::GetDimensions(float& width, float& height)
 
 void Minimap::ComputeBoundingBox(ofRectangle& rect)
 {
-    vector<IDrawableModule*> modules;
+    std::vector<IDrawableModule*> modules;
     TheSynth->GetRootContainer()->GetAllModules(modules);
 
     if (modules.empty())
@@ -88,7 +88,7 @@ ofVec2f Minimap::CoordsToViewport(ofRectangle& boundingBox, float x, float y)
 
 void Minimap::DrawModulesOnMinimap(ofRectangle& boundingBox)
 {
-    vector<IDrawableModule*> modules;
+    std::vector<IDrawableModule*> modules;
     TheSynth->GetRootContainer()->GetAllModules(modules);
 
     ofPushStyle();
