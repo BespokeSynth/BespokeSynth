@@ -550,13 +550,14 @@ void VSTPlugin::Process(double time)
             while (midiIt != mMidiBuffer.end())
             {
                auto msg = (*midiIt).getMessage();
+               auto tMidi = time + (*midiIt).samplePosition * gInvSampleRateMs;
                if (msg.isNoteOn())
                {
-                  mMidiOutCable->PlayNoteOutput(time, msg.getNoteNumber(), msg.getVelocity());
+                  mMidiOutCable->PlayNoteOutput(tMidi, msg.getNoteNumber(), msg.getVelocity());
                }
                else if (msg.isNoteOff())
                {
-                  mMidiOutCable->PlayNoteOutput(time, msg.getNoteNumber(), 0);
+                  mMidiOutCable->PlayNoteOutput(tMidi, msg.getNoteNumber(), 0);
                }
                else if (msg.isController())
                {
