@@ -133,12 +133,12 @@ void KeyboardDisplay::MouseReleased()
 
 int KeyboardDisplay::RootKey() const
 {
-   return TheScale->GetTet() * mRootOctave;
+   return TheScale->GetPitchesPerOctave() * mRootOctave;
 }
 
 int KeyboardDisplay::NumKeys() const
 {
-   return TheScale->GetTet() * mNumOctaves + 1;
+   return TheScale->GetPitchesPerOctave() * mNumOctaves + 1;
 }
 
 void KeyboardDisplay::SetPitchColor(int pitch)
@@ -221,7 +221,7 @@ ofRectangle KeyboardDisplay::GetKeyboardKeyRect(int pitch, int w, int h, bool& i
    
    pitch -= RootKey();
    
-   float offset = pitch/TheScale->GetTet() * (octaveWidth);
+   float offset = pitch/TheScale->GetPitchesPerOctave() * (octaveWidth);
    pitch %= 12;
    
    if ((pitch<=4&&pitch%2==0) || (pitch>=5&&pitch%2==1)) //white key

@@ -121,7 +121,7 @@ public:
    int GetNumScaleTypes() { return (int)mScales.size(); }
    std::string GetScaleName(int index) { return mScales[index].mName; }
    int NumTonesInScale() const { return mScale.NumTonesInScale(); }
-   int GetTet() const { return mTet; }
+   int GetPitchesPerOctave() const { return mPitchesPerOctave; }
 
    float PitchToFreq(float pitch);
    float FreqToPitch(float freq);
@@ -183,10 +183,10 @@ private:
    int mNumSeptatonicScales;
    int mScaleIndex;
    
-   int mTet;
+   int mPitchesPerOctave;
    float mReferenceFreq;
    float mReferencePitch;
-   TextEntry* mTetEntry;
+   TextEntry* mPitchesPerOctaveEntry;
    TextEntry* mReferenceFreqEntry;
    TextEntry* mReferencePitchEntry;
    IntonationMode mIntonation;

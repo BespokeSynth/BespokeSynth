@@ -249,7 +249,7 @@ void Arpeggiator::OnTimeEvent(double time)
       ArpNote current = mChord[mArpIndex];
       int outPitch = current.pitch;
          
-      outPitch += mCurrentOctaveOffset * TheScale->GetTet();
+      outPitch += mCurrentOctaveOffset * TheScale->GetPitchesPerOctave();
 
       
       if (mLastPitch == outPitch)   //same note, play noteoff first

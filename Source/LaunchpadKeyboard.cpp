@@ -310,7 +310,7 @@ void LaunchpadKeyboard::OnGridButton(int x, int y, float velocity, IGridControll
             break;
          }
       }
-      lowestPitch -= TheScale->GetTet();
+      lowestPitch -= TheScale->GetPitchesPerOctave();
    }
 }
 
@@ -466,7 +466,7 @@ int LaunchpadKeyboard::GridToPitch(int x, int y)
       {
          x -= 2;
       }
-      return TheScale->ScaleRoot() + x + 6*y + TheScale->GetTet()*mOctave;
+      return TheScale->ScaleRoot() + x + 6*y + TheScale->GetPitchesPerOctave()*mOctave;
    }
    if (mLayout == kChromatic)
    {
@@ -481,11 +481,11 @@ int LaunchpadKeyboard::GridToPitch(int x, int y)
             x -= 3;
          }
       }
-      return mRootNote + x + 5*y + TheScale->GetTet()*mOctave;
+      return mRootNote + x + 5*y + TheScale->GetPitchesPerOctave()*mOctave;
    }
    if (mLayout == kGuitar)
    {
-      return mRootNote + x + 5*y + TheScale->GetTet()*mOctave + (y>=4 ? -1 : 0);
+      return mRootNote + x + 5*y + TheScale->GetPitchesPerOctave()*mOctave + (y>=4 ? -1 : 0);
    }
    else if (mLayout == kDiatonic)
    {
@@ -504,18 +504,18 @@ int LaunchpadKeyboard::GridToPitch(int x, int y)
             x -= 4;
          }
       }
-      return TheScale->GetPitchFromTone(x + 3*y) + TheScale->GetTet()*(mRootNote/TheScale->GetTet()) + TheScale->GetTet()*mOctave;
+      return TheScale->GetPitchFromTone(x + 3*y) + TheScale->GetPitchesPerOctave()*(mRootNote/TheScale->GetPitchesPerOctave()) + TheScale->GetPitchesPerOctave()*mOctave;
    }
    else if (mLayout == kChordIndividual)
    {
       int note = x%mChords[mCurrentChord].size();
       int oct = x/mChords[mCurrentChord].size();
-      return TheScale->MakeDiatonic(TheScale->GetPitchFromTone(y) + mChords[mCurrentChord][note]) + TheScale->GetTet()*(mOctave+oct);
+      return TheScale->MakeDiatonic(TheScale->GetPitchFromTone(y) + mChords[mCurrentChord][note]) + TheScale->GetPitchesPerOctave()*(mOctave+oct);
    }
    else if (mLayout == kChord)
    {
       if (x < mChords.size())
-         return TheScale->GetPitchFromTone(y) + TheScale->GetTet()*mOctave;
+         return TheScale->GetPitchFromTone(y) + TheScale->GetPitchesPerOctave()*mOctave;
       else
          return INVALID_PITCH;
    }
@@ -533,14 +533,14 @@ int LaunchpadKeyboard::GridToPitch(int x, int y)
             {
                if (y%2 == 0)  // 7 or maj7
                {
-                  int nonDiatonic = TheScale->GetPitchFromTone(0) - 1 + TheScale->GetTet()*(mRootNote/TheScale->GetTet()) + TheScale->GetTet()*(mOctave+y/2);
+                  int nonDiatonic = TheScale->GetPitchFromTone(0) - 1 + TheScale->GetPitchesPerOctave()*(mRootNote/TheScale->GetPitchesPerOctave()) + TheScale->GetPitchesPerOctave()*(mOctave+y/2);
                   if (TheScale->IsInScale(nonDiatonic))
                      --nonDiatonic;
                   return nonDiatonic;
                }
                if (y%2 == 1)  // 4 or sharp 4
                {
-                  int nonDiatonic = TheScale->GetPitchFromTone(4) - 1 + TheScale->GetTet()*(mRootNote/TheScale->GetTet()) + TheScale->GetTet()*(mOctave+y/2);
+                  int nonDiatonic = TheScale->GetPitchFromTone(4) - 1 + TheScale->GetPitchesPerOctave()*(mRootNote/TheScale->GetPitchesPerOctave()) + TheScale->GetPitchesPerOctave()*(mOctave+y/2);
                   if (TheScale->IsInScale(nonDiatonic))
                      --nonDiatonic;
                   return nonDiatonic;
@@ -564,7 +564,7 @@ int LaunchpadKeyboard::GridToPitch(int x, int y)
       if (pos % 8 >= numPitchesInScale)
          return INVALID_PITCH;
       
-      return TheScale->GetPitchFromTone(tone) + TheScale->GetTet()*(mRootNote/TheScale->GetTet()) + TheScale->GetTet()*mOctave;
+      return TheScale->GetPitchFromTone(tone) + TheScale->GetPitchesPerOctave()*(mRootNote/TheScale->GetPitchesPerOctave()) + TheScale->GetPitchesPerOctave()*mOctave;
    }
    assert(false);
    return 0;
@@ -610,7 +610,7 @@ GridColor LaunchpadKeyboard::GetGridSquareColor(int x, int y)
 {
    int pitch = GridToPitch(x,y);
    bool inScale = TheScale->MakeDiatonic(pitch) == pitch;
-   bool isRoot = pitch%TheScale->GetTet() == TheScale->ScaleRoot();
+   bool isRoot = pitch%TheScale->GetPitchesPerOctave() == TheScale->ScaleRoot();
    bool isHeld = false;
    bool isSameOctave = false;
    bool isInPentatonic = pitch >= 0 && TheScale->IsInPentatonic(pitch);
@@ -628,7 +628,7 @@ GridColor LaunchpadKeyboard::GetGridSquareColor(int x, int y)
       isHeld = GetHeldVelocity(GridToPitch(x, y)) > 0;
       for (int i=0; i<128; ++i)
       {
-         if (i % TheScale->GetTet() == pitch % TheScale->GetTet() &&
+         if (i % TheScale->GetPitchesPerOctave() == pitch % TheScale->GetPitchesPerOctave() &&
              GetHeldVelocity(i) > 0)
             isSameOctave = true;
       }

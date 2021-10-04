@@ -99,7 +99,7 @@ std::string Chord::Name(bool withDegree, bool withAccidentals, ScalePitches* sca
 
 void Chord::SetFromDegreeAndScale(int degree, const ScalePitches& scale, int inversion /*= 0*/)
 {
-   mRootPitch = scale.GetPitchFromTone(degree) % TheScale->GetTet();
+   mRootPitch = scale.GetPitchFromTone(degree) % TheScale->GetPitchesPerOctave();
    mType = kChord_Unknown;
    if (scale.IsInScale(mRootPitch+4))
    {
