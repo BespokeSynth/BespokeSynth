@@ -61,7 +61,7 @@ namespace VSTLookup
    static juce::AudioPluginFormatManager sFormatManager;
    static juce::KnownPluginList sPluginList;
    
-   void GetAvailableVSTs(vector<string>& vsts, bool rescan)
+   void GetAvailableVSTs(std::vector<std::string>& vsts, bool rescan)
    {
       static bool sFirstTime = true;
       if (sFirstTime)
@@ -102,7 +102,7 @@ namespace VSTLookup
          vsts.push_back(types[i].fileOrIdentifier.toStdString());
       }
       
-      std::map<string, double> lastUsedTimes;
+      std::map<std::string, double> lastUsedTimes;
       
       if (juce::File(ofToDataPath("vst/used_vsts.json")).existsAsFile())
       {
@@ -112,12 +112,12 @@ namespace VSTLookup
 
          for (auto it = jsonList.begin(); it != jsonList.end(); ++it)
          {
-            string key = it.key().asString();
+            std::string key = it.key().asString();
             lastUsedTimes[key] = jsonList[key].asDouble();
          }
       }
       
-      std::sort(vsts.begin(), vsts.end(), [lastUsedTimes](string a, string b) {
+      std::sort(vsts.begin(), vsts.end(), [lastUsedTimes](std::string a, std::string b) {
          auto itA = lastUsedTimes.find(a);
          auto itB = lastUsedTimes.find(b);
          if (itA == lastUsedTimes.end() && itB == lastUsedTimes.end())
@@ -137,13 +137,13 @@ namespace VSTLookup
    void FillVSTList(DropdownList* list)
    {
       assert(list);
-      vector<string> vsts;
+      std::vector<std::string> vsts;
       GetAvailableVSTs(vsts, false);
       for (int i=0; i<vsts.size(); ++i)
          list->AddLabel(vsts[i].c_str(), i);
    }
    
-   string GetVSTPath(string vstName)
+   std::string GetVSTPath(std::string vstName)
    {
       if (juce::String(vstName).contains("/") || juce::String(vstName).contains("\\"))  //already a path
          return vstName;
@@ -223,12 +223,12 @@ void VSTPlugin::Exit()
    }
 }
 
-string VSTPlugin::GetTitleLabel()
+std::string VSTPlugin::GetTitleLabel()
 {
    return "vst: "+GetPluginName();
 }
 
-string VSTPlugin::GetPluginName()
+std::string VSTPlugin::GetPluginName()
 {
    if (mPlugin)
       return mPluginName;
@@ -237,7 +237,7 @@ string VSTPlugin::GetPluginName()
    return "no plugin loaded";
 }
 
-string VSTPlugin::GetPluginId()
+std::string VSTPlugin::GetPluginId()
 {
    if (mPlugin)
    {
@@ -247,12 +247,12 @@ string VSTPlugin::GetPluginId()
    return "no plugin loaded";
 }
 
-void VSTPlugin::SetVST(string vstName)
+void VSTPlugin::SetVST(std::string vstName)
 {
    ofLog() << "loading VST: " << vstName;
    
    mModuleSaveData.SetString("vst", vstName);
-   string path = VSTLookup::GetVSTPath(vstName);
+   std::string path = VSTLookup::GetVSTPath(vstName);
    
    //mark VST as used
    {
@@ -394,7 +394,7 @@ void VSTPlugin::CreateParameterSliders()
    {
       mParameterSliders[i].mValue = parameters[i]->getValue();
       juce::String name = parameters[i]->getName(32);
-      string label(name.getCharPointer());
+      std::string label(name.getCharPointer());
       try
       {
          int append = 0;
@@ -713,9 +713,9 @@ void VSTPlugin::OnVSTWindowClosed()
    mWindow.release();
 }
 
-vector<IUIControl*> VSTPlugin::ControlsToIgnoreInSaveState() const
+std::vector<IUIControl*> VSTPlugin::ControlsToIgnoreInSaveState() const
 {
-   vector<IUIControl*> ignore;
+   std::vector<IUIControl*> ignore;
    ignore.push_back(mPresetFileSelector);
    return ignore;
 }
@@ -739,7 +739,7 @@ void VSTPlugin::DropdownUpdated(DropdownList* list, int oldVal)
             return;
          }
 
-         unique_ptr<FileInputStream> input(resourceFile.createInputStream());
+         std::unique_ptr<FileInputStream> input(resourceFile.createInputStream());
 
          if (!input->openedOk())
          {
@@ -827,7 +827,7 @@ void VSTPlugin::ButtonClicked(ClickButton* button)
       FileChooser chooser("Save preset as...", File(ofToDataPath("vst/presets/"+ GetPluginId()+"/preset.vstp")), "*.vstp", true, false, TheSynth->GetMainComponent()->getTopLevelComponent());
       if (chooser.browseForFileToSave(true))
       {
-         string path = chooser.getResult().getFullPathName().toStdString();
+         std::string path = chooser.getResult().getFullPathName().toStdString();
          
          File resourceFile (path);
          TemporaryFile tempFile (resourceFile);
@@ -853,7 +853,7 @@ void VSTPlugin::ButtonClicked(ClickButton* button)
             if (vstProgramState.getSize() > 0)
                output.write(vstProgramState.getData(), vstProgramState.getSize());
             
-            vector<int> exposedParams;
+            std::vector<int> exposedParams;
             for (int i=0; i<(int)mParameterSliders.size(); ++i)
             {
                if (mParameterSliders[i].mShowing)
@@ -905,17 +905,13 @@ void VSTPlugin::RefreshPresetFiles()
       return;
    
    juce::File(ofToDataPath("vst/presets/"+ GetPluginId())).createDirectory();
-   DirectoryIterator dir(File(ofToDataPath("vst/presets/"+ GetPluginId())), false);
    mPresetFilePaths.clear();
    mPresetFileSelector->Clear();
-   while(dir.next())
+   for (const auto& entry : RangedDirectoryIterator{File{ofToDataPath("vst/presets/" + GetPluginId())}, false, "*.vstp"})
    {
-      File file = dir.getFile();
-      if (file.getFileExtension() ==  ".vstp")
-      {
-         mPresetFileSelector->AddLabel(file.getFileName().toStdString(), (int)mPresetFilePaths.size());
-         mPresetFilePaths.push_back(file.getFullPathName().toStdString());
-      }
+      const auto& file = entry.getFile();
+      mPresetFileSelector->AddLabel(file.getFileName().toStdString(), (int)mPresetFilePaths.size());
+      mPresetFilePaths.push_back(file.getFullPathName().toStdString());
    }
 }
 
@@ -936,7 +932,7 @@ void VSTPlugin::LoadLayout(const ofxJSONElement& moduleInfo)
 
 void VSTPlugin::SetUpFromSaveData()
 {
-   string vstName = mModuleSaveData.GetString("vst");
+   std::string vstName = mModuleSaveData.GetString("vst");
    if (vstName != "")
       SetVST(vstName);
    
@@ -968,7 +964,7 @@ void VSTPlugin::SaveState(FileStreamOut& out)
       if (vstProgramState.getSize() > 0)
          out.WriteGeneric(vstProgramState.getData(), (int)vstProgramState.getSize());
       
-      vector<int> exposedParams;
+      std::vector<int> exposedParams;
       for (int i=0; i<(int)mParameterSliders.size(); ++i)
       {
          if (mParameterSliders[i].mShowing)

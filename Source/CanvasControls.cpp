@@ -68,7 +68,7 @@ void CanvasControls::SetCanvas(Canvas* canvas)
    mCanvas = canvas;
    mWidth = mCanvas->GetWidth();
    mCanvas->SetControls(this);
-   StringCopy(NameMutable(), (string(mCanvas->Name())+"_controls").c_str(), MAX_TEXTENTRY_LENGTH);
+   StringCopy(NameMutable(), (std::string(mCanvas->Name())+"_controls").c_str(), MAX_TEXTENTRY_LENGTH);
 }
 
 void CanvasControls::SetElement(CanvasElement* element)
@@ -170,7 +170,7 @@ void CanvasControls::ButtonClicked(ClickButton* button)
    if (button == mRemoveElementButton)
    {
       mSelectedElement = nullptr;
-      vector<CanvasElement*> elementsToDelete;
+      std::vector<CanvasElement*> elementsToDelete;
       for (auto* element : mCanvas->GetElements())
       {
          if (element->GetHighlighted())

@@ -18,9 +18,10 @@
 // FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
 // DEALINGS IN THE SOFTWARE.
 
-#include "JuceToPush2DisplayBridge.h"
-#include "Push2-Bitmap.h"
-#include "Macros.h"
+#include "push2/JuceToPush2DisplayBridge.h"
+#include "push2/Push2-Bitmap.h"
+#include "Push2-Display.h"
+
 #include <assert.h>
 
 using namespace ableton;
@@ -31,13 +32,22 @@ Push2DisplayBridge::Push2DisplayBridge()
    : push2Display_(nullptr)
    {};
 
+//------------------------------------------------------------------------------
+
+Push2DisplayBridge::~Push2DisplayBridge() = default;
 
 //------------------------------------------------------------------------------
 
-NBase::Result Push2DisplayBridge::Init(ableton::Push2Display& display)
+NBase::Result Push2DisplayBridge::Init()
 {
-   push2Display_ = &display;
-   return NBase::Result::NoError;
+   std::unique_ptr<Push2Display> display{Push2Display::create()};
+   if (!display)
+     return {"no push 2 support"};
+   auto result{display->Init()};
+   if (result.Failed())
+     return {"no push 2 found"};
+   push2Display_ = std::move(display);
+   return result;
 }
 
 

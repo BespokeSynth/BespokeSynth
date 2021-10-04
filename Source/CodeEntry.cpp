@@ -26,14 +26,14 @@
 */
 
 #include "ModularSynth.h"
-#if BESPOKE_WINDOWS
+#ifdef _MSC_VER
 #define ssize_t ssize_t_undef_hack  //fixes conflict with ssize_t typedefs between python and juce
 #endif
 #include "IDrawableModule.h"
 #include "CodeEntry.h"
 #include "Transport.h"
 #include "ScriptModule.h"
-#if BESPOKE_WINDOWS
+#ifdef _MSC_VER
 #undef ssize_t
 #endif
 
@@ -50,7 +50,8 @@ namespace py = pybind11;
 
 //static
 bool CodeEntry::sWarnJediNotInstalled = false;
-
+bool CodeEntry::sDoPythonAutocomplete = false;
+bool CodeEntry::sDoSyntaxHighlighting = false;
 
 CodeEntry::CodeEntry(ICodeEntryListener* owner, const char* name, int x, int y, float w, float h)
 : mListener(owner)
@@ -64,8 +65,7 @@ CodeEntry::CodeEntry(ICodeEntryListener* owner, const char* name, int x, int y, 
 , mLastPublishTime(-999)
 , mHasError(false)
 , mErrorLine(-1)
-, mDoSyntaxHighlighting(true)
-, mDoPythonAutocomplete(true)
+, mDoSyntaxHighlighting(false)
 , mAutocompleteUpdateTimer(0)
 , mWantToShowAutocomplete(false)
 , mAutocompleteHighlightIndex(0)
@@ -93,7 +93,7 @@ void CodeEntry::Poll()
 {
    if (mCodeUpdated)
    {
-      if (mDoSyntaxHighlighting)
+      if (mDoSyntaxHighlighting && sDoSyntaxHighlighting)
       {
          try
          {
@@ -122,7 +122,7 @@ void CodeEntry::Poll()
       mAutocompleteUpdateTimer -= 1.0 / ofGetFrameRate();
       if (mAutocompleteUpdateTimer <= 0)
       {
-         if (mDoPythonAutocomplete)
+         if (sDoPythonAutocomplete)
          {
             mAutocompleteCaretCoords = GetCaretCoords(mCaretPosition);
 
@@ -130,7 +130,7 @@ void CodeEntry::Poll()
             {
                try
                {
-                  string prefix = ScriptModule::GetBootstrapImportString() + "; import me\n";
+                  std::string prefix = ScriptModule::GetBootstrapImportString() + "; import me\n";
                   py::exec("jediScript = jedi.Script('''" + prefix + GetVisibleCode() + "''', project=jediProject)", py::globals());
                   //py::exec("jediScript = jedi.Script('''" + prefix + GetVisibleCode() + "''')", py::globals());
                   //py::exec("jediScript = jedi.Interpreter('''" + prefix + GetVisibleCode() + "''', [locals(), globals()])", py::globals());
@@ -153,7 +153,7 @@ void CodeEntry::Poll()
                            for (size_t j = 0; j < params.size(); ++j)
                               mAutocompleteSignatures[i].params[j] = juce::String(py::str(params[j].attr("description"))).replace("param ","").toStdString();
                            auto bracket_start = signature.attr("bracket_start").cast< std::tuple<int, int> >();
-                           mAutocompleteSignatures[i].caretPos = GetCaretPosition(get<1>(bracket_start), get<0>(bracket_start)-2);
+                           mAutocompleteSignatures[i].caretPos = GetCaretPosition(std::get<1>(bracket_start), std::get<0>(bracket_start)-2);
                            ++i;
                         }
                         else
@@ -188,8 +188,8 @@ void CodeEntry::Poll()
                            for (auto autocomplete : autocompletes)
                            {
                               //ofLog() << "    --" << autocomplete;
-                              string full = py::str(autocomplete.attr("name"));
-                              string rest = py::str(autocomplete.attr("complete"));
+                              std::string full = py::str(autocomplete.attr("name"));
+                              std::string rest = py::str(autocomplete.attr("complete"));
                               if (!((juce::String)full).startsWith("__") && i < mAutocompletes.size())
                               {
                                  mAutocompletes[i].valid = true;
@@ -206,9 +206,9 @@ void CodeEntry::Poll()
                         else //we're autocompleting a path, look for matching instantiated module names
                         {
                            int stringStart = mAutocompleteSignatures[0].caretPos + 2;
-                           string writtenSoFar = mString.substr(stringStart, mCaretPosition - stringStart);
+                           std::string writtenSoFar = mString.substr(stringStart, mCaretPosition - stringStart);
 
-                           vector<IDrawableModule*> modules;
+                           std::vector<IDrawableModule*> modules;
                            TheSynth->GetAllModules(modules);
 
                            for (auto module : modules)
@@ -216,8 +216,8 @@ void CodeEntry::Poll()
                               juce::String modulePath = module->Path();
                               if (modulePath.startsWith(writtenSoFar))
                               {
-                                 string full = modulePath.toStdString();
-                                 string rest = full;
+                                 std::string full = modulePath.toStdString();
+                                 std::string rest = full;
                                  ofStringReplace(rest, writtenSoFar, "", true);
                                  if (i < mAutocompletes.size())
                                  {
@@ -333,7 +333,7 @@ void CodeEntry::Render()
    
    ofSetColor(color, gModuleDrawAlpha);
    
-   string drawString = GetVisibleCode();
+   std::string drawString = GetVisibleCode();
 
    ofPushStyle();
    const float dim = .7f;
@@ -382,7 +382,7 @@ void CodeEntry::Render()
       {
          ofPushStyle();
          ofFill();
-         ofSetColor(255, 255, 255, 50);
+         ofSetColor(selectedOverlay);
          int caretStart = MIN(mCaretPosition, mCaretPosition2);
          int caretEnd = MAX(mCaretPosition, mCaretPosition2);
          ofVec2f coordsStart = GetCaretCoords(caretStart);
@@ -443,15 +443,15 @@ void CodeEntry::RenderOverlay()
          float x = caretPos.x - charactersLeft * mCharWidth;
          float y = caretPos.y + mCharHeight * (i + 2) - 2;
          if (i == mAutocompleteHighlightIndex)
-            ofSetColor(100, 100, 100);
+            ofSetColor(jediIndexBg);
          else
-            ofSetColor(70, 70, 70);
+            ofSetColor(jediBg);
          ofRect(x, y - mCharHeight+2, gFontFixedWidth.GetStringWidth(mAutocompletes[i].autocompleteFull, mFontSize), mCharHeight);
 
-         ofSetColor(200, 200, 200);
+         ofSetColor(jediAutoComplete);
          gFontFixedWidth.DrawString(mAutocompletes[i].autocompleteFull, mFontSize, x, y);
-         ofSetColor(255, 255, 255);
-         string prefix = "";
+         ofSetColor(jediAutoCompleteRest);
+         std::string prefix = "";
          for (size_t j = 0; j < charactersLeft; ++j)
             prefix += " ";
          gFontFixedWidth.DrawString(prefix + mAutocompletes[i].autocompleteRest, mFontSize, x, y);
@@ -462,12 +462,12 @@ void CodeEntry::RenderOverlay()
    {
       if (mAutocompleteSignatures[i].valid && mAutocompleteSignatures[i].params.size() > 0)
       {
-         string params = "(";
-         string highlightParamString = " ";
+         std::string params = "(";
+         std::string highlightParamString = " ";
          for (size_t j = 0; j < mAutocompleteSignatures[i].params.size(); ++j)
          {
-            string param = mAutocompleteSignatures[i].params[j];
-            string placeholder = "";
+            std::string param = mAutocompleteSignatures[i].params[j];
+            std::string placeholder = "";
             for (size_t k = 0; k < param.length(); ++k)
                placeholder += " ";
             if (j == mAutocompleteSignatures[i].entryIndex)
@@ -491,20 +491,20 @@ void CodeEntry::RenderOverlay()
          highlightParamString += " ";
          float x = GetLinePos(mAutocompleteCaretCoords.y, K(end), !K(published)).x + 10;
          float y = caretPos.y + mCharHeight * (i + 1) - 2;
-         ofSetColor(70, 70, 70);
+         ofSetColor(jediBg);
          ofRect(x, y-mCharHeight+2, gFontFixedWidth.GetStringWidth(params, mFontSize), mCharHeight+2);
-         ofSetColor(170, 170, 255);
+         ofSetColor(jediParams);
          gFontFixedWidth.DrawString(params, mFontSize, x, y);
-         ofSetColor(230, 230, 255);
+         ofSetColor(jediParamsHighlight);
          gFontFixedWidth.DrawString(highlightParamString, mFontSize, x, y);
       }
    }
 }
 
-string CodeEntry::GetVisibleCode()
+std::string CodeEntry::GetVisibleCode()
 {
-   string visible;
-   vector<string> lines = GetLines(false);
+   std::string visible;
+   std::vector<std::string> lines = GetLines(false);
    if (lines.empty())
       return "";
    
@@ -538,9 +538,9 @@ string CodeEntry::GetVisibleCode()
    return visible;
 }
 
-void CodeEntry::DrawSyntaxHighlight(string input, ofColor color, std::vector<int> mapping, int filter1, int filter2)
+void CodeEntry::DrawSyntaxHighlight(std::string input, ofColor color, std::vector<int> mapping, int filter1, int filter2)
 {
-   string filtered = FilterText(input, mapping, filter1, filter2);
+   std::string filtered = FilterText(input, mapping, filter1, filter2);
    ofSetColor(color, gModuleDrawAlpha);
    
    float shake = (1 - ofClamp((gTime - mLastPublishTime) / 150, 0, 1)) * 3.0f;
@@ -550,7 +550,7 @@ void CodeEntry::DrawSyntaxHighlight(string input, ofColor color, std::vector<int
    gFontFixedWidth.DrawString(filtered, mFontSize, mX+2 - mScroll.x + offsetX, mY + mCharHeight - mScroll.y + offsetY);
 }
 
-string CodeEntry::FilterText(string input, std::vector<int> mapping, int filter1, int filter2)
+std::string CodeEntry::FilterText(std::string input, std::vector<int> mapping, int filter1, int filter2)
 {
    for (size_t i=0; i<input.size(); ++i)
    {
@@ -575,7 +575,7 @@ string CodeEntry::FilterText(string input, std::vector<int> mapping, int filter1
 //static
 void CodeEntry::OnPythonInit()
 {
-   const string syntaxHighlightCode = R"(def syntax_highlight_basic():
+   const std::string syntaxHighlightCode = R"(def syntax_highlight_basic():
    #this uses the built in lexer/tokenizer in python to identify part of code
    #will return a meaningful lookuptable for index colours per character
    import tokenize
@@ -667,6 +667,7 @@ void CodeEntry::OnPythonInit()
    try
    {
       py::exec(syntaxHighlightCode, py::globals());
+      sDoSyntaxHighlighting = true;
    }
    catch (const std::exception &e)
    {
@@ -686,6 +687,7 @@ void CodeEntry::OnPythonInit()
          py::exec("jediProject.added_sys_path = [\"" + ofToResourcePath("python_stubs") + "\"]", py::globals());
          //py::eval_file(ofToResourcePath("bespoke_stubs.pyi"), py::globals());
          //py::exec("import sys;sys.path.append(\""+ ofToResourcePath("python_stubs")+"\")", py::globals());
+         sDoPythonAutocomplete = true;
       }
       catch (const std::exception &e)
       {
@@ -793,7 +795,7 @@ void CodeEntry::OnKeyPressed(int key, bool isRepeat)
       {
          ofVec2f coords = GetCaretCoords(mCaretPosition);
          int spacesNeeded = kTabSize - (int)coords.x % kTabSize;
-         string tab;
+         std::string tab;
          for (int i=0; i<spacesNeeded; ++i)
             tab += " ";
          AddString(tab);
@@ -910,7 +912,7 @@ void CodeEntry::OnKeyPressed(int key, bool isRepeat)
                   break;
             }
          }
-         string tab = "\n";
+         std::string tab = "\n";
          for (int i = 0; i < numSpaces; ++i)
             tab += ' ';
          AddString(tab);
@@ -936,7 +938,7 @@ void CodeEntry::OnKeyPressed(int key, bool isRepeat)
          if (mCaretPosition != mCaretPosition2)
             RemoveSelectedText();
          
-         string insert = pasteName->Path();
+         std::string insert = pasteName->Path();
          AddString(insert);
       }
    }
@@ -983,7 +985,7 @@ void CodeEntry::OnKeyPressed(int key, bool isRepeat)
       Publish();
       int lineStart = MIN(GetCaretCoords(mCaretPosition).y, GetCaretCoords(mCaretPosition2).y);
       int lineEnd = MAX(GetCaretCoords(mCaretPosition).y, GetCaretCoords(mCaretPosition2).y);
-      pair<int, int> ranLines = mListener->ExecuteBlock(lineStart, lineEnd);
+      std::pair<int, int> ranLines = mListener->ExecuteBlock(lineStart, lineEnd);
       mLastPublishedLineStart = ranLines.first;
       mLastPublishedLineEnd = ranLines.second;
    }
@@ -1043,7 +1045,7 @@ void CodeEntry::Redo()
    }
 }
 
-void CodeEntry::UpdateString(string newString)
+void CodeEntry::UpdateString(std::string newString)
 {
    mUndoBuffer[mUndoBufferPos].mCaretPos = mCaretPosition;
    
@@ -1064,7 +1066,7 @@ void CodeEntry::AddCharacter(char c)
 {
    if (AllowCharacter(c))
    {
-      string s;
+      std::string s;
       s += c;
       AddString(s);
 
@@ -1072,12 +1074,12 @@ void CodeEntry::AddCharacter(char c)
    }
 }
 
-void CodeEntry::AddString(string s)
+void CodeEntry::AddString(std::string s)
 {
    if (mCaretPosition != mCaretPosition2)
       RemoveSelectedText();
    
-   string toAdd;
+   std::string toAdd;
    for (int i=0; i<s.size(); ++i)
    {
       if (AllowCharacter(s[i]))
@@ -1111,7 +1113,7 @@ void CodeEntry::ShiftLines(bool backwards)
    ofVec2f coordsEnd = GetCaretCoords(caretEnd);
    
    auto lines = GetLines(false);
-   string newString = "";
+   std::string newString = "";
    for (size_t i=0; i<lines.size(); ++i)
    {
       if (i >= coordsStart.y && i <= coordsEnd.y)
@@ -1276,7 +1278,7 @@ ofVec2f CodeEntry::GetLinePos(int lineNum, bool end, bool published /*= true*/)
    
    if (end)
    {
-      string str = published ? mPublishedString : mString;
+      std::string str = published ? mPublishedString : mString;
       auto lines = ofSplitString(str, "\n");
       if (lineNum < (int)lines.size())
          x += lines[lineNum].length() * mCharWidth;
@@ -1355,6 +1357,9 @@ void CodeEntry::SetStyleFromJSON(const ofxJSONElement &vdict) {
             onto.r = arr[0u].asInt();
             onto.g = arr[1u].asInt();
             onto.b = arr[2u].asInt();
+
+            if (def.size() > 3)
+                onto.a = arr[3u].asInt();
         }
     };
     fromRGB( "currentBg", currentBg);
@@ -1372,5 +1377,13 @@ void CodeEntry::SetStyleFromJSON(const ofxJSONElement &vdict) {
     fromRGB( "op", opColor);
     fromRGB( "comma", commaColor);
     fromRGB( "comment", commentColor);
+    fromRGB( "selectedOverlay", selectedOverlay);
+
+    fromRGB("jediBg", jediBg);
+    fromRGB("jediIndexBg", jediIndexBg);
+    fromRGB("jediAutoComplete", jediAutoComplete);
+    fromRGB("jediAutoCompleteRest", jediAutoCompleteRest);
+    fromRGB("jediParams", jediParams);
+    fromRGB("jediParamsHighlight", jediParamsHighlight);
 }
 

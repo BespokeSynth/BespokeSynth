@@ -56,7 +56,7 @@ public:
    void SetController(MidiController* controller, int controllerPage);
    void OnMidiNote(MidiNote& note);
    void OnMidiControl(MidiControl& control);
-   void UpdateLights(vector<LightUpdate> lightUpdates, bool force = false);
+   void UpdateLights(std::vector<LightUpdate> lightUpdates, bool force = false);
    void Draw(ofVec2f vPos);
    void ResetLaunchpad();
    bool HasLaunchpad() { return mController != nullptr; }

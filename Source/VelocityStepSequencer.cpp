@@ -86,7 +86,7 @@ VelocityStepSequencer::~VelocityStepSequencer()
    TheTransport->RemoveListener(this);
 }
 
-void VelocityStepSequencer::SetMidiController(string name)
+void VelocityStepSequencer::SetMidiController(std::string name)
 {
    if (mController)
       mController->RemoveListener(this);

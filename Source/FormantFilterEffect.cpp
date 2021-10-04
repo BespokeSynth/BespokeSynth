@@ -141,7 +141,7 @@ void FormantFilterEffect::UpdateFilters()
    if (total == 0)
       return;
    
-   vector<float> formant;
+   std::vector<float> formant;
    formant.resize(NUM_FORMANT_BANDS);
    formant.assign(NUM_FORMANT_BANDS, 0);
    

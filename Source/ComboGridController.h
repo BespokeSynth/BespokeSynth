@@ -35,7 +35,7 @@ public:
    ~ComboGridController() {}
    static IDrawableModule* Create() { return new ComboGridController(); }
    
-   string GetTitleLabel() override;
+   std::string GetTitleLabel() override;
    void CreateUIControls() override;
    
    void Init() override;
@@ -75,7 +75,7 @@ private:
 
    unsigned int mRows;
    unsigned int mCols;
-   vector<IGridController*> mGrids;
+   std::vector<IGridController*> mGrids;
    Arrangements mArrangement;
    IGridControllerListener* mOwner;
 };

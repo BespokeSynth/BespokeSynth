@@ -217,7 +217,7 @@ void SingleOscillator::PlayNote(double time, int pitch, int velocity, int voiceI
    
    if (mDrawDebug)
    {
-      vector<string> lines = ofSplitString(mDebugLines, "\n");
+      std::vector<std::string> lines = ofSplitString(mDebugLines, "\n");
       mDebugLines = "";
       const int kNumDisplayLines = 10;
       for (int i=0; i<kNumDisplayLines-1; ++i)
@@ -226,7 +226,7 @@ void SingleOscillator::PlayNote(double time, int pitch, int velocity, int voiceI
          if (lineIndex >= 0)
             mDebugLines += lines[lineIndex] + "\n";
       }
-      string debugLine = "PlayNote(" + ofToString(time / 1000) + ", " + ofToString(pitch) + ", " + ofToString(velocity) + ", " + ofToString(voiceIdx) + ")";
+      std::string debugLine = "PlayNote(" + ofToString(time / 1000) + ", " + ofToString(pitch) + ", " + ofToString(velocity) + ", " + ofToString(voiceIdx) + ")";
       mDebugLines += debugLine;
       ofLog() << debugLine;
    }
@@ -327,7 +327,7 @@ void SingleOscillator::DrawModuleUnclipped()
    }
 }
 
-void SingleOscillator::UpdateOldControlName(string& oldName)
+void SingleOscillator::UpdateOldControlName(std::string& oldName)
 {
    IDrawableModule::UpdateOldControlName(oldName);
 

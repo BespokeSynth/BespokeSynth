@@ -50,7 +50,7 @@ public:
    ~BeatBloks();
    static IDrawableModule* Create() { return new BeatBloks(); }
    
-   string GetTitleLabel() override { return "BEAT BLOKS by @awwbees"; }
+   std::string GetTitleLabel() override { return "BEAT BLOKS by @awwbees"; }
    void CreateUIControls() override;
    
    //INoteReceiver
@@ -62,7 +62,7 @@ public:
    void SetEnabled(bool enabled) override { mEnabled = enabled; }
    
    //IDrawableModule
-   void FilesDropped(vector<string> files, int x, int y) override;
+   void FilesDropped(std::vector<std::string> files, int x, int y) override;
    void Poll() override;
    
    //IClickable
@@ -158,12 +158,12 @@ private:
    bool mWantWrite;
    ClickButton* mDoubleLengthButton;
    ClickButton* mHalveLengthButton;
-   vector<Blok> mBars;
-   vector<Blok> mBeats;
-   vector<Blok> mTatums;
-   vector<Blok> mSections;
-   vector<Blok> mSegments;
-   vector<Blok> mNothing;
+   std::vector<Blok> mBars;
+   std::vector<Blok> mBeats;
+   std::vector<Blok> mTatums;
+   std::vector<Blok> mSections;
+   std::vector<Blok> mSegments;
+   std::vector<Blok> mNothing;
    BlokType mDrawBlokType;
    DropdownList* mDrawBlokTypeDropdown;
    bool mLoading;
@@ -178,7 +178,7 @@ private:
    float mRemixPlayhead;
    bool mPlayRemix;
    Checkbox* mPlayRemixCheckbox;
-   list<Blok*> mRemixBloks;
+   std::list<Blok*> mRemixBloks;
    JumpBlender mRemixJumpBlender;
    Blok* mLastPlayedRemixBlok;
    float mLastLookupPlayhead;

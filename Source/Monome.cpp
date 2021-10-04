@@ -154,7 +154,7 @@ void Monome::SetLightFlicker(int x, int y, float intensity)
    }
 }
 
-string Monome::GetControlTooltip(MidiMessageType type, int control)
+std::string Monome::GetControlTooltip(MidiMessageType type, int control)
 {
    if (type == kMidiMessage_Note)
       return "(" + ofToString(control % mMaxColumns) + ", " + ofToString(control/mMaxColumns) + ")";
@@ -167,7 +167,7 @@ void Monome::SetLayoutData(ofxJSONElement& layout)
       mGridRotation = layout["monome_rotation"].asInt();
 }
 
-void Monome::ConnectToDevice(string deviceDesc)
+void Monome::ConnectToDevice(std::string deviceDesc)
 {
    MonomeDevice* device = nullptr;
    for (size_t i=0; i<mConnectedDeviceList.size(); ++i)
@@ -327,7 +327,7 @@ void Monome::SaveState(FileStreamOut& out)
 {
    out << kSaveStateRev;
    
-   string connectedDeviceDesc = "";
+   std::string connectedDeviceDesc = "";
    if (mLastConnectedDeviceInfo.id != "")
       connectedDeviceDesc = mLastConnectedDeviceInfo.GetDescription();
    out << connectedDeviceDesc;

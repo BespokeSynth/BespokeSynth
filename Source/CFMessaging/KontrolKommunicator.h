@@ -32,8 +32,6 @@
 #include <CoreFoundation/CoreFoundation.h>
 #include "../OpenFrameworksPort.h"
 
-using namespace std;
-
 class KDataArray
 {
 public:
@@ -41,7 +39,7 @@ public:
    KDataArray(uint8_t val) { mData.assign(&val, &val+1); }
    KDataArray(uint16_t val) { mData.assign(((uint8_t*)&val), ((uint8_t*)&val)+2); }
    KDataArray(uint32_t messageId) { mData.assign(((uint8_t*)&messageId), ((uint8_t*)&messageId)+4); }
-   KDataArray(string input) { mData.assign(input.c_str(), input.c_str()+input.length()+1); }
+   KDataArray(std::string input) { mData.assign(input.c_str(), input.c_str()+input.length()+1); }
    uint8_t* data() { return mData.data(); }
    void resize(size_t size) { mData.resize(size); }
    size_t size() const { return mData.size(); }
@@ -51,19 +49,19 @@ public:
    KDataArray operator+(const KDataArray& b) { mData.insert(mData.end(), b.mData.begin(), b.mData.end()); return *this; }
    void operator+=(const KDataArray& b) { mData.insert(mData.end(), b.mData.begin(), b.mData.end()); }
 private:
-   vector<uint8_t> mData;
+   std::vector<uint8_t> mData;
 };
 
 struct ReplyEntry
 {
-   string mPort;
+   std::string mPort;
    KDataArray mInput;
    KDataArray mReply;
 };
 
 struct QueuedMessage
 {
-   string mPort;
+   std::string mPort;
    KDataArray mMessage;
 };
 
@@ -84,28 +82,28 @@ public:
    void Init();
    void Exit();
    void CreateListener(const char* portName);
-   CFDataRef OnMessageReceived(string portName, SInt32 msgid, CFDataRef data) override;
-   void AddReply(string portName, string input, string reply);
-   void QueueMessage(string portName, KDataArray message);
+   CFDataRef OnMessageReceived(std::string portName, SInt32 msgid, CFDataRef data) override;
+   void AddReply(std::string portName, std::string input, std::string reply);
+   void QueueMessage(std::string portName, KDataArray message);
    void Update();
-   static KDataArray StringToData(string input);
-   static KDataArray LettersToData(string letters);
+   static KDataArray StringToData(std::string input);
+   static KDataArray LettersToData(std::string letters);
    static uint16_t CharToSegments(char input);
-   KDataArray CreateMessage(string type);
+   KDataArray CreateMessage(std::string type);
    
    bool IsReady() const { return mState == kState_Focused; }
    void SetListener(IKontrolListener* listener) { mListener = listener; }
-   void SetDisplay(const uint16_t sliders[72], string display);
+   void SetDisplay(const uint16_t sliders[72], std::string display);
    void SetKeyLights(ofColor keys[61]);
    
 private:
-   void SendMessage(string portName, KDataArray data);
+   void SendMessage(std::string portName, KDataArray data);
    void CreateSender(const char* portName);
-   CFDataRef ProcessIncomingMessage(string portName, char* data, size_t length);
-   static void Output(string str);
-   string FormatString(string format, int number);
-   KDataArray RespondToMessage(string portName, KDataArray input);
-   void FollowUpToReply(string messageType, uint8_t* reply);
+   CFDataRef ProcessIncomingMessage(std::string portName, char* data, size_t length);
+   static void Output(std::string str);
+   std::string FormatString(std::string format, int number);
+   KDataArray RespondToMessage(std::string portName, KDataArray input);
+   void FollowUpToReply(std::string messageType, uint8_t* reply);
    bool DataEquals(const KDataArray& a, const KDataArray& b);
    void OutputData(const KDataArray& a);
    void OutputRawData(const uint8_t* data, size_t length);
@@ -119,15 +117,15 @@ private:
       kState_Focused
    }mState;
    
-   string mSerialNumber;
-   string mRequestPort;
-   string mNotificationPort;
-   string mRequestSerialPort;
-   string mNotificationSerialPort;
-   vector<ReplyEntry> mReplies;
-   list<QueuedMessage> mMessageQueue;
-   map<string,ListenPort> mListenPorts;
-   map<string,SendPort> mSendPorts;
+   std::string mSerialNumber;
+   std::string mRequestPort;
+   std::string mNotificationPort;
+   std::string mRequestSerialPort;
+   std::string mNotificationSerialPort;
+   std::vector<ReplyEntry> mReplies;
+   std::list<QueuedMessage> mMessageQueue;
+   std::map<std::string,ListenPort> mListenPorts;
+   std::map<std::string,SendPort> mSendPorts;
    ofMutex mMessageQueueMutex;
    IKontrolListener* mListener;
 };

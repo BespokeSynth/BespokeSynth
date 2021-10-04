@@ -38,7 +38,7 @@ public:
    VelocityScaler();
    static IDrawableModule* Create() { return new VelocityScaler(); }
    
-   string GetTitleLabel() override { return "velocity scaler"; }
+   std::string GetTitleLabel() override { return "velocity scaler"; }
    void CreateUIControls() override;
    
    void SetEnabled(bool enabled) override { mEnabled = enabled; }

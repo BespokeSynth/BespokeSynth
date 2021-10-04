@@ -27,12 +27,12 @@
 #include "SynthGlobals.h"
 #include "Scale.h"
 
-Chord::Chord(string name)
+Chord::Chord(std::string name)
 {
    assert(name.length() >= 4);
    
-   string pitchName;
-   string typeName;
+   std::string pitchName;
+   std::string typeName;
    if (name[1] == 'b' || name[1] == '#')
    {
       pitchName = name.substr(0,2);
@@ -58,17 +58,17 @@ Chord::Chord(string name)
       mType = kChord_Unknown;
 }
 
-string Chord::Name(bool withDegree, bool withAccidentals, ScalePitches* scale)
+std::string Chord::Name(bool withDegree, bool withAccidentals, ScalePitches* scale)
 {
    if (scale == nullptr)
       scale = &TheScale->GetScalePitches();
    
    int degree;
-   vector<Accidental> accidentals;
+   std::vector<Accidental> accidentals;
    if (withDegree || withAccidentals)
       scale->GetChordDegreeAndAccidentals(*this, degree, accidentals);
    
-   string chordName = NoteName(mRootPitch);
+   std::string chordName = NoteName(mRootPitch);
    if (mType == kChord_Maj)
       chordName += "maj";
    else if (mType == kChord_Min)
@@ -88,7 +88,7 @@ string Chord::Name(bool withDegree, bool withAccidentals, ScalePitches* scale)
    
    if (withAccidentals)
    {
-      string accidentalList;
+      std::string accidentalList;
       for (int i=0; i<accidentals.size(); ++i)
          accidentalList += ofToString(accidentals[i].mPitch) + (accidentals[i].mDirection == 1? "#" : "b") + " ";
       chordName += accidentalList;
@@ -99,7 +99,7 @@ string Chord::Name(bool withDegree, bool withAccidentals, ScalePitches* scale)
 
 void Chord::SetFromDegreeAndScale(int degree, const ScalePitches& scale, int inversion /*= 0*/)
 {
-   mRootPitch = scale.GetPitchFromTone(degree) % TheScale->GetTet();
+   mRootPitch = scale.GetPitchFromTone(degree) % TheScale->GetPitchesPerOctave();
    mType = kChord_Unknown;
    if (scale.IsInScale(mRootPitch+4))
    {

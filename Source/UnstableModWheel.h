@@ -41,7 +41,7 @@ public:
    virtual ~UnstableModWheel();
    static IDrawableModule* Create() { return new UnstableModWheel(); }
 
-   string GetTitleLabel() override { return "unstable modwheel"; }
+   std::string GetTitleLabel() override { return "unstable modwheel"; }
    void CreateUIControls() override;
    void Init() override;
    void SetEnabled(bool enabled) override { mEnabled = enabled; }

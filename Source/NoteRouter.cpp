@@ -111,7 +111,7 @@ void NoteRouter::PostRepatch(PatchCableSource* cableSource, bool fromUserClick)
       if (cableSource == mDestinationCables[i]->GetPatchCableSource())
       {
          IClickable* target = cableSource->GetTarget();
-         string name = target ? target->Name() : "                      ";
+         std::string name = target ? target->Name() : "                      ";
          mRouteSelector->SetLabel(name.c_str(), i);
       }
    }

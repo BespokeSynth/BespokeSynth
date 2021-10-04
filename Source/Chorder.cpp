@@ -169,7 +169,7 @@ void Chorder::DropdownUpdated(DropdownList* dropdown, int oldVal)
 {
    if (dropdown == mChordDropdown || dropdown == mInversionDropdown)
    {
-      vector<int> chord = TheScale->GetChordDatabase().GetChord(mChordDropdown->GetLabel(mChordIndex), mInversion);
+      std::vector<int> chord = TheScale->GetChordDatabase().GetChord(mChordDropdown->GetLabel(mChordIndex), mInversion);
       mChordGrid->Clear();
       for (int val : chord)
       {
@@ -212,11 +212,11 @@ void Chorder::PlayNote(double time, int pitch, int velocity, int voiceIdx, Modul
             {
                outPitch = pitch + gridPosition;
             }
-            else if (gridPosition%TheScale->NumPitchesInScale() == 0) //if this is the pressed note or an octave of it
+            else if (gridPosition%TheScale->NumTonesInScale() == 0) //if this is the pressed note or an octave of it
             {
                //play the pressed note (might not be in scale, so play it directly)
-               int octave = gridPosition/TheScale->NumPitchesInScale();
-               outPitch = pitch+TheScale->GetTet()*octave;
+               int octave = gridPosition/TheScale->NumTonesInScale();
+               outPitch = pitch+TheScale->GetPitchesPerOctave()*octave;
             }
             else
             {

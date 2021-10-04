@@ -49,7 +49,7 @@ public:
    ~SingleOscillator();
    static IDrawableModule* Create() { return new SingleOscillator(); }
    
-   string GetTitleLabel() override { return "oscillator"; }
+   std::string GetTitleLabel() override { return "oscillator"; }
    void CreateUIControls() override;
    
    void SetType(OscillatorType type) { mVoiceParams.mOscType = type; }
@@ -80,7 +80,7 @@ private:
    void DrawModuleUnclipped() override;
    void GetModuleDimensions(float& width, float& height) override { width = mWidth; height = mHeight; }
    bool Enabled() const override { return mEnabled; }
-   void UpdateOldControlName(string& oldName) override;
+   void UpdateOldControlName(std::string& oldName) override;
    
    float mWidth;
    float mHeight;
@@ -116,7 +116,7 @@ private:
    
    Oscillator mDrawOsc;
    
-   string mDebugLines;
+   std::string mDebugLines;
 };
 
 

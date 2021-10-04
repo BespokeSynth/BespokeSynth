@@ -27,7 +27,6 @@
 
 #pragma once
 
-#include "push2/push2/JuceToPush2DisplayBridge.h"
 #include "IDrawableModule.h"
 #include "MidiDevice.h"
 #include "MidiController.h"
@@ -46,7 +45,7 @@ public:
    virtual ~Push2Control();
    static IDrawableModule* Create() { return new Push2Control(); }
    
-   string GetTitleLabel() override { return "push 2 control"; }
+   std::string GetTitleLabel() override { return "push 2 control"; }
    void CreateUIControls() override;
    void Poll() override;
    
@@ -77,7 +76,7 @@ private:
    void GetModuleDimensions(float& width, float& height) override { width = mWidth; height = mHeight; }
    void OnClicked(int x, int y, bool right) override;
    
-   NBase::Result Initialize();
+   bool Initialize();
    void DrawToFramebuffer(NVGcontext* vg, NVGLUframebuffer* fb, float t, float pxRatio);
    void RenderPush2Display();
    
@@ -85,7 +84,7 @@ private:
    void DrawDisplayModuleControls();
    void DrawLowerModuleSelector();
    void SetDisplayModule(IDrawableModule* module, bool addToHistory);
-   void DrawControls(vector<IUIControl*> controls, bool sliders, float yPos);
+   void DrawControls(std::vector<IUIControl*> controls, bool sliders, float yPos);
    void UpdateControlList();
    void AddFavoriteControl(IUIControl* control);
    void RemoveFavoriteControl(IUIControl* control);
@@ -94,18 +93,14 @@ private:
    int GetPadColorForType(ModuleType type);
    bool GetGridIndex(int gridX, int gridY, int& gridIndex) { gridIndex = gridX + gridY * 8; return gridX >= 0 && gridX < 8 && gridY >= 0 && gridY < 8; }
    bool IsIgnorableModule(IDrawableModule* module);
-   vector<IDrawableModule*> SortModules(vector<IDrawableModule*> modules);
-   void AddModuleChain(IDrawableModule* module, vector<IDrawableModule*>& modules, vector<IDrawableModule*>& output, int depth);
+   std::vector<IDrawableModule*> SortModules(std::vector<IDrawableModule*> modules);
+   void AddModuleChain(IDrawableModule* module, std::vector<IDrawableModule*>& modules, std::vector<IDrawableModule*>& output, int depth);
    void DrawDisplayModuleRect(ofRectangle rect);
-   string GetModuleTypeToSpawn();
+   std::string GetModuleTypeToSpawn();
    ModuleType GetModuleTypeForSpawnList(IUIControl* control);
    ofColor GetSpawnGridColor(int index, ModuleType moduleType) const;
    int GetSpawnGridPadColor(int index, ModuleType moduleType) const;
    
-   bool mDisplayInitialized;
-   
-   static ableton::Push2DisplayBridge* sPush2Bridge;      /* The bridge allowing to use juce::graphics for push */
-   static ableton::Push2Display* sPush2Display;           /* The low-level push2 class */
    unsigned char* mPixels;
    const int kPixelRatio = 1;
    
@@ -118,20 +113,20 @@ private:
    float mHeight;
    
    IDrawableModule* mDisplayModule;
-   vector<IUIControl*> mSliderControls;
-   vector<IUIControl*> mButtonControls;
-   vector<IUIControl*> mDisplayedControls;
+   std::vector<IUIControl*> mSliderControls;
+   std::vector<IUIControl*> mButtonControls;
+   std::vector<IUIControl*> mDisplayedControls;
    int mModuleColumnOffset;
    float mModuleColumnOffsetSmoothed;
    
-   vector<IDrawableModule*> mModules;
+   std::vector<IDrawableModule*> mModules;
    float mModuleListOffset;
    float mModuleListOffsetSmoothed;
    IDrawableModule* mModuleGrid[8*8];
    ofRectangle mModuleGridRect;
    
-   vector<IUIControl*> mFavoriteControls;
-   vector<IUIControl*> mSpawnModuleControls;
+   std::vector<IUIControl*> mFavoriteControls;
+   std::vector<IUIControl*> mSpawnModuleControls;
    bool mNewButtonHeld;
    bool mDeleteButtonHeld;
    bool mModulationButtonHeld;
@@ -139,9 +134,9 @@ private:
    std::array<bool,128> mNoteHeldState;
    IDrawableModule* mHeldModule;
    bool mAllowRepatch;
-   vector<IDrawableModule*> mModuleHistory;
+   std::vector<IDrawableModule*> mModuleHistory;
    int mModuleHistoryPosition;
-   vector<IDrawableModule*> mBookmarkSlots;
+   std::vector<IDrawableModule*> mBookmarkSlots;
    bool mInMidiControllerBindMode;
    
    enum class ScreenDisplayMode
@@ -161,6 +156,7 @@ private:
    SpawnListManager mSpawnLists;
    int mPendingSpawnPitch;
    int mSelectedGridSpawnListIndex;
+   std::string mPushBridgeInitErrMsg;
 };
 
 //https://raw.githubusercontent.com/Ableton/push-interface/master/doc/MidiMapping.png

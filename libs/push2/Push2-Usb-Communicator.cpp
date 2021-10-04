@@ -33,7 +33,7 @@
 #pragma warning(disable:4200)
 #endif
 
-#include "../libusb/libusb.h"
+#include "libusb.h"
 
 //------------------------------------------------------------------------------
 
@@ -57,7 +57,11 @@ namespace
       return NBase::Result("Failed to initialize usblib");
     }
 
+#if LIBUSB_API_VERSION >= 0x01000106
+    libusb_set_option(NULL, LIBUSB_OPTION_LOG_LEVEL, LIBUSB_LOG_LEVEL_ERROR);
+#else
     libusb_set_debug(NULL, LIBUSB_LOG_LEVEL_ERROR);
+#endif
 
     // Get a list of connected devices
     libusb_device** devices;

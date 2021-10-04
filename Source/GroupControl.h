@@ -38,7 +38,7 @@ public:
    ~GroupControl();
    static IDrawableModule* Create() { return new GroupControl(); }
    
-   string GetTitleLabel() override { return "group control"; }
+   std::string GetTitleLabel() override { return "group control"; }
    void CreateUIControls() override;
    
    void CheckboxUpdated(Checkbox* checkbox) override;
@@ -59,7 +59,7 @@ private:
    Checkbox* mGroupCheckbox;
    bool mGroupEnabled;
    
-   vector<PatchCableSource*> mControlCables;
+   std::vector<PatchCableSource*> mControlCables;
 };
 
 #endif /* defined(__Bespoke__GroupControl__) */

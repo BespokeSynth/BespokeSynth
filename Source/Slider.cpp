@@ -203,7 +203,7 @@ void FloatSlider::Render()
    
    DrawHover(mX,mY,mWidth,mHeight);
 
-   string display;
+   std::string display;
    float textSize = 15;
    if (AdjustSmooth())
    {
@@ -213,7 +213,7 @@ void FloatSlider::Render()
    else
    {
       if (mShowName)
-         display = string(Name());
+         display = std::string(Name());
       if (display.length() > 0) //only show a colon if there's a label
          display += ":";
       if (mFloatEntry)
@@ -592,7 +592,7 @@ float FloatSlider::GetMidiValue() const
    return ValToPos(*mVar, true);
 }
 
-string FloatSlider::GetDisplayValue(float val) const
+std::string FloatSlider::GetDisplayValue(float val) const
 {
    if (val == mMin && mMinValueDisplay != "")
       return mMinValueDisplay;
@@ -962,9 +962,9 @@ void IntSlider::Render()
    
    DrawHover(mX,mY,mWidth,mHeight);
 
-   string display;
+   std::string display;
    if (mShowName)
-      display = string(Name());
+      display = std::string(Name());
    if (display.length() > 0) //only show a colon if there's a label
       display += ":";
    if (mIntEntry)
@@ -1128,7 +1128,7 @@ float IntSlider::GetMidiValue() const
    return mSliderVal;
 }
 
-string IntSlider::GetDisplayValue(float val) const
+std::string IntSlider::GetDisplayValue(float val) const
 {
    return ofToString(val,0);
 }

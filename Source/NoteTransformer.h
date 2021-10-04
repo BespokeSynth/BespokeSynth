@@ -39,7 +39,7 @@ public:
    ~NoteTransformer();
    static IDrawableModule* Create() { return new NoteTransformer(); }
    
-   string GetTitleLabel() override { return "transformer"; }
+   std::string GetTitleLabel() override { return "transformer"; }
    
    void SetEnabled(bool enabled) override { mEnabled = enabled; }
    

@@ -56,8 +56,8 @@ public:
    bool ConsumeData(double time, ChannelBuffer* out, int size, bool replace);
    void Play(double time, float rate, int offset, int stopPoint=-1);
    void SetRate(float rate) { mRate = rate; }
-   string Name() const { return mName; }
-   void SetName(string name) { mName = name; }
+   std::string Name() const { return mName; }
+   void SetName(std::string name) { mName = name; }
    int LengthInSamples() const { return mNumSamples; }
    int NumChannels() const { return mData.NumActiveChannels(); }
    ChannelBuffer* Data() { return &mData; }
@@ -70,7 +70,7 @@ public:
    void PadBack(int amount);
    void ClipTo(int start, int end);
    void ShiftWrap(int numSamples);
-   string GetReadPath() const { return mReadPath; }
+   std::string GetReadPath() const { return mReadPath; }
    static bool WriteDataToFile(const char* path, float** data, int numSamples, int channels = 1);
    static bool WriteDataToFile(const char* path, ChannelBuffer* data, int numSamples);
    bool IsPlaying() { return mOffset < mNumSamples; }
@@ -100,8 +100,8 @@ private:
    float mRate;
    float mSampleRateRatio;
    int mStopPoint;
-   string mName;
-   string mReadPath;
+   std::string mName;
+   std::string mReadPath;
    ofMutex mDataMutex;
    ofMutex mPlayMutex;
    bool mLooping;
@@ -109,7 +109,7 @@ private:
    float mVolume;
 
    juce::AudioFormatReader* mReader;
-   unique_ptr<juce::AudioSampleBuffer> mReadBuffer;
+   std::unique_ptr<juce::AudioSampleBuffer> mReadBuffer;
    int mSamplesLeftToRead;
 };
 

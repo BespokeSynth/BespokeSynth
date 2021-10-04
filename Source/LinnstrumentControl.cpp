@@ -97,7 +97,7 @@ void LinnstrumentControl::InitController()
 {
    BuildControllerList();
    
-   const std::vector<string>& devices = mDevice.GetPortList(false);
+   const std::vector<std::string>& devices = mDevice.GetPortList(false);
    for (int i=0; i<devices.size(); ++i)
    {
       if (strstr(devices[i].c_str(), "LinnStrument") != nullptr)
@@ -126,7 +126,7 @@ void LinnstrumentControl::DrawModule()
 void LinnstrumentControl::BuildControllerList()
 {
    mControllerList->Clear();
-   const std::vector<string>& devices = mDevice.GetPortList(false);
+   const std::vector<std::string>& devices = mDevice.GetPortList(false);
    for (int i=0; i<devices.size(); ++i)
       mControllerList->AddLabel(devices[i].c_str(), i);
 }
@@ -279,7 +279,7 @@ void LinnstrumentControl::SendScaleInfo()
    
    const unsigned char setMainNoteBase = 203;
    const unsigned char setAccentNoteBase = 215;
-   if (TheScale->GetTet() == 12) //linnstrument only works with 12-tet
+   if (TheScale->GetPitchesPerOctave() == 12) //linnstrument only works with 12-tet
    {
       for (int pitch = 0; pitch < 12; ++pitch)
       {
@@ -442,8 +442,8 @@ void LinnstrumentControl::NoteAge::Update(int pitch, LinnstrumentControl* linnst
          }
          
          if (pitch != mOutputPitch)
-            linnstrument->SetPitchColor(mOutputPitch + i * TheScale->GetTet(), kLinnColor_Off);
-         linnstrument->SetPitchColor(pitch + i * TheScale->GetTet(), color);
+            linnstrument->SetPitchColor(mOutputPitch + i * TheScale->GetPitchesPerOctave(), kLinnColor_Off);
+         linnstrument->SetPitchColor(pitch + i * TheScale->GetPitchesPerOctave(), color);
       }
       mColor = newColor;
       mOutputPitch = pitch;

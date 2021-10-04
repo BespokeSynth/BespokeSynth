@@ -37,7 +37,7 @@ public:
    virtual ~PulseGate();
    static IDrawableModule* Create() { return new PulseGate(); }
    
-   string GetTitleLabel() override { return "pulse gate"; }
+   std::string GetTitleLabel() override { return "pulse gate"; }
    void CreateUIControls() override;
    
    void SetEnabled(bool enabled) override { mEnabled = enabled; }

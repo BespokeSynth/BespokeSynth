@@ -203,7 +203,7 @@ void IDrawableModule::DrawFrame(float w, float h, bool drawModule, float& titleB
       if (audioSource)
       {
          RollingBuffer* vizBuff = audioSource->GetVizBuffer();
-         int numSamples = min(500,vizBuff->Size());
+         int numSamples = std::min(500,vizBuff->Size());
          float sample;
          float mag = 0;
          for (int ch=0; ch<vizBuff->NumChannels(); ++ch)
@@ -388,7 +388,7 @@ void IDrawableModule::Render()
    float titleBarHeight;
    float highlight;
    DrawFrame(w,h,true,titleBarHeight,highlight);
-   
+
    if (Minimized() || IsVisible() == false)
       DrawBeacon(30,-titleBarHeight/2);
 
@@ -550,10 +550,10 @@ void IDrawableModule::SetTarget(IClickable* target)
    mMainPatchCableSource->SetTarget(target);
 }
 
-void IDrawableModule::SetUpPatchCables(string targets)
+void IDrawableModule::SetUpPatchCables(std::string targets)
 {
    assert(mMainPatchCableSource != nullptr);
-   vector<string> targetVec = ofSplitString(targets, ",");
+   std::vector<std::string> targetVec = ofSplitString(targets, ",");
    if (targetVec.empty() || targets == "")
    {
       mMainPatchCableSource->Clear();
@@ -746,12 +746,12 @@ void IDrawableModule::RemoveChild(IDrawableModule* child)
    RemoveFromVector(child, mChildren);
 }
 
-vector<IUIControl*> IDrawableModule::GetUIControls() const
+std::vector<IUIControl*> IDrawableModule::GetUIControls() const
 {
-   vector<IUIControl*> controls = mUIControls;
+   std::vector<IUIControl*> controls = mUIControls;
    for (int i=0; i<mChildren.size(); ++i)
    {
-      vector<IUIControl*> childControls = mChildren[i]->GetUIControls();
+      std::vector<IUIControl*> childControls = mChildren[i]->GetUIControls();
       controls.insert(controls.end(), childControls.begin(), childControls.end());
    }
    return controls;
@@ -778,7 +778,7 @@ void IDrawableModule::GetDimensions(float& width, float& height)
 
 float IDrawableModule::GetMinimizedWidth()
 {
-   string titleLabel = GetTitleLabel();
+   std::string titleLabel = GetTitleLabel();
    if (titleLabel != mLastTitleLabel)
    {
       mLastTitleLabel = titleLabel;
@@ -812,7 +812,7 @@ void IDrawableModule::AddUIControl(IUIControl* control)
 {
    try
    {
-      string name = control->Name();
+      std::string name = control->Name();
       if (CanSaveState() && name.empty() == false)
       {
          IUIControl* dupe = FindUIControl(name.c_str(), false);
@@ -1009,7 +1009,7 @@ bool IDrawableModule::CheckNeedsDraw()
    return false;
 }
 
-void IDrawableModule::LoadBasics(const ofxJSONElement& moduleInfo, string typeName)
+void IDrawableModule::LoadBasics(const ofxJSONElement& moduleInfo, std::string typeName)
 {
    int x = moduleInfo["position"][0u].asInt();
    int y = moduleInfo["position"][1u].asInt();
@@ -1055,7 +1055,7 @@ void IDrawableModule::SaveState(FileStreamOut& out)
    
    out << kSaveStateRev;
    
-   vector<IUIControl*> controlsToSave;
+   std::vector<IUIControl*> controlsToSave;
    for (auto* control : mUIControls)
    {
       if (!VectorContains(control, ControlsToIgnoreInSaveState()) && control->GetShouldSaveState())
@@ -1066,7 +1066,7 @@ void IDrawableModule::SaveState(FileStreamOut& out)
    for (auto* control : controlsToSave)
    {
       //ofLog() << "Saving control " << control->Name();
-      out << string(control->Name());
+      out << std::string(control->Name());
       control->SaveState(out);
       for (int i=0; i<kControlSeparatorLength; ++i)
          out << kControlSeparator[i];
@@ -1079,7 +1079,7 @@ void IDrawableModule::SaveState(FileStreamOut& out)
    
    for (auto* child : mChildren)
    {
-      out << string(child->Name());
+      out << std::string(child->Name());
       child->SaveState(out);
    }
    
@@ -1100,7 +1100,7 @@ void IDrawableModule::LoadState(FileStreamIn& in)
    in >> numUIControls;
    for (int i=0; i<numUIControls; ++i)
    {
-      string uicontrolname;
+      std::string uicontrolname;
       in >> uicontrolname;
 
       UpdateOldControlName(uicontrolname);
@@ -1129,7 +1129,7 @@ void IDrawableModule::LoadState(FileStreamIn& in)
                //something went wrong, let's print some info to try to figure it out
                ofLog() << "Read char " + ofToString(separatorChar) + " but expected " + kControlSeparator[j] + "!";
                ofLog() << "Save state file position is " + ofToString(in.GetFilePosition()) + ", EoF is " + (in.Eof() ? "true" : "false");
-               string nextFewChars = "Next 10 characters are:";
+               std::string nextFewChars = "Next 10 characters are:";
                for (int c=0;c<10;++c)
                {
                   char ch;
@@ -1152,7 +1152,7 @@ void IDrawableModule::LoadState(FileStreamIn& in)
       
       if (threwException)
       {
-         TheSynth->LogEvent("Error in module \""+string(Name())+"\" loading state for control \""+uicontrolname+"\"", kLogEventType_Error);
+         TheSynth->LogEvent("Error in module \""+std::string(Name())+"\" loading state for control \""+uicontrolname+"\"", kLogEventType_Error);
          
          //read through the rest of the module until we find the spacer, so we can continue loading the next module
          int separatorProgress = 0;
@@ -1179,7 +1179,7 @@ void IDrawableModule::LoadState(FileStreamIn& in)
    
    for (int i=0; i<numChildren; ++i)
    {
-      string childName;
+      std::string childName;
       in >> childName;
       //ofLog() << "Loading " << childName;
       IDrawableModule* child = FindChild(childName.c_str());
@@ -1210,12 +1210,12 @@ void IDrawableModule::LoadState(FileStreamIn& in)
    }
 }
 
-vector<IUIControl*> IDrawableModule::ControlsToNotSetDuringLoadState() const
+std::vector<IUIControl*> IDrawableModule::ControlsToNotSetDuringLoadState() const
 {
-   return vector<IUIControl*>(); //empty
+   return std::vector<IUIControl*>(); //empty
 }
 
-vector<IUIControl*> IDrawableModule::ControlsToIgnoreInSaveState() const
+std::vector<IUIControl*> IDrawableModule::ControlsToIgnoreInSaveState() const
 {
-   return vector<IUIControl*>(); //empty
+   return std::vector<IUIControl*>(); //empty
 }

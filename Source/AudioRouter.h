@@ -39,7 +39,7 @@ public:
    virtual ~AudioRouter();
    static IDrawableModule* Create() { return new AudioRouter(); }
    
-   string GetTitleLabel() override { return "audio router"; }
+   std::string GetTitleLabel() override { return "audio router"; }
    void CreateUIControls() override;
 
    void SetActiveIndex(int index) { mRouteIndex = index; }
@@ -66,10 +66,10 @@ private:
 
    int mRouteIndex;
    RadioButton* mRouteSelector;
-   vector<PatchCableSource*> mDestinationCables;
+   std::vector<PatchCableSource*> mDestinationCables;
    RollingBuffer mBlankVizBuffer;
    
-   array<Ramp,16> mSwitchAndRampIn;
+   std::array<Ramp,16> mSwitchAndRampIn;
    int mLastProcessedRouteIndex;
 };
 

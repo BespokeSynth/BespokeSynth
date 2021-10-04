@@ -40,7 +40,7 @@ public:
    virtual ~ModwheelToVibrato();
    static IDrawableModule* Create() { return new ModwheelToVibrato(); }
    
-   string GetTitleLabel() override { return "modwheel to vibrato"; }
+   std::string GetTitleLabel() override { return "modwheel to vibrato"; }
    void CreateUIControls() override;
    void SetEnabled(bool enabled) override { mEnabled = enabled; }
    

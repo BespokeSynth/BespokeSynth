@@ -45,7 +45,7 @@ public:
    virtual ~PulseTrain();
    static IDrawableModule* Create() { return new PulseTrain(); }
    
-   string GetTitleLabel() override { return "pulse train"; }
+   std::string GetTitleLabel() override { return "pulse train"; }
    void CreateUIControls() override;
    void Init() override;
    

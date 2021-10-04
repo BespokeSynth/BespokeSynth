@@ -43,7 +43,7 @@ public:
    virtual ~ModulatorAccum();
    static IDrawableModule* Create() { return new ModulatorAccum(); }
 
-   string GetTitleLabel() override { return "accum"; }
+   std::string GetTitleLabel() override { return "accum"; }
    void CreateUIControls() override;
    void Init() override;
 

@@ -45,7 +45,7 @@ public:
    ~EventCanvas();
    static IDrawableModule* Create() { return new EventCanvas(); }
    
-   string GetTitleLabel() override { return "event canvas"; }
+   std::string GetTitleLabel() override { return "event canvas"; }
    void CreateUIControls() override;
    void Init() override;
    
@@ -62,7 +62,7 @@ public:
    
    void PostRepatch(PatchCableSource* cableSource, bool fromUserClick) override;
    
-   vector<IUIControl*> ControlsToIgnoreInSaveState() const override;
+   std::vector<IUIControl*> ControlsToIgnoreInSaveState() const override;
    
    void CheckboxUpdated(Checkbox* checkbox) override;
    void FloatSliderUpdated(FloatSlider* slider, float oldVal) override;
@@ -96,8 +96,8 @@ private:
    NoteInterval mInterval;
    DropdownList* mIntervalSelector;
    float mPosition;
-   vector<PatchCableSource*> mControlCables;
-   vector<ofColor> mRowColors;
+   std::vector<PatchCableSource*> mControlCables;
+   std::vector<ofColor> mRowColors;
    bool mRecord;
    Checkbox* mRecordCheckbox;
    float mPreviousPosition;
@@ -109,7 +109,7 @@ private:
    };
    
    const int kMaxEventRows = 256;
-   vector<ControlConnection> mRowConnections;
+   std::vector<ControlConnection> mRowConnections;
 };
 
 #endif /* defined(__Bespoke__EventCanvas__) */

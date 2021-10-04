@@ -44,29 +44,29 @@ public:
    
    void Save(ofxJSONElement& moduleInfo);
    
-   void SetInt(string prop, int val);
-   void SetInt(string prop, int val, int min, int max, bool isTextField);
-   void SetFloat(string prop, float val);
-   void SetFloat(string prop, float val, float min, float max, bool isTextField);
-   void SetBool(string prop, bool val);
-   void SetString(string prop, string val);
+   void SetInt(std::string prop, int val);
+   void SetInt(std::string prop, int val, int min, int max, bool isTextField);
+   void SetFloat(std::string prop, float val);
+   void SetFloat(std::string prop, float val, float min, float max, bool isTextField);
+   void SetBool(std::string prop, bool val);
+   void SetString(std::string prop, std::string val);
    
-   void SetExtents(string prop, float min, float max);
+   void SetExtents(std::string prop, float min, float max);
    
-   bool HasProperty(string prop);
-   int GetInt(string prop);
-   float GetFloat(string prop);
-   bool GetBool(string prop);
-   string GetString(string prop);
-   template <class T> T GetEnum(string prop) { return (T)GetInt(prop); }
+   bool HasProperty(std::string prop);
+   int GetInt(std::string prop);
+   float GetFloat(std::string prop);
+   bool GetBool(std::string prop);
+   std::string GetString(std::string prop);
+   template <class T> T GetEnum(std::string prop) { return (T)GetInt(prop); }
    
-   int LoadInt(string prop, const ofxJSONElement& moduleInfo, int defaultValue = 0, int min=0, int max=10, bool isTextField = false);
-   int LoadInt(string prop, const ofxJSONElement& moduleInfo, int defaultValue, IntSlider* slider, bool isTextField = false);
-   float LoadFloat(string prop, const ofxJSONElement& moduleInfo, float defaultValue = 0, float min=0, float max=1, bool isTextField = false);
-   float LoadFloat(string prop, const ofxJSONElement& moduleInfo, float defaultValue , FloatSlider* slider, bool isTextField = false);
-   bool LoadBool(string prop, const ofxJSONElement& moduleInfo, bool defaultValue = false);
-   string LoadString(string prop, const ofxJSONElement& moduleInfo, string defaultValue = "", FillDropdownFn fillFn = nullptr);
-   template <class T> T LoadEnum(string prop, const ofxJSONElement& moduleInfo, int defaultValue, IUIControl* list = nullptr, EnumMap* map = nullptr)
+   int LoadInt(std::string prop, const ofxJSONElement& moduleInfo, int defaultValue = 0, int min=0, int max=10, bool isTextField = false);
+   int LoadInt(std::string prop, const ofxJSONElement& moduleInfo, int defaultValue, IntSlider* slider, bool isTextField = false);
+   float LoadFloat(std::string prop, const ofxJSONElement& moduleInfo, float defaultValue = 0, float min=0, float max=1, bool isTextField = false);
+   float LoadFloat(std::string prop, const ofxJSONElement& moduleInfo, float defaultValue , FloatSlider* slider, bool isTextField = false);
+   bool LoadBool(std::string prop, const ofxJSONElement& moduleInfo, bool defaultValue = false);
+   std::string LoadString(std::string prop, const ofxJSONElement& moduleInfo, std::string defaultValue = "", FillDropdownFn fillFn = nullptr);
+   template <class T> T LoadEnum(std::string prop, const ofxJSONElement& moduleInfo, int defaultValue, IUIControl* list = nullptr, EnumMap* map = nullptr)
    {
       if (list)
          SetEnumMapFromList(prop, list);
@@ -75,7 +75,7 @@ public:
       return (T)LoadInt(prop, moduleInfo, defaultValue);
    }
    
-   void UpdatePropertyMax(string prop, float max);
+   void UpdatePropertyMax(std::string prop, float max);
    
    enum Type
    {
@@ -87,9 +87,9 @@ public:
    
    struct SaveVal
    {
-      explicit SaveVal(string prop) : mProperty(std::move(prop)), mString(), mMin(0), mMax(10), mIsTextField(false), mFillDropdownFn(nullptr) {}
+      explicit SaveVal(std::string prop) : mProperty(std::move(prop)), mString(), mMin(0), mMax(10), mIsTextField(false), mFillDropdownFn(nullptr) {}
       
-      string mProperty;
+      std::string mProperty;
       Type mType;
       int mInt;
       float mFloat;
@@ -102,16 +102,16 @@ public:
       FillDropdownFn mFillDropdownFn;
    };
    
-   list<SaveVal*>& GetSavedValues() { return mValues; }
+   std::list<SaveVal*>& GetSavedValues() { return mValues; }
 
    //generally these are only used internally, needed to expose them for a special case
-   void SetEnumMapFromList(string prop, IUIControl* list);
-   void SetEnumMap(string prop, EnumMap* map);
+   void SetEnumMapFromList(std::string prop, IUIControl* list);
+   void SetEnumMap(std::string prop, EnumMap* map);
    
 private:
-   SaveVal* GetVal(string prop);
+   SaveVal* GetVal(std::string prop);
    
-   list<SaveVal*> mValues;
+   std::list<SaveVal*> mValues;
 };
 
 #endif /* defined(__modularSynth__ModuleSaveData__) */

@@ -24,7 +24,7 @@ using namespace juce;
 #include "SpaceMouseControl.h"
 
 #ifdef JUCE_WINDOWS
-#include <Windows.h>
+#include <windows.h>
 #endif
 
 //==============================================================================
@@ -43,9 +43,7 @@ public:
    : mLastFpsUpdateTime(0)
    , mFrameCountAccum(0)
    , mPixelRatio(1)
-#if BESPOKE_WINDOWS
-   , mSpaceMouseReader(&mSynth)
-#endif
+   , mSpaceMouseReader(mSynth)
    {
       ofLog() << "bespoke synth " << JUCEApplication::getInstance()->getApplicationVersion();
 
@@ -68,8 +66,11 @@ public:
       int screenWidth, screenHeight;
       {
          const MessageManagerLock lock;
-         mPixelRatio = Desktop::getInstance().getDisplays().getMainDisplay().scale;
-         TheSynth->SetPixelRatio(mPixelRatio);
+         if (const auto* dpy = Desktop::getInstance().getDisplays().getPrimaryDisplay())
+         {
+            mPixelRatio = dpy->scale;
+            TheSynth->SetPixelRatio(mPixelRatio);
+         }
          auto bounds = Desktop::getInstance().getDisplays().getTotalBounds(true);
          screenWidth = bounds.getWidth();
          screenHeight = bounds.getHeight();
@@ -102,6 +103,7 @@ public:
       setSize(width, height);
       setWantsKeyboardFocus(true);
       Desktop::setScreenSaverEnabled(false);
+      mGlobalManagers.mDeviceManager.getAvailableDeviceTypes();   //scans for device types ("Windows Audio", "DirectSound", etc)
    }
    
    ~MainContentComponent()
@@ -137,15 +139,16 @@ public:
 
       if (sRenderFrame % 30 == 0)
       {
-         mPixelRatio = Desktop::getInstance().getDisplays().findDisplayForRect(getScreenBounds()).scale; //adjust pixel ratio based on which screen has the majority of the window
-         TheSynth->SetPixelRatio(mPixelRatio);
+         if (const auto* dpy = Desktop::getInstance().getDisplays().getDisplayForRect(getScreenBounds()))
+         {
+            mPixelRatio = dpy->scale; //adjust pixel ratio based on which screen has the majority of the window
+            TheSynth->SetPixelRatio(mPixelRatio);
+         }
       }
       
       mScreenPosition = getScreenPosition();
 
-#if BESPOKE_WINDOWS
       mSpaceMouseReader.Poll();
-#endif
    }
    
    //==============================================================================
@@ -207,13 +210,11 @@ public:
             ofLog() << output.toStdString();
       }*/
 
-      mGlobalManagers.mDeviceManager.getAvailableDeviceTypes();   //scans for device types ("Windows Audio", "DirectSound", etc)
-
       ofxJSONElement userPrefs;
-      const string kAutoDevice = "auto";
-      const string kNoneDevice = "none";
-      string outputDevice = kAutoDevice;
-      string inputDevice = kNoneDevice;
+      const std::string kAutoDevice = "auto";
+      const std::string kNoneDevice = "none";
+      std::string outputDevice = kAutoDevice;
+      std::string inputDevice = kNoneDevice;
       int sampleRate = 48000;
       int bufferSize = 256;
       bool loaded = userPrefs.open(ModularSynth::GetUserPrefsPath(false));
@@ -491,15 +492,15 @@ private:
    
    void filesDropped(const StringArray& files, int x, int y) override
    {
-      vector<string> strFiles;
+      std::vector<std::string> strFiles;
       for (auto file : files)
          strFiles.push_back(file.toStdString());
       mSynth.FilesDropped(strFiles, x, y);
    }
    
-   string GetAudioDevices()
+   std::string GetAudioDevices()
    {
-      string ret;
+      std::string ret;
       OwnedArray<AudioIODeviceType> types;
       mGlobalManagers.mDeviceManager.createAudioDeviceTypes(types);
       for (int i = 0; i < types.size(); ++i)
@@ -538,14 +539,12 @@ private:
    NVGcontext* mFontBoundsVG;
    int64 mLastFpsUpdateTime;
    int mFrameCountAccum;
-   list<int> mPressedKeys;
+   std::list<int> mPressedKeys;
    double mPixelRatio;
    juce::Point<int> mScreenPosition;
    juce::Point<int> mDesiredInitialPosition;
-#if BESPOKE_WINDOWS
    SpaceMouseMessageWindow mSpaceMouseReader;
-#endif
-   
+
    JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (MainContentComponent)
 };
 

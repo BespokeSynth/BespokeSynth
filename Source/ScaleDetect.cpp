@@ -65,7 +65,7 @@ void ScaleDetect::DrawModule()
          int numScaleTypes = TheScale->GetNumScaleTypes();
          for (int j=0; j<numScaleTypes-1; ++j)
          {
-            if (ScaleSatisfied(mLastPitch%TheScale->GetTet(), TheScale->GetScaleName(j)))
+            if (ScaleSatisfied(mLastPitch%TheScale->GetPitchesPerOctave(), TheScale->GetScaleName(j)))
                mMatchesDropdown->AddLabel(TheScale->GetScaleName(j).c_str(), numMatches++);
          }
       }
@@ -74,13 +74,13 @@ void ScaleDetect::DrawModule()
    }
    
    {
-      string pitchString;
-      vector<int> rootRelative;
+      std::string pitchString;
+      std::vector<int> rootRelative;
       for (int i=0; i<128; ++i)
       {
          if (mPitchOn[i])
          {
-            int entry = (i-mLastPitch+TheScale->GetTet()*10)%TheScale->GetTet();
+            int entry = (i-mLastPitch+TheScale->GetPitchesPerOctave()*10)%TheScale->GetPitchesPerOctave();
             if (!VectorContains(entry, rootRelative))
                rootRelative.push_back(entry);
          }
@@ -104,7 +104,7 @@ void ScaleDetect::PlayNote(double time, int pitch, int velocity, int voiceIdx, M
    }
 }
 
-bool ScaleDetect::ScaleSatisfied(int root, string type)
+bool ScaleDetect::ScaleSatisfied(int root, std::string type)
 {
    ScalePitches scale;
    scale.SetRoot(root);

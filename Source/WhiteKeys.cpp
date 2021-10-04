@@ -53,9 +53,9 @@ void WhiteKeys::PlayNote(double time, int pitch, int velocity, int voiceIdx, Mod
       return;
    }
 
-   int octave = pitch / TheScale->GetTet();
+   int octave = pitch / TheScale->GetPitchesPerOctave();
    int degree = -1;
-   switch (pitch % TheScale->GetTet())
+   switch (pitch % TheScale->GetPitchesPerOctave())
    {
       case 0: degree = 0; break;
       case 2: degree = 1; break;
@@ -69,7 +69,7 @@ void WhiteKeys::PlayNote(double time, int pitch, int velocity, int voiceIdx, Mod
    if (degree != -1)
    {
       pitch = TheScale->GetPitchFromTone(degree);
-      pitch += octave * TheScale->GetTet();
+      pitch += octave * TheScale->GetPitchesPerOctave();
       PlayNoteOutput(time, pitch, velocity, voiceIdx, modulation);
    }
 }

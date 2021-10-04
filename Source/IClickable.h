@@ -58,7 +58,7 @@ public:
    }
    const char* Name() const { return mName; }
    char* NameMutable() { return mName; }
-   string Path(bool ignoreContext = false);
+   std::string Path(bool ignoreContext = false);
    virtual bool CheckNeedsDraw();
    virtual void SetShowing(bool showing) { mShowing = showing; }
    bool IsShowing() const { return mShowing; }
@@ -73,8 +73,8 @@ public:
    static void SetSaveContext(IClickable* context) { sSaveContext = context->Path() + "~"; }
    static void ClearSaveContext() { sSaveContext = ""; }
    
-   static string sLoadContext;
-   static string sSaveContext;
+   static std::string sLoadContext;
+   static std::string sSaveContext;
    
 protected:
    virtual void OnClicked(int x, int y, bool right) {}

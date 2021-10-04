@@ -385,7 +385,7 @@ void LoopStorer::SampleData::Init(LoopStorer* storer, int index)
       mSelectCheckbox->Delete();
    }
    
-   string indexStr = ofToString(index + 1);
+   std::string indexStr = ofToString(index + 1);
    
    int y = storer->GetRowY(index);
    mSelectCheckbox = new Checkbox(storer,("select "+indexStr).c_str(),110,y+20,&mIsCurrentBuffer);

@@ -39,7 +39,7 @@ public:
    ~SampleBrowser();
    static IDrawableModule* Create() { return new SampleBrowser(); }
    
-   string GetTitleLabel() override { return "sample browser"; }
+   std::string GetTitleLabel() override { return "sample browser"; }
    
    void CreateUIControls() override;
    

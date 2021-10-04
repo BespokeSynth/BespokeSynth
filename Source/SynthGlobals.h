@@ -70,14 +70,12 @@ void* operator new[](std::size_t size, const char *file, int line) throw(std::ba
 //avoid "unused variable" warnings
 #define UNUSED(x) ((void) x)
 
-using namespace std;
-
 class IUIControl;
 class IDrawableModule;
 class RollingBuffer;
 class ChannelBuffer;
 
-typedef map<string,int> EnumMap;
+typedef std::map<std::string,int> EnumMap;
 
 const int kWorkBufferSize = 1024*8; //larger than the audio buffer size would ever be (even oversampled)
 
@@ -133,20 +131,20 @@ enum KeyModifiers
    kModifier_Command = 8
 };
 
-class LoadingJSONException : public exception {};
-class UnknownModuleException : public exception
+class LoadingJSONException : public std::exception {};
+class UnknownModuleException : public std::exception
 {
 public:
-   UnknownModuleException(string searchName)
+   UnknownModuleException(std::string searchName)
    : mSearchName(searchName) {}
    ~UnknownModuleException() throw() {}
-   string mSearchName;
+   std::string mSearchName;
 };
-class UnknownEffectTypeException : public exception {};
-class BadUIControlPathException : public exception {};
-class UnknownUIControlException : public exception {};
-class WrongModuleTypeException : public exception {};
-class LoadStateException : public exception {};
+class UnknownEffectTypeException : public std::exception {};
+class BadUIControlPathException : public std::exception {};
+class UnknownUIControlException : public std::exception {};
+class WrongModuleTypeException : public std::exception {};
+class LoadStateException : public std::exception {};
 
 void SynthInit();
 void LoadGlobalResources();
@@ -160,21 +158,21 @@ void Mult(float* buff, float val, int bufferSize);
 void Mult(float* buff1, const float* buff2, int bufferSize);
 void Clear(float* buffer, int bufferSize);
 void BufferCopy(float* dst, const float* src, int bufferSize);
-string NoteName(int pitch, bool flat=false, bool includeOctave = false);
-int PitchFromNoteName(string noteName);
+std::string NoteName(int pitch, bool flat=false, bool includeOctave = false);
+int PitchFromNoteName(std::string noteName);
 float Interp(float a, float start, float end);
 double GetPhaseInc(float freq);
 void FloatWrap(float& num, float space);
 void FloatWrap(double& num, float space);
-void DrawTextNormal(string text, int x, int y, float size = 15);
-void DrawTextLeftJustify(string text, int x, int y, float size = 15);
-void DrawTextBold(string text, int x, int y, float size = 15);
-float GetStringWidth(string text, float size = 15);
+void DrawTextNormal(std::string text, int x, int y, float size = 15);
+void DrawTextLeftJustify(std::string text, int x, int y, float size = 15);
+void DrawTextBold(std::string text, int x, int y, float size = 15);
+float GetStringWidth(std::string text, float size = 15);
 void AssertIfDenormal(float input);
 float GetInterpolatedSample(double offset, const float* buffer, int bufferSize);
 float GetInterpolatedSample(double offset, ChannelBuffer* buffer, int bufferSize, float channelBlend);
 void WriteInterpolatedSample(double offset, float* buffer, int bufferSize, float sample);
-string GetRomanNumeralForDegree(int degree);
+std::string GetRomanNumeralForDegree(int degree);
 void UpdateTarget(IDrawableModule* module);
 void DrawLissajous(RollingBuffer* buffer, float x, float y, float w, float h, float r = .2f, float g = .7f, float b = .2f);
 void StringCopy(char* dest, const char* source, int destLength);
@@ -187,8 +185,8 @@ float Bias(float value, float bias);
 float Pow2(float in);
 void PrintCallstack();
 bool IsInUnitBox(ofVec2f pos);
-string GetUniqueName(string name, vector<IDrawableModule*> existing);
-string GetUniqueName(string name, vector<string> existing);
+std::string GetUniqueName(std::string name, std::vector<IDrawableModule*> existing);
+std::string GetUniqueName(std::string name, std::vector<std::string> existing);
 void SetMemoryTrackingEnabled(bool enabled);
 void DumpUnfreedMemory();
 float DistSqToLine(ofVec2f point, ofVec2f a, ofVec2f b);
@@ -197,14 +195,14 @@ void LoadStateValidate(bool assertion);
 float GetLeftPanGain(float pan);
 float GetRightPanGain(float pan);
 void DrawFallbackText(const char* text, float posX, float posY);
-bool EvaluateExpression(string expression, float currentValue, float& output);
+bool EvaluateExpression(std::string expression, float currentValue, float& output);
 
 inline static float RandomSample()
 {
    return (float(gRandom())/gRandom.max()) * 2.0f - 1.0f;
 }
 
-inline static string GetPathSeparator()
+inline static std::string GetPathSeparator()
 {
 #if BESPOKE_WINDOWS
    return "\\";
@@ -275,6 +273,6 @@ public:
       return *this;
    }
 private:
-   string mMessage;
+   std::string mMessage;
    bool mSendToBespokeConsole;
 };

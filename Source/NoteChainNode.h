@@ -42,7 +42,7 @@ public:
    virtual ~NoteChainNode();
    static IDrawableModule* Create() { return new NoteChainNode(); }
    
-   string GetTitleLabel() override { return "note chain"; }
+   std::string GetTitleLabel() override { return "note chain"; }
    void CreateUIControls() override;
    void Init() override;
    

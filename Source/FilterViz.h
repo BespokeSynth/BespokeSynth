@@ -42,7 +42,7 @@ public:
    ~FilterViz();
    static IDrawableModule* Create() { return new FilterViz(); }
    
-   string GetTitleLabel() override { return "filter viz"; }
+   std::string GetTitleLabel() override { return "filter viz"; }
    void CreateUIControls() override;
    
    //IDrawableModule
@@ -65,7 +65,7 @@ private:
    float* mFFTOutImag;
    
    bool mNeedUpdate;
-   vector<IAudioEffect*> mFilters;
+   std::vector<IAudioEffect*> mFilters;
 };
 
 #endif /* defined(__Bespoke__FilterViz__) */

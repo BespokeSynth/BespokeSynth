@@ -39,7 +39,7 @@ public:
    virtual ~ModulatorSubtract();
    static IDrawableModule* Create() { return new ModulatorSubtract(); }
    
-   string GetTitleLabel() override { return "subtract"; }
+   std::string GetTitleLabel() override { return "subtract"; }
    void CreateUIControls() override;
    
    void SetEnabled(bool enabled) override { mEnabled = enabled; }

@@ -37,7 +37,7 @@ public:
    WhiteKeys();
    static IDrawableModule* Create() { return new WhiteKeys(); }
    
-   string GetTitleLabel() override { return "white keys"; }
+   std::string GetTitleLabel() override { return "white keys"; }
 
    void SetEnabled(bool enabled) override { mEnabled = enabled; }
 

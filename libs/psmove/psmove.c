@@ -27,7 +27,7 @@
  * POSSIBILITY OF SUCH DAMAGE.
  **/
 
-#include "psmove.h"
+#include "psmove/psmove.h"
 
 #include "hidapi.h"
 

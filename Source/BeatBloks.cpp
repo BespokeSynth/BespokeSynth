@@ -288,7 +288,7 @@ void BeatBloks::Process(double time)
    GetVizBuffer()->WriteChunk(out, bufferSize, 0);
 }
 
-void BeatBloks::FilesDropped(vector<string> files, int x, int y)
+void BeatBloks::FilesDropped(std::vector<std::string> files, int x, int y)
 {
    mLoading = true;
    
@@ -298,8 +298,8 @@ void BeatBloks::FilesDropped(vector<string> files, int x, int y)
    
    ResetRead();
    
-   vector<string> tokens = ofSplitString(files[0].c_str(), GetPathSeparator());
-   string cachedFilename = tokens[tokens.size()-1].c_str();
+   std::vector<std::string> tokens = ofSplitString(files[0].c_str(), GetPathSeparator());
+   std::string cachedFilename = tokens[tokens.size()-1].c_str();
    tokens = ofSplitString(cachedFilename, ".");
    cachedFilename = tokens[0]+".cached";
    bool hasCached = juce::File(ofToDataPath(cachedFilename)).existsAsFile();
@@ -381,7 +381,7 @@ void BeatBloks::ResetRead()
 
 void BeatBloks::ReadEchonestLine(const char* line)
 {
-   vector<string> tokens = ofSplitString(line," ");
+   std::vector<std::string> tokens = ofSplitString(line," ");
    if (tokens.size() == 1)
    {
       if (tokens[0] == "bars")
@@ -487,14 +487,14 @@ void BeatBloks::ButtonClicked(ClickButton *button)
    
    if (button == mGetLuckyButton)
    {
-      vector<string> fake;
+      std::vector<std::string> fake;
       fake.push_back(ofToDataPath("Daft Punk - Get Lucky.mp3",true));
       FilesDropped(fake, 0, 0);
       mOffset = -53275;
    }
    if (button == mLoseYourselfButton)
    {
-      vector<string> fake;
+      std::vector<std::string> fake;
       fake.push_back(ofToDataPath("Daft Punk - Lose Yourself To Dance.mp3",true));
       FilesDropped(fake, 0, 0);
    }
@@ -710,7 +710,7 @@ void BeatBloks::DrawModule()
       if (mBars.size() != 0)
       {
          ofSetColor(0,255,255,60);
-         vector<Blok>& drawBloks = mNothing;
+         std::vector<Blok>& drawBloks = mNothing;
          switch (mDrawBlokType)
          {
             case kBlok_Bar:

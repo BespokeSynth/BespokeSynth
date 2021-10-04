@@ -13,6 +13,8 @@
 #include "LocationZoomer.h"
 #include "EffectFactory.h"
 #include "ModuleContainer.h"
+#include "Minimap.h"
+
 #ifdef BESPOKE_LINUX
 #include <climits>
 #endif
@@ -80,7 +82,7 @@ public:
    void MouseReleased(int x, int y, int button);
    void MouseScrolled(float x, float y, bool canZoomCanvas);
    void MouseMagnify(int x, int y, float scaleFactor);
-   void FilesDropped(vector<string> files, int x, int y);
+   void FilesDropped(std::vector<std::string> files, int x, int y);
    
    void AddExtraPoller(IPollable* poller);
    void RemoveExtraPoller(IPollable* poller);
@@ -97,7 +99,7 @@ public:
    
    void AddMidiDevice(MidiDevice* device);
    void ArrangeAudioSourceDependencies();
-   IDrawableModule* SpawnModuleOnTheFly(string moduleName, float x, float y, bool addToContainer = true);
+   IDrawableModule* SpawnModuleOnTheFly(std::string moduleName, float x, float y, bool addToContainer = true);
    void SetMoveModule(IDrawableModule* module, float offsetX, float offsetY);
    
    int GetNumInputChannels() const { return (int)mInputBuffers.size(); }
@@ -105,35 +107,35 @@ public:
    float* GetInputBuffer(int channel);
    float* GetOutputBuffer(int channel);
    
-   IDrawableModule* FindModule(string name, bool fail = false);
-   IAudioReceiver* FindAudioReceiver(string name, bool fail = false);
-   INoteReceiver* FindNoteReceiver(string name, bool fail = false);
-   IUIControl* FindUIControl(string path);
-   MidiController* FindMidiController(string name, bool fail = false);
+   IDrawableModule* FindModule(std::string name, bool fail = false);
+   IAudioReceiver* FindAudioReceiver(std::string name, bool fail = false);
+   INoteReceiver* FindNoteReceiver(std::string name, bool fail = false);
+   IUIControl* FindUIControl(std::string path);
+   MidiController* FindMidiController(std::string name, bool fail = false);
    void MoveToFront(IDrawableModule* module);
    bool InMidiMapMode();
-   void GetAllModules(vector<IDrawableModule*>& out) { mModuleContainer.GetAllModules(out); }
+   void GetAllModules(std::vector<IDrawableModule*>& out) { mModuleContainer.GetAllModules(out); }
    
    void PushModalFocusItem(IDrawableModule* item);
    void PopModalFocusItem();
    IDrawableModule* GetTopModalFocusItem() const;
-   vector<IDrawableModule*> GetModalFocusItemStack() const { return mModalFocusItemStack; }
+   std::vector<IDrawableModule*> GetModalFocusItemStack() const { return mModalFocusItemStack; }
    bool IsModalFocusItem(IDrawableModule* item) const;
    
-   void LogEvent(string event, LogEventType type);
-   void SetNextDrawTooltip(string tooltip) { mNextDrawTooltip = tooltip; }
+   void LogEvent(std::string event, LogEventType type);
+   void SetNextDrawTooltip(std::string tooltip) { mNextDrawTooltip = tooltip; }
    
-   bool LoadLayoutFromFile(string jsonFile, bool makeDefaultLayout = true);
-   bool LoadLayoutFromString(string jsonString);
+   bool LoadLayoutFromFile(std::string jsonFile, bool makeDefaultLayout = true);
+   bool LoadLayoutFromString(std::string jsonString);
    void LoadLayout(ofxJSONElement json);
-   string GetLoadedLayout() const { return mLoadedLayoutPath; }
+   std::string GetLoadedLayout() const { return mLoadedLayoutPath; }
    void ReloadInitialLayout() { mWantReloadInitialLayout = true; }
    
    void AddLissajousDrawer(IDrawableModule* module) { mLissajousDrawers.push_back(module); }
    bool IsLissajousDrawer(IDrawableModule* module) { return VectorContains(module, mLissajousDrawers); }
    
    void GrabSample(ChannelBuffer* data, bool window = false, int numBars = -1);
-   void GrabSample(string filePath);
+   void GrabSample(std::string filePath);
    Sample* GetHeldSample() const { return mHeldSample; }
    void ClearHeldSample();
    
@@ -171,14 +173,14 @@ public:
    juce::OpenGLContext* GetOpenGLContext() { return mOpenGLContext; }
    IDrawableModule* GetLastClickedModule() const;
    EffectFactory* GetEffectFactory() { return &mEffectFactory; }
-   const vector<IDrawableModule*>& GetGroupSelectedModules() const { return mGroupSelectedModules; }
+   const std::vector<IDrawableModule*>& GetGroupSelectedModules() const { return mGroupSelectedModules; }
    bool ShouldAccentuateActiveModules() const;
    LocationZoomer* GetLocationZoomer() { return &mZoomer; }
    
    void RegisterPatchCable(PatchCable* cable);
    void UnregisterPatchCable(PatchCable* cable);
    
-   template<class T> vector<string> GetModuleNames() { return mModuleContainer.GetModuleNames<T>(); }
+   template<class T> std::vector<std::string> GetModuleNames() { return mModuleContainer.GetModuleNames<T>(); }
    
    void LockRender(bool lock) { if (lock) { mRenderLock.lock(); } else { mRenderLock.unlock(); } }
    void UpdateFrameRate(float fps) { mFrameRate = fps; }
@@ -198,21 +200,21 @@ public:
    bool IsLoadingModule() const { return mIsLoadingModule; }
    void SetIsLoadingState(bool loading) { mIsLoadingState = loading; }
    
-   static string GetUserPrefsPath(bool relative);
+   static std::string GetUserPrefsPath(bool relative);
    static void CrashHandler(void*);
    static void DumpStats(bool isCrash, void* crashContext);
    
-   void SaveLayout(string jsonFile = "", bool makeDefaultLayout = true);
+   void SaveLayout(std::string jsonFile = "", bool makeDefaultLayout = true);
    ofxJSONElement GetLayout();
    void SaveLayoutAsPopup();
    void SaveOutput();
-   void SaveState(string file, bool autosave);
-   void LoadState(string file);
+   void SaveState(std::string file, bool autosave);
+   void LoadState(std::string file);
    void SaveCurrentState();
    void SaveStatePopup();
    void LoadStatePopup();
    double GetLastSaveTime() { return mLastSaveTime; }
-   string GetLastSavePath() { return mCurrentSaveStatePath; }
+   std::string GetLastSavePath() { return mCurrentSaveStatePath; }
 
    ofxJSONElement GetUserPrefs() { return mUserPrefs; }
    UserPrefsEditor* GetUserPrefsEditor() { return mUserPrefsEditor; }
@@ -220,7 +222,7 @@ public:
    const juce::String& GetTextFromClipboard() const;
    void CopyTextToClipboard(const juce::String& text);
    
-   void SetFatalError(string error);
+   void SetFatalError(std::string error);
 
    static bool sShouldAutosave;
    static float sBackgroundLissajousR;
@@ -244,11 +246,11 @@ private:
    
    int mIOBufferSize;
    
-   vector<IAudioSource*> mSources;
-   vector<IDrawableModule*> mLissajousDrawers;
-   vector<IDrawableModule*> mDeletedModules;
+   std::vector<IAudioSource*> mSources;
+   std::vector<IDrawableModule*> mLissajousDrawers;
+   std::vector<IDrawableModule*> mDeletedModules;
    
-   vector<IDrawableModule*> mModalFocusItemStack;
+   std::vector<IDrawableModule*> mModalFocusItemStack;
    
    IDrawableModule* mMoveModule;
    int mMoveModuleOffsetX;
@@ -257,7 +259,7 @@ private:
    ofVec2f mLastMoveMouseScreenPos;
    ofVec2f mLastMouseDragPos;
    bool mIsMousePanning;
-   array<bool, 5> mIsMouseButtonHeld{ false };
+   std::array<bool, 5> mIsMouseButtonHeld{ false };
    struct SpaceMouseInfo
    {
       SpaceMouseInfo() : mTwist(0), mZoom(0), mPan(0, 0), mUsingTwist(false), mUsingZoom(false), mUsingPan(false) {}
@@ -278,6 +280,7 @@ private:
 
    LocationZoomer mZoomer;
    QuickSpawnMenu* mQuickSpawn;
+   Minimap* mMinimap;
    UserPrefsEditor* mUserPrefsEditor;
 
    RollingBuffer* mGlobalRecordBuffer;
@@ -285,13 +288,13 @@ private:
    
    struct LogEventItem
    {
-      LogEventItem(double _time, string _text, LogEventType _type) : time(_time), text(_text), type(_type) {}
+      LogEventItem(double _time, std::string _text, LogEventType _type) : time(_time), text(_text), type(_type) {}
       double time;
-      string text;
+      std::string text;
       LogEventType type;
    };
    std::list<LogEventItem> mEvents;
-   std::list<string> mErrors;
+   std::list<std::string> mErrors;
    
    NamedMutex mAudioThreadMutex;
    
@@ -304,9 +307,9 @@ private:
    int mClickStartX; //to detect click and release in place
    int mClickStartY;
    
-   string mLoadedLayoutPath;
+   std::string mLoadedLayoutPath;
    bool mWantReloadInitialLayout;
-   string mCurrentSaveStatePath;
+   std::string mCurrentSaveStatePath;
    double mLastSaveTime;
    
    Sample* mHeldSample;
@@ -320,7 +323,7 @@ private:
    
    ofRectangle mDrawRect;
    
-   vector<IDrawableModule*> mGroupSelectedModules;
+   std::vector<IDrawableModule*> mGroupSelectedModules;
    ModuleContainer* mGroupSelectContext;
    bool mHasDuplicatedDuringDrag;
    bool mHasAutopatchedToTargetDuringDrag;
@@ -329,13 +332,13 @@ private:
    
    bool mShowLoadStatePopup;
    
-   vector<PatchCable*> mPatchCables;
+   std::vector<PatchCable*> mPatchCables;
    
    ofMutex mKeyInputMutex;
-   vector< pair<int,bool> > mQueuedKeyInput;
+   std::vector< std::pair<int,bool> > mQueuedKeyInput;
    
    ofVec2f mMousePos;
-   string mNextDrawTooltip;
+   std::string mNextDrawTooltip;
    
    juce::AudioDeviceManager* mGlobalAudioDeviceManager;
    juce::AudioFormatManager* mGlobalAudioFormatManager;
@@ -353,9 +356,9 @@ private:
    
    bool mIsLoadingModule;
    
-   list<IPollable*> mExtraPollers;
+   std::list<IPollable*> mExtraPollers;
    
-   string mFatalError;
+   std::string mFatalError;
    
    double mLastClapboardTime;
 
@@ -364,8 +367,8 @@ private:
 
    double mPixelRatio;
 
-   vector<float*> mInputBuffers;
-   vector<float*> mOutputBuffers;
+   std::vector<float*> mInputBuffers;
+   std::vector<float*> mOutputBuffers;
 };
 
 extern ModularSynth* TheSynth;

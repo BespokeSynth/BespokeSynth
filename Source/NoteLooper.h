@@ -45,7 +45,7 @@ public:
    ~NoteLooper();
    static IDrawableModule* Create() { return new NoteLooper(); }
    
-   string GetTitleLabel() override { return "note looper"; }
+   std::string GetTitleLabel() override { return "note looper"; }
    void CreateUIControls() override;
    void Init() override;
    void SetEnabled(bool enabled) override { mEnabled = enabled; }
@@ -104,7 +104,7 @@ private:
    {
       ClickButton* mStoreButton;
       ClickButton* mLoadButton;
-      vector<CanvasElement*> mNotes;
+      std::vector<CanvasElement*> mNotes;
    };
 
    float mWidth;
@@ -117,7 +117,7 @@ private:
    Checkbox* mDeleteOrMuteCheckbox;
    IntSlider* mNumMeasuresSlider;
    int mNumMeasures;
-   vector<CanvasElement*> mNoteChecker {128};
+   std::vector<CanvasElement*> mNoteChecker {128};
    std::array<NoteCanvasElement*, 128> mInputNotes {};
    std::array<NoteCanvasElement*, 128> mCurrentNotes {};
    Canvas* mCanvas;

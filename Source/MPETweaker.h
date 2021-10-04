@@ -40,7 +40,7 @@ public:
    virtual ~MPETweaker();
    static IDrawableModule* Create() { return new MPETweaker(); }
    
-   string GetTitleLabel() override { return "mpe tweaker"; }
+   std::string GetTitleLabel() override { return "mpe tweaker"; }
    void CreateUIControls() override;
    void SetEnabled(bool enabled) override { mEnabled = enabled; }
    

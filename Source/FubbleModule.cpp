@@ -510,7 +510,7 @@ void FubbleModule::LoadLayout(const ofxJSONElement& moduleInfo)
 void FubbleModule::SetUpFromSaveData()
 {
    {
-      string controlPathH = mModuleSaveData.GetString("uicontrol_h");
+      std::string controlPathH = mModuleSaveData.GetString("uicontrol_h");
       if (!controlPathH.empty())
       {
          auto uicontrol = TheSynth->FindUIControl(controlPathH);
@@ -523,7 +523,7 @@ void FubbleModule::SetUpFromSaveData()
    }
    
    {
-      string controlPathV = mModuleSaveData.GetString("uicontrol_v");
+      std::string controlPathV = mModuleSaveData.GetString("uicontrol_v");
       if (!controlPathV.empty())
       {
          auto uicontrol = TheSynth->FindUIControl(controlPathV);

@@ -55,16 +55,16 @@ public:
    void SetStart(float start, bool preserveLength);
    virtual float GetEnd() const;
    void SetEnd(float end);
-   vector<IUIControl*>& GetUIControls() { return mUIControls; }
+   std::vector<IUIControl*>& GetUIControls() { return mUIControls; }
    void MoveElementByDrag(ofVec2f dragOffset);
    
    virtual bool IsResizable() const { return true; }
    virtual CanvasElement* CreateDuplicate() const = 0;
    
-   virtual void CheckboxUpdated(string label, bool value);
-   virtual void FloatSliderUpdated(string label, float oldVal, float newVal);
-   virtual void IntSliderUpdated(string label, int oldVal, float newVal);
-   virtual void ButtonClicked(string label);
+   virtual void CheckboxUpdated(std::string label, bool value);
+   virtual void FloatSliderUpdated(std::string label, float oldVal, float newVal);
+   virtual void IntSliderUpdated(std::string label, int oldVal, float newVal);
+   virtual void ButtonClicked(std::string label);
    
    virtual void SaveState(FileStreamOut& out);
    virtual void LoadState(FileStreamIn& in);
@@ -85,7 +85,7 @@ protected:
    
    Canvas* mCanvas;
    bool mHighlighted;
-   vector<IUIControl*> mUIControls;
+   std::vector<IUIControl*> mUIControls;
 };
 
 class NoteCanvasElement : public CanvasElement
@@ -142,8 +142,8 @@ public:
    
    CanvasElement* CreateDuplicate() const override;
    
-   void CheckboxUpdated(string label, bool value) override;
-   void ButtonClicked(string label) override;
+   void CheckboxUpdated(std::string label, bool value) override;
+   void ButtonClicked(std::string label) override;
    
    void SaveState(FileStreamOut& out) override;
    void LoadState(FileStreamIn& in) override;

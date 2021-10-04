@@ -148,7 +148,7 @@ void LooperGranulator::SaveLayout(ofxJSONElement& moduleInfo)
 {
    IDrawableModule::SaveLayout(moduleInfo);
 
-   string targetPath = "";
+   std::string targetPath = "";
    if (mLooperCable->GetTarget())
       targetPath = mLooperCable->GetTarget()->Path();
 

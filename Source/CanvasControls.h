@@ -42,7 +42,7 @@ public:
    ~CanvasControls();
    static IDrawableModule* Create() { return new CanvasControls(); }
    
-   string GetTitleLabel() override { return ""; }
+   std::string GetTitleLabel() override { return ""; }
    void CreateUIControls() override;
    bool HasTitleBar() const override { return false; }
    bool CanMinimize() override { return false; }

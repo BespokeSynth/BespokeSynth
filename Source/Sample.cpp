@@ -56,7 +56,7 @@ bool Sample::Read(const char* path, bool mono, ReadType readType)
 {
    mReadPath = path;
    ofStringReplace(mReadPath, GetPathSeparator(), "/");
-   vector<string> tokens = ofSplitString(mReadPath, "/");
+   std::vector<std::string> tokens = ofSplitString(mReadPath, "/");
    mName = tokens[tokens.size()-1].c_str();
    
    juce::File file(ofToDataPath(mReadPath));
@@ -76,7 +76,7 @@ bool Sample::Read(const char* path, bool mono, ReadType readType)
       mOffset = mNumSamples;
       mSampleRateRatio = float(mReader->sampleRate) / gSampleRate;
       
-      mReadBuffer = make_unique<juce::AudioSampleBuffer>();
+      mReadBuffer = std::make_unique<juce::AudioSampleBuffer>();
       mReadBuffer->setSize(mReader->numChannels, mNumSamples);
       
       if (readType == ReadType::Sync)

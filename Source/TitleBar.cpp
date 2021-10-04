@@ -44,10 +44,10 @@ bool TitleBar::sShowInitialHelpOverlay = true;
 
 namespace
 {
-   const string kRescanPluginsLabel = "rescan VSTs...";
+   const std::string kRescanPluginsLabel = "rescan VSTs...";
 }
 
-SpawnList::SpawnList(IDropdownListener* owner, SpawnListManager* listManager, int x, int y, string label)
+SpawnList::SpawnList(IDropdownListener* owner, SpawnListManager* listManager, int x, int y, std::string label)
 : mLabel(label)
 , mSpawnIndex(-1)
 , mSpawnList(nullptr)
@@ -57,7 +57,7 @@ SpawnList::SpawnList(IDropdownListener* owner, SpawnListManager* listManager, in
 {
 }
 
-void SpawnList::SetList(vector<string> spawnables, string overrideModuleType)
+void SpawnList::SetList(std::vector<std::string> spawnables, std::string overrideModuleType)
 {
    mOverrideModuleType = overrideModuleType;
    if (mSpawnList == nullptr)
@@ -69,7 +69,7 @@ void SpawnList::SetList(vector<string> spawnables, string overrideModuleType)
    mSpawnables = spawnables;
    for (int i=0; i<mSpawnables.size(); ++i)
    {
-      string name = mSpawnables[i].c_str();
+      std::string name = mSpawnables[i].c_str();
       if (mOverrideModuleType == "" && TheSynth->GetModuleFactory()->IsExperimental(name))
          name += " (exp.)";
       if (mOverrideModuleType == "vstplugin" && name != kRescanPluginsLabel)
@@ -96,7 +96,7 @@ void SpawnList::OnSelection(DropdownList* list)
 
 IDrawableModule* SpawnList::Spawn()
 {
-   string moduleType = mSpawnables[mSpawnIndex];
+   std::string moduleType = mSpawnables[mSpawnIndex];
    if (mOverrideModuleType != "")
       moduleType = mOverrideModuleType;
 
@@ -238,7 +238,7 @@ void SpawnListManager::SetModuleFactory(ModuleFactory* factory)
    
    SetUpVstDropdown(false);
    
-   vector<string> prefabs;
+   std::vector<std::string> prefabs;
    ModuleFactory::GetPrefabs(prefabs);
    mPrefabs.SetList(prefabs, "prefab");
    
@@ -255,7 +255,7 @@ void SpawnListManager::SetModuleFactory(ModuleFactory* factory)
 
 void SpawnListManager::SetUpVstDropdown(bool rescan)
 {
-   vector<string> vsts;
+   std::vector<std::string> vsts;
    VSTLookup::GetAvailableVSTs(vsts, rescan);
    vsts.push_back(kRescanPluginsLabel);
    mVstPlugins.SetList(vsts, "vstplugin");
@@ -265,20 +265,16 @@ void TitleBar::ListLayouts()
 {
    mLoadLayoutDropdown->Clear();
    
-   juce::DirectoryIterator dir(juce::File(ofToDataPath("layouts")), false);
    int layoutIdx = 0;
-   while (dir.next())
+   for (const auto& entry : juce::RangedDirectoryIterator{juce::File{ofToDataPath("layouts")}, false, "*.json"})
    {
-      juce::File file = dir.getFile();
-      if (file.getFileExtension() == ".json")
-      {
-         mLoadLayoutDropdown->AddLabel(file.getFileNameWithoutExtension().toRawUTF8(), layoutIdx);
-         
-         if (file.getRelativePathFrom(juce::File(ofToDataPath(""))).toStdString() == TheSynth->GetLoadedLayout())
-            mLoadLayoutIndex = layoutIdx;
-         
-         ++layoutIdx;
-      }
+      const auto& file = entry.getFile();
+      mLoadLayoutDropdown->AddLabel(file.getFileNameWithoutExtension().toRawUTF8(), layoutIdx);
+
+      if (file.getRelativePathFrom(juce::File{ofToDataPath("")}).toStdString() == TheSynth->GetLoadedLayout())
+         mLoadLayoutIndex = layoutIdx;
+
+      ++layoutIdx;
    }
    
    mSaveLayoutButton->PositionTo(mLoadLayoutDropdown, kAnchor_Right);
@@ -327,9 +323,9 @@ void TitleBar::DrawModule()
    DrawTextBold("bespoke", 2, 28, 36);
    ofPopStyle();
    
-   string info;
+   std::string info;
    if (TheSynth->GetMoveModule())
-      info += " (moving module \"" + string(TheSynth->GetMoveModule()->Name()) + "\")";
+      info += " (moving module \"" + std::string(TheSynth->GetMoveModule()->Name()) + "\")";
    if (IKeyboardFocusListener::GetActiveKeyboardFocus())
       info += " (entering text)";
 
@@ -361,7 +357,7 @@ void TitleBar::DrawModule()
 
    float x = startX;
    float y = startY;
-   array<SpawnList*, 9> lists = { &mSpawnLists.mInstrumentModules,
+   std::array<SpawnList*, 9> lists = { &mSpawnLists.mInstrumentModules,
                                   &mSpawnLists.mNoteModules,
                                   &mSpawnLists.mSynthModules,
                                   &mSpawnLists.mAudioModules,
@@ -408,7 +404,7 @@ void TitleBar::DrawModule()
    mModuleType = type;
    
    float usage = TheSynth->GetAudioDeviceManager().getCpuUsage();
-   string stats;
+   std::string stats;
    stats += "fps:" + ofToString(ofGetFrameRate(),0);
    stats += "  audio cpu:" + ofToString(usage * 100,1);
    if (usage > 1)
@@ -448,7 +444,7 @@ void TitleBar::DrawModuleUnclipped()
       TheTitleBar->GetDimensions(titleBarWidth, titleBarHeight);
       float x = 100;
       float y = 40 + titleBarHeight;
-      string filename = juce::File(TheSynth->GetLastSavePath()).getFileName().toStdString();
+      std::string filename = juce::File(TheSynth->GetLastSavePath()).getFileName().toStdString();
       gFontBold.DrawString("saved "+filename, 50, x, y);
       ofPopStyle();
    }
@@ -460,7 +456,7 @@ void TitleBar::DrawModuleUnclipped()
    {
       ofPushStyle();
       ofSetColor(255, 255, 255);
-      string text = "click ? to view help and toggle tooltips";
+      std::string text = "click ? to view help and toggle tooltips";
       float size = 28;
       float titleBarWidth, titleBarHeight;
       TheTitleBar->GetDimensions(titleBarWidth, titleBarHeight);
@@ -507,7 +503,7 @@ void TitleBar::DropdownUpdated(DropdownList* list, int oldVal)
 {
    if (list == mLoadLayoutDropdown)
    {
-      string layout = mLoadLayoutDropdown->GetLabel(mLoadLayoutIndex);
+      std::string layout = mLoadLayoutDropdown->GetLabel(mLoadLayoutIndex);
       TheSynth->LoadLayoutFromFile(ofToDataPath("layouts/"+layout+".json"));
       return;
    }

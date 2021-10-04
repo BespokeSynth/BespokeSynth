@@ -39,7 +39,7 @@ public:
    virtual ~AudioMeter();
    static IDrawableModule* Create() { return new AudioMeter(); }
    
-   string GetTitleLabel() override { return "audiometer"; }
+   std::string GetTitleLabel() override { return "audiometer"; }
    void CreateUIControls() override;
    
    //IAudioSource

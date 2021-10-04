@@ -38,7 +38,7 @@ public:
    virtual ~GlobalControls();
    static IDrawableModule* Create() { return new GlobalControls(); }
 
-   string GetTitleLabel() override { return "global controls"; }
+   std::string GetTitleLabel() override { return "global controls"; }
    void CreateUIControls() override;
    void Poll() override;
 
@@ -49,7 +49,7 @@ public:
    void SaveLayout(ofxJSONElement& moduleInfo) override;
    void SaveState(FileStreamOut& out) override;
    void LoadState(FileStreamIn& in) override;
-   vector<IUIControl*> ControlsToNotSetDuringLoadState() const override;
+   std::vector<IUIControl*> ControlsToNotSetDuringLoadState() const override;
 
 private:
    //IDrawableModule

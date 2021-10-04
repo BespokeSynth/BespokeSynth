@@ -159,7 +159,7 @@ void DrumPlayer::DrumHit::CreateUIControls(DrumPlayer* owner, int index)
 
 namespace
 {
-   static list<string> sHitDirectories;
+   static std::list<std::string> sHitDirectories;
 }
 
 //static
@@ -204,14 +204,14 @@ void DrumPlayer::SetUpNewDrumPlayer()
    ofxJSONElement root;
    root.open(ofToDataPath("drums/drums.json"));
 
-   array<string, NUM_DRUM_HITS> categories = { "808kit/Kick", "808kit/Snare", "808kit/HatClosed", "808kit/HatOpen", "808kit/Kick", "808kit/Clap", "808kit/HatClosed", "808kit/Perc",
+   std::array<std::string, NUM_DRUM_HITS> categories = { "808kit/Kick", "808kit/Snare", "808kit/HatClosed", "808kit/HatOpen", "808kit/Kick", "808kit/Clap", "808kit/HatClosed", "808kit/Perc",
                                                "808kit/Kick", "808kit/Snare", "808kit/HatClosed", "808kit/HatOpen", "808kit/Kick", "808kit/Clap", "808kit/HatClosed", "808kit/Perc" };
    for (size_t i = 0; i < root["directories"].size() && i < categories.size(); ++i)
       categories[i] = root["directories"][i].asString();
 
    for (int i = 0; i < NUM_DRUM_HITS; ++i)
    {
-      string category = categories[i % categories.size()];
+      std::string category = categories[i % categories.size()];
       File dir(ofToDataPath("drums/" + category));
       if (dir.exists())
       {
@@ -535,7 +535,7 @@ void DrumPlayer::PlayNote(double time, int pitch, int velocity, int voiceIdx, Mo
    }
 }
 
-void DrumPlayer::FilesDropped(vector<string> files, int x, int y)
+void DrumPlayer::FilesDropped(std::vector<std::string> files, int x, int y)
 {
    x -= 5;
    y -= 70;
@@ -858,7 +858,7 @@ void DrumPlayer::SaveKits()
          for (int j=0; j<NUM_DRUM_HITS; ++j)
          {
             //get relative path if it's in our data dir
-            string path = mDrumHits[j].mSample.GetReadPath();
+            std::string path = mDrumHits[j].mSample.GetReadPath();
             ofStringReplace(path, File(ofToDataPath("")).getFullPathName().toStdString(), "");
             
             mKits[i].mSampleFiles[j] = path;
@@ -972,7 +972,7 @@ void DrumPlayer::FloatSliderUpdated(FloatSlider* slider, float oldVal)
       {
          mAuditionSampleIdx = ofClamp(mAuditionSampleIdx,0,files.size()-1);
          
-         string file = files[mAuditionSampleIdx].getFullPathName().toStdString();
+         std::string file = files[mAuditionSampleIdx].getFullPathName().toStdString();
          if (mSelectedHitIdx >= 0 && mSelectedHitIdx < NUM_DRUM_HITS)
          {
             LoadSampleLock();
@@ -1066,7 +1066,7 @@ void DrumPlayer::DrumHit::LoadRandomSample()
 
    if (files.size() > 0)
    {
-      string file = files[gRandom() % files.size()].getFullPathName().toStdString();
+      std::string file = files[gRandom() % files.size()].getFullPathName().toStdString();
       
       mOwner->LoadSampleLock();
       mSample.Read(file.c_str());
@@ -1081,9 +1081,9 @@ void DrumPlayer::TextEntryComplete(TextEntry* entry)
 {
 }
 
-vector<IUIControl*> DrumPlayer::ControlsToNotSetDuringLoadState() const
+std::vector<IUIControl*> DrumPlayer::ControlsToNotSetDuringLoadState() const
 {
-   vector<IUIControl*> ignore;
+   std::vector<IUIControl*> ignore;
    ignore.push_back(mKitSelector);
    for (int i=0; i<NUM_DRUM_HITS; ++i)
       ignore.push_back(mDrumHits[i].mHitCategoryDropdown);

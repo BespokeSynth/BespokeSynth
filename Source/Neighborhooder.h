@@ -38,7 +38,7 @@ public:
    Neighborhooder();
    static IDrawableModule* Create() { return new Neighborhooder(); }
    
-   string GetTitleLabel() override { return "notewrap"; }
+   std::string GetTitleLabel() override { return "notewrap"; }
    void CreateUIControls() override;
 
    void SetEnabled(bool enabled) override { mEnabled = enabled; }

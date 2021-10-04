@@ -38,14 +38,14 @@ public:
    
    static IAudioEffect* Create() { return new NoiseEffect(); }
    
-   string GetTitleLabel() override { return "noisify"; }
+   std::string GetTitleLabel() override { return "noisify"; }
    void CreateUIControls() override;
 
    //IAudioEffect
    void ProcessAudio(double time, ChannelBuffer* buffer) override;
    void SetEnabled(bool enabled) override { mEnabled = enabled; }
    float GetEffectAmount() override;
-   string GetType() override { return "noisify"; }
+   std::string GetType() override { return "noisify"; }
 
    
    void CheckboxUpdated(Checkbox* checkbox) override;

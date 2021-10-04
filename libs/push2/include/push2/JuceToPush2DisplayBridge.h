@@ -18,34 +18,49 @@
 // FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
 // DEALINGS IN THE SOFTWARE.
 
-#ifdef _WIN32
+#pragma once
 
-# include "core.c"
-# include "descriptor.c"
-# include "hotplug.c"
-# include "io.c"
-# include "strerror.c"
-# include "sync.c"
+#include "push2/Result.h"
 
-# include "os/poll_windows.c"
-# include "os/threads_windows.c"
-# include "os/windows_winusb.c"
-# include "os/windows_nt_common.c"
+#include <memory>
 
-#elif defined(__APPLE__)
+namespace ableton
+{
+  class Push2Display;
 
-# include "core.c"
-# include "descriptor.c"
-# include "hotplug.c"
-# include "io.c"
-# include "strerror.c"
-# include "sync.c"
+  /*!
+   *  Implements a bridge between juce::Graphics and push2 display format.
+   */
 
-# include "os/darwin_usb.c"
-# include "os/poll_posix.c"
-# include "os/threads_posix.c"
+  class Push2DisplayBridge
+  {
+  public:
 
-#else
- // On linux, we link directly to the system library installed through
- // apt-get / pacman or any other package manages
-#endif
+    Push2DisplayBridge();
+    ~Push2DisplayBridge();
+
+    /*!
+     * Initialises the bridge
+     *
+     *  \return the result of the initialisation process
+     */
+
+    NBase::Result Init();
+
+    /*!
+     *  \return true if this bridge is initialized
+     */
+
+    bool IsInitialized() const { return bool{push2Display_}; }
+
+    /*!
+     * Tells the bridge the drawing is done and the bitmap can be sent to
+     * the push display
+     */
+
+    void Flip(unsigned char* pixels);
+
+  private:
+    std::unique_ptr<Push2Display> push2Display_;    /*< The push display the bridge works on */
+  };
+}

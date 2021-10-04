@@ -192,7 +192,7 @@ void Canvas::SelectElement(CanvasElement* element)
    }
 }
 
-void Canvas::SelectElements(vector<CanvasElement*> elements)
+void Canvas::SelectElements(std::vector<CanvasElement*> elements)
 {
    bool commandHeld = GetKeyModifiers() & kModifier_Command;
    if (mControls)
@@ -354,7 +354,7 @@ bool Canvas::MouseMoved(float x, float y)
             if (GetKeyModifiers() & kModifier_Shift && !mHasDuplicatedThisDrag && dragOffset.distanceSquared() > 9)
             {
                mHasDuplicatedThisDrag = true;
-               vector<CanvasElement*> newElements;
+               std::vector<CanvasElement*> newElements;
                for (auto element : mElements)
                {
                   if (element->GetHighlighted())
@@ -470,7 +470,7 @@ void Canvas::MouseReleased()
    
    if (mDragSelecting)
    {
-      vector<CanvasElement*> selectedElements;
+      std::vector<CanvasElement*> selectedElements;
       for (int i=(int)mElements.size()-1; i>=0; --i)
       {
          if (mElements[i]->GetRect(true, false).intersects(mDragSelectRect) ||
@@ -549,7 +549,7 @@ void Canvas::KeyPressed(int key, bool isRepeat)
          if (mControls)
             mControls->SetElement(nullptr);
          
-         vector<CanvasElement*> toRemove;
+         std::vector<CanvasElement*> toRemove;
          for (auto element : mElements)
          {
             if (element->GetHighlighted())
@@ -631,7 +631,7 @@ CanvasElement* Canvas::GetElementAt(float pos, int row)
    return nullptr;
 }
 
-void Canvas::FillElementsAt(float pos, vector<CanvasElement*>& elementsAt) const
+void Canvas::FillElementsAt(float pos, std::vector<CanvasElement*>& elementsAt) const
 {
    for (int i=0; i<mElements.size(); ++i)
    {
@@ -650,7 +650,7 @@ void Canvas::FillElementsAt(float pos, vector<CanvasElement*>& elementsAt) const
 
 void Canvas::EraseElementsAt(float pos)
 {
-   vector<CanvasElement*> toErase;
+   std::vector<CanvasElement*> toErase;
    for (int i = 0; i < mElements.size(); ++i)
    {
       if (mElements[i]->mRow == -1 || mElements[i]->mCol == -1)

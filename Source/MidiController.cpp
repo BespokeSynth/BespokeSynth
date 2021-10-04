@@ -215,7 +215,7 @@ void MidiController::AddControlConnection(const ofxJSONElement& connection)
          GridLayout* grid = mGrids[index];
          for (int page=0; page<connection["grid_pages"].size(); ++page)
          {
-            string path = connection["grid_pages"][page].asString();
+            std::string path = connection["grid_pages"][page].asString();
             if (path.length() > 0)
                grid->mGridControlTarget[page] = dynamic_cast<GridControlTarget*>(GetOwningContainer()->FindUIControl(path));
             else
@@ -226,8 +226,8 @@ void MidiController::AddControlConnection(const ofxJSONElement& connection)
    }
    
    int control = connection["control"].asInt() % MIDI_PAGE_WIDTH;
-   string path = connection["uicontrol"].asString();
-   string type = connection["type"].asString();
+   std::string path = connection["uicontrol"].asString();
+   std::string type = connection["type"].asString();
    MidiMessageType msgType = kMidiMessage_Control;
    if (type == "control")
    {
@@ -1172,7 +1172,7 @@ void MidiController::DrawModule()
       //DrawTextNormal("                                                                                                                                                                MIDI out                           all", 12, 34);
       //DrawTextNormal("midi       num   chan    path                                                           type       value        inc        feedback    off    on    blink  pages", 12, 46);
       
-      list<UIControlConnection*> toDraw;
+      std::list<UIControlConnection*> toDraw;
       //draw pageless ones first
       for (auto iter = mConnections.begin(); iter != mConnections.end(); ++iter)
       {
@@ -1231,7 +1231,7 @@ namespace
 void MidiController::DrawModuleUnclipped()
 {
    const float kDisplayMs = 500;
-   string displayString;
+   std::string displayString;
    
    IUIControl* drawControl = nullptr;
    if (gTime < mLastBoundControlTime + kDisplayMs)
@@ -1269,7 +1269,7 @@ void MidiController::DrawModuleUnclipped()
 
    if (mHoveredLayoutElement != -1)
    {
-      string tooltip;
+      std::string tooltip;
       ofVec2f pos;
       if (mHoveredLayoutElement < kHoveredLayoutElement_GridOffset)
       {
@@ -1301,7 +1301,7 @@ void MidiController::DrawModuleUnclipped()
    }
 }
 
-string MidiController::GetLayoutTooltip(int controlIndex)
+std::string MidiController::GetLayoutTooltip(int controlIndex)
 {
    if (controlIndex >= 0 && controlIndex < mLayoutControls.size())
    {
@@ -1313,9 +1313,9 @@ string MidiController::GetLayoutTooltip(int controlIndex)
 }
 
 //static
-string MidiController::GetDefaultTooltip(MidiMessageType type, int control)
+std::string MidiController::GetDefaultTooltip(MidiMessageType type, int control)
 {
-   string str;
+   std::string str;
    if (type == kMidiMessage_Note)
       str = "note ";
    else if (type == kMidiMessage_Control)
@@ -1552,7 +1552,7 @@ ControlLayoutElement& MidiController::GetLayoutControl(int control, MidiMessageT
    return mLayoutControls[index];
 }
 
-void MidiController::LoadLayout(string filename)
+void MidiController::LoadLayout(std::string filename)
 {
    mLastLoadedLayoutFile = ofToDataPath("controllers/"+filename);
    for (int i = 0; i < mLayoutFileDropdown->GetNumValues(); ++i)
@@ -1776,7 +1776,7 @@ void MidiController::LoadLayout(string filename)
 
 void MidiController::OnDeviceChanged()
 {
-   string filename = mDeviceIn + ".json";
+   std::string filename = mDeviceIn + ".json";
    ofStringReplace(filename, "/", "");
    LoadLayout(filename);
 
@@ -2030,14 +2030,14 @@ int MidiController::GetLayoutControlIndexForMidi(MidiMessageType type, int contr
    return -1;
 }
 
-static vector<string> sCachedInputDevices;
+static std::vector<std::string> sCachedInputDevices;
 //static
-vector<string> MidiController::GetAvailableInputDevices()
+std::vector<std::string> MidiController::GetAvailableInputDevices()
 {
    if (!juce::MessageManager::existsAndIsCurrentThread())
       return sCachedInputDevices;
    
-   vector<string> devices;
+   std::vector<std::string> devices;
    for (auto& d : MidiInput::getAvailableDevices())
    {
       if (d.identifier == "blah")   //my BCF-2000 and BCR-2000 both report as a BCF-2000, come up with some hack here to name it correctly
@@ -2054,14 +2054,14 @@ vector<string> MidiController::GetAvailableInputDevices()
    return devices;
 }
 
-static vector<string> sCachedOutputDevices;
+static std::vector<std::string> sCachedOutputDevices;
 //static
-vector<string> MidiController::GetAvailableOutputDevices()
+std::vector<std::string> MidiController::GetAvailableOutputDevices()
 {
    if (!juce::MessageManager::existsAndIsCurrentThread())
       return sCachedOutputDevices;
    
-   vector<string> devices;
+   std::vector<std::string> devices;
    for (auto& d : MidiOutput::getDevices())
       devices.push_back(d.toStdString());
 
@@ -2103,8 +2103,8 @@ void MidiController::ConnectDevice()
    mDevice.DisconnectOutput();
    ResyncTwoWay();
 
-   string deviceInName = mControllerList->GetLabel(mControllerIndex);
-   string deviceOutName = String(deviceInName).replace("Input", "Output").replace("input", "output").toStdString();
+   std::string deviceInName = mControllerList->GetLabel(mControllerIndex);
+   std::string deviceOutName = String(deviceInName).replace("Input", "Output").replace("input", "output").toStdString();
    bool hasOutput = MidiOutput::getDevices().contains(String(deviceOutName));
    mDeviceIn = deviceInName;
    mDeviceOut = hasOutput ? deviceOutName : "";
@@ -2381,7 +2381,7 @@ void MidiController::LoadState(FileStreamIn& in)
    }
 }
 
-void UIControlConnection::SetUIControl(string path)
+void UIControlConnection::SetUIControl(std::string path)
 {
    if (mUIControl)
       mUIControl->RemoveRemoteController();
@@ -2404,7 +2404,7 @@ void UIControlConnection::SetUIControl(string path)
       {
          mUIControl = mUIOwner->GetOwningContainer()->FindUIControl(path);
       }
-      catch (exception e)
+      catch (std::exception e)
       {
       }
       mSpecialBinding = kSpecialBinding_None;

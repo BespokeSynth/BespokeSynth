@@ -33,7 +33,7 @@ void IPulseSource::DispatchPulse(PatchCableSource* destination, double time, flo
    if (time == destination->GetLastOnEventTime())   //avoid stack overflow
       return;
    
-   const vector<IPulseReceiver*>& receivers = destination->GetPulseReceivers();
+   const std::vector<IPulseReceiver*>& receivers = destination->GetPulseReceivers();
    destination->AddHistoryEvent(time, true);
    destination->AddHistoryEvent(time + 15, false);
    for (auto* receiver : receivers)

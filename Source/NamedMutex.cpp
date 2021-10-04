@@ -25,7 +25,7 @@
 
 #include "NamedMutex.h"
 
-void NamedMutex::Lock(string locker)
+void NamedMutex::Lock(std::string locker)
 {
    if (mLocker == locker)
    {
@@ -49,7 +49,7 @@ void NamedMutex::Unlock()
    }
 }
 
-ScopedMutex::ScopedMutex(NamedMutex* mutex, string locker)
+ScopedMutex::ScopedMutex(NamedMutex* mutex, std::string locker)
 : mMutex(mutex)
 {
    mMutex->Lock(locker);

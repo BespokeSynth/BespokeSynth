@@ -54,13 +54,13 @@ ChordDatabase::ChordDatabase()
    mChordShapes.push_back(ChordShape("sus2", {0,2,7}));
 }
 
-string ChordDatabase::GetChordName(vector<int> pitches) const
+std::string ChordDatabase::GetChordName(std::vector<int> pitches) const
 {
    int numPitches = (int)pitches.size();
    if (numPitches < 3)
       return "None";
    
-   list<string> names;
+   std::list<std::string> names;
    
    sort(pitches.begin(), pitches.end());
    for (int inversion = 0; inversion<numPitches; ++inversion)
@@ -91,15 +91,15 @@ string ChordDatabase::GetChordName(vector<int> pitches) const
    if (names.size() == 0)
       return "Unknown";
    
-   string ret = "";
-   for (string name : names)
+   std::string ret = "";
+   for (std::string name : names)
       ret += name + "; ";
    return ret.substr(0, ret.length()-2);
 }
 
-vector<int> ChordDatabase::GetChord(string name, int inversion) const
+std::vector<int> ChordDatabase::GetChord(std::string name, int inversion) const
 {
-   vector<int> ret;
+   std::vector<int> ret;
    for (auto shape : mChordShapes)
    {
       if (shape.mName == name)
@@ -118,9 +118,9 @@ vector<int> ChordDatabase::GetChord(string name, int inversion) const
    return ret;
 }
 
-vector<string> ChordDatabase::GetChordNames() const
+std::vector<std::string> ChordDatabase::GetChordNames() const
 {
-   vector<string> ret;
+   std::vector<std::string> ret;
    
    for (auto shape : mChordShapes)
       ret.push_back(shape.mName);

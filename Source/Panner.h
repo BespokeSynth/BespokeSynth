@@ -43,7 +43,7 @@ public:
    virtual ~Panner();
    static IDrawableModule* Create() { return new Panner(); }
    
-   string GetTitleLabel() override { return "panner"; }
+   std::string GetTitleLabel() override { return "panner"; }
    void CreateUIControls() override;
    
    void SetPan(float pan) { mPan = pan; }

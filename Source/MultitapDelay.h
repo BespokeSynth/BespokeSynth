@@ -47,7 +47,7 @@ public:
    ~MultitapDelay();
    static IDrawableModule* Create() { return new MultitapDelay(); }
    
-   string GetTitleLabel() override { return "multitap delay"; }
+   std::string GetTitleLabel() override { return "multitap delay"; }
    void CreateUIControls() override;
    
    //INoteReceiver
@@ -125,7 +125,7 @@ private:
    };
    
    int mNumTaps;
-   vector<DelayTap> mTaps;
+   std::vector<DelayTap> mTaps;
    static const int kNumMPETaps = 16;
    DelayMPETap mMPETaps[kNumMPETaps];
    

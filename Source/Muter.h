@@ -41,13 +41,13 @@ public:
    
    static IAudioEffect* Create() { return new Muter(); }
    
-   string GetTitleLabel() override { return "muter"; }
+   std::string GetTitleLabel() override { return "muter"; }
    void CreateUIControls() override;
 
    //IAudioEffect
    void ProcessAudio(double time, ChannelBuffer* buffer) override;
    void SetEnabled(bool enabled) override {}
-   string GetType() override { return "muter"; }
+   std::string GetType() override { return "muter"; }
 
    void CheckboxUpdated(Checkbox* checkbox) override;
    void FloatSliderUpdated(FloatSlider* slider, float oldVal) override {}

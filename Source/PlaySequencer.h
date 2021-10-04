@@ -47,7 +47,7 @@ public:
    ~PlaySequencer();
    static IDrawableModule* Create() { return new PlaySequencer(); }
 
-   string GetTitleLabel() override { return "play sequencer"; }
+   std::string GetTitleLabel() override { return "play sequencer"; }
    void CreateUIControls() override;
 
    void Init() override;

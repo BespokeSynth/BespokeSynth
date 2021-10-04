@@ -48,11 +48,11 @@ public:
    ~VelocityStepSequencer();
    static IDrawableModule* Create() { return new VelocityStepSequencer(); }
    
-   string GetTitleLabel() override { return "velocity seq"; }
+   std::string GetTitleLabel() override { return "velocity seq"; }
    void CreateUIControls() override;
    void Init() override;
    
-   void SetMidiController(string name);
+   void SetMidiController(std::string name);
    
    void SetEnabled(bool enabled) override { mEnabled = enabled; }
    

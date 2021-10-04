@@ -197,7 +197,7 @@ float Checkbox::GetValue() const
    return *mVar;
 }
 
-string Checkbox::GetDisplayValue(float val) const
+std::string Checkbox::GetDisplayValue(float val) const
 {
    return val>0 ? "on" : "off";
 }

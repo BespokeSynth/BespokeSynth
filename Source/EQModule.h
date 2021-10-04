@@ -42,7 +42,7 @@ public:
    virtual ~EQModule();
    static IDrawableModule* Create() { return new EQModule(); }
 
-   string GetTitleLabel() override { return "eq"; }
+   std::string GetTitleLabel() override { return "eq"; }
    void CreateUIControls() override;
 
    //IAudioSource

@@ -50,7 +50,7 @@ public:
    ~Producer();
    static IDrawableModule* Create() { return new Producer(); }
    
-   string GetTitleLabel() override { return "producer"; }
+   std::string GetTitleLabel() override { return "producer"; }
    void CreateUIControls() override;
    
    //INoteReceiver
@@ -62,7 +62,7 @@ public:
    void SetEnabled(bool enabled) override { mEnabled = enabled; }
    
    //IDrawableModule
-   void FilesDropped(vector<string> files, int x, int y) override;
+   void FilesDropped(std::vector<std::string> files, int x, int y) override;
    
    
    void CheckboxUpdated(Checkbox* checkbox) override;
@@ -127,7 +127,7 @@ private:
    ClickButton* mDoubleLengthButton;
    ClickButton* mHalveLengthButton;
    BiquadFilterEffect mBiquad[PRODUCER_NUM_BIQUADS];
-   list<int> mSkipMeasures;
+   std::list<int> mSkipMeasures;
    ClickButton* mRestartButton;
 };
 

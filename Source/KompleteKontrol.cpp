@@ -157,12 +157,12 @@ void KompleteKontrol::UpdateKeys()
    {
       int pitch = i+mKeyOffset;
       bool inScale = TheScale->MakeDiatonic(pitch) == pitch;
-      bool isRoot = pitch%TheScale->GetTet() == TheScale->ScaleRoot();
-      bool isFifth = (pitch-7)%TheScale->GetTet() == TheScale->ScaleRoot();
+      bool isRoot = pitch%TheScale->GetPitchesPerOctave() == TheScale->ScaleRoot();
+      bool isFifth = (pitch-7)%TheScale->GetPitchesPerOctave() == TheScale->ScaleRoot();
       bool isHeld = false;
       bool isInPentatonic = pitch >= 0 && TheScale->IsInPentatonic(pitch);
       
-      list<int> heldNotes = mNoteOutput.GetHeldNotesList();
+      std::list<int> heldNotes = mNoteOutput.GetHeldNotesList();
       for (int iter : heldNotes)
       {
          if (iter == pitch)
@@ -171,7 +171,7 @@ void KompleteKontrol::UpdateKeys()
       
       if (isRoot)
          keys[i] = ofColor(0,255,0);
-      else if (TheScale->GetTet() != 12)
+      else if (TheScale->GetPitchesPerOctave() != 12)
          keys[i] = ofColor(40,15,0);
       else if (isFifth && inScale)
          keys[i] = ofColor(255,0,70);
@@ -199,7 +199,7 @@ void KompleteKontrol::UpdateText()
       return;
    
    uint16_t sliders[NUM_SLIDER_SEGMENTS];
-   string text;
+   std::string text;
    for (int i=0; i<9; ++i)
    {
       int numPeriods1 = 0;

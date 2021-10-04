@@ -46,13 +46,13 @@ public:
    ~GridModule();
    static IDrawableModule* Create() { return new GridModule(); }
    
-   string GetTitleLabel() override { return "grid"; }
+   std::string GetTitleLabel() override { return "grid"; }
    void CreateUIControls() override;
    
    void Init() override;
    
    void SetGrid(int cols, int rows) { mGrid->SetGrid(cols, rows); }
-   void SetLabel(int row, string label);
+   void SetLabel(int row, std::string label);
    void Set(int col, int row, float value) { mGrid->SetVal(col, row, value, !K(notifyListener)); UpdateLights(); }
    float Get(int col, int row) { return mGrid->GetVal(col, row); }
    void HighlightCell(int col, int row, double time, double duration, int colorIndex);
@@ -113,8 +113,8 @@ private:
    IGridControllerListener* mGridControllerOwner;
    
    UIGrid* mGrid;
-   vector<string> mLabels;
-   vector<ofColor> mColors;
+   std::vector<std::string> mLabels;
+   std::vector<ofColor> mColors;
    
    struct HighlightCellElement
    {

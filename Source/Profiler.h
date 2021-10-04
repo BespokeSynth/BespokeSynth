@@ -53,7 +53,7 @@ private:
       void EndFrame();
       unsigned long long MaxCost() const;
       
-      string mName;
+      std::string mName;
       uint32_t mHash{0};
       unsigned long long mFrameCost{0};
       unsigned long long mHistory[PROFILER_HISTORY_LENGTH]{};

@@ -51,7 +51,7 @@ public:
    ~SamplePlayer();
    static IDrawableModule* Create() { return new SamplePlayer(); }
    
-   string GetTitleLabel() override { return "sampleplayer"; }
+   std::string GetTitleLabel() override { return "sampleplayer"; }
    void CreateUIControls() override;
    void Init() override;
    void Poll() override;
@@ -63,14 +63,14 @@ public:
    void Process(double time) override;
    void SetEnabled(bool enabled) override { mEnabled = enabled; }
    
-   void FilesDropped(vector<string> files, int x, int y) override;
+   void FilesDropped(std::vector<std::string> files, int x, int y) override;
    void SampleDropped(int x, int y, Sample* sample) override;
    bool CanDropSample() const override { return true; }
    bool IsResizable() const override { return true; }
    void Resize(float width, float height) override { mWidth = ofClamp(width, 210, 9999); mHeight = ofClamp(height, 125, 9999); }
    
    void SetCuePoint(int pitch, float startSeconds, float lengthSeconds, float speed);
-   void FillData(vector<float> data);
+   void FillData(std::vector<float> data);
    ChannelBuffer* GetCueSampleData(int cueIndex);
    float GetLengthInSeconds() const;
    
@@ -91,19 +91,19 @@ public:
    void SetUpFromSaveData() override;
    void SaveState(FileStreamOut& out) override;
    void LoadState(FileStreamIn& in) override;
-   vector<IUIControl*> ControlsToIgnoreInSaveState() const override;
+   std::vector<IUIControl*> ControlsToIgnoreInSaveState() const override;
    
 private:
    void UpdateSample(Sample* sample, bool ownsSample);
    float GetPlayPositionForMouse(float mouseX) const;
    float GetSecondsForMouse(float mouseX) const;
    void GetPlayInfoForPitch(int pitch, float& startSeconds, float& lengthSeconds, float& speed) const;
-   void DownloadYoutube(string url, string titles);
-   void SearchYoutube(string searchTerm);
+   void DownloadYoutube(std::string url, std::string titles);
+   void SearchYoutube(std::string searchTerm);
    void LoadFile();
    void SaveFile();
-   void OnYoutubeSearchComplete(string searchTerm, double searchStartTime);
-   void OnYoutubeDownloadComplete(string filename, string title);
+   void OnYoutubeSearchComplete(std::string searchTerm, double searchStartTime);
+   void OnYoutubeDownloadComplete(std::string filename, std::string title);
    void SwitchAndRamp();
    void SetCuePointForX(float mouseX);
    int GetZoomStartSample() const;
@@ -146,7 +146,7 @@ private:
    Checkbox* mLoopCheckbox;
    Checkbox* mRecordCheckbox;
    bool mScrubbingSample;
-   string mYoutubeId;
+   std::string mYoutubeId;
    ClickButton* mDownloadYoutubeButton;
    TextEntry* mDownloadYoutubeSearch;
    char mYoutubeSearch[MAX_TEXTENTRY_LENGTH];
@@ -173,7 +173,7 @@ private:
       float lengthSeconds;
       float speed; 
    };
-   vector<SampleCuePoint> mSampleCuePoints{128};
+   std::vector<SampleCuePoint> mSampleCuePoints{128};
    DropdownList* mCuePointSelector;
    FloatSlider* mCuePointStartSlider;
    FloatSlider* mCuePointLengthSlider;
@@ -195,7 +195,7 @@ private:
    ClickButton* mPlayHoveredClipButton;
    ClickButton* mGrabHoveredClipButton;
 
-   string mErrorString;
+   std::string mErrorString;
 
 #define kMaxYoutubeSearchResults 10
    enum class RunningProcessType
@@ -206,21 +206,21 @@ private:
    };
    struct YoutubeSearchResult
    {
-      string name;
-      string channel;
+      std::string name;
+      std::string channel;
       float lengthSeconds;
-      string youtubeId;
+      std::string youtubeId;
    };
    RunningProcessType mRunningProcessType;
    juce::ChildProcess* mRunningProcess;
    std::function<void()> mOnRunningProcessComplete;
-   vector<YoutubeSearchResult> mYoutubeSearchResults;
+   std::vector<YoutubeSearchResult> mYoutubeSearchResults;
    std::array<ClickButton*, kMaxYoutubeSearchResults> mSearchResultButtons;
 
    ChannelBuffer mLastOutputSample;
    ChannelBuffer mSwitchAndRampVal;
    
-   vector<ChannelBuffer*> mRecordChunks;
+   std::vector<ChannelBuffer*> mRecordChunks;
    bool mDoRecording;   //separate this out from mRecord to allow setup in main thread before audio thread starts recording
    int mRecordingLength;
    bool mRecordingAppendMode;

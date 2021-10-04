@@ -10,8 +10,6 @@
 #include <cmath>
 #include <mutex>
 
-using namespace std;
-
 class NVGcontext;
 
 extern NVGcontext* gNanoVG;
@@ -183,25 +181,25 @@ class RetinaTrueTypeFont
 {
 public:
    RetinaTrueTypeFont() : mLoaded(false) {}
-   void LoadFont(string path);
-   void DrawString(string str, float size, float x, float y);
-   ofRectangle DrawStringWrap(string str, float size, float x, float y, float width);
-   float GetStringWidth(string str, float size);
-   float GetStringHeight(string str, float size);
+   void LoadFont(std::string path);
+   void DrawString(std::string str, float size, float x, float y);
+   ofRectangle DrawStringWrap(std::string str, float size, float x, float y, float width);
+   float GetStringWidth(std::string str, float size);
+   float GetStringHeight(std::string str, float size);
    bool IsLoaded() { return mLoaded; }
    int GetFontHandle() const { return mFontHandle; }
-   string GetFontPath() const { return mFontPath; }
+   std::string GetFontPath() const { return mFontPath; }
 private:
    int mFontHandle;
    int mFontBoundsHandle;
    bool mLoaded;
-   string mFontPath;
+   std::string mFontPath;
 };
 
 typedef ofVec2f ofPoint;
 
-string ofToDataPath(string path, bool makeAboslute = false);
-string ofToResourcePath(string path, bool makeAboslute = false);
+std::string ofToDataPath(std::string path, bool makeAboslute = false);
+std::string ofToResourcePath(std::string path, bool makeAboslute = false);
 void ofPushStyle();
 void ofPopStyle();
 void ofPushMatrix();
@@ -222,9 +220,9 @@ void ofRect(float x, float y, float width, float height, float cornerRadius = 3)
 void ofRect(const ofRectangle& rect, float cornerRadius = 3);
 float ofClamp(float val, float a, float b);
 float ofGetLastFrameTime();
-int ofToInt(const string& intString);
-float ofToFloat(const string& floatString);
-int ofHexToInt(const string& hexString);
+int ofToInt(const std::string& intString);
+float ofToFloat(const std::string& floatString);
+int ofHexToInt(const std::string& hexString);
 void ofLine(float x1, float y1, float x2, float y2);
 void ofLine(ofVec2f v1, ofVec2f v2);
 void ofSetLineWidth(float width);
@@ -241,13 +239,13 @@ float ofGetHeight();
 float ofGetFrameRate();
 float ofLerp(float start, float stop, float amt);
 float ofDistSquared(float x1, float y1, float x2, float y2);
-vector<string> ofSplitString(string str, string splitter, bool ignoreEmpty = false, bool trim = false);
-bool ofIsStringInString(const string& haystack, const string& needle);
+std::vector<std::string> ofSplitString(std::string str, std::string splitter, bool ignoreEmpty = false, bool trim = false);
+bool ofIsStringInString(const std::string& haystack, const std::string& needle);
 void ofScale(float x, float y, float z);
 void ofExit();
 void ofToggleFullscreen();
-void ofStringReplace(string& str, string from, string to, bool firstOnly = false);
-string ofGetTimestampString(string in);
+void ofStringReplace(std::string& str, std::string from, std::string to, bool firstOnly = false);
+std::string ofGetTimestampString(std::string in);
 void ofTriangle(float x1, float y1, float x2, float y2, float x3, float y3);
 
 

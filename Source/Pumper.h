@@ -41,14 +41,14 @@ public:
    
    static IAudioEffect* Create() { return new Pumper(); }
    
-   string GetTitleLabel() override { return "pumper"; }
+   std::string GetTitleLabel() override { return "pumper"; }
    void CreateUIControls() override;
 
    //IAudioEffect
    void ProcessAudio(double time, ChannelBuffer* buffer) override;
    void SetEnabled(bool enabled) override { mEnabled = enabled; }
    float GetEffectAmount() override;
-   string GetType() override { return "pumper"; }
+   std::string GetType() override { return "pumper"; }
 
    void DropdownUpdated(DropdownList* list, int oldVal) override;
    void CheckboxUpdated(Checkbox* checkbox) override {}

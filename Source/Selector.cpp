@@ -90,7 +90,7 @@ void Selector::SyncList()
    mSelector->Clear();
    for (int i=0; i<mControlCables.size()-1; ++i)
    {
-      string controlName = "";
+      std::string controlName = "";
       if (mControlCables[i]->GetTarget())
          controlName = mControlCables[i]->GetTarget()->Path();
       mSelector->AddLabel(controlName.c_str(), i);
@@ -151,7 +151,7 @@ void Selector::SaveLayout(ofxJSONElement& moduleInfo)
    moduleInfo["uicontrols"].resize((unsigned int)mControlCables.size()-1);
    for (int i=0; i<mControlCables.size()-1; ++i)
    {
-      string controlName = "";
+      std::string controlName = "";
       if (mControlCables[i]->GetTarget())
          controlName = mControlCables[i]->GetTarget()->Path();
       moduleInfo["uicontrols"][i] = controlName;
@@ -164,7 +164,7 @@ void Selector::LoadLayout(const ofxJSONElement& moduleInfo)
    
    for (int i=0; i<controls.size(); ++i)
    {
-      string controlPath = controls[i].asString();
+      std::string controlPath = controls[i].asString();
       IUIControl* control = nullptr;
       if (!controlPath.empty())
          control = TheSynth->FindUIControl(controlPath);

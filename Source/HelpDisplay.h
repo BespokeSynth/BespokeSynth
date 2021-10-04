@@ -37,14 +37,14 @@ public:
    virtual ~HelpDisplay();
    static IDrawableModule* Create() { return new HelpDisplay(); }
    
-   string GetTitleLabel() override { return "help"; }
+   std::string GetTitleLabel() override { return "help"; }
    bool IsSaveable() override { return false; }
    bool HasTitleBar() const override { return false; }
    void CreateUIControls() override;
 
-   string GetUIControlTooltip(IUIControl* control);
-   string GetModuleTooltip(IDrawableModule* module);
-   string GetModuleTooltipFromName(string moduleTypeName);
+   std::string GetUIControlTooltip(IUIControl* control);
+   std::string GetModuleTooltip(IDrawableModule* module);
+   std::string GetModuleTooltipFromName(std::string moduleTypeName);
 
    void CheckboxUpdated(Checkbox* checkbox) override;
    void RadioButtonUpdated(RadioButton* radio, int oldVal) override {}
@@ -60,27 +60,27 @@ private:
    bool Enabled() const override { return true; }
    void GetModuleDimensions(float& w, float& h) override;
 
-   void RenderScreenshot(int x, int y, int width, int height, string filename);
+   void RenderScreenshot(int x, int y, int width, int height, std::string filename);
    
    struct UIControlTooltipInfo
    {
-      string controlName;
-      string tooltip;
+      std::string controlName;
+      std::string tooltip;
    };
 
    struct ModuleTooltipInfo
    {
-      string module;
-      string tooltip;
-      list<UIControlTooltipInfo> controlTooltips;
+      std::string module;
+      std::string tooltip;
+      std::list<UIControlTooltipInfo> controlTooltips;
    };
 
    void LoadHelp();
    void LoadTooltips();
-   ModuleTooltipInfo* FindModuleInfo(string moduleTypeName);
+   ModuleTooltipInfo* FindModuleInfo(std::string moduleTypeName);
    UIControlTooltipInfo* FindControlInfo(IUIControl* control);
    
-   vector<string> mHelpText;
+   std::vector<std::string> mHelpText;
    Checkbox* mShowTooltipsCheckbox;
    ClickButton* mDumpModuleInfoButton;
    ClickButton* mDoModuleScreenshotsButton;
@@ -91,9 +91,9 @@ private:
    float mWidth;
    float mHeight;
    static bool sTooltipsLoaded;
-   static list<ModuleTooltipInfo> sTooltips;
+   static std::list<ModuleTooltipInfo> sTooltips;
 
-   list<string> mScreenshotsToProcess;
+   std::list<std::string> mScreenshotsToProcess;
    IDrawableModule* mScreenshotModule;
 };
 

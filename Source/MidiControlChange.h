@@ -41,7 +41,7 @@ public:
    MidiControlChange();
    static IDrawableModule* Create() { return new MidiControlChange(); }
    
-   string GetTitleLabel() override { return "midicc"; }
+   std::string GetTitleLabel() override { return "midicc"; }
    void CreateUIControls() override;
    
    void SetEnabled(bool enabled) override { mEnabled = enabled; }

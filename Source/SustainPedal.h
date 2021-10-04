@@ -37,7 +37,7 @@ public:
    SustainPedal();
    static IDrawableModule* Create() { return new SustainPedal(); }
    
-   string GetTitleLabel() override { return "sustain"; }
+   std::string GetTitleLabel() override { return "sustain"; }
    void CreateUIControls() override;
    
    //INoteReceiver

@@ -38,7 +38,7 @@ public:
    NoteRatchet();
    static IDrawableModule* Create() { return new NoteRatchet(); }
 
-   string GetTitleLabel() override { return "note ratchet"; }
+   std::string GetTitleLabel() override { return "note ratchet"; }
    void CreateUIControls() override;
 
    void SetEnabled(bool enabled) override { mEnabled = enabled; }

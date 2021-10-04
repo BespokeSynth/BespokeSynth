@@ -35,7 +35,7 @@
 
 bool HelpDisplay::sShowTooltips = false;
 bool HelpDisplay::sTooltipsLoaded = false;
-list<HelpDisplay::ModuleTooltipInfo> HelpDisplay::sTooltips;
+std::list<HelpDisplay::ModuleTooltipInfo> HelpDisplay::sTooltips;
 
 HelpDisplay::HelpDisplay()
 : mShowTooltipsCheckbox(nullptr)
@@ -73,7 +73,7 @@ void HelpDisplay::LoadHelp()
    juce::File file(ofToResourcePath("help.txt").c_str());
    if (file.existsAsFile())
    {
-      string help = file.loadFileAsString().toStdString();
+      std::string help = file.loadFileAsString().toStdString();
       ofStringReplace(help, "\r", "");
       mHelpText = ofSplitString(help, "\n");
    }
@@ -87,7 +87,7 @@ void HelpDisplay::DrawModule()
    ofRect(0,0,mWidth,mHeight);
    ofPopStyle();
 
-   DrawTextLeftJustify(juce::JUCEApplication::getInstance()->getApplicationVersion().toStdString() + " (" + string(__DATE__) + " " + string(__TIME__) + ")", mWidth-5, 12);
+   DrawTextLeftJustify(juce::JUCEApplication::getInstance()->getApplicationVersion().toStdString() + " (" + std::string(__DATE__) + " " + std::string(__TIME__) + ")", mWidth-5, 12);
    
    mShowTooltipsCheckbox->Draw();
    mDumpModuleInfoButton->SetShowing(GetKeyModifiers() == kModifier_Shift);
@@ -116,11 +116,11 @@ void HelpDisplay::DrawModule()
    {
       if (mScreenshotModule != nullptr)
       {
-         string typeName = mScreenshotModule->GetTypeName();
+         std::string typeName = mScreenshotModule->GetTypeName();
          if (!mScreenshotsToProcess.empty())
          {
             typeName = *mScreenshotsToProcess.begin();
-            ofStringReplace(typeName, " " + string(ModuleFactory::kEffectChainSuffix), "");   //strip this suffix if it's there
+            ofStringReplace(typeName, " " + std::string(ModuleFactory::kEffectChainSuffix), "");   //strip this suffix if it's there
             mScreenshotsToProcess.pop_front();
          }
 
@@ -176,7 +176,7 @@ void HelpDisplay::CheckboxUpdated(Checkbox* checkbox)
 
 void HelpDisplay::LoadTooltips()
 {
-   string tooltipsPath;
+   std::string tooltipsPath;
    if (TheSynth->GetUserPrefs()["tooltips"].isNull() || !juce::File(ofToResourcePath(TheSynth->GetUserPrefs()["tooltips"].asString())).existsAsFile())
       tooltipsPath = ofToResourcePath("tooltips_eng.txt");
    else
@@ -198,7 +198,7 @@ void HelpDisplay::LoadTooltips()
          if (lines[i].isNotEmpty())
          {
             juce::String line = lines[i].replace("\\n", "\n");
-            vector<string> tokens = ofSplitString(line.toStdString(), "~");
+            std::vector<std::string> tokens = ofSplitString(line.toStdString(), "~");
             if (tokens.size() == 2)
             {
                if (!moduleInfo.module.empty())
@@ -222,7 +222,7 @@ void HelpDisplay::LoadTooltips()
    sTooltipsLoaded = true;
 }
 
-HelpDisplay::ModuleTooltipInfo* HelpDisplay::FindModuleInfo(string moduleTypeName)
+HelpDisplay::ModuleTooltipInfo* HelpDisplay::FindModuleInfo(std::string moduleTypeName)
 {
    for (auto& info : sTooltips)
    {
@@ -256,7 +256,7 @@ namespace
 
       // lookup table for storing results of
       // subproblems
-      std::vector<std::vector<bool>> lookup(n+1, vector<bool>(m+1));
+      std::vector<std::vector<bool>> lookup(n+1, std::vector<bool>(m+1));
 
       // empty pattern can match with empty string
       lookup[0][0] = true;
@@ -305,7 +305,7 @@ HelpDisplay::UIControlTooltipInfo* HelpDisplay::FindControlInfo(IUIControl* cont
       moduleInfo = FindModuleInfo(parent->GetTypeName());
    if (moduleInfo)
    {
-      string controlName = control->Name();
+      std::string controlName = control->Name();
       for (auto& info : moduleInfo->controlTooltips)
       {
          if (StringMatch(info.controlName, controlName))
@@ -319,7 +319,7 @@ HelpDisplay::UIControlTooltipInfo* HelpDisplay::FindControlInfo(IUIControl* cont
       moduleInfo = FindModuleInfo(parent->GetTypeName());
    if (moduleInfo)
    {
-      string controlName = control->Name();
+      std::string controlName = control->Name();
       for (auto& info : moduleInfo->controlTooltips)
       {
          if (StringMatch(info.controlName, controlName))
@@ -330,10 +330,10 @@ HelpDisplay::UIControlTooltipInfo* HelpDisplay::FindControlInfo(IUIControl* cont
    return nullptr;
 }
 
-string HelpDisplay::GetUIControlTooltip(IUIControl* control)
+std::string HelpDisplay::GetUIControlTooltip(IUIControl* control)
 {
-   string name = control->Name();
-   string tooltip;
+   std::string name = control->Name();
+   std::string tooltip;
 
    UIControlTooltipInfo* controlInfo = FindControlInfo(control);
    if (controlInfo && controlInfo->tooltip.size() > 0)
@@ -344,7 +344,7 @@ string HelpDisplay::GetUIControlTooltip(IUIControl* control)
    return name + ": " + tooltip;
 }
 
-string HelpDisplay::GetModuleTooltip(IDrawableModule* module)
+std::string HelpDisplay::GetModuleTooltip(IDrawableModule* module)
 {
    if (module == TheTitleBar)
       return "";
@@ -352,9 +352,9 @@ string HelpDisplay::GetModuleTooltip(IDrawableModule* module)
    return GetModuleTooltipFromName(module->GetTypeName());
 }
 
-string HelpDisplay::GetModuleTooltipFromName(string moduleTypeName)
+std::string HelpDisplay::GetModuleTooltipFromName(std::string moduleTypeName)
 {
-   string tooltip;
+   std::string tooltip;
 
    ModuleTooltipInfo* moduleInfo = FindModuleInfo(moduleTypeName);
    if (moduleInfo && moduleInfo->tooltip.size() > 0)
@@ -383,7 +383,7 @@ void HelpDisplay::ButtonClicked(ClickButton* button)
    {
       LoadTooltips();
 
-      vector<ModuleType> moduleTypes = {
+      std::vector<ModuleType> moduleTypes = {
                                           kModuleType_Note,
                                           kModuleType_Synth,
                                           kModuleType_Audio,
@@ -395,13 +395,13 @@ void HelpDisplay::ButtonClicked(ClickButton* button)
                                        };
       for (auto type : moduleTypes)
       {
-         vector<string> spawnable = TheSynth->GetModuleFactory()->GetSpawnableModules(type);
+         std::vector<std::string> spawnable = TheSynth->GetModuleFactory()->GetSpawnableModules(type);
          for (auto toSpawn : spawnable)
             TheSynth->SpawnModuleOnTheFly(toSpawn, 0, 0);
       }
 
-      string output;
-      vector<IDrawableModule*> modules;
+      std::string output;
+      std::vector<IDrawableModule*> modules;
       TheSynth->GetAllModules(modules);
 
       for (auto* topLevelModule : modules)
@@ -409,24 +409,24 @@ void HelpDisplay::ButtonClicked(ClickButton* button)
          if (topLevelModule->GetTypeName() == "effectchain")
          {
             EffectChain* effectChain = dynamic_cast<EffectChain*>(topLevelModule);
-            vector<string> effects = TheSynth->GetEffectFactory()->GetSpawnableEffects();
-            for (string effect : effects)
+            std::vector<std::string> effects = TheSynth->GetEffectFactory()->GetSpawnableEffects();
+            for (std::string effect : effects)
                effectChain->AddEffect(effect);
          }
          
-         vector<IDrawableModule*> toDump;
+         std::vector<IDrawableModule*> toDump;
          toDump.push_back(topLevelModule);
          for (auto* child : topLevelModule->GetChildren())
             toDump.push_back(child);
 
-         list<string> addedModuleNames;
+         std::list<std::string> addedModuleNames;
          for (auto* module : toDump)
          {
             if (ListContains(module->GetTypeName(), addedModuleNames) || module->GetTypeName().length() == 0)
                continue;
             addedModuleNames.push_back(module->GetTypeName());
             
-            string moduleTooltip = "[no tooltip]";
+            std::string moduleTooltip = "[no tooltip]";
             ModuleTooltipInfo* moduleInfo = FindModuleInfo(module->GetTypeName());
             if (moduleInfo)
             {
@@ -434,17 +434,17 @@ void HelpDisplay::ButtonClicked(ClickButton* button)
                ofStringReplace(moduleTooltip,"\n","\\n");
             }
             output += "\n\n\n" + module->GetTypeName() + "~"+moduleTooltip+"\n";
-            vector<IUIControl*> controls = module->GetUIControls();
-            list<string> addedControlNames;
+            std::vector<IUIControl*> controls = module->GetUIControls();
+            std::list<std::string> addedControlNames;
             for (auto* control : controls)
             {
                if (control->GetParent() != module && VectorContains(dynamic_cast<IDrawableModule*>(control->GetParent()), toDump))
                   continue;   //we'll print this control's info when we are printing for the specific parent module
                
-               string controlName = control->Name();
+               std::string controlName = control->Name();
                if (controlName != "enabled")
                {
-                  string controlTooltip = "[no tooltip]";
+                  std::string controlTooltip = "[no tooltip]";
                   UIControlTooltipInfo* controlInfo = FindControlInfo(control);
                   if (controlInfo)
                   {
@@ -471,7 +471,7 @@ void HelpDisplay::ButtonClicked(ClickButton* button)
       mScreenshotsToProcess.push_back("drumplayer");
       mScreenshotsToProcess.push_back("notesequencer");*/
 
-      vector<ModuleType> moduleTypes = {
+      std::vector<ModuleType> moduleTypes = {
                                           kModuleType_Note,
                                           kModuleType_Synth,
                                           kModuleType_Audio,
@@ -483,7 +483,7 @@ void HelpDisplay::ButtonClicked(ClickButton* button)
       };
       for (auto type : moduleTypes)
       {
-         vector<string> spawnable = TheSynth->GetModuleFactory()->GetSpawnableModules(type);
+         std::vector<std::string> spawnable = TheSynth->GetModuleFactory()->GetSpawnableModules(type);
          for (auto toSpawn : spawnable)
             mScreenshotsToProcess.push_back(toSpawn);
       }
@@ -504,7 +504,7 @@ void HelpDisplay::ButtonClicked(ClickButton* button)
             docs[moduleType.module]["controls"][control.controlName] = control.tooltip;
          }
 
-         string typeName = "unknown";
+         std::string typeName = "unknown";
          if (moduleType.module == "scale" || moduleType.module == "transport" || moduleType.module == "vstplugin")
             typeName = "other";
 
@@ -514,7 +514,7 @@ void HelpDisplay::ButtonClicked(ClickButton* button)
          docs[moduleType.module]["canReceivePulses"] = false;
       }
 
-      vector<ModuleType> moduleTypes = {
+      std::vector<ModuleType> moduleTypes = {
                                           kModuleType_Note,
                                           kModuleType_Synth,
                                           kModuleType_Audio,
@@ -526,12 +526,12 @@ void HelpDisplay::ButtonClicked(ClickButton* button)
       };
       for (auto type : moduleTypes)
       {
-         vector<string> spawnable = TheSynth->GetModuleFactory()->GetSpawnableModules(type);
+         std::vector<std::string> spawnable = TheSynth->GetModuleFactory()->GetSpawnableModules(type);
          for (auto toSpawn : spawnable)
          {
             IDrawableModule* module = TheSynth->SpawnModuleOnTheFly(toSpawn, 100, 300);
 
-            string moduleType;
+            std::string moduleType;
             switch (module->GetModuleType())
             {
                case kModuleType_Note: moduleType = "note effects"; break;
@@ -566,7 +566,7 @@ void HelpDisplay::ScreenshotModule(IDrawableModule* module)
    mScreenshotModule = module;
 }
 
-void HelpDisplay::RenderScreenshot(int x, int y, int width, int height, string filename)
+void HelpDisplay::RenderScreenshot(int x, int y, int width, int height, std::string filename)
 {
    float scale = gDrawScale * TheSynth->GetPixelRatio();
    x = (x + TheSynth->GetDrawOffset().x) * scale;

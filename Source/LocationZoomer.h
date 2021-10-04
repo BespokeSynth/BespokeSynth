@@ -53,7 +53,7 @@ private:
       ofVec2f mOffset;
    };
    
-   map<int, Location> mLocations;
+   std::map<int, Location> mLocations;
    Location mStart;
    Location mDestination;
    float mCurrentProgress;

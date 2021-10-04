@@ -67,7 +67,7 @@ public:
    ~SliderSequencer();
    static IDrawableModule* Create() { return new SliderSequencer(); }
    
-   string GetTitleLabel() override { return "slider sequencer"; }
+   std::string GetTitleLabel() override { return "slider sequencer"; }
    void CreateUIControls() override;
    void Init() override;
 

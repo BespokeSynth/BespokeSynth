@@ -45,7 +45,7 @@ public:
    ~RadioSequencer();
    static IDrawableModule* Create() { return new RadioSequencer(); }
    
-   string GetTitleLabel() override { return "radio sequencer"; }
+   std::string GetTitleLabel() override { return "radio sequencer"; }
    void CreateUIControls() override;
    
    //IGridListener
@@ -97,7 +97,7 @@ private:
    DropdownList* mIntervalSelector;
    int mLength;
    DropdownList* mLengthSelector;
-   vector<PatchCableSource*> mControlCables;
+   std::vector<PatchCableSource*> mControlCables;
    GridControlTarget* mGridControlTarget;
 
    TransportListenerInfo* mTransportListenerInfo;

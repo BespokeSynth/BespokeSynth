@@ -46,9 +46,9 @@ class ofxJSONElement;
 
 namespace VSTLookup
 {
-   void GetAvailableVSTs(vector<string>& vsts, bool rescan);
+   void GetAvailableVSTs(std::vector<std::string>& vsts, bool rescan);
    void FillVSTList(DropdownList* list);
-   string GetVSTPath(string vstName);
+   std::string GetVSTPath(std::string vstName);
 }
 
 class VSTPlugin : public IAudioProcessor, public INoteReceiver, public IDrawableModule, public IDropdownListener, public IFloatSliderListener, public IIntSliderListener, public IButtonListener
@@ -58,7 +58,7 @@ public:
    virtual ~VSTPlugin() override;
    static IDrawableModule* Create() { return new VSTPlugin(); }
    
-   string GetTitleLabel() override;
+   std::string GetTitleLabel() override;
    void CreateUIControls() override;
    
    void SetVol(float vol) { mVol = vol; }
@@ -68,7 +68,7 @@ public:
    
    juce::AudioProcessor* GetAudioProcessor() { return mPlugin.get(); }
    
-   void SetVST(string vstName);
+   void SetVST(std::string vstName);
    void OnVSTWindowClosed();
    
    //IAudioSource
@@ -90,7 +90,7 @@ public:
    virtual void SetUpFromSaveData() override;
    void SaveState(FileStreamOut& out) override;
    void LoadState(FileStreamIn& in) override;
-   vector<IUIControl*> ControlsToIgnoreInSaveState() const override;
+   std::vector<IUIControl*> ControlsToIgnoreInSaveState() const override;
    
    static bool sIsRescanningVsts;
    
@@ -102,8 +102,8 @@ private:
    bool Enabled() const override { return mEnabled; }
    void LoadVST(juce::PluginDescription desc);
    
-   string GetPluginName();
-   string GetPluginId();
+   std::string GetPluginName();
+   std::string GetPluginId();
    void CreateParameterSliders();
    void RefreshPresetFiles();
    
@@ -112,14 +112,14 @@ private:
    int mPresetFileIndex;
    DropdownList* mPresetFileSelector;
    ClickButton* mSavePresetFileButton;
-   vector<string> mPresetFilePaths;
+   std::vector<std::string> mPresetFilePaths;
    ClickButton* mOpenEditorButton;
    int mOverlayWidth;
    int mOverlayHeight;
    
    bool mPluginReady;
    std::unique_ptr<juce::AudioProcessor> mPlugin;
-   string mPluginName;
+   std::string mPluginName;
    std::unique_ptr<VSTWindow> mWindow;
    juce::MidiBuffer mMidiBuffer;
    juce::MidiBuffer mFutureMidiBuffer;
@@ -136,7 +136,7 @@ private:
       bool mInSelectorList;
    };
    
-   vector<ParameterSlider> mParameterSliders;
+   std::vector<ParameterSlider> mParameterSliders;
    
    int mChannel;
    bool mUseVoiceAsChannel;
@@ -151,7 +151,7 @@ private:
       float mLastPressure;
    };
    
-   vector<ChannelModulations> mChannelModulations;
+   std::vector<ChannelModulations> mChannelModulations;
    
    ofMutex mVSTMutex;
    VSTPlayhead mPlayhead;

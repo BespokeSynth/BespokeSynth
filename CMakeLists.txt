@@ -11,6 +11,8 @@
 
 cmake_minimum_required(VERSION 3.16)
 cmake_policy(SET CMP0091 NEW)
+set(CMAKE_CXX_EXTENSIONS OFF)
+set(CMAKE_CXX_STANDARD 17)
 set(CMAKE_MSVC_RUNTIME_LIBRARY "MultiThreaded$<$<CONFIG:Debug>:Debug>")
 set(CMAKE_OSX_DEPLOYMENT_TARGET 10.11 CACHE STRING "Minimum macOS version")
 set(CMAKE_POSITION_INDEPENDENT_CODE ON)
@@ -41,9 +43,7 @@ message(STATUS "       : Version is ${Python_VERSION}")
 message(STATUS "       : Executable is ${Python_EXECUTABLE}")
 message(STATUS "       : Library is ${Python_LIBRARIES}")
 
-message(STATUS "Bespoke: Configuring PyBind")
-set(PYBIND11_NOPYTHON TRUE)
-add_subdirectory(libs/pybind11 CONFIG)
+add_subdirectory(libs)
 
 if (NOT BESPOKE_JUCE_LOCATION)
     set(BESPOKE_JUCE_LOCATION "libs/JUCE" CACHE STRING "" FORCE)
@@ -60,27 +60,12 @@ else()
     message( STATUS "Bespoke: No VST2 support" )
 endif()
 
-add_subdirectory(libs/xwax)
-add_subdirectory(libs/freeverb)
-add_subdirectory(libs/leathers)
-add_subdirectory(libs/json)
-add_subdirectory(libs/nanovg)
-
-add_subdirectory(libs/tuning-library EXCLUDE_FROM_ALL)
-add_subdirectory(libs/oddsound-mts EXCLUDE_FROM_ALL)
-
 # Generate build time info for the cpp
 configure_file(${CMAKE_SOURCE_DIR}/Source/VersionInfo.cpp.in
         ${CMAKE_BINARY_DIR}/geninclude/VersionInfo.cpp)
 
 set(BESPOKE_SOURCE_LIST
         Source/glew/Bespoke_glew.c
-
-
-        Source/push2/push2/JuceToPush2DisplayBridge.cpp
-        Source/push2/libusb/libusb_platform_wrapper.c
-        Source/push2/push2/Push2-Usb-Communicator.cpp
-        Source/push2/Result.cpp
 
         Source/PerlinNoise.cpp
         Source/BitcrushEffect.cpp
@@ -170,6 +155,7 @@ set(BESPOKE_SOURCE_LIST
         Source/MidiControlChange.cpp
         Source/MidiController.cpp
         Source/MidiOutput.cpp
+        Source/Minimap.cpp
         Source/ModulationVisualizer.cpp
         Source/ModulatorAccum.cpp
         Source/ModulatorAdd.cpp
@@ -325,7 +311,6 @@ set(BESPOKE_SOURCE_LIST
         Source/ADSR.cpp
         Source/ADSRDisplay.cpp
         Source/ArrangementController.cpp
-        Source/Bespoke_Platform.cpp
         Source/BiquadFilter.cpp
         Source/Canvas.cpp
         Source/CanvasControls.cpp
@@ -379,6 +364,8 @@ set(BESPOKE_SOURCE_LIST
         Source/OpenFrameworksPort.cpp
         Source/OscController.cpp
         Source/Oscillator.cpp
+        Source/PSMoveController.cpp
+        Source/PSMoveMgr.cpp
         Source/PatchCable.cpp
         Source/PatchCableSource.cpp
         Source/PeakTracker.cpp
@@ -418,9 +405,7 @@ target_sources(BespokeSynth PRIVATE ${BESPOKE_SOURCE_LIST})
 target_include_directories(BespokeSynth PRIVATE
         Source
         Source/glew/include
-        Source/push2
-        Source/push2/libusb
-        Source/push2/modules/libusb)
+        )
 
 target_compile_definitions(BespokeSynth PUBLIC
         JUCE_MODAL_LOOPS_PERMITTED=1
@@ -458,7 +443,7 @@ if (APPLE)
             )
     target_sources(BespokeSynth PRIVATE
             Source/CFMessaging/Bespoke_CFMessaging.cpp
-            Source/psmove/Bespoke_PSMove.c
+            Source/KompleteKontrol.cpp
             )
     target_link_libraries(BespokeSynth PRIVATE
             "-framework CoreAudioKit")
@@ -519,9 +504,6 @@ elseif (WIN32)
             BESPOKE_WINDOWS=1
             GLEW_STATIC=0
             GL_GLEXT_PROTOTYPES=0
-            POLL_WINDOWS=0
-            THREADS_WINDOWS=0
-            HAVE_STRUCT_TIMESPEC
             )
 
     if (BESPOKE_ASIO_SDK_LOCATION)
@@ -529,16 +511,6 @@ elseif (WIN32)
         target_compile_definitions(BespokeSynth PUBLIC JUCE_ASIO=1)
         target_include_directories(BespokeSynth PRIVATE ${BESPOKE_ASIO_SDK_LOCATION}/common)
     endif()
-
-    if (${CMAKE_SIZEOF_VOID_P} EQUAL 4)
-        message(STATUS "Bespoke: Linking With ${CMAKE_SOURCE_DIR}/Source/3DxWare/Lib/x86/siapp.lib")
-        target_link_libraries(BespokeSynth PRIVATE
-                ${CMAKE_SOURCE_DIR}/Source/3dxWare/Lib/x86/siapp.lib)
-    else ()
-        message(STATUS "Bespoke: Linking With ${CMAKE_SOURCE_DIR}/Source/3DxWare/Lib/x64/siapp.lib")
-        target_link_libraries(BespokeSynth PRIVATE
-                ${CMAKE_SOURCE_DIR}/Source/3DxWare/Lib/x64/siapp.lib)
-    endif ()
 
     # Post install tasks - copy resources to the exe output directory
     set_target_properties(BespokeSynth PROPERTIES VS_DEBUGGER_WORKING_DIRECTORY "$<TARGET_FILE_DIR:BespokeSynth>"
@@ -555,22 +527,6 @@ else ()
             GLEW_STATIC=0
             GL_GLEXT_PROTOTYPES=0
             )
-
-    find_library(LIBUSB_1_LIBRARY 
-       NAMES
-         usb-1.0 usb
-       PATHS
-         /usr/lib
-         /usr/local/lib
-         /opt/local/lib
-         /sw/lib
-    )
-    if (NOT LIBUSB_1_LIBRARY)
-       message(ERROR "Bespoke: Cannot resolve libusb. Did you install libusb-1.0.0-dev package?")
-    endif()
-    message(STATUS "Bespoke: Using USB from ${LIBUSB_1_LIBRARY}")
-
-    target_link_libraries(BespokeSynth PRIVATE ${LIBUSB_1_LIBRARY})
 
     # Ant put resources with the exe
     get_target_property(OUTDIR BespokeSynth RUNTIME_OUTPUT_DIRECTORY)
@@ -589,9 +545,13 @@ endif ()
 
 target_include_directories(BespokeSynth PRIVATE ${Python_INCLUDE_DIRS})
 target_link_libraries(BespokeSynth PRIVATE
+        bespoke::3dxware
+        bespoke::exprtk
         bespoke::freeverb
         bespoke::json
         bespoke::nanovg
+        bespoke::psmove
+        bespoke::push2
         bespoke::xwax
         bespoke::leathers
 
@@ -607,6 +567,8 @@ target_link_libraries(BespokeSynth PRIVATE
         juce::juce_opengl
         juce::juce_osc
         juce::juce_gui_basics
+
+        $<$<BOOL:${MINGW}>:dbghelp>
         )
 
 target_link_libraries(BespokeSynth PRIVATE ${Python_LIBRARIES})

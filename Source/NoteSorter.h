@@ -40,7 +40,7 @@ public:
    NoteSorter();
    static IDrawableModule* Create() { return new NoteSorter(); }
 
-   string GetTitleLabel() override { return "notesorter"; }
+   std::string GetTitleLabel() override { return "notesorter"; }
    void CreateUIControls() override;
 
    void PlayNote(double time, int pitch, int velocity, int voiceIdx, ModulationParameters modulation) override;

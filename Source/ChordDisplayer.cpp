@@ -38,7 +38,7 @@ void ChordDisplayer::DrawModule()
    if (Minimized() || IsVisible() == false)
       return;
    
-   list<int> notes = mNoteOutput.GetHeldNotesList();
+   std::list<int> notes = mNoteOutput.GetHeldNotesList();
    
    if (notes.size() > 2)
    {

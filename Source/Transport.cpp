@@ -139,7 +139,7 @@ void Transport::Advance(double ms)
 
    UpdateListeners(ms);
 
-   for (list<IAudioPoller*>::iterator i = mAudioPollers.begin(); i != mAudioPollers.end(); ++i)
+   for (std::list<IAudioPoller*>::iterator i = mAudioPollers.begin(); i != mAudioPollers.end(); ++i)
    {
       IAudioPoller* poller = *i;
       poller->OnTransportAdvanced(amount);
@@ -200,7 +200,7 @@ void Transport::DrawModule()
    double measurePos = GetMeasurePos(gTime);
    
    int count = int(fmod(mMeasureTime,1)*mTimeSigTop) + 1;
-   string display;
+   std::string display;
    display += ofToString(measurePos,2)+" "+ofToString(GetMeasure(gTime))+"\n";
    display += ofToString(count);
    DrawTextNormal(display,5,52);
@@ -288,7 +288,7 @@ TransportListenerInfo* Transport::AddListener(ITimeListener* listener, NoteInter
 
 TransportListenerInfo* Transport::GetListenerInfo(ITimeListener* listener)
 {
-   for (list<TransportListenerInfo>::iterator i = mListeners.begin(); i != mListeners.end(); ++i)
+   for (std::list<TransportListenerInfo>::iterator i = mListeners.begin(); i != mListeners.end(); ++i)
    {
       TransportListenerInfo& info = *i;
       if (info.mListener == listener)
@@ -299,7 +299,7 @@ TransportListenerInfo* Transport::GetListenerInfo(ITimeListener* listener)
 
 void Transport::RemoveListener(ITimeListener* listener)
 {
-   for (list<TransportListenerInfo>::iterator i = mListeners.begin(); i != mListeners.end();)
+   for (std::list<TransportListenerInfo>::iterator i = mListeners.begin(); i != mListeners.end();)
    {
       TransportListenerInfo& info = *i;
       if (info.mListener == listener)
@@ -546,7 +546,7 @@ double Transport::GetMeasureFraction(NoteInterval interval)
 
 void Transport::UpdateListeners(double jumpMs)
 {
-   for (list<TransportListenerInfo>::iterator i = mListeners.begin(); i != mListeners.end(); ++i)
+   for (std::list<TransportListenerInfo>::iterator i = mListeners.begin(); i != mListeners.end(); ++i)
    {
       const TransportListenerInfo& info = *i;
       if (info.mInterval != kInterval_None &&
@@ -582,7 +582,7 @@ void Transport::UpdateListeners(double jumpMs)
 
 void Transport::OnDrumEvent(NoteInterval drumEvent)
 {
-   for (list<TransportListenerInfo>::iterator i = mListeners.begin(); i != mListeners.end(); ++i)
+   for (std::list<TransportListenerInfo>::iterator i = mListeners.begin(); i != mListeners.end(); ++i)
    {
       const TransportListenerInfo& info = *i;
       if (info.mInterval == drumEvent)

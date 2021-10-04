@@ -71,7 +71,7 @@ bool LaunchpadInterpreter::IsMonome() const
    return strcmp(mController->Name(),"monome") == 0;
 }
 
-void LaunchpadInterpreter::UpdateLights(vector<LightUpdate> lightUpdates, bool force /*=false*/)
+void LaunchpadInterpreter::UpdateLights(std::vector<LightUpdate> lightUpdates, bool force /*=false*/)
 {
    if (mController == nullptr)
       return;

@@ -121,9 +121,9 @@ void GlobalControls::SaveLayout(ofxJSONElement& moduleInfo)
    IDrawableModule::SaveLayout(moduleInfo);
 }
 
-vector<IUIControl*> GlobalControls::ControlsToNotSetDuringLoadState() const
+std::vector<IUIControl*> GlobalControls::ControlsToNotSetDuringLoadState() const
 {
-   vector<IUIControl*> ignore;
+   std::vector<IUIControl*> ignore;
    ignore.push_back(mZoomSlider);
    ignore.push_back(mXSlider);
    ignore.push_back(mYSlider);

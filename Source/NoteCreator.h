@@ -41,7 +41,7 @@ public:
    virtual ~NoteCreator();
    static IDrawableModule* Create() { return new NoteCreator(); }
    
-   string GetTitleLabel() override { return "note creator"; }
+   std::string GetTitleLabel() override { return "note creator"; }
    void CreateUIControls() override;
    void Init() override;
    

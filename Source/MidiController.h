@@ -157,7 +157,7 @@ struct UIControlConnection
    
    void SetNext(UIControlConnection* next);
    
-   void SetUIControl(string path);
+   void SetUIControl(std::string path);
    void CreateUIControls(int index);
    void PreDraw();
    void DrawList(int index);
@@ -207,7 +207,7 @@ struct UIControlConnection
    Checkbox* mPagelessCheckbox;
    ClickButton* mRemoveButton;
    ClickButton* mCopyButton;
-   list<IUIControl*> mEditorControls;
+   std::list<IUIControl*> mEditorControls;
 };
 
 enum ControlDrawType
@@ -249,8 +249,8 @@ struct GridLayout
    ofVec2f mPosition;
    ofVec2f mDimensions;
    MidiMessageType mType;
-   vector<int> mControls;
-   vector<int> mColors;
+   std::vector<int> mControls;
+   std::vector<int> mColors;
    
    PatchCableSource* mGridCable;
    GridControlTarget* mGridControlTarget[MAX_MIDI_PAGES];
@@ -265,7 +265,7 @@ public:
    ~MidiController();
    static IDrawableModule* Create() { return new MidiController(); }
    
-   string GetTitleLabel() override { return Name() + string("   "); }
+   std::string GetTitleLabel() override { return Name() + std::string("   "); }
    void CreateUIControls() override;
    
    void Init() override;
@@ -278,8 +278,8 @@ public:
    void AddScriptListener(ScriptModule* script);
    int GetPage() const { return mControllerPage; }
    bool IsInputConnected(bool immediate);
-   string GetDeviceIn() const { return mDeviceIn; }
-   string GetDeviceOut() const { return mDeviceOut; }
+   std::string GetDeviceIn() const { return mDeviceIn; }
+   std::string GetDeviceOut() const { return mDeviceOut; }
    UIControlConnection* GetConnectionForControl(MidiMessageType messageType, int control);
    bool JustBoundControl() const { return gTime - mLastBoundControlTime < 500; }
    
@@ -296,8 +296,8 @@ public:
 
    INonstandardController* GetNonstandardController() { return mNonstandardController; }
 
-   static vector<string> GetAvailableInputDevices();
-   static vector<string> GetAvailableOutputDevices();
+   static std::vector<std::string> GetAvailableInputDevices();
+   static std::vector<std::string> GetAvailableOutputDevices();
 
    //IDrawableModule
    void Poll() override;
@@ -334,7 +334,7 @@ public:
    void SaveState(FileStreamOut& out) override;
    void LoadState(FileStreamIn& in) override;
 
-   static string GetDefaultTooltip(MidiMessageType type, int control);
+   static std::string GetDefaultTooltip(MidiMessageType type, int control);
    
 private:
    enum MappingDisplayMode
@@ -363,9 +363,9 @@ private:
    void OnDeviceChanged();
    int GetLayoutControlIndexForCable(PatchCableSource* cable) const;
    int GetLayoutControlIndexForMidi(MidiMessageType type, int control) const;
-   string GetLayoutTooltip(int controlIndex);
+   std::string GetLayoutTooltip(int controlIndex);
    void UpdateControllerIndex();
-   void LoadLayout(string filename);
+   void LoadLayout(std::string filename);
    
    float mVelocityMult;
    bool mUseChannelAsVoice;
@@ -378,13 +378,13 @@ private:
 
    Modulations mModulation;
 
-   string mDeviceIn;
-   string mDeviceOut;
+   std::string mDeviceIn;
+   std::string mDeviceOut;
    int mOutChannel;
    MidiDevice mDevice;
    double mInitialConnectionTime;
    ofxJSONElement mConnectionsJson;
-   list<UIControlConnection*> mConnections;
+   std::list<UIControlConnection*> mConnections;
    bool mUseNegativeEdge;  //for midi toggle, accept on or off as a button press
    bool mSlidersDefaultToIncremental;
    bool mBindMode;
@@ -418,16 +418,16 @@ private:
    bool mBlink;
    int mControllerPage;
    DropdownList* mPageSelector;
-   vector< list<MidiDeviceListener*> > mListeners;
-   vector<ScriptModule*> mScriptListeners;
+   std::vector< std::list<MidiDeviceListener*> > mListeners;
+   std::vector<ScriptModule*> mScriptListeners;
    bool mPrintInput;
-   string mLastInput;
+   std::string mLastInput;
    INonstandardController* mNonstandardController;
    bool mIsConnected;
    bool mHasCreatedConnectionUIControls;
    float mReconnectWaitTimer;
    ChannelFilter mChannelFilter;
-   string mLastLoadedLayoutFile;
+   std::string mLastLoadedLayoutFile;
    ofxJSONElement mLayoutData;
    
    std::array<ControlLayoutElement, NUM_LAYOUT_CONTROLS> mLayoutControls;
@@ -435,7 +435,7 @@ private:
    int mHoveredLayoutElement;
    int mLayoutWidth;
    int mLayoutHeight;
-   vector<GridLayout*> mGrids;
+   std::vector<GridLayout*> mGrids;
    bool mFoundLayoutFile;
    
    ofMutex mQueuedMessageMutex;

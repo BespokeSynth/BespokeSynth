@@ -116,21 +116,21 @@ void OSCOutput::PlayNote(double time, int pitch, int velocity, int voiceIdx, Mod
    }
 }
 
-void OSCOutput::SendFloat(string address, float val)
+void OSCOutput::SendFloat(std::string address, float val)
 {
    juce::OSCMessage msg(address.c_str());
    msg.addFloat32(val);
    mOscOut.send(msg);
 }
 
-void OSCOutput::SendInt(string address, int val)
+void OSCOutput::SendInt(std::string address, int val)
 {
    juce::OSCMessage msg(address.c_str());
    msg.addInt32(val);
    mOscOut.send(msg);
 }
 
-void OSCOutput::SendString(string address, string val)
+void OSCOutput::SendString(std::string address, std::string val)
 {
    juce::OSCMessage msg(address.c_str());
    msg.addString(val);

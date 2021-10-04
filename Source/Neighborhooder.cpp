@@ -73,9 +73,9 @@ void Neighborhooder::PlayNote(double time, int pitch, int velocity, int voiceIdx
    }
    
    while (pitch >= mMinPitch + mPitchRange)
-      pitch -= TheScale->GetTet();
+      pitch -= TheScale->GetPitchesPerOctave();
    while (pitch < mMinPitch)
-      pitch += TheScale->GetTet();
+      pitch += TheScale->GetPitchesPerOctave();
    PlayNoteOutput(time, pitch, velocity, voiceIdx, modulation);
 }
 

@@ -28,19 +28,17 @@
 
 #include <iostream>
 
-using namespace std;
-
 typedef struct
 {
    uint32_t   messageId;
-   string className;
+   std::string className;
 } MessageIdToString;
 
 #define NUM_NI_MESSAGE_IDS 27
 
 extern MessageIdToString MessageIdToStringTable[NUM_NI_MESSAGE_IDS];
 
-string TypeForMessageID(uint32_t messageId);
-uint32_t MessageIDForType(string type);
+std::string TypeForMessageID(uint32_t messageId);
+uint32_t MessageIDForType(std::string type);
 
 #endif

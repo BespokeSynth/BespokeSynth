@@ -17,14 +17,22 @@
          "bracket" : [ 127, 204, 178 ],
          "op" : [ 229, 76, 153 ],
          "comma" :[ 127, 153, 127 ],
-         "comment" : [ 127, 127, 127 ]
+         "comment" : [ 127, 127, 127 ],
+         "selectedOverlay" : [ 255, 255, 255, 50 ],
+
+         "jediBg": [70, 70, 70],
+         "jediIndexBg": [100,100,100],
+         "jediAutoComplete": [ 200, 200, 200],
+         "jediAutoCompleteRest": [ 255, 255, 255],
+         "jediParams": [170,170,255],
+         "jediParamsHighlight": [230,230,255]
       },
       {
          "name" : "light",
          "font-size" : 14,
-         "currentBg" : [ 255, 245, 225 ],
-         "publishedBg" : [ 245, 235, 2220 ],
-         "unpublishedBg" : [ 255, 245, 235],
+         "currentBg" : [ 250, 240, 230 ],
+         "publishedBg" : [ 245, 235, 225 ],
+         "unpublishedBg" : [ 250, 240, 230],
 
          "string" : [ 42, 161, 152 ],
          "number" : [ 203, 75, 22],
@@ -37,7 +45,16 @@
          "bracket" : [ 38, 139, 210 ],
          "op" : [ 108, 113, 196 ],
          "comma" :[ 7, 54, 66 ],
-         "comment" : [ 220, 50, 47 ]
+         "comment" : [ 220, 50, 47 ],
+
+         "selectedOverlay" :  [ 27, 54, 66, 50 ],
+
+         "jediBg": [240,240,220],
+         "jediIndexBg": [240,230,215],
+         "jediAutoComplete": [ 42,161,152],
+         "jediAutoCompleteRest": [ 62,181,172],
+         "jediParams": [181,137,0],
+         "jediParamsHighlight": [220,150,0]
       }
    ]
 }

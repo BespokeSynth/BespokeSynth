@@ -41,7 +41,7 @@ public:
    virtual ~ValueSetter();
    static IDrawableModule* Create() { return new ValueSetter(); }
    
-   string GetTitleLabel() override { return "value setter"; }
+   std::string GetTitleLabel() override { return "value setter"; }
    void CreateUIControls() override;
    
    void SetEnabled(bool enabled) override { mEnabled = enabled; }

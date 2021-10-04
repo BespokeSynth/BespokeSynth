@@ -3,7 +3,7 @@
 
 #include "juce_core/juce_core.h"
 
-void UpdateUserData(string destDirPath)
+void UpdateUserData(std::string destDirPath)
 {
    juce::File bundledDataDir(ofToResourcePath("userdata_original"));
    juce::File destDataDir(destDirPath);
@@ -45,15 +45,13 @@ void UpdateUserData(string destDirPath)
       ofLog() << "copying data from "+bundledDataDir.getFullPathName().toStdString()+" to "+destDirPath;
       destDataDir.createDirectory();
       
-      juce::DirectoryIterator directories(bundledDataDir, true, "*", juce::File::findDirectories);
-      while (directories.next())
+      for (const auto& entry : juce::RangedDirectoryIterator{bundledDataDir, true, "*", juce::File::findDirectories})
       {
-         juce::String destDirName = juce::String(destDirPath) + "/" + directories.getFile().getRelativePathFrom(bundledDataDir);
+         juce::String destDirName = juce::String(destDirPath) + "/" + entry.getFile().getRelativePathFrom(bundledDataDir);
          juce::File(destDirName).createDirectory();
       }
 
-      juce::DirectoryIterator entry(bundledDataDir, true);
-      while (entry.next())
+      for (const auto& entry : juce::RangedDirectoryIterator{bundledDataDir, true})
       {
          juce::String sourceFileName = entry.getFile().getFullPathName();
          juce::String destFileName = juce::String(destDirPath) + "/" + entry.getFile().getRelativePathFrom(bundledDataDir);

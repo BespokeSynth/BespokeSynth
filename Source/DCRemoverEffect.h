@@ -39,13 +39,13 @@ public:
    
    static IAudioEffect* Create() { return new DCRemoverEffect(); }
    
-   string GetTitleLabel() override { return "dc remover"; }
+   std::string GetTitleLabel() override { return "dc remover"; }
    
    //IAudioEffect
    void ProcessAudio(double time, ChannelBuffer* buffer) override;
    void SetEnabled(bool enabled) override { mEnabled = enabled; }
    float GetEffectAmount() override;
-   string GetType() override { return "dcremover"; }
+   std::string GetType() override { return "dcremover"; }
 
    void CheckboxUpdated(Checkbox* checkbox) override;
    

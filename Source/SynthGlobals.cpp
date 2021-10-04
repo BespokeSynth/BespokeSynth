@@ -276,11 +276,11 @@ void BufferCopy(float* dst, const float* src, int bufferSize)
 #endif
 }
 
-string NoteName(int pitch, bool flat, bool includeOctave)
+std::string NoteName(int pitch, bool flat, bool includeOctave)
 {
    int octave = pitch / 12;
    pitch %= 12;
-   string ret = "x";
+   std::string ret = "x";
    switch (pitch)
    {
       case 0:
@@ -332,7 +332,7 @@ string NoteName(int pitch, bool flat, bool includeOctave)
    return ret;
 }
 
-int PitchFromNoteName(string noteName)
+int PitchFromNoteName(std::string noteName)
 {
    int octave = -2;
    if (isdigit(noteName[noteName.length()-1]))
@@ -381,29 +381,29 @@ void FloatWrap(double& num, float space)
    num -= space * floor(num/space);
 }
 
-void DrawTextNormal(string text, int x, int y, float size)
+void DrawTextNormal(std::string text, int x, int y, float size)
 {
    gFont.DrawString(text, size, x, y);
 }
 
-void DrawTextLeftJustify(string text, int x, int y, float size)
+void DrawTextLeftJustify(std::string text, int x, int y, float size)
 {
    gFont.DrawString(text, size, x - gFont.GetStringWidth(text,size), y);
 }
 
-void DrawTextBold(string text, int x, int y, float size)
+void DrawTextBold(std::string text, int x, int y, float size)
 {
    gFontBold.DrawString(text, size, x, y);
 }
 
-float GetStringWidth(string text, float size)
+float GetStringWidth(std::string text, float size)
 {
    return gFont.GetStringWidth(text, size);
 }
 
 void AssertIfDenormal(float input)
 {
-   assert(input == 0 || input != input || fabsf(input) > numeric_limits<float>::min());
+   assert(input == 0 || input != input || fabsf(input) > std::numeric_limits<float>::min());
 }
 
 float GetInterpolatedSample(double offset, const float* buffer, int bufferSize)
@@ -448,9 +448,9 @@ void WriteInterpolatedSample(double offset, float* buffer, int bufferSize, float
    buffer[posNext] += a*sample;
 }
 
-string GetRomanNumeralForDegree(int degree)
+std::string GetRomanNumeralForDegree(int degree)
 {
-   string roman;
+   std::string roman;
    switch ((degree + 700) % 7)
    {
       case 0: roman = "I"; break;
@@ -470,7 +470,7 @@ void UpdateTarget(IDrawableModule* module)
    INoteSource* noteSource = dynamic_cast<INoteSource*>(module);
    IGridController* grid = dynamic_cast<IGridController*>(module);
    IPulseSource* pulseSource = dynamic_cast<IPulseSource*>(module);
-   string targetName = "";
+   std::string targetName = "";
    if (audioSource)
    {
       for (int i=0; i<audioSource->GetNumTargets(); ++i)
@@ -485,7 +485,7 @@ void UpdateTarget(IDrawableModule* module)
    {
       if (module->GetPatchCableSource())
       {
-         const vector<PatchCable*>& cables = module->GetPatchCableSource()->GetPatchCables();
+         const std::vector<PatchCable*>& cables = module->GetPatchCableSource()->GetPatchCables();
          for (int i=0; i<cables.size(); ++i)
          {
             PatchCable* cable = cables[i];
@@ -655,9 +655,9 @@ bool IsInUnitBox(ofVec2f pos)
    return pos.x >= 0 && pos.x < 1 && pos.y >= 0 && pos.y < 1;
 }
 
-string GetUniqueName(string name, vector<IDrawableModule*> existing)
+std::string GetUniqueName(std::string name, std::vector<IDrawableModule*> existing)
 {
-   string origName = name;
+   std::string origName = name;
    while (origName.length() > 1 && CharacterFunctions::isDigit((char)origName[origName.length()-1]))
       origName.resize(origName.length()-1);
    int suffix = 1;
@@ -681,9 +681,9 @@ string GetUniqueName(string name, vector<IDrawableModule*> existing)
    return name;
 }
 
-string GetUniqueName(string name, vector<string> existing)
+std::string GetUniqueName(std::string name, std::vector<std::string> existing)
 {
-   string origName = name;
+   std::string origName = name;
    int suffix = 1;
    while (true)
    {
@@ -1364,7 +1364,7 @@ void DrawFallbackText(const char* text, float posX, float posY)
    }
 }
 
-bool EvaluateExpression(string expressionStr, float currentValue, float& output)
+bool EvaluateExpression(std::string expressionStr, float currentValue, float& output)
 {
    exprtk::symbol_table<float> symbolTable;
    exprtk::expression<float> expression;
@@ -1394,7 +1394,7 @@ bool EvaluateExpression(string expressionStr, float currentValue, float& output)
 
 ofLog::~ofLog()
 {
-   string output = ofToString(gTime / 1000) + ": " + mMessage;
+   std::string output = ofToString(gTime / 1000) + ": " + mMessage;
    DBG(output);
    if (mSendToBespokeConsole)
       TheSynth->LogEvent(output, kLogEventType_Verbose);

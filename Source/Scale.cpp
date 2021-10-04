@@ -34,16 +34,22 @@
 
 Scale* TheScale = nullptr;
 
+namespace
+{
+   std::string kOddsoundScale = "oddsound";
+   std::string kSclFileScale = "custom";
+}
+
 Scale::Scale()
 : mRootSelector(nullptr)
 , mScaleSelector(nullptr)
 , mScaleDegree(0)
 , mScaleDegreeSlider(nullptr)
 , mNumSeptatonicScales(0)
-, mTet(12)
+, mPitchesPerOctave(12)
 , mReferenceFreq(440)
 , mReferencePitch(69)
-, mTetEntry(nullptr)
+, mPitchesPerOctaveEntry(nullptr)
 , mReferenceFreqEntry(nullptr)
 , mReferencePitchEntry(nullptr)
 , mIntonation(kIntonation_Equal)
@@ -56,10 +62,10 @@ Scale::Scale()
 
 Scale::~Scale()
 {
-    if (oddsound_mts_client)
+    if (mOddsoundMTSClient)
     {
-        MTS_DeregisterClient(oddsound_mts_client);
-        oddsound_mts_client = nullptr;
+        MTS_DeregisterClient(mOddsoundMTSClient);
+        mOddsoundMTSClient = nullptr;
     }
 }
 
@@ -70,13 +76,13 @@ void Scale::CreateUIControls()
    mScaleSelector = new DropdownList(this,"scale",58,5,&mScaleIndex);
    mScaleDegreeSlider = new IntSlider(this,"degree",HIDDEN_UICONTROL,HIDDEN_UICONTROL,115,15,&mScaleDegree,-7,7);
    mIntonationSelector = new DropdownList(this,"intonation",58,24,(int*)(&mIntonation));
-   mTetEntry = new TextEntry(this,"tet",4,24,2,&mTet,0,99);
+   mPitchesPerOctaveEntry = new TextEntry(this,"PPO",4,24,2,&mPitchesPerOctave,0,99);
    mReferenceFreqEntry = new TextEntry(this,"tuning",4,43,3,&mReferenceFreq,1,999);
-   mReferencePitchEntry = new TextEntry(this,"note",72,43,3,&mReferencePitch,0,127);
-   mLoadSCL = new ClickButton(this, "Load SCL", 4, 62);
-   mLoadKBM = new ClickButton(this, "Load KBM", 74, 62);
+   mReferencePitchEntry = new TextEntry(this,"note",76,43,3,&mReferencePitch,0,127);
+   mLoadSCLButton = new ClickButton(this, "load SCL", 4, 24);
+   mLoadKBMButton = new ClickButton(this, "load KBM", 74, 24);
 
-   mTetEntry->DrawLabel(true);
+   mPitchesPerOctaveEntry->DrawLabel(true);
    mReferenceFreqEntry->DrawLabel(true);
    mReferencePitchEntry->DrawLabel(true);
    
@@ -98,8 +104,6 @@ void Scale::CreateUIControls()
    mIntonationSelector->AddLabel("just", kIntonation_Just);
    mIntonationSelector->AddLabel("pyth", kIntonation_Pythagorean);
    mIntonationSelector->AddLabel("mean", kIntonation_Meantone);
-   mIntonationSelector->AddLabel("sclkbm", kIntonation_SCLKBM);
-   mIntonationSelector->AddLabel("oddsound", kIntonation_ODDSOUNDMTS);
 }
 
 void Scale::Init()
@@ -138,32 +142,65 @@ void Scale::Init()
       mScaleSelector->AddLabel("ionian", 0);
       mScales.resize(1);
       mScales[0].mName = "ionian";
-      mScales[0].mPitches = vector<int>{0,2,4,5,7,9,11};
+      mScales[0].mPitches = std::vector<int>{0,2,4,5,7,9,11};
    }
+
+   mScaleSelector->AddLabel(kOddsoundScale, mScaleSelector->GetNumValues());
+   mScaleSelector->AddLabel(kSclFileScale, mScaleSelector->GetNumValues());
    
-   SetRoot(gRandom()%TheScale->GetTet());
+   SetRoot(gRandom()%TheScale->GetPitchesPerOctave());
    SetRandomSeptatonicScale();
 }
 
 float Scale::PitchToFreq(float pitch)
 {
+   if (IsUsingSclFileScale())
+   {
+      auto ip = (int)pitch + 128;
+      if (ip < 0 || ip > 256) return 440;
+
+      // Interpolate in log space
+      auto lt = mTuningTable[ip];
+      auto nt = mTuningTable[ip + ((ip != 255) ? 1 : 0)];
+      auto fp = (pitch + 128) - ip;
+      auto interplt = (1 - fp) * lt + fp * nt;
+
+      // Then pow2 it and multiply by freq0
+      return Pow2(interplt) * Tunings::MIDI_0_FREQ;
+   }
+   
+   if (IsUsingOddsoundScale())
+   {
+      if (mOddsoundMTSClient && MTS_HasMaster(mOddsoundMTSClient))
+      {
+         if (pitch < 0 || pitch > 127)
+            return Pow2((pitch - mReferencePitch) / mPitchesPerOctave) * mReferenceFreq; // Improve this obviously
+         else
+            return MTS_NoteToFrequency(mOddsoundMTSClient, (int)pitch, 0);
+      }
+      else 
+      {
+         return Pow2((pitch - mReferencePitch) / mPitchesPerOctave) * mReferenceFreq;
+      }
+   }
+
    switch (mIntonation)
    {
       case kIntonation_Equal:
-         return Pow2((pitch-mReferencePitch)/mTet) * mReferenceFreq;
+         return Pow2((pitch-mReferencePitch)/mPitchesPerOctave) * mReferenceFreq;
       /*case kIntonation_Rational:
       {
          int referencePitch = ScaleRoot();
          do
          {
-            referencePitch += mTet;
-         }while (referencePitch < mReferencePitch && abs(referencePitch - mReferencePitch) > mTet);
-         float referenceFreq = Pow2((referencePitch-mReferencePitch)/mTet)*mReferenceFreq;
+            referencePitch += mPitchesPerOctave;
+         }while (referencePitch < mReferencePitch && abs(referencePitch - mReferencePitch) > mPitchesPerOctave);
+         float referenceFreq = Pow2((referencePitch-mReferencePitch)/mPitchesPerOctave)*mReferenceFreq;
          
          int intPitch = (int)pitch;
          float remainder = pitch - intPitch;
-         float ratio1 = RationalizeNumber(Pow2(float(intPitch-referencePitch)/mTet));
-         float ratio2 = RationalizeNumber(Pow2(float((intPitch+1)-referencePitch)/mTet));
+         float ratio1 = RationalizeNumber(Pow2(float(intPitch-referencePitch)/mPitchesPerOctave));
+         float ratio2 = RationalizeNumber(Pow2(float((intPitch+1)-referencePitch)/mPitchesPerOctave));
          return ofLerp(ratio1,ratio2,remainder)*referenceFreq;
       }*/
       case kIntonation_Pythagorean:
@@ -174,9 +211,9 @@ float Scale::PitchToFreq(float pitch)
          int referencePitch = ScaleRoot();
          do
          {
-            referencePitch += mTet;
-         }while (referencePitch < mReferencePitch && abs(referencePitch - mReferencePitch) > mTet);
-         float referenceFreq = Pow2((referencePitch-mReferencePitch)/mTet) * mReferenceFreq;
+            referencePitch += mPitchesPerOctave;
+         }while (referencePitch < mReferencePitch && abs(referencePitch - mReferencePitch) > mPitchesPerOctave);
+         float referenceFreq = Pow2((referencePitch-mReferencePitch)/mPitchesPerOctave) * mReferenceFreq;
          
          int intPitch = (int)pitch;
          float remainder = pitch - intPitch;
@@ -186,33 +223,6 @@ float Scale::PitchToFreq(float pitch)
          
          break;
       }
-      case kIntonation_SCLKBM: {
-          auto ip = (int) pitch + 128;
-          if (ip < 0 || ip > 256) return 440;
-
-          // Interpolate in log space
-          auto lt = mTuningTable[ip];
-          auto nt = mTuningTable[ip+((ip != 255) ? 1 : 0 )];
-          auto fp = (pitch+128) - ip;
-          auto interplt = (1-fp) * lt + fp * nt;
-
-          // Then pow2 it and multiply by freq0
-          return Pow2(interplt) * Tunings::MIDI_0_FREQ;
-      }
-           break;
-      case kIntonation_ODDSOUNDMTS: {
-          if (oddsound_mts_client && MTS_HasMaster(oddsound_mts_client)) {
-              if (pitch < 0 || pitch > 127) {
-                  // Improve this obviously
-                  return Pow2((pitch - mReferencePitch) / mTet) * mReferenceFreq;
-              } else {
-                  return MTS_NoteToFrequency(oddsound_mts_client, (int) pitch, 0);
-              }
-          } else {
-              return Pow2((pitch - mReferencePitch) / mTet) * mReferenceFreq;
-          }
-      }
-           break;
       default:
          assert(false);
    }
@@ -226,7 +236,7 @@ float Scale::FreqToPitch(float freq)
    //switch (mIntonation)
    //{
    //   case kIntonation_Equal:
-         return mReferencePitch + mTet*log2(freq/mReferenceFreq);
+         return mReferencePitch + mPitchesPerOctave*log2(freq/mReferenceFreq);
    //   default:
    //      assert(false);
    //}
@@ -236,12 +246,12 @@ float Scale::FreqToPitch(float freq)
 
 int Scale::MakeDiatonic(int pitch)
 {
-   assert(mScale.mScaleRoot >= 0 && mScale.mScaleRoot < mTet);
-   assert(mScale.mScalePitches.size());
+   assert(mScale.mScaleRoot >= 0 && mScale.mScaleRoot < mPitchesPerOctave);
+   assert(mScale.GetPitches().size());
    
-   int pitchOut = (pitch - mScale.mScaleRoot) % mTet; //transform into 0-12 scale space
+   int pitchOut = (pitch - mScale.mScaleRoot) % mPitchesPerOctave; //transform into 0-12 scale space
    
-   for (int i=(int)mScale.mScalePitches.size() - 1; i >= 0; --i)
+   for (int i=(int)mScale.GetPitches().size() - 1; i >= 0; --i)
    {
       if (mScale.GetScalePitch(i) <= pitchOut)
       {
@@ -250,7 +260,7 @@ int Scale::MakeDiatonic(int pitch)
       }
    }
    
-   pitchOut += mTet * ((pitch - mScale.mScaleRoot)/mTet) + mScale.mScaleRoot; //transform back
+   pitchOut += mPitchesPerOctave * ((pitch - mScale.mScaleRoot)/mPitchesPerOctave) + mScale.mScaleRoot; //transform back
    
    return pitchOut;
 }
@@ -270,7 +280,7 @@ int Scale::GetToneFromPitch(int pitch)
    return mScale.GetToneFromPitch(pitch);
 }
 
-void Scale::SetScale(int root, string type)
+void Scale::SetScale(int root, std::string type)
 {
    SetRoot(root);
    SetScaleType(type);
@@ -286,7 +296,7 @@ void Scale::SetRoot(int root, bool force)
    NotifyListeners();
 }
 
-void Scale::SetScaleType(string type, bool force)
+void Scale::SetScaleType(std::string type, bool force)
 {
    int oldScaleIndex = mScaleIndex;
    
@@ -303,6 +313,12 @@ void Scale::SetScaleType(string type, bool force)
       return;
    
    mScale.SetScaleType(type);
+
+   if (type == kSclFileScale || type == kOddsoundScale)
+   {
+      UpdateTuningTable();
+      SetRoot(0);
+   }
    
    NotifyListeners();
 }
@@ -350,7 +366,7 @@ void Scale::RemoveListener(IScaleListener* listener)
 
 void Scale::NotifyListeners()
 {
-   for (list<IScaleListener*>::iterator i = mListeners.begin(); i != mListeners.end(); ++i)
+   for (std::list<IScaleListener*>::iterator i = mListeners.begin(); i != mListeners.end(); ++i)
    {
       (*i)->OnScaleChanged();
    }
@@ -370,25 +386,57 @@ void Scale::DrawModule()
    if (Minimized() || IsVisible() == false)
       return;
 
+   mRootSelector->SetShowing(!IsUsingSclFileScale() && !IsUsingOddsoundScale());
+   mPitchesPerOctaveEntry->SetShowing(!IsUsingSclFileScale() && !IsUsingOddsoundScale());
+   mReferenceFreqEntry->SetShowing(!IsUsingOddsoundScale() && (!IsUsingSclFileScale() || mKbmContents.empty()));
+   mReferencePitchEntry->SetShowing(!IsUsingOddsoundScale() && (!IsUsingSclFileScale() || mKbmContents.empty()));
+   mIntonationSelector->SetShowing(!IsUsingSclFileScale() && !IsUsingOddsoundScale());
+   mLoadSCLButton->SetShowing(IsUsingSclFileScale() && !IsUsingOddsoundScale());
+   mLoadKBMButton->SetShowing(IsUsingSclFileScale() && !IsUsingOddsoundScale());
+
    mRootSelector->Draw();
    mScaleSelector->Draw();
-   mTetEntry->Draw();
+   mPitchesPerOctaveEntry->Draw();
    mReferenceFreqEntry->Draw();
    mReferencePitchEntry->Draw();
    mIntonationSelector->Draw();
-   mLoadSCL->Draw();
-   mLoadKBM->Draw();
+   mLoadSCLButton->Draw();
+   mLoadKBMButton->Draw();
+
+   if (IsUsingSclFileScale())
+      DrawTextNormal(mCustomScaleDescription, 5, 75);
+   if (IsUsingOddsoundScale())
+      DrawTextNormal(mCustomScaleDescription, 5, 45);
 }
 
-vector<int> Scale::GetPitchesForScale(string type)
+void Scale::GetModuleDimensions(float& width, float& height)
 {
+   width = 164;
+   height = IsUsingSclFileScale() ? 109  : 62;
+}
+
+bool Scale::IsUsingOddsoundScale() const
+{
+   return mScaleIndex == mScaleSelector->GetNumValues() - 2;
+}
+
+bool Scale::IsUsingSclFileScale() const
+{
+   return mScaleIndex == mScaleSelector->GetNumValues() - 1;
+}
+
+std::vector<int> Scale::GetPitchesForScale(std::string scaleType)
+{
+   if (scaleType == kSclFileScale || scaleType == kOddsoundScale)
+      return std::vector<int>();
+
    for (int i=0; i<mScales.size(); ++i)
    {
-      if (mScales[i].mName == type)
+      if (mScales[i].mName == scaleType)
          return mScales[i].mPitches;
    }
    assert(false);
-   return vector<int>();
+   return std::vector<int>();
 }
 
 void Scale::Poll()
@@ -456,22 +504,69 @@ float Scale::RationalizeNumber(float input)
 
 void Scale::UpdateTuningTable()
 {
-   if (mIntonation == kIntonation_Equal)
+   if (IsUsingOddsoundScale())
+   {
+       if (mOddsoundMTSClient == nullptr)
+       {
+           ofLog() << "Connecting to oddsound mts";
+           mOddsoundMTSClient = MTS_RegisterClient();
+           mCustomScaleDescription = "connected to oddsound";
+       }
+
+       if (mOddsoundMTSClient == nullptr)
+       {
+          mIntonation = kIntonation_Equal;
+          mCustomScaleDescription = "connection to oddsound failed";
+       }
+   }
+   else if (IsUsingSclFileScale())
+   {
+       try
+       {
+           Tunings::Scale scale;
+           Tunings::KeyboardMapping mapping;
+           if (mSclContents.empty())
+               scale = Tunings::evenTemperament12NoteScale();
+           else
+               scale = Tunings::parseSCLData(mSclContents);
+
+           mPitchesPerOctave = scale.count;
+
+           if (mKbmContents.empty())
+               mapping = Tunings::startScaleOnAndTuneNoteTo(60, (int)mReferencePitch, mReferenceFreq);
+           else
+               mapping = Tunings::parseKBMData(mKbmContents);
+
+           auto tuning = Tunings::Tuning(scale, mapping);
+           for (int i=0; i<256; ++i)
+           {
+               mTuningTable[i] = tuning.logScaledFrequencyForMidiNote(i-128);
+           }
+
+           mCustomScaleDescription = "pitches per octave: " + ofToString(mPitchesPerOctave) + "\nscale: " + scale.description + "\nmapping: " + mapping.rawText;
+       }
+       catch(const Tunings::TuningError &e)
+       {
+           mIntonation = kIntonation_Equal;
+           ofLog() << e.what();
+       }
+   }
+   else if (mIntonation == kIntonation_Equal)
    {
       //no table
    }
-   if (mIntonation == kIntonation_Rational)
+   else if (mIntonation == kIntonation_Rational)
    {
       for (int i=0; i<256; ++i)
-         mTuningTable[i] = RationalizeNumber(Pow2(float(i-128)/mTet));
+         mTuningTable[i] = RationalizeNumber(Pow2(float(i-128)/mPitchesPerOctave));
    }
-   if (mIntonation == kIntonation_Pythagorean ||
+   else if (mIntonation == kIntonation_Pythagorean ||
        mIntonation == kIntonation_Just ||
        mIntonation == kIntonation_Meantone)
    {
-      if (mTet != 12)
+      if (mPitchesPerOctave != 12)
       {
-         mTet = 12;  //only 12-tet supported for these
+         mPitchesPerOctave = 12;  //only 12-PPO supported for these
          NotifyListeners();
       }
       
@@ -545,47 +640,6 @@ void Scale::UpdateTuningTable()
               mTuningTable[i] *= ratio;
       }
    }
-   if( mIntonation == kIntonation_ODDSOUNDMTS)
-   {
-       if (oddsound_mts_client == nullptr)
-       {
-           ofLog() << "Connecting to oddsound mts";
-           oddsound_mts_client = MTS_RegisterClient();
-       }
-
-       if (oddsound_mts_client == nullptr)
-       {
-           mIntonation = kIntonation_Equal;
-           return;
-       }
-   }
-   if (mIntonation== kIntonation_SCLKBM)
-   {
-       try {
-           Tunings::Scale scale;
-           Tunings::KeyboardMapping mapping;
-           if (mSclContents.empty())
-               scale = Tunings::evenTemperament12NoteScale();
-           else
-               scale = Tunings::parseSCLData(mSclContents);
-
-           if (mKbmContents.empty())
-               mapping = Tunings::startScaleOnAndTuneNoteTo(60, (int)mReferencePitch, mReferenceFreq);
-           else
-               mapping = Tunings::parseKBMData(mKbmContents);
-
-           auto tuning = Tunings::Tuning(scale, mapping);
-           for (int i=0; i<256; ++i)
-           {
-               mTuningTable[i] = tuning.logScaledFrequencyForMidiNote(i-128);
-           }
-       }
-       catch(const Tunings::TuningError &e)
-       {
-           mIntonation = kIntonation_Equal;
-           ofLog() << e.what();
-       }
-   }
 }
 
 float Scale::GetTuningTableRatio(int semitonesFromCenter)
@@ -598,7 +652,7 @@ void Scale::DropdownUpdated(DropdownList* list, int oldVal)
    if (list == mRootSelector)
       SetRoot(mScale.mScaleRoot, true);
    if (list == mScaleSelector)
-      SetScaleType(mScales[mScaleIndex].mName, true);
+      SetScaleType(list->GetLabel(mScaleIndex), true);
    if (list == mIntonationSelector)
       UpdateTuningTable();
 }
@@ -617,26 +671,28 @@ void Scale::CheckboxUpdated(Checkbox *checkbox)
 
 void Scale::TextEntryComplete(TextEntry* entry)
 {
-   if (entry == mTetEntry)
+   if (entry == mPitchesPerOctaveEntry)
    {
       UpdateTuningTable();
       NotifyListeners();
    }
+   if (entry == mReferenceFreqEntry || entry == mReferencePitchEntry)
+      UpdateTuningTable();
 }
 
 void Scale::ButtonClicked(ClickButton *button)
 {
-    if (button == mLoadSCL || button == mLoadKBM)
+    if (button == mLoadSCLButton || button == mLoadKBMButton)
     {
         std::string prompt = "Load ";
-        prompt += (button == mLoadSCL) ? "SCL" : "KBM";
-        std::string pat = (button == mLoadSCL) ? "*.scl" : "*.kbm";
-        juce::FileChooser chooser( prompt, juce::File(), pat, true, false, TheSynth->GetMainComponent()->getTopLevelComponent());
+        prompt += (button == mLoadSCLButton) ? "SCL" : "KBM";
+        std::string pat = (button == mLoadSCLButton) ? "*.scl" : "*.kbm";
+        juce::FileChooser chooser( prompt, juce::File(ofToDataPath("")), pat, true, false, TheSynth->GetMainComponent()->getTopLevelComponent());
         if (chooser.browseForFileToOpen())
         {
             auto file = chooser.getResult();
             std::cout << file.getFullPathName().toStdString() << std::endl;
-            if (button == mLoadSCL)
+            if (button == mLoadSCLButton)
             {
                 mSclContents = file.loadFileAsString().toStdString();
             }
@@ -692,13 +748,16 @@ void Scale::LoadState(FileStreamIn &in)
 void ScalePitches::SetRoot(int root)
 {
    assert(root >= 0);
-   mScaleRoot = root % TheScale->GetTet();
+   mScaleRoot = root % TheScale->GetPitchesPerOctave();
 }
 
-void ScalePitches::SetScaleType(string type)
+void ScalePitches::SetScaleType(std::string type)
 {
    mScaleType = type;
-   mScalePitches = TheScale->GetPitchesForScale(type);
+
+   int newFlip = (mScalePitchesFlip == 0) ? 1 : 0;
+   mScalePitches[newFlip] = TheScale->GetPitchesForScale(type);
+   mScalePitchesFlip = newFlip;   
 }
 
 void ScalePitches::SetAccidentals(const std::vector<Accidental>& accidentals)
@@ -742,21 +801,21 @@ void ScalePitches::GetChordDegreeAndAccidentals(const Chord& chord, int& degree,
    
    for (int i=0; i<chordForm.size(); ++i)
    {
-      int chordPitch = (chordForm[i]+pitch-mScaleRoot+TheScale->GetTet())%TheScale->GetTet();
-      if (!VectorContains(chordPitch, mScalePitches))
+      int chordPitch = (chordForm[i]+pitch-mScaleRoot+TheScale->GetPitchesPerOctave())%TheScale->GetPitchesPerOctave();
+      if (!VectorContains(chordPitch, mScalePitches[mScalePitchesFlip]))
       {
          if (type == kChord_Maj || type == kChord_Aug)
          {
-            if (VectorContains(chordPitch-1, mScalePitches))
+            if (VectorContains(chordPitch-1, mScalePitches[mScalePitchesFlip]))
                accidentals.push_back(Accidental(chordPitch-1, 1)); //sharpen
-            else if (VectorContains(chordPitch+1, mScalePitches))
+            else if (VectorContains(chordPitch+1, mScalePitches[mScalePitchesFlip]))
                accidentals.push_back(Accidental(chordPitch+1, -1)); //flatten
          }
          else if (type == kChord_Min || type == kChord_Dim)
          {
-            if (VectorContains(chordPitch+1, mScalePitches))
+            if (VectorContains(chordPitch+1, mScalePitches[mScalePitchesFlip]))
                accidentals.push_back(Accidental(chordPitch+1, -1)); //flatten
-            else if (VectorContains(chordPitch-1, mScalePitches))
+            else if (VectorContains(chordPitch-1, mScalePitches[mScalePitchesFlip]))
                accidentals.push_back(Accidental(chordPitch-1, 1)); //sharpen
          }
          else
@@ -767,9 +826,21 @@ void ScalePitches::GetChordDegreeAndAccidentals(const Chord& chord, int& degree,
    }
 }
 
+int ScalePitches::NumTonesInScale() const
+{
+   int numTones = (int)mScalePitches[mScalePitchesFlip].size();
+   if (numTones == 0)
+      numTones = TheScale->GetPitchesPerOctave();
+   return numTones;
+}
+
 int ScalePitches::GetScalePitch(int index) const
 {
-   int pitch = mScalePitches[index];
+   if (mScalePitches[mScalePitchesFlip].empty())
+      return index;
+
+   assert(index >= 0 && index < mScalePitches[mScalePitchesFlip].size());
+   int pitch = mScalePitches[mScalePitchesFlip][index];
    
    for (int i=0; i<mAccidentals.size(); ++i)
    {
@@ -783,9 +854,9 @@ int ScalePitches::GetScalePitch(int index) const
 bool ScalePitches::IsRoot(int pitch) const
 {
    pitch -= mScaleRoot;
-   pitch += TheScale->GetTet();
+   pitch += TheScale->GetPitchesPerOctave();
    assert(pitch >= 0);
-   pitch %= TheScale->GetTet();
+   pitch %= TheScale->GetPitchesPerOctave();
    
    return pitch == GetScalePitch(0);
 }
@@ -796,9 +867,9 @@ bool ScalePitches::IsInPentatonic(int pitch) const
       return false;
    
    pitch -= mScaleRoot;
-   pitch += TheScale->GetTet();
+   pitch += TheScale->GetPitchesPerOctave();
    assert(pitch >= 0);
-   pitch %= TheScale->GetTet();
+   pitch %= TheScale->GetPitchesPerOctave();
    
    bool isMinor = IsInScale(mScaleRoot+3);
    
@@ -810,13 +881,16 @@ bool ScalePitches::IsInPentatonic(int pitch) const
 
 bool ScalePitches::IsInScale(int pitch) const
 {
+   if (mScalePitches[mScalePitchesFlip].empty())
+      return true;
+
    pitch -= mScaleRoot;
-   pitch += TheScale->GetTet();
+   pitch += TheScale->GetPitchesPerOctave();
    if (pitch < 0)
       return false;
-   pitch %= TheScale->GetTet();
+   pitch %= TheScale->GetPitchesPerOctave();
    
-   for (int i=0; i<mScalePitches.size(); ++i)
+   for (int i=0; i<mScalePitches[mScalePitchesFlip].size(); ++i)
    {
       if (pitch == GetScalePitch(i))
          return true;
@@ -827,28 +901,28 @@ bool ScalePitches::IsInScale(int pitch) const
 
 int ScalePitches::GetPitchFromTone(int n) const
 {
-   int numTones = (int)mScalePitches.size();
-   assert(numTones > 0);
-   int octave = n/numTones;
+   int numTones = NumTonesInScale();
+
+   int octave = n / numTones;
    while (n<0)
    {
-      n+=numTones;
+      n += numTones;
       --octave;
    }
-   int degree = n%numTones;
+   int degree = n % numTones;
    
-   return GetScalePitch(degree) + TheScale->GetTet()*octave + mScaleRoot;
+   return GetScalePitch(degree) + TheScale->GetPitchesPerOctave()*octave + mScaleRoot;
 }
 
 int ScalePitches::GetToneFromPitch(int pitch) const
 {
-   assert(mScaleRoot >= 0 && mScaleRoot < TheScale->GetTet());
-   assert(mScalePitches.size());
+   assert(mScaleRoot >= 0 && mScaleRoot < TheScale->GetPitchesPerOctave());
+   assert(mScalePitches[mScalePitchesFlip].size());
    
-   int numTones = (int)mScalePitches.size();
+   int numTones = (int)mScalePitches[mScalePitchesFlip].size();
    int rootRel = pitch - mScaleRoot;
    while (rootRel < 0)
-      rootRel += TheScale->GetTet();
+      rootRel += TheScale->GetPitchesPerOctave();
    int tone = 0;
    
    for (int i=0; i<999; ++i)
@@ -856,7 +930,7 @@ int ScalePitches::GetToneFromPitch(int pitch) const
       tone = i;
       
       int octave = i/numTones;
-      if (GetScalePitch(i%numTones) + octave*TheScale->GetTet() >= rootRel)
+      if (GetScalePitch(i%numTones) + octave*TheScale->GetPitchesPerOctave() >= rootRel)
          break;
    }
    

@@ -53,9 +53,9 @@ public:
    void ListMonomes();
    void SetLight(int x, int y, float value);
    void SetLightFlicker(int x, int y, float flickerMs);
-   string GetControlTooltip(MidiMessageType type, int control) override;
+   std::string GetControlTooltip(MidiMessageType type, int control) override;
    void SetLayoutData(ofxJSONElement& layout) override;
-   void ConnectToDevice(string deviceDesc);
+   void ConnectToDevice(std::string deviceDesc);
    void UpdateDeviceList(DropdownList* list);
    
    void oscMessageReceived(const juce::OSCMessage& msg) override;
@@ -83,18 +83,18 @@ private:
    int mGridRotation;
    juce::String mPrefix;
    bool mJustRequestedDeviceList;
-   string mPendingDeviceDesc;
+   std::string mPendingDeviceDesc;
    
    struct MonomeDevice
    {
       void CopyFrom(MonomeDevice& other) { id = other.id; product = other.product; port = other.port; }
-      string id;
-      string product;
+      std::string id;
+      std::string product;
       int port;
-      string GetDescription() { return id + " " + product; }
+      std::string GetDescription() { return id + " " + product; }
    };
    
-   vector<MonomeDevice> mConnectedDeviceList;
+   std::vector<MonomeDevice> mConnectedDeviceList;
    
    MidiDeviceListener* mListener;
    DropdownList* mListForMidiController;
@@ -108,7 +108,7 @@ private:
       double mLastSentTime;
    };
    
-   vector<LightInfo> mLights;
+   std::vector<LightInfo> mLights;
 };
 
 #endif /* defined(__modularSynth__Monome__) */

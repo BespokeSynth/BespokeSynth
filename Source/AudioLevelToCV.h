@@ -40,7 +40,7 @@ public:
    virtual ~AudioLevelToCV();
    static IDrawableModule* Create() { return new AudioLevelToCV(); }
    
-   string GetTitleLabel() override { return "level to cv"; }
+   std::string GetTitleLabel() override { return "level to cv"; }
    void CreateUIControls() override;
    
    void SetEnabled(bool enabled) override { mEnabled = enabled; }

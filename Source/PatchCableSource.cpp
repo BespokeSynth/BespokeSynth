@@ -447,7 +447,7 @@ bool PatchCableSource::MouseMoved(float x, float y)
 
 void PatchCableSource::MouseReleased()
 {
-   vector<PatchCable*> cables = mPatchCables;   //copy, since list might get modified here
+   std::vector<PatchCable*> cables = mPatchCables;   //copy, since list might get modified here
    FindValidTargets();
    for (auto cable : cables)
       cable->MouseReleased();
@@ -567,7 +567,7 @@ bool PatchCableSource::IsValidTarget(IClickable* target) const
 void PatchCableSource::FindValidTargets()
 {
    mValidTargets.clear();
-   vector<IDrawableModule*> allModules;
+   std::vector<IDrawableModule*> allModules;
    TheSynth->GetAllModules(allModules);
    for (auto module : allModules)
    {
@@ -673,7 +673,7 @@ void PatchCableSource::SaveState(FileStreamOut& out)
    
    for (int i=0; i<mPatchCables.size(); ++i)
    {
-      string path = "";
+      std::string path = "";
       IClickable* target = mPatchCables[i]->GetTarget();
       if (target)
          path = target->Path();
@@ -691,7 +691,7 @@ void PatchCableSource::LoadState(FileStreamIn& in)
    
    for (int i=0; i<mPatchCables.size(); ++i)
    {
-      string path;
+      std::string path;
       in >> path;
       IClickable* target = TheSynth->FindModule(path, false);
       if (target == nullptr)

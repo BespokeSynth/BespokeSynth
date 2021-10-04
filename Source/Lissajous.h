@@ -40,7 +40,7 @@ public:
    virtual ~Lissajous();
    static IDrawableModule* Create() { return new Lissajous(); }
    
-   string GetTitleLabel() override { return "lissajous"; }
+   std::string GetTitleLabel() override { return "lissajous"; }
    void CreateUIControls() override;
    
    bool IsResizable() const override { return true; }

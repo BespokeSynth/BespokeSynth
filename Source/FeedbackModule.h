@@ -40,7 +40,7 @@ public:
    virtual ~FeedbackModule();
    static IDrawableModule* Create() { return new FeedbackModule(); }
    
-   string GetTitleLabel() override { return "feedback"; }
+   std::string GetTitleLabel() override { return "feedback"; }
    void CreateUIControls() override;
    
    void PostRepatch(PatchCableSource* cableSource, bool fromUserClick) override;

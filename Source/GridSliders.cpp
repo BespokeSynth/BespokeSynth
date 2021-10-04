@@ -229,7 +229,7 @@ void GridSliders::SaveState(FileStreamOut& out)
    out << (int)mControlCables.size();
    for (auto cable : mControlCables)
    {
-      string path = "";
+      std::string path = "";
       if (cable->GetTarget())
          path = cable->GetTarget()->Path();
       out << path;
@@ -248,7 +248,7 @@ void GridSliders::LoadState(FileStreamIn& in)
    in >> size;
    for (int i=0; i<size; ++i)
    {
-      string path;
+      std::string path;
       in >> path;
       if (i < (int)mControlCables.size())
          mControlCables[i]->SetTarget(TheSynth->FindUIControl(path));

@@ -41,7 +41,7 @@ public:
    ~Prefab();
    static IDrawableModule* Create() { return new Prefab(); }
    
-   string GetTitleLabel() override;
+   std::string GetTitleLabel() override;
    void CreateUIControls() override;
    
    ModuleContainer* GetContainer() override { return &mModuleContainer; }
@@ -60,7 +60,7 @@ public:
    //IPatchable
    void PostRepatch(PatchCableSource* cableSource, bool fromUserClick) override;
    
-   void LoadPrefab(string loadPath);
+   void LoadPrefab(std::string loadPath);
 
    static bool sSavingPrefab;
    static bool sLoadingPrefab;
@@ -77,15 +77,15 @@ private:
    bool CanAddDropModules();
    bool IsMouseHovered();
    
-   void SavePrefab(string savePath);
-   void UpdatePrefabName(string path);
+   void SavePrefab(std::string savePath);
+   void UpdatePrefabName(std::string path);
    
    PatchCableSource* mRemoveModuleCable;
    ClickButton* mSaveButton;
    ClickButton* mLoadButton;
    ClickButton* mDisbandButton;
    ModuleContainer mModuleContainer;
-   string mPrefabName;
+   std::string mPrefabName;
 };
 
 

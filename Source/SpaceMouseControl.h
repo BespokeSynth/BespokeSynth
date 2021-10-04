@@ -27,52 +27,25 @@
 
 #pragma once
 
-#ifdef BESPOKE_WINDOWS
-#include "ModularSynth.h"
+#include <memory>
 
-#include <Windows.h>
-
-#include "3DxWare/Inc/spwmacro.h"  /* Common macros used by SpaceWare functions. */
-#include "3DxWare/Inc/si.h"        /* Required for any SpaceWare support within an app.*/
-#include "3DxWare/Inc/siapp.h"     /* Required for siapp.lib symbols */
-
-#pragma warning(disable:4700)
+class ModularSynth;
 
 //==============================================================================
 class SpaceMouseMessageWindow
 {
 public:
-   static SpaceMouseMessageWindow* sInstance;
-
-   SpaceMouseMessageWindow(ModularSynth* theSynth);
+   explicit SpaceMouseMessageWindow(ModularSynth& theSynth);
    ~SpaceMouseMessageWindow();
-
    void Poll();
 
-   static LRESULT CALLBACK MyWndCBProc(HWND hwnd, UINT wm, WPARAM wParam, LPARAM lParam);
-
-   int SbInit(HWND hwndC);
-
-   void ApplyDeadZone(float &var, float deadzone);
-
-   void SbMotionEvent(SiSpwEvent *pEvent);
-   void SbZeroEvent();
-   void SbButtonPressEvent(int buttonnumber);
-   void SbButtonReleaseEvent(int buttonnumber);
-   void HandleDeviceChangeEvent(SiSpwEvent *pEvent);      
-
-   inline HWND getHWND() const noexcept { return hwnd; }
-
+#if BESPOKE_SPACEMOUSE_SUPPORT
 private:
-   ATOM atom;
-   HWND hwnd;
-
-   SiHdl       devHdl;       /* Handle to 3D Mouse Device */
-   SiOpenData oData;
-   ModularSynth* mSynth;
-   bool mIsPanningOrZooming;
-   bool mIsTwisting;
-
-   LPCTSTR getClassNameFromAtom() const noexcept;
+   struct Impl;
+   const std::unique_ptr<Impl> d;
+#endif
 };
+
+#if !BESPOKE_SPACEMOUSE_SUPPORT
+inline void SpaceMouseMessageWindow::Poll() {}
 #endif

@@ -38,7 +38,7 @@ public:
    PitchRemap();
    static IDrawableModule* Create() { return new PitchRemap(); }
    
-   string GetTitleLabel() override { return "pitch remap"; }
+   std::string GetTitleLabel() override { return "pitch remap"; }
    void CreateUIControls() override;
    
    void SetEnabled(bool enabled) override { mEnabled = enabled; }

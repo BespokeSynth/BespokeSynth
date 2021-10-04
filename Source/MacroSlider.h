@@ -40,7 +40,7 @@ public:
    virtual ~MacroSlider();
    static IDrawableModule* Create() { return new MacroSlider(); }
    
-   string GetTitleLabel() override { return "macroslider"; }
+   std::string GetTitleLabel() override { return "macroslider"; }
    void CreateUIControls() override;
    
    void SetEnabled(bool enabled) override { mEnabled = enabled; }
@@ -84,7 +84,7 @@ private:
    
    FloatSlider* mSlider;
    float mValue;
-   vector<Mapping*> mMappings;
+   std::vector<Mapping*> mMappings;
 };
 
 #endif /* defined(__Bespoke__MacroSlider__) */

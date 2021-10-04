@@ -53,13 +53,13 @@ public:
    virtual ~NoteStepSequencer();
    static IDrawableModule* Create() { return new NoteStepSequencer(); }
    
-   string GetTitleLabel() override { return "note sequencer"; }
+   std::string GetTitleLabel() override { return "note sequencer"; }
    void CreateUIControls() override;
    
    void Init() override;
    void SetEnabled(bool enabled) override { mEnabled = enabled; }
    
-   void SetMidiController(string name);
+   void SetMidiController(std::string name);
    
    UIGrid* GetGrid() const { return mGrid; }
    

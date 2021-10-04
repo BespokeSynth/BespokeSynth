@@ -110,7 +110,7 @@ public:
    ~StepSequencer();
    static IDrawableModule* Create() { return new StepSequencer(); }
    
-   string GetTitleLabel() override { return "drum sequencer"; }
+   std::string GetTitleLabel() override { return "drum sequencer"; }
    void CreateUIControls() override;
    
    void Init() override;

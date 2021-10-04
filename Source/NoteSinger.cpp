@@ -85,7 +85,7 @@ void NoteSinger::OnTransportAdvanced(float amount)
       float peak = mPeaks[i].GetPeak();
       if (peak > bestPeak)
       {
-         int numPitchesInScale = TheScale->NumPitchesInScale();
+         int numPitchesInScale = TheScale->NumTonesInScale();
          if (bestBucket != -1 &&
              peak < 2*bestPeak &&
              i % numPitchesInScale == bestBucket % numPitchesInScale)
@@ -109,7 +109,7 @@ void NoteSinger::OnTransportAdvanced(float amount)
    GetBuffer()->Reset();
 }
 
-string NoteSinger::GetTitleLabel()
+std::string NoteSinger::GetTitleLabel()
 {
    if (Minimized())
       return "notesinger";
@@ -133,7 +133,7 @@ void NoteSinger::DrawModule()
 
 void NoteSinger::OnScaleChanged()
 {
-   mNumBuckets = MIN(TheScale->NumPitchesInScale() * 4, NOTESINGER_MAX_BUCKETS);
+   mNumBuckets = MIN(TheScale->NumTonesInScale() * 4, NOTESINGER_MAX_BUCKETS);
    
    for (int i=0; i<mNumBuckets; ++i)
    {
@@ -149,7 +149,7 @@ void NoteSinger::OnScaleChanged()
 
 int NoteSinger::GetPitchForBucket(int bucket)
 {
-   return TheScale->GetPitchFromTone(bucket+TheScale->NumPitchesInScale()*2);
+   return TheScale->GetPitchFromTone(bucket+TheScale->NumTonesInScale()*2);
 }
 
 void NoteSinger::ButtonClicked(ClickButton* button)

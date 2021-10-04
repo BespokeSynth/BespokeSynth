@@ -77,7 +77,7 @@ public:
    ~CircleSequencer();
    static IDrawableModule* Create() { return new CircleSequencer(); }
    
-   string GetTitleLabel() override { return "circle sequencer"; }
+   std::string GetTitleLabel() override { return "circle sequencer"; }
    void CreateUIControls() override;
    void Init() override;
    

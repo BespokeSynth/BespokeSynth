@@ -43,7 +43,7 @@ public:
    virtual ~RingModulator();
    static IDrawableModule* Create() { return new RingModulator(); }
    
-   string GetTitleLabel() override { return "ring modulator"; }
+   std::string GetTitleLabel() override { return "ring modulator"; }
    void CreateUIControls() override;
 
    void SetEnabled(bool enabled) override { mEnabled = enabled; }

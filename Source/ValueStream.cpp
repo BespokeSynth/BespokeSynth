@@ -150,7 +150,7 @@ void ValueStream::LoadLayout(const ofxJSONElement& moduleInfo)
 
 void ValueStream::SetUpFromSaveData()
 {
-   string controlPath = mModuleSaveData.GetString("uicontrol");
+   std::string controlPath = mModuleSaveData.GetString("uicontrol");
    if (!controlPath.empty())
    {
       mUIControl = TheSynth->FindUIControl(controlPath);

@@ -204,7 +204,7 @@ void RadioSequencer::SetNumSteps(int numSteps, bool stretch)
    assert(oldNumSteps != 0);
    if (stretch)   //updated interval, stretch old pattern out to make identical pattern at higher res
    {              // abcd becomes aabbccdd
-      vector<float> pattern;
+      std::vector<float> pattern;
       pattern.resize(oldNumSteps);
       for (int i=0; i<oldNumSteps; ++i)
          pattern[i] = mGrid->GetVal(i,0);
@@ -342,7 +342,7 @@ void RadioSequencer::SaveState(FileStreamOut& out)
    out << (int)mControlCables.size();
    for (auto cable : mControlCables)
    {
-      string path = "";
+      std::string path = "";
       if (cable->GetTarget())
          path = cable->GetTarget()->Path();
       out << path;
@@ -364,7 +364,7 @@ void RadioSequencer::LoadState(FileStreamIn& in)
    mControlCables.resize(size);
    for (auto cable : mControlCables)
    {
-      string path;
+      std::string path;
       in >> path;
       cable->SetTarget(TheSynth->FindUIControl(path));
    }

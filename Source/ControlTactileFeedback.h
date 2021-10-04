@@ -39,7 +39,7 @@ public:
    ~ControlTactileFeedback();
    static IDrawableModule* Create() { return new ControlTactileFeedback(); }
    
-   string GetTitleLabel() override { return "tactile"; }
+   std::string GetTitleLabel() override { return "tactile"; }
    void CreateUIControls() override;
    
    //IAudioSource

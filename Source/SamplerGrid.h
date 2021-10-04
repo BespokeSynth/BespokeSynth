@@ -50,7 +50,7 @@ public:
    ~SamplerGrid();
    static IDrawableModule* Create() { return new SamplerGrid(); }
    
-   string GetTitleLabel() override { return "sampler grid"; }
+   std::string GetTitleLabel() override { return "sampler grid"; }
    void CreateUIControls() override;
    
    void Init() override;
@@ -74,7 +74,7 @@ public:
    //UIGridListener
    void GridUpdated(UIGrid* grid, int col, int row, float value, float oldValue) override;
    
-   void FilesDropped(vector<string> files, int x, int y) override;
+   void FilesDropped(std::vector<std::string> files, int x, int y) override;
    void SampleDropped(int x, int y, Sample* sample) override;
    bool CanDropSample() const override { return true; }
    

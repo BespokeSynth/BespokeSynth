@@ -48,7 +48,7 @@ public:
    ~ClipLauncher();
    static IDrawableModule* Create() { return new ClipLauncher(); }
    
-   string GetTitleLabel() override { return "clip launcher"; }
+   std::string GetTitleLabel() override { return "clip launcher"; }
    void CreateUIControls() override;
    void Init() override;
    
@@ -112,7 +112,7 @@ private:
    float mVolume;
    FloatSlider* mVolumeSlider;
 
-   vector<SampleData> mSamples;
+   std::vector<SampleData> mSamples;
    JumpBlender mJumpBlender;
    ofMutex mSampleMutex;
 };

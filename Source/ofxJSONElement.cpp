@@ -23,14 +23,14 @@ ofxJSONElement::ofxJSONElement(const Json::Value& v) : Value(v)
 
 
 //--------------------------------------------------------------
-ofxJSONElement::ofxJSONElement(string jsonString)
+ofxJSONElement::ofxJSONElement(std::string jsonString)
 {
    parse(jsonString);
 }
 
 
 //--------------------------------------------------------------
-bool ofxJSONElement::parse(string jsonString)
+bool ofxJSONElement::parse(std::string jsonString)
 {
    Reader reader;
    if(!reader.parse( jsonString, *this )) {
@@ -42,7 +42,7 @@ bool ofxJSONElement::parse(string jsonString)
 
 
 //--------------------------------------------------------------
-bool ofxJSONElement::open(string filename)
+bool ofxJSONElement::open(std::string filename)
 {
    juce::File file(filename);
    
@@ -66,7 +66,7 @@ bool ofxJSONElement::open(string filename)
 
 
 //--------------------------------------------------------------
-bool ofxJSONElement::save(string filename, bool pretty)
+bool ofxJSONElement::save(std::string filename, bool pretty)
 {
    filename = ofToDataPath(filename, true);
    juce::File file(filename);
@@ -90,9 +90,9 @@ bool ofxJSONElement::save(string filename, bool pretty)
 
 
 //--------------------------------------------------------------
-string ofxJSONElement::getRawString(bool pretty)
+std::string ofxJSONElement::getRawString(bool pretty)
 {
-   string raw;
+   std::string raw;
    if(pretty) {
       StyledWriter writer;
       raw = writer.write(*this);
@@ -104,9 +104,9 @@ string ofxJSONElement::getRawString(bool pretty)
 }
 
 //--------------------------------------------------------------
-string ofxJSONElement::decodeURL(string &SRC)
+std::string ofxJSONElement::decodeURL(std::string &SRC)
 {
-   string ret;
+   std::string ret;
    char ch;
    int i, ii;
    for (i=0; i<SRC.length(); i++) {
