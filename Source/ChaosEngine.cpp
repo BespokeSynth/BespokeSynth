@@ -132,7 +132,7 @@ void ChaosEngine::Poll()
          if (mTotalChaos)
             TheTransport->SetTimeSignature(gRandom()%8+2, (int)powf(2,gRandom()%3+2));
          
-         TheScale->SetRoot(gRandom()%TheScale->GetTet());
+         TheScale->SetRoot(gRandom()%TheScale->GetPitchesPerOctave());
          TheScale->SetRandomSeptatonicScale();
          float bias = ofRandom(0,1);
          bias *= bias;
@@ -372,7 +372,7 @@ ofRectangle ChaosEngine::GetKeyboardKeyRect(int pitch, bool& isBlackKey)
    const float kbWidth = 200;
    const float kbHeight = 100;
    
-   int offset = pitch/TheScale->GetTet() * (kbWidth - kbWidth/8);
+   int offset = pitch/TheScale->GetPitchesPerOctave() * (kbWidth - kbWidth/8);
    pitch %= 12;
    
    if ((pitch<=4&&pitch%2==0) || (pitch>=5&&pitch%2==1)) //white key

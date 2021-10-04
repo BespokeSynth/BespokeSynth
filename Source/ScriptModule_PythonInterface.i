@@ -100,7 +100,7 @@ PYBIND11_EMBEDDED_MODULE(bespoke, m) {
       size_t numPitches = scalePitches.size();
       std::vector<int> ret(count);
       for (int i=0; i<count; ++i)
-         ret[i] = scalePitches[i % numPitches] + TheScale->GetTet() * (octave + i / numPitches) + root;
+         ret[i] = scalePitches[i % numPitches] + TheScale->GetPitchesPerOctave() * (octave + i / numPitches) + root;
       return ret;
    });
    m.def("tone_to_pitch", [](int index)

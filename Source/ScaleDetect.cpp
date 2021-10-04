@@ -65,7 +65,7 @@ void ScaleDetect::DrawModule()
          int numScaleTypes = TheScale->GetNumScaleTypes();
          for (int j=0; j<numScaleTypes-1; ++j)
          {
-            if (ScaleSatisfied(mLastPitch%TheScale->GetTet(), TheScale->GetScaleName(j)))
+            if (ScaleSatisfied(mLastPitch%TheScale->GetPitchesPerOctave(), TheScale->GetScaleName(j)))
                mMatchesDropdown->AddLabel(TheScale->GetScaleName(j).c_str(), numMatches++);
          }
       }
@@ -80,7 +80,7 @@ void ScaleDetect::DrawModule()
       {
          if (mPitchOn[i])
          {
-            int entry = (i-mLastPitch+TheScale->GetTet()*10)%TheScale->GetTet();
+            int entry = (i-mLastPitch+TheScale->GetPitchesPerOctave()*10)%TheScale->GetPitchesPerOctave();
             if (!VectorContains(entry, rootRelative))
                rootRelative.push_back(entry);
          }

@@ -303,9 +303,9 @@ void NoteStepSequencer::DrawModule()
    
    for (int i=0;i<mNoteRange;++i)
    {
-      if (RowToPitch(i)%TheScale->GetTet() == TheScale->ScaleRoot()%TheScale->GetTet())
+      if (RowToPitch(i)%TheScale->GetPitchesPerOctave() == TheScale->ScaleRoot()%TheScale->GetPitchesPerOctave())
          ofSetColor(0,255,0,80);
-      else if (TheScale->GetTet() == 12 && RowToPitch(i)%TheScale->GetTet() == (TheScale->ScaleRoot()+7)%TheScale->GetTet())
+      else if (TheScale->GetPitchesPerOctave() == 12 && RowToPitch(i)%TheScale->GetPitchesPerOctave() == (TheScale->ScaleRoot()+7)%TheScale->GetPitchesPerOctave())
          ofSetColor(200,150,0,80);
       else if (mNoteMode == kNoteMode_Chromatic && TheScale->IsInScale(RowToPitch(i)))
          ofSetColor(100,75,0,80);
@@ -479,7 +479,7 @@ int NoteStepSequencer::RowToPitch(int row)
       case kNoteMode_Scale:
          return TheScale->GetPitchFromTone(row+mOctave*numPitchesInScale+TheScale->GetScaleDegree());
       case kNoteMode_Chromatic:
-         return row + mOctave * TheScale->GetTet();
+         return row + mOctave * TheScale->GetPitchesPerOctave();
       case kNoteMode_Pentatonic:
       {
          bool isMinor = TheScale->IsInScale(TheScale->ScaleRoot() + 3);
@@ -487,9 +487,9 @@ int NoteStepSequencer::RowToPitch(int row)
          const int majorPentatonic[5] = { 0, 2, 4, 7, 9 };
 
          if (isMinor)
-            return TheScale->ScaleRoot() + (row / 5 + mOctave) * TheScale->GetTet() + minorPentatonic[row % 5];
+            return TheScale->ScaleRoot() + (row / 5 + mOctave) * TheScale->GetPitchesPerOctave() + minorPentatonic[row % 5];
          else
-            return TheScale->ScaleRoot() + (row / 5 + mOctave) * TheScale->GetTet() + majorPentatonic[row % 5];
+            return TheScale->ScaleRoot() + (row / 5 + mOctave) * TheScale->GetPitchesPerOctave() + majorPentatonic[row % 5];
 
       }
       case kNoteMode_Fifths:

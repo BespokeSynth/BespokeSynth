@@ -366,9 +366,9 @@ void NoteCanvas::DrawModule()
    for (int i=0;i<128;++i)
    {
       int pitch = 127-i;
-      if (pitch%TheScale->GetTet() == TheScale->ScaleRoot() % TheScale->GetTet())
+      if (pitch%TheScale->GetPitchesPerOctave() == TheScale->ScaleRoot() % TheScale->GetPitchesPerOctave())
          mCanvas->SetRowColor(i, ofColor(0, 255, 0, 80));
-      else if (pitch%TheScale->GetTet() == (TheScale->ScaleRoot() + 7) % TheScale->GetTet())
+      else if (pitch%TheScale->GetPitchesPerOctave() == (TheScale->ScaleRoot() + 7) % TheScale->GetPitchesPerOctave())
          mCanvas->SetRowColor(i, ofColor(200, 150, 0, 80));
       else if (TheScale->IsInScale(pitch))
          mCanvas->SetRowColor(i, ofColor(100, 75, 0, 80));

@@ -216,7 +216,7 @@ void Chorder::PlayNote(double time, int pitch, int velocity, int voiceIdx, Modul
             {
                //play the pressed note (might not be in scale, so play it directly)
                int octave = gridPosition/TheScale->NumTonesInScale();
-               outPitch = pitch+TheScale->GetTet()*octave;
+               outPitch = pitch+TheScale->GetPitchesPerOctave()*octave;
             }
             else
             {
