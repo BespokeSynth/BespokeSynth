@@ -155,6 +155,7 @@ set(BESPOKE_SOURCE_LIST
         Source/MidiControlChange.cpp
         Source/MidiController.cpp
         Source/MidiOutput.cpp
+        Source/Minimap.cpp
         Source/ModulationVisualizer.cpp
         Source/ModulatorAccum.cpp
         Source/ModulatorAdd.cpp

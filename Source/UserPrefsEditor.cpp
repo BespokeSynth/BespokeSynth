@@ -69,6 +69,7 @@ void UserPrefsEditor::CreateUIControls()
    TEXTENTRY(mFfmpegPathEntry, "ffmpeg_path", 100, &mFfmpegPath);
    TEXTENTRY(mVstSearchDirsEntry, "vstsearchdirs", 1000, &mVstSearchDirs);
    CHECKBOX(mShowTooltipsOnLoadCheckbox, "show_tooltips_on_load", &mShowTooltipsOnLoad);
+   CHECKBOX(mShowMinimapCheckbox, "show_minimap", &mShowMinimap);
    UIBLOCK_SHIFTDOWN();
    BUTTON(mSaveButton, "save and exit bespoke");
    BUTTON(mCancelButton, "cancel");
@@ -203,6 +204,11 @@ void UserPrefsEditor::Show()
       mShowTooltipsOnLoad = true;
    else
       mShowTooltipsOnLoad = TheSynth->GetUserPrefs()["show_tooltips_on_load"].asBool();
+
+   if (TheSynth->GetUserPrefs()["show_minimap"].isNull())
+      mShowMinimap = false;
+   else
+      mShowMinimap = TheSynth->GetUserPrefs()["show_minimap"].asBool();
 
    mWindowPositionXEntry->SetShowing(mSetWindowPosition);
    mWindowPositionYEntry->SetShowing(mSetWindowPosition);
@@ -504,6 +510,7 @@ void UserPrefsEditor::ButtonClicked(ClickButton* button)
       ofStringReplace(vstSearchDirs, ", ", ",");
       UpdatePrefStrArray(userPrefs, "vstsearchdirs", ofSplitString(vstSearchDirs, ","));
       UpdatePrefBool(userPrefs, "show_tooltips_on_load", mShowTooltipsOnLoad);
+      UpdatePrefBool(userPrefs, "show_minimap", mShowMinimap);
 
       std::string output = userPrefs.getRawString(true);
       CleanUpSave(output);

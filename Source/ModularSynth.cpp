@@ -1,6 +1,7 @@
 #include "ModularSynth.h"
 #include "IAudioSource.h"
 #include "IAudioEffect.h"
+#include "OpenFrameworksPort.h"
 #include "SynthGlobals.h"
 #include "Scale.h"
 #include "Transport.h"
@@ -8,6 +9,7 @@
 #include "InputChannel.h"
 #include "OutputChannel.h"
 #include "TitleBar.h"
+#include "Minimap.h"
 #include "LFOController.h"
 #include "MidiController.h"
 #include "ChaosEngine.h"
@@ -77,6 +79,7 @@ ModularSynth::ModularSynth()
 , mConsoleListener(nullptr)
 , mUserPrefsEditor(nullptr)
 , mLastClickedModule(nullptr)
+, mMinimap(nullptr)
 , mInitialized(false)
 , mRecordingLength(0)
 , mGroupSelectContext(nullptr)
@@ -1880,7 +1883,25 @@ void ModularSynth::ResetLayout()
    titleBar->SetModuleFactory(&mModuleFactory);
    titleBar->Init();
    mUILayerModuleContainer.AddModule(titleBar);
-   
+
+   if (!GetUserPrefs()["show_minimap"].isNull() && GetUserPrefs()["show_minimap"].asBool()) 
+   {
+      if (mMinimap != nullptr) 
+      {
+         delete mMinimap;
+         mMinimap = nullptr;
+      }
+      
+      mMinimap = new Minimap();
+      mMinimap->SetName("minimap");
+      mMinimap->SetTypeName("minimap");
+      mMinimap->SetShouldDrawOutline(false);
+      mMinimap->CreateUIControls();
+      mMinimap->SetShowing(true);
+      mMinimap->Init();
+      mUILayerModuleContainer.AddModule(mMinimap);
+   }
+
    ModuleSaveDataPanel* saveDataPanel = new ModuleSaveDataPanel();
    saveDataPanel->SetPosition(-200, 50);
    saveDataPanel->SetName("savepanel");

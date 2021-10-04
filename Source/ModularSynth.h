@@ -13,6 +13,8 @@
 #include "LocationZoomer.h"
 #include "EffectFactory.h"
 #include "ModuleContainer.h"
+#include "Minimap.h"
+
 #ifdef BESPOKE_LINUX
 #include <climits>
 #endif
@@ -278,6 +280,7 @@ private:
 
    LocationZoomer mZoomer;
    QuickSpawnMenu* mQuickSpawn;
+   Minimap* mMinimap;
    UserPrefsEditor* mUserPrefsEditor;
 
    RollingBuffer* mGlobalRecordBuffer;
