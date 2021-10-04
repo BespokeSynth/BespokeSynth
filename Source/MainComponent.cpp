@@ -1,12 +1,6 @@
 #ifndef MAINCOMPONENT_H_INCLUDED
 #define MAINCOMPONENT_H_INCLUDED
 
-
-#ifdef BESPOKE_WINDOWS
-// juce::gl supercedes this
-//#include <GL/glew.h>
-#endif
-
 #include "juce_audio_devices/juce_audio_devices.h"
 #include "juce_audio_formats/juce_audio_formats.h"
 #include "juce_opengl/juce_opengl.h"

@@ -26,8 +26,6 @@
  */
 
 #ifdef BESPOKE_WINDOWS
-// juce now does this for us
-// #include <GL/glew.h>
 #include <windows.h>
 #endif
 
