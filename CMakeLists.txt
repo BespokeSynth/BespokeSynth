@@ -544,6 +544,7 @@ endif ()
 target_include_directories(BespokeSynth PRIVATE ${Python_INCLUDE_DIRS})
 target_link_libraries(BespokeSynth PRIVATE
         bespoke::3dxware
+        bespoke::exprtk
         bespoke::freeverb
         bespoke::json
         bespoke::nanovg

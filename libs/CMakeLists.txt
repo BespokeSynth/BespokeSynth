@@ -1,4 +1,5 @@
 add_subdirectory(3dxware EXCLUDE_FROM_ALL)
+add_subdirectory(exprtk EXCLUDE_FROM_ALL)
 add_subdirectory(freeverb EXCLUDE_FROM_ALL)
 add_subdirectory(json EXCLUDE_FROM_ALL)
 add_subdirectory(leathers EXCLUDE_FROM_ALL)
