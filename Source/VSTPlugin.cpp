@@ -32,6 +32,7 @@
 #include "Profiler.h"
 #include "Scale.h"
 #include "ModulationChain.h"
+#include "PatchCableSource.h"
 //#include "NSWindowOverlay.h"
 
 namespace
@@ -201,7 +202,14 @@ void VSTPlugin::CreateUIControls()
    
    mPresetFileSelector->DrawLabel(true);
    mSavePresetFileButton->PositionTo(mPresetFileSelector,kAnchor_Right);
-   
+
+   mMidiOutCable = new AdditionalNoteCable();
+   mMidiOutCable->SetPatchCableSource(new PatchCableSource(this, kConnectionType_Note));
+   mMidiOutCable->GetPatchCableSource()->SetOverrideCableDir(ofVec2f(1, 0));
+   AddPatchCableSource(mMidiOutCable->GetPatchCableSource());
+   mMidiOutCable->GetPatchCableSource()->SetManualPosition(206-10, 10);
+
+
    if (mPlugin)
    {
       CreateParameterSliders();
@@ -535,7 +543,31 @@ void VSTPlugin::Process(double time)
          mMidiBuffer.clear(gBufferSize, mMidiBuffer.getLastEventTime() + 1);
          
          mPlugin->processBlock(buffer, mMidiBuffer);
-         
+
+         if (!mMidiBuffer.isEmpty())
+         {
+            auto midiIt = mMidiBuffer.begin();
+            while (midiIt != mMidiBuffer.end())
+            {
+               auto msg = (*midiIt).getMessage();
+               auto tMidi = time + (*midiIt).samplePosition * gInvSampleRateMs;
+               if (msg.isNoteOn())
+               {
+                  mMidiOutCable->PlayNoteOutput(tMidi, msg.getNoteNumber(), msg.getVelocity());
+               }
+               else if (msg.isNoteOff())
+               {
+                  mMidiOutCable->PlayNoteOutput(tMidi, msg.getNoteNumber(), 0);
+               }
+               else if (msg.isController())
+               {
+                  mMidiOutCable->SendCCOutput(msg.getControllerNumber(), msg.getControllerValue());
+               }
+               midiIt ++;
+
+            }
+         }
+
          mMidiBuffer.clear();
       }
       mVSTMutex.unlock();
@@ -655,7 +687,9 @@ void VSTPlugin::DrawModule()
    mSavePresetFileButton->Draw();
    mOpenEditorButton->Draw();
    mShowParameterDropdown->Draw();
-   
+
+   DrawTextLeftJustify("MIDI out", 206-18, 14);
+
    if (mDisplayMode == kDisplayMode_Sliders)
    {
       int sliderCount = 0;
