@@ -46,9 +46,7 @@
 #include "WaveformViewer.h"
 #include "FMSynth.h"
 #include "MidiController.h"
-#ifdef BESPOKE_MAC
 #include "PSMoveController.h"
-#endif
 #include "Autotalent.h"
 #include "ScaleDetect.h"
 #include "KarplusStrong.h"
@@ -460,8 +458,8 @@ ModuleFactory::ModuleFactory()
    REGISTER_HIDDEN(ClipLauncher, cliplauncher, kModuleType_Synth);
 #ifdef BESPOKE_MAC
    REGISTER_HIDDEN(KompleteKontrol, kompletekontrol, kModuleType_Note);
-   REGISTER_HIDDEN(PSMoveController, psmove, kModuleType_Other);
 #endif
+   REGISTER_HIDDEN(PSMoveController, psmove, kModuleType_Other);
    REGISTER_HIDDEN(ControlTactileFeedback, controltactilefeedback, kModuleType_Synth);
    REGISTER_HIDDEN(FloatSliderLFOControl, lfo, kModuleType_Other);
    REGISTER_HIDDEN(EnvelopeEditor, envelopeeditor, kModuleType_Other);
