@@ -33,8 +33,19 @@ bool VSTPlayhead::getCurrentPosition(juce::AudioPlayHead::CurrentPositionInfo& r
    result.timeSigDenominator = TheTransport->GetTimeSigBottom();
    result.timeInSamples = gTime * gSampleRateMs;
    result.timeInSeconds = gTime / 1000.;
-   result.ppqPosition = (TheTransport->GetMeasureTime(gTime)) * 480 * 4;
-   result.ppqPositionOfLastBarStart = TheTransport->GetMeasure(gTime) * 480 * 4;
+
+   /*
+   * getMeasureTime is a float of how many measures we are through with fractional
+   * measures. We want to know the number of quarter notes from the epoch which is
+   * just the tsRatio times measure count, and for start of measure we simply floor
+   * the measure time
+   */
+   double tsRatio = 4;
+   if (result.timeSigDenominator > 0)
+      tsRatio = 1.0 * result.timeSigNumerator / result.timeSigDenominator * 4;
+   result.ppqPosition = (TheTransport->GetMeasureTime(gTime)) * tsRatio;
+   result.ppqPositionOfLastBarStart = floor(TheTransport->GetMeasureTime(gTime)) * tsRatio;
+
    result.isPlaying = true;
    result.isRecording = false;
    result.isLooping = false;

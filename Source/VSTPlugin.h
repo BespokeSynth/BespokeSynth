@@ -29,6 +29,7 @@
 #include "IAudioProcessor.h"
 #include "PolyphonyMgr.h"
 #include "INoteReceiver.h"
+#include "INoteSource.h"
 #include "IDrawableModule.h"
 #include "Slider.h"
 #include "DropdownList.h"
@@ -168,6 +169,11 @@ private:
    int mShowParameterIndex;
    DropdownList* mShowParameterDropdown;
    int mTemporarilyDisplayedParamIndex;
+
+   /*
+    * Midi and MultiOut support
+    */
+   AdditionalNoteCable *mMidiOutCable{nullptr};
 };
 
 #endif /* defined(__Bespoke__VSTPlugin__) */
