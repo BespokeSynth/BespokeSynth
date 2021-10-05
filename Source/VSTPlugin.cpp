@@ -349,23 +349,27 @@ void VSTPlugin::LoadVST(juce::PluginDescription desc)
    if (mPlugin != nullptr)
    {
       mPlugin->enableAllBuses();
+      mPlugin->disableNonMainBuses();
 
-      // DIsable all non-main output busses
+      /*
+       * For now, since Bespoke is at best stereo in stereo out,
+       * Disable all non-main input and output busses
+       */
       auto layouts = mPlugin->getBusesLayout();
 
       for (int busIndex = 1; busIndex < layouts.outputBuses.size(); ++busIndex)
           layouts.outputBuses.getReference(busIndex) = AudioChannelSet::disabled();
-
       for (int busIndex = 1; busIndex < layouts.inputBuses.size(); ++busIndex)
           layouts.inputBuses.getReference(busIndex) = AudioChannelSet::disabled();
 
+      ofLog() << "vst layout  - inputs: " << layouts.inputBuses.size() << " x outputs: " << layouts.outputBuses.size();
       mPlugin->setBusesLayout(layouts);
 
       mPlugin->prepareToPlay(gSampleRate, gBufferSize);
       mPlugin->setPlayHead(&mPlayhead);
-      mNumInputs = MIN(mPlugin->getTotalNumInputChannels(), 4);
-      mNumOutputs = MIN(mPlugin->getTotalNumOutputChannels(), 4);
-      ofLog() << "vst inputs: " << mNumInputs << "  vst outputs: " << mNumOutputs;
+      mNumInputs = mPlugin->getTotalNumInputChannels();
+      mNumOutputs = mPlugin->getTotalNumOutputChannels();
+      ofLog() << "vst channel - inputs: " << mNumInputs << " x outputs: " << mNumOutputs;
 
       mPluginName = mPlugin->getName().toStdString();
 
@@ -476,18 +480,23 @@ void VSTPlugin::Process(double time)
 #endif
 
    PROFILER(VSTPlugin);
-   
+
    int inputChannels = MAX(2, mNumInputs);
    GetBuffer()->SetNumActiveChannels(inputChannels);
-   
    SyncBuffers();
-   
+
+   /*
+    * Multi-out VSTs which can't disable those outputs will expect *something* in the
+    * buffer even though we don't read it.
+    */
+   int bufferChannels = MAX(inputChannels, mNumOutputs); // how much to allocate in the juce::AudioBuffer
+
    const int kSafetyMaxChannels = 16; //hitting a crazy issue (memory stomp?) where numchannels is getting blown out sometimes
    
    int bufferSize = GetBuffer()->BufferSize();
    assert(bufferSize == gBufferSize);
    
-   juce::AudioBuffer<float> buffer(inputChannels, bufferSize);
+   juce::AudioBuffer<float> buffer(bufferChannels, bufferSize);
    for (int i=0; i<inputChannels && i < kSafetyMaxChannels; ++i)
       buffer.copyFrom(i, 0, GetBuffer()->GetChannel(MIN(i,GetBuffer()->NumActiveChannels()-1)), GetBuffer()->BufferSize());
 
