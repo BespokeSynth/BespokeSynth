@@ -29,29 +29,37 @@
 #define __Bespoke__Minimap__
 
 #include "IDrawableModule.h"
+#include "UIGrid.h"
+
 
 class Minimap : public IDrawableModule
 {
 
-  public:
+public:
     Minimap();
     ~Minimap();
+    void CreateUIControls() override;
     void DrawModule() override;
-    bool AlwaysOnTop() override;
-    
+    bool AlwaysOnTop() override { return true; };
     void GetDimensions(float & width, float & height) override;
-  private:
-    bool IsSingleton() const override;
+    void GetDimensionsMinimap(float & width, float & height);
+private:
+    bool IsSingleton() const override { return true; };
+    bool HasTitleBar() const override { return false; };
     void ComputeBoundingBox(ofRectangle & rect);
     ofRectangle CoordsToMinimap(ofRectangle & boundingBox, ofRectangle & source);
-    void DrawModulesOnMinimap();
     void DrawModulesOnMinimap(ofRectangle & boundingBox);
     void RectUnion(ofRectangle & target, ofRectangle & unionRect);
+    void UpdateGridValues();
+    void UpdateGridValues(float x, float y);
     void OnClicked(int x, int y, bool right) override;
+    void MouseReleased() override;
+    bool MouseMoved(float x, float y) override;
     ofVec2f CoordsToViewport(ofRectangle & boundingBox, float x, float y);
-    ofVec2f GetPosition(bool local) const;
     void ForcePosition();
     
+    bool mClick;
+    UIGrid* mGrid;
 };
 
 #endif /* defined(__Bespoke__Minimap__) */

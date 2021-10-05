@@ -38,6 +38,7 @@ class NVGcontext;
 class QuickSpawnMenu;
 class ADSRDisplay;
 class UserPrefsEditor;
+class Minimap;
 
 enum LogEventType
 {
@@ -151,6 +152,7 @@ public:
    double GetPixelRatio() const { return mPixelRatio; }
    long GetFrameCount() { return mFrameCount; }
    void SetUIScale(float scale) { mUILayerModuleContainer.SetDrawScale(scale); }
+   float GetUIScale() { return mUILayerModuleContainer.GetDrawScale(); }
    ModuleContainer* GetRootContainer() { return &mModuleContainer; }
 
    void ZoomView(float zoomAmount, bool fromMouse);
@@ -280,7 +282,7 @@ private:
 
    LocationZoomer mZoomer;
    QuickSpawnMenu* mQuickSpawn;
-   Minimap* mMinimap;
+   std::unique_ptr<Minimap> mMinimap;
    UserPrefsEditor* mUserPrefsEditor;
 
    RollingBuffer* mGlobalRecordBuffer;

@@ -3,6 +3,11 @@ navigation
    * space bar + move mouse to pan, or right-click drag in empty space
    * space bar + mousewheel/trackpad-scroll to zoom, or scroll in empty space
    * if you get lost, press ~ to bring up the console, type "home", and press enter to reset to the initial position and zoom
+   * If you have enable the minimap in the settings you can click on the minimap to directly go to that location.
+      - At the bottom of the mimimap you can click on 9 bookmark buttons.
+      - Hold shift while clicking will store your current location and zoom level into that bookmark button.
+      - Use shift+# (where # is a number from 1 to 9) to go to the specified bookmark.
+         - Use command/control+# (where # is a number from 1 to 9) to set the specified bookmark.
 
 
 creating modules
