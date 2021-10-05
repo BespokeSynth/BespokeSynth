@@ -145,14 +145,16 @@ void ModuleContainer::Exit()
    }
 }
 
-void ModuleContainer::SignalEmit(const void* data, size_t size)
+bool ModuleContainer::SignalEmit(const Signal& ev)
 {
    for (int i=0; i<mModules.size(); ++i)
    {
-      if (mModules[i]->GetContainer())
-         mModules[i]->GetContainer()->SignalEmit(data, size);
-      mModules[i]->SignalEmit(data, size);
+      if (mModules[i]->GetContainer()){
+         mModules[i]->GetContainer()->SignalEmit(ev);
+      }
+      mModules[i]->SignalEmit(ev);
    }
+   return true;   // Placeholder for some possible future flow control in the signal propagation.
 }
 
 void ModuleContainer::KeyPressed(int key, bool isRepeat)

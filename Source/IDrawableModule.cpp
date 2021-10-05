@@ -796,10 +796,13 @@ ofVec2f IDrawableModule::GetMinimumDimensions()
    return ofVec2f(GetMinimizedWidth() + 10, 10);
 }
 
-void IDrawableModule::SignalEmit(const void *data, size_t size)
-{
-   for (auto control : mUIControls)
-      control->SignalEmit(data, size);
+bool IDrawableModule::SignalEmit(const Signal& ev)
+{  
+   bool ret=true;
+   for (auto control : mUIControls){
+      ret &= control->SignalEmit(ev);
+   }
+   return ret; 
 }
 
 void IDrawableModule::KeyPressed(int key, bool isRepeat)

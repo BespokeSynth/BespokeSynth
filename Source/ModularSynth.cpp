@@ -880,9 +880,8 @@ IDrawableModule* ModularSynth::GetLastClickedModule() const
    return mLastClickedModule;
 }
 
-void ModularSynth::SignalEmit(const void* data, size_t size){
-   mModuleContainer.SignalEmit(data, size);
-   mUILayerModuleContainer.SignalEmit(data, size);
+bool ModularSynth::SignalEmit(const Signal& ev){
+   return mModuleContainer.SignalEmit(ev) | mUILayerModuleContainer.SignalEmit(ev);
 }
 
 

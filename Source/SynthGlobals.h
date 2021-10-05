@@ -40,6 +40,8 @@
 #include <random>
 #include <float.h>
 
+#include "Signal.h"
+
 //#define BESPOKE_DEBUG_ALLOCATIONS
 
 #ifdef BESPOKE_DEBUG_ALLOCATIONS

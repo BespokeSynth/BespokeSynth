@@ -29,8 +29,6 @@
 #include "ModuleContainer.h"
 #include "FileStream.h"
 
-#include "Event.h"
-
 namespace
 {
    const float kKeyboardYOffset = 0;
@@ -284,9 +282,9 @@ int KeyboardDisplay::GetPitchForTypingKey(int key) const
    return -1;
 }
 
-void KeyboardDisplay::SignalEmit(const void* data, size_t size){
-   auto& kp = Event::keycode(data,size);
-   std::cout<<kp.getKeyCode()<<","<<kp.getModifiers().getRawFlags()<<"\n";
+bool KeyboardDisplay::SignalEmit(const Signal& ev){
+   std::cout<<ev.keycode().getKeyCode()<<","<<ev.keycode().getModifiers().getRawFlags()<<"\n";
+   return true;
 }
 
 void KeyboardDisplay::KeyPressed(int key, bool isRepeat)
