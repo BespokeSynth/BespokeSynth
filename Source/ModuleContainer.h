@@ -54,7 +54,7 @@ public:
    void SetDrawOffset(ofVec2f offset) { mDrawOffset = offset; }
    float GetDrawScale() const;
    void SetDrawScale(float scale) { mDrawScale = scale; }
-   
+   void SignalEmit(const void* data, size_t size);
    void KeyPressed(int key, bool isRepeat);
    void KeyReleased(int key);
    void MouseMoved(float x, float y);

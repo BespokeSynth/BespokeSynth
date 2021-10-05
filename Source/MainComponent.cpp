@@ -453,6 +453,7 @@ private:
          isRepeat = false;
       }
       mSynth.KeyPressed(keyCode, isRepeat);
+      mSynth.SignalEmit(&key,sizeof(key));
       return true;
    }
    

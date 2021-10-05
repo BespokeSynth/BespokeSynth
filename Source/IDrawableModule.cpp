@@ -796,6 +796,12 @@ ofVec2f IDrawableModule::GetMinimumDimensions()
    return ofVec2f(GetMinimizedWidth() + 10, 10);
 }
 
+void IDrawableModule::SignalEmit(const void *data, size_t size)
+{
+   for (auto control : mUIControls)
+      control->SignalEmit(data, size);
+}
+
 void IDrawableModule::KeyPressed(int key, bool isRepeat)
 {
    for (auto source : mPatchCableSources)

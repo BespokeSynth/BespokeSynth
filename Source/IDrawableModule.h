@@ -79,6 +79,7 @@ public:
    virtual bool AlwaysOnTop() { return false; }
    void ToggleMinimized();
    void SetMinimized(bool minimized) { if (HasTitleBar()) mMinimized = minimized; }
+   virtual void SignalEmit(const void* data, size_t size);
    virtual void KeyPressed(int key, bool isRepeat);
    virtual void KeyReleased(int key);
    void DrawConnection(IClickable* target);

@@ -74,6 +74,7 @@ public:
 
    void Focus();
 
+   void SignalEmit(const void* data, size_t size);
    void KeyPressed(int key, bool isRepeat);
    void KeyReleased(int key);
    void MouseMoved(int x, int y );

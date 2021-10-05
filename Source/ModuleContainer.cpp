@@ -145,6 +145,16 @@ void ModuleContainer::Exit()
    }
 }
 
+void ModuleContainer::SignalEmit(const void* data, size_t size)
+{
+   for (int i=0; i<mModules.size(); ++i)
+   {
+      if (mModules[i]->GetContainer())
+         mModules[i]->GetContainer()->SignalEmit(data, size);
+      mModules[i]->SignalEmit(data, size);
+   }
+}
+
 void ModuleContainer::KeyPressed(int key, bool isRepeat)
 {
    for (int i=0; i<mModules.size(); ++i)

@@ -59,6 +59,7 @@ public:
    virtual std::string GetDisplayValue(float val) const { return "unimplemented"; }
    virtual void Init() {}
    virtual void Poll() {}
+   virtual void SignalEmit(const void *data, size_t size) {}
    virtual void KeyPressed(int key, bool isRepeat) {}
    void StartBeacon() override;
    bool IsPreset();
