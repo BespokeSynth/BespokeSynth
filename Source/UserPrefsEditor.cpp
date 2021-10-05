@@ -70,6 +70,7 @@ void UserPrefsEditor::CreateUIControls()
    TEXTENTRY(mVstSearchDirsEntry, "vstsearchdirs", 1000, &mVstSearchDirs);
    CHECKBOX(mShowTooltipsOnLoadCheckbox, "show_tooltips_on_load", &mShowTooltipsOnLoad);
    CHECKBOX(mShowMinimapCheckbox, "show_minimap", &mShowMinimap);
+   CHECKBOX(mUseNativeDecorationsCheckbox, "use_native_decorations", &mUseNativeDecorations);
    UIBLOCK_SHIFTDOWN();
    BUTTON(mSaveButton, "save and exit bespoke");
    BUTTON(mCancelButton, "cancel");
@@ -204,6 +205,12 @@ void UserPrefsEditor::Show()
       mShowTooltipsOnLoad = true;
    else
       mShowTooltipsOnLoad = TheSynth->GetUserPrefs()["show_tooltips_on_load"].asBool();
+   
+   
+   if (TheSynth->GetUserPrefs()["use_native_decorations"].isNull())
+      mUseNativeDecorations = true;
+   else
+      mUseNativeDecorations = TheSynth->GetUserPrefs()["use_native_decorations"].asBool();
 
    if (TheSynth->GetUserPrefs()["show_minimap"].isNull())
       mShowMinimap = false;
@@ -511,6 +518,7 @@ void UserPrefsEditor::ButtonClicked(ClickButton* button)
       UpdatePrefStrArray(userPrefs, "vstsearchdirs", ofSplitString(vstSearchDirs, ","));
       UpdatePrefBool(userPrefs, "show_tooltips_on_load", mShowTooltipsOnLoad);
       UpdatePrefBool(userPrefs, "show_minimap", mShowMinimap);
+      UpdatePrefBool(userPrefs, "use_native_decorations", mUseNativeDecorations);
 
       std::string output = userPrefs.getRawString(true);
       CleanUpSave(output);

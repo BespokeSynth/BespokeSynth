@@ -26,6 +26,7 @@
 #include "VSTWindow.h"
 #include "VSTPlugin.h"
 #include "ModularSynth.h"
+#include "SynthGlobals.h"
 
 #include "juce_gui_extra/juce_gui_extra.h"
 
@@ -50,6 +51,8 @@ VSTWindow::VSTWindow (VSTPlugin* vst,
       setTopLeftPosition(mainMon.getX() + mainMon.getWidth() / 4,
                          mainMon.getY() + mainMon.getHeight() / 4);
    }
+   if (TheSynth->GetUserPrefs()["use_native_decorations"].asBool() == true)
+       setUsingNativeTitleBar(true);
 
    setVisible (true);
    
