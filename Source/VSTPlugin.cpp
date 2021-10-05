@@ -582,7 +582,14 @@ void VSTPlugin::Process(double time)
       mVSTMutex.unlock();
    
       GetBuffer()->Clear();
-      for (int ch=0; ch < buffer.getNumChannels() && ch < kSafetyMaxChannels; ++ch)
+      /*
+       * Until we support multi output we end up with this requirement that
+       * the output is at most stereo. This stops mis-behaving plugins which
+       * output the full buffer set from copying that onto the output.
+       * (Ahem: Surge 1.9)
+       */
+      int nChannelsToCopy = MIN(2, buffer.getNumChannels());
+      for (int ch=0; ch < nChannelsToCopy && ch < kSafetyMaxChannels; ++ch)
       {
          int outputChannel = MIN(ch,GetBuffer()->NumActiveChannels()-1);
          for (int sampleIndex=0; sampleIndex < buffer.getNumSamples(); ++sampleIndex)
