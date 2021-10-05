@@ -121,8 +121,6 @@ private:
    bool mShowTooltipsOnLoad;
    Checkbox* mShowMinimapCheckbox;
    bool mShowMinimap;
-   Checkbox* mUseNativeDecorationsCheckbox;
-   bool mUseNativeDecorations;
    ClickButton* mSaveButton;
    ClickButton* mCancelButton;
 
