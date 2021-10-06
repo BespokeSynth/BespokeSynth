@@ -78,6 +78,7 @@ private:
    bool mTypingInput;
    bool mLatch;
    bool mShowScale;
+   bool mRegisterKeys;
    std::array<float, 128> mLastOnTime{};
    std::array<float, 128> mLastOffTime{};
    std::vector<std::pair<Signal,Signal>> keymap;

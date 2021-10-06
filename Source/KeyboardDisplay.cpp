@@ -43,6 +43,7 @@ KeyboardDisplay::KeyboardDisplay()
 , mTypingInput(false)
 , mLatch(false)
 , mShowScale(false)
+, mRegisterKeys(false)
 {   
    for (int i = 0; i < 128; ++i)
    {
@@ -283,14 +284,16 @@ int KeyboardDisplay::GetPitchForTypingKey(int key) const
 }
 
 bool KeyboardDisplay::SignalEmit(const Signal& ev){
-   if(ev.type()==Signal::type_t::KEYCODE && ev.keycode().mode==KeyCode::RAISE){
-      std::cout<<"[RAISE] "<<ev.keycode().base.getKeyCode()<<","<<ev.keycode().base.getModifiers().getRawFlags()<<"\n";
-   }
-   else if(ev.type()==Signal::type_t::KEYCODE && ev.keycode().mode==KeyCode::SUSTAIN){
-      std::cout<<"[SUS]  "<<ev.keycode().base.getKeyCode()<<","<<ev.keycode().base.getModifiers().getRawFlags()<<"\n";
-   }
-   else if(ev.type()==Signal::type_t::KEYCODE && ev.keycode().mode==KeyCode::FALL){
-      std::cout<<"[FALL] "<<ev.keycode().base.getKeyCode()<<","<<ev.keycode().base.getModifiers().getRawFlags()<<"\n";
+   if(mTypingInput && mEnabled){
+      if(ev.type()==Signal::type_t::KEYCODE && ev.keycode().mode==KeyCode::RAISE){
+         std::cout<<"[RAISE] "<<ev.keycode().base.getKeyCode()<<","<<ev.keycode().base.getModifiers().getRawFlags()<<"\n";
+      }
+      else if(ev.type()==Signal::type_t::KEYCODE && ev.keycode().mode==KeyCode::SUSTAIN){
+         std::cout<<"[SUS]  "<<ev.keycode().base.getKeyCode()<<","<<ev.keycode().base.getModifiers().getRawFlags()<<"\n";
+      }
+      else if(ev.type()==Signal::type_t::KEYCODE && ev.keycode().mode==KeyCode::FALL){
+         std::cout<<"[FALL] "<<ev.keycode().base.getKeyCode()<<","<<ev.keycode().base.getModifiers().getRawFlags()<<"\n";
+      }
    }
    return true;
 }
@@ -327,6 +330,7 @@ void KeyboardDisplay::LoadLayout(const ofxJSONElement& moduleInfo)
    mModuleSaveData.LoadBool("typing_control", moduleInfo, false);
    mModuleSaveData.LoadBool("latch", moduleInfo, false);
    mModuleSaveData.LoadBool("show_scale", moduleInfo, false);
+   mModuleSaveData.LoadBool("register_keys", moduleInfo, false);
    
    SetUpFromSaveData();
 }
@@ -339,6 +343,7 @@ void KeyboardDisplay::SetUpFromSaveData()
    mTypingInput = mModuleSaveData.GetBool("typing_control");
    mLatch = mModuleSaveData.GetBool("latch");
    mShowScale = mModuleSaveData.GetBool("show_scale");
+   mRegisterKeys = mModuleSaveData.GetBool("register_keys");
 
 }
 

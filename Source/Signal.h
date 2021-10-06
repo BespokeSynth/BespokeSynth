@@ -22,10 +22,10 @@ struct Signal{
 
     private:
         type_t _type;
-        union{
+        //enum{
             keycode_t _keycode;
             ui_signal_t _ui_signal;
-        };
+        //};
     public:
 
     Signal():_type(type_t::NONE){}
