@@ -284,7 +284,13 @@ int KeyboardDisplay::GetPitchForTypingKey(int key) const
 
 bool KeyboardDisplay::SignalEmit(const Signal& ev){
    if(ev.type()==Signal::type_t::KEYCODE && ev.keycode().mode==KeyCode::RAISE){
-      std::cout<<ev.keycode().base.getKeyCode()<<","<<ev.keycode().base.getModifiers().getRawFlags()<<"\n";
+      std::cout<<"[RAISE] "<<ev.keycode().base.getKeyCode()<<","<<ev.keycode().base.getModifiers().getRawFlags()<<"\n";
+   }
+   else if(ev.type()==Signal::type_t::KEYCODE && ev.keycode().mode==KeyCode::SUSTAIN){
+      std::cout<<"[SUS]  "<<ev.keycode().base.getKeyCode()<<","<<ev.keycode().base.getModifiers().getRawFlags()<<"\n";
+   }
+   else if(ev.type()==Signal::type_t::KEYCODE && ev.keycode().mode==KeyCode::FALL){
+      std::cout<<"[FALL] "<<ev.keycode().base.getKeyCode()<<","<<ev.keycode().base.getModifiers().getRawFlags()<<"\n";
    }
    return true;
 }

@@ -21,6 +21,14 @@ using namespace juce;
 #include <windows.h>
 #endif
 
+namespace std{
+   bool operator<(const KeyPress& l, const KeyPress& r){
+      if(l.getKeyCode()<r.getKeyCode())return true;
+      else if(l.getKeyCode()>r.getKeyCode())return false;
+      else return l.getModifiers().getRawFlags()<r.getModifiers().getRawFlags();
+   }
+}
+
 //==============================================================================
 /*
  This component lives inside our window, and this is where you should put all
@@ -453,7 +461,11 @@ private:
          isRepeat = false;
       }
       mSynth.KeyPressed(keyCode, isRepeat);
-      mSynth.SignalEmit((Signal::keycode_t){key,KeyCode::RAISE});
+      if (mPressedKeys_alt.find(key)==mPressedKeys_alt.end()){
+         mPressedKeys_alt.insert(key);
+         mSynth.SignalEmit((Signal::keycode_t){key,KeyCode::RAISE});
+      }
+      else mSynth.SignalEmit((Signal::keycode_t){key,KeyCode::SUSTAIN});
       return true;
    }
    
@@ -470,6 +482,16 @@ private:
                break;
             }
          }
+         
+         std::set<KeyPress> delendi={};
+         for(auto& i:mPressedKeys_alt){
+             if (!i.isCurrentlyDown()){
+                mSynth.SignalEmit((Signal::keycode_t){i,KeyCode::FALL});
+                delendi.insert(i);
+             }
+         }
+         for(auto& i:delendi)mPressedKeys_alt.erase(i);
+         
       }
       return true;
    }
@@ -535,6 +557,7 @@ private:
    int64 mLastFpsUpdateTime;
    int mFrameCountAccum;
    std::list<int> mPressedKeys;
+   std::set<KeyPress> mPressedKeys_alt;
    double mPixelRatio;
    juce::Point<int> mScreenPosition;
    juce::Point<int> mDesiredInitialPosition;
