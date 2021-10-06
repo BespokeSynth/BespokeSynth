@@ -52,6 +52,7 @@ public:
       
       openGLContext.setOpenGLVersionRequired(juce::OpenGLContext::openGL3_2);
       openGLContext.setContinuousRepainting(false);
+      openGLContext.setComponentPaintingEnabled(false);
 
 #ifndef BESPOKE_WINDOWS //windows crash handler is set up in ModularSynth() constructor
       SystemStats::setApplicationCrashHandler(ModularSynth::CrashHandler);
@@ -121,7 +122,7 @@ public:
       
       mSynth.Poll();
       
-#if DEBUG || BESPOKE_LINUX
+#if DEBUG
       if (sRenderFrame % 2 == 0)
 #else
       if (true)
