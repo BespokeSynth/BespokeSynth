@@ -84,6 +84,10 @@ void PatchCableSource::SetConnectionType(ConnectionType type)
       mColor = IDrawableModule::GetColor(kModuleType_Modulator);
    else if (mType == kConnectionType_Pulse)
       mColor = IDrawableModule::GetColor(kModuleType_Pulse);
+   else if (mType == kConnectionType_Special)
+      mColor = IDrawableModule::GetColor(kModuleType_Instrument);
+   else if (mType == kConnectionType_UIControl)
+      mColor = IDrawableModule::GetColor(kModuleType_Modulator);
    else
       mColor = IDrawableModule::GetColor(kModuleType_Other);
    mColor.setBrightness(mColor.getBrightness() * .8f);
@@ -469,7 +473,9 @@ bool PatchCableSource::TestClick(int x, int y, bool right, bool testOnly /* = fa
          {
             if (mPatchCables.empty() ||
                 mType == kConnectionType_Note ||
-                mType == kConnectionType_Pulse)
+                mType == kConnectionType_Pulse ||
+                mType == kConnectionType_UIControl ||
+                mType == kConnectionType_Special)
             {
                PatchCable* newCable = AddPatchCable(nullptr);
                newCable->Grab();
