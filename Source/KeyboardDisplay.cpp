@@ -283,7 +283,9 @@ int KeyboardDisplay::GetPitchForTypingKey(int key) const
 }
 
 bool KeyboardDisplay::SignalEmit(const Signal& ev){
-   std::cout<<ev.keycode().getKeyCode()<<","<<ev.keycode().getModifiers().getRawFlags()<<"\n";
+   if(ev.type()==Signal::type_t::KEYCODE && ev.keycode().mode==KeyCode::RAISE){
+      std::cout<<ev.keycode().base.getKeyCode()<<","<<ev.keycode().base.getModifiers().getRawFlags()<<"\n";
+   }
    return true;
 }
 
@@ -331,6 +333,7 @@ void KeyboardDisplay::SetUpFromSaveData()
    mTypingInput = mModuleSaveData.GetBool("typing_control");
    mLatch = mModuleSaveData.GetBool("latch");
    mShowScale = mModuleSaveData.GetBool("show_scale");
+
 }
 
 namespace
@@ -346,6 +349,8 @@ void KeyboardDisplay::SaveState(FileStreamOut& out)
    
    out << mWidth;
    out << mHeight;
+
+   //out << keymap;
 }
 
 void KeyboardDisplay::LoadState(FileStreamIn& in)
@@ -361,6 +366,8 @@ void KeyboardDisplay::LoadState(FileStreamIn& in)
    
    in >> mWidth;
    in >> mHeight;
+
+   //in >> keymap;
 }
 
 

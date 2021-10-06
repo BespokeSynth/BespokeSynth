@@ -80,6 +80,7 @@ private:
    bool mShowScale;
    std::array<float, 128> mLastOnTime{};
    std::array<float, 128> mLastOffTime{};
+   std::vector<std::pair<Signal,Signal>> keymap;
 };
 
 #endif /* defined(__Bespoke__KeyboardDisplay__) */
