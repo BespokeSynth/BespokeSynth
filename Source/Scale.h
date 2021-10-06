@@ -142,6 +142,8 @@ public:
 private:
    struct ScaleInfo
    {
+      ScaleInfo() {}
+      ScaleInfo(std::string name, std::vector<int> pitches) : mName(name), mPitches(pitches) {}
       std::string mName;
       std::vector<int> mPitches;
    };
@@ -153,12 +155,10 @@ private:
    
    void NotifyListeners();
    
+   void SetUpRootList();
    float RationalizeNumber(float input);
    void UpdateTuningTable();
    float GetTuningTableRatio(int semitonesFromCenter);
-   bool IsUsingOddsoundScale() const;
-   bool IsUsingSclFileScale() const;
-   bool IsUsingCustomScale() const { return IsUsingOddsoundScale() || IsUsingSclFileScale(); }
    
    enum IntonationMode
    {
@@ -166,7 +166,9 @@ private:
       kIntonation_Just,
       kIntonation_Pythagorean,
       kIntonation_Meantone,
-      kIntonation_Rational
+      kIntonation_Rational, 
+      kIntonation_SclFile,
+      kIntonation_Oddsound
    };
    
    ScalePitches mScale;
@@ -192,7 +194,7 @@ private:
    IntonationMode mIntonation;
    DropdownList* mIntonationSelector;
    
-   float mTuningTable[256];
+   std::array<float, 256> mTuningTable;
    
    ChordDatabase mChordDatabase;
 

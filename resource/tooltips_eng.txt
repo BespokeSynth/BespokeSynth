@@ -1779,7 +1779,7 @@ scale~controls the global scale used by various modules
 ~scale~which set of notes to use
 ~degree~
 ~intonation~which method to use to tune the scale
-~tet~how many semitones make up an octave
+~PPO~pitches per octave
 ~tuning~what frequency does the pitch defined in "note" represent?
 ~note~the pitch that maps to the frequency defined in "tuning"
 
