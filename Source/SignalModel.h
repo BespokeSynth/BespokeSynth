@@ -22,7 +22,7 @@ struct Signal{
 
     private:
         type_t _type;
-        //enum{
+        //union{
             keycode_t _keycode;
             ui_signal_t _ui_signal;
         //};

@@ -31,9 +31,9 @@
 
 #include "OpenFrameworksPort.h"
 #include <map>
+#include <set>
 #include <list>
 #include <vector>
-#include <set>
 #include <algorithm>
 #include <array>
 #include <math.h>
@@ -41,7 +41,7 @@
 #include <random>
 #include <float.h>
 
-#include "Signal.h"
+#include "SignalModel.h"
 
 //#define BESPOKE_DEBUG_ALLOCATIONS
 
