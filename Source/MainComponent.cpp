@@ -21,13 +21,13 @@ using namespace juce;
 #include <windows.h>
 #endif
 
-namespace std{
-   bool operator<(const KeyPress& l, const KeyPress& r){
-      if(l.getKeyCode()<r.getKeyCode())return true;
-      else if(l.getKeyCode()>r.getKeyCode())return false;
-      else return l.getModifiers().getRawFlags()<r.getModifiers().getRawFlags();
-   }
-}
+
+auto cmp_keypress = [](const juce::KeyPress& l, const juce::KeyPress& r)->bool{
+   if(l.getKeyCode()<r.getKeyCode())return true;
+   else if(l.getKeyCode()>r.getKeyCode())return false;
+   else return l.getModifiers().getRawFlags()<r.getModifiers().getRawFlags();
+};
+
 
 //==============================================================================
 /*
@@ -46,6 +46,7 @@ public:
    , mFrameCountAccum(0)
    , mPixelRatio(1)
    , mSpaceMouseReader(mSynth)
+   , mPressedKeys_alt(cmp_keypress)
    {
       ofLog() << "bespoke synth " << JUCEApplication::getInstance()->getApplicationVersion();
 
@@ -463,9 +464,9 @@ private:
       mSynth.KeyPressed(keyCode, isRepeat);
       if (mPressedKeys_alt.find(key)==mPressedKeys_alt.end()){
          mPressedKeys_alt.insert(key);
-         mSynth.SignalEmit((Signal::keycode_t){key,KeyCode::RAISE});
+         mSynth.SignalEmit(Signal::keycode_t({key,KeyCode::RAISE}));
       }
-      else mSynth.SignalEmit((Signal::keycode_t){key,KeyCode::SUSTAIN});
+      else mSynth.SignalEmit(Signal::keycode_t({key,KeyCode::SUSTAIN}));
       return true;
    }
    
@@ -483,10 +484,10 @@ private:
             }
          }
          
-         std::set<KeyPress> delendi={};
+         std::set<KeyPress,decltype(cmp_keypress)> delendi(cmp_keypress);
          for(auto& i:mPressedKeys_alt){
              if (!i.isCurrentlyDown()){
-                mSynth.SignalEmit((Signal::keycode_t){i,KeyCode::FALL});
+                mSynth.SignalEmit(Signal::keycode_t({i,KeyCode::FALL}));
                 delendi.insert(i);
              }
          }
@@ -557,7 +558,7 @@ private:
    int64 mLastFpsUpdateTime;
    int mFrameCountAccum;
    std::list<int> mPressedKeys;
-   std::set<KeyPress> mPressedKeys_alt;
+   std::set<KeyPress,decltype(cmp_keypress)> mPressedKeys_alt;
    double mPixelRatio;
    juce::Point<int> mScreenPosition;
    juce::Point<int> mDesiredInitialPosition;
