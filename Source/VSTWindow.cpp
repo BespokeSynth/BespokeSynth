@@ -51,8 +51,7 @@ VSTWindow::VSTWindow (VSTPlugin* vst,
                          mainMon.getY() + mainMon.getHeight() / 4);
    }
 
-   setUsingNativeTitleBar(true);
-   setVisible (true);
+   setVisible(true);
    
 #ifdef JUCE_MAC
    if (pluginEditor->getNumChildComponents() > 0)
@@ -96,6 +95,15 @@ VSTWindow* VSTWindow::CreateWindow(VSTPlugin* vst, WindowFormatType type)
 VSTWindow::~VSTWindow()
 {
    clearContentComponent();
+}
+
+void VSTWindow::ShowWindow()
+{
+   bool alwaysOnTop = true;
+   if (!TheSynth->GetUserPrefs()["vst_always_on_top"].isNull())
+      alwaysOnTop = TheSynth->GetUserPrefs()["vst_always_on_top"].asBool();
+   setAlwaysOnTop(alwaysOnTop);
+   toFront(true);
 }
 
 void VSTWindow::moved()

@@ -864,7 +864,7 @@ void VSTPlugin::ButtonClicked(ClickButton* button)
       {
          if (mWindow == nullptr)
             mWindow = std::unique_ptr<VSTWindow>(VSTWindow::CreateWindow(this, VSTWindow::Normal));
-         mWindow->toFront (true);
+         mWindow->ShowWindow();
       }
       
       //if (mWindow->GetNSViewComponent())
