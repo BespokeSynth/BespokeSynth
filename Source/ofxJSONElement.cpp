@@ -68,7 +68,7 @@ bool ofxJSONElement::open(std::string filename)
 //--------------------------------------------------------------
 bool ofxJSONElement::save(std::string filename, bool pretty)
 {
-   filename = ofToDataPath(filename, true);
+   filename = ofToDataPath(filename);
    juce::File file(filename);
    file.create();
    if (!file.exists()) {
