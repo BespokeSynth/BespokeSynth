@@ -31,8 +31,8 @@ Sign up here to receive an email whenever I put out a new release: http://bespok
 
 ### Building
 
-In mid-September 2021 Bespoke moved to CMake rather than Projucer for builds. The prescription to build 
-Bespoke on all platforms is
+Building Bespoke from source is easy and fun! The basic cmake prescription gives you a completed
+executable which is ready to run on your system in many cases.
 
 ```shell
 git clone https://github.com/BespokeSynth/BespokeSynth   # replace this with your fork if you forked
@@ -42,10 +42,21 @@ cmake -Bignore/build
 cmake --build ignore/build --parallel 4
 ```
 
-This will produce a release build in `ignore/build/BespokeSynth_artefacts`.
+This will produce a release build in `ignore/build/Source/BespokeSynth_artefacts`.
 
-On Windows, the above cmake commands make Visual Studio project files in `ignore/build` which you can open and use directly
-rather than the last step. Some windows systems also require the `-A x64` argument to force 64 bit.
-On macOS if you would like to use Xcode, replace the second command with `cmake -Bignore/build -GXcode` 
-and the ignore/build directory will contain xcode project files which you can use. Finally, the CMake file has a set
-of options to enable other build features which are documented in the file.
+There are a few useful options to the *first* cmake command which many folks choose to use.
+
+* `-DBESPOKE_VST2_SDK_LOCATION=/path/to/sdk` will activate VST2 hosting support in your built 
+copy of Bespoke if you have access to the VST SDK
+* `-DBESPOKE_ASIO_SDK_LOCATION=/path/to/sdk` (windows only) will activate ASIO support on windows in your built copy of Bespoke if you have access to the ASIO SDK
+* `-DBESPOKE_PYTHON_ROOT=/...` will override the automatically detected python root. In some cases with M1 mac builds in homebrew this is useful.
+* `-DCMAKE_BUILD_TYPE=Debug` will produce a build with debug information available
+* `-A x64` (windows only) will force visual studio to build for 64 bit architectures, in the event this is not your default
+* `-GXcode` (mac only) will eject xcode project files rather than the default make files
+* `-DCMAKE_INSTALL_PREFIX=/usr` (only used on Linux) will set the `CMAKE_INSTALL_PREFIX` which guides both where your
+built bespoke looks for resources and also where it installs. After a build on Linux with this configured, you can
+do `sudo cmake install ignore/build` and bespoke will install correctly into this directory. The cmake default is `/usr/local`.
+
+The directory name `ignore/build` is arbitrary. Bespoke is set up to `.gitignore` everything in the `ignore` directory but you
+can use any directory name you want for a build or have multiple builds also.
+
