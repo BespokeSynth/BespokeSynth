@@ -51,6 +51,7 @@ VSTWindow::VSTWindow (VSTPlugin* vst,
                          mainMon.getY() + mainMon.getHeight() / 4);
    }
 
+   setUsingNativeTitleBar(true);
    setVisible (true);
    
 #ifdef JUCE_MAC
