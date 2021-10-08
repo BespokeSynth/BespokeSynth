@@ -66,6 +66,7 @@ private:
    DropdownList* mChannelSelector;
    int mChannelSelectionIndex;
    int mStereoSelectionOffset;
+   float mLimit;
    
    struct LevelMeter
    {
