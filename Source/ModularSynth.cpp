@@ -310,7 +310,7 @@ void ModularSynth::LoadResources(void* nanoVG, void* fontBoundsNanoVG)
    LoadGlobalResources();
 
    if (!gFont.IsLoaded())
-      mFatalError = "couldn't load font from " + gFont.GetFontPath();
+      mFatalError = "couldn't load font from " + gFont.GetFontPath() + "\nmaybe bespoke can't find your resources directory?";
 }
 
 void ModularSynth::InitIOBuffers(int inputChannelCount, int outputChannelCount)
