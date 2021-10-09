@@ -11,8 +11,26 @@ juce_add_gui_app(BespokeSynth
 # Generate build time info for the cpp
 configure_file(VersionInfo.cpp.in geninclude/VersionInfo.cpp)
 
+option(BESPOKE_RELIABLE_VERSION_INFO "Update version info on every build (off: generate only at configuration time)" ON)
+if(BESPOKE_RELIABLE_VERSION_INFO)
+    add_custom_target(version-info BYPRODUCTS ${CMAKE_CURRENT_BINARY_DIR}/geninclude/VersionInfoBld.cpp
+            WORKING_DIRECTORY ${CMAKE_SOURCE_DIR}
+            COMMAND ${CMAKE_COMMAND} -D CMAKE_PROJECT_VERSION_MAJOR=${CMAKE_PROJECT_VERSION_MAJOR}
+            -D CMAKE_PROJECT_VERSION_MINOR=${CMAKE_PROJECT_VERSION_MINOR}
+            -D BESPOKESRC=${CMAKE_SOURCE_DIR} -D BESPOKEBLD=${CMAKE_CURRENT_BINARY_DIR}
+            -D WIN32=${WIN32}
+            -P ${CMAKE_SOURCE_DIR}/cmake/versiontools.cmake
+            )
+    add_dependencies(BespokeSynth version-info)
+else()
+    set(BESPOKESRC ${CMAKE_CURRENT_SOURCE_DIR})
+    set(BESPOKEBLD ${CMAKE_CURRENT_BINARY_DIR})
+    include(${CMAKE_SOURCE_DIR}/cmake/versiontools.cmake)
+endif()
+
 target_sources(BespokeSynth PRIVATE
     ${CMAKE_CURRENT_BINARY_DIR}/geninclude/VersionInfo.cpp
+    ${CMAKE_CURRENT_BINARY_DIR}/geninclude/VersionInfoBld.cpp
 
     ADSR.cpp
     ADSRDisplay.cpp
@@ -497,3 +515,40 @@ target_link_libraries(BespokeSynth PRIVATE
     ${Python_LIBRARIES}
     $<$<BOOL:${MINGW}>:dbghelp>
     )
+
+
+# Rules to do some installing and packaging which we will have to refactor  but
+# for now gets a nightly going
+set(BESPOKE_PRODUCT_DIR "${CMAKE_BINARY_DIR}/products")
+set(BESPOKE_NIGHTLY_DIR "${CMAKE_BINARY_DIR}/nightly")
+add_custom_command(TARGET BespokeSynth
+        POST_BUILD
+        WORKING_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}
+        COMMAND ${CMAKE_COMMAND} -E make_directory ${BESPOKE_PRODUCT_DIR}
+        )
+add_custom_target(nightly-package)
+add_dependencies(nightly-package BespokeSynth)
+
+if (APPLE)
+    get_target_property(output_dir BespokeSynth RUNTIME_OUTPUT_DIRECTORY)
+    add_custom_command(TARGET BespokeSynth
+            POST_BUILD
+            WORKING_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}
+            COMMAND ${CMAKE_COMMAND} -E copy_directory ${output_dir}/BespokeSynth.app/ ${BESPOKE_PRODUCT_DIR}/BespokeSynth.app
+            )
+
+    add_custom_command(TARGET nightly-package
+            POST_BUILD
+            WORKING_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}
+            COMMAND ${CMAKE_COMMAND} -E make_directory ${BESPOKE_NIGHTLY_DIR}
+            COMMAND hdiutil create /tmp/tmp.dmg -ov -volname "BespokeSynth" -fs HFS+ -srcfolder "${BESPOKE_PRODUCT_DIR}"
+            COMMAND hdiutil convert /tmp/tmp.dmg -format UDZO -o "${BESPOKE_NIGHTLY_DIR}/BespokeNightly.dmg"
+            )
+else()
+    add_custom_command(TARGET nightly-package
+            POST_BUILD
+            WORKING_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}
+            COMMAND ${CMAKE_COMMAND} -E make_directory ${BESPOKE_NIGHTLY_DIR}
+            COMMAND ${CMAKE_COMMAND} -E echo "coming soon}" > ${BESPOKE_NIGHTLY_DIR}/installer.txt
+            )
+endif()
