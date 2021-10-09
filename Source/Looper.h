@@ -54,7 +54,7 @@ public:
    ~Looper();
    static IDrawableModule* Create() { return new Looper(); }
    
-   std::string GetTitleLabel() override { return "looper"; }
+   
    void CreateUIControls() override;
 
    void SetRecorder(LooperRecorder* recorder);

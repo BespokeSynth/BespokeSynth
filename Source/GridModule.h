@@ -46,7 +46,7 @@ public:
    ~GridModule();
    static IDrawableModule* Create() { return new GridModule(); }
    
-   std::string GetTitleLabel() override { return "grid"; }
+   
    void CreateUIControls() override;
    
    void Init() override;

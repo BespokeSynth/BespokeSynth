@@ -46,7 +46,7 @@ public:
    ~KarplusStrong();
    static IDrawableModule* Create() { return new KarplusStrong(); }
    
-   std::string GetTitleLabel() override { return "karplus/strong"; }
+   
    void CreateUIControls() override;
 
    //IAudioSource

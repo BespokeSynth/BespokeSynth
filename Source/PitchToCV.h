@@ -40,7 +40,7 @@ public:
    virtual ~PitchToCV();
    static IDrawableModule* Create() { return new PitchToCV(); }
    
-   std::string GetTitleLabel() override { return "pitch to cv"; }
+   
    void CreateUIControls() override;
    
    void SetEnabled(bool enabled) override { mEnabled = enabled; }

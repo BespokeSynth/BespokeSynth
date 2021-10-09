@@ -41,7 +41,7 @@ public:
    
    static IAudioEffect* Create() { return new Muter(); }
    
-   std::string GetTitleLabel() override { return "muter"; }
+   
    void CreateUIControls() override;
 
    //IAudioEffect

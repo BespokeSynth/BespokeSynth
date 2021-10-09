@@ -39,7 +39,6 @@ public:
    virtual ~OutputChannel();
    static IDrawableModule* Create() { return new OutputChannel(); }
    
-   std::string GetTitleLabel() override { return "output"; }
    void CreateUIControls() override;
    
    //IAudioReceiver
@@ -66,6 +65,7 @@ private:
    DropdownList* mChannelSelector;
    int mChannelSelectionIndex;
    int mStereoSelectionOffset;
+   float mLimit;
    
    struct LevelMeter
    {

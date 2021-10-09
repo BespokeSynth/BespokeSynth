@@ -40,7 +40,7 @@ public:
    
    static IAudioEffect* Create() { return new FreeverbEffect(); }
    
-   std::string GetTitleLabel() override { return "freeverb"; }
+   
    void CreateUIControls() override;
    
    //IAudioEffect

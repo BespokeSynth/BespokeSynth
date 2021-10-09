@@ -43,7 +43,7 @@ public:
    virtual ~FreqDomainBoilerplate();
    static IDrawableModule* Create() { return new FreqDomainBoilerplate(); }
    
-   std::string GetTitleLabel() override { return "freq domain"; }
+   
    void CreateUIControls() override;
    
    void SetEnabled(bool enabled) override { mEnabled = enabled; }

@@ -14,10 +14,6 @@ bool Minimap::AlwaysOnTop() { return true; }
 
 bool Minimap::IsSingleton() const { return true; }
 
-bool Minimap::HasTitleBar() const { return false; }
-
-std::string Minimap::GetTitleLabel() { return ""; }
-
 void Minimap::GetDimensions(float& width, float& height)
 {
     float windowWidth = ofGetWidth();

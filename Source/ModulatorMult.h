@@ -39,7 +39,7 @@ public:
    virtual ~ModulatorMult();
    static IDrawableModule* Create() { return new ModulatorMult(); }
    
-   std::string GetTitleLabel() override { return "mult"; }
+   
    void CreateUIControls() override;
    
    void SetEnabled(bool enabled) override { mEnabled = enabled; }

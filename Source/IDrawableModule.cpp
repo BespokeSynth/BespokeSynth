@@ -341,8 +341,11 @@ void IDrawableModule::DrawFrame(float w, float h, bool drawModule, float& titleB
       ofPopMatrix();
    }
    
-   ofSetColor(color * (1-GetBeaconAmount()) + ofColor::yellow * GetBeaconAmount(), gModuleDrawAlpha);
-   DrawTextBold(GetTitleLabel(),5+enableToggleOffset,10-titleBarHeight,16);
+   if (HasTitleBar())
+   {
+      ofSetColor(color * (1 - GetBeaconAmount()) + ofColor::yellow * GetBeaconAmount(), gModuleDrawAlpha);
+      DrawTextBold(GetTitleLabel(), 5 + enableToggleOffset, 10 - titleBarHeight, 16);
+   }
    
    if (Enabled() && mShouldDrawOutline)
    {

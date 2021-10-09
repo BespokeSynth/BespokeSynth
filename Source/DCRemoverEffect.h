@@ -39,7 +39,7 @@ public:
    
    static IAudioEffect* Create() { return new DCRemoverEffect(); }
    
-   std::string GetTitleLabel() override { return "dc remover"; }
+   
    
    //IAudioEffect
    void ProcessAudio(double time, ChannelBuffer* buffer) override;

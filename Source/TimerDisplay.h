@@ -38,7 +38,7 @@ public:
    ~TimerDisplay();
    static IDrawableModule* Create() { return new TimerDisplay(); }
    
-   std::string GetTitleLabel() override { return "timer"; }
+   
    void CreateUIControls() override;
    
    void ButtonClicked(ClickButton* button) override;

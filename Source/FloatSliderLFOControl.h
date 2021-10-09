@@ -88,7 +88,7 @@ public:
    FloatSlider* GetOwner() { return mTarget; }
    bool Enabled() const override { return mEnabled; }
    bool HasTitleBar() const override { return mPinned; }
-   std::string GetTitleLabel() override { return mPinned ? "lfo" : ""; }
+   
    bool IsSaveable() override { return mPinned; }
    void CreateUIControls() override;
    bool IsPinned() const { return mPinned; }

@@ -41,7 +41,7 @@ public:
    static IDrawableModule* Create() { return new UserPrefsEditor(); }
 
    void CreateUIControls() override;
-   std::string GetTitleLabel() override { return "settings"; }
+   
    bool AlwaysOnTop() override { return true; }
    bool CanMinimize() override { return false; }
    bool IsSingleton() const override { return true; }

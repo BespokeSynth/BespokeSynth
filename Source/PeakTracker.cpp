@@ -40,8 +40,11 @@ void PeakTracker::Process(float* buffer, int bufferSize)
       {
          /* When we hit a peak, ride the peak to the top. */
          mPeak = input;
-         if (mLimit != -1)
-            mPeak = ofClamp(mPeak, 0, mLimit);
+         if (mLimit != -1 && mPeak >= mLimit)
+         {
+            mPeak = mLimit;
+            mHitLimitTime = gTime;
+         }
       }
       else
       {

@@ -39,7 +39,7 @@ public:
    virtual ~SampleCapturer();
    static IDrawableModule* Create() { return new SampleCapturer(); }
 
-   std::string GetTitleLabel() override { return "sample capturer"; }
+   
    void CreateUIControls() override;
 
    //IAudioSource

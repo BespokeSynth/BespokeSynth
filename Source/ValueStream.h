@@ -41,7 +41,7 @@ public:
    ~ValueStream();
    static IDrawableModule* Create() { return new ValueStream(); }
 
-   std::string GetTitleLabel() override { return "value stream"; }
+   
    void CreateUIControls() override;
 
    IUIControl* GetUIControl() const { return mUIControl; }

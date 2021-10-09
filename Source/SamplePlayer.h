@@ -51,7 +51,7 @@ public:
    ~SamplePlayer();
    static IDrawableModule* Create() { return new SamplePlayer(); }
    
-   std::string GetTitleLabel() override { return "sampleplayer"; }
+   
    void CreateUIControls() override;
    void Init() override;
    void Poll() override;

@@ -39,7 +39,6 @@ public:
    void DrawModule() override;
    void SetDimensions(int w, int h) { mWidth = w; mHeight = h; }
    bool HasTitleBar() const override { return false; }
-   std::string GetTitleLabel() override { return ""; }
    bool IsSaveable() override { return false; }
    std::string GetHoveredModuleTypeName();
    

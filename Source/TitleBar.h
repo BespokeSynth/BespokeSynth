@@ -88,7 +88,7 @@ public:
    TitleBar();
    ~TitleBar();
    
-   std::string GetTitleLabel() override { return ""; }
+   
    void CreateUIControls() override;
    bool HasTitleBar() const override { return false; }
    bool AlwaysOnTop() override { return true; }

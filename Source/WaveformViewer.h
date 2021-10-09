@@ -42,7 +42,7 @@ public:
    virtual ~WaveformViewer();
    static IDrawableModule* Create() { return new WaveformViewer(); }
    
-   std::string GetTitleLabel() override { return "waveform viewer"; }
+   
    void CreateUIControls() override;
    
    //IAudioSource

@@ -43,7 +43,7 @@ public:
    ~ControlSequencer();
    static IDrawableModule* Create() { return new ControlSequencer(); }
    
-   std::string GetTitleLabel() override { return "control sequencer"; }
+   
    void CreateUIControls() override;
    void Init() override;
    
