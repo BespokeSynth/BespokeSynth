@@ -45,7 +45,7 @@ public:
    virtual ~Pulser();
    static IDrawableModule* Create() { return new Pulser(); }
    
-   std::string GetTitleLabel() override { return "pulser"; }
+   
    void CreateUIControls() override;
    void Init() override;
    

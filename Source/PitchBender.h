@@ -40,7 +40,7 @@ public:
    virtual ~PitchBender();
    static IDrawableModule* Create() { return new PitchBender(); }
    
-   std::string GetTitleLabel() override { return "pitchbend"; }
+   
    void CreateUIControls() override;
    void Init() override;
    void SetEnabled(bool enabled) override { mEnabled = enabled; }

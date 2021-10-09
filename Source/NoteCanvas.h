@@ -47,7 +47,7 @@ public:
    ~NoteCanvas();
    static IDrawableModule* Create() { return new NoteCanvas(); }
    
-   std::string GetTitleLabel() override { return "note canvas"; }
+   
    void CreateUIControls() override;
    void Init() override;
    

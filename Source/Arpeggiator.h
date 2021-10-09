@@ -45,7 +45,7 @@ public:
    ~Arpeggiator();
    static IDrawableModule* Create() { return new Arpeggiator(); }
    
-   std::string GetTitleLabel() override { return "arpeggiator"; }
+   
    void CreateUIControls() override;
    
    void Init() override;

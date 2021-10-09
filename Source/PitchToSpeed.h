@@ -40,7 +40,7 @@ public:
    virtual ~PitchToSpeed();
    static IDrawableModule* Create() { return new PitchToSpeed(); }
    
-   std::string GetTitleLabel() override { return "pitch to speed"; }
+   
    void CreateUIControls() override;
    
    void SetEnabled(bool enabled) override { mEnabled = enabled; }

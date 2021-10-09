@@ -39,7 +39,7 @@ public:
    virtual ~NoteStrummer();
    static IDrawableModule* Create() { return new NoteStrummer(); }
    
-   std::string GetTitleLabel() override { return "note strummer"; }
+   
    void CreateUIControls() override;
    void Init() override;
    

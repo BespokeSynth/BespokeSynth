@@ -41,7 +41,7 @@ public:
    virtual ~Splitter();
    static IDrawableModule* Create() { return new Splitter(); }
    
-   std::string GetTitleLabel() override { return "splitter"; }
+   
    void CreateUIControls() override;
    
    //IAudioSource

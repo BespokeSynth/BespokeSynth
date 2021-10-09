@@ -35,7 +35,7 @@ public:
    ~ComboGridController() {}
    static IDrawableModule* Create() { return new ComboGridController(); }
    
-   std::string GetTitleLabel() override;
+   
    void CreateUIControls() override;
    
    void Init() override;

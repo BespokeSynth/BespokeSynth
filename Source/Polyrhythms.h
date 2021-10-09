@@ -67,7 +67,7 @@ public:
    ~Polyrhythms();
    static IDrawableModule* Create() { return new Polyrhythms(); }
    
-   std::string GetTitleLabel() override { return "polyrhythms"; }
+   
    void CreateUIControls() override;
    void Init() override;
    bool IsResizable() const override { return true; }

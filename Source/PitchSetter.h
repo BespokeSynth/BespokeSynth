@@ -38,7 +38,7 @@ public:
    PitchSetter();
    static IDrawableModule* Create() { return new PitchSetter(); }
    
-   std::string GetTitleLabel() override { return "pitch"; }
+   
    void CreateUIControls() override;
    
    void SetEnabled(bool enabled) override { mEnabled = enabled; }

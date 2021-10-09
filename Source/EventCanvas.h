@@ -45,7 +45,7 @@ public:
    ~EventCanvas();
    static IDrawableModule* Create() { return new EventCanvas(); }
    
-   std::string GetTitleLabel() override { return "event canvas"; }
+   
    void CreateUIControls() override;
    void Init() override;
    

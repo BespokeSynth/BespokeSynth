@@ -39,7 +39,7 @@ public:
    Monophonify();
    static IDrawableModule* Create() { return new Monophonify(); }
    
-   std::string GetTitleLabel() override { return "portamento"; }
+   
    void CreateUIControls() override;
    
    void SetEnabled(bool enabled) override { mEnabled = enabled; }

@@ -41,7 +41,7 @@ public:
    
    static IAudioEffect* Create() { return new ButterworthFilterEffect(); }
    
-   std::string GetTitleLabel() override { return "butterworth"; }
+   
    void CreateUIControls() override;
    
    void Init() override;

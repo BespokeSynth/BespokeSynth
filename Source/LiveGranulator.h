@@ -46,7 +46,7 @@ public:
    
    static IAudioEffect* Create() { return new LiveGranulator(); }
    
-   std::string GetTitleLabel() override { return "granulator"; }
+   
    void CreateUIControls() override;
    void Init() override;
    

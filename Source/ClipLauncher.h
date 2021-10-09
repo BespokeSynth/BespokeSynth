@@ -48,7 +48,7 @@ public:
    ~ClipLauncher();
    static IDrawableModule* Create() { return new ClipLauncher(); }
    
-   std::string GetTitleLabel() override { return "clip launcher"; }
+   
    void CreateUIControls() override;
    void Init() override;
    

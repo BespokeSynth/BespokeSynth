@@ -40,7 +40,7 @@ public:
    
    static IAudioEffect* Create() { return new PitchShiftEffect(); }
    
-   std::string GetTitleLabel() override { return "pitchshift"; }
+   
    void CreateUIControls() override;
    
    //IAudioEffect

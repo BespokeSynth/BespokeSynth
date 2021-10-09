@@ -44,7 +44,7 @@ public:
    ~PSMoveController();
    static IDrawableModule* Create() { return new PSMoveController(); }
    
-   std::string GetTitleLabel() override { return "ps move"; }
+   
    void CreateUIControls() override;
    void Init() override;
    

@@ -41,7 +41,7 @@ public:
    ~Prefab();
    static IDrawableModule* Create() { return new Prefab(); }
    
-   std::string GetTitleLabel() override;
+   std::string GetTitleLabel() const override;
    void CreateUIControls() override;
    
    ModuleContainer* GetContainer() override { return &mModuleContainer; }

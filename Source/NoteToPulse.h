@@ -40,7 +40,7 @@ public:
    virtual ~NoteToPulse();
    static IDrawableModule* Create() { return new NoteToPulse(); }
    
-   std::string GetTitleLabel() override { return "note to pulse"; }
+   
    void CreateUIControls() override;
    
    void SetEnabled(bool enabled) override { mEnabled = enabled; }

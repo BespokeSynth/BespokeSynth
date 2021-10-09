@@ -40,7 +40,7 @@ public:
    virtual ~PitchDive();
    static IDrawableModule* Create() { return new PitchDive(); }
    
-   std::string GetTitleLabel() override { return "pitchdive"; }
+   
    void CreateUIControls() override;
    void SetEnabled(bool enabled) override { mEnabled = enabled; }
    

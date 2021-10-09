@@ -40,7 +40,7 @@ public:
    virtual ~Inverter();
    static IDrawableModule* Create() { return new Inverter(); }
    
-   std::string GetTitleLabel() override { return "inverter"; }
+   
    void CreateUIControls() override;
    
    //IAudioSource

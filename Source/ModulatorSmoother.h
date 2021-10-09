@@ -41,7 +41,7 @@ public:
    virtual ~ModulatorSmoother();
    static IDrawableModule* Create() { return new ModulatorSmoother(); }
    
-   std::string GetTitleLabel() override { return "smoother"; }
+   
    void CreateUIControls() override;
    void Init() override;
    

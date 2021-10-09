@@ -44,7 +44,7 @@ public:
    virtual ~Vocoder();
    static IDrawableModule* Create() { return new Vocoder(); }
    
-   std::string GetTitleLabel() override { return "fft vocoder"; }
+   
    void CreateUIControls() override;
    
    void SetEnabled(bool enabled) override { mEnabled = enabled; }

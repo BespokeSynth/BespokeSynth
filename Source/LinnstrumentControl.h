@@ -46,7 +46,7 @@ public:
    virtual ~LinnstrumentControl();
    static IDrawableModule* Create() { return new LinnstrumentControl(); }
    
-   std::string GetTitleLabel() override { return "linnstrument control"; }
+   
    void CreateUIControls() override;
    
    void Init() override;

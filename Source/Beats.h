@@ -98,7 +98,7 @@ public:
    virtual ~Beats();
    static IDrawableModule* Create() { return new Beats(); }
    
-   std::string GetTitleLabel() override { return "beats"; }
+   
    void CreateUIControls() override;
    
    void Init() override;

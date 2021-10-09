@@ -42,7 +42,7 @@ public:
    virtual ~MidiOutputModule();
    static IDrawableModule* Create() { return new MidiOutputModule(); }
    
-   std::string GetTitleLabel() override { return mDevice.Name(); }
+   
    void CreateUIControls() override;
    
    void Init() override;

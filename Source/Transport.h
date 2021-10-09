@@ -95,7 +95,7 @@ class Transport : public IDrawableModule, public IButtonListener, public IFloatS
 public:
    Transport();
    
-   std::string GetTitleLabel() override { return "transport"; }
+   
    void CreateUIControls() override;
 
    float GetTempo() { return mTempo; }

@@ -41,7 +41,7 @@ public:
    virtual ~NoteVibrato();
    static IDrawableModule* Create() { return new NoteVibrato(); }
    
-   std::string GetTitleLabel() override { return "vibrato"; }
+   
    void CreateUIControls() override;
    void Init() override;
    void SetEnabled(bool enabled) override { mEnabled = enabled; }

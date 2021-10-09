@@ -39,7 +39,7 @@ public:
    NotePanAlternator();
    static IDrawableModule* Create() { return new NotePanAlternator(); }
    
-   std::string GetTitleLabel() override { return "pan alternator"; }
+   
    void CreateUIControls() override;
    
    void SetEnabled(bool enabled) override { mEnabled = enabled; }

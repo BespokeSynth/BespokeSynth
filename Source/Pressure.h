@@ -40,7 +40,7 @@ public:
    virtual ~Pressure();
    static IDrawableModule* Create() { return new Pressure(); }
    
-   std::string GetTitleLabel() override { return "pressure"; }
+   
    void CreateUIControls() override;
    void Init() override;
    void SetEnabled(bool enabled) override { mEnabled = enabled; }

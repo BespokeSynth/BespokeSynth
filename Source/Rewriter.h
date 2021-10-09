@@ -43,7 +43,7 @@ public:
    virtual ~Rewriter();
    static IDrawableModule* Create() { return new Rewriter(); }
    
-   std::string GetTitleLabel() override { return "looper rewriter"; }
+   
    void CreateUIControls() override;
 
    void Go();

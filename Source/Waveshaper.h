@@ -41,7 +41,7 @@ public:
    virtual ~Waveshaper();
    static IDrawableModule* Create() { return new Waveshaper(); }
    
-   std::string GetTitleLabel() override { return "waveshaper"; }
+   
    void CreateUIControls() override;
    
    //IAudioSource

@@ -41,7 +41,7 @@ public:
    virtual ~AudioToPulse();
    static IDrawableModule* Create() { return new AudioToPulse(); }
 
-   std::string GetTitleLabel() override { return "audio to pulse"; }
+   
    void CreateUIControls() override;
 
    void SetEnabled(bool enabled) override { mEnabled = enabled; }

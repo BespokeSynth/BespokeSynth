@@ -189,6 +189,8 @@ VSTPlugin::VSTPlugin()
       VSTLookup::sFormatManager.addDefaultFormats();
    
    mChannelModulations.resize(kGlobalModulationIdx+1);
+
+   mPluginName = "no plugin loaded";
 }
 
 void VSTPlugin::CreateUIControls()
@@ -231,21 +233,17 @@ void VSTPlugin::Exit()
    }
 }
 
-std::string VSTPlugin::GetTitleLabel()
+std::string VSTPlugin::GetTitleLabel() const
 {
    return "vst: "+GetPluginName();
 }
 
-std::string VSTPlugin::GetPluginName()
+std::string VSTPlugin::GetPluginName() const
 {
-   if (mPlugin)
-      return mPluginName;
-   if (mModuleSaveData.HasProperty("vst") && mModuleSaveData.GetString("vst").length() > 0)
-      return GetFileNameWithoutExtension(mModuleSaveData.GetString("vst")).toStdString() + " (not loaded)";
-   return "no plugin loaded";
+   return mPluginName;
 }
 
-std::string VSTPlugin::GetPluginId()
+std::string VSTPlugin::GetPluginId() const
 {
    if (mPlugin)
    {
@@ -380,6 +378,9 @@ void VSTPlugin::LoadVST(juce::PluginDescription desc)
    else
    {
       TheSynth->LogEvent("error loading VST: " + errorMessage.toStdString(), kLogEventType_Error);
+
+      if (mModuleSaveData.HasProperty("vst") && mModuleSaveData.GetString("vst").length() > 0)
+         mPluginName = GetFileNameWithoutExtension(mModuleSaveData.GetString("vst")).toStdString() + " (not loaded)";
    }
    mVSTMutex.unlock();
 }
@@ -1057,8 +1058,6 @@ void VSTPlugin::LoadState(FileStreamIn& in)
       if (mPlugin != nullptr)
       {
          ofLog() << "loading vst state for " << mPlugin->getName();
-         
-         mPluginName = mPlugin->getName().toStdString();
 
          mPlugin->setStateInformation(vstState, vstStateSize);
          if (rev >= 1 && vstProgramStateSize > 0)
