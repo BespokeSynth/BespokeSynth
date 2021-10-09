@@ -47,5 +47,7 @@ if (BESPOKE_VST2_SDK_LOCATION)
     message(STATUS "Enabling VST2 - caution, non FOSS build")
 endif()
 
+set_property(DIRECTORY "${CMAKE_CURRENT_SOURCE_DIR}" PROPERTY VS_STARTUP_PROJECT BespokeSynth)
+
 add_subdirectory(libs)
 add_subdirectory(Source)
