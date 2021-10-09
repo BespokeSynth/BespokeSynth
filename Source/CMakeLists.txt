@@ -542,13 +542,79 @@ if (APPLE)
             WORKING_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}
             COMMAND ${CMAKE_COMMAND} -E make_directory ${BESPOKE_NIGHTLY_DIR}
             COMMAND hdiutil create /tmp/tmp.dmg -ov -volname "BespokeSynth" -fs HFS+ -srcfolder "${BESPOKE_PRODUCT_DIR}"
-            COMMAND hdiutil convert /tmp/tmp.dmg -format UDZO -o "${BESPOKE_NIGHTLY_DIR}/BespokeNightly.dmg"
+            COMMAND hdiutil convert /tmp/tmp.dmg -format UDZO -o "${BESPOKE_NIGHTLY_DIR}/BespokeNightly-macOS.dmg"
             )
-else()
+elseif(WIN32)
+    get_target_property(output_dir BespokeSynth RUNTIME_OUTPUT_DIRECTORY)
+    message( STATUS "Will also copy ${Python_RUNTIME_LIBRARY_DIRS}")
+    add_custom_command(TARGET BespokeSynth
+            POST_BUILD
+            WORKING_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}
+            COMMAND ${CMAKE_COMMAND} -E copy ${output_dir}/BespokeSynth.exe ${BESPOKE_PRODUCT_DIR}
+            COMMAND ${CMAKE_COMMAND} -E copy_directory ${output_dir}/resource ${BESPOKE_PRODUCT_DIR}/resource
+            )
+
+    set(stagedir "${CMAKE_BINARY_DIR}/stage-nightly")
     add_custom_command(TARGET nightly-package
             POST_BUILD
             WORKING_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}
             COMMAND ${CMAKE_COMMAND} -E make_directory ${BESPOKE_NIGHTLY_DIR}
-            COMMAND ${CMAKE_COMMAND} -E echo "coming soon}" > ${BESPOKE_NIGHTLY_DIR}/installer.txt
+            COMMAND ${CMAKE_COMMAND} -E make_directory ${stagedir}
+            COMMAND ${CMAKE_COMMAND} -E make_directory ${stagedir}/BespokeSynth
+
+            COMMAND ${CMAKE_COMMAND} -E copy_directory ${BESPOKE_PRODUCT_DIR} ${stagedir}/BespokeSynth
+            )
+
+    # This bit will surely improve
+    if (EXISTS "${Python_RUNTIME_LIBRARY_DIRS}/Python38.dll")
+        add_custom_command(TARGET nightly-package
+                POST_BUILD
+                WORKING_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}
+                COMMAND ${CMAKE_COMMAND} -E copy "${Python_RUNTIME_LIBRARY_DIRS}/Python38.dll" ${stagedir}/BespokeSynth
+                )
+    elseif (EXISTS "${Python_RUNTIME_LIBRARY_DIRS}/Python39.dll")
+        add_custom_command(TARGET nightly-package
+                POST_BUILD
+                WORKING_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}
+                COMMAND ${CMAKE_COMMAND} -E copy "${Python_RUNTIME_LIBRARY_DIRS}/Python39.dll" ${stagedir}/BespokeSynth
+                )
+    else()
+        message( WARNING "Not quite sure how to package a python dll for the nightly" )
+    endif()
+    if (EXISTS "${Python_RUNTIME_LIBRARY_DIRS}/Python3.dll")
+        add_custom_command(TARGET nightly-package
+                POST_BUILD
+                WORKING_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}
+                COMMAND ${CMAKE_COMMAND} -E copy "${Python_RUNTIME_LIBRARY_DIRS}/Python3.dll" ${stagedir}/BespokeSynth
+                )
+    endif()
+    add_custom_command(TARGET nightly-package
+            POST_BUILD
+            WORKING_DIRECTORY ${stagedir}
+            COMMAND ${CMAKE_COMMAND} -E tar cvf ${BESPOKE_NIGHTLY_DIR}/BespokeNightly-win64.zip --format=zip BespokeSynth
+            )
+else()
+    get_target_property(output_dir BespokeSynth RUNTIME_OUTPUT_DIRECTORY)
+    add_custom_command(TARGET BespokeSynth
+            POST_BUILD
+            WORKING_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}
+            COMMAND ${CMAKE_COMMAND} -E copy ${output_dir}/BespokeSynth ${BESPOKE_PRODUCT_DIR}
+            COMMAND ${CMAKE_COMMAND} -E copy_directory ${output_dir}/resource ${BESPOKE_PRODUCT_DIR}/resource
+            )
+
+    set(stagedir "${CMAKE_BINARY_DIR}/stage-nightly")
+    add_custom_command(TARGET nightly-package
+            POST_BUILD
+            WORKING_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}
+            COMMAND ${CMAKE_COMMAND} -E make_directory ${stagedir}
+            COMMAND ${CMAKE_COMMAND} -E make_directory ${BESPOKE_NIGHTLY_DIR}
+            )
+    add_custom_command(TARGET nightly-package
+            POST_BUILD
+            WORKING_DIRECTORY ${stagedir}
+
+            COMMAND ${CMAKE_COMMAND} -E make_directory ${stagedir}/BespokeSynth
+            COMMAND ${CMAKE_COMMAND} -E copy_directory ${BESPOKE_PRODUCT_DIR} ${stagedir}/BespokeSynth
+            COMMAND ${CMAKE_COMMAND} -E tar cvzf ${BESPOKE_NIGHTLY_DIR}/BespokeNightly-linux.tgz BespokeSynth
             )
 endif()

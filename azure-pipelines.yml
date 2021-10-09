@@ -124,11 +124,11 @@ jobs:
           artifactName: 'INSTALLER_WIN_NIGHTLY'
           targetPath: 'build/nightly'
         condition: and(variables.isWindows, ne(variables['Build.Reason'], 'PullRequest'))
-        displayName: mac - publish win artifact
+        displayName: win - publish win artifact
 
       - task: PublishPipelineArtifact@0
         inputs:
           artifactName: 'INSTALLER_LIN_NIGHTLY'
           targetPath: 'build/nightly'
         condition: and(variables.isLinux, ne(variables['Build.Reason'], 'PullRequest'))
-        displayName: mac - publish lin artifact
+        displayName: lin - publish lin artifact
