@@ -12,6 +12,7 @@ set(BESPOKE_ASIO_SDK_LOCATION "" CACHE STRING "Steinberg ASIO SDK directory for 
 set(CMAKE_CXX_EXTENSIONS OFF)
 set(CMAKE_CXX_STANDARD 17)
 set(CMAKE_MSVC_RUNTIME_LIBRARY "MultiThreaded$<$<CONFIG:Debug>:Debug>")
+set_property(DIRECTORY "${CMAKE_CURRENT_SOURCE_DIR}" PROPERTY VS_STARTUP_PROJECT BespokeSynth)
 set(CMAKE_OSX_DEPLOYMENT_TARGET 10.11 CACHE STRING "Minimum macOS version")
 set(CMAKE_POSITION_INDEPENDENT_CODE ON)
 if (NOT CMAKE_BUILD_TYPE)
@@ -46,8 +47,6 @@ if (BESPOKE_VST2_SDK_LOCATION)
     juce_set_vst2_sdk_path(${BESPOKE_VST2_SDK_LOCATION})
     message(STATUS "Enabling VST2 - caution, non FOSS build")
 endif()
-
-set_property(DIRECTORY "${CMAKE_CURRENT_SOURCE_DIR}" PROPERTY VS_STARTUP_PROJECT BespokeSynth)
 
 add_subdirectory(libs)
 add_subdirectory(Source)
