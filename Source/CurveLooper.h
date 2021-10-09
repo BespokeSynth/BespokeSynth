@@ -43,7 +43,7 @@ public:
    ~CurveLooper();
    static IDrawableModule* Create() { return new CurveLooper(); }
    
-   std::string GetTitleLabel() override { return "curve looper"; }
+   
    void CreateUIControls() override;
    
    IUIControl* GetUIControl() const { return mUIControl; }

@@ -37,7 +37,7 @@ public:
    NoteLatch();
    static IDrawableModule* Create() { return new NoteLatch(); }
    
-   std::string GetTitleLabel() override { return "note latch"; }
+   
    
    void SetEnabled(bool enabled) override { mEnabled = enabled; }
    

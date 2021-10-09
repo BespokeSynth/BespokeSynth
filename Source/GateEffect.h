@@ -37,7 +37,7 @@ public:
    GateEffect();
    static IAudioEffect* Create() { return new GateEffect(); }
    
-   std::string GetTitleLabel() override { return "gate"; }
+   
    void CreateUIControls() override;
    
    void SetAttack(float ms) { mAttackTime = ms; }

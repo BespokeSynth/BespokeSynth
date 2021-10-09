@@ -35,7 +35,7 @@ public:
    PreviousNote();
    static IDrawableModule* Create() { return new PreviousNote(); }
    
-   std::string GetTitleLabel() override { return "previous note"; }
+   
    
    void SetEnabled(bool enabled) override { mEnabled = enabled; }
    

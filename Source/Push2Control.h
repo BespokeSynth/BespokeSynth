@@ -45,7 +45,7 @@ public:
    virtual ~Push2Control();
    static IDrawableModule* Create() { return new Push2Control(); }
    
-   std::string GetTitleLabel() override { return "push 2 control"; }
+   
    void CreateUIControls() override;
    void Poll() override;
    

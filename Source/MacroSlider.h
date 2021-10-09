@@ -40,7 +40,7 @@ public:
    virtual ~MacroSlider();
    static IDrawableModule* Create() { return new MacroSlider(); }
    
-   std::string GetTitleLabel() override { return "macroslider"; }
+   
    void CreateUIControls() override;
    
    void SetEnabled(bool enabled) override { mEnabled = enabled; }

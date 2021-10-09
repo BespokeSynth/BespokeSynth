@@ -45,7 +45,7 @@ public:
    ~SampleCanvas();
    static IDrawableModule* Create() { return new SampleCanvas(); }
    
-   std::string GetTitleLabel() override { return "sample canvas"; }
+   
    void CreateUIControls() override;
    
    void SetEnabled(bool enabled) override { mEnabled = enabled; }

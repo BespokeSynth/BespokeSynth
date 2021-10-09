@@ -47,7 +47,7 @@ public:
    ~SampleFinder();
    static IDrawableModule* Create() { return new SampleFinder(); }
    
-   std::string GetTitleLabel() override { return "sample finder"; }
+   
    void CreateUIControls() override;
    
    //INoteReceiver

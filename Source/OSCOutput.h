@@ -47,7 +47,7 @@ public:
    
    void Init() override;
    void Poll() override;
-   std::string GetTitleLabel() override { return "osc output"; }
+   
    void CreateUIControls() override;
 
    void SendFloat(std::string address, float val);

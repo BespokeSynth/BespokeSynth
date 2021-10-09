@@ -265,7 +265,6 @@ public:
    ~MidiController();
    static IDrawableModule* Create() { return new MidiController(); }
    
-   std::string GetTitleLabel() override { return Name() + std::string("   "); }
    void CreateUIControls() override;
    
    void Init() override;

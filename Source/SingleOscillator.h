@@ -49,7 +49,7 @@ public:
    ~SingleOscillator();
    static IDrawableModule* Create() { return new SingleOscillator(); }
    
-   std::string GetTitleLabel() override { return "oscillator"; }
+   
    void CreateUIControls() override;
    
    void SetType(OscillatorType type) { mVoiceParams.mOscType = type; }

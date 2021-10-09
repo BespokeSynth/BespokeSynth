@@ -47,7 +47,7 @@ public:
    ~LoopStorer();
    static IDrawableModule* Create() { return new LoopStorer(); }
    
-   std::string GetTitleLabel() override { return "loop storer"; }
+   
    void CreateUIControls() override;
    void Init() override;
    

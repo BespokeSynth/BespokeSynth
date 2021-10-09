@@ -38,7 +38,7 @@ public:
    static IDrawableModule* Create() { return new NoteStreamDisplay(); }
    void CreateUIControls() override;
    
-   std::string GetTitleLabel() override { return "note stream"; }
+   
    
    bool IsResizable() const override { return true; }
    void Resize(float w, float h) override;

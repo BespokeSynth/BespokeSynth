@@ -53,7 +53,7 @@ public:
    void DrawModule() override;
    void SetDimensions(int w, int h) { mWidth = w; mHeight = h; }
    bool HasTitleBar() const override { return false; }
-   std::string GetTitleLabel() override { return ""; }
+   
    void GetDimensions(float& width, float& height) override { width = mWidth; height = mHeight; }
    bool ShouldClipContents() override { return false; }
    DropdownList* GetOwner() const { return mOwner; }

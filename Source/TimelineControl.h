@@ -37,7 +37,7 @@ public:
    ~TimelineControl();
    static IDrawableModule* Create() { return new TimelineControl(); }
    
-   std::string GetTitleLabel() override { return "timeline control"; }
+   
    void CreateUIControls() override;
    
    void CheckboxUpdated(Checkbox* checkbox) override;

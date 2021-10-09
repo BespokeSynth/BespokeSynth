@@ -44,7 +44,7 @@ public:
    ~FMSynth();
    static IDrawableModule* Create() { return new FMSynth(); }
    
-   std::string GetTitleLabel() override { return "FM"; }
+   
    void CreateUIControls() override;
 
    //IAudioSource

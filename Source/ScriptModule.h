@@ -53,7 +53,7 @@ public:
    static void InitializePythonIfNecessary();
    static void CheckIfPythonEverSuccessfullyInitialized();
    
-   std::string GetTitleLabel() override { return "script"; }
+   
    void CreateUIControls() override;
    
    void Poll() override;
@@ -291,7 +291,7 @@ public:
    virtual ~ScriptReferenceDisplay();
    static IDrawableModule* Create() { return new ScriptReferenceDisplay(); }
 
-   std::string GetTitleLabel() override { return "script reference"; }
+   
    void CreateUIControls() override;
 
    void ButtonClicked(ClickButton* button) override;

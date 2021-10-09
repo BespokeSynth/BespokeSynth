@@ -59,7 +59,7 @@ public:
    virtual ~VSTPlugin() override;
    static IDrawableModule* Create() { return new VSTPlugin(); }
    
-   std::string GetTitleLabel() override;
+   std::string GetTitleLabel() const override;
    void CreateUIControls() override;
    
    void SetVol(float vol) { mVol = vol; }
@@ -103,8 +103,8 @@ private:
    bool Enabled() const override { return mEnabled; }
    void LoadVST(juce::PluginDescription desc);
    
-   std::string GetPluginName();
-   std::string GetPluginId();
+   std::string GetPluginName() const;
+   std::string GetPluginId() const;
    void CreateParameterSliders();
    void RefreshPresetFiles();
    

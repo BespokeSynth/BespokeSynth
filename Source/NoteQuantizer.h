@@ -42,7 +42,7 @@ public:
    void CreateUIControls() override;
    void Init() override;
 
-   std::string GetTitleLabel() override { return "quantizer"; }
+   
 
    //INoteReceiver
    void PlayNote(double time, int pitch, int velocity, int voiceIdx = -1, ModulationParameters modulation = ModulationParameters()) override;

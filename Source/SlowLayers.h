@@ -43,7 +43,7 @@ public:
    virtual ~SlowLayers();
    static IDrawableModule* Create() { return new SlowLayers(); }
    
-   std::string GetTitleLabel() override { return "slow layers"; }
+   
    void CreateUIControls() override;
    
    void Clear();

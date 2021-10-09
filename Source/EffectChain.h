@@ -46,7 +46,7 @@ public:
    virtual ~EffectChain();
    static IDrawableModule* Create() { return new EffectChain(); }
    
-   std::string GetTitleLabel() override { return "effect chain"; }
+   
    void CreateUIControls() override;
    void SetEnabled(bool enabled) override { mEnabled = enabled; }
    

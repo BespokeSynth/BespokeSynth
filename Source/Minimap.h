@@ -38,11 +38,10 @@ class Minimap : public IDrawableModule
     ~Minimap();
     void DrawModule() override;
     bool AlwaysOnTop() override;
-    std::string GetTitleLabel() override;
+    
     void GetDimensions(float & width, float & height) override;
   private:
     bool IsSingleton() const override;
-    bool HasTitleBar() const override;
     void ComputeBoundingBox(ofRectangle & rect);
     ofRectangle CoordsToMinimap(ofRectangle & boundingBox, ofRectangle & source);
     void DrawModulesOnMinimap();

@@ -57,7 +57,7 @@ void Prefab::CreateUIControls()
    AddPatchCableSource(mRemoveModuleCable);
 }
 
-std::string Prefab::GetTitleLabel()
+std::string Prefab::GetTitleLabel() const
 {
    if (mPrefabName != "")
       return "prefab: "+mPrefabName;

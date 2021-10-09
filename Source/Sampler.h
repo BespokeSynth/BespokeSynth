@@ -50,7 +50,7 @@ public:
    ~Sampler();
    static IDrawableModule* Create() { return new Sampler(); }
    
-   std::string GetTitleLabel() override { return "sampler"; }
+   
    void CreateUIControls() override;
    
    void Poll() override;

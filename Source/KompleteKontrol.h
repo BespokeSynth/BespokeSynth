@@ -46,7 +46,7 @@ public:
    ~KompleteKontrol();
    static IDrawableModule* Create() { return new KompleteKontrol(); }
    
-   std::string GetTitleLabel() override { return "komplete kontrol"; }
+   
    void CreateUIControls() override;
    
    void Poll() override;

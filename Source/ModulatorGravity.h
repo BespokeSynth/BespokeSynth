@@ -43,7 +43,7 @@ public:
    virtual ~ModulatorGravity();
    static IDrawableModule* Create() { return new ModulatorGravity(); }
    
-   std::string GetTitleLabel() override { return "gravity"; }
+   
    void CreateUIControls() override;
    void Init() override;
    

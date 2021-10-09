@@ -42,7 +42,7 @@ public:
    ~FilterViz();
    static IDrawableModule* Create() { return new FilterViz(); }
    
-   std::string GetTitleLabel() override { return "filter viz"; }
+   
    void CreateUIControls() override;
    
    //IDrawableModule

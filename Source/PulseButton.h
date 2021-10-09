@@ -38,7 +38,7 @@ public:
    virtual ~PulseButton();
    static IDrawableModule* Create() { return new PulseButton(); }
    
-   std::string GetTitleLabel() override { return "pulse button"; }
+   
    void CreateUIControls() override;
 
    void ButtonClicked(ClickButton* button) override;

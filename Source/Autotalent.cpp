@@ -933,14 +933,6 @@ void Autotalent::Process(double time)
    mLatency = (N-1);
 }
 
-std::string Autotalent::GetTitleLabel()
-{
-   if (Minimized())
-      return "autotalent";
-   else
-      return "autotalent "+ofToString(mPitch,2)+" "+ofToString(mConfidence,2);
-}
-
 void Autotalent::DrawModule()
 {
    if (Minimized() || IsVisible() == false)

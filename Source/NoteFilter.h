@@ -35,7 +35,7 @@ public:
    virtual ~NoteFilter();
    static IDrawableModule* Create() { return new NoteFilter(); }
    
-   std::string GetTitleLabel() override { return "note filter"; }
+   
    void CreateUIControls() override;
    
    void SetEnabled(bool enabled) override { mEnabled = enabled; }

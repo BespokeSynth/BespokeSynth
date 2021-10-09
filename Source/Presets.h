@@ -44,7 +44,7 @@ public:
    virtual ~Presets();
    static IDrawableModule* Create() { return new Presets(); }
    
-   std::string GetTitleLabel() override { return "presets"; }
+   
    void CreateUIControls() override;
    
    //IDrawableModule
