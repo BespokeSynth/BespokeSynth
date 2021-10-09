@@ -47,7 +47,7 @@ public:
    static IDrawableModule* Create() { return new ModuleSaveDataPanel(); }
    static bool CanCreate() { return TheSaveDataPanel == nullptr; }
    
-   std::string GetTitleLabel() override { return ""; }
+   std::string GetTitleLabel() const override { return ""; }
    bool AlwaysOnTop() override { return true; }
    bool CanMinimize() override { return false; }
    bool IsSingleton() const override { return true; }
