@@ -52,6 +52,9 @@ VSTWindow::VSTWindow (VSTPlugin* vst,
    }
 
    setVisible(true);
+#if BESPOKE_LINUX
+   setUsingNativeTitleBar(true);
+#endif
    
 #ifdef JUCE_MAC
    if (pluginEditor->getNumChildComponents() > 0)
@@ -99,10 +102,12 @@ VSTWindow::~VSTWindow()
 
 void VSTWindow::ShowWindow()
 {
+#if !BESPOKE_LINUX
    bool alwaysOnTop = true;
    if (!TheSynth->GetUserPrefs()["vst_always_on_top"].isNull())
       alwaysOnTop = TheSynth->GetUserPrefs()["vst_always_on_top"].asBool();
    setAlwaysOnTop(alwaysOnTop);
+#endif
    toFront(true);
 }
 
