@@ -62,38 +62,55 @@ void QuickSpawnMenu::Init()
 void QuickSpawnMenu::KeyPressed(int key, bool isRepeat)
 {
    IDrawableModule::KeyPressed(key, isRepeat);
-   if (key < CHAR_MAX && ((key >= 'a' && key <= 'z') || key == ';') && !isRepeat && GetKeyModifiers() == kModifier_None)
-   {
-      mElements = TheSynth->GetModuleFactory()->GetSpawnableModules((char)key);
-      if (mElements.size() > 0)
-      {
-         mCurrentMenuChar = (char)key;
 
-         float width = 150;
-         for (auto element : mElements)
-         {
-            float elementWidth = GetStringWidth(element) + 10;
-            if (elementWidth > width)
-               width = elementWidth;
-         }
-         
-         SetDimensions(width, (int)mElements.size() * itemSpacing);
-         float minX = 5;
-         float maxX = ofGetWidth() / GetOwningContainer()->GetDrawScale() - mWidth- 5;
-         float minY = TheTitleBar->GetRect().height + 5;
-         float maxY = ofGetHeight() / GetOwningContainer()->GetDrawScale() - mHeight - 5;
-         SetPosition(ofClamp(TheSynth->GetMouseX(GetOwningContainer()) - mWidth / 2, minX, maxX),
-                     ofClamp(TheSynth->GetMouseY(GetOwningContainer()) - mHeight / 2, minY, maxY));
-         SetShowing(true);
-      }
-   }
+   if (isRepeat)
+      return;
+
+   if (mHeldKeys.isEmpty())
+      mAppearAtMousePos.set(TheSynth->GetMouseX(GetOwningContainer()), TheSynth->GetMouseY(GetOwningContainer()));
+
+   if (key >= 0 && key < CHAR_MAX && ((key >= 'a' && key <= 'z') || key == ';') && !isRepeat && GetKeyModifiers() == kModifier_None)
+      mHeldKeys += (char)key;
+
+   UpdateDisplay();
 }
 
 void QuickSpawnMenu::KeyReleased(int key)
 {
-   if (key == mCurrentMenuChar)
+   if (key >= 0 && key < CHAR_MAX)
+      mHeldKeys = mHeldKeys.removeCharacters(juce::String::charToString((char)key));
+   if (mHeldKeys.isEmpty())
+      SetShowing(false);
+
+   UpdateDisplay();
+}
+
+void QuickSpawnMenu::UpdateDisplay()
+{
+   if (mHeldKeys.isEmpty())
    {
       SetShowing(false);
+   }
+   else
+   {
+      mElements = TheSynth->GetModuleFactory()->GetSpawnableModules(mHeldKeys.toStdString());
+
+      float width = 150;
+      for (auto element : mElements)
+      {
+         float elementWidth = GetStringWidth(element) + 10;
+         if (elementWidth > width)
+            width = elementWidth;
+      }
+
+      SetDimensions(width, MAX((int)mElements.size(), 1) * itemSpacing);
+      float minX = 5;
+      float maxX = ofGetWidth() / GetOwningContainer()->GetDrawScale() - mWidth - 5;
+      float minY = TheTitleBar->GetRect().height + 5;
+      float maxY = ofGetHeight() / GetOwningContainer()->GetDrawScale() - mHeight - 5;
+      SetPosition(ofClamp(mAppearAtMousePos.x - mWidth / 2, minX, maxX),
+                  ofClamp(mAppearAtMousePos.y - mHeight / 2, minY, maxY));
+      SetShowing(true);
    }
 }
 
@@ -126,8 +143,18 @@ void QuickSpawnMenu::DrawModule()
          ofSetColor(255,255,255);
       DrawTextNormal(mElements[i], 1, i*itemSpacing+12);
    }
+   if (mElements.size() == 0)
+   {
+      ofSetColor(255, 255, 255);
+      DrawTextNormal("no modules found", 1, 12);
+   }
    
    ofPopStyle();
+}
+
+void QuickSpawnMenu::DrawModuleUnclipped()
+{
+   DrawTextBold(mHeldKeys.toStdString(), 3, -2, 17);
 }
 
 bool QuickSpawnMenu::MouseMoved(float x, float y)

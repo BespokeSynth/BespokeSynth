@@ -395,7 +395,7 @@ void HelpDisplay::ButtonClicked(ClickButton* button)
                                        };
       for (auto type : moduleTypes)
       {
-         std::vector<std::string> spawnable = TheSynth->GetModuleFactory()->GetSpawnableModules(type);
+         const auto& spawnable = TheSynth->GetModuleFactory()->GetSpawnableModules(type);
          for (auto toSpawn : spawnable)
             TheSynth->SpawnModuleOnTheFly(toSpawn, 0, 0);
       }
@@ -483,7 +483,7 @@ void HelpDisplay::ButtonClicked(ClickButton* button)
       };
       for (auto type : moduleTypes)
       {
-         std::vector<std::string> spawnable = TheSynth->GetModuleFactory()->GetSpawnableModules(type);
+         const auto& spawnable = TheSynth->GetModuleFactory()->GetSpawnableModules(type);
          for (auto toSpawn : spawnable)
             mScreenshotsToProcess.push_back(toSpawn);
       }
@@ -526,7 +526,7 @@ void HelpDisplay::ButtonClicked(ClickButton* button)
       };
       for (auto type : moduleTypes)
       {
-         std::vector<std::string> spawnable = TheSynth->GetModuleFactory()->GetSpawnableModules(type);
+         const auto& spawnable = TheSynth->GetModuleFactory()->GetSpawnableModules(type);
          for (auto toSpawn : spawnable)
          {
             IDrawableModule* module = TheSynth->SpawnModuleOnTheFly(toSpawn, 100, 300);

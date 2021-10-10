@@ -246,6 +246,8 @@
 #include "MidiControlChange.h"
 #include "MPETweaker.h"
 
+#include <juce_core/juce_core.h>
+
 #define REGISTER(class,name,type) Register(#name, &(class::Create), &(class::CanCreate), type, false, false);
 #define REGISTER_HIDDEN(class,name,type) Register(#name, &(class::Create), &(class::CanCreate), type, true, false);
 #define REGISTER_EXPERIMENTAL(class,name,type) Register(#name, &(class::Create), &(class::CanCreate), type, false, true);
@@ -507,9 +509,11 @@ std::vector<std::string> ModuleFactory::GetSpawnableModules(ModuleType moduleTyp
    return modules;
 }
 
-std::vector<std::string> ModuleFactory::GetSpawnableModules(char c)
+std::vector<std::string> ModuleFactory::GetSpawnableModules(std::string keys)
 {
-   std::vector<std::string> modules;
+   char c = keys[0];
+
+   std::vector<juce::String> modules;
    for (auto iter = mFactoryMap.begin(); iter != mFactoryMap.end(); ++iter)
    {
       if (iter->first[0] == c &&
@@ -547,9 +551,34 @@ std::vector<std::string> ModuleFactory::GetSpawnableModules(char c)
       if (tolower(effect[0]) == c)
          modules.push_back(effect + " " + kEffectChainSuffix);
    }
-
    sort(modules.begin(), modules.end());
-   return modules;
+
+   std::vector<std::string> ret;
+   for (size_t i = 0; i < modules.size(); ++i)
+   {
+      int stringPos = 0;
+      int end = modules[i].indexOfChar('.');
+      if (end == -1)
+         end = modules[i].indexOfChar(' ');
+      if (end == -1)
+         end = modules[i].length() - 1;
+      bool showModule = true;
+      for (size_t j = 1; j < keys.length(); ++j)
+      {
+         stringPos = modules[i].substring(stringPos+1, end+1).indexOfChar(keys[j]);
+         if (stringPos == -1) //couldn't find key in remaining string
+         {
+            showModule = false;
+            break;
+         }
+      }
+
+      if (showModule)
+         ret.push_back(modules[i].toStdString());
+   }
+
+   
+   return ret;
 }
 
 ModuleType ModuleFactory::GetModuleType(std::string typeName)
