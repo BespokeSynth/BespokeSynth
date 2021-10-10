@@ -14,6 +14,31 @@
 
 using namespace Json;
 
+class ScopedLocale
+{
+public:
+    ScopedLocale() noexcept
+#if WINDOWS
+    : locale(::_strdup(::setlocale(LC_NUMERIC, nullptr)))
+#else
+            : locale(::strdup(::setlocale(LC_NUMERIC, nullptr)))
+#endif
+    {
+       ::setlocale(LC_NUMERIC, "C");
+    }
+
+    ~ScopedLocale() noexcept
+    {
+       if (locale != nullptr)
+       {
+          ::setlocale(LC_NUMERIC, locale);
+          ::free(locale);
+       }
+    }
+
+private:
+    char *const locale;
+};
 
 //--------------------------------------------------------------
 ofxJSONElement::ofxJSONElement(const Json::Value& v) : Value(v)
@@ -32,6 +57,7 @@ ofxJSONElement::ofxJSONElement(std::string jsonString)
 //--------------------------------------------------------------
 bool ofxJSONElement::parse(std::string jsonString)
 {
+   ScopedLocale numericToC;
    Reader reader;
    if(!reader.parse( jsonString, *this )) {
       ofLog() << "Unable to parse string";
@@ -44,6 +70,7 @@ bool ofxJSONElement::parse(std::string jsonString)
 //--------------------------------------------------------------
 bool ofxJSONElement::open(std::string filename)
 {
+   ScopedLocale numericToC;
    juce::File file(filename);
    
    if (file.exists())
@@ -68,6 +95,7 @@ bool ofxJSONElement::open(std::string filename)
 //--------------------------------------------------------------
 bool ofxJSONElement::save(std::string filename, bool pretty)
 {
+   ScopedLocale numericToC;
    filename = ofToDataPath(filename);
    juce::File file(filename);
    file.create();
@@ -92,6 +120,7 @@ bool ofxJSONElement::save(std::string filename, bool pretty)
 //--------------------------------------------------------------
 std::string ofxJSONElement::getRawString(bool pretty)
 {
+   ScopedLocale numericToC;
    std::string raw;
    if(pretty) {
       StyledWriter writer;
