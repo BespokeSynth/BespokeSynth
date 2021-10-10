@@ -37,10 +37,11 @@ script~python scripting for livecoding notes and module control
 ~code~write code here. press ctrl-R to execute the code, or ctrl-shift-R to just execute the current block.
 ~run~click here to execute the code, or press ctrl-R
 ~stop~cancel any events scheduled by this script
-~a~variable for the script to use, can be modulation by other sources
-~b~variable for the script to use, can be modulation by other sources
-~c~variable for the script to use, can be modulation by other sources
-~d~variable for the script to use, can be modulation by other sources
+~a~variable for the script to use, can be modulation by other sources. access via me.get("a")
+~b~variable for the script to use, can be modulation by other sources. access via me.get("b")
+~c~variable for the script to use, can be modulation by other sources. access via me.get("c")
+~d~variable for the script to use, can be modulation by other sources. access via me.get("d")
+~style~choose a text theme, from script_styles.json
 
 
 
