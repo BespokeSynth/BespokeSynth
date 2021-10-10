@@ -39,7 +39,7 @@ public:
    ~Selector();
    static IDrawableModule* Create() { return new Selector(); }
    
-   std::string GetTitleLabel() override { return "selector"; }
+   
    void CreateUIControls() override;
    
    void RadioButtonUpdated(RadioButton* radio, int oldVal) override;

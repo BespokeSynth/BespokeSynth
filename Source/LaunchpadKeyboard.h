@@ -48,7 +48,7 @@ public:
    ~LaunchpadKeyboard();
    static IDrawableModule* Create() { return new LaunchpadKeyboard(); }
    
-   std::string GetTitleLabel() override { return "gridkeyboard"; }
+   
    void CreateUIControls() override;
    void Init() override;
 

@@ -1,3 +1,5 @@
+include(cmake/versiontools.cmake)
+
 juce_add_gui_app(BespokeSynth
     PRODUCT_NAME BespokeSynth
     ICON_BIG ${CMAKE_SOURCE_DIR}/bespoke_icon.png
@@ -8,12 +10,9 @@ juce_add_gui_app(BespokeSynth
     DOCUMENT_BROWSER_ENABLED      TRUE
     )
 
-# Generate build time info for the cpp
-configure_file(VersionInfo.cpp.in geninclude/VersionInfo.cpp)
+bespoke_buildtime_version_info(BespokeSynth)
 
 target_sources(BespokeSynth PRIVATE
-    ${CMAKE_CURRENT_BINARY_DIR}/geninclude/VersionInfo.cpp
-
     ADSR.cpp
     ADSRDisplay.cpp
     Amplifier.cpp
@@ -479,9 +478,8 @@ target_link_libraries(BespokeSynth PRIVATE
     bespoke::nanovg
     bespoke::psmove
     bespoke::push2
+    bespoke::pybind11
     bespoke::xwax
-
-    pybind11::pybind11
 
     tuning-library
     oddsound-mts
@@ -497,3 +495,40 @@ target_link_libraries(BespokeSynth PRIVATE
     ${Python_LIBRARIES}
     $<$<BOOL:${MINGW}>:dbghelp>
     )
+
+
+# Rules to do some installing and packaging which we will have to refactor  but
+# for now gets a nightly going
+set(BESPOKE_PRODUCT_DIR "${CMAKE_BINARY_DIR}/products")
+set(BESPOKE_NIGHTLY_DIR "${CMAKE_BINARY_DIR}/nightly")
+add_custom_command(TARGET BespokeSynth
+        POST_BUILD
+        WORKING_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}
+        COMMAND ${CMAKE_COMMAND} -E make_directory ${BESPOKE_PRODUCT_DIR}
+        )
+add_custom_target(nightly-package)
+add_dependencies(nightly-package BespokeSynth)
+
+if (APPLE)
+    get_target_property(output_dir BespokeSynth RUNTIME_OUTPUT_DIRECTORY)
+    add_custom_command(TARGET BespokeSynth
+            POST_BUILD
+            WORKING_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}
+            COMMAND ${CMAKE_COMMAND} -E copy_directory ${output_dir}/BespokeSynth.app/ ${BESPOKE_PRODUCT_DIR}/BespokeSynth.app
+            )
+
+    add_custom_command(TARGET nightly-package
+            POST_BUILD
+            WORKING_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}
+            COMMAND ${CMAKE_COMMAND} -E make_directory ${BESPOKE_NIGHTLY_DIR}
+            COMMAND hdiutil create /tmp/tmp.dmg -ov -volname "BespokeSynth" -fs HFS+ -srcfolder "${BESPOKE_PRODUCT_DIR}"
+            COMMAND hdiutil convert /tmp/tmp.dmg -format UDZO -o "${BESPOKE_NIGHTLY_DIR}/BespokeNightly.dmg"
+            )
+else()
+    add_custom_command(TARGET nightly-package
+            POST_BUILD
+            WORKING_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}
+            COMMAND ${CMAKE_COMMAND} -E make_directory ${BESPOKE_NIGHTLY_DIR}
+            COMMAND ${CMAKE_COMMAND} -E echo "coming soon}" > ${BESPOKE_NIGHTLY_DIR}/installer.txt
+            )
+endif()

@@ -92,7 +92,6 @@ public:
    ~Scale();
    void Init() override;
    
-   std::string GetTitleLabel() override { return "scale"; }
    void CreateUIControls() override;
    
    bool IsSingleton() const override { return true; }

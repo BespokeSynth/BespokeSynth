@@ -41,7 +41,7 @@ public:
    virtual ~TakeRecorder();
    static IDrawableModule* Create() { return new TakeRecorder(); }
    
-   std::string GetTitleLabel() override { return "take recorder"; }
+   
    void CreateUIControls() override;
    
    //IAudioProcessor

@@ -40,7 +40,7 @@ public:
    virtual ~AudioSend();
    static IDrawableModule* Create() { return new AudioSend(); }
    
-   std::string GetTitleLabel() override { return "send"; }
+   
    void CreateUIControls() override;
 
    void SetSend(float amount, bool crossfade) { mAmount = amount; mCrossfade = crossfade; }

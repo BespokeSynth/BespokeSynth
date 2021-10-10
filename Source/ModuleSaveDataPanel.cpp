@@ -103,7 +103,7 @@ void ModuleSaveDataPanel::ReloadSaveData()
    
    mAlignmentX = 10 + maxWidth;
    int x = mAlignmentX;
-   int y = 5;
+   int y = 5 + itemSpacing;
    
    TextEntry* nameEntry = new TextEntry(this,"",x,y,27,mSaveModule->NameMutable());
    mSaveDataControls.push_back(nameEntry);
@@ -198,9 +198,13 @@ void ModuleSaveDataPanel::DrawModule()
 {
    if (Minimized() || mAppearAmount < 1)
       return;
-   
+
    int x = mAlignmentX-5;
    int y = 5;
+
+   DrawTextLeftJustify("type", x, y + 12);
+   DrawTextBold(mSaveModule->GetTypeName(), mAlignmentX, y + 12);
+   y += itemSpacing;
    
    DrawTextLeftJustify("name", x, y+12);
    y += itemSpacing;

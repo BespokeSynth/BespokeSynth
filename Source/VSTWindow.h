@@ -50,6 +50,8 @@ public:
    
    VSTWindow(VSTPlugin* vst, Component* pluginEditor, WindowFormatType);
    ~VSTWindow();
+
+   void ShowWindow();
    
    static VSTWindow* CreateWindow(VSTPlugin* vst, WindowFormatType);
    

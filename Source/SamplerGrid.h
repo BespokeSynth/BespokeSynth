@@ -50,7 +50,7 @@ public:
    ~SamplerGrid();
    static IDrawableModule* Create() { return new SamplerGrid(); }
    
-   std::string GetTitleLabel() override { return "sampler grid"; }
+   
    void CreateUIControls() override;
    
    void Init() override;

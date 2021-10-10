@@ -36,7 +36,7 @@ public:
    ChordDisplayer();
    static IDrawableModule* Create() { return new ChordDisplayer(); }
    
-   std::string GetTitleLabel() override { return "chord displayer"; }
+   
    
    //INoteReceiver
    void PlayNote(double time, int pitch, int velocity, int voiceIdx = -1, ModulationParameters modulation = ModulationParameters()) override;

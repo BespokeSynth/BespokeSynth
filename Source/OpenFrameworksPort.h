@@ -198,8 +198,9 @@ private:
 
 typedef ofVec2f ofPoint;
 
-std::string ofToDataPath(std::string path, bool makeAboslute = false);
-std::string ofToResourcePath(std::string path, bool makeAboslute = false);
+std::string ofToDataPath(const std::string& path);
+std::string ofToFactoryPath(const std::string& path);
+std::string ofToResourcePath(const std::string& path);
 void ofPushStyle();
 void ofPopStyle();
 void ofPushMatrix();

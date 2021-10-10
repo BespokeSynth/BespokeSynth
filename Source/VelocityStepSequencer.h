@@ -48,7 +48,7 @@ public:
    ~VelocityStepSequencer();
    static IDrawableModule* Create() { return new VelocityStepSequencer(); }
    
-   std::string GetTitleLabel() override { return "velocity seq"; }
+   
    void CreateUIControls() override;
    void Init() override;
    

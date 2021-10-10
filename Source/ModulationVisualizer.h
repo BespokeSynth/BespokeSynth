@@ -37,7 +37,7 @@ public:
    ModulationVisualizer();
    static IDrawableModule* Create() { return new ModulationVisualizer(); }
    
-   std::string GetTitleLabel() override { return "modulation visualizer"; }
+   
    
    void SetEnabled(bool enabled) override { mEnabled = enabled; }
    

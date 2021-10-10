@@ -118,7 +118,7 @@ public:
    
    static IAudioEffect* Create() { return new Compressor(); }
    
-   std::string GetTitleLabel() override { return "compressor"; }
+   
    void CreateUIControls() override;
 
    //IAudioEffect

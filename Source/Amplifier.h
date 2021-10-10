@@ -39,7 +39,7 @@ public:
    virtual ~Amplifier();
    static IDrawableModule* Create() { return new Amplifier(); }
    
-   std::string GetTitleLabel() override { return "gain"; }
+   
    void CreateUIControls() override;
    
    //IAudioSource

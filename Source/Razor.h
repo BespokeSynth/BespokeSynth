@@ -55,7 +55,7 @@ public:
    ~Razor();
    static IDrawableModule* Create() { return new Razor(); }
    
-   std::string GetTitleLabel() override { return "razor"; }
+   
    void CreateUIControls() override;
    
    //IAudioSource

@@ -39,7 +39,7 @@ public:
    virtual ~NoteToFreq();
    static IDrawableModule* Create() { return new NoteToFreq(); }
    
-   std::string GetTitleLabel() override { return "notetofreq"; }
+   
    void CreateUIControls() override;
    
    void SetEnabled(bool enabled) override { mEnabled = enabled; }

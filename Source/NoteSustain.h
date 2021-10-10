@@ -38,7 +38,7 @@ public:
    ~NoteSustain();
    static IDrawableModule* Create() { return new NoteSustain(); }
    
-   std::string GetTitleLabel() override { return "note duration"; }
+   
    void CreateUIControls() override;
    void Init() override;
    

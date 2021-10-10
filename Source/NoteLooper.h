@@ -45,7 +45,7 @@ public:
    ~NoteLooper();
    static IDrawableModule* Create() { return new NoteLooper(); }
    
-   std::string GetTitleLabel() override { return "note looper"; }
+   
    void CreateUIControls() override;
    void Init() override;
    void SetEnabled(bool enabled) override { mEnabled = enabled; }

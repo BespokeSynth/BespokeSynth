@@ -49,7 +49,10 @@ public:
 #if BESPOKE_LINUX
       ofLog() << "   install prefix  : '" << Bespoke::CMAKE_INSTALL_PREFIX << "'";
 #endif
-      
+      ofLog() << "   git hash        : " << Bespoke::GIT_HASH;
+      ofLog() << "   git branch      : " << Bespoke::GIT_BRANCH;
+      ofLog() << "   build time      : " << Bespoke::BUILD_DATE << " at " << Bespoke::BUILD_TIME;
+
       openGLContext.setOpenGLVersionRequired(juce::OpenGLContext::openGL3_2);
       openGLContext.setContinuousRepainting(false);
       openGLContext.setComponentPaintingEnabled(false);

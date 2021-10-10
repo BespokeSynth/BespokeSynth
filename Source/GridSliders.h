@@ -42,7 +42,7 @@ public:
    ~GridSliders();
    static IDrawableModule* Create() { return new GridSliders(); }
 
-   std::string GetTitleLabel() override { return "grid sliders"; }
+   
    void CreateUIControls() override;
 
    //IDrawableModule
