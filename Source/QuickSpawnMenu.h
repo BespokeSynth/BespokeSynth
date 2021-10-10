@@ -29,6 +29,8 @@
 
 #include "IDrawableModule.h"
 
+#include "juce_core/juce_core.h"
+
 class QuickSpawnMenu : public IDrawableModule
 {
 public:
@@ -37,6 +39,7 @@ public:
    
    void Init() override;
    void DrawModule() override;
+   void DrawModuleUnclipped() override;
    void SetDimensions(int w, int h) { mWidth = w; mHeight = h; }
    bool HasTitleBar() const override { return false; }
    bool IsSaveable() override { return false; }
@@ -50,15 +53,18 @@ public:
    
 private:
    std::string GetModuleTypeNameAt(int x, int y);
+   void UpdateDisplay();
+
    void OnClicked(int x, int y, bool right) override;
    bool MouseMoved(float x, float y) override;
    void GetDimensions(float& width, float& height) override { width = mWidth; height = mHeight; }
    float mWidth;
    float mHeight;
    std::vector<std::string> mElements;
-   char mCurrentMenuChar;
    int mLastHoverX;
    int mLastHoverY;
+   juce::String mHeldKeys;
+   ofVec2f mAppearAtMousePos;
 };
 
 extern QuickSpawnMenu* TheQuickSpawnMenu;
