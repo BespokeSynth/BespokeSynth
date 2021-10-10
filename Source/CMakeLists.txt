@@ -497,9 +497,8 @@ target_link_libraries(BespokeSynth PRIVATE
     bespoke::nanovg
     bespoke::psmove
     bespoke::push2
+    bespoke::pybind11
     bespoke::xwax
-
-    pybind11::pybind11
 
     tuning-library
     oddsound-mts

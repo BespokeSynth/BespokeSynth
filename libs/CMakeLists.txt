@@ -7,7 +7,13 @@ add_subdirectory(nanovg EXCLUDE_FROM_ALL)
 add_subdirectory(oddsound-mts EXCLUDE_FROM_ALL)
 add_subdirectory(psmove EXCLUDE_FROM_ALL)
 add_subdirectory(push2 EXCLUDE_FROM_ALL)
+
 set(PYBIND11_NOPYTHON TRUE)
 add_subdirectory(pybind11 EXCLUDE_FROM_ALL)
+add_library(bespoke_pybind11_wrapper INTERFACE)
+target_compile_definitions(bespoke_pybind11_wrapper INTERFACE PYBIND11_EXPORT=)
+target_link_libraries(bespoke_pybind11_wrapper INTERFACE pybind11::pybind11)
+add_library(bespoke::pybind11 ALIAS bespoke_pybind11_wrapper)
+
 add_subdirectory(tuning-library EXCLUDE_FROM_ALL)
 add_subdirectory(xwax EXCLUDE_FROM_ALL)
