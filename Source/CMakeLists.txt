@@ -1,3 +1,5 @@
+include(cmake/versiontools.cmake)
+
 juce_add_gui_app(BespokeSynth
     PRODUCT_NAME BespokeSynth
     ICON_BIG ${CMAKE_SOURCE_DIR}/bespoke_icon.png
@@ -8,30 +10,9 @@ juce_add_gui_app(BespokeSynth
     DOCUMENT_BROWSER_ENABLED      TRUE
     )
 
-# Generate build time info for the cpp
-configure_file(VersionInfo.cpp.in geninclude/VersionInfo.cpp)
-
-option(BESPOKE_RELIABLE_VERSION_INFO "Update version info on every build (off: generate only at configuration time)" ON)
-if(BESPOKE_RELIABLE_VERSION_INFO)
-    add_custom_target(version-info BYPRODUCTS ${CMAKE_CURRENT_BINARY_DIR}/geninclude/VersionInfoBld.cpp
-            WORKING_DIRECTORY ${CMAKE_SOURCE_DIR}
-            COMMAND ${CMAKE_COMMAND} -D CMAKE_PROJECT_VERSION_MAJOR=${CMAKE_PROJECT_VERSION_MAJOR}
-            -D CMAKE_PROJECT_VERSION_MINOR=${CMAKE_PROJECT_VERSION_MINOR}
-            -D BESPOKESRC=${CMAKE_SOURCE_DIR} -D BESPOKEBLD=${CMAKE_CURRENT_BINARY_DIR}
-            -D WIN32=${WIN32}
-            -P ${CMAKE_SOURCE_DIR}/cmake/versiontools.cmake
-            )
-    add_dependencies(BespokeSynth version-info)
-else()
-    set(BESPOKESRC ${CMAKE_CURRENT_SOURCE_DIR})
-    set(BESPOKEBLD ${CMAKE_CURRENT_BINARY_DIR})
-    include(${CMAKE_SOURCE_DIR}/cmake/versiontools.cmake)
-endif()
+bespoke_buildtime_version_info(BespokeSynth)
 
 target_sources(BespokeSynth PRIVATE
-    ${CMAKE_CURRENT_BINARY_DIR}/geninclude/VersionInfo.cpp
-    ${CMAKE_CURRENT_BINARY_DIR}/geninclude/VersionInfoBld.cpp
-
     ADSR.cpp
     ADSRDisplay.cpp
     Amplifier.cpp
