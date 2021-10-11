@@ -912,7 +912,7 @@ void ScriptModule::RefreshStyleFiles()
         root.open(ofToResourcePath("userdata_original/script_styles.json"));
 
     mStyleJSON = root["styles"];
-    for (size_t i = 0; i < mStyleJSON.size(); ++i)
+    for (auto i = 0; i < mStyleJSON.size(); ++i)
     {
         mScriptStyleSelector->AddLabel(mStyleJSON[i]["name"].asString(), i);
     }

@@ -206,7 +206,7 @@ void DrumPlayer::SetUpNewDrumPlayer()
 
    std::array<std::string, NUM_DRUM_HITS> categories = { "808kit/Kick", "808kit/Snare", "808kit/HatClosed", "808kit/HatOpen", "808kit/Kick", "808kit/Clap", "808kit/HatClosed", "808kit/Perc",
                                                "808kit/Kick", "808kit/Snare", "808kit/HatClosed", "808kit/HatOpen", "808kit/Kick", "808kit/Clap", "808kit/HatClosed", "808kit/Perc" };
-   for (size_t i = 0; i < root["directories"].size() && i < categories.size(); ++i)
+   for (auto i = 0; i < root["directories"].size() && i < categories.size(); ++i)
       categories[i] = root["directories"][i].asString();
 
    for (int i = 0; i < NUM_DRUM_HITS; ++i)
