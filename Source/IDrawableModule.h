@@ -157,10 +157,10 @@ public:
    virtual bool HasDebugDraw() const { return false; }
    virtual bool HasPush2OverrideControls() const { return false; }
    virtual void GetPush2OverrideControls(std::vector<IUIControl*>& controls) const { }
+   std::vector<PatchCableSource*> GetPatchCableSources() const { return mPatchCableSources; }
    
    //IPatchable
    PatchCableSource* GetPatchCableSource(int index=0) override { if (index == 0) return mMainPatchCableSource; else return mPatchCableSources[index]; }
-   std::vector<PatchCableSource*> GetPatchCableSources() { return mPatchCableSources; }
    
    static void FindClosestSides(float xThis, float yThis, float wThis, float hThis, float xThat, float yThat, float wThat, float hThat, float& startX, float& startY, float& endX, float& endY, bool sidesOnly = false);
    
@@ -214,6 +214,7 @@ private:
    bool mCanReceivePulses;
 
    ofMutex mSliderMutex;
+   ofMutex mCableSourceMutex;
    
    PatchCableSource* mMainPatchCableSource;
    std::vector<PatchCableSource*> mPatchCableSources;
