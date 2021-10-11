@@ -1,13 +1,13 @@
 
 
 
-valuestream~zeigt den Wert eines Steuerelements im Zeitverlauf an. Schließen Sie das Kabel an ein UI-Steuerelement an, um zu sehen, wie es sich verändert.
-~speed~wie schnell die Anzeige scrollen soll
+valuestream~Zeigt den Wert eines Steuerelements im Zeitverlauf an. Schließen Sie das Kabel an ein UI-Steuerelement an, um zu sehen, wie es sich verändert.
+~speed~Wie schnell die Anzeige scrollen soll
 
 
 
-timerdisplay~zeigt einen Timer an, der angibt, wie lange ein Patch bereits läuft
-~reset~timer zurück auf Null setzen
+timerdisplay~Zeigt einen Timer an, der angibt, wie lange ein Patch bereits läuft
+~reset~Timer zurück auf Null setzen
 
 
 
@@ -24,41 +24,42 @@ selector~Optionsschalter, um nur einen Wert auf einmal zu aktivieren. Patchen Si
 
 
 
-scriptstatus~Zeigt alles im aktuellen Python-Scope an, fürs debugging
+scriptstatus~Zeigt alles im aktuellen Python-Scope an, zwecks Debugging
 ~reset all~Setzt Scope-Variablen zurück
 
 
 
-script~Python-Skripting für Livecoding Notizen und Modul Steuerung
+script~Python-Skripting für Livecoding, Noten und Modul Steuerung
 ~loadscript~Wählen Sie hier ein Skript aus, bestätigen Sie mit "load"
-~load~das Ausgewählte Skript laden
+~load~das Ausgewähltes Skript laden
 ~save as~Aktuelles Skript speichern
 ~?~Skripting Referenz anzeigen
 ~code~Hier Code schreiben. strg-R um den Code auszuführen, oder strg-shift-R um nur den aktuellen Block auszuführen.
 ~run~Hier klicken um den Code auszuführen (oder strg-R drücken)
-~stop~alle von diesem Skript veranlassten Ereignisse abbrechen
-~a~Variable die das Skript verwenden soll, kann Modulation durch andere Quellen sein
-~b~Variable die das Skript verwenden soll, kann Modulation durch andere Quellen sein
-~c~Variable die das Skript verwenden soll, kann Modulation durch andere Quellen sein
-~d~Variable die das Skript verwenden soll, kann Modulation durch andere Quellen sein
+~stop~Alle von diesem Skript veranlassten Ereignisse abbrechen
+~a~Variable die das Skript verwenden soll, kann Modulation durch andere Quellen sein, Zugriff über me.get("a")
+~b~Variable die das Skript verwenden soll, kann Modulation durch andere Quellen sein, Zugriff über me.get("b")
+~c~Variable die das Skript verwenden soll, kann Modulation durch andere Quellen sein, Zugriff über me.get("c")
+~d~Variable die das Skript verwenden soll, kann Modulation durch andere Quellen sein, Zugriff über me.get("d")
+~style~Ein "text theme" unter script_styles.json auswählen
 
 
 
 radiosequencer~Sequenz um nur einen Wert auf einmal zu aktivieren. Patchen Sie es auf die "aktiviert" checkbox in einigen Modulen, um nur ein Modul auf einmal zu aktivieren. funktioniert gut in Verbindung mit dem Modul "groupcontrol".
 ~interval~Rate zum Vorrücken
 ~length~Länge der Sequenz
-~grid~ein Raster aus einem "midicontroller"-Modul hier reinpatchen
+~grid~Ein Raster aus einem "midicontroller"-Modul hier reinpatchen
 
 
 
-presets~Speichern und Wiederherstellen von Werte-Sets. Verbinden Sie den grauen Kreis mit Modulen, um alle Steuerelemente dieses Moduls zu beeinflussen. Verbinden Sie den violetten Kreis mit einem Steuerelement, um nur dieses Steuerelement zu beeinflussen. Klicken Sie mit gedrückter Umschalttaste auf das Raster, um eine Voreinstellung in diesem Feld zu speichern, und klicken Sie auf ein Rasterfeld, um diese Voreinstellung zu laden.
+presets~Speichern und Wiederherstellen von Werte-Sets. Verbinden Sie den grauen Kreis mit Modulen, um alle Steuerelemente dieses Moduls zu beeinflussen. Verbinden Sie den violetten Kreis mit einem Steuerelement, um nur dieses Steuerelement zu beeinflussen. Klicken Sie mit gedrückter Shifttaste auf das Raster, um eine Voreinstellung in diesem Feld zu speichern, und klicken Sie auf ein Rasterfeld, um diese Voreinstellung zu laden.
 ~save~[todo]
 ~blend ms~Dauer der Überblendung voreingestellter Werte
 ~preset~Zu einer Voreinstellung springen
 
 
 
-prefab~Erstellen sie eine Sammlung von Modulen, die über das Menü "prefabs" geladen werden können. Ziehen sie die Module hierher, um sie der prefab hinzuzufügen. Ziehen sie das graue Kabel zu allen Modulen, die sie aus der prefab entfernen möchten.
+prefab~Erstellen Sie eine Sammlung von Modulen, die über das Menü "prefabs" geladen werden können. Ziehen Sie die Module hierher, um sie der prefab hinzuzufügen. Ziehen Sie das graue Kabel zu allen Modulen, die Sie aus der prefab entfernen möchten.
 ~save~als .pfb Datei speichern
 ~load~.pfb laden
 ~disband~Alle Module aus dieser prefab freigeben
@@ -92,7 +93,7 @@ loopergranulator~Zur Bentzung mit einem "looper" Modul um die Inhalte mittels Gr
 ~pos rand~Randomisierung des Grain Startpunkts
 ~speed rand~Randomisierung der Graingeschwindigkeit
 ~spacing rand~Randomisierung der Zeit zwischen Grains
-~octaves~sollen wir Oktaven und Quinten hinzufügen?
+~octaves~Sollen wir Oktaven und Quinten hinzufügen?
 ~width~Stereobreite der Grainplatzierung
 
 
@@ -120,18 +121,18 @@ globalcontrols~Interface-Steuerungen, die es Ihnen ermöglichen sollen, Midi-Con
 
 
 
-eventcanvas~schedule values to set over time
+eventcanvas~Geplante Werte im Zeitverlauf festlegen
 ~quantize~Rasterquantisierung von Events
 ~measures~Länge des Loops
 ~interval~Gitter für das Einrasten von Events
 ~record~Aufzeichnung verbundener Werte bei deren Änderung
-~canvas~Canvas of Events. Canvas Steuerungen:\n-Shift-Klick um ein Event hinzuzufügen\n-Shift-Taste halten und Event ziehen zum Duplizieren\n-Alt-Taste halten um ein Event ohne Einrasten zu ziehen\n-Strg + ziehen rastet zum interval\n-Shift-Scroll für Zoom\n-Halten Sie die Alt-Taste gedrückt und greifen Sie ein leeres Feld, um die Canvas-Ansicht zu verschieben.\n-Halten Sie die Strg-Taste gedrückt und leeren Raum greifen um die Canvas-Ansicht zu zoomen.
+~canvas~Canvas of Events. Canvas Steuerungen:\n-Shift-Klick um ein Event hinzuzufügen\n-Shift-Taste halten und Event ziehen zum Duplizieren\n-Alt-Taste halten um ein Event ohne Einrasten zu ziehen\n-Strg + ziehen rastet zum interval\n-Shift-Scroll für Zoom\n-Halten Sie die Alt-Taste gedrückt und greifen Sie ein leeres Feld, um die Canvas-Ansicht zu verschieben.\n-Strg-Taste gedrückt halten und leeren Raum greifen um die Canvas-Ansicht zu zoomen.
 ~timeline~Looppunkte steuern
-~delete~hervorgehobene Elemente löschen
+~delete~Hervorgehobene Elemente löschen
 ~view rows~Anzahl sichtbarer Reihen
-~clear~alle Elemente löschen
+~clear~Alle Elemente löschen
 ~drag mode~Richtung in die Elemente gezogen werden können
-~scrollh~horizontale Bildlaufleiste
+~scrollh~Horizontale Bildlaufleiste
 
 
 
@@ -156,7 +157,7 @@ pulsesequence~Definiert eine sich wiederholende Folge von Impulsen
 
 pulser~Senden von Impulsnachrichten in einem Intervall
 ~interval~Rate der Impuls Sendungen
-~timemode~when to send downbeat pulses, or set to "free" for pulses not locked to the transport
+~timemode~Wann Downbeat Impulse gesendet werden sollen, auf "free" setzen für Impulse die nicht auf den Transport gelocked sein sollen.
 ~t~Puls Intervall in Millisekunden
 ~offset~Impulszeitversatz, in Bruchteilen eines Taktes
 ~random~Die gepulsten Module anweisen, ihre Position zufällig zu verändern
@@ -236,7 +237,7 @@ ramper~Überblenden eines Steuerelements auf einen bestimmten Wert über eine be
 
 
 
-pressuretocv~Den Druck einer Note in einen Modulationswert umwandeln
+pressuretocv~Den Andruck einer Note in einen Modulationswert umwandeln
 ~min~Ausgabe für pressure 0
 ~max~Ausgabe für pressure 127
 
@@ -283,7 +284,7 @@ macroslider~Einen Wert nehmen und skalierte Versionen dieses Wertes an mehrere Z
 leveltocv~Einen Modulationswert ausgeben, der auf dem Pegel des eingehenden Audiosignals basiert
 ~gain~Das Eingangssignal mit diesem Wert multiplizieren
 ~attack~Rate des Anstiegs auf den Eingangspegel
-~release~Rate des Abklingens auf den Eingangspegel
+~release~Rate des Abklingens vom Eingangspegel
 ~min~Ausgabe wenn Pegel Null ist
 ~max~Ausgabe wenn Pegel Eins ist
 
@@ -318,28 +319,28 @@ fubble~Zeichnen Sie auf ein X/Y-Pad und spielen Sie die Zeichnung ab, um Werte z
 expression~Modulation mittels textbasiertem mathematischen Ausdruck formen
 ~y=~Ausdruck zur Änderung der Eingabe. Versuchen sie etwas wie "x+sin(x*pi*a)". Verfügbare Variablen: a,b,c,d,e = die Slider unten. t = Zeit.
 ~input~Eingabe zur Verwendung als x Variable
-~a~Variable zur Verwendung in expressions
-~b~Variable zur Verwendung in expressions
-~c~Variable zur Verwendung in expressions
-~d~Variable zur Verwendung in expressions
-~e~Variable zur Verwendung in expressions
+~a~Variable zur Verwendung im Ausdruck
+~b~Variable zur Verwendung im Ausdruck
+~c~Variable zur Verwendung im Ausdruck
+~d~Variable zur Verwendung im Ausdruck
+~e~Variable zur Verwendung im Ausdruck
 
 
 
-envelope~modulate a value with a triggered envelope
-~advanced~switch to advanced envelope editor (allows for a more complicated envelope than just an ADSR). double-click on an advanced envelope line to add stages, right click on points to remove them, drag on lines to bend them.
+envelope~Einen Wert mit einer getriggerten Hüllkurve modulieren
+~advanced~Zum erweiterten Hüllkurven-Editor wechseln (ermöglicht komplexere Hüllkurven statt nur ADSR). Doppellicken Sie auf eine erweiterte Hüllkurvenlinie, um Stufen hinzuzufügen, klicken Sie mit der rechten Maustaste auf Punkte, um sie zu entfernen, ziehen Sie an Linien, um sie zu verbiegen.
 ~adsr~Hüllkurvenansicht
-~adsrA~envelope attack
-~adsrD~envelope decay
-~adsrS~envelope sustain
-~adsrR~envelope release
-~low~niedrigen Wert ausgeben
-~high~hohen Wert ausgeben
+~adsrA~Hüllkurven Attack
+~adsrD~Hüllkurven Decay
+~adsrS~Hüllkurven Sustain
+~adsrR~Hüllkurven Release
+~low~Niedrigen Wert ausgeben
+~high~Hohen Wert ausgeben
 ~length~Länge der Hüllkurvenansicht
 ~use velocity~Soll der Hüllkurven Ausgang durch den Anschlag des Eingangs skaliert werden?
 ~has sustain~Soll diese Hüllkurve eine Sustain Phase haben?
 ~sustain stage~Welche Stufe des Hüllkurvenverlaufs soll den Sustain haben?
-~max sustain~Wie lang ist die maximale Dauer des Sustain in Millisekunden? Ein Wert von -1 bedeutet, dass es keine maximale Dauer gibt.
+~max sustain~Wie lang ist die maximale Dauer des Sustain in Millisekunden? Ein Wert von -1 bedeutet, kein Maximum.
 
 
 
@@ -363,8 +364,8 @@ controlsequencer~Eine Steuerung stufenweise in einem Intervall modulieren
 
 audiotocv~Ein Audiosignal zur Modulation einer Steuerung verwenden. Ermöglicht eine Modulation der Audiorate, um Effekte wie FM zu erzielen.
 ~gain~Wert eingehender Audio Signale ändern 
-~min~minimaler Ausgangswert
-~max~maximaler Ausgangswert
+~min~Minimaler Ausgangswert
+~max~Maximaler Ausgangswert
 
 
 
@@ -383,7 +384,7 @@ add~Gibt das Ergebnis von Wert 1 plus Wert 2 aus. Wert 1 und Wert 2 sind als Pat
 
 accum~Wert über die Zeit anhäufen
 ~value~Ausgabewert
-~velocity~zu akkumulierende Menge
+~velocity~Zu akkumulierende Menge
 
 
 
@@ -425,7 +426,7 @@ playsequencer~Drum-Sequenzer, mit dem Sie Steps einspielen und aufnehmen können
 ~link columns~Ob das Steuerelement für das Stummschalten/Löschen für die gesamte Spalte verwendet werden soll
 ~store*~Die gegenwärtige Sequenz in diesem Slot speichern
 ~load*~Die in diesem Slot gespeicherte Sequenz laden
-~mute/delete*~Wenn Schreiben deaktiviert ist, wird diese Zeile stummgeschaltet. Wenn Schreiben aktiviert ist, werden die Schritte gelöscht, wenn der Abspielkopf sie passiert.
+~mute/delete*~Wenn Schreiben deaktiviert ist, wird diese Zeile stummgeschaltet. Wenn Schreiben aktiviert ist, werden die Schritte gelöscht, sobald der Abspielkopf sie passiert.
 
 
 
@@ -465,19 +466,19 @@ notelooper~Note-Loop-Recorder mit Overdubbing- und Ersetzungsfunktion
 ~write~Soll der Eingang aufgenommen werden?
 ~del/mute~Wenn "Schreiben" aktiviert ist, werden die Noten gelöscht, wenn der Abspielkopf über sie hinwegfährt, andernfalls werden sie einfach stummgeschaltet.
 ~num bars~Looplänge in Takten festlegen
-~clear~pattern entfernen
-~store*~pattern speichern
-~load*~pattern wiederherstellen
+~clear~Pattern entfernen
+~store*~Pattern speichern
+~load*~Pattern wiederherstellen
 ~canvas~Canvas mit aufgenommenen Noten
 
 
 
-notecreator~eine einmalige Note erstellen
+notecreator~Eine einmalige Note erstellen
 ~pitch~Tonhöhe der Note ausgeben
 ~trigger~Drücken, um eine Note für eine bestimmte Dauer auszulösen
 ~on~Einschalten um Note zu starten, abschalten um Note zu beenden 
 ~velocity~Anschlagsgeschwindigkeit der Note
-~duration~Notenlänge wenn "trigger" button genutzt wird
+~duration~Notenlänge wenn "trigger" Button genutzt wird
 
 
 
@@ -491,16 +492,16 @@ notecounter~Sequentielles Durchlaufen der Tonhöhen. Nützlich für die Steuerun
 
 
 
-notechain~eine Note auslösen, gefolgt von einem Impuls, um eine weitere Note nach einer Verzögerung auszulösen
+notechain~Eine Note auslösen, gefolgt von einem Impuls, um eine weitere Note nach einer Verzögerung auszulösen
 ~pitch~Die abgespielte Tonhöhe
-~trigger~play note for this chain node
+~trigger~Note für diese "chain node" abspielen
 ~velocity~Anschlagsgeschwindigkeit der Note
 ~duration~Dauer der Note, in Takten
 ~next~Intervall bis zum Senden des Impulses
 
 
 
-notecanvas~Looping-Note-Roll
+notecanvas~Loop-Noten-Rolle
 ~quantize~Ausgewählte Note zum Intervall quantisieren
 ~play~Note auf Canvas spielen
 ~rec~Eingehende Noten in Canvas aufnehmen
@@ -508,7 +509,7 @@ notecanvas~Looping-Note-Roll
 ~measures~Looplänge
 ~show chord intervals~Klammern anzeigen, um Akkordbeziehungen anzuzeigen
 ~interval~Intervall zu welchem quantisiert werden soll
-~canvas~Canvas of Notes. Canvas Steuerung:\n-Shift-Klick um ein Note hinzuzufügen\n-Shift halten und Note ziehen zum Duplizieren\n-Halten Sie die Alt-Taste gedrückt, um eine Notiz ohne Einrasten zu ziehen.\n-Halten Sie beim Ziehen die Strg-Taste gedrückt, um auf ein Intervall einzurasten\n-Shift-Scroll zum zoomen\n-Halten Sie die Alt-Taste gedrückt und greifen Sie einen leeres Bereich, um die Leinwand zu verschieben. view\n-Halten Sie die Strg-Taste gedrückt und greifen Sie einen leeren Bereich, um die Leinwandansicht zu vergrößern.
+~canvas~Canvas of Notes. Canvas Steuerung:\n-Shift-Klick um ein Note hinzuzufügen\n-Shift halten und Note ziehen zum Duplizieren\n-Halten Sie die Alt-Taste gedrückt, um eine Note ohne Einrasten zu ziehen.\n-Halten Sie beim Ziehen die Strg-Taste gedrückt, um auf ein Intervall einzurasten\n-Shift-Scroll zum zoomen\n-Halten Sie die Alt-Taste gedrückt und greifen Sie einen leeres Bereich, um die Leinwand zu verschieben. view\n-Halten Sie die Strg-Taste gedrückt und greifen Sie einen leeren Bereich, um die Leinwandansicht zu vergrößern.
 ~timeline~Looppunkte steuern
 ~delete~Hervorgehobene Elemente löschen
 ~view rows~Anzahl sichtbarer Zeilen
@@ -519,7 +520,7 @@ notecanvas~Looping-Note-Roll
 
 
 
-midicontroller~Midi Input von externen Geräten erhalten. Um eine schöne Anzeige in der "Layout"-Ansicht zu erhalten, erstellen Sie eine .json-Datei mit dem gleichen Namen wie Ihr Controller, um das Layout Ihres Controllers zu beschreiben, und legen Sie sie in Ihrem "data/controllers"-Verzeichnis ab. schauen Sie sich die anderen Dateien in diesem Verzeichnis für Beispiele an.
+midicontroller~Midi Input von externen Geräten erhalten. Um eine schöne Anzeige in der "layout"-Ansicht zu erhalten, erstellen Sie eine .json-Datei mit dem gleichen Namen wie Ihr Controller, um das Layout Ihres Controllers zu beschreiben, und legen Sie sie in Ihrem "data/controllers"-Verzeichnis ab. Schauen Sie sich die anderen Dateien in diesem Verzeichnis für Beispiele an.
 ~controller~Verwendetes Midi-Gerät
 ~mappingdisplay~Welche Mapping-Ansicht zu sehen ist
 ~bind (hold shift)~Wenn diese Funktion aktiviert ist, können Sie eine Midi-Eingabe einem UI-Steuerelement zuordnen, indem Sie mit dem Mauszeiger über ein UI-Steuerelement fahren, die Umschalttaste gedrückt halten und dann die gewünschte Midi-Eingabe verwenden.
@@ -536,13 +537,13 @@ midicontroller~Midi Input von externen Geräten erhalten. Um eine schöne Anzeig
 ~midi on~Das obere Ende des Midi-Bereichs. Senden Sie diesen Wert, wenn der gewünschte Regler eingeschaltet ist. Wenn "scale" aktiviert ist, steuert dies auch das obere Ende des Schiebereglerbereichs, und Sie können midi off auf einen höheren Wert als midi on setzen, um die Richtung eines Schiebereglers umzukehren.
 ~scale~Soll der Ausgang dieses Midi-Sliders zwischen "midi off" und "midi on" skaliert werden?
 ~blink~Wenn die anvisierte Steuerung aktiviert ist, abwechselnd Ein/Aus-Nachrichten senden, um die zugehörige LED blinken zu lassen.
-~increment~Wenn "controltype" auf "set" oder "release" steht, wird der anvisierte Regler um diesen Betrag erhöht (und das Feld "value" wird ignoriert). Wenn "controltype" auf "slider" steht, wird der anvisierte Regler um diesen Betrag in der Richtung geändert, in der der Regler geändert wurde (diese Einstellung ist nützlich für "infinite encoders")
+~increment~Wenn "controltype" auf "set" oder "release" steht, wird der anvisierte Regler um diesen Betrag erhöht (und das Feld "value" wird ignoriert). Wenn "controltype" auf "slider" steht, wird der anvisierte Regler um diesen Betrag in die Richtung geändert, in welche der Regler geändert wurde (diese Einstellung ist nützlich für "infinite encoders")
 ~twoway~Sollen wir eine Rückmeldung an den Controller senden? (zur Steuerung der mit Taste/Knopf verbundenen LEDs)
 ~feedback~An welche CC oder Note sollen wir die Rückmeldung senden?
 ~pageless~Soll diese Verbindung über alle Seiten des Midicontrollers hinweg funktionieren?
 ~ x ~Diese Verbindung löschen
 ~copy~Diese Verbindung duplizieren
-~layout~Welche Layout-Datei sollten wir für diesen Controller verwenden? Diese können im Ordner Documents/BespokeSynth/controllers erstellt werden.
+~layout~Welche Layout-Datei sollen wir für diesen Controller verwenden? Diese können im Ordner Documents/BespokeSynth/controllers erstellt werden.
 ~monome~Welchen Monome sollen wir nehmen?
 
 
@@ -554,9 +555,9 @@ keyboarddisplay~Zeigt eingegebene Noten auf einer Tastatur an und ermöglicht es
 gridkeyboard~Rasterbasiertes Keyboard, Vornehmlich für 64-Pad Grid-Controller gedacht
 ~layout~Keyboard Style
 ~octave~Basisoktave
-~latch~lVerriegelung von Tastendrücken, d. h. Sie drücken einmal, um eine Note zu spielen, und erneut, um eine Note loszulassen
+~latch~Verriegelung von Tastendrücken, d. h. Sie drücken einmal, um eine Note zu spielen, und erneut, um eine Note loszulassen
 ~arrangement~Welcher Layout-Style sollverwendet werden?
-~ch.latch~latch chord button presses
+~ch.latch~Verriegelung des Akkordtastendrucks
 ~p.root~Für chorder, Grundton immer spielen lassen
 ~grid~Ein Raster aus einem "midicontroller"-Modul hier reinpatchen
 
@@ -638,7 +639,7 @@ vocodercarrier~Schließen Sie die Module "vocoder" oder "fftvocoder" an. Senden 
 
 
 
-vocoder~Frequenzband basierter Vocoder.  Muss mit einem "Vocodercarrier"-Modul gepaart werden. Die Stimme sollte in dieses Modul geroutet werden, und ein Synthesizer sollte in den Vocodercarrier gepatcht werden.
+vocoder~Frequenzband basierter Vocoder.  Muss mit einem "vocodercarrier"-Modul gepaart werden. Die Stimme sollte in dieses Modul geroutet werden, und ein Synthesizer sollte in den Vocodercarrier gepatcht werden.
 ~input~Eingangssignal-Verstärkung
 ~carrier~Carrier-Signal-Verstärkung
 ~volume~Ausgangsverstärkung
@@ -669,7 +670,7 @@ stutter~erfasst und stottert die Eingabe
 ~reverse~Umgekehrtes Halbtonstottern
 ~ramp in~Stottern mit ansteigender Geschwindigkeit von Null auf Eins
 ~ramp out~Stottern mit schnell auf Null abfallender Geschwindigkeit
-~tumble up~beschleunigendes Stottern
+~tumble up~Beschleunigendes Stottern
 ~tumble down~Verlangsamendes Stottern
 ~half speed~Stottern bei halber Geschwindigkeit, tiefe Tonlage
 ~double speed~Stottern bei doppelter Geschwindigkeit, hohe Tonlage
@@ -689,9 +690,9 @@ spectrum~Anzeige der Spektraldaten des Audiosignals
 
 
 
-signalclamp~begrenzt den Wert eines Audiosignals innerhalb eines Bereichs
-~min~minimaler Ausgangswert
-~max~maximaler Ausgangswert
+signalclamp~Begrenzt den Wert eines Audiosignals innerhalb eines Bereichs
+~min~Minimaler Ausgangswert
+~max~Maximaler Ausgangswert
 
 
 
@@ -721,7 +722,7 @@ samplecapturer~[work in progress]Audio in kurze Clips aufnehmen. Aufnahme starte
 
 
 
-ringmodulator~die Amplitude eines Signals mit einer Frequenz modulieren
+ringmodulator~Die Amplitude eines Signals mit einer Frequenz modulieren
 ~freq~Verwendete Frequenz.  Kann auch durch Anschließen eines Noteneingangs an dieses Modul eingestellt werden.
 ~dry/wet~Wie viel des Originaltons im Vergleich zum modulierten Ton verwendet werden soll
 ~volume~Ausgangslautstärke
@@ -750,14 +751,14 @@ multitapdelay~Delay mit mehreren tap points
 ~display length~Länge der Buffer-Anzeige, in Sekunden
 ~delay *~Tap-Delay-Time, in Millisekunden
 ~gain *~Tap-Delay Betrag
-~feedback *~wie viel verzögertes Audio von diesem Abgriff in den Eingang zurückgeführt werden soll
+~feedback *~Wie viel verzögertes Audio von diesem Abgriff in den Eingang zurückgeführt werden soll
 ~pan *~Stereo Pan für diesen Abgriff.
 
 
 
-looperrewriter~Schreibt den Inhalt eines Loopers mit dem empfangenen Input neu, damit Sie Ihre eigenen Loops neu sampeln können. Der graue Punkt wird an ein "looper"-Modul angeschlossen.\n\ Idealerweise wird dieses Modul direkt an einen "send" angeschlossen, der linke Ausgang des "send" wird mit der Effektverarbeitung verbunden (z. B. mit einer "effectchain"), die Effektverarbeitung wird mit diesem "rewriter" verbunden und der rechte Ausgang des "Sends" wird ebenfalls mit diesem "rewriter" verbunden.
+looperrewriter~Schreibt den Inhalt eines Loopers mit dem empfangenen Input neu, damit Sie Ihre eigenen Loops neu sampeln können. Der graue Punkt wird an ein "looper"-Modul angeschlossen.\n\ Idealerweise wird dieses Modul direkt an einen "send" angeschlossen, der linke Ausgang des "send" wird mit der Effektverarbeitung verbunden (z. B. mit einer "effectchain"), die Effektverarbeitung wird mit diesem "rewriter" verbunden und der rechte Ausgang des "sends" wird ebenfalls mit diesem "rewriter" verbunden.
 ~ go ~Den angeschlossenen Looper umschreiben, und wenn dieser Looper mit einem Send verbunden ist, diesen Send so einstellen, dass er nur am rechten Ausgang ausgegeben wird
-~new loop~Beginnen sie mit der Aufnahme einer dynamischen Looplänge. Drücken sie "go", wenn sie diese in den Looper schreiben wollen. Dies ändert auch das globale tempo von bespoke, um es an den neuen Loop anzupassen. es ist also ziemlich mächtig und beängstigend! klicken sie erneut, um abzubrechen.
+~new loop~Beginnen Sie mit der Aufnahme einer dynamischen Looplänge. Drücken Sie "go", wenn Sie diese in den Looper schreiben wollen. Dies ändert auch das globale Tempo von bespoke, um es an den neuen Loop anzupassen. es ist also ziemlich mächtig und beängstigend! klicken Sie erneut, um abzubrechen.
 
 
 
@@ -770,13 +771,13 @@ looperrecorder~Kommandozentrale zur Verwaltung der Aufzeichnung in mehreren Loop
 ~2xtempo~Verdoppelung des globalen Transporttempos, wobei die angeschlossenen Looper gleich klingend bleiben.
 ~.5tempo~Halbierung des globalen Transporttempos, wobei die angeschlossenen Looper gleich klingend bleiben.
 ~target~Looper an welchen die Audiodaten übertragen werden, wenn Sie die On-Buffer-Capture-Tasten auf der linken Seite verwenden
-~mode~Recorder-Modus: Verwenden Sie "record", um Eingaben aufzuzeichnen und in den Buffer zu übertragen, wenn Sie bereit für eine Loop sind, verwenden Sie "overdub", um Eingaben aufzuzeichnen und den Loop in der von uns festgelegten Länge abzuspielen, und verwenden Sie "loop", um die aktuelle Schleife ohne weitere Eingaben abzuspielen.
-~clear~den aufgezeichneten Buffer löschen
+~mode~Recorder-Modus: Verwenden Sie "record", um Eingaben aufzuzeichnen und in den Buffer zu übertragen, wenn Sie bereit für eine Loop sind, verwenden Sie "overdub", um Eingaben aufzuzeichnen und den Loop in der von uns festgelegten Länge abzuspielen, und verwenden Sie "loop", um den aktuellen Loop ohne weitere Eingaben abzuspielen.
+~clear~Den aufgezeichneten Buffer löschen
 ~free rec~Aktivieren, um die Aufnahme eines Loops ohne vorgegebene Länge zu starten. Deaktivieren, um die Aufnahme zu beenden, den globalen Transport an die Loop-Länge anzupassen und den Modus des Rekorders auf "loop" umzuschalten
 ~cancel free rec~Wenn "free rec" aktiviert ist, die Aufnahme abbrechen, ohne die Loop-Länge festzulegen.
 ~orig speed~Looper auf das Tempo zurücksetzen, mit dem die Loops aufgenommen wurden
 ~snap to pitch~Tempo auf den nächstgelegenen Wert einrasten, der einer Tonart entspricht
-~resample~alle angeschlossenen Looper auf das neue Tempo umrechnen
+~resample~Alle angeschlossenen Looper auf das neue Tempo umrechnen
 ~resample & set key~Einrasten des Tempos auf den nächstgelegenen Wert, der mit einer Tonart übereinstimmt (basierend auf der aktuellen Tonart und der Tempoänderung), Neuabtastung aller angeschlossenen Looper auf dieses neue Tempo und Änderung der globalen Skala auf die neue Tonart
 
 
@@ -797,7 +798,7 @@ looper~Eingehendes Audio loopen. Verwendung mit einem "Looperrecorder" für voll
 ~copy~Kopieren Sie den Inhalt dieses Loopers auf einen anderen. Klicken Sie auf diese Schaltfläche auf der Kopierquelle und dann auf dem Kopierziel.
 ~2x~Loop in doppelter Geschwindigkeit abspielen
 ~.5x~Loop in halber Geschwindigkeit abspielen
-~undo~undo last loop commit
+~undo~Letzte Loop-Entscheidung rückgängig machen
 ~offset~Betrag, um den der Abspielkopf des Loopers von der Transportposition zu versetzt werden soll.
 ~set~Den Inhalt des Loopers so verschieben, dass der aktuelle Offset der Anfang des Buffers ist
 ~scrspd~Wiedergabegeschwindigkeit, wird verwendet, wenn "scr" aktiviert ist. modulieren Sie schnell für einen vinylähnlichen Scratching-Effekt.
@@ -861,7 +862,7 @@ eq~Multi-Band-Equalizer, zur Anpassung der Ausgangspegel in Frequenzbereichen
 
 
 
-effectchain~Container zur Aufnahme einer Liste von Effekten, die nacheinander angewendet werden. Die Effekte können mit den Schaltflächen < und > leicht neu geordnet und mit der Schaltfläche x gelöscht werden. Halten Sie die Shift gedrückt, um eine Schaltfläche x für alle Effekte freizulegen.
+effectchain~Container zur Aufnahme einer Liste von Effekten, die nacheinander angewendet werden. Die Effekte können mit den Schaltflächen < und > leicht neu geordnet und mit der Schaltfläche x gelöscht werden. Halten Sie Shift gedrückt, um eine Schaltfläche x für alle Effekte freizulegen.
 ~volume~Ausgangslautstärke
 ~effect~Auswählen welcher Effekt hinzugefügt werden soll
 ~spawn~Den aktuell markierten Effekt spawnen
@@ -901,10 +902,10 @@ butterworth~Filter nach der Butterworth-Formel
 compressor~Lautstärke auf einem gewissen Level halten
 ~mix~Komprimierungsgrad. Verringern Sie diesen Wert für einen "Parallel-Kompressions"-Effekt. Sie sollten diesen Mix-Schieberegler anstelle des Mix-Schiebereglers der Effektkette verwenden, um "lookahead" zu kompensieren.
 ~threshold~Schwellenwert, ab dem die Verstärkung reduziert werden soll
-~ratio~wie stark die Verstärkung reduziert werden soll, wenn der Schwellenwert überschritten wird
+~ratio~Wie stark die Verstärkung reduziert werden soll, wenn der Schwellenwert überschritten wird
 ~attack~Geschwindigkeit zur Anwendung der Verstärkungsreduzierung
 ~release~Geschwindigkeit zur Aufhebung der Verstärkungsreduzierung
-~lookahead~wie viel Zeit für "look ahead" für die Anpassung der Kompressionshüllkurve zur Verfügung steht. Dies führt zwangsläufig zu einer Verzögerung der Ausgabe, die durch eine etwas frühere Ausführung der Sequenzer kompensiert werden kann.
+~lookahead~Wie viel Zeit für "look ahead" für die Anpassung der Kompressionshüllkurve zur Verfügung steht. Dies führt zwangsläufig zu einer Verzögerung der Ausgabe, die durch eine etwas frühere Ausführung der Sequenzer kompensiert werden kann.
 ~output~Makeup Gain, um die Lautstärke zu erhöhen
 
 
@@ -916,7 +917,7 @@ dcremover~Hochpassfilter mit einer 10-Hz-Grenze zur Beseitigung des DC-Offsets, 
 delay~Echo Delay
 ~delay~Verzögerung in Millisekunden
 ~amount~Anteil der Verzögerung, die zurückkehrt
-~interval~setzt die Verzögerungslänge auf eine musikalische Dauer
+~interval~Setzt die Verzögerungslänge auf eine musikalische Dauer
 ~short~Shortcut zum Verkleinern des Bereichs des Verzögerungsreglers, um hörbare Verzögerungen und Kammfiltersounds zu ermöglichen
 ~dry~Soll das trockene Signal durchgelassen werden oder nur das verzögerte Signal?
 ~feedback~Soll das Ausgangssignal in die Verzögerung zurückgeführt werden?
@@ -946,7 +947,7 @@ formant~[unfertig, kaputt]Filter mit Schwerpunkt auf der Kontrolle von Formanten
 
 freeverb~Nachhall mit dem "Freeverb"-Algorithmus
 ~room size~Steuert die Länge des Nachhalls, ein höherer Wert bedeutet einen längeren Nachhall
-~damp~Dämpfung hoher Frequenzen ; ein Wert von Null bedeutet, dass alle Frequenzen mit der gleichen Geschwindigkeit abklingen, während höhere Einstellungen zu einem schnelleren Abklingen des Hochfrequenzbereichs führen
+~damp~Dämpfung hoher Frequenzen; ein Wert von Null bedeutet, dass alle Frequenzen mit der gleichen Geschwindigkeit abklingen, während höhere Einstellungen zu einem schnelleren Abklingen des Hochfrequenzbereichs führen
 ~wet~Anteil des Hallsignals
 ~dry~Anteil des unberührten Signals
 ~width~Stereo Breite des Halls
@@ -988,8 +989,8 @@ muter~Eingehendes Signal stummschalten
 
 
 noisify~Eingangssignal mit white noise multiplizieren
-~amount~Anzuwndende Rauschmenge
-~width~wie häufig ein neues Noise Sample gewählt werden soll
+~amount~Anzuwendende Rauschmenge
+~width~Wie häufig ein neues Noise Sample gewählt werden soll
 
 
 
@@ -1002,8 +1003,8 @@ pitchshift~Verschiebt die Tonhöhe eines Signals
 pumper~Die Lautstärke eines Signals rhythmisch dippen, um einen "pumping sidechain"-Effekt zu emulieren
 ~amount~Betrag zur Verringerung der Lautstärke
 ~length~Pumplänge
-~curve~wie die Lautstärke zurückkehrt
-~attack~wie schnell die Lautstärke abnimmt
+~curve~Wie die Lautstärke zurückkehrt
+~attack~Wie schnell die Lautstärke abnimmt
 ~interval~Pumprate
 
 
@@ -1013,7 +1014,7 @@ tremolo~Die Lautstärke des Signals rhythmisch modulieren
 ~offset~Versatz der LFO Phase
 ~duty~Pulsbreite des LFOs
 ~interval~LFO Geschwindigkeit
-~osc~LFO Oscillatortyp
+~osc~LFO Oszillatortyp
 
 
 
@@ -1022,7 +1023,7 @@ dcoffset~Einen konstanten Versatz zu einem Audiosignal hinzufügen
 
 
 
-autotalent~[aufgegebenes Modul, evtl. kaputt]autotune unter Verwendung des "autotalent" Codes
+autotalent~[aufgegebenes Modul, evtl. kaputt]Autotune unter Verwendung des "autotalent" Codes
 ~A~[todo]
 ~Bb~[todo]
 ~B~[todo]
@@ -1061,14 +1062,14 @@ audiometer~Setzt einen Schieberegler auf die Lautstärke eines Audiopegels. nüt
 
 
 
-signalgenerator~Einfaches OsZillator Signal
+signalgenerator~Einfaches Oszillator Signal
 ~freq~Signal-Frequenz
 ~freq mode~Welchen Modus sollen wir für die Eingangsnoten verwenden? "instant" ändert die Frequenz der Eingangsnote sofort, "ramp" ändert die Frequenz im Laufe der Zeit und "slider" erlaubt es Ihnen, einen Schieberegler zu verwenden, um zwischen den letzten beiden Eingangsnoten zu interpolieren.
 ~osc~Oszillatortyp
 ~pw~Pulsbreite (oder Form für nicht-rechteckige Wellen)
 ~slider~Slider zur Interpolation zwischen den letzten beiden eingegebenen Tonhöhen
 ~ramp~Zeitspanne für die Erhöhung der Eingangsfrequenz
-~sync~schaltet den "Sync"-Modus ein, um die Phase auf die Frequenz von syncf zurückzusetzen
+~sync~Schaltet den "Sync"-Modus ein, um die Phase auf die Frequenz von syncf zurückzusetzen
 ~syncf~Frequenz zum Zurücksetzen der Phase, wenn "sync" aktiviert ist
 ~soften~Abschwächen der Kanten von Rechteck- und Sägezahnwellenformen
 ~shuffle~Dehnt und staucht jeden zweiten Zyklus der Wellenform
@@ -1081,7 +1082,7 @@ signalgenerator~Einfaches OsZillator Signal
 
 seaofgrain~Granularer Synthesizer, spielbar mit Schiebereglern oder MPE-Eingang
 ~load~Eine Sample-Datei laden
-~record~Eingang als granularen Puffer aufzeichnen, um seaofgrain as live granulare delay zu verwenden
+~record~Eingang als granularen Puffer aufzeichnen, um seaofgrain as Live-Granular-Delay zu verwenden
 ~volume~Ausgangslautstärke
 ~offset~Wo die Ansicht des Samples beginnen soll
 ~display length~Menge des sichtbaren Samples
@@ -1095,7 +1096,7 @@ seaofgrain~Granularer Synthesizer, spielbar mit Schiebereglern oder MPE-Eingang
 ~pos r *~Randomisierung des Grain-Startpunkts
 ~speed r *~Randomisierung der Grain-Geschwindigkeit
 ~spacing r*~Randomisierung der zeit zwischen Grains
-~octaves *~sollen wir Oktaven und Quinten hinzufügen?
+~octaves *~Sollen wir Oktaven und Quinten hinzufügen?
 ~width *~Stereobreite der Grainplatzierung
 ~pan *~Stereo Panorama der Grainplatzierung
 
@@ -1135,14 +1136,14 @@ sampleplayer~Sample-Wiedergabe mit auslösbaren Cue-Points, Clip-Extraktion und 
 ~click sets cue~wenn wahr, wird durch Klicken auf die Wellenform die Startposition des aktuellen Cue gesetzt
 ~select played~wenn wahr, wird jeder Cue-Punkt, der über eingehende Noten gespielt wird, zum aktuellen Cue-Punkt
 ~play cue~Aktuelles Cue abspielen
-~show grid~ein Viertelnotenraster anzeigen (wenn weit genug hineingezoomt wird)
+~show grid~Ein Viertelnotenraster anzeigen (wenn weit genug hineingezoomt wird)
 ~4~auto-slice 4 slices
 ~8~auto-slice 8 slices
 ~16~auto-slice 16 slices
 ~32~auto-slice 32 slices
 ~searchresult*~Klicken Sie hier, um dieses Youtube-Suchergebnis herunterzuladen. Das Herunterladen langer Videos kann eine Weile dauern.
 ~append to rec~Bei der Aufnahme an die vorherige Aufnahme anhängen, anstatt das Sample zuerst zu löschen
-~record as clips~nur dann aufnehmen, wenn genügend Input vorhanden ist, um das Gate zu öffnen, und jedes aufgenommene Segment mit Cue-Points markieren
+~record as clips~Nur dann aufnehmen, wenn genügend Input vorhanden ist, um das Gate zu öffnen, und jedes aufgenommene Segment mit Cue-Points markieren
 ~threshold~Lautstärkeschwelle, um das Gate für die Aufnahme zu öffnen
 ~attack~Geschwindigkeit, mit der das Gate geöffnet wird
 ~release~Geschwindigkeit, mit der das Gate geschlossen wird
@@ -1172,7 +1173,7 @@ oscillator~Polyphoner Hüllkurvenoszillator. Modulationen (mit MPE-Support): Mod
 ~shuffle~Dehnt und staucht jeden zweiten Zyklus der Wellenform
 ~soften~Abschwächen der Kanten von Rechteck- und Sägezahnwellenformen
 ~phase~Phasenversatz des Oszillators und Phasenversatz zwischen den Unisono-Stimmen. Nützlich, um einen sehr schnellen Modulator einzuschleifen, um Phasenmodulation zu erreichen.
-~sync~schaltet den "Sync"-Modus ein, um die Phase auf die Frequenz von syncf zurückzusetzen
+~sync~Schaltet den "Sync"-Modus ein, um die Phase auf die Frequenz von syncf zurückzusetzen
 ~syncf~Frequenz zum Zurücksetzen der Phase, wenn "sync" aktiviert ist
 ~env~[none]
 ~envA~Lautstärke Hüllkurven-Attack
@@ -1205,17 +1206,17 @@ metronome~Piept im Takt
 
 karplusstrong~Polyphoner Physical-Modeling-Synthesizer für gezupfte Saiten
 ~vol~Ausgangslautstärke
-~invert~soll Feedback invertiert werden?
+~invert~Soll Feedback invertiert werden?
 ~filter~Betrag der Filter-Resonanz
 ~feedback~Betrag des Feedback der Resonanz
 ~source type~Audio das für die Anregung verwendet wird
 ~x freq~Frequenz des Anregungstons
 ~x att~Einblendzeit des Anregungstons
 ~x dec~Ausblendzeit des Anregungstons
-~vel2vol~wie sehr die Anschlagsgeschwindigkeit die Lautstärkeder Stimme beeinflussen soll
-~vel2env~wie sehr die Anschlagsgeschwindigkeit die Anregungs-Attack-Zeit beeinflussen soll
+~vel2vol~Wie sehr die Anschlagsgeschwindigkeit die Lautstärkeder Stimme beeinflussen soll
+~vel2env~Wie sehr die Anschlagsgeschwindigkeit die Anregungs-Attack-Zeit beeinflussen soll
 ~pitchtone~Stellt ein, wie die Tonhöhe die Filtermenge beeinflusst. Ein Wert von Null bewirkt eine gleichmäßige Filterung über den gesamten Tonhöhenbereich, höhere Werte filtern hohe Tonhöhen weniger, niedrige Werte filtern niedrige Tonhöhen weniger.
-~lite cpu~Einige Parameter werden nur einmal pro buffer neu berechnet, um die CPU-Belastung zu verringern. Kann in einigen Szenarien schlechter klingen, insbesondere bei schneller Modulation.
+~lite cpu~Einige Parameter werden nur einmal pro Buffer neu berechnet, um die CPU-Belastung zu verringern. Kann in einigen Szenarien schlechter klingen, insbesondere bei schneller Modulation.
 
 
 
@@ -1327,16 +1328,16 @@ drumplayer~Sample Player für drum playback gedacht
 ~pan *~Stereo Pan Position des Samples
 ~widen *~Stereo Delay des Samples um Breite zu erzeugen
 ~start *~Startversatz des Samples in Prozent 
-~single out *~soll das Sample eine eigene Ausgabe haben?
+~single out *~Soll das Sample eine eigene Ausgabe haben?
 ~linkid *~Wenn linkid nicht -1 ist, jede andere Probe mit einer passenden linkid stummschalten (nützlich für die Verknüpfung von offenen und geschlossenen hats)
 ~envelope *~Sollen wir einen Lautstärke-Hüllkurve auf das Sample anwenden?
 ~view ms *~Länge der Hüllkurvenansicht in Millisekunden
 ~hitcategory*~Ordner, aus denen Sie wählen können, wenn Sie auf die Schaltfläche "random" klicken. Diese Ordner befinden sich im Verzeichnis data/drums/hits/
 ~envelopedisplay *~[none]
-~envelopedisplay *A~envelope attack
-~envelopedisplay *D~envelope decay
-~envelopedisplay *S~envelope sustain
-~envelopedisplay *R~envelope release
+~envelopedisplay *A~Hüllkurven-Attack
+~envelopedisplay *D~Hüllkurven-Decay
+~envelopedisplay *S~Hüllkurven-Sustain
+~envelopedisplay *R~Hüllkurven-Release
 ~test *~Dieses Sample abspielen
 ~random *~Ein zufälliges Sample der gewählten hitcategory auswählen
 
@@ -1470,7 +1471,7 @@ pitchsetter~Eine eingehende Note auf eine bestimmte Tonhöhe einstellen
 
 
 
-pitchremap~Eingbetonhöhen auf verschiedene Ausgangstonhöhen übertragen.
+pitchremap~Eingabetonhöhen auf verschiedene Ausgangstonhöhen übertragen.
 ~from*~Zu ändernde Tonhöhe
 ~to*~Gewünschte Tonhöhe
 
@@ -1509,7 +1510,7 @@ notestream~Einen Notenstream anzeigen, während sie gespielt werden
 
 
 
-notesorter~separate notes by pitch. any unmapped pitches go through the standard outlet.
+notesorter~Noten nach Tonhöhen separieren. Alle nicht zugeordneten Tonhöhen werden über den Standardausgang ausgegeben.
 ~pitch *~Zu verwendende Tonhöhe für diesen Ausgang 
 
 
@@ -1591,7 +1592,7 @@ notefilter~Nur bestimmte Tonhöhe durchlassen
 
 
 
-noteduration~sets the length a note will play, ignoring the note-off message
+noteduration~Legt die Länge fest, mit der eine Note gespielt wird, wobei die Note-off-Meldung ignoriert wird
 ~duration~Länge der Note in Takten
 
 
@@ -1633,7 +1634,7 @@ modwheeltovibrato~Notenmodulationsrad-Eingang in rhythmisches Pitchbend umwandel
 
 
 
-modwheeltopressure~vertauscht die expression-Eingabe mit midi-pressure in der Ausgabe
+modwheeltopressure~Vertauscht die expression-Eingabe mit midi-pressure in der Ausgabe
 
 
 
@@ -1677,7 +1678,7 @@ gridnotedisplayer~Verwendung mit einem Gridkeyboard zur Anzeige der aktuell gesp
 
 
 chordholder~Hält alle gleichzeitig gedrückten Noten, bis neue Noten gedrückt werden
-~stop~das Abspielen von Noten stoppen
+~stop~Das Abspielen von Noten stoppen
 ~pulse to play~Wenn diese Option aktiviert ist, werden die eingegebenen Noten nicht sofort abgespielt, sondern es wird auf einen Eingabeimpuls gewartet, bevor sie abgespielt werden.
 
 
