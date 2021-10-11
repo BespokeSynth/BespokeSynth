@@ -505,6 +505,14 @@ std::vector<std::string> ModuleFactory::GetSpawnableModules(ModuleType moduleTyp
          (mIsHiddenModuleMap[iter->first] == false || gShowDevModules))
          modules.push_back(iter->first);
    }
+   
+   if (moduleType == kModuleType_Audio)
+   {
+      std::vector<std::string> effects = TheSynth->GetEffectFactory()->GetSpawnableEffects();
+      for (auto effect : effects)
+         modules.push_back(effect + " " + kEffectChainSuffix);
+   }
+   
    sort(modules.begin(), modules.end());
    return modules;
 }
