@@ -279,12 +279,7 @@ namespace
                lookup[i][j]
                = lookup[i][j - 1] || lookup[i - 1][j];
 
-            // Current characters are considered as
-            // matching in two cases
-            // (a) current character of pattern is '?'
-            // (b) characters actually match
-            else if (pattern[j - 1] == '?'
-               || target[i - 1] == pattern[j - 1])
+            else if (target[i - 1] == pattern[j - 1])
                lookup[i][j] = lookup[i - 1][j - 1];
 
             // If characters don't match

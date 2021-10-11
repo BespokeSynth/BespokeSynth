@@ -286,14 +286,14 @@ void ScriptModule::DrawModule()
    if (CodeEntry::HasJediNotInstalledWarning())
    {
       ofPushStyle();
-      ofRectangle buttonRect = mShowReferenceButton->GetRect(true);
+      ofRectangle buttonRect = mScriptStyleSelector->GetRect(true);
       ofFill();
       ofSetColor(255, 255, 0);
       float x = buttonRect.getMaxX() + 10;
       float y = buttonRect.getCenter().y;
       ofCircle(x, y, 6);
       ofSetColor(0, 0, 0);
-      DrawTextBold("!", x-1, y+5, 17);
+      DrawTextBold("!", x-2, y+5, 17);
       ofPopStyle();
       
       if (mShowJediWarning)
