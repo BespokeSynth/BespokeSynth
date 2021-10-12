@@ -705,7 +705,10 @@ void VSTPlugin::DrawModule()
    mOpenEditorButton->Draw();
    mShowParameterDropdown->Draw();
 
-   DrawTextLeftJustify("MIDI out", 206-18, 14);
+   ofPushStyle();
+   ofSetColor(IDrawableModule::GetColor(kModuleType_Note));
+   DrawTextRightJustify("midi out:", 206-18, 14);
+   ofPopStyle();
 
    if (mDisplayMode == kDisplayMode_Sliders)
    {

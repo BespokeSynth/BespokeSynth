@@ -244,7 +244,7 @@ void FloatSlider::Render()
       ofRect(rect.x - 28, rect.y, rect.width + 28, rect.height);
       mMaxEntry->Draw();
       ofSetColor(255, 255, 255);
-      DrawTextLeftJustify("max:", rect.x, rect.y + 5 + mHeight / 2);
+      DrawTextRightJustify("max:", rect.x, rect.y + 5 + mHeight / 2);
       ofPopStyle();
    }
    if (mMinEntry)
@@ -256,7 +256,7 @@ void FloatSlider::Render()
       ofRect(rect.x - 28, rect.y, rect.width + 28, rect.height);
       mMinEntry->Draw();
       ofSetColor(255, 255, 255);
-      DrawTextLeftJustify("min:", rect.x, rect.y + 5 + mHeight / 2);
+      DrawTextRightJustify("min:", rect.x, rect.y + 5 + mHeight / 2);
       ofPopStyle();
    }
 
@@ -279,7 +279,7 @@ void FloatSlider::Render()
 
       ofPushMatrix();
       ofClipWindow(mX + mWidth * .6f, mY, mWidth * .4f, mHeight, true);
-      DrawTextLeftJustify(ofToString(mMax), mX+mWidth-2, mY + 4 + mHeight / 2, 12);
+      DrawTextRightJustify(ofToString(mMax), mX+mWidth-2, mY + 4 + mHeight / 2, 12);
       ofPopMatrix();
 
       ofPopStyle();
@@ -994,7 +994,7 @@ void IntSlider::Render()
       ofRect(rect.x - 28, rect.y, rect.width + 28, rect.height);
       mMaxEntry->Draw();
       ofSetColor(255, 255, 255);
-      DrawTextLeftJustify("max:", rect.x, rect.y + 5 + mHeight / 2);
+      DrawTextRightJustify("max:", rect.x, rect.y + 5 + mHeight / 2);
       ofPopStyle();
    }
    if (mMinEntry)
@@ -1006,7 +1006,7 @@ void IntSlider::Render()
       ofRect(rect.x - 28, rect.y, rect.width + 28, rect.height);
       mMinEntry->Draw();
       ofSetColor(255, 255, 255);
-      DrawTextLeftJustify("min:", rect.x, rect.y + 5 + mHeight / 2);
+      DrawTextRightJustify("min:", rect.x, rect.y + 5 + mHeight / 2);
       ofPopStyle();
    }
 
@@ -1022,7 +1022,7 @@ void IntSlider::Render()
       ofRect(mX, mY, mWidth * .4f, mHeight);
       ofRect(mX + mWidth * .6f, mY, mWidth * .4f, mHeight);
       DrawTextNormal(ofToString(mMin), mX + 2, mY + 4 + mHeight / 2, 12);
-      DrawTextLeftJustify(ofToString(mMax), mX + mWidth - 2, mY + 4 + mHeight / 2, 12);
+      DrawTextRightJustify(ofToString(mMax), mX + mWidth - 2, mY + 4 + mHeight / 2, 12);
       ofPopStyle();
    }
    

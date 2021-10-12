@@ -386,7 +386,7 @@ void DrawTextNormal(std::string text, int x, int y, float size)
    gFont.DrawString(text, size, x, y);
 }
 
-void DrawTextLeftJustify(std::string text, int x, int y, float size)
+void DrawTextRightJustify(std::string text, int x, int y, float size)
 {
    gFont.DrawString(text, size, x - gFont.GetStringWidth(text,size), y);
 }
