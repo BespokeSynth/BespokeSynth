@@ -447,6 +447,31 @@ private:
    
    bool keyPressed(const KeyPress& key) override
    {
+      /*
+       * This is a temporary fix for 1.0.1. This keyPressed handler
+       * always returns true whether or not Bespoke handles the event
+       * and with juce 6.1.1 it gets all the events. That 'return true'
+       * therefore suppresses the cmd-q/alt-f4 to quit.
+       *
+       * The correct fix is take every key handler and make it have
+       * a return type bool and then at the end return true if any
+       * subordinate key handler returns true, and false if not,
+       * but that touches the entire codebase, so to fix the 1.0 to
+       * 1.0.1. regression with command q on macos, just for now do this
+       * and if it gets merged, open an issue.
+       */
+#if BESPOKE_MAC
+      if (key.getKeyCode() == 'Q' && key.getModifiers().isCommandDown())
+      {
+         return false;
+      }
+#else
+      if (key.getKeyCode() == KeyPress::F4Key && key.getModifiers().isAltDown())
+      {
+         return false;
+      }
+#endif
+
       int keyCode = key.getTextCharacter();
       if (keyCode < 32)
          keyCode = key.getKeyCode();
@@ -474,7 +499,7 @@ private:
             }
          }
       }
-      return true;
+      return false;
    }
 
    void focusGained(FocusChangeType cause) override
