@@ -609,7 +609,7 @@ void PatchCableSource::CableGrabbed()
 
 void PatchCableSource::KeyPressed(int key, bool isRepeat)
 {
-   if (key == OF_KEY_BACKSPACE)
+   if (key == juce::KeyPress::backspaceKey || key == juce::KeyPress::deleteKey)
    {
       for (auto cable : mPatchCables)
       {
