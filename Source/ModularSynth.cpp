@@ -924,7 +924,7 @@ void ModularSynth::KeyPressed(int key, bool isRepeat)
    
    key = KeyToLower(key);  //now convert to lowercase because everything else just cares about keys as buttons (unmodified by shift)
    
-   if (key == OF_KEY_BACKSPACE && !isRepeat)
+   if ((key == juce::KeyPress::backspaceKey || key == juce::KeyPress::deleteKey) && !isRepeat)
    {
       for (auto module : mGroupSelectedModules)
          module->GetOwningContainer()->DeleteModule(module);

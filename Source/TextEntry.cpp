@@ -329,7 +329,7 @@ void TextEntry::OnKeyPressed(int key, bool isRepeat)
       if (pendingNewEntry)
          pendingNewEntry->MakeActiveTextEntry(true);
    }
-   else if (key == OF_KEY_BACKSPACE)
+   else if (key == juce::KeyPress::backspaceKey)
    {
       int len = (int)strlen(mString);
       if (mCaretPosition != mCaretPosition2) 

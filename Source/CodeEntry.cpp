@@ -762,7 +762,7 @@ namespace
 
 void CodeEntry::OnKeyPressed(int key, bool isRepeat)
 {
-   if (key == OF_KEY_BACKSPACE)
+   if (key == juce::KeyPress::backspaceKey)
    {
       if (mCaretPosition != mCaretPosition2)
       {
