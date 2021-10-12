@@ -447,6 +447,26 @@ private:
    
    bool keyPressed(const KeyPress& key) override
    {
+#if BESPOKE_MAC
+      /*
+       * This is a temporary fix for 1.0.1. This keyPressed handler
+       * always returns true whether or not Bespoke handles the event
+       * and with juce 6.1.1 it gets all the events. That 'return true'
+       * therefore supresses the cmd q to quit.
+       *
+       * The correct fix is take every key handler and make it have
+       * a return type bool and then at the end return true if any
+       * subordinate key handler returns true, and false if not,
+       * but that touches the entire codebase, so to fix the 1.0 to
+       * 1.0.1. regression with command q on macos, just for now do this
+       * and if it gets merged, open an issue.
+       */
+      if (key.getKeyCode() == 'q' && key.getModifiers().isCommandDown())
+      {
+         return false;
+      }
+#endif
+
       int keyCode = key.getTextCharacter();
       if (keyCode < 32)
          keyCode = key.getKeyCode();
