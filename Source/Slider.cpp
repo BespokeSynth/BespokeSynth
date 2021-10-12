@@ -722,7 +722,7 @@ void FloatSlider::TextEntryComplete(TextEntry* entry)
       
       float evaluated = 0;
       bool expressionValid = EvaluateExpression(mEntryString, *GetModifyValue(), evaluated);
-      if (expressionValid)
+      if (expressionValid && ((evaluated >= mMin && evaluated <= mMax) || (GetKeyModifiers() & kModifier_Shift)))
          SetValue(evaluated);
    }
    if (entry == mMaxEntry)
@@ -1187,8 +1187,9 @@ void IntSlider::TextEntryComplete(TextEntry* entry)
       
       float evaluated = 0;
       bool expressionValid = EvaluateExpression(mEntryString, *mVar, evaluated);
-      if (expressionValid)
-         SetValue(round(evaluated));
+      int evaluatedInt = round(evaluated);
+      if (expressionValid && ((evaluatedInt >= mMin && evaluatedInt <= mMax) || (GetKeyModifiers() & kModifier_Shift)))
+         SetValue(evaluatedInt);
    }
    if (entry == mMaxEntry)
    {
