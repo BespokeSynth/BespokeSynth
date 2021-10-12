@@ -446,11 +446,13 @@ void IDrawableModule::Render()
    ofPopMatrix();
    ofPopStyle();
 
+   mCableSourceMutex.lock();
    for (auto source : mPatchCableSources)
    {
       source->UpdatePosition(false);
       source->DrawSource();
    }
+   mCableSourceMutex.unlock();
 }
 
 void IDrawableModule::RenderUnclipped()
@@ -473,11 +475,13 @@ void IDrawableModule::RenderUnclipped()
 
 void IDrawableModule::DrawPatchCables(bool parentMinimized)
 {
+   mCableSourceMutex.lock();
    for (auto source : mPatchCableSources)
    {
       source->UpdatePosition(parentMinimized);
       source->DrawCables(parentMinimized);
    }
+   mCableSourceMutex.unlock();
 }
 
 //static
@@ -574,35 +578,48 @@ void IDrawableModule::SetUpPatchCables(std::string targets)
 
 void IDrawableModule::AddPatchCableSource(PatchCableSource* source)
 {
+   mCableSourceMutex.lock();
    mPatchCableSources.push_back(source);
+   mCableSourceMutex.unlock();
 }
 
 void IDrawableModule::RemovePatchCableSource(PatchCableSource* source)
 {
+   mCableSourceMutex.lock();
    RemoveFromVector(source, mPatchCableSources);
+   mCableSourceMutex.unlock();
    delete source;
 }
 
 void IDrawableModule::Exit()
 {
+   mCableSourceMutex.lock();
    for (auto source : mPatchCableSources)
    {
       source->Clear();
    }
+   mCableSourceMutex.unlock();
 }
 
 bool IDrawableModule::TestClick(int x, int y, bool right, bool testOnly /*=false*/)
 {
+   bool ret = false;
+ 
+   mCableSourceMutex.lock();
    for (auto source : mPatchCableSources)
    {
       if (source->TestClick(x, y, right, testOnly))
-         return true;
+      {
+         ret = true;
+         break;
    }
+   }
+   mCableSourceMutex.unlock();
    
-   if (IClickable::TestClick(x, y, right, testOnly))
+   if (!ret && IClickable::TestClick(x, y, right, testOnly))
       return true;
    
-   return false;
+   return ret;
 }
 
 void IDrawableModule::OnClicked(int x, int y, bool right)
@@ -670,8 +687,10 @@ bool IDrawableModule::MouseMoved(float x, float y)
    
    if (!mShowing)
       return false;
+   mCableSourceMutex.lock();
    for (auto source : mPatchCableSources)
       source->NotifyMouseMoved(x,y);
+   mCableSourceMutex.unlock();
    if (Minimized())
       return false;
    for (int i=0; i<mUIControls.size(); ++i)
@@ -692,7 +711,9 @@ void IDrawableModule::MouseReleased()
       mUIControls[i]->MouseReleased();
    for (int i=0; i<mChildren.size(); ++i)
       mChildren[i]->MouseReleased();
+   mCableSourceMutex.lock();
    auto sources = mPatchCableSources;
+   mCableSourceMutex.unlock();
    for (auto source : sources)
       source->MouseReleased();
 }
@@ -801,8 +822,10 @@ ofVec2f IDrawableModule::GetMinimumDimensions()
 
 void IDrawableModule::KeyPressed(int key, bool isRepeat)
 {
+   mCableSourceMutex.lock();
    for (auto source : mPatchCableSources)
       source->KeyPressed(key, isRepeat);
+   mCableSourceMutex.unlock();
    for (auto control : mUIControls)
       control->KeyPressed(key, isRepeat);
 }
