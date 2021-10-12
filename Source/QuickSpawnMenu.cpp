@@ -172,7 +172,7 @@ void QuickSpawnMenu::OnClicked(int x, int y, bool right)
    std::string moduleTypeName = GetModuleTypeNameAt(x, y);
    if (moduleTypeName != "")
    {
-      IDrawableModule* module = TheSynth->SpawnModuleOnTheFly(moduleTypeName, TheSynth->GetMouseX(GetOwningContainer()) + moduleGrabOffset.x, TheSynth->GetMouseY(GetOwningContainer()) + moduleGrabOffset.y);
+      IDrawableModule* module = TheSynth->SpawnModuleOnTheFly(moduleTypeName, TheSynth->GetMouseX(TheSynth->GetRootContainer()) + moduleGrabOffset.x, TheSynth->GetMouseY(TheSynth->GetRootContainer()) + moduleGrabOffset.y);
       TheSynth->SetMoveModule(module, moduleGrabOffset.x, moduleGrabOffset.y);
    }
    
