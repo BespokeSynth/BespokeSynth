@@ -202,16 +202,16 @@ void ModuleSaveDataPanel::DrawModule()
    int x = mAlignmentX-5;
    int y = 5;
 
-   DrawTextLeftJustify("type", x, y + 12);
+   DrawTextRightJustify("type", x, y + 12);
    DrawTextBold(mSaveModule->GetTypeName(), mAlignmentX, y + 12);
    y += itemSpacing;
    
-   DrawTextLeftJustify("name", x, y+12);
+   DrawTextRightJustify("name", x, y+12);
    y += itemSpacing;
    
    for (auto iter = mLabels.begin(); iter != mLabels.end(); ++iter)
    {
-      DrawTextLeftJustify(*iter, x, y+12);
+      DrawTextRightJustify(*iter, x, y+12);
       y += itemSpacing;
    }
    

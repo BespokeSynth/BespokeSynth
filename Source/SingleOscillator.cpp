@@ -309,12 +309,12 @@ void SingleOscillator::DrawModule()
       ofPopStyle();
    }
 
-   DrawTextLeftJustify("wave", kGap + kColumnWidth - 3, 15);
-   DrawTextLeftJustify("volume", (kGap + kColumnWidth) * 2 - 3, 15);
+   DrawTextRightJustify("wave", kGap + kColumnWidth - 3, 15);
+   DrawTextRightJustify("volume", (kGap + kColumnWidth) * 2 - 3, 15);
    ofPushStyle();
    if (mVoiceParams.mFilterCutoffMax == SINGLEOSCILLATOR_NO_CUTOFF)
       ofSetColor(100, 100, 100);
-   DrawTextLeftJustify("filter", (kGap + kColumnWidth) * 3 - 3, 15);
+   DrawTextRightJustify("filter", (kGap + kColumnWidth) * 3 - 3, 15);
    ofPopStyle();
 }
  

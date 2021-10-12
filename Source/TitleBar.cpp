@@ -331,7 +331,7 @@ void TitleBar::DrawModule()
 
    float pixelWidth = GetPixelWidth();
    
-   DrawTextLeftJustify(info, pixelWidth - 140, 32);
+   DrawTextRightJustify(info, pixelWidth - 140, 32);
    
    mSaveLayoutButton->Draw();
    mSaveStateButton->Draw();
@@ -411,7 +411,7 @@ void TitleBar::DrawModule()
       ofSetColor(255,150,150);
    else
       ofSetColor(255,255,255);
-   DrawTextLeftJustify(stats, ofGetWidth()/GetOwningContainer()->GetDrawScale() - 5, 33);
+   DrawTextRightJustify(stats, ofGetWidth()/GetOwningContainer()->GetDrawScale() - 5, 33);
    mDisplayHelpButton->SetPosition(ofGetWidth()/GetOwningContainer()->GetDrawScale() - 20, 4);
    mDisplayHelpButton->Draw();
    mDisplayUserPrefsEditorButton->SetPosition(mDisplayHelpButton->GetPosition(true).x - 55, 4);

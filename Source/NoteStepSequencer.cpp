@@ -279,7 +279,7 @@ void NoteStepSequencer::DrawModule()
       ofPopStyle();
    }
    
-   DrawTextLeftJustify("random:", 102, 14);
+   DrawTextRightJustify("random:", 102, 14);
    
    ofPushStyle();
    ofFill();

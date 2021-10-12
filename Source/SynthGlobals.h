@@ -165,7 +165,7 @@ double GetPhaseInc(float freq);
 void FloatWrap(float& num, float space);
 void FloatWrap(double& num, float space);
 void DrawTextNormal(std::string text, int x, int y, float size = 15);
-void DrawTextLeftJustify(std::string text, int x, int y, float size = 15);
+void DrawTextRightJustify(std::string text, int x, int y, float size = 15);
 void DrawTextBold(std::string text, int x, int y, float size = 15);
 float GetStringWidth(std::string text, float size = 15);
 void AssertIfDenormal(float input);
