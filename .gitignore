@@ -273,6 +273,11 @@ _pkginfo.txt
 # clangd cache files
 .cache/
 
+# VS Code
+.vscode/
+*.code-workspace
+build/
+
 # Others
 ClientBin/
 ~$*
