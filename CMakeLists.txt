@@ -7,6 +7,7 @@ set(BESPOKE_JUCE_LOCATION "${CMAKE_SOURCE_DIR}/libs/JUCE" CACHE STRING "Path to 
 set(BESPOKE_PYTHON_ROOT "" CACHE STRING "Python search path. Override as needed.")
 set(BESPOKE_VST2_SDK_LOCATION "" CACHE STRING "Steinberg VST2 SDK directory for non-FOSS builds")
 set(BESPOKE_ASIO_SDK_LOCATION "" CACHE STRING "Steinberg ASIO SDK directory for non-FOSS builds")
+set(BESPOKE_LINUX_HIGH_FPS_WITH_THREAD_PROBLEMS 0 CACHE BOOL "Enable if you want 60fps on Linux, but there's the possibility that you will get thread safety crashes. This is being investigated for a future release")
 
 # Global CMake options
 set(CMAKE_CXX_EXTENSIONS OFF)
