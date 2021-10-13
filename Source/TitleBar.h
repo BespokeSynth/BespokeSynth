@@ -65,7 +65,7 @@ struct SpawnListManager
    SpawnListManager(IDropdownListener* owner);
    
    void SetModuleFactory(ModuleFactory* factory);
-   void SetUpVstDropdown(bool rescan);
+   void SetUpVstDropdown();
    std::vector<SpawnList*> GetDropdowns() { return mDropdowns; }
    
    SpawnList mInstrumentModules;
@@ -93,17 +93,17 @@ public:
    bool HasTitleBar() const override { return false; }
    bool AlwaysOnTop() override { return true; }
    bool IsSingleton() const override { return true; }
-   void Poll() override;
    
    HelpDisplay* GetHelpDisplay() { return mHelpDisplay; }
 
    void SetModuleFactory(ModuleFactory* factory) { mSpawnLists.SetModuleFactory(factory); }
    void ListLayouts();
-   void RescanVSTs() { mVstRescanCountdown = 5; }
+   void ManageVSTs();
    
    bool IsSaveable() override { return false; }
    
    void CheckboxUpdated(Checkbox* checkbox) override;
+   void DropdownClicked(DropdownList* list) override;
    void DropdownUpdated(DropdownList* list, int oldVal) override;
    void ButtonClicked(ClickButton* button) override;
    void FloatSliderUpdated(FloatSlider* slider, float oldVal) override {}
@@ -139,7 +139,6 @@ private:
    HelpDisplay* mHelpDisplay;
    
    SpawnListManager mSpawnLists;
-   int mVstRescanCountdown;
    
    bool mLeftCornerHovered;
 };

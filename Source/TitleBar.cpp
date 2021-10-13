@@ -44,7 +44,7 @@ bool TitleBar::sShowInitialHelpOverlay = true;
 
 namespace
 {
-   const std::string kRescanPluginsLabel = "rescan VSTs...";
+   const std::string kManageVSTsLabel = "manage VSTs...";
 }
 
 SpawnList::SpawnList(IDropdownListener* owner, SpawnListManager* listManager, int x, int y, std::string label)
@@ -72,7 +72,7 @@ void SpawnList::SetList(std::vector<std::string> spawnables, std::string overrid
       std::string name = mSpawnables[i].c_str();
       if (mOverrideModuleType == "" && TheSynth->GetModuleFactory()->IsExperimental(name))
          name += " (exp.)";
-      if (mOverrideModuleType == "vstplugin" && name != kRescanPluginsLabel)
+      if (mOverrideModuleType == "vstplugin" && name != kManageVSTsLabel)
          name = juce::File(name).getFileName().toStdString();
       mSpawnList->AddLabel(name,i);
    }
@@ -102,9 +102,9 @@ IDrawableModule* SpawnList::Spawn()
 
    if (mOverrideModuleType == "vstplugin")
    {
-      if (mSpawnables[mSpawnIndex] == kRescanPluginsLabel)
+      if (mSpawnables[mSpawnIndex] == kManageVSTsLabel)
       {
-         TheTitleBar->RescanVSTs();
+         TheTitleBar->ManageVSTs();
          return nullptr;
       }
    }
@@ -157,7 +157,6 @@ TitleBar::TitleBar()
 , mLoadLayoutDropdown(nullptr)
 , mLoadLayoutIndex(-1)
 , mSpawnLists(this)
-, mVstRescanCountdown(0)
 , mLeftCornerHovered(false)
 {
    assert(TheTitleBar == nullptr);
@@ -203,14 +202,19 @@ TitleBar::~TitleBar()
    TheTitleBar = nullptr;
 }
 
-void TitleBar::Poll()
+void TitleBar::ManageVSTs()
 {
-   if (mVstRescanCountdown > 0)
-   {
-      --mVstRescanCountdown;
-      if (mVstRescanCountdown == 0)
-         mSpawnLists.SetUpVstDropdown(true);
-   }
+   juce::StringArray args;
+   args.add(ofToFactoryPath("") + "/BespokeVSTScanner.exe");
+
+   std::string command = "";
+   for (auto& arg : args)
+      command += arg.toStdString() + " ";
+   ofLog() << "running " << command;
+   auto* process = new juce::ChildProcess();
+   bool success = process->start(args);
+   if (!success)
+      TheSynth->LogEvent("Couldn't start " + command, kLogEventType_Error);
 }
 
 SpawnListManager::SpawnListManager(IDropdownListener* owner)
@@ -236,7 +240,7 @@ void SpawnListManager::SetModuleFactory(ModuleFactory* factory)
    mPulseModules.SetList(factory->GetSpawnableModules(kModuleType_Pulse), "");
    mOtherModules.SetList(factory->GetSpawnableModules(kModuleType_Other), "");
    
-   SetUpVstDropdown(false);
+   SetUpVstDropdown();
    
    std::vector<std::string> prefabs;
    ModuleFactory::GetPrefabs(prefabs);
@@ -253,11 +257,11 @@ void SpawnListManager::SetModuleFactory(ModuleFactory* factory)
    mDropdowns.push_back(&mPrefabs);
 }
 
-void SpawnListManager::SetUpVstDropdown(bool rescan)
+void SpawnListManager::SetUpVstDropdown()
 {
    std::vector<std::string> vsts;
-   VSTLookup::GetAvailableVSTs(vsts, rescan);
-   vsts.push_back(kRescanPluginsLabel);
+   VSTLookup::GetAvailableVSTs(vsts);
+   vsts.insert(vsts.begin(), kManageVSTsLabel);
    mVstPlugins.SetList(vsts, "vstplugin");
 }
 
@@ -422,19 +426,6 @@ void TitleBar::DrawModule()
 
 void TitleBar::DrawModuleUnclipped()
 {
-   if (mVstRescanCountdown > 0 || VSTPlugin::sIsRescanningVsts)
-   {
-      ofPushStyle();
-      ofSetColor(255, 255, 255);
-      float titleBarWidth, titleBarHeight;
-      TheTitleBar->GetDimensions(titleBarWidth, titleBarHeight);
-      float x = 100;
-      float y = 40 + titleBarHeight;
-      gFontBold.DrawString("scanning VSTs, please wait...", 50, x, y);
-      ofPopStyle();
-      return;
-   }
-
    float saveCooldown = 1 - ofClamp((gTime - TheSynth->GetLastSaveTime()) / 1000, 0, 1);
    if (saveCooldown > 0)
    {
@@ -497,6 +488,12 @@ void TitleBar::GetModuleDimensions(float& width, float& height)
 
 void TitleBar::CheckboxUpdated(Checkbox* checkbox)
 {
+}
+
+void TitleBar::DropdownClicked(DropdownList* list)
+{
+   if (list == mSpawnLists.mVstPlugins.GetList())
+      mSpawnLists.SetUpVstDropdown();
 }
 
 void TitleBar::DropdownUpdated(DropdownList* list, int oldVal)

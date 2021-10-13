@@ -52,9 +52,6 @@ namespace
    }
 }
 
-//static
-bool VSTPlugin::sIsRescanningVsts = false;
-
 using namespace juce;
 
 namespace VSTLookup
@@ -62,41 +59,19 @@ namespace VSTLookup
    static juce::AudioPluginFormatManager sFormatManager;
    static juce::KnownPluginList sPluginList;
    
-   void GetAvailableVSTs(std::vector<std::string>& vsts, bool rescan)
+   void GetAvailableVSTs(std::vector<std::string>& vsts)
    {
       static bool sFirstTime = true;
       if (sFirstTime)
          sFormatManager.addDefaultFormats();
 
-      if (rescan)
+      auto file = juce::File(ofToDataPath("vst/found_vsts.xml"));
+      if (file.existsAsFile())
       {
-         VSTPlugin::sIsRescanningVsts = true;
-         sPluginList.clear();
-         juce::File deadMansPedalFile(ofToDataPath("vst/deadmanspedal.txt"));
-         juce::FileSearchPath searchPath;
-         for (int i = 0; i < TheSynth->GetUserPrefs()["vstsearchdirs"].size(); ++i)
-            searchPath.add(juce::File(TheSynth->GetUserPrefs()["vstsearchdirs"][i].asString()));
-         for (int i = 0; i < sFormatManager.getNumFormats(); ++i)
-         {
-            juce::PluginDirectoryScanner scanner(sPluginList, *(sFormatManager.getFormat(i)), searchPath, true, deadMansPedalFile, true);
-            juce::String nameOfPluginBeingScanned;
-            while (scanner.scanNextFile(true, nameOfPluginBeingScanned))
-            {
-               ofLog() << "scanning " + nameOfPluginBeingScanned;
-            }
-         }
-         sPluginList.createXml()->writeTo(juce::File(ofToDataPath("vst/found_vsts.xml")));
-         VSTPlugin::sIsRescanningVsts = false;
+         auto xml = juce::parseXML(file);
+         sPluginList.recreateFromXml(*xml);
       }
-      else
-      {
-         auto file = juce::File(ofToDataPath("vst/found_vsts.xml"));
-         if (file.existsAsFile())
-         {
-            auto xml = juce::parseXML(file);
-            sPluginList.recreateFromXml(*xml);
-         }
-      }
+      
       auto types = sPluginList.getTypes();
       for (int i=0; i<types.size(); ++i)
       {
@@ -139,7 +114,7 @@ namespace VSTLookup
    {
       assert(list);
       std::vector<std::string> vsts;
-      GetAvailableVSTs(vsts, false);
+      GetAvailableVSTs(vsts);
       for (int i=0; i<vsts.size(); ++i)
          list->AddLabel(vsts[i].c_str(), i);
    }
