@@ -273,8 +273,10 @@ float Scale::FreqToPitch(float freq)
 
 int Scale::MakeDiatonic(int pitch)
 {
+   if (mScale.GetPitches().size() == 0)   //"chromatic" mode
+      return pitch;
+   
    assert(mScale.mScaleRoot >= 0 && mScale.mScaleRoot < mPitchesPerOctave);
-   assert(mScale.GetPitches().size());
    
    int pitchOut = (pitch - mScale.mScaleRoot) % mPitchesPerOctave; //transform into 0-12 scale space
    
