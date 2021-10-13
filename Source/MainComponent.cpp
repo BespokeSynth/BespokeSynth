@@ -55,7 +55,9 @@ public:
 
       openGLContext.setOpenGLVersionRequired(juce::OpenGLContext::openGL3_2);
       openGLContext.setContinuousRepainting(false);
+#if BESPOKE_LINUX_HIGH_FPS_WITH_THREAD_PROBLEMS
       openGLContext.setComponentPaintingEnabled(false);
+#endif
 
 #ifndef BESPOKE_WINDOWS //windows crash handler is set up in ModularSynth() constructor
       SystemStats::setApplicationCrashHandler(ModularSynth::CrashHandler);
@@ -125,7 +127,7 @@ public:
       
       mSynth.Poll();
       
-#if DEBUG
+#if DEBUG || (BESPOKE_LINUX && !BESPOKE_LINUX_HIGH_FPS_WITH_THREAD_PROBLEMS)
       if (sRenderFrame % 2 == 0)
 #else
       if (true)
