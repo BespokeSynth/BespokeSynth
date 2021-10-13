@@ -133,7 +133,7 @@ void Scale::Init()
    
    Json::Value& scales = root["scales"];
 
-   mScales.push_back(ScaleInfo(kChromaticScale, std::vector<int>{}));
+   mScales.push_back(ScaleInfo(kChromaticScale, std::vector<int>{0,1,2,3,4,5,6,7,8,9,10,11}));
    mScaleSelector->AddLabel(kChromaticScale, 0);
 
    for (int i=0; i<scales.size(); ++i)

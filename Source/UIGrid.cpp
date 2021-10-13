@@ -278,7 +278,7 @@ void UIGrid::OnClicked(int x, int y, bool right)
    }
    else
    {
-      if (mData[dataIndex] == mStrength)
+      if (mSingleColumn && mData[dataIndex] == mStrength) 
       {
          mData[dataIndex] = 0;
          mLastClickWasClear = true;
