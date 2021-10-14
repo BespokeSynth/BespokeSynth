@@ -38,8 +38,8 @@ executable which is ready to run on your system in many cases.
 git clone https://github.com/BespokeSynth/BespokeSynth   # replace this with your fork if you forked
 cd BespokeSynth
 git submodule update --init --recursive
-cmake -Bignore/build
-cmake --build ignore/build --parallel 4
+cmake -Bignore/build -DCMAKE_BUILD_TYPE=Release
+cmake --build ignore/build --parallel 4 --config Release
 ```
 
 This will produce a release build in `ignore/build/Source/BespokeSynth_artefacts`.
@@ -59,4 +59,16 @@ do `sudo cmake install ignore/build` and bespoke will install correctly into thi
 
 The directory name `ignore/build` is arbitrary. Bespoke is set up to `.gitignore` everything in the `ignore` directory but you
 can use any directory name you want for a build or have multiple builds also.
+
+To be able to build you will need a few things, depending on your OS
+
+* All systems require an install of git
+* On Windows: 
+  * Install Visual Studio 2019 Community Edition. When you install Visual Studio, make sure to include CLI tools and CMake, which are included in
+    'Optional CLI support' and 'Toolset for Desktop' install bundles
+  * Python from python.org
+  * Run all commands from the visual studio command shell which will be available after you install VS.
+* On MacOS: install xcode; install xcode command line tools with `xcode-select --install` and install cmake with `brew install cmake` if you use homebrew or from cmake.org if not
+* On Linux you probably already have everything (gcc, git, etc...), but you will need to install required packages. The full list we
+install on a fresh ubuntu 20 box are listed in the azure-pipelines.yml
 
