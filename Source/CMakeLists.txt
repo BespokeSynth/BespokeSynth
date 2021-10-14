@@ -461,7 +461,7 @@ elseif (WIN32)
         POST_BUILD
         WORKING_DIRECTORY ${CMAKE_SOURCE_DIR}
         COMMAND ${CMAKE_COMMAND} -E copy_directory resource ${OUTDIR}/resource
-        COMMAND ${CMAKE_COMMAND} -E copy ${SCANNEROUTDIR}/*.exe ${OUTDIR})
+        COMMAND ${CMAKE_COMMAND} -E copy ${SCANNEROUTDIR}/BespokeVSTScanner.exe ${OUTDIR})
 else ()
     target_compile_definitions(BespokeSynth PRIVATE BESPOKE_LINUX=1)
 
