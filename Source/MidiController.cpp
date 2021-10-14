@@ -1629,6 +1629,16 @@ void MidiController::LoadLayout(std::string filename)
          mResendFeedbackOnRelease = mLayoutData["resend_feedback_on_release"].asBool();
          mModuleSaveData.SetBool("resend_feedback_on_release", mResendFeedbackOnRelease);
       }
+      if (!mLayoutData["channelfilter"].isNull())
+      {
+         const int layoutChannelFilter = mLayoutData["channelfilter"].asInt();
+         if (layoutChannelFilter >= (int)ChannelFilter::k1 && layoutChannelFilter <= (int)ChannelFilter::k16)
+         {
+            mChannelFilter = (ChannelFilter)layoutChannelFilter;
+            // The enum is restored by casting from an int
+            mModuleSaveData.SetInt("channelfilter", layoutChannelFilter);
+         }
+      }
       if (!mLayoutData["groups"].isNull())
       {
          useDefaultLayout = false;
