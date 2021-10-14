@@ -370,6 +370,8 @@ target_compile_definitions(BespokeSynth PRIVATE
     BESPOKE_LINUX_HIGH_FPS_WITH_THREAD_PROBLEMS=$<BOOL:${BESPOKE_LINUX_HIGH_FPS_WITH_THREAD_PROBLEMS}>
     )
 
+add_dependencies(BespokeSynth BespokeVSTScanner)
+
 if (APPLE)
     target_compile_definitions(BespokeSynth PRIVATE
         BESPOKE_MAC=1
@@ -422,11 +424,15 @@ if (APPLE)
             "'-DBESPOKE_PYTHON_ROOT=/opt/homebrew/Cellar/python\@3.9/3.9.6'")
     endif()
 
+    get_target_property(SCANNEROUTDIR BespokeVSTScanner RUNTIME_OUTPUT_DIRECTORY)
+
     add_custom_command(TARGET BespokeSynth
         POST_BUILD
         WORKING_DIRECTORY ${CMAKE_SOURCE_DIR}
         COMMAND ${CMAKE_COMMAND} -E make_directory ${OUTDIR}/BespokeSynth.app/Contents/Frameworks/LocalPython
         COMMAND ${CMAKE_COMMAND} -E copy ${Python_FRAMEWORK_DIR}/${Python_BIN} ${OUTDIR}/BespokeSynth.app/Contents/Frameworks/LocalPython
+        # This is pretty questionable
+        COMMAND ${CMAKE_COMMAND} -E copy_directory ${SCANNEROUTDIR}/BespokeVSTScanner.app ${OUTDIR}/BespokeSynth.app/Contents/Resources/BespokeVSTScanner.app
         COMMAND codesign --remove-signature ${OUTDIR}/BespokeSynth.app/Contents/Frameworks/LocalPython/${Python_BIN}
         COMMAND codesign -s - ${OUTDIR}/BespokeSynth.app/Contents/Frameworks/LocalPython/${Python_BIN}
         # THis is the 'normal' case
@@ -450,10 +456,12 @@ elseif (WIN32)
         VS_DEBUGGER_COMMAND           "$<TARGET_FILE:BespokeSynth>"
         VS_DEBUGGER_ENVIRONMENT       "PATH=%PATH%;${CMAKE_PREFIX_PATH}/bin")
     get_target_property(OUTDIR BespokeSynth RUNTIME_OUTPUT_DIRECTORY)
+    get_target_property(SCANNEROUTDIR BespokeVSTScanner RUNTIME_OUTPUT_DIRECTORY)
     add_custom_command(TARGET BespokeSynth
         POST_BUILD
         WORKING_DIRECTORY ${CMAKE_SOURCE_DIR}
-        COMMAND ${CMAKE_COMMAND} -E copy_directory resource ${OUTDIR}/resource)
+        COMMAND ${CMAKE_COMMAND} -E copy_directory resource ${OUTDIR}/resource
+        COMMAND ${CMAKE_COMMAND} -E copy ${SCANNEROUTDIR}/*.exe ${OUTDIR})
 else ()
     target_compile_definitions(BespokeSynth PRIVATE BESPOKE_LINUX=1)
 
@@ -497,7 +505,6 @@ target_link_libraries(BespokeSynth PRIVATE
     ${Python_LIBRARIES}
     $<$<BOOL:${MINGW}>:dbghelp>
     )
-
 
 # Rules to do some installing and packaging which we will have to refactor  but
 # for now gets a nightly going
