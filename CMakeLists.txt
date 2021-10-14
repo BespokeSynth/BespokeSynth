@@ -50,4 +50,5 @@ if (BESPOKE_VST2_SDK_LOCATION)
 endif()
 
 add_subdirectory(libs)
+add_subdirectory(BespokeVSTScanner)
 add_subdirectory(Source)

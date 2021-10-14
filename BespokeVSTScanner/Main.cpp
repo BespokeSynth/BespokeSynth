@@ -8,9 +8,12 @@
   ==============================================================================
 */
 
-#include <JuceHeader.h>
+#include "juce_gui_basics/juce_gui_basics.h"
+#include "juce_audio_processors/juce_audio_processors.h"
+#include "juce_audio_formats/juce_audio_formats.h"
 #include "MainComponent.h"
 
+using namespace juce;
 namespace CommandIDs
 {
    static const int showPluginListEditor = 0x30100;
@@ -24,8 +27,8 @@ public:
    //==============================================================================
    BespokeVSTScannerApplication() {}
 
-   const String getApplicationName() override { return ProjectInfo::projectName; }
-   const String getApplicationVersion() override { return ProjectInfo::versionString; }
+   const String getApplicationName() override { return "BespokeVSTScanner"; }
+   const String getApplicationVersion() override { return "1.0.0"; }
    bool moreThanOneInstanceAllowed() override { return true; }
 
    //==============================================================================
@@ -113,6 +116,7 @@ public:
          formatManager.addDefaultFormats();
 
          setVisible(true);
+         setAlwaysOnTop(true);
       }
 
       virtual ~MainWindow()
@@ -135,7 +139,7 @@ public:
          return names;
       }
 
-      PopupMenu getMenuForIndex(int topLevelMenuIndex, const String& /*menuName*/)
+      PopupMenu getMenuForIndex(int topLevelMenuIndex, const String& /*menuName*/) override
       {
          PopupMenu menu;
 
@@ -151,7 +155,7 @@ public:
          return menu;
       }
 
-      void menuItemSelected(int menuItemID, int /*topLevelMenuIndex*/)
+      void menuItemSelected(int menuItemID, int /*topLevelMenuIndex*/) override
       {
       }
 

@@ -205,7 +205,13 @@ TitleBar::~TitleBar()
 void TitleBar::ManageVSTs()
 {
    juce::StringArray args;
+#if BESPOKE_WINDOWS
    args.add(ofToFactoryPath("") + "/BespokeVSTScanner.exe");
+#elif BESPOKE_MAC
+   args.add(ofToFactoryPath("") + "/BespokeVSTScanner.app/Contents/MacOS/BespokeVSTScanner");
+#else
+   args.add(ofToFactoryPath("") + "/BespokeVSTScanner");
+#endif
 
    std::string command = "";
    for (auto& arg : args)

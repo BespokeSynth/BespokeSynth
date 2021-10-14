@@ -8,14 +8,14 @@
 
 #pragma once
 
-#include <JuceHeader.h>
+#include "juce_gui_basics/juce_gui_basics.h"
 
 //==============================================================================
 /*
     This component lives inside our window, and this is where you should put all
     your controls and content.
 */
-class MainComponent   : public Component
+class MainComponent   : public juce::Component
 {
 public:
     //==============================================================================
@@ -23,7 +23,7 @@ public:
     ~MainComponent();
 
     //==============================================================================
-    void paint (Graphics&) override;
+    void paint (juce::Graphics&) override;
     void resized() override;
 
 private:

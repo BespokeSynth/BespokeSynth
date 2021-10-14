@@ -8,6 +8,8 @@
 
 #include "MainComponent.h"
 
+using namespace juce;
+
 //==============================================================================
 MainComponent::MainComponent()
 {
