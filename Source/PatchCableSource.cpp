@@ -577,7 +577,8 @@ void PatchCableSource::FindValidTargets()
          {
             if (uicontrol->IsShowing() &&
                 (uicontrol->GetShouldSaveState() || dynamic_cast<ClickButton*>(uicontrol) != nullptr) &&
-                uicontrol->CanBeTargetedBy(this))
+                uicontrol->CanBeTargetedBy(this) &&
+                !uicontrol->GetNoHover())
                mValidTargets.push_back(uicontrol);
          }
       }
