@@ -56,7 +56,7 @@ void SustainPedal::CheckboxUpdated(Checkbox* checkbox)
          {
             if (mIsNoteBeingSustained[i])
             {
-               PlayNoteOutput(gBufferSize*gInvSampleRateMs, i, 0, -1);
+               PlayNoteOutput(gTime + gBufferSize*gInvSampleRateMs, i, 0, -1);
                mIsNoteBeingSustained[i] = false;
             }
          }
