@@ -33,17 +33,33 @@
         },
         {
             "rows": 2,
-            "cols": 8,
-            "position" : [ 65, 0 ],
+            "cols": 7,
+            "position" : [ 100, 0 ],
             "dimensions" : [28, 28],
             "spacing" : [30, 30],
             "controls" : [
-                 112, 74, 71, 76, 77, 93, 73, 75,
-                 114, 18, 19, 16, 17, 91, 79, 72
+                 74, 71, 76, 77, 93, 73, 75,
+                 18, 19, 16, 17, 91, 79, 72
                 ],
             "colors" : [ 0, 127],
             "messageType" : "control",
             "drawType" : "knob"
+        },
+        {
+            "rows": 2,
+            "cols": 1,
+            "position" : [ 65, 0 ],
+            "dimensions" : [28, 28],
+            "spacing" : [30, 30],
+            "controls" : [
+                 112,
+                 114
+                ],
+            "colors" : [ 0, 127],
+            "messageType" : "control",
+            "drawType" : "slider",
+            "incremental": true,
+            "incrementThreshold": 0.01
         },
        {
           "rows": 1,
