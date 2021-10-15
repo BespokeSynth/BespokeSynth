@@ -73,12 +73,13 @@ void OutputChannel::Process(double time)
    if (numChannels == 1)
    {
       int channel = channelSelectionIndex;
+      auto getBufferGetChannel0 = GetBuffer()->GetChannel(0);
       if (channel >= 0 && channel < TheSynth->GetNumOutputChannels())
       {
          for (int i = 0; i<gBufferSize; ++i)
-            TheSynth->GetOutputBuffer(channel)[i] += CLAMP(GetBuffer()->GetChannel(0)[i], -mLimit, mLimit);
+            TheSynth->GetOutputBuffer(channel)[i] += std::clamp(/*GetBuffer()->GetChannel(0)*/ getBufferGetChannel0[i], -mLimit, mLimit);
       }
-      GetVizBuffer()->WriteChunk(GetBuffer()->GetChannel(0), gBufferSize, 0);
+      GetVizBuffer()->WriteChunk(/*GetBuffer()->GetChannel(0)*/ getBufferGetChannel0, gBufferSize, 0);
       
       mLevelMeters[0].mPeakTracker.Process(TheSynth->GetOutputBuffer(channel), gBufferSize);
       mLevelMeters[0].mPeakTrackerSlow.Process(TheSynth->GetOutputBuffer(channel), gBufferSize);

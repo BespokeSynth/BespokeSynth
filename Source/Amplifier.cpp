@@ -60,10 +60,11 @@ void Amplifier::Process(double time)
       ChannelBuffer* out = target->GetBuffer();
       for (int ch=0; ch<GetBuffer()->NumActiveChannels(); ++ch)
       {
+         auto getBufferChannelCh = GetBuffer()->GetChannel(ch);
          for (int i=0; i<bufferSize; ++i)
          {
             ComputeSliders(i);
-            gWorkBuffer[i] = GetBuffer()->GetChannel(ch)[i] * mGain;
+            gWorkBuffer[i] = getBufferChannelCh[i] * mGain;
          }
          Add(out->GetChannel(ch), gWorkBuffer, GetBuffer()->BufferSize());
          GetVizBuffer()->WriteChunk(gWorkBuffer, GetBuffer()->BufferSize(), ch);
