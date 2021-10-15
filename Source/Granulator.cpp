@@ -142,12 +142,8 @@ void Grain::Spawn(Granulator* owner, double time, double pos, float speedMult, f
 
 inline double Grain::GetWindow(double time)
 {
-   if (time > mStartTime && time < mEndTime)
-   {
-      double phase = (time-mStartTime) * mStartToEndInv;
-      return .5 * (1 - juce::dsp::FastMathApproximations::cos<double>(phase * TWO_PI));
-   }
-   return 0;
+   double phase = (time-mStartTime) * mStartToEndInv;
+   return .5 * (1 - juce::dsp::FastMathApproximations::cos<double>(phase * TWO_PI));
 }
 
 void Grain::Process(double time, ChannelBuffer* buffer, int bufferLength, float* output)
@@ -158,7 +154,7 @@ void Grain::Process(double time, ChannelBuffer* buffer, int bufferLength, float*
       float window = GetWindow(time);
       for (int ch=0; ch<buffer->NumActiveChannels(); ++ch)
       {
-         float sample = GetInterpolatedSample(mPos, buffer, bufferLength, ofClamp(ch + mStereoPosition, 0, 1));
+         float sample = GetInterpolatedSample(mPos, buffer, bufferLength, std::clamp(ch + mStereoPosition, 0.f, 1.f));
          output[ch] += sample * window * mVol * (1 + (ch == 0 ? mStereoPosition : -mStereoPosition));
       }
    }
@@ -171,7 +167,7 @@ void Grain::DrawGrain(int idx, float x, float y, float w, float h, int bufferSta
       return;
    ofPushStyle();
    ofFill();
-   float alpha = GetWindow(gTime);
+   float alpha = GetWindow(std::clamp(gTime, mStartTime, mEndTime));
    ofSetColor(255,0,0,alpha*255);
    ofCircle(x+a*w, y+mDrawPos*h, MAX(3,h/MAX_GRAINS/2));
    ofPopStyle();
