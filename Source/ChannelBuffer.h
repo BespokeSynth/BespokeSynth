@@ -37,6 +37,11 @@ public:
    ~ChannelBuffer();
    
    float* GetChannel(int channel);
+   void   GuaranteeChannel(int channel);
+   float* GetChannelUnchecked(int channel) const
+   {
+      return mBuffers[channel];
+   }
    
    void Clear() const;
    

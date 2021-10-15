@@ -115,6 +115,10 @@ void LiveGranulator::ProcessAudio(double time, ChannelBuffer* buffer)
    float bufferSize = buffer->BufferSize();
    mBuffer.SetNumChannels(buffer->NumActiveChannels());
 
+   // guarantee the channels are there so we can use GetChannelUnchecked later
+   for (int ch=0; ch<buffer->NumActiveChannels(); ++ch)
+      buffer->GuaranteeChannel(ch);
+
    for (int i=0; i<bufferSize; ++i)
    {
       ComputeSliders(i);
@@ -123,13 +127,13 @@ void LiveGranulator::ProcessAudio(double time, ChannelBuffer* buffer)
       if (!mFreeze)
       {
          for (int ch=0; ch<buffer->NumActiveChannels(); ++ch)
-            mBuffer.Write(buffer->GetChannel(ch)[i], ch);
+            mBuffer.Write(buffer->GetChannelUnchecked(ch)[i], ch);
       }
       else if (mFreezeExtraSamples < FREEZE_EXTRA_SAMPLES_COUNT)
       {
          ++mFreezeExtraSamples;
          for (int ch=0; ch<buffer->NumActiveChannels(); ++ch)
-            mBuffer.Write(buffer->GetChannel(ch)[i], ch);
+            mBuffer.Write(buffer->GetChannelUnchecked(ch)[i], ch);
       }
       
       if (mEnabled)

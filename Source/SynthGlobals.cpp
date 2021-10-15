@@ -426,15 +426,15 @@ float GetInterpolatedSample(double offset, ChannelBuffer* buffer, int bufferSize
    assert(channelBlend >= 0);
    
    if (buffer->NumActiveChannels() == 1)
-      return GetInterpolatedSample(offset, buffer->GetChannel(0), bufferSize);
+      return GetInterpolatedSample(offset, buffer->GetChannelUnchecked(0), bufferSize);
    
    int channelA = floor(channelBlend);
    if (channelA == buffer->NumActiveChannels() - 1)
       channelA -= 1;
    int channelB = channelA + 1;
    
-   return (1 - (channelBlend - channelA)) * GetInterpolatedSample(offset, buffer->GetChannel(channelA), bufferSize) +
-          (channelBlend - channelA) * GetInterpolatedSample(offset, buffer->GetChannel(channelB), bufferSize);
+   return (1 - (channelBlend - channelA)) * GetInterpolatedSample(offset, buffer->GetChannelUnchecked(channelA), bufferSize) +
+          (channelBlend - channelA) * GetInterpolatedSample(offset, buffer->GetChannelUnchecked(channelB), bufferSize);
 }
 
 void WriteInterpolatedSample(double offset, float* buffer, int bufferSize, float sample)

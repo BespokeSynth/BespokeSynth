@@ -86,6 +86,13 @@ float* ChannelBuffer::GetChannel(int channel)
    return ret;
 }
 
+void ChannelBuffer::GuaranteeChannel(int channel)
+{
+   // For now we can just call GetChannel which guarantees it
+   // but split the API just in case we want to do something else
+   GetChannel(channel);
+}
+
 void ChannelBuffer::Clear() const
 {
    for (int i=0; i<mNumChannels; ++i)
