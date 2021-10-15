@@ -28,7 +28,7 @@
 #include "ModularSynth.h"
 
 SustainPedal::SustainPedal()
-: mSustain(false)
+: mSustain(false), mNoteRepeat(false)
 {
 }
 
@@ -37,6 +37,7 @@ void SustainPedal::CreateUIControls()
    IDrawableModule::CreateUIControls();
 
    mSustainCheckbox = new Checkbox(this, "sustain", 3, 3, &mSustain);
+   mNoteRepeatCheckbox = new Checkbox(this, "note repeat", 3, 18, &mNoteRepeat);
 }
 
 void SustainPedal::DrawModule()
@@ -44,6 +45,7 @@ void SustainPedal::DrawModule()
    if (Minimized() || IsVisible() == false)
       return;
    mSustainCheckbox->Draw();
+   mNoteRepeatCheckbox->Draw();
 }
 
 void SustainPedal::CheckboxUpdated(Checkbox* checkbox)
@@ -70,8 +72,9 @@ void SustainPedal::PlayNote(double time, int pitch, int velocity, int voiceIdx, 
    {
       if (velocity > 0)
       {
-         if (!mIsNoteBeingSustained[pitch]) //don't replay already-sustained notes
+         if (!mIsNoteBeingSustained[pitch] || mNoteRepeat) //don't replay already-sustained notes
             PlayNoteOutput(time, pitch, velocity, voiceIdx, modulation);
+
          mIsNoteBeingSustained[pitch] = false;   //not being sustained by this module it if it's held down
       }
       else

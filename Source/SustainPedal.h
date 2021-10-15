@@ -50,12 +50,14 @@ public:
 private:
    //IDrawableModule
    void DrawModule() override;
-   void GetModuleDimensions(float& width, float& height) override { width = 90; height = 21; }
+   void GetModuleDimensions(float& width, float& height) override { width = 90; height = 36; }
    bool Enabled() const override { return true; }
    
    std::array<bool, 128> mIsNoteBeingSustained{ false };
    bool mSustain;
+   bool mNoteRepeat;
    Checkbox* mSustainCheckbox;
+   Checkbox* mNoteRepeatCheckbox;
 };
 
 #endif /* defined(__Bespoke__SustainPedal__) */
