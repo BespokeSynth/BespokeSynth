@@ -54,7 +54,12 @@ public:
    void MouseReleased() override;
    bool IsMouseDown() const override { return mMouseDown; }
    void SetExtents(float min, float max) { mMin = min; mMax = max; }
-   void Compute(int samplesIn = 0);
+   void Compute(int samplesIn = 0)
+   {
+      mComputeHasBeenCalledOnce = true;   //mark this slider as one whose owner calls compute on it
+      if (mIsSmoothing || mModulator != nullptr)
+         DoCompute(samplesIn);
+   }
    void DisplayLFOControl();
    void DisableLFO();
    FloatSliderLFOControl* GetLFO() { return mLFOControl; }
@@ -118,6 +123,7 @@ private:
    float ValToPos(float val, bool ignoreSmooth) const;
    bool AdjustSmooth() const;
    void SmoothUpdated();
+   void DoCompute(int samplesIn);
    
    int mWidth;
    int mHeight;

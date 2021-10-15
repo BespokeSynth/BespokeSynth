@@ -615,10 +615,8 @@ std::string FloatSlider::GetDisplayValue(float val) const
    return ofToString(displayVar,decDigits);
 }
 
-void FloatSlider::Compute(int samplesIn /*= 0*/)
+void FloatSlider::DoCompute(int samplesIn /*= 0*/)
 {
-   mComputeHasBeenCalledOnce = true;
-
    if (mLastComputeTime == gTime && mLastComputeSamplesIn == samplesIn)
       return;  //we've just calculated this, no need to do it again! earlying out avoids wasted work and circular modulation loops
 
@@ -630,8 +628,8 @@ void FloatSlider::Compute(int samplesIn /*= 0*/)
 
    float oldVal = *mVar;
 
-   static bool sUseCache = true;
-   if (sUseCache && samplesIn >= 0 && samplesIn < gBufferSize && mLastComputeCacheTime[samplesIn] == gTime)
+   const bool kUseCache = true;
+   if (kUseCache && samplesIn >= 0 && samplesIn < gBufferSize && mLastComputeCacheTime[samplesIn] == gTime)
    {
       *mVar = mLastComputeCacheValue[samplesIn];
    }
@@ -648,7 +646,7 @@ void FloatSlider::Compute(int samplesIn /*= 0*/)
       if (mIsSmoothing)
          *mVar = mRamp.Value(gTime + samplesIn * gInvSampleRateMs);
 
-      if (samplesIn >= 0 && samplesIn < gBufferSize && mLastComputeCacheTime[samplesIn] == gTime)
+      if (samplesIn >= 0 && samplesIn < gBufferSize && mLastComputeCacheTime[samplesIn] != gTime)
       {
          mLastComputeCacheValue[samplesIn] = *mVar;
          mLastComputeCacheTime[samplesIn] = gTime;
