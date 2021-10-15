@@ -27,6 +27,7 @@
 #include "SynthGlobals.h"
 #include "Profiler.h"
 #include "ChannelBuffer.h"
+#include "juce_dsp/maths/juce_FastMathApproximations.h"
 
 Granulator::Granulator()
 : mNextGrainIdx(0)
@@ -131,9 +132,18 @@ void Grain::Spawn(Granulator* owner, double time, double pos, float speedMult, f
    mSpeedMult = speedMult;
    mStartTime = time;
    mEndTime = time + lengthInMs;
+   mStartToEnd = mEndTime - mStartTime;
+   mStartToEndInv = 1.0 / mStartToEnd;
    mVol = vol;
    mStereoPosition = ofRandom(-width, width);
    mDrawPos = ofRandom(1);
+}
+
+
+inline double Grain::GetWindow(double time)
+{
+   double phase = (time-mStartTime) * mStartToEndInv;
+   return .5 * (1 - juce::dsp::FastMathApproximations::cos<double>(phase * TWO_PI));
 }
 
 void Grain::Process(double time, ChannelBuffer* buffer, int bufferLength, float* output)
@@ -144,20 +154,10 @@ void Grain::Process(double time, ChannelBuffer* buffer, int bufferLength, float*
       float window = GetWindow(time);
       for (int ch=0; ch<buffer->NumActiveChannels(); ++ch)
       {
-         float sample = GetInterpolatedSample(mPos, buffer, bufferLength, ofClamp(ch + mStereoPosition, 0, 1));
+         float sample = GetInterpolatedSample(mPos, buffer, bufferLength, std::clamp(ch + mStereoPosition, 0.f, 1.f));
          output[ch] += sample * window * mVol * (1 + (ch == 0 ? mStereoPosition : -mStereoPosition));
       }
    }
-}
-
-double Grain::GetWindow(double time)
-{
-   if (time > mStartTime && time < mEndTime)
-   {
-      double phase = (time-mStartTime)/(mEndTime-mStartTime);
-      return .5 * (1 - cos(phase * TWO_PI));
-   }
-   return 0;
 }
 
 void Grain::DrawGrain(int idx, float x, float y, float w, float h, int bufferStart, int viewLength, int bufferLength)
@@ -167,7 +167,7 @@ void Grain::DrawGrain(int idx, float x, float y, float w, float h, int bufferSta
       return;
    ofPushStyle();
    ofFill();
-   float alpha = GetWindow(gTime);
+   float alpha = GetWindow(std::clamp(gTime, mStartTime, mEndTime));
    ofSetColor(255,0,0,alpha*255);
    ofCircle(x+a*w, y+mDrawPos*h, MAX(3,h/MAX_GRAINS/2));
    ofPopStyle();
