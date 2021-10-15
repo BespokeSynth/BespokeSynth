@@ -183,6 +183,7 @@ target_sources(BespokeSynth PRIVATE
     NoteCreator.cpp
     NoteDelayer.cpp
     NoteDisplayer.cpp
+    NoteExpressionRouter.cpp
     NoteFilter.cpp
     NoteFlusher.cpp
     NoteGate.cpp

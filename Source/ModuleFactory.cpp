@@ -247,6 +247,7 @@
 #include "MPETweaker.h"
 
 #include <juce_core/juce_core.h>
+#include "NoteExpressionRouter.h"
 
 #define REGISTER(class,name,type) Register(#name, &(class::Create), &(class::CanCreate), type, false, false);
 #define REGISTER_HIDDEN(class,name,type) Register(#name, &(class::Create), &(class::CanCreate), type, true, false);
@@ -435,6 +436,7 @@ ModuleFactory::ModuleFactory()
    REGISTER(MPETweaker, mpetweaker, kModuleType_Note);
    REGISTER(GridSliders, gridsliders, kModuleType_Modulator);
    REGISTER(MultitrackRecorder, multitrackrecorder, kModuleType_Other);
+   REGISTER(NoteExpressionRouter, noteexpressionrouter, kModuleType_Note);
 
    //REGISTER_EXPERIMENTAL(MidiPlayer, midiplayer, kModuleType_Instrument);
    REGISTER_HIDDEN(Autotalent, autotalent, kModuleType_Audio);
