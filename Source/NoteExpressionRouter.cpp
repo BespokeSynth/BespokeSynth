@@ -27,7 +27,6 @@
 
 #include "NoteExpressionRouter.h"
 #include "OpenFrameworksPort.h"
-#include "Scale.h"
 #include "ModularSynth.h"
 #include "PatchCableSource.h"
 #include "UIControlMacros.h"

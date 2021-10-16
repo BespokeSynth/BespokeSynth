@@ -27,12 +27,12 @@
 
 #pragma once
 
-#include <iostream>
+#include <array>
 #include "NoteEffectBase.h"
 #include "IDrawableModule.h"
 #include "Checkbox.h"
 #include "INoteSource.h"
-#include "Slider.h"
+#include "TextEntry.h"
 #include "exprtk/exprtk.hpp"
 
 class NoteExpressionRouter : public INoteReceiver, public INoteSource, public IDrawableModule, public ITextEntryListener
