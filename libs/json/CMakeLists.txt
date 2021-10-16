@@ -7,5 +7,5 @@ add_library(${PROJECT_NAME}
         )
 
 target_include_directories(${PROJECT_NAME} PUBLIC jsoncpp/include)
-
+target_compile_options(${PROJECT_NAME} PRIVATE $<$<CXX_COMPILER_ID:GNU>:-Wno-deprecated-declarations>)
 add_library(bespoke::${PROJECT_NAME} ALIAS ${PROJECT_NAME})
