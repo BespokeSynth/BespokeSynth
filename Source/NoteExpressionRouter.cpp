@@ -33,7 +33,7 @@
 
 NoteExpressionRouter::NoteExpressionRouter()
 {
-   mSymbolTable.add_variable("n", mSTNote);
+   mSymbolTable.add_variable("p", mSTNote);
    mSymbolTable.add_variable("v", mSTVelocity);
 
    for (auto i=0; i<kMaxDestinations; ++i)
@@ -51,7 +51,7 @@ void NoteExpressionRouter::CreateUIControls()
    UIBLOCK0();
    for (int i=0; i<kMaxDestinations; ++i)
    {
-      TEXTENTRY(mExpressionWidget[i],("expression "+ofToString(i)).c_str(),30, mExpressionText[i]);
+      TEXTENTRY(mExpressionWidget[i],("expression"+ofToString(i)).c_str(),30, mExpressionText[i]);
       mDestinationCables[i] = new AdditionalNoteCable();
       mDestinationCables[i]->SetPatchCableSource(new PatchCableSource(this, kConnectionType_Note));
       mDestinationCables[i]->GetPatchCableSource()->SetOverrideCableDir(ofVec2f(1,0));

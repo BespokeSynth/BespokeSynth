@@ -46,6 +46,8 @@ public:
    
    void PlayNote(double time, int pitch, int velocity, int voiceIdx, ModulationParameters modulation) override;
    void SendCC(int control, int value, int voiceIdx = -1) override;
+
+   void TextEntryComplete(TextEntry *entry) override;
    
    virtual void LoadLayout(const ofxJSONElement& moduleInfo) override;
    virtual void SetUpFromSaveData() override;
@@ -60,9 +62,6 @@ private:
    AdditionalNoteCable* mDestinationCables[kMaxDestinations];
    float mWidth;
    float mHeight;
-
-public:
-    void TextEntryComplete(TextEntry *entry) override;
 
 private:
 
