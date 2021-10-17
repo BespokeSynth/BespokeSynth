@@ -319,6 +319,7 @@ target_sources(BespokeSynth PRIVATE
     VSTPlayhead.cpp
     VSTPlugin.cpp
     VSTWindow.cpp
+    VSTScanner.cpp
     ValueSetter.cpp
     ValueStream.cpp
     VelocityScaler.cpp

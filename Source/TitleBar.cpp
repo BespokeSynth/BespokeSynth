@@ -34,6 +34,7 @@
 #include "Prefab.h"
 #include "UserPrefsEditor.h"
 #include "UIControlMacros.h"
+#include "VSTScanner.h"
 
 #include "juce_audio_devices/juce_audio_devices.h"
 
@@ -44,7 +45,7 @@ bool TitleBar::sShowInitialHelpOverlay = true;
 
 namespace
 {
-   const std::string kRescanPluginsLabel = "rescan VSTs...";
+   const std::string kManageVSTsLabel = "manage VSTs...";
 }
 
 SpawnList::SpawnList(IDropdownListener* owner, SpawnListManager* listManager, int x, int y, std::string label)
@@ -72,7 +73,7 @@ void SpawnList::SetList(std::vector<std::string> spawnables, std::string overrid
       std::string name = mSpawnables[i].c_str();
       if (mOverrideModuleType == "" && TheSynth->GetModuleFactory()->IsExperimental(name))
          name += " (exp.)";
-      if (mOverrideModuleType == "vstplugin" && name != kRescanPluginsLabel)
+      if (mOverrideModuleType == "vstplugin" && name != kManageVSTsLabel)
          name = juce::File(name).getFileName().toStdString();
       mSpawnList->AddLabel(name,i);
    }
@@ -102,9 +103,9 @@ IDrawableModule* SpawnList::Spawn()
 
    if (mOverrideModuleType == "vstplugin")
    {
-      if (mSpawnables[mSpawnIndex] == kRescanPluginsLabel)
+      if (mSpawnables[mSpawnIndex] == kManageVSTsLabel)
       {
-         TheTitleBar->RescanVSTs();
+         TheTitleBar->ManageVSTs();
          return nullptr;
       }
    }
@@ -157,7 +158,6 @@ TitleBar::TitleBar()
 , mLoadLayoutDropdown(nullptr)
 , mLoadLayoutIndex(-1)
 , mSpawnLists(this)
-, mVstRescanCountdown(0)
 , mLeftCornerHovered(false)
 {
    assert(TheTitleBar == nullptr);
@@ -203,14 +203,19 @@ TitleBar::~TitleBar()
    TheTitleBar = nullptr;
 }
 
-void TitleBar::Poll()
+void TitleBar::ManageVSTs()
 {
-   if (mVstRescanCountdown > 0)
-   {
-      --mVstRescanCountdown;
-      if (mVstRescanCountdown == 0)
-         mSpawnLists.SetUpVstDropdown(true);
-   }
+   if (mPluginListWindow == nullptr)
+      mPluginListWindow.reset(new PluginListWindow(VSTPlugin::sFormatManager, this));
+
+   mPluginListWindow->toFront(true);
+}
+
+void TitleBar::OnWindowClosed()
+{
+   mPluginListWindow.reset(nullptr);
+
+   VSTPlugin::sPluginList.createXml()->writeTo(juce::File(ofToDataPath("vst/found_vsts.xml")));
 }
 
 SpawnListManager::SpawnListManager(IDropdownListener* owner)
@@ -236,7 +241,7 @@ void SpawnListManager::SetModuleFactory(ModuleFactory* factory)
    mPulseModules.SetList(factory->GetSpawnableModules(kModuleType_Pulse), "");
    mOtherModules.SetList(factory->GetSpawnableModules(kModuleType_Other), "");
    
-   SetUpVstDropdown(false);
+   SetUpVstDropdown();
    
    std::vector<std::string> prefabs;
    ModuleFactory::GetPrefabs(prefabs);
@@ -253,11 +258,11 @@ void SpawnListManager::SetModuleFactory(ModuleFactory* factory)
    mDropdowns.push_back(&mPrefabs);
 }
 
-void SpawnListManager::SetUpVstDropdown(bool rescan)
+void SpawnListManager::SetUpVstDropdown()
 {
    std::vector<std::string> vsts;
-   VSTLookup::GetAvailableVSTs(vsts, rescan);
-   vsts.push_back(kRescanPluginsLabel);
+   VSTLookup::GetAvailableVSTs(vsts);
+   vsts.insert(vsts.begin(), kManageVSTsLabel);
    mVstPlugins.SetList(vsts, "vstplugin");
 }
 
@@ -422,15 +427,15 @@ void TitleBar::DrawModule()
 
 void TitleBar::DrawModuleUnclipped()
 {
-   if (mVstRescanCountdown > 0 || VSTPlugin::sIsRescanningVsts)
+   if (mPluginListWindow != nullptr)
    {
       ofPushStyle();
       ofSetColor(255, 255, 255);
       float titleBarWidth, titleBarHeight;
       TheTitleBar->GetDimensions(titleBarWidth, titleBarHeight);
       float x = 100;
-      float y = 40 + titleBarHeight;
-      gFontBold.DrawString("scanning VSTs, please wait...", 50, x, y);
+      float y = 50 + titleBarHeight;
+      gFontBold.DrawString("please close VST manager to continue", 50, x, y);
       ofPopStyle();
       return;
    }
@@ -497,6 +502,12 @@ void TitleBar::GetModuleDimensions(float& width, float& height)
 
 void TitleBar::CheckboxUpdated(Checkbox* checkbox)
 {
+}
+
+void TitleBar::DropdownClicked(DropdownList* list)
+{
+   if (list == mSpawnLists.mVstPlugins.GetList())
+      mSpawnLists.SetUpVstDropdown();
 }
 
 void TitleBar::DropdownUpdated(DropdownList* list, int oldVal)

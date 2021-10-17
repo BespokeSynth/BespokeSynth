@@ -67,7 +67,6 @@ void UserPrefsEditor::CreateUIControls()
    TEXTENTRY(mDefaultLayoutPathEntry, "layout", 100, &mDefaultLayoutPath);
    TEXTENTRY(mYoutubeDlPathEntry, "youtube-dl_path", 100, &mYoutubeDlPath);
    TEXTENTRY(mFfmpegPathEntry, "ffmpeg_path", 100, &mFfmpegPath);
-   TEXTENTRY(mVstSearchDirsEntry, "vstsearchdirs", 1000, &mVstSearchDirs);
    CHECKBOX(mShowTooltipsOnLoadCheckbox, "show_tooltips_on_load", &mShowTooltipsOnLoad);
    CHECKBOX(mShowMinimapCheckbox, "show_minimap", &mShowMinimap);
    UIBLOCK_SHIFTDOWN();
@@ -81,7 +80,6 @@ void UserPrefsEditor::CreateUIControls()
    mUIScaleSlider->SetShowName(false);
    mScrollMultiplierVerticalSlider->SetShowName(false);
    mScrollMultiplierHorizontalSlider->SetShowName(false);
-   mVstSearchDirsEntry->SetFlexibleWidth(true);
 }
 
 void UserPrefsEditor::Show()
@@ -177,28 +175,6 @@ void UserPrefsEditor::Show()
    }
    else
       mFfmpegPath = TheSynth->GetUserPrefs()["ffmpeg_path"].asString();
-   
-   if (TheSynth->GetUserPrefs()["vstsearchdirs"].isNull())
-   {
-#if BESPOKE_MAC
-      mVstSearchDirs = "/Library/Audio/Plug-Ins/VST3, /Library/Audio/Plug-Ins/VST";
-#elif BESPOKE_LINUX
-      mVstSearchDirs = "~/.vst/, /usr/lib64/vst, /usr/lib64/vst3, /usr/lib/lxvst";
-#else
-      mVstSearchDirs = "C:/Program Files/Common Files/VST2, C:/Program Files/Common Files/VST3, C:/Program Files/Steinberg/VSTPlugins";
-#endif
-   }
-   else
-   {
-      const ofxJSONElement& strArray = TheSynth->GetUserPrefs()["vstsearchdirs"];
-      mVstSearchDirs = "";
-      for (unsigned int i=0; i<strArray.size(); ++i)
-      {
-         mVstSearchDirs += strArray[i].asString();
-         if (i < strArray.size()-1)
-            mVstSearchDirs += ", ";
-      }
-   }
 
    if (TheSynth->GetUserPrefs()["show_tooltips_on_load"].isNull())
       mShowTooltipsOnLoad = true;
@@ -506,9 +482,6 @@ void UserPrefsEditor::ButtonClicked(ClickButton* button)
       UpdatePrefStr(userPrefs, "layout", mDefaultLayoutPath);
       UpdatePrefStr(userPrefs, "youtube-dl_path", mYoutubeDlPath);
       UpdatePrefStr(userPrefs, "ffmpeg_path", mFfmpegPath);
-      std::string vstSearchDirs = mVstSearchDirs;
-      ofStringReplace(vstSearchDirs, ", ", ",");
-      UpdatePrefStrArray(userPrefs, "vstsearchdirs", ofSplitString(vstSearchDirs, ","));
       UpdatePrefBool(userPrefs, "show_tooltips_on_load", mShowTooltipsOnLoad);
       UpdatePrefBool(userPrefs, "show_minimap", mShowMinimap);
 

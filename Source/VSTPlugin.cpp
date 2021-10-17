@@ -52,52 +52,30 @@ namespace
    }
 }
 
-//static
-bool VSTPlugin::sIsRescanningVsts = false;
-
 using namespace juce;
+
+//static
+juce::AudioPluginFormatManager VSTPlugin::sFormatManager;
+juce::KnownPluginList VSTPlugin::sPluginList;
 
 namespace VSTLookup
 {
-   static juce::AudioPluginFormatManager sFormatManager;
-   static juce::KnownPluginList sPluginList;
-   
-   void GetAvailableVSTs(std::vector<std::string>& vsts, bool rescan)
+   void GetAvailableVSTs(std::vector<std::string>& vsts)
    {
       static bool sFirstTime = true;
       if (sFirstTime)
-         sFormatManager.addDefaultFormats();
+      {
+         VSTPlugin::sFormatManager.addDefaultFormats();
 
-      if (rescan)
-      {
-         VSTPlugin::sIsRescanningVsts = true;
-         sPluginList.clear();
-         juce::File deadMansPedalFile(ofToDataPath("vst/deadmanspedal.txt"));
-         juce::FileSearchPath searchPath;
-         for (int i = 0; i < TheSynth->GetUserPrefs()["vstsearchdirs"].size(); ++i)
-            searchPath.add(juce::File(TheSynth->GetUserPrefs()["vstsearchdirs"][i].asString()));
-         for (int i = 0; i < sFormatManager.getNumFormats(); ++i)
-         {
-            juce::PluginDirectoryScanner scanner(sPluginList, *(sFormatManager.getFormat(i)), searchPath, true, deadMansPedalFile, true);
-            juce::String nameOfPluginBeingScanned;
-            while (scanner.scanNextFile(true, nameOfPluginBeingScanned))
-            {
-               ofLog() << "scanning " + nameOfPluginBeingScanned;
-            }
-         }
-         sPluginList.createXml()->writeTo(juce::File(ofToDataPath("vst/found_vsts.xml")));
-         VSTPlugin::sIsRescanningVsts = false;
-      }
-      else
-      {
          auto file = juce::File(ofToDataPath("vst/found_vsts.xml"));
          if (file.existsAsFile())
          {
             auto xml = juce::parseXML(file);
-            sPluginList.recreateFromXml(*xml);
+            VSTPlugin::sPluginList.recreateFromXml(*xml);
          }
       }
-      auto types = sPluginList.getTypes();
+      
+      auto types = VSTPlugin::sPluginList.getTypes();
       for (int i=0; i<types.size(); ++i)
       {
          vsts.push_back(types[i].fileOrIdentifier.toStdString());
@@ -139,7 +117,7 @@ namespace VSTLookup
    {
       assert(list);
       std::vector<std::string> vsts;
-      GetAvailableVSTs(vsts, false);
+      GetAvailableVSTs(vsts);
       for (int i=0; i<vsts.size(); ++i)
          list->AddLabel(vsts[i].c_str(), i);
    }
@@ -150,7 +128,7 @@ namespace VSTLookup
          return vstName;
       
       vstName = GetFileNameWithoutExtension(vstName).toStdString();
-      auto types = sPluginList.getTypes();
+      auto types = VSTPlugin::sPluginList.getTypes();
       for (int i=0; i<types.size(); ++i)
       {
          juce::File vst(types[i].fileOrIdentifier);
@@ -185,8 +163,8 @@ VSTPlugin::VSTPlugin()
    juce::File(ofToDataPath("vst")).createDirectory();
    juce::File(ofToDataPath("vst/presets")).createDirectory();
    
-   if (VSTLookup::sFormatManager.getNumFormats() == 0)
-      VSTLookup::sFormatManager.addDefaultFormats();
+   if (sFormatManager.getNumFormats() == 0)
+      sFormatManager.addDefaultFormats();
    
    mChannelModulations.resize(kGlobalModulationIdx+1);
 
@@ -282,7 +260,7 @@ void VSTPlugin::SetVST(std::string vstName)
       //mWindowOverlay = nullptr;
    }
    
-   auto types = VSTLookup::sPluginList.getTypes();
+   auto types = sPluginList.getTypes();
    bool found = false;
    for (int i=0; i<types.size(); ++i)
    {
@@ -339,11 +317,11 @@ void VSTPlugin::LoadVST(juce::PluginDescription desc)
             callbackDone = true;
          };
 
-         sFormatManager.getFormat(i)->createPluginInstanceAsync(desc, gSampleRate, gBufferSize, completionCallback);*/
+         VSTPlugin::sFormatManager.getFormat(i)->createPluginInstanceAsync(desc, gSampleRate, gBufferSize, completionCallback);*/
 
    mVSTMutex.lock();
    juce::String errorMessage;
-   mPlugin = VSTLookup::sFormatManager.createPluginInstance(desc, gSampleRate, gBufferSize, errorMessage);
+   mPlugin = sFormatManager.createPluginInstance(desc, gSampleRate, gBufferSize, errorMessage);
    if (mPlugin != nullptr)
    {
       mPlugin->enableAllBuses();
@@ -867,7 +845,7 @@ void VSTPlugin::ButtonClicked(ClickButton* button)
       if (mPlugin != nullptr)
       {
          if (mWindow == nullptr)
-            mWindow = std::unique_ptr<VSTWindow>(VSTWindow::CreateWindow(this, VSTWindow::Normal));
+            mWindow = std::unique_ptr<VSTWindow>(VSTWindow::CreateVSTWindow(this, VSTWindow::Normal));
          mWindow->ShowWindow();
       }
       

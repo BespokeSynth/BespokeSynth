@@ -41,6 +41,7 @@ VSTWindow::VSTWindow (VSTPlugin* vst,
 #endif
 {
    setSize (400, 300);
+   setResizable(true, true);
    
    setContentOwned (pluginEditor, true);
 
@@ -64,7 +65,7 @@ VSTWindow::VSTWindow (VSTPlugin* vst,
 }
 
 //static
-VSTWindow* VSTWindow::CreateWindow(VSTPlugin* vst, WindowFormatType type)
+VSTWindow* VSTWindow::CreateVSTWindow(VSTPlugin* vst, WindowFormatType type)
 {
    juce::AudioProcessorEditor* ui = nullptr;
    
