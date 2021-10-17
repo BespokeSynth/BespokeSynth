@@ -1520,6 +1520,11 @@ noterouter~allows you to control where notes are routed to using a UI control. t
 
 
 
+noteexpression~control where notes are routed based upon evaluated expressions. the variable "p" represents pitch, and "v" represents velocity
+~expression*~expression to evaluate for this cable. example expression to route notes with pitch greater than 80 and velocity less than 60:\n"p > 80 && v < 60"
+
+
+
 noteratchet~rapidly repeat an input note over a duration
 ~duration~total length of time repeats should last
 ~subdivision~length of each repeat
