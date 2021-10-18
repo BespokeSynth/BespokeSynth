@@ -230,7 +230,7 @@ void ModularSynth::DumpStats(bool isCrash, void* crashContext)
    log.appendText("display language: " + juce::SystemStats::getDisplayLanguage() + "\n");
    log.appendText("description: " + juce::SystemStats::getDeviceDescription() + "\n");
    log.appendText("manufacturer: " + juce::SystemStats::getDeviceManufacturer() + "\n");
-   log.appendText("build: bespoke " + JUCEApplication::getInstance()->getApplicationVersion() + " (" + std::string(__DATE__) + " " + std::string(__TIME__) + ")\n");
+   log.appendText("build: bespoke " + GetBuildInfoString() + ")\n");
 }
 
 bool ModularSynth::IsReady()

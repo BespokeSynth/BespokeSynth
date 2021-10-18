@@ -150,6 +150,7 @@ void SynthInit();
 void LoadGlobalResources();
 
 void SetGlobalSampleRateAndBufferSize(int rate, int size);
+std::string GetBuildInfoString();
 void DrawAudioBuffer(float width, float height, ChannelBuffer* buffer, float start, float end, float pos, float vol=1, ofColor color=ofColor::black, int wraparoundFrom = -1, int wraparoundTo = 0);
 void DrawAudioBuffer(float width, float height, const float* buffer, float start, float end, float pos, float vol=1, ofColor color=ofColor::black, int wraparoundFrom = -1, int wraparoundTo = 0, int bufferSize = -1);
 void Add(float* buff1, const float* buff2, int bufferSize);
