@@ -52,6 +52,7 @@ public:
       ofLog() << "   git hash        : " << Bespoke::GIT_HASH;
       ofLog() << "   git branch      : " << Bespoke::GIT_BRANCH;
       ofLog() << "   build time      : " << Bespoke::BUILD_DATE << " at " << Bespoke::BUILD_TIME;
+      ofLog() << "   command line    : " << JUCEApplication::getCommandLineParameters();
 
       openGLContext.setOpenGLVersionRequired(juce::OpenGLContext::openGL3_2);
       openGLContext.setContinuousRepainting(false);
@@ -325,6 +326,13 @@ public:
             audioError += juce::String("\n\nattempted to set output to: "+outputDevice+" and input to: "+inputDevice+"\n\ninitialization errors could potentially be fixed by changing buffer size, sample rate, or input/output devices in userprefs.json\nto use no input device, specify \"none\" for \"audio_input_device\"");
          mSynth.SetFatalError("error initializing audio device: "+audioError.toStdString() +
                               "\n\n\nvalid devices:\n" + GetAudioDevices());
+      }
+
+      if (JUCEApplication::getCommandLineParameterArray().size() > 0)
+      {
+         juce::String argument = JUCEApplication::getCommandLineParameterArray()[0];
+         if (argument.endsWith(".bsk"))
+            mSynth.SetStartupSaveStateFile(argument.toStdString());
       }
       
       startTimerHz(60);

@@ -840,8 +840,8 @@ void ModularSynth::DrawConsole()
          else if (it->type == kLogEventType_Warning)
             ofSetColor(255, 255, 0);
          else
-            ofSetColor(200, 200, 200);
-         DrawTextNormal(it->text, 10, consoleY);
+            ofSetColor(255, 255, 255);
+         gFontFixedWidth.DrawString(it->text, 15, 10, consoleY);
          std::vector<std::string> lines = ofSplitString(it->text, "\n");
          ofPopStyle();
          consoleY += 15 * lines.size();
@@ -854,7 +854,7 @@ void ModularSynth::DrawConsole()
          ofSetColor(255,0,0);
          for (auto it = mErrors.begin(); it != mErrors.end(); ++it)
          {
-            DrawTextNormal(*it, 600, consoleY);
+            gFontFixedWidth.DrawString(*it, 15, 600, consoleY);
             std::vector<std::string> lines = ofSplitString(*it, "\n");
             consoleY += 15 * lines.size();
          }
