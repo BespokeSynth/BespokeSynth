@@ -47,7 +47,7 @@ class ofxJSONElement;
 
 namespace VSTLookup
 {
-   void GetAvailableVSTs(std::vector<std::string>& vsts, bool rescan);
+   void GetAvailableVSTs(std::vector<std::string>& vsts);
    void FillVSTList(DropdownList* list);
    std::string GetVSTPath(std::string vstName);
 }
@@ -92,8 +92,9 @@ public:
    void SaveState(FileStreamOut& out) override;
    void LoadState(FileStreamIn& in) override;
    std::vector<IUIControl*> ControlsToIgnoreInSaveState() const override;
-   
-   static bool sIsRescanningVsts;
+
+   static juce::AudioPluginFormatManager sFormatManager;
+   static juce::KnownPluginList sPluginList;
    
 private:
    //IDrawableModule

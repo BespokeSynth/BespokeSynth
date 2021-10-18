@@ -532,7 +532,7 @@ std::vector<std::string> ModuleFactory::GetSpawnableModules(std::string keys)
    }
 
    std::vector<std::string> vsts;
-   VSTLookup::GetAvailableVSTs(vsts, false);
+   VSTLookup::GetAvailableVSTs(vsts);
    for (auto vstFile : vsts)
    {
       std::string vstName = juce::File(vstFile).getFileName().toStdString();

@@ -31,11 +31,13 @@
 #include "DropdownList.h"
 #include "ClickButton.h"
 #include "Slider.h"
+#include "WindowCloseListener.h"
 
 class ModuleFactory;
 class TitleBar;
 class HelpDisplay;
 struct SpawnListManager;
+class PluginListWindow;
 
 class SpawnList
 {
@@ -65,7 +67,7 @@ struct SpawnListManager
    SpawnListManager(IDropdownListener* owner);
    
    void SetModuleFactory(ModuleFactory* factory);
-   void SetUpVstDropdown(bool rescan);
+   void SetUpVstDropdown();
    std::vector<SpawnList*> GetDropdowns() { return mDropdowns; }
    
    SpawnList mInstrumentModules;
@@ -82,7 +84,7 @@ private:
    std::vector<SpawnList*> mDropdowns;
 };
 
-class TitleBar : public IDrawableModule, public IDropdownListener, public IButtonListener, public IFloatSliderListener
+class TitleBar : public IDrawableModule, public IDropdownListener, public IButtonListener, public IFloatSliderListener, public WindowCloseListener
 {
 public:
    TitleBar();
@@ -93,17 +95,19 @@ public:
    bool HasTitleBar() const override { return false; }
    bool AlwaysOnTop() override { return true; }
    bool IsSingleton() const override { return true; }
-   void Poll() override;
    
    HelpDisplay* GetHelpDisplay() { return mHelpDisplay; }
 
    void SetModuleFactory(ModuleFactory* factory) { mSpawnLists.SetModuleFactory(factory); }
    void ListLayouts();
-   void RescanVSTs() { mVstRescanCountdown = 5; }
+   void ManageVSTs();
    
    bool IsSaveable() override { return false; }
+
+   void OnWindowClosed() override;
    
    void CheckboxUpdated(Checkbox* checkbox) override;
+   void DropdownClicked(DropdownList* list) override;
    void DropdownUpdated(DropdownList* list, int oldVal) override;
    void ButtonClicked(ClickButton* button) override;
    void FloatSliderUpdated(FloatSlider* slider, float oldVal) override {}
@@ -139,9 +143,10 @@ private:
    HelpDisplay* mHelpDisplay;
    
    SpawnListManager mSpawnLists;
-   int mVstRescanCountdown;
    
    bool mLeftCornerHovered;
+
+   std::unique_ptr<PluginListWindow> mPluginListWindow;
 };
 
 extern TitleBar* TheTitleBar;
