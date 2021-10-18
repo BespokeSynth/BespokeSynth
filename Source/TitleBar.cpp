@@ -326,6 +326,13 @@ void TitleBar::DrawModule()
    if (gHoveredModule == this && mLeftCornerHovered)
       ofSetColor(ofColor::lerp(ofColor::black, ofColor::white, ofMap(sin(gTime / 1000 * PI * 2),-1,1,.7f,.9f)));
    DrawTextBold("bespoke", 2, 28, 36);
+#if DEBUG
+   ofFill();
+   ofSetColor(0, 0, 0, 180);
+   ofRect(13, 12, 90, 17);
+   ofSetColor(255, 0, 0);
+   DrawTextBold("debug build", 17, 25, 19);
+#endif
    ofPopStyle();
    
    std::string info;

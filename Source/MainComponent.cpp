@@ -39,7 +39,7 @@ public:
    , mPixelRatio(1)
    , mSpaceMouseReader(mSynth)
    {
-      ofLog() << "bespoke synth " << JUCEApplication::getInstance()->getApplicationVersion();
+      ofLog() << "bespoke synth " << GetBuildInfoString();
 
       // sigh ofLog isn't a stream so std::hex doesn't work so
       char jv[256];

@@ -118,6 +118,15 @@ void SetGlobalSampleRateAndBufferSize(int rate, int size)
    gNyquistLimit = gSampleRate / 2.0f;
 }
 
+std::string GetBuildInfoString()
+{
+   return
+#if DEBUG
+      "DEBUG BUILD " + 
+#endif
+      juce::JUCEApplication::getInstance()->getApplicationVersion().toStdString() + " (" + std::string(__DATE__) + " " + std::string(__TIME__) + ")";
+}
+
 void DrawAudioBuffer(float width, float height, ChannelBuffer* buffer, float start, float end, float pos, float vol /*=1*/, ofColor color /*=ofColor::black*/, int wraparoundFrom /*= -1*/, int wraparoundTo /*= 0*/)
 {
    ofPushMatrix();
