@@ -1403,7 +1403,7 @@ bool EvaluateExpression(std::string expressionStr, float currentValue, float& ou
 
 ofLog::~ofLog()
 {
-   std::string output = ofToString(gTime / 1000) + ": " + mMessage;
+   std::string output = ofToString(gTime / 1000, 8) + ": " + mMessage;
    DBG(output);
    if (mSendToBespokeConsole)
       TheSynth->LogEvent(output, kLogEventType_Verbose);

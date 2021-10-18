@@ -52,6 +52,7 @@ public:
       ofLog() << "   git hash        : " << Bespoke::GIT_HASH;
       ofLog() << "   git branch      : " << Bespoke::GIT_BRANCH;
       ofLog() << "   build time      : " << Bespoke::BUILD_DATE << " at " << Bespoke::BUILD_TIME;
+      ofLog() << "   command line    : " << JUCEApplication::getCommandLineParameters();
 
       openGLContext.setOpenGLVersionRequired(juce::OpenGLContext::openGL3_2);
       openGLContext.setContinuousRepainting(false);
@@ -326,6 +327,13 @@ public:
          mSynth.SetFatalError("error initializing audio device: "+audioError.toStdString() +
                               "\n\n\nvalid devices:\n" + GetAudioDevices());
       }
+
+      if (JUCEApplication::getCommandLineParameterArray().size() > 0)
+      {
+         juce::String argument = JUCEApplication::getCommandLineParameterArray()[0];
+         if (argument.endsWith(".bsk"))
+            mSynth.SetStartupSaveStateFile(argument.toStdString());
+      }
       
       startTimerHz(60);
    }
@@ -334,6 +342,11 @@ public:
    {
       nvgDeleteGLES2(mVG);
       nvgDeleteGLES2(mFontBoundsVG);
+   }
+
+   void SetStartupSaveStateFile(const juce::String& bskPath)
+   {
+      mSynth.SetStartupSaveStateFile(bskPath.toStdString());
    }
    
    void render() override
@@ -576,6 +589,16 @@ private:
 
 // (This function is called by the app startup code to create our main component)
 Component* createMainContentComponent()     { return new MainContentComponent(); }
+
+// This function is called when opening the app with a bsk file.
+void SetStartupSaveStateFile(const juce::String& bskFilePath, Component* component)
+{
+   auto* mainComponent = dynamic_cast<MainContentComponent*>(component);
+   if(mainComponent == nullptr)
+      ofLog() << "Non main component sent to SetStartupSaveStateFile";
+   else
+      mainComponent->SetStartupSaveStateFile(bskFilePath);
+}
 
 
 #endif  // MAINCOMPONENT_H_INCLUDED

@@ -209,7 +209,8 @@ public:
    void SaveLayoutAsPopup();
    void SaveOutput();
    void SaveState(std::string file, bool autosave);
-   void LoadState(std::string file);
+   void LoadState(std::string file); 
+   void SetStartupSaveStateFile(std::string bskPath);
    void SaveCurrentState();
    void SaveStatePopup();
    void LoadStatePopup();
@@ -310,6 +311,7 @@ private:
    std::string mLoadedLayoutPath;
    bool mWantReloadInitialLayout;
    std::string mCurrentSaveStatePath;
+   std::string mStartupSaveStateFile;
    double mLastSaveTime;
    
    Sample* mHeldSample;

@@ -18,6 +18,7 @@ using namespace juce;
 
 Component* createMainContentComponent();
 std::unique_ptr<juce::ApplicationProperties> appProperties;
+void SetStartupSaveStateFile(const String& bskPath, Component* mainComponent);
 
 juce::ApplicationProperties& getAppProperties()
 {
@@ -76,6 +77,10 @@ public:
       // When another instance of the app is launched while this one is running,
       // this method is invoked, and the commandLine parameter tells you what
       // the other instance's command-line arguments were.
+
+      // This is also called when opening the app with a file.
+      if(commandLine.isNotEmpty() && commandLine.endsWith(".bsk"))
+        SetStartupSaveStateFile(commandLine, mainWindow->getContentComponent());
    }
    
    //==============================================================================

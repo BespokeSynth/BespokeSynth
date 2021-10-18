@@ -8,6 +8,7 @@ juce_add_gui_app(BespokeSynth
     BLUETOOTH_PERMISSION_ENABLED  TRUE
     FILE_SHARING_ENABLED          TRUE
     DOCUMENT_BROWSER_ENABLED      TRUE
+    DOCUMENT_EXTENSIONS           .bsk
     )
 
 bespoke_buildtime_version_info(BespokeSynth)

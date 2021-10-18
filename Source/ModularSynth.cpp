@@ -352,7 +352,10 @@ void ModularSynth::Poll()
       
       if (!mInitialized && sFrameCount > 3) //let some frames render before blocking for a load
       {
-         LoadLayoutFromFile(ofToDataPath(defaultLayout));
+         if(!mStartupSaveStateFile.empty())
+            LoadState(mStartupSaveStateFile);
+         else
+            LoadLayoutFromFile(ofToDataPath(defaultLayout));
          mInitialized = true;
       }
 
@@ -837,8 +840,8 @@ void ModularSynth::DrawConsole()
          else if (it->type == kLogEventType_Warning)
             ofSetColor(255, 255, 0);
          else
-            ofSetColor(200, 200, 200);
-         DrawTextNormal(it->text, 10, consoleY);
+            ofSetColor(255, 255, 255);
+         gFontFixedWidth.DrawString(it->text, 15, 10, consoleY);
          std::vector<std::string> lines = ofSplitString(it->text, "\n");
          ofPopStyle();
          consoleY += 15 * lines.size();
@@ -851,7 +854,7 @@ void ModularSynth::DrawConsole()
          ofSetColor(255,0,0);
          for (auto it = mErrors.begin(); it != mErrors.end(); ++it)
          {
-            DrawTextNormal(*it, 600, consoleY);
+            gFontFixedWidth.DrawString(*it, 15, 600, consoleY);
             std::vector<std::string> lines = ofSplitString(*it, "\n");
             consoleY += 15 * lines.size();
          }
@@ -1741,6 +1744,12 @@ void ModularSynth::FilesDropped(std::vector<std::string> files, int intX, int in
       float y = GetMouseY(&mModuleContainer, intY);
       IDrawableModule* target = GetModuleAtCursor();
 
+      if (files.size() == 1 && juce::String(files[0]).endsWith(".bsk"))
+      {
+          LoadState(files[0]);
+          return;
+      }
+      
       if (target != nullptr)
       {
          float moduleX, moduleY;
@@ -2342,6 +2351,11 @@ void ModularSynth::SaveState(std::string file, bool autosave)
    mModuleContainer.SaveState(out);
    
    mAudioThreadMutex.Unlock();
+}
+
+void ModularSynth::SetStartupSaveStateFile(std::string bskPath)
+{
+   mStartupSaveStateFile = std::move(bskPath);
 }
 
 void ModularSynth::LoadState(std::string file)
