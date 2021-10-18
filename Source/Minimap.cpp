@@ -2,23 +2,29 @@
 #include "ModularSynth.h"
 #include "OpenFrameworksPort.h"
 
-const float MAX_LENGTH = 150;
-const float MARGIN_RIGHT = 15;
-const float MARGIN_BOTTOM = 15;
-const float BOOKMARK_SIZE = 15;
-const float NUM_BOOKMARKS = 9;
+namespace
+{
+   const float kMaxLength = 150;
+   const float kMarginRight = 15;
+   const float kMarginTop = 75;
+   const float kBookmarkSize = 15;
+   const float kNumBookmarks = 9;
+}
 
 Minimap::Minimap()
    : mClick(false)
    , mGrid(nullptr)
-{}
+{
+}
 
-Minimap::~Minimap() {}
+Minimap::~Minimap()
+{
+}
 
 void Minimap::CreateUIControls()
 {
    IDrawableModule::CreateUIControls();
-   mGrid = new UIGrid(0, 0, MAX_LENGTH, BOOKMARK_SIZE, NUM_BOOKMARKS, 1, this);
+   mGrid = new UIGrid(0, 0, kMaxLength, kBookmarkSize, kNumBookmarks, 1, this);
 }
 
 void Minimap::GetDimensions(float& width, float& height)
@@ -29,25 +35,26 @@ void Minimap::GetDimensions(float& width, float& height)
 
    if (ofGetWidth() > ofGetHeight())
    {
-      width = MAX_LENGTH;
-      height = (MAX_LENGTH / ratio) + BOOKMARK_SIZE;
+      width = kMaxLength;
+      height = (kMaxLength / ratio) + kBookmarkSize;
    }
    else
    {
-      height = MAX_LENGTH;
-      width = (MAX_LENGTH * ratio) + BOOKMARK_SIZE;
+      height = kMaxLength;
+      width = (kMaxLength * ratio) + kBookmarkSize;
    }
 }
 
-void Minimap::GetDimensionsMinimap(float& width, float& height){
+void Minimap::GetDimensionsMinimap(float& width, float& height)
+{
    GetDimensions(width, height);
    if (width < height)
    {
-      width -= BOOKMARK_SIZE;
+      width -= kBookmarkSize;
    }
    else
    {
-      height -= BOOKMARK_SIZE;
+      height -= kBookmarkSize;
    }
 }
 
@@ -73,6 +80,16 @@ void Minimap::ComputeBoundingBox(ofRectangle& rect)
       ofRectangle moduleRect = modules[i]->GetRect();
       RectUnion(rect, moduleRect);
    }
+   
+   float minimapWidth, minimapHeight;
+   GetDimensionsMinimap(minimapWidth, minimapHeight);
+   float boundsAspectRatio = rect.width / rect.height;
+   float minimapAspectRatio = minimapWidth / minimapHeight;
+   //retain aspect ratio
+   if (boundsAspectRatio > minimapAspectRatio)
+      rect.height = rect.width / minimapAspectRatio;
+   else
+      rect.width = rect.height * minimapAspectRatio;
 }
 
 ofRectangle Minimap::CoordsToMinimap(ofRectangle& boundingBox, ofRectangle& source)
@@ -167,15 +184,15 @@ void Minimap::DrawModule()
 
    if (width < height)
    {
-      mGrid->SetDimensions(BOOKMARK_SIZE, height);
-      mGrid->SetPosition(width - BOOKMARK_SIZE, 0);
-      mGrid->SetGrid(1, NUM_BOOKMARKS);
+      mGrid->SetDimensions(kBookmarkSize, height);
+      mGrid->SetPosition(width - kBookmarkSize, 0);
+      mGrid->SetGrid(1, kNumBookmarks);
    }
    else
    {
-      mGrid->SetDimensions(width, BOOKMARK_SIZE);
-      mGrid->SetPosition(0, height - BOOKMARK_SIZE);
-      mGrid->SetGrid(NUM_BOOKMARKS, 1);
+      mGrid->SetDimensions(width, kBookmarkSize);
+      mGrid->SetPosition(0, height - kBookmarkSize);
+      mGrid->SetGrid(kNumBookmarks, 1);
    }
    ofPushStyle();
    ofSetColor(255, 255, 255, 80);
@@ -261,7 +278,7 @@ void Minimap::ForcePosition()
    float width, height, scale;
    scale = 1 / TheSynth->GetUIScale();
    GetDimensions(width, height);
-   mX = (ofGetWidth() * scale) - (width + MARGIN_RIGHT);
-   mY = (ofGetHeight() * scale) - (height + MARGIN_BOTTOM);
+   mX = (ofGetWidth() * scale) - (width + kMarginRight);
+   mY = kMarginTop;
    gDrawScale = gDrawScale;
 }

@@ -34,32 +34,33 @@
 
 class Minimap : public IDrawableModule
 {
-
 public:
-    Minimap();
-    ~Minimap();
-    void CreateUIControls() override;
-    void DrawModule() override;
-    bool AlwaysOnTop() override { return true; };
-    void GetDimensions(float & width, float & height) override;
-    void GetDimensionsMinimap(float & width, float & height);
+   Minimap();
+   ~Minimap();
+
+   void CreateUIControls() override;
+   void DrawModule() override;
+
+   bool AlwaysOnTop() override { return true; };
+   void GetDimensions(float& width, float& height) override;
+   void GetDimensionsMinimap(float& width, float& height);
 private:
-    bool IsSingleton() const override { return true; };
-    bool HasTitleBar() const override { return false; };
-    void ComputeBoundingBox(ofRectangle & rect);
-    ofRectangle CoordsToMinimap(ofRectangle & boundingBox, ofRectangle & source);
-    void DrawModulesOnMinimap(ofRectangle & boundingBox);
-    void RectUnion(ofRectangle & target, ofRectangle & unionRect);
-    void UpdateGridValues();
-    void UpdateGridValues(float x, float y);
-    void OnClicked(int x, int y, bool right) override;
-    void MouseReleased() override;
-    bool MouseMoved(float x, float y) override;
-    ofVec2f CoordsToViewport(ofRectangle & boundingBox, float x, float y);
-    void ForcePosition();
-    
-    bool mClick;
-    UIGrid* mGrid;
+   bool IsSingleton() const override { return true; };
+   bool HasTitleBar() const override { return false; };
+   void ComputeBoundingBox(ofRectangle & rect);
+   ofRectangle CoordsToMinimap(ofRectangle & boundingBox, ofRectangle & source);
+   void DrawModulesOnMinimap(ofRectangle & boundingBox);
+   void RectUnion(ofRectangle & target, ofRectangle & unionRect);
+   void UpdateGridValues();
+   void UpdateGridValues(float x, float y);
+   void OnClicked(int x, int y, bool right) override;
+   void MouseReleased() override;
+   bool MouseMoved(float x, float y) override;
+   ofVec2f CoordsToViewport(ofRectangle & boundingBox, float x, float y);
+   void ForcePosition();
+
+   bool mClick;
+   UIGrid* mGrid;
 };
 
 #endif /* defined(__Bespoke__Minimap__) */
