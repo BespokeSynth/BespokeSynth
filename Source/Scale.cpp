@@ -785,7 +785,7 @@ void ScalePitches::SetScaleType(std::string type)
 
    int newFlip = (mScalePitchesFlip == 0) ? 1 : 0;
    mScalePitches[newFlip] = TheScale->GetPitchesForScale(type);
-   mScalePitchesFlip = newFlip;   
+   mScalePitchesFlip = newFlip;
 }
 
 void ScalePitches::SetAccidentals(const std::vector<Accidental>& accidentals)
