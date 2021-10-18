@@ -335,6 +335,11 @@ public:
       nvgDeleteGLES2(mVG);
       nvgDeleteGLES2(mFontBoundsVG);
    }
+
+   void SetStartupSaveStateFile(const juce::String& bskPath)
+   {
+      mSynth.SetStartupSaveStateFile(bskPath.toStdString());
+   }
    
    void render() override
    {
@@ -576,6 +581,16 @@ private:
 
 // (This function is called by the app startup code to create our main component)
 Component* createMainContentComponent()     { return new MainContentComponent(); }
+
+// This function is called when opening the app with a bsk file.
+void SetStartupSaveStateFile(const juce::String& bskFilePath, Component* component)
+{
+   auto* mainComponent = dynamic_cast<MainContentComponent*>(component);
+   if(mainComponent == nullptr)
+      ofLog() << "Non main component sent to SetStartupSaveStateFile";
+   else
+      mainComponent->SetStartupSaveStateFile(bskFilePath);
+}
 
 
 #endif  // MAINCOMPONENT_H_INCLUDED

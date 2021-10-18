@@ -352,7 +352,10 @@ void ModularSynth::Poll()
       
       if (!mInitialized && sFrameCount > 3) //let some frames render before blocking for a load
       {
-         LoadLayoutFromFile(ofToDataPath(defaultLayout));
+         if(!mStartupSaveStateFile.empty())
+            LoadState(mStartupSaveStateFile);
+         else
+            LoadLayoutFromFile(ofToDataPath(defaultLayout));
          mInitialized = true;
       }
 
@@ -1741,6 +1744,12 @@ void ModularSynth::FilesDropped(std::vector<std::string> files, int intX, int in
       float y = GetMouseY(&mModuleContainer, intY);
       IDrawableModule* target = GetModuleAtCursor();
 
+      if (files.size() == 1 && juce::String(files[0]).endsWith(".bsk"))
+      {
+          LoadState(files[0]);
+          return;
+      }
+      
       if (target != nullptr)
       {
          float moduleX, moduleY;
@@ -2342,6 +2351,11 @@ void ModularSynth::SaveState(std::string file, bool autosave)
    mModuleContainer.SaveState(out);
    
    mAudioThreadMutex.Unlock();
+}
+
+void ModularSynth::SetStartupSaveStateFile(std::string bskPath)
+{
+   mStartupSaveStateFile = std::move(bskPath);
 }
 
 void ModularSynth::LoadState(std::string file)
