@@ -1405,7 +1405,7 @@ unstablepressure~MPE-Pressure mittels Perlin-Noise mutieren
 
 
 unstablepitch~MPE-Pitchbend mittels Perlin-Noise mutieren
-~amount~amount of mutation
+~amount~Anzahl der Mutationen
 ~warble~slow-layer Mutationsrate
 ~noise~fast-later Mutationsrate
 
@@ -1517,6 +1517,11 @@ notesorter~Noten nach Tonhöhen separieren. Alle nicht zugeordneten Tonhöhen we
 
 noterouter~Ermöglicht es Ihnen, über eine UI-Control zu steuern, wohin Noten geleitet werden. Um der Liste Ziele hinzuzufügen, patchen Sie sie als target
 ~route~Das Zielmodul des Noterouters
+
+
+
+noteexpression~Steuerung wohin Noten weitergeleitet werden basierend auf ausgewerteten Expressions. Die Variable "p" steht für pitch, und "v" für velocity.
+~expression*~Ausdruck, der für dieses Kabel auszuwerten ist. Beispielausdruck für die Weiterleitung von Noten mit einer Tonhöhe von mehr als 80 und einer Anschlagsstärke von weniger als 60:\n"p > 80 && v < 60"
 
 
 
