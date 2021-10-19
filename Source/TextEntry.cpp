@@ -315,7 +315,7 @@ void TextEntry::OnKeyPressed(int key, bool isRepeat)
       AcceptEntry(true);
       IKeyboardFocusListener::ClearActiveKeyboardFocus(!K(notifyListeners));
    }
-   if (key == OF_KEY_TAB)
+   else if (key == OF_KEY_TAB)
    {
       TextEntry* pendingNewEntry = nullptr;
       if (GetKeyModifiers() == kModifier_Shift)
@@ -390,7 +390,7 @@ void TextEntry::OnKeyPressed(int key, bool isRepeat)
             AcceptEntry(false);
          }
       }
-      if (mType == kTextEntry_Int)
+      else if (mType == kTextEntry_Int)
       {
          if (*mVarInt + 1 <= mIntMax)
          {
@@ -411,7 +411,7 @@ void TextEntry::OnKeyPressed(int key, bool isRepeat)
             AcceptEntry(false);
          }
       }
-      if (mType == kTextEntry_Int)
+      else if (mType == kTextEntry_Int)
       {
          if (*mVarInt - 1 >= mIntMin)
          {
@@ -420,11 +420,6 @@ void TextEntry::OnKeyPressed(int key, bool isRepeat)
             AcceptEntry(false);
          }
       }
-   }
-   else if (key == OF_KEY_RETURN)
-   {
-      if (mCaretPosition != mCaretPosition2)
-         RemoveSelectedText();
    }
    else if (toupper(key) == 'V' && GetKeyModifiers() == kModifier_Command)
    {
@@ -587,7 +582,7 @@ void TextEntry::Increment(float amount)
          AcceptEntry(false);
       }
    }
-   if (mType == kTextEntry_Int)
+   else if (mType == kTextEntry_Int)
    {
       int newVal = *mVarInt + (int)amount;
       if (newVal >= mIntMin && newVal <= mIntMax)
