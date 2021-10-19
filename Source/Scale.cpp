@@ -133,7 +133,7 @@ void Scale::Init()
    
    Json::Value& scales = root["scales"];
 
-   mScales.push_back(ScaleInfo(kChromaticScale, std::vector<int>{}));
+   mScales.push_back(ScaleInfo(kChromaticScale, std::vector<int>{}));  //this list is intentionally empty: 0 pitches means "chromatic"
    mScaleSelector->AddLabel(kChromaticScale, 0);
 
    for (int i=0; i<scales.size(); ++i)
@@ -165,7 +165,7 @@ void Scale::Init()
    if (mNumSeptatonicScales == 0) //dumb-but-acceptable handling of an assumption
    {
       mScales.clear();
-      mScales.push_back(ScaleInfo(kChromaticScale, std::vector<int>{}));
+      mScales.push_back(ScaleInfo(kChromaticScale, std::vector<int>{}));  //this list is intentionally empty: 0 pitches means "chromatic"
       mScaleSelector->AddLabel(kChromaticScale, 0);
       
       mScales.push_back(ScaleInfo("ionian", std::vector<int>{ 0,2,4,5,7,9,11 }));
@@ -273,7 +273,7 @@ float Scale::FreqToPitch(float freq)
 
 int Scale::MakeDiatonic(int pitch)
 {
-   if (mScale.GetPitches().size() == 0)   //"chromatic" mode
+   if (mScale.GetPitches().empty())   //empty list means "chromatic"
       return pitch;
    
    assert(mScale.mScaleRoot >= 0 && mScale.mScaleRoot < mPitchesPerOctave);
@@ -944,8 +944,10 @@ int ScalePitches::GetPitchFromTone(int n) const
 
 int ScalePitches::GetToneFromPitch(int pitch) const
 {
+   if (mScalePitches[mScalePitchesFlip].empty())      //empty list means "chromatic"
+      return pitch;
+
    assert(mScaleRoot >= 0 && mScaleRoot < TheScale->GetPitchesPerOctave());
-   assert(mScalePitches[mScalePitchesFlip].size());
    
    int numTones = (int)mScalePitches[mScalePitchesFlip].size();
    int rootRel = pitch - mScaleRoot;
