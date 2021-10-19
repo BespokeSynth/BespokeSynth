@@ -188,9 +188,9 @@ void CustomPluginListComponent::OnResize()
 /////////////////////////////////////////////////////////////////////////////////////////////////
 
 PluginListWindow::PluginListWindow(juce::AudioPluginFormatManager& pluginFormatManager, WindowCloseListener* listener)
-   : juce::DocumentWindow("Available Plugins",
+   : juce::DocumentWindow("VST Manager",
       juce::LookAndFeel::getDefaultLookAndFeel().findColour(juce::ResizableWindow::backgroundColourId),
-      juce::DocumentWindow::minimiseButton | juce::DocumentWindow::closeButton)
+      juce::DocumentWindow::closeButton)
    , mListener(listener)
 {
    auto deadMansPedalFile(juce::File(ofToDataPath("vst/deadmanspedal.txt")));
