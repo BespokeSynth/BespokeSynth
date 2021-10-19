@@ -171,6 +171,7 @@ private:
    float mSwing;
    FloatSlider* mSwingSlider;
    ClickButton* mResetButton;
+   ClickButton* mPlayPauseButton;
    DropdownList* mTimeSigTopDropdown;
    DropdownList* mTimeSigBottomDropdown;
    DropdownList* mSwingIntervalDropdown;
