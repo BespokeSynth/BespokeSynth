@@ -35,7 +35,6 @@
 SignalGenerator::SignalGenerator()
 : mOsc(kOsc_Sin)
 , mVol(0)
-, mSmoothedVol(0)
 , mVolSlider(nullptr)
 , mOscType(kOsc_Sin)
 , mOscSelector(nullptr)
@@ -149,17 +148,7 @@ void SignalGenerator::Process(double time)
    {
       ComputeSliders(pos);
       
-      float volSq;
-      if (mVolSlider->GetLFO() && mVolSlider->GetLFO()->IsEnabled())
-      {
-         volSq = mVol * mVol;
-      }
-      else
-      {
-         float smooth = .001f;
-         mSmoothedVol = mSmoothedVol * (1-smooth) + mVol * smooth;
-         volSq = mSmoothedVol * mSmoothedVol;
-      }
+      float volSq = mVol * mVol;
       
       if (mFreqMode == kFreqMode_Root)
          mFreq = TheScale->PitchToFreq(TheScale->ScaleRoot() + 24);
