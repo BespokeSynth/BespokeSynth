@@ -1062,7 +1062,7 @@ audiometer~Setzt einen Schieberegler auf die Lautstärke eines Audiopegels. nüt
 
 
 
-signalgenerator~Einfaches Oszillator Signal
+signalgenerator~Einfaches Oszillator Signal. Senden Sie eine Note, um die Frequenz einzustellen und einen Impuls, um die Phase zurückzusetzen.
 ~freq~Signal-Frequenz
 ~freq mode~Welchen Modus sollen wir für die Eingangsnoten verwenden? "instant" ändert die Frequenz der Eingangsnote sofort, "ramp" ändert die Frequenz im Laufe der Zeit und "slider" erlaubt es Ihnen, einen Schieberegler zu verwenden, um zwischen den letzten beiden Eingangsnoten zu interpolieren.
 ~osc~Oszillatortyp
@@ -1750,6 +1750,8 @@ transport~Steuert das Tempo und die aktuelle Zeitposition
 ~ < ~Aktuelle Zeit rückwärts stupsen
 ~ > ~Aktuelle Zeit vorwärts stupsen
 ~set tempo~
+~play/pause~Die gesamte Audioverarbeitung stoppen (shift-p)
+
 
 
 
