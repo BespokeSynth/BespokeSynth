@@ -574,10 +574,10 @@ void MidiController::MidiReceived(MidiMessageType messageType, int control, floa
                float increment = connection->mIncrementAmount / 100;
                if (GetKeyModifiers() & kModifier_Shift)
                   increment /= 50;
-               const float diff = std::abs(value - .5f);
+               const float diff = std::abs(value - 64/127.0f);
                if (diff > connection->mIncrementThreshold)
                {
-                   if (value > .5f)
+                   if (value > 64/127.0f)
                       curValue += increment;
                    else
                       curValue -= increment;
