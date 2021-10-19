@@ -1750,6 +1750,7 @@ transport~controls tempo and current time position
 ~ < ~nudge current time backward
 ~ > ~nudge current time forward
 ~set tempo~
+~play/pause~stop all audio processing (shift-p)
 
 
 
