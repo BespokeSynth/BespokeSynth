@@ -35,10 +35,11 @@
 #include "Checkbox.h"
 #include "EnvOscillator.h"
 #include "Ramp.h"
+#include "IPulseReceiver.h"
 
 class ofxJSONElement;
 
-class SignalGenerator : public IAudioSource, public INoteReceiver, public IDrawableModule, public IDropdownListener, public IFloatSliderListener, public IIntSliderListener
+class SignalGenerator : public IAudioSource, public INoteReceiver, public IDrawableModule, public IDropdownListener, public IFloatSliderListener, public IIntSliderListener, public IPulseReceiver
 {
 public:
    SignalGenerator();
@@ -57,6 +58,9 @@ public:
    //INoteReceiver
    void PlayNote(double time, int pitch, int velocity, int voiceIdx = -1, ModulationParameters modulation = ModulationParameters()) override;
    void SendCC(int control, int value, int voiceIdx = -1) override {}
+
+   //IPulseReceiver
+   void OnPulse(double time, float velocity, int flags) override;
    
    void DropdownUpdated(DropdownList* list, int oldVal) override;
    void FloatSliderUpdated(FloatSlider* slider, float oldVal) override;
@@ -117,6 +121,7 @@ private:
    FloatSlider* mSoftenSlider;
    float mPhaseOffset;
    FloatSlider* mPhaseOffsetSlider;
+   double mResetPhaseAtMs;
    
    float* mWriteBuffer;
 };

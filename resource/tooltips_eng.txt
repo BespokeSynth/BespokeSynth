@@ -1062,7 +1062,7 @@ audiometer~sets a slider to an audio level's volume. useful to map a midi displa
 
 
 
-signalgenerator~basic oscillator signal
+signalgenerator~basic oscillator signal. send a note into it to set the frequency, and send a pulse to reset the phase.
 ~freq~signal frequency
 ~freq mode~what mode should we use for input notes? "instant" changes to the input note's frequency instantly, "ramp" ramps to the frequency over time, and "slider" allows you to use a slider to interpolate between the last two input notes
 ~osc~oscillator type
