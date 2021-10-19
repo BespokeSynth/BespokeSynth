@@ -84,7 +84,6 @@ private:
    void SetFreqMode(FreqMode mode);
    
    float mVol;
-   float mSmoothedVol;
    FloatSlider* mVolSlider;
    OscillatorType mOscType;
    DropdownList* mOscSelector;
