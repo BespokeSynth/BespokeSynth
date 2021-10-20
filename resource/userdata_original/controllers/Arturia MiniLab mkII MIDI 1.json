@@ -59,7 +59,6 @@
             "messageType" : "control",
             "drawType" : "slider",
             "incremental": true,
-            "incrementThreshold": 0.01
         },
        {
           "rows": 1,
