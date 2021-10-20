@@ -492,6 +492,8 @@ void ModularSynth::Draw(void* vg)
    if (mFatalError != "")
    {
       ofSetColor(255, 255, 255, 255);
+      DrawFallbackText(("bespoke " + GetBuildInfoString()).c_str(), 100, 50);
+
       if (gFont.IsLoaded())
          DrawTextNormal(mFatalError,100,100, 20);
       else
@@ -2565,6 +2567,10 @@ void ModularSynth::OnConsoleInput()
       else if (tokens[0] == "getwindowinfo")
       {
          ofLog() << "pos:(" << mMainComponent->getTopLevelComponent()->getPosition().x << ", " << mMainComponent->getTopLevelComponent()->getPosition().y << ") size:(" << ofGetWidth() << ", " << ofGetHeight() << ")";
+      }
+      else if (tokens[0] == "getmouse")
+      {
+         ofLog() << "mouse pos raw:(" << mMousePos.x << ", " << mMousePos.y << ") " << "   mouse pos canvas:(" << GetMouseX(&mModuleContainer) << ", " << GetMouseY(&mModuleContainer) << ")";
       }
       else if (tokens[0] == "screenshotmodule")
       {
