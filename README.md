@@ -55,7 +55,7 @@ copy of Bespoke if you have access to the VST SDK
 * `-GXcode` (mac only) will eject xcode project files rather than the default make files
 * `-DCMAKE_INSTALL_PREFIX=/usr` (only used on Linux) will set the `CMAKE_INSTALL_PREFIX` which guides both where your
 built bespoke looks for resources and also where it installs. After a build on Linux with this configured, you can
-do `sudo cmake install ignore/build` and bespoke will install correctly into this directory. The cmake default is `/usr/local`.
+do `sudo cmake --install ignore/build` and bespoke will install correctly into this directory. The cmake default is `/usr/local`.
 
 The directory name `ignore/build` is arbitrary. Bespoke is set up to `.gitignore` everything in the `ignore` directory but you
 can use any directory name you want for a build or have multiple builds also.
