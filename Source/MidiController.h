@@ -175,7 +175,6 @@ struct UIControlConnection
    bool mScaleOutput;
    bool mBlink;
    float mIncrementAmount;
-   float mIncrementThreshold;
    bool mTwoWay;
    int mFeedbackControl;
    SpecialControlBinding mSpecialBinding;
@@ -221,7 +220,7 @@ enum ControlDrawType
 struct ControlLayoutElement
 {
    ControlLayoutElement() : mActive(false), mControlCable(nullptr), mConnectionType(kControlType_Slider) {}
-   void Setup(MidiController* owner, MidiMessageType type, int control, ControlDrawType drawType, bool incremental, float incrementThreshold, int offVal, int onVal, bool scaleOutput, ControlType connectionType, float x, float y, float w, float h);
+   void Setup(MidiController* owner, MidiMessageType type, int control, ControlDrawType drawType, bool incremental, int offVal, int onVal, bool scaleOutput, ControlType connectionType, float x, float y, float w, float h);
    
    bool mActive;
    MidiMessageType mType;
