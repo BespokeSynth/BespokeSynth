@@ -70,8 +70,8 @@ void SustainPedal::PlayNote(double time, int pitch, int velocity, int voiceIdx, 
    {
       if (velocity > 0)
       {
-         if (!mIsNoteBeingSustained[pitch]) //don't replay already-sustained notes
-            PlayNoteOutput(time, pitch, velocity, voiceIdx, modulation);
+         PlayNoteOutput(time, pitch, 0, voiceIdx, modulation);
+         PlayNoteOutput(time, pitch, velocity, voiceIdx, modulation);
          mIsNoteBeingSustained[pitch] = false;   //not being sustained by this module it if it's held down
       }
       else
