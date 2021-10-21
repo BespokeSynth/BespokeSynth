@@ -49,6 +49,7 @@ private:
    float mSpeedMult;
    double mStartTime;
    double mEndTime;
+   double mStartToEnd, mStartToEndInv;
    float mVol;
    float mStereoPosition;
    float mDrawPos;
