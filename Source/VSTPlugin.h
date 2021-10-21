@@ -50,6 +50,7 @@ namespace VSTLookup
    void GetAvailableVSTs(std::vector<std::string>& vsts);
    void FillVSTList(DropdownList* list);
    std::string GetVSTPath(std::string vstName);
+   void SortByLastUsed(std::vector<std::string>& vsts);
 }
 
 class VSTPlugin : public IAudioProcessor, public INoteReceiver, public IDrawableModule, public IDropdownListener, public IFloatSliderListener, public IIntSliderListener, public IButtonListener

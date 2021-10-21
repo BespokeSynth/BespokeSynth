@@ -77,38 +77,14 @@ namespace VSTLookup
       
       auto types = VSTPlugin::sPluginList.getTypes();
       for (int i=0; i<types.size(); ++i)
-      {
          vsts.push_back(types[i].fileOrIdentifier.toStdString());
-      }
-      
-      std::map<std::string, double> lastUsedTimes;
-      
-      if (juce::File(ofToDataPath("vst/used_vsts.json")).existsAsFile())
-      {
-         ofxJSONElement root;
-         root.open(ofToDataPath("vst/used_vsts.json"));
-         ofxJSONElement jsonList = root["vsts"];
 
-         for (auto it = jsonList.begin(); it != jsonList.end(); ++it)
-         {
-            std::string key = it.key().asString();
-            lastUsedTimes[key] = jsonList[key].asDouble();
-         }
-      }
-      
-      std::sort(vsts.begin(), vsts.end(), [lastUsedTimes](std::string a, std::string b) {
-         auto itA = lastUsedTimes.find(a);
-         auto itB = lastUsedTimes.find(b);
-         if (itA == lastUsedTimes.end() && itB == lastUsedTimes.end())
-            return a < b;
-         if (itA != lastUsedTimes.end() && itB == lastUsedTimes.end())
-            return true;
-         if (itA == lastUsedTimes.end() && itB != lastUsedTimes.end())
-            return false;
-         double timeA = (*itA).second;
-         double timeB = (*itB).second;
-         return timeA > timeB;
-      });
+      SortByLastUsed(vsts);
+
+      //add a bunch of duplicates to the list, to simulate a user with many VSTs
+      /*auto vstCopy = vsts;
+      for (int i = 0; i < 40; ++i)
+         vsts.insert(vsts.end(), vstCopy.begin(), vstCopy.end());*/
 
       sFirstTime = false;
    }
@@ -137,6 +113,38 @@ namespace VSTLookup
       }
       
       return "";
+   }
+
+   void SortByLastUsed(std::vector<std::string>& vsts)
+   {
+      std::map<std::string, double> lastUsedTimes;
+
+      if (juce::File(ofToDataPath("vst/used_vsts.json")).existsAsFile())
+      {
+         ofxJSONElement root;
+         root.open(ofToDataPath("vst/used_vsts.json"));
+         ofxJSONElement jsonList = root["vsts"];
+
+         for (auto it = jsonList.begin(); it != jsonList.end(); ++it)
+         {
+            std::string key = it.key().asString();
+            lastUsedTimes[key] = jsonList[key].asDouble();
+         }
+      }
+
+      std::sort(vsts.begin(), vsts.end(), [lastUsedTimes](std::string a, std::string b) {
+         auto itA = lastUsedTimes.find(a);
+         auto itB = lastUsedTimes.find(b);
+         if (itA == lastUsedTimes.end() && itB == lastUsedTimes.end())
+            return a < b;
+         if (itA != lastUsedTimes.end() && itB == lastUsedTimes.end())
+            return true;
+         if (itA == lastUsedTimes.end() && itB != lastUsedTimes.end())
+            return false;
+         double timeA = (*itA).second;
+         double timeB = (*itB).second;
+         return timeA > timeB;
+      });
    }
 }
 

@@ -225,8 +225,8 @@ SpawnListManager::SpawnListManager(IDropdownListener* owner)
 , mAudioModules(owner,this,0,0,"audio effects:")
 , mModulatorModules(owner,this,0,0,"modulators:")
 , mPulseModules(owner, this, 0, 0, "pulse:")
+, mVstPlugins(owner, this, 0, 0, "vst plugins:")
 , mOtherModules(owner,this,0,0,"other:")
-, mVstPlugins(owner,this,0,0,"vst plugins:")
 , mPrefabs(owner,this,0,0,"prefabs:")
 {
 }
@@ -253,8 +253,8 @@ void SpawnListManager::SetModuleFactory(ModuleFactory* factory)
    mDropdowns.push_back(&mAudioModules);
    mDropdowns.push_back(&mModulatorModules);
    mDropdowns.push_back(&mPulseModules);
-   mDropdowns.push_back(&mOtherModules);
    mDropdowns.push_back(&mVstPlugins);
+   mDropdowns.push_back(&mOtherModules);
    mDropdowns.push_back(&mPrefabs);
 }
 
@@ -375,8 +375,8 @@ void TitleBar::DrawModule()
                                   &mSpawnLists.mAudioModules,
                                   &mSpawnLists.mModulatorModules,
                                   &mSpawnLists.mPulseModules,
-                                  &mSpawnLists.mOtherModules,
                                   &mSpawnLists.mVstPlugins,
+                                  &mSpawnLists.mOtherModules,
                                   &mSpawnLists.mPrefabs };
 
    for (auto list : lists)
@@ -407,10 +407,10 @@ void TitleBar::DrawModule()
    mSpawnLists.mModulatorModules.Draw();
    mModuleType = kModuleType_Pulse;
    mSpawnLists.mPulseModules.Draw();
-   mModuleType = kModuleType_Other;
-   mSpawnLists.mOtherModules.Draw();
    mModuleType = kModuleType_Synth;
    mSpawnLists.mVstPlugins.Draw();
+   mModuleType = kModuleType_Other;
+   mSpawnLists.mOtherModules.Draw();
    mModuleType = kModuleType_Other;
    mSpawnLists.mPrefabs.Draw();
    mModuleType = type;
@@ -532,8 +532,8 @@ void TitleBar::DropdownUpdated(DropdownList* list, int oldVal)
    mSpawnLists.mAudioModules.OnSelection(list);
    mSpawnLists.mModulatorModules.OnSelection(list);
    mSpawnLists.mPulseModules.OnSelection(list);
-   mSpawnLists.mOtherModules.OnSelection(list);
    mSpawnLists.mVstPlugins.OnSelection(list);
+   mSpawnLists.mOtherModules.OnSelection(list);
    mSpawnLists.mPrefabs.OnSelection(list);
 }
 
