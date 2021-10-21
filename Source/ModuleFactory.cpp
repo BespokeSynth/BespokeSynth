@@ -519,15 +519,40 @@ std::vector<std::string> ModuleFactory::GetSpawnableModules(ModuleType moduleTyp
    return modules;
 }
 
+namespace
+{
+   bool CheckHeldKeysMatch(juce::String name, std::string heldKeys)
+   {
+      name = name.toLowerCase();
+
+      if (name.isEmpty() || heldKeys.empty() || name[0] != heldKeys[0])
+         return false;
+
+      int stringPos = 0;
+      int end = name.indexOfChar('.');
+      if (end == -1)
+         end = name.indexOfChar(' ');
+      if (end == -1)
+         end = name.length() - 1;
+      bool showModule = true;
+      for (size_t j = 1; j < heldKeys.length(); ++j)
+      {
+         stringPos = name.substring(stringPos + 1, end + 1).indexOfChar(heldKeys[j]);
+         if (stringPos == -1) //couldn't find key in remaining string
+            return false;
+      }
+
+      return true;
+   }
+}
+
 std::vector<std::string> ModuleFactory::GetSpawnableModules(std::string keys)
 {
-   char c = keys[0];
-
    std::vector<juce::String> modules;
    for (auto iter = mFactoryMap.begin(); iter != mFactoryMap.end(); ++iter)
    {
-      if (iter->first[0] == c &&
-          (mIsHiddenModuleMap[iter->first] == false || gShowDevModules))
+      if ((mIsHiddenModuleMap[iter->first] == false || gShowDevModules) &&
+          CheckHeldKeysMatch(iter->first, keys))
          modules.push_back(iter->first);
    }
 
@@ -537,7 +562,7 @@ std::vector<std::string> ModuleFactory::GetSpawnableModules(std::string keys)
    for (auto vstFile : vsts)
    {
       std::string vstName = juce::File(vstFile).getFileName().toStdString();
-      if (tolower(vstName[0]) == c)
+      if (CheckHeldKeysMatch(vstName, keys))
          matchingVsts.push_back(vstFile);
    }
    const int kMaxQuickspawnVstCount = 10;
@@ -563,49 +588,28 @@ std::vector<std::string> ModuleFactory::GetSpawnableModules(std::string keys)
    ModuleFactory::GetPrefabs(prefabs);
    for (auto prefab : prefabs)
    {
-      if (tolower(prefab[0]) == c || c == ';')
+      if (CheckHeldKeysMatch(prefab, keys) || keys[0] == ';')
          modules.push_back(prefab + " " + kPrefabSuffix);
    }
 
    std::vector<std::string> midicontrollers = MidiController::GetAvailableInputDevices();
    for (auto midicontroller : midicontrollers)
    {
-      if (tolower(midicontroller[0]) == c)
+      if (CheckHeldKeysMatch(midicontroller, keys))
          modules.push_back(midicontroller + " " + kMidiControllerSuffix);
    }
 
    std::vector<std::string> effects = TheSynth->GetEffectFactory()->GetSpawnableEffects();
    for (auto effect : effects)
    {
-      if (tolower(effect[0]) == c)
+      if (CheckHeldKeysMatch(effect, keys))
          modules.push_back(effect + " " + kEffectChainSuffix);
    }
    sort(modules.begin(), modules.end());
 
    std::vector<std::string> ret;
    for (size_t i = 0; i < modules.size(); ++i)
-   {
-      int stringPos = 0;
-      int end = modules[i].indexOfChar('.');
-      if (end == -1)
-         end = modules[i].indexOfChar(' ');
-      if (end == -1)
-         end = modules[i].length() - 1;
-      bool showModule = true;
-      for (size_t j = 1; j < keys.length(); ++j)
-      {
-         stringPos = modules[i].substring(stringPos+1, end+1).indexOfChar(keys[j]);
-         if (stringPos == -1) //couldn't find key in remaining string
-         {
-            showModule = false;
-            break;
-         }
-      }
-
-      if (showModule)
-         ret.push_back(modules[i].toStdString());
-   }
-
+      ret.push_back(modules[i].toStdString());
    
    return ret;
 }

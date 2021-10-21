@@ -79,6 +79,9 @@ namespace VSTLookup
       for (int i=0; i<types.size(); ++i)
          vsts.push_back(types[i].fileOrIdentifier.toStdString());
 
+      //for (int i = 0; i < 40; ++i)
+      //   vsts.insert(vsts.begin(), std::string("c:/a+") + ofToString(gRandom()));
+
       SortByLastUsed(vsts);
 
       //add a bunch of duplicates to the list, to simulate a user with many VSTs
@@ -135,14 +138,16 @@ namespace VSTLookup
       std::sort(vsts.begin(), vsts.end(), [lastUsedTimes](std::string a, std::string b) {
          auto itA = lastUsedTimes.find(a);
          auto itB = lastUsedTimes.find(b);
-         if (itA == lastUsedTimes.end() && itB == lastUsedTimes.end())
+         double timeA = 0;
+         double timeB = 0;
+         if (itA != lastUsedTimes.end())
+            timeA = (*itA).second;
+         if (itB != lastUsedTimes.end())
+            timeB = (*itB).second;
+
+         if (timeA == timeB)
             return a < b;
-         if (itA != lastUsedTimes.end() && itB == lastUsedTimes.end())
-            return true;
-         if (itA == lastUsedTimes.end() && itB != lastUsedTimes.end())
-            return false;
-         double timeA = (*itA).second;
-         double timeB = (*itB).second;
+         
          return timeA > timeB;
       });
    }
