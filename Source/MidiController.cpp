@@ -1994,7 +1994,7 @@ void MidiController::PostRepatch(PatchCableSource* cableSource, bool fromUserCli
          UIControlConnection* connection = AddControlConnection(mLayoutControls[layoutControl].mType, mLayoutControls[layoutControl].mControl, -1, dynamic_cast<IUIControl*>(cableSource->GetTarget()));
          
          RadioButton* radioButton = dynamic_cast<RadioButton*>(cableSource->GetTarget());
-         if (radioButton)
+         if (radioButton && mLayoutControls[layoutControl].mDrawType == kDrawType_Button)
          {
             connection->mType = kControlType_SetValue;
             float closestSq = FLT_MAX;
