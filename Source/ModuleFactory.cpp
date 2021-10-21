@@ -533,11 +533,30 @@ std::vector<std::string> ModuleFactory::GetSpawnableModules(std::string keys)
 
    std::vector<std::string> vsts;
    VSTLookup::GetAvailableVSTs(vsts);
+   std::vector<std::string> matchingVsts;
    for (auto vstFile : vsts)
    {
       std::string vstName = juce::File(vstFile).getFileName().toStdString();
       if (tolower(vstName[0]) == c)
+         matchingVsts.push_back(vstFile);
+   }
+   const int kMaxQuickspawnVstCount = 10;
+   if ((int)matchingVsts.size() <= kMaxQuickspawnVstCount)
+   {
+      for (auto vstFile : matchingVsts)
+      {
+         std::string vstName = juce::File(vstFile).getFileName().toStdString();
          modules.push_back(vstName + " " + kVSTSuffix);
+      }
+   }
+   else
+   {
+      VSTLookup::SortByLastUsed(matchingVsts);
+      for (int i = 0; i < kMaxQuickspawnVstCount; ++i)
+      {
+         std::string vstName = juce::File(matchingVsts[i]).getFileName().toStdString();
+         modules.push_back(vstName + " " + kVSTSuffix);
+      }
    }
 
    std::vector<std::string> prefabs;

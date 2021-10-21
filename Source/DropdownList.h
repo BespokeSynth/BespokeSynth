@@ -123,12 +123,11 @@ private:
    int FindItemIndex(float val) const;
    void SetValue(int value, bool forceUpdate);
    void CalculateWidth();
-   void UpdateModalListPosition();
+   ofVec2f GetModalListPosition() const;
 
    int mWidth;
    int mHeight;
    int mModalWidth;
-   int mColumns;
    int mMaxPerColumn;
    std::vector<DropdownListElement> mElements;
    int* mVar;

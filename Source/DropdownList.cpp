@@ -37,7 +37,6 @@ namespace
 DropdownList::DropdownList(IDropdownListener* owner, const char* name, int x, int y, int* var, float width)
 : mWidth(35)
 , mHeight(itemSpacing)
-, mColumns(1)
 , mVar(var)
 , mModalList(this)
 , mOwner(owner)
@@ -117,9 +116,6 @@ void DropdownList::CalculateWidth()
    
    if (mAutoCalculateWidth)
       mWidth = MIN(mModalWidth, 180);
-   
-   mColumns = 1 + ((int)mElements.size()-1) / mMaxPerColumn;
-   mModalList.SetDimensions(mModalWidth*mColumns, itemSpacing * MIN((int)mElements.size(), mMaxPerColumn));
 }
 
 std::string DropdownList::GetLabel(int val) const
@@ -206,7 +202,11 @@ void DropdownList::DrawDropdown(int w, int h)
 {
    ofPushStyle();
 
-   int hoverIndex = GetItemIndex(mModalList.GetMouseX(), mModalList.GetMouseY());
+   int hoverIndex = -1;
+   float dropdownW, dropdownH;
+   mModalList.GetDimensions(dropdownW, dropdownH);
+   if (mModalList.GetMouseX() >= 0 && mModalList.GetMouseY() >= 0 && mModalList.GetMouseX() < dropdownW && mModalList.GetMouseY() < dropdownH)
+      hoverIndex = GetItemIndex(mModalList.GetMouseX(), mModalList.GetMouseY());
 
    ofSetColor(0,0,0);
    ofFill();
@@ -261,8 +261,23 @@ void DropdownList::OnClicked(int x, int y, bool right)
    if (mElements.empty())
       return;
 
-   UpdateModalListPosition();
+   ofVec2f modalPos = GetModalListPosition();
    mModalList.SetOwningContainer(GetModuleParent()->GetOwningContainer());
+
+   float screenX = (modalPos.x + GetModuleParent()->GetOwningContainer()->GetDrawOffset().x) * GetModuleParent()->GetOwningContainer()->GetDrawScale();
+   float screenY = (modalPos.y + GetModuleParent()->GetOwningContainer()->GetDrawOffset().y) * GetModuleParent()->GetOwningContainer()->GetDrawScale();
+   float maxX = ofGetWidth() - 5;
+   float maxY = ofGetHeight() - 5;
+
+   const int kMinPerColumn = 1;
+   mMaxPerColumn = std::max(kMinPerColumn, int((maxY - screenY) / (itemSpacing * GetModuleParent()->GetOwningContainer()->GetDrawScale())));
+
+   int columns = 1 + ((int)mElements.size() - 1) / mMaxPerColumn;
+   ofVec2f modalDimensions(mModalWidth*columns, itemSpacing * std::min((int)mElements.size(), mMaxPerColumn));
+   modalPos.x = std::max(5.0f, std::min(modalPos.x, maxX - modalDimensions.x));
+   mModalList.SetPosition(modalPos.x, modalPos.y);
+   mModalList.SetDimensions(modalDimensions.x, modalDimensions.y);
+   
    TheSynth->PushModalFocusItem(&mModalList);
 }
 
@@ -271,13 +286,13 @@ int DropdownList::GetItemIndex(int x, int y)
    return y / itemSpacing + x / mModalWidth * mMaxPerColumn;
 }
 
-void DropdownList::UpdateModalListPosition()
+ofVec2f DropdownList::GetModalListPosition() const
 {
    float thisx, thisy;
    GetPosition(thisx, thisy);
    if (mDrawLabel)
       thisx += mLabelSize;
-   mModalList.SetPosition(thisx, thisy + itemSpacing);
+   return ofVec2f(thisx, thisy + itemSpacing);
 }
 
 bool DropdownList::MouseMoved(float x, float y)
