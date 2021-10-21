@@ -1,7 +1,12 @@
 # This is a multi-role CMake file. The IF branch runs on include, the ELSE
 # branch runs in script mode or when re-included after setting BESPOKESRC.
 if(CMAKE_PARENT_LIST_FILE AND NOT BESPOKESRC)
-    option(BESPOKE_RELIABLE_VERSION_INFO "Update version info on every build (off: generate only at configuration time)" OFF)
+    # Toggle this to on by default. here's my reasoning
+    # 1. Users who know what they are doing and dont want this can turn it off
+    # 2. Self build users who are struggling to build won't know to turn it off but need reliable build inf
+    # so having it 'on' means a few power users add an option but the bug reports on discord get more
+    # version accurate
+    option(BESPOKE_RELIABLE_VERSION_INFO "Update version info on every build (off: generate only at configuration time)" ON)
     function(bespoke_buildtime_version_info TARGET)
         configure_file(VersionInfo.cpp.in geninclude/VersionInfo.cpp)
         target_sources(${TARGET} PRIVATE

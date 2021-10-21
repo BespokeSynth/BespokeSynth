@@ -23,6 +23,17 @@ endif ()
 project(BespokeSynth VERSION 1.0.1 LANGUAGES C CXX ASM)
 
 message(STATUS "Build Type: ${CMAKE_BUILD_TYPE}")
+math(EXPR BESPOKE_BITNESS "${CMAKE_SIZEOF_VOID_P} * 8" OUTPUT_FORMAT DECIMAL)
+message(STATUS "Targeting ${BESPOKE_BITNESS} bit configuration")
+if (WIN32)
+    if (${BESPOKE_BITNESS} EQUAL 32)
+        message(WARNING "You are trying to do a 32 bit windows build, which is unsupported. This means"
+                " either your IDE tool chain is not set to 64 bits or your command prompt defaults to 32."
+                " It can usually be resolved by either editing your IDE settings to target a 64 bit build"
+                " or by removing this build dir and adding '-A x64' to your cmake command arguments")
+        message(FATAL_ERROR "32 bit build not proceeding")
+    endif()
+endif()
 
 # Global compile options
 add_compile_options(
