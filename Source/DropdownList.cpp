@@ -251,6 +251,24 @@ void DropdownList::DropdownClicked(int x, int y)
       SetIndex(index, K(forceUpdate));
 }
 
+namespace
+{
+   float ToScreenPosX(float x, IDrawableModule* parent)
+   {
+      return (x + parent->GetOwningContainer()->GetDrawOffset().x) * parent->GetOwningContainer()->GetDrawScale();
+   }
+
+   float ToScreenPosY(float y, IDrawableModule* parent)
+   {
+      return (y + parent->GetOwningContainer()->GetDrawOffset().y) * parent->GetOwningContainer()->GetDrawScale();
+   }
+
+   float FromScreenPosX(float x, IDrawableModule* parent)
+   {
+      return (x / parent->GetOwningContainer()->GetDrawScale()) - parent->GetOwningContainer()->GetDrawOffset().x;
+   }
+}
+
 void DropdownList::OnClicked(int x, int y, bool right)
 {
    if (right)
@@ -264,7 +282,7 @@ void DropdownList::OnClicked(int x, int y, bool right)
    ofVec2f modalPos = GetModalListPosition();
    mModalList.SetOwningContainer(GetModuleParent()->GetOwningContainer());
 
-   float screenX = (modalPos.x + GetModuleParent()->GetOwningContainer()->GetDrawOffset().x) * GetModuleParent()->GetOwningContainer()->GetDrawScale();
+   float screenX = ToScreenPosX(modalPos.x, GetModuleParent());
    float screenY = (modalPos.y + GetModuleParent()->GetOwningContainer()->GetDrawOffset().y) * GetModuleParent()->GetOwningContainer()->GetDrawScale();
    float maxX = ofGetWidth() - 5;
    float maxY = ofGetHeight() - 5;
@@ -274,7 +292,7 @@ void DropdownList::OnClicked(int x, int y, bool right)
 
    int columns = 1 + ((int)mElements.size() - 1) / mMaxPerColumn;
    ofVec2f modalDimensions(mModalWidth*columns, itemSpacing * std::min((int)mElements.size(), mMaxPerColumn));
-   modalPos.x = std::max(5.0f, std::min(modalPos.x, maxX - modalDimensions.x));
+   modalPos.x = std::max(FromScreenPosX(5.0f, GetModuleParent()), std::min(modalPos.x, FromScreenPosX(maxX - modalDimensions.x * GetModuleParent()->GetOwningContainer()->GetDrawScale(), GetModuleParent())));
    mModalList.SetPosition(modalPos.x, modalPos.y);
    mModalList.SetDimensions(modalDimensions.x, modalDimensions.y);
    
