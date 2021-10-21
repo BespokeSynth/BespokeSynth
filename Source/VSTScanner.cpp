@@ -200,14 +200,14 @@ PluginListWindow::PluginListWindow(juce::AudioPluginFormatManager& pluginFormatM
    mComponent = new CustomPluginListComponent(pluginFormatManager,
                                               VSTPlugin::sPluginList,
                                               deadMansPedalFile,
-                                              nullptr, true);
+                                              getAppProperties().getUserSettings(), true);
 
    setContentOwned(mComponent, true);
 
    setResizable(true, false);
    setResizeLimits(300, 400, 1500, 1500);
    setSize(600, 600);
-   setAlwaysOnTop(true);
+   //setAlwaysOnTop(true);
 
    if (const auto* dpy = juce::Desktop::getInstance().getDisplays().getDisplayForRect(TheSynth->GetMainComponent()->getScreenBounds()))
    {
