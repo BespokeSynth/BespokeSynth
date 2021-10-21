@@ -69,9 +69,9 @@ void LocationZoomer::Update()
 
 void LocationZoomer::OnKeyPressed(char key)
 {
-   if (key < CHAR_MAX && juce::CharacterFunctions::isDigit((char)key) && key != '0') //0 is reserved
+   if (key < CHAR_MAX && juce::CharacterFunctions::isDigit(key) && key != '0') // 0 is reserved
    {
-      if (GetKeyModifiers() == kModifier_Control)
+      if (GetKeyModifiers() == kModifier_Command)
          WriteCurrentLocation(key);
       else if (GetKeyModifiers() == kModifier_Shift)
          MoveToLocation(key);
@@ -82,6 +82,11 @@ void LocationZoomer::WriteCurrentLocation(char key)
 {
    mLocations[key].mZoomLevel = gDrawScale;
    mLocations[key].mOffset = TheSynth->GetDrawOffset();
+}
+
+bool LocationZoomer::HasLocation(char key)
+{
+   return mLocations.find(key) != mLocations.end();
 }
 
 void LocationZoomer::MoveToLocation(char key)

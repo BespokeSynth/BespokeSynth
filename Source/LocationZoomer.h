@@ -42,9 +42,10 @@ public:
    void LoadFromSaveData(const ofxJSONElement& saveData);
    void EnterVanityPanningMode();
    void ExitVanityPanningMode();
-private:
    void WriteCurrentLocation(char key);
+   bool HasLocation(char key);
    void MoveToLocation(char key);
+private:
    void PickNewVanityPanningDestination();
    
    struct Location

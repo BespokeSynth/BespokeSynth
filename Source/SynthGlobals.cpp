@@ -547,17 +547,16 @@ void StringCopy(char* dest, const char* source, int destLength)
 
 int GetKeyModifiers()
 {
-   ModifierKeys modifiers = ModifierKeys::getCurrentModifiers();
    int ret = 0;
-   if (modifiers.isShiftDown())
+   if (ModifierKeys::currentModifiers.isShiftDown())
       ret |= kModifier_Shift;
-   if (modifiers.isAltDown())
+   if (ModifierKeys::currentModifiers.isAltDown())
       ret |= kModifier_Alt;
 #if BESPOKE_MAC
-   if (modifiers.isCtrlDown())
+   if (ModifierKeys::currentModifiers.isCtrlDown())
       ret |= kModifier_Control;   //control and command interfere with each other on non-mac keyboards
 #endif
-   if (modifiers.isCommandDown())
+   if (ModifierKeys::currentModifiers.isCommandDown())
       ret |= kModifier_Command;
    return ret;
 }

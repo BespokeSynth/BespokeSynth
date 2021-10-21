@@ -9,7 +9,6 @@
 #include "InputChannel.h"
 #include "OutputChannel.h"
 #include "TitleBar.h"
-#include "Minimap.h"
 #include "LFOController.h"
 #include "MidiController.h"
 #include "ChaosEngine.h"
@@ -532,7 +531,7 @@ void ModularSynth::Draw(void* vg)
    
    ofTranslate(GetDrawOffset().x, GetDrawOffset().y);
 
-	ofNoFill();
+   ofNoFill();
 
    TheSaveDataPanel->SetShowing(TheSaveDataPanel->GetModule());
    TheSaveDataPanel->UpdatePosition();
@@ -677,7 +676,7 @@ void ModularSynth::Draw(void* vg)
                tooltipContainer = list->GetModuleParent()->GetOwningContainer();
             }
          }
-         else if (GetMouseY(&mModuleContainer) < gHoveredModule->GetPosition().y)  //this means we're hovering over the module's title bar
+         else if (GetMouseY(&mModuleContainer) < gHoveredModule->GetPosition().y && gHoveredModule->HasTitleBar())  //this means we're hovering over the module's title bar
          {
             tooltip = helpDisplay->GetModuleTooltip(gHoveredModule);
             tooltipContainer = gHoveredModule->GetOwningContainer();
@@ -1897,20 +1896,16 @@ void ModularSynth::ResetLayout()
 
    if (!GetUserPrefs()["show_minimap"].isNull() && GetUserPrefs()["show_minimap"].asBool()) 
    {
-      if (mMinimap != nullptr) 
-      {
-         delete mMinimap;
-         mMinimap = nullptr;
-      }
-      
-      mMinimap = new Minimap();
+      mMinimap = std::make_unique<Minimap>();
       mMinimap->SetName("minimap");
       mMinimap->SetTypeName("minimap");
       mMinimap->SetShouldDrawOutline(false);
       mMinimap->CreateUIControls();
       mMinimap->SetShowing(true);
       mMinimap->Init();
-      mUILayerModuleContainer.AddModule(mMinimap);
+      mUILayerModuleContainer.AddModule(mMinimap.get());
+
+      TitleBar::sShowInitialHelpOverlay = false;  //don't show initial help popup, it collides with minimap, and a user who has customized the settings likely doesn't need it
    }
 
    ModuleSaveDataPanel* saveDataPanel = new ModuleSaveDataPanel();
