@@ -1893,6 +1893,8 @@ void ModularSynth::ResetLayout()
       mMinimap->SetShowing(true);
       mMinimap->Init();
       mUILayerModuleContainer.AddModule(mMinimap.get());
+
+      TitleBar::sShowInitialHelpOverlay = false;  //don't show initial help popup, it collides with minimap, and a user who has customized the settings likely doesn't need it
    }
 
    ModuleSaveDataPanel* saveDataPanel = new ModuleSaveDataPanel();

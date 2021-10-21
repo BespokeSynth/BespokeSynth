@@ -5,8 +5,8 @@
 namespace
 {
    const float kMaxLength = 150;
-   const float kMarginRight = 15;
-   const float kMarginTop = 75;
+   const float kMarginRight = 10;
+   const float kMarginTop = 45;
    const float kBookmarkSize = 15;
    const float kNumBookmarks = 9;
 }
@@ -14,6 +14,7 @@ namespace
 Minimap::Minimap()
    : mClick(false)
    , mGrid(nullptr)
+   , mHoveredBookmarkPos(-1, -1)
 {
 }
 
@@ -182,6 +183,14 @@ void Minimap::DrawModule()
 
    DrawModulesOnMinimap(boundingBox);
 
+   for (int i = 0; i < mGrid->GetCols() * mGrid->GetRows(); ++i)
+   {
+      float val = 0.0f;
+      if (TheSynth->GetLocationZoomer()->HasLocation(i + '1'))
+         val = .5f;
+      mGrid->SetVal(i % mGrid->GetCols(), i / mGrid->GetCols(), val);
+   }
+   
    if (width < height)
    {
       mGrid->SetDimensions(kBookmarkSize, height);
@@ -194,37 +203,38 @@ void Minimap::DrawModule()
       mGrid->SetPosition(0, height - kBookmarkSize);
       mGrid->SetGrid(kNumBookmarks, 1);
    }
+
    ofPushStyle();
    ofSetColor(255, 255, 255, 80);
-    ofRect(CoordsToMinimap(boundingBox, viewport));
+   ofRect(CoordsToMinimap(boundingBox, viewport));
    ofSetColor(255, 255, 255, 10);
    ofFill();
-    ofRect(CoordsToMinimap(boundingBox, viewport));
+   ofRect(CoordsToMinimap(boundingBox, viewport));
    ofPopStyle();
+
    mGrid->Draw();
-}
 
-void Minimap::UpdateGridValues()
-{
-   UpdateGridValues(0, 0);
-}
+   if (mHoveredBookmarkPos.mCol != -1)
+   {
+      ofPushStyle();
+      ofSetColor(255, 255, 255);
+      ofFill();
 
-void Minimap::UpdateGridValues(float x, float y)
-{
-   mGrid->Clear();
-   for (int i = 0; i < mGrid->GetRows() * mGrid->GetCols(); ++i)
-   {
-      float val = 0.2;
-      if (TheSynth->GetLocationZoomer()->HasLocation(i + 49))
-         val = .5f;
-      mGrid->SetVal(i % mGrid->GetCols(), i / mGrid->GetCols(), val);
-   }
-   float gridX, gridY;
-   mGrid->GetPosition(gridX, gridY, true);
-   if (mGrid->TestHover(x - gridX, y - gridY))
-   {
-      GridCell cell = mGrid->GetGridCellAt(x - gridX, y - gridY);
-      mGrid->SetVal(cell.mCol, cell.mRow, .8f);
+      ofVec2f pos = mGrid->GetCellPosition(mHoveredBookmarkPos.mCol, mHoveredBookmarkPos.mRow) + mGrid->GetPosition(true);
+      float xsize = float(mGrid->GetWidth()) / mGrid->GetCols();
+      float ysize = float(mGrid->GetHeight()) / mGrid->GetRows();
+
+      if (GetKeyModifiers() == kModifier_Shift)
+      {
+         ofRect(pos.x + xsize / 2 - 1, pos.y + 2, 2, ysize - 4, 0);
+         ofRect(pos.x + 2, pos.y + ysize / 2 - 1, xsize - 4, 2, 0);
+      }
+      else
+      {
+         ofCircle(pos.x + xsize / 2, pos.y + ysize / 2, xsize / 2 - 2);
+      }
+
+      ofPopStyle();
    }
 }
 
@@ -235,12 +245,11 @@ void Minimap::OnClicked(int x, int y, bool right)
       float gridX, gridY;
       mGrid->GetPosition(gridX, gridY, true);
       GridCell cell = mGrid->GetGridCellAt(x - gridX, y - gridY);
-      int number = cell.mCol + cell.mRow + 49; // We assume a single row or column always so adding is fine.
+      int number = cell.mCol + cell.mRow + '1';
       if (GetKeyModifiers() == kModifier_Shift)
          TheSynth->GetLocationZoomer()->WriteCurrentLocation(number);
       else
          TheSynth->GetLocationZoomer()->MoveToLocation(number);
-      UpdateGridValues();
    }
    else
    {
@@ -269,7 +278,19 @@ bool Minimap::MouseMoved(float x, float y)
       TheSynth->SetDrawOffset(ofVec2f(-viewportCoords.x + viewport.width / 2, -viewportCoords.y + viewport.height / 2));
    }
    mGrid->NotifyMouseMoved(x, y);
-   UpdateGridValues(x, y);
+
+   float gridX, gridY;
+   mGrid->GetPosition(gridX, gridY, true);
+   if (mGrid->TestHover(x - gridX, y - gridY))
+   {
+      mHoveredBookmarkPos = mGrid->GetGridCellAt(x - gridX, y - gridY);
+   }
+   else
+   {
+      mHoveredBookmarkPos.mCol = -1;
+      mHoveredBookmarkPos.mRow = -1;
+   }
+
    return false;
 }
 
@@ -280,5 +301,4 @@ void Minimap::ForcePosition()
    GetDimensions(width, height);
    mX = (ofGetWidth() * scale) - (width + kMarginRight);
    mY = kMarginTop;
-   gDrawScale = gDrawScale;
 }

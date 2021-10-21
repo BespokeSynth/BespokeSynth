@@ -51,8 +51,6 @@ private:
    ofRectangle CoordsToMinimap(ofRectangle & boundingBox, ofRectangle & source);
    void DrawModulesOnMinimap(ofRectangle & boundingBox);
    void RectUnion(ofRectangle & target, ofRectangle & unionRect);
-   void UpdateGridValues();
-   void UpdateGridValues(float x, float y);
    void OnClicked(int x, int y, bool right) override;
    void MouseReleased() override;
    bool MouseMoved(float x, float y) override;
@@ -61,6 +59,7 @@ private:
 
    bool mClick;
    UIGrid* mGrid;
+   GridCell mHoveredBookmarkPos;
 };
 
 #endif /* defined(__Bespoke__Minimap__) */
