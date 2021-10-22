@@ -2815,7 +2815,7 @@ void ModularSynth::SaveOutput()
       mSaveOutputBuffer[1][i] = mGlobalRecordBuffer->GetSample((int)mRecordingLength-i-1, 1);
    }
 
-   Sample::WriteDataToFile(filename.c_str(), mSaveOutputBuffer, (int)mRecordingLength, 2);
+   Sample::WriteDataToFile(filename, mSaveOutputBuffer, (int)mRecordingLength, 2);
    
    //mOutputBufferMeasurePos.ReadChunk(mSaveOutputBuffer, mRecordingLength);
    //Sample::WriteDataToFile(filenamePos.c_str(), mSaveOutputBuffer, mRecordingLength, 1);

@@ -170,10 +170,10 @@ bool Sample::Write(const char* path /*=nullptr*/)
 }
 
 //static
-bool Sample::WriteDataToFile(const char *path, float **data, int numSamples, int channels)
+bool Sample::WriteDataToFile(const std::string &path, float **data, int numSamples, int channels)
 {
    auto wavFormat = std::make_unique<juce::WavAudioFormat>();
-   juce::File outputFile(ofToDataPath(path).c_str());
+   juce::File outputFile(ofToDataPath(path));
    outputFile.create();
    auto outputTo = outputFile.createOutputStream();
    assert(outputTo != nullptr);
