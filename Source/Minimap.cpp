@@ -204,6 +204,11 @@ void Minimap::DrawModule()
       mGrid->SetGrid(kNumBookmarks, 1);
    }
 
+   ofPushMatrix();
+   float widthMM;
+   float heightMM;
+   GetDimensionsMinimap(widthMM, heightMM);
+   ofClipWindow(0, 0, widthMM, heightMM, true);
    ofPushStyle();
    ofSetColor(255, 255, 255, 80);
    ofRect(CoordsToMinimap(boundingBox, viewport));
@@ -211,6 +216,7 @@ void Minimap::DrawModule()
    ofFill();
    ofRect(CoordsToMinimap(boundingBox, viewport));
    ofPopStyle();
+   ofPopMatrix();
 
    mGrid->Draw();
 
