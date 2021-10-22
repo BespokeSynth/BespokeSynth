@@ -1717,7 +1717,7 @@ titlebar~
 ~load~load a saved .bsk file to restore state
 ~save~save current state as .bsk file, to be restored later
 ~save as~save current state as a new .bsk file
-~reset layout~reset to the layout specified in "layout" in userprefs.json
+~new patch~reset to the layout specified in "layout" in userprefs.json
 ~write audio~write the last 30 minutes of audio to your specified recordings_path
 ~ ? ~show help
 ~settings~adjust preferences, saved as userprefs.json
@@ -1725,6 +1725,12 @@ titlebar~
 ~lookahead (exp.)~use lookahead scheduling, which is necessary for scriptmodule. gets automatically turned on when you use scriptmodule. so far, lookahead scheduling seems to not create any issues, but leaving this checkbox here just in case.
 ~autosave~every time a new module is added, trigger a save to data/savestate/autosave/, to help reload state in the event of a crash. can be quite slow if using modules with large samples.
 ~play/pause~stop all audio processing (shift-p)
+
+
+
+newpatchconfirm~
+~confirm~clear everything and start fresh
+~cancel~dismiss this
 
 
 

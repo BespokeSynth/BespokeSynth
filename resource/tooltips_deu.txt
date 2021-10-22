@@ -1717,7 +1717,7 @@ titlebar~
 ~load~Laden einer gespeicherten .bsk-Datei zur Wiederherstellung des Zustands
 ~save~Den aktuellen Zustand als .bsk-Datei, für die spätere Wiederherstellung
 ~save as~Den aktuellen Zustand als neue .bsk-Datei speichern
-~reset layout~Zurücksetzen auf das in "layout" in userprefs.json angegebene Layout
+~new patch~Zurücksetzen auf das in "layout" in userprefs.json angegebene Layout
 ~write audio~Die letzten 30 Minuten des Audios in den angegebenen recordings_path schreiben
 ~ ? ~Hilfe anzeigen
 ~settings~Einstellungen anpassen, gespeichert als userprefs.json

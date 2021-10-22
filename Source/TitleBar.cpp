@@ -165,6 +165,9 @@ TitleBar::TitleBar()
    
    mHelpDisplay = dynamic_cast<HelpDisplay*>(HelpDisplay::Create());
    mHelpDisplay->SetTypeName("helpdisplay");
+
+   mNewPatchConfirmPopup.SetTypeName("newpatchconfirm");
+   mNewPatchConfirmPopup.SetName("newpatchconfirm");
    
    SetShouldDrawOutline(false);
 }
@@ -179,7 +182,7 @@ void TitleBar::CreateUIControls()
    BUTTON(mSaveStateAsButton, "save as"); UIBLOCK_SHIFTRIGHT(); UIBLOCK_SHIFTX(10);
    BUTTON(mWriteAudioButton, "write audio");
    UIBLOCK_NEWLINE();
-   BUTTON(mResetLayoutButton,"reset layout"); UIBLOCK_SHIFTRIGHT();
+   BUTTON(mResetLayoutButton,"new patch"); UIBLOCK_SHIFTRIGHT();
    CHECKBOX(mEventLookaheadCheckbox, "lookahead (exp.)", &Transport::sDoEventLookahead); UIBLOCK_SHIFTRIGHT();
    CHECKBOX(mShouldAutosaveCheckbox, "autosave", &ModularSynth::sShouldAutosave);
    ENDUIBLOCK0();
@@ -195,6 +198,8 @@ void TitleBar::CreateUIControls()
    mHelpDisplay->CreateUIControls();
    
    ListLayouts();
+
+   mNewPatchConfirmPopup.CreateUIControls();
 }
 
 TitleBar::~TitleBar()
@@ -568,9 +573,38 @@ void TitleBar::ButtonClicked(ClickButton* button)
    if (button == mDisplayUserPrefsEditorButton)
       TheSynth->GetUserPrefsEditor()->Show();
    if (button == mResetLayoutButton)
-      TheSynth->ReloadInitialLayout();
+   {
+      auto& buttonRect = mResetLayoutButton->GetRect();
+      mNewPatchConfirmPopup.SetOwningContainer(GetOwningContainer());
+      mNewPatchConfirmPopup.SetPosition(buttonRect.x, buttonRect.y + buttonRect.height + 2);
+      TheSynth->PushModalFocusItem(&mNewPatchConfirmPopup);
+   }
    if (button == mPlayPauseButton)
       TheSynth->ToggleAudioPaused();
 }
 
+void NewPatchConfirmPopup::CreateUIControls()
+{
+   IDrawableModule::CreateUIControls();
 
+   UIBLOCK(3, 20);
+   BUTTON(mConfirmButton, "confirm"); UIBLOCK_SHIFTRIGHT(); UIBLOCK_SHIFTX(5);
+   BUTTON(mCancelButton, "cancel");
+   ENDUIBLOCK(mWidth, mHeight);
+}
+
+void NewPatchConfirmPopup::DrawModule()
+{
+   DrawTextNormal("clear this patch?", 3, 14);
+
+   mConfirmButton->Draw();
+   mCancelButton->Draw();
+}
+
+void NewPatchConfirmPopup::ButtonClicked(ClickButton* button)
+{
+   if (button == mConfirmButton)
+      TheSynth->ReloadInitialLayout();
+   if (button == mCancelButton)
+      TheSynth->PopModalFocusItem();
+}
