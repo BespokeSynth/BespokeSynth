@@ -502,6 +502,38 @@ void TextEntry::ClearInput()
    mCaretPosition2 = 0;
 }
 
+void TextEntry::SetFromMidiCC(float slider, bool setViaModulator /*= false*/)
+{
+   if (mType == kTextEntry_Int)
+   {
+      *mVarInt = GetValueForMidiCC(slider);
+      UpdateDisplayString();
+   }
+
+   if (mType == kTextEntry_Float)
+   {
+      *mVarFloat = GetValueForMidiCC(slider);
+      UpdateDisplayString();
+   }
+}
+
+float TextEntry::GetValueForMidiCC(float slider) const
+{
+   if (mType == kTextEntry_Int)
+   {
+      slider = ofClamp(slider, 0, 1);
+      return (int)round(ofMap(slider, 0, 1, mIntMin, mIntMax));
+   }
+
+   if (mType == kTextEntry_Float)
+   {
+      slider = ofClamp(slider, 0, 1);
+      return ofMap(slider, 0, 1, mFloatMin, mFloatMax);
+   }
+
+   return 0;
+}
+
 void TextEntry::SetValue(float value)
 {
    if (mType == kTextEntry_Int)
@@ -515,6 +547,20 @@ void TextEntry::SetValue(float value)
       *mVarFloat = value;
       UpdateDisplayString();
    }
+}
+
+int TextEntry::GetNumValues()
+{
+   if (mType == kTextEntry_Int)
+      return mIntMax - mIntMin + 1;
+   return 0;
+}
+
+std::string TextEntry::GetDisplayValue(float val) const
+{
+   if (mType == kTextEntry_Int || mType == kTextEntry_Float)
+      return ofToString(val);
+   return mString;
 }
 
 void TextEntry::AcceptEntry(bool pressedEnter)

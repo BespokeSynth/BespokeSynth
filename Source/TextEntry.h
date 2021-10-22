@@ -91,8 +91,11 @@ public:
    void GetDimensions(float& width, float& height) override;
 
    //IUIControl
-   void SetFromMidiCC(float slider, bool setViaModulator = false) override {}
+   void SetFromMidiCC(float slider, bool setViaModulator = false) override;
+   float GetValueForMidiCC(float slider) const override;
    void SetValue(float value) override;
+   int GetNumValues() override;
+   std::string GetDisplayValue(float val) const override;
    void Increment(float amount) override;
    void SaveState(FileStreamOut& out) override;
    void LoadState(FileStreamIn& in, bool shouldSetValue = true) override;
