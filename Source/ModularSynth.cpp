@@ -2796,7 +2796,15 @@ void ModularSynth::SaveOutput()
    if (!mUserPrefs["recordings_path"].isNull())
       recordingsPath = mUserPrefs["recordings_path"].asString();
    
-   std::string filename = ofGetTimestampString(recordingsPath + "recording_%Y-%m-%d_%H-%M.wav");
+   std::string save_prefix = "recording_";
+   if (!mCurrentSaveStatePath.empty())
+   {
+       // This assumes that mCurrentSaveStatePath always has a valid filename at the end
+       std::string filename = File(mCurrentSaveStatePath).getFileNameWithoutExtension().toStdString();
+       save_prefix = filename + "_";
+   }
+
+   std::string filename = ofGetTimestampString(recordingsPath + save_prefix + "%Y-%m-%d_%H-%M.wav");
    //string filenamePos = ofGetTimestampString("recordings/pos_%Y-%m-%d_%H-%M.wav");
 
    assert(mRecordingLength <= mGlobalRecordBuffer->Size());
