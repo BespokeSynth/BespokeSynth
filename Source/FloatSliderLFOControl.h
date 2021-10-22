@@ -154,7 +154,7 @@ public:
    static void Shutdown();
    static FloatSliderLFOControl* GetLFO(FloatSlider* owner);
 private:
-#define LFO_POOL_SIZE 64
+#define LFO_POOL_SIZE 256
    static FloatSliderLFOControl* sLFOPool[LFO_POOL_SIZE];
    static int sNextLFOIndex;
    static bool sInitialized;

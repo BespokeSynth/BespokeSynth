@@ -437,6 +437,7 @@ ModuleFactory::ModuleFactory()
    REGISTER(GridSliders, gridsliders, kModuleType_Modulator);
    REGISTER(MultitrackRecorder, multitrackrecorder, kModuleType_Other);
    REGISTER(NoteExpressionRouter, noteexpression, kModuleType_Note);
+   REGISTER(FloatSliderLFOControl, lfo, kModuleType_Other);
 
    //REGISTER_EXPERIMENTAL(MidiPlayer, midiplayer, kModuleType_Instrument);
    REGISTER_HIDDEN(Autotalent, autotalent, kModuleType_Audio);
@@ -465,7 +466,6 @@ ModuleFactory::ModuleFactory()
 #endif
    REGISTER_HIDDEN(PSMoveController, psmove, kModuleType_Other);
    REGISTER_HIDDEN(ControlTactileFeedback, controltactilefeedback, kModuleType_Synth);
-   REGISTER_HIDDEN(FloatSliderLFOControl, lfo, kModuleType_Other);
    REGISTER_HIDDEN(EnvelopeEditor, envelopeeditor, kModuleType_Other);
    REGISTER_HIDDEN(LFOController, lfocontroller, kModuleType_Other); //old, probably irrelevant
    REGISTER_HIDDEN(Razor, razor, kModuleType_Synth);
