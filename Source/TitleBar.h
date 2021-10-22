@@ -84,6 +84,25 @@ private:
    std::vector<SpawnList*> mDropdowns;
 };
 
+class NewPatchConfirmPopup : public IDrawableModule, public IButtonListener
+{
+public:
+   NewPatchConfirmPopup() {}
+   void CreateUIControls() override;
+   void DrawModule() override;
+   bool HasTitleBar() const override { return false; }
+
+   void GetDimensions(float& width, float& height) override { width = mWidth; height = mHeight; }
+
+   void ButtonClicked(ClickButton* button) override;
+   
+private:
+   int mWidth;
+   int mHeight;
+   ClickButton* mConfirmButton;
+   ClickButton* mCancelButton;
+};
+
 class TitleBar : public IDrawableModule, public IDropdownListener, public IButtonListener, public IFloatSliderListener, public WindowCloseListener
 {
 public:
@@ -147,6 +166,8 @@ private:
    bool mLeftCornerHovered;
 
    std::unique_ptr<PluginListWindow> mPluginListWindow;
+
+   NewPatchConfirmPopup mNewPatchConfirmPopup;
 };
 
 extern TitleBar* TheTitleBar;

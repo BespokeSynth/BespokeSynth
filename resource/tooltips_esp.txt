@@ -1712,7 +1712,7 @@ titlebar~
 ~load~cargar un archivo .bsk guardado para restaurar el estado 
 ~save~guardar estado actual como archivo .bsk , para restaurarlo después
 ~save as~guarda el estado actual como un nuevo archivo .bsk
-~reset layout~resetea el layout especificado en  "layout" en el archivo userprefs.json
+~new patch~resetea el layout especificado en  "layout" en el archivo userprefs.json
 ~write audio~graba los últimos 30 minutos de audio a el directorio de grabaciones especificado “recordings_path”
 ~ ? ~muestra ayuda
 ~settings~ajuste de preferencias, guardadas como userprefs.json
