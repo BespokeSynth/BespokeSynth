@@ -574,7 +574,7 @@ void TitleBar::ButtonClicked(ClickButton* button)
       TheSynth->GetUserPrefsEditor()->Show();
    if (button == mResetLayoutButton)
    {
-      auto& buttonRect = mResetLayoutButton->GetRect();
+      auto buttonRect = mResetLayoutButton->GetRect();
       mNewPatchConfirmPopup.SetOwningContainer(GetOwningContainer());
       mNewPatchConfirmPopup.SetPosition(buttonRect.x, buttonRect.y + buttonRect.height + 2);
       TheSynth->PushModalFocusItem(&mNewPatchConfirmPopup);
