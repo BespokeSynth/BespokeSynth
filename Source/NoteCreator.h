@@ -31,10 +31,9 @@
 #include "ClickButton.h"
 #include "TextEntry.h"
 #include "Slider.h"
-#include "Transport.h"
 #include "IPulseReceiver.h"
 
-class NoteCreator : public IDrawableModule, public INoteSource, public IButtonListener, public ITextEntryListener, public IFloatSliderListener, public IAudioPoller, public IPulseReceiver
+class NoteCreator : public IDrawableModule, public INoteSource, public IButtonListener, public ITextEntryListener, public IFloatSliderListener, public IPulseReceiver
 {
 public:
    NoteCreator();
@@ -46,8 +45,6 @@ public:
    void Init() override;
    
    void SetEnabled(bool enabled) override { mEnabled = enabled; }
-   
-   void OnTransportAdvanced(float amount) override;
    
    void OnPulse(double time, float velocity, int flags) override;
    
@@ -65,8 +62,11 @@ protected:
    //IDrawableModule
    void DrawModule() override;
    bool Enabled() const override { return mEnabled; }
-   void GetModuleDimensions(float& w, float& h) override { w=110; h=58; }
+   void GetModuleDimensions(float& w, float& h) override { w=mWidth; h=mHeight; }
    
+   int mWidth;
+   int mHeight;
+
    ClickButton* mTriggerButton;
    TextEntry* mPitchEntry;
    FloatSlider* mVelocitySlider;
@@ -77,7 +77,6 @@ protected:
    float mDuration;
    double mStartTime;
    bool mNoteOn;
-   bool mNoteOnByTrigger;
    int mVoiceIndex;
 };
 
