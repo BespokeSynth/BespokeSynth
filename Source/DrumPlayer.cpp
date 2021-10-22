@@ -838,6 +838,14 @@ void DrumPlayer::DrumHit::DrawUIControls()
 
 int DrumPlayer::GetAssociatedSampleIndex(int x, int y)
 {
+    if (x > 3)
+    {
+        // For long rows, overflow the x value vertically
+        // This makes e.g. 8 pads on a single row usable for
+        // two drumplayer rows
+        y = y + (x / 4);
+        x = x % 4;
+    }
    int pos = x+(3-y)*4;
    if (pos < 16)
       return pos;
