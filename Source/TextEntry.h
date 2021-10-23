@@ -93,6 +93,7 @@ public:
    //IUIControl
    void SetFromMidiCC(float slider, bool setViaModulator = false) override;
    float GetValueForMidiCC(float slider) const override;
+   float GetMidiValue() const override;
    void SetValue(float value) override;
    int GetNumValues() override;
    std::string GetDisplayValue(float val) const override;

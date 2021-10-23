@@ -534,6 +534,17 @@ float TextEntry::GetValueForMidiCC(float slider) const
    return 0;
 }
 
+float TextEntry::GetMidiValue() const
+{
+   if (mType == kTextEntry_Int)
+      return ofMap(*mVarInt, mIntMin, mIntMax, 0, 1);
+
+   if (mType == kTextEntry_Float)
+      return ofMap(*mVarFloat, mFloatMin, mFloatMax, 0, 1);
+
+   return 0;
+}
+
 void TextEntry::SetValue(float value)
 {
    if (mType == kTextEntry_Int)
