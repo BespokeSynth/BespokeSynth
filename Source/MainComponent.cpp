@@ -418,21 +418,30 @@ public:
       // If you add any child components, this is where you should
       // update their positions.
    }
-   
+
 private:
+   int GetMouseButton(const MouseEvent& e)
+   {
+      if (e.mods.isPopupMenu())
+         return 2;
+      if (e.mods.isMiddleButtonDown())
+         return 3;
+      return 1;
+   }
+
    void mouseDown(const MouseEvent& e) override
    {
-      mSynth.MousePressed(e.getMouseDownX(), e.getMouseDownY(), e.mods.isPopupMenu() ? 2 : 1);
+      mSynth.MousePressed(e.getMouseDownX(), e.getMouseDownY(), GetMouseButton(e));
    }
    
    void mouseUp(const MouseEvent& e) override
    {
-      mSynth.MouseReleased(e.getPosition().x, e.getPosition().y, e.mods.isPopupMenu() ? 2 : 1);
+      mSynth.MouseReleased(e.getPosition().x, e.getPosition().y, GetMouseButton(e));
    }
    
    void mouseDrag(const MouseEvent& e) override
    {
-      mSynth.MouseDragged(e.getPosition().x, e.getPosition().y, e.mods.isPopupMenu() ? 2 : 1);
+      mSynth.MouseDragged(e.getPosition().x, e.getPosition().y, GetMouseButton(e));
    }
    
    void mouseMove(const MouseEvent& e) override
