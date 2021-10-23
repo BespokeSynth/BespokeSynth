@@ -35,6 +35,7 @@
 #include "UIControlMacros.h"
 #include "PatchCableSource.h"
 #include "Prefab.h"
+#include "VersionInfo.h"
 #if BESPOKE_WINDOWS
 #undef ssize_t
 #endif
@@ -126,6 +127,8 @@ void ScriptModule::CreateUIControls()
    FLOATSLIDER(mDSlider, "d", &mD, 0, 1);
    ENDUIBLOCK(mWidth, mHeight);
 
+   mPythonInstalledConfirmButton = new ClickButton(this, "yes, I have Python installed", 20, 100);
+
    RefreshStyleFiles();
 
    if (!mStyleJSON.empty())
@@ -137,11 +140,6 @@ void ScriptModule::UninitializePython()
    if (sPythonInitialized)
       py::finalize_interpreter();
    sPythonInitialized = false;
-}
-
-namespace
-{
-   std::string kPythonIsInstalledMarkerFile = "python_installed";
 }
 
 //static
@@ -158,7 +156,7 @@ void ScriptModule::InitializePythonIfNecessary()
 
    if (!sHasPythonEverSuccessfullyInitialized)
    {
-      File(ofToDataPath("internal/" + kPythonIsInstalledMarkerFile)).create();
+      File(ofToDataPath("internal/python_" + std::string(Bespoke::PYTHON_VERSION) + "_installed")).create();
       sHasPythonEverSuccessfullyInitialized = true;
    }
 }
@@ -168,7 +166,7 @@ void ScriptModule::CheckIfPythonEverSuccessfullyInitialized()
 {
    if (!sHasPythonEverSuccessfullyInitialized)
    {
-      if (File(ofToDataPath("internal/"+kPythonIsInstalledMarkerFile)).existsAsFile())
+      if (File(ofToDataPath("internal/python_" + std::string(Bespoke::PYTHON_VERSION) + "_installed")).existsAsFile())
          sHasPythonEverSuccessfullyInitialized = true;
    }
 }
@@ -177,7 +175,7 @@ void ScriptModule::OnClicked(int x, int y, bool right)
 {
    if (!sHasPythonEverSuccessfullyInitialized)
    {
-      InitializePythonIfNecessary();
+      mPythonInstalledConfirmButton->TestClick(x, y, right);
    }
    else
    {
@@ -192,10 +190,27 @@ void ScriptModule::DrawModule()
 
    if (!sHasPythonEverSuccessfullyInitialized)
    {
-      DrawTextNormal("please ensure that you have Python 3.8 installed\nif you do not have Python 3.8 installed, Bespoke may crash\n\nclick to continue...", 20, 20);
+      //DrawTextNormal("please ensure that you have Python 3.8 installed\nif you do not have Python 3.8 installed, Bespoke may crash\n\nclick to continue...", 20, 20);
+      juce::String pythonVersionRev = Bespoke::PYTHON_VERSION;
+      juce::String pythonVersionMinor = pythonVersionRev.substring(0, pythonVersionRev.lastIndexOfChar('.'));
+      if (pythonVersionRev.lastIndexOfChar('.') == -1)
+         pythonVersionMinor = "***ERROR***";
+      DrawTextNormal("this version of bespoke was built with Python " + pythonVersionRev.toStdString() + "\n" +
+                     "please ensure that you have some flavor of Python " + pythonVersionMinor.toStdString() + " installed.\n"+
+                     "(not an older or newer version!)\n\n" +
+                     "if you do not, bespoke will crash!", 20, 20);
+
+      mCodeEntry->SetShowing(false);
+
+      mPythonInstalledConfirmButton->SetLabel(("yes, I have Python " + pythonVersionMinor.toStdString() + " installed").c_str());
+      mPythonInstalledConfirmButton->Draw();
+
       return;
    }
    
+   mPythonInstalledConfirmButton->SetShowing(false);
+   mCodeEntry->SetShowing(true);
+
    mLoadScriptSelector->Draw();
    mLoadScriptButton->Draw();
    mSaveScriptButton->Draw();
@@ -793,6 +808,9 @@ void ScriptModule::MidiReceived(MidiMessageType messageType, int control, float 
 
 void ScriptModule::ButtonClicked(ClickButton* button)
 {
+   if (button == mPythonInstalledConfirmButton)
+      InitializePythonIfNecessary();
+
    if (button == mRunButton)
    {
       mCodeEntry->Publish();

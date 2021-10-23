@@ -148,6 +148,7 @@ private:
    void OnClicked(int x, int y, bool right) override;
    bool MouseMoved(float x, float y) override;
    
+   ClickButton* mPythonInstalledConfirmButton;
    DropdownList* mLoadScriptSelector;
    DropdownList* mScriptStyleSelector;
    ClickButton* mLoadScriptButton;
