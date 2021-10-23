@@ -159,7 +159,7 @@ void ClickButton::OnClicked(int x, int y, bool right)
    mOwner->ButtonClicked(this);
 }
 
-void ClickButton::MouseReleased()
+void ClickButton::MouseReleased(bool right)
 {
    mClickTime = 0;
 }
@@ -175,7 +175,7 @@ void ClickButton::SetFromMidiCC(float slider, bool setViaModulator /*= false*/)
    if (slider > 0)
       OnClicked(0,0,false);
    else
-      MouseReleased();
+      MouseReleased(false);
 }
 
 void ClickButton::SetValue(float value)
@@ -183,7 +183,7 @@ void ClickButton::SetValue(float value)
    if (value > 0)
       OnClicked(0,0,false);
    else
-      MouseReleased();
+      MouseReleased(false);
 }
 
 float ClickButton::GetMidiValue() const

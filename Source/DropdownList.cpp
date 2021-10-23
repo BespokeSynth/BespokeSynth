@@ -319,7 +319,7 @@ bool DropdownList::MouseMoved(float x, float y)
    return false;
 }
 
-void DropdownList::MouseReleased()
+void DropdownList::MouseReleased(bool right)
 {
 }
 

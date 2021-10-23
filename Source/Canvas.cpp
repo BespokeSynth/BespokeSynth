@@ -450,7 +450,7 @@ bool Canvas::MouseMoved(float x, float y)
    return false;
 }
 
-void Canvas::MouseReleased()
+void Canvas::MouseReleased(bool right)
 {
    if (mClick && mClickedElement != nullptr && mDragEnd == kHighlightEnd_None)
    {

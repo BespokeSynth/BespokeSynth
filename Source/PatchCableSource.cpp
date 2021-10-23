@@ -445,12 +445,12 @@ bool PatchCableSource::MouseMoved(float x, float y)
    return false;
 }
 
-void PatchCableSource::MouseReleased()
+void PatchCableSource::MouseReleased(bool right)
 {
    std::vector<PatchCable*> cables = mPatchCables;   //copy, since list might get modified here
    FindValidTargets();
    for (auto cable : cables)
-      cable->MouseReleased();
+      cable->MouseReleased(right);
 }
 
 bool PatchCableSource::TestClick(int x, int y, bool right, bool testOnly /* = false */)

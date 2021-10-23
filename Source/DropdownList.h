@@ -81,7 +81,7 @@ public:
    std::string GetLabel(int val) const;
    void Render() override;
    bool MouseMoved(float x, float y) override;
-   void MouseReleased() override;
+   void MouseReleased(bool right) override;
    void DrawDropdown(int w, int h);
    void DropdownClicked(int x, int y);
    void SetIndex(int i, bool forceUpdate = false);

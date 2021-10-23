@@ -61,7 +61,7 @@ private:
    bool Enabled() const override { return mEnabled; }
    void OnClicked(int x, int y, bool right) override;
    bool MouseMoved(float x, float y) override;
-   void MouseReleased() override;
+   void MouseReleased(bool right) override;
 
    static const int kMaxSampleLengthSeconds = 3;
    struct SampleElement

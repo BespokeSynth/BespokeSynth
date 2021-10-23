@@ -131,9 +131,9 @@ void Arpeggiator::OnClicked(int x, int y, bool right)
    IDrawableModule::OnClicked(x,y,right);
 }
 
-void Arpeggiator::MouseReleased()
+void Arpeggiator::MouseReleased(bool right)
 {
-   IDrawableModule::MouseReleased();
+   IDrawableModule::MouseReleased(right);
 }
 
 bool Arpeggiator::MouseMoved(float x, float y)

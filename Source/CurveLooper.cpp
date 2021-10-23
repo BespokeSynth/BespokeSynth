@@ -145,11 +145,11 @@ void CurveLooper::OnClicked(int x, int y, bool right)
    mEnvelopeControl.OnClicked(x, y, right);
 }
 
-void CurveLooper::MouseReleased()
+void CurveLooper::MouseReleased(bool right)
 {
-   IDrawableModule::MouseReleased();
+   IDrawableModule::MouseReleased(right);
    
-   mEnvelopeControl.MouseReleased();
+   mEnvelopeControl.MouseReleased(right);
 }
 
 bool CurveLooper::MouseMoved(float x, float y)

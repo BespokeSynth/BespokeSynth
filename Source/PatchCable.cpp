@@ -391,24 +391,31 @@ bool PatchCable::MouseMoved(float x, float y)
    return false;
 }
 
-void PatchCable::MouseReleased()
+void PatchCable::MouseReleased(bool right)
 {
    if (mDragging)
    {
-      ofVec2f mousePos(TheSynth->GetRawMouseX(), TheSynth->GetRawMouseY());
-      if ((mousePos - mGrabPos).distanceSquared() > 3)
+      if (right)
       {
-         IClickable* target = GetDropTarget();
-         if (target)
-            mOwner->SetPatchCableTarget(this, target, true);
-         
-         mDragging = false;
-         mHovered = false;
-         if (sActivePatchCable == this)
-            sActivePatchCable = nullptr;
-         
-         if (mTarget == nullptr)
-            Destroy();
+         Destroy();
+      }
+      else
+      {
+         ofVec2f mousePos(TheSynth->GetRawMouseX(), TheSynth->GetRawMouseY());
+         if ((mousePos - mGrabPos).distanceSquared() > 3)
+         {
+            IClickable* target = GetDropTarget();
+            if (target)
+               mOwner->SetPatchCableTarget(this, target, true);
+
+            mDragging = false;
+            mHovered = false;
+            if (sActivePatchCable == this)
+               sActivePatchCable = nullptr;
+
+            if (mTarget == nullptr)
+               Destroy();
+         }
       }
    }
 }

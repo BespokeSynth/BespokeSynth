@@ -42,7 +42,7 @@ public:
    void SetADSR(::ADSR* adsr) { mAdsr = adsr; }
    void OnClicked(int x, int y, bool right);
    void MouseMoved(float x, float y);
-   void MouseReleased();
+   void MouseReleased(bool right);
    void Draw();
    void SetViewLength(float length) { mViewLength = length; }
    ofVec2f GetPosition() const { return mPosition; }
@@ -86,7 +86,7 @@ public:
    bool HasTitleBar() const override { return mPinned; }
    bool IsSaveable() override { return mPinned; }
    void CreateUIControls() override;
-   void MouseReleased() override;
+   void MouseReleased(bool right) override;
    bool MouseMoved(float x, float y) override;
    
    bool IsPinned() const { return mPinned; }

@@ -107,7 +107,7 @@ void CanvasScrollbar::OnClicked(int x, int y, bool right)
       mScrollBarOffset = y - GetBarStart();
 }
 
-void CanvasScrollbar::MouseReleased()
+void CanvasScrollbar::MouseReleased(bool right)
 {
    mClick = false;
 }

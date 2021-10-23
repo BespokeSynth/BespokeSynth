@@ -331,9 +331,9 @@ void SeaOfGrain::OnClicked(int x, int y, bool right)
    IDrawableModule::OnClicked(x, y, right);
 }
 
-void SeaOfGrain::MouseReleased()
+void SeaOfGrain::MouseReleased(bool right)
 {
-   IDrawableModule::MouseReleased();
+   IDrawableModule::MouseReleased(right);
 }
 
 bool SeaOfGrain::MouseMoved(float x, float y)

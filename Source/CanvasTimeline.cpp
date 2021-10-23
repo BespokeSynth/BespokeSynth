@@ -142,7 +142,7 @@ void CanvasTimeline::OnClicked(int x, int y, bool right)
    mClick = true;
 }
 
-void CanvasTimeline::MouseReleased()
+void CanvasTimeline::MouseReleased(bool right)
 {
    if (mClick)
    {

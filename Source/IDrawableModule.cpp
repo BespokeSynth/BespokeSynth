@@ -682,19 +682,19 @@ bool IDrawableModule::MouseMoved(float x, float y)
    return false;
 }
 
-void IDrawableModule::MouseReleased()
+void IDrawableModule::MouseReleased(bool right)
 {
    if (CanMinimize() && mMinimizeAreaClicked &&
        TheSynth->HasNotMovedMouseSinceClick())
       ToggleMinimized();
    mMinimizeAreaClicked = false;
    for (int i=0; i<mUIControls.size(); ++i)
-      mUIControls[i]->MouseReleased();
+      mUIControls[i]->MouseReleased(right);
    for (int i=0; i<mChildren.size(); ++i)
-      mChildren[i]->MouseReleased();
+      mChildren[i]->MouseReleased(right);
    auto sources = mPatchCableSources;
    for (auto source : sources)
-      source->MouseReleased();
+      source->MouseReleased(right);
 }
 
 IUIControl* IDrawableModule::FindUIControl(const char* name, bool fail /*=true*/) const

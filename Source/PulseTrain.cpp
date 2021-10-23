@@ -190,10 +190,10 @@ void PulseTrain::OnClicked(int x, int y, bool right)
    mVelocityGrid->TestClick(x, y, right);
 }
 
-void PulseTrain::MouseReleased()
+void PulseTrain::MouseReleased(bool right)
 {
-   IDrawableModule::MouseReleased();
-   mVelocityGrid->MouseReleased();
+   IDrawableModule::MouseReleased(right);
+   mVelocityGrid->MouseReleased(right);
 }
 
 bool PulseTrain::MouseMoved(float x, float y)

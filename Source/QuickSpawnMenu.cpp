@@ -114,7 +114,7 @@ void QuickSpawnMenu::UpdateDisplay()
    }
 }
 
-void QuickSpawnMenu::MouseReleased()
+void QuickSpawnMenu::MouseReleased(bool right)
 {
    if (IsShowing())
    {

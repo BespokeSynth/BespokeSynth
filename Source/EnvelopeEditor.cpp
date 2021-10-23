@@ -246,7 +246,7 @@ void EnvelopeControl::OnClicked(int x, int y, bool right)
    }
 }
 
-void EnvelopeControl::MouseReleased()
+void EnvelopeControl::MouseReleased(bool right)
 {
    mClick = false;
 }
@@ -482,11 +482,11 @@ void EnvelopeEditor::OnClicked(int x, int y, bool right)
    mEnvelopeControl.OnClicked(x,y,right);
 }
 
-void EnvelopeEditor::MouseReleased()
+void EnvelopeEditor::MouseReleased(bool right)
 {
-   IDrawableModule::MouseReleased();
+   IDrawableModule::MouseReleased(right);
    
-   mEnvelopeControl.MouseReleased();
+   mEnvelopeControl.MouseReleased(right);
 }
 
 bool EnvelopeEditor::MouseMoved(float x, float y)

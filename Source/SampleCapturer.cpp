@@ -251,9 +251,9 @@ void SampleCapturer::OnClicked(int x, int y, bool right)
    mIsDragging = true;
 }
 
-void SampleCapturer::MouseReleased()
+void SampleCapturer::MouseReleased(bool right)
 {
-   IDrawableModule::MouseReleased();
+   IDrawableModule::MouseReleased(right);
    mIsDragging = false;
 }
 

@@ -158,11 +158,11 @@ void EnvelopeModulator::OnClicked(int x, int y, bool right)
    mEnvelopeControl.OnClicked(x,y,right);
 }
 
-void EnvelopeModulator::MouseReleased()
+void EnvelopeModulator::MouseReleased(bool right)
 {
-   IDrawableModule::MouseReleased();
+   IDrawableModule::MouseReleased(right);
    
-   mEnvelopeControl.MouseReleased();
+   mEnvelopeControl.MouseReleased(right);
 }
 
 bool EnvelopeModulator::MouseMoved(float x, float y)

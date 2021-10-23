@@ -590,10 +590,10 @@ void StepSequencer::OnClicked(int x, int y, bool right)
       UpdateLights();
 }
 
-void StepSequencer::MouseReleased()
+void StepSequencer::MouseReleased(bool right)
 {
-   IDrawableModule::MouseReleased();
-   mGrid->MouseReleased();
+   IDrawableModule::MouseReleased(right);
+   mGrid->MouseReleased(right);
    UpdateLights();
 }
 

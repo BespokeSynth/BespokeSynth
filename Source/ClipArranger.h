@@ -47,7 +47,7 @@ public:
    void Poll() override;
    void Process(double time, float* left, float* right, int bufferSize);
    
-   void MouseReleased() override;
+   void MouseReleased(bool right) override;
    bool MouseMoved(float x, float y) override;
    
    void FilesDropped(std::vector<std::string> files, int x, int y) override;

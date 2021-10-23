@@ -393,9 +393,9 @@ void FubbleModule::RecordPoint()
    mLength = time;
 }
 
-void FubbleModule::MouseReleased()
+void FubbleModule::MouseReleased(bool right)
 {
-   IDrawableModule::MouseReleased();
+   IDrawableModule::MouseReleased(right);
    
    mIsRightClicking = false;
    

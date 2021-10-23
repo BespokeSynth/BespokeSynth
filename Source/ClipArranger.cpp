@@ -129,7 +129,7 @@ void ClipArranger::OnClicked(int x, int y, bool right)
    }
 }
 
-void ClipArranger::MouseReleased()
+void ClipArranger::MouseReleased(bool right)
 {
    if (mMouseDown)
    {

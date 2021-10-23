@@ -278,11 +278,11 @@ void GridModule::OnClicked(int x, int y, bool right)
    mGrid->TestClick(x, y, right);
 }
 
-void GridModule::MouseReleased()
+void GridModule::MouseReleased(bool right)
 {
-   IDrawableModule::MouseReleased();
+   IDrawableModule::MouseReleased(right);
    
-   mGrid->MouseReleased();
+   mGrid->MouseReleased(right);
 }
 
 void GridModule::SetLight(int x, int y, GridColor color, bool force)

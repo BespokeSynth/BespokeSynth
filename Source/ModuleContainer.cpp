@@ -180,7 +180,7 @@ void ModuleContainer::MouseMoved(float x, float y)
    }
 }
 
-void ModuleContainer::MouseReleased()
+void ModuleContainer::MouseReleased(bool right)
 {
    if (mOwner != nullptr) return;
    
@@ -188,8 +188,8 @@ void ModuleContainer::MouseReleased()
    {
       ModuleContainer* subcontainer = mModules[i]->GetContainer();
       if (subcontainer)
-         subcontainer->MouseReleased();
-      mModules[i]->MouseReleased();
+         subcontainer->MouseReleased(right);
+      mModules[i]->MouseReleased(right);
    }
 }
 

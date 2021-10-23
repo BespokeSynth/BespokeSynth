@@ -111,11 +111,11 @@ void Polyrhythms::OnClicked(int x, int y, bool right)
       mRhythmLines[i]->OnClicked(x,y,right);
 }
 
-void Polyrhythms::MouseReleased()
+void Polyrhythms::MouseReleased(bool right)
 {
-   IDrawableModule::MouseReleased();
+   IDrawableModule::MouseReleased(right);
    for (int i=0; i<mRhythmLines.size(); ++i)
-      mRhythmLines[i]->MouseReleased();
+      mRhythmLines[i]->MouseReleased(right);
 }
 
 bool Polyrhythms::MouseMoved(float x, float y)
@@ -248,9 +248,9 @@ void RhythmLine::OnClicked(int x, int y, bool right)
    mGrid->TestClick(x, y, right);
 }
 
-void RhythmLine::MouseReleased()
+void RhythmLine::MouseReleased(bool right)
 {
-   mGrid->MouseReleased();
+   mGrid->MouseReleased(right);
 }
 
 void RhythmLine::MouseMoved(float x, float y)

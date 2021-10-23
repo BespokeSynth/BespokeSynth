@@ -114,9 +114,9 @@ void Prefab::OnClicked(int x, int y, bool right)
       TheSynth->SetGroupSelectContext(&mModuleContainer);
 }
 
-void Prefab::MouseReleased()
+void Prefab::MouseReleased(bool right)
 {
-   IDrawableModule::MouseReleased();
+   IDrawableModule::MouseReleased(right);
 
    if (CanAddDropModules())
    {

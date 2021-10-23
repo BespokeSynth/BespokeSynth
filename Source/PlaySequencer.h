@@ -55,7 +55,7 @@ public:
    void SetEnabled(bool enabled) override { mEnabled = enabled; }
 
    //IClickable
-   void MouseReleased() override;
+   void MouseReleased(bool right) override;
    bool MouseMoved(float x, float y) override;
 
    //INoteReceiver

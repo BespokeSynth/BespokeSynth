@@ -39,7 +39,7 @@ class ADSRDisplay : public IUIControl
 public:
    ADSRDisplay(IDrawableModule* owner, const char* name, int x, int y, int w, int h, ::ADSR* adsr);
    void Render() override;
-   void MouseReleased() override;
+   void MouseReleased(bool right) override;
    bool MouseMoved(float x, float y) override;
 
    void SetVol(float vol) { mVol = vol; }

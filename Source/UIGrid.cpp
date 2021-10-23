@@ -306,7 +306,7 @@ void UIGrid::OnClicked(int x, int y, bool right)
    mHoldRow = cell.mRow;
 }
 
-void UIGrid::MouseReleased()
+void UIGrid::MouseReleased(bool right)
 {
    if (mClick && mMomentary)
    {

@@ -135,10 +135,10 @@ void Chorder::OnClicked(int x, int y, bool right)
    mChordGrid->TestClick(x, y, right);
 }
 
-void Chorder::MouseReleased()
+void Chorder::MouseReleased(bool right)
 {
-   IDrawableModule::MouseReleased();
-   mChordGrid->MouseReleased();
+   IDrawableModule::MouseReleased(right);
+   mChordGrid->MouseReleased(right);
 }
 
 bool Chorder::MouseMoved(float x, float y)

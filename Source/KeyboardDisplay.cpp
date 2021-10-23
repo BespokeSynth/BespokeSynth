@@ -120,9 +120,9 @@ void KeyboardDisplay::OnClicked(int x, int y, bool right)
    }
 }
 
-void KeyboardDisplay::MouseReleased()
+void KeyboardDisplay::MouseReleased(bool right)
 {
-   IDrawableModule::MouseReleased();
+   IDrawableModule::MouseReleased(right);
    if (mPlayingMousePitch != -1 && !mLatch)
    {
       double time = gTime + gBufferSizeMs;

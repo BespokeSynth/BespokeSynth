@@ -53,7 +53,7 @@ public:
    bool Enabled() const override { return mEnabled; }
    
    void CreateUIControls() override;
-   void MouseReleased() override;
+   void MouseReleased(bool right) override;
    bool MouseMoved(float x, float y) override;
    bool IsResizable() const override { return mAdvancedDisplay; }
    void Resize(float w, float h) override;

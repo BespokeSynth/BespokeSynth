@@ -955,9 +955,9 @@ void SamplePlayer::SetCuePointForX(float mouseX)
    mSampleCuePoints[mActiveCuePointIndex].speed = 1;
 }
 
-void SamplePlayer::MouseReleased()
+void SamplePlayer::MouseReleased(bool right)
 {
-   IDrawableModule::MouseReleased();
+   IDrawableModule::MouseReleased(right);
    mScrubbingSample = false;
 }
 

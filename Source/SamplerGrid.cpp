@@ -397,11 +397,11 @@ void SamplerGrid::OnClicked(int x, int y, bool right)
    }
 }
 
-void SamplerGrid::MouseReleased()
+void SamplerGrid::MouseReleased(bool right)
 {
-   IDrawableModule::MouseReleased();
+   IDrawableModule::MouseReleased(right);
    
-   mGrid->MouseReleased();
+   mGrid->MouseReleased(right);
 }
 
 void SamplerGrid::FilesDropped(std::vector<std::string> files, int x, int y)

@@ -66,7 +66,7 @@ public:
    void GridUpdated(UIGrid* grid, int col, int row, float value, float oldValue) override;
    
    //IClickable
-   void MouseReleased() override;
+   void MouseReleased(bool right) override;
    bool MouseMoved(float x, float y) override;
    bool MouseScrolled(int x, int y, float scrollX, float scrollY) override;
    

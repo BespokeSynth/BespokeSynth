@@ -356,7 +356,7 @@ void FloatSlider::OnClicked(int x, int y, bool right)
    UpdateTouching();
 }
 
-void FloatSlider::MouseReleased()
+void FloatSlider::MouseReleased(bool right)
 {
    if (mMouseDown)
       mTouching = false;

@@ -43,7 +43,7 @@ public:
    //INoteReceiver
    void PlayNote(double time, int pitch, int velocity, int voiceIdx = -1, ModulationParameters modulation = ModulationParameters()) override;
    
-   void MouseReleased() override;
+   void MouseReleased(bool right) override;
    void KeyPressed(int key, bool isRepeat) override;
    void KeyReleased(int key) override;
    

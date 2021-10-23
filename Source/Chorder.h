@@ -68,7 +68,7 @@ private:
    void DrawModule() override;
    void GetModuleDimensions(float& width, float& height) override { width = 135; height = 75; }
    void OnClicked(int x, int y, bool right) override;
-   void MouseReleased() override;
+   void MouseReleased(bool right) override;
    bool MouseMoved(float x, float y) override;
    
    void PlayChorderNote(double time, int pitch, int velocity, int voiceIdx, ModulationParameters modulation);

@@ -104,11 +104,11 @@ void ModulatorCurve::OnClicked(int x, int y, bool right)
    mEnvelopeControl.OnClicked(x,y,right);
 }
 
-void ModulatorCurve::MouseReleased()
+void ModulatorCurve::MouseReleased(bool right)
 {
-   IDrawableModule::MouseReleased();
+   IDrawableModule::MouseReleased(right);
    
-   mEnvelopeControl.MouseReleased();
+   mEnvelopeControl.MouseReleased(right);
 }
 
 bool ModulatorCurve::MouseMoved(float x, float y)

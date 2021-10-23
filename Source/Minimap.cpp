@@ -268,7 +268,7 @@ void Minimap::OnClicked(int x, int y, bool right)
    }
 }
 
-void Minimap::MouseReleased()
+void Minimap::MouseReleased(bool right)
 {
    mClick = false;
 }

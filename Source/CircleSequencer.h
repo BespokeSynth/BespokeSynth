@@ -47,7 +47,7 @@ public:
    CircleSequencerRing(CircleSequencer* owner, int index);
    void Draw();
    void OnClicked(int x, int y, bool right);
-   void MouseReleased();
+   void MouseReleased(bool right);
    void MouseMoved(float x, float y);
    void CreateUIControls();
    void OnTransportAdvanced(float amount);
@@ -87,7 +87,7 @@ public:
    void OnTransportAdvanced(float amount) override;
    
    //IClickable
-   void MouseReleased() override;
+   void MouseReleased(bool right) override;
    bool MouseMoved(float x, float y) override;
    
    void CheckboxUpdated(Checkbox* checkbox) override;

@@ -321,9 +321,9 @@ void EQModule::OnClicked(int x, int y, bool right)
       mDragging = true;
 }
 
-void EQModule::MouseReleased()
+void EQModule::MouseReleased(bool right)
 {
-   IDrawableModule::MouseReleased();
+   IDrawableModule::MouseReleased(right);
 
    mDragging = false;
 }

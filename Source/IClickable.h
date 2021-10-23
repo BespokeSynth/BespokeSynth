@@ -48,7 +48,7 @@ public:
    void SetParent(IClickable* parent) { mParent = parent; }
    bool NotifyMouseMoved(float x, float y);
    bool NotifyMouseScrolled(int x, int y, float scrollX, float scrollY);
-   virtual void MouseReleased() {}
+   virtual void MouseReleased(bool right) {}
    virtual void GetDimensions(float& width, float& height) { width = 10; height = 10; }
    ofVec2f GetDimensions();
    ofRectangle GetRect(bool local = false);

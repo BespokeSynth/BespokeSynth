@@ -51,7 +51,7 @@ public:
    void SetVar(float* var) { mVar = var; }
    void Render() override;
    bool MouseMoved(float x, float y) override;
-   void MouseReleased() override;
+   void MouseReleased(bool right) override;
    bool IsMouseDown() const override { return mMouseDown; }
    void SetExtents(float min, float max) { mMin = min; mMax = max; }
    void Compute(int samplesIn = 0)
@@ -187,7 +187,7 @@ public:
    void SetVar(int* var) { mVar = var; }
    void Render() override;
    bool MouseMoved(float x, float y) override;
-   void MouseReleased() override { mMouseDown = false; }
+   void MouseReleased(bool right) override { mMouseDown = false; }
    bool IsMouseDown() const override { return mMouseDown; }
    void SetExtents(int min, int max) { mMin = min; mMax = max; CalcSliderVal(); }
    void SetShowName(bool show) { mShowName = show; }

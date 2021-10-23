@@ -406,11 +406,11 @@ void NoteStepSequencer::OnClicked(int x, int y, bool right)
    mVelocityGrid->TestClick(x, y, right);
 }
 
-void NoteStepSequencer::MouseReleased()
+void NoteStepSequencer::MouseReleased(bool right)
 {
-   IDrawableModule::MouseReleased();
-   mGrid->MouseReleased();
-   mVelocityGrid->MouseReleased();
+   IDrawableModule::MouseReleased(right);
+   mGrid->MouseReleased(right);
+   mVelocityGrid->MouseReleased(right);
 }
 
 bool NoteStepSequencer::MouseMoved(float x, float y)

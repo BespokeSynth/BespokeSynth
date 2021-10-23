@@ -1584,6 +1584,7 @@ void ModularSynth::OnModuleDeleted(IDrawableModule* module)
 
 void ModularSynth::MouseReleased(int intX, int intY, int button)
 {
+   const bool right = button == 2;
    mMousePos.x = intX;
    mMousePos.y = intY;
 
@@ -1600,14 +1601,14 @@ void ModularSynth::MouseReleased(int intX, int intY, int button)
    
    if (GetTopModalFocusItem())
    {
-      GetTopModalFocusItem()->MouseReleased();
+      GetTopModalFocusItem()->MouseReleased(right);
    }
    
    if (mResizeModule)
       mResizeModule = nullptr;
 
-   mModuleContainer.MouseReleased();
-   mUILayerModuleContainer.MouseReleased();
+   mModuleContainer.MouseReleased(right);
+   mUILayerModuleContainer.MouseReleased(right);
 
    if (mMoveModule)
    {

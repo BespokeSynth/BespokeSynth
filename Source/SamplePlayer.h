@@ -122,7 +122,7 @@ private:
    void GetModuleDimensions(float& width, float& height) override;
    void OnClicked(int x, int y, bool right) override;
    bool MouseMoved(float x, float y) override;
-   void MouseReleased() override;
+   void MouseReleased(bool right) override;
    bool MouseScrolled(int x, int y, float scrollX, float scrollY) override;
       
    float mWidth;

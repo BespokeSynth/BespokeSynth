@@ -116,9 +116,9 @@ void Ramper::OnClicked(int x, int y, bool right)
    IDrawableModule::OnClicked(x,y,right);
 }
 
-void Ramper::MouseReleased()
+void Ramper::MouseReleased(bool right)
 {
-   IDrawableModule::MouseReleased();
+   IDrawableModule::MouseReleased(right);
 }
 
 bool Ramper::MouseMoved(float x, float y)

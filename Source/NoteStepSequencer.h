@@ -73,7 +73,7 @@ public:
    void Poll() override;
 
    //IClickable
-   void MouseReleased() override;
+   void MouseReleased(bool right) override;
    bool MouseMoved(float x, float y) override;
    bool MouseScrolled(int x, int y, float scrollX, float scrollY) override;
    

@@ -146,7 +146,7 @@ public:
    void Resize(float w, float h) override;
 
    //IClickable
-   void MouseReleased() override;
+   void MouseReleased(bool right) override;
    bool MouseMoved(float x, float y) override;
    
    //IPush2GridController

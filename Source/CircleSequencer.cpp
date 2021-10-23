@@ -109,11 +109,11 @@ void CircleSequencer::OnClicked(int x, int y, bool right)
       mCircleSequencerRings[i]->OnClicked(x,y,right);
 }
 
-void CircleSequencer::MouseReleased()
+void CircleSequencer::MouseReleased(bool right)
 {
-   IDrawableModule::MouseReleased();
+   IDrawableModule::MouseReleased(right);
    for (int i=0; i<mCircleSequencerRings.size(); ++i)
-      mCircleSequencerRings[i]->MouseReleased();
+      mCircleSequencerRings[i]->MouseReleased(right);
 }
 
 bool CircleSequencer::MouseMoved(float x, float y)
@@ -291,7 +291,7 @@ void CircleSequencerRing::OnClicked(int x, int y, bool right)
    }
 }
 
-void CircleSequencerRing::MouseReleased()
+void CircleSequencerRing::MouseReleased(bool right)
 {
    mCurrentlyClickedStepIdx = -1;
 }

@@ -148,10 +148,10 @@ void ControlSequencer::OnClicked(int x, int y, bool right)
    mGrid->TestClick(x, y, right);
 }
 
-void ControlSequencer::MouseReleased()
+void ControlSequencer::MouseReleased(bool right)
 {
-   IDrawableModule::MouseReleased();
-   mGrid->MouseReleased();
+   IDrawableModule::MouseReleased(right);
+   mGrid->MouseReleased(right);
 }
 
 bool ControlSequencer::MouseMoved(float x, float y)

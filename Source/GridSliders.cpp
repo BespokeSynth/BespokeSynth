@@ -166,9 +166,9 @@ void GridSliders::OnClicked(int x, int y, bool right)
    IDrawableModule::OnClicked(x, y, right);
 }
 
-void GridSliders::MouseReleased()
+void GridSliders::MouseReleased(bool right)
 {
-   IDrawableModule::MouseReleased();
+   IDrawableModule::MouseReleased(right);
 }
 
 bool GridSliders::MouseMoved(float x, float y)

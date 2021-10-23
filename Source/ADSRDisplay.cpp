@@ -332,7 +332,7 @@ void ADSRDisplay::OnClicked(int x, int y, bool right)
    }
 }
 
-void ADSRDisplay::MouseReleased()
+void ADSRDisplay::MouseReleased(bool right)
 {
    mClick = false;
 }

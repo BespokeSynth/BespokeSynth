@@ -47,7 +47,7 @@ public:
    
    void KeyPressed(int key, bool isRepeat) override;
    void KeyReleased(int key) override;
-   void MouseReleased() override;
+   void MouseReleased(bool right) override;
    
    bool IsSingleton() const override { return true; }
    

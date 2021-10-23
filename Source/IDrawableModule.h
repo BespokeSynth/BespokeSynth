@@ -95,7 +95,7 @@ public:
    virtual void Exit();
    bool IsInitialized() const { return mInitialized; }
    bool Minimized() const { return mMinimizeAnimation > 0; }
-   virtual void MouseReleased() override;
+   virtual void MouseReleased(bool right) override;
    virtual void FilesDropped(std::vector<std::string> files, int x, int y) {}
    virtual std::string GetTitleLabel() const { return Name(); }
    virtual bool HasTitleBar() const { return true; }

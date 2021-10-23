@@ -134,7 +134,7 @@ public:
    void Render() override;
    bool TestClick(int x, int y, bool right, bool testOnly = false) override;
    bool MouseMoved(float x, float y) override;
-   void MouseReleased() override;
+   void MouseReleased(bool right) override;
    void GetDimensions(float& width, float& height) override { width = 10; height = 10; }
    void KeyPressed(int key, bool isRepeat);
    

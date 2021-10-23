@@ -45,7 +45,7 @@ public:
    RhythmLine(Polyrhythms* owner, int index);
    void Draw();
    void OnClicked(int x, int y, bool right);
-   void MouseReleased();
+   void MouseReleased(bool right);
    void MouseMoved(float x, float y);
    void CreateUIControls();
    void OnResize();
@@ -79,7 +79,7 @@ public:
    void OnTransportAdvanced(float amount) override;
 
    //IClickable
-   void MouseReleased() override;
+   void MouseReleased(bool right) override;
    bool MouseMoved(float x, float y) override;
    
    void DropdownUpdated(DropdownList* list, int oldVal) override;

@@ -52,7 +52,7 @@ private:
    void DrawModulesOnMinimap(ofRectangle & boundingBox);
    void RectUnion(ofRectangle & target, ofRectangle & unionRect);
    void OnClicked(int x, int y, bool right) override;
-   void MouseReleased() override;
+   void MouseReleased(bool right) override;
    bool MouseMoved(float x, float y) override;
    ofVec2f CoordsToViewport(ofRectangle & boundingBox, float x, float y);
    void ForcePosition();

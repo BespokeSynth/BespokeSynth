@@ -651,9 +651,9 @@ void BeatBloks::PlaceHeldBlok()
    }
 }
 
-void BeatBloks::MouseReleased()
+void BeatBloks::MouseReleased(bool right)
 {
-   IDrawableModule::MouseReleased();
+   IDrawableModule::MouseReleased(right);
    
    if (!mBlockMultiPlaceEngaged && mMouseY > mRemixBufferY && mMouseY < mRemixBufferY+mBufferH)
    {

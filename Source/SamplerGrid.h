@@ -94,7 +94,7 @@ private:
    void GetModuleDimensions(float& width, float& height) override;
    bool Enabled() const override { return mEnabled; }
    void OnClicked(int x, int y, bool right) override;
-   void MouseReleased() override;
+   void MouseReleased(bool right) override;
    
    void InitGrid();
    void UpdateLights();

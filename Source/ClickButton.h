@@ -56,7 +56,7 @@ public:
    ClickButton(IButtonListener* owner, const char* label, IUIControl* anchor, AnchorDirection anchorDirection, ButtonDisplayStyle displayStyle = ButtonDisplayStyle::kText);
    void SetLabel(const char* label);
    void Render() override;
-   void MouseReleased() override;
+   void MouseReleased(bool right) override;
    bool MouseMoved(float x, float y) override;
    void SetDisplayText(bool display) { mDisplayStyle = ButtonDisplayStyle::kNoLabel; }
    void SetDisplayStyle(ButtonDisplayStyle style) { mDisplayStyle = style; }

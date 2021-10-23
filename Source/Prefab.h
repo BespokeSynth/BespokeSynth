@@ -72,7 +72,7 @@ private:
    bool Enabled() const override { return mEnabled; }
    void GetModuleDimensions(float& width, float& height) override;
    void OnClicked(int x, int y, bool right) override;
-   void MouseReleased() override;
+   void MouseReleased(bool right) override;
 
    bool CanAddDropModules();
    bool IsMouseHovered();

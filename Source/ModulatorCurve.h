@@ -53,7 +53,7 @@ public:
    
    FloatSlider* GetTarget() { return mTarget; }
    
-   void MouseReleased() override;
+   void MouseReleased(bool right) override;
    bool MouseMoved(float x, float y) override;
    
    //IFloatSliderListener

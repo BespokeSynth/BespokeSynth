@@ -171,9 +171,9 @@ void MultitapDelay::OnClicked(int x, int y, bool right)
    IDrawableModule::OnClicked(x, y, right);
 }
 
-void MultitapDelay::MouseReleased()
+void MultitapDelay::MouseReleased(bool right)
 {
-   IDrawableModule::MouseReleased();
+   IDrawableModule::MouseReleased(right);
 }
 
 bool MultitapDelay::MouseMoved(float x, float y)

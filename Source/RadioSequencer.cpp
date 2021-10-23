@@ -184,10 +184,10 @@ void RadioSequencer::OnClicked(int x, int y, bool right)
    mGrid->TestClick(x, y, right);
 }
 
-void RadioSequencer::MouseReleased()
+void RadioSequencer::MouseReleased(bool right)
 {
-   IDrawableModule::MouseReleased();
-   mGrid->MouseReleased();
+   IDrawableModule::MouseReleased(right);
+   mGrid->MouseReleased(right);
 }
 
 bool RadioSequencer::MouseMoved(float x, float y)
