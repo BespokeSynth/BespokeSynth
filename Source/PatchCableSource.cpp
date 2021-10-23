@@ -460,6 +460,9 @@ bool PatchCableSource::TestClick(int x, int y, bool right, bool testOnly /* = fa
    
    if (!mClickable)
       return false;
+
+   if (right)
+      return false;
    
    if (mHoverIndex != -1)
    {

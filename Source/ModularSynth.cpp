@@ -1260,10 +1260,9 @@ void ModularSynth::MouseDragged(int intX, int intY, int button)
 
 void ModularSynth::MousePressed(int intX, int intY, int button)
 {
+   bool rightButton = button == 2;
+
    mZoomer.ExitVanityPanningMode();
-   
-   if (PatchCable::sActivePatchCable != nullptr)
-      return;
    
    mMousePos.x = intX;
    mMousePos.y = intY;
@@ -1282,11 +1281,16 @@ void ModularSynth::MousePressed(int intX, int intY, int button)
       return;
    }
 
+   if (PatchCable::sActivePatchCable != nullptr)
+   {
+      if (rightButton)
+         PatchCable::sActivePatchCable->Destroy();
+      return;
+   }
+
    mLastMouseDragPos = ofVec2f(x,y);
    mGroupSelectContext = nullptr;
    
-   bool rightButton = button == 2;
-
    IKeyboardFocusListener::sKeyboardFocusBeforeClick = IKeyboardFocusListener::GetActiveKeyboardFocus();
    IKeyboardFocusListener::ClearActiveKeyboardFocus(K(notifyListeners));
 
