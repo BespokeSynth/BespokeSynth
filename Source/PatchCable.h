@@ -75,7 +75,7 @@ public:
    
    void Grab();
    bool IsValidTarget(IClickable* target) const;
-   void Destroy();
+   void Destroy(bool fromUserClick = false);
    
    void SetUIControlConnection(UIControlConnection* conn) { mUIControlConnection = conn; }
    

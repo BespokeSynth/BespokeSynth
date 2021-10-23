@@ -1284,7 +1284,7 @@ void ModularSynth::MousePressed(int intX, int intY, int button)
    if (PatchCable::sActivePatchCable != nullptr)
    {
       if (rightButton)
-         PatchCable::sActivePatchCable->Destroy();
+         PatchCable::sActivePatchCable->Destroy(true);
       return;
    }
 
