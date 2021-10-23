@@ -1180,6 +1180,9 @@ void ModularSynth::MouseDragged(int intX, int intY, int button)
    ofVec2f drag = ofVec2f(x,y) - mLastMouseDragPos;
    mLastMouseDragPos = ofVec2f(x,y);
 
+   if (button == 3)
+      return;
+
    if (GetMoveModule() && (abs(mClickStartX-x) >= 1 || abs(mClickStartY-y) >= 1))
    {
       mClickStartX = INT_MAX;  //moved enough from click spot to reset
@@ -1271,6 +1274,14 @@ void ModularSynth::MousePressed(int intX, int intY, int button)
    float x = GetMouseX(&mModuleContainer);
    float y = GetMouseY(&mModuleContainer);
    
+   if (button == 3)
+   {
+      mClickStartX = x;
+      mClickStartY = y;
+      mIsMousePanning = true;
+      return;
+   }
+
    mLastMouseDragPos = ofVec2f(x,y);
    mGroupSelectContext = nullptr;
    
@@ -1578,6 +1589,11 @@ void ModularSynth::MouseReleased(int intX, int intY, int button)
 
    if (button >= 0 && button < (int)mIsMouseButtonHeld.size())
       mIsMouseButtonHeld[button] = false;
+
+   mIsMousePanning = false;
+
+   if (button == 3)
+      return;
    
    float x = GetMouseX(&mModuleContainer);
    float y = GetMouseY(&mModuleContainer);
@@ -1633,8 +1649,6 @@ void ModularSynth::MouseReleased(int intX, int intY, int button)
    
    mClickStartX = INT_MAX;
    mClickStartY = INT_MAX;
-
-   mIsMousePanning = false;
 }
 
 void ModularSynth::AudioOut(float** output, int bufferSize, int nChannels)

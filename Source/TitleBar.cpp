@@ -391,7 +391,7 @@ void TitleBar::DrawModule()
       list->GetList()->GetDimensions(w, h);
       x += w + 5;
 
-      if (x >= pixelWidth - 250)
+      if (x >= pixelWidth - 260)
       {
          x = startX;
          y += 18;
