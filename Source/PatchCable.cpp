@@ -446,6 +446,9 @@ IClickable* PatchCable::GetDropTarget()
 
 bool PatchCable::TestClick(int x, int y, bool right, bool testOnly /* = false */)
 {
+   if (right)
+      return false;
+
    if (mHovered)
    {
       if (!testOnly)
