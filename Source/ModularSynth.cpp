@@ -1403,10 +1403,10 @@ void ModularSynth::MouseScrolled(float x, float y, bool canZoomCanvas)
          float w,h;
          gHoveredUIControl->GetDimensions(w, h);
          movementScale = 200.0f / w;
-            
-         if (GetKeyModifiers() & kModifier_Shift)
-            movementScale *= .01f;
       }
+
+      if (GetKeyModifiers() & kModifier_Shift)
+         movementScale *= .01f;
 
       if (clickButton)
          return;
