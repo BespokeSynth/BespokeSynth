@@ -462,6 +462,20 @@ notesequencer~Loop-Sequenz von Noten in einem Intervall. Kombinieren Sie as mit 
 
 
 
+notetable~Eine Tonhöhe (beginnend bei Null) auf eine Tonhöhenskala mappen
+~random pitch~Randomisieren Sie die Tonhöhen in der Sequenz. Halten Sie Shift gedrückt, um die Zufallsauswahl auf Grundtöne und Quinten zu beschränken.
+~length~Die Anzahl der Tonhöhen
+~octave~Oktave der unteren Tonhöhe dieser Sequenz
+~notemode~Welchen Satz von Tonhöhen sollen die Reihen darstellen?
+~tone*~Tonhöhe dieser Spalte
+~grid~Hier ein Grid aus einem "Midicontroller"-Modul einfügen
+~x offset~X-Versatz des verbundenen Grid-Controllers
+~y offset~Y-Versatz des verbundenen Grid-Controllers
+~rand pitch chance~Wie hoch ist die Wahrscheinlichkeit, dass ein Schritt geändert wird, wenn auf die Schaltfläche für die zufällige Tonhöhe geklickt wird?
+~rand pitch range~Wenn auf die Schaltfläche für die zufällige Tonhöhe geklickt wird, wie weit ändert sich dann die Tonhöhe?
+
+
+
 notelooper~Note-Loop-Recorder mit Overdubbing- und Ersetzungsfunktion
 ~write~Soll der Eingang aufgenommen werden?
 ~del/mute~Wenn "Schreiben" aktiviert ist, werden die Noten gelöscht, wenn der Abspielkopf über sie hinwegfährt, andernfalls werden sie einfach stummgeschaltet.
@@ -569,8 +583,7 @@ fouronthefloor~Sendet Note 0 bei jedem Beat, um Kick Drum zu triggern
 
 
 drumsequencer~Step-Sequenzer für Drums. Halten Sie beim Ziehen auf dem Raster Shift gedrückt, um die Step-Geschwindigkeit anzupassen.
-~str~Velocity, die bei der Einstellung eines Steps über einen Grid-Controller verwendet wird, falls das Kontrollkästchen neben diesem Schieberegler aktiviert ist
-~use str~Ob der Schieberegler "str" für die Einstellung der Anschlagsstärke verwendet werden soll
+~vel~Anschlagsdynamik bei der Einstellung eines Schritts
 ~measures~Länge der Sequenz in Takten
 ~preset~Ein Pattern-Preset auswählen
 ~yoff~Vertikaler Versatz der Grid-Controller Pattern Ansicht
@@ -588,11 +601,13 @@ drumsequencer~Step-Sequenzer für Drums. Halten Sie beim Ziehen auf dem Raster S
 ~randomize~Sequenz randomisieren
 ~r den~Dichte der Zufallsausgabe. Je höher dieser Wert ist, desto stärker ist die Zufallsausgabe belegt.
 ~r amt~Die Wahrscheinlichkeit, dass sich jeder Schritt bei der Zufallsauswahl ändert. Bei niedrigen Werten wird nur ein kleiner Teil der Sequenz geändert, bei hohen Werten wird ein größerer Teil der Sequenz ersetzt.
+~r lock*~Diese Zeile sperren, damit sie nicht randomisiert wird
 
 
 
 helpdisplay~Hilfe anzeigen
 ~show tooltips~Diese tooltips anzeigen. Sie können sie auch mit F1 ein- und ausschalten, oder im Menü "settings" standardmäßig ein- oder ausschalten.
+~copy build info~Informationen zu dieser Version in die Zwischenablage kopieren, für Hilfeanfragen
 ~help page~Welche Seite der Hilfeinformationen angezeigt werden soll
 
 
@@ -1133,6 +1148,7 @@ sampleplayer~Sample-Wiedergabe mit auslösbaren Cue-Points, Clip-Extraktion und 
 ~cue len~Länge des aktuellen Cue in Sekunden. Bei einem Wert von Null wird bis zum Ende des Samples gespielt.
 ~cue speed~Abspielgeschwindigkeit des aktuellen Cues
 ~cuepoint~setzt den aktuellen Cue zwecks Bearbeitung
+~cue stop~Wenn Note-Off empfangen wird, das Abspielen dieses Cues stoppen.
 ~click sets cue~wenn wahr, wird durch Klicken auf die Wellenform die Startposition des aktuellen Cue gesetzt
 ~select played~wenn wahr, wird jeder Cue-Punkt, der über eingehende Noten gespielt wird, zum aktuellen Cue-Punkt
 ~play cue~Aktuelles Cue abspielen
@@ -1277,6 +1293,10 @@ fmsynth~Polyphone FM Synthese
 
 
 
+notetoggle~Eine Steuerung ein- oder ausschalten, je nachdem, ob Eingangsnoten vorhanden sind.
+
+
+
 drumsynth~Oszillator+Noise Drum Synth
 ~vol~the output volume
 ~edit~Parameter für jeden Schlag anzeigen
@@ -1308,6 +1328,7 @@ drumsynth~Oszillator+Noise Drum Synth
 ~cutoffmax*~Filter-Start-Cutoff-Frequenz
 ~cutoffmin*~Filter-End-Cutoff-Frequenz
 ~q*~Filter Resonanz
+~oversampling~Oversampling-Anteil. Erhöht die Klangqualität, aber auch die CPU-Auslastung.
 
 
 
@@ -1340,6 +1361,7 @@ drumplayer~Sample Player für drum playback gedacht
 ~envelopedisplay *R~Hüllkurven-Release
 ~test *~Dieses Sample abspielen
 ~random *~Ein zufälliges Sample der gewählten hitcategory auswählen
+~grab *~Dieses Sample greifen
 
 
 
@@ -1728,6 +1750,12 @@ titlebar~
 
 
 
+newpatchconfirm~
+~confirm~Alles löschen und neu anfangen
+~cancel~Abbrechen
+
+
+
 vstplugin~Eine VST-Plugin-Instanz
 ~vol~Einstellung der Ausgangslautstärke
 ~program change~Eine Program Change Nachricht an die VST-Instanz senden
@@ -1735,6 +1763,7 @@ vstplugin~Eine VST-Plugin-Instanz
 ~show parameter~Parameter auswählen, um sie anzuzeigen, damit sie über die bespoke-Oberfläche angepasst werden können. Wenn ein VST mehr als 20 Parameter hat, ist diese Liste anfangs leer. In diesem Fall müssen Sie einen Parameter in der VST-Oberfläche verschieben, damit er in dieser Liste erscheint.
 ~preset~Auswahl gespeicherter VST Presets
 ~save as~Die aktuellen VST Settings als Preset speichern um sie später wieder zu laden
+~panic~"all notes off" und "all sounds off" an dieses Plugin senden, um es sofort zum Schweigen zu bringen.
 
 
 
@@ -1751,7 +1780,6 @@ transport~Steuert das Tempo und die aktuelle Zeitposition
 ~ > ~Aktuelle Zeit vorwärts stupsen
 ~set tempo~
 ~play/pause~Die gesamte Audioverarbeitung stoppen (shift-p)
-
 
 
 
@@ -1774,6 +1802,7 @@ m185sequencer~Sequenzer unter Verwendung des einzigartigen Paradigmas des m185 o
 
 notestepper~Ausgabe von Noten durch einen Patchkabel-Rundlauf, um eine sequenzielle Vielfalt zu schaffen
 ~length~Länge der Sequenz
+~reset~Auf Start zurücksetzen
 
 
 
