@@ -35,7 +35,6 @@
 SignalGenerator::SignalGenerator()
 : mOsc(kOsc_Sin)
 , mVol(0)
-, mSmoothedVol(0)
 , mVolSlider(nullptr)
 , mOscType(kOsc_Sin)
 , mOscSelector(nullptr)
@@ -64,6 +63,7 @@ SignalGenerator::SignalGenerator()
 , mSoftenSlider(nullptr)
 , mPhaseOffset(0)
 , mPhaseOffsetSlider(nullptr)
+, mResetPhaseAtMs(-9999)
 {
    mWriteBuffer = new float[gBufferSize];
    
@@ -148,18 +148,14 @@ void SignalGenerator::Process(double time)
    for (int pos=0; pos<bufferSize; ++pos)
    {
       ComputeSliders(pos);
+
+      if (mResetPhaseAtMs > 0 && time > mResetPhaseAtMs)
+      {
+         mPhase = mPhaseOffset;
+         mResetPhaseAtMs = -9999;
+      }
       
-      float volSq;
-      if (mVolSlider->GetLFO() && mVolSlider->GetLFO()->IsEnabled())
-      {
-         volSq = mVol * mVol;
-      }
-      else
-      {
-         float smooth = .001f;
-         mSmoothedVol = mSmoothedVol * (1-smooth) + mVol * smooth;
-         volSq = mSmoothedVol * mSmoothedVol;
-      }
+      float volSq = mVol * mVol;
       
       if (mFreqMode == kFreqMode_Root)
          mFreq = TheScale->PitchToFreq(TheScale->ScaleRoot() + 24);
@@ -229,6 +225,11 @@ void SignalGenerator::PlayNote(double time, int pitch, int velocity, int voiceId
          }
       }
    }
+}
+
+void SignalGenerator::OnPulse(double time, float velocity, int flags)
+{
+   mResetPhaseAtMs = time;
 }
 
 void SignalGenerator::SetEnabled(bool enabled)

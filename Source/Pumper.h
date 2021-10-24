@@ -41,7 +41,7 @@ public:
    
    static IAudioEffect* Create() { return new Pumper(); }
    
-   std::string GetTitleLabel() override { return "pumper"; }
+   
    void CreateUIControls() override;
 
    //IAudioEffect

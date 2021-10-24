@@ -35,6 +35,7 @@
 #include "UIControlMacros.h"
 #include "PatchCableSource.h"
 #include "Prefab.h"
+#include "VersionInfo.h"
 #if BESPOKE_WINDOWS
 #undef ssize_t
 #endif
@@ -73,13 +74,14 @@ ofColor ScriptModule::sBackgroundTextColor = ofColor::white;
 bool ScriptModule::sPythonInitialized = false;
 //static
 bool ScriptModule::sHasPythonEverSuccessfullyInitialized = false;
+//static
+ofxJSONElement ScriptModule::sStyleJSON;
 
 ScriptModule::ScriptModule()
 : mCodeEntry(nullptr)
 , mRunButton(nullptr)
 , mStopButton(nullptr)
-, mLoadScriptIndex(-1)
-, mScriptStyleIndex(0)
+, mHotloadScripts(false)
 , mA(0)
 , mB(0)
 , mC(0)
@@ -115,8 +117,7 @@ void ScriptModule::CreateUIControls()
    DROPDOWN(mLoadScriptSelector, "loadscript", &mLoadScriptIndex, 120); UIBLOCK_SHIFTRIGHT();
    BUTTON(mLoadScriptButton,"load"); UIBLOCK_SHIFTRIGHT();
    BUTTON(mSaveScriptButton,"save as"); UIBLOCK_SHIFTRIGHT();
-   BUTTON(mShowReferenceButton, "?"); UIBLOCK_SHIFTRIGHT();
-   DROPDOWN(mScriptStyleSelector, "style", &mScriptStyleIndex, 120); UIBLOCK_NEWLINE();
+   BUTTON(mShowReferenceButton, "?"); UIBLOCK_NEWLINE();
    UICONTROL_CUSTOM(mCodeEntry, new CodeEntry(UICONTROL_BASICS("code"),500,300));
    BUTTON(mRunButton, "run"); UIBLOCK_SHIFTRIGHT();
    BUTTON(mStopButton, "stop"); UIBLOCK_NEWLINE();
@@ -126,10 +127,12 @@ void ScriptModule::CreateUIControls()
    FLOATSLIDER(mDSlider, "d", &mD, 0, 1);
    ENDUIBLOCK(mWidth, mHeight);
 
+   mPythonInstalledConfirmButton = new ClickButton(this, "yes, I have Python installed", 20, 100);
+
    RefreshStyleFiles();
 
-   if (!mStyleJSON.empty())
-      mCodeEntry->SetStyleFromJSON(mStyleJSON[0u]);
+   if (!sStyleJSON.empty())
+      mCodeEntry->SetStyleFromJSON(sStyleJSON[0u]);
 }
 
 void ScriptModule::UninitializePython()
@@ -137,11 +140,6 @@ void ScriptModule::UninitializePython()
    if (sPythonInitialized)
       py::finalize_interpreter();
    sPythonInitialized = false;
-}
-
-namespace
-{
-   std::string kPythonIsInstalledMarkerFile = "python_installed";
 }
 
 //static
@@ -158,7 +156,7 @@ void ScriptModule::InitializePythonIfNecessary()
 
    if (!sHasPythonEverSuccessfullyInitialized)
    {
-      File(ofToDataPath("internal/" + kPythonIsInstalledMarkerFile)).create();
+      File(ofToDataPath("internal/python_" + std::string(Bespoke::PYTHON_VERSION) + "_installed")).create();
       sHasPythonEverSuccessfullyInitialized = true;
    }
 }
@@ -168,7 +166,7 @@ void ScriptModule::CheckIfPythonEverSuccessfullyInitialized()
 {
    if (!sHasPythonEverSuccessfullyInitialized)
    {
-      if (File(ofToDataPath("internal/"+kPythonIsInstalledMarkerFile)).existsAsFile())
+      if (File(ofToDataPath("internal/python_" + std::string(Bespoke::PYTHON_VERSION) + "_installed")).existsAsFile())
          sHasPythonEverSuccessfullyInitialized = true;
    }
 }
@@ -177,7 +175,7 @@ void ScriptModule::OnClicked(int x, int y, bool right)
 {
    if (!sHasPythonEverSuccessfullyInitialized)
    {
-      InitializePythonIfNecessary();
+      mPythonInstalledConfirmButton->TestClick(x, y, right);
    }
    else
    {
@@ -192,15 +190,31 @@ void ScriptModule::DrawModule()
 
    if (!sHasPythonEverSuccessfullyInitialized)
    {
-      DrawTextNormal("please ensure that you have Python 3.8 installed\nif you do not have Python 3.8 installed, Bespoke may crash\n\nclick to continue...", 20, 20);
+      //DrawTextNormal("please ensure that you have Python 3.8 installed\nif you do not have Python 3.8 installed, Bespoke may crash\n\nclick to continue...", 20, 20);
+      juce::String pythonVersionRev = Bespoke::PYTHON_VERSION;
+      juce::String pythonVersionMinor = pythonVersionRev.substring(0, pythonVersionRev.lastIndexOfChar('.'));
+      if (pythonVersionRev.lastIndexOfChar('.') == -1)
+         pythonVersionMinor = "***ERROR***";
+      DrawTextNormal("this version of bespoke was built with Python " + pythonVersionRev.toStdString() + "\n" +
+                     "please ensure that you have some flavor of Python " + pythonVersionMinor.toStdString() + " installed.\n"+
+                     "(not an older or newer version!)\n\n" +
+                     "if you do not, bespoke will crash!", 20, 20);
+
+      mCodeEntry->SetShowing(false);
+
+      mPythonInstalledConfirmButton->SetLabel(("yes, I have Python " + pythonVersionMinor.toStdString() + " installed").c_str());
+      mPythonInstalledConfirmButton->Draw();
+
       return;
    }
    
+   mPythonInstalledConfirmButton->SetShowing(false);
+   mCodeEntry->SetShowing(true);
+
    mLoadScriptSelector->Draw();
    mLoadScriptButton->Draw();
    mSaveScriptButton->Draw();
    mShowReferenceButton->Draw();
-   mScriptStyleSelector->Draw();
    mCodeEntry->Draw();
    mRunButton->Draw();
    mStopButton->Draw();
@@ -293,7 +307,7 @@ void ScriptModule::DrawModule()
       float y = buttonRect.getCenter().y;
       ofCircle(x, y, 6);
       ofSetColor(0, 0, 0);
-      DrawTextBold("!", x-1, y+5, 17);
+      DrawTextBold("!", x-2, y+5, 17);
       ofPopStyle();
       
       if (mShowJediWarning)
@@ -542,6 +556,19 @@ void ScriptModule::Poll()
          RunCode(gTime, methodCall);
       mMidiMessageQueue.clear();
       mMidiMessageQueueMutex.unlock();
+   }
+
+   if (mHotloadScripts && !mLoadedScriptPath.empty())
+   {
+      File scriptFile = File(mLoadedScriptPath);
+      if (mLoadedScriptFiletime < scriptFile.getLastModificationTime())
+      {
+         std::unique_ptr<FileInputStream> input(scriptFile.createInputStream());
+         mCodeEntry->SetText(input->readString().toStdString());
+         mCodeEntry->Publish();
+         ExecuteCode();
+         mLoadedScriptFiletime = scriptFile.getLastModificationTime();
+      }
    }
 }
 
@@ -793,6 +820,9 @@ void ScriptModule::MidiReceived(MidiMessageType messageType, int control, float 
 
 void ScriptModule::ButtonClicked(ClickButton* button)
 {
+   if (button == mPythonInstalledConfirmButton)
+      InitializePythonIfNecessary();
+
    if (button == mRunButton)
    {
       mCodeEntry->Publish();
@@ -855,7 +885,8 @@ void ScriptModule::ButtonClicked(ClickButton* button)
    {
       if (mLoadScriptIndex >= 0 && mLoadScriptIndex < (int)mScriptFilePaths.size())
       {
-         File resourceFile = File(mScriptFilePaths[mLoadScriptIndex]);
+         mLoadedScriptPath = mScriptFilePaths[mLoadScriptIndex];
+         File resourceFile = File(mLoadedScriptPath);
          
          if (!resourceFile.existsAsFile())
          {
@@ -870,6 +901,8 @@ void ScriptModule::ButtonClicked(ClickButton* button)
             DBG("Failed to open file");
             return;
          }
+
+         mLoadedScriptFiletime = resourceFile.getLastModificationTime();
              
          mCodeEntry->SetText(input->readString().toStdString());
       }
@@ -888,34 +921,20 @@ void ScriptModule::DropdownClicked(DropdownList* list)
 {
    if (list == mLoadScriptSelector)
       RefreshScriptFiles();
-   if (list == mScriptStyleSelector)
-      RefreshStyleFiles();
 }
 
 void ScriptModule::DropdownUpdated(DropdownList *list, int oldValue)
 {
-    if (list == mScriptStyleSelector)
-    {
-        int v = (int)list->GetValue();
-        if ( v >= 0 && v < mStyleJSON.size())
-            mCodeEntry->SetStyleFromJSON(mStyleJSON[v]);
-    }
 }
 
 void ScriptModule::RefreshStyleFiles()
 {
-    mScriptStyleSelector->Clear();
     ofxJSONElement root;
     if (File(ofToDataPath("script_styles.json")).existsAsFile())
         root.open(ofToDataPath("script_styles.json"));
     else
         root.open(ofToResourcePath("userdata_original/script_styles.json"));
-
-    mStyleJSON = root["styles"];
-    for (size_t i = 0; i < mStyleJSON.size(); ++i)
-    {
-        mScriptStyleSelector->AddLabel(mStyleJSON[i]["name"].asString(), i);
-    }
+    sStyleJSON = root["styles"];
 }
 
 void ScriptModule::RefreshScriptFiles()
@@ -1352,6 +1371,13 @@ void ScriptModule::LoadLayout(const ofxJSONElement& moduleInfo)
    mModuleSaveData.LoadBool("execute_on_init", moduleInfo, true);
    mModuleSaveData.LoadInt("init_execute_priority", moduleInfo, 0, -9999, 9999, K(isTextField));
    mModuleSaveData.LoadBool("syntax_highlighting", moduleInfo, true);
+   mModuleSaveData.LoadString("style", moduleInfo, "classic", [](DropdownList* list) {
+      for (auto i = 0; i < sStyleJSON.size(); ++i)
+      {
+         list->AddLabel(sStyleJSON[i]["name"].asString(), i);
+      }
+   });
+   mModuleSaveData.LoadBool("hotload_script_files", moduleInfo, false);
    
    SetUpFromSaveData();
 }
@@ -1372,6 +1398,15 @@ void ScriptModule::SetUpFromSaveData()
    }
 
    mCodeEntry->SetDoSyntaxHighlighting(mModuleSaveData.GetBool("syntax_highlighting"));
+
+   std::string styleName = mModuleSaveData.GetString("style");
+   for (auto i = 0; i < sStyleJSON.size(); ++i)
+   {
+      if (sStyleJSON[i]["name"].asString() == styleName)
+         mCodeEntry->SetStyleFromJSON(sStyleJSON[i]);
+   }
+
+   mHotloadScripts = mModuleSaveData.GetBool("hotload_script_files");
 }
 
 void ScriptModule::SaveLayout(ofxJSONElement& moduleInfo)

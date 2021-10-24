@@ -46,7 +46,7 @@ public:
    
    static IAudioEffect* Create() { return new EQEffect(); }
    
-   std::string GetTitleLabel() override { return "basiceq"; }
+   
    void CreateUIControls() override;
    
    void Init() override;

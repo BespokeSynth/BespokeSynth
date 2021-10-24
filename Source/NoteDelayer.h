@@ -40,7 +40,7 @@ public:
    ~NoteDelayer();
    static IDrawableModule* Create() { return new NoteDelayer(); }
    
-   std::string GetTitleLabel() override { return "note delayer"; }
+   
    void CreateUIControls() override;
    void Init() override;
    

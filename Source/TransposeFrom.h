@@ -41,7 +41,7 @@ public:
    virtual ~TransposeFrom();
    static IDrawableModule* Create() { return new TransposeFrom(); }
    
-   std::string GetTitleLabel() override { return "transpose from"; }
+   
    void CreateUIControls() override;
    
    void SetEnabled(bool enabled) override { mEnabled = enabled; }

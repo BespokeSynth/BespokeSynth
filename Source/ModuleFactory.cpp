@@ -245,6 +245,9 @@
 #include "MPESmoother.h"
 #include "MidiControlChange.h"
 #include "MPETweaker.h"
+#include "NoteExpressionRouter.h"
+
+#include <juce_core/juce_core.h>
 
 #define REGISTER(class,name,type) Register(#name, &(class::Create), &(class::CanCreate), type, false, false);
 #define REGISTER_HIDDEN(class,name,type) Register(#name, &(class::Create), &(class::CanCreate), type, true, false);
@@ -433,6 +436,8 @@ ModuleFactory::ModuleFactory()
    REGISTER(MPETweaker, mpetweaker, kModuleType_Note);
    REGISTER(GridSliders, gridsliders, kModuleType_Modulator);
    REGISTER(MultitrackRecorder, multitrackrecorder, kModuleType_Other);
+   REGISTER(NoteExpressionRouter, noteexpression, kModuleType_Note);
+   REGISTER(FloatSliderLFOControl, lfo, kModuleType_Other);
 
    //REGISTER_EXPERIMENTAL(MidiPlayer, midiplayer, kModuleType_Instrument);
    REGISTER_HIDDEN(Autotalent, autotalent, kModuleType_Audio);
@@ -461,7 +466,6 @@ ModuleFactory::ModuleFactory()
 #endif
    REGISTER_HIDDEN(PSMoveController, psmove, kModuleType_Other);
    REGISTER_HIDDEN(ControlTactileFeedback, controltactilefeedback, kModuleType_Synth);
-   REGISTER_HIDDEN(FloatSliderLFOControl, lfo, kModuleType_Other);
    REGISTER_HIDDEN(EnvelopeEditor, envelopeeditor, kModuleType_Other);
    REGISTER_HIDDEN(LFOController, lfocontroller, kModuleType_Other); //old, probably irrelevant
    REGISTER_HIDDEN(Razor, razor, kModuleType_Synth);
@@ -503,53 +507,111 @@ std::vector<std::string> ModuleFactory::GetSpawnableModules(ModuleType moduleTyp
          (mIsHiddenModuleMap[iter->first] == false || gShowDevModules))
          modules.push_back(iter->first);
    }
+   
+   if (moduleType == kModuleType_Audio)
+   {
+      std::vector<std::string> effects = TheSynth->GetEffectFactory()->GetSpawnableEffects();
+      for (auto effect : effects)
+         modules.push_back(effect + " " + kEffectChainSuffix);
+   }
+   
    sort(modules.begin(), modules.end());
    return modules;
 }
 
-std::vector<std::string> ModuleFactory::GetSpawnableModules(char c)
+namespace
 {
-   std::vector<std::string> modules;
+   bool CheckHeldKeysMatch(juce::String name, std::string heldKeys)
+   {
+      name = name.toLowerCase();
+
+      if (name.isEmpty() || heldKeys.empty() || name[0] != heldKeys[0])
+         return false;
+
+      int stringPos = 0;
+      int end = name.indexOfChar('.');
+      if (end == -1)
+         end = name.indexOfChar(' ');
+      if (end == -1)
+         end = name.length() - 1;
+      bool showModule = true;
+      for (size_t j = 1; j < heldKeys.length(); ++j)
+      {
+         stringPos = name.substring(stringPos + 1, end + 1).indexOfChar(heldKeys[j]);
+         if (stringPos == -1) //couldn't find key in remaining string
+            return false;
+      }
+
+      return true;
+   }
+}
+
+std::vector<std::string> ModuleFactory::GetSpawnableModules(std::string keys)
+{
+   std::vector<juce::String> modules;
    for (auto iter = mFactoryMap.begin(); iter != mFactoryMap.end(); ++iter)
    {
-      if (iter->first[0] == c &&
-          (mIsHiddenModuleMap[iter->first] == false || gShowDevModules))
+      if ((mIsHiddenModuleMap[iter->first] == false || gShowDevModules) &&
+          CheckHeldKeysMatch(iter->first, keys))
          modules.push_back(iter->first);
    }
 
    std::vector<std::string> vsts;
-   VSTLookup::GetAvailableVSTs(vsts, false);
+   VSTLookup::GetAvailableVSTs(vsts);
+   std::vector<std::string> matchingVsts;
    for (auto vstFile : vsts)
    {
       std::string vstName = juce::File(vstFile).getFileName().toStdString();
-      if (tolower(vstName[0]) == c)
+      if (CheckHeldKeysMatch(vstName, keys))
+         matchingVsts.push_back(vstFile);
+   }
+   const int kMaxQuickspawnVstCount = 10;
+   if ((int)matchingVsts.size() <= kMaxQuickspawnVstCount)
+   {
+      for (auto vstFile : matchingVsts)
+      {
+         std::string vstName = juce::File(vstFile).getFileName().toStdString();
          modules.push_back(vstName + " " + kVSTSuffix);
+      }
+   }
+   else
+   {
+      VSTLookup::SortByLastUsed(matchingVsts);
+      for (int i = 0; i < kMaxQuickspawnVstCount; ++i)
+      {
+         std::string vstName = juce::File(matchingVsts[i]).getFileName().toStdString();
+         modules.push_back(vstName + " " + kVSTSuffix);
+      }
    }
 
    std::vector<std::string> prefabs;
    ModuleFactory::GetPrefabs(prefabs);
    for (auto prefab : prefabs)
    {
-      if (tolower(prefab[0]) == c || c == ';')
+      if (CheckHeldKeysMatch(prefab, keys) || keys[0] == ';')
          modules.push_back(prefab + " " + kPrefabSuffix);
    }
 
    std::vector<std::string> midicontrollers = MidiController::GetAvailableInputDevices();
    for (auto midicontroller : midicontrollers)
    {
-      if (tolower(midicontroller[0]) == c)
+      if (CheckHeldKeysMatch(midicontroller, keys))
          modules.push_back(midicontroller + " " + kMidiControllerSuffix);
    }
 
    std::vector<std::string> effects = TheSynth->GetEffectFactory()->GetSpawnableEffects();
    for (auto effect : effects)
    {
-      if (tolower(effect[0]) == c)
+      if (CheckHeldKeysMatch(effect, keys))
          modules.push_back(effect + " " + kEffectChainSuffix);
    }
-
    sort(modules.begin(), modules.end());
-   return modules;
+
+   std::vector<std::string> ret;
+   for (size_t i = 0; i < modules.size(); ++i)
+      ret.push_back(modules[i].toStdString());
+   
+   return ret;
 }
 
 ModuleType ModuleFactory::GetModuleType(std::string typeName)

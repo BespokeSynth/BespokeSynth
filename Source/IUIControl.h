@@ -75,6 +75,7 @@ public:
    virtual void ResetToOriginal() {}
    virtual void Increment(float amount) {}
    void SetNoHover(bool noHover) { mNoHover = noHover; }
+   bool GetNoHover() const { return mNoHover; }
    virtual bool AttemptTextInput() { return false; }
    void PositionTo(IUIControl* anchor, AnchorDirection direction);
    void GetColors(ofColor& color, ofColor& textColor);

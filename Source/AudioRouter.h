@@ -39,7 +39,7 @@ public:
    virtual ~AudioRouter();
    static IDrawableModule* Create() { return new AudioRouter(); }
    
-   std::string GetTitleLabel() override { return "audio router"; }
+   
    void CreateUIControls() override;
 
    void SetActiveIndex(int index) { mRouteIndex = index; }

@@ -38,7 +38,7 @@ public:
    
    static IAudioEffect* Create() { return new BitcrushEffect(); }
    
-   std::string GetTitleLabel() override { return "bitcrush"; }
+   
    void CreateUIControls() override;
    
    //IAudioEffect

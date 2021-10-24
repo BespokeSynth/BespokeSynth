@@ -42,7 +42,7 @@ public:
    
    static IAudioEffect* Create() { return new FormantFilterEffect(); }
    
-   std::string GetTitleLabel() override { return "formant"; }
+   
    void CreateUIControls() override;
    
    void Init() override;

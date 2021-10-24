@@ -208,7 +208,7 @@ void SampleCapturer::ButtonClicked(ClickButton* button)
    {
       FileChooser chooser("Save sample as...", File(ofToDataPath(ofGetTimestampString("samples/%Y-%m-%d_%H-%M.wav"))), "*.wav", true, false, TheSynth->GetMainComponent()->getTopLevelComponent());
       if (chooser.browseForFileToSave(true))
-         Sample::WriteDataToFile(chooser.getResult().getFullPathName().toUTF8(), &mSamples[mCurrentSampleIndex].mBuffer, mSamples[mCurrentSampleIndex].mRecordingLength);
+         Sample::WriteDataToFile(chooser.getResult().getFullPathName().toStdString(), &mSamples[mCurrentSampleIndex].mBuffer, mSamples[mCurrentSampleIndex].mRecordingLength);
    }
 
    if (button == mDeleteButton)

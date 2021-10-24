@@ -37,7 +37,7 @@ public:
    NoteRangeFilter();
    static IDrawableModule* Create() { return new NoteRangeFilter(); }
    
-   std::string GetTitleLabel() override { return "note range filter"; }
+   
    void CreateUIControls() override;
    
    void SetEnabled(bool enabled) override { mEnabled = enabled; }

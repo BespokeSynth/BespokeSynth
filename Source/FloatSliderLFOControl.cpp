@@ -39,8 +39,6 @@ FloatSliderLFOControl::FloatSliderLFOControl()
 , mShuffleSlider(nullptr)
 , mPinned(false)
 {
-   SetLFOEnabled(false);
-   
    mLFOSettings.mInterval = kInterval_1n;
    mLFOSettings.mOscType = kOsc_Sin;
    mLFOSettings.mLFOOffset = 0;
@@ -209,6 +207,7 @@ void FloatSliderLFOControl::SetLFOEnabled(bool enabled)
          GetMax() = mTarget->GetValue();
       }
    }
+
    mEnabled = enabled;
 }
 
@@ -424,7 +423,6 @@ void FloatSliderLFOControl::SaveLayout(ofxJSONElement& moduleInfo)
 void FloatSliderLFOControl::LoadLayout(const ofxJSONElement& moduleInfo)
 {
    mModuleSaveData.LoadString("target", moduleInfo);
-   mModuleSaveData.LoadBool("enabled", moduleInfo);
    
    SetUpFromSaveData();
 }
@@ -438,8 +436,6 @@ void FloatSliderLFOControl::SetUpFromSaveData()
    
    UpdateFromSettings();
    UpdateVisibleControls();
-   
-   mEnabled = mModuleSaveData.GetBool("enabled");
    
    if (mTargetCable == nullptr)
    {
@@ -462,6 +458,7 @@ void LFOPool::Init()
       sLFOPool[i]->CreateUIControls();
       sLFOPool[i]->Init();
       sLFOPool[i]->SetTypeName("lfo");
+      sLFOPool[i]->SetLFOEnabled(false);
    }
    sInitialized = true;
 }

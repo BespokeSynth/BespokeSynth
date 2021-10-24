@@ -38,7 +38,7 @@ public:
    ~GroupControl();
    static IDrawableModule* Create() { return new GroupControl(); }
    
-   std::string GetTitleLabel() override { return "group control"; }
+   
    void CreateUIControls() override;
    
    void CheckboxUpdated(Checkbox* checkbox) override;

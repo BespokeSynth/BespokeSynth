@@ -53,7 +53,7 @@ public:
    virtual ~NoteStepSequencer();
    static IDrawableModule* Create() { return new NoteStepSequencer(); }
    
-   std::string GetTitleLabel() override { return "note sequencer"; }
+   
    void CreateUIControls() override;
    
    void Init() override;

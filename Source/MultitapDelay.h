@@ -47,7 +47,7 @@ public:
    ~MultitapDelay();
    static IDrawableModule* Create() { return new MultitapDelay(); }
    
-   std::string GetTitleLabel() override { return "multitap delay"; }
+   
    void CreateUIControls() override;
    
    //INoteReceiver

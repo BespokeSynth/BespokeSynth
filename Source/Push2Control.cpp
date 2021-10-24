@@ -25,11 +25,6 @@
   ==============================================================================
 */
 
-#ifdef BESPOKE_WINDOWS
-// juce::gl supercedes this
-// #include <GL/glew.h>
-#endif
-
 #include "juce_opengl/juce_opengl.h"
 using namespace juce::gl;
 

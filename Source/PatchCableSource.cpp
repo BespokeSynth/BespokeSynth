@@ -460,6 +460,9 @@ bool PatchCableSource::TestClick(int x, int y, bool right, bool testOnly /* = fa
    
    if (!mClickable)
       return false;
+
+   if (right)
+      return false;
    
    if (mHoverIndex != -1)
    {
@@ -577,7 +580,8 @@ void PatchCableSource::FindValidTargets()
          {
             if (uicontrol->IsShowing() &&
                 (uicontrol->GetShouldSaveState() || dynamic_cast<ClickButton*>(uicontrol) != nullptr) &&
-                uicontrol->CanBeTargetedBy(this))
+                uicontrol->CanBeTargetedBy(this) &&
+                !uicontrol->GetNoHover())
                mValidTargets.push_back(uicontrol);
          }
       }
@@ -609,7 +613,7 @@ void PatchCableSource::CableGrabbed()
 
 void PatchCableSource::KeyPressed(int key, bool isRepeat)
 {
-   if (key == OF_KEY_BACKSPACE)
+   if (key == juce::KeyPress::backspaceKey || key == juce::KeyPress::deleteKey)
    {
       for (auto cable : mPatchCables)
       {

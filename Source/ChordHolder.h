@@ -39,7 +39,7 @@ public:
    ChordHolder();
    static IDrawableModule* Create() { return new ChordHolder(); }
 
-   std::string GetTitleLabel() override { return "chord holder"; }
+   
    void CreateUIControls() override;
 
    void SetEnabled(bool enabled) override { mEnabled = enabled; }

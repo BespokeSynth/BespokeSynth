@@ -53,7 +53,7 @@ public:
    static void InitializePythonIfNecessary();
    static void CheckIfPythonEverSuccessfullyInitialized();
    
-   std::string GetTitleLabel() override { return "script"; }
+   
    void CreateUIControls() override;
    
    void Poll() override;
@@ -148,8 +148,8 @@ private:
    void OnClicked(int x, int y, bool right) override;
    bool MouseMoved(float x, float y) override;
    
+   ClickButton* mPythonInstalledConfirmButton;
    DropdownList* mLoadScriptSelector;
-   DropdownList* mScriptStyleSelector;
    ClickButton* mLoadScriptButton;
    ClickButton* mSaveScriptButton;
    ClickButton* mShowReferenceButton;
@@ -161,8 +161,10 @@ private:
    FloatSlider* mCSlider;
    FloatSlider* mDSlider;
    int mLoadScriptIndex;
-   int mScriptStyleIndex;
-   ofxJSONElement mStyleJSON;
+   std::string mLoadedScriptPath;
+   juce::Time mLoadedScriptFiletime;
+   bool mHotloadScripts;
+   static ofxJSONElement sStyleJSON;
    float mA;
    float mB;
    float mC;
@@ -291,7 +293,7 @@ public:
    virtual ~ScriptReferenceDisplay();
    static IDrawableModule* Create() { return new ScriptReferenceDisplay(); }
 
-   std::string GetTitleLabel() override { return "script reference"; }
+   
    void CreateUIControls() override;
 
    void ButtonClicked(ClickButton* button) override;

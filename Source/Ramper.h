@@ -44,7 +44,7 @@ public:
    ~Ramper();
    static IDrawableModule* Create() { return new Ramper(); }
    
-   std::string GetTitleLabel() override { return "ramper"; }
+   
    void CreateUIControls() override;
    void Init() override;
    

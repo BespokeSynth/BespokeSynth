@@ -50,8 +50,10 @@ public:
    
    VSTWindow(VSTPlugin* vst, Component* pluginEditor, WindowFormatType);
    ~VSTWindow();
+
+   void ShowWindow();
    
-   static VSTWindow* CreateWindow(VSTPlugin* vst, WindowFormatType);
+   static VSTWindow* CreateVSTWindow(VSTPlugin* vst, WindowFormatType);
    
    static void closeCurrentlyOpenWindowsFor (const juce::uint32 nodeId);
    static void closeAllCurrentlyOpenWindows();

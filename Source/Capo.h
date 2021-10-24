@@ -39,7 +39,7 @@ public:
    Capo();
    static IDrawableModule* Create() { return new Capo(); }
    
-   std::string GetTitleLabel() override { return "capo"; }
+   
    void CreateUIControls() override;
    
    void SetEnabled(bool enabled) override { mEnabled = enabled; }

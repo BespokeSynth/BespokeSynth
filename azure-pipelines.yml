@@ -15,23 +15,15 @@ jobs:
         macOS-x64:
           imageName: 'macos-10.15'
           isMac: True
-          cmakeArguments: "-GXcode -DCMAKE_BUILD_TYPE=Debug -D\"CMAKE_OSX_ARCHITECTURES=x86_64\""
-          cmakeConfig: "Debug"
-        #macOS-arm:
-        #  imageName: 'macos-10.15'
-        #  isMac: True
-        #  cmakeArguments: "-DCMAKE_BUILD_TYPE=Debug -D\"CMAKE_OSX_ARCHITECTURES=arm64\""
-        #  cmakeConfig: "Debug"
+          cmakeArguments: "-GXcode -D\"CMAKE_OSX_ARCHITECTURES=x86_64\""
         windows-x64:
           imageName: 'windows-2019'
           isWindows: True
-          cmakeArguments: "-A x64 -DCMAKE_BUILD_TYPE=Debug"
-          cmakeConfig: "Debug"
+          cmakeArguments: "-A x64"
         linux-x64:
           imageName: 'ubuntu-20.04'
           isLinux: True
-          cmakeArguments: "-GNinja -DCMAKE_BUILD_TYPE=Debug"
-          cmakeConfig: "Debug"
+          cmakeArguments: "-GNinja"
 
     pool:
       vmImage: $(imageName)
@@ -42,9 +34,27 @@ jobs:
         # submodules: recursive # can't do submodules here b'cuz depth=1 fails with Github
 
       - bash: |
-          echo "BUILD REASON   = " $BUILD_REASON
+          echo "BUILD REASON   = " $(Build.Reason)
           echo "cmakeArguments = " $(cmakeArguments)
-          echo "cmakeConfig    = " $(cmakeConfig)
+
+          if [ $(Build.Reason) == "PullRequest" ]; then
+            export CMAKE_CONFIG=Debug
+            export CMAKE_TARGET=BespokeSynth
+            echo "##vso[task.setvariable variable=CMAKE_CONFIG]Debug"
+            echo "##vso[task.setvariable variable=CMAKE_CONFIG;isOutput=true]Debug"
+            echo "##vso[task.setvariable variable=CMAKE_TARGET]BespokeSynth"
+            echo "##vso[task.setvariable variable=CMAKE_TARGET;isOutput=true]BespokeSynth"
+          else
+            export CMAKE_CONFIG=Release
+            export CMAKE_TARGET=nightly-package
+            echo "##vso[task.setvariable variable=CMAKE_CONFIG]Release"
+            echo "##vso[task.setvariable variable=CMAKE_CONFIG;isOutput=true]Release"
+            echo "##vso[task.setvariable variable=CMAKE_TARGET]nightly-package"
+            echo "##vso[task.setvariable variable=CMAKE_TARGET;isOutput=true]nightly-package"
+          fi
+
+          echo "cmakeConfig    = " $CMAKE_CONFIG
+          echo "cmakeTarget    = " $CMAKE_TARGET
         displayName: all - details on build
 
       - bash: |
@@ -92,10 +102,33 @@ jobs:
 
       - bash: |
           set -e
-          cmake -Bbuild $(cmakeArguments)
+          echo Building with BUILD_TYPE = $CMAKE_CONFIG
+          cmake -Bbuild $(cmakeArguments) -DCMAKE_BUILD_TYPE=$CMAKE_CONFIG
         displayName: all - configure with cmake
 
       - bash: |
           set -e
-          cmake --build build --config $(cmakeConfig)
+          echo Building with TARGET = $CMAKE_TARGET
+          cmake --build build --config $CMAKE_CONFIG --target $CMAKE_TARGET
         displayName: all - build with cmake
+
+      - task: PublishPipelineArtifact@0
+        inputs:
+          artifactName: 'INSTALLER_MAC_NIGHTLY'
+          targetPath: 'build/nightly'
+        condition: and(variables.isMac, ne(variables['Build.Reason'], 'PullRequest'))
+        displayName: mac - publish mac artifact
+
+      - task: PublishPipelineArtifact@0
+        inputs:
+          artifactName: 'INSTALLER_WIN_NIGHTLY'
+          targetPath: 'build/nightly'
+        condition: and(variables.isWindows, ne(variables['Build.Reason'], 'PullRequest'))
+        displayName: mac - publish win artifact
+
+      - task: PublishPipelineArtifact@0
+        inputs:
+          artifactName: 'INSTALLER_LIN_NIGHTLY'
+          targetPath: 'build/nightly'
+        condition: and(variables.isLinux, ne(variables['Build.Reason'], 'PullRequest'))
+        displayName: mac - publish lin artifact

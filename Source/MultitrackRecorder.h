@@ -43,7 +43,7 @@ public:
    virtual ~MultitrackRecorder();
    static IDrawableModule* Create() { return new MultitrackRecorder(); }
    
-   std::string GetTitleLabel() override { return "multitrack recorder"; }
+   
    void CreateUIControls() override;
    ModuleContainer* GetContainer() override { return &mModuleContainer; }
    bool IsResizable() const override { return true; }
@@ -91,7 +91,7 @@ public:
    virtual ~MultitrackRecorderTrack();
    static IDrawableModule* Create() { return new MultitrackRecorderTrack(); }
 
-   std::string GetTitleLabel() override { return " "; }
+   
    void CreateUIControls() override;
    bool HasTitleBar() const override { return false; }
 

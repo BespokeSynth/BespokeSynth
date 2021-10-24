@@ -26,13 +26,7 @@
  */
 
 #ifdef BESPOKE_WINDOWS
-// juce now does this for us
-// #include <GL/glew.h>
 #include <windows.h>
-#endif
-
-#if BESPOKE_MAC
-#include <CoreFoundation/CoreFoundation.h>
 #endif
 
 #include "juce_opengl/juce_opengl.h"
@@ -67,126 +61,53 @@ ofColor ofColor::clear(0, 0, 0, 0);
 NVGcontext* gNanoVG = nullptr;
 NVGcontext* gFontBoundsNanoVG = nullptr;
 
-std::string ofToDataPath(std::string path, bool makeAbsolute)
+std::string ofToDataPath(const std::string& path)
 {
-   if (path.empty() == false && path[0] == '.')
+   if (!path.empty() && (path[0] == '.' || juce::File::isAbsolutePath(path)))
       return path;
-   if (path.empty() == false && path[0] == '/')
-      return path;
-   if (path.empty() == false && path[1] == ':')
-      return path;
-   
-   static juce::File sWorkingDirectory;
-   static bool sFirstTime = true;
-   if (sFirstTime)
-   {
-      sFirstTime = false;
-      sWorkingDirectory = juce::File::getCurrentWorkingDirectory();
-   }
-   sWorkingDirectory.setAsCurrentWorkingDirectory(); //restore working directory, in case a VST plugin changed it (ROLI Studio Drums does this!)
-   
-   static std::string sDataDir = "";
-   if (sDataDir == "")
-   {
-      std::string dataDir = File::getSpecialLocation(File::userDocumentsDirectory).getChildFile("BespokeSynth").getFullPathName().toStdString();
-      ofStringReplace(dataDir, "\\", "/");
+
+   static const auto sDataDir = [] {
+      auto dataDir = juce::File::getSpecialLocation(juce::File::userDocumentsDirectory).getChildFile("BespokeSynth").getFullPathName().toStdString();
+#if BESPOKE_WINDOWS
+      std::replace(begin(dataDir), end(dataDir), '\\', '/');
+#endif
       UpdateUserData(dataDir);
-      sDataDir = dataDir;
-   }
+      dataDir += '/';
+      return dataDir;
+   }();
    
-   return sDataDir + "/" + path;
+   return sDataDir + path;
 }
 
-std::string ofToResourcePath(std::string path, bool makeAbsolute)
+std::string ofToFactoryPath(const std::string &subdir)
 {
-   if (path.empty() == false && path[0] == '.')
-      return path;
-   if (path.empty() == false && path[0] == '/')
-      return path;
-   if (path.empty() == false && path[1] == ':')
-      return path;
-   
-   static juce::File sWorkingDirectory;
-   static bool sFirstTime = true;
-   if (sFirstTime)
-   {
-      sFirstTime = false;
-      sWorkingDirectory = juce::File::getCurrentWorkingDirectory();
-   }
-   sWorkingDirectory.setAsCurrentWorkingDirectory(); //restore working directory, in case a VST plugin changed it (ROLI Studio Drums does this!)
-   
-   static std::string sResourceDir = "";
-   if (sResourceDir == "")
-   {
-#if JUCE_WINDOWS
-      std::string localResourceDir = File::getCurrentWorkingDirectory().getChildFile("resource").getFullPathName().toStdString();
-      if (juce::File(localResourceDir).exists())
-         sResourceDir = localResourceDir;
-      else
-         sResourceDir = File::getCurrentWorkingDirectory().getChildFile("../../../resource").getFullPathName().toStdString();   //fall back to looking at OSX dir in dev environment
-      ofStringReplace(sResourceDir, "\\", "/");
-
-#elif JUCE_LINUX
-      std::string localDataDir = File::getCurrentWorkingDirectory().getChildFile("resource").getFullPathName().toStdString();
-      std::string cmakeDataDir = File(Bespoke::CMAKE_INSTALL_PREFIX).getChildFile("share/BespokeSynth/resource").getFullPathName().toStdString();
-      std::string installedDataDir = File::getSpecialLocation(File::globalApplicationsDirectory).getChildFile("share/BespokeSynth/resource").getFullPathName().toStdString(); // /usr/share/BespokeSynth/resource
-      if (juce::File(localDataDir).exists())
-         sResourceDir = localDataDir;
-      else if (getenv("BESPOKE_DATA_DIR") && juce::File(getenv("BESPOKE_DATA_DIR")).exists())
-          sResourceDir = getenv("BESPOKE_DATA_DIR");
-      else if (juce::File(cmakeDataDir).exists())
-         sResourceDir = cmakeDataDir;
-      else if (juce::File(installedDataDir).exists())
-         sResourceDir = installedDataDir;
-      ofLog() << "Resources directory is '" << sResourceDir << "'";
-   
-#elif BESPOKE_MAC
-      auto bundle = CFBundleGetMainBundle();
-      bool foundResources = false;
-      if (bundle)
-      {
-
-          auto url = CFBundleCopyResourcesDirectoryURL(bundle);
-
-          if (url)
-          {
-              char bResPath[PATH_MAX];
-              if (CFURLGetFileSystemRepresentation(url, true, (UInt8*)bResPath, PATH_MAX))
-              {
-                  std::string p = bResPath;
-                  p += "/resource";
-                  if (juce::File(p).exists()) {
-                      foundResources = true;
-                      sResourceDir = p;
-                      ofLog() << "macOS: Resource Bundle From [" << p << "]";
-                  }
-              }
-              CFRelease(url);
-          }
-      }
-
-      if (!foundResources) {
-          // Retain the old code for now just in case
-#if DEBUG
-          std::string relative = "../Release/resource";
+   std::string result;
+#if BESPOKE_MAC
+   auto resDir = juce::File::getSpecialLocation(juce::File::SpecialLocationType::currentApplicationFile).getChildFile("Contents/Resources").getChildFile(subdir);
 #else
-          std::string relative = "resource";
+   auto resDir = juce::File::getSpecialLocation(juce::File::SpecialLocationType::currentExecutableFile).getSiblingFile(subdir);
+#if BESPOKE_LINUX
+   if (!resDir.isDirectory())
+      resDir = juce::File{juce::CharPointer_UTF8{Bespoke::CMAKE_INSTALL_PREFIX}}.getChildFile("share/BespokeSynth").getChildFile(subdir);
 #endif
+#endif
+   if (!resDir.isDirectory())
+      throw std::runtime_error{"Application directory not found. Please reinstall Bespoke."};
 
-          std::string localResourceDir = File::getCurrentWorkingDirectory().getChildFile(
-                  relative).getFullPathName().toStdString();
-          if (juce::File(localResourceDir).exists()) {
-              sResourceDir = localResourceDir;
-          } else {
-              sResourceDir = "/Applications/BespokeSynth/resource";
-          }
-      }
-#else
-#error Mac, Linux or Windows only supported at this time
+   result = resDir.getFullPathName().toStdString();
+#if BESPOKE_WINDOWS
+   std::replace(begin(result), end(result), '\\', '/');
 #endif
-   }
-   
-   return sResourceDir + "/" + path;
+   return result;
+}
+
+std::string ofToResourcePath(const std::string& path)
+{
+   if (!path.empty() && (path[0] == '.' || juce::File::isAbsolutePath(path)))
+      return path;
+
+   static const auto sResourceDir = ofToFactoryPath("resource") + '/';
+   return sResourceDir + path;
 }
 
 struct StyleStack

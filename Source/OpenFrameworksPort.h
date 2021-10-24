@@ -151,7 +151,6 @@ using ofMutex = std::recursive_mutex;
 
 #define OF_KEY_RETURN juce::KeyPress::returnKey
 #define OF_KEY_TAB juce::KeyPress::tabKey
-#define OF_KEY_BACKSPACE juce::KeyPress::backspaceKey
 #define OF_KEY_LEFT juce::KeyPress::leftKey
 #define OF_KEY_RIGHT juce::KeyPress::rightKey
 #define OF_KEY_ESC juce::KeyPress::escapeKey
@@ -198,8 +197,9 @@ private:
 
 typedef ofVec2f ofPoint;
 
-std::string ofToDataPath(std::string path, bool makeAboslute = false);
-std::string ofToResourcePath(std::string path, bool makeAboslute = false);
+std::string ofToDataPath(const std::string& path);
+std::string ofToFactoryPath(const std::string& path);
+std::string ofToResourcePath(const std::string& path);
 void ofPushStyle();
 void ofPopStyle();
 void ofPushMatrix();

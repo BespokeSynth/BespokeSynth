@@ -36,7 +36,7 @@ public:
    GainStageEffect();
    static IAudioEffect* Create() { return new GainStageEffect(); }
    
-   std::string GetTitleLabel() override { return "gain stage"; }
+   
    void CreateUIControls() override;
 
    //IAudioEffect

@@ -47,7 +47,7 @@ public:
    ~SeaOfGrain();
    static IDrawableModule* Create() { return new SeaOfGrain(); }
    
-   std::string GetTitleLabel() override { return "sea of grain"; }
+   
    void CreateUIControls() override;
    
    //INoteReceiver

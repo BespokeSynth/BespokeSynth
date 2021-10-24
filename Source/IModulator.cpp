@@ -83,12 +83,15 @@ void IModulator::OnModulatorRepatch()
 
 void IModulator::Poll()
 {
-   mLastPollValue = Value();
-   const float kBlendRate = -9.65784f;
-   float blend = exp2(kBlendRate / ofGetFrameRate()); //framerate-independent blend
-   mSmoothedValue = mSmoothedValue * blend + mLastPollValue * (1-blend);
-   if (RequiresManualPolling())
-      mUIControlTarget->SetFromMidiCC(mLastPollValue, true);
+   if (Active())
+   {
+      mLastPollValue = Value();
+      const float kBlendRate = -9.65784f;
+      float blend = exp2(kBlendRate / ofGetFrameRate()); //framerate-independent blend
+      mSmoothedValue = mSmoothedValue * blend + mLastPollValue * (1 - blend);
+      if (RequiresManualPolling())
+         mUIControlTarget->SetFromMidiCC(mLastPollValue, true);
+   }
 }
 
 float IModulator::GetRecentChange() const

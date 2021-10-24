@@ -43,7 +43,7 @@ public:
    virtual ~VolcaBeatsControl();
    static IDrawableModule* Create() { return new VolcaBeatsControl(); }
    
-   std::string GetTitleLabel() override { return "volca beats control"; }
+   
    void CreateUIControls() override;
    
    void SetEnabled(bool enabled) override { mEnabled = enabled; }

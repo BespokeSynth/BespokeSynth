@@ -37,10 +37,11 @@ script~python scripting for livecoding notes and module control
 ~code~write code here. press ctrl-R to execute the code, or ctrl-shift-R to just execute the current block.
 ~run~click here to execute the code, or press ctrl-R
 ~stop~cancel any events scheduled by this script
-~a~variable for the script to use, can be modulation by other sources
-~b~variable for the script to use, can be modulation by other sources
-~c~variable for the script to use, can be modulation by other sources
-~d~variable for the script to use, can be modulation by other sources
+~a~variable for the script to use, can be modulation by other sources. access via me.get("a")
+~b~variable for the script to use, can be modulation by other sources. access via me.get("b")
+~c~variable for the script to use, can be modulation by other sources. access via me.get("c")
+~d~variable for the script to use, can be modulation by other sources. access via me.get("d")
+~style~choose a text theme, from script_styles.json
 
 
 
@@ -1061,7 +1062,7 @@ audiometer~sets a slider to an audio level's volume. useful to map a midi displa
 
 
 
-signalgenerator~basic oscillator signal
+signalgenerator~basic oscillator signal. send a note into it to set the frequency, and send a pulse to reset the phase.
 ~freq~signal frequency
 ~freq mode~what mode should we use for input notes? "instant" changes to the input note's frequency instantly, "ramp" ramps to the frequency over time, and "slider" allows you to use a slider to interpolate between the last two input notes
 ~osc~oscillator type
@@ -1519,6 +1520,11 @@ noterouter~allows you to control where notes are routed to using a UI control. t
 
 
 
+noteexpression~control where notes are routed based upon evaluated expressions. the variable "p" represents pitch, and "v" represents velocity
+~expression*~expression to evaluate for this cable. example expression to route notes with pitch greater than 80 and velocity less than 60:\n"p > 80 && v < 60"
+
+
+
 noteratchet~rapidly repeat an input note over a duration
 ~duration~total length of time repeats should last
 ~subdivision~length of each repeat
@@ -1711,7 +1717,7 @@ titlebar~
 ~load~load a saved .bsk file to restore state
 ~save~save current state as .bsk file, to be restored later
 ~save as~save current state as a new .bsk file
-~reset layout~reset to the layout specified in "layout" in userprefs.json
+~new patch~reset to the layout specified in "layout" in userprefs.json
 ~write audio~write the last 30 minutes of audio to your specified recordings_path
 ~ ? ~show help
 ~settings~adjust preferences, saved as userprefs.json
@@ -1719,6 +1725,12 @@ titlebar~
 ~lookahead (exp.)~use lookahead scheduling, which is necessary for scriptmodule. gets automatically turned on when you use scriptmodule. so far, lookahead scheduling seems to not create any issues, but leaving this checkbox here just in case.
 ~autosave~every time a new module is added, trigger a save to data/savestate/autosave/, to help reload state in the event of a crash. can be quite slow if using modules with large samples.
 ~play/pause~stop all audio processing (shift-p)
+
+
+
+newpatchconfirm~
+~confirm~clear everything and start fresh
+~cancel~dismiss this
 
 
 
@@ -1744,6 +1756,7 @@ transport~controls tempo and current time position
 ~ < ~nudge current time backward
 ~ > ~nudge current time forward
 ~set tempo~
+~play/pause~stop all audio processing (shift-p)
 
 
 
@@ -1779,7 +1792,7 @@ scale~controls the global scale used by various modules
 ~scale~which set of notes to use
 ~degree~
 ~intonation~which method to use to tune the scale
-~tet~how many semitones make up an octave
+~PPO~pitches per octave
 ~tuning~what frequency does the pitch defined in "note" represent?
 ~note~the pitch that maps to the frequency defined in "tuning"
 

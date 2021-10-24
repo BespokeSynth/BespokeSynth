@@ -71,8 +71,8 @@ public:
    void ClipTo(int start, int end);
    void ShiftWrap(int numSamples);
    std::string GetReadPath() const { return mReadPath; }
-   static bool WriteDataToFile(const char* path, float** data, int numSamples, int channels = 1);
-   static bool WriteDataToFile(const char* path, ChannelBuffer* data, int numSamples);
+   static bool WriteDataToFile(const std::string& path, float** data, int numSamples, int channels = 1);
+   static bool WriteDataToFile(const std::string& path, ChannelBuffer* data, int numSamples);
    bool IsPlaying() { return mOffset < mNumSamples; }
    void LockDataMutex(bool lock) { lock ? mDataMutex.lock() : mDataMutex.unlock(); }
    void Create(int length);

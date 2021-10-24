@@ -50,7 +50,7 @@ public:
    ~Producer();
    static IDrawableModule* Create() { return new Producer(); }
    
-   std::string GetTitleLabel() override { return "producer"; }
+   
    void CreateUIControls() override;
    
    //INoteReceiver

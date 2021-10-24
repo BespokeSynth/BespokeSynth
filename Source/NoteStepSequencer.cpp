@@ -97,9 +97,8 @@ void NoteStepSequencer::CreateUIControls()
    BUTTON(mRandomizeLengthButton, "len"); UIBLOCK_SHIFTRIGHT();
    UIBLOCK_SHIFTX(5);
    UICONTROL_CUSTOM(mGridControlTarget, new GridControlTarget(UICONTROL_BASICS("grid"))); UIBLOCK_SHIFTRIGHT();
-   INTSLIDER(mGridControlOffsetXSlider, "x offset", &mGridControlOffsetX, 0, 16);
+   INTSLIDER(mGridControlOffsetXSlider, "x offset", &mGridControlOffsetX, 0, 16); UIBLOCK_SHIFTRIGHT();
    INTSLIDER(mGridControlOffsetYSlider, "y offset", &mGridControlOffsetY, 0, 16);
-   UIBLOCK_SHIFTUP();
    UIBLOCK_NEWLINE();
    UIBLOCK_PUSHSLIDERWIDTH(150);
    INTSLIDER(mLengthSlider, "length", &mLength, 1, NSS_MAX_STEPS); UIBLOCK_SHIFTRIGHT();
@@ -111,7 +110,7 @@ void NoteStepSequencer::CreateUIControls()
    DROPDOWN(mNoteModeSelector,"notemode",(int*)(&mNoteMode),80); UIBLOCK_NEWLINE();
    ENDUIBLOCK0();
    
-   UIBLOCK(220,3,150);
+   UIBLOCK(220,20,150);
    FLOATSLIDER(mRandomizePitchChanceSlider, "rand pitch chance", &mRandomizePitchChance, 0, 1);
    FLOATSLIDER(mRandomizePitchRangeSlider, "rand pitch range", &mRandomizePitchRange, 0, 1);
    UIBLOCK_NEWCOLUMN();
@@ -279,7 +278,7 @@ void NoteStepSequencer::DrawModule()
       ofPopStyle();
    }
    
-   DrawTextLeftJustify("random:", 102, 14);
+   DrawTextRightJustify("random:", 102, 14);
    
    ofPushStyle();
    ofFill();

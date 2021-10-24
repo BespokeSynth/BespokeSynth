@@ -29,30 +29,37 @@
 #define __Bespoke__Minimap__
 
 #include "IDrawableModule.h"
+#include "UIGrid.h"
+
 
 class Minimap : public IDrawableModule
 {
+public:
+   Minimap();
+   ~Minimap();
 
-  public:
-    Minimap();
-    ~Minimap();
-    void DrawModule() override;
-    bool AlwaysOnTop() override;
-    std::string GetTitleLabel() override;
-    void GetDimensions(float & width, float & height) override;
-  private:
-    bool IsSingleton() const override;
-    bool HasTitleBar() const override;
-    void ComputeBoundingBox(ofRectangle & rect);
-    ofRectangle CoordsToMinimap(ofRectangle & boundingBox, ofRectangle & source);
-    void DrawModulesOnMinimap();
-    void DrawModulesOnMinimap(ofRectangle & boundingBox);
-    void RectUnion(ofRectangle & target, ofRectangle & unionRect);
-    void OnClicked(int x, int y, bool right) override;
-    ofVec2f CoordsToViewport(ofRectangle & boundingBox, float x, float y);
-    ofVec2f GetPosition(bool local) const;
-    void ForcePosition();
-    
+   void CreateUIControls() override;
+   void DrawModule() override;
+
+   bool AlwaysOnTop() override { return true; };
+   void GetDimensions(float& width, float& height) override;
+   void GetDimensionsMinimap(float& width, float& height);
+private:
+   bool IsSingleton() const override { return true; };
+   bool HasTitleBar() const override { return false; };
+   void ComputeBoundingBox(ofRectangle & rect);
+   ofRectangle CoordsToMinimap(ofRectangle & boundingBox, ofRectangle & source);
+   void DrawModulesOnMinimap(ofRectangle & boundingBox);
+   void RectUnion(ofRectangle & target, ofRectangle & unionRect);
+   void OnClicked(int x, int y, bool right) override;
+   void MouseReleased() override;
+   bool MouseMoved(float x, float y) override;
+   ofVec2f CoordsToViewport(ofRectangle & boundingBox, float x, float y);
+   void ForcePosition();
+
+   bool mClick;
+   UIGrid* mGrid;
+   GridCell mHoveredBookmarkPos;
 };
 
 #endif /* defined(__Bespoke__Minimap__) */

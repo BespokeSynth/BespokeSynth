@@ -41,7 +41,7 @@ public:
    virtual ~ModulatorExpression();
    static IDrawableModule* Create() { return new ModulatorExpression(); }
    
-   std::string GetTitleLabel() override { return "expression"; }
+   
    void CreateUIControls() override;
    
    //IModulator

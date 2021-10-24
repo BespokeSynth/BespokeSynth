@@ -37,7 +37,7 @@ public:
    virtual ~HelpDisplay();
    static IDrawableModule* Create() { return new HelpDisplay(); }
    
-   std::string GetTitleLabel() override { return "help"; }
+   
    bool IsSaveable() override { return false; }
    bool HasTitleBar() const override { return false; }
    void CreateUIControls() override;

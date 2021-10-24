@@ -193,7 +193,7 @@ void ModulatorExpression::DrawModule()
       DrawTextNormal(ofToString(drawMinOutput,2), kGraphX+kGraphWidth*.35f, kGraphY+kGraphHeight-1);
       DrawTextNormal(ofToString(drawMaxOutput,2), kGraphX+kGraphWidth*.35f, kGraphY+12);
       DrawTextNormal(ofToString(mExpressionInputSlider->GetMin()), kGraphX+1, kGraphY+kGraphHeight/2+6);
-      DrawTextLeftJustify(ofToString(mExpressionInputSlider->GetMax()), kGraphX+kGraphWidth-1, kGraphY+kGraphHeight/2+6);
+      DrawTextRightJustify(ofToString(mExpressionInputSlider->GetMax()), kGraphX+kGraphWidth-1, kGraphY+kGraphHeight/2+6);
       
       ofPopMatrix();
    }

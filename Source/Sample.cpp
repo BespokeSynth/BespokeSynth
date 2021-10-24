@@ -57,7 +57,7 @@ bool Sample::Read(const char* path, bool mono, ReadType readType)
    mReadPath = path;
    ofStringReplace(mReadPath, GetPathSeparator(), "/");
    std::vector<std::string> tokens = ofSplitString(mReadPath, "/");
-   mName = tokens[tokens.size()-1].c_str();
+   mName = tokens[tokens.size()-1];
    
    juce::File file(ofToDataPath(mReadPath));
    delete mReader;
@@ -164,16 +164,16 @@ void Sample::Setup(int length)
 
 bool Sample::Write(const char* path /*=nullptr*/)
 {
-   const char* writeTo = path ? path : mReadPath.c_str();
+   const std::string writeTo = path ? path : mReadPath;
    WriteDataToFile(writeTo, &mData, mNumSamples);
    return true;
 }
 
 //static
-bool Sample::WriteDataToFile(const char *path, float **data, int numSamples, int channels)
+bool Sample::WriteDataToFile(const std::string& path, float **data, int numSamples, int channels)
 {
    auto wavFormat = std::make_unique<juce::WavAudioFormat>();
-   juce::File outputFile(ofToDataPath(path).c_str());
+   juce::File outputFile(ofToDataPath(path));
    outputFile.create();
    auto outputTo = outputFile.createOutputStream();
    assert(outputTo != nullptr);
@@ -186,7 +186,7 @@ bool Sample::WriteDataToFile(const char *path, float **data, int numSamples, int
 }
 
 //static
-bool Sample::WriteDataToFile(const char *path, ChannelBuffer* data, int numSamples)
+bool Sample::WriteDataToFile(const std::string& path, ChannelBuffer* data, int numSamples)
 {
    int numChannels = data->NumActiveChannels();
    float** channelData = new float*[numChannels];

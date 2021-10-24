@@ -56,7 +56,7 @@ public:
    ~DrumPlayer();
    static IDrawableModule* Create() { return new DrumPlayer(); }
    
-   std::string GetTitleLabel() override { return "drumplayer"; }
+   
    void CreateUIControls() override;
    void Init() override;
    

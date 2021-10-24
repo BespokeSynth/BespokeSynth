@@ -103,9 +103,10 @@ void ModuleSaveDataPanel::ReloadSaveData()
    
    mAlignmentX = 10 + maxWidth;
    int x = mAlignmentX;
-   int y = 5;
+   int y = 5 + itemSpacing;
    
    TextEntry* nameEntry = new TextEntry(this,"",x,y,27,mSaveModule->NameMutable());
+   nameEntry->SetNoHover(true);
    mSaveDataControls.push_back(nameEntry);
    y += itemSpacing;
    
@@ -176,10 +177,12 @@ void ModuleSaveDataPanel::ReloadSaveData()
    
    y += 6;
    mApplyButton = new ClickButton(this,"apply",x,y);
+   mApplyButton->SetNoHover(true);
    mSaveDataControls.push_back(mApplyButton);
    if (mSaveModule->CanBeDeleted())
    {
       mDeleteButton = new ClickButton(this,"delete module",x+50,y);
+      mDeleteButton->SetNoHover(true);
       mSaveDataControls.push_back(mDeleteButton);
    }
    y += itemSpacing;
@@ -187,6 +190,7 @@ void ModuleSaveDataPanel::ReloadSaveData()
    if (mSaveModule->HasDebugDraw())
    {
       mDrawDebugCheckbox = new Checkbox(this, "draw debug", x, y, &mSaveModule->mDrawDebug);
+      mDrawDebugCheckbox->SetNoHover(true);
       mSaveDataControls.push_back(mDrawDebugCheckbox);
       y += itemSpacing;
    }
@@ -198,16 +202,20 @@ void ModuleSaveDataPanel::DrawModule()
 {
    if (Minimized() || mAppearAmount < 1)
       return;
-   
+
    int x = mAlignmentX-5;
    int y = 5;
+
+   DrawTextRightJustify("type", x, y + 12);
+   DrawTextBold(mSaveModule->GetTypeName(), mAlignmentX, y + 12);
+   y += itemSpacing;
    
-   DrawTextLeftJustify("name", x, y+12);
+   DrawTextRightJustify("name", x, y+12);
    y += itemSpacing;
    
    for (auto iter = mLabels.begin(); iter != mLabels.end(); ++iter)
    {
-      DrawTextLeftJustify(*iter, x, y+12);
+      DrawTextRightJustify(*iter, x, y+12);
       y += itemSpacing;
    }
    

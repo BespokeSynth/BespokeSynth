@@ -93,7 +93,7 @@ void ScriptStatus::DrawModule()
    
    if (!ScriptModule::sHasPythonEverSuccessfullyInitialized)
    {
-      DrawTextNormal("please ensure that you have Python 3.8 installed\nif you do not have Python 3.8 installed, Bespoke may crash\n\nclick to continue...", 20, 20);
+      DrawTextNormal("please create a \"script\" module to initialize Python", 20, 20);
       return;
    }
    
@@ -104,11 +104,7 @@ void ScriptStatus::DrawModule()
 
 void ScriptStatus::OnClicked(int x, int y, bool right)
 {
-   if (!ScriptModule::sHasPythonEverSuccessfullyInitialized)
-   {
-      ScriptModule::InitializePythonIfNecessary();
-   }
-   else
+   if (ScriptModule::sHasPythonEverSuccessfullyInitialized)
    {
       IDrawableModule::OnClicked(x, y, right);
    }

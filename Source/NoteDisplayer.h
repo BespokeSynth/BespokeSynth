@@ -35,7 +35,7 @@ public:
    NoteDisplayer() = default;
    static IDrawableModule* Create() { return new NoteDisplayer(); }
    
-   std::string GetTitleLabel() override { return "notedisplayer"; }
+   
    
    //INoteReceiver
    void PlayNote(double time, int pitch, int velocity, int voiceIdx = -1, ModulationParameters modulation = ModulationParameters()) override;

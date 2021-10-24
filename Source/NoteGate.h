@@ -36,7 +36,7 @@ public:
    virtual ~NoteGate();
    static IDrawableModule* Create() { return new NoteGate(); }
    
-   std::string GetTitleLabel() override { return "note gate"; }
+   
    void CreateUIControls() override;
    
    //INoteReceiver

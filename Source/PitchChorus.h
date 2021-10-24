@@ -41,7 +41,7 @@ public:
    virtual ~PitchChorus();
    static IDrawableModule* Create() { return new PitchChorus(); }
    
-   std::string GetTitleLabel() override { return "pitchchorus"; }
+   
    void CreateUIControls() override;
    
    //IAudioProcessor

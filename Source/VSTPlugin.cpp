@@ -52,59 +52,76 @@ namespace
    }
 }
 
-//static
-bool VSTPlugin::sIsRescanningVsts = false;
-
 using namespace juce;
+
+//static
+juce::AudioPluginFormatManager VSTPlugin::sFormatManager;
+juce::KnownPluginList VSTPlugin::sPluginList;
 
 namespace VSTLookup
 {
-   static juce::AudioPluginFormatManager sFormatManager;
-   static juce::KnownPluginList sPluginList;
-   
-   void GetAvailableVSTs(std::vector<std::string>& vsts, bool rescan)
+   void GetAvailableVSTs(std::vector<std::string>& vsts)
    {
       static bool sFirstTime = true;
       if (sFirstTime)
-         sFormatManager.addDefaultFormats();
+      {
+         VSTPlugin::sFormatManager.addDefaultFormats();
 
-      if (rescan)
-      {
-         VSTPlugin::sIsRescanningVsts = true;
-         sPluginList.clear();
-         juce::File deadMansPedalFile(ofToDataPath("vst/deadmanspedal.txt"));
-         juce::FileSearchPath searchPath;
-         for (int i = 0; i < TheSynth->GetUserPrefs()["vstsearchdirs"].size(); ++i)
-            searchPath.add(juce::File(TheSynth->GetUserPrefs()["vstsearchdirs"][i].asString()));
-         for (int i = 0; i < sFormatManager.getNumFormats(); ++i)
-         {
-            juce::PluginDirectoryScanner scanner(sPluginList, *(sFormatManager.getFormat(i)), searchPath, true, deadMansPedalFile, true);
-            juce::String nameOfPluginBeingScanned;
-            while (scanner.scanNextFile(true, nameOfPluginBeingScanned))
-            {
-               ofLog() << "scanning " + nameOfPluginBeingScanned;
-            }
-         }
-         sPluginList.createXml()->writeTo(juce::File(ofToDataPath("vst/found_vsts.xml")));
-         VSTPlugin::sIsRescanningVsts = false;
-      }
-      else
-      {
          auto file = juce::File(ofToDataPath("vst/found_vsts.xml"));
          if (file.existsAsFile())
          {
             auto xml = juce::parseXML(file);
-            sPluginList.recreateFromXml(*xml);
+            VSTPlugin::sPluginList.recreateFromXml(*xml);
          }
       }
-      auto types = sPluginList.getTypes();
+      
+      auto types = VSTPlugin::sPluginList.getTypes();
+      for (int i=0; i<types.size(); ++i)
+         vsts.push_back(types[i].fileOrIdentifier.toStdString());
+
+      //for (int i = 0; i < 40; ++i)
+      //   vsts.insert(vsts.begin(), std::string("c:/a+") + ofToString(gRandom()));
+
+      SortByLastUsed(vsts);
+
+      //add a bunch of duplicates to the list, to simulate a user with many VSTs
+      /*auto vstCopy = vsts;
+      for (int i = 0; i < 40; ++i)
+         vsts.insert(vsts.end(), vstCopy.begin(), vstCopy.end());*/
+
+      sFirstTime = false;
+   }
+   
+   void FillVSTList(DropdownList* list)
+   {
+      assert(list);
+      std::vector<std::string> vsts;
+      GetAvailableVSTs(vsts);
+      for (int i=0; i<vsts.size(); ++i)
+         list->AddLabel(vsts[i].c_str(), i);
+   }
+   
+   std::string GetVSTPath(std::string vstName)
+   {
+      if (juce::String(vstName).contains("/") || juce::String(vstName).contains("\\"))  //already a path
+         return vstName;
+      
+      vstName = GetFileNameWithoutExtension(vstName).toStdString();
+      auto types = VSTPlugin::sPluginList.getTypes();
       for (int i=0; i<types.size(); ++i)
       {
-         vsts.push_back(types[i].fileOrIdentifier.toStdString());
+         juce::File vst(types[i].fileOrIdentifier);
+         if (vst.getFileNameWithoutExtension().toStdString() == vstName)
+            return types[i].fileOrIdentifier.toStdString();
       }
       
+      return "";
+   }
+
+   void SortByLastUsed(std::vector<std::string>& vsts)
+   {
       std::map<std::string, double> lastUsedTimes;
-      
+
       if (juce::File(ofToDataPath("vst/used_vsts.json")).existsAsFile())
       {
          ofxJSONElement root;
@@ -117,48 +134,22 @@ namespace VSTLookup
             lastUsedTimes[key] = jsonList[key].asDouble();
          }
       }
-      
+
       std::sort(vsts.begin(), vsts.end(), [lastUsedTimes](std::string a, std::string b) {
          auto itA = lastUsedTimes.find(a);
          auto itB = lastUsedTimes.find(b);
-         if (itA == lastUsedTimes.end() && itB == lastUsedTimes.end())
+         double timeA = 0;
+         double timeB = 0;
+         if (itA != lastUsedTimes.end())
+            timeA = (*itA).second;
+         if (itB != lastUsedTimes.end())
+            timeB = (*itB).second;
+
+         if (timeA == timeB)
             return a < b;
-         if (itA != lastUsedTimes.end() && itB == lastUsedTimes.end())
-            return true;
-         if (itA == lastUsedTimes.end() && itB != lastUsedTimes.end())
-            return false;
-         double timeA = (*itA).second;
-         double timeB = (*itB).second;
+         
          return timeA > timeB;
       });
-
-      sFirstTime = false;
-   }
-   
-   void FillVSTList(DropdownList* list)
-   {
-      assert(list);
-      std::vector<std::string> vsts;
-      GetAvailableVSTs(vsts, false);
-      for (int i=0; i<vsts.size(); ++i)
-         list->AddLabel(vsts[i].c_str(), i);
-   }
-   
-   std::string GetVSTPath(std::string vstName)
-   {
-      if (juce::String(vstName).contains("/") || juce::String(vstName).contains("\\"))  //already a path
-         return vstName;
-      
-      vstName = GetFileNameWithoutExtension(vstName).toStdString();
-      auto types = sPluginList.getTypes();
-      for (int i=0; i<types.size(); ++i)
-      {
-         juce::File vst(types[i].fileOrIdentifier);
-         if (vst.getFileNameWithoutExtension().toStdString() == vstName)
-            return types[i].fileOrIdentifier.toStdString();
-      }
-      
-      return "";
    }
 }
 
@@ -185,10 +176,12 @@ VSTPlugin::VSTPlugin()
    juce::File(ofToDataPath("vst")).createDirectory();
    juce::File(ofToDataPath("vst/presets")).createDirectory();
    
-   if (VSTLookup::sFormatManager.getNumFormats() == 0)
-      VSTLookup::sFormatManager.addDefaultFormats();
+   if (sFormatManager.getNumFormats() == 0)
+      sFormatManager.addDefaultFormats();
    
    mChannelModulations.resize(kGlobalModulationIdx+1);
+
+   mPluginName = "no plugin loaded";
 }
 
 void VSTPlugin::CreateUIControls()
@@ -231,21 +224,17 @@ void VSTPlugin::Exit()
    }
 }
 
-std::string VSTPlugin::GetTitleLabel()
+std::string VSTPlugin::GetTitleLabel() const
 {
    return "vst: "+GetPluginName();
 }
 
-std::string VSTPlugin::GetPluginName()
+std::string VSTPlugin::GetPluginName() const
 {
-   if (mPlugin)
-      return mPluginName;
-   if (mModuleSaveData.HasProperty("vst") && mModuleSaveData.GetString("vst").length() > 0)
-      return GetFileNameWithoutExtension(mModuleSaveData.GetString("vst")).toStdString() + " (not loaded)";
-   return "no plugin loaded";
+   return mPluginName;
 }
 
-std::string VSTPlugin::GetPluginId()
+std::string VSTPlugin::GetPluginId() const
 {
    if (mPlugin)
    {
@@ -284,7 +273,7 @@ void VSTPlugin::SetVST(std::string vstName)
       //mWindowOverlay = nullptr;
    }
    
-   auto types = VSTLookup::sPluginList.getTypes();
+   auto types = sPluginList.getTypes();
    bool found = false;
    for (int i=0; i<types.size(); ++i)
    {
@@ -341,31 +330,35 @@ void VSTPlugin::LoadVST(juce::PluginDescription desc)
             callbackDone = true;
          };
 
-         sFormatManager.getFormat(i)->createPluginInstanceAsync(desc, gSampleRate, gBufferSize, completionCallback);*/
+         VSTPlugin::sFormatManager.getFormat(i)->createPluginInstanceAsync(desc, gSampleRate, gBufferSize, completionCallback);*/
 
    mVSTMutex.lock();
    juce::String errorMessage;
-   mPlugin = VSTLookup::sFormatManager.createPluginInstance(desc, gSampleRate, gBufferSize, errorMessage);
+   mPlugin = sFormatManager.createPluginInstance(desc, gSampleRate, gBufferSize, errorMessage);
    if (mPlugin != nullptr)
    {
       mPlugin->enableAllBuses();
+      mPlugin->disableNonMainBuses();
 
-      // DIsable all non-main output busses
+      /*
+       * For now, since Bespoke is at best stereo in stereo out,
+       * Disable all non-main input and output busses
+       */
       auto layouts = mPlugin->getBusesLayout();
 
       for (int busIndex = 1; busIndex < layouts.outputBuses.size(); ++busIndex)
           layouts.outputBuses.getReference(busIndex) = AudioChannelSet::disabled();
-
       for (int busIndex = 1; busIndex < layouts.inputBuses.size(); ++busIndex)
           layouts.inputBuses.getReference(busIndex) = AudioChannelSet::disabled();
 
+      ofLog() << "vst layout  - inputs: " << layouts.inputBuses.size() << " x outputs: " << layouts.outputBuses.size();
       mPlugin->setBusesLayout(layouts);
 
       mPlugin->prepareToPlay(gSampleRate, gBufferSize);
       mPlugin->setPlayHead(&mPlayhead);
-      mNumInputs = MIN(mPlugin->getTotalNumInputChannels(), 4);
-      mNumOutputs = MIN(mPlugin->getTotalNumOutputChannels(), 4);
-      ofLog() << "vst inputs: " << mNumInputs << "  vst outputs: " << mNumOutputs;
+      mNumInputs = mPlugin->getTotalNumInputChannels();
+      mNumOutputs = mPlugin->getTotalNumOutputChannels();
+      ofLog() << "vst channel - inputs: " << mNumInputs << " x outputs: " << mNumOutputs;
 
       mPluginName = mPlugin->getName().toStdString();
 
@@ -376,6 +369,9 @@ void VSTPlugin::LoadVST(juce::PluginDescription desc)
    else
    {
       TheSynth->LogEvent("error loading VST: " + errorMessage.toStdString(), kLogEventType_Error);
+
+      if (mModuleSaveData.HasProperty("vst") && mModuleSaveData.GetString("vst").length() > 0)
+         mPluginName = GetFileNameWithoutExtension(mModuleSaveData.GetString("vst")).toStdString() + " (not loaded)";
    }
    mVSTMutex.unlock();
 }
@@ -476,18 +472,23 @@ void VSTPlugin::Process(double time)
 #endif
 
    PROFILER(VSTPlugin);
-   
+
    int inputChannels = MAX(2, mNumInputs);
    GetBuffer()->SetNumActiveChannels(inputChannels);
-   
    SyncBuffers();
-   
+
+   /*
+    * Multi-out VSTs which can't disable those outputs will expect *something* in the
+    * buffer even though we don't read it.
+    */
+   int bufferChannels = MAX(inputChannels, mNumOutputs); // how much to allocate in the juce::AudioBuffer
+
    const int kSafetyMaxChannels = 16; //hitting a crazy issue (memory stomp?) where numchannels is getting blown out sometimes
    
    int bufferSize = GetBuffer()->BufferSize();
    assert(bufferSize == gBufferSize);
    
-   juce::AudioBuffer<float> buffer(inputChannels, bufferSize);
+   juce::AudioBuffer<float> buffer(bufferChannels, bufferSize);
    for (int i=0; i<inputChannels && i < kSafetyMaxChannels; ++i)
       buffer.copyFrom(i, 0, GetBuffer()->GetChannel(MIN(i,GetBuffer()->NumActiveChannels()-1)), GetBuffer()->BufferSize());
 
@@ -573,7 +574,14 @@ void VSTPlugin::Process(double time)
       mVSTMutex.unlock();
    
       GetBuffer()->Clear();
-      for (int ch=0; ch < buffer.getNumChannels() && ch < kSafetyMaxChannels; ++ch)
+      /*
+       * Until we support multi output we end up with this requirement that
+       * the output is at most stereo. This stops mis-behaving plugins which
+       * output the full buffer set from copying that onto the output.
+       * (Ahem: Surge 1.9)
+       */
+      int nChannelsToCopy = MIN(2, buffer.getNumChannels());
+      for (int ch=0; ch < nChannelsToCopy && ch < kSafetyMaxChannels; ++ch)
       {
          int outputChannel = MIN(ch,GetBuffer()->NumActiveChannels()-1);
          for (int sampleIndex=0; sampleIndex < buffer.getNumSamples(); ++sampleIndex)
@@ -688,7 +696,10 @@ void VSTPlugin::DrawModule()
    mOpenEditorButton->Draw();
    mShowParameterDropdown->Draw();
 
-   DrawTextLeftJustify("MIDI out", 206-18, 14);
+   ofPushStyle();
+   ofSetColor(IDrawableModule::GetColor(kModuleType_Note));
+   DrawTextRightJustify("midi out:", 206-18, 14);
+   ofPopStyle();
 
    if (mDisplayMode == kDisplayMode_Sliders)
    {
@@ -847,8 +858,8 @@ void VSTPlugin::ButtonClicked(ClickButton* button)
       if (mPlugin != nullptr)
       {
          if (mWindow == nullptr)
-            mWindow = std::unique_ptr<VSTWindow>(VSTWindow::CreateWindow(this, VSTWindow::Normal));
-         mWindow->toFront (true);
+            mWindow = std::unique_ptr<VSTWindow>(VSTWindow::CreateVSTWindow(this, VSTWindow::Normal));
+         mWindow->ShowWindow();
       }
       
       //if (mWindow->GetNSViewComponent())
@@ -1041,8 +1052,6 @@ void VSTPlugin::LoadState(FileStreamIn& in)
       if (mPlugin != nullptr)
       {
          ofLog() << "loading vst state for " << mPlugin->getName();
-         
-         mPluginName = mPlugin->getName().toStdString();
 
          mPlugin->setStateInformation(vstState, vstStateSize);
          if (rev >= 1 && vstProgramStateSize > 0)
