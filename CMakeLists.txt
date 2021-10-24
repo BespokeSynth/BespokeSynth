@@ -3,6 +3,7 @@ cmake_policy(SET CMP0091 NEW)
 
 # Global build parameters. Optional features are configurable via additional
 # BESPOKE_* variables defined in their respective subdirs.
+option(BESPOKE_PORTABLE "Create a self-contained build that ships all dependencies" OFF)
 set(BESPOKE_JUCE_LOCATION "${CMAKE_SOURCE_DIR}/libs/JUCE" CACHE STRING "Path to JUCE library source tree")
 set(BESPOKE_PYTHON_ROOT "" CACHE STRING "Python search path. Override as needed.")
 set(BESPOKE_VST2_SDK_LOCATION "" CACHE STRING "Steinberg VST2 SDK directory for non-FOSS builds")
@@ -40,6 +41,15 @@ if(WIN32 AND ${BESPOKE_BITNESS} EQUAL 32)
         $<$<CXX_COMPILER_ID:MSVC>:/LARGEADDRESSAWARE>
         $<$<BOOL:${MINGW}>:LINKER:--large-address-aware>
         )
+endif()
+
+if(BESPOKE_PORTABLE)
+    message(STATUS "Portable build enabled")
+    if(MINGW)
+        message(WARNING "Portable MinGW builds don't ship the runtime DLLs \
+        (libgcc_s_seh-1.dll, libstdc++-6.dll, libwinpthread-1.dll). Make sure \
+        to copy them to the .exe's directory before distributing this build.")
+    endif()
 endif()
 
 if(BESPOKE_PYTHON_ROOT)
