@@ -150,7 +150,6 @@ private:
    
    ClickButton* mPythonInstalledConfirmButton;
    DropdownList* mLoadScriptSelector;
-   DropdownList* mScriptStyleSelector;
    ClickButton* mLoadScriptButton;
    ClickButton* mSaveScriptButton;
    ClickButton* mShowReferenceButton;
@@ -162,8 +161,7 @@ private:
    FloatSlider* mCSlider;
    FloatSlider* mDSlider;
    int mLoadScriptIndex;
-   int mScriptStyleIndex;
-   ofxJSONElement mStyleJSON;
+   static ofxJSONElement sStyleJSON;
    float mA;
    float mB;
    float mC;
