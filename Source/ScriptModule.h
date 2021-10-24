@@ -161,6 +161,9 @@ private:
    FloatSlider* mCSlider;
    FloatSlider* mDSlider;
    int mLoadScriptIndex;
+   std::string mLoadedScriptPath;
+   juce::Time mLoadedScriptFiletime;
+   bool mHotloadScripts;
    static ofxJSONElement sStyleJSON;
    float mA;
    float mB;

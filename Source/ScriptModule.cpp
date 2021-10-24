@@ -81,6 +81,7 @@ ScriptModule::ScriptModule()
 : mCodeEntry(nullptr)
 , mRunButton(nullptr)
 , mStopButton(nullptr)
+, mHotloadScripts(false)
 , mA(0)
 , mB(0)
 , mC(0)
@@ -556,6 +557,19 @@ void ScriptModule::Poll()
       mMidiMessageQueue.clear();
       mMidiMessageQueueMutex.unlock();
    }
+
+   if (mHotloadScripts && !mLoadedScriptPath.empty())
+   {
+      File scriptFile = File(mLoadedScriptPath);
+      if (mLoadedScriptFiletime < scriptFile.getLastModificationTime())
+      {
+         std::unique_ptr<FileInputStream> input(scriptFile.createInputStream());
+         mCodeEntry->SetText(input->readString().toStdString());
+         mCodeEntry->Publish();
+         ExecuteCode();
+         mLoadedScriptFiletime = scriptFile.getLastModificationTime();
+      }
+   }
 }
 
 //static
@@ -871,7 +885,8 @@ void ScriptModule::ButtonClicked(ClickButton* button)
    {
       if (mLoadScriptIndex >= 0 && mLoadScriptIndex < (int)mScriptFilePaths.size())
       {
-         File resourceFile = File(mScriptFilePaths[mLoadScriptIndex]);
+         mLoadedScriptPath = mScriptFilePaths[mLoadScriptIndex];
+         File resourceFile = File(mLoadedScriptPath);
          
          if (!resourceFile.existsAsFile())
          {
@@ -886,6 +901,8 @@ void ScriptModule::ButtonClicked(ClickButton* button)
             DBG("Failed to open file");
             return;
          }
+
+         mLoadedScriptFiletime = resourceFile.getLastModificationTime();
              
          mCodeEntry->SetText(input->readString().toStdString());
       }
@@ -1360,6 +1377,7 @@ void ScriptModule::LoadLayout(const ofxJSONElement& moduleInfo)
          list->AddLabel(sStyleJSON[i]["name"].asString(), i);
       }
    });
+   mModuleSaveData.LoadBool("hotload_script_files", moduleInfo, false);
    
    SetUpFromSaveData();
 }
@@ -1387,6 +1405,8 @@ void ScriptModule::SetUpFromSaveData()
       if (sStyleJSON[i]["name"].asString() == styleName)
          mCodeEntry->SetStyleFromJSON(sStyleJSON[i]);
    }
+
+   mHotloadScripts = mModuleSaveData.GetBool("hotload_script_files");
 }
 
 void ScriptModule::SaveLayout(ofxJSONElement& moduleInfo)
