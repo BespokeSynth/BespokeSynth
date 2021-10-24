@@ -1416,14 +1416,18 @@ void ScriptModule::SaveLayout(ofxJSONElement& moduleInfo)
 
 namespace
 {
-   const int kSaveStateRev = 1;
+   const int kSaveStateRev = 2;
 }
 
 void ScriptModule::SaveState(FileStreamOut& out)
 {
-   IDrawableModule::SaveState(out);
-   
+   if (!CanSaveState())
+      return;
+
    out << kSaveStateRev;
+   out << (int)mExtraNoteOutputs.size();
+
+   IDrawableModule::SaveState(out);
    
    out << mWidth;
    out << mHeight;
@@ -1431,11 +1435,28 @@ void ScriptModule::SaveState(FileStreamOut& out)
 
 void ScriptModule::LoadState(FileStreamIn& in)
 {
+   int rev;
+
+   if (ModuleContainer::kSaveStateRev >= 421)
+   {
+      in >> rev;
+      LoadStateValidate(rev <= kSaveStateRev);
+   }
+
+   if (rev >= 2)
+   {
+      int extraNoteOutputs;
+      in >> extraNoteOutputs;
+      SetNumNoteOutputs(extraNoteOutputs + 1);
+   }
+
    IDrawableModule::LoadState(in);
    
-   int rev;
-   in >> rev;
-   LoadStateValidate(rev == kSaveStateRev);
+   if (ModuleContainer::kSaveStateRev == 420)
+   {
+      in >> rev;
+      LoadStateValidate(rev <= kSaveStateRev);
+   }
    
    float w, h;
    in >> w;

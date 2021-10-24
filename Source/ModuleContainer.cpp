@@ -567,11 +567,6 @@ ofxJSONElement ModuleContainer::WriteModules()
    return modules;
 }
 
-namespace
-{
-   const int kSaveStateRev = 420;
-}
-
 void ModuleContainer::SaveState(FileStreamOut& out)
 {
    out << kSaveStateRev;
@@ -610,7 +605,7 @@ void ModuleContainer::LoadState(FileStreamIn& in)
    
    int header;
    in >> header;
-   assert(header == kSaveStateRev);
+   assert(header <= kSaveStateRev);
    
    int savedModules;
    in >> savedModules;
