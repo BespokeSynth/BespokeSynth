@@ -244,7 +244,7 @@ void FloatSlider::Render()
       ofRect(rect.x - 28, rect.y, rect.width + 28, rect.height);
       mMaxEntry->Draw();
       ofSetColor(255, 255, 255);
-      DrawTextLeftJustify("max:", rect.x, rect.y + 5 + mHeight / 2);
+      DrawTextRightJustify("max:", rect.x, rect.y + 5 + mHeight / 2);
       ofPopStyle();
    }
    if (mMinEntry)
@@ -256,7 +256,7 @@ void FloatSlider::Render()
       ofRect(rect.x - 28, rect.y, rect.width + 28, rect.height);
       mMinEntry->Draw();
       ofSetColor(255, 255, 255);
-      DrawTextLeftJustify("min:", rect.x, rect.y + 5 + mHeight / 2);
+      DrawTextRightJustify("min:", rect.x, rect.y + 5 + mHeight / 2);
       ofPopStyle();
    }
 
@@ -279,7 +279,7 @@ void FloatSlider::Render()
 
       ofPushMatrix();
       ofClipWindow(mX + mWidth * .6f, mY, mWidth * .4f, mHeight, true);
-      DrawTextLeftJustify(ofToString(mMax), mX+mWidth-2, mY + 4 + mHeight / 2, 12);
+      DrawTextRightJustify(ofToString(mMax), mX+mWidth-2, mY + 4 + mHeight / 2, 12);
       ofPopMatrix();
 
       ofPopStyle();
@@ -615,10 +615,8 @@ std::string FloatSlider::GetDisplayValue(float val) const
    return ofToString(displayVar,decDigits);
 }
 
-void FloatSlider::Compute(int samplesIn /*= 0*/)
+void FloatSlider::DoCompute(int samplesIn /*= 0*/)
 {
-   mComputeHasBeenCalledOnce = true;
-
    if (mLastComputeTime == gTime && mLastComputeSamplesIn == samplesIn)
       return;  //we've just calculated this, no need to do it again! earlying out avoids wasted work and circular modulation loops
 
@@ -630,8 +628,8 @@ void FloatSlider::Compute(int samplesIn /*= 0*/)
 
    float oldVal = *mVar;
 
-   static bool sUseCache = true;
-   if (sUseCache && samplesIn >= 0 && samplesIn < gBufferSize && mLastComputeCacheTime[samplesIn] == gTime)
+   const bool kUseCache = true;
+   if (kUseCache && samplesIn >= 0 && samplesIn < gBufferSize && mLastComputeCacheTime[samplesIn] == gTime)
    {
       *mVar = mLastComputeCacheValue[samplesIn];
    }
@@ -648,7 +646,7 @@ void FloatSlider::Compute(int samplesIn /*= 0*/)
       if (mIsSmoothing)
          *mVar = mRamp.Value(gTime + samplesIn * gInvSampleRateMs);
 
-      if (samplesIn >= 0 && samplesIn < gBufferSize && mLastComputeCacheTime[samplesIn] == gTime)
+      if (samplesIn >= 0 && samplesIn < gBufferSize && mLastComputeCacheTime[samplesIn] != gTime)
       {
          mLastComputeCacheValue[samplesIn] = *mVar;
          mLastComputeCacheTime[samplesIn] = gTime;
@@ -722,7 +720,7 @@ void FloatSlider::TextEntryComplete(TextEntry* entry)
       
       float evaluated = 0;
       bool expressionValid = EvaluateExpression(mEntryString, *GetModifyValue(), evaluated);
-      if (expressionValid)
+      if (expressionValid && ((evaluated >= mMin && evaluated <= mMax) || (GetKeyModifiers() & kModifier_Shift)))
          SetValue(evaluated);
    }
    if (entry == mMaxEntry)
@@ -994,7 +992,7 @@ void IntSlider::Render()
       ofRect(rect.x - 28, rect.y, rect.width + 28, rect.height);
       mMaxEntry->Draw();
       ofSetColor(255, 255, 255);
-      DrawTextLeftJustify("max:", rect.x, rect.y + 5 + mHeight / 2);
+      DrawTextRightJustify("max:", rect.x, rect.y + 5 + mHeight / 2);
       ofPopStyle();
    }
    if (mMinEntry)
@@ -1006,7 +1004,7 @@ void IntSlider::Render()
       ofRect(rect.x - 28, rect.y, rect.width + 28, rect.height);
       mMinEntry->Draw();
       ofSetColor(255, 255, 255);
-      DrawTextLeftJustify("min:", rect.x, rect.y + 5 + mHeight / 2);
+      DrawTextRightJustify("min:", rect.x, rect.y + 5 + mHeight / 2);
       ofPopStyle();
    }
 
@@ -1022,7 +1020,7 @@ void IntSlider::Render()
       ofRect(mX, mY, mWidth * .4f, mHeight);
       ofRect(mX + mWidth * .6f, mY, mWidth * .4f, mHeight);
       DrawTextNormal(ofToString(mMin), mX + 2, mY + 4 + mHeight / 2, 12);
-      DrawTextLeftJustify(ofToString(mMax), mX + mWidth - 2, mY + 4 + mHeight / 2, 12);
+      DrawTextRightJustify(ofToString(mMax), mX + mWidth - 2, mY + 4 + mHeight / 2, 12);
       ofPopStyle();
    }
    
@@ -1187,8 +1185,9 @@ void IntSlider::TextEntryComplete(TextEntry* entry)
       
       float evaluated = 0;
       bool expressionValid = EvaluateExpression(mEntryString, *mVar, evaluated);
-      if (expressionValid)
-         SetValue(round(evaluated));
+      int evaluatedInt = round(evaluated);
+      if (expressionValid && ((evaluatedInt >= mMin && evaluatedInt <= mMax) || (GetKeyModifiers() & kModifier_Shift)))
+         SetValue(evaluatedInt);
    }
    if (entry == mMaxEntry)
    {

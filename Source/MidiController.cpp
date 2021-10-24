@@ -573,11 +573,15 @@ void MidiController::MidiReceived(MidiMessageType messageType, int control, floa
                float increment = connection->mIncrementAmount / 100;
                if (GetKeyModifiers() & kModifier_Shift)
                   increment /= 50;
-               if (value > .5f)
-                  curValue += increment;
-               else
-                  curValue -= increment;
-               uicontrol->SetFromMidiCC(curValue);
+               const float midpoint = 64.0f / 127.0f;
+               if (value != midpoint)
+               {
+                   if (value > midpoint)
+                      curValue += increment;
+                   else
+                      curValue -= increment;
+                   uicontrol->SetFromMidiCC(curValue);
+               }
             }
             else
             {
@@ -1629,6 +1633,16 @@ void MidiController::LoadLayout(std::string filename)
          mResendFeedbackOnRelease = mLayoutData["resend_feedback_on_release"].asBool();
          mModuleSaveData.SetBool("resend_feedback_on_release", mResendFeedbackOnRelease);
       }
+      if (!mLayoutData["channelfilter"].isNull())
+      {
+         const int layoutChannelFilter = mLayoutData["channelfilter"].asInt();
+         if (layoutChannelFilter >= (int)ChannelFilter::k1 && layoutChannelFilter <= (int)ChannelFilter::k16)
+         {
+            mChannelFilter = (ChannelFilter)layoutChannelFilter;
+            // The enum is restored by casting from an int
+            mModuleSaveData.SetInt("channelfilter", layoutChannelFilter);
+         }
+      }
       if (!mLayoutData["groups"].isNull())
       {
          useDefaultLayout = false;
@@ -1980,7 +1994,7 @@ void MidiController::PostRepatch(PatchCableSource* cableSource, bool fromUserCli
          UIControlConnection* connection = AddControlConnection(mLayoutControls[layoutControl].mType, mLayoutControls[layoutControl].mControl, -1, dynamic_cast<IUIControl*>(cableSource->GetTarget()));
          
          RadioButton* radioButton = dynamic_cast<RadioButton*>(cableSource->GetTarget());
-         if (radioButton)
+         if (radioButton && mLayoutControls[layoutControl].mDrawType == kDrawType_Button)
          {
             connection->mType = kControlType_SetValue;
             float closestSq = FLT_MAX;

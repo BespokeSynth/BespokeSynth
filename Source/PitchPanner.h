@@ -39,7 +39,7 @@ public:
    PitchPanner();
    static IDrawableModule* Create() { return new PitchPanner(); }
    
-   std::string GetTitleLabel() override { return "pitch panner"; }
+   
    void CreateUIControls() override;
    
    void SetEnabled(bool enabled) override { mEnabled = enabled; }

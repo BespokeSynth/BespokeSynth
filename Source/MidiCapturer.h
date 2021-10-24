@@ -58,7 +58,7 @@ public:
    virtual ~MidiCapturer();
    static IDrawableModule* Create() { return new MidiCapturer(); }
    
-   std::string GetTitleLabel() override { return "midi capturer"; }
+   
    void Init() override;
    
    void AddDummyController(MidiCapturerDummyController* controller);

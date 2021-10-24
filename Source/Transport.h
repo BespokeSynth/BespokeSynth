@@ -95,7 +95,7 @@ class Transport : public IDrawableModule, public IButtonListener, public IFloatS
 public:
    Transport();
    
-   std::string GetTitleLabel() override { return "transport"; }
+   
    void CreateUIControls() override;
 
    float GetTempo() { return mTempo; }
@@ -171,6 +171,7 @@ private:
    float mSwing;
    FloatSlider* mSwingSlider;
    ClickButton* mResetButton;
+   ClickButton* mPlayPauseButton;
    DropdownList* mTimeSigTopDropdown;
    DropdownList* mTimeSigBottomDropdown;
    DropdownList* mSwingIntervalDropdown;

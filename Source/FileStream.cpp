@@ -79,10 +79,9 @@ FileStreamOut& FileStreamOut::operator<<(const double &var)
 
 FileStreamOut& FileStreamOut::operator<<(const std::string &var)
 {
-   size_t len = var.length();
-   mStream->write(&len, sizeof(size_t));
-   for (int i=0; i<len; ++i)
-      mStream->write(&var[i], sizeof(char));
+   const uint64_t len = var.length();
+   mStream->write(&len, sizeof(len));
+   mStream->write(var.data(), len);
    return *this;
 }
 
@@ -134,8 +133,8 @@ FileStreamIn& FileStreamIn::operator>>(double &var)
 
 FileStreamIn& FileStreamIn::operator>>(std::string &var)
 {
-   size_t len;
-   mStream->read(&len, sizeof(size_t));
+   uint64_t len;
+   mStream->read(&len, sizeof(len));
    
    if (TheSynth->IsLoadingModule())
       LoadStateValidate(len < 99999);   //probably garbage beyond this point
@@ -143,8 +142,7 @@ FileStreamIn& FileStreamIn::operator>>(std::string &var)
       assert(len < 99999);   //probably garbage beyond this point
    
    var.resize(len);
-   for (int i=0; i<len; ++i)
-      mStream->read(&var[i], sizeof(char));
+   mStream->read(var.data(), len);
    return *this;
 }
 

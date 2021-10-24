@@ -150,6 +150,7 @@ void SynthInit();
 void LoadGlobalResources();
 
 void SetGlobalSampleRateAndBufferSize(int rate, int size);
+std::string GetBuildInfoString();
 void DrawAudioBuffer(float width, float height, ChannelBuffer* buffer, float start, float end, float pos, float vol=1, ofColor color=ofColor::black, int wraparoundFrom = -1, int wraparoundTo = 0);
 void DrawAudioBuffer(float width, float height, const float* buffer, float start, float end, float pos, float vol=1, ofColor color=ofColor::black, int wraparoundFrom = -1, int wraparoundTo = 0, int bufferSize = -1);
 void Add(float* buff1, const float* buff2, int bufferSize);
@@ -165,7 +166,7 @@ double GetPhaseInc(float freq);
 void FloatWrap(float& num, float space);
 void FloatWrap(double& num, float space);
 void DrawTextNormal(std::string text, int x, int y, float size = 15);
-void DrawTextLeftJustify(std::string text, int x, int y, float size = 15);
+void DrawTextRightJustify(std::string text, int x, int y, float size = 15);
 void DrawTextBold(std::string text, int x, int y, float size = 15);
 float GetStringWidth(std::string text, float size = 15);
 void AssertIfDenormal(float input);

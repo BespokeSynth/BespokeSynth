@@ -26,7 +26,7 @@ public:
    virtual ~M185Sequencer();
    static IDrawableModule* Create() { return new M185Sequencer(); }
 
-   std::string GetTitleLabel() override { return "m185 sequencer"; }
+   
    void CreateUIControls() override;
    void Init() override;
 

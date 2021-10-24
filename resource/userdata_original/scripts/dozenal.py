@@ -2,9 +2,9 @@
 #this allows you to call me.play_note(d40, 127) to play the 0th note of the 4th octave
 
 def dozenaldigit(decimal):
-   if decimal is 11:
+   if decimal == 11:
       return 'E'
-   elif decimal is 10:
+   elif decimal == 10:
       return 'X'
    else:
       return str(decimal)

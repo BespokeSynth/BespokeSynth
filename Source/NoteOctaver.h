@@ -39,7 +39,7 @@ public:
    NoteOctaver();
    static IDrawableModule* Create() { return new NoteOctaver(); }
    
-   std::string GetTitleLabel() override { return "octaver"; }
+   
    void CreateUIControls() override;
 
    void SetEnabled(bool enabled) override { mEnabled = enabled; }

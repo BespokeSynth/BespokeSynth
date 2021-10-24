@@ -40,7 +40,7 @@ public:
    Kicker();
    static IDrawableModule* Create() { return new Kicker(); }
    
-   std::string GetTitleLabel() override { return "kicker"; }
+   
 
    void SetEnabled(bool enabled) override { mEnabled = enabled; }
    void SetDrumPlayer(DrumPlayer* drumPlayer) { mDrumPlayer = drumPlayer; }

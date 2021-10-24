@@ -45,7 +45,7 @@ public:
    static IDrawableModule* Create() { return new LFOController(); }
    static bool CanCreate() { return TheLFOController == nullptr; }
    
-   std::string GetTitleLabel() override { return "LFO control"; }
+   
    void CreateUIControls() override;
    
    void SetSlider(FloatSlider* slider);

@@ -39,7 +39,7 @@ public:
    virtual ~DCOffset();
    static IDrawableModule* Create() { return new DCOffset(); }
    
-   std::string GetTitleLabel() override { return "dc offset"; }
+   
    void CreateUIControls() override;
    
    //IAudioSource

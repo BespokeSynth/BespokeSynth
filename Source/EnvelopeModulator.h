@@ -51,7 +51,7 @@ public:
    void Start(double time, const ::ADSR& adsr);
    void SetEnabled(bool enabled) override { mEnabled = enabled; }
    bool Enabled() const override { return mEnabled; }
-   std::string GetTitleLabel() override { return "envelope"; }
+   
    void CreateUIControls() override;
    void MouseReleased() override;
    bool MouseMoved(float x, float y) override;

@@ -87,7 +87,7 @@ void HelpDisplay::DrawModule()
    ofRect(0,0,mWidth,mHeight);
    ofPopStyle();
 
-   DrawTextLeftJustify(juce::JUCEApplication::getInstance()->getApplicationVersion().toStdString() + " (" + std::string(__DATE__) + " " + std::string(__TIME__) + ")", mWidth-5, 12);
+   DrawTextRightJustify(GetBuildInfoString(), mWidth-5, 12);
    
    mShowTooltipsCheckbox->Draw();
    mDumpModuleInfoButton->SetShowing(GetKeyModifiers() == kModifier_Shift);
@@ -279,12 +279,7 @@ namespace
                lookup[i][j]
                = lookup[i][j - 1] || lookup[i - 1][j];
 
-            // Current characters are considered as
-            // matching in two cases
-            // (a) current character of pattern is '?'
-            // (b) characters actually match
-            else if (pattern[j - 1] == '?'
-               || target[i - 1] == pattern[j - 1])
+            else if (target[i - 1] == pattern[j - 1])
                lookup[i][j] = lookup[i - 1][j - 1];
 
             // If characters don't match
@@ -395,7 +390,7 @@ void HelpDisplay::ButtonClicked(ClickButton* button)
                                        };
       for (auto type : moduleTypes)
       {
-         std::vector<std::string> spawnable = TheSynth->GetModuleFactory()->GetSpawnableModules(type);
+         const auto& spawnable = TheSynth->GetModuleFactory()->GetSpawnableModules(type);
          for (auto toSpawn : spawnable)
             TheSynth->SpawnModuleOnTheFly(toSpawn, 0, 0);
       }
@@ -483,7 +478,7 @@ void HelpDisplay::ButtonClicked(ClickButton* button)
       };
       for (auto type : moduleTypes)
       {
-         std::vector<std::string> spawnable = TheSynth->GetModuleFactory()->GetSpawnableModules(type);
+         const auto& spawnable = TheSynth->GetModuleFactory()->GetSpawnableModules(type);
          for (auto toSpawn : spawnable)
             mScreenshotsToProcess.push_back(toSpawn);
       }
@@ -526,7 +521,7 @@ void HelpDisplay::ButtonClicked(ClickButton* button)
       };
       for (auto type : moduleTypes)
       {
-         std::vector<std::string> spawnable = TheSynth->GetModuleFactory()->GetSpawnableModules(type);
+         const auto& spawnable = TheSynth->GetModuleFactory()->GetSpawnableModules(type);
          for (auto toSpawn : spawnable)
          {
             IDrawableModule* module = TheSynth->SpawnModuleOnTheFly(toSpawn, 100, 300);

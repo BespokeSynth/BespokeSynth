@@ -75,6 +75,7 @@ void Transport::CreateUIControls()
    mTimeSigTopDropdown = new DropdownList(this,"timesigtop",101,42,&mTimeSigTop);
    mTimeSigBottomDropdown = new DropdownList(this,"timesigbottom",101,60,&mTimeSigBottom);
    mResetButton = new ClickButton(this, "reset",5,78);
+   mPlayPauseButton = new ClickButton(this, "play/pause",42,78,ButtonDisplayStyle::kPause);
    mNudgeBackButton = new ClickButton(this," < ",80,78);
    mNudgeForwardButton = new ClickButton(this," > ",110,78);
    mSetTempoCheckbox = new Checkbox(this,"set tempo",HIDDEN_UICONTROL,HIDDEN_UICONTROL,&mSetTempoBool);
@@ -222,6 +223,11 @@ void Transport::DrawModule()
 
    mSwingSlider->Draw();
    mResetButton->Draw();
+   if (TheSynth->IsAudioPaused())
+      mPlayPauseButton->SetDisplayStyle(ButtonDisplayStyle::kPlay);
+   else
+      mPlayPauseButton->SetDisplayStyle(ButtonDisplayStyle::kPause);
+   mPlayPauseButton->Draw();
    mTimeSigTopDropdown->Draw();
    mTimeSigBottomDropdown->Draw();
    mSwingIntervalDropdown->Draw();
@@ -259,6 +265,8 @@ void Transport::ButtonClicked(ClickButton *button)
       AdjustTempo(1);
    if (button == mDecreaseTempoButton)
       AdjustTempo(-1);
+   if (button == mPlayPauseButton)
+      TheSynth->ToggleAudioPaused();
 }
 
 TransportListenerInfo* Transport::AddListener(ITimeListener* listener, NoteInterval interval, OffsetInfo offsetInfo, bool useEventLookahead)

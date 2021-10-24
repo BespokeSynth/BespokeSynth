@@ -544,7 +544,7 @@ void Canvas::KeyPressed(int key, bool isRepeat)
 {
    if (TheSynth->GetLastClickedModule() == GetParent() && gHoveredUIControl == this)
    {
-      if (key == OF_KEY_BACKSPACE)
+      if (key == juce::KeyPress::backspaceKey || key == juce::KeyPress::deleteKey)
       {
          if (mControls)
             mControls->SetElement(nullptr);

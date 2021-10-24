@@ -37,7 +37,7 @@ public:
    virtual ~ModwheelToPressure();
    static IDrawableModule* Create() { return new ModwheelToPressure(); }
    
-   std::string GetTitleLabel() override { return "modwheel to pressure"; }
+   
    void SetEnabled(bool enabled) override { mEnabled = enabled; }
    
    //INoteReceiver

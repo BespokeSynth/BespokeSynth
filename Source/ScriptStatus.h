@@ -41,7 +41,7 @@ public:
    
    void Poll() override;
    
-   std::string GetTitleLabel() override { return "script status"; }
+   
    void CreateUIControls() override;
    
    void ButtonClicked(ClickButton* button) override;

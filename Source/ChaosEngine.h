@@ -50,7 +50,7 @@ public:
    static IDrawableModule* Create() { return new ChaosEngine(); }
    static bool CanCreate() { return TheChaosEngine == nullptr; }
    
-   std::string GetTitleLabel() override { return "CHAOS ENGINE"; }
+   
    void CreateUIControls() override;
    
    void Init() override;

@@ -457,7 +457,7 @@ void LooperRecorder::SnapToClosestPitch()
 void LooperRecorder::KeyPressed(int key, bool isRepeat)
 {
    IDrawableModule::KeyPressed(key, isRepeat);
-   if (GetKeyModifiers() == kModifier_Control)
+   if (GetKeyModifiers() == (kModifier_Command | kModifier_Shift))
    {
       if (key >= '1' && key <= '4')
       {

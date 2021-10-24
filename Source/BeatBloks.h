@@ -50,7 +50,7 @@ public:
    ~BeatBloks();
    static IDrawableModule* Create() { return new BeatBloks(); }
    
-   std::string GetTitleLabel() override { return "BEAT BLOKS by @awwbees"; }
+   
    void CreateUIControls() override;
    
    //INoteReceiver

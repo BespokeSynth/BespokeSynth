@@ -315,7 +315,7 @@ void TextEntry::OnKeyPressed(int key, bool isRepeat)
       AcceptEntry(true);
       IKeyboardFocusListener::ClearActiveKeyboardFocus(!K(notifyListeners));
    }
-   if (key == OF_KEY_TAB)
+   else if (key == OF_KEY_TAB)
    {
       TextEntry* pendingNewEntry = nullptr;
       if (GetKeyModifiers() == kModifier_Shift)
@@ -329,7 +329,7 @@ void TextEntry::OnKeyPressed(int key, bool isRepeat)
       if (pendingNewEntry)
          pendingNewEntry->MakeActiveTextEntry(true);
    }
-   else if (key == OF_KEY_BACKSPACE)
+   else if (key == juce::KeyPress::backspaceKey)
    {
       int len = (int)strlen(mString);
       if (mCaretPosition != mCaretPosition2) 
@@ -390,7 +390,7 @@ void TextEntry::OnKeyPressed(int key, bool isRepeat)
             AcceptEntry(false);
          }
       }
-      if (mType == kTextEntry_Int)
+      else if (mType == kTextEntry_Int)
       {
          if (*mVarInt + 1 <= mIntMax)
          {
@@ -411,7 +411,7 @@ void TextEntry::OnKeyPressed(int key, bool isRepeat)
             AcceptEntry(false);
          }
       }
-      if (mType == kTextEntry_Int)
+      else if (mType == kTextEntry_Int)
       {
          if (*mVarInt - 1 >= mIntMin)
          {
@@ -420,11 +420,6 @@ void TextEntry::OnKeyPressed(int key, bool isRepeat)
             AcceptEntry(false);
          }
       }
-   }
-   else if (key == OF_KEY_RETURN)
-   {
-      if (mCaretPosition != mCaretPosition2)
-         RemoveSelectedText();
    }
    else if (toupper(key) == 'V' && GetKeyModifiers() == kModifier_Command)
    {
@@ -507,6 +502,49 @@ void TextEntry::ClearInput()
    mCaretPosition2 = 0;
 }
 
+void TextEntry::SetFromMidiCC(float slider, bool setViaModulator /*= false*/)
+{
+   if (mType == kTextEntry_Int)
+   {
+      *mVarInt = GetValueForMidiCC(slider);
+      UpdateDisplayString();
+   }
+
+   if (mType == kTextEntry_Float)
+   {
+      *mVarFloat = GetValueForMidiCC(slider);
+      UpdateDisplayString();
+   }
+}
+
+float TextEntry::GetValueForMidiCC(float slider) const
+{
+   if (mType == kTextEntry_Int)
+   {
+      slider = ofClamp(slider, 0, 1);
+      return (int)round(ofMap(slider, 0, 1, mIntMin, mIntMax));
+   }
+
+   if (mType == kTextEntry_Float)
+   {
+      slider = ofClamp(slider, 0, 1);
+      return ofMap(slider, 0, 1, mFloatMin, mFloatMax);
+   }
+
+   return 0;
+}
+
+float TextEntry::GetMidiValue() const
+{
+   if (mType == kTextEntry_Int)
+      return ofMap(*mVarInt, mIntMin, mIntMax, 0, 1);
+
+   if (mType == kTextEntry_Float)
+      return ofMap(*mVarFloat, mFloatMin, mFloatMax, 0, 1);
+
+   return 0;
+}
+
 void TextEntry::SetValue(float value)
 {
    if (mType == kTextEntry_Int)
@@ -520,6 +558,20 @@ void TextEntry::SetValue(float value)
       *mVarFloat = value;
       UpdateDisplayString();
    }
+}
+
+int TextEntry::GetNumValues()
+{
+   if (mType == kTextEntry_Int)
+      return mIntMax - mIntMin + 1;
+   return 0;
+}
+
+std::string TextEntry::GetDisplayValue(float val) const
+{
+   if (mType == kTextEntry_Int || mType == kTextEntry_Float)
+      return ofToString(val);
+   return mString;
 }
 
 void TextEntry::AcceptEntry(bool pressedEnter)
@@ -587,7 +639,7 @@ void TextEntry::Increment(float amount)
          AcceptEntry(false);
       }
    }
-   if (mType == kTextEntry_Int)
+   else if (mType == kTextEntry_Int)
    {
       int newVal = *mVarInt + (int)amount;
       if (newVal >= mIntMin && newVal <= mIntMax)

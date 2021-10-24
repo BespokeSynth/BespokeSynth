@@ -118,6 +118,15 @@ void SetGlobalSampleRateAndBufferSize(int rate, int size)
    gNyquistLimit = gSampleRate / 2.0f;
 }
 
+std::string GetBuildInfoString()
+{
+   return
+#if DEBUG
+      "DEBUG BUILD " + 
+#endif
+      juce::JUCEApplication::getInstance()->getApplicationVersion().toStdString() + " (" + std::string(__DATE__) + " " + std::string(__TIME__) + ")";
+}
+
 void DrawAudioBuffer(float width, float height, ChannelBuffer* buffer, float start, float end, float pos, float vol /*=1*/, ofColor color /*=ofColor::black*/, int wraparoundFrom /*= -1*/, int wraparoundTo /*= 0*/)
 {
    ofPushMatrix();
@@ -386,7 +395,7 @@ void DrawTextNormal(std::string text, int x, int y, float size)
    gFont.DrawString(text, size, x, y);
 }
 
-void DrawTextLeftJustify(std::string text, int x, int y, float size)
+void DrawTextRightJustify(std::string text, int x, int y, float size)
 {
    gFont.DrawString(text, size, x - gFont.GetStringWidth(text,size), y);
 }
@@ -538,17 +547,16 @@ void StringCopy(char* dest, const char* source, int destLength)
 
 int GetKeyModifiers()
 {
-   ModifierKeys modifiers = ModifierKeys::getCurrentModifiers();
    int ret = 0;
-   if (modifiers.isShiftDown())
+   if (ModifierKeys::currentModifiers.isShiftDown())
       ret |= kModifier_Shift;
-   if (modifiers.isAltDown())
+   if (ModifierKeys::currentModifiers.isAltDown())
       ret |= kModifier_Alt;
 #if BESPOKE_MAC
-   if (modifiers.isCtrlDown())
+   if (ModifierKeys::currentModifiers.isCtrlDown())
       ret |= kModifier_Control;   //control and command interfere with each other on non-mac keyboards
 #endif
-   if (modifiers.isCommandDown())
+   if (ModifierKeys::currentModifiers.isCommandDown())
       ret |= kModifier_Command;
    return ret;
 }
@@ -1394,7 +1402,7 @@ bool EvaluateExpression(std::string expressionStr, float currentValue, float& ou
 
 ofLog::~ofLog()
 {
-   std::string output = ofToString(gTime / 1000) + ": " + mMessage;
+   std::string output = ofToString(gTime / 1000, 8) + ": " + mMessage;
    DBG(output);
    if (mSendToBespokeConsole)
       TheSynth->LogEvent(output, kLogEventType_Verbose);

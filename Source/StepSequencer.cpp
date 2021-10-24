@@ -563,7 +563,7 @@ void StepSequencer::DrawModule()
 
 void StepSequencer::DrawRowLabel(const char* label, int row, int x, int y)
 {
-   DrawTextLeftJustify(label, x, y+row*9.4f);
+   DrawTextRightJustify(label, x, y+row*9.4f);
 }
 
 void StepSequencer::GetModuleDimensions(float& width, float& height)
@@ -1194,7 +1194,7 @@ void StepSequencerRow::Draw(float x, float y)
    mRowPitchEntry->Draw();
    
    if (!showTextEntry)
-      DrawTextLeftJustify(ofToString(mRowPitch), x - 7, y + 10);
+      DrawTextRightJustify(ofToString(mRowPitch), x - 7, y + 10);
        
    const float kPlayHighlightDurationMs = 250;
    for (size_t i = 0; i < mPlayedSteps.size(); ++i)

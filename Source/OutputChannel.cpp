@@ -33,6 +33,7 @@ OutputChannel::OutputChannel()
 , mWidth(64)
 , mHeight(40)
 , mChannelSelectionIndex(0)
+, mLimit(1)
 {
    for (size_t i=0; i<mLevelMeters.size(); ++i)
    {
@@ -72,9 +73,13 @@ void OutputChannel::Process(double time)
    if (numChannels == 1)
    {
       int channel = channelSelectionIndex;
+      auto getBufferGetChannel0 = GetBuffer()->GetChannel(0);
       if (channel >= 0 && channel < TheSynth->GetNumOutputChannels())
-         Add(TheSynth->GetOutputBuffer(channel), GetBuffer()->GetChannel(0), gBufferSize);
-      GetVizBuffer()->WriteChunk(GetBuffer()->GetChannel(0), gBufferSize, 0);
+      {
+         for (int i = 0; i<gBufferSize; ++i)
+            TheSynth->GetOutputBuffer(channel)[i] += std::clamp(/*GetBuffer()->GetChannel(0)*/ getBufferGetChannel0[i], -mLimit, mLimit);
+      }
+      GetVizBuffer()->WriteChunk(/*GetBuffer()->GetChannel(0)*/ getBufferGetChannel0, gBufferSize, 0);
       
       mLevelMeters[0].mPeakTracker.Process(TheSynth->GetOutputBuffer(channel), gBufferSize);
       mLevelMeters[0].mPeakTrackerSlow.Process(TheSynth->GetOutputBuffer(channel), gBufferSize);
@@ -84,14 +89,16 @@ void OutputChannel::Process(double time)
       int channel1 = channelSelectionIndex - mStereoSelectionOffset;
       if (channel1 >= 0 && channel1 < TheSynth->GetNumOutputChannels())
       {
-         Add(TheSynth->GetOutputBuffer(channel1), GetBuffer()->GetChannel(0), gBufferSize);
+         for (int i = 0; i < gBufferSize; ++i)
+            TheSynth->GetOutputBuffer(channel1)[i] += CLAMP(GetBuffer()->GetChannel(0)[i], -mLimit, mLimit);
          GetVizBuffer()->WriteChunk(GetBuffer()->GetChannel(0), gBufferSize, 0);
       }
       int channel2 = channel1 + 1;
       int inputChannel2 = (GetBuffer()->NumActiveChannels() >= 2) ? 1 : 0;
       if (channel2 >= 0 && channel2 < TheSynth->GetNumOutputChannels())
       {
-         Add(TheSynth->GetOutputBuffer(channel2), GetBuffer()->GetChannel(inputChannel2), gBufferSize);
+         for (int i = 0; i < gBufferSize; ++i)
+            TheSynth->GetOutputBuffer(channel2)[i] += CLAMP(GetBuffer()->GetChannel(inputChannel2)[i], -mLimit, mLimit);
          GetVizBuffer()->WriteChunk(GetBuffer()->GetChannel(inputChannel2), gBufferSize, 1);
       }
       
@@ -124,8 +131,8 @@ void OutputChannel::DrawModule()
       {
          ofPushStyle();
          ofFill();
-         float level = mLevelMeters[i].mPeakTracker.GetPeak();
-         float slowLevel = mLevelMeters[i].mPeakTrackerSlow.GetPeak();
+         float level = mLevelMeters[i].mPeakTracker.GetPeak() / mLimit;
+         float slowLevel = mLevelMeters[i].mPeakTrackerSlow.GetPeak() / mLimit;
          ofColor color(0, 255, 0);
          if (j > kNumSegments - 3)
             color.set(255, 0, 0);
@@ -141,6 +148,14 @@ void OutputChannel::DrawModule()
          ofRect(kPaddingOutside+kSegmentWidth*j, 20+i*(kBarHeight+2), kSegmentWidth-kPaddingBetween, kBarHeight, 0);
          ofPopStyle();
       }
+
+      if (mLevelMeters[i].mPeakTrackerSlow.GetLastHitLimitTime() > gTime - 1000)
+      {
+         ofPushStyle();
+         ofSetColor(ofColor::red);
+         DrawTextBold("clipped", kPaddingOutside + 10, 20 + i * (kBarHeight + 2) + 8, 12.0f);
+         ofPopStyle();
+      }
    }
 }
 
@@ -149,6 +164,7 @@ void OutputChannel::LoadLayout(const ofxJSONElement& moduleInfo)
    if (!moduleInfo["channel"].isNull())
       mModuleSaveData.LoadInt("channel", moduleInfo, 0, 0, TheSynth->GetNumOutputChannels() - 1);
    mModuleSaveData.LoadEnum<int>("channels", moduleInfo, 0, mChannelSelector);
+   mModuleSaveData.LoadFloat("limit", moduleInfo, 1, 0, 1000, K(isTextField));
 
    SetUpFromSaveData();
 }
@@ -159,5 +175,9 @@ void OutputChannel::SetUpFromSaveData()
       mChannelSelectionIndex = mModuleSaveData.GetInt("channel") - 1;
    else
       mChannelSelectionIndex = mModuleSaveData.GetEnum<int>("channels");
+   mLimit = mModuleSaveData.GetFloat("limit");
+
+   for (size_t i = 0; i < mLevelMeters.size(); ++i)
+      mLevelMeters[i].mPeakTrackerSlow.SetLimit(mLimit);
 }
 

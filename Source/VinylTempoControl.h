@@ -61,7 +61,7 @@ public:
    ~VinylTempoControl();
    static IDrawableModule* Create() { return new VinylTempoControl(); }
    
-   std::string GetTitleLabel() override { return "vinylcontrol"; }
+   
    
    void SetEnabled(bool enabled) override { mEnabled = enabled; }
    void CreateUIControls() override;

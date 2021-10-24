@@ -29,6 +29,7 @@
 #include "ModularSynth.h"
 #include "EnvelopeEditor.h"
 #include "PatchCable.h"
+#include "IModulator.h"
 
 ADSRDisplay::DisplayMode ADSRDisplay::sDisplayMode = ADSRDisplay::kDisplayEnvelope;
 
@@ -233,13 +234,13 @@ void ADSRDisplay::UpdateSliderVisibility()
           (PatchCable::sActivePatchCable->GetConnectionType() == kConnectionType_Modulator || PatchCable::sActivePatchCable->GetConnectionType() == kConnectionType_UIControl))
          slidersActive = true;
    }
-   if (mASlider && mASlider->GetModulator() != nullptr)
+   if (mASlider && mASlider->GetModulator() != nullptr && mASlider->GetModulator()->Active())
       slidersActive = true;
-   if (mDSlider && mDSlider->GetModulator() != nullptr)
+   if (mDSlider && mDSlider->GetModulator() != nullptr && mDSlider->GetModulator()->Active())
       slidersActive = true;
-   if (mSSlider && mSSlider->GetModulator() != nullptr)
+   if (mSSlider && mSSlider->GetModulator() != nullptr && mSSlider->GetModulator()->Active())
       slidersActive = true;
-   if (mRSlider && mRSlider->GetModulator() != nullptr)
+   if (mRSlider && mRSlider->GetModulator() != nullptr && mRSlider->GetModulator()->Active())
       slidersActive = true;
    if (mASlider)
    {
@@ -290,7 +291,7 @@ void ADSRDisplay::SpawnEnvelopeEditor()
 
 void ADSRDisplay::OnClicked(int x, int y, bool right)
 {
-   if (sDisplayMode == kDisplaySliders)
+   if (mASlider != nullptr && mASlider->IsShowing())
    {
       if (gHoveredUIControl == mASlider) mASlider->TestClick(x + mX, y + mY, right, false);
       if (gHoveredUIControl == mDSlider) mDSlider->TestClick(x + mX, y + mY, right, false);

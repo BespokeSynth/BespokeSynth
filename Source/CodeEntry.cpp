@@ -287,9 +287,13 @@ void CodeEntry::Render()
    }
    ofRect(mX, mY, w, h);
    
-   if (gTime - mLastPublishTime < 400)
+   double timeSincePublished = gTime - mLastPublishTime;
+   if (TheSynth->IsAudioPaused())
+      timeSincePublished = 99999;
+   
+   if (timeSincePublished < 400)
    {
-      ofSetColor(0,255,0,150*(1-(gTime - mLastPublishTime)/400));
+      ofSetColor(0,255,0,150*(1-timeSincePublished/400));
       ofRect(mX, mLastPublishedLineStart * mCharHeight + mY + 3 - mScroll.y, mWidth, mCharHeight * (mLastPublishedLineEnd+1-mLastPublishedLineStart), L(corner, 2));
    }
    
@@ -302,7 +306,7 @@ void CodeEntry::Render()
    }
    else if (mString != mPublishedString)
    {
-      float highlight = 1 - ofClamp((gTime - mLastInputTime) / 150, 0, 1);
+      float highlight = 1 - ofClamp(timeSincePublished / 150, 0, 1);
       ofSetColor(ofLerp(170,255,highlight), 255, ofLerp(170,255,highlight), gModuleDrawAlpha);
       ofSetLineWidth(2 + highlight * 3);
    }
@@ -544,6 +548,8 @@ void CodeEntry::DrawSyntaxHighlight(std::string input, ofColor color, std::vecto
    ofSetColor(color, gModuleDrawAlpha);
    
    float shake = (1 - ofClamp((gTime - mLastPublishTime) / 150, 0, 1)) * 3.0f;
+   if (TheSynth->IsAudioPaused())
+      shake = 0;
    float offsetX = ofRandom(-shake, shake);
    float offsetY = ofRandom(-shake, shake);
    
@@ -756,7 +762,7 @@ namespace
 
 void CodeEntry::OnKeyPressed(int key, bool isRepeat)
 {
-   if (key == OF_KEY_BACKSPACE)
+   if (key == juce::KeyPress::backspaceKey)
    {
       if (mCaretPosition != mCaretPosition2)
       {

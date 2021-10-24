@@ -46,7 +46,7 @@ public:
    ScaleDetect();
    static IDrawableModule* Create() { return new ScaleDetect(); }
    
-   std::string GetTitleLabel() override { return "detect"; }
+   
    void CreateUIControls() override;
 
    //INoteReceiver

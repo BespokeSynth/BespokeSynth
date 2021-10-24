@@ -40,18 +40,6 @@ void ComboGridController::CreateUIControls()
    IDrawableModule::CreateUIControls();
 }
 
-std::string ComboGridController::GetTitleLabel()
-{
-   std::string title = "combo:";
-   for (int i=0; i<mGrids.size(); ++i)
-   {
-      title += dynamic_cast<IClickable*>(mGrids[i])->Name();
-      if (i < mGrids.size()-1)
-         title += "+";
-   }
-   return title;
-}
-
 void ComboGridController::Init()
 {
    IDrawableModule::Init();

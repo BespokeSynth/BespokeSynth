@@ -53,7 +53,7 @@ public:
    void DrawModule() override;
    void SetDimensions(int w, int h) { mWidth = w; mHeight = h; }
    bool HasTitleBar() const override { return false; }
-   std::string GetTitleLabel() override { return ""; }
+   
    void GetDimensions(float& width, float& height) override { width = mWidth; height = mHeight; }
    bool ShouldClipContents() override { return false; }
    DropdownList* GetOwner() const { return mOwner; }
@@ -123,12 +123,11 @@ private:
    int FindItemIndex(float val) const;
    void SetValue(int value, bool forceUpdate);
    void CalculateWidth();
-   void UpdateModalListPosition();
+   ofVec2f GetModalListPosition() const;
 
    int mWidth;
    int mHeight;
    int mModalWidth;
-   int mColumns;
    int mMaxPerColumn;
    std::vector<DropdownListElement> mElements;
    int* mVar;

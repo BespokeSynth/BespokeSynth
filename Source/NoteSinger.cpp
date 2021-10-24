@@ -109,13 +109,6 @@ void NoteSinger::OnTransportAdvanced(float amount)
    GetBuffer()->Reset();
 }
 
-std::string NoteSinger::GetTitleLabel()
-{
-   if (Minimized())
-      return "notesinger";
-   return "notesinger "+ofToString(mPitch,2);
-}
-
 void NoteSinger::DrawModule()
 {
    if (Minimized() || IsVisible() == false)

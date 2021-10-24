@@ -44,7 +44,7 @@ public:
    
    static IAudioEffect* Create() { return new DelayEffect(); }
    
-   std::string GetTitleLabel() override { return "delay"; }
+   
    void CreateUIControls() override;
    bool Enabled() const override { return mEnabled; }
 

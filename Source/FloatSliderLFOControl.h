@@ -88,7 +88,7 @@ public:
    FloatSlider* GetOwner() { return mTarget; }
    bool Enabled() const override { return mEnabled; }
    bool HasTitleBar() const override { return mPinned; }
-   std::string GetTitleLabel() override { return mPinned ? "lfo" : ""; }
+   
    bool IsSaveable() override { return mPinned; }
    void CreateUIControls() override;
    bool IsPinned() const { return mPinned; }
@@ -154,7 +154,7 @@ public:
    static void Shutdown();
    static FloatSliderLFOControl* GetLFO(FloatSlider* owner);
 private:
-#define LFO_POOL_SIZE 64
+#define LFO_POOL_SIZE 256
    static FloatSliderLFOControl* sLFOPool[LFO_POOL_SIZE];
    static int sNextLFOIndex;
    static bool sInitialized;

@@ -41,7 +41,7 @@ public:
    
    static IAudioEffect* Create() { return new DistortionEffect(); }
    
-   std::string GetTitleLabel() override { return "distort"; }
+   
    void CreateUIControls() override;
    
    void SetClip(float amount);

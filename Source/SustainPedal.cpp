@@ -56,7 +56,7 @@ void SustainPedal::CheckboxUpdated(Checkbox* checkbox)
          {
             if (mIsNoteBeingSustained[i])
             {
-               PlayNoteOutput(gBufferSize*gInvSampleRateMs, i, 0, -1);
+               PlayNoteOutput(gTime + gBufferSize*gInvSampleRateMs, i, 0, -1);
                mIsNoteBeingSustained[i] = false;
             }
          }
@@ -70,8 +70,8 @@ void SustainPedal::PlayNote(double time, int pitch, int velocity, int voiceIdx, 
    {
       if (velocity > 0)
       {
-         if (!mIsNoteBeingSustained[pitch]) //don't replay already-sustained notes
-            PlayNoteOutput(time, pitch, velocity, voiceIdx, modulation);
+         PlayNoteOutput(time, pitch, 0, voiceIdx, modulation);
+         PlayNoteOutput(time, pitch, velocity, voiceIdx, modulation);
          mIsNoteBeingSustained[pitch] = false;   //not being sustained by this module it if it's held down
       }
       else

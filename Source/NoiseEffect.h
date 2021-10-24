@@ -38,7 +38,7 @@ public:
    
    static IAudioEffect* Create() { return new NoiseEffect(); }
    
-   std::string GetTitleLabel() override { return "noisify"; }
+   
    void CreateUIControls() override;
 
    //IAudioEffect

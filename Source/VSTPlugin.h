@@ -47,9 +47,10 @@ class ofxJSONElement;
 
 namespace VSTLookup
 {
-   void GetAvailableVSTs(std::vector<std::string>& vsts, bool rescan);
+   void GetAvailableVSTs(std::vector<std::string>& vsts);
    void FillVSTList(DropdownList* list);
    std::string GetVSTPath(std::string vstName);
+   void SortByLastUsed(std::vector<std::string>& vsts);
 }
 
 class VSTPlugin : public IAudioProcessor, public INoteReceiver, public IDrawableModule, public IDropdownListener, public IFloatSliderListener, public IIntSliderListener, public IButtonListener
@@ -59,7 +60,7 @@ public:
    virtual ~VSTPlugin() override;
    static IDrawableModule* Create() { return new VSTPlugin(); }
    
-   std::string GetTitleLabel() override;
+   std::string GetTitleLabel() const override;
    void CreateUIControls() override;
    
    void SetVol(float vol) { mVol = vol; }
@@ -92,8 +93,9 @@ public:
    void SaveState(FileStreamOut& out) override;
    void LoadState(FileStreamIn& in) override;
    std::vector<IUIControl*> ControlsToIgnoreInSaveState() const override;
-   
-   static bool sIsRescanningVsts;
+
+   static juce::AudioPluginFormatManager sFormatManager;
+   static juce::KnownPluginList sPluginList;
    
 private:
    //IDrawableModule
@@ -103,8 +105,8 @@ private:
    bool Enabled() const override { return mEnabled; }
    void LoadVST(juce::PluginDescription desc);
    
-   std::string GetPluginName();
-   std::string GetPluginId();
+   std::string GetPluginName() const;
+   std::string GetPluginId() const;
    void CreateParameterSliders();
    void RefreshPresetFiles();
    

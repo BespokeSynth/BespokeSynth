@@ -40,7 +40,7 @@ public:
    
    static IAudioEffect* Create() { return new TremoloEffect(); }
    
-   std::string GetTitleLabel() override { return "tremolo"; }
+   
    void CreateUIControls() override;
 
    //IAudioEffect

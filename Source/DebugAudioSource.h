@@ -41,7 +41,7 @@ public:
    ~DebugAudioSource();
    static IDrawableModule* Create() { return new DebugAudioSource(); }
    
-   std::string GetTitleLabel() override { return "debug"; }
+   
    
    //IAudioSource
    void Process(double time) override;

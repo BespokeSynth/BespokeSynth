@@ -38,7 +38,7 @@ public:
    virtual ~GlobalControls();
    static IDrawableModule* Create() { return new GlobalControls(); }
 
-   std::string GetTitleLabel() override { return "global controls"; }
+   
    void CreateUIControls() override;
    void Poll() override;
 

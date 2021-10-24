@@ -9,7 +9,6 @@
 #include "InputChannel.h"
 #include "OutputChannel.h"
 #include "TitleBar.h"
-#include "Minimap.h"
 #include "LFOController.h"
 #include "MidiController.h"
 #include "ChaosEngine.h"
@@ -230,7 +229,7 @@ void ModularSynth::DumpStats(bool isCrash, void* crashContext)
    log.appendText("display language: " + juce::SystemStats::getDisplayLanguage() + "\n");
    log.appendText("description: " + juce::SystemStats::getDeviceDescription() + "\n");
    log.appendText("manufacturer: " + juce::SystemStats::getDeviceManufacturer() + "\n");
-   log.appendText("build: bespoke " + JUCEApplication::getInstance()->getApplicationVersion() + " (" + std::string(__DATE__) + " " + std::string(__TIME__) + ")\n");
+   log.appendText("build: bespoke " + GetBuildInfoString() + ")\n");
 }
 
 bool ModularSynth::IsReady()
@@ -310,7 +309,7 @@ void ModularSynth::LoadResources(void* nanoVG, void* fontBoundsNanoVG)
    LoadGlobalResources();
 
    if (!gFont.IsLoaded())
-      mFatalError = "couldn't load font from " + gFont.GetFontPath();
+      mFatalError = "couldn't load font from " + gFont.GetFontPath() + "\nmaybe bespoke can't find your resources directory?";
 }
 
 void ModularSynth::InitIOBuffers(int inputChannelCount, int outputChannelCount)
@@ -352,7 +351,10 @@ void ModularSynth::Poll()
       
       if (!mInitialized && sFrameCount > 3) //let some frames render before blocking for a load
       {
-         LoadLayoutFromFile(ofToDataPath(defaultLayout));
+         if(!mStartupSaveStateFile.empty())
+            LoadState(mStartupSaveStateFile);
+         else
+            LoadLayoutFromFile(ofToDataPath(defaultLayout));
          mInitialized = true;
       }
 
@@ -489,6 +491,8 @@ void ModularSynth::Draw(void* vg)
    if (mFatalError != "")
    {
       ofSetColor(255, 255, 255, 255);
+      DrawFallbackText(("bespoke " + GetBuildInfoString()).c_str(), 100, 50);
+
       if (gFont.IsLoaded())
          DrawTextNormal(mFatalError,100,100, 20);
       else
@@ -527,7 +531,7 @@ void ModularSynth::Draw(void* vg)
    
    ofTranslate(GetDrawOffset().x, GetDrawOffset().y);
 
-	ofNoFill();
+   ofNoFill();
 
    TheSaveDataPanel->SetShowing(TheSaveDataPanel->GetModule());
    TheSaveDataPanel->UpdatePosition();
@@ -672,7 +676,7 @@ void ModularSynth::Draw(void* vg)
                tooltipContainer = list->GetModuleParent()->GetOwningContainer();
             }
          }
-         else if (GetMouseY(&mModuleContainer) < gHoveredModule->GetPosition().y)  //this means we're hovering over the module's title bar
+         else if (GetMouseY(&mModuleContainer) < gHoveredModule->GetPosition().y && gHoveredModule->HasTitleBar())  //this means we're hovering over the module's title bar
          {
             tooltip = helpDisplay->GetModuleTooltip(gHoveredModule);
             tooltipContainer = gHoveredModule->GetOwningContainer();
@@ -837,8 +841,8 @@ void ModularSynth::DrawConsole()
          else if (it->type == kLogEventType_Warning)
             ofSetColor(255, 255, 0);
          else
-            ofSetColor(200, 200, 200);
-         DrawTextNormal(it->text, 10, consoleY);
+            ofSetColor(255, 255, 255);
+         gFontFixedWidth.DrawString(it->text, 15, 10, consoleY);
          std::vector<std::string> lines = ofSplitString(it->text, "\n");
          ofPopStyle();
          consoleY += 15 * lines.size();
@@ -851,7 +855,7 @@ void ModularSynth::DrawConsole()
          ofSetColor(255,0,0);
          for (auto it = mErrors.begin(); it != mErrors.end(); ++it)
          {
-            DrawTextNormal(*it, 600, consoleY);
+            gFontFixedWidth.DrawString(*it, 15, 600, consoleY);
             std::vector<std::string> lines = ofSplitString(*it, "\n");
             consoleY += 15 * lines.size();
          }
@@ -924,7 +928,7 @@ void ModularSynth::KeyPressed(int key, bool isRepeat)
    
    key = KeyToLower(key);  //now convert to lowercase because everything else just cares about keys as buttons (unmodified by shift)
    
-   if (key == OF_KEY_BACKSPACE && !isRepeat)
+   if ((key == juce::KeyPress::backspaceKey || key == juce::KeyPress::deleteKey) && !isRepeat)
    {
       for (auto module : mGroupSelectedModules)
          module->GetOwningContainer()->DeleteModule(module);
@@ -1176,6 +1180,9 @@ void ModularSynth::MouseDragged(int intX, int intY, int button)
    ofVec2f drag = ofVec2f(x,y) - mLastMouseDragPos;
    mLastMouseDragPos = ofVec2f(x,y);
 
+   if (button == 3)
+      return;
+
    if (GetMoveModule() && (abs(mClickStartX-x) >= 1 || abs(mClickStartY-y) >= 1))
    {
       mClickStartX = INT_MAX;  //moved enough from click spot to reset
@@ -1253,10 +1260,9 @@ void ModularSynth::MouseDragged(int intX, int intY, int button)
 
 void ModularSynth::MousePressed(int intX, int intY, int button)
 {
+   bool rightButton = button == 2;
+
    mZoomer.ExitVanityPanningMode();
-   
-   if (PatchCable::sActivePatchCable != nullptr)
-      return;
    
    mMousePos.x = intX;
    mMousePos.y = intY;
@@ -1267,11 +1273,24 @@ void ModularSynth::MousePressed(int intX, int intY, int button)
    float x = GetMouseX(&mModuleContainer);
    float y = GetMouseY(&mModuleContainer);
    
+   if (button == 3)
+   {
+      mClickStartX = x;
+      mClickStartY = y;
+      mIsMousePanning = true;
+      return;
+   }
+
+   if (PatchCable::sActivePatchCable != nullptr)
+   {
+      if (rightButton)
+         PatchCable::sActivePatchCable->Destroy();
+      return;
+   }
+
    mLastMouseDragPos = ofVec2f(x,y);
    mGroupSelectContext = nullptr;
    
-   bool rightButton = button == 2;
-
    IKeyboardFocusListener::sKeyboardFocusBeforeClick = IKeyboardFocusListener::GetActiveKeyboardFocus();
    IKeyboardFocusListener::ClearActiveKeyboardFocus(K(notifyListeners));
 
@@ -1399,10 +1418,10 @@ void ModularSynth::MouseScrolled(float x, float y, bool canZoomCanvas)
          float w,h;
          gHoveredUIControl->GetDimensions(w, h);
          movementScale = 200.0f / w;
-            
-         if (GetKeyModifiers() & kModifier_Shift)
-            movementScale *= .01f;
       }
+
+      if (GetKeyModifiers() & kModifier_Shift)
+         movementScale *= .01f;
 
       if (clickButton)
          return;
@@ -1574,6 +1593,11 @@ void ModularSynth::MouseReleased(int intX, int intY, int button)
 
    if (button >= 0 && button < (int)mIsMouseButtonHeld.size())
       mIsMouseButtonHeld[button] = false;
+
+   mIsMousePanning = false;
+
+   if (button == 3)
+      return;
    
    float x = GetMouseX(&mModuleContainer);
    float y = GetMouseY(&mModuleContainer);
@@ -1629,8 +1653,6 @@ void ModularSynth::MouseReleased(int intX, int intY, int button)
    
    mClickStartX = INT_MAX;
    mClickStartY = INT_MAX;
-
-   mIsMousePanning = false;
 }
 
 void ModularSynth::AudioOut(float** output, int bufferSize, int nChannels)
@@ -1741,6 +1763,12 @@ void ModularSynth::FilesDropped(std::vector<std::string> files, int intX, int in
       float y = GetMouseY(&mModuleContainer, intY);
       IDrawableModule* target = GetModuleAtCursor();
 
+      if (files.size() == 1 && juce::String(files[0]).endsWith(".bsk"))
+      {
+          LoadState(files[0]);
+          return;
+      }
+      
       if (target != nullptr)
       {
          float moduleX, moduleY;
@@ -1886,20 +1914,16 @@ void ModularSynth::ResetLayout()
 
    if (!GetUserPrefs()["show_minimap"].isNull() && GetUserPrefs()["show_minimap"].asBool()) 
    {
-      if (mMinimap != nullptr) 
-      {
-         delete mMinimap;
-         mMinimap = nullptr;
-      }
-      
-      mMinimap = new Minimap();
+      mMinimap = std::make_unique<Minimap>();
       mMinimap->SetName("minimap");
       mMinimap->SetTypeName("minimap");
       mMinimap->SetShouldDrawOutline(false);
       mMinimap->CreateUIControls();
       mMinimap->SetShowing(true);
       mMinimap->Init();
-      mUILayerModuleContainer.AddModule(mMinimap);
+      mUILayerModuleContainer.AddModule(mMinimap.get());
+
+      TitleBar::sShowInitialHelpOverlay = false;  //don't show initial help popup, it collides with minimap, and a user who has customized the settings likely doesn't need it
    }
 
    ModuleSaveDataPanel* saveDataPanel = new ModuleSaveDataPanel();
@@ -2344,6 +2368,11 @@ void ModularSynth::SaveState(std::string file, bool autosave)
    mAudioThreadMutex.Unlock();
 }
 
+void ModularSynth::SetStartupSaveStateFile(std::string bskPath)
+{
+   mStartupSaveStateFile = std::move(bskPath);
+}
+
 void ModularSynth::LoadState(std::string file)
 {
    ofLog() << "LoadState() " << file;
@@ -2551,6 +2580,10 @@ void ModularSynth::OnConsoleInput()
       else if (tokens[0] == "getwindowinfo")
       {
          ofLog() << "pos:(" << mMainComponent->getTopLevelComponent()->getPosition().x << ", " << mMainComponent->getTopLevelComponent()->getPosition().y << ") size:(" << ofGetWidth() << ", " << ofGetHeight() << ")";
+      }
+      else if (tokens[0] == "getmouse")
+      {
+         ofLog() << "mouse pos raw:(" << mMousePos.x << ", " << mMousePos.y << ") " << "   mouse pos canvas:(" << GetMouseX(&mModuleContainer) << ", " << GetMouseY(&mModuleContainer) << ")";
       }
       else if (tokens[0] == "screenshotmodule")
       {
@@ -2781,7 +2814,15 @@ void ModularSynth::SaveOutput()
    if (!mUserPrefs["recordings_path"].isNull())
       recordingsPath = mUserPrefs["recordings_path"].asString();
    
-   std::string filename = ofGetTimestampString(recordingsPath + "recording_%Y-%m-%d_%H-%M.wav");
+   std::string save_prefix = "recording_";
+   if (!mCurrentSaveStatePath.empty())
+   {
+       // This assumes that mCurrentSaveStatePath always has a valid filename at the end
+       std::string filename = File(mCurrentSaveStatePath).getFileNameWithoutExtension().toStdString();
+       save_prefix = filename + "_";
+   }
+
+   std::string filename = ofGetTimestampString(recordingsPath + save_prefix + "%Y-%m-%d_%H-%M.wav");
    //string filenamePos = ofGetTimestampString("recordings/pos_%Y-%m-%d_%H-%M.wav");
 
    assert(mRecordingLength <= mGlobalRecordBuffer->Size());
@@ -2792,7 +2833,7 @@ void ModularSynth::SaveOutput()
       mSaveOutputBuffer[1][i] = mGlobalRecordBuffer->GetSample((int)mRecordingLength-i-1, 1);
    }
 
-   Sample::WriteDataToFile(filename.c_str(), mSaveOutputBuffer, (int)mRecordingLength, 2);
+   Sample::WriteDataToFile(filename, mSaveOutputBuffer, (int)mRecordingLength, 2);
    
    //mOutputBufferMeasurePos.ReadChunk(mSaveOutputBuffer, mRecordingLength);
    //Sample::WriteDataToFile(filenamePos.c_str(), mSaveOutputBuffer, mRecordingLength, 1);

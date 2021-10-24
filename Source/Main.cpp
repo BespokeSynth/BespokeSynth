@@ -10,19 +10,27 @@
 
 #include "juce_gui_basics/juce_gui_basics.h"
 #include <memory>
+#include "VSTScanner.h"
 
 #include "VersionInfo.h"
 
 using namespace juce;
 
 Component* createMainContentComponent();
+std::unique_ptr<juce::ApplicationProperties> appProperties;
+void SetStartupSaveStateFile(const String& bskPath, Component* mainComponent);
+
+juce::ApplicationProperties& getAppProperties()
+{
+   return *appProperties;
+}
 
 //==============================================================================
 class BespokeApplication  : public JUCEApplication
 {
 public:
    //==============================================================================
-   BespokeApplication() {}
+   BespokeApplication() = default;
    
    const String getApplicationName() override       { return Bespoke::APP_NAME; }
    const String getApplicationVersion() override    { return Bespoke::VERSION; }
@@ -31,9 +39,23 @@ public:
    //==============================================================================
    void initialise (const String& commandLine) override
    {
-      // This method is where you should put your application's initialisation code..
+      auto scannerSubprocess = std::make_unique<PluginScannerSubprocess>();
+
+      if (scannerSubprocess->initialiseFromCommandLine(commandLine, kScanProcessUID))
+      {
+         storedScannerSubprocess = std::move(scannerSubprocess);
+         return;
+      }
       
       mainWindow = std::make_unique<MainWindow>("bespoke synth");
+
+      juce::PropertiesFile::Options options;
+      options.applicationName = "Bespoke Synth";
+      options.filenameSuffix = "settings";
+      options.osxLibrarySubFolder = "Preferences";
+
+      appProperties.reset(new juce::ApplicationProperties());
+      appProperties->setStorageParameters(options);
    }
    
    void shutdown() override
@@ -55,6 +77,10 @@ public:
       // When another instance of the app is launched while this one is running,
       // this method is invoked, and the commandLine parameter tells you what
       // the other instance's command-line arguments were.
+
+      // This is also called when opening the app with a file.
+      if(commandLine.isNotEmpty() && commandLine.endsWith(".bsk"))
+        SetStartupSaveStateFile(commandLine, mainWindow->getContentComponent());
    }
    
    //==============================================================================
@@ -98,6 +124,7 @@ public:
    
 private:
    std::unique_ptr<MainWindow> mainWindow;
+   std::unique_ptr<PluginScannerSubprocess> storedScannerSubprocess;
 };
 
 //==============================================================================

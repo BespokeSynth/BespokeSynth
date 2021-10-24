@@ -10,3 +10,6 @@
 [submodule "libs/oddsound-mts/MTS-ESP"]
 	path = libs/oddsound-mts/MTS-ESP
 	url = https://github.com/ODDSound/MTS-ESP
+[submodule "libs/json/jsoncpp"]
+	path = libs/json/jsoncpp
+	url = https://github.com/open-source-parsers/jsoncpp.git

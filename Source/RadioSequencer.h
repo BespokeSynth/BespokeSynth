@@ -45,7 +45,7 @@ public:
    ~RadioSequencer();
    static IDrawableModule* Create() { return new RadioSequencer(); }
    
-   std::string GetTitleLabel() override { return "radio sequencer"; }
+   
    void CreateUIControls() override;
    
    //IGridListener

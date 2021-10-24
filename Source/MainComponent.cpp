@@ -1,12 +1,6 @@
 #ifndef MAINCOMPONENT_H_INCLUDED
 #define MAINCOMPONENT_H_INCLUDED
 
-
-#ifdef BESPOKE_WINDOWS
-// juce::gl supercedes this
-//#include <GL/glew.h>
-#endif
-
 #include "juce_audio_devices/juce_audio_devices.h"
 #include "juce_audio_formats/juce_audio_formats.h"
 #include "juce_opengl/juce_opengl.h"
@@ -45,7 +39,7 @@ public:
    , mPixelRatio(1)
    , mSpaceMouseReader(mSynth)
    {
-      ofLog() << "bespoke synth " << JUCEApplication::getInstance()->getApplicationVersion();
+      ofLog() << "bespoke synth " << GetBuildInfoString();
 
       // sigh ofLog isn't a stream so std::hex doesn't work so
       char jv[256];
@@ -55,9 +49,16 @@ public:
 #if BESPOKE_LINUX
       ofLog() << "   install prefix  : '" << Bespoke::CMAKE_INSTALL_PREFIX << "'";
 #endif
-      
+      ofLog() << "   git hash        : " << Bespoke::GIT_HASH;
+      ofLog() << "   git branch      : " << Bespoke::GIT_BRANCH;
+      ofLog() << "   build time      : " << Bespoke::BUILD_DATE << " at " << Bespoke::BUILD_TIME;
+      ofLog() << "   command line    : " << JUCEApplication::getCommandLineParameters();
+
       openGLContext.setOpenGLVersionRequired(juce::OpenGLContext::openGL3_2);
       openGLContext.setContinuousRepainting(false);
+#if BESPOKE_LINUX_HIGH_FPS_WITH_THREAD_PROBLEMS
+      openGLContext.setComponentPaintingEnabled(false);
+#endif
 
 #ifndef BESPOKE_WINDOWS //windows crash handler is set up in ModularSynth() constructor
       SystemStats::setApplicationCrashHandler(ModularSynth::CrashHandler);
@@ -127,7 +128,7 @@ public:
       
       mSynth.Poll();
       
-#if DEBUG || BESPOKE_LINUX
+#if DEBUG || (BESPOKE_LINUX && !BESPOKE_LINUX_HIGH_FPS_WITH_THREAD_PROBLEMS)
       if (sRenderFrame % 2 == 0)
 #else
       if (true)
@@ -326,6 +327,13 @@ public:
          mSynth.SetFatalError("error initializing audio device: "+audioError.toStdString() +
                               "\n\n\nvalid devices:\n" + GetAudioDevices());
       }
+
+      if (JUCEApplication::getCommandLineParameterArray().size() > 0)
+      {
+         juce::String argument = JUCEApplication::getCommandLineParameterArray()[0];
+         if (argument.endsWith(".bsk"))
+            mSynth.SetStartupSaveStateFile(argument.toStdString());
+      }
       
       startTimerHz(60);
    }
@@ -334,6 +342,11 @@ public:
    {
       nvgDeleteGLES2(mVG);
       nvgDeleteGLES2(mFontBoundsVG);
+   }
+
+   void SetStartupSaveStateFile(const juce::String& bskPath)
+   {
+      mSynth.SetStartupSaveStateFile(bskPath.toStdString());
    }
    
    void render() override
@@ -405,21 +418,30 @@ public:
       // If you add any child components, this is where you should
       // update their positions.
    }
-   
+
 private:
+   int GetMouseButton(const MouseEvent& e)
+   {
+      if (e.mods.isPopupMenu())
+         return 2;
+      if (e.mods.isMiddleButtonDown())
+         return 3;
+      return 1;
+   }
+
    void mouseDown(const MouseEvent& e) override
    {
-      mSynth.MousePressed(e.getMouseDownX(), e.getMouseDownY(), e.mods.isPopupMenu() ? 2 : 1);
+      mSynth.MousePressed(e.getMouseDownX(), e.getMouseDownY(), GetMouseButton(e));
    }
    
    void mouseUp(const MouseEvent& e) override
    {
-      mSynth.MouseReleased(e.getPosition().x, e.getPosition().y, e.mods.isPopupMenu() ? 2 : 1);
+      mSynth.MouseReleased(e.getPosition().x, e.getPosition().y, GetMouseButton(e));
    }
    
    void mouseDrag(const MouseEvent& e) override
    {
-      mSynth.MouseDragged(e.getPosition().x, e.getPosition().y, e.mods.isPopupMenu() ? 2 : 1);
+      mSynth.MouseDragged(e.getPosition().x, e.getPosition().y, GetMouseButton(e));
    }
    
    void mouseMove(const MouseEvent& e) override
@@ -449,6 +471,31 @@ private:
    
    bool keyPressed(const KeyPress& key) override
    {
+      /*
+       * This is a temporary fix for 1.0.1. This keyPressed handler
+       * always returns true whether or not Bespoke handles the event
+       * and with juce 6.1.1 it gets all the events. That 'return true'
+       * therefore suppresses the cmd-q/alt-f4 to quit.
+       *
+       * The correct fix is take every key handler and make it have
+       * a return type bool and then at the end return true if any
+       * subordinate key handler returns true, and false if not,
+       * but that touches the entire codebase, so to fix the 1.0 to
+       * 1.0.1. regression with command q on macos, just for now do this
+       * and if it gets merged, open an issue.
+       */
+#if BESPOKE_MAC
+      if (key.getKeyCode() == 'Q' && key.getModifiers().isCommandDown())
+      {
+         return false;
+      }
+#else
+      if (key.getKeyCode() == KeyPress::F4Key && key.getModifiers().isAltDown())
+      {
+         return false;
+      }
+#endif
+
       int keyCode = key.getTextCharacter();
       if (keyCode < 32)
          keyCode = key.getKeyCode();
@@ -476,7 +523,7 @@ private:
             }
          }
       }
-      return true;
+      return false;
    }
 
    void focusGained(FocusChangeType cause) override
@@ -551,6 +598,16 @@ private:
 
 // (This function is called by the app startup code to create our main component)
 Component* createMainContentComponent()     { return new MainContentComponent(); }
+
+// This function is called when opening the app with a bsk file.
+void SetStartupSaveStateFile(const juce::String& bskFilePath, Component* component)
+{
+   auto* mainComponent = dynamic_cast<MainContentComponent*>(component);
+   if(mainComponent == nullptr)
+      ofLog() << "Non main component sent to SetStartupSaveStateFile";
+   else
+      mainComponent->SetStartupSaveStateFile(bskFilePath);
+}
 
 
 #endif  // MAINCOMPONENT_H_INCLUDED

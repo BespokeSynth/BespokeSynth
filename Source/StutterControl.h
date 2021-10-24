@@ -43,7 +43,7 @@ public:
    ~StutterControl();
    static IDrawableModule* Create() { return new StutterControl(); }
    
-   std::string GetTitleLabel() override { return "stutter"; }
+   
    void CreateUIControls() override;
    void Init() override;
    

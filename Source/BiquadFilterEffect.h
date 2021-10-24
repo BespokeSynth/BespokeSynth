@@ -43,7 +43,7 @@ public:
    
    static IAudioEffect* Create() { return new BiquadFilterEffect(); }
    
-   std::string GetTitleLabel() override { return "biquad"; }
+   
    void CreateUIControls() override;
    
    void Init() override;

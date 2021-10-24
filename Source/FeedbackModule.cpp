@@ -141,7 +141,7 @@ void FeedbackModule::DrawModule()
    mDelay.Draw();
    mSignalLimitSlider->Draw();
 
-   DrawTextLeftJustify("feedback out:", 100, 12);
+   DrawTextRightJustify("feedback out:", 100, 12);
 }
 
 void FeedbackModule::PostRepatch(PatchCableSource* cableSource, bool fromUserClick)

@@ -41,7 +41,7 @@ public:
    virtual ~ModWheelToCV();
    static IDrawableModule* Create() { return new ModWheelToCV(); }
    
-   std::string GetTitleLabel() override { return "modwheel to cv"; }
+   
    void CreateUIControls() override;
    
    void SetEnabled(bool enabled) override { mEnabled = enabled; }

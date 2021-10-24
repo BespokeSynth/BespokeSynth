@@ -10,6 +10,9 @@
 #include "ofxJSONElement.h"
 #include "SynthGlobals.h"
 
+#include <json/reader.h>
+#include <json/writer.h>
+
 #include "juce_core/juce_core.h"
 
 using namespace Json;
@@ -32,8 +35,11 @@ ofxJSONElement::ofxJSONElement(std::string jsonString)
 //--------------------------------------------------------------
 bool ofxJSONElement::parse(std::string jsonString)
 {
-   Reader reader;
-   if(!reader.parse( jsonString, *this )) {
+   CharReaderBuilder rb;
+   auto reader = std::unique_ptr<Json::CharReader>(rb.newCharReader());
+   if(! reader->parse( jsonString.c_str(),
+                       jsonString.c_str() + jsonString.size(),
+                      this, nullptr)) {
       ofLog() << "Unable to parse string";
       return false;
    }
@@ -49,9 +55,12 @@ bool ofxJSONElement::open(std::string filename)
    if (file.exists())
    {
       juce::String str = file.loadFileAsString();
-      
-      Reader reader;
-      if(!reader.parse( str.toStdString(), *this ))
+
+      CharReaderBuilder builder;
+      auto reader = std::unique_ptr<CharReader>(builder.newCharReader());
+      auto mS = str.toStdString();
+
+      if(!reader->parse( mS.c_str(), mS.c_str() + mS.size(), this, nullptr ))
       {
          ofLog() << "Unable to parse "+filename;
          return false;
@@ -68,21 +77,22 @@ bool ofxJSONElement::open(std::string filename)
 //--------------------------------------------------------------
 bool ofxJSONElement::save(std::string filename, bool pretty)
 {
-   filename = ofToDataPath(filename, true);
+   filename = ofToDataPath(filename);
    juce::File file(filename);
    file.create();
    if (!file.exists()) {
       ofLog() << "Unable to create "+filename;
       return false;
    }
-   
+
+   Json::StreamWriterBuilder builder;
+
    if(pretty) {
-      StyledWriter writer;
-      file.replaceWithText(writer.write( *this ));
-   } else {
-      FastWriter writer;
-      file.replaceWithText(writer.write( *this ));
+      builder["indentation"] = "   ";
    }
+   const std::string json_file = Json::writeString(builder, *this);
+   file.replaceWithText(json_file);
+
    ofLog() << "JSON saved to "+filename;
    return true;
 }
@@ -93,13 +103,12 @@ bool ofxJSONElement::save(std::string filename, bool pretty)
 std::string ofxJSONElement::getRawString(bool pretty)
 {
    std::string raw;
+   Json::StreamWriterBuilder builder;
+
    if(pretty) {
-      StyledWriter writer;
-      raw = writer.write(*this);
-   } else {
-      FastWriter writer;
-      raw = writer.write(*this);
+      builder["indentation"] = "   ";
    }
+   raw = Json::writeString(builder, *this);
    return raw;
 }
 
