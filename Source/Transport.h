@@ -121,7 +121,7 @@ public:
    void SetMeasure(int count) { mMeasureTime = mMeasureTime - (int)mMeasureTime + count; }
    void SetDownbeat() { mMeasureTime = mMeasureTime - (int)mMeasureTime - .001; }
    static int CountInStandardMeasure(NoteInterval interval);
-   void Reset(float rewindAmount = 0.001f);
+   void Reset(float rewindAmount = 0.005f);
    void OnDrumEvent(NoteInterval drumEvent);
    void SetLoop(int measureStart, int measureEnd) { assert(measureStart < measureEnd); mLoopStartMeasure = measureStart; mLoopEndMeasure = measureEnd; }
    void ClearLoop() { mLoopStartMeasure = -1; mLoopEndMeasure = -1; }
