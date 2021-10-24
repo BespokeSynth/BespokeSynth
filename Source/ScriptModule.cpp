@@ -74,13 +74,13 @@ ofColor ScriptModule::sBackgroundTextColor = ofColor::white;
 bool ScriptModule::sPythonInitialized = false;
 //static
 bool ScriptModule::sHasPythonEverSuccessfullyInitialized = false;
+//static
+ofxJSONElement ScriptModule::sStyleJSON;
 
 ScriptModule::ScriptModule()
 : mCodeEntry(nullptr)
 , mRunButton(nullptr)
 , mStopButton(nullptr)
-, mLoadScriptIndex(-1)
-, mScriptStyleIndex(0)
 , mA(0)
 , mB(0)
 , mC(0)
@@ -116,8 +116,7 @@ void ScriptModule::CreateUIControls()
    DROPDOWN(mLoadScriptSelector, "loadscript", &mLoadScriptIndex, 120); UIBLOCK_SHIFTRIGHT();
    BUTTON(mLoadScriptButton,"load"); UIBLOCK_SHIFTRIGHT();
    BUTTON(mSaveScriptButton,"save as"); UIBLOCK_SHIFTRIGHT();
-   BUTTON(mShowReferenceButton, "?"); UIBLOCK_SHIFTRIGHT();
-   DROPDOWN(mScriptStyleSelector, "style", &mScriptStyleIndex, 120); UIBLOCK_NEWLINE();
+   BUTTON(mShowReferenceButton, "?"); UIBLOCK_NEWLINE();
    UICONTROL_CUSTOM(mCodeEntry, new CodeEntry(UICONTROL_BASICS("code"),500,300));
    BUTTON(mRunButton, "run"); UIBLOCK_SHIFTRIGHT();
    BUTTON(mStopButton, "stop"); UIBLOCK_NEWLINE();
@@ -131,8 +130,8 @@ void ScriptModule::CreateUIControls()
 
    RefreshStyleFiles();
 
-   if (!mStyleJSON.empty())
-      mCodeEntry->SetStyleFromJSON(mStyleJSON[0u]);
+   if (!sStyleJSON.empty())
+      mCodeEntry->SetStyleFromJSON(sStyleJSON[0u]);
 }
 
 void ScriptModule::UninitializePython()
@@ -215,7 +214,6 @@ void ScriptModule::DrawModule()
    mLoadScriptButton->Draw();
    mSaveScriptButton->Draw();
    mShowReferenceButton->Draw();
-   mScriptStyleSelector->Draw();
    mCodeEntry->Draw();
    mRunButton->Draw();
    mStopButton->Draw();
@@ -301,7 +299,7 @@ void ScriptModule::DrawModule()
    if (CodeEntry::HasJediNotInstalledWarning())
    {
       ofPushStyle();
-      ofRectangle buttonRect = mScriptStyleSelector->GetRect(true);
+      ofRectangle buttonRect = mShowReferenceButton->GetRect(true);
       ofFill();
       ofSetColor(255, 255, 0);
       float x = buttonRect.getMaxX() + 10;
@@ -906,34 +904,20 @@ void ScriptModule::DropdownClicked(DropdownList* list)
 {
    if (list == mLoadScriptSelector)
       RefreshScriptFiles();
-   if (list == mScriptStyleSelector)
-      RefreshStyleFiles();
 }
 
 void ScriptModule::DropdownUpdated(DropdownList *list, int oldValue)
 {
-    if (list == mScriptStyleSelector)
-    {
-        int v = (int)list->GetValue();
-        if ( v >= 0 && v < mStyleJSON.size())
-            mCodeEntry->SetStyleFromJSON(mStyleJSON[v]);
-    }
 }
 
 void ScriptModule::RefreshStyleFiles()
 {
-    mScriptStyleSelector->Clear();
     ofxJSONElement root;
     if (File(ofToDataPath("script_styles.json")).existsAsFile())
         root.open(ofToDataPath("script_styles.json"));
     else
         root.open(ofToResourcePath("userdata_original/script_styles.json"));
-
-    mStyleJSON = root["styles"];
-    for (auto i = 0; i < mStyleJSON.size(); ++i)
-    {
-        mScriptStyleSelector->AddLabel(mStyleJSON[i]["name"].asString(), i);
-    }
+    sStyleJSON = root["styles"];
 }
 
 void ScriptModule::RefreshScriptFiles()
@@ -1370,6 +1354,12 @@ void ScriptModule::LoadLayout(const ofxJSONElement& moduleInfo)
    mModuleSaveData.LoadBool("execute_on_init", moduleInfo, true);
    mModuleSaveData.LoadInt("init_execute_priority", moduleInfo, 0, -9999, 9999, K(isTextField));
    mModuleSaveData.LoadBool("syntax_highlighting", moduleInfo, true);
+   mModuleSaveData.LoadString("style", moduleInfo, "classic", [](DropdownList* list) {
+      for (auto i = 0; i < sStyleJSON.size(); ++i)
+      {
+         list->AddLabel(sStyleJSON[i]["name"].asString(), i);
+      }
+   });
    
    SetUpFromSaveData();
 }
@@ -1390,6 +1380,13 @@ void ScriptModule::SetUpFromSaveData()
    }
 
    mCodeEntry->SetDoSyntaxHighlighting(mModuleSaveData.GetBool("syntax_highlighting"));
+
+   std::string styleName = mModuleSaveData.GetString("style");
+   for (auto i = 0; i < sStyleJSON.size(); ++i)
+   {
+      if (sStyleJSON[i]["name"].asString() == styleName)
+         mCodeEntry->SetStyleFromJSON(sStyleJSON[i]);
+   }
 }
 
 void ScriptModule::SaveLayout(ofxJSONElement& moduleInfo)
