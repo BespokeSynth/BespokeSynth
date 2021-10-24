@@ -33,6 +33,29 @@
 #include "DropdownList.h"
 #include "ClickButton.h"
 
+class UserPrefsEditor;
+
+class UserPref
+{
+public:
+   virtual IUIControl* GetControl() = 0;
+};
+
+class UserPrefDropdown : public UserPref
+{
+public:
+   UserPrefDropdown(std::string name, int defaultValue, int width) : mName(name), mValue(defaultValue), mWidth(width) {}
+   void SetUpControl(IDropdownListener* owner) { mDropdown = new DropdownList(owner, mName.c_str(), -1, -1, &mValue, mWidth); }
+   IUIControl* GetControl() override { return mDropdown; }
+   DropdownList* GetDropdown() { return mDropdown; }
+   int& GetValue() { return mValue; }
+private:
+   std::string mName;
+   int mValue;
+   DropdownList* mDropdown;
+   float mWidth;
+};
+
 class UserPrefsEditor : public IDrawableModule, public IFloatSliderListener, public IIntSliderListener, public ITextEntryListener, public IDropdownListener, public IButtonListener
 {
 public:
@@ -73,16 +96,11 @@ private:
    void UpdatePrefBool(ofxJSONElement& userPrefs, std::string prefName, bool value);
    void CleanUpSave(std::string& json);
 
-   DropdownList* mDeviceTypeDropdown;
-   int mDeviceTypeIndex;
-   DropdownList* mSampleRateDropdown;
-   int mSampleRateIndex;
-   DropdownList* mBufferSizeDropdown;
-   int mBufferSizeIndex;
-   DropdownList* mAudioOutputDeviceDropdown;
-   int mAudioOutputDeviceIndex;
-   DropdownList* mAudioInputDeviceDropdown;
-   int mAudioInputDeviceIndex;
+   UserPrefDropdown mDeviceType{ "devicetype", 0, 200 };
+   UserPrefDropdown mAudioOutputDevice{ "audio_output_device", 0, 350 };
+   UserPrefDropdown mAudioInputDevice{ "audio_input_device", 0, 350 };
+   UserPrefDropdown mSampleRate{ "samplerate", 0, 100 };
+   UserPrefDropdown mBufferSize{ "buffersize", 0, 100 };
    TextEntry* mWindowWidthEntry;
    int mWindowWidth;
    TextEntry* mWindowHeightEntry;

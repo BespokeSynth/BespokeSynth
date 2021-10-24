@@ -721,7 +721,7 @@ void Autotalent::Process(double time)
             lfoval = mLfoamp*sin(lfoval*PI*0.5);
          }
          // add in quantized LFO
-         if (mLfoquant>=1)
+         if (mLfoquant)
          {
             outpitch = outpitch + (int)(numNotes*lfoval + numNotes + 0.5) - numNotes;
          }
@@ -743,7 +743,7 @@ void Autotalent::Process(double time)
          outpitch = outpitch - (iNote2Pitch[iScwarp] - iNote2Pitch[0]); //more scale rotation here
 
          // add in unquantized LFO
-         if (mLfoquant<=0)
+         if (!mLfoquant)
          {
             outpitch = outpitch + lfoval*2;
          }
