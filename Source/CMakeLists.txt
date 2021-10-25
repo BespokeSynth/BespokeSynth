@@ -317,6 +317,7 @@ target_sources(BespokeSynth PRIVATE
     UnstablePitch.cpp
     UnstablePressure.cpp
     UserData.cpp
+    UserPrefs.cpp
     UserPrefsEditor.cpp
     VSTPlayhead.cpp
     VSTPlugin.cpp

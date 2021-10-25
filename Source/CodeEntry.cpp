@@ -1331,12 +1331,17 @@ void CodeEntry::LoadState(FileStreamIn& in, bool shouldSetValue)
    int rev;
    in >> rev;
    LoadStateValidate(rev == kSaveStateRev);
-   
-   in >> mString;
-   UpdateString(mString);
-   //Publish();
-   //if (mListener != nullptr)
-   //   mListener->ExecuteCode(mString);
+
+   std::string var;
+   in >> var;
+   if (shouldSetValue)
+   {
+      UpdateString(var);
+
+      //Publish();
+      //if (mListener != nullptr)
+      //   mListener->ExecuteCode(mString);
+   }
 }
 
 void CodeEntry::SetStyleFromJSON(const ofxJSONElement &vdict) {

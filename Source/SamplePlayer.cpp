@@ -35,6 +35,7 @@
 #include "PatchCableSource.h"
 #include "Scale.h"
 #include "UIControlMacros.h"
+#include "UserPrefs.h"
 
 #include "juce_gui_basics/juce_gui_basics.h"
 #include "juce_audio_formats/juce_audio_formats.h"
@@ -646,51 +647,6 @@ void SamplePlayer::TextEntryComplete(TextEntry* entry)
    }
 }
 
-namespace
-{
-   std::string GetYoutubeDlPath()
-   {
-      static std::string sPath = "";
-      if (sPath == "")
-      {
-         if (TheSynth->GetUserPrefs()["youtube-dl_path"].isNull())
-         {
-#if BESPOKE_WINDOWS
-            sPath = "c:/youtube-dl/bin/youtube-dl.exe";
-#else
-            sPath = "/opt/local/bin/youtube-dl";
-#endif
-         }
-         else
-         {
-            sPath = TheSynth->GetUserPrefs()["youtube-dl_path"].asString();
-         }
-      }
-      return sPath;
-   }
-
-   std::string GetFfmpegPath()
-   {
-      static std::string sPath = "";
-      if (sPath == "")
-      {
-         if (TheSynth->GetUserPrefs()["ffmpeg_path"].isNull())
-         {
-   #if BESPOKE_WINDOWS
-            sPath = "c:/ffmpeg/bin/ffmpeg.exe";
-   #else
-            sPath = "/opt/local/bin/ffmpeg";
-   #endif
-         }
-         else
-         {
-            sPath = TheSynth->GetUserPrefs()["ffmpeg_path"].asString();
-         }
-      }
-      return sPath;
-   }
-}
-
 void SamplePlayer::DownloadYoutube(std::string url, std::string title)
 {
    mPlay = false;
@@ -712,7 +668,7 @@ void SamplePlayer::DownloadYoutube(std::string url, std::string title)
    }
    
    StringArray args;
-   args.add(GetYoutubeDlPath());
+   args.add(UserPrefs.youtube_dl_path.Get());
    args.add(url);
    args.add("--extract-audio");
    args.add("--audio-format");
@@ -721,7 +677,7 @@ void SamplePlayer::DownloadYoutube(std::string url, std::string title)
    args.add("0");
    args.add("--no-progress");
    args.add("--ffmpeg-location");
-   args.add(GetFfmpegPath());
+   args.add(UserPrefs.ffmpeg_path.Get());
    args.add("-o");
    args.add(ofToDataPath(tempDownloadName));
    
@@ -773,7 +729,7 @@ void SamplePlayer::SearchYoutube(std::string searchTerm)
    mYoutubeSearchResults.clear();
 
    StringArray args;
-   args.add(GetYoutubeDlPath());
+   args.add(UserPrefs.youtube_dl_path.Get());
    args.add("ytsearch"+ofToString(kMaxYoutubeSearchResults)+":"+searchTerm);
    args.add("--no-playlist");
    args.add("--write-info-json");

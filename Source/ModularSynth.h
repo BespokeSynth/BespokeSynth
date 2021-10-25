@@ -202,7 +202,7 @@ public:
    bool IsLoadingModule() const { return mIsLoadingModule; }
    void SetIsLoadingState(bool loading) { mIsLoadingState = loading; }
    
-   static std::string GetUserPrefsPath(bool relative);
+   static std::string GetUserPrefsPath();
    static void CrashHandler(void*);
    static void DumpStats(bool isCrash, void* crashContext);
    
@@ -219,7 +219,6 @@ public:
    double GetLastSaveTime() { return mLastSaveTime; }
    std::string GetLastSavePath() { return mCurrentSaveStatePath; }
 
-   ofxJSONElement GetUserPrefs() { return mUserPrefs; }
    UserPrefsEditor* GetUserPrefsEditor() { return mUserPrefsEditor; }
 
    const juce::String& GetTextFromClipboard() const;
@@ -321,8 +320,6 @@ private:
    float* mSaveOutputBuffer[2];
    
    IDrawableModule* mLastClickedModule;
-   
-   ofxJSONElement mUserPrefs;
    bool mInitialized;
    
    ofRectangle mDrawRect;
@@ -365,9 +362,6 @@ private:
    std::string mFatalError;
    
    double mLastClapboardTime;
-
-   float mScrollMultiplierHorizontal;
-   float mScrollMultiplierVertical;
 
    double mPixelRatio;
 

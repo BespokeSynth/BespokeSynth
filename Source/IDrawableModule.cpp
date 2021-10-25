@@ -1117,7 +1117,7 @@ void IDrawableModule::LoadState(FileStreamIn& in)
          if (control == nullptr)
             throw UnknownUIControlException();
       
-         float setValue = true;
+         bool setValue = true;
          if (VectorContains(control, ControlsToNotSetDuringLoadState()))
             setValue = false;
          control->LoadState(in, setValue);
