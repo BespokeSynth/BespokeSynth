@@ -507,31 +507,29 @@ void DrumPlayer::PlayNote(double time, int pitch, int velocity, int voiceIdx, Mo
       return;
    }
    
-   pitch %= 24;
-   if (pitch >= 0 && pitch < NUM_DRUM_HITS)
+   // Ensure all notes hit a pad
+   pitch %= NUM_DRUM_HITS;
+   if (velocity > 0)
    {
-      if (velocity > 0)
+      //reset all linked drum hits
+      int playingId = mDrumHits[pitch].mLinkId;
+      if (playingId != -1)
       {
-         //reset all linked drum hits
-         int playingId = mDrumHits[pitch].mLinkId;
-         if (playingId != -1)
+         for (int i = 0; i < NUM_DRUM_HITS; ++i)
          {
-            for (int i = 0; i < NUM_DRUM_HITS; ++i)
-            {
-               if (i != pitch && mDrumHits[i].mLinkId == playingId)
-                  mDrumHits[i].StopLinked(time);
-            }
+            if (i != pitch && mDrumHits[i].mLinkId == playingId)
+               mDrumHits[i].StopLinked(time);
          }
-
-         //play this one
-         mDrumHits[pitch].mVelocity = velocity / 127.0f;
-         mDrumHits[pitch].mPanInput = modulation.pan;
-         mDrumHits[pitch].mPitchBend = modulation.pitchBend;
-         float startOffsetPercent = mDrumHits[pitch].mStartOffset;
-         if (modulation.modWheel != nullptr)
-            startOffsetPercent += modulation.modWheel->GetValue(0);
-         mDrumHits[pitch].StartPlayhead(time, startOffsetPercent, velocity/127.0f);
       }
+
+      //play this one
+      mDrumHits[pitch].mVelocity = velocity / 127.0f;
+      mDrumHits[pitch].mPanInput = modulation.pan;
+      mDrumHits[pitch].mPitchBend = modulation.pitchBend;
+      float startOffsetPercent = mDrumHits[pitch].mStartOffset;
+      if (modulation.modWheel != nullptr)
+         startOffsetPercent += modulation.modWheel->GetValue(0);
+      mDrumHits[pitch].StartPlayhead(time, startOffsetPercent, velocity/127.0f);
    }
 }
 
