@@ -16,6 +16,7 @@ using namespace juce;
 #include "SynthGlobals.h"
 #include "Push2Control.h"  //TODO(Ryan) remove
 #include "SpaceMouseControl.h"
+#include "UserPrefs.h"
 
 #ifdef JUCE_WINDOWS
 #include <windows.h>
@@ -63,6 +64,8 @@ public:
 #ifndef BESPOKE_WINDOWS //windows crash handler is set up in ModularSynth() constructor
       SystemStats::setApplicationCrashHandler(ModularSynth::CrashHandler);
 #endif
+
+      UserPrefs.Init();
       
       int screenWidth, screenHeight;
       {
@@ -78,21 +81,14 @@ public:
          ofLog() << "pixel ratio: " << mPixelRatio << " screen width: " << screenWidth << " screen height: " << screenHeight;
       }
       
-      int width = 1700;
-      int height = 1100;
+      int width = UserPrefs.width.Get();
+      int height = UserPrefs.height.Get();
       mDesiredInitialPosition.setXY(INT_MAX, INT_MAX);
-      ofxJSONElement userPrefs;
-      bool loaded = userPrefs.open(ModularSynth::GetUserPrefsPath(false));
-      if (loaded)
-      {
-         width = userPrefs["width"].asInt();
-         height = userPrefs["height"].asInt();
-         if (!userPrefs["position_x"].isNull())
-            mDesiredInitialPosition.setXY(userPrefs["position_x"].asInt(), userPrefs["position_y"].asInt());
-      }
       
-      if (mDesiredInitialPosition.x == INT_MAX)
+      if (UserPrefs.set_manual_window_position.Get())
       {
+         mDesiredInitialPosition.setXY(UserPrefs.position_x.Get(), UserPrefs.position_y.Get());
+
          if (width + getTopLevelComponent()->getPosition().x > screenWidth)
             width = screenWidth - getTopLevelComponent()->getPosition().x;
          if (height + getTopLevelComponent()->getPosition().y + 20 > screenHeight)
@@ -211,32 +207,18 @@ public:
             ofLog() << output.toStdString();
       }*/
 
-      ofxJSONElement userPrefs;
       const std::string kAutoDevice = "auto";
       const std::string kNoneDevice = "none";
-      std::string outputDevice = kAutoDevice;
-      std::string inputDevice = kNoneDevice;
-      int sampleRate = 48000;
-      int bufferSize = 256;
-      bool loaded = userPrefs.open(ModularSynth::GetUserPrefsPath(false));
-      if (loaded)
-      {
-         if (!userPrefs["samplerate"].isNull())
-            sampleRate = userPrefs["samplerate"].asInt();
-         if (!userPrefs["buffersize"].isNull())
-            bufferSize = userPrefs["buffersize"].asInt();
-         if (!userPrefs["devicetype"].isNull() && userPrefs["devicetype"].asString() != "auto")
-            mGlobalManagers.mDeviceManager.setCurrentAudioDeviceType(userPrefs["devicetype"].asString(), true);
-         if (!userPrefs["audio_output_device"].isNull())
-            outputDevice = userPrefs["audio_output_device"].asString();
-         if (!userPrefs["audio_input_device"].isNull())
-            inputDevice = userPrefs["audio_input_device"].asString();
-      }
 
-      SetGlobalSampleRateAndBufferSize(sampleRate, bufferSize);
+      if (UserPrefs.devicetype.Get() != kAutoDevice)
+         mGlobalManagers.mDeviceManager.setCurrentAudioDeviceType(UserPrefs.devicetype.Get(), true);
+
+      SetGlobalSampleRateAndBufferSize(UserPrefs.samplerate.Get(), UserPrefs.buffersize.Get());
       
       mSynth.Setup(&mGlobalManagers.mDeviceManager, &mGlobalManagers.mAudioFormatManager, this, &openGLContext);
 
+      std::string outputDevice = UserPrefs.audio_output_device.Get();
+      std::string inputDevice = UserPrefs.audio_input_device.Get();
       if (!mGlobalManagers.mDeviceManager.getCurrentDeviceTypeObject()->hasSeparateInputsAndOutputs())
          inputDevice = outputDevice;    //asio must have identical input and output
       
@@ -328,11 +310,14 @@ public:
                               "\n\n\nvalid devices:\n" + GetAudioDevices());
       }
 
-      if (JUCEApplication::getCommandLineParameterArray().size() > 0)
+      for (int i = 0; i < JUCEApplication::getCommandLineParameterArray().size(); ++i)
       {
-         juce::String argument = JUCEApplication::getCommandLineParameterArray()[0];
+         juce::String argument = JUCEApplication::getCommandLineParameterArray()[i];
          if (argument.endsWith(".bsk"))
+         {
             mSynth.SetStartupSaveStateFile(argument.toStdString());
+            break;
+         }
       }
       
       startTimerHz(60);

@@ -26,6 +26,7 @@
 #include "VSTWindow.h"
 #include "VSTPlugin.h"
 #include "ModularSynth.h"
+#include "UserPrefs.h"
 
 #include "juce_gui_extra/juce_gui_extra.h"
 
@@ -104,10 +105,7 @@ VSTWindow::~VSTWindow()
 void VSTWindow::ShowWindow()
 {
 #if !BESPOKE_LINUX
-   bool alwaysOnTop = true;
-   if (!TheSynth->GetUserPrefs()["vst_always_on_top"].isNull())
-      alwaysOnTop = TheSynth->GetUserPrefs()["vst_always_on_top"].asBool();
-   setAlwaysOnTop(alwaysOnTop);
+   setAlwaysOnTop(UserPrefs.vst_always_on_top.Get());
 #endif
    toFront(true);
 }

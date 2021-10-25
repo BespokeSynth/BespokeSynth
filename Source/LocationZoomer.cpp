@@ -26,6 +26,7 @@
 #include "LocationZoomer.h"
 #include "SynthGlobals.h"
 #include "ModularSynth.h"
+#include "UserPrefs.h"
 
 #include "juce_core/juce_core.h"
 
@@ -38,7 +39,7 @@ LocationZoomer::LocationZoomer()
 
 void LocationZoomer::Init()
 {
-   mHome.mZoomLevel = TheSynth->GetUserPrefs()["zoom"].isNull() ? 1 : TheSynth->GetUserPrefs()["zoom"].asDouble();
+   mHome.mZoomLevel = UserPrefs.zoom.Get();
    mHome.mOffset.set(0,0);
    mStart = mHome;
    mDestination = mHome;
@@ -160,7 +161,7 @@ void LocationZoomer::PickNewVanityPanningDestination()
    
    ofVec2f center = allModulesCenter * .5f + randomModulesCenter * .5f;
    
-   float newScale = ofRandom(1, 1.5f) * (TheSynth->GetUserPrefs()["zoom"].isNull() ? 1 : TheSynth->GetUserPrefs()["zoom"].asDouble());
+   float newScale = ofRandom(1, 1.5f) * UserPrefs.zoom.Get();
    
    mStart.mZoomLevel = gDrawScale;
    mStart.mOffset = TheSynth->GetDrawOffset();

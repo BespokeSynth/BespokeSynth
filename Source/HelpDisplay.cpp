@@ -29,6 +29,7 @@
 #include "ModularSynth.h"
 #include "TitleBar.h"
 #include "EffectChain.h"
+#include "UserPrefs.h"
 
 #include "juce_gui_basics/juce_gui_basics.h"
 #include "juce_opengl/juce_opengl.h"
@@ -45,7 +46,7 @@ HelpDisplay::HelpDisplay()
 {
    LoadHelp();
 
-   sShowTooltips = TheSynth->GetUserPrefs()["show_tooltips_on_load"].isNull() ? true : (TheSynth->GetUserPrefs()["show_tooltips_on_load"].asInt() > 0);
+   sShowTooltips = UserPrefs.show_tooltips_on_load.Get();
    LoadTooltips();
 }
 
@@ -176,18 +177,12 @@ void HelpDisplay::CheckboxUpdated(Checkbox* checkbox)
 
 void HelpDisplay::LoadTooltips()
 {
-   std::string tooltipsPath;
-   if (TheSynth->GetUserPrefs()["tooltips"].isNull() || !juce::File(ofToResourcePath(TheSynth->GetUserPrefs()["tooltips"].asString())).existsAsFile())
-      tooltipsPath = ofToResourcePath("tooltips_eng.txt");
-   else
-      tooltipsPath = ofToResourcePath(TheSynth->GetUserPrefs()["tooltips"].asString());
-
    sTooltips.clear();
 
    ModuleTooltipInfo moduleInfo;
    UIControlTooltipInfo controlInfo;
 
-   juce::File tooltipsFile(tooltipsPath);
+   juce::File tooltipsFile(ofToResourcePath(UserPrefs.tooltips.Get()));
    if (tooltipsFile.existsAsFile())
    {
       juce::StringArray lines;

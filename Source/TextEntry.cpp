@@ -685,6 +685,9 @@ void TextEntry::LoadState(FileStreamIn& in, bool shouldSetValue)
    
    std::string var;
    in >> var;
-   StringCopy(mString, var.c_str(), MAX_TEXTENTRY_LENGTH);
-   AcceptEntry(false);
+   if (shouldSetValue)
+   {
+      StringCopy(mString, var.c_str(), MAX_TEXTENTRY_LENGTH);
+      AcceptEntry(false);
+   }
 }

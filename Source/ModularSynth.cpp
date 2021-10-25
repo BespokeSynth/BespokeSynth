@@ -36,6 +36,7 @@
 #include "Canvas.h"
 #include "EffectChain.h"
 #include "ClickButton.h"
+#include "UserPrefs.h"
 
 #if BESPOKE_WINDOWS
 #include <windows.h>
@@ -93,8 +94,6 @@ ModularSynth::ModularSynth()
 , mFrameCount(0)
 , mIsLoadingModule(false)
 , mLastClapboardTime(-9999)
-, mScrollMultiplierHorizontal(1)
-, mScrollMultiplierVertical(1)
 , mPixelRatio(1)
 {
    mConsoleText[0] = 0;
@@ -243,34 +242,12 @@ void ModularSynth::Setup(juce::AudioDeviceManager* globalAudioDeviceManager, juc
    mGlobalAudioFormatManager = globalAudioFormatManager;
    mMainComponent = mainComponent;
    mOpenGLContext = openGLContext;
-   int recordBufferLengthMinutes = 30;
    
-   bool loaded = mUserPrefs.open(GetUserPrefsPath(false));
-   if (loaded)
-   {
-      sShouldAutosave = mUserPrefs["autosave"].isNull() ? false : (mUserPrefs["autosave"].asInt() > 0);
-
-      if (!mUserPrefs["scroll_multiplier_horizontal"].isNull())
-         mScrollMultiplierHorizontal = mUserPrefs["scroll_multiplier_horizontal"].asDouble();
-      if (!mUserPrefs["scroll_multiplier_vertical"].isNull())
-         mScrollMultiplierVertical = mUserPrefs["scroll_multiplier_vertical"].asDouble();
-
-      if (!mUserPrefs["record_buffer_length_minutes"].isNull())
-         recordBufferLengthMinutes = mUserPrefs["record_buffer_length_minutes"].asDouble();
-   }
-   /*else
-   {
-      mFatalError = "couldn't find or load data/"+GetUserPrefsPath(true);
-#if BESPOKE_MAC
-      if (!juce::File(GetUserPrefsPath(false)).existsAsFile())
-         mFatalError += "\nplease install to /Applications/BespokeSynth or launch via run_bespoke.command";
-#endif
-      LogEvent("couldn't find or load userprefs.json", kLogEventType_Error);
-   }*/
+   sShouldAutosave = UserPrefs.autosave.Get();
 
    mIOBufferSize = gBufferSize;
    
-   mGlobalRecordBuffer = new RollingBuffer(recordBufferLengthMinutes * 60 * gSampleRate);
+   mGlobalRecordBuffer = new RollingBuffer(UserPrefs.record_buffer_length_minutes.Get() * 60 * gSampleRate);
    mGlobalRecordBuffer->SetNumChannels(2);
    mSaveOutputBuffer[0] = new float[mGlobalRecordBuffer->Size()];
    mSaveOutputBuffer[1] = new float[mGlobalRecordBuffer->Size()];
@@ -321,22 +298,21 @@ void ModularSynth::InitIOBuffers(int inputChannelCount, int outputChannelCount)
 }
 
 
-std::string ModularSynth::GetUserPrefsPath(bool relative)
+std::string ModularSynth::GetUserPrefsPath()
 {
    std::string filename = "userprefs.json";
-   if (JUCEApplication::getCommandLineParameterArray().size() > 0)
+   for (int i=0; i < JUCEApplication::getCommandLineParameterArray().size(); ++i)
    {
-      juce::String specified = JUCEApplication::getCommandLineParameterArray()[0];
+      juce::String specified = JUCEApplication::getCommandLineParameterArray()[i];
       if (specified.endsWith(".json"))
       {
          filename = specified.toStdString();
          if (!juce::File(ofToDataPath(filename)).existsAsFile())
              TheSynth->SetFatalError("couldn't find command-line-specified userprefs file at " + ofToDataPath(filename));
+         break;
       }
    }
    
-   if (relative)
-      return filename;
    return ofToDataPath(filename);
 }
 
@@ -344,23 +320,19 @@ static int sFrameCount = 0;
 void ModularSynth::Poll()
 {
    if (mFatalError == "")
-   {
-      std::string defaultLayout = "layouts/blank.json";
-      if (!mUserPrefs["layout"].isNull())
-         defaultLayout = mUserPrefs["layout"].asString();
-      
+   {  
       if (!mInitialized && sFrameCount > 3) //let some frames render before blocking for a load
       {
          if(!mStartupSaveStateFile.empty())
             LoadState(mStartupSaveStateFile);
          else
-            LoadLayoutFromFile(ofToDataPath(defaultLayout));
+            LoadLayoutFromFile(ofToDataPath(UserPrefs.layout.Get()));
          mInitialized = true;
       }
 
       if (mWantReloadInitialLayout)
       {
-         LoadLayoutFromFile(ofToDataPath(defaultLayout));
+         LoadLayoutFromFile(ofToDataPath(UserPrefs.layout.Get()));
          mWantReloadInitialLayout = false;
       }
    }
@@ -1416,8 +1388,8 @@ void ModularSynth::MousePressed(int intX, int intY, int button)
 
 void ModularSynth::MouseScrolled(float x, float y, bool canZoomCanvas)
 {
-   x *= mScrollMultiplierHorizontal;
-   y *= mScrollMultiplierVertical;
+   x *= UserPrefs.scroll_multiplier_horizontal.Get();
+   y *= UserPrefs.scroll_multiplier_vertical.Get();
 
    if (IsKeyHeld(' ') || (GetModuleAtCursor() == nullptr && gHoveredUIControl == nullptr))
    {
@@ -1924,7 +1896,7 @@ void ModularSynth::ResetLayout()
    titleBar->Init();
    mUILayerModuleContainer.AddModule(titleBar);
 
-   if (!GetUserPrefs()["show_minimap"].isNull() && GetUserPrefs()["show_minimap"].asBool()) 
+   if (UserPrefs.show_minimap.Get()) 
    {
       mMinimap = std::make_unique<Minimap>();
       mMinimap->SetName("minimap");
@@ -1966,10 +1938,7 @@ void ModularSynth::ResetLayout()
    
    GetDrawOffset().set(0,0);
    
-   float uiScale = 1;
-   if (!mUserPrefs["ui_scale"].isNull())
-      uiScale = mUserPrefs["ui_scale"].asDouble();
-   SetUIScale(uiScale);
+   SetUIScale(UserPrefs.ui_scale.Get());
 }
 
 bool ModularSynth::LoadLayoutFromFile(std::string jsonFile, bool makeDefaultLayout /*= true*/)
@@ -2066,8 +2035,8 @@ void ModularSynth::LoadLayout(ofxJSONElement json)
 
 void ModularSynth::UpdateUserPrefsLayout()
 {
-   //mUserPrefs["layout"] = mLoadedLayoutPath;
-   //mUserPrefs.save(GetUserPrefsPath(), true);
+   //mUserPrefsFile["layout"] = mLoadedLayoutPath;
+   //mUserPrefsFile.save(GetUserPrefsPath(), true);
 }
 
 void ModularSynth::AddExtraPoller(IPollable* poller)
@@ -2821,10 +2790,6 @@ void ModularSynth::ReconnectMidiDevices()
 void ModularSynth::SaveOutput()
 {
    ScopedMutex mutex(&mAudioThreadMutex, "SaveOutput()");
-
-   std::string recordingsPath = "recordings/";
-   if (!mUserPrefs["recordings_path"].isNull())
-      recordingsPath = mUserPrefs["recordings_path"].asString();
    
    std::string save_prefix = "recording_";
    if (!mCurrentSaveStatePath.empty())
@@ -2834,7 +2799,7 @@ void ModularSynth::SaveOutput()
        save_prefix = filename + "_";
    }
 
-   std::string filename = ofGetTimestampString(recordingsPath + save_prefix + "%Y-%m-%d_%H-%M.wav");
+   std::string filename = ofGetTimestampString(UserPrefs.recordings_path.Get() + save_prefix + "%Y-%m-%d_%H-%M.wav");
    //string filenamePos = ofGetTimestampString("recordings/pos_%Y-%m-%d_%H-%M.wav");
 
    assert(mRecordingLength <= mGlobalRecordBuffer->Size());
