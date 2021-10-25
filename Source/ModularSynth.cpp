@@ -1229,9 +1229,31 @@ void ModularSynth::MouseDragged(int intX, int intY, int button)
       
       mHasDuplicatedDuringDrag = true;
    }
-   
-   for (auto module : mGroupSelectedModules)
-      module->Move(drag.x, drag.y);
+
+   if (mGroupSelectContext != nullptr)
+   {
+      float x = GetMouseX(mGroupSelectContext);
+      float y = GetMouseY(mGroupSelectContext);
+      ofRectangle rect = ofRectangle(ofPoint(MIN(mClickStartX, x), MIN(mClickStartY, y)), ofPoint(MAX(mClickStartX, x), MAX(mClickStartY, y)));
+      if (rect.width > 10 || rect.height > 10)
+      {
+         mGroupSelectContext->GetModulesWithinRect(rect, mGroupSelectedModules);
+         if (mGroupSelectedModules.size() > 0)
+         {
+            for (int i = (int)mGroupSelectedModules.size() - 1; i >= 0; --i) //do this backwards to preserve existing order
+               MoveToFront(mGroupSelectedModules[i]);
+         }
+      }
+      else
+      {
+         mGroupSelectedModules.clear();
+      }
+   }
+   else
+   {
+      for (auto module : mGroupSelectedModules)
+         module->Move(drag.x, drag.y);
+   }
 
    if (mMoveModule)
    {
@@ -1631,28 +1653,18 @@ void ModularSynth::MouseReleased(int intX, int intY, int button)
       }
       ClearHeldSample();
    }
-   
-   if (mGroupSelectContext != nullptr)
+
+   if (!mGroupSelectedModules.empty())
    {
-      ofRectangle rect = ofRectangle(ofPoint(MIN(mClickStartX, x), MIN(mClickStartY, y)), ofPoint(MAX(mClickStartX, x), MAX(mClickStartY, y)));
-      if (rect.width > 10 || rect.height > 10)
-      {
-         mGroupSelectContext->GetModulesWithinRect(rect, mGroupSelectedModules);
-         if (mGroupSelectedModules.size() > 0)
-         {
-            for (int i = (int)mGroupSelectedModules.size() - 1; i >= 0; --i) //do this backwards to preserve existing order
-               MoveToFront(mGroupSelectedModules[i]);
-         }
-      }
-      else
-      {
+      ofVec2f dragStart(mClickStartX, mClickStartY);
+      ofVec2f dragRelease(GetMouseX(&mModuleContainer), GetMouseY(&mModuleContainer));
+      if ((dragRelease - dragStart).distanceSquared() < 3 * 3)
          mGroupSelectedModules.clear();
-      }
-      mGroupSelectContext = nullptr;
    }
-   
+
    mClickStartX = INT_MAX;
    mClickStartY = INT_MAX;
+   mGroupSelectContext = nullptr;
 }
 
 void ModularSynth::AudioOut(float** output, int bufferSize, int nChannels)

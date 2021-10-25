@@ -346,13 +346,13 @@ void IDrawableModule::DrawFrame(float w, float h, bool drawModule, float& titleB
       ofSetColor(color * (1 - GetBeaconAmount()) + ofColor::yellow * GetBeaconAmount(), gModuleDrawAlpha);
       DrawTextBold(GetTitleLabel(), 5 + enableToggleOffset, 10 - titleBarHeight, 16);
    }
-   
-   if (Enabled() && mShouldDrawOutline)
+
+   bool groupSelected = !TheSynth->GetGroupSelectedModules().empty() && VectorContains(this, TheSynth->GetGroupSelectedModules());
+   if ((Enabled() || groupSelected) && mShouldDrawOutline)
    {
       ofPushStyle();
       ofNoFill();
 
-      bool groupSelected = !TheSynth->GetGroupSelectedModules().empty() && VectorContains(this, TheSynth->GetGroupSelectedModules());
       if (groupSelected)
       {
          float pulse = ofMap(sin(gTime / 500 * PI * 2), -1, 1, .2f, 1);
