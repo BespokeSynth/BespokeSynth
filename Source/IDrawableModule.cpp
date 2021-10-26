@@ -56,7 +56,7 @@ float IDrawableModule::sBrightness = 220;
 IDrawableModule::IDrawableModule()
 : mModuleType(kModuleType_Unknown)
 , mMinimized(false)
-, mMinimizeAreaClicked(false)
+, mWasMinimizeAreaClicked(false)
 , mMinimizeAnimation(0)
 , mEnabled(true)
 , mEnabledCheckbox(nullptr)
@@ -622,9 +622,9 @@ void IDrawableModule::OnClicked(int x, int y, bool right)
       {
          //"enabled" area
       }
-      else if (x < GetMinimizedWidth())
+      else if (x < GetMinimizedWidth() && CanMinimize())
       {
-         mMinimizeAreaClicked = true;
+         mWasMinimizeAreaClicked = true;
          return;
       }
       else if (!Minimized() && IsSaveable() &&
@@ -684,10 +684,7 @@ bool IDrawableModule::MouseMoved(float x, float y)
 
 void IDrawableModule::MouseReleased()
 {
-   if (CanMinimize() && mMinimizeAreaClicked &&
-       TheSynth->HasNotMovedMouseSinceClick())
-      ToggleMinimized();
-   mMinimizeAreaClicked = false;
+   mWasMinimizeAreaClicked = false;
    for (int i=0; i<mUIControls.size(); ++i)
       mUIControls[i]->MouseReleased();
    for (int i=0; i<mChildren.size(); ++i)

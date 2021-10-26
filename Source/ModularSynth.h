@@ -25,6 +25,7 @@ namespace juce {
    class Component;
    class OpenGLContext;
    class String;
+   class MouseInputSource;
 }
 
 class IAudioSource;
@@ -77,12 +78,12 @@ public:
 
    void KeyPressed(int key, bool isRepeat);
    void KeyReleased(int key);
-   void MouseMoved(int x, int y );
-   void MouseDragged(int x, int y, int button);
-   void MousePressed(int x, int y, int button);
-   void MouseReleased(int x, int y, int button);
+   void MouseMoved(int x, int y);
+   void MouseDragged(int x, int y, int button, const juce::MouseInputSource& source);
+   void MousePressed(int x, int y, int button, const juce::MouseInputSource& source);
+   void MouseReleased(int x, int y, int button, const juce::MouseInputSource& source);
    void MouseScrolled(float x, float y, bool canZoomCanvas);
-   void MouseMagnify(int x, int y, float scaleFactor);
+   void MouseMagnify(int x, int y, float scaleFactor, const juce::MouseInputSource& source);
    void FilesDropped(std::vector<std::string> files, int x, int y);
    
    void AddExtraPoller(IPollable* poller);
@@ -165,8 +166,7 @@ public:
    
    void SetGroupSelectContext(ModuleContainer* context) { mGroupSelectContext = context; }
    bool IsGroupSelecting() const { return mGroupSelectContext != nullptr; }
-   
-   bool HasNotMovedMouseSinceClick() { return mClickStartX < INT_MAX; }
+
    IDrawableModule* GetMoveModule() { return mMoveModule; }
    ModuleFactory* GetModuleFactory() { return &mModuleFactory; }
    juce::AudioDeviceManager &GetAudioDeviceManager() { return *mGlobalAudioDeviceManager; }

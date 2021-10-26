@@ -1008,19 +1008,19 @@ bool ModularSynth::IsMouseButtonHeld(int button)
    return false;
 }
 
-void ModularSynth::MouseMoved(int intX, int intY )
+void ModularSynth::MouseMoved(int intX, int intY)
 {
    bool changed = (mMousePos.x != intX || mMousePos.y != intY);
 
    mMousePos.x = intX;
    mMousePos.y = intY;
-   
+
    if (IsKeyHeld(' ') || mIsMousePanning)
    {
       GetDrawOffset() += (ofVec2f(intX,intY) - mLastMoveMouseScreenPos) / gDrawScale;
       mZoomer.CancelMovement();
    }
-   
+
    mLastMoveMouseScreenPos = ofVec2f(intX,intY);
 
    if (changed)
@@ -1037,11 +1037,11 @@ void ModularSynth::MouseMoved(int intX, int intY )
    {
       float x = GetMouseX(&mModuleContainer);
       float y = GetMouseY(&mModuleContainer);
-      
+
       float oldX, oldY;
       mMoveModule->GetPosition(oldX, oldY);
       mMoveModule->Move(x + mMoveModuleOffsetX - oldX, y + mMoveModuleOffsetY - oldY);
-      
+
       if (GetKeyModifiers() == kModifier_Shift)
       {
          for (auto* module : mModuleContainer.GetModules())
@@ -1055,7 +1055,7 @@ void ModularSynth::MouseMoved(int intX, int intY )
                   patchCableSource->FindValidTargets();
                   if (!patchCableSource->IsValidTarget(mMoveModule))
                      continue;
-                  
+
                   if (patchCableSource->GetPatchCables().size() == 0)
                   {
                      PatchCableSource::sAllowInsert = false;
@@ -1078,7 +1078,7 @@ void ModularSynth::MouseMoved(int intX, int intY )
                   }
                }
             }
-            
+
             if (!mHasAutopatchedToTargetDuringDrag)
             {
                for (auto* patchCableSource : mMoveModule->GetPatchCableSources())
@@ -1107,7 +1107,7 @@ void ModularSynth::MouseMoved(int intX, int intY )
       {
          mHasAutopatchedToTargetDuringDrag = false;
       }
-      
+
       return;
    }
 
@@ -1116,19 +1116,19 @@ void ModularSynth::MouseMoved(int intX, int intY )
       float x = GetMouseX(&mModuleContainer);
       float y = GetMouseY(&mModuleContainer);
       mModuleContainer.MouseMoved(x, y);
-      
+
       x = GetMouseX(&mUILayerModuleContainer);
       y = GetMouseY(&mUILayerModuleContainer);
       mUILayerModuleContainer.MouseMoved(x, y);
    }
-   
+
    if (gHoveredUIControl && changed)
-   {  
+   {
       if (!gHoveredUIControl->IsMouseDown())
       {
          float x = GetMouseX(gHoveredUIControl->GetModuleParent()->GetOwningContainer());
          float y = GetMouseY(gHoveredUIControl->GetModuleParent()->GetOwningContainer());
-         
+
          float uiX, uiY;
          gHoveredUIControl->GetPosition(uiX, uiY);
          float w, h;
@@ -1137,37 +1137,31 @@ void ModularSynth::MouseMoved(int intX, int intY )
             gHoveredUIControl = nullptr;
       }
    }
-   
+
    gHoveredModule = GetModuleAtCursor();
 }
 
-void ModularSynth::MouseDragged(int intX, int intY, int button)
+void ModularSynth::MouseDragged(int intX, int intY, int button, const juce::MouseInputSource& source)
 {
    mMousePos.x = intX;
    mMousePos.y = intY;
-   
+
    float x = GetMouseX(&mModuleContainer);
    float y = GetMouseY(&mModuleContainer);
-   
+
    ofVec2f drag = ofVec2f(x,y) - mLastMouseDragPos;
    mLastMouseDragPos = ofVec2f(x,y);
 
    if (button == 3)
       return;
 
-   if (GetMoveModule() && (abs(mClickStartX-x) >= 1 || abs(mClickStartY-y) >= 1))
-   {
-      mClickStartX = INT_MAX;  //moved enough from click spot to reset
-      mClickStartY = INT_MAX;
-   }
-   
    for (auto* modal : mModalFocusItemStack)
    {
       float x = GetMouseX(modal->GetOwningContainer());
       float y = GetMouseY(modal->GetOwningContainer());
       modal->NotifyMouseMoved(x, y);
    }
-   
+
    if (GetKeyModifiers() == kModifier_Alt && !mHasDuplicatedDuringDrag)
    {
       std::vector<IDrawableModule*> newGroupSelectedModules;
@@ -1195,10 +1189,10 @@ void ModularSynth::MouseDragged(int intX, int intY, int button)
          }
       }
       mGroupSelectedModules = newGroupSelectedModules;
-      
+
       if (mMoveModule && !mMoveModule->IsSingleton())
          mMoveModule = DuplicateModule(mMoveModule);
-      
+
       mHasDuplicatedDuringDrag = true;
    }
 
@@ -1232,7 +1226,7 @@ void ModularSynth::MouseDragged(int intX, int intY, int button)
       mMoveModule->Move(drag.x, drag.y);
       return;
    }
-   
+
    if (mResizeModule)
    {
       float moduleX, moduleY;
@@ -1246,27 +1240,27 @@ void ModularSynth::MouseDragged(int intX, int intY, int button)
    }
 
    mModuleContainer.MouseMoved(x, y);
-   
+
    x = GetMouseX(&mUILayerModuleContainer);
    y = GetMouseY(&mUILayerModuleContainer);
    mUILayerModuleContainer.MouseMoved(x, y);
 }
 
-void ModularSynth::MousePressed(int intX, int intY, int button)
+void ModularSynth::MousePressed(int intX, int intY, int button, const juce::MouseInputSource& source)
 {
    bool rightButton = button == 2;
 
    mZoomer.ExitVanityPanningMode();
-   
+
    mMousePos.x = intX;
    mMousePos.y = intY;
 
    if (button >= 0 && button < (int)mIsMouseButtonHeld.size())
       mIsMouseButtonHeld[button] = true;
-   
+
    float x = GetMouseX(&mModuleContainer);
    float y = GetMouseY(&mModuleContainer);
-   
+
    if (button == 3)
    {
       mClickStartX = x;
@@ -1282,9 +1276,15 @@ void ModularSynth::MousePressed(int intX, int intY, int button)
       return;
    }
 
+   if (mMoveModule)
+   {
+      mMoveModule = nullptr;
+      return;
+   }
+
    mLastMouseDragPos = ofVec2f(x,y);
    mGroupSelectContext = nullptr;
-   
+
    IKeyboardFocusListener::sKeyboardFocusBeforeClick = IKeyboardFocusListener::GetActiveKeyboardFocus();
    IKeyboardFocusListener::ClearActiveKeyboardFocus(K(notifyListeners));
 
@@ -1303,7 +1303,7 @@ void ModularSynth::MousePressed(int intX, int intY, int button)
             slider->GetPosition(uiX, uiY);
             float w, h;
             slider->GetDimensions(w, h);
-            
+
             if (x < uiX || y < uiY || x > uiX + w || y > uiY + h)
                PopModalFocusItem();
          }
@@ -1326,9 +1326,9 @@ void ModularSynth::MousePressed(int intX, int intY, int button)
          gBindToUIControl = gHoveredUIControl;
       return;
    }
-   
+
    IDrawableModule* clicked = GetModuleAtCursor();
-   
+
    for (auto cable : mPatchCables)
    {
       if (clicked &&
@@ -1339,7 +1339,7 @@ void ModularSynth::MousePressed(int intX, int intY, int button)
       if (cable->TestClick(x,y,rightButton))
          return;
    }
-   
+
    mClickStartX = x;
    mClickStartY = y;
    if (clicked == nullptr)
@@ -1368,7 +1368,7 @@ void ModularSynth::MousePressed(int intX, int intY, int button)
    else
       mLastClickedModule = nullptr;
    mHasDuplicatedDuringDrag = false;
-   
+
    if (mGroupSelectedModules.empty() == false)
    {
       if (!VectorContains(clicked, mGroupSelectedModules))
@@ -1419,9 +1419,9 @@ void ModularSynth::MouseScrolled(float x, float y, bool canZoomCanvas)
 
       if (clickButton)
          return;
-         
+
       float change = y/100 * movementScale;
-         
+
       if (floatSlider && floatSlider->GetModulator() && floatSlider->GetModulator()->Active() && floatSlider->GetModulator()->CanAdjustRange())
       {
          IModulator* modulator = floatSlider->GetModulator();
@@ -1429,13 +1429,13 @@ void ModularSynth::MouseScrolled(float x, float y, bool canZoomCanvas)
          float max = floatSlider->GetMax();
          float modMin = ofMap(modulator->GetMin(),min,max,0,1);
          float modMax = ofMap(modulator->GetMax(),min,max,0,1);
-            
+
          modulator->GetMin() = ofMap(modMin - change,0,1,min,max,K(clamp));
          modulator->GetMax() = ofMap(modMax + change,0,1,min,max,K(clamp));
-            
+
          return;
       }
-         
+
       if (gHoveredUIControl->InvertScrollDirection())
          val -= change;
       else
@@ -1453,7 +1453,7 @@ void ModularSynth::MouseScrolled(float x, float y, bool canZoomCanvas)
    }
 }
 
-void ModularSynth::MouseMagnify(int intX, int intY, float scaleFactor)
+void ModularSynth::MouseMagnify(int intX, int intY, float scaleFactor, const juce::MouseInputSource& source)
 {
    mMousePos.x = intX;
    mMousePos.y = intY;
@@ -1510,7 +1510,7 @@ IDrawableModule* ModularSynth::GetModuleAtCursor(int offsetX /*=0*/, int offsetY
    IDrawableModule* uiLayerModule = mUILayerModuleContainer.GetModuleAt(x, y);
    if (uiLayerModule)
       return uiLayerModule;
-   
+
    x = GetMouseX(&mModuleContainer) + offsetX;
    y = GetMouseY(&mModuleContainer) + offsetY;
    return mModuleContainer.GetModuleAt(x, y);
@@ -1520,25 +1520,25 @@ void ModularSynth::CheckClick(IDrawableModule* clickedModule, int x, int y, bool
 {
    if (clickedModule != TheTitleBar)
       MoveToFront(clickedModule);
-   
+
    //check to see if we clicked in the move area
    float moduleX, moduleY;
    clickedModule->GetPosition(moduleX, moduleY);
    int modulePosX = x - moduleX;
    int modulePosY = y - moduleY;
-   
+
    if (modulePosY < 0 && clickedModule != TheTitleBar && (!clickedModule->HasEnableCheckbox() || modulePosX > 20))
    {
       mMoveModule = clickedModule;
       mMoveModuleOffsetX = moduleX - x;
       mMoveModuleOffsetY = moduleY - y;
    }
-   
+
    float parentX = 0;
    float parentY = 0;
    if (clickedModule->GetParent())
       clickedModule->GetParent()->GetPosition(parentX, parentY);
-   
+
    //do the regular click
    clickedModule->TestClick(x - parentX,y - parentY,rightButton);
 }
@@ -1553,11 +1553,11 @@ void ModularSynth::OnModuleDeleted(IDrawableModule* module)
 {
    if (!module->CanBeDeleted() || module->IsDeleted())
       return;
-   
+
    mDeletedModules.push_back(module);
-   
+
    mAudioThreadMutex.Lock("delete");
-   
+
    std::list<PatchCable*> cablesToRemove;
    for (auto* cable : mPatchCables)
    {
@@ -1566,21 +1566,21 @@ void ModularSynth::OnModuleDeleted(IDrawableModule* module)
    }
    for (auto* cable : cablesToRemove)
       RemoveFromVector(cable, mPatchCables);
-   
+
    RemoveFromVector(dynamic_cast<IAudioSource*>(module),mSources);
    RemoveFromVector(module,mLissajousDrawers);
    TheTransport->RemoveAudioPoller(dynamic_cast<IAudioPoller*>(module));
    //delete module; TODO(Ryan) deleting is hard... need to clear out everything with a reference to this, or switch to smart pointers
-   
+
    if (module == TheChaosEngine)
       TheChaosEngine = nullptr;
    if (module == TheLFOController)
       TheLFOController = nullptr;
-   
+
    mAudioThreadMutex.Unlock();
 }
 
-void ModularSynth::MouseReleased(int intX, int intY, int button)
+void ModularSynth::MouseReleased(int intX, int intY, int button, const juce::MouseInputSource& source)
 {
    mMousePos.x = intX;
    mMousePos.y = intY;
@@ -1604,15 +1604,24 @@ void ModularSynth::MouseReleased(int intX, int intY, int button)
    if (mResizeModule)
       mResizeModule = nullptr;
 
-   mModuleContainer.MouseReleased();
-   mUILayerModuleContainer.MouseReleased();
-
    if (mMoveModule)
    {
-      float moduleX, moduleY;
-      mMoveModule->GetPosition(moduleX, moduleY);
-      mMoveModule = nullptr;
+      if (!source.hasMovedSignificantlySincePressed())
+      {
+         if (mMoveModule->WasMinimizeAreaClicked())
+         {
+            mMoveModule->ToggleMinimized();
+            mMoveModule = nullptr;
+         }
+      }
+      else
+      {
+         mMoveModule = nullptr;
+      }
    }
+
+   mModuleContainer.MouseReleased();
+   mUILayerModuleContainer.MouseReleased();
    
    if (mHeldSample)
    {
@@ -1626,13 +1635,8 @@ void ModularSynth::MouseReleased(int intX, int intY, int button)
       ClearHeldSample();
    }
 
-   if (!mGroupSelectedModules.empty())
-   {
-      ofVec2f dragStart(mClickStartX, mClickStartY);
-      ofVec2f dragRelease(GetMouseX(&mModuleContainer), GetMouseY(&mModuleContainer));
-      if ((dragRelease - dragStart).distanceSquared() < 3 * 3)
-         mGroupSelectedModules.clear();
-   }
+   if (!mGroupSelectedModules.empty() && !source.hasMovedSignificantlySincePressed())
+      mGroupSelectedModules.clear();
 
    mClickStartX = INT_MAX;
    mClickStartY = INT_MAX;
@@ -2582,7 +2586,7 @@ void ModularSynth::OnConsoleInput()
       else
       {
          ofLog() << "Creating: " << mConsoleText;
-         ofVec2f grabOffset(-40,20);
+         ofVec2f grabOffset(-40,10);
          IDrawableModule* module = SpawnModuleOnTheFly(mConsoleText, GetMouseX(&mModuleContainer) + grabOffset.x, GetMouseY(&mModuleContainer) + grabOffset.y);
          TheSynth->SetMoveModule(module, grabOffset.x, grabOffset.y);
       }

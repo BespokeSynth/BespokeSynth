@@ -95,6 +95,7 @@ public:
    virtual void Exit();
    bool IsInitialized() const { return mInitialized; }
    bool Minimized() const { return mMinimizeAnimation > 0; }
+   bool WasMinimizeAreaClicked() const { return mWasMinimizeAreaClicked; }
    virtual void MouseReleased() override;
    virtual void FilesDropped(std::vector<std::string> files, int x, int y) {}
    virtual std::string GetTitleLabel() const { return Name(); }
@@ -200,7 +201,7 @@ private:
    ModuleContainer* mOwningContainer;
 
    bool mMinimized;
-   bool mMinimizeAreaClicked;
+   bool mWasMinimizeAreaClicked;
    float mMinimizeAnimation;
    bool mUIControlsCreated;
    bool mInitialized;
