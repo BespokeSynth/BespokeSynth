@@ -416,17 +416,17 @@ private:
 
    void mouseDown(const MouseEvent& e) override
    {
-      mSynth.MousePressed(e.getMouseDownX(), e.getMouseDownY(), GetMouseButton(e));
+      mSynth.MousePressed(e.getMouseDownX(), e.getMouseDownY(), GetMouseButton(e), e.source);
    }
    
    void mouseUp(const MouseEvent& e) override
    {
-      mSynth.MouseReleased(e.getPosition().x, e.getPosition().y, GetMouseButton(e));
+      mSynth.MouseReleased(e.getPosition().x, e.getPosition().y, GetMouseButton(e), e.source);
    }
    
    void mouseDrag(const MouseEvent& e) override
    {
-      mSynth.MouseDragged(e.getPosition().x, e.getPosition().y, GetMouseButton(e));
+      mSynth.MouseDragged(e.getPosition().x, e.getPosition().y, GetMouseButton(e), e.source);
    }
    
    void mouseMove(const MouseEvent& e) override
@@ -451,7 +451,7 @@ private:
    
    void mouseMagnify(const MouseEvent& e, float scaleFactor) override
    {
-      mSynth.MouseMagnify(e.getPosition().x, e.getPosition().y, scaleFactor);
+      mSynth.MouseMagnify(e.getPosition().x, e.getPosition().y, scaleFactor, e.source);
    }
    
    bool keyPressed(const KeyPress& key) override
