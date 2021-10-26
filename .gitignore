@@ -396,6 +396,7 @@ bespoke_windows_installer/Bespoke-Windows.wixpdb
 
 cmake-build*
 ignore/*
+instrumentscli0.trace/*
 
 run_cmake.bat
 run_cmake.sh
