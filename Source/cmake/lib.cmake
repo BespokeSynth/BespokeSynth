@@ -1,3 +1,14 @@
+# Install resource directory to the output directory or bundle
+function(bespoke_copy_resource_dir TARGET)
+    add_custom_command(TARGET ${TARGET} POST_BUILD
+        COMMAND ${CMAKE_COMMAND} -P "${CMAKE_CURRENT_LIST_DIR}/cmake/install-quiet.cmake"
+        "${CMAKE_SOURCE_DIR}/resource"
+        "$<TARGET_FILE_DIR:${TARGET}>$<$<BOOL:${APPLE}>:/../Resources>"
+        QUIET
+        VERBATIM
+        )
+endfunction()
+
 # Install dependencies to the output directory and fix up binaries
 function(bespoke_make_portable TARGET)
     if(NOT BESPOKE_PORTABLE)
