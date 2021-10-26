@@ -95,7 +95,8 @@ jobs:
               libxcursor1 \
               libxcb-cursor-dev \
               libxcb-cursor0 \
-              libusb-1.0.0-dev
+              libusb-1.0.0-dev \
+              patchelf
 
         condition: variables.isLinux
         displayName: linux - run apt-get

@@ -73,7 +73,13 @@ ofColor ScriptModule::sBackgroundTextColor = ofColor::white;
 //static
 bool ScriptModule::sPythonInitialized = false;
 //static
-bool ScriptModule::sHasPythonEverSuccessfullyInitialized = false;
+bool ScriptModule::sHasPythonEverSuccessfullyInitialized =
+#ifdef BESPOKE_PORTABLE_PYTHON
+true;
+#else
+false;
+#endif
+
 //static
 ofxJSONElement ScriptModule::sStyleJSON;
 
@@ -142,12 +148,27 @@ void ScriptModule::UninitializePython()
    sPythonInitialized = false;
 }
 
+namespace
+{
+   // Py_SetPythonHome()'s signature varies depending on Python version. This converts to the string type we need.
+   std::string toPythonHome(const std::string &s, void (*)(char*)) { return s; }
+   std::wstring toPythonHome(const std::string &s, void (*)(const wchar_t*)) { return juce::String{s}.toWideCharPointer(); }
+}
+
 //static
 void ScriptModule::InitializePythonIfNecessary()
 {
    if (!sPythonInitialized)
    {
+#ifdef BESPOKE_PORTABLE_PYTHON
+      static const auto pythonHomeUtf8{ofToFactoryPath("python")};
+      static auto PYTHONHOME{toPythonHome(pythonHomeUtf8, Py_SetPythonHome)};
+      Py_SetPythonHome(PYTHONHOME.data());
+#endif
       py::initialize_interpreter();
+#ifdef BESPOKE_PORTABLE_PYTHON
+      py::exec(std::string{"import sys; sys.executable = '"} + pythonHomeUtf8 + "/" BESPOKE_PORTABLE_PYTHON "'; del sys");
+#endif
       py::exec(GetBootstrapImportString(), py::globals());
       
       CodeEntry::OnPythonInit();
