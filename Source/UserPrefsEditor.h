@@ -72,6 +72,7 @@ private:
    void DrawRightLabel(IUIControl* control, std::string text, ofColor color, float offsetX = 12);
    void CleanUpSave(std::string& json);
    bool PrefRequiresRestart(UserPref* pref) const;
+   void Save();
 
    UserPrefCategory mCategory{ UserPrefCategory::General };
    RadioButton* mCategorySelector;

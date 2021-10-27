@@ -57,13 +57,19 @@ void UserPrefsEditor::CreateUIControls()
    mCategorySelector->AddLabel("general", (int)UserPrefCategory::General);
    mCategorySelector->AddLabel("graphics", (int)UserPrefCategory::Graphics);
    mCategorySelector->AddLabel("paths", (int)UserPrefCategory::Paths);
+
+   UpdateDropdowns({});
+
+   if (!juce::File(TheSynth->GetUserPrefsPath()).existsAsFile())
+   {
+      Save();
+      UserPrefs.mUserPrefsFile.open(TheSynth->GetUserPrefsPath());
+   }
 }
 
 void UserPrefsEditor::Show()
 {
    SetShowing(true);
-
-   UpdateDropdowns({});
 }
 
 void UserPrefsEditor::UpdateDropdowns(std::vector<DropdownList*> toUpdate)
@@ -81,7 +87,8 @@ void UserPrefsEditor::UpdateDropdowns(std::vector<DropdownList*> toUpdate)
       for (auto* deviceType : deviceManager.getAvailableDeviceTypes())
       {
          UserPrefs.devicetype.GetDropdown()->AddLabel(deviceType->getTypeName().toStdString(), i);
-         if (deviceType == deviceManager.getCurrentDeviceTypeObject())
+         if (deviceType == deviceManager.getCurrentDeviceTypeObject() &&
+             UserPrefs.devicetype.Get() != "auto")
             UserPrefs.devicetype.GetIndex() = i;
          ++i;
       }
@@ -100,7 +107,9 @@ void UserPrefsEditor::UpdateDropdowns(std::vector<DropdownList*> toUpdate)
       for (auto outputDevice : selectedDeviceType->getDeviceNames())
       {
          UserPrefs.audio_output_device.GetDropdown()->AddLabel(outputDevice.toStdString(), i);
-         if (deviceManager.getCurrentAudioDevice() != nullptr && i == selectedDeviceType->getIndexOfDevice(deviceManager.getCurrentAudioDevice(), false))
+         if (deviceManager.getCurrentAudioDevice() != nullptr &&
+             i == selectedDeviceType->getIndexOfDevice(deviceManager.getCurrentAudioDevice(), false) &&
+             UserPrefs.audio_output_device.Get() != "auto")
             UserPrefs.audio_output_device.GetIndex() = i;
          ++i;
       }
@@ -127,7 +136,9 @@ void UserPrefsEditor::UpdateDropdowns(std::vector<DropdownList*> toUpdate)
       for (auto inputDevice : selectedDeviceType->getDeviceNames(true))
       {
          UserPrefs.audio_input_device.GetDropdown()->AddLabel(inputDevice.toStdString(), i);
-         if (deviceManager.getCurrentAudioDevice() != nullptr && i == selectedDeviceType->getIndexOfDevice(deviceManager.getCurrentAudioDevice(), true))
+         if (deviceManager.getCurrentAudioDevice() != nullptr &&
+             i == selectedDeviceType->getIndexOfDevice(deviceManager.getCurrentAudioDevice(), true) &&
+             UserPrefs.audio_input_device.Get() != "auto")
             UserPrefs.audio_input_device.GetIndex() = i;
          ++i;
       }
@@ -307,25 +318,32 @@ bool UserPrefsEditor::PrefRequiresRestart(UserPref* pref) const
    return pref == &UserPrefs.devicetype || pref == &UserPrefs.audio_output_device || pref == &UserPrefs.audio_input_device || pref == &UserPrefs.samplerate || pref == &UserPrefs.buffersize || pref == &UserPrefs.record_buffer_length_minutes || pref == &UserPrefs.show_minimap;
 }
 
+void UserPrefsEditor::Save()
+{
+   //make a copy
+   ofxJSONElement prefsFile = UserPrefs.mUserPrefsFile;
+
+   //remove legacy prefs
+   prefsFile.removeMember("vstsearchdirs");
+   prefsFile.removeMember("youtube-dl_path");
+
+   for (int i = 0; i < (int)UserPrefs.mUserPrefs.size(); ++i)
+      UserPrefs.mUserPrefs[i]->Save(i, prefsFile);
+
+   std::string output = prefsFile.getRawString(true);
+   CleanUpSave(output);
+
+   juce::File file(TheSynth->GetUserPrefsPath());
+   file.create();
+   file.replaceWithText(output);
+}
+
 void UserPrefsEditor::ButtonClicked(ClickButton* button)
 {
    if (button == mSaveButton)
    {
-      //remove legacy prefs
-      UserPrefs.mUserPrefsFile.removeMember("vstsearchdirs");
-      UserPrefs.mUserPrefsFile.removeMember("youtube-dl_path");
-
-      for (int i=0; i < (int)UserPrefs.mUserPrefs.size(); ++i)
-         UserPrefs.mUserPrefs[i]->Save(i);
-
-      std::string output = UserPrefs.mUserPrefsFile.getRawString(true);
-      CleanUpSave(output);
-
-      juce::File file(TheSynth->GetUserPrefsPath());
-      file.create();
-      file.replaceWithText(output);
-
-      UserPrefs.mUserPrefsFile.open(TheSynth->GetUserPrefsPath());
+      Save();
+      SetShowing(false);
    }
 
    if (button == mCancelButton)
@@ -385,8 +403,6 @@ void UserPrefsEditor::DropdownUpdated(DropdownList* list, int oldVal)
 
 void UserPrefsEditor::RadioButtonUpdated(RadioButton* radio, int oldVal)
 {
-   if (radio == mCategorySelector)
-      UpdateDropdowns({});
 }
 
 std::vector<IUIControl*> UserPrefsEditor::ControlsToNotSetDuringLoadState() const
