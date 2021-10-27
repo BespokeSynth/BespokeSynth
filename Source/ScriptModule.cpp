@@ -1456,9 +1456,9 @@ void ScriptModule::SaveState(FileStreamOut& out)
 
 void ScriptModule::LoadState(FileStreamIn& in)
 {
-   int rev;
+   int rev = -1;
 
-   if (ModuleContainer::kSaveStateRev >= 421)
+   if (ModuleContainer::sFileSaveStateRev >= 421)
    {
       in >> rev;
       LoadStateValidate(rev <= kSaveStateRev);
@@ -1473,7 +1473,7 @@ void ScriptModule::LoadState(FileStreamIn& in)
 
    IDrawableModule::LoadState(in);
    
-   if (ModuleContainer::kSaveStateRev == 420)
+   if (ModuleContainer::sFileSaveStateRev == 420)
    {
       in >> rev;
       LoadStateValidate(rev <= kSaveStateRev);
