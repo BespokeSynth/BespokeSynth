@@ -1541,16 +1541,15 @@ void ModularSynth::CheckClick(IDrawableModule* clickedModule, int x, int y, bool
       MoveToFront(clickedModule);
 
    //check to see if we clicked in the move area
-   float moduleX, moduleY;
-   clickedModule->GetPosition(moduleX, moduleY);
-   int modulePosX = x - moduleX;
-   int modulePosY = y - moduleY;
+   ofRectangle moduleRect = clickedModule->GetRect();
+   int modulePosX = x - moduleRect.x;
+   int modulePosY = y - moduleRect.y;
 
-   if (modulePosY < 0 && clickedModule != TheTitleBar && (!clickedModule->HasEnableCheckbox() || modulePosX > 20))
+   if (modulePosY < 0 && clickedModule != TheTitleBar && (!clickedModule->HasEnableCheckbox() || modulePosX > 20) && modulePosX < moduleRect.width - 15)
    {
       mMoveModule = clickedModule;
-      mMoveModuleOffsetX = moduleX - x;
-      mMoveModuleOffsetY = moduleY - y;
+      mMoveModuleOffsetX = moduleRect.x - x;
+      mMoveModuleOffsetY = moduleRect.y - y;
    }
 
    float parentX = 0;
