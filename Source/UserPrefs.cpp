@@ -78,6 +78,11 @@ void UserPrefString::Save(int index) //this numbering is a silly markup hack to 
    UserPrefs.mUserPrefsFile["**" + UserPrefsHolder::ToStringLeadingZeroes(index) + "**" + mName] = mValue;
 }
 
+bool UserPrefString::DiffersFromSavedValue() const
+{
+   return mValue != UserPrefs.mUserPrefsFile[mName].asString();
+}
+
 ////////////////////////////////////////////////////////////////////////////////
 
 void UserPrefDropdownInt::Init()
@@ -100,6 +105,11 @@ void UserPrefDropdownInt::Save(int index) //this numbering is a silly markup hac
 {
    UserPrefs.mUserPrefsFile.removeMember(mName);
    UserPrefs.mUserPrefsFile["**" + UserPrefsHolder::ToStringLeadingZeroes(index) + "**" + mName] = ofToInt(mDropdown->GetLabel(mIndex));
+}
+
+bool UserPrefDropdownInt::DiffersFromSavedValue() const
+{
+   return ofToInt(mDropdown->GetLabel(mIndex)) != UserPrefs.mUserPrefsFile[mName].asInt();
 }
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -126,6 +136,11 @@ void UserPrefDropdownString::Save(int index) //this numbering is a silly markup 
    UserPrefs.mUserPrefsFile["**" + UserPrefsHolder::ToStringLeadingZeroes(index) + "**" + mName] = mDropdown->GetLabel(mIndex);
 }
 
+bool UserPrefDropdownString::DiffersFromSavedValue() const
+{
+   return mDropdown->GetLabel(mIndex) != UserPrefs.mUserPrefsFile[mName].asString();
+}
+
 ////////////////////////////////////////////////////////////////////////////////
 
 void UserPrefTextEntryInt::Init()
@@ -133,6 +148,7 @@ void UserPrefTextEntryInt::Init()
    if (!UserPrefs.mUserPrefsFile[mName].isNull())
       mValue = UserPrefs.mUserPrefsFile[mName].asInt();
 }
+
 void UserPrefTextEntryInt::SetUpControl(IDrawableModule* owner)
 {
    mTextEntry = new TextEntry(dynamic_cast<ITextEntryListener*>(owner), mName.c_str(), -1, -1, mDigits, &mValue, mMin, mMax);
@@ -149,12 +165,17 @@ void UserPrefTextEntryInt::Save(int index) //this numbering is a silly markup ha
    UserPrefs.mUserPrefsFile["**" + UserPrefsHolder::ToStringLeadingZeroes(index) + "**" + mName] = mValue;
 }
 
+bool UserPrefTextEntryInt::DiffersFromSavedValue() const
+{
+   return mValue != UserPrefs.mUserPrefsFile[mName].asInt();
+}
+
 ////////////////////////////////////////////////////////////////////////////////
 
 void UserPrefTextEntryFloat::Init()
 {
    if (!UserPrefs.mUserPrefsFile[mName].isNull())
-      mValue = (float)UserPrefs.mUserPrefsFile[mName].asDouble();
+      mValue = UserPrefs.mUserPrefsFile[mName].asFloat();
 }
 void UserPrefTextEntryFloat::SetUpControl(IDrawableModule* owner)
 {
@@ -170,6 +191,11 @@ void UserPrefTextEntryFloat::Save(int index) //this numbering is a silly markup 
 {
    UserPrefs.mUserPrefsFile.removeMember(mName);
    UserPrefs.mUserPrefsFile["**" + UserPrefsHolder::ToStringLeadingZeroes(index) + "**" + mName] = mValue;
+}
+
+bool UserPrefTextEntryFloat::DiffersFromSavedValue() const
+{
+   return mValue != UserPrefs.mUserPrefsFile[mName].asFloat();
 }
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -196,12 +222,17 @@ void UserPrefBool::Save(int index) //this numbering is a silly markup hack to ge
    UserPrefs.mUserPrefsFile["**" + UserPrefsHolder::ToStringLeadingZeroes(index) + "**" + mName] = mValue;
 }
 
+bool UserPrefBool::DiffersFromSavedValue() const
+{
+   return mValue != UserPrefs.mUserPrefsFile[mName].asBool();
+}
+
 ////////////////////////////////////////////////////////////////////////////////
 
 void UserPrefFloat::Init()
 {
    if (!UserPrefs.mUserPrefsFile[mName].isNull())
-      mValue = (float)UserPrefs.mUserPrefsFile[mName].asDouble();
+      mValue = UserPrefs.mUserPrefsFile[mName].asFloat();
 }
 
 void UserPrefFloat::SetUpControl(IDrawableModule* owner)
@@ -219,4 +250,9 @@ void UserPrefFloat::Save(int index) //this numbering is a silly markup hack to g
 {
    UserPrefs.mUserPrefsFile.removeMember(mName);
    UserPrefs.mUserPrefsFile["**" + UserPrefsHolder::ToStringLeadingZeroes(index) + "**" + mName] = mValue;
+}
+
+bool UserPrefFloat::DiffersFromSavedValue() const
+{
+   return mValue != UserPrefs.mUserPrefsFile[mName].asFloat();
 }

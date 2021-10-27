@@ -28,7 +28,6 @@
 #include "UserPrefsEditor.h"
 #include "ModularSynth.h"
 #include "SynthGlobals.h"
-#include "UIControlMacros.h"
 #include "UserPrefs.h"
 
 #include "juce_audio_devices/juce_audio_devices.h"
@@ -44,15 +43,20 @@ UserPrefsEditor::~UserPrefsEditor()
 
 void UserPrefsEditor::CreateUIControls()
 {
+   SetName("settings");
+
    IDrawableModule::CreateUIControls();
 
    for (auto* pref : UserPrefs.mUserPrefs)
       pref->SetUpControl(this);
 
-   UIBLOCK0();
-   BUTTON(mSaveButton, "save and exit bespoke");
-   BUTTON(mCancelButton, "cancel");
-   ENDUIBLOCK0();
+   mCategorySelector = new RadioButton(this, "category", 5, 10, (int*)(&mCategory), kRadioHorizontal);
+   mSaveButton = new ClickButton(this, "save", -1, -1);
+   mCancelButton = new ClickButton(this, "cancel", -1, -1);
+
+   mCategorySelector->AddLabel("general", (int)UserPrefCategory::General);
+   mCategorySelector->AddLabel("graphics", (int)UserPrefCategory::Graphics);
+   mCategorySelector->AddLabel("paths", (int)UserPrefCategory::Paths);
 }
 
 void UserPrefsEditor::Show()
@@ -199,9 +203,6 @@ void UserPrefsEditor::UpdateDropdowns(std::vector<DropdownList*> toUpdate)
 
 void UserPrefsEditor::DrawModule()
 {
-   DrawTextNormal("editor for userprefs.json file", 3, 15);
-   DrawTextNormal("any changes will not take effect until bespoke is restarted", 3, 35);
-
    auto& deviceManager = TheSynth->GetAudioDeviceManager();
    auto* selectedDeviceType = UserPrefs.devicetype.GetIndex() != -1 ? deviceManager.getAvailableDeviceTypes()[UserPrefs.devicetype.GetIndex()] : deviceManager.getCurrentDeviceTypeObject();
    UserPrefs.audio_input_device.GetControl()->SetShowing(selectedDeviceType->hasSeparateInputsAndOutputs());
@@ -209,22 +210,42 @@ void UserPrefsEditor::DrawModule()
    UserPrefs.position_x.GetControl()->SetShowing(UserPrefs.set_manual_window_position.Get());
    UserPrefs.position_y.GetControl()->SetShowing(UserPrefs.set_manual_window_position.Get());
 
+   mCategorySelector->Draw();
+
    int controlX = 175;
    int controlY = 50;
-   for (auto* control : GetUIControls())
+   bool hasPrefThatRequiresRestart = false;
+   for (auto* pref : UserPrefs.mUserPrefs)
    {
-      control->SetPosition(controlX, controlY);
-      if (control->IsShowing() && control != mSaveButton && control != mCancelButton)
-         DrawTextNormal(control->Name(), 3, control->GetPosition(K(local)).y + 12);
-      control->Draw();
+      pref->GetControl()->SetShowing(pref->mCategory == mCategory);
+      if (pref->GetControl()->IsShowing())
+      {
+         pref->GetControl()->SetPosition(controlX, controlY);
+         DrawTextNormal(pref->mName, 3, pref->GetControl()->GetPosition(K(local)).y + 12);
+         pref->GetControl()->Draw();
 
-      controlY += 17;
+         if (PrefRequiresRestart(pref) && pref->DiffersFromSavedValue())
+         {
+            DrawRightLabel(pref->GetControl(), "*", ofColor::magenta, 4);
+            hasPrefThatRequiresRestart = true;
+         }
+
+         controlY += 17;
+      }
    }
+   controlY += 17;
+   mSaveButton->SetPosition(controlX, controlY);
+   mSaveButton->Draw();
+   mCancelButton->SetPosition(controlX + 40, controlY);
+   mCancelButton->Draw();
    mWidth = 1150;
    mHeight = controlY + 20;
 
    if (UserPrefs.devicetype.GetDropdown()->GetLabel(UserPrefs.devicetype.GetIndex()) == "DirectSound")
       DrawRightLabel(UserPrefs.devicetype.GetControl(), "warning: DirectSound can cause crackle and strange behavior for some sample rates and buffer sizes", ofColor::yellow);
+
+   if (!selectedDeviceType->hasSeparateInputsAndOutputs())
+      DrawRightLabel(UserPrefs.audio_output_device.GetControl(), "note: "+ UserPrefs.devicetype.GetDropdown()->GetLabel(UserPrefs.devicetype.GetIndex())+" uses the same device for output and input", ofColor::white);
 
    if (UserPrefs.samplerate.GetDropdown()->GetNumValues() == 0)
    {
@@ -258,21 +279,32 @@ void UserPrefsEditor::DrawModule()
    DrawRightLabel(UserPrefs.layout.GetControl(), "(default: " + UserPrefs.layout.GetDefault() + ")", ofColor::white);
    DrawRightLabel(UserPrefs.youtube_dl_path.GetControl(), "(default: " + UserPrefs.youtube_dl_path.GetDefault() + ")", ofColor::white);
    DrawRightLabel(UserPrefs.ffmpeg_path.GetControl(), "(default: " + UserPrefs.ffmpeg_path.GetDefault() + ")", ofColor::white);
+
+   if (hasPrefThatRequiresRestart)
+      DrawRightLabel(mCancelButton, "*requires restart before taking effect", ofColor::magenta, 4);
 }
 
-void UserPrefsEditor::DrawRightLabel(IUIControl* control, std::string text, ofColor color)
+void UserPrefsEditor::DrawRightLabel(IUIControl* control, std::string text, ofColor color, float offsetX)
 {
-   ofRectangle rect = control->GetRect(true);
-   ofPushStyle();
-   ofSetColor(color);
-   DrawTextNormal(text, rect.getMaxX()+5, rect.getMaxY()-3, 13);
-   ofPopStyle();
+   if (control->IsShowing())
+   {
+      ofRectangle rect = control->GetRect(true);
+      ofPushStyle();
+      ofSetColor(color);
+      DrawTextNormal(text, rect.getMaxX() + offsetX, rect.getMaxY() - 3, 13);
+      ofPopStyle();
+   }
 }
 
 void UserPrefsEditor::CleanUpSave(std::string& json)  //remove the markup hack that got the json file to save ordered
 {
    for (int i = 0; i < (int)UserPrefs.mUserPrefs.size(); ++i)
       ofStringReplace(json, "**" + UserPrefsHolder::ToStringLeadingZeroes(i) + "**", "", true);
+}
+
+bool UserPrefsEditor::PrefRequiresRestart(UserPref* pref) const
+{
+   return pref == &UserPrefs.devicetype || pref == &UserPrefs.audio_output_device || pref == &UserPrefs.audio_input_device || pref == &UserPrefs.samplerate || pref == &UserPrefs.buffersize || pref == &UserPrefs.record_buffer_length_minutes || pref == &UserPrefs.show_minimap;
 }
 
 void UserPrefsEditor::ButtonClicked(ClickButton* button)
@@ -293,8 +325,9 @@ void UserPrefsEditor::ButtonClicked(ClickButton* button)
       file.create();
       file.replaceWithText(output);
 
-      juce::JUCEApplicationBase::quit();
+      UserPrefs.mUserPrefsFile.open(TheSynth->GetUserPrefsPath());
    }
+
    if (button == mCancelButton)
       SetShowing(false);
 }
@@ -305,8 +338,23 @@ void UserPrefsEditor::CheckboxUpdated(Checkbox* checkbox)
 
 void UserPrefsEditor::FloatSliderUpdated(FloatSlider* slider, float oldVal)
 {
-   if (slider == UserPrefs.ui_scale.GetSlider() && !TheSynth->IsLoadingState())
-      TheSynth->SetUIScale(UserPrefs.ui_scale.Get());
+   if (!TheSynth->IsLoadingState())
+   {
+      if (slider == UserPrefs.ui_scale.GetSlider())
+         TheSynth->SetUIScale(UserPrefs.ui_scale.Get());
+      if (slider == UserPrefs.lissajous_r.GetSlider() || slider == UserPrefs.lissajous_g.GetSlider() || slider == UserPrefs.lissajous_b.GetSlider())
+      {
+         ModularSynth::sBackgroundLissajousR = UserPrefs.lissajous_r.Get();
+         ModularSynth::sBackgroundLissajousG = UserPrefs.lissajous_g.Get();
+         ModularSynth::sBackgroundLissajousB = UserPrefs.lissajous_b.Get();
+      }
+      if (slider == UserPrefs.background_r.GetSlider() || slider == UserPrefs.background_g.GetSlider() || slider == UserPrefs.background_b.GetSlider())
+      {
+         ModularSynth::sBackgroundR = UserPrefs.background_r.Get();
+         ModularSynth::sBackgroundG = UserPrefs.background_g.Get();
+         ModularSynth::sBackgroundB = UserPrefs.background_b.Get();
+      }
+   }
 }
 
 void UserPrefsEditor::IntSliderUpdated(IntSlider* slider, int oldVal)
@@ -333,6 +381,12 @@ void UserPrefsEditor::DropdownUpdated(DropdownList* list, int oldVal)
    {
       UpdateDropdowns({ UserPrefs.samplerate.GetDropdown(), UserPrefs.buffersize.GetDropdown() });
    }
+}
+
+void UserPrefsEditor::RadioButtonUpdated(RadioButton* radio, int oldVal)
+{
+   if (radio == mCategorySelector)
+      UpdateDropdowns({});
 }
 
 std::vector<IUIControl*> UserPrefsEditor::ControlsToNotSetDuringLoadState() const

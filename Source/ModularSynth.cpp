@@ -54,6 +54,9 @@ bool ModularSynth::sShouldAutosave = false;
 float ModularSynth::sBackgroundLissajousR = 0.408f;
 float ModularSynth::sBackgroundLissajousG = 0.245f;
 float ModularSynth::sBackgroundLissajousB = 0.418f;
+float ModularSynth::sBackgroundR = 0.09f;
+float ModularSynth::sBackgroundG = 0.09f;
+float ModularSynth::sBackgroundB = 0.09f;
 
 #if BESPOKE_WINDOWS
 LONG WINAPI TopLevelExceptionHandler(PEXCEPTION_POINTERS pExceptionInfo);
@@ -271,6 +274,21 @@ void ModularSynth::Setup(juce::AudioDeviceManager* globalAudioDeviceManager, juc
    TheTransport->Init();
    
    DrumPlayer::SetUpHitDirectories();
+
+   sBackgroundLissajousR = UserPrefs.lissajous_r.Get();
+   sBackgroundLissajousG = UserPrefs.lissajous_g.Get();
+   sBackgroundLissajousB = UserPrefs.lissajous_b.Get();
+   sBackgroundR = UserPrefs.background_r.Get();
+   sBackgroundG = UserPrefs.background_g.Get();
+   sBackgroundB = UserPrefs.background_b.Get();
+
+   Time time = Time::getCurrentTime();
+   if (time.getMonth() + 1 == 10 && time.getDayOfMonth() == 31)
+   {
+      sBackgroundLissajousR = 0.722f;
+      sBackgroundLissajousG = 0.328f;
+      sBackgroundLissajousB = 0.0f;
+   }
    
    ResetLayout();
    
@@ -479,7 +497,8 @@ void ModularSynth::Draw(void* vg)
       ofPopStyle();
    }
    
-   DrawLissajous(mGlobalRecordBuffer, 0, 0, ofGetWidth(), ofGetHeight(), sBackgroundLissajousR, sBackgroundLissajousG, sBackgroundLissajousB);
+   if (UserPrefs.draw_background_lissajous.Get())
+      DrawLissajous(mGlobalRecordBuffer, 0, 0, ofGetWidth(), ofGetHeight(), sBackgroundLissajousR, sBackgroundLissajousG, sBackgroundLissajousB);
    
    if (gTime == 1 && mFatalError == "")
    {
@@ -757,7 +776,7 @@ void ModularSynth::PostRender()
 
 void ModularSynth::DrawConsole()
 {
-   if (!mErrors.empty())
+   /*if (!mErrors.empty())
    {
       ofPushStyle();
       ofFill();
@@ -768,7 +787,7 @@ void ModularSynth::DrawConsole()
       ofVertex(0,20);
       ofEndShape();
       ofPopStyle();
-   }
+   }*/
    
    float consoleY = TheTitleBar->GetRect().height + 15;
    
