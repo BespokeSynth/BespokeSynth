@@ -394,14 +394,6 @@ if (APPLE)
         KompleteKontrol.cpp
         )
     target_link_libraries(BespokeSynth PRIVATE "-framework CoreAudioKit")
-
-    # Post install tasks - copy resources to the bundle
-    get_target_property(OUTDIR BespokeSynth RUNTIME_OUTPUT_DIRECTORY)
-    add_custom_command(TARGET BespokeSynth
-        POST_BUILD
-        WORKING_DIRECTORY ${CMAKE_SOURCE_DIR}
-        COMMAND ${CMAKE_COMMAND} -E copy_directory resource ${OUTDIR}/BespokeSynth.app/Contents/Resources/resource
-        )
 elseif (WIN32)
     target_compile_definitions(BespokeSynth PRIVATE BESPOKE_WINDOWS=1)
 
@@ -411,24 +403,11 @@ elseif (WIN32)
         target_include_directories(BespokeSynth PRIVATE ${BESPOKE_ASIO_SDK_LOCATION}/common)
     endif()
 
-    # Post install tasks - copy resources to the exe output directory
     set_target_properties(BespokeSynth PROPERTIES VS_DEBUGGER_WORKING_DIRECTORY "$<TARGET_FILE_DIR:BespokeSynth>"
         VS_DEBUGGER_COMMAND           "$<TARGET_FILE:BespokeSynth>"
         VS_DEBUGGER_ENVIRONMENT       "PATH=%PATH%;${CMAKE_PREFIX_PATH}/bin")
-    get_target_property(OUTDIR BespokeSynth RUNTIME_OUTPUT_DIRECTORY)
-    add_custom_command(TARGET BespokeSynth
-        POST_BUILD
-        WORKING_DIRECTORY ${CMAKE_SOURCE_DIR}
-        COMMAND ${CMAKE_COMMAND} -E copy_directory resource ${OUTDIR}/resource)
 else ()
     target_compile_definitions(BespokeSynth PRIVATE BESPOKE_LINUX=1)
-
-    # Ant put resources with the exe
-    get_target_property(OUTDIR BespokeSynth RUNTIME_OUTPUT_DIRECTORY)
-    add_custom_command(TARGET BespokeSynth
-        POST_BUILD
-        WORKING_DIRECTORY ${CMAKE_SOURCE_DIR}
-        COMMAND ${CMAKE_COMMAND} -E copy_directory resource ${OUTDIR}/resource)
 
     # Finally provide install rules if folks want to install into CMAKE_INSTALL_PREFIX
     install(TARGETS BespokeSynth DESTINATION bin)
@@ -464,6 +443,7 @@ target_link_libraries(BespokeSynth PRIVATE
     $<$<BOOL:${MINGW}>:dbghelp>
     )
 
+bespoke_copy_resource_dir(BespokeSynth)
 bespoke_make_portable(BespokeSynth)
 
 # Rules to do some installing and packaging which we will have to refactor  but
