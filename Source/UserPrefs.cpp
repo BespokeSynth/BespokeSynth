@@ -72,10 +72,10 @@ IUIControl* UserPrefString::GetControl()
    return mTextEntry;
 }
 
-void UserPrefString::Save(int index) //this numbering is a silly markup hack to get the json file to save ordered
+void UserPrefString::Save(int index, ofxJSONElement& prefsJson) //this numbering is a silly markup hack to get the json file to save ordered
 {
-   UserPrefs.mUserPrefsFile.removeMember(mName);
-   UserPrefs.mUserPrefsFile["**" + UserPrefsHolder::ToStringLeadingZeroes(index) + "**" + mName] = mValue;
+   prefsJson.removeMember(mName);
+   prefsJson["**" + UserPrefsHolder::ToStringLeadingZeroes(index) + "**" + mName] = mValue;
 }
 
 bool UserPrefString::DiffersFromSavedValue() const
@@ -101,10 +101,10 @@ IUIControl* UserPrefDropdownInt::GetControl()
    return mDropdown;
 }
 
-void UserPrefDropdownInt::Save(int index) //this numbering is a silly markup hack to get the json file to save ordered
+void UserPrefDropdownInt::Save(int index, ofxJSONElement& prefsJson) //this numbering is a silly markup hack to get the json file to save ordered
 {
-   UserPrefs.mUserPrefsFile.removeMember(mName);
-   UserPrefs.mUserPrefsFile["**" + UserPrefsHolder::ToStringLeadingZeroes(index) + "**" + mName] = ofToInt(mDropdown->GetLabel(mIndex));
+   prefsJson.removeMember(mName);
+   prefsJson["**" + UserPrefsHolder::ToStringLeadingZeroes(index) + "**" + mName] = ofToInt(mDropdown->GetLabel(mIndex));
 }
 
 bool UserPrefDropdownInt::DiffersFromSavedValue() const
@@ -130,10 +130,10 @@ IUIControl* UserPrefDropdownString::GetControl()
    return mDropdown;
 }
 
-void UserPrefDropdownString::Save(int index) //this numbering is a silly markup hack to get the json file to save ordered
+void UserPrefDropdownString::Save(int index, ofxJSONElement& prefsJson) //this numbering is a silly markup hack to get the json file to save ordered
 {
-   UserPrefs.mUserPrefsFile.removeMember(mName);
-   UserPrefs.mUserPrefsFile["**" + UserPrefsHolder::ToStringLeadingZeroes(index) + "**" + mName] = mDropdown->GetLabel(mIndex);
+   prefsJson.removeMember(mName);
+   prefsJson["**" + UserPrefsHolder::ToStringLeadingZeroes(index) + "**" + mName] = mDropdown->GetLabel(mIndex);
 }
 
 bool UserPrefDropdownString::DiffersFromSavedValue() const
@@ -159,10 +159,10 @@ IUIControl* UserPrefTextEntryInt::GetControl()
    return mTextEntry;
 }
 
-void UserPrefTextEntryInt::Save(int index) //this numbering is a silly markup hack to get the json file to save ordered
+void UserPrefTextEntryInt::Save(int index, ofxJSONElement& prefsJson) //this numbering is a silly markup hack to get the json file to save ordered
 {
-   UserPrefs.mUserPrefsFile.removeMember(mName);
-   UserPrefs.mUserPrefsFile["**" + UserPrefsHolder::ToStringLeadingZeroes(index) + "**" + mName] = mValue;
+   prefsJson.removeMember(mName);
+   prefsJson["**" + UserPrefsHolder::ToStringLeadingZeroes(index) + "**" + mName] = mValue;
 }
 
 bool UserPrefTextEntryInt::DiffersFromSavedValue() const
@@ -187,10 +187,10 @@ IUIControl* UserPrefTextEntryFloat::GetControl()
    return mTextEntry;
 }
 
-void UserPrefTextEntryFloat::Save(int index) //this numbering is a silly markup hack to get the json file to save ordered
+void UserPrefTextEntryFloat::Save(int index, ofxJSONElement& prefsJson) //this numbering is a silly markup hack to get the json file to save ordered
 {
-   UserPrefs.mUserPrefsFile.removeMember(mName);
-   UserPrefs.mUserPrefsFile["**" + UserPrefsHolder::ToStringLeadingZeroes(index) + "**" + mName] = mValue;
+   prefsJson.removeMember(mName);
+   prefsJson["**" + UserPrefsHolder::ToStringLeadingZeroes(index) + "**" + mName] = mValue;
 }
 
 bool UserPrefTextEntryFloat::DiffersFromSavedValue() const
@@ -216,10 +216,10 @@ IUIControl* UserPrefBool::GetControl()
    return mCheckbox;
 }
 
-void UserPrefBool::Save(int index) //this numbering is a silly markup hack to get the json file to save ordered
+void UserPrefBool::Save(int index, ofxJSONElement& prefsJson) //this numbering is a silly markup hack to get the json file to save ordered
 {
-   UserPrefs.mUserPrefsFile.removeMember(mName);
-   UserPrefs.mUserPrefsFile["**" + UserPrefsHolder::ToStringLeadingZeroes(index) + "**" + mName] = mValue;
+   prefsJson.removeMember(mName);
+   prefsJson["**" + UserPrefsHolder::ToStringLeadingZeroes(index) + "**" + mName] = mValue;
 }
 
 bool UserPrefBool::DiffersFromSavedValue() const
@@ -246,10 +246,10 @@ IUIControl* UserPrefFloat::GetControl()
    return mSlider;
 }
 
-void UserPrefFloat::Save(int index) //this numbering is a silly markup hack to get the json file to save ordered
+void UserPrefFloat::Save(int index, ofxJSONElement& prefsJson) //this numbering is a silly markup hack to get the json file to save ordered
 {
-   UserPrefs.mUserPrefsFile.removeMember(mName);
-   UserPrefs.mUserPrefsFile["**" + UserPrefsHolder::ToStringLeadingZeroes(index) + "**" + mName] = mValue;
+   prefsJson.removeMember(mName);
+   prefsJson["**" + UserPrefsHolder::ToStringLeadingZeroes(index) + "**" + mName] = mValue;
 }
 
 bool UserPrefFloat::DiffersFromSavedValue() const
