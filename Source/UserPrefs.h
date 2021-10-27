@@ -38,6 +38,11 @@ class TextEntry;
 class Checkbox;
 class FloatSlider;
 
+enum class UserPrefCategory
+{
+   General, Graphics, Paths
+};
+
 class UserPref
 {
 public:
@@ -45,6 +50,9 @@ public:
    virtual IUIControl* GetControl() = 0;
    virtual void SetUpControl(IDrawableModule* owner) = 0;
    virtual void Save(int index) = 0;
+   virtual bool DiffersFromSavedValue() const = 0;
+   UserPrefCategory mCategory;
+   std::string mName;
 };
 
 void RegisterUserPref(UserPref* pref);
@@ -52,7 +60,7 @@ void RegisterUserPref(UserPref* pref);
 class UserPrefString : public UserPref
 {
 public:
-   UserPrefString(std::string name, std::string defaultValue, int charWidth) : mName(name), mValue(defaultValue), mDefault(defaultValue), mCharWidth(charWidth) { RegisterUserPref(this); }
+   UserPrefString(std::string name, std::string defaultValue, int charWidth, UserPrefCategory category) : mValue(defaultValue), mDefault(defaultValue), mCharWidth(charWidth) { RegisterUserPref(this); mName = name; mCategory = category; }
    void Init() override;
    void SetUpControl(IDrawableModule* owner) override;
    IUIControl* GetControl() override;
@@ -60,8 +68,8 @@ public:
    std::string& Get() { return mValue; }
    std::string GetDefault() { return mDefault; }
    void Save(int index) override;
+   bool DiffersFromSavedValue() const override;
 private:
-   std::string mName;
    std::string mValue;
    std::string mDefault;
    TextEntry* mTextEntry;
@@ -71,7 +79,7 @@ private:
 class UserPrefDropdownInt : public UserPref
 {
 public:
-   UserPrefDropdownInt(std::string name, int defaultValue, int width) : mName(name), mValue(defaultValue), mWidth(width) { RegisterUserPref(this); }
+   UserPrefDropdownInt(std::string name, int defaultValue, int width, UserPrefCategory category) : mValue(defaultValue), mWidth(width) { RegisterUserPref(this); mName = name; mCategory = category; }
    void Init() override;
    void SetUpControl(IDrawableModule* owner) override;
    IUIControl* GetControl() override;
@@ -79,8 +87,8 @@ public:
    int& Get() { return mValue; }
    int& GetIndex() { return mIndex; }
    void Save(int index) override;
+   bool DiffersFromSavedValue() const override;
 private:
-   std::string mName;
    int mValue;
    int mIndex;
    DropdownList* mDropdown;
@@ -90,7 +98,7 @@ private:
 class UserPrefDropdownString : public UserPref
 {
 public:
-   UserPrefDropdownString(std::string name, std::string defaultValue, int width) : mName(name), mValue(defaultValue), mIndex(-1), mWidth(width) { RegisterUserPref(this); }
+   UserPrefDropdownString(std::string name, std::string defaultValue, int width, UserPrefCategory category) : mValue(defaultValue), mIndex(-1), mWidth(width) { RegisterUserPref(this); mName = name; mCategory = category; }
    void Init() override;
    void SetUpControl(IDrawableModule* owner) override;
    IUIControl* GetControl() override;
@@ -98,8 +106,8 @@ public:
    std::string& Get() { return mValue; }
    int& GetIndex() { return mIndex; }
    void Save(int index) override;
+   bool DiffersFromSavedValue() const override;
 private:
-   std::string mName;
    std::string mValue;
    int mIndex;
    DropdownList* mDropdown;
@@ -109,15 +117,15 @@ private:
 class UserPrefTextEntryInt : public UserPref
 {
 public:
-   UserPrefTextEntryInt(std::string name, int defaultValue, int min, int max, int digits) : mName(name), mValue(defaultValue), mMin(min), mMax(max), mDigits(digits) { RegisterUserPref(this); }
+   UserPrefTextEntryInt(std::string name, int defaultValue, int min, int max, int digits, UserPrefCategory category) : mValue(defaultValue), mMin(min), mMax(max), mDigits(digits) { RegisterUserPref(this); mName = name; mCategory = category; }
    void Init() override;
    void SetUpControl(IDrawableModule* owner) override;
    IUIControl* GetControl() override;
    TextEntry* GetTextEntry() { return mTextEntry; }
    int& Get() { return mValue; }
    void Save(int index) override;
+   bool DiffersFromSavedValue() const override;
 private:
-   std::string mName;
    int mValue;
    TextEntry* mTextEntry;
    int mMin;
@@ -128,15 +136,15 @@ private:
 class UserPrefTextEntryFloat : public UserPref
 {
 public:
-   UserPrefTextEntryFloat(std::string name, float defaultValue, float min, float max, int digits) : mName(name), mValue(defaultValue), mMin(min), mMax(max), mDigits(digits) { RegisterUserPref(this); }
+   UserPrefTextEntryFloat(std::string name, float defaultValue, float min, float max, int digits, UserPrefCategory category) : mValue(defaultValue), mMin(min), mMax(max), mDigits(digits) { RegisterUserPref(this); mName = name; mCategory = category; }
    void Init() override;
    void SetUpControl(IDrawableModule* owner) override;
    IUIControl* GetControl() override;
    TextEntry* GetTextEntry() { return mTextEntry; }
    float& Get() { return mValue; }
    void Save(int index) override;
+   bool DiffersFromSavedValue() const override;
 private:
-   std::string mName;
    float mValue;
    TextEntry* mTextEntry;
    float mMin;
@@ -147,15 +155,15 @@ private:
 class UserPrefBool : public UserPref
 {
 public:
-   UserPrefBool(std::string name, bool defaultValue) : mName(name), mValue(defaultValue) { RegisterUserPref(this); }
+   UserPrefBool(std::string name, bool defaultValue, UserPrefCategory category) : mValue(defaultValue) { RegisterUserPref(this); mName = name; mCategory = category; }
    void Init() override;
    void SetUpControl(IDrawableModule* owner) override;
    IUIControl* GetControl() override;
    Checkbox* GetCheckbox() { return mCheckbox; }
    bool& Get() { return mValue; }
    void Save(int index) override;
+   bool DiffersFromSavedValue() const override;
 private:
-   std::string mName;
    bool mValue;
    Checkbox* mCheckbox;
 };
@@ -163,15 +171,15 @@ private:
 class UserPrefFloat : public UserPref
 {
 public:
-   UserPrefFloat(std::string name, float defaultValue, float min, float max) : mName(name), mValue(defaultValue), mMin(min), mMax(max) { RegisterUserPref(this); }
+   UserPrefFloat(std::string name, float defaultValue, float min, float max, UserPrefCategory category) : mValue(defaultValue), mMin(min), mMax(max) { RegisterUserPref(this); mName = name; mCategory = category; }
    void Init() override;
    void SetUpControl(IDrawableModule* owner) override;
    IUIControl* GetControl() override;
    FloatSlider* GetSlider() { return mSlider; }
    float& Get() { return mValue; }
    void Save(int index) override;
+   bool DiffersFromSavedValue() const override;
 private:
-   std::string mName;
    float mValue;
    FloatSlider* mSlider;
    float mMin;
@@ -202,32 +210,41 @@ public:
    ofxJSONElement mUserPrefsFile;
    std::vector<UserPref*> mUserPrefs;
 
-   UserPrefDropdownString devicetype{ "devicetype", "auto", 200 };
-   UserPrefDropdownString audio_output_device{ "audio_output_device", "auto", 350 };
-   UserPrefDropdownString audio_input_device{ "audio_input_device", "none", 350 };
-   UserPrefDropdownInt samplerate{ "samplerate", 48000, 100 };
-   UserPrefDropdownInt buffersize{ "buffersize", 256, 100 };
-   UserPrefTextEntryInt width{ "width", 1700, 100, 10000, 5 };
-   UserPrefTextEntryInt height{ "height", 1100, 100, 10000, 5 };
-   UserPrefBool set_manual_window_position{ "set_manual_window_position", false };
-   UserPrefTextEntryInt position_x{ "position_x", 100, -10000, 10000, 5 };
-   UserPrefTextEntryInt position_y{ "position_y", 100, -10000, 10000, 5 };
-   UserPrefFloat zoom{ "zoom", 1, .25f, 2 };
-   UserPrefFloat ui_scale{ "ui_scale", 1, .25f, 2 };
-   UserPrefFloat scroll_multiplier_vertical{ "scroll_multiplier_vertical", 1, -2, 2 };
-   UserPrefFloat scroll_multiplier_horizontal{ "scroll_multiplier_horizontal", 1, -2, 2 };
-   UserPrefBool autosave{ "autosave", false };
-   UserPrefBool show_tooltips_on_load{ "show_tooltips_on_load", true };
-   UserPrefBool show_minimap{ "show_minimap", false };
-   UserPrefString recordings_path{ "recordings_path", "recordings/", 70 };
-   UserPrefTextEntryFloat record_buffer_length_minutes{ "record_buffer_length_minutes", 30, 1, 120, 5 };
-   UserPrefString tooltips{ "tooltips", "tooltips_eng.txt", 70 };
-   UserPrefString layout{ "layout", "layouts/blank.json", 70 };
-   UserPrefString youtube_dl_path{ "youtube_dl_path", kDefaultYoutubeDlPath, 70 };
-   UserPrefString ffmpeg_path{ "ffmpeg_path", kDefaultFfmpegPath, 70 };
+   UserPrefDropdownString devicetype{ "devicetype", "auto", 200, UserPrefCategory::General };
+   UserPrefDropdownString audio_output_device{ "audio_output_device", "auto", 350, UserPrefCategory::General };
+   UserPrefDropdownString audio_input_device{ "audio_input_device", "none", 350, UserPrefCategory::General };
+   UserPrefDropdownInt samplerate{ "samplerate", 48000, 100, UserPrefCategory::General };
+   UserPrefDropdownInt buffersize{ "buffersize", 256, 100, UserPrefCategory::General };
+   UserPrefTextEntryInt width{ "width", 1700, 100, 10000, 5, UserPrefCategory::General };
+   UserPrefTextEntryInt height{ "height", 1100, 100, 10000, 5, UserPrefCategory::General };
+   UserPrefBool set_manual_window_position{ "set_manual_window_position", false, UserPrefCategory::General };
+   UserPrefTextEntryInt position_x{ "position_x", 100, -10000, 10000, 5, UserPrefCategory::General };
+   UserPrefTextEntryInt position_y{ "position_y", 100, -10000, 10000, 5, UserPrefCategory::General };
+   UserPrefFloat zoom{ "zoom", 1, .25f, 2, UserPrefCategory::General };
+   UserPrefFloat ui_scale{ "ui_scale", 1, .25f, 2, UserPrefCategory::General };
+   UserPrefFloat scroll_multiplier_vertical{ "scroll_multiplier_vertical", 1, -2, 2, UserPrefCategory::General };
+   UserPrefFloat scroll_multiplier_horizontal{ "scroll_multiplier_horizontal", 1, -2, 2, UserPrefCategory::General };
+   UserPrefBool autosave{ "autosave", false, UserPrefCategory::General };
+   UserPrefBool show_tooltips_on_load{ "show_tooltips_on_load", true, UserPrefCategory::General };
+   UserPrefBool show_minimap{ "show_minimap", false, UserPrefCategory::General };
+   UserPrefTextEntryFloat record_buffer_length_minutes{ "record_buffer_length_minutes", 30, 1, 120, 5, UserPrefCategory::General };
 #if !BESPOKE_LINUX
-   UserPrefBool vst_always_on_top{ "vst_always_on_top", true };
+   UserPrefBool vst_always_on_top{ "vst_always_on_top", true, UserPrefCategory::General };
 #endif
+
+   UserPrefBool draw_background_lissajous{ "draw_background_lissajous", true, UserPrefCategory::Graphics };
+   UserPrefFloat lissajous_r{ "lissajous_r", 0.408f, 0, 1, UserPrefCategory::Graphics };
+   UserPrefFloat lissajous_g{ "lissajous_g", 0.245f, 0, 1, UserPrefCategory::Graphics };
+   UserPrefFloat lissajous_b{ "lissajous_b", 0.418f, 0, 1, UserPrefCategory::Graphics };
+   UserPrefFloat background_r{ "background_r", 0.09f, 0, 1, UserPrefCategory::Graphics };
+   UserPrefFloat background_g{ "background_g", 0.09f, 0, 1, UserPrefCategory::Graphics };
+   UserPrefFloat background_b{ "background_b", 0.09f, 0, 1, UserPrefCategory::Graphics };
+
+   UserPrefString recordings_path{ "recordings_path", "recordings/", 70, UserPrefCategory::Paths };
+   UserPrefString tooltips{ "tooltips", "tooltips_eng.txt", 70, UserPrefCategory::Paths };
+   UserPrefString layout{ "layout", "layouts/blank.json", 70, UserPrefCategory::Paths };
+   UserPrefString youtube_dl_path{ "youtube_dl_path", kDefaultYoutubeDlPath, 70, UserPrefCategory::Paths };
+   UserPrefString ffmpeg_path{ "ffmpeg_path", kDefaultFfmpegPath, 70, UserPrefCategory::Paths };
 };
 
 extern UserPrefsHolder UserPrefs;

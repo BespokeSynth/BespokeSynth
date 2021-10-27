@@ -230,6 +230,9 @@ public:
    static float sBackgroundLissajousR;
    static float sBackgroundLissajousG;
    static float sBackgroundLissajousB;
+   static float sBackgroundR;
+   static float sBackgroundG;
+   static float sBackgroundB;
    
 private:
    void ResetLayout();

@@ -32,8 +32,10 @@
 #include "TextEntry.h"
 #include "DropdownList.h"
 #include "ClickButton.h"
+#include "RadioButton.h"
+#include "UserPrefs.h"
 
-class UserPrefsEditor : public IDrawableModule, public IFloatSliderListener, public IIntSliderListener, public ITextEntryListener, public IDropdownListener, public IButtonListener
+class UserPrefsEditor : public IDrawableModule, public IFloatSliderListener, public IIntSliderListener, public ITextEntryListener, public IDropdownListener, public IButtonListener, public IRadioButtonListener
 {
 public:
    UserPrefsEditor();
@@ -54,6 +56,7 @@ public:
    void TextEntryComplete(TextEntry* entry) override;
    void DropdownUpdated(DropdownList* list, int oldVal) override;
    void ButtonClicked(ClickButton* button) override;
+   void RadioButtonUpdated(RadioButton* radio, int oldVal) override;
 
    bool IsSaveable() override { return false; }
    std::vector<IUIControl*> ControlsToNotSetDuringLoadState() const override;
@@ -66,9 +69,12 @@ private:
    void GetModuleDimensions(float& width, float& height) override { width = mWidth; height = mHeight; }
 
    void UpdateDropdowns(std::vector<DropdownList*> toUpdate);
-   void DrawRightLabel(IUIControl* control, std::string text, ofColor color);
+   void DrawRightLabel(IUIControl* control, std::string text, ofColor color, float offsetX = 12);
    void CleanUpSave(std::string& json);
+   bool PrefRequiresRestart(UserPref* pref) const;
 
+   UserPrefCategory mCategory{ UserPrefCategory::General };
+   RadioButton* mCategorySelector;
    ClickButton* mSaveButton;
    ClickButton* mCancelButton;
 

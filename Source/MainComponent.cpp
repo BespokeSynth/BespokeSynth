@@ -350,7 +350,7 @@ public:
       
       static float kMotionTrails = .4f;
       
-      ofVec3f bgColor(.09f,.09f,.09f);
+      ofVec3f bgColor(ModularSynth::sBackgroundR, ModularSynth::sBackgroundG, ModularSynth::sBackgroundB);
       glViewport(0, 0, width*mPixelRatio, height*mPixelRatio);
       glClearColor(bgColor.x,bgColor.y,bgColor.z,0);
       if (kMotionTrails <= 0)
