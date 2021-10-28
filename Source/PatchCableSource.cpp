@@ -433,6 +433,9 @@ bool PatchCableSource::MouseMoved(float x, float y)
    y = TheSynth->GetMouseY(mOwner->GetOwningContainer());
    
    mHoverIndex = GetHoverIndex(x, y);
+
+   if (mHoverIndex != -1 && gHoveredUIControl != nullptr && !gHoveredUIControl->IsMouseDown())
+      gHoveredUIControl = nullptr; //if we're hovering over a patch cable, get rid of ui control hover
    
    for (size_t i=0; i<mPatchCables.size(); ++i)
    {

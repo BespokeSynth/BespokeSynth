@@ -639,7 +639,8 @@ void ModularSynth::Draw(void* vg)
    if (HelpDisplay::sShowTooltips && 
        !IUIControl::WasLastHoverSetViaTab() &&
        mGroupSelectContext == nullptr &&
-       PatchCable::sActivePatchCable == nullptr)
+       PatchCable::sActivePatchCable == nullptr &&
+       mGroupSelectedModules.empty())
    {
       HelpDisplay* helpDisplay = TheTitleBar->GetHelpDisplay();
 
@@ -677,7 +678,7 @@ void ModularSynth::Draw(void* vg)
             tooltipContainer = gHoveredModule->GetOwningContainer();
          }
       }
-      else if (hasValidHoveredControl) 
+      else if (hasValidHoveredControl && !gHoveredUIControl->IsMouseDown())
       {
          tooltip = helpDisplay->GetUIControlTooltip(gHoveredUIControl);
          tooltipContainer = gHoveredUIControl->GetModuleParent()->GetOwningContainer();
@@ -1156,7 +1157,7 @@ void ModularSynth::MouseMoved(int intX, int intY)
          gHoveredUIControl->GetPosition(uiX, uiY);
          float w, h;
          gHoveredUIControl->GetDimensions(w, h);
-         if (x < uiX - 10 || y < uiY - 10 || x > uiX + w + 10 || y > uiY + h + 10)
+         if (x < uiX - 5 || y < uiY - 5 || x > uiX + w + 5 || y > uiY + h + 5)
             gHoveredUIControl = nullptr;
       }
    }
@@ -1284,6 +1285,12 @@ void ModularSynth::MousePressed(int intX, int intY, int button, const juce::Mous
    float x = GetMouseX(&mModuleContainer);
    float y = GetMouseY(&mModuleContainer);
 
+   mLastMouseDragPos = ofVec2f(x, y);
+   mGroupSelectContext = nullptr;
+
+   IKeyboardFocusListener::sKeyboardFocusBeforeClick = IKeyboardFocusListener::GetActiveKeyboardFocus();
+   IKeyboardFocusListener::ClearActiveKeyboardFocus(K(notifyListeners));
+
    if (button == 3)
    {
       mClickStartX = x;
@@ -1305,11 +1312,19 @@ void ModularSynth::MousePressed(int intX, int intY, int button, const juce::Mous
       return;
    }
 
-   mLastMouseDragPos = ofVec2f(x,y);
-   mGroupSelectContext = nullptr;
+   if (gHoveredUIControl != nullptr && !IUIControl::WasLastHoverSetViaTab() && mGroupSelectedModules.empty())
+   {
+      //if we have a hovered UI control, clamp clicks within its rect and direct them straight to it
+      ofVec2f controlClickPos(GetMouseX(gHoveredUIControl->GetModuleParent()->GetOwningContainer()), GetMouseY(gHoveredUIControl->GetModuleParent()->GetOwningContainer()));
+      controlClickPos -= gHoveredUIControl->GetParent()->GetPosition();
 
-   IKeyboardFocusListener::sKeyboardFocusBeforeClick = IKeyboardFocusListener::GetActiveKeyboardFocus();
-   IKeyboardFocusListener::ClearActiveKeyboardFocus(K(notifyListeners));
+      ofRectangle controlRect = gHoveredUIControl->GetRect(K(local));
+      controlClickPos.x = std::clamp(controlClickPos.x, controlRect.getMinX(), controlRect.getMaxX());
+      controlClickPos.y = std::clamp(controlClickPos.y, controlRect.getMinY(), controlRect.getMaxY());
+
+      gHoveredUIControl->TestClick(controlClickPos.x, controlClickPos.y, rightButton);
+      return;
+   }
 
    if (GetTopModalFocusItem())
    {
