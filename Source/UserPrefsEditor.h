@@ -49,6 +49,7 @@ public:
    bool IsSingleton() const override { return true; }
 
    void Show();
+   void CreatePrefsFileIfNonexistent();
 
    void CheckboxUpdated(Checkbox* checkbox) override;
    void FloatSliderUpdated(FloatSlider* slider, float oldVal) override;
