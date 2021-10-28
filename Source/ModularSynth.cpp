@@ -341,6 +341,8 @@ void ModularSynth::Poll()
    {  
       if (!mInitialized && sFrameCount > 3) //let some frames render before blocking for a load
       {
+         mUserPrefsEditor->CreatePrefsFileIfNonexistent();
+         
          if(!mStartupSaveStateFile.empty())
             LoadState(mStartupSaveStateFile);
          else

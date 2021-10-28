@@ -57,7 +57,16 @@ void UserPrefsEditor::CreateUIControls()
    mCategorySelector->AddLabel("general", (int)UserPrefCategory::General);
    mCategorySelector->AddLabel("graphics", (int)UserPrefCategory::Graphics);
    mCategorySelector->AddLabel("paths", (int)UserPrefCategory::Paths);
+}
 
+void UserPrefsEditor::Show()
+{
+   UpdateDropdowns({});
+   SetShowing(true);
+}
+
+void UserPrefsEditor::CreatePrefsFileIfNonexistent()
+{
    UpdateDropdowns({});
 
    if (!juce::File(TheSynth->GetUserPrefsPath()).existsAsFile())
@@ -65,11 +74,6 @@ void UserPrefsEditor::CreateUIControls()
       Save();
       UserPrefs.mUserPrefsFile.open(TheSynth->GetUserPrefsPath());
    }
-}
-
-void UserPrefsEditor::Show()
-{
-   SetShowing(true);
 }
 
 void UserPrefsEditor::UpdateDropdowns(std::vector<DropdownList*> toUpdate)
