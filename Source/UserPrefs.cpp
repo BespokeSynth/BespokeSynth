@@ -45,7 +45,7 @@ void UserPrefsHolder::Init()
    mUserPrefsFile.open(TheSynth->GetUserPrefsPath());
 
    for (auto* pref : mUserPrefs)
-      pref->Init();
+      pref->Init();   
 }
 
 std::string UserPrefsHolder::ToStringLeadingZeroes(int number)
@@ -59,8 +59,16 @@ std::string UserPrefsHolder::ToStringLeadingZeroes(int number)
 
 void UserPrefString::Init()
 {
-   if (!UserPrefs.mUserPrefsFile[mName].isNull())
-      mValue = UserPrefs.mUserPrefsFile[mName].asString();
+   try
+   {
+      if (!UserPrefs.mUserPrefsFile[mName].isNull())
+         mValue = UserPrefs.mUserPrefsFile[mName].asString();
+   }
+   catch (Json::LogicError& e)
+   {
+      TheSynth->LogEvent("json error loading userpref for " + mName + ": " + e.what(), kLogEventType_Error);
+      UserPrefs.mUserPrefsFile[mName] = mDefault;
+   }
 }
 void UserPrefString::SetUpControl(IDrawableModule* owner)
 {
@@ -87,8 +95,16 @@ bool UserPrefString::DiffersFromSavedValue() const
 
 void UserPrefDropdownInt::Init()
 {
-   if (!UserPrefs.mUserPrefsFile[mName].isNull())
-      mValue = UserPrefs.mUserPrefsFile[mName].asInt();
+   try
+   {
+      if (!UserPrefs.mUserPrefsFile[mName].isNull())
+         mValue = UserPrefs.mUserPrefsFile[mName].asInt();
+   }
+   catch (Json::LogicError& e)
+   {
+      TheSynth->LogEvent("json error loading userpref for " + mName + ": " + e.what(), kLogEventType_Error);
+      UserPrefs.mUserPrefsFile[mName] = mDefault;
+   }
 }
 
 void UserPrefDropdownInt::SetUpControl(IDrawableModule* owner)
@@ -118,6 +134,16 @@ void UserPrefDropdownString::Init()
 {
    if (!UserPrefs.mUserPrefsFile[mName].isNull())
       mValue = UserPrefs.mUserPrefsFile[mName].asString();
+   try
+   {
+      if (!UserPrefs.mUserPrefsFile[mName].isNull())
+         mValue = UserPrefs.mUserPrefsFile[mName].asString();
+   }
+   catch (Json::LogicError& e)
+   {
+      TheSynth->LogEvent("json error loading userpref for " + mName + ": " + e.what(), kLogEventType_Error);
+      UserPrefs.mUserPrefsFile[mName] = mDefault;
+   }
 }
 
 void UserPrefDropdownString::SetUpControl(IDrawableModule* owner)
@@ -145,8 +171,16 @@ bool UserPrefDropdownString::DiffersFromSavedValue() const
 
 void UserPrefTextEntryInt::Init()
 {
-   if (!UserPrefs.mUserPrefsFile[mName].isNull())
-      mValue = UserPrefs.mUserPrefsFile[mName].asInt();
+   try
+   {
+      if (!UserPrefs.mUserPrefsFile[mName].isNull())
+         mValue = UserPrefs.mUserPrefsFile[mName].asInt();
+   }
+   catch (Json::LogicError& e)
+   {
+      TheSynth->LogEvent("json error loading userpref for " + mName + ": " + e.what(), kLogEventType_Error);
+      UserPrefs.mUserPrefsFile[mName] = mDefault;
+   }
 }
 
 void UserPrefTextEntryInt::SetUpControl(IDrawableModule* owner)
@@ -174,8 +208,16 @@ bool UserPrefTextEntryInt::DiffersFromSavedValue() const
 
 void UserPrefTextEntryFloat::Init()
 {
-   if (!UserPrefs.mUserPrefsFile[mName].isNull())
-      mValue = UserPrefs.mUserPrefsFile[mName].asFloat();
+   try
+   {
+      if (!UserPrefs.mUserPrefsFile[mName].isNull())
+         mValue = UserPrefs.mUserPrefsFile[mName].asFloat();
+   }
+   catch (Json::LogicError& e)
+   {
+      TheSynth->LogEvent("json error loading userpref for " + mName + ": " + e.what(), kLogEventType_Error);
+      UserPrefs.mUserPrefsFile[mName] = mDefault;
+   }
 }
 void UserPrefTextEntryFloat::SetUpControl(IDrawableModule* owner)
 {
@@ -202,8 +244,16 @@ bool UserPrefTextEntryFloat::DiffersFromSavedValue() const
 
 void UserPrefBool::Init()
 {
-   if (!UserPrefs.mUserPrefsFile[mName].isNull())
-      mValue = UserPrefs.mUserPrefsFile[mName].asBool();
+   try
+   {
+      if (!UserPrefs.mUserPrefsFile[mName].isNull())
+         mValue = UserPrefs.mUserPrefsFile[mName].asBool();
+   }
+   catch (Json::LogicError& e)
+   {
+      TheSynth->LogEvent("json error loading userpref for " + mName + ": " + e.what(), kLogEventType_Error);
+      UserPrefs.mUserPrefsFile[mName] = mDefault;
+   }
 }
 
 void UserPrefBool::SetUpControl(IDrawableModule* owner)
@@ -231,8 +281,16 @@ bool UserPrefBool::DiffersFromSavedValue() const
 
 void UserPrefFloat::Init()
 {
-   if (!UserPrefs.mUserPrefsFile[mName].isNull())
-      mValue = UserPrefs.mUserPrefsFile[mName].asFloat();
+   try
+   {
+      if (!UserPrefs.mUserPrefsFile[mName].isNull())
+         mValue = UserPrefs.mUserPrefsFile[mName].asFloat();
+   }
+   catch (Json::LogicError& e)
+   {
+      TheSynth->LogEvent("json error loading userpref for " + mName + ": " + e.what(), kLogEventType_Error);
+      UserPrefs.mUserPrefsFile[mName] = mDefault;
+   }
 }
 
 void UserPrefFloat::SetUpControl(IDrawableModule* owner)

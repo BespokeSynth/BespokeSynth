@@ -230,8 +230,8 @@ public:
    UserPrefTextEntryInt width{ "width", 1700, 100, 10000, 5, UserPrefCategory::General };
    UserPrefTextEntryInt height{ "height", 1100, 100, 10000, 5, UserPrefCategory::General };
    UserPrefBool set_manual_window_position{ "set_manual_window_position", false, UserPrefCategory::General };
-   UserPrefTextEntryInt position_x{ "position_x", 100, -10000, 10000, 5, UserPrefCategory::General };
-   UserPrefTextEntryInt position_y{ "position_y", 100, -10000, 10000, 5, UserPrefCategory::General };
+   UserPrefTextEntryInt position_x{ "position_x", 200, -10000, 10000, 5, UserPrefCategory::General };
+   UserPrefTextEntryInt position_y{ "position_y", 200, -10000, 10000, 5, UserPrefCategory::General };
    UserPrefFloat zoom{ "zoom", 1, .25f, 2, UserPrefCategory::General };
    UserPrefFloat ui_scale{ "ui_scale", 1, .25f, 2, UserPrefCategory::General };
    UserPrefFloat scroll_multiplier_vertical{ "scroll_multiplier_vertical", 1, -2, 2, UserPrefCategory::General };
