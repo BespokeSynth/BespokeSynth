@@ -389,6 +389,8 @@ void ModularSynth::Poll()
       {
          if (GetKeyModifiers() == kModifier_Shift)
             desiredCursor = MouseCursor::CrosshairCursor;
+         else if (dynamic_cast<FloatSlider*>(gHoveredUIControl) != nullptr && dynamic_cast<FloatSlider*>(gHoveredUIControl)->GetModulator() != nullptr && dynamic_cast<FloatSlider*>(gHoveredUIControl)->GetModulator()->Active())
+            desiredCursor = MouseCursor::UpDownLeftRightResizeCursor;
          else
             desiredCursor = MouseCursor::LeftRightResizeCursor;
       }
