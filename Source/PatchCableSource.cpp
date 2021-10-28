@@ -38,6 +38,7 @@
 namespace
 {
    const int kPatchCableSourceRadius = 5;
+   const int kPatchCableSourceClickRadius = 7;
    const int kPatchCableSpacing = 8;
 }
 
@@ -531,7 +532,7 @@ int PatchCableSource::GetHoverIndex(float x, float y) const
    float cableY = mY;
    for (int i = 0; i < mPatchCables.size() || i == 0; ++i)
    {
-      if (ofDistSquared(x, y, cableX, cableY) < kPatchCableSourceRadius * kPatchCableSourceRadius)
+      if (ofDistSquared(x, y, cableX, cableY) < kPatchCableSourceClickRadius * kPatchCableSourceClickRadius)
          return i;
 
       if (mSide == Side::kBottom)
