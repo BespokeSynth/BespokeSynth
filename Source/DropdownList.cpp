@@ -29,19 +29,14 @@
 #include "ModularSynth.h"
 #include "Push2Control.h"
 
-namespace
-{
-   const int itemSpacing = 15;
-}
-
 DropdownList::DropdownList(IDropdownListener* owner, const char* name, int x, int y, int* var, float width)
 : mWidth(35)
-, mHeight(itemSpacing)
+, mHeight(kItemSpacing)
 , mVar(var)
 , mModalList(this)
 , mOwner(owner)
 , mMaxPerColumn(40)
-, mModalWidth(20)
+, mMaxItemWidth(20)
 , mUnknownItemString("-----")
 , mDrawLabel(false)
 , mSliderVal(0)
@@ -82,7 +77,7 @@ void DropdownList::AddLabel(std::string label, int value)
    mElements.push_back(element);
 
    CalculateWidth();
-   mHeight = itemSpacing;
+   mHeight = kItemSpacing;
    
    CalcSliderVal();
 }
@@ -96,7 +91,7 @@ void DropdownList::RemoveLabel(int value)
          mElements.erase(iter);
          
          CalculateWidth();
-         mHeight = itemSpacing;
+         mHeight = kItemSpacing;
          
          CalcSliderVal();
          break;
@@ -106,16 +101,16 @@ void DropdownList::RemoveLabel(int value)
 
 void DropdownList::CalculateWidth()
 {
-   mModalWidth = mWidth;
+   mMaxItemWidth = mWidth;
    for (int i=0; i<mElements.size(); ++i)
    {
       int width = GetStringWidth(mElements[i].mLabel) + 15;
-      if (width > mModalWidth)
-         mModalWidth = width;
+      if (width > mMaxItemWidth)
+         mMaxItemWidth = width;
    }
    
    if (mAutoCalculateWidth)
-      mWidth = MIN(mModalWidth, 180);
+      mWidth = MIN(mMaxItemWidth, 180);
 }
 
 std::string DropdownList::GetLabel(int val) const
@@ -208,17 +203,21 @@ void DropdownList::DrawDropdown(int w, int h)
    if (mModalList.GetMouseX() >= 0 && mModalList.GetMouseY() >= 0 && mModalList.GetMouseX() < dropdownW && mModalList.GetMouseY() < dropdownH)
       hoverIndex = GetItemIndex(mModalList.GetMouseX(), mModalList.GetMouseY());
 
+   int maxPerColumn = mMaxPerColumn;
+   if (Push2Control::sDrawingPush2Display)
+      maxPerColumn = 9999;
+
    ofSetColor(0,0,0);
    ofFill();
    ofRect(0,0,w,h);
    for (int i=0; i<mElements.size(); ++i)
    {
-      int col = i/mMaxPerColumn;
+      int col = i / maxPerColumn;
       
       if (i == hoverIndex)
       {
          ofSetColor(100, 100, 100, 100);
-         ofRect(mModalWidth * col, (i%mMaxPerColumn)*itemSpacing, mModalWidth, itemSpacing);
+         ofRect(mMaxItemWidth * col, (i%maxPerColumn)*kItemSpacing, mMaxItemWidth, kItemSpacing);
       }
 
       if (mVar && mElements[i].mValue == *mVar)
@@ -226,7 +225,7 @@ void DropdownList::DrawDropdown(int w, int h)
       else
          ofSetColor(255,255,255);
       
-      DrawTextNormal(mElements[i].mLabel, 1+mModalWidth*col, (i%mMaxPerColumn)*itemSpacing+12);
+      DrawTextNormal(mElements[i].mLabel, 1+mMaxItemWidth*col, (i%maxPerColumn)*kItemSpacing+12);
    }
    ofSetColor(255,255,255);
    ofSetLineWidth(.5f);
@@ -288,10 +287,10 @@ void DropdownList::OnClicked(int x, int y, bool right)
    float maxY = ofGetHeight() - 5;
 
    const int kMinPerColumn = 1;
-   mMaxPerColumn = std::max(kMinPerColumn, int((maxY - screenY) / (itemSpacing * GetModuleParent()->GetOwningContainer()->GetDrawScale())));
+   mMaxPerColumn = std::max(kMinPerColumn, int((maxY - screenY) / (kItemSpacing * GetModuleParent()->GetOwningContainer()->GetDrawScale())));
 
    int columns = 1 + ((int)mElements.size() - 1) / mMaxPerColumn;
-   ofVec2f modalDimensions(mModalWidth*columns, itemSpacing * std::min((int)mElements.size(), mMaxPerColumn));
+   ofVec2f modalDimensions(mMaxItemWidth*columns, kItemSpacing * std::min((int)mElements.size(), mMaxPerColumn));
    modalPos.x = std::max(FromScreenPosX(5.0f, GetModuleParent()), std::min(modalPos.x, FromScreenPosX(maxX - modalDimensions.x * GetModuleParent()->GetOwningContainer()->GetDrawScale(), GetModuleParent())));
    mModalList.SetPosition(modalPos.x, modalPos.y);
    mModalList.SetDimensions(modalDimensions.x, modalDimensions.y);
@@ -301,7 +300,7 @@ void DropdownList::OnClicked(int x, int y, bool right)
 
 int DropdownList::GetItemIndex(int x, int y)
 {
-   return y / itemSpacing + x / mModalWidth * mMaxPerColumn;
+   return y / kItemSpacing + x / mMaxItemWidth * mMaxPerColumn;
 }
 
 ofVec2f DropdownList::GetModalListPosition() const
@@ -310,7 +309,7 @@ ofVec2f DropdownList::GetModalListPosition() const
    GetPosition(thisx, thisy);
    if (mDrawLabel)
       thisx += mLabelSize;
-   return ofVec2f(thisx, thisy + itemSpacing);
+   return ofVec2f(thisx, thisy + kItemSpacing);
 }
 
 bool DropdownList::MouseMoved(float x, float y)
@@ -328,7 +327,7 @@ void DropdownList::Clear()
    mElements.clear();
    if (mAutoCalculateWidth)
       mWidth = 35;
-   mHeight = itemSpacing;
+   mHeight = kItemSpacing;
 }
 
 void DropdownList::SetFromMidiCC(float slider, bool setViaModulator /*= false*/)

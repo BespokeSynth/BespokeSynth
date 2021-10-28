@@ -97,6 +97,7 @@ public:
    int GetItemIndex(int x, int y);
    DropdownListElement GetElement(int index) { return mElements[index]; }
    DropdownListModal* GetModalDropdown() { return &mModalList; }
+   float GetMaxItemWidth() const { return mMaxItemWidth; }
 
    //IUIControl
    void SetFromMidiCC(float slider, bool setViaModulator = false) override;
@@ -113,6 +114,8 @@ public:
    void LoadState(FileStreamIn& in, bool shouldSetValue = true) override;
    
    void GetDimensions(float& width, float& height) override;
+
+   static constexpr int kItemSpacing = 15;
    
 protected:
    ~DropdownList();   //protected so that it can't be created on the stack
@@ -127,7 +130,7 @@ private:
 
    int mWidth;
    int mHeight;
-   int mModalWidth;
+   int mMaxItemWidth;
    int mMaxPerColumn;
    std::vector<DropdownListElement> mElements;
    int* mVar;
