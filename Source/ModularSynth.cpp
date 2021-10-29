@@ -699,6 +699,9 @@ void ModularSynth::Draw(void* vg)
    if (tooltip != "" && tooltipContainer != nullptr)
    {
       ofPushMatrix();
+      
+      //Tooltips style ——>
+
       float scale = tooltipContainer->GetDrawScale();
       ofVec2f offset = tooltipContainer->GetDrawOffset();
       ofScale(scale, scale, scale);
@@ -713,31 +716,76 @@ void ModularSynth::Draw(void* vg)
       nvgFontSize(gNanoVG, fontSize);
       float bounds[4];
       nvgTextBoxBounds(gNanoVG, x, y, maxWidth, tooltip.c_str(), nullptr, bounds);
-      float padding = 3;
+      float padding = 8;
       ofRectangle rect(bounds[0]-padding, bounds[1] - padding, bounds[2] - bounds[0] + padding*2, bounds[3] - bounds[1] + padding*2);
       
-      float minX = 5 - offset.x;
-      float maxX = ofGetWidth() / scale  - rect.width - 5 - offset.x;
-      float minY = 5 - offset.y;
-      float maxY = ofGetHeight() / scale - rect.height - 5 - offset.y;
+      float minX = 1 - offset.x;
+      float maxX = ofGetWidth() / scale  - rect.width - 1 - offset.x;
+      float minY = 1 - offset.y;
+      float maxY = ofGetHeight() / scale - rect.height - 1 - offset.y;
       
       float onscreenRectX = ofClamp(rect.x, minX, maxX);
       float onscreenRectY = ofClamp(rect.y, minY, maxY);
       
-      float tooltipBackgroundAlpha = 180;
+      float tooltipBackgroundAlpha = 250;
+       
+      //Tooltips LightTheme
+//      ofFill();
+//      ofSetColor(230, 230, 230, tooltipBackgroundAlpha);
+//      ofRect(onscreenRectX, onscreenRectY, rect.width+4, rect.height-2);
+//
+//      ofNoFill();
+//      ofSetColor(230, 230, 230, tooltipBackgroundAlpha);
+//      ofRect(onscreenRectX, onscreenRectY, rect.width+4, rect.height-2);
+//
+//      ofSetColor(30, 30, 30);
+//      //DrawTextNormal(tooltip, x + 5, y + 12);
+//      gFont.DrawStringWrap(tooltip, fontSize, x + (onscreenRectX - rect.x)+2, y + (onscreenRectY - rect.y)-2, maxWidth);
+      //end of LightTheme      
 
-      ofFill();
-      ofSetColor(50, 50, 50, tooltipBackgroundAlpha);
-      ofRect(onscreenRectX, onscreenRectY, rect.width, rect.height);
+        //Tooltips DarckTheme
+        ofFill();
+        ofSetColor(0, 0, 0, tooltipBackgroundAlpha);
+        ofRect(onscreenRectX, onscreenRectY, rect.width, rect.height);
+  
+        ofNoFill();
+        ofSetColor(0, 0, 0, tooltipBackgroundAlpha);
+        ofRect(onscreenRectX, onscreenRectY, rect.width, rect.height);
+  
+        ofSetColor(220, 220, 220);
+        //DrawTextNormal(tooltip, x + 5, y + 12);
+        gFont.DrawStringWrap(tooltip, fontSize, x + (onscreenRectX - rect.x), y + (onscreenRectY - rect.y)-1, maxWidth);
+        //end of DarckTheme
 
-      ofNoFill();
-      ofSetColor(255, 255, 255, tooltipBackgroundAlpha);
-      ofRect(onscreenRectX, onscreenRectY, rect.width, rect.height);
+//      //Tooltips DarckTheme with in/out layout for further developmnt
+//      ofFill();
+//      ofSetColor(0, 0, 0, tooltipBackgroundAlpha);
+//      ofRect(onscreenRectX, onscreenRectY, rect.width, rect.height+12);
+//
+//      ofNoFill();
+//      ofSetColor(0, 0, 0, tooltipBackgroundAlpha);
+//      ofRect(onscreenRectX, onscreenRectY, rect.width, rect.height+12);
+//
+//      ofSetColor(220, 220, 220);
+//      //DrawTextNormal(tooltip, x + 5, y + 12);
+//      gFont.DrawStringWrap(tooltip, fontSize, x + (onscreenRectX - rect.x), y + (onscreenRectY - rect.y)-2, maxWidth);
+//      
+//      gFont.DrawStringWrap("in", fontSize, onscreenRectX+8, onscreenRectY+rect.height+2, maxWidth);
+//      
+//      gFont.DrawStringWrap("out", fontSize, onscreenRectX+50, onscreenRectY+rect.height+2, maxWidth);
+// 
+//      ofFill();
+//      ofSetColor(0, 167, 203); 
+//      ofSetLineWidth(1.5f);
+//      ofCircle(onscreenRectX+77, rect.height + onscreenRectY-1.5f, 3);
+//
+//      //ofFill();   
+//      ofSetColor(0, 167, 203);
+//      ofRect(onscreenRectX+23, rect.height + onscreenRectY-3, 8, 3, 1.0f);
+//      //end of In/Out layout
 
-      ofSetColor(255, 255, 255);
-      //DrawTextNormal(tooltip, x + 5, y + 12);
-      gFont.DrawStringWrap(tooltip, fontSize, x + (onscreenRectX - rect.x), y + (onscreenRectY - rect.y), maxWidth);
-      
+
+     
       ofPopMatrix();
    }
 
