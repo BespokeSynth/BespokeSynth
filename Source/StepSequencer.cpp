@@ -52,8 +52,6 @@ StepSequencer::StepSequencer()
 , mNumMeasures(1)
 , mStepInterval(kInterval_16n)
 , mStepIntervalDropdown(nullptr)
-, mUseStrengthSliderCheckbox(nullptr)
-, mUseStrengthSlider(false)
 , mCurrentColumn(0)
 , mCurrentColumnSlider(nullptr)
 , mFlusher(this)
@@ -84,8 +82,7 @@ void StepSequencer::CreateUIControls()
 {
    IDrawableModule::CreateUIControls();
    mGrid = new UIGrid(40,45,250,150,16,NUM_STEPSEQ_ROWS, this);
-   mStrengthSlider = new FloatSlider(this,"str",87,22,50,15,&mStrength,0,1,2);
-   mUseStrengthSliderCheckbox = new Checkbox(this,"use str",139,22,&mUseStrengthSlider);
+   mStrengthSlider = new FloatSlider(this,"vel",87,22,70,15,&mStrength,0,1,2);
    mRandomizeButton = new ClickButton(this, "randomize", 160, 22);
    mRandomizationDensitySlider = new FloatSlider(this, "r den", mRandomizeButton, kAnchor_Right, 65, 15, &mRandomizationDensity, 0, 1, 2);
    mRandomizationAmountSlider = new FloatSlider(this, "r amt", mRandomizationDensitySlider, kAnchor_Right, 65, 15, &mRandomizationAmount, 0, 1, 2);
@@ -128,6 +125,8 @@ void StepSequencer::CreateUIControls()
       mRows[i]->CreateUIControls();
       mOffsets[i] = 0;
       mOffsetSlider[i] = new FloatSlider(this,("offset"+ofToString(i)).c_str(),230,185-i*9.4f,90,9,&mOffsets[i],-1,1);
+      mRandomLock[i] = false;
+      mRandomLockCheckbox[i] = new Checkbox(this, ("r lock" + ofToString(i)).c_str(), mGridYOffDropdown->GetRect().getMaxX() + 4 + i * 60, 3, &mRandomLock[i]);
       mNoteRepeats[i] = new NoteRepeat(this, i);
    }
    
@@ -151,8 +150,6 @@ void StepSequencer::CreateUIControls()
    mStepIntervalDropdown->AddLabel("32n", kInterval_32n);
    mStepIntervalDropdown->AddLabel("32nt", kInterval_32nt);
    mStepIntervalDropdown->AddLabel("64n", kInterval_64n);
-   
-   mUseStrengthSliderCheckbox->SetDisplayText(false);
 }
 
 StepSequencer::~StepSequencer()
@@ -325,9 +322,7 @@ void StepSequencer::OnGridButton(int x, int y, float velocity, IGridController* 
                float val = mGrid->GetVal(gridPos.x,gridPos.y);
                if (val == 0)
                {
-                  float strength = 1;
-                  if (mUseStrengthSlider)
-                     strength = mStrength;
+                  float strength = mStrength;
                   mGrid->SetVal(gridPos.x, gridPos.y, strength);
                   mHeldButtons.rbegin()->mTime = 0;
                }
@@ -347,22 +342,11 @@ void StepSequencer::OnGridButton(int x, int y, float velocity, IGridController* 
                
                if (holdTime < 500)
                {
-                  if (mUseStrengthSlider)
-                  {
-                     float val = mGrid->GetVal(gridPos.x,gridPos.y);
-                     if (val == mStrength)
-                        mGrid->SetVal(gridPos.x,gridPos.y,0);
-                     else
-                        mGrid->SetVal(gridPos.x,gridPos.y,mStrength);
-                  }
+                  float val = mGrid->GetVal(gridPos.x,gridPos.y);
+                  if (val == mStrength)
+                     mGrid->SetVal(gridPos.x,gridPos.y,0);
                   else
-                  {
-                     float val = mGrid->GetVal(gridPos.x,gridPos.y);
-                     if (val > 0)
-                        mGrid->SetVal(gridPos.x,gridPos.y,0);
-                     else
-                        mGrid->SetVal(gridPos.x,gridPos.y,1);
-                  }
+                     mGrid->SetVal(gridPos.x,gridPos.y,mStrength);
                }
             }
          }
@@ -467,7 +451,6 @@ void StepSequencer::DrawModule()
    
    mGrid->Draw();
    mStrengthSlider->Draw();
-   mUseStrengthSliderCheckbox->Draw();
    mNumMeasuresSlider->Draw();
    mPresetDropdown->Draw();
    mAdjustOffsetsCheckbox->Draw();
@@ -502,11 +485,24 @@ void StepSequencer::DrawModule()
             mOffsetSlider[i]->SetShowing(false);
          }
 
+         mRandomLockCheckbox[i]->SetShowing(true);
+         mRandomLockCheckbox[i]->Draw();
+
          mRows[i]->Draw(gridX, y);
+
+         if (mRandomLock[i])
+         {
+            ofPushStyle();
+            ofSetColor(255, 0, 0, 50);
+            ofFill();
+            ofRect(gridX, y, mGrid->GetWidth(), (mGrid->GetHeight() / float(mNumRows)));
+            ofPopStyle();
+         }
       }
       else
       {
          mOffsetSlider[i]->SetShowing(false);
+         mRandomLockCheckbox[i]->SetShowing(false);
       }
    }
 
@@ -619,10 +615,6 @@ bool StepSequencer::OnPush2Control(MidiMessageType type, int controlIndex, float
          OnGridButton(gridX, gridY, midiValue/127, mGridControlTarget->GetGridController());
          return true;
       }
-      if (controlIndex == 12) //touching pitchbend
-      {
-         mUseStrengthSlider = midiValue > 0;
-      }
    }
    
    if (type == kMidiMessage_PitchBend)
@@ -633,6 +625,10 @@ bool StepSequencer::OnPush2Control(MidiMessageType type, int controlIndex, float
          float oldStrength = mStrength;
          mStrength = val;
          FloatSliderUpdated(mStrengthSlider, oldStrength);
+      }
+      else
+      {
+         mStrength = 1;
       }
       return true;
    }
@@ -970,14 +966,17 @@ void StepSequencer::ButtonClicked(ClickButton* button)
    {
       for (int row=0; row < mGrid->GetRows(); ++row)
       {
-         for (int col=0; col < mGrid->GetCols(); ++col)
+         if (!mRandomLock[row])
          {
-            if (ofRandom(1) < mRandomizationAmount)
+            for (int col = 0; col < mGrid->GetCols(); ++col)
             {
-               float value = 0;
-               if (ofRandom(1) < mRandomizationDensity)
-                  value = ofRandom(1);
-               mGrid->SetVal(col, row, value);
+               if (ofRandom(1) < mRandomizationAmount)
+               {
+                  float value = 0;
+                  if (ofRandom(1) < mRandomizationDensity)
+                     value = ofRandom(1);
+                  mGrid->SetVal(col, row, value);
+               }
             }
          }
       }

@@ -243,7 +243,7 @@ void UIGrid::OnClicked(int x, int y, bool right)
          }
          else
          {
-            mData[dataIndex] = 1;
+            mData[dataIndex] = mStrength;
          }
       }
    }
@@ -278,7 +278,7 @@ void UIGrid::OnClicked(int x, int y, bool right)
    }
    else
    {
-      if (mData[dataIndex] == mStrength)
+      if (mData[dataIndex] > 0)
       {
          mData[dataIndex] = 0;
          mLastClickWasClear = true;
