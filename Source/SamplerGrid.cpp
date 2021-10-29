@@ -392,7 +392,7 @@ void SamplerGrid::OnClicked(int x, int y, bool right)
       {
          //TODO(Ryan) multichannel
          ChannelBuffer temp(mEditSample->mSampleData + mEditSample->mSampleStart, mEditSample->mSampleEnd - mEditSample->mSampleStart);
-         TheSynth->GrabSample(&temp, K(window));
+         TheSynth->GrabSample(&temp, "gridsample", K(window));
       }
    }
 }

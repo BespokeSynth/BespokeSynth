@@ -283,7 +283,7 @@ void ModularSynth::Setup(juce::AudioDeviceManager* globalAudioDeviceManager, juc
    sBackgroundB = UserPrefs.background_b.Get();
 
    Time time = Time::getCurrentTime();
-   if (fabsf(sBackgroundR - UserPrefs.background_r.GetDefault()) < .001f && fabsf(sBackgroundG - UserPrefs.background_g.GetDefault()) < .001f && fabsf(sBackgroundB == UserPrefs.background_b.GetDefault()) < .001f && time.getMonth() + 1 == 10 && time.getDayOfMonth() == 31)
+   if (fabsf(sBackgroundR - UserPrefs.background_r.GetDefault()) < .001f && fabsf(sBackgroundG - UserPrefs.background_g.GetDefault()) < .001f && fabsf(sBackgroundB - UserPrefs.background_b.GetDefault()) < .001f && time.getMonth() + 1 == 10 && time.getDayOfMonth() == 31)
    {
       sBackgroundLissajousR = 0.722f;
       sBackgroundLissajousG = 0.328f;
@@ -640,7 +640,8 @@ void ModularSynth::Draw(void* vg)
        !IUIControl::WasLastHoverSetViaTab() &&
        mGroupSelectContext == nullptr &&
        PatchCable::sActivePatchCable == nullptr &&
-       mGroupSelectedModules.empty())
+       mGroupSelectedModules.empty() &&
+       mHeldSample == nullptr)
    {
       HelpDisplay* helpDisplay = TheTitleBar->GetHelpDisplay();
 
@@ -2216,11 +2217,12 @@ IUIControl* ModularSynth::FindUIControl(std::string path)
    return mModuleContainer.FindUIControl(IClickable::sLoadContext+path);
 }
 
-void ModularSynth::GrabSample(ChannelBuffer* data, bool window, int numBars)
+void ModularSynth::GrabSample(ChannelBuffer* data, std::string name, bool window, int numBars)
 {
    delete mHeldSample;
    mHeldSample = new Sample();
    mHeldSample->Create(data);
+   mHeldSample->SetName(name);
    mHeldSample->SetNumBars(numBars);
    
    //window sample to avoid clicks

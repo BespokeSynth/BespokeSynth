@@ -143,6 +143,7 @@ void DrumPlayer::DrumHit::CreateUIControls(DrumPlayer* owner, int index)
    FLOATSLIDER(mEnvelopeLengthSlider, ("view ms "+ofToString(index)).c_str(),&mEnvelopeLength,10,2000);
    DROPDOWN(mHitCategoryDropdown,("hitcategory"+ofToString(index)).c_str(),&mHitCategoryIndex,100);
    UICONTROL_CUSTOM(mEnvelopeDisplay, new ADSRDisplay(UICONTROL_BASICS(("envelopedisplay "+ofToString(index)).c_str()),135, 100,&mEnvelope));
+   BUTTON_STYLE(mGrabSampleButton, ("grab " + ofToString(index)).c_str(), ButtonDisplayStyle::kGrabSample);
    ENDUIBLOCK0();
 #undef UIBLOCK_OWNER
 #define UIBLOCK_OWNER this //reset
@@ -246,6 +247,7 @@ void DrumPlayer::DrumHit::SetUIControlsShowing(bool showing)
    mLinkIdSlider->SetShowing(showing);
    mEnvelopeLengthSlider->SetShowing(showing);
    mHitCategoryDropdown->SetShowing(showing);
+   mGrabSampleButton->SetShowing(showing);
 }
 
 void DrumPlayer::LoadKit(int kit)
@@ -756,6 +758,12 @@ void DrumPlayer::DrawModule()
       }
       ofPopStyle();
       ofPopMatrix();
+
+      for (size_t i = 0; i < mDrumHits.size(); ++i)
+      {
+         mDrumHits[i].mTestButton->Draw();
+         mDrumHits[i].mRandomButton->Draw();
+      }
       
       if (mSelectedHitIdx != -1)
          mDrumHits[mSelectedHitIdx].DrawUIControls();
@@ -817,8 +825,6 @@ void DrumPlayer::DrumHit::DrawUIControls()
    
    mVolSlider->Draw();
    mSpeedSlider->Draw();
-   mTestButton->Draw();
-   mRandomButton->Draw();
    mLinkIdSlider->Draw();
    mHitCategoryDropdown->Draw();
    mPanSlider->Draw();
@@ -834,6 +840,7 @@ void DrumPlayer::DrumHit::DrawUIControls()
       mEnvelopeDisplay->SetOverrideDrawTime(mPlayheads[mCurrentPlayheadIndex].mEnvelopeTime);
       mEnvelopeDisplay->Draw();
    }
+   mGrabSampleButton->Draw();
 }
 
 int DrumPlayer::GetAssociatedSampleIndex(int x, int y)
@@ -1059,6 +1066,8 @@ void DrumPlayer::ButtonClicked(ClickButton* button)
          PlayNote(gTime + gBufferSizeMs, i, 127);
       if (button == mDrumHits[i].mRandomButton)
          mDrumHits[i].LoadRandomSample();
+      if (button == mDrumHits[i].mGrabSampleButton)
+         mDrumHits[i].GrabSample();
    }
 }
 
@@ -1083,6 +1092,11 @@ void DrumPlayer::DrumHit::LoadRandomSample()
       //mVelocity = .5f;
       mEnvelopeLength = mSample.LengthInSamples() * gInvSampleRateMs;
    }
+}
+
+void DrumPlayer::DrumHit::GrabSample()
+{
+   TheSynth->GrabSample(mSample.Data(), mSample.Name());
 }
 
 void DrumPlayer::TextEntryComplete(TextEntry* entry)
