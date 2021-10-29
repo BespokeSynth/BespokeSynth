@@ -569,8 +569,7 @@ fouronthefloor~sends note 0 every beat, to trigger a kick drum
 
 
 drumsequencer~step sequencer intended for drums. hold shift when dragging on the grid to adjust step velocity.
-~str~velocity to use when setting a step via a grid controller, if the checkbox next to this slider is checked
-~use str~if the "str" slider should be used for setting velocity
+~vel~velocity to use when setting a step
 ~measures~length of the sequence in measures
 ~preset~select a pattern preset
 ~yoff~vertical offset for grid controller's view of the pattern
@@ -588,6 +587,7 @@ drumsequencer~step sequencer intended for drums. hold shift when dragging on the
 ~randomize~randomize the sequence
 ~r den~density of the randomizer output. the higher this is, the busier the random output will be.
 ~r amt~the chance that each step will change when being randomized. low values will only change a small amount of the sequence, high values will replace more of the sequence.
+~r lock*~lock this row so it doesn't get randomized
 
 
 

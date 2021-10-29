@@ -212,8 +212,6 @@ private:
    UIGrid* mGrid;
    float mStrength;
    FloatSlider* mStrengthSlider;
-   bool mUseStrengthSlider;
-   Checkbox* mUseStrengthSliderCheckbox;
    int mGridYOff;
    DropdownList* mPresetDropdown;
    int mPreset;
@@ -224,6 +222,8 @@ private:
    Checkbox* mAdjustOffsetsCheckbox;
    std::array<float, NUM_STEPSEQ_ROWS> mOffsets;
    std::array<FloatSlider*, NUM_STEPSEQ_ROWS> mOffsetSlider;
+   std::array<bool, NUM_STEPSEQ_ROWS> mRandomLock;
+   std::array<Checkbox*, NUM_STEPSEQ_ROWS> mRandomLockCheckbox;
    std::map<int,int> mPadPressures;
    NoteInterval mRepeatRate;
    DropdownList* mRepeatRateDropdown;
