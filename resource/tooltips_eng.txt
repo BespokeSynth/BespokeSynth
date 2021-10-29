@@ -1340,6 +1340,7 @@ drumplayer~sample player intended for drum playback
 ~envelopedisplay *R~envelope release
 ~test *~play this sample
 ~random *~choose a random sample from the selected hitcategory
+~grab *~grab this sample
 
 
 

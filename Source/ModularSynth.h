@@ -136,7 +136,7 @@ public:
    void AddLissajousDrawer(IDrawableModule* module) { mLissajousDrawers.push_back(module); }
    bool IsLissajousDrawer(IDrawableModule* module) { return VectorContains(module, mLissajousDrawers); }
    
-   void GrabSample(ChannelBuffer* data, bool window = false, int numBars = -1);
+   void GrabSample(ChannelBuffer* data, std::string name, bool window = false, int numBars = -1);
    void GrabSample(std::string filePath);
    Sample* GetHeldSample() const { return mHeldSample; }
    void ClearHeldSample();

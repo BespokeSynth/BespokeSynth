@@ -1080,7 +1080,7 @@ void Looper::OnClicked(int x, int y, bool right)
       grab.SetNumActiveChannels(mBuffer->NumActiveChannels());
       for (int ch=0; ch<grab.NumActiveChannels(); ++ch)
          BufferCopy(grab.GetChannel(ch), mBuffer->GetChannel(ch), mLoopLength);
-      TheSynth->GrabSample(&grab, false, mNumBars);
+      TheSynth->GrabSample(&grab, "loop", false, mNumBars);
    }
 }
 
