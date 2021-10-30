@@ -199,7 +199,7 @@ int SpaceMouseMessageWindow::Impl::SbInit(HWND hwndC)
 
    //SiSetUiMode(devHdl, SI_UI_ALL_CONTROLS); /* Config SoftButton Win Display */
    SiGrabDevice(devHdl, SPW_TRUE); /* PREVENTS OTHER APPLICATIONS FROM RECEIVING 3D CONNEXION DATA !!! */
-   res = 1;        /* opened device succesfully */
+   res = 1;        /* opened device successfully */
    return res;
 }
 

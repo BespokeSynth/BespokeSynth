@@ -956,7 +956,7 @@
          "pitch" : "amount to pitch shift looper output",
          "resample for tempo" : "this button appears when the current global tempo no longer matches the tempo that the buffer was recorded at. click this to resample the buffer to match the new tempo.",
          "save" : "save this loop to a wav file",
-         "scr" : "allow loop to be scrached by adjusting \"scrspd\"",
+         "scr" : "allow loop to be scratched by adjusting \"scrspd\"",
          "scrspd" : "playback speed, used with \"scr\" is enabled. modulate quickly for a vinyl-like scratching effect.",
          "set" : "shift the contents of the looper so the current offset is the start of the buffer",
          "swap" : "swap the contents of this looper and with another. click this button on two loopers to swap them.",
