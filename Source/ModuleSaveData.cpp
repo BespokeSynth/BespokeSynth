@@ -184,8 +184,14 @@ std::string ModuleSaveData::GetString(std::string prop)
 int ModuleSaveData::LoadInt(std::string prop, const ofxJSONElement& moduleInfo, int defaultValue, int min, int max, bool isTextField)
 {
    int val = defaultValue;
-   if (!moduleInfo[prop].isNull())
-      val = moduleInfo[prop].asInt();
+   try
+   {
+      if (!moduleInfo[prop].isNull())
+         val = moduleInfo[prop].asInt();
+   }
+   catch (Json::LogicError& e)
+   {
+   }
    SetInt(prop, val, min, max, isTextField);
    return val;
 }
@@ -202,8 +208,14 @@ int ModuleSaveData::LoadInt(std::string prop, const ofxJSONElement& moduleInfo, 
 float ModuleSaveData::LoadFloat(std::string prop, const ofxJSONElement& moduleInfo, float defaultValue, float min, float max, bool isTextField)
 {
    float val = defaultValue;
-   if (!moduleInfo[prop].isNull())
-      val = moduleInfo[prop].asDouble();
+   try
+   {
+      if (!moduleInfo[prop].isNull())
+         val = moduleInfo[prop].asDouble();
+   }
+   catch (Json::LogicError& e)
+   {
+   }
    SetFloat(prop, val, min, max, isTextField);
    return val;
 }
@@ -220,8 +232,14 @@ float ModuleSaveData::LoadFloat(std::string prop, const ofxJSONElement& moduleIn
 bool ModuleSaveData::LoadBool(std::string prop, const ofxJSONElement& moduleInfo, bool defaultValue)
 {
    bool val = defaultValue;
-   if (!moduleInfo[prop].isNull())
-      val = moduleInfo[prop].asBool();
+   try
+   {
+      if (!moduleInfo[prop].isNull())
+         val = moduleInfo[prop].asBool();
+   }
+   catch (Json::LogicError& e)
+   {
+   }
    SetBool(prop, val);
    return val;
 }
@@ -229,8 +247,14 @@ bool ModuleSaveData::LoadBool(std::string prop, const ofxJSONElement& moduleInfo
 std::string ModuleSaveData::LoadString(std::string prop, const ofxJSONElement& moduleInfo, std::string defaultValue, FillDropdownFn fillFn)
 {
    std::string val = defaultValue;
-   if (!moduleInfo[prop].isNull())
-      val = moduleInfo[prop].asString();
+   try
+   {
+      if (!moduleInfo[prop].isNull())
+         val = moduleInfo[prop].asString();
+   }
+   catch (Json::LogicError& e)
+   {
+   }
    SetString(prop, val);
    SaveVal* save = GetVal(prop);
    assert(save);

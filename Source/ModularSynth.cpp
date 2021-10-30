@@ -1313,7 +1313,11 @@ void ModularSynth::MousePressed(int intX, int intY, int button, const juce::Mous
       return;
    }
 
-   if (gHoveredUIControl != nullptr && !IUIControl::WasLastHoverSetViaTab() && mGroupSelectedModules.empty())
+   if (gHoveredUIControl != nullptr &&
+       !IUIControl::WasLastHoverSetViaTab() &&
+       mGroupSelectedModules.empty() &&
+       mQuickSpawn->IsShowing() == false &&
+       (GetTopModalFocusItem() == nullptr || gHoveredUIControl->GetModuleParent() == GetTopModalFocusItem()))
    {
       //if we have a hovered UI control, clamp clicks within its rect and direct them straight to it
       ofVec2f controlClickPos(GetMouseX(gHoveredUIControl->GetModuleParent()->GetOwningContainer()), GetMouseY(gHoveredUIControl->GetModuleParent()->GetOwningContainer()));
@@ -2097,35 +2101,41 @@ IDrawableModule* ModularSynth::CreateModule(const ofxJSONElement& moduleInfo)
 {
    IDrawableModule* module = nullptr;
 
-   if (moduleInfo["comment_out"].asBool()) //hack since json doesn't allow comments
-      return nullptr;
-
-   std::string type = moduleInfo["type"].asString();
-   type = ModuleFactory::FixUpTypeName(type);
-   
    try
    {
-      if (type == "transport")
-         module = TheTransport;
-      else if (type == "scale")
-         module = TheScale;
-      else
-         module = mModuleFactory.MakeModule(type);
-   
-      if (module == nullptr)
-      {
-         LogEvent("Couldn't create unknown module type \""+type+"\"", kLogEventType_Error);
+      if (moduleInfo["comment_out"].asBool()) //hack since json doesn't allow comments
          return nullptr;
+
+      std::string type = moduleInfo["type"].asString();
+      type = ModuleFactory::FixUpTypeName(type);
+
+      try
+      {
+         if (type == "transport")
+            module = TheTransport;
+         else if (type == "scale")
+            module = TheScale;
+         else
+            module = mModuleFactory.MakeModule(type);
+
+         if (module == nullptr)
+         {
+            LogEvent("Couldn't create unknown module type \"" + type + "\"", kLogEventType_Error);
+            return nullptr;
+         }
+
+         if (module->IsSingleton() == false)
+            module->CreateUIControls();
+         module->LoadBasics(moduleInfo, type);
+         assert(strlen(module->Name()) > 0);
       }
-      
-      if (module->IsSingleton() == false)
-         module->CreateUIControls();
-      module->LoadBasics(moduleInfo, type);
-      assert(strlen(module->Name()) > 0);
+      catch (UnknownModuleException& e)
+      {
+         LogEvent("Couldn't find referenced module \"" + e.mSearchName + "\" when loading \"" + moduleInfo["name"].asString() + "\"", kLogEventType_Error);
+      }
    }
-   catch (UnknownModuleException& e)
+   catch (Json::LogicError& e)
    {
-      LogEvent("Couldn't find referenced module \""+e.mSearchName+"\" when loading \""+moduleInfo["name"].asString()+"\"", kLogEventType_Error);
    }
    
    return module;

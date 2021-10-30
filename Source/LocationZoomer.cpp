@@ -195,10 +195,16 @@ void LocationZoomer::LoadFromSaveData(const ofxJSONElement& saveData)
    mLocations.clear();
    for (int i=0; i<saveData.size(); ++i)
    {
-      int shortcut = saveData[i]["shortcut"].asInt();
-      mLocations[shortcut].mZoomLevel = saveData[i]["zoomlevel"].asDouble();
-      mLocations[shortcut].mOffset.set(saveData[i]["offset_x"].asDouble(),
-                                       saveData[i]["offset_y"].asDouble());
+      try
+      {
+         int shortcut = saveData[i]["shortcut"].asInt();
+         mLocations[shortcut].mZoomLevel = saveData[i]["zoomlevel"].asDouble();
+         mLocations[shortcut].mOffset.set(saveData[i]["offset_x"].asDouble(),
+            saveData[i]["offset_y"].asDouble());
+      }
+      catch (Json::LogicError& e)
+      {
+      }
    }
    MoveToLocation('1');
    mCurrentProgress = .999f;

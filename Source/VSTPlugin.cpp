@@ -130,8 +130,14 @@ namespace VSTLookup
 
          for (auto it = jsonList.begin(); it != jsonList.end(); ++it)
          {
-            std::string key = it.key().asString();
-            lastUsedTimes[key] = jsonList[key].asDouble();
+            try
+            {
+               std::string key = it.key().asString();
+               lastUsedTimes[key] = jsonList[key].asDouble();
+            }
+            catch (Json::LogicError& e)
+            {
+            }
          }
       }
 

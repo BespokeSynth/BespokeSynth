@@ -138,27 +138,33 @@ void Scale::Init()
 
    for (int i=0; i<scales.size(); ++i)
    {
-      Json::Value& scale = scales[i];
+      try
+      {
+         Json::Value& scale = scales[i];
       
-      ScaleInfo scaleInfo;
-      scaleInfo.mName = scale.begin().key().asString();
-      if (scaleInfo.mName == kChromaticScale) //this is a reserved word now
-         continue;
+         ScaleInfo scaleInfo;
+         scaleInfo.mName = scale.begin().key().asString();
+         if (scaleInfo.mName == kChromaticScale) //this is a reserved word now
+            continue;
 
-      Json::Value& pitches = scale[scaleInfo.mName];
-      for (int j=0; j<pitches.size(); ++j)
-      {
-         int pitch = pitches[j].asInt();
-         scaleInfo.mPitches.push_back(pitch);
+         Json::Value& pitches = scale[scaleInfo.mName];
+         for (int j=0; j<pitches.size(); ++j)
+         {
+            int pitch = pitches[j].asInt();
+            scaleInfo.mPitches.push_back(pitch);
+         }
+         mScales.push_back(scaleInfo);
+      
+         mScaleSelector->AddLabel(scaleInfo.mName.c_str(), mScaleSelector->GetNumValues());
+      
+         if (scaleInfo.mPitches.size() == 7)
+         {
+            ++mNumSeptatonicScales;
+            assert(mNumSeptatonicScales == i+1);   //make sure septatonic scales come first (after initial chromatic scale)
+         }
       }
-      mScales.push_back(scaleInfo);
-      
-      mScaleSelector->AddLabel(scaleInfo.mName.c_str(), mScaleSelector->GetNumValues());
-      
-      if (scaleInfo.mPitches.size() == 7)
+      catch (Json::LogicError& e)
       {
-         ++mNumSeptatonicScales;
-         assert(mNumSeptatonicScales == i+1);   //make sure septatonic scales come first (after initial chromatic scale)
       }
    }
    

@@ -321,25 +321,31 @@ void Presets::Load()
       Json::Value& presets = root["presets"];
       for (int i=0; i<presets.size(); ++i)
       {
-         Json::Value& preset = presets[i];
-         mPresetCollection[i].mDescription = preset["description"].asString();
-         mPresetCollection[i].mPresets.resize(preset["controls"].size());
-         for (int j=0; j<preset["controls"].size(); ++j)
+         try
          {
-            Preset& presetData = mPresetCollection[i].mPresets[j];
-            presetData.mControlPath = preset["controls"][j]["control"].asString();
-            presetData.mValue = preset["controls"][j]["value"].asDouble();
-            presetData.mHasLFO = preset["controls"][j]["has_lfo"].asBool();
-            if (presetData.mHasLFO)
+            Json::Value& preset = presets[i];
+            mPresetCollection[i].mDescription = preset["description"].asString();
+            mPresetCollection[i].mPresets.resize(preset["controls"].size());
+            for (int j=0; j<preset["controls"].size(); ++j)
             {
-               presetData.mLFOSettings.mInterval = (NoteInterval)preset["controls"][j]["lfo_interval"].asInt();
-               presetData.mLFOSettings.mOscType = (OscillatorType)preset["controls"][j]["lfo_osctype"].asInt();
-               presetData.mLFOSettings.mLFOOffset = preset["controls"][j]["lfo_offset"].asDouble();
-               presetData.mLFOSettings.mBias = preset["controls"][j]["lfo_bias"].asDouble();
-               presetData.mLFOSettings.mSpread = preset["controls"][j]["lfo_spread"].asDouble();
-               presetData.mLFOSettings.mSoften = preset["controls"][j]["lfo_soften"].asDouble();
-               presetData.mLFOSettings.mShuffle = preset["controls"][j]["lfo_shuffle"].asDouble();
-            }  
+               Preset& presetData = mPresetCollection[i].mPresets[j];
+               presetData.mControlPath = preset["controls"][j]["control"].asString();
+               presetData.mValue = preset["controls"][j]["value"].asDouble();
+               presetData.mHasLFO = preset["controls"][j]["has_lfo"].asBool();
+               if (presetData.mHasLFO)
+               {
+                  presetData.mLFOSettings.mInterval = (NoteInterval)preset["controls"][j]["lfo_interval"].asInt();
+                  presetData.mLFOSettings.mOscType = (OscillatorType)preset["controls"][j]["lfo_osctype"].asInt();
+                  presetData.mLFOSettings.mLFOOffset = preset["controls"][j]["lfo_offset"].asDouble();
+                  presetData.mLFOSettings.mBias = preset["controls"][j]["lfo_bias"].asDouble();
+                  presetData.mLFOSettings.mSpread = preset["controls"][j]["lfo_spread"].asDouble();
+                  presetData.mLFOSettings.mSoften = preset["controls"][j]["lfo_soften"].asDouble();
+                  presetData.mLFOSettings.mShuffle = preset["controls"][j]["lfo_shuffle"].asDouble();
+               }  
+            }
+         }
+         catch (Json::LogicError& e)
+         {
          }
       }
    }

@@ -907,26 +907,32 @@ void DrumPlayer::ReadKits()
    mKits.resize(kits.size());
    for (int i=0; i<kits.size(); ++i)
    {
-      Json::Value& kit = kits[i];
-      int numHitsInFile = kit["samples"].size();
-      for (int j=0; j<NUM_DRUM_HITS && j<numHitsInFile; ++j)
+      try
       {
-         mKits[i].mSampleFiles[j] = kit["samples"][j]["sample"].asString();
-         mKits[i].mLinkIds[j] = kit["samples"][j]["linkid"].asInt();
-         if (kit["samples"][j]["vol"].isNull() == false)
-            mKits[i].mVols[j] = kit["samples"][j]["vol"].asDouble();
-         else
-            mKits[i].mVols[j] = 1;
-         if (kit["samples"][j]["speed"].isNull() == false)
-            mKits[i].mSpeeds[j] = kit["samples"][j]["speed"].asDouble();
-         else
-            mKits[i].mSpeeds[j] = 1;
-         if (kit["samples"][j]["pan"].isNull() == false)
-            mKits[i].mPans[j] = kit["samples"][j]["pan"].asDouble();
-         else
-            mKits[i].mPans[j] = 0;
+         Json::Value& kit = kits[i];
+         int numHitsInFile = kit["samples"].size();
+         for (int j=0; j<NUM_DRUM_HITS && j<numHitsInFile; ++j)
+         {
+            mKits[i].mSampleFiles[j] = kit["samples"][j]["sample"].asString();
+            mKits[i].mLinkIds[j] = kit["samples"][j]["linkid"].asInt();
+            if (kit["samples"][j]["vol"].isNull() == false)
+               mKits[i].mVols[j] = kit["samples"][j]["vol"].asDouble();
+            else
+               mKits[i].mVols[j] = 1;
+            if (kit["samples"][j]["speed"].isNull() == false)
+               mKits[i].mSpeeds[j] = kit["samples"][j]["speed"].asDouble();
+            else
+               mKits[i].mSpeeds[j] = 1;
+            if (kit["samples"][j]["pan"].isNull() == false)
+               mKits[i].mPans[j] = kit["samples"][j]["pan"].asDouble();
+            else
+               mKits[i].mPans[j] = 0;
+         }
+         mKits[i].mName = kit["name"].asString();
       }
-      mKits[i].mName = kit["name"].asString();
+      catch (Json::LogicError& e)
+      {
+      }
    }
 }
 
