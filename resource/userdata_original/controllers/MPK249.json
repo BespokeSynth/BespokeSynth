@@ -1,0 +1,192 @@
+{
+
+ "groups" : [
+	  {
+		   "rows": 1,
+		   "cols": 1,
+		   "position" : [ 0, 0 ],
+		   "dimensions" : [28, 21],
+		   "spacing" : [30, 22],
+		   "controls" : [114],
+		   "messageType" : "control",
+		   "drawType" : "button"
+      },
+      {
+		   "rows": 1,
+		   "cols": 5,
+		   "position" : [ 40, 0 ],
+		   "dimensions" : [28, 21],
+		   "spacing" : [30, 22],
+		   "controls" : [115,116,117,118,119],
+		   "messageType" : "control",
+		   "drawType" : "button"
+      },
+      {
+		   "rows": 4,
+		   "cols": 4,
+		   "position" : [ 0, 40 ],
+		   "dimensions" : [28, 28],
+		   "spacing" : [30,30],
+         "controls" : [ 48, 49, 50, 51,
+                        44, 45, 46, 47,
+                        40, 41, 42, 43,
+                        36, 37, 38, 39
+                      ],
+		   "messageType" : "note",
+		   "drawType" : "button"
+      },
+      {
+		   "rows": 4,
+		   "cols": 4,
+		   "position" : [ 0, 180 ],
+		   "dimensions" : [28, 28],
+		   "spacing" : [30,30],
+         "controls" : [ 64, 65, 66, 67,
+                        60, 61, 62, 63,
+                        56, 57, 58, 59,
+                        52, 53, 54, 55
+                      ],
+		   "messageType" : "note",
+		   "drawType" : "button"
+      },
+      {
+		   "rows": 4,
+		   "cols": 4,
+		   "position" : [ 0, 320 ],
+		   "dimensions" : [28, 28],
+		   "spacing" : [30,30],
+         "controls" : [ 80, 81, 82, 83,
+                        76, 77, 78, 79,
+                        72, 73, 74, 75,
+                        68, 69, 70, 71
+                      ],
+		   "messageType" : "note",
+		   "drawType" : "button"
+      },
+      {
+		   "rows": 4,
+		   "cols": 4,
+		   "position" : [ 0, 460 ],
+		   "dimensions" : [28, 28],
+		   "spacing" : [30,30],
+         "controls" : [ 96, 97, 98, 99,
+                        92, 93, 94, 95,
+                        88, 89, 90, 91,
+                        84, 85, 86, 87
+                      ],
+		   "messageType" : "note",
+		   "drawType" : "button"
+      },  
+      {
+         "rows": 1,
+         "cols": 8,
+         "position" : [ 150, 40 ],
+		   "dimensions" : [28, 28],
+		   "spacing" : [30, 30],
+         "controls" : [3,9,14,15,16,17,20,19],
+         "messageType" : "control",
+         "drawType" : "knob"       
+      },
+      {
+         "rows": 1,
+         "cols": 8,
+         "position" : [ 150, 74 ],
+         "dimensions" : [28, 56],
+         "spacing" : [30, 58],
+         "controls" : [18,21,22,23,24,25,26,27],
+         "messageType" : "control",
+         "drawType" : "slider"
+      },
+	   {
+		   "rows": 1,
+		   "cols": 8,
+		   "position" : [ 150, 142 ],
+		   "dimensions" : [28, 14],
+		   "spacing" : [30, 16],
+		   "controls" : [28,29,30,31,35,41,46,47],
+		   "messageType" : "control",
+		   "drawType" : "button"
+      },
+      {
+         "rows": 1,
+         "cols": 8,
+         "position" : [ 150, 180 ],
+		   "dimensions" : [28, 28],
+		   "spacing" : [30, 30],
+         "controls" : [52,53,54,55,57,58,59,60],
+         "messageType" : "control",
+         "drawType" : "knob"
+      },
+      {
+         "rows": 1,
+         "cols": 8,
+         "position" : [ 150, 214 ],
+         "dimensions" : [28, 56],
+         "spacing" : [30, 58],
+         "controls" : [61,62,63,70,71,72,73,74],
+         "messageType" : "control",
+         "drawType" : "slider"
+      },
+	   {
+		   "rows": 1,
+		   "cols": 8,
+		   "position" : [ 150, 282 ],
+		   "dimensions" : [28, 14],
+		   "spacing" : [30, 16],
+		   "controls" : [75,76,77,78,79,80,81,82],
+		   "messageType" : "control",
+		   "drawType" : "button"
+      },
+      {
+         "rows": 1,
+         "cols": 8,
+         "position" : [ 150, 320 ],
+		   "dimensions" : [28, 28],
+		   "spacing" : [30, 30],
+         "controls" : [83,85,86,87,88,89,90,91],
+         "messageType" : "control",
+         "drawType" : "knob"
+      },
+      {
+         "rows": 1,
+         "cols": 8,
+         "position" : [ 150, 354 ],
+         "dimensions" : [28, 56],
+         "spacing" : [30, 58],
+         "controls" : [92,93,94,95,102,103,104,105],
+         "messageType" : "control",
+         "drawType" : "slider"
+      },
+	   {
+		   "rows": 1,
+		   "cols": 8,
+		   "position" : [ 150, 422 ],
+		   "dimensions" : [28, 14],
+		   "spacing" : [30, 16],
+		   "controls" : [106,107,108,109,110,111,112,113],
+		   "messageType" : "control",
+		   "drawType" : "button"
+      },
+      {
+         "rows": 1,
+         "cols": 1,
+         "position" : [ 150, 496 ],
+         "dimensions" : [28, 80],
+         "spacing" : [30, 82],
+         "messageType" : "pitchbend",
+         "drawType" : "slider"
+      }, 
+      {
+         "rows": 1,
+         "cols": 1,
+         "position" : [ 186, 496 ],
+         "dimensions" : [28, 80],
+         "spacing" : [30, 82],
+         "controls" : [1],
+		   "messageType" : "control",
+         "drawType" : "slider"
+      } 
+   ],
+	 "resend_feedback_on_release" : true
+}
+
