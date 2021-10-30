@@ -97,7 +97,7 @@ private:
    void UpdateSample(Sample* sample, bool ownsSample);
    float GetPlayPositionForMouse(float mouseX) const;
    float GetSecondsForMouse(float mouseX) const;
-   void GetPlayInfoForPitch(int pitch, float& startSeconds, float& lengthSeconds, float& speed) const;
+   void GetPlayInfoForPitch(int pitch, float& startSeconds, float& lengthSeconds, float& speed, bool& stopOnNoteOff) const;
    void DownloadYoutube(std::string url, std::string titles);
    void SearchYoutube(std::string searchTerm);
    void LoadFile();
@@ -168,16 +168,17 @@ private:
    
    struct SampleCuePoint
    {
-      SampleCuePoint() : startSeconds(0), lengthSeconds(0), speed(1) {}
-      float startSeconds;
-      float lengthSeconds;
-      float speed; 
+      float startSeconds{ 0 };
+      float lengthSeconds{ 0 };
+      float speed{ 1 };
+      bool stopOnNoteOff{ false };
    };
    std::vector<SampleCuePoint> mSampleCuePoints{128};
    DropdownList* mCuePointSelector;
    FloatSlider* mCuePointStartSlider;
    FloatSlider* mCuePointLengthSlider;
    FloatSlider* mCuePointSpeedSlider;
+   Checkbox* mCuePointStopCheckbox;
    int mActiveCuePointIndex;
    int mHoveredCuePointIndex;
    bool mSetCuePoint;
@@ -229,5 +230,6 @@ private:
    Checkbox* mRecordAsClipsCheckbox;
    GateEffect mRecordGate;
    int mRecordAsClipsCueIndex;
+   bool mStopOnNoteOff{ false };
 };
 
