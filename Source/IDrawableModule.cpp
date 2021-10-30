@@ -1011,18 +1011,36 @@ bool IDrawableModule::CheckNeedsDraw()
 
 void IDrawableModule::LoadBasics(const ofxJSONElement& moduleInfo, std::string typeName)
 {
-   int x = moduleInfo["position"][0u].asInt();
-   int y = moduleInfo["position"][1u].asInt();
+   int x = 0;
+   int y = 0;
+   std::string name = "error";
+   bool start_minimized = false;
+   bool draw_lissajous = false;
+
+   try
+   {
+      x = moduleInfo["position"][0u].asInt();
+      y = moduleInfo["position"][1u].asInt();
+      name = moduleInfo["name"].asString();
+      start_minimized = moduleInfo["start_minimized"].asBool();
+      draw_lissajous = moduleInfo["draw_lissajous"].asBool();
+   }
+   catch (Json::LogicError& e)
+   {
+      TheSynth->LogEvent("json error loading userpref for " + typeName + ": " + e.what(), kLogEventType_Error);
+   }
+
+   
    SetPosition(x,y);
    
-   SetName(moduleInfo["name"].asString().c_str());
+   SetName(name.c_str());
    
-   SetMinimized(moduleInfo["start_minimized"].asBool());
+   SetMinimized(start_minimized);
    
    if (mMinimized)
       mMinimizeAnimation = 1;
    
-   if (moduleInfo["draw_lissajous"].asBool())
+   if (draw_lissajous)
       TheSynth->AddLissajousDrawer(this);
    
    mTypeName = typeName;

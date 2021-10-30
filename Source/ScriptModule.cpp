@@ -1395,7 +1395,13 @@ void ScriptModule::LoadLayout(const ofxJSONElement& moduleInfo)
    mModuleSaveData.LoadString("style", moduleInfo, "classic", [](DropdownList* list) {
       for (auto i = 0; i < sStyleJSON.size(); ++i)
       {
-         list->AddLabel(sStyleJSON[i]["name"].asString(), i);
+         try
+         {
+            list->AddLabel(sStyleJSON[i]["name"].asString(), i);
+         }
+         catch (Json::LogicError& e)
+         {
+         }
       }
    });
    mModuleSaveData.LoadBool("hotload_script_files", moduleInfo, false);
@@ -1423,8 +1429,14 @@ void ScriptModule::SetUpFromSaveData()
    std::string styleName = mModuleSaveData.GetString("style");
    for (auto i = 0; i < sStyleJSON.size(); ++i)
    {
-      if (sStyleJSON[i]["name"].asString() == styleName)
-         mCodeEntry->SetStyleFromJSON(sStyleJSON[i]);
+      try
+      {
+         if (sStyleJSON[i]["name"].asString() == styleName)
+            mCodeEntry->SetStyleFromJSON(sStyleJSON[i]);
+      }
+      catch (Json::LogicError& e)
+      {
+      }
    }
 
    mHotloadScripts = mModuleSaveData.GetBool("hotload_script_files");

@@ -1365,12 +1365,18 @@ void CodeEntry::SetStyleFromJSON(const ofxJSONElement &vdict) {
         }
         else
         {
-            onto.r = arr[0u].asInt();
-            onto.g = arr[1u].asInt();
-            onto.b = arr[2u].asInt();
+           try
+           {
+              onto.r = arr[0u].asInt();
+              onto.g = arr[1u].asInt();
+              onto.b = arr[2u].asInt();
 
-            if (def.size() > 3)
-                onto.a = arr[3u].asInt();
+              if (def.size() > 3)
+                 onto.a = arr[3u].asInt();
+           }
+           catch (Json::LogicError& e)
+           {
+           }
         }
     };
     fromRGB( "currentBg", currentBg);
