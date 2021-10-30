@@ -26,20 +26,13 @@
 #include "ControlSequencer.h"
 #include "ModularSynth.h"
 #include "PatchCableSource.h"
+#include "UIControlMacros.h"
+#include "MathUtils.h"
 
 std::list<ControlSequencer*> ControlSequencer::sControlSequencers;
 
 ControlSequencer::ControlSequencer()
-: mGrid(nullptr)
-, mUIControl(nullptr)
-, mInterval(kInterval_16n)
-, mIntervalSelector(nullptr)
-, mLength(4)
-, mLengthSelector(nullptr)
-, mControlCable(nullptr)
-, mRandomize(nullptr)
 {
-   
    sControlSequencers.push_back(this);
 }
 
@@ -60,10 +53,15 @@ ControlSequencer::~ControlSequencer()
 void ControlSequencer::CreateUIControls()
 {
    IDrawableModule::CreateUIControls();
-   mGrid = new UIGrid(5,23,130,40,16,1, this);
-   mIntervalSelector = new DropdownList(this,"interval",5,3,(int*)(&mInterval),40);
-   mLengthSelector = new DropdownList(this,"length",mIntervalSelector,kAnchor_Right,(int*)(&mLength),40);
-   mRandomize = new ClickButton(this,"random",mLengthSelector,kAnchor_Right);
+   
+   int width, height;
+   UIBLOCK(3, 3, 200);
+   INTSLIDER(mLengthSlider, "length", &mLength, 1, 64); UIBLOCK_SHIFTRIGHT();
+   DROPDOWN(mIntervalSelector, "interval", (int*)(&mInterval), 40); UIBLOCK_SHIFTRIGHT();
+   BUTTON(mRandomize, "random");
+   ENDUIBLOCK(width, height);
+
+   mGrid = new UIGrid(5, 25, mRandomize->GetRect().getMaxX() - 6, 40, 16, 1, this);
    
    mControlCable = new PatchCableSource(this, kConnectionType_Modulator);
    //mControlCable->SetManualPosition(86, 10);
@@ -74,9 +72,9 @@ void ControlSequencer::CreateUIControls()
    mGrid->SetMajorColSize(4);
    mGrid->SetListener(this);
    
-   /*mIntervalSelector->AddLabel("8", kInterval_8);
+   mIntervalSelector->AddLabel("8", kInterval_8);
    mIntervalSelector->AddLabel("4", kInterval_4);
-   mIntervalSelector->AddLabel("2", kInterval_2);*/
+   mIntervalSelector->AddLabel("2", kInterval_2);
    mIntervalSelector->AddLabel("1n", kInterval_1n);
    mIntervalSelector->AddLabel("2n", kInterval_2n);
    mIntervalSelector->AddLabel("4n", kInterval_4n);
@@ -87,36 +85,75 @@ void ControlSequencer::CreateUIControls()
    mIntervalSelector->AddLabel("16nt", kInterval_16nt);
    mIntervalSelector->AddLabel("32n", kInterval_32n);
    mIntervalSelector->AddLabel("64n", kInterval_64n);
-   
-   mLengthSelector->AddLabel("4n", 1);
-   mLengthSelector->AddLabel("2n", 2);
-   mLengthSelector->AddLabel("1", 4);
-   mLengthSelector->AddLabel("2", 8);
-   mLengthSelector->AddLabel("3", 12);
-   mLengthSelector->AddLabel("4", 16);
-   mLengthSelector->AddLabel("6", 24);
-   mLengthSelector->AddLabel("8", 32);
-   mLengthSelector->AddLabel("16", 64);
-   mLengthSelector->AddLabel("32", 128);
-   mLengthSelector->AddLabel("64", 256);
-   mLengthSelector->AddLabel("128", 512);
 }
 
 void ControlSequencer::Poll()
 {
 }
 
-void ControlSequencer::OnTimeEvent(double time)
+void ControlSequencer::Step(double time, int pulseFlags)
 {
-   int step = TheTransport->GetSyncedStep(time, this, mTransportListenerInfo, mGrid->GetCols());
+   int length = mLength;
+   if (length <= 0)
+      length = 1;
+
+   int direction = 1;
+   if (pulseFlags & kPulseFlag_Backward)
+      direction = -1;
+   if (pulseFlags & kPulseFlag_Repeat)
+      direction = 0;
+
+   mStep = (mStep + direction + length) % length;
+
+   if (pulseFlags & kPulseFlag_Reset)
+      mStep = 0;
+   else if (pulseFlags & kPulseFlag_Random)
+      mStep = gRandom() % length;
+
+   if (!mHasExternalPulseSource || (pulseFlags & kPulseFlag_SyncToTransport))
+   {
+      mStep = TheTransport->GetSyncedStep(time, this, mTransportListenerInfo, length);
+   }
+
+   if (pulseFlags & kPulseFlag_Align)
+   {
+      int stepsPerMeasure = TheTransport->GetStepsPerMeasure(this);
+      int numMeasures = ceil(float(length) / stepsPerMeasure);
+      int measure = TheTransport->GetMeasure(time) % numMeasures;
+      int step = ((TheTransport->GetQuantized(time, mTransportListenerInfo) % stepsPerMeasure) + measure * stepsPerMeasure) % length;
+      mStep = step;
+   }
    
-   mGrid->SetHighlightCol(time, step);
+   mGrid->SetHighlightCol(time, mStep);
    
    if (mUIControl && mEnabled)
    {
-      mUIControl->SetFromMidiCC(mGrid->GetVal(step, 0), true);
+      mUIControl->SetFromMidiCC(mGrid->GetVal(mStep, 0), true);
       mControlCable->AddHistoryEvent(gTime, true);
       mControlCable->AddHistoryEvent(gTime + 15, false);
+   }
+}
+
+void ControlSequencer::OnPulse(double time, float velocity, int flags)
+{
+   mHasExternalPulseSource = true;
+
+   Step(time, flags);
+}
+
+void ControlSequencer::OnTimeEvent(double time)
+{
+   if (!mHasExternalPulseSource)
+      Step(time, 0);
+}
+
+void ControlSequencer::PlayNote(double time, int pitch, int velocity, int voiceIdx, ModulationParameters modulation)
+{
+   if (velocity > 0)
+   {
+      mHasExternalPulseSource = true;
+      mStep = pitch % std::max(1, mLength);
+      Step(time, kPulseFlag_Repeat);
    }
 }
 
@@ -127,7 +164,7 @@ void ControlSequencer::DrawModule()
    
    mGrid->Draw();
    mIntervalSelector->Draw();
-   mLengthSelector->Draw();
+   mLengthSlider->Draw();
    mRandomize->Draw();
    
    int currentHover = mGrid->CurrentHover();
@@ -161,33 +198,6 @@ bool ControlSequencer::MouseMoved(float x, float y)
    return false;
 }
 
-void ControlSequencer::SetNumSteps(int numSteps, bool stretch)
-{
-   int oldNumSteps = mGrid->GetCols();
-   assert(numSteps != 0);
-   assert(oldNumSteps != 0);
-   if (stretch)   //updated interval, stretch old pattern out to make identical pattern at higher res
-   {              // abcd becomes aabbccdd
-      std::vector<float> pattern;
-      pattern.resize(oldNumSteps);
-      for (int i=0; i<oldNumSteps; ++i)
-         pattern[i] = mGrid->GetVal(i,0);
-      float ratio = float(numSteps)/oldNumSteps;
-      for (int i=0; i<numSteps; ++i)
-         mGrid->SetVal(i, 0, pattern[int(i/ratio)]);
-   }
-   else           //updated length, copy old pattern out to make identical pattern over longer time
-   {              // abcd becomes abcdabcd
-      int numCopies = numSteps / oldNumSteps;
-      for (int i=1; i<numCopies; ++i)
-      {
-         for (int j=0; j<oldNumSteps; ++j)
-            mGrid->SetVal(i*oldNumSteps + j, 0, mGrid->GetVal(j, 0));
-      }
-   }
-   mGrid->SetGrid(numSteps,1);
-}
-
 void ControlSequencer::GridUpdated(UIGrid* grid, int col, int row, float value, float oldValue)
 {
    if (grid == mGrid)
@@ -218,29 +228,31 @@ void ControlSequencer::PostRepatch(PatchCableSource* cableSource, bool fromUserC
    }
 }
 
-void ControlSequencer::DropdownUpdated(DropdownList* list, int oldVal)
+void ControlSequencer::IntSliderUpdated(IntSlider* slider, int oldVal)
 {
-   int newSteps = int(mLength/4.0f * TheTransport->CountInStandardMeasure(mInterval));
-   if (list == mIntervalSelector)
+   if (slider == mLengthSlider)
    {
-      if (newSteps > 0)
+      mGrid->SetGrid(mLength, 1);
+      if (mLength > oldVal)
       {
-         TransportListenerInfo* transportListenerInfo = TheTransport->GetListenerInfo(this);
-         if (transportListenerInfo != nullptr)
-            transportListenerInfo->mInterval =  mInterval;
-         SetNumSteps(newSteps, true);
-      }
-      else
-      {
-         mInterval = (NoteInterval)oldVal;
+         //slice the loop into the nearest power of 2 and loop new steps from there
+         int oldLengthPow2 = std::max(1, MathUtils::HighestPow2(oldVal));
+         for (int i = oldVal; i < mLength; ++i)
+         {
+            int loopedFrom = i % oldLengthPow2;
+            mGrid->SetVal(i, 0, mGrid->GetVal(i % oldLengthPow2, 0));
+         }
       }
    }
-   if (list == mLengthSelector)
+}
+
+void ControlSequencer::DropdownUpdated(DropdownList* list, int oldVal)
+{
+   if (list == mIntervalSelector)
    {
-      if (newSteps > 0)
-         SetNumSteps(newSteps, false);
-      else
-         mLength = oldVal;
+      TransportListenerInfo* transportListenerInfo = TheTransport->GetListenerInfo(this);
+      if (transportListenerInfo != nullptr)
+         transportListenerInfo->mInterval =  mInterval;
    }
 }
 
@@ -287,8 +299,6 @@ void ControlSequencer::SaveLayout(ofxJSONElement& moduleInfo)
 void ControlSequencer::LoadLayout(const ofxJSONElement& moduleInfo)
 {
    mModuleSaveData.LoadString("uicontrol", moduleInfo);
-   mModuleSaveData.LoadFloat("gridwidth", moduleInfo, 130, 120, 1000);
-   mModuleSaveData.LoadFloat("gridheight", moduleInfo, 40, 15, 1000);
    
    SetUpFromSaveData();
 }
@@ -306,30 +316,89 @@ void ControlSequencer::SetUpFromSaveData()
    {
       mUIControl = nullptr;
    }
-   SetGridSize(mModuleSaveData.GetFloat("gridwidth"), mModuleSaveData.GetFloat("gridheight"));
 }
 
 namespace
 {
-   const int kSaveStateRev = 0;
+   const int kSaveStateRev = 1;
 }
 
 void ControlSequencer::SaveState(FileStreamOut& out)
 {
+   out << kSaveStateRev;
+
    IDrawableModule::SaveState(out);
    
-   out << kSaveStateRev;
-   
    mGrid->SaveState(out);
+   out << mGrid->GetWidth();
+   out << mGrid->GetHeight();
 }
 
 void ControlSequencer::LoadState(FileStreamIn& in)
 {
+   mLoadRev = -1;
+
+   if (ModuleContainer::sFileSaveStateRev >= 422)
+   {
+      in >> mLoadRev;
+      LoadStateValidate(mLoadRev <= kSaveStateRev);
+   }
+
    IDrawableModule::LoadState(in);
    
-   int rev;
-   in >> rev;
-   LoadStateValidate(rev == kSaveStateRev);
+   if (ModuleContainer::sFileSaveStateRev <= 421)
+   {
+      in >> mLoadRev;
+      LoadStateValidate(mLoadRev <= kSaveStateRev);
+   }
    
    mGrid->LoadState(in);
+
+   if (mLoadRev >= 1)
+   {
+      float width, height;
+      in >> width;
+      in >> height;
+      mGrid->SetDimensions(width, height);
+   }
+
+   if (mLoadRev == 0)
+   {
+      //port old data
+      float len = 0;
+      if (mOldLengthStr == "4n")  len = .25f;
+      if (mOldLengthStr == "2n")  len = .5f;
+      if (mOldLengthStr == "1")   len = 1;
+      if (mOldLengthStr == "2")   len = 2;
+      if (mOldLengthStr == "3")   len = 3;
+      if (mOldLengthStr == "4")   len = 4;
+      if (mOldLengthStr == "6")   len = 6;
+      if (mOldLengthStr == "8")   len = 8;
+      if (mOldLengthStr == "16")  len = 16;
+      if (mOldLengthStr == "32")  len = 32;
+      if (mOldLengthStr == "64")  len = 64;
+      if (mOldLengthStr == "128") len = 128;
+
+      mLength = int(len * TheTransport->CountInStandardMeasure(mInterval));
+      int min, max;
+      mLengthSlider->GetRange(min, max);
+      if (mLength > max)
+         mLengthSlider->SetExtents(min, mLength);
+   }
+}
+
+bool ControlSequencer::LoadOldControl(FileStreamIn& in, std::string& oldName)
+{
+   if (mLoadRev < 1)
+   {
+      if (oldName == "length")
+      {
+         //load dropdown string
+         int dropdownRev;
+         in >> dropdownRev;
+         in >> mOldLengthStr;
+         return true;
+      }
+   }
+   return false;
 }

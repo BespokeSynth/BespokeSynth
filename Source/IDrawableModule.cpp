@@ -1126,16 +1126,23 @@ void IDrawableModule::LoadState(FileStreamIn& in)
       bool threwException = false;
       try
       {
-         //ofLog() << "loading control " << uicontrolname;
-         auto* control = FindUIControl(uicontrolname.c_str(), false);
+         if (LoadOldControl(in, uicontrolname))
+         {
+            //old data loaded, we're good now!
+         }
+         else
+         {
+            //ofLog() << "loading control " << uicontrolname;
+            auto* control = FindUIControl(uicontrolname.c_str(), false);
 
-         if (control == nullptr)
-            throw UnknownUIControlException();
-      
-         bool setValue = true;
-         if (VectorContains(control, ControlsToNotSetDuringLoadState()))
-            setValue = false;
-         control->LoadState(in, setValue);
+            if (control == nullptr)
+               throw UnknownUIControlException();
+
+            bool setValue = true;
+            if (VectorContains(control, ControlsToNotSetDuringLoadState()))
+               setValue = false;
+            control->LoadState(in, setValue);
+         }
          
          for (int j=0; j<kControlSeparatorLength; ++j)
          {
