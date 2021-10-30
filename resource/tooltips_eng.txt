@@ -1132,6 +1132,7 @@ sampleplayer~sample playback with triggerable cue points, clip extraction, and y
 ~cue start~start point in seconds of the current cue
 ~cue len~length in seconds of the current cue. a value of zero will play to the end of the sample.
 ~cue speed~playback speed of the current cue
+~cue stop~stop playing this cue if a note-off is received
 ~cuepoint~sets the current cue to edit
 ~click sets cue~when true, clicking on the waveform will set the start position of the current cue
 ~select played~when true, any cue point played via incoming notes will become the current cue
