@@ -37,10 +37,11 @@
 #include "Slider.h"
 #include "IPulseReceiver.h"
 #include "UIGrid.h"
+#include "IDrivableSequencer.h"
 
 class PatchCableSource;
 
-class PulseSequence : public IDrawableModule, public ITimeListener, public IButtonListener, public IDropdownListener, public IIntSliderListener, public IFloatSliderListener, public IAudioPoller, public IPulseSource, public IPulseReceiver, public UIGridListener
+class PulseSequence : public IDrawableModule, public ITimeListener, public IButtonListener, public IDropdownListener, public IIntSliderListener, public IFloatSliderListener, public IAudioPoller, public IPulseSource, public IPulseReceiver, public UIGridListener, public IDrivableSequencer
 {
 public:
    PulseSequence();
@@ -69,6 +70,10 @@ public:
    void MouseReleased() override;
    bool MouseMoved(float x, float y) override;
    bool MouseScrolled(int x, int y, float scrollX, float scrollY) override;
+
+   //IDrivableSequencer
+   bool HasExternalPulseSource() const override { return mHasExternalPulseSource; }
+   void ResetExternalPulseSource() override { mHasExternalPulseSource = false; }
    
    void ButtonClicked(ClickButton* button) override;
    void CheckboxUpdated(Checkbox* checkbox) override;

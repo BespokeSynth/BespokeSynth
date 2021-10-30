@@ -16,10 +16,11 @@
 #include "INoteSource.h"
 #include "IPulseReceiver.h"
 #include "Slider.h"
+#include "IDrivableSequencer.h"
 
 #define NUM_M185SEQUENCER_STEPS 8
 
-class M185Sequencer : public IDrawableModule, public IButtonListener, public IDropdownListener, public IIntSliderListener, public ITimeListener, public IPulseReceiver, public INoteSource
+class M185Sequencer : public IDrawableModule, public IButtonListener, public IDropdownListener, public IIntSliderListener, public ITimeListener, public IPulseReceiver, public INoteSource, public IDrivableSequencer
 {
 public:
    M185Sequencer();
@@ -41,6 +42,10 @@ public:
 
    //IPulseReceiver
    void OnPulse(double time, float velocity, int flags) override;
+
+   //IDrivableSequencer
+   bool HasExternalPulseSource() const override { return mHasExternalPulseSource; }
+   void ResetExternalPulseSource() override { mHasExternalPulseSource = false; }
 
    //IDropdownListener
    void DropdownUpdated(DropdownList* list, int oldVal) override;

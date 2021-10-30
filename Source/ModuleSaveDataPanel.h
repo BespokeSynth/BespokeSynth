@@ -82,6 +82,7 @@ private:
    ClickButton* mApplyButton;
    ClickButton* mDeleteButton;
    Checkbox* mDrawDebugCheckbox;
+   ClickButton* mResetSequencerButton;
    std::map<DropdownList*,ModuleSaveData::SaveVal*> mStringDropdowns;
 
    int mHeight;

@@ -41,6 +41,7 @@
 #include "Push2Control.h"
 #include "IPulseReceiver.h"
 #include "TextEntry.h"
+#include "IDrivableSequencer.h"
 
 #define NUM_STEPSEQ_ROWS 16
 #define META_STEP_MAX 64
@@ -103,7 +104,7 @@ private:
    StepSequencer* mSeq;
 };
 
-class StepSequencer : public IDrawableModule, public INoteSource, public ITimeListener, public IFloatSliderListener, public IGridControllerListener, public IButtonListener, public IDropdownListener, public INoteReceiver, public IRadioButtonListener, public IIntSliderListener, public IPush2GridController, public IPulseReceiver, public ITextEntryListener
+class StepSequencer : public IDrawableModule, public INoteSource, public ITimeListener, public IFloatSliderListener, public IGridControllerListener, public IButtonListener, public IDropdownListener, public INoteReceiver, public IRadioButtonListener, public IIntSliderListener, public IPush2GridController, public IPulseReceiver, public ITextEntryListener, public IDrivableSequencer
 {
 public:
    StepSequencer();
@@ -154,7 +155,10 @@ public:
    void UpdatePush2Leds(Push2Control* push2) override;
    
    bool IsMetaStepActive(double time, int col, int row);
-   bool HasExternalPulseSource() const { return mHasExternalPulseSource; }
+
+   //IDrivableSequencer
+   bool HasExternalPulseSource() const override { return mHasExternalPulseSource; }
+   void ResetExternalPulseSource() override { mHasExternalPulseSource = false; }
 
    void CheckboxUpdated(Checkbox* checkbox) override;
    void FloatSliderUpdated(FloatSlider* slider, float oldVal) override;

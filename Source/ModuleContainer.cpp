@@ -572,7 +572,7 @@ ofxJSONElement ModuleContainer::WriteModules()
 
 namespace
 {
-   const int kSaveStateRev = 421;
+   const int kSaveStateRev = 422;
 }
 
 void ModuleContainer::SaveState(FileStreamOut& out)

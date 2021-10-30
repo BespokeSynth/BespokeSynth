@@ -33,40 +33,57 @@
 #include "Checkbox.h"
 #include "Transport.h"
 #include "DropdownList.h"
+#include "Slider.h"
+#include "IPulseReceiver.h"
+#include "INoteReceiver.h"
+#include "IDrivableSequencer.h"
 
 class PatchCableSource;
 
-class ControlSequencer : public IDrawableModule, public ITimeListener, public IDropdownListener, public UIGridListener, public IButtonListener
+class ControlSequencer : public IDrawableModule, public ITimeListener, public IDropdownListener, public UIGridListener, public IButtonListener, public IIntSliderListener, public IPulseReceiver, public INoteReceiver, public IDrivableSequencer
 {
 public:
    ControlSequencer();
    ~ControlSequencer();
    static IDrawableModule* Create() { return new ControlSequencer(); }
-   
-   
+
+
    void CreateUIControls() override;
    void Init() override;
-   
+
    IUIControl* GetUIControl() const { return mUIControl; }
-   
+
    //IGridListener
    void GridUpdated(UIGrid* grid, int col, int row, float value, float oldValue) override;
-   
+
    //IDrawableModule
    void Poll() override;
    bool IsResizable() const override { return true; }
    void Resize(float w, float h) override;
    void SetEnabled(bool enabled) override { mEnabled = enabled; }
-   
+
    //ITimeListener
    void OnTimeEvent(double time) override;
+
+   //IPulseReceiver
+   void OnPulse(double time, float velocity, int flags) override;
+
+   //INoteReceiver
+   void PlayNote(double time, int pitch, int velocity, int voiceIdx = -1, ModulationParameters modulation = ModulationParameters()) override;
+   void SendCC(int control, int value, int voiceIdx = -1) override {}
+
+   //IDrivableSequencer
+   bool HasExternalPulseSource() const override { return mHasExternalPulseSource; }
+   void ResetExternalPulseSource() override { mHasExternalPulseSource = false; }
    
    void CheckboxUpdated(Checkbox* checkbox) override {}
+   void IntSliderUpdated(IntSlider* slider, int oldVal) override;
    void DropdownUpdated(DropdownList* list, int oldVal) override;
    void ButtonClicked(ClickButton* button) override;
    
    void LoadLayout(const ofxJSONElement& moduleInfo) override;
    void SaveLayout(ofxJSONElement& moduleInfo) override;
+   bool LoadOldControl(FileStreamIn& in, std::string& oldName) override;
    void SetUpFromSaveData() override;
    
    void SaveState(FileStreamOut& out) override;
@@ -78,8 +95,8 @@ public:
    void PostRepatch(PatchCableSource* cableSource, bool fromUserClick) override;
    
 private:
+   void Step(double time, int pulseFlags);
    void SetGridSize(float w, float h);
-   void SetNumSteps(int numSteps, bool stretch);
    
    //IDrawableModule
    void DrawModule() override;
@@ -89,14 +106,18 @@ private:
    bool MouseMoved(float x, float y) override;
    void MouseReleased() override;
    
-   UIGrid* mGrid;
-   IUIControl* mUIControl;
-   NoteInterval mInterval;
-   DropdownList* mIntervalSelector;
-   int mLength;
-   DropdownList* mLengthSelector;
-   PatchCableSource* mControlCable;
-   ClickButton* mRandomize;
+   UIGrid* mGrid{ nullptr };
+   IUIControl* mUIControl{ nullptr };
+   NoteInterval mInterval{ kInterval_16n };
+   DropdownList* mIntervalSelector{ nullptr };
+   int mLength{ 16 };
+   IntSlider* mLengthSlider{ nullptr };
+   std::string mOldLengthStr;
+   int mLoadRev{ -1 };
+   PatchCableSource* mControlCable{ nullptr };
+   ClickButton* mRandomize{ nullptr };
+   bool mHasExternalPulseSource{ false };
+   int mStep{ 0 };
 
    TransportListenerInfo* mTransportListenerInfo;
 };
