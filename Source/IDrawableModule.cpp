@@ -1027,7 +1027,7 @@ void IDrawableModule::LoadBasics(const ofxJSONElement& moduleInfo, std::string t
    }
    catch (Json::LogicError& e)
    {
-      TheSynth->LogEvent("json error loading userpref for " + typeName + ": " + e.what(), kLogEventType_Error);
+      TheSynth->LogEvent(__PRETTY_FUNCTION__ + std::string(" json error: ") + e.what(), kLogEventType_Error);
    }
 
    

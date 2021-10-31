@@ -323,6 +323,7 @@ void MidiController::AddControlConnection(const ofxJSONElement& connection)
    }
    catch (Json::LogicError& e)
    {
+      TheSynth->LogEvent(__PRETTY_FUNCTION__ + std::string(" json error: ") + e.what(), kLogEventType_Error);
    }
 }
 
@@ -1765,6 +1766,7 @@ void MidiController::LoadLayout(std::string filename)
    catch (Json::LogicError& e)
    {
       loaded = false;
+      TheSynth->LogEvent(__PRETTY_FUNCTION__ + std::string(" json error: ") + e.what(), kLogEventType_Error);
    }
    
    if (!loaded)

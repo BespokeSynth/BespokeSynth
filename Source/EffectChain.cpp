@@ -552,6 +552,7 @@ void EffectChain::LoadBasics(const ofxJSONElement& moduleInfo, std::string typeN
       }
       catch (Json::LogicError& e)
       {
+         TheSynth->LogEvent(__PRETTY_FUNCTION__ + std::string(" json error: ") + e.what(), kLogEventType_Error);
       }
    }
 }
@@ -575,6 +576,7 @@ void EffectChain::LoadLayout(const ofxJSONElement& moduleInfo)
       }
       catch (Json::LogicError& e)
       {
+         TheSynth->LogEvent(__PRETTY_FUNCTION__ + std::string(" json error: ") + e.what(), kLogEventType_Error);
       }
    }
 

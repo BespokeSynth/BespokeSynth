@@ -1401,6 +1401,7 @@ void ScriptModule::LoadLayout(const ofxJSONElement& moduleInfo)
          }
          catch (Json::LogicError& e)
          {
+            TheSynth->LogEvent(__PRETTY_FUNCTION__ + std::string(" json error: ") + e.what(), kLogEventType_Error);
          }
       }
    });
@@ -1436,6 +1437,7 @@ void ScriptModule::SetUpFromSaveData()
       }
       catch (Json::LogicError& e)
       {
+         TheSynth->LogEvent(__PRETTY_FUNCTION__ + std::string(" json error: ") + e.what(), kLogEventType_Error);
       }
    }
 
