@@ -542,7 +542,7 @@ bool Canvas::MouseScrolled(int x, int y, float scrollX, float scrollY)
 
 void Canvas::KeyPressed(int key, bool isRepeat)
 {
-   if (TheSynth->GetLastClickedModule() == GetParent() && gHoveredUIControl == this)
+   if (gHoveredUIControl == this)
    {
       if (key == juce::KeyPress::backspaceKey || key == juce::KeyPress::deleteKey)
       {
@@ -565,22 +565,28 @@ void Canvas::KeyPressed(int key, bool isRepeat)
          for (auto* element : mElements)
             element->SetHighlight(true);
       }
+
+
       if (key == OF_KEY_LEFT || key == OF_KEY_RIGHT)
       {
          int direction = (key == OF_KEY_LEFT) ? -1 : 1;
          for (auto* element : mElements)
          {
             if (element->GetHighlighted())
-               element->mCol += direction;
+               element->mCol = ofClamp(element->mCol + direction, 0, mNumCols-1);
          }
       }
+
+      int pitchDirectionFactor = 1;
+      if (GetKeyModifiers() == kModifier_Shift)
+         pitchDirectionFactor = 12; //octave
       if (key == OF_KEY_UP || key == OF_KEY_DOWN)
       {
          int direction = (key == OF_KEY_UP) ? -1 : 1;
          for (auto* element : mElements)
          {
             if (element->GetHighlighted())
-               element->mRow += direction;
+               element->mRow = ofClamp(element->mRow + (direction * pitchDirectionFactor), 0, mNumRows-1);
          }
       }
    }

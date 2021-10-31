@@ -149,38 +149,7 @@ void NoteCanvas::PlayNote(double time, int pitch, int velocity, int voiceIdx, Mo
 
 void NoteCanvas::KeyPressed(int key, bool isRepeat)
 {
-   if (TheSynth->GetLastClickedModule() == this)
-   {
-      if (key == OF_KEY_UP || key == OF_KEY_DOWN || key == OF_KEY_RIGHT || key == OF_KEY_LEFT)
-      {
-         int directionUpDown = 0;
-         int directionLeftRight = 0;
-         if (key == OF_KEY_UP)
-            directionUpDown = -1;
-         if (key == OF_KEY_DOWN)
-            directionUpDown = 1;
-         if (key == OF_KEY_LEFT)
-            directionLeftRight = -1;
-         if (key == OF_KEY_RIGHT)
-            directionLeftRight = 1;
-         
-         if (GetKeyModifiers() == kModifier_Shift)
-            directionUpDown *= 12; //octave
-         
-         for (auto element : mCanvas->GetElements())
-         {
-            if (element->GetHighlighted())
-            {
-               element->mRow = ofClamp(element->mRow + directionUpDown, 0, 127);
-               element->mCol = ofClamp(element->mCol + directionLeftRight, 0, mCanvas->GetNumCols()-1);
-            }
-         }
-      }
-      else
-      {
-         mCanvas->KeyPressed(key, isRepeat);
-      }
-   }
+   IDrawableModule::KeyPressed(key, isRepeat);
 }
 
 bool NoteCanvas::FreeRecordParityMatched()
