@@ -24,6 +24,7 @@
 //
 
 #include "ModuleSaveData.h"
+#include "ModularSynth.h"
 #include "ofxJSONElement.h"
 #include "SynthGlobals.h"
 #include "DropdownList.h"
@@ -191,6 +192,7 @@ int ModuleSaveData::LoadInt(std::string prop, const ofxJSONElement& moduleInfo, 
    }
    catch (Json::LogicError& e)
    {
+      TheSynth->LogEvent(__PRETTY_FUNCTION__ + std::string(" json error: ") + e.what(), kLogEventType_Error);
    }
    SetInt(prop, val, min, max, isTextField);
    return val;
@@ -215,6 +217,7 @@ float ModuleSaveData::LoadFloat(std::string prop, const ofxJSONElement& moduleIn
    }
    catch (Json::LogicError& e)
    {
+      TheSynth->LogEvent(__PRETTY_FUNCTION__ + std::string(" json error: ") + e.what(), kLogEventType_Error);
    }
    SetFloat(prop, val, min, max, isTextField);
    return val;
@@ -239,6 +242,7 @@ bool ModuleSaveData::LoadBool(std::string prop, const ofxJSONElement& moduleInfo
    }
    catch (Json::LogicError& e)
    {
+      TheSynth->LogEvent(__PRETTY_FUNCTION__ + std::string(" json error: ") + e.what(), kLogEventType_Error);
    }
    SetBool(prop, val);
    return val;
@@ -254,6 +258,7 @@ std::string ModuleSaveData::LoadString(std::string prop, const ofxJSONElement& m
    }
    catch (Json::LogicError& e)
    {
+      TheSynth->LogEvent(__PRETTY_FUNCTION__ + std::string(" json error: ") + e.what(), kLogEventType_Error);
    }
    SetString(prop, val);
    SaveVal* save = GetVal(prop);

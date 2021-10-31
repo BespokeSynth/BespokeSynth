@@ -165,6 +165,7 @@ void Scale::Init()
       }
       catch (Json::LogicError& e)
       {
+         TheSynth->LogEvent(__PRETTY_FUNCTION__ + std::string(" json error: ") + e.what(), kLogEventType_Error);
       }
    }
    
