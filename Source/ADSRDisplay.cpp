@@ -56,10 +56,10 @@ ADSRDisplay::ADSRDisplay(IDrawableModule* owner, const char* name, int x, int y,
    if (floatListener)
    {
       int sliderHeight = h/4;
-      mASlider = new FloatSlider(floatListener,(std::string(name)+"A").c_str(),x,y,w,sliderHeight,&(mAdsr->GetA()),1,1000);
+      mASlider = new FloatSlider(floatListener,(std::string(name)+"A").c_str(),x,y,w,sliderHeight,&(mAdsr->GetA()),0,1000);
       mDSlider = new FloatSlider(floatListener,(std::string(name)+"D").c_str(),x,y+sliderHeight,w,sliderHeight,&(mAdsr->GetD()),0,1000);
       mSSlider = new FloatSlider(floatListener,(std::string(name)+"S").c_str(),x,y+sliderHeight*2,w,sliderHeight,&(mAdsr->GetS()),0,1);
-      mRSlider = new FloatSlider(floatListener,(std::string(name)+"R").c_str(),x,y+sliderHeight*3,w,sliderHeight,&(mAdsr->GetR()),1,1000);
+      mRSlider = new FloatSlider(floatListener,(std::string(name)+"R").c_str(),x,y+sliderHeight*3,w,sliderHeight,&(mAdsr->GetR()),0,1000);
       
       mASlider->SetMode(FloatSlider::kSquare);
       mDSlider->SetMode(FloatSlider::kSquare);

@@ -1309,6 +1309,7 @@ drumsynth~oscillator+noise drum synth
 ~cutoffmax*~filter start cutoff frequency
 ~cutoffmin*~filter end cutoff frequency
 ~q*~filter resonance
+~oversampling~oversampling amount. increases sound quality, but also increases cpu usage.
 
 
 
