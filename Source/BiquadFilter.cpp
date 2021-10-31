@@ -31,6 +31,7 @@ BiquadFilter::BiquadFilter()
 , mF(4000)
 , mQ(sqrt(2) / 2)
 , mDbGain(0)
+, mSampleRate(gSampleRate)
 {
    Clear();
    UpdateFilterCoeff();
@@ -66,7 +67,7 @@ void BiquadFilter::UpdateFilterCoeff()
 
    double norm;
    double V = pow(10, fabs(mDbGain) / 20.0);
-   double K = tan(M_PI * (mF / gSampleRate));
+   double K = tan(M_PI * (mF / mSampleRate));
    switch (mType)
    {
       case kFilterType_Lowpass:
@@ -230,7 +231,7 @@ void BiquadFilter::CopyCoeffFrom(BiquadFilter& other)
 
 float BiquadFilter::GetMagnitudeResponseAt(float f)
 {
-   auto const piw0 = (f/gSampleRate) * M_PI * 2;
+   auto const piw0 = (f/mSampleRate) * M_PI * 2;
    auto const cosw = std::cos(piw0);
    auto const sinw = std::sin(piw0);
 
