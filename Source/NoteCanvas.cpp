@@ -149,6 +149,8 @@ void NoteCanvas::PlayNote(double time, int pitch, int velocity, int voiceIdx, Mo
 
 void NoteCanvas::KeyPressed(int key, bool isRepeat)
 {
+   IDrawableModule::KeyPressed(key, isRepeat);
+
    if (TheSynth->GetLastClickedModule() == this)
    {
       if (key == OF_KEY_UP || key == OF_KEY_DOWN || key == OF_KEY_RIGHT || key == OF_KEY_LEFT)
