@@ -1278,6 +1278,10 @@ fmsynth~polyphonic fm synthesis
 
 
 
+notetoggle~turn a control on or off depending on if there are any input notes
+
+
+
 drumsynth~oscillator+noise drum synth
 ~vol~the output volume
 ~edit~display parameters for each hit
