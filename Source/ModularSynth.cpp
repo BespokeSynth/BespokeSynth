@@ -1336,10 +1336,10 @@ void ModularSynth::MousePressed(int intX, int intY, int button, const juce::Mous
       controlClickPos.x = std::clamp(controlClickPos.x, controlRect.getMinX(), controlRect.getMaxX());
       controlClickPos.y = std::clamp(controlClickPos.y, controlRect.getMinY(), controlRect.getMaxY());
 
-      gHoveredUIControl->TestClick(controlClickPos.x, controlClickPos.y, rightButton);
-
       if (gHoveredUIControl->GetModuleParent() != TheTitleBar)
          mLastClickedModule = gHoveredUIControl->GetModuleParent();
+
+      gHoveredUIControl->TestClick(controlClickPos.x, controlClickPos.y, rightButton);
    }
    else
    {
