@@ -1313,6 +1313,15 @@ void ModularSynth::MousePressed(int intX, int intY, int button, const juce::Mous
       return;
    }
 
+   if (InMidiMapMode())
+   {
+      if (gBindToUIControl == gHoveredUIControl)   //if it's the same, clear it
+         gBindToUIControl = nullptr;
+      else
+         gBindToUIControl = gHoveredUIControl;
+      return;
+   }
+
    if (gHoveredUIControl != nullptr &&
        !IUIControl::WasLastHoverSetViaTab() &&
        mGroupSelectedModules.empty() &&
@@ -1328,105 +1337,102 @@ void ModularSynth::MousePressed(int intX, int intY, int button, const juce::Mous
       controlClickPos.y = std::clamp(controlClickPos.y, controlRect.getMinY(), controlRect.getMaxY());
 
       gHoveredUIControl->TestClick(controlClickPos.x, controlClickPos.y, rightButton);
-      return;
+
+      if (gHoveredUIControl->GetModuleParent() != TheTitleBar)
+         mLastClickedModule = gHoveredUIControl->GetModuleParent();
    }
-
-   if (GetTopModalFocusItem())
-   {
-      float modalX = GetMouseX(GetTopModalFocusItem()->GetOwningContainer());
-      float modalY = GetMouseY(GetTopModalFocusItem()->GetOwningContainer());
-      bool clicked = GetTopModalFocusItem()->TestClick(modalX, modalY, rightButton);
-      if (!clicked)
-      {
-         FloatSliderLFOControl* lfo = dynamic_cast<FloatSliderLFOControl*>(GetTopModalFocusItem());
-         if (lfo) //if it's an LFO, don't dismiss it if you're adjusting the slider
-         {
-            FloatSlider* slider = lfo->GetOwner();
-            float uiX,uiY;
-            slider->GetPosition(uiX, uiY);
-            float w, h;
-            slider->GetDimensions(w, h);
-
-            if (x < uiX || y < uiY || x > uiX + w || y > uiY + h)
-               PopModalFocusItem();
-         }
-         else  //otherwise, always dismiss if you click outside it
-         {
-            PopModalFocusItem();
-         }
-      }
-      else
-      {
-         return;
-      }
-   }
-
-   if (InMidiMapMode())
-   {
-      if (gBindToUIControl == gHoveredUIControl)   //if it's the same, clear it
-         gBindToUIControl = nullptr;
-      else
-         gBindToUIControl = gHoveredUIControl;
-      return;
-   }
-
-   IDrawableModule* clicked = GetModuleAtCursor();
-
-   for (auto cable : mPatchCables)
-   {
-      if (clicked &&
-          (clicked == GetTopModalFocusItem() ||
-           clicked->AlwaysOnTop() ||
-           mModuleContainer.IsHigherThan(clicked, cable->GetOwningModule())))
-         break;
-      if (cable->TestClick(x,y,rightButton))
-         return;
-   }
-
-   mClickStartX = x;
-   mClickStartY = y;
-   if (clicked == nullptr)
-   {
-      if (rightButton)
-      {
-         mIsMousePanning = true;
-      }
-      else
-      {
-         bool beginGroupSelect = true;
-
-         //only start lassoing if we have a bit of space from a module, to avoid a common issue I'm seeing where people lasso accidentally
-         if (GetModuleAtCursor(7, 7) || GetModuleAtCursor(-7, 7) || GetModuleAtCursor(7, -7) || GetModuleAtCursor(-7, -7))
-            beginGroupSelect = false;
-
-         if (beginGroupSelect)
-         {
-            SetGroupSelectContext(&mModuleContainer);
-            gHoveredUIControl = nullptr;
-         }
-      }
-   }
-   if (clicked != nullptr && clicked != TheTitleBar)
-      mLastClickedModule = clicked;
    else
-      mLastClickedModule = nullptr;
-   mHasDuplicatedDuringDrag = false;
-
-   if (mGroupSelectedModules.empty() == false)
    {
-      if (!VectorContains(clicked, mGroupSelectedModules))
-         mGroupSelectedModules.clear();
-      return;
-   }
+      if (GetTopModalFocusItem())
+      {
+         float modalX = GetMouseX(GetTopModalFocusItem()->GetOwningContainer());
+         float modalY = GetMouseY(GetTopModalFocusItem()->GetOwningContainer());
+         bool clicked = GetTopModalFocusItem()->TestClick(modalX, modalY, rightButton);
+         if (!clicked)
+         {
+            FloatSliderLFOControl* lfo = dynamic_cast<FloatSliderLFOControl*>(GetTopModalFocusItem());
+            if (lfo) //if it's an LFO, don't dismiss it if you're adjusting the slider
+            {
+               FloatSlider* slider = lfo->GetOwner();
+               float uiX,uiY;
+               slider->GetPosition(uiX, uiY);
+               float w, h;
+               slider->GetDimensions(w, h);
 
-   if (clicked)
-   {
-      x = GetMouseX(clicked->GetModuleParent()->GetOwningContainer());
-      y = GetMouseY(clicked->GetModuleParent()->GetOwningContainer());
-      CheckClick(clicked, x, y, rightButton);
+               if (x < uiX || y < uiY || x > uiX + w || y > uiY + h)
+                  PopModalFocusItem();
+            }
+            else  //otherwise, always dismiss if you click outside it
+            {
+               PopModalFocusItem();
+            }
+         }
+         else
+         {
+            return;
+         }
+      }
+
+      IDrawableModule* clicked = GetModuleAtCursor();
+
+      for (auto cable : mPatchCables)
+      {
+         if (clicked &&
+            (clicked == GetTopModalFocusItem() ||
+               clicked->AlwaysOnTop() ||
+               mModuleContainer.IsHigherThan(clicked, cable->GetOwningModule())))
+            break;
+         if (cable->TestClick(x,y,rightButton))
+            return;
+      }
+
+      mClickStartX = x;
+      mClickStartY = y;
+      if (clicked == nullptr)
+      {
+         if (rightButton)
+         {
+            mIsMousePanning = true;
+         }
+         else
+         {
+            bool beginGroupSelect = true;
+
+            //only start lassoing if we have a bit of space from a module, to avoid a common issue I'm seeing where people lasso accidentally
+            if (GetModuleAtCursor(7, 7) || GetModuleAtCursor(-7, 7) || GetModuleAtCursor(7, -7) || GetModuleAtCursor(-7, -7))
+               beginGroupSelect = false;
+
+            if (beginGroupSelect)
+            {
+               SetGroupSelectContext(&mModuleContainer);
+               gHoveredUIControl = nullptr;
+            }
+         }
+      }
+      if (clicked != nullptr && clicked != TheTitleBar)
+         mLastClickedModule = clicked;
+      else
+         mLastClickedModule = nullptr;
+      mHasDuplicatedDuringDrag = false;
+
+      if (mGroupSelectedModules.empty() == false)
+      {
+         if (!VectorContains(clicked, mGroupSelectedModules))
+            mGroupSelectedModules.clear();
+         return;
+      }
+
+      if (clicked)
+      {
+         x = GetMouseX(clicked->GetModuleParent()->GetOwningContainer());
+         y = GetMouseY(clicked->GetModuleParent()->GetOwningContainer());
+         CheckClick(clicked, x, y, rightButton);
+      }
+      else if (TheSaveDataPanel != nullptr)
+      {
+         TheSaveDataPanel->SetModule(nullptr);
+      }
    }
-   else if (TheSaveDataPanel != nullptr)
-      TheSaveDataPanel->SetModule(nullptr);
 }
 
 void ModularSynth::MouseScrolled(float x, float y, bool canZoomCanvas)
