@@ -88,13 +88,13 @@ public:
       if (UserPrefs.set_manual_window_position.Get())
       {
          mDesiredInitialPosition.setXY(UserPrefs.position_x.Get(), UserPrefs.position_y.Get());
-
+      }
+      else
+      {
          if (width + getTopLevelComponent()->getPosition().x > screenWidth)
             width = screenWidth - getTopLevelComponent()->getPosition().x;
          if (height + getTopLevelComponent()->getPosition().y + 20 > screenHeight)
             height = screenHeight - getTopLevelComponent()->getPosition().y - 20;
-
-         setSize(width, height);
       }
       
       setSize(width, height);
