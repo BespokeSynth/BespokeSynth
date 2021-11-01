@@ -1576,11 +1576,7 @@ void ModularSynth::CheckClick(IDrawableModule* clickedModule, int x, int y, bool
    int modulePosY = y - moduleRect.y;
 
    if (modulePosY < 0 && clickedModule != TheTitleBar && (!clickedModule->HasEnableCheckbox() || modulePosX > 20) && modulePosX < moduleRect.width - 15)
-   {
-      mMoveModule = clickedModule;
-      mMoveModuleOffsetX = moduleRect.x - x;
-      mMoveModuleOffsetY = moduleRect.y - y;
-   }
+      SetMoveModule(clickedModule, moduleRect.x - x, moduleRect.y - y, false);
 
    float parentX = 0;
    float parentY = 0;
@@ -1661,6 +1657,9 @@ void ModularSynth::MouseReleased(int intX, int intY, int button, const juce::Mou
             mMoveModule->ToggleMinimized();
             mMoveModule = nullptr;
          }
+
+         if (!mMoveModuleCanStickToCursor)
+            mMoveModule = nullptr;
       }
       else
       {
@@ -2654,7 +2653,7 @@ void ModularSynth::OnConsoleInput()
          ofLog() << "Creating: " << mConsoleText;
          ofVec2f grabOffset(-40,10);
          IDrawableModule* module = SpawnModuleOnTheFly(mConsoleText, GetMouseX(&mModuleContainer) + grabOffset.x, GetMouseY(&mModuleContainer) + grabOffset.y);
-         TheSynth->SetMoveModule(module, grabOffset.x, grabOffset.y);
+         TheSynth->SetMoveModule(module, grabOffset.x, grabOffset.y, true);
       }
    }
 }
@@ -2838,11 +2837,12 @@ IDrawableModule* ModularSynth::SpawnModuleOnTheFly(std::string moduleName, float
    return module;
 }
 
-void ModularSynth::SetMoveModule(IDrawableModule* module, float offsetX, float offsetY)
+void ModularSynth::SetMoveModule(IDrawableModule* module, float offsetX, float offsetY, bool canStickToCursor)
 {
    mMoveModule = module;
    mMoveModuleOffsetX = offsetX;
    mMoveModuleOffsetY = offsetY;
+   mMoveModuleCanStickToCursor = canStickToCursor;
 }
 
 void ModularSynth::AddMidiDevice(MidiDevice* device)
