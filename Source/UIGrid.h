@@ -68,7 +68,7 @@ public:
    int GetHighlightCol(double time) const;
    void SetMajorColSize(int size) { mMajorCol = size; }
    int GetMajorColSize() const { return mMajorCol; }
-   void SetSingleColumnMode(int set) { mSingleColumn = set; }
+   void SetSingleColumnMode(bool set) { mSingleColumn = set; }
    void Clear();
    void SetFlip(bool flip) { mFlip = flip; }
    void SetStrength(float strength) { mStrength = strength; }
