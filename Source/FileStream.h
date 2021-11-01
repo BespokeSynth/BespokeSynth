@@ -73,6 +73,7 @@ public:
    int GetFilePosition() const;
    bool OpenedOk() const;
    bool Eof() const;
+   static bool s32BitMode;
 private:
     std::unique_ptr<juce::FileInputStream> mStream;
 };

@@ -28,6 +28,9 @@
 
 #include "juce_core/juce_core.h"
 
+//static
+bool FileStreamIn::s32BitMode = false;
+
 FileStreamOut::FileStreamOut(const std::string& file)
 : mStream(std::make_unique<juce::FileOutputStream>(juce::File{file}))
 {
@@ -134,7 +137,16 @@ FileStreamIn& FileStreamIn::operator>>(double &var)
 FileStreamIn& FileStreamIn::operator>>(std::string &var)
 {
    uint64_t len;
-   mStream->read(&len, sizeof(len));
+   if (s32BitMode)
+   {
+      uint32_t len32;
+      mStream->read(&len32, sizeof(len32));
+      len = len32;
+   }
+   else
+   {
+      mStream->read(&len, sizeof(len));
+   }
    
    if (TheSynth->IsLoadingModule())
       LoadStateValidate(len < 99999);   //probably garbage beyond this point
