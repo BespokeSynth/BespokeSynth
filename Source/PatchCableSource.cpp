@@ -623,14 +623,14 @@ void PatchCableSource::KeyPressed(int key, bool isRepeat)
       {
          if (cable != nullptr && cable == PatchCable::sActivePatchCable)
          {
-            RemovePatchCable(cable);
+            RemovePatchCable(cable, true);
             break;
          }
       }
    }
 }
 
-void PatchCableSource::RemovePatchCable(PatchCable* cable)
+void PatchCableSource::RemovePatchCable(PatchCable* cable, bool fromUserAction)
 {
    mOwner->PreRepatch(this);
    mAudioReceiver = nullptr;
@@ -640,7 +640,7 @@ void PatchCableSource::RemovePatchCable(PatchCable* cable)
       RemoveFromVector(dynamic_cast<IPulseReceiver*>(cable->GetTarget()), mPulseReceivers);
    }
    RemoveFromVector(cable, mPatchCables);
-   mOwner->PostRepatch(this, false);
+   mOwner->PostRepatch(this, fromUserAction);
    delete cable;
 }
 

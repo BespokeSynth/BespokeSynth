@@ -1338,6 +1338,18 @@ std::string MidiController::GetDefaultTooltip(MidiMessageType type, int control)
    return str + ofToString(control);
 }
 
+UIControlConnection *MidiController::GetConnectionForCableSource(const PatchCableSource *source)
+{
+   for (auto c : mLayoutControls)
+   {
+      if (c.mActive && c.mControlCable == source)
+      {
+         return GetConnectionForControl(c.mType, c.mControl);
+      }
+   }
+   return nullptr;
+}
+
 void MidiController::OnClicked(int x, int y, bool right)
 {
    IDrawableModule::OnClicked(x, y, right);
@@ -2002,32 +2014,41 @@ void MidiController::PostRepatch(PatchCableSource* cableSource, bool fromUserCli
          break;
    }
    
-   if (fromUserClick && !repatched && cableSource->GetTarget())   //need to make connection
+   if (cableSource->GetTarget())   //need to make connection
    {
-      int layoutControl = GetLayoutControlIndexForCable(cableSource);
-      if (layoutControl != -1)
+      if (fromUserClick && !repatched)
       {
-         UIControlConnection* connection = AddControlConnection(mLayoutControls[layoutControl].mType, mLayoutControls[layoutControl].mControl, -1, dynamic_cast<IUIControl*>(cableSource->GetTarget()));
-         
-         RadioButton* radioButton = dynamic_cast<RadioButton*>(cableSource->GetTarget());
-         if (radioButton && mLayoutControls[layoutControl].mDrawType == kDrawType_Button)
+         int layoutControl = GetLayoutControlIndexForCable(cableSource);
+         if (layoutControl != -1)
          {
-            connection->mType = kControlType_SetValue;
-            float closestSq = FLT_MAX;
-            int closestIdx = 0;
-            ofVec2f mousePos(TheSynth->GetRawMouseX(), TheSynth->GetRawMouseY());
-            for (int i=0; i<radioButton->GetNumValues(); ++i)
+            UIControlConnection* connection = AddControlConnection(mLayoutControls[layoutControl].mType, mLayoutControls[layoutControl].mControl, -1, dynamic_cast<IUIControl*>(cableSource->GetTarget()));
+
+            RadioButton* radioButton = dynamic_cast<RadioButton*>(cableSource->GetTarget());
+            if (radioButton && mLayoutControls[layoutControl].mDrawType == kDrawType_Button)
             {
-               float distSq = (mousePos - radioButton->GetOptionPosition(i)).distanceSquared();
-               if (distSq < closestSq)
+               connection->mType = kControlType_SetValue;
+               float closestSq = FLT_MAX;
+               int closestIdx = 0;
+               ofVec2f mousePos(TheSynth->GetRawMouseX(), TheSynth->GetRawMouseY());
+               for (int i=0; i<radioButton->GetNumValues(); ++i)
                {
-                  closestSq = distSq;
-                  closestIdx = i;
+                  float distSq = (mousePos - radioButton->GetOptionPosition(i)).distanceSquared();
+                  if (distSq < closestSq)
+                  {
+                     closestSq = distSq;
+                     closestIdx = i;
+                  }
                }
+               connection->mValue = closestIdx;
             }
-            connection->mValue = closestIdx;
          }
       }
+   }
+   else // need to remove a connection if no cables remain
+   {
+      auto uiConnection = GetConnectionForCableSource(cableSource);
+      mConnections.remove(uiConnection);
+      delete uiConnection;
    }
 }
 

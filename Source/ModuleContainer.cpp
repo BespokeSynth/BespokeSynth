@@ -349,7 +349,7 @@ void ModuleContainer::DeleteModule(IDrawableModule* module)
                cablesToDestroy.push_back(cable);
          }
          for (auto cable : cablesToDestroy)
-            cable->Destroy();
+            cable->Destroy(false);
       }
    }
 

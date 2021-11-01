@@ -408,7 +408,7 @@ void PatchCable::MouseReleased()
             sActivePatchCable = nullptr;
          
          if (mTarget == nullptr)
-            Destroy();
+            Destroy(true);
       }
    }
 }
@@ -602,9 +602,9 @@ bool PatchCable::IsValidTarget(IClickable* target) const
    return mOwner->IsValidTarget(target);
 }
 
-void PatchCable::Destroy()
+void PatchCable::Destroy(bool fromUserClick)
 {
-   mOwner->RemovePatchCable(this);
+   mOwner->RemovePatchCable(this, fromUserClick);
 }
 
 ConnectionType PatchCable::GetConnectionType() const

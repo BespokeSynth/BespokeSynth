@@ -1303,7 +1303,7 @@ void ModularSynth::MousePressed(int intX, int intY, int button, const juce::Mous
    if (PatchCable::sActivePatchCable != nullptr)
    {
       if (rightButton)
-         PatchCable::sActivePatchCable->Destroy();
+         PatchCable::sActivePatchCable->Destroy(true);
       return;
    }
 
