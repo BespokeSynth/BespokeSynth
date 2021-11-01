@@ -2429,6 +2429,14 @@ void ModularSynth::LoadState(std::string file)
    mAudioThreadMutex.Unlock();
    
    FileStreamIn in(ofToDataPath(file));
+
+   //TODO(Ryan) here's a little hack to allow older BSK files that were saved in 32-bit to load.
+   //I guess this could bite me if someone ever has a very massive json. the number corresponds to a long-standing sanity check in FileStreamIn::operator>>(std::string &var), so this shouldn't break any current behavior.
+   //this should definitely be removed if anything about the structure of the BSK format changes.
+   uint64_t firstLength[1];
+   in.Peek(firstLength, sizeof(uint64_t));
+   if (firstLength[0] >= 99999)
+      FileStreamIn::s32BitMode = true;
    
    std::string jsonString;
    in >> jsonString;
@@ -2442,6 +2450,8 @@ void ModularSynth::LoadState(std::string file)
       
       TheTransport->Reset();
    }
+
+   FileStreamIn::s32BitMode = false;
    
    mCurrentSaveStatePath = file;
    std::string filename = File(mCurrentSaveStatePath).getFileName().toStdString();
