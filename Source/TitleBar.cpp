@@ -90,7 +90,7 @@ void SpawnList::OnSelection(DropdownList* list)
    {
       IDrawableModule* module = Spawn();
       if (module != nullptr)
-         TheSynth->SetMoveModule(module, moduleGrabOffset.x, moduleGrabOffset.y);
+         TheSynth->SetMoveModule(module, moduleGrabOffset.x, moduleGrabOffset.y, true);
       mSpawnIndex = -1;
    }
 }

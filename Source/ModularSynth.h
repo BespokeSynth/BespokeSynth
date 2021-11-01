@@ -102,7 +102,7 @@ public:
    void AddMidiDevice(MidiDevice* device);
    void ArrangeAudioSourceDependencies();
    IDrawableModule* SpawnModuleOnTheFly(std::string moduleName, float x, float y, bool addToContainer = true);
-   void SetMoveModule(IDrawableModule* module, float offsetX, float offsetY);
+   void SetMoveModule(IDrawableModule* module, float offsetX, float offsetY, bool canStickToCursor);
    
    int GetNumInputChannels() const { return (int)mInputBuffers.size(); }
    int GetNumOutputChannels() const { return (int)mOutputBuffers.size(); }
@@ -260,6 +260,7 @@ private:
    IDrawableModule* mMoveModule;
    int mMoveModuleOffsetX;
    int mMoveModuleOffsetY;
+   bool mMoveModuleCanStickToCursor{ false };   //if the most current mMoveModule can stick to the cursor if you release the mouse button before moving it
    
    ofVec2f mLastMoveMouseScreenPos;
    ofVec2f mLastMouseDragPos;

@@ -488,7 +488,7 @@ bool PatchCableSource::TestClick(int x, int y, bool right, bool testOnly /* = fa
                send->SetTarget(GetTarget());
                SetTarget(send);
                send->SetSend(1, false);
-               TheSynth->SetMoveModule(send, spawnOffset.x, spawnOffset.y);
+               TheSynth->SetMoveModule(send, spawnOffset.x, spawnOffset.y, false);
             }
             else if (mType == kConnectionType_Modulator)
             {
@@ -497,7 +497,7 @@ bool PatchCableSource::TestClick(int x, int y, bool right, bool testOnly /* = fa
                IUIControl* currentTarget = dynamic_cast<IUIControl*>(GetTarget());
                SetTarget(macroSlider->GetSlider());
                macroSlider->SetOutputTarget(0, currentTarget);
-               TheSynth->SetMoveModule(macroSlider, spawnOffset.x, spawnOffset.y);
+               TheSynth->SetMoveModule(macroSlider, spawnOffset.x, spawnOffset.y, false);
             }
          }
          else
