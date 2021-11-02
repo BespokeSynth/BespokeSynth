@@ -1650,6 +1650,7 @@ void ModularSynth::MouseReleased(int intX, int intY, int button, const juce::Mou
 
    if (mMoveModule)
    {
+      Prefab::sJustReleasedModule = mMoveModule;
       if (!source.hasMovedSignificantlySincePressed())
       {
          if (mMoveModule->WasMinimizeAreaClicked())
@@ -1688,6 +1689,7 @@ void ModularSynth::MouseReleased(int intX, int intY, int button, const juce::Mou
    mClickStartX = INT_MAX;
    mClickStartY = INT_MAX;
    mGroupSelectContext = nullptr;
+   Prefab::sJustReleasedModule = nullptr;
 }
 
 void ModularSynth::AudioOut(float** output, int bufferSize, int nChannels)
@@ -2300,9 +2302,8 @@ IDrawableModule* ModularSynth::DuplicateModule(IDrawableModule* module)
    
    ofxJSONElement layoutData;
    module->SaveLayout(layoutData);
-   std::vector<IDrawableModule*> allModules;
-   mModuleContainer.GetAllModules(allModules);
-   std::string newName = GetUniqueName(layoutData["name"].asString(), allModules);
+   std::vector<IDrawableModule*> modules = mModuleContainer.GetModules();
+   std::string newName = GetUniqueName(layoutData["name"].asString(), modules);
    layoutData["name"] = newName;
    
    IDrawableModule* newModule = CreateModule(layoutData);
@@ -2760,9 +2761,8 @@ IDrawableModule* ModularSynth::SpawnModuleOnTheFly(std::string moduleName, float
 
    ofxJSONElement dummy;
    dummy["type"] = moduleType;
-   std::vector<IDrawableModule*> allModules;
-   mModuleContainer.GetAllModules(allModules);
-   dummy["name"] = GetUniqueName(moduleType, allModules);
+   std::vector<IDrawableModule*> modules = mModuleContainer.GetModules();
+   dummy["name"] = GetUniqueName(moduleType, modules);
    dummy["onthefly"] = true;
 
    if (moduleType == "effectchain")
