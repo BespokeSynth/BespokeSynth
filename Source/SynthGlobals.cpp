@@ -674,7 +674,7 @@ std::string GetUniqueName(std::string name, std::vector<IDrawableModule*> existi
       bool isNameUnique = true;
       for (int i=0; i<existing.size(); ++i)
       {
-         if (existing[i]->Path() == name)
+         if (existing[i]->Name() == name)
          {
             ++suffix;
             name = origName + ofToString(suffix);
