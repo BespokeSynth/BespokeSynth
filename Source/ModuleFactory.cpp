@@ -247,6 +247,7 @@
 #include "MPETweaker.h"
 #include "NoteExpressionRouter.h"
 #include "NoteToggle.h"
+#include "NoteTable.h"
 
 #include <juce_core/juce_core.h>
 
@@ -440,6 +441,7 @@ ModuleFactory::ModuleFactory()
    REGISTER(NoteExpressionRouter, noteexpression, kModuleType_Note);
    REGISTER(FloatSliderLFOControl, lfo, kModuleType_Other);
    REGISTER(NoteToggle, notetoggle, kModuleType_Other);
+   REGISTER(NoteTable, notetable, kModuleType_Note);
 
    //REGISTER_EXPERIMENTAL(MidiPlayer, midiplayer, kModuleType_Instrument);
    REGISTER_HIDDEN(Autotalent, autotalent, kModuleType_Audio);

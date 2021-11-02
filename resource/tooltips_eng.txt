@@ -462,6 +462,20 @@ notesequencer~looping sequence of notes at an interval. pair with a "pulser" mod
 
 
 
+notetable~map a pitch (starting from zero) to a scale pitch
+~random pitch~randomize pitches in the sequence. hold shift to constrain the randomization to only pick roots and fifths.
+~length~the number of pitches
+~octave~octave of the bottom pitch of this sequence
+~notemode~which set of pitches should the rows represent?
+~tone*~pitch for this column
+~grid~patch a grid in here from a "midicontroller" module
+~x offset~x offset of attached grid controller
+~y offset~y offset of attached grid controller
+~rand pitch chance~when clicking the random pitch button, what is the chance that a step gets changed?
+~rand pitch range~when clicking the random pitch button, how far will the pitch change?
+
+
+
 notelooper~note loop recorder with overdubbing and replacement functionality
 ~write~should input should be recorded?
 ~del/mute~if "write" is enabled, erase notes as the playhead passes over them. otherwise, just mute them.
