@@ -91,6 +91,8 @@ public:
    
    bool IsPinned() const { return mPinned; }
    void SetADSRDisplay(ADSRDisplay* adsrDisplay);
+   bool HasSpecialDelete() const override { return true; }
+   void DoSpecialDelete() override;
    
    void CheckboxUpdated(Checkbox* checkbox) override;
    void RadioButtonUpdated(RadioButton* radio, int oldVal) override {}

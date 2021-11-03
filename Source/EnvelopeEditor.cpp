@@ -441,6 +441,12 @@ void EnvelopeEditor::SetADSRDisplay(ADSRDisplay* adsrDisplay)
    mMaxSustainSlider->SetShowing(mADSRDisplay->GetADSR()->GetHasSustainStage());
 }
 
+void EnvelopeEditor::DoSpecialDelete()
+{
+   mEnabled = false;
+   mPinned = false;
+}
+
 void EnvelopeEditor::DrawModule()
 {
    if (!mPinned)
