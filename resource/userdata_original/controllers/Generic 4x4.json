@@ -1,0 +1,20 @@
+{
+   "groups" : [
+      {
+         "rows": 4,
+         "cols": 4,
+         "position" : [ 0, 35 ],
+         "dimensions" : [28, 28],
+         "spacing" : [30, 30],
+         "controls" : [ 
+            66, 68, 70, 72,
+            65, 67, 69, 71,
+            54, 56, 58, 60,
+            53, 55, 57, 59
+         ],
+         "colors" : [ 0, 127],
+         "messageType" : "note",
+         "drawType" : "button"
+      }
+   ]
+}
