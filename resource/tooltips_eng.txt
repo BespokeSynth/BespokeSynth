@@ -1800,6 +1800,7 @@ m185sequencer~sequencer using the unique paradigm of the the m185 or intellijel 
 
 notestepper~output notes through a round robin of patch cables, to create sequential variety
 ~length~length of the sequence
+~reset~reset to the start
 
 
 
