@@ -428,7 +428,7 @@ void SamplePlayer::PlayNote(double time, int pitch, int velocity, int voiceIdx /
    if (mSelectPlayedCuePoint)
       mRecentPlayedCuePoint = pitch;
 
-   if (!NoteInputBuffer::IsTimeWithinFrame(time))
+   if (!NoteInputBuffer::IsTimeWithinFrame(time) && GetTarget() && mSample)
    {
       mNoteInputBuffer.QueueNote(time, pitch, velocity, voiceIdx, modulation);
       return;
