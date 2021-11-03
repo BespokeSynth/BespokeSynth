@@ -645,7 +645,7 @@ void ModularSynth::Draw(void* vg)
    {
       HelpDisplay* helpDisplay = TheTitleBar->GetHelpDisplay();
 
-      bool hasValidHoveredControl = gHoveredUIControl && std::string(gHoveredUIControl->Name()) != "enabled";
+      bool hasValidHoveredControl = gHoveredUIControl && gHoveredUIControl->GetModuleParent() && !gHoveredUIControl->GetModuleParent()->IsDeleted() && std::string(gHoveredUIControl->Name()) != "enabled";
       
       if (gHoveredModule && (!hasValidHoveredControl || (gHoveredUIControl != nullptr && gHoveredUIControl->GetModuleParent() != gHoveredModule)))
       {
@@ -1323,6 +1323,7 @@ void ModularSynth::MousePressed(int intX, int intY, int button, const juce::Mous
    }
 
    if (gHoveredUIControl != nullptr &&
+       gHoveredUIControl->GetModuleParent() && !gHoveredUIControl->GetModuleParent()->IsDeleted() &&
        !IUIControl::WasLastHoverSetViaTab() &&
        mGroupSelectedModules.empty() &&
        mQuickSpawn->IsShowing() == false &&

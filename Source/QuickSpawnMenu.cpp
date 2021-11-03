@@ -87,7 +87,7 @@ void QuickSpawnMenu::KeyReleased(int key)
 
 void QuickSpawnMenu::UpdateDisplay()
 {
-   if (mHeldKeys.isEmpty())
+   if (mHeldKeys.isEmpty() || TheSynth->GetMoveModule() != nullptr)
    {
       SetShowing(false);
    }
