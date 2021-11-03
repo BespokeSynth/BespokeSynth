@@ -79,7 +79,7 @@ namespace VSTLookup
       for (int i=0; i<types.size(); ++i)
          vsts.push_back(types[i].fileOrIdentifier.toStdString());
 
-      //for (int i = 0; i < 40; ++i)
+      //for (int i = 0; i < 2000; ++i)
       //   vsts.insert(vsts.begin(), std::string("c:/a+") + ofToString(gRandom()));
 
       SortByLastUsed(vsts);
