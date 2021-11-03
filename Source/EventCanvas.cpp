@@ -50,6 +50,7 @@ EventCanvas::EventCanvas()
 , mPreviousPosition(0)
 {
    SetEnabled(true);
+   setPollPriority(0.1);
    
    mRowColors.push_back(ofColor::red);
    mRowColors.push_back(ofColor::green);

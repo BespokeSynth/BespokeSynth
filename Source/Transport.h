@@ -39,6 +39,12 @@ class ITimeListener
 public:
    virtual ~ITimeListener() {}
    virtual void OnTimeEvent(double time) = 0;
+   
+   float getTimePriority() { return mTimePriority; }
+   void setTimePriority(float inPri) { mTimePriority = CLAMP(inPri, 0, 1); }
+    
+private:
+   float mTimePriority = 0.5; //on a scale from 0-1, with a default in the middle
 };
 
 enum NoteInterval
@@ -88,6 +94,8 @@ struct TransportListenerInfo
    OffsetInfo mOffsetInfo;
    bool mUseEventLookahead;
    int mCustomDivisor;
+   
+   bool operator < (const TransportListenerInfo& right) const { return mListener->getTimePriority() < right.mListener->getTimePriority(); }
 };
 
 class Transport : public IDrawableModule, public IButtonListener, public IFloatSliderListener, public IDropdownListener

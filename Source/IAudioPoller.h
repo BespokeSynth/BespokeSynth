@@ -32,4 +32,12 @@ class IAudioPoller
 public:
    virtual ~IAudioPoller() {}
    virtual void OnTransportAdvanced(float amount) = 0;
+   
+   float getPollPriority() { return mPollPriority; };
+   void setPollPriority(float inPri) { mPollPriority = CLAMP(inPri, 0, 1); }
+   
+   bool operator <(const IAudioPoller & right) const { return mPollPriority < right.mPollPriority; }
+   
+private:
+   float mPollPriority = 0.5; //on a scale from 0-1, with a default in the middle
 };

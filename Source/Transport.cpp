@@ -138,13 +138,13 @@ void Transport::Advance(double ms)
    if (TheChaosEngine)
       TheChaosEngine->AudioUpdate();
 
-   UpdateListeners(ms);
-
    for (std::list<IAudioPoller*>::iterator i = mAudioPollers.begin(); i != mAudioPollers.end(); ++i)
    {
       IAudioPoller* poller = *i;
       poller->OnTransportAdvanced(amount);
    }
+   
+   UpdateListeners(ms);
 }
 
 float QuadraticBezier (float x, float a, float b)
@@ -289,6 +289,7 @@ TransportListenerInfo* Transport::AddListener(ITimeListener* listener, NoteInter
    else
    {
       mListeners.push_front(TransportListenerInfo(listener, interval, offsetInfo, useEventLookahead));
+      mListeners.sort();
    }
 
    return GetListenerInfo(listener);
@@ -327,7 +328,10 @@ void Transport::AddAudioPoller(IAudioPoller* poller)
 #endif
 
    if (!ListContains(poller, mAudioPollers))
+   {
       mAudioPollers.push_front(poller);
+      mAudioPollers.sort();
+   }
 }
 
 void Transport::RemoveAudioPoller(IAudioPoller* poller)
