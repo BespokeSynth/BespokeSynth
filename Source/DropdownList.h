@@ -29,6 +29,7 @@
 #include <iostream>
 #include "IUIControl.h"
 #include "IDrawableModule.h"
+#include "ClickButton.h"
 
 struct DropdownListElement
 {
@@ -46,10 +47,14 @@ public:
    virtual void DropdownUpdated(DropdownList* list, int oldVal) = 0;
 };
 
-class DropdownListModal : public IDrawableModule
+class DropdownListModal : public IDrawableModule, public IButtonListener
 {
 public:
    DropdownListModal(DropdownList* owner) { mOwner = owner; }
+
+   void CreateUIControls() override;
+
+   void SetUpModal();
    void DrawModule() override;
    void SetDimensions(int w, int h) { mWidth = w; mHeight = h; }
    bool HasTitleBar() const override { return false; }
@@ -61,6 +66,10 @@ public:
    std::string GetHoveredLabel();
    float GetMouseX() { return mMouseX; }
    float GetMouseY() { return mMouseY; }
+   void SetShowPagingControls(bool show);
+
+   void ButtonClicked(ClickButton* button) override;
+
 private:
    void OnClicked(int x, int y, bool right) override;
    int mWidth;
@@ -69,6 +78,8 @@ private:
    float mMouseX;
    float mMouseY;
    DropdownList* mOwner;
+   ClickButton* mPagePrevButton{ nullptr };
+   ClickButton* mPageNextButton{ nullptr };
 };
 
 class DropdownList : public IUIControl
@@ -83,7 +94,7 @@ public:
    bool MouseMoved(float x, float y) override;
    void MouseReleased() override;
    void DrawDropdown(int w, int h);
-   void DropdownClicked(int x, int y);
+   bool DropdownClickedAt(int x, int y);
    void SetIndex(int i, bool forceUpdate = false);
    void Clear();
    void SetVar(int* var) { mVar = var; }
@@ -94,10 +105,11 @@ public:
    void SetDrawTriangle(bool draw) { mDrawTriangle = draw; }
    void GetPopupDimensions(float& width, float& height) { mModalList.GetDimensions(width, height); }
    void SetMaxPerColumn(int max) { mMaxPerColumn = max; CalculateWidth(); }
-   int GetItemIndex(int x, int y);
+   int GetItemIndexAt(int x, int y);
    DropdownListElement GetElement(int index) { return mElements[index]; }
    DropdownListModal* GetModalDropdown() { return &mModalList; }
    float GetMaxItemWidth() const { return mMaxItemWidth; }
+   void ChangePage(int direction);
 
    //IUIControl
    void SetFromMidiCC(float slider, bool setViaModulator = false) override;
@@ -116,6 +128,7 @@ public:
    void GetDimensions(float& width, float& height) override;
 
    static constexpr int kItemSpacing = 15;
+   static constexpr int kPageBarSpacing = 20;
    
 protected:
    ~DropdownList();   //protected so that it can't be created on the stack
@@ -132,6 +145,9 @@ private:
    int mHeight;
    int mMaxItemWidth;
    int mMaxPerColumn;
+   int mDisplayColumns;
+   int mTotalColumns;
+   int mCurrentPagedColumn;
    std::vector<DropdownListElement> mElements;
    int* mVar;
    DropdownListModal mModalList;
