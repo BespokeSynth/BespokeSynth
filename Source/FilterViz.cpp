@@ -58,8 +58,6 @@ void FilterViz::CreateUIControls()
 
 FilterViz::~FilterViz()
 {
-   for (int i=0; i<mFilters.size(); ++i)
-      delete mFilters[i];
    delete mImpulseBuffer;
    delete mFFTOutReal;
    delete mFFTOutImag;

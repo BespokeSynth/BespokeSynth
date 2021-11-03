@@ -49,8 +49,6 @@ EffectChain::EffectChain()
 
 EffectChain::~EffectChain()
 {
-   for (int i=0; i<mEffects.size(); ++i)
-      delete mEffects[i];
 }
 
 void EffectChain::CreateUIControls()
@@ -425,6 +423,8 @@ void EffectChain::DeleteEffect(int index)
       RemoveChild(toRemove);
       //delete toRemove;   TODO(Ryan) can't do this in case stuff is referring to its UI controls
       mEffectMutex.unlock();
+
+      TheSynth->OnModuleDeleted(toRemove);
    }
 }
 

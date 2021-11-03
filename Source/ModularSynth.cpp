@@ -1614,6 +1614,7 @@ void ModularSynth::OnModuleDeleted(IDrawableModule* module)
    RemoveFromVector(dynamic_cast<IAudioSource*>(module),mSources);
    RemoveFromVector(module,mLissajousDrawers);
    TheTransport->RemoveAudioPoller(dynamic_cast<IAudioPoller*>(module));
+   module->MarkAsDeleted();
    //delete module; TODO(Ryan) deleting is hard... need to clear out everything with a reference to this, or switch to smart pointers
 
    if (module == TheChaosEngine)
