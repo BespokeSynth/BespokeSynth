@@ -42,7 +42,7 @@ PulseTrain::PulseTrain()
 {
    for (int i=0; i<kMaxSteps; ++i)
       mVels[i] = 1;
-   
+   setPollPriority(.1);
 }
 
 void PulseTrain::Init()
