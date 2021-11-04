@@ -24,6 +24,8 @@ file(INSTALL
     PATTERN "turtledemo" EXCLUDE
     )
 
+set(BESPOKE_PIP_PACKAGES jedi)
+
 if(APPLE)
     function(relinkPySigned binary newPySO)
         execute_process(COMMAND codesign --remove-signature "${binary}")
@@ -47,9 +49,16 @@ elseif(WIN32)
     file(INSTALL ${pyBinaries} DESTINATION "${pyDirDst}")
     file(INSTALL "${pyDirSrc}/DLLs" DESTINATION "${pyDirDst}")
     file(INSTALL "${CMAKE_CURRENT_BINARY_DIR}/python.manifest" DESTINATION "${pyDirDst}")
+    set(pyExecutable "${pyDirDst}/python.exe")
 else()
     get_filename_component(pySO "${Python_LIBRARIES}" REALPATH)
     file(INSTALL "${pySO}" DESTINATION "${pyDirDst}/bin")
     execute_process(COMMAND ${CMAKE_COMMAND} -E copy "${Python_EXECUTABLE}" "${pyDirDst}/bin/python")
     execute_process(COMMAND patchelf --set-rpath "$ORIGIN" "${pyDirDst}/bin/python")
+    set(pyExecutable "${pyDirDst}/bin/python")
 endif()
+
+unset(ENV{PYTHONHOME})
+execute_process(COMMAND "${pyExecutable}" -m ensurepip  --default-pip)
+execute_process(COMMAND "${pyExecutable}" -m pip install ${BESPOKE_PIP_PACKAGES})
+
