@@ -1374,22 +1374,30 @@ void ModularSynth::MousePressed(int intX, int intY, int button, const juce::Mous
          }
       }
 
-      IDrawableModule* clicked = GetModuleAtCursor();
+      IDrawableModule* clickedModule = GetModuleAtCursor();
 
       for (auto cable : mPatchCables)
       {
-         if (clicked &&
-            (clicked == GetTopModalFocusItem() ||
-               clicked->AlwaysOnTop() ||
-               mModuleContainer.IsHigherThan(clicked, cable->GetOwningModule())))
-            break;
-         if (cable->TestClick(x,y,rightButton))
-            return;
+         if (clickedModule &&
+             (cable->GetTarget() == nullptr || clickedModule != cable->GetTarget()->GetModuleParent()) &&
+             (clickedModule == GetTopModalFocusItem() ||
+              clickedModule->AlwaysOnTop() ||
+              mModuleContainer.IsHigherThan(clickedModule, cable->GetOwningModule())
+             )
+            )
+         {
+            
+         }
+         else
+         {
+            if (cable->TestClick(x, y, rightButton))
+               return;
+         }
       }
 
       mClickStartX = x;
       mClickStartY = y;
-      if (clicked == nullptr)
+      if (clickedModule == nullptr)
       {
          if (rightButton)
          {
@@ -1410,24 +1418,24 @@ void ModularSynth::MousePressed(int intX, int intY, int button, const juce::Mous
             }
          }
       }
-      if (clicked != nullptr && clicked != TheTitleBar)
-         mLastClickedModule = clicked;
+      if (clickedModule != nullptr && clickedModule != TheTitleBar)
+         mLastClickedModule = clickedModule;
       else
          mLastClickedModule = nullptr;
       mHasDuplicatedDuringDrag = false;
 
       if (mGroupSelectedModules.empty() == false)
       {
-         if (!VectorContains(clicked, mGroupSelectedModules))
+         if (!VectorContains(clickedModule, mGroupSelectedModules))
             mGroupSelectedModules.clear();
          return;
       }
 
-      if (clicked)
+      if (clickedModule)
       {
-         x = GetMouseX(clicked->GetModuleParent()->GetOwningContainer());
-         y = GetMouseY(clicked->GetModuleParent()->GetOwningContainer());
-         CheckClick(clicked, x, y, rightButton);
+         x = GetMouseX(clickedModule->GetModuleParent()->GetOwningContainer());
+         y = GetMouseY(clickedModule->GetModuleParent()->GetOwningContainer());
+         CheckClick(clickedModule, x, y, rightButton);
       }
       else if (TheSaveDataPanel != nullptr)
       {

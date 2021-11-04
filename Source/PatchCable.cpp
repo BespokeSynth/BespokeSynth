@@ -379,14 +379,11 @@ void PatchCable::Render()
 
 bool PatchCable::MouseMoved(float x, float y)
 {
-   if (GetConnectionType() == kConnectionType_Modulator || GetConnectionType() == kConnectionType_UIControl) //no repatching UI control cables by the plug
-      return false;
-   
    x = TheSynth->GetMouseX(GetOwningModule()->GetOwningContainer());
    y = TheSynth->GetMouseY(GetOwningModule()->GetOwningContainer());
    
    PatchCablePos cable = GetPatchCablePos();
-   mHovered = DistSqToLine(ofVec2f(x,y),cable.plug,cable.end) < 25;
+   mHovered = DistSqToLine(ofVec2f(x,y),cable.plug,cable.end) < 25 && gHoveredUIControl == nullptr;
    
    return false;
 }
@@ -446,10 +443,7 @@ IClickable* PatchCable::GetDropTarget()
 
 bool PatchCable::TestClick(int x, int y, bool right, bool testOnly /* = false */)
 {
-   if (right)
-      return false;
-
-   if (mHovered)
+   if (mHovered && !right)
    {
       if (!testOnly)
          Grab();

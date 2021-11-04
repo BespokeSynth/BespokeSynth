@@ -476,7 +476,9 @@ bool PatchCableSource::TestClick(int x, int y, bool right, bool testOnly /* = fa
          {
             if (mPatchCables.empty() ||
                 mType == kConnectionType_Note ||
-                mType == kConnectionType_Pulse)
+                mType == kConnectionType_Pulse ||
+                mType == kConnectionType_UIControl ||
+                mType == kConnectionType_Special)
             {
                PatchCable* newCable = AddPatchCable(nullptr);
                newCable->Grab();

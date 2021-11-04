@@ -61,17 +61,27 @@ void Presets::CreateUIControls()
    for (int i=0; i<100; ++i)
       mCurrentPresetSelector->AddLabel(ofToString(i).c_str(), i);
    
-   mModuleCable = new PatchCableSource(this, kConnectionType_Special);
-   mModuleCable->SetManualPosition(15, 10);
-   mModuleCable->SetDefaultPatchBehavior(kDefaultPatchBehavior_Add);
-   //mModuleCable->SetPatchCableDrawMode(kPatchCableDrawMode_HoverOnly);
-   AddPatchCableSource(mModuleCable);
+   {
+      mModuleCable = new PatchCableSource(this, kConnectionType_Special);
+      ofColor color = IDrawableModule::GetColor(kModuleType_Other);
+      color.a *= .3f;
+      mModuleCable->SetColor(color);
+      mModuleCable->SetManualPosition(15, 10);
+      mModuleCable->SetDefaultPatchBehavior(kDefaultPatchBehavior_Add);
+      //mModuleCable->SetPatchCableDrawMode(kPatchCableDrawMode_HoverOnly);
+      AddPatchCableSource(mModuleCable);
+   }
    
-   mUIControlCable = new PatchCableSource(this, kConnectionType_UIControl);
-   mUIControlCable->SetManualPosition(30, 10);
-   mUIControlCable->SetDefaultPatchBehavior(kDefaultPatchBehavior_Add);
-   //mUIControlCable->SetPatchCableDrawMode(kPatchCableDrawMode_HoverOnly);
-   AddPatchCableSource(mUIControlCable);
+   {
+      mUIControlCable = new PatchCableSource(this, kConnectionType_UIControl);
+      ofColor color = IDrawableModule::GetColor(kModuleType_Modulator);
+      color.a *= .3f;
+      mUIControlCable->SetColor(color);
+      mUIControlCable->SetManualPosition(30, 10);
+      mUIControlCable->SetDefaultPatchBehavior(kDefaultPatchBehavior_Add);
+      //mUIControlCable->SetPatchCableDrawMode(kPatchCableDrawMode_HoverOnly);
+      AddPatchCableSource(mUIControlCable);
+   }
 }
 
 void Presets::Init()
@@ -115,6 +125,20 @@ void Presets::DrawModule()
    {
       assert(hover >= 0 && hover < mPresetCollection.size());
       DrawTextNormal(mPresetCollection[hover].mDescription,50,0);
+   }
+
+   ofVec2f pos = mGrid->GetCellPosition(hover % mGrid->GetCols(), hover / mGrid->GetCols()) + mGrid->GetPosition(true);
+   float xsize = float(mGrid->GetWidth()) / mGrid->GetCols();
+   float ysize = float(mGrid->GetHeight()) / mGrid->GetRows();
+
+   if (GetKeyModifiers() == kModifier_Shift)
+   {
+      ofPushStyle();
+      ofSetColor(0, 0, 0);
+      ofFill();
+      ofRect(pos.x + xsize / 2 - 1, pos.y + 2, 2, ysize - 4, 0);
+      ofRect(pos.x + 2, pos.y + ysize / 2 - 1, xsize - 4, 2, 0);
+      ofPopStyle();
    }
 }
 
@@ -176,7 +200,7 @@ void Presets::SetPreset(int idx)
    }
    
    const PresetCollection& coll = mPresetCollection[idx];
-   for (std::vector<Preset>::const_iterator i=coll.mPresets.begin();
+   for (std::list<Preset>::const_iterator i=coll.mPresets.begin();
         i != coll.mPresets.end(); ++i)
    {
       IUIControl* control = TheSynth->FindUIControl(i->mControlPath);
@@ -239,12 +263,47 @@ void Presets::PostRepatch(PatchCableSource* cableSource, bool fromUserClick)
 {
    if (TheSynth->IsLoadingState())
       return;
+
+   auto numModules = mPresetModules.size();
+   auto numControls = mPresetControls.size();
+
    mPresetModules.clear();
    for (auto cable : mModuleCable->GetPatchCables())
       mPresetModules.push_back(static_cast<IDrawableModule*>(cable->GetTarget()));
    mPresetControls.clear();
    for (auto cable : mUIControlCable->GetPatchCables())
       mPresetControls.push_back(static_cast<IUIControl*>(cable->GetTarget()));
+
+   if (mPresetModules.size() < numModules || mPresetControls.size() < numControls)  //we removed something, clean up any presets that refer to it
+   {
+      for (auto& square : mPresetCollection)
+      {
+         std::vector<Preset> toRemove;
+         for (const auto& preset : square.mPresets)
+         {
+            if (!IsConnectedToPath(preset.mControlPath))
+               toRemove.push_back(preset);
+         }
+
+         for (auto remove : toRemove)
+            square.mPresets.remove(remove);
+      }
+   }
+}
+
+bool Presets::IsConnectedToPath(std::string path) const
+{
+   IUIControl* control = TheSynth->FindUIControl(path);
+   if (control == nullptr)
+      return false;
+
+   if (VectorContains(control, mPresetControls))
+      return true;
+
+   if (VectorContains(control->GetModuleParent(), mPresetModules))
+      return true;
+
+   return false;
 }
 
 void Presets::Store(int idx)
@@ -277,9 +336,9 @@ void Presets::Save()
    {
       Json::Value& preset = presets[i];
       preset["description"] = mPresetCollection[i].mDescription;
-      for (int j=0; j<mPresetCollection[i].mPresets.size(); ++j)
+      int j = 0;
+      for (const auto& presetData : mPresetCollection[i].mPresets)
       {
-         const Preset& presetData = mPresetCollection[i].mPresets[j];
          preset["controls"][j]["control"] = presetData.mControlPath;
          preset["controls"][j]["value"] = presetData.mValue;
          preset["controls"][j]["has_lfo"] = presetData.mHasLFO;
@@ -293,7 +352,7 @@ void Presets::Save()
             preset["controls"][j]["lfo_soften"] = presetData.mLFOSettings.mSoften;
             preset["controls"][j]["lfo_shuffle"] = presetData.mLFOSettings.mShuffle;
          }
-         
+         ++j;
       }
    }
    
@@ -326,9 +385,9 @@ void Presets::Load()
             Json::Value& preset = presets[i];
             mPresetCollection[i].mDescription = preset["description"].asString();
             mPresetCollection[i].mPresets.resize(preset["controls"].size());
-            for (int j=0; j<preset["controls"].size(); ++j)
+            int j = 0;
+            for (auto& presetData : mPresetCollection[i].mPresets)
             {
-               Preset& presetData = mPresetCollection[i].mPresets[j];
                presetData.mControlPath = preset["controls"][j]["control"].asString();
                presetData.mValue = preset["controls"][j]["value"].asDouble();
                presetData.mHasLFO = preset["controls"][j]["has_lfo"].asBool();
@@ -341,7 +400,8 @@ void Presets::Load()
                   presetData.mLFOSettings.mSpread = preset["controls"][j]["lfo_spread"].asDouble();
                   presetData.mLFOSettings.mSoften = preset["controls"][j]["lfo_soften"].asDouble();
                   presetData.mLFOSettings.mShuffle = preset["controls"][j]["lfo_shuffle"].asDouble();
-               }  
+               }
+               ++j;
             }
          }
          catch (Json::LogicError& e)
@@ -466,13 +526,13 @@ void Presets::LoadState(FileStreamIn& in)
       int presetSize;
       in >> presetSize;
       mPresetCollection[i].mPresets.resize(presetSize);
-      for (int j=0; j<presetSize; ++j)
+      int j = 0;
+      for (auto& presetData : mPresetCollection[i].mPresets)
       {
-         Preset& preset = mPresetCollection[i].mPresets[j];
-         in >> preset.mControlPath;
-         in >> preset.mValue;
-         in >> preset.mHasLFO;
-         preset.mLFOSettings.LoadState(in);
+         in >> presetData.mControlPath;
+         in >> presetData.mValue;
+         in >> presetData.mHasLFO;
+         presetData.mLFOSettings.LoadState(in);
       }
       in >> mPresetCollection[i].mDescription;
    }
