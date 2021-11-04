@@ -855,7 +855,7 @@ void ScriptModule::ButtonClicked(ClickButton* button)
    
    if (button == mSaveScriptButton)
    {
-      FileChooser chooser("Save script as...", File(ofToDataPath("scripts/script.py")), "*.py", true, false, TheSynth->GetMainComponent()->getTopLevelComponent());
+      FileChooser chooser("Save script as...", File(ofToDataPath("scripts/script.py")), "*.py", true, false, TheSynth->GetModalParent());
       if (chooser.browseForFileToSave(true))
       {
          std::string path = chooser.getResult().getFullPathName().toStdString();

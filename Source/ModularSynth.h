@@ -172,6 +172,11 @@ public:
    juce::AudioDeviceManager &GetAudioDeviceManager() { return *mGlobalAudioDeviceManager; }
    juce::AudioFormatManager &GetAudioFormatManager() { return *mGlobalAudioFormatManager; }
    juce::Component* GetMainComponent() { return mMainComponent; }
+#ifdef BESPOKE_LINUX
+   juce::Component* GetModalParent() { return nullptr; }
+#else
+   juce::Component* GetModalParent() { return mMainComponent->getTopLevelComponent(); }
+#endif
    juce::OpenGLContext* GetOpenGLContext() { return mOpenGLContext; }
    IDrawableModule* GetLastClickedModule() const;
    EffectFactory* GetEffectFactory() { return &mEffectFactory; }
