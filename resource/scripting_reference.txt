@@ -32,6 +32,7 @@ globals:
    bespoke.get_tempo()
    bespoke.set_background_text(str, size, xPos, yPos, red, green, blue)
       optional: size=50, xPos = 150, yPos = 250, red = 1, green = 1, blue = 1
+   bespoke.random(seed, index)
 
 
 script-relative:
@@ -165,8 +166,8 @@ import envelope
    static:
       envelope.get(path)
    instance:
-      e.start(tuple<float,float> stages)
-      e.schedule(delay, tuple<float,float> stages)
+      e.start(stages)
+      e.schedule(delay, stages)
 
 
 import drumplayer

@@ -5,6 +5,7 @@ def extractParamString(group, skipFirst):
    params = group.split(' ')[1:][::2]
    if skipFirst:
       params = params[1:]
+   params = [x for x in params if "<" not in x]
    paramString = " ".join(params)
    return paramString
 
@@ -112,11 +113,11 @@ for line in lines:
                   stubLine(currentModule, "   "+m.group(1)+": ...")
                   #   Note: ...
 
-docFile = open("Builds/MacOSX/build/Release/resource/scripting_reference.txt", "w+")
+docFile = open("resource/scripting_reference.txt", "w+")
 docFile.writelines(docOutput)
 
 for key in stubOutput.keys():
-   dir = "Builds/MacOSX/build/Release/resource/python_stubs/"+key+"/"
+   dir = "resource/python_stubs/"+key+"/"
    if not os.path.exists(dir):
       os.mkdir(dir)
    stubFile = open(dir+"__init__.pyi", "w+")

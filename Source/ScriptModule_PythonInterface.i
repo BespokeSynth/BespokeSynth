@@ -141,6 +141,14 @@ PYBIND11_EMBEDDED_MODULE(bespoke, m) {
       ScriptModule::sBackgroundTextPos.set(xPos, yPos);
       ScriptModule::sBackgroundTextColor.set(red * 255, green * 255, blue * 255);
    }, "str"_a, "size"_a=50, "xPos"_a = 150, "yPos"_a = 250, "red"_a = 1, "green"_a = 1, "blue"_a = 1);
+   m.def("random", [](int seed, int index)
+   {
+      juce::uint64 x = seed + ((juce::uint64)index << 32);
+      x = (x ^ (x >> 30)) * (0xbf58476d1ce4e5b9);
+      x = (x ^ (x >> 27)) * (0x94d049bb133111eb);
+      x = x ^ (x >> 31);
+      return (int)x;
+   });
 }
 
 PYBIND11_EMBEDDED_MODULE(scriptmodule, m)

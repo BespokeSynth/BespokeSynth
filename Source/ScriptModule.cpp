@@ -1053,8 +1053,8 @@ std::pair<int,int> ScriptModule::RunScript(double time, int lineStart/*=-1*/, in
    std::string code = mCodeEntry->GetText(true);
    std::vector<std::string> lines = ofSplitString(code, "\n");
    
-   size_t executionStartLine = 0;
-   size_t executionEndLine = (int)lines.size();
+   int executionStartLine = 0;
+   int executionEndLine = (int)lines.size();
    if (lineStart != -1)
    {
       for (size_t i=(size_t)lineStart; i >= 0; --i)
