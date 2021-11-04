@@ -148,8 +148,10 @@ void FloatSlider::Render()
    ofSetColor(color);
    ofRect(mX,mY,mWidth,mHeight);
    ofNoFill();
+
+   bool showSmoothAdjustmentUI = AdjustSmooth() && (gHoveredUIControl == this || mSmooth > 0);
    
-   if (mIsSmoothing && !AdjustSmooth())
+   if (mIsSmoothing && !showSmoothAdjustmentUI)
    {
       ofPushStyle();
       ofSetColor(255,255,0,gModuleDrawAlpha);
@@ -162,7 +164,7 @@ void FloatSlider::Render()
    }
    
    float screenPos;
-   if (mModulator && mModulator->Active() && !AdjustSmooth())
+   if (mModulator && mModulator->Active() && !showSmoothAdjustmentUI)
    {
       screenPos = mX+1+(mWidth-2)*ValToPos(*mVar, true);
       float lfomax = ofClamp(mModulator->GetMax(),mMin,mMax);
@@ -190,7 +192,7 @@ void FloatSlider::Render()
          ofSetColor(255,0,0,gModuleDrawAlpha);
       else
          ofSetColor(30,30,30,gModuleDrawAlpha);
-      if (AdjustSmooth())
+      if (showSmoothAdjustmentUI)
          ofSetColor(255,255, 0, gModuleDrawAlpha);
       float val = ofClamp(*mVar,mMin,mMax);
       screenPos = mX+1+(mWidth-2)*ValToPos(val, false);
@@ -205,7 +207,7 @@ void FloatSlider::Render()
 
    std::string display;
    float textSize = 15;
-   if (AdjustSmooth())
+   if (showSmoothAdjustmentUI)
    {
       display = "smooth: "+ofToString(mSmooth, 3);
       textSize = 11;
@@ -498,7 +500,7 @@ float FloatSlider::PosToVal(float pos, bool ignoreSmooth) const
 
 float FloatSlider::ValToPos(float val, bool ignoreSmooth) const
 {
-   if (AdjustSmooth() && !ignoreSmooth)
+   if (AdjustSmooth() && (gHoveredUIControl == this || mSmooth > 0) && !ignoreSmooth)
       return sqrtf(mSmooth);
    if (mMode == kNormal)
       return (val - mMin) / (mMax-mMin);
