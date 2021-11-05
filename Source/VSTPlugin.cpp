@@ -198,8 +198,9 @@ void VSTPlugin::CreateUIControls()
    mOpenEditorButton = new ClickButton(this, "open", mVolSlider, kAnchor_Right_Padded);
    mPresetFileSelector = new DropdownList(this,"preset",3,21,&mPresetFileIndex,110);
    mSavePresetFileButton = new ClickButton(this,"save as",-1,-1);
-   mShowParameterDropdown = new DropdownList(this,"show parameter",3,38,&mShowParameterIndex);
-   
+   mShowParameterDropdown = new DropdownList(this,"show parameter",3,38,&mShowParameterIndex, 160);
+   mPanicButton = new ClickButton(this, "panic", 166,38);
+
    mPresetFileSelector->DrawLabel(true);
    mSavePresetFileButton->PositionTo(mPresetFileSelector,kAnchor_Right);
 
@@ -549,7 +550,16 @@ void VSTPlugin::Process(double time)
          mFutureMidiBuffer.clear();
          mFutureMidiBuffer.addEvents(mMidiBuffer, gBufferSize, mMidiBuffer.getLastEventTime()-gBufferSize + 1, -gBufferSize);
          mMidiBuffer.clear(gBufferSize, mMidiBuffer.getLastEventTime() + 1);
-         
+
+         if (mWantsPanic)
+         {
+            mWantsPanic = false;
+
+            mMidiBuffer.clear();
+            mMidiBuffer.addEvent(juce::MidiMessage::allNotesOff(0), 0);
+            mMidiBuffer.addEvent(juce::MidiMessage::allSoundOff(0), 1);
+         }
+
          mPlugin->processBlock(buffer, mMidiBuffer);
 
          if (!mMidiBuffer.isEmpty())
@@ -701,6 +711,7 @@ void VSTPlugin::DrawModule()
    mPresetFileSelector->Draw();
    mSavePresetFileButton->Draw();
    mOpenEditorButton->Draw();
+   mPanicButton->Draw();
    mShowParameterDropdown->Draw();
 
    ofPushStyle();
@@ -872,7 +883,12 @@ void VSTPlugin::ButtonClicked(ClickButton* button)
       //if (mWindow->GetNSViewComponent())
       //   mWindowOverlay = new NSWindowOverlay(mWindow->GetNSViewComponent()->getView());
    }
-   
+
+   if (button == mPanicButton)
+   {
+      mWantsPanic = true;
+   }
+
    if (button == mSavePresetFileButton && mPlugin != nullptr)
    {
       juce::File(ofToDataPath("vst/presets/"+GetPluginId())).createDirectory();
