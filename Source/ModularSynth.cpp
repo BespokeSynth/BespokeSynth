@@ -2363,7 +2363,7 @@ void ModularSynth::SaveLayout(std::string jsonFile, bool makeDefaultLayout /*= t
 
 void ModularSynth::SaveLayoutAsPopup()
 {
-   FileChooser chooser("Save current layout as...", File(ofToDataPath("layouts/newlayout.json")), "*.json", true, false, mMainComponent->getTopLevelComponent());
+   FileChooser chooser("Save current layout as...", File(ofToDataPath("layouts/newlayout.json")), "*.json", true, false, GetFileChooserParent());
    if (chooser.browseForFileToSave(true))
       SaveLayout(chooser.getResult().getRelativePathFrom(File(ofToDataPath(""))).toStdString());
 }
@@ -2379,9 +2379,18 @@ void ModularSynth::SaveCurrentState()
    SaveState(mCurrentSaveStatePath, false);
 }
 
+juce::Component* ModularSynth::GetFileChooserParent() const
+{
+#if BESPOKE_LINUX
+   return nullptr;
+#else
+   return mMainComponent->getTopLevelComponent();
+#endif
+}
+
 void ModularSynth::SaveStatePopup()
 {
-   FileChooser chooser("Save current state as...", File(ofToDataPath(ofGetTimestampString("savestate/%Y-%m-%d_%H-%M.bsk"))), "*.bsk", true, false, mMainComponent->getTopLevelComponent());
+   FileChooser chooser("Save current state as...", File(ofToDataPath(ofGetTimestampString("savestate/%Y-%m-%d_%H-%M.bsk"))), "*.bsk", true, false, GetFileChooserParent());
    if (chooser.browseForFileToSave(true))
       SaveState(chooser.getResult().getFullPathName().toStdString(), false);
 }
@@ -2393,7 +2402,7 @@ void ModularSynth::LoadStatePopup()
 
 void ModularSynth::LoadStatePopupImp()
 {
-   FileChooser chooser("Load state", File(ofToDataPath("savestate")), "*.bsk", true, false, mMainComponent->getTopLevelComponent());
+   FileChooser chooser("Load state", File(ofToDataPath("savestate")), "*.bsk", true, false, GetFileChooserParent());
    if (chooser.browseForFileToOpen())
       LoadState(chooser.getResult().getFullPathName().toStdString());
 }

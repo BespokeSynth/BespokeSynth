@@ -722,7 +722,7 @@ void Scale::ButtonClicked(ClickButton *button)
         std::string prompt = "Load ";
         prompt += (button == mLoadSCLButton) ? "SCL" : "KBM";
         std::string pat = (button == mLoadSCLButton) ? "*.scl" : "*.kbm";
-        juce::FileChooser chooser( prompt, juce::File(""), pat, true, false, TheSynth->GetMainComponent()->getTopLevelComponent());
+        juce::FileChooser chooser( prompt, juce::File(""), pat, true, false, TheSynth->GetFileChooserParent());
         if (chooser.browseForFileToOpen())
         {
             auto file = chooser.getResult();

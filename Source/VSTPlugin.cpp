@@ -892,7 +892,7 @@ void VSTPlugin::ButtonClicked(ClickButton* button)
    if (button == mSavePresetFileButton && mPlugin != nullptr)
    {
       juce::File(ofToDataPath("vst/presets/"+GetPluginId())).createDirectory();
-      FileChooser chooser("Save preset as...", File(ofToDataPath("vst/presets/"+ GetPluginId()+"/preset.vstp")), "*.vstp", true, false, TheSynth->GetMainComponent()->getTopLevelComponent());
+      FileChooser chooser("Save preset as...", File(ofToDataPath("vst/presets/"+ GetPluginId()+"/preset.vstp")), "*.vstp", true, false, TheSynth->GetFileChooserParent());
       if (chooser.browseForFileToSave(true))
       {
          std::string path = chooser.getResult().getFullPathName().toStdString();
