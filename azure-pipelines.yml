@@ -104,7 +104,7 @@ jobs:
       - bash: |
           set -e
           echo Building with BUILD_TYPE = $CMAKE_CONFIG
-          cmake -Bbuild $(cmakeArguments) -DCMAKE_BUILD_TYPE=$CMAKE_CONFIG
+          cmake -Bbuild $(cmakeArguments) -DCMAKE_BUILD_TYPE=$CMAKE_CONFIG -DBESPOKE_PORTABLE=True
         displayName: all - configure with cmake
 
       - bash: |
