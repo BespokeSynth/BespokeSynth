@@ -1,11 +1,21 @@
 # Path to your midi file
-midifile='/home/asmw/src/BespokeSynth/overlap.mid'
+midifile='/home/asmw/src/BespokeSynth/multitrack.mid'
 
 # If you want to write the notes to a canvas, set its name here
 canvas = ''
 
-from mido import MidiFile
+# Which track to extract
+track = 1
+
+from mido import MidiFile, tick2second, bpm2tempo
 import time
+
+tempo = bpm2tempo(120)
+
+try:
+    tempo = bpm2tempo(bespoke.get_tempo())
+except:
+    pass
 
 mid = MidiFile(midifile)
 
@@ -32,9 +42,16 @@ timecount = 0.0
 
 on_notes = {}
 
-for msg in mid:
+if len(mid.tracks) < track:
+    track = 1
+
+t = mid.tracks[track - 1]
+
+print(mid.ticks_per_beat)
+
+for msg in t:
     print(f'{timecount}: {msg}')
-    timecount += msg.time
+    timecount += tick2second(msg.time, mid.ticks_per_beat, tempo)
     if msg.type == 'note_on':
         on_notes[msg.note] = timecount
     elif msg.type == 'note_off':
