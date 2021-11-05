@@ -3,10 +3,10 @@ navigation
    * space bar + move mouse to pan, or right-click drag in empty space
    * space bar + mousewheel/trackpad-scroll to zoom, or scroll in empty space
    * if you get lost, press ~ to bring up the console, type "home", and press enter to reset to the initial position and zoom
-   * If you have enabled the minimap in the settings, you can click on the minimap to directly go to a location.
-      - At the bottom of the mimimap you can click on 9 bookmark buttons.
-      - Hold shift while clicking will store your current location into that bookmark button.
-      - Use shift+[num] to go to the specified bookmark.
+   * if you have enabled the minimap in the settings, you can click on the minimap to directly go to a location
+      -at the bottom of the mimimap you can click on 9 bookmark buttons
+      -hold shift while clicking will store your current location into that bookmark button
+      -use shift+[num] to go to the specified bookmark
 
 
 creating modules
