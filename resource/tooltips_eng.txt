@@ -607,6 +607,7 @@ drumsequencer~step sequencer intended for drums. hold shift when dragging on the
 
 helpdisplay~displays help information
 ~show tooltips~displays these tooltips. you can also toggle them with the F1 key, and you can turn these on or off by default in the "settings" menu.
+~copy build info~copy info about this build to the clipboard, for help requests
 ~help page~which page of help information to show
 
 
