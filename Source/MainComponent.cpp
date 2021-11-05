@@ -57,7 +57,7 @@ public:
 
       openGLContext.setOpenGLVersionRequired(juce::OpenGLContext::openGL3_2);
       openGLContext.setContinuousRepainting(false);
-#if BESPOKE_LINUX_HIGH_FPS_WITH_THREAD_PROBLEMS
+#if BESPOKE_LINUX //turning this on improves linux framerate, but seems to expose thread safety issues on windows/mac. see git PRs #349 and #396
       openGLContext.setComponentPaintingEnabled(false);
 #endif
 
@@ -124,7 +124,7 @@ public:
       
       mSynth.Poll();
       
-#if DEBUG || (BESPOKE_LINUX && !BESPOKE_LINUX_HIGH_FPS_WITH_THREAD_PROBLEMS)
+#if DEBUG
       if (sRenderFrame % 2 == 0)
 #else
       if (true)
