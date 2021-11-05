@@ -212,7 +212,7 @@ void Prefab::ButtonClicked(ClickButton* button)
    using namespace juce;
    if (button == mSaveButton)
    {
-      FileChooser chooser("Save prefab as...", File(ofToDataPath("prefabs/prefab.pfb")), "*.pfb", true, false, TheSynth->GetMainComponent()->getTopLevelComponent());
+      FileChooser chooser("Save prefab as...", File(ofToDataPath("prefabs/prefab.pfb")), "*.pfb", true, false, TheSynth->GetFileChooserParent());
       if (chooser.browseForFileToSave(true))
       {
          std::string savePath = chooser.getResult().getRelativePathFrom(File(ofToDataPath(""))).toStdString();
@@ -222,7 +222,7 @@ void Prefab::ButtonClicked(ClickButton* button)
    
    if (button == mLoadButton)
    {
-      FileChooser chooser("Load prefab...", File(ofToDataPath("prefabs")), "*.pfb", true, false, TheSynth->GetMainComponent()->getTopLevelComponent());
+      FileChooser chooser("Load prefab...", File(ofToDataPath("prefabs")), "*.pfb", true, false, TheSynth->GetFileChooserParent());
       if (chooser.browseForFileToOpen())
       {
          std::string loadPath = chooser.getResult().getRelativePathFrom(File(ofToDataPath(""))).toStdString();

@@ -771,7 +771,7 @@ void SamplePlayer::OnYoutubeSearchComplete(std::string searchTerm, double search
 void SamplePlayer::LoadFile()
 {
    FileChooser chooser("Load sample", File(ofToDataPath("samples")),
-                       TheSynth->GetAudioFormatManager().getWildcardForAllFormats(), true, false, TheSynth->GetMainComponent()->getTopLevelComponent());
+                       TheSynth->GetAudioFormatManager().getWildcardForAllFormats(), true, false, TheSynth->GetFileChooserParent());
    if (chooser.browseForFileToOpen())
    {
       auto file = chooser.getResult();
@@ -786,7 +786,7 @@ void SamplePlayer::LoadFile()
 void SamplePlayer::SaveFile()
 {
    FileChooser chooser("Save sample", File(ofToDataPath("samples")),
-                       "*.wav", true, false, TheSynth->GetMainComponent()->getTopLevelComponent());
+                       "*.wav", true, false, TheSynth->GetFileChooserParent());
    if (chooser.browseForFileToSave(true))
    {
       auto file = chooser.getResult();

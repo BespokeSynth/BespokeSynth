@@ -220,6 +220,7 @@ public:
    std::string GetLastSavePath() { return mCurrentSaveStatePath; }
 
    UserPrefsEditor* GetUserPrefsEditor() { return mUserPrefsEditor; }
+   juce::Component* GetFileChooserParent() const;
 
    const juce::String& GetTextFromClipboard() const;
    void CopyTextToClipboard(const juce::String& text);
