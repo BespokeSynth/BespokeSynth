@@ -1763,6 +1763,7 @@ vstplugin~a VST plugin instance
 ~show parameter~select parameters to display them, so they can be adjusted from within bespoke's interface. if a VST has more than 20 parameters, this list will initially be empty. in that case, to make a parameter appear in this list, wiggle it within the VST's interface.
 ~preset~choose from saved VST presets
 ~save as~save the current VST settings as a preset to load again later
+~panic~send "all notes off" and "all sounds off" to this plugin in order to silence it immediately
 
 
 
