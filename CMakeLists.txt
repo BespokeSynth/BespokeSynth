@@ -34,6 +34,8 @@ add_compile_options(
     $<$<CXX_COMPILER_ID:MSVC>:/utf-8>
     )
 
+set(CMAKE_MSVC_RUNTIME_LIBRARY "MultiThreaded$<$<CONFIG:Debug>:Debug>")
+
 if(WIN32 AND ${BESPOKE_BITNESS} EQUAL 32)
     add_link_options(
         # Windows 32-bit: Extended address space
