@@ -80,6 +80,7 @@ float gCornerRoundness = 1;
 
 std::random_device gRandomDevice;
 std::mt19937 gRandom(gRandomDevice());
+std::uniform_real_distribution<float> gUniformBipolarDist(-1.f, 1.f);
 
 void SynthInit()
 {
