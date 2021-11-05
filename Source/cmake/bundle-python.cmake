@@ -59,6 +59,7 @@ else()
 endif()
 
 unset(ENV{PYTHONHOME})
-execute_process(COMMAND "${pyExecutable}" -m ensurepip  --default-pip)
+message(STATUS "Ensuring pip with ${EnsurePipScript}")
+execute_process(COMMAND "${pyExecutable}" "${EnsurePipScript}")
 execute_process(COMMAND "${pyExecutable}" -m pip install ${BESPOKE_PIP_PACKAGES})
 

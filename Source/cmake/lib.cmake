@@ -43,6 +43,7 @@ function(bespoke_make_portable TARGET)
         -D Python_LIBRARIES="${Python_LIBRARIES}"
         -D Python_VERSION_MAJOR="${Python_VERSION_MAJOR}"
         -D Python_VERSION_MINOR="${Python_VERSION_MINOR}"
+        -D EnsurePipScript="${CMAKE_SOURCE_DIR}/scripts/py-utils/ensurepip-hack.py"
         -P "${CMAKE_CURRENT_SOURCE_DIR}/cmake/bundle-python.cmake"
         )
 
