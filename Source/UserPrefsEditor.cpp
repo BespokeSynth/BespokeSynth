@@ -319,7 +319,15 @@ void UserPrefsEditor::CleanUpSave(std::string& json)  //remove the markup hack t
 
 bool UserPrefsEditor::PrefRequiresRestart(UserPref* pref) const
 {
-   return pref == &UserPrefs.devicetype || pref == &UserPrefs.audio_output_device || pref == &UserPrefs.audio_input_device || pref == &UserPrefs.samplerate || pref == &UserPrefs.buffersize || pref == &UserPrefs.record_buffer_length_minutes || pref == &UserPrefs.show_minimap;
+   return pref == &UserPrefs.devicetype ||
+          pref == &UserPrefs.audio_output_device ||
+          pref == &UserPrefs.audio_input_device ||
+          pref == &UserPrefs.samplerate ||
+          pref == &UserPrefs.buffersize ||
+          pref == &UserPrefs.max_output_channels ||
+          pref == &UserPrefs.max_input_channels ||  
+          pref == &UserPrefs.record_buffer_length_minutes ||
+          pref == &UserPrefs.show_minimap;
 }
 
 void UserPrefsEditor::Save()

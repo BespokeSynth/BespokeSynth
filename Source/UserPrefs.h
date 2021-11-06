@@ -243,6 +243,8 @@ public:
 #if !BESPOKE_LINUX
    UserPrefBool vst_always_on_top{ "vst_always_on_top", true, UserPrefCategory::General };
 #endif
+   UserPrefTextEntryInt max_output_channels{ "max_output_channels", 16, 1, 1024, 5, UserPrefCategory::General };
+   UserPrefTextEntryInt max_input_channels{ "max_input_channels", 16, 1, 1024, 5, UserPrefCategory::General };
 
    UserPrefBool draw_background_lissajous{ "draw_background_lissajous", true, UserPrefCategory::Graphics };
    UserPrefFloat lissajous_r{ "lissajous_r", 0.408f, 0, 1, UserPrefCategory::Graphics };
