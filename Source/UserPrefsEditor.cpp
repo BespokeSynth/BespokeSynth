@@ -220,10 +220,6 @@ void UserPrefsEditor::DrawModule()
 {
    auto& deviceManager = TheSynth->GetAudioDeviceManager();
    auto* selectedDeviceType = UserPrefs.devicetype.GetIndex() != -1 ? deviceManager.getAvailableDeviceTypes()[UserPrefs.devicetype.GetIndex()] : deviceManager.getCurrentDeviceTypeObject();
-   UserPrefs.audio_input_device.GetControl()->SetShowing(selectedDeviceType->hasSeparateInputsAndOutputs());
-
-   UserPrefs.position_x.GetControl()->SetShowing(UserPrefs.set_manual_window_position.Get());
-   UserPrefs.position_y.GetControl()->SetShowing(UserPrefs.set_manual_window_position.Get());
 
    mCategorySelector->Draw();
 
@@ -232,7 +228,15 @@ void UserPrefsEditor::DrawModule()
    bool hasPrefThatRequiresRestart = false;
    for (auto* pref : UserPrefs.mUserPrefs)
    {
-      pref->GetControl()->SetShowing(pref->mCategory == mCategory);
+      bool onPage = pref->mCategory == mCategory;
+      bool hide = false;
+      if (pref == &UserPrefs.audio_input_device)
+         hide = !selectedDeviceType->hasSeparateInputsAndOutputs();
+      if (pref == &UserPrefs.position_x || pref == &UserPrefs.position_y)
+         hide = !UserPrefs.set_manual_window_position.Get();
+
+      pref->GetControl()->SetShowing(onPage && !hide);
+
       if (pref->GetControl()->IsShowing())
       {
          pref->GetControl()->SetPosition(controlX, controlY);
@@ -244,9 +248,10 @@ void UserPrefsEditor::DrawModule()
             DrawRightLabel(pref->GetControl(), "*", ofColor::magenta, 4);
             hasPrefThatRequiresRestart = true;
          }
-
-         controlY += 17;
       }
+
+      if (onPage)
+         controlY += 17;
    }
    controlY += 17;
    mSaveButton->SetPosition(controlX, controlY);
@@ -260,7 +265,13 @@ void UserPrefsEditor::DrawModule()
       DrawRightLabel(UserPrefs.devicetype.GetControl(), "warning: DirectSound can cause crackle and strange behavior for some sample rates and buffer sizes", ofColor::yellow);
 
    if (!selectedDeviceType->hasSeparateInputsAndOutputs())
-      DrawRightLabel(UserPrefs.audio_output_device.GetControl(), "note: "+ UserPrefs.devicetype.GetDropdown()->GetLabel(UserPrefs.devicetype.GetIndex())+" uses the same device for output and input", ofColor::white);
+   {
+      ofRectangle rect = UserPrefs.audio_output_device.GetControl()->GetRect(true);
+      ofPushStyle();
+      ofSetColor(ofColor::white);
+      DrawTextNormal("note: " + UserPrefs.devicetype.GetDropdown()->GetLabel(UserPrefs.devicetype.GetIndex()) + " uses the same audio device for output and input", rect.x, rect.getMaxY() + 14, 13);
+      ofPopStyle();
+   }
 
    if (UserPrefs.samplerate.GetDropdown()->GetNumValues() == 0)
    {
