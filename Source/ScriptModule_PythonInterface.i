@@ -671,7 +671,7 @@ PYBIND11_EMBEDDED_MODULE(module, m)
       .def("get_target", [](IDrawableModule& module)
       {
          auto* cable = module.GetPatchCableSource();
-         if (cable)
+         if (cable && cable->GetTarget())
             return cable->GetTarget()->Path();
          return std::string();
       })
