@@ -253,6 +253,14 @@ public:
    UserPrefFloat background_r{ "background_r", 0.09f, 0, 1, UserPrefCategory::Graphics };
    UserPrefFloat background_g{ "background_g", 0.09f, 0, 1, UserPrefCategory::Graphics };
    UserPrefFloat background_b{ "background_b", 0.09f, 0, 1, UserPrefCategory::Graphics };
+   UserPrefTextEntryFloat mouse_offset_x{ "mouse_offset_x", 0, -100, 100, 5, UserPrefCategory::Graphics };
+   UserPrefTextEntryFloat mouse_offset_y{ "mouse_offset_y",
+#if BESPOKE_MAC
+                                                           -4,
+#else
+                                                            0,
+#endif
+                                                               -100, 100, 5, UserPrefCategory::Graphics };
 
    UserPrefString recordings_path{ "recordings_path", "recordings/", 70, UserPrefCategory::Paths };
    UserPrefString tooltips{ "tooltips", "tooltips_eng.txt", 70, UserPrefCategory::Paths };
