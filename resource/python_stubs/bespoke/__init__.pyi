@@ -51,3 +51,6 @@ def set_background_text(str, size=50, xPos = 150, yPos = 250, red = 1, green = 1
 def random(seed, index):
    pass
 
+def get_modules():
+   pass
+

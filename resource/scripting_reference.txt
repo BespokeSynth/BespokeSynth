@@ -33,6 +33,7 @@ globals:
    bespoke.set_background_text(str, size, xPos, yPos, red, green, blue)
       optional: size=50, xPos = 150, yPos = 250, red = 1, green = 1, blue = 1
    bespoke.random(seed, index)
+   bespoke.get_modules()
 
 
 script-relative:
@@ -183,7 +184,13 @@ import module
       module.create(moduleType, x, y)
    instance:
       m.set_position(x, y)
+      m.get_position_x()
+      m.get_position_y()
+      m.get_width()
+      m.get_height()
       m.set_target(target)
+      m.get_target()
+      m.set_name(name)
       m.delete()
       m.set(path, value)
       m.get(path)

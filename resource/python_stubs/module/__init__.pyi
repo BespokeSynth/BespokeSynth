@@ -10,7 +10,25 @@ class module:
    def set_position(this, x, y):
       pass
 
+   def get_position_x(this, ):
+      pass
+
+   def get_position_y(this, ):
+      pass
+
+   def get_width(this, ):
+      pass
+
+   def get_height(this, ):
+      pass
+
    def set_target(this, target):
+      pass
+
+   def get_target(this, ):
+      pass
+
+   def set_name(this, name):
       pass
 
    def delete(this, ):
