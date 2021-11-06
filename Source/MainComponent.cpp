@@ -235,8 +235,8 @@ public:
       hr = CoInitializeEx(0, COINIT_MULTITHREADED);
 #endif
       
-      int inputChannels = 16;
-      int outputChannels = 16;
+      int inputChannels = UserPrefs.max_input_channels.Get();
+      int outputChannels = UserPrefs.max_output_channels.Get();
       
       if (inputDevice == kNoneDevice)
          inputChannels = 0;
