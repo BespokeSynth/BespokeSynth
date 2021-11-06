@@ -149,6 +149,18 @@ PYBIND11_EMBEDDED_MODULE(bespoke, m) {
       x = x ^ (x >> 31);
       return (int)x;
    });
+   m.def("get_modules", []()
+   {
+      std::vector<IDrawableModule*> modules;
+      TheSynth->GetAllModules(modules);
+      std::vector<std::string> paths;
+      for (auto* module : modules)
+      {
+         if (module)
+            paths.push_back(module->Path());
+      }
+      return paths;
+   });
 }
 
 PYBIND11_EMBEDDED_MODULE(scriptmodule, m)
@@ -623,18 +635,49 @@ PYBIND11_EMBEDDED_MODULE(module, m)
       ScriptModule::sMostRecentLineExecutedModule->ClearContext();
       return ret;
    }, py::return_value_policy::reference);
-   m.def("create", [](std::string moduleType, int x, int y)
+   m.def("create", [](std::string moduleType, float x, float y)
    {
       return TheSynth->SpawnModuleOnTheFly(moduleType, x, y);
    }, py::return_value_policy::reference);
    py::class_<IDrawableModule>(m, "module")
-      .def("set_position", [](IDrawableModule& module, int x, int y)
+      .def("set_position", [](IDrawableModule& module, float x, float y)
       {
          module.SetPosition(x,y);
+      })
+      .def("get_position_x", [](IDrawableModule& module)
+      {
+         return module.GetPosition().x;
+      })
+      .def("get_position_y", [](IDrawableModule& module)
+      {
+         return module.GetPosition().y;
+      })
+      .def("get_width", [](IDrawableModule& module)
+      {
+         float w, h;
+         module.GetDimensions(w, h);
+         return h;
+      })
+      .def("get_height", [](IDrawableModule& module)
+      {
+         float w, h;
+         module.GetDimensions(w, h);
+         return h;
       })
       .def("set_target", [](IDrawableModule& module, IDrawableModule* target)
       {
          module.SetTarget(target);
+      })
+      .def("get_target", [](IDrawableModule& module)
+      {
+         auto* cable = module.GetPatchCableSource();
+         if (cable)
+            return cable->GetTarget()->Path();
+         return std::string();
+      })
+      .def("set_name", [](IDrawableModule& module, std::string name)
+      {
+         module.SetName(name.c_str());
       })
       .def("delete", [](IDrawableModule& module)
       {
