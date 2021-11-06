@@ -1,5 +1,5 @@
 <?xml version="1.0"?>
-<?define ProductVersion = "1.0.0"?>
+<?define ProductVersion = "1.0.999"?>
 <?define ProductUpgradeCode = "ba790d99-4d2c-4e33-a92d-219970637fca"?>
 <Wix xmlns="http://schemas.microsoft.com/wix/2006/wi">
    <Product Id="*" UpgradeCode="$(var.ProductUpgradeCode)" 
@@ -23,10 +23,11 @@
             <Directory Id="INSTALLDIR" Name="BespokeSynth">
                <Component Id="ApplicationFiles" Guid="0a2563f0-5f49-4ae8-acda-143a019f73a2">
                   <File Id="MainExecutable" Source="..\ignore\build\Source\BespokeSynth_artefacts\Release\BespokeSynth.exe"/>
-                  <File Id="PythonLibrary" Source="python38.dll"/>
                   <File Id="Readme" Source="readme.txt"/>
                </Component>
                <Directory Id="RESOURCE_DIR_REF" Name="resource">
+               </Directory>
+               <Directory Id="PYTHON_DIR_REF" Name="python">
                </Directory>
             </Directory>
          </Directory>
@@ -67,6 +68,7 @@
          <ComponentRef Id="ApplicationFiles"/>
          <ComponentRef Id="ApplicationShortcuts"/>
          <ComponentGroupRef Id="BespokeResourceDir" />
+         <ComponentGroupRef Id="BespokePythonDir" />
       </Feature>
    </Product>
 </Wix>
