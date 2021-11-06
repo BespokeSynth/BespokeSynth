@@ -1,13 +1,16 @@
 # Path to your midi file
 midifile='/home/asmw/src/BespokeSynth/multitrack.mid'
 
-# If you want to write the notes to a canvas, set its name here
-canvas = ''
+# If true, every selected track will be rendered into its own canvas
+create_canvas = True
 
-# Which tracks to extract/play
-tracks = [1,2]
+# Auto link the created canvases to the target of this script
+auto_link = True
 
-# whether to play on script load
+# Which tracks to extract/play, empty list means all
+tracks = []
+
+# whether to start playing all notes on script load
 play_on_load = False
 
 from mido import MidiFile, tick2second, bpm2tempo
@@ -37,8 +40,12 @@ class BespokeNote(object):
     def __str__(self):
         return f'@{self.delay()}->{self.length()} [{self.pitch}/{self.velocity}]'
 
-def parse_midi(midifile, tracks = [1]):
+def parse_midi(midifile, tracks = []):
     mid = MidiFile(midifile)
+
+    if not tracks:
+        tracks = range(len(mid.tracks))
+
     bespoke_notes = {}
 
     for track in tracks:
@@ -61,32 +68,53 @@ def parse_midi(midifile, tracks = [1]):
                     del(on_notes[msg.note])
     return bespoke_notes
 
-nc = None
-if canvas != '':
-    try:
-        import notecanvas
-        nc = notecanvas.get(canvas)
-        nc.clear()
-    except:
-        pass
-
-def play(notes, canvas = None):
+def schedule(notes):
     output = 0
     for track in notes:
         for bn in notes[track]:
-            if canvas is None:
-                try:
-                    me.schedule_note(bn.delay(), bn.pitch, bn.velocity, bn.length(), 0, output)
-                except:
-                    print(f'{output}: {bn}')
-            else:
-                canvas.add_note(bn.delay(), bn.pitch, bn.velocity, bn.length())
+            try:
+                me.schedule_note(bn.delay(), bn.pitch, bn.velocity, bn.length(), 0, output)
+            except:
+                print(f'{output}: {bn}')
         output += 1
 
-notes = parse_midi(midifile, tracks)
+def render(notes, canvas):
+    for bn in notes:
+        canvas.add_note(bn.delay(), bn.pitch, bn.velocity, bn.length())
+    canvas.fit()
+
+def create_canvases(tracks):
+    import module
+    import notecanvas
+    y = 260
+    increment = 400
+    for t in tracks:
+        if len(tracks[t]) > 0:
+            print(f"Creating canvas for track {t}")
+            c = module.create('notecanvas', 10, y)
+            name = f'MIDI Track {t}'
+            c.set_name(name)
+            # TODO: calling add_note on the returned module does not work, why?
+            render(track_notes[t], c)
+            if auto_link:
+                target = module.get(me.get_target())
+                if target:
+                    c.set_target(target)
+            y += increment
+        else:
+            print(f"Skipping empty track {t}")
+
+track_notes = parse_midi(midifile, tracks)
+
+if not tracks:
+    tracks = track_notes.keys()
+
+if create_canvas:
+    print("Creating canvases")
+    create_canvases(track_notes)
 
 if play_on_load:
-    play(notes)
+    schedule(track_notes)
 
 def on_pulse():
-    play(notes)
+    schedule(track_notes)

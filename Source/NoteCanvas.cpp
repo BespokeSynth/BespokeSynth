@@ -350,6 +350,17 @@ NoteCanvasElement* NoteCanvas::AddNote(double measurePos, int pitch, int velocit
    return element;
 }
 
+void NoteCanvas::FitNotes()
+{
+   float latest = 0.0;
+   for (auto* element : mCanvas->GetElements())
+   {
+      if(element->GetEnd() > latest)
+         latest = element->GetEnd();
+   }
+   SetNumMeasures(static_cast<int>(std::ceil(latest)));
+}
+
 void NoteCanvas::CanvasUpdated(Canvas* canvas)
 {
    if (canvas == mCanvas)
