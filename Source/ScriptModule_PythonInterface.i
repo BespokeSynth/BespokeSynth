@@ -379,6 +379,10 @@ PYBIND11_EMBEDDED_MODULE(notecanvas, m)
       .def("clear", [](NoteCanvas& canvas)
       {
          canvas.Clear();
+      })
+      .def("fit", [](NoteCanvas& canvas)
+      {
+         canvas.FitNotes();
       });
 }
 
