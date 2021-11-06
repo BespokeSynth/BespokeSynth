@@ -15,6 +15,7 @@ void UpdateUserData(std::string destDirPath)
 
    bool needCopy = false;
    std::vector<juce::String> preserveOldFileList;
+   std::vector<juce::String> leaveAloneFileList;
    
    if(!destDataVersionFile.exists())
    {
@@ -40,6 +41,7 @@ void UpdateUserData(std::string destDirPath)
          //I can use the data version in the future to see if special accomodations need to be made for copy/overwriting any specific files
 
          preserveOldFileList.push_back(juce::String(destDirPath) + "/layouts/blank.json");
+         leaveAloneFileList.push_back(juce::String(destDirPath) + "/drums/drums.json");
       }
    }
    
@@ -64,9 +66,13 @@ void UpdateUserData(std::string destDirPath)
             copyFile = true;
          if (juce::File(destFileName).exists() && !juce::File(destFileName).hasIdenticalContentTo(juce::File(sourceFileName)))
          {
-            if (VectorContains(destFileName, preserveOldFileList))
-               juce::File(destFileName).copyFileTo(destFileName+"_old");
-            copyFile = true;
+            if (!VectorContains(destFileName, leaveAloneFileList))
+            {
+               if (VectorContains(destFileName, preserveOldFileList))
+                  juce::File(destFileName).copyFileTo(destFileName+"_old");
+            
+               copyFile = true;
+            }
          }
              
          if (copyFile)
