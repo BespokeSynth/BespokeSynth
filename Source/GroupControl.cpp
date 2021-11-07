@@ -123,14 +123,21 @@ void GroupControl::LoadLayout(const ofxJSONElement& moduleInfo)
    
    for (int i=0; i<controls.size(); ++i)
    {
-      std::string controlPath = controls[i].asString();
-      IUIControl* control = nullptr;
-      if (!controlPath.empty())
-         control = TheSynth->FindUIControl(controlPath);
-      PatchCableSource* cable = new PatchCableSource(this, kConnectionType_Modulator);
-      AddPatchCableSource(cable);
-      cable->SetTarget(control);
-      mControlCables.push_back(cable);
+      try
+      {
+         std::string controlPath = controls[i].asString();
+         IUIControl* control = nullptr;
+         if (!controlPath.empty())
+            control = TheSynth->FindUIControl(controlPath);
+         PatchCableSource* cable = new PatchCableSource(this, kConnectionType_Modulator);
+         AddPatchCableSource(cable);
+         cable->SetTarget(control);
+         mControlCables.push_back(cable);
+      }
+      catch (Json::LogicError& e)
+      {
+         TheSynth->LogEvent(__PRETTY_FUNCTION__ + std::string(" json error: ") + e.what(), kLogEventType_Error);
+      }
    }
    
    //add extra cable

@@ -31,6 +31,7 @@
 #include "Sample.h"
 #include "UIControlMacros.h"
 #include "PatchCableSource.h"
+#include "UserPrefs.h"
 
 MultitrackRecorder::MultitrackRecorder()
 : mRecord(false)
@@ -128,11 +129,7 @@ void MultitrackRecorder::ButtonClicked(ClickButton* button)
 
    if (button == mBounceButton)
    {
-      std::string recordingsPath = "recordings/";
-      if (!TheSynth->GetUserPrefs()["recordings_path"].isNull())
-         recordingsPath = TheSynth->GetUserPrefs()["recordings_path"].asString();
-
-      std::string filenamePrefix = ofGetTimestampString(recordingsPath + "multitrack_%Y-%m-%d_%H-%M_");
+      std::string filenamePrefix = ofGetTimestampString(UserPrefs.recordings_path.Get() + "multitrack_%Y-%m-%d_%H-%M_");
 
       int numFiles = 0;
       for (int i = 0; i < (int)mTracks.size(); ++i)

@@ -29,6 +29,8 @@
 #include "ModularSynth.h"
 #include "TitleBar.h"
 #include "EffectChain.h"
+#include "UserPrefs.h"
+#include "VersionInfo.h"
 
 #include "juce_gui_basics/juce_gui_basics.h"
 #include "juce_opengl/juce_opengl.h"
@@ -45,7 +47,7 @@ HelpDisplay::HelpDisplay()
 {
    LoadHelp();
 
-   sShowTooltips = TheSynth->GetUserPrefs()["show_tooltips_on_load"].isNull() ? true : (TheSynth->GetUserPrefs()["show_tooltips_on_load"].asInt() > 0);
+   sShowTooltips = UserPrefs.show_tooltips_on_load.Get();
    LoadTooltips();
 }
 
@@ -54,7 +56,8 @@ void HelpDisplay::CreateUIControls()
    IDrawableModule::CreateUIControls();
    
    mShowTooltipsCheckbox = new Checkbox(this, "show tooltips", 3, 22, &sShowTooltips);
-   mDumpModuleInfoButton = new ClickButton(this, "dump module info", 110, 22);
+   mCopyBuildInfoButton = new ClickButton(this, "copy build info", mShowTooltipsCheckbox, kAnchor_Right);
+   mDumpModuleInfoButton = new ClickButton(this, "dump module info", 200, 22);
    mDoModuleScreenshotsButton = new ClickButton(this, "do screenshots", mDumpModuleInfoButton, kAnchor_Right);
    mDoModuleDocumentationButton = new ClickButton(this, "do documentation", mDoModuleScreenshotsButton, kAnchor_Right);
    mTutorialVideoLinkButton = new ClickButton(this, "youtu.be/SYBc8X2IxqM", 160, 61);
@@ -90,6 +93,7 @@ void HelpDisplay::DrawModule()
    DrawTextRightJustify(GetBuildInfoString(), mWidth-5, 12);
    
    mShowTooltipsCheckbox->Draw();
+   mCopyBuildInfoButton->Draw();
    mDumpModuleInfoButton->SetShowing(GetKeyModifiers() == kModifier_Shift);
    mDumpModuleInfoButton->Draw();
    mDoModuleScreenshotsButton->SetShowing(GetKeyModifiers() == kModifier_Shift);
@@ -176,18 +180,12 @@ void HelpDisplay::CheckboxUpdated(Checkbox* checkbox)
 
 void HelpDisplay::LoadTooltips()
 {
-   std::string tooltipsPath;
-   if (TheSynth->GetUserPrefs()["tooltips"].isNull() || !juce::File(ofToResourcePath(TheSynth->GetUserPrefs()["tooltips"].asString())).existsAsFile())
-      tooltipsPath = ofToResourcePath("tooltips_eng.txt");
-   else
-      tooltipsPath = ofToResourcePath(TheSynth->GetUserPrefs()["tooltips"].asString());
-
    sTooltips.clear();
 
    ModuleTooltipInfo moduleInfo;
    UIControlTooltipInfo controlInfo;
 
-   juce::File tooltipsFile(tooltipsPath);
+   juce::File tooltipsFile(ofToResourcePath(UserPrefs.tooltips.Get()));
    if (tooltipsFile.existsAsFile())
    {
       juce::StringArray lines;
@@ -373,6 +371,10 @@ void HelpDisplay::ButtonClicked(ClickButton* button)
    if (button == mDiscordLinkButton)
    {
       juce::URL("https://discord.gg/YdTMkvvpZZ").launchInDefaultBrowser();
+   }
+   if (button == mCopyBuildInfoButton)
+   {
+      juce::SystemClipboard::copyTextToClipboard("bespoke " + juce::String(GetBuildInfoString()) + " - " + juce::SystemStats::getOperatingSystemName() + " - " + Bespoke::GIT_BRANCH + " " + Bespoke::GIT_HASH);
    }
    if (button == mDumpModuleInfoButton)
    {

@@ -99,7 +99,7 @@ public:
    RollingBuffer* GetOverrideVizBuffer() const { return mOverrideVizBuffer; }
    void UpdatePosition(bool parentMinimized);
    void SetManualPosition(int x, int y) { mManualPositionX = x; mManualPositionY = y; mAutomaticPositioning = false; }
-   void RemovePatchCable(PatchCable* cable);
+   void RemovePatchCable(PatchCable* cable, bool fromUserAction = false);
    void ClearPatchCables();
    void SetPatchCableTarget(PatchCable* cable, IClickable* target, bool fromUserClick);
    const std::vector<INoteReceiver*>& GetNoteReceivers() const { return mNoteReceivers; }

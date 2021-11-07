@@ -33,6 +33,7 @@
 #include "FillSaveDropdown.h"
 #include "UIControlMacros.h"
 #include "PatchCableSource.h"
+#include "MathUtils.h"
 
 NoteStepSequencer::NoteStepSequencer()
 : mInterval(kInterval_8n)
@@ -255,7 +256,7 @@ void NoteStepSequencer::DrawModule()
    {
       ofVec2f pos = mGrid->GetCellPosition(0, i-1) + mGrid->GetPosition(true);
       float scale = MIN(mGrid->IClickable::GetDimensions().y / mGrid->GetRows(), 20);
-      DrawTextNormal(NoteName(RowToPitch(i),false,true) + "("+ ofToString(RowToPitch(i)) + ")", pos.x + 1, pos.y - (scale/8) + 1, scale);
+      DrawTextNormal(NoteName(RowToPitch(i),false,true) + "("+ ofToString(RowToPitch(i)) + ")", pos.x + 1, pos.y - (scale/8), scale);
    }
    ofPopStyle();
    
@@ -1007,24 +1008,6 @@ void NoteStepSequencer::FloatSliderUpdated(FloatSlider* slider, float oldVal)
    }
 }
 
-namespace
-{
-   int HighestPow2(int n)
-   {
-      int res = 0;
-      for (int i = n; i >= 1; i--)
-      {
-         // If i is a power of 2
-         if ((i & (i - 1)) == 0)
-         {
-            res = i;
-            break;
-         }
-      }
-      return res;
-   }
-}
-
 void NoteStepSequencer::IntSliderUpdated(IntSlider* slider, int oldVal)
 {
    if (slider == mLoopResetPointSlider || slider == mLengthSlider)
@@ -1036,7 +1019,7 @@ void NoteStepSequencer::IntSliderUpdated(IntSlider* slider, int oldVal)
       if (mLength > oldVal)
       {
          //slice the loop into the nearest power of 2 and loop new steps from there
-         int oldLengthPow2 = HighestPow2(oldVal);
+         int oldLengthPow2 = std::max(1, MathUtils::HighestPow2(oldVal));
          for (int i = oldVal; i < mLength; ++i)
          {
             int loopedFrom = i % oldLengthPow2;

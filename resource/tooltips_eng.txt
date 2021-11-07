@@ -462,6 +462,20 @@ notesequencer~looping sequence of notes at an interval. pair with a "pulser" mod
 
 
 
+notetable~map a pitch (starting from zero) to a scale pitch
+~random pitch~randomize pitches in the sequence. hold shift to constrain the randomization to only pick roots and fifths.
+~length~the number of pitches
+~octave~octave of the bottom pitch of this sequence
+~notemode~which set of pitches should the rows represent?
+~tone*~pitch for this column
+~grid~patch a grid in here from a "midicontroller" module
+~x offset~x offset of attached grid controller
+~y offset~y offset of attached grid controller
+~rand pitch chance~when clicking the random pitch button, what is the chance that a step gets changed?
+~rand pitch range~when clicking the random pitch button, how far will the pitch change?
+
+
+
 notelooper~note loop recorder with overdubbing and replacement functionality
 ~write~should input should be recorded?
 ~del/mute~if "write" is enabled, erase notes as the playhead passes over them. otherwise, just mute them.
@@ -569,8 +583,7 @@ fouronthefloor~sends note 0 every beat, to trigger a kick drum
 
 
 drumsequencer~step sequencer intended for drums. hold shift when dragging on the grid to adjust step velocity.
-~str~velocity to use when setting a step via a grid controller, if the checkbox next to this slider is checked
-~use str~if the "str" slider should be used for setting velocity
+~vel~velocity to use when setting a step
 ~measures~length of the sequence in measures
 ~preset~select a pattern preset
 ~yoff~vertical offset for grid controller's view of the pattern
@@ -588,11 +601,13 @@ drumsequencer~step sequencer intended for drums. hold shift when dragging on the
 ~randomize~randomize the sequence
 ~r den~density of the randomizer output. the higher this is, the busier the random output will be.
 ~r amt~the chance that each step will change when being randomized. low values will only change a small amount of the sequence, high values will replace more of the sequence.
+~r lock*~lock this row so it doesn't get randomized
 
 
 
 helpdisplay~displays help information
 ~show tooltips~displays these tooltips. you can also toggle them with the F1 key, and you can turn these on or off by default in the "settings" menu.
+~copy build info~copy info about this build to the clipboard, for help requests
 ~help page~which page of help information to show
 
 
@@ -1132,6 +1147,7 @@ sampleplayer~sample playback with triggerable cue points, clip extraction, and y
 ~cue start~start point in seconds of the current cue
 ~cue len~length in seconds of the current cue. a value of zero will play to the end of the sample.
 ~cue speed~playback speed of the current cue
+~cue stop~stop playing this cue if a note-off is received
 ~cuepoint~sets the current cue to edit
 ~click sets cue~when true, clicking on the waveform will set the start position of the current cue
 ~select played~when true, any cue point played via incoming notes will become the current cue
@@ -1277,6 +1293,10 @@ fmsynth~polyphonic fm synthesis
 
 
 
+notetoggle~turn a control on or off depending on if there are any input notes
+
+
+
 drumsynth~oscillator+noise drum synth
 ~vol~the output volume
 ~edit~display parameters for each hit
@@ -1308,6 +1328,7 @@ drumsynth~oscillator+noise drum synth
 ~cutoffmax*~filter start cutoff frequency
 ~cutoffmin*~filter end cutoff frequency
 ~q*~filter resonance
+~oversampling~oversampling amount. increases sound quality, but also increases cpu usage.
 
 
 
@@ -1340,6 +1361,7 @@ drumplayer~sample player intended for drum playback
 ~envelopedisplay *R~envelope release
 ~test *~play this sample
 ~random *~choose a random sample from the selected hitcategory
+~grab *~grab this sample
 
 
 
@@ -1741,6 +1763,7 @@ vstplugin~a VST plugin instance
 ~show parameter~select parameters to display them, so they can be adjusted from within bespoke's interface. if a VST has more than 20 parameters, this list will initially be empty. in that case, to make a parameter appear in this list, wiggle it within the VST's interface.
 ~preset~choose from saved VST presets
 ~save as~save the current VST settings as a preset to load again later
+~panic~send "all notes off" and "all sounds off" to this plugin in order to silence it immediately
 
 
 
@@ -1779,6 +1802,7 @@ m185sequencer~sequencer using the unique paradigm of the the m185 or intellijel 
 
 notestepper~output notes through a round robin of patch cables, to create sequential variety
 ~length~length of the sequence
+~reset~reset to the start
 
 
 

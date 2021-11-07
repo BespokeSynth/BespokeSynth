@@ -16,6 +16,7 @@ using namespace juce;
 #include "SynthGlobals.h"
 #include "Push2Control.h"  //TODO(Ryan) remove
 #include "SpaceMouseControl.h"
+#include "UserPrefs.h"
 
 #ifdef JUCE_WINDOWS
 #include <windows.h>
@@ -56,13 +57,15 @@ public:
 
       openGLContext.setOpenGLVersionRequired(juce::OpenGLContext::openGL3_2);
       openGLContext.setContinuousRepainting(false);
-#if BESPOKE_LINUX_HIGH_FPS_WITH_THREAD_PROBLEMS
+#if BESPOKE_LINUX //turning this on improves linux framerate, but seems to expose thread safety issues on windows/mac. see git PRs #349 and #396
       openGLContext.setComponentPaintingEnabled(false);
 #endif
 
 #ifndef BESPOKE_WINDOWS //windows crash handler is set up in ModularSynth() constructor
       SystemStats::setApplicationCrashHandler(ModularSynth::CrashHandler);
 #endif
+
+      UserPrefs.Init();
       
       int screenWidth, screenHeight;
       {
@@ -78,27 +81,20 @@ public:
          ofLog() << "pixel ratio: " << mPixelRatio << " screen width: " << screenWidth << " screen height: " << screenHeight;
       }
       
-      int width = 1700;
-      int height = 1100;
+      int width = UserPrefs.width.Get();
+      int height = UserPrefs.height.Get();
       mDesiredInitialPosition.setXY(INT_MAX, INT_MAX);
-      ofxJSONElement userPrefs;
-      bool loaded = userPrefs.open(ModularSynth::GetUserPrefsPath(false));
-      if (loaded)
-      {
-         width = userPrefs["width"].asInt();
-         height = userPrefs["height"].asInt();
-         if (!userPrefs["position_x"].isNull())
-            mDesiredInitialPosition.setXY(userPrefs["position_x"].asInt(), userPrefs["position_y"].asInt());
-      }
       
-      if (mDesiredInitialPosition.x == INT_MAX)
+      if (UserPrefs.set_manual_window_position.Get())
+      {
+         mDesiredInitialPosition.setXY(UserPrefs.position_x.Get(), UserPrefs.position_y.Get());
+      }
+      else
       {
          if (width + getTopLevelComponent()->getPosition().x > screenWidth)
             width = screenWidth - getTopLevelComponent()->getPosition().x;
          if (height + getTopLevelComponent()->getPosition().y + 20 > screenHeight)
             height = screenHeight - getTopLevelComponent()->getPosition().y - 20;
-
-         setSize(width, height);
       }
       
       setSize(width, height);
@@ -128,7 +124,7 @@ public:
       
       mSynth.Poll();
       
-#if DEBUG || (BESPOKE_LINUX && !BESPOKE_LINUX_HIGH_FPS_WITH_THREAD_PROBLEMS)
+#if DEBUG
       if (sRenderFrame % 2 == 0)
 #else
       if (true)
@@ -211,32 +207,18 @@ public:
             ofLog() << output.toStdString();
       }*/
 
-      ofxJSONElement userPrefs;
       const std::string kAutoDevice = "auto";
       const std::string kNoneDevice = "none";
-      std::string outputDevice = kAutoDevice;
-      std::string inputDevice = kNoneDevice;
-      int sampleRate = 48000;
-      int bufferSize = 256;
-      bool loaded = userPrefs.open(ModularSynth::GetUserPrefsPath(false));
-      if (loaded)
-      {
-         if (!userPrefs["samplerate"].isNull())
-            sampleRate = userPrefs["samplerate"].asInt();
-         if (!userPrefs["buffersize"].isNull())
-            bufferSize = userPrefs["buffersize"].asInt();
-         if (!userPrefs["devicetype"].isNull() && userPrefs["devicetype"].asString() != "auto")
-            mGlobalManagers.mDeviceManager.setCurrentAudioDeviceType(userPrefs["devicetype"].asString(), true);
-         if (!userPrefs["audio_output_device"].isNull())
-            outputDevice = userPrefs["audio_output_device"].asString();
-         if (!userPrefs["audio_input_device"].isNull())
-            inputDevice = userPrefs["audio_input_device"].asString();
-      }
 
-      SetGlobalSampleRateAndBufferSize(sampleRate, bufferSize);
+      if (UserPrefs.devicetype.Get() != kAutoDevice)
+         mGlobalManagers.mDeviceManager.setCurrentAudioDeviceType(UserPrefs.devicetype.Get(), true);
+
+      SetGlobalSampleRateAndBufferSize(UserPrefs.samplerate.Get(), UserPrefs.buffersize.Get());
       
       mSynth.Setup(&mGlobalManagers.mDeviceManager, &mGlobalManagers.mAudioFormatManager, this, &openGLContext);
 
+      std::string outputDevice = UserPrefs.audio_output_device.Get();
+      std::string inputDevice = UserPrefs.audio_input_device.Get();
       if (!mGlobalManagers.mDeviceManager.getCurrentDeviceTypeObject()->hasSeparateInputsAndOutputs())
          inputDevice = outputDevice;    //asio must have identical input and output
       
@@ -253,8 +235,8 @@ public:
       hr = CoInitializeEx(0, COINIT_MULTITHREADED);
 #endif
       
-      int inputChannels = 16;
-      int outputChannels = 16;
+      int inputChannels = UserPrefs.max_input_channels.Get();
+      int outputChannels = UserPrefs.max_output_channels.Get();
       
       if (inputDevice == kNoneDevice)
          inputChannels = 0;
@@ -328,11 +310,14 @@ public:
                               "\n\n\nvalid devices:\n" + GetAudioDevices());
       }
 
-      if (JUCEApplication::getCommandLineParameterArray().size() > 0)
+      for (int i = 0; i < JUCEApplication::getCommandLineParameterArray().size(); ++i)
       {
-         juce::String argument = JUCEApplication::getCommandLineParameterArray()[0];
+         juce::String argument = JUCEApplication::getCommandLineParameterArray()[i];
          if (argument.endsWith(".bsk"))
+         {
             mSynth.SetStartupSaveStateFile(argument.toStdString());
+            break;
+         }
       }
       
       startTimerHz(60);
@@ -365,7 +350,7 @@ public:
       
       static float kMotionTrails = .4f;
       
-      ofVec3f bgColor(.09f,.09f,.09f);
+      ofVec3f bgColor(ModularSynth::sBackgroundR, ModularSynth::sBackgroundG, ModularSynth::sBackgroundB);
       glViewport(0, 0, width*mPixelRatio, height*mPixelRatio);
       glClearColor(bgColor.x,bgColor.y,bgColor.z,0);
       if (kMotionTrails <= 0)
@@ -431,17 +416,17 @@ private:
 
    void mouseDown(const MouseEvent& e) override
    {
-      mSynth.MousePressed(e.getMouseDownX(), e.getMouseDownY(), GetMouseButton(e));
+      mSynth.MousePressed(e.getMouseDownX(), e.getMouseDownY(), GetMouseButton(e), e.source);
    }
    
    void mouseUp(const MouseEvent& e) override
    {
-      mSynth.MouseReleased(e.getPosition().x, e.getPosition().y, GetMouseButton(e));
+      mSynth.MouseReleased(e.getPosition().x, e.getPosition().y, GetMouseButton(e), e.source);
    }
    
    void mouseDrag(const MouseEvent& e) override
    {
-      mSynth.MouseDragged(e.getPosition().x, e.getPosition().y, GetMouseButton(e));
+      mSynth.MouseDragged(e.getPosition().x, e.getPosition().y, GetMouseButton(e), e.source);
    }
    
    void mouseMove(const MouseEvent& e) override
@@ -466,7 +451,7 @@ private:
    
    void mouseMagnify(const MouseEvent& e, float scaleFactor) override
    {
-      mSynth.MouseMagnify(e.getPosition().x, e.getPosition().y, scaleFactor);
+      mSynth.MouseMagnify(e.getPosition().x, e.getPosition().y, scaleFactor, e.source);
    }
    
    bool keyPressed(const KeyPress& key) override

@@ -73,7 +73,13 @@ ofColor ScriptModule::sBackgroundTextColor = ofColor::white;
 //static
 bool ScriptModule::sPythonInitialized = false;
 //static
-bool ScriptModule::sHasPythonEverSuccessfullyInitialized = false;
+bool ScriptModule::sHasPythonEverSuccessfullyInitialized =
+#ifdef BESPOKE_PORTABLE_PYTHON
+true;
+#else
+false;
+#endif
+
 //static
 ofxJSONElement ScriptModule::sStyleJSON;
 
@@ -142,12 +148,27 @@ void ScriptModule::UninitializePython()
    sPythonInitialized = false;
 }
 
+namespace
+{
+   // Py_SetPythonHome()'s signature varies depending on Python version. This converts to the string type we need.
+   std::string toPythonHome(const std::string &s, void (*)(char*)) { return s; }
+   std::wstring toPythonHome(const std::string &s, void (*)(const wchar_t*)) { return juce::String{s}.toWideCharPointer(); }
+}
+
 //static
 void ScriptModule::InitializePythonIfNecessary()
 {
    if (!sPythonInitialized)
    {
+#ifdef BESPOKE_PORTABLE_PYTHON
+      static const auto pythonHomeUtf8{ofToFactoryPath("python")};
+      static auto PYTHONHOME{toPythonHome(pythonHomeUtf8, Py_SetPythonHome)};
+      Py_SetPythonHome(PYTHONHOME.data());
+#endif
       py::initialize_interpreter();
+#ifdef BESPOKE_PORTABLE_PYTHON
+      py::exec(std::string{"import sys; sys.executable = '"} + pythonHomeUtf8 + "/" BESPOKE_PORTABLE_PYTHON "'; del sys");
+#endif
       py::exec(GetBootstrapImportString(), py::globals());
       
       CodeEntry::OnPythonInit();
@@ -834,7 +855,7 @@ void ScriptModule::ButtonClicked(ClickButton* button)
    
    if (button == mSaveScriptButton)
    {
-      FileChooser chooser("Save script as...", File(ofToDataPath("scripts/script.py")), "*.py", true, false, TheSynth->GetMainComponent()->getTopLevelComponent());
+      FileChooser chooser("Save script as...", File(ofToDataPath("scripts/script.py")), "*.py", true, false, TheSynth->GetFileChooserParent());
       if (chooser.browseForFileToSave(true))
       {
          std::string path = chooser.getResult().getFullPathName().toStdString();
@@ -1032,8 +1053,8 @@ std::pair<int,int> ScriptModule::RunScript(double time, int lineStart/*=-1*/, in
    std::string code = mCodeEntry->GetText(true);
    std::vector<std::string> lines = ofSplitString(code, "\n");
    
-   size_t executionStartLine = 0;
-   size_t executionEndLine = (int)lines.size();
+   int executionStartLine = 0;
+   int executionEndLine = (int)lines.size();
    if (lineStart != -1)
    {
       for (size_t i=(size_t)lineStart; i >= 0; --i)
@@ -1374,7 +1395,14 @@ void ScriptModule::LoadLayout(const ofxJSONElement& moduleInfo)
    mModuleSaveData.LoadString("style", moduleInfo, "classic", [](DropdownList* list) {
       for (auto i = 0; i < sStyleJSON.size(); ++i)
       {
-         list->AddLabel(sStyleJSON[i]["name"].asString(), i);
+         try
+         {
+            list->AddLabel(sStyleJSON[i]["name"].asString(), i);
+         }
+         catch (Json::LogicError& e)
+         {
+            TheSynth->LogEvent(__PRETTY_FUNCTION__ + std::string(" json error: ") + e.what(), kLogEventType_Error);
+         }
       }
    });
    mModuleSaveData.LoadBool("hotload_script_files", moduleInfo, false);
@@ -1402,8 +1430,15 @@ void ScriptModule::SetUpFromSaveData()
    std::string styleName = mModuleSaveData.GetString("style");
    for (auto i = 0; i < sStyleJSON.size(); ++i)
    {
-      if (sStyleJSON[i]["name"].asString() == styleName)
-         mCodeEntry->SetStyleFromJSON(sStyleJSON[i]);
+      try
+      {
+         if (sStyleJSON[i]["name"].asString() == styleName)
+            mCodeEntry->SetStyleFromJSON(sStyleJSON[i]);
+      }
+      catch (Json::LogicError& e)
+      {
+         TheSynth->LogEvent(__PRETTY_FUNCTION__ + std::string(" json error: ") + e.what(), kLogEventType_Error);
+      }
    }
 
    mHotloadScripts = mModuleSaveData.GetBool("hotload_script_files");
@@ -1416,14 +1451,18 @@ void ScriptModule::SaveLayout(ofxJSONElement& moduleInfo)
 
 namespace
 {
-   const int kSaveStateRev = 1;
+   const int kSaveStateRev = 2;
 }
 
 void ScriptModule::SaveState(FileStreamOut& out)
 {
-   IDrawableModule::SaveState(out);
-   
+   if (!CanSaveState())
+      return;
+
    out << kSaveStateRev;
+   out << (int)mExtraNoteOutputs.size();
+
+   IDrawableModule::SaveState(out);
    
    out << mWidth;
    out << mHeight;
@@ -1431,11 +1470,28 @@ void ScriptModule::SaveState(FileStreamOut& out)
 
 void ScriptModule::LoadState(FileStreamIn& in)
 {
+   int rev = -1;
+
+   if (ModuleContainer::sFileSaveStateRev >= 421)
+   {
+      in >> rev;
+      LoadStateValidate(rev <= kSaveStateRev);
+   }
+
+   if (rev >= 2)
+   {
+      int extraNoteOutputs;
+      in >> extraNoteOutputs;
+      SetNumNoteOutputs(extraNoteOutputs + 1);
+   }
+
    IDrawableModule::LoadState(in);
    
-   int rev;
-   in >> rev;
-   LoadStateValidate(rev == kSaveStateRev);
+   if (ModuleContainer::sFileSaveStateRev == 420)
+   {
+      in >> rev;
+      LoadStateValidate(rev <= kSaveStateRev);
+   }
    
    float w, h;
    in >> w;

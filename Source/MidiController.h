@@ -281,6 +281,7 @@ public:
    std::string GetDeviceIn() const { return mDeviceIn; }
    std::string GetDeviceOut() const { return mDeviceOut; }
    UIControlConnection* GetConnectionForControl(MidiMessageType messageType, int control);
+   UIControlConnection* GetConnectionForCableSource(const PatchCableSource *source);
    bool JustBoundControl() const { return gTime - mLastBoundControlTime < 500; }
    
    void SetVelocityMult(float mult) { mVelocityMult = mult; }

@@ -38,6 +38,7 @@
 namespace
 {
    const int kPatchCableSourceRadius = 5;
+   const int kPatchCableSourceClickRadius = 7;
    const int kPatchCableSpacing = 8;
 }
 
@@ -432,6 +433,9 @@ bool PatchCableSource::MouseMoved(float x, float y)
    y = TheSynth->GetMouseY(mOwner->GetOwningContainer());
    
    mHoverIndex = GetHoverIndex(x, y);
+
+   if (mHoverIndex != -1 && gHoveredUIControl != nullptr && !gHoveredUIControl->IsMouseDown())
+      gHoveredUIControl = nullptr; //if we're hovering over a patch cable, get rid of ui control hover
    
    for (size_t i=0; i<mPatchCables.size(); ++i)
    {
@@ -472,7 +476,9 @@ bool PatchCableSource::TestClick(int x, int y, bool right, bool testOnly /* = fa
          {
             if (mPatchCables.empty() ||
                 mType == kConnectionType_Note ||
-                mType == kConnectionType_Pulse)
+                mType == kConnectionType_Pulse ||
+                mType == kConnectionType_UIControl ||
+                mType == kConnectionType_Special)
             {
                PatchCable* newCable = AddPatchCable(nullptr);
                newCable->Grab();
@@ -484,7 +490,7 @@ bool PatchCableSource::TestClick(int x, int y, bool right, bool testOnly /* = fa
                send->SetTarget(GetTarget());
                SetTarget(send);
                send->SetSend(1, false);
-               TheSynth->SetMoveModule(send, spawnOffset.x, spawnOffset.y);
+               TheSynth->SetMoveModule(send, spawnOffset.x, spawnOffset.y, false);
             }
             else if (mType == kConnectionType_Modulator)
             {
@@ -493,7 +499,7 @@ bool PatchCableSource::TestClick(int x, int y, bool right, bool testOnly /* = fa
                IUIControl* currentTarget = dynamic_cast<IUIControl*>(GetTarget());
                SetTarget(macroSlider->GetSlider());
                macroSlider->SetOutputTarget(0, currentTarget);
-               TheSynth->SetMoveModule(macroSlider, spawnOffset.x, spawnOffset.y);
+               TheSynth->SetMoveModule(macroSlider, spawnOffset.x, spawnOffset.y, false);
             }
          }
          else
@@ -531,7 +537,7 @@ int PatchCableSource::GetHoverIndex(float x, float y) const
    float cableY = mY;
    for (int i = 0; i < mPatchCables.size() || i == 0; ++i)
    {
-      if (ofDistSquared(x, y, cableX, cableY) < kPatchCableSourceRadius * kPatchCableSourceRadius)
+      if (ofDistSquared(x, y, cableX, cableY) < kPatchCableSourceClickRadius * kPatchCableSourceClickRadius)
          return i;
 
       if (mSide == Side::kBottom)
@@ -619,14 +625,14 @@ void PatchCableSource::KeyPressed(int key, bool isRepeat)
       {
          if (cable != nullptr && cable == PatchCable::sActivePatchCable)
          {
-            RemovePatchCable(cable);
+            RemovePatchCable(cable, true);
             break;
          }
       }
    }
 }
 
-void PatchCableSource::RemovePatchCable(PatchCable* cable)
+void PatchCableSource::RemovePatchCable(PatchCable* cable, bool fromUserAction)
 {
    mOwner->PreRepatch(this);
    mAudioReceiver = nullptr;
@@ -636,7 +642,7 @@ void PatchCableSource::RemovePatchCable(PatchCable* cable)
       RemoveFromVector(dynamic_cast<IPulseReceiver*>(cable->GetTarget()), mPulseReceivers);
    }
    RemoveFromVector(cable, mPatchCables);
-   mOwner->PostRepatch(this, false);
+   mOwner->PostRepatch(this, fromUserAction);
    delete cable;
 }
 

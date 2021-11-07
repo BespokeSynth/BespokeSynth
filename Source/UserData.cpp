@@ -14,6 +14,8 @@ void UpdateUserData(std::string destDirPath)
       return;
 
    bool needCopy = false;
+   std::vector<juce::String> preserveOldFileList;
+   std::vector<juce::String> leaveAloneFileList;
    
    if(!destDataVersionFile.exists())
    {
@@ -37,6 +39,9 @@ void UpdateUserData(std::string destDirPath)
          int destDataVersion = ofToInt(destVersionLines[0].toStdString());
          needCopy = destDataVersion < bundledDataVersion;
          //I can use the data version in the future to see if special accomodations need to be made for copy/overwriting any specific files
+
+         preserveOldFileList.push_back(juce::String(destDirPath) + "/layouts/blank.json");
+         leaveAloneFileList.push_back(juce::String(destDirPath) + "/drums/drums.json");
       }
    }
    
@@ -54,15 +59,20 @@ void UpdateUserData(std::string destDirPath)
       for (const auto& entry : juce::RangedDirectoryIterator{bundledDataDir, true})
       {
          juce::String sourceFileName = entry.getFile().getFullPathName();
-         juce::String destFileName = juce::String(destDirPath) + "/" + entry.getFile().getRelativePathFrom(bundledDataDir);
+         juce::String destFileName = juce::String(destDirPath) + "/" + entry.getFile().getRelativePathFrom(bundledDataDir).replaceCharacter('\\','/');
 
          bool copyFile = false;
          if (!juce::File(destFileName).exists())
             copyFile = true;
          if (juce::File(destFileName).exists() && !juce::File(destFileName).hasIdenticalContentTo(juce::File(sourceFileName)))
          {
-            juce::File(destFileName).copyFileTo(destFileName+"_old");
-            copyFile = true;
+            if (!VectorContains(destFileName, leaveAloneFileList))
+            {
+               if (VectorContains(destFileName, preserveOldFileList))
+                  juce::File(destFileName).copyFileTo(destFileName+"_old");
+            
+               copyFile = true;
+            }
          }
              
          if (copyFile)

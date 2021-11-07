@@ -35,10 +35,14 @@
 #include "Transport.h"
 #include "DropdownList.h"
 #include "GridController.h"
+#include "Slider.h"
+#include "IPulseReceiver.h"
+#include "INoteReceiver.h"
+#include "IDrivableSequencer.h"
 
 class PatchCableSource;
 
-class RadioSequencer : public IDrawableModule, public ITimeListener, public IDropdownListener, public UIGridListener, public IGridControllerListener
+class RadioSequencer : public IDrawableModule, public ITimeListener, public IDropdownListener, public UIGridListener, public IGridControllerListener, public IIntSliderListener, public IPulseReceiver, public INoteReceiver, public IDrivableSequencer
 {
 public:
    RadioSequencer();
@@ -60,13 +64,25 @@ public:
    
    //ITimeListener
    void OnTimeEvent(double time) override;
+
+   //IPulseReceiver
+   void OnPulse(double time, float velocity, int flags) override;
+
+   //INoteReceiver
+   void PlayNote(double time, int pitch, int velocity, int voiceIdx = -1, ModulationParameters modulation = ModulationParameters()) override;
+   void SendCC(int control, int value, int voiceIdx = -1) override {}
    
    //IGridControllerListener
    void OnControllerPageSelected() override;
    void OnGridButton(int x, int y, float velocity, IGridController* grid) override;
+
+   //IDrivableSequencer
+   bool HasExternalPulseSource() const override { return mHasExternalPulseSource; }
+   void ResetExternalPulseSource() override { mHasExternalPulseSource = false; }
    
    void CheckboxUpdated(Checkbox* checkbox) override {}
    void DropdownUpdated(DropdownList* list, int oldVal) override;
+   void IntSliderUpdated(IntSlider* slider, int oldVal) override;
    
    void LoadLayout(const ofxJSONElement& moduleInfo) override;
    void SaveLayout(ofxJSONElement& moduleInfo) override;
@@ -74,13 +90,14 @@ public:
    
    void SaveState(FileStreamOut& out) override;
    void LoadState(FileStreamIn& in) override;
+   bool LoadOldControl(FileStreamIn& in, std::string& oldName) override;
    
    //IPatchable
    void PostRepatch(PatchCableSource* cableSource, bool fromUserClick) override;
    
 private:
+   void Step(double time, int pulseFlags);
    void SetGridSize(float w, float h);
-   void SetNumSteps(int numSteps, bool stretch);
    void SyncControlCablesToGrid();
    void UpdateGridLights();
    
@@ -92,13 +109,17 @@ private:
    bool MouseMoved(float x, float y) override;
    void MouseReleased() override;
    
-   UIGrid* mGrid;
-   NoteInterval mInterval;
-   DropdownList* mIntervalSelector;
-   int mLength;
-   DropdownList* mLengthSelector;
+   UIGrid* mGrid{ nullptr };
+   NoteInterval mInterval{ kInterval_1n };
+   DropdownList* mIntervalSelector{ nullptr };
+   int mLength{ 4 };
+   IntSlider* mLengthSlider{ nullptr };
+   std::string mOldLengthStr;
    std::vector<PatchCableSource*> mControlCables;
-   GridControlTarget* mGridControlTarget;
+   GridControlTarget* mGridControlTarget{ nullptr };
+   bool mHasExternalPulseSource{ false };
+   int mStep{ 0 };
+   int mLoadRev{ -1 };
 
    TransportListenerInfo* mTransportListenerInfo;
 };

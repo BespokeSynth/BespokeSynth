@@ -48,3 +48,9 @@ def get_tempo():
 def set_background_text(str, size=50, xPos = 150, yPos = 250, red = 1, green = 1, blue = 1):
    pass
 
+def random(seed, index):
+   pass
+
+def get_modules():
+   pass
+

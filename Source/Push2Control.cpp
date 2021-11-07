@@ -760,11 +760,11 @@ void Push2Control::DrawControls(std::vector<IUIControl*> controls, bool sliders,
          if (dropdown != nullptr)
          {
             const float kCentering = 7;
-            float w, h;
-            dropdown->GetPopupDimensions(w, h);
+            float w = dropdown->GetMaxItemWidth();
+            float h = dropdown->GetNumValues() * DropdownList::kItemSpacing;
             ofPushMatrix();
             ofTranslate(kColumnSpacing * i + 3, yPos + kCentering - h * controls[i]->GetMidiValue());
-            dropdown->DrawDropdown(w, h);
+            dropdown->DrawDropdown(w, h, true);
             ofFill();
             ofColor color = IDrawableModule::GetColor(controls[i]->GetModuleParent()->GetModuleType());
             color.a = 25;

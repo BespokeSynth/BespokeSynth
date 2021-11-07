@@ -128,7 +128,7 @@ void SeaOfGrain::Process(double time)
       return;
    
    ComputeSliders(0);
-   int numChannels = mHasRecordedInput ? GetBuffer()->NumActiveChannels() : mSample->NumChannels();
+   int numChannels = 2;
    SyncBuffers(numChannels);
    mRecordBuffer.SetNumChannels(GetBuffer()->NumActiveChannels());
    
@@ -309,7 +309,7 @@ void SeaOfGrain::LoadFile()
 {
    using namespace juce;
    FileChooser chooser("Load sample", File(ofToDataPath("samples")),
-                       TheSynth->GetAudioFormatManager().getWildcardForAllFormats(), true, false, TheSynth->GetMainComponent()->getTopLevelComponent());
+                       TheSynth->GetAudioFormatManager().getWildcardForAllFormats(), true, false, TheSynth->GetFileChooserParent());
    if (chooser.browseForFileToOpen())
    {
       auto file = chooser.getResult();

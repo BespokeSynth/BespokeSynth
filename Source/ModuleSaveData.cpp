@@ -24,6 +24,7 @@
 //
 
 #include "ModuleSaveData.h"
+#include "ModularSynth.h"
 #include "ofxJSONElement.h"
 #include "SynthGlobals.h"
 #include "DropdownList.h"
@@ -184,8 +185,15 @@ std::string ModuleSaveData::GetString(std::string prop)
 int ModuleSaveData::LoadInt(std::string prop, const ofxJSONElement& moduleInfo, int defaultValue, int min, int max, bool isTextField)
 {
    int val = defaultValue;
-   if (!moduleInfo[prop].isNull())
-      val = moduleInfo[prop].asInt();
+   try
+   {
+      if (!moduleInfo[prop].isNull())
+         val = moduleInfo[prop].asInt();
+   }
+   catch (Json::LogicError& e)
+   {
+      TheSynth->LogEvent(__PRETTY_FUNCTION__ + std::string(" json error: ") + e.what(), kLogEventType_Error);
+   }
    SetInt(prop, val, min, max, isTextField);
    return val;
 }
@@ -202,8 +210,15 @@ int ModuleSaveData::LoadInt(std::string prop, const ofxJSONElement& moduleInfo, 
 float ModuleSaveData::LoadFloat(std::string prop, const ofxJSONElement& moduleInfo, float defaultValue, float min, float max, bool isTextField)
 {
    float val = defaultValue;
-   if (!moduleInfo[prop].isNull())
-      val = moduleInfo[prop].asDouble();
+   try
+   {
+      if (!moduleInfo[prop].isNull())
+         val = moduleInfo[prop].asDouble();
+   }
+   catch (Json::LogicError& e)
+   {
+      TheSynth->LogEvent(__PRETTY_FUNCTION__ + std::string(" json error: ") + e.what(), kLogEventType_Error);
+   }
    SetFloat(prop, val, min, max, isTextField);
    return val;
 }
@@ -220,8 +235,15 @@ float ModuleSaveData::LoadFloat(std::string prop, const ofxJSONElement& moduleIn
 bool ModuleSaveData::LoadBool(std::string prop, const ofxJSONElement& moduleInfo, bool defaultValue)
 {
    bool val = defaultValue;
-   if (!moduleInfo[prop].isNull())
-      val = moduleInfo[prop].asBool();
+   try
+   {
+      if (!moduleInfo[prop].isNull())
+         val = moduleInfo[prop].asBool();
+   }
+   catch (Json::LogicError& e)
+   {
+      TheSynth->LogEvent(__PRETTY_FUNCTION__ + std::string(" json error: ") + e.what(), kLogEventType_Error);
+   }
    SetBool(prop, val);
    return val;
 }
@@ -229,8 +251,15 @@ bool ModuleSaveData::LoadBool(std::string prop, const ofxJSONElement& moduleInfo
 std::string ModuleSaveData::LoadString(std::string prop, const ofxJSONElement& moduleInfo, std::string defaultValue, FillDropdownFn fillFn)
 {
    std::string val = defaultValue;
-   if (!moduleInfo[prop].isNull())
-      val = moduleInfo[prop].asString();
+   try
+   {
+      if (!moduleInfo[prop].isNull())
+         val = moduleInfo[prop].asString();
+   }
+   catch (Json::LogicError& e)
+   {
+      TheSynth->LogEvent(__PRETTY_FUNCTION__ + std::string(" json error: ") + e.what(), kLogEventType_Error);
+   }
    SetString(prop, val);
    SaveVal* save = GetVal(prop);
    assert(save);

@@ -56,7 +56,7 @@ float IDrawableModule::sBrightness = 220;
 IDrawableModule::IDrawableModule()
 : mModuleType(kModuleType_Unknown)
 , mMinimized(false)
-, mMinimizeAreaClicked(false)
+, mWasMinimizeAreaClicked(false)
 , mMinimizeAnimation(0)
 , mEnabled(true)
 , mEnabledCheckbox(nullptr)
@@ -346,13 +346,13 @@ void IDrawableModule::DrawFrame(float w, float h, bool drawModule, float& titleB
       ofSetColor(color * (1 - GetBeaconAmount()) + ofColor::yellow * GetBeaconAmount(), gModuleDrawAlpha);
       DrawTextBold(GetTitleLabel(), 5 + enableToggleOffset, 10 - titleBarHeight, 16);
    }
-   
-   if (Enabled() && mShouldDrawOutline)
+
+   bool groupSelected = !TheSynth->GetGroupSelectedModules().empty() && VectorContains(this, TheSynth->GetGroupSelectedModules());
+   if ((Enabled() || groupSelected) && mShouldDrawOutline)
    {
       ofPushStyle();
       ofNoFill();
 
-      bool groupSelected = !TheSynth->GetGroupSelectedModules().empty() && VectorContains(this, TheSynth->GetGroupSelectedModules());
       if (groupSelected)
       {
          float pulse = ofMap(sin(gTime / 500 * PI * 2), -1, 1, .2f, 1);
@@ -622,9 +622,9 @@ void IDrawableModule::OnClicked(int x, int y, bool right)
       {
          //"enabled" area
       }
-      else if (x < GetMinimizedWidth())
+      else if (x < GetMinimizedWidth() && CanMinimize())
       {
-         mMinimizeAreaClicked = true;
+         mWasMinimizeAreaClicked = true;
          return;
       }
       else if (!Minimized() && IsSaveable() &&
@@ -684,10 +684,7 @@ bool IDrawableModule::MouseMoved(float x, float y)
 
 void IDrawableModule::MouseReleased()
 {
-   if (CanMinimize() && mMinimizeAreaClicked &&
-       TheSynth->HasNotMovedMouseSinceClick())
-      ToggleMinimized();
-   mMinimizeAreaClicked = false;
+   mWasMinimizeAreaClicked = false;
    for (int i=0; i<mUIControls.size(); ++i)
       mUIControls[i]->MouseReleased();
    for (int i=0; i<mChildren.size(); ++i)
@@ -1014,18 +1011,36 @@ bool IDrawableModule::CheckNeedsDraw()
 
 void IDrawableModule::LoadBasics(const ofxJSONElement& moduleInfo, std::string typeName)
 {
-   int x = moduleInfo["position"][0u].asInt();
-   int y = moduleInfo["position"][1u].asInt();
+   int x = 0;
+   int y = 0;
+   std::string name = "error";
+   bool start_minimized = false;
+   bool draw_lissajous = false;
+
+   try
+   {
+      x = moduleInfo["position"][0u].asInt();
+      y = moduleInfo["position"][1u].asInt();
+      name = moduleInfo["name"].asString();
+      start_minimized = moduleInfo["start_minimized"].asBool();
+      draw_lissajous = moduleInfo["draw_lissajous"].asBool();
+   }
+   catch (Json::LogicError& e)
+   {
+      TheSynth->LogEvent(__PRETTY_FUNCTION__ + std::string(" json error: ") + e.what(), kLogEventType_Error);
+   }
+
+   
    SetPosition(x,y);
    
-   SetName(moduleInfo["name"].asString().c_str());
+   SetName(name.c_str());
    
-   SetMinimized(moduleInfo["start_minimized"].asBool());
+   SetMinimized(start_minimized);
    
    if (mMinimized)
       mMinimizeAnimation = 1;
    
-   if (moduleInfo["draw_lissajous"].asBool())
+   if (draw_lissajous)
       TheSynth->AddLissajousDrawer(this);
    
    mTypeName = typeName;
@@ -1111,16 +1126,23 @@ void IDrawableModule::LoadState(FileStreamIn& in)
       bool threwException = false;
       try
       {
-         //ofLog() << "loading control " << uicontrolname;
-         auto* control = FindUIControl(uicontrolname.c_str(), false);
+         if (LoadOldControl(in, uicontrolname))
+         {
+            //old data loaded, we're good now!
+         }
+         else
+         {
+            //ofLog() << "loading control " << uicontrolname;
+            auto* control = FindUIControl(uicontrolname.c_str(), false);
 
-         if (control == nullptr)
-            throw UnknownUIControlException();
-      
-         float setValue = true;
-         if (VectorContains(control, ControlsToNotSetDuringLoadState()))
-            setValue = false;
-         control->LoadState(in, setValue);
+            if (control == nullptr)
+               throw UnknownUIControlException();
+
+            bool setValue = true;
+            if (VectorContains(control, ControlsToNotSetDuringLoadState()))
+               setValue = false;
+            control->LoadState(in, setValue);
+         }
          
          for (int j=0; j<kControlSeparatorLength; ++j)
          {

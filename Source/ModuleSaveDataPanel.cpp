@@ -29,6 +29,7 @@
 #include "IAudioReceiver.h"
 #include "INoteReceiver.h"
 #include "ModuleContainer.h"
+#include "IDrivableSequencer.h"
 
 #include <cstring>
 
@@ -43,6 +44,7 @@ ModuleSaveDataPanel::ModuleSaveDataPanel()
 , mApplyButton(nullptr)
 , mDeleteButton(nullptr)
 , mDrawDebugCheckbox(nullptr)
+, mResetSequencerButton(nullptr)
 {
    assert(TheSaveDataPanel == nullptr);
    TheSaveDataPanel = this;
@@ -194,6 +196,15 @@ void ModuleSaveDataPanel::ReloadSaveData()
       mSaveDataControls.push_back(mDrawDebugCheckbox);
       y += itemSpacing;
    }
+
+   IDrivableSequencer* sequencer = dynamic_cast<IDrivableSequencer*>(mSaveModule);
+   if (sequencer && sequencer->HasExternalPulseSource())
+   {
+      mResetSequencerButton = new ClickButton(this, "resume self-advance mode", x, y);
+      mResetSequencerButton->SetNoHover(true);
+      mSaveDataControls.push_back(mResetSequencerButton);
+      y += itemSpacing;
+   }
    
    mHeight = y+5;
 }
@@ -276,6 +287,12 @@ void ModuleSaveDataPanel::ButtonClicked(ClickButton* button)
    {
       mSaveModule->GetOwningContainer()->DeleteModule(mSaveModule);
       SetModule(nullptr);
+   }
+   if (button == mResetSequencerButton)
+   {
+      IDrivableSequencer* sequencer = dynamic_cast<IDrivableSequencer*>(mSaveModule);
+      if (sequencer && sequencer->HasExternalPulseSource())
+         sequencer->ResetExternalPulseSource();
    }
 }
 

@@ -28,6 +28,8 @@
 #include "RadioSequencer.h"
 #include "ModularSynth.h"
 #include "PatchCableSource.h"
+#include "UIControlMacros.h"
+#include "MathUtils.h"
 
 namespace
 {
@@ -35,11 +37,6 @@ namespace
 }
 
 RadioSequencer::RadioSequencer()
-: mGrid(nullptr)
-, mInterval(kInterval_1n)
-, mIntervalSelector(nullptr)
-, mLength(4)
-, mLengthSelector(nullptr)
 {
 }
 
@@ -58,11 +55,15 @@ RadioSequencer::~RadioSequencer()
 void RadioSequencer::CreateUIControls()
 {
    IDrawableModule::CreateUIControls();
-   mGrid = new UIGrid(5,23,200,170,mLength,8, this);
-   mIntervalSelector = new DropdownList(this,"interval",5,3,(int*)(&mInterval));
-   mLengthSelector = new DropdownList(this,"length",-1,-1,(int*)(&mLength));
-   mGridControlTarget = new GridControlTarget(this, "grid", -1, -1);
-   
+
+   int width, height;
+   UIBLOCK(3, 3, 200);
+   INTSLIDER(mLengthSlider, "length", &mLength, 1, 16); UIBLOCK_SHIFTRIGHT();
+   DROPDOWN(mIntervalSelector, "interval", (int*)(&mInterval), 40); UIBLOCK_SHIFTRIGHT();
+   UICONTROL_CUSTOM(mGridControlTarget, new GridControlTarget(UICONTROL_BASICS("grid")));
+   ENDUIBLOCK(width, height);
+
+   mGrid = new UIGrid(5, 25, mGridControlTarget->GetRect().getMaxX() - 6, 170, mLength, 8, this);
    mGrid->SetHighlightCol(gTime, -1);
    mGrid->SetSingleColumnMode(true);
    mGrid->SetMajorColSize(4);
@@ -81,17 +82,6 @@ void RadioSequencer::CreateUIControls()
    mIntervalSelector->AddLabel("16nt", kInterval_16nt);
    mIntervalSelector->AddLabel("32n", kInterval_32n);
    mIntervalSelector->AddLabel("64n", kInterval_64n);
-   
-   mLengthSelector->AddLabel("4", 4);
-   mLengthSelector->AddLabel("6", 6);
-   mLengthSelector->AddLabel("8", 8);
-   mLengthSelector->AddLabel("16", 16);
-   mLengthSelector->AddLabel("32", 32);
-   mLengthSelector->AddLabel("64", 64);
-   mLengthSelector->AddLabel("128", 128);
-   
-   mLengthSelector->PositionTo(mIntervalSelector, kAnchor_Right);
-   mGridControlTarget->PositionTo(mLengthSelector, kAnchor_Right);
    
    SyncControlCablesToGrid();
 }
@@ -131,34 +121,86 @@ void RadioSequencer::UpdateGridLights()
    }
 }
 
-void RadioSequencer::OnTimeEvent(double time)
+void RadioSequencer::Step(double time, int pulseFlags)
 {
+   int length = mLength;
+   if (length <= 0)
+      length = 1;
+
+   int direction = 1;
+   if (pulseFlags & kPulseFlag_Backward)
+      direction = -1;
+   if (pulseFlags & kPulseFlag_Repeat)
+      direction = 0;
+
+   mStep = (mStep + direction + length) % length;
+
+   if (pulseFlags & kPulseFlag_Reset)
+      mStep = 0;
+   else if (pulseFlags & kPulseFlag_Random)
+      mStep = gRandom() % length;
+
+   if (!mHasExternalPulseSource || (pulseFlags & kPulseFlag_SyncToTransport))
+   {
+      mStep = TheTransport->GetSyncedStep(time, this, mTransportListenerInfo, length);
+   }
+
+   if (pulseFlags & kPulseFlag_Align)
+   {
+      int stepsPerMeasure = TheTransport->GetStepsPerMeasure(this);
+      int numMeasures = ceil(float(length) / stepsPerMeasure);
+      int measure = TheTransport->GetMeasure(time) % numMeasures;
+      int step = ((TheTransport->GetQuantized(time, mTransportListenerInfo) % stepsPerMeasure) + measure * stepsPerMeasure) % length;
+      mStep = step;
+   }
+
    if (!mEnabled)
       return;
 
-   int step = TheTransport->GetSyncedStep(time, this, mTransportListenerInfo, mGrid->GetCols());
-   
-   mGrid->SetHighlightCol(time, step);
-   
-   IUIControl* controlToEnable = nullptr;
-   for (int i=0; i<mControlCables.size(); ++i)
+   mGrid->SetHighlightCol(time, mStep);
+
+   std::vector<IUIControl*> controlsToEnable;
+   for (int i = 0; i < mControlCables.size(); ++i)
    {
       IUIControl* uicontrol = nullptr;
       if (mControlCables[i]->GetTarget())
          uicontrol = dynamic_cast<IUIControl*>(mControlCables[i]->GetTarget());
       if (uicontrol)
       {
-         if (mGrid->GetVal(step, i) > 0)
-            controlToEnable = uicontrol;
+         if (mGrid->GetVal(mStep, i) > 0)
+            controlsToEnable.push_back(uicontrol);
          else
             uicontrol->SetValue(0);
       }
    }
-   
-   if (controlToEnable)
-      controlToEnable->SetValue(1);
-   
+
+   for (auto* control : controlsToEnable)
+      control->SetValue(1);
+
    UpdateGridLights();
+}
+
+void RadioSequencer::OnPulse(double time, float velocity, int flags)
+{
+   mHasExternalPulseSource = true;
+
+   Step(time, flags);
+}
+
+void RadioSequencer::OnTimeEvent(double time)
+{
+   if (!mHasExternalPulseSource)
+      Step(time, 0);
+}
+
+void RadioSequencer::PlayNote(double time, int pitch, int velocity, int voiceIdx, ModulationParameters modulation)
+{
+   if (velocity > 0)
+   {
+      mHasExternalPulseSource = true;
+      mStep = pitch % std::max(1, mLength);
+      Step(time, kPulseFlag_Repeat);
+   }
 }
 
 void RadioSequencer::DrawModule()
@@ -168,7 +210,7 @@ void RadioSequencer::DrawModule()
    
    mGrid->Draw();
    mIntervalSelector->Draw();
-   mLengthSelector->Draw();
+   mLengthSlider->Draw();
    mGridControlTarget->Draw();
    
    for (int i=0; i<mControlCables.size(); ++i)
@@ -195,33 +237,6 @@ bool RadioSequencer::MouseMoved(float x, float y)
    IDrawableModule::MouseMoved(x,y);
    mGrid->NotifyMouseMoved(x,y);
    return false;
-}
-
-void RadioSequencer::SetNumSteps(int numSteps, bool stretch)
-{
-   int oldNumSteps = mGrid->GetCols();
-   assert(numSteps != 0);
-   assert(oldNumSteps != 0);
-   if (stretch)   //updated interval, stretch old pattern out to make identical pattern at higher res
-   {              // abcd becomes aabbccdd
-      std::vector<float> pattern;
-      pattern.resize(oldNumSteps);
-      for (int i=0; i<oldNumSteps; ++i)
-         pattern[i] = mGrid->GetVal(i,0);
-      float ratio = float(numSteps)/oldNumSteps;
-      for (int i=0; i<numSteps; ++i)
-         mGrid->SetVal(i, 0, pattern[int(i/ratio)]);
-   }
-   else           //updated length, copy old pattern out to make identical pattern over longer time
-   {              // abcd becomes abcdabcd
-      int numCopies = numSteps / oldNumSteps;
-      for (int i=1; i<numCopies; ++i)
-      {
-         for (int j=0; j<oldNumSteps; ++j)
-            mGrid->SetVal(i*oldNumSteps + j, 0, mGrid->GetVal(j, 0));
-      }
-   }
-   mGrid->SetGrid(numSteps,mGrid->GetRows());
 }
 
 void RadioSequencer::GridUpdated(UIGrid* grid, int col, int row, float value, float oldValue)
@@ -262,27 +277,30 @@ void RadioSequencer::SyncControlCablesToGrid()
 
 void RadioSequencer::DropdownUpdated(DropdownList* list, int oldVal)
 {
-   int newSteps = int(mLength * TheTransport->CountInStandardMeasure(mInterval));
    if (list == mIntervalSelector)
    {
-      if (newSteps > 0)
-      {
-         TransportListenerInfo* transportListenerInfo = TheTransport->GetListenerInfo(this);
-         if (transportListenerInfo != nullptr)
-            transportListenerInfo->mInterval = mInterval;
-         SetNumSteps(newSteps, true);
-      }
-      else
-      {
-         mInterval = (NoteInterval)oldVal;
-      }
+      TransportListenerInfo* transportListenerInfo = TheTransport->GetListenerInfo(this);
+      if (transportListenerInfo != nullptr)
+         transportListenerInfo->mInterval = mInterval;
    }
-   if (list == mLengthSelector)
+}
+
+void RadioSequencer::IntSliderUpdated(IntSlider* slider, int oldVal)
+{
+   if (slider == mLengthSlider)
    {
-      if (newSteps > 0)
-         SetNumSteps(newSteps, false);
-      else
-         mLength = oldVal;
+      mGrid->SetGrid(mLength, mGrid->GetRows());
+      if (mLength > oldVal)
+      {
+         //slice the loop into the nearest power of 2 and loop new steps from there
+         int oldLengthPow2 = std::max(1, MathUtils::HighestPow2(oldVal));
+         for (int i = oldVal; i < mLength; ++i)
+         {
+            int loopedFrom = i % oldLengthPow2;
+            for (int row = 0; row < mGrid->GetRows(); ++row)
+               mGrid->SetVal(i, row, mGrid->GetVal(i % oldLengthPow2, row));
+         }
+      }
    }
 }
 
@@ -316,28 +334,27 @@ void RadioSequencer::SaveLayout(ofxJSONElement& moduleInfo)
 }
 
 void RadioSequencer::LoadLayout(const ofxJSONElement& moduleInfo)
-{
-   mModuleSaveData.LoadFloat("gridwidth", moduleInfo, 200, 200, 1000);
-   mModuleSaveData.LoadFloat("gridheight", moduleInfo, 170, 170, 1000);
-   
+{  
+   mModuleSaveData.LoadBool("one_per_column_mode", moduleInfo, true);
+
    SetUpFromSaveData();
 }
 
 void RadioSequencer::SetUpFromSaveData()
 {
-   SetGridSize(mModuleSaveData.GetFloat("gridwidth"), mModuleSaveData.GetFloat("gridheight"));
+   mGrid->SetSingleColumnMode(mModuleSaveData.GetBool("one_per_column_mode"));
 }
 
 namespace
 {
-   const int kSaveStateRev = 0;
+   const int kSaveStateRev = 1;
 }
 
 void RadioSequencer::SaveState(FileStreamOut& out)
 {
-   IDrawableModule::SaveState(out);
-   
    out << kSaveStateRev;
+
+   IDrawableModule::SaveState(out);
    
    out << (int)mControlCables.size();
    for (auto cable : mControlCables)
@@ -349,15 +366,27 @@ void RadioSequencer::SaveState(FileStreamOut& out)
    }
    
    mGrid->SaveState(out);
+   out << mGrid->GetWidth();
+   out << mGrid->GetHeight();
 }
 
 void RadioSequencer::LoadState(FileStreamIn& in)
 {
+   mLoadRev = -1;
+
+   if (ModuleContainer::sFileSaveStateRev >= 422)
+   {
+      in >> mLoadRev;
+      LoadStateValidate(mLoadRev <= kSaveStateRev);
+   }
+
    IDrawableModule::LoadState(in);
-   
-   int rev;
-   in >> rev;
-   LoadStateValidate(rev == kSaveStateRev);
+
+   if (ModuleContainer::sFileSaveStateRev <= 421)
+   {
+      in >> mLoadRev;
+      LoadStateValidate(mLoadRev <= kSaveStateRev);
+   }
    
    int size;
    in >> size;
@@ -370,4 +399,47 @@ void RadioSequencer::LoadState(FileStreamIn& in)
    }
    
    mGrid->LoadState(in);
+
+   if (mLoadRev >= 1)
+   {
+      float width, height;
+      in >> width;
+      in >> height;
+      mGrid->SetDimensions(width, height);
+   }
+
+   if (mLoadRev == 0)
+   {
+      //port old data
+      float len = 0;
+      if (mOldLengthStr == "4")   len = 4;
+      if (mOldLengthStr == "6")   len = 6;
+      if (mOldLengthStr == "8")   len = 8;
+      if (mOldLengthStr == "16")  len = 16;
+      if (mOldLengthStr == "32")  len = 32;
+      if (mOldLengthStr == "64")  len = 64;
+      if (mOldLengthStr == "128") len = 128;
+
+      mLength = int(len * TheTransport->CountInStandardMeasure(mInterval));
+      int min, max;
+      mLengthSlider->GetRange(min, max);
+      if (mLength > max)
+         mLengthSlider->SetExtents(min, mLength);
+   }
+}
+
+bool RadioSequencer::LoadOldControl(FileStreamIn& in, std::string& oldName)
+{
+   if (mLoadRev < 1)
+   {
+      if (oldName == "length")
+      {
+         //load dropdown string
+         int dropdownRev;
+         in >> dropdownRev;
+         in >> mOldLengthStr;
+         return true;
+      }
+   }
+   return false;
 }

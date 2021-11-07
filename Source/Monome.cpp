@@ -163,8 +163,15 @@ std::string Monome::GetControlTooltip(MidiMessageType type, int control)
 
 void Monome::SetLayoutData(ofxJSONElement& layout)
 {
-   if (!layout["monome_rotation"].isNull())
-      mGridRotation = layout["monome_rotation"].asInt();
+   try
+   {
+      if (!layout["monome_rotation"].isNull())
+         mGridRotation = layout["monome_rotation"].asInt();
+   }
+   catch (Json::LogicError& e)
+   {
+      TheSynth->LogEvent(__PRETTY_FUNCTION__ + std::string(" json error: ") + e.what(), kLogEventType_Error);
+   }
 }
 
 void Monome::ConnectToDevice(std::string deviceDesc)

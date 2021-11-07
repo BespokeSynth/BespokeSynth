@@ -41,12 +41,13 @@
 #include "Scale.h"
 #include "IPulseReceiver.h"
 #include "GridController.h"
+#include "IDrivableSequencer.h"
 
 #define NSS_MAX_STEPS 32
 
 class PatchCableSource;
 
-class NoteStepSequencer : public IDrawableModule, public ITimeListener, public INoteSource, public IButtonListener, public IDropdownListener, public IIntSliderListener, public IFloatSliderListener, public MidiDeviceListener, public UIGridListener, public IAudioPoller, public IScaleListener, public INoteReceiver, public IPulseReceiver, public IGridControllerListener
+class NoteStepSequencer : public IDrawableModule, public ITimeListener, public INoteSource, public IButtonListener, public IDropdownListener, public IIntSliderListener, public IFloatSliderListener, public MidiDeviceListener, public UIGridListener, public IAudioPoller, public IScaleListener, public INoteReceiver, public IPulseReceiver, public IGridControllerListener, public IDrivableSequencer
 {
 public:
    NoteStepSequencer();
@@ -103,6 +104,10 @@ public:
    //IGridControllerListener
    void OnControllerPageSelected() override;
    void OnGridButton(int x, int y, float velocity, IGridController* grid) override;
+
+   //IDrivableSequencer
+   bool HasExternalPulseSource() const override { return mHasExternalPulseSource; }
+   void ResetExternalPulseSource() override { mHasExternalPulseSource = false; }
    
    void ButtonClicked(ClickButton* button) override;
    void CheckboxUpdated(Checkbox* checkbox) override;
@@ -199,7 +204,7 @@ private:
    FloatSlider* mRandomizeVelocityChanceSlider;
    FloatSlider* mRandomizeVelocityDensitySlider;
    
-   std::array<double, NSS_MAX_STEPS> mLastStepPlayTime;
+   std::array<double, NSS_MAX_STEPS> mLastStepPlayTime{ -1 };
    std::array<DropdownList*, NSS_MAX_STEPS> mToneDropdowns;
    std::array<IntSlider*, NSS_MAX_STEPS> mVelocitySliders;
    std::array<FloatSlider*, NSS_MAX_STEPS> mLengthSliders;

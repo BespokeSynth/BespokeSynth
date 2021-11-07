@@ -288,6 +288,7 @@ ClientBin/
 *.publishsettings
 node_modules/
 orleans.codegen.cs
+CMakeUserPresets.json
 
 # Since there are multiple workflows, uncomment next line to ignore bower_components
 # (https://github.com/github/gitignore/pull/1529#issuecomment-104372622)
@@ -387,6 +388,10 @@ bespoke_windows_installer/HarvestedResourceDir.wixobj
 
 bespoke_windows_installer/HarvestedResourceDir.wxs
 
+bespoke_windows_installer/HarvestedPythonDir.wxs
+
+bespoke_windows_installer/HarvestedPythonDir.wixobj
+
 Builds/LinuxMakefile/Bespoke-Linux.zip
 
 bespoke_windows_installer/Bespoke-Windows.msi
@@ -395,6 +400,7 @@ bespoke_windows_installer/Bespoke-Windows.wixpdb
 
 cmake-build*
 ignore/*
+instrumentscli0.trace/*
 
 run_cmake.bat
 run_cmake.sh

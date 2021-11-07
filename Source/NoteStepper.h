@@ -33,8 +33,9 @@
 #include "Checkbox.h"
 #include "INoteSource.h"
 #include "Slider.h"
+#include "ClickButton.h"
 
-class NoteStepper : public INoteReceiver, public INoteSource, public IDrawableModule, public IIntSliderListener
+class NoteStepper : public INoteReceiver, public INoteSource, public IDrawableModule, public IIntSliderListener, public IButtonListener
 {
 public:
    NoteStepper();
@@ -47,6 +48,7 @@ public:
    void SendCC(int control, int value, int voiceIdx = -1) override;
    
    void IntSliderUpdated(IntSlider* slider, int oldVal) override {}
+   void ButtonClicked(ClickButton* button) override;
    
    virtual void LoadLayout(const ofxJSONElement& moduleInfo) override;
    virtual void SetUpFromSaveData() override;
@@ -65,6 +67,7 @@ private:
    float mHeight;
    std::array<int, 128> mLastNoteDestinations;
    int mCurrentDestinationIndex;
+   ClickButton* mResetButton;
    int mLength;
    IntSlider* mLengthSlider;
    double mLastNoteOnTime;

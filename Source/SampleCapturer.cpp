@@ -206,7 +206,7 @@ void SampleCapturer::ButtonClicked(ClickButton* button)
 
    if (button == mSaveButton)
    {
-      FileChooser chooser("Save sample as...", File(ofToDataPath(ofGetTimestampString("samples/%Y-%m-%d_%H-%M.wav"))), "*.wav", true, false, TheSynth->GetMainComponent()->getTopLevelComponent());
+      FileChooser chooser("Save sample as...", File(ofToDataPath(ofGetTimestampString("samples/%Y-%m-%d_%H-%M.wav"))), "*.wav", true, false, TheSynth->GetFileChooserParent());
       if (chooser.browseForFileToSave(true))
          Sample::WriteDataToFile(chooser.getResult().getFullPathName().toStdString(), &mSamples[mCurrentSampleIndex].mBuffer, mSamples[mCurrentSampleIndex].mRecordingLength);
    }
@@ -243,7 +243,7 @@ void SampleCapturer::OnClicked(int x, int y, bool right)
             grab.SetNumActiveChannels(mSamples[i].mBuffer.NumActiveChannels());
             for (int ch = 0; ch < grab.NumActiveChannels(); ++ch)
                BufferCopy(grab.GetChannel(ch), mSamples[i].mBuffer.GetChannel(ch), mSamples[i].mRecordingLength);
-            TheSynth->GrabSample(&grab, false);
+            TheSynth->GrabSample(&grab, "captured", false);
          }
       }
    }

@@ -32,8 +32,10 @@
 #include "TextEntry.h"
 #include "DropdownList.h"
 #include "ClickButton.h"
+#include "RadioButton.h"
+#include "UserPrefs.h"
 
-class UserPrefsEditor : public IDrawableModule, public IFloatSliderListener, public IIntSliderListener, public ITextEntryListener, public IDropdownListener, public IButtonListener
+class UserPrefsEditor : public IDrawableModule, public IFloatSliderListener, public IIntSliderListener, public ITextEntryListener, public IDropdownListener, public IButtonListener, public IRadioButtonListener
 {
 public:
    UserPrefsEditor();
@@ -41,12 +43,13 @@ public:
    static IDrawableModule* Create() { return new UserPrefsEditor(); }
 
    void CreateUIControls() override;
-   
+
    bool AlwaysOnTop() override { return true; }
    bool CanMinimize() override { return false; }
    bool IsSingleton() const override { return true; }
 
    void Show();
+   void CreatePrefsFileIfNonexistent();
 
    void CheckboxUpdated(Checkbox* checkbox) override;
    void FloatSliderUpdated(FloatSlider* slider, float oldVal) override;
@@ -54,8 +57,11 @@ public:
    void TextEntryComplete(TextEntry* entry) override;
    void DropdownUpdated(DropdownList* list, int oldVal) override;
    void ButtonClicked(ClickButton* button) override;
+   void RadioButtonUpdated(RadioButton* radio, int oldVal) override;
 
    bool IsSaveable() override { return false; }
+   std::vector<IUIControl*> ControlsToNotSetDuringLoadState() const override;
+   std::vector<IUIControl*> ControlsToIgnoreInSaveState() const override;
 
 private:
    //IDrawableModule
@@ -64,67 +70,16 @@ private:
    void GetModuleDimensions(float& width, float& height) override { width = mWidth; height = mHeight; }
 
    void UpdateDropdowns(std::vector<DropdownList*> toUpdate);
-   void DrawRightLabel(IUIControl* control, std::string text, ofColor color);
-   void PrepareForSave();
-   void UpdatePrefStr(ofxJSONElement& userPrefs, std::string prefName, std::string value);
-   void UpdatePrefStrArray(ofxJSONElement& userPrefs, std::string prefName, std::vector<std::string> value);
-   void UpdatePrefInt(ofxJSONElement& userPrefs, std::string prefName, int value);
-   void UpdatePrefFloat(ofxJSONElement& userPrefs, std::string prefName, float value);
-   void UpdatePrefBool(ofxJSONElement& userPrefs, std::string prefName, bool value);
+   void DrawRightLabel(IUIControl* control, std::string text, ofColor color, float offsetX = 12);
    void CleanUpSave(std::string& json);
+   bool PrefRequiresRestart(UserPref* pref) const;
+   void Save();
 
-   DropdownList* mDeviceTypeDropdown;
-   int mDeviceTypeIndex;
-   DropdownList* mSampleRateDropdown;
-   int mSampleRateIndex;
-   DropdownList* mBufferSizeDropdown;
-   int mBufferSizeIndex;
-   DropdownList* mAudioOutputDeviceDropdown;
-   int mAudioOutputDeviceIndex;
-   DropdownList* mAudioInputDeviceDropdown;
-   int mAudioInputDeviceIndex;
-   TextEntry* mWindowWidthEntry;
-   int mWindowWidth;
-   TextEntry* mWindowHeightEntry;
-   int mWindowHeight;
-   Checkbox* mSetWindowPositionCheckbox;
-   bool mSetWindowPosition;
-   TextEntry* mWindowPositionXEntry;
-   int mWindowPositionX;
-   TextEntry* mWindowPositionYEntry;
-   int mWindowPositionY;
-   FloatSlider* mZoomSlider;
-   float mZoom;
-   FloatSlider* mUIScaleSlider;
-   float mUIScale;
-   FloatSlider* mScrollMultiplierVerticalSlider;
-   float mScrollMultiplierVertical;
-   FloatSlider* mScrollMultiplierHorizontalSlider;
-   float mScrollMultiplierHorizontal;
-   Checkbox* mAutosaveCheckbox;
-   bool mAutosave;
-   TextEntry* mRecordingsPathEntry;
-   std::string mRecordingsPath;
-   TextEntry* mRecordBufferLengthEntry;
-   float mRecordBufferLengthMinutes;
-   TextEntry* mTooltipsFilePathEntry;
-   std::string mTooltipsFilePath;
-   TextEntry* mDefaultLayoutPathEntry;
-   std::string mDefaultLayoutPath;
-   TextEntry* mYoutubeDlPathEntry;
-   std::string mYoutubeDlPath;
-   TextEntry* mFfmpegPathEntry;
-   std::string mFfmpegPath;
-   TextEntry* mVstSearchDirsEntry;
-   std::string mVstSearchDirs;
-   Checkbox* mShowTooltipsOnLoadCheckbox;
-   bool mShowTooltipsOnLoad;
-   Checkbox* mShowMinimapCheckbox;
-   bool mShowMinimap;
+   UserPrefCategory mCategory{ UserPrefCategory::General };
+   RadioButton* mCategorySelector;
    ClickButton* mSaveButton;
    ClickButton* mCancelButton;
 
    float mWidth;
    float mHeight;
-   int mSavePrefIndex;
 };

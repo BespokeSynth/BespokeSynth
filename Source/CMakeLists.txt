@@ -1,3 +1,4 @@
+include(cmake/lib.cmake)
 include(cmake/versiontools.cmake)
 
 juce_add_gui_app(BespokeSynth
@@ -9,6 +10,7 @@ juce_add_gui_app(BespokeSynth
     FILE_SHARING_ENABLED          TRUE
     DOCUMENT_BROWSER_ENABLED      TRUE
     DOCUMENT_EXTENSIONS           .bsk
+    BUNDLE_ID                     com.ryanchallinor.bespokesynth
     )
 
 bespoke_buildtime_version_info(BespokeSynth)
@@ -207,7 +209,9 @@ target_sources(BespokeSynth PRIVATE
     NoteStreamDisplay.cpp
     NoteStrummer.cpp
     NoteSustain.cpp
+    NoteTable.cpp
     NoteToFreq.cpp
+    NoteToggle.cpp
     NoteToMs.cpp
     NoteToPulse.cpp
     NoteTransformer.cpp
@@ -317,6 +321,7 @@ target_sources(BespokeSynth PRIVATE
     UnstablePitch.cpp
     UnstablePressure.cpp
     UserData.cpp
+    UserPrefs.cpp
     UserPrefsEditor.cpp
     VSTPlayhead.cpp
     VSTPlugin.cpp
@@ -337,6 +342,12 @@ target_sources(BespokeSynth PRIVATE
     WhiteKeys.cpp
     ofxJSONElement.cpp
     )
+
+if(BESPOKE_PORTABLE)
+    set_source_files_properties(ScriptModule.cpp PROPERTIES
+        COMPILE_DEFINITIONS BESPOKE_PORTABLE_PYTHON="$<IF:$<BOOL:${WIN32}>,python.exe,bin/python>"
+        )
+endif()
 
 target_include_directories(BespokeSynth PRIVATE
     ${CMAKE_CURRENT_SOURCE_DIR}
@@ -369,14 +380,15 @@ target_compile_definitions(BespokeSynth PRIVATE
     JUCE_PLUGINHOST_VST=$<BOOL:${BESPOKE_VST2_SDK_LOCATION}>
 
     JUCE_CATCH_UNHANDLED_EXCEPTIONS=0
-
-    BESPOKE_LINUX_HIGH_FPS_WITH_THREAD_PROBLEMS=$<BOOL:${BESPOKE_LINUX_HIGH_FPS_WITH_THREAD_PROBLEMS}>
     )
 
 if (APPLE)
     target_compile_definitions(BespokeSynth PRIVATE
         BESPOKE_MAC=1
         JUCE_PLUGINHOST_AU=0 # this needs work but if you turn it to 1 with the link below it works
+        )
+    set_target_properties(BespokeSynth PROPERTIES
+        XCODE_ATTRIBUTE_ENABLE_HARDENED_RUNTIME YES
         )
     target_sources(BespokeSynth PRIVATE
         CFMessaging/KontrolKommunicator.cpp
@@ -386,59 +398,6 @@ if (APPLE)
         KompleteKontrol.cpp
         )
     target_link_libraries(BespokeSynth PRIVATE "-framework CoreAudioKit")
-
-    # Post install tasks - copy resources to the bundle
-    get_target_property(OUTDIR BespokeSynth RUNTIME_OUTPUT_DIRECTORY)
-    add_custom_command(TARGET BespokeSynth
-        POST_BUILD
-        WORKING_DIRECTORY ${CMAKE_SOURCE_DIR}
-        COMMAND ${CMAKE_COMMAND} -E copy_directory resource ${OUTDIR}/BespokeSynth.app/Contents/Resources/resource
-        )
-
-    get_filename_component(Python_FRAMEWORK_DIR ${Python_LIBRARY_DIRS} DIRECTORY)
-    foreach(PYCAND Python Python3.9 Python3.8 Python3)
-        if (EXISTS "${Python_FRAMEWORK_DIR}/${PYCAND}")
-            set( Python_BIN "${PYCAND}")
-        endif()
-    endforeach()
-    if (NOT DEFINED Python_BIN)
-        message( FATAL_ERROR "Cannot find python binary. Consider setting BESPOKE_PYTHON_ROOT" )
-    endif()
-
-    # Alright what is this doing? Well the python build hard-codes a reference to a python
-    # framework which means this executable wont even *start* on a machine which isn't
-    # configured the same as python. Our desired behavior is that the executable starts
-    # but python doesn't work. So copy the python framework build stub into the resources
-    # framework and repoint the python to it with install_name_tool.
-    #
-    # But also: If you have no python installed, or have BESPOKE_PYTHON_ROOT set oddly,
-    # you end up with a wierdo case where you use XCode python. We warn about that here
-    # but also do the couple of rpath changes just in case below, which deal with that
-    message(STATUS "Mac Python Framework is '${Python_BIN}' from '${Python_FRAMEWORK_DIR}'")
-
-    string(FIND ${Python_FRAMEWORK_DIR} "Xcode.app" IS_PYTHON_XCODE)
-    if (${IS_PYTHON_XCODE} GREATER 0)
-        message( WARNING "Your python built environment came from Xcode.app. "
-            "This may not be what you want. Consider setting BESPOKE_PYTHON_ROOT to "
-            "a python install of your choosing. Especially, if you are on an M1 "
-            "mac and use homebrew, you may want to use something like "
-            "'-DBESPOKE_PYTHON_ROOT=/opt/homebrew/Cellar/python\@3.9/3.9.6'")
-    endif()
-
-    add_custom_command(TARGET BespokeSynth
-        POST_BUILD
-        WORKING_DIRECTORY ${CMAKE_SOURCE_DIR}
-        COMMAND ${CMAKE_COMMAND} -E make_directory ${OUTDIR}/BespokeSynth.app/Contents/Frameworks/LocalPython
-        COMMAND ${CMAKE_COMMAND} -E copy ${Python_FRAMEWORK_DIR}/${Python_BIN} ${OUTDIR}/BespokeSynth.app/Contents/Frameworks/LocalPython
-        COMMAND codesign --remove-signature ${OUTDIR}/BespokeSynth.app/Contents/Frameworks/LocalPython/${Python_BIN}
-        COMMAND codesign -s - ${OUTDIR}/BespokeSynth.app/Contents/Frameworks/LocalPython/${Python_BIN}
-        # THis is the 'normal' case
-        COMMAND install_name_tool -change "${Python_FRAMEWORK_DIR}/${Python_BIN}" "@executable_path/../Frameworks/LocalPython/${Python_BIN}" ${OUTDIR}/BespokeSynth.app/Contents/MacOS/BespokeSynth
-        # These are the 'got it from xcode by mistake' cases
-        COMMAND install_name_tool -change "@rpath/Python3.framework/Versions/3.8/Python3" "@executable_path/../Frameworks/LocalPython/${Python_BIN}" ${OUTDIR}/BespokeSynth.app/Contents/MacOS/BespokeSynth
-        COMMAND install_name_tool -change "@rpath/Python3.framework/Versions/3.9/Python3" "@executable_path/../Frameworks/LocalPython/${Python_BIN}" ${OUTDIR}/BespokeSynth.app/Contents/MacOS/BespokeSynth
-        )
-
 elseif (WIN32)
     target_compile_definitions(BespokeSynth PRIVATE BESPOKE_WINDOWS=1)
 
@@ -448,24 +407,11 @@ elseif (WIN32)
         target_include_directories(BespokeSynth PRIVATE ${BESPOKE_ASIO_SDK_LOCATION}/common)
     endif()
 
-    # Post install tasks - copy resources to the exe output directory
     set_target_properties(BespokeSynth PROPERTIES VS_DEBUGGER_WORKING_DIRECTORY "$<TARGET_FILE_DIR:BespokeSynth>"
         VS_DEBUGGER_COMMAND           "$<TARGET_FILE:BespokeSynth>"
         VS_DEBUGGER_ENVIRONMENT       "PATH=%PATH%;${CMAKE_PREFIX_PATH}/bin")
-    get_target_property(OUTDIR BespokeSynth RUNTIME_OUTPUT_DIRECTORY)
-    add_custom_command(TARGET BespokeSynth
-        POST_BUILD
-        WORKING_DIRECTORY ${CMAKE_SOURCE_DIR}
-        COMMAND ${CMAKE_COMMAND} -E copy_directory resource ${OUTDIR}/resource)
 else ()
     target_compile_definitions(BespokeSynth PRIVATE BESPOKE_LINUX=1)
-
-    # Ant put resources with the exe
-    get_target_property(OUTDIR BespokeSynth RUNTIME_OUTPUT_DIRECTORY)
-    add_custom_command(TARGET BespokeSynth
-        POST_BUILD
-        WORKING_DIRECTORY ${CMAKE_SOURCE_DIR}
-        COMMAND ${CMAKE_COMMAND} -E copy_directory resource ${OUTDIR}/resource)
 
     # Finally provide install rules if folks want to install into CMAKE_INSTALL_PREFIX
     install(TARGETS BespokeSynth DESTINATION bin)
@@ -501,32 +447,22 @@ target_link_libraries(BespokeSynth PRIVATE
     $<$<BOOL:${MINGW}>:dbghelp>
     )
 
+bespoke_copy_resource_dir(BespokeSynth)
+bespoke_make_portable(BespokeSynth)
 
 # Rules to do some installing and packaging which we will have to refactor  but
 # for now gets a nightly going
-set(BESPOKE_PRODUCT_DIR "${CMAKE_BINARY_DIR}/products")
 set(BESPOKE_NIGHTLY_DIR "${CMAKE_BINARY_DIR}/nightly")
-add_custom_command(TARGET BespokeSynth
-        POST_BUILD
-        WORKING_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}
-        COMMAND ${CMAKE_COMMAND} -E make_directory ${BESPOKE_PRODUCT_DIR}
-        )
 add_custom_target(nightly-package)
 add_dependencies(nightly-package BespokeSynth)
 
 if (APPLE)
-    get_target_property(output_dir BespokeSynth RUNTIME_OUTPUT_DIRECTORY)
-    add_custom_command(TARGET BespokeSynth
-            POST_BUILD
-            WORKING_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}
-            COMMAND ${CMAKE_COMMAND} -E copy_directory ${output_dir}/BespokeSynth.app/ ${BESPOKE_PRODUCT_DIR}/BespokeSynth.app
-            )
-
     add_custom_command(TARGET nightly-package
             POST_BUILD
             WORKING_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}
             COMMAND ${CMAKE_COMMAND} -E make_directory ${BESPOKE_NIGHTLY_DIR}
-            COMMAND hdiutil create /tmp/tmp.dmg -ov -volname "BespokeSynth" -fs HFS+ -srcfolder "${BESPOKE_PRODUCT_DIR}"
+            COMMAND hdiutil create /tmp/tmp.dmg -ov -volname "BespokeSynth" -fs HFS+ -srcfolder $<TARGET_BUNDLE_DIR:BespokeSynth>
+            COMMAND ${CMAKE_COMMAND} -E rm -f "${BESPOKE_NIGHTLY_DIR}/BespokeNightly.dmg"
             COMMAND hdiutil convert /tmp/tmp.dmg -format UDZO -o "${BESPOKE_NIGHTLY_DIR}/BespokeNightly.dmg"
             )
 else()

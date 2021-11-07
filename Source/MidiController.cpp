@@ -207,116 +207,123 @@ UIControlConnection* MidiController::AddControlConnection(MidiMessageType messag
 
 void MidiController::AddControlConnection(const ofxJSONElement& connection)
 {
-   if (connection.isMember("grid_index"))
+   try
    {
-      int index = connection["grid_index"].asInt();
-      if (index < (int)mGrids.size())
+      if (connection.isMember("grid_index"))
       {
-         GridLayout* grid = mGrids[index];
-         for (int page=0; page<connection["grid_pages"].size(); ++page)
+         int index = connection["grid_index"].asInt();
+         if (index < (int)mGrids.size())
          {
-            std::string path = connection["grid_pages"][page].asString();
-            if (path.length() > 0)
-               grid->mGridControlTarget[page] = dynamic_cast<GridControlTarget*>(GetOwningContainer()->FindUIControl(path));
-            else
-               grid->mGridControlTarget[page] = nullptr;
+            GridLayout* grid = mGrids[index];
+            for (int page = 0; page < connection["grid_pages"].size(); ++page)
+            {
+               std::string path = connection["grid_pages"][page].asString();
+               if (path.length() > 0)
+                  grid->mGridControlTarget[page] = dynamic_cast<GridControlTarget*>(GetOwningContainer()->FindUIControl(path));
+               else
+                  grid->mGridControlTarget[page] = nullptr;
+            }
          }
+         return;
       }
-      return;
-   }
-   
-   int control = connection["control"].asInt() % MIDI_PAGE_WIDTH;
-   std::string path = connection["uicontrol"].asString();
-   std::string type = connection["type"].asString();
-   MidiMessageType msgType = kMidiMessage_Control;
-   if (type == "control")
-   {
-      msgType = kMidiMessage_Control;
-   }
-   else if (type == "note")
-   {
-      msgType = kMidiMessage_Note;
-   }
-   else if (type == "program")
-   {
-      msgType = kMidiMessage_Program;
-   }
-   else if (type == "pitchbend")
-   {
-      msgType = kMidiMessage_PitchBend;
-      control = MIDI_PITCH_BEND_CONTROL_NUM;
-   }
-   int channel = -1;
-   if (!connection["channel"].isNull())
-      channel = connection["channel"].asInt();
-   
-   int page = -1;
-   bool pageless = false;
-   if (!connection["page"].isNull())
-      page = connection["page"].asInt();
-   if (page == -1)
-      pageless = true;
-   
-   UIControlConnection* controlConnection = new UIControlConnection(this);
-   controlConnection->mMessageType = msgType;
-   controlConnection->mControl = control;
-   controlConnection->SetUIControl(path);
-   
-   ControlType controlType = kControlType_SetValue;
-   if (connection["toggle"].asBool())
-      controlType = kControlType_Toggle;
-   else if (connection["direct"].asBool())
-      controlType = kControlType_Direct;
-   else if (connection["value"].isNull())
-      controlType = kControlType_Slider;
-   else if (connection["release"].asBool())
-      controlType = kControlType_SetValueOnRelease;
-   controlConnection->mType = controlType;
-   
-   controlConnection->mChannel = channel;
-   controlConnection->mPage = page;
-   controlConnection->mPageless = pageless;
 
-   if (!connection["midi_on_value"].isNull())
-      controlConnection->mMidiOnValue = connection["midi_on_value"].asInt();
-   
-   if (!connection["midi_off_value"].isNull())
-      controlConnection->mMidiOffValue = connection["midi_off_value"].asInt();
-   
-   if (!connection["blink"].isNull())
-      controlConnection->mBlink = connection["blink"].asBool();
-   
-   if (!connection["value"].isNull())
-      controlConnection->mValue = connection["value"].asDouble();
-   
-   if (!connection["increment_amount"].isNull())
-      controlConnection->mIncrementAmount = connection["increment_amount"].asDouble();
-   
-   if (!connection["twoway"].isNull())
-      controlConnection->mTwoWay = connection["twoway"].asBool();
-   
-   if (!connection["feedbackcontrol"].isNull())
-      controlConnection->mFeedbackControl = connection["feedbackcontrol"].asInt();
-   
-   //controlConnection->CreateUIControls(this, mConnections.size()); //do this on the first draw instead, to avoid a long init time when setting up a bunch of minimized controllers
-   mConnections.push_back(controlConnection);
-   
-   if (!connection["pages"].isNull())
-   {
-      for (int i=0; i<connection["pages"].size(); ++i)
+      int control = connection["control"].asInt() % MIDI_PAGE_WIDTH;
+      std::string path = connection["uicontrol"].asString();
+      std::string type = connection["type"].asString();
+      MidiMessageType msgType = kMidiMessage_Control;
+      if (type == "control")
       {
-         IUIControl* uicontrolNextPage = TheSynth->FindUIControl(connection["pages"][i].asCString());
-         if (uicontrolNextPage)
+         msgType = kMidiMessage_Control;
+      }
+      else if (type == "note")
+      {
+         msgType = kMidiMessage_Note;
+      }
+      else if (type == "program")
+      {
+         msgType = kMidiMessage_Program;
+      }
+      else if (type == "pitchbend")
+      {
+         msgType = kMidiMessage_PitchBend;
+         control = MIDI_PITCH_BEND_CONTROL_NUM;
+      }
+      int channel = -1;
+      if (!connection["channel"].isNull())
+         channel = connection["channel"].asInt();
+
+      int page = -1;
+      bool pageless = false;
+      if (!connection["page"].isNull())
+         page = connection["page"].asInt();
+      if (page == -1)
+         pageless = true;
+
+      UIControlConnection* controlConnection = new UIControlConnection(this);
+      controlConnection->mMessageType = msgType;
+      controlConnection->mControl = control;
+      controlConnection->SetUIControl(path);
+
+      ControlType controlType = kControlType_SetValue;
+      if (connection["toggle"].asBool())
+         controlType = kControlType_Toggle;
+      else if (connection["direct"].asBool())
+         controlType = kControlType_Direct;
+      else if (connection["value"].isNull())
+         controlType = kControlType_Slider;
+      else if (connection["release"].asBool())
+         controlType = kControlType_SetValueOnRelease;
+      controlConnection->mType = controlType;
+
+      controlConnection->mChannel = channel;
+      controlConnection->mPage = page;
+      controlConnection->mPageless = pageless;
+
+      if (!connection["midi_on_value"].isNull())
+         controlConnection->mMidiOnValue = connection["midi_on_value"].asInt();
+
+      if (!connection["midi_off_value"].isNull())
+         controlConnection->mMidiOffValue = connection["midi_off_value"].asInt();
+
+      if (!connection["blink"].isNull())
+         controlConnection->mBlink = connection["blink"].asBool();
+
+      if (!connection["value"].isNull())
+         controlConnection->mValue = connection["value"].asDouble();
+
+      if (!connection["increment_amount"].isNull())
+         controlConnection->mIncrementAmount = connection["increment_amount"].asDouble();
+
+      if (!connection["twoway"].isNull())
+         controlConnection->mTwoWay = connection["twoway"].asBool();
+
+      if (!connection["feedbackcontrol"].isNull())
+         controlConnection->mFeedbackControl = connection["feedbackcontrol"].asInt();
+
+      //controlConnection->CreateUIControls(this, mConnections.size()); //do this on the first draw instead, to avoid a long init time when setting up a bunch of minimized controllers
+      mConnections.push_back(controlConnection);
+
+      if (!connection["pages"].isNull())
+      {
+         for (int i = 0; i < connection["pages"].size(); ++i)
          {
-            UIControlConnection* nextPageConnection = new UIControlConnection(*controlConnection);
-            nextPageConnection->mPage += i+1;
-            nextPageConnection->mUIControl = uicontrolNextPage;
-            nextPageConnection->mEditorControls.clear(); //TODO(Ryan) temp fix
-            nextPageConnection->CreateUIControls((int)mConnections.size());
-            mConnections.push_back(nextPageConnection);
-            uicontrolNextPage->AddRemoteController();
+            IUIControl* uicontrolNextPage = TheSynth->FindUIControl(connection["pages"][i].asCString());
+            if (uicontrolNextPage)
+            {
+               UIControlConnection* nextPageConnection = new UIControlConnection(*controlConnection);
+               nextPageConnection->mPage += i + 1;
+               nextPageConnection->mUIControl = uicontrolNextPage;
+               nextPageConnection->mEditorControls.clear(); //TODO(Ryan) temp fix
+               nextPageConnection->CreateUIControls((int)mConnections.size());
+               mConnections.push_back(nextPageConnection);
+               uicontrolNextPage->AddRemoteController();
+            }
          }
       }
+   }
+   catch (Json::LogicError& e)
+   {
+      TheSynth->LogEvent(__PRETTY_FUNCTION__ + std::string(" json error: ") + e.what(), kLogEventType_Error);
    }
 }
 
@@ -1331,6 +1338,18 @@ std::string MidiController::GetDefaultTooltip(MidiMessageType type, int control)
    return str + ofToString(control);
 }
 
+UIControlConnection *MidiController::GetConnectionForCableSource(const PatchCableSource *source)
+{
+   for (auto c : mLayoutControls)
+   {
+      if (c.mActive && c.mControlCable == source)
+      {
+         return GetConnectionForControl(c.mType, c.mControl);
+      }
+   }
+   return nullptr;
+}
+
 void MidiController::OnClicked(int x, int y, bool right)
 {
    IDrawableModule::OnClicked(x, y, right);
@@ -1580,180 +1599,189 @@ void MidiController::LoadLayout(std::string filename)
    
    bool useDefaultLayout = true;
    bool loaded = mLayoutData.open(mLastLoadedLayoutFile);
-   if (loaded)
+   try
    {
-      if (mNonstandardController != nullptr)
-         mNonstandardController->SetLayoutData(mLayoutData);
-      
-      mFoundLayoutFile = true;
-      if (!mLayoutData["outchannel"].isNull())
+      if (loaded)
       {
-         mOutChannel = mLayoutData["outchannel"].asInt();
-         mModuleSaveData.SetInt("outchannel", mOutChannel);
-      }
-      if (!mLayoutData["outdevice"].isNull())
-      {
-         mDeviceOut = mLayoutData["outdevice"].asString();
-         mModuleSaveData.SetString("deviceout", mDeviceOut);
-         mTwoWay = true;
-         mDevice.ConnectOutput(mDeviceOut.c_str(), mOutChannel);
-      }
-      if (!mLayoutData["usechannelasvoice"].isNull())
-      {
-         SetUseChannelAsVoice(mLayoutData["usechannelasvoice"].asBool());
-         mModuleSaveData.SetBool("usechannelasvoice", mUseChannelAsVoice);
-      }
-      if (!mLayoutData["pitchbendrange"].isNull())
-      {
-         SetPitchBendRange(mLayoutData["pitchbendrange"].asInt());
-         mModuleSaveData.SetFloat("pitchbendrange", mPitchBendRange);
-      }
-      if (!mLayoutData["modwheelcc"].isNull())
-      {
-         mModwheelCC = mLayoutData["modwheelcc"].asInt();
-         mModuleSaveData.SetInt("modwheelcc(1or74)", mModwheelCC);
-      }
-      if (!mLayoutData["modwheeloffset"].isNull())
-      {
-         mModWheelOffset = mLayoutData["modwheeloffset"].asDouble();
-         mModuleSaveData.SetFloat("modwheeloffset", mModWheelOffset);
-      }
-      if (!mLayoutData["pressureoffset"].isNull())
-      {
-         mPressureOffset = mLayoutData["pressureoffset"].asDouble();
-         mModuleSaveData.SetFloat("pressureoffset", mPressureOffset);
-      }
-      if (!mLayoutData["twoway_on_change"].isNull())
-      {
-         mSendTwoWayOnChange = mLayoutData["twoway_on_change"].asBool();
-         mModuleSaveData.SetBool("twoway_on_change", mSendTwoWayOnChange);
-      }
-      if (!mLayoutData["resend_feedback_on_release"].isNull())
-      {
-         mResendFeedbackOnRelease = mLayoutData["resend_feedback_on_release"].asBool();
-         mModuleSaveData.SetBool("resend_feedback_on_release", mResendFeedbackOnRelease);
-      }
-      if (!mLayoutData["channelfilter"].isNull())
-      {
-         const int layoutChannelFilter = mLayoutData["channelfilter"].asInt();
-         if (layoutChannelFilter >= (int)ChannelFilter::k1 && layoutChannelFilter <= (int)ChannelFilter::k16)
+         if (mNonstandardController != nullptr)
+            mNonstandardController->SetLayoutData(mLayoutData);
+
+         mFoundLayoutFile = true;
+         if (!mLayoutData["outchannel"].isNull())
          {
-            mChannelFilter = (ChannelFilter)layoutChannelFilter;
-            // The enum is restored by casting from an int
-            mModuleSaveData.SetInt("channelfilter", layoutChannelFilter);
+            mOutChannel = mLayoutData["outchannel"].asInt();
+            mModuleSaveData.SetInt("outchannel", mOutChannel);
          }
-      }
-      if (!mLayoutData["groups"].isNull())
-      {
-         useDefaultLayout = false;
-         for (int group = 0; group < mLayoutData["groups"].size(); ++group)
+         if (!mLayoutData["outdevice"].isNull())
          {
-            int rows = mLayoutData["groups"][group]["rows"].asInt();
-            int cols = mLayoutData["groups"][group]["cols"].asInt();
-            ofVec2f pos;
-            pos.x = (mLayoutData["groups"][group]["position"])[0u].asDouble();
-            pos.y = (mLayoutData["groups"][group]["position"])[1u].asDouble();
-            ofVec2f dim;
-            dim.x = (mLayoutData["groups"][group]["dimensions"])[0u].asDouble();
-            dim.y = (mLayoutData["groups"][group]["dimensions"])[1u].asDouble();
-            ofVec2f spacing;
-            spacing.x = (mLayoutData["groups"][group]["spacing"])[0u].asDouble();
-            spacing.y = (mLayoutData["groups"][group]["spacing"])[1u].asDouble();
-            MidiMessageType messageType;
-            if (mLayoutData["groups"][group]["messageType"] == "control")
-               messageType = kMidiMessage_Control;
-            if (mLayoutData["groups"][group]["messageType"] == "note")
-               messageType = kMidiMessage_Note;
-            if (mLayoutData["groups"][group]["messageType"] == "pitchbend")
-               messageType = kMidiMessage_PitchBend;
-            if (mLayoutData["groups"][group]["messageType"] == "program")
-               messageType = kMidiMessage_Program;
-            ControlDrawType drawType;
-            if (mLayoutData["groups"][group]["drawType"] == "button")
-               drawType = kDrawType_Button;
-            if (mLayoutData["groups"][group]["drawType"] == "knob")
-               drawType = kDrawType_Knob;
-            if (mLayoutData["groups"][group]["drawType"] == "slider")
-               drawType = kDrawType_Slider;
-            bool incremental = false;
-            if (!mLayoutData["groups"][group]["incremental"].isNull())
-               incremental = mLayoutData["groups"][group]["incremental"].asBool();
-            int offVal = 0;
-            int onVal = 127;
-            if (!mLayoutData["groups"][group]["colors"].isNull() &&
-               mLayoutData["groups"][group]["colors"].size() > 2)
+            mDeviceOut = mLayoutData["outdevice"].asString();
+            mModuleSaveData.SetString("deviceout", mDeviceOut);
+            mTwoWay = true;
+            mDevice.ConnectOutput(mDeviceOut.c_str(), mOutChannel);
+         }
+         if (!mLayoutData["usechannelasvoice"].isNull())
+         {
+            SetUseChannelAsVoice(mLayoutData["usechannelasvoice"].asBool());
+            mModuleSaveData.SetBool("usechannelasvoice", mUseChannelAsVoice);
+         }
+         if (!mLayoutData["pitchbendrange"].isNull())
+         {
+            SetPitchBendRange(mLayoutData["pitchbendrange"].asInt());
+            mModuleSaveData.SetFloat("pitchbendrange", mPitchBendRange);
+         }
+         if (!mLayoutData["modwheelcc"].isNull())
+         {
+            mModwheelCC = mLayoutData["modwheelcc"].asInt();
+            mModuleSaveData.SetInt("modwheelcc(1or74)", mModwheelCC);
+         }
+         if (!mLayoutData["modwheeloffset"].isNull())
+         {
+            mModWheelOffset = mLayoutData["modwheeloffset"].asDouble();
+            mModuleSaveData.SetFloat("modwheeloffset", mModWheelOffset);
+         }
+         if (!mLayoutData["pressureoffset"].isNull())
+         {
+            mPressureOffset = mLayoutData["pressureoffset"].asDouble();
+            mModuleSaveData.SetFloat("pressureoffset", mPressureOffset);
+         }
+         if (!mLayoutData["twoway_on_change"].isNull())
+         {
+            mSendTwoWayOnChange = mLayoutData["twoway_on_change"].asBool();
+            mModuleSaveData.SetBool("twoway_on_change", mSendTwoWayOnChange);
+         }
+         if (!mLayoutData["resend_feedback_on_release"].isNull())
+         {
+            mResendFeedbackOnRelease = mLayoutData["resend_feedback_on_release"].asBool();
+            mModuleSaveData.SetBool("resend_feedback_on_release", mResendFeedbackOnRelease);
+         }
+         if (!mLayoutData["channelfilter"].isNull())
+         {
+            const int layoutChannelFilter = mLayoutData["channelfilter"].asInt();
+            if (layoutChannelFilter >= (int)ChannelFilter::k1 && layoutChannelFilter <= (int)ChannelFilter::k16)
             {
-               offVal = mLayoutData["groups"][group]["colors"][0u].asInt();
-               onVal = mLayoutData["groups"][group]["colors"][2u].asInt();
+               mChannelFilter = (ChannelFilter)layoutChannelFilter;
+               // The enum is restored by casting from an int
+               mModuleSaveData.SetInt("channelfilter", layoutChannelFilter);
             }
-            ControlType connectionType = kControlType_Default;
-            if (mLayoutData["groups"][group]["connection_type"] == "slider")
-               connectionType = kControlType_Slider;
-            if (mLayoutData["groups"][group]["connection_type"] == "set")
-               connectionType = kControlType_SetValue;
-            if (mLayoutData["groups"][group]["connection_type"] == "release")
-               connectionType = kControlType_SetValueOnRelease;
-            if (mLayoutData["groups"][group]["connection_type"] == "toggle")
-               connectionType = kControlType_Toggle;
-            if (mLayoutData["groups"][group]["connection_type"] == "direct")
-               connectionType = kControlType_Direct;
-            for (int row = 0; row < rows; ++row)
+         }
+         if (!mLayoutData["groups"].isNull())
+         {
+            useDefaultLayout = false;
+            for (int group = 0; group < mLayoutData["groups"].size(); ++group)
             {
-               for (int col = 0; col < cols; ++col)
+               int rows = mLayoutData["groups"][group]["rows"].asInt();
+               int cols = mLayoutData["groups"][group]["cols"].asInt();
+               ofVec2f pos;
+               pos.x = (mLayoutData["groups"][group]["position"])[0u].asDouble();
+               pos.y = (mLayoutData["groups"][group]["position"])[1u].asDouble();
+               ofVec2f dim;
+               dim.x = (mLayoutData["groups"][group]["dimensions"])[0u].asDouble();
+               dim.y = (mLayoutData["groups"][group]["dimensions"])[1u].asDouble();
+               ofVec2f spacing;
+               spacing.x = (mLayoutData["groups"][group]["spacing"])[0u].asDouble();
+               spacing.y = (mLayoutData["groups"][group]["spacing"])[1u].asDouble();
+               MidiMessageType messageType;
+               if (mLayoutData["groups"][group]["messageType"] == "control")
+                  messageType = kMidiMessage_Control;
+               if (mLayoutData["groups"][group]["messageType"] == "note")
+                  messageType = kMidiMessage_Note;
+               if (mLayoutData["groups"][group]["messageType"] == "pitchbend")
+                  messageType = kMidiMessage_PitchBend;
+               if (mLayoutData["groups"][group]["messageType"] == "program")
+                  messageType = kMidiMessage_Program;
+               ControlDrawType drawType;
+               if (mLayoutData["groups"][group]["drawType"] == "button")
+                  drawType = kDrawType_Button;
+               if (mLayoutData["groups"][group]["drawType"] == "knob")
+                  drawType = kDrawType_Knob;
+               if (mLayoutData["groups"][group]["drawType"] == "slider")
+                  drawType = kDrawType_Slider;
+               bool incremental = false;
+               if (!mLayoutData["groups"][group]["incremental"].isNull())
+                  incremental = mLayoutData["groups"][group]["incremental"].asBool();
+               int offVal = 0;
+               int onVal = 127;
+               if (!mLayoutData["groups"][group]["colors"].isNull() &&
+                  mLayoutData["groups"][group]["colors"].size() > 2)
                {
-                  int index = col + row * cols;
-                  int control = mLayoutData["groups"][group]["controls"][index].asInt();
-                  GetLayoutControl(control, messageType).Setup(this, messageType, control, drawType, incremental, offVal, onVal, false, connectionType, pos.x + kLayoutButtonsX + spacing.x*col, pos.y + kLayoutButtonsY + spacing.y*row, dim.x, dim.y);
-
-                  //clear out values on controllers
-                  /*if (messageType == kMidiMessage_Note)
-                     SendNote(0, control, offVal, true);
-                  if (messageType == kMidiMessage_Control)
-                     SendCC(0, control, offVal);*/
+                  offVal = mLayoutData["groups"][group]["colors"][0u].asInt();
+                  onVal = mLayoutData["groups"][group]["colors"][2u].asInt();
                }
-            }
-
-            if (drawType == kDrawType_Button && rows * cols >= 8) //we're a button grid
-            {
-               GridLayout* grid = new GridLayout();
-               grid->mRows = rows;
-               grid->mCols = cols;
-               grid->mPosition.set(pos.x + kLayoutButtonsX - 2, pos.y + kLayoutButtonsY - 2);
-               grid->mDimensions.set(spacing.x*cols + 2, spacing.y*rows + 2);
-               grid->mType = messageType;
-               grid->mGridCable = new PatchCableSource(this, kConnectionType_Grid);
-               grid->mGridCable->SetManualPosition(pos.x + kLayoutButtonsX - 2, pos.y + kLayoutButtonsY - 2);
-               grid->mGridCable->AddTypeFilter("gridcontroller");
-               AddPatchCableSource(grid->mGridCable);
-
+               ControlType connectionType = kControlType_Default;
+               if (mLayoutData["groups"][group]["connection_type"] == "slider")
+                  connectionType = kControlType_Slider;
+               if (mLayoutData["groups"][group]["connection_type"] == "set")
+                  connectionType = kControlType_SetValue;
+               if (mLayoutData["groups"][group]["connection_type"] == "release")
+                  connectionType = kControlType_SetValueOnRelease;
+               if (mLayoutData["groups"][group]["connection_type"] == "toggle")
+                  connectionType = kControlType_Toggle;
+               if (mLayoutData["groups"][group]["connection_type"] == "direct")
+                  connectionType = kControlType_Direct;
                for (int row = 0; row < rows; ++row)
                {
                   for (int col = 0; col < cols; ++col)
                   {
                      int index = col + row * cols;
                      int control = mLayoutData["groups"][group]["controls"][index].asInt();
-                     grid->mControls.push_back(control);
+                     GetLayoutControl(control, messageType).Setup(this, messageType, control, drawType, incremental, offVal, onVal, false, connectionType, pos.x + kLayoutButtonsX + spacing.x*col, pos.y + kLayoutButtonsY + spacing.y*row, dim.x, dim.y);
+
+                     //clear out values on controllers
+                     /*if (messageType == kMidiMessage_Note)
+                        SendNote(0, control, offVal, true);
+                     if (messageType == kMidiMessage_Control)
+                        SendCC(0, control, offVal);*/
                   }
                }
 
-               if (!mLayoutData["groups"][group]["colors"].isNull() &&
-                  mLayoutData["groups"][group]["colors"].size() > 0)
+               if (drawType == kDrawType_Button && rows * cols >= 8) //we're a button grid
                {
-                  for (int i = 0; i < mLayoutData["groups"][group]["colors"].size(); ++i)
-                     grid->mColors.push_back(mLayoutData["groups"][group]["colors"][i].asInt());
-               }
-               else
-               {
-                  grid->mColors.push_back(0);
-                  grid->mColors.push_back(127);
-               }
+                  GridLayout* grid = new GridLayout();
+                  grid->mRows = rows;
+                  grid->mCols = cols;
+                  grid->mPosition.set(pos.x + kLayoutButtonsX - 2, pos.y + kLayoutButtonsY - 2);
+                  grid->mDimensions.set(spacing.x*cols + 2, spacing.y*rows + 2);
+                  grid->mType = messageType;
+                  grid->mGridCable = new PatchCableSource(this, kConnectionType_Grid);
+                  grid->mGridCable->SetManualPosition(pos.x + kLayoutButtonsX - 2, pos.y + kLayoutButtonsY - 2);
+                  grid->mGridCable->AddTypeFilter("gridcontroller");
+                  AddPatchCableSource(grid->mGridCable);
 
-               mGrids.push_back(grid);
+                  for (int row = 0; row < rows; ++row)
+                  {
+                     for (int col = 0; col < cols; ++col)
+                     {
+                        int index = col + row * cols;
+                        int control = mLayoutData["groups"][group]["controls"][index].asInt();
+                        grid->mControls.push_back(control);
+                     }
+                  }
+
+                  if (!mLayoutData["groups"][group]["colors"].isNull() &&
+                     mLayoutData["groups"][group]["colors"].size() > 0)
+                  {
+                     for (int i = 0; i < mLayoutData["groups"][group]["colors"].size(); ++i)
+                        grid->mColors.push_back(mLayoutData["groups"][group]["colors"][i].asInt());
+                  }
+                  else
+                  {
+                     grid->mColors.push_back(0);
+                     grid->mColors.push_back(127);
+                  }
+
+                  mGrids.push_back(grid);
+               }
             }
          }
       }
    }
-   else
+   catch (Json::LogicError& e)
+   {
+      loaded = false;
+      TheSynth->LogEvent(__PRETTY_FUNCTION__ + std::string(" json error: ") + e.what(), kLogEventType_Error);
+   }
+   
+   if (!loaded)
    {
       mFoundLayoutFile = false;
       mLayoutData.clear();
@@ -1986,32 +2014,41 @@ void MidiController::PostRepatch(PatchCableSource* cableSource, bool fromUserCli
          break;
    }
    
-   if (fromUserClick && !repatched && cableSource->GetTarget())   //need to make connection
+   if (cableSource->GetTarget())   //need to make connection
    {
-      int layoutControl = GetLayoutControlIndexForCable(cableSource);
-      if (layoutControl != -1)
+      if (fromUserClick && !repatched)
       {
-         UIControlConnection* connection = AddControlConnection(mLayoutControls[layoutControl].mType, mLayoutControls[layoutControl].mControl, -1, dynamic_cast<IUIControl*>(cableSource->GetTarget()));
-         
-         RadioButton* radioButton = dynamic_cast<RadioButton*>(cableSource->GetTarget());
-         if (radioButton && mLayoutControls[layoutControl].mDrawType == kDrawType_Button)
+         int layoutControl = GetLayoutControlIndexForCable(cableSource);
+         if (layoutControl != -1)
          {
-            connection->mType = kControlType_SetValue;
-            float closestSq = FLT_MAX;
-            int closestIdx = 0;
-            ofVec2f mousePos(TheSynth->GetRawMouseX(), TheSynth->GetRawMouseY());
-            for (int i=0; i<radioButton->GetNumValues(); ++i)
+            UIControlConnection* connection = AddControlConnection(mLayoutControls[layoutControl].mType, mLayoutControls[layoutControl].mControl, -1, dynamic_cast<IUIControl*>(cableSource->GetTarget()));
+
+            RadioButton* radioButton = dynamic_cast<RadioButton*>(cableSource->GetTarget());
+            if (radioButton && mLayoutControls[layoutControl].mDrawType == kDrawType_Button)
             {
-               float distSq = (mousePos - radioButton->GetOptionPosition(i)).distanceSquared();
-               if (distSq < closestSq)
+               connection->mType = kControlType_SetValue;
+               float closestSq = FLT_MAX;
+               int closestIdx = 0;
+               ofVec2f mousePos(TheSynth->GetRawMouseX(), TheSynth->GetRawMouseY());
+               for (int i=0; i<radioButton->GetNumValues(); ++i)
                {
-                  closestSq = distSq;
-                  closestIdx = i;
+                  float distSq = (mousePos - radioButton->GetOptionPosition(i)).distanceSquared();
+                  if (distSq < closestSq)
+                  {
+                     closestSq = distSq;
+                     closestIdx = i;
+                  }
                }
+               connection->mValue = closestIdx;
             }
-            connection->mValue = closestIdx;
          }
       }
+   }
+   else // need to remove a connection if no cables remain
+   {
+      auto uiConnection = GetConnectionForCableSource(cableSource);
+      mConnections.remove(uiConnection);
+      delete uiConnection;
    }
 }
 

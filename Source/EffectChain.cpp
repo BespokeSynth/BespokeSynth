@@ -545,8 +545,15 @@ void EffectChain::LoadBasics(const ofxJSONElement& moduleInfo, std::string typeN
    
    for (int i=0; i<effects.size(); ++i)
    {
-      std::string type = effects[i]["type"].asString();
-      AddEffect(type);
+      try
+      {
+         std::string type = effects[i]["type"].asString();
+         AddEffect(type);
+      }
+      catch (Json::LogicError& e)
+      {
+         TheSynth->LogEvent(__PRETTY_FUNCTION__ + std::string(" json error: ") + e.what(), kLogEventType_Error);
+      }
    }
 }
 
@@ -561,9 +568,16 @@ void EffectChain::LoadLayout(const ofxJSONElement& moduleInfo)
    assert(mEffects.size() == effects.size());
    for (int i=0; i<mEffects.size(); ++i)
    {
-      std::string type = effects[i]["type"].asString();
-      assert(mEffects[i]->GetType() == type);
-      mEffects[i]->LoadLayout(effects[i]);
+      try
+      {
+         std::string type = effects[i]["type"].asString();
+         assert(mEffects[i]->GetType() == type);
+         mEffects[i]->LoadLayout(effects[i]);
+      }
+      catch (Json::LogicError& e)
+      {
+         TheSynth->LogEvent(__PRETTY_FUNCTION__ + std::string(" json error: ") + e.what(), kLogEventType_Error);
+      }
    }
 
    SetUpFromSaveData();

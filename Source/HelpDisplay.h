@@ -82,6 +82,7 @@ private:
    
    std::vector<std::string> mHelpText;
    Checkbox* mShowTooltipsCheckbox;
+   ClickButton* mCopyBuildInfoButton;
    ClickButton* mDumpModuleInfoButton;
    ClickButton* mDoModuleScreenshotsButton;
    ClickButton* mDoModuleDocumentationButton;

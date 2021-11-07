@@ -53,6 +53,9 @@ void GlobalControls::CreateUIControls()
    FLOATSLIDER(mBackgroundLissajousRSlider, "lissajous r", &ModularSynth::sBackgroundLissajousR, 0, 1);
    FLOATSLIDER(mBackgroundLissajousGSlider, "lissajous g", &ModularSynth::sBackgroundLissajousG, 0, 1);
    FLOATSLIDER(mBackgroundLissajousBSlider, "lissajous b", &ModularSynth::sBackgroundLissajousB, 0, 1);
+   FLOATSLIDER(mBackgroundRSlider, "background r", &ModularSynth::sBackgroundR, 0, 1);
+   FLOATSLIDER(mBackgroundGSlider, "background g", &ModularSynth::sBackgroundG, 0, 1);
+   FLOATSLIDER(mBackgroundBSlider, "background b", &ModularSynth::sBackgroundB, 0, 1);
    ENDUIBLOCK(mWidth, mHeight);
 }
 
@@ -74,6 +77,9 @@ void GlobalControls::DrawModule()
    mBackgroundLissajousRSlider->Draw();
    mBackgroundLissajousGSlider->Draw();
    mBackgroundLissajousBSlider->Draw();
+   mBackgroundRSlider->Draw();
+   mBackgroundGSlider->Draw();
+   mBackgroundBSlider->Draw();
 }
 
 void GlobalControls::FloatSliderUpdated(FloatSlider* slider, float oldVal)

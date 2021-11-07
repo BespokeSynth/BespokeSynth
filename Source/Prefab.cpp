@@ -33,6 +33,8 @@
 
 //static
 bool Prefab::sLoadingPrefab = false;
+//static
+IDrawableModule* Prefab::sJustReleasedModule = nullptr;
 
 Prefab::Prefab()
 {
@@ -94,10 +96,14 @@ bool Prefab::CanAddDropModules()
    {
       if (TheSynth->GetMoveModule() != nullptr && !VectorContains(TheSynth->GetMoveModule(), mModuleContainer.GetModules()))
          return true;
+      if (sJustReleasedModule != nullptr && !VectorContains(sJustReleasedModule, mModuleContainer.GetModules()))
+         return true;
       if (!TheSynth->GetGroupSelectedModules().empty())
       {
          for (auto* module : TheSynth->GetGroupSelectedModules())
          {
+            if (module == this)
+               return false;
             if (!VectorContains(module, mModuleContainer.GetModules()))
                return true;
          }
@@ -120,8 +126,8 @@ void Prefab::MouseReleased()
 
    if (CanAddDropModules())
    {
-      if (TheSynth->GetMoveModule() != nullptr && !VectorContains(TheSynth->GetMoveModule(), mModuleContainer.GetModules()))
-         mModuleContainer.TakeModule(TheSynth->GetMoveModule());
+      if (sJustReleasedModule != nullptr && !VectorContains(sJustReleasedModule, mModuleContainer.GetModules()))
+         mModuleContainer.TakeModule(sJustReleasedModule);
 
       for(auto* module : TheSynth->GetGroupSelectedModules())
       {
@@ -206,7 +212,7 @@ void Prefab::ButtonClicked(ClickButton* button)
    using namespace juce;
    if (button == mSaveButton)
    {
-      FileChooser chooser("Save prefab as...", File(ofToDataPath("prefabs/prefab.pfb")), "*.pfb", true, false, TheSynth->GetMainComponent()->getTopLevelComponent());
+      FileChooser chooser("Save prefab as...", File(ofToDataPath("prefabs/prefab.pfb")), "*.pfb", true, false, TheSynth->GetFileChooserParent());
       if (chooser.browseForFileToSave(true))
       {
          std::string savePath = chooser.getResult().getRelativePathFrom(File(ofToDataPath(""))).toStdString();
@@ -216,7 +222,7 @@ void Prefab::ButtonClicked(ClickButton* button)
    
    if (button == mLoadButton)
    {
-      FileChooser chooser("Load prefab...", File(ofToDataPath("prefabs")), "*.pfb", true, false, TheSynth->GetMainComponent()->getTopLevelComponent());
+      FileChooser chooser("Load prefab...", File(ofToDataPath("prefabs")), "*.pfb", true, false, TheSynth->GetFileChooserParent());
       if (chooser.browseForFileToOpen())
       {
          std::string loadPath = chooser.getResult().getRelativePathFrom(File(ofToDataPath(""))).toStdString();

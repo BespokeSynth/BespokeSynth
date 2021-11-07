@@ -65,6 +65,9 @@ private:
    FloatSlider* mBackgroundLissajousRSlider;
    FloatSlider* mBackgroundLissajousGSlider;
    FloatSlider* mBackgroundLissajousBSlider;
+   FloatSlider* mBackgroundRSlider;
+   FloatSlider* mBackgroundGSlider;
+   FloatSlider* mBackgroundBSlider;
 
    float mWidth;
    float mHeight;

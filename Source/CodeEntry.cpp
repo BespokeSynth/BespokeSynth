@@ -1331,12 +1331,17 @@ void CodeEntry::LoadState(FileStreamIn& in, bool shouldSetValue)
    int rev;
    in >> rev;
    LoadStateValidate(rev == kSaveStateRev);
-   
-   in >> mString;
-   UpdateString(mString);
-   //Publish();
-   //if (mListener != nullptr)
-   //   mListener->ExecuteCode(mString);
+
+   std::string var;
+   in >> var;
+   if (shouldSetValue)
+   {
+      UpdateString(var);
+
+      //Publish();
+      //if (mListener != nullptr)
+      //   mListener->ExecuteCode(mString);
+   }
 }
 
 void CodeEntry::SetStyleFromJSON(const ofxJSONElement &vdict) {
@@ -1360,12 +1365,19 @@ void CodeEntry::SetStyleFromJSON(const ofxJSONElement &vdict) {
         }
         else
         {
-            onto.r = arr[0u].asInt();
-            onto.g = arr[1u].asInt();
-            onto.b = arr[2u].asInt();
+           try
+           {
+              onto.r = arr[0u].asInt();
+              onto.g = arr[1u].asInt();
+              onto.b = arr[2u].asInt();
 
-            if (def.size() > 3)
-                onto.a = arr[3u].asInt();
+              if (def.size() > 3)
+                 onto.a = arr[3u].asInt();
+           }
+           catch (Json::LogicError& e)
+           {
+              TheSynth->LogEvent(__PRETTY_FUNCTION__ + std::string(" json error: ") + e.what(), kLogEventType_Error);
+           }
         }
     };
     fromRGB( "currentBg", currentBg);

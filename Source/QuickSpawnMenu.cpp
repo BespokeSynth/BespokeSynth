@@ -87,7 +87,7 @@ void QuickSpawnMenu::KeyReleased(int key)
 
 void QuickSpawnMenu::UpdateDisplay()
 {
-   if (mHeldKeys.isEmpty())
+   if (mHeldKeys.isEmpty() || TheSynth->GetMoveModule() != nullptr)
    {
       SetShowing(false);
    }
@@ -173,7 +173,7 @@ void QuickSpawnMenu::OnClicked(int x, int y, bool right)
    if (moduleTypeName != "")
    {
       IDrawableModule* module = TheSynth->SpawnModuleOnTheFly(moduleTypeName, TheSynth->GetMouseX(TheSynth->GetRootContainer()) + moduleGrabOffset.x, TheSynth->GetMouseY(TheSynth->GetRootContainer()) + moduleGrabOffset.y);
-      TheSynth->SetMoveModule(module, moduleGrabOffset.x, moduleGrabOffset.y);
+      TheSynth->SetMoveModule(module, moduleGrabOffset.x, moduleGrabOffset.y, true);
    }
    
    SetShowing(false);

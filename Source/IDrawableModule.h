@@ -95,6 +95,7 @@ public:
    virtual void Exit();
    bool IsInitialized() const { return mInitialized; }
    bool Minimized() const { return mMinimizeAnimation > 0; }
+   bool WasMinimizeAreaClicked() const { return mWasMinimizeAreaClicked; }
    virtual void MouseReleased() override;
    virtual void FilesDropped(std::vector<std::string> files, int x, int y) {}
    virtual std::string GetTitleLabel() const { return Name(); }
@@ -152,6 +153,7 @@ public:
    virtual std::vector<IUIControl*> ControlsToNotSetDuringLoadState() const;
    virtual std::vector<IUIControl*> ControlsToIgnoreInSaveState() const;
    virtual void UpdateOldControlName(std::string& oldName) {}
+   virtual bool LoadOldControl(FileStreamIn& in, std::string& oldName) { return false; }
    virtual bool CanSaveState() const { return true; }
    virtual size_t GetExpectedSaveStateNumChildren() const { return mChildren.size(); }
    virtual bool HasDebugDraw() const { return false; }
@@ -200,7 +202,7 @@ private:
    ModuleContainer* mOwningContainer;
 
    bool mMinimized;
-   bool mMinimizeAreaClicked;
+   bool mWasMinimizeAreaClicked;
    float mMinimizeAnimation;
    bool mUIControlsCreated;
    bool mInitialized;

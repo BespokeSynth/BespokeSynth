@@ -29,19 +29,14 @@
 #include "ModularSynth.h"
 #include "Push2Control.h"
 
-namespace
-{
-   const int itemSpacing = 15;
-}
-
 DropdownList::DropdownList(IDropdownListener* owner, const char* name, int x, int y, int* var, float width)
 : mWidth(35)
-, mHeight(itemSpacing)
+, mHeight(kItemSpacing)
 , mVar(var)
 , mModalList(this)
 , mOwner(owner)
 , mMaxPerColumn(40)
-, mModalWidth(20)
+, mMaxItemWidth(20)
 , mUnknownItemString("-----")
 , mDrawLabel(false)
 , mSliderVal(0)
@@ -82,7 +77,7 @@ void DropdownList::AddLabel(std::string label, int value)
    mElements.push_back(element);
 
    CalculateWidth();
-   mHeight = itemSpacing;
+   mHeight = kItemSpacing;
    
    CalcSliderVal();
 }
@@ -96,7 +91,7 @@ void DropdownList::RemoveLabel(int value)
          mElements.erase(iter);
          
          CalculateWidth();
-         mHeight = itemSpacing;
+         mHeight = kItemSpacing;
          
          CalcSliderVal();
          break;
@@ -106,16 +101,16 @@ void DropdownList::RemoveLabel(int value)
 
 void DropdownList::CalculateWidth()
 {
-   mModalWidth = mWidth;
+   mMaxItemWidth = mWidth;
    for (int i=0; i<mElements.size(); ++i)
    {
       int width = GetStringWidth(mElements[i].mLabel) + 15;
-      if (width > mModalWidth)
-         mModalWidth = width;
+      if (width > mMaxItemWidth)
+         mMaxItemWidth = width;
    }
    
    if (mAutoCalculateWidth)
-      mWidth = MIN(mModalWidth, 180);
+      mWidth = MIN(mMaxItemWidth, 180);
 }
 
 std::string DropdownList::GetLabel(int val) const
@@ -176,7 +171,7 @@ void DropdownList::Render()
    
    DrawHover(mX+xOffset, mY, w-xOffset, h);
    
-   if (mLastScrolledTime + 300 > gTime && TheSynth->GetTopModalFocusItem() != &mModalList && !Push2Control::sDrawingPush2Display && mElements.size() < mMaxPerColumn)
+   if (mLastScrolledTime + 300 > gTime && TheSynth->GetTopModalFocusItem() != &mModalList && !Push2Control::sDrawingPush2Display)
    {
       const float kCentering = 7;
       float w, h;
@@ -185,7 +180,9 @@ void DropdownList::Render()
       mModalList.SetPosition(0, 0);
       ofPushMatrix();
       ofTranslate(mX, mY + kCentering - h * mSliderVal);
+      mModalList.SetIsScrolling(true);
       mModalList.Render();
+      mModalList.SetIsScrolling(false);
       ofPopMatrix();
 
       ofPushStyle();
@@ -198,27 +195,52 @@ void DropdownList::Render()
    }
 }
 
-void DropdownList::DrawDropdown(int w, int h)
+void DropdownList::DrawDropdown(int w, int h, bool isScrolling)
 {
    ofPushStyle();
+
+   if (isScrolling)
+      mModalList.SetDimensions(mMaxItemWidth, (int)mElements.size() * kItemSpacing);
 
    int hoverIndex = -1;
    float dropdownW, dropdownH;
    mModalList.GetDimensions(dropdownW, dropdownH);
    if (mModalList.GetMouseX() >= 0 && mModalList.GetMouseY() >= 0 && mModalList.GetMouseX() < dropdownW && mModalList.GetMouseY() < dropdownH)
-      hoverIndex = GetItemIndex(mModalList.GetMouseX(), mModalList.GetMouseY());
+      hoverIndex = GetItemIndexAt(mModalList.GetMouseX(), mModalList.GetMouseY());
+
+   int maxPerColumn = mMaxPerColumn;
+   int displayColumns = mDisplayColumns;
+   int totalColumns = mTotalColumns;
+   int currentPagedColumn = mCurrentPagedColumn;
+   if (isScrolling)
+   {
+      maxPerColumn = 9999;
+      displayColumns = 1;
+      totalColumns = 1;
+      mCurrentPagedColumn = 0;
+   }
+
+   bool paged = (displayColumns < totalColumns);
+   float pageHeaderShift = (paged ? kPageBarSpacing : 0);
+   mModalList.SetShowPagingControls(paged);
 
    ofSetColor(0,0,0);
    ofFill();
    ofRect(0,0,w,h);
    for (int i=0; i<mElements.size(); ++i)
    {
-      int col = i/mMaxPerColumn;
+      int col = i / maxPerColumn - currentPagedColumn;
+
+      if (col < 0)
+         continue;
+
+      if (col >= displayColumns)
+         break;
       
       if (i == hoverIndex)
       {
          ofSetColor(100, 100, 100, 100);
-         ofRect(mModalWidth * col, (i%mMaxPerColumn)*itemSpacing, mModalWidth, itemSpacing);
+         ofRect(mMaxItemWidth * col, (i%maxPerColumn)*kItemSpacing + pageHeaderShift, mMaxItemWidth, kItemSpacing);
       }
 
       if (mVar && mElements[i].mValue == *mVar)
@@ -226,14 +248,27 @@ void DropdownList::DrawDropdown(int w, int h)
       else
          ofSetColor(255,255,255);
       
-      DrawTextNormal(mElements[i].mLabel, 1+mModalWidth*col, (i%mMaxPerColumn)*itemSpacing+12);
+      DrawTextNormal(mElements[i].mLabel, 1 + mMaxItemWidth * col, (i%maxPerColumn)*kItemSpacing + 12 + pageHeaderShift);
    }
    ofSetColor(255,255,255);
+
+   if (paged)
+   {
+      DrawTextNormal("page " + ofToString(mCurrentPagedColumn / displayColumns + 1) + "/" + ofToString(totalColumns / displayColumns + 1), 30, 14);
+   }
+
    ofSetLineWidth(.5f);
    ofNoFill();
    ofRect(0,0,w,h);
 
    ofPopStyle();
+}
+
+void DropdownList::ChangePage(int direction)
+{
+   int newColumn = mCurrentPagedColumn + direction * mDisplayColumns;
+   if (newColumn >= 0 && newColumn < ceil(float(mTotalColumns) / mDisplayColumns) * mDisplayColumns)
+      mCurrentPagedColumn = newColumn;
 }
 
 void DropdownList::GetDimensions(float& width, float& height)
@@ -244,11 +279,15 @@ void DropdownList::GetDimensions(float& width, float& height)
    height = mHeight;
 }
 
-void DropdownList::DropdownClicked(int x, int y)
+bool DropdownList::DropdownClickedAt(int x, int y)
 {
-   int index = GetItemIndex(x,y);
+   int index = GetItemIndexAt(x,y);
    if (index >= 0 && index < mElements.size())
+   {
       SetIndex(index, K(forceUpdate));
+      return true;
+   }
+   return false;
 }
 
 namespace
@@ -279,6 +318,8 @@ void DropdownList::OnClicked(int x, int y, bool right)
    if (mElements.empty())
       return;
 
+   mModalList.SetUpModal();
+
    ofVec2f modalPos = GetModalListPosition();
    mModalList.SetOwningContainer(GetModuleParent()->GetOwningContainer());
 
@@ -287,11 +328,16 @@ void DropdownList::OnClicked(int x, int y, bool right)
    float maxX = ofGetWidth() - 5;
    float maxY = ofGetHeight() - 5;
 
-   const int kMinPerColumn = 1;
-   mMaxPerColumn = std::max(kMinPerColumn, int((maxY - screenY) / (itemSpacing * GetModuleParent()->GetOwningContainer()->GetDrawScale())));
+   const int kMinPerColumn = 3;
+   mMaxPerColumn = std::max(kMinPerColumn, int((maxY - screenY) / (kItemSpacing * GetModuleParent()->GetOwningContainer()->GetDrawScale())));
+   mTotalColumns = 1 + ((int)mElements.size() - 1) / mMaxPerColumn;
+   int maxDisplayColumns = std::max(1, int((ofGetWidth() / GetModuleParent()->GetOwningContainer()->GetDrawScale()) / mMaxItemWidth));
+   mDisplayColumns = std::min(mTotalColumns, maxDisplayColumns);
+   mCurrentPagedColumn = 0;
 
-   int columns = 1 + ((int)mElements.size() - 1) / mMaxPerColumn;
-   ofVec2f modalDimensions(mModalWidth*columns, itemSpacing * std::min((int)mElements.size(), mMaxPerColumn));
+   bool paged = (mDisplayColumns < mTotalColumns);
+
+   ofVec2f modalDimensions(mMaxItemWidth*mDisplayColumns, kItemSpacing * std::min((int)mElements.size(), mMaxPerColumn + (paged ? 1 : 0)));
    modalPos.x = std::max(FromScreenPosX(5.0f, GetModuleParent()), std::min(modalPos.x, FromScreenPosX(maxX - modalDimensions.x * GetModuleParent()->GetOwningContainer()->GetDrawScale(), GetModuleParent())));
    mModalList.SetPosition(modalPos.x, modalPos.y);
    mModalList.SetDimensions(modalDimensions.x, modalDimensions.y);
@@ -299,9 +345,18 @@ void DropdownList::OnClicked(int x, int y, bool right)
    TheSynth->PushModalFocusItem(&mModalList);
 }
 
-int DropdownList::GetItemIndex(int x, int y)
+int DropdownList::GetItemIndexAt(int x, int y)
 {
-   return y / itemSpacing + x / mModalWidth * mMaxPerColumn;
+   bool paged = (mDisplayColumns < mTotalColumns);
+   int indexOffset = 0;
+   if (paged)
+   {
+      y -= kPageBarSpacing;
+      if (y < 0)
+         return -1;
+      indexOffset = mCurrentPagedColumn * mMaxPerColumn;
+   }
+   return y / kItemSpacing + x / mMaxItemWidth * mMaxPerColumn + indexOffset;
 }
 
 ofVec2f DropdownList::GetModalListPosition() const
@@ -310,7 +365,7 @@ ofVec2f DropdownList::GetModalListPosition() const
    GetPosition(thisx, thisy);
    if (mDrawLabel)
       thisx += mLabelSize;
-   return ofVec2f(thisx, thisy + itemSpacing);
+   return ofVec2f(thisx, thisy + kItemSpacing);
 }
 
 bool DropdownList::MouseMoved(float x, float y)
@@ -328,7 +383,7 @@ void DropdownList::Clear()
    mElements.clear();
    if (mAutoCalculateWidth)
       mWidth = 35;
-   mHeight = itemSpacing;
+   mHeight = kItemSpacing;
 }
 
 void DropdownList::SetFromMidiCC(float slider, bool setViaModulator /*= false*/)
@@ -477,14 +532,40 @@ void DropdownList::LoadState(FileStreamIn& in, bool shouldSetValue)
    }
 }
 
+void DropdownListModal::SetUpModal()
+{
+   if (mPagePrevButton == nullptr)
+      CreateUIControls();
+}
+
+void DropdownListModal::CreateUIControls()
+{
+   IDrawableModule::CreateUIControls();
+   mPagePrevButton = new ClickButton(this, " < ", 3, 3);
+   mPageNextButton = new ClickButton(this, " > ", 100, 3);
+}
+
+void DropdownListModal::SetShowPagingControls(bool show)
+{
+   if (mPagePrevButton)
+      mPagePrevButton->SetShowing(show);
+   if (mPageNextButton)
+      mPageNextButton->SetShowing(show);
+}
+
 void DropdownListModal::DrawModule()
 {
-   mOwner->DrawDropdown(mWidth, mHeight);
+   mOwner->DrawDropdown(mWidth, mHeight, mIsScrolling);
+
+   if (mPagePrevButton)
+      mPagePrevButton->Draw();
+   if (mPageNextButton)
+      mPageNextButton->Draw();
 }
 
 std::string DropdownListModal::GetHoveredLabel()
 {
-   int index = mOwner->GetItemIndex((int)mMouseX, (int)mMouseY);
+   int index = mOwner->GetItemIndexAt((int)mMouseX, (int)mMouseY);
    if (index >= 0 && index < mOwner->GetNumValues())
       return mOwner->GetElement(index).mLabel;
    return "";
@@ -492,6 +573,7 @@ std::string DropdownListModal::GetHoveredLabel()
 
 bool DropdownListModal::MouseMoved(float x, float y)
 {
+   IDrawableModule::MouseMoved(x, y);
    mMouseX = x;
    mMouseY = y;
    return false;
@@ -499,9 +581,19 @@ bool DropdownListModal::MouseMoved(float x, float y)
 
 void DropdownListModal::OnClicked(int x, int y, bool right)
 {
+   IDrawableModule::OnClicked(x, y, right);
+
    if (right)
       return;
    
-   mOwner->DropdownClicked(x,y);
-   TheSynth->PopModalFocusItem();
+   if (mOwner->DropdownClickedAt(x,y))
+      TheSynth->PopModalFocusItem();
+}
+
+void DropdownListModal::ButtonClicked(ClickButton* button)
+{
+   if (button == mPagePrevButton)
+      mOwner->ChangePage(-1);
+   if (button == mPageNextButton)
+      mOwner->ChangePage(1);
 }

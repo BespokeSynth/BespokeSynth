@@ -25,6 +25,7 @@ namespace juce {
    class Component;
    class OpenGLContext;
    class String;
+   class MouseInputSource;
 }
 
 class IAudioSource;
@@ -77,12 +78,12 @@ public:
 
    void KeyPressed(int key, bool isRepeat);
    void KeyReleased(int key);
-   void MouseMoved(int x, int y );
-   void MouseDragged(int x, int y, int button);
-   void MousePressed(int x, int y, int button);
-   void MouseReleased(int x, int y, int button);
+   void MouseMoved(int x, int y);
+   void MouseDragged(int x, int y, int button, const juce::MouseInputSource& source);
+   void MousePressed(int x, int y, int button, const juce::MouseInputSource& source);
+   void MouseReleased(int x, int y, int button, const juce::MouseInputSource& source);
    void MouseScrolled(float x, float y, bool canZoomCanvas);
-   void MouseMagnify(int x, int y, float scaleFactor);
+   void MouseMagnify(int x, int y, float scaleFactor, const juce::MouseInputSource& source);
    void FilesDropped(std::vector<std::string> files, int x, int y);
    
    void AddExtraPoller(IPollable* poller);
@@ -101,7 +102,7 @@ public:
    void AddMidiDevice(MidiDevice* device);
    void ArrangeAudioSourceDependencies();
    IDrawableModule* SpawnModuleOnTheFly(std::string moduleName, float x, float y, bool addToContainer = true);
-   void SetMoveModule(IDrawableModule* module, float offsetX, float offsetY);
+   void SetMoveModule(IDrawableModule* module, float offsetX, float offsetY, bool canStickToCursor);
    
    int GetNumInputChannels() const { return (int)mInputBuffers.size(); }
    int GetNumOutputChannels() const { return (int)mOutputBuffers.size(); }
@@ -135,7 +136,7 @@ public:
    void AddLissajousDrawer(IDrawableModule* module) { mLissajousDrawers.push_back(module); }
    bool IsLissajousDrawer(IDrawableModule* module) { return VectorContains(module, mLissajousDrawers); }
    
-   void GrabSample(ChannelBuffer* data, bool window = false, int numBars = -1);
+   void GrabSample(ChannelBuffer* data, std::string name, bool window = false, int numBars = -1);
    void GrabSample(std::string filePath);
    Sample* GetHeldSample() const { return mHeldSample; }
    void ClearHeldSample();
@@ -165,8 +166,7 @@ public:
    
    void SetGroupSelectContext(ModuleContainer* context) { mGroupSelectContext = context; }
    bool IsGroupSelecting() const { return mGroupSelectContext != nullptr; }
-   
-   bool HasNotMovedMouseSinceClick() { return mClickStartX < INT_MAX; }
+
    IDrawableModule* GetMoveModule() { return mMoveModule; }
    ModuleFactory* GetModuleFactory() { return &mModuleFactory; }
    juce::AudioDeviceManager &GetAudioDeviceManager() { return *mGlobalAudioDeviceManager; }
@@ -202,7 +202,7 @@ public:
    bool IsLoadingModule() const { return mIsLoadingModule; }
    void SetIsLoadingState(bool loading) { mIsLoadingState = loading; }
    
-   static std::string GetUserPrefsPath(bool relative);
+   static std::string GetUserPrefsPath();
    static void CrashHandler(void*);
    static void DumpStats(bool isCrash, void* crashContext);
    
@@ -219,8 +219,8 @@ public:
    double GetLastSaveTime() { return mLastSaveTime; }
    std::string GetLastSavePath() { return mCurrentSaveStatePath; }
 
-   ofxJSONElement GetUserPrefs() { return mUserPrefs; }
    UserPrefsEditor* GetUserPrefsEditor() { return mUserPrefsEditor; }
+   juce::Component* GetFileChooserParent() const;
 
    const juce::String& GetTextFromClipboard() const;
    void CopyTextToClipboard(const juce::String& text);
@@ -231,6 +231,9 @@ public:
    static float sBackgroundLissajousR;
    static float sBackgroundLissajousG;
    static float sBackgroundLissajousB;
+   static float sBackgroundR;
+   static float sBackgroundG;
+   static float sBackgroundB;
    
 private:
    void ResetLayout();
@@ -258,6 +261,7 @@ private:
    IDrawableModule* mMoveModule;
    int mMoveModuleOffsetX;
    int mMoveModuleOffsetY;
+   bool mMoveModuleCanStickToCursor{ false };   //if the most current mMoveModule can stick to the cursor if you release the mouse button before moving it
    
    ofVec2f mLastMoveMouseScreenPos;
    ofVec2f mLastMouseDragPos;
@@ -321,8 +325,6 @@ private:
    float* mSaveOutputBuffer[2];
    
    IDrawableModule* mLastClickedModule;
-   
-   ofxJSONElement mUserPrefs;
    bool mInitialized;
    
    ofRectangle mDrawRect;
@@ -365,9 +367,6 @@ private:
    std::string mFatalError;
    
    double mLastClapboardTime;
-
-   float mScrollMultiplierHorizontal;
-   float mScrollMultiplierVertical;
 
    double mPixelRatio;
 

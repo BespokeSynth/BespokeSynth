@@ -169,7 +169,7 @@ void FMSynth::PlayNote(double time, int pitch, int velocity, int voiceIdx, Modul
    if (!mEnabled)
       return;
 
-   if (!NoteInputBuffer::IsTimeWithinFrame(time))
+   if (!NoteInputBuffer::IsTimeWithinFrame(time) && GetTarget())
    {
       mNoteInputBuffer.QueueNote(time, pitch, velocity, voiceIdx, modulation);
       return;
