@@ -387,6 +387,9 @@ if (APPLE)
         BESPOKE_MAC=1
         JUCE_PLUGINHOST_AU=0 # this needs work but if you turn it to 1 with the link below it works
         )
+    set_target_properties(BespokeSynth PROPERTIES
+        XCODE_ATTRIBUTE_ENABLE_HARDENED_RUNTIME YES
+        )
     target_sources(BespokeSynth PRIVATE
         CFMessaging/KontrolKommunicator.cpp
         CFMessaging/ListenPort.cpp
@@ -395,6 +398,19 @@ if (APPLE)
         KompleteKontrol.cpp
         )
     target_link_libraries(BespokeSynth PRIVATE "-framework CoreAudioKit")
+
+    if (BESPOKE_SIGN_AS)
+        add_custom_target(BespokeSynthSigned)
+        add_dependencies(BespokeSynthSigned BespokeSynth)
+
+        get_target_property(SIGN_HERE BespokeSynth RUNTIME_OUTPUT_DIRECTORY)
+        add_custom_command(TARGET BespokeSynthSigned POST_BUILD VERBATIM
+                WORKING_DIRECTORY ${SIGN_HERE}
+                COMMAND codesign --force -s "${BESPOKE_SIGN_AS}" --deep BespokeSynth.app/Contents/Frameworks/Python.framework/
+                COMMAND find BespokeSynth.app/Contents/Frameworks/Python.framework/Versions/ -name *.so -exec codesign --force -s "${BESPOKE_SIGN_AS}" {} \;
+                COMMAND codesign --force -s "${BESPOKE_SIGN_AS}" -o runtime --deep BespokeSynth.app
+                )
+    endif()
 elseif (WIN32)
     target_compile_definitions(BespokeSynth PRIVATE BESPOKE_WINDOWS=1)
 
