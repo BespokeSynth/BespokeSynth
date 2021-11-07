@@ -425,15 +425,17 @@ if (APPLE)
         if ("${CMAKE_XCODE_ATTRIBUTE_CODE_SIGN_IDENTITY}" STREQUAL "")
             set(PYSIG "-")
         else()
-            set(PYSIG "${CMAKE_XCODE_ATTRIBUTE_CODE_SIGN_IDENTITY}")
+            set(PYSIG ${CMAKE_XCODE_ATTRIBUTE_CODE_SIGN_IDENTITY})
         endif()
         message(STATUS "Signing local python with ${PYSIG}")
         add_custom_command(TARGET BespokeSynth
                 POST_BUILD
                 WORKING_DIRECTORY ${CMAKE_SOURCE_DIR}
+                VERBATIM
                 COMMAND ${CMAKE_COMMAND} -E make_directory ${OUTDIR}/BespokeSynth.app/Contents/Frameworks/LocalPython
                 COMMAND ${CMAKE_COMMAND} -E copy ${Python_FRAMEWORK_DIR}/${Python_BIN} ${OUTDIR}/BespokeSynth.app/Contents/Frameworks/LocalPython
                 COMMAND codesign --remove-signature ${OUTDIR}/BespokeSynth.app/Contents/Frameworks/LocalPython/${Python_BIN}
+                COMMAND echo codesign -s "${PYSIG}" ${OUTDIR}/BespokeSynth.app/Contents/Frameworks/LocalPython/${Python_BIN}
                 COMMAND codesign -s "${PYSIG}" ${OUTDIR}/BespokeSynth.app/Contents/Frameworks/LocalPython/${Python_BIN}
                 # THis is the 'normal' case
                 COMMAND install_name_tool -change "${Python_FRAMEWORK_DIR}/${Python_BIN}" "@executable_path/../Frameworks/LocalPython/${Python_BIN}" ${OUTDIR}/BespokeSynth.app/Contents/MacOS/BespokeSynth
