@@ -3,7 +3,7 @@
   "background": "background.png",
   "icon-size": 80,
   "contents": [
-    { "x": 192, "y": 338, "type": "file", "path": "BespokeSynth" },
+    { "x": 192, "y": 338, "type": "file", "path": "BespokeSynth.app" },
     { "x": 448, "y": 338, "type": "link", "path": "/Applications" }
   ]
 }
