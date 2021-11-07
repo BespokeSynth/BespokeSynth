@@ -387,6 +387,9 @@ if (APPLE)
         BESPOKE_MAC=1
         JUCE_PLUGINHOST_AU=0 # this needs work but if you turn it to 1 with the link below it works
         )
+    set_target_properties(BespokeSynth PROPERTIES
+         XCODE_ATTRIBUTE_ENABLE_HARDENED_RUNTIME YES
+         )
     target_sources(BespokeSynth PRIVATE
         CFMessaging/KontrolKommunicator.cpp
         CFMessaging/ListenPort.cpp
@@ -395,6 +398,50 @@ if (APPLE)
         KompleteKontrol.cpp
         )
     target_link_libraries(BespokeSynth PRIVATE "-framework CoreAudioKit")
+
+    if (NOT BESPOKE_PORTABLE)
+        get_target_property(OUTDIR BespokeSynth RUNTIME_OUTPUT_DIRECTORY)
+
+        get_filename_component(Python_FRAMEWORK_DIR ${Python_LIBRARY_DIRS} DIRECTORY)
+        foreach( PYCAND Python Python3.9 Python3.8 Python3)
+            if (EXISTS "${Python_FRAMEWORK_DIR}/${PYCAND}")
+                set( Python_BIN "${PYCAND}")
+            endif()
+        endforeach()
+        if (NOT DEFINED Python_BIN)
+            message( FATAL_ERROR "Bespoke: Cannot find python binary. Consider setting BESPOKE_PYTHON_ROOT" )
+        endif()
+
+        string( FIND ${Python_FRAMEWORK_DIR} "Xcode.app" IS_PYTHON_XCODE)
+        if (${IS_PYTHON_XCODE} GREATER 0)
+            message( WARNING "Your python built environment came from Xcode.app. "
+                    "This may not be what you want. Consider setting BESPOKE_PYTHON_ROOT to "
+                    "a python install of your choosing. Especially, if you are on an M1 "
+                    "mac and use homebrew, you may want to use something like "
+                    "'-DBESPOKE_PYTHON_ROOT=/opt/homebrew/Cellar/python\@3.9/3.9.6'")
+        endif()
+
+        message(STATUS "Making local python to allow runnable executable on non-py machines")
+        if ("${CMAKE_XCODE_ATTRIBUTE_CODE_SIGN_IDENTITY}" STREQUAL "")
+            set(PYSIG "-")
+        else()
+            set(PYSIG "${CMAKE_XCODE_ATTRIBUTE_CODE_SIGN_IDENTITY}")
+        endif()
+        message(STATUS "Signing local python with ${PYSIG}")
+        add_custom_command(TARGET BespokeSynth
+                POST_BUILD
+                WORKING_DIRECTORY ${CMAKE_SOURCE_DIR}
+                COMMAND ${CMAKE_COMMAND} -E make_directory ${OUTDIR}/BespokeSynth.app/Contents/Frameworks/LocalPython
+                COMMAND ${CMAKE_COMMAND} -E copy ${Python_FRAMEWORK_DIR}/${Python_BIN} ${OUTDIR}/BespokeSynth.app/Contents/Frameworks/LocalPython
+                COMMAND codesign --remove-signature ${OUTDIR}/BespokeSynth.app/Contents/Frameworks/LocalPython/${Python_BIN}
+                COMMAND codesign -s "${PYSIG}" ${OUTDIR}/BespokeSynth.app/Contents/Frameworks/LocalPython/${Python_BIN}
+                # THis is the 'normal' case
+                COMMAND install_name_tool -change "${Python_FRAMEWORK_DIR}/${Python_BIN}" "@executable_path/../Frameworks/LocalPython/${Python_BIN}" ${OUTDIR}/BespokeSynth.app/Contents/MacOS/BespokeSynth
+                # These are the 'got it from xcode by mistake' cases
+                COMMAND install_name_tool -change "@rpath/Python3.framework/Versions/3.8/Python3" "@executable_path/../Frameworks/LocalPython/${Python_BIN}" ${OUTDIR}/BespokeSynth.app/Contents/MacOS/BespokeSynth
+                COMMAND install_name_tool -change "@rpath/Python3.framework/Versions/3.9/Python3" "@executable_path/../Frameworks/LocalPython/${Python_BIN}" ${OUTDIR}/BespokeSynth.app/Contents/MacOS/BespokeSynth
+                )
+    endif()
 elseif (WIN32)
     target_compile_definitions(BespokeSynth PRIVATE BESPOKE_WINDOWS=1)
 
