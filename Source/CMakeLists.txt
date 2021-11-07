@@ -10,6 +10,7 @@ juce_add_gui_app(BespokeSynth
     FILE_SHARING_ENABLED          TRUE
     DOCUMENT_BROWSER_ENABLED      TRUE
     DOCUMENT_EXTENSIONS           .bsk
+    BUNDLE_ID                     com.ryanchallinor.bespokesynth
     )
 
 bespoke_buildtime_version_info(BespokeSynth)
