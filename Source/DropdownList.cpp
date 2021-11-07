@@ -171,7 +171,7 @@ void DropdownList::Render()
    
    DrawHover(mX+xOffset, mY, w-xOffset, h);
    
-   if (mLastScrolledTime + 300 > gTime && TheSynth->GetTopModalFocusItem() != &mModalList && !Push2Control::sDrawingPush2Display && mElements.size() < mMaxPerColumn)
+   if (mLastScrolledTime + 300 > gTime && TheSynth->GetTopModalFocusItem() != &mModalList && !Push2Control::sDrawingPush2Display)
    {
       const float kCentering = 7;
       float w, h;
@@ -180,7 +180,9 @@ void DropdownList::Render()
       mModalList.SetPosition(0, 0);
       ofPushMatrix();
       ofTranslate(mX, mY + kCentering - h * mSliderVal);
+      mModalList.SetIsScrolling(true);
       mModalList.Render();
+      mModalList.SetIsScrolling(false);
       ofPopMatrix();
 
       ofPushStyle();
@@ -193,9 +195,12 @@ void DropdownList::Render()
    }
 }
 
-void DropdownList::DrawDropdown(int w, int h)
+void DropdownList::DrawDropdown(int w, int h, bool isScrolling)
 {
    ofPushStyle();
+
+   if (isScrolling)
+      mModalList.SetDimensions(mMaxItemWidth, (int)mElements.size() * kItemSpacing);
 
    int hoverIndex = -1;
    float dropdownW, dropdownH;
@@ -206,11 +211,13 @@ void DropdownList::DrawDropdown(int w, int h)
    int maxPerColumn = mMaxPerColumn;
    int displayColumns = mDisplayColumns;
    int totalColumns = mTotalColumns;
-   if (Push2Control::sDrawingPush2Display)
+   int currentPagedColumn = mCurrentPagedColumn;
+   if (isScrolling)
    {
       maxPerColumn = 9999;
       displayColumns = 1;
       totalColumns = 1;
+      mCurrentPagedColumn = 0;
    }
 
    bool paged = (displayColumns < totalColumns);
@@ -222,7 +229,7 @@ void DropdownList::DrawDropdown(int w, int h)
    ofRect(0,0,w,h);
    for (int i=0; i<mElements.size(); ++i)
    {
-      int col = i / maxPerColumn - mCurrentPagedColumn;
+      int col = i / maxPerColumn - currentPagedColumn;
 
       if (col < 0)
          continue;
@@ -540,16 +547,20 @@ void DropdownListModal::CreateUIControls()
 
 void DropdownListModal::SetShowPagingControls(bool show)
 {
-   mPagePrevButton->SetShowing(show);
-   mPageNextButton->SetShowing(show);
+   if (mPagePrevButton)
+      mPagePrevButton->SetShowing(show);
+   if (mPageNextButton)
+      mPageNextButton->SetShowing(show);
 }
 
 void DropdownListModal::DrawModule()
 {
-   mOwner->DrawDropdown(mWidth, mHeight);
+   mOwner->DrawDropdown(mWidth, mHeight, mIsScrolling);
 
-   mPagePrevButton->Draw();
-   mPageNextButton->Draw();
+   if (mPagePrevButton)
+      mPagePrevButton->Draw();
+   if (mPageNextButton)
+      mPageNextButton->Draw();
 }
 
 std::string DropdownListModal::GetHoveredLabel()

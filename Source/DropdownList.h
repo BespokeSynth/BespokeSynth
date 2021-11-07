@@ -67,19 +67,21 @@ public:
    float GetMouseX() { return mMouseX; }
    float GetMouseY() { return mMouseY; }
    void SetShowPagingControls(bool show);
+   void SetIsScrolling(bool scrolling) { mIsScrolling = scrolling; }
 
    void ButtonClicked(ClickButton* button) override;
 
 private:
    void OnClicked(int x, int y, bool right) override;
-   int mWidth;
-   int mHeight;
-   int mColumnWidth;
+   int mWidth{ 1 };
+   int mHeight{ 1 };
+   int mColumnWidth{ 1 };
    float mMouseX;
    float mMouseY;
    DropdownList* mOwner;
    ClickButton* mPagePrevButton{ nullptr };
    ClickButton* mPageNextButton{ nullptr };
+   bool mIsScrolling{ false };
 };
 
 class DropdownList : public IUIControl
@@ -93,7 +95,7 @@ public:
    void Render() override;
    bool MouseMoved(float x, float y) override;
    void MouseReleased() override;
-   void DrawDropdown(int w, int h);
+   void DrawDropdown(int w, int h, bool isScrolling);
    bool DropdownClickedAt(int x, int y);
    void SetIndex(int i, bool forceUpdate = false);
    void Clear();
