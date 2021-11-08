@@ -408,6 +408,9 @@ if (APPLE)
                 WORKING_DIRECTORY ${SIGN_HERE}
                 COMMAND codesign --force -s "${BESPOKE_SIGN_AS}" --deep BespokeSynth.app/Contents/Frameworks/Python.framework/
                 COMMAND find BespokeSynth.app/Contents/Frameworks/Python.framework/Versions/ -name *.so -exec codesign --force -s "${BESPOKE_SIGN_AS}" {} \;
+                COMMAND find BespokeSynth.app/Contents/Frameworks/Python.framework/Versions/ -name *.o -exec codesign --force -s "${BESPOKE_SIGN_AS}" {} \;
+                COMMAND find BespokeSynth.app/Contents/Frameworks/Python.framework/Versions/ -name python3* -perm +111 -exec codesign -o runtime --force -s "${BESPOKE_SIGN_AS}" {} \;
+                COMMAND find BespokeSynth.app/Contents/Frameworks/Python.framework/Versions/ -name Python -exec codesign -o runtime --force -s "${BESPOKE_SIGN_AS}" {} \;
                 COMMAND codesign --force -s "${BESPOKE_SIGN_AS}" -o runtime --deep BespokeSynth.app
                 )
     endif()
