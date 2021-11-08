@@ -360,10 +360,16 @@ void MidiController::OnTransportAdvanced(float amount)
    }
    mQueuedNotes.clear();
    
-   for (auto note = mQueuedControls.begin(); note != mQueuedControls.end(); ++note)
+   for (auto ctrl = mQueuedControls.begin(); ctrl != mQueuedControls.end(); ++ctrl)
    {
+      int voiceIdx = -1;
+
+      if (mUseChannelAsVoice)
+         voiceIdx = ctrl->mChannel - 1;
+
+      SendCCOutput(ctrl->mControl, ctrl->mValue, voiceIdx);
       for (auto i = mListeners[mControllerPage].begin(); i != mListeners[mControllerPage].end(); ++i)
-         (*i)->OnMidiControl(*note);
+         (*i)->OnMidiControl(*ctrl);
    }
    mQueuedControls.clear();
    
