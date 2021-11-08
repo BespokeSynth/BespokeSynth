@@ -400,6 +400,7 @@ if (APPLE)
     target_link_libraries(BespokeSynth PRIVATE "-framework CoreAudioKit")
 
     if (BESPOKE_SIGN_AS)
+        message(STATUS "Creating target BespokeSynthSigned")
         add_custom_target(BespokeSynthSigned)
         add_dependencies(BespokeSynthSigned BespokeSynth)
 
@@ -409,9 +410,9 @@ if (APPLE)
                 COMMAND codesign --force -s "${BESPOKE_SIGN_AS}" --deep BespokeSynth.app/Contents/Frameworks/Python.framework/
                 COMMAND find BespokeSynth.app/Contents/Frameworks/Python.framework/Versions/ -name *.so -exec codesign --force -s "${BESPOKE_SIGN_AS}" {} \;
                 COMMAND find BespokeSynth.app/Contents/Frameworks/Python.framework/Versions/ -name *.o -exec codesign --force -s "${BESPOKE_SIGN_AS}" {} \;
-                COMMAND find BespokeSynth.app/Contents/Frameworks/Python.framework/Versions/ -name python3* -perm +111 -exec codesign -o runtime --force -s "${BESPOKE_SIGN_AS}" {} \;
-                COMMAND find BespokeSynth.app/Contents/Frameworks/Python.framework/Versions/ -name Python -exec codesign -o runtime --force -s "${BESPOKE_SIGN_AS}" {} \;
-                COMMAND codesign --force -s "${BESPOKE_SIGN_AS}" -o runtime --deep BespokeSynth.app
+                COMMAND find BespokeSynth.app/Contents/Frameworks/Python.framework/Versions/ -name python3* -perm +111 -exec codesign -o runtime --entitlements "${CMAKE_SOURCE_DIR}/scripts/installer_macOS/entitlements.plist" --force -s "${BESPOKE_SIGN_AS}"  {} \;
+                COMMAND find BespokeSynth.app/Contents/Frameworks/Python.framework/Versions/ -name Python -exec codesign -o runtime --entitlements "${CMAKE_SOURCE_DIR}/scripts/installer_macOS/entitlements.plist" --force -s "${BESPOKE_SIGN_AS}" {} \;
+                COMMAND codesign --force -s "${BESPOKE_SIGN_AS}" -o runtime --entitlements "${CMAKE_SOURCE_DIR}/scripts/installer_macOS/entitlements.plist" --deep BespokeSynth.app
                 )
     endif()
 elseif (WIN32)
