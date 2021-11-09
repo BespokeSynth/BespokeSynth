@@ -57,6 +57,7 @@ float ModularSynth::sBackgroundLissajousB = 0.418f;
 float ModularSynth::sBackgroundR = 0.09f;
 float ModularSynth::sBackgroundG = 0.09f;
 float ModularSynth::sBackgroundB = 0.09f;
+int ModularSynth::sLoadingFileSaveStateRev = ModularSynth::kSaveStateRev;
 
 #if BESPOKE_WINDOWS
 LONG WINAPI TopLevelExceptionHandler(PEXCEPTION_POINTERS pExceptionInfo);
