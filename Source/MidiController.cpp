@@ -362,12 +362,16 @@ void MidiController::OnTransportAdvanced(float amount)
    
    for (auto ctrl = mQueuedControls.begin(); ctrl != mQueuedControls.end(); ++ctrl)
    {
-      int voiceIdx = -1;
+      if (mSendCCOutput)
+      {
+         int voiceIdx = -1;
 
-      if (mUseChannelAsVoice)
-         voiceIdx = ctrl->mChannel - 1;
+         if (mUseChannelAsVoice)
+            voiceIdx = ctrl->mChannel - 1;
 
-      SendCCOutput(ctrl->mControl, ctrl->mValue, voiceIdx);
+         SendCCOutput(ctrl->mControl, ctrl->mValue, voiceIdx);
+      }
+
       for (auto i = mListeners[mControllerPage].begin(); i != mListeners[mControllerPage].end(); ++i)
          (*i)->OnMidiControl(*ctrl);
    }
@@ -2259,6 +2263,7 @@ void MidiController::LoadLayout(const ofxJSONElement& moduleInfo)
    
    mModuleSaveData.LoadInt("outchannel", moduleInfo, 1, 1, 16);
    
+   mModuleSaveData.LoadBool("send_cc_output", moduleInfo, true);
    mModuleSaveData.LoadBool("negativeedge",moduleInfo,false);
    mModuleSaveData.LoadBool("incrementalsliders", moduleInfo, false);
    mModuleSaveData.LoadBool("twoway_on_change", moduleInfo, true);
@@ -2289,6 +2294,7 @@ void MidiController::SetUpFromSaveData()
    mOutChannel = mModuleSaveData.GetInt("outchannel");
    assert(mOutChannel > 0 && mOutChannel <= 16);
    
+   mSendCCOutput = mModuleSaveData.GetBool("send_cc_output");
    UseNegativeEdge(mModuleSaveData.GetBool("negativeedge"));
    mSlidersDefaultToIncremental = mModuleSaveData.GetBool("incrementalsliders");
    mSendTwoWayOnChange = mModuleSaveData.GetBool("twoway_on_change");
