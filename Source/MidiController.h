@@ -386,7 +386,7 @@ private:
    double mInitialConnectionTime;
    ofxJSONElement mConnectionsJson;
    std::list<UIControlConnection*> mConnections;
-   bool mSendCCOutput{ true };
+   bool mSendCCOutput{ false };
    bool mUseNegativeEdge;  //for midi toggle, accept on or off as a button press
    bool mSlidersDefaultToIncremental;
    bool mBindMode;
