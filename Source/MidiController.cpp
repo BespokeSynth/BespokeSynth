@@ -2263,7 +2263,7 @@ void MidiController::LoadLayout(const ofxJSONElement& moduleInfo)
    
    mModuleSaveData.LoadInt("outchannel", moduleInfo, 1, 1, 16);
    
-   mModuleSaveData.LoadBool("send_cc_output", moduleInfo, true);
+   mModuleSaveData.LoadBool("send_cc_output", moduleInfo, false);
    mModuleSaveData.LoadBool("negativeedge",moduleInfo,false);
    mModuleSaveData.LoadBool("incrementalsliders", moduleInfo, false);
    mModuleSaveData.LoadBool("twoway_on_change", moduleInfo, true);
