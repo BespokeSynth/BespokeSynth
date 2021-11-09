@@ -338,7 +338,7 @@ void ControlSequencer::LoadState(FileStreamIn& in)
 {
    mLoadRev = -1;
 
-   if (ModuleContainer::sFileSaveStateRev >= 422)
+   if (ModularSynth::sLoadingFileSaveStateRev >= 422)
    {
       in >> mLoadRev;
       LoadStateValidate(mLoadRev <= kSaveStateRev);
@@ -346,7 +346,7 @@ void ControlSequencer::LoadState(FileStreamIn& in)
 
    IDrawableModule::LoadState(in);
    
-   if (ModuleContainer::sFileSaveStateRev <= 421)
+   if (ModularSynth::sLoadingFileSaveStateRev <= 421)
    {
       in >> mLoadRev;
       LoadStateValidate(mLoadRev <= kSaveStateRev);

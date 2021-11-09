@@ -234,6 +234,9 @@ public:
    static float sBackgroundR;
    static float sBackgroundG;
    static float sBackgroundB;
+
+   static int sLoadingFileSaveStateRev;
+   static constexpr int kSaveStateRev = 422;
    
 private:
    void ResetLayout();
