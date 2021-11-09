@@ -51,6 +51,8 @@ public:
    
    void CreateUIControls() override;
    void Init() override;
+   void SetEnabled(bool enabled) override { mEnabled = enabled; }
+   bool HasDebugDraw() const override { return true; }
 
    void SetDisplayer(LaunchpadNoteDisplayer* displayer) { mDisplayer = displayer; }
    void DisplayNote(int pitch, int velocity);
@@ -104,8 +106,11 @@ private:
 
    //IDrawableModule
    void DrawModule() override;
+   void DrawModuleUnclipped() override;
    void GetModuleDimensions(float& width, float& height) override { width=120; height=74; }
+   bool Enabled() const override { return mEnabled; }
    
+   void PlayKeyboardNote(double time, int pitch, int velocity);
    void UpdateLights(bool force = false);
    GridColor GetGridSquareColor(int x, int y);
    int GridToPitch(int x, int y);
@@ -139,6 +144,8 @@ private:
    bool mPreserveChordRoot;
    Checkbox* mPreserveChordRootCheckbox;
    GridControlTarget* mGridControlTarget;
+
+   std::string mDebugLines;
 };
 
 #endif /* defined(__modularSynth__LaunchpadKeyboard__) */
