@@ -464,11 +464,13 @@ void ModularSynth::ZoomView(float zoomAmount, bool fromMouse)
       zoomCenter = ofVec2f(ofGetWidth() / gDrawScale * .5f, ofGetHeight() / gDrawScale * .5f);
    GetDrawOffset() -= zoomCenter * zoomAmount;
    mZoomer.CancelMovement();
+   mHideTooltipsUntilMouseMove = true;
 }
 
 void ModularSynth::PanView(float x, float y)
 {
    GetDrawOffset() += ofVec2f(x, y) / gDrawScale;
+   mHideTooltipsUntilMouseMove = true;
 }
 
 void ModularSynth::Draw(void* vg)
@@ -638,6 +640,7 @@ void ModularSynth::Draw(void* vg)
    std::string tooltip = "";
    ModuleContainer* tooltipContainer = nullptr;
    if (HelpDisplay::sShowTooltips && 
+       !mHideTooltipsUntilMouseMove &&
        !IUIControl::WasLastHoverSetViaTab() &&
        mGroupSelectContext == nullptr &&
        PatchCable::sActivePatchCable == nullptr &&
@@ -884,6 +887,8 @@ IDrawableModule* ModularSynth::GetLastClickedModule() const
 
 void ModularSynth::KeyPressed(int key, bool isRepeat)
 {
+   mHideTooltipsUntilMouseMove = true;
+
    if (gHoveredUIControl &&
        IKeyboardFocusListener::GetActiveKeyboardFocus() == nullptr &&
        !isRepeat)
@@ -1052,6 +1057,8 @@ void ModularSynth::MouseMoved(int intX, int intY)
          float y = GetMouseY(modal->GetOwningContainer());
          modal->NotifyMouseMoved(x, y);
       }
+
+      mHideTooltipsUntilMouseMove = false;
    }
 
    if (mMoveModule)
