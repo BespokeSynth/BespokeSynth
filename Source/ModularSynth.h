@@ -348,6 +348,7 @@ private:
    
    ofVec2f mMousePos;
    std::string mNextDrawTooltip;
+   bool mHideTooltipsUntilMouseMove{ false };
    
    juce::AudioDeviceManager* mGlobalAudioDeviceManager;
    juce::AudioFormatManager* mGlobalAudioFormatManager;
