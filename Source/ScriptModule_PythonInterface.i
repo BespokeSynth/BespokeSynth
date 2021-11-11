@@ -270,10 +270,14 @@ PYBIND11_EMBEDDED_MODULE(notesequencer, m)
       return ret;
    }, py::return_value_policy::reference);
    py::class_<NoteStepSequencer, IDrawableModule>(m, "notesequencer")
-      .def("set_step", [](NoteStepSequencer& seq, int step, int pitch, int velocity, float length)
+      .def("set_step", [](NoteStepSequencer& seq, int step, int row, int velocity, float length)
       {
-         seq.SetStep(step, pitch, velocity, length);
-      });
+         seq.SetStep(step, row, velocity, length);
+      }, "step"_a, "row"_a, "velocity"_a = 127, "length"_a = 1.0)
+      .def("set_pitch", [](NoteStepSequencer& seq, int step, int pitch, int velocity, float length)
+      {
+         seq.SetPitch(step, pitch, velocity, length);
+      }, "step"_a, "pitch"_a, "velocity"_a = 127, "length"_a = 1.0);
 }
 
 PYBIND11_EMBEDDED_MODULE(drumsequencer, m)
