@@ -10,3 +10,6 @@ class notecanvas:
    def clear(this, ):
       pass
 
+   def fit(this, ):
+      pass
+

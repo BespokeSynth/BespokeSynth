@@ -70,7 +70,10 @@ import notesequencer
    static:
       notesequencer.get(path)
    instance:
-      n.set_step(step, pitch, velocity, length)
+      n.set_step(step, row, velocity, length)
+         optional: velocity = 127, length = 1.0
+      n.set_pitch(step, pitch, velocity, length)
+         optional: velocity = 127, length = 1.0
 
 
 import drumsequencer
@@ -107,6 +110,7 @@ import notecanvas
    instance:
       n.add_note(measurePos, pitch, velocity, length)
       n.clear()
+      n.fit()
 
 
 import sampleplayer
