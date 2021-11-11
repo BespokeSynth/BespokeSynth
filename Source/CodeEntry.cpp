@@ -273,6 +273,8 @@ void CodeEntry::Render()
    ofColor color = ofColor::white;
    
    ofFill();
+
+   bool hasUnpublishedCode = (mString != mPublishedString);
    
    if (isCurrent)
    {
@@ -280,10 +282,10 @@ void CodeEntry::Render()
    }
    else
    {
-      if (mString != mPublishedString)
-         ofSetColor(publishedBg);
-      else
+      if (hasUnpublishedCode)
          ofSetColor(unpublishedBg);
+      else
+         ofSetColor(publishedBg);
    }
    ofRect(mX, mY, w, h);
    
@@ -304,7 +306,7 @@ void CodeEntry::Render()
       ofSetColor(255, 0, 0, gModuleDrawAlpha);
       ofSetLineWidth(2);
    }
-   else if (mString != mPublishedString)
+   else if (hasUnpublishedCode)
    {
       float highlight = 1 - ofClamp(timeSincePublished / 150, 0, 1);
       ofSetColor(ofLerp(170,255,highlight), 255, ofLerp(170,255,highlight), gModuleDrawAlpha);
@@ -329,7 +331,7 @@ void CodeEntry::Render()
    mCharWidth = gFontFixedWidth.GetStringWidth("x", mFontSize);
    mCharHeight = gFontFixedWidth.GetStringHeight("x", mFontSize);
    
-   if (mString != mPublishedString)
+   if (hasUnpublishedCode)
    {
       ofSetColor(color, gModuleDrawAlpha * .05f);
       gFontFixedWidth.DrawString(mPublishedString, mFontSize, mX+2 - mScroll.x, mY + mCharHeight - mScroll.y);
@@ -715,7 +717,7 @@ void CodeEntry::OnCodeUpdated()
 
 bool CodeEntry::IsAutocompleteShowing()
 {
-   if (!mWantToShowAutocomplete || mCaretPosition != mCaretPosition2)
+   if (!mWantToShowAutocomplete || mCaretPosition != mCaretPosition2 || mString == mPublishedString)
       return false;
 
    if (mAutocompletes[0].valid == false && mAutocompleteSignatures[0].valid == false)
@@ -1380,22 +1382,22 @@ void CodeEntry::SetStyleFromJSON(const ofxJSONElement &vdict) {
            }
         }
     };
-    fromRGB( "currentBg", currentBg);
+    fromRGB("currentBg", currentBg);
     fromRGB("publishedBg", publishedBg);
-    fromRGB( "unpublishedBg", unpublishedBg);
-    fromRGB( "string", stringColor);
-    fromRGB( "number", numberColor);
-    fromRGB( "name1", name1Color);
-    fromRGB( "name2", name2Color);
-    fromRGB( "defined", definedColor);
-    fromRGB( "equals", equalsColor);
-    fromRGB( "paren", parenColor);
-    fromRGB( "brace", braceColor);
-    fromRGB( "bracket", bracketColor);
-    fromRGB( "op", opColor);
-    fromRGB( "comma", commaColor);
-    fromRGB( "comment", commentColor);
-    fromRGB( "selectedOverlay", selectedOverlay);
+    fromRGB("unpublishedBg", unpublishedBg);
+    fromRGB("string", stringColor);
+    fromRGB("number", numberColor);
+    fromRGB("name1", name1Color);
+    fromRGB("name2", name2Color);
+    fromRGB("defined", definedColor);
+    fromRGB("equals", equalsColor);
+    fromRGB("paren", parenColor);
+    fromRGB("brace", braceColor);
+    fromRGB("bracket", bracketColor);
+    fromRGB("op", opColor);
+    fromRGB("comma", commaColor);
+    fromRGB("comment", commentColor);
+    fromRGB("selectedOverlay", selectedOverlay);
 
     fromRGB("jediBg", jediBg);
     fromRGB("jediIndexBg", jediIndexBg);

@@ -951,10 +951,10 @@ void ScriptModule::DropdownUpdated(DropdownList *list, int oldValue)
 void ScriptModule::RefreshStyleFiles()
 {
     ofxJSONElement root;
-    if (File(ofToDataPath("script_styles.json")).existsAsFile())
-        root.open(ofToDataPath("script_styles.json"));
+    if (File(ofToDataPath("scriptstyles.json")).existsAsFile())
+        root.open(ofToDataPath("scriptstyles.json"));
     else
-        root.open(ofToResourcePath("userdata_original/script_styles.json"));
+        root.open(ofToResourcePath("userdata_original/scriptstyles.json"));
     sStyleJSON = root["styles"];
 }
 
