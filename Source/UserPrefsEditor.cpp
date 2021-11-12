@@ -63,6 +63,12 @@ void UserPrefsEditor::Show()
 {
    UpdateDropdowns({});
    SetShowing(true);
+
+   if (TheSynth->HasFatalError())
+   {
+      mSaveButton->SetLabel("save and exit");
+      mCancelButton->SetShowing(false);
+   }
 }
 
 void UserPrefsEditor::CreatePrefsFileIfNonexistent()
@@ -256,7 +262,7 @@ void UserPrefsEditor::DrawModule()
    controlY += 17;
    mSaveButton->SetPosition(controlX, controlY);
    mSaveButton->Draw();
-   mCancelButton->SetPosition(controlX + 40, controlY);
+   mCancelButton->SetPosition(mSaveButton->GetRect(K(local)).getMaxX() + 10, controlY);
    mCancelButton->Draw();
    mWidth = 1150;
    mHeight = controlY + 20;
@@ -264,7 +270,7 @@ void UserPrefsEditor::DrawModule()
    if (UserPrefs.devicetype.GetDropdown()->GetLabel(UserPrefs.devicetype.GetIndex()) == "DirectSound")
       DrawRightLabel(UserPrefs.devicetype.GetControl(), "warning: DirectSound can cause crackle and strange behavior for some sample rates and buffer sizes", ofColor::yellow);
 
-   if (!selectedDeviceType->hasSeparateInputsAndOutputs())
+   if (!selectedDeviceType->hasSeparateInputsAndOutputs() && mCategory == UserPrefCategory::General)
    {
       ofRectangle rect = UserPrefs.audio_output_device.GetControl()->GetRect(true);
       ofPushStyle();
@@ -359,6 +365,9 @@ void UserPrefsEditor::Save()
    juce::File file(TheSynth->GetUserPrefsPath());
    file.create();
    file.replaceWithText(output);
+
+   if (TheSynth->HasFatalError())   //this popup spawned at load due to a bad init setting. in this case, the button says "save and exit"
+      juce::JUCEApplicationBase::quit();
 }
 
 void UserPrefsEditor::ButtonClicked(ClickButton* button)

@@ -2029,9 +2029,9 @@ bool ModularSynth::LoadLayoutFromFile(std::string jsonFile, bool makeDefaultLayo
       IDrawableModule* splitter = FindModule("splitter");
       IDrawableModule* output1 = FindModule("output 1");
       IDrawableModule* output2 = FindModule("output 2");
-      if (output1 != nullptr && output1->GetPosition().y > ofGetHeight() - 40)
+      if (output1 != nullptr && output1->GetPosition().y > ofGetHeight() / gDrawScale - 40)
       {
-         float offset = ofGetHeight() - output1->GetPosition().y - 40;
+         float offset = ofGetHeight() / gDrawScale - output1->GetPosition().y - 40;
          if (gain != nullptr)
             gain->SetPosition(gain->GetPosition().x, gain->GetPosition().y + offset);
          if (splitter != nullptr)
@@ -2042,9 +2042,9 @@ bool ModularSynth::LoadLayoutFromFile(std::string jsonFile, bool makeDefaultLayo
             output2->SetPosition(output2->GetPosition().x, output2->GetPosition().y + offset);
       }
 
-      if (output2 != nullptr && output2->GetPosition().x > ofGetWidth() - 100)
+      if (output2 != nullptr && output2->GetPosition().x > ofGetWidth() / gDrawScale - 100)
       {
-         float offset = ofGetWidth() - output2->GetPosition().x - 100;
+         float offset = ofGetWidth() / gDrawScale - output2->GetPosition().x - 100;
          if (gain != nullptr)
             gain->SetPosition(gain->GetPosition().x + offset, gain->GetPosition().y);
          if (splitter != nullptr)
