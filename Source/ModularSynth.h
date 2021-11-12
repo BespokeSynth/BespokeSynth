@@ -132,6 +132,7 @@ public:
    void LoadLayout(ofxJSONElement json);
    std::string GetLoadedLayout() const { return mLoadedLayoutPath; }
    void ReloadInitialLayout() { mWantReloadInitialLayout = true; }
+   bool HasFatalError() { return mFatalError != ""; }
    
    void AddLissajousDrawer(IDrawableModule* module) { mLissajousDrawers.push_back(module); }
    bool IsLissajousDrawer(IDrawableModule* module) { return VectorContains(module, mLissajousDrawers); }
