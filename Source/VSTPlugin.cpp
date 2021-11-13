@@ -556,8 +556,10 @@ void VSTPlugin::Process(double time)
             mWantsPanic = false;
 
             mMidiBuffer.clear();
-            mMidiBuffer.addEvent(juce::MidiMessage::allNotesOff(0), 0);
-            mMidiBuffer.addEvent(juce::MidiMessage::allSoundOff(0), 1);
+            for (int channel=1; channel<=16; ++channel)
+               mMidiBuffer.addEvent(juce::MidiMessage::allNotesOff(channel), 0);
+            for (int channel=1; channel<=16; ++channel)
+               mMidiBuffer.addEvent(juce::MidiMessage::allSoundOff(channel), 1);
          }
 
          mPlugin->processBlock(buffer, mMidiBuffer);
