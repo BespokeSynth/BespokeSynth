@@ -664,7 +664,7 @@ PYBIND11_EMBEDDED_MODULE(module, m)
       {
          float w, h;
          module.GetDimensions(w, h);
-         return h;
+         return w;
       })
       .def("get_height", [](IDrawableModule& module)
       {
