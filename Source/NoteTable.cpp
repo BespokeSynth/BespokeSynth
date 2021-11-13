@@ -53,7 +53,8 @@ NoteTable::NoteTable()
 , mGridControlOffsetX(0)
 , mGridControlOffsetY(0)
 {  
-   RandomizePitches(true);
+   for (int i=0; i < mLength; ++i)
+      mTones[i] = i;
    
    TheScale->AddListener(this);
 }
