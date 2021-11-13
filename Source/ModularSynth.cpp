@@ -887,7 +887,8 @@ IDrawableModule* ModularSynth::GetLastClickedModule() const
 
 void ModularSynth::KeyPressed(int key, bool isRepeat)
 {
-   mHideTooltipsUntilMouseMove = true;
+   if (!isRepeat)
+      mHideTooltipsUntilMouseMove = true;
 
    if (gHoveredUIControl &&
        IKeyboardFocusListener::GetActiveKeyboardFocus() == nullptr &&
