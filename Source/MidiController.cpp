@@ -41,6 +41,11 @@
 
 using namespace juce;
 
+//static
+double MidiController::sLastConnectedActivityTime = -9999;
+IUIControl* MidiController::sLastActivityUIControl = nullptr;
+double MidiController::sLastBoundControlTime = -9999;
+IUIControl* MidiController::sLastBoundUIControl = nullptr;
 bool UIControlConnection::sDrawCables = true;
 
 namespace
@@ -62,10 +67,6 @@ MidiController::MidiController()
 , mResendFeedbackOnRelease(false)
 , mControllerIndex(-1)
 , mLastActivityTime(-9999)
-, mLastConnectedActivityTime(-9999)
-, mLastActivityUIControl(nullptr)
-, mLastBoundControlTime(-9999)
-, mLastBoundUIControl(nullptr)
 , mBlink(false)
 , mControllerPage(0)
 , mPageSelector(nullptr)
@@ -537,9 +538,9 @@ void MidiController::MidiReceived(MidiMessageType messageType, int control, floa
    if (mBindMode && gBindToUIControl)
    {
       AddControlConnection(messageType, control, channel, gBindToUIControl);
-      mLastBoundControlTime = gTime;
-      mLastBoundUIControl = gBindToUIControl;
-      mLastBoundUIControl->StartBeacon();
+      sLastBoundControlTime = gTime;
+      sLastBoundUIControl = gBindToUIControl;
+      sLastBoundUIControl->StartBeacon();
       gBindToUIControl = nullptr;
       return;
    }
@@ -547,9 +548,9 @@ void MidiController::MidiReceived(MidiMessageType messageType, int control, floa
    if (Push2Control::sBindToUIControl)
    {
       AddControlConnection(messageType, control, channel, Push2Control::sBindToUIControl);
-      mLastBoundControlTime = gTime;
-      mLastBoundUIControl = Push2Control::sBindToUIControl;
-      mLastBoundUIControl->StartBeacon();
+      sLastBoundControlTime = gTime;
+      sLastBoundUIControl = Push2Control::sBindToUIControl;
+      sLastBoundUIControl->StartBeacon();
       Push2Control::sBindToUIControl = nullptr;
       return;
    }
@@ -557,9 +558,9 @@ void MidiController::MidiReceived(MidiMessageType messageType, int control, floa
    if (mBindMode && gHoveredUIControl && (GetKeyModifiers() == kModifier_Shift))
    {
       AddControlConnection(messageType, control, channel, gHoveredUIControl);
-      mLastBoundControlTime = gTime;
-      mLastBoundUIControl = gHoveredUIControl;
-      mLastBoundUIControl->StartBeacon();
+      sLastBoundControlTime = gTime;
+      sLastBoundUIControl = gHoveredUIControl;
+      sLastBoundUIControl->StartBeacon();
       return;
    }
 
@@ -579,8 +580,8 @@ void MidiController::MidiReceived(MidiMessageType messageType, int control, floa
          if (uicontrol == nullptr)
             continue;
          
-         mLastActivityUIControl = uicontrol;
-         mLastConnectedActivityTime = gTime;
+         sLastActivityUIControl = uicontrol;
+         sLastConnectedActivityTime = gTime;
 
          if (connection->mType == kControlType_Slider)
          {
@@ -790,7 +791,7 @@ void MidiController::Poll()
          if (uicontrol == nullptr)
             continue;
 
-         if (JustBoundControl() && uicontrol == mLastBoundUIControl)
+         if (JustBoundControl() && uicontrol == sLastBoundUIControl)
             continue;
          
          if (!connection->mPageless && connection->mPage != mControllerPage)
@@ -1251,43 +1252,6 @@ namespace
 
 void MidiController::DrawModuleUnclipped()
 {
-   const float kDisplayMs = 500;
-   std::string displayString;
-   
-   IUIControl* drawControl = nullptr;
-   if (gTime < mLastBoundControlTime + kDisplayMs)
-   {
-      drawControl = mLastBoundUIControl;
-      if (drawControl != nullptr)
-         displayString = drawControl->Path() + " bound!";
-   }
-   else if (gTime < mLastConnectedActivityTime + kDisplayMs)
-   {
-      drawControl = mLastActivityUIControl;
-      if (drawControl != nullptr)
-         displayString = drawControl->Path() + ": " + drawControl->GetDisplayValue(drawControl->GetValue());
-   }
-
-   if (!displayString.empty() && drawControl != nullptr)
-   {
-      ofPushMatrix();
-      ofTranslate(-TheSynth->GetDrawOffset().x, -TheSynth->GetDrawOffset().y);
-      ofTranslate(-GetPosition().x, -GetPosition().y);
-      ofPushStyle();
-      ofFill();
-      ofVec2f pos(50, TheSynth->GetDrawRect().height - 100);
-      const float kWidth = 500;
-      const float kHeight = 70;
-      ofSetColor(80, 80, 80);
-      ofRect(pos.x, pos.y, kWidth, kHeight);
-      ofSetColor(120, 120, 120);
-      ofRect(pos.x, pos.y, kWidth * drawControl->GetMidiValue(), kHeight);
-      ofSetColor(255, 255, 255);
-      DrawTextBold(displayString, pos.x + 20, pos.y + 50, 40);
-      ofPopStyle();
-      ofPopMatrix();
-   }
-
    if (mHoveredLayoutElement != -1)
    {
       std::string tooltip;
