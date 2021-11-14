@@ -35,6 +35,7 @@
 #include "UserPrefsEditor.h"
 #include "UIControlMacros.h"
 #include "VSTScanner.h"
+#include "MidiController.h"
 
 #include "juce_audio_devices/juce_audio_devices.h"
 
@@ -488,6 +489,42 @@ void TitleBar::DrawModuleUnclipped()
       ofLine(x - 3 * scale, y - 15 * scale, x, y - 18 * scale);
       ofLine(x + 3 * scale, y - 15 * scale, x, y - 18 * scale);
       ofPopStyle();
+   }
+
+   //midicontroller
+   {
+      const float kDisplayMs = 500;
+      std::string displayString;
+
+      IUIControl* drawControl = nullptr;
+      if (gTime < MidiController::sLastBoundControlTime + kDisplayMs)
+      {
+         drawControl = MidiController::sLastBoundUIControl;
+         if (drawControl != nullptr)
+            displayString = drawControl->Path() + " bound!";
+      }
+      else if (gTime < MidiController::sLastConnectedActivityTime + kDisplayMs)
+      {
+         drawControl = MidiController::sLastActivityUIControl;
+         if (drawControl != nullptr)
+            displayString = drawControl->Path() + ": " + drawControl->GetDisplayValue(drawControl->GetValue());
+      }
+
+      if (!displayString.empty() && drawControl != nullptr)
+      {
+         ofPushStyle();
+         ofFill();
+         ofVec2f pos(50, ofGetHeight() / GetOwningContainer()->GetDrawScale() - 100);
+         const float kWidth = 600;
+         const float kHeight = 70;
+         ofSetColor(80, 80, 80);
+         ofRect(pos.x, pos.y, kWidth, kHeight);
+         ofSetColor(120, 120, 120);
+         ofRect(pos.x, pos.y, kWidth * drawControl->GetMidiValue(), kHeight);
+         ofSetColor(255, 255, 255);
+         DrawTextBold(displayString, pos.x + 20, pos.y + 50, 40);
+         ofPopStyle();
+      }
    }
 }
 

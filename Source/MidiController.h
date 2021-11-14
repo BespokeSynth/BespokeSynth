@@ -282,7 +282,6 @@ public:
    std::string GetDeviceOut() const { return mDeviceOut; }
    UIControlConnection* GetConnectionForControl(MidiMessageType messageType, int control);
    UIControlConnection* GetConnectionForCableSource(const PatchCableSource *source);
-   bool JustBoundControl() const { return gTime - mLastBoundControlTime < 500; }
    
    void SetVelocityMult(float mult) { mVelocityMult = mult; }
    void SetUseChannelAsVoice(bool use) { mUseChannelAsVoice = use; }
@@ -336,6 +335,11 @@ public:
    void LoadState(FileStreamIn& in) override;
 
    static std::string GetDefaultTooltip(MidiMessageType type, int control);
+
+   static double sLastConnectedActivityTime;
+   static IUIControl* sLastActivityUIControl;
+   static double sLastBoundControlTime;
+   static IUIControl* sLastBoundUIControl;
    
 private:
    enum MappingDisplayMode
@@ -367,6 +371,7 @@ private:
    std::string GetLayoutTooltip(int controlIndex);
    void UpdateControllerIndex();
    void LoadLayout(std::string filename);
+   bool JustBoundControl() const { return gTime - sLastBoundControlTime < 500; }
    
    float mVelocityMult;
    bool mUseChannelAsVoice;
@@ -412,11 +417,7 @@ private:
 
    int mControllerIndex;
    double mLastActivityTime;
-   double mLastConnectedActivityTime;
-   IUIControl* mLastActivityUIControl;
    bool mLastActivityBound;
-   double mLastBoundControlTime;
-   IUIControl* mLastBoundUIControl;
    bool mBlink;
    int mControllerPage;
    DropdownList* mPageSelector;
