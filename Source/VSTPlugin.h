@@ -180,6 +180,8 @@ private:
     * Midi and MultiOut support
     */
    AdditionalNoteCable *mMidiOutCable{nullptr};
+
+   bool mWantOpenVstWindow{ false };
 };
 
 #endif /* defined(__Bespoke__VSTPlugin__) */
