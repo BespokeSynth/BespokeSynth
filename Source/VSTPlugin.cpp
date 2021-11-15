@@ -455,6 +455,20 @@ void VSTPlugin::Poll()
          }
       }
    }
+
+   if (mWantOpenVstWindow)
+   {
+      if (mPlugin != nullptr)
+      {
+         if (mWindow == nullptr)
+            mWindow = std::unique_ptr<VSTWindow>(VSTWindow::CreateVSTWindow(this, VSTWindow::Normal));
+         mWindow->ShowWindow();
+
+         //if (mWindow->GetNSViewComponent())
+         //   mWindowOverlay = new NSWindowOverlay(mWindow->GetNSViewComponent()->getView());
+      }
+      mWantOpenVstWindow = false;
+   }
 }
 
 void VSTPlugin::Process(double time)
@@ -874,17 +888,7 @@ void VSTPlugin::CheckboxUpdated(Checkbox* checkbox)
 void VSTPlugin::ButtonClicked(ClickButton* button)
 {
    if (button == mOpenEditorButton)
-   {
-      if (mPlugin != nullptr)
-      {
-         if (mWindow == nullptr)
-            mWindow = std::unique_ptr<VSTWindow>(VSTWindow::CreateVSTWindow(this, VSTWindow::Normal));
-         mWindow->ShowWindow();
-      }
-      
-      //if (mWindow->GetNSViewComponent())
-      //   mWindowOverlay = new NSWindowOverlay(mWindow->GetNSViewComponent()->getView());
-   }
+      mWantOpenVstWindow = true;
 
    if (button == mPanicButton)
    {
