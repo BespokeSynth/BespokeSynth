@@ -187,6 +187,7 @@ private:
    };
    DrawPass mDrawPass;
    bool mParentMinimized;
+   IDrawableModule* mLastSeenAutopatchableModule;
 };
 
 #endif /* defined(__Bespoke__PatchCableSource__) */
