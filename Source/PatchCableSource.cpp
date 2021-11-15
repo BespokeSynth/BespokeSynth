@@ -307,9 +307,28 @@ void PatchCableSource::Render()
       if (mDrawPass == DrawPass::kSource && (mPatchCableDrawMode != kPatchCableDrawMode_SourceOnHoverOnly || mHoverIndex != -1))
       {
          ofSetLineWidth(0);
-         ofSetColor(mColor);
+         ofColor color = mColor;
+         float radius = kPatchCableSourceRadius;
+         IDrawableModule* moveModule = TheSynth->GetMoveModule();
+         if (GetKeyModifiers() == kModifier_Shift && moveModule != nullptr)
+         {
+            if (mLastSeenAutopatchableModule != moveModule)
+            {
+               FindValidTargets();
+               mLastSeenAutopatchableModule = moveModule;
+            }
+            if ((IsValidTarget(moveModule) && GetTarget() != moveModule) || (GetOwner() == moveModule && GetTarget() == nullptr))
+            {
+               //highlight autopatchable cable sources
+               float lerp = ofMap(sin(gTime / 600 * PI * 2), -1, 1, 0, 1);
+               color = ofColor::lerp(color, ofColor::white, lerp * .7f);
+               radius = ofLerp(radius, kPatchCableSourceClickRadius, lerp);
+            }
+         }
+
+         ofSetColor(color);
          ofFill();
-         ofCircle(cableX, cableY, kPatchCableSourceRadius);
+         ofCircle(cableX, cableY, radius);
 
          if (mHoverIndex == i && PatchCable::sActivePatchCable == nullptr && !TheSynth->IsGroupSelecting())
          {
