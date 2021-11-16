@@ -147,7 +147,7 @@ void ChordHolder::OnPulse(double time, float velocity, int flags)
 
       if (mNoteInputHeld[i])
       {
-         PlayNoteOutput(time, i, velocity, -1);
+         PlayNoteOutput(time, i, velocity * 127, -1);
          mNotePlaying[i] = true;
       }
    }
