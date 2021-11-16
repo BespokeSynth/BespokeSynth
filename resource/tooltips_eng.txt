@@ -159,7 +159,7 @@ pulser~send pulse messages at an interval
 ~interval~rate to send pulses
 ~timemode~when to send downbeat pulses, or set to "free" for pulses not locked to the transport
 ~t~pulse interval in milliseconds
-~offset~pulse time offset, in fractions of a measure
+~offset~pulse time offset, in fractions of the interval
 ~random~tell pulsed modules to randomize their position
 ~reset~length of sequence before sending reset pulse
 ~div~measure division, when using "div" as the interval
