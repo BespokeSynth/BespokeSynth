@@ -1229,7 +1229,7 @@ void MidiController::DrawModule()
          ControlLayoutElement& control = GetLayoutControl(connection->mControl, connection->mMessageType);
          if (control.mControlCable)
          {
-            int x = 356;
+            int x = 370;
             int y = 59 + 20 * i;
 
             control.mControlCable->SetEnabled(UIControlConnection::sDrawCables);
@@ -1443,7 +1443,7 @@ void MidiController::GetModuleDimensions(float& width, float& height)
 {
    if (mMappingDisplayMode == kList)
    {
-      width = 880;
+      width = 900;
       height = 72 + 20 * GetNumConnectionsOnPage(mControllerPage);
    }
    else if (mMappingDisplayMode == kLayout)
@@ -2593,17 +2593,19 @@ void UIControlConnection::DrawList(int index)
    mIncrementalEntry->DrawLabel(false);
    mFeedbackDropdown->DrawLabel(false);
    
+   int x = 12;
    int y = 52 + 20 * index;
    
    IUIControl* lastControl = nullptr;
    for (auto iter = mEditorControls.begin(); iter != mEditorControls.end(); ++iter)
    {
-      if (lastControl)
-         (*iter)->PositionTo(lastControl, kAnchor_Right);
-      else
-         (*iter)->SetPosition(12,y);
+      (*iter)->SetPosition(x,y);
       (*iter)->Draw();
       lastControl = *iter;
+
+      x += (*iter)->GetRect().width + 3;
+      if (*iter == mUIControlPathEntry)
+         x += 13;
    }
    
    ofRectangle rect = mUIControlPathEntry->GetRect(true);
