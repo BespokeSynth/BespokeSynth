@@ -639,13 +639,19 @@ void ModularSynth::Draw(void* vg)
    
    std::string tooltip = "";
    ModuleContainer* tooltipContainer = nullptr;
-   if (HelpDisplay::sShowTooltips && 
-       !mHideTooltipsUntilMouseMove &&
-       !IUIControl::WasLastHoverSetViaTab() &&
-       mGroupSelectContext == nullptr &&
-       PatchCable::sActivePatchCable == nullptr &&
-       mGroupSelectedModules.empty() &&
-       mHeldSample == nullptr)
+   ofVec2f tooltipPos(FLT_MAX, FLT_MAX);
+   if (mNextDrawTooltip != "")
+   {
+      tooltip = mNextDrawTooltip;
+      tooltipContainer = &mModuleContainer;
+   }
+   else if (HelpDisplay::sShowTooltips && 
+            !mHideTooltipsUntilMouseMove &&
+            !IUIControl::WasLastHoverSetViaTab() &&
+            mGroupSelectContext == nullptr &&
+            PatchCable::sActivePatchCable == nullptr &&
+            mGroupSelectedModules.empty() &&
+            mHeldSample == nullptr)
    {
       HelpDisplay* helpDisplay = TheTitleBar->GetHelpDisplay();
 
@@ -682,38 +688,45 @@ void ModularSynth::Draw(void* vg)
             tooltip = helpDisplay->GetModuleTooltip(gHoveredModule);
             tooltipContainer = gHoveredModule->GetOwningContainer();
          }
+          
+         if (tooltipContainer != nullptr)
+         {
+            tooltipPos.x = gHoveredModule->GetRect().getMaxX() + 10;
+            tooltipPos.y = GetMouseY(tooltipContainer) + 7;
+         }
       }
       else if (hasValidHoveredControl && !gHoveredUIControl->IsMouseDown())
       {
          tooltip = helpDisplay->GetUIControlTooltip(gHoveredUIControl);
          tooltipContainer = gHoveredUIControl->GetModuleParent()->GetOwningContainer();
+         tooltipPos.x = gHoveredUIControl->GetRect().getMaxX() + 10;
+         tooltipPos.y = GetMouseY(tooltipContainer) + 18;
       }
    }
-   
-   if (mNextDrawTooltip != "")
-   {
-      tooltip = mNextDrawTooltip;
-      tooltipContainer = &mModuleContainer;
-   }
+
    mNextDrawTooltip = "";
    
    if (tooltip != "" && tooltipContainer != nullptr)
    {
+      if (tooltipPos.x == FLT_MAX)
+      {
+         tooltipPos.x = GetMouseX(tooltipContainer) + 25;
+         tooltipPos.y = GetMouseY(tooltipContainer) + 30;
+      }
+
       ofPushMatrix();
       float scale = tooltipContainer->GetDrawScale();
       ofVec2f offset = tooltipContainer->GetDrawOffset();
       ofScale(scale, scale, scale);
       ofTranslate(offset.x, offset.y);
       
-      float x = GetMouseX(tooltipContainer) + 25;
-      float y = GetMouseY(tooltipContainer) + 30;
       float maxWidth = 300;
 
       float fontSize = 15;
       nvgFontFaceId(gNanoVG, gFont.GetFontHandle());
       nvgFontSize(gNanoVG, fontSize);
       float bounds[4];
-      nvgTextBoxBounds(gNanoVG, x, y, maxWidth, tooltip.c_str(), nullptr, bounds);
+      nvgTextBoxBounds(gNanoVG, tooltipPos.x, tooltipPos.y, maxWidth, tooltip.c_str(), nullptr, bounds);
       float padding = 3;
       ofRectangle rect(bounds[0]-padding, bounds[1] - padding, bounds[2] - bounds[0] + padding*2, bounds[3] - bounds[1] + padding*2);
       
@@ -723,6 +736,11 @@ void ModularSynth::Draw(void* vg)
       float maxY = ofGetHeight() / scale - rect.height - 5 - offset.y;
       
       float onscreenRectX = ofClamp(rect.x, minX, maxX);
+      if (onscreenRectX < rect.x)
+      {
+         tooltipPos.y += 20;
+         rect.y += 20;
+      }
       float onscreenRectY = ofClamp(rect.y, minY, maxY);
       
       float tooltipBackgroundAlpha = 180;
@@ -737,7 +755,7 @@ void ModularSynth::Draw(void* vg)
 
       ofSetColor(255, 255, 255);
       //DrawTextNormal(tooltip, x + 5, y + 12);
-      gFont.DrawStringWrap(tooltip, fontSize, x + (onscreenRectX - rect.x), y + (onscreenRectY - rect.y), maxWidth);
+      gFont.DrawStringWrap(tooltip, fontSize, tooltipPos.x + (onscreenRectX - rect.x), tooltipPos.y + (onscreenRectY - rect.y), maxWidth);
       
       ofPopMatrix();
    }
