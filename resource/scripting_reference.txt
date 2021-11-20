@@ -128,8 +128,8 @@ import midicontroller
    static:
       midicontroller.get(path)
    instance:
-      m.set_connection(messageType, control, controlPath, controlType, value, channel, page)
-         optional: controlType = Default, value = 0, channel = -1, page=0
+      m.set_connection(messageType, control, controlPath, controlType, value, channel, page, midi_off, midi_on, scale, blink, increment, twoway, feedbackControl, isPageless)
+         optional: controlType = Default, value = 0, channel = -1, page=0, midi_off=0, midi_on = 127, scale = false, blink = false, increment = 0, twoway = true, feedbackControl = -1, isPageless = false
          example: m.set_connection(m.Control, 32, "oscillator~pw"), or m.set_connection(m.Note, 10, "oscillator~osc", m.SetValue, 2)
       m.send_note(pitch, velocity, forceNoteOn, channel, page)
          optional: forceNoteOn = false, channel = -1, page = 0

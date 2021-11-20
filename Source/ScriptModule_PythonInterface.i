@@ -452,7 +452,7 @@ PYBIND11_EMBEDDED_MODULE(midicontroller, m)
       .value("Default", ControlType::kControlType_Default)
       .export_values();
    midiControllerClass
-      .def("set_connection", [](MidiController& midicontroller, MidiMessageType messageType, int control, std::string controlPath, ControlType controlType, int value, int channel, int page)
+      .def("set_connection", [](MidiController& midicontroller, MidiMessageType messageType, int control, std::string controlPath, ControlType controlType, int value, int channel, int page, int midi_off, int midi_on, bool scale, bool blink, float increment, bool twoway, int feedbackControl, bool isPageless)
       {
          ScriptModule::sMostRecentLineExecutedModule->SetContext();
          IUIControl* uicontrol = TheSynth->FindUIControl(controlPath.c_str());
@@ -463,9 +463,11 @@ PYBIND11_EMBEDDED_MODULE(midicontroller, m)
                connection->mType = controlType;
             connection->mValue = value;
             connection->mPage = page;
+            connection->mMidiOffValue = midi_off;
+            connection->mMidiOnValue = midi_on;
          }
          ScriptModule::sMostRecentLineExecutedModule->ClearContext();
-      }, "messageType"_a, "control"_a, "controlPath"_a, "controlType"_a = kControlType_Default, "value"_a = 0, "channel"_a = -1, "page"_a=0)
+      }, "messageType"_a, "control"_a, "controlPath"_a, "controlType"_a = kControlType_Default, "value"_a = 0, "channel"_a = -1, "page"_a=0, "midi_off"_a=0, "midi_on"_a = 127, "scale"_a = false, "blink"_a = false, "increment"_a = 0, "twoway"_a = true, "feedbackControl"_a = -1, "isPageless"_a = false)
       ///example: m.set_connection(m.Control, 32, "oscillator~pw"), or m.set_connection(m.Note, 10, "oscillator~osc", m.SetValue, 2)
       .def("send_note", [](MidiController& midicontroller, int pitch, int velocity, bool forceNoteOn, int channel, int page)
       {
