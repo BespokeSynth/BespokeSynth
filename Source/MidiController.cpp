@@ -893,6 +893,10 @@ void MidiController::Poll()
    
    if (mNonstandardController != nullptr)
       mNonstandardController->Poll();
+
+   auto connections = mConnections;
+   for (auto* connection : connections)
+      connection->Poll();
 }
 
 void MidiController::Exit()
@@ -1817,7 +1821,23 @@ void MidiController::ButtonClicked(ClickButton* button)
 {
    if (button == mAddConnectionButton)
    {
-      AddControlConnection(kMidiMessage_Control, 0, -1, nullptr);
+      int index;
+      for (index = 0; index <= 127; ++index)
+      {
+         bool isAvailable = true;
+         for (auto* connection : mConnections)
+         {
+            if (connection->mMessageType == kMidiMessage_Control && connection->mControl == index)
+            {
+               isAvailable = false;
+               break;
+            }
+         }
+
+         if (isAvailable)
+            break;
+      }
+      AddControlConnection(kMidiMessage_Control, index, -1, nullptr);
    }
    for (auto iter = mConnections.begin(); iter != mConnections.end(); ++iter)
    {
@@ -2540,10 +2560,8 @@ void UIControlConnection::SetShowing(bool enabled)
       (*iter)->SetShowing(enabled);
 }
 
-void UIControlConnection::PreDraw()
+void UIControlConnection::Poll()
 {
-   SetShowing(true);
-   
    if (mUIControl || mSpecialBinding != kSpecialBinding_None)
    {
       if (mSpecialBinding == kSpecialBinding_Hover)
@@ -2551,7 +2569,7 @@ void UIControlConnection::PreDraw()
          StringCopy(mUIControlPathInput, "hover", MAX_TEXTENTRY_LENGTH);
       }
       else if (mSpecialBinding >= kSpecialBinding_HotBind0 &&
-               mSpecialBinding <= kSpecialBinding_HotBind9)
+         mSpecialBinding <= kSpecialBinding_HotBind9)
       {
          StringCopy(mUIControlPathInput, ("hotbind" + ofToString(mSpecialBinding - kSpecialBinding_HotBind0)).c_str(), MAX_TEXTENTRY_LENGTH);
       }
@@ -2561,17 +2579,24 @@ void UIControlConnection::PreDraw()
          if (mUIOwner->GetLayoutControl(mControl, mMessageType).mControlCable)
             mUIOwner->GetLayoutControl(mControl, mMessageType).mControlCable->SetTarget(mUIControl);
       }
-      mUIControlPathEntry->SetInErrorMode(false);
+      if (mUIControlPathEntry != nullptr)
+         mUIControlPathEntry->SetInErrorMode(false);
    }
    else
    {
-      mUIControlPathEntry->SetInErrorMode(true);
+      if (mUIControlPathEntry != nullptr)
+         mUIControlPathEntry->SetInErrorMode(true);
       if (PatchCable::sActivePatchCable == nullptr)
       {
          if (mUIOwner->GetLayoutControl(mControl, mMessageType).mControlCable)
             mUIOwner->GetLayoutControl(mControl, mMessageType).mControlCable->ClearPatchCables();
       }
    }
+}
+
+void UIControlConnection::PreDraw()
+{
+   SetShowing(true);
    
    if (mUIOwner->GetLayoutControl(mControl, mMessageType).mControlCable)
       mUIOwner->GetLayoutControl(mControl, mMessageType).mControlCable->SetEnabled(sDrawCables);
