@@ -159,6 +159,7 @@ struct UIControlConnection
    
    void SetUIControl(std::string path);
    void CreateUIControls(int index);
+   void Poll();
    void PreDraw();
    void DrawList(int index);
    void DrawLayout();
@@ -190,23 +191,23 @@ struct UIControlConnection
    MidiController* mUIOwner;
    
    //editor controls
-   DropdownList* mMessageTypeDropdown;
-   TextEntry* mControlEntry;
-   DropdownList* mChannelDropdown;
-   TextEntry* mUIControlPathEntry;
+   DropdownList* mMessageTypeDropdown{ nullptr };
+   TextEntry* mControlEntry{ nullptr };
+   DropdownList* mChannelDropdown{ nullptr };
+   TextEntry* mUIControlPathEntry{ nullptr };
    char mUIControlPathInput[MAX_TEXTENTRY_LENGTH];
-   DropdownList* mControlTypeDropdown;
-   TextEntry* mValueEntry;
-   TextEntry* mMidiOffEntry;
-   TextEntry* mMidiOnEntry;
-   Checkbox* mScaleOutputCheckbox;
-   Checkbox* mBlinkCheckbox;
-   TextEntry* mIncrementalEntry;
-   Checkbox* mTwoWayCheckbox;
-   DropdownList* mFeedbackDropdown;
-   Checkbox* mPagelessCheckbox;
-   ClickButton* mRemoveButton;
-   ClickButton* mCopyButton;
+   DropdownList* mControlTypeDropdown{ nullptr };
+   TextEntry* mValueEntry{ nullptr };
+   TextEntry* mMidiOffEntry{ nullptr };
+   TextEntry* mMidiOnEntry{ nullptr };
+   Checkbox* mScaleOutputCheckbox{ nullptr };
+   Checkbox* mBlinkCheckbox{ nullptr };
+   TextEntry* mIncrementalEntry{ nullptr };
+   Checkbox* mTwoWayCheckbox{ nullptr };
+   DropdownList* mFeedbackDropdown{ nullptr };
+   Checkbox* mPagelessCheckbox{ nullptr };
+   ClickButton* mRemoveButton{ nullptr };
+   ClickButton* mCopyButton{ nullptr };
    std::list<IUIControl*> mEditorControls;
 };
 
