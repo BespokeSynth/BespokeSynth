@@ -594,11 +594,11 @@ void MidiController::MidiReceived(MidiMessageType messageType, int control, floa
                const float midpoint = 64.0f / 127.0f;
                if (value != midpoint)
                {
-                   if (value > midpoint)
-                      curValue += increment;
-                   else
-                      curValue -= increment;
-                   uicontrol->SetFromMidiCC(curValue);
+                  float change = (value - midpoint) * 127;
+                  float sign = change > 0 ? 1 : -1;
+                  change = sign * sqrtf(fabsf(change));  //make response fall off for bigger changes
+                  curValue += increment * change;
+                  uicontrol->SetFromMidiCC(curValue);
                }
             }
             else
