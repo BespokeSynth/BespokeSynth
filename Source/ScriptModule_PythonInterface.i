@@ -465,6 +465,12 @@ PYBIND11_EMBEDDED_MODULE(midicontroller, m)
             connection->mPage = page;
             connection->mMidiOffValue = midi_off;
             connection->mMidiOnValue = midi_on;
+            connection->mScaleOutput = scale;
+            connection->mBlink = blink;
+            connection->mIncrementAmount = increment;
+            connection->mTwoWay = twoway;
+            connection->mFeedbackControl = feedbackControl;
+            connection->mPageless = isPageless;
          }
          ScriptModule::sMostRecentLineExecutedModule->ClearContext();
       }, "messageType"_a, "control"_a, "controlPath"_a, "controlType"_a = kControlType_Default, "value"_a = 0, "channel"_a = -1, "page"_a=0, "midi_off"_a=0, "midi_on"_a = 127, "scale"_a = false, "blink"_a = false, "increment"_a = 0, "twoway"_a = true, "feedbackControl"_a = -1, "isPageless"_a = false)
