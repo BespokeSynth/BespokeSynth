@@ -451,7 +451,7 @@ endif ()
 target_link_libraries(BespokeSynth PRIVATE
     bespoke::exprtk
     bespoke::freeverb
-    bespoke::json
+    $<IF:$<STREQUAL:${BESPOKE_SYSTEM_JSONCPP},OFF>,bespoke::json,jsoncpp>
     bespoke::leathers
     bespoke::nanovg
     bespoke::psmove
