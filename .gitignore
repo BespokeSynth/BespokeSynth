@@ -363,9 +363,6 @@ Builds/LinuxMakefile/build/BespokeSynth
 
 Builds/MacOSX/build/BespokeSynth/
 
-# explicitly allow spacemouse lib, so it doesn't get excluded by *.lib above
-!*/3DxWare/Lib/**
-
 Builds/MacOSX/BespokeSynth.xcodeproj/
 
 Builds/MacOSX/Icon.icns
