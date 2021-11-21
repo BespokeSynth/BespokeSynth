@@ -8,6 +8,7 @@ set(BESPOKE_JUCE_LOCATION "${CMAKE_SOURCE_DIR}/libs/JUCE" CACHE STRING "Path to 
 set(BESPOKE_PYTHON_ROOT "" CACHE STRING "Python search path. Override as needed.")
 set(BESPOKE_VST2_SDK_LOCATION "" CACHE STRING "Steinberg VST2 SDK directory for non-FOSS builds")
 set(BESPOKE_ASIO_SDK_LOCATION "" CACHE STRING "Steinberg ASIO SDK directory for non-FOSS builds")
+set(BESPOKE_SPACEMOUSE_SDK_LOCATION "" CACHE STRING "3Dxware SpaceMouse SDK directory for non-FOSS builds")
 
 # Global CMake options
 set(CMAKE_CXX_EXTENSIONS OFF)

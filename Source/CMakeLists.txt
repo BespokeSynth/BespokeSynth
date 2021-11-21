@@ -424,6 +424,17 @@ elseif (WIN32)
         target_include_directories(BespokeSynth PRIVATE ${BESPOKE_ASIO_SDK_LOCATION}/common)
     endif()
 
+    if (BESPOKE_SPACEMOUSE_SDK_LOCATION)
+        message( STATUS "Including SpaceMouse from ${BESPOKE_SPACEMOUSE_SDK_LOCATION}")
+        target_compile_definitions(BespokeSynth PRIVATE BESPOKE_SPACEMOUSE_SUPPORT=1)
+        target_include_directories(BespokeSynth PRIVATE ${BESPOKE_SPACEMOUSE_SDK_LOCATION}/include)
+        if (${CMAKE_SIZEOF_VOID_P} EQUAL 4)
+            target_link_libraries(BespokeSynth PRIVATE "${BESPOKE_SPACEMOUSE_SDK_LOCATION}/windows/x86/siapp.lib")
+        else()
+            target_link_libraries(BespokeSynth PRIVATE "${BESPOKE_SPACEMOUSE_SDK_LOCATION}/windows/x64/siapp.lib")
+        endif()
+    endif()
+
     set_target_properties(BespokeSynth PROPERTIES VS_DEBUGGER_WORKING_DIRECTORY "$<TARGET_FILE_DIR:BespokeSynth>"
         VS_DEBUGGER_COMMAND           "$<TARGET_FILE:BespokeSynth>"
         VS_DEBUGGER_ENVIRONMENT       "PATH=%PATH%;${CMAKE_PREFIX_PATH}/bin")
@@ -438,7 +449,6 @@ else ()
 endif ()
 
 target_link_libraries(BespokeSynth PRIVATE
-    bespoke::3dxware
     bespoke::exprtk
     bespoke::freeverb
     bespoke::json
