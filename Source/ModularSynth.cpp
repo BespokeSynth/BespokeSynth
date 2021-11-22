@@ -2225,7 +2225,7 @@ IDrawableModule* ModularSynth::FindModule(std::string name, bool fail)
       }
       return mModuleContainer.FindModule(name.substr(1, name.length() - 1), fail);
    }
-   return mModuleContainer.FindModule(IClickable::sLoadContext+name, fail);
+   return mModuleContainer.FindModule(IClickable::sPathLoadContext+name, fail);
 }
 
 MidiController* ModularSynth::FindMidiController(std::string name, bool fail)
@@ -2263,7 +2263,7 @@ IUIControl* ModularSynth::FindUIControl(std::string path)
          return nullptr;
       return mModuleContainer.FindUIControl(path.substr(1, path.length() - 1));
    }
-   return mModuleContainer.FindUIControl(IClickable::sLoadContext+path);
+   return mModuleContainer.FindUIControl(IClickable::sPathLoadContext+path);
 }
 
 void ModularSynth::GrabSample(ChannelBuffer* data, std::string name, bool window, int numBars)

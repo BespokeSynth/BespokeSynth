@@ -30,8 +30,8 @@
 
 #include <cstring>
 
-std::string IClickable::sLoadContext = "";
-std::string IClickable::sSaveContext = "";
+std::string IClickable::sPathLoadContext = "";
+std::string IClickable::sPathSaveContext = "";
 
 IClickable::IClickable()
 : mX(0)
@@ -156,7 +156,7 @@ std::string IClickable::Path(bool ignoreContext)
    
    if (!ignoreContext)
    {
-      if (sLoadContext != "")
+      if (sPathLoadContext != "")
       {
          if (path[0] == '$')
          {
@@ -167,13 +167,13 @@ std::string IClickable::Path(bool ignoreContext)
          }
          else
          {
-            path = sLoadContext + path;
+            path = sPathLoadContext + path;
          }
       }
-      if (sSaveContext != "")
+      if (sPathSaveContext != "")
       {
-         if (strstr(path.c_str(), sSaveContext.c_str()) == path.c_str())   //path starts with sSaveContext
-            path = path.substr(sSaveContext.length(), path.length() - sSaveContext.length());
+         if (strstr(path.c_str(), sPathSaveContext.c_str()) == path.c_str())   //path starts with sSaveContext
+            path = path.substr(sPathSaveContext.length(), path.length() - sPathSaveContext.length());
          else
             path = "$"+path; //path is outside of our context, and therefore invalid
       }
