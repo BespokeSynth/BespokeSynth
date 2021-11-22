@@ -1294,14 +1294,14 @@ bool ScriptModule::IsNonWhitespace(std::string line)
 static std::string sContextToRestore = "";
 void ScriptModule::SetContext()
 {
-   sContextToRestore = IClickable::sLoadContext;
+   sContextToRestore = IClickable::sPathLoadContext;
    if (GetOwningContainer()->GetOwner() != nullptr)
       IClickable::SetLoadContext(GetOwningContainer()->GetOwner());
 }
 
 void ScriptModule::ClearContext()
 {
-   IClickable::sLoadContext = sContextToRestore;
+   IClickable::sPathLoadContext = sContextToRestore;
 }
 
 void ScriptModule::OnModuleReferenceBound(IDrawableModule* target)

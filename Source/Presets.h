@@ -92,7 +92,7 @@ private:
    {
       Preset() {}
       Preset(std::string path, float val) : mControlPath(path), mValue(val), mHasLFO(false) {}
-      Preset(IUIControl* control);
+      Preset(IUIControl* control, Presets* presets);
       bool operator==(const Preset& other) const
       {
          return mControlPath == other.mControlPath &&

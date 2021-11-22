@@ -68,13 +68,13 @@ public:
    IClickable* GetRootParent();
    IDrawableModule* GetModuleParent();
    
-   static void SetLoadContext(IClickable* context) { sLoadContext = context->Path() + "~"; }
-   static void ClearLoadContext() { sLoadContext = ""; }
-   static void SetSaveContext(IClickable* context) { sSaveContext = context->Path() + "~"; }
-   static void ClearSaveContext() { sSaveContext = ""; }
+   static void SetLoadContext(IClickable* context) { sPathLoadContext = context->Path() + "~"; }
+   static void ClearLoadContext() { sPathLoadContext = ""; }
+   static void SetSaveContext(IClickable* context) { sPathSaveContext = context->Path() + "~"; }
+   static void ClearSaveContext() { sPathSaveContext = ""; }
    
-   static std::string sLoadContext;
-   static std::string sSaveContext;
+   static std::string sPathLoadContext;
+   static std::string sPathSaveContext;
    
 protected:
    virtual void OnClicked(int x, int y, bool right) {}
