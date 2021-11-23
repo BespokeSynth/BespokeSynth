@@ -11,6 +11,7 @@ set(BESPOKE_ASIO_SDK_LOCATION "" CACHE STRING "Steinberg ASIO SDK directory for 
 set(BESPOKE_SPACEMOUSE_SDK_LOCATION "" CACHE STRING "3Dxware SpaceMouse SDK directory for non-FOSS builds")
 option(BESPOKE_SYSTEM_PYBIND11 "Use a system installation of pybind11" OFF)
 option(BESPOKE_SYSTEM_JSONCPP "Use system-wide installation of jsoncpp" OFF)
+option(BESPOKE_SYSTEM_TUNING_LIBRARY "Use system installation of tuning-library" OFF)
 
 # Global CMake options
 set(CMAKE_CXX_EXTENSIONS OFF)
