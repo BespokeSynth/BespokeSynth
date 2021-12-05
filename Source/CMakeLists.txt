@@ -485,14 +485,6 @@ add_dependencies(nightly-package BespokeSynth)
 
 if (APPLE)
     add_dependencies(nightly-package BespokeSynthSigned)
-    #add_custom_command(TARGET nightly-package
-    #        POST_BUILD
-    #        WORKING_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}
-    #        COMMAND ${CMAKE_COMMAND} -E make_directory ${BESPOKE_NIGHTLY_DIR}
-    #        COMMAND hdiutil create /tmp/tmp.dmg -ov -volname "BespokeSynth" -fs HFS+ -srcfolder $<TARGET_BUNDLE_DIR:BespokeSynth>
-    #        COMMAND ${CMAKE_COMMAND} -E rm -f "${BESPOKE_NIGHTLY_DIR}/BespokeNightly.dmg"
-    #        COMMAND hdiutil convert /tmp/tmp.dmg -format UDZO -o "${BESPOKE_NIGHTLY_DIR}/BespokeNightly.dmg"
-    #        )
     get_target_property(output_dir BespokeSynth RUNTIME_OUTPUT_DIRECTORY)
     add_custom_command(TARGET nightly-package
              POST_BUILD

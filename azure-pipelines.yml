@@ -41,7 +41,7 @@ jobs:
           echo "BUILD REASON   = " $(Build.Reason)
           echo "cmakeArguments = " $(cmakeArguments)
 
-          if [ $(Build.Reason) == "PullRequestBlah" ]; then
+          if [ $(Build.Reason) == "PullRequest" ]; then
             export CMAKE_CONFIG=Debug
             export CMAKE_TARGET=BespokeSynth
             echo "##vso[task.setvariable variable=CMAKE_CONFIG]Debug"
@@ -109,7 +109,7 @@ jobs:
           npm install -g appdmg
           wget https://www.python.org/ftp/python/3.10.0/python-3.10.0post2-macos11.pkg
           sudo installer -pkg python-3.10.0post2-macos11.pkg -target /
-        condition: and(variables.isMac, ne(variables['Build.Reason'], 'PullRequestBlah'))
+        condition: and(variables.isMac, ne(variables['Build.Reason'], 'PullRequest'))
         displayName: mac - install dependencies needed for distribution build
 
       - task: InstallAppleCertificate@2
@@ -176,7 +176,7 @@ jobs:
            set -e
            echo Copying build output from build/Source/BespokeSynth_artefacts/Release to build/nightly
            cp -R build/Source/BespokeSynth_artefacts/Release build/nightly
-        condition: and(variables.isWindows, ne(variables['Build.Reason'], 'PullRequestBlah'))
+        condition: and(variables.isWindows, ne(variables['Build.Reason'], 'PullRequest'))
         displayName: win - copy win artifact
 
       - bash: |
@@ -184,26 +184,26 @@ jobs:
            echo Compressing build output from build/Source/BespokeSynth_artefacts/Release to build/nightly
            mkdir build/nightly
            tar -cvzf build/nightly/Bespoke-Linux.tar.gz build/Source/BespokeSynth_artefacts/Release
-        condition: and(variables.isLinux, ne(variables['Build.Reason'], 'PullRequestBlah'))
+        condition: and(variables.isLinux, ne(variables['Build.Reason'], 'PullRequest'))
         displayName: lin - compress lin artifact
 
       - task: PublishPipelineArtifact@0
         inputs:
           artifactName: 'INSTALLER_MAC_NIGHTLY'
           targetPath: 'build/nightly'
-        condition: and(variables.isMac, ne(variables['Build.Reason'], 'PullRequestBlah'))
+        condition: and(variables.isMac, ne(variables['Build.Reason'], 'PullRequest'))
         displayName: mac - publish mac artifact
 
       - task: PublishPipelineArtifact@0
         inputs:
           artifactName: 'INSTALLER_WIN_NIGHTLY'
           targetPath: 'build/nightly'
-        condition: and(variables.isWindows, ne(variables['Build.Reason'], 'PullRequestBlah'))
+        condition: and(variables.isWindows, ne(variables['Build.Reason'], 'PullRequest'))
         displayName: win - publish win artifact
 
       - task: PublishPipelineArtifact@0
         inputs:
           artifactName: 'INSTALLER_LIN_NIGHTLY'
           targetPath: 'build/nightly'
-        condition: and(variables.isLinux, ne(variables['Build.Reason'], 'PullRequestBlah'))
+        condition: and(variables.isLinux, ne(variables['Build.Reason'], 'PullRequest'))
         displayName: lin - publish lin artifact
