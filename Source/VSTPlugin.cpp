@@ -230,6 +230,10 @@ void VSTPlugin::Exit()
    {
       mWindow.reset();
    }
+   if (mPlugin)
+   {
+      mPlugin.reset();
+   }
 }
 
 std::string VSTPlugin::GetTitleLabel() const
