@@ -484,7 +484,10 @@ add_custom_target(nightly-package)
 add_dependencies(nightly-package BespokeSynth)
 
 if (APPLE)
-    add_dependencies(nightly-package BespokeSynthSigned)
+    if (BESPOKE_SIGN_AS)
+        # If we aren't signing there's no target
+        add_dependencies(nightly-package BespokeSynthSigned)
+    endif()
     get_target_property(output_dir BespokeSynth RUNTIME_OUTPUT_DIRECTORY)
     add_custom_command(TARGET nightly-package
              POST_BUILD
