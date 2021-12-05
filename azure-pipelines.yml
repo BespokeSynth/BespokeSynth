@@ -3,6 +3,10 @@
 trigger:
   - main
 
+variables:
+  - group: mac-signing
+  - group: libraries
+
 pr:
   - main
 
@@ -15,7 +19,7 @@ jobs:
         macOS-x64:
           imageName: 'macos-10.15'
           isMac: True
-          cmakeArguments: "-GXcode -D\"CMAKE_OSX_ARCHITECTURES=x86_64\""
+          cmakeArguments: "-GXcode -D\"CMAKE_OSX_ARCHITECTURES=x86_64\" -DBESPOKE_SIGN_AS='$(MAC_SIGNING_CERT)' -DBESPOKE_PYTHON_ROOT='/Library/Frameworks/Python.framework/Versions/3.9'"
         windows-x64:
           imageName: 'windows-2019'
           isWindows: True
@@ -37,7 +41,7 @@ jobs:
           echo "BUILD REASON   = " $(Build.Reason)
           echo "cmakeArguments = " $(cmakeArguments)
 
-          if [ $(Build.Reason) == "PullRequest" ]; then
+          if [ $(Build.Reason) == "PullRequestBlah" ]; then
             export CMAKE_CONFIG=Debug
             export CMAKE_TARGET=BespokeSynth
             echo "##vso[task.setvariable variable=CMAKE_CONFIG]Debug"
@@ -101,35 +105,103 @@ jobs:
         condition: variables.isLinux
         displayName: linux - run apt-get
 
+      - script: |
+          npm install -g appdmg
+        condition: and(variables.isMac, ne(variables['Build.Reason'], 'PullRequestBlah'))
+        displayName: mac - install appdmg for packaging
+
+      - task: InstallAppleCertificate@2
+        inputs:
+          certSecureFile: 'bespoke_dev_id_app.p12'
+          certPwd: '$(MAC_EXPORTED_CERT_PW)'
+        condition: variables.isMac
+
+      - task: InstallAppleCertificate@2
+        inputs:
+          certSecureFile: 'bespoke_dev_id_inst.p12'
+          certPwd: '$(MAC_EXPORTED_CERT_PW)'
+        condition : variables.isMac
+      
+      - task: DownloadSecureFile@1
+        name: extra_apis
+        inputs:
+          secureFile: extra_apis.zip
+
+      - bash: |
+          mv "$(extra_apis.secureFilePath)" "$(Build.SourcesDirectory)"
+        displayName: move extra_apis
+
+      - task: ExtractFiles@1
+        inputs:
+          archiveFilePatterns: 'extra_apis.zip'
+          destinationFolder: '$(Build.SourcesDirectory)/extra_apis'
+
       - bash: |
           set -e
-          echo Building with BUILD_TYPE = $CMAKE_CONFIG
-          cmake -Bbuild $(cmakeArguments) -DCMAKE_BUILD_TYPE=$CMAKE_CONFIG -DBESPOKE_PORTABLE=True
+          echo Building with BUILD_TYPE = $CMAKE_CONFIG and arguments = $(cmakeArguments)
+          cmake -Bbuild $(cmakeArguments) $(LIBRARY_PATHS) -DCMAKE_BUILD_TYPE=$CMAKE_CONFIG -DBESPOKE_PORTABLE=True
         displayName: all - configure with cmake
+
+      - bash: |
+          set -e
+          sudo xcode-select -s /Applications/Xcode_12.2.app
+          echo Building with TARGET = $CMAKE_TARGET
+          cmake --build build --config $CMAKE_CONFIG --target $CMAKE_TARGET
+        displayName: mac - build with cmake
+        condition: variables.isMac
+        env:
+          MAC_INSTALLING_CERT: $(MAC_INSTALLING_CERT)
+          MAC_SIGNING_1UPW: $(MAC_SIGNING_1UPW)
+          MAC_SIGNING_CERT: $(MAC_SIGNING_CERT)
+          MAC_SIGNING_ID: $(MAC_SIGNING_ID)
+          MAC_SIGNING_TEAM: $(MAC_SIGNING_TEAM)
 
       - bash: |
           set -e
           echo Building with TARGET = $CMAKE_TARGET
           cmake --build build --config $CMAKE_CONFIG --target $CMAKE_TARGET
-        displayName: all - build with cmake
+        displayName: win - build with cmake
+        condition: variables.isWindows
+
+      - bash: |
+          set -e
+          echo Building with TARGET = $CMAKE_TARGET
+          cmake --build build --config $CMAKE_CONFIG --target $CMAKE_TARGET
+        displayName: lin - build with cmake
+        condition: variables.isLinux
+
+      - bash: |
+           set -e
+           echo Copying build output from build/Source/BespokeSynth_artefacts/Release to build/nightly
+           cp -R build/Source/BespokeSynth_artefacts/Release build/nightly
+        condition: and(variables.isWindows, ne(variables['Build.Reason'], 'PullRequestBlah'))
+        displayName: win - copy win artifact
+
+      - bash: |
+           set -e
+           echo Compressing build output from build/Source/BespokeSynth_artefacts/Release to build/nightly
+           mkdir build/nightly
+           tar -cvzf build/nightly/Bespoke-Linux.tar.gz build/Source/BespokeSynth_artefacts/Release
+        condition: and(variables.isLinux, ne(variables['Build.Reason'], 'PullRequestBlah'))
+        displayName: lin - compress lin artifact
 
       - task: PublishPipelineArtifact@0
         inputs:
           artifactName: 'INSTALLER_MAC_NIGHTLY'
           targetPath: 'build/nightly'
-        condition: and(variables.isMac, ne(variables['Build.Reason'], 'PullRequest'))
+        condition: and(variables.isMac, ne(variables['Build.Reason'], 'PullRequestBlah'))
         displayName: mac - publish mac artifact
 
       - task: PublishPipelineArtifact@0
         inputs:
           artifactName: 'INSTALLER_WIN_NIGHTLY'
           targetPath: 'build/nightly'
-        condition: and(variables.isWindows, ne(variables['Build.Reason'], 'PullRequest'))
-        displayName: mac - publish win artifact
+        condition: and(variables.isWindows, ne(variables['Build.Reason'], 'PullRequestBlah'))
+        displayName: win - publish win artifact
 
       - task: PublishPipelineArtifact@0
         inputs:
           artifactName: 'INSTALLER_LIN_NIGHTLY'
           targetPath: 'build/nightly'
-        condition: and(variables.isLinux, ne(variables['Build.Reason'], 'PullRequest'))
-        displayName: mac - publish lin artifact
+        condition: and(variables.isLinux, ne(variables['Build.Reason'], 'PullRequestBlah'))
+        displayName: lin - publish lin artifact
