@@ -484,19 +484,10 @@ add_custom_target(nightly-package)
 add_dependencies(nightly-package BespokeSynth)
 
 if (APPLE)
+    add_dependencies(nightly-package BespokeSynthSigned)
+    get_target_property(output_dir BespokeSynth RUNTIME_OUTPUT_DIRECTORY)
     add_custom_command(TARGET nightly-package
-            POST_BUILD
-            WORKING_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}
-            COMMAND ${CMAKE_COMMAND} -E make_directory ${BESPOKE_NIGHTLY_DIR}
-            COMMAND hdiutil create /tmp/tmp.dmg -ov -volname "BespokeSynth" -fs HFS+ -srcfolder $<TARGET_BUNDLE_DIR:BespokeSynth>
-            COMMAND ${CMAKE_COMMAND} -E rm -f "${BESPOKE_NIGHTLY_DIR}/BespokeNightly.dmg"
-            COMMAND hdiutil convert /tmp/tmp.dmg -format UDZO -o "${BESPOKE_NIGHTLY_DIR}/BespokeNightly.dmg"
-            )
-else()
-    add_custom_command(TARGET nightly-package
-            POST_BUILD
-            WORKING_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}
-            COMMAND ${CMAKE_COMMAND} -E make_directory ${BESPOKE_NIGHTLY_DIR}
-            COMMAND ${CMAKE_COMMAND} -E echo "coming soon}" > ${BESPOKE_NIGHTLY_DIR}/installer.txt
-            )
+             POST_BUILD
+             COMMAND ${CMAKE_SOURCE_DIR}/scripts/installer_macOS/make_installer.sh "${output_dir}" "${CMAKE_SOURCE_DIR}/scripts/installer_macOS" "${BESPOKE_NIGHTLY_DIR}" "${CMAKE_PROJECT_VERSION}"
+             )
 endif()
