@@ -105,16 +105,6 @@ jobs:
         condition: variables.isLinux
         displayName: linux - run apt-get
 
-      - bash: |
-          set -e
-
-          sudo apt-get update
-
-          sudo apt-get install -y zip
-
-        condition: and(variables.isWindows, ne(variables['Build.Reason'], 'PullRequest'))
-        displayName: windows - run apt-get for distribution build
-
       - script: |
           npm install -g appdmg
           wget https://www.python.org/ftp/python/3.10.0/python-3.10.0post2-macos11.pkg
@@ -195,11 +185,14 @@ jobs:
 
       - bash: |
            set -e
-           echo Compressing build output from build/Source/BespokeSynth_artefacts/Release to build/nightly
            mkdir build/nightly
-           cd build/Source/BespokeSynth_artefacts/Release
-           zip -r ../../../nightly/BespokeSynth-Windows.zip ./*
         condition: and(variables.isWindows, ne(variables['Build.Reason'], 'PullRequest'))
+        displayName: win - make nightly dir
+
+      - task: PowerShell@2
+        inputs:
+          targetType: 'filePath'
+          script: 'Compress-Archive -Path build/Source/BespokeSynth_artefacts/Release/* -DestinationPath build/nightly/BespokeSynth-Windows.zip'
         displayName: win - compress win artifact
 
       - bash: |
