@@ -187,7 +187,7 @@ jobs:
            set -e
            echo Copying build output from build/Source/BespokeSynth_artefacts/Release to windows_nightly_artefact
            cp -R build/Source/BespokeSynth_artefacts/Release windows_nightly_artefact
-        condition: and(variables.isWindows, ne(variables['Build.Reason'], 'PullRequest'))
+        condition: and(variables.isWindows, ne(variables['Build.Reason'], 'PullRequestBlah'))
         displayName: win - copy win artifact
 
       - powershell: |
