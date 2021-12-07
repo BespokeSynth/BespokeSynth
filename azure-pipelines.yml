@@ -218,3 +218,65 @@ jobs:
           targetPath: 'build/nightly'
         condition: and(variables.isLinux, ne(variables['Build.Reason'], 'PullRequest'))
         displayName: lin - publish lin artifact
+
+
+
+  - job: Release
+    dependsOn: Build
+    condition: and(succeeded(), ne(variables['Build.Reason'], 'PullRequest'))
+    pool:
+      vmImage: 'macos-10.15'
+
+    steps:
+    - checkout: self
+      persistCredentials: true
+
+    - task: DownloadSecureFile@1
+      inputs:
+        secureFile: discord-nightly.webhook
+
+    - task: DownloadPipelineArtifact@0
+      inputs:
+        artifactName: 'INSTALLER_MAC_NIGHTLY'
+        targetPath: $(System.DefaultWorkingDirectory)
+
+    - task: DownloadPipelineArtifact@0
+      inputs:
+        artifactName: 'INSTALLER_WIN_NIGHTLY'
+        targetPath: $(System.DefaultWorkingDirectory)
+
+    - task: DownloadPipelineArtifact@0
+      inputs:
+        artifactName: 'INSTALLER_LIN_NIGHTLY'
+        targetPath: $(System.DefaultWorkingDirectory)
+
+    - bash: |
+        set -e
+        set -x
+
+        mkdir -p releases
+        
+        mv *.* releases
+
+        echo "bespoke nightly build" >> releases/ReleaseNotes.md
+
+        ls -alFh releases
+      displayName: Prepare Release
+
+    - task: GitHubRelease@0
+      displayName: "Create Github Nightly Release"
+      inputs:
+        gitHubConnection: BespokeSynthPublish
+        repositoryName: BespokeSynth/BespokeSynth
+        action: 'edit'
+        tag: Nightly
+        target: '$(Build.SourceVersion)'
+        addChangeLog: false
+        assetUploadMode: 'delete'
+        releaseNotesFile: $(System.DefaultWorkingDirectory)/releases/ReleaseNotes.md
+        assets: $(System.DefaultWorkingDirectory)/releases/*.*
+        isPreRelease: true
+
+    - bash: |
+        curl -i -H "Accept: application/json" -H "Content-Type:application/json" -X POST --data "{\"content\": \"a bespoke nightly build is available. get it here:\nhttps://github.com/BespokeSynth/BespokeSynth/releases/tag/Nightly\"}" `cat $AGENT_TEMPDIRECTORY/discord-nightly.webhook`
+      displayName: Tell Discord
