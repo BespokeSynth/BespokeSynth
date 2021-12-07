@@ -185,16 +185,18 @@ jobs:
 
       - bash: |
            set -e
-           echo Copying build output from build/Source/BespokeSynth_artefacts/Release to build/nightly
-           cp -R build/Source/BespokeSynth_artefacts/Release build/nightly
+           echo Compressing build output from build/Source/BespokeSynth_artefacts/Release to build/nightly
+           mkdir build/nightly
+           cd build/Source/BespokeSynth_artefacts/Release
+           zip -r ../../../nightly/BespokeSynth-Windows.zip ./*
         condition: and(variables.isWindows, ne(variables['Build.Reason'], 'PullRequest'))
-        displayName: win - copy win artifact
+        displayName: win - compress win artifact
 
       - bash: |
            set -e
            echo Compressing build output from build/Source/BespokeSynth_artefacts/Release to build/nightly
            mkdir build/nightly
-           tar -cvzf build/nightly/Bespoke-Linux.tar.gz build/Source/BespokeSynth_artefacts/Release
+           tar -cvzf build/nightly/BespokeSynth-Linux.tar.gz build/Source/BespokeSynth_artefacts/Release
         condition: and(variables.isLinux, ne(variables['Build.Reason'], 'PullRequest'))
         displayName: lin - compress lin artifact
 
@@ -256,7 +258,7 @@ jobs:
 
         mkdir -p releases
         
-        mv *.* releases
+        mv *.zip *.dmg *.gz releases
 
         echo "bespoke nightly build" >> releases/ReleaseNotes.md
 
