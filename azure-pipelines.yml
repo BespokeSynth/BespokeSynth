@@ -191,8 +191,9 @@ jobs:
 
       - task: PowerShell@2
         inputs:
-          targetType: 'filePath'
+          targetType: 'inline'
           script: 'Compress-Archive -Path build/Source/BespokeSynth_artefacts/Release/* -DestinationPath build/nightly/BespokeSynth-Windows.zip'
+        condition: and(variables.isWindows, ne(variables['Build.Reason'], 'PullRequest'))
         displayName: win - compress win artifact
 
       - bash: |
