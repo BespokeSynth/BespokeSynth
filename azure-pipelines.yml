@@ -183,9 +183,15 @@ jobs:
         displayName: lin - build with cmake
         condition: variables.isLinux
 
+      - bash: |
+           set -e
+           echo Copying build output from build/Source/BespokeSynth_artefacts/Release to windows_nightly_artefact
+           cp -R build/Source/BespokeSynth_artefacts/Release windows_nightly_artefact
+        condition: and(variables.isWindows, ne(variables['Build.Reason'], 'PullRequest'))
+        displayName: win - copy win artifact
+
       - powershell: |
-          echo Copying build output from build/Source/BespokeSynth_artefacts/Release to build/nightly
-          cp -R build/Source/BespokeSynth_artefacts/Release windows_nightly_artefact
+          echo Compressing build output from windows_nightly_artefact to build/nightly
           mkdir build/nightly
           Compress-Archive -Path windows_nightly_artefact/* -DestinationPath build/nightly/BespokeSynth-Windows.zip
         condition: and(variables.isWindows, ne(variables['Build.Reason'], 'PullRequestBlah'))
