@@ -184,8 +184,10 @@ jobs:
         condition: variables.isLinux
 
       - powershell: |
-           mkdir build/nightly
-           Compress-Archive -Path build/Source/BespokeSynth_artefacts/Release/* -DestinationPath build/nightly/BespokeSynth-Windows.zip
+          echo Copying build output from build/Source/BespokeSynth_artefacts/Release to build/nightly
+          cp -R build/Source/BespokeSynth_artefacts/Release windows_nightly_artefact
+          mkdir build/nightly
+          Compress-Archive -Path windows_nightly_artefact/* -DestinationPath build/nightly/BespokeSynth-Windows.zip
         condition: and(variables.isWindows, ne(variables['Build.Reason'], 'PullRequestBlah'))
         displayName: win - compress win artifact
 
