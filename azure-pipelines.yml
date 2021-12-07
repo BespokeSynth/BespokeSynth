@@ -105,6 +105,16 @@ jobs:
         condition: variables.isLinux
         displayName: linux - run apt-get
 
+      - bash: |
+          set -e
+
+          sudo apt-get update
+
+          sudo apt-get install -y zip
+
+        condition: and(variables.isWindows, ne(variables['Build.Reason'], 'PullRequest'))
+        displayName: windows - run apt-get for distribution build
+
       - script: |
           npm install -g appdmg
           wget https://www.python.org/ftp/python/3.10.0/python-3.10.0post2-macos11.pkg
