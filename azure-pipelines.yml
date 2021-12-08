@@ -41,7 +41,7 @@ jobs:
           echo "BUILD REASON   = " $(Build.Reason)
           echo "cmakeArguments = " $(cmakeArguments)
 
-          if [ $(Build.Reason) == "PullRequestBlah" ]; then
+          if [ $(Build.Reason) == "PullRequest" ]; then
             export CMAKE_CONFIG=Debug
             export CMAKE_TARGET=BespokeSynth
             echo "##vso[task.setvariable variable=CMAKE_CONFIG]Debug"
@@ -109,7 +109,7 @@ jobs:
           npm install -g appdmg
           wget https://www.python.org/ftp/python/3.10.0/python-3.10.0post2-macos11.pkg
           sudo installer -pkg python-3.10.0post2-macos11.pkg -target /
-        condition: and(variables.isMac, ne(variables['Build.Reason'], 'PullRequestBlah'))
+        condition: and(variables.isMac, ne(variables['Build.Reason'], 'PullRequest'))
         displayName: mac - install dependencies needed for distribution build
 
       - task: InstallAppleCertificate@2
@@ -128,32 +128,32 @@ jobs:
         name: extra_apis
         inputs:
           secureFile: extra_apis.zip
-        condition: ne(variables['Build.Reason'], 'PullRequestBlah')
+        condition: ne(variables['Build.Reason'], 'PullRequest')
 
       - bash: |
           mv "$(extra_apis.secureFilePath)" "$(Build.SourcesDirectory)"
         displayName: move extra_apis
-        condition: ne(variables['Build.Reason'], 'PullRequestBlah')
+        condition: ne(variables['Build.Reason'], 'PullRequest')
 
       - task: ExtractFiles@1
         inputs:
           archiveFilePatterns: 'extra_apis.zip'
           destinationFolder: '$(Build.SourcesDirectory)/extra_apis'
-        condition: ne(variables['Build.Reason'], 'PullRequestBlah')
+        condition: ne(variables['Build.Reason'], 'PullRequest')
 
       - bash: |
           set -e
           echo Building with BUILD_TYPE = $CMAKE_CONFIG and arguments = $(cmakeArguments)
           cmake -Bbuild $(cmakeArguments) $(LIBRARY_PATHS) -DCMAKE_BUILD_TYPE=$CMAKE_CONFIG -DBESPOKE_PORTABLE=True -DBESPOKE_NIGHTLY=True
         displayName: all - configure with cmake for nightly
-        condition: ne(variables['Build.Reason'], 'PullRequestBlah')
+        condition: ne(variables['Build.Reason'], 'PullRequest')
 
       - bash: |
           set -e
           echo Building with BUILD_TYPE = $CMAKE_CONFIG and arguments = $(cmakeArguments)
           cmake -Bbuild $(cmakeArguments) -DCMAKE_BUILD_TYPE=$CMAKE_CONFIG -DBESPOKE_PORTABLE=True
         displayName: all - configure with cmake for PR
-        condition: eq(variables['Build.Reason'], 'PullRequestBlah')
+        condition: eq(variables['Build.Reason'], 'PullRequest')
 
       - bash: |
           set -e
@@ -187,14 +187,14 @@ jobs:
            set -e
            echo Copying build output from build/Source/BespokeSynth_artefacts/Release to windows_nightly_artefact
            cp -R build/Source/BespokeSynth_artefacts/Release windows_nightly_artefact
-        condition: and(variables.isWindows, ne(variables['Build.Reason'], 'PullRequestBlah'))
+        condition: and(variables.isWindows, ne(variables['Build.Reason'], 'PullRequest'))
         displayName: win - copy win artifact
 
       - powershell: |
           echo Compressing build output from windows_nightly_artefact to build/nightly
           mkdir build/nightly
           Compress-Archive -Path windows_nightly_artefact/* -DestinationPath build/nightly/BespokeSynth-Windows.zip
-        condition: and(variables.isWindows, ne(variables['Build.Reason'], 'PullRequestBlah'))
+        condition: and(variables.isWindows, ne(variables['Build.Reason'], 'PullRequest'))
         displayName: win - compress win artifact
 
       - bash: |
@@ -202,35 +202,35 @@ jobs:
            echo Compressing build output from build/Source/BespokeSynth_artefacts/Release to build/nightly
            mkdir build/nightly
            tar -cvzf build/nightly/BespokeSynth-Linux.tar.gz build/Source/BespokeSynth_artefacts/Release
-        condition: and(variables.isLinux, ne(variables['Build.Reason'], 'PullRequestBlah'))
+        condition: and(variables.isLinux, ne(variables['Build.Reason'], 'PullRequest'))
         displayName: lin - compress lin artifact
 
       - task: PublishPipelineArtifact@0
         inputs:
           artifactName: 'INSTALLER_MAC_NIGHTLY'
           targetPath: 'build/nightly'
-        condition: and(variables.isMac, ne(variables['Build.Reason'], 'PullRequestBlah'))
+        condition: and(variables.isMac, ne(variables['Build.Reason'], 'PullRequest'))
         displayName: mac - publish mac artifact
 
       - task: PublishPipelineArtifact@0
         inputs:
           artifactName: 'INSTALLER_WIN_NIGHTLY'
           targetPath: 'build/nightly'
-        condition: and(variables.isWindows, ne(variables['Build.Reason'], 'PullRequestBlah'))
+        condition: and(variables.isWindows, ne(variables['Build.Reason'], 'PullRequest'))
         displayName: win - publish win artifact
 
       - task: PublishPipelineArtifact@0
         inputs:
           artifactName: 'INSTALLER_LIN_NIGHTLY'
           targetPath: 'build/nightly'
-        condition: and(variables.isLinux, ne(variables['Build.Reason'], 'PullRequestBlah'))
+        condition: and(variables.isLinux, ne(variables['Build.Reason'], 'PullRequest'))
         displayName: lin - publish lin artifact
 
 
 
   - job: Release
     dependsOn: Build
-    condition: and(succeeded(), ne(variables['Build.Reason'], 'PullRequestBlah'))
+    condition: and(succeeded(), ne(variables['Build.Reason'], 'PullRequest'))
     pool:
       vmImage: 'macos-10.15'
 
