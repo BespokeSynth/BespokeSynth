@@ -3,6 +3,7 @@ cmake_policy(SET CMP0091 NEW)
 
 # Global build parameters. Optional features are configurable via additional
 # BESPOKE_* variables defined in their respective subdirs.
+option(BESPOKE_NIGHTLY "Automated build from github" OFF)
 option(BESPOKE_PORTABLE "Create a self-contained build that ships all dependencies" OFF)
 set(BESPOKE_JUCE_LOCATION "${CMAKE_SOURCE_DIR}/libs/JUCE" CACHE STRING "Path to JUCE library source tree")
 set(BESPOKE_PYTHON_ROOT "" CACHE STRING "Python search path. Override as needed.")
@@ -45,6 +46,10 @@ if(WIN32 AND ${BESPOKE_BITNESS} EQUAL 32)
         $<$<CXX_COMPILER_ID:MSVC>:/LARGEADDRESSAWARE>
         $<$<BOOL:${MINGW}>:LINKER:--large-address-aware>
         )
+endif()
+
+if(BESPOKE_NIGHTLY)
+    message(STATUS "Nightly build")
 endif()
 
 if(BESPOKE_PORTABLE)

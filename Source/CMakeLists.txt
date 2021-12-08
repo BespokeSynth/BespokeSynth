@@ -343,6 +343,12 @@ target_sources(BespokeSynth PRIVATE
     ofxJSONElement.cpp
     )
 
+if(BESPOKE_NIGHTLY)
+    target_compile_definitions(BespokeSynth PRIVATE
+        BESPOKE_NIGHTLY=1
+        )
+endif()
+
 if(BESPOKE_PORTABLE)
     set_source_files_properties(ScriptModule.cpp PROPERTIES
         COMPILE_DEFINITIONS BESPOKE_PORTABLE_PYTHON="$<IF:$<BOOL:${WIN32}>,python.exe,bin/python>"
