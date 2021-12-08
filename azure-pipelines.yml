@@ -261,9 +261,15 @@ jobs:
         set -e
         set -x
 
+        short_hash=`git rev-parse --short=7 HEAD`
+
         mkdir -p releases
         
         mv *.zip *.dmg *.gz releases
+
+        cd releases
+        for f in *.*; do echo mv -- "$f" "${f%.*}_$short_hash.${f#*.}"; done
+        cd ..
 
         echo "bespoke nightly build" >> releases/ReleaseNotes.md
 
