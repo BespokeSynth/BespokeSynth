@@ -268,7 +268,7 @@ jobs:
         mv *.zip *.dmg *.gz releases
 
         cd releases
-        for f in *.*; do mv -- "$f" "${f%.*}_$short_hash_$(date +%F).${f##*.}"; done
+        for f in *.*; do mv -- "$f" "${f%.*}_${short_hash}_$(date +%F).${f##*.}"; done
         cd ..
 
         echo "bespoke nightly build" >> releases/ReleaseNotes.md
