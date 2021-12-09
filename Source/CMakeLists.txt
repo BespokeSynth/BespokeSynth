@@ -475,6 +475,12 @@ target_link_libraries(BespokeSynth PRIVATE
     juce::juce_gui_basics
     juce::juce_opengl
     juce::juce_osc
+    # if JUCE is devendored, these libraries need to be linked against
+    $<$<BOOL:${BESPOKE_DEVENDORED_SYSTEM_JUCE}>:FLAC>
+    $<$<BOOL:${BESPOKE_DEVENDORED_SYSTEM_JUCE}>:ogg>
+    $<$<BOOL:${BESPOKE_DEVENDORED_SYSTEM_JUCE}>:vorbis>
+    $<$<BOOL:${BESPOKE_DEVENDORED_SYSTEM_JUCE}>:vorbisenc>
+    $<$<BOOL:${BESPOKE_DEVENDORED_SYSTEM_JUCE}>:vorbisfile>
 
     ${Python_LIBRARIES}
     $<$<BOOL:${MINGW}>:dbghelp>
