@@ -204,9 +204,9 @@ void ModularSynth::DumpStats(bool isCrash, void* crashContext)
                moduleInfo.SizeOfStruct = sizeof(moduleInfo);
 
                if (::SymGetModuleInfo64(process, symbol->ModBase, &moduleInfo))
-                  log.appendText(moduleInfo.ModuleName + String(": "));
+                  log.appendText(String(moduleInfo.ModuleName) + String(": "));
 
-               log.appendText(symbol->Name + String(" + 0x") + String::toHexString((juce::int64)displacement) + "\n");
+               log.appendText(String(symbol->Name) + String(" + 0x") + String::toHexString((juce::int64)displacement) + "\n");
             }
 
          }
