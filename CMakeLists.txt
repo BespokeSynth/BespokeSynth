@@ -14,6 +14,7 @@ option(BESPOKE_SYSTEM_JUCE "Use system installation of juce" OFF)
 option(BESPOKE_DEVENDORED_SYSTEM_JUCE "Use system libraries when using system installation of juce" OFF)
 option(BESPOKE_SYSTEM_PYBIND11 "Use a system installation of pybind11" OFF)
 option(BESPOKE_SYSTEM_JSONCPP "Use system-wide installation of jsoncpp" OFF)
+option(BESPOKE_SYSTEM_TUNING_LIBRARY "Use system installation of tuning-library" OFF)
 
 # Global CMake options
 set(CMAKE_CXX_EXTENSIONS OFF)

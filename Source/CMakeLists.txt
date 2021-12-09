@@ -465,7 +465,7 @@ target_link_libraries(BespokeSynth PRIVATE
     bespoke::pybind11
     bespoke::xwax
 
-    tuning-library
+    $<$<STREQUAL:${BESPOKE_SYSTEM_TUNING_LIBRARY},OFF>:tuning-library>
     oddsound-mts
 
     juce::juce_audio_basics
