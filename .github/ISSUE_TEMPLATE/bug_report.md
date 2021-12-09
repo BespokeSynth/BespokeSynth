@@ -1,6 +1,6 @@
 ---
 name: Bug report 🐞
-about: Something does not work as expected! Create a report to help BespokeSynth improve
+about: Something does not work as expected! Create a report to help Bespoke improve
 title: ''
 labels: bug
 assignees: ''
