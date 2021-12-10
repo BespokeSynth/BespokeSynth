@@ -52,7 +52,7 @@ void ValueSetter::CreateUIControls()
    ENDUIBLOCK(mWidth, mHeight);
 
    auto entryRect = mValueEntry->GetRect();
-   mValueSlider = new FloatSlider(this, "slider", entryRect.x, entryRect.y, entryRect.width, entryRect.height, &mValue, -1, 1);
+   mValueSlider = new FloatSlider(this, "slider", entryRect.x, entryRect.y, entryRect.width, entryRect.height, &mValue, 0, 1);
    mValueSlider->SetShowing(false);
    
    mControlCable = new PatchCableSource(this, kConnectionType_Modulator);
