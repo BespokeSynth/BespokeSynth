@@ -36,6 +36,8 @@
 #include "CanvasTimeline.h"
 #include "CanvasScrollbar.h"
 
+#include "juce_gui_basics/juce_gui_basics.h"
+
 NoteCanvas::NoteCanvas()
 : mCanvas(nullptr)
 , mCanvasControls(nullptr)
@@ -74,6 +76,8 @@ void NoteCanvas::CreateUIControls()
    IDrawableModule::CreateUIControls();
    
    mQuantizeButton = new ClickButton(this,"quantize",160,5);
+   mLoadMidiButton = new ClickButton(this,"load midi", 224, 5);
+   mSaveMidiButton = new ClickButton(this,"save midi", 290, 5);
    //mClipButton = new ClickButton(this,"clip",220,5);
    mPlayCheckbox = new Checkbox(this,"play",5,5,&mPlay);
    mRecordCheckbox = new Checkbox(this,"rec",50,5,&mRecord);
@@ -468,6 +472,8 @@ void NoteCanvas::DrawModule()
    
    mCanvasControls->Draw();
    mQuantizeButton->Draw();
+   mLoadMidiButton->Draw();
+   mSaveMidiButton->Draw();
    //mClipButton->Draw();
    mPlayCheckbox->Draw();
    mRecordCheckbox->Draw();
@@ -604,6 +610,87 @@ void NoteCanvas::QuantizeNotes()
    }
 }
 
+void NoteCanvas::LoadMidi()
+{
+	using namespace juce;
+	FileChooser chooser("Load midi", File(ofToDataPath("")), "*.mid", true, false, TheSynth->GetFileChooserParent());
+	if (chooser.browseForFileToOpen())
+	{
+		mCanvas->Clear();
+		File file = chooser.getResult();
+        FileInputStream inputStream(file);
+		MidiFile midifile;
+		if (midifile.readFrom(inputStream)) 
+        {
+			midifile.convertTimestampTicksToSeconds();
+            int trackToGet = 0;
+			if (midifile.getNumTracks() > 1) 
+            {
+                trackToGet = 1;
+			}
+			const MidiMessageSequence* trackSequence = midifile.getTrack(trackToGet);
+			for (int eventIndex = 0; eventIndex < trackSequence->getNumEvents(); eventIndex++) 
+            {
+				MidiMessageSequence::MidiEventHolder* noteEvent = trackSequence->getEventPointer(eventIndex);
+				if (noteEvent->noteOffObject) 
+                {
+					int note = noteEvent->message.getNoteNumber();
+					int veloc = noteEvent->message.getVelocity() * 1.27;
+                    double start = (noteEvent->message.getTimeStamp() / 2);
+					double end = (noteEvent->noteOffObject->message.getTimeStamp() / 2);
+					double length = end - start;					
+					AddNote(start, note, veloc, length, -1, ModulationParameters());
+				}
+			}
+            float latest = 0.0;
+            for (auto* element : mCanvas->GetElements()) 
+            {
+                if(element->GetEnd() > latest)
+                latest = element->GetEnd();
+            }
+            mNumMeasuresSlider->SetExtents(0, static_cast<int>(std::ceil(latest)));
+            FitNotes();            
+		}
+	}
+}
+
+void NoteCanvas::SaveMidi()
+{
+    using namespace juce;
+    constexpr static int tppq = 96;
+
+    FileChooser chooser("Save midi", File(ofToDataPath("midi")), "*.mid", true, false,  TheSynth->GetFileChooserParent());
+    if (chooser.browseForFileToSave(true))
+    {
+        MidiFile midifile;  
+        midifile.setTicksPerQuarterNote(tppq);
+        MidiMessageSequence track1;
+        MidiMessage trackTimeSig = MidiMessage::timeSignatureMetaEvent(TheTransport->GetTimeSigTop(), TheTransport->GetTimeSigBottom());
+        track1.addEvent(trackTimeSig);
+        for (auto* element : mCanvas->GetElements()) 
+        {
+            NoteCanvasElement* noteOnElement = static_cast<NoteCanvasElement*>(element);
+            int noteNumber = mCanvas->GetNumRows() - noteOnElement->mRow - 1;
+            float noteStart = (element->mCol + element->mOffset) * tppq *
++                    TheTransport->GetMeasureFraction(mInterval) / TheTransport->GetMeasureFraction(kInterval_4n); 
+            float velocity = noteOnElement->GetVelocity();
+            MidiMessage messageOn = MidiMessage::noteOn(1, noteNumber, velocity);
+            messageOn.setTimeStamp(noteStart);
+            track1.addEvent(messageOn);
+            float noteEnd = (element->mCol + element->mOffset + element->mLength) * tppq *
++                    TheTransport->GetMeasureFraction(mInterval) / TheTransport->GetMeasureFraction(kInterval_4n);
+            MidiMessage messageOff = MidiMessage::noteOff(1, noteNumber, velocity);
+            messageOff.setTimeStamp(noteEnd);
+            track1.addEvent(messageOff);            
+        }
+        midifile.addTrack(track1);     
+        std::string savePath = chooser.getResult().getFullPathName().toStdString();
+        File f(savePath);
+        FileOutputStream out(f);
+        midifile.writeTo(out);
+    }
+}
+
 void NoteCanvas::CheckboxUpdated(Checkbox* checkbox)
 {
    if (checkbox == mEnabledCheckbox)
@@ -641,6 +728,12 @@ void NoteCanvas::ButtonClicked(ClickButton* button)
    
    if (button == mClipButton)
       ClipNotes();
+
+   if (button == mLoadMidiButton)
+       LoadMidi();
+
+   if (button == mSaveMidiButton)
+       SaveMidi();
 }
 
 void NoteCanvas::FloatSliderUpdated(FloatSlider* slider, float oldVal)

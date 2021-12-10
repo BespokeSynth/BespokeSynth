@@ -96,6 +96,8 @@ private:
    bool FreeRecordParityMatched();
    void ClipNotes();
    void QuantizeNotes();
+   void LoadMidi();
+   void SaveMidi();
    
    Canvas* mCanvas;
    CanvasControls* mCanvasControls;
@@ -108,6 +110,8 @@ private:
    IntSlider* mNumMeasuresSlider;
    int mNumMeasures;
    ClickButton* mQuantizeButton;
+   ClickButton* mLoadMidiButton;
+   ClickButton* mSaveMidiButton;
    ClickButton* mClipButton;
    bool mPlay;
    Checkbox* mPlayCheckbox;
