@@ -611,103 +611,83 @@ void NoteCanvas::QuantizeNotes()
 }
 
 void NoteCanvas::LoadMidi()
-{//sneed
+{
 	using namespace juce;
 	FileChooser chooser("Load midi", File(ofToDataPath("")), "*.mid", true, false, TheSynth->GetFileChooserParent());
 	if (chooser.browseForFileToOpen())
 	{
-
 		mCanvas->Clear();
 		File file = chooser.getResult();
-
-		//get fileinputstream from midi file
-		FileInputStream inputStream(file);
+        FileInputStream inputStream(file);
 		MidiFile midifile;
-
-
-		if (midifile.readFrom(inputStream)) {
+		if (midifile.readFrom(inputStream)) 
+        {
 			midifile.convertTimestampTicksToSeconds();
-
-
             int trackToGet = 0;
-			if (midifile.getNumTracks() > 1) {
-				//Midi Type 1 - Prompt user to select which tracks to import
+			if (midifile.getNumTracks() > 1) 
+            {
                 trackToGet = 1;
 			}
 			const MidiMessageSequence* trackSequence = midifile.getTrack(trackToGet);
-			for (int eventIndex = 0; eventIndex < trackSequence->getNumEvents(); eventIndex++) {
+			for (int eventIndex = 0; eventIndex < trackSequence->getNumEvents(); eventIndex++) 
+            {
 				MidiMessageSequence::MidiEventHolder* noteEvent = trackSequence->getEventPointer(eventIndex);
-				if (noteEvent->noteOffObject) {
+				if (noteEvent->noteOffObject) 
+                {
 					int note = noteEvent->message.getNoteNumber();
-					int veloc = noteEvent->message.getVelocity() * 1.27; //not exact bc AddNote uses int argument
+					int veloc = noteEvent->message.getVelocity() * 1.27;
                     double start = (noteEvent->message.getTimeStamp() / 2);
 					double end = (noteEvent->noteOffObject->message.getTimeStamp() / 2);
-					double length = end - start;
-					
+					double length = end - start;					
 					AddNote(start, note, veloc, length, -1, ModulationParameters());
 				}
 			}
-
-            //Set new measures slider limit
             float latest = 0.0;
-            for (auto* element : mCanvas->GetElements()) {
+            for (auto* element : mCanvas->GetElements()) 
+            {
                 if(element->GetEnd() > latest)
                 latest = element->GetEnd();
             }
             mNumMeasuresSlider->SetExtents(0, static_cast<int>(std::ceil(latest)));
-
-            //Set new length to length of imported midi            
             FitNotes();            
 		}
 	}
 }
 
 void NoteCanvas::SaveMidi()
-{//chuck
+{
     using namespace juce;
+    constexpr static int tppq = 96;
+
     FileChooser chooser("Save midi", File(ofToDataPath("midi")), "*.mid", true, false,  TheSynth->GetFileChooserParent());
     if (chooser.browseForFileToSave(true))
     {
         MidiFile midifile;  
-        midifile.setTicksPerQuarterNote(96);
-        
-        //Setup track with meta events
+        midifile.setTicksPerQuarterNote(tppq);
         MidiMessageSequence track1;
         MidiMessage trackTimeSig = MidiMessage::timeSignatureMetaEvent(TheTransport->GetTimeSigTop(), TheTransport->GetTimeSigBottom());
-        //MidiMessage trackTempo = MidiMessage::tempoMetaEvent((TheTransport->MsPerBar()*1000)/16);//microseconds per 1/4 note = (1000*ms) / 16?
         track1.addEvent(trackTimeSig);
-        //track1.addEvent(trackTempo);
-
-        for (auto* element : mCanvas->GetElements()) {
-
-            //Note On message
+        for (auto* element : mCanvas->GetElements()) 
+        {
             NoteCanvasElement* noteOnElement = static_cast<NoteCanvasElement*>(element);
-            int noteNumber = noteOnElement->mRow;
-
-            //float noteStart = element->GetStart() * TheTransport->MsPerBar();
-            float noteStart = (element->mCol + element->mOffset) * TheTransport->MsPerBar(); 
-
+            int noteNumber = mCanvas->GetNumRows() - noteOnElement->mRow - 1;
+            float noteStart = (element->mCol + element->mOffset) * tppq *
++                    TheTransport->GetMeasureFraction(mInterval) / TheTransport->GetMeasureFraction(kInterval_4n); 
             float velocity = noteOnElement->GetVelocity();
             MidiMessage messageOn = MidiMessage::noteOn(1, noteNumber, velocity);
             messageOn.setTimeStamp(noteStart);
             track1.addEvent(messageOn);
-            //Note Off message
-            //float noteEnd = element->GetEnd() * TheTransport->MsPerBar();
-            float noteEnd = (element->mCol + element->mOffset + element->mLength) * TheTransport->MsPerBar(); 
+            float noteEnd = (element->mCol + element->mOffset + element->mLength) * tppq *
++                    TheTransport->GetMeasureFraction(mInterval) / TheTransport->GetMeasureFraction(kInterval_4n);
             MidiMessage messageOff = MidiMessage::noteOff(1, noteNumber, velocity);
             messageOff.setTimeStamp(noteEnd);
-            track1.addEvent(messageOff);
-            track1.updateMatchedPairs();
+            track1.addEvent(messageOff);            
         }
-        
-        midifile.addTrack(track1);
-
+        midifile.addTrack(track1);     
         std::string savePath = chooser.getResult().getFullPathName().toStdString();
         File f(savePath);
         FileOutputStream out(f);
         midifile.writeTo(out);
-
-
     }
 }
 
