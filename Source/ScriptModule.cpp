@@ -635,6 +635,20 @@ void ScriptModule::PlayNoteFromScriptAfterDelay(float pitch, float velocity, dou
    }
 }
 
+void ScriptModule::SendCCFromScript(int control, int value, int noteOutputIndex)
+{
+   if (noteOutputIndex == 0)
+   {
+      SendCC(control, value);
+      return;
+   }
+
+   if (noteOutputIndex - 1 < (int)mExtraNoteOutputs.size())
+   {
+      mExtraNoteOutputs[noteOutputIndex - 1]->SendCCOutput(control, value);
+   }
+}
+
 void ScriptModule::ScheduleNote(double time, float pitch, float velocity, float pan, int noteOutputIndex)
 {
    for (size_t i=0; i<mScheduledNoteOutput.size(); ++i)

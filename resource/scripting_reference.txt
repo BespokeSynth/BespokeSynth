@@ -64,6 +64,8 @@ script-relative:
       example: me.get_caller().play_note(60,127)
    me.set_num_note_outputs(num)
    me.connect_osc_input(port)
+   me.send_cc(control, value, output_index)
+      optional: output_index = 0
 
 
 import notesequencer
@@ -180,6 +182,15 @@ import drumplayer
       drumplayer.get(path)
    instance:
       d.import_sampleplayer_cue(samplePlayer, srcCueIndex, destHitIndex)
+
+
+import vstplugin
+   static:
+      vstplugin.get(path)
+   instance:
+      v.send_cc(ctl, value, channel)
+      v.send_program_change(program, channel)
+      v.send_data(a, b, c)
 
 
 import module
