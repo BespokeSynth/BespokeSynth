@@ -699,6 +699,16 @@ void VSTPlugin::SendCC(int control, int value, int voiceIdx /*=-1*/)
    mMidiBuffer.addEvent(juce::MidiMessage::controllerEvent((mUseVoiceAsChannel ? channel : mChannel), control, (uint8)value), 0);
 }
 
+void VSTPlugin::SendMidi(const juce::MidiMessage& message)
+{
+   if (!mPluginReady || mPlugin == nullptr)
+      return;
+
+   const juce::ScopedLock lock(mMidiInputLock);
+
+   mMidiBuffer.addEvent(message, 0);
+}
+
 void VSTPlugin::SetEnabled(bool enabled)
 {
    mEnabled = enabled;

@@ -39,6 +39,7 @@
 #include "OSCOutput.h"
 #include "EnvelopeModulator.h"
 #include "DrumPlayer.h"
+#include "VSTPlugin.h"
 
 #include "leathers/push"
 #include "leathers/unused-value"
@@ -256,7 +257,11 @@ PYBIND11_EMBEDDED_MODULE(scriptmodule, m)
       .def("connect_osc_input", [](ScriptModule& module, int port)
       {
          module.ConnectOscInput(port);
-      });
+      })
+      .def("send_cc", [](ScriptModule& module, int control, int value, int output_index)
+      {
+         module.SendCCFromScript(control, value, output_index);
+      }, "control"_a, "value"_a, "output_index"_a = 0);
 }
 
 PYBIND11_EMBEDDED_MODULE(notesequencer, m)
@@ -639,6 +644,32 @@ PYBIND11_EMBEDDED_MODULE(drumplayer, m)
       {
          drumPlayer.ImportSampleCuePoint(samplePlayer, srcCueIndex, destHitIndex);
       });
+}
+
+PYBIND11_EMBEDDED_MODULE(vstplugin, m)
+{
+   m.def("get", [](std::string path)
+   {
+      ScriptModule::sMostRecentLineExecutedModule->SetContext();
+      auto* ret = dynamic_cast<VSTPlugin*>(TheSynth->FindModule(path));
+      ScriptModule::sMostRecentLineExecutedModule->OnModuleReferenceBound(ret);
+      ScriptModule::sMostRecentLineExecutedModule->ClearContext();
+      return ret;
+   }, py::return_value_policy::reference);
+   py::class_<VSTPlugin, IDrawableModule> vstpluginClass(m, "vstplugin");
+   vstpluginClass
+      .def("send_cc", [](VSTPlugin& vstplugin, int ctl, int value, int channel)
+   {
+      vstplugin.SendMidi(juce::MidiMessage::controllerEvent(std::clamp(channel, 1, 16), ctl, value));
+   })
+      .def("send_program_change", [](VSTPlugin& vstplugin, int program, int channel)
+   {
+      vstplugin.SendMidi(juce::MidiMessage::programChange(std::clamp(channel, 1, 16), program));
+   })
+      .def("send_data", [](VSTPlugin& vstplugin, int a, int b, int c)
+   {
+      vstplugin.SendMidi(juce::MidiMessage(a, b, c));
+   });
 }
 
 PYBIND11_EMBEDDED_MODULE(module, m)
