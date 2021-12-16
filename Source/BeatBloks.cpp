@@ -967,8 +967,7 @@ void BeatBloks::CheckboxUpdated(Checkbox *checkbox)
    {
       if (mSample)
          mSample->Reset();
-      TheTransport->SetMeasure(0);
-      TheTransport->SetMeasurePos(0);
+      TheTransport->SetMeasureTime(0);
    }
    if (checkbox == mPlayRemixCheckbox)
    {

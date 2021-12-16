@@ -1,5 +1,6 @@
 include(cmake/lib.cmake)
 include(cmake/versiontools.cmake)
+include(../libs/link/AbletonLinkConfig.cmake)
 
 juce_add_gui_app(BespokeSynth
     PRODUCT_NAME BespokeSynth
@@ -16,6 +17,7 @@ juce_add_gui_app(BespokeSynth
 bespoke_buildtime_version_info(BespokeSynth)
 
 target_sources(BespokeSynth PRIVATE
+    AbletonLink.cpp
     ADSR.cpp
     ADSRDisplay.cpp
     Amplifier.cpp
@@ -467,6 +469,7 @@ target_link_libraries(BespokeSynth PRIVATE
 
     $<$<STREQUAL:${BESPOKE_SYSTEM_TUNING_LIBRARY},OFF>:tuning-library>
     oddsound-mts
+    Ableton::Link
 
     juce::juce_audio_basics
     juce::juce_audio_devices
