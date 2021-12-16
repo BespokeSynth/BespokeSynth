@@ -205,6 +205,7 @@ import module
       m.get_height()
       m.set_target(target)
       m.get_target()
+      m.get_targets()
       m.set_name(name)
       m.delete()
       m.set(path, value)

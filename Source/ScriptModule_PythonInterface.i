@@ -722,6 +722,22 @@ PYBIND11_EMBEDDED_MODULE(module, m)
             return cable->GetTarget()->Path();
          return std::string();
       })
+      .def("get_targets", [](IDrawableModule& module)
+      {
+         std::vector<std::string> ret;
+         for (auto* source : module.GetPatchCableSources())
+         {
+            if (source == nullptr)
+               continue;
+
+            for (auto* cable : source->GetPatchCables())
+            {
+               if (cable != nullptr && cable->GetTarget() != nullptr)
+                  ret.push_back(cable->GetTarget()->Path());
+            }
+         }
+         return ret;
+      })
       .def("set_name", [](IDrawableModule& module, std::string name)
       {
          module.SetName(name.c_str());
