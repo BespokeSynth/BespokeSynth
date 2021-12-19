@@ -67,7 +67,9 @@ struct SpawnListManager
    SpawnListManager(IDropdownListener* owner);
    
    void SetModuleFactory(ModuleFactory* factory);
+   void SetUpPrefabsDropdown();
    void SetUpVstDropdown();
+   
    std::vector<SpawnList*> GetDropdowns() { return mDropdowns; }
    
    SpawnList mInstrumentModules;
