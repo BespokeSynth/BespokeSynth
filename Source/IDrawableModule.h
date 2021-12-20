@@ -112,6 +112,7 @@ public:
    std::vector<IDrawableModule*> GetChildren() const { return mChildren; }
    virtual bool IsResizable() const { return false; }
    virtual void Resize(float width, float height) { assert(false); }
+   bool IsHoveringOverResizeHandle() const { return mHoveringOverResizeHandle; }
    void SetTypeName(std::string type) { mTypeName = type; }
    void SetTarget(IClickable* target);
    void SetUpPatchCables(std::string targets);

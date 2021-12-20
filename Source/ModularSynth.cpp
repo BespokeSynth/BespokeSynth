@@ -1345,7 +1345,7 @@ void ModularSynth::MousePressed(int intX, int intY, int button, const juce::Mous
    }
 
    if (gHoveredUIControl != nullptr &&
-       gHoveredUIControl->GetModuleParent() && !gHoveredUIControl->GetModuleParent()->IsDeleted() &&
+       gHoveredUIControl->GetModuleParent() && !gHoveredUIControl->GetModuleParent()->IsDeleted() && !gHoveredUIControl->GetModuleParent()->IsHoveringOverResizeHandle() &&
        !IUIControl::WasLastHoverSetViaTab() &&
        mGroupSelectedModules.empty() &&
        mQuickSpawn->IsShowing() == false &&

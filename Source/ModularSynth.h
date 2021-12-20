@@ -179,6 +179,7 @@ public:
    const std::vector<IDrawableModule*>& GetGroupSelectedModules() const { return mGroupSelectedModules; }
    bool ShouldAccentuateActiveModules() const;
    LocationZoomer* GetLocationZoomer() { return &mZoomer; }
+   IDrawableModule* GetModuleAtCursor(int offsetX = 0, int offsetY = 0);
    
    void RegisterPatchCable(PatchCable* cable);
    void UnregisterPatchCable(PatchCable* cable);
@@ -250,7 +251,6 @@ private:
    void DeleteAllModules();
    void TriggerClapboard();
    void DoAutosave();
-   IDrawableModule* GetModuleAtCursor(int offsetX = 0, int offsetY = 0);
 
    void ReadClipboardTextFromSystem();
    

@@ -86,7 +86,8 @@ void IUIControl::CheckHover(int x, int y)
    if (TheSynth->GetFrameCount() != sLastHoveredUIControlFrame &&
        !TheSynth->IsGroupSelecting() && PatchCable::sActivePatchCable == nullptr &&
        TestHover(x, y) &&
-       (gHoveredUIControl == nullptr || !gHoveredUIControl->IsMouseDown()))
+       (gHoveredUIControl == nullptr || !gHoveredUIControl->IsMouseDown()) &&
+      GetModuleParent() == TheSynth->GetModuleAtCursor())
    {
       gHoveredUIControl = this;
       sLastHoveredUIControl = this;
