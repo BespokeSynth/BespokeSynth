@@ -359,7 +359,7 @@ private:
    bool MouseMoved(float x, float y) override;
 
    void ConnectDevice();
-   void MidiReceived(MidiMessageType messageType, int control, float value, int channel = -1);
+   void MidiReceived(MidiMessageType messageType, int control, float scaledValue, int rawValue, int channel);
    void RemoveConnection(int control, MidiMessageType messageType, int channel, int page);
    void ResyncTwoWay();
    int GetNumConnectionsOnPage(int page);

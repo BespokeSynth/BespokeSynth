@@ -406,7 +406,7 @@ void MidiController::OnMidiNote(MidiNote& note)
       mModulation.GetPitchBend(voiceIdx)->SetValue(0);
    }
    
-   MidiReceived(kMidiMessage_Note, note.mPitch, note.mVelocity/127.0f, note.mChannel);
+   MidiReceived(kMidiMessage_Note, note.mPitch, note.mVelocity/127.0f, note.mVelocity, note.mChannel);
    
    mQueuedMessageMutex.lock();
    mQueuedNotes.push_back(note);
@@ -434,7 +434,7 @@ void MidiController::OnMidiControl(MidiControl& control)
       mModulation.GetModWheel(voiceIdx)->SetValue(control.mValue / 127.0f);
    }
    
-   MidiReceived(kMidiMessage_Control, control.mControl, control.mValue/127.0f, control.mChannel);
+   MidiReceived(kMidiMessage_Control, control.mControl, control.mValue/127.0f, control.mValue, control.mChannel);
    
    mQueuedMessageMutex.lock();
    mQueuedControls.push_back(control);
@@ -464,7 +464,7 @@ void MidiController::OnMidiProgramChange(MidiProgramChange& program)
    if (!mEnabled || (mChannelFilter != ChannelFilter::kAny && program.mChannel != (int)mChannelFilter))
       return;
    
-   MidiReceived(kMidiMessage_Program, program.mProgram, 1, program.mChannel);
+   MidiReceived(kMidiMessage_Program, program.mProgram, 1, 1, program.mChannel);
    
    mQueuedMessageMutex.lock();
    mQueuedProgramChanges.push_back(program);
@@ -490,7 +490,7 @@ void MidiController::OnMidiPitchBend(MidiPitchBend& pitchBend)
    
    mModulation.GetPitchBend(voiceIdx)->SetValue(amount);
    
-   MidiReceived(kMidiMessage_PitchBend, MIDI_PITCH_BEND_CONTROL_NUM, pitchBend.mValue/16383.0f, pitchBend.mChannel);   //16383 = max pitch bend
+   MidiReceived(kMidiMessage_PitchBend, MIDI_PITCH_BEND_CONTROL_NUM, pitchBend.mValue/16383.0f, pitchBend.mValue, pitchBend.mChannel);   //16383 = max pitch bend
  
    mQueuedMessageMutex.lock();
    mQueuedPitchBends.push_back(pitchBend);
@@ -507,7 +507,7 @@ void MidiController::OnMidi(const MidiMessage& message)
    mNoteOutput.SendMidi(message);
 }
 
-void MidiController::MidiReceived(MidiMessageType messageType, int control, float value, int channel)
+void MidiController::MidiReceived(MidiMessageType messageType, int control, float value, int rawValue, int channel)
 {
    assert(mEnabled);
    
@@ -533,7 +533,7 @@ void MidiController::MidiReceived(MidiMessageType messageType, int control, floa
    if (messageType != kMidiMessage_PitchBend)
       mLastInput += ofToString(control);
    
-   mLastInput += ", value: " + ofToString(value,2) + ", channel: " + ofToString(channel);
+   mLastInput += ", value: " + ofToString(value,2) + " (" + ofToString(rawValue) + "), channel: " + ofToString(channel);
 
    if (mBindMode && gBindToUIControl)
    {
