@@ -204,6 +204,23 @@ jobs:
            tar -cvzf build/nightly/BespokeSynth-Linux.tar.gz build/Source/BespokeSynth_artefacts/Release
         condition: and(variables.isLinux, ne(variables['Build.Reason'], 'PullRequest'))
         displayName: lin - compress lin artifact
+        
+      - bash: |
+          mkdir -p stage_git/git_info
+          git log -1 --pretty=format:'%h : %s - %an' > stage_git/git_info/git_nightly_log_display
+          git log -1 --pretty=format:'%h : %s%n%aD%n%an%n%n%B' > stage_git/git_info/git_nightly_log_long_display
+          git log -5 --pretty=format:'%h : %s - %an' > stage_git/git_info/git_nightly_recent_five
+          git log -1 --pretty=format:'%h' > stage_git/git_info/git_nightly_log_hash
+          cat stage_git/git_info/*
+        condition: variables.isLinux
+        displayName: lin - make git log info
+
+      - task: PublishPipelineArtifact@0
+        inputs:
+          artifactName: 'GIT_INFO'
+          targetPath: 'stage_git/'
+        condition: variables.isLinux
+        displayName: lin - publish the git info
 
       - task: PublishPipelineArtifact@0
         inputs:
@@ -257,6 +274,11 @@ jobs:
         artifactName: 'INSTALLER_LIN_NIGHTLY'
         targetPath: $(System.DefaultWorkingDirectory)
 
+    - task: DownloadPipelineArtifact@0
+      inputs:
+        artifactName: 'GIT_INFO'
+        targetPath: $(System.DefaultWorkingDirectory)
+
     - bash: |
         set -e
         set -x
@@ -264,6 +286,7 @@ jobs:
         short_hash=`git rev-parse --short=7 HEAD`
 
         mkdir -p releases
+        ls $(System.DefaultWorkingDirectory)/git_info
         
         mv *.zip *.dmg *.gz releases
 
@@ -272,6 +295,15 @@ jobs:
         cd ..
 
         echo "bespoke nightly build" >> releases/ReleaseNotes.md
+        echo " " >> releases/ReleaseNotes.md
+        echo "<pre>" >> releases/ReleaseNotes.md
+        cat $(System.DefaultWorkingDirectory)/git_info/git_nightly_recent_five >> releases/ReleaseNotes.md
+        echo " " >> releases/ReleaseNotes.md
+        echo "</pre>" >> releases/ReleaseNotes.md
+
+        echo "---------------"
+        cat releases/ReleaseNotes.md
+        echo "---------------"
 
         ls -alFh releases
       displayName: Prepare Release
