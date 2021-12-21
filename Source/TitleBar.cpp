@@ -248,10 +248,7 @@ void SpawnListManager::SetModuleFactory(ModuleFactory* factory)
    mOtherModules.SetList(factory->GetSpawnableModules(kModuleType_Other), "");
    
    SetUpVstDropdown();
-   
-   std::vector<std::string> prefabs;
-   ModuleFactory::GetPrefabs(prefabs);
-   mPrefabs.SetList(prefabs, "prefab");
+   SetUpPrefabsDropdown();
    
    mDropdowns.push_back(&mInstrumentModules);
    mDropdowns.push_back(&mNoteModules);
@@ -262,6 +259,13 @@ void SpawnListManager::SetModuleFactory(ModuleFactory* factory)
    mDropdowns.push_back(&mVstPlugins);
    mDropdowns.push_back(&mOtherModules);
    mDropdowns.push_back(&mPrefabs);
+}
+
+void SpawnListManager::SetUpPrefabsDropdown()
+{
+    std::vector<std::string> prefabs;
+    ModuleFactory::GetPrefabs(prefabs);
+    mPrefabs.SetList(prefabs, "prefab");
 }
 
 void SpawnListManager::SetUpVstDropdown()
@@ -560,6 +564,9 @@ void TitleBar::DropdownClicked(DropdownList* list)
 {
    if (list == mSpawnLists.mVstPlugins.GetList())
       mSpawnLists.SetUpVstDropdown();
+
+   if (list == mSpawnLists.mPrefabs.GetList())
+       mSpawnLists.SetUpPrefabsDropdown();
 }
 
 void TitleBar::DropdownUpdated(DropdownList* list, int oldVal)
