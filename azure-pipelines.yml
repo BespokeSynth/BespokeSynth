@@ -207,12 +207,10 @@ jobs:
         
       - bash: |
           mkdir -p stage_git/git_info
-          cd BespokeSynth
-          git log -1 --pretty=format:'%h : %s - %an' > ../stage_git/git_info/git_nightly_log_display
-          git log -1 --pretty=format:'%h : %s%n%aD%n%an%n%n%B' > ../stage_git/git_info/git_nightly_log_long_display
-          git log -5 --pretty=format:'%h : %s - %an' > ../stage_git/git_info/git_nightly_recent_five
-          git log -1 --pretty=format:'%h' > ../stage_git/git_info/git_nightly_log_hash
-          cd ..
+          git log -1 --pretty=format:'%h : %s - %an' > stage_git/git_info/git_nightly_log_display
+          git log -1 --pretty=format:'%h : %s%n%aD%n%an%n%n%B' > stage_git/git_info/git_nightly_log_long_display
+          git log -5 --pretty=format:'%h : %s - %an' > stage_git/git_info/git_nightly_recent_five
+          git log -1 --pretty=format:'%h' > stage_git/git_info/git_nightly_log_hash
           cat stage_git/git_info/*
         condition: variables.isLinux
         displayName: Use the linux build to make git log info
