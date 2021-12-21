@@ -294,7 +294,7 @@ jobs:
         for f in *.*; do mv -- "$f" "${f%.*}_${short_hash}_$(date +%F).${f##*.}"; done
         cd ..
 
-        echo "bespoke nightly build" >> releases/ReleaseNotes.md
+        echo "bespoke nightly build $(date +%F)" >> releases/ReleaseNotes.md
         echo " " >> releases/ReleaseNotes.md
         echo "<pre>" >> releases/ReleaseNotes.md
         cat $(System.DefaultWorkingDirectory)/git_info/git_nightly_recent_five >> releases/ReleaseNotes.md
