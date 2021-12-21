@@ -34,7 +34,7 @@ jobs:
 
     steps:
       - checkout: self
-        fetchDepth: 1
+        fetchDepth: 5
         # submodules: recursive # can't do submodules here b'cuz depth=1 fails with Github
 
       - bash: |
