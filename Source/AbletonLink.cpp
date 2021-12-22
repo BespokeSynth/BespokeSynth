@@ -34,8 +34,12 @@
 #include "ableton/link/Timeline.hpp"
 #include "ableton/link/HostTimeFilter.hpp"
 
+static ableton::link::HostTimeFilter<ableton::link::platform::Clock> sHostTimeFilter;
+
 AbletonLink::AbletonLink()
 {
+   sHostTimeFilter.reset();
+
    mNumPeers = 0;
 
    mTempo = TheTransport->GetTempo();
@@ -72,10 +76,10 @@ void AbletonLink::CreateUIControls()
 {
    IDrawableModule::CreateUIControls();
    UIBLOCK0();
+   FLOATSLIDER(mOffsetMsSlider, "offset ms", &mOffsetMs, -1000, 1000);
    ENDUIBLOCK(mWidth, mHeight);
 
-   mWidth = 150;
-   mHeight = 100;
+   mHeight = 80;
 }
 
 void AbletonLink::Poll()
@@ -84,17 +88,16 @@ void AbletonLink::Poll()
 
 void AbletonLink::OnTransportAdvanced(float amount)
 {
-   if (mLink.get() != nullptr)
+   if (mEnabled && mLink.get() != nullptr)
    {
       if (mTempo != TheTransport->GetTempo())
       {
          mTempo = TheTransport->GetTempo();
-         auto sessionState = mLink->captureAppSessionState();
+         auto sessionState = mLink->captureAudioSessionState();
          sessionState.setTempo(mTempo, mLink->clock().micros());
-         mLink->commitAppSessionState(sessionState);
+         mLink->commitAudioSessionState(sessionState);
       }
 
-      auto hostTimeMs = mLink->clock().micros();
       auto& deviceManager = TheSynth->GetAudioDeviceManager();
       if (deviceManager.getCurrentAudioDevice() != nullptr)
       {
@@ -102,21 +105,24 @@ void AbletonLink::OnTransportAdvanced(float amount)
          auto outputLatencySamples = deviceManager.getCurrentAudioDevice()->getOutputLatencyInSamples();
          auto bufferSize = deviceManager.getCurrentAudioDevice()->getCurrentBufferSizeSamples();
 
-         auto outputLatencyMs = std::chrono::microseconds(llround(outputLatencySamples / sampleRate));
+         const auto hostTimeUs = sHostTimeFilter.sampleTimeToHostTime(mSampleTime);
+         const auto outputLatencyUs = std::chrono::microseconds{ std::llround(1.0e6 * bufferSize / sampleRate) };
+         auto offsetUs = std::chrono::microseconds{ llround(mOffsetMs * 1000) };
 
-         outputLatencyMs += std::chrono::microseconds(llround(1.0e6 * bufferSize));
+         auto adjustedTimeUs = hostTimeUs + outputLatencyUs + offsetUs;
 
-         auto adjustedTimeMs = hostTimeMs + outputLatencyMs;
-
-         auto sessionState = mLink->captureAppSessionState();
+         auto sessionState = mLink->captureAudioSessionState();
 
          double quantum = TheTransport->GetTimeSigTop();
-         mLastReceivedBeat = sessionState.beatAtTime(adjustedTimeMs, quantum);
+         mLastReceivedBeat = sessionState.beatAtTime(adjustedTimeUs, quantum);
 
          TheTransport->SetMeasureTime(mLastReceivedBeat / quantum);
 
+
          // Timeline modifications are complete, commit the results
-         //mLink->commitAppSessionState(sessionState);
+         //mLink->commitAudioSessionState(sessionState);
+
+         mSampleTime += gBufferSize;
       }
    }
 }
@@ -126,10 +132,16 @@ void AbletonLink::DrawModule()
    if (Minimized() || IsVisible() == false)
       return;
 
-   DrawTextNormal("peers: " + ofToString(mNumPeers) + "\ntempo: " + ofToString(mTempo) + "\nbeat: " + ofToString(mLastReceivedBeat), 3, 15);
+   mOffsetMsSlider->Draw();
+
+   DrawTextNormal("peers: " + ofToString(mNumPeers) + "\ntempo: " + ofToString(mTempo) + "\nbeat: " + ofToString(mLastReceivedBeat), 3, 40);
 }
 
 void AbletonLink::CheckboxUpdated(Checkbox *checkbox)
+{
+}
+
+void AbletonLink::FloatSliderUpdated(FloatSlider* slider, float oldVal)
 {
 }
 

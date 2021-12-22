@@ -29,13 +29,14 @@
 #include "IDrawableModule.h"
 #include "Checkbox.h"
 #include "IAudioPoller.h"
+#include "Slider.h"
 
 namespace ableton
 {
    class Link;
 }
 
-class AbletonLink : public IDrawableModule, public IAudioPoller
+class AbletonLink : public IDrawableModule, public IAudioPoller, public IFloatSliderListener
 {
 public:
    AbletonLink();
@@ -51,6 +52,7 @@ public:
    void SetEnabled(bool enabled) override { mEnabled = enabled; }
    
    void CheckboxUpdated(Checkbox* checkbox) override;
+   void FloatSliderUpdated(FloatSlider* slider, float oldVal) override;
    
 private:
    //IDrawableModule
@@ -61,10 +63,14 @@ private:
    float mWidth;
    float mHeight;
 
+   float mOffsetMs{ 0 };
+   FloatSlider* mOffsetMsSlider;
+
    std::unique_ptr<ableton::Link> mLink;
    double mTempo = 120.0;
    std::size_t mNumPeers = 0;
    double mLastReceivedBeat{ 0 };
+   double mSampleTime{ 0 };
 };
 
 
