@@ -634,8 +634,7 @@ void LooperRecorder::ButtonClicked(ClickButton* button)
       pos *= 2;
       count += int(pos);
       pos -= int(pos);
-      TheTransport->SetMeasurePos(pos);
-      TheTransport->SetMeasure(count);
+      TheTransport->SetMeasureTime(count + pos);
       for (int i = 0; i < mLoopers.size(); ++i)
       {
          if (mLoopers[i])
@@ -657,8 +656,7 @@ void LooperRecorder::ButtonClicked(ClickButton* button)
       pos /= 2;
       count += int(pos);
       pos -= int(pos);
-      TheTransport->SetMeasurePos(pos);
-      TheTransport->SetMeasure(count);
+      TheTransport->SetMeasureTime(count + pos);
       for (int i = 0; i < mLoopers.size(); ++i)
       {
          if (mLoopers[i])
@@ -689,10 +687,9 @@ void LooperRecorder::ButtonClicked(ClickButton* button)
       int newMeasure = int(TheTransport->GetMeasure(gTime)+TheTransport->GetMeasurePos(gTime)-.5f);
       if (newMeasure < 0)
          newMeasure = 7;
-      TheTransport->SetMeasure(newMeasure);
       float newMeasurePos = TheTransport->GetMeasurePos(gTime) - .5f;
       FloatWrap(newMeasurePos,1);
-      TheTransport->SetMeasurePos(newMeasurePos);
+      TheTransport->SetMeasureTime(newMeasure + newMeasurePos);
    }
 
    if (button == mShiftDownbeatButton)
