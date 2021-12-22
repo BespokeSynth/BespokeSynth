@@ -62,7 +62,7 @@ jobs:
         displayName: all - details on build
 
       - bash: |
-          git submodule update --init --recursive
+          git submodule update --init --recursive --depth 1
         displayName: all - submodule init
 
 
