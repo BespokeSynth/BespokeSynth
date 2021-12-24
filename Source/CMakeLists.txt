@@ -395,9 +395,6 @@ if (APPLE)
         BESPOKE_MAC=1
         JUCE_PLUGINHOST_AU=0 # this needs work but if you turn it to 1 with the link below it works
         )
-    set_target_properties(BespokeSynth PROPERTIES
-        XCODE_ATTRIBUTE_ENABLE_HARDENED_RUNTIME YES
-        )
     target_sources(BespokeSynth PRIVATE
         CFMessaging/KontrolKommunicator.cpp
         CFMessaging/ListenPort.cpp
@@ -408,6 +405,11 @@ if (APPLE)
     target_link_libraries(BespokeSynth PRIVATE "-framework CoreAudioKit")
 
     if (BESPOKE_SIGN_AS)
+        message(STATUS "Enabling hardened runtime for signed build")
+        set_target_properties(BespokeSynth PROPERTIES
+            XCODE_ATTRIBUTE_ENABLE_HARDENED_RUNTIME YES
+        )
+
         message(STATUS "Creating target BespokeSynthSigned")
         add_custom_target(BespokeSynthSigned)
         add_dependencies(BespokeSynthSigned BespokeSynth)
