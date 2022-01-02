@@ -145,6 +145,8 @@ target_sources(BespokeSynth PRIVATE
     MathUtils.cpp
     Metronome.cpp
     MidiCapturer.cpp
+    MidiClockIn.cpp
+    MidiClockOut.cpp
     MidiControlChange.cpp
     MidiController.cpp
     MidiDevice.cpp

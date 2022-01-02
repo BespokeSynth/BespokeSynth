@@ -249,6 +249,8 @@
 #include "NoteToggle.h"
 #include "NoteTable.h"
 #include "AbletonLink.h"
+#include "MidiClockIn.h"
+#include "MidiClockOut.h"
 
 #include <juce_core/juce_core.h>
 
@@ -444,6 +446,8 @@ ModuleFactory::ModuleFactory()
    REGISTER(NoteToggle, notetoggle, kModuleType_Other);
    REGISTER(NoteTable, notetable, kModuleType_Note);
    REGISTER(AbletonLink, abletonlink, kModuleType_Other);
+   REGISTER(MidiClockIn, clockin, kModuleType_Other);
+   REGISTER(MidiClockOut, clockout, kModuleType_Other);
 
    //REGISTER_EXPERIMENTAL(MidiPlayer, midiplayer, kModuleType_Instrument);
    REGISTER_HIDDEN(Autotalent, autotalent, kModuleType_Audio);
