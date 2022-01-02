@@ -240,6 +240,19 @@ void MidiDevice::SendData(unsigned char a, unsigned char b, unsigned char c)
    }
 }
 
+void MidiDevice::SendMessage(double time, juce::MidiMessage message)
+{
+   if (mMidiOut)
+   {
+      int sampleNumber = (time - gTime) * gSampleRateMs;
+      
+      juce::MidiBuffer midiBuffer;
+      midiBuffer.addEvent(message, sampleNumber);
+      
+      mMidiOut->sendBlockOfMessages(midiBuffer, Time::getMillisecondCounter(), gSampleRate);
+   }
+}
+
 void MidiDevice::handleIncomingMidiMessage(MidiInput* source, const MidiMessage& message)
 {
    if (TheSynth->IsReady() == false)
@@ -316,4 +329,46 @@ void MidiDevice::SendMidiMessage(MidiDeviceListener* listener, const char* devic
       pressure.mChannel = message.getChannel();
       listener->OnMidiPressure(pressure);
    }
+   /*if (message.isMidiClock())
+   {
+      static double sLastTime = -1;
+      static std::array<float, 40> sTempos;
+      static int sTempoIdx = 0;
+      if (sLastTime > 0)
+      {
+         double deltaSeconds = (message.getTimeStamp() - sLastTime);
+         double pulsesPerSecond = 1 / deltaSeconds;
+         double beatsPerSecond = pulsesPerSecond / 24;
+         double instantTempo = beatsPerSecond * 60;
+         sTempos[sTempoIdx] = instantTempo;
+         sTempoIdx = (sTempoIdx + 1) % sTempos.size();
+         double avgTempo = 0;
+         for (auto& tempo : sTempos)
+            avgTempo += tempo;
+         avgTempo /= sTempos.size();
+         if (sTempoIdx == 0)
+            ofLog() << avgTempo;
+      }
+      sLastTime = message.getTimeStamp();
+   }
+   if (message.isMidiStart())
+   {
+      ofLog() << "midi start";
+   }
+   if (message.isMidiStop())
+   {
+      ofLog() << "midi stop";
+   }
+   if (message.isMidiContinue())
+   {
+      ofLog() << "midi continue";
+   }
+   if (message.isSongPositionPointer())
+   {
+      ofLog() << "midi position pointer " << ofToString(message.getSongPositionPointerMidiBeat());
+   }
+   if (message.isQuarterFrame())
+   {
+      ofLog() << "midi quarter frame " << ofToString(message.getQuarterFrameValue()) << " " << ofToString(message.getQuarterFrameSequenceNumber());
+   }*/
 }
