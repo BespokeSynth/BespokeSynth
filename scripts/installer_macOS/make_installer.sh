@@ -40,12 +40,13 @@ if [[ ! -z $MAC_SIGNING_CERT ]]; then
   # but if i dont
   ruuid=$(xcrun altool --notarize-app --primary-bundle-id "com.ryanchallinor.bespokesynth" \
               --username ${MAC_SIGNING_ID} --password ${MAC_SIGNING_1UPW} -t osx \
-              --file "${TARGET_DIR}/$OUTPUT_BASE_FILENAME.dmg" 2>&1 \
+              --file "${TARGET_DIR}/$OUTPUT_BASE_FILENAME.dmg" 2>&1 | tee altool.out \
              | awk '/RequestUUID/ { print $NF; }')
   echo "REQUEST UID : $ruuid"
 
   if [[ $ruuid == "" ]]; then
         echo "could not upload for notarization"
+        cat altool.out
         exit 1
   fi
 
