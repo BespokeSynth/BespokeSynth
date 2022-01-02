@@ -22,7 +22,6 @@ file(INSTALL
     PATTERN "tkinter" EXCLUDE
     PATTERN "turtle.py" EXCLUDE
     PATTERN "turtledemo" EXCLUDE
-    PATTERN "Documentation" EXCLUDE
     )
 
 set(BESPOKE_PIP_PACKAGES jedi)
