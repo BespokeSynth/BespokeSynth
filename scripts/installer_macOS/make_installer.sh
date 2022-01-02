@@ -23,9 +23,10 @@ fi
 OUTPUT_BASE_FILENAME="BespokeSynth-Mac-$VERSION"
 
 mkdir -p "${TARGET_DIR}"
-rm -rf "${SOURCEDIR}/BespokeSynth.app"
-ditto "${INDIR}/BespokeSynth.app" "${SOURCEDIR}/BespokeSynth.app"
-appdmg "${SOURCEDIR}/bespoke_dmg.json" "${TARGET_DIR}/$OUTPUT_BASE_FILENAME.dmg"
+echo "{ \"title\": \"Bespoke\", \"background\": \"background.png\", \"icon-size\": 80," > dmg_manifest.json
+echo "\"contents\": [ { \"x\": 192, \"y\": 338, \"type\": \"file\", \"path\": \"${INDIR}/BespokeSynth.app\"}, " >> dmg_manifest.json 
+echo "{ \"x\": 448, \"y\": 338, \"type\": \"link\", \"path\": \"/Applications\" }]}" >> dmg_manifest.json 
+appdmg "dmg_manifest.json" "${TARGET_DIR}/$OUTPUT_BASE_FILENAME.dmg"
 
 echo "dmg created at ${TARGET_DIR}/$OUTPUT_BASE_FILENAME.dmg"
 
