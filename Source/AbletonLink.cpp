@@ -116,8 +116,15 @@ void AbletonLink::OnTransportAdvanced(float amount)
          double quantum = TheTransport->GetTimeSigTop();
          mLastReceivedBeat = sessionState.beatAtTime(adjustedTimeUs, quantum);
 
-         TheTransport->SetMeasureTime(mLastReceivedBeat / quantum);
-
+         double measureTime = mLastReceivedBeat / quantum;
+         double localMeasureTime = TheTransport->GetMeasureTime(gTime);
+         double difference = measureTime - localMeasureTime;
+         if (abs(difference) > .01f)
+         {
+            //too far off, correct
+            TheTransport->SetMeasureTime(measureTime);
+            ofLog() << "correcting transport position for ableton link";
+         }
 
          // Timeline modifications are complete, commit the results
          //mLink->commitAudioSessionState(sessionState);
