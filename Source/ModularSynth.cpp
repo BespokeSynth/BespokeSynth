@@ -529,6 +529,27 @@ void ModularSynth::Draw(void* vg)
    
    ofTranslate(GetDrawOffset().x, GetDrawOffset().y);
 
+   if (ShouldShowGridSnap())
+   {
+      ofPushStyle();
+      ofSetLineWidth(.5f);
+      ofSetColor(255, 255, 255, 40);
+      float gridSnapSize = UserPrefs.grid_snap_size.Get();
+      int gridLinesVertical = (int)ceil((ofGetWidth() / gDrawScale) / gridSnapSize);
+      for (int i = 0; i < gridLinesVertical; ++i)
+      {
+         float x = i * gridSnapSize - floor(GetDrawOffset().x / gridSnapSize) * gridSnapSize;
+         ofLine(x, -GetDrawOffset().y, x, -GetDrawOffset().y + ofGetHeight() / gDrawScale);
+      }
+      int gridLinesHorizontal = (int)ceil((ofGetHeight() / gDrawScale) / gridSnapSize);
+      for (int i = 0; i < gridLinesHorizontal; ++i)
+      {
+         float y = i * gridSnapSize - floor(GetDrawOffset().y / gridSnapSize) * gridSnapSize;
+         ofLine(-GetDrawOffset().x, y, -GetDrawOffset().x + ofGetWidth() / gDrawScale, y);
+      }
+      ofPopStyle();
+   }
+
    ofNoFill();
 
    TheSaveDataPanel->SetShowing(TheSaveDataPanel->GetModule());
@@ -1045,12 +1066,17 @@ float ModularSynth::GetMouseY(ModuleContainer* context, float rawY /*= FLT_MAX*/
    return ((rawY == FLT_MAX ? mMousePos.y : rawY) + UserPrefs.mouse_offset_y.Get()) / context->GetDrawScale() - context->GetDrawOffset().y;
 }
 
-bool ModularSynth::IsMouseButtonHeld(int button)
+bool ModularSynth::IsMouseButtonHeld(int button) const
 {
    if (button >= 0 && button < (int)mIsMouseButtonHeld.size())
       return mIsMouseButtonHeld[button];
 
    return false;
+}
+
+bool ModularSynth::ShouldShowGridSnap() const
+{
+   return (mMoveModule || (!mGroupSelectedModules.empty() && IsMouseButtonHeld(1)))&& (GetKeyModifiers() & kModifier_Command);
 }
 
 void ModularSynth::MouseMoved(int intX, int intY)
@@ -1087,7 +1113,16 @@ void ModularSynth::MouseMoved(int intX, int intY)
 
       float oldX, oldY;
       mMoveModule->GetPosition(oldX, oldY);
-      mMoveModule->Move(x + mMoveModuleOffsetX - oldX, y + mMoveModuleOffsetY - oldY);
+      float newX = x + mMoveModuleOffsetX;
+      float newY = y + mMoveModuleOffsetY;
+
+      if (ShouldShowGridSnap())
+      {
+         newX = round(newX / UserPrefs.grid_snap_size.Get()) * UserPrefs.grid_snap_size.Get();
+         newY = round((newY - mMoveModule->TitleBarHeight()) / UserPrefs.grid_snap_size.Get()) * UserPrefs.grid_snap_size.Get() + mMoveModule->TitleBarHeight();
+      }
+
+      mMoveModule->Move(newX - oldX, newY - oldY);
 
       if (GetKeyModifiers() == kModifier_Shift)
       {
@@ -1264,14 +1299,38 @@ void ModularSynth::MouseDragged(int intX, int intY, int button, const juce::Mous
    }
    else
    {
+      float oldX, oldY;
+      mLastClickedModule->GetPosition(oldX, oldY);
+      float newX = x + mMoveModuleOffsetX;
+      float newY = y + mMoveModuleOffsetY;
+
+      if (ShouldShowGridSnap())
+      {
+         newX = round(newX / UserPrefs.grid_snap_size.Get()) * UserPrefs.grid_snap_size.Get();
+         newY = round((newY - mLastClickedModule->TitleBarHeight()) / UserPrefs.grid_snap_size.Get()) * UserPrefs.grid_snap_size.Get() + mLastClickedModule->TitleBarHeight();
+      }
+
+      float adjustedDragX = newX - oldX;
+      float adjustedDragY = newY - oldY;
+
       for (auto module : mGroupSelectedModules)
-         module->Move(drag.x, drag.y);
+         module->Move(adjustedDragX, adjustedDragY);
    }
 
    if (mMoveModule)
    {
-      mMoveModule->Move(drag.x, drag.y);
-      return;
+      float oldX, oldY;
+      mMoveModule->GetPosition(oldX, oldY);
+      float newX = x + mMoveModuleOffsetX;
+      float newY = y + mMoveModuleOffsetY;
+
+      if (ShouldShowGridSnap())
+      {
+         newX = round(newX / UserPrefs.grid_snap_size.Get()) * UserPrefs.grid_snap_size.Get();
+         newY = round((newY - mMoveModule->TitleBarHeight()) / UserPrefs.grid_snap_size.Get()) * UserPrefs.grid_snap_size.Get() + mMoveModule->TitleBarHeight();
+      }
+
+      mMoveModule->Move(newX - oldX, newY - oldY);
    }
 
    if (mResizeModule)
@@ -1441,9 +1500,15 @@ void ModularSynth::MousePressed(int intX, int intY, int button, const juce::Mous
          }
       }
       if (clickedModule != nullptr && clickedModule != TheTitleBar)
+      {
          mLastClickedModule = clickedModule;
+         mMoveModuleOffsetX = clickedModule->GetPosition().x - x;
+         mMoveModuleOffsetY = clickedModule->GetPosition().y - y;
+      }
       else
+      {
          mLastClickedModule = nullptr;
+      }
       mHasDuplicatedDuringDrag = false;
 
       if (mGroupSelectedModules.empty() == false)
