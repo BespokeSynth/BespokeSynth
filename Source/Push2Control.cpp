@@ -148,8 +148,8 @@ void Push2Control::CreateUIControls()
    mSpawnModuleControls.push_back(mSpawnLists.mAudioModules.GetList());
    mSpawnModuleControls.push_back(mSpawnLists.mModulatorModules.GetList());
    mSpawnModuleControls.push_back(mSpawnLists.mPulseModules.GetList());
-   mSpawnModuleControls.push_back(mSpawnLists.mOtherModules.GetList());
    mSpawnModuleControls.push_back(mSpawnLists.mVstPlugins.GetList());
+   mSpawnModuleControls.push_back(mSpawnLists.mOtherModules.GetList());
    mSpawnModuleControls.push_back(mSpawnLists.mPrefabs.GetList());
 }
 
