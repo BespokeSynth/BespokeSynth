@@ -33,6 +33,7 @@
 MidiClockIn::MidiClockIn()
 : mDevice(this)
 {
+   mTempoHistory.fill(0);
 }
 
 MidiClockIn::~MidiClockIn()
@@ -43,10 +44,11 @@ void MidiClockIn::CreateUIControls()
 {
    IDrawableModule::CreateUIControls();
    
-   UIBLOCK0();
+   UIBLOCK(3,3,120);
    DROPDOWN(mDeviceList, "device", &mDeviceIndex, 120);
    DROPDOWN(mTempoRoundModeList, "rounding", ((int*)&mTempoRoundMode), 40);
    FLOATSLIDER(mStartOffsetMsSlider, "start offset ms", &mStartOffsetMs, -300, 300);
+   INTSLIDER(mSmoothAmountSlider, "smoothing", &mSmoothAmount, 1, (int)mTempoHistory.size());
    ENDUIBLOCK(mWidth, mHeight);
    
    mTempoRoundModeList->DrawLabel(true);
@@ -81,10 +83,12 @@ void MidiClockIn::InitDevice()
 float MidiClockIn::GetRoundedTempo()
 {
    float avgTempo = 0;
-   for (auto& tempo : mTempoHistory)
-      avgTempo += tempo;
-   avgTempo /= mTempoHistory.size();
-   
+   int temposToCount = std::min((int)mTempoHistory.size(), mSmoothAmount);
+
+   for (int i = 0; i < temposToCount; ++i)
+      avgTempo += mTempoHistory[(mTempoIdx - 1 - i+ (int)mTempoHistory.size()) % (int)mTempoHistory.size()];
+   avgTempo /= temposToCount;
+
    switch (mTempoRoundMode)
    {
       case TempoRoundMode::kNone:
@@ -110,6 +114,7 @@ void MidiClockIn::DrawModule()
    mDeviceList->Draw();
    mTempoRoundModeList->Draw();
    mStartOffsetMsSlider->Draw();
+   mSmoothAmountSlider->Draw();
    
    DrawTextNormal("tempo: " + ofToString(GetRoundedTempo()), 4, mHeight - 5);
 }

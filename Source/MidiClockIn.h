@@ -33,7 +33,7 @@
 
 class IAudioSource;
 
-class MidiClockIn : public IDrawableModule, public IDropdownListener, public MidiDeviceListener, public IFloatSliderListener
+class MidiClockIn : public IDrawableModule, public IDropdownListener, public MidiDeviceListener, public IFloatSliderListener, public IIntSliderListener
 {
 public:
    MidiClockIn();
@@ -51,6 +51,7 @@ public:
    void DropdownUpdated(DropdownList* list, int oldVal) override;
    void DropdownClicked(DropdownList* list) override;
    void FloatSliderUpdated(FloatSlider* slider, float oldVal) override {}
+   void IntSliderUpdated(IntSlider* slider, int oldVal) override {}
    
    virtual void LoadLayout(const ofxJSONElement& moduleInfo) override;
    virtual void SetUpFromSaveData() override;
@@ -76,17 +77,21 @@ private:
       kQuarter,
       kTenth
    };
+
+   static constexpr int kMaxHistory = 40;
    
    int mDeviceIndex{-1};
    DropdownList* mDeviceList;
-   TempoRoundMode mTempoRoundMode{TempoRoundMode::kNone};
+   TempoRoundMode mTempoRoundMode{TempoRoundMode::kWhole};
    DropdownList* mTempoRoundModeList;
-   float mStartOffsetMs;
+   float mStartOffsetMs{ 0 };
    FloatSlider* mStartOffsetMsSlider;
+   int mSmoothAmount{ kMaxHistory/2 };
+   IntSlider* mSmoothAmountSlider;
    
    MidiDevice mDevice;
    
-   std::array<float, 40> mTempoHistory;
+   std::array<float, kMaxHistory> mTempoHistory;
    int mTempoIdx{-1};
    double mLastTimestamp{-1};
 };
