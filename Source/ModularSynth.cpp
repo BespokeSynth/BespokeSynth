@@ -1255,6 +1255,9 @@ void ModularSynth::MouseDragged(int intX, int intY, int button, const juce::Mous
             IDrawableModule* newModule = DuplicateModule(module);
             newGroupSelectedModules.push_back(newModule);
             oldToNewModuleMap[module] = newModule;
+
+            if (module == mLastClickedModule)
+               mLastClickedModule = newModule;
          }
       }
       for (auto module : newGroupSelectedModules)
@@ -1297,7 +1300,7 @@ void ModularSynth::MouseDragged(int intX, int intY, int button, const juce::Mous
          mGroupSelectedModules.clear();
       }
    }
-   else
+   else if (mLastClickedModule)
    {
       float oldX, oldY;
       mLastClickedModule->GetPosition(oldX, oldY);
