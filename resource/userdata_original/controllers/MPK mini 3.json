@@ -1,0 +1,61 @@
+{
+  "groups": [
+    {
+      "rows": 1,
+      "cols": 1,
+      "position" : [ 0, 0],
+      "dimensions" : [28, 80],
+      "spacing" : [30],
+      "messageType" : "pitchbend",
+      "drawType" : "slider"
+    },
+    {
+      "rows": 1,
+      "cols": 1,
+      "position" : [ 30, 0 ],
+      "dimensions" : [28, 80],
+      "spacing" : [30],
+      "controls" : [1],
+      "messageType" : "control",
+      "drawType" : "slider"
+    },
+    {
+      "rows": 2,
+      "cols": 4,
+      "position": [70, 30],
+      "dimensions": [30, 18],
+      "spacing": [36, 20],
+      "controls":[ 40, 41, 42, 43, 
+                   36, 37, 38, 39],
+      "messageType": "note",
+      "drawType": "button"
+    },
+    {
+      "rows": 2,
+      "cols": 4,
+      "position": [240, 30],
+      "dimensions": [18, 18],
+      "spacing": [24, 24],
+      "controls": [ 70, 71, 72, 73,
+                    74, 75, 76, 77],
+      "messageType": "control",
+      "drawType": "knob"
+    },
+    {
+      "rows": 1,
+      "cols": 25,
+      "position" : [ 0, 100 ],
+      "dimensions" : [14, 84],
+      "spacing" : [16, 30],
+      "controls" : [
+        48, 49, 50, 51, 52, 53, 54,
+        55, 56, 57, 58, 59, 60, 61,
+        62, 63, 64, 65, 66, 67, 68,
+        69, 70, 71, 72
+      ],
+      "colors" : [ 0, 127],
+      "messageType" : "note",
+      "drawType" : "button"
+    }
+  ]
+}
