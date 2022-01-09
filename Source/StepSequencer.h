@@ -188,7 +188,7 @@ private:
    
    void DrawRowLabel(const char* label, int row, int x, int y);
    void SetPreset(int preset);
-   int GetNumSteps(NoteInterval interval) const;
+   int GetNumSteps(NoteInterval interval, int numMeasures) const;
    Vec2i ControllerToGrid(const Vec2i& controller);
    int GetNumControllerChunks(); //how many vertical chunks of the sequence are there to fit multi-rowed on the controller?
    int GetMetaStep(double time);
