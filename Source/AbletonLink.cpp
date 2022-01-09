@@ -55,7 +55,8 @@ AbletonLink::AbletonLink()
 
    mLink->setTempoCallback([this](const double bpm)
    {
-      TheTransport->SetTempo(bpm);
+      if (mEnabled)
+         TheTransport->SetTempo(bpm);
       mTempo = bpm;
    });
 }
