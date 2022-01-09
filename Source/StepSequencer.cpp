@@ -446,7 +446,7 @@ void StepSequencer::DrawModule()
 
    mGridYOffDropdown->SetShowing(HasGridController());
    mAdjustOffsetsCheckbox->SetShowing(!mHasExternalPulseSource);
-   mCurrentColumnSlider->SetExtents(0, GetNumSteps(mStepInterval));
+   mCurrentColumnSlider->SetExtents(0, GetNumSteps(mStepInterval, mNumMeasures));
    mRepeatRateDropdown->SetShowing(mNoteInputMode == NoteInputMode::RepeatHeld);
    
    mGrid->Draw();
@@ -513,7 +513,7 @@ void StepSequencer::DrawModule()
       ofSetLineWidth(4);
       ofSetColor(255,0,0,50);
       float squareh = float(mGrid->GetHeight())/mNumRows;
-      float squarew = float(mGrid->GetWidth())/GetNumSteps(mStepInterval);
+      float squarew = float(mGrid->GetWidth())/GetNumSteps(mStepInterval, mNumMeasures);
       int chunkSize = mGrid->GetRows() / GetNumControllerChunks();
       float width = MIN(mGrid->GetWidth(), squarew * GetGridControllerCols() * GetNumControllerChunks());
       ofRect(gridX,gridY+squareh*(mNumRows-chunkSize)-squareh*mGridYOff*chunkSize,width,squareh*chunkSize);
@@ -668,15 +668,15 @@ void StepSequencer::UpdatePush2Leds(Push2Control* push2)
    }
 }
 
-int StepSequencer::GetNumSteps(NoteInterval interval) const
+int StepSequencer::GetNumSteps(NoteInterval interval, int numMeasures) const
 {
-   return TheTransport->CountInStandardMeasure(interval) * TheTransport->GetTimeSigTop()/TheTransport->GetTimeSigBottom() * mNumMeasures;
+   return TheTransport->CountInStandardMeasure(interval) * TheTransport->GetTimeSigTop()/TheTransport->GetTimeSigBottom() * numMeasures;
 }
 
 int StepSequencer::GetStepNum(double time)
 {
    int measure = TheTransport->GetMeasure(time) % mNumMeasures;
-   int stepsPerMeasure = GetNumSteps(mStepInterval);
+   int stepsPerMeasure = GetNumSteps(mStepInterval, mNumMeasures);
 
    return TheTransport->GetQuantized(time, mTransportListenerInfo) % stepsPerMeasure + measure * stepsPerMeasure / mNumMeasures;
 }
@@ -692,7 +692,7 @@ void StepSequencer::Step(double time, float velocity, int pulseFlags)
    if (!mIsSetUp)
       return;
 
-   mGrid->SetGrid(GetNumSteps(mStepInterval),mNumRows);
+   mGrid->SetGrid(GetNumSteps(mStepInterval, mNumMeasures),mNumRows);
 
    if (!mEnabled)
    {
@@ -706,12 +706,12 @@ void StepSequencer::Step(double time, float velocity, int pulseFlags)
    if (pulseFlags & kPulseFlag_Repeat)
       direction = 0;
 
-   mCurrentColumn = (mCurrentColumn + direction + GetNumSteps(mStepInterval)) % GetNumSteps(mStepInterval);
+   mCurrentColumn = (mCurrentColumn + direction + GetNumSteps(mStepInterval, mNumMeasures)) % GetNumSteps(mStepInterval, mNumMeasures);
 
    if (pulseFlags & kPulseFlag_Reset)
       mCurrentColumn = 0;
    else if (pulseFlags & kPulseFlag_Random)
-      mCurrentColumn = gRandom() % GetNumSteps(mStepInterval);
+      mCurrentColumn = gRandom() % GetNumSteps(mStepInterval, mNumMeasures);
 
    if (!mHasExternalPulseSource || (pulseFlags & kPulseFlag_SyncToTransport))
       mCurrentColumn = GetStepNum(time);
@@ -719,9 +719,9 @@ void StepSequencer::Step(double time, float velocity, int pulseFlags)
    if (pulseFlags & kPulseFlag_Align)
    {
       int stepsPerMeasure = TheTransport->GetStepsPerMeasure(this);
-      int numMeasures = ceil(float(GetNumSteps(mStepInterval)) / stepsPerMeasure);
+      int numMeasures = ceil(float(GetNumSteps(mStepInterval, mNumMeasures)) / stepsPerMeasure);
       int measure = TheTransport->GetMeasure(time) % numMeasures;
-      int step = ((TheTransport->GetQuantized(time, mTransportListenerInfo) % stepsPerMeasure) + measure * stepsPerMeasure) % GetNumSteps(mStepInterval);
+      int step = ((TheTransport->GetQuantized(time, mTransportListenerInfo) % stepsPerMeasure) + measure * stepsPerMeasure) % GetNumSteps(mStepInterval, mNumMeasures);
       mCurrentColumn = step;
    }
  
@@ -755,7 +755,7 @@ void StepSequencer::PlayNote(double time, int pitch, int velocity, int voiceIdx,
                mOffsets[i] = 0;
          }
 
-         mCurrentColumn = pitch % GetNumSteps(mStepInterval);
+         mCurrentColumn = pitch % GetNumSteps(mStepInterval, mNumMeasures);
          Step(time, velocity / 127.0f, kPulseFlag_Repeat);
       }
    }
@@ -927,11 +927,11 @@ void StepSequencer::IntSliderUpdated(IntSlider* slider, int oldVal)
 {
    if (slider == mNumMeasuresSlider)
    {
-      mGrid->SetGrid(GetNumSteps(mStepInterval), mNumRows);
+      mGrid->SetGrid(GetNumSteps(mStepInterval, mNumMeasures), mNumRows);
       if (mNumMeasures > oldVal)
       {
-         int newChunkCount = ceil(mNumMeasures / oldVal);
-         int stepsPerChunk = GetNumSteps(mStepInterval) / newChunkCount;
+         int newChunkCount = ceil(float(mNumMeasures) / oldVal);
+         int stepsPerChunk = GetNumSteps(mStepInterval, oldVal);
          for (int chunk = 1; chunk < newChunkCount; ++chunk)
          {
             for (int col = 0; col < stepsPerChunk && col + stepsPerChunk * chunk < mGrid->GetCols(); ++col)
@@ -995,8 +995,8 @@ void StepSequencer::DropdownUpdated(DropdownList* list, int oldVal)
    if (list == mStepIntervalDropdown)
    {
       UIGrid* oldGrid = new UIGrid(*mGrid);
-      int oldNumSteps = GetNumSteps((NoteInterval)oldVal);
-      int newNumSteps = GetNumSteps(mStepInterval);
+      int oldNumSteps = GetNumSteps((NoteInterval)oldVal, mNumMeasures);
+      int newNumSteps = GetNumSteps(mStepInterval, mNumMeasures);
       for (int i=0; i<mGrid->GetRows(); ++i)
       {
          for (int j=0; j<newNumSteps; ++j)
@@ -1057,7 +1057,7 @@ void StepSequencer::SetUpFromSaveData()
 {
    SetUpPatchCables(mModuleSaveData.GetString("target"));
    mNumRows = mModuleSaveData.GetInt("gridrows");
-   mGrid->SetGrid(GetNumSteps(mStepInterval), mNumRows);
+   mGrid->SetGrid(GetNumSteps(mStepInterval, mNumMeasures), mNumRows);
    
    bool multisliderMode = mModuleSaveData.GetBool("multislider_mode");
    mGrid->SetGridMode(multisliderMode ? UIGrid::kMultisliderBipolar : UIGrid::kNormal);
