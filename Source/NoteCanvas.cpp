@@ -76,8 +76,9 @@ void NoteCanvas::CreateUIControls()
    IDrawableModule::CreateUIControls();
    
    mQuantizeButton = new ClickButton(this,"quantize",160,5);
-   mLoadMidiButton = new ClickButton(this,"load midi", 224, 5);
-   mSaveMidiButton = new ClickButton(this,"save midi", 290, 5);
+   mSaveMidiButton = new ClickButton(this, "save midi", 228, 5);
+   mLoadMidiButton = new ClickButton(this,"load midi", 290, 5);
+   mLoadMidiTrackEntry = new TextEntry(this, "loadtrack", 350, 5, 3, &mLoadMidiTrack, 0, 127);
    //mClipButton = new ClickButton(this,"clip",220,5);
    mPlayCheckbox = new Checkbox(this,"play",5,5,&mPlay);
    mRecordCheckbox = new Checkbox(this,"rec",50,5,&mRecord);
@@ -326,6 +327,8 @@ void NoteCanvas::UpdateNumColumns()
 
 void NoteCanvas::Clear()
 {
+   bool wasPlaying = mPlay;
+   mPlay = false;
    for (int pitch=0; pitch<128; ++pitch)
    {
       mInputNotes[pitch] = nullptr;
@@ -333,6 +336,7 @@ void NoteCanvas::Clear()
    }
    mNoteOutput.Flush(gTime);
    mCanvas->Clear();
+   mPlay = wasPlaying;
 }
 
 NoteCanvasElement* NoteCanvas::AddNote(double measurePos, int pitch, int velocity, double length, int voiceIdx/*=-1*/, ModulationParameters modulation/* = ModulationParameters()*/)
@@ -472,8 +476,9 @@ void NoteCanvas::DrawModule()
    
    mCanvasControls->Draw();
    mQuantizeButton->Draw();
-   mLoadMidiButton->Draw();
    mSaveMidiButton->Draw();
+   mLoadMidiButton->Draw();
+   mLoadMidiTrackEntry->Draw();
    //mClipButton->Draw();
    mPlayCheckbox->Draw();
    mRecordCheckbox->Draw();
@@ -616,41 +621,45 @@ void NoteCanvas::LoadMidi()
 	FileChooser chooser("Load midi", File(ofToDataPath("")), "*.mid", true, false, TheSynth->GetFileChooserParent());
 	if (chooser.browseForFileToOpen())
 	{
+      bool wasPlaying = mPlay;
+      mPlay = false;
+
 		mCanvas->Clear();
+      SetNumMeasures(1);
 		File file = chooser.getResult();
-        FileInputStream inputStream(file);
-		MidiFile midifile;
-		if (midifile.readFrom(inputStream)) 
-        {
-			midifile.convertTimestampTicksToSeconds();
-            int trackToGet = 0;
-			if (midifile.getNumTracks() > 1) 
+      FileInputStream inputStream(file);
+      MidiFile midifile;
+      if (midifile.readFrom(inputStream))
+      {
+         midifile.convertTimestampTicksToSeconds();
+         int trackToGet = 0;
+         if (midifile.getNumTracks() > 1)
+            trackToGet = mLoadMidiTrack;
+         const MidiMessageSequence* trackSequence = midifile.getTrack(trackToGet);
+         for (int eventIndex = 0; eventIndex < trackSequence->getNumEvents(); eventIndex++)
+         {
+            MidiMessageSequence::MidiEventHolder* noteEvent = trackSequence->getEventPointer(eventIndex);
+            if (noteEvent->noteOffObject)
             {
-                trackToGet = 1;
-			}
-			const MidiMessageSequence* trackSequence = midifile.getTrack(trackToGet);
-			for (int eventIndex = 0; eventIndex < trackSequence->getNumEvents(); eventIndex++) 
-            {
-				MidiMessageSequence::MidiEventHolder* noteEvent = trackSequence->getEventPointer(eventIndex);
-				if (noteEvent->noteOffObject) 
-                {
-					int note = noteEvent->message.getNoteNumber();
-					int veloc = noteEvent->message.getVelocity() * 1.27;
-                    double start = (noteEvent->message.getTimeStamp() / 2);
-					double end = (noteEvent->noteOffObject->message.getTimeStamp() / 2);
-					double length = end - start;					
-					AddNote(start, note, veloc, length, -1, ModulationParameters());
-				}
-			}
-            float latest = 0.0;
-            for (auto* element : mCanvas->GetElements()) 
-            {
-                if(element->GetEnd() > latest)
-                latest = element->GetEnd();
+               int note = noteEvent->message.getNoteNumber();
+               int veloc = noteEvent->message.getVelocity() * 1.27;
+               double start = (noteEvent->message.getTimeStamp() / 2);
+               double end = (noteEvent->noteOffObject->message.getTimeStamp() / 2);
+               double length = end - start;
+               AddNote(start, note, veloc, length, -1, ModulationParameters());
             }
-            mNumMeasuresSlider->SetExtents(0, static_cast<int>(std::ceil(latest)));
-            FitNotes();            
-		}
+         }
+         float latest = 0.0;
+         for (auto* element : mCanvas->GetElements())
+         {
+            if (element->GetEnd() > latest)
+               latest = element->GetEnd();
+         }
+         mNumMeasuresSlider->SetExtents(0, static_cast<int>(std::ceil(latest)));
+         FitNotes();
+      }
+
+      mPlay = wasPlaying;
 	}
 }
 
