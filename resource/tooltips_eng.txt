@@ -817,7 +817,7 @@ looper~loop input audio. use with a "looperrecorder" for full functionality.
 ~offset~amount to offset looper's playhead from transport position
 ~set~shift the contents of the looper so the current offset is the start of the buffer
 ~scrspd~playback speed, used with "scr" is enabled. modulate quickly for a vinyl-like scratching effect.
-~scr~allow loop to be scrached by adjusting "scrspd"
+~scr~allow loop to be scratched by adjusting "scrspd"
 ~fourtet~use a textural trick I saw four tet illustrate in a video once: slice the audio into chunks, and for each chunk it at double speed followed by playing it in reverse at double speed. this slider adjusts the mix between the original audio and this "fourtetified" audio.
 ~fourtetslices~chunk size to use for "fourtet" effect
 ~beatwheel on~[none]
