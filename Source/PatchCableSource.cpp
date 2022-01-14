@@ -307,9 +307,28 @@ void PatchCableSource::Render()
       if (mDrawPass == DrawPass::kSource && (mPatchCableDrawMode != kPatchCableDrawMode_SourceOnHoverOnly || mHoverIndex != -1))
       {
          ofSetLineWidth(0);
-         ofSetColor(mColor);
+         ofColor color = mColor;
+         float radius = kPatchCableSourceRadius;
+         IDrawableModule* moveModule = TheSynth->GetMoveModule();
+         if (GetKeyModifiers() == kModifier_Shift && moveModule != nullptr)
+         {
+            if (mLastSeenAutopatchableModule != moveModule)
+            {
+               FindValidTargets();
+               mLastSeenAutopatchableModule = moveModule;
+            }
+            if ((IsValidTarget(moveModule) && GetTarget() != moveModule) || (GetOwner() == moveModule && GetTarget() == nullptr))
+            {
+               //highlight autopatchable cable sources
+               float lerp = ofMap(sin(gTime / 600 * PI * 2), -1, 1, 0, 1);
+               color = ofColor::lerp(color, ofColor::white, lerp * .7f);
+               radius = ofLerp(radius, kPatchCableSourceClickRadius, lerp);
+            }
+         }
+
+         ofSetColor(color);
          ofFill();
-         ofCircle(cableX, cableY, kPatchCableSourceRadius);
+         ofCircle(cableX, cableY, radius);
 
          if (mHoverIndex == i && PatchCable::sActivePatchCable == nullptr && !TheSynth->IsGroupSelecting())
          {
@@ -476,7 +495,9 @@ bool PatchCableSource::TestClick(int x, int y, bool right, bool testOnly /* = fa
          {
             if (mPatchCables.empty() ||
                 mType == kConnectionType_Note ||
-                mType == kConnectionType_Pulse)
+                mType == kConnectionType_Pulse ||
+                mType == kConnectionType_UIControl ||
+                mType == kConnectionType_Special)
             {
                PatchCable* newCable = AddPatchCable(nullptr);
                newCable->Grab();
@@ -488,7 +509,7 @@ bool PatchCableSource::TestClick(int x, int y, bool right, bool testOnly /* = fa
                send->SetTarget(GetTarget());
                SetTarget(send);
                send->SetSend(1, false);
-               TheSynth->SetMoveModule(send, spawnOffset.x, spawnOffset.y);
+               TheSynth->SetMoveModule(send, spawnOffset.x, spawnOffset.y, false);
             }
             else if (mType == kConnectionType_Modulator)
             {
@@ -497,7 +518,7 @@ bool PatchCableSource::TestClick(int x, int y, bool right, bool testOnly /* = fa
                IUIControl* currentTarget = dynamic_cast<IUIControl*>(GetTarget());
                SetTarget(macroSlider->GetSlider());
                macroSlider->SetOutputTarget(0, currentTarget);
-               TheSynth->SetMoveModule(macroSlider, spawnOffset.x, spawnOffset.y);
+               TheSynth->SetMoveModule(macroSlider, spawnOffset.x, spawnOffset.y, false);
             }
          }
          else
@@ -623,14 +644,14 @@ void PatchCableSource::KeyPressed(int key, bool isRepeat)
       {
          if (cable != nullptr && cable == PatchCable::sActivePatchCable)
          {
-            RemovePatchCable(cable);
+            RemovePatchCable(cable, true);
             break;
          }
       }
    }
 }
 
-void PatchCableSource::RemovePatchCable(PatchCable* cable)
+void PatchCableSource::RemovePatchCable(PatchCable* cable, bool fromUserAction)
 {
    mOwner->PreRepatch(this);
    mAudioReceiver = nullptr;
@@ -640,7 +661,7 @@ void PatchCableSource::RemovePatchCable(PatchCable* cable)
       RemoveFromVector(dynamic_cast<IPulseReceiver*>(cable->GetTarget()), mPulseReceivers);
    }
    RemoveFromVector(cable, mPatchCables);
-   mOwner->PostRepatch(this, false);
+   mOwner->PostRepatch(this, fromUserAction);
    delete cable;
 }
 

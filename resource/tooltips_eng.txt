@@ -159,7 +159,7 @@ pulser~send pulse messages at an interval
 ~interval~rate to send pulses
 ~timemode~when to send downbeat pulses, or set to "free" for pulses not locked to the transport
 ~t~pulse interval in milliseconds
-~offset~pulse time offset, in fractions of a measure
+~offset~pulse time offset, in fractions of the interval
 ~random~tell pulsed modules to randomize their position
 ~reset~length of sequence before sending reset pulse
 ~div~measure division, when using "div" as the interval
@@ -462,6 +462,20 @@ notesequencer~looping sequence of notes at an interval. pair with a "pulser" mod
 
 
 
+notetable~map a pitch (starting from zero) to a scale pitch
+~random pitch~randomize pitches in the sequence. hold shift to constrain the randomization to only pick roots and fifths.
+~length~the number of pitches
+~octave~octave of the bottom pitch of this sequence
+~notemode~which set of pitches should the rows represent?
+~tone*~pitch for this column
+~grid~patch a grid in here from a "midicontroller" module
+~x offset~x offset of attached grid controller
+~y offset~y offset of attached grid controller
+~rand pitch chance~when clicking the random pitch button, what is the chance that a step gets changed?
+~rand pitch range~when clicking the random pitch button, how far will the pitch change?
+
+
+
 notelooper~note loop recorder with overdubbing and replacement functionality
 ~write~should input should be recorded?
 ~del/mute~if "write" is enabled, erase notes as the playhead passes over them. otherwise, just mute them.
@@ -593,6 +607,7 @@ drumsequencer~step sequencer intended for drums. hold shift when dragging on the
 
 helpdisplay~displays help information
 ~show tooltips~displays these tooltips. you can also toggle them with the F1 key, and you can turn these on or off by default in the "settings" menu.
+~copy build info~copy info about this build to the clipboard, for help requests
 ~help page~which page of help information to show
 
 
@@ -1278,6 +1293,10 @@ fmsynth~polyphonic fm synthesis
 
 
 
+notetoggle~turn a control on or off depending on if there are any input notes
+
+
+
 drumsynth~oscillator+noise drum synth
 ~vol~the output volume
 ~edit~display parameters for each hit
@@ -1309,6 +1328,7 @@ drumsynth~oscillator+noise drum synth
 ~cutoffmax*~filter start cutoff frequency
 ~cutoffmin*~filter end cutoff frequency
 ~q*~filter resonance
+~oversampling~oversampling amount. increases sound quality, but also increases cpu usage.
 
 
 
@@ -1743,6 +1763,7 @@ vstplugin~a VST plugin instance
 ~show parameter~select parameters to display them, so they can be adjusted from within bespoke's interface. if a VST has more than 20 parameters, this list will initially be empty. in that case, to make a parameter appear in this list, wiggle it within the VST's interface.
 ~preset~choose from saved VST presets
 ~save as~save the current VST settings as a preset to load again later
+~panic~send "all notes off" and "all sounds off" to this plugin in order to silence it immediately
 
 
 
@@ -1781,6 +1802,7 @@ m185sequencer~sequencer using the unique paradigm of the the m185 or intellijel 
 
 notestepper~output notes through a round robin of patch cables, to create sequential variety
 ~length~length of the sequence
+~reset~reset to the start
 
 
 

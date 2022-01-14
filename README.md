@@ -7,7 +7,8 @@ You can find the most recent builds for Mac/Windows/Linux at http://bespokesynth
 
 Join the [Bespoke Discord](https://discord.gg/YdTMkvvpZZ) for support and to discuss with the community.
 
-<a href='https://ko-fi.com/awwbees' target='_blank'><img height='35' style='border:0px;height:46px;' src='https://az743702.vo.msecnd.net/cdn/kofi3.png?v=0' border='0' alt='Buy Me a Coffee at ko-fi.com' />
+## Searchable Documentation
+Find searchable, community-written documentation here! https://bespokesynth.github.io/BespokeSynthDocs/
 
 ## Screenshot
 ![screenshot](screenshot-1.png)
@@ -49,6 +50,7 @@ There are a few useful options to the *first* cmake command which many folks cho
 * `-DBESPOKE_VST2_SDK_LOCATION=/path/to/sdk` will activate VST2 hosting support in your built 
 copy of Bespoke if you have access to the VST SDK
 * `-DBESPOKE_ASIO_SDK_LOCATION=/path/to/sdk` (windows only) will activate ASIO support on windows in your built copy of Bespoke if you have access to the ASIO SDK
+* `-DBESPOKE_SPACEMOUSE_SDK_LOCATION=/path/to/sdk` (windows only) will activate SpaceMouse canvas navigation support on windows in your built copy of Bespoke if you have access to the SpaceMouse SDK
 * `-DBESPOKE_PYTHON_ROOT=/...` will override the automatically detected python root. In some cases with M1 mac builds in homebrew this is useful.
 * `-DCMAKE_BUILD_TYPE=Debug` will produce a build with debug information available
 * `-A x64` (windows only) will force visual studio to build for 64 bit architectures, in the event this is not your default

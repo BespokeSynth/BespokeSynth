@@ -13,3 +13,6 @@
 [submodule "libs/json/jsoncpp"]
 	path = libs/json/jsoncpp
 	url = https://github.com/open-source-parsers/jsoncpp.git
+[submodule "libs/link"]
+	path = libs/link
+	url = https://github.com/Ableton/link.git

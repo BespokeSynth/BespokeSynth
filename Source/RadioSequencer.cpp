@@ -159,7 +159,7 @@ void RadioSequencer::Step(double time, int pulseFlags)
 
    mGrid->SetHighlightCol(time, mStep);
 
-   IUIControl* controlToEnable = nullptr;
+   std::vector<IUIControl*> controlsToEnable;
    for (int i = 0; i < mControlCables.size(); ++i)
    {
       IUIControl* uicontrol = nullptr;
@@ -168,14 +168,14 @@ void RadioSequencer::Step(double time, int pulseFlags)
       if (uicontrol)
       {
          if (mGrid->GetVal(mStep, i) > 0)
-            controlToEnable = uicontrol;
+            controlsToEnable.push_back(uicontrol);
          else
             uicontrol->SetValue(0);
       }
    }
 
-   if (controlToEnable)
-      controlToEnable->SetValue(1);
+   for (auto* control : controlsToEnable)
+      control->SetValue(1);
 
    UpdateGridLights();
 }
@@ -335,11 +335,14 @@ void RadioSequencer::SaveLayout(ofxJSONElement& moduleInfo)
 
 void RadioSequencer::LoadLayout(const ofxJSONElement& moduleInfo)
 {  
+   mModuleSaveData.LoadBool("one_per_column_mode", moduleInfo, true);
+
    SetUpFromSaveData();
 }
 
 void RadioSequencer::SetUpFromSaveData()
 {
+   mGrid->SetSingleColumnMode(mModuleSaveData.GetBool("one_per_column_mode"));
 }
 
 namespace
@@ -371,7 +374,7 @@ void RadioSequencer::LoadState(FileStreamIn& in)
 {
    mLoadRev = -1;
 
-   if (ModuleContainer::sFileSaveStateRev >= 422)
+   if (ModularSynth::sLoadingFileSaveStateRev >= 422)
    {
       in >> mLoadRev;
       LoadStateValidate(mLoadRev <= kSaveStateRev);
@@ -379,7 +382,7 @@ void RadioSequencer::LoadState(FileStreamIn& in)
 
    IDrawableModule::LoadState(in);
 
-   if (ModuleContainer::sFileSaveStateRev <= 421)
+   if (ModularSynth::sLoadingFileSaveStateRev <= 421)
    {
       in >> mLoadRev;
       LoadStateValidate(mLoadRev <= kSaveStateRev);

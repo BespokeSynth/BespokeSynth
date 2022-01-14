@@ -79,6 +79,7 @@ private:
    void Save();
    void Load();
    void SetGridSize(float w, float h);
+   bool IsConnectedToPath(std::string path) const;
 
    //IDrawableModule
    void DrawModule() override;
@@ -91,7 +92,13 @@ private:
    {
       Preset() {}
       Preset(std::string path, float val) : mControlPath(path), mValue(val), mHasLFO(false) {}
-      Preset(IUIControl* control);
+      Preset(IUIControl* control, Presets* presets);
+      bool operator==(const Preset& other) const
+      {
+         return mControlPath == other.mControlPath &&
+                mValue == other.mValue &&
+                mHasLFO == other.mHasLFO;
+      }
       std::string mControlPath;
       float mValue;
       bool mHasLFO;
@@ -100,7 +107,7 @@ private:
    
    struct PresetCollection
    {
-      std::vector<Preset> mPresets;
+      std::list<Preset> mPresets;
       std::string mDescription;
    };
    

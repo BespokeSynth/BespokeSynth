@@ -106,7 +106,7 @@
              <div class="col-lg-8 col-lg-offset-2">
                 <h2>Get Bespoke</h2>
                  <p>Bespoke has releases for Mac, Windows, and Linux.<br/>It is <a href="https://github.com/BespokeSynth/BespokeSynth/">open source</a>, licensed with GPLv3.</p>
-                 <p>Bespoke is free, but you can pay for it if you want to.<br/>All versions are identical.<br/>Here is a feature matrix for the pricing tiers:</p>
+                 <p>Bespoke is free, but you can pay for it if you want. All versions are identical.<br/>Your payment goes directly to the <a href="https://www.naacpldf.org/">NAACP Legal Defense and Educational Fund</a>.<br/>Here is a feature matrix for the pricing tiers:</p>
              </div>
                  <p>
                      <div class="box">
@@ -140,10 +140,10 @@
                               <th class="services">Access to documentation</th>
                            </tr>
                            <tr>
-                              <th class="services">Five fewer dollars in your pocket</th>
+                              <th class="services">$20 donated to charity</th>
                            </tr>
                            <tr>
-                              <th class="services">Fifteen fewer dollars in your pocket</th>
+                              <th class="services">$40 donated to charity</th>
                            </tr>
                            </table>
                            <table class="price-matrix" border="0">
@@ -154,11 +154,11 @@
                               </th>
                               <th class="header-plus"><b>bespoke plus</b>
                                  <hr />
-                                 $5
+                                 $20
                               </th>
                               <th class="header-pro"><b>bespoke pro</b>
                                  <hr />
-                                 $15
+                                 $40
                               </th>
                            </tr>
                            
@@ -216,109 +216,46 @@
                               <td class="padded">
                                  <a href="builds/Bespoke-Windows.msi">Download for Windows</a><br/><br/>
                                  <a href="builds/Bespoke-Mac.dmg">Download for Mac</a><br/><br/>
-                                 <a href="builds/Bespoke-Linux.zip">Download for Linux</a>
+                                 <a href="https://software.opensuse.org//download.html?project=home%3Abespokesynth&package=bespokesynth">Download for Linux</a>
                               </td>
-                              <td class="paypal-td">
-                                 <span class="paypal-price-plus">$5</span>
+                              <td class="payment-td">
+                                 <span class="payment-price-plus">$20</span>
                                  <div id="smart-button-container">
                                     <div style="text-align: center;">
-                                       <div id="paypal-button-container"></div>
+                                       <div id="payment-button-container">
+                                       <script>
+                                          function replaceAfterButtonClick()
+                                          {
+                                             const element = document.getElementById('payment-button-container');
+                                             element.innerHTML = '';
+                                             element.innerHTML = '<td class="padded">Thank you!!!<br/><a href="builds/Bespoke-Windows.msi">Download for Windows</a><br/><a href="builds/Bespoke-Mac.dmg">Download for Mac</a><br/><a href="https://software.opensuse.org//download.html?project=home%3Abespokesynth&package=bespokesynth">Download for Linux</a></td>';
+                                          }
+                                       </script>
+                                       <a href="https://engage.naacpldf.org/dBCvDTd9IEiXX_jPkmkT_w2?&am=20" class="donate-button" target="_blank"
+                                          onclick="replaceAfterButtonClick();"><img src="img/ldf_donate_grey.png"/></a>
+                                       </div>
                                     </div>
                                     </div>
-                                 <script src="https://www.paypal.com/sdk/js?client-id=AY9v6yo4K6O5Vo9AWAO0C9p9iws_fEvjEB5PWRPfG4Mh762q5a8hiskw_a9FsrReC2MHEVRmxpfA5TV5&disable-funding=credit,card,venmo&currency=USD" data-sdk-integration-source="button-factory"></script>
-                                 <script>
-                                    function initPayPalButton() {
-                                    paypal.Buttons({
-                                       style: {
-                                          shape: 'pill',
-                                          color: 'silver',
-                                          layout: 'vertical',
-                                          label: 'paypal',
-                                          
-                                       },
-                              
-                                       createOrder: function(data, actions) {
-                                          return actions.order.create({
-                                          purchase_units: [{"description":"bespoke plus","amount":{"currency_code":"USD","value":5}}],
-                                          application_context: { shipping_preference: 'NO_SHIPPING' }
-                                          });
-                                       },
-                              
-                                       onApprove: function(data, actions) {
-                                          return actions.order.capture().then(function(orderData) {
-                                          
-                                          // Full available details
-                                          console.log('Capture result', orderData, JSON.stringify(orderData, null, 2));
-                              
-                                          // Show a success message within this page, e.g.
-                                          const element = document.getElementById('paypal-button-container');
-                                          element.innerHTML = '';
-                                          element.innerHTML = '<td class="padded">Thank you!!!<br/><a href="builds/Bespoke-Windows.msi">Download for Windows</a><br/><a href="builds/Bespoke-Mac.dmg">Download for Mac</a><br/><a href="builds/Bespoke-Linux.zip">Download for Linux</a></td>';
-                              
-                                          // Or go to another URL:  actions.redirect('thank_you.html');
-                                          
-                                          });
-                                       },
-                              
-                                       onError: function(err) {
-                                          console.log(err);
-                                       }
-                                    }).render('#paypal-button-container');
-                                    }
-                                    initPayPalButton();
-                                 </script>
-                                 (refunds issued with no questions asked)
                               </td>
-                              <td class="paypal-td">
-                                 <span class="paypal-price-pro">$15</span>
+                              <td class="payment-td">
+                                 <span class="payment-price-pro">$40</span>
                                  <div id="smart-button-container">
                                     <div style="text-align: center;">
-                                       <div id="paypal-button-container2"></div>
+                                       <div id="payment-button-container2">
+                                          <script>
+                                             function replaceAfterButtonClick2()
+                                             {
+                                                const element = document.getElementById('payment-button-container2');
+                                                element.innerHTML = '';
+                                                element.innerHTML = '<td class="padded">Thank you!!!<br/><a href="builds/Bespoke-Windows.msi">Download for Windows</a><br/><a href="builds/Bespoke-Mac.dmg">Download for Mac</a><br/><a href="https://software.opensuse.org//download.html?project=home%3Abespokesynth&package=bespokesynth">Download for Linux</a></td>';
+                                             }
+                                          </script>
+                                          <a href="https://engage.naacpldf.org/dBCvDTd9IEiXX_jPkmkT_w2?&am=40" class="donate-button" target="_blank"
+                                             onclick="replaceAfterButtonClick2();"><img src="img/ldf_donate.png"/></a>
+                                          </div>
+                                       </div>
                                     </div>
                                     </div>
-                                 
-                                 <script>
-                                    function initPayPalButton() {
-                                    paypal.Buttons({
-                                       style: {
-                                          shape: 'pill',
-                                          color: 'gold',
-                                          layout: 'vertical',
-                                          label: 'paypal',
-                                          
-                                       },
-                              
-                                       createOrder: function(data, actions) {
-                                          return actions.order.create({
-                                          purchase_units: [{"description":"bespoke plus","amount":{"currency_code":"USD","value":15}}],
-                                          application_context: { shipping_preference: 'NO_SHIPPING' }
-                                          });
-                                       },
-                              
-                                       onApprove: function(data, actions) {
-                                          return actions.order.capture().then(function(orderData) {
-                                          
-                                          // Full available details
-                                          console.log('Capture result', orderData, JSON.stringify(orderData, null, 2));
-                              
-                                          // Show a success message within this page, e.g.
-                                          const element = document.getElementById('paypal-button-container2');
-                                          element.innerHTML = '';
-                                          element.innerHTML = '<td class="padded">Thank you!!!<br/><a href="builds/Bespoke-Windows.msi">Download for Windows</a><br/><a href="builds/Bespoke-Mac.dmg">Download for Mac</a><br/><a href="builds/Bespoke-Linux.zip">Download for Linux</a></td>';
-                              
-                                          // Or go to another URL:  actions.redirect('thank_you.html');
-                                          
-                                          });
-                                       },
-                              
-                                       onError: function(err) {
-                                          console.log(err);
-                                       }
-                                    }).render('#paypal-button-container2');
-                                    }
-                                    initPayPalButton();
-                                 </script>
-                                 (refunds issued with no questions asked)
                               </td>
                            </tr>
                            </table>
@@ -331,10 +268,6 @@
                      </div>
                  </p>
                <div class="col-lg-8 col-lg-offset-2">
-                  <p>
-                     <br/><br/>If you'd prefer to contribute via ko-fi, one-time or monthly, that is also an option:
-                     <script type='text/javascript' src='https://storage.ko-fi.com/cdn/widget/Widget_2.js'></script><script type='text/javascript'>kofiwidget2.init('leave a tip', '#1b85b3', 'G2G25XM9M');kofiwidget2.draw();</script> 
-                  </p>
                  <p><br/>You can join the <a href="https://discord.gg/YdTMkvvpZZ">Discord</a> for discussion and support, and you can follow development progress on <a href="https://github.com/BespokeSynth/BespokeSynth/">GitHub</a>.</p>
                  <p>You can also find me on Twitter at <a href="https://twitter.com/awwbees">@awwbees</a></p>
                  <ul class="list-inline banner-social-buttons">

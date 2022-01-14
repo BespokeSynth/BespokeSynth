@@ -1,12 +1,12 @@
 <?xml version="1.0"?>
-<?define ProductVersion = "1.0.0"?>
+<?define ProductVersion = "1.1.0"?>
 <?define ProductUpgradeCode = "ba790d99-4d2c-4e33-a92d-219970637fca"?>
 <Wix xmlns="http://schemas.microsoft.com/wix/2006/wi">
    <Product Id="*" UpgradeCode="$(var.ProductUpgradeCode)" 
             Name="Bespoke Synth" Version="$(var.ProductVersion)" Manufacturer="Ryan Challinor" Language="1033">
       <Package InstallerVersion="200" Compressed="yes" Comments="Windows Installer Package"/>
       <Media Id="1" Cabinet="product.cab" EmbedCab="yes"/>
-      <Icon Id="ProductIcon" SourceFile="..\Builds\VisualStudio2015\icon.ico"/>
+      <Icon Id="ProductIcon" SourceFile="..\ignore\build\Source\BespokeSynth_artefacts\JuceLibraryCode\icon.ico"/>
       <Property Id="ARPPRODUCTICON" Value="ProductIcon"/>
       <Property Id="ARPHELPLINK" Value="http://www.bespokesynth.com"/>
       <Property Id="ARPURLINFOABOUT" Value="http://www.bespokesynth.com"/>
@@ -22,11 +22,12 @@
          <Directory Id="ProgramFiles64Folder">
             <Directory Id="INSTALLDIR" Name="BespokeSynth">
                <Component Id="ApplicationFiles" Guid="0a2563f0-5f49-4ae8-acda-143a019f73a2">
-                  <File Id="MainExecutable" Source="..\Builds\VisualStudio2015\x64\Release\App\BespokeSynth.exe"/>
-                  <File Id="PythonLibrary" Source="..\Builds\VisualStudio2015\x64\Release\App\python38.dll"/>
+                  <File Id="MainExecutable" Source="..\ignore\build\Source\BespokeSynth_artefacts\Release\BespokeSynth.exe"/>
                   <File Id="Readme" Source="readme.txt"/>
                </Component>
                <Directory Id="RESOURCE_DIR_REF" Name="resource">
+               </Directory>
+               <Directory Id="PYTHON_DIR_REF" Name="python">
                </Directory>
             </Directory>
          </Directory>
@@ -67,6 +68,7 @@
          <ComponentRef Id="ApplicationFiles"/>
          <ComponentRef Id="ApplicationShortcuts"/>
          <ComponentGroupRef Id="BespokeResourceDir" />
+         <ComponentGroupRef Id="BespokePythonDir" />
       </Feature>
    </Product>
 </Wix>

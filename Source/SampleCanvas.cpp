@@ -158,9 +158,7 @@ void SampleCanvas::OnClicked(int x, int y, bool right)
    if (y >= 0 && y < canvasY)
    {
       float pos = float(x - canvasX)/mCanvas->GetWidth() * mCanvas->GetNumCols();
-      int measure = int(pos);
-      TheTransport->SetMeasure(measure);
-      TheTransport->SetMeasurePos(pos - measure);
+      TheTransport->SetMeasureTime(pos);
    }*/
 }
 

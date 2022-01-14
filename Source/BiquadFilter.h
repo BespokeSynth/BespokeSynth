@@ -23,10 +23,7 @@
 //
 //
 
-#ifndef __modularSynth__BiquadFilter__
-#define __modularSynth__BiquadFilter__
-
-#include <iostream>
+#pragma once
 
 enum FilterType
 {
@@ -48,6 +45,7 @@ class BiquadFilter
 public:
    BiquadFilter();
    
+   void SetSampleRate(double sampleRate) { mSampleRate = sampleRate; }
    void Clear();
    void SetFilterType(FilterType type) { if (type != mType) { mType = type; Clear(); } }
    void SetFilterParams(double f, double q);
@@ -73,6 +71,7 @@ private:
    double mB2;
    double mZ1;
    double mZ2;
+   double mSampleRate;
 };
 
 inline float BiquadFilter::Filter(float in) {
@@ -81,5 +80,3 @@ inline float BiquadFilter::Filter(float in) {
    mZ2 = in * mA2 - mB2 * out;
    return out;
 }
-
-#endif /* defined(__modularSynth__BiquadFilter__) */

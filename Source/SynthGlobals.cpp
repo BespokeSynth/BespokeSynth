@@ -80,6 +80,8 @@ float gCornerRoundness = 1;
 
 std::random_device gRandomDevice;
 std::mt19937 gRandom(gRandomDevice());
+std::uniform_real_distribution<float> gRandom01(0.0f, 1.f);
+std::uniform_real_distribution<float> gRandomBipolarDist(-1.f, 1.f);
 
 void SynthInit()
 {
@@ -123,6 +125,9 @@ std::string GetBuildInfoString()
    return
 #if DEBUG
       "DEBUG BUILD " + 
+#endif
+#if BESPOKE_NIGHTLY
+      "NIGHTLY " + 
 #endif
       juce::JUCEApplication::getInstance()->getApplicationVersion().toStdString() + " (" + std::string(__DATE__) + " " + std::string(__TIME__) + ")";
 }
@@ -674,7 +679,7 @@ std::string GetUniqueName(std::string name, std::vector<IDrawableModule*> existi
       bool isNameUnique = true;
       for (int i=0; i<existing.size(); ++i)
       {
-         if (existing[i]->Path() == name)
+         if (existing[i]->Name() == name)
          {
             ++suffix;
             name = origName + ofToString(suffix);

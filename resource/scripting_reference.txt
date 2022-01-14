@@ -32,6 +32,8 @@ globals:
    bespoke.get_tempo()
    bespoke.set_background_text(str, size, xPos, yPos, red, green, blue)
       optional: size=50, xPos = 150, yPos = 250, red = 1, green = 1, blue = 1
+   bespoke.random(seed, index)
+   bespoke.get_modules()
 
 
 script-relative:
@@ -62,13 +64,18 @@ script-relative:
       example: me.get_caller().play_note(60,127)
    me.set_num_note_outputs(num)
    me.connect_osc_input(port)
+   me.send_cc(control, value, output_index)
+      optional: output_index = 0
 
 
 import notesequencer
    static:
       notesequencer.get(path)
    instance:
-      n.set_step(step, pitch, velocity, length)
+      n.set_step(step, row, velocity, length)
+         optional: velocity = 127, length = 1.0
+      n.set_pitch(step, pitch, velocity, length)
+         optional: velocity = 127, length = 1.0
 
 
 import drumsequencer
@@ -105,6 +112,7 @@ import notecanvas
    instance:
       n.add_note(measurePos, pitch, velocity, length)
       n.clear()
+      n.fit()
 
 
 import sampleplayer
@@ -122,8 +130,8 @@ import midicontroller
    static:
       midicontroller.get(path)
    instance:
-      m.set_connection(messageType, control, controlPath, controlType, value, channel, page)
-         optional: controlType = Default, value = 0, channel = -1, page=0
+      m.set_connection(messageType, control, controlPath, controlType, value, channel, page, midi_off, midi_on, scale, blink, increment, twoway, feedbackControl, isPageless)
+         optional: controlType = Default, value = 0, channel = -1, page=0, midi_off=0, midi_on = 127, scale = false, blink = false, increment = 0, twoway = true, feedbackControl = -1, isPageless = false
          example: m.set_connection(m.Control, 32, "oscillator~pw"), or m.set_connection(m.Note, 10, "oscillator~osc", m.SetValue, 2)
       m.send_note(pitch, velocity, forceNoteOn, channel, page)
          optional: forceNoteOn = false, channel = -1, page = 0
@@ -165,8 +173,8 @@ import envelope
    static:
       envelope.get(path)
    instance:
-      e.start(tuple<float,float> stages)
-      e.schedule(delay, tuple<float,float> stages)
+      e.start(stages)
+      e.schedule(delay, stages)
 
 
 import drumplayer
@@ -176,13 +184,29 @@ import drumplayer
       d.import_sampleplayer_cue(samplePlayer, srcCueIndex, destHitIndex)
 
 
+import vstplugin
+   static:
+      vstplugin.get(path)
+   instance:
+      v.send_cc(ctl, value, channel)
+      v.send_program_change(program, channel)
+      v.send_data(a, b, c)
+
+
 import module
    static:
       module.get(path)
       module.create(moduleType, x, y)
    instance:
       m.set_position(x, y)
+      m.get_position_x()
+      m.get_position_y()
+      m.get_width()
+      m.get_height()
       m.set_target(target)
+      m.get_target()
+      m.get_targets()
+      m.set_name(name)
       m.delete()
       m.set(path, value)
       m.get(path)

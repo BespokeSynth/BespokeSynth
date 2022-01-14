@@ -46,6 +46,7 @@ void NoteStepper::CreateUIControls()
    IDrawableModule::CreateUIControls();
    
    UIBLOCK(3, 3, 15+(kMaxDestinations-1)*15);
+   BUTTON(mResetButton, "reset");
    INTSLIDER(mLengthSlider,"length",&mLength,1,kMaxDestinations);
    ENDUIBLOCK(mWidth,mHeight);
    mHeight += 15;
@@ -67,6 +68,7 @@ void NoteStepper::DrawModule()
    if (Minimized() || IsVisible() == false)
       return;
    
+   mResetButton->Draw();
    mLengthSlider->Draw();
    
    for (int i=0; i<kMaxDestinations; ++i)
@@ -116,6 +118,12 @@ void NoteStepper::SendNoteToIndex(int index, double time, int pitch, int velocit
 void NoteStepper::SendCC(int control, int value, int voiceIdx)
 {
    SendCCOutput(control, value, voiceIdx);
+}
+
+void NoteStepper::ButtonClicked(ClickButton* button)
+{
+   if (button == mResetButton)
+      mCurrentDestinationIndex = -1;
 }
 
 void NoteStepper::LoadLayout(const ofxJSONElement& moduleInfo)

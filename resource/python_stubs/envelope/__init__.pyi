@@ -4,9 +4,9 @@ def get(path) -> envelope:
    pass
 
 class envelope:
-   def start(this, tuple<float,float> stages):
+   def start(this, stages):
       pass
 
-   def schedule(this, delay, tuple<float,float> stages):
+   def schedule(this, delay, stages):
       pass
 

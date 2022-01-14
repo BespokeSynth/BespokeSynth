@@ -40,6 +40,8 @@
 #include "VSTPlayhead.h"
 #include "VSTWindow.h"
 
+#include <atomic>
+
 #include "juce_audio_processors/juce_audio_processors.h"
 
 class ofxJSONElement;
@@ -80,6 +82,7 @@ public:
    //INoteReceiver
    void PlayNote(double time, int pitch, int velocity, int voiceIdx = -1, ModulationParameters modulation = ModulationParameters()) override;
    void SendCC(int control, int value, int voiceIdx = -1) override;
+   void SendMidi(const juce::MidiMessage& message) override;
    
    void DropdownClicked(DropdownList* list) override;
    void DropdownUpdated(DropdownList* list, int oldVal) override;
@@ -117,6 +120,8 @@ private:
    ClickButton* mSavePresetFileButton;
    std::vector<std::string> mPresetFilePaths;
    ClickButton* mOpenEditorButton;
+   ClickButton* mPanicButton;
+   std::atomic<bool> mWantsPanic{false};
    int mOverlayWidth;
    int mOverlayHeight;
    
@@ -176,6 +181,8 @@ private:
     * Midi and MultiOut support
     */
    AdditionalNoteCable *mMidiOutCable{nullptr};
+
+   bool mWantOpenVstWindow{ false };
 };
 
 #endif /* defined(__Bespoke__VSTPlugin__) */

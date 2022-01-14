@@ -88,6 +88,8 @@ void UserPrefString::Save(int index, ofxJSONElement& prefsJson) //this numbering
 
 bool UserPrefString::DiffersFromSavedValue() const
 {
+   if (UserPrefs.mUserPrefsFile[mName].isNull())
+      return false;
    return mValue != UserPrefs.mUserPrefsFile[mName].asString();
 }
 
@@ -125,6 +127,8 @@ void UserPrefDropdownInt::Save(int index, ofxJSONElement& prefsJson) //this numb
 
 bool UserPrefDropdownInt::DiffersFromSavedValue() const
 {
+   if (UserPrefs.mUserPrefsFile[mName].isNull())
+      return false;
    return ofToInt(mDropdown->GetLabel(mIndex)) != UserPrefs.mUserPrefsFile[mName].asInt();
 }
 
@@ -164,6 +168,8 @@ void UserPrefDropdownString::Save(int index, ofxJSONElement& prefsJson) //this n
 
 bool UserPrefDropdownString::DiffersFromSavedValue() const
 {
+   if (UserPrefs.mUserPrefsFile[mName].isNull())
+      return false;
    return mDropdown->GetLabel(mIndex) != UserPrefs.mUserPrefsFile[mName].asString();
 }
 
@@ -201,6 +207,8 @@ void UserPrefTextEntryInt::Save(int index, ofxJSONElement& prefsJson) //this num
 
 bool UserPrefTextEntryInt::DiffersFromSavedValue() const
 {
+   if (UserPrefs.mUserPrefsFile[mName].isNull())
+      return false;
    return mValue != UserPrefs.mUserPrefsFile[mName].asInt();
 }
 
@@ -237,6 +245,8 @@ void UserPrefTextEntryFloat::Save(int index, ofxJSONElement& prefsJson) //this n
 
 bool UserPrefTextEntryFloat::DiffersFromSavedValue() const
 {
+   if (UserPrefs.mUserPrefsFile[mName].isNull())
+      return false;
    return mValue != UserPrefs.mUserPrefsFile[mName].asFloat();
 }
 
@@ -274,6 +284,8 @@ void UserPrefBool::Save(int index, ofxJSONElement& prefsJson) //this numbering i
 
 bool UserPrefBool::DiffersFromSavedValue() const
 {
+   if (UserPrefs.mUserPrefsFile[mName].isNull())
+      return false;
    return mValue != UserPrefs.mUserPrefsFile[mName].asBool();
 }
 
@@ -312,5 +324,7 @@ void UserPrefFloat::Save(int index, ofxJSONElement& prefsJson) //this numbering 
 
 bool UserPrefFloat::DiffersFromSavedValue() const
 {
+   if (UserPrefs.mUserPrefsFile[mName].isNull())
+      return false;
    return mValue != UserPrefs.mUserPrefsFile[mName].asFloat();
 }

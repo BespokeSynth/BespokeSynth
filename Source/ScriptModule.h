@@ -60,6 +60,7 @@ public:
    
    void PlayNoteFromScript(float pitch, float velocity, float pan, int noteOutputIndex);
    void PlayNoteFromScriptAfterDelay(float pitch, float velocity, double delayMeasureTime, float pan, int noteOutputIndex);
+   void SendCCFromScript(int control, int value, int noteOutputIndex);
    void ScheduleMethod(std::string method, double delayMeasureTime);
    void ScheduleUIControlValue(IUIControl* control, float value, double delayMeasureTime);
    void HighlightLine(int lineNum, int scriptModuleIndex);

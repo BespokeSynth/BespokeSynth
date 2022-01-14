@@ -51,6 +51,10 @@ void* operator new[](std::size_t size, const char *file, int line) throw(std::ba
 #endif
 #define new DEBUG_NEW
 
+#if !defined(__PRETTY_FUNCTION__) && !defined(__GNUC__)
+#define __PRETTY_FUNCTION__ __FUNCSIG__
+#endif
+
 #define MAX_BUFFER_SIZE 30*gSampleRate
 #define MAX_TEXTENTRY_LENGTH 1024
 
@@ -109,6 +113,8 @@ extern bool gShowDevModules;
 extern float gCornerRoundness;
 extern std::random_device gRandomDevice;
 extern std::mt19937 gRandom;
+extern std::uniform_real_distribution<float> gRandom01;
+extern std::uniform_real_distribution<float> gRandomBipolarDist;
 
 enum OscillatorType
 {
@@ -200,7 +206,7 @@ bool EvaluateExpression(std::string expression, float currentValue, float& outpu
 
 inline static float RandomSample()
 {
-   return (float(gRandom())/gRandom.max()) * 2.0f - 1.0f;
+   return gRandomBipolarDist(gRandom);
 }
 
 inline static std::string GetPathSeparator()

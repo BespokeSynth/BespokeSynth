@@ -516,7 +516,18 @@ int NoteStepSequencer::PitchToRow(int pitch)
    return -1;
 }
 
-void NoteStepSequencer::SetStep(int index, int pitch, int velocity, float length)
+void NoteStepSequencer::SetStep(int index, int row, int velocity, float length)
+{
+   if (index >= 0 && index < NSS_MAX_STEPS)
+   {
+      mTones[index] = std::clamp(row, 0, MAX_GRID_SIZE-1);
+      mVels[index] = ofClamp(velocity, 0, 127);
+      mNoteLengths[index] = length;
+      SyncGridToSeq();
+   }
+}
+
+void NoteStepSequencer::SetPitch(int index, int pitch, int velocity, float length)
 {
    if (index >= 0 && index < NSS_MAX_STEPS)
    {

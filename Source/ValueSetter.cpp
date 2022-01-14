@@ -50,6 +50,10 @@ void ValueSetter::CreateUIControls()
    UIBLOCK_SHIFTRIGHT();
    UICONTROL_CUSTOM(mButton, new ClickButton(UICONTROL_BASICS("set")));
    ENDUIBLOCK(mWidth, mHeight);
+
+   auto entryRect = mValueEntry->GetRect();
+   mValueSlider = new FloatSlider(this, "slider", entryRect.x, entryRect.y, entryRect.width, entryRect.height, &mValue, 0, 1);
+   mValueSlider->SetShowing(false);
    
    mControlCable = new PatchCableSource(this, kConnectionType_Modulator);
    AddPatchCableSource(mControlCable);
@@ -61,6 +65,7 @@ void ValueSetter::DrawModule()
       return;
    
    mValueEntry->Draw();
+   mValueSlider->Draw();
    mButton->Draw();
 }
 
@@ -107,6 +112,7 @@ void ValueSetter::SaveLayout(ofxJSONElement& moduleInfo)
 void ValueSetter::LoadLayout(const ofxJSONElement& moduleInfo)
 {
    mModuleSaveData.LoadString("target", moduleInfo);
+   mModuleSaveData.LoadBool("show_slider", moduleInfo, false);
    
    SetUpFromSaveData();
 }
@@ -115,4 +121,8 @@ void ValueSetter::SetUpFromSaveData()
 {
    mTarget = TheSynth->FindUIControl(mModuleSaveData.GetString("target"));
    mControlCable->SetTarget(mTarget);
+
+   bool showSlider = mModuleSaveData.GetBool("show_slider");
+   mValueEntry->SetShowing(!showSlider);
+   mValueSlider->SetShowing(showSlider);
 }

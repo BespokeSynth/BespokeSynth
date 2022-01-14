@@ -61,7 +61,12 @@ public:
    
    void Clear();
    NoteCanvasElement* AddNote(double measurePos, int pitch, int velocity, double length, int voiceIdx = -1, ModulationParameters modulation = ModulationParameters());
-   
+
+   /**
+    * @brief FitNotes adapt measures to fit all added notes
+    */
+   void FitNotes();
+
    void OnTransportAdvanced(float amount) override;
    
    void CanvasUpdated(Canvas* canvas) override;

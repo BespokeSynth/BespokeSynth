@@ -32,19 +32,17 @@
 #include "Profiler.h"
 #include "UIControlMacros.h"
 #include "IAudioReceiver.h"
+#include "ADSRDisplay.h"
+#include "UIControlMacros.h"
 
 #define DRUMSYNTH_NO_CUTOFF 10000
 
 DrumSynth::DrumSynth()
 : mVolume(1)
 , mVolSlider(nullptr)
-, mEditMode(true)
-, mEditCheckbox(nullptr)
 , mUseIndividualOuts(false)
 , mMonoOutput(false)
 {
-   mOutputBuffer = new float[gBufferSize];
-   
    for (int i=0; i<(int)mHits.size(); ++i)
    {
       int x = (i % DRUMSYNTH_PADS_HORIZONTAL)*DRUMSYNTH_PAD_WIDTH + 5;
@@ -58,8 +56,16 @@ DrumSynth::DrumSynth()
 void DrumSynth::CreateUIControls()
 {
    IDrawableModule::CreateUIControls();
-   mVolSlider = new FloatSlider(this,"vol",4,4,100,15,&mVolume,0,2);
-   //mEditCheckbox = new Checkbox(this,"edit",73,20,&mEditMode);
+   UIBLOCK0();
+   FLOATSLIDER(mVolSlider, "vol", &mVolume, 0, 2);
+   DROPDOWN(mOversamplingSelector, "oversampling", &mOversampling, 40);
+   ENDUIBLOCK0();
+
+   mOversamplingSelector->DrawLabel(true);
+   mOversamplingSelector->AddLabel("1x", 1);
+   mOversamplingSelector->AddLabel("2x", 2);
+   mOversamplingSelector->AddLabel("4x", 4);
+   mOversamplingSelector->AddLabel("8x", 8);
    
    for (size_t i=0; i<mHits.size(); ++i)
       mHits[i]->CreateUIControls();
@@ -67,7 +73,6 @@ void DrumSynth::CreateUIControls()
 
 DrumSynth::~DrumSynth()
 {
-   delete[] mOutputBuffer;
    for (size_t i=0; i<mHits.size(); ++i)
       delete mHits[i];
 }
@@ -84,9 +89,18 @@ void DrumSynth::Process(double time)
    
    ComputeSliders(0);
    SyncOutputBuffer(numChannels);
-   
+
+   int oversampling = mOversampling;
    int bufferSize = gBufferSize;
-   ChannelBuffer* out = target ? target->GetBuffer() : nullptr;
+   double sampleIncrementMs = gInvSampleRateMs;
+   double sampleRate = gSampleRate;
+
+   if (oversampling != 1)
+   {
+      bufferSize *= oversampling;
+      sampleIncrementMs /= oversampling;
+      sampleRate *= oversampling;
+   }
    
    float volSq = mVolume * mVolume;
    
@@ -94,35 +108,57 @@ void DrumSynth::Process(double time)
    {
       for (int i=0; i<(int)mHits.size(); ++i)
       {
+         int hitOversampling = oversampling;
+         int hitBufferSize = bufferSize;
+
          if (GetTarget(i+1) != nullptr)
          {
-            Clear(mOutputBuffer, bufferSize);
+            Clear(gWorkBuffer, hitBufferSize);
          
-            mHits[i]->Process(time, mOutputBuffer, bufferSize);
+            mHits[i]->Process(time, gWorkBuffer, hitBufferSize, oversampling, sampleRate, sampleIncrementMs);
+
+            //assume power-of-two
+            while (hitOversampling > 1)
+            {
+               for (int i = 0; i < hitBufferSize; ++i)
+                  gWorkBuffer[i] = (gWorkBuffer[i * 2] + gWorkBuffer[i * 2 + 1]) / 2;
+               hitOversampling /= 2;
+               hitBufferSize /= 2;
+            }
          
-            Mult(mOutputBuffer, volSq, bufferSize);
-            out = GetTarget(i+1)->GetBuffer();
+            Mult(gWorkBuffer, volSq, hitBufferSize);
+            auto* targetBuffer = GetTarget(i+1)->GetBuffer();
             mHits[i]->mIndividualOutput->mVizBuffer->SetNumChannels(numChannels);
             for (int ch=0; ch<numChannels; ++ch)
             {
-               mHits[i]->mIndividualOutput->mVizBuffer->WriteChunk(mOutputBuffer, bufferSize, ch);
-               Add(out->GetChannel(ch), mOutputBuffer, bufferSize);
+               mHits[i]->mIndividualOutput->mVizBuffer->WriteChunk(gWorkBuffer, hitBufferSize, ch);
+               Add(targetBuffer->GetChannel(ch), gWorkBuffer, hitBufferSize);
             }
          }
       }
    }
    else
    {
-      Clear(mOutputBuffer, bufferSize);
+      Clear(gWorkBuffer, bufferSize);
       
       for (size_t i=0; i<mHits.size(); ++i)
-         mHits[i]->Process(time, mOutputBuffer, bufferSize);
-      
-      Mult(mOutputBuffer, volSq, bufferSize);
+         mHits[i]->Process(time, gWorkBuffer, bufferSize, oversampling, sampleRate, sampleIncrementMs);
+
+      //assume power-of-two
+      while (oversampling > 1)
+      {
+         for (int i = 0; i < bufferSize; ++i)
+            gWorkBuffer[i] = (gWorkBuffer[i * 2] + gWorkBuffer[i * 2 + 1]) / 2;
+         oversampling /= 2;
+         bufferSize /= 2;
+      }
+
+      Mult(gWorkBuffer, volSq, bufferSize);
+
       for (int ch=0; ch<numChannels; ++ch)
       {
-         GetVizBuffer()->WriteChunk(mOutputBuffer, bufferSize, ch);
-         Add(out->GetChannel(ch), mOutputBuffer, bufferSize);
+         GetVizBuffer()->WriteChunk(gWorkBuffer, bufferSize, ch);
+         Add(target->GetBuffer()->GetChannel(ch), gWorkBuffer, bufferSize);
       }
    }
 }
@@ -141,9 +177,6 @@ void DrumSynth::OnClicked(int x, int y, bool right)
    IDrawableModule::OnClicked(x,y,right);
    
    if (right)
-      return;
-   
-   if (!mEditMode)
       return;
    
    x -= 5;
@@ -169,34 +202,31 @@ void DrumSynth::DrawModule()
       return;
    
    mVolSlider->Draw();
-   //mEditCheckbox->Draw();
+   mOversamplingSelector->Draw();
    
-   if (mEditMode)
+   ofPushMatrix();
+   for (size_t i=0; i<mHits.size(); ++i)
    {
-      ofPushMatrix();
-      for (size_t i=0; i<mHits.size(); ++i)
+      ofPushStyle();
+      if (mHits[i]->Level() > 0)
       {
-         ofPushStyle();
-         if (mHits[i]->Level() > 0)
-         {
-            ofFill();
-            ofSetColor(200,100,0,gModuleDrawAlpha * sqrtf(mHits[i]->Level()));
-            ofRect(mHits[i]->mX,mHits[i]->mY, DRUMSYNTH_PAD_WIDTH, DRUMSYNTH_PAD_HEIGHT);
-         }
-         ofSetColor(200,100,0,gModuleDrawAlpha);
-         ofNoFill();
+         ofFill();
+         ofSetColor(200,100,0,gModuleDrawAlpha * sqrtf(mHits[i]->Level()));
          ofRect(mHits[i]->mX,mHits[i]->mY, DRUMSYNTH_PAD_WIDTH, DRUMSYNTH_PAD_HEIGHT);
-         ofPopStyle();
-         
-         ofSetColor(255,255,255,gModuleDrawAlpha);
-         
-         std::string name = ofToString(i);
-         DrawTextNormal(name,mHits[i]->mX+5,mHits[i]->mY+12);
-         
-         mHits[i]->Draw();
       }
-      ofPopMatrix();
+      ofSetColor(200,100,0,gModuleDrawAlpha);
+      ofNoFill();
+      ofRect(mHits[i]->mX,mHits[i]->mY, DRUMSYNTH_PAD_WIDTH, DRUMSYNTH_PAD_HEIGHT);
+      ofPopStyle();
+         
+      ofSetColor(255,255,255,gModuleDrawAlpha);
+         
+      std::string name = ofToString(i);
+      DrawTextNormal(name,mHits[i]->mX+5,mHits[i]->mY+12);
+         
+      mHits[i]->Draw();
    }
+   ofPopMatrix();
 }
 
 int DrumSynth::GetAssociatedSampleIndex(int x, int y)
@@ -209,16 +239,8 @@ int DrumSynth::GetAssociatedSampleIndex(int x, int y)
 
 void DrumSynth::GetModuleDimensions(float& width, float& height)
 {
-   if (mEditMode)
-   {
-      width = 10 + MIN(mHits.size(), DRUMSYNTH_PADS_HORIZONTAL) * DRUMSYNTH_PAD_WIDTH;
-      height = 52 + mHits.size() / DRUMSYNTH_PADS_HORIZONTAL * DRUMSYNTH_PAD_HEIGHT;
-   }
-   else
-   {
-      width = 110;
-      height = 40;
-   }
+   width = 10 + MIN(mHits.size(), DRUMSYNTH_PADS_HORIZONTAL) * DRUMSYNTH_PAD_WIDTH;
+   height = 52 + mHits.size() / DRUMSYNTH_PADS_HORIZONTAL * DRUMSYNTH_PAD_HEIGHT;
 }
 
 void DrumSynth::FloatSliderUpdated(FloatSlider* slider, float oldVal)
@@ -368,11 +390,12 @@ void DrumSynth::DrumSynthHit::Play(double time, float velocity)
    mStartTime = time;
 }
 
-void DrumSynth::DrumSynthHit::Process(double time, float* out, int bufferSize)
+void DrumSynth::DrumSynthHit::Process(double time, float* out, int bufferSize, int oversampling, double sampleRate, double sampleIncrementMs)
 {
    if (mData.mTone.GetADSR()->IsDone(time) && mData.mNoise.GetADSR()->IsDone(time))
    {
       mLevel.Reset();
+      mPhase = 0;
       return;
    }
    
@@ -380,8 +403,11 @@ void DrumSynth::DrumSynthHit::Process(double time, float* out, int bufferSize)
    {
       float freq = ofLerp(mData.mFreqMin, mData.mFreqMax, mData.mFreqAdsr.Value(time));
       if (mData.mCutoffMax != DRUMSYNTH_NO_CUTOFF)
+      {
+         mFilter.SetSampleRate(sampleRate);
          mFilter.SetFilterParams(ofLerp(mData.mCutoffMin, mData.mCutoffMax, mData.mFilterAdsr.Value(time)), mData.mQ);
-      float phaseInc = GetPhaseInc(freq);
+      }
+      float phaseInc = GetPhaseInc(freq) / oversampling;
       
       float sample = mData.mTone.Audio(time, mPhase) * mData.mVol * mData.mVol;
       float noise = mData.mNoise.Audio(time, mPhase);
@@ -395,7 +421,7 @@ void DrumSynth::DrumSynthHit::Process(double time, float* out, int bufferSize)
       mPhase += phaseInc;
       while (mPhase > FTWO_PI) { mPhase -= FTWO_PI; }
       
-      time += gInvSampleRateMs;
+      time += sampleIncrementMs;
    }
 }
 

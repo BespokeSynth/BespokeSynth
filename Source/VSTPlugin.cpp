@@ -79,7 +79,7 @@ namespace VSTLookup
       for (int i=0; i<types.size(); ++i)
          vsts.push_back(types[i].fileOrIdentifier.toStdString());
 
-      //for (int i = 0; i < 40; ++i)
+      //for (int i = 0; i < 2000; ++i)
       //   vsts.insert(vsts.begin(), std::string("c:/a+") + ofToString(gRandom()));
 
       SortByLastUsed(vsts);
@@ -137,6 +137,7 @@ namespace VSTLookup
             }
             catch (Json::LogicError& e)
             {
+               TheSynth->LogEvent(__PRETTY_FUNCTION__ + std::string(" json error: ") + e.what(), kLogEventType_Error);
             }
          }
       }
@@ -197,8 +198,9 @@ void VSTPlugin::CreateUIControls()
    mOpenEditorButton = new ClickButton(this, "open", mVolSlider, kAnchor_Right_Padded);
    mPresetFileSelector = new DropdownList(this,"preset",3,21,&mPresetFileIndex,110);
    mSavePresetFileButton = new ClickButton(this,"save as",-1,-1);
-   mShowParameterDropdown = new DropdownList(this,"show parameter",3,38,&mShowParameterIndex);
-   
+   mShowParameterDropdown = new DropdownList(this,"show parameter",3,38,&mShowParameterIndex, 160);
+   mPanicButton = new ClickButton(this, "panic", 166,38);
+
    mPresetFileSelector->DrawLabel(true);
    mSavePresetFileButton->PositionTo(mPresetFileSelector,kAnchor_Right);
 
@@ -227,6 +229,10 @@ void VSTPlugin::Exit()
    if (mWindow)
    {
       mWindow.reset();
+   }
+   if (mPlugin)
+   {
+      mPlugin.reset();
    }
 }
 
@@ -453,6 +459,20 @@ void VSTPlugin::Poll()
          }
       }
    }
+
+   if (mWantOpenVstWindow)
+   {
+      if (mPlugin != nullptr)
+      {
+         if (mWindow == nullptr)
+            mWindow = std::unique_ptr<VSTWindow>(VSTWindow::CreateVSTWindow(this, VSTWindow::Normal));
+         mWindow->ShowWindow();
+
+         //if (mWindow->GetNSViewComponent())
+         //   mWindowOverlay = new NSWindowOverlay(mWindow->GetNSViewComponent()->getView());
+      }
+      mWantOpenVstWindow = false;
+   }
 }
 
 void VSTPlugin::Process(double time)
@@ -548,7 +568,18 @@ void VSTPlugin::Process(double time)
          mFutureMidiBuffer.clear();
          mFutureMidiBuffer.addEvents(mMidiBuffer, gBufferSize, mMidiBuffer.getLastEventTime()-gBufferSize + 1, -gBufferSize);
          mMidiBuffer.clear(gBufferSize, mMidiBuffer.getLastEventTime() + 1);
-         
+
+         if (mWantsPanic)
+         {
+            mWantsPanic = false;
+
+            mMidiBuffer.clear();
+            for (int channel=1; channel<=16; ++channel)
+               mMidiBuffer.addEvent(juce::MidiMessage::allNotesOff(channel), 0);
+            for (int channel=1; channel<=16; ++channel)
+               mMidiBuffer.addEvent(juce::MidiMessage::allSoundOff(channel), 1);
+         }
+
          mPlugin->processBlock(buffer, mMidiBuffer);
 
          if (!mMidiBuffer.isEmpty())
@@ -668,6 +699,16 @@ void VSTPlugin::SendCC(int control, int value, int voiceIdx /*=-1*/)
    mMidiBuffer.addEvent(juce::MidiMessage::controllerEvent((mUseVoiceAsChannel ? channel : mChannel), control, (uint8)value), 0);
 }
 
+void VSTPlugin::SendMidi(const juce::MidiMessage& message)
+{
+   if (!mPluginReady || mPlugin == nullptr)
+      return;
+
+   const juce::ScopedLock lock(mMidiInputLock);
+
+   mMidiBuffer.addEvent(message, 0);
+}
+
 void VSTPlugin::SetEnabled(bool enabled)
 {
    mEnabled = enabled;
@@ -700,6 +741,7 @@ void VSTPlugin::DrawModule()
    mPresetFileSelector->Draw();
    mSavePresetFileButton->Draw();
    mOpenEditorButton->Draw();
+   mPanicButton->Draw();
    mShowParameterDropdown->Draw();
 
    ofPushStyle();
@@ -860,22 +902,17 @@ void VSTPlugin::CheckboxUpdated(Checkbox* checkbox)
 void VSTPlugin::ButtonClicked(ClickButton* button)
 {
    if (button == mOpenEditorButton)
+      mWantOpenVstWindow = true;
+
+   if (button == mPanicButton)
    {
-      if (mPlugin != nullptr)
-      {
-         if (mWindow == nullptr)
-            mWindow = std::unique_ptr<VSTWindow>(VSTWindow::CreateVSTWindow(this, VSTWindow::Normal));
-         mWindow->ShowWindow();
-      }
-      
-      //if (mWindow->GetNSViewComponent())
-      //   mWindowOverlay = new NSWindowOverlay(mWindow->GetNSViewComponent()->getView());
+      mWantsPanic = true;
    }
-   
+
    if (button == mSavePresetFileButton && mPlugin != nullptr)
    {
       juce::File(ofToDataPath("vst/presets/"+GetPluginId())).createDirectory();
-      FileChooser chooser("Save preset as...", File(ofToDataPath("vst/presets/"+ GetPluginId()+"/preset.vstp")), "*.vstp", true, false, TheSynth->GetMainComponent()->getTopLevelComponent());
+      FileChooser chooser("Save preset as...", File(ofToDataPath("vst/presets/"+ GetPluginId()+"/preset.vstp")), "*.vstp", true, false, TheSynth->GetFileChooserParent());
       if (chooser.browseForFileToSave(true))
       {
          std::string path = chooser.getResult().getFullPathName().toStdString();

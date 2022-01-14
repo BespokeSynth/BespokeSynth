@@ -356,7 +356,7 @@ float ofMap(float val, float fromStart, float fromEnd, float toStart, float toEn
 
 float ofRandom(float max)
 {
-   return max * float(gRandom()) / gRandom.max();
+   return max * gRandom01(gRandom);
 }
 
 float ofRandom(float x, float y)
@@ -368,7 +368,7 @@ float ofRandom(float x, float y)
    if (x == y) return x; 			// float == ?, wise? epsilon?
    high = MAX(x,y);
    low = MIN(x,y);
-   randNum = low + ((high-low) * float(gRandom()) / gRandom.max());
+   randNum = low + ((high-low) * gRandom01(gRandom));
    return randNum;
 }
 
@@ -504,18 +504,18 @@ std::string ofGetTimestampString(std::string in)
 {
    Time time = Time::getCurrentTime();
    ofStringReplace(in, "%Y", ofToString(time.getYear()));
-   char buff[5];
-   sprintf(buff ,"%02d", time.getMonth()+1);
+   char buff[16];
+   sprintf(buff, "%02d", time.getMonth()+1);
    ofStringReplace(in, "%m", buff);
-   sprintf(buff ,"%02d", time.getDayOfMonth());
+   sprintf(buff, "%02d", time.getDayOfMonth());
    ofStringReplace(in, "%d", buff);
-   sprintf(buff ,"%02d", time.getHours());
+   sprintf(buff, "%02d", time.getHours());
    ofStringReplace(in, "%H", buff);
-   sprintf(buff ,"%02d", time.getMinutes());
+   sprintf(buff, "%02d", time.getMinutes());
    ofStringReplace(in, "%M", buff);
-   sprintf(buff ,"%02d", time.getSeconds());
+   sprintf(buff, "%02d", time.getSeconds());
    ofStringReplace(in, "%S", buff);
-   sprintf(buff ,"%03d", time.getMilliseconds());
+   sprintf(buff, "%03d", time.getMilliseconds());
    ofStringReplace(in, "%i", buff);
    return in;
 }

@@ -30,11 +30,12 @@
 #include "IPulseReceiver.h"
 #include "TextEntry.h"
 #include "ClickButton.h"
+#include "Slider.h"
 
 class PatchCableSource;
 class IUIControl;
 
-class ValueSetter : public IDrawableModule, public IPulseReceiver, public ITextEntryListener, public IButtonListener
+class ValueSetter : public IDrawableModule, public IPulseReceiver, public ITextEntryListener, public IButtonListener, public IFloatSliderListener
 {
 public:
    ValueSetter();
@@ -55,6 +56,7 @@ public:
    void PostRepatch(PatchCableSource* cableSource, bool fromUserClick) override;
    
    void TextEntryComplete(TextEntry* entry) override {}
+   void FloatSliderUpdated(FloatSlider* slider, float oldVal) override {}
    
    void SaveLayout(ofxJSONElement& moduleInfo) override;
    void LoadLayout(const ofxJSONElement& moduleInfo) override;
@@ -71,6 +73,7 @@ private:
    IUIControl* mTarget;
    float mValue;
    TextEntry* mValueEntry;
+   FloatSlider* mValueSlider;
    ClickButton* mButton;
    
    float mWidth;

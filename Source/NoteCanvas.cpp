@@ -149,6 +149,8 @@ void NoteCanvas::PlayNote(double time, int pitch, int velocity, int voiceIdx, Mo
 
 void NoteCanvas::KeyPressed(int key, bool isRepeat)
 {
+   IDrawableModule::KeyPressed(key, isRepeat);
+
    if (TheSynth->GetLastClickedModule() == this)
    {
       if (key == OF_KEY_UP || key == OF_KEY_DOWN || key == OF_KEY_RIGHT || key == OF_KEY_LEFT)
@@ -346,6 +348,17 @@ NoteCanvasElement* NoteCanvas::AddNote(double measurePos, int pitch, int velocit
    mCanvas->AddElement(element);
    
    return element;
+}
+
+void NoteCanvas::FitNotes()
+{
+   float latest = 0.0;
+   for (auto* element : mCanvas->GetElements())
+   {
+      if(element->GetEnd() > latest)
+         latest = element->GetEnd();
+   }
+   SetNumMeasures(static_cast<int>(std::ceil(latest)));
 }
 
 void NoteCanvas::CanvasUpdated(Canvas* canvas)

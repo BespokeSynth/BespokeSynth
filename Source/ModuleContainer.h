@@ -89,8 +89,6 @@ public:
    static constexpr int GetModuleSeparatorLength() { return 13; }
    static const char* GetModuleSeparator() { return "ryanchallinor"; }
    static bool DoesModuleHaveMoreSaveData(FileStreamIn& in);
-
-   static int sFileSaveStateRev;
    
 private:   
    std::vector<IDrawableModule*> mModules;

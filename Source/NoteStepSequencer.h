@@ -66,7 +66,8 @@ public:
    
    int RowToPitch(int row);
    int PitchToRow(int pitch);
-   void SetStep(int index, int pitch, int velocity, float length);
+   void SetStep(int index, int step, int velocity, float length);
+   void SetPitch(int index, int pitch, int velocity, float length);
    
    //IDrawableModule
    bool IsResizable() const override { return true; }
@@ -204,7 +205,7 @@ private:
    FloatSlider* mRandomizeVelocityChanceSlider;
    FloatSlider* mRandomizeVelocityDensitySlider;
    
-   std::array<double, NSS_MAX_STEPS> mLastStepPlayTime;
+   std::array<double, NSS_MAX_STEPS> mLastStepPlayTime{ -1 };
    std::array<DropdownList*, NSS_MAX_STEPS> mToneDropdowns;
    std::array<IntSlider*, NSS_MAX_STEPS> mVelocitySliders;
    std::array<FloatSlider*, NSS_MAX_STEPS> mLengthSliders;
