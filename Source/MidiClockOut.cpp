@@ -45,7 +45,15 @@ void MidiClockOut::CreateUIControls()
    
    UIBLOCK0();
    DROPDOWN(mDeviceList, "device", &mDeviceIndex, 120);
+   BUTTON(mStartButton, "send start");
+   DROPDOWN(mMultiplierSelector, "multiplier", ((int*)&mMultiplier), 70);
    ENDUIBLOCK(mWidth, mHeight);
+
+   mMultiplierSelector->AddLabel("quarter", (int)ClockMultiplier::Quarter);
+   mMultiplierSelector->AddLabel("half", (int)ClockMultiplier::Half);
+   mMultiplierSelector->AddLabel("one", (int)ClockMultiplier::One);
+   mMultiplierSelector->AddLabel("two", (int)ClockMultiplier::Two);
+   mMultiplierSelector->AddLabel("four", (int)ClockMultiplier::Four);
 }
 
 void MidiClockOut::Init()
@@ -75,6 +83,8 @@ void MidiClockOut::DrawModule()
       return;
    
    mDeviceList->Draw();
+   mStartButton->Draw();
+   mMultiplierSelector->Draw();
 }
 
 void MidiClockOut::BuildDeviceList()
@@ -89,13 +99,33 @@ void MidiClockOut::OnTransportAdvanced(float amount)
 {
    if (mEnabled)
    {
-      double oldPulse = TheTransport->GetMeasureTime(gTime) * TheTransport->GetTimeSigTop() * 24;
-      double newPulse = TheTransport->GetMeasureTime(gTime+gBufferSizeMs) * TheTransport->GetTimeSigTop() * 24;
+      int pulsesPerBeat = 24;
+      switch (mMultiplier)
+      {
+         case ClockMultiplier::Quarter: pulsesPerBeat /= 4; break;
+         case ClockMultiplier::Half: pulsesPerBeat /= 2; break;
+         case ClockMultiplier::Two: pulsesPerBeat *= 2; break;
+         case ClockMultiplier::Four: pulsesPerBeat *= 4; break;
+      }
+      int pulsesPerMeasure = TheTransport->GetTimeSigTop() * pulsesPerBeat;
+
+      double oldPulse = TheTransport->GetMeasureTime(gTime) * pulsesPerMeasure;
+      double newPulse = TheTransport->GetMeasureTime(gTime+gBufferSizeMs) * pulsesPerMeasure;
       int pulses = int(floor(newPulse) - floor(oldPulse));
       double distToFirstPulse = 1 - fmod(oldPulse, 1);
-      double pulseMs = TheTransport->GetDuration(kInterval_4n) / 24;
-      for (int i=0; i<pulses; ++i)
-         mDevice.SendMessage(gTime + (distToFirstPulse + i) * pulseMs, juce::MidiMessage::midiClock());
+      double pulseMs = TheTransport->GetDuration(kInterval_4n) / pulsesPerBeat;
+      for (int i = 0; i < pulses; ++i)
+      {
+         if (mClockStartQueued && (int(oldPulse) + i) % pulsesPerMeasure == 0)
+         {
+            mDevice.SendMessage(gTime + (distToFirstPulse + i) * pulseMs, juce::MidiMessage::midiStart());
+            mClockStartQueued = false;
+         }
+         else
+         {
+            mDevice.SendMessage(gTime + (distToFirstPulse + i) * pulseMs, juce::MidiMessage::midiClock());
+         }
+      }
    }
 }
 
@@ -105,6 +135,12 @@ void MidiClockOut::DropdownUpdated(DropdownList* list, int oldVal)
    {
       mDevice.ConnectOutput(mDeviceIndex);
    }
+}
+
+void MidiClockOut::ButtonClicked(ClickButton* button)
+{
+   if (button == mStartButton)
+      mClockStartQueued = true;
 }
 
 void MidiClockOut::DropdownClicked(DropdownList* list)

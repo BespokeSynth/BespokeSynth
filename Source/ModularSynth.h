@@ -157,6 +157,7 @@ public:
    float GetUIScale() { return mUILayerModuleContainer.GetDrawScale(); }
    ModuleContainer* GetRootContainer() { return &mModuleContainer; }
    bool ShouldShowGridSnap() const;
+   bool MouseMovedSignificantlySincePressed() const { return mMouseMovedSignificantlySincePressed; }
 
    void ZoomView(float zoomAmount, bool fromMouse);
    void PanView(float x, float y);
@@ -318,6 +319,7 @@ private:
    
    int mClickStartX; //to detect click and release in place
    int mClickStartY;
+   bool mMouseMovedSignificantlySincePressed{ true };
    
    std::string mLoadedLayoutPath;
    bool mWantReloadInitialLayout;

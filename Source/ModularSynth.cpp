@@ -1215,7 +1215,9 @@ void ModularSynth::MouseMoved(int intX, int intY)
          gHoveredUIControl->GetPosition(uiX, uiY);
          float w, h;
          gHoveredUIControl->GetDimensions(w, h);
-         if (x < uiX - 5 || y < uiY - 5 || x > uiX + w + 5 || y > uiY + h + 5)
+         const float kHoverBreakDistance = 5;
+         if (x < uiX - kHoverBreakDistance || y < uiY - kHoverBreakDistance || x > uiX + w + kHoverBreakDistance || y > uiY + h + kHoverBreakDistance || //moved far enough away from ui control
+             (y < gHoveredUIControl->GetModuleParent()->GetPosition().y && uiY > gHoveredUIControl->GetModuleParent()->GetPosition().y)) //hovering over title bar (and it's not the enable/disable checkbox)
             gHoveredUIControl = nullptr;
       }
    }
@@ -1727,6 +1729,7 @@ void ModularSynth::MouseReleased(int intX, int intY, int button, const juce::Mou
 {
    mMousePos.x = intX;
    mMousePos.y = intY;
+   mMouseMovedSignificantlySincePressed = source.hasMovedSignificantlySincePressed();
 
    if (button >= 0 && button < (int)mIsMouseButtonHeld.size())
       mIsMouseButtonHeld[button] = false;
@@ -1750,7 +1753,7 @@ void ModularSynth::MouseReleased(int intX, int intY, int button, const juce::Mou
    if (mMoveModule)
    {
       Prefab::sJustReleasedModule = mMoveModule;
-      if (!source.hasMovedSignificantlySincePressed())
+      if (!mMouseMovedSignificantlySincePressed)
       {
          if (mMoveModule->WasMinimizeAreaClicked())
          {
@@ -1782,7 +1785,7 @@ void ModularSynth::MouseReleased(int intX, int intY, int button, const juce::Mou
       ClearHeldSample();
    }
 
-   if (!mGroupSelectedModules.empty() && !source.hasMovedSignificantlySincePressed())
+   if (!mGroupSelectedModules.empty() && !mMouseMovedSignificantlySincePressed)
       mGroupSelectedModules.clear();
 
    mClickStartX = INT_MAX;

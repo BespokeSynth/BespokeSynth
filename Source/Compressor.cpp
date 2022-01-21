@@ -48,6 +48,7 @@ namespace
 
 Compressor::Compressor()
 : mMix(1)
+, mDrive(1)
 , mThreshold(-24)
 , mRatio(4)
 , mAttack(.1f)
@@ -70,8 +71,10 @@ void Compressor::CreateUIControls()
    IDrawableModule::CreateUIControls();
    UIBLOCK0();
    FLOATSLIDER(mMixSlider, "mix",&mMix,0,1);
+   FLOATSLIDER(mDriveSlider, "drive", &mDrive, .01f, 2);
    FLOATSLIDER(mThresholdSlider, "threshold",&mThreshold,-70,0);
    FLOATSLIDER(mRatioSlider, "ratio",&mRatio,1,40);
+   UIBLOCK_NEWCOLUMN();
    FLOATSLIDER(mAttackSlider, "attack",&mAttack,.1f,kMaxLookaheadMs);
    FLOATSLIDER(mReleaseSlider, "release",&mRelease,.1f,500);
    FLOATSLIDER(mLookaheadSlider, "lookahead",&mLookahead,0,kMaxLookaheadMs);
@@ -107,6 +110,7 @@ void Compressor::ProcessAudio(double time, ChannelBuffer* buffer)
       float input = 0;
       for (int ch=0; ch<buffer->NumActiveChannels(); ++ch)
          input = MAX(input, fabsf(buffer->GetChannel(ch)[i]));
+      input *= mDrive;
 
       /* if desired, one could use another EnvelopeDetector to smooth
        * the rectified signal.
@@ -139,7 +143,7 @@ void Compressor::ProcessAudio(double time, ChannelBuffer* buffer)
       // transfer function
       double reduction = overdB * ( invRatio - 1.0 );	// gain reduction (dB)
       double makeup = (-mThreshold * .5) * (1.0 - invRatio);
-      mOutputGain = ofLerp(1, dB2lin( reduction + makeup ) * mOutputAdjust, mMix);
+      mOutputGain = ofLerp(1, dB2lin( reduction + makeup ) * mDrive * mOutputAdjust, mMix);
 
       // output gain
       for (int ch=0; ch<buffer->NumActiveChannels(); ++ch)
@@ -153,6 +157,7 @@ void Compressor::ProcessAudio(double time, ChannelBuffer* buffer)
 void Compressor::DrawModule()
 {
    mMixSlider->Draw();
+   mDriveSlider->Draw();
    mThresholdSlider->Draw();
    mRatioSlider->Draw();
    mAttackSlider->Draw();

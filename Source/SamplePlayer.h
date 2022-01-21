@@ -39,12 +39,13 @@
 #include "TextEntry.h"
 #include "RadioButton.h"
 #include "GateEffect.h"
+#include "IPulseReceiver.h"
 
 #include "juce_osc/juce_osc.h"
 
 class Sample;
 
-class SamplePlayer : public IAudioProcessor, public IDrawableModule, public INoteReceiver, public IFloatSliderListener, public IIntSliderListener, public IDropdownListener, public IButtonListener, public IRadioButtonListener, public ITextEntryListener, private juce::OSCReceiver, private juce::OSCReceiver::Listener<juce::OSCReceiver::RealtimeCallback>
+class SamplePlayer : public IAudioProcessor, public IDrawableModule, public INoteReceiver, public IFloatSliderListener, public IIntSliderListener, public IDropdownListener, public IButtonListener, public IRadioButtonListener, public ITextEntryListener, public IPulseReceiver, private juce::OSCReceiver, private juce::OSCReceiver::Listener<juce::OSCReceiver::RealtimeCallback>
 {
 public:
    SamplePlayer();
@@ -58,6 +59,7 @@ public:
    
    void PlayNote(double time, int pitch, int velocity, int voiceIdx = -1, ModulationParameters modulation = ModulationParameters()) override;
    void SendCC(int control, int value, int voiceIdx = -1) override {}
+   void OnPulse(double time, float velocity, int flags) override;
    
    //IAudioSource
    void Process(double time) override;
