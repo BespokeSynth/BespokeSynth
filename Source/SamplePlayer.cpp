@@ -443,6 +443,12 @@ void SamplePlayer::PlayNote(double time, int pitch, int velocity, int voiceIdx /
    }
 }
 
+void SamplePlayer::OnPulse(double time, float velocity, int flags)
+{
+   if (mSample != nullptr)
+      PlayCuePoint(time, -1, velocity * 127, 1, 0);
+}
+
 void SamplePlayer::PlayCuePoint(double time, int index, int velocity, float speedMult, float startOffsetSeconds)
 {
    if (mSample != nullptr)
@@ -520,7 +526,7 @@ void SamplePlayer::FilesDropped(std::vector<std::string> files, int x, int y)
 
 void SamplePlayer::SampleDropped(int x, int y, Sample* sample)
 {
-   if (gHoveredUIControl == nullptr)   //avoid problem of grabbing a clip via the clip grab button and immediately dropping it onto this sampleplayer by accident
+   if (TheSynth->MouseMovedSignificantlySincePressed())   //avoid problem of grabbing a clip via the clip grab button and immediately dropping it onto this sampleplayer by accident
    {
       Sample* copy = new Sample();
       copy->CopyFrom(sample);
@@ -939,7 +945,7 @@ float SamplePlayer::GetSecondsForMouse(float mouseX) const
 
 void SamplePlayer::GetPlayInfoForPitch(int pitch, float& startSeconds, float& lengthSeconds, float& speed, bool& stopOnNoteOff) const
 {
-   if (pitch < mSampleCuePoints.size())
+   if (pitch >= 0 && pitch < mSampleCuePoints.size())
    {
       startSeconds = mSampleCuePoints[pitch].startSeconds;
       lengthSeconds = mSampleCuePoints[pitch].lengthSeconds;

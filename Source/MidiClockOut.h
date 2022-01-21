@@ -31,10 +31,11 @@
 #include "DropdownList.h"
 #include "Transport.h"
 #include "Slider.h"
+#include "ClickButton.h"
 
 class IAudioSource;
 
-class MidiClockOut : public IDrawableModule, public IDropdownListener, public IAudioPoller, public IFloatSliderListener
+class MidiClockOut : public IDrawableModule, public IDropdownListener, public IAudioPoller, public IFloatSliderListener, public IButtonListener
 {
 public:
    MidiClockOut();
@@ -51,6 +52,7 @@ public:
    void DropdownUpdated(DropdownList* list, int oldVal) override;
    void DropdownClicked(DropdownList* list) override;
    void FloatSliderUpdated(FloatSlider* slider, float oldVal) override {}
+   void ButtonClicked(ClickButton* button) override;
    
    virtual void LoadLayout(const ofxJSONElement& moduleInfo) override;
    virtual void SetUpFromSaveData() override;
@@ -67,8 +69,21 @@ private:
    float mWidth;
    float mHeight;
    
-   int mDeviceIndex{-1};
+   enum class ClockMultiplier
+   {
+      Quarter,
+      Half,
+      One,
+      Two,
+      Four
+   };
+
+   int mDeviceIndex{ -1 };
    DropdownList* mDeviceList;
+   bool mClockStartQueued{ false };
+   ClickButton* mStartButton;
+   ClockMultiplier mMultiplier{ ClockMultiplier::One };
+   DropdownList* mMultiplierSelector;
    
    MidiDevice mDevice;
 };

@@ -136,6 +136,7 @@ private:
    bool Enabled() const override { return mEnabled; }
 
    float mMix;
+   float mDrive;
    float mThreshold;
    float mRatio;
    float mAttack;
@@ -143,6 +144,7 @@ private:
    float mLookahead;
    float mOutputAdjust;
    FloatSlider* mMixSlider;
+   FloatSlider* mDriveSlider;
    FloatSlider* mThresholdSlider;
    FloatSlider* mRatioSlider;
    FloatSlider* mAttackSlider;
