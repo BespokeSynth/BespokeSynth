@@ -560,6 +560,17 @@ void TextEntry::SetValue(float value)
    }
 }
 
+float TextEntry::GetValue() const
+{
+   if (mType == kTextEntry_Int)
+      return *mVarInt;
+
+   if (mType == kTextEntry_Float)
+      return *mVarFloat;
+   
+   return 0;
+}
+
 int TextEntry::GetNumValues()
 {
    if (mType == kTextEntry_Int)
