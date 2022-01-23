@@ -54,10 +54,6 @@ namespace
 
 using namespace juce;
 
-//static
-juce::AudioPluginFormatManager VSTPlugin::sFormatManager;
-juce::KnownPluginList VSTPlugin::sPluginList;
-
 namespace VSTLookup
 {
    void GetAvailableVSTs(std::vector<std::string>& vsts)
@@ -65,17 +61,15 @@ namespace VSTLookup
       static bool sFirstTime = true;
       if (sFirstTime)
       {
-         VSTPlugin::sFormatManager.addDefaultFormats();
-
          auto file = juce::File(ofToDataPath("vst/found_vsts.xml"));
          if (file.existsAsFile())
          {
             auto xml = juce::parseXML(file);
-            VSTPlugin::sPluginList.recreateFromXml(*xml);
+            TheSynth->GetKnownPluginList().recreateFromXml(*xml);
          }
       }
       
-      auto types = VSTPlugin::sPluginList.getTypes();
+      auto types = TheSynth->GetKnownPluginList().getTypes();
       for (int i=0; i<types.size(); ++i)
          vsts.push_back(types[i].fileOrIdentifier.toStdString());
 
@@ -107,7 +101,7 @@ namespace VSTLookup
          return vstName;
       
       vstName = GetFileNameWithoutExtension(vstName).toStdString();
-      auto types = VSTPlugin::sPluginList.getTypes();
+      auto types = TheSynth->GetKnownPluginList().getTypes();
       for (int i=0; i<types.size(); ++i)
       {
          juce::File vst(types[i].fileOrIdentifier);
@@ -182,9 +176,6 @@ VSTPlugin::VSTPlugin()
 {
    juce::File(ofToDataPath("vst")).createDirectory();
    juce::File(ofToDataPath("vst/presets")).createDirectory();
-   
-   if (sFormatManager.getNumFormats() == 0)
-      sFormatManager.addDefaultFormats();
    
    mChannelModulations.resize(kGlobalModulationIdx+1);
 
@@ -285,7 +276,7 @@ void VSTPlugin::SetVST(std::string vstName)
       //mWindowOverlay = nullptr;
    }
    
-   auto types = sPluginList.getTypes();
+   auto types = TheSynth->GetKnownPluginList().getTypes();
    bool found = false;
    for (int i=0; i<types.size(); ++i)
    {
@@ -342,11 +333,11 @@ void VSTPlugin::LoadVST(juce::PluginDescription desc)
             callbackDone = true;
          };
 
-         VSTPlugin::sFormatManager.getFormat(i)->createPluginInstanceAsync(desc, gSampleRate, gBufferSize, completionCallback);*/
+         TheSynth->GetAudioPluginFormatManager().getFormat(i)->createPluginInstanceAsync(desc, gSampleRate, gBufferSize, completionCallback);*/
 
    mVSTMutex.lock();
    juce::String errorMessage;
-   mPlugin = sFormatManager.createPluginInstance(desc, gSampleRate, gBufferSize, errorMessage);
+   mPlugin = TheSynth->GetAudioPluginFormatManager().createPluginInstance(desc, gSampleRate, gBufferSize, errorMessage);
    if (mPlugin != nullptr)
    {
       mPlugin->enableAllBuses();

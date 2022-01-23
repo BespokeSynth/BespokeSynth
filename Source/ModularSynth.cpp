@@ -38,6 +38,8 @@
 #include "ClickButton.h"
 #include "UserPrefs.h"
 
+#include "juce_audio_processors/juce_audio_processors.h"
+
 #if BESPOKE_WINDOWS
 #include <windows.h>
 #include <dbghelp.h>
@@ -107,6 +109,11 @@ ModularSynth::ModularSynth()
 #if BESPOKE_WINDOWS
    SetUnhandledExceptionFilter(TopLevelExceptionHandler);
 #endif
+   
+   mAudioPluginFormatManager = std::make_unique<juce::AudioPluginFormatManager>();
+   mKnownPluginList = std::make_unique<juce::KnownPluginList>();
+   
+   mAudioPluginFormatManager->addDefaultFormats();
 }
 
 ModularSynth::~ModularSynth()
@@ -116,6 +123,8 @@ ModularSynth::~ModularSynth()
    delete mGlobalRecordBuffer;
    delete[] mSaveOutputBuffer[0];
    delete[] mSaveOutputBuffer[1];
+   mAudioPluginFormatManager.reset();
+   mKnownPluginList.reset();
 
    SetMemoryTrackingEnabled(false); //avoid crashes when the tracking lists themselves are deleted
    
