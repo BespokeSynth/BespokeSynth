@@ -54,7 +54,7 @@ public:
       options.filenameSuffix = "settings";
       options.osxLibrarySubFolder = "Preferences";
 
-      appProperties.reset(new juce::ApplicationProperties());
+      appProperties = std::make_unique<juce::ApplicationProperties>();
       appProperties->setStorageParameters(options);
    }
    
@@ -62,6 +62,7 @@ public:
    {
       // Add your application's shutdown code here..
       mainWindow.reset();
+      appProperties.reset();
    }
    
    //==============================================================================

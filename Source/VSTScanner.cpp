@@ -195,10 +195,10 @@ PluginListWindow::PluginListWindow(juce::AudioPluginFormatManager& pluginFormatM
 {
    auto deadMansPedalFile(juce::File(ofToDataPath("vst/deadmanspedal.txt")));
 
-   VSTPlugin::sPluginList.setCustomScanner(std::make_unique<CustomPluginScanner>());
+   TheSynth->GetKnownPluginList().setCustomScanner(std::make_unique<CustomPluginScanner>());
 
    mComponent = new CustomPluginListComponent(pluginFormatManager,
-                                              VSTPlugin::sPluginList,
+                                              TheSynth->GetKnownPluginList(),
                                               deadMansPedalFile,
                                               getAppProperties().getUserSettings(), true);
 

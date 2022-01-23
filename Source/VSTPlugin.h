@@ -96,9 +96,6 @@ public:
    void SaveState(FileStreamOut& out) override;
    void LoadState(FileStreamIn& in) override;
    std::vector<IUIControl*> ControlsToIgnoreInSaveState() const override;
-
-   static juce::AudioPluginFormatManager sFormatManager;
-   static juce::KnownPluginList sPluginList;
    
 private:
    //IDrawableModule
