@@ -353,14 +353,14 @@ public:
       ofVec3f bgColor(ModularSynth::sBackgroundR, ModularSynth::sBackgroundG, ModularSynth::sBackgroundB);
       glViewport(0, 0, width*mPixelRatio, height*mPixelRatio);
       glClearColor(bgColor.x,bgColor.y,bgColor.z,0);
-      if (kMotionTrails <= 0)
+      if (UserPrefs.motion_trails.Get() <= 0)
          glClear(GL_COLOR_BUFFER_BIT|GL_DEPTH_BUFFER_BIT|GL_STENCIL_BUFFER_BIT);
       
       nvgBeginFrame(mVG, width, height, mPixelRatio);
       
-      if (kMotionTrails > 0)
+      if (UserPrefs.motion_trails.Get() > 0)
       {
-         ofSetColor(bgColor.x*255,bgColor.y*255,bgColor.z*255,(1-kMotionTrails*(ofGetFrameRate()/60.0f))*255);
+         ofSetColor(bgColor.x*255,bgColor.y*255,bgColor.z*255,(1 - (UserPrefs.motion_trails.Get() * kMotionTrails) * (ofGetFrameRate()/60.0f))*255);
          ofFill();
          ofRect(0,0,width,height);
       }

@@ -108,6 +108,7 @@ public:
    void SendProgramChange(int program, int channel = -1);
    void SendPitchBend(int bend, int channel = -1);
    void SendData(unsigned char a, unsigned char b, unsigned char c);
+   void SendMessage(double time, juce::MidiMessage message);
    
    static void SendMidiMessage(MidiDeviceListener* listener, const char* deviceName, const juce::MidiMessage& message);
    

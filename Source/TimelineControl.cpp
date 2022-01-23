@@ -109,8 +109,7 @@ void TimelineControl::FloatSliderUpdated(FloatSlider* slider, float oldVal)
 {
    if (slider == mTimeSlider)
    {
-      TheTransport->SetMeasure(int(mTime));
-      TheTransport->SetMeasurePos(mTime - int(mTime));
+      TheTransport->SetMeasureTime(mTime);
    }
 }
 

@@ -126,6 +126,9 @@ std::string GetBuildInfoString()
 #if DEBUG
       "DEBUG BUILD " + 
 #endif
+#if BESPOKE_NIGHTLY
+      "NIGHTLY " + 
+#endif
       juce::JUCEApplication::getInstance()->getApplicationVersion().toStdString() + " (" + std::string(__DATE__) + " " + std::string(__TIME__) + ")";
 }
 

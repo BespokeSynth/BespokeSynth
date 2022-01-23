@@ -37,9 +37,6 @@
 
 #include "juce_core/juce_core.h"
 
-//static
-int ModuleContainer::sFileSaveStateRev = -1;
-
 ModuleContainer::ModuleContainer()
 : mOwner(nullptr)
 , mDrawScale(1)
@@ -571,14 +568,9 @@ ofxJSONElement ModuleContainer::WriteModules()
    return modules;
 }
 
-namespace
-{
-   const int kSaveStateRev = 422;
-}
-
 void ModuleContainer::SaveState(FileStreamOut& out)
 {
-   out << kSaveStateRev;
+   out << ModularSynth::kSaveStateRev;
    
    int savedModules = 0;
    for (auto* module : mModules)
@@ -614,8 +606,8 @@ void ModuleContainer::LoadState(FileStreamIn& in)
    
    int header;
    in >> header;
-   assert(header <= kSaveStateRev);
-   sFileSaveStateRev = header;
+   assert(header <= ModularSynth::kSaveStateRev);
+   ModularSynth::sLoadingFileSaveStateRev = header;
    
    int savedModules;
    in >> savedModules;
@@ -685,6 +677,8 @@ void ModuleContainer::LoadState(FileStreamIn& in)
 
    IClickable::ClearLoadContext();
    TheSynth->SetIsLoadingState(wasLoadingState);
+
+   ModularSynth::sLoadingFileSaveStateRev = ModularSynth::kSaveStateRev;   //reset to current
 }
 
 //static

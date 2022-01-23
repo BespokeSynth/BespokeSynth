@@ -144,6 +144,9 @@ void M185Sequencer::StepBy(double time, float velocity, int flags)
            mSteps[mStepIdx].mGate == GateType::kGate_Hold)) ||
          mSteps[mStepIdx].mGate == GateType::kGate_Repeat;
 
+      if (mSteps[mStepIdx].mPulseCount == 0)
+         playNextNote = false;
+
       if (stopPrevNote && mLastPitch >= 0)
       {
          PlayNoteOutput(time, mLastPitch, 0, -1);

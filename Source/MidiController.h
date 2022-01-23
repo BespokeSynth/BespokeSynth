@@ -159,6 +159,7 @@ struct UIControlConnection
    
    void SetUIControl(std::string path);
    void CreateUIControls(int index);
+   void Poll();
    void PreDraw();
    void DrawList(int index);
    void DrawLayout();
@@ -190,23 +191,23 @@ struct UIControlConnection
    MidiController* mUIOwner;
    
    //editor controls
-   DropdownList* mMessageTypeDropdown;
-   TextEntry* mControlEntry;
-   DropdownList* mChannelDropdown;
-   TextEntry* mUIControlPathEntry;
+   DropdownList* mMessageTypeDropdown{ nullptr };
+   TextEntry* mControlEntry{ nullptr };
+   DropdownList* mChannelDropdown{ nullptr };
+   TextEntry* mUIControlPathEntry{ nullptr };
    char mUIControlPathInput[MAX_TEXTENTRY_LENGTH];
-   DropdownList* mControlTypeDropdown;
-   TextEntry* mValueEntry;
-   TextEntry* mMidiOffEntry;
-   TextEntry* mMidiOnEntry;
-   Checkbox* mScaleOutputCheckbox;
-   Checkbox* mBlinkCheckbox;
-   TextEntry* mIncrementalEntry;
-   Checkbox* mTwoWayCheckbox;
-   DropdownList* mFeedbackDropdown;
-   Checkbox* mPagelessCheckbox;
-   ClickButton* mRemoveButton;
-   ClickButton* mCopyButton;
+   DropdownList* mControlTypeDropdown{ nullptr };
+   TextEntry* mValueEntry{ nullptr };
+   TextEntry* mMidiOffEntry{ nullptr };
+   TextEntry* mMidiOnEntry{ nullptr };
+   Checkbox* mScaleOutputCheckbox{ nullptr };
+   Checkbox* mBlinkCheckbox{ nullptr };
+   TextEntry* mIncrementalEntry{ nullptr };
+   Checkbox* mTwoWayCheckbox{ nullptr };
+   DropdownList* mFeedbackDropdown{ nullptr };
+   Checkbox* mPagelessCheckbox{ nullptr };
+   ClickButton* mRemoveButton{ nullptr };
+   ClickButton* mCopyButton{ nullptr };
    std::list<IUIControl*> mEditorControls;
 };
 
@@ -282,7 +283,6 @@ public:
    std::string GetDeviceOut() const { return mDeviceOut; }
    UIControlConnection* GetConnectionForControl(MidiMessageType messageType, int control);
    UIControlConnection* GetConnectionForCableSource(const PatchCableSource *source);
-   bool JustBoundControl() const { return gTime - mLastBoundControlTime < 500; }
    
    void SetVelocityMult(float mult) { mVelocityMult = mult; }
    void SetUseChannelAsVoice(bool use) { mUseChannelAsVoice = use; }
@@ -336,6 +336,11 @@ public:
    void LoadState(FileStreamIn& in) override;
 
    static std::string GetDefaultTooltip(MidiMessageType type, int control);
+
+   static double sLastConnectedActivityTime;
+   static IUIControl* sLastActivityUIControl;
+   static double sLastBoundControlTime;
+   static IUIControl* sLastBoundUIControl;
    
 private:
    enum MappingDisplayMode
@@ -354,7 +359,7 @@ private:
    bool MouseMoved(float x, float y) override;
 
    void ConnectDevice();
-   void MidiReceived(MidiMessageType messageType, int control, float value, int channel = -1);
+   void MidiReceived(MidiMessageType messageType, int control, float scaledValue, int rawValue, int channel);
    void RemoveConnection(int control, MidiMessageType messageType, int channel, int page);
    void ResyncTwoWay();
    int GetNumConnectionsOnPage(int page);
@@ -367,6 +372,7 @@ private:
    std::string GetLayoutTooltip(int controlIndex);
    void UpdateControllerIndex();
    void LoadLayout(std::string filename);
+   bool JustBoundControl() const { return gTime - sLastBoundControlTime < 500; }
    
    float mVelocityMult;
    bool mUseChannelAsVoice;
@@ -386,6 +392,7 @@ private:
    double mInitialConnectionTime;
    ofxJSONElement mConnectionsJson;
    std::list<UIControlConnection*> mConnections;
+   bool mSendCCOutput{ false };
    bool mUseNegativeEdge;  //for midi toggle, accept on or off as a button press
    bool mSlidersDefaultToIncremental;
    bool mBindMode;
@@ -411,11 +418,7 @@ private:
 
    int mControllerIndex;
    double mLastActivityTime;
-   double mLastConnectedActivityTime;
-   IUIControl* mLastActivityUIControl;
    bool mLastActivityBound;
-   double mLastBoundControlTime;
-   IUIControl* mLastBoundUIControl;
    bool mBlink;
    int mControllerPage;
    DropdownList* mPageSelector;

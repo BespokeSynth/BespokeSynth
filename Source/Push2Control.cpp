@@ -148,8 +148,8 @@ void Push2Control::CreateUIControls()
    mSpawnModuleControls.push_back(mSpawnLists.mAudioModules.GetList());
    mSpawnModuleControls.push_back(mSpawnLists.mModulatorModules.GetList());
    mSpawnModuleControls.push_back(mSpawnLists.mPulseModules.GetList());
-   mSpawnModuleControls.push_back(mSpawnLists.mOtherModules.GetList());
    mSpawnModuleControls.push_back(mSpawnLists.mVstPlugins.GetList());
+   mSpawnModuleControls.push_back(mSpawnLists.mOtherModules.GetList());
    mSpawnModuleControls.push_back(mSpawnLists.mPrefabs.GetList());
 }
 
@@ -337,11 +337,20 @@ void Push2Control::DrawToFramebuffer(NVGcontext* vg, NVGLUframebuffer* fb, float
       if (stateInfo != "")
       {
          ofPushStyle();
+
          ofFill();
-         ofSetColor(175, 255, 221);
+         ofColor bgColor(175, 255, 221);
+         bgColor = bgColor * ofMap(sin(gTime / 300 * PI * 2), -1, 1, .7f, 1);
+         ofSetColor(bgColor);
          ofRect(1, 120, ableton::Push2DisplayBitmap::kWidth-2, ableton::Push2DisplayBitmap::kHeight - 120);
-         ofSetColor(0, 0, 0, ofMap(sin(gTime / 1000 * PI * 2), -1, 1, 170, 255));
+
+         ofNoFill();
+         ofSetColor(255,0,0);
+         ofRect(1, 1, ableton::Push2DisplayBitmap::kWidth - 2, ableton::Push2DisplayBitmap::kHeight - 2);
+
+         ofSetColor(0, 0, 0);
          DrawTextBold(stateInfo, 10, 147, 20);
+
          ofPopStyle();
       }
    }
@@ -1189,6 +1198,7 @@ void Push2Control::OnMidiControl(MidiControl& control)
    else if (control.mControl == kSetupButton && control.mValue > 0)
    {
       mInMidiControllerBindMode = !mInMidiControllerBindMode;
+      mAllowRepatch = false;
    }
    else if (control.mControl == kNewButton)
    {
@@ -1209,7 +1219,10 @@ void Push2Control::OnMidiControl(MidiControl& control)
    else if (control.mControl == kCircleButton)
    {
       if (control.mValue > 0)
+      {
          mAllowRepatch = !mAllowRepatch;
+         mInMidiControllerBindMode = false;
+      }
    }
    else if (control.mControl == kTapTempoButton)
    {

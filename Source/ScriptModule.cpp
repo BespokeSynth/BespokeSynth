@@ -635,6 +635,20 @@ void ScriptModule::PlayNoteFromScriptAfterDelay(float pitch, float velocity, dou
    }
 }
 
+void ScriptModule::SendCCFromScript(int control, int value, int noteOutputIndex)
+{
+   if (noteOutputIndex == 0)
+   {
+      SendCC(control, value);
+      return;
+   }
+
+   if (noteOutputIndex - 1 < (int)mExtraNoteOutputs.size())
+   {
+      mExtraNoteOutputs[noteOutputIndex - 1]->SendCCOutput(control, value);
+   }
+}
+
 void ScriptModule::ScheduleNote(double time, float pitch, float velocity, float pan, int noteOutputIndex)
 {
    for (size_t i=0; i<mScheduledNoteOutput.size(); ++i)
@@ -951,10 +965,10 @@ void ScriptModule::DropdownUpdated(DropdownList *list, int oldValue)
 void ScriptModule::RefreshStyleFiles()
 {
     ofxJSONElement root;
-    if (File(ofToDataPath("script_styles.json")).existsAsFile())
-        root.open(ofToDataPath("script_styles.json"));
+    if (File(ofToDataPath("scriptstyles.json")).existsAsFile())
+        root.open(ofToDataPath("scriptstyles.json"));
     else
-        root.open(ofToResourcePath("userdata_original/script_styles.json"));
+        root.open(ofToResourcePath("userdata_original/scriptstyles.json"));
     sStyleJSON = root["styles"];
 }
 
@@ -1294,14 +1308,14 @@ bool ScriptModule::IsNonWhitespace(std::string line)
 static std::string sContextToRestore = "";
 void ScriptModule::SetContext()
 {
-   sContextToRestore = IClickable::sLoadContext;
+   sContextToRestore = IClickable::sPathLoadContext;
    if (GetOwningContainer()->GetOwner() != nullptr)
       IClickable::SetLoadContext(GetOwningContainer()->GetOwner());
 }
 
 void ScriptModule::ClearContext()
 {
-   IClickable::sLoadContext = sContextToRestore;
+   IClickable::sPathLoadContext = sContextToRestore;
 }
 
 void ScriptModule::OnModuleReferenceBound(IDrawableModule* target)
@@ -1472,7 +1486,7 @@ void ScriptModule::LoadState(FileStreamIn& in)
 {
    int rev = -1;
 
-   if (ModuleContainer::sFileSaveStateRev >= 421)
+   if (ModularSynth::sLoadingFileSaveStateRev >= 421)
    {
       in >> rev;
       LoadStateValidate(rev <= kSaveStateRev);
@@ -1487,7 +1501,7 @@ void ScriptModule::LoadState(FileStreamIn& in)
 
    IDrawableModule::LoadState(in);
    
-   if (ModuleContainer::sFileSaveStateRev == 420)
+   if (ModularSynth::sLoadingFileSaveStateRev == 420)
    {
       in >> rev;
       LoadStateValidate(rev <= kSaveStateRev);

@@ -115,7 +115,7 @@ public:
    double GetDuration(NoteInterval interval);
    int GetQuantized(double time, const TransportListenerInfo* listenerInfo, double* remainderMs = nullptr);
    double GetMeasurePos(double time) const { return fmod(GetMeasureTime(time), 1); }
-   void SetMeasurePos(double pos) { mMeasureTime = mMeasureTime - floor(mMeasureTime) + pos; }
+   void SetMeasureTime(double measureTime) { mMeasureTime = measureTime; }
    int GetMeasure(double time) const { return (int)floor(GetMeasureTime(time)); }
    double GetMeasureTime(double time) const { return mMeasureTime + (time - gTime) / MsPerBar(); }
    void SetMeasure(int count) { mMeasureTime = mMeasureTime - (int)mMeasureTime + count; }

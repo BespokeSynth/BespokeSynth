@@ -203,7 +203,11 @@ void Presets::SetPreset(int idx)
    for (std::list<Preset>::const_iterator i=coll.mPresets.begin();
         i != coll.mPresets.end(); ++i)
    {
+      auto context = IClickable::sPathLoadContext;
+      IClickable::sPathLoadContext = GetParent() ? GetParent()->Path() + "~" : "";
       IUIControl* control = TheSynth->FindUIControl(i->mControlPath);
+      IClickable::sPathLoadContext = context;
+
       if (control)
       {
          if (mBlendTime == 0 || i->mHasLFO)
@@ -293,7 +297,11 @@ void Presets::PostRepatch(PatchCableSource* cableSource, bool fromUserClick)
 
 bool Presets::IsConnectedToPath(std::string path) const
 {
+   auto context = IClickable::sPathLoadContext;
+   IClickable::sPathLoadContext = GetParent() ? GetParent()->Path() + "~" : "";
    IUIControl* control = TheSynth->FindUIControl(path);
+   IClickable::sPathLoadContext = context;
+
    if (control == nullptr)
       return false;
 
@@ -315,14 +323,14 @@ void Presets::Store(int idx)
    
    for (int i=0; i<mPresetControls.size(); ++i)
    {
-      coll.mPresets.push_back(Preset(mPresetControls[i]));
+      coll.mPresets.push_back(Preset(mPresetControls[i], this));
    }
    for (int i=0; i<mPresetModules.size(); ++i)
    {
       std::vector<IUIControl*> controls = mPresetModules[i]->GetUIControls();
       for (int j=0; j<controls.size(); ++j)
       {
-         coll.mPresets.push_back(Preset(controls[j]));
+         coll.mPresets.push_back(Preset(controls[j], this));
       }
    }
 }
@@ -572,9 +580,13 @@ std::vector<IUIControl*> Presets::ControlsToNotSetDuringLoadState() const
    return ignore;
 }
 
-Presets::Preset::Preset(IUIControl* control)
+Presets::Preset::Preset(IUIControl* control, Presets* presets)
 {
+   auto context = IClickable::sPathSaveContext;
+   IClickable::sPathSaveContext = presets->GetParent() ? presets->GetParent()->Path() + "~" : "";
    mControlPath = control->Path();
+   IClickable::sPathSaveContext = context;
+
    mValue = control->GetValue();
    
    FloatSlider* slider = dynamic_cast<FloatSlider*>(control);

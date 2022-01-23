@@ -3,6 +3,10 @@
 trigger:
   - main
 
+variables:
+  - group: mac-signing
+  - group: libraries
+
 pr:
   - main
 
@@ -15,7 +19,7 @@ jobs:
         macOS-x64:
           imageName: 'macos-10.15'
           isMac: True
-          cmakeArguments: "-GXcode -D\"CMAKE_OSX_ARCHITECTURES=x86_64\""
+          cmakeArguments: "-GXcode -D\"CMAKE_OSX_ARCHITECTURES=x86_64\" -DBESPOKE_SIGN_AS='$(MAC_SIGNING_CERT)' -DBESPOKE_PYTHON_ROOT='/Library/Frameworks/Python.framework/Versions/3.10'"
         windows-x64:
           imageName: 'windows-2019'
           isWindows: True
@@ -30,7 +34,7 @@ jobs:
 
     steps:
       - checkout: self
-        fetchDepth: 1
+        fetchDepth: 5
         # submodules: recursive # can't do submodules here b'cuz depth=1 fails with Github
 
       - bash: |
@@ -58,7 +62,7 @@ jobs:
         displayName: all - details on build
 
       - bash: |
-          git submodule update --init --recursive
+          git submodule update --init --recursive --depth 1
         displayName: all - submodule init
 
 
@@ -101,17 +105,122 @@ jobs:
         condition: variables.isLinux
         displayName: linux - run apt-get
 
+      - script: |
+          npm install -g appdmg
+          wget https://www.python.org/ftp/python/3.10.0/python-3.10.0post2-macos11.pkg
+          sudo installer -pkg python-3.10.0post2-macos11.pkg -target /
+        condition: and(variables.isMac, ne(variables['Build.Reason'], 'PullRequest'))
+        displayName: mac - install dependencies needed for distribution build
+
+      - task: InstallAppleCertificate@2
+        inputs:
+          certSecureFile: 'bespoke_dev_id_app.p12'
+          certPwd: '$(MAC_EXPORTED_CERT_PW)'
+        condition: variables.isMac
+
+      - task: InstallAppleCertificate@2
+        inputs:
+          certSecureFile: 'bespoke_dev_id_inst.p12'
+          certPwd: '$(MAC_EXPORTED_CERT_PW)'
+        condition : variables.isMac
+      
+      - task: DownloadSecureFile@1
+        name: extra_apis
+        inputs:
+          secureFile: extra_apis.zip
+        condition: ne(variables['Build.Reason'], 'PullRequest')
+
+      - bash: |
+          mv "$(extra_apis.secureFilePath)" "$(Build.SourcesDirectory)"
+        displayName: move extra_apis
+        condition: ne(variables['Build.Reason'], 'PullRequest')
+
+      - task: ExtractFiles@1
+        inputs:
+          archiveFilePatterns: 'extra_apis.zip'
+          destinationFolder: '$(Build.SourcesDirectory)/extra_apis'
+        condition: ne(variables['Build.Reason'], 'PullRequest')
+
       - bash: |
           set -e
-          echo Building with BUILD_TYPE = $CMAKE_CONFIG
+          echo Building with BUILD_TYPE = $CMAKE_CONFIG and arguments = $(cmakeArguments)
+          cmake -Bbuild $(cmakeArguments) $(LIBRARY_PATHS) -DCMAKE_BUILD_TYPE=$CMAKE_CONFIG -DBESPOKE_PORTABLE=True -DBESPOKE_NIGHTLY=True
+        displayName: all - configure with cmake for nightly
+        condition: ne(variables['Build.Reason'], 'PullRequest')
+
+      - bash: |
+          set -e
+          echo Building with BUILD_TYPE = $CMAKE_CONFIG and arguments = $(cmakeArguments)
           cmake -Bbuild $(cmakeArguments) -DCMAKE_BUILD_TYPE=$CMAKE_CONFIG -DBESPOKE_PORTABLE=True
-        displayName: all - configure with cmake
+        displayName: all - configure with cmake for PR
+        condition: eq(variables['Build.Reason'], 'PullRequest')
+
+      - bash: |
+          set -e
+          sudo xcode-select -s /Applications/Xcode_12.2.app
+          echo Building with TARGET = $CMAKE_TARGET
+          cmake --build build --config $CMAKE_CONFIG --target $CMAKE_TARGET
+        displayName: mac - build with cmake
+        condition: variables.isMac
+        env:
+          MAC_INSTALLING_CERT: $(MAC_INSTALLING_CERT)
+          MAC_SIGNING_1UPW: $(MAC_SIGNING_1UPW)
+          MAC_SIGNING_CERT: $(MAC_SIGNING_CERT)
+          MAC_SIGNING_ID: $(MAC_SIGNING_ID)
+          MAC_SIGNING_TEAM: $(MAC_SIGNING_TEAM)
 
       - bash: |
           set -e
           echo Building with TARGET = $CMAKE_TARGET
           cmake --build build --config $CMAKE_CONFIG --target $CMAKE_TARGET
-        displayName: all - build with cmake
+        displayName: win - build with cmake
+        condition: variables.isWindows
+
+      - bash: |
+          set -e
+          echo Building with TARGET = $CMAKE_TARGET
+          cmake --build build --config $CMAKE_CONFIG --target $CMAKE_TARGET
+        displayName: lin - build with cmake
+        condition: variables.isLinux
+
+      - bash: |
+           set -e
+           echo Copying build output from build/Source/BespokeSynth_artefacts/Release to windows_nightly_artefact
+           cp -R build/Source/BespokeSynth_artefacts/Release windows_nightly_artefact
+        condition: and(variables.isWindows, ne(variables['Build.Reason'], 'PullRequest'))
+        displayName: win - copy win artifact
+
+      - powershell: |
+          echo Compressing build output from windows_nightly_artefact to build/nightly
+          mkdir build/nightly
+          Compress-Archive -Path windows_nightly_artefact/* -DestinationPath build/nightly/BespokeSynth-Windows.zip
+        condition: and(variables.isWindows, ne(variables['Build.Reason'], 'PullRequest'))
+        displayName: win - compress win artifact
+
+      - bash: |
+           set -e
+           echo Compressing build output from build/Source/BespokeSynth_artefacts/Release to build/nightly
+           mkdir build/nightly
+           tar -cvzf build/nightly/BespokeSynth-Linux.tar.gz build/Source/BespokeSynth_artefacts/Release
+        condition: and(variables.isLinux, ne(variables['Build.Reason'], 'PullRequest'))
+        displayName: lin - compress lin artifact
+        
+      - bash: |
+          mkdir -p stage_git/git_info
+          git log -1 --pretty=format:'%h : %s - %an' > stage_git/git_info/git_nightly_log_display
+          git log -1 --pretty=format:'%h : %s%n%aD%n%an%n%n%B' > stage_git/git_info/git_nightly_log_long_display
+          git log -5 --pretty=format:'%h : %s - %an' > stage_git/git_info/git_nightly_recent_five
+          git log -1 --pretty=format:'%h' > stage_git/git_info/git_nightly_log_hash
+          cat stage_git/git_info/*
+        condition: variables.isLinux
+        displayName: lin - make git log info
+
+      - task: PublishPipelineArtifact@0
+        inputs:
+          artifactName: 'GIT_INFO'
+          targetPath: 'stage_git/'
+        condition: variables.isLinux
+        displayName: lin - publish the git info
 
       - task: PublishPipelineArtifact@0
         inputs:
@@ -125,11 +234,94 @@ jobs:
           artifactName: 'INSTALLER_WIN_NIGHTLY'
           targetPath: 'build/nightly'
         condition: and(variables.isWindows, ne(variables['Build.Reason'], 'PullRequest'))
-        displayName: mac - publish win artifact
+        displayName: win - publish win artifact
 
       - task: PublishPipelineArtifact@0
         inputs:
           artifactName: 'INSTALLER_LIN_NIGHTLY'
           targetPath: 'build/nightly'
         condition: and(variables.isLinux, ne(variables['Build.Reason'], 'PullRequest'))
-        displayName: mac - publish lin artifact
+        displayName: lin - publish lin artifact
+
+
+
+  - job: Release
+    dependsOn: Build
+    condition: and(succeeded(), ne(variables['Build.Reason'], 'PullRequest'))
+    pool:
+      vmImage: 'macos-10.15'
+
+    steps:
+    - checkout: self
+      persistCredentials: true
+
+    - task: DownloadSecureFile@1
+      inputs:
+        secureFile: discord-nightly.webhook
+
+    - task: DownloadPipelineArtifact@0
+      inputs:
+        artifactName: 'INSTALLER_MAC_NIGHTLY'
+        targetPath: $(System.DefaultWorkingDirectory)
+
+    - task: DownloadPipelineArtifact@0
+      inputs:
+        artifactName: 'INSTALLER_WIN_NIGHTLY'
+        targetPath: $(System.DefaultWorkingDirectory)
+
+    - task: DownloadPipelineArtifact@0
+      inputs:
+        artifactName: 'INSTALLER_LIN_NIGHTLY'
+        targetPath: $(System.DefaultWorkingDirectory)
+
+    - task: DownloadPipelineArtifact@0
+      inputs:
+        artifactName: 'GIT_INFO'
+        targetPath: $(System.DefaultWorkingDirectory)
+
+    - bash: |
+        set -e
+        set -x
+
+        short_hash=`git rev-parse --short=7 HEAD`
+
+        mkdir -p releases
+        ls $(System.DefaultWorkingDirectory)/git_info
+        
+        mv *.zip *.dmg *.gz releases
+
+        cd releases
+        for f in *.*; do mv -- "$f" "${f%.*}_${short_hash}_$(date +%F).${f##*.}"; done
+        cd ..
+
+        echo "bespoke nightly build $(date +%F)" >> releases/ReleaseNotes.md
+        echo " " >> releases/ReleaseNotes.md
+        echo "<pre>" >> releases/ReleaseNotes.md
+        cat $(System.DefaultWorkingDirectory)/git_info/git_nightly_recent_five >> releases/ReleaseNotes.md
+        echo " " >> releases/ReleaseNotes.md
+        echo "</pre>" >> releases/ReleaseNotes.md
+
+        echo "---------------"
+        cat releases/ReleaseNotes.md
+        echo "---------------"
+
+        ls -alFh releases
+      displayName: Prepare Release
+
+    - task: GitHubRelease@0
+      displayName: "Create Github Nightly Release"
+      inputs:
+        gitHubConnection: BespokeSynthPublish
+        repositoryName: BespokeSynth/BespokeSynth
+        action: 'edit'
+        tag: Nightly
+        target: '$(Build.SourceVersion)'
+        addChangeLog: false
+        assetUploadMode: 'delete'
+        releaseNotesFile: $(System.DefaultWorkingDirectory)/releases/ReleaseNotes.md
+        assets: $(System.DefaultWorkingDirectory)/releases/*.*
+        isPreRelease: true
+
+    - bash: |
+        curl -i -H "Accept: application/json" -H "Content-Type:application/json" -X POST --data "{\"content\": \"a bespoke nightly build is available. get it here:\nhttps://github.com/BespokeSynth/BespokeSynth/releases/tag/Nightly\"}" `cat $AGENT_TEMPDIRECTORY/discord-nightly.webhook`
+      displayName: Tell Discord

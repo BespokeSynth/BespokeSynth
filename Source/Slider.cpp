@@ -785,6 +785,7 @@ void FloatSlider::LoadState(FileStreamIn& in, bool shouldSetValue)
    
    float var;
    in >> var;
+   mRamp.SetValue(var);
    
    if (rev < 5)
    {

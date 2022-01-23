@@ -28,6 +28,9 @@ class module:
    def get_target(this, ):
       pass
 
+   def get_targets(this, ):
+      pass
+
    def set_name(this, name):
       pass
 

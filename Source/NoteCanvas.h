@@ -35,12 +35,13 @@
 #include "INoteReceiver.h"
 #include "ClickButton.h"
 #include "DropdownList.h"
+#include "TextEntry.h"
 
 class CanvasControls;
 class CanvasTimeline;
 class CanvasScrollbar;
 
-class NoteCanvas : public IDrawableModule, public INoteSource, public ICanvasListener, public IFloatSliderListener, public IAudioPoller, public IIntSliderListener, public INoteReceiver, public IButtonListener, public IDropdownListener
+class NoteCanvas : public IDrawableModule, public INoteSource, public ICanvasListener, public IFloatSliderListener, public IAudioPoller, public IIntSliderListener, public INoteReceiver, public IButtonListener, public IDropdownListener, public ITextEntryListener
 {
 public:
    NoteCanvas();
@@ -76,6 +77,7 @@ public:
    void IntSliderUpdated(IntSlider* slider, int oldVal) override;
    void ButtonClicked(ClickButton* button) override;
    void DropdownUpdated(DropdownList* list, int oldVal) override;
+   void TextEntryComplete(TextEntry* entry) override {}
    
    void LoadLayout(const ofxJSONElement& moduleInfo) override;
    void SetUpFromSaveData() override;
@@ -96,6 +98,8 @@ private:
    bool FreeRecordParityMatched();
    void ClipNotes();
    void QuantizeNotes();
+   void LoadMidi();
+   void SaveMidi();
    
    Canvas* mCanvas;
    CanvasControls* mCanvasControls;
@@ -108,6 +112,10 @@ private:
    IntSlider* mNumMeasuresSlider;
    int mNumMeasures;
    ClickButton* mQuantizeButton;
+   ClickButton* mSaveMidiButton;
+   ClickButton* mLoadMidiButton;
+   TextEntry* mLoadMidiTrackEntry;
+   int mLoadMidiTrack{ 1 };
    ClickButton* mClipButton;
    bool mPlay;
    Checkbox* mPlayCheckbox;

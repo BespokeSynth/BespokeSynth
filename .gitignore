@@ -363,9 +363,6 @@ Builds/LinuxMakefile/build/BespokeSynth
 
 Builds/MacOSX/build/BespokeSynth/
 
-# explicitly allow spacemouse lib, so it doesn't get excluded by *.lib above
-!*/3DxWare/Lib/**
-
 Builds/MacOSX/BespokeSynth.xcodeproj/
 
 Builds/MacOSX/Icon.icns
@@ -404,3 +401,5 @@ instrumentscli0.trace/*
 
 run_cmake.bat
 run_cmake.sh
+
+scripts/installer_macOS/Bespoke-Mac.dmg

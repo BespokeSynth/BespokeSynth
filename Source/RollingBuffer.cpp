@@ -176,6 +176,7 @@ void RollingBuffer::LoadState(FileStreamIn& in)
    for (int i=0; i<channels; ++i)
    {
       in >> mOffsetToNow[i];
+      mOffsetToNow[i] %= Size();
       if (savedSize <= Size())
       {
          in.Read(mBuffer.GetChannel(i), savedSize);

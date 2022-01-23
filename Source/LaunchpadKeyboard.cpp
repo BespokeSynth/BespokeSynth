@@ -265,7 +265,7 @@ void LaunchpadKeyboard::OnGridButton(int x, int y, float velocity, IGridControll
          PressedNoteFor(x, y, (int)127*velocity);
          mNoteOutput.Flush(time);
          for (int i=0; i<mChords[x].size(); ++i)
-            PlayNoteOutput(time, TheScale->MakeDiatonic(pitch+mChords[x][i]), 127*velocity, -1);
+            PlayKeyboardNote(time, TheScale->MakeDiatonic(pitch+mChords[x][i]), 127*velocity);
       }
       else
       {
@@ -288,7 +288,7 @@ void LaunchpadKeyboard::OnGridButton(int x, int y, float velocity, IGridControll
    {
       if (bOn)
       {
-         PlayNoteOutput(time, pitch, 127*velocity, -1);
+         PlayKeyboardNote(time, pitch, 127*velocity);
          PressedNoteFor(x,y,(int)127*velocity);
       }
       else
@@ -327,8 +327,34 @@ void LaunchpadKeyboard::ReleaseNoteFor(int x, int y)
    if (pitch >= 0 && pitch < 128)
    {
       double time = gTime + gBufferSizeMs;
-      PlayNoteOutput(time, pitch, 0, -1);
+      PlayKeyboardNote(time, pitch, 0);
       mCurrentNotes[pitch] = 0;
+   }
+}
+
+void LaunchpadKeyboard::PlayKeyboardNote(double time, int pitch, int velocity)
+{
+   if (mEnabled || velocity == 0)
+   {
+      if (velocity == 0)
+         time += .001f; //TODO(Ryan) gross hack. need to handle the case better of receiving a note-on followed by a note-off for one pitch at the exact same time. right now it causes stuck notes.
+      PlayNoteOutput(time, pitch, velocity, -1);
+   }
+
+   if (mDrawDebug)
+   {
+      std::vector<std::string> lines = ofSplitString(mDebugLines, "\n");
+      mDebugLines = "";
+      const int kNumDisplayLines = 40;
+      for (int i = 0; i < kNumDisplayLines - 1; ++i)
+      {
+         int lineIndex = (int)lines.size() - (kNumDisplayLines - 1) + i;
+         if (lineIndex >= 0)
+            mDebugLines += lines[lineIndex] + "\n";
+      }
+      std::string debugLine = "PlayNote(" + ofToString(time / 1000) + ", " + ofToString(pitch) + ", " + ofToString(velocity) + ")";
+      mDebugLines += debugLine;
+      ofLog() << debugLine;
    }
 }
 
@@ -451,6 +477,17 @@ void LaunchpadKeyboard::DrawModule()
    mArrangementModeDropdown->Draw();
    mPreserveChordRootCheckbox->Draw();
    mGridControlTarget->Draw();
+}
+
+void LaunchpadKeyboard::DrawModuleUnclipped()
+{
+   if (mDrawDebug)
+   {
+      DrawTextNormal(mDebugLines, 0, 90);
+
+      for (int i = 0; i < 128; ++i)
+         DrawTextNormal(ofToString(i) + " " + ofToString(mCurrentNotes[i]), 180 + (i/24) * 20, (i%24) * 9, 8);
+   }
 }
 
 int LaunchpadKeyboard::GridToPitch(int x, int y)
@@ -732,6 +769,12 @@ void LaunchpadKeyboard::Poll()
 
 void LaunchpadKeyboard::CheckboxUpdated(Checkbox* checkbox)
 {
+   if (checkbox == mEnabledCheckbox)
+   {
+      double time = gTime + gBufferSizeMs;
+      mHeldChordTones.clear();
+      mNoteOutput.Flush(time);
+   }
    if (checkbox == mPreserveChordRootCheckbox)
    {
       if (!ListContains(0,mHeldChordTones))

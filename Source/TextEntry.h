@@ -95,6 +95,7 @@ public:
    float GetValueForMidiCC(float slider) const override;
    float GetMidiValue() const override;
    void SetValue(float value) override;
+   float GetValue() const override;
    int GetNumValues() override;
    std::string GetDisplayValue(float val) const override;
    void Increment(float amount) override;

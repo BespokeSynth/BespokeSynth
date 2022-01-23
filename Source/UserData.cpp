@@ -38,7 +38,7 @@ void UpdateUserData(std::string destDirPath)
          int bundledDataVersion = ofToInt(bundledVersionLines[0].toStdString());
          int destDataVersion = ofToInt(destVersionLines[0].toStdString());
          needCopy = destDataVersion < bundledDataVersion;
-         //I can use the data version in the future to see if special accomodations need to be made for copy/overwriting any specific files
+         //I can use the data version in the future to see if special accommodations need to be made for copy/overwriting any specific files
 
          preserveOldFileList.push_back(juce::String(destDirPath) + "/layouts/blank.json");
          leaveAloneFileList.push_back(juce::String(destDirPath) + "/drums/drums.json");

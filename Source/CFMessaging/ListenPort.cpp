@@ -57,7 +57,7 @@ void ListenPort::CreateListener(const char* portName, ListenPortCallback* callba
    
    ListenPortReceiver::RegisterPort(this, mReceivePort);
    
-   // create the runloop souce from the local message port passed in
+   // create the runloop source from the local message port passed in
    mLoopSource = CFMessagePortCreateRunLoopSource(kCFAllocatorDefault, mReceivePort, (CFIndex)0);
    
    pthread_t a;

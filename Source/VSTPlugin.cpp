@@ -230,6 +230,10 @@ void VSTPlugin::Exit()
    {
       mWindow.reset();
    }
+   if (mPlugin)
+   {
+      mPlugin.reset();
+   }
 }
 
 std::string VSTPlugin::GetTitleLabel() const
@@ -455,6 +459,20 @@ void VSTPlugin::Poll()
          }
       }
    }
+
+   if (mWantOpenVstWindow)
+   {
+      if (mPlugin != nullptr)
+      {
+         if (mWindow == nullptr)
+            mWindow = std::unique_ptr<VSTWindow>(VSTWindow::CreateVSTWindow(this, VSTWindow::Normal));
+         mWindow->ShowWindow();
+
+         //if (mWindow->GetNSViewComponent())
+         //   mWindowOverlay = new NSWindowOverlay(mWindow->GetNSViewComponent()->getView());
+      }
+      mWantOpenVstWindow = false;
+   }
 }
 
 void VSTPlugin::Process(double time)
@@ -556,8 +574,10 @@ void VSTPlugin::Process(double time)
             mWantsPanic = false;
 
             mMidiBuffer.clear();
-            mMidiBuffer.addEvent(juce::MidiMessage::allNotesOff(0), 0);
-            mMidiBuffer.addEvent(juce::MidiMessage::allSoundOff(0), 1);
+            for (int channel=1; channel<=16; ++channel)
+               mMidiBuffer.addEvent(juce::MidiMessage::allNotesOff(channel), 0);
+            for (int channel=1; channel<=16; ++channel)
+               mMidiBuffer.addEvent(juce::MidiMessage::allSoundOff(channel), 1);
          }
 
          mPlugin->processBlock(buffer, mMidiBuffer);
@@ -677,6 +697,16 @@ void VSTPlugin::SendCC(int control, int value, int voiceIdx /*=-1*/)
    const juce::ScopedLock lock(mMidiInputLock);
    
    mMidiBuffer.addEvent(juce::MidiMessage::controllerEvent((mUseVoiceAsChannel ? channel : mChannel), control, (uint8)value), 0);
+}
+
+void VSTPlugin::SendMidi(const juce::MidiMessage& message)
+{
+   if (!mPluginReady || mPlugin == nullptr)
+      return;
+
+   const juce::ScopedLock lock(mMidiInputLock);
+
+   mMidiBuffer.addEvent(message, 0);
 }
 
 void VSTPlugin::SetEnabled(bool enabled)
@@ -872,17 +902,7 @@ void VSTPlugin::CheckboxUpdated(Checkbox* checkbox)
 void VSTPlugin::ButtonClicked(ClickButton* button)
 {
    if (button == mOpenEditorButton)
-   {
-      if (mPlugin != nullptr)
-      {
-         if (mWindow == nullptr)
-            mWindow = std::unique_ptr<VSTWindow>(VSTWindow::CreateVSTWindow(this, VSTWindow::Normal));
-         mWindow->ShowWindow();
-      }
-      
-      //if (mWindow->GetNSViewComponent())
-      //   mWindowOverlay = new NSWindowOverlay(mWindow->GetNSViewComponent()->getView());
-   }
+      mWantOpenVstWindow = true;
 
    if (button == mPanicButton)
    {

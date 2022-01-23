@@ -687,7 +687,7 @@ void Canvas::Clear()
 
 namespace
 {
-   const int kSaveStateRev = 2;
+   const int kSaveStateRev = 3;
 }
 
 void Canvas::SaveState(FileStreamOut& out)
@@ -698,6 +698,8 @@ void Canvas::SaveState(FileStreamOut& out)
    out << mNumRows;
    out << mNumVisibleRows;
    out << mRowOffset;
+   out << mLoopStart;
+   out << mLoopEnd;
    out << (int)mElements.size();
    for (int i=0; i<mElements.size(); ++i)
    {
@@ -717,6 +719,11 @@ void Canvas::LoadState(FileStreamIn& in, bool shouldSetValue)
    in >> mNumRows;
    in >> mNumVisibleRows;
    in >> mRowOffset;
+   if (rev >= 3)
+   {
+      in >> mLoopStart;
+      in >> mLoopEnd;
+   }
    mElements.clear();
    int size;
    in >> size;
