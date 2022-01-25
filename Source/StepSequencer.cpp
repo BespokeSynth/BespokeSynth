@@ -125,8 +125,7 @@ void StepSequencer::CreateUIControls()
       mRows[i]->CreateUIControls();
       mOffsets[i] = 0;
       mOffsetSlider[i] = new FloatSlider(this,("offset"+ofToString(i)).c_str(),230,185-i*9.4f,90,9,&mOffsets[i],-1,1);
-      mRandomLock[i] = false;
-      mRandomLockCheckbox[i] = new Checkbox(this, ("r lock" + ofToString(i)).c_str(), mGridYOffDropdown->GetRect().getMaxX() + 4 + i * 60, 3, &mRandomLock[i]);
+      mRandomizeRowButton[i] = new ClickButton(this, ("random" + ofToString(i)).c_str(), mGridYOffDropdown->GetRect().getMaxX() + 4 + i * 60, 3);
       mNoteRepeats[i] = new NoteRepeat(this, i);
    }
    
@@ -485,24 +484,13 @@ void StepSequencer::DrawModule()
             mOffsetSlider[i]->SetShowing(false);
          }
 
-         mRandomLockCheckbox[i]->SetShowing(true);
-         mRandomLockCheckbox[i]->Draw();
+         mRandomizeRowButton[i]->Draw();
 
          mRows[i]->Draw(gridX, y);
-
-         if (mRandomLock[i])
-         {
-            ofPushStyle();
-            ofSetColor(255, 0, 0, 50);
-            ofFill();
-            ofRect(gridX, y, mGrid->GetWidth(), (mGrid->GetHeight() / float(mNumRows)));
-            ofPopStyle();
-         }
       }
       else
       {
          mOffsetSlider[i]->SetShowing(false);
-         mRandomLockCheckbox[i]->SetShowing(false);
       }
    }
 
@@ -890,6 +878,20 @@ bool StepSequencer::HasGridController()
    return mGridControlTarget->GetGridController() != nullptr && mGridControlTarget->GetGridController()->IsConnected();
 }
 
+void StepSequencer::RandomizeRow(int row)
+{
+   for (int col = 0; col < mGrid->GetCols(); ++col)
+   {
+      if (ofRandom(1) < mRandomizationAmount)
+      {
+         float value = 0;
+         if (ofRandom(1) < mRandomizationDensity)
+            value = ofRandom(1);
+         mGrid->SetVal(col, row, value);
+      }
+   }
+}
+
 void StepSequencer::CheckboxUpdated(Checkbox* checkbox)
 {
    if (checkbox == mEnabledCheckbox)
@@ -965,21 +967,12 @@ void StepSequencer::ButtonClicked(ClickButton* button)
    if (button == mRandomizeButton)
    {
       for (int row=0; row < mGrid->GetRows(); ++row)
-      {
-         if (!mRandomLock[row])
-         {
-            for (int col = 0; col < mGrid->GetCols(); ++col)
-            {
-               if (ofRandom(1) < mRandomizationAmount)
-               {
-                  float value = 0;
-                  if (ofRandom(1) < mRandomizationDensity)
-                     value = ofRandom(1);
-                  mGrid->SetVal(col, row, value);
-               }
-            }
-         }
-      }
+         RandomizeRow(row);
+   }
+   for (int row=0; row < mRandomizeRowButton.size(); ++row)
+   {
+      if (button == mRandomizeRowButton[row])
+         RandomizeRow(row);
    }
 }
 
