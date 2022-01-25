@@ -236,8 +236,6 @@ target_sources(BespokeSynth PRIVATE
     KeyboardDisplay.h
     Kicker.cpp
     Kicker.h
-    KompleteKontrol.cpp
-    KompleteKontrol.h
     LFO.cpp
     LFO.h
     LFOController.cpp
@@ -743,6 +741,7 @@ if (APPLE)
         CFMessaging/NIMessage.cpp
         CFMessaging/SendPort.cpp
         KompleteKontrol.cpp
+        KompleteKontrol.h
         )
     target_link_libraries(BespokeSynth PRIVATE "-framework CoreAudioKit")
 
