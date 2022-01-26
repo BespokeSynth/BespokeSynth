@@ -666,6 +666,8 @@ target_sources(BespokeSynth PRIVATE
     VelocityStepSequencer.h
     VelocityToCV.cpp
     VelocityToCV.h
+    VelocityToChance.cpp
+    VelocityToChance.h
     VinylTempoControl.cpp
     VinylTempoControl.h
     Vocoder.cpp
