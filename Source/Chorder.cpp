@@ -197,7 +197,9 @@ void Chorder::PlayNote(double time, int pitch, int velocity, int voiceIdx, Modul
       mVelocity = velocity;
 
    int idx = 0;
-   for (int row=0; row<mChordGrid->GetRows(); ++row)
+   // iterate rows from bottom to top to go from lowest to highest note
+   // for compatibility with arpeggiator and strummer
+   for (int row=mChordGrid->GetRows() - 1; row>=0; --row)
    {
       for (int col=0; col<mChordGrid->GetCols(); ++col)
       {
