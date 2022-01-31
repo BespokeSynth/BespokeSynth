@@ -109,7 +109,7 @@ jobs:
           npm install -g appdmg
           wget https://www.python.org/ftp/python/3.10.0/python-3.10.0post2-macos11.pkg
           sudo installer -pkg python-3.10.0post2-macos11.pkg -target /
-        condition: and(variables.isMac, ne(variables['Build.Reason'], 'PullRequest'))
+        condition: and(variables.isMac)
         displayName: mac - install dependencies needed for distribution build
 
       - task: InstallAppleCertificate@2
