@@ -500,6 +500,10 @@ PYBIND11_EMBEDDED_MODULE(midicontroller, m)
       {
          midicontroller.SendData(page, a, b, c);
       }, "a"_a, "b"_a, "c"_a, "page"_a = 0)
+      .def("send_sysex", [](MidiController& midicontroller, std::string data, int page)
+      {
+         midicontroller.SendSysEx(page, data);
+      }, "data"_a, "page"_a = 0)
       .def("add_script_listener", [](MidiController& midicontroller, ScriptModule* script)
       {
          midicontroller.AddScriptListener(script);
