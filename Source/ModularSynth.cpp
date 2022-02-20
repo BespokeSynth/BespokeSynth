@@ -2696,6 +2696,15 @@ void ModularSynth::OnConsoleInput()
             (*iter)->SetMinimized(true);
          }
       }
+      else if (tokens[0] == "movetransport")
+      {
+         if (tokens.size() >= 2)
+         {
+            double time = atof(tokens[1].c_str());
+            if (time >= 1)
+                TheTransport->SetTransportPosition(time-1);
+         }
+      }
       else if (tokens[0] == "resettime")
       {
          gTime = 0;

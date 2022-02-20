@@ -196,7 +196,7 @@ void ControllingSong::Process(double time)
          int measure;
          float measurePos;
          mMidiReader.GetMeasurePos(ms, measure, measurePos);
-         TheTransport->SetMeasureTime(measure + measurePos);
+         TheTransport->SetTransportPosition(measure + measurePos);
       }
       
       gWorkChannelBuffer.SetNumActiveChannels(1);

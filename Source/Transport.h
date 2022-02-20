@@ -32,6 +32,7 @@
 #include "ClickButton.h"
 #include "DropdownList.h"
 #include "Checkbox.h"
+#include "TextEntry.h"
 #include "IAudioPoller.h"
 
 class ITimeListener
@@ -90,7 +91,7 @@ struct TransportListenerInfo
    int mCustomDivisor;
 };
 
-class Transport : public IDrawableModule, public IButtonListener, public IFloatSliderListener, public IDropdownListener
+class Transport : public IDrawableModule, public IButtonListener, public IFloatSliderListener, public IDropdownListener, public ITextEntryListener
 {
 public:
    Transport();
@@ -107,6 +108,7 @@ public:
    float GetSwing() { return mSwing; }
    double MsPerBar() const { return 60.0/mTempo * 1000 * mTimeSigTop * 4.0/mTimeSigBottom; }
    void Advance(double ms);
+   void SetTransportPosition(double time);
    TransportListenerInfo* AddListener(ITimeListener* listener, NoteInterval interval, OffsetInfo offsetInfo, bool useEventLookahead);
    void RemoveListener(ITimeListener* listener);
    TransportListenerInfo* GetListenerInfo(ITimeListener* listener);
@@ -115,7 +117,6 @@ public:
    double GetDuration(NoteInterval interval);
    int GetQuantized(double time, const TransportListenerInfo* listenerInfo, double* remainderMs = nullptr);
    double GetMeasurePos(double time) const { return fmod(GetMeasureTime(time), 1); }
-   void SetMeasureTime(double measureTime) { mMeasureTime = measureTime; }
    int GetMeasure(double time) const { return (int)floor(GetMeasureTime(time)); }
    double GetMeasureTime(double time) const { return mMeasureTime + (time - gTime) / MsPerBar(); }
    void SetMeasure(int count) { mMeasureTime = mMeasureTime - (int)mMeasureTime + count; }
@@ -142,6 +143,7 @@ public:
    void FloatSliderUpdated(FloatSlider* slider, float oldVal) override;
    void DropdownUpdated(DropdownList* list, int oldVal) override;
    void CheckboxUpdated(Checkbox* checkbox) override;
+   void TextEntryComplete(TextEntry* entry) override;
 
    void LoadLayout(const ofxJSONElement& moduleInfo) override;
    void SetUpFromSaveData() override;
@@ -152,15 +154,18 @@ public:
    static double sEventEarlyMs;
    
 private:
+   void SetMeasureTime(double measureTime) { mMeasureTime = measureTime; }
    void UpdateListeners(double jumpMs);
+   void UpdateAudioPollers(float amount);
    double Swing(double measurePos);
    double SwingBeat(double pos);
    void Nudge(double amount);
    void AdjustTempo(double amount);
+   void UpdateMeasurePos();
 
    //IDrawableModule
    void DrawModule() override;
-   void GetModuleDimensions(float& width, float& height) override { width = 140; height = 100; }
+   void GetModuleDimensions(float& width, float& height) override { width = 140; height = 110; }
    bool Enabled() const override { return true; }
    
    float mTempo;
@@ -183,6 +188,10 @@ private:
    ClickButton* mIncreaseTempoButton;
    ClickButton* mDecreaseTempoButton;
    FloatSlider* mTempoSlider;
+   int mMeasure;
+   float mMeasurePos;
+   TextEntry* mMeasureEntry;
+   FloatSlider* mMeasurePosSlider;
    int mLoopStartMeasure;
    int mLoopEndMeasure;
 

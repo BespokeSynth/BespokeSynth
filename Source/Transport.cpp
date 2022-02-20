@@ -55,6 +55,10 @@ Transport::Transport()
 , mIncreaseTempoButton(nullptr)
 , mDecreaseTempoButton(nullptr)
 , mTempoSlider(nullptr)
+, mMeasure(1)
+, mMeasurePos(0.0)
+, mMeasureEntry(nullptr)
+, mMeasurePosSlider(nullptr)
 , mLoopStartMeasure(-1)
 , mLoopEndMeasure(-1)
 {
@@ -74,12 +78,16 @@ void Transport::CreateUIControls()
    mSwingIntervalDropdown = new DropdownList(this,"swing interval",101,22,&mSwingInterval);
    mTimeSigTopDropdown = new DropdownList(this,"timesigtop",101,42,&mTimeSigTop);
    mTimeSigBottomDropdown = new DropdownList(this,"timesigbottom",101,60,&mTimeSigBottom);
-   mResetButton = new ClickButton(this, "reset",5,78);
-   mPlayPauseButton = new ClickButton(this, "play/pause",42,78,ButtonDisplayStyle::kPause);
-   mNudgeBackButton = new ClickButton(this," < ",80,78);
-   mNudgeForwardButton = new ClickButton(this," > ",110,78);
+   mMeasureEntry = new TextEntry(this, "measure", 5, 41, 6, &mMeasure, -1, INT_MAX);
+   mMeasurePosSlider = new FloatSlider(this, "measurepos", 65, 41, 33, 15, &mMeasurePos, 0, 0.99, 2);
+   mResetButton = new ClickButton(this, "reset",5,88);
+   mPlayPauseButton = new ClickButton(this, "play/pause",42,88,ButtonDisplayStyle::kPause);
+   mNudgeBackButton = new ClickButton(this," < ",80,88);
+   mNudgeForwardButton = new ClickButton(this," > ",110,88);
    mSetTempoCheckbox = new Checkbox(this,"set tempo",HIDDEN_UICONTROL,HIDDEN_UICONTROL,&mSetTempoBool);
    
+   mMeasurePosSlider->SetShowName(false);
+
    mTimeSigTopDropdown->AddLabel("2", 2);
    mTimeSigTopDropdown->AddLabel("3", 3);
    mTimeSigTopDropdown->AddLabel("4", 4);
@@ -135,16 +143,13 @@ void Transport::Advance(double ms)
    if (mLoopStartMeasure != -1 && (GetMeasure(gTime) < mLoopStartMeasure || GetMeasure(gTime) >= mLoopEndMeasure))
       SetMeasure(mLoopStartMeasure);
    
+   UpdateMeasurePos();
+
    if (TheChaosEngine)
       TheChaosEngine->AudioUpdate();
 
    UpdateListeners(ms);
-
-   for (std::list<IAudioPoller*>::iterator i = mAudioPollers.begin(); i != mAudioPollers.end(); ++i)
-   {
-      IAudioPoller* poller = *i;
-      poller->OnTransportAdvanced(amount);
-   }
+   UpdateAudioPollers(amount);
 }
 
 float QuadraticBezier (float x, float a, float b)
@@ -191,6 +196,7 @@ double Transport::SwingBeat(double pos)
 void Transport::Nudge(double amount)
 {
    mMeasureTime += amount;
+   UpdateMeasurePos();
 }
 
 void Transport::DrawModule()
@@ -201,10 +207,9 @@ void Transport::DrawModule()
    double measurePos = GetMeasurePos(gTime);
    
    int count = int(fmod(mMeasureTime,1)*mTimeSigTop) + 1;
-   std::string display;
-   display += ofToString(measurePos,2)+" "+ofToString(GetMeasure(gTime))+"\n";
-   display += ofToString(count);
-   DrawTextNormal(display,5,52);
+   std::string display = "beat: " + ofToString(count);
+   display += "\ntime: " + ofToString(round(mMeasureTime * MsPerBar() / 10) / 100);
+   DrawTextNormal(display,5,68);
 
    ofPushStyle();
    float w,h;
@@ -218,7 +223,7 @@ void Transport::DrawModule()
    else
       ofSetColor(0,255,255);
    ofLine(w*measurePos,0,w*measurePos,h);
-   ofRect(0,95,w*((measurePos+(GetMeasure(gTime)%4))/4),5);
+   ofRect(0,105,w*((measurePos+(GetMeasure(gTime)%4))/4),5);
    ofPopStyle();
 
    mSwingSlider->Draw();
@@ -230,6 +235,8 @@ void Transport::DrawModule()
    mPlayPauseButton->Draw();
    mTimeSigTopDropdown->Draw();
    mTimeSigBottomDropdown->Draw();
+   mMeasurePosSlider->Draw();
+   mMeasureEntry->Draw();
    mSwingIntervalDropdown->Draw();
    mNudgeBackButton->Draw();
    mNudgeForwardButton->Draw();
@@ -251,6 +258,25 @@ void Transport::DrawModule()
 void Transport::Reset(float rewindAmount)
 {
    mMeasureTime = -rewindAmount;
+   UpdateMeasurePos();
+}
+
+void Transport::UpdateMeasurePos()
+{
+   mMeasurePos = round(GetMeasurePos(gTime)*100)/100;
+   mMeasure = GetMeasure(gTime) + 1;
+}
+
+void Transport::TextEntryComplete(TextEntry* entry)
+{
+   if (entry == mMeasureEntry)
+      SetMeasure(mMeasure - 1);
+}
+
+void Transport::FloatSliderUpdated(FloatSlider* slider, float oldVal)
+{
+   if (slider == mMeasurePosSlider)
+      SetMeasureTime((int)mMeasureTime + mMeasurePos);
 }
 
 void Transport::ButtonClicked(ClickButton *button)
@@ -267,6 +293,12 @@ void Transport::ButtonClicked(ClickButton *button)
       AdjustTempo(-1);
    if (button == mPlayPauseButton)
       TheSynth->ToggleAudioPaused();
+}
+
+void Transport::SetTransportPosition(double time)
+{
+   SetMeasureTime(time);
+   UpdateMeasurePos();
 }
 
 TransportListenerInfo* Transport::AddListener(ITimeListener* listener, NoteInterval interval, OffsetInfo offsetInfo, bool useEventLookahead)
@@ -333,6 +365,15 @@ void Transport::AddAudioPoller(IAudioPoller* poller)
 void Transport::RemoveAudioPoller(IAudioPoller* poller)
 {
    mAudioPollers.remove(poller);
+}
+
+void Transport::UpdateAudioPollers(float amount)
+{
+   for (std::list<IAudioPoller*>::iterator i = mAudioPollers.begin(); i != mAudioPollers.end(); ++i)
+   {
+      IAudioPoller* poller = *i;
+      poller->OnTransportAdvanced(amount);
+   }
 }
 
 int Transport::GetQuantized(double time, const TransportListenerInfo* listenerInfo, double* remainderMs /*=nullptr*/)
@@ -596,10 +637,6 @@ void Transport::OnDrumEvent(NoteInterval drumEvent)
       if (info.mInterval == drumEvent)
          info.mListener->OnTimeEvent(0); //TODO(Ryan) calc sample offset
    }
-}
-
-void Transport::FloatSliderUpdated(FloatSlider* slider, float oldVal)
-{
 }
 
 void Transport::CheckboxUpdated(Checkbox* checkbox)

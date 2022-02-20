@@ -1775,6 +1775,8 @@ transport~controls tempo and current time position
 ~swing interval~interval over which to apply swing
 ~timesigtop~time signature top value
 ~timesigbottom~time signature bottom value
+~measure~current measure
+~measurepos~current position within the measure. a value of .5 represents halfway through the measure.
 ~reset~reset timeline to zero
 ~ < ~nudge current time backward
 ~ > ~nudge current time forward

@@ -123,7 +123,7 @@ void AbletonLink::OnTransportAdvanced(float amount)
          if (abs(difference) > .01f)
          {
             //too far off, correct
-            TheTransport->SetMeasureTime(measureTime);
+            TheTransport->SetTransportPosition(measureTime);
             ofLog() << "correcting transport position for ableton link";
          }
 

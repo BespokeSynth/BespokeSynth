@@ -166,7 +166,7 @@ void MidiClockIn::OnMidi(const juce::MidiMessage& message)
       ofLog() << "midi position pointer " << ofToString(message.getSongPositionPointerMidiBeat());
       
       if (mEnabled)
-         TheTransport->SetMeasureTime(message.getSongPositionPointerMidiBeat() / TheTransport->GetTimeSigTop() + mStartOffsetMs / TheTransport->MsPerBar());
+         TheTransport->SetTransportPosition(message.getSongPositionPointerMidiBeat() / TheTransport->GetTimeSigTop() + mStartOffsetMs / TheTransport->MsPerBar());
    }
    if (message.isQuarterFrame())
    {
