@@ -549,7 +549,7 @@ void TextEntry::SetValue(float value)
 {
    if (mType == kTextEntry_Int)
    {
-      *mVarInt = value;
+      *mVarInt = std::round(value);
       UpdateDisplayString();
    }
 
