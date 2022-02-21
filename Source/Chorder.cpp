@@ -43,13 +43,19 @@ Chorder::Chorder()
 {
    std::memset(mHeldCount, 0, TOTAL_NUM_NOTES*sizeof(int));
    std::memset(mInputNotes, 0, TOTAL_NUM_NOTES*sizeof(bool));
+   TheScale->AddListener(this);
+}
+
+Chorder::~Chorder()
+{
+   TheScale->RemoveListener(this);
 }
 
 void Chorder::CreateUIControls()
 {
    IDrawableModule::CreateUIControls();
    
-   mChordGrid = new UIGrid(2,2,130,50,mDiatonic ? 7 : 12,3, this);
+   mChordGrid = new UIGrid(2,2,130,50,mDiatonic ? TheScale->NumTonesInScale() : TheScale->GetPitchesPerOctave(),3, this);
    mChordGrid->SetVal(0, 1, 1);
    mChordGrid->SetListener(this);
    
@@ -70,6 +76,32 @@ void Chorder::DrawModule()
 {
    if (Minimized() || IsVisible() == false)
       return;
+
+   ofPushStyle();
+   ofFill();
+   for (int i=0;i<mChordGrid->GetCols();++i)
+   {
+      bool addColor = false;
+      if (i == 0)
+      {
+         ofSetColor(0, 255, 0, 80);
+         addColor = true;
+      }
+      else if ((mDiatonic && i == 4 && TheScale->NumTonesInScale() == 7) || (!mDiatonic && i == 7 && TheScale->GetPitchesPerOctave() == 12))
+      {
+         ofSetColor(200, 150, 0, 80);
+         addColor = true;
+      }
+      
+      if (addColor)
+      {
+         ofRectangle rect = mChordGrid->GetRect(true);
+         rect.width /= mChordGrid->GetCols();
+         rect.x += i * rect.width;
+         ofRect(rect);
+      }
+   }
+   ofPopStyle();
    
    mChordGrid->Draw();
    mDiatonicCheckbox->Draw();
@@ -148,6 +180,11 @@ bool Chorder::MouseMoved(float x, float y)
    return false;
 }
 
+void Chorder::OnScaleChanged()
+{
+   mChordGrid->SetGrid(mDiatonic ? TheScale->NumTonesInScale() : TheScale->GetPitchesPerOctave(), 3);
+}
+
 void Chorder::CheckboxUpdated(Checkbox *checkbox)
 {
    if (checkbox == mEnabledCheckbox)
@@ -161,7 +198,7 @@ void Chorder::CheckboxUpdated(Checkbox *checkbox)
    {
       mChordDropdown->SetShowing(!mDiatonic);
       mInversionDropdown->SetShowing(!mDiatonic);
-      mChordGrid->SetGrid(mDiatonic ? 7 : 12, 3);
+      mChordGrid->SetGrid(mDiatonic ? TheScale->NumTonesInScale() : TheScale->GetPitchesPerOctave(), 3);
    }
 }
 
@@ -173,8 +210,8 @@ void Chorder::DropdownUpdated(DropdownList* dropdown, int oldVal)
       mChordGrid->Clear();
       for (int val : chord)
       {
-         int row = 2 - ((val + 12) / 12);
-         int col = (val + 12) % 12;
+         int row = 2 - ((val + TheScale->GetPitchesPerOctave()) / TheScale->GetPitchesPerOctave());
+         int col = (val + TheScale->GetPitchesPerOctave()) % TheScale->GetPitchesPerOctave();
          mChordGrid->SetVal(col, row, 1);
       }
    }
