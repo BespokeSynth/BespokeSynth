@@ -106,6 +106,7 @@ public:
    void SetSwing(float swing) { mSwing = swing; }
    float GetSwing() { return mSwing; }
    double MsPerBar() const { return 60.0/mTempo * 1000 * mTimeSigTop * 4.0/mTimeSigBottom; }
+   void Start();
    void Advance(double ms);
    TransportListenerInfo* AddListener(ITimeListener* listener, NoteInterval interval, OffsetInfo offsetInfo, bool useEventLookahead);
    void RemoveListener(ITimeListener* listener);
@@ -121,7 +122,7 @@ public:
    void SetMeasure(int count) { mMeasureTime = mMeasureTime - (int)mMeasureTime + count; }
    void SetDownbeat() { mMeasureTime = mMeasureTime - (int)mMeasureTime - .001; }
    static int CountInStandardMeasure(NoteInterval interval);
-   void Reset(float rewindAmount = 0.005f);
+   void Reset();
    void OnDrumEvent(NoteInterval drumEvent);
    void SetLoop(int measureStart, int measureEnd) { assert(measureStart < measureEnd); mLoopStartMeasure = measureStart; mLoopEndMeasure = measureEnd; }
    void ClearLoop() { mLoopStartMeasure = -1; mLoopEndMeasure = -1; }
@@ -157,6 +158,7 @@ private:
    double SwingBeat(double pos);
    void Nudge(double amount);
    void AdjustTempo(double amount);
+   void ToggleAudioPaused();
 
    //IDrawableModule
    void DrawModule() override;

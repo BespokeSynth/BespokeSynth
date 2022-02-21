@@ -124,6 +124,15 @@ void Transport::AdjustTempo(double amount)
    SetTempo(MAX(1, GetTempo() + amount));
 }
 
+void Transport::Start()
+{
+    for (std::list<TransportListenerInfo>::iterator i = mListeners.begin(); i != mListeners.end(); ++i)
+    {
+        const TransportListenerInfo& info = *i;
+        info.mListener->OnTimeEvent(gTime);
+    }
+}
+
 void Transport::Advance(double ms)
 {
    double amount = ms/MsPerBar();
@@ -248,9 +257,9 @@ void Transport::DrawModule()
    ofRect(0,h-Swing(measurePos)*h,4,1);
 }
 
-void Transport::Reset(float rewindAmount)
+void Transport::Reset()
 {
-   mMeasureTime = -rewindAmount;
+   mMeasureTime = 0;
 }
 
 void Transport::ButtonClicked(ClickButton *button)
@@ -266,7 +275,16 @@ void Transport::ButtonClicked(ClickButton *button)
    if (button == mDecreaseTempoButton)
       AdjustTempo(-1);
    if (button == mPlayPauseButton)
-      TheSynth->ToggleAudioPaused();
+      ToggleAudioPaused();
+}
+
+void Transport::ToggleAudioPaused()
+{
+    TheSynth->ToggleAudioPaused();
+    if (!TheSynth->IsAudioPaused())
+    {
+        Start();
+    }
 }
 
 TransportListenerInfo* Transport::AddListener(ITimeListener* listener, NoteInterval interval, OffsetInfo offsetInfo, bool useEventLookahead)
