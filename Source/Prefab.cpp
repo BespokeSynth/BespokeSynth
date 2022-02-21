@@ -102,7 +102,7 @@ bool Prefab::CanAddDropModules()
       {
          for (auto* module : TheSynth->GetGroupSelectedModules())
          {
-            if (module == this)
+            if (module == this || module->IsSingleton())
                return false;
             if (!VectorContains(module, mModuleContainer.GetModules()))
                return true;
