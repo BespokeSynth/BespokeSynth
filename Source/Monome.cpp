@@ -31,8 +31,6 @@ int Monome::sNextMonomeReceivePort = 13338;
 
 Monome::Monome(MidiDeviceListener* listener)
 : mMonomeReceivePort(-1)
-, mIsOscSetUp(false)
-, mHasMonome(false)
 , mMaxColumns(16)
 , mGridRotation(0)
 , mPrefix("monome")
@@ -100,7 +98,7 @@ bool Monome::SetUpOsc()
 
 void Monome::SetLightInternal(int x, int y, float value)
 {
-   if (!mHasMonome)
+   if (!mHasMonome || !mLightsInitialized)
       return;
    
    Vec2i pos = Rotate(x, y, mGridRotation);
@@ -277,6 +275,7 @@ void Monome::oscMessageReceived(const juce::OSCMessage& msg)
          mMaxColumns = msg[1].getInt32();
       
       mLights.resize(msg[0].getInt32() * msg[1].getInt32());
+      mLightsInitialized = true;
    }
    else if (label == "/"+mPrefix+"/grid/key")
    {
