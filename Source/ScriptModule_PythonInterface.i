@@ -463,11 +463,10 @@ PYBIND11_EMBEDDED_MODULE(midicontroller, m)
          IUIControl* uicontrol = TheSynth->FindUIControl(controlPath.c_str());
          if (uicontrol != nullptr)
          {
-            auto* connection = midicontroller.AddControlConnection(messageType, control, channel, uicontrol);
+            auto* connection = midicontroller.AddControlConnection(messageType, control, channel, uicontrol, page);
             if (controlType != kControlType_Default)
                connection->mType = controlType;
             connection->mValue = value;
-            connection->mPage = page;
             connection->mMidiOffValue = midi_off;
             connection->mMidiOnValue = midi_on;
             connection->mScaleOutput = scale;

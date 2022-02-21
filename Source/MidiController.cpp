@@ -168,16 +168,18 @@ void MidiController::RemoveListener(MidiDeviceListener* listener)
       mListeners[i].remove(listener);
 }
 
-UIControlConnection* MidiController::AddControlConnection(MidiMessageType messageType, int control, int channel, IUIControl* uicontrol)
+UIControlConnection* MidiController::AddControlConnection(MidiMessageType messageType, int control, int channel, IUIControl* uicontrol, int page /*= -1*/)
 {
-   RemoveConnection(control, messageType, channel, mControllerPage);
+   if (page == -1)
+      page = mControllerPage;
+   RemoveConnection(control, messageType, channel, page);
 
    UIControlConnection* connection = new UIControlConnection(this);
    connection->mMessageType = messageType;
    connection->mControl = control;
    connection->mUIControl = uicontrol;
    connection->mChannel = channel;
-   connection->mPage = mControllerPage;
+   connection->mPage = page;
    if (dynamic_cast<Checkbox*>(uicontrol) != nullptr)
       connection->mType = kControlType_Toggle;
    else if (dynamic_cast<TextEntry*>(uicontrol) != nullptr)
@@ -190,7 +192,7 @@ UIControlConnection* MidiController::AddControlConnection(MidiMessageType messag
    int layoutControl = GetLayoutControlIndexForMidi(messageType, control);
    if (layoutControl != -1)
    {
-      connection->mIncrementAmount = mLayoutControls[layoutControl].mIncremental ? 1 : 0;
+      connection->mIncrementAmount = mLayoutControls[layoutControl].mIncrementAmount;
       connection->mMidiOffValue = mLayoutControls[layoutControl].mOffVal;
       connection->mMidiOnValue = mLayoutControls[layoutControl].mOnVal;
       connection->mScaleOutput = mLayoutControls[layoutControl].mScaleOutput;
@@ -1112,7 +1114,7 @@ void MidiController::DrawModule()
             if (control.mDrawType == kDrawType_Knob)
             {
                float value = control.mLastValue;
-               if (control.mIncremental)
+               if (control.mIncrementAmount != 0)
                   value = uiControlValue;
                
                ofCircle(center.x, center.y, control.mDimensions.x/2);
@@ -1126,7 +1128,7 @@ void MidiController::DrawModule()
             if (control.mDrawType == kDrawType_Slider)
             {
                float value = control.mLastValue;
-               if (control.mIncremental)
+               if (control.mIncrementAmount != 0)
                   value = uiControlValue;
                
                ofRect(control.mPosition.x, control.mPosition.y, control.mDimensions.x, control.mDimensions.y, 0);
@@ -1674,9 +1676,11 @@ void MidiController::LoadLayout(std::string filename)
                   drawType = kDrawType_Knob;
                if (mLayoutData["groups"][group]["drawType"] == "slider")
                   drawType = kDrawType_Slider;
-               bool incremental = false;
+               float incrementAmount = 0;
                if (!mLayoutData["groups"][group]["incremental"].isNull())
-                  incremental = mLayoutData["groups"][group]["incremental"].asBool();
+                  incrementAmount = mLayoutData["groups"][group]["incremental"].asBool() ? 1 : 0;
+               if (!mLayoutData["groups"][group]["increment_amount"].isNull())
+                  incrementAmount = mLayoutData["groups"][group]["increment_amount"].asDouble();
                int offVal = 0;
                int onVal = 127;
                if (!mLayoutData["groups"][group]["colors"].isNull() &&
@@ -1702,7 +1706,7 @@ void MidiController::LoadLayout(std::string filename)
                   {
                      int index = col + row * cols;
                      int control = mLayoutData["groups"][group]["controls"][index].asInt();
-                     GetLayoutControl(control, messageType).Setup(this, messageType, control, drawType, incremental, offVal, onVal, false, connectionType, pos.x + kLayoutButtonsX + spacing.x*col, pos.y + kLayoutButtonsY + spacing.y*row, dim.x, dim.y);
+                     GetLayoutControl(control, messageType).Setup(this, messageType, control, drawType, incrementAmount, offVal, onVal, false, connectionType, pos.x + kLayoutButtonsX + spacing.x*col, pos.y + kLayoutButtonsY + spacing.y*row, dim.x, dim.y);
 
                      //clear out values on controllers
                      /*if (messageType == kMidiMessage_Note)
@@ -1773,13 +1777,13 @@ void MidiController::LoadLayout(std::string filename)
       for (int i=0; i<128; ++i)
       {
          GetLayoutControl(i, kMidiMessage_Control).
-            Setup(this, kMidiMessage_Control, i, kDrawType_Slider, false, 0, 127, true, kControlType_Default, i%8 * kSpacingX + kLayoutButtonsX + 9, i/8 * kSpacingY + kLayoutButtonsY, kSpacingX * .666f, kSpacingY * .93f);
+            Setup(this, kMidiMessage_Control, i, kDrawType_Slider, 0, 0, 127, true, kControlType_Default, i%8 * kSpacingX + kLayoutButtonsX + 9, i/8 * kSpacingY + kLayoutButtonsY, kSpacingX * .666f, kSpacingY * .93f);
          GetLayoutControl(i, kMidiMessage_Note).
-            Setup(this, kMidiMessage_Note, i, kDrawType_Button, false, 0, 127, true, kControlType_Default, i%8 * kSpacingX + 8 * kSpacingX + kLayoutButtonsX + 15, i/8 * kSpacingY + kLayoutButtonsY, kSpacingX * .93f, kSpacingY * .93f);
+            Setup(this, kMidiMessage_Note, i, kDrawType_Button, 0, 0, 127, true, kControlType_Default, i%8 * kSpacingX + 8 * kSpacingX + kLayoutButtonsX + 15, i/8 * kSpacingY + kLayoutButtonsY, kSpacingX * .93f, kSpacingY * .93f);
       }
       
       GetLayoutControl(0, kMidiMessage_PitchBend).
-         Setup(this, kMidiMessage_PitchBend, 0, kDrawType_Slider, false, 0, 127, true, kControlType_Default, kLayoutButtonsX + kSpacingX * 17, kLayoutButtonsY, 25, 100);
+         Setup(this, kMidiMessage_PitchBend, 0, kDrawType_Slider, 0, 0, 127, true, kControlType_Default, kLayoutButtonsX + kSpacingX * 17, kLayoutButtonsY, 25, 100);
    }
    
    mLayoutWidth = 0;
@@ -2742,15 +2746,15 @@ UIControlConnection::~UIControlConnection()
    mEditorControls.clear();
 }
 
-void ControlLayoutElement::Setup(MidiController* owner, MidiMessageType type, int control, ControlDrawType drawType, bool incremental, int offVal, int onVal, bool scaleOutput, ControlType connectionType, float x, float y, float w, float h)
+void ControlLayoutElement::Setup(MidiController* owner, MidiMessageType type, int control, ControlDrawType drawType, float incrementAmount, int offVal, int onVal, bool scaleOutput, ControlType connectionType, float x, float y, float w, float h)
 {
-   assert(incremental == false || type == kMidiMessage_Control);  //only control type can be incremental
+   assert(incrementAmount == 0 || type == kMidiMessage_Control);  //only control type can be incremental
    
    mActive = true;
    mType = type;
    mControl = control;
    mDrawType = drawType;
-   mIncremental = incremental;
+   mIncrementAmount = incrementAmount;
    mOffVal = offVal;
    mOnVal = onVal;
    mScaleOutput = scaleOutput;
