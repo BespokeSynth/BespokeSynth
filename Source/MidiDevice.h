@@ -92,7 +92,7 @@ public:
    bool ConnectInput(const char* name);
    void ConnectInput(int index);
    bool ConnectOutput(const char* name, int channel = 1);
-   void ConnectOutput(int index, int channel = 1);
+   bool ConnectOutput(int index, int channel = 1);
    void DisconnectInput();
    void DisconnectOutput();
    bool Reconnect();

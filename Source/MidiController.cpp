@@ -1800,9 +1800,12 @@ void MidiController::LoadLayout(std::string filename)
 
 void MidiController::OnDeviceChanged()
 {
-   std::string filename = mDeviceIn + ".json";
-   ofStringReplace(filename, "/", "");
-   LoadLayout(filename);
+   if (!mDeviceIn.empty()) 
+   {
+      std::string filename = mDeviceIn + ".json";
+      ofStringReplace(filename, "/", "");
+      LoadLayout(filename);
+   }
 
    mModulation.GetModWheel(-1)->SetValue(mModWheelOffset);
    mModulation.GetPressure(-1)->SetValue(mPressureOffset);
