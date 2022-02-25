@@ -30,7 +30,7 @@
 #include "OpenFrameworksPort.h"
 #include "Slider.h"
 
-class TimelineControl : public IDrawableModule, public IFloatSliderListener, public IIntSliderListener
+class TimelineControl : public IDrawableModule, public IFloatSliderListener, public IIntSliderListener, public ITextEntryListener
 {
 public:
    TimelineControl();
@@ -43,7 +43,8 @@ public:
    void CheckboxUpdated(Checkbox* checkbox) override;
    void FloatSliderUpdated(FloatSlider* slider, float oldVal) override;
    void IntSliderUpdated(IntSlider* slider, int oldVal) override;
-   
+   void TextEntryComplete(TextEntry* entry) override;
+
    bool IsResizable() const override { return true; }
    void Resize(float width, float height) override;
    
@@ -62,6 +63,7 @@ private:
    float mWidth;
    float mNumMeasures;
    float mTime;
+   TextEntry* mNumMeasuresEntry;
    FloatSlider* mTimeSlider;
    bool mLoop;
    Checkbox* mLoopCheckbox;
