@@ -38,6 +38,7 @@
 #include "ChannelBuffer.h"
 #include "IPulseReceiver.h"
 #include "exprtk/exprtk.hpp"
+#include "UserPrefs.h"
 
 #include "juce_audio_formats/juce_audio_formats.h"
 #include "juce_gui_basics/juce_gui_basics.h"
@@ -110,9 +111,9 @@ void LoadGlobalResources()
 void SetGlobalSampleRateAndBufferSize(int rate, int size)
 {
    assert(size <= kWorkBufferSize);
-   gBufferSize = size;
+   gBufferSize = size * UserPrefs.oversampling.Get();
 
-   gSampleRate = rate;
+   gSampleRate = rate * UserPrefs.oversampling.Get();
    gTwoPiOverSampleRate = TWO_PI / gSampleRate;
    gSampleRateMs = gSampleRate / 1000.0;
    gInvSampleRateMs = 1000.0 / gSampleRate;
