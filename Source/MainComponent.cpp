@@ -223,8 +223,8 @@ public:
          inputDevice = outputDevice;    //asio must have identical input and output
       
       AudioDeviceManager::AudioDeviceSetup preferredSetupOptions;
-      preferredSetupOptions.sampleRate = gSampleRate;
-      preferredSetupOptions.bufferSize = gBufferSize;
+      preferredSetupOptions.sampleRate = gSampleRate / UserPrefs.oversampling.Get();
+      preferredSetupOptions.bufferSize = gBufferSize / UserPrefs.oversampling.Get();
       if (outputDevice != kAutoDevice && outputDevice != kNoneDevice)
          preferredSetupOptions.outputDeviceName = outputDevice;
       if (inputDevice != kAutoDevice && inputDevice != kNoneDevice)
@@ -265,14 +265,14 @@ public:
             mSynth.SetFatalError("error setting input device to '"+inputDevice+"', fix this in userprefs.json (use \"auto\" for default device, or \"none\" for no device)"+
                                  "\n\n\nvalid devices:\n"+GetAudioDevices());
          }
-         else if (loadedSetup.bufferSize != gBufferSize)
+         else if (loadedSetup.bufferSize != gBufferSize / UserPrefs.oversampling.Get())
          {
-            mSynth.SetFatalError("error setting buffer size to "+ofToString(gBufferSize)+" on device '"+ loadedSetup.outputDeviceName.toStdString()+"', fix this in userprefs.json" +
+            mSynth.SetFatalError("error setting buffer size to "+ofToString(gBufferSize / UserPrefs.oversampling.Get())+" on device '"+ loadedSetup.outputDeviceName.toStdString()+"', fix this in userprefs.json" +
                                  "\n\n(a valid buffer size might be: " + ofToString(loadedSetup.bufferSize) + ")");
          }
-         else if (loadedSetup.sampleRate != gSampleRate)
+         else if (loadedSetup.sampleRate != gSampleRate / UserPrefs.oversampling.Get())
          {
-            mSynth.SetFatalError("error setting sample rate to "+ofToString(gSampleRate) + " on device '" + loadedSetup.outputDeviceName.toStdString() + "', fix this in userprefs.json"+
+            mSynth.SetFatalError("error setting sample rate to "+ofToString(gSampleRate / UserPrefs.oversampling.Get()) + " on device '" + loadedSetup.outputDeviceName.toStdString() + "', fix this in userprefs.json"+
                                  "\n\n(a valid sample rate might be: "+ofToString(loadedSetup.sampleRate)+")");
          }
          else

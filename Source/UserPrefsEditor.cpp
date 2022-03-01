@@ -57,6 +57,14 @@ void UserPrefsEditor::CreateUIControls()
    mCategorySelector->AddLabel("general", (int)UserPrefCategory::General);
    mCategorySelector->AddLabel("graphics", (int)UserPrefCategory::Graphics);
    mCategorySelector->AddLabel("paths", (int)UserPrefCategory::Paths);
+
+   std::array<int, 5> oversampleAmounts = { 1, 2, 4, 8, 16 };
+   for (int oversample : oversampleAmounts)
+   {
+      UserPrefs.oversampling.GetDropdown()->AddLabel(ofToString(oversample), oversample);
+      if (UserPrefs.oversampling.Get() == oversample)
+         UserPrefs.oversampling.GetIndex() = oversample;
+   }
 }
 
 void UserPrefsEditor::Show()
@@ -341,6 +349,7 @@ bool UserPrefsEditor::PrefRequiresRestart(UserPref* pref) const
           pref == &UserPrefs.audio_input_device ||
           pref == &UserPrefs.samplerate ||
           pref == &UserPrefs.buffersize ||
+          pref == &UserPrefs.oversampling ||
           pref == &UserPrefs.max_output_channels ||
           pref == &UserPrefs.max_input_channels ||  
           pref == &UserPrefs.record_buffer_length_minutes ||

@@ -1847,7 +1847,24 @@ void ModularSynth::AudioOut(float** output, int bufferSize, int nChannels)
 
       //put it into speakers
       for (int i = 0; i < nChannels; ++i)
-         BufferCopy(output[i], mOutputBuffers[i], gBufferSize);
+      {
+         int oversampling = UserPrefs.oversampling.Get();
+         if (oversampling == 1)
+         {
+            BufferCopy(output[i], mOutputBuffers[i], gBufferSize);
+         }
+         else
+         {
+            for (int sampleIndex = 0; sampleIndex < gBufferSize / oversampling; ++sampleIndex)
+            {
+               output[i][sampleIndex] = 0;
+               for (int subsample = 0; subsample < oversampling; ++subsample)
+               {
+                  output[i][sampleIndex] += mOutputBuffers[i][sampleIndex * oversampling + subsample] / oversampling;
+               }
+            }
+         }
+      }
    }
    
    if (gTime - mLastClapboardTime < 100)
