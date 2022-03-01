@@ -912,8 +912,8 @@ bool SamplePlayer::MouseMoved(float x, float y)
          if (bestCuePointIndex != -1)
          {
             mHoveredCuePointIndex = bestCuePointIndex;
-            mActiveCuePointIndex = bestCuePointIndex;
-            UpdateActiveCuePoint();
+            //mActiveCuePointIndex = bestCuePointIndex;
+            //UpdateActiveCuePoint();
          }
       }
    }

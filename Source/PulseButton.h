@@ -55,4 +55,5 @@ private:
    ClickButton* mButton;
    float mWidth;
    float mHeight;
+   bool mForceImmediate{ false };
 };
