@@ -976,11 +976,19 @@ void ScriptModule::RefreshScriptFiles()
 {
    mScriptFilePaths.clear();
    mLoadScriptSelector->Clear();
-   for (const auto& entry : RangedDirectoryIterator{File{ofToDataPath("scripts")}, false, "*.py"})
+   std::list<std::string> scripts;
+   for (const auto& entry : RangedDirectoryIterator{ File{ofToDataPath("scripts")}, false, "*.py" })
    {
       const auto& file = entry.getFile();
-      mLoadScriptSelector->AddLabel(file.getFileName().toStdString(), (int)mScriptFilePaths.size());
-      mScriptFilePaths.push_back(file.getFullPathName().toStdString());
+      scripts.push_back(file.getFileName().toStdString());
+   }
+
+   scripts.sort();
+
+   for (const auto& script : scripts)
+   {
+      mLoadScriptSelector->AddLabel(script, (int)mScriptFilePaths.size());
+      mScriptFilePaths.push_back(script);
    }
 }
 
