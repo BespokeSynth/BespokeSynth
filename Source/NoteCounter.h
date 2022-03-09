@@ -31,8 +31,10 @@
 #include "Transport.h"
 #include "Slider.h"
 #include "DropdownList.h"
+#include "IPulseReceiver.h"
+#include "IDrivableSequencer.h"
 
-class NoteCounter : public IDrawableModule, public INoteSource, public ITimeListener, public IIntSliderListener, public IDropdownListener
+class NoteCounter : public IDrawableModule, public INoteSource, public ITimeListener, public IIntSliderListener, public IDropdownListener, public IPulseReceiver, public IDrivableSequencer
 {
 public:
    NoteCounter();
@@ -48,18 +50,29 @@ public:
    //ITimeListener
    void OnTimeEvent(double time) override;
    
+   //IPulseReceiver
+   void OnPulse(double time, float velocity, int flags) override;
+   
+   //IDrivableSequencer
+   bool HasExternalPulseSource() const override { return mHasExternalPulseSource; }
+   void ResetExternalPulseSource() override { mHasExternalPulseSource = false; }
+   
    void CheckboxUpdated(Checkbox* checkbox) override;
    void IntSliderUpdated(IntSlider* slider, int oldVal) override;
    void DropdownUpdated(DropdownList* list, int oldVal) override;
    
    virtual void LoadLayout(const ofxJSONElement& moduleInfo) override;
    virtual void SetUpFromSaveData() override;
+   void SaveState(FileStreamOut& out) override;
+   void LoadState(FileStreamIn& in) override;
    
 private:
    //IDrawableModule
    void DrawModule() override;
    void GetModuleDimensions(float& width, float& height) override;
    bool Enabled() const override { return mEnabled; }
+   
+   void Step(double time, float velocity, int pulseFlags);
    
    float mWidth;
    float mHeight;
@@ -78,4 +91,6 @@ private:
    Checkbox* mRandomCheckbox;
    
    TransportListenerInfo* mTransportListenerInfo;
+   
+   bool mHasExternalPulseSource{ false };
 };

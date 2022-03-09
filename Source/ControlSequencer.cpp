@@ -61,7 +61,7 @@ void ControlSequencer::CreateUIControls()
    BUTTON(mRandomize, "random");
    ENDUIBLOCK(width, height);
 
-   mGrid = new UIGrid(5, 25, mRandomize->GetRect().getMaxX() - 6, 40, 16, 1, this);
+   mGrid = new UIGrid("uigrid", 5, 25, mRandomize->GetRect().getMaxX() - 6, 40, 16, 1, this);
    
    mControlCable = new PatchCableSource(this, kConnectionType_Modulator);
    //mControlCable->SetManualPosition(86, 10);

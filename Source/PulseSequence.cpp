@@ -61,7 +61,7 @@ void PulseSequence::CreateUIControls()
    mLengthSlider = new IntSlider(this,"length",3,2,96,15,&mLength,1,kMaxSteps);
    mIntervalSelector = new DropdownList(this,"interval",mLengthSlider,kAnchor_Right,(int*)(&mInterval));
    
-   mVelocityGrid = new UIGrid(3,20,174,15,mLength,1, this);
+   mVelocityGrid = new UIGrid("uigrid", 3,20,174,15,mLength,1, this);
    
    mIntervalSelector->AddLabel("1n", kInterval_1n);
    mIntervalSelector->AddLabel("2n", kInterval_2n);

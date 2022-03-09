@@ -77,7 +77,7 @@ void NoteTable::CreateUIControls()
    INTSLIDER(mGridControlOffsetYSlider, "y offset", &mGridControlOffsetY, 0, 16);
    ENDUIBLOCK(width, height);
 
-   mGrid = new UIGrid(5, height + 18, width-10, 110, 8, 24, this);
+   mGrid = new UIGrid("uigrid", 5, height + 18, width-10, 110, 8, 24, this);
    
    for (int i=0; i< kMaxLength; ++i)
    {

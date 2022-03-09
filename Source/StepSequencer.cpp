@@ -81,7 +81,7 @@ void StepSequencer::Init()
 void StepSequencer::CreateUIControls()
 {
    IDrawableModule::CreateUIControls();
-   mGrid = new UIGrid(40,45,250,150,16,NUM_STEPSEQ_ROWS, this);
+   mGrid = new UIGrid("uigrid", 40,45,250,150,16,NUM_STEPSEQ_ROWS, this);
    mStrengthSlider = new FloatSlider(this,"vel",87,22,70,15,&mStrength,0,1,2);
    mRandomizeButton = new ClickButton(this, "randomize", 160, 22);
    mRandomizationDensitySlider = new FloatSlider(this, "r den", mRandomizeButton, kAnchor_Right, 65, 15, &mRandomizationDensity, 0, 1, 2);

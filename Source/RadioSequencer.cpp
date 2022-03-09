@@ -63,7 +63,7 @@ void RadioSequencer::CreateUIControls()
    UICONTROL_CUSTOM(mGridControlTarget, new GridControlTarget(UICONTROL_BASICS("grid")));
    ENDUIBLOCK(width, height);
 
-   mGrid = new UIGrid(5, 25, mGridControlTarget->GetRect().getMaxX() - 6, 170, mLength, 8, this);
+   mGrid = new UIGrid("uigrid", 5, 25, mGridControlTarget->GetRect().getMaxX() - 6, 170, mLength, 8, this);
    mGrid->SetHighlightCol(gTime, -1);
    mGrid->SetSingleColumnMode(true);
    mGrid->SetMajorColSize(4);
