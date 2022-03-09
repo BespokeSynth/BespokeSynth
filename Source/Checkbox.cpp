@@ -162,7 +162,7 @@ void Checkbox::SetFromMidiCC(float slider, bool setViaModulator /*= false*/)
 {
    slider = ofClamp(slider,0,1);
    mSliderVal = slider;
-   bool on = GetValueForMidiCC(slider) > 0;
+   bool on = GetValueForMidiCC(slider) > 0.5f;
    if (*mVar != on)
    {
       *mVar = on;
@@ -178,7 +178,7 @@ float Checkbox::GetValueForMidiCC(float slider) const
 
 void Checkbox::SetValue(float value)
 {
-   bool on = value > 0;
+   bool on = value > 0.5f;
    if (*mVar != on)
    {
       *mVar = on;

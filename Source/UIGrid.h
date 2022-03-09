@@ -51,7 +51,7 @@ struct GridCell
 class UIGrid : public IUIControl
 {
 public:
-   UIGrid(int x, int y, int w, int h, int cols, int rows, IClickable* parent);
+   UIGrid(std::string name, int x, int y, int w, int h, int cols, int rows, IClickable* parent);
    void Init(int x, int y, int w, int h, int cols, int rows, IClickable* parent);
    void SetGrid(int cols, int rows);
    int GetRows() { return mRows; }

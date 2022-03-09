@@ -42,6 +42,7 @@ class Sample;
 class PatchCable;
 class PatchCableSource;
 class ModuleContainer;
+class UIGrid;
 
 enum ModuleType
 {
@@ -84,8 +85,10 @@ public:
    void DrawConnection(IClickable* target);
    void AddUIControl(IUIControl* control);
    void RemoveUIControl(IUIControl* control);
+   void AddUIGrid(UIGrid* grid);
    IUIControl* FindUIControl(const char* name, bool fail = true) const;
    std::vector<IUIControl*> GetUIControls() const;
+   std::vector<UIGrid*> GetUIGrids() const;
    void AddChild(IDrawableModule* child);
    void RemoveChild(IDrawableModule* child);
    IDrawableModule* FindChild(const char* name) const;
@@ -197,6 +200,7 @@ private:
    std::vector<IUIControl*> mUIControls;
    std::vector<IDrawableModule*> mChildren;
    std::vector<FloatSlider*> mFloatSliders;
+   std::vector<UIGrid*> mUIGrids;
    static const int mTitleBarHeight = 12;
    std::string mTypeName;
    static const int sResizeCornerSize = 8;

@@ -75,7 +75,7 @@ void PlaySequencer::CreateUIControls()
    UIBLOCK_SHIFTUP();
    CHECKBOX(mLinkColumnsCheckbox, "link columns", &mLinkColumns);
    ENDUIBLOCK(width, height);
-   mGrid = new UIGrid(3, height, mWidth-16, 150, TheTransport->CountInStandardMeasure(mInterval), (int)mLanes.size(), this);
+   mGrid = new UIGrid("uigrid", 3, height, mWidth-16, 150, TheTransport->CountInStandardMeasure(mInterval), (int)mLanes.size(), this);
    mHeight = height + 153;
    mGrid->SetFlip(true);
    mGrid->SetGridMode(UIGrid::kMultisliderBipolar);

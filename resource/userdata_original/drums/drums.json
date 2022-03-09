@@ -5,19 +5,19 @@
               "these directories"],
    "directories" : [
       "808kit/Kick",
-      "808kit/Snare",
+      "808kit/Clap",
       "808kit/HatClosed",
       "808kit/HatOpen",
       "808kit/Kick",
-      "808kit/Clap",
+      "808kit/Snare",
       "808kit/HatClosed",
       "808kit/Perc",
       "808kit/Kick",
-      "808kit/Snare",
+      "808kit/Clap",
       "808kit/HatClosed",
       "808kit/HatOpen",
       "808kit/Kick",
-      "808kit/Clap",
+      "808kit/Snare",
       "808kit/HatClosed",
       "808kit/Perc"
    ]

@@ -45,6 +45,7 @@
 #include "nanovg/nanovg.h"
 #include "IPulseReceiver.h"
 #include "Push2Control.h"
+#include "UIGrid.h"
 
 float IDrawableModule::sHueNote = 27;
 float IDrawableModule::sHueAudio = 135;
@@ -703,6 +704,11 @@ IUIControl* IDrawableModule::FindUIControl(const char* name, bool fail /*=true*/
          if (strcmp(mUIControls[i]->Name(),name) == 0)
             return mUIControls[i];
       }
+      for (int i=0; i<mUIGrids.size(); ++i)
+      {
+         if (strcmp(mUIGrids[i]->Name(),name) == 0)
+            return mUIGrids[i];
+      }
    }
    if (fail)
       throw UnknownUIControlException();
@@ -755,6 +761,17 @@ std::vector<IUIControl*> IDrawableModule::GetUIControls() const
       controls.insert(controls.end(), childControls.begin(), childControls.end());
    }
    return controls;
+}
+
+std::vector<UIGrid*> IDrawableModule::GetUIGrids() const
+{
+   std::vector<UIGrid*> grids = mUIGrids;
+   for (int i=0; i<mChildren.size(); ++i)
+   {
+      std::vector<UIGrid*> childGrids = mChildren[i]->GetUIGrids();
+      grids.insert(grids.end(), childGrids.begin(), childGrids.end());
+   }
+   return grids;
 }
 
 void IDrawableModule::GetDimensions(float& width, float& height)
@@ -857,6 +874,11 @@ void IDrawableModule::RemoveUIControl(IUIControl* control)
       RemoveFromVector(slider, mFloatSliders, K(fail));
       mSliderMutex.unlock();
    }
+}
+
+void IDrawableModule::AddUIGrid(UIGrid* grid)
+{
+   mUIGrids.push_back(grid);
 }
 
 void IDrawableModule::ComputeSliders(int samplesIn)
