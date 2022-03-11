@@ -126,18 +126,25 @@ void Presets::DrawModule()
       DrawTextNormal(mPresetCollection[hover].mDescription,50,0);
    }
 
-   ofVec2f pos = mGrid->GetCellPosition(hover % mGrid->GetCols(), hover / mGrid->GetCols()) + mGrid->GetPosition(true);
-   float xsize = float(mGrid->GetWidth()) / mGrid->GetCols();
-   float ysize = float(mGrid->GetHeight()) / mGrid->GetRows();
-
-   if (GetKeyModifiers() == kModifier_Shift)
+   bool shiftHeld = GetKeyModifiers() == kModifier_Shift;
+   if (shiftHeld)
    {
+      ofVec2f pos = mGrid->GetCellPosition(hover % mGrid->GetCols(), hover / mGrid->GetCols()) + mGrid->GetPosition(true);
+      float xsize = float(mGrid->GetWidth()) / mGrid->GetCols();
+      float ysize = float(mGrid->GetHeight()) / mGrid->GetRows();
+      
       ofPushStyle();
       ofSetColor(0, 0, 0);
       ofFill();
-      ofRect(pos.x + xsize / 2 - 1, pos.y + 2, 2, ysize - 4, 0);
-      ofRect(pos.x + 2, pos.y + ysize / 2 - 1, xsize - 4, 2, 0);
+      ofRect(pos.x + xsize / 2 - 1, pos.y + 3, 2, ysize - 6, 0);
+      ofRect(pos.x + 3, pos.y + ysize / 2 - 1, xsize - 6, 2, 0);
       ofPopStyle();
+   }
+   
+   if (mShiftHeld != shiftHeld)
+   {
+      mShiftHeld = shiftHeld;
+      UpdateGridValues();
    }
 }
 
@@ -149,7 +156,7 @@ void Presets::UpdateGridValues()
       float val = 0;
       if (mPresetCollection[i].mPresets.empty() == false)
          val = .5f;
-      if (i == mCurrentPreset)
+      if (i == mCurrentPreset && !mShiftHeld)
          val = 1;
       mGrid->SetVal(i%mGrid->GetCols(), i/mGrid->GetCols(), val);
    }
@@ -219,7 +226,10 @@ void Presets::SetPreset(int idx)
 
       if (control)
       {
-         if (mBlendTime == 0 || i->mHasLFO || !i->mGridContents.empty())
+         if (mBlendTime == 0 ||
+             i->mHasLFO ||
+             !i->mGridContents.empty() ||
+             !i->mString.empty())
          {
             control->SetValueDirect(i->mValue);
             
@@ -243,6 +253,10 @@ void Presets::SetPreset(int idx)
                   }
                }
             }
+            
+            TextEntry* textEntry = dynamic_cast<TextEntry*>(control);
+            if (textEntry && textEntry->GetTextEntryType() == kTextEntry_Text)
+               textEntry->SetText(i->mString);
          }
          else
          {
@@ -411,6 +425,7 @@ void Presets::Save()
             for (int k=0; k<(int)presetData.mGridContents.size(); ++k)
                preset["controls"][j]["grid"][k] = presetData.mGridContents[k];
          }
+         preset["controls"][j]["string"] = presetData.mString;
          ++j;
       }
    }
@@ -468,6 +483,7 @@ void Presets::Load()
                   for (int k=0; k<(int)presetData.mGridContents.size(); ++k)
                      presetData.mGridContents[k] = preset["controls"][j]["grid"][k].asDouble();
                }
+               presetData.mString = preset["controls"][j]["string"].asString();
                ++j;
             }
          }
@@ -572,6 +588,7 @@ void Presets::SaveState(FileStreamOut& out)
          assert(preset.mGridContents.size() == preset.mGridCols * preset.mGridRows);
          for (size_t i=0; i<preset.mGridContents.size(); ++i)
             out << preset.mGridContents[i];
+         out << preset.mString;
       }
       out << coll.mDescription;
    }
@@ -613,6 +630,7 @@ void Presets::LoadState(FileStreamIn& in)
          presetData.mGridContents.resize(presetData.mGridCols * presetData.mGridRows);
          for (int k=0; k<presetData.mGridCols * presetData.mGridRows; ++k)
             in >> presetData.mGridContents[k];
+         in >> presetData.mString;
       }
       in >> mPresetCollection[i].mDescription;
    }
@@ -694,5 +712,9 @@ Presets::Preset::Preset(IUIControl* control, Presets* presets)
          }
       }
    }
+   
+   TextEntry* textEntry = dynamic_cast<TextEntry*>(control);
+   if (textEntry && textEntry->GetTextEntryType() == kTextEntry_Text)
+      mString = textEntry->GetText();
 }
 

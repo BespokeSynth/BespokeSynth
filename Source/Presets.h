@@ -111,6 +111,7 @@ private:
       int mGridCols;
       int mGridRows;
       std::vector<float> mGridContents;
+      std::string mString;
    };
    
    struct PresetCollection
@@ -142,6 +143,7 @@ private:
    IntSlider* mCurrentPresetSlider;
    PatchCableSource* mModuleCable;
    PatchCableSource* mUIControlCable;
+   bool mShiftHeld{ false };
 };
 
 
