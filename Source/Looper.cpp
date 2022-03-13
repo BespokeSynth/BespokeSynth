@@ -129,7 +129,7 @@ Looper::Looper()
       mLastInputSample[i] = 0;
    }
 
-   SetLoopLength(4 * 60.0f / gDefaultTempo * gSampleRate);
+   SetLoopLength(4 * 60.0f / TheTransport->GetTempo() * gSampleRate);
 }
 
 void Looper::CreateUIControls()

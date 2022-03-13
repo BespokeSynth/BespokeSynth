@@ -181,8 +181,7 @@ void Scale::Init()
       mNumSeptatonicScales = 1;
    }
    
-   SetRoot(gRandom()%TheScale->GetPitchesPerOctave());
-   SetRandomSeptatonicScale();
+   SetRandomRootAndScale();
 }
 
 float Scale::PitchToFreq(float pitch)
@@ -353,6 +352,12 @@ void Scale::SetScaleType(std::string type, bool force)
    NotifyListeners();
 }
 
+void Scale::SetRandomRootAndScale()
+{
+   SetRoot(gRandom()%TheScale->GetPitchesPerOctave());
+   SetRandomSeptatonicScale();
+}
+
 void Scale::SetRandomSeptatonicScale()
 {
    mScaleIndex = gRandom()%mNumSeptatonicScales + 1;
@@ -463,6 +468,12 @@ std::vector<int> Scale::GetPitchesForScale(std::string scaleType)
 void Scale::Poll()
 {
    ComputeSliders(0);
+   
+   if (mWantSetRandomRootAndScale)
+   {
+      SetRandomRootAndScale();
+      mWantSetRandomRootAndScale = false;
+   }
 }
 
 float Scale::RationalizeNumber(float input)
@@ -738,6 +749,19 @@ void Scale::ButtonClicked(ClickButton *button)
             UpdateTuningTable();
         }
     }
+}
+
+void Scale::LoadLayout(const ofxJSONElement& moduleInfo)
+{
+   mModuleSaveData.LoadBool("randomize_scale_on_load", moduleInfo, false);
+   
+   SetUpFromSaveData();
+}
+
+void Scale::SetUpFromSaveData()
+{
+   if (mModuleSaveData.GetBool("randomize_scale_on_load"))
+      mWantSetRandomRootAndScale = true;
 }
 
 namespace

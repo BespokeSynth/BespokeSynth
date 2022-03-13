@@ -135,6 +135,8 @@ public:
 
    void ButtonClicked(ClickButton *button) override;
 
+   void LoadLayout(const ofxJSONElement& moduleInfo) override;
+   void SetUpFromSaveData() override;
    void SaveState(FileStreamOut& out) override;
    void LoadState(FileStreamIn& in) override;
 
@@ -158,6 +160,7 @@ private:
    float RationalizeNumber(float input);
    void UpdateTuningTable();
    float GetTuningTableRatio(int semitonesFromCenter);
+   void SetRandomRootAndScale();
    
    enum IntonationMode
    {
@@ -202,6 +205,7 @@ private:
    std::string mSclContents;
    std::string mKbmContents;
    std::string mCustomScaleDescription;
+   bool mWantSetRandomRootAndScale{false};
 };
 
 extern Scale* TheScale;

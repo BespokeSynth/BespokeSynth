@@ -135,7 +135,7 @@ void UIGrid::Render()
          if (mCurrentHover == i + j * mCols && gHoveredUIControl == nullptr)
          {
             ofFill();
-            ofSetColor(200, 200, 200, 170);
+            ofSetColor(255, 255, 0, 170);
             ofRect(x+2,y+2,xsize-4,ysize-4);
          }
       }
