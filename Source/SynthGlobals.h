@@ -92,7 +92,6 @@ extern double gSampleRateMs;
 extern double gInvSampleRateMs;
 extern double gBufferSizeMs;
 extern double gNyquistLimit;
-extern float gDefaultTempo;
 extern bool gPrintMidiInput;
 extern double gTime;
 extern IUIControl* gBindToUIControl;

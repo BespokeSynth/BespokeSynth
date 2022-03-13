@@ -56,7 +56,6 @@ double gSampleRateMs = -999;
 double gInvSampleRateMs = -999;
 double gBufferSizeMs = -999;
 double gNyquistLimit = -999;
-float gDefaultTempo = 105;
 bool gPrintMidiInput = false;
 double gTime = 1; //using a double here, so I'm going to lose nanosecond accuracy
                   //if I run for 4 months straight
@@ -87,8 +86,6 @@ std::uniform_real_distribution<float> gRandomBipolarDist(-1.f, 1.f);
 void SynthInit()
 {
    std::locale::global(std::locale::classic());
-   
-   gDefaultTempo = gRandom() % 80 + 75;
    
    Clear(gZeroBuffer, kWorkBufferSize);
    

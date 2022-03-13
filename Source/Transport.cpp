@@ -36,7 +36,7 @@ bool Transport::sDoEventLookahead = false;
 double Transport::sEventEarlyMs = 150;
 
 Transport::Transport()
-: mTempo(gDefaultTempo)
+: mTempo(120)
 , mTimeSigTop(4)
 , mTimeSigBottom(4)
 , mMeasureTime(0)
@@ -62,6 +62,13 @@ Transport::Transport()
    TheTransport = this;
 
    SetName("transport");
+   
+   SetRandomTempo();
+}
+
+void Transport::SetRandomTempo()
+{
+   SetTempo(gRandom() % 80 + 75);
 }
 
 void Transport::CreateUIControls()
@@ -112,6 +119,15 @@ void Transport::CreateUIControls()
 void Transport::Init()
 {
    IDrawableModule::Init();
+}
+
+void Transport::Poll()
+{
+   if (mWantSetRandomTempo)
+   {
+      SetRandomTempo();
+      mWantSetRandomTempo = false;
+   }
 }
 
 void Transport::KeyPressed(int key, bool isRepeat)
@@ -628,11 +644,15 @@ void Transport::DropdownUpdated(DropdownList* list, int oldVal)
 
 void Transport::LoadLayout(const ofxJSONElement& moduleInfo)
 {
+   mModuleSaveData.LoadBool("randomize_tempo_on_load", moduleInfo, false);
+   
    SetUpFromSaveData();
 }
 
 void Transport::SetUpFromSaveData()
 {
+   if (mModuleSaveData.GetBool("randomize_tempo_on_load"))
+      mWantSetRandomTempo = true;
 }
 
 namespace
