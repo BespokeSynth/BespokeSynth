@@ -233,6 +233,9 @@ public:
    UserPrefBool set_manual_window_position{ "set_manual_window_position", false, UserPrefCategory::General };
    UserPrefTextEntryInt position_x{ "position_x", 200, -10000, 10000, 5, UserPrefCategory::General };
    UserPrefTextEntryInt position_y{ "position_y", 200, -10000, 10000, 5, UserPrefCategory::General };
+   UserPrefDropdownInt bars_per_output_chunk{ "bars_per_output_chunk", 2, 100, UserPrefCategory::General };
+   UserPrefDropdownInt num_of_output_chunks{ "num_of_output_chunks", 16, 100, UserPrefCategory::General };
+   UserPrefBool enable_chunked_output{ "enable_chunked_output", false, UserPrefCategory::General };
    UserPrefFloat zoom{ "zoom", 1, .25f, 2, UserPrefCategory::General };
    UserPrefFloat ui_scale{ "ui_scale", 1, .25f, 2, UserPrefCategory::General };
    UserPrefFloat grid_snap_size{ "grid_snap_size", 30, 5, 150, UserPrefCategory::General };

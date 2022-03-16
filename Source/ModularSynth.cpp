@@ -65,6 +65,7 @@ int ModularSynth::sLoadingFileSaveStateRev = ModularSynth::kSaveStateRev;
 LONG WINAPI TopLevelExceptionHandler(PEXCEPTION_POINTERS pExceptionInfo);
 #endif
 
+using namespace std::chrono;
 using namespace juce;
 
 void AtExit()
@@ -264,14 +265,26 @@ void ModularSynth::Setup(juce::AudioDeviceManager* globalAudioDeviceManager, juc
    mGlobalRecordBuffer->SetNumChannels(2);
    mSaveOutputBuffer[0] = new float[mGlobalRecordBuffer->Size()];
    mSaveOutputBuffer[1] = new float[mGlobalRecordBuffer->Size()];
-   
-   juce::File(ofToDataPath("savestate")).createDirectory();
-   juce::File(ofToDataPath("savestate/autosave")).createDirectory();
-   juce::File(ofToDataPath("recordings")).createDirectory();
-   juce::File(ofToDataPath("samples")).createDirectory();
-   juce::File(ofToDataPath("scripts")).createDirectory();
-   juce::File(ofToDataPath("internal")).createDirectory();
-   juce::File(ofToDataPath("vst")).createDirectory();
+
+    mEnableChunkedOutput = UserPrefs.enable_chunked_output.Get();
+    mBarsPerOutputChunk = UserPrefs.bars_per_output_chunk.Get();
+    mNumOfOutputChunks = UserPrefs.num_of_output_chunks.Get();
+
+    for (int i = 0; i < mNumOfOutputChunks; i++) {
+        mGlobalChunkedRecordBuffer.push_back(new RollingBuffer(
+                UserPrefs.record_buffer_length_minutes.Get() * 60 * gSampleRate));
+        mGlobalChunkedRecordBuffer.at(i)->SetNumChannels(2);
+        mChunkedRecordingLength.push_back(0);
+        mChunkedRecordingLabels.push_back("default");
+    }
+
+    juce::File(ofToDataPath("savestate")).createDirectory();
+    juce::File(ofToDataPath("savestate/autosave")).createDirectory();
+    juce::File(ofToDataPath("recordings")).createDirectory();
+    juce::File(ofToDataPath("samples")).createDirectory();
+    juce::File(ofToDataPath("scripts")).createDirectory();
+    juce::File(ofToDataPath("internal")).createDirectory();
+    juce::File(ofToDataPath("vst")).createDirectory();
    
    SynthInit();
 
@@ -1879,14 +1892,51 @@ void ModularSynth::AudioOut(float** output, int bufferSize, int nChannels)
       }
    }
    /////////// AUDIO PROCESSING ENDS HERE /////////////
-   if (nChannels >= 1)
-      mGlobalRecordBuffer->WriteChunk(output[0], bufferSize, 0);
-   if (nChannels >= 2)
-      mGlobalRecordBuffer->WriteChunk(output[1], bufferSize, 1);
-   mRecordingLength += bufferSize;
-   mRecordingLength = MIN(mRecordingLength, mGlobalRecordBuffer->Size());
-   
-   Profiler::PrintCounters();
+    
+    if (mEnableChunkedOutput) {
+        int measure = TheTransport->GetMeasure(gTime);
+        if (measure % mBarsPerOutputChunk == 0) {
+            if (mEnableOutputChunkToIncrement) {
+                mEnableOutputChunkToIncrement = false;
+                mOutputChunkIndex++;
+
+                if (mOutputChunkIndex >= mGlobalChunkedRecordBuffer.size()) {
+                    //if the max number of allocated output buffers have been filled start reusing buffers starting at the beginning
+                    mOutputChunkIndex = 0;
+                }
+
+                mGlobalChunkedRecordBuffer.at(mOutputChunkIndex)->ClearBuffer();
+                mChunkedRecordingLength.at(mOutputChunkIndex) = 0;
+            }
+        } else {
+            mEnableOutputChunkToIncrement = true;
+        }
+
+        float tempo = TheTransport->GetTempo();
+        int scaleRoot = TheScale->GetScalePitches().ScaleRoot();
+        std::string noteName = TheScale->GetScalePitches().mNoteNames[scaleRoot];
+        std::string scaleType = TheScale->GetScalePitches().GetType();
+
+        std::ostringstream ss;
+        ss << "bpm-" << tempo << "-" << noteName << "-" << scaleType;
+        mChunkedRecordingLabels[mOutputChunkIndex] = ss.str();
+
+        if (nChannels >= 1)
+            mGlobalChunkedRecordBuffer.at(mOutputChunkIndex)->WriteChunk(output[0], bufferSize, 0);
+        if (nChannels >= 2)
+            mGlobalChunkedRecordBuffer.at(mOutputChunkIndex)->WriteChunk(output[1], bufferSize, 1);
+
+        mChunkedRecordingLength.at(mOutputChunkIndex) += bufferSize;
+    }
+
+    if (nChannels >= 1)
+        mGlobalRecordBuffer->WriteChunk(output[0], bufferSize, 0);
+    if (nChannels >= 2)
+        mGlobalRecordBuffer->WriteChunk(output[1], bufferSize, 1);
+    mRecordingLength += bufferSize;
+    mRecordingLength = MIN(mRecordingLength, mGlobalRecordBuffer->Size());
+
+    Profiler::PrintCounters();
 }
 
 void ModularSynth::AudioIn(const float** input, int bufferSize, int nChannels)
@@ -3024,6 +3074,25 @@ void ModularSynth::SaveOutput()
    
    mGlobalRecordBuffer->ClearBuffer();
    mRecordingLength = 0;
+
+    if (mEnableChunkedOutput) {
+        for (int i = 0; i < mNumOfOutputChunks; ++i) {
+            for (int j = 0; j < mChunkedRecordingLength.at(i); ++j) {
+                //RESET mSaveOUTPUTBUFFER
+                //TODO WHERE IS THE SIZE OF THE BUFFER SET???
+                mSaveOutputBuffer[0][j] = mGlobalChunkedRecordBuffer.at(i)->GetSample(
+                        (int) mChunkedRecordingLength.at(i) - j - 1,
+                        0);
+                mSaveOutputBuffer[1][j] = mGlobalChunkedRecordBuffer.at(i)->GetSample(
+                        (int) mChunkedRecordingLength.at(i) - j - 1,
+                        1);
+            }
+
+            std::chrono::milliseconds ms = duration_cast<milliseconds>( system_clock::now().time_since_epoch());
+            std::string filename = UserPrefs.recordings_path.Get() + "chunked-output/" + mChunkedRecordingLabels[i] + "-" + std::to_string(i) + "-" + std::to_string(ms.count()) + ".wav";
+            Sample::WriteDataToFile(filename, mSaveOutputBuffer, (int) mChunkedRecordingLength.at(i), 2);
+        }
+    }
 }
 
 const String& ModularSynth::GetTextFromClipboard() const {

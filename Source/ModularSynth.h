@@ -303,6 +303,15 @@ private:
    RollingBuffer* mGlobalRecordBuffer;
    long long mRecordingLength;
    
+   bool mEnableChunkedOutput;
+   int mBarsPerOutputChunk = 2;
+   int mNumOfOutputChunks = 4;
+   std::vector<RollingBuffer*> mGlobalChunkedRecordBuffer;
+   std::vector<long long> mChunkedRecordingLength;
+   std::vector<std::string> mChunkedRecordingLabels;
+   int mOutputChunkIndex = -1;
+   bool mEnableOutputChunkToIncrement = true;
+
    struct LogEventItem
    {
       LogEventItem(double _time, std::string _text, LogEventType _type) : time(_time), text(_text), type(_type) {}

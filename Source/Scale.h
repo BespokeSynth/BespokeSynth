@@ -62,6 +62,7 @@ struct ScalePitches
    std::vector<int> mScalePitches[2]; //double-buffered to avoid thread safety issues when modifying
    std::atomic<int> mScalePitchesFlip{0};
    std::vector<Accidental> mAccidentals;
+   std::string mNoteNames[12] = { "C", "C#/Db", "D", "D#/Eb", "E", "F", "F#/Gb", "G", "G#/Ab", "A", "A#/Bb" };
    
    void SetRoot(int root);
    void SetScaleType(std::string type);
