@@ -1907,19 +1907,19 @@ void ModularSynth::AudioOut(float** output, int bufferSize, int nChannels)
 
                 mGlobalChunkedRecordBuffer.at(mOutputChunkIndex)->ClearBuffer();
                 mChunkedRecordingLength.at(mOutputChunkIndex) = 0;
+                
+                //Create Label For Chunk
+                float tempo = TheTransport->GetTempo();
+                int scaleRoot = TheScale->GetScalePitches().ScaleRoot();
+                std::string noteName = TheScale->GetScalePitches().mNoteNames[scaleRoot];
+                std::string scaleType = TheScale->GetScalePitches().GetType();
+                std::ostringstream ss;
+                ss << "bpm-" << tempo << "-" << noteName << "-" << scaleType;
+                mChunkedRecordingLabels[mOutputChunkIndex] = ss.str();
             }
         } else {
             mEnableOutputChunkToIncrement = true;
         }
-
-        float tempo = TheTransport->GetTempo();
-        int scaleRoot = TheScale->GetScalePitches().ScaleRoot();
-        std::string noteName = TheScale->GetScalePitches().mNoteNames[scaleRoot];
-        std::string scaleType = TheScale->GetScalePitches().GetType();
-
-        std::ostringstream ss;
-        ss << "bpm-" << tempo << "-" << noteName << "-" << scaleType;
-        mChunkedRecordingLabels[mOutputChunkIndex] = ss.str();
 
         if (nChannels >= 1)
             mGlobalChunkedRecordBuffer.at(mOutputChunkIndex)->WriteChunk(output[0], bufferSize, 0);
@@ -1927,14 +1927,14 @@ void ModularSynth::AudioOut(float** output, int bufferSize, int nChannels)
             mGlobalChunkedRecordBuffer.at(mOutputChunkIndex)->WriteChunk(output[1], bufferSize, 1);
 
         mChunkedRecordingLength.at(mOutputChunkIndex) += bufferSize;
+    } else {
+        if (nChannels >= 1)
+            mGlobalRecordBuffer->WriteChunk(output[0], bufferSize, 0);
+        if (nChannels >= 2)
+            mGlobalRecordBuffer->WriteChunk(output[1], bufferSize, 1);
+        mRecordingLength += bufferSize;
+        mRecordingLength = MIN(mRecordingLength, mGlobalRecordBuffer->Size());
     }
-
-    if (nChannels >= 1)
-        mGlobalRecordBuffer->WriteChunk(output[0], bufferSize, 0);
-    if (nChannels >= 2)
-        mGlobalRecordBuffer->WriteChunk(output[1], bufferSize, 1);
-    mRecordingLength += bufferSize;
-    mRecordingLength = MIN(mRecordingLength, mGlobalRecordBuffer->Size());
 
     Profiler::PrintCounters();
 }
@@ -3067,7 +3067,9 @@ void ModularSynth::SaveOutput()
       mSaveOutputBuffer[1][i] = mGlobalRecordBuffer->GetSample((int)mRecordingLength-i-1, 1);
    }
 
-   Sample::WriteDataToFile(filename, mSaveOutputBuffer, (int)mRecordingLength, 2);
+   if (!mEnableChunkedOutput) {
+      Sample::WriteDataToFile(filename, mSaveOutputBuffer, (int)mRecordingLength, 2);
+   }
    
    //mOutputBufferMeasurePos.ReadChunk(mSaveOutputBuffer, mRecordingLength);
    //Sample::WriteDataToFile(filenamePos.c_str(), mSaveOutputBuffer, mRecordingLength, 1);
