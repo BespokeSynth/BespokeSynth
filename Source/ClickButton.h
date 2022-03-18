@@ -46,7 +46,9 @@ enum class ButtonDisplayStyle
    kStop,
    kGrabSample,
    kSampleIcon,
-   kFolderIcon
+   kFolderIcon,
+   kArrowRight,
+   kArrowLeft
 };
 
 class ClickButton : public IUIControl

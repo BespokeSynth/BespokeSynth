@@ -151,6 +151,9 @@ void DrumPlayer::DrumHit::CreateUIControls(DrumPlayer* owner, int index)
    int x = 5 + (index % 4) * 70;
    int y = 70 + (3-(index / 4)) * 70;
    mTestButton = new ClickButton(owner,("test "+ofToString(index)).c_str(),x+5,y+38,ButtonDisplayStyle::kPlay);
+   mPrevButton = new ClickButton(owner,("prev "+ofToString(index)).c_str(),x+27,y+38,ButtonDisplayStyle::kArrowLeft);
+   mNextButton = new ClickButton(owner,("next "+ofToString(index)).c_str(),x+48,y+38,ButtonDisplayStyle::kArrowRight);
+   
    mRandomButton = new ClickButton(owner,("random "+ofToString(index)).c_str(),x+5,y+53);
    
    UpdateHitDirectoryDropdown();
@@ -762,6 +765,8 @@ void DrumPlayer::DrawModule()
       for (size_t i = 0; i < mDrumHits.size(); ++i)
       {
          mDrumHits[i].mTestButton->Draw();
+         mDrumHits[i].mPrevButton->Draw();
+         mDrumHits[i].mNextButton->Draw();
          mDrumHits[i].mRandomButton->Draw();
       }
       
@@ -1075,7 +1080,23 @@ void DrumPlayer::ButtonClicked(ClickButton* button)
          mDrumHits[i].LoadRandomSample();
       if (button == mDrumHits[i].mGrabSampleButton)
          mDrumHits[i].GrabSample();
+      if (button == mDrumHits[i].mNextButton)
+         mDrumHits[i].LoadNextSample(1);
+      if (button == mDrumHits[i].mPrevButton)
+         mDrumHits[i].LoadNextSample(-1);
    }
+}
+
+void DrumPlayer::DrumHit::LoadSample(std::string path)
+{
+   mOwner->LoadSampleLock();
+   mSample.Read(path.c_str());
+   mOwner->LoadSampleUnlock();
+   //mSample.Play(gTime, mSpeed, 0);
+   //mVelocity = .5f;
+   mEnvelopeLength = mSample.LengthInSamples() * gInvSampleRateMs;
+   for (size_t i = 0; i < mPlayheads.size(); ++i)
+      mPlayheads[i].mStartTime = -1;
 }
 
 void DrumPlayer::DrumHit::LoadRandomSample()
@@ -1089,15 +1110,36 @@ void DrumPlayer::DrumHit::LoadRandomSample()
    }
 
    if (files.size() > 0)
+      LoadSample(files[gRandom() % files.size()].getFullPathName().toStdString());
+}
+
+void DrumPlayer::DrumHit::LoadNextSample(int direction)
+{
+   File dir(ofToDataPath("drums/"+mHitCategory));
+   Array<File> files;
+   int currentIndex = -1;
+   int i = 0;
+   auto dirContents = dir.findChildFiles(File::findFiles, false);
+   dirContents.sort();
+   for (auto file : dirContents)
    {
-      std::string file = files[gRandom() % files.size()].getFullPathName().toStdString();
-      
-      mOwner->LoadSampleLock();
-      mSample.Read(file.c_str());
-      mOwner->LoadSampleUnlock();
-      //mSample.Play(gTime, mSpeed, 0);
-      //mVelocity = .5f;
-      mEnvelopeLength = mSample.LengthInSamples() * gInvSampleRateMs;
+      if (file.getFileName()[0] != '.')
+      {
+         files.add(file);
+         if (mSample.GetReadPath() == file.getFullPathName())
+            currentIndex = i;
+         ++i;
+      }
+   }
+
+   if (files.size() > 0)
+   {
+      int newIndex;
+      if (currentIndex == -1)
+         newIndex = 0;
+      else
+         newIndex = ofClamp(currentIndex + direction, 0, (int)files.size()-1);
+      LoadSample(files[newIndex].getFullPathName().toStdString());
    }
 }
 
