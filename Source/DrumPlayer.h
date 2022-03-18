@@ -248,6 +248,8 @@ private:
       void DrawUIControls();
       void UpdateHitDirectoryDropdown();
       void LoadRandomSample();
+      void LoadNextSample(int direction);
+      void LoadSample(std::string path);
       void GrabSample();
       void StartPlayhead(double time, float startOffsetPercent, float velocity);
       void StopLinked(double time);
@@ -276,6 +278,8 @@ private:
       FloatSlider* mSpeedSlider;
       ClickButton* mTestButton;
       ClickButton* mRandomButton;
+      ClickButton* mNextButton;
+      ClickButton* mPrevButton;
       ClickButton* mGrabSampleButton;
       Checkbox* mUseEnvelopeCheckbox;
       ADSRDisplay* mEnvelopeDisplay;

@@ -69,7 +69,7 @@ bool CustomPluginScanner::findPluginTypesFor(juce::AudioPluginFormat& format,
    stream.writeString(format.getName());
    stream.writeString(fileOrIdentifier);
 
-   if (superprocess->sendMessageToFollower(block))
+   if (superprocess->sendMessageToWorker(block))
    {
       std::unique_lock<std::mutex> lock(mutex);
       gotResponse = false;
@@ -124,10 +124,10 @@ void CustomPluginScanner::changeListenerCallback(juce::ChangeBroadcaster*)
 CustomPluginScanner::Superprocess::Superprocess(CustomPluginScanner& o)
    : owner(o)
 {
-   launchFollowerProcess(juce::File::getSpecialLocation(juce::File::currentExecutableFile), kScanProcessUID, 0, 0);
+   launchWorkerProcess(juce::File::getSpecialLocation(juce::File::currentExecutableFile), kScanProcessUID, 0, 0);
 }
 
-void CustomPluginScanner::Superprocess::handleMessageFromFollower(const juce::MemoryBlock& mb)
+void CustomPluginScanner::Superprocess::handleMessageFromWorker(const juce::MemoryBlock& mb)
 {
    auto xml = parseXML(mb.toString());
 
@@ -245,7 +245,7 @@ PluginScannerSubprocess::PluginScannerSubprocess()
    formatManager.addDefaultFormats();
 }
 
-void PluginScannerSubprocess::handleMessageFromLeader(const juce::MemoryBlock& mb)
+void PluginScannerSubprocess::handleMessageFromCoordinator(const juce::MemoryBlock& mb)
 {
    {
       const std::lock_guard<std::mutex> lock(mutex);
@@ -296,7 +296,7 @@ void PluginScannerSubprocess::handleAsyncUpdate()
          xml.addChildElement(desc->createXml().release());
 
       const auto str = xml.toString();
-      sendMessageToLeader({ str.toRawUTF8(), str.getNumBytesAsUTF8() });
+      sendMessageToCoordinator({ str.toRawUTF8(), str.getNumBytesAsUTF8() });
    }
 }
 
