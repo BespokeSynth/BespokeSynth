@@ -293,6 +293,7 @@ public:
    void SendProgramChange(int page, int program, int channel = -1);
    void SendPitchBend(int page, int bend, int channel = -1);
    void SendData(int page, unsigned char a, unsigned char b, unsigned char c);
+   void SendSysEx(int page, std::string data);
 
    INonstandardController* GetNonstandardController() { return mNonstandardController; }
 

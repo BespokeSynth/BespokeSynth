@@ -1528,6 +1528,14 @@ void MidiController::SendData(int page, unsigned char a, unsigned char b, unsign
    }
 }
 
+void MidiController::SendSysEx(int page, std::string data)
+{
+   if (page == mControllerPage)
+   {
+      mDevice.SendSysEx(data);
+   }
+}
+
 UIControlConnection* MidiController::GetConnectionForControl(MidiMessageType messageType, int control)
 {
    for (auto i=mConnections.begin(); i != mConnections.end(); ++i)

@@ -232,6 +232,14 @@ void MidiDevice::SendPitchBend(int bend, int channel /* = -1*/)
    }
 }
 
+void MidiDevice::SendSysEx(std::string data)
+{
+   if (mMidiOut)
+   {
+      mMidiOut->sendMessageNow(MidiMessage::createSysExMessage(data.c_str(), data.length()));
+   }
+}
+
 void MidiDevice::SendData(unsigned char a, unsigned char b, unsigned char c)
 {
    if (mMidiOut)
