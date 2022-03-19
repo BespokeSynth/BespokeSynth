@@ -92,7 +92,6 @@ MidiController::MidiController()
 , mHoveredLayoutElement(-1)
 , mLayoutWidth(0)
 , mLayoutHeight(0)
-, mFoundLayoutFile(false)
 {
    mListeners.resize(MAX_MIDI_PAGES);  
 }
@@ -122,7 +121,7 @@ void MidiController::CreateUIControls()
    mOscInPortEntry->DrawLabel(true);
    mMonomeDeviceDropdown->DrawLabel(true);
    
-   mLayoutFileDropdown->AddLabel("default", 0);
+   mLayoutFileDropdown->AddLabel(kDefaultLayout, 0);
    File dir(ofToDataPath("controllers"));
    Array<File> files;
    for (auto file : dir.findChildFiles(File::findFiles, false, "*.json"))
@@ -1166,8 +1165,8 @@ void MidiController::DrawModule()
       ofRect(kLayoutControlsX,kLayoutControlsY,235,140);
       ofPopStyle();
       
-      if (!mFoundLayoutFile)
-         gFont.DrawStringWrap("couldn't load layout file at "+mLastLoadedLayoutFile+", using the default layout instead", 15, 3, kLayoutControlsY + 160, 235);
+      if (mLayoutLoadError != "")
+         gFont.DrawStringWrap(mLayoutLoadError, 15, 3, kLayoutControlsY + 160, 235);
       
       if (mHighlightedLayoutElement != -1)
       {
@@ -1563,9 +1562,13 @@ ControlLayoutElement& MidiController::GetLayoutControl(int control, MidiMessageT
    return mLayoutControls[index];
 }
 
-void MidiController::LoadLayout(std::string filename)
+void MidiController::LoadControllerLayout(std::string filename)
 {
-   mLastLoadedLayoutFile = ofToDataPath("controllers/"+filename);
+   if (filename != kDefaultLayout)
+      mLastLoadedLayoutFile = ofToDataPath("controllers/"+filename);
+   else
+      mLastLoadedLayoutFile = "";
+   
    for (int i = 0; i < mLayoutFileDropdown->GetNumValues(); ++i)
    {
       if (filename == mLayoutFileDropdown->GetLabel(i))
@@ -1586,7 +1589,8 @@ void MidiController::LoadLayout(std::string filename)
    mGrids.clear();
    
    bool useDefaultLayout = true;
-   bool loaded = mLayoutData.open(mLastLoadedLayoutFile);
+   bool loaded = mLastLoadedLayoutFile != "" &&
+                 mLayoutData.open(mLastLoadedLayoutFile);
    try
    {
       if (loaded)
@@ -1594,7 +1598,6 @@ void MidiController::LoadLayout(std::string filename)
          if (mNonstandardController != nullptr)
             mNonstandardController->SetLayoutData(mLayoutData);
 
-         mFoundLayoutFile = true;
          if (!mLayoutData["outchannel"].isNull())
          {
             mOutChannel = mLayoutData["outchannel"].asInt();
@@ -1773,8 +1776,16 @@ void MidiController::LoadLayout(std::string filename)
    
    if (!loaded)
    {
-      mFoundLayoutFile = false;
+      mLayoutFileIndex = 0;
       mLayoutData.clear();
+      if (mLastLoadedLayoutFile == "")
+         mLayoutLoadError = "using default layout. set up controller files in "+ofToDataPath("controllers");
+      else
+         mLayoutLoadError  = "couldn't load layout file at "+mLastLoadedLayoutFile+", using the default layout instead";
+   }
+   else
+   {
+      mLayoutLoadError = "";
    }
    
    if (useDefaultLayout)
@@ -1808,9 +1819,16 @@ void MidiController::LoadLayout(std::string filename)
 
 void MidiController::OnDeviceChanged()
 {
-   std::string filename = mDeviceIn + ".json";
-   ofStringReplace(filename, "/", "");
-   LoadLayout(filename);
+   if (!mDeviceIn.empty()) 
+   {
+      std::string filename = mDeviceIn + ".json";
+      ofStringReplace(filename, "/", "");
+      LoadControllerLayout(filename);
+   }
+   else
+   {
+      LoadControllerLayout(kDefaultLayout);
+   }
 
    mModulation.GetModWheel(-1)->SetValue(mModWheelOffset);
    mModulation.GetPressure(-1)->SetValue(mPressureOffset);
@@ -1923,7 +1941,7 @@ void MidiController::DropdownUpdated(DropdownList* list, int oldVal)
    }
    if (list == mLayoutFileDropdown)
    {
-      LoadLayout(mLayoutFileDropdown->GetLabel(mLayoutFileIndex));
+      LoadControllerLayout(mLayoutFileDropdown->GetLabel(mLayoutFileIndex));
    }
 }
 

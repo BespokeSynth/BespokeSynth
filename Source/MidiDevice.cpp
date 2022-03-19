@@ -79,28 +79,35 @@ bool MidiDevice::ConnectOutput(const char* name, int channel /*= 1*/)
    {
       if (devices[i] == name)
       {
-         ConnectOutput(i, channel);
-         found = true;
+         found = ConnectOutput(i, channel);
          break;
       }
    }
    
    if (!found)
+   {
+      TheSynth->LogEvent("Failed to connect to Midi Output: " + std::string(name), kLogEventType_Error);
       DisconnectOutput();
+   }
    
    return found;
 }
 
-void MidiDevice::ConnectOutput(int index, int channel /*= 1*/)
+bool MidiDevice::ConnectOutput(int index, int channel /*= 1*/)
 {
    mMidiOut.reset();
    mMidiOut = MidiOutput::openDevice(index);
-   mMidiOut->startBackgroundThread();
+   if(mMidiOut)
+   {
+      mMidiOut->startBackgroundThread();
+      mDeviceNameOut = mMidiOut->getName();
 
-   mDeviceNameOut = mMidiOut->getName();
+      assert(channel > 0 && channel <= 16);
+      mOutputChannel = channel;
+      return true;
+   }
 
-   assert(channel > 0 && channel <= 16);
-   mOutputChannel = channel;
+   return false;
 }
 
 void MidiDevice::DisconnectInput()
@@ -112,7 +119,7 @@ void MidiDevice::DisconnectInput()
 
 void MidiDevice::DisconnectOutput()
 {
-   if (mMidiOut.get())
+   if (mMidiOut)
       mMidiOut->stopBackgroundThread();
    mMidiOut.reset();
    mMidiOut = nullptr;

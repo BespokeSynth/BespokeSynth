@@ -371,8 +371,10 @@ private:
    int GetLayoutControlIndexForMidi(MidiMessageType type, int control) const;
    std::string GetLayoutTooltip(int controlIndex);
    void UpdateControllerIndex();
-   void LoadLayout(std::string filename);
+   void LoadControllerLayout(std::string filename);
    bool JustBoundControl() const { return gTime - sLastBoundControlTime < 500; }
+   
+   const std::string kDefaultLayout = "default";
    
    float mVelocityMult;
    bool mUseChannelAsVoice;
@@ -433,6 +435,7 @@ private:
    ChannelFilter mChannelFilter;
    std::string mLastLoadedLayoutFile;
    ofxJSONElement mLayoutData;
+   std::string mLayoutLoadError;
    
    std::array<ControlLayoutElement, NUM_LAYOUT_CONTROLS> mLayoutControls;
    int mHighlightedLayoutElement;
@@ -440,7 +443,6 @@ private:
    int mLayoutWidth;
    int mLayoutHeight;
    std::vector<GridLayout*> mGrids;
-   bool mFoundLayoutFile;
    
    ofMutex mQueuedMessageMutex;
 };
