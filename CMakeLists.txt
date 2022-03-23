@@ -15,6 +15,7 @@ option(BESPOKE_DEVENDORED_SYSTEM_JUCE "Use system libraries when using system in
 option(BESPOKE_SYSTEM_PYBIND11 "Use a system installation of pybind11" OFF)
 option(BESPOKE_SYSTEM_JSONCPP "Use system-wide installation of jsoncpp" OFF)
 option(BESPOKE_SYSTEM_TUNING_LIBRARY "Use system installation of tuning-library" OFF)
+option(BESPOKE_USE_ASAN "Build with ASAN" OFF)
 
 # Global CMake options
 set(CMAKE_CXX_EXTENSIONS OFF)
@@ -49,6 +50,12 @@ if(WIN32 AND ${BESPOKE_BITNESS} EQUAL 32)
         $<$<CXX_COMPILER_ID:MSVC>:/LARGEADDRESSAWARE>
         $<$<BOOL:${MINGW}>:LINKER:--large-address-aware>
         )
+endif()
+
+if (BESPOKE_USE_ASAN)
+    message( STATUS "BUILDING with ASAN" )
+    add_compile_options(-fsanitize=address -fno-omit-frame-pointer)
+    add_link_options(-fsanitize=address)
 endif()
 
 if(BESPOKE_NIGHTLY)
