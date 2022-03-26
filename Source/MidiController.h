@@ -421,6 +421,7 @@ private:
    int mControllerIndex;
    double mLastActivityTime;
    bool mLastActivityBound;
+   bool mShowActivityUIOverlay{true};
    bool mBlink;
    int mControllerPage;
    DropdownList* mPageSelector;

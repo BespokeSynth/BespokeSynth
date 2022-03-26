@@ -581,8 +581,11 @@ void MidiController::MidiReceived(MidiMessageType messageType, int control, floa
          if (uicontrol == nullptr)
             continue;
          
-         sLastActivityUIControl = uicontrol;
-         sLastConnectedActivityTime = gTime;
+         if (mShowActivityUIOverlay)
+         {
+            sLastActivityUIControl = uicontrol;
+            sLastConnectedActivityTime = gTime;
+         }
 
          if (connection->mType == kControlType_Slider)
          {
@@ -2282,6 +2285,7 @@ void MidiController::LoadLayout(const ofxJSONElement& moduleInfo)
    mModuleSaveData.LoadBool("incrementalsliders", moduleInfo, false);
    mModuleSaveData.LoadBool("twoway_on_change", moduleInfo, true);
    mModuleSaveData.LoadBool("resend_feedback_on_release", moduleInfo, false);
+   mModuleSaveData.LoadBool("show_activity_ui_overlay", moduleInfo, true);
    
    mConnectionsJson = moduleInfo["connections"];
 
@@ -2313,6 +2317,7 @@ void MidiController::SetUpFromSaveData()
    mSlidersDefaultToIncremental = mModuleSaveData.GetBool("incrementalsliders");
    mSendTwoWayOnChange = mModuleSaveData.GetBool("twoway_on_change");
    mResendFeedbackOnRelease = mModuleSaveData.GetBool("resend_feedback_on_release");
+   mShowActivityUIOverlay = mModuleSaveData.GetBool("show_activity_ui_overlay");
    
    BuildControllerList();
    
