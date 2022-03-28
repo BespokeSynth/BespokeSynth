@@ -988,7 +988,7 @@ void ScriptModule::RefreshScriptFiles()
    for (const auto& script : scripts)
    {
       mLoadScriptSelector->AddLabel(script, (int)mScriptFilePaths.size());
-      mScriptFilePaths.push_back(script);
+      mScriptFilePaths.push_back(ofToDataPath("scripts/"+script));
    }
 }
 
