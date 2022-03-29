@@ -79,7 +79,7 @@ bool gShowDevModules = false;
 float gCornerRoundness = 1;
 
 std::random_device gRandomDevice;
-std::mt19937 gRandom(gRandomDevice());
+bespoke::core::Xoshiro256ss gRandom(gRandomDevice());
 std::uniform_real_distribution<float> gRandom01(0.0f, 1.f);
 std::uniform_real_distribution<float> gRandomBipolarDist(-1.f, 1.f);
 
