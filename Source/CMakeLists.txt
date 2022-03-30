@@ -371,6 +371,8 @@ target_sources(BespokeSynth PRIVATE
     NoteDelayer.h
     NoteDisplayer.cpp
     NoteDisplayer.h
+    NoteEcho.cpp
+    NoteEcho.h
     NoteEffectBase.h
     NoteExpressionRouter.cpp
     NoteExpressionRouter.h
