@@ -37,10 +37,12 @@ script~Scripting con python para livecoding de notas y control de módulos
 ~code~escribe código aquí. presiona ctrl-R para ejecutar el código, o ctrl-shift-R para ejecutar solo el bloque actual
 ~run~click aqui para ejecutar el código, o presiona ctrl-R
 ~stop~cancela eventos programados por este script
-~a~variable usada por el script, puede ser modulada por otras señales
-~b~variable usada por el script, puede ser modulada por otras señales
-~c~variable usada por el script, puede ser modulada por otras señales
-~d~variable usada por el script, puede ser modulada por otras señales
+~a~variable usada por el script, puede ser modulada por otras señales, accede a ella mediante me.get("a")
+~b~variable usada por el script, puede ser modulada por otras señales, accede a ella mediante me.get("b")
+~c~variable usada por el script, puede ser modulada por otras señales, accede a ella mediante me.get("c")
+~d~variable usada por el script, puede ser modulada por otras señales, accede a ella mediante me.get("d")
+~style~elige un estilo de texto, desde script_styles.json
+
 
 
 
@@ -55,7 +57,7 @@ presets~guarda y recupera sets de valores.Conecta el círculo gris de los módul
 ~save~[todo]
 ~blend ms~tiempo de fundido entre valores
 ~preset~salta a un preset
-
+~random~añade aleatoriedad al los controles conectados
 
 
 prefab~crea una colección de módulos que pueden cargarse desde el menú “prefabs”. Arrastra y suelta aquí tus módulos para añadirlos al Prefabricado. Arrastra el cable gris a cualquier módulo que quieras eliminar del prefab
@@ -316,7 +318,7 @@ fubble~dibuja en un X/Y pad y lanza el dibujo para modular valores. Basado en un
 
 
 expression~forma de la modulación con expresión matemática basada en texto
-~y=~expresión para modificar entrada. Intenta algo como "x+sin(x*pi*a)". variables disponibles: a,b,c,d,e = los sliders abajo. t = tiempo.
+~y=~expresión para modificar entrada. Intenta algo como "x+sin(x*pi*a)". variables disponibles: a,b,c,d,e = los sliders abajo. t = tiempo
 ~input~entrada a usar como variable x
 ~a~variable a usar en expresiones 
 ~b~variable a usar en expresiones
@@ -461,6 +463,18 @@ notesequencer~un bucle de secuencias de notas a un intervalo . emparéjalo con u
 
 
 
+notetable~mapea un tono (comenzando desde cero) a un tono de la escala
+~random pitch~añade aleatoriedad a una secuencia. manten shift presionado para restringir la aleatoriedad y solo usar notas base y quintas.
+~length~el numero de notas
+~octave~octava mas baja de esta secuancia
+~notemode~que grupos de notas deberia representar esta fila? 
+~tone*~notas para esta columna
+~grid~conecta a un grid aqui desde un módulo "midicontroller"
+~x offset~offset x del grid controller conectado 
+~y offset~offset y del grid controller conectado
+~rand pitch chance~cuando se hace click en el botón random pitch , cual es la probabilidad de que el ultimo paso se cambie ? 
+~rand pitch range~cuando se hace click en el botón random pitch, ¿Cuánto va a cambiar el pitch ?
+
 notelooper~grabador de patrones de notas con overdubbing  y funcionalidad de reemplazo 
 ~write~¿ Debería la entrada ser grabada ? 
 ~del/mute~si "write" está activado, elimina notas a medida que el cabezal pasa por ellas. En caso contrario, solo siléncialas 
@@ -469,8 +483,6 @@ notelooper~grabador de patrones de notas con overdubbing  y funcionalidad de ree
 ~store*~guarda patrón
 ~load*~carga patrón
 ~canvas~lienzo de notas grabadas
-
-
 
 notecreator~crea señales de notas  on-off 
 ~pitch~tono de la nota de salida
@@ -567,9 +579,11 @@ fouronthefloor~manda la nota 0 en cada compás, para lanzar un bombo
 
 
 
+
+
+
 drumsequencer~secuenciador de pasos diseñado para percusiones.mantén shift mientras arrastras en la rejilla para ajustar la velocity de cada paso.
-~str~velocity a usar cuando se establece un paso mediante grid controller,si la casilla al lado de este slider está activada 
-~use str~si el "str" del slider debería ser usado para establecer la velocity
+~vel~velocity a utilizar cuando se configura un paso
 ~measures~duración de la secuencia en in medidas
 ~preset~elige un preset de patrón 
 ~yoff~ offset vertical para la vista del grid controller del patrón
@@ -587,22 +601,18 @@ drumsequencer~secuenciador de pasos diseñado para percusiones.mantén shift mie
 ~randomize~aplica aleatoriedad a la secuencia
 ~r den~densidad de la salida de aleatoriedad. Cuanto más alta , mas poblada será la salida.
 ~r amt~la probabilidad de que cada paso sea cambiado cuando se aplique aleatoriedad. Valores bajos cambiarán solo una pequeña parte de la secuencia, valores altos reemplazarán más partes de la secuencia.
-
-
+~r lock*~bloquea esta fila para que no sea afectada al por la aleatoriedad
 
 helpdisplay~muestra información de ayuda
 ~show tooltips~muestra estos consejos. también puedes activarlos con la tecla F1 , y los puedes desactivar por defecto en el menú de configuración principal.
+~copy build info~copia información relevante para peticiones de soporte/ayuda
 ~help page~la página de ayuda para mostrar
-
-
 
 multitrackrecorder~graba varias pistas de audio sincronizadas , grabalas al disco para depues mezclar  en un DAW externo
 ~record~comienza a grabar a las pistas
 ~bounce~escribe las pisas al directorio de grabaciones
 ~add track~añade una pista adicional
 ~clear~borra el audio en las pistas
-
-
 
 multitrackrecordertrack~una pista en un grabador multipista “multitrackrecorder”
 ~ X ~borra esta pista
@@ -1061,7 +1071,7 @@ audiometer~establece un slider a un volumen de audio . Útil para mapear a un va
 
 
 
-signalgenerator~oscilador básico 
+signalgenerator~oscilador básico.manda una nota hacia el set frequency, y manda un pulso para resetear la fase.
 ~freq~frecuencia de la señal
 ~freq mode~¿ qué modo debemos usar para las notas entrantes ? "instant" cambia a la nota del tono entrante instantáneamente , "ramp" trepa hacia la frecuencia a lo largo del tiempo, y "slider" te permite usar el slider para interpolar entre las 2 últimas notas entrantes
 ~osc~tipo de oscilador
@@ -1129,6 +1139,7 @@ sampleplayer~sample playback con cue points lanzables, extracción de clip , y f
 ~trim~descarta todo el audio fuera del rango del zoom
 ~youtube~descarga el audio de la url de youtube en tu portapapeles actual
 ~cue start~punto de comienzo en segundos del cue actual
+~cue stop~deja de tocar este cue si se recibe un note-off
 ~cue len~longitud de duración en segundos del cue actual.un valor de cero tocará hasta el fin de la muestra.
 ~cue speed~velocidad de reproducción del cue actual
 ~cuepoint~establece el cue actual a editar 
@@ -1308,6 +1319,7 @@ drumsynth~oscilador+sintetizador de percusiones mediante ruido
 ~cutoffmax*~frecuencia de corte inicial
 ~cutoffmin*~frecuencia de corte final
 ~q*~filter resonance
+~oversampling~cantidad de oversampling. aumenta la calidad de sonido , pero tambien el uso de CPU
 
 
 
@@ -1340,6 +1352,7 @@ drumplayer~sample player concebido para percusiones
 ~envelopedisplay *R~envelope release
 ~test *~lanza esta muestra
 ~random *~elige una muestra al azar de la hitcategory elegida
+~grab *~ selecciona esta muestra
 
 
 
@@ -1531,6 +1544,8 @@ noterangefilter~permite pasar únicamente notas en un cierto rango
 ~max~el tono más alto permitido 
 ~wrap~en lugar de rechazar las notas fuera de este rango , ¿deberíamos ajustarlas al rango ?
 
+noteexpression~controla a donde se enrutan las notas basándose en expresiones. la variable "p" representa el tono, y "v" el velocity
+~expression*~la expresión a evaluar para este cable. expresión de ejemplo para rutear notas con tono mayor de 80 y velovity menor de 60:\n"p > 80 && v < 60"
 
 
 notepanrandom~establece el paneo de una nota a valores aleatorios ,para sintetizadores internos que soportan notas con información de paneo
@@ -1730,7 +1745,12 @@ vstplugin~una instancia de interfaz VST
 ~show parameter~selecciona los parámetros para visualizarlos, para que puedan ser ajustados por la interfaz de Bespoke. si un vst tiene más de 20 parámetros, esta lista estará inicialmente vacía. en ese caso, para hacer que un parámetro aparezca en la lista, muévelo dentro de la interfaz gráfica del plugin VST.
 ~preset~elige de entre los presets VST guardados 
 ~save as~guarda las opciones actuales como un preset para ser cargado más tarde
+~panic~envía  "all notes off" y "all sounds off" a este plugin para silenciarlo inmediadamente
 
+
+newpatchconfirm~
+~confirm~borra todo y empieza desde cero 
+~cancel~ignora esto
 
 
 transport~controla el tempo y la posición actual del tiempo
@@ -1745,6 +1765,7 @@ transport~controla el tempo y la posición actual del tiempo
 ~ < ~empuja el tiempo actual hacia atrás
 ~ > ~empuja el tiempo actual adelante
 ~set tempo~
+~play/pause~para todo el procesamiento de audio (shift-p)
 
 
 
@@ -1767,7 +1788,7 @@ m185sequencer~secuenciador que usa el paradigma único del m185 o intellijel met
 
 notestepper~devuelve notas mediante un “round robin” de cables de patch, para crear variedad secuencial to create sequential variety
 ~length~duración de la secuencia
-
+~reset~resetea al inicio de la secuencia
 
 
 
@@ -1780,6 +1801,7 @@ scale~controla la escala global usada por varios módulos
 ~scale~que set de notas utilizar
 ~degree~ 
 ~intonation~qué método utilizar para afinar la escala
+~PPO~notas por octava
 ~tet~de cuántos semitonos se compone una octava
 ~tuning~qué frecuencia definida “note” representa?
 ~note~el tono que corresponde con la frecuencia definida en "tuning"
