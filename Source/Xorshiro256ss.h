@@ -28,6 +28,7 @@
 #define BESPOKESYNTH_XORSHIRO256SS_H
 
 #include <cstddef>
+#include <cstdint>
 #include <climits> // CHAR_BIT
 
 namespace bespoke::core
@@ -40,38 +41,35 @@ namespace bespoke::core
             return sizeof(T) * CHAR_BIT;
         }
 
-        using u64 = size_t;
-
-        constexpr u64 splitmix64(u64& x)
+        constexpr std::uint64_t splitmix64(std::uint64_t& x)
         {
-            u64 z = (x += 0x9e3779b97f4a7c15uLL);
+            std::uint64_t z = (x += 0x9e3779b97f4a7c15uLL);
             z = (z ^ (z >> 30)) * 0xbf58476d1ce4e5b9uLL;
             z = (z ^ (z >> 27)) * 0x94d049bb133111ebuLL;
             return z ^ (z >> 31);
         }
 
-        constexpr u64 rotl(u64 x, int k)
+        constexpr std::uint64_t rotl(std::uint64_t x, int k)
         {
-            return (x << k) | (x >> (BitSizeOf<u64>() - k));
+            return (x << k) | (x >> (BitSizeOf<std::uint64_t>() - k));
         }
 
         /**
-         * Xoshiro256ss as a C++ Random Number Engine.
+         * Xoshiro256** as a C++ Random Number Engine.
          * There's no fancy standardese concept name (Trust me, I checked), unfortunately..
          */
         struct Xoshiro256ss
         {
-            using result_type = u64;
+            using result_type = std::uint64_t;
 
-            static_assert(sizeof(u64) == 8, "size_t needs to be 64 bits");
-            u64 s[4]{};
+            std::uint64_t s[4]{};
 
             constexpr explicit Xoshiro256ss() : Xoshiro256ss(0)
             {
 
             }
 
-            constexpr explicit Xoshiro256ss(u64 seed)
+            constexpr explicit Xoshiro256ss(std::uint64_t seed)
             {
                 s[0] = splitmix64(seed);
                 s[1] = splitmix64(seed);
@@ -86,7 +84,7 @@ namespace bespoke::core
 
             static constexpr result_type max()
             {
-                return u64(-1);
+                return std::uint64_t(-1);
             }
 
             constexpr result_type operator()()
