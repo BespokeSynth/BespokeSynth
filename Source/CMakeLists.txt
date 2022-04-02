@@ -613,6 +613,8 @@ target_sources(BespokeSynth PRIVATE
     StutterControl.h
     SustainPedal.cpp
     SustainPedal.h
+    SwitchAndRamp.cpp
+    SwitchAndRamp.h
     SynthGlobals.cpp
     SynthGlobals.h
     TakeRecorder.cpp

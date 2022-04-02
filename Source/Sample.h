@@ -61,7 +61,7 @@ public:
    int LengthInSamples() const { return mNumSamples; }
    int NumChannels() const { return mData.NumActiveChannels(); }
    ChannelBuffer* Data() { return &mData; }
-   int GetPlayPosition() const { return mOffset; }
+   double GetPlayPosition() const { return mOffset; }
    void SetPlayPosition(double sample) { mOffset = sample; }
    float GetSampleRateRatio() const { return mSampleRateRatio; }
    void Reset() { mOffset = mNumSamples; }

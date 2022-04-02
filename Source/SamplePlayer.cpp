@@ -85,8 +85,6 @@ SamplePlayer::SamplePlayer()
 , mRunningProcess(nullptr)
 , mOnRunningProcessComplete(nullptr)
 , mIsLoadingSample(false)
-, mLastOutputSample(1)
-, mSwitchAndRampVal(1)
 , mDoRecording(false)
 , mRecordingLength(0)
 , mRecordingAppendMode(false)
@@ -375,8 +373,6 @@ void SamplePlayer::Process(double time)
       mSample->SetRate(mPlaySpeed);
       
       gWorkChannelBuffer.SetNumActiveChannels(mSample->NumChannels());
-      mLastOutputSample.SetNumActiveChannels(mSample->NumChannels());
-      mSwitchAndRampVal.SetNumActiveChannels(mSample->NumChannels());
 
       if (mPlay)
       {
@@ -404,16 +400,10 @@ void SamplePlayer::Process(double time)
       for (int ch = 0; ch < gWorkChannelBuffer.NumActiveChannels(); ++ch)
       {
          for (int i = 0; i < bufferSize; ++i)
-         {
-            gWorkChannelBuffer.GetChannel(ch)[i] += mSwitchAndRampVal.GetChannel(ch)[0];
-            mSwitchAndRampVal.GetChannel(ch)[0] *= .999f;
-            if (mSwitchAndRampVal.GetChannel(ch)[0] < .0001f && mSwitchAndRampVal.GetChannel(ch)[0] > -.0001f)
-               mSwitchAndRampVal.GetChannel(ch)[0] = 0;
-         }
+            gWorkChannelBuffer.GetChannel(ch)[i] = mSwitchAndRamp.Process(ch, gWorkChannelBuffer.GetChannel(ch)[i]);
 
          Add(target->GetBuffer()->GetChannel(ch), gWorkChannelBuffer.GetChannel(ch), bufferSize);
          GetVizBuffer()->WriteChunk(gWorkChannelBuffer.GetChannel(ch), bufferSize, ch);
-         mLastOutputSample.GetChannel(ch)[0] = gWorkChannelBuffer.GetChannel(ch)[bufferSize-1];
       }
    }
    
@@ -462,14 +452,8 @@ void SamplePlayer::PlayCuePoint(double time, int index, int velocity, float spee
       mAdsr.Start(time, velocity / 127.0f);
       if (lengthSeconds > 0)
          mAdsr.Stop(time + lengthSeconds * 1000 / speed);
-      SwitchAndRamp();
+      mSwitchAndRamp.StartSwitch();
    }
-}
-
-void SamplePlayer::SwitchAndRamp()
-{
-   for (int ch = 0; ch < mSwitchAndRampVal.NumActiveChannels(); ++ch)
-      mSwitchAndRampVal.GetChannel(ch)[0] = mLastOutputSample.GetChannel(ch)[0];
 }
 
 void SamplePlayer::DropdownClicked(DropdownList* list)
@@ -577,7 +561,7 @@ void SamplePlayer::ButtonClicked(ClickButton *button)
    if (button == mPauseButton && mSample != nullptr)
    {
       mPlay = false;
-      SwitchAndRamp();
+      mSwitchAndRamp.StartSwitch();
    }
    if (button == mStopButton)
    {
@@ -589,7 +573,7 @@ void SamplePlayer::ButtonClicked(ClickButton *button)
       {
          mPlay = false;
          mSample->SetPlayPosition(0);
-         SwitchAndRamp();
+         mSwitchAndRamp.StartSwitch();
       }
    }
    if (button == mDownloadYoutubeButton)
@@ -822,7 +806,7 @@ void SamplePlayer::OnClicked(int x, int y, bool right)
    
    if (y > 60 && y < mHeight - 20 && mSample != nullptr && gHoveredUIControl == nullptr)
    {
-      SwitchAndRamp();
+      mSwitchAndRamp.StartSwitch();
       mCuePointSpeed = 1;
       mStopOnNoteOff = false;
       mPlay = true;
@@ -874,7 +858,7 @@ bool SamplePlayer::MouseMoved(float x, float y)
    IDrawableModule::MouseMoved(x, y);
    if (mScrubbingSample && mSample != nullptr)
    {
-      SwitchAndRamp();
+      mSwitchAndRamp.StartSwitch();
       mSample->SetPlayPosition(int(GetPlayPositionForMouse(x)));
       mAdsr.Clear();
       mAdsr.Start(gTime + gBufferSizeMs, 1);
