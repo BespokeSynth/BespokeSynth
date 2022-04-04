@@ -78,6 +78,7 @@ void ValueSetter::OnPulse(double time, float velocity, int flags)
 {
    if (velocity > 0 && mEnabled)
    {
+      ComputeSliders((time - gTime) * gSampleRateMs);
       Go();
    }
 }

@@ -198,6 +198,7 @@ private:
    bool HasGridController();
    int GetGridControllerRows();
    int GetGridControllerCols();
+   void RandomizeRow(int row);
    
    struct HeldButton
    {
@@ -226,8 +227,7 @@ private:
    Checkbox* mAdjustOffsetsCheckbox;
    std::array<float, NUM_STEPSEQ_ROWS> mOffsets;
    std::array<FloatSlider*, NUM_STEPSEQ_ROWS> mOffsetSlider;
-   std::array<bool, NUM_STEPSEQ_ROWS> mRandomLock;
-   std::array<Checkbox*, NUM_STEPSEQ_ROWS> mRandomLockCheckbox;
+   std::array<ClickButton*, NUM_STEPSEQ_ROWS> mRandomizeRowButton;
    std::map<int,int> mPadPressures;
    NoteInterval mRepeatRate;
    DropdownList* mRepeatRateDropdown;

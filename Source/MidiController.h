@@ -221,7 +221,7 @@ enum ControlDrawType
 struct ControlLayoutElement
 {
    ControlLayoutElement() : mActive(false), mControlCable(nullptr), mConnectionType(kControlType_Slider) {}
-   void Setup(MidiController* owner, MidiMessageType type, int control, ControlDrawType drawType, bool incremental, int offVal, int onVal, bool scaleOutput, ControlType connectionType, float x, float y, float w, float h);
+   void Setup(MidiController* owner, MidiMessageType type, int control, ControlDrawType drawType, float incrementAmount, int offVal, int onVal, bool scaleOutput, ControlType connectionType, float x, float y, float w, float h);
    
    bool mActive;
    MidiMessageType mType;
@@ -229,8 +229,7 @@ struct ControlLayoutElement
    ofVec2f mPosition;
    ofVec2f mDimensions;
    ControlDrawType mDrawType;
-   bool mIncremental;
-   float mIncrementThreshold;
+   float mIncrementAmount;
    int mOffVal;
    int mOnVal;
    bool mScaleOutput;
@@ -272,7 +271,7 @@ public:
    void Init() override;
 
    void AddControlConnection(const ofxJSONElement& connection);
-   UIControlConnection* AddControlConnection(MidiMessageType messageType, int control, int channel, IUIControl* uicontrol);
+   UIControlConnection* AddControlConnection(MidiMessageType messageType, int control, int channel, IUIControl* uicontrol, int page = -1);
    void UseNegativeEdge(bool use) { mUseNegativeEdge = use; }
    void AddListener(MidiDeviceListener* listener, int page);
    void RemoveListener(MidiDeviceListener* listener);
@@ -294,6 +293,7 @@ public:
    void SendProgramChange(int page, int program, int channel = -1);
    void SendPitchBend(int page, int bend, int channel = -1);
    void SendData(int page, unsigned char a, unsigned char b, unsigned char c);
+   void SendSysEx(int page, std::string data);
 
    INonstandardController* GetNonstandardController() { return mNonstandardController; }
 
@@ -371,8 +371,10 @@ private:
    int GetLayoutControlIndexForMidi(MidiMessageType type, int control) const;
    std::string GetLayoutTooltip(int controlIndex);
    void UpdateControllerIndex();
-   void LoadLayout(std::string filename);
+   void LoadControllerLayout(std::string filename);
    bool JustBoundControl() const { return gTime - sLastBoundControlTime < 500; }
+   
+   const std::string kDefaultLayout = "default";
    
    float mVelocityMult;
    bool mUseChannelAsVoice;
@@ -419,6 +421,7 @@ private:
    int mControllerIndex;
    double mLastActivityTime;
    bool mLastActivityBound;
+   bool mShowActivityUIOverlay{true};
    bool mBlink;
    int mControllerPage;
    DropdownList* mPageSelector;
@@ -433,6 +436,7 @@ private:
    ChannelFilter mChannelFilter;
    std::string mLastLoadedLayoutFile;
    ofxJSONElement mLayoutData;
+   std::string mLayoutLoadError;
    
    std::array<ControlLayoutElement, NUM_LAYOUT_CONTROLS> mLayoutControls;
    int mHighlightedLayoutElement;
@@ -440,7 +444,6 @@ private:
    int mLayoutWidth;
    int mLayoutHeight;
    std::vector<GridLayout*> mGrids;
-   bool mFoundLayoutFile;
    
    ofMutex mQueuedMessageMutex;
 };

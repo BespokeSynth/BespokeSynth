@@ -18,8 +18,8 @@
 /*
   ==============================================================================
 
-    PulseButton.h
-    Created: 20 Jun 2020 2:46:02pm
+    NoteEcho.h
+    Created: 29 March 2022
     Author:  Ryan Challinor
 
   ==============================================================================
@@ -27,33 +27,41 @@
 
 #pragma once
 
+#include <iostream>
+#include "NoteEffectBase.h"
 #include "IDrawableModule.h"
-#include "IPulseReceiver.h"
-#include "ClickButton.h"
+#include "Checkbox.h"
+#include "INoteSource.h"
+#include "Slider.h"
 
-class PulseButton : public IDrawableModule, public IPulseSource, public IButtonListener
+class NoteEcho : public INoteReceiver, public INoteSource, public IDrawableModule, public IFloatSliderListener
 {
 public:
-   PulseButton();
-   virtual ~PulseButton();
-   static IDrawableModule* Create() { return new PulseButton(); }
-   
+   NoteEcho();
+   static IDrawableModule* Create() { return new NoteEcho(); }
    
    void CreateUIControls() override;
-
-   void ButtonClicked(ClickButton* button) override;
    
-   void LoadLayout(const ofxJSONElement& moduleInfo) override;
-   void SetUpFromSaveData() override;
+   void PlayNote(double time, int pitch, int velocity, int voiceIdx, ModulationParameters modulation) override;
+   void SendCC(int control, int value, int voiceIdx = -1) override;
    
+   void FloatSliderUpdated(FloatSlider* slider, float oldVal) override {}
+   
+   virtual void LoadLayout(const ofxJSONElement& moduleInfo) override;
+   virtual void SetUpFromSaveData() override;
+   virtual void SaveLayout(ofxJSONElement& moduleInfo) override;
 private:
    //IDrawableModule
    void DrawModule() override;
    void GetModuleDimensions(float& width, float& height) override { width = mWidth; height = mHeight; }
    bool Enabled() const override { return true; }
    
-   ClickButton* mButton;
+   void SendNoteToIndex(int index, double time, int pitch, int velocity, int voiceIdx, ModulationParameters modulation);
+
+   static const int kMaxDestinations = 5;
+   std::array<float, kMaxDestinations> mDelay;
+   std::array<FloatSlider*, kMaxDestinations> mDelaySlider;
+   std::array<AdditionalNoteCable*, kMaxDestinations> mDestinationCables;
    float mWidth;
    float mHeight;
-   bool mForceImmediate{ false };
 };

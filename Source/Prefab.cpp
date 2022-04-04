@@ -92,7 +92,7 @@ bool Prefab::IsMouseHovered()
 
 bool Prefab::CanAddDropModules()
 {
-   if (IsMouseHovered())
+   if (IsMouseHovered() && !TheSynth->IsGroupSelecting())
    {
       if (TheSynth->GetMoveModule() != nullptr && !VectorContains(TheSynth->GetMoveModule(), mModuleContainer.GetModules()))
          return true;
@@ -102,7 +102,7 @@ bool Prefab::CanAddDropModules()
       {
          for (auto* module : TheSynth->GetGroupSelectedModules())
          {
-            if (module == this)
+            if (module == this || module->IsSingleton())
                return false;
             if (!VectorContains(module, mModuleContainer.GetModules()))
                return true;
@@ -124,7 +124,7 @@ void Prefab::MouseReleased()
 {
    IDrawableModule::MouseReleased();
 
-   if (CanAddDropModules())
+   if (CanAddDropModules() && !VectorContains<IDrawableModule*>(this, TheSynth->GetGroupSelectedModules()))
    {
       if (sJustReleasedModule != nullptr && !VectorContains(sJustReleasedModule, mModuleContainer.GetModules()))
          mModuleContainer.TakeModule(sJustReleasedModule);

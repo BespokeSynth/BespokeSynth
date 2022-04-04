@@ -87,6 +87,8 @@ public:
    void SetFlexibleWidth(bool flex) { mFlexibleWidth = flex; }
    void ClearInput();
    const char* GetText() const { return mString; }
+   TextEntryType GetTextEntryType() const { return mType; }
+   void SetText(std::string text);
    
    void GetDimensions(float& width, float& height) override;
 

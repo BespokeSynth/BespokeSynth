@@ -38,6 +38,7 @@
 #include "ChannelBuffer.h"
 #include "IPulseReceiver.h"
 #include "exprtk/exprtk.hpp"
+#include "UserPrefs.h"
 
 #include "juce_audio_formats/juce_audio_formats.h"
 #include "juce_gui_basics/juce_gui_basics.h"
@@ -55,7 +56,6 @@ double gSampleRateMs = -999;
 double gInvSampleRateMs = -999;
 double gBufferSizeMs = -999;
 double gNyquistLimit = -999;
-float gDefaultTempo = 105;
 bool gPrintMidiInput = false;
 double gTime = 1; //using a double here, so I'm going to lose nanosecond accuracy
                   //if I run for 4 months straight
@@ -87,8 +87,6 @@ void SynthInit()
 {
    std::locale::global(std::locale::classic());
    
-   gDefaultTempo = gRandom() % 80 + 75;
-   
    Clear(gZeroBuffer, kWorkBufferSize);
    
    for (int i=0; i<10; ++i)
@@ -110,9 +108,9 @@ void LoadGlobalResources()
 void SetGlobalSampleRateAndBufferSize(int rate, int size)
 {
    assert(size <= kWorkBufferSize);
-   gBufferSize = size;
+   gBufferSize = size * UserPrefs.oversampling.Get();
 
-   gSampleRate = rate;
+   gSampleRate = rate * UserPrefs.oversampling.Get();
    gTwoPiOverSampleRate = TWO_PI / gSampleRate;
    gSampleRateMs = gSampleRate / 1000.0;
    gInvSampleRateMs = 1000.0 / gSampleRate;

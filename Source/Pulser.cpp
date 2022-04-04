@@ -192,6 +192,9 @@ void Pulser::OnTimeEvent(double time)
    if (mTimeMode == kTimeMode_Sync)
       flags |= kPulseFlag_SyncToTransport;
    
+   if (mTimeMode == kTimeMode_Align)
+      flags |= kPulseFlag_Align;
+   
    if (mWaitingForDownbeat && shouldReset)
       mWaitingForDownbeat = false;
    

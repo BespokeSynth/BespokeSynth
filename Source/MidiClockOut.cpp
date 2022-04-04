@@ -104,6 +104,7 @@ void MidiClockOut::OnTransportAdvanced(float amount)
       {
          case ClockMultiplier::Quarter: pulsesPerBeat /= 4; break;
          case ClockMultiplier::Half: pulsesPerBeat /= 2; break;
+         case ClockMultiplier::One: break;
          case ClockMultiplier::Two: pulsesPerBeat *= 2; break;
          case ClockMultiplier::Four: pulsesPerBeat *= 4; break;
       }

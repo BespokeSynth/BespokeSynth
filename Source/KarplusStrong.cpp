@@ -69,7 +69,7 @@ void KarplusStrong::CreateUIControls()
    mVolSlider = new FloatSlider(this,"vol",3,2,80,15,&mVolume,0,2);
    mInvertCheckbox = new Checkbox(this,"invert",mVolSlider,kAnchor_Right,&mVoiceParams.mInvert);
    mFilterSlider = new FloatSlider(this,"filter",mVolSlider,kAnchor_Below,140,15,&mVoiceParams.mFilter,0,5);
-   mFeedbackSlider = new FloatSlider(this,"feedback",mFilterSlider,kAnchor_Below,140,15,&mVoiceParams.mFeedback,.9f,.9999f,4);
+   mFeedbackSlider = new FloatSlider(this,"feedback",mFilterSlider,kAnchor_Below,140,15,&mVoiceParams.mFeedback,.5f,.9999f,4);
    mSourceDropdown = new DropdownList(this,"source type",mFeedbackSlider,kAnchor_Below,(int*)&mVoiceParams.mSourceType,52);
    mExciterFreqSlider = new FloatSlider(this,"x freq",mSourceDropdown,kAnchor_Right,85,15,&mVoiceParams.mExciterFreq,10,1000);
    mExciterAttackSlider = new FloatSlider(this,"x att",mSourceDropdown,kAnchor_Below,69,15,&mVoiceParams.mExciterAttack,0.01f,40);

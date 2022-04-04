@@ -77,8 +77,9 @@ private:
    juce::OSCSender mToSerialOsc;
    juce::OSCSender mToMonome;
    int mMonomeReceivePort;
-   bool mIsOscSetUp;
-   bool mHasMonome;
+   bool mIsOscSetUp{ false };
+   bool mHasMonome{ false };
+   bool mLightsInitialized{ false };
    int mMaxColumns;
    int mGridRotation;
    juce::String mPrefix;

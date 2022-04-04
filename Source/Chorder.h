@@ -32,13 +32,15 @@
 #include "Checkbox.h"
 #include "UIGrid.h"
 #include "DropdownList.h"
+#include "Scale.h"
 
 #define TOTAL_NUM_NOTES 128
 
-class Chorder : public NoteEffectBase, public IDrawableModule, public UIGridListener, public IDropdownListener
+class Chorder : public NoteEffectBase, public IDrawableModule, public UIGridListener, public IDropdownListener, public IScaleListener
 {
 public:
    Chorder();
+   virtual ~Chorder();
    static IDrawableModule* Create() { return new Chorder(); }
    
    
@@ -54,6 +56,8 @@ public:
    
    void CheckboxUpdated(Checkbox* checkbox) override;
    void DropdownUpdated(DropdownList* dropdown, int oldVal) override;
+
+   void OnScaleChanged() override;
 
    void SetEnabled(bool enabled) override { mEnabled = enabled; }
    virtual bool Enabled() const override { return mEnabled; }

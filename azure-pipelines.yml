@@ -19,7 +19,7 @@ jobs:
         macOS-x64:
           imageName: 'macos-10.15'
           isMac: True
-          cmakeArguments: "-GXcode -D\"CMAKE_OSX_ARCHITECTURES=x86_64\" -DBESPOKE_SIGN_AS='$(MAC_SIGNING_CERT)' -DBESPOKE_PYTHON_ROOT='/Library/Frameworks/Python.framework/Versions/3.10'"
+          cmakeArguments: "-GXcode -D\"CMAKE_OSX_ARCHITECTURES='arm64;x86_64'\" -DBESPOKE_SIGN_AS='$(MAC_SIGNING_CERT)' -DBESPOKE_PYTHON_ROOT='/Library/Frameworks/Python.framework/Versions/3.10'"
         windows-x64:
           imageName: 'windows-2019'
           isWindows: True
@@ -109,7 +109,7 @@ jobs:
           npm install -g appdmg
           wget https://www.python.org/ftp/python/3.10.0/python-3.10.0post2-macos11.pkg
           sudo installer -pkg python-3.10.0post2-macos11.pkg -target /
-        condition: and(variables.isMac, ne(variables['Build.Reason'], 'PullRequest'))
+        condition: variables.isMac
         displayName: mac - install dependencies needed for distribution build
 
       - task: InstallAppleCertificate@2

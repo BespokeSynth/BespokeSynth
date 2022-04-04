@@ -139,6 +139,18 @@ void ClickButton::Render()
       ofRect(mX + 2, mY + 4, 16, 9, 2);
       DrawTextNormal(Name(), mX + 22, mY + 12);
    }
+   else if (mDisplayStyle == ButtonDisplayStyle::kArrowRight)
+   {
+      ofSetColor(textColor);
+      ofLine(mX+6, mY+3, mX+14, mY+7);
+      ofLine(mX+6, mY+11, mX+14, mY+7);
+   }
+   else if (mDisplayStyle == ButtonDisplayStyle::kArrowLeft)
+   {
+      ofSetColor(textColor);
+      ofLine(mX+14, mY+3, mX+6, mY+7);
+      ofLine(mX+14, mY+11, mX+6, mY+7);
+   }
    
    ofPopStyle();
    

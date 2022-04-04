@@ -122,8 +122,8 @@ void NoteStepSequencer::CreateUIControls()
    FLOATSLIDER(mRandomizeVelocityDensitySlider, "rand vel density", &mRandomizeVelocityDensity, 0, 1);
    ENDUIBLOCK0();
 
-   mGrid = new UIGrid(5, 55, 200, 80, 8, 24, this);
-   mVelocityGrid = new UIGrid(5, 117, 200, 45, 8, 1, this);
+   mGrid = new UIGrid("notegrid", 5, 55, 200, 80, 8, 24, this);
+   mVelocityGrid = new UIGrid("velocitygrid", 5, 117, 200, 45, 8, 1, this);
    mLoopResetPointSlider = new IntSlider(this,"loop reset",-1,-1,100,15,&mLoopResetPoint,0,mLength);
    
    for (int i=0; i<NSS_MAX_STEPS; ++i)
@@ -1105,9 +1105,6 @@ void NoteStepSequencer::SetUpStepControls()
 void NoteStepSequencer::SaveLayout(ofxJSONElement& moduleInfo)
 {
    IDrawableModule::SaveLayout(moduleInfo);
-   
-   moduleInfo["gridwidth"] = mGrid->GetWidth();
-   moduleInfo["gridheight"] = mGrid->GetHeight();
 }
 
 void NoteStepSequencer::LoadLayout(const ofxJSONElement& moduleInfo)
@@ -1115,8 +1112,6 @@ void NoteStepSequencer::LoadLayout(const ofxJSONElement& moduleInfo)
    mModuleSaveData.LoadString("target", moduleInfo);
 
    mModuleSaveData.LoadString("controller", moduleInfo, "", FillDropdown<MidiController*>);
-   mModuleSaveData.LoadInt("gridwidth", moduleInfo, 210, 210, 2000, true);
-   mModuleSaveData.LoadInt("gridheight", moduleInfo, 120, 80, 2000, true);
    mModuleSaveData.LoadInt("gridrows", moduleInfo, 15, 1, 127, K(isTextField));
    mModuleSaveData.LoadInt("gridsteps", moduleInfo, 8, 1, NSS_MAX_STEPS, K(isTextField));
    mModuleSaveData.LoadBool("stepcontrols", moduleInfo, false);
@@ -1128,7 +1123,6 @@ void NoteStepSequencer::SetUpFromSaveData()
 {
    SetUpPatchCables(mModuleSaveData.GetString("target"));
    SetMidiController(mModuleSaveData.GetString("controller"));
-   mGrid->SetDimensions(mModuleSaveData.GetInt("gridwidth"), mModuleSaveData.GetInt("gridheight"));
    mNoteRange = mModuleSaveData.GetInt("gridrows");
    mShowStepControls = mModuleSaveData.GetBool("stepcontrols");
    UpdateVelocityGridPos();

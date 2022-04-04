@@ -502,6 +502,16 @@ void TextEntry::ClearInput()
    mCaretPosition2 = 0;
 }
 
+void TextEntry::SetText(std::string text)
+{
+   if (mVarCString)
+      StringCopy(mVarCString, text.c_str(), MAX_TEXTENTRY_LENGTH);
+   if (mVarString)
+      *mVarString = text;
+   mCaretPosition = 0;
+   mCaretPosition2 = 0;
+}
+
 void TextEntry::SetFromMidiCC(float slider, bool setViaModulator /*= false*/)
 {
    if (mType == kTextEntry_Int)
@@ -549,7 +559,7 @@ void TextEntry::SetValue(float value)
 {
    if (mType == kTextEntry_Int)
    {
-      *mVarInt = value;
+      *mVarInt = std::round(value);
       UpdateDisplayString();
    }
 

@@ -26,6 +26,8 @@ namespace juce {
    class OpenGLContext;
    class String;
    class MouseInputSource;
+   class AudioPluginFormatManager;
+   class KnownPluginList;
 }
 
 class IAudioSource;
@@ -174,6 +176,8 @@ public:
    ModuleFactory* GetModuleFactory() { return &mModuleFactory; }
    juce::AudioDeviceManager &GetAudioDeviceManager() { return *mGlobalAudioDeviceManager; }
    juce::AudioFormatManager &GetAudioFormatManager() { return *mGlobalAudioFormatManager; }
+   juce::AudioPluginFormatManager &GetAudioPluginFormatManager() { return *mAudioPluginFormatManager.get(); }
+   juce::KnownPluginList &GetKnownPluginList() { return *mKnownPluginList.get(); }
    juce::Component* GetMainComponent() { return mMainComponent; }
    juce::OpenGLContext* GetOpenGLContext() { return mOpenGLContext; }
    IDrawableModule* GetLastClickedModule() const;
@@ -380,6 +384,9 @@ private:
 
    std::vector<float*> mInputBuffers;
    std::vector<float*> mOutputBuffers;
+   
+   std::unique_ptr<juce::AudioPluginFormatManager> mAudioPluginFormatManager;
+   std::unique_ptr<juce::KnownPluginList> mKnownPluginList;
 };
 
 extern ModularSynth* TheSynth;

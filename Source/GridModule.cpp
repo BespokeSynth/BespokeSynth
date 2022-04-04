@@ -60,7 +60,7 @@ void GridModule::CreateUIControls()
    
    mMomentaryCheckbox = new Checkbox(this, "momentary", 40, 3, &mMomentary);
    
-   mGrid = new UIGrid(40, 22, 90, 90, 8, 8, this);
+   mGrid = new UIGrid("uigrid", 40, 22, 90, 90, 8, 8, this);
    mGrid->SetListener(this);
    mGridControlTarget = new GridControlTarget(this, "grid", 4, 4);
    

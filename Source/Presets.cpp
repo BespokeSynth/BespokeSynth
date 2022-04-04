@@ -38,8 +38,8 @@ Presets::Presets()
 , mBlending(false)
 , mBlendTime(0)
 , mBlendTimeSlider(nullptr)
-, mCurrentPreset(-1)
-, mCurrentPresetSelector(nullptr)
+, mCurrentPreset(0)
+, mCurrentPresetSlider(nullptr)
 {
 }
 
@@ -51,15 +51,13 @@ Presets::~Presets()
 void Presets::CreateUIControls()
 {
    IDrawableModule::CreateUIControls();
-   mGrid = new UIGrid(5,38,120,50,8,3, this);
+   mGrid = new UIGrid("uigrid", 5,38,120,50,8,3, this);
    mSaveButton = new ClickButton(this,"save",50,3);
-   mBlendTimeSlider = new FloatSlider(this,"blend ms",5,20,120,15,&mBlendTime,0,5000);
-   mCurrentPresetSelector = new DropdownList(this,"preset",85,3,&mCurrentPreset);
+   mBlendTimeSlider = new FloatSlider(this,"blend ms",5,20,70,15,&mBlendTime,0,5000);
+   mCurrentPresetSlider = new IntSlider(this,"preset",45,3,80,15,&mCurrentPreset,0,mGrid->GetCols() * mGrid->GetRows() - 1);
+   mRandomizeButton = new ClickButton(this, "random", 78, 20);
    
    mSaveButton->SetShowing(false);
-
-   for (int i=0; i<100; ++i)
-      mCurrentPresetSelector->AddLabel(ofToString(i).c_str(), i);
    
    {
       mModuleCable = new PatchCableSource(this, kConnectionType_Special);
@@ -118,7 +116,8 @@ void Presets::DrawModule()
    mGrid->Draw();
    mSaveButton->Draw();
    mBlendTimeSlider->Draw();
-   mCurrentPresetSelector->Draw();
+   mCurrentPresetSlider->Draw();
+   mRandomizeButton->Draw();
    
    int hover = mGrid->CurrentHover();
    if (hover != -1 && !mPresetCollection.empty())
@@ -127,18 +126,25 @@ void Presets::DrawModule()
       DrawTextNormal(mPresetCollection[hover].mDescription,50,0);
    }
 
-   ofVec2f pos = mGrid->GetCellPosition(hover % mGrid->GetCols(), hover / mGrid->GetCols()) + mGrid->GetPosition(true);
-   float xsize = float(mGrid->GetWidth()) / mGrid->GetCols();
-   float ysize = float(mGrid->GetHeight()) / mGrid->GetRows();
-
-   if (GetKeyModifiers() == kModifier_Shift)
+   bool shiftHeld = GetKeyModifiers() == kModifier_Shift;
+   if (shiftHeld)
    {
+      ofVec2f pos = mGrid->GetCellPosition(hover % mGrid->GetCols(), hover / mGrid->GetCols()) + mGrid->GetPosition(true);
+      float xsize = float(mGrid->GetWidth()) / mGrid->GetCols();
+      float ysize = float(mGrid->GetHeight()) / mGrid->GetRows();
+      
       ofPushStyle();
       ofSetColor(0, 0, 0);
       ofFill();
-      ofRect(pos.x + xsize / 2 - 1, pos.y + 2, 2, ysize - 4, 0);
-      ofRect(pos.x + 2, pos.y + ysize / 2 - 1, xsize - 4, 2, 0);
+      ofRect(pos.x + xsize / 2 - 1, pos.y + 3, 2, ysize - 6, 0);
+      ofRect(pos.x + 3, pos.y + ysize / 2 - 1, xsize - 6, 2, 0);
       ofPopStyle();
+   }
+   
+   if (mShiftHeld != shiftHeld)
+   {
+      mShiftHeld = shiftHeld;
+      UpdateGridValues();
    }
 }
 
@@ -150,7 +156,7 @@ void Presets::UpdateGridValues()
       float val = 0;
       if (mPresetCollection[i].mPresets.empty() == false)
          val = .5f;
-      if (i == mCurrentPreset)
+      if (i == mCurrentPreset && !mShiftHeld)
          val = 1;
       mGrid->SetVal(i%mGrid->GetCols(), i/mGrid->GetCols(), val);
    }
@@ -187,6 +193,16 @@ bool Presets::MouseMoved(float x, float y)
    return false;
 }
 
+void Presets::PlayNote(double time, int pitch, int velocity, int voiceIdx, ModulationParameters modulation)
+{
+   if (pitch < (int)mPresetCollection.size())
+   {
+      mCurrentPreset = pitch;
+      SetPreset(pitch);
+      UpdateGridValues();
+   }
+}
+
 void Presets::SetPreset(int idx)
 {
    assert(idx >= 0 && idx < mPresetCollection.size());
@@ -210,7 +226,10 @@ void Presets::SetPreset(int idx)
 
       if (control)
       {
-         if (mBlendTime == 0 || i->mHasLFO)
+         if (mBlendTime == 0 ||
+             i->mHasLFO ||
+             !i->mGridContents.empty() ||
+             !i->mString.empty())
          {
             control->SetValueDirect(i->mValue);
             
@@ -222,6 +241,22 @@ void Presets::SetPreset(int idx)
                else
                   slider->DisableLFO();
             }
+            
+            UIGrid* grid = dynamic_cast<UIGrid*>(control);
+            if (grid)
+            {
+               for (int col=0; col < i->mGridCols; ++col)
+               {
+                  for (int row=0; row < i->mGridRows; ++row)
+                  {
+                     grid->SetVal(col, row, i->mGridContents[col + row * i->mGridCols]);
+                  }
+               }
+            }
+            
+            TextEntry* textEntry = dynamic_cast<TextEntry*>(control);
+            if (textEntry && textEntry->GetTextEntryType() == kTextEntry_Text)
+               textEntry->SetText(i->mString);
          }
          else
          {
@@ -241,6 +276,26 @@ void Presets::SetPreset(int idx)
    }
    
    mDrawSetPresetsCountdown = 30;
+}
+
+void Presets::RandomizeTargets()
+{
+   for (int i=0; i<mPresetControls.size(); ++i)
+      RandomizeControl(mPresetControls[i]);
+   for (int i=0; i<mPresetModules.size(); ++i)
+   {
+      for (auto* control : mPresetModules[i]->GetUIControls())
+         RandomizeControl(control);
+   }
+}
+
+void Presets::RandomizeControl(IUIControl* control)
+{
+   if (strcmp(control->Name(), "enabled") == 0) //don't randomize enabled/disable checkbox, too annoying
+      return;
+   if (dynamic_cast<ClickButton*>(control) != nullptr)
+      return;
+   control->SetFromMidiCC(ofRandom(1), true);
 }
 
 void Presets::OnTransportAdvanced(float amount)
@@ -327,11 +382,13 @@ void Presets::Store(int idx)
    }
    for (int i=0; i<mPresetModules.size(); ++i)
    {
-      std::vector<IUIControl*> controls = mPresetModules[i]->GetUIControls();
-      for (int j=0; j<controls.size(); ++j)
+      for (auto* control : mPresetModules[i]->GetUIControls())
       {
-         coll.mPresets.push_back(Preset(controls[j], this));
+         if (dynamic_cast<ClickButton*>(control) == nullptr)
+            coll.mPresets.push_back(Preset(control, this));
       }
+      for (auto* grid : mPresetModules[i]->GetUIGrids())
+         coll.mPresets.push_back(Preset(grid, this));
    }
 }
 
@@ -360,6 +417,15 @@ void Presets::Save()
             preset["controls"][j]["lfo_soften"] = presetData.mLFOSettings.mSoften;
             preset["controls"][j]["lfo_shuffle"] = presetData.mLFOSettings.mShuffle;
          }
+         if (!presetData.mGridContents.empty())
+         {
+            preset["controls"][j]["grid_cols"] = presetData.mGridCols;
+            preset["controls"][j]["grid_rows"] = presetData.mGridRows;
+            preset["controls"][j]["grid"].resize(presetData.mGridContents.size());
+            for (int k=0; k<(int)presetData.mGridContents.size(); ++k)
+               preset["controls"][j]["grid"][k] = presetData.mGridContents[k];
+         }
+         preset["controls"][j]["string"] = presetData.mString;
          ++j;
       }
    }
@@ -409,6 +475,15 @@ void Presets::Load()
                   presetData.mLFOSettings.mSoften = preset["controls"][j]["lfo_soften"].asDouble();
                   presetData.mLFOSettings.mShuffle = preset["controls"][j]["lfo_shuffle"].asDouble();
                }
+               presetData.mGridCols = preset["controls"][j]["grid_cols"].asInt();
+               presetData.mGridRows = preset["controls"][j]["grid_rows"].asInt();
+               presetData.mGridContents.resize(preset["controls"][j]["grid"].size());
+               if (!presetData.mGridContents.empty())
+               {
+                  for (int k=0; k<(int)presetData.mGridContents.size(); ++k)
+                     presetData.mGridContents[k] = preset["controls"][j]["grid"][k].asDouble();
+               }
+               presetData.mString = preset["controls"][j]["string"].asString();
                ++j;
             }
          }
@@ -426,11 +501,13 @@ void Presets::ButtonClicked(ClickButton* button)
 {
    if (button == mSaveButton)
       Save();
+   if (button == mRandomizeButton)
+      RandomizeTargets();
 }
 
-void Presets::DropdownUpdated(DropdownList* list, int oldVal)
+void Presets::IntSliderUpdated(IntSlider* slider, int oldVal)
 {
-   if (list == mCurrentPresetSelector)
+   if (slider == mCurrentPresetSlider)
    {
       SetPreset(mCurrentPreset);
       UpdateGridValues();
@@ -456,6 +533,7 @@ void Presets::SetGridSize(float w, float h)
    int cols = MIN(w / 15, maxGridSide);
    int rows = MIN(h / 15, maxGridSide);
    mGrid->SetGrid(cols, rows);
+   mCurrentPresetSlider->SetExtents(0, mGrid->GetCols()*mGrid->GetRows() - 1);
    UpdateGridValues();
 }
 
@@ -505,6 +583,12 @@ void Presets::SaveState(FileStreamOut& out)
          out << preset.mValue;
          out << preset.mHasLFO;
          preset.mLFOSettings.SaveState(out);
+         out << preset.mGridCols;
+         out << preset.mGridRows;
+         assert(preset.mGridContents.size() == preset.mGridCols * preset.mGridRows);
+         for (size_t i=0; i<preset.mGridContents.size(); ++i)
+            out << preset.mGridContents[i];
+         out << preset.mString;
       }
       out << coll.mDescription;
    }
@@ -541,6 +625,12 @@ void Presets::LoadState(FileStreamIn& in)
          in >> presetData.mValue;
          in >> presetData.mHasLFO;
          presetData.mLFOSettings.LoadState(in);
+         in >> presetData.mGridCols;
+         in >> presetData.mGridRows;
+         presetData.mGridContents.resize(presetData.mGridCols * presetData.mGridRows);
+         for (int k=0; k<presetData.mGridCols * presetData.mGridRows; ++k)
+            in >> presetData.mGridContents[k];
+         in >> presetData.mString;
       }
       in >> mPresetCollection[i].mDescription;
    }
@@ -576,7 +666,7 @@ void Presets::LoadState(FileStreamIn& in)
 std::vector<IUIControl*> Presets::ControlsToNotSetDuringLoadState() const
 {
    std::vector<IUIControl*> ignore;
-   ignore.push_back(mCurrentPresetSelector);
+   ignore.push_back(mCurrentPresetSlider);
    return ignore;
 }
 
@@ -607,5 +697,24 @@ Presets::Preset::Preset(IUIControl* control, Presets* presets)
    {
       mHasLFO = false;
    }
+   
+   UIGrid* grid = dynamic_cast<UIGrid*>(control);
+   if (grid)
+   {
+      mGridCols = grid->GetCols();
+      mGridRows = grid->GetRows();
+      mGridContents.resize(grid->GetCols() * grid->GetRows());
+      for (int col = 0; col < grid->GetCols(); ++col)
+      {
+         for (int row = 0; row < grid->GetRows(); ++row)
+         {
+            mGridContents[col + row * grid->GetCols()] = grid->GetVal(col, row);
+         }
+      }
+   }
+   
+   TextEntry* textEntry = dynamic_cast<TextEntry*>(control);
+   if (textEntry && textEntry->GetTextEntryType() == kTextEntry_Text)
+      mString = textEntry->GetText();
 }
 

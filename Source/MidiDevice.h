@@ -92,7 +92,7 @@ public:
    bool ConnectInput(const char* name);
    void ConnectInput(int index);
    bool ConnectOutput(const char* name, int channel = 1);
-   void ConnectOutput(int index, int channel = 1);
+   bool ConnectOutput(int index, int channel = 1);
    void DisconnectInput();
    void DisconnectOutput();
    bool Reconnect();
@@ -107,6 +107,7 @@ public:
    void SendAftertouch(int pressure, int channel = -1);
    void SendProgramChange(int program, int channel = -1);
    void SendPitchBend(int bend, int channel = -1);
+   void SendSysEx(std::string data);
    void SendData(unsigned char a, unsigned char b, unsigned char c);
    void SendMessage(double time, juce::MidiMessage message);
    

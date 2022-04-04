@@ -32,6 +32,9 @@ class midicontroller:
    def send_data(this, a, b, c, page = 0):
       pass
 
+   def send_sysex(this, data, page = 0):
+      pass
+
    def add_script_listener(this, script):
       pass
 

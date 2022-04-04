@@ -26,10 +26,11 @@
 #include "UIGrid.h"
 #include "SynthGlobals.h"
 #include "FileStream.h"
+#include "IDrawableModule.h"
 
 #include <cstring>
 
-UIGrid::UIGrid(int x, int y, int w, int h, int cols, int rows, IClickable* parent)
+UIGrid::UIGrid(std::string name, int x, int y, int w, int h, int cols, int rows, IClickable* parent)
 : mClick(false)
 , mWidth(w)
 , mHeight(h)
@@ -49,12 +50,13 @@ UIGrid::UIGrid(int x, int y, int w, int h, int cols, int rows, IClickable* paren
 , mShouldDrawValue(false)
 , mMomentary(false)
 {
-   SetName("uigrid");
+   SetName(name.c_str());
    SetPosition(x,y);
    SetGrid(cols,rows);
    Clear();
    SetParent(parent);
    std::memset(mDrawOffset, 0, MAX_GRID_SIZE*sizeof(float));
+   dynamic_cast<IDrawableModule*>(parent)->AddUIGrid(this);
 }
 
 UIGrid::~UIGrid()
@@ -129,6 +131,13 @@ void UIGrid::Render()
                }
             }
          }
+         
+         if (mCurrentHover == i + j * mCols && gHoveredUIControl == nullptr)
+         {
+            ofFill();
+            ofSetColor(255, 255, 0, 170);
+            ofRect(x+2,y+2,xsize-4,ysize-4);
+         }
       }
    }
    ofNoFill();
@@ -161,6 +170,7 @@ void UIGrid::Render()
       DrawTextNormal(ofToString(GetVal(mCurrentHover % mCols, mCurrentHover / mCols)), 0, 12);
    }
    ofPopStyle();
+   
    ofPopMatrix();
 }
 
@@ -325,7 +335,7 @@ bool UIGrid::MouseMoved(float x, float y)
    float clickHeight, clickWidth;
    GridCell cell = GetGridCellAt(x, y, &clickHeight, &clickWidth);
    
-   if (mRestrictDragToRow)
+   if (mClick && mRestrictDragToRow)
    {
       if (cell.mRow > mHoldRow)
          clickHeight = mFlip ? 1 : 0;
@@ -444,7 +454,7 @@ void UIGrid::SetVal(int col, int row, float val, bool notifyListener)
       float oldValue = mData[GetDataIndex(col,row)];
       mData[GetDataIndex(col,row)] = val;
       
-      if (mSingleColumn)
+      if (mSingleColumn && val > 0)
       {
          for (int i=0; i<MAX_GRID_SIZE; ++i)
          {

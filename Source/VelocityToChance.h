@@ -18,30 +18,34 @@
 /*
   ==============================================================================
 
-    PulseButton.h
-    Created: 20 Jun 2020 2:46:02pm
+    VelocityToChance.h
+    Created: 29 Jan 2020 9:17:02pm
     Author:  Ryan Challinor
 
   ==============================================================================
 */
 
 #pragma once
+#include "NoteEffectBase.h"
+#include "Slider.h"
 
-#include "IDrawableModule.h"
-#include "IPulseReceiver.h"
-#include "ClickButton.h"
-
-class PulseButton : public IDrawableModule, public IPulseSource, public IButtonListener
+class VelocityToChance : public NoteEffectBase, public IFloatSliderListener, public IDrawableModule
 {
 public:
-   PulseButton();
-   virtual ~PulseButton();
-   static IDrawableModule* Create() { return new PulseButton(); }
+   VelocityToChance();
+   virtual ~VelocityToChance();
+   static IDrawableModule* Create() { return new VelocityToChance(); }
    
    
    void CreateUIControls() override;
-
-   void ButtonClicked(ClickButton* button) override;
+   
+   void SetEnabled(bool enabled) override { mEnabled = enabled; }
+   
+   //INoteReceiver
+   void PlayNote(double time, int pitch, int velocity, int voiceIdx = -1, ModulationParameters modulation = ModulationParameters()) override;
+   
+   void FloatSliderUpdated(FloatSlider* slider, float oldVal) override {}
+   void CheckboxUpdated(Checkbox* checkbox) override {}
    
    void LoadLayout(const ofxJSONElement& moduleInfo) override;
    void SetUpFromSaveData() override;
@@ -49,11 +53,12 @@ public:
 private:
    //IDrawableModule
    void DrawModule() override;
-   void GetModuleDimensions(float& width, float& height) override { width = mWidth; height = mHeight; }
-   bool Enabled() const override { return true; }
+   void GetModuleDimensions(float& width, float& height) override;
+   bool Enabled() const override { return mEnabled; }
    
-   ClickButton* mButton;
-   float mWidth;
-   float mHeight;
-   bool mForceImmediate{ false };
+   bool mFullVelocity{ true };
+   Checkbox* mFullVelocityCheckbox;
+   
+   float mLastRejectTime;
+   float mLastAcceptTime;
 };

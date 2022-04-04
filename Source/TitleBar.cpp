@@ -212,7 +212,7 @@ TitleBar::~TitleBar()
 void TitleBar::ManageVSTs()
 {
    if (mPluginListWindow == nullptr)
-      mPluginListWindow.reset(new PluginListWindow(VSTPlugin::sFormatManager, this));
+      mPluginListWindow.reset(new PluginListWindow(TheSynth->GetAudioPluginFormatManager(), this));
 
    mPluginListWindow->toFront(true);
 }
@@ -221,7 +221,7 @@ void TitleBar::OnWindowClosed()
 {
    mPluginListWindow.reset(nullptr);
 
-   VSTPlugin::sPluginList.createXml()->writeTo(juce::File(ofToDataPath("vst/found_vsts.xml")));
+   TheSynth->GetKnownPluginList().createXml()->writeTo(juce::File(ofToDataPath("vst/found_vsts.xml")));
 }
 
 SpawnListManager::SpawnListManager(IDropdownListener* owner)
