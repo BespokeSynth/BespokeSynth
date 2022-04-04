@@ -270,10 +270,15 @@ void SpawnListManager::SetUpPrefabsDropdown()
 
 void SpawnListManager::SetUpVstDropdown()
 {
-   std::vector<std::string> vsts;
+   std::vector<juce::PluginDescription> vsts;
    VSTLookup::GetAvailableVSTs(vsts);
-   vsts.insert(vsts.begin(), kManageVSTsLabel);
-   mVstPlugins.SetList(vsts, "vstplugin");
+   std::vector<std::string> vstNames;
+   for (auto vst : vsts)
+   {
+      vstNames.push_back(vst.name.toStdString());
+   }
+   vstNames.insert(vstNames.begin(), kManageVSTsLabel);
+   mVstPlugins.SetList(vstNames, "vstplugin");
 }
 
 void TitleBar::ListLayouts()

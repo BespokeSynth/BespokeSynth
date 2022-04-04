@@ -56,7 +56,7 @@ using namespace juce;
 
 namespace VSTLookup
 {
-   void GetAvailableVSTs(std::vector<std::string>& vsts)
+   void GetAvailableVSTs(std::vector<PluginDescription>& vsts)
    {
       static bool sFirstTime = true;
       if (sFirstTime)
@@ -71,12 +71,13 @@ namespace VSTLookup
       
       auto types = TheSynth->GetKnownPluginList().getTypes();
       for (int i=0; i<types.size(); ++i)
-         vsts.push_back(types[i].fileOrIdentifier.toStdString());
+         //vsts.push_back(types[i].fileOrIdentifier.toStdString());
+         vsts.push_back(types[i]);
 
       //for (int i = 0; i < 2000; ++i)
       //   vsts.insert(vsts.begin(), std::string("c:/a+") + ofToString(gRandom()));
 
-      SortByLastUsed(vsts);
+      //SortByLastUsed(vsts);
 
       //add a bunch of duplicates to the list, to simulate a user with many VSTs
       /*auto vstCopy = vsts;
@@ -89,15 +90,15 @@ namespace VSTLookup
    void FillVSTList(DropdownList* list)
    {
       assert(list);
-      std::vector<std::string> vsts;
+      std::vector<PluginDescription> vsts;
       GetAvailableVSTs(vsts);
       for (int i=0; i<vsts.size(); ++i)
-         list->AddLabel(vsts[i].c_str(), i);
+         list->AddLabel(vsts[i].name.toStdString(), i);
    }
    
    std::string GetVSTPath(std::string vstName)
    {
-      if (juce::String(vstName).contains("/") || juce::String(vstName).contains("\\"))  //already a path
+      /*if (juce::String(vstName).contains("/") || juce::String(vstName).contains("\\"))  //already a path
          return vstName;
       
       vstName = GetFileNameWithoutExtension(vstName).toStdString();
@@ -108,8 +109,8 @@ namespace VSTLookup
          if (vst.getFileNameWithoutExtension().toStdString() == vstName)
             return types[i].fileOrIdentifier.toStdString();
       }
-      
-      return "";
+      */
+      return vstName;
    }
 
    void SortByLastUsed(std::vector<std::string>& vsts)
@@ -280,7 +281,8 @@ void VSTPlugin::SetVST(std::string vstName)
    bool found = false;
    for (int i=0; i<types.size(); ++i)
    {
-      if (path == types[i].fileOrIdentifier)
+      //if (path == types[i].fileOrIdentifier)
+      if(path == types[i].name)
       {
          found = true;
          PluginDescription desc = types[i];
