@@ -44,16 +44,20 @@ class SpawnList
 public:
    SpawnList(IDropdownListener* owner, SpawnListManager* listManager, int x, int y, std::string label);
    void SetList(std::vector<std::string> spawnables, std::string overrideModuleType);
+   void SetListVST(std::vector<std::pair <std::string, int>> spawnableVSTs, std::string overrideModuleType);
    void OnSelection(DropdownList* list);
+   void OnSelectionVST(DropdownList* list);
    void SetPosition(int x, int y);
    void SetPositionRelativeTo(SpawnList* list);
    void Draw();
    DropdownList* GetList() { return mSpawnList; }
    IDrawableModule* Spawn();
+   IDrawableModule* SpawnVST();
    
 private:
    std::string mLabel;
    std::vector<std::string> mSpawnables;
+   std::vector<std::pair <std::string, int>> mSpawnableVSTs;
    int mSpawnIndex;
    DropdownList* mSpawnList;
    IDropdownListener* mOwner;

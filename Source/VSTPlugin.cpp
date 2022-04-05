@@ -93,7 +93,7 @@ namespace VSTLookup
       std::vector<PluginDescription> vsts;
       GetAvailableVSTs(vsts);
       for (int i=0; i<vsts.size(); ++i)
-         list->AddLabel(vsts[i].name.toStdString(), i);
+         list->AddLabel(vsts[i].name.toStdString(), vsts[i].uniqueId);
    }
    
    std::string GetVSTPath(std::string vstName)
@@ -248,27 +248,27 @@ std::string VSTPlugin::GetPluginId() const
    return "no plugin loaded";
 }
 
-void VSTPlugin::SetVST(std::string vstName)
+void VSTPlugin::SetVST(int id)
 {
-   ofLog() << "loading VST: " << vstName;
+   ofLog() << "loading VST: " << id;
    
-   mModuleSaveData.SetString("vst", vstName);
-   std::string path = VSTLookup::GetVSTPath(vstName);
-   
-   //mark VST as used
-   {
-      ofxJSONElement root;
-      root.open(ofToDataPath("vst/used_vsts.json"));
-      
-      auto time = juce::Time::getCurrentTime();
-      root["vsts"][path] = (double)time.currentTimeMillis();
+   //mModuleSaveData.SetString("vst", id);
+   //juce::PluginDescription path = VSTLookup::GetVSTPath(vstName);
+   //
+   ////mark VST as used
+   //{
+   //   ofxJSONElement root;
+   //   root.open(ofToDataPath("vst/used_vsts.json"));
+   //   
+   //   auto time = juce::Time::getCurrentTime();
+   //   root["vsts"][path] = (double)time.currentTimeMillis();
 
-      root.save(ofToDataPath("vst/used_vsts.json"), true);
-   }
-   
-   if (mPlugin != nullptr && dynamic_cast<juce::AudioPluginInstance*>(mPlugin.get())->getPluginDescription().fileOrIdentifier.toStdString() == path)
-      return;  //this VST is already loaded! we're all set
-   
+   //   root.save(ofToDataPath("vst/used_vsts.json"), true);
+   //}
+   //
+   //if (mPlugin != nullptr && dynamic_cast<juce::AudioPluginInstance*>(mPlugin.get())->getPluginDescription().fileOrIdentifier.toStdString() == path)
+   //   return;  //this VST is already loaded! we're all set
+   //
    if (mPlugin != nullptr && mWindow != nullptr)
    {
       VSTWindow* window = mWindow.release();
@@ -282,7 +282,7 @@ void VSTPlugin::SetVST(std::string vstName)
    for (int i=0; i<types.size(); ++i)
    {
       //if (path == types[i].fileOrIdentifier)
-      if(path == types[i].name)
+      if(id == types[i].uniqueId)
       {
          found = true;
          PluginDescription desc = types[i];
@@ -291,21 +291,22 @@ void VSTPlugin::SetVST(std::string vstName)
       }
    }
 
-   if (!found) //couldn't find the VST at this path. maybe its installation got moved, or the bespoke state was saved on a different computer. try to find a VST of the same name.
-   {
-      juce::String desiredVstName = juce::String(path).replaceCharacter('\\', '/').fromLastOccurrenceOf("/", false, false).upToFirstOccurrenceOf(".", false, false);
-      for (int i = 0; i < types.size(); ++i)
-      {
-         juce::String thisVstName = juce::String(types[i].fileOrIdentifier).replaceCharacter('\\', '/').fromLastOccurrenceOf("/", false, false).upToFirstOccurrenceOf(".", false, false);
-         if (thisVstName == desiredVstName)
-         {
-            found = true;
-            PluginDescription desc = types[i];
-            LoadVST(desc);
-            break;
-         }
-      }
-   }
+   //if (!found) //couldn't find the VST at this path. maybe its installation got moved, or the bespoke state was saved on a different computer. try to find a VST of the same name.
+   //{
+   //   juce::String desiredVstName = juce::String(path).replaceCharacter('\\', '/').fromLastOccurrenceOf("/", false, false).upToFirstOccurrenceOf(".", false, false);
+   //   for (int i = 0; i < types.size(); ++i)
+   //   {
+   //      juce::String thisVstName = juce::String(types[i].fileOrIdentifier).replaceCharacter('\\', '/').fromLastOccurrenceOf("/", false, false).upToFirstOccurrenceOf(".", false, false);
+   //      if (thisVstName == desiredVstName)
+   //      {
+   //         found = true;
+   //         PluginDescription desc = types[i];
+   //         LoadVST(desc);
+   //         break;
+   //      }
+   //   }
+   //}
+   
 }
 
 void VSTPlugin::LoadVST(juce::PluginDescription desc)
@@ -1015,7 +1016,7 @@ void VSTPlugin::SetUpFromSaveData()
 {
    std::string vstName = mModuleSaveData.GetString("vst");
    if (vstName != "")
-      SetVST(vstName);
+      //SetVST(vstName);
    
    SetTarget(TheSynth->FindModule(mModuleSaveData.GetString("target")));
    

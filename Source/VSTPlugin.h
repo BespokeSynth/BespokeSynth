@@ -72,7 +72,7 @@ public:
    
    juce::AudioProcessor* GetAudioProcessor() { return mPlugin.get(); }
    
-   void SetVST(std::string vstName);
+   void SetVST(int id);
    void OnVSTWindowClosed();
    
    //IAudioSource
