@@ -134,23 +134,8 @@ IDrawableModule* SpawnList::Spawn()
    if (mOverrideModuleType != "")
       moduleType = mOverrideModuleType;
 
-   //if (mOverrideModuleType == "vstplugin")
-   //{
-   //   if (mSpawnables[mSpawnIndex] == kManageVSTsLabel)
-   //   {
-   //      TheTitleBar->ManageVSTs();
-   //      return nullptr;
-   //   }
-   //}
-   
    IDrawableModule* module = TheSynth->SpawnModuleOnTheFly(moduleType, TheSynth->GetMouseX(TheSynth->GetRootContainer()) + moduleGrabOffset.x, TheSynth->GetMouseY(TheSynth->GetRootContainer()) + moduleGrabOffset.y);
-   
-   //if (mOverrideModuleType == "vstplugin")
-   //{
-   //   VSTPlugin* plugin = dynamic_cast<VSTPlugin*>(module);
-   //   plugin->SetVST(mSpawnIndex);
-   //}
-   //
+
    if (mOverrideModuleType == "prefab")
    {
       Prefab* prefab = dynamic_cast<Prefab*>(module);
@@ -165,23 +150,21 @@ IDrawableModule* SpawnList::SpawnVST()
     //std::string moduleType = mSpawnableVSTs[mSpawnIndex].first;
     //if (mOverrideModuleType != "")
     std::string moduleType = mOverrideModuleType;
-
-    /*if (mOverrideModuleType == "vstplugin")
+ 
+    if (mSpawnIndex == 0)
     {
-        if (mSpawnableVSTs[mSpawnIndex].first == kManageVSTsLabel)
-        {
-            TheTitleBar->ManageVSTs();
-            return nullptr;
-        }
-    }*/
-
+       TheTitleBar->ManageVSTs();
+       return nullptr;
+       //DBG("kManageVSTsLabel clicked \n");
+    }
+ 
     IDrawableModule* module = TheSynth->SpawnModuleOnTheFly(moduleType, TheSynth->GetMouseX(TheSynth->GetRootContainer()) + moduleGrabOffset.x, TheSynth->GetMouseY(TheSynth->GetRootContainer()) + moduleGrabOffset.y);
 
     if (mOverrideModuleType == "vstplugin")
     {
         VSTPlugin* plugin = dynamic_cast<VSTPlugin*>(module);
         plugin->SetVST(mSpawnIndex);
-        DBG(mSpawnIndex);
+        //DBG(mSpawnIndex);
     }
 
     return module;
@@ -335,10 +318,10 @@ void SpawnListManager::SetUpVstDropdown()
    std::vector<std::pair <std::string, int>> vstIDs;
    for (auto vst : vsts)
    {
-      vstIDs.push_back(std::make_pair (vst.name.toStdString(), vst.uniqueId));
+      vstIDs.push_back(std::make_pair (vst.name.toStdString() + " [" + vst.pluginFormatName.toLowerCase().toStdString() + "]", vst.uniqueId));
       DBG(vst.name.toStdString() << " " << vst.uniqueId);
    }
-   //vstIDs.insert(vstIDs.begin(), kManageVSTsLabel);
+   vstIDs.insert(vstIDs.begin(), std::make_pair(kManageVSTsLabel, 0));
    mVstPlugins.SetListVST(vstIDs, "vstplugin");
 }
 
