@@ -106,6 +106,7 @@ private:
    void LoadVST(juce::PluginDescription desc);
    
    std::string GetPluginName() const;
+   std::string GetPluginFormatName() const;
    std::string GetPluginId() const;
    void CreateParameterSliders();
    void RefreshPresetFiles();

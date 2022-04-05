@@ -230,12 +230,22 @@ void VSTPlugin::Exit()
 
 std::string VSTPlugin::GetTitleLabel() const
 {
-   return "vst: "+GetPluginName();
+   return GetPluginFormatName() + ": " +GetPluginName();
 }
 
 std::string VSTPlugin::GetPluginName() const
 {
    return mPluginName;
+}
+
+std::string VSTPlugin::GetPluginFormatName() const
+{
+   if (mPlugin)
+   {
+      const auto& desc = dynamic_cast<juce::AudioPluginInstance*>(mPlugin.get())->getPluginDescription();
+      return ofToString(desc.pluginFormatName.toLowerCase());
+   }
+   return "no plugin loaded";
 }
 
 std::string VSTPlugin::GetPluginId() const
