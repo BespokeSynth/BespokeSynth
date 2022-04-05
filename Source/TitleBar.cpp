@@ -180,8 +180,8 @@ IDrawableModule* SpawnList::SpawnVST()
     if (mOverrideModuleType == "vstplugin")
     {
         VSTPlugin* plugin = dynamic_cast<VSTPlugin*>(module);
-        //plugin->SetVST(mSpawnableVSTs[mSpawnIndex].second);
-        DBG(mSpawnableVSTs[mSpawnIndex].first);
+        plugin->SetVST(mSpawnIndex);
+        DBG(mSpawnIndex);
     }
 
     return module;
@@ -336,6 +336,7 @@ void SpawnListManager::SetUpVstDropdown()
    for (auto vst : vsts)
    {
       vstIDs.push_back(std::make_pair (vst.name.toStdString(), vst.uniqueId));
+      DBG(vst.name.toStdString() << " " << vst.uniqueId);
    }
    //vstIDs.insert(vstIDs.begin(), kManageVSTsLabel);
    mVstPlugins.SetListVST(vstIDs, "vstplugin");
