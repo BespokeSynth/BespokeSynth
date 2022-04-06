@@ -865,8 +865,6 @@ endif()
 # the code will run on windows in the pipeline.
 add_custom_target(code-quality-pipeline-checks)
 
-add_dependencies(code-quality-pipeline-checks)
-
 # Clang Format checks
 set(CLANG_FORMAT_DIRS Source)
 set(CLANG_FORMAT_EXTS cpp h)
