@@ -353,13 +353,11 @@ void ModuleContainer::DeleteModule(IDrawableModule* module)
 
    for (auto* child : module->GetChildren())
    {
-      child->MarkAsDeleted();
       child->SetEnabled(false);
       child->Exit();
       TheSynth->OnModuleDeleted(child);
    }
 
-   module->MarkAsDeleted();
    module->SetEnabled(false);
    module->Exit();
    TheSynth->OnModuleDeleted(module);
