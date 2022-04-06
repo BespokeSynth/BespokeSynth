@@ -155,7 +155,6 @@ IDrawableModule* SpawnList::SpawnVST()
     {
        TheTitleBar->ManageVSTs();
        return nullptr;
-       //DBG("kManageVSTsLabel clicked \n");
     }
  
     IDrawableModule* module = TheSynth->SpawnModuleOnTheFly(moduleType, TheSynth->GetMouseX(TheSynth->GetRootContainer()) + moduleGrabOffset.x, TheSynth->GetMouseY(TheSynth->GetRootContainer()) + moduleGrabOffset.y);
@@ -319,7 +318,6 @@ void SpawnListManager::SetUpVstDropdown()
    for (auto vst : vsts)
    {
       vstIDs.push_back(std::make_pair (vst.name.toStdString() + " [" + vst.pluginFormatName.toLowerCase().toStdString() + "]", vst.uniqueId));
-      DBG(vst.name.toStdString() << " " << vst.uniqueId);
    }
    vstIDs.insert(vstIDs.begin(), std::make_pair(kManageVSTsLabel, 0));
    mVstPlugins.SetListVST(vstIDs, "vstplugin");
