@@ -52,6 +52,7 @@ namespace VSTLookup
    void GetAvailableVSTs(std::vector<juce::PluginDescription>& vsts);
    void FillVSTList(DropdownList* list);
    std::string GetVSTPath(std::string vstName);
+   juce::PluginDescription GetVSTDesc(int id);
    void SortByLastUsed(std::vector<std::string>& vsts);
 }
 
