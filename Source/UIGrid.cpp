@@ -55,7 +55,7 @@ UIGrid::UIGrid(std::string name, int x, int y, int w, int h, int cols, int rows,
    SetGrid(cols,rows);
    Clear();
    SetParent(parent);
-   std::memset(mDrawOffset, 0, MAX_GRID_SIZE*sizeof(float));
+   mDrawOffset.fill(0);
    dynamic_cast<IDrawableModule*>(parent)->AddUIGrid(this);
 }
 
@@ -71,7 +71,7 @@ void UIGrid::Init(int x, int y, int w, int h, int cols, int rows, IClickable* pa
    SetGrid(cols,rows);
    Clear();
    SetParent(parent);
-   std::memset(mDrawOffset, 0, MAX_GRID_SIZE*sizeof(float));
+   mDrawOffset.fill(0);
 }
 
 void UIGrid::Render()
@@ -177,7 +177,7 @@ void UIGrid::Render()
 float UIGrid::GetX(int col, int row) const
 {
    float xsize = float(mWidth) / mCols;
-   return (col+mDrawOffset[row])*xsize;
+   return (col+mDrawOffset[std::clamp(row, 0, (int)mDrawOffset.size()-1)])*xsize;
 }
 
 float UIGrid::GetY(int row) const

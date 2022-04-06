@@ -391,7 +391,7 @@ void Looper::Process(double time)
             WriteInterpolatedSample(offset-1, mBuffer->GetChannel(ch), mLoopLength, mLastInputSample[ch] * writeAmount);
          mLastInputSample[ch] = GetBuffer()->GetChannel(ch)[i];
 
-         output[ch] *= volSq;
+         output[ch] = mSwitchAndRamp.Process(ch, output[ch] * volSq);
          
          mWorkBuffer.GetChannel(ch)[i] = output[ch] * mMuteRamp.Value(time);
 
@@ -523,6 +523,7 @@ void Looper::ProcessFourTet(double time, int sampleIdx)
    measurePos *= numSlices;
    int slice = (int)measurePos;
    float sliceProgress = measurePos - slice;
+   float oldOffset = mLoopPosOffset;
    if (slice % 2 == 0)
       mLoopPosOffset = (sliceProgress + slice/2) * (mLoopLength/float(numSlices) * 2);
    else
@@ -532,6 +533,10 @@ void Looper::ProcessFourTet(double time, int sampleIdx)
    mLoopPosOffset -= mLoopPos + sampleIdx * GetPlaybackSpeed();
    
    FloatWrap(mLoopPosOffset, mLoopLength);
+   
+   //smooth discontinuity
+   if (oldOffset >= mLoopLength * .5f && mLoopPosOffset < mLoopLength * .5f)
+      mSwitchAndRamp.StartSwitch();
 }
 
 void Looper::ProcessBeatwheel(double time, int sampleIdx)
@@ -666,19 +671,6 @@ void Looper::DrawModule()
    ofPushMatrix();
    
    ofTranslate(BUFFER_X,BUFFER_Y);
-   ofPushStyle();
-   ofFill();
-   float age = ofClamp((gTime-mLastCommitTime)/240000,0,1);
-   ofSetColor(100,0,0,gModuleDrawAlpha*.2f);
-   ofRect(0,0,BUFFER_W,BUFFER_H*ofClamp(age*2,0,1));
-   if (age > .5f)
-   {
-      ofSetColor(200,0,0,gModuleDrawAlpha*.2f);
-      ofRect(0,0,BUFFER_W,BUFFER_H*((age - .5f)*2));
-   }
-   //ofSetColor(255,255,255,gModuleDrawAlpha);
-   //DrawTextNormal(ofToString(mLoopCount),2,12);
-   ofPopStyle();
    
    assert(mLoopLength > 0);
    

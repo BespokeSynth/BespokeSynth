@@ -40,6 +40,7 @@
 #include "RadioButton.h"
 #include "GateEffect.h"
 #include "IPulseReceiver.h"
+#include "SwitchAndRamp.h"
 
 #include "juce_osc/juce_osc.h"
 
@@ -106,7 +107,6 @@ private:
    void SaveFile();
    void OnYoutubeSearchComplete(std::string searchTerm, double searchStartTime);
    void OnYoutubeDownloadComplete(std::string filename, std::string title);
-   void SwitchAndRamp();
    void SetCuePointForX(float mouseX);
    int GetZoomStartSample() const;
    int GetZoomEndSample() const;
@@ -220,8 +220,7 @@ private:
    std::vector<YoutubeSearchResult> mYoutubeSearchResults;
    std::array<ClickButton*, kMaxYoutubeSearchResults> mSearchResultButtons;
 
-   ChannelBuffer mLastOutputSample;
-   ChannelBuffer mSwitchAndRampVal;
+   SwitchAndRamp mSwitchAndRamp;
    
    std::vector<ChannelBuffer*> mRecordChunks;
    bool mDoRecording;   //separate this out from mRecord to allow setup in main thread before audio thread starts recording

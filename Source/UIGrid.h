@@ -143,7 +143,7 @@ private:
    float mStrength;
    int mCurrentHover;
    UIGridListener* mListener;
-   float mDrawOffset[MAX_GRID_SIZE];
+   std::array<float, MAX_GRID_SIZE> mDrawOffset;
    GridMode mGridMode;
    bool mRestrictDragToRow;
    bool mRequireShiftForMultislider;

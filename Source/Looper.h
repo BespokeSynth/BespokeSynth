@@ -39,6 +39,7 @@
 #include "JumpBlender.h"
 #include "PitchShifter.h"
 #include "INoteReceiver.h"
+#include "SwitchAndRamp.h"
 
 class LooperRecorder;
 class Rewriter;
@@ -239,6 +240,8 @@ private:
    Checkbox* mKeepPitchCheckbox;
 
    LooperGranulator* mGranulator;
+   
+   SwitchAndRamp mSwitchAndRamp;
 };
 
 
