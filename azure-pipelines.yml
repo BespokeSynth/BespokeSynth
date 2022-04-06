@@ -20,19 +20,22 @@ jobs:
           imageName: 'macos-10.15'
           isMac: True
           cmakeArguments: "-GXcode -D\"CMAKE_OSX_ARCHITECTURES='arm64;x86_64'\" -DBESPOKE_SIGN_AS='$(MAC_SIGNING_CERT)' -DBESPOKE_PYTHON_ROOT='/Library/Frameworks/Python.framework/Versions/3.10'"
+          cmakeTarget: "BespokeSynth"
         windows-x64:
           imageName: 'windows-2019'
           isWindows: True
           cmakeArguments: "-A x64"
-        windows-codequality:
-          imageName: 'windows-2019'
-          isWindows: True
-          cmakeArguments: "-A x64"
+          cmakeTarget: "BespokeSynth"
+        codequality:
+          imageName: 'ubuntu-20.04'
+          isLinux: True
+          cmakeArguments: ""
           cmakeTarget: "code-quality-pipeline-checks"
         linux-x64:
           imageName: 'ubuntu-20.04'
           isLinux: True
           cmakeArguments: "-GNinja"
+          cmakeTarget: "BespokeSynth"
 
     pool:
       vmImage: $(imageName)
@@ -48,7 +51,7 @@ jobs:
 
           if [ $(Build.Reason) == "PullRequest" ]; then
             export CMAKE_CONFIG=Debug
-            export CMAKE_TARGET=BespokeSynth
+            export CMAKE_TARGET=$(cmakeTarget)
             echo "##vso[task.setvariable variable=CMAKE_CONFIG]Debug"
             echo "##vso[task.setvariable variable=CMAKE_CONFIG;isOutput=true]Debug"
             echo "##vso[task.setvariable variable=CMAKE_TARGET]BespokeSynth"

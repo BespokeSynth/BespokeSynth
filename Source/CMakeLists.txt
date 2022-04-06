@@ -862,7 +862,7 @@ endif()
 # CI Pipeline {{{
 # this checks if PRs are following clang-format rules
 # nabbed from https://github.com/surge-synthesizer/surge/blob/94fa4c7d4d4bbfdfe34820bd365f653b49314747/CMakeLists.txt#L172
-# the code will run on windows in the pipeline.
+# the code will run on linux in the pipeline.
 add_custom_target(code-quality-pipeline-checks)
 
 # Clang Format checks
