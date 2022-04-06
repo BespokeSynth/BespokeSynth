@@ -66,7 +66,7 @@ DrumPlayer::DrumPlayer()
 {
 
    ReadKits();
-   
+
    strcpy(mNewKitName, "new");
 }
 
@@ -88,17 +88,17 @@ DrumPlayer::~DrumPlayer()
 void DrumPlayer::CreateUIControls()
 {
    IDrawableModule::CreateUIControls();
-   mVolSlider = new FloatSlider(this,"vol",4,2,100,15,&mVolume,0,2);
-   mSpeedSlider = new FloatSlider(this,"speed",4,18,100,15,&mSpeed,0.2f,3);
+   mVolSlider = new FloatSlider(this, "vol", 4, 2, 100, 15, &mVolume, 0, 2);
+   mSpeedSlider = new FloatSlider(this, "speed", 4, 18, 100, 15, &mSpeed, 0.2f, 3);
    mSpeedRandomizationSlider = new FloatSlider(this, "speed rnd", 4, 34, 100, 15, &mSpeedRandomization, 0, .2f);
-   mKitSelector = new DropdownList(this,"kit",4,50,&mLoadedKit);
-   mEditCheckbox = new Checkbox(this,"edit",73,52,&mEditMode);
+   mKitSelector = new DropdownList(this, "kit", 4, 50, &mLoadedKit);
+   mEditCheckbox = new Checkbox(this, "edit", 73, 52, &mEditMode);
    //mSaveButton = new ClickButton(this,"save current",200,22);
    //mNewKitButton = new ClickButton(this,"new kit", 200, 4);
    //mNewKitNameEntry = new TextEntry(this,"kitname",200, 40,7,mNewKitName);
-   mAuditionSlider = new FloatSlider(this,"aud",140,50,40,15,&mAuditionInc,-1,1,0);
-   mMonoCheckbox = new Checkbox(this,"mono",mVolSlider,kAnchor_Right_Padded,&mMonoOutput);
-   mShuffleButton = new ClickButton(this,"shuffle",140,34);
+   mAuditionSlider = new FloatSlider(this, "aud", 140, 50, 40, 15, &mAuditionInc, -1, 1, 0);
+   mMonoCheckbox = new Checkbox(this, "mono", mVolSlider, kAnchor_Right_Padded, &mMonoOutput);
+   mShuffleButton = new ClickButton(this, "shuffle", 140, 34);
    mGridControlTarget = new GridControlTarget(this, "grid", 4, 50);
    mQuantizeIntervalSelector = new DropdownList(this, "quantize", 200, 4, (int*)(&mQuantizeInterval));
    mNoteRepeatCheckbox = new Checkbox(this, "repeat", 200, 22, &mNoteRepeat);
@@ -114,50 +114,50 @@ void DrumPlayer::CreateUIControls()
    mQuantizeIntervalSelector->AddLabel("16nt", kInterval_16nt);
    mQuantizeIntervalSelector->AddLabel("32n", kInterval_32n);
    mQuantizeIntervalSelector->AddLabel("64n", kInterval_64n);
-   
-   for (int i=0; i<NUM_DRUM_HITS; ++i)
+
+   for (int i = 0; i < NUM_DRUM_HITS; ++i)
       mDrumHits[i].CreateUIControls(this, i);
-   
-   for (int i=0; i<mKits.size(); ++i)
+
+   for (int i = 0; i < mKits.size(); ++i)
       mKitSelector->AddLabel(mKits[i].mName.c_str(), i);
-   
+
    UpdateVisibleControls();
-   
+
    GetPatchCableSource()->SetManualSide(PatchCableSource::Side::kBottom);
    mSpeedRandomizationSlider->SetMode(FloatSlider::kSquare);
 }
 
 void DrumPlayer::DrumHit::CreateUIControls(DrumPlayer* owner, int index)
 {
-   UIBLOCK(310,37);
+   UIBLOCK(310, 37);
 #undef UIBLOCK_OWNER
 #define UIBLOCK_OWNER owner //change owner
-   FLOATSLIDER_DIGITS(mVolSlider, ("vol "+ofToString(index)).c_str(),&mVol,0,2,2);
-   FLOATSLIDER_DIGITS(mSpeedSlider, ("speed "+ofToString(index)).c_str(),&mSpeed,.2f,3,2);
-   FLOATSLIDER(mPanSlider, ("pan "+ofToString(index)).c_str(),&mPan,-1,1);
-   INTSLIDER(mWidenSlider, ("widen "+ofToString(index)).c_str(),&mWiden,-150,150);
-   FLOATSLIDER(mStartOffsetSlider, ("start "+ofToString(index)).c_str(),&mStartOffset,0,1);
-   CHECKBOX(mIndividualOutputCheckbox, ("single out "+ofToString(index)).c_str(),&mHasIndividualOutput);
+   FLOATSLIDER_DIGITS(mVolSlider, ("vol " + ofToString(index)).c_str(), &mVol, 0, 2, 2);
+   FLOATSLIDER_DIGITS(mSpeedSlider, ("speed " + ofToString(index)).c_str(), &mSpeed, .2f, 3, 2);
+   FLOATSLIDER(mPanSlider, ("pan " + ofToString(index)).c_str(), &mPan, -1, 1);
+   INTSLIDER(mWidenSlider, ("widen " + ofToString(index)).c_str(), &mWiden, -150, 150);
+   FLOATSLIDER(mStartOffsetSlider, ("start " + ofToString(index)).c_str(), &mStartOffset, 0, 1);
+   CHECKBOX(mIndividualOutputCheckbox, ("single out " + ofToString(index)).c_str(), &mHasIndividualOutput);
    INTSLIDER(mLinkIdSlider, ("linkid " + ofToString(index)).c_str(), &mLinkId, -1, 5);
-   CHECKBOX(mUseEnvelopeCheckbox, ("envelope "+ofToString(index)).c_str(),&mUseEnvelope);
-   FLOATSLIDER(mEnvelopeLengthSlider, ("view ms "+ofToString(index)).c_str(),&mEnvelopeLength,10,2000);
-   DROPDOWN(mHitCategoryDropdown,("hitcategory"+ofToString(index)).c_str(),&mHitCategoryIndex,100);
-   UICONTROL_CUSTOM(mEnvelopeDisplay, new ADSRDisplay(UICONTROL_BASICS(("envelopedisplay "+ofToString(index)).c_str()),135, 100,&mEnvelope));
+   CHECKBOX(mUseEnvelopeCheckbox, ("envelope " + ofToString(index)).c_str(), &mUseEnvelope);
+   FLOATSLIDER(mEnvelopeLengthSlider, ("view ms " + ofToString(index)).c_str(), &mEnvelopeLength, 10, 2000);
+   DROPDOWN(mHitCategoryDropdown, ("hitcategory" + ofToString(index)).c_str(), &mHitCategoryIndex, 100);
+   UICONTROL_CUSTOM(mEnvelopeDisplay, new ADSRDisplay(UICONTROL_BASICS(("envelopedisplay " + ofToString(index)).c_str()), 135, 100, &mEnvelope));
    BUTTON_STYLE(mGrabSampleButton, ("grab " + ofToString(index)).c_str(), ButtonDisplayStyle::kGrabSample);
    ENDUIBLOCK0();
 #undef UIBLOCK_OWNER
 #define UIBLOCK_OWNER this //reset
-   
+
    int x = 5 + (index % 4) * 70;
-   int y = 70 + (3-(index / 4)) * 70;
-   mTestButton = new ClickButton(owner,("test "+ofToString(index)).c_str(),x+5,y+38,ButtonDisplayStyle::kPlay);
-   mPrevButton = new ClickButton(owner,("prev "+ofToString(index)).c_str(),x+27,y+38,ButtonDisplayStyle::kArrowLeft);
-   mNextButton = new ClickButton(owner,("next "+ofToString(index)).c_str(),x+48,y+38,ButtonDisplayStyle::kArrowRight);
-   
-   mRandomButton = new ClickButton(owner,("random "+ofToString(index)).c_str(),x+5,y+53);
-   
+   int y = 70 + (3 - (index / 4)) * 70;
+   mTestButton = new ClickButton(owner, ("test " + ofToString(index)).c_str(), x + 5, y + 38, ButtonDisplayStyle::kPlay);
+   mPrevButton = new ClickButton(owner, ("prev " + ofToString(index)).c_str(), x + 27, y + 38, ButtonDisplayStyle::kArrowLeft);
+   mNextButton = new ClickButton(owner, ("next " + ofToString(index)).c_str(), x + 48, y + 38, ButtonDisplayStyle::kArrowRight);
+
+   mRandomButton = new ClickButton(owner, ("random " + ofToString(index)).c_str(), x + 5, y + 53);
+
    UpdateHitDirectoryDropdown();
-   
+
    mOwner = owner;
 }
 
@@ -188,7 +188,7 @@ void DrumPlayer::DrumHit::UpdateHitDirectoryDropdown()
    for (auto dir : sHitDirectories)
       mHitCategoryDropdown->AddLabel(dir, mHitCategoryDropdown->GetNumValues());
    mHitCategoryIndex = -1;
-   for (int i=0; i<mHitCategoryDropdown->GetNumValues(); ++i)
+   for (int i = 0; i < mHitCategoryDropdown->GetNumValues(); ++i)
    {
       if (mHitCategory == mHitCategoryDropdown->GetLabel(i))
          mHitCategoryIndex = i;
@@ -209,7 +209,7 @@ void DrumPlayer::SetUpNewDrumPlayer()
    root.open(ofToDataPath("drums/drums.json"));
 
    std::array<std::string, NUM_DRUM_HITS> categories = { "808kit/Kick", "808kit/Snare", "808kit/HatClosed", "808kit/HatOpen", "808kit/Kick", "808kit/Clap", "808kit/HatClosed", "808kit/Perc",
-                                               "808kit/Kick", "808kit/Snare", "808kit/HatClosed", "808kit/HatOpen", "808kit/Kick", "808kit/Clap", "808kit/HatClosed", "808kit/Perc" };
+                                                         "808kit/Kick", "808kit/Snare", "808kit/HatClosed", "808kit/HatOpen", "808kit/Kick", "808kit/Clap", "808kit/HatClosed", "808kit/Perc" };
    for (auto i = 0; i < root["directories"].size() && i < categories.size(); ++i)
       categories[i] = root["directories"][i].asString();
 
@@ -233,7 +233,7 @@ void DrumPlayer::SetUpNewDrumPlayer()
 
 void DrumPlayer::UpdateVisibleControls()
 {
-   for (int i=0; i<NUM_DRUM_HITS; ++i)
+   for (int i = 0; i < NUM_DRUM_HITS; ++i)
       mDrumHits[i].SetUIControlsShowing(i == mSelectedHitIdx && mEditMode);
 }
 
@@ -261,7 +261,7 @@ void DrumPlayer::LoadKit(int kit)
       mLoadedKit = kit;
 
       LoadSampleLock();
-      for (int i=0; i<NUM_DRUM_HITS; ++i)
+      for (int i = 0; i < NUM_DRUM_HITS; ++i)
       {
          mDrumHits[i].mSample.Read(mKits[kit].mSampleFiles[i].c_str());
          mDrumHits[i].mLinkId = mKits[kit].mLinkIds[i];
@@ -291,37 +291,37 @@ void DrumPlayer::LoadSampleUnlock()
 void DrumPlayer::Process(double time)
 {
    PROFILER(DrumPlayer);
-   
+
    if (!mEnabled)
       return;
-   
+
    mNoteInputBuffer.Process(time);
-   
+
    int numChannels = mMonoOutput ? 1 : 2;
-   
+
    ComputeSliders(0);
    SyncOutputBuffer(numChannels);
    for (auto output : mIndividualOutputs)
       output->mVizBuffer->SetNumChannels(numChannels);
    mOutputBuffer.SetNumActiveChannels(numChannels);
-   
+
    int bufferSize = gBufferSize;
-   
+
    float volSq = mVolume * mVolume * .5f;
-   
+
    mOutputBuffer.Clear();
-   
+
    if (!mLoadingSamples)
    {
       mLoadSamplesAudioMutex.lock();
       mLoadingSamples = true;
-      for (int i=0; i<NUM_DRUM_HITS; ++i)
+      for (int i = 0; i < NUM_DRUM_HITS; ++i)
       {
          int individualOutputIndex = GetIndividualOutputIndex(i);
          gWorkChannelBuffer.SetNumActiveChannels(numChannels);
          if (mDrumHits[i].Process(time, mSpeed, volSq, &gWorkChannelBuffer, bufferSize))
          {
-            for (int ch=0; ch<numChannels; ++ch)
+            for (int ch = 0; ch < numChannels; ++ch)
             {
                if (individualOutputIndex != -1)
                {
@@ -341,7 +341,7 @@ void DrumPlayer::Process(double time)
          {
             if (individualOutputIndex != -1)
             {
-               for (int ch=0; ch<numChannels; ++ch)
+               for (int ch = 0; ch < numChannels; ++ch)
                   mIndividualOutputs[individualOutputIndex]->mVizBuffer->WriteChunk(gZeroBuffer, bufferSize, ch);
             }
          }
@@ -349,12 +349,12 @@ void DrumPlayer::Process(double time)
       mLoadingSamples = false;
       mLoadSamplesAudioMutex.unlock();
    }
-   
+
    IAudioReceiver* target = GetTarget();
-   for (int ch=0; ch<numChannels; ++ch)
+   for (int ch = 0; ch < numChannels; ++ch)
    {
       GetVizBuffer()->WriteChunk(mOutputBuffer.GetChannel(ch), bufferSize, ch);
-   
+
       if (target)
          Add(target->GetBuffer()->GetChannel(ch), mOutputBuffer.GetChannel(ch), bufferSize);
    }
@@ -372,7 +372,7 @@ void DrumPlayer::DrumHit::StartPlayhead(double time, float startOffsetPercent, f
          mPlayheads[i].mOffset = startOffsetPercent * mSample.LengthInSamples();
          mPlayheads[i].mEnvelopeTime = 0;
          mPlayheads[i].mEnvelopeScale = ofLerp(.2f, 1, velocity);
-         mPlayheads[i].mSpeedTweak = ofRandom(1-mOwner->mSpeedRandomization, 1+ mOwner->mSpeedRandomization);
+         mPlayheads[i].mSpeedTweak = ofRandom(1 - mOwner->mSpeedRandomization, 1 + mOwner->mSpeedRandomization);
       }
       else
       {
@@ -468,7 +468,7 @@ bool DrumPlayer::DrumHit::Process(double time, float speed, float vol, ChannelBu
       }
 
       time += gInvSampleRateMs;
-   }   
+   }
 
    if (mSamplesRemainingToProcess > 0)
    {
@@ -487,13 +487,13 @@ bool DrumPlayer::DrumHit::Process(double time, float speed, float vol, ChannelBu
 
       return true;
    }
-      
+
    return false;
 }
 
 int DrumPlayer::GetIndividualOutputIndex(int hitIndex)
 {
-   for (int i=0; i<mIndividualOutputs.size(); ++i)
+   for (int i = 0; i < mIndividualOutputs.size(); ++i)
    {
       if (mIndividualOutputs[i]->mHitIndex == hitIndex)
          return i;
@@ -511,7 +511,7 @@ void DrumPlayer::PlayNote(double time, int pitch, int velocity, int voiceIdx, Mo
       mNoteInputBuffer.QueueNote(time, pitch, velocity, voiceIdx, modulation);
       return;
    }
-   
+
    pitch %= 24;
    if (pitch >= 0 && pitch < NUM_DRUM_HITS)
    {
@@ -535,7 +535,7 @@ void DrumPlayer::PlayNote(double time, int pitch, int velocity, int voiceIdx, Mo
          float startOffsetPercent = mDrumHits[pitch].mStartOffset;
          if (modulation.modWheel != nullptr)
             startOffsetPercent += modulation.modWheel->GetValue(0);
-         mDrumHits[pitch].StartPlayhead(time, startOffsetPercent, velocity/127.0f);
+         mDrumHits[pitch].StartPlayhead(time, startOffsetPercent, velocity / 127.0f);
       }
    }
 }
@@ -544,18 +544,18 @@ void DrumPlayer::FilesDropped(std::vector<std::string> files, int x, int y)
 {
    x -= 5;
    y -= 70;
-   if (x<0 || y<0)
+   if (x < 0 || y < 0)
       return;
    x /= 70;
    y /= 70;
-   
+
    File auditionDir(files[0]);
 
    if (auditionDir.isDirectory())
    {
       mAuditionDir = files[0];
       if (x < 4 && y < 4)
-         mSelectedHitIdx = GetAssociatedSampleIndex(x,y);
+         mSelectedHitIdx = GetAssociatedSampleIndex(x, y);
       mAuditionSampleIdx = -1;
    }
    else
@@ -563,9 +563,9 @@ void DrumPlayer::FilesDropped(std::vector<std::string> files, int x, int y)
       auditionDir = "";
       if (x < 4 && y < 4)
       {
-         for (int i=0; i<files.size(); ++i)
+         for (int i = 0; i < files.size(); ++i)
          {
-            int sampleIdx = GetAssociatedSampleIndex(x+i%4, y+i/4);
+            int sampleIdx = GetAssociatedSampleIndex(x + i % 4, y + i / 4);
             if (sampleIdx != -1)
             {
                LoadSampleLock();
@@ -589,21 +589,21 @@ void DrumPlayer::SampleDropped(int x, int y, Sample* sample)
 {
    assert(sample);
    int numSamples = sample->LengthInSamples();
-   
+
    if (numSamples <= 0)
       return;
-   
+
    x -= 5;
    y -= 70;
-   if (x<0 || y<0)
+   if (x < 0 || y < 0)
       return;
    x /= 70;
    y /= 70;
-   
+
    mAuditionDir = "";
    if (x < 4 && y < 4)
    {
-      int sampleIdx = GetAssociatedSampleIndex(x,y);
+      int sampleIdx = GetAssociatedSampleIndex(x, y);
       if (sampleIdx != -1)
       {
          SetHitSample(sampleIdx, sample);
@@ -640,17 +640,17 @@ void DrumPlayer::SetHitSample(int sampleIndex, Sample* sample)
 
 void DrumPlayer::OnClicked(int x, int y, bool right)
 {
-   IDrawableModule::OnClicked(x,y,right);
-   
+   IDrawableModule::OnClicked(x, y, right);
+
    if (right)
       return;
-   
+
    if (!mEditMode)
       return;
 
    x -= 5;
    y -= 70;
-   if (x<0 || y<0)
+   if (x < 0 || y < 0)
       return;
    x /= 70;
    y /= 70;
@@ -660,7 +660,7 @@ void DrumPlayer::OnClicked(int x, int y, bool right)
       if (sampleIdx != -1)
       {
          mSelectedHitIdx = sampleIdx;
-         mAuditionDir = ofToDataPath("drums/"+mDrumHits[sampleIdx].mHitCategory);
+         mAuditionDir = ofToDataPath("drums/" + mDrumHits[sampleIdx].mHitCategory);
          UpdateVisibleControls();
       }
    }
@@ -705,7 +705,7 @@ void DrumPlayer::DrawModule()
 {
    if (Minimized() || IsVisible() == false)
       return;
-   
+
    mVolSlider->Draw();
    mSpeedSlider->Draw();
    mSpeedRandomizationSlider->Draw();
@@ -720,7 +720,7 @@ void DrumPlayer::DrawModule()
       ofSetColor(50, 50, 50, gModuleDrawAlpha);
       ofRect(300, 5, 145, 360);
       ofPopStyle();
-      
+
       mMonoCheckbox->Draw();
       //mSaveButton->Draw();
       //mNewKitButton->Draw();
@@ -733,9 +733,9 @@ void DrumPlayer::DrawModule()
       ofPushMatrix();
       ofPushStyle();
       ofTranslate(5, 70);
-      for (int i=0; i<4; ++i)
+      for (int i = 0; i < 4; ++i)
       {
-         for (int j=0; j<4; ++j)
+         for (int j = 0; j < 4; ++j)
          {
             int sampleIdx = GetAssociatedSampleIndex(i, j);
 
@@ -744,19 +744,19 @@ void DrumPlayer::DrawModule()
             ofRect(i * 70, j * 70, 70, 70);
 
             float alpha = sqrt(1 - mDrumHits[sampleIdx].GetPlayProgress(gTime));
-            ofSetColor(200,100,0,gModuleDrawAlpha * alpha);
+            ofSetColor(200, 100, 0, gModuleDrawAlpha * alpha);
             ofFill();
-            ofRect(i*70,j*70,70,70);
-            
+            ofRect(i * 70, j * 70, 70, 70);
+
             if (sampleIdx == mSelectedHitIdx)
             {
-               ofSetColor(0,200,255,gModuleDrawAlpha);
+               ofSetColor(0, 200, 255, gModuleDrawAlpha);
                ofNoFill();
-               ofRect(i*70+1,j*70+1,68,68);
+               ofRect(i * 70 + 1, j * 70 + 1, 68, 68);
             }
 
-            ofSetColor(255,255,255,gModuleDrawAlpha);
-            gFont.DrawStringWrap(mDrumHits[sampleIdx].mSample.Name(), 12, i*70+5,j*70+10, 60);
+            ofSetColor(255, 255, 255, gModuleDrawAlpha);
+            gFont.DrawStringWrap(mDrumHits[sampleIdx].mSample.Name(), 12, i * 70 + 5, j * 70 + 10, 60);
          }
       }
       ofPopStyle();
@@ -769,16 +769,16 @@ void DrumPlayer::DrawModule()
          mDrumHits[i].mNextButton->Draw();
          mDrumHits[i].mRandomButton->Draw();
       }
-      
+
       if (mSelectedHitIdx != -1)
          mDrumHits[mSelectedHitIdx].DrawUIControls();
    }
-   
+
    float moduleW, moduleH;
    GetDimensions(moduleW, moduleH);
-   for (int i=0; i<mIndividualOutputs.size(); ++i)
+   for (int i = 0; i < mIndividualOutputs.size(); ++i)
    {
-      DrawTextNormal(ofToString(mIndividualOutputs[i]->mHitIndex), moduleW - 20, 10 + i*12);
+      DrawTextNormal(ofToString(mIndividualOutputs[i]->mHitIndex), moduleW - 20, 10 + i * 12);
       mIndividualOutputs[i]->UpdatePosition(i);
    }
 }
@@ -787,9 +787,9 @@ void DrumPlayer::UpdateLights()
 {
    const int kCols = 4;
    const int kRows = 4;
-   for (int x=0; x<kCols; ++x)
+   for (int x = 0; x < kCols; ++x)
    {
-      for (int y=0; y<kRows; ++y)
+      for (int y = 0; y < kRows; ++y)
       {
          int sampleIdx = GetAssociatedSampleIndex(x, y);
          Sample* sample = nullptr;
@@ -798,11 +798,11 @@ void DrumPlayer::UpdateLights()
          if (mGridControlTarget->GetGridController())
          {
             if (mDrumHits[sampleIdx].GetPlayProgress(gTime) < .75f)
-               mGridControlTarget->GetGridController()->SetLight(x,y,kGridColor3Bright);
+               mGridControlTarget->GetGridController()->SetLight(x, y, kGridColor3Bright);
             else if (sample)
-               mGridControlTarget->GetGridController()->SetLight(x,y,kGridColor3Dim);
+               mGridControlTarget->GetGridController()->SetLight(x, y, kGridColor3Dim);
             else
-               mGridControlTarget->GetGridController()->SetLight(x,y,kGridColorOff);
+               mGridControlTarget->GetGridController()->SetLight(x, y, kGridColorOff);
          }
       }
    }
@@ -823,11 +823,11 @@ void DrumPlayer::DrumHit::DrawUIControls()
    if (!mOwner->mLoadingSamples)
    {
       mOwner->mLoadSamplesDrawMutex.lock();
-      DrawAudioBuffer(135, 100, mSample.Data(), mStartOffset*displayLength, displayLength, mSample.GetPlayPosition());
+      DrawAudioBuffer(135, 100, mSample.Data(), mStartOffset * displayLength, displayLength, mSample.GetPlayPosition());
       mOwner->mLoadSamplesDrawMutex.unlock();
    }
    ofPopMatrix();
-   
+
    mVolSlider->Draw();
    mSpeedSlider->Draw();
    mLinkIdSlider->Draw();
@@ -850,15 +850,15 @@ void DrumPlayer::DrumHit::DrawUIControls()
 
 int DrumPlayer::GetAssociatedSampleIndex(int x, int y)
 {
-    if (x > 3)
-    {
-        // For long rows, overflow the x value vertically
-        // This makes e.g. 8 pads on a single row usable for
-        // two drumplayer rows
-        y = y + (x / 4);
-        x = x % 4;
-    }
-   int pos = x+(3-y)*4;
+   if (x > 3)
+   {
+      // For long rows, overflow the x value vertically
+      // This makes e.g. 8 pads on a single row usable for
+      // two drumplayer rows
+      y = y + (x / 4);
+      x = x % 4;
+   }
+   int pos = x + (3 - y) * 4;
    if (pos < 16)
       return pos;
    return -1;
@@ -869,18 +869,18 @@ void DrumPlayer::SaveKits()
    ofxJSONElement root;
 
    Json::Value& kits = root["kits"];
-   for (int i=0; i<mKits.size(); ++i)
+   for (int i = 0; i < mKits.size(); ++i)
    {
       Json::Value& kit = kits[i];
-      
+
       if (i == mLoadedKit)
       {
-         for (int j=0; j<NUM_DRUM_HITS; ++j)
+         for (int j = 0; j < NUM_DRUM_HITS; ++j)
          {
             //get relative path if it's in our data dir
             std::string path = mDrumHits[j].mSample.GetReadPath();
             ofStringReplace(path, File(ofToDataPath("")).getFullPathName().toStdString(), "");
-            
+
             mKits[i].mSampleFiles[j] = path;
             mKits[i].mLinkIds[j] = mDrumHits[j].mLinkId;
             mKits[i].mVols[j] = mDrumHits[j].mVol;
@@ -888,8 +888,8 @@ void DrumPlayer::SaveKits()
             mKits[i].mPans[j] = mDrumHits[j].mPan;
          }
       }
-      
-      for (int j=0; j<NUM_DRUM_HITS; ++j)
+
+      for (int j = 0; j < NUM_DRUM_HITS; ++j)
       {
          kit["samples"][j]["sample"] = mKits[i].mSampleFiles[j];
          kit["samples"][j]["linkid"] = mKits[i].mLinkIds[j];
@@ -910,13 +910,13 @@ void DrumPlayer::ReadKits()
 
    Json::Value& kits = root["kits"];
    mKits.resize(kits.size());
-   for (int i=0; i<kits.size(); ++i)
+   for (int i = 0; i < kits.size(); ++i)
    {
       try
       {
          Json::Value& kit = kits[i];
          int numHitsInFile = kit["samples"].size();
-         for (int j=0; j<NUM_DRUM_HITS && j<numHitsInFile; ++j)
+         for (int j = 0; j < NUM_DRUM_HITS && j < numHitsInFile; ++j)
          {
             mKits[i].mSampleFiles[j] = kit["samples"][j]["sample"].asString();
             mKits[i].mLinkIds[j] = kit["samples"][j]["linkid"].asInt();
@@ -947,7 +947,7 @@ void DrumPlayer::CreateKit()
    StoredDrumKit kit;
 
    kit.mName = mNewKitName;
-   for (int i=0; i<NUM_DRUM_HITS; ++i)
+   for (int i = 0; i < NUM_DRUM_HITS; ++i)
    {
       kit.mSampleFiles[i] = mDrumHits[i].mSample.GetReadPath();
       kit.mLinkIds[i] = mDrumHits[i].mLinkId;
@@ -960,12 +960,12 @@ void DrumPlayer::CreateKit()
 
 void DrumPlayer::ShuffleKit()
 {
-   for (int j=0; j<NUM_DRUM_HITS; ++j)
+   for (int j = 0; j < NUM_DRUM_HITS; ++j)
    {
       mDrumHits[j].LoadRandomSample();
-      mDrumHits[j].mVol *= ofRandom(.9f,1.1f);
-      mDrumHits[j].mSpeed *= ofRandom(.9f,1.1f);
-      mDrumHits[j].mPan = ofRandom(-1.0f,1.0f);
+      mDrumHits[j].mVol *= ofRandom(.9f, 1.1f);
+      mDrumHits[j].mSpeed *= ofRandom(.9f, 1.1f);
+      mDrumHits[j].mPan = ofRandom(-1.0f, 1.0f);
    }
 }
 
@@ -990,15 +990,15 @@ void DrumPlayer::FloatSliderUpdated(FloatSlider* slider, float oldVal)
 {
    if (slider == mAuditionSlider)
    {
-      mAuditionSampleIdx += mAuditionInc>0?-1:1;
+      mAuditionSampleIdx += mAuditionInc > 0 ? -1 : 1;
       mAuditionInc = 0;
       File dir(mAuditionDir);
       Array<File> files;
       dir.findChildFiles(files, File::findFiles, false);
       if (files.size() > 0)
       {
-         mAuditionSampleIdx = ofClamp(mAuditionSampleIdx,0,files.size()-1);
-         
+         mAuditionSampleIdx = ofClamp(mAuditionSampleIdx, 0, files.size() - 1);
+
          std::string file = files[mAuditionSampleIdx].getFullPathName().toStdString();
          if (mSelectedHitIdx >= 0 && mSelectedHitIdx < NUM_DRUM_HITS)
          {
@@ -1021,7 +1021,7 @@ void DrumPlayer::DropdownUpdated(DropdownList* list, int oldVal)
 {
    if (list == mKitSelector)
       LoadKit(mLoadedKit);
-   for (int i=0; i<NUM_DRUM_HITS; ++i)
+   for (int i = 0; i < NUM_DRUM_HITS; ++i)
    {
       if (list == mDrumHits[i].mHitCategoryDropdown)
          mDrumHits[i].mHitCategory = mDrumHits[i].mHitCategoryDropdown->GetLabel(mDrumHits[i].mHitCategoryIndex);
@@ -1039,8 +1039,8 @@ void DrumPlayer::CheckboxUpdated(Checkbox* checkbox)
 {
    if (checkbox == mEditCheckbox)
       UpdateVisibleControls();
-   
-   for (int i=0; i<NUM_DRUM_HITS; ++i)
+
+   for (int i = 0; i < NUM_DRUM_HITS; ++i)
    {
       if (checkbox == mDrumHits[i].mIndividualOutputCheckbox)
       {
@@ -1071,8 +1071,8 @@ void DrumPlayer::ButtonClicked(ClickButton* button)
       CreateKit();*/
    if (button == mShuffleButton)
       ShuffleKit();
-   
-   for (int i=0; i<NUM_DRUM_HITS; ++i)
+
+   for (int i = 0; i < NUM_DRUM_HITS; ++i)
    {
       if (button == mDrumHits[i].mTestButton)
          PlayNote(gTime + gBufferSizeMs, i, 127);
@@ -1101,7 +1101,7 @@ void DrumPlayer::DrumHit::LoadSample(std::string path)
 
 void DrumPlayer::DrumHit::LoadRandomSample()
 {
-   File dir(ofToDataPath("drums/"+mHitCategory));
+   File dir(ofToDataPath("drums/" + mHitCategory));
    Array<File> files;
    for (auto file : dir.findChildFiles(File::findFiles, false))
    {
@@ -1115,7 +1115,7 @@ void DrumPlayer::DrumHit::LoadRandomSample()
 
 void DrumPlayer::DrumHit::LoadNextSample(int direction)
 {
-   File dir(ofToDataPath("drums/"+mHitCategory));
+   File dir(ofToDataPath("drums/" + mHitCategory));
    Array<File> files;
    int currentIndex = -1;
    int i = 0;
@@ -1138,7 +1138,7 @@ void DrumPlayer::DrumHit::LoadNextSample(int direction)
       if (currentIndex == -1)
          newIndex = 0;
       else
-         newIndex = ofClamp(currentIndex + direction, 0, (int)files.size()-1);
+         newIndex = ofClamp(currentIndex + direction, 0, (int)files.size() - 1);
       LoadSample(files[newIndex].getFullPathName().toStdString());
    }
 }
@@ -1156,7 +1156,7 @@ std::vector<IUIControl*> DrumPlayer::ControlsToNotSetDuringLoadState() const
 {
    std::vector<IUIControl*> ignore;
    ignore.push_back(mKitSelector);
-   for (int i=0; i<NUM_DRUM_HITS; ++i)
+   for (int i = 0; i < NUM_DRUM_HITS; ++i)
       ignore.push_back(mDrumHits[i].mHitCategoryDropdown);
    return ignore;
 }
@@ -1182,10 +1182,10 @@ namespace
 void DrumPlayer::SaveState(FileStreamOut& out)
 {
    IDrawableModule::SaveState(out);
-   
+
    out << kSaveStateRev;
-   
-   for (int i=0; i<NUM_DRUM_HITS; ++i)
+
+   for (int i = 0; i < NUM_DRUM_HITS; ++i)
    {
       mDrumHits[i].mSample.SaveState(out);
       out << mDrumHits[i].mLinkId;
@@ -1198,12 +1198,12 @@ void DrumPlayer::SaveState(FileStreamOut& out)
 void DrumPlayer::LoadState(FileStreamIn& in)
 {
    IDrawableModule::LoadState(in);
-   
+
    int rev;
    in >> rev;
    LoadStateValidate(rev <= kSaveStateRev);
-   
-   for (int i=0; i<NUM_DRUM_HITS; ++i)
+
+   for (int i = 0; i < NUM_DRUM_HITS; ++i)
    {
       mDrumHits[i].mSample.LoadState(in);
       in >> mDrumHits[i].mLinkId;

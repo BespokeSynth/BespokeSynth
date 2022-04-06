@@ -38,7 +38,7 @@ public:
    NoteRatchet();
    static IDrawableModule* Create() { return new NoteRatchet(); }
 
-   
+
    void CreateUIControls() override;
 
    void SetEnabled(bool enabled) override { mEnabled = enabled; }
@@ -55,7 +55,11 @@ public:
 private:
    //IDrawableModule
    void DrawModule() override;
-   void GetModuleDimensions(float& width, float& height) override { width = mWidth; height = mHeight; }
+   void GetModuleDimensions(float& width, float& height) override
+   {
+      width = mWidth;
+      height = mHeight;
+   }
    bool Enabled() const override { return mEnabled; }
 
    float mWidth;

@@ -37,10 +37,10 @@ class TremoloEffect : public IAudioEffect, public IDropdownListener, public IFlo
 {
 public:
    TremoloEffect();
-   
+
    static IAudioEffect* Create() { return new TremoloEffect(); }
-   
-   
+
+
    void CreateUIControls() override;
 
    //IAudioEffect
@@ -51,21 +51,26 @@ public:
 
    //IDropdownListener
    void DropdownUpdated(DropdownList* list, int oldVal) override;
-   
+
    void CheckboxUpdated(Checkbox* checkbox) override;
    //IFloatSliderListener
    void FloatSliderUpdated(FloatSlider* slider, float oldVal) override;
+
 private:
    //IDrawableModule
    void DrawModule() override;
-   void GetModuleDimensions(float& width, float& height) override { width = mWidth; height = mHeight; }
+   void GetModuleDimensions(float& width, float& height) override
+   {
+      width = mWidth;
+      height = mHeight;
+   }
    bool Enabled() const override { return mEnabled; }
 
    float mAmount;
    FloatSlider* mAmountSlider;
    float mOffset;
    FloatSlider* mOffsetSlider;
-   
+
    LFO mLFO;
    NoteInterval mInterval;
    DropdownList* mIntervalSelector;
@@ -82,4 +87,3 @@ private:
 
 
 #endif /* defined(__modularSynth__TremoloEffect__) */
-

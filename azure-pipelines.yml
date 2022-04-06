@@ -24,6 +24,11 @@ jobs:
           imageName: 'windows-2019'
           isWindows: True
           cmakeArguments: "-A x64"
+        windows-codequality:
+          imageName: 'windows-2019'
+          isWindows: True
+          cmakeArguments: "-A x64"
+          cmakeTarget: "code-quality-pipeline-checks"
         linux-x64:
           imageName: 'ubuntu-20.04'
           isLinux: True

@@ -45,14 +45,14 @@ void PreviousNote::PlayNote(double time, int pitch, int velocity, int voiceIdx, 
       PlayNoteOutput(time, pitch, velocity, voiceIdx, modulation);
       return;
    }
-   
+
    if (velocity > 0)
    {
       if (mPitch != -1)
       {
          PlayNoteOutput(time, mPitch, mVelocity, voiceIdx, modulation);
       }
-      
+
       mPitch = pitch;
       mVelocity = velocity;
    }
@@ -65,7 +65,7 @@ void PreviousNote::PlayNote(double time, int pitch, int velocity, int voiceIdx, 
 void PreviousNote::LoadLayout(const ofxJSONElement& moduleInfo)
 {
    mModuleSaveData.LoadString("target", moduleInfo);
-   
+
    SetUpFromSaveData();
 }
 

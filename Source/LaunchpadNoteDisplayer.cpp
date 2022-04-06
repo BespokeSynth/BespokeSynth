@@ -36,7 +36,6 @@ LaunchpadNoteDisplayer::LaunchpadNoteDisplayer()
 
 void LaunchpadNoteDisplayer::DrawModule()
 {
-   
 }
 
 void LaunchpadNoteDisplayer::DrawModuleUnclipped()
@@ -56,7 +55,7 @@ void LaunchpadNoteDisplayer::LoadLayout(const ofxJSONElement& moduleInfo)
 {
    mModuleSaveData.LoadString("target", moduleInfo);
    mModuleSaveData.LoadString("gridkeyboard", moduleInfo, "", FillDropdown<LaunchpadKeyboard*>);
-   
+
    SetUpFromSaveData();
 }
 
@@ -67,5 +66,3 @@ void LaunchpadNoteDisplayer::SetUpFromSaveData()
    if (mLaunchpad)
       mLaunchpad->SetDisplayer(this);
 }
-
-

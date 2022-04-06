@@ -52,31 +52,31 @@ Sampler::Sampler()
 , mPassthroughCheckbox(nullptr)
 , mWriteBuffer(gBufferSize)
 {
-   mSampleData = new float[MAX_SAMPLER_LENGTH];   //store up to 2 seconds
+   mSampleData = new float[MAX_SAMPLER_LENGTH]; //store up to 2 seconds
    Clear(mSampleData, MAX_SAMPLER_LENGTH);
-   
+
    mVoiceParams.mVol = .5f;
-   mVoiceParams.mAdsr.Set(10,0,1,10);
+   mVoiceParams.mAdsr.Set(10, 0, 1, 10);
    mVoiceParams.mSampleData = mSampleData;
    mVoiceParams.mSampleLength = 0;
    mVoiceParams.mDetectedFreq = -1;
    mVoiceParams.mLoop = false;
-   
+
    mPolyMgr.Init(kVoiceType_Sampler, &mVoiceParams);
-   
+
    //mWriteBuffer.SetNumActiveChannels(2);
 }
 
 void Sampler::CreateUIControls()
 {
    IDrawableModule::CreateUIControls();
-   mVolSlider = new FloatSlider(this,"vol",5,73,80,15,&mVoiceParams.mVol,0,1);
-   mADSRDisplay = new ADSRDisplay(this,"env",5,15,80,40,&mVoiceParams.mAdsr);
-   mRecordCheckbox = new Checkbox(this,"rec",5,57,&mRecording);
-   mThreshSlider = new FloatSlider(this,"thresh",90,73,80,15,&mThresh,0,1);
-   mPitchCorrectCheckbox = new Checkbox(this,"pitch",60,57,&mPitchCorrect);
-   mPassthroughCheckbox = new Checkbox(this,"passthrough",70,0,&mPassthrough);
-   
+   mVolSlider = new FloatSlider(this, "vol", 5, 73, 80, 15, &mVoiceParams.mVol, 0, 1);
+   mADSRDisplay = new ADSRDisplay(this, "env", 5, 15, 80, 40, &mVoiceParams.mAdsr);
+   mRecordCheckbox = new Checkbox(this, "rec", 5, 57, &mRecording);
+   mThreshSlider = new FloatSlider(this, "thresh", 90, 73, 80, 15, &mThresh, 0, 1);
+   mPitchCorrectCheckbox = new Checkbox(this, "pitch", 60, 57, &mPitchCorrect);
+   mPassthroughCheckbox = new Checkbox(this, "passthrough", 70, 0, &mPassthrough);
+
    mADSRDisplay->SetVol(mVoiceParams.mVol);
 }
 
@@ -102,32 +102,32 @@ void Sampler::Process(double time)
 
    if (!mEnabled || target == nullptr)
       return;
-   
+
    mNoteInputBuffer.Process(time);
-   
+
    ComputeSliders(0);
    SyncBuffers();
-   
+
    int bufferSize = GetBuffer()->BufferSize();
-   
+
    mWriteBuffer.Clear();
-   
+
    if (mRecording)
    {
-      for (int i=0; i<gBufferSize; ++i)
+      for (int i = 0; i < gBufferSize; ++i)
       {
          //if we've already started recording, or if it's a new recording and there's sound
-         if (mRecordPos > 0 || fabsf(GetBuffer()->GetChannel(0)[i]) > mThresh )
+         if (mRecordPos > 0 || fabsf(GetBuffer()->GetChannel(0)[i]) > mThresh)
          {
             mSampleData[mRecordPos] = GetBuffer()->GetChannel(0)[i];
             if (mPassthrough)
             {
-               for (int ch=0; ch<mWriteBuffer.NumActiveChannels(); ++ch)
+               for (int ch = 0; ch < mWriteBuffer.NumActiveChannels(); ++ch)
                   mWriteBuffer.GetChannel(ch)[i] += mSampleData[mRecordPos];
             }
             ++mRecordPos;
          }
-         
+
          if (mRecordPos >= MAX_SAMPLER_LENGTH)
          {
             StopRecording();
@@ -135,16 +135,16 @@ void Sampler::Process(double time)
          }
       }
    }
-   
+
    mPolyMgr.Process(time, &mWriteBuffer, bufferSize);
-   
+
    SyncOutputBuffer(mWriteBuffer.NumActiveChannels());
-   for (int ch=0; ch<mWriteBuffer.NumActiveChannels(); ++ch)
+   for (int ch = 0; ch < mWriteBuffer.NumActiveChannels(); ++ch)
    {
-      GetVizBuffer()->WriteChunk(mWriteBuffer.GetChannel(ch),mWriteBuffer.BufferSize(), ch);
+      GetVizBuffer()->WriteChunk(mWriteBuffer.GetChannel(ch), mWriteBuffer.BufferSize(), ch);
       Add(target->GetBuffer()->GetChannel(ch), mWriteBuffer.GetChannel(ch), gBufferSize);
    }
-   
+
    GetBuffer()->Reset();
 }
 
@@ -158,16 +158,16 @@ void Sampler::PlayNote(double time, int pitch, int velocity, int voiceIdx, Modul
       mNoteInputBuffer.QueueNote(time, pitch, velocity, voiceIdx, modulation);
       return;
    }
-   
+
    if (velocity > 0)
    {
-      mPolyMgr.Start(time, pitch, velocity/127.0f, voiceIdx, modulation);
-      mVoiceParams.mAdsr.Start(time,1);         //for visualization
+      mPolyMgr.Start(time, pitch, velocity / 127.0f, voiceIdx, modulation);
+      mVoiceParams.mAdsr.Start(time, 1); //for visualization
    }
    else
    {
       mPolyMgr.Stop(time, pitch);
-      mVoiceParams.mAdsr.Stop(time);         //for visualization
+      mVoiceParams.mAdsr.Stop(time); //for visualization
    }
 }
 
@@ -180,22 +180,22 @@ void Sampler::DrawModule()
 {
    if (Minimized() || IsVisible() == false)
       return;
-   
+
    mVolSlider->Draw();
    mADSRDisplay->Draw();
    mRecordCheckbox->Draw();
    mThreshSlider->Draw();
    mPitchCorrectCheckbox->Draw();
    mPassthroughCheckbox->Draw();
-   
+
    ofPushMatrix();
-   ofTranslate(100,15);
+   ofTranslate(100, 15);
    DrawAudioBuffer(100, 50, mSampleData, 0, mVoiceParams.mSampleLength, -1);
    ofPushStyle();
    ofNoFill();
-   ofSetColor(255,0,0);
+   ofSetColor(255, 0, 0);
    if (mRecording && mRecordPos > 0)
-      ofRect(0,0,100,50);
+      ofRect(0, 0, 100, 50);
    ofPopStyle();
    ofPopMatrix();
 }
@@ -224,7 +224,7 @@ float Sampler::DetectSampleFrequency()
       
       time += gInvSampleRateMs;
    }*/
-   
+
    float pitch = mPitchDetector.DetectPitch(mSampleData, MAX_SAMPLER_LENGTH);
    float freq = TheScale->PitchToFreq(pitch);
    ofLog() << "Detected frequency: " << freq;
@@ -241,7 +241,7 @@ void Sampler::FilesDropped(std::vector<std::string> files, int x, int y)
 {
    Sample sample;
    sample.Read(files[0].c_str());
-   SampleDropped(x,y,&sample);
+   SampleDropped(x, y, &sample);
 }
 
 void Sampler::SampleDropped(int x, int y, Sample* sample)
@@ -250,14 +250,14 @@ void Sampler::SampleDropped(int x, int y, Sample* sample)
    //TODO(Ryan) multichannel
    const float* data = sample->Data()->GetChannel(0);
    int numSamples = sample->LengthInSamples();
-   
+
    if (numSamples <= 0)
       return;
-   
+
    mVoiceParams.mSampleLength = MIN(MAX_SAMPLER_LENGTH, numSamples);
    Clear(mSampleData, MAX_SAMPLER_LENGTH);
-   
-   for (int i=0; i<mVoiceParams.mSampleLength; ++i)
+
+   for (int i = 0; i < mVoiceParams.mSampleLength; ++i)
       mSampleData[i] = data[i];
 }
 
@@ -265,7 +265,7 @@ void Sampler::LoadLayout(const ofxJSONElement& moduleInfo)
 {
    mModuleSaveData.LoadString("target", moduleInfo);
    mModuleSaveData.LoadBool("loop", moduleInfo, false);
-   
+
    SetUpFromSaveData();
 }
 
@@ -288,7 +288,6 @@ void Sampler::FloatSliderUpdated(FloatSlider* slider, float oldVal)
 
 void Sampler::IntSliderUpdated(IntSlider* slider, int oldVal)
 {
-   
 }
 
 void Sampler::CheckboxUpdated(Checkbox* checkbox)
@@ -323,9 +322,9 @@ namespace
 void Sampler::SaveState(FileStreamOut& out)
 {
    IDrawableModule::SaveState(out);
-   
+
    out << kSaveStateRev;
-   
+
    out.Write(mSampleData, MAX_SAMPLER_LENGTH);
    out << mVoiceParams.mSampleLength;
 }
@@ -333,17 +332,16 @@ void Sampler::SaveState(FileStreamOut& out)
 void Sampler::LoadState(FileStreamIn& in)
 {
    IDrawableModule::LoadState(in);
-   
+
    int rev;
    in >> rev;
    LoadStateValidate(rev == kSaveStateRev);
-   
+
    in.Read(mSampleData, MAX_SAMPLER_LENGTH);
-   
+
    if (rev >= 1)
       in >> mVoiceParams.mSampleLength;
-   
+
    if (mPitchCorrect)
       mWantDetectPitch = true;
 }
-

@@ -35,16 +35,16 @@
 #include "Transport.h"
 #include "Ramp.h"
 
-#define DELAY_BUFFER_SIZE 5*gSampleRate
+#define DELAY_BUFFER_SIZE 5 * gSampleRate
 
 class DelayEffect : public IAudioEffect, public IFloatSliderListener, public IDropdownListener
 {
 public:
    DelayEffect();
-   
+
    static IAudioEffect* Create() { return new DelayEffect(); }
-   
-   
+
+
    void CreateUIControls() override;
    bool Enabled() const override { return mEnabled; }
 
@@ -54,7 +54,7 @@ public:
    void Clear() { mDelayBuffer.ClearBuffer(); }
    void SetDry(bool dry) { mDry = dry; }
    void SetFeedbackModuleMode();
-   
+
    //IAudioEffect
    void ProcessAudio(double time, ChannelBuffer* buffer) override;
    void SetEnabled(bool enabled) override;
@@ -64,17 +64,21 @@ public:
    void CheckboxUpdated(Checkbox* checkbox) override;
    void FloatSliderUpdated(FloatSlider* slider, float oldVal) override;
    void DropdownUpdated(DropdownList* list, int oldVal) override;
-   
+
    void SaveState(FileStreamOut& out) override;
    void LoadState(FileStreamIn& in) override;
-   
+
 private:
    //IDrawableModule
-   void GetModuleDimensions(float& width, float& height) override { width = mWidth; height = mHeight; }
+   void GetModuleDimensions(float& width, float& height) override
+   {
+      width = mWidth;
+      height = mHeight;
+   }
    void DrawModule() override;
-   
+
    float GetMinDelayMs() const;
-   
+
    float mDelay;
    float mFeedback;
    bool mEcho;
@@ -84,7 +88,7 @@ private:
    Checkbox* mEchoCheckbox;
    NoteInterval mInterval;
    DropdownList* mIntervalSelector;
-   
+
    bool mShortTime;
    Checkbox* mShortTimeCheckbox;
    Ramp mDelayRamp;
@@ -95,12 +99,11 @@ private:
    Checkbox* mDryCheckbox;
    Checkbox* mAcceptInputCheckbox;
    Checkbox* mInvertCheckbox;
-   
+
    float mWidth;
    float mHeight;
-   
+
    bool mFeedbackModuleMode; //special mode when this delay effect is being used in a FeedbackModule
 };
 
 #endif /* defined(__modularSynth__DelayEffect__) */
-

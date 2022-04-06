@@ -42,7 +42,7 @@ public:
    virtual ~EQModule();
    static IDrawableModule* Create() { return new EQModule(); }
 
-   
+
    void CreateUIControls() override;
 
    //IAudioSource
@@ -63,7 +63,11 @@ public:
 private:
    //IDrawableModule
    void DrawModule() override;
-   void GetModuleDimensions(float& w, float& h) override { w = mWidth; h = mHeight; }
+   void GetModuleDimensions(float& w, float& h) override
+   {
+      w = mWidth;
+      h = mHeight;
+   }
    bool Enabled() const override { return mEnabled; }
    void OnClicked(int x, int y, bool right) override;
    bool MouseMoved(float x, float y) override;
@@ -92,7 +96,7 @@ private:
    struct Filter
    {
       bool mEnabled;
-      std::array<BiquadFilter,2> mFilter;
+      std::array<BiquadFilter, 2> mFilter;
       Checkbox* mEnabledCheckbox;
       DropdownList* mTypeSelector;
       FloatSlider* mFSlider;

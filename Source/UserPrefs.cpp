@@ -45,7 +45,7 @@ void UserPrefsHolder::Init()
    mUserPrefsFile.open(TheSynth->GetUserPrefsPath());
 
    for (auto* pref : mUserPrefs)
-      pref->Init();   
+      pref->Init();
 }
 
 std::string UserPrefsHolder::ToStringLeadingZeroes(int number)

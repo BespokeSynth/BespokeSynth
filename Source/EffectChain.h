@@ -45,19 +45,19 @@ public:
    EffectChain();
    virtual ~EffectChain();
    static IDrawableModule* Create() { return new EffectChain(); }
-   
-   
+
+
    void CreateUIControls() override;
    void SetEnabled(bool enabled) override { mEnabled = enabled; }
-   
+
    void Init() override;
    void Poll() override;
    void AddEffect(std::string type, bool onTheFly = false);
    void SetWideCount(int count) { mNumFXWide = count; }
-   
+
    //IAudioSource
    void Process(double time) override;
-   
+
    void KeyPressed(int key, bool isRepeat) override;
    void KeyReleased(int key) override;
 
@@ -68,20 +68,20 @@ public:
    void CheckboxUpdated(Checkbox* checkbox) override;
    void FloatSliderUpdated(FloatSlider* slider, float oldVal) override;
    void DropdownUpdated(DropdownList* list, int oldVal) override;
-   
+
    virtual void LoadBasics(const ofxJSONElement& moduleInfo, std::string typeName) override;
    virtual void LoadLayout(const ofxJSONElement& moduleInfo) override;
    virtual void SetUpFromSaveData() override;
    virtual void SaveLayout(ofxJSONElement& moduleInfo) override;
    virtual void UpdateOldControlName(std::string& oldName) override;
-   
+
 private:
    //IDrawableModule
    void DrawModule() override;
    void GetModuleDimensions(float& width, float& height) override;
    bool Enabled() const override { return mEnabled; }
    std::vector<IUIControl*> ControlsToIgnoreInSaveState() const override;
-   
+
    int GetRowHeight(int row) const;
    int NumRows() const;
    void DeleteEffect(int index);
@@ -97,12 +97,12 @@ private:
       FloatSlider* mDryWetSlider;
       ClickButton* mPush2DisplayEffectButton;
    };
-   
+
    std::vector<IAudioEffect*> mEffects;
    ChannelBuffer mDryBuffer;
    std::vector<EffectControls> mEffectControls;
    std::array<float, MAX_EFFECTS_IN_CHAIN> mDryWetLevels;
-   
+
    double mSwapTime;
    int mSwapFromIdx;
    int mSwapToIdx;
@@ -115,13 +115,13 @@ private:
    bool mShowSpawnList;
    int mWantToDeleteEffectAtIndex;
    IAudioEffect* mPush2DisplayEffect;
-   
+
    std::vector<std::string> mEffectTypesToSpawn;
    int mSpawnIndex;
    DropdownList* mEffectSpawnList;
    ClickButton* mSpawnEffectButton;
    ClickButton* mPush2ExitEffectButton;
-   
+
    ofMutex mEffectMutex;
 };
 

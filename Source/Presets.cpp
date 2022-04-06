@@ -51,14 +51,14 @@ Presets::~Presets()
 void Presets::CreateUIControls()
 {
    IDrawableModule::CreateUIControls();
-   mGrid = new UIGrid("uigrid", 5,38,120,50,8,3, this);
-   mSaveButton = new ClickButton(this,"save",50,3);
-   mBlendTimeSlider = new FloatSlider(this,"blend ms",5,20,70,15,&mBlendTime,0,5000);
-   mCurrentPresetSlider = new IntSlider(this,"preset",45,3,80,15,&mCurrentPreset,0,mGrid->GetCols() * mGrid->GetRows() - 1);
+   mGrid = new UIGrid("uigrid", 5, 38, 120, 50, 8, 3, this);
+   mSaveButton = new ClickButton(this, "save", 50, 3);
+   mBlendTimeSlider = new FloatSlider(this, "blend ms", 5, 20, 70, 15, &mBlendTime, 0, 5000);
+   mCurrentPresetSlider = new IntSlider(this, "preset", 45, 3, 80, 15, &mCurrentPreset, 0, mGrid->GetCols() * mGrid->GetRows() - 1);
    mRandomizeButton = new ClickButton(this, "random", 78, 20);
-   
+
    mSaveButton->SetShowing(false);
-   
+
    {
       mModuleCable = new PatchCableSource(this, kConnectionType_Special);
       ofColor color = IDrawableModule::GetColor(kModuleType_Other);
@@ -69,7 +69,7 @@ void Presets::CreateUIControls()
       //mModuleCable->SetPatchCableDrawMode(kPatchCableDrawMode_HoverOnly);
       AddPatchCableSource(mModuleCable);
    }
-   
+
    {
       mUIControlCable = new PatchCableSource(this, kConnectionType_UIControl);
       ofColor color = IDrawableModule::GetColor(kModuleType_Modulator);
@@ -85,7 +85,7 @@ void Presets::CreateUIControls()
 void Presets::Init()
 {
    IDrawableModule::Init();
-   
+
    int defaultPreset = mModuleSaveData.GetInt("defaultpreset");
    if (defaultPreset != -1)
       SetPreset(defaultPreset);
@@ -101,7 +101,7 @@ void Presets::Poll()
       if (mDrawSetPresetsCountdown == 0)
          sPresetHighlightControls.clear();
    }
-   
+
    if (!mBlending && !mBlendRamps.empty())
    {
       mBlendRamps.clear();
@@ -112,18 +112,18 @@ void Presets::DrawModule()
 {
    if (Minimized() || IsVisible() == false)
       return;
-   
+
    mGrid->Draw();
    mSaveButton->Draw();
    mBlendTimeSlider->Draw();
    mCurrentPresetSlider->Draw();
    mRandomizeButton->Draw();
-   
+
    int hover = mGrid->CurrentHover();
    if (hover != -1 && !mPresetCollection.empty())
    {
       assert(hover >= 0 && hover < mPresetCollection.size());
-      DrawTextNormal(mPresetCollection[hover].mDescription,50,0);
+      DrawTextNormal(mPresetCollection[hover].mDescription, 50, 0);
    }
 
    bool shiftHeld = GetKeyModifiers() == kModifier_Shift;
@@ -132,7 +132,7 @@ void Presets::DrawModule()
       ofVec2f pos = mGrid->GetCellPosition(hover % mGrid->GetCols(), hover / mGrid->GetCols()) + mGrid->GetPosition(true);
       float xsize = float(mGrid->GetWidth()) / mGrid->GetCols();
       float ysize = float(mGrid->GetHeight()) / mGrid->GetRows();
-      
+
       ofPushStyle();
       ofSetColor(0, 0, 0);
       ofFill();
@@ -140,7 +140,7 @@ void Presets::DrawModule()
       ofRect(pos.x + 3, pos.y + ysize / 2 - 1, xsize - 6, 2, 0);
       ofPopStyle();
    }
-   
+
    if (mShiftHeld != shiftHeld)
    {
       mShiftHeld = shiftHeld;
@@ -151,45 +151,45 @@ void Presets::DrawModule()
 void Presets::UpdateGridValues()
 {
    mGrid->Clear();
-   for (int i=0; i<mGrid->GetRows()*mGrid->GetCols();++i)
+   for (int i = 0; i < mGrid->GetRows() * mGrid->GetCols(); ++i)
    {
       float val = 0;
       if (mPresetCollection[i].mPresets.empty() == false)
          val = .5f;
       if (i == mCurrentPreset && !mShiftHeld)
          val = 1;
-      mGrid->SetVal(i%mGrid->GetCols(), i/mGrid->GetCols(), val);
+      mGrid->SetVal(i % mGrid->GetCols(), i / mGrid->GetCols(), val);
    }
 }
 
 void Presets::OnClicked(int x, int y, bool right)
 {
-   IDrawableModule::OnClicked(x,y,right);
-   
+   IDrawableModule::OnClicked(x, y, right);
+
    if (right)
       return;
-   
+
    if (mGrid->TestClick(x, y, right, true))
    {
-      float gridX,gridY;
+      float gridX, gridY;
       mGrid->GetPosition(gridX, gridY, true);
-      GridCell cell = mGrid->GetGridCellAt(x-gridX,y-gridY);
-      
+      GridCell cell = mGrid->GetGridCellAt(x - gridX, y - gridY);
+
       mCurrentPreset = cell.mCol + cell.mRow * mGrid->GetCols();
-      
+
       if (GetKeyModifiers() == kModifier_Shift)
          Store(mCurrentPreset);
       else
          SetPreset(mCurrentPreset);
-      
+
       UpdateGridValues();
    }
 }
 
 bool Presets::MouseMoved(float x, float y)
 {
-   IDrawableModule::MouseMoved(x,y);
-   mGrid->NotifyMouseMoved(x,y);
+   IDrawableModule::MouseMoved(x, y);
+   mGrid->NotifyMouseMoved(x, y);
    return false;
 }
 
@@ -206,7 +206,7 @@ void Presets::PlayNote(double time, int pitch, int velocity, int voiceIdx, Modul
 void Presets::SetPreset(int idx)
 {
    assert(idx >= 0 && idx < mPresetCollection.size());
-   
+
    if (mBlendTime > 0)
    {
       mRampMutex.lock();
@@ -214,9 +214,9 @@ void Presets::SetPreset(int idx)
       mBlendProgress = 0;
       mBlendRamps.clear();
    }
-   
+
    const PresetCollection& coll = mPresetCollection[idx];
-   for (std::list<Preset>::const_iterator i=coll.mPresets.begin();
+   for (std::list<Preset>::const_iterator i = coll.mPresets.begin();
         i != coll.mPresets.end(); ++i)
    {
       auto context = IClickable::sPathLoadContext;
@@ -232,7 +232,7 @@ void Presets::SetPreset(int idx)
              !i->mString.empty())
          {
             control->SetValueDirect(i->mValue);
-            
+
             FloatSlider* slider = dynamic_cast<FloatSlider*>(control);
             if (slider)
             {
@@ -241,19 +241,19 @@ void Presets::SetPreset(int idx)
                else
                   slider->DisableLFO();
             }
-            
+
             UIGrid* grid = dynamic_cast<UIGrid*>(control);
             if (grid)
             {
-               for (int col=0; col < i->mGridCols; ++col)
+               for (int col = 0; col < i->mGridCols; ++col)
                {
-                  for (int row=0; row < i->mGridRows; ++row)
+                  for (int row = 0; row < i->mGridRows; ++row)
                   {
                      grid->SetVal(col, row, i->mGridContents[col + row * i->mGridCols]);
                   }
                }
             }
-            
+
             TextEntry* textEntry = dynamic_cast<TextEntry*>(control);
             if (textEntry && textEntry->GetTextEntryType() == kTextEntry_Text)
                textEntry->SetText(i->mString);
@@ -265,24 +265,24 @@ void Presets::SetPreset(int idx)
             ramp.mRamp.Start(0, control->GetValue(), i->mValue, mBlendTime);
             mBlendRamps.push_back(ramp);
          }
-         
+
          sPresetHighlightControls.push_back(control);
       }
    }
-   
+
    if (mBlendTime > 0)
    {
       mRampMutex.unlock();
    }
-   
+
    mDrawSetPresetsCountdown = 30;
 }
 
 void Presets::RandomizeTargets()
 {
-   for (int i=0; i<mPresetControls.size(); ++i)
+   for (int i = 0; i < mPresetControls.size(); ++i)
       RandomizeControl(mPresetControls[i]);
-   for (int i=0; i<mPresetModules.size(); ++i)
+   for (int i = 0; i < mPresetModules.size(); ++i)
    {
       for (auto* control : mPresetModules[i]->GetUIControls())
          RandomizeControl(control);
@@ -303,17 +303,17 @@ void Presets::OnTransportAdvanced(float amount)
    if (mBlending)
    {
       mRampMutex.lock();
-      
+
       mBlendProgress += amount * TheTransport->MsPerBar();
-      
+
       for (auto& ramp : mBlendRamps)
       {
          ramp.mUIControl->SetValueDirect(ramp.mRamp.Value(mBlendProgress));
       }
-      
+
       if (mBlendProgress >= mBlendTime)
          mBlending = false;
-      
+
       mRampMutex.unlock();
    }
 }
@@ -333,7 +333,7 @@ void Presets::PostRepatch(PatchCableSource* cableSource, bool fromUserClick)
    for (auto cable : mUIControlCable->GetPatchCables())
       mPresetControls.push_back(static_cast<IUIControl*>(cable->GetTarget()));
 
-   if (mPresetModules.size() < numModules || mPresetControls.size() < numControls)  //we removed something, clean up any presets that refer to it
+   if (mPresetModules.size() < numModules || mPresetControls.size() < numControls) //we removed something, clean up any presets that refer to it
    {
       for (auto& square : mPresetCollection)
       {
@@ -372,15 +372,15 @@ bool Presets::IsConnectedToPath(std::string path) const
 void Presets::Store(int idx)
 {
    assert(idx >= 0 && idx < mPresetCollection.size());
-   
+
    PresetCollection& coll = mPresetCollection[idx];
    coll.mPresets.clear();
-   
-   for (int i=0; i<mPresetControls.size(); ++i)
+
+   for (int i = 0; i < mPresetControls.size(); ++i)
    {
       coll.mPresets.push_back(Preset(mPresetControls[i], this));
    }
-   for (int i=0; i<mPresetModules.size(); ++i)
+   for (int i = 0; i < mPresetModules.size(); ++i)
    {
       for (auto* control : mPresetModules[i]->GetUIControls())
       {
@@ -395,9 +395,9 @@ void Presets::Store(int idx)
 void Presets::Save()
 {
    ofxJSONElement root;
-   
+
    Json::Value& presets = root["presets"];
-   for (unsigned int i=0; i<mPresetCollection.size(); ++i)
+   for (unsigned int i = 0; i < mPresetCollection.size(); ++i)
    {
       Json::Value& preset = presets[i];
       preset["description"] = mPresetCollection[i].mDescription;
@@ -422,14 +422,14 @@ void Presets::Save()
             preset["controls"][j]["grid_cols"] = presetData.mGridCols;
             preset["controls"][j]["grid_rows"] = presetData.mGridRows;
             preset["controls"][j]["grid"].resize(presetData.mGridContents.size());
-            for (int k=0; k<(int)presetData.mGridContents.size(); ++k)
+            for (int k = 0; k < (int)presetData.mGridContents.size(); ++k)
                preset["controls"][j]["grid"][k] = presetData.mGridContents[k];
          }
          preset["controls"][j]["string"] = presetData.mString;
          ++j;
       }
    }
-   
+
    root.save(ofToDataPath(mModuleSaveData.GetString("presetsfile")), true);
 }
 
@@ -444,15 +444,15 @@ void Presets::Load()
 {
    mPresetCollection.clear();
    mPresetCollection.resize(maxGridSide * maxGridSide);
-   
+
    std::string presetsFile = mModuleSaveData.GetString("presetsfile");
    if (!presetsFile.empty())
    {
       ofxJSONElement root;
       root.open(ofToDataPath(mModuleSaveData.GetString("presetsfile")));
-      
+
       Json::Value& presets = root["presets"];
-      for (int i=0; i<presets.size(); ++i)
+      for (int i = 0; i < presets.size(); ++i)
       {
          try
          {
@@ -480,7 +480,7 @@ void Presets::Load()
                presetData.mGridContents.resize(preset["controls"][j]["grid"].size());
                if (!presetData.mGridContents.empty())
                {
-                  for (int k=0; k<(int)presetData.mGridContents.size(); ++k)
+                  for (int k = 0; k < (int)presetData.mGridContents.size(); ++k)
                      presetData.mGridContents[k] = preset["controls"][j]["grid"][k].asDouble();
                }
                presetData.mString = preset["controls"][j]["string"].asString();
@@ -493,7 +493,7 @@ void Presets::Load()
          }
       }
    }
-   
+
    UpdateGridValues();
 }
 
@@ -524,7 +524,7 @@ void Presets::Resize(float w, float h)
 {
    w = MAX(w - extraW, 120);
    h = MAX(h - extraH, 15);
-   SetGridSize(w,h);
+   SetGridSize(w, h);
 }
 
 void Presets::SetGridSize(float w, float h)
@@ -533,14 +533,14 @@ void Presets::SetGridSize(float w, float h)
    int cols = MIN(w / 15, maxGridSide);
    int rows = MIN(h / 15, maxGridSide);
    mGrid->SetGrid(cols, rows);
-   mCurrentPresetSlider->SetExtents(0, mGrid->GetCols()*mGrid->GetRows() - 1);
+   mCurrentPresetSlider->SetExtents(0, mGrid->GetCols() * mGrid->GetRows() - 1);
    UpdateGridValues();
 }
 
 void Presets::SaveLayout(ofxJSONElement& moduleInfo)
 {
    IDrawableModule::SaveLayout(moduleInfo);
-   
+
    moduleInfo["gridwidth"] = mGrid->GetWidth();
    moduleInfo["gridheight"] = mGrid->GetHeight();
 }
@@ -549,10 +549,10 @@ void Presets::LoadLayout(const ofxJSONElement& moduleInfo)
 {
    mModuleSaveData.LoadString("presetsfile", moduleInfo);
    mModuleSaveData.LoadInt("defaultpreset", moduleInfo, -1, -1, 100, true);
-   
+
    mModuleSaveData.LoadFloat("gridwidth", moduleInfo, 120, 120, 1000);
    mModuleSaveData.LoadFloat("gridheight", moduleInfo, 50, 15, 1000);
-   
+
    SetUpFromSaveData();
 }
 
@@ -570,9 +570,9 @@ namespace
 void Presets::SaveState(FileStreamOut& out)
 {
    IDrawableModule::SaveState(out);
-   
+
    out << kSaveStateRev;
-   
+
    out << (int)mPresetCollection.size();
    for (auto& coll : mPresetCollection)
    {
@@ -586,17 +586,17 @@ void Presets::SaveState(FileStreamOut& out)
          out << preset.mGridCols;
          out << preset.mGridRows;
          assert(preset.mGridContents.size() == preset.mGridCols * preset.mGridRows);
-         for (size_t i=0; i<preset.mGridContents.size(); ++i)
+         for (size_t i = 0; i < preset.mGridContents.size(); ++i)
             out << preset.mGridContents[i];
          out << preset.mString;
       }
       out << coll.mDescription;
    }
-   
+
    out << (int)mPresetModules.size();
    for (auto module : mPresetModules)
       out << module->Path();
-   
+
    out << (int)mPresetControls.size();
    for (auto control : mPresetControls)
       out << control->Path();
@@ -605,15 +605,15 @@ void Presets::SaveState(FileStreamOut& out)
 void Presets::LoadState(FileStreamIn& in)
 {
    IDrawableModule::LoadState(in);
-   
+
    int rev;
    in >> rev;
    LoadStateValidate(rev == kSaveStateRev);
-   
+
    int collSize;
    in >> collSize;
    mPresetCollection.resize(collSize);
-   for (int i=0; i<collSize; ++i)
+   for (int i = 0; i < collSize; ++i)
    {
       int presetSize;
       in >> presetSize;
@@ -628,19 +628,19 @@ void Presets::LoadState(FileStreamIn& in)
          in >> presetData.mGridCols;
          in >> presetData.mGridRows;
          presetData.mGridContents.resize(presetData.mGridCols * presetData.mGridRows);
-         for (int k=0; k<presetData.mGridCols * presetData.mGridRows; ++k)
+         for (int k = 0; k < presetData.mGridCols * presetData.mGridRows; ++k)
             in >> presetData.mGridContents[k];
          in >> presetData.mString;
       }
       in >> mPresetCollection[i].mDescription;
    }
-   
+
    UpdateGridValues();
-   
+
    std::string path;
    int size;
    in >> size;
-   for (int i=0; i<size; ++i)
+   for (int i = 0; i < size; ++i)
    {
       in >> path;
       IDrawableModule* module = TheSynth->FindModule(path);
@@ -651,7 +651,7 @@ void Presets::LoadState(FileStreamIn& in)
       }
    }
    in >> size;
-   for (int i=0; i<size; ++i)
+   for (int i = 0; i < size; ++i)
    {
       in >> path;
       IUIControl* control = TheSynth->FindUIControl(path);
@@ -678,7 +678,7 @@ Presets::Preset::Preset(IUIControl* control, Presets* presets)
    IClickable::sPathSaveContext = context;
 
    mValue = control->GetValue();
-   
+
    FloatSlider* slider = dynamic_cast<FloatSlider*>(control);
    if (slider)
    {
@@ -697,7 +697,7 @@ Presets::Preset::Preset(IUIControl* control, Presets* presets)
    {
       mHasLFO = false;
    }
-   
+
    UIGrid* grid = dynamic_cast<UIGrid*>(control);
    if (grid)
    {
@@ -712,9 +712,8 @@ Presets::Preset::Preset(IUIControl* control, Presets* presets)
          }
       }
    }
-   
+
    TextEntry* textEntry = dynamic_cast<TextEntry*>(control);
    if (textEntry && textEntry->GetTextEntryType() == kTextEntry_Text)
       mString = textEntry->GetText();
 }
-

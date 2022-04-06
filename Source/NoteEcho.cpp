@@ -34,28 +34,28 @@
 
 NoteEcho::NoteEcho()
 {
-   for (int i=0; i<kMaxDestinations; ++i)
+   for (int i = 0; i < kMaxDestinations; ++i)
       mDelay[i] = i * .125f;
 }
 
 void NoteEcho::CreateUIControls()
 {
    IDrawableModule::CreateUIControls();
-   
+
    UIBLOCK0();
-   for (int i=0; i<kMaxDestinations; ++i)
+   for (int i = 0; i < kMaxDestinations; ++i)
    {
-      FLOATSLIDER(mDelaySlider[i],("delay "+ofToString(i)).c_str(),&mDelay[i],0,1);
+      FLOATSLIDER(mDelaySlider[i], ("delay " + ofToString(i)).c_str(), &mDelay[i], 0, 1);
       mDestinationCables[i] = new AdditionalNoteCable();
       mDestinationCables[i]->SetPatchCableSource(new PatchCableSource(this, kConnectionType_Note));
-      mDestinationCables[i]->GetPatchCableSource()->SetOverrideCableDir(ofVec2f(1,0));
+      mDestinationCables[i]->GetPatchCableSource()->SetOverrideCableDir(ofVec2f(1, 0));
       AddPatchCableSource(mDestinationCables[i]->GetPatchCableSource());
       ofRectangle rect = mDelaySlider[i]->GetRect(true);
-      mDestinationCables[i]->GetPatchCableSource()->SetManualPosition(rect.getMaxX() + 10, rect.y + rect.height/2);
+      mDestinationCables[i]->GetPatchCableSource()->SetManualPosition(rect.getMaxX() + 10, rect.y + rect.height / 2);
    }
-   ENDUIBLOCK(mWidth,mHeight);
+   ENDUIBLOCK(mWidth, mHeight);
    mWidth += 20;
-   
+
    GetPatchCableSource()->SetEnabled(false);
 }
 
@@ -63,16 +63,16 @@ void NoteEcho::DrawModule()
 {
    if (Minimized() || IsVisible() == false)
       return;
-   
-   for (int i=0; i<kMaxDestinations; ++i)
+
+   for (int i = 0; i < kMaxDestinations; ++i)
       mDelaySlider[i]->Draw();
 }
 
 void NoteEcho::PlayNote(double time, int pitch, int velocity, int voiceIdx, ModulationParameters modulation)
 {
    ComputeSliders(0);
-   
-   for (int i=0; i<kMaxDestinations; ++i)
+
+   for (int i = 0; i < kMaxDestinations; ++i)
    {
       double delayMs = mDelay[i] / (float(TheTransport->GetTimeSigTop()) / TheTransport->GetTimeSigBottom()) * TheTransport->MsPerBar();
       SendNoteToIndex(i, time + delayMs, pitch, velocity, voiceIdx, modulation);

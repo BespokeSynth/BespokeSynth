@@ -33,13 +33,13 @@
 #include <algorithm>
 
 ValueStream::ValueStream()
-   : mUIControl(nullptr)
-   , mFloatSlider(nullptr)
-   , mControlCable(nullptr)
-   , mWidth(200)
-   , mHeight(120)
-   , mSpeed(1)
-   , mValueDisplayPointer(0)
+: mUIControl(nullptr)
+, mFloatSlider(nullptr)
+, mControlCable(nullptr)
+, mWidth(200)
+, mHeight(120)
+, mSpeed(1)
+, mValueDisplayPointer(0)
 {
 }
 
@@ -97,7 +97,7 @@ void ValueStream::DrawModule()
       for (int i = 0; i < mWidth; ++i)
       {
          float x = mWidth - i;
-         int samplesAgo = int(i  / (mSpeed / 200)) + 1;
+         int samplesAgo = int(i / (mSpeed / 200)) + 1;
          if (samplesAgo < mValues.size())
          {
             float y = ofMap(mValues[(mValueDisplayPointer - samplesAgo + mValues.size()) % mValues.size()], mFloatSlider->GetMin(), mFloatSlider->GetMax(), mHeight - 10, 10);

@@ -37,9 +37,9 @@ void ChordDisplayer::DrawModule()
 {
    if (Minimized() || IsVisible() == false)
       return;
-   
+
    std::list<int> notes = mNoteOutput.GetHeldNotesList();
-   
+
    if (notes.size() > 2)
    {
       std::vector<int> chord{ std::begin(notes), std::end(notes) };
@@ -55,7 +55,7 @@ void ChordDisplayer::PlayNote(double time, int pitch, int velocity, int voiceIdx
 void ChordDisplayer::LoadLayout(const ofxJSONElement& moduleInfo)
 {
    mModuleSaveData.LoadString("target", moduleInfo);
-   
+
    SetUpFromSaveData();
 }
 

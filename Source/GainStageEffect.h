@@ -35,8 +35,8 @@ class GainStageEffect : public IAudioEffect, public IFloatSliderListener
 public:
    GainStageEffect();
    static IAudioEffect* Create() { return new GainStageEffect(); }
-   
-   
+
+
    void CreateUIControls() override;
 
    //IAudioEffect
@@ -46,13 +46,17 @@ public:
 
    void CheckboxUpdated(Checkbox* checkbox) override;
    void FloatSliderUpdated(FloatSlider* slider, float oldVal) override;
-   
+
 private:
    //IDrawableModule
    void DrawModule() override;
-   void GetModuleDimensions(float& width, float& height) override { width=120; height=20; }
+   void GetModuleDimensions(float& width, float& height) override
+   {
+      width = 120;
+      height = 20;
+   }
    bool Enabled() const override { return mEnabled; }
-   
+
    float mGain;
    FloatSlider* mGainSlider;
 };

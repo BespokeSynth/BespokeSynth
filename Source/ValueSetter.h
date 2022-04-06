@@ -41,41 +41,46 @@ public:
    ValueSetter();
    virtual ~ValueSetter();
    static IDrawableModule* Create() { return new ValueSetter(); }
-   
-   
+
+
    void CreateUIControls() override;
-   
+
    void SetEnabled(bool enabled) override { mEnabled = enabled; }
-   
+
    //IPulseReceiver
    void OnPulse(double time, float velocity, int flags) override;
-   
+
    void ButtonClicked(ClickButton* button) override;
-   
+
    //IPatchable
    void PostRepatch(PatchCableSource* cableSource, bool fromUserClick) override;
-   
+
    void TextEntryComplete(TextEntry* entry) override {}
    void FloatSliderUpdated(FloatSlider* slider, float oldVal) override {}
-   
+
    void SaveLayout(ofxJSONElement& moduleInfo) override;
    void LoadLayout(const ofxJSONElement& moduleInfo) override;
    void SetUpFromSaveData() override;
+
 private:
    //IDrawableModule
    void DrawModule() override;
-   void GetModuleDimensions(float& width, float& height) override { width = mWidth; height = mHeight; }
+   void GetModuleDimensions(float& width, float& height) override
+   {
+      width = mWidth;
+      height = mHeight;
+   }
    bool Enabled() const override { return mEnabled; }
-   
+
    void Go();
-   
+
    PatchCableSource* mControlCable;
    IUIControl* mTarget;
    float mValue;
    TextEntry* mValueEntry;
    FloatSlider* mValueSlider;
    ClickButton* mButton;
-   
+
    float mWidth;
    float mHeight;
 };

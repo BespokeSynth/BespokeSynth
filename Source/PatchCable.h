@@ -56,39 +56,45 @@ enum ConnectionType
 class PatchCable : public IClickable
 {
    friend class PatchCableSource;
+
 public:
    PatchCable(PatchCableSource* owner);
    virtual ~PatchCable();
-   
+
    void Render() override;
    bool TestClick(int x, int y, bool right, bool testOnly = false) override;
    bool MouseMoved(float x, float y) override;
    void MouseReleased() override;
-   void GetDimensions(float& width, float& height) override { width = 10; height = 10; }
-   
+   void GetDimensions(float& width, float& height) override
+   {
+      width = 10;
+      height = 10;
+   }
+
    IDrawableModule* GetOwningModule() const;
    IClickable* GetTarget() const { return mTarget; }
    ConnectionType GetConnectionType() const;
    bool IsDragging() const { return mDragging; }
    void SetHoveringOnSource(bool hovering) { mHoveringOnSource = hovering; }
    void SetSourceIndex(int index) { mSourceIndex = index; }
-   
+
    void Grab();
    bool IsValidTarget(IClickable* target) const;
    void Destroy(bool fromUserClick);
-   
+
    void SetUIControlConnection(UIControlConnection* conn) { mUIControlConnection = conn; }
-   
+
    static PatchCable* sActivePatchCable;
-   
+
 protected:
    void OnClicked(int x, int y, bool right) override;
+
 private:
    void SetTarget(IClickable* target);
    PatchCablePos GetPatchCablePos();
    ofVec2f FindClosestSide(int x, int y, int w, int h, ofVec2f start, ofVec2f startDirection, ofVec2f& endDirection);
    IClickable* GetDropTarget();
-   
+
    PatchCableSource* mOwner;
    IClickable* mTarget;
    RadioButton* mTargetRadioButton;

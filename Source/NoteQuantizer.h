@@ -42,7 +42,6 @@ public:
    void CreateUIControls() override;
    void Init() override;
 
-   
 
    //INoteReceiver
    void PlayNote(double time, int pitch, int velocity, int voiceIdx = -1, ModulationParameters modulation = ModulationParameters()) override;
@@ -57,13 +56,21 @@ public:
 private:
    //IDrawableModule
    void DrawModule() override;
-   void GetModuleDimensions(float& width, float& height) override { width = 80; height = 40; }
+   void GetModuleDimensions(float& width, float& height) override
+   {
+      width = 80;
+      height = 40;
+   }
    bool Enabled() const override { return true; }
    void OnEvent(double time, float strength);
 
    struct InputInfo
    {
-      InputInfo() : velocity(0), voiceIdx(-1), held(false), hasPlayedYet(false) {}
+      InputInfo()
+      : velocity(0)
+      , voiceIdx(-1)
+      , held(false)
+      , hasPlayedYet(false) {}
       int velocity;
       int voiceIdx;
       bool held;

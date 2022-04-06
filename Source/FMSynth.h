@@ -43,8 +43,8 @@ public:
    FMSynth();
    ~FMSynth();
    static IDrawableModule* Create() { return new FMSynth(); }
-   
-   
+
+
    void CreateUIControls() override;
 
    //IAudioSource
@@ -63,37 +63,41 @@ public:
    virtual void SetUpFromSaveData() override;
 
    bool HasDebugDraw() const override { return true; }
-   
+
 private:
    void UpdateHarmonicRatio();
 
    //IDrawableModule
    void DrawModule() override;
    void DrawModuleUnclipped() override;
-   void GetModuleDimensions(float& width, float& height) override { width = 180; height = 203; }
+   void GetModuleDimensions(float& width, float& height) override
+   {
+      width = 180;
+      height = 203;
+   }
    bool Enabled() const override { return mEnabled; }
-   
+
    PolyphonyMgr mPolyMgr;
    NoteInputBuffer mNoteInputBuffer;
    FMVoiceParams mVoiceParams;
    FloatSlider* mVolSlider;
    ADSRDisplay* mAdsrDisplayVol;
    FloatSlider* mPhaseOffsetSlider0;
-   
+
    FloatSlider* mHarmSlider;
    ADSRDisplay* mAdsrDisplayHarm;
    FloatSlider* mModSlider;
    ADSRDisplay* mAdsrDisplayMod;
-   int mHarmRatioBase;  //negative means 1/val
+   int mHarmRatioBase; //negative means 1/val
    float mHarmRatioTweak;
    DropdownList* mHarmRatioBaseDropdown;
    FloatSlider* mPhaseOffsetSlider1;
-   
+
    FloatSlider* mHarmSlider2;
    ADSRDisplay* mAdsrDisplayHarm2;
    FloatSlider* mModSlider2;
    ADSRDisplay* mAdsrDisplayMod2;
-   int mHarmRatioBase2;  //negative means 1/val
+   int mHarmRatioBase2; //negative means 1/val
    float mHarmRatioTweak2;
    DropdownList* mHarmRatioBaseDropdown2;
    FloatSlider* mPhaseOffsetSlider2;
@@ -104,4 +108,3 @@ private:
 };
 
 #endif /* defined(__modularSynth__FMSynth__) */
-

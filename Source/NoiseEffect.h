@@ -35,10 +35,10 @@ class NoiseEffect : public IAudioEffect, public IIntSliderListener, public IFloa
 {
 public:
    NoiseEffect();
-   
+
    static IAudioEffect* Create() { return new NoiseEffect(); }
-   
-   
+
+
    void CreateUIControls() override;
 
    //IAudioEffect
@@ -47,7 +47,7 @@ public:
    float GetEffectAmount() override;
    std::string GetType() override { return "noisify"; }
 
-   
+
    void CheckboxUpdated(Checkbox* checkbox) override;
    //IIntSliderListener
    void IntSliderUpdated(IntSlider* slider, int oldVal) override;
@@ -57,18 +57,20 @@ public:
 private:
    //IDrawableModule
    void DrawModule() override;
-   void GetModuleDimensions(float& width, float& height) override { width=120; height=60; }
+   void GetModuleDimensions(float& width, float& height) override
+   {
+      width = 120;
+      height = 60;
+   }
    bool Enabled() const override { return mEnabled; }
 
-   
+
    float mAmount;
    int mWidth;
    int mSampleCounter;
    float mRandom;
    FloatSlider* mAmountSlider;
    IntSlider* mWidthSlider;
-   
 };
 
 #endif /* defined(__modularSynth__NoiseEffect__) */
-

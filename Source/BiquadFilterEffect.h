@@ -40,56 +40,54 @@ class BiquadFilterEffect : public IAudioEffect, public IDropdownListener, public
 public:
    BiquadFilterEffect();
    ~BiquadFilterEffect();
-   
+
    static IAudioEffect* Create() { return new BiquadFilterEffect(); }
-   
-   
+
+
    void CreateUIControls() override;
-   
+
    void Init() override;
-   
+
    void SetFilterType(FilterType type) { mBiquad[0].SetFilterType(type); }
    void SetFilterParams(float f, float q) { mBiquad[0].SetFilterParams(f, q); }
    void Clear();
-   
+
    //IAudioEffect
    void ProcessAudio(double time, ChannelBuffer* buffer) override;
    void SetEnabled(bool enabled) override { mEnabled = enabled; }
    float GetEffectAmount() override;
    std::string GetType() override { return "biquad"; }
-   
+
    bool MouseMoved(float x, float y) override;
 
    void DropdownUpdated(DropdownList* list, int oldVal) override;
    void CheckboxUpdated(Checkbox* checkbox) override;
    void FloatSliderUpdated(FloatSlider* slider, float oldVal) override;
    void RadioButtonUpdated(RadioButton* list, int oldVal) override;
-   
+
    void LoadLayout(const ofxJSONElement& info) override;
    void SetUpFromSaveData() override;
    void SaveLayout(ofxJSONElement& info) override;
-   
+
 private:
    //IDrawableModule
    void GetModuleDimensions(float& width, float& height) override;
    void DrawModule() override;
    bool Enabled() const override { return mEnabled; }
-   
+
    void ResetFilter();
-   
+
    RadioButton* mTypeSelector;
-   
+
    FloatSlider* mFSlider;
    FloatSlider* mQSlider;
    FloatSlider* mGSlider;
    bool mMouseControl;
-   
+
    BiquadFilter mBiquad[ChannelBuffer::kMaxNumChannels];
    ChannelBuffer mDryBuffer;
-   
+
    bool mCoefficientsHaveChanged;
 };
 
 #endif /* defined(__modularSynth__BiquadFilterEffect__) */
-
-

@@ -32,7 +32,7 @@
 bool FileStreamIn::s32BitMode = false;
 
 FileStreamOut::FileStreamOut(const std::string& file)
-: mStream(std::make_unique<juce::FileOutputStream>(juce::File{file}))
+: mStream(std::make_unique<juce::FileOutputStream>(juce::File{ file }))
 {
    mStream->setPosition(0);
    mStream->truncate();
@@ -44,43 +44,43 @@ FileStreamOut::~FileStreamOut()
 }
 
 FileStreamIn::FileStreamIn(const std::string& file)
-: mStream(std::make_unique<juce::FileInputStream>(juce::File{file}))
+: mStream(std::make_unique<juce::FileInputStream>(juce::File{ file }))
 {
 }
 
 FileStreamIn::~FileStreamIn() = default;
 
-FileStreamOut& FileStreamOut::operator<<(const int &var)
+FileStreamOut& FileStreamOut::operator<<(const int& var)
 {
    mStream->write(&var, sizeof(int));
    return *this;
 }
 
-FileStreamOut& FileStreamOut::operator<<(const uint32_t &var)
+FileStreamOut& FileStreamOut::operator<<(const uint32_t& var)
 {
    mStream->write(&var, sizeof(uint32_t));
    return *this;
 }
 
-FileStreamOut& FileStreamOut::operator<<(const bool &var)
+FileStreamOut& FileStreamOut::operator<<(const bool& var)
 {
    mStream->write(&var, sizeof(bool));
    return *this;
 }
 
-FileStreamOut& FileStreamOut::operator<<(const float &var)
+FileStreamOut& FileStreamOut::operator<<(const float& var)
 {
    mStream->write(&var, sizeof(float));
    return *this;
 }
 
-FileStreamOut& FileStreamOut::operator<<(const double &var)
+FileStreamOut& FileStreamOut::operator<<(const double& var)
 {
    mStream->write(&var, sizeof(double));
    return *this;
 }
 
-FileStreamOut& FileStreamOut::operator<<(const std::string &var)
+FileStreamOut& FileStreamOut::operator<<(const std::string& var)
 {
    const uint64_t len = var.length();
    mStream->write(&len, sizeof(len));
@@ -88,7 +88,7 @@ FileStreamOut& FileStreamOut::operator<<(const std::string &var)
    return *this;
 }
 
-FileStreamOut& FileStreamOut::operator<<(const char &var)
+FileStreamOut& FileStreamOut::operator<<(const char& var)
 {
    mStream->write(&var, sizeof(char));
    return *this;
@@ -96,7 +96,7 @@ FileStreamOut& FileStreamOut::operator<<(const char &var)
 
 void FileStreamOut::Write(const float* buffer, int size)
 {
-   mStream->write(buffer, sizeof(float)*size);
+   mStream->write(buffer, sizeof(float) * size);
 }
 
 void FileStreamOut::WriteGeneric(const void* buffer, int size)
@@ -104,37 +104,37 @@ void FileStreamOut::WriteGeneric(const void* buffer, int size)
    mStream->write(buffer, size);
 }
 
-FileStreamIn& FileStreamIn::operator>>(int &var)
+FileStreamIn& FileStreamIn::operator>>(int& var)
 {
    mStream->read(&var, sizeof(int));
    return *this;
 }
 
-FileStreamIn& FileStreamIn::operator>>(uint32_t &var)
+FileStreamIn& FileStreamIn::operator>>(uint32_t& var)
 {
    mStream->read(&var, sizeof(uint32_t));
    return *this;
 }
 
-FileStreamIn& FileStreamIn::operator>>(bool &var)
+FileStreamIn& FileStreamIn::operator>>(bool& var)
 {
    mStream->read(&var, sizeof(bool));
    return *this;
 }
 
-FileStreamIn& FileStreamIn::operator>>(float &var)
+FileStreamIn& FileStreamIn::operator>>(float& var)
 {
    mStream->read(&var, sizeof(float));
    return *this;
 }
 
-FileStreamIn& FileStreamIn::operator>>(double &var)
+FileStreamIn& FileStreamIn::operator>>(double& var)
 {
    mStream->read(&var, sizeof(double));
    return *this;
 }
 
-FileStreamIn& FileStreamIn::operator>>(std::string &var)
+FileStreamIn& FileStreamIn::operator>>(std::string& var)
 {
    uint64_t len;
    if (s32BitMode)
@@ -147,18 +147,18 @@ FileStreamIn& FileStreamIn::operator>>(std::string &var)
    {
       mStream->read(&len, sizeof(len));
    }
-   
+
    if (TheSynth->IsLoadingModule())
-      LoadStateValidate(len < 99999);   //probably garbage beyond this point
+      LoadStateValidate(len < 99999); //probably garbage beyond this point
    else
-      assert(len < 99999);   //probably garbage beyond this point
-   
+      assert(len < 99999); //probably garbage beyond this point
+
    var.resize(len);
    mStream->read(var.data(), len);
    return *this;
 }
 
-FileStreamIn& FileStreamIn::operator>>(char &var)
+FileStreamIn& FileStreamIn::operator>>(char& var)
 {
    mStream->read(&var, sizeof(char));
    return *this;
@@ -166,14 +166,14 @@ FileStreamIn& FileStreamIn::operator>>(char &var)
 
 void FileStreamIn::Read(float* buffer, int size)
 {
-   mStream->read(buffer, sizeof(float)*size);
+   mStream->read(buffer, sizeof(float) * size);
 }
 
 void FileStreamIn::ReadGeneric(void* buffer, int size)
 {
    mStream->read(buffer, size);
 }
-                        
+
 void FileStreamIn::Peek(void* buffer, int size)
 {
    auto pos = mStream->getPosition();

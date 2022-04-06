@@ -34,23 +34,26 @@ class NoteDisplayer : public NoteEffectBase, public IDrawableModule
 public:
    NoteDisplayer() = default;
    static IDrawableModule* Create() { return new NoteDisplayer(); }
-   
-   
-   
+
+
    //INoteReceiver
    void PlayNote(double time, int pitch, int velocity, int voiceIdx = -1, ModulationParameters modulation = ModulationParameters()) override;
-   
+
    void LoadLayout(const ofxJSONElement& moduleInfo) override;
    void SetUpFromSaveData() override;
-   
+
 private:
    //IDrawableModule
    void DrawModule() override;
-   void GetModuleDimensions(float& width, float& height) override { width = 110; height = 60; }
+   void GetModuleDimensions(float& width, float& height) override
+   {
+      width = 110;
+      height = 60;
+   }
    bool Enabled() const override { return true; }
-   
+
    void DrawNoteName(int pitch, float y) const;
-   
+
    int mVelocities[127]{};
 };
 

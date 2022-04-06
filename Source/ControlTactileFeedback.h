@@ -38,38 +38,40 @@ public:
    ControlTactileFeedback();
    ~ControlTactileFeedback();
    static IDrawableModule* Create() { return new ControlTactileFeedback(); }
-   
-   
+
+
    void CreateUIControls() override;
-   
+
    //IAudioSource
    void Process(double time) override;
    void SetEnabled(bool enabled) override { mEnabled = enabled; }
-   
-   
+
+
    void CheckboxUpdated(Checkbox* checkbox) override {}
-   
+
    //IFloatSliderListener
    void FloatSliderUpdated(FloatSlider* slider, float oldVal) override {}
-   
+
    virtual void LoadLayout(const ofxJSONElement& moduleInfo) override;
    virtual void SetUpFromSaveData() override;
-   
+
 private:
    //IDrawableModule
    void DrawModule() override;
    bool Enabled() const override { return mEnabled; }
-   void GetModuleDimensions(float& width, float& height) override { width=80; height=60; }
-   
+   void GetModuleDimensions(float& width, float& height) override
+   {
+      width = 80;
+      height = 60;
+   }
+
    float mPhase;
    float mPhaseInc;
-   
-   
-   
+
+
    float mVolume;
    FloatSlider* mVolumeSlider;
 };
 
 
 #endif /* defined(__modularSynth__ControlTactileFeedback__) */
-

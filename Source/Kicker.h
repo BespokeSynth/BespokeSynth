@@ -39,8 +39,7 @@ class Kicker : public NoteEffectBase, public IDrawableModule
 public:
    Kicker();
    static IDrawableModule* Create() { return new Kicker(); }
-   
-   
+
 
    void SetEnabled(bool enabled) override { mEnabled = enabled; }
    void SetDrumPlayer(DrumPlayer* drumPlayer) { mDrumPlayer = drumPlayer; }
@@ -49,15 +48,20 @@ public:
    void PlayNote(double time, int pitch, int velocity, int voiceIdx = -1, ModulationParameters modulation = ModulationParameters()) override;
 
    void CheckboxUpdated(Checkbox* checkbox) override;
-   
+
    virtual void LoadLayout(const ofxJSONElement& moduleInfo) override;
    virtual void SetUpFromSaveData() override;
+
 private:
    //IDrawableModule
    void DrawModule() override;
-   void GetModuleDimensions(float& width, float& height) override { width = 90; height = 0; }
+   void GetModuleDimensions(float& width, float& height) override
+   {
+      width = 90;
+      height = 0;
+   }
    bool Enabled() const override { return mEnabled; }
-   
+
    DrumPlayer* mDrumPlayer;
 };
 

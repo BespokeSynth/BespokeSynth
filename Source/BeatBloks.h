@@ -49,27 +49,27 @@ public:
    BeatBloks();
    ~BeatBloks();
    static IDrawableModule* Create() { return new BeatBloks(); }
-   
-   
+
+
    void CreateUIControls() override;
-   
+
    //INoteReceiver
    void PlayNote(double time, int pitch, int velocity, int voiceIdx = -1, ModulationParameters modulation = ModulationParameters()) override;
    void SendCC(int control, int value, int voiceIdx = -1) override {}
-   
+
    //IAudioSource
    void Process(double time) override;
    void SetEnabled(bool enabled) override { mEnabled = enabled; }
-   
+
    //IDrawableModule
    void FilesDropped(std::vector<std::string> files, int x, int y) override;
    void Poll() override;
-   
+
    //IClickable
    void MouseReleased() override;
    bool MouseMoved(float x, float y) override;
-   
-   
+
+
    void CheckboxUpdated(Checkbox* checkbox) override;
    //IFloatSliderListener
    void FloatSliderUpdated(FloatSlider* slider, float oldVal) override;
@@ -80,10 +80,10 @@ public:
    void DropdownUpdated(DropdownList* list, int oldVal) override;
    //IButtonListener
    void ButtonClicked(ClickButton* button) override;
-   
+
    virtual void LoadLayout(const ofxJSONElement& moduleInfo) override;
    virtual void SetUpFromSaveData() override;
-   
+
 private:
    enum BlokType
    {
@@ -93,17 +93,19 @@ private:
       kBlok_Segment,
       kBlok_Section
    };
-   
+
    struct Blok
    {
       Blok(float startTime, float duration, float confidence)
-      : mStartTime(startTime), mDuration(duration), mConfidence(confidence) {}
+      : mStartTime(startTime)
+      , mDuration(duration)
+      , mConfidence(confidence) {}
       float mStartTime;
       float mDuration;
       float mConfidence;
       BlokType mType;
    };
-   
+
    enum ReadState
    {
       kReadState_Start,
@@ -113,7 +115,7 @@ private:
       kReadState_Sections,
       kReadState_Segments
    } mReadState;
-   
+
    void UpdateSample();
    void DoWrite();
    void UpdateZoomExtents();
@@ -123,15 +125,15 @@ private:
    float GetInsertPosition(int& insertIndex);
    void PlaceHeldBlok();
    Blok* RemoveBlokAt(int x);
-   
+
    //IDrawableModule
    void DrawModule() override;
    bool Enabled() const override { return mEnabled; }
    void GetModuleDimensions(float& width, float& height) override;
    void OnClicked(int x, int y, bool right) override;
-   
+
    Sample* mSample;
-   
+
    float mVolume;
    FloatSlider* mVolumeSlider;
    float* mWriteBuffer;
@@ -174,7 +176,7 @@ private:
    float mGrabOffsetY;
    ClickButton* mGetLuckyButton;
    ClickButton* mLoseYourselfButton;
-   
+
    float mRemixPlayhead;
    bool mPlayRemix;
    Checkbox* mPlayRemixCheckbox;
@@ -188,16 +190,15 @@ private:
    float mRemixZoomEnd;
    FloatSlider* mRemixZoomEndSlider;
    bool mBlockMultiPlaceEngaged;
-   
+
    bool mPlayBlokPreview;
    float mBlokPreviewPlayhead;
    Ramp mBlokPreviewRamp;
-   
+
    bool mDrawSources;
    Checkbox* mDrawSourcesCheckbox;
-   
+
    int mLastRemovedRemixBlokIdx;
 };
 
 #endif /* defined(__modularSynth__BeatBloks__) */
-

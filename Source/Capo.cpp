@@ -39,8 +39,8 @@ void Capo::CreateUIControls()
 {
    IDrawableModule::CreateUIControls();
    UIBLOCK0();
-   INTSLIDER(mCapoSlider,"capo",&mCapo,-12,12);
-   CHECKBOX(mRetriggerCheckbox,"retrigger",&mRetrigger);
+   INTSLIDER(mCapoSlider, "capo", &mCapo, -12, 12);
+   CHECKBOX(mRetriggerCheckbox, "retrigger", &mRetrigger);
    ENDUIBLOCK(mWidth, mHeight);
 }
 
@@ -48,12 +48,12 @@ void Capo::DrawModule()
 {
    if (Minimized() || IsVisible() == false)
       return;
-   
+
    mCapoSlider->Draw();
    mRetriggerCheckbox->Draw();
 }
 
-void Capo::CheckboxUpdated(Checkbox *checkbox)
+void Capo::CheckboxUpdated(Checkbox* checkbox)
 {
    if (checkbox == mEnabledCheckbox)
       mNoteOutput.Flush(gTime);
@@ -66,7 +66,7 @@ void Capo::PlayNote(double time, int pitch, int velocity, int voiceIdx, Modulati
       PlayNoteOutput(time, pitch, velocity, voiceIdx, modulation);
       return;
    }
-   
+
    if (pitch >= 0 && pitch < 128)
    {
       if (velocity > 0)
@@ -80,7 +80,7 @@ void Capo::PlayNote(double time, int pitch, int velocity, int voiceIdx, Modulati
       {
          mInputNotes[pitch].mOn = false;
       }
-      
+
       PlayNoteOutput(time, mInputNotes[pitch].mOutputPitch, velocity, mInputNotes[pitch].mVoiceIdx, modulation);
    }
 }
@@ -90,11 +90,11 @@ void Capo::IntSliderUpdated(IntSlider* slider, int oldVal)
    if (slider == mCapoSlider && mEnabled && mRetrigger)
    {
       double time = gTime + gBufferSizeMs;
-      for (int pitch=0; pitch<128; ++pitch)
+      for (int pitch = 0; pitch < 128; ++pitch)
       {
          if (mInputNotes[pitch].mOn)
          {
-            PlayNoteOutput(time+.01, mInputNotes[pitch].mOutputPitch, 0, mInputNotes[pitch].mVoiceIdx, ModulationParameters());
+            PlayNoteOutput(time + .01, mInputNotes[pitch].mOutputPitch, 0, mInputNotes[pitch].mVoiceIdx, ModulationParameters());
             mInputNotes[pitch].mOutputPitch = pitch + mCapo;
             PlayNoteOutput(time, mInputNotes[pitch].mOutputPitch, mInputNotes[pitch].mVelocity, mInputNotes[pitch].mVoiceIdx, ModulationParameters());
          }
@@ -113,4 +113,3 @@ void Capo::SetUpFromSaveData()
 {
    SetUpPatchCables(mModuleSaveData.GetString("target"));
 }
-

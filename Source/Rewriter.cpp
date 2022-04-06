@@ -53,15 +53,16 @@ void Rewriter::CreateUIControls()
 {
    IDrawableModule::CreateUIControls();
    UIBLOCK0();
-   BUTTON(mRewriteButton, " go "); UIBLOCK_SHIFTRIGHT();
-   BUTTON(mStartRecordTimeButton,"new loop");
+   BUTTON(mRewriteButton, " go ");
+   UIBLOCK_SHIFTRIGHT();
+   BUTTON(mStartRecordTimeButton, "new loop");
    ENDUIBLOCK(mWidth, mHeight);
-   
+
    mWidth = 110;
    mHeight += kBufferHeight + 3;
 
-   mLooperCable = new PatchCableSource(this,kConnectionType_Special);
-   mLooperCable->SetManualPosition(mWidth-10, 10);
+   mLooperCable = new PatchCableSource(this, kConnectionType_Special);
+   mLooperCable->SetManualPosition(mWidth - 10, 10);
    mLooperCable->AddTypeFilter("looper");
    ofColor color = mLooperCable->GetColor();
    color.a *= .3f;
@@ -93,19 +94,19 @@ void Rewriter::Process(double time)
 
    if (target == nullptr)
       return;
-   
+
    SyncBuffers();
    mRecordBuffer.SetNumChannels(GetBuffer()->NumActiveChannels());
 
    int bufferSize = GetBuffer()->BufferSize();
 
-   for (int ch=0; ch<GetBuffer()->NumActiveChannels(); ++ch)
+   for (int ch = 0; ch < GetBuffer()->NumActiveChannels(); ++ch)
    {
       mRecordBuffer.WriteChunk(GetBuffer()->GetChannel(ch), bufferSize, ch);
 
       Add(target->GetBuffer()->GetChannel(ch), GetBuffer()->GetChannel(ch), bufferSize);
 
-      GetVizBuffer()->WriteChunk(GetBuffer()->GetChannel(ch),bufferSize, ch);
+      GetVizBuffer()->WriteChunk(GetBuffer()->GetChannel(ch), bufferSize, ch);
    }
 
    GetBuffer()->Reset();
@@ -115,7 +116,7 @@ void Rewriter::DrawModule()
 {
    if (Minimized() || IsVisible() == false)
       return;
-   
+
    mRewriteButton->Draw();
    mStartRecordTimeButton->Draw();
 
@@ -142,7 +143,7 @@ void Rewriter::DrawModule()
       int endSample = startSample - 1;
       if (endSample < 0)
          endSample += loopSamples;
-      int loopBeginSample = startSample - loopSamples * (1-playhead);
+      int loopBeginSample = startSample - loopSamples * (1 - playhead);
       if (loopBeginSample < 0)
          loopBeginSample += mRecordBuffer.Size();
 
@@ -150,7 +151,7 @@ void Rewriter::DrawModule()
       ofPopMatrix();
 
       ofSetColor(0, 255, 0);
-      ofLine(rect.x + rect.width*playhead, rect.y, rect.x + rect.width*playhead, rect.y + rect.height);
+      ofLine(rect.x + rect.width * playhead, rect.y, rect.x + rect.width * playhead, rect.y + rect.height);
    }
    else
    {
@@ -158,7 +159,7 @@ void Rewriter::DrawModule()
    }
 }
 
-void Rewriter::ButtonClicked(ClickButton *button)
+void Rewriter::ButtonClicked(ClickButton* button)
 {
    if (button == mStartRecordTimeButton)
    {
@@ -184,8 +185,8 @@ void Rewriter::Go()
          float recordedMs = gTime + gBufferSizeMs - mStartRecordTime;
          float numBarsCurrentTempo = recordedMs / TheTransport->MsPerBar();
          int numBars = int(numBarsCurrentTempo + .5f);
-         numBars = MAX(1, int(Pow2(floor(log2(numBars)))));   //find closest power of 2
-         
+         numBars = MAX(1, int(Pow2(floor(log2(numBars))))); //find closest power of 2
+
          int beats = numBars * TheTransport->GetTimeSigTop();
          float minutes = recordedMs / 1000.0f / 60.0f;
          float bpm = beats / minutes;
@@ -207,8 +208,8 @@ void Rewriter::Go()
 void Rewriter::LoadLayout(const ofxJSONElement& moduleInfo)
 {
    mModuleSaveData.LoadString("target", moduleInfo);
-   
-   mModuleSaveData.LoadString("looper",moduleInfo,"",FillDropdown<Looper*>);
+
+   mModuleSaveData.LoadString("looper", moduleInfo, "", FillDropdown<Looper*>);
 
    SetUpFromSaveData();
 }
@@ -227,7 +228,6 @@ void Rewriter::SaveLayout(ofxJSONElement& moduleInfo)
 void Rewriter::SetUpFromSaveData()
 {
    SetTarget(TheSynth->FindModule(mModuleSaveData.GetString("target")));
-   
-   mLooperCable->SetTarget(TheSynth->FindModule(mModuleSaveData.GetString("looper"),false));
-}
 
+   mLooperCable->SetTarget(TheSynth->FindModule(mModuleSaveData.GetString("looper"), false));
+}

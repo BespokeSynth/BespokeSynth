@@ -53,7 +53,9 @@ enum PatchCableDrawMode
 
 struct NoteHistoryEvent
 {
-   NoteHistoryEvent() : mOn(false), mTime(0) {}
+   NoteHistoryEvent()
+   : mOn(false)
+   , mTime(0) {}
    bool mOn;
    double mTime;
 };
@@ -61,12 +63,17 @@ struct NoteHistoryEvent
 class NoteHistory
 {
 public:
-   NoteHistory() { mHistoryPos = 0; mLastOnEventTime = -999; }
+   NoteHistory()
+   {
+      mHistoryPos = 0;
+      mLastOnEventTime = -999;
+   }
    void AddEvent(double time, bool on);
    bool CurrentlyOn();
    double GetLastOnEventTime() { return mLastOnEventTime; }
    const NoteHistoryEvent& GetHistoryEvent(int ago) const;
    static const int kHistorySize = 100;
+
 private:
    NoteHistoryEvent mHistory[kHistorySize];
    int mHistoryPos;
@@ -83,7 +90,7 @@ public:
       kLeft,
       kRight
    };
-   
+
    PatchCableSource(IDrawableModule* owner, ConnectionType type);
    virtual ~PatchCableSource();
    PatchCable* AddPatchCable(IClickable* target);
@@ -98,7 +105,12 @@ public:
    void SetOverrideVizBuffer(RollingBuffer* viz) { mOverrideVizBuffer = viz; }
    RollingBuffer* GetOverrideVizBuffer() const { return mOverrideVizBuffer; }
    void UpdatePosition(bool parentMinimized);
-   void SetManualPosition(int x, int y) { mManualPositionX = x; mManualPositionY = y; mAutomaticPositioning = false; }
+   void SetManualPosition(int x, int y)
+   {
+      mManualPositionX = x;
+      mManualPositionY = y;
+      mAutomaticPositioning = false;
+   }
    void RemovePatchCable(PatchCable* cable, bool fromUserAction = false);
    void ClearPatchCables();
    void SetPatchCableTarget(PatchCable* cable, IClickable* target, bool fromUserClick);
@@ -119,36 +131,52 @@ public:
    void SetManualSide(Side side) { mManualSide = side; }
    void SetClickable(bool clickable) { mClickable = clickable; }
    bool TestHover(float x, float y) const;
-   void SetOverrideCableDir(ofVec2f dir) { mHasOverrideCableDir = true; mOverrideCableDir = dir; }
+   void SetOverrideCableDir(ofVec2f dir)
+   {
+      mHasOverrideCableDir = true;
+      mOverrideCableDir = dir;
+   }
    ofVec2f GetCableStart(int index) const;
    ofVec2f GetCableStartDir(int index, ofVec2f dest) const;
    void SetModulatorOwner(IModulator* modulator) { mModulatorOwner = modulator; }
    IModulator* GetModulatorOwner() const { return mModulatorOwner; }
-   
-   void AddHistoryEvent(double time, bool on) { mNoteHistory.AddEvent(time, on); if (on) { mLastOnEventTime = time; } }
+
+   void AddHistoryEvent(double time, bool on)
+   {
+      mNoteHistory.AddEvent(time, on);
+      if (on)
+      {
+         mLastOnEventTime = time;
+      }
+   }
    NoteHistory& GetHistory() { return mNoteHistory; }
    double GetLastOnEventTime() const { return mLastOnEventTime; }
-   
+
    void DrawSource();
    void DrawCables(bool parentMinimized);
    void Render() override;
    bool TestClick(int x, int y, bool right, bool testOnly = false) override;
    bool MouseMoved(float x, float y) override;
    void MouseReleased() override;
-   void GetDimensions(float& width, float& height) override { width = 10; height = 10; }
+   void GetDimensions(float& width, float& height) override
+   {
+      width = 10;
+      height = 10;
+   }
    void KeyPressed(int key, bool isRepeat);
-   
+
    void SaveState(FileStreamOut& out);
    void LoadState(FileStreamIn& in);
-   
+
    static bool sAllowInsert;
-   
+
 protected:
    void OnClicked(int x, int y, bool right) override;
+
 private:
    bool InAddCableMode() const;
    int GetHoverIndex(float x, float y) const;
-   
+
    std::vector<PatchCable*> mPatchCables;
    int mHoverIndex; //-1 = not hovered
    ConnectionType mType;
@@ -167,17 +195,17 @@ private:
    Side mManualSide;
    bool mHasOverrideCableDir;
    ofVec2f mOverrideCableDir;
-   
+
    std::vector<INoteReceiver*> mNoteReceivers;
    std::vector<IPulseReceiver*> mPulseReceivers;
    IAudioReceiver* mAudioReceiver;
-   
+
    std::vector<std::string> mTypeFilter;
    std::vector<IClickable*> mValidTargets;
-   
+
    NoteHistory mNoteHistory;
    double mLastOnEventTime;
-   
+
    IModulator* mModulatorOwner;
 
    enum class DrawPass

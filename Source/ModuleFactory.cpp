@@ -256,9 +256,9 @@
 
 #include <juce_core/juce_core.h>
 
-#define REGISTER(class,name,type) Register(#name, &(class::Create), &(class::CanCreate), type, false, false);
-#define REGISTER_HIDDEN(class,name,type) Register(#name, &(class::Create), &(class::CanCreate), type, true, false);
-#define REGISTER_EXPERIMENTAL(class,name,type) Register(#name, &(class::Create), &(class::CanCreate), type, false, true);
+#define REGISTER(class, name, type) Register(#name, &(class ::Create), &(class ::CanCreate), type, false, false);
+#define REGISTER_HIDDEN(class, name, type) Register(#name, &(class ::Create), &(class ::CanCreate), type, true, false);
+#define REGISTER_EXPERIMENTAL(class, name, type) Register(#name, &(class ::Create), &(class ::CanCreate), type, false, true);
 
 ModuleFactory::ModuleFactory()
 {
@@ -518,17 +518,17 @@ std::vector<std::string> ModuleFactory::GetSpawnableModules(ModuleType moduleTyp
    for (auto iter = mFactoryMap.begin(); iter != mFactoryMap.end(); ++iter)
    {
       if (mModuleTypeMap[iter->first] == moduleType &&
-         (mIsHiddenModuleMap[iter->first] == false || gShowDevModules))
+          (mIsHiddenModuleMap[iter->first] == false || gShowDevModules))
          modules.push_back(iter->first);
    }
-   
+
    if (moduleType == kModuleType_Audio)
    {
       std::vector<std::string> effects = TheSynth->GetEffectFactory()->GetSpawnableEffects();
       for (auto effect : effects)
          modules.push_back(effect + " " + kEffectChainSuffix);
    }
-   
+
    sort(modules.begin(), modules.end());
    return modules;
 }
@@ -624,7 +624,7 @@ std::vector<std::string> ModuleFactory::GetSpawnableModules(std::string keys)
    std::vector<std::string> ret;
    for (size_t i = 0; i < modules.size(); ++i)
       ret.push_back(modules[i].toStdString());
-   
+
    return ret;
 }
 

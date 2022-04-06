@@ -9,15 +9,15 @@ void UpdateUserData(std::string destDirPath)
    juce::File destDataDir(destDirPath);
    juce::File bundledDataVersionFile(bundledDataDir.getChildFile("userdata_version.txt"));
    juce::File destDataVersionFile(destDataDir.getChildFile("userdata_version.txt"));
-   
+
    if (!bundledDataVersionFile.exists())
       return;
 
    bool needCopy = false;
    std::vector<juce::String> preserveOldFileList;
    std::vector<juce::String> leaveAloneFileList;
-   
-   if(!destDataVersionFile.exists())
+
+   if (!destDataVersionFile.exists())
    {
       needCopy = true;
    }
@@ -44,22 +44,22 @@ void UpdateUserData(std::string destDirPath)
          leaveAloneFileList.push_back(juce::String(destDirPath) + "/drums/drums.json");
       }
    }
-   
+
    if (needCopy)
    {
-      ofLog() << "copying data from "+bundledDataDir.getFullPathName().toStdString()+" to "+destDirPath;
+      ofLog() << "copying data from " + bundledDataDir.getFullPathName().toStdString() + " to " + destDirPath;
       destDataDir.createDirectory();
-      
-      for (const auto& entry : juce::RangedDirectoryIterator{bundledDataDir, true, "*", juce::File::findDirectories})
+
+      for (const auto& entry : juce::RangedDirectoryIterator{ bundledDataDir, true, "*", juce::File::findDirectories })
       {
          juce::String destDirName = juce::String(destDirPath) + "/" + entry.getFile().getRelativePathFrom(bundledDataDir);
          juce::File(destDirName).createDirectory();
       }
 
-      for (const auto& entry : juce::RangedDirectoryIterator{bundledDataDir, true})
+      for (const auto& entry : juce::RangedDirectoryIterator{ bundledDataDir, true })
       {
          juce::String sourceFileName = entry.getFile().getFullPathName();
-         juce::String destFileName = juce::String(destDirPath) + "/" + entry.getFile().getRelativePathFrom(bundledDataDir).replaceCharacter('\\','/');
+         juce::String destFileName = juce::String(destDirPath) + "/" + entry.getFile().getRelativePathFrom(bundledDataDir).replaceCharacter('\\', '/');
 
          bool copyFile = false;
          if (!juce::File(destFileName).exists())
@@ -69,12 +69,12 @@ void UpdateUserData(std::string destDirPath)
             if (!VectorContains(destFileName, leaveAloneFileList))
             {
                if (VectorContains(destFileName, preserveOldFileList))
-                  juce::File(destFileName).copyFileTo(destFileName+"_old");
-            
+                  juce::File(destFileName).copyFileTo(destFileName + "_old");
+
                copyFile = true;
             }
          }
-             
+
          if (copyFile)
             juce::File(sourceFileName).copyFileTo(destFileName);
       }

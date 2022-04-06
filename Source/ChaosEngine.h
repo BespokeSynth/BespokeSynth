@@ -49,33 +49,44 @@ public:
    ~ChaosEngine();
    static IDrawableModule* Create() { return new ChaosEngine(); }
    static bool CanCreate() { return TheChaosEngine == nullptr; }
-   
-   
+
+
    void CreateUIControls() override;
-   
+
    void Init() override;
    void Poll() override;
    void AudioUpdate();
-   void RestartProgression() { mRestarting = true; mChordProgressionIdx = -1; }
-   
+   void RestartProgression()
+   {
+      mRestarting = true;
+      mChordProgressionIdx = -1;
+   }
+
    void DropdownUpdated(DropdownList* list, int oldVal) override;
    void CheckboxUpdated(Checkbox* checkbox) override;
    void ButtonClicked(ClickButton* button) override;
    void RadioButtonUpdated(RadioButton* list, int oldVal) override;
    void IntSliderUpdated(IntSlider* slider, int oldVal) override;
-   
+
    virtual void LoadLayout(const ofxJSONElement& moduleInfo) override;
    virtual void SetUpFromSaveData() override;
-   
+
 private:
    struct ProgressionChord
    {
-      ProgressionChord(int degree, int beatLength = -1) : mDegree(degree), mBeatLength(beatLength), mInversion(0) {}
-      
-      ProgressionChord(int degree, std::vector<Accidental> accidentals, int beatLength = -1) : mDegree(degree), mAccidentals(accidentals), mBeatLength(beatLength), mInversion(0) {}
-      
+      ProgressionChord(int degree, int beatLength = -1)
+      : mDegree(degree)
+      , mBeatLength(beatLength)
+      , mInversion(0) {}
+
+      ProgressionChord(int degree, std::vector<Accidental> accidentals, int beatLength = -1)
+      : mDegree(degree)
+      , mAccidentals(accidentals)
+      , mBeatLength(beatLength)
+      , mInversion(0) {}
+
       ProgressionChord(const ofxJSONElement& chordInfo, ScalePitches scale);
-      
+
       bool SameChord(const ProgressionChord& chord)
       {
          return mDegree == chord.mDegree &&
@@ -86,13 +97,13 @@ private:
       std::vector<Accidental> mAccidentals;
       int mInversion;
    };
-   
+
    struct SongSection
    {
       std::string mName;
       std::vector<ProgressionChord> mChords;
    };
-   
+
    struct Song
    {
       std::string mName;
@@ -103,7 +114,7 @@ private:
       std::string mScaleType;
       std::vector<SongSection> mSections;
    };
-   
+
    void SetPitchColor(int pitch);
    void DrawKeyboard(float x, float y);
    void DrawGuitar(float x, float y);
@@ -113,13 +124,17 @@ private:
    void GenerateRandomProgression();
    std::vector<int> GetCurrentChordPitches();
    ofRectangle GetKeyboardKeyRect(int pitch, bool& isBlackKey);
-   
+
    //IDrawableModule
    void DrawModule() override;
    bool Enabled() const override { return true; }
-   void GetModuleDimensions(float& width, float& height) override { width=610; height=700; }
+   void GetModuleDimensions(float& width, float& height) override
+   {
+      width = 610;
+      height = 700;
+   }
    void OnClicked(int x, int y, bool right) override;
-   
+
    ClickButton* mChaosButton;
    bool mTotalChaos;
    Checkbox* mTotalChaosCheckbox;
@@ -128,42 +143,41 @@ private:
    int mLastAudioUpdateBeat;
    int mBeatsLeftToChordChange;
    bool mRestarting;
-   
+
    int mChordProgressionIdx;
    std::vector<ProgressionChord> mChordProgression;
    ofMutex mProgressionMutex;
    IntSlider* mChordProgressionSlider;
-   
+
    int mSectionIdx;
    RadioButton* mSectionDropdown;
-   
+
    int mSongIdx;
    DropdownList* mSongDropdown;
    std::vector<Song> mSongs;
    ClickButton* mReadSongsButton;
-   
+
    bool mPlayChord;
    Checkbox* mPlayChordCheckbox;
    bool mProgress;
    Checkbox* mProgressCheckbox;
-   
+
    int mDegree;
    IntSlider* mDegreeSlider;
    Chord mInputChord;
    DropdownList* mRootNoteList;
    DropdownList* mChordTypeList;
    IntSlider* mInversionSlider;
-   
+
    std::vector<Chord> mInputChords;
    ClickButton* mAddChordButton;
    ClickButton* mRemoveChordButton;
    ClickButton* mSetProgressionButton;
-   
+
    ClickButton* mRandomProgressionButton;
-   
+
    bool mHideBeat;
    Checkbox* mHideBeatCheckbox;
 };
 
 #endif /* defined(__modularSynth__ChaosEngine__) */
-

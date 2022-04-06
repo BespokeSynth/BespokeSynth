@@ -36,8 +36,8 @@ public:
    HelpDisplay();
    virtual ~HelpDisplay();
    static IDrawableModule* Create() { return new HelpDisplay(); }
-   
-   
+
+
    bool IsSaveable() override { return false; }
    bool HasTitleBar() const override { return false; }
    void CreateUIControls() override;
@@ -61,7 +61,7 @@ private:
    void GetModuleDimensions(float& w, float& h) override;
 
    void RenderScreenshot(int x, int y, int width, int height, std::string filename);
-   
+
    struct UIControlTooltipInfo
    {
       std::string controlName;
@@ -79,7 +79,7 @@ private:
    void LoadTooltips();
    ModuleTooltipInfo* FindModuleInfo(std::string moduleTypeName);
    UIControlTooltipInfo* FindControlInfo(IUIControl* control);
-   
+
    std::vector<std::string> mHelpText;
    Checkbox* mShowTooltipsCheckbox;
    ClickButton* mCopyBuildInfoButton;

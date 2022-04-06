@@ -56,14 +56,14 @@ Ramper::~Ramper()
 void Ramper::CreateUIControls()
 {
    IDrawableModule::CreateUIControls();
-   mLengthSelector = new DropdownList(this,"length",3,3,(int*)(&mLength));
-   mTriggerButton = new ClickButton(this,"start",67,3);
-   mTargetValueSlider = new FloatSlider(this,"target",3,20,94,15,&mTargetValue,0,1);
-   
+   mLengthSelector = new DropdownList(this, "length", 3, 3, (int*)(&mLength));
+   mTriggerButton = new ClickButton(this, "start", 67, 3);
+   mTargetValueSlider = new FloatSlider(this, "target", 3, 20, 94, 15, &mTargetValue, 0, 1);
+
    mControlCable = new PatchCableSource(this, kConnectionType_Modulator);
    //mControlCable->SetManualPosition(86, 10);
    AddPatchCableSource(mControlCable);
-   
+
    mLengthSelector->AddLabel("64", kInterval_64);
    mLengthSelector->AddLabel("32", kInterval_32);
    mLengthSelector->AddLabel("16", kInterval_16);
@@ -92,7 +92,7 @@ void Ramper::OnTransportAdvanced(float amount)
       float progress = measureProgress / length;
       if (progress >= 0 && progress < 1)
       {
-         
+
          mUIControl->SetValue(ofLerp(mStartValue, mTargetValue, progress));
       }
       else
@@ -113,7 +113,7 @@ void Ramper::DrawModule()
 
 void Ramper::OnClicked(int x, int y, bool right)
 {
-   IDrawableModule::OnClicked(x,y,right);
+   IDrawableModule::OnClicked(x, y, right);
 }
 
 void Ramper::MouseReleased()
@@ -123,7 +123,7 @@ void Ramper::MouseReleased()
 
 bool Ramper::MouseMoved(float x, float y)
 {
-   IDrawableModule::MouseMoved(x,y);
+   IDrawableModule::MouseMoved(x, y);
    return false;
 }
 
@@ -173,14 +173,14 @@ void Ramper::GetModuleDimensions(float& width, float& height)
 void Ramper::SaveLayout(ofxJSONElement& moduleInfo)
 {
    IDrawableModule::SaveLayout(moduleInfo);
-   
+
    moduleInfo["uicontrol"] = mUIControl ? mUIControl->Path() : "";
 }
 
 void Ramper::LoadLayout(const ofxJSONElement& moduleInfo)
 {
    mModuleSaveData.LoadString("uicontrol", moduleInfo);
-   
+
    SetUpFromSaveData();
 }
 

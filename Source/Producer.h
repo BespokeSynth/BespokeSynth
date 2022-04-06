@@ -49,22 +49,22 @@ public:
    Producer();
    ~Producer();
    static IDrawableModule* Create() { return new Producer(); }
-   
-   
+
+
    void CreateUIControls() override;
-   
+
    //INoteReceiver
    void PlayNote(double time, int pitch, int velocity, int voiceIdx = -1, ModulationParameters modulation = ModulationParameters()) override;
    void SendCC(int control, int value, int voiceIdx = -1) override {}
-   
+
    //IAudioSource
    void Process(double time) override;
    void SetEnabled(bool enabled) override { mEnabled = enabled; }
-   
+
    //IDrawableModule
    void FilesDropped(std::vector<std::string> files, int x, int y) override;
-   
-   
+
+
    void CheckboxUpdated(Checkbox* checkbox) override;
    //IFloatSliderListener
    void FloatSliderUpdated(FloatSlider* slider, float oldVal) override;
@@ -75,11 +75,11 @@ public:
    void DropdownUpdated(DropdownList* list, int oldVal) override;
    //IButtonListener
    void ButtonClicked(ClickButton* button) override;
-   
+
    virtual void LoadLayout(const ofxJSONElement& moduleInfo) override;
    virtual void SetUpFromSaveData() override;
-   
-   
+
+
 private:
    void UpdateSample();
    void DoWrite();
@@ -89,15 +89,15 @@ private:
    int GetMeasureForSample(int sample);
    int GetSamplesPerMeasure();
    bool IsSkipMeasure(int measure);
-   
+
    //IDrawableModule
    void DrawModule() override;
    bool Enabled() const override { return mEnabled; }
    void GetModuleDimensions(float& width, float& height) override;
    void OnClicked(int x, int y, bool right) override;
-   
+
    Sample* mSample;
-   
+
    float mVolume;
    FloatSlider* mVolumeSlider;
    float* mWriteBuffer;
@@ -133,4 +133,3 @@ private:
 
 
 #endif /* defined(__modularSynth__Producer__) */
-

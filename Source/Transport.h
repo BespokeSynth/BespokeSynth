@@ -73,7 +73,8 @@ enum NoteInterval
 struct OffsetInfo
 {
    OffsetInfo(double offset, bool offsetIsInMs)
-   : mOffset(offset), mOffsetIsInMs(offsetIsInMs) {}
+   : mOffset(offset)
+   , mOffsetIsInMs(offsetIsInMs) {}
    double mOffset;
    bool mOffsetIsInMs;
 };
@@ -81,8 +82,12 @@ struct OffsetInfo
 struct TransportListenerInfo
 {
    TransportListenerInfo(ITimeListener* listener, NoteInterval interval, OffsetInfo offsetInfo, bool useEventLookahead)
-   : mListener(listener), mInterval(interval), mOffsetInfo(offsetInfo), mUseEventLookahead(useEventLookahead), mCustomDivisor(8) {}
-   
+   : mListener(listener)
+   , mInterval(interval)
+   , mOffsetInfo(offsetInfo)
+   , mUseEventLookahead(useEventLookahead)
+   , mCustomDivisor(8) {}
+
    ITimeListener* mListener;
    NoteInterval mInterval;
    OffsetInfo mOffsetInfo;
@@ -94,18 +99,22 @@ class Transport : public IDrawableModule, public IButtonListener, public IFloatS
 {
 public:
    Transport();
-   
+
    void CreateUIControls() override;
    void Poll() override;
 
    float GetTempo() { return mTempo; }
    void SetTempo(float tempo) { mTempo = tempo; }
-   void SetTimeSignature(int top, int bottom) { mTimeSigTop = top; mTimeSigBottom = bottom; }
+   void SetTimeSignature(int top, int bottom)
+   {
+      mTimeSigTop = top;
+      mTimeSigBottom = bottom;
+   }
    int GetTimeSigTop() { return mTimeSigTop; }
    int GetTimeSigBottom() { return mTimeSigBottom; }
    void SetSwing(float swing) { mSwing = swing; }
    float GetSwing() { return mSwing; }
-   double MsPerBar() const { return 60.0/mTempo * 1000 * mTimeSigTop * 4.0/mTimeSigBottom; }
+   double MsPerBar() const { return 60.0 / mTempo * 1000 * mTimeSigTop * 4.0 / mTimeSigBottom; }
    void Advance(double ms);
    TransportListenerInfo* AddListener(ITimeListener* listener, NoteInterval interval, OffsetInfo offsetInfo, bool useEventLookahead);
    void RemoveListener(ITimeListener* listener);
@@ -123,16 +132,25 @@ public:
    static int CountInStandardMeasure(NoteInterval interval);
    void Reset(float rewindAmount = 0.005f);
    void OnDrumEvent(NoteInterval drumEvent);
-   void SetLoop(int measureStart, int measureEnd) { assert(measureStart < measureEnd); mLoopStartMeasure = measureStart; mLoopEndMeasure = measureEnd; }
-   void ClearLoop() { mLoopStartMeasure = -1; mLoopEndMeasure = -1; }
+   void SetLoop(int measureStart, int measureEnd)
+   {
+      assert(measureStart < measureEnd);
+      mLoopStartMeasure = measureStart;
+      mLoopEndMeasure = measureEnd;
+   }
+   void ClearLoop()
+   {
+      mLoopStartMeasure = -1;
+      mLoopEndMeasure = -1;
+   }
    double GetMeasureFraction(NoteInterval interval);
    int GetStepsPerMeasure(ITimeListener* listener);
    int GetSyncedStep(double time, ITimeListener* listener, const TransportListenerInfo* listenerInfo, int length = -1);
-   
+
    bool CheckNeedsDraw() override { return true; }
-   
+
    double GetEventLookaheadMs() { return sDoEventLookahead ? sEventEarlyMs : 0; }
-   
+
    //IDrawableModule
    void Init() override;
    void KeyPressed(int key, bool isRepeat) override;
@@ -147,10 +165,10 @@ public:
    void SetUpFromSaveData() override;
    void SaveState(FileStreamOut& out) override;
    void LoadState(FileStreamIn& in) override;
-   
+
    static bool sDoEventLookahead;
    static double sEventEarlyMs;
-   
+
 private:
    void UpdateListeners(double jumpMs);
    double Swing(double measurePos);
@@ -161,9 +179,13 @@ private:
 
    //IDrawableModule
    void DrawModule() override;
-   void GetModuleDimensions(float& width, float& height) override { width = 140; height = 100; }
+   void GetModuleDimensions(float& width, float& height) override
+   {
+      width = 140;
+      height = 100;
+   }
    bool Enabled() const override { return true; }
-   
+
    float mTempo;
    int mTimeSigTop;
    int mTimeSigBottom;
@@ -186,7 +208,7 @@ private:
    FloatSlider* mTempoSlider;
    int mLoopStartMeasure;
    int mLoopEndMeasure;
-   bool mWantSetRandomTempo{false};
+   bool mWantSetRandomTempo{ false };
 
    std::list<TransportListenerInfo> mListeners;
    std::list<IAudioPoller*> mAudioPollers;
@@ -195,4 +217,3 @@ private:
 extern Transport* TheTransport;
 
 #endif /* defined(__modularSynth__Transport__) */
-

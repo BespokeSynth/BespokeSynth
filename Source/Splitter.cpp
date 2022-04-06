@@ -32,21 +32,21 @@
 
 Splitter::Splitter()
 : IAudioProcessor(gBufferSize)
-, mVizBuffer2(VIZ_BUFFER_SECONDS*gSampleRate)
+, mVizBuffer2(VIZ_BUFFER_SECONDS * gSampleRate)
 {
 }
 
 void Splitter::CreateUIControls()
 {
    IDrawableModule::CreateUIControls();
-   
-   float w,h;
+
+   float w, h;
    GetDimensions(w, h);
-   GetPatchCableSource()->SetManualPosition(w/2-15,h+3);
+   GetPatchCableSource()->SetManualPosition(w / 2 - 15, h + 3);
    GetPatchCableSource()->SetManualSide(PatchCableSource::Side::kBottom);
-   
+
    mPatchCableSource2 = new PatchCableSource(this, kConnectionType_Audio);
-   mPatchCableSource2->SetManualPosition(w/2+15,h+3);
+   mPatchCableSource2->SetManualPosition(w / 2 + 15, h + 3);
    mPatchCableSource2->SetOverrideVizBuffer(&mVizBuffer2);
    mPatchCableSource2->SetManualSide(PatchCableSource::Side::kBottom);
    AddPatchCableSource(mPatchCableSource2);
@@ -59,10 +59,10 @@ Splitter::~Splitter()
 void Splitter::Process(double time)
 {
    PROFILER(Splitter);
-   
+
    if (!mEnabled)
       return;
-   
+
    IAudioReceiver* target0 = GetTarget(0);
    if (target0)
    {
@@ -70,7 +70,7 @@ void Splitter::Process(double time)
       Add(out->GetChannel(0), GetBuffer()->GetChannel(0), GetBuffer()->BufferSize());
       GetVizBuffer()->WriteChunk(GetBuffer()->GetChannel(0), GetBuffer()->BufferSize(), 0);
    }
-   
+
    int secondChannel = 1;
    if (GetBuffer()->NumActiveChannels() == 1)
       secondChannel = 0;
@@ -81,7 +81,7 @@ void Splitter::Process(double time)
       Add(out2->GetChannel(0), GetBuffer()->GetChannel(secondChannel), GetBuffer()->BufferSize());
       mVizBuffer2.WriteChunk(GetBuffer()->GetChannel(secondChannel), GetBuffer()->BufferSize(), 0);
    }
-   
+
    GetBuffer()->Reset();
 }
 
@@ -95,7 +95,7 @@ void Splitter::LoadLayout(const ofxJSONElement& moduleInfo)
 {
    mModuleSaveData.LoadString("target", moduleInfo);
    mModuleSaveData.LoadString("target2", moduleInfo);
-   
+
    SetUpFromSaveData();
 }
 
@@ -106,5 +106,3 @@ void Splitter::SetUpFromSaveData()
    if (target2)
       mPatchCableSource2->AddPatchCable(target2);
 }
-
-

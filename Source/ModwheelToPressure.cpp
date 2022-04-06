@@ -54,7 +54,7 @@ void ModwheelToPressure::PlayNote(double time, int pitch, int velocity, int voic
 void ModwheelToPressure::LoadLayout(const ofxJSONElement& moduleInfo)
 {
    mModuleSaveData.LoadString("target", moduleInfo);
-   
+
    SetUpFromSaveData();
 }
 

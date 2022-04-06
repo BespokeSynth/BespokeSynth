@@ -39,7 +39,7 @@ Checkbox::Checkbox(IDrawableModule* owner, const char* label, int x, int y, bool
 {
    assert(owner);
    SetLabel(label);
-   SetPosition(x,y);
+   SetPosition(x, y);
    owner->AddUIControl(this);
    SetParent(dynamic_cast<IClickable*>(owner));
    CalcSliderVal();
@@ -90,20 +90,20 @@ void Checkbox::Poll()
 void Checkbox::Render()
 {
    mLastDisplayedValue = *mVar;
-   
+
    ofPushStyle();
-   
-   DrawBeacon(mX+6, mY+8);
-   
+
+   DrawBeacon(mX + 6, mY + 8);
+
    ofColor color;
    if (IsPreset())
-      color.set(0,255,0);
+      color.set(0, 255, 0);
    else if (mUseCircleLook)
       color = mCustomColor;
    else
-      color.set(255,255,255);
+      color.set(255, 255, 255);
    color.a = gModuleDrawAlpha;
-   
+
    ofColor darkColor = color;
    darkColor.setBrightness(30);
 
@@ -111,28 +111,28 @@ void Checkbox::Render()
    if (mUseCircleLook)
    {
       ofSetColor(darkColor);
-      ofCircle(mX+mHeight/2-1,mY+mHeight/2+1,mHeight/3);
+      ofCircle(mX + mHeight / 2 - 1, mY + mHeight / 2 + 1, mHeight / 3);
    }
    else
    {
-      ofSetColor(color.r,color.g,color.b,color.a*.2f);
-      ofRect(mX,mY+1,mHeight-3,mHeight-3);
+      ofSetColor(color.r, color.g, color.b, color.a * .2f);
+      ofRect(mX, mY + 1, mHeight - 3, mHeight - 3);
    }
 
    ofSetColor(color);
-   
+
    if (mDisplayText)
-      DrawTextNormal(Name(), mX+13, mY+12);
+      DrawTextNormal(Name(), mX + 13, mY + 12);
    if (*mVar)
    {
       if (mUseCircleLook)
-         ofCircle(mX+mHeight/2-1,mY+mHeight/2+1,mHeight/5);
+         ofCircle(mX + mHeight / 2 - 1, mY + mHeight / 2 + 1, mHeight / 5);
       else
-         ofRect(mX+2, mY+3, mHeight-7, mHeight-7, 2);
+         ofRect(mX + 2, mY + 3, mHeight - 7, mHeight - 7, 2);
    }
 
    ofPopStyle();
-   
+
    DrawHover(mX, mY, mWidth, mHeight);
 }
 
@@ -140,7 +140,7 @@ void Checkbox::OnClicked(int x, int y, bool right)
 {
    if (right)
       return;
-   
+
    *mVar = !(*mVar);
    CalcSliderVal();
    mOwner->CheckboxUpdated(this);
@@ -160,7 +160,7 @@ bool Checkbox::MouseMoved(float x, float y)
 
 void Checkbox::SetFromMidiCC(float slider, bool setViaModulator /*= false*/)
 {
-   slider = ofClamp(slider,0,1);
+   slider = ofClamp(slider, 0, 1);
    mSliderVal = slider;
    bool on = GetValueForMidiCC(slider) > 0.5f;
    if (*mVar != on)
@@ -199,7 +199,7 @@ float Checkbox::GetValue() const
 
 std::string Checkbox::GetDisplayValue(float val) const
 {
-   return val>0 ? "on" : "off";
+   return val > 0 ? "on" : "off";
 }
 
 void Checkbox::Increment(float amount)
@@ -212,7 +212,7 @@ bool Checkbox::CheckNeedsDraw()
 {
    if (IUIControl::CheckNeedsDraw())
       return true;
-   
+
    return *mVar != mLastDisplayedValue;
 }
 
@@ -224,7 +224,7 @@ namespace
 void Checkbox::SaveState(FileStreamOut& out)
 {
    out << kSaveStateRev;
-   
+
    out << (float)*mVar;
 }
 
@@ -233,7 +233,7 @@ void Checkbox::LoadState(FileStreamIn& in, bool shouldSetValue)
    int rev;
    in >> rev;
    LoadStateValidate(rev == kSaveStateRev);
-   
+
    float var;
    in >> var;
    if (shouldSetValue)

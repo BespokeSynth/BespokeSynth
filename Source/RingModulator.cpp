@@ -50,11 +50,11 @@ RingModulator::RingModulator()
 void RingModulator::CreateUIControls()
 {
    IDrawableModule::CreateUIControls();
-   mFreqSlider = new FloatSlider(this,"freq", 5, 4, 120, 15, &mFreq, 20, 2000);
-   mDryWetSlider = new FloatSlider(this,"dry/wet", 5, 20, 120, 15, &mDryWet, 0, 1);
-   mVolumeSlider = new FloatSlider(this,"volume", 5, 36, 120, 15, &mVolume, 0, 2);
-   mGlideSlider = new FloatSlider(this,"glide",5,52,120,15,&mGlideTime,0,1000);
-   
+   mFreqSlider = new FloatSlider(this, "freq", 5, 4, 120, 15, &mFreq, 20, 2000);
+   mDryWetSlider = new FloatSlider(this, "dry/wet", 5, 20, 120, 15, &mDryWet, 0, 1);
+   mVolumeSlider = new FloatSlider(this, "volume", 5, 36, 120, 15, &mVolume, 0, 2);
+   mGlideSlider = new FloatSlider(this, "glide", 5, 52, 120, 15, &mGlideTime, 0, 1000);
+
    mFreqSlider->SetMode(FloatSlider::kLogarithmic);
 }
 
@@ -70,7 +70,7 @@ void RingModulator::Process(double time)
 
    if (target == nullptr)
       return;
-   
+
    SyncBuffers();
    mDryBuffer.SetNumActiveChannels(GetBuffer()->NumActiveChannels());
 
@@ -79,31 +79,34 @@ void RingModulator::Process(double time)
    if (mEnabled)
    {
       mDryBuffer.CopyFrom(GetBuffer());
-      
-      for (int i=0; i<bufferSize; ++i)
+
+      for (int i = 0; i < bufferSize; ++i)
       {
          ComputeSliders(0);
-         
-         for (int ch=0; ch<GetBuffer()->NumActiveChannels(); ++ch)
+
+         for (int ch = 0; ch < GetBuffer()->NumActiveChannels(); ++ch)
             GetBuffer()->GetChannel(ch)[i] *= mModOsc.Audio(time, mPhase);
 
          float phaseInc = GetPhaseInc(mFreqRamp.Value(time));
          mPhase += phaseInc;
-         while (mPhase > FTWO_PI) { mPhase -= FTWO_PI; }
+         while (mPhase > FTWO_PI)
+         {
+            mPhase -= FTWO_PI;
+         }
 
          time += gInvSampleRateMs;
       }
    }
-   
-   for (int ch=0; ch<GetBuffer()->NumActiveChannels(); ++ch)
+
+   for (int ch = 0; ch < GetBuffer()->NumActiveChannels(); ++ch)
    {
       if (mEnabled)
       {
-         Mult(mDryBuffer.GetChannel(ch), (1-mDryWet)*mVolume*mVolume, GetBuffer()->BufferSize());
-         Mult(GetBuffer()->GetChannel(ch), mDryWet*mVolume*mVolume, GetBuffer()->BufferSize());
+         Mult(mDryBuffer.GetChannel(ch), (1 - mDryWet) * mVolume * mVolume, GetBuffer()->BufferSize());
+         Mult(GetBuffer()->GetChannel(ch), mDryWet * mVolume * mVolume, GetBuffer()->BufferSize());
          Add(GetBuffer()->GetChannel(ch), mDryBuffer.GetChannel(ch), GetBuffer()->BufferSize());
       }
-      
+
       Add(target->GetBuffer()->GetChannel(ch), GetBuffer()->GetChannel(ch), GetBuffer()->BufferSize());
       GetVizBuffer()->WriteChunk(GetBuffer()->GetChannel(ch), GetBuffer()->BufferSize(), ch);
    }
@@ -116,11 +119,11 @@ void RingModulator::DrawModule()
 
    if (Minimized() || IsVisible() == false)
       return;
-   
+
    mFreqSlider->Draw();
    mVolumeSlider->Draw();
    mDryWetSlider->Draw();
-   
+
    mGlideSlider->Draw();
 }
 
@@ -161,5 +164,3 @@ void RingModulator::SetUpFromSaveData()
 {
    SetTarget(TheSynth->FindModule(mModuleSaveData.GetString("target")));
 }
-
-

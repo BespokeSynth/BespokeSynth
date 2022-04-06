@@ -45,9 +45,9 @@ void Polyrhythms::Init()
 void Polyrhythms::CreateUIControls()
 {
    IDrawableModule::CreateUIControls();
-   for (int i=0; i<(int)mRhythmLines.size(); ++i)
+   for (int i = 0; i < (int)mRhythmLines.size(); ++i)
    {
-      mRhythmLines[i] = new RhythmLine(this,i);
+      mRhythmLines[i] = new RhythmLine(this, i);
       mRhythmLines[i]->CreateUIControls();
    }
 }
@@ -55,32 +55,32 @@ void Polyrhythms::CreateUIControls()
 Polyrhythms::~Polyrhythms()
 {
    TheTransport->RemoveAudioPoller(this);
-   
-   for (int i=0; i<mRhythmLines.size(); ++i)
+
+   for (int i = 0; i < mRhythmLines.size(); ++i)
       delete mRhythmLines[i];
 }
 
 void Polyrhythms::OnTransportAdvanced(float amount)
 {
    PROFILER(Polyrhythms);
-   
+
    if (!mEnabled)
       return;
 
-   for (int i=0; i<mRhythmLines.size(); ++i)
+   for (int i = 0; i < mRhythmLines.size(); ++i)
    {
       int beats = mRhythmLines[i]->mGrid->GetCols();
       int oldQuantized;
       if (amount > TheTransport->GetMeasurePos(gTime))
          oldQuantized = -1;
       else
-         oldQuantized = int((TheTransport->GetMeasurePos(gTime)-amount) * beats);
+         oldQuantized = int((TheTransport->GetMeasurePos(gTime) - amount) * beats);
       int quantized = int(TheTransport->GetMeasurePos(gTime) * beats);
-      float val = mRhythmLines[i]->mGrid->GetValRefactor(0,quantized);
+      float val = mRhythmLines[i]->mGrid->GetValRefactor(0, quantized);
 
       if (quantized != oldQuantized && val > 0)
       {
-         PlayNoteOutput(gTime, mRhythmLines[i]->mPitch, val*127, -1);
+         PlayNoteOutput(gTime, mRhythmLines[i]->mPitch, val * 127, -1);
       }
 
       mRhythmLines[i]->mGrid->SetHighlightCol(gTime, quantized);
@@ -91,44 +91,44 @@ void Polyrhythms::DrawModule()
 {
    if (Minimized() || IsVisible() == false)
       return;
-   
-   for (int i=0; i<mRhythmLines.size(); ++i)
+
+   for (int i = 0; i < mRhythmLines.size(); ++i)
       mRhythmLines[i]->Draw();
 }
 
 void Polyrhythms::Resize(float w, float h)
 {
-   mWidth = MAX(150,w);
+   mWidth = MAX(150, w);
    mHeight = mRhythmLines.size() * 17 + 5;
-   for (int i=0; i<mRhythmLines.size(); ++i)
+   for (int i = 0; i < mRhythmLines.size(); ++i)
       mRhythmLines[i]->OnResize();
 }
 
 void Polyrhythms::OnClicked(int x, int y, bool right)
 {
-   IDrawableModule::OnClicked(x,y,right);
-   for (int i=0; i<mRhythmLines.size(); ++i)
-      mRhythmLines[i]->OnClicked(x,y,right);
+   IDrawableModule::OnClicked(x, y, right);
+   for (int i = 0; i < mRhythmLines.size(); ++i)
+      mRhythmLines[i]->OnClicked(x, y, right);
 }
 
 void Polyrhythms::MouseReleased()
 {
    IDrawableModule::MouseReleased();
-   for (int i=0; i<mRhythmLines.size(); ++i)
+   for (int i = 0; i < mRhythmLines.size(); ++i)
       mRhythmLines[i]->MouseReleased();
 }
 
 bool Polyrhythms::MouseMoved(float x, float y)
 {
-   IDrawableModule::MouseMoved(x,y);
-   for (int i=0; i<mRhythmLines.size(); ++i)
-      mRhythmLines[i]->MouseMoved(x,y);
+   IDrawableModule::MouseMoved(x, y);
+   for (int i = 0; i < mRhythmLines.size(); ++i)
+      mRhythmLines[i]->MouseMoved(x, y);
    return false;
 }
 
 void Polyrhythms::DropdownUpdated(DropdownList* list, int oldVal)
 {
-   for (int i=0; i<mRhythmLines.size(); ++i)
+   for (int i = 0; i < mRhythmLines.size(); ++i)
    {
       if (list == mRhythmLines[i]->mLengthSelector)
          mRhythmLines[i]->UpdateGrid();
@@ -192,10 +192,10 @@ RhythmLine::RhythmLine(Polyrhythms* owner, int index)
 
 void RhythmLine::CreateUIControls()
 {
-   mGrid = new UIGrid("uigrid", 4,4+mIndex*17,100,15,4,1, mOwner);
-   mLengthSelector = new DropdownList(mOwner,("length"+ofToString(mIndex)).c_str(),-1,-1,&mLength);
-   mNoteSelector = new TextEntry(mOwner,("note"+ofToString(mIndex)).c_str(),-1,-1,4,&mPitch,0,127);
-   
+   mGrid = new UIGrid("uigrid", 4, 4 + mIndex * 17, 100, 15, 4, 1, mOwner);
+   mLengthSelector = new DropdownList(mOwner, ("length" + ofToString(mIndex)).c_str(), -1, -1, &mLength);
+   mNoteSelector = new TextEntry(mOwner, ("note" + ofToString(mIndex)).c_str(), -1, -1, 4, &mPitch, 0, 127);
+
    mLengthSelector->AddLabel("3", 3);
    mLengthSelector->AddLabel("4", 4);
    mLengthSelector->AddLabel("5", 5);
@@ -210,10 +210,10 @@ void RhythmLine::CreateUIControls()
    mLengthSelector->AddLabel("7x4", 28);
    mLengthSelector->AddLabel("8x4", 32);
    mLengthSelector->AddLabel("9x4", 36);
-   
+
    mGrid->SetGridMode(UIGrid::kMultisliderBipolar);
    mGrid->SetRequireShiftForMultislider(true);
-   
+
    OnResize();
 }
 
@@ -226,9 +226,9 @@ void RhythmLine::OnResize()
 
 void RhythmLine::UpdateGrid()
 {
-   mGrid->SetGrid(mLength,1);
+   mGrid->SetGrid(mLength, 1);
    if (mLength % 4 == 0)
-      mGrid->SetMajorColSize(mLength/4);
+      mGrid->SetMajorColSize(mLength / 4);
    else
       mGrid->SetMajorColSize(-1);
 }
@@ -244,7 +244,7 @@ void RhythmLine::OnClicked(int x, int y, bool right)
 {
    if (right)
       return;
-   
+
    mGrid->TestClick(x, y, right);
 }
 
@@ -257,4 +257,3 @@ void RhythmLine::MouseMoved(float x, float y)
 {
    mGrid->NotifyMouseMoved(x, y);
 }
-

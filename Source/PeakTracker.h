@@ -31,15 +31,19 @@
 class PeakTracker
 {
 public:
-   PeakTracker() : mPeak(0), mDecayTime(.01f), mLimit(-1), mHitLimitTime(-9999) {}
-   
+   PeakTracker()
+   : mPeak(0)
+   , mDecayTime(.01f)
+   , mLimit(-1)
+   , mHitLimitTime(-9999) {}
+
    void Process(float* buffer, int bufferSize);
    float GetPeak() const { return mPeak; }
    void SetDecayTime(float time) { mDecayTime = time; }
    void SetLimit(float limit) { mLimit = limit; }
    void Reset() { mPeak = 0; }
    double GetLastHitLimitTime() const { return mHitLimitTime; }
-   
+
 private:
    float mPeak;
    float mDecayTime;

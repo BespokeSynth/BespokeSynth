@@ -40,17 +40,17 @@ public:
    Prefab();
    ~Prefab();
    static IDrawableModule* Create() { return new Prefab(); }
-   
+
    std::string GetTitleLabel() const override;
    void CreateUIControls() override;
-   
+
    ModuleContainer* GetContainer() override { return &mModuleContainer; }
-   
+
    void Poll() override;
    bool ShouldClipContents() override { return false; }
-   
+
    void ButtonClicked(ClickButton* button) override;
-   
+
    void LoadLayout(const ofxJSONElement& moduleInfo) override;
    void SaveLayout(ofxJSONElement& moduleInfo) override;
    void SetUpFromSaveData() override;
@@ -59,12 +59,12 @@ public:
 
    //IPatchable
    void PostRepatch(PatchCableSource* cableSource, bool fromUserClick) override;
-   
+
    void LoadPrefab(std::string loadPath);
 
    static bool sLoadingPrefab;
    static IDrawableModule* sJustReleasedModule;
-   
+
 private:
    //IDrawableModule
    void DrawModule() override;
@@ -76,10 +76,10 @@ private:
 
    bool CanAddDropModules();
    bool IsMouseHovered();
-   
+
    void SavePrefab(std::string savePath);
    void UpdatePrefabName(std::string path);
-   
+
    PatchCableSource* mRemoveModuleCable;
    ClickButton* mSaveButton;
    ClickButton* mLoadButton;
@@ -89,5 +89,4 @@ private:
 };
 
 
-
-#endif  // PREFAB_H_INCLUDED
+#endif // PREFAB_H_INCLUDED

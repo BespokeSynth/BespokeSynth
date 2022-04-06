@@ -47,7 +47,8 @@
 #endif
 
 ModularSynth* TheSynth = nullptr;
-namespace {
+namespace
+{
    juce::String TheClipboard;
 }
 
@@ -109,17 +110,17 @@ ModularSynth::ModularSynth()
 #if BESPOKE_WINDOWS
    SetUnhandledExceptionFilter(TopLevelExceptionHandler);
 #endif
-   
+
    mAudioPluginFormatManager = std::make_unique<juce::AudioPluginFormatManager>();
    mKnownPluginList = std::make_unique<juce::KnownPluginList>();
-   
+
    mAudioPluginFormatManager->addDefaultFormats();
 }
 
 ModularSynth::~ModularSynth()
 {
    DeleteAllModules();
-   
+
    delete mGlobalRecordBuffer;
    delete[] mSaveOutputBuffer[0];
    delete[] mSaveOutputBuffer[1];
@@ -127,10 +128,10 @@ ModularSynth::~ModularSynth()
    mKnownPluginList.reset();
 
    SetMemoryTrackingEnabled(false); //avoid crashes when the tracking lists themselves are deleted
-   
+
    assert(TheSynth == this);
    TheSynth = nullptr;
-   
+
    ScriptModule::UninitializePython();
 }
 
@@ -195,14 +196,15 @@ void ModularSynth::DumpStats(bool isCrash, void* crashContext)
          symbol->SizeOfStruct = sizeof(SYMBOL_INFO);
 
          while (StackWalk64(machine_type,
-            GetCurrentProcess(),
-            GetCurrentThread(),
-            &stack_frame,
-            &context_record,
-            NULL,
-            &SymFunctionTableAccess64,
-            &SymGetModuleBase64,
-            NULL)) {
+                            GetCurrentProcess(),
+                            GetCurrentThread(),
+                            &stack_frame,
+                            &context_record,
+                            NULL,
+                            &SymFunctionTableAccess64,
+                            &SymGetModuleBase64,
+                            NULL))
+         {
 
             DWORD64 displacement = 0;
 
@@ -217,7 +219,6 @@ void ModularSynth::DumpStats(bool isCrash, void* crashContext)
 
                log.appendText(String(symbol->Name) + String(" + 0x") + String::toHexString((juce::int64)displacement) + "\n");
             }
-
          }
          log.appendText("\n\n\n");
       }
@@ -228,7 +229,7 @@ void ModularSynth::DumpStats(bool isCrash, void* crashContext)
       log.appendText("\n\n\n");
    }
 
-   log.appendText("OS: " + juce::SystemStats::getOperatingSystemName()+"\n");
+   log.appendText("OS: " + juce::SystemStats::getOperatingSystemName() + "\n");
    log.appendText("CPU vendor: " + juce::SystemStats::getCpuVendor() + "\n");
    log.appendText("CPU model: " + juce::SystemStats::getCpuModel() + "\n");
    log.appendText("CPU speed: " + ofToString(juce::SystemStats::getCpuSpeedInMegahertz()) + " MHz\n");
@@ -255,16 +256,16 @@ void ModularSynth::Setup(juce::AudioDeviceManager* globalAudioDeviceManager, juc
    mGlobalAudioFormatManager = globalAudioFormatManager;
    mMainComponent = mainComponent;
    mOpenGLContext = openGLContext;
-   
+
    sShouldAutosave = UserPrefs.autosave.Get();
 
    mIOBufferSize = gBufferSize;
-   
+
    mGlobalRecordBuffer = new RollingBuffer(UserPrefs.record_buffer_length_minutes.Get() * 60 * gSampleRate);
    mGlobalRecordBuffer->SetNumChannels(2);
    mSaveOutputBuffer[0] = new float[mGlobalRecordBuffer->Size()];
    mSaveOutputBuffer[1] = new float[mGlobalRecordBuffer->Size()];
-   
+
    juce::File(ofToDataPath("savestate")).createDirectory();
    juce::File(ofToDataPath("savestate/autosave")).createDirectory();
    juce::File(ofToDataPath("recordings")).createDirectory();
@@ -272,7 +273,7 @@ void ModularSynth::Setup(juce::AudioDeviceManager* globalAudioDeviceManager, juc
    juce::File(ofToDataPath("scripts")).createDirectory();
    juce::File(ofToDataPath("internal")).createDirectory();
    juce::File(ofToDataPath("vst")).createDirectory();
-   
+
    SynthInit();
 
    new Transport();
@@ -282,7 +283,7 @@ void ModularSynth::Setup(juce::AudioDeviceManager* globalAudioDeviceManager, juc
 
    TheScale->Init();
    TheTransport->Init();
-   
+
    DrumPlayer::SetUpHitDirectories();
 
    sBackgroundLissajousR = UserPrefs.lissajous_r.Get();
@@ -299,11 +300,11 @@ void ModularSynth::Setup(juce::AudioDeviceManager* globalAudioDeviceManager, juc
       sBackgroundLissajousG = 0.328f;
       sBackgroundLissajousB = 0.0f;
    }
-   
+
    ResetLayout();
-   
+
    mConsoleListener = new ConsoleListener();
-   mConsoleEntry = new TextEntry(mConsoleListener,"console",0,20,50,mConsoleText);
+   mConsoleEntry = new TextEntry(mConsoleListener, "console", 0, 20, 50, mConsoleText);
    mConsoleEntry->SetRequireEnter(true);
 }
 
@@ -329,18 +330,18 @@ void ModularSynth::InitIOBuffers(int inputChannelCount, int outputChannelCount)
 std::string ModularSynth::GetUserPrefsPath()
 {
    std::string filename = "userprefs.json";
-   for (int i=0; i < JUCEApplication::getCommandLineParameterArray().size(); ++i)
+   for (int i = 0; i < JUCEApplication::getCommandLineParameterArray().size(); ++i)
    {
       juce::String specified = JUCEApplication::getCommandLineParameterArray()[i];
       if (specified.endsWith(".json"))
       {
          filename = specified.toStdString();
          if (!juce::File(ofToDataPath(filename)).existsAsFile())
-             TheSynth->SetFatalError("couldn't find command-line-specified userprefs file at " + ofToDataPath(filename));
+            TheSynth->SetFatalError("couldn't find command-line-specified userprefs file at " + ofToDataPath(filename));
          break;
       }
    }
-   
+
    return ofToDataPath(filename);
 }
 
@@ -348,12 +349,12 @@ static int sFrameCount = 0;
 void ModularSynth::Poll()
 {
    if (mFatalError == "")
-   {  
+   {
       if (!mInitialized && sFrameCount > 3) //let some frames render before blocking for a load
       {
          mUserPrefsEditor->CreatePrefsFileIfNonexistent();
-         
-         if(!mStartupSaveStateFile.empty())
+
+         if (!mStartupSaveStateFile.empty())
             LoadState(mStartupSaveStateFile);
          else
             LoadLayoutFromFile(ofToDataPath(UserPrefs.layout.Get()));
@@ -366,9 +367,9 @@ void ModularSynth::Poll()
          mWantReloadInitialLayout = false;
       }
    }
-   
+
    mZoomer.Update();
-   
+
    if (!mIsLoadingState)
    {
       for (auto p : mExtraPollers)
@@ -376,13 +377,13 @@ void ModularSynth::Poll()
       mModuleContainer.Poll();
       mUILayerModuleContainer.Poll();
    }
-   
+
    if (mShowLoadStatePopup)
    {
       mShowLoadStatePopup = false;
       LoadStatePopupImp();
    }
-   
+
    if (mScheduledEnvelopeEditorSpawnDisplay != nullptr)
    {
       mScheduledEnvelopeEditorSpawnDisplay->SpawnEnvelopeEditor();
@@ -433,18 +434,18 @@ void ModularSynth::Poll()
          mMainComponent->setMouseCursor(desiredCursor);
       }
    }
-   
+
    ++sFrameCount;
 }
 
 void ModularSynth::DeleteAllModules()
 {
    mModuleContainer.Clear();
-   
-   for (int i=0; i<mDeletedModules.size(); ++i)
+
+   for (int i = 0; i < mDeletedModules.size(); ++i)
       delete mDeletedModules[i];
    mDeletedModules.clear();
-   
+
    delete TheScale;
    TheScale = nullptr;
    delete TheTransport;
@@ -464,7 +465,7 @@ void ModularSynth::ZoomView(float zoomAmount, bool fromMouse)
    gDrawScale *= 1 + zoomAmount;
    float minZoom = .1f;
    float maxZoom = 8;
-   gDrawScale = ofClamp(gDrawScale,minZoom,maxZoom);
+   gDrawScale = ofClamp(gDrawScale, minZoom, maxZoom);
    zoomAmount = (gDrawScale - oldDrawScale) / oldDrawScale; //find actual adjusted amount
    ofVec2f zoomCenter;
    if (fromMouse)
@@ -485,22 +486,22 @@ void ModularSynth::PanView(float x, float y)
 void ModularSynth::Draw(void* vg)
 {
    gNanoVG = (NVGcontext*)vg;
-   
+
    ofNoFill();
-   
+
    //DrawTextNormal("fps: "+ofToString(ofGetFrameRate(),4)+" "+ofToString(ofGetWidth()*ofGetHeight()), 100, 100,50);
    //return;
-   
+
    mModuleContainer.SetDrawScale(gDrawScale);
    mDrawRect.set(-GetDrawOffset().x, -GetDrawOffset().y, ofGetWidth() / gDrawScale, ofGetHeight() / gDrawScale);
-   
+
    if (mFatalError != "")
    {
       ofSetColor(255, 255, 255, 255);
       DrawFallbackText(("bespoke " + GetBuildInfoString()).c_str(), 100, 50);
 
       if (gFont.IsLoaded())
-         DrawTextNormal(mFatalError,100,100, 20);
+         DrawTextNormal(mFatalError, 100, 100, 20);
       else
          DrawFallbackText(mFatalError.c_str(), 100, 100);
    }
@@ -512,30 +513,30 @@ void ModularSynth::Draw(void* vg)
       DrawTextBold(ScriptModule::sBackgroundTextString, ScriptModule::sBackgroundTextPos.x, ScriptModule::sBackgroundTextPos.y + ScriptModule::sBackgroundTextSize, ScriptModule::sBackgroundTextSize);
       ofPopStyle();
    }
-   
+
    if (UserPrefs.draw_background_lissajous.Get())
       DrawLissajous(mGlobalRecordBuffer, 0, 0, ofGetWidth(), ofGetHeight(), sBackgroundLissajousR, sBackgroundLissajousG, sBackgroundLissajousB);
-   
+
    if (gTime == 1 && mFatalError == "")
    {
       std::string loading("Bespoke is initializing audio...");
-      DrawTextNormal(loading,ofGetWidth()/2-GetStringWidth(loading,30)/2,ofGetHeight()/2-6, 30);
+      DrawTextNormal(loading, ofGetWidth() / 2 - GetStringWidth(loading, 30) / 2, ofGetHeight() / 2 - 6, 30);
       return;
    }
-   
+
    if (!mInitialized && mFatalError == "")
    {
       std::string loading("Bespoke is loading...");
-      DrawTextNormal(loading,ofGetWidth()/2-GetStringWidth(loading,30)/2,ofGetHeight()/2-6, 30);
+      DrawTextNormal(loading, ofGetWidth() / 2 - GetStringWidth(loading, 30) / 2, ofGetHeight() / 2 - 6, 30);
       return;
    }
-   
+
    ofPushMatrix();
-   
-   ofScale(gDrawScale,gDrawScale,gDrawScale);
-   
+
+   ofScale(gDrawScale, gDrawScale, gDrawScale);
+
    ofPushMatrix();
-   
+
    ofTranslate(GetDrawOffset().x, GetDrawOffset().y);
 
    if (ShouldShowGridSnap())
@@ -563,24 +564,24 @@ void ModularSynth::Draw(void* vg)
 
    TheSaveDataPanel->SetShowing(TheSaveDataPanel->GetModule());
    TheSaveDataPanel->UpdatePosition();
-   
+
    mModuleContainer.Draw();
    mModuleContainer.DrawPatchCables(false);
    mModuleContainer.DrawUnclipped();
-   
-   for (int i=0; i<mLissajousDrawers.size(); ++i)
+
+   for (int i = 0; i < mLissajousDrawers.size(); ++i)
    {
       float moduleX, moduleY;
       mLissajousDrawers[i]->GetPosition(moduleX, moduleY);
       IAudioSource* source = dynamic_cast<IAudioSource*>(mLissajousDrawers[i]);
-      DrawLissajous(source->GetVizBuffer(), moduleX, moduleY-240, 240, 240);
+      DrawLissajous(source->GetVizBuffer(), moduleX, moduleY - 240, 240, 240);
    }
-   
+
    if (mGroupSelectContext != nullptr)
    {
       ofPushStyle();
-      ofSetColor(255,255,255);
-      ofRect(mClickStartX, mClickStartY, GetMouseX(&mModuleContainer)-mClickStartX, GetMouseY(&mModuleContainer)-mClickStartY);
+      ofSetColor(255, 255, 255);
+      ofRect(mClickStartX, mClickStartY, GetMouseX(&mModuleContainer) - mClickStartX, GetMouseY(&mModuleContainer) - mClickStartY);
       ofPopStyle();
    }
 
@@ -591,8 +592,8 @@ void ModularSynth::Draw(void* vg)
       ofSetColor(255, 255, 255);
       ofCircle(GetMouseX(&mModuleContainer), GetMouseY(&mModuleContainer), 1);
       ofPopStyle();
-   }   
-   
+   }
+
    /*TODO_PORT(Ryan)
    const int starvationDisplayTicks = 500;
    if (mSoundStream.getTickCount() - mSoundStream.GetLastStarvationTick() < starvationDisplayTicks)
@@ -610,12 +611,12 @@ void ModularSynth::Draw(void* vg)
       ofTranslate(GetMouseX(&mModuleContainer), GetMouseY(&mModuleContainer));
       ofClipWindow(0, 0, 120, 70, true);
       DrawAudioBuffer(120, 70, mHeldSample->Data(), 0, mHeldSample->LengthInSamples(), -1);
-      ofSetColor(255,255,255);
+      ofSetColor(255, 255, 255);
       DrawTextNormal(mHeldSample->Name(), 0, 13);
       ofPopStyle();
       ofPopMatrix();
    }
-   
+
    /*ofPushStyle();
    ofNoFill();
    ofSetLineWidth(3);
@@ -623,16 +624,16 @@ void ModularSynth::Draw(void* vg)
    ofSetCircleResolution(100);
    ofCircle(GetMouseX(&mModuleContainer), GetMouseY(&mModuleContainer), 30 + (TheTransport->GetMeasurePos() * 20));
    ofPopStyle();*/
-   
+
    ofPopMatrix();
-   
+
    if (gTime - mLastClapboardTime < 100)
    {
-      ofSetColor(255,255,255,(1 - (gTime - mLastClapboardTime) / 100) * 255);
+      ofSetColor(255, 255, 255, (1 - (gTime - mLastClapboardTime) / 100) * 255);
       ofFill();
       ofRect(0, 0, ofGetWidth(), ofGetHeight());
    }
-   
+
    ofPopMatrix();
 
    ofPushMatrix();
@@ -647,15 +648,15 @@ void ModularSynth::Draw(void* vg)
       }
       ofScale(uiScale, uiScale, uiScale);
       ofTranslate(mUILayerModuleContainer.GetDrawOffset().x, mUILayerModuleContainer.GetDrawOffset().y);
-      
+
       mUILayerModuleContainer.Draw();
       mUILayerModuleContainer.DrawUnclipped();
-      
+
       Profiler::Draw();
       DrawConsole();
    }
    ofPopMatrix();
-   
+
    for (auto* modal : mModalFocusItemStack)
    {
       ofPushMatrix();
@@ -666,7 +667,7 @@ void ModularSynth::Draw(void* vg)
       modal->Draw();
       ofPopMatrix();
    }
-   
+
    std::string tooltip = "";
    ModuleContainer* tooltipContainer = nullptr;
    ofVec2f tooltipPos(FLT_MAX, FLT_MAX);
@@ -675,7 +676,7 @@ void ModularSynth::Draw(void* vg)
       tooltip = mNextDrawTooltip;
       tooltipContainer = &mModuleContainer;
    }
-   else if (HelpDisplay::sShowTooltips && 
+   else if (HelpDisplay::sShowTooltips &&
             !mHideTooltipsUntilMouseMove &&
             !IUIControl::WasLastHoverSetViaTab() &&
             mGroupSelectContext == nullptr &&
@@ -686,13 +687,13 @@ void ModularSynth::Draw(void* vg)
       HelpDisplay* helpDisplay = TheTitleBar->GetHelpDisplay();
 
       bool hasValidHoveredControl = gHoveredUIControl && gHoveredUIControl->GetModuleParent() && !gHoveredUIControl->GetModuleParent()->IsDeleted() && std::string(gHoveredUIControl->Name()) != "enabled";
-      
+
       if (gHoveredModule && (!hasValidHoveredControl || (gHoveredUIControl != nullptr && gHoveredUIControl->GetModuleParent() != gHoveredModule)))
       {
          if (gHoveredModule == mQuickSpawn)
          {
             std::string name = mQuickSpawn->GetHoveredModuleTypeName();
-            ofStringReplace(name, " " + std::string(ModuleFactory::kEffectChainSuffix), "");   //strip this suffix if it's there
+            ofStringReplace(name, " " + std::string(ModuleFactory::kEffectChainSuffix), ""); //strip this suffix if it's there
             tooltip = helpDisplay->GetModuleTooltipFromName(name);
             tooltipContainer = mQuickSpawn->GetOwningContainer();
          }
@@ -713,12 +714,12 @@ void ModularSynth::Draw(void* vg)
                tooltipContainer = list->GetModuleParent()->GetOwningContainer();
             }
          }
-         else if (GetMouseY(&mModuleContainer) < gHoveredModule->GetPosition().y && gHoveredModule->HasTitleBar())  //this means we're hovering over the module's title bar
+         else if (GetMouseY(&mModuleContainer) < gHoveredModule->GetPosition().y && gHoveredModule->HasTitleBar()) //this means we're hovering over the module's title bar
          {
             tooltip = helpDisplay->GetModuleTooltip(gHoveredModule);
             tooltipContainer = gHoveredModule->GetOwningContainer();
          }
-          
+
          if (tooltipContainer != nullptr)
          {
             tooltipPos.x = gHoveredModule->GetRect().getMaxX() + 10;
@@ -735,7 +736,7 @@ void ModularSynth::Draw(void* vg)
    }
 
    mNextDrawTooltip = "";
-   
+
    if (tooltip != "" && tooltipContainer != nullptr)
    {
       if (tooltipPos.x == FLT_MAX)
@@ -749,7 +750,7 @@ void ModularSynth::Draw(void* vg)
       ofVec2f offset = tooltipContainer->GetDrawOffset();
       ofScale(scale, scale, scale);
       ofTranslate(offset.x, offset.y);
-      
+
       float maxWidth = 300;
 
       float fontSize = 15;
@@ -758,13 +759,13 @@ void ModularSynth::Draw(void* vg)
       float bounds[4];
       nvgTextBoxBounds(gNanoVG, tooltipPos.x, tooltipPos.y, maxWidth, tooltip.c_str(), nullptr, bounds);
       float padding = 3;
-      ofRectangle rect(bounds[0]-padding, bounds[1] - padding, bounds[2] - bounds[0] + padding*2, bounds[3] - bounds[1] + padding*2);
-      
+      ofRectangle rect(bounds[0] - padding, bounds[1] - padding, bounds[2] - bounds[0] + padding * 2, bounds[3] - bounds[1] + padding * 2);
+
       float minX = 5 - offset.x;
-      float maxX = ofGetWidth() / scale  - rect.width - 5 - offset.x;
+      float maxX = ofGetWidth() / scale - rect.width - 5 - offset.x;
       float minY = 5 - offset.y;
       float maxY = ofGetHeight() / scale - rect.height - 5 - offset.y;
-      
+
       float onscreenRectX = ofClamp(rect.x, minX, maxX);
       if (onscreenRectX < rect.x)
       {
@@ -772,7 +773,7 @@ void ModularSynth::Draw(void* vg)
          rect.y += 20;
       }
       float onscreenRectY = ofClamp(rect.y, minY, maxY);
-      
+
       float tooltipBackgroundAlpha = 180;
 
       ofFill();
@@ -786,7 +787,7 @@ void ModularSynth::Draw(void* vg)
       ofSetColor(255, 255, 255);
       //DrawTextNormal(tooltip, x + 5, y + 12);
       gFont.DrawStringWrap(tooltip, fontSize, tooltipPos.x + (onscreenRectX - rect.x), tooltipPos.y + (onscreenRectY - rect.y), maxWidth);
-      
+
       ofPopMatrix();
    }
 
@@ -846,12 +847,12 @@ void ModularSynth::DrawConsole()
       ofEndShape();
       ofPopStyle();
    }*/
-   
+
    float consoleY = TheTitleBar->GetRect().height + 15;
-   
+
    if (IKeyboardFocusListener::GetActiveKeyboardFocus() == mConsoleEntry)
    {
-      mConsoleEntry->SetPosition(0, consoleY-15);
+      mConsoleEntry->SetPosition(0, consoleY - 15);
       mConsoleEntry->Draw();
       consoleY += 17;
    }
@@ -861,11 +862,11 @@ void ModularSynth::DrawConsole()
       {
          ofPushStyle();
          ofSetColor(0, 255, 255);
-         DrawTextNormal(gHoveredUIControl->Path(), 0, consoleY-4);
+         DrawTextNormal(gHoveredUIControl->Path(), 0, consoleY - 4);
          ofPopStyle();
       }
    }
-   
+
    if (IKeyboardFocusListener::GetActiveKeyboardFocus() == mConsoleEntry)
    {
       int outputLines = (int)mEvents.size();
@@ -901,7 +902,7 @@ void ModularSynth::DrawConsole()
       {
          consoleY = 0;
          ofPushStyle();
-         ofSetColor(255,0,0);
+         ofSetColor(255, 0, 0);
          for (auto it = mErrors.begin(); it != mErrors.end(); ++it)
          {
             gFontFixedWidth.DrawString(*it, 15, 600, consoleY);
@@ -946,7 +947,7 @@ void ModularSynth::KeyPressed(int key, bool isRepeat)
       {
          float inc;
          if ((key == OF_KEY_DOWN && gHoveredUIControl->InvertScrollDirection() == false) ||
-             (key == OF_KEY_UP   && gHoveredUIControl->InvertScrollDirection() == true))
+             (key == OF_KEY_UP && gHoveredUIControl->InvertScrollDirection() == true))
             inc = -1;
          else
             inc = 1;
@@ -971,22 +972,22 @@ void ModularSynth::KeyPressed(int key, bool isRepeat)
          gHoveredUIControl->AttemptTextInput();
       }
    }
-   
-   if (IKeyboardFocusListener::GetActiveKeyboardFocus())  //active text entry captures all input
+
+   if (IKeyboardFocusListener::GetActiveKeyboardFocus()) //active text entry captures all input
    {
       IKeyboardFocusListener::GetActiveKeyboardFocus()->OnKeyPressed(key, isRepeat);
       return;
    }
-   
-   key = KeyToLower(key);  //now convert to lowercase because everything else just cares about keys as buttons (unmodified by shift)
-   
+
+   key = KeyToLower(key); //now convert to lowercase because everything else just cares about keys as buttons (unmodified by shift)
+
    if ((key == juce::KeyPress::backspaceKey || key == juce::KeyPress::deleteKey) && !isRepeat)
    {
       for (auto module : mGroupSelectedModules)
          module->GetOwningContainer()->DeleteModule(module);
       mGroupSelectedModules.clear();
    }
-   
+
    if (key == KeyPress::F2Key && !isRepeat)
    {
       ADSRDisplay::ToggleDisplayMode();
@@ -1004,12 +1005,12 @@ void ModularSynth::KeyPressed(int key, bool isRepeat)
          mConsoleEntry->MakeActiveTextEntry(true);
       }
    }
-   
+
    if (key == KeyPress::F1Key && !isRepeat)
    {
       HelpDisplay::sShowTooltips = !HelpDisplay::sShowTooltips;
    }
-   
+
    if (key == OF_KEY_TAB)
    {
       if (GetKeyModifiers() == kModifier_Shift)
@@ -1019,26 +1020,26 @@ void ModularSynth::KeyPressed(int key, bool isRepeat)
    }
 
    mZoomer.OnKeyPressed(key);
-   
+
    if (key < CHAR_MAX && CharacterFunctions::isDigit((char)key) && (GetKeyModifiers() == kModifier_Alt))
    {
       int num = key - '0';
       assert(num >= 0 && num <= 9);
       gHotBindUIControl[num] = gHoveredUIControl;
    }
-   
+
    mModuleContainer.KeyPressed(key, isRepeat);
    mUILayerModuleContainer.KeyPressed(key, isRepeat);
 
    if (key == '/' && !isRepeat)
       ofToggleFullscreen();
-   
+
    if (key == 'p' && GetKeyModifiers() == kModifier_Shift && !isRepeat)
       mAudioPaused = !mAudioPaused;
 
    if (key == 's' && GetKeyModifiers() == kModifier_Command && !isRepeat)
       SaveCurrentState();
-   
+
    if (key == 's' && GetKeyModifiers() == (kModifier_Command | kModifier_Shift) && !isRepeat)
       SaveStatePopup();
 
@@ -1047,7 +1048,7 @@ void ModularSynth::KeyPressed(int key, bool isRepeat)
 
    //if (key == 'c' && !isRepeat)
    //   mousePressed(GetMouseX(&mModuleContainer), GetMouseY(&mModuleContainer), 0);
-   
+
    //if (key == '=' && !isRepeat)
    //   ZoomView(.1f);
    //if (key == '-' && !isRepeat)
@@ -1057,10 +1058,10 @@ void ModularSynth::KeyPressed(int key, bool isRepeat)
 void ModularSynth::KeyReleased(int key)
 {
    key = KeyToLower(key);
-   
+
    //if (key == 'c')
    //   mouseReleased(GetMouseX(&mModuleContainer), GetMouseY(&mModuleContainer), 0);
-   
+
    mModuleContainer.KeyReleased(key);
    mUILayerModuleContainer.KeyReleased(key);
 }
@@ -1085,7 +1086,7 @@ bool ModularSynth::IsMouseButtonHeld(int button) const
 
 bool ModularSynth::ShouldShowGridSnap() const
 {
-   return (mMoveModule || (!mGroupSelectedModules.empty() && IsMouseButtonHeld(1)))&& (GetKeyModifiers() & kModifier_Command);
+   return (mMoveModule || (!mGroupSelectedModules.empty() && IsMouseButtonHeld(1))) && (GetKeyModifiers() & kModifier_Command);
 }
 
 void ModularSynth::MouseMoved(int intX, int intY)
@@ -1097,11 +1098,11 @@ void ModularSynth::MouseMoved(int intX, int intY)
 
    if (IsKeyHeld(' ') || mIsMousePanning)
    {
-      GetDrawOffset() += (ofVec2f(intX,intY) - mLastMoveMouseScreenPos) / gDrawScale;
+      GetDrawOffset() += (ofVec2f(intX, intY) - mLastMoveMouseScreenPos) / gDrawScale;
       mZoomer.CancelMovement();
    }
 
-   mLastMoveMouseScreenPos = ofVec2f(intX,intY);
+   mLastMoveMouseScreenPos = ofVec2f(intX, intY);
 
    if (changed)
    {
@@ -1155,7 +1156,7 @@ void ModularSynth::MouseMoved(int intX, int intY)
                      break;
                   }
                   else if (patchCableSource->GetPatchCables().size() == 1 && patchCableSource->GetTarget() != mMoveModule &&
-                      mMoveModule->GetPatchCableSource()) //insert
+                           mMoveModule->GetPatchCableSource()) //insert
                   {
                      mMoveModule->GetPatchCableSource()->FindValidTargets();
                      if (mMoveModule->GetPatchCableSource()->IsValidTarget(patchCableSource->GetTarget()))
@@ -1242,8 +1243,8 @@ void ModularSynth::MouseDragged(int intX, int intY, int button, const juce::Mous
    float x = GetMouseX(&mModuleContainer);
    float y = GetMouseY(&mModuleContainer);
 
-   ofVec2f drag = ofVec2f(x,y) - mLastMouseDragPos;
-   mLastMouseDragPos = ofVec2f(x,y);
+   ofVec2f drag = ofVec2f(x, y) - mLastMouseDragPos;
+   mLastMouseDragPos = ofVec2f(x, y);
 
    if (button == 3)
       return;
@@ -1410,7 +1411,7 @@ void ModularSynth::MousePressed(int intX, int intY, int button, const juce::Mous
 
    if (InMidiMapMode())
    {
-      if (gBindToUIControl == gHoveredUIControl)   //if it's the same, clear it
+      if (gBindToUIControl == gHoveredUIControl) //if it's the same, clear it
          gBindToUIControl = nullptr;
       else
          gBindToUIControl = gHoveredUIControl;
@@ -1450,7 +1451,7 @@ void ModularSynth::MousePressed(int intX, int intY, int button, const juce::Mous
             if (lfo) //if it's an LFO, don't dismiss it if you're adjusting the slider
             {
                FloatSlider* slider = lfo->GetOwner();
-               float uiX,uiY;
+               float uiX, uiY;
                slider->GetPosition(uiX, uiY);
                float w, h;
                slider->GetDimensions(w, h);
@@ -1458,7 +1459,7 @@ void ModularSynth::MousePressed(int intX, int intY, int button, const juce::Mous
                if (x < uiX || y < uiY || x > uiX + w || y > uiY + h)
                   PopModalFocusItem();
             }
-            else  //otherwise, always dismiss if you click outside it
+            else //otherwise, always dismiss if you click outside it
             {
                PopModalFocusItem();
             }
@@ -1477,11 +1478,8 @@ void ModularSynth::MousePressed(int intX, int intY, int button, const juce::Mous
              (cable->GetTarget() == nullptr || clickedModule != cable->GetTarget()->GetModuleParent()) &&
              (clickedModule == GetTopModalFocusItem() ||
               clickedModule->AlwaysOnTop() ||
-              mModuleContainer.IsHigherThan(clickedModule, cable->GetOwningModule())
-             )
-            )
+              mModuleContainer.IsHigherThan(clickedModule, cable->GetOwningModule())))
          {
-            
          }
          else
          {
@@ -1553,7 +1551,7 @@ void ModularSynth::MouseScrolled(float x, float y, bool canZoomCanvas)
    if (IsKeyHeld(' ') || (GetModuleAtCursor() == nullptr && gHoveredUIControl == nullptr))
    {
       if (canZoomCanvas)
-         ZoomView(y/50, true);
+         ZoomView(y / 50, true);
    }
    else if (gHoveredUIControl)
    {
@@ -1568,7 +1566,7 @@ void ModularSynth::MouseScrolled(float x, float y, bool canZoomCanvas)
       ClickButton* clickButton = dynamic_cast<ClickButton*>(gHoveredUIControl);
       if (floatSlider || intSlider)
       {
-         float w,h;
+         float w, h;
          gHoveredUIControl->GetDimensions(w, h);
          movementScale = 200.0f / w;
       }
@@ -1579,18 +1577,18 @@ void ModularSynth::MouseScrolled(float x, float y, bool canZoomCanvas)
       if (clickButton)
          return;
 
-      float change = y/100 * movementScale;
+      float change = y / 100 * movementScale;
 
       if (floatSlider && floatSlider->GetModulator() && floatSlider->GetModulator()->Active() && floatSlider->GetModulator()->CanAdjustRange())
       {
          IModulator* modulator = floatSlider->GetModulator();
          float min = floatSlider->GetMin();
          float max = floatSlider->GetMax();
-         float modMin = ofMap(modulator->GetMin(),min,max,0,1);
-         float modMax = ofMap(modulator->GetMax(),min,max,0,1);
+         float modMin = ofMap(modulator->GetMin(), min, max, 0, 1);
+         float modMax = ofMap(modulator->GetMax(), min, max, 0, 1);
 
-         modulator->GetMin() = ofMap(modMin - change,0,1,min,max,K(clamp));
-         modulator->GetMax() = ofMap(modMax + change,0,1,min,max,K(clamp));
+         modulator->GetMin() = ofMap(modMin - change, 0, 1, min, max, K(clamp));
+         modulator->GetMax() = ofMap(modMax + change, 0, 1, min, max, K(clamp));
 
          return;
       }
@@ -1694,7 +1692,7 @@ void ModularSynth::CheckClick(IDrawableModule* clickedModule, int x, int y, bool
       clickedModule->GetParent()->GetPosition(parentX, parentY);
 
    //do the regular click
-   clickedModule->TestClick(x - parentX,y - parentY,rightButton);
+   clickedModule->TestClick(x - parentX, y - parentY, rightButton);
 }
 
 void ModularSynth::MoveToFront(IDrawableModule* module)
@@ -1721,8 +1719,8 @@ void ModularSynth::OnModuleDeleted(IDrawableModule* module)
    for (auto* cable : cablesToRemove)
       RemoveFromVector(cable, mPatchCables);
 
-   RemoveFromVector(dynamic_cast<IAudioSource*>(module),mSources);
-   RemoveFromVector(module,mLissajousDrawers);
+   RemoveFromVector(dynamic_cast<IAudioSource*>(module), mSources);
+   RemoveFromVector(module, mLissajousDrawers);
    TheTransport->RemoveAudioPoller(dynamic_cast<IAudioPoller*>(module));
    //delete module; TODO(Ryan) deleting is hard... need to clear out everything with a reference to this, or switch to smart pointers
 
@@ -1747,15 +1745,15 @@ void ModularSynth::MouseReleased(int intX, int intY, int button, const juce::Mou
 
    if (button == 3)
       return;
-   
+
    float x = GetMouseX(&mModuleContainer);
    float y = GetMouseY(&mModuleContainer);
-   
+
    if (GetTopModalFocusItem())
    {
       GetTopModalFocusItem()->MouseReleased();
    }
-   
+
    if (mResizeModule)
       mResizeModule = nullptr;
 
@@ -1781,7 +1779,7 @@ void ModularSynth::MouseReleased(int intX, int intY, int button, const juce::Mou
 
    mModuleContainer.MouseReleased();
    mUILayerModuleContainer.MouseReleased();
-   
+
    if (mHeldSample)
    {
       IDrawableModule* module = GetModuleAtCursor();
@@ -1789,7 +1787,7 @@ void ModularSynth::MouseReleased(int intX, int intY, int button, const juce::Mou
       {
          float moduleX, moduleY;
          module->GetPosition(moduleX, moduleY);
-         module->SampleDropped(x-moduleX, y-moduleY, GetHeldSample());
+         module->SampleDropped(x - moduleX, y - moduleY, GetHeldSample());
       }
       ClearHeldSample();
    }
@@ -1806,32 +1804,32 @@ void ModularSynth::MouseReleased(int intX, int intY, int button, const juce::Mou
 void ModularSynth::AudioOut(float** output, int bufferSize, int nChannels)
 {
    PROFILER(audioOut_total);
-   
+
    static bool sFirst = true;
    if (sFirst)
    {
       FloatVectorOperations::disableDenormalisedNumberSupport();
       sFirst = false;
    }
-   
+
    if (mAudioPaused)
    {
-      for (int ch=0; ch<nChannels; ++ch)
+      for (int ch = 0; ch < nChannels; ++ch)
       {
-         for (int i=0; i<bufferSize; ++i)
+         for (int i = 0; i < bufferSize; ++i)
             output[ch][i] = 0;
       }
       return;
    }
-   
+
    ScopedMutex mutex(&mAudioThreadMutex, "audioOut()");
-   
+
    /////////// AUDIO PROCESSING STARTS HERE /////////////
    assert(bufferSize == mIOBufferSize);
    assert(nChannels == (int)mOutputBuffers.size());
-   assert(mIOBufferSize == gBufferSize);  //need to be the same for now
-                                          //if we want these different, need to fix outBuffer here, and also fix audioIn()
-                                          //by now, many assumptions will have to be fixed to support mIOBufferSize and gBufferSize diverging
+   assert(mIOBufferSize == gBufferSize); //need to be the same for now
+   //if we want these different, need to fix outBuffer here, and also fix audioIn()
+   //by now, many assumptions will have to be fixed to support mIOBufferSize and gBufferSize diverging
    for (int ioOffset = 0; ioOffset < mIOBufferSize; ioOffset += gBufferSize)
    {
       for (size_t i = 0; i < mOutputBuffers.size(); ++i)
@@ -1840,9 +1838,9 @@ void ModularSynth::AudioOut(float** output, int bufferSize, int nChannels)
       double elapsed = gInvSampleRateMs * mIOBufferSize;
       gTime += elapsed;
       TheTransport->Advance(elapsed);
-      
+
       //process all audio
-      for (int i=0; i<mSources.size(); ++i)
+      for (int i = 0; i < mSources.size(); ++i)
          mSources[i]->Process(gTime);
 
       //put it into speakers
@@ -1866,12 +1864,12 @@ void ModularSynth::AudioOut(float** output, int bufferSize, int nChannels)
          }
       }
    }
-   
+
    if (gTime - mLastClapboardTime < 100)
    {
-      for (int ch=0; ch<nChannels; ++ch)
+      for (int ch = 0; ch < nChannels; ++ch)
       {
-         for (int i=0; i<bufferSize; ++i)
+         for (int i = 0; i < bufferSize; ++i)
          {
             float sample = sin(GetPhaseInc(440) * i) * (1 - ((gTime - mLastClapboardTime) / 100));
             output[ch][i] = sample;
@@ -1885,7 +1883,7 @@ void ModularSynth::AudioOut(float** output, int bufferSize, int nChannels)
       mGlobalRecordBuffer->WriteChunk(output[1], bufferSize, 1);
    mRecordingLength += bufferSize;
    mRecordingLength = MIN(mRecordingLength, mGlobalRecordBuffer->Size());
-   
+
    Profiler::PrintCounters();
 }
 
@@ -1893,13 +1891,13 @@ void ModularSynth::AudioIn(const float** input, int bufferSize, int nChannels)
 {
    if (mAudioPaused)
       return;
-   
+
    ScopedMutex mutex(&mAudioThreadMutex, "audioIn()");
 
    assert(bufferSize == mIOBufferSize);
    assert(nChannels == (int)mInputBuffers.size());
-   
-   for (int i=0; i<nChannels; ++i)
+
+   for (int i = 0; i < nChannels; ++i)
    {
       BufferCopy(mInputBuffers[i], input[i], bufferSize);
    }
@@ -1930,10 +1928,10 @@ void ModularSynth::FilesDropped(std::vector<std::string> files, int intX, int in
 
       if (files.size() == 1 && juce::String(files[0]).endsWith(".bsk"))
       {
-          LoadState(files[0]);
-          return;
+         LoadState(files[0]);
+         return;
       }
-      
+
       if (target != nullptr)
       {
          float moduleX, moduleY;
@@ -1947,7 +1945,8 @@ void ModularSynth::FilesDropped(std::vector<std::string> files, int intX, int in
 
 struct SourceDepInfo
 {
-   SourceDepInfo(IAudioSource* me) : mMe(me) {}
+   SourceDepInfo(IAudioSource* me)
+   : mMe(me) {}
    IAudioSource* mMe;
    std::vector<IAudioSource*> mDeps;
 };
@@ -1955,16 +1954,16 @@ struct SourceDepInfo
 void ModularSynth::ArrangeAudioSourceDependencies()
 {
    //ofLog() << "Calculating audio source dependencies:";
-   
+
    std::vector<SourceDepInfo> deps;
-   for (int i=0; i<mSources.size(); ++i)
+   for (int i = 0; i < mSources.size(); ++i)
       deps.push_back(SourceDepInfo(mSources[i]));
-      
-   for (int i=0; i<mSources.size(); ++i)
+
+   for (int i = 0; i < mSources.size(); ++i)
    {
-      for (int j=0; j<mSources.size(); ++j)
+      for (int j = 0; j < mSources.size(); ++j)
       {
-         for (int k=0; k<mSources[i]->GetNumTargets(); ++k)
+         for (int k = 0; k < mSources[i]->GetNumTargets(); ++k)
          {
             if (mSources[i]->GetTarget(k) != nullptr &&
                 mSources[i]->GetTarget(k) == dynamic_cast<IAudioReceiver*>(mSources[j]))
@@ -1974,7 +1973,7 @@ void ModularSynth::ArrangeAudioSourceDependencies()
          }
       }
    }
-   
+
    /*for (int i=0; i<deps.size(); ++i)
    {
       string depStr;
@@ -1986,20 +1985,20 @@ void ModularSynth::ArrangeAudioSourceDependencies()
       }
       ofLog() << dynamic_cast<IDrawableModule*>(deps[i].mMe)->Name() << "depends on:" << depStr;
    }*/
-   
+
    //TODO(Ryan) detect circular dependencies
-   
+
    mSources.clear();
    int loopCount = 0;
    while (deps.size() > 0 && loopCount < 1000) //stupid circular dependency detection, make better
    {
-      for (int i=0; i<deps.size(); ++i)
+      for (int i = 0; i < deps.size(); ++i)
       {
          bool hasDeps = false;
-         for (int j=0; j<deps[i].mDeps.size(); ++j)
+         for (int j = 0; j < deps[i].mDeps.size(); ++j)
          {
             bool found = false;
-            for (int k=0; k<mSources.size(); ++k)
+            for (int k = 0; k < mSources.size(); ++k)
             {
                if (deps[i].mDeps[j] == mSources[k])
                   found = true;
@@ -2011,19 +2010,19 @@ void ModularSynth::ArrangeAudioSourceDependencies()
          {
             mSources.push_back(deps[i].mMe);
             deps.erase(deps.begin() + i);
-            i-=1;
+            i -= 1;
          }
       }
       ++loopCount;
    }
-   
-   if (loopCount == 1000)  //circular dependency, don't lose the rest of the sources
+
+   if (loopCount == 1000) //circular dependency, don't lose the rest of the sources
    {
       ofLog() << "circular dependency detected";
-      for (int i=0; i<deps.size(); ++i)
+      for (int i = 0; i < deps.size(); ++i)
          mSources.push_back(deps[i].mMe);
    }
-   
+
    /*ofLog() << "new ordering:";
    for (int i=0; i<mSources.size(); ++i)
       ofLog() << dynamic_cast<IDrawableModule*>(mSources[i])->Name();*/
@@ -2036,8 +2035,8 @@ void ModularSynth::ResetLayout()
 
    mModuleContainer.Clear();
    mUILayerModuleContainer.Clear();
-   
-   for (int i=0; i<mDeletedModules.size(); ++i)
+
+   for (int i = 0; i < mDeletedModules.size(); ++i)
       delete mDeletedModules[i];
 
    mDeletedModules.clear();
@@ -2047,14 +2046,14 @@ void ModularSynth::ResetLayout()
    LFOPool::Shutdown();
    IKeyboardFocusListener::ClearActiveKeyboardFocus(!K(notifyListeners));
    ScriptModule::sBackgroundTextString = "";
-   
+
    mErrors.clear();
-   
+
    std::vector<PatchCable*> cablesToDelete = mPatchCables;
    for (auto cable : cablesToDelete)
       delete cable;
    assert(mPatchCables.size() == 0); //everything should have been cleared out by that
-   
+
    gBindToUIControl = nullptr;
    mModalFocusItemStack.clear();
    gHoveredUIControl = nullptr;
@@ -2062,14 +2061,14 @@ void ModularSynth::ResetLayout()
 
    LFOPool::Init();
    mZoomer.Init();
-   
+
    delete TheTitleBar;
    delete TheSaveDataPanel;
    delete mQuickSpawn;
    delete mUserPrefsEditor;
-   
+
    TitleBar* titleBar = new TitleBar();
-   titleBar->SetPosition(0,0);
+   titleBar->SetPosition(0, 0);
    titleBar->SetName("titlebar");
    titleBar->SetTypeName("titlebar");
    titleBar->CreateUIControls();
@@ -2077,7 +2076,7 @@ void ModularSynth::ResetLayout()
    titleBar->Init();
    mUILayerModuleContainer.AddModule(titleBar);
 
-   if (UserPrefs.show_minimap.Get()) 
+   if (UserPrefs.show_minimap.Get())
    {
       mMinimap = std::make_unique<Minimap>();
       mMinimap->SetName("minimap");
@@ -2088,7 +2087,7 @@ void ModularSynth::ResetLayout()
       mMinimap->Init();
       mUILayerModuleContainer.AddModule(mMinimap.get());
 
-      TitleBar::sShowInitialHelpOverlay = false;  //don't show initial help popup, it collides with minimap, and a user who has customized the settings likely doesn't need it
+      TitleBar::sShowInitialHelpOverlay = false; //don't show initial help popup, it collides with minimap, and a user who has customized the settings likely doesn't need it
    }
 
    ModuleSaveDataPanel* saveDataPanel = new ModuleSaveDataPanel();
@@ -2097,7 +2096,7 @@ void ModularSynth::ResetLayout()
    saveDataPanel->CreateUIControls();
    saveDataPanel->Init();
    mModuleContainer.AddModule(saveDataPanel);
-   
+
    mQuickSpawn = new QuickSpawnMenu();
    mQuickSpawn->SetName("quickspawn");
    mQuickSpawn->CreateUIControls();
@@ -2116,9 +2115,9 @@ void ModularSynth::ResetLayout()
       mUserPrefsEditor->Show();
       TheTitleBar->SetShowing(false);
    }
-   
-   GetDrawOffset().set(0,0);
-   
+
+   GetDrawOffset().set(0, 0);
+
    SetUIScale(UserPrefs.ui_scale.Get());
 }
 
@@ -2126,19 +2125,19 @@ bool ModularSynth::LoadLayoutFromFile(std::string jsonFile, bool makeDefaultLayo
 {
    ofLog() << "Loading layout: " << jsonFile;
    mLoadedLayoutPath = String(jsonFile).replace(ofToDataPath("").c_str(), "").toStdString();
-   
+
    ofxJSONElement root;
    bool loaded = root.open(jsonFile);
-   
+
    if (!loaded)
    {
-      LogEvent("Couldn't load, error parsing "+jsonFile, kLogEventType_Error);
+      LogEvent("Couldn't load, error parsing " + jsonFile, kLogEventType_Error);
       LogEvent("Try loading it up in a json validator", kLogEventType_Error);
       return false;
    }
-   
+
    LoadLayout(root);
-   
+
    if (juce::String(jsonFile).endsWith("blank.json"))
    {
       IDrawableModule* gain = FindModule("gain");
@@ -2171,10 +2170,10 @@ bool ModularSynth::LoadLayoutFromFile(std::string jsonFile, bool makeDefaultLayo
             output2->SetPosition(output2->GetPosition().x + offset, output2->GetPosition().y);
       }
    }
-   
+
    if (makeDefaultLayout)
       UpdateUserPrefsLayout();
-   
+
    return true;
 }
 
@@ -2182,14 +2181,14 @@ bool ModularSynth::LoadLayoutFromString(std::string jsonString)
 {
    ofxJSONElement root;
    bool loaded = root.parse(jsonString);
-   
+
    if (!loaded)
    {
       LogEvent("Couldn't load, error parsing json string", kLogEventType_Error);
       ofLog() << jsonString;
       return false;
    }
-   
+
    LoadLayout(root);
    return true;
 }
@@ -2198,18 +2197,18 @@ void ModularSynth::LoadLayout(ofxJSONElement json)
 {
    ScriptModule::UninitializePython();
    Transport::sDoEventLookahead = false;
-   
+
    //ofLoadURLAsync("http://bespoke.com/telemetry/"+jsonFile);
-   
+
    ScopedMutex mutex(&mAudioThreadMutex, "LoadLayout()");
    std::lock_guard<std::recursive_mutex> renderLock(mRenderLock);
-   
+
    ResetLayout();
-   
+
    mModuleContainer.LoadModules(json["modules"]);
-   
+
    //timer.PrintCosts();
-   
+
    mZoomer.LoadFromSaveData(json["zoomlocations"]);
    ArrangeAudioSourceDependencies();
 }
@@ -2273,7 +2272,7 @@ IDrawableModule* ModularSynth::CreateModule(const ofxJSONElement& moduleInfo)
    {
       TheSynth->LogEvent(__PRETTY_FUNCTION__ + std::string(" json error: ") + e.what(), kLogEventType_Error);
    }
-   
+
    return module;
 }
 
@@ -2289,7 +2288,7 @@ void ModularSynth::SetUpModule(IDrawableModule* module, const ofxJSONElement& mo
    }
    catch (UnknownModuleException& e)
    {
-      LogEvent("Couldn't find referenced module \""+e.mSearchName+"\" when setting up \""+moduleInfo["name"].asString()+"\"", kLogEventType_Error);
+      LogEvent("Couldn't find referenced module \"" + e.mSearchName + "\" when setting up \"" + moduleInfo["name"].asString() + "\"", kLogEventType_Error);
    }
 }
 
@@ -2322,16 +2321,16 @@ IDrawableModule* ModularSynth::FindModule(std::string name, bool fail)
       }
       return mModuleContainer.FindModule(name.substr(1, name.length() - 1), fail);
    }
-   return mModuleContainer.FindModule(IClickable::sPathLoadContext+name, fail);
+   return mModuleContainer.FindModule(IClickable::sPathLoadContext + name, fail);
 }
 
 MidiController* ModularSynth::FindMidiController(std::string name, bool fail)
 {
    if (name == "")
       return nullptr;
-   
+
    MidiController* m = nullptr;
-   
+
    try
    {
       m = dynamic_cast<MidiController*>(FindModule(name, fail));
@@ -2340,13 +2339,13 @@ MidiController* ModularSynth::FindMidiController(std::string name, bool fail)
    }
    catch (UnknownModuleException& e)
    {
-      LogEvent("Couldn't find referenced midi controller \""+name+"\"", kLogEventType_Error);
+      LogEvent("Couldn't find referenced midi controller \"" + name + "\"", kLogEventType_Error);
    }
    catch (WrongModuleTypeException& e)
    {
-      LogEvent("\""+name+"\" is not a midicontroller", kLogEventType_Error);
+      LogEvent("\"" + name + "\" is not a midicontroller", kLogEventType_Error);
    }
-   
+
    return m;
 }
 
@@ -2360,7 +2359,7 @@ IUIControl* ModularSynth::FindUIControl(std::string path)
          return nullptr;
       return mModuleContainer.FindUIControl(path.substr(1, path.length() - 1));
    }
-   return mModuleContainer.FindUIControl(IClickable::sPathLoadContext+path);
+   return mModuleContainer.FindUIControl(IClickable::sPathLoadContext + path);
 }
 
 void ModularSynth::GrabSample(ChannelBuffer* data, std::string name, bool window, int numBars)
@@ -2370,7 +2369,7 @@ void ModularSynth::GrabSample(ChannelBuffer* data, std::string name, bool window
    mHeldSample->Create(data);
    mHeldSample->SetName(name);
    mHeldSample->SetNumBars(numBars);
-   
+
    //window sample to avoid clicks
    if (window)
    {
@@ -2378,13 +2377,13 @@ void ModularSynth::GrabSample(ChannelBuffer* data, std::string name, bool window
       const int fadeSamples = 15;
       if (length > fadeSamples * 2) //only window if there's enough space
       {
-         for (int i=0; i<fadeSamples; ++i)
+         for (int i = 0; i < fadeSamples; ++i)
          {
-            for (int ch=0; ch<mHeldSample->NumChannels(); ++ch)
+            for (int ch = 0; ch < mHeldSample->NumChannels(); ++ch)
             {
-               float fade = float(i)/fadeSamples;
+               float fade = float(i) / fadeSamples;
                mHeldSample->Data()->GetChannel(ch)[i] *= fade;
-               mHeldSample->Data()->GetChannel(ch)[length-1-i] *= fade;
+               mHeldSample->Data()->GetChannel(ch)[length - 1 - i] *= fade;
             }
          }
       }
@@ -2427,41 +2426,41 @@ IDrawableModule* ModularSynth::DuplicateModule(IDrawableModule* module)
       FileStreamOut out(ofToDataPath("tmp"));
       module->SaveState(out);
    }
-   
+
    ofxJSONElement layoutData;
    module->SaveLayout(layoutData);
    std::vector<IDrawableModule*> modules = mModuleContainer.GetModules();
    std::string newName = GetUniqueName(layoutData["name"].asString(), modules);
    layoutData["name"] = newName;
-   
+
    IDrawableModule* newModule = CreateModule(layoutData);
    mModuleContainer.AddModule(newModule);
    SetUpModule(newModule, layoutData);
    newModule->Init();
-   
+
    assert(newModule);
-   
+
    newModule->SetName(module->Name()); //temporarily rename to the same as what we duplicated, so we can load state properly
-   
+
    {
       FileStreamIn in(ofToDataPath("tmp"));
       mIsLoadingModule = true;
       newModule->LoadState(in);
       mIsLoadingModule = false;
    }
-   
+
    newModule->SetName(newName.c_str());
-   
+
    return newModule;
 }
 
 ofxJSONElement ModularSynth::GetLayout()
 {
    ofxJSONElement root;
-   
+
    root["modules"] = mModuleContainer.WriteModules();
    root["zoomlocations"] = mZoomer.GetSaveData();
-   
+
    return root;
 }
 
@@ -2469,12 +2468,12 @@ void ModularSynth::SaveLayout(std::string jsonFile, bool makeDefaultLayout /*= t
 {
    if (jsonFile.empty())
       jsonFile = ofToDataPath(mLoadedLayoutPath);
-   
+
    ofxJSONElement root = GetLayout();
    root.save(jsonFile, true);
-   
+
    mLoadedLayoutPath = String(jsonFile).replace(ofToDataPath("").c_str(), "").toStdString();
-   
+
    TheTitleBar->ListLayouts();
    if (makeDefaultLayout)
       UpdateUserPrefsLayout();
@@ -2533,16 +2532,16 @@ void ModularSynth::SaveState(std::string file, bool autosave)
       mCurrentSaveStatePath = file;
       mLastSaveTime = gTime;
       std::string filename = File(mCurrentSaveStatePath).getFileName().toStdString();
-      mMainComponent->getTopLevelComponent()->setName("bespoke synth - "+filename);
+      mMainComponent->getTopLevelComponent()->setName("bespoke synth - " + filename);
    }
 
    mAudioThreadMutex.Lock("SaveState()");
-   
+
    FileStreamOut out(file);
-   
+
    out << GetLayout().getRawString(true);
    mModuleContainer.SaveState(out);
-   
+
    mAudioThreadMutex.Unlock();
 }
 
@@ -2562,15 +2561,15 @@ void ModularSynth::LoadState(std::string file)
    }
 
    if (mInitialized)
-      TitleBar::sShowInitialHelpOverlay = false;  //don't show initial help popup
-   
+      TitleBar::sShowInitialHelpOverlay = false; //don't show initial help popup
+
    mAudioThreadMutex.Lock("LoadState()");
    LockRender(true);
    mAudioPaused = true;
    mIsLoadingState = true;
    LockRender(false);
    mAudioThreadMutex.Unlock();
-   
+
    FileStreamIn in(ofToDataPath(file));
 
    //TODO(Ryan) here's a little hack to allow older BSK files that were saved in 32-bit to load.
@@ -2580,22 +2579,22 @@ void ModularSynth::LoadState(std::string file)
    in.Peek(firstLength, sizeof(uint64_t));
    if (firstLength[0] >= 99999)
       FileStreamIn::s32BitMode = true;
-   
+
    std::string jsonString;
    in >> jsonString;
    bool layoutLoaded = LoadLayoutFromString(jsonString);
-   
+
    if (layoutLoaded)
    {
       mIsLoadingModule = true;
       mModuleContainer.LoadState(in);
       mIsLoadingModule = false;
-      
+
       TheTransport->Reset();
    }
 
    FileStreamIn::s32BitMode = false;
-   
+
    mCurrentSaveStatePath = file;
    std::string filename = File(mCurrentSaveStatePath).getFileName().toStdString();
    mMainComponent->getTopLevelComponent()->setName("bespoke synth - " + filename);
@@ -2611,56 +2610,56 @@ void ModularSynth::LoadState(std::string file)
 IAudioReceiver* ModularSynth::FindAudioReceiver(std::string name, bool fail)
 {
    IAudioReceiver* a = nullptr;
-   
+
    if (name == "")
       return nullptr;
-   
+
    try
    {
-      a = dynamic_cast<IAudioReceiver*>(FindModule(name,fail));
+      a = dynamic_cast<IAudioReceiver*>(FindModule(name, fail));
       if (a == nullptr)
          throw WrongModuleTypeException();
    }
    catch (UnknownModuleException& e)
    {
-      LogEvent("Couldn't find referenced audio receiver \""+name+"\"", kLogEventType_Error);
+      LogEvent("Couldn't find referenced audio receiver \"" + name + "\"", kLogEventType_Error);
    }
    catch (WrongModuleTypeException& e)
    {
-      LogEvent("\""+name+"\" is not an audio receiver", kLogEventType_Error);
+      LogEvent("\"" + name + "\" is not an audio receiver", kLogEventType_Error);
    }
-   
+
    return a;
 }
 
 INoteReceiver* ModularSynth::FindNoteReceiver(std::string name, bool fail)
 {
    INoteReceiver* n = nullptr;
-   
+
    if (name == "")
       return nullptr;
-   
+
    try
    {
-      n = dynamic_cast<INoteReceiver*>(FindModule(name,fail));
+      n = dynamic_cast<INoteReceiver*>(FindModule(name, fail));
       if (n == nullptr)
          throw WrongModuleTypeException();
    }
    catch (UnknownModuleException& e)
    {
-      LogEvent("Couldn't find referenced note receiver \""+name+"\"", kLogEventType_Error);
+      LogEvent("Couldn't find referenced note receiver \"" + name + "\"", kLogEventType_Error);
    }
    catch (WrongModuleTypeException& e)
    {
-      LogEvent("\""+name+"\" is not a note receiver", kLogEventType_Error);
+      LogEvent("\"" + name + "\" is not a note receiver", kLogEventType_Error);
    }
-      
+
    return n;
 }
 
 void ModularSynth::OnConsoleInput()
 {
-   std::vector<std::string> tokens = ofSplitString(mConsoleText," ",true,true);
+   std::vector<std::string> tokens = ofSplitString(mConsoleText, " ", true, true);
    if (tokens.size() > 0)
    {
       if (tokens[0] == "")
@@ -2750,12 +2749,12 @@ void ModularSynth::OnConsoleInput()
       else if (tokens[0] == "savestate")
       {
          if (tokens.size() >= 2)
-            SaveState(ofToDataPath("savestate/"+tokens[1]), false);
+            SaveState(ofToDataPath("savestate/" + tokens[1]), false);
       }
       else if (tokens[0] == "loadstate")
       {
          if (tokens.size() >= 2)
-            LoadState(ofToDataPath("savestate/"+tokens[1]));
+            LoadState(ofToDataPath("savestate/" + tokens[1]));
       }
       else if (tokens[0] == "s")
       {
@@ -2771,7 +2770,8 @@ void ModularSynth::OnConsoleInput()
       }
       else if (tokens[0] == "getmouse")
       {
-         ofLog() << "mouse pos raw:(" << mMousePos.x << ", " << mMousePos.y << ") " << "   mouse pos canvas:(" << GetMouseX(&mModuleContainer) << ", " << GetMouseY(&mModuleContainer) << ")";
+         ofLog() << "mouse pos raw:(" << mMousePos.x << ", " << mMousePos.y << ") "
+                 << "   mouse pos canvas:(" << GetMouseX(&mModuleContainer) << ", " << GetMouseY(&mModuleContainer) << ")";
       }
       else if (tokens[0] == "screenshotmodule")
       {
@@ -2789,7 +2789,7 @@ void ModularSynth::OnConsoleInput()
       else
       {
          ofLog() << "Creating: " << mConsoleText;
-         ofVec2f grabOffset(-40,10);
+         ofVec2f grabOffset(-40, 10);
          IDrawableModule* module = SpawnModuleOnTheFly(mConsoleText, GetMouseX(&mModuleContainer) + grabOffset.x, GetMouseY(&mModuleContainer) + grabOffset.y);
          TheSynth->SetMoveModule(module, grabOffset.x, grabOffset.y, true);
       }
@@ -2835,9 +2835,9 @@ void ModularSynth::DoAutosave()
 IDrawableModule* ModularSynth::SpawnModuleOnTheFly(std::string moduleName, float x, float y, bool addToContainer)
 {
    if (mInitialized)
-      TitleBar::sShowInitialHelpOverlay = false;  //don't show initial help popup
+      TitleBar::sShowInitialHelpOverlay = false; //don't show initial help popup
 
-   std::vector<std::string> tokens = ofSplitString(moduleName," ");
+   std::vector<std::string> tokens = ofSplitString(moduleName, " ");
    if (tokens.size() == 0)
       return nullptr;
 
@@ -2845,7 +2845,7 @@ IDrawableModule* ModularSynth::SpawnModuleOnTheFly(std::string moduleName, float
       DoAutosave();
 
    std::string moduleType = tokens[0];
-   
+
    moduleType = ModuleFactory::FixUpTypeName(moduleType);
 
    std::string vstToSetUp = "";
@@ -2904,9 +2904,9 @@ IDrawableModule* ModularSynth::SpawnModuleOnTheFly(std::string moduleName, float
 
    if (moduleType == "effectchain")
    {
-      for (int i=1; i<tokens.size(); ++i)
+      for (int i = 1; i < tokens.size(); ++i)
       {
-         if (VectorContains(tokens[i],GetEffectFactory()->GetSpawnableEffects()))
+         if (VectorContains(tokens[i], GetEffectFactory()->GetSpawnableEffects()))
          {
             ofxJSONElement effect;
             effect["type"] = tokens[i];
@@ -2940,11 +2940,11 @@ IDrawableModule* ModularSynth::SpawnModuleOnTheFly(std::string moduleName, float
    }
    catch (LoadingJSONException& e)
    {
-      LogEvent("Error spawning \""+moduleName+"\" on the fly", kLogEventType_Warning);
+      LogEvent("Error spawning \"" + moduleName + "\" on the fly", kLogEventType_Warning);
    }
    catch (UnknownModuleException& e)
    {
-      LogEvent("Error spawning \""+moduleName+"\" on the fly, couldn't find \""+e.mSearchName+"\"", kLogEventType_Warning);
+      LogEvent("Error spawning \"" + moduleName + "\" on the fly, couldn't find \"" + e.mSearchName + "\"", kLogEventType_Warning);
    }
 
    if (prefabToSetUp != "")
@@ -2990,52 +2990,55 @@ void ModularSynth::AddMidiDevice(MidiDevice* device)
 
 void ModularSynth::ReconnectMidiDevices()
 {
-   for (int i=0; i<mMidiDevices.size(); ++i)
+   for (int i = 0; i < mMidiDevices.size(); ++i)
       mMidiDevices[i]->Reconnect();
 }
 
 void ModularSynth::SaveOutput()
 {
    ScopedMutex mutex(&mAudioThreadMutex, "SaveOutput()");
-   
+
    std::string save_prefix = "recording_";
    if (!mCurrentSaveStatePath.empty())
    {
-       // This assumes that mCurrentSaveStatePath always has a valid filename at the end
-       std::string filename = File(mCurrentSaveStatePath).getFileNameWithoutExtension().toStdString();
-       save_prefix = filename + "_";
+      // This assumes that mCurrentSaveStatePath always has a valid filename at the end
+      std::string filename = File(mCurrentSaveStatePath).getFileNameWithoutExtension().toStdString();
+      save_prefix = filename + "_";
    }
 
    std::string filename = ofGetTimestampString(UserPrefs.recordings_path.Get() + save_prefix + "%Y-%m-%d_%H-%M.wav");
    //string filenamePos = ofGetTimestampString("recordings/pos_%Y-%m-%d_%H-%M.wav");
 
    assert(mRecordingLength <= mGlobalRecordBuffer->Size());
-   
-   for (int i=0; i<mRecordingLength; ++i)
+
+   for (int i = 0; i < mRecordingLength; ++i)
    {
-      mSaveOutputBuffer[0][i] = mGlobalRecordBuffer->GetSample((int)mRecordingLength-i-1, 0);
-      mSaveOutputBuffer[1][i] = mGlobalRecordBuffer->GetSample((int)mRecordingLength-i-1, 1);
+      mSaveOutputBuffer[0][i] = mGlobalRecordBuffer->GetSample((int)mRecordingLength - i - 1, 0);
+      mSaveOutputBuffer[1][i] = mGlobalRecordBuffer->GetSample((int)mRecordingLength - i - 1, 1);
    }
 
    Sample::WriteDataToFile(filename, mSaveOutputBuffer, (int)mRecordingLength, 2);
-   
+
    //mOutputBufferMeasurePos.ReadChunk(mSaveOutputBuffer, mRecordingLength);
    //Sample::WriteDataToFile(filenamePos.c_str(), mSaveOutputBuffer, mRecordingLength, 1);
-   
+
    mGlobalRecordBuffer->ClearBuffer();
    mRecordingLength = 0;
 }
 
-const String& ModularSynth::GetTextFromClipboard() const {
+const String& ModularSynth::GetTextFromClipboard() const
+{
    return TheClipboard;
 }
 
-void ModularSynth::CopyTextToClipboard(const String& text) {
+void ModularSynth::CopyTextToClipboard(const String& text)
+{
    TheClipboard = text;
    SystemClipboard::copyTextToClipboard(text);
 }
 
-void ModularSynth::ReadClipboardTextFromSystem() {
+void ModularSynth::ReadClipboardTextFromSystem()
+{
    TheClipboard = SystemClipboard::getTextFromClipboard();
 }
 

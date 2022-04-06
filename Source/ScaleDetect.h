@@ -35,7 +35,9 @@
 
 struct MatchingScale
 {
-   MatchingScale(int root, std::string type) : mRoot(root), mType(type) {}
+   MatchingScale(int root, std::string type)
+   : mRoot(root)
+   , mType(type) {}
    int mRoot;
    std::string mType;
 };
@@ -45,8 +47,8 @@ class ScaleDetect : public NoteEffectBase, public IDrawableModule, public IButto
 public:
    ScaleDetect();
    static IDrawableModule* Create() { return new ScaleDetect(); }
-   
-   
+
+
    void CreateUIControls() override;
 
    //INoteReceiver
@@ -54,28 +56,31 @@ public:
 
    void ButtonClicked(ClickButton* button) override;
    void DropdownUpdated(DropdownList* list, int oldVal) override;
-   
+
    virtual void LoadLayout(const ofxJSONElement& moduleInfo) override;
    virtual void SetUpFromSaveData() override;
-   
-   
+
+
 private:
    bool ScaleSatisfied(int root, std::string type);
 
    //IDrawableModule
    void DrawModule() override;
-   void GetModuleDimensions(float& width, float& height) override { width = 140; height = 36; }
+   void GetModuleDimensions(float& width, float& height) override
+   {
+      width = 140;
+      height = 36;
+   }
    bool Enabled() const override { return true; }
 
-   std::array<bool,128> mPitchOn{false};
+   std::array<bool, 128> mPitchOn{ false };
    ClickButton* mResetButton;
    int mLastPitch;
    bool mDoDetect;
    bool mNeedsUpdate;
-   
+
    DropdownList* mMatchesDropdown;
    int mSelectedMatch;
 };
 
 #endif /* defined(__modularSynth__ScaleDetect__) */
-

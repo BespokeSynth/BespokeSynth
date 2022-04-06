@@ -44,42 +44,46 @@ public:
    Push2Control();
    virtual ~Push2Control();
    static IDrawableModule* Create() { return new Push2Control(); }
-   
-   
+
+
    void CreateUIControls() override;
    void Poll() override;
-   
+
    void SetLed(MidiMessageType type, int index, int color, int flashColor = -1);
-   
+
    void OnMidiNote(MidiNote& note) override;
    void OnMidiControl(MidiControl& control) override;
    void OnMidiPitchBend(MidiPitchBend& pitchBend) override;
-   
+
    void DropdownUpdated(DropdownList* list, int oldVal) override {}
-   
+
    void LoadLayout(const ofxJSONElement& moduleInfo) override;
    void SetUpFromSaveData() override;
    void SaveLayout(ofxJSONElement& moduleInfo) override;
-   
+
    static bool sDrawingPush2Display;
    static NVGcontext* sVG;
    static NVGLUframebuffer* sFB;
    static void CreateStaticFramebuffer(); //windows was having trouble creating a nanovg context and fbo on the fly
    static IUIControl* sBindToUIControl;
-   
+
 private:
    //IDrawableModule
    void DrawModule() override;
    void DrawModuleUnclipped() override;
    void PostRender() override;
    bool Enabled() const override { return true; }
-   void GetModuleDimensions(float& width, float& height) override { width = mWidth; height = mHeight; }
+   void GetModuleDimensions(float& width, float& height) override
+   {
+      width = mWidth;
+      height = mHeight;
+   }
    void OnClicked(int x, int y, bool right) override;
-   
+
    bool Initialize();
    void DrawToFramebuffer(NVGcontext* vg, NVGLUframebuffer* fb, float t, float pxRatio);
    void RenderPush2Display();
-   
+
    void SetModuleGridLights();
    void DrawDisplayModuleControls();
    void DrawLowerModuleSelector();
@@ -91,7 +95,11 @@ private:
    void BookmarkModuleToSlot(int slotIndex, IDrawableModule* module);
    void SwitchToBookmarkedModule(int slotIndex);
    int GetPadColorForType(ModuleType type);
-   bool GetGridIndex(int gridX, int gridY, int& gridIndex) { gridIndex = gridX + gridY * 8; return gridX >= 0 && gridX < 8 && gridY >= 0 && gridY < 8; }
+   bool GetGridIndex(int gridX, int gridY, int& gridIndex)
+   {
+      gridIndex = gridX + gridY * 8;
+      return gridX >= 0 && gridX < 8 && gridY >= 0 && gridY < 8;
+   }
    bool IsIgnorableModule(IDrawableModule* module);
    std::vector<IDrawableModule*> SortModules(std::vector<IDrawableModule*> modules);
    void AddModuleChain(IDrawableModule* module, std::vector<IDrawableModule*>& modules, std::vector<IDrawableModule*>& output, int depth);
@@ -100,59 +108,59 @@ private:
    ModuleType GetModuleTypeForSpawnList(IUIControl* control);
    ofColor GetSpawnGridColor(int index, ModuleType moduleType) const;
    int GetSpawnGridPadColor(int index, ModuleType moduleType) const;
-   
+
    unsigned char* mPixels;
    const int kPixelRatio = 1;
-   
+
    const float kColumnSpacing = 121;
-   
+
    int mFontHandle;
    int mFontHandleBold;
-   
+
    float mWidth;
    float mHeight;
-   
+
    IDrawableModule* mDisplayModule;
    std::vector<IUIControl*> mSliderControls;
    std::vector<IUIControl*> mButtonControls;
    std::vector<IUIControl*> mDisplayedControls;
    int mModuleColumnOffset;
    float mModuleColumnOffsetSmoothed;
-   
+
    std::vector<IDrawableModule*> mModules;
    float mModuleListOffset;
    float mModuleListOffsetSmoothed;
-   IDrawableModule* mModuleGrid[8*8];
+   IDrawableModule* mModuleGrid[8 * 8];
    ofRectangle mModuleGridRect;
-   
+
    std::vector<IUIControl*> mFavoriteControls;
    std::vector<IUIControl*> mSpawnModuleControls;
    bool mNewButtonHeld;
    bool mDeleteButtonHeld;
    bool mModulationButtonHeld;
    bool mAddModuleBookmarkButtonHeld;
-   std::array<bool,128> mNoteHeldState;
+   std::array<bool, 128> mNoteHeldState;
    IDrawableModule* mHeldModule;
    bool mAllowRepatch;
    std::vector<IDrawableModule*> mModuleHistory;
    int mModuleHistoryPosition;
    std::vector<IDrawableModule*> mBookmarkSlots;
    bool mInMidiControllerBindMode;
-   
+
    enum class ScreenDisplayMode
    {
       kNormal,
       kAddModule
    };
    ScreenDisplayMode mScreenDisplayMode;
-   
+
    IPush2GridController* mGridControlModule;
    bool mDisplayModuleCanControlGrid;
-   
-   int mLedState[128*2];  //bottom 128 are notes, top 128 are CCs
-   
+
+   int mLedState[128 * 2]; //bottom 128 are notes, top 128 are CCs
+
    MidiDevice mDevice;
-   
+
    SpawnListManager mSpawnLists;
    int mPendingSpawnPitch;
    int mSelectedGridSpawnListIndex;

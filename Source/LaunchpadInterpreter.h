@@ -34,7 +34,12 @@ struct MidiControl;
 
 struct LightUpdate
 {
-   LightUpdate(int x, int y, char r, char g, float intensity=1) : mX(x), mY(y), mR(r), mG(g), mIntensity(intensity) {}
+   LightUpdate(int x, int y, char r, char g, float intensity = 1)
+   : mX(x)
+   , mY(y)
+   , mR(r)
+   , mG(g)
+   , mIntensity(intensity) {}
    int mX;
    int mY;
    char mR;
@@ -60,15 +65,15 @@ public:
    void Draw(ofVec2f vPos);
    void ResetLaunchpad();
    bool HasLaunchpad() { return mController != nullptr; }
-   
+
    static int LaunchpadColor(int r, int g);
-   
+
 private:
    void ClearStoredLights();
    bool IsMonome() const;
-   
+
    ILaunchpadListener* mListener;
-   int mLights[64+8+8]; //grid + side + top
+   int mLights[64 + 8 + 8]; //grid + side + top
    MidiController* mController;
    int mControllerPage;
 };

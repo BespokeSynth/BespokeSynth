@@ -44,11 +44,11 @@ NoteRangeFilter::NoteRangeFilter()
 void NoteRangeFilter::CreateUIControls()
 {
    IDrawableModule::CreateUIControls();
-   
+
    UIBLOCK0();
-   INTSLIDER(mMinPitchSlider,"min",&mMinPitch,0,127);
-   INTSLIDER(mMaxPitchSlider,"max",&mMaxPitch,0,127);
-   CHECKBOX(mWrapCheckbox,"wrap",&mWrap);
+   INTSLIDER(mMinPitchSlider, "min", &mMinPitch, 0, 127);
+   INTSLIDER(mMaxPitchSlider, "max", &mMaxPitch, 0, 127);
+   CHECKBOX(mWrapCheckbox, "wrap", &mWrap);
    ENDUIBLOCK(mWidth, mHeight);
 }
 
@@ -57,7 +57,7 @@ void NoteRangeFilter::DrawModule()
 
    if (Minimized() || IsVisible() == false)
       return;
-   
+
    mMinPitchSlider->Draw();
    mMaxPitchSlider->Draw();
    mWrapCheckbox->Draw();
@@ -87,7 +87,7 @@ void NoteRangeFilter::PlayNote(double time, int pitch, int velocity, int voiceId
       while (pitch > mMaxPitch)
          pitch -= length;
    }
-   
+
    if (!mEnabled || (pitch >= mMinPitch && pitch <= mMaxPitch))
    {
       PlayNoteOutput(time, pitch, velocity, voiceIdx, modulation);
@@ -97,7 +97,7 @@ void NoteRangeFilter::PlayNote(double time, int pitch, int velocity, int voiceId
 void NoteRangeFilter::LoadLayout(const ofxJSONElement& moduleInfo)
 {
    mModuleSaveData.LoadString("target", moduleInfo);
-   
+
    SetUpFromSaveData();
 }
 

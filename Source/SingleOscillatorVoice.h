@@ -53,7 +53,7 @@ public:
    int mUnison;
    float mUnisonWidth;
    float mSoften;
-   
+
    float mFilterCutoffMax;
    float mFilterCutoffMin;
    float mFilterQ;
@@ -61,7 +61,7 @@ public:
 
    float mVelToVolume;
    float mVelToEnvelope;
-   
+
    bool mLiteCPUMode;
 };
 
@@ -70,7 +70,7 @@ class SingleOscillatorVoice : public IMidiVoice
 public:
    SingleOscillatorVoice(IDrawableModule* owner = nullptr);
    ~SingleOscillatorVoice();
-   
+
    // IMidiVoice
    void Start(double time, float amount) override;
    void Stop(double time) override;
@@ -80,17 +80,22 @@ public:
    bool IsDone(double time) override;
 
    static float GetADSRScale(float velocity, float velToEnvelope);
-   
+
    static const int kMaxUnison = 8;
+
 private:
    void DoParameterUpdate(int samplesIn,
                           float& pitch,
                           float& freq,
                           float& vol);
-   
+
    struct OscData
    {
-      OscData() : mPhase(0), mSyncPhase(0), mOsc(kOsc_Square), mDetuneFactor(0) {}
+      OscData()
+      : mPhase(0)
+      , mSyncPhase(0)
+      , mOsc(kOsc_Square)
+      , mDetuneFactor(0) {}
       float mPhase;
       float mSyncPhase;
       Oscillator mOsc;
@@ -100,12 +105,12 @@ private:
    OscData mOscData[kMaxUnison];
    ::ADSR mAdsr;
    OscillatorVoiceParams* mVoiceParams;
-   
+
    ::ADSR mFilterAdsr;
    BiquadFilter mFilterLeft;
    BiquadFilter mFilterRight;
    bool mUseFilter;
-   
+
    IDrawableModule* mOwner;
 };
 

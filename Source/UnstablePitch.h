@@ -37,9 +37,9 @@
 struct UnstablePerlinModulation
 {
    UnstablePerlinModulation(float amount, float warble, float noise)
-      : mPerlinAmount(amount)
-      , mPerlinWarble(warble)
-      , mPerlinNoise(noise)
+   : mPerlinAmount(amount)
+   , mPerlinWarble(warble)
+   , mPerlinNoise(noise)
    {
       mPerlinSeed = gRandom() % 10000;
    }
@@ -63,7 +63,7 @@ public:
    virtual ~UnstablePitch();
    static IDrawableModule* Create() { return new UnstablePitch(); }
 
-   
+
    void CreateUIControls() override;
    void Init() override;
    void SetEnabled(bool enabled) override { mEnabled = enabled; }
@@ -79,10 +79,15 @@ public:
 
    void LoadLayout(const ofxJSONElement& moduleInfo) override;
    void SetUpFromSaveData() override;
+
 private:
    //IDrawableModule
    void DrawModule() override;
-   void GetModuleDimensions(float& width, float& height) override { width = mWidth; height = mHeight; }
+   void GetModuleDimensions(float& width, float& height) override
+   {
+      width = mWidth;
+      height = mHeight;
+   }
    bool Enabled() const override { return mEnabled; }
 
    void FillModulationBuffer(double time, int voiceIdx);
@@ -93,10 +98,9 @@ private:
    FloatSlider* mNoiseSlider;
    float mWidth;
    float mHeight;
-   std::array<bool, kNumVoices> mIsVoiceUsed { false };
+   std::array<bool, kNumVoices> mIsVoiceUsed{ false };
    std::array<int, 128> mPitchToVoice;
    int mVoiceRoundRobin;
 
    Modulations mModulation;
 };
-

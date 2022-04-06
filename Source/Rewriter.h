@@ -42,12 +42,12 @@ public:
    Rewriter();
    virtual ~Rewriter();
    static IDrawableModule* Create() { return new Rewriter(); }
-   
-   
+
+
    void CreateUIControls() override;
 
    void Go();
-   
+
    void PostRepatch(PatchCableSource* cableSource, bool fromUserClick) override;
 
    //IAudioSource
@@ -55,19 +55,23 @@ public:
 
    //IButtonListener
    void ButtonClicked(ClickButton* button) override;
-   
+
    void CheckboxUpdated(Checkbox* checkbox) override;
-   
+
    void LoadLayout(const ofxJSONElement& moduleInfo) override;
    void SaveLayout(ofxJSONElement& moduleInfo) override;
    void SetUpFromSaveData() override;
-   
+
 private:
    //IDrawableModule
    void DrawModule() override;
-   void GetModuleDimensions(float& w, float& h) override { w=mWidth; h=mHeight; }
+   void GetModuleDimensions(float& w, float& h) override
+   {
+      w = mWidth;
+      h = mHeight;
+   }
    bool Enabled() const override { return mEnabled; }
-   
+
    float mWidth;
    float mHeight;
 
@@ -78,10 +82,9 @@ private:
 
    RollingBuffer mRecordBuffer;
    Looper* mConnectedLooper;
-   
+
    PatchCableSource* mLooperCable;
 };
 
 
 #endif /* defined(__modularSynth__Rewriter__) */
-

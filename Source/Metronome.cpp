@@ -47,7 +47,7 @@ void Metronome::Init()
 void Metronome::CreateUIControls()
 {
    IDrawableModule::CreateUIControls();
-   mVolumeSlider = new FloatSlider(this,"vol",5,18,70,15,&mVolume,0,1);
+   mVolumeSlider = new FloatSlider(this, "vol", 5, 18, 70, 15, &mVolume, 0, 1);
 }
 
 Metronome::~Metronome()
@@ -68,14 +68,17 @@ void Metronome::Process(double time)
    float* out = target->GetBuffer()->GetChannel(0);
    assert(bufferSize == gBufferSize);
 
-   for (int i=0; i<bufferSize; ++i)
+   for (int i = 0; i < bufferSize; ++i)
    {
       float sample = mOsc.Audio(time, mPhase) * mVolume / 10;
       out[i] += sample;
       GetVizBuffer()->Write(sample, 0);
 
       mPhase += mPhaseInc;
-      while (mPhase > FTWO_PI) { mPhase -= FTWO_PI; }
+      while (mPhase > FTWO_PI)
+      {
+         mPhase -= FTWO_PI;
+      }
 
       time += gInvSampleRateMs;
    }
@@ -87,17 +90,17 @@ void Metronome::OnTimeEvent(double time)
    if (step == 0)
    {
       mPhaseInc = GetPhaseInc(880);
-      mOsc.Start(gTime,1,0,100,0,0);
+      mOsc.Start(gTime, 1, 0, 100, 0, 0);
    }
    else if (step == 2)
    {
       mPhaseInc = GetPhaseInc(480);
-      mOsc.Start(gTime,1,0,70,0,0);
+      mOsc.Start(gTime, 1, 0, 70, 0, 0);
    }
    else
    {
       mPhaseInc = GetPhaseInc(440);
-      mOsc.Start(gTime,.8f,0,50,0,0);
+      mOsc.Start(gTime, .8f, 0, 50, 0, 0);
    }
 }
 
@@ -106,7 +109,7 @@ void Metronome::DrawModule()
 
    if (Minimized() || IsVisible() == false)
       return;
-   
+
    mVolumeSlider->Draw();
 }
 
@@ -121,4 +124,3 @@ void Metronome::SetUpFromSaveData()
 {
    SetTarget(TheSynth->FindModule(mModuleSaveData.GetString("target")));
 }
-

@@ -47,7 +47,7 @@ class Monome : public INonstandardController,
 public:
    Monome(MidiDeviceListener* listener);
    ~Monome();
-   
+
    void Poll() override;
    bool SetUpOsc();
    void ListMonomes();
@@ -57,11 +57,11 @@ public:
    void SetLayoutData(ofxJSONElement& layout) override;
    void ConnectToDevice(std::string deviceDesc);
    void UpdateDeviceList(DropdownList* list);
-   
+
    void oscMessageReceived(const juce::OSCMessage& msg) override;
-   
-   void SendValue(int page, int control, float value, bool forceNoteOn = false, int channel = -1)override;
-   
+
+   void SendValue(int page, int control, float value, bool forceNoteOn = false, int channel = -1) override;
+
    bool IsInputConnected() override { return mHasMonome; }
    bool Reconnect() override;
 
@@ -71,9 +71,9 @@ public:
 private:
    void SetLightInternal(int x, int y, float value);
    Vec2i Rotate(int x, int y, int rotations);
-   
+
    static int sNextMonomeReceivePort;
-   
+
    juce::OSCSender mToSerialOsc;
    juce::OSCSender mToMonome;
    int mMonomeReceivePort;
@@ -85,30 +85,38 @@ private:
    juce::String mPrefix;
    bool mJustRequestedDeviceList;
    std::string mPendingDeviceDesc;
-   
+
    struct MonomeDevice
    {
-      void CopyFrom(MonomeDevice& other) { id = other.id; product = other.product; port = other.port; }
+      void CopyFrom(MonomeDevice& other)
+      {
+         id = other.id;
+         product = other.product;
+         port = other.port;
+      }
       std::string id;
       std::string product;
       int port;
       std::string GetDescription() { return id + " " + product; }
    };
-   
+
    std::vector<MonomeDevice> mConnectedDeviceList;
-   
+
    MidiDeviceListener* mListener;
    DropdownList* mListForMidiController;
    MonomeDevice mLastConnectedDeviceInfo;
-   
+
    struct LightInfo
    {
-      LightInfo() : mValue(0), mLastUpdatedTime(0), mLastSentTime(0) {}
+      LightInfo()
+      : mValue(0)
+      , mLastUpdatedTime(0)
+      , mLastSentTime(0) {}
       float mValue;
       double mLastUpdatedTime;
       double mLastSentTime;
    };
-   
+
    std::vector<LightInfo> mLights;
 };
 

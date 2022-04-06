@@ -46,52 +46,52 @@ public:
    LoopStorer();
    ~LoopStorer();
    static IDrawableModule* Create() { return new LoopStorer(); }
-   
-   
+
+
    void CreateUIControls() override;
    void Init() override;
-   
+
    void Poll() override;
    void PostRepatch(PatchCableSource* cableSource, bool fromUserClick) override;
-   
+
    int GetRowY(int idx);
    Looper* GetLooper() { return mLooper; }
    int GetQueuedBufferIdx() { return mQueuedSwapBufferIdx; }
-   
+
    void SetEnabled(bool enabled) override { mEnabled = enabled; }
-   
+
    void OnTimeEvent(double time) override;
-   
+
    void CheckboxUpdated(Checkbox* checkbox) override;
    void FloatSliderUpdated(FloatSlider* slider, float oldVal) override;
    void IntSliderUpdated(IntSlider* slider, int oldVal) override;
    void DropdownClicked(DropdownList* list) override;
    void DropdownUpdated(DropdownList* list, int oldVal) override;
    void ButtonClicked(ClickButton* button) override;
-   
+
    void LoadLayout(const ofxJSONElement& moduleInfo) override;
    void SaveLayout(ofxJSONElement& moduleInfo) override;
    void SetUpFromSaveData() override;
    void SaveState(FileStreamOut& out) override;
    void LoadState(FileStreamIn& in) override;
-   
+
 private:
    //IDrawableModule
    void DrawModule() override;
    bool Enabled() const override { return mEnabled; }
    void GetModuleDimensions(float& width, float& height) override;
-   
+
    void SwapBuffer(int swapToIdx);
-   
+
    class SampleData
    {
    public:
       SampleData();
       ~SampleData();
-      
+
       void Init(LoopStorer* storer, int index);
       void Draw();
-      
+
       ChannelBuffer* mBuffer;
       int mNumBars;
       Checkbox* mSelectCheckbox;
@@ -100,7 +100,7 @@ private:
       int mBufferLength;
       bool mIsCurrentBuffer;
    };
-   
+
    Looper* mLooper;
    Checkbox* mRewriteToSelectionCheckbox;
    bool mRewriteToSelection;
@@ -111,10 +111,10 @@ private:
    bool mIsSwapping;
    ClickButton* mClearButton;
    ofMutex mLoadMutex;
-   
+
    std::vector<SampleData*> mSamples;
    int mCurrentBufferIdx;
-   
+
    PatchCableSource* mLooperCable;
 };
 

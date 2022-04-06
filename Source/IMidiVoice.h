@@ -34,7 +34,9 @@ class IVoiceParams;
 class IMidiVoice
 {
 public:
-   IMidiVoice() : mPitch(0), mPan(0) {}
+   IMidiVoice()
+   : mPitch(0)
+   , mPan(0) {}
    virtual ~IMidiVoice() {}
    virtual void ClearVoice() = 0;
    void SetPitch(float pitch) { mPitch = ofClamp(pitch, 0, 127); }
@@ -44,12 +46,21 @@ public:
    virtual bool Process(double time, ChannelBuffer* out, int oversampling) = 0;
    virtual bool IsDone(double time) = 0;
    virtual void SetVoiceParams(IVoiceParams* params) = 0;
-   void SetPan(float pan) { assert(pan >= -1 && pan <= 1); mPan = pan; }
-   float GetPan() const { assert(mPan >= -1 && mPan <= 1); return mPan; }
-   
+   void SetPan(float pan)
+   {
+      assert(pan >= -1 && pan <= 1);
+      mPan = pan;
+   }
+   float GetPan() const
+   {
+      assert(mPan >= -1 && mPan <= 1);
+      return mPan;
+   }
+
    float GetPitch(int samplesIn) { return mPitch + (mModulators.pitchBend ? mModulators.pitchBend->GetValue(samplesIn) : 0); }
    float GetModWheel(int samplesIn) { return mModulators.modWheel ? mModulators.modWheel->GetValue(samplesIn) : 0.5f; }
    float GetPressure(int samplesIn) { return mModulators.pressure ? mModulators.pressure->GetValue(samplesIn) : 0.5f; }
+
 private:
    float mPitch;
    float mPan;

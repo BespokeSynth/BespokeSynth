@@ -39,7 +39,7 @@ public:
    ChordHolder();
    static IDrawableModule* Create() { return new ChordHolder(); }
 
-   
+
    void CreateUIControls() override;
 
    void SetEnabled(bool enabled) override { mEnabled = enabled; }
@@ -55,10 +55,15 @@ public:
 
    virtual void LoadLayout(const ofxJSONElement& moduleInfo) override;
    virtual void SetUpFromSaveData() override;
+
 private:
    //IDrawableModule
    void DrawModule() override;
-   void GetModuleDimensions(float& width, float& height) override { width = 131; height = 21; }
+   void GetModuleDimensions(float& width, float& height) override
+   {
+      width = 131;
+      height = 21;
+   }
    bool Enabled() const override { return mEnabled; }
 
    void Stop();

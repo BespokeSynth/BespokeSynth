@@ -47,7 +47,7 @@ public:
    ~PlaySequencer();
    static IDrawableModule* Create() { return new PlaySequencer(); }
 
-   
+
    void CreateUIControls() override;
 
    void Init() override;
@@ -87,14 +87,18 @@ public:
 private:
    //IDrawableModule
    void DrawModule() override;
-   void GetModuleDimensions(float& width, float& height) override { width = mWidth; height = mHeight; }
+   void GetModuleDimensions(float& width, float& height) override
+   {
+      width = mWidth;
+      height = mHeight;
+   }
    bool Enabled() const override { return mEnabled; }
    void OnClicked(int x, int y, bool right) override;
 
    int GetStep(double time);
    void UpdateInterval();
    void UpdateNumMeasures(int oldNumMeasures);
-   void UpdateLights(bool betweener=false);
+   void UpdateLights(bool betweener = false);
    int GetVelocityLevel();
 
    class NoteOffScheduler : public ITimeListener
@@ -119,7 +123,7 @@ private:
    float mVelocityFull;
    float mVelocityMed;
    float mVelocityLight;
-   
+
    DropdownList* mIntervalSelector;
    Checkbox* mWriteCheckbox;
    Checkbox* mNoteRepeatCheckbox;
@@ -131,7 +135,10 @@ private:
 
    struct PlayLane
    {
-      PlayLane() : mInputVelocity(0), mIsPlaying(false), mMuteOrErase(false) {}
+      PlayLane()
+      : mInputVelocity(0)
+      , mIsPlaying(false)
+      , mMuteOrErase(false) {}
       int mInputVelocity;
       bool mIsPlaying;
       Checkbox* mMuteOrEraseCheckbox;
@@ -142,11 +149,13 @@ private:
 
    struct SavedPattern
    {
-      SavedPattern() : mNumMeasures(1), mHasSequence(false) {}
+      SavedPattern()
+      : mNumMeasures(1)
+      , mHasSequence(false) {}
       ClickButton* mStoreButton;
       ClickButton* mLoadButton;
       float mNumMeasures;
-      std::array<float, MAX_GRID_SIZE*MAX_GRID_SIZE> mData;
+      std::array<float, MAX_GRID_SIZE * MAX_GRID_SIZE> mData;
       bool mHasSequence;
    };
 

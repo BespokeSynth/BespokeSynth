@@ -35,30 +35,30 @@
 NoteHocket::NoteHocket()
 {
    mWeight[0] = 1;
-   for (int i=1; i<kMaxDestinations; ++i)
+   for (int i = 1; i < kMaxDestinations; ++i)
       mWeight[i] = 0;
-   for (int i=0; i<128; ++i)
+   for (int i = 0; i < 128; ++i)
       mLastNoteDestinations[i] = -1;
 }
 
 void NoteHocket::CreateUIControls()
 {
    IDrawableModule::CreateUIControls();
-   
+
    UIBLOCK0();
-   for (int i=0; i<kMaxDestinations; ++i)
+   for (int i = 0; i < kMaxDestinations; ++i)
    {
-      FLOATSLIDER(mWeightSlider[i],("weight "+ofToString(i)).c_str(),&mWeight[i],0,1);
+      FLOATSLIDER(mWeightSlider[i], ("weight " + ofToString(i)).c_str(), &mWeight[i], 0, 1);
       mDestinationCables[i] = new AdditionalNoteCable();
       mDestinationCables[i]->SetPatchCableSource(new PatchCableSource(this, kConnectionType_Note));
-      mDestinationCables[i]->GetPatchCableSource()->SetOverrideCableDir(ofVec2f(1,0));
+      mDestinationCables[i]->GetPatchCableSource()->SetOverrideCableDir(ofVec2f(1, 0));
       AddPatchCableSource(mDestinationCables[i]->GetPatchCableSource());
       ofRectangle rect = mWeightSlider[i]->GetRect(true);
-      mDestinationCables[i]->GetPatchCableSource()->SetManualPosition(rect.getMaxX() + 10, rect.y + rect.height/2);
+      mDestinationCables[i]->GetPatchCableSource()->SetManualPosition(rect.getMaxX() + 10, rect.y + rect.height / 2);
    }
-   ENDUIBLOCK(mWidth,mHeight);
+   ENDUIBLOCK(mWidth, mHeight);
    mWidth += 20;
-   
+
    GetPatchCableSource()->SetEnabled(false);
 }
 
@@ -66,8 +66,8 @@ void NoteHocket::DrawModule()
 {
    if (Minimized() || IsVisible() == false)
       return;
-   
-   for (int i=0; i<kMaxDestinations; ++i)
+
+   for (int i = 0; i < kMaxDestinations; ++i)
       mWeightSlider[i]->Draw();
 }
 
@@ -77,19 +77,19 @@ void NoteHocket::PlayNote(double time, int pitch, int velocity, int voiceIdx, Mo
    if (velocity > 0)
    {
       ComputeSliders(0);
-      
+
       float totalWeight = 0;
-      for (int i=0; i<kMaxDestinations; ++i)
+      for (int i = 0; i < kMaxDestinations; ++i)
          totalWeight += mWeight[i];
       float random = ofRandom(totalWeight);
-      
-      for (selectedDestination=0; selectedDestination<kMaxDestinations; ++selectedDestination)
+
+      for (selectedDestination = 0; selectedDestination < kMaxDestinations; ++selectedDestination)
       {
          if (random <= mWeight[selectedDestination] || selectedDestination == kMaxDestinations - 1)
             break;
          random -= mWeight[selectedDestination];
       }
-      
+
       if (mLastNoteDestinations[pitch] != -1 && mLastNoteDestinations[pitch] != selectedDestination)
          SendNoteToIndex(mLastNoteDestinations[pitch], time, pitch, 0, voiceIdx, modulation);
       mLastNoteDestinations[pitch] = selectedDestination;
@@ -101,7 +101,7 @@ void NoteHocket::PlayNote(double time, int pitch, int velocity, int voiceIdx, Mo
          return;
       mLastNoteDestinations[pitch] = -1;
    }
-   
+
    SendNoteToIndex(selectedDestination, time, pitch, velocity, voiceIdx, modulation);
 }
 

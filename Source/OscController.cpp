@@ -48,11 +48,11 @@ void OscController::Connect()
    {
       bool connected = OSCReceiver::connect(mInPort);
       assert(connected);
-      
+
       OSCReceiver::addListener(this);
-      
+
       ConnectOutput();
-      
+
       mConnected = true;
    }
    catch (std::exception e)
@@ -91,10 +91,10 @@ void OscController::SendValue(int page, int control, float value, bool forceNote
 {
    if (!mConnected)
       return;
-   
-   for (int i=0; i<mOscMap.size(); ++i)
+
+   for (int i = 0; i < mOscMap.size(); ++i)
    {
-      if (control == mOscMap[i].mControl)// && mOscMap[i].mLastChangedTime + 50 < gTime)
+      if (control == mOscMap[i].mControl) // && mOscMap[i].mLastChangedTime + 50 < gTime)
       {
          juce::OSCMessage msg(mOscMap[i].mAddress.c_str());
 
@@ -105,10 +105,10 @@ void OscController::SendValue(int page, int control, float value, bool forceNote
          }
          else
          {
-            mOscMap[i].mIntValue = value*127;
+            mOscMap[i].mIntValue = value * 127;
             msg.addInt32(mOscMap[i].mIntValue);
          }
-         
+
          if (mOutputConnected)
             mOscOut.send(msg);
       }
@@ -122,7 +122,7 @@ void OscController::oscMessageReceived(const juce::OSCMessage& msg)
    if (address == "/jockey/sync")
    {
       std::string outputAddress = msg[0].getString().toStdString();
-      std::vector<std::string> tokens= ofSplitString(outputAddress, ":");
+      std::vector<std::string> tokens = ofSplitString(outputAddress, ":");
       if (tokens.size() == 2)
       {
          mOutAddress = tokens[0];
@@ -138,7 +138,7 @@ void OscController::oscMessageReceived(const juce::OSCMessage& msg)
    int mapIndex = FindControl(address);
 
    bool isNew = false;
-   if (mapIndex == -1)  //create a new map entry
+   if (mapIndex == -1) //create a new map entry
    {
       isNew = true;
       mapIndex = AddControl(address, msg[0].isFloat32());

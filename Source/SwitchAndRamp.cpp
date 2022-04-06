@@ -37,14 +37,14 @@ float SwitchAndRamp::Process(int channel, float input, float rampSpeed)
       mOffset[channel] = mLastOutput[channel] - input;
       mSwitching[channel] = false;
    }
-   
+
    if (mOffset[channel] > rampSpeed)
       mOffset[channel] -= rampSpeed;
    else if (mOffset[channel] < -rampSpeed)
       mOffset[channel] += rampSpeed;
    else
       mOffset[channel] = 0;
-   
+
    float ret = input + mOffset[channel];
    mLastOutput[channel] = ret;
    return ret;

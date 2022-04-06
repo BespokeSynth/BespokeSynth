@@ -50,24 +50,28 @@ public:
    ::ADSR* GetADSR() { return mAdsr; }
    void SpawnEnvelopeEditor();
    void SetOverrideDrawTime(double time) { mOverrideDrawTime = time; }
-   void SetShowing(bool showing) override { IUIControl::SetShowing(showing); UpdateSliderVisibility(); }
-   
+   void SetShowing(bool showing) override
+   {
+      IUIControl::SetShowing(showing);
+      UpdateSliderVisibility();
+   }
+
    //IUIControl
    void SetFromMidiCC(float slider, bool setViaModulator = false) override {}
    void SetValue(float value) override {}
    bool CanBeTargetedBy(PatchCableSource* source) const override { return false; }
    void SaveState(FileStreamOut& out) override;
    void LoadState(FileStreamIn& in, bool shouldSetValue = true) override;
-   
+
    enum DisplayMode
    {
       kDisplayEnvelope,
       kDisplaySliders
    };
    static void ToggleDisplayMode();
-   
+
 protected:
-   ~ADSRDisplay();   //protected so that it can't be created on the stack
+   ~ADSRDisplay(); //protected so that it can't be created on the stack
 
 private:
    enum AdjustParam
@@ -82,17 +86,21 @@ private:
    } mAdjustMode;
 
    void OnClicked(int x, int y, bool right) override;
-   void GetDimensions(float& width, float& height) override { width = mWidth; height = mHeight; }
-   
+   void GetDimensions(float& width, float& height) override
+   {
+      width = mWidth;
+      height = mHeight;
+   }
+
    void UpdateSliderVisibility();
-   
+
    float mWidth;
    float mHeight;
    float mVol;
    float mMaxTime;
    bool mClick;
    ::ADSR* mAdsr;
-   ::ADSR mViewAdsr;   //for ADSR simulation in drawing
+   ::ADSR mViewAdsr; //for ADSR simulation in drawing
    ofVec2f mClickStart;
    ::ADSR mClickAdsr;
    bool mHighlighted;

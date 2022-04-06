@@ -26,7 +26,7 @@
 #pragma once
 
 #if __clang__
- #pragma clang diagnostic ignored "-Wreorder"
+#pragma clang diagnostic ignored "-Wreorder"
 #endif
 
 #include "OpenFrameworksPort.h"
@@ -43,9 +43,9 @@
 //#define BESPOKE_DEBUG_ALLOCATIONS
 
 #ifdef BESPOKE_DEBUG_ALLOCATIONS
-void* operator new(std::size_t size, const char *file, int line) throw(std::bad_alloc);
-void* operator new[](std::size_t size, const char *file, int line) throw(std::bad_alloc);
-#define DEBUG_NEW new(__FILE__, __LINE__)
+void* operator new(std::size_t size, const char* file, int line) throw(std::bad_alloc);
+void* operator new[](std::size_t size, const char* file, int line) throw(std::bad_alloc);
+#define DEBUG_NEW new (__FILE__, __LINE__)
 #else
 #define DEBUG_NEW new
 #endif
@@ -55,33 +55,33 @@ void* operator new[](std::size_t size, const char *file, int line) throw(std::ba
 #define __PRETTY_FUNCTION__ __FUNCSIG__
 #endif
 
-#define MAX_BUFFER_SIZE 30*gSampleRate
+#define MAX_BUFFER_SIZE 30 * gSampleRate
 #define MAX_TEXTENTRY_LENGTH 1024
 
 #ifndef M_PI
 #define M_PI PI
 #endif
 
-#define FPI       3.14159265358979323846f
-#define FTWO_PI   6.28318530717958647693f
+#define FPI 3.14159265358979323846f
+#define FTWO_PI 6.28318530717958647693f
 
 #define USE_VECTOR_OPS
 
 //bool labeling technique that I stole from Ableton
 #define K(x) true
-#define L(x,y) y
+#define L(x, y) y
 
 //avoid "unused variable" warnings
-#define UNUSED(x) ((void) x)
+#define UNUSED(x) ((void)x)
 
 class IUIControl;
 class IDrawableModule;
 class RollingBuffer;
 class ChannelBuffer;
 
-typedef std::map<std::string,int> EnumMap;
+typedef std::map<std::string, int> EnumMap;
 
-const int kWorkBufferSize = 1024*8; //larger than the audio buffer size would ever be (even oversampled)
+const int kWorkBufferSize = 1024 * 8; //larger than the audio buffer size would ever be (even oversampled)
 
 const int kNumVoices = 16;
 
@@ -101,7 +101,7 @@ extern RetinaTrueTypeFont gFontFixedWidth;
 extern float gModuleDrawAlpha;
 extern float gNullBuffer[kWorkBufferSize];
 extern float gZeroBuffer[kWorkBufferSize];
-extern float gWorkBuffer[kWorkBufferSize];  //scratch buffer for doing work in
+extern float gWorkBuffer[kWorkBufferSize]; //scratch buffer for doing work in
 extern ChannelBuffer gWorkChannelBuffer;
 extern IDrawableModule* gHoveredModule;
 extern IUIControl* gHoveredUIControl;
@@ -136,7 +136,9 @@ enum KeyModifiers
    kModifier_Command = 8
 };
 
-class LoadingJSONException : public std::exception {};
+class LoadingJSONException : public std::exception
+{
+};
 class UnknownModuleException : public std::exception
 {
 public:
@@ -145,26 +147,36 @@ public:
    ~UnknownModuleException() throw() {}
    std::string mSearchName;
 };
-class UnknownEffectTypeException : public std::exception {};
-class BadUIControlPathException : public std::exception {};
-class UnknownUIControlException : public std::exception {};
-class WrongModuleTypeException : public std::exception {};
-class LoadStateException : public std::exception {};
+class UnknownEffectTypeException : public std::exception
+{
+};
+class BadUIControlPathException : public std::exception
+{
+};
+class UnknownUIControlException : public std::exception
+{
+};
+class WrongModuleTypeException : public std::exception
+{
+};
+class LoadStateException : public std::exception
+{
+};
 
 void SynthInit();
 void LoadGlobalResources();
 
 void SetGlobalSampleRateAndBufferSize(int rate, int size);
 std::string GetBuildInfoString();
-void DrawAudioBuffer(float width, float height, ChannelBuffer* buffer, float start, float end, float pos, float vol=1, ofColor color=ofColor::black, int wraparoundFrom = -1, int wraparoundTo = 0);
-void DrawAudioBuffer(float width, float height, const float* buffer, float start, float end, float pos, float vol=1, ofColor color=ofColor::black, int wraparoundFrom = -1, int wraparoundTo = 0, int bufferSize = -1);
+void DrawAudioBuffer(float width, float height, ChannelBuffer* buffer, float start, float end, float pos, float vol = 1, ofColor color = ofColor::black, int wraparoundFrom = -1, int wraparoundTo = 0);
+void DrawAudioBuffer(float width, float height, const float* buffer, float start, float end, float pos, float vol = 1, ofColor color = ofColor::black, int wraparoundFrom = -1, int wraparoundTo = 0, int bufferSize = -1);
 void Add(float* buff1, const float* buff2, int bufferSize);
 void Subtract(float* buff1, const float* buff2, int bufferSize);
 void Mult(float* buff, float val, int bufferSize);
 void Mult(float* buff1, const float* buff2, int bufferSize);
 void Clear(float* buffer, int bufferSize);
 void BufferCopy(float* dst, const float* src, int bufferSize);
-std::string NoteName(int pitch, bool flat=false, bool includeOctave = false);
+std::string NoteName(int pitch, bool flat = false, bool includeOctave = false);
 int PitchFromNoteName(std::string noteName);
 float Interp(float a, float start, float end);
 double GetPhaseInc(float freq);
@@ -231,7 +243,7 @@ inline static void Assert(bool condition)
 #endif
 
 template <class T>
-void RemoveFromVector(T element, std::vector<T>& vec, bool fail=false)
+void RemoveFromVector(T element, std::vector<T>& vec, bool fail = false)
 {
    auto toRemove = std::find(vec.begin(), vec.end(), element);
    if (fail && toRemove == vec.end())
@@ -254,8 +266,12 @@ bool ListContains(T element, const std::list<T>& lis)
 
 struct Vec2i
 {
-   Vec2i() : x(0), y(0) {}
-   Vec2i(int _x, int _y) : x(_x), y(_y) {}
+   Vec2i()
+   : x(0)
+   , y(0) {}
+   Vec2i(int _x, int _y)
+   : x(_x)
+   , y(_y) {}
    int x;
    int y;
 };
@@ -263,9 +279,10 @@ struct Vec2i
 class ofLog
 {
 public:
-   ofLog() : mSendToBespokeConsole(true) {}
+   ofLog()
+   : mSendToBespokeConsole(true) {}
    ~ofLog();
-   
+
    template <class T>
    ofLog& operator<<(const T& value)
    {
@@ -278,6 +295,7 @@ public:
       mSendToBespokeConsole = false;
       return *this;
    }
+
 private:
    std::string mMessage;
    bool mSendToBespokeConsole;

@@ -60,12 +60,11 @@ public:
    VinylTempoControl();
    ~VinylTempoControl();
    static IDrawableModule* Create() { return new VinylTempoControl(); }
-   
-   
-   
+
+
    void SetEnabled(bool enabled) override { mEnabled = enabled; }
    void CreateUIControls() override;
-   
+
    void Process(double time) override;
 
    void PostRepatch(PatchCableSource* cableSource, bool fromUserClick) override;
@@ -74,20 +73,25 @@ public:
    float Value(int samplesIn = 0) override;
    bool Active() const override { return mEnabled; }
    bool CanAdjustRange() const override { return false; }
-   
+
    void CheckboxUpdated(Checkbox* checkbox) override;
-   
+
    void SaveLayout(ofxJSONElement& moduleInfo) override;
    void LoadLayout(const ofxJSONElement& moduleInfo) override;
    void SetUpFromSaveData() override;
+
 private:
    bool CanStartVinylControl();
-   
+
    //IDrawableModule
    void DrawModule() override;
-   void GetModuleDimensions(float& width, float& height) override { width = 90; height = 20; }
+   void GetModuleDimensions(float& width, float& height) override
+   {
+      width = 90;
+      height = 20;
+   }
    bool Enabled() const override { return mEnabled; }
-   
+
    bool mUseVinylControl;
    Checkbox* mUseVinylControlCheckbox;
    float mReferencePitch;

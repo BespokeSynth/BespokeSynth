@@ -39,10 +39,9 @@ void Kicker::DrawModule()
    DrawConnection(mDrumPlayer);
    if (Minimized() || IsVisible() == false)
       return;
-   
 }
 
-void Kicker::CheckboxUpdated(Checkbox *checkbox)
+void Kicker::CheckboxUpdated(Checkbox* checkbox)
 {
    if (checkbox == mEnabledCheckbox)
       mNoteOutput.Flush(gTime);
@@ -61,7 +60,7 @@ void Kicker::PlayNote(double time, int pitch, int velocity, int voiceIdx, Modula
 void Kicker::LoadLayout(const ofxJSONElement& moduleInfo)
 {
    mModuleSaveData.LoadString("target", moduleInfo);
-   mModuleSaveData.LoadString("drumplayer", moduleInfo,"",FillDropdown<DrumPlayer*>);
+   mModuleSaveData.LoadString("drumplayer", moduleInfo, "", FillDropdown<DrumPlayer*>);
 
    SetUpFromSaveData();
 }
@@ -69,7 +68,5 @@ void Kicker::LoadLayout(const ofxJSONElement& moduleInfo)
 void Kicker::SetUpFromSaveData()
 {
    SetUpPatchCables(mModuleSaveData.GetString("target"));
-   SetDrumPlayer(dynamic_cast<DrumPlayer*>(TheSynth->FindModule(mModuleSaveData.GetString("drumplayer"),false)));
+   SetDrumPlayer(dynamic_cast<DrumPlayer*>(TheSynth->FindModule(mModuleSaveData.GetString("drumplayer"), false)));
 }
-
-

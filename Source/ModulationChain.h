@@ -44,6 +44,7 @@ public:
    void CreateBuffer();
    void FillBuffer(float* buffer);
    float GetBufferValue(int sampleIdx);
+
 private:
    Ramp mRamp;
    LFO mLFO;
@@ -67,7 +68,11 @@ struct ModulationParameters
    ModulationParameters(ModulationChain* _pitchBend,
                         ModulationChain* _modWheel,
                         ModulationChain* _pressure,
-                        float _pan) : pitchBend(_pitchBend), modWheel(_modWheel), pressure(_pressure), pan(_pan) {}
+                        float _pan)
+   : pitchBend(_pitchBend)
+   , modWheel(_modWheel)
+   , pressure(_pressure)
+   , pan(_pan) {}
    ModulationChain* pitchBend = nullptr;
    ModulationChain* modWheel = nullptr;
    ModulationChain* pressure = nullptr;
@@ -77,10 +82,11 @@ struct ModulationParameters
 class Modulations
 {
 public:
-   Modulations(bool isGlobalEffect);   //isGlobalEffect: is the effect that we're using this on a global effect that affects all voices (pitch bend all voices that come through here the same way) or a voice effect (affect individual voices that come through here individually)?
+   Modulations(bool isGlobalEffect); //isGlobalEffect: is the effect that we're using this on a global effect that affects all voices (pitch bend all voices that come through here the same way) or a voice effect (affect individual voices that come through here individually)?
    ModulationChain* GetPitchBend(int voiceIdx);
    ModulationChain* GetModWheel(int voiceIdx);
    ModulationChain* GetPressure(int voiceIdx);
+
 private:
    ModulationCollection mGlobalModulation;
    std::vector<ModulationCollection> mVoiceModulations;

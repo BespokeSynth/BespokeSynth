@@ -36,26 +36,30 @@ public:
    PulseHocket();
    virtual ~PulseHocket();
    static IDrawableModule* Create() { return new PulseHocket(); }
-   
-   
+
+
    void CreateUIControls() override;
-   
+
    void SetEnabled(bool enabled) override { mEnabled = enabled; }
-   
+
    //IPulseReceiver
    void OnPulse(double time, float velocity, int flags) override;
-   
+
    void FloatSliderUpdated(FloatSlider* slider, float oldVal) override {}
-   
+
    void LoadLayout(const ofxJSONElement& moduleInfo) override;
    void SetUpFromSaveData() override;
-   
+
 private:
    //IDrawableModule
    void DrawModule() override;
-   void GetModuleDimensions(float& width, float& height) override { width = mWidth; height = mHeight; }
+   void GetModuleDimensions(float& width, float& height) override
+   {
+      width = mWidth;
+      height = mHeight;
+   }
    bool Enabled() const override { return true; }
-   
+
    static const int kMaxDestinations = 5;
    float mWeight[kMaxDestinations];
    FloatSlider* mWeightSlider[kMaxDestinations];

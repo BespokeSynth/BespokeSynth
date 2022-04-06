@@ -53,8 +53,9 @@ public:
    void OnTransportAdvanced(float amount);
    void SaveState(FileStreamOut& out);
    void LoadState(FileStreamIn& in);
+
 private:
-   float GetRadius() { return 90-mIndex*15; }
+   float GetRadius() { return 90 - mIndex * 15; }
    int GetStepIndex(int x, int y, float& radiusOut);
    int mLength;
    DropdownList* mLengthSelector;
@@ -76,36 +77,41 @@ public:
    CircleSequencer();
    ~CircleSequencer();
    static IDrawableModule* Create() { return new CircleSequencer(); }
-   
-   
+
+
    void CreateUIControls() override;
    void Init() override;
-   
+
    void SetEnabled(bool on) override { mEnabled = on; }
-   
+
    //IAudioPoller
    void OnTransportAdvanced(float amount) override;
-   
+
    //IClickable
    void MouseReleased() override;
    bool MouseMoved(float x, float y) override;
-   
+
    void CheckboxUpdated(Checkbox* checkbox) override;
    void FloatSliderUpdated(FloatSlider* slider, float oldVal) override;
    void DropdownUpdated(DropdownList* list, int oldVal) override;
    void TextEntryComplete(TextEntry* entry) override {}
-   
+
    void SaveState(FileStreamOut& out) override;
    void LoadState(FileStreamIn& in) override;
    virtual void LoadLayout(const ofxJSONElement& moduleInfo) override;
    virtual void SetUpFromSaveData() override;
+
 private:
    //IDrawableModule
    void DrawModule() override;
-   void GetModuleDimensions(float& width, float& height) override { width=400; height=200; }
+   void GetModuleDimensions(float& width, float& height) override
+   {
+      width = 400;
+      height = 200;
+   }
    void OnClicked(int x, int y, bool right) override;
    bool Enabled() const override { return mEnabled; }
-   
+
    std::vector<CircleSequencerRing*> mCircleSequencerRings;
 };
 

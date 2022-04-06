@@ -39,25 +39,30 @@ public:
    PitchDive();
    virtual ~PitchDive();
    static IDrawableModule* Create() { return new PitchDive(); }
-   
-   
+
+
    void CreateUIControls() override;
    void SetEnabled(bool enabled) override { mEnabled = enabled; }
-   
+
    //INoteReceiver
    void PlayNote(double time, int pitch, int velocity, int voiceIdx = -1, ModulationParameters modulation = ModulationParameters()) override;
-   
+
    void FloatSliderUpdated(FloatSlider* slider, float oldVal) override;
    void CheckboxUpdated(Checkbox* checkbox) override;
-   
+
    void LoadLayout(const ofxJSONElement& moduleInfo) override;
    void SetUpFromSaveData() override;
+
 private:
    //IDrawableModule
    void DrawModule() override;
-   void GetModuleDimensions(float& width, float& height) override { width = 120; height = 40; }
+   void GetModuleDimensions(float& width, float& height) override
+   {
+      width = 120;
+      height = 40;
+   }
    bool Enabled() const override { return mEnabled; }
-   
+
    float mStart;
    FloatSlider* mStartSlider;
    float mTime;

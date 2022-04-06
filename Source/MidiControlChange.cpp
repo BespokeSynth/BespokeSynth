@@ -50,7 +50,7 @@ void MidiControlChange::DrawModule()
 {
    if (Minimized() || IsVisible() == false)
       return;
-   
+
    mControlEntry->Draw();
    mValueSlider->Draw();
 }

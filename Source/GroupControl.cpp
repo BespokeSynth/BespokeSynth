@@ -38,26 +38,26 @@ GroupControl::~GroupControl()
 void GroupControl::CreateUIControls()
 {
    IDrawableModule::CreateUIControls();
-   
-   mGroupCheckbox = new Checkbox(this,"group enabled",3,3,&mGroupEnabled);
+
+   mGroupCheckbox = new Checkbox(this, "group enabled", 3, 3, &mGroupEnabled);
 }
 
 void GroupControl::DrawModule()
 {
    if (Minimized() || IsVisible() == false)
       return;
-   
-   for (int i=0; i<mControlCables.size(); ++i)
+
+   for (int i = 0; i < mControlCables.size(); ++i)
    {
       mControlCables[i]->SetManualPosition(10 + i * 12, 25);
    }
-   
+
    mGroupCheckbox->Draw();
 }
 
 void GroupControl::PostRepatch(PatchCableSource* cableSource, bool fromUserClick)
 {
-   for (int i=0; i<mControlCables.size(); ++i)
+   for (int i = 0; i < mControlCables.size(); ++i)
    {
       if (mControlCables[i] == cableSource)
       {
@@ -74,7 +74,7 @@ void GroupControl::PostRepatch(PatchCableSource* cableSource, bool fromUserClick
          {
             RemoveFromVector(cableSource, mControlCables);
          }
-         
+
          break;
       }
    }
@@ -82,7 +82,7 @@ void GroupControl::PostRepatch(PatchCableSource* cableSource, bool fromUserClick
 
 void GroupControl::CheckboxUpdated(Checkbox* checkbox)
 {
-   for (int i=0; i<mControlCables.size(); ++i)
+   for (int i = 0; i < mControlCables.size(); ++i)
    {
       IUIControl* uicontrol = nullptr;
       if (mControlCables[i]->GetTarget())
@@ -106,9 +106,9 @@ void GroupControl::GetModuleDimensions(float& width, float& height)
 void GroupControl::SaveLayout(ofxJSONElement& moduleInfo)
 {
    IDrawableModule::SaveLayout(moduleInfo);
-   
-   moduleInfo["uicontrols"].resize((unsigned int)mControlCables.size()-1);
-   for (int i=0; i<mControlCables.size()-1; ++i)
+
+   moduleInfo["uicontrols"].resize((unsigned int)mControlCables.size() - 1);
+   for (int i = 0; i < mControlCables.size() - 1; ++i)
    {
       std::string controlName = "";
       if (mControlCables[i]->GetTarget())
@@ -120,8 +120,8 @@ void GroupControl::SaveLayout(ofxJSONElement& moduleInfo)
 void GroupControl::LoadLayout(const ofxJSONElement& moduleInfo)
 {
    const Json::Value& controls = moduleInfo["uicontrols"];
-   
-   for (int i=0; i<controls.size(); ++i)
+
+   for (int i = 0; i < controls.size(); ++i)
    {
       try
       {
@@ -139,12 +139,12 @@ void GroupControl::LoadLayout(const ofxJSONElement& moduleInfo)
          TheSynth->LogEvent(__PRETTY_FUNCTION__ + std::string(" json error: ") + e.what(), kLogEventType_Error);
       }
    }
-   
+
    //add extra cable
    PatchCableSource* cable = new PatchCableSource(this, kConnectionType_Modulator);
    AddPatchCableSource(cable);
    mControlCables.push_back(cable);
-   
+
    SetUpFromSaveData();
 }
 

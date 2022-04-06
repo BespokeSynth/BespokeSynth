@@ -19,7 +19,8 @@
 #include <climits>
 #endif
 
-namespace juce {
+namespace juce
+{
    class AudioDeviceManager;
    class AudioFormatManager;
    class Component;
@@ -53,9 +54,14 @@ enum LogEventType
 class ConsoleListener : public IDrawableModule, public ITextEntryListener
 {
 public:
-   void GetModuleDimensions(float& width, float& height) override { width = 1; height = 1; }
+   void GetModuleDimensions(float& width, float& height) override
+   {
+      width = 1;
+      height = 1;
+   }
    void TextEntryActivated(TextEntry* entry) override;
    void TextEntryComplete(TextEntry* entry) override;
+
 private:
    void DrawModule() override {}
    bool Enabled() const override { return false; }
@@ -163,9 +169,21 @@ public:
 
    void ZoomView(float zoomAmount, bool fromMouse);
    void PanView(float x, float y);
-   void SetRawSpaceMouseTwist(float twist, bool isUsing) { mSpaceMouseInfo.mTwist = twist; mSpaceMouseInfo.mUsingTwist = isUsing; }
-   void SetRawSpaceMouseZoom(float zoom, bool isUsing) { mSpaceMouseInfo.mZoom = zoom; mSpaceMouseInfo.mUsingZoom = isUsing; }
-   void SetRawSpaceMousePan(float x, float y, bool isUsing) { mSpaceMouseInfo.mPan.set(x, y); mSpaceMouseInfo.mUsingPan = isUsing; }
+   void SetRawSpaceMouseTwist(float twist, bool isUsing)
+   {
+      mSpaceMouseInfo.mTwist = twist;
+      mSpaceMouseInfo.mUsingTwist = isUsing;
+   }
+   void SetRawSpaceMouseZoom(float zoom, bool isUsing)
+   {
+      mSpaceMouseInfo.mZoom = zoom;
+      mSpaceMouseInfo.mUsingZoom = isUsing;
+   }
+   void SetRawSpaceMousePan(float x, float y, bool isUsing)
+   {
+      mSpaceMouseInfo.mPan.set(x, y);
+      mSpaceMouseInfo.mUsingPan = isUsing;
+   }
 
    void SetResizeModule(IDrawableModule* module) { mResizeModule = module; }
 
@@ -174,10 +192,10 @@ public:
 
    IDrawableModule* GetMoveModule() { return mMoveModule; }
    ModuleFactory* GetModuleFactory() { return &mModuleFactory; }
-   juce::AudioDeviceManager &GetAudioDeviceManager() { return *mGlobalAudioDeviceManager; }
-   juce::AudioFormatManager &GetAudioFormatManager() { return *mGlobalAudioFormatManager; }
-   juce::AudioPluginFormatManager &GetAudioPluginFormatManager() { return *mAudioPluginFormatManager.get(); }
-   juce::KnownPluginList &GetKnownPluginList() { return *mKnownPluginList.get(); }
+   juce::AudioDeviceManager& GetAudioDeviceManager() { return *mGlobalAudioDeviceManager; }
+   juce::AudioFormatManager& GetAudioFormatManager() { return *mGlobalAudioFormatManager; }
+   juce::AudioPluginFormatManager& GetAudioPluginFormatManager() { return *mAudioPluginFormatManager.get(); }
+   juce::KnownPluginList& GetKnownPluginList() { return *mKnownPluginList.get(); }
    juce::Component* GetMainComponent() { return mMainComponent; }
    juce::OpenGLContext* GetOpenGLContext() { return mOpenGLContext; }
    IDrawableModule* GetLastClickedModule() const;
@@ -190,9 +208,20 @@ public:
    void RegisterPatchCable(PatchCable* cable);
    void UnregisterPatchCable(PatchCable* cable);
 
-   template<class T> std::vector<std::string> GetModuleNames() { return mModuleContainer.GetModuleNames<T>(); }
+   template <class T>
+   std::vector<std::string> GetModuleNames() { return mModuleContainer.GetModuleNames<T>(); }
 
-   void LockRender(bool lock) { if (lock) { mRenderLock.lock(); } else { mRenderLock.unlock(); } }
+   void LockRender(bool lock)
+   {
+      if (lock)
+      {
+         mRenderLock.lock();
+      }
+      else
+      {
+         mRenderLock.unlock();
+      }
+   }
    void UpdateFrameRate(float fps) { mFrameRate = fps; }
    float GetFrameRate() const { return mFrameRate; }
    std::recursive_mutex& GetRenderLock() { return mRenderLock; }
@@ -271,15 +300,21 @@ private:
    IDrawableModule* mMoveModule;
    int mMoveModuleOffsetX;
    int mMoveModuleOffsetY;
-   bool mMoveModuleCanStickToCursor{ false };   //if the most current mMoveModule can stick to the cursor if you release the mouse button before moving it
-   
+   bool mMoveModuleCanStickToCursor{ false }; //if the most current mMoveModule can stick to the cursor if you release the mouse button before moving it
+
    ofVec2f mLastMoveMouseScreenPos;
    ofVec2f mLastMouseDragPos;
    bool mIsMousePanning;
    std::array<bool, 5> mIsMouseButtonHeld{ false };
    struct SpaceMouseInfo
    {
-      SpaceMouseInfo() : mTwist(0), mZoom(0), mPan(0, 0), mUsingTwist(false), mUsingZoom(false), mUsingPan(false) {}
+      SpaceMouseInfo()
+      : mTwist(0)
+      , mZoom(0)
+      , mPan(0, 0)
+      , mUsingTwist(false)
+      , mUsingZoom(false)
+      , mUsingPan(false) {}
       float mTwist;
       float mZoom;
       ofVec2f mPan;
@@ -292,7 +327,7 @@ private:
    char mConsoleText[MAX_TEXTENTRY_LENGTH];
    TextEntry* mConsoleEntry;
    ConsoleListener* mConsoleListener;
-   
+
    std::vector<MidiDevice*> mMidiDevices;
 
    LocationZoomer mZoomer;
@@ -302,89 +337,92 @@ private:
 
    RollingBuffer* mGlobalRecordBuffer;
    long long mRecordingLength;
-   
+
    struct LogEventItem
    {
-      LogEventItem(double _time, std::string _text, LogEventType _type) : time(_time), text(_text), type(_type) {}
+      LogEventItem(double _time, std::string _text, LogEventType _type)
+      : time(_time)
+      , text(_text)
+      , type(_type) {}
       double time;
       std::string text;
       LogEventType type;
    };
    std::list<LogEventItem> mEvents;
    std::list<std::string> mErrors;
-   
+
    NamedMutex mAudioThreadMutex;
-   
+
    bool mAudioPaused;
    bool mIsLoadingState;
-   
+
    ModuleFactory mModuleFactory;
    EffectFactory mEffectFactory;
-   
+
    int mClickStartX; //to detect click and release in place
    int mClickStartY;
    bool mMouseMovedSignificantlySincePressed{ true };
-   
+
    std::string mLoadedLayoutPath;
    bool mWantReloadInitialLayout;
    std::string mCurrentSaveStatePath;
    std::string mStartupSaveStateFile;
    double mLastSaveTime;
-   
+
    Sample* mHeldSample;
-   
+
    float* mSaveOutputBuffer[2];
-   
+
    IDrawableModule* mLastClickedModule;
    bool mInitialized;
-   
+
    ofRectangle mDrawRect;
-   
+
    std::vector<IDrawableModule*> mGroupSelectedModules;
    ModuleContainer* mGroupSelectContext;
    bool mHasDuplicatedDuringDrag;
    bool mHasAutopatchedToTargetDuringDrag;
-   
+
    IDrawableModule* mResizeModule;
-   
+
    bool mShowLoadStatePopup;
-   
+
    std::vector<PatchCable*> mPatchCables;
-   
+
    ofMutex mKeyInputMutex;
-   std::vector< std::pair<int,bool> > mQueuedKeyInput;
-   
+   std::vector<std::pair<int, bool> > mQueuedKeyInput;
+
    ofVec2f mMousePos;
    std::string mNextDrawTooltip;
    bool mHideTooltipsUntilMouseMove{ false };
-   
+
    juce::AudioDeviceManager* mGlobalAudioDeviceManager;
    juce::AudioFormatManager* mGlobalAudioFormatManager;
    juce::Component* mMainComponent;
    juce::OpenGLContext* mOpenGLContext;
-   
+
    std::recursive_mutex mRenderLock;
    float mFrameRate;
    long mFrameCount;
-   
+
    ModuleContainer mModuleContainer;
    ModuleContainer mUILayerModuleContainer;
-   
+
    ADSRDisplay* mScheduledEnvelopeEditorSpawnDisplay;
-   
+
    bool mIsLoadingModule;
-   
+
    std::list<IPollable*> mExtraPollers;
-   
+
    std::string mFatalError;
-   
+
    double mLastClapboardTime;
 
    double mPixelRatio;
 
    std::vector<float*> mInputBuffers;
    std::vector<float*> mOutputBuffers;
-   
+
    std::unique_ptr<juce::AudioPluginFormatManager> mAudioPluginFormatManager;
    std::unique_ptr<juce::KnownPluginList> mKnownPluginList;
 };

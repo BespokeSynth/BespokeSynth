@@ -60,16 +60,16 @@ ControllingSong::ControllingSong()
 void ControllingSong::CreateUIControls()
 {
    IDrawableModule::CreateUIControls();
-   mVolumeSlider = new FloatSlider(this,"vol",150,20,100,15,&mVolume,0,1);
-   mNextSongButton = new ClickButton(this,"next",350,4);
-   mSongSelector = new DropdownList(this,"song",150,4,&mCurrentSongIndex);
-   mTestBeatOffsetSlider = new IntSlider(this,"test offset",400,4,100,15,&mTestBeatOffset,-10,10);
-   mPlayCheckbox = new Checkbox(this,"play",4,15,&mPlay);
-   mShuffleCheckbox = new Checkbox(this,"shuffle",80,15,&mShuffle);
+   mVolumeSlider = new FloatSlider(this, "vol", 150, 20, 100, 15, &mVolume, 0, 1);
+   mNextSongButton = new ClickButton(this, "next", 350, 4);
+   mSongSelector = new DropdownList(this, "song", 150, 4, &mCurrentSongIndex);
+   mTestBeatOffsetSlider = new IntSlider(this, "test offset", 400, 4, 100, 15, &mTestBeatOffset, -10, 10);
+   mPlayCheckbox = new Checkbox(this, "play", 4, 15, &mPlay);
+   mShuffleCheckbox = new Checkbox(this, "shuffle", 80, 15, &mShuffle);
    mPhraseBackButton = new ClickButton(this, " [ ", 350, 20);
    mPhraseForwardButton = new ClickButton(this, " ] ", 390, 20);
-   mSpeedSlider = new FloatSlider(this,"speed",450,20,100,15,&mSpeed,0,5);
-   mMuteCheckbox = new Checkbox(this,"mute",250,4,&mMute);
+   mSpeedSlider = new FloatSlider(this, "speed", 450, 20, 100, 15, &mSpeed, 0, 5);
+   mMuteCheckbox = new Checkbox(this, "mute", 250, 4, &mMute);
 }
 
 ControllingSong::~ControllingSong()
@@ -79,8 +79,8 @@ ControllingSong::~ControllingSong()
 void ControllingSong::Init()
 {
    IDrawableModule::Init();
-   
-   for (int i=0; i<mSongList["songs"].size(); ++i)
+
+   for (int i = 0; i < mSongList["songs"].size(); ++i)
    {
       mShuffleList.push_back(i);
       std::string title = mSongList["songs"][i]["name"].asString();
@@ -88,7 +88,7 @@ void ControllingSong::Init()
          title = "X " + title;
       mSongSelector->AddLabel(title.c_str(), i);
    }
-   
+
    std::shuffle(begin(mShuffleList), end(mShuffleList), std::mt19937(std::random_device()()));
 }
 
@@ -100,7 +100,7 @@ void ControllingSong::Poll()
       if (mShuffle)
       {
          nextSong = mShuffleList[mShuffleIndex++];
-         
+
          if (mShuffleIndex == mSongList["songs"].size())
          {
             mShuffleIndex = 0;
@@ -109,14 +109,14 @@ void ControllingSong::Poll()
       }
       else
       {
-         nextSong = mCurrentSongIndex+1;
-         
+         nextSong = mCurrentSongIndex + 1;
+
          if (nextSong == mSongList["songs"].size())
             nextSong = 0;
       }
-      
+
       LoadSong(nextSong);
-      
+
       mNeedNewSong = false;
    }
 }
@@ -124,85 +124,85 @@ void ControllingSong::Poll()
 void ControllingSong::LoadSong(int index)
 {
    mLoadingSong = true;
-   
+
    mLoadSongMutex.lock();
-   
+
    mCurrentSongIndex = index;
-   
+
    mMidiReader.Read(ofToDataPath(mSongList["songs"][index]["midi"].asString()).c_str());
-   
-   for (int i=0; i<mSongList["songs"][index]["wavs"].size(); ++i)
+
+   for (int i = 0; i < mSongList["songs"][index]["wavs"].size(); ++i)
    {
-      if (i==0)
+      if (i == 0)
       {
          mSample.Read(ofToDataPath(mSongList["songs"][index]["wavs"][i].asString()).c_str());
          mSample.SetPlayPosition(0);
       }
       else
       {
-         int followIdx = i-1;
+         int followIdx = i - 1;
          if (followIdx < mFollowSongs.size())
             mFollowSongs[followIdx]->LoadSample(ofToDataPath(mSongList["songs"][index]["wavs"][i].asString()).c_str());
       }
    }
-   
+
    std::string keyroot = mSongList["songs"][index]["keyroot"].asString();
    if (keyroot != "X" && keyroot != "")
    {
       TheScale->SetRoot(PitchFromNoteName(keyroot));
       TheScale->SetScaleType(mSongList["songs"][index]["keytype"].asString());
    }
-   
+
    mMidiReader.SetBeatOffset(mSongList["songs"][index]["beatoffset"].asInt());
-   
+
    mSongStartTime = gTime;
-   
+
    mLoadSongMutex.unlock();
-   
+
    mLoadingSong = false;
 }
 
 void ControllingSong::Process(double time)
 {
    PROFILER(ControllingSong);
-   
+
    IAudioReceiver* target = GetTarget();
    if (!mEnabled || target == nullptr)
       return;
-   
+
    ComputeSliders(0);
-   
+
    int bufferSize = target->GetBuffer()->BufferSize();
    float* out = target->GetBuffer()->GetChannel(0);
    assert(bufferSize == gBufferSize);
-   
+
    float volSq = mVolume * mVolume * .5f;
-   
+
    mSample.SetRate(mSpeed);
-   
-   for (int i=0; i<mFollowSongs.size(); ++i)
+
+   for (int i = 0; i < mFollowSongs.size(); ++i)
    {
       mFollowSongs[i]->SetPlaybackInfo(mPlay, mSample.GetPlayPosition(), mSpeed, mVolume);
    }
-   
+
    if (!mLoadingSong && mPlay)
    {
       mLoadSongMutex.lock();
-      
+
       double ms = mSample.GetPlayPosition() / mSample.GetSampleRateRatio() / double(gSampleRate) * 1000.0;
       if (ms >= 0)
       {
-         TheTransport->SetTempo(MIN(200,mMidiReader.GetTempo(ms)) * mSpeed);
+         TheTransport->SetTempo(MIN(200, mMidiReader.GetTempo(ms)) * mSpeed);
          int measure;
          float measurePos;
          mMidiReader.GetMeasurePos(ms, measure, measurePos);
          TheTransport->SetMeasureTime(measure + measurePos);
       }
-      
+
       gWorkChannelBuffer.SetNumActiveChannels(1);
       if (mSample.ConsumeData(time, &gWorkChannelBuffer, bufferSize, true))
       {
-         for (int i=0; i<bufferSize; ++i)
+         for (int i = 0; i < bufferSize; ++i)
          {
             float sample = gWorkChannelBuffer.GetChannel(0)[i] * volSq;
             if (mMute)
@@ -228,7 +228,7 @@ void ControllingSong::DrawModule()
 {
    if (Minimized() || IsVisible() == false)
       return;
-   
+
    mNextSongButton->Draw();
    mSongSelector->Draw();
    mTestBeatOffsetSlider->Draw();
@@ -239,24 +239,24 @@ void ControllingSong::DrawModule()
    mSpeedSlider->Draw();
    mMuteCheckbox->Draw();
    mVolumeSlider->Draw();
-   
+
    if (mCurrentSongIndex != -1)
    {
       ofPushMatrix();
-      ofTranslate(10,50);
+      ofTranslate(10, 50);
       if (mCurrentSongIndex != -1)
-         DrawTextNormal(mSongList["songs"][mCurrentSongIndex]["name"].asString(),0,-10);
-      DrawAudioBuffer(540, 100, mSample.Data(), 0, mSample.LengthInSamples()/mSample.GetSampleRateRatio(), mSample.GetPlayPosition());
+         DrawTextNormal(mSongList["songs"][mCurrentSongIndex]["name"].asString(), 0, -10);
+      DrawAudioBuffer(540, 100, mSample.Data(), 0, mSample.LengthInSamples() / mSample.GetSampleRateRatio(), mSample.GetPlayPosition());
       ofPopMatrix();
    }
-   
+
    ofPushStyle();
-   float w,h;
-   GetDimensions(w,h);
+   float w, h;
+   GetDimensions(w, h);
    ofFill();
-   ofSetColor(255,255,255,50);
-   float beatWidth = w/4;
-   ofRect(int(TheTransport->GetMeasurePos(gTime)*4)*beatWidth,0,beatWidth,h);
+   ofSetColor(255, 255, 255, 50);
+   float beatWidth = w / 4;
+   ofRect(int(TheTransport->GetMeasurePos(gTime) * 4) * beatWidth, 0, beatWidth, h);
    ofPopStyle();
 }
 
@@ -309,16 +309,16 @@ void ControllingSong::LoadLayout(const ofxJSONElement& moduleInfo)
 {
    mModuleSaveData.LoadString("target", moduleInfo);
    mModuleSaveData.LoadString("songs", moduleInfo);
-   
+
    const Json::Value& follows = moduleInfo["followsongs"];
-   for (int i=0; i<follows.size(); ++i)
+   for (int i = 0; i < follows.size(); ++i)
    {
       std::string follow = follows[i].asString();
       FollowingSong* followSong = dynamic_cast<FollowingSong*>(TheSynth->FindModule(follow));
       if (followSong)
          mFollowSongs.push_back(followSong);
    }
-   
+
    SetUpFromSaveData();
 }
 
@@ -331,12 +331,11 @@ void ControllingSong::SetUpFromSaveData()
 void ControllingSong::SaveLayout(ofxJSONElement& moduleInfo)
 {
    IDrawableModule::SaveLayout(moduleInfo);
-   
+
    moduleInfo["followsongs"].resize((unsigned int)mFollowSongs.size());
-   for (int i=0; i<mFollowSongs.size(); ++i)
+   for (int i = 0; i < mFollowSongs.size(); ++i)
    {
       IDrawableModule* module = dynamic_cast<IDrawableModule*>(mFollowSongs[i]);
       moduleInfo["followsongs"][i] = module->Name();
    }
 }
-

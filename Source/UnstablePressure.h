@@ -41,7 +41,7 @@ public:
    virtual ~UnstablePressure();
    static IDrawableModule* Create() { return new UnstablePressure(); }
 
-   
+
    void CreateUIControls() override;
    void Init() override;
    void SetEnabled(bool enabled) override { mEnabled = enabled; }
@@ -57,10 +57,15 @@ public:
 
    void LoadLayout(const ofxJSONElement& moduleInfo) override;
    void SetUpFromSaveData() override;
+
 private:
    //IDrawableModule
    void DrawModule() override;
-   void GetModuleDimensions(float& width, float& height) override { width = mWidth; height = mHeight; }
+   void GetModuleDimensions(float& width, float& height) override
+   {
+      width = mWidth;
+      height = mHeight;
+   }
    bool Enabled() const override { return mEnabled; }
 
    void FillModulationBuffer(double time, int voiceIdx);
@@ -77,4 +82,3 @@ private:
 
    Modulations mModulation;
 };
-

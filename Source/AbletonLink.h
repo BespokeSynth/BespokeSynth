@@ -42,24 +42,28 @@ public:
    AbletonLink();
    virtual ~AbletonLink();
    static IDrawableModule* Create() { return new AbletonLink(); }
-   
+
    void Init() override;
    void CreateUIControls() override;
    void Poll() override;
 
    void OnTransportAdvanced(float amount) override;
-   
+
    void SetEnabled(bool enabled) override { mEnabled = enabled; }
-   
+
    void CheckboxUpdated(Checkbox* checkbox) override;
    void FloatSliderUpdated(FloatSlider* slider, float oldVal) override;
-   
+
 private:
    //IDrawableModule
    void DrawModule() override;
-   void GetModuleDimensions(float& width, float& height) override { width = mWidth; height = mHeight; }
+   void GetModuleDimensions(float& width, float& height) override
+   {
+      width = mWidth;
+      height = mHeight;
+   }
    bool Enabled() const override { return mEnabled; }
-   
+
    float mWidth;
    float mHeight;
 
@@ -72,5 +76,3 @@ private:
    double mLastReceivedBeat{ 0 };
    double mSampleTime{ 0 };
 };
-
-

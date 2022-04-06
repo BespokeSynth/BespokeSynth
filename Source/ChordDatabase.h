@@ -36,6 +36,7 @@ public:
    std::string GetChordName(std::vector<int> pitches) const;
    std::vector<int> GetChord(std::string name, int inversion) const;
    std::vector<std::string> GetChordNames() const;
+
 private:
    struct ChordShape
    {

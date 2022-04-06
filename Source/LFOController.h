@@ -44,27 +44,31 @@ public:
    ~LFOController();
    static IDrawableModule* Create() { return new LFOController(); }
    static bool CanCreate() { return TheLFOController == nullptr; }
-   
-   
+
+
    void CreateUIControls() override;
-   
+
    void SetSlider(FloatSlider* slider);
    bool WantsBinding(FloatSlider* slider);
    FloatSlider* GetControlled() { return mSlider; }
-   
+
    //IDrawableModule
    void Poll() override;
-   
+
    void DropdownUpdated(DropdownList* list, int oldVal) override;
    void FloatSliderUpdated(FloatSlider* slider, float oldVal) override;
    void ButtonClicked(ClickButton* button) override;
-   
+
 private:
    //IDrawableModule
    void DrawModule() override;
    bool Enabled() const override { return true; }
-   void GetModuleDimensions(float& width, float& height) override { width=130; height=77; }
-   
+   void GetModuleDimensions(float& width, float& height) override
+   {
+      width = 130;
+      height = 77;
+   }
+
    int dummy;
    float dummy2;
    DropdownList* mIntervalSelector;
@@ -74,10 +78,9 @@ private:
    bool mWantBind;
    ClickButton* mBindButton;
    double mStopBindTime;
-   
+
    FloatSlider* mSlider;
    FloatSliderLFOControl* mLFO;
 };
 
 #endif /* defined(__modularSynth__LFOController__) */
-
