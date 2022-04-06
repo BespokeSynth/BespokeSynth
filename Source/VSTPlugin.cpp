@@ -95,6 +95,7 @@ namespace VSTLookup
 		for (int i = 0; i < vsts.size(); ++i)
 			list->AddLabel(vsts[i].name.toStdString(), vsts[i].uniqueId);
 	}
+
 	std::string GetVSTPath(std::string vstName)
 	{
 		if (juce::String(vstName).contains("/") || juce::String(vstName).contains("\\"))  //already a path
@@ -273,13 +274,68 @@ std::string VSTPlugin::GetPluginId() const
 	return "no plugin loaded";
 }
 
-void VSTPlugin::SetVST(int id)
+juce::PluginDescription VSTPlugin::GetVSTFileDesc(std::string vstName)
 {
-	ofLog() << "loading VST: " << id;
+	DBG("try to get file for desc");
 
+	std::string path = VSTLookup::GetVSTPath(vstName);
+
+	auto types = TheSynth->GetKnownPluginList().getTypes();
+	bool found = false;
+	for (int i = 0; i < types.size(); ++i)
+	{
+		if (path == types[i].fileOrIdentifier)
+		{
+			found = true;
+			juce::PluginDescription desc = types[i];
+			DBG("found");
+			return desc;
+			break;
+		}
+	}
+
+	if (!found) //couldn't find the VST at this path. maybe its installation got moved, or the bespoke state was saved on a different computer. try to find a VST of the same name.
+	{
+		DBG("not found, try again");
+		juce::String desiredVstName = juce::String(path).replaceCharacter('\\', '/').fromLastOccurrenceOf("/", false, false).upToFirstOccurrenceOf(".", false, false);
+		for (int i = 0; i < types.size(); ++i)
+		{
+			juce::String thisVstName = juce::String(types[i].fileOrIdentifier).replaceCharacter('\\', '/').fromLastOccurrenceOf("/", false, false).upToFirstOccurrenceOf(".", false, false);
+			if (thisVstName == desiredVstName)
+			{
+				found = true;
+				juce::PluginDescription desc = types[i];
+				DBG("found in another place");
+				return desc;
+				break;
+			}
+		}
+	}
+}
+
+void VSTPlugin::SetVST(std::string vstName, int id)
+{
+	juce::PluginDescription vstDesc;
+
+	//ofLog() << "loading VST: " << vstName << "ID: " << id;
+
+	if (id == 0 && vstName != "")
+	{
+		DBG("looking for desc in filename");
+		vstDesc = GetVSTFileDesc(vstName);
+		id = vstDesc.uniqueId;
+	}
+
+	else
+	{
+		vstDesc = VSTLookup::GetVSTDesc(id);
+	}
+
+	if (vstName == "")
+		vstName = vstDesc.name.toStdString();
+
+	mModuleSaveData.SetString("vst", vstName);
 	mModuleSaveData.SetInt("vstId", id);
-	DBG(id);
-	juce::PluginDescription vstDesc = VSTLookup::GetVSTDesc(id);
 
 	//mark VST as used
 	//{
@@ -304,23 +360,6 @@ void VSTPlugin::SetVST(int id)
 	}
 
 	LoadVST(vstDesc);
-	
-	//if (!found) //couldn't find the VST at this path. maybe its installation got moved, or the bespoke state was saved on a different computer. try to find a VST of the same name.
-	//{
-	//   juce::String desiredVstName = juce::String(path).replaceCharacter('\\', '/').fromLastOccurrenceOf("/", false, false).upToFirstOccurrenceOf(".", false, false);
-	//   for (int i = 0; i < types.size(); ++i)
-	//   {
-	//      juce::String thisVstName = juce::String(types[i].fileOrIdentifier).replaceCharacter('\\', '/').fromLastOccurrenceOf("/", false, false).upToFirstOccurrenceOf(".", false, false);
-	//      if (thisVstName == desiredVstName)
-	//      {
-	//         found = true;
-	//         PluginDescription desc = types[i];
-	//         LoadVST(desc);
-	//         break;
-	//      }
-	//   }
-	//}
-
 }
 
 void VSTPlugin::LoadVST(juce::PluginDescription desc)
@@ -1029,9 +1068,26 @@ void VSTPlugin::LoadLayout(const ofxJSONElement& moduleInfo)
 
 void VSTPlugin::SetUpFromSaveData()
 {
-	int vstId = mModuleSaveData.GetInt("vstId");
-	if (vstId != 0)
-		SetVST(vstId);
+	if (mModuleSaveData.HasProperty("vstId"))
+	{
+		std::string vstName = mModuleSaveData.GetString("vst");
+		/*int vstId = mModuleSaveData.GetInt("vstId");
+		if (vstId != 0)
+		{
+			DBG("new savetstate");
+			SetVST(vstName, vstId);
+		}*/
+		DBG(vstName);
+	}
+	else
+	{
+		std::string vstName = mModuleSaveData.GetString("vst");
+		if (vstName != "")
+		{
+			DBG("old savetstate");
+			SetVST(vstName, 0);
+		}
+	}
 
 		SetTarget(TheSynth->FindModule(mModuleSaveData.GetString("target")));
 

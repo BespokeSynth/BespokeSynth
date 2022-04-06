@@ -73,7 +73,7 @@ public:
    
    juce::AudioProcessor* GetAudioProcessor() { return mPlugin.get(); }
    
-   void SetVST(int id);
+   void SetVST(std::string vstName, int id);
    void OnVSTWindowClosed();
    
    //IAudioSource
@@ -105,7 +105,8 @@ private:
    void GetModuleDimensions(float& width, float& height) override;
    bool Enabled() const override { return mEnabled; }
    void LoadVST(juce::PluginDescription desc);
-   
+   juce::PluginDescription GetVSTFileDesc(std::string vstName);
+
    std::string GetPluginName() const;
    std::string GetPluginFormatName() const;
    std::string GetPluginId() const;

@@ -163,7 +163,7 @@ IDrawableModule* SpawnList::SpawnVST()
     if (mOverrideModuleType == "vstplugin")
     {
         VSTPlugin* plugin = dynamic_cast<VSTPlugin*>(module);
-        plugin->SetVST(mSpawnIndex);
+        plugin->SetVST("", mSpawnIndex);
         //DBG(mSpawnIndex);
     }
 
