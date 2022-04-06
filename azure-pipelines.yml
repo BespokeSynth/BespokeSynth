@@ -54,8 +54,8 @@ jobs:
             export CMAKE_TARGET=$(cmakeTarget)
             echo "##vso[task.setvariable variable=CMAKE_CONFIG]Debug"
             echo "##vso[task.setvariable variable=CMAKE_CONFIG;isOutput=true]Debug"
-            echo "##vso[task.setvariable variable=CMAKE_TARGET]BespokeSynth"
-            echo "##vso[task.setvariable variable=CMAKE_TARGET;isOutput=true]BespokeSynth"
+            echo "##vso[task.setvariable variable=CMAKE_TARGET]$(cmakeTarget)"
+            echo "##vso[task.setvariable variable=CMAKE_TARGET;isOutput=true]$(cmakeTarget)"
           else
             export CMAKE_CONFIG=Release
             export CMAKE_TARGET=nightly-package
