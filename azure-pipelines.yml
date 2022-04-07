@@ -26,7 +26,7 @@ jobs:
           isWindows: True
           cmakeArguments: "-A x64"
           cmakeTarget: "BespokeSynth"
-        codequality:
+        code-quality:
           imageName: 'ubuntu-20.04'
           isLinux: True
           cmakeArguments: ""
