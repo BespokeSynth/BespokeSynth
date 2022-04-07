@@ -197,7 +197,7 @@ jobs:
            cp -R build/Source/BespokeSynth_artefacts/Release windows_nightly_artefact
         condition: and(variables.isWindows,
                        ne(variables['Build.Reason'], 'PullRequest'),
-                       ne(variables['cmakeTarget'], "code-quality-pipeline-checks"))
+                       ne(variables['cmakeTarget'], 'code-quality-pipeline-checks'))
         displayName: win - copy win artifact
 
       - powershell: |
@@ -206,7 +206,7 @@ jobs:
           Compress-Archive -Path windows_nightly_artefact/* -DestinationPath build/nightly/BespokeSynth-Windows.zip
         condition: and(variables.isWindows,
                        ne(variables['Build.Reason'], 'PullRequest'),
-                       ne(variables['cmakeTarget'], "code-quality-pipeline-checks"))
+                       ne(variables['cmakeTarget'], 'code-quality-pipeline-checks'))
         displayName: win - compress win artifact
 
       - bash: |
@@ -216,7 +216,7 @@ jobs:
            tar -cvzf build/nightly/BespokeSynth-Linux.tar.gz build/Source/BespokeSynth_artefacts/Release
         condition: and(variables.isLinux,
                        ne(variables['Build.Reason'], 'PullRequest'),
-                       ne(variables['cmakeTarget'], "code-quality-pipeline-checks"))
+                       ne(variables['cmakeTarget'], 'code-quality-pipeline-checks'))
         displayName: lin - compress lin artifact
         
       - bash: |
@@ -242,7 +242,7 @@ jobs:
           targetPath: 'build/nightly'
         condition: and(variables.isMac,
                        ne(variables['Build.Reason'], 'PullRequest'),
-                       ne(variables['cmakeTarget'], "code-quality-pipeline-checks"))
+                       ne(variables['cmakeTarget'], 'code-quality-pipeline-checks'))
         displayName: mac - publish mac artifact
 
       - task: PublishPipelineArtifact@0
@@ -251,7 +251,7 @@ jobs:
           targetPath: 'build/nightly'
         condition: and(variables.isWindows,
                        ne(variables['Build.Reason'], 'PullRequest'),
-                       ne(variables['cmakeTarget'], "code-quality-pipeline-checks"))
+                       ne(variables['cmakeTarget'], 'code-quality-pipeline-checks'))
         displayName: win - publish win artifact
 
       - task: PublishPipelineArtifact@0
@@ -260,7 +260,7 @@ jobs:
           targetPath: 'build/nightly'
         condition: and(variables.isLinux,
                        ne(variables['Build.Reason'], 'PullRequest'),
-                       ne(variables['cmakeTarget'], "code-quality-pipeline-checks"))
+                       ne(variables['cmakeTarget'], 'code-quality-pipeline-checks'))
         displayName: lin - publish lin artifact
 
 
