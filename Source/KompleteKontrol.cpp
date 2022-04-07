@@ -49,7 +49,7 @@ KompleteKontrol::KompleteKontrol()
 void KompleteKontrol::CreateUIControls()
 {
    IDrawableModule::CreateUIControls();
-   
+
    mMidiControllerCable = new PatchCableSource(this, kConnectionType_Special);
    mMidiControllerCable->AddTypeFilter("midicontroller");
    mMidiControllerCable->SetManualPosition(95, 10);
@@ -70,19 +70,19 @@ void KompleteKontrol::Exit()
 void KompleteKontrol::Poll()
 {
    mKontrol.Update();
-   
+
    if (!mInitialized && mKontrol.IsReady())
    {
       mNeedKeysUpdate = true;
       mInitialized = true;
    }
-   
+
    if (mNeedKeysUpdate)
       UpdateKeys();
-   
-   for (int i=0; i<9; ++i)
+
+   for (int i = 0; i < 9; ++i)
    {
-      int control = i-1+100;
+      int control = i - 1 + 100;
       if (i == 0)
          control = 21;
       UIControlConnection* connection = nullptr;
@@ -98,7 +98,7 @@ void KompleteKontrol::Poll()
             mTextBoxes[i].line1 = juce::String(uicontrol->Name()).toUpperCase().toStdString();
             mTextBoxes[i].line2 = juce::String(uicontrol->GetDisplayValue(uicontrol->GetValue())).toUpperCase().toStdString();
             if (mTextBoxes[i].line2.length() > 0 && mTextBoxes[i].line2[0] == '.')
-               mTextBoxes[i].line2 = " "+mTextBoxes[i].line2; //can't have a period as the first character, so add a space
+               mTextBoxes[i].line2 = " " + mTextBoxes[i].line2; //can't have a period as the first character, so add a space
          }
          else
          {
@@ -114,7 +114,7 @@ void KompleteKontrol::Poll()
          mTextBoxes[i].line2 = "";
       }
    }
-   
+
    if (mInitialized)
       UpdateText();
 }
@@ -123,8 +123,8 @@ void KompleteKontrol::DrawModule()
 {
    if (Minimized() || IsVisible() == false)
       return;
-   
-   DrawTextNormal("midicontroller:",5,13);
+
+   DrawTextNormal("midicontroller:", 5, 13);
 }
 
 void KompleteKontrol::PostRepatch(PatchCableSource* cableSource, bool fromUserClick)
@@ -137,8 +137,8 @@ void KompleteKontrol::PostRepatch(PatchCableSource* cableSource, bool fromUserCl
 
 void KompleteKontrol::PlayNote(double time, int pitch, int velocity, int voiceIdx, ModulationParameters modulation)
 {
-   mNoteOutput.PlayNote(time,pitch,velocity,voiceIdx,modulation);
-   
+   mNoteOutput.PlayNote(time, pitch, velocity, voiceIdx, modulation);
+
    mNeedKeysUpdate = true;
 }
 
@@ -151,41 +151,41 @@ void KompleteKontrol::UpdateKeys()
 {
    if (!mKontrol.IsReady())
       return;
-   
+
    ofColor keys[61];
-   for (int i=0; i<kNumKeys; ++i)
+   for (int i = 0; i < kNumKeys; ++i)
    {
-      int pitch = i+mKeyOffset;
+      int pitch = i + mKeyOffset;
       bool inScale = TheScale->MakeDiatonic(pitch) == pitch;
-      bool isRoot = pitch%TheScale->GetPitchesPerOctave() == TheScale->ScaleRoot();
-      bool isFifth = (pitch-7)%TheScale->GetPitchesPerOctave() == TheScale->ScaleRoot();
+      bool isRoot = pitch % TheScale->GetPitchesPerOctave() == TheScale->ScaleRoot();
+      bool isFifth = (pitch - 7) % TheScale->GetPitchesPerOctave() == TheScale->ScaleRoot();
       bool isHeld = false;
       bool isInPentatonic = pitch >= 0 && TheScale->IsInPentatonic(pitch);
-      
+
       std::list<int> heldNotes = mNoteOutput.GetHeldNotesList();
       for (int iter : heldNotes)
       {
          if (iter == pitch)
             isHeld = true;
       }
-      
+
       if (isRoot)
-         keys[i] = ofColor(0,255,0);
+         keys[i] = ofColor(0, 255, 0);
       else if (TheScale->GetPitchesPerOctave() != 12)
-         keys[i] = ofColor(40,15,0);
+         keys[i] = ofColor(40, 15, 0);
       else if (isFifth && inScale)
-         keys[i] = ofColor(255,0,70);
+         keys[i] = ofColor(255, 0, 70);
       else if (isInPentatonic)
-         keys[i] = ofColor(255,70,0);
+         keys[i] = ofColor(255, 70, 0);
       else if (inScale)
-         keys[i] = ofColor(40,15,0);
+         keys[i] = ofColor(40, 15, 0);
       else
          keys[i] = ofColor::black;
-      
+
       if (isHeld)
       {
          if (keys[i].r == 0 && keys[i].g == 0 && keys[i].b == 0)
-            keys[i] = ofColor::blue;  //out-of-key pressed notes turn blue
+            keys[i] = ofColor::blue; //out-of-key pressed notes turn blue
          else
             keys[i] = ofColor::red;
       }
@@ -197,71 +197,71 @@ void KompleteKontrol::UpdateText()
 {
    if (mKontrol.IsReady() == false)
       return;
-   
+
    uint16_t sliders[NUM_SLIDER_SEGMENTS];
    std::string text;
-   for (int i=0; i<9; ++i)
+   for (int i = 0; i < 9; ++i)
    {
       int numPeriods1 = 0;
       int numPeriods2 = 0;
-      for (int j=0; j<8; ++j)
+      for (int j = 0; j < 8; ++j)
       {
          uint16_t cell = 0;
          if (mTextBoxes[i].slider)
          {
-            if (j==0)
+            if (j == 0)
                cell |= 4;
-            if (mTextBoxes[i].amount > j/8.0f)
+            if (mTextBoxes[i].amount > j / 8.0f)
                cell |= 3;
             if (j == 7 && mTextBoxes[i].amount > .999f)
-               cell |= 0xffff;   //fill that ninth cell
+               cell |= 0xffff; //fill that ninth cell
          }
-         
-         if (j+1+numPeriods1 < mTextBoxes[i].line1.length() &&
-             mTextBoxes[i].line1[j+1+numPeriods1] == '.')
+
+         if (j + 1 + numPeriods1 < mTextBoxes[i].line1.length() &&
+             mTextBoxes[i].line1[j + 1 + numPeriods1] == '.')
          {
             ++numPeriods1;
             cell |= 256;
          }
-         if (j+1+numPeriods2 < mTextBoxes[i].line2.length() &&
-             mTextBoxes[i].line2[j+1+numPeriods2] == '.')
+         if (j + 1 + numPeriods2 < mTextBoxes[i].line2.length() &&
+             mTextBoxes[i].line2[j + 1 + numPeriods2] == '.')
          {
             ++numPeriods2;
             cell |= 512;
          }
-         
-         sliders[i*8+j] = cell;
+
+         sliders[i * 8 + j] = cell;
       }
    }
-   for (int i=0; i<9; ++i)
+   for (int i = 0; i < 9; ++i)
    {
-      ofStringReplace(mTextBoxes[i].line1, ".","");
-      for (int j=0; j<8; ++j)
+      ofStringReplace(mTextBoxes[i].line1, ".", "");
+      for (int j = 0; j < 8; ++j)
       {
-         if (j<mTextBoxes[i].line1.length())
+         if (j < mTextBoxes[i].line1.length())
             text += mTextBoxes[i].line1[j];
          else
             text += " ";
       }
    }
-   for (int i=0; i<9; ++i)
+   for (int i = 0; i < 9; ++i)
    {
-      ofStringReplace(mTextBoxes[i].line2, ".","");
-      for (int j=0; j<8; ++j)
+      ofStringReplace(mTextBoxes[i].line2, ".", "");
+      for (int j = 0; j < 8; ++j)
       {
-         if (j<mTextBoxes[i].line2.length())
+         if (j < mTextBoxes[i].line2.length())
             text += mTextBoxes[i].line2[j];
          else
             text += " ";
       }
    }
-   
+
    if (text != mCurrentText ||
-       memcmp(sliders, mCurrentSliders, NUM_SLIDER_SEGMENTS*sizeof(uint16_t)) != 0)
+       memcmp(sliders, mCurrentSliders, NUM_SLIDER_SEGMENTS * sizeof(uint16_t)) != 0)
    {
       mKontrol.SetDisplay(sliders, text);
       mCurrentText = text;
-      memcpy(mCurrentSliders, sliders, NUM_SLIDER_SEGMENTS*sizeof(uint16_t));
+      memcpy(mCurrentSliders, sliders, NUM_SLIDER_SEGMENTS * sizeof(uint16_t));
    }
 }
 
@@ -285,9 +285,9 @@ void KompleteKontrol::OnKontrolButton(int control, bool on)
       }
       else
       {
-         if (control == 1)  //fix collision with mod wheel
+         if (control == 1) //fix collision with mod wheel
             control = 98;
-         
+
          MidiControl c;
          c.mDeviceName = 0;
          c.mChannel = 1;
@@ -305,7 +305,7 @@ void KompleteKontrol::OnKontrolEncoder(int control, float change)
       MidiControl c;
       c.mDeviceName = 0;
       c.mChannel = 1;
-      c.mControl = control+100;
+      c.mControl = control + 100;
       c.mValue = change > 0 ? 127 : 0;
       mController->OnMidiControl(c);
    }
@@ -320,8 +320,8 @@ void KompleteKontrol::OnKontrolOctave(int octave)
 void KompleteKontrol::LoadLayout(const ofxJSONElement& moduleInfo)
 {
    mModuleSaveData.LoadString("target", moduleInfo);
-   mModuleSaveData.LoadString("controller",moduleInfo,"",FillDropdown<MidiController*>);
-   
+   mModuleSaveData.LoadString("controller", moduleInfo, "", FillDropdown<MidiController*>);
+
    SetUpFromSaveData();
 }
 

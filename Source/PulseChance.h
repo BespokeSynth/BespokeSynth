@@ -36,26 +36,26 @@ public:
    PulseChance();
    virtual ~PulseChance();
    static IDrawableModule* Create() { return new PulseChance(); }
-   
-   
+
+
    void CreateUIControls() override;
-   
+
    void SetEnabled(bool enabled) override { mEnabled = enabled; }
-   
+
    //IPulseReceiver
    void OnPulse(double time, float velocity, int flags) override;
-   
+
    void FloatSliderUpdated(FloatSlider* slider, float oldVal) override {}
-   
+
    void LoadLayout(const ofxJSONElement& moduleInfo) override;
    void SetUpFromSaveData() override;
-   
+
 private:
    //IDrawableModule
    void DrawModule() override;
    void GetModuleDimensions(float& width, float& height) override;
    bool Enabled() const override { return mEnabled; }
-   
+
    float mChance;
    FloatSlider* mChanceSlider;
    float mLastRejectTime;

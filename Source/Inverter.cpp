@@ -36,7 +36,7 @@ Inverter::Inverter()
 
 void Inverter::CreateUIControls()
 {
-   IDrawableModule::CreateUIControls();\
+   IDrawableModule::CreateUIControls();
 }
 
 Inverter::~Inverter()
@@ -49,23 +49,23 @@ void Inverter::Process(double time)
 
    if (!mEnabled)
       return;
-   
+
    ComputeSliders(0);
    SyncBuffers();
-   
+
    IAudioReceiver* target = GetTarget();
 
    if (target)
    {
       ChannelBuffer* out = target->GetBuffer();
-      for (int ch=0; ch<GetBuffer()->NumActiveChannels(); ++ch)
+      for (int ch = 0; ch < GetBuffer()->NumActiveChannels(); ++ch)
       {
          Mult(GetBuffer()->GetChannel(ch), -1, out->BufferSize());
          Add(out->GetChannel(ch), GetBuffer()->GetChannel(ch), out->BufferSize());
-         GetVizBuffer()->WriteChunk(GetBuffer()->GetChannel(ch),GetBuffer()->BufferSize(), ch);
+         GetVizBuffer()->WriteChunk(GetBuffer()->GetChannel(ch), GetBuffer()->BufferSize(), ch);
       }
    }
-   
+
    GetBuffer()->Reset();
 }
 

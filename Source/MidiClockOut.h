@@ -41,34 +41,38 @@ public:
    MidiClockOut();
    virtual ~MidiClockOut();
    static IDrawableModule* Create() { return new MidiClockOut(); }
-   
+
    void CreateUIControls() override;
    void Init() override;
    void SetEnabled(bool enabled) override { mEnabled = enabled; }
-   
+
    //IAudioPoller
    void OnTransportAdvanced(float amount) override;
-   
+
    void DropdownUpdated(DropdownList* list, int oldVal) override;
    void DropdownClicked(DropdownList* list) override;
    void FloatSliderUpdated(FloatSlider* slider, float oldVal) override {}
    void ButtonClicked(ClickButton* button) override;
-   
+
    virtual void LoadLayout(const ofxJSONElement& moduleInfo) override;
    virtual void SetUpFromSaveData() override;
-   
+
 private:
    void InitDevice();
    void BuildDeviceList();
-   
+
    //IDrawableModule
    void DrawModule() override;
    bool Enabled() const override { return mEnabled; }
-   void GetModuleDimensions(float& w, float& h) override { w=mWidth; h=mHeight; }
-   
+   void GetModuleDimensions(float& w, float& h) override
+   {
+      w = mWidth;
+      h = mHeight;
+   }
+
    float mWidth;
    float mHeight;
-   
+
    enum class ClockMultiplier
    {
       Quarter,
@@ -84,6 +88,6 @@ private:
    ClickButton* mStartButton;
    ClockMultiplier mMultiplier{ ClockMultiplier::One };
    DropdownList* mMultiplierSelector;
-   
+
    MidiDevice mDevice;
 };

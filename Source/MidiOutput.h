@@ -41,43 +41,47 @@ public:
    MidiOutputModule();
    virtual ~MidiOutputModule();
    static IDrawableModule* Create() { return new MidiOutputModule(); }
-   
-   
+
+
    void CreateUIControls() override;
-   
+
    void Init() override;
-   
+
    void PlayNote(double time, int pitch, int velocity, int voiceIdx = -1, ModulationParameters modulation = ModulationParameters()) override;
    void SendCC(int control, int value, int voiceIdx = -1) override;
-   
+
    //IAudioPoller
    void OnTransportAdvanced(float amount) override;
-   
+
    void DropdownUpdated(DropdownList* list, int oldVal) override;
    void DropdownClicked(DropdownList* list) override;
-   
+
    virtual void LoadLayout(const ofxJSONElement& moduleInfo) override;
    virtual void SetUpFromSaveData() override;
-   
+
 private:
    void InitController();
    void BuildControllerList();
-   
+
    //IDrawableModule
    void DrawModule() override;
    bool Enabled() const override { return true; }
-   void GetModuleDimensions(float& w, float& h) override { w=190; h=25; }
-   
+   void GetModuleDimensions(float& w, float& h) override
+   {
+      w = 190;
+      h = 25;
+   }
+
    int mControllerIndex;
    DropdownList* mControllerList;
-   
+
    MidiDevice mDevice;
-   
+
    int mChannel;
    bool mUseVoiceAsChannel;
    float mPitchBendRange;
    int mModwheelCC;
-   
+
    struct ChannelModulations
    {
       ModulationParameters mModulation;
@@ -85,7 +89,7 @@ private:
       float mLastModWheel;
       float mLastPressure;
    };
-   
+
    std::vector<ChannelModulations> mChannelModulations;
 };
 

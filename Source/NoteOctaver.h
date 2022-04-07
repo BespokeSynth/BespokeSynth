@@ -38,27 +38,31 @@ class NoteOctaver : public NoteEffectBase, public IDrawableModule, public IIntSl
 public:
    NoteOctaver();
    static IDrawableModule* Create() { return new NoteOctaver(); }
-   
-   
+
+
    void CreateUIControls() override;
 
    void SetEnabled(bool enabled) override { mEnabled = enabled; }
 
    //INoteReceiver
    void PlayNote(double time, int pitch, int velocity, int voiceIdx = -1, ModulationParameters modulation = ModulationParameters()) override;
-   
+
    void CheckboxUpdated(Checkbox* checkbox) override;
    //IIntSliderListener
    void IntSliderUpdated(IntSlider* slider, int oldVal) override;
-   
+
    virtual void LoadLayout(const ofxJSONElement& moduleInfo) override;
    virtual void SetUpFromSaveData() override;
-   
-   
+
+
 private:
    struct NoteInfo
    {
-      NoteInfo() : mOn(false), mVelocity(0), mVoiceIdx(-1) {}
+      NoteInfo()
+      : mOn(false)
+      , mVelocity(0)
+      , mVoiceIdx(-1)
+      {}
       bool mOn;
       int mVelocity;
       int mVoiceIdx;
@@ -66,9 +70,13 @@ private:
 
    //IDrawableModule
    void DrawModule() override;
-   void GetModuleDimensions(float& width, float& height) override { width = 108; height = 22; }
-   bool Enabled() const override { return mEnabled; }   
-   
+   void GetModuleDimensions(float& width, float& height) override
+   {
+      width = 108;
+      height = 22;
+   }
+   bool Enabled() const override { return mEnabled; }
+
    int mOctave;
    IntSlider* mOctaveSlider;
    std::array<NoteInfo, 128> mInputNotes;
@@ -76,4 +84,3 @@ private:
 
 
 #endif /* defined(__modularSynth__NoteOctaver__) */
-

@@ -40,32 +40,32 @@ public:
    ModulatorExpression();
    virtual ~ModulatorExpression();
    static IDrawableModule* Create() { return new ModulatorExpression(); }
-   
-   
+
+
    void CreateUIControls() override;
-   
+
    //IModulator
    float Value(int samplesIn = 0) override;
    bool Active() const override { return mEnabled; }
    bool CanAdjustRange() const override { return false; }
-   
+
    void PostRepatch(PatchCableSource* cableSource, bool fromUserClick) override;
-   
+
    //IFloatSliderListener
    void FloatSliderUpdated(FloatSlider* slider, float oldVal) override {}
-   
+
    //ITextEntryListener
    void TextEntryComplete(TextEntry* entry) override;
-   
+
    virtual void LoadLayout(const ofxJSONElement& moduleInfo) override;
    virtual void SetUpFromSaveData() override;
-   
+
 private:
    //IDrawableModule
    void DrawModule() override;
    void GetModuleDimensions(float& w, float& h) override;
    bool Enabled() const override { return mEnabled; }
-   
+
    float mExpressionInput;
    FloatSlider* mExpressionInputSlider;
    float mA;
@@ -78,14 +78,14 @@ private:
    FloatSlider* mDSlider;
    float mE;
    FloatSlider* mESlider;
-   
+
    std::string mEntryString;
    TextEntry* mTextEntry;
    exprtk::symbol_table<float> mSymbolTable;
    exprtk::expression<float> mExpression;
    exprtk::symbol_table<float> mSymbolTableDraw;
    exprtk::expression<float> mExpressionDraw;
-   
+
    float mExpressionInputDraw;
    float mT;
    bool mExpressionValid;

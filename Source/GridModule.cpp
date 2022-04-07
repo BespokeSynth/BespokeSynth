@@ -42,7 +42,7 @@ GridModule::GridModule()
 , mMomentary(false)
 , mDirectColorMode(true)
 {
-   for (size_t i=0; i<mHighlightCells.size(); ++i)
+   for (size_t i = 0; i < mHighlightCells.size(); ++i)
       mHighlightCells[i].time = -1;
    mColors.push_back(ofColor::white);
    mColors.push_back(ofColor::magenta);
@@ -50,22 +50,22 @@ GridModule::GridModule()
    mColors.push_back(ofColor::red);
    mColors.push_back(ofColor::yellow);
    mColors.push_back(ofColor::blue);
-   for (size_t i=0; i<mGridOverlay.size(); ++i)
+   for (size_t i = 0; i < mGridOverlay.size(); ++i)
       mGridOverlay[i] = -1;
 }
 
 void GridModule::CreateUIControls()
 {
    IDrawableModule::CreateUIControls();
-   
+
    mMomentaryCheckbox = new Checkbox(this, "momentary", 40, 3, &mMomentary);
-   
+
    mGrid = new UIGrid("uigrid", 40, 22, 90, 90, 8, 8, this);
    mGrid->SetListener(this);
    mGridControlTarget = new GridControlTarget(this, "grid", 4, 4);
-   
+
    GetPatchCableSource()->SetEnabled(false);
-   
+
    mGridOutputCable = new PatchCableSource(this, kConnectionType_Grid);
    mGridOutputCable->SetManualPosition(10, 30);
    mGridOutputCable->AddTypeFilter("gridcontroller");
@@ -79,7 +79,7 @@ GridModule::~GridModule()
 void GridModule::Init()
 {
    IDrawableModule::Init();
-   
+
    UpdateLights();
 }
 
@@ -87,7 +87,7 @@ void GridModule::OnControllerPageSelected()
 {
    if (mGridControlTarget->GetGridController())
       mGridControlTarget->GetGridController()->ResetLights();
-   
+
    UpdateLights();
 }
 
@@ -101,12 +101,12 @@ void GridModule::OnGridButton(int x, int y, float velocity, IGridController* gri
    if (y < GetRows() && x < GetCols())
    {
       for (auto listener : mScriptListeners)
-         listener->RunCode(gTime, "on_grid_button("+ofToString(x)+", "+ofToString(y)+", "+ofToString(velocity)+")");
-      
+         listener->RunCode(gTime, "on_grid_button(" + ofToString(x) + ", " + ofToString(y) + ", " + ofToString(velocity) + ")");
+
       if (mGridControllerOwner)
          mGridControllerOwner->OnGridButton(x, y, velocity, this);
    }
-   
+
    UpdateLights();
 }
 
@@ -119,17 +119,17 @@ void GridModule::UpdateLights()
 {
    if (!mGridControlTarget)
       return;
-   
-   for (int x=0; x<GetCols(); ++x)
+
+   for (int x = 0; x < GetCols(); ++x)
    {
-      for (int y=0; y<GetRows(); ++y)
+      for (int y = 0; y < GetRows(); ++y)
       {
          if (mGridControlTarget->GetGridController())
          {
             if (mDirectColorMode)
-               mGridControlTarget->GetGridController()->SetLightDirect(x, y, Get(x,y) * 127);
+               mGridControlTarget->GetGridController()->SetLightDirect(x, y, Get(x, y) * 127);
             else
-               mGridControlTarget->GetGridController()->SetLight(x, y, Get(x,y) > 0 ? kGridColor1Bright : kGridColorOff);
+               mGridControlTarget->GetGridController()->SetLight(x, y, Get(x, y) > 0 ? kGridColor1Bright : kGridColorOff);
          }
       }
    }
@@ -139,26 +139,26 @@ void GridModule::DrawModule()
 {
    if (Minimized() || IsVisible() == false)
       return;
-   
+
    mMomentaryCheckbox->Draw();
-   
-   ofSetColor(150,150,150,255);
+
+   ofSetColor(150, 150, 150, 255);
    mGrid->Draw();
    mGridControlTarget->Draw();
-   
+
    ofPushStyle();
    ofSetColor(128, 128, 128, gModuleDrawAlpha * .8f);
-   for (int i=0; i<mGrid->GetRows() && i<(int)mLabels.size(); ++i)
+   for (int i = 0; i < mGrid->GetRows() && i < (int)mLabels.size(); ++i)
    {
       ofVec2f pos = mGrid->GetCellPosition(0, i) + mGrid->GetPosition(true);
       float scale = MIN(mGrid->IClickable::GetDimensions().y / mGrid->GetRows(), 12);
-      DrawTextNormal(mLabels[i], 2, pos.y - (scale/8), scale);
+      DrawTextNormal(mLabels[i], 2, pos.y - (scale / 8), scale);
    }
    ofPopStyle();
-   
+
    ofPushStyle();
    ofFill();
-   for (int i=0; i<(int)mGridOverlay.size(); ++i)
+   for (int i = 0; i < (int)mGridOverlay.size(); ++i)
    {
       if (mGridOverlay[i] > 0)
       {
@@ -169,15 +169,15 @@ void GridModule::DrawModule()
             float xsize = float(mGrid->GetWidth()) / mGrid->GetCols();
             float ysize = float(mGrid->GetHeight()) / mGrid->GetRows();
             ofSetColor(GetColor(mGridOverlay[i]));
-            ofRect(pos.x+3, pos.y+3, xsize-6, ysize-6);
+            ofRect(pos.x + 3, pos.y + 3, xsize - 6, ysize - 6);
          }
       }
    }
    ofPopStyle();
-   
+
    ofPushStyle();
    ofSetLineWidth(3);
-   for (size_t i=0; i<mHighlightCells.size(); ++i)
+   for (size_t i = 0; i < mHighlightCells.size(); ++i)
    {
       if (mHighlightCells[i].time != -1)
       {
@@ -203,7 +203,7 @@ void GridModule::DrawModule()
 
 void GridModule::HighlightCell(int col, int row, double time, double duration, int colorIndex)
 {
-   for (size_t i=0; i<mHighlightCells.size(); ++i)
+   for (size_t i = 0; i < mHighlightCells.size(); ++i)
    {
       if (mHighlightCells[i].time == -1)
       {
@@ -219,20 +219,19 @@ void GridModule::HighlightCell(int col, int row, double time, double duration, i
 void GridModule::SetCellColor(int col, int row, int colorIndex)
 {
    mGridOverlay[col + row * kGridOverlayMaxDim] = colorIndex;
-   
 }
 
 void GridModule::SetLabel(int row, std::string label)
 {
    if (row >= (int)mLabels.size())
-      mLabels.resize(row+1);
+      mLabels.resize(row + 1);
    mLabels[row] = label;
 }
 
 void GridModule::SetColor(int colorIndex, ofColor color)
 {
    if (colorIndex >= (int)mColors.size())
-      mColors.resize(colorIndex+1);
+      mColors.resize(colorIndex + 1);
    mColors[colorIndex] = color;
 }
 
@@ -252,7 +251,7 @@ void GridModule::AddListener(ScriptModule* listener)
 void GridModule::Clear()
 {
    mGrid->Clear();
-   for (size_t i=0; i<mGridOverlay.size(); ++i)
+   for (size_t i = 0; i < mGridOverlay.size(); ++i)
       mGridOverlay[i] = -1;
    UpdateLights();
 }
@@ -274,14 +273,14 @@ void GridModule::Resize(float w, float h)
 void GridModule::OnClicked(int x, int y, bool right)
 {
    IDrawableModule::OnClicked(x, y, right);
-   
+
    mGrid->TestClick(x, y, right);
 }
 
 void GridModule::MouseReleased()
 {
    IDrawableModule::MouseReleased();
-   
+
    mGrid->MouseReleased();
 }
 
@@ -289,9 +288,9 @@ void GridModule::SetLight(int x, int y, GridColor color, bool force)
 {
    if (x >= GetCols() || y >= GetRows())
       return;
-   
+
    int colorIdx = (int)color;
-   
+
    SetLightDirect(x, y, colorIdx, force);
 }
 
@@ -328,7 +327,7 @@ void GridModule::PostRepatch(PatchCableSource* cableSource, bool fromUserClick)
 void GridModule::LoadLayout(const ofxJSONElement& moduleInfo)
 {
    mModuleSaveData.LoadBool("direct_color_mode", moduleInfo, true);
-   
+
    SetUpFromSaveData();
 }
 
@@ -351,9 +350,9 @@ namespace
 void GridModule::SaveState(FileStreamOut& out)
 {
    IDrawableModule::SaveState(out);
-   
+
    out << kSaveStateRev;
-   
+
    mGrid->SaveState(out);
    out << mGrid->GetWidth();
    out << mGrid->GetHeight();
@@ -373,11 +372,11 @@ void GridModule::SaveState(FileStreamOut& out)
 void GridModule::LoadState(FileStreamIn& in)
 {
    IDrawableModule::LoadState(in);
-   
+
    int rev;
    in >> rev;
    LoadStateValidate(rev <= kSaveStateRev);
-   
+
    if (rev >= 1)
    {
       mGrid->LoadState(in);
@@ -386,7 +385,7 @@ void GridModule::LoadState(FileStreamIn& in)
       in >> h;
       mGrid->SetDimensions(w, h);
    }
-   
+
    if (rev >= 2)
    {
       int cols, rows, divisions, numLabels;
@@ -397,23 +396,22 @@ void GridModule::LoadState(FileStreamIn& in)
       mGrid->SetMajorColSize(divisions);
       in >> numLabels;
       mLabels.resize(numLabels);
-      for (int i=0; i<numLabels; ++i)
+      for (int i = 0; i < numLabels; ++i)
          in >> mLabels[i];
    }
-   
+
    if (rev >= 3)
    {
       int numColors;
       in >> numColors;
       mColors.resize(numColors);
-      for (int i=0; i<numColors; ++i)
+      for (int i = 0; i < numColors; ++i)
          in >> mColors[i].r >> mColors[i].g >> mColors[i].b;
    }
-   
+
    if (rev >= 4)
    {
-      for (size_t i=0; i<mGridOverlay.size(); ++i)
+      for (size_t i = 0; i < mGridOverlay.size(); ++i)
          in >> mGridOverlay[i];
    }
 }
-

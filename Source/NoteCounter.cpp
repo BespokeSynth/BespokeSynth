@@ -53,16 +53,18 @@ void NoteCounter::Init()
 void NoteCounter::CreateUIControls()
 {
    IDrawableModule::CreateUIControls();
-   
+
    UIBLOCK0();
-   DROPDOWN(mIntervalSelector, "interval", ((int*)(&mInterval)), 50); UIBLOCK_SHIFTRIGHT();
-   CHECKBOX(mSyncCheckbox, "sync", &mSync); UIBLOCK_NEWLINE();
+   DROPDOWN(mIntervalSelector, "interval", ((int*)(&mInterval)), 50);
+   UIBLOCK_SHIFTRIGHT();
+   CHECKBOX(mSyncCheckbox, "sync", &mSync);
+   UIBLOCK_NEWLINE();
    INTSLIDER(mStartSlider, "start", &mStart, 0, 32);
    INTSLIDER(mLengthSlider, "length", &mLength, 1, 32);
    CHECKBOX(mRandomCheckbox, "random", &mRandom);
    INTSLIDER(mCustomDivisorSlider, "div", &mCustomDivisor, 1, 32);
    ENDUIBLOCK(mWidth, mHeight);
-   
+
    mIntervalSelector->AddLabel("1n", kInterval_1n);
    mIntervalSelector->AddLabel("2n", kInterval_2n);
    mIntervalSelector->AddLabel("4n", kInterval_4n);
@@ -98,9 +100,9 @@ void NoteCounter::Step(double time, float velocity, int pulseFlags)
 {
    if (!mEnabled)
       return;
-   
+
    bool sync = mSync || pulseFlags & kPulseFlag_SyncToTransport;
-   
+
    if (sync)
    {
       mStep = TheTransport->GetSyncedStep(time, this, mTransportListenerInfo, mLength);
@@ -120,7 +122,7 @@ void NoteCounter::Step(double time, float velocity, int pulseFlags)
          mStep = step;
       }
    }
-   
+
    mNoteOutput.Flush(time);
    if (mRandom)
       PlayNoteOutput(time, gRandom() % mLength + mStart, 127, -1);
@@ -147,7 +149,7 @@ void NoteCounter::OnTimeEvent(double time)
 void NoteCounter::OnPulse(double time, float velocity, int flags)
 {
    mHasExternalPulseSource = true;
-   
+
    Step(time, velocity, flags);
 }
 
@@ -187,7 +189,7 @@ void NoteCounter::GetModuleDimensions(float& width, float& height)
 void NoteCounter::LoadLayout(const ofxJSONElement& moduleInfo)
 {
    mModuleSaveData.LoadString("target", moduleInfo);
-   
+
    SetUpFromSaveData();
 }
 
@@ -204,9 +206,9 @@ namespace
 void NoteCounter::SaveState(FileStreamOut& out)
 {
    IDrawableModule::SaveState(out);
-   
+
    out << kSaveStateRev;
-   
+
    out << mWidth;
    out << mHeight;
    out << mHasExternalPulseSource;
@@ -215,14 +217,14 @@ void NoteCounter::SaveState(FileStreamOut& out)
 void NoteCounter::LoadState(FileStreamIn& in)
 {
    IDrawableModule::LoadState(in);
-   
+
    if (!ModuleContainer::DoesModuleHaveMoreSaveData(in))
-      return;  //this was saved before we added versioning, bail out
-   
+      return; //this was saved before we added versioning, bail out
+
    int rev;
    in >> rev;
    LoadStateValidate(rev <= kSaveStateRev);
-   
+
    in >> mWidth;
    in >> mHeight;
    in >> mHasExternalPulseSource;

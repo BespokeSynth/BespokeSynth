@@ -44,10 +44,10 @@ public:
    OSCOutput();
    virtual ~OSCOutput();
    static IDrawableModule* Create() { return new OSCOutput(); }
-   
+
    void Init() override;
    void Poll() override;
-   
+
    void CreateUIControls() override;
 
    void SendFloat(std::string address, float val);
@@ -57,20 +57,20 @@ public:
    //INoteReceiver
    void PlayNote(double time, int pitch, int velocity, int voiceIdx, ModulationParameters modulation) override;
    void SendCC(int control, int value, int voiceIdx = -1) override {}
-   
+
    void FloatSliderUpdated(FloatSlider* slider, float oldVal) override;
    void TextEntryComplete(TextEntry* entry) override;
-   
+
    void LoadLayout(const ofxJSONElement& moduleInfo) override;
    void SetUpFromSaveData() override;
    void SaveLayout(ofxJSONElement& moduleInfo) override;
-   
+
 private:
    //IDrawableModule
    void DrawModule() override;
    bool Enabled() const override { return true; }
    void GetModuleDimensions(float& width, float& height) override;
-   
+
    char* mLabels[OSC_OUTPUT_MAX_PARAMS];
    std::list<TextEntry*> mLabelEntry;
    float mParams[OSC_OUTPUT_MAX_PARAMS];
@@ -83,7 +83,7 @@ private:
 
    std::string mNoteOutLabel;
    TextEntry* mNoteOutLabelEntry;
-   
+
    juce::OSCSender mOscOut;
 
    float mWidth;

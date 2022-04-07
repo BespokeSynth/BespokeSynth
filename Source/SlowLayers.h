@@ -42,21 +42,21 @@ public:
    SlowLayers();
    virtual ~SlowLayers();
    static IDrawableModule* Create() { return new SlowLayers(); }
-   
-   
+
+
    void CreateUIControls() override;
-   
+
    void Clear();
    int NumBars() { return mNumBars; }
    void SetNumBars(int numBars);
-   
+
    //IAudioSource
    void Process(double time) override;
    void SetEnabled(bool enabled) override { mEnabled = enabled; }
-   
+
    //IAudioProcessor
    InputMode GetInputMode() override { return kInputMode_Mono; }
-   
+
    bool CheckNeedsDraw() override { return true; }
 
    void ButtonClicked(ClickButton* button) override;
@@ -67,6 +67,7 @@ public:
 
    virtual void LoadLayout(const ofxJSONElement& moduleInfo) override;
    virtual void SetUpFromSaveData() override;
+
 private:
    //IDrawableModule
    void DrawModule() override;

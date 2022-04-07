@@ -36,24 +36,28 @@ public:
    PulseGate();
    virtual ~PulseGate();
    static IDrawableModule* Create() { return new PulseGate(); }
-   
-   
+
+
    void CreateUIControls() override;
-   
+
    void SetEnabled(bool enabled) override { mEnabled = enabled; }
-   
+
    //IPulseReceiver
    void OnPulse(double time, float velocity, int flags) override;
-   
+
    void LoadLayout(const ofxJSONElement& moduleInfo) override;
    void SetUpFromSaveData() override;
-   
+
 private:
    //IDrawableModule
    void DrawModule() override;
-   void GetModuleDimensions(float& width, float& height) override { width = mWidth; height = mHeight; }
+   void GetModuleDimensions(float& width, float& height) override
+   {
+      width = mWidth;
+      height = mHeight;
+   }
    bool Enabled() const override { return true; }
-   
+
    bool mAllow;
    Checkbox* mAllowCheckbox;
    float mWidth;

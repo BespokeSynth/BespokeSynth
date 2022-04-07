@@ -39,44 +39,48 @@ public:
    ModulatorCurve();
    virtual ~ModulatorCurve();
    static IDrawableModule* Create() { return new ModulatorCurve(); }
-   
-   
+
+
    void CreateUIControls() override;
-   
+
    void SetEnabled(bool enabled) override { mEnabled = enabled; }
-   
+
    void PostRepatch(PatchCableSource* cableSource, bool fromUserClick) override;
-   
+
    //IModulator
    float Value(int samplesIn = 0) override;
    bool Active() const override { return mEnabled; }
-   
+
    FloatSlider* GetTarget() { return mTarget; }
-   
+
    void MouseReleased() override;
    bool MouseMoved(float x, float y) override;
-   
+
    //IFloatSliderListener
    void FloatSliderUpdated(FloatSlider* slider, float oldVal) override {}
-   
+
    void SaveLayout(ofxJSONElement& moduleInfo) override;
    void LoadLayout(const ofxJSONElement& moduleInfo) override;
    void SetUpFromSaveData() override;
-   
+
    void SaveState(FileStreamOut& out) override;
    void LoadState(FileStreamIn& in) override;
-   
+
 private:
    //IDrawableModule
    void DrawModule() override;
-   void GetModuleDimensions(float& w, float& h) override { w=106; h=121; }
+   void GetModuleDimensions(float& w, float& h) override
+   {
+      w = 106;
+      h = 121;
+   }
    bool Enabled() const override { return mEnabled; }
-   
+
    void OnClicked(int x, int y, bool right) override;
-   
+
    float mInput;
    EnvelopeControl mEnvelopeControl;
    ::ADSR mAdsr;
-   
+
    FloatSlider* mInputSlider;
 };

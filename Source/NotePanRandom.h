@@ -37,31 +37,35 @@ class NotePanRandom : public NoteEffectBase, public IDrawableModule, public IFlo
 public:
    NotePanRandom();
    static IDrawableModule* Create() { return new NotePanRandom(); }
-   
-   
+
+
    void CreateUIControls() override;
-   
+
    void SetEnabled(bool enabled) override { mEnabled = enabled; }
-   
+
    //INoteReceiver
    void PlayNote(double time, int pitch, int velocity, int voiceIdx = -1, ModulationParameters modulation = ModulationParameters()) override;
-   
+
    void FloatSliderUpdated(FloatSlider* slider, float oldVal) override {}
-   
+
    virtual void LoadLayout(const ofxJSONElement& moduleInfo) override;
    virtual void SetUpFromSaveData() override;
-   
+
 private:
    //IDrawableModule
    void DrawModule() override;
-   void GetModuleDimensions(float& width, float& height) override { width = mWidth; height = mHeight; }
+   void GetModuleDimensions(float& width, float& height) override
+   {
+      width = mWidth;
+      height = mHeight;
+   }
    bool Enabled() const override { return mEnabled; }
-   
+
    float mSpread;
    FloatSlider* mSpreadSlider;
    float mCenter;
    FloatSlider* mCenterSlider;
-   
+
    static const int kPanHistoryDisplaySize = 10;
    struct PanHistoryDisplayItem
    {
@@ -70,7 +74,7 @@ private:
    };
    PanHistoryDisplayItem mPanHistoryDisplay[kPanHistoryDisplaySize];
    int mPanHistoryDisplayIndex;
-   
+
    float mWidth;
    float mHeight;
 };

@@ -50,6 +50,7 @@ public:
    void SetPosition(ofVec2f pos) { mPosition = pos; }
    void SetDimensions(ofVec2f dim) { mDimensions = dim; }
    void SetFixedLengthMode(bool fixed) { mFixedLengthMode = fixed; }
+
 private:
    void AddVertex(float x, float y);
    float GetPreSustainTime();
@@ -58,7 +59,7 @@ private:
    float GetValueForY(float y);
    float GetXForTime(float time);
    float GetYForValue(float value);
-   
+
    ofVec2f mPosition;
    ofVec2f mDimensions;
    ::ADSR* mAdsr;
@@ -80,7 +81,7 @@ public:
    static IDrawableModule* Create() { return new EnvelopeEditor(); }
    void Delete() { delete this; }
    void DrawModule() override;
-   
+
    void SetEnabled(bool enabled) override {} //don't use this one
    bool Enabled() const override { return true; }
    bool HasTitleBar() const override { return mPinned; }
@@ -88,34 +89,38 @@ public:
    void CreateUIControls() override;
    void MouseReleased() override;
    bool MouseMoved(float x, float y) override;
-   
+
    bool IsPinned() const { return mPinned; }
    void SetADSRDisplay(ADSRDisplay* adsrDisplay);
    bool HasSpecialDelete() const override { return true; }
    void DoSpecialDelete() override;
-   
+
    void CheckboxUpdated(Checkbox* checkbox) override;
    void RadioButtonUpdated(RadioButton* radio, int oldVal) override {}
    void IntSliderUpdated(IntSlider* slider, int oldVal) override {}
    void FloatSliderUpdated(FloatSlider* slider, float oldVal) override;
    void ButtonClicked(ClickButton* button) override;
    void DropdownUpdated(DropdownList* list, int oldVal) override {}
-   
-   void GetModuleDimensions(float& width, float& height) override { width = 400; height = 300; }
-   
+
+   void GetModuleDimensions(float& width, float& height) override
+   {
+      width = 400;
+      height = 300;
+   }
+
    void SaveLayout(ofxJSONElement& moduleInfo) override;
    void LoadLayout(const ofxJSONElement& moduleInfo) override;
    void SetUpFromSaveData() override;
-   
+
 protected:
    ~EnvelopeEditor();
-   
+
 private:
    void OnClicked(int x, int y, bool right) override;
    void Pin();
-   
+
    EnvelopeControl mEnvelopeControl;
-   
+
    ADSRDisplay* mADSRDisplay;
    ClickButton* mPinButton;
    bool mPinned;

@@ -47,17 +47,17 @@ public:
    ClipLauncher();
    ~ClipLauncher();
    static IDrawableModule* Create() { return new ClipLauncher(); }
-   
-   
+
+
    void CreateUIControls() override;
    void Init() override;
-   
+
    int GetRowY(int idx);
-   
+
    //IAudioSource
    void Process(double time) override;
    void SetEnabled(bool enabled) override { mEnabled = enabled; }
-   
+
    void CheckboxUpdated(Checkbox* checkbox) override;
    void FloatSliderUpdated(FloatSlider* slider, float oldVal) override;
    void IntSliderUpdated(IntSlider* slider, int oldVal) override;
@@ -65,18 +65,18 @@ public:
    void DropdownUpdated(DropdownList* list, int oldVal) override;
    void ButtonClicked(ClickButton* button) override;
    void OnTimeEvent(double time) override;
-   
+
    virtual void LoadLayout(const ofxJSONElement& moduleInfo) override;
    virtual void SetUpFromSaveData() override;
-   
+
 private:
    void RecalcPos(double time, int idx);
-   
+
    //IDrawableModule
    void DrawModule() override;
    bool Enabled() const override { return mEnabled; }
    void GetModuleDimensions(float& width, float& height) override;
-   
+
    class SampleData
    {
    public:
@@ -90,12 +90,13 @@ private:
       , mIndex(0)
       , mPlay(false)
       , mHasSample(false)
-      {}
+      {
+      }
       ~SampleData();
-      
+
       void Init(ClipLauncher* launcher, int index);
       void Draw();
-      
+
       Sample* mSample;
       int mNumBars;
       float mVolume;
@@ -106,9 +107,9 @@ private:
       bool mPlay;
       bool mHasSample;
    };
-   
+
    Looper* mLooper;
-   
+
    float mVolume;
    FloatSlider* mVolumeSlider;
 

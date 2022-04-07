@@ -38,12 +38,12 @@ public:
    Selector();
    ~Selector();
    static IDrawableModule* Create() { return new Selector(); }
-   
-   
+
+
    void CreateUIControls() override;
-   
+
    void RadioButtonUpdated(RadioButton* radio, int oldVal) override;
-   
+
    void LoadLayout(const ofxJSONElement& moduleInfo) override;
    void SaveLayout(ofxJSONElement& moduleInfo) override;
    void SetUpFromSaveData() override;
@@ -51,22 +51,22 @@ public:
    //INoteReceiver
    void PlayNote(double time, int pitch, int velocity, int voiceIdx = -1, ModulationParameters modulation = ModulationParameters()) override;
    void SendCC(int control, int value, int voiceIdx = -1) override {}
-   
+
    //IPatchable
    void PostRepatch(PatchCableSource* cableSource, bool fromUserClick) override;
-   
+
 private:
    //IDrawableModule
    void DrawModule() override;
    bool Enabled() const override { return mEnabled; }
    void GetModuleDimensions(float& width, float& height) override;
-   
+
    void SyncList();
    void SetIndex(int index);
-   
+
    RadioButton* mSelector;
    int mCurrentValue;
-   
+
    std::vector<PatchCableSource*> mControlCables;
 };
 

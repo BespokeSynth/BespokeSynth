@@ -78,8 +78,11 @@ bool CustomPluginScanner::findPluginTypesFor(juce::AudioPluginFormat& format,
       for (;;)
       {
          if (condvar.wait_for(lock,
-            std::chrono::milliseconds(50),
-            [this] { return gotResponse || shouldExit(); }))
+                              std::chrono::milliseconds(50),
+                              [this]
+                              {
+                                 return gotResponse || shouldExit();
+                              }))
          {
             break;
          }
@@ -122,7 +125,7 @@ void CustomPluginScanner::changeListenerCallback(juce::ChangeBroadcaster*)
 }
 
 CustomPluginScanner::Superprocess::Superprocess(CustomPluginScanner& o)
-   : owner(o)
+: owner(o)
 {
    launchWorkerProcess(juce::File::getSpecialLocation(juce::File::currentExecutableFile), kScanProcessUID, 0, 0);
 }
@@ -149,11 +152,11 @@ void CustomPluginScanner::Superprocess::handleConnectionLost()
 /////////////////////////////////////////////////////////////////////////////////////////////////
 
 CustomPluginListComponent::CustomPluginListComponent(juce::AudioPluginFormatManager& manager,
-   juce::KnownPluginList& listToRepresent,
-   const juce::File& pedal,
-   juce::PropertiesFile* props,
-   bool async)
-   : juce::PluginListComponent(manager, listToRepresent, pedal, props, async)
+                                                     juce::KnownPluginList& listToRepresent,
+                                                     const juce::File& pedal,
+                                                     juce::PropertiesFile* props,
+                                                     bool async)
+: juce::PluginListComponent(manager, listToRepresent, pedal, props, async)
 {
    addAndMakeVisible(validationModeLabel);
    addAndMakeVisible(validationModeBox);
@@ -188,10 +191,10 @@ void CustomPluginListComponent::OnResize()
 /////////////////////////////////////////////////////////////////////////////////////////////////
 
 PluginListWindow::PluginListWindow(juce::AudioPluginFormatManager& pluginFormatManager, WindowCloseListener* listener)
-   : juce::DocumentWindow("VST Manager",
-      juce::LookAndFeel::getDefaultLookAndFeel().findColour(juce::ResizableWindow::backgroundColourId),
-      juce::DocumentWindow::closeButton)
-   , mListener(listener)
+: juce::DocumentWindow("VST Manager",
+                       juce::LookAndFeel::getDefaultLookAndFeel().findColour(juce::ResizableWindow::backgroundColourId),
+                       juce::DocumentWindow::closeButton)
+, mListener(listener)
 {
    auto deadMansPedalFile(juce::File(ofToDataPath("vst/deadmanspedal.txt")));
 
@@ -213,7 +216,7 @@ PluginListWindow::PluginListWindow(juce::AudioPluginFormatManager& pluginFormatM
    {
       const auto& mainMon = dpy->userArea;
       setTopLeftPosition(mainMon.getX() + mainMon.getWidth() / 4,
-         mainMon.getY() + mainMon.getHeight() / 4);
+                         mainMon.getY() + mainMon.getHeight() / 4);
    }
 
    restoreWindowStateFromString(getAppProperties().getUserSettings()->getValue("listWindowPos"));
@@ -299,4 +302,3 @@ void PluginScannerSubprocess::handleAsyncUpdate()
       sendMessageToCoordinator({ str.toRawUTF8(), str.getNumBytesAsUTF8() });
    }
 }
-

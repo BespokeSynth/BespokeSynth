@@ -61,16 +61,16 @@ void Monome::ListMonomes()
       mMonomeReceivePort = sNextMonomeReceivePort;
       ++sNextMonomeReceivePort;
    }
-   
+
    if (!mIsOscSetUp)
    {
       bool success = SetUpOsc();
       if (!success)
          return;
    }
-   
+
    mJustRequestedDeviceList = true;
-   
+
    juce::OSCMessage listMsg("/serialosc/list");
    listMsg.addString("localhost");
    listMsg.addInt32(mMonomeReceivePort);
@@ -81,17 +81,17 @@ void Monome::ListMonomes()
 bool Monome::SetUpOsc()
 {
    assert(!mIsOscSetUp);
-   
+
    bool connected = OSCReceiver::connect(mMonomeReceivePort);
    if (!connected)
       return false;
-   
+
    OSCReceiver::addListener(this);
-   
-   connected = mToSerialOsc.connect( HOST, SERIAL_OSC_PORT );
+
+   connected = mToSerialOsc.connect(HOST, SERIAL_OSC_PORT);
    if (!connected)
       return false;
-   
+
    mIsOscSetUp = true;
    return true;
 }
@@ -100,7 +100,7 @@ void Monome::SetLightInternal(int x, int y, float value)
 {
    if (!mHasMonome || !mLightsInitialized)
       return;
-   
+
    Vec2i pos = Rotate(x, y, mGridRotation);
    int index = pos.x + pos.y * mMaxColumns;
    mLights[index].mValue = value;
@@ -115,23 +115,23 @@ void Monome::SetLight(int x, int y, float value)
 void Monome::Poll()
 {
    int updatedLightCount = 0;
-   for (int i=0; i<(int)mLights.size(); ++i)
+   for (int i = 0; i < (int)mLights.size(); ++i)
    {
       int index = (i * 13 + TheSynth->GetFrameCount() * 7) % (int)mLights.size();
-      
+
       if (mLights[index].mLastUpdatedTime > mLights[index].mLastSentTime)
       {
-         juce::OSCMessage lightMsg("/"+mPrefix+"/grid/led/level/set");
+         juce::OSCMessage lightMsg("/" + mPrefix + "/grid/led/level/set");
          lightMsg.addInt32(index % mMaxColumns);
          lightMsg.addInt32(index / mMaxColumns);
-         lightMsg.addInt32(mLights[index].mValue*16);
+         lightMsg.addInt32(mLights[index].mValue * 16);
          bool written = mToMonome.send(lightMsg);
          assert(written);
-         
+
          mLights[index].mLastSentTime = gTime;
          ++updatedLightCount;
       }
-      
+
       static float kRateLimit = 16;
       if (updatedLightCount > kRateLimit)
          break;
@@ -142,12 +142,12 @@ void Monome::SetLightFlicker(int x, int y, float intensity)
 {
    if (intensity == 0)
    {
-      SetLight(x,y,false);
+      SetLight(x, y, false);
       return;
    }
    if (intensity == 1)
    {
-      SetLight(x,y,true);
+      SetLight(x, y, true);
       return;
    }
 }
@@ -155,7 +155,7 @@ void Monome::SetLightFlicker(int x, int y, float intensity)
 std::string Monome::GetControlTooltip(MidiMessageType type, int control)
 {
    if (type == kMidiMessage_Note)
-      return "(" + ofToString(control % mMaxColumns) + ", " + ofToString(control/mMaxColumns) + ")";
+      return "(" + ofToString(control % mMaxColumns) + ", " + ofToString(control / mMaxColumns) + ")";
    return MidiController::GetDefaultTooltip(type, control);
 }
 
@@ -175,52 +175,52 @@ void Monome::SetLayoutData(ofxJSONElement& layout)
 void Monome::ConnectToDevice(std::string deviceDesc)
 {
    MonomeDevice* device = nullptr;
-   for (size_t i=0; i<mConnectedDeviceList.size(); ++i)
+   for (size_t i = 0; i < mConnectedDeviceList.size(); ++i)
    {
       if (mConnectedDeviceList[i].GetDescription() == deviceDesc)
          device = &mConnectedDeviceList[i];
    }
-   
+
    if (device == nullptr)
    {
-      TheSynth->LogEvent("couldn't find monome device "+deviceDesc, kLogEventType_Error);
+      TheSynth->LogEvent("couldn't find monome device " + deviceDesc, kLogEventType_Error);
       return;
    }
-   
+
    mPrefix = device->id;
    mLastConnectedDeviceInfo.CopyFrom(*device);
-   
+
    if (mListForMidiController != nullptr)
    {
-      for (int i=0; i<mListForMidiController->GetNumValues(); ++i)
+      for (int i = 0; i < mListForMidiController->GetNumValues(); ++i)
       {
          if (mListForMidiController->GetLabel(i) == device->GetDescription())
             mListForMidiController->SetValueDirect(i);
       }
    }
-   
+
    mToMonome.connect(HOST, device->port);
    mHasMonome = true;
-   
+
    juce::OSCMessage setPortMsg("/sys/port");
    setPortMsg.addInt32(mMonomeReceivePort);
    bool written = mToMonome.send(setPortMsg);
    assert(written);
-   
+
    juce::OSCMessage setHostMsg("/sys/host");
    setHostMsg.addString(HOST);
    written = mToMonome.send(setHostMsg);
    assert(written);
-   
+
    juce::OSCMessage setPrefixMsg("/sys/prefix");
    setPrefixMsg.addString(mPrefix);
    written = mToMonome.send(setPrefixMsg);
    assert(written);
-   
+
    juce::OSCMessage sysInfoMsg("/sys/info");
    written = mToMonome.send(sysInfoMsg);
    assert(written);
-   
+
    /*OSCMessage setTiltMsg("/"+mPrefix+"/tilt/set");
    setTiltMsg.addInt32(0);
    setTiltMsg.addInt32(1);
@@ -237,23 +237,23 @@ bool Monome::Reconnect()
 void Monome::oscMessageReceived(const juce::OSCMessage& msg)
 {
    juce::String label = msg.getAddressPattern().toString();
-   
+
    if (label == "/serialosc/device")
    {
       MonomeDevice device;
       device.id = msg[0].getString().toStdString();
       device.product = msg[1].getString().toStdString();
       device.port = msg[2].getInt32();
-      
+
       mConnectedDeviceList.push_back(device);
-      
+
       if (mListForMidiController != nullptr)
       {
          if (mJustRequestedDeviceList)
             mListForMidiController->Clear();
-         
+
          mListForMidiController->AddLabel(device.GetDescription(), mListForMidiController->GetNumValues());
-         
+
          if (mPendingDeviceDesc != "")
          {
             ofLog() << mPendingDeviceDesc;
@@ -264,7 +264,7 @@ void Monome::oscMessageReceived(const juce::OSCMessage& msg)
             }
          }
       }
-      
+
       mJustRequestedDeviceList = false;
    }
    else if (label == "/sys/size")
@@ -273,23 +273,23 @@ void Monome::oscMessageReceived(const juce::OSCMessage& msg)
          mMaxColumns = msg[0].getInt32();
       else
          mMaxColumns = msg[1].getInt32();
-      
+
       mLights.resize(msg[0].getInt32() * msg[1].getInt32());
       mLightsInitialized = true;
    }
-   else if (label == "/"+mPrefix+"/grid/key")
+   else if (label == "/" + mPrefix + "/grid/key")
    {
       Vec2i pos = Rotate(msg[0].getInt32(), msg[1].getInt32(), -mGridRotation);
       int val = msg[2].getInt32();
-      
+
       MidiNote note;
-      note.mPitch = pos.x + pos.y*mMaxColumns;
+      note.mPitch = pos.x + pos.y * mMaxColumns;
       note.mVelocity = val * 127.0f;
       note.mChannel = 0;
       note.mDeviceName = mPrefix.toUTF8();
       mListener->OnMidiNote(note);
    }
-   else if (label == "/"+mPrefix+"/tilt")
+   else if (label == "/" + mPrefix + "/tilt")
    {
       /*MidiControl updown;
       updown.mControl = 1;
@@ -306,7 +306,7 @@ void Monome::oscMessageReceived(const juce::OSCMessage& msg)
 void Monome::SendValue(int page, int control, float value, bool forceNoteOn /*= false*/, int channel /*= -1*/)
 {
    //SetLightFlicker(control%8,control/8,value);
-   SetLight(control%mMaxColumns,control/mMaxColumns,value);
+   SetLight(control % mMaxColumns, control / mMaxColumns, value);
 }
 
 Vec2i Monome::Rotate(int x, int y, int rotations)
@@ -332,7 +332,7 @@ namespace
 void Monome::SaveState(FileStreamOut& out)
 {
    out << kSaveStateRev;
-   
+
    std::string connectedDeviceDesc = "";
    if (mLastConnectedDeviceInfo.id != "")
       connectedDeviceDesc = mLastConnectedDeviceInfo.GetDescription();
@@ -344,6 +344,6 @@ void Monome::LoadState(FileStreamIn& in)
    int rev;
    in >> rev;
    LoadStateValidate(rev == kSaveStateRev);
-   
+
    in >> mPendingDeviceDesc;
 }

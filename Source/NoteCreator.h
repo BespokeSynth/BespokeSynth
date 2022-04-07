@@ -39,31 +39,35 @@ public:
    NoteCreator();
    virtual ~NoteCreator();
    static IDrawableModule* Create() { return new NoteCreator(); }
-   
-   
+
+
    void CreateUIControls() override;
    void Init() override;
-   
+
    void SetEnabled(bool enabled) override { mEnabled = enabled; }
-   
+
    void OnPulse(double time, float velocity, int flags) override;
-   
+
    void CheckboxUpdated(Checkbox* checkbox) override;
    void ButtonClicked(ClickButton* button) override;
    void TextEntryComplete(TextEntry* entry) override;
    void FloatSliderUpdated(FloatSlider* slider, float oldVal) override {}
-   
+
    void LoadLayout(const ofxJSONElement& moduleInfo) override;
    void SetUpFromSaveData() override;
-   
+
 protected:
    void TriggerNote(double time, float velocity);
-   
+
    //IDrawableModule
    void DrawModule() override;
    bool Enabled() const override { return mEnabled; }
-   void GetModuleDimensions(float& w, float& h) override { w=mWidth; h=mHeight; }
-   
+   void GetModuleDimensions(float& w, float& h) override
+   {
+      w = mWidth;
+      h = mHeight;
+   }
+
    int mWidth;
    int mHeight;
 

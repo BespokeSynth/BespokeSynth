@@ -32,8 +32,9 @@ class SwitchAndRamp
 public:
    void StartSwitch();
    float Process(int channel, float input, float rampSpeed = .005f);
+
 private:
-   std::array<bool, ChannelBuffer::kMaxNumChannels> mSwitching{false};
+   std::array<bool, ChannelBuffer::kMaxNumChannels> mSwitching{ false };
    std::array<float, ChannelBuffer::kMaxNumChannels> mLastOutput;
    std::array<float, ChannelBuffer::kMaxNumChannels> mOffset;
 };

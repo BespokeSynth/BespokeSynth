@@ -42,7 +42,7 @@ void NoteSustain::Init()
 void NoteSustain::CreateUIControls()
 {
    IDrawableModule::CreateUIControls();
-   mSustainSlider = new FloatSlider(this,"duration",5,2,100,15,&mSustain,0.01f,4,4);
+   mSustainSlider = new FloatSlider(this, "duration", 5, 2, 100, 15, &mSustain, 0.01f, 4, 4);
    mSustainSlider->SetMode(FloatSlider::kSquare);
 }
 
@@ -55,7 +55,7 @@ void NoteSustain::DrawModule()
 {
    if (Minimized() || IsVisible() == false)
       return;
-   
+
    mSustainSlider->Draw();
 }
 
@@ -82,16 +82,16 @@ void NoteSustain::PlayNote(double time, int pitch, int velocity, int voiceIdx, M
       PlayNoteOutput(time, pitch, velocity, voiceIdx, modulation);
       return;
    }
-   
+
    if (velocity > 0)
       PlayNoteOutput(time, pitch, velocity, voiceIdx, modulation);
-   
+
    if (velocity > 0)
    {
       ComputeSliders(0);
-      
+
       float durationMs = mSustain / (float(TheTransport->GetTimeSigTop()) / TheTransport->GetTimeSigBottom()) * TheTransport->MsPerBar();
-      
+
       bool found = false;
       for (auto& queued : mNoteOffs)
       {
@@ -103,9 +103,9 @@ void NoteSustain::PlayNote(double time, int pitch, int velocity, int voiceIdx, M
             break;
          }
       }
-      
+
       if (!found)
-         mNoteOffs.push_back(QueuedNoteOff(time+durationMs, pitch, voiceIdx));
+         mNoteOffs.push_back(QueuedNoteOff(time + durationMs, pitch, voiceIdx));
    }
 }
 
@@ -116,7 +116,7 @@ void NoteSustain::FloatSliderUpdated(FloatSlider* slider, float oldVal)
 void NoteSustain::LoadLayout(const ofxJSONElement& moduleInfo)
 {
    mModuleSaveData.LoadString("target", moduleInfo);
-   
+
    SetUpFromSaveData();
 }
 

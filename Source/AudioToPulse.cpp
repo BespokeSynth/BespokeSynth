@@ -55,7 +55,7 @@ void AudioToPulse::CreateUIControls()
    FLOATSLIDER(mThresholdSlider, "threshold", &mThreshold, 0, 1);
    FLOATSLIDER(mReleaseSlider, "release", &mRelease, .01f, 1000);
    ENDUIBLOCK(mWidth, mHeight);
-   
+
    mThresholdSlider->SetMode(FloatSlider::kSquare);
    mReleaseSlider->SetMode(FloatSlider::kSquare);
 
@@ -75,12 +75,12 @@ void AudioToPulse::DrawModule()
 
    ofPushStyle();
    ofFill();
-   ofSetColor(0, 255, 0, gModuleDrawAlpha*.4f);
+   ofSetColor(0, 255, 0, gModuleDrawAlpha * .4f);
    ofRectangle rect = mThresholdSlider->GetRect(true);
    rect.width *= ofClamp(sqrtf(mPeak), 0, 1);
    rect.height *= .5f;
    ofRect(rect);
-   ofSetColor(255, 0, 0, gModuleDrawAlpha*.4f);
+   ofSetColor(255, 0, 0, gModuleDrawAlpha * .4f);
    rect = mThresholdSlider->GetRect(true);
    rect.width *= ofClamp(mEnvelope, 0, 1);
    rect.height *= .5f;

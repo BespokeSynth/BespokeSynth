@@ -35,24 +35,24 @@ public:
    NoteGate();
    virtual ~NoteGate();
    static IDrawableModule* Create() { return new NoteGate(); }
-   
-   
+
+
    void CreateUIControls() override;
-   
+
    //INoteReceiver
    void PlayNote(double time, int pitch, int velocity, int voiceIdx = -1, ModulationParameters modulation = ModulationParameters()) override;
 
    void CheckboxUpdated(Checkbox* checkbox) override;
-   
+
    void LoadLayout(const ofxJSONElement& moduleInfo) override;
    void SetUpFromSaveData() override;
-   
+
 private:
    //IDrawableModule
    void DrawModule() override;
    void GetModuleDimensions(float& width, float& height) override;
    bool Enabled() const override { return true; }
-   
+
    bool mGate;
    Checkbox* mGateCheckbox;
    std::array<NoteInputElement, 128> mActiveNotes{ false };

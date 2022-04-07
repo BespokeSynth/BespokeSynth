@@ -59,11 +59,12 @@ void NoteCreator::CreateUIControls()
    IDrawableModule::CreateUIControls();
 
    UIBLOCK0();
-   TEXTENTRY_NUM(mPitchEntry,"pitch",4,&mPitch,0,127);
+   TEXTENTRY_NUM(mPitchEntry, "pitch", 4, &mPitch, 0, 127);
    FLOATSLIDER(mVelocitySlider, "velocity", &mVelocity, 0, 1);
    FLOATSLIDER(mDurationSlider, "duration", &mDuration, 1, 1000);
-   CHECKBOX(mNoteOnCheckbox, "on", &mNoteOn); UIBLOCK_SHIFTRIGHT();
-   BUTTON(mTriggerButton,"trigger");
+   CHECKBOX(mNoteOnCheckbox, "on", &mNoteOn);
+   UIBLOCK_SHIFTRIGHT();
+   BUTTON(mTriggerButton, "trigger");
    ENDUIBLOCK(mWidth, mHeight);
 
    mPitchEntry->DrawLabel(true);
@@ -73,7 +74,7 @@ void NoteCreator::DrawModule()
 {
    if (Minimized() || IsVisible() == false)
       return;
-   
+
    mPitchEntry->Draw();
    mNoteOnCheckbox->Draw();
    mTriggerButton->Draw();
@@ -89,7 +90,7 @@ void NoteCreator::OnPulse(double time, float velocity, int flags)
 void NoteCreator::TriggerNote(double time, float velocity)
 {
    mStartTime = time;
-   PlayNoteOutput(mStartTime, mPitch, velocity*127, mVoiceIndex);
+   PlayNoteOutput(mStartTime, mPitch, velocity * 127, mVoiceIndex);
    PlayNoteOutput(mStartTime + mDuration, mPitch, 0, mVoiceIndex);
 }
 
@@ -103,7 +104,7 @@ void NoteCreator::CheckboxUpdated(Checkbox* checkbox)
    {
       if (mNoteOn)
       {
-         PlayNoteOutput(time, mPitch, mVelocity*127, mVoiceIndex);
+         PlayNoteOutput(time, mPitch, mVelocity * 127, mVoiceIndex);
       }
       else
       {
@@ -139,7 +140,7 @@ void NoteCreator::LoadLayout(const ofxJSONElement& moduleInfo)
 {
    mModuleSaveData.LoadString("target", moduleInfo);
    mModuleSaveData.LoadInt("voice index", moduleInfo, -1, -1, kNumVoices);
-   
+
    SetUpFromSaveData();
 }
 

@@ -37,24 +37,25 @@ class NoteRouter : public NoteEffectBase, public IDrawableModule, public IRadioB
 public:
    NoteRouter();
    static IDrawableModule* Create() { return new NoteRouter(); }
-   
-   
+
+
    void CreateUIControls() override;
 
    void PostRepatch(PatchCableSource* cableSource, bool fromUserClick) override;
-   
+
    void SetActiveIndex(int index) { mRouteMask = 1 << index; }
    void SetSelectedMask(int mask);
-   
+
    //INoteReceiver
    void PlayNote(double time, int pitch, int velocity, int voiceIdx = -1, ModulationParameters modulation = ModulationParameters()) override;
 
    //IRadioButtonListener
    void RadioButtonUpdated(RadioButton* radio, int oldVal) override;
-   
+
    virtual void LoadLayout(const ofxJSONElement& moduleInfo) override;
    virtual void SetUpFromSaveData() override;
    virtual void SaveLayout(ofxJSONElement& moduleInfo) override;
+
 private:
    //IDrawableModule
    void DrawModule() override;
@@ -68,4 +69,3 @@ private:
 };
 
 #endif /* defined(__modularSynth__NoteRouter__) */
-

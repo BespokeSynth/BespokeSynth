@@ -30,7 +30,7 @@
 
 typedef struct
 {
-   uint32_t   messageId;
+   uint32_t messageId;
    std::string className;
 } MessageIdToString;
 

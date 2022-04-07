@@ -43,13 +43,13 @@ public:
    Autotalent();
    ~Autotalent();
    static IDrawableModule* Create() { return new Autotalent(); }
-   
-   
+
+
    void CreateUIControls() override;
 
    //IAudioReceiver
    InputMode GetInputMode() override { return kInputMode_Mono; }
-   
+
    //IAudioSource
    void Process(double time) override;
 
@@ -68,16 +68,20 @@ public:
    void RadioButtonUpdated(RadioButton* radio, int oldVal) override {}
    //IButtonListener
    void ButtonClicked(ClickButton* button) override;
-   
+
    virtual void LoadLayout(const ofxJSONElement& moduleInfo) override;
    virtual void SetUpFromSaveData() override;
-   
+
 private:
    void UpdateShiftSlider();
 
    //IDrawableModule
    void DrawModule() override;
-   void GetModuleDimensions(float& width, float& height) override { width=260; height=360; }
+   void GetModuleDimensions(float& width, float& height) override
+   {
+      width = 260;
+      height = 360;
+   }
    bool Enabled() const override { return mEnabled; }
 
    float* mWorkingBuffer;
@@ -107,10 +111,10 @@ private:
    Checkbox* mFcorrCheckbox;
    FloatSlider* mFwarpSlider;
    FloatSlider* mMixSlider;
-   
+
    ClickButton* mSetFromScaleButton;
 
-////////////////////////////////////////
+   ////////////////////////////////////////
    //ported
    float mTune;
    float mFixed;
@@ -214,4 +218,3 @@ private:
 };
 
 #endif /* defined(__modularSynth__Autotalent__) */
-

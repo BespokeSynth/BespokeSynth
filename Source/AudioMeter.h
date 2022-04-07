@@ -38,26 +38,30 @@ public:
    AudioMeter();
    virtual ~AudioMeter();
    static IDrawableModule* Create() { return new AudioMeter(); }
-   
-   
+
+
    void CreateUIControls() override;
-   
+
    //IAudioSource
    void Process(double time) override;
    void SetEnabled(bool enabled) override { mEnabled = enabled; }
-   
+
    //IFloatSliderListener
    void FloatSliderUpdated(FloatSlider* slider, float oldVal) override {}
-   
+
    void LoadLayout(const ofxJSONElement& moduleInfo) override;
    void SetUpFromSaveData() override;
-   
+
 private:
    //IDrawableModule
    void DrawModule() override;
-   void GetModuleDimensions(float& w, float& h) override { w=120; h=22; }
+   void GetModuleDimensions(float& w, float& h) override
+   {
+      w = 120;
+      h = 22;
+   }
    bool Enabled() const override { return mEnabled; }
-   
+
    float mLevel;
    float mMaxLevel;
    FloatSlider* mLevelSlider;

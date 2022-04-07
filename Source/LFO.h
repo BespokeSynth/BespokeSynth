@@ -58,9 +58,10 @@ public:
 
    //ITimeListener
    void OnTimeEvent(double time) override;
-   
+
    //IAudioPoller
    void OnTransportAdvanced(float amount) override;
+
 private:
    NoteInterval mPeriod;
    float mPhaseOffset;

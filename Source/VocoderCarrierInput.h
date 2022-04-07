@@ -43,8 +43,8 @@ public:
    VocoderCarrierInput();
    virtual ~VocoderCarrierInput();
    static IDrawableModule* Create() { return new VocoderCarrierInput(); }
-   
-   
+
+
    void CreateUIControls() override;
 
    //IAudioProcessor
@@ -52,14 +52,18 @@ public:
 
    //IAudioSource
    void Process(double time) override;
-   
+
    virtual void LoadLayout(const ofxJSONElement& moduleInfo) override;
    virtual void SetUpFromSaveData() override;
 
 private:
    //IDrawableModule
    void DrawModule() override;
-   void GetModuleDimensions(float& w, float& h) override { w=60; h=0; }
+   void GetModuleDimensions(float& w, float& h) override
+   {
+      w = 60;
+      h = 0;
+   }
    bool Enabled() const override { return true; }
 
    VocoderBase* mVocoder;

@@ -141,11 +141,11 @@ private:
    struct IndividualOutput
    {
       IndividualOutput(DrumSynthHit* owner)
-         : mHit(owner)
-         , mVizBuffer(nullptr)
-         , mPatchCableSource(nullptr)
+      : mHit(owner)
+      , mVizBuffer(nullptr)
+      , mPatchCableSource(nullptr)
       {
-         mVizBuffer = new RollingBuffer(VIZ_BUFFER_SECONDS*gSampleRate);
+         mVizBuffer = new RollingBuffer(VIZ_BUFFER_SECONDS * gSampleRate);
          mPatchCableSource = new PatchCableSource(owner->mParent, kConnectionType_Audio);
 
          mPatchCableSource->SetOverrideVizBuffer(mVizBuffer);
@@ -181,4 +181,3 @@ private:
    int mOversampling{ 1 };
    DropdownList* mOversamplingSelector;
 };
-

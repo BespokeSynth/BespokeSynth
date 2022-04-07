@@ -39,36 +39,40 @@ public:
    PitchBender();
    virtual ~PitchBender();
    static IDrawableModule* Create() { return new PitchBender(); }
-   
-   
+
+
    void CreateUIControls() override;
    void Init() override;
    void SetEnabled(bool enabled) override { mEnabled = enabled; }
-   
+
    //INoteReceiver
    void PlayNote(double time, int pitch, int velocity, int voiceIdx = -1, ModulationParameters modulation = ModulationParameters()) override;
-   
+
    //IAudioPoller
    void OnTransportAdvanced(float amount) override;
-   
+
    void FloatSliderUpdated(FloatSlider* slider, float oldVal) override;
    void CheckboxUpdated(Checkbox* checkbox) override;
-   
+
    void LoadLayout(const ofxJSONElement& moduleInfo) override;
    void SetUpFromSaveData() override;
+
 private:
    //IDrawableModule
    void DrawModule() override;
-   void GetModuleDimensions(float& width, float& height) override { width = 120; height = 22; }
+   void GetModuleDimensions(float& width, float& height) override
+   {
+      width = 120;
+      height = 22;
+   }
    bool Enabled() const override { return mEnabled; }
-   
+
    float mBend;
    FloatSlider* mBendSlider;
    float mRange;
    //Checkbox mBendingCheckbox;
-   
+
    Modulations mModulation;
 };
 
 #endif /* defined(__Bespoke__PitchBender__) */
-

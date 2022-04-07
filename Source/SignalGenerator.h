@@ -45,37 +45,37 @@ public:
    SignalGenerator();
    ~SignalGenerator();
    static IDrawableModule* Create() { return new SignalGenerator(); }
-   
-   
+
+
    void CreateUIControls() override;
-   
+
    void SetVol(float vol) { mVol = vol; }
-   
+
    //IAudioSource
    void Process(double time) override;
    void SetEnabled(bool enabled) override;
-   
+
    //INoteReceiver
    void PlayNote(double time, int pitch, int velocity, int voiceIdx = -1, ModulationParameters modulation = ModulationParameters()) override;
    void SendCC(int control, int value, int voiceIdx = -1) override {}
 
    //IPulseReceiver
    void OnPulse(double time, float velocity, int flags) override;
-   
+
    void DropdownUpdated(DropdownList* list, int oldVal) override;
    void FloatSliderUpdated(FloatSlider* slider, float oldVal) override;
    void IntSliderUpdated(IntSlider* slider, int oldVal) override;
    void CheckboxUpdated(Checkbox* checkbox) override;
-   
+
    virtual void LoadLayout(const ofxJSONElement& moduleInfo) override;
    virtual void SetUpFromSaveData() override;
-   
+
 private:
    //IDrawableModule
    void DrawModule() override;
    void GetModuleDimensions(float& width, float& height) override;
    bool Enabled() const override { return mEnabled; }
-   
+
    enum FreqMode
    {
       kFreqMode_Instant,
@@ -83,10 +83,10 @@ private:
       kFreqMode_Ramp,
       kFreqMode_Slider
    };
-   
+
    void SetType(OscillatorType type);
    void SetFreqMode(FreqMode mode);
-   
+
    float mVol;
    FloatSlider* mVolSlider;
    OscillatorType mOscType;
@@ -122,9 +122,8 @@ private:
    float mPhaseOffset;
    FloatSlider* mPhaseOffsetSlider;
    double mResetPhaseAtMs;
-   
+
    float* mWriteBuffer;
 };
 
 #endif /* defined(__Bespoke__SignalGenerator__) */
-

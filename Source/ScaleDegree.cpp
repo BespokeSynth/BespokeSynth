@@ -40,10 +40,10 @@ void ScaleDegree::CreateUIControls()
 {
    IDrawableModule::CreateUIControls();
    UIBLOCK0();
-   DROPDOWN(mScaleDegreeSelector,"degree",&mScaleDegree,50);
-   CHECKBOX(mRetriggerCheckbox,"retrigger",&mRetrigger);
+   DROPDOWN(mScaleDegreeSelector, "degree", &mScaleDegree, 50);
+   CHECKBOX(mRetriggerCheckbox, "retrigger", &mRetrigger);
    ENDUIBLOCK(mWidth, mHeight);
-   
+
    mScaleDegreeSelector->AddLabel("-I", -7);
    mScaleDegreeSelector->AddLabel("-II", -6);
    mScaleDegreeSelector->AddLabel("-III", -5);
@@ -65,12 +65,12 @@ void ScaleDegree::DrawModule()
 {
    if (Minimized() || IsVisible() == false)
       return;
-   
+
    mScaleDegreeSelector->Draw();
    mRetriggerCheckbox->Draw();
 }
 
-void ScaleDegree::CheckboxUpdated(Checkbox *checkbox)
+void ScaleDegree::CheckboxUpdated(Checkbox* checkbox)
 {
    if (checkbox == mEnabledCheckbox)
       mNoteOutput.Flush(gTime);
@@ -83,7 +83,7 @@ void ScaleDegree::PlayNote(double time, int pitch, int velocity, int voiceIdx, M
       PlayNoteOutput(time, pitch, velocity, voiceIdx, modulation);
       return;
    }
-   
+
    if (pitch >= 0 && pitch < 128)
    {
       if (velocity > 0)
@@ -97,7 +97,7 @@ void ScaleDegree::PlayNote(double time, int pitch, int velocity, int voiceIdx, M
       {
          mInputNotes[pitch].mOn = false;
       }
-      
+
       PlayNoteOutput(time, mInputNotes[pitch].mOutputPitch, velocity, mInputNotes[pitch].mVoiceIdx, modulation);
    }
 }
@@ -114,11 +114,11 @@ void ScaleDegree::DropdownUpdated(DropdownList* slider, int oldVal)
    if (slider == mScaleDegreeSelector && mEnabled && mRetrigger)
    {
       double time = gTime + gBufferSizeMs;
-      for (int pitch=0; pitch<128; ++pitch)
+      for (int pitch = 0; pitch < 128; ++pitch)
       {
          if (mInputNotes[pitch].mOn)
          {
-            PlayNoteOutput(time+.01, mInputNotes[pitch].mOutputPitch, 0, mInputNotes[pitch].mVoiceIdx, ModulationParameters());
+            PlayNoteOutput(time + .01, mInputNotes[pitch].mOutputPitch, 0, mInputNotes[pitch].mVoiceIdx, ModulationParameters());
             mInputNotes[pitch].mOutputPitch = TransformPitch(pitch);
             PlayNoteOutput(time, mInputNotes[pitch].mOutputPitch, mInputNotes[pitch].mVelocity, mInputNotes[pitch].mVoiceIdx, ModulationParameters());
          }
@@ -129,7 +129,7 @@ void ScaleDegree::DropdownUpdated(DropdownList* slider, int oldVal)
 void ScaleDegree::LoadLayout(const ofxJSONElement& moduleInfo)
 {
    mModuleSaveData.LoadString("target", moduleInfo);
-   
+
    SetUpFromSaveData();
 }
 

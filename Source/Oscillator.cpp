@@ -28,22 +28,22 @@
 float Oscillator::Value(float phase) const
 {
    if (mType == kOsc_Tri)
-      phase += .5f * FPI;  //shift phase to make triangle start at zero instead of 1, to eliminate click on start
+      phase += .5f * FPI; //shift phase to make triangle start at zero instead of 1, to eliminate click on start
 
    if (mShuffle > 0)
    {
       phase = fmod(phase, FTWO_PI * 2);
-      
-      float shufflePoint = FTWO_PI * (1+mShuffle);
-      
+
+      float shufflePoint = FTWO_PI * (1 + mShuffle);
+
       if (phase < shufflePoint)
-         phase = phase / (1+mShuffle);
+         phase = phase / (1 + mShuffle);
       else
-         phase = (phase - shufflePoint) / (1-mShuffle);
+         phase = (phase - shufflePoint) / (1 - mShuffle);
    }
-   
+
    phase = fmod(phase, FTWO_PI);
-   
+
    float sample = 0;
    switch (mType)
    {
@@ -63,27 +63,27 @@ float Oscillator::Value(float phase) const
          }
          else
          {
-            float phase01 = phase/FTWO_PI;
+            float phase01 = phase / FTWO_PI;
             phase01 += .75f;
             phase01 -= (mPulseWidth - .5f) / 2;
             phase01 -= int(phase01);
-            sample = ofClamp((fabs(phase01 - .5f) * 4 - 1 + (mPulseWidth-.5f) * 2) / mSoften,-1,1);
+            sample = ofClamp((fabs(phase01 - .5f) * 4 - 1 + (mPulseWidth - .5f) * 2) / mSoften, -1, 1);
          }
          break;
       case kOsc_Tri:
-         sample = fabs(phase/FTWO_PI - .5f) * 4 - 1;
+         sample = fabs(phase / FTWO_PI - .5f) * 4 - 1;
          break;
       case kOsc_Random:
-         sample = ofRandom(-1,1);
+         sample = ofRandom(-1, 1);
          break;
       default:
          //assert(false);
          break;
    }
-   
+
    if (mType != kOsc_Square && mPulseWidth != .5f)
-      sample = (Bias(sample/2+.5f, mPulseWidth) - .5f) * 2; //give "pulse width" to non-square oscillators
-   
+      sample = (Bias(sample / 2 + .5f, mPulseWidth) - .5f) * 2; //give "pulse width" to non-square oscillators
+
    return sample;
 }
 
@@ -92,7 +92,7 @@ float Oscillator::SawSample(float phase) const
    phase /= FTWO_PI;
    if (mSoften == 0)
       return phase * 2 - 1;
-   if (phase < 1-mSoften)
-      return phase/(1-mSoften) * 2 - 1;
-   return 1 - ((phase - (1-mSoften)) / mSoften * 2);
+   if (phase < 1 - mSoften)
+      return phase / (1 - mSoften) * 2 - 1;
+   return 1 - ((phase - (1 - mSoften)) / mSoften * 2);
 }

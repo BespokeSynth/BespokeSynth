@@ -49,7 +49,7 @@ Pressure::~Pressure()
 void Pressure::CreateUIControls()
 {
    IDrawableModule::CreateUIControls();
-   mPressureSlider = new FloatSlider(this,"pressure",5,2,110,15,&mPressure,0,1);
+   mPressureSlider = new FloatSlider(this, "pressure", 5, 2, 110, 15, &mPressure, 0, 1);
 }
 
 void Pressure::DrawModule()
@@ -66,7 +66,7 @@ void Pressure::PlayNote(double time, int pitch, int velocity, int voiceIdx, Modu
       mModulation.GetPressure(voiceIdx)->AppendTo(modulation.pressure);
       modulation.pressure = mModulation.GetPressure(voiceIdx);
    }
-   
+
    PlayNoteOutput(time, pitch, velocity, voiceIdx, modulation);
 }
 
@@ -88,7 +88,7 @@ void Pressure::CheckboxUpdated(Checkbox* checkbox)
 void Pressure::LoadLayout(const ofxJSONElement& moduleInfo)
 {
    mModuleSaveData.LoadString("target", moduleInfo);
-   
+
    SetUpFromSaveData();
 }
 

@@ -36,40 +36,44 @@
 #include "Transport.h"
 #include "DropdownList.h"
 
-#define FREEZE_EXTRA_SAMPLES_COUNT 2*gSampleRate
+#define FREEZE_EXTRA_SAMPLES_COUNT 2 * gSampleRate
 
 class LiveGranulator : public IAudioEffect, public IFloatSliderListener, public ITimeListener, public IDropdownListener
 {
 public:
    LiveGranulator();
    virtual ~LiveGranulator();
-   
+
    static IAudioEffect* Create() { return new LiveGranulator(); }
-   
-   
+
+
    void CreateUIControls() override;
    void Init() override;
-   
+
    //IAudioEffect
    void ProcessAudio(double time, ChannelBuffer* buffer) override;
    void SetEnabled(bool enabled) override { mEnabled = enabled; }
    float GetEffectAmount() override;
    std::string GetType() override { return "granulator"; }
-   
+
    void OnTimeEvent(double time) override;
-   
+
    void CheckboxUpdated(Checkbox* checkbox) override;
    void FloatSliderUpdated(FloatSlider* slider, float oldVal) override;
    void DropdownUpdated(DropdownList* list, int oldVal) override;
-   
+
 private:
    void Freeze();
-   
+
    //IDrawableModule
    void DrawModule() override;
-   void GetModuleDimensions(float& w, float& h) override { w = mWidth; h = mHeight; }
-   bool Enabled() const override { return mEnabled; }   
-   
+   void GetModuleDimensions(float& w, float& h) override
+   {
+      w = mWidth;
+      h = mHeight;
+   }
+   bool Enabled() const override { return mEnabled; }
+
    float mBufferLength;
    RollingBuffer mBuffer;
    Granulator mGranulator;
@@ -90,11 +94,10 @@ private:
    NoteInterval mAutoCaptureInterval;
    DropdownList* mAutoCaptureDropdown;
    FloatSlider* mWidthSlider;
-   
+
    float mWidth;
    float mHeight;
    float mBufferX;
 };
 
 #endif /* defined(__modularSynth__LiveGranulator__) */
-

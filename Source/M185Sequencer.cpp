@@ -37,18 +37,21 @@ void M185Sequencer::CreateUIControls()
    IDrawableModule::CreateUIControls();
 
    UIBLOCK2(10, 0);
-   DROPDOWN(mIntervalSelector,"interval",(int*)(&mInterval), 40); UIBLOCK_SHIFTRIGHT();
-   BUTTON(mResetStepButton,"reset step");
-   int i=0;
+   DROPDOWN(mIntervalSelector, "interval", (int*)(&mInterval), 40);
+   UIBLOCK_SHIFTRIGHT();
+   BUTTON(mResetStepButton, "reset step");
+   int i = 0;
    for (auto& step : mSteps)
    {
       UIBLOCK_NEWLINE();
       step.xPos = 0;
       step.yPos = yPos;
 
-      INTSLIDER(step.mPitchSlider,("pitch"+ofToString(i)).c_str(),&step.mPitch,0,127); UIBLOCK_SHIFTRIGHT();
-      INTSLIDER(step.mPulseCountSlider,("pulses"+ofToString(i)).c_str(),&step.mPulseCount,0,8); UIBLOCK_SHIFTRIGHT();
-      DROPDOWN(step.mGateSelector,("gate"+ofToString(i)).c_str(), (int*)(&step.mGate), 60);
+      INTSLIDER(step.mPitchSlider, ("pitch" + ofToString(i)).c_str(), &step.mPitch, 0, 127);
+      UIBLOCK_SHIFTRIGHT();
+      INTSLIDER(step.mPulseCountSlider, ("pulses" + ofToString(i)).c_str(), &step.mPulseCount, 0, 8);
+      UIBLOCK_SHIFTRIGHT();
+      DROPDOWN(step.mGateSelector, ("gate" + ofToString(i)).c_str(), (int*)(&step.mGate), 60);
 
       step.mGateSelector->AddLabel("repeat", GateType::kGate_Repeat);
       step.mGateSelector->AddLabel("once", GateType::kGate_Once);
@@ -90,13 +93,13 @@ void M185Sequencer::DrawModule()
    int totalSteps = 0;
    for (auto& step : mSteps)
       totalSteps += step.mPulseCount;
-   DrawTextNormal("total steps: "+ofToString(totalSteps), 120, 13);
+   DrawTextNormal("total steps: " + ofToString(totalSteps), 120, 13);
 
    ofPushStyle();
    for (int i = 0; i < mSteps.size(); i++)
    {
       ofFill();
-      ofSetColor(0,i == mLastPlayedStepIdx ? 255 : 0,0,gModuleDrawAlpha*.4f);
+      ofSetColor(0, i == mLastPlayedStepIdx ? 255 : 0, 0, gModuleDrawAlpha * .4f);
       ofRect(mSteps[i].xPos,
              mSteps[i].yPos,
              10, 10);
@@ -131,18 +134,18 @@ void M185Sequencer::StepBy(double time, float velocity, int flags)
 {
    if (flags & kPulseFlag_Reset)
       ResetStep();
-   
+
    if (mEnabled)
    {
       bool stopPrevNote =
-         mStepPulseIdx == 0 ||
-         mSteps[mStepIdx].mGate == GateType::kGate_Repeat ||
-         (mStepPulseIdx > 0 && mSteps[mStepIdx].mGate == GateType::kGate_Once);
+      mStepPulseIdx == 0 ||
+      mSteps[mStepIdx].mGate == GateType::kGate_Repeat ||
+      (mStepPulseIdx > 0 && mSteps[mStepIdx].mGate == GateType::kGate_Once);
       bool playNextNote =
-         (mStepPulseIdx == 0 &&
-          (mSteps[mStepIdx].mGate == GateType::kGate_Once ||
-           mSteps[mStepIdx].mGate == GateType::kGate_Hold)) ||
-         mSteps[mStepIdx].mGate == GateType::kGate_Repeat;
+      (mStepPulseIdx == 0 &&
+       (mSteps[mStepIdx].mGate == GateType::kGate_Once ||
+        mSteps[mStepIdx].mGate == GateType::kGate_Hold)) ||
+      mSteps[mStepIdx].mGate == GateType::kGate_Repeat;
 
       if (mSteps[mStepIdx].mPulseCount == 0)
          playNextNote = false;
@@ -154,7 +157,7 @@ void M185Sequencer::StepBy(double time, float velocity, int flags)
       }
       if (playNextNote)
       {
-         PlayNoteOutput(time, mSteps[mStepIdx].mPitch, velocity*127, -1);
+         PlayNoteOutput(time, mSteps[mStepIdx].mPitch, velocity * 127, -1);
          mLastPitch = mSteps[mStepIdx].mPitch;
       }
    }
@@ -163,7 +166,7 @@ void M185Sequencer::StepBy(double time, float velocity, int flags)
       PlayNoteOutput(time, mLastPitch, 0, -1);
       mLastPitch = -1;
    }
-   
+
    mLastPlayedStepIdx = mStepIdx;
 
    // Update step/pulse
@@ -233,7 +236,7 @@ void M185Sequencer::SaveState(FileStreamOut& out)
       out << step.mPulseCount;
       out << (int)step.mGate;
    }
-   out << (int) mInterval;
+   out << (int)mInterval;
    out << mHasExternalPulseSource;
 }
 
@@ -248,11 +251,11 @@ void M185Sequencer::LoadState(FileStreamIn& in)
 
       int gate;
       in >> gate;
-      step.mGate = (GateType) gate;
+      step.mGate = (GateType)gate;
    }
    int interval;
    in >> interval;
-   mInterval = (NoteInterval) interval;
+   mInterval = (NoteInterval)interval;
 
    in >> mHasExternalPulseSource;
 }

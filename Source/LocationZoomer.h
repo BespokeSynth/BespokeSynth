@@ -45,22 +45,23 @@ public:
    void WriteCurrentLocation(char key);
    bool HasLocation(char key);
    void MoveToLocation(char key);
+
 private:
    void PickNewVanityPanningDestination();
-   
+
    struct Location
    {
       float mZoomLevel;
       ofVec2f mOffset;
    };
-   
+
    std::map<int, Location> mLocations;
    Location mStart;
    Location mDestination;
    float mCurrentProgress;
    float mSpeed;
    Location mHome;
-   
+
    bool mInVanityPanningMode;
 };
 

@@ -43,39 +43,39 @@ MidiClockIn::~MidiClockIn()
 void MidiClockIn::CreateUIControls()
 {
    IDrawableModule::CreateUIControls();
-   
-   UIBLOCK(3,3,120);
+
+   UIBLOCK(3, 3, 120);
    DROPDOWN(mDeviceList, "device", &mDeviceIndex, 120);
    DROPDOWN(mTempoRoundModeList, "rounding", ((int*)&mTempoRoundMode), 40);
    FLOATSLIDER(mStartOffsetMsSlider, "start offset ms", &mStartOffsetMs, -300, 300);
    INTSLIDER(mSmoothAmountSlider, "smoothing", &mSmoothAmount, 1, (int)mTempoHistory.size());
    ENDUIBLOCK(mWidth, mHeight);
-   
+
    mTempoRoundModeList->DrawLabel(true);
    mTempoRoundModeList->AddLabel("none", (int)TempoRoundMode::kNone);
    mTempoRoundModeList->AddLabel("1", (int)TempoRoundMode::kWhole);
    mTempoRoundModeList->AddLabel(".5", (int)TempoRoundMode::kHalf);
    mTempoRoundModeList->AddLabel(".25", (int)TempoRoundMode::kQuarter);
    mTempoRoundModeList->AddLabel(".1", (int)TempoRoundMode::kTenth);
-   
+
    mHeight += 20;
 }
 
 void MidiClockIn::Init()
 {
    IDrawableModule::Init();
-   
+
    InitDevice();
 }
 
 void MidiClockIn::InitDevice()
 {
    BuildDeviceList();
-   
+
    const std::vector<std::string>& devices = mDevice.GetPortList(true);
-   for (int i=0; i<devices.size(); ++i)
+   for (int i = 0; i < devices.size(); ++i)
    {
-      if (strcmp(devices[i].c_str(),mDevice.Name()) == 0)
+      if (strcmp(devices[i].c_str(), mDevice.Name()) == 0)
          mDeviceIndex = i;
    }
 }
@@ -86,7 +86,7 @@ float MidiClockIn::GetRoundedTempo()
    int temposToCount = std::min((int)mTempoHistory.size(), mSmoothAmount);
 
    for (int i = 0; i < temposToCount; ++i)
-      avgTempo += mTempoHistory[(mTempoIdx - 1 - i+ (int)mTempoHistory.size()) % (int)mTempoHistory.size()];
+      avgTempo += mTempoHistory[(mTempoIdx - 1 - i + (int)mTempoHistory.size()) % (int)mTempoHistory.size()];
    avgTempo /= temposToCount;
 
    switch (mTempoRoundMode)
@@ -96,13 +96,13 @@ float MidiClockIn::GetRoundedTempo()
       case TempoRoundMode::kWhole:
          return round(avgTempo);
       case TempoRoundMode::kHalf:
-         return round(avgTempo*2)/2;
+         return round(avgTempo * 2) / 2;
       case TempoRoundMode::kQuarter:
-         return round(avgTempo*4)/4;
+         return round(avgTempo * 4) / 4;
       case TempoRoundMode::kTenth:
-         return round(avgTempo*10)/10;
+         return round(avgTempo * 10) / 10;
    }
-   
+
    return avgTempo;
 }
 
@@ -110,12 +110,12 @@ void MidiClockIn::DrawModule()
 {
    if (Minimized() || IsVisible() == false)
       return;
-   
+
    mDeviceList->Draw();
    mTempoRoundModeList->Draw();
    mStartOffsetMsSlider->Draw();
    mSmoothAmountSlider->Draw();
-   
+
    DrawTextNormal("tempo: " + ofToString(GetRoundedTempo()), 4, mHeight - 5);
 }
 
@@ -123,7 +123,7 @@ void MidiClockIn::BuildDeviceList()
 {
    mDeviceList->Clear();
    const std::vector<std::string>& devices = mDevice.GetPortList(true);
-   for (int i=0; i<devices.size(); ++i)
+   for (int i = 0; i < devices.size(); ++i)
       mDeviceList->AddLabel(devices[i].c_str(), i);
 }
 
@@ -137,13 +137,13 @@ void MidiClockIn::OnMidi(const juce::MidiMessage& message)
          double pulsesPerSecond = 1 / deltaSeconds;
          double beatsPerSecond = pulsesPerSecond / 24;
          double instantTempo = beatsPerSecond * 60;
-         
+
          if (mTempoIdx == -1)
             mTempoHistory.fill(instantTempo);
          else
             mTempoHistory[mTempoIdx] = instantTempo;
          mTempoIdx = (mTempoIdx + 1) % mTempoHistory.size();
-         
+
          if (mEnabled)
             TheTransport->SetTempo(GetRoundedTempo());
       }
@@ -164,7 +164,7 @@ void MidiClockIn::OnMidi(const juce::MidiMessage& message)
    if (message.isSongPositionPointer())
    {
       ofLog() << "midi position pointer " << ofToString(message.getSongPositionPointerMidiBeat());
-      
+
       if (mEnabled)
          TheTransport->SetMeasureTime(message.getSongPositionPointerMidiBeat() / TheTransport->GetTimeSigTop() + mStartOffsetMs / TheTransport->MsPerBar());
    }

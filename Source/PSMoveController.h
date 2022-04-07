@@ -43,13 +43,13 @@ public:
    PSMoveController();
    ~PSMoveController();
    static IDrawableModule* Create() { return new PSMoveController(); }
-   
-   
+
+
    void CreateUIControls() override;
    void Init() override;
-   
+
    void SetEnabled(bool enabled) override { mEnabled = enabled; }
-   
+
    void Poll() override;
    void Exit() override;
 
@@ -65,13 +65,18 @@ public:
    void OnTimeEvent(double time) override;
    //IFloatSliderLIstener
    void FloatSliderUpdated(FloatSlider* slider, float oldVal) override;
-   
+
    virtual void LoadLayout(const ofxJSONElement& moduleInfo) override;
    virtual void SetUpFromSaveData() override;
+
 private:
    //IDrawableModule
    void DrawModule() override;
-   void GetModuleDimensions(float& width, float& height) override { width = 152; height = 140; }
+   void GetModuleDimensions(float& width, float& height) override
+   {
+      width = 152;
+      height = 140;
+   }
    bool Enabled() const override { return mEnabled; }
 
    PSMoveMgr mMoveMgr;
@@ -97,7 +102,7 @@ private:
    IUIControl* mYawUIControl;
    IUIControl* mRollUIControl;
    IUIControl* mEnergyUIControl;
-   
+
    bool mPSButtonDown;
 
    TransportListenerInfo* mTransportListenerInfo;

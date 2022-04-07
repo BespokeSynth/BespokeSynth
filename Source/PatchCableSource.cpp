@@ -97,31 +97,31 @@ PatchCable* PatchCableSource::AddPatchCable(IClickable* target)
       if (cable != nullptr && cable->GetTarget() == target)
          return nullptr;
    }
-   
+
    PatchCable* cable = new PatchCable(this);
    mPatchCables.push_back(cable);
-   
+
    if (target)
       SetPatchCableTarget(cable, target, false);
-   
+
    return cable;
 }
 
 void PatchCableSource::SetPatchCableTarget(PatchCable* cable, IClickable* target, bool fromUserClick)
 {
    IClickable* oldTarget = cable->GetTarget();
-   
+
    mOwner->PreRepatch(this);
-   
+
    if (cable->GetTarget())
    {
       mAudioReceiver = nullptr;
       RemoveFromVector(dynamic_cast<INoteReceiver*>(cable->GetTarget()), mNoteReceivers);
       RemoveFromVector(dynamic_cast<IPulseReceiver*>(cable->GetTarget()), mPulseReceivers);
    }
-   
+
    cable->SetTarget(target);
-   
+
    INoteReceiver* noteReceiver = dynamic_cast<INoteReceiver*>(target);
    if (noteReceiver)
       mNoteReceivers.push_back(noteReceiver);
@@ -134,13 +134,13 @@ void PatchCableSource::SetPatchCableTarget(PatchCable* cable, IClickable* target
       mAudioReceiver = audioReceiver;
       TheSynth->ArrangeAudioSourceDependencies();
    }
-   
+
    mOwner->PostRepatch(this, fromUserClick);
-   
+
    //insert
    if (GetKeyModifiers() == kModifier_Shift && fromUserClick)
    {
-      if (sAllowInsert)  //avoid cascade on the next set
+      if (sAllowInsert) //avoid cascade on the next set
       {
          sAllowInsert = false;
          IDrawableModule* targetModule = dynamic_cast<IDrawableModule*>(target);
@@ -167,7 +167,7 @@ void PatchCableSource::UpdatePosition(bool parentMinimized)
 {
    if ((mAutomaticPositioning || parentMinimized) && mOwner != nullptr)
    {
-      float x,y,w,h;
+      float x, y, w, h;
       mOwner->GetPosition(x, y);
       mOwner->GetDimensions(w, h);
 
@@ -176,7 +176,7 @@ void PatchCableSource::UpdatePosition(bool parentMinimized)
          mOwner->GetParent()->GetPosition(x, y);
          mOwner->GetParent()->GetDimensions(w, h);
       }
-      
+
       if (mManualSide == Side::kNone || parentMinimized)
       {
          ofVec2f centerOfMass;
@@ -193,7 +193,7 @@ void PatchCableSource::UpdatePosition(bool parentMinimized)
                }
                else if (cable->GetTarget())
                {
-                  float targetX,targetY,targetW,targetH;
+                  float targetX, targetY, targetW, targetH;
                   cable->GetTarget()->GetPosition(targetX, targetY);
                   cable->GetTarget()->GetDimensions(targetW, targetH);
                   centerOfMass.x += targetX + targetW / 2;
@@ -204,12 +204,12 @@ void PatchCableSource::UpdatePosition(bool parentMinimized)
          }
          centerOfMass.x /= count;
          centerOfMass.y /= count;
-         
+
          if (count > 0)
          {
-            if (centerOfMass.y > y+h)
+            if (centerOfMass.y > y + h)
                mSide = Side::kBottom;
-            else if (centerOfMass.x < x+w/2)
+            else if (centerOfMass.x < x + w / 2)
                mSide = Side::kLeft;
             else
                mSide = Side::kRight;
@@ -223,26 +223,26 @@ void PatchCableSource::UpdatePosition(bool parentMinimized)
       {
          mSide = mManualSide;
       }
-      
+
       if (mSide == Side::kBottom)
       {
-         mX = x+w/2;
-         mY = y+h+3;
+         mX = x + w / 2;
+         mY = y + h + 3;
       }
       else if (mSide == Side::kLeft)
       {
-         mX = x-3;
-         mY = y+h/2;
+         mX = x - 3;
+         mY = y + h / 2;
       }
       else if (mSide == Side::kRight)
       {
-         mX = x+w+3;
-         mY = y+h/2;
+         mX = x + w + 3;
+         mY = y + h / 2;
       }
    }
    else
    {
-      float x,y;
+      float x, y;
       mOwner->GetPosition(x, y);
       mX = mManualPositionX + x;
       mY = mManualPositionY + y;
@@ -278,7 +278,7 @@ void PatchCableSource::Render()
       cableY -= mOwner->GetOwningContainer()->GetOwnerPosition().y;
    }
 
-   for (int i = 0; i < (int)mPatchCables.size() || i==0; ++i)
+   for (int i = 0; i < (int)mPatchCables.size() || i == 0; ++i)
    {
       if (i < (int)mPatchCables.size() && mPatchCables[i] != nullptr)
       {
@@ -293,7 +293,7 @@ void PatchCableSource::Render()
                ModuleContainer* owningModuleContainer = owningModule->GetOwningContainer();
                ModuleContainer* targetContainer = target->GetModuleParent()->GetOwningContainer();
                if (owningModuleContainer == targetContainer)
-                  continue;   //this is an internally-patched cable in a minimized module
+                  continue; //this is an internally-patched cable in a minimized module
             }
          }
       }
@@ -343,7 +343,7 @@ void PatchCableSource::Render()
                ofLine(cableX - (kPatchCableSourceRadius - 1), cableY, cableX + (kPatchCableSourceRadius - 1), cableY);
             }
          }
-         
+
          if (mType == kConnectionType_Grid)
          {
             ofPushStyle();
@@ -400,13 +400,13 @@ ofVec2f PatchCableSource::GetCableStartDir(int index, ofVec2f dest) const
       Direction dir;
       switch (mSide)
       {
-      case Side::kBottom: dir = Direction::kDown; break;
-      case Side::kLeft: dir = Direction::kLeft; break;
-      case Side::kRight: dir = Direction::kRight; break;
-      case Side::kNone: dir = Direction::kNone; break;
+         case Side::kBottom: dir = Direction::kDown; break;
+         case Side::kLeft: dir = Direction::kLeft; break;
+         case Side::kRight: dir = Direction::kRight; break;
+         case Side::kNone: dir = Direction::kNone; break;
       }
 
-      if (mPatchCables.size() > 0 && index < mPatchCables.size() - 1)  //not the top of the cable stack
+      if (mPatchCables.size() > 0 && index < mPatchCables.size() - 1) //not the top of the cable stack
       {
          if (mSide == Side::kBottom)
          {
@@ -426,16 +426,16 @@ ofVec2f PatchCableSource::GetCableStartDir(int index, ofVec2f dest) const
 
       switch (dir)
       {
-      case Direction::kDown:
-         return ofVec2f(0, 1);
-      case Direction::kRight:
-         return ofVec2f(1, 0);
-      case Direction::kLeft:
-         return ofVec2f(-1, 0);
-      case Direction::kUp:
-         return ofVec2f(0, -1);
-      default:
-         return ofVec2f(0, 0);
+         case Direction::kDown:
+            return ofVec2f(0, 1);
+         case Direction::kRight:
+            return ofVec2f(1, 0);
+         case Direction::kLeft:
+            return ofVec2f(-1, 0);
+         case Direction::kUp:
+            return ofVec2f(0, -1);
+         default:
+            return ofVec2f(0, 0);
       }
    }
 }
@@ -444,19 +444,19 @@ bool PatchCableSource::MouseMoved(float x, float y)
 {
    if (!Enabled())
       return false;
-   
+
    if (!mClickable)
       return false;
-   
+
    x = TheSynth->GetMouseX(mOwner->GetOwningContainer());
    y = TheSynth->GetMouseY(mOwner->GetOwningContainer());
-   
+
    mHoverIndex = GetHoverIndex(x, y);
 
    if (mHoverIndex != -1 && gHoveredUIControl != nullptr && !gHoveredUIControl->IsMouseDown())
       gHoveredUIControl = nullptr; //if we're hovering over a patch cable, get rid of ui control hover
-   
-   for (size_t i=0; i<mPatchCables.size(); ++i)
+
+   for (size_t i = 0; i < mPatchCables.size(); ++i)
    {
       if (mPatchCables[i] != nullptr)
       {
@@ -464,13 +464,13 @@ bool PatchCableSource::MouseMoved(float x, float y)
          mPatchCables[i]->NotifyMouseMoved(x, y);
       }
    }
-   
+
    return false;
 }
 
 void PatchCableSource::MouseReleased()
 {
-   std::vector<PatchCable*> cables = mPatchCables;   //copy, since list might get modified here
+   std::vector<PatchCable*> cables = mPatchCables; //copy, since list might get modified here
    FindValidTargets();
    for (auto cable : cables)
       cable->MouseReleased();
@@ -480,13 +480,13 @@ bool PatchCableSource::TestClick(int x, int y, bool right, bool testOnly /* = fa
 {
    if (!Enabled())
       return false;
-   
+
    if (!mClickable)
       return false;
 
    if (right)
       return false;
-   
+
    if (mHoverIndex != -1)
    {
       if (!testOnly)
@@ -529,13 +529,13 @@ bool PatchCableSource::TestClick(int x, int y, bool right, bool testOnly /* = fa
       }
       return true;
    }
-   
+
    //for (auto cable : mPatchCables)
    //{
    //   if (cable->TestClick(x, y, right, testOnly))
    //      return true;
    //}
-   
+
    return false;
 }
 
@@ -543,10 +543,10 @@ bool PatchCableSource::TestHover(float x, float y) const
 {
    if (!Enabled())
       return false;
-   
+
    if (!mClickable)
       return false;
-   
+
    return GetHoverIndex(x, y) != -1;
 }
 
@@ -577,7 +577,6 @@ bool PatchCableSource::Enabled() const
 
 void PatchCableSource::OnClicked(int x, int y, bool right)
 {
-   
 }
 
 bool PatchCableSource::InAddCableMode() const
@@ -632,7 +631,7 @@ void PatchCableSource::FindValidTargets()
 void PatchCableSource::CableGrabbed()
 {
    FindValidTargets();
-   
+
    mOwner->OnCableGrabbed(this);
 }
 
@@ -699,8 +698,8 @@ IClickable* PatchCableSource::GetTarget() const
 void PatchCableSource::SaveState(FileStreamOut& out)
 {
    out << (int)mPatchCables.size();
-   
-   for (int i=0; i<mPatchCables.size(); ++i)
+
+   for (int i = 0; i < mPatchCables.size(); ++i)
    {
       std::string path = "";
       IClickable* target = mPatchCables[i]->GetTarget();
@@ -713,12 +712,12 @@ void PatchCableSource::SaveState(FileStreamOut& out)
 void PatchCableSource::LoadState(FileStreamIn& in)
 {
    ClearPatchCables();
-   
+
    int size;
    in >> size;
    mPatchCables.resize(size);
-   
-   for (int i=0; i<mPatchCables.size(); ++i)
+
+   for (int i = 0; i < mPatchCables.size(); ++i)
    {
       std::string path;
       in >> path;
@@ -731,13 +730,12 @@ void PatchCableSource::LoadState(FileStreamIn& in)
          }
          catch (UnknownUIControlException& e)
          {
-            
          }
       }
       mPatchCables[i] = new PatchCable(this);
       SetPatchCableTarget(mPatchCables[i], target, false);
    }
-   
+
    mOwner->PostRepatch(this, false);
 }
 
@@ -745,7 +743,7 @@ void NoteHistory::AddEvent(double time, bool on)
 {
    if (on)
       mLastOnEventTime = time;
-   
+
    mHistoryPos = (mHistoryPos + 1) % kHistorySize;
    mHistory[mHistoryPos].mTime = time;
    mHistory[mHistoryPos].mOn = on;

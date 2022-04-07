@@ -38,29 +38,33 @@ class Monophonify : public NoteEffectBase, public IDrawableModule, public IFloat
 public:
    Monophonify();
    static IDrawableModule* Create() { return new Monophonify(); }
-   
-   
+
+
    void CreateUIControls() override;
-   
+
    void SetEnabled(bool enabled) override { mEnabled = enabled; }
-   
+
    //INoteReceiver
    void PlayNote(double time, int pitch, int velocity, int voiceIdx = -1, ModulationParameters modulation = ModulationParameters()) override;
-   
+
    void CheckboxUpdated(Checkbox* checkbox) override;
    //IFloatSliderListener
    void FloatSliderUpdated(FloatSlider* slider, float oldVal) override;
-   
+
    virtual void LoadLayout(const ofxJSONElement& moduleInfo) override;
    virtual void SetUpFromSaveData() override;
-   
+
 private:
    //IDrawableModule
    void DrawModule() override;
-   void GetModuleDimensions(float& width, float& height) override { width = mWidth; height = mHeight; }
+   void GetModuleDimensions(float& width, float& height) override
+   {
+      width = mWidth;
+      height = mHeight;
+   }
    bool Enabled() const override { return mEnabled; }
    int GetMostRecentPitch() const;
-   
+
    double mHeldNotes[128];
    int mInitialPitch;
    int mLastPlayedPitch;
@@ -68,7 +72,7 @@ private:
    float mWidth;
    float mHeight;
    int mVoiceIdx;
-   
+
    bool mRequireHeldNote;
    Checkbox* mRequireHeldNoteCheckbox;
    float mGlideTime;
@@ -78,4 +82,3 @@ private:
 
 
 #endif /* defined(__modularSynth__Monophonify__) */
-

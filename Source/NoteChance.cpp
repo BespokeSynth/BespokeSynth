@@ -42,7 +42,7 @@ NoteChance::~NoteChance()
 void NoteChance::CreateUIControls()
 {
    IDrawableModule::CreateUIControls();
-   
+
    mChanceSlider = new FloatSlider(this, "chance", 3, 2, 100, 15, &mChance, 0, 1);
 }
 
@@ -50,24 +50,24 @@ void NoteChance::DrawModule()
 {
    if (Minimized() || IsVisible() == false)
       return;
-   
+
    mChanceSlider->Draw();
-   
+
    if (gTime - mLastAcceptTime > 0 && gTime - mLastAcceptTime < 200)
    {
       ofPushStyle();
-      ofSetColor(0,255,0,255*(1-(gTime - mLastAcceptTime)/200));
+      ofSetColor(0, 255, 0, 255 * (1 - (gTime - mLastAcceptTime) / 200));
       ofFill();
-      ofRect(106,2,10,7);
+      ofRect(106, 2, 10, 7);
       ofPopStyle();
    }
-   
+
    if (gTime - mLastRejectTime > 0 && gTime - mLastRejectTime < 200)
    {
       ofPushStyle();
-      ofSetColor(255,0,0,255*(1-(gTime - mLastRejectTime)/200));
+      ofSetColor(255, 0, 0, 255 * (1 - (gTime - mLastRejectTime) / 200));
       ofFill();
-      ofRect(106,9,10,7);
+      ofRect(106, 9, 10, 7);
       ofPopStyle();
    }
 }
@@ -79,14 +79,14 @@ void NoteChance::PlayNote(double time, int pitch, int velocity, int voiceIdx, Mo
       PlayNoteOutput(time, pitch, velocity, voiceIdx, modulation);
       return;
    }
-   
+
    if (velocity > 0)
       ComputeSliders(0);
-   
+
    bool accept = ofRandom(1) <= mChance;
    if (accept || velocity == 0)
       PlayNoteOutput(time, pitch, velocity, voiceIdx, modulation);
-   
+
    if (velocity > 0)
    {
       if (accept)
@@ -105,7 +105,7 @@ void NoteChance::GetModuleDimensions(float& width, float& height)
 void NoteChance::LoadLayout(const ofxJSONElement& moduleInfo)
 {
    mModuleSaveData.LoadString("target", moduleInfo);
-   
+
    SetUpFromSaveData();
 }
 

@@ -44,7 +44,7 @@ public:
    SliderLine(SliderSequencer* owner, int x, int y, int index);
    void Draw();
    void CreateUIControls();
-   
+
    float mPoint;
    FloatSlider* mSlider;
    float mVelocity;
@@ -66,32 +66,37 @@ public:
    SliderSequencer();
    ~SliderSequencer();
    static IDrawableModule* Create() { return new SliderSequencer(); }
-   
-   
+
+
    void CreateUIControls() override;
    void Init() override;
 
    void SetEnabled(bool on) override { mEnabled = on; }
-   
+
    //IAudioPoller
    void OnTransportAdvanced(float amount) override;
-   
+
    void CheckboxUpdated(Checkbox* checkbox) override;
    void FloatSliderUpdated(FloatSlider* slider, float oldVal) override;
    void DropdownUpdated(DropdownList* list, int oldVal) override;
    void IntSliderUpdated(IntSlider* slider, int oldVal) override;
    void TextEntryComplete(TextEntry* entry) override {}
-   
+
    virtual void LoadLayout(const ofxJSONElement& moduleInfo) override;
    virtual void SetUpFromSaveData() override;
+
 private:
    float MeasurePos(double time);
-   
+
    //IDrawableModule
    void DrawModule() override;
-   void GetModuleDimensions(float& width, float& height) override { width=320; height=165; }
+   void GetModuleDimensions(float& width, float& height) override
+   {
+      width = 320;
+      height = 165;
+   }
    bool Enabled() const override { return mEnabled; }
-   
+
    float mLastMeasurePos;
    std::vector<SliderLine*> mSliderLines;
    int mDivision;
@@ -100,5 +105,3 @@ private:
 
 
 #endif /* defined(__Bespoke__SliderSequencer__) */
-
-

@@ -37,8 +37,8 @@ class Neighborhooder : public NoteEffectBase, public IDrawableModule, public IIn
 public:
    Neighborhooder();
    static IDrawableModule* Create() { return new Neighborhooder(); }
-   
-   
+
+
    void CreateUIControls() override;
 
    void SetEnabled(bool enabled) override { mEnabled = enabled; }
@@ -48,13 +48,18 @@ public:
 
    void CheckboxUpdated(Checkbox* checkbox) override;
    void IntSliderUpdated(IntSlider* slider, int oldVal) override;
-   
+
    virtual void LoadLayout(const ofxJSONElement& moduleInfo) override;
    virtual void SetUpFromSaveData() override;
+
 private:
    //IDrawableModule
    void DrawModule() override;
-   void GetModuleDimensions(float& width, float& height) override { width = 120; height = 38; }
+   void GetModuleDimensions(float& width, float& height) override
+   {
+      width = 120;
+      height = 38;
+   }
    bool Enabled() const override { return mEnabled; }
 
    int mMinPitch;
@@ -64,4 +69,3 @@ private:
 };
 
 #endif /* defined(__modularSynth__Neighborhooder__) */
-

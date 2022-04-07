@@ -39,20 +39,24 @@ public:
    Inverter();
    virtual ~Inverter();
    static IDrawableModule* Create() { return new Inverter(); }
-   
-   
+
+
    void CreateUIControls() override;
-   
+
    //IAudioSource
    void Process(double time) override;
    void SetEnabled(bool enabled) override { mEnabled = enabled; }
-   
+
    virtual void LoadLayout(const ofxJSONElement& moduleInfo) override;
    virtual void SetUpFromSaveData() override;
-   
+
 private:
    //IDrawableModule
    void DrawModule() override;
-   void GetModuleDimensions(float& w, float& h) override { w=120; h=12; }
+   void GetModuleDimensions(float& w, float& h) override
+   {
+      w = 120;
+      h = 12;
+   }
    bool Enabled() const override { return mEnabled; }
 };

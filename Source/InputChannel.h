@@ -37,28 +37,32 @@ public:
    InputChannel();
    virtual ~InputChannel();
    static IDrawableModule* Create() { return new InputChannel(); }
-   
-   
+
+
    void CreateUIControls() override;
-   
+
    //IAudioReceiver
    InputMode GetInputMode() override { return mChannelSelectionIndex < mStereoSelectionOffset ? kInputMode_Mono : kInputMode_Multichannel; }
-   
+
    //IAudioSource
    void Process(double time) override;
    void SetEnabled(bool enabled) override { mEnabled = enabled; }
 
    void DropdownUpdated(DropdownList* list, int oldVal) override {}
-   
+
    virtual void LoadLayout(const ofxJSONElement& moduleInfo) override;
    virtual void SetUpFromSaveData() override;
-   
+
 private:
    //IDrawableModule
    void DrawModule() override;
-   void GetModuleDimensions(float& width, float& height) override { width = 64; height = 20; }
+   void GetModuleDimensions(float& width, float& height) override
+   {
+      width = 64;
+      height = 20;
+   }
    bool Enabled() const override { return mEnabled; }
-   
+
    DropdownList* mChannelSelector;
    int mChannelSelectionIndex;
    int mStereoSelectionOffset;

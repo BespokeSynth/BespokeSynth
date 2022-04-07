@@ -27,9 +27,9 @@
 
 MidiReader::MidiReader()
 : /*mSequencer(nullptr)
-,*/ mBeatOffset(0)
+,*/
+mBeatOffset(0)
 {
-   
 }
 
 MidiReader::~MidiReader()
@@ -37,7 +37,7 @@ MidiReader::~MidiReader()
    //delete mSequencer;
 }
 
-void MidiReader::Read(const char *midiFileName)
+void MidiReader::Read(const char* midiFileName)
 {
    /*MIDITimedBigMessage event;
    int eventTrack = 0;
@@ -76,7 +76,7 @@ float MidiReader::GetTempo(double ms)
       mSequencer->GoToTimeMs(ms);
       return mSequencer->GetCurrentTempo();
    }*/
-   
+
    return 120;
 }
 
@@ -87,7 +87,7 @@ int MidiReader::GetBeat(double ms)
       mSequencer->GoToTimeMs(ms);
       return mSequencer->GetCurrentBeat();
    }*/
-   
+
    return 0;
 }
 

@@ -38,49 +38,53 @@ class ButterworthFilterEffect : public IAudioEffect, public IDropdownListener, p
 public:
    ButterworthFilterEffect();
    ~ButterworthFilterEffect();
-   
+
    static IAudioEffect* Create() { return new ButterworthFilterEffect(); }
-   
-   
+
+
    void CreateUIControls() override;
-   
+
    void Init() override;
-   
+
    void SetFilterParams(float f, float q) { mButterworth[0].Set(f, q); }
-   
+
    //IAudioEffect
    void ProcessAudio(double time, ChannelBuffer* buffer) override;
    void SetEnabled(bool enabled) override { mEnabled = enabled; }
    float GetEffectAmount() override;
    std::string GetType() override { return "butterworth"; }
-   
+
    void DropdownUpdated(DropdownList* list, int oldVal) override;
    void CheckboxUpdated(Checkbox* checkbox) override;
    void FloatSliderUpdated(FloatSlider* slider, float oldVal) override;
-   
+
    void LoadLayout(const ofxJSONElement& info) override;
    void SetUpFromSaveData() override;
    void SaveLayout(ofxJSONElement& info) override;
-   
+
 private:
    //IDrawableModule
-   void GetModuleDimensions(float& width, float& height) override { width = mWidth; height = mHeight; }
+   void GetModuleDimensions(float& width, float& height) override
+   {
+      width = mWidth;
+      height = mHeight;
+   }
    void DrawModule() override;
    bool Enabled() const override { return mEnabled; }
-   
+
    void ResetFilter();
-   
+
    float mF;
    FloatSlider* mFSlider;
    float mQ;
    FloatSlider* mQSlider;
-   
+
    float mWidth;
    float mHeight;
-   
+
    CFilterButterworth24db mButterworth[ChannelBuffer::kMaxNumChannels];
    ChannelBuffer mDryBuffer;
-   
+
    bool mCoefficientsHaveChanged;
 };
 

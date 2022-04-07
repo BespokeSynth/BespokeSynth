@@ -46,17 +46,17 @@ public:
    ~ModuleSaveDataPanel();
    static IDrawableModule* Create() { return new ModuleSaveDataPanel(); }
    static bool CanCreate() { return TheSaveDataPanel == nullptr; }
-   
+
    std::string GetTitleLabel() const override { return ""; }
    bool AlwaysOnTop() override { return true; }
    bool CanMinimize() override { return false; }
    bool IsSingleton() const override { return true; }
-   
+
    void SetModule(IDrawableModule* module);
    IDrawableModule* GetModule() { return mSaveModule; }
    void UpdatePosition();
    void ReloadSaveData();
-   
+
    void CheckboxUpdated(Checkbox* checkbox) override;
    void FloatSliderUpdated(FloatSlider* slider, float oldVal) override;
    void IntSliderUpdated(IntSlider* slider, int oldVal) override;
@@ -64,18 +64,18 @@ public:
    void DropdownClicked(DropdownList* list) override;
    void DropdownUpdated(DropdownList* list, int oldVal) override;
    void ButtonClicked(ClickButton* button) override;
-   
+
    bool IsSaveable() override { return false; }
-   
+
 private:
    void ApplyChanges();
    void FillDropdownList(DropdownList* list, ModuleSaveData::SaveVal* save);
-   
+
    //IDrawableModule
    void DrawModule() override;
    bool Enabled() const override { return true; }
    void GetModuleDimensions(float& width, float& height) override;
-   
+
    IDrawableModule* mSaveModule;
    std::vector<IUIControl*> mSaveDataControls;
    std::vector<std::string> mLabels;
@@ -83,7 +83,7 @@ private:
    ClickButton* mDeleteButton;
    Checkbox* mDrawDebugCheckbox;
    ClickButton* mResetSequencerButton;
-   std::map<DropdownList*,ModuleSaveData::SaveVal*> mStringDropdowns;
+   std::map<DropdownList*, ModuleSaveData::SaveVal*> mStringDropdowns;
 
    int mHeight;
    float mAppearAmount;

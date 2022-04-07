@@ -56,10 +56,11 @@ public:
    static void SetActiveKeyboardFocus(IKeyboardFocusListener* focus) { sCurrentKeyboardFocus = focus; }
    static IKeyboardFocusListener* GetActiveKeyboardFocus() { return sCurrentKeyboardFocus; }
    static void ClearActiveKeyboardFocus(bool notifyListeners);
-   
+
    virtual void OnKeyPressed(int key, bool isRepeat) = 0;
 
    static IKeyboardFocusListener* sKeyboardFocusBeforeClick;
+
 private:
    virtual void AcceptEntry(bool pressedEnter) {}
    virtual void CancelEntry() {}
@@ -76,7 +77,7 @@ public:
    void OnKeyPressed(int key, bool isRepeat) override;
    void Render() override;
    void Delete() override;
-   
+
    void MakeActiveTextEntry(bool setCaretToEnd);
    void RemoveSelectedText();
    void SetNextTextEntry(TextEntry* entry);
@@ -89,7 +90,7 @@ public:
    const char* GetText() const { return mString; }
    TextEntryType GetTextEntryType() const { return mType; }
    void SetText(std::string text);
-   
+
    void GetDimensions(float& width, float& height) override;
 
    //IUIControl
@@ -106,13 +107,13 @@ public:
    bool IsSliderControl() override { return false; }
    bool IsButtonControl() override { return false; }
    bool IsTextEntry() const override { return true; }
-   
+
 protected:
-   ~TextEntry();   //protected so that it can't be created on the stack
-   
+   ~TextEntry(); //protected so that it can't be created on the stack
+
 private:
-   void Construct(ITextEntryListener* owner, const char* name, int x, int y, int charWidth);  //shared constructor
-   
+   void Construct(ITextEntryListener* owner, const char* name, int x, int y, int charWidth); //shared constructor
+
    void AddCharacter(char c);
    bool AllowCharacter(char c);
    void AcceptEntry(bool pressedEnter) override;
@@ -120,7 +121,7 @@ private:
    void MoveCaret(int pos, bool allowSelection = true);
    void OnClicked(int x, int y, bool right) override;
    bool MouseMoved(float x, float y) override;
-   
+
    int mCharWidth;
    ITextEntryListener* mListener;
    char mString[MAX_TEXTENTRY_LENGTH];

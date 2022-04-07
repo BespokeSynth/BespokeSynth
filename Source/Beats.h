@@ -47,10 +47,12 @@ class Beats;
 
 struct BeatData
 {
-   BeatData() : mBeat(nullptr) {}
+   BeatData()
+   : mBeat(nullptr)
+   {}
    void LoadBeat(Sample* sample);
    void RecalcPos(double time, bool doubleTime, int numBars);
-   
+
    Sample* mBeat;
 };
 
@@ -66,9 +68,9 @@ public:
    int GetNumSamples() { return (int)mSamples.size(); }
    void SaveState(FileStreamOut& out);
    void LoadState(FileStreamIn& in);
-   
+
    void RadioButtonUpdated(RadioButton* list, int oldVal);
-   
+
 private:
    RadioButton* mSelector;
    int mSampleIndex;
@@ -78,8 +80,8 @@ private:
    int mIndex;
    float mFilter;
    FloatSlider* mFilterSlider;
-   std::array<BiquadFilter,2> mLowpass;
-   std::array<BiquadFilter,2> mHighpass;
+   std::array<BiquadFilter, 2> mLowpass;
+   std::array<BiquadFilter, 2> mHighpass;
    Beats* mOwner;
    Ramp mFilterRamp;
    bool mDoubleTime;
@@ -97,21 +99,21 @@ public:
    Beats();
    virtual ~Beats();
    static IDrawableModule* Create() { return new Beats(); }
-   
-   
+
+
    void CreateUIControls() override;
-   
+
    void Init() override;
-   
+
    //IAudioSource
    void Process(double time) override;
    void SetEnabled(bool enabled) override { mEnabled = enabled; }
-   
+
    //IDrawableModule
    void FilesDropped(std::vector<std::string> files, int x, int y) override;
    void SampleDropped(int x, int y, Sample* sample) override;
    bool CanDropSample() const override { return true; }
-   
+
    void CheckboxUpdated(Checkbox* checkbox) override;
    void FloatSliderUpdated(FloatSlider* slider, float oldVal) override;
    void IntSliderUpdated(IntSlider* slider, int oldVal) override;
@@ -119,26 +121,25 @@ public:
    void DropdownUpdated(DropdownList* list, int oldVal) override;
    void ButtonClicked(ClickButton* button) override;
    void RadioButtonUpdated(RadioButton* list, int oldVal) override;
-   
+
    //ITimeListener
    void OnTimeEvent(double time) override;
-   
+
    void LoadLayout(const ofxJSONElement& moduleInfo) override;
    void SaveLayout(ofxJSONElement& moduleInfo) override;
    void SetUpFromSaveData() override;
    void SaveState(FileStreamOut& out) override;
    void LoadState(FileStreamIn& in) override;
-   
+
 private:
    //IDrawableModule
    void DrawModule() override;
    bool Enabled() const override { return mEnabled; }
    void GetModuleDimensions(float& width, float& height) override;
-   
+
    ChannelBuffer mWriteBuffer;
    std::array<BeatColumn*, 4> mBeatColumns;
    int mRows;
 };
 
 #endif /* defined(__modularSynth__Beats__) */
-

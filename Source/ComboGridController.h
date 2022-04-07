@@ -34,12 +34,12 @@ public:
    ComboGridController();
    ~ComboGridController() {}
    static IDrawableModule* Create() { return new ComboGridController(); }
-   
-   
+
+
    void CreateUIControls() override;
-   
+
    void Init() override;
-   
+
    void SetGridControllerOwner(IGridControllerListener* owner) override { mOwner = owner; }
    void SetLight(int x, int y, GridColor color, bool force = false) override;
    void SetLightDirect(int x, int y, int color, bool force = false) override;
@@ -48,7 +48,7 @@ public:
    int NumRows() override { return mRows; }
    bool HasInput() const override;
    bool IsConnected() const override { return true; }
-   
+
    void SetTarget(IClickable* target);
 
    void OnControllerPageSelected() override {}

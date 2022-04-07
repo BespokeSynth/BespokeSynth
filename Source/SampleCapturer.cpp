@@ -35,11 +35,11 @@
 #include "juce_gui_basics/juce_gui_basics.h"
 
 SampleCapturer::SampleCapturer()
-   : IAudioProcessor(gBufferSize)
-   , mCurrentSampleIndex(0)
-   , mWantRecord(false)
-   , mIsRecording(false)
-   , mIsDragging(false)
+: IAudioProcessor(gBufferSize)
+, mCurrentSampleIndex(0)
+, mWantRecord(false)
+, mIsRecording(false)
+, mIsDragging(false)
 {
 }
 
@@ -263,7 +263,6 @@ bool SampleCapturer::MouseMoved(float x, float y)
 
    if (mIsDragging)
    {
-
    }
 
    return false;

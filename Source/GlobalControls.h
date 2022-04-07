@@ -38,7 +38,7 @@ public:
    virtual ~GlobalControls();
    static IDrawableModule* Create() { return new GlobalControls(); }
 
-   
+
    void CreateUIControls() override;
    void Poll() override;
 

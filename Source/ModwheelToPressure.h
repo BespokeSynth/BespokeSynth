@@ -36,19 +36,24 @@ public:
    ModwheelToPressure();
    virtual ~ModwheelToPressure();
    static IDrawableModule* Create() { return new ModwheelToPressure(); }
-   
-   
+
+
    void SetEnabled(bool enabled) override { mEnabled = enabled; }
-   
+
    //INoteReceiver
    void PlayNote(double time, int pitch, int velocity, int voiceIdx = -1, ModulationParameters modulation = ModulationParameters()) override;
-   
+
    void LoadLayout(const ofxJSONElement& moduleInfo) override;
    void SetUpFromSaveData() override;
+
 private:
    //IDrawableModule
    void DrawModule() override;
-   void GetModuleDimensions(float& width, float& height) override { width = 120; height = 0; }
+   void GetModuleDimensions(float& width, float& height) override
+   {
+      width = 120;
+      height = 0;
+   }
    bool Enabled() const override { return mEnabled; }
 };
 

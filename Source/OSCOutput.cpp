@@ -35,11 +35,11 @@ OSCOutput::OSCOutput()
 , mOscOutPort(7000)
 , mNoteOutLabel("note")
 {
-   for (int i=0; i<OSC_OUTPUT_MAX_PARAMS; ++i)
+   for (int i = 0; i < OSC_OUTPUT_MAX_PARAMS; ++i)
    {
       mParams[i] = 0;
       mLabels[i] = new char[MAX_TEXTENTRY_LENGTH];
-      strcpy(mLabels[i], ("slider"+ofToString(i)).c_str());
+      strcpy(mLabels[i], ("slider" + ofToString(i)).c_str());
    }
 }
 
@@ -50,19 +50,21 @@ OSCOutput::~OSCOutput()
 void OSCOutput::Init()
 {
    IDrawableModule::Init();
-   
+
    mOscOut.connect(mOscOutAddress, mOscOutPort);
 }
 
 void OSCOutput::CreateUIControls()
 {
    IDrawableModule::CreateUIControls();
-   
+
    UIBLOCK0();
-   TEXTENTRY(mOscOutAddressEntry, "osc out address", 16, &mOscOutAddress); UIBLOCK_SHIFTRIGHT();
-   TEXTENTRY_NUM(mOscOutPortEntry, "osc out port", 6, &mOscOutPort, 0, 99999); UIBLOCK_NEWLINE();
+   TEXTENTRY(mOscOutAddressEntry, "osc out address", 16, &mOscOutAddress);
+   UIBLOCK_SHIFTRIGHT();
+   TEXTENTRY_NUM(mOscOutPortEntry, "osc out port", 6, &mOscOutPort, 0, 99999);
+   UIBLOCK_NEWLINE();
    UIBLOCK_SHIFTY(5);
-   for (int i=0; i<8; ++i)
+   for (int i = 0; i < 8; ++i)
    {
       TextEntry* labelEntry;
       TEXTENTRY(labelEntry, ("label" + ofToString(i)).c_str(), 10, mLabels[i]);
@@ -93,7 +95,7 @@ void OSCOutput::DrawModule()
 
    mOscOutAddressEntry->Draw();
    mOscOutPortEntry->Draw();
-   
+
    for (auto* entry : mLabelEntry)
       entry->Draw();
    for (auto* slider : mSliders)
@@ -106,7 +108,7 @@ void OSCOutput::PlayNote(double time, int pitch, int velocity, int voiceIdx, Mod
 {
    if (mNoteOutLabel.size() > 0)
    {
-      juce::OSCMessage msg(("/bespoke/"+mNoteOutLabel).c_str());
+      juce::OSCMessage msg(("/bespoke/" + mNoteOutLabel).c_str());
       float pitchOut = pitch;
       if (modulation.pitchBend != nullptr)
          pitchOut += modulation.pitchBend->GetValue(0);
@@ -156,7 +158,7 @@ void OSCOutput::FloatSliderUpdated(FloatSlider* slider, float oldVal)
 
 void OSCOutput::TextEntryComplete(TextEntry* entry)
 {
-   int i=0;
+   int i = 0;
    for (auto* iter : mLabelEntry)
    {
       if (iter == entry)

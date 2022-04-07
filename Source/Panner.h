@@ -42,30 +42,34 @@ public:
    Panner();
    virtual ~Panner();
    static IDrawableModule* Create() { return new Panner(); }
-   
-   
+
+
    void CreateUIControls() override;
-   
+
    void SetPan(float pan) { mPan = pan; }
-   
+
    //IAudioSource
    void Process(double time) override;
    void SetEnabled(bool enabled) override { mEnabled = enabled; }
-   
+
    void FloatSliderUpdated(FloatSlider* slider, float oldVal) override;
    void IntSliderUpdated(IntSlider* slider, int oldVal) override;
    void ButtonClicked(ClickButton* button) override;
    void CheckboxUpdated(Checkbox* checkbox) override;
-   
+
    virtual void LoadLayout(const ofxJSONElement& moduleInfo) override;
    virtual void SetUpFromSaveData() override;
-   
+
 private:
    //IDrawableModule
    void DrawModule() override;
-   void GetModuleDimensions(float& w, float& h) override { w=120; h=40; }
+   void GetModuleDimensions(float& w, float& h) override
+   {
+      w = 120;
+      h = 40;
+   }
    bool Enabled() const override { return mEnabled; }
-   
+
    float mPan;
    Ramp mPanRamp;
    FloatSlider* mPanSlider;
@@ -73,4 +77,3 @@ private:
    FloatSlider* mWidenSlider;
    RollingBuffer mWidenerBuffer;
 };
-

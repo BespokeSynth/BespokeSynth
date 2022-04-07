@@ -75,29 +75,29 @@ public:
    //IDrivableSequencer
    bool HasExternalPulseSource() const override { return mHasExternalPulseSource; }
    void ResetExternalPulseSource() override { mHasExternalPulseSource = false; }
-   
+
    void CheckboxUpdated(Checkbox* checkbox) override {}
    void IntSliderUpdated(IntSlider* slider, int oldVal) override;
    void DropdownUpdated(DropdownList* list, int oldVal) override;
    void ButtonClicked(ClickButton* button) override;
-   
+
    void LoadLayout(const ofxJSONElement& moduleInfo) override;
    void SaveLayout(ofxJSONElement& moduleInfo) override;
    bool LoadOldControl(FileStreamIn& in, std::string& oldName) override;
    void SetUpFromSaveData() override;
-   
+
    void SaveState(FileStreamOut& out) override;
    void LoadState(FileStreamIn& in) override;
-   
+
    static std::list<ControlSequencer*> sControlSequencers;
-   
+
    //IPatchable
    void PostRepatch(PatchCableSource* cableSource, bool fromUserClick) override;
-   
+
 private:
    void Step(double time, int pulseFlags);
    void SetGridSize(float w, float h);
-   
+
    //IDrawableModule
    void DrawModule() override;
    bool Enabled() const override { return mEnabled; }
@@ -105,7 +105,7 @@ private:
    void OnClicked(int x, int y, bool right) override;
    bool MouseMoved(float x, float y) override;
    void MouseReleased() override;
-   
+
    UIGrid* mGrid{ nullptr };
    IUIControl* mUIControl{ nullptr };
    NoteInterval mInterval{ kInterval_16n };

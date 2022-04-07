@@ -41,7 +41,7 @@ ControlTactileFeedback::ControlTactileFeedback()
 void ControlTactileFeedback::CreateUIControls()
 {
    IDrawableModule::CreateUIControls();
-   mVolumeSlider = new FloatSlider(this,"vol",5,43,70,15,&mVolume,0,1);
+   mVolumeSlider = new FloatSlider(this, "vol", 5, 43, 70, 15, &mVolume, 0, 1);
 }
 
 ControlTactileFeedback::~ControlTactileFeedback()
@@ -55,26 +55,29 @@ void ControlTactileFeedback::Process(double time)
    IAudioReceiver* target = GetTarget();
    if (!mEnabled || target == nullptr)
       return;
-   
+
    int bufferSize = target->GetBuffer()->BufferSize();
    float* out = target->GetBuffer()->GetChannel(0);
    assert(bufferSize == gBufferSize);
-   
-   for (int i=0; i<bufferSize; ++i)
+
+   for (int i = 0; i < bufferSize; ++i)
    {
-      float sample = (mPhase/FTWO_PI * 2 - 1) * gControlTactileFeedback * mVolume;
+      float sample = (mPhase / FTWO_PI * 2 - 1) * gControlTactileFeedback * mVolume;
       out[i] += sample;
       GetVizBuffer()->Write(sample, 0);
-      
+
       mPhase += mPhaseInc;
-      while (mPhase > FTWO_PI) { mPhase -= FTWO_PI; }
-      
+      while (mPhase > FTWO_PI)
+      {
+         mPhase -= FTWO_PI;
+      }
+
       const float decayTime = .005f;
-      float decay = powf( 0.5f, 1.0f/(decayTime * gSampleRate));
+      float decay = powf(0.5f, 1.0f / (decayTime * gSampleRate));
       gControlTactileFeedback *= decay;
       if (gControlTactileFeedback <= FLT_EPSILON)
          gControlTactileFeedback = 0;
-      
+
       time += gInvSampleRateMs;
    }
 }
@@ -84,7 +87,7 @@ void ControlTactileFeedback::DrawModule()
 
    if (Minimized() || IsVisible() == false)
       return;
-   
+
    mVolumeSlider->Draw();
 }
 
@@ -100,4 +103,3 @@ void ControlTactileFeedback::SetUpFromSaveData()
 {
    SetTarget(TheSynth->FindModule(mModuleSaveData.GetString("target")));
 }
-

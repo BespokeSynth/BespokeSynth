@@ -41,17 +41,17 @@ PulseButton::~PulseButton()
 void PulseButton::CreateUIControls()
 {
    IDrawableModule::CreateUIControls();
-   
+
    UIBLOCK0();
-   BUTTON(mButton,"pulse");
-   ENDUIBLOCK(mWidth,mHeight);
+   BUTTON(mButton, "pulse");
+   ENDUIBLOCK(mWidth, mHeight);
 }
 
 void PulseButton::DrawModule()
 {
    if (Minimized() || IsVisible() == false)
       return;
-   
+
    mButton->Draw();
 }
 
@@ -70,7 +70,7 @@ void PulseButton::LoadLayout(const ofxJSONElement& moduleInfo)
 {
    mModuleSaveData.LoadString("target", moduleInfo);
    mModuleSaveData.LoadBool("force_immediate", moduleInfo);
-   
+
    SetUpFromSaveData();
 }
 

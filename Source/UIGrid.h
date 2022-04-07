@@ -43,7 +43,10 @@ public:
 
 struct GridCell
 {
-   GridCell(int col, int row) : mCol(col), mRow(row) {}
+   GridCell(int col, int row)
+   : mCol(col)
+   , mRow(row)
+   {}
    int mCol;
    int mRow;
 };
@@ -75,16 +78,20 @@ public:
    int CurrentHover() { return mCurrentHover; }
    void SetListener(UIGridListener* listener) { mListener = listener; }
    void SetDrawOffset(int row, float amount) { mDrawOffset[row] = amount; }
-   void SetDimensions(float width, float height) { mWidth = width; mHeight = height; }
+   void SetDimensions(float width, float height)
+   {
+      mWidth = width;
+      mHeight = height;
+   }
    float GetWidth() const { return mWidth; }
    float GetHeight() const { return mHeight; }
    void SetRestrictDragToRow(bool set) { mRestrictDragToRow = set; }
    void SetRequireShiftForMultislider(bool set) { mRequireShiftForMultislider = set; }
    void SetShouldDrawValue(bool draw) { mShouldDrawValue = draw; }
    void SetMomentary(bool momentary) { mMomentary = momentary; }
-   const std::array<float, MAX_GRID_SIZE*MAX_GRID_SIZE>& GetData() const { return mData; }
-   void SetData(std::array<float, MAX_GRID_SIZE*MAX_GRID_SIZE>& data) { mData = data; }
-   
+   const std::array<float, MAX_GRID_SIZE * MAX_GRID_SIZE>& GetData() const { return mData; }
+   void SetData(std::array<float, MAX_GRID_SIZE * MAX_GRID_SIZE>& data) { mData = data; }
+
    enum GridMode
    {
       kNormal,
@@ -93,7 +100,7 @@ public:
       kMultisliderBipolar
    };
    void SetGridMode(GridMode mode) { mGridMode = mode; }
-   
+
    GridCell GetGridCellAt(float x, float y, float* clickHeight = nullptr, float* clickWidth = nullptr);
    ofVec2f GetCellPosition(int col, int row);
 
@@ -102,17 +109,21 @@ public:
    void SetValue(float value) override {}
    bool IsSliderControl() override { return false; }
    bool IsButtonControl() override { return false; }
-   
+
    void SaveState(FileStreamOut& out) override;
    void LoadState(FileStreamIn& in, bool shouldSetValue = true) override;
-   
+
 protected:
-   ~UIGrid();   //protected so that it can't be created on the stack
-   
+   ~UIGrid(); //protected so that it can't be created on the stack
+
 private:
    void OnClicked(int x, int y, bool right) override;
-   void GetDimensions(float& width, float& height) override { width = mWidth; height = mHeight; }
-   
+   void GetDimensions(float& width, float& height) override
+   {
+      width = mWidth;
+      height = mHeight;
+   }
+
    int GetDataIndex(int col, int row) { return col + row * MAX_GRID_SIZE; }
    float GetX(int col, int row) const;
    float GetY(int row) const;
@@ -120,11 +131,14 @@ private:
 
    struct HighlightColBuffer
    {
-      HighlightColBuffer() : time(0), col(-1) {}
+      HighlightColBuffer()
+      : time(0)
+      , col(-1)
+      {}
       double time;
       int col;
    };
-   
+
    float mWidth;
    float mHeight;
    int mRows;
@@ -134,7 +148,7 @@ private:
    int mHoldCol;
    int mHoldRow;
    bool mLastClickWasClear;
-   std::array<float, MAX_GRID_SIZE*MAX_GRID_SIZE> mData;
+   std::array<float, MAX_GRID_SIZE * MAX_GRID_SIZE> mData;
    std::array<HighlightColBuffer, 10> mHighlightColBuffer;
    int mNextHighlightColPointer;
    int mMajorCol;

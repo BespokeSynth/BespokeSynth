@@ -43,7 +43,7 @@ KeyboardDisplay::KeyboardDisplay()
 , mTypingInput(false)
 , mLatch(false)
 , mShowScale(false)
-{   
+{
    for (int i = 0; i < 128; ++i)
    {
       mLastOnTime[i] = 0;
@@ -60,14 +60,14 @@ void KeyboardDisplay::DrawModule()
 {
    if (Minimized() || IsVisible() == false)
       return;
-   
-   DrawKeyboard(0,kKeyboardYOffset,mWidth,mHeight-kKeyboardYOffset);
+
+   DrawKeyboard(0, kKeyboardYOffset, mWidth, mHeight - kKeyboardYOffset);
 }
 
 void KeyboardDisplay::PlayNote(double time, int pitch, int velocity, int voiceIdx, ModulationParameters modulation)
 {
    PlayNoteOutput(time, pitch, velocity, voiceIdx, modulation);
-   
+
    if (pitch >= 0 && pitch < 128)
    {
       if (velocity > 0)
@@ -84,24 +84,24 @@ void KeyboardDisplay::PlayNote(double time, int pitch, int velocity, int voiceId
 
 void KeyboardDisplay::OnClicked(int x, int y, bool right)
 {
-   IDrawableModule::OnClicked(x,y,right);
+   IDrawableModule::OnClicked(x, y, right);
 
    if (IsHoveringOverResizeHandle())
       return;
-   
+
    double time = gTime + gBufferSizeMs;
-   for (int i=0; i<NumKeys(); ++i)
+   for (int i = 0; i < NumKeys(); ++i)
    {
-      for (int pass=0; pass<2; ++pass)
+      for (int pass = 0; pass < 2; ++pass)
       {
-         for (int i=0;i<NumKeys();++i)
+         for (int i = 0; i < NumKeys(); ++i)
          {
             bool isBlackKey;
-            if (GetKeyboardKeyRect(i+RootKey(), mWidth, mHeight - kKeyboardYOffset, isBlackKey).contains(x,y - kKeyboardYOffset))
+            if (GetKeyboardKeyRect(i + RootKey(), mWidth, mHeight - kKeyboardYOffset, isBlackKey).contains(x, y - kKeyboardYOffset))
             {
                if ((pass == 0 && isBlackKey) || (pass == 1 && !isBlackKey))
                {
-                  int pitch = i+RootKey();
+                  int pitch = i + RootKey();
                   if (mPlayingMousePitch == -1 || !mLatch)
                   {
                      PlayNote(time, pitch, 127);
@@ -174,26 +174,26 @@ void KeyboardDisplay::DrawKeyboard(int x, int y, int w, int h)
    ofPushStyle();
    ofPushMatrix();
    ofTranslate(x, y);
-   
-   for (int pass=0; pass<2; ++pass)
+
+   for (int pass = 0; pass < 2; ++pass)
    {
-      for (int i=0;i<NumKeys();++i)
+      for (int i = 0; i < NumKeys(); ++i)
       {
          bool isBlackKey;
          ofRectangle key = GetKeyboardKeyRect(i + RootKey(), w, h, isBlackKey);
-         
+
          if ((pass == 0 && !isBlackKey) || (pass == 1 && isBlackKey))
          {
             SetPitchColor(i);
             ofFill();
             ofRect(key);
-            ofSetColor(0,0,0);
+            ofSetColor(0, 0, 0);
             ofNoFill();
             ofRect(key);
          }
       }
    }
-   
+
    ofPushStyle();
    ofFill();
    ofSetLineWidth(2);
@@ -204,15 +204,15 @@ void KeyboardDisplay::DrawKeyboard(int x, int y, int w, int h)
          bool isBlackKey;
          ofRectangle key = GetKeyboardKeyRect(pitch, w, h, isBlackKey);
          key.height /= 3;
-         key.y += key.height*2;
-         
-         ofSetColor(255,255,255,ofLerp(255, 150, ofClamp((gTime - mLastOnTime[pitch]) / 150.0f, 0, 1)));
-         
+         key.y += key.height * 2;
+
+         ofSetColor(255, 255, 255, ofLerp(255, 150, ofClamp((gTime - mLastOnTime[pitch]) / 150.0f, 0, 1)));
+
          ofRect(key);
       }
    }
    ofPopStyle();
-   
+
    ofPopMatrix();
    ofPopStyle();
 }
@@ -221,30 +221,30 @@ ofRectangle KeyboardDisplay::GetKeyboardKeyRect(int pitch, int w, int h, bool& i
 {
    float extraKeyWidth = w / (mNumOctaves * 7 + 1);
    float octaveWidth = (w - extraKeyWidth) / mNumOctaves;
-   
+
    pitch -= RootKey();
-   
-   float offset = pitch/TheScale->GetPitchesPerOctave() * (octaveWidth);
+
+   float offset = pitch / TheScale->GetPitchesPerOctave() * (octaveWidth);
    pitch %= 12;
-   
-   if ((pitch<=4&&pitch%2==0) || (pitch>=5&&pitch%2==1)) //white key
+
+   if ((pitch <= 4 && pitch % 2 == 0) || (pitch >= 5 && pitch % 2 == 1)) //white key
    {
-      int whiteKey = (pitch+1)/2;
+      int whiteKey = (pitch + 1) / 2;
       isBlackKey = false;
-      return ofRectangle(offset+whiteKey*octaveWidth/7,0,octaveWidth/7,h);
+      return ofRectangle(offset + whiteKey * octaveWidth / 7, 0, octaveWidth / 7, h);
    }
    else //black key
    {
-      int blackKey = pitch/2;
+      int blackKey = pitch / 2;
       isBlackKey = true;
-      return ofRectangle(offset+blackKey*octaveWidth/7+octaveWidth/16+octaveWidth/7*.1f,0,octaveWidth/7*.8f,h/2);
+      return ofRectangle(offset + blackKey * octaveWidth / 7 + octaveWidth / 16 + octaveWidth / 7 * .1f, 0, octaveWidth / 7 * .8f, h / 2);
    }
 }
 
 int KeyboardDisplay::GetPitchForTypingKey(int key) const
 {
    int index = -1;
-   
+
    if (key == 'a')
       index = 0;
    if (key == 'w')
@@ -279,16 +279,16 @@ int KeyboardDisplay::GetPitchForTypingKey(int key) const
       index = 15;
    if (key == ';')
       index = 16;
-   
+
    if (index != -1)
-      return mRootOctave*12+index;
+      return mRootOctave * 12 + index;
    return -1;
 }
 
 void KeyboardDisplay::KeyPressed(int key, bool isRepeat)
 {
    IDrawableModule::KeyPressed(key, isRepeat);
-   
+
    if (mTypingInput && mEnabled && !isRepeat)
    {
       double time = gTime + gBufferSizeMs;
@@ -317,7 +317,7 @@ void KeyboardDisplay::LoadLayout(const ofxJSONElement& moduleInfo)
    mModuleSaveData.LoadBool("typing_control", moduleInfo, false);
    mModuleSaveData.LoadBool("latch", moduleInfo, false);
    mModuleSaveData.LoadBool("show_scale", moduleInfo, false);
-   
+
    SetUpFromSaveData();
 }
 
@@ -339,9 +339,9 @@ namespace
 void KeyboardDisplay::SaveState(FileStreamOut& out)
 {
    IDrawableModule::SaveState(out);
-   
+
    out << kSaveStateRev;
-   
+
    out << mWidth;
    out << mHeight;
 }
@@ -349,16 +349,14 @@ void KeyboardDisplay::SaveState(FileStreamOut& out)
 void KeyboardDisplay::LoadState(FileStreamIn& in)
 {
    IDrawableModule::LoadState(in);
-   
+
    if (!ModuleContainer::DoesModuleHaveMoreSaveData(in))
-      return;  //this was saved before we added versioning, bail out
-   
+      return; //this was saved before we added versioning, bail out
+
    int rev;
    in >> rev;
    LoadStateValidate(rev == kSaveStateRev);
-   
+
    in >> mWidth;
    in >> mHeight;
 }
-
-
