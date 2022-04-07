@@ -33,76 +33,76 @@
 
 namespace bespoke::core
 {
-    namespace detail
-    {
-        template<class T>
-        constexpr size_t BitSizeOf()
-        {
-            return sizeof(T) * CHAR_BIT;
-        }
+   namespace detail
+   {
+      template <class T>
+      constexpr size_t BitSizeOf()
+      {
+         return sizeof(T) * CHAR_BIT;
+      }
 
-        constexpr std::uint64_t splitmix64(std::uint64_t& x)
-        {
-            std::uint64_t z = (x += 0x9e3779b97f4a7c15uLL);
-            z = (z ^ (z >> 30)) * 0xbf58476d1ce4e5b9uLL;
-            z = (z ^ (z >> 27)) * 0x94d049bb133111ebuLL;
-            return z ^ (z >> 31);
-        }
+      constexpr std::uint64_t splitmix64(std::uint64_t& x)
+      {
+         std::uint64_t z = (x += 0x9e3779b97f4a7c15uLL);
+         z = (z ^ (z >> 30)) * 0xbf58476d1ce4e5b9uLL;
+         z = (z ^ (z >> 27)) * 0x94d049bb133111ebuLL;
+         return z ^ (z >> 31);
+      }
 
-        constexpr std::uint64_t rotl(std::uint64_t x, int k)
-        {
-            return (x << k) | (x >> (BitSizeOf<std::uint64_t>() - k));
-        }
+      constexpr std::uint64_t rotl(std::uint64_t x, int k)
+      {
+         return (x << k) | (x >> (BitSizeOf<std::uint64_t>() - k));
+      }
 
-        /**
-         * Xoshiro256** as a C++ Random Number Engine.
-         * There's no fancy standardese concept name (Trust me, I checked), unfortunately..
-         */
-        struct Xoshiro256ss
-        {
-            using result_type = std::uint64_t;
+      /**
+       * Xoshiro256** as a C++ Random Number Engine.
+       * There's no fancy standardese concept name (Trust me, I checked), unfortunately..
+       */
+      struct Xoshiro256ss
+      {
+         using result_type = std::uint64_t;
 
-            std::uint64_t s[4]{};
+         std::uint64_t s[4]{};
 
-            constexpr explicit Xoshiro256ss() : Xoshiro256ss(0)
-            {
+         constexpr explicit Xoshiro256ss()
+         : Xoshiro256ss(0)
+         {
+         }
 
-            }
+         constexpr explicit Xoshiro256ss(std::uint64_t seed)
+         {
+            s[0] = splitmix64(seed);
+            s[1] = splitmix64(seed);
+            s[2] = splitmix64(seed);
+            s[3] = splitmix64(seed);
+         }
 
-            constexpr explicit Xoshiro256ss(std::uint64_t seed)
-            {
-                s[0] = splitmix64(seed);
-                s[1] = splitmix64(seed);
-                s[2] = splitmix64(seed);
-                s[3] = splitmix64(seed);
-            }
+         static constexpr result_type min()
+         {
+            return 0;
+         }
 
-            static constexpr result_type min()
-            {
-                return 0;
-            }
+         static constexpr result_type max()
+         {
+            return std::uint64_t(-1);
+         }
 
-            static constexpr result_type max()
-            {
-                return std::uint64_t(-1);
-            }
+         constexpr result_type operator()()
+         {
+            result_type result = rotl(s[1] * 5, 7) * 9;
+            result_type t = s[1] << 17;
+            s[2] ^= s[0];
+            s[3] ^= s[1];
+            s[1] ^= s[2];
+            s[0] ^= s[3];
+            s[2] ^= t;
+            s[3] = rotl(s[3], 45);
+            return result;
+         }
+      };
+   }
 
-            constexpr result_type operator()()
-            {
-                result_type result = rotl(s[1] * 5, 7) * 9;
-                result_type t = s[1] << 17;
-                s[2] ^= s[0];
-                s[3] ^= s[1];
-                s[1] ^= s[2];
-                s[0] ^= s[3];
-                s[2] ^= t;
-                s[3] = rotl(s[3], 45);
-                return result;
-            }
-        };
-    }
-
-    using detail::Xoshiro256ss;
+   using detail::Xoshiro256ss;
 }
 
 #endif //BESPOKESYNTH_XORSHIRO256SS_H
