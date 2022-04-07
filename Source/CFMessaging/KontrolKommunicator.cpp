@@ -57,17 +57,17 @@ void KontrolKommunicator::CreateListener(const char* portName)
 
 void KontrolKommunicator::OutputRawData2(const uint8_t* data, size_t length)
 {
-   for (int i=0; i<length; ++i)
+   for (int i = 0; i < length; ++i)
    {
       std::cout << ofToString(data[i]);
-      if (i%4 == 3)
+      if (i % 4 == 3)
          std::cout << " ";
    }
    std::cout << "\n";
-   for (int i=0; i<length; ++i)
+   for (int i = 0; i < length; ++i)
    {
       std::cout << FormatString("%02x ", data[i]);
-      if (i%4 == 3)
+      if (i % 4 == 3)
          std::cout << " ";
    }
    std::cout << "\n";
@@ -76,11 +76,11 @@ void KontrolKommunicator::OutputRawData2(const uint8_t* data, size_t length)
 CFDataRef KontrolKommunicator::OnMessageReceived(std::string portname, SInt32 msgid, CFDataRef data)
 {
    vm_address_t vmData;
-   vm_allocate(mach_task_self(),  &vmData, (vm_size_t)vm_page_size, TRUE);
+   vm_allocate(mach_task_self(), &vmData, (vm_size_t)vm_page_size, TRUE);
    char* dataBuffer = (char*)vmData;
    size_t length = CFDataGetLength(data);
    CFDataGetBytes(data, CFRangeMake(0, length), (uint8_t*)dataBuffer);
-   
+
    if (mListener)
    {
       switch (msgid)
@@ -88,35 +88,39 @@ CFDataRef KontrolKommunicator::OnMessageReceived(std::string portname, SInt32 ms
          case 0x03734e00: //NIButtonPressedMessage
          {
             mListener->OnKontrolButton((int)(((uint8_t*)dataBuffer)[16]), (bool)(((uint8_t*)dataBuffer)[20]));
-         }break;
+         }
+         break;
          case 0x03654e00: //NIWheelsChangedMessage
          {
-            mListener->OnKontrolEncoder((int)(((uint8_t*)dataBuffer)[16]), (float)((((int32_t*)dataBuffer)[5])/1000000000.0f));
-         }break;
+            mListener->OnKontrolEncoder((int)(((uint8_t*)dataBuffer)[16]), (float)((((int32_t*)dataBuffer)[5]) / 1000000000.0f));
+         }
+         break;
          case 0x03774e00: //NIBrowseWheelMessage
          {
             mListener->OnKontrolEncoder(8, (float)(((int8_t*)dataBuffer)[20]));
-         }break;
+         }
+         break;
          case 0x03564e66: //NIOctaveChangedMessage
          {
             mListener->OnKontrolOctave((int)(((uint8_t*)dataBuffer)[8]));
-         }break;
+         }
+         break;
       }
    }
-   
+
    mMessageQueueMutex.lock();
-   
+
    Output(portname + " received CF message with length " + ofToString(length) + ":\n");
    uint32_t messageID = *((uint32_t*)dataBuffer);
    Output(FormatString("0x%08x", messageID) + " (" + TypeForMessageID(messageID) + ")\n");
    OutputRawData((uint8_t*)dataBuffer, length);
-   
+
    CFDataRef reply = ProcessIncomingMessage(portname, dataBuffer, length);
-   
+
    mMessageQueueMutex.unlock();
-   
-   vm_deallocate(mach_task_self(),  vmData, (vm_size_t)vm_page_size);
-   
+
+   vm_deallocate(mach_task_self(), vmData, (vm_size_t)vm_page_size);
+
    return reply;
 }
 
@@ -124,25 +128,25 @@ CFDataRef KontrolKommunicator::ProcessIncomingMessage(std::string portName, char
 {
    KDataArray input;
    input.resize(length);
-   for (int i=0; i<length; ++i)
+   for (int i = 0; i < length; ++i)
       input[i] = data[i];
    KDataArray reply = RespondToMessage(portName, input);
    if (!reply.empty())
    {
       vm_address_t vmaddress;
-      vm_allocate(mach_task_self(),  &vmaddress, (vm_size_t)vm_page_size, TRUE);
+      vm_allocate(mach_task_self(), &vmaddress, (vm_size_t)vm_page_size, TRUE);
       memcpy((void*)vmaddress, reply.data(), reply.size());
-      
-      Output("Replying to "+portName+" with length "+ofToString(reply.size())+":\n");
+
+      Output("Replying to " + portName + " with length " + ofToString(reply.size()) + ":\n");
       OutputData(reply);
-      
+
       return CFDataCreateWithBytesNoCopy(kCFAllocatorDefault, (uint8_t*)vmaddress, reply.size(), kCFAllocatorNull);
    }
    else
    {
-      Output("Replying to "+portName+" with:\n[empty]\n");
+      Output("Replying to " + portName + " with:\n[empty]\n");
    }
-   
+
    return NULL;
 }
 
@@ -191,8 +195,8 @@ uint16_t KontrolKommunicator::CharToSegments(char input)
       case '|': return 0x0042;
       case '/': return 0x0024;
       case '-': return 0x0018;
-     case '\\': return 0x0081;
-     case '\'': return 0x0002;
+      case '\\': return 0x0081;
+      case '\'': return 0x0002;
       case '?': return 0x0750;
       case '*': return 0x00ff;
       case '+': return 0x005a;
@@ -206,12 +210,12 @@ uint16_t KontrolKommunicator::CharToSegments(char input)
 KDataArray KontrolKommunicator::LettersToData(std::string input)
 {
    KDataArray data;
-   data.resize(input.length()*2);
-   for (int i=0; i<input.length(); ++i)
+   data.resize(input.length() * 2);
+   for (int i = 0; i < input.length(); ++i)
    {
       uint16_t segments = CharToSegments(input[i]);
-      data[i*2] = *(((uint8_t*)&segments)+1);
-      data[i*2+1] = segments;
+      data[i * 2] = *(((uint8_t*)&segments) + 1);
+      data[i * 2 + 1] = segments;
    }
    return data;
 }
@@ -268,7 +272,7 @@ void KontrolKommunicator::Update()
          QueueMessage(mRequestSerialPort, lights);
       }
    }*/
-   
+
    mMessageQueueMutex.lock();
    if (!mMessageQueue.empty())
    {
@@ -283,41 +287,41 @@ void KontrolKommunicator::SendMessage(std::string portName, KDataArray data)
 {
    if (mSendPorts.find(portName) == mSendPorts.end())
       CreateSender(portName.c_str());
-   
+
    vm_address_t vmaddress;
-   vm_allocate(mach_task_self(),  &vmaddress, (vm_size_t)vm_page_size, TRUE);
+   vm_allocate(mach_task_self(), &vmaddress, (vm_size_t)vm_page_size, TRUE);
    memcpy((void*)vmaddress, data.data(), data.size());
    uint32_t messageID = *((uint32_t*)data.data());
-   
+
    Output("Sending message (" + TypeForMessageID(messageID) + ") to " + portName + " with length " + ofToString(data.size()) + " and contents:\n");
    OutputRawData((uint8_t*)vmaddress, data.size());
-   
+
    CFDataRef reply = NULL;
    mSendPorts[portName].SendData(*((uint32_t*)vmaddress), CFDataCreateWithBytesNoCopy(kCFAllocatorDefault, (uint8_t*)vmaddress, data.size(), kCFAllocatorNull), reply);
-   
+
    if (reply)
    {
-      vm_deallocate(mach_task_self(),  vmaddress, (vm_size_t)vm_page_size);
-      
-      Output("Received reply on "+portName+" with length " + ofToString(CFDataGetLength(reply)) + " and contents:\n");
-      
+      vm_deallocate(mach_task_self(), vmaddress, (vm_size_t)vm_page_size);
+
+      Output("Received reply on " + portName + " with length " + ofToString(CFDataGetLength(reply)) + " and contents:\n");
+
       vm_address_t vmData;
-      vm_allocate(mach_task_self(),  &vmData, (vm_size_t)vm_page_size, TRUE);
+      vm_allocate(mach_task_self(), &vmData, (vm_size_t)vm_page_size, TRUE);
       char* dataBuffer = (char*)vmData;
       int replyLength = (int)CFDataGetLength(reply);
       CFDataGetBytes(reply, CFRangeMake(0, replyLength), (uint8_t*)dataBuffer);
-      
+
       OutputRawData((uint8_t*)vmData, replyLength);
-      
+
       if (DataEquals(data, StringToData(RKEY_MESSAGE)))
       {
          if (mListener)
             mListener->OnKontrolOctave((uint8_t)dataBuffer[0]);
       }
-      
+
       FollowUpToReply(TypeForMessageID(messageID), (uint8_t*)vmData);
-      
-      vm_deallocate(mach_task_self(),  vmData, (vm_size_t)vm_page_size);
+
+      vm_deallocate(mach_task_self(), vmData, (vm_size_t)vm_page_size);
       CFRelease(reply);
    }
 }
@@ -345,7 +349,7 @@ KDataArray KontrolKommunicator::RespondToMessage(std::string portName, KDataArra
 {
    uint32_t messageID = *((uint32_t*)input.data());
    std::string type = TypeForMessageID(messageID);
-   
+
    //fake software responses
    if (portName == mNotificationPort)
    {
@@ -353,9 +357,9 @@ KDataArray KontrolKommunicator::RespondToMessage(std::string portName, KDataArra
       {
          mState = kState_InitializeSerial;
          mSerialNumber = "";
-         for (int i=16; i<input.size(); i+=2)
+         for (int i = 16; i < input.size(); i += 2)
             mSerialNumber += (char)input[i];
-         Output("SERIAL NUMBER:"+mSerialNumber+"\n");
+         Output("SERIAL NUMBER:" + mSerialNumber + "\n");
          QueueMessage("NIHWMainHandler", CreateMessage("NIGetServiceVersionMessage"));
          return KDataArray();
       }
@@ -373,7 +377,7 @@ KDataArray KontrolKommunicator::RespondToMessage(std::string portName, KDataArra
       if (type == "NISetFocusMessage")
       {
          mState = kState_Focused;
-         QueueMessage(mRequestSerialPort, StringToData("54 73 49 02  00 00 00 00"));   //unknown
+         QueueMessage(mRequestSerialPort, StringToData("54 73 49 02  00 00 00 00")); //unknown
          QueueMessage(mRequestSerialPort, StringToData("74 73 49 02  65 75 72 74  ")); //unknown
          QueueMessage(mRequestSerialPort, StringToData("56 73 6b 02  03 00 00 00  ")); //unknown
          QueueMessage(mRequestSerialPort, StringToData("43 73 74 02  00 00 00 00  00 00 00 00  28 00 00 00  06 00 00 00  00 00 ff 3f  00 00 01 00  03 00 00 02  00 00 00 00  03 01 00 00  00 00 7f 00  00 00 00 01  00 00 00 00  00 00 00 00  ")); //unknown
@@ -381,7 +385,7 @@ KDataArray KontrolKommunicator::RespondToMessage(std::string portName, KDataArra
          return KDataArray();
       }
    }
-   
+
    Output("&&& No appropriate reply found.\n");
    return KDataArray();
 }
@@ -404,9 +408,9 @@ void KontrolKommunicator::FollowUpToReply(std::string messageType, uint8_t* repl
    if (messageType == "NIHWSDeviceConnectMessage")
    {
       mRequestPort = (char*)(reply + 8);
-      mNotificationPort = (char*)(reply + 8 + WordAlign((int)mRequestPort.length()) + /*4*/5); // TODO(Ryan) plus 5??? it used to be plus 4.
+      mNotificationPort = (char*)(reply + 8 + WordAlign((int)mRequestPort.length()) + /*4*/ 5); // TODO(Ryan) plus 5??? it used to be plus 4.
       Output("REQUEST PORT:" + mRequestPort + " NOTIFICATION PORT:" + mNotificationPort + "\n");
-      
+
       CreateListener(mNotificationPort.c_str());
       QueueMessage(mRequestPort, CreateMessage("NISetAsciiStringMessage"));
    }
@@ -425,7 +429,7 @@ void KontrolKommunicator::FollowUpToReply(std::string messageType, uint8_t* repl
       mRequestSerialPort = (char*)(reply + 8);
       mNotificationSerialPort = (char*)(reply + 8 + WordAlign((int)mRequestSerialPort.length()) + 4);
       Output("REQUEST SERIAL PORT:" + mRequestSerialPort + " NOTIFICATION SERIAL PORT:" + mNotificationSerialPort + "\n");
-      
+
       CreateListener(mNotificationSerialPort.c_str());
       QueueMessage(mRequestSerialPort, CreateMessage("NISetAsciiStringMessage"));
    }
@@ -435,7 +439,7 @@ KDataArray KontrolKommunicator::CreateMessage(std::string type)
 {
    uint32_t messageID = MessageIDForType(type);
    KDataArray ret(messageID);
-   
+
    //fake software messages
    if (type == "NIGetServiceVersionMessage")
    {
@@ -464,7 +468,7 @@ KDataArray KontrolKommunicator::CreateMessage(std::string type)
    {
       ret += StringToData("50 13 00 00  4b 4b 69 4e  79 6d 72 70  09 00 00 00");
       KDataArray zero = KDataArray((uint8_t)0);
-      for (int i=0; i<mSerialNumber.length(); ++i)
+      for (int i = 0; i < mSerialNumber.length(); ++i)
          ret += KDataArray((uint8_t)mSerialNumber[i]) + zero;
       ret += zero + zero;
    }
@@ -486,7 +490,7 @@ KDataArray KontrolKommunicator::CreateMessage(std::string type)
 void KontrolKommunicator::Output(std::string str)
 {
    return;
-   
+
    std::cout << str;
 }
 
@@ -503,7 +507,7 @@ KDataArray KontrolKommunicator::StringToData(std::string input)
    size_t length = tokens.size();
    KDataArray data;
    data.resize(length);
-   for (int i=0; i<length; ++i)
+   for (int i = 0; i < length; ++i)
       data[i] = ofHexToInt(tokens[i]);
    return data;
 }
@@ -512,7 +516,7 @@ bool KontrolKommunicator::DataEquals(const KDataArray& a, const KDataArray& b)
 {
    if (a.size() != b.size())
       return false;
-   for (int i=0; i<a.size(); ++i)
+   for (int i = 0; i < a.size(); ++i)
    {
       if (a[i] != b[i])
          return false;
@@ -522,21 +526,21 @@ bool KontrolKommunicator::DataEquals(const KDataArray& a, const KDataArray& b)
 
 void KontrolKommunicator::OutputData(const KDataArray& a)
 {
-   for (int i=0; i<a.size(); ++i)
+   for (int i = 0; i < a.size(); ++i)
    {
       Output(ofToString(a[i]));
-      if (i%4 == 3)
+      if (i % 4 == 3)
          Output(" ");
    }
    Output("\n");
-   for (int i=0; i<a.size(); ++i)
+   for (int i = 0; i < a.size(); ++i)
    {
       Output(FormatString("%02x ", a[i]));
-      if (i%4 == 3)
+      if (i % 4 == 3)
          Output(" ");
    }
    Output("\n");
-   for (int i=0; i<a.size(); ++i)
+   for (int i = 0; i < a.size(); ++i)
    {
       char c;
       if (a[i] > 32 && a[i] < 127)
@@ -544,7 +548,7 @@ void KontrolKommunicator::OutputData(const KDataArray& a)
       else
          c = '#';
       Output(FormatString("%c ", c));
-      if (i%4 == 3)
+      if (i % 4 == 3)
          Output(" ");
    }
    Output("\n");
@@ -552,21 +556,21 @@ void KontrolKommunicator::OutputData(const KDataArray& a)
 
 void KontrolKommunicator::OutputRawData(const uint8_t* data, size_t length)
 {
-   for (int i=0; i<length; ++i)
+   for (int i = 0; i < length; ++i)
    {
       Output(ofToString(data[i]));
-      if (i%4 == 3)
+      if (i % 4 == 3)
          Output(" ");
    }
    Output("\n");
-   for (int i=0; i<length; ++i)
+   for (int i = 0; i < length; ++i)
    {
       Output(FormatString("%02x ", data[i]));
-      if (i%4 == 3)
+      if (i % 4 == 3)
          Output(" ");
    }
    Output("\n");
-   for (int i=0; i<length; ++i)
+   for (int i = 0; i < length; ++i)
    {
       char c;
       if (data[i] > 32 && data[i] < 127)
@@ -574,7 +578,7 @@ void KontrolKommunicator::OutputRawData(const uint8_t* data, size_t length)
       else
          c = '#';
       Output(FormatString("%c ", c));
-      if (i%4 == 3)
+      if (i % 4 == 3)
          Output(" ");
    }
    Output("\n");
@@ -583,31 +587,31 @@ void KontrolKommunicator::OutputRawData(const uint8_t* data, size_t length)
 void KontrolKommunicator::SetDisplay(const uint16_t sliders[72], std::string display)
 {
    KDataArray text(MessageIDForType("NIDisplayDrawMessage"));
-   text += StringToData("00 00 00 00  00 00 00 00  03 00 48 00  b0 01 00 00");   //some sort of header
+   text += StringToData("00 00 00 00  00 00 00 00  03 00 48 00  b0 01 00 00"); //some sort of header
    int rowLength = 72;
-   assert(display.length() == rowLength*2);
-   
-   for (int i=0; i<rowLength; ++i)
+   assert(display.length() == rowLength * 2);
+
+   for (int i = 0; i < rowLength; ++i)
       text += (uint16_t)sliders[i];
-   
+
    KDataArray output = LettersToData(display);
    text += output;
-   
+
    SendMessage(mRequestSerialPort, text);
 }
 
 void KontrolKommunicator::SetKeyLights(ofColor keys[61])
 {
    KDataArray lights(MessageIDForType("NISetLedStateMessage"));
-   
+
    lights += StringToData("d0 00 00 00  13 00 00 00  00 00 00 00  00 00 00 13  00 13 00 00  00 00 00 00  00 13 00 13  00"); //some sort of header
-   
-   for (int i=0; i<61; ++i)
+
+   for (int i = 0; i < 61; ++i)
    {
       lights += (uint8_t)keys[i].r;
       lights += (uint8_t)keys[i].g;
       lights += (uint8_t)keys[i].b;
    }
-   
+
    SendMessage(mRequestSerialPort, lights);
 }
