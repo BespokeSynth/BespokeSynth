@@ -195,14 +195,18 @@ jobs:
            set -e
            echo Copying build output from build/Source/BespokeSynth_artefacts/Release to windows_nightly_artefact
            cp -R build/Source/BespokeSynth_artefacts/Release windows_nightly_artefact
-        condition: and(variables.isWindows, ne(variables['Build.Reason'], 'PullRequest', ne(variables['cmakeTarget'], "code-quality-pipeline-checks"))
+        condition: and(variables.isWindows,
+                       ne(variables['Build.Reason'], 'PullRequest'),
+                       ne(variables['cmakeTarget'], "code-quality-pipeline-checks"))
         displayName: win - copy win artifact
 
       - powershell: |
           echo Compressing build output from windows_nightly_artefact to build/nightly
           mkdir build/nightly
           Compress-Archive -Path windows_nightly_artefact/* -DestinationPath build/nightly/BespokeSynth-Windows.zip
-        condition: and(variables.isWindows, ne(variables['Build.Reason'], 'PullRequest', ne(variables['cmakeTarget'], "code-quality-pipeline-checks"))
+        condition: and(variables.isWindows,
+                       ne(variables['Build.Reason'], 'PullRequest'),
+                       ne(variables['cmakeTarget'], "code-quality-pipeline-checks"))
         displayName: win - compress win artifact
 
       - bash: |
@@ -210,7 +214,9 @@ jobs:
            echo Compressing build output from build/Source/BespokeSynth_artefacts/Release to build/nightly
            mkdir build/nightly
            tar -cvzf build/nightly/BespokeSynth-Linux.tar.gz build/Source/BespokeSynth_artefacts/Release
-        condition: and(variables.isLinux, ne(variables['Build.Reason'], 'PullRequest'), ne(variables['cmakeTarget'], "code-quality-pipeline-checks"))
+        condition: and(variables.isLinux,
+                       ne(variables['Build.Reason'], 'PullRequest'),
+                       ne(variables['cmakeTarget'], "code-quality-pipeline-checks"))
         displayName: lin - compress lin artifact
         
       - bash: |
@@ -234,21 +240,27 @@ jobs:
         inputs:
           artifactName: 'INSTALLER_MAC_NIGHTLY'
           targetPath: 'build/nightly'
-        condition: and(variables.isMac, ne(variables['Build.Reason'], 'PullRequest'), ne(variables['cmakeTarget'], "code-quality-pipeline-checks")
+        condition: and(variables.isMac,
+                       ne(variables['Build.Reason'], 'PullRequest'),
+                       ne(variables['cmakeTarget'], "code-quality-pipeline-checks"))
         displayName: mac - publish mac artifact
 
       - task: PublishPipelineArtifact@0
         inputs:
           artifactName: 'INSTALLER_WIN_NIGHTLY'
           targetPath: 'build/nightly'
-        condition: and(variables.isWindows, ne(variables['Build.Reason'], 'PullRequest'), ne(variables['cmakeTarget'], "code-quality-pipeline-checks")
+        condition: and(variables.isWindows,
+                       ne(variables['Build.Reason'], 'PullRequest'),
+                       ne(variables['cmakeTarget'], "code-quality-pipeline-checks"))
         displayName: win - publish win artifact
 
       - task: PublishPipelineArtifact@0
         inputs:
           artifactName: 'INSTALLER_LIN_NIGHTLY'
           targetPath: 'build/nightly'
-        condition: and(variables.isLinux, ne(variables['Build.Reason'], 'PullRequest'), ne(variables['cmakeTarget'], "code-quality-pipeline-checks")
+        condition: and(variables.isLinux,
+                       ne(variables['Build.Reason'], 'PullRequest'),
+                       ne(variables['cmakeTarget'], "code-quality-pipeline-checks"))
         displayName: lin - publish lin artifact
 
 
