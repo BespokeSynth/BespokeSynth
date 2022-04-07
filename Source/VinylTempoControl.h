@@ -30,7 +30,8 @@
 #include "IDrawableModule.h"
 #include "IAudioProcessor.h"
 #include "IModulator.h"
-extern "C" {
+extern "C"
+{
 #include "xwax/timecoder.h"
 }
 
