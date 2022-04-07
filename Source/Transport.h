@@ -74,7 +74,8 @@ struct OffsetInfo
 {
    OffsetInfo(double offset, bool offsetIsInMs)
    : mOffset(offset)
-   , mOffsetIsInMs(offsetIsInMs) {}
+   , mOffsetIsInMs(offsetIsInMs)
+   {}
    double mOffset;
    bool mOffsetIsInMs;
 };
@@ -86,7 +87,8 @@ struct TransportListenerInfo
    , mInterval(interval)
    , mOffsetInfo(offsetInfo)
    , mUseEventLookahead(useEventLookahead)
-   , mCustomDivisor(8) {}
+   , mCustomDivisor(8)
+   {}
 
    ITimeListener* mListener;
    NoteInterval mInterval;

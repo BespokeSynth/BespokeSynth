@@ -206,7 +206,8 @@ private:
       struct Playhead
       {
          Playhead()
-         : mStartTime(-1) {}
+         : mStartTime(-1)
+         {}
          double mStartTime;
          double mCutOffTime;
          double mOffset;

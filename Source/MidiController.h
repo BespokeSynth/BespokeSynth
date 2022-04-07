@@ -239,7 +239,8 @@ struct ControlLayoutElement
    ControlLayoutElement()
    : mActive(false)
    , mControlCable(nullptr)
-   , mConnectionType(kControlType_Slider) {}
+   , mConnectionType(kControlType_Slider)
+   {}
    void Setup(MidiController* owner, MidiMessageType type, int control, ControlDrawType drawType, float incrementAmount, int offVal, int onVal, bool scaleOutput, ControlType connectionType, float x, float y, float w, float h);
 
    bool mActive;

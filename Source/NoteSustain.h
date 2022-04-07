@@ -73,7 +73,8 @@ private:
       QueuedNoteOff(double time, double pitch, double voiceIdx)
       : mTime(time)
       , mPitch(pitch)
-      , mVoiceIdx(voiceIdx) {}
+      , mVoiceIdx(voiceIdx)
+      {}
       double mTime;
       int mPitch;
       int mVoiceIdx;

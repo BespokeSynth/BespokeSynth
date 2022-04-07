@@ -36,7 +36,8 @@ class EnvOscillator
 public:
    EnvOscillator(OscillatorType type)
    : mOsc(type)
-   , mPulseWidth(.5f) {}
+   , mPulseWidth(.5f)
+   {}
 
    void SetType(OscillatorType type) { mOsc.SetType(type); }
    void SetADSR(float a, float d, float s, float r) { mAdsr.Set(a, d, s, r); }

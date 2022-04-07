@@ -48,7 +48,8 @@ class Beats;
 struct BeatData
 {
    BeatData()
-   : mBeat(nullptr) {}
+   : mBeat(nullptr)
+   {}
    void LoadBeat(Sample* sample);
    void RecalcPos(double time, bool doubleTime, int numBars);
 

@@ -3,6 +3,7 @@ BasedOnStyle: WebKit
 AccessModifierOffset: -3
 AlignAfterOpenBracket: Align
 AlignOperands: true
+AllowAllConstructorInitializersOnNextLine: false
 AllowShortCaseLabelsOnASingleLine: true
 AllowShortIfStatementsOnASingleLine: false
 AllowShortLoopsOnASingleLine: false
@@ -19,9 +20,9 @@ BraceWrapping:
   BeforeCatch: true
   BeforeElse: true
   BeforeLambdaBody: true
+  SplitEmptyFunction: false
 BreakBeforeBinaryOperators: None
 BreakBeforeBraces: Custom
-PackConstructorInitializers: CurrentLine
 ConstructorInitializerIndentWidth: 0
 ContinuationIndentWidth: 0
 IndentCaseLabels: true

@@ -37,7 +37,8 @@ public:
    : mType(type)
    , mPulseWidth(.5f)
    , mShuffle(0)
-   , mSoften(0) {}
+   , mSoften(0)
+   {}
 
    OscillatorType GetType() const { return mType; }
    void SetType(OscillatorType type) { mType = type; }

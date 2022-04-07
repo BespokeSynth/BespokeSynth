@@ -95,7 +95,8 @@ private:
       : mPhase(0)
       , mSyncPhase(0)
       , mOsc(kOsc_Square)
-      , mDetuneFactor(0) {}
+      , mDetuneFactor(0)
+      {}
       float mPhase;
       float mSyncPhase;
       Oscillator mOsc;

@@ -124,7 +124,8 @@ private:
    struct UndoBufferEntry
    {
       UndoBufferEntry()
-      : mCaretPos(0) {}
+      : mCaretPos(0)
+      {}
       std::string mString;
       int mCaretPos;
    };

@@ -38,7 +38,8 @@ public:
    };
 
    IAudioReceiver(int bufferSize)
-   : mInputBuffer(bufferSize) {}
+   : mInputBuffer(bufferSize)
+   {}
    virtual ~IAudioReceiver() {}
    virtual ChannelBuffer* GetBuffer() { return &mInputBuffer; }
    virtual InputMode GetInputMode() { return kInputMode_Multichannel; }

@@ -77,13 +77,15 @@ private:
       ProgressionChord(int degree, int beatLength = -1)
       : mDegree(degree)
       , mBeatLength(beatLength)
-      , mInversion(0) {}
+      , mInversion(0)
+      {}
 
       ProgressionChord(int degree, std::vector<Accidental> accidentals, int beatLength = -1)
       : mDegree(degree)
       , mAccidentals(accidentals)
       , mBeatLength(beatLength)
-      , mInversion(0) {}
+      , mInversion(0)
+      {}
 
       ProgressionChord(const ofxJSONElement& chordInfo, ScalePitches scale);
 

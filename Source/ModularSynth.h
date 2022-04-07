@@ -314,7 +314,8 @@ private:
       , mPan(0, 0)
       , mUsingTwist(false)
       , mUsingZoom(false)
-      , mUsingPan(false) {}
+      , mUsingPan(false)
+      {}
       float mTwist;
       float mZoom;
       ofVec2f mPan;
@@ -343,7 +344,8 @@ private:
       LogEventItem(double _time, std::string _text, LogEventType _type)
       : time(_time)
       , text(_text)
-      , type(_type) {}
+      , type(_type)
+      {}
       double time;
       std::string text;
       LogEventType type;

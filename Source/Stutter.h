@@ -51,12 +51,14 @@ struct StutterParams
    : interval(_interval)
    , speedStart(_speed)
    , speedEnd(_speed)
-   , speedBlendTime(0) {}
+   , speedBlendTime(0)
+   {}
    StutterParams(NoteInterval _interval, float _speedStart, float _speedEnd, float _speedBlendTime)
    : interval(_interval)
    , speedStart(_speedStart)
    , speedEnd(_speedEnd)
-   , speedBlendTime(_speedBlendTime) {}
+   , speedBlendTime(_speedBlendTime)
+   {}
    bool operator==(const StutterParams& other) const
    {
       return interval == other.interval &&

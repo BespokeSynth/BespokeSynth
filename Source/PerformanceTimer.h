@@ -53,7 +53,8 @@ private:
    {
       Cost(std::string name, long cost)
       : mName(name)
-      , mCost(cost) {}
+      , mCost(cost)
+      {}
       std::string mName;
       long mCost;
    };

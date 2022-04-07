@@ -47,7 +47,8 @@ struct Chord
    Chord(int pitch, ChordType type, int inversion = 0)
    : mRootPitch(pitch)
    , mType(type)
-   , mInversion(inversion) {}
+   , mInversion(inversion)
+   {}
 
    int mRootPitch;
    ChordType mType;

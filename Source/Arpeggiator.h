@@ -99,7 +99,8 @@ private:
       : pitch(_pitch)
       , vel(_vel)
       , voiceIdx(_voiceIdx)
-      , modulation(_modulation) {}
+      , modulation(_modulation)
+      {}
       int pitch;
       int vel;
       int voiceIdx;

@@ -52,7 +52,8 @@ struct CanvasCoord
 {
    CanvasCoord(int _col, int _row)
    : col(_col)
-   , row(_row) {}
+   , row(_row)
+   {}
    int col;
    int row;
 };

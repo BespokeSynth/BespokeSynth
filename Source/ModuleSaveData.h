@@ -95,7 +95,8 @@ public:
       , mMin(0)
       , mMax(10)
       , mIsTextField(false)
-      , mFillDropdownFn(nullptr) {}
+      , mFillDropdownFn(nullptr)
+      {}
 
       std::string mProperty;
       Type mType;

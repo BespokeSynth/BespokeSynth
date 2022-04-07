@@ -58,7 +58,8 @@ private:
       NoteInfo()
       : mOn(false)
       , mVelocity(0)
-      , mVoiceIdx(-1) {}
+      , mVoiceIdx(-1)
+      {}
       bool mOn;
       int mVelocity;
       int mVoiceIdx;

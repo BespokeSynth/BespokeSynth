@@ -143,7 +143,8 @@ class UnknownModuleException : public std::exception
 {
 public:
    UnknownModuleException(std::string searchName)
-   : mSearchName(searchName) {}
+   : mSearchName(searchName)
+   {}
    ~UnknownModuleException() throw() {}
    std::string mSearchName;
 };
@@ -268,10 +269,12 @@ struct Vec2i
 {
    Vec2i()
    : x(0)
-   , y(0) {}
+   , y(0)
+   {}
    Vec2i(int _x, int _y)
    : x(_x)
-   , y(_y) {}
+   , y(_y)
+   {}
    int x;
    int y;
 };
@@ -280,7 +283,8 @@ class ofLog
 {
 public:
    ofLog()
-   : mSendToBespokeConsole(true) {}
+   : mSendToBespokeConsole(true)
+   {}
    ~ofLog();
 
    template <class T>

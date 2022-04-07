@@ -74,7 +74,8 @@ private:
    {
       TextBox()
       : slider(false)
-      , amount(0) {}
+      , amount(0)
+      {}
       bool slider;
       float amount;
       std::string line1;

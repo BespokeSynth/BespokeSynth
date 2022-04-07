@@ -111,7 +111,8 @@ private:
       LightInfo()
       : mValue(0)
       , mLastUpdatedTime(0)
-      , mLastSentTime(0) {}
+      , mLastSentTime(0)
+      {}
       float mValue;
       double mLastUpdatedTime;
       double mLastSentTime;

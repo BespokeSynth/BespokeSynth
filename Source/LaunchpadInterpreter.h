@@ -39,7 +39,8 @@ struct LightUpdate
    , mY(y)
    , mR(r)
    , mG(g)
-   , mIntensity(intensity) {}
+   , mIntensity(intensity)
+   {}
    int mX;
    int mY;
    char mR;

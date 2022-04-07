@@ -35,7 +35,8 @@ public:
    : mPeak(0)
    , mDecayTime(.01f)
    , mLimit(-1)
-   , mHitLimitTime(-9999) {}
+   , mHitLimitTime(-9999)
+   {}
 
    void Process(float* buffer, int bufferSize);
    float GetPeak() const { return mPeak; }

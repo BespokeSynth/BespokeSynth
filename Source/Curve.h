@@ -38,7 +38,8 @@ public:
    CurvePoint() {}
    CurvePoint(float time, float value)
    : mTime(time)
-   , mValue(value) {}
+   , mValue(value)
+   {}
    float mTime;
    float mValue;
 };

@@ -48,7 +48,8 @@ public:
    IUIControl()
    : mRemoteControlCount(0)
    , mNoHover(false)
-   , mShouldSaveState(true) {}
+   , mShouldSaveState(true)
+   {}
    virtual void Delete() { delete this; }
    void AddRemoteController() { ++mRemoteControlCount; }
    void RemoveRemoteController() { --mRemoteControlCount; }

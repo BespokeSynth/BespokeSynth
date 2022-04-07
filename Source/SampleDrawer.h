@@ -40,7 +40,8 @@ public:
    , mX(0)
    , mY(0)
    , mWidth(1)
-   , mHeight(1) {}
+   , mHeight(1)
+   {}
    void SetSample(Sample* sample) { mSample = sample; }
    void SetPosition(float x, float y)
    {

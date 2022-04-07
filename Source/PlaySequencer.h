@@ -138,7 +138,8 @@ private:
       PlayLane()
       : mInputVelocity(0)
       , mIsPlaying(false)
-      , mMuteOrErase(false) {}
+      , mMuteOrErase(false)
+      {}
       int mInputVelocity;
       bool mIsPlaying;
       Checkbox* mMuteOrEraseCheckbox;
@@ -151,7 +152,8 @@ private:
    {
       SavedPattern()
       : mNumMeasures(1)
-      , mHasSequence(false) {}
+      , mHasSequence(false)
+      {}
       ClickButton* mStoreButton;
       ClickButton* mLoadButton;
       float mNumMeasures;

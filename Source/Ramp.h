@@ -33,7 +33,8 @@ class Ramp
 {
 public:
    Ramp()
-   : mRampDataPointer(0) {}
+   : mRampDataPointer(0)
+   {}
    void Start(double curTime, float end, double endTime);
    void Start(double curTime, float start, float end, double endTime);
    void SetValue(float val);
@@ -48,7 +49,8 @@ private:
       : mStartTime(-1)
       , mStartValue(0)
       , mEndValue(1)
-      , mEndTime(-1) {}
+      , mEndTime(-1)
+      {}
       double mStartTime;
       float mStartValue;
       float mEndValue;

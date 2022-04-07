@@ -36,7 +36,8 @@ class IMidiVoice
 public:
    IMidiVoice()
    : mPitch(0)
-   , mPan(0) {}
+   , mPan(0)
+   {}
    virtual ~IMidiVoice() {}
    virtual void ClearVoice() = 0;
    void SetPitch(float pitch) { mPitch = ofClamp(pitch, 0, 127); }

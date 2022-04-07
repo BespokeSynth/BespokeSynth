@@ -40,7 +40,8 @@ class NoteOutput : public INoteReceiver
 public:
    explicit NoteOutput(INoteSource* source)
    : mNoteSource(source)
-   , mStackDepth(0) {}
+   , mStackDepth(0)
+   {}
 
    void Flush(double time);
    void FlushTarget(double time, INoteReceiver* target);
@@ -70,7 +71,8 @@ class INoteSource : public virtual IPatchable
 public:
    INoteSource()
    : mNoteOutput(this)
-   , mInNoteOutput(false) {}
+   , mInNoteOutput(false)
+   {}
    virtual ~INoteSource() {}
    void PlayNoteOutput(double time, int pitch, int velocity, int voiceIdx = -1, ModulationParameters modulation = ModulationParameters());
    void SendCCOutput(int control, int value, int voiceIdx = -1);

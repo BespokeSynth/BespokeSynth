@@ -37,7 +37,8 @@ struct MatchingScale
 {
    MatchingScale(int root, std::string type)
    : mRoot(root)
-   , mType(type) {}
+   , mType(type)
+   {}
    int mRoot;
    std::string mType;
 };

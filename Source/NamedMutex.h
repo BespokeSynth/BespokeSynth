@@ -33,7 +33,8 @@ class NamedMutex
 public:
    NamedMutex()
    : mLocker("<none>")
-   , mExtraLockCount(0) {}
+   , mExtraLockCount(0)
+   {}
    void Lock(std::string locker);
    void Unlock();
 

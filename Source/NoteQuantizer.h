@@ -70,7 +70,8 @@ private:
       : velocity(0)
       , voiceIdx(-1)
       , held(false)
-      , hasPlayedYet(false) {}
+      , hasPlayedYet(false)
+      {}
       int velocity;
       int voiceIdx;
       bool held;

@@ -79,7 +79,8 @@ private:
    {
       Node(const T& val)
       : value(val)
-      , next(nullptr) {}
+      , next(nullptr)
+      {}
 
       T value;
       Node* next;

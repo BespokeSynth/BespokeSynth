@@ -70,7 +70,8 @@ private:
    struct PlayedStep
    {
       PlayedStep()
-      : time(-1) {}
+      : time(-1)
+      {}
       int step;
       double time;
    };

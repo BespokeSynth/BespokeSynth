@@ -45,7 +45,8 @@ struct GridCell
 {
    GridCell(int col, int row)
    : mCol(col)
-   , mRow(row) {}
+   , mRow(row)
+   {}
    int mCol;
    int mRow;
 };
@@ -132,7 +133,8 @@ private:
    {
       HighlightColBuffer()
       : time(0)
-      , col(-1) {}
+      , col(-1)
+      {}
       double time;
       int col;
    };

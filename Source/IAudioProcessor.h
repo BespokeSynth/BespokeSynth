@@ -34,7 +34,8 @@ class IAudioProcessor : public IAudioReceiver, public IAudioSource
 {
 public:
    IAudioProcessor(int bufferSize)
-   : IAudioReceiver(bufferSize) {}
+   : IAudioReceiver(bufferSize)
+   {}
 
 protected:
    void SyncBuffers(int overrideNumOutputChannels = -1);

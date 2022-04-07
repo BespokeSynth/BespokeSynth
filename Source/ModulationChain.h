@@ -72,7 +72,8 @@ struct ModulationParameters
    : pitchBend(_pitchBend)
    , modWheel(_modWheel)
    , pressure(_pressure)
-   , pan(_pan) {}
+   , pan(_pan)
+   {}
    ModulationChain* pitchBend = nullptr;
    ModulationChain* modWheel = nullptr;
    ModulationChain* pressure = nullptr;

@@ -877,6 +877,7 @@ add_custom_command(TARGET code-quality-pipeline-checks
   POST_BUILD
   WORKING_DIRECTORY ${CMAKE_SOURCE_DIR}
   COMMAND ${CMAKE_COMMAND} -E echo About to check clang-format
+  COMMAND ${CMAKE_COMMAND} -E clang-format --version
   COMMAND git ls-files -- ${CLANG_FORMAT_GLOBS} | xargs clang-format --dry-run --Werror
   )
 # }}}

@@ -52,7 +52,8 @@ struct VoiceInfo
 {
    VoiceInfo()
    : mPitch(-1)
-   , mNoteOn(false) {}
+   , mNoteOn(false)
+   {}
 
    float mPitch;
    IMidiVoice* mVoice;

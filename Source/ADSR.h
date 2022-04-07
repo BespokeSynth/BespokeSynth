@@ -43,7 +43,8 @@ public:
       Stage()
       : target(0)
       , time(1)
-      , curve(0) {}
+      , curve(0)
+      {}
       float target;
       float time;
       float curve;
@@ -53,9 +54,13 @@ public:
    : mNextEventPointer(0)
    , mMaxSustain(-1)
    , mFreeReleaseLevel(false)
-   , mTimeScale(1) { Set(a, d, s, r); }
+   , mTimeScale(1)
+   {
+      Set(a, d, s, r);
+   }
    ADSR()
-   : ADSR(1, 1, 1, 1) {}
+   : ADSR(1, 1, 1, 1)
+   {}
    void Start(double time, float target, float timeScale = 1);
    void Start(double time, float target, float a, float d, float s, float r, float timeScale = 1);
    void Start(double time, float target, const ADSR& adsr, float timeScale = 1);

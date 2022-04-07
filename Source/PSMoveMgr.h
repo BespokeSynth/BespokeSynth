@@ -18,7 +18,8 @@ class PSMoveMgr
 {
 public:
    PSMoveMgr()
-   : mListener(NULL) {}
+   : mListener(NULL)
+   {}
 
    void Setup();
    void Update();

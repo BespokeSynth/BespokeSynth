@@ -47,7 +47,8 @@ struct Accidental
 {
    Accidental(int pitch, int direction)
    : mPitch(pitch)
-   , mDirection(direction) {}
+   , mDirection(direction)
+   {}
    int mPitch;
    int mDirection;
 };
@@ -146,7 +147,8 @@ private:
       ScaleInfo() {}
       ScaleInfo(std::string name, std::vector<int> pitches)
       : mName(name)
-      , mPitches(pitches) {}
+      , mPitches(pitches)
+      {}
       std::string mName;
       std::vector<int> mPitches;
    };

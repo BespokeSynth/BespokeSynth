@@ -55,7 +55,8 @@ struct NoteHistoryEvent
 {
    NoteHistoryEvent()
    : mOn(false)
-   , mTime(0) {}
+   , mTime(0)
+   {}
    bool mOn;
    double mTime;
 };

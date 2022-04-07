@@ -18,17 +18,20 @@ extern NVGcontext* gFontBoundsNanoVG;
 struct ofColor
 {
    ofColor()
-   : ofColor(255, 255, 255) {}
+   : ofColor(255, 255, 255)
+   {}
    ofColor(int _r, int _g, int _b)
    : r(_r)
    , g(_g)
    , b(_b)
-   , a(255) {}
+   , a(255)
+   {}
    ofColor(int _r, int _g, int _b, int _a)
    : r(_r)
    , g(_g)
    , b(_b)
-   , a(_a) {}
+   , a(_a)
+   {}
    void set(int _r, int _g, int _b, int _a = 255)
    {
       r = _r;
@@ -62,10 +65,12 @@ struct ofVec2f
 {
    ofVec2f()
    : x(0)
-   , y(0) {}
+   , y(0)
+   {}
    ofVec2f(float _x, float _y)
    : x(_x)
-   , y(_y) {}
+   , y(_y)
+   {}
    void set(float _x, float _y)
    {
       x = _x;
@@ -124,11 +129,13 @@ struct ofVec3f
    ofVec3f()
    : x(0)
    , y(0)
-   , z(0) {}
+   , z(0)
+   {}
    ofVec3f(float _x, float _y, float _z)
    : x(_x)
    , y(_y)
-   , z(_z) {}
+   , z(_z)
+   {}
    float length() const
    {
       return sqrt(x * x + y * y + z * z);
@@ -144,7 +151,8 @@ struct ofRectangle
    : x(0)
    , y(0)
    , width(100)
-   , height(100) {}
+   , height(100)
+   {}
    ofRectangle(float _x, float _y, float _w, float _h)
    : x(_x)
    , y(_y)
@@ -223,7 +231,8 @@ class RetinaTrueTypeFont
 {
 public:
    RetinaTrueTypeFont()
-   : mLoaded(false) {}
+   : mLoaded(false)
+   {}
    void LoadFont(std::string path);
    void DrawString(std::string str, float size, float x, float y);
    ofRectangle DrawStringWrap(std::string str, float size, float x, float y, float width);

@@ -99,7 +99,8 @@ private:
       Blok(float startTime, float duration, float confidence)
       : mStartTime(startTime)
       , mDuration(duration)
-      , mConfidence(confidence) {}
+      , mConfidence(confidence)
+      {}
       float mStartTime;
       float mDuration;
       float mConfidence;

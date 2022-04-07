@@ -1946,7 +1946,8 @@ void ModularSynth::FilesDropped(std::vector<std::string> files, int intX, int in
 struct SourceDepInfo
 {
    SourceDepInfo(IAudioSource* me)
-   : mMe(me) {}
+   : mMe(me)
+   {}
    IAudioSource* mMe;
    std::vector<IAudioSource*> mDeps;
 };

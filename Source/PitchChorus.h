@@ -74,7 +74,8 @@ private:
       PitchShifterVoice()
       : mShifter(1024)
       , mOn(false)
-      , mPitch(-1) {}
+      , mPitch(-1)
+      {}
       PitchShifter mShifter;
       bool mOn;
       Ramp mRamp;
