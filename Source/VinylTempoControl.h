@@ -30,10 +30,12 @@
 #include "IDrawableModule.h"
 #include "IAudioProcessor.h"
 #include "IModulator.h"
+// clang-format off
 extern "C"
 {
 #include "xwax/timecoder.h"
 }
+// clang-format on
 
 class VinylProcessor
 {
