@@ -26,7 +26,6 @@ BreakBeforeBraces: Custom
 ConstructorInitializerIndentWidth: 0
 ContinuationIndentWidth: 0
 IndentCaseLabels: true
-IndentAccessModifiers: false
 IndentWidth: 3
 MaxEmptyLinesToKeep: 2
 NamespaceIndentation: All
