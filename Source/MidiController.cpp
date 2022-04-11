@@ -336,6 +336,7 @@ void MidiController::OnTransportAdvanced(float amount)
    mQueuedMessageMutex.lock();
 
    double firstNoteTimestampMs = -1;
+   double lastPlayTime = -1;
    for (auto note = mQueuedNotes.begin(); note != mQueuedNotes.end(); ++note)
    {
       int voiceIdx = -1;
@@ -354,7 +355,10 @@ void MidiController::OnTransportAdvanced(float amount)
       else
       {
          playTime = gTime + (note->mTimestampMs - firstNoteTimestampMs);
+         if (playTime <= lastPlayTime)
+            playTime += .01; //hack to handle note on/off in the same frame
       }
+      lastPlayTime = playTime;
       PlayNoteOutput(playTime, note->mPitch + mNoteOffset, MIN(127, note->mVelocity * mVelocityMult), voiceIdx, ModulationParameters(mModulation.GetPitchBend(voiceIdx), mModulation.GetModWheel(voiceIdx), mModulation.GetPressure(voiceIdx), 0));
 
       for (auto i = mListeners[mControllerPage].begin(); i != mListeners[mControllerPage].end(); ++i)
