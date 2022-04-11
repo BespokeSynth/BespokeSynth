@@ -152,7 +152,7 @@ void OscController::oscMessageReceived(const juce::OSCMessage& msg)
          note.mVelocity = 0;
       else
          note.mVelocity = msg[1 + offset].getFloat32() * 127;
-      ofLog() << "OSCNote: P: " << note.mPitch << " V: " << note.mVelocity << "" << note.mChannel;
+      //ofLog() << "OSCNote: P: " << note.mPitch << " V: " << note.mVelocity << " ch:" << note.mChannel;
       if (mListener != nullptr)
          mListener->OnMidiNote(note);
       return;
