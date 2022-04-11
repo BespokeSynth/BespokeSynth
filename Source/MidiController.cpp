@@ -356,7 +356,7 @@ void MidiController::OnTransportAdvanced(float amount)
       {
          playTime = gTime + (note->mTimestampMs - firstNoteTimestampMs);
          if (playTime <= lastPlayTime)
-            playTime += .01f; //hack to handle note on/off in the same frame
+            playTime += .01; //hack to handle note on/off in the same frame
       }
       lastPlayTime = playTime;
       PlayNoteOutput(playTime, note->mPitch + mNoteOffset, MIN(127, note->mVelocity * mVelocityMult), voiceIdx, ModulationParameters(mModulation.GetPitchBend(voiceIdx), mModulation.GetModWheel(voiceIdx), mModulation.GetPressure(voiceIdx), 0));
