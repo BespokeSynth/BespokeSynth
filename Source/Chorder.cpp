@@ -43,7 +43,7 @@ Chorder::Chorder()
 {
    std::memset(mHeldCount, 0, TOTAL_NUM_NOTES * sizeof(int));
    std::memset(mInputNotes, 0, TOTAL_NUM_NOTES * sizeof(bool));
-  
+
    TheScale->AddListener(this);
 }
 
