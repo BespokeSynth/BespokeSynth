@@ -43,6 +43,7 @@ Chorder::Chorder()
 {
    std::memset(mHeldCount, 0, TOTAL_NUM_NOTES * sizeof(int));
    std::memset(mInputNotes, 0, TOTAL_NUM_NOTES * sizeof(bool));
+
    TheScale->AddListener(this);
 }
 
@@ -56,6 +57,7 @@ void Chorder::CreateUIControls()
    IDrawableModule::CreateUIControls();
 
    mChordGrid = new UIGrid("uigrid", 2, 2, 130, 50, mDiatonic ? TheScale->NumTonesInScale() : TheScale->GetPitchesPerOctave(), 3, this);
+
    mChordGrid->SetVal(0, 1, 1);
    mChordGrid->SetListener(this);
 
@@ -234,7 +236,9 @@ void Chorder::PlayNote(double time, int pitch, int velocity, int voiceIdx, Modul
       mVelocity = velocity;
 
    int idx = 0;
-   for (int row = 0; row < mChordGrid->GetRows(); ++row)
+   // iterate rows from bottom to top to go from lowest to highest note
+   // for compatibility with arpeggiator and strummer
+   for (int row = mChordGrid->GetRows() - 1; row >= 0; --row)
    {
       for (int col = 0; col < mChordGrid->GetCols(); ++col)
       {
