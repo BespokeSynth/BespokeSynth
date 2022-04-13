@@ -24,12 +24,13 @@
 // Based on the C version by David Blackman and Sebastiano Vigna (2018),
 // https://prng.di.unimi.it/xoshiro256starstar.c
 
-#ifndef BESPOKESYNTH_XORSHIRO256SS_H
-#define BESPOKESYNTH_XORSHIRO256SS_H
+#ifndef BESPOKESYNTH_XOSHIRO256SS_H
+#define BESPOKESYNTH_XOSHIRO256SS_H
 
 #include <cstddef>
 #include <cstdint>
 #include <climits> // CHAR_BIT
+#include <random>
 
 namespace bespoke::core
 {
@@ -41,7 +42,7 @@ namespace bespoke::core
          return sizeof(T) * CHAR_BIT;
       }
 
-      constexpr std::uint64_t splitmix64(std::uint64_t& x)
+      constexpr std::uint64_t splitmix64(std::uint64_t x)
       {
          std::uint64_t z = (x += 0x9e3779b97f4a7c15uLL);
          z = (z ^ (z >> 30)) * 0xbf58476d1ce4e5b9uLL;
@@ -55,8 +56,8 @@ namespace bespoke::core
       }
 
       /**
-       * Xoshiro256** as a C++ Random Number Engine.
-       * There's no fancy standardese concept name (Trust me, I checked), unfortunately..
+       * Xoshiro256** as a C++ RandomNumberEngine,
+       * which can be used in C++ random algorithms.
        */
       struct Xoshiro256ss
       {
@@ -75,6 +76,32 @@ namespace bespoke::core
             s[1] = splitmix64(seed);
             s[2] = splitmix64(seed);
             s[3] = splitmix64(seed);
+         }
+
+         /**
+          * Constructor for seeding from a `std::random_device`.
+          *
+          * \param[in] rd Random device to seed this engine with.
+          */
+         constexpr explicit Xoshiro256ss(std::random_device& rd)
+         {
+            // Get 64 bits out of the random device.
+            //
+            // This lambda is quite literal, as it fetches
+            // 2 iterations of the random engine, and
+            // shifts + OR's them into a 64bit value.
+            auto get_u64 = [&rd]
+            {
+               std::uint64_t the_thing = rd();
+               return (the_thing << 32) | rd();
+            };
+
+            // seed with 256 bits of entropy from the random device + splitmix64
+            // to ensure we seed it well, as per recommendation.
+            s[0] = splitmix64(get_u64());
+            s[1] = splitmix64(get_u64());
+            s[2] = splitmix64(get_u64());
+            s[3] = splitmix64(get_u64());
          }
 
          static constexpr result_type min()
@@ -105,4 +132,4 @@ namespace bespoke::core
    using detail::Xoshiro256ss;
 }
 
-#endif //BESPOKESYNTH_XORSHIRO256SS_H
+#endif //BESPOKESYNTH_XOSHIRO256SS_H

@@ -29,7 +29,7 @@
 #pragma clang diagnostic ignored "-Wreorder"
 #endif
 
-#include "Xorshiro256ss.h"
+#include "Xoshiro256ss.h"
 #include "OpenFrameworksPort.h"
 #include <map>
 #include <list>
