@@ -39,31 +39,35 @@ public:
    FeedbackModule();
    virtual ~FeedbackModule();
    static IDrawableModule* Create() { return new FeedbackModule(); }
-   
-   
+
+
    void CreateUIControls() override;
-   
+
    void PostRepatch(PatchCableSource* cableSource, bool fromUserClick) override;
-   
+
    //IAudioSource
    void Process(double time) override;
    void SetEnabled(bool enabled) override { mEnabled = enabled; }
-   
+
    //IFloatSliderListener
    void FloatSliderUpdated(FloatSlider* slider, float oldVal) override {}
-   
+
    void LoadLayout(const ofxJSONElement& moduleInfo) override;
    void SaveLayout(ofxJSONElement& moduleInfo) override;
    void SetUpFromSaveData() override;
-   
+
 private:
    //IDrawableModule
    void DrawModule() override;
-   void GetModuleDimensions(float& w, float& h) override { w=115; h=125; }
+   void GetModuleDimensions(float& w, float& h) override
+   {
+      w = 115;
+      h = 125;
+   }
    bool Enabled() const override { return mEnabled; }
-   
+
    DelayEffect mDelay;
-   
+
    IAudioReceiver* mFeedbackTarget;
    PatchCableSource* mFeedbackTargetCable;
    RollingBuffer mFeedbackVizBuffer;

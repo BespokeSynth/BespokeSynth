@@ -463,11 +463,10 @@ PYBIND11_EMBEDDED_MODULE(midicontroller, m)
          IUIControl* uicontrol = TheSynth->FindUIControl(controlPath.c_str());
          if (uicontrol != nullptr)
          {
-            auto* connection = midicontroller.AddControlConnection(messageType, control, channel, uicontrol);
+            auto* connection = midicontroller.AddControlConnection(messageType, control, channel, uicontrol, page);
             if (controlType != kControlType_Default)
                connection->mType = controlType;
             connection->mValue = value;
-            connection->mPage = page;
             connection->mMidiOffValue = midi_off;
             connection->mMidiOnValue = midi_on;
             connection->mScaleOutput = scale;
@@ -500,6 +499,10 @@ PYBIND11_EMBEDDED_MODULE(midicontroller, m)
       {
          midicontroller.SendData(page, a, b, c);
       }, "a"_a, "b"_a, "c"_a, "page"_a = 0)
+      .def("send_sysex", [](MidiController& midicontroller, std::string data, int page)
+      {
+         midicontroller.SendSysEx(page, data);
+      }, "data"_a, "page"_a = 0)
       .def("add_script_listener", [](MidiController& midicontroller, ScriptModule* script)
       {
          midicontroller.AddScriptListener(script);

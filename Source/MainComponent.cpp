@@ -14,7 +14,7 @@ using namespace juce;
 #include "nanovg/nanovg_gl.h"
 #include "ModularSynth.h"
 #include "SynthGlobals.h"
-#include "Push2Control.h"  //TODO(Ryan) remove
+#include "Push2Control.h" //TODO(Ryan) remove
 #include "SpaceMouseControl.h"
 #include "UserPrefs.h"
 
@@ -27,10 +27,10 @@ using namespace juce;
  This component lives inside our window, and this is where you should put all
  your controls and content.
  */
-class MainContentComponent   : public OpenGLAppComponent,
-                               public AudioIODeviceCallback,
-                               public FileDragAndDropTarget,
-                               private Timer
+class MainContentComponent : public OpenGLAppComponent,
+                             public AudioIODeviceCallback,
+                             public FileDragAndDropTarget,
+                             private Timer
 {
 public:
    //==============================================================================
@@ -66,7 +66,7 @@ public:
 #endif
 
       UserPrefs.Init();
-      
+
       int screenWidth, screenHeight;
       {
          const MessageManagerLock lock;
@@ -80,11 +80,11 @@ public:
          screenHeight = bounds.getHeight();
          ofLog() << "pixel ratio: " << mPixelRatio << " screen width: " << screenWidth << " screen height: " << screenHeight;
       }
-      
+
       int width = UserPrefs.width.Get();
       int height = UserPrefs.height.Get();
       mDesiredInitialPosition.setXY(INT_MAX, INT_MAX);
-      
+
       if (UserPrefs.set_manual_window_position.Get())
       {
          mDesiredInitialPosition.setXY(UserPrefs.position_x.Get(), UserPrefs.position_y.Get());
@@ -96,19 +96,19 @@ public:
          if (height + getTopLevelComponent()->getPosition().y + 20 > screenHeight)
             height = screenHeight - getTopLevelComponent()->getPosition().y - 20;
       }
-      
+
       setSize(width, height);
       setWantsKeyboardFocus(true);
       Desktop::setScreenSaverEnabled(false);
-      mGlobalManagers.mDeviceManager.getAvailableDeviceTypes();   //scans for device types ("Windows Audio", "DirectSound", etc)
+      mGlobalManagers.mDeviceManager.getAvailableDeviceTypes(); //scans for device types ("Windows Audio", "DirectSound", etc)
    }
-   
+
    ~MainContentComponent()
    {
       shutdownOpenGL();
       shutdownAudio();
    }
-   
+
    void timerCallback() override
    {
       static int sRenderFrame = 0;
@@ -121,9 +121,9 @@ public:
          grabKeyboardFocus();
          sHasGrabbedFocus = true;
       }
-      
+
       mSynth.Poll();
-      
+
 #if DEBUG
       if (sRenderFrame % 2 == 0)
 #else
@@ -142,22 +142,22 @@ public:
             TheSynth->SetPixelRatio(mPixelRatio);
          }
       }
-      
+
       mScreenPosition = getScreenPosition();
 
       mSpaceMouseReader.Poll();
    }
-   
+
    //==============================================================================
    void audioDeviceAboutToStart(AudioIODevice* device) override
    {
       // This function will be called when the audio device is started, or when
       // its settings (i.e. sample rate, block size, etc) are changed.
-      
+
       // You can use this function to initialise any resources you might need,
       // but be careful - it will be called on the audio thread, not the GUI thread.
    }
-   
+
    void audioDeviceIOCallback(const float** inputChannelData,
                               int numInputChannels,
                               float** outputChannelData,
@@ -167,36 +167,35 @@ public:
       mSynth.AudioIn(inputChannelData, numSamples, numInputChannels);
       mSynth.AudioOut(outputChannelData, numSamples, numOutputChannels);
    }
-   
+
    void audioDeviceStopped() override
    {
-      
    }
-   
+
    void shutdownAudio()
    {
       mGlobalManagers.mDeviceManager.removeAudioCallback(this);
       mGlobalManagers.mDeviceManager.closeAudioDevice();
    }
-   
+
    void initialise() override
    {
 #ifdef JUCE_WINDOWS
       // glewInit();
 #endif
-      
+
       mVG = nvgCreateGLES2(NVG_ANTIALIAS | NVG_STENCIL_STROKES);
       mFontBoundsVG = nvgCreateGLES2(NVG_ANTIALIAS | NVG_STENCIL_STROKES);
-      
+
       if (mVG == nullptr)
          printf("Could not init nanovg.\n");
       if (mFontBoundsVG == nullptr)
          printf("Could not init font bounds nanovg.\n");
 
       Push2Control::CreateStaticFramebuffer();
-      
+
       mSynth.LoadResources(mVG, mFontBoundsVG);
-      
+
       /*for (auto deviceType : mGlobalManagers.mDeviceManager.getAvailableDeviceTypes())
       {
          ofLog() << "inputs:";
@@ -214,17 +213,17 @@ public:
          mGlobalManagers.mDeviceManager.setCurrentAudioDeviceType(UserPrefs.devicetype.Get(), true);
 
       SetGlobalSampleRateAndBufferSize(UserPrefs.samplerate.Get(), UserPrefs.buffersize.Get());
-      
+
       mSynth.Setup(&mGlobalManagers.mDeviceManager, &mGlobalManagers.mAudioFormatManager, this, &openGLContext);
 
       std::string outputDevice = UserPrefs.audio_output_device.Get();
       std::string inputDevice = UserPrefs.audio_input_device.Get();
       if (!mGlobalManagers.mDeviceManager.getCurrentDeviceTypeObject()->hasSeparateInputsAndOutputs())
-         inputDevice = outputDevice;    //asio must have identical input and output
-      
+         inputDevice = outputDevice; //asio must have identical input and output
+
       AudioDeviceManager::AudioDeviceSetup preferredSetupOptions;
-      preferredSetupOptions.sampleRate = gSampleRate;
-      preferredSetupOptions.bufferSize = gBufferSize;
+      preferredSetupOptions.sampleRate = gSampleRate / UserPrefs.oversampling.Get();
+      preferredSetupOptions.bufferSize = gBufferSize / UserPrefs.oversampling.Get();
       if (outputDevice != kAutoDevice && outputDevice != kNoneDevice)
          preferredSetupOptions.outputDeviceName = outputDevice;
       if (inputDevice != kAutoDevice && inputDevice != kNoneDevice)
@@ -234,10 +233,10 @@ public:
       HRESULT hr;
       hr = CoInitializeEx(0, COINIT_MULTITHREADED);
 #endif
-      
+
       int inputChannels = UserPrefs.max_input_channels.Get();
       int outputChannels = UserPrefs.max_output_channels.Get();
-      
+
       if (inputDevice == kNoneDevice)
          inputChannels = 0;
       if (outputDevice == kNoneDevice)
@@ -256,27 +255,27 @@ public:
          if (outputDevice != kAutoDevice && outputDevice != kNoneDevice &&
              loadedSetup.outputDeviceName.toStdString() != outputDevice)
          {
-            mSynth.SetFatalError("error setting output device to '"+outputDevice+"', fix this in userprefs.json (use \"auto\" for default device)"+
-                                 "\n\n\nvalid devices:\n"+GetAudioDevices());
+            mSynth.SetFatalError("error setting output device to '" + outputDevice + "', fix this in userprefs.json (use \"auto\" for default device)" +
+                                 "\n\n\nvalid devices:\n" + GetAudioDevices());
          }
          else if (inputDevice != kAutoDevice && inputDevice != kNoneDevice &&
                   loadedSetup.inputDeviceName.toStdString() != inputDevice)
          {
-            mSynth.SetFatalError("error setting input device to '"+inputDevice+"', fix this in userprefs.json (use \"auto\" for default device, or \"none\" for no device)"+
-                                 "\n\n\nvalid devices:\n"+GetAudioDevices());
+            mSynth.SetFatalError("error setting input device to '" + inputDevice + "', fix this in userprefs.json (use \"auto\" for default device, or \"none\" for no device)" +
+                                 "\n\n\nvalid devices:\n" + GetAudioDevices());
          }
-         else if (loadedSetup.bufferSize != gBufferSize)
+         else if (loadedSetup.bufferSize != gBufferSize / UserPrefs.oversampling.Get())
          {
-            mSynth.SetFatalError("error setting buffer size to "+ofToString(gBufferSize)+" on device '"+ loadedSetup.outputDeviceName.toStdString()+"', fix this in userprefs.json" +
+            mSynth.SetFatalError("error setting buffer size to " + ofToString(gBufferSize / UserPrefs.oversampling.Get()) + " on device '" + loadedSetup.outputDeviceName.toStdString() + "', fix this in userprefs.json" +
                                  "\n\n(a valid buffer size might be: " + ofToString(loadedSetup.bufferSize) + ")");
          }
-         else if (loadedSetup.sampleRate != gSampleRate)
+         else if (loadedSetup.sampleRate != gSampleRate / UserPrefs.oversampling.Get())
          {
-            mSynth.SetFatalError("error setting sample rate to "+ofToString(gSampleRate) + " on device '" + loadedSetup.outputDeviceName.toStdString() + "', fix this in userprefs.json"+
-                                 "\n\n(a valid sample rate might be: "+ofToString(loadedSetup.sampleRate)+")");
+            mSynth.SetFatalError("error setting sample rate to " + ofToString(gSampleRate / UserPrefs.oversampling.Get()) + " on device '" + loadedSetup.outputDeviceName.toStdString() + "', fix this in userprefs.json" +
+                                 "\n\n(a valid sample rate might be: " + ofToString(loadedSetup.sampleRate) + ")");
          }
          else
-         {            
+         {
             ofLog() << "output: " << loadedSetup.outputDeviceName << "   input: " << loadedSetup.inputDeviceName;
 
             int numInputChannels = 0;
@@ -305,8 +304,8 @@ public:
          if (audioError.startsWith("No such device"))
             audioError += "\n\nfix this in userprefs.json (you can use \"auto\" for the default device)";
          else
-            audioError += juce::String("\n\nattempted to set output to: "+outputDevice+" and input to: "+inputDevice+"\n\ninitialization errors could potentially be fixed by changing buffer size, sample rate, or input/output devices in userprefs.json\nto use no input device, specify \"none\" for \"audio_input_device\"");
-         mSynth.SetFatalError("error initializing audio device: "+audioError.toStdString() +
+            audioError += juce::String("\n\nattempted to set output to: " + outputDevice + " and input to: " + inputDevice + "\n\ninitialization errors could potentially be fixed by changing buffer size, sample rate, or input/output devices in userprefs.json\nto use no input device, specify \"none\" for \"audio_input_device\"");
+         mSynth.SetFatalError("error initializing audio device: " + audioError.toStdString() +
                               "\n\n\nvalid devices:\n" + GetAudioDevices());
       }
 
@@ -319,10 +318,10 @@ public:
             break;
          }
       }
-      
+
       startTimerHz(60);
    }
-   
+
    void shutdown() override
    {
       nvgDeleteGLES2(mVG);
@@ -333,70 +332,70 @@ public:
    {
       mSynth.SetStartupSaveStateFile(bskPath.toStdString());
    }
-   
+
    void render() override
    {
       if (mSynth.IsLoadingState())
          return;
-      
+
       mSynth.LockRender(true);
-      
+
       juce::Point<int> mouse = Desktop::getMousePosition();
       mouse -= mScreenPosition;
       mSynth.MouseMoved(mouse.x, mouse.y);
-      
+
       float width = getWidth();
       float height = getHeight();
-      
+
       static float kMotionTrails = .4f;
-      
+
       ofVec3f bgColor(ModularSynth::sBackgroundR, ModularSynth::sBackgroundG, ModularSynth::sBackgroundB);
-      glViewport(0, 0, width*mPixelRatio, height*mPixelRatio);
-      glClearColor(bgColor.x,bgColor.y,bgColor.z,0);
+      glViewport(0, 0, width * mPixelRatio, height * mPixelRatio);
+      glClearColor(bgColor.x, bgColor.y, bgColor.z, 0);
       if (UserPrefs.motion_trails.Get() <= 0)
-         glClear(GL_COLOR_BUFFER_BIT|GL_DEPTH_BUFFER_BIT|GL_STENCIL_BUFFER_BIT);
-      
+         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT | GL_STENCIL_BUFFER_BIT);
+
       nvgBeginFrame(mVG, width, height, mPixelRatio);
-      
+
       if (UserPrefs.motion_trails.Get() > 0)
       {
-         ofSetColor(bgColor.x*255,bgColor.y*255,bgColor.z*255,(1 - (UserPrefs.motion_trails.Get() * kMotionTrails) * (ofGetFrameRate()/60.0f))*255);
+         ofSetColor(bgColor.x * 255, bgColor.y * 255, bgColor.z * 255, (1 - (UserPrefs.motion_trails.Get() * kMotionTrails) * (ofGetFrameRate() / 60.0f)) * 255);
          ofFill();
-         ofRect(0,0,width,height);
+         ofRect(0, 0, width, height);
       }
-      
+
       nvgLineCap(mVG, NVG_ROUND);
       nvgLineJoin(mVG, NVG_ROUND);
       static float sSpacing = -.3f;
       nvgTextLetterSpacing(mVG, sSpacing);
       nvgTextLetterSpacing(mFontBoundsVG, sSpacing);
-      
+
       mSynth.Draw(mVG);
-      
+
       nvgEndFrame(mVG);
-      
+
       mSynth.PostRender();
-      
+
       mSynth.LockRender(false);
-      
+
       ++mFrameCountAccum;
       int64 time = Time::currentTimeMillis();
-      
+
       const int64 kCalcFpsIntervalMs = 1000;
       if (time - mLastFpsUpdateTime >= kCalcFpsIntervalMs)
       {
          mSynth.UpdateFrameRate(mFrameCountAccum / (kCalcFpsIntervalMs / 1000.0f));
-         
+
          mFrameCountAccum = 0;
          mLastFpsUpdateTime = time;
       }
    }
-   
+
    //==============================================================================
    void paint(Graphics& g) override
    {
    }
-   
+
    void resized() override
    {
       // This is called when the MainContentComponent is resized.
@@ -418,23 +417,23 @@ private:
    {
       mSynth.MousePressed(e.getMouseDownX(), e.getMouseDownY(), GetMouseButton(e), e.source);
    }
-   
+
    void mouseUp(const MouseEvent& e) override
    {
       mSynth.MouseReleased(e.getPosition().x, e.getPosition().y, GetMouseButton(e), e.source);
    }
-   
+
    void mouseDrag(const MouseEvent& e) override
    {
       mSynth.MouseDragged(e.getPosition().x, e.getPosition().y, GetMouseButton(e), e.source);
    }
-   
+
    void mouseMove(const MouseEvent& e) override
    {
       //Don't do mouse move in here, it really slows UI responsiveness in some scenarios. We do it when we render instead.
       //mSynth.MouseMoved(e.getPosition().x, e.getPosition().y);
    }
-   
+
    void mouseWheelMove(const MouseEvent& e, const MouseWheelDetails& wheel) override
    {
       float invert = 1;
@@ -448,12 +447,12 @@ private:
       if (!wheel.isInertial)
          mSynth.MouseScrolled(wheel.deltaX * scale, wheel.deltaY * scale * invert, true);
    }
-   
+
    void mouseMagnify(const MouseEvent& e, float scaleFactor) override
    {
       mSynth.MouseMagnify(e.getPosition().x, e.getPosition().y, scaleFactor, e.source);
    }
-   
+
    bool keyPressed(const KeyPress& key) override
    {
       /*
@@ -493,7 +492,7 @@ private:
       mSynth.KeyPressed(keyCode, isRepeat);
       return true;
    }
-   
+
    bool keyStateChanged(bool isKeyDown) override
    {
       if (!isKeyDown)
@@ -521,7 +520,7 @@ private:
       //TODO_PORT(Ryan)
       return true;
    }
-   
+
    void filesDropped(const StringArray& files, int x, int y) override
    {
       std::vector<std::string> strFiles;
@@ -529,7 +528,7 @@ private:
          strFiles.push_back(file.toStdString());
       mSynth.FilesDropped(strFiles, x, y);
    }
-   
+
    std::string GetAudioDevices()
    {
       std::string ret;
@@ -537,8 +536,8 @@ private:
       mGlobalManagers.mDeviceManager.createAudioDeviceTypes(types);
       for (int i = 0; i < types.size(); ++i)
       {
-         String typeName(types[i]->getTypeName());  // This will be things like "DirectSound", "CoreAudio", etc.
-         types[i]->scanForDevices();                 // This must be called before getting the list of devices
+         String typeName(types[i]->getTypeName()); // This will be things like "DirectSound", "CoreAudio", etc.
+         types[i]->scanForDevices(); // This must be called before getting the list of devices
 
          ret += "output:\n";
          {
@@ -566,7 +565,7 @@ private:
    } mGlobalManagers;
 
    ModularSynth mSynth;
-   
+
    NVGcontext* mVG;
    NVGcontext* mFontBoundsVG;
    int64 mLastFpsUpdateTime;
@@ -577,22 +576,22 @@ private:
    juce::Point<int> mDesiredInitialPosition;
    SpaceMouseMessageWindow mSpaceMouseReader;
 
-   JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (MainContentComponent)
+   JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR(MainContentComponent)
 };
 
 
 // (This function is called by the app startup code to create our main component)
-Component* createMainContentComponent()     { return new MainContentComponent(); }
+Component* createMainContentComponent() { return new MainContentComponent(); }
 
 // This function is called when opening the app with a bsk file.
 void SetStartupSaveStateFile(const juce::String& bskFilePath, Component* component)
 {
    auto* mainComponent = dynamic_cast<MainContentComponent*>(component);
-   if(mainComponent == nullptr)
+   if (mainComponent == nullptr)
       ofLog() << "Non main component sent to SetStartupSaveStateFile";
    else
       mainComponent->SetStartupSaveStateFile(bskFilePath);
 }
 
 
-#endif  // MAINCOMPONENT_H_INCLUDED
+#endif // MAINCOMPONENT_H_INCLUDED

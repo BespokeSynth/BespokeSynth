@@ -62,9 +62,9 @@ public:
    void Clear();
    EnumMap GetEnumMap();
    void SetForcedWidth(int width) { mForcedWidth = width; }
-   
+
    bool MouseMoved(float x, float y) override;
-   
+
    static int GetSpacing();
 
    //IUIControl
@@ -83,12 +83,16 @@ public:
    void SaveState(FileStreamOut& out) override;
    void LoadState(FileStreamIn& in, bool shouldSetValue = true) override;
 
-   void GetDimensions(float& width, float& height) override { width = mWidth; height = mHeight; }
-   
+   void GetDimensions(float& width, float& height) override
+   {
+      width = mWidth;
+      height = mHeight;
+   }
+
    ofVec2f GetOptionPosition(int optionIndex);
-   
+
 protected:
-   ~RadioButton();   //protected so that it can't be created on the stack
+   ~RadioButton(); //protected so that it can't be created on the stack
 
 private:
    void SetIndex(int i);
@@ -96,7 +100,7 @@ private:
    void UpdateDimensions();
 
    void OnClicked(int x, int y, bool right) override;
-   
+
    int mWidth;
    int mHeight;
    float mElementWidth;

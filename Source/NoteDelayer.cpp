@@ -52,17 +52,17 @@ NoteDelayer::~NoteDelayer()
 void NoteDelayer::CreateUIControls()
 {
    IDrawableModule::CreateUIControls();
-   
-   mDelaySlider = new FloatSlider(this,"delay",4,4,100,15,&mDelay,0,1,4);
+
+   mDelaySlider = new FloatSlider(this, "delay", 4, 4, 100, 15, &mDelay, 0, 1, 4);
 }
 
 void NoteDelayer::DrawModule()
 {
    if (Minimized() || IsVisible() == false)
       return;
-   
+
    mDelaySlider->Draw();
-   
+
    float t = (gTime - mLastNoteOnTime) / (mDelay * TheTransport->GetDuration(kInterval_1n));
    if (t > 0 && t < 1)
    {
@@ -70,13 +70,13 @@ void NoteDelayer::DrawModule()
       ofNoFill();
       ofCircle(54, 11, 10);
       ofFill();
-      ofSetColor(255,255,255,gModuleDrawAlpha);
+      ofSetColor(255, 255, 255, gModuleDrawAlpha);
       ofCircle(54 + sin(t * TWO_PI) * 10, 11 - cos(t * TWO_PI) * 10, 2);
       ofPopStyle();
    }
 }
 
-void NoteDelayer::CheckboxUpdated(Checkbox *checkbox)
+void NoteDelayer::CheckboxUpdated(Checkbox* checkbox)
 {
    if (checkbox == mEnabledCheckbox)
    {
@@ -89,13 +89,13 @@ void NoteDelayer::CheckboxUpdated(Checkbox *checkbox)
 void NoteDelayer::OnTransportAdvanced(float amount)
 {
    PROFILER(NoteDelayer);
-   
+
    ComputeSliders(0);
-   
+
    int end = mAppendIndex;
    if (mAppendIndex < mConsumeIndex)
       end += kQueueSize;
-   for (int i=mConsumeIndex; i<end; ++i)
+   for (int i = mConsumeIndex; i < end; ++i)
    {
       const NoteInfo& info = mInputNotes[i % kQueueSize];
       if (gTime + gBufferSizeMs >= info.mTriggerTime)
@@ -110,10 +110,10 @@ void NoteDelayer::PlayNote(double time, int pitch, int velocity, int voiceIdx, M
 {
    if (!mEnabled)
       return;
-   
+
    if (velocity > 0)
       mLastNoteOnTime = time;
-   
+
    if ((mAppendIndex + 1) % kQueueSize != mConsumeIndex)
    {
       NoteInfo info;
@@ -133,7 +133,7 @@ void NoteDelayer::FloatSliderUpdated(FloatSlider* slider, float oldVal)
 void NoteDelayer::LoadLayout(const ofxJSONElement& moduleInfo)
 {
    mModuleSaveData.LoadString("target", moduleInfo);
-   
+
    SetUpFromSaveData();
 }
 

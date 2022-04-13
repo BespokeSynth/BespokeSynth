@@ -37,14 +37,18 @@ class IAudioReceiver;
 class IAudioSource : public virtual IPatchable
 {
 public:
-   IAudioSource() : mVizBuffer(VIZ_BUFFER_SECONDS*gSampleRate) {}
+   IAudioSource()
+   : mVizBuffer(VIZ_BUFFER_SECONDS * gSampleRate)
+   {}
    virtual ~IAudioSource() {}
    virtual void Process(double time) = 0;
-   IAudioReceiver* GetTarget(int index=0);
+   IAudioReceiver* GetTarget(int index = 0);
    virtual int GetNumTargets() { return 1; }
    RollingBuffer* GetVizBuffer() { return &mVizBuffer; }
+
 protected:
    void SyncOutputBuffer(int numChannels);
+
 private:
    RollingBuffer mVizBuffer;
 };

@@ -49,11 +49,11 @@ Prefab::~Prefab()
 void Prefab::CreateUIControls()
 {
    IDrawableModule::CreateUIControls();
-   
+
    mSaveButton = new ClickButton(this, "save", 95, 2);
    mLoadButton = new ClickButton(this, "load", mSaveButton, kAnchor_Right);
    mDisbandButton = new ClickButton(this, "disband", mLoadButton, kAnchor_Right);
-   
+
    mRemoveModuleCable = new PatchCableSource(this, kConnectionType_Special);
    mRemoveModuleCable->SetManualPosition(10, 10);
    AddPatchCableSource(mRemoveModuleCable);
@@ -62,25 +62,25 @@ void Prefab::CreateUIControls()
 std::string Prefab::GetTitleLabel() const
 {
    if (mPrefabName != "")
-      return "prefab: "+mPrefabName;
+      return "prefab: " + mPrefabName;
    return "prefab";
 }
 
 void Prefab::Poll()
 {
-   float xMin,yMin;
+   float xMin, yMin;
    GetPosition(xMin, yMin);
    for (auto* module : mModuleContainer.GetModules())
    {
       xMin = MIN(xMin, module->GetPosition().x);
       yMin = MIN(yMin, module->GetPosition().y - 30);
    }
-   
+
    int xOffset = GetPosition().x - xMin;
    int yOffset = GetPosition().y - yMin;
    for (auto* module : mModuleContainer.GetModules())
       module->SetPosition(module->GetPosition(true).x + xOffset, module->GetPosition(true).y + yOffset);
-   
+
    if (abs(GetPosition().x - xMin) >= 1 || abs(GetPosition().y - yMin) >= 1)
       SetPosition(xMin, yMin);
 }
@@ -102,7 +102,7 @@ bool Prefab::CanAddDropModules()
       {
          for (auto* module : TheSynth->GetGroupSelectedModules())
          {
-            if (module == this)
+            if (module == this || module->IsSingleton())
                return false;
             if (!VectorContains(module, mModuleContainer.GetModules()))
                return true;
@@ -115,7 +115,7 @@ bool Prefab::CanAddDropModules()
 void Prefab::OnClicked(int x, int y, bool right)
 {
    IDrawableModule::OnClicked(x, y, right);
-   
+
    if (y > 0 && !right)
       TheSynth->SetGroupSelectContext(&mModuleContainer);
 }
@@ -129,7 +129,7 @@ void Prefab::MouseReleased()
       if (sJustReleasedModule != nullptr && !VectorContains(sJustReleasedModule, mModuleContainer.GetModules()))
          mModuleContainer.TakeModule(sJustReleasedModule);
 
-      for(auto* module : TheSynth->GetGroupSelectedModules())
+      for (auto* module : TheSynth->GetGroupSelectedModules())
       {
          if (!VectorContains(module, mModuleContainer.GetModules()))
             mModuleContainer.TakeModule(module);
@@ -153,7 +153,7 @@ void Prefab::DrawModule()
       ofPushStyle();
       ofSetColor(255, 255, 255, 80);
       ofFill();
-      ofRect(0,0,GetRect().width,GetRect().height);
+      ofRect(0, 0, GetRect().width, GetRect().height);
       ofPopStyle();
    }
 
@@ -161,7 +161,7 @@ void Prefab::DrawModule()
    mLoadButton->Draw();
    mDisbandButton->Draw();
    DrawTextNormal("remove", 18, 14);
-   
+
    mModuleContainer.Draw();
 }
 
@@ -189,14 +189,14 @@ void Prefab::PostRepatch(PatchCableSource* cableSource, bool fromUserClick)
 
 void Prefab::GetModuleDimensions(float& width, float& height)
 {
-   float x,y;
+   float x, y;
    GetPosition(x, y);
    width = 215;
    height = 40;
-   
+
    //if (PatchCable::sActivePatchCable && PatchCable::sActivePatchCable->GetOwningModule() == this)
    //   return;
-      
+
    for (auto* module : mModuleContainer.GetModules())
    {
       ofRectangle rect = module->GetRect();
@@ -219,7 +219,7 @@ void Prefab::ButtonClicked(ClickButton* button)
          SavePrefab(savePath);
       }
    }
-   
+
    if (button == mLoadButton)
    {
       FileChooser chooser("Load prefab...", File(ofToDataPath("prefabs")), "*.pfb", true, false, TheSynth->GetFileChooserParent());
@@ -229,7 +229,7 @@ void Prefab::ButtonClicked(ClickButton* button)
          LoadPrefab(ofToDataPath(loadPath));
       }
    }
-   
+
    if (button == mDisbandButton)
    {
       auto modules = mModuleContainer.GetModules();
@@ -242,29 +242,29 @@ void Prefab::ButtonClicked(ClickButton* button)
 void Prefab::SavePrefab(std::string savePath)
 {
    ofxJSONElement root;
-   
+
    root["modules"] = mModuleContainer.WriteModules();
-   
+
    std::stringstream ss(root.getRawString(true));
    std::string line;
    std::string lines;
-   while (getline(ss,line,'\n'))
+   while (getline(ss, line, '\n'))
    {
       const char* pos = strstr(line.c_str(), " : \"$");
       if (pos != nullptr)
       {
-         bool endsWithComma = line[line.length()-1] == ',';
+         bool endsWithComma = line[line.length() - 1] == ',';
          ofStringReplace(line, pos, " : \"\"");
          if (endsWithComma)
             line += ",";
       }
       lines += line + '\n';
    }
-   
+
    UpdatePrefabName(savePath);
-   
+
    FileStreamOut out(ofToDataPath(savePath));
-   
+
    out << lines;
    mModuleContainer.SaveState(out);
 }
@@ -275,29 +275,29 @@ void Prefab::LoadPrefab(std::string loadPath)
 
    ScopedMutex mutex(TheSynth->GetAudioMutex(), "LoadPrefab()");
    std::lock_guard<std::recursive_mutex> renderLock(TheSynth->GetRenderLock());
-   
+
    mModuleContainer.Clear();
-   
+
    FileStreamIn in(ofToDataPath(loadPath));
 
    assert(in.OpenedOk());
-   
+
    std::string jsonString;
    in >> jsonString;
    ofxJSONElement root;
    bool loaded = root.parse(jsonString);
-   
+
    if (!loaded)
    {
-      TheSynth->LogEvent("Couldn't load, error parsing "+loadPath, kLogEventType_Error);
+      TheSynth->LogEvent("Couldn't load, error parsing " + loadPath, kLogEventType_Error);
       TheSynth->LogEvent("Try loading it up in a json validator", kLogEventType_Error);
       return;
    }
-   
+
    UpdatePrefabName(loadPath);
-   
+
    mModuleContainer.LoadModules(root["modules"]);
-   
+
    mModuleContainer.LoadState(in);
 
    sLoadingPrefab = false;
@@ -344,7 +344,7 @@ void Prefab::LoadState(FileStreamIn& in)
    IDrawableModule::LoadState(in);
 
    if (!ModuleContainer::DoesModuleHaveMoreSaveData(in))
-      return;  //this was saved before we added versioning, bail out
+      return; //this was saved before we added versioning, bail out
 
    int rev;
    in >> rev;

@@ -54,8 +54,9 @@ radiosequencer~sequence to only enable one value at a time. patch it to the "ena
 
 presets~save and restore sets of values. connect the grey circle to modules to affect all controls on that module. connect the purple circle to a control to affect only that control. shift-click on the grid to store a preset to that square, and click on a grid square to load that preset.
 ~save~[todo]
-~blend ms~time to blend preset values over
+~blend ms~length of time to blend preset values over
 ~preset~jump to a preset
+~random~randomize connected controls
 
 
 

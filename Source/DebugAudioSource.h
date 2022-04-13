@@ -40,29 +40,29 @@ public:
    DebugAudioSource();
    ~DebugAudioSource();
    static IDrawableModule* Create() { return new DebugAudioSource(); }
-   
-   
-   
+
+
    //IAudioSource
    void Process(double time) override;
    void SetEnabled(bool enabled) override { mEnabled = enabled; }
-   
+
    void CheckboxUpdated(Checkbox* checkbox) override {}
-   
+
    //IFloatSliderListener
    void FloatSliderUpdated(FloatSlider* slider, float oldVal) override {}
-   
+
    virtual void LoadLayout(const ofxJSONElement& moduleInfo) override;
    virtual void SetUpFromSaveData() override;
-   
+
 private:
    //IDrawableModule
    void DrawModule() override;
    bool Enabled() const override { return mEnabled; }
-   void GetModuleDimensions(float& width, float& height) override { width=80; height=60; }
-   
-   
-   
+   void GetModuleDimensions(float& width, float& height) override
+   {
+      width = 80;
+      height = 60;
+   }
 };
 
 #endif /* defined(__Bespoke__DebugAudioSource__) */

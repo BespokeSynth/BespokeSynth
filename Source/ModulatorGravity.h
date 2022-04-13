@@ -42,44 +42,48 @@ public:
    ModulatorGravity();
    virtual ~ModulatorGravity();
    static IDrawableModule* Create() { return new ModulatorGravity(); }
-   
-   
+
+
    void CreateUIControls() override;
    void Init() override;
-   
+
    void SetEnabled(bool enabled) override { mEnabled = enabled; }
-   
+
    void PostRepatch(PatchCableSource* cableSource, bool fromUserClick) override;
 
    void OnPulse(double time, float velocity, int flags) override;
-   
+
    //IModulator
    float Value(int samplesIn = 0) override;
    bool Active() const override { return mEnabled; }
-   
+
    //IAudioPoller
    void OnTransportAdvanced(float amount) override;
-   
+
    FloatSlider* GetTarget() { return mTarget; }
-   
+
    //IFloatSliderListener
    void FloatSliderUpdated(FloatSlider* slider, float oldVal) override {}
-   
+
    //IButtonListener
    void ButtonClicked(ClickButton* button) override;
-   
+
    void SaveLayout(ofxJSONElement& moduleInfo) override;
    void LoadLayout(const ofxJSONElement& moduleInfo) override;
    void SetUpFromSaveData() override;
-   
+
 private:
    void Kick(float strength);
 
    //IDrawableModule
    void DrawModule() override;
-   void GetModuleDimensions(float& w, float& h) override { w=mWidth; h=mHeight; }
+   void GetModuleDimensions(float& w, float& h) override
+   {
+      w = mWidth;
+      h = mHeight;
+   }
    bool Enabled() const override { return mEnabled; }
-   
+
    float mWidth;
    float mHeight;
    float mValue;
@@ -88,7 +92,7 @@ private:
    float mGravity;
    float mKickAmount;
    float mDrag;
-   
+
    FloatSlider* mGravitySlider;
    FloatSlider* mKickAmountSlider;
    FloatSlider* mDragSlider;

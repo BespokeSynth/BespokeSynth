@@ -45,10 +45,10 @@ NoteHumanizer::~NoteHumanizer()
 void NoteHumanizer::CreateUIControls()
 {
    IDrawableModule::CreateUIControls();
-   
-   mTimeSlider = new FloatSlider(this,"time",4,4,100,15,&mTime,0,500);
-   mVelocitySlider = new FloatSlider(this,"velocity",mTimeSlider,kAnchor_Below,100,15,&mVelocity,0,1);
-   
+
+   mTimeSlider = new FloatSlider(this, "time", 4, 4, 100, 15, &mTime, 0, 500);
+   mVelocitySlider = new FloatSlider(this, "velocity", mTimeSlider, kAnchor_Below, 100, 15, &mVelocity, 0, 1);
+
    mTimeSlider->SetMode(FloatSlider::kSquare);
 }
 
@@ -56,15 +56,15 @@ void NoteHumanizer::DrawModule()
 {
    if (Minimized() || IsVisible() == false)
       return;
-   
+
    mTimeSlider->Draw();
    mVelocitySlider->Draw();
 }
 
-void NoteHumanizer::CheckboxUpdated(Checkbox *checkbox)
+void NoteHumanizer::CheckboxUpdated(Checkbox* checkbox)
 {
    if (checkbox == mEnabledCheckbox)
-      mNoteOutput.Flush(gTime+gBufferSizeMs);
+      mNoteOutput.Flush(gTime + gBufferSizeMs);
 }
 
 void NoteHumanizer::PlayNote(double time, int pitch, int velocity, int voiceIdx, ModulationParameters modulation)
@@ -98,7 +98,7 @@ void NoteHumanizer::FloatSliderUpdated(FloatSlider* slider, float oldVal)
 void NoteHumanizer::LoadLayout(const ofxJSONElement& moduleInfo)
 {
    mModuleSaveData.LoadString("target", moduleInfo);
-   
+
    SetUpFromSaveData();
 }
 

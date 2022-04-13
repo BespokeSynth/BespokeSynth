@@ -12,9 +12,9 @@ namespace
 }
 
 Minimap::Minimap()
-   : mClick(false)
-   , mGrid(nullptr)
-   , mHoveredBookmarkPos(-1, -1)
+: mClick(false)
+, mGrid(nullptr)
+, mHoveredBookmarkPos(-1, -1)
 {
 }
 
@@ -25,7 +25,7 @@ Minimap::~Minimap()
 void Minimap::CreateUIControls()
 {
    IDrawableModule::CreateUIControls();
-   mGrid = new UIGrid(0, 0, kMaxLength, kBookmarkSize, kNumBookmarks, 1, this);
+   mGrid = new UIGrid("uigrid", 0, 0, kMaxLength, kBookmarkSize, kNumBookmarks, 1, this);
 }
 
 void Minimap::GetDimensions(float& width, float& height)
@@ -81,7 +81,7 @@ void Minimap::ComputeBoundingBox(ofRectangle& rect)
       ofRectangle moduleRect = modules[i]->GetRect();
       RectUnion(rect, moduleRect);
    }
-   
+
    float minimapWidth, minimapHeight;
    GetDimensionsMinimap(minimapWidth, minimapHeight);
    float boundsAspectRatio = rect.width / rect.height;
@@ -104,7 +104,7 @@ ofRectangle Minimap::CoordsToMinimap(ofRectangle& boundingBox, ofRectangle& sour
    float x2 = (source.getMaxX() - boundingBox.x) / boundingBox.width * width;
    float y2 = (source.getMaxY() - boundingBox.y) / boundingBox.height * height;
 
-   return {x1, y1, x2 - x1, y2 - y1};
+   return { x1, y1, x2 - x1, y2 - y1 };
 }
 
 ofVec2f Minimap::CoordsToViewport(ofRectangle& boundingBox, float x, float y)
@@ -116,7 +116,7 @@ ofVec2f Minimap::CoordsToViewport(ofRectangle& boundingBox, float x, float y)
    float x1 = x / width * boundingBox.width + boundingBox.x;
    float y1 = y / height * boundingBox.height + boundingBox.y;
 
-   return {x1, y1};
+   return { x1, y1 };
 }
 
 void Minimap::DrawModulesOnMinimap(ofRectangle& boundingBox)
@@ -190,7 +190,7 @@ void Minimap::DrawModule()
          val = .5f;
       mGrid->SetVal(i % mGrid->GetCols(), i / mGrid->GetCols(), val);
    }
-   
+
    if (width < height)
    {
       mGrid->SetDimensions(kBookmarkSize, height);

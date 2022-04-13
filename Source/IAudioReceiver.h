@@ -36,13 +36,17 @@ public:
       kInputMode_Mono,
       kInputMode_Multichannel
    };
-   
-   IAudioReceiver(int bufferSize) : mInputBuffer(bufferSize) {}
+
+   IAudioReceiver(int bufferSize)
+   : mInputBuffer(bufferSize)
+   {}
    virtual ~IAudioReceiver() {}
    virtual ChannelBuffer* GetBuffer() { return &mInputBuffer; }
    virtual InputMode GetInputMode() { return kInputMode_Multichannel; }
+
 protected:
    void SyncInputBuffer();
+
 private:
    ChannelBuffer mInputBuffer;
 };

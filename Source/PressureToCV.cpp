@@ -47,7 +47,7 @@ void PressureToCV::CreateUIControls()
    mTargetCable = new PatchCableSource(this, kConnectionType_Modulator);
    mTargetCable->SetModulatorOwner(this);
    AddPatchCableSource(mTargetCable);
-   
+
    mMinSlider = new FloatSlider(this, "min", 3, 2, 100, 15, &mDummyMin, 0, 1);
    mMaxSlider = new FloatSlider(this, "max", mMinSlider, kAnchor_Below, 100, 15, &mDummyMax, 0, 1);
 }
@@ -56,7 +56,7 @@ void PressureToCV::DrawModule()
 {
    if (Minimized() || IsVisible() == false)
       return;
-   
+
    mMinSlider->Draw();
    mMaxSlider->Draw();
 }
@@ -77,24 +77,24 @@ void PressureToCV::PlayNote(double time, int pitch, int velocity, int voiceIdx, 
 float PressureToCV::Value(int samplesIn)
 {
    float pressure = mPressure ? mPressure->GetValue(samplesIn) : 0;
-   return ofMap(pressure,0,1,GetMin(),GetMax(),K(clamped));
+   return ofMap(pressure, 0, 1, GetMin(), GetMax(), K(clamped));
 }
 
 void PressureToCV::SaveLayout(ofxJSONElement& moduleInfo)
 {
    IDrawableModule::SaveLayout(moduleInfo);
-   
+
    std::string targetPath = "";
    if (mTarget)
       targetPath = mTarget->Path();
-   
+
    moduleInfo["target"] = targetPath;
 }
 
 void PressureToCV::LoadLayout(const ofxJSONElement& moduleInfo)
 {
    mModuleSaveData.LoadString("target", moduleInfo);
-   
+
    SetUpFromSaveData();
 }
 

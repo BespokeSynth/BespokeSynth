@@ -48,8 +48,8 @@ public:
    NoteSinger();
    ~NoteSinger();
    static IDrawableModule* Create() { return new NoteSinger(); }
-   
-   
+
+
    void CreateUIControls() override;
    void Init() override;
 
@@ -58,12 +58,12 @@ public:
 
    //IAudioPoller
    void OnTransportAdvanced(float amount) override;
-   
+
    //IScaleListener
    void OnScaleChanged() override;
 
    void SetEnabled(bool enabled) override { mEnabled = enabled; }
-   
+
    void CheckboxUpdated(Checkbox* checkbox) override;
    //IIntSliderListener
    void IntSliderUpdated(IntSlider* slider, int oldVal) override {}
@@ -73,17 +73,21 @@ public:
    void RadioButtonUpdated(RadioButton* radio, int oldVal) override {}
    //IButtonListener
    void ButtonClicked(ClickButton* button) override;
-   
+
    virtual void LoadLayout(const ofxJSONElement& moduleInfo) override;
    virtual void SetUpFromSaveData() override;
-   
-   
+
+
 private:
    //IDrawableModule
    void DrawModule() override;
-   void GetModuleDimensions(float& width, float& height) override { width=100; height=50; }
+   void GetModuleDimensions(float& width, float& height) override
+   {
+      width = 100;
+      height = 50;
+   }
    bool Enabled() const override { return mEnabled; }
-   
+
    int GetPitchForBucket(int bucket);
 
    int mOctave;
@@ -100,4 +104,3 @@ private:
 
 
 #endif /* defined(__modularSynth__NoteSinger__) */
-

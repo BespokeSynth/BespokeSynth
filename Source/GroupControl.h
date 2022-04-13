@@ -37,28 +37,28 @@ public:
    GroupControl();
    ~GroupControl();
    static IDrawableModule* Create() { return new GroupControl(); }
-   
-   
+
+
    void CreateUIControls() override;
-   
+
    void CheckboxUpdated(Checkbox* checkbox) override;
-   
+
    void LoadLayout(const ofxJSONElement& moduleInfo) override;
    void SaveLayout(ofxJSONElement& moduleInfo) override;
    void SetUpFromSaveData() override;
-   
+
    //IPatchable
    void PostRepatch(PatchCableSource* cableSource, bool fromUserClick) override;
-   
+
 private:
    //IDrawableModule
    void DrawModule() override;
    bool Enabled() const override { return mEnabled; }
    void GetModuleDimensions(float& width, float& height) override;
-   
+
    Checkbox* mGroupCheckbox;
    bool mGroupEnabled;
-   
+
    std::vector<PatchCableSource*> mControlCables;
 };
 

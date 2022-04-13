@@ -59,14 +59,14 @@ float LFO::CalculatePhase(int samplesIn /*= 0*/, bool doTransform /* = true*/) c
    else
    {
       float period = TheTransport->GetDuration(mPeriod) / TheTransport->GetDuration(kInterval_1n);
-      
-      float phase = TheTransport->GetMeasureTime(gTime+samplesIn*gInvSampleRateMs) / period + (1 - mPhaseOffset) + 1;  //+1 so we can have negative samplesIn
-      
-      phase -= int(phase) / 2 * 2;  //using 2 allows for shuffle to work
-      
+
+      float phase = TheTransport->GetMeasureTime(gTime + samplesIn * gInvSampleRateMs) / period + (1 - mPhaseOffset) + 1; //+1 so we can have negative samplesIn
+
+      phase -= int(phase) / 2 * 2; //using 2 allows for shuffle to work
+
       ret = phase;
    }
-   
+
    if (doTransform)
       return TransformPhase(ret);
    return ret;
@@ -82,20 +82,20 @@ float LFO::TransformPhase(float phase) const
 float LFO::Value(int samplesIn /*= 0*/, float forcePhase /*= -1*/) const
 {
    //PROFILER(LFO_Value);
-   
-   if (mPeriod == kInterval_None)  //no oscillator
+
+   if (mPeriod == kInterval_None) //no oscillator
       return mMode == kLFOMode_Envelope ? 1 : 0;
 
    float phase = CalculatePhase(samplesIn);
-   
+
    if (forcePhase != -1)
       phase = forcePhase;
-   
+
    phase *= FTWO_PI;
-   
+
    float sample;
    bool nonstandardOsc = false;
-   
+
    //use sample-and-hold value
    if (mOsc.GetType() == kOsc_Random &&
        !(mPeriod == kInterval_2 ||
@@ -107,7 +107,7 @@ float LFO::Value(int samplesIn /*= 0*/, float forcePhase /*= -1*/) const
          mPeriod == kInterval_64))
    {
       nonstandardOsc = true;
-      sample = pow(mRandom.Value(gTime + samplesIn * gInvSampleRateMs), powf((1-mOsc.GetPulseWidth())*2, 2));
+      sample = pow(mRandom.Value(gTime + samplesIn * gInvSampleRateMs), powf((1 - mOsc.GetPulseWidth()) * 2, 2));
    }
    else if (mOsc.GetType() == kOsc_Drunk)
    {
@@ -127,7 +127,7 @@ float LFO::Value(int samplesIn /*= 0*/, float forcePhase /*= -1*/) const
    else
    {
       sample = mOsc.Value(phase);
-      if (mMode == kLFOMode_Envelope)     //rescale to 0 1
+      if (mMode == kLFOMode_Envelope) //rescale to 0 1
          sample = sample * .5f + .5f;
    }
 
@@ -136,7 +136,7 @@ float LFO::Value(int samplesIn /*= 0*/, float forcePhase /*= -1*/) const
       if (mOsc.GetPulseWidth() != .5f)
          sample = Bias(sample, mOsc.GetPulseWidth());
 
-      if (mMode == kLFOMode_Oscillator)   //rescale to -1 1
+      if (mMode == kLFOMode_Oscillator) //rescale to -1 1
          sample = (sample - .5f * 2);
    }
 
@@ -147,7 +147,7 @@ void LFO::SetPeriod(NoteInterval interval)
 {
    if (interval == kInterval_Free)
       mFreePhase = CalculatePhase();
-   
+
    mPeriod = interval;
    if (mOsc.GetType() == kOsc_Random)
    {
@@ -155,7 +155,7 @@ void LFO::SetPeriod(NoteInterval interval)
       if (transportListenerInfo != nullptr)
          transportListenerInfo->mInterval = mPeriod;
    }
-   
+
    if (mOsc.GetType() == kOsc_Drunk || mPeriod == kInterval_Free)
       TheTransport->AddAudioPoller(this);
    else
@@ -165,7 +165,7 @@ void LFO::SetPeriod(NoteInterval interval)
 void LFO::SetType(OscillatorType type)
 {
    mOsc.SetType(type);
-   
+
    if (type == kOsc_Random)
       TheTransport->AddListener(this, mPeriod, OffsetInfo(0, true), false);
    else
@@ -173,7 +173,7 @@ void LFO::SetType(OscillatorType type)
 
    if (type == kOsc_Perlin)
       mPerlinSeed = gRandom() % 10000;
-   
+
    if (mOsc.GetType() == kOsc_Drunk || mOsc.GetType() == kOsc_Perlin || mPeriod == kInterval_Free)
       TheTransport->AddAudioPoller(this);
    else
@@ -185,7 +185,7 @@ void LFO::OnTimeEvent(double time)
    if (mOsc.GetSoften() == 0)
       mRandom.SetValue(ofRandom(1));
    else
-      mRandom.Start(time, ofRandom(1), time+mOsc.GetSoften() * 30);
+      mRandom.Start(time, ofRandom(1), time + mOsc.GetSoften() * 30);
 }
 
 void LFO::OnTransportAdvanced(float amount)
@@ -196,7 +196,7 @@ void LFO::OnTransportAdvanced(float amount)
       float drunk = ofRandom(-distance, distance);
       if (mDrunk + drunk > 1 || mDrunk + drunk < 0)
          drunk *= -1;
-      mDrunk = ofClamp(mDrunk+drunk, 0, 1);
+      mDrunk = ofClamp(mDrunk + drunk, 0, 1);
    }
    if (mPeriod == kInterval_Free || mOsc.GetType() == kOsc_Perlin)
    {

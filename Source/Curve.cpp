@@ -40,14 +40,14 @@ void Curve::AddPoint(CurvePoint point)
 {
    if (IsAtCapacity())
       return;
-   
+
    bool inserted = false;
-   for (int i=0; i<mNumCurvePoints; ++i)
+   for (int i = 0; i < mNumCurvePoints; ++i)
    {
       if (mPoints[i].mTime > point.mTime)
       {
-         for (int j=i; j<mNumCurvePoints; ++j)
-            mPoints[j+1] = mPoints[j];
+         for (int j = i; j < mNumCurvePoints; ++j)
+            mPoints[j + 1] = mPoints[j];
          mPoints[i] = point;
          inserted = true;
          ++mNumCurvePoints;
@@ -68,44 +68,44 @@ void Curve::AddPointAtEnd(CurvePoint point)
 
 int Curve::FindIndexForTime(float time)
 {
-   int max = mNumCurvePoints-1;
+   int max = mNumCurvePoints - 1;
    int left = 0;
    int right = max;
    while (left <= right)
    {
-      int mid = left + (right-left)/2;
+      int mid = left + (right - left) / 2;
 
-      if (mPoints[mid].mTime < time && (mid == max || mPoints[mid+1].mTime >= time)) // Check if x is present at mid
+      if (mPoints[mid].mTime < time && (mid == max || mPoints[mid + 1].mTime >= time)) // Check if x is present at mid
          return mid;
       if (mPoints[mid].mTime < time) // If time greater, ignore left half
          left = mid + 1;
       else // If time is smaller, ignore right half
          right = mid - 1;
-  }
-  
-  // if we reach here, then element was not present
-  return -1;
+   }
+
+   // if we reach here, then element was not present
+   return -1;
 }
 
 float Curve::Evaluate(float time, bool holdEndForLoop)
 {
    float retVal = 0;
-   
+
    if (mNumCurvePoints > 0)
    {
       if (time <= mPoints[0].mTime)
       {
          if (holdEndForLoop)
-            return mPoints[mNumCurvePoints-1].mValue;
+            return mPoints[mNumCurvePoints - 1].mValue;
          else
             return mPoints[0].mValue;
       }
-      
+
       int beforeIndex = 0;
       int quickCheckIndex = mLastEvalIndex;
       if (quickCheckIndex < mNumCurvePoints &&
           mPoints[quickCheckIndex].mTime < time &&
-          (quickCheckIndex == mNumCurvePoints-1 || mPoints[quickCheckIndex+1].mTime >= time))
+          (quickCheckIndex == mNumCurvePoints - 1 || mPoints[quickCheckIndex + 1].mTime >= time))
       {
          beforeIndex = quickCheckIndex;
       }
@@ -122,13 +122,13 @@ float Curve::Evaluate(float time, bool holdEndForLoop)
          beforeIndex = FindIndexForTime(time);
          assert(beforeIndex >= 0 && beforeIndex < mNumCurvePoints);
       }
-      
+
       mLastEvalIndex = beforeIndex;
-      int afterIndex = MIN(beforeIndex+1, mNumCurvePoints-1);
-      
+      int afterIndex = MIN(beforeIndex + 1, mNumCurvePoints - 1);
+
       retVal = ofMap(time, mPoints[beforeIndex].mTime, mPoints[afterIndex].mTime, mPoints[beforeIndex].mValue, mPoints[afterIndex].mValue, K(clamp));
    }
-   
+
    return retVal;
 }
 
@@ -138,13 +138,13 @@ void Curve::Render()
    ofNoFill();
    ofSetColor(mColor);
    ofBeginShape();
-   for (int i=0; i<mWidth; ++i)
+   for (int i = 0; i < mWidth; ++i)
    {
-      float val = Evaluate(ofMap(float(i)/mWidth,0,1,mStart,mEnd));
-      
+      float val = Evaluate(ofMap(float(i) / mWidth, 0, 1, mStart, mEnd));
+
       if (i > 0)
       {
-         ofVertex(i+mX,mY+(1-val)*mHeight);
+         ofVertex(i + mX, mY + (1 - val) * mHeight);
       }
    }
    ofEndShape();
@@ -187,9 +187,9 @@ namespace
 void Curve::SaveState(FileStreamOut& out)
 {
    out << kSaveStateRev;
-   
+
    out << mNumCurvePoints;
-   for (int i=0; i<mNumCurvePoints; ++i)
+   for (int i = 0; i < mNumCurvePoints; ++i)
       out << mPoints[i].mTime << mPoints[i].mValue;
 }
 
@@ -198,8 +198,8 @@ void Curve::LoadState(FileStreamIn& in)
    int rev;
    in >> rev;
    LoadStateValidate(rev <= kSaveStateRev);
-   
+
    in >> mNumCurvePoints;
-   for (int i=0; i<mNumCurvePoints; ++i)
+   for (int i = 0; i < mNumCurvePoints; ++i)
       in >> mPoints[i].mTime >> mPoints[i].mValue;
 }

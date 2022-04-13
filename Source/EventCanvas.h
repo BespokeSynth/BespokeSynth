@@ -44,48 +44,48 @@ public:
    EventCanvas();
    ~EventCanvas();
    static IDrawableModule* Create() { return new EventCanvas(); }
-   
-   
+
+
    void CreateUIControls() override;
    void Init() override;
-   
+
    IUIControl* GetUIControlForRow(int row);
    ofColor GetRowColor(int row) const;
-   
+
    void SetEnabled(bool enabled) override { mEnabled = enabled; }
    bool IsResizable() const override { return true; }
    void Resize(float w, float h) override;
-   
+
    void OnTransportAdvanced(float amount) override;
-   
+
    void CanvasUpdated(Canvas* canvas) override;
-   
+
    void PostRepatch(PatchCableSource* cableSource, bool fromUserClick) override;
-   
+
    std::vector<IUIControl*> ControlsToIgnoreInSaveState() const override;
-   
+
    void CheckboxUpdated(Checkbox* checkbox) override;
    void FloatSliderUpdated(FloatSlider* slider, float oldVal) override;
    void IntSliderUpdated(IntSlider* slider, int oldVal) override;
    void ButtonClicked(ClickButton* button) override;
    void DropdownUpdated(DropdownList* list, int oldVal) override;
    void TextEntryComplete(TextEntry* entry) override;
-   
+
    void LoadLayout(const ofxJSONElement& moduleInfo) override;
    void SetUpFromSaveData() override;
    void SaveLayout(ofxJSONElement& moduleInfo) override;
    void SaveState(FileStreamOut& out) override;
    void LoadState(FileStreamIn& in) override;
-   
+
 private:
    //IDrawableModule
    void DrawModule() override;
    void GetModuleDimensions(float& width, float& height) override;
    bool Enabled() const override { return mEnabled; }
-   
+
    void UpdateNumColumns();
    void SyncControlCablesToCanvas();
-   
+
    Canvas* mCanvas;
    CanvasControls* mCanvasControls;
    CanvasScrollbar* mCanvasScrollbarHorizontal;
@@ -101,13 +101,13 @@ private:
    bool mRecord;
    Checkbox* mRecordCheckbox;
    float mPreviousPosition;
-   
+
    struct ControlConnection
    {
       IUIControl* mUIControl;
       float mLastValue;
    };
-   
+
    const int kMaxEventRows = 256;
    std::vector<ControlConnection> mRowConnections;
 };

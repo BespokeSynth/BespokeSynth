@@ -43,34 +43,38 @@ public:
    MultibandCompressor();
    virtual ~MultibandCompressor();
    static IDrawableModule* Create() { return new MultibandCompressor(); }
-   
-   
+
+
    void CreateUIControls() override;
-   
+
    //IAudioReceiver
    InputMode GetInputMode() override { return kInputMode_Mono; }
-   
+
    //IAudioSource
    void Process(double time) override;
    void SetEnabled(bool enabled) override { mEnabled = enabled; }
-   
+
    void FloatSliderUpdated(FloatSlider* slider, float oldVal) override;
    void IntSliderUpdated(IntSlider* slider, int oldVal) override;
-   
+
    virtual void LoadLayout(const ofxJSONElement& moduleInfo) override;
    virtual void SetUpFromSaveData() override;
-   
+
 private:
    //IDrawableModule
    void DrawModule() override;
-   void GetModuleDimensions(float& w, float& h) override { w=210; h=150; }
+   void GetModuleDimensions(float& w, float& h) override
+   {
+      w = 210;
+      h = 150;
+   }
    bool Enabled() const override { return mEnabled; }
-   
+
    void CalcFilters();
-   
+
    float* mWorkBuffer;
    float* mOutBuffer;
-   
+
    float mDryWet;
    FloatSlider* mDryWetSlider;
    IntSlider* mNumBandsSlider;
@@ -83,10 +87,9 @@ private:
    FloatSlider* mRingTimeSlider;
    float mMaxBand;
    FloatSlider* mMaxBandSlider;
-   
+
    CLinkwitzRiley_4thOrder mFilters[COMPRESSOR_MAX_BANDS];
    PeakTracker mPeaks[COMPRESSOR_MAX_BANDS];
 };
 
 #endif /* defined(__Bespoke__MultibandCompressor__) */
-

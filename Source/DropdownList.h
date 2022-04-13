@@ -56,10 +56,18 @@ public:
 
    void SetUpModal();
    void DrawModule() override;
-   void SetDimensions(int w, int h) { mWidth = w; mHeight = h; }
+   void SetDimensions(int w, int h)
+   {
+      mWidth = w;
+      mHeight = h;
+   }
    bool HasTitleBar() const override { return false; }
-   
-   void GetDimensions(float& width, float& height) override { width = mWidth; height = mHeight; }
+
+   void GetDimensions(float& width, float& height) override
+   {
+      width = mWidth;
+      height = mHeight;
+   }
    bool ShouldClipContents() override { return false; }
    DropdownList* GetOwner() const { return mOwner; }
    bool MouseMoved(float x, float y) override;
@@ -101,12 +109,20 @@ public:
    void Clear();
    void SetVar(int* var) { mVar = var; }
    EnumMap GetEnumMap();
-   void SetUnknownItemString(std::string str) { mUnknownItemString = str; CalculateWidth(); }
+   void SetUnknownItemString(std::string str)
+   {
+      mUnknownItemString = str;
+      CalculateWidth();
+   }
    void DrawLabel(bool draw) { mDrawLabel = draw; }
    void SetWidth(int width) { mWidth = width; }
    void SetDrawTriangle(bool draw) { mDrawTriangle = draw; }
    void GetPopupDimensions(float& width, float& height) { mModalList.GetDimensions(width, height); }
-   void SetMaxPerColumn(int max) { mMaxPerColumn = max; CalculateWidth(); }
+   void SetMaxPerColumn(int max)
+   {
+      mMaxPerColumn = max;
+      CalculateWidth();
+   }
    int GetItemIndexAt(int x, int y);
    DropdownListElement GetElement(int index) { return mElements[index]; }
    DropdownListModal* GetModalDropdown() { return &mModalList; }
@@ -126,14 +142,14 @@ public:
    void Poll() override;
    void SaveState(FileStreamOut& out) override;
    void LoadState(FileStreamIn& in, bool shouldSetValue = true) override;
-   
+
    void GetDimensions(float& width, float& height) override;
 
    static constexpr int kItemSpacing = 15;
    static constexpr int kPageBarSpacing = 20;
-   
+
 protected:
-   ~DropdownList();   //protected so that it can't be created on the stack
+   ~DropdownList(); //protected so that it can't be created on the stack
 
 private:
    void OnClicked(int x, int y, bool right) override;

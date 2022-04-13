@@ -47,19 +47,19 @@ public:
    NoteCanvas();
    ~NoteCanvas();
    static IDrawableModule* Create() { return new NoteCanvas(); }
-   
-   
+
+
    void CreateUIControls() override;
    void Init() override;
-   
+
    void SetEnabled(bool enabled) override { mEnabled = enabled; }
    bool IsResizable() const override { return true; }
    void Resize(float w, float h) override;
    void KeyPressed(int key, bool isRepeat) override;
-   
+
    void PlayNote(double time, int pitch, int velocity, int voiceIdx = -1, ModulationParameters modulation = ModulationParameters()) override;
    void SendCC(int control, int value, int voiceIdx = -1) override {}
-   
+
    void Clear();
    NoteCanvasElement* AddNote(double measurePos, int pitch, int velocity, double length, int voiceIdx = -1, ModulationParameters modulation = ModulationParameters());
 
@@ -69,28 +69,28 @@ public:
    void FitNotes();
 
    void OnTransportAdvanced(float amount) override;
-   
+
    void CanvasUpdated(Canvas* canvas) override;
-   
+
    void CheckboxUpdated(Checkbox* checkbox) override;
    void FloatSliderUpdated(FloatSlider* slider, float oldVal) override;
    void IntSliderUpdated(IntSlider* slider, int oldVal) override;
    void ButtonClicked(ClickButton* button) override;
    void DropdownUpdated(DropdownList* list, int oldVal) override;
    void TextEntryComplete(TextEntry* entry) override {}
-   
+
    void LoadLayout(const ofxJSONElement& moduleInfo) override;
    void SetUpFromSaveData() override;
    void SaveLayout(ofxJSONElement& moduleInfo) override;
    void SaveState(FileStreamOut& out) override;
    void LoadState(FileStreamIn& in) override;
-   
+
 private:
    //IDrawableModule
    void DrawModule() override;
    void GetModuleDimensions(float& width, float& height) override;
    bool Enabled() const override { return mEnabled; }
-   
+
    double GetCurPos(double time) const;
    void UpdateNumColumns();
    void SetRecording(bool rec);
@@ -100,15 +100,15 @@ private:
    void QuantizeNotes();
    void LoadMidi();
    void SaveMidi();
-   
+
    Canvas* mCanvas;
    CanvasControls* mCanvasControls;
    CanvasTimeline* mCanvasTimeline;
    CanvasScrollbar* mCanvasScrollbarHorizontal;
    CanvasScrollbar* mCanvasScrollbarVertical;
-   std::vector<CanvasElement*> mNoteChecker{128};
-   std::vector<NoteCanvasElement*> mInputNotes{128};
-   std::vector<NoteCanvasElement*> mCurrentNotes{128};
+   std::vector<CanvasElement*> mNoteChecker{ 128 };
+   std::vector<NoteCanvasElement*> mInputNotes{ 128 };
+   std::vector<NoteCanvasElement*> mCurrentNotes{ 128 };
    IntSlider* mNumMeasuresSlider;
    int mNumMeasures;
    ClickButton* mQuantizeButton;
@@ -129,7 +129,7 @@ private:
    int mFreeRecordStartMeasure;
    bool mShowIntervals;
    Checkbox* mShowIntervalsCheckbox;
-   
+
    std::vector<ModulationParameters> mVoiceModulations;
 };
 

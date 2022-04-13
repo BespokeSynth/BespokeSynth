@@ -38,10 +38,10 @@ class Muter : public IAudioEffect, public IFloatSliderListener
 public:
    Muter();
    virtual ~Muter();
-   
+
    static IAudioEffect* Create() { return new Muter(); }
-   
-   
+
+
    void CreateUIControls() override;
 
    //IAudioEffect
@@ -57,7 +57,11 @@ private:
 
    //IDrawableModule
    void DrawModule() override;
-   void GetModuleDimensions(float& w, float& h) override { w=80; h=38; }
+   void GetModuleDimensions(float& w, float& h) override
+   {
+      w = 80;
+      h = 38;
+   }
    bool Enabled() const override { return true; }
 
    bool mPass;
@@ -70,4 +74,3 @@ private:
 
 
 #endif /* defined(__modularSynth__Muter__) */
-

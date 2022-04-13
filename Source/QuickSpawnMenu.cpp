@@ -35,7 +35,7 @@ QuickSpawnMenu* TheQuickSpawnMenu = nullptr;
 namespace
 {
    const int itemSpacing = 15;
-   ofVec2f moduleGrabOffset(-40,10);
+   ofVec2f moduleGrabOffset(-40, 10);
 }
 
 QuickSpawnMenu::QuickSpawnMenu()
@@ -125,30 +125,30 @@ void QuickSpawnMenu::MouseReleased()
 void QuickSpawnMenu::DrawModule()
 {
    ofPushStyle();
-   
+
    int highlightIndex = -1;
    if (TheSynth->GetMouseY(GetOwningContainer()) > GetPosition().y)
-      highlightIndex = (TheSynth->GetMouseY(GetOwningContainer()) - GetPosition().y)/itemSpacing;
-   
-   ofSetColor(50,50,50,100);
+      highlightIndex = (TheSynth->GetMouseY(GetOwningContainer()) - GetPosition().y) / itemSpacing;
+
+   ofSetColor(50, 50, 50, 100);
    ofFill();
-   ofRect(-2,-2,mWidth+4,mHeight+4);
-   for (int i=0; i<mElements.size(); ++i)
+   ofRect(-2, -2, mWidth + 4, mHeight + 4);
+   for (int i = 0; i < mElements.size(); ++i)
    {
-      ofSetColor(IDrawableModule::GetColor(TheSynth->GetModuleFactory()->GetModuleType(mElements[i]))*(i==highlightIndex ? .7f : .5f), 255);
-      ofRect(0, i*itemSpacing+1, mWidth, itemSpacing-1);
+      ofSetColor(IDrawableModule::GetColor(TheSynth->GetModuleFactory()->GetModuleType(mElements[i])) * (i == highlightIndex ? .7f : .5f), 255);
+      ofRect(0, i * itemSpacing + 1, mWidth, itemSpacing - 1);
       if (i == highlightIndex)
          ofSetColor(255, 255, 0);
       else
-         ofSetColor(255,255,255);
-      DrawTextNormal(mElements[i], 1, i*itemSpacing+12);
+         ofSetColor(255, 255, 255);
+      DrawTextNormal(mElements[i], 1, i * itemSpacing + 12);
    }
    if (mElements.size() == 0)
    {
       ofSetColor(255, 255, 255);
       DrawTextNormal("no modules found", 1, 12);
    }
-   
+
    ofPopStyle();
 }
 
@@ -168,14 +168,14 @@ void QuickSpawnMenu::OnClicked(int x, int y, bool right)
 {
    if (right)
       return;
-   
+
    std::string moduleTypeName = GetModuleTypeNameAt(x, y);
    if (moduleTypeName != "")
    {
       IDrawableModule* module = TheSynth->SpawnModuleOnTheFly(moduleTypeName, TheSynth->GetMouseX(TheSynth->GetRootContainer()) + moduleGrabOffset.x, TheSynth->GetMouseY(TheSynth->GetRootContainer()) + moduleGrabOffset.y);
       TheSynth->SetMoveModule(module, moduleGrabOffset.x, moduleGrabOffset.y, true);
    }
-   
+
    SetShowing(false);
 }
 

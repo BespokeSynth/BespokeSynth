@@ -42,10 +42,10 @@ public:
    FreqDomainBoilerplate();
    virtual ~FreqDomainBoilerplate();
    static IDrawableModule* Create() { return new FreqDomainBoilerplate(); }
-   
-   
+
+
    void CreateUIControls() override;
-   
+
    void SetEnabled(bool enabled) override { mEnabled = enabled; }
 
    //IAudioReceiver
@@ -60,14 +60,17 @@ public:
    void FloatSliderUpdated(FloatSlider* slider, float oldVal) override {}
 
 private:
-
    //IDrawableModule
    void DrawModule() override;
-   void GetModuleDimensions(float& w, float& h) override { w=235; h=170; }
+   void GetModuleDimensions(float& w, float& h) override
+   {
+      w = 235;
+      h = 170;
+   }
    bool Enabled() const override { return mEnabled; }
 
    FFTData mFFTData;
-   
+
    float* mWindower;
 
    ::FFT mFFT;
@@ -92,4 +95,3 @@ private:
 
 
 #endif /* defined(__modularSynth__FreqDomainBoilerplate__) */
-

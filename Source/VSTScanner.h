@@ -29,15 +29,6 @@
 
 #include "juce_audio_processors/juce_audio_processors.h"
 
-//adjustments to isolate language
-typedef juce::ChildProcessMaster ChildProcessLeader;
-typedef juce::ChildProcessSlave ChildProcessFollower;
-#define handleMessageFromLeader handleMessageFromMaster
-#define sendMessageToLeader sendMessageToMaster
-#define handleMessageFromFollower handleMessageFromSlave
-#define launchFollowerProcess launchSlaveProcess
-#define sendMessageToFollower sendMessageToSlave
-
 constexpr const char* kScanProcessUID = "bespokesynth";
 constexpr const char* kScanModeKey = "pluginScanMode";
 
@@ -54,13 +45,13 @@ public:
    void scanFinished() override { superprocess = nullptr; }
 
 private:
-   class Superprocess : public ChildProcessLeader
+   class Superprocess : public juce::ChildProcessCoordinator
    {
    public:
       explicit Superprocess(CustomPluginScanner& o);
 
    private:
-      void handleMessageFromFollower(const juce::MemoryBlock& mb) override;
+      void handleMessageFromWorker(const juce::MemoryBlock& mb) override;
       void handleConnectionLost() override;
 
       CustomPluginScanner& owner;
@@ -117,16 +108,16 @@ private:
    JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR(PluginListWindow)
 };
 
-class PluginScannerSubprocess : private ChildProcessFollower,
+class PluginScannerSubprocess : private juce::ChildProcessWorker,
                                 private juce::AsyncUpdater
 {
 public:
    PluginScannerSubprocess();
 
-   using ChildProcessFollower::initialiseFromCommandLine;
+   using juce::ChildProcessWorker::initialiseFromCommandLine;
 
 private:
-   void handleMessageFromLeader(const juce::MemoryBlock& mb) override;
+   void handleMessageFromCoordinator(const juce::MemoryBlock& mb) override;
    void handleConnectionLost() override;
 
    // It's important to run the plugin scan on the main thread!

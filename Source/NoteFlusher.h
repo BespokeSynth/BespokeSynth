@@ -36,20 +36,25 @@ class NoteFlusher : public NoteEffectBase, public IDrawableModule, public IButto
 public:
    NoteFlusher();
    static IDrawableModule* Create() { return new NoteFlusher(); }
-   
-   
+
+
    void CreateUIControls() override;
-   
+
    void ButtonClicked(ClickButton* button) override;
-   
+
    virtual void LoadLayout(const ofxJSONElement& moduleInfo) override;
    virtual void SetUpFromSaveData() override;
+
 private:
    //IDrawableModule
    void DrawModule() override;
-   void GetModuleDimensions(float& width, float& height) override { width = 90; height = 18; }
+   void GetModuleDimensions(float& width, float& height) override
+   {
+      width = 90;
+      height = 18;
+   }
    bool Enabled() const override { return mEnabled; }
-   
+
    ClickButton* mFlushButton;
 };
 

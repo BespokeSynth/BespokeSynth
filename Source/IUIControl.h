@@ -45,7 +45,11 @@ enum AnchorDirection
 class IUIControl : public IClickable
 {
 public:
-   IUIControl() : mRemoteControlCount(0), mNoHover(false), mShouldSaveState(true) {}
+   IUIControl()
+   : mRemoteControlCount(0)
+   , mNoHover(false)
+   , mShouldSaveState(true)
+   {}
    virtual void Delete() { delete this; }
    void AddRemoteController() { ++mRemoteControlCount; }
    void RemoveRemoteController() { --mRemoteControlCount; }
@@ -62,7 +66,11 @@ public:
    virtual void KeyPressed(int key, bool isRepeat) {}
    void StartBeacon() override;
    bool IsPreset();
-   virtual void GetRange(float& min, float& max) { min = 0; max = 1; }
+   virtual void GetRange(float& min, float& max)
+   {
+      min = 0;
+      max = 1;
+   }
    virtual bool IsBitmask() { return false; }
    bool TestHover(int x, int y);
    void CheckHover(int x, int y);
@@ -85,19 +93,20 @@ public:
    virtual bool IsButtonControl() { return false; }
    virtual bool IsMouseDown() const { return false; }
    virtual bool IsTextEntry() const { return false; }
-   
+
    static void SetNewManualHover(int direction);
    static bool WasLastHoverSetViaTab() { return sLastUIHoverWasSetViaTab; }
-   
+
    virtual void SaveState(FileStreamOut& out) = 0;
    virtual void LoadState(FileStreamIn& in, bool shouldSetValue = true) = 0;
+
 protected:
    virtual ~IUIControl();
-   
+
    int mRemoteControlCount;
    bool mNoHover;
    bool mShouldSaveState;
-   
+
    static IUIControl* sLastHoveredUIControl;
    static bool sLastUIHoverWasSetViaTab;
 };

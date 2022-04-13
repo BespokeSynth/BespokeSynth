@@ -26,7 +26,7 @@
 */
 
 #if BESPOKE_WINDOWS
-#define ssize_t ssize_t_undef_hack  //fixes conflict with ssize_t typedefs between python and juce
+#define ssize_t ssize_t_undef_hack //fixes conflict with ssize_t typedefs between python and juce
 #endif
 #include "ScriptModule.h"
 #include "SynthGlobals.h"
@@ -45,8 +45,8 @@
 #include "leathers/push"
 #include "leathers/unused-value"
 #include "leathers/range-loop-analysis"
-   #include "pybind11/embed.h"
-   #include "pybind11/stl.h"
+#include "pybind11/embed.h"
+#include "pybind11/stl.h"
 #include "leathers/pop"
 
 namespace py = pybind11;
@@ -102,13 +102,13 @@ ScriptModule::ScriptModule()
       InitializePythonIfNecessary();
 
    Reset();
-   
+
    mScriptModuleIndex = sScriptModules.size();
    sScriptModules.push_back(this);
 
    OSCReceiver::addListener(this);
-   
-   Transport::sDoEventLookahead = true;   //scripts require lookahead to be able to schedule on time
+
+   Transport::sDoEventLookahead = true; //scripts require lookahead to be able to schedule on time
 }
 
 ScriptModule::~ScriptModule()
@@ -118,18 +118,27 @@ ScriptModule::~ScriptModule()
 void ScriptModule::CreateUIControls()
 {
    IDrawableModule::CreateUIControls();
-   
+
    UIBLOCK0();
-   DROPDOWN(mLoadScriptSelector, "loadscript", &mLoadScriptIndex, 120); UIBLOCK_SHIFTRIGHT();
-   BUTTON(mLoadScriptButton,"load"); UIBLOCK_SHIFTRIGHT();
-   BUTTON(mSaveScriptButton,"save as"); UIBLOCK_SHIFTRIGHT();
-   BUTTON(mShowReferenceButton, "?"); UIBLOCK_NEWLINE();
-   UICONTROL_CUSTOM(mCodeEntry, new CodeEntry(UICONTROL_BASICS("code"),500,300));
-   BUTTON(mRunButton, "run"); UIBLOCK_SHIFTRIGHT();
-   BUTTON(mStopButton, "stop"); UIBLOCK_NEWLINE();
-   FLOATSLIDER(mASlider, "a", &mA, 0, 1); UIBLOCK_SHIFTRIGHT();
-   FLOATSLIDER(mBSlider, "b", &mB, 0, 1); UIBLOCK_SHIFTRIGHT();
-   FLOATSLIDER(mCSlider, "c", &mC, 0, 1); UIBLOCK_SHIFTRIGHT();
+   DROPDOWN(mLoadScriptSelector, "loadscript", &mLoadScriptIndex, 120);
+   UIBLOCK_SHIFTRIGHT();
+   BUTTON(mLoadScriptButton, "load");
+   UIBLOCK_SHIFTRIGHT();
+   BUTTON(mSaveScriptButton, "save as");
+   UIBLOCK_SHIFTRIGHT();
+   BUTTON(mShowReferenceButton, "?");
+   UIBLOCK_NEWLINE();
+   UICONTROL_CUSTOM(mCodeEntry, new CodeEntry(UICONTROL_BASICS("code"), 500, 300));
+   BUTTON(mRunButton, "run");
+   UIBLOCK_SHIFTRIGHT();
+   BUTTON(mStopButton, "stop");
+   UIBLOCK_NEWLINE();
+   FLOATSLIDER(mASlider, "a", &mA, 0, 1);
+   UIBLOCK_SHIFTRIGHT();
+   FLOATSLIDER(mBSlider, "b", &mB, 0, 1);
+   UIBLOCK_SHIFTRIGHT();
+   FLOATSLIDER(mCSlider, "c", &mC, 0, 1);
+   UIBLOCK_SHIFTRIGHT();
    FLOATSLIDER(mDSlider, "d", &mD, 0, 1);
    ENDUIBLOCK(mWidth, mHeight);
 
@@ -151,8 +160,8 @@ void ScriptModule::UninitializePython()
 namespace
 {
    // Py_SetPythonHome()'s signature varies depending on Python version. This converts to the string type we need.
-   std::string toPythonHome(const std::string &s, void (*)(char*)) { return s; }
-   std::wstring toPythonHome(const std::string &s, void (*)(const wchar_t*)) { return juce::String{s}.toWideCharPointer(); }
+   std::string toPythonHome(const std::string& s, void (*)(char*)) { return s; }
+   std::wstring toPythonHome(const std::string& s, void (*)(const wchar_t*)) { return juce::String{ s }.toWideCharPointer(); }
 }
 
 //static
@@ -161,16 +170,16 @@ void ScriptModule::InitializePythonIfNecessary()
    if (!sPythonInitialized)
    {
 #ifdef BESPOKE_PORTABLE_PYTHON
-      static const auto pythonHomeUtf8{ofToFactoryPath("python")};
-      static auto PYTHONHOME{toPythonHome(pythonHomeUtf8, Py_SetPythonHome)};
+      static const auto pythonHomeUtf8{ ofToFactoryPath("python") };
+      static auto PYTHONHOME{ toPythonHome(pythonHomeUtf8, Py_SetPythonHome) };
       Py_SetPythonHome(PYTHONHOME.data());
 #endif
       py::initialize_interpreter();
 #ifdef BESPOKE_PORTABLE_PYTHON
-      py::exec(std::string{"import sys; sys.executable = '"} + pythonHomeUtf8 + "/" BESPOKE_PORTABLE_PYTHON "'; del sys");
+      py::exec(std::string{ "import sys; sys.executable = '" } + pythonHomeUtf8 + "/" BESPOKE_PORTABLE_PYTHON "'; del sys");
 #endif
       py::exec(GetBootstrapImportString(), py::globals());
-      
+
       CodeEntry::OnPythonInit();
    }
    sPythonInitialized = true;
@@ -217,9 +226,10 @@ void ScriptModule::DrawModule()
       if (pythonVersionRev.lastIndexOfChar('.') == -1)
          pythonVersionMinor = "***ERROR***";
       DrawTextNormal("this version of bespoke was built with Python " + pythonVersionRev.toStdString() + "\n" +
-                     "please ensure that you have some flavor of Python " + pythonVersionMinor.toStdString() + " installed.\n"+
+                     "please ensure that you have some flavor of Python " + pythonVersionMinor.toStdString() + " installed.\n" +
                      "(not an older or newer version!)\n\n" +
-                     "if you do not, bespoke will crash!", 20, 20);
+                     "if you do not, bespoke will crash!",
+                     20, 20);
 
       mCodeEntry->SetShowing(false);
 
@@ -228,7 +238,7 @@ void ScriptModule::DrawModule()
 
       return;
    }
-   
+
    mPythonInstalledConfirmButton->SetShowing(false);
    mCodeEntry->SetShowing(true);
 
@@ -243,7 +253,7 @@ void ScriptModule::DrawModule()
    mBSlider->Draw();
    mCSlider->Draw();
    mDSlider->Draw();
-   
+
    if (mLastError != "")
    {
       ofSetColor(255, 0, 0, gModuleDrawAlpha);
@@ -252,36 +262,36 @@ void ScriptModule::DrawModule()
       errorPos.y += 12;
       DrawTextNormal(mLastError, errorPos.x, errorPos.y);
    }
-   
+
    mLineExecuteTracker.Draw(mCodeEntry, 0, ofColor::green);
    mNotePlayTracker.Draw(mCodeEntry, 1, IDrawableModule::GetColor(kModuleType_Note));
    mMethodCallTracker.Draw(mCodeEntry, 1, IDrawableModule::GetColor(kModuleType_Other));
    mUIControlTracker.Draw(mCodeEntry, 1, IDrawableModule::GetColor(kModuleType_Modulator));
-   
-   for (size_t i=0; i<mScheduledNoteOutput.size(); ++i)
+
+   for (size_t i = 0; i < mScheduledNoteOutput.size(); ++i)
    {
       if (mScheduledNoteOutput[i].time != -1 &&
           //mScheduledNoteOutput[i].velocity > 0 &&
           gTime + 50 < mScheduledNoteOutput[i].time)
          DrawTimer(mScheduledNoteOutput[i].lineNum, mScheduledNoteOutput[i].startTime, mScheduledNoteOutput[i].time, IDrawableModule::GetColor(kModuleType_Note), mScheduledNoteOutput[i].velocity > 0);
    }
-   
-   for (size_t i=0; i<mScheduledMethodCall.size(); ++i)
+
+   for (size_t i = 0; i < mScheduledMethodCall.size(); ++i)
    {
       if (mScheduledMethodCall[i].time != -1 &&
           gTime + 50 < mScheduledMethodCall[i].time)
          DrawTimer(mScheduledMethodCall[i].lineNum, mScheduledMethodCall[i].startTime, mScheduledMethodCall[i].time, IDrawableModule::GetColor(kModuleType_Other), true);
    }
-   
-   for (size_t i=0; i<mScheduledUIControlValue.size(); ++i)
+
+   for (size_t i = 0; i < mScheduledUIControlValue.size(); ++i)
    {
       if (mScheduledUIControlValue[i].time != -1 &&
           gTime + 50 < mScheduledUIControlValue[i].time)
          DrawTimer(mScheduledUIControlValue[i].lineNum, mScheduledUIControlValue[i].startTime, mScheduledUIControlValue[i].time, IDrawableModule::GetColor(kModuleType_Modulator), true);
    }
-   
+
    ofPushStyle();
-   for (size_t i=0; i<mPrintDisplay.size(); ++i)
+   for (size_t i = 0; i < mPrintDisplay.size(); ++i)
    {
       if (mPrintDisplay[i].time == -1)
          continue;
@@ -289,7 +299,7 @@ void ScriptModule::DrawModule()
       float fadeMs = 500;
       if (gTime - mPrintDisplay[i].time >= 0 && gTime - mPrintDisplay[i].time < fadeMs)
       {
-         ofSetColor(ofColor::white, 255*(1-(gTime - mPrintDisplay[i].time)/fadeMs));
+         ofSetColor(ofColor::white, 255 * (1 - (gTime - mPrintDisplay[i].time) / fadeMs));
          ofVec2f linePos = mCodeEntry->GetLinePos(mPrintDisplay[i].lineNum, K(end));
          DrawTextNormal(mPrintDisplay[i].text, linePos.x + 10, linePos.y + 15);
       }
@@ -298,8 +308,8 @@ void ScriptModule::DrawModule()
          mPrintDisplay[i].time = -1;
       }
    }
-   
-   for (size_t i=0; i<mUIControlModifications.size(); ++i)
+
+   for (size_t i = 0; i < mUIControlModifications.size(); ++i)
    {
       if (mUIControlModifications[i].time == -1)
          continue;
@@ -307,7 +317,7 @@ void ScriptModule::DrawModule()
       float fadeMs = 500;
       if (gTime - mUIControlModifications[i].time >= 0 && gTime - mUIControlModifications[i].time < fadeMs)
       {
-         ofSetColor(IDrawableModule::GetColor(kModuleType_Modulator), 255*(1-(gTime - mUIControlModifications[i].time)/fadeMs));
+         ofSetColor(IDrawableModule::GetColor(kModuleType_Modulator), 255 * (1 - (gTime - mUIControlModifications[i].time) / fadeMs));
          ofVec2f linePos = mCodeEntry->GetLinePos(mUIControlModifications[i].lineNum, K(end));
          DrawTextNormal(ofToString(mUIControlModifications[i].value), linePos.x + 10, linePos.y + 15);
       }
@@ -317,7 +327,7 @@ void ScriptModule::DrawModule()
       }
    }
    ofPopStyle();
-   
+
    if (CodeEntry::HasJediNotInstalledWarning())
    {
       ofPushStyle();
@@ -328,9 +338,9 @@ void ScriptModule::DrawModule()
       float y = buttonRect.getCenter().y;
       ofCircle(x, y, 6);
       ofSetColor(0, 0, 0);
-      DrawTextBold("!", x-2, y+5, 17);
+      DrawTextBold("!", x - 2, y + 5, 17);
       ofPopStyle();
-      
+
       if (mShowJediWarning)
          TheSynth->SetNextDrawTooltip("warning: jedi is not installed, so scripting autocomplete will not work. to add autocomplete functionality, install jedi, which you can likely do with the command 'pip install jedi' in a terminal window");
    }
@@ -347,42 +357,42 @@ void ScriptModule::DrawModuleUnclipped()
    if (mDrawDebug)
    {
       std::string debugText = mLastRunLiteralCode;
-      
-      for (size_t i=0; i<mScheduledNoteOutput.size(); ++i)
+
+      for (size_t i = 0; i < mScheduledNoteOutput.size(); ++i)
       {
          if (mScheduledNoteOutput[i].time != -1 &&
              gTime + 50 < mScheduledNoteOutput[i].time)
-            debugText += "\nP:"+ofToString(mScheduledNoteOutput[i].pitch) + " V:" + ofToString(mScheduledNoteOutput[i].velocity) + ", " + ofToString(mScheduledNoteOutput[i].time) + " " + ofToString(mScheduledNoteOutput[i].startTime) + ", line:" + ofToString(mScheduledNoteOutput[i].lineNum);
+            debugText += "\nP:" + ofToString(mScheduledNoteOutput[i].pitch) + " V:" + ofToString(mScheduledNoteOutput[i].velocity) + ", " + ofToString(mScheduledNoteOutput[i].time) + " " + ofToString(mScheduledNoteOutput[i].startTime) + ", line:" + ofToString(mScheduledNoteOutput[i].lineNum);
       }
-      
-      for (size_t i=0; i<mScheduledMethodCall.size(); ++i)
+
+      for (size_t i = 0; i < mScheduledMethodCall.size(); ++i)
       {
          if (mScheduledMethodCall[i].time != -1 &&
              gTime + 50 < mScheduledMethodCall[i].time)
-            debugText += "\n"+mScheduledMethodCall[i].method + ", " + ofToString(mScheduledMethodCall[i].time) + " " + ofToString(mScheduledMethodCall[i].startTime) + " " + ofToString(mScheduledMethodCall[i].lineNum);
+            debugText += "\n" + mScheduledMethodCall[i].method + ", " + ofToString(mScheduledMethodCall[i].time) + " " + ofToString(mScheduledMethodCall[i].startTime) + " " + ofToString(mScheduledMethodCall[i].lineNum);
       }
-      
-      for (size_t i=0; i<mScheduledUIControlValue.size(); ++i)
+
+      for (size_t i = 0; i < mScheduledUIControlValue.size(); ++i)
       {
          if (mScheduledUIControlValue[i].time != -1 &&
              gTime + 50 < mScheduledUIControlValue[i].time)
-            debugText += "\n"+ std::string(mScheduledUIControlValue[i].control->Name()) + ": " + ofToString(mScheduledUIControlValue[i].value) + ", " + ofToString(mScheduledUIControlValue[i].time) + " " + ofToString(mScheduledUIControlValue[i].startTime) + " " + ofToString(mScheduledUIControlValue[i].lineNum);
+            debugText += "\n" + std::string(mScheduledUIControlValue[i].control->Name()) + ": " + ofToString(mScheduledUIControlValue[i].value) + ", " + ofToString(mScheduledUIControlValue[i].time) + " " + ofToString(mScheduledUIControlValue[i].startTime) + " " + ofToString(mScheduledUIControlValue[i].lineNum);
       }
-      
+
       std::string lineNumbers = "";
       std::vector<std::string> lines = ofSplitString(mLastRunLiteralCode, "\n");
-      for (size_t i=0; i<lines.size(); ++i)
+      for (size_t i = 0; i < lines.size(); ++i)
       {
-         lineNumbers += ofToString(i+1)+"\n";
+         lineNumbers += ofToString(i + 1) + "\n";
       }
-      
-      ofSetColor(100,100,100);
-      DrawTextNormal(lineNumbers, mWidth+5, 0);
-      ofSetColor(255,255,255);
+
+      ofSetColor(100, 100, 100);
+      DrawTextNormal(lineNumbers, mWidth + 5, 0);
+      ofSetColor(255, 255, 255);
       DrawTextNormal(debugText, mWidth + 30, 0);
    }
-   
-   for (size_t i=0; i<mUIControlModifications.size(); ++i)
+
+   for (size_t i = 0; i < mUIControlModifications.size(); ++i)
    {
       if (mUIControlModifications[i].time == -1)
          continue;
@@ -390,10 +400,10 @@ void ScriptModule::DrawModuleUnclipped()
       float fadeMs = 200;
       if (gTime - mUIControlModifications[i].time >= 0 && gTime - mUIControlModifications[i].time < fadeMs)
       {
-         ofSetColor(IDrawableModule::GetColor(kModuleType_Modulator), 100*(1-(gTime - mUIControlModifications[i].time)/fadeMs));
-         
+         ofSetColor(IDrawableModule::GetColor(kModuleType_Modulator), 100 * (1 - (gTime - mUIControlModifications[i].time) / fadeMs));
+
          ofVec2f linePos = mCodeEntry->GetLinePos(mUIControlModifications[i].lineNum, false);
-      
+
          ofPushMatrix();
          ofTranslate(-mX, -mY);
          ofSetLineWidth(1);
@@ -419,8 +429,8 @@ void ScriptModule::DrawModuleUnclipped()
          ofSetColor(IDrawableModule::GetColor(kModuleType_Other), 30);
          ofFill();
          float codeY = mCodeEntry->GetPosition(true).y;
-         float topY = ofClamp(linePos.y + 3, codeY, codeY+mCodeEntry->GetRect().height);
-         float bottomY = ofClamp(linePos.y + 3 + mCodeEntry->GetCharHeight(), codeY, codeY+mCodeEntry->GetRect().height);
+         float topY = ofClamp(linePos.y + 3, codeY, codeY + mCodeEntry->GetRect().height);
+         float bottomY = ofClamp(linePos.y + 3 + mCodeEntry->GetCharHeight(), codeY, codeY + mCodeEntry->GetRect().height);
          ofRectangle lineRect(linePos.x, topY, mCodeEntry->GetRect().width, bottomY - topY);
          ofRect(lineRect, L(corner, 0));
 
@@ -443,12 +453,12 @@ bool ScriptModule::MouseMoved(float x, float y)
       ofRectangle buttonRect = mShowReferenceButton->GetRect(true);
       float warningX = buttonRect.getMaxX() + 10;
       float warningY = buttonRect.getCenter().y;
-      if (ofDistSquared(x, y, warningX, warningY) <= 6*6)
+      if (ofDistSquared(x, y, warningX, warningY) <= 6 * 6)
          mShowJediWarning = true;
       else
          mShowJediWarning = false;
    }
-   
+
    return IDrawableModule::MouseMoved(x, y);
 }
 
@@ -492,10 +502,10 @@ void ScriptModule::Poll()
       }
       sScriptsRequestingInitExecution.clear();
    }
-   
+
    double time = gTime;
-   
-   for (size_t i=0; i<mScheduledPulseTimes.size(); ++i)
+
+   for (size_t i = 0; i < mScheduledPulseTimes.size(); ++i)
    {
       if (mScheduledPulseTimes[i] != -1)
       {
@@ -509,8 +519,8 @@ void ScriptModule::Poll()
          }
       }
    }
-   
-   for (size_t i=0; i<mPendingNoteInput.size(); ++i)
+
+   for (size_t i = 0; i < mPendingNoteInput.size(); ++i)
    {
       if (mPendingNoteInput[i].time != -1 &&
           time + TheTransport->GetEventLookaheadMs() > mPendingNoteInput[i].time)
@@ -519,13 +529,13 @@ void ScriptModule::Poll()
          {
             //if (mPendingNoteInput[i].time < time)
             //   ofLog() << "trying to run script triggered by note too late!";
-            RunCode(mPendingNoteInput[i].time, "on_note("+ofToString(mPendingNoteInput[i].pitch)+", "+ofToString(mPendingNoteInput[i].velocity)+")");
+            RunCode(mPendingNoteInput[i].time, "on_note(" + ofToString(mPendingNoteInput[i].pitch) + ", " + ofToString(mPendingNoteInput[i].velocity) + ")");
          }
          mPendingNoteInput[i].time = -1;
       }
    }
-   
-   for (size_t i=0; i<mScheduledUIControlValue.size(); ++i)
+
+   for (size_t i = 0; i < mScheduledUIControlValue.size(); ++i)
    {
       if (mScheduledUIControlValue[i].time != -1 &&
           time + TheTransport->GetEventLookaheadMs() > mScheduledUIControlValue[i].time)
@@ -534,9 +544,9 @@ void ScriptModule::Poll()
          mScheduledUIControlValue[i].time = -1;
       }
    }
-   
+
    //note offs first
-   for (size_t i=0; i<mScheduledNoteOutput.size(); ++i)
+   for (size_t i = 0; i < mScheduledNoteOutput.size(); ++i)
    {
       if (mScheduledNoteOutput[i].time != -1 &&
           mScheduledNoteOutput[i].velocity == 0 &&
@@ -546,9 +556,9 @@ void ScriptModule::Poll()
          mScheduledNoteOutput[i].time = -1;
       }
    }
-   
+
    //then note ons
-   for (size_t i=0; i<mScheduledNoteOutput.size(); ++i)
+   for (size_t i = 0; i < mScheduledNoteOutput.size(); ++i)
    {
       if (mScheduledNoteOutput[i].time != -1 &&
           mScheduledNoteOutput[i].velocity != 0 &&
@@ -558,8 +568,8 @@ void ScriptModule::Poll()
          mScheduledNoteOutput[i].time = -1;
       }
    }
-   
-   for (size_t i=0; i<mScheduledMethodCall.size(); ++i)
+
+   for (size_t i = 0; i < mScheduledMethodCall.size(); ++i)
    {
       if (mScheduledMethodCall[i].time != -1 &&
           time + TheTransport->GetEventLookaheadMs() > mScheduledMethodCall[i].time)
@@ -620,9 +630,9 @@ void ScriptModule::PlayNoteFromScriptAfterDelay(float pitch, float velocity, dou
    double time = GetScheduledTime(delayMeasureTime);
    //if (velocity == 0)
    //   time -= gBufferSizeMs + 1;  //TODO(Ryan) hack to make note offs happen a buffer early... figure out why scheduled lengths are longer than it takes to get the next pulse of the same interval
-   
+
    //ofLog() << "ScriptModule::PlayNoteFromScriptAfterDelay() " << velocity << " " << time << " " << sMostRecentRunTime << " " << (time - sMostRecentRunTime);
-   
+
    if (time <= sMostRecentRunTime)
    {
       if (time < gTime)
@@ -651,7 +661,7 @@ void ScriptModule::SendCCFromScript(int control, int value, int noteOutputIndex)
 
 void ScriptModule::ScheduleNote(double time, float pitch, float velocity, float pan, int noteOutputIndex)
 {
-   for (size_t i=0; i<mScheduledNoteOutput.size(); ++i)
+   for (size_t i = 0; i < mScheduledNoteOutput.size(); ++i)
    {
       if (mScheduledNoteOutput[i].time == -1)
       {
@@ -669,12 +679,12 @@ void ScriptModule::ScheduleNote(double time, float pitch, float velocity, float 
 
 void ScriptModule::ScheduleMethod(std::string method, double delayMeasureTime)
 {
-   for (size_t i=0; i<mScheduledMethodCall.size(); ++i)
+   for (size_t i = 0; i < mScheduledMethodCall.size(); ++i)
    {
       if (mScheduledMethodCall[i].time == -1)
       {
          double time = GetScheduledTime(delayMeasureTime);
-         
+
          mScheduledMethodCall[i].time = time;
          mScheduledMethodCall[i].startTime = sMostRecentRunTime;
          mScheduledMethodCall[i].method = method;
@@ -686,12 +696,12 @@ void ScriptModule::ScheduleMethod(std::string method, double delayMeasureTime)
 
 void ScriptModule::ScheduleUIControlValue(IUIControl* control, float value, double delayMeasureTime)
 {
-   for (size_t i=0; i<mScheduledUIControlValue.size(); ++i)
+   for (size_t i = 0; i < mScheduledUIControlValue.size(); ++i)
    {
       if (mScheduledUIControlValue[i].time == -1)
       {
          double time = GetScheduledTime(delayMeasureTime);
-         
+
          mScheduledUIControlValue[i].time = time;
          mScheduledUIControlValue[i].startTime = sMostRecentRunTime;
          mScheduledUIControlValue[i].control = control;
@@ -716,7 +726,7 @@ void ScriptModule::HighlightLine(int lineNum, int scriptModuleIndex)
 
 void ScriptModule::PrintText(std::string text)
 {
-   for (size_t i=0; i<mPrintDisplay.size(); ++i)
+   for (size_t i = 0; i < mPrintDisplay.size(); ++i)
    {
       if (mPrintDisplay[i].time == -1 || mPrintDisplay[i].lineNum == mNextLineToExecute)
       {
@@ -735,17 +745,17 @@ IUIControl* ScriptModule::GetUIControl(std::string path)
       control = TheSynth->FindUIControl(path);
    else
       control = TheSynth->FindUIControl(Path() + "~" + path);
-   
+
    return control;
 }
 
 void ScriptModule::AdjustUIControl(IUIControl* control, float value, int lineNum)
 {
    control->SetValue(value);
-   
+
    mUIControlTracker.AddEvent(lineNum);
-   
-   for (size_t i=0; i<mUIControlModifications.size(); ++i)
+
+   for (size_t i = 0; i < mUIControlModifications.size(); ++i)
    {
       if (mUIControlModifications[i].time == -1 || mUIControlModifications[i].lineNum == lineNum)
       {
@@ -763,7 +773,7 @@ void ScriptModule::PlayNote(double time, float pitch, float velocity, float pan,
    if (velocity > 0)
    {
       //run through any scheduled note offs for this pitch
-      for (size_t i=0; i<mScheduledNoteOutput.size(); ++i)
+      for (size_t i = 0; i < mScheduledNoteOutput.size(); ++i)
       {
          if (mScheduledNoteOutput[i].velocity == 0 &&
              mScheduledNoteOutput[i].pitch == pitch &&
@@ -775,9 +785,9 @@ void ScriptModule::PlayNote(double time, float pitch, float velocity, float pan,
          }
       }
    }
-   
+
    //ofLog() << "ScriptModule::PlayNote() " << velocity << " " << time;
-   int intPitch = int(pitch+.5f);
+   int intPitch = int(pitch + .5f);
    ModulationParameters modulation;
    modulation.pan = pan;
    if (pitch - intPitch != 0)
@@ -786,9 +796,9 @@ void ScriptModule::PlayNote(double time, float pitch, float velocity, float pan,
       modulation.pitchBend->SetValue(pitch - intPitch);
    }
    SendNoteToIndex(noteOutputIndex, time, intPitch, (int)velocity, -1, modulation);
-   
+
    if (velocity > 0)
-      mNotePlayTracker.AddEvent(lineNum, ofToString(pitch) + " " + ofToString(velocity) + " " + ofToString(pan,1));
+      mNotePlayTracker.AddEvent(lineNum, ofToString(pitch) + " " + ofToString(velocity) + " " + ofToString(pan, 1));
 }
 
 void ScriptModule::SendNoteToIndex(int index, double time, int pitch, int velocity, int voiceIdx, ModulationParameters modulation)
@@ -798,10 +808,10 @@ void ScriptModule::SendNoteToIndex(int index, double time, int pitch, int veloci
       PlayNoteOutput(time, pitch, velocity, voiceIdx, modulation);
       return;
    }
-   
-   if (index-1 < (int)mExtraNoteOutputs.size())
+
+   if (index - 1 < (int)mExtraNoteOutputs.size())
    {
-      mExtraNoteOutputs[index-1]->PlayNoteOutput(time, pitch, velocity, voiceIdx, modulation);
+      mExtraNoteOutputs[index - 1]->PlayNoteOutput(time, pitch, velocity, voiceIdx, modulation);
    }
 }
 
@@ -811,9 +821,9 @@ void ScriptModule::SetNumNoteOutputs(int num)
    {
       auto noteCable = new AdditionalNoteCable();
       noteCable->SetPatchCableSource(new PatchCableSource(this, kConnectionType_Note));
-      noteCable->GetPatchCableSource()->SetOverrideCableDir(ofVec2f(-1,0));
+      noteCable->GetPatchCableSource()->SetOverrideCableDir(ofVec2f(-1, 0));
       AddPatchCableSource(noteCable->GetPatchCableSource());
-      noteCable->GetPatchCableSource()->SetManualPosition(0, 30+20*(int)mExtraNoteOutputs.size());
+      noteCable->GetPatchCableSource()->SetManualPosition(0, 30 + 20 * (int)mExtraNoteOutputs.size());
       mExtraNoteOutputs.push_back(noteCable);
    }
 }
@@ -843,7 +853,7 @@ void ScriptModule::oscMessageReceived(const OSCMessage& msg)
          messageString += " " + msg[i].getString().toStdString();
    }
 
-   RunCode(gTime, "on_osc(\""+ messageString +"\")");
+   RunCode(gTime, "on_osc(\"" + messageString + "\")");
 }
 
 void ScriptModule::MidiReceived(MidiMessageType messageType, int control, float value, int channel)
@@ -863,19 +873,19 @@ void ScriptModule::ButtonClicked(ClickButton* button)
       mCodeEntry->Publish();
       RunScript(gTime);
    }
-   
+
    if (button == mStopButton)
       Stop();
-   
+
    if (button == mSaveScriptButton)
    {
       FileChooser chooser("Save script as...", File(ofToDataPath("scripts/script.py")), "*.py", true, false, TheSynth->GetFileChooserParent());
       if (chooser.browseForFileToSave(true))
       {
          std::string path = chooser.getResult().getFullPathName().toStdString();
-         
-         File resourceFile (path);
-         TemporaryFile tempFile (resourceFile);
+
+         File resourceFile(path);
+         TemporaryFile tempFile(resourceFile);
 
          {
             FileOutputStream output(tempFile.getFile());
@@ -902,10 +912,10 @@ void ScriptModule::ButtonClicked(ClickButton* button)
             DBG("An error occurred writing the file");
             return;
          }
-         
+
          RefreshScriptFiles();
-         
-         for (size_t i=0; i<mScriptFilePaths.size(); ++i)
+
+         for (size_t i = 0; i < mScriptFilePaths.size(); ++i)
          {
             if (mScriptFilePaths[i] == path)
             {
@@ -915,14 +925,14 @@ void ScriptModule::ButtonClicked(ClickButton* button)
          }
       }
    }
-   
+
    if (button == mLoadScriptButton)
    {
       if (mLoadScriptIndex >= 0 && mLoadScriptIndex < (int)mScriptFilePaths.size())
       {
          mLoadedScriptPath = mScriptFilePaths[mLoadScriptIndex];
          File resourceFile = File(mLoadedScriptPath);
-         
+
          if (!resourceFile.existsAsFile())
          {
             DBG("File doesn't exist ...");
@@ -938,7 +948,7 @@ void ScriptModule::ButtonClicked(ClickButton* button)
          }
 
          mLoadedScriptFiletime = resourceFile.getLastModificationTime();
-             
+
          mCodeEntry->SetText(input->readString().toStdString());
       }
    }
@@ -958,38 +968,46 @@ void ScriptModule::DropdownClicked(DropdownList* list)
       RefreshScriptFiles();
 }
 
-void ScriptModule::DropdownUpdated(DropdownList *list, int oldValue)
+void ScriptModule::DropdownUpdated(DropdownList* list, int oldValue)
 {
 }
 
 void ScriptModule::RefreshStyleFiles()
 {
-    ofxJSONElement root;
-    if (File(ofToDataPath("scriptstyles.json")).existsAsFile())
-        root.open(ofToDataPath("scriptstyles.json"));
-    else
-        root.open(ofToResourcePath("userdata_original/scriptstyles.json"));
-    sStyleJSON = root["styles"];
+   ofxJSONElement root;
+   if (File(ofToDataPath("scriptstyles.json")).existsAsFile())
+      root.open(ofToDataPath("scriptstyles.json"));
+   else
+      root.open(ofToResourcePath("userdata_original/scriptstyles.json"));
+   sStyleJSON = root["styles"];
 }
 
 void ScriptModule::RefreshScriptFiles()
 {
    mScriptFilePaths.clear();
    mLoadScriptSelector->Clear();
-   for (const auto& entry : RangedDirectoryIterator{File{ofToDataPath("scripts")}, false, "*.py"})
+   std::list<std::string> scripts;
+   for (const auto& entry : RangedDirectoryIterator{ File{ ofToDataPath("scripts") }, false, "*.py" })
    {
       const auto& file = entry.getFile();
-      mLoadScriptSelector->AddLabel(file.getFileName().toStdString(), (int)mScriptFilePaths.size());
-      mScriptFilePaths.push_back(file.getFullPathName().toStdString());
+      scripts.push_back(file.getFileName().toStdString());
+   }
+
+   scripts.sort();
+
+   for (const auto& script : scripts)
+   {
+      mLoadScriptSelector->AddLabel(script, (int)mScriptFilePaths.size());
+      mScriptFilePaths.push_back(ofToDataPath("scripts/" + script));
    }
 }
 
 void ScriptModule::ExecuteCode()
 {
-   RunScript(gTime+gBufferSizeMs);
+   RunScript(gTime + gBufferSizeMs);
 }
 
-std::pair<int,int> ScriptModule::ExecuteBlock(int lineStart, int lineEnd)
+std::pair<int, int> ScriptModule::ExecuteBlock(int lineStart, int lineEnd)
 {
    return RunScript(gTime, lineStart, lineEnd);
 }
@@ -1023,7 +1041,7 @@ void ScriptModule::OnCodeUpdated()
 
 void ScriptModule::OnPulse(double time, float velocity, int flags)
 {
-   for (size_t i=0; i<mScheduledPulseTimes.size(); ++i)
+   for (size_t i = 0; i < mScheduledPulseTimes.size(); ++i)
    {
       if (mScheduledPulseTimes[i] == -1)
       {
@@ -1036,7 +1054,7 @@ void ScriptModule::OnPulse(double time, float velocity, int flags)
 //INoteReceiver
 void ScriptModule::PlayNote(double time, int pitch, int velocity, int voiceIdx /*= -1*/, ModulationParameters modulation /*= ModulationParameters()*/)
 {
-   for (size_t i=0; i<mPendingNoteInput.size(); ++i)
+   for (size_t i = 0; i < mPendingNoteInput.size(); ++i)
    {
       if (mPendingNoteInput[i].time == -1)
       {
@@ -1050,28 +1068,28 @@ void ScriptModule::PlayNote(double time, int pitch, int velocity, int voiceIdx /
 
 std::string ScriptModule::GetThisName()
 {
-   return "me__"+ofToString(mScriptModuleIndex);
+   return "me__" + ofToString(mScriptModuleIndex);
 }
 
-std::pair<int,int> ScriptModule::RunScript(double time, int lineStart/*=-1*/, int lineEnd/*=-1*/)
+std::pair<int, int> ScriptModule::RunScript(double time, int lineStart /*=-1*/, int lineEnd /*=-1*/)
 {
    //should only be called from main thread
 
    if (!sPythonInitialized)
    {
       TheSynth->LogEvent("trying to call ScriptModule::RunScript() before python is initialized", kLogEventType_Error);
-      return std::make_pair(0,0);
+      return std::make_pair(0, 0);
    }
 
-   py::exec(GetThisName()+" = scriptmodule.get_me("+ofToString(mScriptModuleIndex)+")", py::globals());
+   py::exec(GetThisName() + " = scriptmodule.get_me(" + ofToString(mScriptModuleIndex) + ")", py::globals());
    std::string code = mCodeEntry->GetText(true);
    std::vector<std::string> lines = ofSplitString(code, "\n");
-   
+
    int executionStartLine = 0;
    int executionEndLine = (int)lines.size();
    if (lineStart != -1)
    {
-      for (size_t i=(size_t)lineStart; i >= 0; --i)
+      for (size_t i = (size_t)lineStart; i >= 0; --i)
       {
          if (lines[i][0] != ' ') //no indentation
          {
@@ -1079,30 +1097,30 @@ std::pair<int,int> ScriptModule::RunScript(double time, int lineStart/*=-1*/, in
             break;
          }
       }
-      
-      for (size_t i=(size_t)lineEnd+1; i < (int)lines.size(); ++i)
+
+      for (size_t i = (size_t)lineEnd + 1; i < (int)lines.size(); ++i)
       {
          if (lines[i][0] != ' ') //no indentation
          {
-            executionEndLine = i-1;
+            executionEndLine = i - 1;
             break;
          }
       }
    }
-   
+
    code = "";
-   for (size_t i=0; i<lines.size(); ++i)
+   for (size_t i = 0; i < lines.size(); ++i)
    {
       std::string prefix = "";
       if (i < executionStartLine || i > executionEndLine)
          prefix = "#";
-      if (ShouldDisplayLineExecutionPre(i > 0 ? lines[i-1] : "", lines[i]))
-         code += prefix + GetIndentation(lines[i])+"me.highlight_line("+ofToString(i)+","+ofToString(mScriptModuleIndex)+")               ###instrumentation###\n";
-      code += prefix + lines[i]+"\n";
+      if (ShouldDisplayLineExecutionPre(i > 0 ? lines[i - 1] : "", lines[i]))
+         code += prefix + GetIndentation(lines[i]) + "me.highlight_line(" + ofToString(i) + "," + ofToString(mScriptModuleIndex) + ")               ###instrumentation###\n";
+      code += prefix + lines[i] + "\n";
    }
    FixUpCode(code);
    mLastRunLiteralCode = code;
-   
+
    RunCode(time, code);
 
    return std::make_pair(executionStartLine, executionEndLine);
@@ -1111,7 +1129,7 @@ std::pair<int,int> ScriptModule::RunScript(double time, int lineStart/*=-1*/, in
 void ScriptModule::RunCode(double time, std::string code)
 {
    //should only be called from main thread
-   
+
    if (!sPythonInitialized)
    {
       TheSynth->LogEvent("trying to call ScriptModule::RunCode() before python is initialized", kLogEventType_Error);
@@ -1127,26 +1145,26 @@ void ScriptModule::RunCode(double time, std::string code)
    {
       //ofLog() << "****";
       //ofLog() << (string)py::str(mPythonGlobals);
-      
+
       FixUpCode(code);
       //ofLog() << code;
       py::exec(code, py::globals());
-      
+
       //ofLog() << "&&&&";
       //ofLog() << (string)py::str(mPythonGlobals);
-      
+
       mCodeEntry->SetError(false);
       mLastError = "";
    }
-   catch (pybind11::error_already_set &e)
+   catch (pybind11::error_already_set& e)
    {
       ofLog() << "python execution exception (error_already_set): " << e.what();
-      
+
       if (mNextLineToExecute == -1) //this script hasn't executed yet
          sMostRecentLineExecutedModule = this;
-      
-      sMostRecentLineExecutedModule->mLastError = (std::string)py::str(e.type()) + ": "+ (std::string)py::str(e.value());
-      
+
+      sMostRecentLineExecutedModule->mLastError = (std::string)py::str(e.type()) + ": " + (std::string)py::str(e.value());
+
       int lineNumber = sMostRecentLineExecutedModule->mNextLineToExecute;
       if (lineNumber == -1)
       {
@@ -1162,17 +1180,17 @@ void ScriptModule::RunCode(double time, std::string code)
                std::string lineNumberText = errorString.substr(start, len);
                int rawLineNumber = stoi(lineNumberText);
                int realLineNumber = rawLineNumber - 1;
-               
+
                std::vector<std::string> lines = ofSplitString(sMostRecentLineExecutedModule->mLastRunLiteralCode, "\n");
-               for (size_t i=0; i<lines.size() && i < rawLineNumber; ++i)
+               for (size_t i = 0; i < lines.size() && i < rawLineNumber; ++i)
                {
                   if (ofIsStringInString(lines[i], "###instrumentation###"))
                      --realLineNumber;
                }
-               
+
                lineNumber = realLineNumber;
             }
-            catch(std::exception const & e)
+            catch (std::exception const& e)
             {
             }
          }
@@ -1193,7 +1211,7 @@ void ScriptModule::RunCode(double time, std::string code)
             char *actual_line_no = PyBytes_AsString(line_no_unicode);  // Line number
             ofLog() << actual_line_no;
          }*/
-         
+
          /*PyTracebackObject* trace = (PyTracebackObject*)e.trace().ptr();
          if (trace != nullptr)
          {
@@ -1210,10 +1228,10 @@ void ScriptModule::RunCode(double time, std::string code)
             }
          }*/
       }
-      
+
       sMostRecentLineExecutedModule->mCodeEntry->SetError(true, lineNumber);
    }
-   catch (const std::exception &e)
+   catch (const std::exception& e)
    {
       ofLog() << "python execution exception: " << e.what();
    }
@@ -1229,12 +1247,12 @@ std::string ScriptModule::GetMethodPrefix()
 void ScriptModule::FixUpCode(std::string& code)
 {
    std::string prefix = GetMethodPrefix();
-   ofStringReplace(code, "on_pulse(", "on_pulse__"+ prefix +"(");
-   ofStringReplace(code, "on_note(", "on_note__"+ prefix +"(");
-   ofStringReplace(code, "on_grid_button(", "on_grid_button__"+ prefix +"(");
+   ofStringReplace(code, "on_pulse(", "on_pulse__" + prefix + "(");
+   ofStringReplace(code, "on_note(", "on_note__" + prefix + "(");
+   ofStringReplace(code, "on_grid_button(", "on_grid_button__" + prefix + "(");
    ofStringReplace(code, "on_osc(", "on_osc__" + prefix + "(");
    ofStringReplace(code, "on_midi(", "on_midi__" + prefix + "(");
-   ofStringReplace(code, "this.", GetThisName()+".");
+   ofStringReplace(code, "this.", GetThisName() + ".");
    ofStringReplace(code, "me.", GetThisName() + ".");
 }
 
@@ -1262,22 +1280,22 @@ bool ScriptModule::ShouldDisplayLineExecutionPre(std::string priorLine, std::str
 {
    if (!IsNonWhitespace(line))
       return false;
-   
+
    char firstCharacter;
    char lastCharacter;
-   
+
    GetFirstAndLastCharacter(priorLine, firstCharacter, lastCharacter);
    if (firstCharacter == '@')
       return false;
    if (lastCharacter == ',')
       return false;
-   
+
    GetFirstAndLastCharacter(line, firstCharacter, lastCharacter);
    if (firstCharacter == '@')
       return false;
    if (firstCharacter == '#')
       return false;
-   if (lastCharacter == ':' && (ofIsStringInString(line, "else") || ofIsStringInString(line, "elif") || ofIsStringInString(line,"except")))
+   if (lastCharacter == ':' && (ofIsStringInString(line, "else") || ofIsStringInString(line, "elif") || ofIsStringInString(line, "except")))
       return false;
    return true;
 }
@@ -1346,7 +1364,7 @@ void ScriptModule::Stop()
    double time = gTime + gBufferSizeMs;
 
    //run through any scheduled note offs for this pitch
-   for (size_t i=0; i<mScheduledNoteOutput.size(); ++i)
+   for (size_t i = 0; i < mScheduledNoteOutput.size(); ++i)
    {
       if (mScheduledNoteOutput[i].time != -1 &&
           mScheduledNoteOutput[i].velocity == 0)
@@ -1355,28 +1373,28 @@ void ScriptModule::Stop()
          mScheduledNoteOutput[i].time = -1;
       }
    }
-   
+
    Reset();
 }
 
 void ScriptModule::Reset()
 {
-   for (size_t i=0; i<mScheduledPulseTimes.size(); ++i)
+   for (size_t i = 0; i < mScheduledPulseTimes.size(); ++i)
       mScheduledPulseTimes[i] = -1;
-   
-   for (size_t i=0; i<mScheduledNoteOutput.size(); ++i)
+
+   for (size_t i = 0; i < mScheduledNoteOutput.size(); ++i)
       mScheduledNoteOutput[i].time = -1;
-   
-   for (size_t i=0; i<mScheduledMethodCall.size(); ++i)
+
+   for (size_t i = 0; i < mScheduledMethodCall.size(); ++i)
       mScheduledMethodCall[i].time = -1;
-   
-   for (size_t i=0; i<mScheduledUIControlValue.size(); ++i)
+
+   for (size_t i = 0; i < mScheduledUIControlValue.size(); ++i)
       mScheduledUIControlValue[i].time = -1;
-   
-   for (size_t i=0; i<mPendingNoteInput.size(); ++i)
+
+   for (size_t i = 0; i < mPendingNoteInput.size(); ++i)
       mPendingNoteInput[i].time = -1;
-   
-   for (size_t i=0; i<mPrintDisplay.size(); ++i)
+
+   for (size_t i = 0; i < mPrintDisplay.size(); ++i)
       mPrintDisplay[i].time = -1;
 }
 
@@ -1406,21 +1424,22 @@ void ScriptModule::LoadLayout(const ofxJSONElement& moduleInfo)
    mModuleSaveData.LoadBool("execute_on_init", moduleInfo, true);
    mModuleSaveData.LoadInt("init_execute_priority", moduleInfo, 0, -9999, 9999, K(isTextField));
    mModuleSaveData.LoadBool("syntax_highlighting", moduleInfo, true);
-   mModuleSaveData.LoadString("style", moduleInfo, "classic", [](DropdownList* list) {
-      for (auto i = 0; i < sStyleJSON.size(); ++i)
-      {
-         try
-         {
-            list->AddLabel(sStyleJSON[i]["name"].asString(), i);
-         }
-         catch (Json::LogicError& e)
-         {
-            TheSynth->LogEvent(__PRETTY_FUNCTION__ + std::string(" json error: ") + e.what(), kLogEventType_Error);
-         }
-      }
-   });
+   mModuleSaveData.LoadString("style", moduleInfo, "classic", [](DropdownList* list)
+                              {
+                                 for (auto i = 0; i < sStyleJSON.size(); ++i)
+                                 {
+                                    try
+                                    {
+                                       list->AddLabel(sStyleJSON[i]["name"].asString(), i);
+                                    }
+                                    catch (Json::LogicError& e)
+                                    {
+                                       TheSynth->LogEvent(__PRETTY_FUNCTION__ + std::string(" json error: ") + e.what(), kLogEventType_Error);
+                                    }
+                                 }
+                              });
    mModuleSaveData.LoadBool("hotload_script_files", moduleInfo, false);
-   
+
    SetUpFromSaveData();
 }
 
@@ -1434,7 +1453,7 @@ void ScriptModule::SetUpFromSaveData()
                                                               this,
                                                               [](const ScriptModule* left, const ScriptModule* right)
                                                               {
-                                                                  return left->mInitExecutePriority < right->mInitExecutePriority;
+                                                                 return left->mInitExecutePriority < right->mInitExecutePriority;
                                                               }),
                                              this);
    }
@@ -1477,7 +1496,7 @@ void ScriptModule::SaveState(FileStreamOut& out)
    out << (int)mExtraNoteOutputs.size();
 
    IDrawableModule::SaveState(out);
-   
+
    out << mWidth;
    out << mHeight;
 }
@@ -1500,13 +1519,13 @@ void ScriptModule::LoadState(FileStreamIn& in)
    }
 
    IDrawableModule::LoadState(in);
-   
+
    if (ModularSynth::sLoadingFileSaveStateRev == 420)
    {
       in >> rev;
       LoadStateValidate(rev <= kSaveStateRev);
    }
-   
+
    float w, h;
    in >> w;
    in >> h;
@@ -1517,19 +1536,19 @@ void ScriptModule::LineEventTracker::Draw(CodeEntry* codeEntry, int style, ofCol
 {
    ofPushStyle();
    ofFill();
-   for (int i=0; i<(int)mText.size(); ++i)
+   for (int i = 0; i < (int)mText.size(); ++i)
    {
       float alpha = style == 0 ? 200 : 150;
       float fadeMs = style == 0 ? 200 : 150;
       if (gTime - mTimes[i] > 0 && gTime - mTimes[i] < fadeMs)
       {
-         ofSetColor(color, alpha*(1-(gTime - mTimes[i])/fadeMs));
+         ofSetColor(color, alpha * (1 - (gTime - mTimes[i]) / fadeMs));
          ofVec2f linePos = codeEntry->GetLinePos(i, false);
          if (style == 0)
-            ofRect(linePos.x + 1, linePos.y + 3, 4, codeEntry->GetCharHeight(), L(corner,0));
+            ofRect(linePos.x + 1, linePos.y + 3, 4, codeEntry->GetCharHeight(), L(corner, 0));
          if (style == 1)
             ofCircle(linePos.x + 11, linePos.y + 10, 5);
-         
+
          if (mText[i] != "")
          {
             ofVec2f linePos = codeEntry->GetLinePos(i, K(end));
@@ -1568,7 +1587,7 @@ void ScriptReferenceDisplay::LoadText()
       ofStringReplace(text, "\r", "");
       mText = ofSplitString(text, "\n");
    }
-   
+
    mMaxScrollAmount = (int)mText.size() * 14;
 }
 
@@ -1579,7 +1598,7 @@ void ScriptReferenceDisplay::DrawModule()
    float y = 34;
    for (size_t i = 0; i < mText.size(); ++i)
    {
-      DrawTextNormal(mText[i], 4-mScrollOffset.x, y-mScrollOffset.y);
+      DrawTextNormal(mText[i], 4 - mScrollOffset.x, y - mScrollOffset.y);
       y += 14;
    }
 }

@@ -50,14 +50,18 @@ class OscController : public INonstandardController,
 public:
    OscController(MidiDeviceListener* listener, std::string outAddress, int outPort, int inPort);
    ~OscController();
-   
+
    void Connect();
    void oscMessageReceived(const juce::OSCMessage& msg) override;
    void SendValue(int page, int control, float value, bool forceNoteOn = false, int channel = -1) override;
    int AddControl(std::string address, bool isFloat);
-   
+
    bool IsInputConnected() override { return mConnected; }
-   bool Reconnect() override { Connect(); return mConnected; }
+   bool Reconnect() override
+   {
+      Connect();
+      return mConnected;
+   }
    bool SetInPort(int port);
    std::string GetControlTooltip(MidiMessageType type, int control) override;
 
@@ -69,14 +73,14 @@ private:
 
    int FindControl(std::string address);
    void ConnectOutput();
-   
+
    std::string mOutAddress;
    int mOutPort;
    int mInPort;
    juce::OSCSender mOscOut;
    bool mConnected;
    bool mOutputConnected;
-   
+
    std::vector<OscMap> mOscMap;
 };
 

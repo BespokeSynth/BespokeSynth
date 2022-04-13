@@ -37,7 +37,7 @@ Monophonify::Monophonify()
 , mGlideTime(0)
 , mGlideSlider(nullptr)
 {
-   for (int i=0; i<128; ++i)
+   for (int i = 0; i < 128; ++i)
       mHeldNotes[i] = -1;
 }
 
@@ -48,7 +48,7 @@ void Monophonify::CreateUIControls()
    CHECKBOX(mRequireHeldNoteCheckbox, "require held", &mRequireHeldNote);
    FLOATSLIDER(mGlideSlider, "glide", &mGlideTime, 0, 1000);
    ENDUIBLOCK(mWidth, mHeight);
-   
+
    mGlideSlider->SetMode(FloatSlider::kSquare);
 }
 
@@ -56,7 +56,7 @@ void Monophonify::DrawModule()
 {
    if (Minimized() || IsVisible() == false)
       return;
-   
+
    mRequireHeldNoteCheckbox->Draw();
    mGlideSlider->Draw();
 }
@@ -68,21 +68,21 @@ void Monophonify::PlayNote(double time, int pitch, int velocity, int voiceIdx, M
       PlayNoteOutput(time, pitch, velocity, voiceIdx, modulation);
       return;
    }
-   
+
    if (pitch < 0 || pitch >= 128)
       return;
-   
+
    mPitchBend.AppendTo(modulation.pitchBend);
    modulation.pitchBend = &mPitchBend;
 
    voiceIdx = mVoiceIdx;
-   
+
    if (velocity > 0)
    {
       mLastVelocity = velocity;
-      
+
       int bendFromPitch = GetMostRecentPitch();
-      
+
       if (bendFromPitch != -1)
       {
          if (mRequireHeldNote)
@@ -113,11 +113,11 @@ void Monophonify::PlayNote(double time, int pitch, int velocity, int voiceIdx, M
    else
    {
       bool wasCurrNote = pitch == GetMostRecentPitch();
-      
+
       mHeldNotes[pitch] = -1;
-      
+
       int returnToPitch = GetMostRecentPitch();
-      
+
       if (returnToPitch != -1)
       {
          if (wasCurrNote)
@@ -145,7 +145,7 @@ int Monophonify::GetMostRecentPitch() const
 {
    int mostRecentPitch = -1;
    double mostRecentTime = 0;
-   for (int i=0; i<128; ++i)
+   for (int i = 0; i < 128; ++i)
    {
       if (mHeldNotes[i] > mostRecentTime)
       {
@@ -162,7 +162,7 @@ void Monophonify::CheckboxUpdated(Checkbox* checkbox)
    if (checkbox == mEnabledCheckbox)
    {
       mNoteOutput.Flush(gTime);
-      for (int i=0; i<128; ++i)
+      for (int i = 0; i < 128; ++i)
          mHeldNotes[i] = -1;
    }
 }
@@ -174,7 +174,7 @@ void Monophonify::FloatSliderUpdated(FloatSlider* slider, float oldVal)
 void Monophonify::LoadLayout(const ofxJSONElement& moduleInfo)
 {
    mModuleSaveData.LoadString("target", moduleInfo);
-   mModuleSaveData.LoadInt("voice_idx", moduleInfo, 0, 0, kNumVoices-1);
+   mModuleSaveData.LoadInt("voice_idx", moduleInfo, 0, 0, kNumVoices - 1);
 
    SetUpFromSaveData();
 }
@@ -184,4 +184,3 @@ void Monophonify::SetUpFromSaveData()
    SetUpPatchCables(mModuleSaveData.GetString("target"));
    mVoiceIdx = mModuleSaveData.GetInt("voice_idx");
 }
-

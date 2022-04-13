@@ -1,0 +1,1831 @@
+
+
+
+valuestream~zamana göre kontrolün değerini gösterir. değerin değişimini görmek için UI kontrolüne kablo bağlayın.
+~speed~ekranın ne kadar hızla kayacağını belirler
+
+
+
+timerdisplay~yamanın ne kadar süredir çalıştığını belirten zamanlayıcıyı görüntüler
+~reset~zamanlayıcıyı sıfırlayın
+
+
+
+timelinecontrol~[yarıda bırakılmış modül, muhtemelen arızalı] aktarım imlecini konumlandırmak için genel zaman çizelgesi kontrolü
+~measure~[todo]
+~loop~[todo]
+~loop start~[todo]
+~loop end~[todo]
+
+
+
+selector~bir defada yalnızca bir değeri etkinleştirmek için radyo düğmesi kontrolü. bir defada yalnızca bir modülü etkinleştirmek için birden fazla modül üzerinde "enabled" onay kutusuna radyo düğmesi kontrolünü yamalayın. "groupcontrol" modülüyle uyumlu çalışır.
+~selector~değeri 1 olarak ayarlar
+
+
+
+scriptstatus~hata ayıklama için geçerli python dilinde tüm ayarları gösterir
+~reset all~python dili değişkenlerini sıfırlar
+
+
+
+script~canlı kodlanan notalar ve modül kontrolü için python komut dosyası
+~loadscript~buradan komut dosyası seçin, ardından "load” üzerine tıklayın
+~load~seçilen komut dosyasını yükleyin
+~save as~mevcut komut dosyasını kaydedin
+~?~komut dosyası referansını görüntüleyin
+~code~buraya kodu yazın. kodu çalıştırmak için ctrl-R’ye veya sadece geçerli bloku çalıştırmak için ctrl-shift-R’ye basın.
+~run~kodu çalıştırmak için buraya tıklayın veya ctrl-R’ye basın
+~stop~bu komut dosyasıyla programlanan tüm etkinlikleri iptal edin
+~a~kullanılacak komut dosyası için değişken, diğer kaynaklar için modülasyon değeri olabilir. me.get("a") ile erişin
+~a~kullanılacak komut dosyası için değişken, diğer kaynaklar için modülasyon değeri olabilir. me.get("b") ile erişin
+~a~kullanılacak komut dosyası için değişken, diğer kaynaklar için modülasyon değeri olabilir. me.get("c") ile erişin
+~a~kullanılacak komut dosyası için değişken, diğer kaynaklar için modülasyon değeri olabilir. me.get("d") ile erişin
+~style~script_styles.json dosyasından metin teması seçin
+
+
+
+radiosequencer~bir defada yalnızca bir değeri etkinleştiren sekans. bir defada yalnızca bir modülü etkinleştirmek için birden fazla modül üzerinde "enabled” onay kutusuna sekansı yamalayın. "groupcontrol" modülüyle uyumlu çalışır.
+~interval~ilerleme oranı
+~length~sekans uzunluğu
+~grid~"midicontroller" modülünden buraya ızgara yamalayın
+
+
+
+presets~değerler dizisini kaydedin ve geri yükleyin. ilgili modüldeki tüm kontrolleri değiştirmek için gri çemberi farklı modüllere bağlayın. yalnızca ilgili kontrolü değiştirmek için kontrole mor çemberi bağlayın. ilgili kareye bir ön ayarı kaydetmek için shift tuşuna basarak ızgara karesi üzerine tıklayın ve ilgili ön ayarı yüklemek için ızgara karesi üzerine tıklayın.
+~save~[todo]
+~blend ms~ön ayar değerlerinin zamana göre karıştırma süresi
+~preset~ön ayarı seçin
+
+
+
+prefab~"prefabs" menüsünden yüklenebilecek bir dizi modül oluşturun. prefab menüsüne eklenmesi için modülleri buraya sürükleyip bırakın. prefab menüsünden çıkarmak istediğiniz herhangi bir modüle gri kabloyu bağlayın.
+~save~.pfb dosyası olarak kaydedin
+~load~.pfb yükleyin
+~disband~bu prefab menüsünden tüm modülleri ayırın
+
+
+
+oscoutput~slider değeri değiştiğinde veya nota alındığında OSC mesajı gönderir
+~osc out address~OSC mesajlarının gönderileceği destinasyon
+~osc out port~OSC mesajlarının gönderileceği port
+~label*~slider değerini gönderme etiketi. mesaj /bespoke/[label] [value] formatında gönderilir
+~slider*~ilgili adrese değer gönderir. ses düzeyleri göndermek için leveltocv gibi bir modülatörü herhangi bir slider’a yamalamayı deneyin.
+~note out address~giriş notalarını gönderme etiketi. mesaj format /bespoke/[label] [pitch] [velocity] formatında gönderilir
+
+
+
+loopstorer~[yarıda bırakılmış modül, muhtemelen arızalı] loopları yüklemek ve kaldırmak için looper’daki loop’ları kaydedin
+~rewrite~[todo]
+~quantization~[todo]
+~clear~[todo]
+~select *~[todo]
+
+
+
+loopergranulator~önceki kayıtları tanecikli sentezleme tekniğiyle çalmak için "looper" modülüyle birlikte kullanın
+~on~looper’un çalması sırasında tanecikli sentezleme tekniğini kullanın
+~overlap~üst üste gelen tanecik sayısı
+~speed~tanecik çalma hızı
+~len ms~milisaniye cinsinden taneciğin uzunluğu
+~loop pos~loop üzerindeki çalma pozisyonu
+~freeze~looper süresinin ilerlemesini durdurun
+~pos rand~tanecik başlangıç noktasının rastgele seçimi
+~speed rand~tanecik hızının rastgele seçimi
+~spacing rand~tanecikler arasındaki sürenin rastgele seçimi
+~octaves~oktavlar ve beşinci notalar eklenmeli mi?
+~width~tanecik yerleşiminin stereo genişliği
+
+
+
+groupcontrol~birden fazla onay kutusuna bağlayın ve tek onay kutusuyla tümünü kontrol edin
+~group enabled~bağlanan onay kutularını kontrol eder
+
+
+
+grid~ızgara temelli midi kontrolörlerde kullanılan komut dizilerinin yazılmasına yardımcı olması için "script" modülü tarafından kullanılacak genel ızgara
+~grid~"midicontroller" modülünden buraya ızgara yamalayın
+~momentary~fare tıklamaları anlık giriş olarak algılanmalı mı?
+
+
+
+globalcontrols~bespoke ekranında gezinmek için midi kontrolörleri kullanmanıza olanak sağlamayı amaçlayan ara yüz kontrolü. bu slider’ların doğrudan fareyle kontrol edilmesi tavsiye edilmez.
+~zoom~yakınlaştırma düzeyi
+~x pos~yatay panlama pozisyonu
+~y pos~dikey panlama pozisyonu
+~scroll x~fareyle yatay kaydırma işlemini emüle edin
+~scroll y~fareyle dikey kaydırma işlemini emüle edin
+~lissajous r~lissajous eğrisinin arka planındaki kırmızı miktarı
+~lissajous g~lissajous eğrisinin arka planındaki yeşil miktarı
+~lissajous b~lissajous eğrisinin arka planındaki mavi miktarı
+
+
+
+eventcanvas~zamana göre değişecek değerleri planlayın
+~quantize~ızgaraya etkinlikleri kuantize edin
+~measures~loop uzunluğu
+~interval~etkinliklerin yaslanacağı ızgara
+~record~ayar değiştiğinde bağlanan değerleri kaydedin
+~canvas~etkinlik paneli. panel kontrolleri:\n-etkinlik eklemek için shift tuşuna basarak tıklayın\n-kopyalamak için etkinliği shift tuşuna basarak sürükleyip bırakın\n-yaslamadan etkinliği sürüklemek için alt tuşuna basılı tutun\n-aralığa yaslamak için sürükleyip bırakarak ctrl tuşuna basılı tutun\n-yakınlaştırmak için shift tuşuna basılı tutarak kaydırın\n-panel görünümünü yana kaydırmak için alt tuşuna basılı tutarak boş alan seçin\n-panel görünümü yakınlaştırmak için ctrl tuşuna basılı tutarak boş alan seçin
+~timeline~loop noktalarını kontrol edin
+~delete~vurgulanan öğeleri silin
+~view rows~görüntülenen satır sayısı
+~clear~tüm öğeleri silin
+~drag mode~öğelerin sürüklenebileceği yön
+~scrollh~yatay kaydırma çubuğu
+
+
+
+comment~yamanın bir özelliğini açıklamak amacıyla metni görüntülemeye yarayan kutu
+~comment~buraya metni yazın
+
+
+
+pulsetrain~darbe zamanı geldiğinde işlenecek darbe listesini belirler
+~length~sekans uzunluğu
+~interval~sekanstaki her bir adımın uzunluğu
+
+
+
+pulsesequence~darbelerden oluşan loop sekansını belirleyin
+~length~sekans uzunluğu
+~interval~sekanstaki her bir adımın uzunluğu
+~<~sekansı sola kaydırın
+~>~sekansı sağa kaydırın
+
+
+
+pulser~bir aralıkta darbe mesajları gönderin
+~interval~darbe gönderme hızı
+~timemode~ölçünün ilk darbesinin gönderilme zamanı veya aktarım imleciyle senkronize edilmemiş darbeler için "free" olarak ayarlayın
+~t~milisaniye cinsinden darbe aralığı
+~offset~aralık cinsinden darbe süresi ofseti
+~random~darbe gönderilen modüllere pozisyonlarını rastgele seçmesini bildirin
+~reset~sıfırlama darbesi gönderilmeden önceki sekans uzunluğu
+~div~aralık olarak "div" kullanılırsa ölçü bölmesi
+
+
+
+pulsehocket~rastgele seçilen destinasyonlara darbeler gönderir
+~weight *~darbenin bu destinasyona ulaşma olasılığı
+
+
+
+pulsegate~darbelerin geçip geçmemesini kontrol edin
+~allow~darbeler bu modülden geçip gitmeli mi?
+
+
+
+pulsedelayer~darbeleri geciktirin
+~delay~ölçü cinsinden gecikme süresi
+
+
+
+pulsechance~olasılığa bağlı olarak darbelerin geçişine rastgele izin verin
+~chance~darbelerin geçmesi olasılığı
+
+
+
+pulsebutton~düğmeye basarak bir darbe tetikleyin
+~pulse~darbe tetikleyin
+
+
+
+notetopulse~bir nota bu modüle ulaştığında darbe tetikleyin
+
+
+
+audiotopulse~ses düzeyi belirlenen eşik değerini aştığında darbe gönderin
+~threshold~sinyal belirlenen eşik değerine ulaştığında darbe gönderin
+~release~bir darbenin yeniden tetiklenebilmesi öncesinde ses sinyali için bekleme süresi
+
+
+
+vinylcontrol~vinil giriş sesi kontrolüne bağlı olarak hız değeri çıkışını veren modülatör. bir "giriş" modülünden yamalanmış vinil plak kontrolünden gelen stereo sinyalle (serato programını kontrol ettiğiniz gibi) çalıştırın.
+~control~aktarım kontrolünü etkinleştirin/devre dışı bırakın. etkinleştirildiğinde geçerli hızı referans hızı olarak kullanır (bu nedenle, vinil hızını değiştirene kadar çıkış 1 değerini verir)
+
+
+
+velocitytocv~nota hızı alır ve bu hızı modülasyon değerine dönüştürün
+~min~hız 0 için çıkış
+~max~hız 127 için çıkışı
+
+
+
+valuesetter~hedefteki kontrol için belirlenen değeri ayarlayın
+~value~ayarlanacak değer
+~set~değeri göndermek için buraya tıklayın (veya aynı işlem için bu modüle darbe gönderin)
+
+
+
+subtract~value 1 eksi value 2 işleminin sonucunu verir. value 1 ve value 2 modülatörler için yama değeri olarak kullanılabilir.
+~value 1~
+~value 2~
+
+
+
+smoother~yuvarlanmış giriş değeri verir
+~input~yuvarlanacak değeri belirleyin, buraya bir modülatör yamalayın
+~smooth~uygulanacak yuvarlama miktarı
+
+
+
+ramper~belirtilen süre içerisinde belirli bir değeri kontrole karıştırın
+~length~toplam karıştırma süresi
+~start~karıştırma işlemini başlatın (veya aynı işlem için bu modüle darbe gönderin)
+~target~yükseltme işlemi sonlandığında ulaşan değer
+
+
+
+pressuretocv~nota basıncını alır ve bunu bir modülasyon değerine dönüştürür
+~min~basınç 0 için çıkış
+~max~basınç 127 için çıkış
+
+
+
+pitchtospeed~girişin perdesini hız oranına dönüştürür. bir sample’ın çalma hızını kontrol etmek için bu modülü kullanabilirsiniz ve modülü bir klavye ile çalabilirsiniz.
+~ref freq~çıkış frekansı giriş frekansının belirtilen sayıya bölünmesiyle bulunur
+
+
+
+pitchtocv~nota perdesini alır ve bunu bir modülasyona dönüştürür
+~min~perde 0 için çıkış
+~max~perde 127 için çıkış
+
+
+
+notetoms~giriş notası alır ve milisaniye cinsinden bu nota frekansının periyodunu verir. özel perdeler oluşturmak amacıyla gecikme hatlarının ayarlanmasında kullanılabilir.
+
+
+
+notetofreq~giriş notası alır ve hertz cinsinden bu notanın frekansını verir
+
+
+
+mult~value 2 çarpı value 1 işleminin sonucunu verir. value 1 ve value 2 modülatörler için yama değeri olarak kullanılabilir.
+~value 1~
+~value 2~
+
+
+
+modwheeltocv~notanın modülasyon tekerleği değerini alır ve bu değeri modülasyon değerine dönüştürür
+~min~modülasyon tekerleği değeri 0 için çıkış
+~max~modülasyon tekerleği değeri 127 için çıkış
+
+
+
+macroslider~bir değeri alır ve birden fazla destinasyona bu değerin ölçeklendirilmiş versiyonlarını gönderir
+~input~giriş değeri. modülasyon yama hedefi olarak kullanılır.
+~start*~giriş aralığının en altındaki çıkış değeri
+~end*~giriş aralığının en üstündeki çıkış değeri
+
+
+
+leveltocv~gelen ses düzeyine bağlı olarak modülasyon değeri verir
+~gain~giriş sesini bu değerle çarpın
+~attack~bu hızda giriş seviyesini yükseltin
+~release~bu hızda giriş seviyesini sönümleyin
+~min~seviye sıfır olduğu zamanki çıkış
+~max~seviye bir olduğu zamanki çıkış
+
+
+
+gridsliders~birden fazla slider’ı kontrol etmek için bir ızgara kontrolörü kullanın
+~direction~ızgarada slider’lar dikey mi yatay mı gösterilsin?
+~grid~"midicontroller" modülünden buraya ızgara yamalayın
+
+
+
+gravity~modülasyon değerinin fizik kurallarına göre artmasını ve azalmasını sağlar
+~gravity~aşağı yönlü uygulanacak yer çekimi kuvveti
+~kick amt~anlık artış yapıldığında yukarı yönlü uygulanacak kuvvetin miktarı
+~drag~hızın tersi yönde uygulanacak direnç kuvveti
+~kick~anlık artış uygulamak için tıklayın (ya da aynı işlem için bu modüle darbe gönderin)
+
+
+
+fubble~X/Y pedinde çizim yapın ve olivia jack tarafından belirlenen konsepte bağlı kalarak değerleri modüle etmek için çizimdeki değerleri kullanın
+~quantize~çalma hızını belirli bir ritmik aralığa kuantize edilmeli mi?
+~length~kuantize edilecek aralık
+~speed~çalma hızını arttırın ya da azaltın
+~clear~çizimi silin
+~mutate amount~perlin gürültü alanına göre çizime etki edecek miktar
+~mutate warp~perlin gürültü alanının ölçeği
+~mutate noise~perlin gürültü alanından geçme hızı
+~reseed~perlin gürültü alanında farklı konuma atlayın
+
+
+
+expression~metin tabanlı matematiksel ifadeyle modülasyonu şekillendirin
+~y=~girişi modifiye etmeye yönelik matematiksel ifade. "x+sin(x*pi*a)” gibi bir şeyler yazın. kullanılabilir değişkenler: a,b,c,d,e = aşağıdaki slider’lar, t = zamanı gösterir.
+~input~x değişkeni olarak kullanılacak giriş
+~a~matematiksel ifadede kullanılacak değişken
+~b~matematiksel ifadede kullanılacak değişken
+~c~matematiksel ifadede kullanılacak değişken
+~d~matematiksel ifadede kullanılacak değişken
+~e~matematiksel ifadede kullanılacak değişken
+
+
+
+envelope~tetiklenen zarfla değeri modüle edin
+~advanced~gelişmiş zarf düzenleyicisine geçiş yapın (basit ADSR’den daha karmaşık zarfın kullanılmasına izin verir). kademe eklemek için gelişmiş zarf çizgisine çift tıklayın, nokta silmek için nokta üzerinde sağa tıklayın, çizgiyi bükmek için çizgiyi tutup sürükleyin.
+~adsr~zarf görünümü
+~adsrA~zarfın atağı
+~adsrD~zarfın sönümlemesi
+~adsrS~zarfın tutması
+~adsrR~zarfın bırakması
+~low~çıkışın en düşük değeri
+~high~çıkışın en yüksek değeri
+~length~zarf görüntüleme uzunluğu
+~use velocity~zarf çıkışı giriş hızı kadar ölçeklendirilmeli mi?
+~has sustain~bu zarfta tutma kademesi olmalı mı?
+~sustain stage~zarf adımlarından hangisinde tutma kademesi olmalı?
+~max sustain~milisaniye cinsinden maksimum tutma uzunluğu nedir? -1 değeri maksimum değerin olmadığını gösterir
+
+
+
+curvelooper~loop eğrisiyle zamana göre değeri modüle edin
+~length~loop uzunluğu
+~randomize~rastgele eğri oluşturun
+
+
+
+curve~eğrideki aralık değerine göre girişi eşleştirin. nokta eklemek için eğriye çift tıklayın, nokta silmek için nokta üzerinde sağa tıklayın, çizgiyi bükmek için çizgiyi tutup sürükleyin.
+~input~giriş değeri (modülasyon hedefi olarak kullanılabilir)
+
+
+
+controlsequencer~belirtilen aralıkta adım girişiyle kontrolü modüle edin
+~interval~ilerleme oranı
+~length~sekans uzunluğu
+~random~sekans değerlerini rastgele seçin
+
+
+
+audiotocv~kontrolü modüle etmek için ses sinyali kullanın. FM gibi efektleri elde etmek için ses-hız modülasyonu özelliğinin kullanılmasına izin verir.
+~gain~gelen sesi yükseltir
+~min~minimum çıkış değeri
+~max~maksimum çıkış değeri
+
+
+
+addcentered~ range 2 ile çarpılan value 2 artı value 1 işleminin sonucunu verir. belirli bir frekansta range 2’ye bağlı olarak value 1’in modüle edilmesi için optimize edilmiştir. value 1 ya da value 2, modülatörler için yama hedefi olarak kullanılabilir.
+~value 1~orta değer
+~value 2~modülasyon değeri
+~range 2~modülasyon miktarı
+
+
+
+add~value 1 artı value 2 işleminin sonucunu verir. value 1 ve value  2 modülatörler için yama hedefi olarak kullanılabilir.
+~value 1~toplanacak değer
+~value 2~toplanacak değer
+
+
+
+accum~zamana göre değeri biriktirin
+~value~çıkış değeri
+~velocity~biriktirilecek miktar
+
+
+
+slidersequencer~zaman çizelgesinin herhangi noktasında nota tetikleyin
+~division~ilerleme hızı
+~time*~bu notayı tetikleme zamanı
+~vel*~bu notanın hızı
+~note*~bu notanın perdesi
+~playing*~bu nota çalınıyor mu?
+
+
+
+randomnote~rastgele olasılıkla belirlenen aralıkta nota çalın
+~interval~nota uzunluğu
+~probability~bir aralıkta notanın çalınması olasılığı
+~pitch~kullanılacak perde
+~velocity~kullanılacak hız
+~offset~aralıkta çalma imlecinin kaydırılacağı süre
+~skip~nota çalındıktan sonra, notayı ileride n-1 kere çalmayın
+
+
+
+push2control~bespoke arayüzünü kontrol etmek için ableton push 2 kullanın
+
+
+
+polyrhythms~farklı bölmelere sahip satırlarla loop sekansı
+~length*~bu satırdaki adım sayısı
+~note*~bu satırda kullanılacak perde
+
+
+
+playsequencer~pulsar-23 davul makinesinden esinlenilerek adımları kayıt almak ve üst üste kaydetmek için değer girmenize izin veren davul sıralayıcısı
+~grid~"midicontroller" modülünden buraya ızgara yamalayın
+~interval~adım boyutu
+~measures~loop uzunluğu
+~write~geçerli girişin sekansa yazılıp yazılmayacağını belirleyin. mute/delete kontrolü bu satır için etkinleştirilirse seçim adımları silinir
+~note repeat~tutulan notaların her adımda tekrarlanıp tekrarlanmayacağını belirleyin
+~link columns~mute/delete kontrolünün tüm sütun boyunca kullanılıp kullanılmayacağını belirleyin
+~store*~mevcut sekansı bu yuvaya kaydedin
+~load*~bu yuvaya kaydedilen sekansı yükleyin
+~mute/delete*~yazma devre dışı bırakıldıysa bu satırı sessize alın. yazma etkinleştirildiyse, çalma imleci adımların üzerinden geçerken adımları silin
+
+
+
+notesinger~algılanan perdeye bağlı olarak nota verir
+~oct~çıkış perdesinin uyarlanacağı oktav
+
+
+
+notesequencer~belirli bir aralıkta notaların loop sekansı. daha ilginç adım kontrolü için "pulser" modülüyle eşleştirin. adım uzunluğunu ayarlamak için "shift" tuşuna basılı tutun.
+~interval~nota uzunluğu
+~pitch~sekanstaki perde değerlerini rastgele belirleyin. yalnızca kök nota ve beşinci notayı rastgele seçmek için shift tuşuna basılı tutun.
+~len~her bir adımda notanın uzunluğunu rastgele belirleyin.
+~vel~her bir adımda notanın hızını rastgele belirleyin.
+~length~aşağıdaki sekansın çalınması gereken uzunluk. tüm ızgara uzunluğu üçgen menüdeki "ızgara adımları" ayarlanarak değiştirilebilir.
+~<~sekansı sola kaydırın
+~>~sekansı sağa kaydırın
+~clear~tüm adımları temizleyin
+~octave~bu sekanstaki en alt perdenin oktavı
+~notemode~satırlarda hangi perde dizisi gösterilmelidir?
+~loop reset~sekans loop’a alındığında, bu ayarı kullanarak sıfırlayın. ilk adımdan sekansı yeniden başlatmak için pulser’den "downbeat” stili mesaj gönderin.
+~tone*~bu sütunun perdesi
+~vel*~bu sütunun hızı
+~len*~bu sütunun uzunluğu
+~grid~"midicontroller" modülünden buraya ızgara yamalayın
+~x offset~bağlanan ızgara kontrolörünün x ofseti
+~y offset~bağlanan ızgara kontrolörünün y ofseti
+~rand pitch chance~rastgele perde düğmesine tıklandığında, bir adımın değişmesi olasılığı nedir?
+~rand pitch range~rastgele perde düğmesine tıklandığında, perde ne kadar değişmeli?
+~rand len chance~rastgele uzunluk düğmesine tıklandığında, bir adımın değişmesi olasılığı nedir?
+~rand len range~rastgele uzunluk düğmesine tıklandığında, uzunluk ne kadar değişmeli?
+~rand vel chance~rastgele hız düğmesine tıklandığında, bir adımın değişmesi olasılığı nedir?
+~rand vel chance~rastgele hız düğmesine tıklandığında, bir adımda bir notanın olması olasılığı nedir?
+
+
+
+notetable~perde değerini (sıfırdan başlayan) gam perdesine eşleştirin
+~random pitch~sekanstaki perde değerlerini rastgele belirleyin. yalnızca kök nota ve beşinci notayı rastgele seçmek için shift tuşuna basılı tutun.
+~length~perde sayısı
+~octave~bu sekanstaki en alt perdenin oktavı
+~notemode~satırlarda hangi perde dizisi gösterilmelidir?
+~tone*~bu sütunun perdesi
+~grid~"midicontroller" modülünden buraya ızgara yamalayın
+~x offset~bağlanan ızgara kontrolörünün x ofseti
+~y offset~bağlanan ızgara kontrolörünün y ofseti
+~rand pitch chance~rastgele perde düğmesine tıklandığında, bir adımın değişmesi olasılığı nedir?
+~rand pitch range~rastgele perde düğmesine tıklandığında, perde ne kadar değişmeli?
+
+
+
+notelooper~üst üste kaydetme ve değiştirme işlevselliğiyle birlikte nota loop kaydedicisi
+~write~giriş kaydedilmeli mi?
+~del/mute~"write" etkinleştirilirse, çalma imleci adımların üzerinden geçerken notaları siler. aksi durumda sadece notaları sessize alır.
+~num bars~ölçü cinsinden loop uzunluğunu ayarlayın
+~clear~örüntüyü silin
+~store*~örüntüyü kaydedin
+~load*~örüntüyü yükleyin
+~canvas~kaydedilmiş notaların paneli
+
+
+
+notecreator~bir defalık nota oluşturun
+~pitch~çıkış notası perdesi
+~trigger~belirli bir süre boyunca notayı tetiklemek için basın
+~on~kesintisiz nota çalma modunu etkinleştirin ya da devre dışı bırakın
+~velocity~nota hızı
+~duration~"trigger" düğmesi kullanıldığında nota uzunluğu
+
+
+
+notecounter~perdeler arasında sırayla ilerleyin. "notesequencer" veya "drumsequencer" modüllerinin çalıştırılması için kullanılabilir.
+~interval~ilerleme oranı
+~sync~çıkış perdesinin global aktarımla senkronize edilip edilmeyeceğini belirleyin
+~start~sekans başlangıcındaki perde
+~length~sekans uzunluğu
+~random~sıralı olması beklenen ancak rastgele belirlenen perde değerleri verir
+~div~aralık olarak "div" kullanılırsa ölçü bölmesi
+
+
+
+notechain~gecikme süresinin tamamlanmasından sonra başka bir notayı tetiklemek için darbenin ardından nota tetikleyin
+~pitch~çalınacak perde
+~trigger~bu sıralı diziye ait notayı çalın
+~velocity~nota hızı
+~duration~ölçü cinsinden nota süresi
+~next~darbe gönderilene kadar ki aralık
+
+
+
+notecanvas~nota değerlerini looplayın
+~quantize~aralığa seçili notaları kuantize edin
+~play~paneldeki notaları çalın
+~rec~panele giriş değerlerini kaydedin
+~free rec~kayıt modunu etkinleştirin ve sona ulaşıldığında paneli uzatın
+~measures~loop uzunluğu
+~show chord intervals~akort ilişkilerini görüntülemek için parantez bağlantılı gösterimi kullanın
+~interval~kuantize edilecek aralık
+~canvas~nota paneli. panel kontrolleri:\n-nota eklemek için shift tuşuna basarak tıklayın\n-kopyalamak için notayı shift tuşuna basarak sürükleyip bırakın\n-yaslamadan notayı sürüklemek için alt tuşuna basılı tutun\n-aralığa yaslamak için sürükleyip bırakarak ctrl tuşuna basılı tutun\n-yakınlaştırmak için shift tuşuna basılı tutarak kaydırın\n-panel görünümünü yana kaydırmak için alt tuşuna basılı tutarak boş alan seçin\n-panel görünümü yakınlaştırmak için ctrl tuşuna basılı tutarak boş alan seçin
+~timeline~loop noktalarını kontrol edin
+~delete~vurgulanan öğeleri silin
+~view rows~görüntülenen satır sayısı
+~clear~tüm öğeleri silin
+~drag mode~öğelerin sürüklenebileceği yön
+~scrollh~yatay kaydırma çubuğu
+~scrollv~dikey kaydırma çubuğu
+
+
+
+midicontroller~harici cihazlardan midi girişi alın. "layout" görünümünde kullanışlı ekran elde etmek için kontrolörünüzün yerleşimini açıklamak amacıyla kontrolörünüzle aynı ismi taşıyan .json dosyası oluşturun ve bu dosyayı "data/controllers" dizinine yerleştirin. örnek olması amacıyla bu dizindeki diğer dosyalara bakın.
+~controller~kullanılacak midi cihazı
+~mappingdisplay~görüntülenecek eşleştirme görünümü
+~bind (hold shift)~bu ayar etkinleştirildiğinde UI kontrolü üzerine gelip, shift tuşuna basılı tutup ardından istenilen midi girişini kullanarak UI kontrolüne midi girişi eşleştirebilirsiniz
+~page~kullanacağınız midi kontrolü sayfasını seçin. her sayfa bağımsız midi kontrolörü olarak hareket eder, bu nedenle birçok ayarı kontrol ederken bir midi kontrolörünün aktif olmasına izin vermek için bu sayfaları kullanın
+~add~eşleştirmeyi manuel olarak ekleyin
+~osc input port~osccontroller girişi olarak kullanılacak port
+~messagetype~midi mesajı türü
+~control~referans değeri olarak kabul edilecek perde veya kontrol
+~channel~kullanılacak kanal
+~path~ayarı değişen kontrolün dosya yolu
+~controltype~bu kontrolün hedef cihazı nasıl modifiye edeceğini belirler.\n -slider: slider değeri olarak "midi off" ve "midi on" arasında interpole edilen bir değer ayarlayın\n -set: bu düğmeye basıldığında doğrudan belirlenen değeri ayarlayın\n -release: bu düğmeye basıldığında doğrudan belirlenen değeri ayarlayın\n -toggle: bu düğmeye basıldığına kontrol değerini etkinleştirin/devre dışı bırakın\n -direct: sabit midi giriş değerini kontrol için ayarlayın
+~value~ayarlanacak değer
+~midi off~midi aralığının en düşük değeri. hedeflenen kontrol aktif olmadığında bu değeri gönderin. "scale" etkinleştirildiyse, ayrıca bu ayar slider aralığının en düşük değerini kontrol eder ve slider yönünü geri çevirmek için midi off değerini midi on değerinden daha yükseğe ayarlayabilirsiniz.
+~midi on~midi aralığının en yüksek değeri. hedeflenen kontrol aktif olduğunda bu değeri gönderin. "scale" etkinleştirildiyse, ayrıca bu ayar slider aralığının en yüksek değerini kontrol eder ve slider yönünü geri çevirmek için midi off değerini midi on değerinden daha yükseğe ayarlayabilirsiniz.
+~scale~bu midi slider’ının çıkışı "midi off" ve "midi on” arasında bir değere ölçeklendirilmeli mi?
+~blink~hedeflenen kontrol etkinleştirildiğinde ilişkilendirilmiş LED’i açıp kapatmak için birbirini takip eden aç/kapat mesajı gönderin
+~increment~"controltype" kontrolü "set" veya "release” olarak ayarlandığında, hedeflenen kontrol bu miktar kadar arttırılır (ve "value" alanı göz ardı edilir). "controltype" kontrolü "slider” olarak ayarlandığında, hedeflenen kontrol hareket etme yönüyle aynı oranda değişir (bu ayar "sonsuz enkoderler” için kullanılabilir)
+~twoway~kontrolöre geri besleme göndermeli mi? (düğme/butonla ilişkilendirilmiş LED’leri kontrol etmek için)
+~feedback~hangi cc ya da notaya geri besleme gönderilmeli?
+~pageless~bu bağlantı midi kontrolörünün tüm sayfalarında çalışmalı mı?
+~ x ~bu bağlantıyı silin
+~copy~bu bağlantıyı kopyalayın
+~layout~bu kontrolör için hangi yerleşim dosyasını kullanmalı? bu dosyaları Documents/BespokeSynth/controllers klasörünüzde oluşturabilirsiniz.
+~monome~hangi monome kullanılmalı?
+
+
+
+keyboarddisplay~klavye üzerinde giriş notalarını gösterir ve nota çalmanız için klavyeye tıklamanız yeterlidir
+
+
+
+gridkeyboard~ızgara tabanlı klavye, esasen 64 pedi olan ızgara kontrolörlerle kullanılır
+~layout~klavye stili
+~octave~baz oktavı
+~latch~tuşa basıldığında notayı mandallayın, öyle ki bir kere basarak notayı çalın ve notayı sonlandırmak isterseniz tekrar basın
+~arrangement~hangi yerleşim stili kullanılmalı?
+~ch.latch~akort düğmesine basıldığında akordu mandallar
+~p.root~chorder modülü için kök notasının her defasında çalınmasını sağlar
+~grid~"midicontroller" modülünden buraya ızgara yamalayın
+
+
+
+fouronthefloor~bas davul tetiklemek için her vuruşta 0 notasını gönderir
+~two~her iki ölçüde tek nota gönderir
+
+
+
+drumsequencer~davul sesleri için hazırlanan adım sıralayıcısı. adım hızını ayarlamak için ızgara üzerinde sürüklerken shift tuşuna basılı tutun.
+~vel~adımı ayarlarken kullanılacak hız
+~measures~ölçü cinsinden sekans uzunluğu
+~preset~örüntü ön ayarı belirleyin
+~yoff~ızgara kontrolöründeki örüntü görünümü için dikey ofset
+~offsets~"offsets" slider’larını görüntüleyin
+~repeat~geçerli hızda giriş notalarını tekrarlayın
+~step~her bir adımın uzunluğu
+~column~midi kontrolörde adımın görselleştirilmesi için kullanılan geçerli sütun
+~<~tüm örüntüyü bir adım sola kaydırın
+~>~tüm örüntüyü bir adım sağa kaydırın
+~grid~"midicontroller" modülünden buraya ızgara yamalayın
+~velocity~hızı kontrol etmek için "midicontroller" modülünden buraya ızgara yamalayın
+~metastep~"meta step” ayarını kontrol etmek için "midicontroller" modülünden buraya ızgara yamalayın. Bunun ne işe yaradığını unuttum.
+~rowpitch*~bu satırın çıkış perdesi
+~offset*~ölçü içerisinde satırı ileri/geri kaydırın. trampetlerinizi, hat’leriniz vb. biraz geciktirmeyi deneyin
+~randomize~sekansı rastgele belirleyin
+~r den~rastgele örüntü belirleyicisi yoğunluğu. değer ne kadar yüksek olursa, rastgele örüntü o kadar karmaşık olacaktır.
+~r amt~rastgele belirlenmesi seçildiğinde her bir adımın değişme olasılığı. düşük değerler sekansı çok az miktarda değiştirir, yüksek değerler sekansı daha fazla değiştirir.
+~r lock*~satırın rastgele belirlenmemesi için bu satırı kilitleyin
+
+
+
+helpdisplay~yardım bilgilerini görüntüleyin
+~show tooltips~bilgi çubuklarını gösterir. ayrıca F1 tuşuyla bilgi çubuklarını açıp kapatabilirsiniz ve "settings" menüsünde bilgi çubuklarını varsayılan olarak açıp kapatabilirsiniz.
+~copy build info~yardım talebi sırasında kullanmak için bu sürüm bilgilerini panoya kopyalayın
+~help page~görüntülenecek yardım bilgisi sayfası
+
+
+
+multitrackrecorder~harici DAW’de miksleme için diske yazmak amacıyla birden fazla senkronize edilmiş ses kaydı alın
+~record~ses kanallarına girişi kaydedin
+~bounce~ses kanallarınızı kayıtlar dizininize yazın
+~add track~ek kanal ekleyin
+~clear~kanallardaki sesini silin
+
+
+
+multitrackrecordertrack~çok kanallı kaydedicideki kanal
+~ X ~bu kanalı silin
+
+
+
+circlesequencer~loop’u çember olarak gösteren poliritmik sıralayıcı
+~length*~bu çemberdeki adım sayısı
+~note*~bu çemberde kullanılacak perde
+~offset*~bu çemberin zamanlama ofseti
+
+
+
+waveshaper~matematiksel ifadeyle dalga şekli belirleyin
+~y=~matematiksel ifadeyle dalga şekli belirleme. "x+sin(x*pi*a)” gibi bir ifade yazın. mevcut değişkenler: a,b,c,d,e = aşağıdaki slider’lar, t = zamanı gösterir. x1,x2,y1,y2 = biquad durum saklaması.
+~rescale~matematiksel ifadeye çevirmeden önce girişi yeniden ölçeklendirin
+~a~matematiksel ifadede kullanılacak değişken
+~b~matematiksel ifadede kullanılacak değişken
+~c~matematiksel ifadede kullanılacak değişken
+~d~matematiksel ifadede kullanılacak değişken
+~e~matematiksel ifadede kullanılacak değişken
+
+
+
+waveformviewer~dalga şekli ekranı
+~freq~görüntülenmesi için istenen frekans. bu modüle nota girişi yamalarsanız otomatik olarak ayarlanır
+~length~kullanılacak sample sayısı
+~draw gain~dalga şekli ekranı ölçeğini ayarlayın
+
+
+
+vocodercarrier~"vocoder" veya "fftvocoder" modülüne bağlayın. bu modüle sentezleyici sesini gönderin ve vocoder modülüne vokal sesini gönderin.
+
+
+
+vocoder~frekans bandı tabanlı ses kodlayıcı. bu modül "vocodercarrier" ile eşleştirilmelidir. vokal sesi bu modüle yönlendirilmeli ve sentezleyici vocodercarrier modülüne yamalanmalıdır.
+~input~giriş sinyali gain değeri
+~carrier~taşıyıcı sinyali gain değeri
+~volume~çıkış gain değeri
+~mix~orijinal girişin ses kodlayıcıda işlenmiş sinyale göre çıkış miktarı
+~max band~her frekans bandı için ses sınırı
+~spacing~frekans bantlarının ne kadar aralıklı olacağını belirleyin
+~bands~ne kadar sayıda frekans bandının kullanılacağını belirleyin
+~f base~en düşük bant için frekans
+~f range~en yüksek bant için frekans aralığı
+~q~bantların rezonansı
+~ring~bantların "eski değerine” ne kadar sürede geleceğini belirleyin
+
+
+
+takerecorder~[yarıda bırakılmış modül, muhtemelen hatalı]
+~start~[todo]
+
+
+
+stutter~girişi yakalar ve özel dj efektleri uygular
+~grid~"midicontroller" modülünden buraya ızgara yamalayın
+~half note~yarım nota loop’a alır
+~quarter~dörtlük nota loop’a alır
+~8th~sekizlik nota loop’a alır
+~16th~onaltılık nota loop’a alır
+~32nd~otuzikilik nota loop’a alır
+~64th~altmışdörtlük nota loop’a alır
+~reverse~yarım nota geri loop’a alır
+~ramp in~sıfır değerinden bir değerine sesi hızlıca yükselterek loop’a alır
+~ramp out~sıfır değerine sesi hızlıca düşürerek çalmayı durdurur
+~tumble up~artan hızda loop’a alıp çalma hızını arttırır
+~tumble down~azalan hızda loop’a alıp çalma hızını arttırır
+~half speed~düşük perdede yarı hızda çalar
+~double speed~yüksek perdede iki katı hızda çalar
+~triplets~triplet aralıkta loop’a alır
+~dotted eighth~hızlı vuruşlu sekiz notada loop’a alır
+~free~aşağıdaki slider’larla belirlenen ayara göre loop’a alır
+~free length~"free" stutter modu için saniye cinsinden uzunluk
+~free speed~"free" stutter modu hızı
+
+
+
+splitter~stereo sinyali iki mono sinyale ayırır veya mono sinyali çiftler
+
+
+
+spectrum~ses sinyalinin spektrum verilerini görüntüleyin
+
+
+
+signalclamp~ses sinyali değerinin belirli bir aralıkta olmasını sağlar
+~min~minimum çıkış değeri
+~max~maksimum çıkış değeri
+
+
+
+send~sinyali çiftleyin ve ikinci bir destinasyona gönderin
+~amount~sağ taraftaki kablo için çıkış miktarı
+~crossfade~bu ayar işaretlendiğinde, "amount" değeri artarken sol taraftaki kablonun çıkışı azaltılır
+
+
+
+samplergrid~pedlere girişi kaydedin ve pedleri çalın. 64 pedli ızgara kontrolörle kullanılabilir.
+~passthrough~gelen ses sinyali çıkıştan geçip gitmeli mi?
+~vol~çıkış ses düzeyi
+~clear~etkinleştirildiğinde basılan ızgara karelerini temizleyin
+~edit~en son basılan ızgara karesi için kaydedilmiş sample’ı ayarlamak amacıyla kontrolleri etkinleştirin
+~duplicate~etkinleştirildiğinde basılan ızgara karesine son basılan sample’ı kopyalar
+~start~sample başlangıcı
+~end~sample sonu
+~grid~"midicontroller" modülünden buraya ızgara yamalayın
+
+
+
+samplecapturer~[üzerine çalışılıyor] kısa klipler için ses kaydedin. ses eşik değerini geçtiğinde kayıt başlar.
+~record~kaydedilsin mi?
+~play~bu klibi çalın
+~save~dosyaya bu klibi kaydedin
+~delete~bu klibi temizleyin
+
+
+
+ringmodulator~belirli bir frekanstaki sinyal genliğini modüle edin
+~freq~kullanılacak frekans. bu modüle nota girişi yamalanıp da ayarlanabilir.
+~dry/wet~orijinal sesin modüle edilmiş sese göre ne kadar kullanılacağını belirleyin
+~volume~ses düzeyi çıkışı
+~glide~istenilen frekansta giriş notasının ne kadar kaydırılması gerektiğini gösterir
+
+
+
+pitchchorus~giriş midi notalarına bağlı olarak giriş sinyalinin perdesi değiştirilmiş versiyonunu verir. perde 60, referans perde olarak kullanılır.
+~passthrough~orijinal ses bu modülden geçip gitmeli mi?
+
+
+
+panner~sesi sola ve sağa panlayın. ayrıca mono girişi stereo çıkışa dönüştürür.
+~pan~sinyalin sol ve sağ kanallardan çıkış miktarı. 0,5 değeri sol ve sağ kanala eşit miktarda sinyal gönderir.
+~widen~burada belirlenen sayıda sample kadar bir kanalı geciktirin. sesin bir yönden geliyormuş gibi algılanmasına neden olan panlamaya benzer bir etki oluşturun.
+
+
+
+output~çıkış kanalına (hoparlörlerinize ya da ses kartınıza) ses göndermek için buraya sesi yönlendirin
+~ch~sesin gönderileceği kanal (ya da kanallar, stereo ses istiyorsanız)
+
+
+
+multitapdelay~birden fazla efekt noktasında gecikme
+~dry~dry sinyalin ne kadarının geçeceğini belirleyin
+~display length~saniye cinsinden ön bellek ekranının uzunluğu
+~delay *~milisaniye cinsinden efekt noktası gecikme süresi
+~gain *~efekt noktası gecikme miktarı
+~feedback *~bu efekt noktasında geciktirilen sesin ne kadarının girişe geri besleneceğini belirler
+~pan *~bu efekt noktası için stereo panlama
+
+
+
+looperrewriter~alınan girişle looper’daki kayıtları yeniden yazarak kendi loop’larınızı resample’lamanıza yardımcı olur. "looper" modülüne gri noktayı bağlayın.\n\n "looper" modülünü doğrudan "send” çıkışına bağlanması, "send" ayarının en solundaki çıkışın aktif efektlerinize ("effectchain” gibi) bağlanması, bu "rewriter” modülüne aktif efektin bağlanması ve ardından "send" ayarının en sağdaki çıkışının bu "rewriter” modülüne bağlanması bu modülün en iyi kullanım yoludur
+~ go ~bağlanan looper’ı yeniden yazın ve bu looper send’e bağlanmışsa bu send’i yalnızca sağ çıkışı kullanması için ayarlayın
+~new loop~dinamik loop uzunluğunda kaydı başlatın. looper’a kaydı yeniden yazmak istediğinizde "go" tuşuna basın. bu işlem ayrıca bespoke global temposunu değiştirerek yeni loop ile eşleşir, böylelikle çok yararlı ve kullanışlı olabilir! iptal etmek için yeniden bu tuşa tıklayın.
+
+
+
+looperrecorder~birden fazla looper için kaydı yönetmeye ve geriye yönelik loop yakalamaya (örn. daima kayıt açık) yarayan komut merkezi
+~1~o an için hedeflenen looper’a son ölçüyü yazın
+~2~o an için hedeflenen looper’a son 2 ölçüyü yazın
+~4~o an için hedeflenen looper’a son 4 ölçüyü yazın
+~8~o an için hedeflenen looper’a son 8 ölçüyü yazın
+~length~bağlanmış looper’larda "commit" butonu kullanıldığında ölçü cinsinden uzunluk
+~2xtempo~bağlanmış looper’ların senkronize edilmesini sağlayıp global aktarım temposunu iki katına çıkarın
+~.5tempo~bağlanmış looper’ların senkronize edilmesini sağlayıp global aktarım temposunu yarıya indirin
+~target~ön belleğe kaydetme butonuna basıldığında sesi işleyecek looper
+~mode~kaydedici modu: girişi kaydetmek için "record" ayarını kullanın ve loop almaya hazır olduğunuzda ön belleğe girişin işlenmesine olanak sağlar, girişi kaydetmek için "overdub" ayarını kullanın ve belirlenen uzunlukta loop’u çalın ve girişi eklemeye gerek kalmadan loop’u çalmak için "loop" ayarını kullanın
+~clear~kaydedilmiş ön belleği temizleyin
+~free rec~ön tanımlı uzunluk olmaksızın loop’u kaydetmeye başlamanıza olanak sağlar. kaydı sonlandırmak için devre dışı bırakın, loop uzunluğuyla eşleşmesi için global aktarım değerlerini ayarlayın ve kaydedici modunu "loop” olarak değiştirin
+~cancel free rec~"free rec" ayarı etkinleştirildiğinde, loop uzunluğunu ayarlamaksızın kaydı iptal edin
+~orig speed~loop’ların kaydedildiği tempoya looper’ı sıfırlayın
+~snap to pitch~anahtar nota ile eşleşen en yakın değere tempoyu eşitler
+~resample~yeni tempoya göre tüm bağlanmış looper’ları resample’lar
+~resample & set key~nota anahtarıyla (mevcut nota anahtarı ve tempo değişimine bağlı olarak) eşleşen en yakın değere tempoyu eşitler, yeni tempoya göre tüm bağlanmış looper’ları resample’lar ve yeni anahtara göre global gamı değiştirir
+
+
+
+looper~giriş sesini loop’a alır. tam işlevsellik için "looperrecorder" ile birlikte kullanın.
+~num bars~ölçü cinsinden loop uzunluğu
+~clear~loop sesini temizleyin
+~volume~çıkış ses düzeyi
+~b~geçerli sesi dalga şekline dönüştürür
+~ m ~bu looper’daki kaydı alın ve başka bir kayıtla birleştirin, önce birleştirilecek kaynakta sonra birleştirme hedefinde bu düğmeye basın.
+~decay~her loop’un ses düzeyini düşürme miktarı
+~save~wav dosyasına bu loop’u kaydedin
+~mute~bu looper’ı sessize alın
+~commit~bu loop’a geçerli looperrecorder önbelleğini işleyin
+~capture~sonraki loop başladığında, loop süresi kadar girişi kaydedin
+~write~loop önbelleğine giriş ses düzeyini yazın
+~swap~bu looper ile diğer looper’daki kaydı karşılıklı değiştirin. kayıtların yerini değiştirmek için iki looper’da da bu düğmeye tıklayın.
+~copy~bu looper’daki kaydı alın ve kaydı başka bir looper’a kopyalayın. önce kopyalanacak kaynakta sonra kopyalama hedefinde bu düğmeye tıklayın.
+~2x~loop’un çalma hızını iki katına çıkarın
+~.5x~loop çalma hızını yarıya düşürün
+~undo~son loop işlemesini iptal edin
+~offset~looper aktarma imlecinin aktarım pozisyonundan ofsetlenme miktarı
+~set~geçerli ofset ön belleğin başlangıcında olacak şekilde looper’daki kaydı kaydırın
+~scrspd~"scr" etkinleştirildiğinde kullanılan çalma hızı. plak tipi “scratching” etkisini için hızlıca değiştirin.
+~scr~loop’un "scrspd” değeriyle belirlenen miktarda “scratch” etkisi oluşturun
+~fourtet~geçmiş bir zamanda four tet’in bir videoda paylaştığı gibi tekstür etkisinden yararlanın: ses dosyasını parçalara ayırın ve her bir parçayı iki katı hızda bir ileri bir geri çalın. bu slider orijinal ses ve bu "fourtetified" sesin karıştırılma oranını ayarlar.
+~fourtetslices~"fourtet" etkisi için kullanılacak parça boyutu
+~beatwheel on~[none]
+~beatwheel pos right~[none]
+~beatwheel depth right~[none]
+~beatwheel pos left~[none]
+~beatwheel depth left~[none]
+~beatwheel single measure~[none]
+~pitch~looper çıkışının perde kaydırması miktarı
+~auto~aktarım temposu değiştirilirken perde kaydırması otomatik ayarlanmalı mı?
+~resample for tempo~geçerli global tempo, önbelleğin kaydedildiği tempoyla artık eşleşmediğinde bu düğme görüntülenir. yeni tempoyla eşleştirmek için ön belleği resample’lamak için bu düğmeye tıklayın.
+
+
+
+lissajous~lissajous eğrisine benzer giriş ses düzeyi eğrisi çizin. stereo kanalların stereo genişliğini göstermesi amacıyla kullanılması için modülün üçgen menüsündeki "autocorrelation" ayarını kapatın.
+~scale~lissajous görüntüsünün görsel ölçeği
+
+
+
+inverter~sinyali -1 ile çarpın. yeniden birleştirildiğinde sinyalin bazı parçalarını çıkarmak için send değeriyle birlikte kullanıldığında oldukça ilginç efektler ortaya koyar.
+
+
+
+input~mikrofon gibi giriş kaynağından ses alın
+~ch~kullanılacak kanal (ya da kanallar stereo ses istiyorsanız)
+
+
+
+freqdelay~giriş notalarına bağlı olan gecikme süresiyle belirlenen gecikme etkisi
+~dry/wet~efektin uygulanma miktarı
+
+
+
+fftvocoder~FFT tabanlı ses kodlayıcı
+~input~giriş sinyali gain değeri
+~carrier~taşıyıcı sinyali gain değeri
+~volume~çıkış gain değeri
+~dry/wet~orijinal girişin ses kodlayıcıda işlenmiş sinyale göre çıkış miktarı
+~fric thresh~ses kodlaması için taşıyıcı sinyalin mi beyaz gürültünün mü kullanılacağını belirlemek için daraltılı algılama hassasiyeti
+~whisper~taşıyıcı sinyalin bazı faz bölümlerinin rastgele belirlenme miktarı, bu değer çıkış sesinin ne kadarının fısıltı gibi çıkacağını belirler
+~phase off~taşıyıcı sinyalin bazı faz bölümlerinin ofsetlenme miktarı
+~cut~basın bazı faz bölümlerinin silinme miktarı
+
+
+
+feedback~sinyal zincirinde daha önceki konuma geciktirilen sesi geri besleyin. ses zincirine sesi geri göndermek için "feedback out" konnektörünü ve işlenmiş sesi ileri göndermek için ana çıkış konnektörünü kullanın. geri beslemenin kullanılması sıklıkla beklenmeyen ve ayar tutmayan sonuçlara yol açabilir!
+~limit~geri beslemenin aşırı derece patlaması gibi sorunlarla karşılaşmamak için bu aralıkta geri besleme sesini kesin.
+
+
+
+eq~belirli frekans aralıklarında çıkış seviyelerini ayarlamak için çok bantlı ekolayzır
+~enabled*~bu bant etkinleştirilsin mi?
+~type*~bu bantta kullanılacak filtre tipi
+~f*~bu bant için frekans kesmesi
+~g*~bu bant için gain değeri
+~q*~bu bant için rezonans
+
+
+
+effectchain~seri uygulanan bir dizi efekti içeren konteyner. efektler < ve > düğmeleriyle kolaylıkla yeniden sıralanabilir ve x düğmesiyle silinebilir. tüm efektler için x düğmesini ekrana getirmek için shift tuşuna basılı tutun.
+~volume~çıkış gain değeri
+~effect~eklenecek efekti seçin
+~spawn~o an için vurgulanan efekti ortaya çıkarır
+~exit effect~push2 cihazında ana effectchain kontrollerine efekt kontrolünü geri atar
+~<~zincirde bu efekti sola hareket ettirir
+~>~zincirde bu efekti sağa hareket ettirir
+~x~bu efekti silin
+~mix*~bu efekti için wet/dry slider’ı
+
+
+
+basiceq~basit çok bantlı EQ
+~even~EQ’yu sıfırlayın
+
+
+
+biquad~biquad formülünü kullanarak filtreleyin
+~type~filtre tipi
+~F~frekans kesmesi
+~Q~resonans
+~G~gain
+
+
+
+bitcrush~düşük kaliteli efektler için sample çözünürlüğü ve sample hızını azaltın
+~crush~sample çözünürlük azaltımı
+~downsamp~sample hızı azaltımı
+
+
+
+butterworth~bant geçiren formül kullanarak filtreleyin
+~F~frekans kesmesi
+~Q~resonans
+
+
+
+compressor~belirli bir düzeyde sesi tutmayı deneyin
+~mix~kompresyon miktarı. "paralel kompresyon" efekti için bu değeri düşürün. lookahead değerini telafi etmek için effectchain’ın mix slider’ı yerine bu mix slider’ı kullanın.
+~threshold~gain etkisinin azaltılmaya başladığı eşik değeri
+~ratio~sinyal eşik değerini geçtiğinde uygulanacak gain azaltımı değeri
+~attack~gain azaltımı uygulama hızı
+~release~gain azaltımı devre dışı bırakma hızı
+~lookahead~kompresyon zarfını ayarlamak için "sinyalin ilerisine" ne oranda bakılacağını belirleyin. bu işlem kaçınılamaz bir şekilde çıkış sinyalinizde gecikmeye sebep olacaktır, sıralayıcıları bir miktar önce çalıştırarak çıkış sinyali gecikmesi telafi edilebilir.
+~output~ses düzeyini arttırmak için gain’i yeni ayara uydurur
+
+
+
+dcremover~sinyalin sıfırdan uzaklaşmasına devam etmesi için DC ofsetini devre dışı bırakmak amacıyla 10 hz kesme değerli yüksek geçişli filtre
+
+
+
+delay~ekolu gecikme
+~delay~milisaniye cinsinden gecikme
+~amount~geri gönderilen gecikme miktarı
+~interval~bir ölçüye göre gecikme uzunluğunu ayarlayın
+~short~duyabilir oranda gecikmeye ve taraklı filtre seslerine izin vermek için gecikme slider’ı çalışma aralığını düşürmeye yönelik kısayol
+~dry~dry sinyal mi yoksa sadece gecikmiş sinyal mi geçmeli?
+~feedback~çıkış sesi gecikme hattına geri beslenmeli mi?
+~input~girişi gecikmeli mi almalı?
+~invert~gecikmiş sesin sinyali tersine çevirmeli mi? bu işlem farklı bir sese neden olabilir ve ayrıca sesin geri besleme hattında birikmesini önlemek için DC ofsetini devre dışı bırakabilir.
+
+
+
+distortion~dalga şekli distorsiyonu
+~type~uygulanacak distorsiyon stili
+~clip~distorsiyonun kesme noktası, daha düşük değer daha etkili distorsiyonla sonuçlanır
+~preamp~distorsiyona beslenme öncesinde sinyal gain değeri
+~fuzz~asimetrik distorsiyon etkisi için giriş sinyalini merkezden dışa doğru ittirin
+~center input~daha kontrollü bir yolla oluşturulan distorsiyon etkisi için giriş sinyalinden dc ofsetini çıkarın
+
+
+
+formant~[sonlandırılmamış, hatalı] formantların kontrol edilmesine yarayan filtre
+~ee~[todo]
+~oo~[todo]
+~i~[todo]
+~e~[todo]
+~u~[todo]
+~a~[todo]
+
+
+
+freeverb~"freeverb" algoritmasından yararlanan yankı efekti
+~room size~yankı uzunluğunu kontrol eder, daha yüksek değer daha uzun yankı anlamına gelir
+~damp~yüksek frekans zayıflaması; sıfır değeri tüm frekansların aynı oranda sönümleneceği anlamına gelir, aynı şekilde daha yüksek ayar yüksek frekans aralığının daha hızlı sönümlenmesine neden olur
+~wet~yankı sinyali miktarı
+~dry~işlenmemiş sinyal miktarı
+~width~yankının stereo genişliği
+
+
+
+gainstage~effectchain modülüyle ses düzeyini kontrol edin
+~gain~ses düzeyi çarpanı
+
+
+
+gate~belirli bir eşik değerinin üzerinde olduğunda yalnızca sinyalin geçmesine izin verir. hat gürültüsünü ortadan kaldırmak veya sadece efekt olarak kullanılabilir.
+~threshold~gürültü kapısının açıldığı ses düzeyi eşik değeri
+~attack~gürültü kapısının karıştırma işlemi için açılma hızı
+~release~gürültü kapısının karıştırma işlemi için kapanma hızı
+
+
+
+granulator~o an ki girişi taneciklendirme efektiyle işleyin
+~overlap~üst üste gelen tanecik sayısı
+~speed~tanecik çalma hızı
+~len ms~milisaniye cinsinden taneciğin uzunluğu
+~dry~dry sinyalinin geçme miktarı
+~autocapture~belirtilen aralıktaki girişi dondurun
+~pos r~tanecik başlangıç noktasının rastgele seçimi
+~spd r~tanecik hızının rastgele seçimi
+~spa r~tanecikler arasındaki sürenin rastgele seçimi
+~frz~önceden kaydedilmiş önbelleği dondurun
+~g oct~oktavlar ve beşinci notalar eklenmeli mi?
+~width~tanecik yerleşiminin stereo genişliği
+~pos~önbellekteki çalma pozisyonu
+
+
+
+muter~gelen sinyali sessize alın
+~pass~bu ayar işaretlendiğinde, sinyalin geçmesine izin verilir
+~ms~sinyali sessize alma/sinyalin sesini açma işlemi sırasındaki yükseltme süresi
+
+
+
+noisify~giriş sinyalini beyaz gürültüyle çarpın
+~amount~uygulanacak gürültü miktarı
+~width~yeni gürültü sample’nın ne sıklıkla seçileceğini belirleyin
+
+
+
+pitchshift~sinyalin perdesini kaydırın
+~ratio~perde kaydırma miktarı (1 değeri kaydırma olmayacağı anlamına gelir)
+~ratioselector~kullanışlı perde değerleri için kısayol
+
+
+
+pumper~”pompalanan yan zincir” etkisini emüle etmek için sinyalin sesini ritmik olarak en düşük değere getirin
+~amount~ses alçaltma miktarı
+~length~pompa uzunluğu
+~curve~sesin geri gelme yolu
+~attack~sesin azaltma keskinliği
+~interval~pompalanma hızı
+
+
+
+tremolo~sinyalin sesini ritmik olarak modüle edin
+~amount~ses alçaltma miktarı
+~offset~LFO fazını ofsetler
+~duty~LFO darbe genişliği
+~interval~LFO hızı
+~osc~LFO osilatör tipi
+
+
+
+dcoffset~ses sinyaline sabit ofset değerini ekleyin
+~offset~eklenecek ofset miktarı
+
+
+
+autotalent~[yarıda bırakılmış modül, muhtemelen hatalı] "autotalent" kodundan yararlanarak otomatik akort edin
+~A~[todo]
+~Bb~[todo]
+~B~[todo]
+~C~[todo]
+~Db~[todo]
+~D~[todo]
+~Eb~[todo]
+~E~[todo]
+~F~[todo]
+~Gb~[todo]
+~G~[todo]
+~Ab~[todo]
+~amount~[todo]
+~smooth~[todo]
+~shift~[todo]
+~scwarp~[todo]
+~lfoamp~[todo]
+~lforate~[todo]
+~lfoshape~[todo]
+~lfosymm~[todo]
+~lfoquant~[todo]
+~formant correct~[todo]
+~fwarp~[todo]
+~mix~[todo]
+~set from scale~[todo]
+
+
+
+audiorouter~sesin yönlendirileceği yolu değiştirmek için anahtar. listeye eklemek için hedeflere bağlayın.
+~route~ses destinasyonu
+
+
+
+audiometer~ses sinyalinin düzeyi için slider atayın. midi görüntüleme değerini eşleştirmek için kullanılabilir.
+~level~giriş sesi seviyesi. kontrolörünüzde görüntülenen değeri görmek için LED ekranı midi kontrolünü buraya bağlayın.
+
+
+
+signalgenerator~basit osilatör sinyali. frekansı ayarlamak için bu modüle nota yollayın ve fazı sıfırlamak için bir darbe gönderin.
+~freq~sinyal frekansı
+~freq mode~giriş notaları için hangi mod kullanılmalı? "instant” anlık olarak giriş notası frekansını değiştirir, "ramp" frekansı zamanla arttırır ve "slider" son iki giriş notası arasından interpole yapmanız için slider kullanmanıza olanak sağlar
+~osc~osilatör tipi
+~pw~darbe genişliği (veya kare olmayan dalgaların şekli)
+~slider~son iki giriş perdesi arasında interpole yapmanıza yarayan slider
+~ramp~giriş frekansını yükseltme süresi
+~sync~syncf frekansında fazın sıfırlanması için "sync" modunu etkinleştirin
+~syncf~"sync" etkinleştirildiğinde fazın sıfırlanacağı frekans
+~soften~kare ve testere dalga şekillerinin kenarlarını yuvarlar
+~shuffle~dalga şeklinin diğer tüm döngülerini uzatır ve daraltır
+~mult~frekans çarpanı
+~phase~faz ofseti
+~vol~çıkış sesi düzeyi
+~detune~belirlenen frekanstan akordun bozulması miktarı
+
+
+
+seaofgrain~tanecikli sentezleyici, slider’lar veya MPE girişiyle çalınabilir
+~load~sample dosyası yükleyin
+~record~anlık tanecikli gecikme için seaofgrain modülünü kullanarak girişi tanecik efektiyle işlenmiş önbellek olarak kaydedin
+~volume~çıkış ses düzeyi
+~offset~sample görünümünün başlayacağı konum
+~display length~görüntülenecek sample uzunluğu
+~keyboard base pitch~sample’ın başlangıcı gösteren midi perdesi
+~keyboard num pitches~sample boyunca kullanılacak perde sayısı
+~gain *~sesin düzeyi
+~pos *~sesin sample’daki konumu
+~overlap *~üst üste gelen tanecik oranı
+~speed *~tanecik çalma hızı
+~len ms *~milisaniye cinsinden bir taneciğin uzunluğu
+~pos r *~tanecik başlangıç noktasının rastgele seçimi
+~speed r *~tanecik hızının rastgele seçimi
+~spacing r*~tanecikler arasındaki sürenin rastgele seçimi
+~octaves *~oktavlar ve beşinci notalar eklenmeli mi?
+~width *~tanecik yerleşiminin stereo genişliği
+~pan *~tanecik yerleşiminin stereo panı
+
+
+
+sampler~çok basit polifonik perde ayarlı sample oynatıcı ve kaydedici. sesi içeriye gönderin ve kaydedilmiş sesi çalmak için nota girişini kullanın.
+~vol~çıkış sesi düzeyi
+~env~ses düzeyi zarfı
+~envA~ses düzeyi zarfının atağı
+~envD~ses düzeyi zarfının sönümlemesi
+~envS~ses düzeyi zarfının tutması
+~envR~ses düzeyi zarfının bırakması
+~rec~mevcut kaydı silmek için etkinleştirin ve giriş eşik değerine ulaşıldığında yeni sesi kaydedin
+~thresh~kaydetme etkinleştirildiğinde, kayda başlanılması için giriş sesinin bu eşik değeri geçmesi gerekir
+~pitch~sesin perdesinin düzeltilmesi denenmeli mi?
+~passthrough~kayıt alınırken giriş sesi bu modülden geçip gitmeli mi?
+
+
+
+sampleplayer~tetiklenebilir cue noktalarıyla sample çalma, klip çıkartma ve youtube arama/indirme işlevselliği. ek özelliklere erişmek için bu modülü daha büyük hale getirin. panonuzda youtube URL’niz varsa, video sesini indirmenize izin veren düğme görünür.
+~volume~çıkış gain değeri
+~speed~geçerli çalma hızı
+~yt:~bu bağlantı için youtube’ta arama yapın
+~play~o an ki aktarım imleci konumundan çalmaya başlayın
+~pause~çalmayı durdurun ve aktarım imlecini olduğu yerde bırakın
+~stop~çalmayı durdurun ve aktarım imlecini sıfırlayın
+~loop~sona ulaştığında aktarım imlecini başlangıca getirin
+~load~sample yüklemek için dosya seçicisini görüntüleyin
+~save~dosyaya bu sample’ı kaydedin
+~record~sample önbelleğimize ses girişini kaydedin. mevcut sample’ı siler.
+~trim~geçerli yakınlaştırma aralığı dışındaki tüm sesi silin
+~youtube~panonuzda mevcut bulunan youtube URL’sinin sesini indirin
+~cue start~geçerli cue için saniye cinsinden başlangıç noktası
+~cue len~geçerli cue’nun saniye cinsinden uzunluğu. sıfır değeri sample’ın sonuna kadar oynatır.
+~cue speed~geçerli cue’nun çalma hızı
+~cue stop~nota kapalı sinyali alınırsa çalmayı durdurun
+~cuepoint~düzenlenecek geçerli cue’yu belirleyin
+~click sets cue~ayar işaretlendiğinde, dalga şekline tıklanması geçerli cue noktasının başlangıç konumunu ayarlar
+~select played~ayar işaretlendiğinde, gelen notalarla oynatılan herhangi bir cue noktası geçerli cue haline gelir
+~play cue~geçerli cue’yu oynatın
+~show grid~dörtlük nota ızgarasını görüntüleyin (yeteri kadar uzaklaştırıldığında)
+~4~ otomatik olarak 4 dilime ayırın
+~8~ otomatik olarak 8 dilime ayırın
+~16~ otomatik olarak 16 dilime ayırın
+~32~ otomatik olarak 32 dilime ayırın
+~searchresult*~youtube arama sonucunu indirmek için tıklayın. uzun videoların indirilmesi biraz vakit alabilir.
+~append to rec~kayıt alırken, ilk önce sample’ı silmek yerine önceki kayda ekleyin
+~record as clips~kayıt alırken, yalnızca gürültü kapısını açabilecek düzeyde olan giriş alındığında kayıt işlemini başlatın ve cue noktalarıyla her kaydedilen bölümü işaretleyin
+~threshold~kayıt için gürültü kapısını açma ses düzeyinin eşik değeri
+~attack~gürültü kapısının karıştırma işlemi için açılma hızı
+~release~gürültü kapısının karıştırma işlemi için kapanma hızı
+~playhovered~bu cue’yu oynatın
+~grabhovered~sample’ı başka bir modüle bırakmak için bu cue’ye ait sample’ı tutun
+
+
+
+samplecanvas~sample düzenleme görünümü
+~measures~ölçü cinsinden panel uzunluğu
+~interval~ızgarada ölçü içerisinden alt bölme aralığı
+~canvas~sample paneli. buraya sample’ları sürükleyip bırakın. panel kontrolleri:\n-sample’ı kopyalamak için shift tuşuna basarak sürükleyip bırakın\n-yaslamadan sample’ı alt tuşuna basarak sürükleyip bırakın\n-aralığa yaslamak için sürükleyip bırakarak ctrl tuşuna basılı tutun\n-panel görünümünü kenara almak için alt tuşuna basılı tutarak boş alan seçin\n-panel görünümü yakınlaştırmak için ctrl tuşuna basılı tutarak boş alan seçin
+~timeline~loop noktalarını kontrol edin
+~scrollh~yatay kaydırma çubuğu
+~scrollv~dikey kaydırma çubuğu
+~delete~vurgulanan öğeleri silin
+~view rows~görüntülenen satır sayısı
+~clear~tüm öğeleri silin
+~drag mode~öğelerin sürüklenebileceği yön
+
+
+
+oscillator~polifonik zarflı osilatör. modülasyonlar (MPE desteğiyle): modülasyon tekerleği filtreyi daha hızlı kapatır (filtre etkinleştirilmişse), basınç akordu bozma miktarını azaltır
+~osc~osilatör tipi
+~mult~gelen perdenin frekansını bu değerle çarpar
+~pw~darbe genişliği (veya kare olmayan dalgaların şekli)
+~shuffle~dalga şeklinin diğer tüm çevrimlerini uzatır ve daraltır
+~soften~kare ve testere dalga şekillerinin kenarlarını yuvarlar
+~phase~osilatörün faz ofseti ve perdeleri aynı olan sesler arasındaki faz ofseti. faz modülasyonu elde etmek amacıyla çok hızlı modülatörle yamalamak için kullanılabilir.
+~sync~syncf frekansında fazın sıfırlanması için "sync" modunu etkinleştirin
+~syncf~"sync" etkinleştirildiğinde fazın sıfırlanacağı frekans
+~env~[none]
+~envA~ses düzeyi zarfının atağı
+~envD~ses düzeyi zarfının sönümlemesi
+~envS~ses düzeyi zarfının tutması
+~envR~ses düzeyi zarfının bırakması
+~vol~osilatörün ses düzeyi
+~detune~unison ayarı 1 olduğunda, osilatörün akordunu belirtilen miktarda bozar, unison ayarı 2 olduğunda, osilatör normal olarak akortlanır ve diğer osilatörün akordu bu miktarda bozulur, unison >2 olduğunda, osilatörlerin akordu belirtilen aralıkta rastgele bozulur.
+~unison~notanın çalınması için osilatörün ne oranda kullanılacağını belirleyin
+~width~unison ayarı 1’den büyük olduğunda seslerin nasıl panlanacağını kontrol edin
+~adsr len~ADSR kontrollerinin görüntüleme uzunluğu
+~envfilter~[none]
+~envfilterA~filtre zarfının atağı
+~envfilterD~filtre zarfının sönümlemesi
+~envfilterS~filtre zarfının gecikmesi
+~envfilterR~filtre zarfının bırakması
+~fmax~zarfın maksimum değerinde düşük geçişli filtrenin frekans kesmesi. filtreyi devre dışı bırakmak için bu slider’ı maks ayarına getirin
+~fmin~zarfın minimum değerinde düşük geçişli filtrenin frekans kesmesi
+~q~düşük geçişli filtrenin resonansı
+~vel2vol~çıkış ses düzeyine giriş hızı ne kadar etki etmeli?
+~vel2env~ses düzeyinin hızına ve filtre zarflarına giriş hızı ne kadar etki etmeli?
+~lite cpu~CPU yükünü azaltmak için önbellekte bazı parametreleri yalnızca bir kere hesaplayın. bazı durumlarda perde değişimleri ve hızlı modülasyon işlemleri sesi daha da kötü hale getirebilir.
+
+
+
+metronome~ölçüye göre ses çıkarır
+~vol~metronom ses düzeyi
+
+
+
+karplusstrong~polifonik telli fiziksel modellemeli sentezleyici
+~vol~çıkış sesi düzeyi
+~invert~geri besleme tersine çevirmeli mi?
+~filter~resonansı filtreleme miktarı
+~feedback~resonansın geri besleme miktarı
+~source type~uyarım için kullanılacak ses
+~x freq~uyarım sesi frekansı
+~x att~uyarım sesi için sesi yavaş yavaş yükseltme süresi
+~x dec~uyarım sesi için sesi yavaş yavaş azaltma süresi
+~vel2vol~ses düzeyine hızın ne kadar etki edeceğini belirleyin
+~vel2env~uyarım atak süresine hızın ne kadar etki edeceğini belirleyin
+~pitchtone~perdenin filtre miktarına ne kadar etki edeceğini belirleyin. sıfır değeri tüm perde aralığında eşit filtrelemeyle sonuçlanır, daha yüksek değerle yüksek perdeler daha az filtrelenir, düşük değerle düşük perdeler daha az filtrelenir.
+~lite cpu~CPU yükünü azaltmak için önbellekte bazı parametreleri yalnızca bir kere hesaplayın. bazı durumlarda perde değişimleri ve hızlı modülasyon işlemleri sesi daha da kötü hale getirebilir.
+
+
+
+lfo~düşük frekanslı osilatörle slider’ı modüle eder
+~enable~modülasyonu açıp kapatın
+~pin~LFO penceresini görünür hale getirin
+~interval~osilasyon periyodunun uzunluğu
+~osc~osilasyon dalga şeklinin tipi
+~offset~osilasyonu biraz önce/sonra gerçekleştirmek için faz ofseti
+~free rate~herhangi bir ritmi olmadan çalışan osilatörün hızı
+~low~dalga şeklinin en düşük noktasındaki çıkış değeri
+~high~dalga şeklinin en yüksek noktasındaki çıkış değeri
+~spread~en düşük ve yüksek noktalara daha yakın olacak şekilde dalga şeklini yayın
+~bias~en düşük veya yüksek noktaya doğru dalga şeklini saptırın
+~length~dalga şekli çevriminin tamamının geçilmesi için gereken süre miktarı
+~shuffle~hızlı ve düşük çevrime sahip olması için dalga şeklini ayarlayın
+~soften~kare ve testere dalga şekillerinin belirgin kenarlarını yuvarlar
+~lite cpu~CPU yükünü azaltmak için önbellekte bazı parametreleri yalnızca bir kere hesaplayın. bazı durumlarda özellikle hızlı modülasyon işlemleri sırasında ses kötü çıkabilir.
+
+
+
+fmsynth~polifonik fm sentezleyici
+~adsrosc~
+~adsroscA~
+~adsroscD~
+~adsroscS~
+~adsroscR~
+~adsrharm~
+~adsrharmA~
+~adsrharmD~
+~adsrharmS~
+~adsrharmR~
+~adsrmod~
+~adsrmodA~
+~adsrmodD~
+~adsrmodS~
+~adsrmodR~
+~adsrharm2~
+~adsrharm2A~
+~adsrharm2D~
+~adsrharm2S~
+~adsrharm2R~
+~adsrmod2~
+~adsrmod2A~
+~adsrmod2D~
+~adsrmod2S~
+~adsrmod2R~
+~harmratio~giriş perdesi için birinci modülatörün harmonik oranı
+~harmratio2~giriş perdesi için ikinci modülatörün harmonik oranı
+~tweak~birinci modülatörün harmonik oranı çarpanı
+~mod~birinci modülatörü modüle etme miktarı
+~tweak2~ikinci modülatörün harmonik oranı çarpanı
+~mod2~ikinci modülatörü modüle etme miktarı
+~vol~çıkış ses düzeyi
+~phase0~ana osilatörün faz ofseti
+~phase1~birinci modülatörün faz ofseti
+~phase2~ikinci modülatörün faz ofseti
+
+
+
+notetoggle~herhangi bir giriş notası olup olmamasına bağlı olarak kontrolü açıp kapatın
+
+
+
+drumsynth~osilatör+gürültü davul sentezleyicisi
+~vol~çıkış ses düzeyi
+~edit~her bir vuruş için parametreleri görüntüleyin
+~adsrtone*~
+~adsrtone*A~
+~adsrtone*D~
+~adsrtone*S~
+~adsrtone*R~
+~vol*~osilatör ses düzeyi
+~adsrnoise*~
+~adsrnoise*A~
+~adsrnoise*D~
+~adsrnoise*S~
+~adsrnoise*R~
+~noise*~gürültü ses düzeyi
+~type*~osilatör tipi
+~adsrfreq*~
+~adsrfreq*A~
+~adsrfreq*D~
+~adsrfreq*S~
+~adsrfreq*R~
+~freqmax*~osilatör başlangıç frekansı
+~freqmin*~osilatör bitiş frekansı
+~adsrfilter*~
+~adsrfilter*A~
+~adsrfilter*D~
+~adsrfilter*S~
+~adsrfilter*R~
+~cutoffmax*~başlangıç kesme frekansını filtreleyin
+~cutoffmin*~bitiş kesme frekansını filtreleyin
+~q*~resonansı filtreleyin
+~oversampling~maksimum kayıt frekansı üzerinde yapılan örnekleme miktarı. ses kalitesini arttırırken cpu kullanımını da arttırır.
+
+
+
+drumplayer~davul sesleri için kullanılan sample oynatıcısı
+~vol~çıkış ses düzeyi
+~speed~global sample hızı çarpanı
+~speed rnd~global sample hızı rastgele seçim seviyesi
+~kit~[none]
+~edit~düzenleme için pedleri görüntüleyin
+~aud~geçerli pedin dosya kategorisindeki veya bir pede dosya bırakılan en son dizindeki ses sample’larına göz atın
+~mono~çıkışı mono yapın
+~shuffle~sample’ları, hızları ve panları rastgele seçin
+~grid~"midicontroller" modülünden buraya ızgara yamalayın
+~quantize~belirtilen aralığa girişi kuantize edin
+~repeat~kuantize edilirse, belirtilen aralıkta notalar tekrarlanmalı mı?
+~vol *~sample’ın ses düzeyi 
+~speed *~sample’ın hızı
+~pan *~sample’ın stereo pan pozisyonu
+~widen *~genişlik hissi vermek için sample’ın stereo gecikmesi
+~start *~sample’ın başlangıç ofseti yüzdesi
+~single out *~sample’ın kendi bağımsız çıkışı olmalı mı?
+~linkid *~linkid değeri -1 değilse, linkid değerinin eşleşmesi durumunda diğer tüm sample’ları sessize alın (açık ve kapalı hat’ların bağlanmasına kullanılabilir)
+~envelope *~sample’a ses düzeyi zarfı eklenmeli mi?
+~view ms *~milisaniye cinsinden zarfı görüntüleme uzunluğu
+~hitcategory*~"random” düğmesine tıkladığında seçimin yapılacağı klasör. bu klasör data/drums/hits/ dizini altındadır
+~envelopedisplay *~[none]
+~envelopedisplay *A~zarfın atağı
+~envelopedisplay *D~zarfın sönümlemesi
+~envelopedisplay *S~zarfın tutması
+~envelopedisplay *R~zarfın bırakması
+~test *~mevcut sample’ı oynatın
+~random *~seçili hitcategory değeri için rastgele sample seçin
+~grab *~bu sample’ı tutun
+
+
+
+beats~sample katmanlarını birlikte mikslemek için çoklu loop oynatıcı
+~volume*~katman ses düzeyi
+~filter*~katman filtresi. negatif değerler düşük geçiş, pozitif değerler yüksek geçiş efektine neden olur.
+~pan*~katman panı
+~double*~iki katı hızla çalmak için bu ayarı etkinleştirin
+~bars*~bu yuvadaki sample’lar kaç ölçü uzunlukta olmalı?
+~selector*~bu yuvada hangi sample çalınmalı? belirtilen yuvaya sample’ları eklemek için buraya sample’ları sürükleyip bırakın.
+
+
+
+whitekeys~geçerli global gamı çalmak yerine C major gamına karşılık gelen beyaz tuşları yeniden eşleştirin
+
+
+
+volcabeatscontrol~KORG volca beats davul makinesinin çeşitli öğelerini kontrol etmek için MIDI verisi verir
+~clap speed~
+~clave speed~
+~agogo speed~
+~crash speed~
+~stutter time~
+~stutter depth~
+~tom decay~
+~closed hat decay~
+~open hat decay~
+~hat grain~
+~level *~
+
+
+
+vibrato~notalara ritmik salınımlı perde değişimleri ekleyin
+~vibrato~eklenecek perde değişimi miktarı
+~vibinterval~perde değişimi salınımının hızı
+
+
+
+velocitystepsequencer~sıralayıcı yardımıyla gelen notaların hızını ayarlar
+~interval~sıralayıcı ilerleme hızı
+~len~sekans uzunluğu
+~downbeat~ölçünün ilk darbesinde sekans sıfırlanmalı mı?
+~vel*~belirtilen adım için hız
+
+
+
+velocitysetter~bu değere göre notanın hızını ayarlayın
+~vel~kullanılacak hız
+~rand~çıkış hızının azaltılmasının rastgele seçilme miktarı
+
+
+
+velocityscaler~daha yüksek ya da daha düşük değere notanın hızını ölçeklendirin
+~scale~hızın çarpılacağı değer
+
+
+
+unstablepressure~perlin gürültü tekniğiyle MPE basıncını dönüştürün
+~amount~dönüşüm miktarı
+~warble~yavaş katman dönüşüm oranı
+~noise~hızlı katman dönüşüm oranı
+
+
+
+unstablepitch~perlin gürültü tekniğiyle MPE perde değişimini dönüştürün
+~amount~dönüşüm miktarı
+~warble~yavaş katman dönüşüm oranı
+~noise~hızlı katman dönüşüm oranı
+
+
+
+unstablemodwheel~perlin gürültü tekniğiyle MPE kaymasını dönüştürün
+~amount~dönüşüm miktarı
+~warble~yavaş katman dönüşüm oranı
+~noise~hızlı katman dönüşüm oranı
+
+
+
+sustainpedal~giriş notalarına tutma efekti uygulamaya devam eder
+~sustain~giriş notaları tutulmalı mı?
+
+
+
+scaledetect~bir dizi nota girişine uyan gamı tespit edin. son çalınan perde kök nota olarak kullanılır.
+~reset~notaların giriş dizisini sıfırlayın
+~matches~bu kök notayla eşleşen gam
+
+
+
+scaledegree~geçerli gama bağlı olarak girişi transpoze edin
+~degree~transpoze miktarı
+~retrigger~transpoze miktarını değiştirirken geçerli notaları anlık olarak yeniden çalın
+
+
+
+quantizer~sonraki örnekleme aralığına kadar girişleri geciktirin
+~quantize~örnekleme aralığı
+~repeat~nota tutulurken bu nota her aralıkta tekrarlanmalı mı?
+
+
+
+previousnote~nota alındığında bu notadan önceki notayı verir
+
+
+
+pressuretovibrato~midi basınç modülasyonu girişini alır ve perde değişiminden yararlanarak bu girişi vibrato girişine çevirir
+~vibrato~vibrato miktarı
+~vibinterval~vibrato hızı
+
+
+
+pressuretomodwheel~midi basınç modülasyonu girişini alır ve bu girişi modülasyon tekerleği modülasyonuna çevirir
+
+
+
+pressure~notalara basınç modülasyonu ekleyin
+~pressure~basınç miktarı
+
+
+
+portamento~bir defada tek bir notanın çalınmasına izin verir ve notalar arasında kaymak için perde değişimini kullanır
+~require held~etkinleştirildiyse, eski nota tutulması durumunda yalnızca yeni notayı kaydırın. aksi takdirde önceki nota girişine bağlı olarak kaydırın.
+~glide~milisaniye cinsinden kaydırma miktarı
+
+
+
+pitchsetter~belirli bir perdeyi kullanmak için gelen notayı ayarlayın
+~pitch~kullanılacak perde
+
+
+
+pitchremap~farklı çıkış perdelerine giriş perdelerini yeniden eşleştirin
+~from*~değiştirilecek perde
+~to*~istenilen perde
+
+
+
+pitchpanner~giriş perdesine bağlı olarak notalara pan modülasyonu ekleyin, böylece düşük perdeler bir yöne ve yüksek perdeler diğer yöne panlanır
+~left~tam sola panlanacak perde
+~right~tam sağa panlanacak perde
+
+
+
+pitchdive~başlangıç ofsetinden giriş perdesine geçmek için perde değişimini kullanın
+~start~başlanacak yarım nota ofseti
+~time~milisaniye cinsinden perde ofsetinden giriş perdesine yükselme süresi
+
+
+
+pitchbender~notalara perde değişimi ekleyin
+~bend~yarım nota cinsinden değişim miktarı
+
+
+
+notewrap~istenilen aralıkta kalmak için giriş perdesini kaydırın
+~min~perde aralığının en düşük değeri
+~range~minimum perdeye geri gelmenin öncesinde ulaşılan yarım nota sayısı
+
+
+
+notestrummer~bu modüle bir akort gönderin ve akorttaki tüm notaları tek tek çalmak için slider’ı hareket ettirin
+~strum~notaları tek tek çalmak için notaların üzerinden slider’ı geçirin
+
+
+
+notestream~notaların çalınmasıyla notaların akışını görüntüleyin
+~reset~perde aralığını sıfırlayın
+
+
+
+notesorter~perdeye göre notaları ayırın. eşleştirilmemiş tüm perdeler standart çıkıştan geçer.
+~pitch *~belirtilen çıkışta kullanılacak perde
+
+
+
+noterouter~UI kontrolünden yararlanarak notaların nereye yönlendirileceğini kontrol etmenize izin verir. listeye eklemek için destinasyonları hedef olarak yamalayın
+~route~noterouter için destinasyon modülü
+
+
+
+noteexpression~işlenen ifadelere bağlı olarak notaların nereye yönlendirileceğini kontrol edin. "p" değişkeni perdeyi ve "v” değişkeni hızı ifade eder
+~expression*~belirtilen kablo için değerlendirilecek ifade. perdesi 80’den daha yüksek ve hızı 60’dan daha düşük olan notaları yönlendirmek için örnek ifade:\n"p > 80 ve v < 60"
+
+
+
+noteratchet~bir süre zarfında giriş notasını hızlıca tekrarlayın
+~duration~toplam tekrarlama süresinin ne kadar uzun olacağını belirleyin
+~subdivision~her bir tekrarın uzunluğu
+
+
+
+noterangefilter~sadece belirli bir perde aralığında olan notaların geçmesine izin verin
+~min~izin verilen minimum perde
+~max~izin verilen maksimum perde
+~wrap~bu aralığın dışındaki notaları devre dışı bırakın. ilgili notaları aralığın içerisine kaydırmalı mı?
+
+
+
+notepanrandom~notaların panlanmasını destekleyen dahili sentezleyiciler için rastgele değerleri nota panı olarak ayarlar
+~spread~rastgele seçim seviyesi
+~center~pan pozisyonunu ortalayın
+
+
+
+notepanner~notaların panlanmasını destekleyen dahili sentezleyiciler için nota panını ayarlar
+~pan~pan pozisyonu, 0,5 değeri ortadadır
+
+
+
+notepanalternator~notaların panlanmasını destekleyen dahili sentezleyiciler için iki değer arasında değişerek nota panını ayarlar
+~one~pan pozisyonu, 0,5 değeri ortadadır
+~two~pan pozisyonu, 0,5 değeri ortadadır
+
+
+
+noteoctaver~oktav cinsinden notayı transpoze edin
+~octave~arttırılacak veya düşürülecek oktav sayısı
+
+
+
+notelatch~notaları çalmak veya sessize almak için mesajlarla alınan notayı kullanın
+
+
+
+notehumanizer~zamanlama ve hızı rastgele seçin
+~time~milisaniye cinsinden zamanlamayı rastgele seçim seviyesi.
+~velocity~hız rastgele seçim seviyesi
+
+
+
+notehocket~rastgele destinasyonlara notaları gönderir
+~weight *~belirtilen destinasyona notanın gönderilme olasılığı
+
+
+
+notegate~notaların geçmesine izin verin ya da vermeyin
+~open~notaların geçmesine izin verilip verilmeyeceğini belirleyin
+
+
+
+noteflusher~tüm notalar için nota kapalı sinyali gönderir
+~flush~notaları silmek için tıklayın
+
+
+
+notefilter~sadece belirli perdelerin geçmesine izin verin
+~C-2 (0)~
+~C#-2 (1)~
+~D-2 (2)~
+~D#-2 (3)~
+~E-2 (4)~
+~F-2 (5)~
+~F#-2 (6)~
+~G-2 (7)~
+
+
+
+noteduration~nota kapalı mesajını göz ardı ederek çalınacak notanın uzunluğunu ayarlayın
+~duration~ölçü cinsinden nota uzunluğu
+
+
+
+notedisplayer~giriş notası bilgisini görüntüleyin
+
+
+
+notedelayer~belirli miktarda giriş notasını geciktirin
+~delay~ölçü cinsinden gecikme süresi miktarı
+
+
+
+notechance~notaların geçmesine rastgele izin verin
+~chance~notanın geçme olasılığı
+
+
+
+mpetweaker~gelen MPE modülasyon değerlerini ayarlayın
+~pitchbend mult~gelen perde değişiminin arttırılma miktarı
+~pitchbend offset~gelen perde değişiminin ofsetlenme miktarı
+~pressure mult~gelen basıncın arttırılma miktarı
+~pressure offset~gelen basıncın ofsetlenme miktarı
+~modwheel mult~gelen modülasyon tekerleği sinyalinin arttırılma miktarı
+~modwheel offset~gelen modülasyon tekerleği sinyalinin ofsetlenme miktarı
+
+
+
+mpesmoother~[no tooltip]
+~pitch~gelen perde değişiminin düzleştirme miktarı
+~pressure~gelen basıncın düzleştirme miktarı
+~modwheel~gelen modülasyon tekerleği sinyalinin düzleştirme miktarı
+
+
+
+modwheeltovibrato~nota modülasyon tekerleği girişi ritmik perde değişimini dönüştürün
+~vibrato~perde değişimi miktarı
+~vibinterval~vibrato oranı
+
+
+
+modwheeltopressure~çıkışta modülasyon girişini midi basıncına dönüştürün
+
+
+
+modwheel~notaya ifade değeri ekler
+~modwheel~modülasyon seviyesi
+
+
+
+modulationvizualizer~notalar için MPE modülasyon değerlerini görüntüleyin
+
+
+
+midioutput~donanım veya başka bir yazılım gibi harici destinasyona midi sinyali gönderin
+~controller~midi sinyalinin gönderildiği destinasyon
+
+
+
+midicc~"midioutput" modülüne yönlendirilecek midi kontrolü değiştirme mesajlarını verir
+~control~CC kontrol numarası
+~value~bu değer değiştirildiğinde CC değeri verir
+
+
+
+samplebrowser~sample’lar için sisteminize göz atın. istenilen hedeflere (sampleplayer, drumplayer, seaofgrain, vb.) buradan sample’ı sürükleyip bırakın
+~ < ~önceki sayfa
+~ > ~sonraki sayfa
+
+
+
+linnstrumentcontrol~[üzerine çalışılıyor] çeşitli yollarla linnstrument kontrolörünün ışıklarını kontrol edin
+~controller~linnstrument modülüne sahip midi kontrolör
+~decay~sönmeden önce tuş ışığının yanma süresi
+~blackout~tüm ışıkları söndürün
+~octaves~tuşa basıldığında, tüm oktavlar için bu tuşun ışığı yanmalı mı?
+~guitar lines~"guitar lines" ışık yerleşimi kullanılmalı mı?
+
+
+
+gridnotedisplayer~o an için çalınan notaları görüntülemek, akortları, arpejlerin çalınmasını vb. görselleştirmek için gridkeyboard modülüyle birlikte kullanın
+
+
+
+chordholder~yeni notalara basılana kadar tutma işlemiyle aynı anda basılan tüm notaları saklar
+~stop~notaların çalınmasını durdurun
+~pulse to play~etkinleştirildiğinde, giriş notaları hemen çalınmaz, bunun yerine notaların çalınmasının öncesinde giriş notasını beklenir
+
+
+
+chorder~gelen perde değerini alır ve akortlar oluşturmak için ek notaları çalar
+~diatonic~ızgara kromatik diziye mi yoksa sadece gama göre mi belirlenmeli?
+~chord~akort ön ayarları
+~inversion~tersine çalma ön ayarları
+
+
+
+chorddisplayer~geçerli gam dahilinde hangi akordun çalındığını gösterir
+
+
+
+capo~yarım nota kadar gelen notaları kaydırın
+~capo~kaydırılacak yarım nota sayısı
+~retrigger~kapo miktarı değiştirilirken geçerli notaları hemen çalın
+
+
+
+arpeggiator~tutulan notaları arpej yapar. bu modülde kaldırılması gereken birden fazla tam olarak geliştirilememiş özellik vardır.
+~interval~arpej yapma hızı
+~step~arpej sırasında adımların yönü ve adımların arasındaki mesafe. sıfır değeri "pingpong” etkisine neden olur.
+~octaves~kaç oktavın kullanılacağını gösterir
+
+
+
+titlebar~
+~save layout~[none]
+~load~durumu geri yüklemek için kaydedilmiş .bsk dosyasını yükleyin
+~save~daha sonra yüklenmek üzere geçerli durumu .bsk dosyası olarak kaydedin
+~save as~geçerli durumu yeni .bsk dosyası olarak kaydedin
+~new patch~userprefs.json dosyasında "layout" olarak belirtilen yerleşime geçiş yapın
+~write audio~belirtilen recordings_path dizininize son 30 dakikada kaydedilen sesi yazın
+~ ? ~show help
+~settings~userprefs.json dosyasında kaydedildiği şekliyle ayarları belirleyin
+~load layout~[none]
+~lookahead (exp.)~scriptmodule için gerekli olan lookahead planlamasından yararlanın. scriptmodule’den yararlandığınızda otomatik olarak açılır, bu zaman kadar lookahead planlaması sorunsuz çalışmaktadır, ancak aksi bir durumuyla karşılaşılması olasılığına karşı bu onay kutusu yerleştirilmiştir.
+~autosave~yeni modül her eklendiğinde, hatayla karşılaşılması anında program durumunun yeniden yüklenmesine yardımcı olması için data/savestate/autosave/ yoluna kayıt alınmasını deneyin daha büyük sample’lara sahip modüller kullanırsanız bu işlem çok yavaş olabilir.
+~play/pause~tüm ses işlemesini durdurun (shift-p)
+
+
+
+newpatchconfirm~
+~confirm~tüm modülleri silin ve boş sayfa açın
+~cancel~bu işlemi iptal edin
+
+
+
+vstplugin~VST eklentisi modülü
+~vol~çıkış ses düzeyini ayarlayın
+~program change~VST modülüne program değiştirme mesajı gönderin
+~open~eklenti penceresini görüntüleyin
+~show parameter~görüntülenecek parametreleri seçin, böylece parametreler bespoke'un arayüzünden ayarlanabilir. VST’de 20’den fazla parametre varsa, bu liste ilk başta boş olur. bu durumda listede parametrenin görülmesini sağlamak için, VST arayüzünde parametre ayarını değiştirin.
+~preset~kaydedilmiş VST ön ayarlarından seçin yapın
+~save as~daha sonra tekrar yüklemek amacıyla geçerli VST ayarlarını ön ayar olarak kaydedin
+~panic~eklentinin sesini hemen kapatmak için bu eklentiye "all notes off" ve "all sounds off" sinyali gönderin
+
+
+
+transport~tempo ve geçerli süre pozisyonunu kontrol eder
+~tempo~vuruş/dakika cinsinden global tempo
+~ + ~tempoyu bir arttırır
+~ - ~tempoyu bir azaltır
+~swing~swing aralığında müzikal ölçünün orta noktasının nerede olması gerektiğini belirler. 0,5 değeri swing’in olmadığı anlamına gelir.
+~swing interval~swing’in uygulanacağı aralık
+~timesigtop~zaman işareti üst değeri
+~timesigbottom~zaman işareti alt değeri
+~reset~zaman çizelgesini sıfıra getirin
+~ < ~geçerli süreyi hızlıca geriye getirin
+~> ~geçerli süreyi hızlıca ileriye getirin
+~set tempo~
+~play/pause~tüm ses işlemesini durdurun (shift-p)
+
+
+
+transposefrom~geçerli gamın kök notasına belirlenen kök notasından gelen girişi transpoze edin. bu modülün ilk akla gelen kullanımı, C gamında klavyeyi çaldığınızda sesin geçerli gama transpoze edilmesi olabilir.
+~root~transpoze edilecek kök notası
+~retrigger~transpoze edilmiş kök notası veya gam değiştirilirken geçerli notaları hemen çalın
+
+
+
+m185sequencer~benzersiz m185 veya intellijel metropolis yaklaşımından yararlanan sıralayıcı
+~interval~adım başına aralık
+~reset step~ilk adıma sayacı sıfırlayın
+~pitch*~bu satırda kullanılacak perde
+~pulses*~bu satırdaki toplam adım sayısı
+~gate*~her satırın davranışı: "repeat" her adımı çalar, "once" sadece ilk adımı çalar, "hold" tüm adımları tutar, "rest" hiçbir adımı çalmaz
+
+
+
+
+
+notestepper~sıralama çeşitliği oluşturmak için bir dizi yama kablosu üzerinden notaları verir
+~length~sekans uzunluğu
+~reset~başlangıca sıfırlayın
+
+
+
+
+splitter~stereo sinyali iki mono sinyale ayırır veya mono sinyali çiftler
+
+
+
+scale~çeşitli modüller tarafından kullanılan global gamı kontrol eder
+~root~gamın kök notası
+~scale~kullanılacak nota gamı
+~degree~
+~intonation~gamı akort etmek için kullanılacak yöntem
+~PPO~oktav başına perde
+~tuning~"note" ayarıyla belirlenen perde hangi frekansa karşılık gelir?
+~note~"tuning” ayarıyla belirlenen frekansla eşleşen perde
+
+
+
+output~çıkış kanalına (hoparlörlerinize ya da ses kartınıza) ses göndermek için buraya sesi yönlendirin
+~ch~sesin gönderileceği kanal (ya da kanallar, stereo ses istiyorsanız)
+
+
+
+gain~ses sinyalinin ses düzeyini ayarlar
+~gain~sinyalin ayarlanma miktarı. 1 değeri sinyalde değişikliğe neden olmaz.

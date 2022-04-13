@@ -43,10 +43,10 @@ public:
    Vocoder();
    virtual ~Vocoder();
    static IDrawableModule* Create() { return new Vocoder(); }
-   
-   
+
+
    void CreateUIControls() override;
-   
+
    void SetEnabled(bool enabled) override { mEnabled = enabled; }
 
    void SetCarrierBuffer(float* carrier, int bufferSize) override;
@@ -60,22 +60,24 @@ public:
    void CheckboxUpdated(Checkbox* checkbox) override;
    void FloatSliderUpdated(FloatSlider* slider, float oldVal) override {}
    void IntSliderUpdated(IntSlider* slider, int oldVal) override {}
-   
+
    virtual void LoadLayout(const ofxJSONElement& moduleInfo) override;
    virtual void SetUpFromSaveData() override;
-   
-private:
 
+private:
    //IDrawableModule
    void DrawModule() override;
-   void GetModuleDimensions(float& w, float& h) override { w=235; h=170; }
+   void GetModuleDimensions(float& w, float& h) override
+   {
+      w = 235;
+      h = 170;
+   }
    bool Enabled() const override { return mEnabled; }
 
    FFTData mFFTData;
-   
+
    float* mWindower;
 
-   
 
    ::FFT mFFT;
    RollingBuffer mRollingInputBuffer;
@@ -100,7 +102,7 @@ private:
    FloatSlider* mWhisperSlider;
    float mPhaseOffset;
    FloatSlider* mPhaseOffsetSlider;
-   
+
    int mCut;
    IntSlider* mCutSlider;
 
@@ -111,4 +113,3 @@ private:
 
 
 #endif /* defined(__modularSynth__Vocoder__) */
-

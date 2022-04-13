@@ -45,6 +45,7 @@
 #include "nanovg/nanovg.h"
 #include "IPulseReceiver.h"
 #include "Push2Control.h"
+#include "UIGrid.h"
 
 float IDrawableModule::sHueNote = 27;
 float IDrawableModule::sHueAudio = 135;
@@ -77,7 +78,7 @@ IDrawableModule::IDrawableModule()
 
 IDrawableModule::~IDrawableModule()
 {
-   for (int i=0; i<mUIControls.size(); ++i)
+   for (int i = 0; i < mUIControls.size(); ++i)
       mUIControls[i]->Delete();
    for (auto source : mPatchCableSources)
       delete source;
@@ -87,8 +88,8 @@ void IDrawableModule::CreateUIControls()
 {
    assert(mUIControlsCreated == false);
    mUIControlsCreated = true;
-   mEnabledCheckbox = new Checkbox(this,"enabled",3,-TitleBarHeight()-2,&mEnabled);
-   
+   mEnabledCheckbox = new Checkbox(this, "enabled", 3, -TitleBarHeight() - 2, &mEnabled);
+
    ConnectionType type = kConnectionType_Special;
    if (dynamic_cast<IAudioSource*>(this))
       type = kConnectionType_Audio;
@@ -103,16 +104,16 @@ void IDrawableModule::CreateUIControls()
       mMainPatchCableSource = new PatchCableSource(this, type);
       mPatchCableSources.push_back(mMainPatchCableSource);
    }
-   
+
    GetMinimizedWidth(); //update cached width
 }
 
 void IDrawableModule::Init()
 {
-   assert(mUIControlsCreated);  //did you not call CreateUIControls() for this module?
+   assert(mUIControlsCreated); //did you not call CreateUIControls() for this module?
    assert(!mInitialized);
    mInitialized = true;
-   
+
    mModuleType = TheSynth->GetModuleFactory()->GetModuleType(mTypeName);
    if (mModuleType == kModuleType_Other)
    {
@@ -123,16 +124,16 @@ void IDrawableModule::Init()
    mCanReceiveAudio = (dynamic_cast<IAudioReceiver*>(this) != nullptr);
    mCanReceiveNotes = (dynamic_cast<INoteReceiver*>(this) != nullptr);
    mCanReceivePulses = (dynamic_cast<IPulseReceiver*>(this) != nullptr);
-   
+
    bool wasEnabled = Enabled();
    bool showEnableToggle = false;
    SetEnabled(!wasEnabled);
-   if (Enabled() == wasEnabled)  //nothing changed
+   if (Enabled() == wasEnabled) //nothing changed
       showEnableToggle = false; //so don't show toggle, this module doesn't support it
    else
       showEnableToggle = true;
    SetEnabled(wasEnabled);
-   
+
    if (showEnableToggle)
    {
       mEnabledCheckbox->SetDisplayText(false);
@@ -144,15 +145,15 @@ void IDrawableModule::Init()
       mEnabledCheckbox->Delete();
       mEnabledCheckbox = nullptr;
    }
-   
-   for (int i=0; i<mUIControls.size(); ++i)
+
+   for (int i = 0; i < mUIControls.size(); ++i)
       mUIControls[i]->Init();
-   
-   for (int i=0; i<mChildren.size(); ++i)
+
+   for (int i = 0; i < mChildren.size(); ++i)
    {
       ModuleContainer* container = GetContainer();
       if (container != nullptr && VectorContains(mChildren[i], container->GetModules()))
-         continue;   //stuff in module containers was already initialized
+         continue; //stuff in module containers was already initialized
       mChildren[i]->Init();
    }
 }
@@ -160,24 +161,24 @@ void IDrawableModule::Init()
 void IDrawableModule::BasePoll()
 {
    Poll();
-   for (int i=0; i<mUIControls.size(); ++i)
+   for (int i = 0; i < mUIControls.size(); ++i)
       mUIControls[i]->Poll();
-   for (int i=0; i<mChildren.size(); ++i)
+   for (int i = 0; i < mChildren.size(); ++i)
       mChildren[i]->BasePoll();
 }
 
 bool IDrawableModule::IsWithinRect(const ofRectangle& rect)
 {
-   float x,y;
+   float x, y;
    GetPosition(x, y);
    float w, h;
-   GetDimensions(w,h);
-   
+   GetDimensions(w, h);
+
    float titleBarHeight = mTitleBarHeight;
    if (!HasTitleBar())
       titleBarHeight = 0;
-   
-   return rect.intersects(ofRectangle(x,y-titleBarHeight,w,h+titleBarHeight));
+
+   return rect.intersects(ofRectangle(x, y - titleBarHeight, w, h + titleBarHeight));
 }
 
 bool IDrawableModule::IsVisible()
@@ -190,63 +191,63 @@ void IDrawableModule::DrawFrame(float w, float h, bool drawModule, float& titleB
    titleBarHeight = mTitleBarHeight;
    if (!HasTitleBar())
       titleBarHeight = 0;
-   
+
    ofTranslate(mX, mY, 0);
 
    ofColor color = GetColor(mModuleType);
-   
+
    highlight = 0;
-   
+
    if (Enabled())
    {
       IAudioSource* audioSource = dynamic_cast<IAudioSource*>(this);
       if (audioSource)
       {
          RollingBuffer* vizBuff = audioSource->GetVizBuffer();
-         int numSamples = std::min(500,vizBuff->Size());
+         int numSamples = std::min(500, vizBuff->Size());
          float sample;
          float mag = 0;
-         for (int ch=0; ch<vizBuff->NumChannels(); ++ch)
+         for (int ch = 0; ch < vizBuff->NumChannels(); ++ch)
          {
-            for (int i=0; i<numSamples; ++i)
+            for (int i = 0; i < numSamples; ++i)
             {
                sample = vizBuff->GetSample(i, ch);
-               mag += sample*sample;
+               mag += sample * sample;
             }
          }
          mag /= numSamples * vizBuff->NumChannels();
          mag = sqrtf(mag);
          mag = sqrtf(mag);
          mag *= 3;
-         mag = ofClamp(mag,0,1);
-         
-         highlight = mag*.15f;
+         mag = ofClamp(mag, 0, 1);
+
+         highlight = mag * .15f;
       }
-      
+
       if (GetPatchCableSource() != nullptr)
       {
          float elapsed = float(gTime - GetPatchCableSource()->GetHistory().GetLastOnEventTime()) / NOTE_HISTORY_LENGTH;
          highlight = MAX(highlight, .15f * ofClamp(1 - elapsed, 0, 1));
       }
    }
-   
+
    const bool kUseDropshadow = false;
    if (kUseDropshadow && GetParent() == nullptr && GetModuleType() != kModuleType_Other)
    {
       const float shadowSize = 20;
       float shadowStrength = .2f + highlight;
-      NVGpaint shadowPaint = nvgBoxGradient(gNanoVG, -shadowSize/2,-titleBarHeight-shadowSize/2, w+shadowSize,h+titleBarHeight+shadowSize, gCornerRoundness*shadowSize*.5f, shadowSize, nvgRGBA(color.r*shadowStrength,color.g*shadowStrength,color.b*shadowStrength,128), nvgRGBA(0,0,0,0));
+      NVGpaint shadowPaint = nvgBoxGradient(gNanoVG, -shadowSize / 2, -titleBarHeight - shadowSize / 2, w + shadowSize, h + titleBarHeight + shadowSize, gCornerRoundness * shadowSize * .5f, shadowSize, nvgRGBA(color.r * shadowStrength, color.g * shadowStrength, color.b * shadowStrength, 128), nvgRGBA(0, 0, 0, 0));
       nvgBeginPath(gNanoVG);
-      nvgRect(gNanoVG, -shadowSize,-shadowSize-titleBarHeight, w+shadowSize*2,h+titleBarHeight+shadowSize*2);
+      nvgRect(gNanoVG, -shadowSize, -shadowSize - titleBarHeight, w + shadowSize * 2, h + titleBarHeight + shadowSize * 2);
       nvgFillPaint(gNanoVG, shadowPaint);
       nvgFill(gNanoVG);
    }
-   
+
    ofFill();
    if (Enabled())
-      ofSetColor(color.r*(.25f+highlight),color.g*(.25f+highlight),color.b*(.25f+highlight),210);
+      ofSetColor(color.r * (.25f + highlight), color.g * (.25f + highlight), color.b * (.25f + highlight), 210);
    else
-      ofSetColor(color.r*.2f,color.g*.2f,color.b*.2f,120);
+      ofSetColor(color.r * .2f, color.g * .2f, color.b * .2f, 120);
    //gModuleShader.begin();
    const float kHighlightGrowAmount = 40;
    ofRect(0 - highlight * kHighlightGrowAmount, -titleBarHeight - highlight * kHighlightGrowAmount,
@@ -258,15 +259,15 @@ void IDrawableModule::DrawFrame(float w, float h, bool drawModule, float& titleB
       gModuleDrawAlpha = 255;
    else
       gModuleDrawAlpha = 100;
-   
+
    bool dimModule = false;
-   
+
    if (TheSynth->GetGroupSelectedModules().empty() == false)
    {
       if (!VectorContains(GetModuleParent(), TheSynth->GetGroupSelectedModules()))
          dimModule = true;
    }
-   
+
    if (PatchCable::sActivePatchCable &&
        (PatchCable::sActivePatchCable->GetConnectionType() != kConnectionType_Modulator || PatchCable::sActivePatchCable->GetConnectionType() != kConnectionType_UIControl) &&
        !PatchCable::sActivePatchCable->IsValidTarget(this))
@@ -276,10 +277,10 @@ void IDrawableModule::DrawFrame(float w, float h, bool drawModule, float& titleB
 
    if (TheSynth->GetHeldSample() != nullptr && !CanDropSample())
       dimModule = true;
-   
+
    if (dimModule)
       gModuleDrawAlpha *= .2f;
-   
+
    float enableToggleOffset = 0;
    if (HasTitleBar())
    {
@@ -288,47 +289,47 @@ void IDrawableModule::DrawFrame(float w, float h, bool drawModule, float& titleB
       ofFill();
       ofPushMatrix();
       ofClipWindow(0, -titleBarHeight, w, titleBarHeight, true);
-      ofRect(0,-titleBarHeight,w,titleBarHeight*2);
+      ofRect(0, -titleBarHeight, w, titleBarHeight * 2);
       ofPopMatrix();
-      
+
       if (mEnabledCheckbox)
       {
          enableToggleOffset = TitleBarHeight();
          mEnabledCheckbox->Draw();
       }
-      
+
       if (IsSaveable() && !Minimized())
       {
          ofSetColor(color.r, color.g, color.b, gModuleDrawAlpha);
          if (TheSaveDataPanel->GetModule() == this)
          {
-            ofTriangle(w-9, -titleBarHeight+2,
-                       w-9, -2,
-                       w-2, -titleBarHeight / 2);
+            ofTriangle(w - 9, -titleBarHeight + 2,
+                       w - 9, -2,
+                       w - 2, -titleBarHeight / 2);
          }
          else
          {
-            ofTriangle(w-10, -titleBarHeight+3,
-                       w-2,  -titleBarHeight+3,
-                       w-6,  -2);
+            ofTriangle(w - 10, -titleBarHeight + 3,
+                       w - 2, -titleBarHeight + 3,
+                       w - 6, -2);
          }
       }
       ofPopStyle();
    }
-   
+
    const bool kDrawInnerFade = true;
    if (kDrawInnerFade && !Push2Control::sDrawingPush2Display)
    {
       float fadeRoundness = 100;
       float fadeLength = w / 3;
       const float kFadeStrength = .75f;
-      NVGpaint shadowPaint = nvgBoxGradient(gNanoVG, 0, -titleBarHeight, w,h+titleBarHeight, fadeRoundness, fadeLength, nvgRGBA(color.r * .2f, color.g * .2f, color.b * .2f, 255 * kFadeStrength), nvgRGBA(0,0,0,0));
+      NVGpaint shadowPaint = nvgBoxGradient(gNanoVG, 0, -titleBarHeight, w, h + titleBarHeight, fadeRoundness, fadeLength, nvgRGBA(color.r * .2f, color.g * .2f, color.b * .2f, 255 * kFadeStrength), nvgRGBA(0, 0, 0, 0));
       nvgBeginPath(gNanoVG);
-      nvgRect(gNanoVG, 0, -titleBarHeight, w,h+titleBarHeight);
+      nvgRect(gNanoVG, 0, -titleBarHeight, w, h + titleBarHeight);
       nvgFillPaint(gNanoVG, shadowPaint);
       nvgFill(gNanoVG);
    }
-   
+
    if (drawModule)
    {
       ofSetColor(color, gModuleDrawAlpha);
@@ -340,7 +341,7 @@ void IDrawableModule::DrawFrame(float w, float h, bool drawModule, float& titleB
       DrawModule();
       ofPopMatrix();
    }
-   
+
    if (HasTitleBar())
    {
       ofSetColor(color * (1 - GetBeaconAmount()) + ofColor::yellow * GetBeaconAmount(), gModuleDrawAlpha);
@@ -361,10 +362,10 @@ void IDrawableModule::DrawFrame(float w, float h, bool drawModule, float& titleB
       }
       else
       {
-         ofSetColor(color.r*(.5f + highlight), color.g*(.5f + highlight), color.b*(.5f + highlight), 200);
+         ofSetColor(color.r * (.5f + highlight), color.g * (.5f + highlight), color.b * (.5f + highlight), 200);
          ofSetLineWidth(.5f);
-      }      
-      ofRect(-.5f, -titleBarHeight-.5f, w+1, h+titleBarHeight+1, 4);
+      }
+      ofRect(-.5f, -titleBarHeight - .5f, w + 1, h + titleBarHeight + 1, 4);
       ofPopStyle();
    }
 }
@@ -373,9 +374,9 @@ void IDrawableModule::Render()
 {
    if (!mShowing)
       return;
-   
+
    PreDrawModule();
-   
+
    if (mMinimized)
       mMinimizeAnimation += ofGetLastFrameTime() * 5;
    else
@@ -383,24 +384,24 @@ void IDrawableModule::Render()
    mMinimizeAnimation = ofClamp(mMinimizeAnimation, 0, 1);
 
    float w, h;
-   GetDimensions(w,h);
-   
+   GetDimensions(w, h);
+
    ofPushMatrix();
    ofPushStyle();
-   
+
    float titleBarHeight;
    float highlight;
-   DrawFrame(w,h,true,titleBarHeight,highlight);
+   DrawFrame(w, h, true, titleBarHeight, highlight);
 
    if (Minimized() || IsVisible() == false)
-      DrawBeacon(30,-titleBarHeight/2);
+      DrawBeacon(30, -titleBarHeight / 2);
 
    ofPushStyle();
    const float kPipWidth = 8;
    const float kPipSpacing = 2;
    float receiveIndicatorX = w - (kPipWidth + kPipSpacing);
    ofFill();
-   
+
    if (CanReceiveAudio())
    {
       ofSetColor(GetColor(kModuleType_Audio));
@@ -420,7 +421,7 @@ void IDrawableModule::Render()
       receiveIndicatorX -= kPipWidth + kPipSpacing;
    }
    ofPopStyle();
-   
+
    if (IsResizable() && !Minimized())
    {
       ofColor color = GetColor(mModuleType);
@@ -429,20 +430,20 @@ void IDrawableModule::Render()
          ofSetLineWidth(4);
       else
          ofSetLineWidth(2);
-      ofLine(w-sResizeCornerSize, h, w, h);
-      ofLine(w, h-sResizeCornerSize, w, h);
+      ofLine(w - sResizeCornerSize, h, w, h);
+      ofLine(w, h - sResizeCornerSize, w, h);
    }
-   
+
    gModuleDrawAlpha = 255;
-   
+
    ofFill();
-   
+
    if (TheSynth->ShouldAccentuateActiveModules() && GetParent() == nullptr)
    {
-      ofSetColor(0,0,0,ofMap(highlight,0,.1f,200,0,K(clamp)));
-      ofRect(0,-titleBarHeight,w,h+titleBarHeight);
+      ofSetColor(0, 0, 0, ofMap(highlight, 0, .1f, 200, 0, K(clamp)));
+      ofRect(0, -titleBarHeight, w, h + titleBarHeight);
    }
-   
+
    ofPopMatrix();
    ofPopStyle();
 
@@ -507,43 +508,43 @@ void IDrawableModule::DrawConnection(IClickable* target)
    float lineWidth = 1;
    float plugWidth = 4;
    int lineAlpha = 100;
-   
+
    IDrawableModule* targetModule = dynamic_cast<IDrawableModule*>(target);
-   
+
    bool fatCable = false;
    if (TheSynth->GetLastClickedModule() == this ||
        TheSynth->GetLastClickedModule() == targetModule)
       fatCable = true;
-   
+
    if (fatCable)
    {
       lineWidth = 3;
       plugWidth = 8;
       lineAlpha = 255;
    }
-   
+
    ofPushMatrix();
    ofPushStyle();
-   
+
    PatchCableOld cable = GetPatchCableOld(target);
-   
+
    ofColor lineColor = GetColor(kModuleType_Other);
    lineColor.setBrightness(lineColor.getBrightness() * .8f);
    ofColor lineColorAlphaed = lineColor;
    lineColorAlphaed.a = lineAlpha;
-   
-   float wThis,hThis,xThis,yThis;
-   GetDimensions(wThis,hThis);
-   GetPosition(xThis,yThis);
+
+   float wThis, hThis, xThis, yThis;
+   GetDimensions(wThis, hThis);
+   GetPosition(xThis, yThis);
 
    ofSetLineWidth(plugWidth);
    ofSetColor(lineColor);
-   ofLine(cable.plug.x,cable.plug.y,cable.end.x,cable.end.y);
-   
+   ofLine(cable.plug.x, cable.plug.y, cable.end.x, cable.end.y);
+
    ofSetLineWidth(lineWidth);
    ofSetColor(lineColorAlphaed);
-   ofLine(cable.start.x,cable.start.y,cable.plug.x,cable.plug.y);
-   
+   ofLine(cable.start.x, cable.start.y, cable.plug.x, cable.plug.y);
+
    ofPopStyle();
    ofPopMatrix();
 }
@@ -563,7 +564,7 @@ void IDrawableModule::SetUpPatchCables(std::string targets)
    }
    else
    {
-      for (int i=0; i<targetVec.size(); ++i)
+      for (int i = 0; i < targetVec.size(); ++i)
       {
          IClickable* target = dynamic_cast<IClickable*>(TheSynth->FindModule(targetVec[i]));
          if (target)
@@ -598,24 +599,24 @@ bool IDrawableModule::TestClick(int x, int y, bool right, bool testOnly /*=false
       if (source->TestClick(x, y, right, testOnly))
          return true;
    }
-   
+
    if (IClickable::TestClick(x, y, right, testOnly))
       return true;
-   
+
    return false;
 }
 
 void IDrawableModule::OnClicked(int x, int y, bool right)
 {
-   float w,h;
+   float w, h;
    GetModuleDimensions(w, h);
-   
+
    if (IsResizable() && mHoveringOverResizeHandle)
    {
       TheSynth->SetResizeModule(this);
       return;
    }
-   
+
    if (y < 0)
    {
       if (mEnabledCheckbox && x < 20)
@@ -636,7 +637,7 @@ void IDrawableModule::OnClicked(int x, int y, bool right)
             TheSaveDataPanel->SetModule(this);
       }
    }
-   
+
    for (int i = 0; i < mUIControls.size(); ++i)
    {
       if (mUIControls[i]->TestClick(x, y, right))
@@ -647,10 +648,10 @@ void IDrawableModule::OnClicked(int x, int y, bool right)
       if (mChildren[i]->TestClick(x, y, right))
          break;
    }
-   
+
    for (auto* seq : ControlSequencer::sControlSequencers)
    {
-      for (int i=0; i<mUIControls.size(); ++i)
+      for (int i = 0; i < mUIControls.size(); ++i)
       {
          if (mUIControls[i] == seq->GetUIControl())
             TheSynth->MoveToFront(seq);
@@ -661,33 +662,33 @@ void IDrawableModule::OnClicked(int x, int y, bool right)
 
 bool IDrawableModule::MouseMoved(float x, float y)
 {
-   float w,h;
+   float w, h;
    GetModuleDimensions(w, h);
    if (mShowing && !Minimized() && IsResizable() && x > w - sResizeCornerSize && y > h - sResizeCornerSize && x <= w && y <= h)
       mHoveringOverResizeHandle = true;
    else
       mHoveringOverResizeHandle = false;
-   
+
    if (!mShowing)
       return false;
    for (auto source : mPatchCableSources)
-      source->NotifyMouseMoved(x,y);
+      source->NotifyMouseMoved(x, y);
    if (Minimized())
       return false;
-   for (int i=0; i<mUIControls.size(); ++i)
-      mUIControls[i]->NotifyMouseMoved(x,y);
-   for (int i=0; i<mChildren.size(); ++i)
+   for (int i = 0; i < mUIControls.size(); ++i)
+      mUIControls[i]->NotifyMouseMoved(x, y);
+   for (int i = 0; i < mChildren.size(); ++i)
       mChildren[i]->NotifyMouseMoved(x, y);
-   
+
    return false;
 }
 
 void IDrawableModule::MouseReleased()
 {
    mWasMinimizeAreaClicked = false;
-   for (int i=0; i<mUIControls.size(); ++i)
+   for (int i = 0; i < mUIControls.size(); ++i)
       mUIControls[i]->MouseReleased();
-   for (int i=0; i<mChildren.size(); ++i)
+   for (int i = 0; i < mChildren.size(); ++i)
       mChildren[i]->MouseReleased();
    auto sources = mPatchCableSources;
    for (auto source : sources)
@@ -698,10 +699,15 @@ IUIControl* IDrawableModule::FindUIControl(const char* name, bool fail /*=true*/
 {
    if (name != 0)
    {
-      for (int i=0; i<mUIControls.size(); ++i)
+      for (int i = 0; i < mUIControls.size(); ++i)
       {
-         if (strcmp(mUIControls[i]->Name(),name) == 0)
+         if (strcmp(mUIControls[i]->Name(), name) == 0)
             return mUIControls[i];
+      }
+      for (int i = 0; i < mUIGrids.size(); ++i)
+      {
+         if (strcmp(mUIGrids[i]->Name(), name) == 0)
+            return mUIGrids[i];
       }
    }
    if (fail)
@@ -711,9 +717,9 @@ IUIControl* IDrawableModule::FindUIControl(const char* name, bool fail /*=true*/
 
 IDrawableModule* IDrawableModule::FindChild(const char* name) const
 {
-   for (int i=0; i<mChildren.size(); ++i)
+   for (int i = 0; i < mChildren.size(); ++i)
    {
-      if (strcmp(mChildren[i]->Name(),name) == 0)
+      if (strcmp(mChildren[i]->Name(), name) == 0)
          return mChildren[i];
    }
    throw UnknownModuleException(name);
@@ -726,9 +732,9 @@ void IDrawableModule::AddChild(IDrawableModule* child)
       dynamic_cast<IDrawableModule*>(child->GetParent())->RemoveChild(child);
    child->SetParent(this);
    if (child->Name()[0] == 0)
-      child->SetName(("child"+ofToString(mChildren.size())).c_str());
-   
-   for (int i=0; i<mChildren.size(); ++i)
+      child->SetName(("child" + ofToString(mChildren.size())).c_str());
+
+   for (int i = 0; i < mChildren.size(); ++i)
    {
       if (strcmp(mChildren[i]->Name(), child->Name()) == 0)
       {
@@ -736,7 +742,7 @@ void IDrawableModule::AddChild(IDrawableModule* child)
          break;
       }
    }
-   
+
    mChildren.push_back(child);
 }
 
@@ -749,7 +755,7 @@ void IDrawableModule::RemoveChild(IDrawableModule* child)
 std::vector<IUIControl*> IDrawableModule::GetUIControls() const
 {
    std::vector<IUIControl*> controls = mUIControls;
-   for (int i=0; i<mChildren.size(); ++i)
+   for (int i = 0; i < mChildren.size(); ++i)
    {
       std::vector<IUIControl*> childControls = mChildren[i]->GetUIControls();
       controls.insert(controls.end(), childControls.begin(), childControls.end());
@@ -757,21 +763,34 @@ std::vector<IUIControl*> IDrawableModule::GetUIControls() const
    return controls;
 }
 
+std::vector<UIGrid*> IDrawableModule::GetUIGrids() const
+{
+   std::vector<UIGrid*> grids = mUIGrids;
+   for (int i = 0; i < mChildren.size(); ++i)
+   {
+      std::vector<UIGrid*> childGrids = mChildren[i]->GetUIGrids();
+      grids.insert(grids.end(), childGrids.begin(), childGrids.end());
+   }
+   return grids;
+}
+
 void IDrawableModule::GetDimensions(float& width, float& height)
 {
    int minimizedWidth = GetMinimizedWidth();
    int minimizedHeight = 0;
-   
-   float moduleWidth,moduleHeight;
+
+   float moduleWidth, moduleHeight;
    GetModuleDimensions(moduleWidth, moduleHeight);
    if (moduleWidth == 1 && moduleHeight == 1)
    {
-      width = 1; height = 1; return;   //special case for repatch stub, let it be 1 pixel
+      width = 1;
+      height = 1;
+      return; //special case for repatch stub, let it be 1 pixel
    }
    ofVec2f minimumDimensions = GetMinimumDimensions();
    moduleWidth = MAX(moduleWidth, minimumDimensions.x);
    moduleHeight = MAX(moduleHeight, minimumDimensions.y);
-   
+
    width = EaseIn(moduleWidth, minimizedWidth, mMinimizeAnimation);
    height = EaseOut(moduleHeight, minimizedHeight, mMinimizeAnimation);
 }
@@ -836,7 +855,7 @@ void IDrawableModule::AddUIControl(IUIControl* control)
    catch (UnknownUIControlException& e)
    {
    }
-   
+
    mUIControls.push_back(control);
    FloatSlider* slider = dynamic_cast<FloatSlider*>(control);
    if (slider)
@@ -859,34 +878,39 @@ void IDrawableModule::RemoveUIControl(IUIControl* control)
    }
 }
 
+void IDrawableModule::AddUIGrid(UIGrid* grid)
+{
+   mUIGrids.push_back(grid);
+}
+
 void IDrawableModule::ComputeSliders(int samplesIn)
 {
    //mSliderMutex.lock(); TODO(Ryan) mutex acquisition is slow, how can I do this faster?
-   for (int i=0; i<mFloatSliders.size(); ++i)
+   for (int i = 0; i < mFloatSliders.size(); ++i)
       mFloatSliders[i]->Compute(samplesIn);
    //mSliderMutex.unlock();
 }
 
 PatchCableOld IDrawableModule::GetPatchCableOld(IClickable* target)
 {
-   float wThis,hThis,xThis,yThis,wThat,hThat,xThat,yThat;
-   GetDimensions(wThis,hThis);
-   GetPosition(xThis,yThis);
+   float wThis, hThis, xThis, yThis, wThat, hThat, xThat, yThat;
+   GetDimensions(wThis, hThis);
+   GetPosition(xThis, yThis);
    if (target)
    {
-      target->GetDimensions(wThat,hThat);
-      target->GetPosition(xThat,yThat);
+      target->GetDimensions(wThat, hThat);
+      target->GetPosition(xThat, yThat);
    }
    else
    {
       wThat = 0;
       hThat = 0;
-      xThat = xThis + wThis/2;
+      xThat = xThis + wThis / 2;
       yThat = yThis + hThis + 20;
    }
-   
+
    ofTranslate(-xThis, -yThis);
-   
+
    if (HasTitleBar())
    {
       yThis -= mTitleBarHeight;
@@ -898,17 +922,17 @@ PatchCableOld IDrawableModule::GetPatchCableOld(IClickable* target)
       yThat -= mTitleBarHeight;
       hThat += mTitleBarHeight;
    }
-   
-   float startX,startY,endX,endY;
-   FindClosestSides(xThis,yThis,wThis,hThis,xThat,yThat,wThat,hThat, startX,startY,endX,endY);
-   
-   float diffX = endX-startX;
-   float diffY = endY-startY;
-   float length = sqrtf(diffX*diffX + diffY*diffY);
-   float endCap = MIN(.5f,20/length);
-   int plugX = int((startX-endX)*endCap)+endX;
-   int plugY = int((startY-endY)*endCap)+endY;
-   
+
+   float startX, startY, endX, endY;
+   FindClosestSides(xThis, yThis, wThis, hThis, xThat, yThat, wThat, hThat, startX, startY, endX, endY);
+
+   float diffX = endX - startX;
+   float diffY = endY - startY;
+   float length = sqrtf(diffX * diffX + diffY * diffY);
+   float endCap = MIN(.5f, 20 / length);
+   int plugX = int((startX - endX) * endCap) + endX;
+   int plugY = int((startY - endY) * endCap) + endY;
+
    PatchCableOld cable;
    cable.start.x = startX;
    cable.start.y = startY;
@@ -916,42 +940,42 @@ PatchCableOld IDrawableModule::GetPatchCableOld(IClickable* target)
    cable.end.y = endY;
    cable.plug.x = plugX;
    cable.plug.y = plugY;
-   
+
    return cable;
 }
 
 void IDrawableModule::FindClosestSides(float xThis, float yThis, float wThis, float hThis, float xThat, float yThat, float wThat, float hThat, float& startX, float& startY, float& endX, float& endY, bool sidesOnly /*= false*/)
 {
    ofVec2f vDirs[4];
-   vDirs[0].set(-1,0);
-   vDirs[1].set(1,0);
-   vDirs[2].set(0,-1);
-   vDirs[3].set(0,1);
+   vDirs[0].set(-1, 0);
+   vDirs[1].set(1, 0);
+   vDirs[2].set(0, -1);
+   vDirs[3].set(0, 1);
 
    ofVec2f vThis[4];
-   vThis[0].set(xThis,yThis+hThis/2);        //left
-   vThis[1].set(xThis+wThis,yThis+hThis/2);  //right
-   vThis[2].set(xThis+wThis/2,yThis);        //top
-   vThis[3].set(xThis+wThis/2,yThis+hThis);  //bottom
+   vThis[0].set(xThis, yThis + hThis / 2); //left
+   vThis[1].set(xThis + wThis, yThis + hThis / 2); //right
+   vThis[2].set(xThis + wThis / 2, yThis); //top
+   vThis[3].set(xThis + wThis / 2, yThis + hThis); //bottom
    ofVec2f vThat[4];
-   vThat[0].set(xThat,yThat+hThat/2);
-   vThat[1].set(xThat+wThat,yThat+hThat/2);
-   vThat[2].set(xThat+wThat/2,yThat);
-   vThat[3].set(xThat+wThat/2,yThat+hThat);
+   vThat[0].set(xThat, yThat + hThat / 2);
+   vThat[1].set(xThat + wThat, yThat + hThat / 2);
+   vThat[2].set(xThat + wThat / 2, yThat);
+   vThat[3].set(xThat + wThat / 2, yThat + hThat);
 
    float closest = FLT_MAX;
    int closestPair = 0;
-   for (int i=0; i<4; ++i)
+   for (int i = 0; i < 4; ++i)
    {
       if (i == 2) //skip top
          continue;
 
       if (sidesOnly && i == 3)
-         continue;   //skip bottom
-      
-      for (int j=0; j<4; ++j)
+         continue; //skip bottom
+
+      for (int j = 0; j < 4; ++j)
       {
-         ofVec2f vDiff = vThat[j]-vThis[i];
+         ofVec2f vDiff = vThat[j] - vThis[i];
          float distSq = vDiff.lengthSquared();
          if (distSq < closest &&
              //i/2 == j/2 &&   //only connect horizontal-horizontal, vertical-vertical
@@ -959,19 +983,18 @@ void IDrawableModule::FindClosestSides(float xThis, float yThis, float wThis, fl
              // (i/2 == 1 && fabs(vDiff.y) > 10)
              //) &&
              vDiff.dot(vDirs[i]) > 0 &&
-             vDiff.dot(vDirs[j]) < 0
-            )
+             vDiff.dot(vDirs[j]) < 0)
          {
             closest = distSq;
-            closestPair = i + j*4;
+            closestPair = i + j * 4;
          }
       }
    }
 
-   startX = vThis[closestPair%4].x;
-   startY = vThis[closestPair%4].y;
-   endX = vThat[closestPair/4].x;
-   endY = vThat[closestPair/4].y;
+   startX = vThis[closestPair % 4].x;
+   startY = vThis[closestPair % 4].y;
+   endX = vThat[closestPair / 4].x;
+   endY = vThat[closestPair / 4].y;
    if (endY > vThis[3].y && !sidesOnly)
    {
       startX = vThis[3].x;
@@ -993,19 +1016,19 @@ bool IDrawableModule::CheckNeedsDraw()
 {
    if (IClickable::CheckNeedsDraw())
       return true;
-   
-   for (int i=0; i<mUIControls.size(); ++i)
+
+   for (int i = 0; i < mUIControls.size(); ++i)
    {
       if (mUIControls[i]->CheckNeedsDraw())
          return true;
    }
-   
-   for (int i=0; i<mChildren.size(); ++i)
+
+   for (int i = 0; i < mChildren.size(); ++i)
    {
       if (mChildren[i]->CheckNeedsDraw())
          return true;
    }
-   
+
    return false;
 }
 
@@ -1030,19 +1053,19 @@ void IDrawableModule::LoadBasics(const ofxJSONElement& moduleInfo, std::string t
       TheSynth->LogEvent(__PRETTY_FUNCTION__ + std::string(" json error: ") + e.what(), kLogEventType_Error);
    }
 
-   
-   SetPosition(x,y);
-   
+
+   SetPosition(x, y);
+
    SetName(name.c_str());
-   
+
    SetMinimized(start_minimized);
-   
+
    if (mMinimized)
       mMinimizeAnimation = 1;
-   
+
    if (draw_lissajous)
       TheSynth->AddLissajousDrawer(this);
-   
+
    mTypeName = typeName;
 }
 
@@ -1063,44 +1086,44 @@ namespace
 {
    const int kSaveStateRev = 1;
    const int kControlSeparatorLength = 16;
-   const char kControlSeparator[kControlSeparatorLength+1] = "controlseparator";
+   const char kControlSeparator[kControlSeparatorLength + 1] = "controlseparator";
 }
 
 void IDrawableModule::SaveState(FileStreamOut& out)
 {
    if (!CanSaveState())
       return;
-   
+
    out << kSaveStateRev;
-   
+
    std::vector<IUIControl*> controlsToSave;
    for (auto* control : mUIControls)
    {
       if (!VectorContains(control, ControlsToIgnoreInSaveState()) && control->GetShouldSaveState())
          controlsToSave.push_back(control);
    }
-   
+
    out << (int)controlsToSave.size();
    for (auto* control : controlsToSave)
    {
       //ofLog() << "Saving control " << control->Name();
       out << std::string(control->Name());
       control->SaveState(out);
-      for (int i=0; i<kControlSeparatorLength; ++i)
+      for (int i = 0; i < kControlSeparatorLength; ++i)
          out << kControlSeparator[i];
    }
-   
+
    if (GetContainer())
       GetContainer()->SaveState(out);
-   
+
    out << (int)mChildren.size();
-   
+
    for (auto* child : mChildren)
    {
       out << std::string(child->Name());
       child->SaveState(out);
    }
-   
+
    out << (int)mPatchCableSources.size();
    for (auto* cable : mPatchCableSources)
       cable->SaveState(out);
@@ -1110,19 +1133,19 @@ void IDrawableModule::LoadState(FileStreamIn& in)
 {
    if (!CanSaveState())
       return;
-   
+
    int rev;
    in >> rev;
-   
+
    int numUIControls;
    in >> numUIControls;
-   for (int i=0; i<numUIControls; ++i)
+   for (int i = 0; i < numUIControls; ++i)
    {
       std::string uicontrolname;
       in >> uicontrolname;
 
       UpdateOldControlName(uicontrolname);
-      
+
       bool threwException = false;
       try
       {
@@ -1143,8 +1166,8 @@ void IDrawableModule::LoadState(FileStreamIn& in)
                setValue = false;
             control->LoadState(in, setValue);
          }
-         
-         for (int j=0; j<kControlSeparatorLength; ++j)
+
+         for (int j = 0; j < kControlSeparatorLength; ++j)
          {
             char separatorChar;
             in >> separatorChar;
@@ -1155,7 +1178,7 @@ void IDrawableModule::LoadState(FileStreamIn& in)
                ofLog() << "Read char " + ofToString(separatorChar) + " but expected " + kControlSeparator[j] + "!";
                ofLog() << "Save state file position is " + ofToString(in.GetFilePosition()) + ", EoF is " + (in.Eof() ? "true" : "false");
                std::string nextFewChars = "Next 10 characters are:";
-               for (int c=0;c<10;++c)
+               for (int c = 0; c < 10; ++c)
                {
                   char ch;
                   in >> ch;
@@ -1174,11 +1197,11 @@ void IDrawableModule::LoadState(FileStreamIn& in)
       {
          threwException = true;
       }
-      
+
       if (threwException)
       {
-         TheSynth->LogEvent("Error in module \""+std::string(Name())+"\" loading state for control \""+uicontrolname+"\"", kLogEventType_Error);
-         
+         TheSynth->LogEvent("Error in module \"" + std::string(Name()) + "\" loading state for control \"" + uicontrolname + "\"", kLogEventType_Error);
+
          //read through the rest of the module until we find the spacer, so we can continue loading the next module
          int separatorProgress = 0;
          while (!in.Eof())
@@ -1190,19 +1213,19 @@ void IDrawableModule::LoadState(FileStreamIn& in)
             else
                separatorProgress = 0;
             if (separatorProgress == kControlSeparatorLength)
-               break;   //we did it!
+               break; //we did it!
          }
       }
    }
-   
+
    if (GetContainer())
       GetContainer()->LoadState(in);
-   
+
    int numChildren;
    in >> numChildren;
    LoadStateValidate(numChildren <= mChildren.size());
-   
-   for (int i=0; i<numChildren; ++i)
+
+   for (int i = 0; i < numChildren; ++i)
    {
       std::string childName;
       in >> childName;
@@ -1211,13 +1234,13 @@ void IDrawableModule::LoadState(FileStreamIn& in)
       LoadStateValidate(child);
       child->LoadState(in);
    }
-   
+
    if (rev >= 1)
    {
       int numPatchCableSources;
       in >> numPatchCableSources;
       PatchCableSource* dummy = nullptr;
-      for (int i=0; i<numPatchCableSources; ++i)
+      for (int i = 0; i < numPatchCableSources; ++i)
       {
          PatchCableSource* readIn;
          if (i < mPatchCableSources.size())

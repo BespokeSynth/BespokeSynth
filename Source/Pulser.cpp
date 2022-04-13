@@ -61,14 +61,14 @@ void Pulser::Init()
 void Pulser::CreateUIControls()
 {
    IDrawableModule::CreateUIControls();
-   mIntervalSelector = new DropdownList(this,"interval",75,2,(int*)(&mInterval));
-   mTimeModeSelector = new DropdownList(this,"timemode",5,2,(int*)(&mTimeMode));
-   mFreeTimeSlider = new FloatSlider(this,"t",75,2,44,15,&mFreeTimeStep,10,1000,0);
-   mOffsetSlider = new FloatSlider(this,"offset",mTimeModeSelector,kAnchor_Below,113,15,&mOffset,-1,1);
-   mRandomStepCheckbox = new Checkbox(this,"random",mOffsetSlider,kAnchor_Below,&mRandomStep);
+   mIntervalSelector = new DropdownList(this, "interval", 75, 2, (int*)(&mInterval));
+   mTimeModeSelector = new DropdownList(this, "timemode", 5, 2, (int*)(&mTimeMode));
+   mFreeTimeSlider = new FloatSlider(this, "t", 75, 2, 44, 15, &mFreeTimeStep, 10, 1000, 0);
+   mOffsetSlider = new FloatSlider(this, "offset", mTimeModeSelector, kAnchor_Below, 113, 15, &mOffset, -1, 1);
+   mRandomStepCheckbox = new Checkbox(this, "random", mOffsetSlider, kAnchor_Below, &mRandomStep);
    mResetLengthSlider = new IntSlider(this, "reset", mRandomStepCheckbox, kAnchor_Below, 113, 15, &mResetLength, 1, 16);
    mCustomDivisorSlider = new IntSlider(this, "div", mRandomStepCheckbox, kAnchor_Right, 52, 15, &mCustomDivisor, 1, 32);
-   
+
    mIntervalSelector->AddLabel("16", kInterval_16);
    mIntervalSelector->AddLabel("8", kInterval_8);
    mIntervalSelector->AddLabel("4", kInterval_4);
@@ -86,7 +86,7 @@ void Pulser::CreateUIControls()
    mIntervalSelector->AddLabel("64n", kInterval_64n);
    mIntervalSelector->AddLabel("none", kInterval_None);
    mIntervalSelector->AddLabel("div", kInterval_CustomDivisor);
-   
+
    mTimeModeSelector->AddLabel("step", kTimeMode_Step);
    mTimeModeSelector->AddLabel("reset", kTimeMode_Reset);
    mTimeModeSelector->AddLabel("sync", kTimeMode_Sync);
@@ -95,9 +95,9 @@ void Pulser::CreateUIControls()
    mTimeModeSelector->AddLabel("dnbeat2", kTimeMode_Downbeat2);
    mTimeModeSelector->AddLabel("dnbeat4", kTimeMode_Downbeat4);
    mTimeModeSelector->AddLabel("free", kTimeMode_Free);
-   
+
    mFreeTimeSlider->SetMode(FloatSlider::kSquare);
-   
+
    mFreeTimeSlider->SetShowing(mTimeMode == kTimeMode_Free);
 }
 
@@ -111,9 +111,9 @@ void Pulser::DrawModule()
 {
    if (Minimized() || IsVisible() == false)
       return;
-   
-   ofSetColor(255,255,255,gModuleDrawAlpha);
-   
+
+   ofSetColor(255, 255, 255, gModuleDrawAlpha);
+
    mIntervalSelector->Draw();
    mTimeModeSelector->Draw();
    mFreeTimeSlider->Draw();
@@ -136,9 +136,9 @@ void Pulser::CheckboxUpdated(Checkbox* checkbox)
 void Pulser::OnTransportAdvanced(float amount)
 {
    PROFILER(Pulser);
-   
+
    ComputeSliders(0);
-   
+
    if (mTimeMode == kTimeMode_Free)
    {
       float ms = amount * TheTransport->MsPerBar();
@@ -156,17 +156,17 @@ void Pulser::OnTimeEvent(double time)
    if (!mEnabled)
       return;
 
-   float offsetMs = GetOffset()*TheTransport->MsPerBar();
-   
+   float offsetMs = GetOffset() * TheTransport->MsPerBar();
+
    int flags = 0;
-   
+
    bool shouldReset = false;
    if (mTimeMode == kTimeMode_Downbeat)
       shouldReset = TheTransport->GetQuantized(time, mTransportListenerInfo) == 0;
-   if (mTimeMode == kTimeMode_Downbeat2)           
-      shouldReset = TheTransport->GetQuantized(time, mTransportListenerInfo) == 0 && TheTransport->GetMeasure(time+offsetMs) % 2 == 0;
-   if (mTimeMode == kTimeMode_Downbeat4)           
-      shouldReset = TheTransport->GetQuantized(time, mTransportListenerInfo) == 0 && TheTransport->GetMeasure(time+offsetMs) % 4 == 0;
+   if (mTimeMode == kTimeMode_Downbeat2)
+      shouldReset = TheTransport->GetQuantized(time, mTransportListenerInfo) == 0 && TheTransport->GetMeasure(time + offsetMs) % 2 == 0;
+   if (mTimeMode == kTimeMode_Downbeat4)
+      shouldReset = TheTransport->GetQuantized(time, mTransportListenerInfo) == 0 && TheTransport->GetMeasure(time + offsetMs) % 4 == 0;
    if (mTimeMode == kTimeMode_Reset)
    {
       int step = 0;
@@ -182,22 +182,25 @@ void Pulser::OnTimeEvent(double time)
       if (step % mResetLength == 0)
          shouldReset = true;
    }
-   
+
    if (shouldReset)
       flags |= kPulseFlag_Reset;
-   
+
    if (mRandomStep)
       flags |= kPulseFlag_Random;
-   
+
    if (mTimeMode == kTimeMode_Sync)
       flags |= kPulseFlag_SyncToTransport;
-   
+
+   if (mTimeMode == kTimeMode_Align)
+      flags |= kPulseFlag_Align;
+
    if (mWaitingForDownbeat && shouldReset)
       mWaitingForDownbeat = false;
-   
+
    if (mWaitingForDownbeat && (mTimeMode == kTimeMode_Downbeat || mTimeMode == kTimeMode_Downbeat2 || mTimeMode == kTimeMode_Downbeat4))
       return;
-   
+
    DispatchPulse(GetPatchCableSource(), time, 1, flags);
 }
 
@@ -229,7 +232,7 @@ float Pulser::GetOffset()
       return -mOffset * 16;
    if (mInterval == kInterval_CustomDivisor)
       return -mOffset / mCustomDivisor;
-   return (-mOffset/TheTransport->CountInStandardMeasure(mInterval));
+   return (-mOffset / TheTransport->CountInStandardMeasure(mInterval));
 }
 
 void Pulser::DropdownUpdated(DropdownList* list, int oldVal)
@@ -247,7 +250,7 @@ void Pulser::DropdownUpdated(DropdownList* list, int oldVal)
    {
       mIntervalSelector->SetShowing(mTimeMode != kTimeMode_Free);
       mFreeTimeSlider->SetShowing(mTimeMode == kTimeMode_Free);
-      
+
       if (mTimeMode == kTimeMode_Free && mInterval < kInterval_None)
       {
          mFreeTimeStep = TheTransport->GetDuration(mInterval);
@@ -264,7 +267,7 @@ void Pulser::DropdownUpdated(DropdownList* list, int oldVal)
             transportListenerInfo->mOffsetInfo = OffsetInfo(GetOffset(), false);
          }
       }
-      
+
       mResetLengthSlider->SetShowing(mTimeMode == kTimeMode_Reset);
    }
 }
@@ -299,7 +302,7 @@ void Pulser::SaveLayout(ofxJSONElement& moduleInfo)
 void Pulser::LoadLayout(const ofxJSONElement& moduleInfo)
 {
    mModuleSaveData.LoadString("target", moduleInfo);
-   
+
    SetUpFromSaveData();
 }
 

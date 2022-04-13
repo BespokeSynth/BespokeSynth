@@ -46,7 +46,7 @@ void ValueSetter::CreateUIControls()
 {
    IDrawableModule::CreateUIControls();
    UIBLOCK0();
-   UICONTROL_CUSTOM(mValueEntry, new TextEntry(UICONTROL_BASICS("value"),7,&mValue,-99999,99999); mValueEntry->DrawLabel(true););
+   UICONTROL_CUSTOM(mValueEntry, new TextEntry(UICONTROL_BASICS("value"), 7, &mValue, -99999, 99999); mValueEntry->DrawLabel(true););
    UIBLOCK_SHIFTRIGHT();
    UICONTROL_CUSTOM(mButton, new ClickButton(UICONTROL_BASICS("set")));
    ENDUIBLOCK(mWidth, mHeight);
@@ -54,7 +54,7 @@ void ValueSetter::CreateUIControls()
    auto entryRect = mValueEntry->GetRect();
    mValueSlider = new FloatSlider(this, "slider", entryRect.x, entryRect.y, entryRect.width, entryRect.height, &mValue, 0, 1);
    mValueSlider->SetShowing(false);
-   
+
    mControlCable = new PatchCableSource(this, kConnectionType_Modulator);
    AddPatchCableSource(mControlCable);
 }
@@ -63,7 +63,7 @@ void ValueSetter::DrawModule()
 {
    if (Minimized() || IsVisible() == false)
       return;
-   
+
    mValueEntry->Draw();
    mValueSlider->Draw();
    mButton->Draw();
@@ -78,6 +78,7 @@ void ValueSetter::OnPulse(double time, float velocity, int flags)
 {
    if (velocity > 0 && mEnabled)
    {
+      ComputeSliders((time - gTime) * gSampleRateMs);
       Go();
    }
 }
@@ -101,11 +102,11 @@ void ValueSetter::Go()
 void ValueSetter::SaveLayout(ofxJSONElement& moduleInfo)
 {
    IDrawableModule::SaveLayout(moduleInfo);
-   
+
    std::string targetPath = "";
    if (mTarget)
       targetPath = mTarget->Path();
-   
+
    moduleInfo["target"] = targetPath;
 }
 
@@ -113,7 +114,7 @@ void ValueSetter::LoadLayout(const ofxJSONElement& moduleInfo)
 {
    mModuleSaveData.LoadString("target", moduleInfo);
    mModuleSaveData.LoadBool("show_slider", moduleInfo, false);
-   
+
    SetUpFromSaveData();
 }
 

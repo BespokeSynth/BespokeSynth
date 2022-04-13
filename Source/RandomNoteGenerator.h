@@ -39,31 +39,35 @@ public:
    RandomNoteGenerator();
    ~RandomNoteGenerator();
    static IDrawableModule* Create() { return new RandomNoteGenerator(); }
-   
-   
+
+
    void CreateUIControls() override;
    void Init() override;
-   
+
    void SetEnabled(bool enabled) override { mEnabled = enabled; }
-   
+
    //ITimeListener
    void OnTimeEvent(double time) override;
-   
+
    void CheckboxUpdated(Checkbox* checkbox) override;
    void FloatSliderUpdated(FloatSlider* slider, float oldVal) override;
    void IntSliderUpdated(IntSlider* slider, int oldVal) override;
    void DropdownUpdated(DropdownList* list, int oldVal) override;
-   
+
    virtual void LoadLayout(const ofxJSONElement& moduleInfo) override;
    virtual void SetUpFromSaveData() override;
-   
+
 private:
    //IDrawableModule
    void DrawModule() override;
-   void GetModuleDimensions(float& width, float& height) override { width=120; height=92; }
+   void GetModuleDimensions(float& width, float& height) override
+   {
+      width = 120;
+      height = 92;
+   }
    bool Enabled() const override { return mEnabled; }
-   
-   
+
+
    NoteInterval mInterval;
    DropdownList* mIntervalSelector;
    float mProbability;

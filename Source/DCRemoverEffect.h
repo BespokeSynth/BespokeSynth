@@ -36,11 +36,10 @@ class DCRemoverEffect : public IAudioEffect
 public:
    DCRemoverEffect();
    ~DCRemoverEffect();
-   
+
    static IAudioEffect* Create() { return new DCRemoverEffect(); }
-   
-   
-   
+
+
    //IAudioEffect
    void ProcessAudio(double time, ChannelBuffer* buffer) override;
    void SetEnabled(bool enabled) override { mEnabled = enabled; }
@@ -48,13 +47,13 @@ public:
    std::string GetType() override { return "dcremover"; }
 
    void CheckboxUpdated(Checkbox* checkbox) override;
-   
+
 private:
    //IDrawableModule
    void GetModuleDimensions(float& width, float& height) override;
    void DrawModule() override;
    bool Enabled() const override { return mEnabled; }
-   
+
    BiquadFilter mBiquad[ChannelBuffer::kMaxNumChannels];
 };
 

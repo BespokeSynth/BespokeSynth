@@ -35,7 +35,7 @@ EnvelopeModulator::EnvelopeModulator()
 , mAdvancedDisplayCheckbox(nullptr)
 , mAdvancedDisplay(false)
 , mAdsrDisplay(nullptr)
-, mEnvelopeControl(ofVec2f(105,5),ofVec2f(mWidth-110,mHeight-10))
+, mEnvelopeControl(ofVec2f(105, 5), ofVec2f(mWidth - 110, mHeight - 10))
 , mUseVelocity(false)
 , mADSRViewLength(1000)
 , mADSRViewLengthSlider(nullptr)
@@ -46,32 +46,32 @@ EnvelopeModulator::EnvelopeModulator()
    mEnvelopeControl.SetViewLength(mADSRViewLength);
    mEnvelopeControl.SetADSR(&mAdsr);
    mAdsr.GetFreeReleaseLevel() = true;
-   mAdsr.Set(10,100,.5f,100);
+   mAdsr.Set(10, 100, .5f, 100);
 }
 
 void EnvelopeModulator::CreateUIControls()
 {
    IDrawableModule::CreateUIControls();
-   
+
    GetPatchCableSource()->SetEnabled(false);
-   
+
    mTargetCable = new PatchCableSource(this, kConnectionType_Modulator);
    mTargetCable->SetModulatorOwner(this);
    AddPatchCableSource(mTargetCable);
-   
+
    mAdvancedDisplayCheckbox = new Checkbox(this, "advanced", 2, 2, &mAdvancedDisplay);
    mAdsrDisplay = new ADSRDisplay(this, "adsr", 105, 2, 100, 66, &mAdsr);
    mMinSlider = new FloatSlider(this, "low", mAdvancedDisplayCheckbox, kAnchor_Below, 100, 15, &mDummyMin, 0, 1);
    mMaxSlider = new FloatSlider(this, "high", mMinSlider, kAnchor_Below, 100, 15, &mDummyMax, 0, 1);
-   mADSRViewLengthSlider = new FloatSlider(this,"length", mMaxSlider, kAnchor_Below,100,15,&mADSRViewLength,100,10000);
+   mADSRViewLengthSlider = new FloatSlider(this, "length", mMaxSlider, kAnchor_Below, 100, 15, &mADSRViewLength, 100, 10000);
    mUseVelocityCheckbox = new Checkbox(this, "use velocity", mADSRViewLengthSlider, kAnchor_Below, &mUseVelocity);
    mHasSustainStageCheckbox = new Checkbox(this, "has sustain", mUseVelocityCheckbox, kAnchor_Below, &mAdsr.GetHasSustainStage());
-   mSustainStageSlider = new IntSlider(this, "sustain stage", mHasSustainStageCheckbox, kAnchor_Below, 100, 15, &mAdsr.GetSustainStage(), 1, MAX_ADSR_STAGES-1);
+   mSustainStageSlider = new IntSlider(this, "sustain stage", mHasSustainStageCheckbox, kAnchor_Below, 100, 15, &mAdsr.GetSustainStage(), 1, MAX_ADSR_STAGES - 1);
    mMaxSustainSlider = new FloatSlider(this, "max sustain", mSustainStageSlider, kAnchor_Below, 100, 15, &mAdsr.GetMaxSustain(), -1, 5000);
-   
+
    mADSRViewLengthSlider->SetMode(FloatSlider::kSquare);
    mMaxSustainSlider->SetMode(FloatSlider::kSquare);
-   
+
    mSustainStageSlider->SetShowing(mAdsr.GetHasSustainStage());
    mMaxSustainSlider->SetShowing(mAdsr.GetHasSustainStage());
 
@@ -88,9 +88,9 @@ void EnvelopeModulator::DrawModule()
 {
    if (Minimized())
       return;
-   
+
    mSustainStageSlider->SetExtents(1, mAdsr.GetNumStages() - 2);
-   
+
    mAdvancedDisplayCheckbox->Draw();
    mMinSlider->Draw();
    mMaxSlider->Draw();
@@ -101,7 +101,7 @@ void EnvelopeModulator::DrawModule()
    mMaxSustainSlider->Draw();
 
    mAdsrDisplay->Draw();
-   
+
    if (mAdvancedDisplay)
       mEnvelopeControl.Draw();
 }
@@ -114,14 +114,14 @@ void EnvelopeModulator::Start(double time, const ::ADSR& adsr)
 void EnvelopeModulator::PlayNote(double time, int pitch, int velocity, int voiceIdx, ModulationParameters modulation)
 {
    PlayNoteOutput(time, pitch, velocity, voiceIdx, modulation);
-   
+
    if (mNoteOutput.HasHeldNotes() == false)
    {
       mAdsr.Stop(time);
    }
    else if (velocity > 0)
    {
-      mAdsr.Start(time, mUseVelocity ? velocity/127.0f : 1);
+      mAdsr.Start(time, mUseVelocity ? velocity / 127.0f : 1);
    }
 }
 
@@ -148,29 +148,29 @@ void EnvelopeModulator::Resize(float w, float h)
 {
    mWidth = MAX(w, 250);
    mHeight = MAX(h, 102);
-   mEnvelopeControl.SetDimensions(ofVec2f(mWidth - 110, mHeight-10));
+   mEnvelopeControl.SetDimensions(ofVec2f(mWidth - 110, mHeight - 10));
 }
 
 void EnvelopeModulator::OnClicked(int x, int y, bool right)
 {
    IDrawableModule::OnClicked(x, y, right);
-   
-   mEnvelopeControl.OnClicked(x,y,right);
+
+   mEnvelopeControl.OnClicked(x, y, right);
 }
 
 void EnvelopeModulator::MouseReleased()
 {
    IDrawableModule::MouseReleased();
-   
+
    mEnvelopeControl.MouseReleased();
 }
 
 bool EnvelopeModulator::MouseMoved(float x, float y)
 {
    IDrawableModule::MouseMoved(x, y);
-   
+
    mEnvelopeControl.MouseMoved(x, y);
-   
+
    return false;
 }
 
@@ -219,18 +219,18 @@ void EnvelopeModulator::FloatSliderUpdated(FloatSlider* slider, float oldVal)
 void EnvelopeModulator::SaveLayout(ofxJSONElement& moduleInfo)
 {
    IDrawableModule::SaveLayout(moduleInfo);
-   
+
    std::string targetPath = "";
    if (mTarget)
       targetPath = mTarget->Path();
-   
+
    moduleInfo["target"] = targetPath;
 }
 
 void EnvelopeModulator::LoadLayout(const ofxJSONElement& moduleInfo)
 {
    mModuleSaveData.LoadString("target", moduleInfo);
-   
+
    SetUpFromSaveData();
 }
 
@@ -247,20 +247,19 @@ namespace
 void EnvelopeModulator::SaveState(FileStreamOut& out)
 {
    IDrawableModule::SaveState(out);
-   
+
    out << kSaveStateRev;
-   
+
    mAdsr.SaveState(out);
 }
 
 void EnvelopeModulator::LoadState(FileStreamIn& in)
 {
    IDrawableModule::LoadState(in);
-   
+
    int rev;
    in >> rev;
    LoadStateValidate(rev == kSaveStateRev);
-   
+
    mAdsr.LoadState(in);
 }
-

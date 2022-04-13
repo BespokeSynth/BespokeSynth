@@ -70,28 +70,28 @@ void FollowingSong::SetPlaybackInfo(bool play, int position, float speed, float 
 void FollowingSong::Process(double time)
 {
    PROFILER(FollowingSong);
-   
+
    IAudioReceiver* target = GetTarget();
 
    if (!mEnabled || target == nullptr)
       return;
-   
+
    ComputeSliders(0);
-   
+
    int bufferSize = target->GetBuffer()->BufferSize();
    float* out = target->GetBuffer()->GetChannel(0);
    assert(bufferSize == gBufferSize);
-   
+
    float volSq = mVolume * mVolume * .5f;
-   
+
    if (!mLoadingSong && mPlay)
    {
       mLoadSongMutex.lock();
-      
+
       gWorkChannelBuffer.SetNumActiveChannels(1);
       if (mSample.ConsumeData(time, &gWorkChannelBuffer, bufferSize, true))
       {
-         for (int i=0; i<bufferSize; ++i)
+         for (int i = 0; i < bufferSize; ++i)
          {
             float sample = gWorkChannelBuffer.GetChannel(0)[i] * volSq;
             if (mMute)
@@ -116,22 +116,22 @@ void FollowingSong::DrawModule()
 {
    if (Minimized() || IsVisible() == false)
       return;
- 
+
    mMuteCheckbox->Draw();
-   
+
    ofPushMatrix();
-   ofTranslate(10,20);
-   DrawTextNormal(mSample.Name(),100,-10);
-   DrawAudioBuffer(540, 100, mSample.Data(), 0, mSample.LengthInSamples()/mSample.GetSampleRateRatio(), mSample.GetPlayPosition());
+   ofTranslate(10, 20);
+   DrawTextNormal(mSample.Name(), 100, -10);
+   DrawAudioBuffer(540, 100, mSample.Data(), 0, mSample.LengthInSamples() / mSample.GetSampleRateRatio(), mSample.GetPlayPosition());
    ofPopMatrix();
-   
+
    ofPushStyle();
-   float w,h;
-   GetDimensions(w,h);
+   float w, h;
+   GetDimensions(w, h);
    ofFill();
-   ofSetColor(255,255,255,50);
-   float beatWidth = w/4;
-   ofRect(int(TheTransport->GetMeasurePos(gTime)*4)*beatWidth,0,beatWidth,h);
+   ofSetColor(255, 255, 255, 50);
+   float beatWidth = w / 4;
+   ofRect(int(TheTransport->GetMeasurePos(gTime) * 4) * beatWidth, 0, beatWidth, h);
    ofPopStyle();
 }
 
@@ -162,7 +162,7 @@ void FollowingSong::FloatSliderUpdated(FloatSlider* slider, float oldVal)
 void FollowingSong::LoadLayout(const ofxJSONElement& moduleInfo)
 {
    mModuleSaveData.LoadString("target", moduleInfo);
-   
+
    SetUpFromSaveData();
 }
 
@@ -170,5 +170,3 @@ void FollowingSong::SetUpFromSaveData()
 {
    SetTarget(TheSynth->FindModule(mModuleSaveData.GetString("target")));
 }
-
-

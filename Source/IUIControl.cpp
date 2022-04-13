@@ -53,30 +53,30 @@ bool IUIControl::TestHover(int x, int y)
 {
    if (mNoHover)
       return false;
-   
+
    if (!mShowing)
       return false;
-   
-   float w,h;
+
+   float w, h;
    GetDimensions(w, h);
-   if (x>=0 && x<w && y>=0 && y<h) //make sure we're hovered over the control
+   if (x >= 0 && x < w && y >= 0 && y < h) //make sure we're hovered over the control
    {
       IDrawableModule* moduleParent = GetModuleParent();
-      float thisX,thisY;
+      float thisX, thisY;
       GetPosition(thisX, thisY);
       x += thisX;
       y += thisY;
-      if (moduleParent->GetOwningContainer()->GetModuleAt(x,y) == moduleParent)
+      if (moduleParent->GetOwningContainer()->GetModuleAt(x, y) == moduleParent)
       {
-         float localX,localY;
+         float localX, localY;
          GetPosition(localX, localY, K(localOnly));
-         float parentW,parentH;
+         float parentW, parentH;
          GetParent()->GetDimensions(parentW, parentH);
          if (localX < parentW && localY < parentH)
             return true;
       }
    }
-   
+
    return false;
 }
 
@@ -87,7 +87,7 @@ void IUIControl::CheckHover(int x, int y)
        !TheSynth->IsGroupSelecting() && PatchCable::sActivePatchCable == nullptr &&
        TestHover(x, y) &&
        (gHoveredUIControl == nullptr || !gHoveredUIControl->IsMouseDown()) &&
-      GetModuleParent() == TheSynth->GetModuleAtCursor())
+       GetModuleParent() == TheSynth->GetModuleAtCursor())
    {
       gHoveredUIControl = this;
       sLastHoveredUIControl = this;
@@ -100,35 +100,35 @@ void IUIControl::DrawHover(float x, float y, float w, float h)
 {
    if (Push2Control::sDrawingPush2Display)
       return;
-   
+
    if (gHoveredUIControl == this && IKeyboardFocusListener::GetActiveKeyboardFocus() == nullptr && TheSynth->GetGroupSelectedModules().empty())
    {
       ofPushStyle();
       ofNoFill();
-      ofSetColor(0,255,255,255);
-      ofRect(x,y,w,h,4);
+      ofSetColor(0, 255, 255, 255);
+      ofRect(x, y, w, h, 4);
       ofPopStyle();
    }
-   
+
    if (mRemoteControlCount > 0 && TheSynth->InMidiMapMode())
    {
       ofPushStyle();
       ofFill();
-      ofSetColor(255,0,255,100);
-      ofRect(x,y,w,h);
+      ofSetColor(255, 0, 255, 100);
+      ofRect(x, y, w, h);
       ofPopStyle();
    }
-   
+
    if (gBindToUIControl == this)
    {
       ofPushStyle();
       ofNoFill();
       ofSetLineWidth(5);
-      ofSetColor(255,0,255,200);
-      ofRect(x,y,w,h);
+      ofSetColor(255, 0, 255, 200);
+      ofRect(x, y, w, h);
       ofPopStyle();
    }
-   
+
    DrawPatchCableHover();
 }
 
@@ -140,13 +140,13 @@ void IUIControl::DrawPatchCableHover()
         PatchCable::sActivePatchCable->GetConnectionType() == kConnectionType_Grid) &&
        PatchCable::sActivePatchCable->IsValidTarget(this))
    {
-      float w,h;
+      float w, h;
       GetDimensions(w, h);
       ofPushStyle();
       ofNoFill();
       ofSetLineWidth(1.5f);
-      ofSetColor(255,0,255,200);
-      ofRect(mX,mY,w,h);
+      ofSetColor(255, 0, 255, 200);
+      ofRect(mX, mY, w, h);
       ofPopStyle();
    }
 }
@@ -191,19 +191,19 @@ void IUIControl::GetColors(ofColor& color, ofColor& textColor)
       color = IDrawableModule::GetColor(module->GetModuleType());
    else
       color = ofColor::white;
-   float h,s,b;
+   float h, s, b;
    color.getHsb(h, s, b);
-   color.setHsb(h, s * .4f, ofLerp(b,0,.6f));
+   color.setHsb(h, s * .4f, ofLerp(b, 0, .6f));
    if (IsPreset())
    {
-      float h,s,b;
+      float h, s, b;
       color.getHsb(h, s, b);
       color.setHsb(85, s, b);
-      textColor.set(0,255,0,gModuleDrawAlpha);
+      textColor.set(0, 255, 0, gModuleDrawAlpha);
    }
    else
    {
-      textColor.set(255,255,255,gModuleDrawAlpha);
+      textColor.set(255, 255, 255, gModuleDrawAlpha);
    }
 }
 
@@ -222,7 +222,7 @@ void IUIControl::SetNewManualHover(int direction)
       {
          const auto& controls = uiControlModule->GetUIControls();
          int controlIndex = 0;
-         for (int i=0; i <(int)controls.size(); ++i)
+         for (int i = 0; i < (int)controls.size(); ++i)
          {
             if (controls[i] == gHoveredUIControl)
             {
@@ -230,10 +230,10 @@ void IUIControl::SetNewManualHover(int direction)
                break;
             }
          }
-         
-         for (int i=1; i <(int)controls.size(); ++i)
+
+         for (int i = 1; i < (int)controls.size(); ++i)
          {
-            int newControlIndex = (controlIndex + i*direction + (int)controls.size()) % (int)controls.size();
+            int newControlIndex = (controlIndex + i * direction + (int)controls.size()) % (int)controls.size();
             if (controls[newControlIndex]->IsShowing())
             {
                gHoveredUIControl = controls[newControlIndex];

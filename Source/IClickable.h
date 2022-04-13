@@ -39,22 +39,35 @@ public:
    virtual ~IClickable() {}
    void Draw();
    virtual void Render() {}
-   void SetPosition(float x, float y) { mX = x; mY = y; }
+   void SetPosition(float x, float y)
+   {
+      mX = x;
+      mY = y;
+   }
    void GetPosition(float& x, float& y, bool local = false) const;
    ofVec2f GetPosition(bool local = false) const;
-   virtual void Move(float moveX, float moveY) { mX += moveX; mY += moveY; }
+   virtual void Move(float moveX, float moveY)
+   {
+      mX += moveX;
+      mY += moveY;
+   }
    virtual bool TestClick(int x, int y, bool right, bool testOnly = false);
    IClickable* GetParent() const { return mParent; }
    void SetParent(IClickable* parent) { mParent = parent; }
    bool NotifyMouseMoved(float x, float y);
    bool NotifyMouseScrolled(int x, int y, float scrollX, float scrollY);
    virtual void MouseReleased() {}
-   virtual void GetDimensions(float& width, float& height) { width = 10; height = 10; }
+   virtual void GetDimensions(float& width, float& height)
+   {
+      width = 10;
+      height = 10;
+   }
    ofVec2f GetDimensions();
    ofRectangle GetRect(bool local = false);
-   void SetName(const char* name) {
-     if (mName != name)
-       StringCopy(mName, name, MAX_TEXTENTRY_LENGTH);
+   void SetName(const char* name)
+   {
+      if (mName != name)
+         StringCopy(mName, name, MAX_TEXTENTRY_LENGTH);
    }
    const char* Name() const { return mName; }
    char* NameMutable() { return mName; }
@@ -67,25 +80,25 @@ public:
    void DrawBeacon(int x, int y);
    IClickable* GetRootParent();
    IDrawableModule* GetModuleParent();
-   
+
    static void SetLoadContext(IClickable* context) { sPathLoadContext = context->Path() + "~"; }
    static void ClearLoadContext() { sPathLoadContext = ""; }
    static void SetSaveContext(IClickable* context) { sPathSaveContext = context->Path() + "~"; }
    static void ClearSaveContext() { sPathSaveContext = ""; }
-   
+
    static std::string sPathLoadContext;
    static std::string sPathSaveContext;
-   
+
 protected:
    virtual void OnClicked(int x, int y, bool right) {}
    virtual bool MouseMoved(float x, float y) { return false; }
    virtual bool MouseScrolled(int x, int y, float scrollX, float scrollY) { return false; }
-   
+
    float mX;
    float mY;
    IClickable* mParent;
    bool mShowing;
-   
+
 private:
    char mName[MAX_TEXTENTRY_LENGTH];
    double mBeaconTime;

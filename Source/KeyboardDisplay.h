@@ -34,41 +34,49 @@ class KeyboardDisplay : public NoteEffectBase, public IDrawableModule
 public:
    KeyboardDisplay();
    static IDrawableModule* Create() { return new KeyboardDisplay(); }
-   
-   
+
+
    void CreateUIControls() override;
-   
+
    void SetEnabled(bool enabled) override { mEnabled = enabled; }
-   
+
    //INoteReceiver
    void PlayNote(double time, int pitch, int velocity, int voiceIdx = -1, ModulationParameters modulation = ModulationParameters()) override;
-   
+
    void MouseReleased() override;
    void KeyPressed(int key, bool isRepeat) override;
    void KeyReleased(int key) override;
-   
+
    void LoadLayout(const ofxJSONElement& moduleInfo) override;
    void SetUpFromSaveData() override;
    void SaveState(FileStreamOut& out) override;
    void LoadState(FileStreamIn& in) override;
-   
+
 private:
    //IDrawableModule
    void DrawModule() override;
-   void GetModuleDimensions(float& width, float& height) override { width = mWidth; height = mHeight; }
+   void GetModuleDimensions(float& width, float& height) override
+   {
+      width = mWidth;
+      height = mHeight;
+   }
    bool Enabled() const override { return mEnabled; }
    void OnClicked(int x, int y, bool right) override;
    bool IsResizable() const override { return true; }
-   void Resize(float w, float h) override { mWidth = w; mHeight = h; }
-   
+   void Resize(float w, float h) override
+   {
+      mWidth = w;
+      mHeight = h;
+   }
+
    void DrawKeyboard(int x, int y, int w, int h);
    void SetPitchColor(int pitch);
    ofRectangle GetKeyboardKeyRect(int pitch, int w, int h, bool& isBlackKey) const;
-   
+
    int RootKey() const;
    int NumKeys() const;
    int GetPitchForTypingKey(int key) const;
-   
+
    float mWidth;
    float mHeight;
    int mRootOctave;

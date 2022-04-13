@@ -42,9 +42,8 @@ PulseSequence::PulseSequence()
 , mAdvanceBackwardButton(nullptr)
 , mAdvanceForwardButton(nullptr)
 {
-   for (int i=0; i<kMaxSteps; ++i)
+   for (int i = 0; i < kMaxSteps; ++i)
       mVels[i] = 1;
-   
 }
 
 void PulseSequence::Init()
@@ -58,11 +57,11 @@ void PulseSequence::Init()
 void PulseSequence::CreateUIControls()
 {
    IDrawableModule::CreateUIControls();
-   mLengthSlider = new IntSlider(this,"length",3,2,96,15,&mLength,1,kMaxSteps);
-   mIntervalSelector = new DropdownList(this,"interval",mLengthSlider,kAnchor_Right,(int*)(&mInterval));
-   
-   mVelocityGrid = new UIGrid(3,20,174,15,mLength,1, this);
-   
+   mLengthSlider = new IntSlider(this, "length", 3, 2, 96, 15, &mLength, 1, kMaxSteps);
+   mIntervalSelector = new DropdownList(this, "interval", mLengthSlider, kAnchor_Right, (int*)(&mInterval));
+
+   mVelocityGrid = new UIGrid("uigrid", 3, 20, 174, 15, mLength, 1, this);
+
    mIntervalSelector->AddLabel("1n", kInterval_1n);
    mIntervalSelector->AddLabel("2n", kInterval_2n);
    mIntervalSelector->AddLabel("4n", kInterval_4n);
@@ -74,20 +73,20 @@ void PulseSequence::CreateUIControls()
    mIntervalSelector->AddLabel("32n", kInterval_32n);
    mIntervalSelector->AddLabel("64n", kInterval_64n);
    mIntervalSelector->AddLabel("none", kInterval_None);
-   
-   mAdvanceBackwardButton = new ClickButton(this,"<",mIntervalSelector,kAnchor_Right);
-   mAdvanceForwardButton = new ClickButton(this,">",mAdvanceBackwardButton,kAnchor_Right);
-   
+
+   mAdvanceBackwardButton = new ClickButton(this, "<", mIntervalSelector, kAnchor_Right);
+   mAdvanceForwardButton = new ClickButton(this, ">", mAdvanceBackwardButton, kAnchor_Right);
+
    mVelocityGrid->SetGridMode(UIGrid::kMultisliderBipolar);
    mVelocityGrid->SetListener(this);
    mVelocityGrid->SetRequireShiftForMultislider(true);
-   for (int i=0; i<kMaxSteps; ++i)
+   for (int i = 0; i < kMaxSteps; ++i)
       mVelocityGrid->SetVal(i, 0, mVels[i], !K(notifyListener));
-   
-   for (int i=0; i<kIndividualStepCables; ++i)
+
+   for (int i = 0; i < kIndividualStepCables; ++i)
    {
       mStepCables[i] = new PatchCableSource(this, kConnectionType_Pulse);
-      mStepCables[i]->SetOverrideCableDir(ofVec2f(0,1));
+      mStepCables[i]->SetOverrideCableDir(ofVec2f(0, 1));
       AddPatchCableSource(mStepCables[i]);
    }
 }
@@ -102,18 +101,18 @@ void PulseSequence::DrawModule()
 {
    if (Minimized() || IsVisible() == false)
       return;
-   
-   ofSetColor(255,255,255,gModuleDrawAlpha);
-   
+
+   ofSetColor(255, 255, 255, gModuleDrawAlpha);
+
    mIntervalSelector->SetShowing(!mHasExternalPulseSource);
-   
+
    mIntervalSelector->Draw();
    mLengthSlider->Draw();
    mVelocityGrid->Draw();
    mAdvanceBackwardButton->Draw();
    mAdvanceForwardButton->Draw();
-   
-   for (int i=0; i<kIndividualStepCables; ++i)
+
+   for (int i = 0; i < kIndividualStepCables; ++i)
    {
       if (i < mLength)
       {
@@ -137,7 +136,7 @@ void PulseSequence::CheckboxUpdated(Checkbox* checkbox)
 void PulseSequence::OnTransportAdvanced(float amount)
 {
    PROFILER(PulseSequence);
-   
+
    ComputeSliders(0);
 }
 
@@ -157,13 +156,13 @@ void PulseSequence::Step(double time, float velocity, int flags)
 {
    if (!mEnabled)
       return;
-   
+
    int direction = 1;
    if (flags & kPulseFlag_Backward)
       direction = -1;
-   
+
    mStep = (mStep + direction + mLength) % mLength;
-   
+
    if (flags & kPulseFlag_Reset)
       mStep = 0;
    else if (flags & kPulseFlag_Random)
@@ -173,7 +172,7 @@ void PulseSequence::Step(double time, float velocity, int flags)
    {
       mStep = TheTransport->GetSyncedStep(time, this, mTransportListenerInfo, mLength);
    }
-   
+
    if (flags & kPulseFlag_Align)
    {
       int stepsPerMeasure = TheTransport->GetStepsPerMeasure(this);
@@ -181,17 +180,17 @@ void PulseSequence::Step(double time, float velocity, int flags)
       int measure = TheTransport->GetMeasure(time) % numMeasures;
       mStep = ((TheTransport->GetQuantized(time, mTransportListenerInfo) % stepsPerMeasure) + measure * stepsPerMeasure) % mLength;
    }
-   
+
    float v = mVels[mStep] * velocity;
-   
+
    if (v > 0)
    {
       DispatchPulse(GetPatchCableSource(), time, v, 0);
-      
+
       if (mStep < kIndividualStepCables)
          DispatchPulse(mStepCables[mStep], time, v, 0);
    }
-   
+
    mVelocityGrid->SetHighlightCol(time, mStep);
 }
 
@@ -203,8 +202,8 @@ void PulseSequence::GetModuleDimensions(float& width, float& height)
 
 void PulseSequence::OnClicked(int x, int y, bool right)
 {
-   IDrawableModule::OnClicked(x,y,right);
-   
+   IDrawableModule::OnClicked(x, y, right);
+
    mVelocityGrid->TestClick(x, y, right);
 }
 
@@ -216,14 +215,14 @@ void PulseSequence::MouseReleased()
 
 bool PulseSequence::MouseMoved(float x, float y)
 {
-   IDrawableModule::MouseMoved(x,y);
+   IDrawableModule::MouseMoved(x, y);
    mVelocityGrid->NotifyMouseMoved(x, y);
    return false;
 }
 
 bool PulseSequence::MouseScrolled(int x, int y, float scrollX, float scrollY)
 {
-   mVelocityGrid->NotifyMouseScrolled(x,y,scrollX,scrollY);
+   mVelocityGrid->NotifyMouseScrolled(x, y, scrollX, scrollY);
    return false;
 }
 
@@ -262,8 +261,8 @@ void PulseSequence::GridUpdated(UIGrid* grid, int col, int row, float value, flo
 {
    if (grid == mVelocityGrid)
    {
-      for (int i=0; i<mVelocityGrid->GetCols(); ++i)
-         mVels[i] = mVelocityGrid->GetVal(i,0);
+      for (int i = 0; i < mVelocityGrid->GetCols(); ++i)
+         mVels[i] = mVelocityGrid->GetVal(i, 0);
    }
 }
 
@@ -275,9 +274,9 @@ namespace
 void PulseSequence::SaveState(FileStreamOut& out)
 {
    IDrawableModule::SaveState(out);
-   
+
    out << kSaveStateRev;
-   
+
    mVelocityGrid->SaveState(out);
    out << mHasExternalPulseSource;
 }
@@ -285,11 +284,11 @@ void PulseSequence::SaveState(FileStreamOut& out)
 void PulseSequence::LoadState(FileStreamIn& in)
 {
    IDrawableModule::LoadState(in);
-   
+
    int rev;
    in >> rev;
    LoadStateValidate(rev <= kSaveStateRev);
-   
+
    mVelocityGrid->LoadState(in);
    GridUpdated(mVelocityGrid, 0, 0, 0, 0);
 
@@ -305,7 +304,7 @@ void PulseSequence::SaveLayout(ofxJSONElement& moduleInfo)
 void PulseSequence::LoadLayout(const ofxJSONElement& moduleInfo)
 {
    mModuleSaveData.LoadString("target", moduleInfo);
-   
+
    SetUpFromSaveData();
 }
 

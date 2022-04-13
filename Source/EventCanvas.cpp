@@ -50,20 +50,20 @@ EventCanvas::EventCanvas()
 , mPreviousPosition(0)
 {
    SetEnabled(true);
-   
+
    mRowColors.push_back(ofColor::red);
    mRowColors.push_back(ofColor::green);
    mRowColors.push_back(ofColor::blue);
    mRowColors.push_back(ofColor::orange);
    mRowColors.push_back(ofColor::purple);
    mRowColors.push_back(ofColor::yellow);
-   
+
    for (auto& color : mRowColors)
    {
       color.setBrightness(color.getBrightness() * .8f);
       color.setSaturation(color.getSaturation() * .7f);
    }
-   
+
    mRowConnections.resize(kMaxEventRows);
 }
 
@@ -77,14 +77,14 @@ void EventCanvas::Init()
 void EventCanvas::CreateUIControls()
 {
    IDrawableModule::CreateUIControls();
-   
-   mQuantizeButton = new ClickButton(this,"quantize",160,5);
-   mNumMeasuresEntry = new TextEntry(this,"measures",5,5,3,&mNumMeasures,1,999);
-   mIntervalSelector = new DropdownList(this,"interval",110,5,(int*)(&mInterval));
-   mRecordCheckbox = new Checkbox(this,"record",220,5,&mRecord);
-   
+
+   mQuantizeButton = new ClickButton(this, "quantize", 160, 5);
+   mNumMeasuresEntry = new TextEntry(this, "measures", 5, 5, 3, &mNumMeasures, 1, 999);
+   mIntervalSelector = new DropdownList(this, "interval", 110, 5, (int*)(&mInterval));
+   mRecordCheckbox = new Checkbox(this, "record", 220, 5, &mRecord);
+
    mNumMeasuresEntry->DrawLabel(true);
-   
+
    mIntervalSelector->AddLabel("4", kInterval_4);
    mIntervalSelector->AddLabel("1n", kInterval_1n);
    mIntervalSelector->AddLabel("4n", kInterval_4n);
@@ -94,8 +94,8 @@ void EventCanvas::CreateUIControls()
    mIntervalSelector->AddLabel("16n", kInterval_16n);
    mIntervalSelector->AddLabel("16nt", kInterval_16nt);
    mIntervalSelector->AddLabel("32n", kInterval_32n);
-   
-   mCanvas = new Canvas(this, 5, 45, 390, 100, L(length,1), L(rows,8), L(cols,16), &(EventCanvasElement::Create));
+
+   mCanvas = new Canvas(this, 5, 45, 390, 100, L(length, 1), L(rows, 8), L(cols, 16), &(EventCanvasElement::Create));
    AddUIControl(mCanvas);
    mCanvasControls = new CanvasControls();
    mCanvasControls->SetCanvas(mCanvas);
@@ -103,14 +103,14 @@ void EventCanvas::CreateUIControls()
    mCanvasControls->AllowDragModeSelection(false);
    AddChild(mCanvasControls);
    UpdateNumColumns();
-   
+
    mCanvas->SetListener(this);
    mCanvas->SetDragMode(Canvas::kDragHorizontal);
    mCanvas->SetNumVisibleRows(8);
 
    mCanvasScrollbarHorizontal = new CanvasScrollbar(mCanvas, "scrollh", CanvasScrollbar::Style::kHorizontal);
    AddUIControl(mCanvasScrollbarHorizontal);
-   
+
    SyncControlCablesToCanvas();
 }
 
@@ -123,22 +123,22 @@ EventCanvas::~EventCanvas()
 void EventCanvas::OnTransportAdvanced(float amount)
 {
    PROFILER(EventCanvas);
-   
+
    if (mCanvas == nullptr)
       return;
-   
+
    //look ahead one buffer so that we set things slightly early, so we'll do things like catch the downbeat right after enabling a sequencer, etc.
    float posOffset = gBufferSizeMs / TheTransport->MsPerBar() / mNumMeasures;
-   
+
    float curPos = ((TheTransport->GetMeasure(gTime) % mNumMeasures) + TheTransport->GetMeasurePos(gTime)) / mNumMeasures + posOffset;
    FloatWrap(curPos, 1);
-   
+
    mCanvas->SetCursorPos(curPos);
    mPosition = curPos;
-   
+
    if (!mEnabled)
       return;
-   
+
    for (auto* canvasElement : mCanvas->GetElements())
    {
       float elementStart = canvasElement->GetStart();
@@ -165,33 +165,33 @@ void EventCanvas::OnTransportAdvanced(float amount)
             if (startPassed)
                element->Trigger();
          }
-         
+
          IUIControl* control = mRowConnections[element->mRow].mUIControl;
          if (control)
             mRowConnections[element->mRow].mLastValue = control->GetValue();
       }
    }
-   
-   for (int i=0; i<mControlCables.size(); ++i)
+
+   for (int i = 0; i < mControlCables.size(); ++i)
    {
       if (mRowConnections[i].mUIControl)
       {
          float value = mRowConnections[i].mUIControl->GetValue();
-         
+
          if (mRecord && mRowConnections[i].mLastValue != value)
          {
             float colPos = curPos * mCanvas->GetNumCols();
-            int col = int(colPos+.5f);
+            int col = int(colPos + .5f);
             EventCanvasElement* element = new EventCanvasElement(mCanvas, col, i, colPos - col);
             element->SetUIControl(mRowConnections[i].mUIControl);
             element->SetValue(value);
             mCanvas->AddElement(element);
          }
-      
+
          mRowConnections[i].mLastValue = value;
       }
    }
-   
+
    mPreviousPosition = curPos;
 }
 
@@ -204,7 +204,7 @@ void EventCanvas::UpdateNumColumns()
    }
    else
    {
-      mCanvas->RescaleNumCols(TheTransport->GetDuration(kInterval_1n)/TheTransport->GetDuration(mInterval) * mNumMeasures);
+      mCanvas->RescaleNumCols(TheTransport->GetDuration(kInterval_1n) / TheTransport->GetDuration(mInterval) * mNumMeasures);
       mCanvas->SetMajorColumnInterval(-1);
    }
 }
@@ -216,25 +216,24 @@ IUIControl* EventCanvas::GetUIControlForRow(int row)
 
 ofColor EventCanvas::GetRowColor(int row) const
 {
-   return mRowColors[row%mRowColors.size()];
+   return mRowColors[row % mRowColors.size()];
 }
 
 void EventCanvas::CanvasUpdated(Canvas* canvas)
 {
    if (canvas == mCanvas)
    {
-      
    }
 }
 void EventCanvas::PostRepatch(PatchCableSource* cableSource, bool fromUserClick)
 {
-   for (int i=0; i<mControlCables.size(); ++i)
+   for (int i = 0; i < mControlCables.size(); ++i)
    {
       mRowConnections[i].mUIControl = dynamic_cast<IUIControl*>(mControlCables[i]->GetTarget());
       if (mRowConnections[i].mUIControl)
          mRowConnections[i].mLastValue = mRowConnections[i].mUIControl->GetValue();
    }
-   
+
    for (auto canvasElement : mCanvas->GetElements())
    {
       EventCanvasElement* element = static_cast<EventCanvasElement*>(canvasElement);
@@ -247,40 +246,40 @@ void EventCanvas::DrawModule()
 {
    if (Minimized() || IsVisible() == false)
       return;
-   
+
    ofPushStyle();
    ofFill();
-   for (int i=0;i<mCanvas->GetNumVisibleRows();++i)
+   for (int i = 0; i < mCanvas->GetNumVisibleRows(); ++i)
    {
-      ofColor color = GetRowColor(i+mCanvas->GetRowOffset());
+      ofColor color = GetRowColor(i + mCanvas->GetRowOffset());
       color.a = 50;
       ofSetColor(color);
-      
-      float boxHeight = (float(mCanvas->GetHeight())/mCanvas->GetNumVisibleRows());
-      float y = mCanvas->GetPosition(true).y + i*boxHeight;
-      ofRect(mCanvas->GetPosition(true).x,y,mCanvas->GetWidth(),boxHeight);
+
+      float boxHeight = (float(mCanvas->GetHeight()) / mCanvas->GetNumVisibleRows());
+      float y = mCanvas->GetPosition(true).y + i * boxHeight;
+      ofRect(mCanvas->GetPosition(true).x, y, mCanvas->GetWidth(), boxHeight);
    }
    ofPopStyle();
-   
+
    ofPushStyle();
-   ofSetColor(128,128,128);
+   ofSetColor(128, 128, 128);
    mCanvas->Draw();
    ofPopStyle();
 
    mCanvasScrollbarHorizontal->Draw();
-   
+
    mCanvasControls->Draw();
    mQuantizeButton->Draw();
    mNumMeasuresEntry->Draw();
    mIntervalSelector->Draw();
    mRecordCheckbox->Draw();
-   
+
    ofRectangle canvasRect = mCanvas->GetRect(true);
-   for (int i=0; i<mControlCables.size(); ++i)
+   for (int i = 0; i < mControlCables.size(); ++i)
    {
       if (mCanvas->IsRowVisible(i))
       {
-         mControlCables[i]->SetManualPosition(GetRect().width, canvasRect.y + (canvasRect.height/mCanvas->GetNumVisibleRows()) * (i-mCanvas->GetRowOffset()+.5f));
+         mControlCables[i]->SetManualPosition(GetRect().width, canvasRect.y + (canvasRect.height / mCanvas->GetNumVisibleRows()) * (i - mCanvas->GetRowOffset() + .5f));
          mControlCables[i]->SetEnabled(true);
       }
       else
@@ -293,23 +292,23 @@ void EventCanvas::DrawModule()
 void EventCanvas::SyncControlCablesToCanvas()
 {
    if (mCanvas->GetNumRows() == mControlCables.size())
-      return;  //nothing to do
-   
+      return; //nothing to do
+
    if (mCanvas->GetNumRows() > mControlCables.size())
    {
       int oldSize = (int)mControlCables.size();
       mControlCables.resize(mCanvas->GetNumRows());
-      for (int i=oldSize; i<mControlCables.size(); ++i)
+      for (int i = oldSize; i < mControlCables.size(); ++i)
       {
          mControlCables[i] = new PatchCableSource(this, kConnectionType_UIControl);
-         mControlCables[i]->SetOverrideCableDir(ofVec2f(1,0));
+         mControlCables[i]->SetOverrideCableDir(ofVec2f(1, 0));
          mControlCables[i]->SetColor(GetRowColor(i));
          AddPatchCableSource(mControlCables[i]);
       }
    }
    else
    {
-      for (int i=mCanvas->GetNumRows(); i<mControlCables.size(); ++i)
+      for (int i = mCanvas->GetNumRows(); i < mControlCables.size(); ++i)
          RemovePatchCableSource(mControlCables[i]);
       mControlCables.resize(mCanvas->GetNumRows());
    }
@@ -395,7 +394,7 @@ void EventCanvas::LoadLayout(const ofxJSONElement& moduleInfo)
    mModuleSaveData.LoadFloat("canvaswidth", moduleInfo, 390, 390, 99999, K(isTextField));
    mModuleSaveData.LoadFloat("canvasheight", moduleInfo, 100, 40, 99999, K(isTextField));
    mModuleSaveData.LoadInt("num_rows", moduleInfo, 8, 1, 999, K(isTextField));
-   
+
    SetUpFromSaveData();
 }
 
@@ -410,7 +409,7 @@ void EventCanvas::SetUpFromSaveData()
 void EventCanvas::SaveLayout(ofxJSONElement& moduleInfo)
 {
    IDrawableModule::SaveLayout(moduleInfo);
-   
+
    moduleInfo["canvaswidth"] = mCanvas->GetWidth();
    moduleInfo["canvasheight"] = mCanvas->GetHeight();
 }
@@ -423,9 +422,9 @@ namespace
 void EventCanvas::SaveState(FileStreamOut& out)
 {
    IDrawableModule::SaveState(out);
-   
+
    out << kSaveStateRev;
-   
+
    out << (int)mControlCables.size();
    for (auto cable : mControlCables)
    {
@@ -434,18 +433,18 @@ void EventCanvas::SaveState(FileStreamOut& out)
          path = cable->GetTarget()->Path();
       out << path;
    }
-   
+
    mCanvas->SaveState(out);
 }
 
 void EventCanvas::LoadState(FileStreamIn& in)
 {
    IDrawableModule::LoadState(in);
-   
+
    int rev;
    in >> rev;
    LoadStateValidate(rev <= kSaveStateRev);
-   
+
    int size;
    in >> size;
    mControlCables.resize(size);
@@ -455,7 +454,7 @@ void EventCanvas::LoadState(FileStreamIn& in)
       in >> path;
       cable->SetTarget(TheSynth->FindUIControl(path));
    }
-   
+
    mCanvas->LoadState(in);
 }
 

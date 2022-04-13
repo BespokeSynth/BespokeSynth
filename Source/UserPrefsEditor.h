@@ -67,7 +67,11 @@ private:
    //IDrawableModule
    void DrawModule() override;
    bool Enabled() const override { return true; }
-   void GetModuleDimensions(float& width, float& height) override { width = mWidth; height = mHeight; }
+   void GetModuleDimensions(float& width, float& height) override
+   {
+      width = mWidth;
+      height = mHeight;
+   }
 
    void UpdateDropdowns(std::vector<DropdownList*> toUpdate);
    void DrawRightLabel(IUIControl* control, std::string text, ofColor color, float offsetX = 12);

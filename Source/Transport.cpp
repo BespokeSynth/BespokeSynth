@@ -36,7 +36,7 @@ bool Transport::sDoEventLookahead = false;
 double Transport::sEventEarlyMs = 150;
 
 Transport::Transport()
-: mTempo(gDefaultTempo)
+: mTempo(120)
 , mTimeSigTop(4)
 , mTimeSigBottom(4)
 , mMeasureTime(0)
@@ -62,24 +62,31 @@ Transport::Transport()
    TheTransport = this;
 
    SetName("transport");
+
+   SetRandomTempo();
+}
+
+void Transport::SetRandomTempo()
+{
+   SetTempo(gRandom() % 80 + 75);
 }
 
 void Transport::CreateUIControls()
 {
    IDrawableModule::CreateUIControls();
-   mTempoSlider = new FloatSlider(this,"tempo",5,4,93,15,&mTempo,1,225);
-   mIncreaseTempoButton = new ClickButton(this," + ",118,4);
-   mDecreaseTempoButton = new ClickButton(this," - ",101,4);
-   mSwingSlider = new FloatSlider(this,"swing",5,22,93,15,&mSwing,.5f,.7f);
-   mSwingIntervalDropdown = new DropdownList(this,"swing interval",101,22,&mSwingInterval);
-   mTimeSigTopDropdown = new DropdownList(this,"timesigtop",101,42,&mTimeSigTop);
-   mTimeSigBottomDropdown = new DropdownList(this,"timesigbottom",101,60,&mTimeSigBottom);
-   mResetButton = new ClickButton(this, "reset",5,78);
-   mPlayPauseButton = new ClickButton(this, "play/pause",42,78,ButtonDisplayStyle::kPause);
-   mNudgeBackButton = new ClickButton(this," < ",80,78);
-   mNudgeForwardButton = new ClickButton(this," > ",110,78);
-   mSetTempoCheckbox = new Checkbox(this,"set tempo",HIDDEN_UICONTROL,HIDDEN_UICONTROL,&mSetTempoBool);
-   
+   mTempoSlider = new FloatSlider(this, "tempo", 5, 4, 93, 15, &mTempo, 1, 225);
+   mIncreaseTempoButton = new ClickButton(this, " + ", 118, 4);
+   mDecreaseTempoButton = new ClickButton(this, " - ", 101, 4);
+   mSwingSlider = new FloatSlider(this, "swing", 5, 22, 93, 15, &mSwing, .5f, .7f);
+   mSwingIntervalDropdown = new DropdownList(this, "swing interval", 101, 22, &mSwingInterval);
+   mTimeSigTopDropdown = new DropdownList(this, "timesigtop", 101, 42, &mTimeSigTop);
+   mTimeSigBottomDropdown = new DropdownList(this, "timesigbottom", 101, 60, &mTimeSigBottom);
+   mResetButton = new ClickButton(this, "reset", 5, 78);
+   mPlayPauseButton = new ClickButton(this, "play/pause", 42, 78, ButtonDisplayStyle::kPause);
+   mNudgeBackButton = new ClickButton(this, " < ", 80, 78);
+   mNudgeForwardButton = new ClickButton(this, " > ", 110, 78);
+   mSetTempoCheckbox = new Checkbox(this, "set tempo", HIDDEN_UICONTROL, HIDDEN_UICONTROL, &mSetTempoBool);
+
    mTimeSigTopDropdown->AddLabel("2", 2);
    mTimeSigTopDropdown->AddLabel("3", 3);
    mTimeSigTopDropdown->AddLabel("4", 4);
@@ -98,12 +105,12 @@ void Transport::CreateUIControls()
    mTimeSigTopDropdown->AddLabel("17", 17);
    mTimeSigTopDropdown->AddLabel("18", 18);
    mTimeSigTopDropdown->AddLabel("19", 19);
-   
+
    mTimeSigBottomDropdown->AddLabel("2", 2);
    mTimeSigBottomDropdown->AddLabel("4", 4);
    mTimeSigBottomDropdown->AddLabel("8", 8);
    mTimeSigBottomDropdown->AddLabel("16", 16);
-   
+
    mSwingIntervalDropdown->AddLabel("4n", 4);
    mSwingIntervalDropdown->AddLabel("8n", 8);
    mSwingIntervalDropdown->AddLabel("16n", 16);
@@ -112,6 +119,15 @@ void Transport::CreateUIControls()
 void Transport::Init()
 {
    IDrawableModule::Init();
+}
+
+void Transport::Poll()
+{
+   if (mWantSetRandomTempo)
+   {
+      SetRandomTempo();
+      mWantSetRandomTempo = false;
+   }
 }
 
 void Transport::KeyPressed(int key, bool isRepeat)
@@ -126,15 +142,15 @@ void Transport::AdjustTempo(double amount)
 
 void Transport::Advance(double ms)
 {
-   double amount = ms/MsPerBar();
-   
+   double amount = ms / MsPerBar();
+
    assert(amount > 0);
-   
+
    mMeasureTime += amount;
-   
+
    if (mLoopStartMeasure != -1 && (GetMeasure(gTime) < mLoopStartMeasure || GetMeasure(gTime) >= mLoopEndMeasure))
       SetMeasure(mLoopStartMeasure);
-   
+
    if (TheChaosEngine)
       TheChaosEngine->AudioUpdate();
 
@@ -147,44 +163,45 @@ void Transport::Advance(double ms)
    }
 }
 
-float QuadraticBezier (float x, float a, float b)
+float QuadraticBezier(float x, float a, float b)
 {
-	// adapted from BEZMATH.PS (1993)
-	// by Don Lancaster, SYNERGETICS Inc.
-	// http://www.tinaja.com/text/bezmath.html
-   
-	float epsilon = 0.00001f;
-	a = ofClamp(a,0,1);
-	b = ofClamp(b,0,1);
-	if (a == 0.5f){
-		a += epsilon;
-	}
-   
-	// solve t from x (an inverse operation)
-	float om2a = 1 - 2*a;
-	float t = (sqrtf(a*a + om2a*x) - a)/om2a;
-	float y = (1-2*b)*(t*t) + (2*b)*t;
-	return y;
+   // adapted from BEZMATH.PS (1993)
+   // by Don Lancaster, SYNERGETICS Inc.
+   // http://www.tinaja.com/text/bezmath.html
+
+   float epsilon = 0.00001f;
+   a = ofClamp(a, 0, 1);
+   b = ofClamp(b, 0, 1);
+   if (a == 0.5f)
+   {
+      a += epsilon;
+   }
+
+   // solve t from x (an inverse operation)
+   float om2a = 1 - 2 * a;
+   float t = (sqrtf(a * a + om2a * x) - a) / om2a;
+   float y = (1 - 2 * b) * (t * t) + (2 * b) * t;
+   return y;
 }
 
 double Transport::Swing(double measurePos)
 {
    double swingSlices = double(mSwingInterval) * mTimeSigTop / 4.0;
-   
+
    double swingPos = measurePos * swingSlices;
    int swingBeat = int(swingPos);
    swingPos -= swingBeat;
-   
+
    double swung = SwingBeat(swingPos);
-   
+
    return (swingBeat + swung) / swingSlices;
 }
 
 double Transport::SwingBeat(double pos)
 {
    double swingDouble = mSwing;
-   double term = (.5 - swingDouble) / (swingDouble*swingDouble - swingDouble);
-   pos = term*pos*pos + (1-term)*pos;
+   double term = (.5 - swingDouble) / (swingDouble * swingDouble - swingDouble);
+   pos = term * pos * pos + (1 - term) * pos;
    return pos;
 }
 
@@ -197,28 +214,28 @@ void Transport::DrawModule()
 {
    if (Minimized() || IsVisible() == false)
       return;
-   
+
    double measurePos = GetMeasurePos(gTime);
-   
-   int count = int(fmod(mMeasureTime,1)*mTimeSigTop) + 1;
+
+   int count = int(fmod(mMeasureTime, 1) * mTimeSigTop) + 1;
    std::string display;
-   display += ofToString(measurePos,2)+" "+ofToString(GetMeasure(gTime))+"\n";
+   display += ofToString(measurePos, 2) + " " + ofToString(GetMeasure(gTime)) + "\n";
    display += ofToString(count);
-   DrawTextNormal(display,5,52);
+   DrawTextNormal(display, 5, 52);
 
    ofPushStyle();
-   float w,h;
-   GetDimensions(w,h);
+   float w, h;
+   GetDimensions(w, h);
    ofFill();
-   ofSetColor(255,255,255,50);
-   float beatWidth = w/mTimeSigTop;
-   ofRect((count-1)*beatWidth,0,beatWidth,h,0);
+   ofSetColor(255, 255, 255, 50);
+   float beatWidth = w / mTimeSigTop;
+   ofRect((count - 1) * beatWidth, 0, beatWidth, h, 0);
    if (count % 2)
-      ofSetColor(255,0,255);
+      ofSetColor(255, 0, 255);
    else
-      ofSetColor(0,255,255);
-   ofLine(w*measurePos,0,w*measurePos,h);
-   ofRect(0,95,w*((measurePos+(GetMeasure(gTime)%4))/4),5);
+      ofSetColor(0, 255, 255);
+   ofLine(w * measurePos, 0, w * measurePos, h);
+   ofRect(0, 95, w * ((measurePos + (GetMeasure(gTime) % 4)) / 4), 5);
    ofPopStyle();
 
    mSwingSlider->Draw();
@@ -236,16 +253,16 @@ void Transport::DrawModule()
    mIncreaseTempoButton->Draw();
    mDecreaseTempoButton->Draw();
    mTempoSlider->Draw();
-   
+
    ofBeginShape();
-   for (int i=0;i<w-1;++i)
+   for (int i = 0; i < w - 1; ++i)
    {
-      float pos = i/float(w-1);
+      float pos = i / float(w - 1);
       float swung = Swing(pos);
-      ofVertex(i+1,h-1-swung*(h-1));
+      ofVertex(i + 1, h - 1 - swung * (h - 1));
    }
    ofEndShape();
-   ofRect(0,h-Swing(measurePos)*h,4,1);
+   ofRect(0, h - Swing(measurePos) * h, 4, 1);
 }
 
 void Transport::Reset(float rewindAmount)
@@ -253,7 +270,7 @@ void Transport::Reset(float rewindAmount)
    mMeasureTime = -rewindAmount;
 }
 
-void Transport::ButtonClicked(ClickButton *button)
+void Transport::ButtonClicked(ClickButton* button)
 {
    if (button == mResetButton)
       Reset();
@@ -341,13 +358,13 @@ int Transport::GetQuantized(double time, const TransportListenerInfo* listenerIn
    if (listenerInfo->mOffsetInfo.mOffsetIsInMs)
       offsetMs = listenerInfo->mOffsetInfo.mOffset;
    else
-      offsetMs = listenerInfo->mOffsetInfo.mOffset*MsPerBar();
+      offsetMs = listenerInfo->mOffsetInfo.mOffset * MsPerBar();
    time += offsetMs;
 
    int measure = GetMeasure(time);
    double measurePos = GetMeasurePos(time);
    double pos = Swing(measurePos);
-   
+
    NoteInterval interval = listenerInfo->mInterval;
    switch (interval)
    {
@@ -367,7 +384,7 @@ int Transport::GetQuantized(double time, const TransportListenerInfo* listenerIn
          return ret;
       }
       case kInterval_None:
-         interval = kInterval_16n;  //just pick some default value
+         interval = kInterval_16n; //just pick some default value
          //intentionally fall through
       case kInterval_2n:
       case kInterval_2nt:
@@ -444,11 +461,11 @@ int Transport::CountInStandardMeasure(NoteInterval interval)
       case kInterval_64n:
          return 64;
       case kInterval_None:
-         return 16;  //TODO(Ryan) whatever
+         return 16; //TODO(Ryan) whatever
       default:
          //TODO(Ryan) this doesn't really make sense, does it?
          //assert(false);
-         TheSynth->LogEvent("error: CountInStandardMeasure() called with invalid interval "+ofToString(interval), kLogEventType_Error);
+         TheSynth->LogEvent("error: CountInStandardMeasure() called with invalid interval " + ofToString(interval), kLogEventType_Error);
          return 1;
    }
    return 0;
@@ -473,8 +490,8 @@ int Transport::GetSyncedStep(double time, ITimeListener* listener, const Transpo
    if (listenerInfo->mOffsetInfo.mOffsetIsInMs)
       offsetMs = listenerInfo->mOffsetInfo.mOffset;
    else
-      offsetMs = listenerInfo->mOffsetInfo.mOffset*MsPerBar();
-   
+      offsetMs = listenerInfo->mOffsetInfo.mOffset * MsPerBar();
+
    int step;
    if (GetMeasureFraction(listenerInfo->mInterval) < 1)
    {
@@ -506,33 +523,33 @@ double Transport::GetMeasureFraction(NoteInterval interval)
       case kInterval_1n:
          return 1.0;
       case kInterval_2n:
-         return GetMeasureFraction(kInterval_4n)*2;
+         return GetMeasureFraction(kInterval_4n) * 2;
       case kInterval_2nt:
          return GetMeasureFraction(kInterval_2n) * 2.0 / 3.0;
       case kInterval_4n:
-         return 1.0/mTimeSigTop;
+         return 1.0 / mTimeSigTop;
       case kInterval_4nt:
          return GetMeasureFraction(kInterval_4n) * 2.0 / 3.0;
       case kInterval_8n:
-         return GetMeasureFraction(kInterval_4n)*.5;
+         return GetMeasureFraction(kInterval_4n) * .5;
       case kInterval_8nt:
          return GetMeasureFraction(kInterval_8n) * 2.0 / 3.0;
       case kInterval_16n:
-         return GetMeasureFraction(kInterval_4n)*.25;
+         return GetMeasureFraction(kInterval_4n) * .25;
       case kInterval_16nt:
          return GetMeasureFraction(kInterval_16n) * 2.0 / 3.0;
       case kInterval_32n:
-         return GetMeasureFraction(kInterval_4n)*.125;
+         return GetMeasureFraction(kInterval_4n) * .125;
       case kInterval_32nt:
          return GetMeasureFraction(kInterval_32n) * 2.0 / 3.0;
       case kInterval_64n:
-         return GetMeasureFraction(kInterval_4n)*.0625;
+         return GetMeasureFraction(kInterval_4n) * .0625;
       case kInterval_4nd:
-         return GetMeasureFraction(kInterval_4n)*1.5;
+         return GetMeasureFraction(kInterval_4n) * 1.5;
       case kInterval_8nd:
-         return GetMeasureFraction(kInterval_8n)*1.5;
+         return GetMeasureFraction(kInterval_8n) * 1.5;
       case kInterval_16nd:
-         return GetMeasureFraction(kInterval_16n)*1.5;
+         return GetMeasureFraction(kInterval_16n) * 1.5;
       case kInterval_2:
          return 2;
       case kInterval_3:
@@ -559,19 +576,19 @@ void Transport::UpdateListeners(double jumpMs)
       const TransportListenerInfo& info = *i;
       if (info.mInterval != kInterval_None &&
           info.mInterval != kInterval_Free)
-      {         
+      {
          double lookaheadMs = jumpMs;
          if (info.mUseEventLookahead)
             lookaheadMs = MAX(lookaheadMs, GetEventLookaheadMs());
-         
+
          double checkTime = gTime + lookaheadMs;
-         
+
          double remainderMs;
          int oldStep = GetQuantized(checkTime - jumpMs, &info);
          int newStep = GetQuantized(checkTime, &info, &remainderMs);
          if (oldStep != newStep)
          {
-            double time = checkTime - remainderMs + .0001;  //TODO(Ryan) investigate this fudge number. I would think that subtracting remainderMs from checkTime would give me a number that gives me the same GetQuantized() result with a zero remainder, but sometimes it is just short of the correct quantization
+            double time = checkTime - remainderMs + .0001; //TODO(Ryan) investigate this fudge number. I would think that subtracting remainderMs from checkTime would give me a number that gives me the same GetQuantized() result with a zero remainder, but sometimes it is just short of the correct quantization
             /*ofLog() << oldStep << " " << newStep << " " << remainderMs << " " << jumpMs << " " << checkTime << " " << time << " " << GetQuantized(checkTime, info.mInterval) << " " << GetQuantized(time, info.mInterval);
             if (GetQuantized(checkTime + offsetMs, info.mInterval) != GetQuantized(time + offsetMs, info.mInterval))
             {
@@ -616,7 +633,7 @@ void Transport::CheckboxUpdated(Checkbox* checkbox)
          float recordedTime = gTime - mStartRecordTime;
          int beats = numBars * GetTimeSigTop();
          float minutes = recordedTime / 1000.0f / 60.0f;
-         SetTempo(beats/minutes);
+         SetTempo(beats / minutes);
          SetDownbeat();
       }
    }
@@ -628,11 +645,15 @@ void Transport::DropdownUpdated(DropdownList* list, int oldVal)
 
 void Transport::LoadLayout(const ofxJSONElement& moduleInfo)
 {
+   mModuleSaveData.LoadBool("randomize_tempo_on_load", moduleInfo, false);
+
    SetUpFromSaveData();
 }
 
 void Transport::SetUpFromSaveData()
 {
+   if (mModuleSaveData.GetBool("randomize_tempo_on_load"))
+      mWantSetRandomTempo = true;
 }
 
 namespace
@@ -643,20 +664,20 @@ namespace
 void Transport::SaveState(FileStreamOut& out)
 {
    IDrawableModule::SaveState(out);
-   
+
    out << kSaveStateRev;
-   
+
    out << mMeasureTime;
 }
 
 void Transport::LoadState(FileStreamIn& in)
 {
    IDrawableModule::LoadState(in);
-   
+
    int rev;
    in >> rev;
    LoadStateValidate(rev <= kSaveStateRev);
-   
+
    if (rev == 0) //load as float instead of double
    {
       float measurePos;
@@ -668,4 +689,3 @@ void Transport::LoadState(FileStreamIn& in)
       in >> mMeasureTime;
    }
 }
-

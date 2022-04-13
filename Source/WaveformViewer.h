@@ -41,21 +41,21 @@ public:
    WaveformViewer();
    virtual ~WaveformViewer();
    static IDrawableModule* Create() { return new WaveformViewer(); }
-   
-   
+
+
    void CreateUIControls() override;
-   
+
    //IAudioSource
    void Process(double time) override;
    void SetEnabled(bool enabled) override { mEnabled = enabled; }
-   
+
    bool IsResizable() const override { return true; }
    void Resize(float w, float h) override;
-   
+
    virtual void LoadLayout(const ofxJSONElement& moduleInfo) override;
    virtual void SaveLayout(ofxJSONElement& moduleInfo) override;
    virtual void SetUpFromSaveData() override;
-   
+
    void FloatSliderUpdated(FloatSlider* slider, float oldVal) override {}
    void IntSliderUpdated(IntSlider* slider, int oldVal) override {}
    void TextEntryComplete(TextEntry* entry) override {}
@@ -63,13 +63,17 @@ public:
    //INoteReceiver
    void PlayNote(double time, int pitch, int velocity, int voiceIdx = -1, ModulationParameters modulation = ModulationParameters()) override;
    void SendCC(int control, int value, int voiceIdx = -1) override {}
-   
+
 private:
    //IDrawableModule
    void DrawModule() override;
-   void GetModuleDimensions(float& w, float& h) override { w=mWidth; h=mHeight; }
+   void GetModuleDimensions(float& w, float& h) override
+   {
+      w = mWidth;
+      h = mHeight;
+   }
    bool Enabled() const override { return mEnabled; }
-   
+
    float mAudioView[BUFFER_VIZ_SIZE][2];
    bool mDoubleBufferFlip;
 
@@ -97,4 +101,3 @@ private:
 };
 
 #endif /* defined(__modularSynth__WaveformViewer__) */
-

@@ -49,16 +49,16 @@ AbletonLink::AbletonLink()
    mLink->enable(true);
 
    mLink->setNumPeersCallback([this](std::size_t p)
-   {
-      mNumPeers = p;
-   });
+                              {
+                                 mNumPeers = p;
+                              });
 
    mLink->setTempoCallback([this](const double bpm)
-   {
-      if (mEnabled)
-         TheTransport->SetTempo(bpm);
-      mTempo = bpm;
-   });
+                           {
+                              if (mEnabled)
+                                 TheTransport->SetTempo(bpm);
+                              mTempo = bpm;
+                           });
 }
 
 void AbletonLink::Init()
@@ -145,11 +145,10 @@ void AbletonLink::DrawModule()
    DrawTextNormal("peers: " + ofToString(mNumPeers) + "\ntempo: " + ofToString(mTempo) + "\nbeat: " + ofToString(mLastReceivedBeat), 3, 40);
 }
 
-void AbletonLink::CheckboxUpdated(Checkbox *checkbox)
+void AbletonLink::CheckboxUpdated(Checkbox* checkbox)
 {
 }
 
 void AbletonLink::FloatSliderUpdated(FloatSlider* slider, float oldVal)
 {
 }
-

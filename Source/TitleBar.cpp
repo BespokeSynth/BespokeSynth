@@ -55,7 +55,7 @@ SpawnList::SpawnList(IDropdownListener* owner, SpawnListManager* listManager, in
 , mSpawnList(nullptr)
 , mOwner(owner)
 , mListManager(listManager)
-, mPos(x,y)
+, mPos(x, y)
 {
 }
 
@@ -63,26 +63,26 @@ void SpawnList::SetList(std::vector<std::string> spawnables, std::string overrid
 {
    mOverrideModuleType = overrideModuleType;
    if (mSpawnList == nullptr)
-      mSpawnList = new DropdownList(mOwner,mLabel.c_str(),mPos.x,mPos.y,&mSpawnIndex);
+      mSpawnList = new DropdownList(mOwner, mLabel.c_str(), mPos.x, mPos.y, &mSpawnIndex);
    mSpawnList->SetNoHover(true);
-   
+
    mSpawnList->Clear();
    mSpawnList->SetUnknownItemString(mLabel);
    mSpawnables = spawnables;
-   for (int i=0; i<mSpawnables.size(); ++i)
+   for (int i = 0; i < mSpawnables.size(); ++i)
    {
       std::string name = mSpawnables[i].c_str();
       if (mOverrideModuleType == "" && TheSynth->GetModuleFactory()->IsExperimental(name))
          name += " (exp.)";
       if (mOverrideModuleType == "vstplugin" && name != kManageVSTsLabel)
          name = juce::File(name).getFileName().toStdString();
-      mSpawnList->AddLabel(name,i);
+      mSpawnList->AddLabel(name, i);
    }
 }
 
 namespace
 {
-   ofVec2f moduleGrabOffset(-40,10);
+   ofVec2f moduleGrabOffset(-40, 10);
 }
 
 void SpawnList::OnSelection(DropdownList* list)
@@ -110,27 +110,27 @@ IDrawableModule* SpawnList::Spawn()
          return nullptr;
       }
    }
-   
+
    IDrawableModule* module = TheSynth->SpawnModuleOnTheFly(moduleType, TheSynth->GetMouseX(TheSynth->GetRootContainer()) + moduleGrabOffset.x, TheSynth->GetMouseY(TheSynth->GetRootContainer()) + moduleGrabOffset.y);
-   
+
    if (mOverrideModuleType == "vstplugin")
    {
       VSTPlugin* plugin = dynamic_cast<VSTPlugin*>(module);
       plugin->SetVST(mSpawnables[mSpawnIndex]);
    }
-   
+
    if (mOverrideModuleType == "prefab")
    {
       Prefab* prefab = dynamic_cast<Prefab*>(module);
-      prefab->LoadPrefab("prefabs"+GetPathSeparator()+mSpawnables[mSpawnIndex]);
+      prefab->LoadPrefab("prefabs" + GetPathSeparator() + mSpawnables[mSpawnIndex]);
    }
-   
+
    return module;
 }
 
 void SpawnList::Draw()
 {
-   float x,y;
+   float x, y;
    mSpawnList->GetPosition(x, y, true);
    //DrawTextNormal(mLabel,x,y-2);
    mSpawnList->Draw();
@@ -143,7 +143,7 @@ void SpawnList::SetPosition(int x, int y)
 
 void SpawnList::SetPositionRelativeTo(SpawnList* list)
 {
-   float x,y,w,h;
+   float x, y, w, h;
    list->mSpawnList->GetPosition(x, y, true);
    list->mSpawnList->GetDimensions(w, h);
    mSpawnList->SetPosition(x + w + 5, y);
@@ -163,13 +163,13 @@ TitleBar::TitleBar()
 {
    assert(TheTitleBar == nullptr);
    TheTitleBar = this;
-   
+
    mHelpDisplay = dynamic_cast<HelpDisplay*>(HelpDisplay::Create());
    mHelpDisplay->SetTypeName("helpdisplay");
 
    mNewPatchConfirmPopup.SetTypeName("newpatchconfirm");
    mNewPatchConfirmPopup.SetName("newpatchconfirm");
-   
+
    SetShouldDrawOutline(false);
 }
 
@@ -177,27 +177,35 @@ void TitleBar::CreateUIControls()
 {
    IDrawableModule::CreateUIControls();
    UIBLOCK(140, 1);
-   BUTTON_STYLE(mPlayPauseButton, "play/pause", ButtonDisplayStyle::kPause); UIBLOCK_SHIFTRIGHT(); UIBLOCK_SHIFTX(10);
-   BUTTON(mLoadStateButton, "load"); UIBLOCK_SHIFTRIGHT();
-   BUTTON(mSaveStateButton,"save"); UIBLOCK_SHIFTRIGHT();
-   BUTTON(mSaveStateAsButton, "save as"); UIBLOCK_SHIFTRIGHT(); UIBLOCK_SHIFTX(10);
+   BUTTON_STYLE(mPlayPauseButton, "play/pause", ButtonDisplayStyle::kPause);
+   UIBLOCK_SHIFTRIGHT();
+   UIBLOCK_SHIFTX(10);
+   BUTTON(mLoadStateButton, "load");
+   UIBLOCK_SHIFTRIGHT();
+   BUTTON(mSaveStateButton, "save");
+   UIBLOCK_SHIFTRIGHT();
+   BUTTON(mSaveStateAsButton, "save as");
+   UIBLOCK_SHIFTRIGHT();
+   UIBLOCK_SHIFTX(10);
    BUTTON(mWriteAudioButton, "write audio");
    UIBLOCK_NEWLINE();
-   BUTTON(mResetLayoutButton,"new patch"); UIBLOCK_SHIFTRIGHT();
-   CHECKBOX(mEventLookaheadCheckbox, "lookahead (exp.)", &Transport::sDoEventLookahead); UIBLOCK_SHIFTRIGHT();
+   BUTTON(mResetLayoutButton, "new patch");
+   UIBLOCK_SHIFTRIGHT();
+   CHECKBOX(mEventLookaheadCheckbox, "lookahead (exp.)", &Transport::sDoEventLookahead);
+   UIBLOCK_SHIFTRIGHT();
    CHECKBOX(mShouldAutosaveCheckbox, "autosave", &ModularSynth::sShouldAutosave);
    ENDUIBLOCK0();
 
-   mDisplayHelpButton = new ClickButton(this," ? ",380,1);
-   mDisplayUserPrefsEditorButton = new ClickButton(this, "settings", 330, 1);   
+   mDisplayHelpButton = new ClickButton(this, " ? ", 380, 1);
+   mDisplayUserPrefsEditorButton = new ClickButton(this, "settings", 330, 1);
    mLoadLayoutDropdown = new DropdownList(this, "load layout", 140, 20, &mLoadLayoutIndex);
    mSaveLayoutButton = new ClickButton(this, "save layout", 280, 19);
-   
+
    mLoadLayoutDropdown->SetShowing(false);
    mSaveLayoutButton->SetShowing(false);
-   
+
    mHelpDisplay->CreateUIControls();
-   
+
    ListLayouts();
 
    mNewPatchConfirmPopup.CreateUIControls();
@@ -225,15 +233,15 @@ void TitleBar::OnWindowClosed()
 }
 
 SpawnListManager::SpawnListManager(IDropdownListener* owner)
-: mInstrumentModules(owner,this,500,16,"instruments:")
-, mNoteModules(owner,this,0,0,"note effects:")
-, mSynthModules(owner,this,0,0,"synths:")
-, mAudioModules(owner,this,0,0,"audio effects:")
-, mModulatorModules(owner,this,0,0,"modulators:")
+: mInstrumentModules(owner, this, 500, 16, "instruments:")
+, mNoteModules(owner, this, 0, 0, "note effects:")
+, mSynthModules(owner, this, 0, 0, "synths:")
+, mAudioModules(owner, this, 0, 0, "audio effects:")
+, mModulatorModules(owner, this, 0, 0, "modulators:")
 , mPulseModules(owner, this, 0, 0, "pulse:")
 , mVstPlugins(owner, this, 0, 0, "vst plugins:")
-, mOtherModules(owner,this,0,0,"other:")
-, mPrefabs(owner,this,0,0,"prefabs:")
+, mOtherModules(owner, this, 0, 0, "other:")
+, mPrefabs(owner, this, 0, 0, "prefabs:")
 {
 }
 
@@ -246,10 +254,10 @@ void SpawnListManager::SetModuleFactory(ModuleFactory* factory)
    mModulatorModules.SetList(factory->GetSpawnableModules(kModuleType_Modulator), "");
    mPulseModules.SetList(factory->GetSpawnableModules(kModuleType_Pulse), "");
    mOtherModules.SetList(factory->GetSpawnableModules(kModuleType_Other), "");
-   
+
    SetUpVstDropdown();
    SetUpPrefabsDropdown();
-   
+
    mDropdowns.push_back(&mInstrumentModules);
    mDropdowns.push_back(&mNoteModules);
    mDropdowns.push_back(&mSynthModules);
@@ -263,9 +271,9 @@ void SpawnListManager::SetModuleFactory(ModuleFactory* factory)
 
 void SpawnListManager::SetUpPrefabsDropdown()
 {
-    std::vector<std::string> prefabs;
-    ModuleFactory::GetPrefabs(prefabs);
-    mPrefabs.SetList(prefabs, "prefab");
+   std::vector<std::string> prefabs;
+   ModuleFactory::GetPrefabs(prefabs);
+   mPrefabs.SetList(prefabs, "prefab");
 }
 
 void SpawnListManager::SetUpVstDropdown()
@@ -279,39 +287,39 @@ void SpawnListManager::SetUpVstDropdown()
 void TitleBar::ListLayouts()
 {
    mLoadLayoutDropdown->Clear();
-   
+
    int layoutIdx = 0;
-   for (const auto& entry : juce::RangedDirectoryIterator{juce::File{ofToDataPath("layouts")}, false, "*.json"})
+   for (const auto& entry : juce::RangedDirectoryIterator{ juce::File{ ofToDataPath("layouts") }, false, "*.json" })
    {
       const auto& file = entry.getFile();
       mLoadLayoutDropdown->AddLabel(file.getFileNameWithoutExtension().toRawUTF8(), layoutIdx);
 
-      if (file.getRelativePathFrom(juce::File{ofToDataPath("")}).toStdString() == TheSynth->GetLoadedLayout())
+      if (file.getRelativePathFrom(juce::File{ ofToDataPath("") }).toStdString() == TheSynth->GetLoadedLayout())
          mLoadLayoutIndex = layoutIdx;
 
       ++layoutIdx;
    }
-   
+
    mSaveLayoutButton->PositionTo(mLoadLayoutDropdown, kAnchor_Right);
 }
 
 void TitleBar::OnClicked(int x, int y, bool right)
 {
-   IDrawableModule::OnClicked(x,y,right);
-   
+   IDrawableModule::OnClicked(x, y, right);
+
    if (mLeftCornerHovered)
       TheSynth->GetLocationZoomer()->EnterVanityPanningMode();
 }
 
 bool TitleBar::MouseMoved(float x, float y)
 {
-   IDrawableModule::MouseMoved(x,y);
-   
+   IDrawableModule::MouseMoved(x, y);
+
    if (x < 130 && y < 36)
       mLeftCornerHovered = true;
    else
       mLeftCornerHovered = false;
-   
+
    return false;
 }
 
@@ -329,12 +337,12 @@ void TitleBar::DrawModule()
 {
    if (HiddenByZoom())
       return;
-   
-   ofSetColor(255,255,255);
-   
+
+   ofSetColor(255, 255, 255);
+
    ofPushStyle();
    if (gHoveredModule == this && mLeftCornerHovered)
-      ofSetColor(ofColor::lerp(ofColor::black, ofColor::white, ofMap(sin(gTime / 1000 * PI * 2),-1,1,.7f,.9f)));
+      ofSetColor(ofColor::lerp(ofColor::black, ofColor::white, ofMap(sin(gTime / 1000 * PI * 2), -1, 1, .7f, .9f)));
    DrawTextBold("bespoke", 2, 28, 36);
 #if BESPOKE_NIGHTLY
    DrawTextNormal("nightly", 90, 35, 10);
@@ -347,7 +355,7 @@ void TitleBar::DrawModule()
    DrawTextBold("debug build", 17, 25, 19);
 #endif
    ofPopStyle();
-   
+
    std::string info;
    if (TheSynth->GetMoveModule())
       info += " (moving module \"" + std::string(TheSynth->GetMoveModule()->Name()) + "\")";
@@ -355,9 +363,9 @@ void TitleBar::DrawModule()
       info += " (entering text)";
 
    float pixelWidth = GetPixelWidth();
-   
+
    DrawTextRightJustify(info, pixelWidth - 140, 32);
-   
+
    mSaveLayoutButton->Draw();
    mSaveStateButton->Draw();
    mSaveStateAsButton->Draw();
@@ -383,14 +391,14 @@ void TitleBar::DrawModule()
    float x = startX;
    float y = startY;
    std::array<SpawnList*, 9> lists = { &mSpawnLists.mInstrumentModules,
-                                  &mSpawnLists.mNoteModules,
-                                  &mSpawnLists.mSynthModules,
-                                  &mSpawnLists.mAudioModules,
-                                  &mSpawnLists.mModulatorModules,
-                                  &mSpawnLists.mPulseModules,
-                                  &mSpawnLists.mVstPlugins,
-                                  &mSpawnLists.mOtherModules,
-                                  &mSpawnLists.mPrefabs };
+                                       &mSpawnLists.mNoteModules,
+                                       &mSpawnLists.mSynthModules,
+                                       &mSpawnLists.mAudioModules,
+                                       &mSpawnLists.mModulatorModules,
+                                       &mSpawnLists.mPulseModules,
+                                       &mSpawnLists.mVstPlugins,
+                                       &mSpawnLists.mOtherModules,
+                                       &mSpawnLists.mPrefabs };
 
    for (auto list : lists)
    {
@@ -427,17 +435,17 @@ void TitleBar::DrawModule()
    mModuleType = kModuleType_Other;
    mSpawnLists.mPrefabs.Draw();
    mModuleType = type;
-   
+
    float usage = TheSynth->GetAudioDeviceManager().getCpuUsage();
    std::string stats;
-   stats += "fps:" + ofToString(ofGetFrameRate(),0);
-   stats += "  audio cpu:" + ofToString(usage * 100,1);
+   stats += "fps:" + ofToString(ofGetFrameRate(), 0);
+   stats += "  audio cpu:" + ofToString(usage * 100, 1);
    if (usage > 1)
-      ofSetColor(255,150,150);
+      ofSetColor(255, 150, 150);
    else
-      ofSetColor(255,255,255);
-   DrawTextRightJustify(stats, ofGetWidth()/GetOwningContainer()->GetDrawScale() - 5, 33);
-   mDisplayHelpButton->SetPosition(ofGetWidth()/GetOwningContainer()->GetDrawScale() - 20, 4);
+      ofSetColor(255, 255, 255);
+   DrawTextRightJustify(stats, ofGetWidth() / GetOwningContainer()->GetDrawScale() - 5, 33);
+   mDisplayHelpButton->SetPosition(ofGetWidth() / GetOwningContainer()->GetDrawScale() - 20, 4);
    mDisplayHelpButton->Draw();
    mDisplayUserPrefsEditorButton->SetPosition(mDisplayHelpButton->GetPosition(true).x - 55, 4);
    mDisplayUserPrefsEditorButton->Draw();
@@ -470,7 +478,7 @@ void TitleBar::DrawModuleUnclipped()
       float x = 100;
       float y = 40 + titleBarHeight;
       std::string filename = juce::File(TheSynth->GetLastSavePath()).getFileName().toStdString();
-      gFontBold.DrawString("saved "+filename, 50, x, y);
+      gFontBold.DrawString("saved " + filename, 50, x, y);
       ofPopStyle();
    }
 
@@ -548,7 +556,7 @@ void TitleBar::GetModuleDimensions(float& width, float& height)
       height = 0;
       return;
    }
-   
+
    width = ofGetWidth() / GetOwningContainer()->GetDrawScale() + 5;
    if (GetPixelWidth() < kDoubleHeightThreshold)
       height = 36 * 2;
@@ -566,7 +574,7 @@ void TitleBar::DropdownClicked(DropdownList* list)
       mSpawnLists.SetUpVstDropdown();
 
    if (list == mSpawnLists.mPrefabs.GetList())
-       mSpawnLists.SetUpPrefabsDropdown();
+      mSpawnLists.SetUpPrefabsDropdown();
 }
 
 void TitleBar::DropdownUpdated(DropdownList* list, int oldVal)
@@ -574,10 +582,10 @@ void TitleBar::DropdownUpdated(DropdownList* list, int oldVal)
    if (list == mLoadLayoutDropdown)
    {
       std::string layout = mLoadLayoutDropdown->GetLabel(mLoadLayoutIndex);
-      TheSynth->LoadLayoutFromFile(ofToDataPath("layouts/"+layout+".json"));
+      TheSynth->LoadLayoutFromFile(ofToDataPath("layouts/" + layout + ".json"));
       return;
    }
-   
+
    mSpawnLists.mInstrumentModules.OnSelection(list);
    mSpawnLists.mNoteModules.OnSelection(list);
    mSpawnLists.mSynthModules.OnSelection(list);
@@ -635,7 +643,9 @@ void NewPatchConfirmPopup::CreateUIControls()
    IDrawableModule::CreateUIControls();
 
    UIBLOCK(3, 20);
-   BUTTON(mConfirmButton, "confirm"); UIBLOCK_SHIFTRIGHT(); UIBLOCK_SHIFTX(5);
+   BUTTON(mConfirmButton, "confirm");
+   UIBLOCK_SHIFTRIGHT();
+   UIBLOCK_SHIFTX(5);
    BUTTON(mCancelButton, "cancel");
    ENDUIBLOCK(mWidth, mHeight);
 }

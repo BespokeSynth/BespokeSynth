@@ -46,17 +46,17 @@ SampleBrowser::~SampleBrowser()
 void SampleBrowser::CreateUIControls()
 {
    IDrawableModule::CreateUIControls();
-   
+
    UIBLOCK(3, 20);
-   for (int i=0; i<(int)mButtons.size(); ++i)
+   for (int i = 0; i < (int)mButtons.size(); ++i)
    {
-      BUTTON(mButtons[i], ("button"+ofToString(i)).c_str());
+      BUTTON(mButtons[i], ("button" + ofToString(i)).c_str());
    }
    BUTTON(mBackButton, " < ");
    UIBLOCK_SHIFTX(80);
    BUTTON(mForwardButton, " > ");
    ENDUIBLOCK0();
-   
+
    SetDirectory(mCurrentDirectory);
 }
 
@@ -64,33 +64,33 @@ void SampleBrowser::DrawModule()
 {
    if (Minimized() || IsVisible() == false)
       return;
-   
+
    float fontSize = 15;
-   float stringWidth = gFont.GetStringWidth(mCurrentDirectory.toStdString(),fontSize);
+   float stringWidth = gFont.GetStringWidth(mCurrentDirectory.toStdString(), fontSize);
    float moduleWidth, moduleHeight;
    GetModuleDimensions(moduleWidth, moduleHeight);
    float textX = 3;
    if (stringWidth > moduleWidth)
       textX = moduleWidth - 3 - stringWidth;
    gFont.DrawString(mCurrentDirectory.toStdString(), fontSize, textX, 15);
-   
-   for (size_t i=0; i<mButtons.size(); ++i)
+
+   for (size_t i = 0; i < mButtons.size(); ++i)
       mButtons[i]->Draw();
    mBackButton->Draw();
    mForwardButton->Draw();
-   
+
    int numPages = GetNumPages();
    if (numPages > 1)
-      DrawTextNormal(ofToString(mCurrentPage+1)+"/"+ofToString(numPages), 40, mBackButton->GetPosition(true).y+12);
+      DrawTextNormal(ofToString(mCurrentPage + 1) + "/" + ofToString(numPages), 40, mBackButton->GetPosition(true).y + 12);
 }
 
 void SampleBrowser::ButtonClicked(ClickButton* button)
 {
    if (button == mBackButton)
-      ShowPage(mCurrentPage-1);
+      ShowPage(mCurrentPage - 1);
    if (button == mForwardButton)
-      ShowPage(mCurrentPage+1);
-   for (int i=0; i<(int)mButtons.size(); ++i)
+      ShowPage(mCurrentPage + 1);
+   for (int i = 0; i < (int)mButtons.size(); ++i)
    {
       if (button == mButtons[i])
       {
@@ -137,16 +137,19 @@ namespace
 
    void SortDirectoryListing(StringArray& listing)
    {
-      std::sort(listing.begin(), listing.end(), [](const String& a, const String& b) { return CompareDirectoryListing(a, b) < 0; });
+      std::sort(listing.begin(), listing.end(), [](const String& a, const String& b)
+                {
+                   return CompareDirectoryListing(a, b) < 0;
+                });
    }
 }
 
 void SampleBrowser::SetDirectory(String dirPath)
 {
    mCurrentDirectory = dirPath;
-   
+
    mDirectoryListing.clear();
-   
+
    if (dirPath != "")
    {
       String matcher = TheSynth->GetAudioFormatManager().getWildcardForAllFormats();
@@ -189,18 +192,18 @@ void SampleBrowser::SetDirectory(String dirPath)
          mDirectoryListing.add(root.getFullPathName());
    }
    SortDirectoryListing(mDirectoryListing);
-            
+
    ShowPage(0);
 }
 
 void SampleBrowser::ShowPage(int page)
 {
-   page = ofClamp(page, 0, GetNumPages()-1);
+   page = ofClamp(page, 0, GetNumPages() - 1);
    mCurrentPage = page;
    int offset = page * (int)mButtons.size();
-   for (int i=0; i<(int)mButtons.size(); ++i)
+   for (int i = 0; i < (int)mButtons.size(); ++i)
    {
-      if (i+offset < (int)mDirectoryListing.size())
+      if (i + offset < (int)mDirectoryListing.size())
       {
          mButtons[i]->SetShowing(true);
          if (mDirectoryListing[i + offset] == ".." || File(mDirectoryListing[i + offset]).isDirectory())
@@ -211,14 +214,14 @@ void SampleBrowser::ShowPage(int page)
          if (mDirectoryListing[i + offset] == "..")
             mButtons[i]->SetLabel("..");
          else
-            mButtons[i]->SetLabel(File(mDirectoryListing[i+offset]).getFileName().toStdString().c_str());
+            mButtons[i]->SetLabel(File(mDirectoryListing[i + offset]).getFileName().toStdString().c_str());
       }
       else
       {
          mButtons[i]->SetShowing(false);
       }
    }
-   
+
    mBackButton->SetShowing(GetNumPages() > 1 && mCurrentPage > 0);
    mForwardButton->SetShowing(GetNumPages() > 1 && mCurrentPage < GetNumPages() - 1);
 }
@@ -245,22 +248,21 @@ namespace
 void SampleBrowser::SaveState(FileStreamOut& out)
 {
    IDrawableModule::SaveState(out);
-   
+
    out << kSaveStateRev;
-   
+
    out << mCurrentDirectory.toStdString();
 }
 
 void SampleBrowser::LoadState(FileStreamIn& in)
 {
    IDrawableModule::LoadState(in);
-   
+
    int rev;
    in >> rev;
    LoadStateValidate(rev == kSaveStateRev);
-   
+
    std::string currentDirectory;
    in >> currentDirectory;
    SetDirectory(currentDirectory);
 }
-

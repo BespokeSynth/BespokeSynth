@@ -49,17 +49,17 @@ CanvasControls::~CanvasControls()
 void CanvasControls::CreateUIControls()
 {
    IDrawableModule::CreateUIControls();
-   mRemoveElementButton = new ClickButton(this,"delete",5,1);
-   mNumVisibleRowsEntry = new TextEntry(this,"view rows",175,1,3,&mCanvas->mNumVisibleRows,1,9999);
+   mRemoveElementButton = new ClickButton(this, "delete", 5, 1);
+   mNumVisibleRowsEntry = new TextEntry(this, "view rows", 175, 1, 3, &mCanvas->mNumVisibleRows, 1, 9999);
    mClearButton = new ClickButton(this, "clear", 270, 1);
    mDragModeSelector = new DropdownList(this, "drag mode", 310, 1, (int*)(&mCanvas->mDragMode));
-   
+
    mDragModeSelector->AddLabel("drag both", Canvas::kDragBoth);
    mDragModeSelector->AddLabel("horizontal", Canvas::kDragHorizontal);
    mDragModeSelector->AddLabel("vertical", Canvas::kDragVertical);
 
    mNumVisibleRowsEntry->DrawLabel(true);
-   
+
    SetElement(nullptr);
 }
 
@@ -68,7 +68,7 @@ void CanvasControls::SetCanvas(Canvas* canvas)
    mCanvas = canvas;
    mWidth = mCanvas->GetWidth();
    mCanvas->SetControls(this);
-   StringCopy(NameMutable(), (std::string(mCanvas->Name())+"_controls").c_str(), MAX_TEXTENTRY_LENGTH);
+   StringCopy(NameMutable(), (std::string(mCanvas->Name()) + "_controls").c_str(), MAX_TEXTENTRY_LENGTH);
 }
 
 void CanvasControls::SetElement(CanvasElement* element)
@@ -78,16 +78,16 @@ void CanvasControls::SetElement(CanvasElement* element)
       for (auto* control : mSelectedElement->GetUIControls())
          control->SetShowing(false);
    }
-   
+
    mSelectedElement = element;
-   
+
    if (mSelectedElement)
    {
       int idx = 0;
       for (auto* control : mSelectedElement->GetUIControls())
       {
          control->SetShowing(true);
-         control->SetPosition(5+(idx/4)*110, 20+(idx%4)*18);
+         control->SetPosition(5 + (idx / 4) * 110, 20 + (idx % 4) * 18);
          ++idx;
       }
    }
@@ -100,9 +100,9 @@ void CanvasControls::AllowDragModeSelection(bool allow)
 
 void CanvasControls::PreDrawModule()
 {
-   float x,y;
+   float x, y;
    mCanvas->GetPosition(x, y, K(localOnly));
-   SetPosition(x,y+13+mCanvas->GetHeight());
+   SetPosition(x, y + 13 + mCanvas->GetHeight());
 }
 
 void CanvasControls::DrawModule()
@@ -208,4 +208,3 @@ void CanvasControls::LoadLayout(const ofxJSONElement& moduleInfo)
 void CanvasControls::SetUpFromSaveData()
 {
 }
-

@@ -60,6 +60,7 @@ public:
    void UpdateTimeListener();
    void Draw(float x, float y);
    int GetRowPitch() const { return mRowPitch; }
+
 private:
    UIGrid* mGrid;
    int mRow;
@@ -68,7 +69,9 @@ private:
 
    struct PlayedStep
    {
-      PlayedStep() : time(-1) {}
+      PlayedStep()
+      : time(-1)
+      {}
       int step;
       double time;
    };
@@ -86,6 +89,7 @@ public:
    void OnTimeEvent(double time) override;
    void SetInterval(NoteInterval interval);
    void SetOffset(float offset);
+
 private:
    int mRow;
    StepSequencer* mSeq;
@@ -100,6 +104,7 @@ public:
    ~StepSequencerNoteFlusher();
    void SetInterval(NoteInterval interval);
    void OnTimeEvent(double time) override;
+
 private:
    StepSequencer* mSeq;
 };
@@ -110,10 +115,10 @@ public:
    StepSequencer();
    ~StepSequencer();
    static IDrawableModule* Create() { return new StepSequencer(); }
-   
-   
+
+
    void CreateUIControls() override;
-   
+
    void Init() override;
    void Poll() override;
    void PlayStepNote(double time, int note, float val);
@@ -122,11 +127,15 @@ public:
    int GetPadPressure(int row) { return mPadPressures[row]; }
    NoteInterval GetStepInterval() const { return mStepInterval; }
    int GetStepNum(double time);
-   void Flush(double time) { if (mEnabled) mNoteOutput.Flush(time); }
+   void Flush(double time)
+   {
+      if (mEnabled)
+         mNoteOutput.Flush(time);
+   }
    int GetStep(int step, int pitch);
    void SetStep(int step, int pitch, int velocity);
    int GetRowPitch(int row) const { return mRows[row]->GetRowPitch(); }
-   
+
    //INoteReceiver
    void PlayNote(double time, int pitch, int velocity, int voiceIdx = -1, ModulationParameters modulation = ModulationParameters()) override;
    void SendPressure(int pitch, int pressure) override;
@@ -134,14 +143,14 @@ public:
 
    //IPulseReceiver
    void OnPulse(double time, float velocity, int flags) override;
-   
+
    //ITimeListener
    void OnTimeEvent(double time) override;
-   
+
    //IGridControllerListener
    void OnControllerPageSelected() override;
    void OnGridButton(int x, int y, float velocity, IGridController* grid) override;
-   
+
    //IDrawableModule
    bool IsResizable() const override { return true; }
    void Resize(float w, float h) override;
@@ -149,11 +158,11 @@ public:
    //IClickable
    void MouseReleased() override;
    bool MouseMoved(float x, float y) override;
-   
+
    //IPush2GridController
    bool OnPush2Control(MidiMessageType type, int controlIndex, float midiValue) override;
    void UpdatePush2Leds(Push2Control* push2) override;
-   
+
    bool IsMetaStepActive(double time, int col, int row);
 
    //IDrivableSequencer
@@ -173,7 +182,7 @@ public:
    void SetUpFromSaveData() override;
    void SaveState(FileStreamOut& out) override;
    void LoadState(FileStreamIn& in) override;
-   
+
 private:
    //IDrawableModule
    void DrawModule() override;
@@ -181,28 +190,33 @@ private:
    void OnClicked(int x, int y, bool right) override;
    void Exit() override;
    void KeyPressed(int key, bool isRepeat) override;
-   
+
    void UpdateLights(bool force = false);
    void UpdateVelocityLights();
    void UpdateMetaLights();
-   
+
    void DrawRowLabel(const char* label, int row, int x, int y);
    void SetPreset(int preset);
    int GetNumSteps(NoteInterval interval, int numMeasures) const;
    Vec2i ControllerToGrid(const Vec2i& controller);
    int GetNumControllerChunks(); //how many vertical chunks of the sequence are there to fit multi-rowed on the controller?
    int GetMetaStep(double time);
-   int GetMetaStepMaskIndex(int col, int row) { return MIN(col, META_STEP_MAX-1) + row * META_STEP_MAX; }
+   int GetMetaStepMaskIndex(int col, int row) { return MIN(col, META_STEP_MAX - 1) + row * META_STEP_MAX; }
    GridColor GetGridColor(int x, int y);
    void Step(double time, float velocity, int pulseFlags);
    bool HasGridController();
    int GetGridControllerRows();
    int GetGridControllerCols();
    void RandomizeRow(int row);
-   
+
    struct HeldButton
    {
-      HeldButton(int col, int row) { mCol = col; mRow = row; mTime = gTime; }
+      HeldButton(int col, int row)
+      {
+         mCol = col;
+         mRow = row;
+         mTime = gTime;
+      }
       int mCol;
       int mRow;
       double mTime;
@@ -213,7 +227,7 @@ private:
       PlayStepIndex,
       RepeatHeld
    };
-   
+
    UIGrid* mGrid;
    float mStrength;
    FloatSlider* mStrengthSlider;
@@ -228,7 +242,7 @@ private:
    std::array<float, NUM_STEPSEQ_ROWS> mOffsets;
    std::array<FloatSlider*, NUM_STEPSEQ_ROWS> mOffsetSlider;
    std::array<ClickButton*, NUM_STEPSEQ_ROWS> mRandomizeRowButton;
-   std::map<int,int> mPadPressures;
+   std::map<int, int> mPadPressures;
    NoteInterval mRepeatRate;
    DropdownList* mRepeatRateDropdown;
    std::array<NoteRepeat*, NUM_STEPSEQ_ROWS> mNoteRepeats;
@@ -262,4 +276,3 @@ private:
 
 
 #endif /* defined(__modularSynth__StepSequencer__) */
-

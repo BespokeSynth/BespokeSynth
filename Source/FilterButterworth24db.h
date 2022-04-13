@@ -36,7 +36,7 @@ public:
    void CopyCoeffFrom(CFilterButterworth24db& other);
    float Run(float input);
    void Clear();
-   
+
 private:
    float t0, t1, t2, t3;
    float coef0, coef1, coef2, coef3;

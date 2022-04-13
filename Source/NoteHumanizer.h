@@ -42,28 +42,32 @@ public:
    NoteHumanizer();
    ~NoteHumanizer();
    static IDrawableModule* Create() { return new NoteHumanizer(); }
-   
-   
+
+
    void CreateUIControls() override;
-   
+
    void SetEnabled(bool enabled) override { mEnabled = enabled; }
-   
+
    //INoteReceiver
    void PlayNote(double time, int pitch, int velocity, int voiceIdx = -1, ModulationParameters modulation = ModulationParameters()) override;
-   
+
    void CheckboxUpdated(Checkbox* checkbox) override;
    void FloatSliderUpdated(FloatSlider* slider, float oldVal) override;
-   
+
    virtual void LoadLayout(const ofxJSONElement& moduleInfo) override;
    virtual void SetUpFromSaveData() override;
-   
-   
-private:   
+
+
+private:
    //IDrawableModule
    void DrawModule() override;
-   void GetModuleDimensions(float& width, float& height) override { width = 108; height = 40; }
+   void GetModuleDimensions(float& width, float& height) override
+   {
+      width = 108;
+      height = 40;
+   }
    bool Enabled() const override { return mEnabled; }
-   
+
    float mTime;
    FloatSlider* mTimeSlider;
    float mVelocity;
@@ -73,4 +77,4 @@ private:
 };
 
 
-#endif  // NOTEHUMANIZER_H_INCLUDED
+#endif // NOTEHUMANIZER_H_INCLUDED

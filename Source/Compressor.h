@@ -46,79 +46,76 @@ static const double DC_OFFSET = 1.0E-25;
 //-------------------------------------------------------------
 class EnvelopeDetector
 {
-	public:
-		EnvelopeDetector(
-                       double ms = 1.0
-                       );
-		virtual ~EnvelopeDetector() {}
+public:
+   EnvelopeDetector(
+   double ms = 1.0);
+   virtual ~EnvelopeDetector() {}
 
-		// time constant
-		virtual void   setTc( double ms );
-		virtual double getTc( void ) const { return ms_; }
+   // time constant
+   virtual void setTc(double ms);
+   virtual double getTc(void) const { return ms_; }
 
-		// runtime function
-		void run( double in, double &state ) {
-			state = in + coef_ * ( state - in );
-		}
+   // runtime function
+   void run(double in, double& state)
+   {
+      state = in + coef_ * (state - in);
+   }
 
-	protected:
+protected:
+   double ms_; // time constant in ms
+   double coef_; // runtime coefficient
+   virtual void setCoef(void); // coef calculation
 
-		double ms_;				// time constant in ms
-		double coef_;			// runtime coefficient
-		virtual void setCoef( void );	// coef calculation
+}; // end SimpleComp class
 
-	};	// end SimpleComp class
+//-------------------------------------------------------------
+// attack/release envelope
+//-------------------------------------------------------------
+class AttRelEnvelope
+{
+public:
+   AttRelEnvelope(
+   double att_ms = 10.0, double rel_ms = 100.0);
+   virtual ~AttRelEnvelope() {}
 
-	//-------------------------------------------------------------
-	// attack/release envelope
-	//-------------------------------------------------------------
-	class AttRelEnvelope
-	{
-	public:
-		AttRelEnvelope(
-                     double att_ms = 10.0
-                     , double rel_ms = 100.0
-                     );
-		virtual ~AttRelEnvelope() {}
+   // attack time constant
+   virtual void setAttack(double ms);
+   virtual double getAttack(void) const { return att_.getTc(); }
 
-		// attack time constant
-		virtual void   setAttack( double ms );
-		virtual double getAttack( void ) const { return att_.getTc(); }
+   // release time constant
+   virtual void setRelease(double ms);
+   virtual double getRelease(void) const { return rel_.getTc(); }
 
-		// release time constant
-		virtual void   setRelease( double ms );
-		virtual double getRelease( void ) const { return rel_.getTc(); }
+   // runtime function
+   void run(double in, double& state)
+   {
 
-		// runtime function
-		void run( double in, double &state ) {
-
-			/* assumes that:
+      /* assumes that:
           * positive delta = attack
           * negative delta = release
           * good for linear & log values
           */
 
-			if ( in > state )
-				att_.run( in, state );	// attack
-			else
-				rel_.run( in, state );	// release
-		}
-      
-	private:
-      
-		EnvelopeDetector att_;
-		EnvelopeDetector rel_;
-		
-};	// end AttRelEnvelope class
+      if (in > state)
+         att_.run(in, state); // attack
+      else
+         rel_.run(in, state); // release
+   }
+
+private:
+   EnvelopeDetector att_;
+   EnvelopeDetector rel_;
+
+}; // end AttRelEnvelope class
 
 class Compressor : public IAudioEffect, public IFloatSliderListener
 {
 public:
    Compressor();
-   
+
    static IAudioEffect* Create() { return new Compressor(); }
-   
-   
+
+
    void CreateUIControls() override;
 
    //IAudioEffect
@@ -132,7 +129,11 @@ public:
 private:
    //IDrawableModule
    void DrawModule() override;
-   void GetModuleDimensions(float& width, float& height) override { width=mWidth; height=mHeight; }
+   void GetModuleDimensions(float& width, float& height) override
+   {
+      width = mWidth;
+      height = mHeight;
+   }
    bool Enabled() const override { return mEnabled; }
 
    float mMix;
@@ -151,19 +152,18 @@ private:
    FloatSlider* mReleaseSlider;
    FloatSlider* mLookaheadSlider;
    FloatSlider* mOutputAdjustSlider;
-   
+
    double mCurrentInputDb;
    double mOutputGain;
    float mWidth;
    float mHeight;
 
    // runtime variables
-   double envdB_;			// over-threshold envelope (dB)
+   double envdB_; // over-threshold envelope (dB)
 
    AttRelEnvelope mEnv;
-   
+
    RollingBuffer mDelayBuffer;
 };
 
 #endif /* defined(__modularSynth__Compressor__) */
-

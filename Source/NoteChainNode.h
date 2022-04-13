@@ -41,38 +41,42 @@ public:
    NoteChainNode();
    virtual ~NoteChainNode();
    static IDrawableModule* Create() { return new NoteChainNode(); }
-   
-   
+
+
    void CreateUIControls() override;
    void Init() override;
-   
+
    void SetEnabled(bool enabled) override { mEnabled = enabled; }
-   
+
    //IPulseReceiver
    void OnPulse(double time, float velocity, int flags) override;
-   
+
    void OnTimeEvent(double time) override;
    void OnTransportAdvanced(float amount) override;
-   
+
    void PostRepatch(PatchCableSource* cableSource, bool fromUserClick) override;
-   
+
    void CheckboxUpdated(Checkbox* checkbox) override;
    void ButtonClicked(ClickButton* button) override;
    void TextEntryComplete(TextEntry* entry) override;
    void FloatSliderUpdated(FloatSlider* slider, float oldVal) override {}
    void DropdownUpdated(DropdownList* list, int oldVal) override {}
-   
+
    void LoadLayout(const ofxJSONElement& moduleInfo) override;
    void SetUpFromSaveData() override;
-   
+
 private:
    //IDrawableModule
    void DrawModule() override;
    bool Enabled() const override { return mEnabled; }
-   void GetModuleDimensions(float& w, float& h) override { w=110; h=76; }
-   
+   void GetModuleDimensions(float& w, float& h) override
+   {
+      w = 110;
+      h = 76;
+   }
+
    void TriggerNote(double time);
-   
+
    ClickButton* mTriggerButton;
    TextEntry* mPitchEntry;
    FloatSlider* mVelocitySlider;

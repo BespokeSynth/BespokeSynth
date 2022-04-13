@@ -88,36 +88,37 @@ class MidiDevice : public juce::MidiInputCallback
 public:
    MidiDevice(MidiDeviceListener* listener);
    virtual ~MidiDevice();
-   
+
    bool ConnectInput(const char* name);
    void ConnectInput(int index);
    bool ConnectOutput(const char* name, int channel = 1);
-   void ConnectOutput(int index, int channel = 1);
+   bool ConnectOutput(int index, int channel = 1);
    void DisconnectInput();
    void DisconnectOutput();
    bool Reconnect();
    bool IsInputConnected(bool immediate);
 
    const char* Name() { return mIsInputEnabled ? mDeviceNameIn.toRawUTF8() : mDeviceNameOut.toRawUTF8(); }
-   
+
    std::vector<std::string> GetPortList(bool forInput);
-   
+
    void SendNote(double time, int pitch, int velocity, bool forceNoteOn, int channel);
    void SendCC(int ctl, int value, int channel = -1);
    void SendAftertouch(int pressure, int channel = -1);
    void SendProgramChange(int program, int channel = -1);
    void SendPitchBend(int bend, int channel = -1);
+   void SendSysEx(std::string data);
    void SendData(unsigned char a, unsigned char b, unsigned char c);
    void SendMessage(double time, juce::MidiMessage message);
-   
+
    static void SendMidiMessage(MidiDeviceListener* listener, const char* deviceName, const juce::MidiMessage& message);
-   
+
 private:
    void handleIncomingMidiMessage(juce::MidiInput* source, const juce::MidiMessage& message) override;
-   
+
    juce::String mDeviceNameIn;
    juce::String mDeviceNameOut;
-   
+
    std::unique_ptr<juce::MidiOutput> mMidiOut;
    MidiDeviceListener* mListener;
    int mOutputChannel;

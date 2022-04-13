@@ -45,8 +45,8 @@ public:
    KarplusStrong();
    ~KarplusStrong();
    static IDrawableModule* Create() { return new KarplusStrong(); }
-   
-   
+
+
    void CreateUIControls() override;
 
    //IAudioSource
@@ -62,15 +62,19 @@ public:
    void CheckboxUpdated(Checkbox* checkbox) override;
 
    bool HasDebugDraw() const override { return true; }
-   
+
    virtual void LoadLayout(const ofxJSONElement& moduleInfo) override;
    virtual void SetUpFromSaveData() override;
-   
+
 private:
    //IDrawableModule
    void DrawModule() override;
    void DrawModuleUnclipped() override;
-   void GetModuleDimensions(float& width, float& height) override { width = 275; height = 126; }
+   void GetModuleDimensions(float& width, float& height) override
+   {
+      width = 275;
+      height = 126;
+   }
    bool Enabled() const override { return mEnabled; }
 
    PolyphonyMgr mPolyMgr;
@@ -84,7 +88,7 @@ private:
    Checkbox* mInvertCheckbox;
    BiquadFilterEffect mBiquad;
    BiquadFilter mDCRemover[ChannelBuffer::kMaxNumChannels];
-   
+
    Checkbox* mStretchCheckbox;
    FloatSlider* mExciterFreqSlider;
    FloatSlider* mExciterAttackSlider;
@@ -99,4 +103,3 @@ private:
 
 
 #endif /* defined(__modularSynth__KarplusStrong__) */
-

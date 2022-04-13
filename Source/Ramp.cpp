@@ -66,7 +66,7 @@ float Ramp::Value(double time) const
       return rampData->mStartValue;
    if (time >= rampData->mEndTime)
       return rampData->mEndValue;
-   
+
    double blend = (time - rampData->mStartTime) / (rampData->mEndTime - rampData->mStartTime);
    float retVal = rampData->mStartValue + blend * (rampData->mEndValue - rampData->mStartValue);
    if (fabsf(retVal) < FLT_EPSILON)

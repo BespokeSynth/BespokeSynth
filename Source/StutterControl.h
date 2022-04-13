@@ -42,28 +42,28 @@ public:
    StutterControl();
    ~StutterControl();
    static IDrawableModule* Create() { return new StutterControl(); }
-   
-   
+
+
    void CreateUIControls() override;
    void Init() override;
-   
+
    //IAudioSource
    void Process(double time) override;
-   
+
    //IGridControllerListener
    void OnControllerPageSelected() override;
    void OnGridButton(int x, int y, float velocity, IGridController* grid) override;
-   
+
    //INoteReceiver
    void PlayNote(double time, int pitch, int velocity, int voiceIdx, ModulationParameters modulation) override;
    void SendCC(int control, int value, int voiceIdx) override {}
-   
+
    void CheckboxUpdated(Checkbox* checkbox) override;
    void FloatSliderUpdated(FloatSlider* slider, float oldVal) override;
-   
+
    virtual void LoadLayout(const ofxJSONElement& moduleInfo) override;
    virtual void SetUpFromSaveData() override;
-   
+
 private:
    enum StutterType
    {
@@ -85,17 +85,17 @@ private:
       kFree,
       kNumStutterTypes
    };
-   
+
    StutterType GetStutterFromKey(int key);
    void SendStutter(double time, StutterParams stutter, bool on);
    StutterParams GetStutter(StutterType type);
-   
+
    //IDrawableModule
    void DrawModule() override;
    bool Enabled() const override { return true; }
    void GetModuleDimensions(float& width, float& height) override;
    void UpdateGridLights();
-   
+
    Stutter mStutterProcessor;
    Checkbox* mStutterCheckboxes[kNumStutterTypes];
    bool mStutter[kNumStutterTypes];

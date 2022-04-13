@@ -86,15 +86,15 @@ namespace
 void LooperRecorder::CreateUIControls()
 {
    IDrawableModule::CreateUIControls();
-   
-   mCommit1BarButton = new ClickButton(this, "1", 3 + kBufferSegmentWidth*3, 3);
+
+   mCommit1BarButton = new ClickButton(this, "1", 3 + kBufferSegmentWidth * 3, 3);
    mCommit2BarsButton = new ClickButton(this, "2", 3 + kBufferSegmentWidth * 2, 3);
    mCommit4BarsButton = new ClickButton(this, "4", 3 + kBufferSegmentWidth, 3);
    mCommit8BarsButton = new ClickButton(this, "8", 3, 3);
 
    float width, height;
 
-   UIBLOCK(kBufferSegmentWidth*4 + 6, 3, 60);
+   UIBLOCK(kBufferSegmentWidth * 4 + 6, 3, 60);
    DROPDOWN(mNumBarsSelector, "length", &mNumBars, 50);
    BUTTON(mDoubleTempoButton, "2xtempo");
    BUTTON(mHalfTempoButton, ".5tempo");
@@ -114,7 +114,7 @@ void LooperRecorder::CreateUIControls()
    mWidth = MAX(mWidth, width);
    mHeight = MAX(mHeight, height);
 
-   UIBLOCK(3, kBufferHeight+6);
+   UIBLOCK(3, kBufferHeight + 6);
    BUTTON(mOrigSpeedButton, "orig speed");
    BUTTON(mSnapPitchButton, "snap to pitch");
    BUTTON(mResampleButton, "resample");
@@ -122,29 +122,29 @@ void LooperRecorder::CreateUIControls()
    ENDUIBLOCK(width, height);
 
    mWidth = MAX(mWidth, width);
-   mHeight = MAX(mHeight, height);   
-   
-   mNumBarsSelector->AddLabel(" 1 ",1);
-   mNumBarsSelector->AddLabel(" 2 ",2);
-   mNumBarsSelector->AddLabel(" 3 ",3);
-   mNumBarsSelector->AddLabel(" 4 ",4);
-   mNumBarsSelector->AddLabel(" 6 ",6);
-   mNumBarsSelector->AddLabel(" 8 ",8);
-   mNumBarsSelector->AddLabel("12 ",12);
-   
+   mHeight = MAX(mHeight, height);
+
+   mNumBarsSelector->AddLabel(" 1 ", 1);
+   mNumBarsSelector->AddLabel(" 2 ", 2);
+   mNumBarsSelector->AddLabel(" 3 ", 3);
+   mNumBarsSelector->AddLabel(" 4 ", 4);
+   mNumBarsSelector->AddLabel(" 6 ", 6);
+   mNumBarsSelector->AddLabel(" 8 ", 8);
+   mNumBarsSelector->AddLabel("12 ", 12);
+
    mModeSelector->AddLabel("record", kRecorderMode_Record);
    mModeSelector->AddLabel("overdub", kRecorderMode_Overdub);
    mModeSelector->AddLabel("loop", kRecorderMode_Loop);
 
    mCommit1BarButton->SetDisplayText(false);
-   mCommit1BarButton->SetDimensions(kBufferSegmentWidth,kBufferHeight);
+   mCommit1BarButton->SetDimensions(kBufferSegmentWidth, kBufferHeight);
    mCommit2BarsButton->SetDisplayText(false);
-   mCommit2BarsButton->SetDimensions(kBufferSegmentWidth*2, kBufferHeight);
+   mCommit2BarsButton->SetDimensions(kBufferSegmentWidth * 2, kBufferHeight);
    mCommit4BarsButton->SetDisplayText(false);
-   mCommit4BarsButton->SetDimensions(kBufferSegmentWidth*3, kBufferHeight);
+   mCommit4BarsButton->SetDimensions(kBufferSegmentWidth * 3, kBufferHeight);
    mCommit8BarsButton->SetDisplayText(false);
-   mCommit8BarsButton->SetDimensions(kBufferSegmentWidth*4, kBufferHeight);
-   
+   mCommit8BarsButton->SetDimensions(kBufferSegmentWidth * 4, kBufferHeight);
+
    SyncCablesToLoopers();
 }
 
@@ -171,7 +171,7 @@ void LooperRecorder::Process(double time)
    SyncBuffers();
    mWriteBuffer.SetNumActiveChannels(GetBuffer()->NumActiveChannels());
    mRecordBuffer.SetNumChannels(GetBuffer()->NumActiveChannels());
-   
+
    int bufferSize = GetBuffer()->BufferSize();
 
    if (mCommitToLooper)
@@ -179,30 +179,30 @@ void LooperRecorder::Process(double time)
       SyncLoopLengths();
       mCommitToLooper->SetNumBars(mNumBars);
       mCommitToLooper->Commit();
-      
+
       mRecorderMode = kRecorderMode_Record;
-      mQuietInputRamp.Start(gTime, 0, gTime+10);
+      mQuietInputRamp.Start(gTime, 0, gTime + 10);
       mUnquietInputTime = gTime + 1000; //no input for 1 second
       mCommitToLooper = nullptr;
    }
-   
+
    if (mUnquietInputTime != -1 && time >= mUnquietInputTime)
    {
-      mQuietInputRamp.Start(time, 1, time+10);
+      mQuietInputRamp.Start(time, 1, time + 10);
       mUnquietInputTime = -1;
    }
-   
+
    UpdateSpeed();
-   
+
    bool acceptInput = (mRecorderMode == kRecorderMode_Record || mRecorderMode == kRecorderMode_Overdub);
    bool loop = (mRecorderMode == kRecorderMode_Loop || mRecorderMode == kRecorderMode_Overdub);
 
-   
-   for (int i=0; i<bufferSize; ++i)
+
+   for (int i = 0; i < bufferSize; ++i)
    {
       if (acceptInput)
       {
-         for (int ch=0; ch<GetBuffer()->NumActiveChannels(); ++ch)
+         for (int ch = 0; ch < GetBuffer()->NumActiveChannels(); ++ch)
          {
             GetBuffer()->GetChannel(ch)[i] *= mQuietInputRamp.Value(time);
             mWriteBuffer.GetChannel(ch)[i] = GetBuffer()->GetChannel(ch)[i];
@@ -211,7 +211,7 @@ void LooperRecorder::Process(double time)
       }
       else
       {
-         for (int ch=0; ch<GetBuffer()->NumActiveChannels(); ++ch)
+         for (int ch = 0; ch < GetBuffer()->NumActiveChannels(); ++ch)
             mWriteBuffer.GetChannel(ch)[i] = 0;
       }
    }
@@ -219,10 +219,10 @@ void LooperRecorder::Process(double time)
    if (loop)
    {
       int delaySamps = TheTransport->GetDuration(kInterval_1n) * NumBars() / gInvSampleRateMs;
-      delaySamps = MIN(delaySamps, MAX_BUFFER_SIZE-1);
-      for (int i=0; i<bufferSize; ++i)
+      delaySamps = MIN(delaySamps, MAX_BUFFER_SIZE - 1);
+      for (int i = 0; i < bufferSize; ++i)
       {
-         for (int ch=0; ch<GetBuffer()->NumActiveChannels(); ++ch)
+         for (int ch = 0; ch < GetBuffer()->NumActiveChannels(); ++ch)
          {
             float sample = mRecordBuffer.GetSample(delaySamps - i, ch);
             mWriteBuffer.GetChannel(ch)[i] += sample;
@@ -230,16 +230,16 @@ void LooperRecorder::Process(double time)
          }
       }
    }
-   
-   for (int ch=0; ch<GetBuffer()->NumActiveChannels(); ++ch)
+
+   for (int ch = 0; ch < GetBuffer()->NumActiveChannels(); ++ch)
    {
       mRecordBuffer.WriteChunk(mWriteBuffer.GetChannel(ch), bufferSize, ch);
-   
+
       Add(target->GetBuffer()->GetChannel(ch), GetBuffer()->GetChannel(ch), bufferSize);
-   
-      GetVizBuffer()->WriteChunk(GetBuffer()->GetChannel(ch),bufferSize, ch);
+
+      GetVizBuffer()->WriteChunk(GetBuffer()->GetChannel(ch), bufferSize, ch);
    }
-   
+
    GetBuffer()->Reset();
 }
 
@@ -255,22 +255,22 @@ void LooperRecorder::DrawCircleHash(ofVec2f center, float progress, float width,
 void LooperRecorder::SyncCablesToLoopers()
 {
    int numLoopers = MAX(4, (int)mLoopers.size());
-   
-   if (!mLoopers.empty() && mLoopers[mLoopers.size()-1] != nullptr)
+
+   if (!mLoopers.empty() && mLoopers[mLoopers.size() - 1] != nullptr)
       ++numLoopers; //add an extra cable for an additional looper
-   
+
    if (numLoopers == mLooperPatchCables.size())
-      return;  //nothing to do
-   
+      return; //nothing to do
+
    if (numLoopers > mLooperPatchCables.size())
    {
       int oldSize = (int)mLooperPatchCables.size();
       mLooperPatchCables.resize(numLoopers);
-      for (int i=0; i<oldSize; ++i)
+      for (int i = 0; i < oldSize; ++i)
       {
          mLooperPatchCables[i]->SetTarget(mLoopers[i]);
       }
-      for (int i=oldSize; i<mLooperPatchCables.size(); ++i)
+      for (int i = oldSize; i < mLooperPatchCables.size(); ++i)
       {
          mLooperPatchCables[i] = new PatchCableSource(this, kConnectionType_Special);
          mLooperPatchCables[i]->AddTypeFilter("looper");
@@ -278,7 +278,7 @@ void LooperRecorder::SyncCablesToLoopers()
          if (i < mLoopers.size())
             looper = mLoopers[i];
          mLooperPatchCables[i]->SetTarget(looper);
-         mLooperPatchCables[i]->SetManualPosition(160+i*12, 117);
+         mLooperPatchCables[i]->SetManualPosition(160 + i * 12, 117);
          mLooperPatchCables[i]->SetOverrideCableDir(ofVec2f(0, 1));
          ofColor color = mLooperPatchCables[i]->GetColor();
          color.a *= .3f;
@@ -288,7 +288,7 @@ void LooperRecorder::SyncCablesToLoopers()
    }
    else
    {
-      for (int i=numLoopers; i<mLooperPatchCables.size(); ++i)
+      for (int i = numLoopers; i < mLooperPatchCables.size(); ++i)
          RemovePatchCableSource(mLooperPatchCables[i]);
       mLooperPatchCables.resize(numLoopers);
    }
@@ -296,7 +296,7 @@ void LooperRecorder::SyncCablesToLoopers()
 
 void LooperRecorder::PreRepatch(PatchCableSource* cableSource)
 {
-   for (int i=0; i<mLooperPatchCables.size(); ++i)
+   for (int i = 0; i < mLooperPatchCables.size(); ++i)
    {
       if (cableSource == mLooperPatchCables[i])
       {
@@ -313,7 +313,7 @@ void LooperRecorder::PostRepatch(PatchCableSource* cableSource, bool fromUserCli
 {
    mLoopers.resize(mLooperPatchCables.size());
    int maxLooperIndex = 0;
-   for (int i=0; i< mLoopers.size(); ++i)
+   for (int i = 0; i < mLoopers.size(); ++i)
    {
       if (cableSource == mLooperPatchCables[i])
       {
@@ -328,7 +328,7 @@ void LooperRecorder::PostRepatch(PatchCableSource* cableSource, bool fromUserCli
 
    if (maxLooperIndex > 0)
       mNextCommitTargetSlider->SetExtents(0, maxLooperIndex);
-   
+
    SyncCablesToLoopers();
 }
 
@@ -359,16 +359,16 @@ void LooperRecorder::DrawModule()
       float rootPitch = AdjustedRootForSpeed();
       int pitch = int(rootPitch + .5f);
       int cents = (rootPitch - pitch) * 100;
-      
-      std::string speed = "speed "+ofToString(mSpeed,2)+", ";
-      
+
+      std::string speed = "speed " + ofToString(mSpeed, 2) + ", ";
+
       std::string detune = NoteName(pitch);
       if (cents > 0)
          detune += " +" + ofToString(cents) + " cents";
       if (cents < 0)
          detune += " -" + ofToString(-cents) + " cents";
-      
-      DrawTextNormal(speed + detune,100,80);
+
+      DrawTextNormal(speed + detune, 100, 80);
    }
 
    if (mCommit1BarButton == gHoveredUIControl)
@@ -382,7 +382,7 @@ void LooperRecorder::DrawModule()
 
    ofPushStyle();
    int sampsPerBar = abs(int(TheTransport->MsPerBar() / 1000 * gSampleRate));
-   for (int i = 0; i < 4; ++i)   //segments
+   for (int i = 0; i < 4; ++i) //segments
    {
       int bars = 1;
       int barOffset = 0;
@@ -400,7 +400,7 @@ void LooperRecorder::DrawModule()
          bars = 4;
          barOffset = 4;
       }
-      mRecordBuffer.Draw(3+(3-i)*kBufferSegmentWidth, 3, kBufferSegmentWidth, kBufferHeight, sampsPerBar*bars, -1, sampsPerBar*barOffset);
+      mRecordBuffer.Draw(3 + (3 - i) * kBufferSegmentWidth, 3, kBufferSegmentWidth, kBufferHeight, sampsPerBar * bars, -1, sampsPerBar * barOffset);
    }
 
    ofSetColor(0, 0, 0, 20);
@@ -420,16 +420,16 @@ void LooperRecorder::DrawModule()
    for (int i=0; i<mNumBars; ++i)
       DrawCircleHash(center, float(i)/mNumBars, 1, radius * .8f, radius);
    ofPopStyle();*/
-   
+
    if (mDrawDebug)
-      mRecordBuffer.Draw(0,162,800,100);
-   
-   DrawTextNormal("loopers:",155,109);
+      mRecordBuffer.Draw(0, 162, 800, 100);
+
+   DrawTextNormal("loopers:", 155, 109);
 }
 
 void LooperRecorder::RemoveLooper(Looper* looper)
 {
-   for (int i=0; i<mLoopers.size(); ++i)
+   for (int i = 0; i < mLoopers.size(); ++i)
    {
       if (mLoopers[i] == looper)
          mLoopers[i] = nullptr;
@@ -438,7 +438,7 @@ void LooperRecorder::RemoveLooper(Looper* looper)
 
 float LooperRecorder::AdjustedRootForSpeed()
 {
-   float rootFreq = TheScale->PitchToFreq(TheScale->ScaleRoot()+24);
+   float rootFreq = TheScale->PitchToFreq(TheScale->ScaleRoot() + 24);
    rootFreq *= mSpeed;
    return TheScale->FreqToPitch(rootFreq);
 }
@@ -451,7 +451,7 @@ void LooperRecorder::SnapToClosestPitch()
    float currentFreq = TheScale->PitchToFreq(currentPitch);
    float desiredFreq = TheScale->PitchToFreq(desiredPitch);
 
-   TheTransport->SetTempo(TheTransport->GetTempo() * desiredFreq/currentFreq);
+   TheTransport->SetTempo(TheTransport->GetTempo() * desiredFreq / currentFreq);
 }
 
 void LooperRecorder::KeyPressed(int key, bool isRepeat)
@@ -468,13 +468,13 @@ void LooperRecorder::KeyPressed(int key, bool isRepeat)
       if (key >= '5' && key <= '8')
       {
          int idx = key - '5';
-         SetNumBars(powf(2,idx));
+         SetNumBars(powf(2, idx));
       }
    }
 
-   if (key == 'k')   //resample and set key
+   if (key == 'k') //resample and set key
       Resample(true);
-   if (key == 'l')   //resample (without setting key)
+   if (key == 'l') //resample (without setting key)
       Resample(false);
 }
 
@@ -483,9 +483,9 @@ void LooperRecorder::Resample(bool setKey)
    if (setKey)
    {
       SnapToClosestPitch();
-      TheScale->SetRoot(int(AdjustedRootForSpeed()+.5f));
+      TheScale->SetRoot(int(AdjustedRootForSpeed() + .5f));
    }
-   
+
    SyncLoopLengths();
 }
 
@@ -502,10 +502,10 @@ void LooperRecorder::UpdateSpeed()
 
 void LooperRecorder::SyncLoopLengths()
 {
-   if (mSpeed <= 0)  //avoid crashing
+   if (mSpeed <= 0) //avoid crashing
       return;
 
-   for (int i=0; i<mLoopers.size(); ++i)
+   for (int i = 0; i < mLoopers.size(); ++i)
    {
       if (mLoopers[i])
       {
@@ -540,7 +540,7 @@ void LooperRecorder::RequestMerge(Looper* looper)
    }
 }
 
-void LooperRecorder::RequestSwap(Looper *looper)
+void LooperRecorder::RequestSwap(Looper* looper)
 {
    if (mSwapSource == nullptr)
    {
@@ -557,7 +557,7 @@ void LooperRecorder::RequestSwap(Looper *looper)
    }
 }
 
-void LooperRecorder::RequestCopy(Looper *looper)
+void LooperRecorder::RequestCopy(Looper* looper)
 {
    if (mCopySource == nullptr)
    {
@@ -583,7 +583,7 @@ void LooperRecorder::StartFreeRecord()
 {
    if (mFreeRecording)
       return;
-   
+
    mFreeRecording = true;
    mStartFreeRecordTime = gTime;
 }
@@ -592,11 +592,11 @@ void LooperRecorder::EndFreeRecord()
 {
    if (!mFreeRecording)
       return;
-   
+
    float recordedTime = gTime - mStartFreeRecordTime;
    int beats = mNumBars * TheTransport->GetTimeSigTop();
    float minutes = recordedTime / 1000.0f / 60.0f;
-   TheTransport->SetTempo(beats/minutes);
+   TheTransport->SetTempo(beats / minutes);
    TheTransport->SetDownbeat();
    mRecorderMode = kRecorderMode_Loop;
    mFreeRecording = false;
@@ -616,20 +616,20 @@ void LooperRecorder::ButtonClicked(ClickButton* button)
    if (button == mResampAndSetButton)
    {
       SnapToClosestPitch();
-      TheScale->SetRoot(int(AdjustedRootForSpeed()+.5f));
+      TheScale->SetRoot(int(AdjustedRootForSpeed() + .5f));
       SyncLoopLengths();
    }
 
    if (button == mDoubleTempoButton)
    {
-      for (int i=0; i<mLoopers.size(); ++i)
+      for (int i = 0; i < mLoopers.size(); ++i)
       {
          if (mLoopers[i])
             mLoopers[i]->DoubleNumBars();
       }
-      TheTransport->SetTempo(TheTransport->GetTempo()*2);
+      TheTransport->SetTempo(TheTransport->GetTempo() * 2);
       mBaseTempo = TheTransport->GetTempo();
-      float pos = TheTransport->GetMeasurePos(gTime) + (TheTransport->GetMeasure(gTime)%8);
+      float pos = TheTransport->GetMeasurePos(gTime) + (TheTransport->GetMeasure(gTime) % 8);
       int count = TheTransport->GetMeasure(gTime) - int(pos);
       pos *= 2;
       count += int(pos);
@@ -644,14 +644,14 @@ void LooperRecorder::ButtonClicked(ClickButton* button)
 
    if (button == mHalfTempoButton)
    {
-      for (int i=0; i<mLoopers.size(); ++i)
+      for (int i = 0; i < mLoopers.size(); ++i)
       {
          if (mLoopers[i])
             mLoopers[i]->HalveNumBars();
       }
-      TheTransport->SetTempo(TheTransport->GetTempo()/2);
+      TheTransport->SetTempo(TheTransport->GetTempo() / 2);
       mBaseTempo = TheTransport->GetTempo();
-      float pos = TheTransport->GetMeasurePos(gTime) + (TheTransport->GetMeasure(gTime)%8);
+      float pos = TheTransport->GetMeasurePos(gTime) + (TheTransport->GetMeasure(gTime) % 8);
       int count = TheTransport->GetMeasure(gTime) - int(pos);
       pos /= 2;
       count += int(pos);
@@ -666,12 +666,12 @@ void LooperRecorder::ButtonClicked(ClickButton* button)
 
    if (button == mShiftMeasureButton)
    {
-      for (int i=0; i<mLoopers.size(); ++i)
+      for (int i = 0; i < mLoopers.size(); ++i)
       {
          if (mLoopers[i])
             mLoopers[i]->ShiftMeasure();
       }
-      int newMeasure = TheTransport->GetMeasure(gTime)-1;
+      int newMeasure = TheTransport->GetMeasure(gTime) - 1;
       if (newMeasure < 0)
          newMeasure = 7;
       TheTransport->SetMeasure(newMeasure);
@@ -679,24 +679,24 @@ void LooperRecorder::ButtonClicked(ClickButton* button)
 
    if (button == mHalfShiftButton)
    {
-      for (int i=0; i<mLoopers.size(); ++i)
+      for (int i = 0; i < mLoopers.size(); ++i)
       {
          if (mLoopers[i])
             mLoopers[i]->HalfShift();
       }
-      int newMeasure = int(TheTransport->GetMeasure(gTime)+TheTransport->GetMeasurePos(gTime)-.5f);
+      int newMeasure = int(TheTransport->GetMeasure(gTime) + TheTransport->GetMeasurePos(gTime) - .5f);
       if (newMeasure < 0)
          newMeasure = 7;
       float newMeasurePos = TheTransport->GetMeasurePos(gTime) - .5f;
-      FloatWrap(newMeasurePos,1);
+      FloatWrap(newMeasurePos, 1);
       TheTransport->SetMeasureTime(newMeasure + newMeasurePos);
    }
 
    if (button == mShiftDownbeatButton)
    {
-      TheTransport->SetMeasure(TheTransport->GetMeasure(gTime)/8 * 8);   //align to 8 bars
+      TheTransport->SetMeasure(TheTransport->GetMeasure(gTime) / 8 * 8); //align to 8 bars
       TheTransport->SetDownbeat();
-      for (int i=0; i<mLoopers.size(); ++i)
+      for (int i = 0; i < mLoopers.size(); ++i)
       {
          if (mLoopers[i])
             mLoopers[i]->ShiftDownbeat();
@@ -715,7 +715,7 @@ void LooperRecorder::ButtonClicked(ClickButton* button)
 
    if (button == mSnapPitchButton)
       SnapToClosestPitch();
-   
+
    if (button == mCancelFreeRecordButton)
       CancelFreeRecord();
 
@@ -725,15 +725,19 @@ void LooperRecorder::ButtonClicked(ClickButton* button)
        button == mCommit8BarsButton)
    {
       int numBars = 1;
-      if (button == mCommit1BarButton)  numBars = 1;
-      if (button == mCommit2BarsButton) numBars = 2;
-      if (button == mCommit4BarsButton) numBars = 4; 
-      if (button == mCommit8BarsButton) numBars = 8;
+      if (button == mCommit1BarButton)
+         numBars = 1;
+      if (button == mCommit2BarsButton)
+         numBars = 2;
+      if (button == mCommit4BarsButton)
+         numBars = 4;
+      if (button == mCommit8BarsButton)
+         numBars = 8;
 
       mNumBars = numBars;
       if (mNextCommitTargetIndex < (int)mLoopers.size())
          Commit(mLoopers[mNextCommitTargetIndex]);
-      for (int i=0; i<(int)mLoopers.size(); ++i)
+      for (int i = 0; i < (int)mLoopers.size(); ++i)
       {
          mNextCommitTargetIndex = (mNextCommitTargetIndex + 1) % mLoopers.size();
          if (mLoopers[mNextCommitTargetIndex] != nullptr)
@@ -784,11 +788,11 @@ void LooperRecorder::LoadLayout(const ofxJSONElement& moduleInfo)
    mModuleSaveData.LoadString("target", moduleInfo);
    mModuleSaveData.LoadString("headphonestarget", moduleInfo, "", FillDropdown<IAudioReceiver*>);
    mModuleSaveData.LoadString("outputtarget", moduleInfo, "", FillDropdown<IAudioReceiver*>);
-   
+
    if (!moduleInfo["loopers"].isNull())
    {
       mLoopers.resize(moduleInfo["loopers"].size());
-      for (int i=0; i<moduleInfo["loopers"].size(); ++i)
+      for (int i = 0; i < moduleInfo["loopers"].size(); ++i)
          mLoopers[i] = dynamic_cast<Looper*>(TheSynth->FindModule(moduleInfo["loopers"][i].asString()));
       SyncCablesToLoopers();
    }
@@ -800,7 +804,7 @@ void LooperRecorder::SaveLayout(ofxJSONElement& moduleInfo)
 {
    IDrawableModule::SaveLayout(moduleInfo);
    moduleInfo["loopers"].resize((unsigned int)mLoopers.size());
-   for (int i=0; i<mLoopers.size(); ++i)
+   for (int i = 0; i < mLoopers.size(); ++i)
    {
       std::string name;
       if (mLoopers[i])
@@ -824,9 +828,9 @@ namespace
 void LooperRecorder::SaveState(FileStreamOut& out)
 {
    IDrawableModule::SaveState(out);
-   
+
    out << kSaveStateRev;
-   
+
    out << mBaseTempo;
    out << mSpeed;
    mRecordBuffer.SaveState(out);
@@ -835,14 +839,12 @@ void LooperRecorder::SaveState(FileStreamOut& out)
 void LooperRecorder::LoadState(FileStreamIn& in)
 {
    IDrawableModule::LoadState(in);
-   
+
    int rev;
    in >> rev;
    LoadStateValidate(rev == kSaveStateRev);
-   
+
    in >> mBaseTempo;
    in >> mSpeed;
    mRecordBuffer.LoadState(in);
 }
-
-
