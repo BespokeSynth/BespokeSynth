@@ -29,6 +29,7 @@
 #pragma clang diagnostic ignored "-Wreorder"
 #endif
 
+#include "Xoshiro256ss.h"
 #include "OpenFrameworksPort.h"
 #include <map>
 #include <list>
@@ -110,8 +111,10 @@ extern float gControlTactileFeedback;
 extern float gDrawScale;
 extern bool gShowDevModules;
 extern float gCornerRoundness;
+
 extern std::random_device gRandomDevice;
-extern std::mt19937 gRandom;
+
+extern bespoke::core::Xoshiro256ss gRandom;
 extern std::uniform_real_distribution<float> gRandom01;
 extern std::uniform_real_distribution<float> gRandomBipolarDist;
 
