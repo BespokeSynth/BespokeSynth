@@ -481,7 +481,7 @@ private:
 #endif
 
       int keyCode = key.getTextCharacter();
-      if (keyCode < 32)
+      if (keyCode < 32 || key.getModifiers().isAltDown())
          keyCode = key.getKeyCode();
       bool isRepeat = true;
       if (find(mPressedKeys.begin(), mPressedKeys.end(), keyCode) == mPressedKeys.end())

@@ -967,7 +967,7 @@ void ModularSynth::KeyPressed(int key, bool isRepeat)
       {
          gHoveredUIControl->ResetToOriginal();
       }
-      else if (key != ' ' && key != OF_KEY_TAB && key != '`' && key < CHAR_MAX && juce::CharacterFunctions::isPrintable((char)key))
+      else if (key != ' ' && key != OF_KEY_TAB && key != '`' && key < CHAR_MAX && juce::CharacterFunctions::isPrintable((char)key) && (GetKeyModifiers() & kModifier_Alt) == false)
       {
          gHoveredUIControl->AttemptTextInput();
       }
@@ -1021,7 +1021,7 @@ void ModularSynth::KeyPressed(int key, bool isRepeat)
 
    mZoomer.OnKeyPressed(key);
 
-   if (key < CHAR_MAX && CharacterFunctions::isDigit((char)key) && (GetKeyModifiers() == kModifier_Alt))
+   if (CharacterFunctions::isDigit((char)key) && (GetKeyModifiers() & kModifier_Alt))
    {
       int num = key - '0';
       assert(num >= 0 && num <= 9);
@@ -1256,7 +1256,7 @@ void ModularSynth::MouseDragged(int intX, int intY, int button, const juce::Mous
       modal->NotifyMouseMoved(x, y);
    }
 
-   if (GetKeyModifiers() == kModifier_Alt && !mHasDuplicatedDuringDrag)
+   if ((GetKeyModifiers() & kModifier_Alt) && !mHasDuplicatedDuringDrag)
    {
       std::vector<IDrawableModule*> newGroupSelectedModules;
       std::map<IDrawableModule*, IDrawableModule*> oldToNewModuleMap;
