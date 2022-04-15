@@ -52,12 +52,12 @@ void Presets::CreateUIControls()
 {
    IDrawableModule::CreateUIControls();
    mGrid = new UIGrid("uigrid", 5, 38, 120, 50, 8, 3, this);
-   mSaveButton = new ClickButton(this, "save", 50, 3);
+   mSaveButton = new ClickButton(this, "save", 130, 3);
    mBlendTimeSlider = new FloatSlider(this, "blend ms", 5, 20, 70, 15, &mBlendTime, 0, 5000);
    mCurrentPresetSlider = new IntSlider(this, "preset", 45, 3, 80, 15, &mCurrentPreset, 0, mGrid->GetCols() * mGrid->GetRows() - 1);
    mRandomizeButton = new ClickButton(this, "random", 78, 20);
 
-   mSaveButton->SetShowing(false);
+   mSaveButton->SetShowing(true);
 
    {
       mModuleCable = new PatchCableSource(this, kConnectionType_Special);
