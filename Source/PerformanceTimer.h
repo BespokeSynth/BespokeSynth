@@ -35,6 +35,7 @@ class TimerInstance
 public:
    TimerInstance(std::string name, PerformanceTimer& manager);
    ~TimerInstance();
+
 private:
    long mTimerStart;
    std::string mName;
@@ -46,16 +47,20 @@ class PerformanceTimer
 public:
    void RecordCost(std::string name, long cost);
    void PrintCosts();
+
 private:
    struct Cost
    {
-      Cost(std::string name, long cost) : mName(name), mCost(cost) {}
+      Cost(std::string name, long cost)
+      : mName(name)
+      , mCost(cost)
+      {}
       std::string mName;
       long mCost;
    };
-   
+
    static bool SortCosts(const PerformanceTimer::Cost& a, const PerformanceTimer::Cost& b);
-   
+
    std::vector<Cost> mCostTable;
 };
 

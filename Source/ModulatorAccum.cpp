@@ -34,8 +34,8 @@
 #include "UIControlMacros.h"
 
 ModulatorAccum::ModulatorAccum()
-   : mValue(0)
-   , mVelocity(0)
+: mValue(0)
+, mVelocity(0)
 {
 }
 

@@ -40,7 +40,9 @@ class FloatSlider;
 
 enum class UserPrefCategory
 {
-   General, Graphics, Paths
+   General,
+   Graphics,
+   Paths
 };
 
 class UserPref
@@ -60,7 +62,15 @@ void RegisterUserPref(UserPref* pref);
 class UserPrefString : public UserPref
 {
 public:
-   UserPrefString(std::string name, std::string defaultValue, int charWidth, UserPrefCategory category) : mValue(defaultValue), mDefault(defaultValue), mCharWidth(charWidth) { RegisterUserPref(this); mName = name; mCategory = category; }
+   UserPrefString(std::string name, std::string defaultValue, int charWidth, UserPrefCategory category)
+   : mValue(defaultValue)
+   , mDefault(defaultValue)
+   , mCharWidth(charWidth)
+   {
+      RegisterUserPref(this);
+      mName = name;
+      mCategory = category;
+   }
    void Init() override;
    void SetUpControl(IDrawableModule* owner) override;
    IUIControl* GetControl() override;
@@ -69,6 +79,7 @@ public:
    std::string GetDefault() { return mDefault; }
    void Save(int index, ofxJSONElement& prefsJson) override;
    bool DiffersFromSavedValue() const override;
+
 private:
    std::string mValue;
    std::string mDefault;
@@ -79,7 +90,15 @@ private:
 class UserPrefDropdownInt : public UserPref
 {
 public:
-   UserPrefDropdownInt(std::string name, int defaultValue, int width, UserPrefCategory category) : mValue(defaultValue), mDefault(defaultValue), mWidth(width) { RegisterUserPref(this); mName = name; mCategory = category; }
+   UserPrefDropdownInt(std::string name, int defaultValue, int width, UserPrefCategory category)
+   : mValue(defaultValue)
+   , mDefault(defaultValue)
+   , mWidth(width)
+   {
+      RegisterUserPref(this);
+      mName = name;
+      mCategory = category;
+   }
    void Init() override;
    void SetUpControl(IDrawableModule* owner) override;
    IUIControl* GetControl() override;
@@ -89,6 +108,7 @@ public:
    int& GetIndex() { return mIndex; }
    void Save(int index, ofxJSONElement& prefsJson) override;
    bool DiffersFromSavedValue() const override;
+
 private:
    int mValue;
    int mDefault;
@@ -100,7 +120,16 @@ private:
 class UserPrefDropdownString : public UserPref
 {
 public:
-   UserPrefDropdownString(std::string name, std::string defaultValue, int width, UserPrefCategory category) : mValue(defaultValue), mDefault(defaultValue), mIndex(-1), mWidth(width) { RegisterUserPref(this); mName = name; mCategory = category; }
+   UserPrefDropdownString(std::string name, std::string defaultValue, int width, UserPrefCategory category)
+   : mValue(defaultValue)
+   , mDefault(defaultValue)
+   , mIndex(-1)
+   , mWidth(width)
+   {
+      RegisterUserPref(this);
+      mName = name;
+      mCategory = category;
+   }
    void Init() override;
    void SetUpControl(IDrawableModule* owner) override;
    IUIControl* GetControl() override;
@@ -110,6 +139,7 @@ public:
    int& GetIndex() { return mIndex; }
    void Save(int index, ofxJSONElement& prefsJson) override;
    bool DiffersFromSavedValue() const override;
+
 private:
    std::string mValue;
    std::string mDefault;
@@ -121,7 +151,17 @@ private:
 class UserPrefTextEntryInt : public UserPref
 {
 public:
-   UserPrefTextEntryInt(std::string name, int defaultValue, int min, int max, int digits, UserPrefCategory category) : mValue(defaultValue), mDefault(defaultValue), mMin(min), mMax(max), mDigits(digits) { RegisterUserPref(this); mName = name; mCategory = category; }
+   UserPrefTextEntryInt(std::string name, int defaultValue, int min, int max, int digits, UserPrefCategory category)
+   : mValue(defaultValue)
+   , mDefault(defaultValue)
+   , mMin(min)
+   , mMax(max)
+   , mDigits(digits)
+   {
+      RegisterUserPref(this);
+      mName = name;
+      mCategory = category;
+   }
    void Init() override;
    void SetUpControl(IDrawableModule* owner) override;
    IUIControl* GetControl() override;
@@ -130,6 +170,7 @@ public:
    int GetDefault() { return mDefault; }
    void Save(int index, ofxJSONElement& prefsJson) override;
    bool DiffersFromSavedValue() const override;
+
 private:
    int mValue;
    int mDefault;
@@ -142,7 +183,17 @@ private:
 class UserPrefTextEntryFloat : public UserPref
 {
 public:
-   UserPrefTextEntryFloat(std::string name, float defaultValue, float min, float max, int digits, UserPrefCategory category) : mValue(defaultValue), mDefault(defaultValue), mMin(min), mMax(max), mDigits(digits) { RegisterUserPref(this); mName = name; mCategory = category; }
+   UserPrefTextEntryFloat(std::string name, float defaultValue, float min, float max, int digits, UserPrefCategory category)
+   : mValue(defaultValue)
+   , mDefault(defaultValue)
+   , mMin(min)
+   , mMax(max)
+   , mDigits(digits)
+   {
+      RegisterUserPref(this);
+      mName = name;
+      mCategory = category;
+   }
    void Init() override;
    void SetUpControl(IDrawableModule* owner) override;
    IUIControl* GetControl() override;
@@ -151,6 +202,7 @@ public:
    float GetDefault() { return mDefault; }
    void Save(int index, ofxJSONElement& prefsJson) override;
    bool DiffersFromSavedValue() const override;
+
 private:
    float mValue;
    float mDefault;
@@ -163,7 +215,13 @@ private:
 class UserPrefBool : public UserPref
 {
 public:
-   UserPrefBool(std::string name, bool defaultValue, UserPrefCategory category) : mValue(defaultValue) { RegisterUserPref(this); mName = name; mCategory = category; }
+   UserPrefBool(std::string name, bool defaultValue, UserPrefCategory category)
+   : mValue(defaultValue)
+   {
+      RegisterUserPref(this);
+      mName = name;
+      mCategory = category;
+   }
    void Init() override;
    void SetUpControl(IDrawableModule* owner) override;
    IUIControl* GetControl() override;
@@ -172,6 +230,7 @@ public:
    bool GetDefault() { return mDefault; }
    void Save(int index, ofxJSONElement& prefsJson) override;
    bool DiffersFromSavedValue() const override;
+
 private:
    bool mValue;
    bool mDefault;
@@ -181,7 +240,16 @@ private:
 class UserPrefFloat : public UserPref
 {
 public:
-   UserPrefFloat(std::string name, float defaultValue, float min, float max, UserPrefCategory category) : mValue(defaultValue), mDefault(defaultValue), mMin(min), mMax(max) { RegisterUserPref(this); mName = name; mCategory = category; }
+   UserPrefFloat(std::string name, float defaultValue, float min, float max, UserPrefCategory category)
+   : mValue(defaultValue)
+   , mDefault(defaultValue)
+   , mMin(min)
+   , mMax(max)
+   {
+      RegisterUserPref(this);
+      mName = name;
+      mCategory = category;
+   }
    void Init() override;
    void SetUpControl(IDrawableModule* owner) override;
    IUIControl* GetControl() override;
@@ -190,6 +258,7 @@ public:
    float GetDefault() { return mDefault; }
    void Save(int index, ofxJSONElement& prefsJson) override;
    bool DiffersFromSavedValue() const override;
+
 private:
    float mValue;
    float mDefault;
@@ -257,13 +326,16 @@ public:
    UserPrefFloat background_b{ "background_b", 0.09f, 0, 1, UserPrefCategory::Graphics };
    UserPrefFloat motion_trails{ "motion_trails", 1, 0, 2, UserPrefCategory::Graphics };
    UserPrefTextEntryFloat mouse_offset_x{ "mouse_offset_x", 0, -100, 100, 5, UserPrefCategory::Graphics };
-   UserPrefTextEntryFloat mouse_offset_y{ "mouse_offset_y",
+   UserPrefTextEntryFloat mouse_offset_y
+   {
+      "mouse_offset_y",
 #if BESPOKE_MAC
-                                                           -4,
+      -4,
 #else
-                                                            0,
+      0,
 #endif
-                                                               -100, 100, 5, UserPrefCategory::Graphics };
+      -100, 100, 5, UserPrefCategory::Graphics
+   };
 
    UserPrefString recordings_path{ "recordings_path", "recordings/", 70, UserPrefCategory::Paths };
    UserPrefString tooltips{ "tooltips", "tooltips_eng.txt", 70, UserPrefCategory::Paths };

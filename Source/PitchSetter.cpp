@@ -38,7 +38,7 @@ PitchSetter::PitchSetter()
 void PitchSetter::CreateUIControls()
 {
    IDrawableModule::CreateUIControls();
-   mPitchSlider = new IntSlider(this,"pitch",5,2,80,15,&mPitch,0,127);
+   mPitchSlider = new IntSlider(this, "pitch", 5, 2, 80, 15, &mPitch, 0, 127);
 }
 
 void PitchSetter::DrawModule()
@@ -46,7 +46,7 @@ void PitchSetter::DrawModule()
 
    if (Minimized() || IsVisible() == false)
       return;
-   
+
    mPitchSlider->Draw();
 }
 
@@ -65,7 +65,7 @@ void PitchSetter::IntSliderUpdated(IntSlider* slider, int oldVal)
 void PitchSetter::PlayNote(double time, int pitch, int velocity, int voiceIdx, ModulationParameters modulation)
 {
    ComputeSliders(0);
-   
+
    if (mEnabled)
       PlayNoteOutput(time, mPitch, velocity, voiceIdx, modulation);
    else
@@ -75,7 +75,7 @@ void PitchSetter::PlayNote(double time, int pitch, int velocity, int voiceIdx, M
 void PitchSetter::LoadLayout(const ofxJSONElement& moduleInfo)
 {
    mModuleSaveData.LoadString("target", moduleInfo);
-   
+
    SetUpFromSaveData();
 }
 

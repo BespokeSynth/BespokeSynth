@@ -40,29 +40,29 @@ public:
    Waveshaper();
    virtual ~Waveshaper();
    static IDrawableModule* Create() { return new Waveshaper(); }
-   
-   
+
+
    void CreateUIControls() override;
-   
+
    //IAudioSource
    void Process(double time) override;
    void SetEnabled(bool enabled) override { mEnabled = enabled; }
-   
+
    //IFloatSliderListener
    void FloatSliderUpdated(FloatSlider* slider, float oldVal) override {}
-   
+
    //ITextEntryListener
    void TextEntryComplete(TextEntry* entry) override;
-   
+
    virtual void LoadLayout(const ofxJSONElement& moduleInfo) override;
    virtual void SetUpFromSaveData() override;
-   
+
 private:
    //IDrawableModule
    void DrawModule() override;
    void GetModuleDimensions(float& w, float& h) override;
    bool Enabled() const override { return mEnabled; }
-   
+
    float mRescale;
    FloatSlider* mRescaleSlider;
    float mA;
@@ -75,14 +75,14 @@ private:
    FloatSlider* mDSlider;
    float mE;
    FloatSlider* mESlider;
-   
+
    std::string mEntryString;
    TextEntry* mTextEntry;
    exprtk::symbol_table<float> mSymbolTable;
    exprtk::expression<float> mExpression;
    exprtk::symbol_table<float> mSymbolTableDraw;
    exprtk::expression<float> mExpressionDraw;
-   
+
    float mExpressionInput;
    float mHistPre1;
    float mHistPre2;
@@ -93,7 +93,7 @@ private:
    bool mExpressionValid;
    float mSmoothMax;
    float mSmoothMin;
-   
+
    struct BiquadState
    {
       BiquadState()
@@ -101,12 +101,13 @@ private:
       , mHistPre2(0)
       , mHistPost1(0)
       , mHistPost2(0)
-      {}
+      {
+      }
       float mHistPre1;
       float mHistPre2;
       float mHistPost1;
       float mHistPost2;
    };
-   
+
    BiquadState mBiquadState[ChannelBuffer::kMaxNumChannels];
 };

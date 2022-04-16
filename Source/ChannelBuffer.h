@@ -33,13 +33,13 @@ class ChannelBuffer
 {
 public:
    ChannelBuffer(int bufferSize);
-   ChannelBuffer(float* data, int bufferSize);  //intended as a temporary holder for passing raw data to methods that want a ChannelBuffer
+   ChannelBuffer(float* data, int bufferSize); //intended as a temporary holder for passing raw data to methods that want a ChannelBuffer
    ~ChannelBuffer();
-   
+
    float* GetChannel(int channel);
-   
+
    void Clear() const;
-   
+
    void SetMaxAllowedChannels(int channels);
    void SetNumActiveChannels(int channels) { mActiveChannels = MIN(mNumChannels, channels); }
    int NumActiveChannels() const { return mActiveChannels; }
@@ -48,9 +48,14 @@ public:
    int BufferSize() const { return mBufferSize; }
    void CopyFrom(ChannelBuffer* src, int length = -1, int startOffset = 0);
    void SetChannelPointer(float* data, int channel, bool deleteOldData);
-   void Reset() { Clear(); mRecentActiveChannels = mActiveChannels; SetNumActiveChannels(1); }
+   void Reset()
+   {
+      Clear();
+      mRecentActiveChannels = mActiveChannels;
+      SetNumActiveChannels(1);
+   }
    void Resize(int bufferSize);
-   
+
    enum class LoadMode
    {
       kSetBufferSize,
@@ -59,13 +64,13 @@ public:
    };
 
    void Save(FileStreamOut& out, int writeLength);
-   void Load(FileStreamIn& in, int &readLength, LoadMode loadMode);
-   
+   void Load(FileStreamIn& in, int& readLength, LoadMode loadMode);
+
    static const int kMaxNumChannels = 2;
-   
+
 private:
    void Setup(int bufferSize);
-   
+
    int mActiveChannels;
    int mNumChannels;
    int mBufferSize;

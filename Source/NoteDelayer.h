@@ -39,25 +39,25 @@ public:
    NoteDelayer();
    ~NoteDelayer();
    static IDrawableModule* Create() { return new NoteDelayer(); }
-   
-   
+
+
    void CreateUIControls() override;
    void Init() override;
-   
+
    void SetEnabled(bool enabled) override { mEnabled = enabled; }
-   
+
    //INoteReceiver
    void PlayNote(double time, int pitch, int velocity, int voiceIdx = -1, ModulationParameters modulation = ModulationParameters()) override;
-   
+
    void OnTransportAdvanced(float amount) override;
-   
+
    void CheckboxUpdated(Checkbox* checkbox) override;
    void FloatSliderUpdated(FloatSlider* slider, float oldVal) override;
-   
+
    virtual void LoadLayout(const ofxJSONElement& moduleInfo) override;
    virtual void SetUpFromSaveData() override;
-   
-   
+
+
 private:
    struct NoteInfo
    {
@@ -66,17 +66,21 @@ private:
       double mTriggerTime;
       ModulationParameters mModulation;
    };
-   
+
    //IDrawableModule
    void DrawModule() override;
-   void GetModuleDimensions(float& width, float& height) override { width = 108; height = 22; }
+   void GetModuleDimensions(float& width, float& height) override
+   {
+      width = 108;
+      height = 22;
+   }
    bool Enabled() const override { return mEnabled; }
-   
+
    float mDelay;
    FloatSlider* mDelaySlider;
-   
+
    float mLastNoteOnTime;
-   
+
    static const int kQueueSize = 500;
    NoteInfo mInputNotes[kQueueSize];
    int mConsumeIndex;

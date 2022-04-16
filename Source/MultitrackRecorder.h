@@ -42,28 +42,32 @@ public:
    MultitrackRecorder();
    virtual ~MultitrackRecorder();
    static IDrawableModule* Create() { return new MultitrackRecorder(); }
-   
-   
+
+
    void CreateUIControls() override;
    ModuleContainer* GetContainer() override { return &mModuleContainer; }
    bool IsResizable() const override { return true; }
    void Resize(float width, float height) override { mWidth = ofClamp(width, 210, 9999); }
-   
+
    void RemoveTrack(MultitrackRecorderTrack* track);
 
    void ButtonClicked(ClickButton* button) override;
    void CheckboxUpdated(Checkbox* checkbox) override;
-   
+
    void SaveLayout(ofxJSONElement& moduleInfo) override;
    void LoadLayout(const ofxJSONElement& moduleInfo) override;
    void SetUpFromSaveData() override;
    void SaveState(FileStreamOut& out) override;
    void LoadState(FileStreamIn& in) override;
-   
+
 private:
    //IDrawableModule
    void DrawModule() override;
-   void GetModuleDimensions(float& width, float& height) override { width = mWidth; height = mHeight; }
+   void GetModuleDimensions(float& width, float& height) override
+   {
+      width = mWidth;
+      height = mHeight;
+   }
 
    void AddTrack();
    int GetRecordingLength();
@@ -91,7 +95,7 @@ public:
    virtual ~MultitrackRecorderTrack();
    static IDrawableModule* Create() { return new MultitrackRecorderTrack(); }
 
-   
+
    void CreateUIControls() override;
    bool HasTitleBar() const override { return false; }
 

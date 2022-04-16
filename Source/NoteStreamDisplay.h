@@ -37,32 +37,35 @@ public:
    NoteStreamDisplay();
    static IDrawableModule* Create() { return new NoteStreamDisplay(); }
    void CreateUIControls() override;
-   
-   
-   
+
+
    bool IsResizable() const override { return true; }
    void Resize(float w, float h) override;
-   
+
    //INoteReceiver
    void PlayNote(double time, int pitch, int velocity, int voiceIdx = -1, ModulationParameters modulation = ModulationParameters()) override;
-   
+
    void ButtonClicked(ClickButton* button) override;
-   
+
    bool HasDebugDraw() const override { return true; }
-   
+
    void LoadLayout(const ofxJSONElement& moduleInfo) override;
    void SaveLayout(ofxJSONElement& moduleInfo) override;
    void SetUpFromSaveData() override;
-   
+
 private:
    //IDrawableModule
    void DrawModule() override;
    void DrawModuleUnclipped() override;
-   void GetModuleDimensions(float& w, float& h) override { w=mWidth; h=mHeight; }
+   void GetModuleDimensions(float& w, float& h) override
+   {
+      w = mWidth;
+      h = mHeight;
+   }
    bool Enabled() const override { return true; }
    bool IsElementActive(int index) const;
    float GetYPos(int pitch, float noteHeight) const;
-   
+
    struct NoteStreamElement
    {
       int pitch;
@@ -70,7 +73,7 @@ private:
       double timeOn;
       double timeOff;
    };
-   
+
    static const int kNoteStreamCapacity = 100;
    NoteStreamElement mNoteStream[kNoteStreamCapacity];
    float mWidth;

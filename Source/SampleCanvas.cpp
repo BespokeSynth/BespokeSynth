@@ -62,14 +62,14 @@ void SampleCanvas::CreateUIControls()
    mIntervalSelector->AddLabel("32n", kInterval_32n);
    mIntervalSelector->AddLabel("64n", kInterval_64n);
 
-   mCanvas = new Canvas(this, 5, 35, 790, 100, mNumMeasures, L(rows,4), L(cols,4), &(SampleCanvasElement::Create));
+   mCanvas = new Canvas(this, 5, 35, 790, 100, mNumMeasures, L(rows, 4), L(cols, 4), &(SampleCanvasElement::Create));
    AddUIControl(mCanvas);
    mCanvasControls = new CanvasControls();
    mCanvasControls->SetCanvas(mCanvas);
    mCanvasControls->CreateUIControls();
    AddChild(mCanvasControls);
    UpdateNumColumns();
-   
+
    mCanvas->SetListener(this);
 
    mCanvasTimeline = new CanvasTimeline(mCanvas, "timeline");
@@ -90,21 +90,21 @@ SampleCanvas::~SampleCanvas()
 void SampleCanvas::Process(double time)
 {
    PROFILER(SampleCanvas);
-   
+
    IAudioReceiver* target = GetTarget();
 
    if (!mEnabled || target == nullptr)
       return;
-   
+
    float canvasPos = GetCurPos(time);
-   
+
    mCanvas->SetCursorPos(canvasPos);
-   
+
    int bufferSize = target->GetBuffer()->BufferSize();
    assert(bufferSize == gBufferSize);
-   
+
    gWorkChannelBuffer.Clear();
-   
+
    const std::vector<CanvasElement*>& elements = mCanvas->GetElements();
    for (int elemIdx = 0; elemIdx < elements.size(); ++elemIdx)
    {
@@ -113,17 +113,17 @@ void SampleCanvas::Process(double time)
       float vol = element->GetVolume();
       if (clip == nullptr || element->IsMuted())
          continue;
-      
-      for (int i=0; i<bufferSize; ++i)
+
+      for (int i = 0; i < bufferSize; ++i)
       {
          float sample = 0;
-         
+
          float pos = GetCurPos(time + i * gInvSampleRateMs);
-         
+
          sample = ofMap(pos, element->GetStart(), element->GetEnd(), 0, clip->LengthInSamples());
-         
+
          sample *= vol;
-         
+
          if (sample >= 0 && sample < clip->LengthInSamples())
          {
             for (int ch = 0; ch < target->GetBuffer()->NumActiveChannels(); ++ch)
@@ -134,7 +134,7 @@ void SampleCanvas::Process(double time)
          }
       }
    }
-   
+
    for (int ch = 0; ch < target->GetBuffer()->NumActiveChannels(); ++ch)
    {
       ChannelBuffer* out = GetTarget()->GetBuffer();
@@ -152,7 +152,7 @@ double SampleCanvas::GetCurPos(double time) const
 void SampleCanvas::OnClicked(int x, int y, bool right)
 {
    IDrawableModule::OnClicked(x, y, right);
-   
+
    /*float canvasX,canvasY;
    mCanvas->GetPosition(canvasX, canvasY, true);
    if (y >= 0 && y < canvasY)
@@ -166,7 +166,6 @@ void SampleCanvas::CanvasUpdated(Canvas* canvas)
 {
    if (canvas == mCanvas)
    {
-      
    }
 }
 
@@ -193,15 +192,15 @@ void SampleCanvas::FilesDropped(std::vector<std::string> files, int x, int y)
 {
    Sample sample;
    sample.Read(files[0].c_str());
-   SampleDropped(x,y,&sample);
+   SampleDropped(x, y, &sample);
 }
 
 void SampleCanvas::SampleDropped(int x, int y, Sample* sample)
 {
    CanvasCoord coord = mCanvas->GetCoordAt(x - mCanvas->GetPosition(true).x, y - mCanvas->GetPosition(true).y);
-   coord.col = MAX(0,coord.col);
-   coord.row = MAX(0,coord.row);
-   SampleCanvasElement* element = static_cast<SampleCanvasElement*>(mCanvas->CreateElement(coord.col,coord.row));
+   coord.col = MAX(0, coord.col);
+   coord.row = MAX(0, coord.row);
+   SampleCanvasElement* element = static_cast<SampleCanvasElement*>(mCanvas->CreateElement(coord.col, coord.row));
    Sample* newSamp = new Sample();
    newSamp->CopyFrom(sample);
    element->SetSample(newSamp);
@@ -308,7 +307,7 @@ void SampleCanvas::LoadState(FileStreamIn& in)
    IDrawableModule::LoadState(in);
 
    if (!ModuleContainer::DoesModuleHaveMoreSaveData(in))
-      return;  //this was saved before we added versioning, bail out
+      return; //this was saved before we added versioning, bail out
 
    int rev;
    in >> rev;

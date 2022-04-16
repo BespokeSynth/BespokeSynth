@@ -35,7 +35,7 @@ IAudioReceiver* IAudioSource::GetTarget(int index)
 
 void IAudioSource::SyncOutputBuffer(int numChannels)
 {
-   for (int i=0; i<GetNumTargets(); ++i)
+   for (int i = 0; i < GetNumTargets(); ++i)
    {
       if (GetTarget(i))
       {
@@ -45,4 +45,3 @@ void IAudioSource::SyncOutputBuffer(int numChannels)
    }
    GetVizBuffer()->SetNumChannels(numChannels);
 }
-

@@ -50,10 +50,10 @@ WaveformViewer::WaveformViewer()
    mBufferVizOffset[1] = 0;
    mVizPhase[0] = 0;
    mVizPhase[1] = 0;
-   
-	for (int i=0; i<BUFFER_VIZ_SIZE; ++i)
+
+   for (int i = 0; i < BUFFER_VIZ_SIZE; ++i)
    {
-      for (int j=0; j<2; ++j)
+      for (int j = 0; j < 2; ++j)
          mAudioView[i][j] = 0;
    }
 }
@@ -80,41 +80,44 @@ WaveformViewer::~WaveformViewer()
 void WaveformViewer::Process(double time)
 {
    PROFILER(WaveformViewer);
-   
+
    ComputeSliders(0);
 
    if (!mEnabled)
       return;
-   
+
    SyncBuffers();
 
    int lengthSamples = MIN(mLengthSamples, BUFFER_VIZ_SIZE);
-   
+
    int bufferSize = GetBuffer()->BufferSize();
    IAudioReceiver* target = GetTarget();
    if (target)
    {
       ChannelBuffer* out = target->GetBuffer();
-      for (int ch=0; ch<GetBuffer()->NumActiveChannels(); ++ch)
+      for (int ch = 0; ch < GetBuffer()->NumActiveChannels(); ++ch)
       {
          if (ch == 0)
             BufferCopy(gWorkBuffer, GetBuffer()->GetChannel(ch), GetBuffer()->BufferSize());
          else
             Add(gWorkBuffer, GetBuffer()->GetChannel(ch), GetBuffer()->BufferSize());
          Add(out->GetChannel(ch), GetBuffer()->GetChannel(ch), out->BufferSize());
-         GetVizBuffer()->WriteChunk(GetBuffer()->GetChannel(ch),GetBuffer()->BufferSize(), ch);
+         GetVizBuffer()->WriteChunk(GetBuffer()->GetChannel(ch), GetBuffer()->BufferSize(), ch);
       }
    }
-   
-   for (int i=0; i<bufferSize; ++i)
-      mAudioView[(i+mBufferVizOffset[!mDoubleBufferFlip]) % lengthSamples][!mDoubleBufferFlip] = gWorkBuffer[i];
-      
+
+   for (int i = 0; i < bufferSize; ++i)
+      mAudioView[(i + mBufferVizOffset[!mDoubleBufferFlip]) % lengthSamples][!mDoubleBufferFlip] = gWorkBuffer[i];
+
    GetBuffer()->Reset();
-   
-   float vizPhaseInc = GetPhaseInc(mDisplayFreq/2);
+
+   float vizPhaseInc = GetPhaseInc(mDisplayFreq / 2);
    mVizPhase[!mDoubleBufferFlip] += vizPhaseInc * bufferSize;
-   while (mVizPhase[!mDoubleBufferFlip] > FTWO_PI) { mVizPhase[!mDoubleBufferFlip] -= FTWO_PI; }
-   
+   while (mVizPhase[!mDoubleBufferFlip] > FTWO_PI)
+   {
+      mVizPhase[!mDoubleBufferFlip] -= FTWO_PI;
+   }
+
    mBufferVizOffset[!mDoubleBufferFlip] = (mBufferVizOffset[!mDoubleBufferFlip] + bufferSize) % lengthSamples;
 }
 
@@ -122,7 +125,7 @@ void WaveformViewer::DrawModule()
 {
    if (Minimized() || IsVisible() == false)
       return;
-   
+
    mDisplayFreqEntry->Draw();
    mLengthSamplesSlider->Draw();
    mDrawGainSlider->Draw();
@@ -135,55 +138,55 @@ void WaveformViewer::DrawModule()
 
    ofPushStyle();
    ofPushMatrix();
-   
+
    ofSetColor(245, 58, 135);
    ofSetLineWidth(2);
-   
-   float w,h;
-   GetDimensions(w,h);
+
+   float w, h;
+   GetDimensions(w, h);
    int lengthSamples = MIN(mLengthSamples, BUFFER_VIZ_SIZE);
-   float vizPhaseInc = GetPhaseInc(mDisplayFreq/2);
+   float vizPhaseInc = GetPhaseInc(mDisplayFreq / 2);
    float phaseStart = (FTWO_PI - mVizPhase[mDoubleBufferFlip]) / vizPhaseInc;
-   float end = lengthSamples -(FTWO_PI/vizPhaseInc);
-   
+   float end = lengthSamples - (FTWO_PI / vizPhaseInc);
+
    if (mDrawWaveform)
    {
       ofBeginShape();
-      for (int i=phaseStart;i < lengthSamples; i++)
+      for (int i = phaseStart; i < lengthSamples; i++)
       {
-         float x = ofMap(i-phaseStart, 0, end, 0, w, true);
-         float samp = mAudioView[(i+mBufferVizOffset[mDoubleBufferFlip])% lengthSamples][mDoubleBufferFlip];
+         float x = ofMap(i - phaseStart, 0, end, 0, w, true);
+         float samp = mAudioView[(i + mBufferVizOffset[mDoubleBufferFlip]) % lengthSamples][mDoubleBufferFlip];
          samp *= mDrawGain;
-         if (x<w)
-            ofVertex(x, h/2-samp*(h/2));
+         if (x < w)
+            ofVertex(x, h / 2 - samp * (h / 2));
       }
       ofEndShape(false);
    }
-   
+
    if (mDrawCircle)
    {
       ofSetCircleResolution(32);
       ofSetLineWidth(1);
-      for (int i=phaseStart;i < lengthSamples; i++)
+      for (int i = phaseStart; i < lengthSamples; i++)
       {
-         float a = float(i-phaseStart) / end;
+         float a = float(i - phaseStart) / end;
          if (a < 1)
          {
-            float rad = a * MIN(w,h)/2;
-            float samp = mAudioView[(i+mBufferVizOffset[mDoubleBufferFlip])% lengthSamples][mDoubleBufferFlip];
+            float rad = a * MIN(w, h) / 2;
+            float samp = mAudioView[(i + mBufferVizOffset[mDoubleBufferFlip]) % lengthSamples][mDoubleBufferFlip];
             if (samp > 0)
-               ofSetColor(245, 58, 135, ofMap(samp*mDrawGain/10,0,1,0,255,true));
+               ofSetColor(245, 58, 135, ofMap(samp * mDrawGain / 10, 0, 1, 0, 255, true));
             else
-               ofSetColor(58, 245, 135, ofMap(-samp*mDrawGain/10,0,1,0,255,true));
-            ofCircle(w/2,h/2,rad);
+               ofSetColor(58, 245, 135, ofMap(-samp * mDrawGain / 10, 0, 1, 0, 255, true));
+            ofCircle(w / 2, h / 2, rad);
          }
       }
    }
-   
-   ofPopMatrix();
-	ofPopStyle();
 
-   for (int i=0; i< lengthSamples; ++i)
+   ofPopMatrix();
+   ofPopStyle();
+
+   for (int i = 0; i < lengthSamples; ++i)
       mAudioView[i][mDoubleBufferFlip] = mAudioView[i][!mDoubleBufferFlip];
    mBufferVizOffset[mDoubleBufferFlip] = mBufferVizOffset[!mDoubleBufferFlip];
    mVizPhase[mDoubleBufferFlip] = mVizPhase[!mDoubleBufferFlip];
@@ -233,4 +236,3 @@ void WaveformViewer::SetUpFromSaveData()
    mDrawWaveform = mModuleSaveData.GetBool("draw_waveform");
    mDrawCircle = mModuleSaveData.GetBool("draw_circle");
 }
-

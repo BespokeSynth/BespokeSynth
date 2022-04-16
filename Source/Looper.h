@@ -39,6 +39,7 @@
 #include "JumpBlender.h"
 #include "PitchShifter.h"
 #include "INoteReceiver.h"
+#include "SwitchAndRamp.h"
 
 class LooperRecorder;
 class Rewriter;
@@ -53,8 +54,8 @@ public:
    Looper();
    ~Looper();
    static IDrawableModule* Create() { return new Looper(); }
-   
-   
+
+
    void CreateUIControls() override;
 
    void SetRecorder(LooperRecorder* recorder);
@@ -81,18 +82,18 @@ public:
    int GetLoopLength() { return mLoopLength; }
    void SetGranulator(LooperGranulator* granulator) { mGranulator = granulator; }
    double GetPlaybackSpeed() const;
-   
+
    void Poll() override;
    void Exit() override;
-   
+
    //IAudioSource
    void Process(double time) override;
    void SetEnabled(bool enabled) override { mEnabled = enabled; }
-   
+
    //INoteReceiver
    void PlayNote(double time, int pitch, int velocity, int voiceIdx = -1, ModulationParameters modulation = ModulationParameters()) override;
    void SendCC(int control, int value, int voiceIdx = -1) override {}
-   
+
    //IDrawableModule
    void FilesDropped(std::vector<std::string> files, int x, int y) override;
 
@@ -102,24 +103,25 @@ public:
    void SetLoopLength(int length);
    void SetRewriter(Rewriter* rewriter) { mRewriter = rewriter; }
    void Rewrite();
-   
+
    bool CheckNeedsDraw() override { return true; }
-   
+
    //IButtonListener
    void ButtonClicked(ClickButton* button) override;
    //IFloatSliderListener
    void FloatSliderUpdated(FloatSlider* slider, float oldVal) override;
    //IRadioButtonListener
    void RadioButtonUpdated(RadioButton* radio, int oldVal) override;
-   
+
    void CheckboxUpdated(Checkbox* checkbox) override;
    //IDropdownListener
    void DropdownUpdated(DropdownList* list, int oldVal) override;
-   
+
    void LoadLayout(const ofxJSONElement& moduleInfo) override;
    void SetUpFromSaveData() override;
    void SaveState(FileStreamOut& out) override;
    void LoadState(FileStreamIn& in) override;
+
 private:
    void DoShiftMeasure();
    void DoHalfShift();
@@ -136,13 +138,13 @@ private:
    void DrawBeatwheel();
    float GetActualLoopPos(int samplesIn) const;
    int GetBeatwheelDepthLevel() const;
-   
+
    //IDrawableModule
    void DrawModule() override;
    void GetModuleDimensions(float& width, float& height) override;
    bool Enabled() const override { return mEnabled; }
    void OnClicked(int x, int y, bool right) override;
-   
+
    static const int BUFFER_X = 3;
    static const int BUFFER_Y = 3;
    static const int BUFFER_W = 170;
@@ -215,7 +217,7 @@ private:
    float mLastInputSample[ChannelBuffer::kMaxNumChannels];
    float mBufferTempo;
    ClickButton* mResampleButton;
-   
+
    //beatwheel
    bool mBeatwheel;
    static float mBeatwheelPosRight;
@@ -239,8 +241,9 @@ private:
    Checkbox* mKeepPitchCheckbox;
 
    LooperGranulator* mGranulator;
+
+   SwitchAndRamp mSwitchAndRamp;
 };
 
 
 #endif /* defined(__modularSynth__Looper__) */
-

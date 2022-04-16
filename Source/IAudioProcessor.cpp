@@ -30,10 +30,10 @@
 void IAudioProcessor::SyncBuffers(int overrideNumOutputChannels)
 {
    SyncInputBuffer();
-   
+
    int numOutputChannels = GetBuffer()->NumActiveChannels();
    if (overrideNumOutputChannels != -1)
       numOutputChannels = overrideNumOutputChannels;
-   
+
    SyncOutputBuffer(numOutputChannels);
 }

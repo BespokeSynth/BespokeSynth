@@ -36,29 +36,29 @@ public:
    TimelineControl();
    ~TimelineControl();
    static IDrawableModule* Create() { return new TimelineControl(); }
-   
-   
+
+
    void CreateUIControls() override;
-   
+
    void CheckboxUpdated(Checkbox* checkbox) override;
    void FloatSliderUpdated(FloatSlider* slider, float oldVal) override;
    void IntSliderUpdated(IntSlider* slider, int oldVal) override;
-   
+
    bool IsResizable() const override { return true; }
    void Resize(float width, float height) override;
-   
+
    void LoadLayout(const ofxJSONElement& moduleInfo) override;
    void SetUpFromSaveData() override;
    void SaveLayout(ofxJSONElement& moduleInfo) override;
-   
+
 private:
    //IDrawableModule
    void DrawModule() override;
    bool Enabled() const override { return true; }
    void GetModuleDimensions(float& w, float& h) override;
-   
+
    float GetSliderWidth() { return mWidth - 50; }
-   
+
    float mWidth;
    float mNumMeasures;
    float mTime;

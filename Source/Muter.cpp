@@ -38,8 +38,8 @@ Muter::Muter()
 void Muter::CreateUIControls()
 {
    IDrawableModule::CreateUIControls();
-   mPassCheckbox = new Checkbox(this,"pass",5,2,&mPass);
-   mRampTimeSlider = new FloatSlider(this,"ms",5,20,70,15,&mRampTimeMs,3,1000);
+   mPassCheckbox = new Checkbox(this, "pass", 5, 2, &mPass);
+   mRampTimeSlider = new FloatSlider(this, "ms", 5, 20, 70, 15, &mRampTimeMs, 3, 1000);
    mRampTimeSlider->SetMode(FloatSlider::kSquare);
 }
 
@@ -52,10 +52,10 @@ void Muter::ProcessAudio(double time, ChannelBuffer* buffer)
    PROFILER(Muter);
 
    float bufferSize = buffer->BufferSize();
-   
-   for (int i=0; i<bufferSize; ++i)
+
+   for (int i = 0; i < bufferSize; ++i)
    {
-      for (int ch=0; ch<buffer->NumActiveChannels(); ++ch)
+      for (int ch = 0; ch < buffer->NumActiveChannels(); ++ch)
          buffer->GetChannel(ch)[i] *= mRamp.Value(time);
       time += gInvSampleRateMs;
    }
@@ -70,6 +70,5 @@ void Muter::DrawModule()
 void Muter::CheckboxUpdated(Checkbox* checkbox)
 {
    double time = gTime + gBufferSizeMs;
-   mRamp.Start(time, mPass ? 1 : 0, time+mRampTimeMs);
+   mRamp.Start(time, mPass ? 1 : 0, time + mRampTimeMs);
 }
-

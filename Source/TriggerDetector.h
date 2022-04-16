@@ -38,9 +38,9 @@ public:
    bool CheckTriggered();
    void SetThreshold(float thresh) { mThreshold = thresh; }
    void Draw(int x, int y);
-   
+
    float mSharpness;
-   
+
 private:
    float mThreshold;
    bool mTriggered;

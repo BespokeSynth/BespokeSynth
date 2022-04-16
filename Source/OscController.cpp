@@ -48,11 +48,11 @@ void OscController::Connect()
    {
       bool connected = OSCReceiver::connect(mInPort);
       assert(connected);
-      
+
       OSCReceiver::addListener(this);
-      
+
       ConnectOutput();
-      
+
       mConnected = true;
    }
    catch (std::exception e)
@@ -91,10 +91,10 @@ void OscController::SendValue(int page, int control, float value, bool forceNote
 {
    if (!mConnected)
       return;
-   
-   for (int i=0; i<mOscMap.size(); ++i)
+
+   for (int i = 0; i < mOscMap.size(); ++i)
    {
-      if (control == mOscMap[i].mControl)// && mOscMap[i].mLastChangedTime + 50 < gTime)
+      if (control == mOscMap[i].mControl) // && mOscMap[i].mLastChangedTime + 50 < gTime)
       {
          juce::OSCMessage msg(mOscMap[i].mAddress.c_str());
 
@@ -105,10 +105,10 @@ void OscController::SendValue(int page, int control, float value, bool forceNote
          }
          else
          {
-            mOscMap[i].mIntValue = value*127;
+            mOscMap[i].mIntValue = value * 127;
             msg.addInt32(mOscMap[i].mIntValue);
          }
-         
+
          if (mOutputConnected)
             mOscOut.send(msg);
       }
@@ -122,7 +122,7 @@ void OscController::oscMessageReceived(const juce::OSCMessage& msg)
    if (address == "/jockey/sync")
    {
       std::string outputAddress = msg[0].getString().toStdString();
-      std::vector<std::string> tokens= ofSplitString(outputAddress, ":");
+      std::vector<std::string> tokens = ofSplitString(outputAddress, ":");
       if (tokens.size() == 2)
       {
          mOutAddress = tokens[0];
@@ -135,45 +135,72 @@ void OscController::oscMessageReceived(const juce::OSCMessage& msg)
    if (msg.size() == 0 || (!msg[0].isFloat32() && !msg[0].isInt32()))
       return;
 
-   int mapIndex = FindControl(address);
-
-   bool isNew = false;
-   if (mapIndex == -1)  //create a new map entry
+   // Handle note data and output these as notes instead of CC's.
+   if (address.rfind("/note", 0) == 0 && msg.size() >= 2 && ((msg[0].isFloat32() && msg[1].isFloat32()) || (msg[0].isInt32() && msg[1].isFloat32() && msg[2].isFloat32())))
    {
-      isNew = true;
-      mapIndex = AddControl(address, msg[0].isFloat32());
-   }
-
-   MidiControl control;
-   control.mControl = mOscMap[mapIndex].mControl;
-   control.mDeviceName = "osccontroller";
-   control.mChannel = 1;
-   mOscMap[mapIndex].mLastChangedTime = gTime;
-   if (mOscMap[mapIndex].mIsFloat)
-   {
-      assert(msg[0].isFloat32());
-      mOscMap[mapIndex].mFloatValue = msg[0].getFloat32();
-      control.mValue = mOscMap[mapIndex].mFloatValue * 127;
-   }
-   else
-   {
-      assert(msg[0].isInt32());
-      mOscMap[mapIndex].mIntValue = msg[0].getInt32();
-      control.mValue = mOscMap[mapIndex].mIntValue;
-   }
-
-   if (isNew)
-   {
-      MidiController* midiController = dynamic_cast<MidiController*>(mListener);
-      if (midiController)
+      MidiNote note;
+      note.mDeviceName = "osccontroller";
+      note.mChannel = 1;
+      int offset = 0;
+      if (msg.size() >= 3 && msg[0].isInt32())
       {
-         auto& layoutControl = midiController->GetLayoutControl(control.mControl, kMidiMessage_Control);
-         layoutControl.mConnectionType = mOscMap[mapIndex].mIsFloat ? kControlType_Slider : kControlType_Direct;
+         note.mChannel = msg[0].getInt32();
+         offset = 1;
       }
+      note.mPitch = msg[0 + offset].getFloat32();
+      if (msg[1 + offset].getFloat32() < 1 / 127)
+         note.mVelocity = 0;
+      else
+         note.mVelocity = msg[1 + offset].getFloat32() * 127;
+      //ofLog() << "OSCNote: P: " << note.mPitch << " V: " << note.mVelocity << " ch:" << note.mChannel;
+      if (mListener != nullptr)
+         mListener->OnMidiNote(note);
+      return;
    }
 
-   if (mListener != nullptr)
-      mListener->OnMidiControl(control);
+   for (int i = 0; i < msg.size(); ++i)
+   {
+      auto calculated_address = (i > 0) ? address + " " + std::to_string(i + 1) : address;
+      int mapIndex = FindControl(calculated_address);
+
+      bool isNew = false;
+      if (mapIndex == -1) //create a new map entry
+      {
+         isNew = true;
+         mapIndex = AddControl(calculated_address, msg[i].isFloat32());
+      }
+
+      MidiControl control;
+      control.mControl = mOscMap[mapIndex].mControl;
+      control.mDeviceName = "osccontroller";
+      control.mChannel = 1;
+      mOscMap[mapIndex].mLastChangedTime = gTime;
+      if (mOscMap[mapIndex].mIsFloat)
+      {
+         assert(msg[i].isFloat32());
+         mOscMap[mapIndex].mFloatValue = msg[i].getFloat32();
+         control.mValue = mOscMap[mapIndex].mFloatValue * 127;
+      }
+      else
+      {
+         assert(msg[i].isInt32());
+         mOscMap[mapIndex].mIntValue = msg[i].getInt32();
+         control.mValue = mOscMap[mapIndex].mIntValue;
+      }
+
+      if (isNew)
+      {
+         MidiController* midiController = dynamic_cast<MidiController*>(mListener);
+         if (midiController)
+         {
+            auto& layoutControl = midiController->GetLayoutControl(control.mControl, kMidiMessage_Control);
+            layoutControl.mConnectionType = mOscMap[mapIndex].mIsFloat ? kControlType_Slider : kControlType_Direct;
+         }
+      }
+
+      if (mListener != nullptr)
+         mListener->OnMidiControl(control);
+   }
 }
 
 int OscController::FindControl(std::string address)

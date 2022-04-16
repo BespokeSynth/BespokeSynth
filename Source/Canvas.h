@@ -38,7 +38,7 @@ class Canvas;
 class CanvasControls;
 class CanvasElement;
 
-typedef CanvasElement* (*CreateCanvasElementFn)(Canvas* canvas,int col,int row);
+typedef CanvasElement* (*CreateCanvasElementFn)(Canvas* canvas, int col, int row);
 
 class ICanvasListener
 {
@@ -50,7 +50,10 @@ public:
 
 struct CanvasCoord
 {
-   CanvasCoord(int _col, int _row) : col(_col), row(_row) {}
+   CanvasCoord(int _col, int _row)
+   : col(_col)
+   , row(_row)
+   {}
    int col;
    int row;
 };
@@ -64,7 +67,7 @@ public:
       kHighlightEnd_Start,
       kHighlightEnd_End
    };
-   
+
    enum DragMode
    {
       kDragNone = 0,
@@ -72,18 +75,22 @@ public:
       kDragVertical = 2,
       kDragBoth = kDragHorizontal | kDragVertical
    };
-   
+
 public:
    Canvas(IDrawableModule* parent, int x, int y, int w, int h, float length, int rows, int cols, CreateCanvasElementFn elementCreator);
    ~Canvas();
-   
+
    void Render() override;
    void MouseReleased() override;
    bool MouseMoved(float x, float y) override;
    bool MouseScrolled(int x, int y, float scrollX, float scrollY) override;
    void Clear();
    void SetListener(ICanvasListener* listener) { mListener = listener; }
-   void SetDimensions(int width, int height) { mWidth = width; mHeight = height; }
+   void SetDimensions(int width, int height)
+   {
+      mWidth = width;
+      mHeight = height;
+   }
    float GetWidth() const { return mWidth; }
    float GetHeight() const { return mHeight; }
    void SetLength(float length) { mLength = length; }
@@ -105,11 +112,11 @@ public:
    CanvasElement* GetElementAt(float pos, int row);
    void SetCursorPos(float pos) { mCursorPos = pos; }
    float GetCursorPos() const { return mCursorPos; }
-   CanvasElement* CreateElement(int col, int row) { return mElementCreator(this,col,row); }
+   CanvasElement* CreateElement(int col, int row) { return mElementCreator(this, col, row); }
    CanvasCoord GetCoordAt(int x, int y);
    void SetNumVisibleRows(int rows) { mNumVisibleRows = rows; }
    int GetNumVisibleRows() const { return MIN(mNumVisibleRows, mNumRows); }
-   void SetRowOffset(int offset) { mRowOffset = ofClamp(offset,0,mNumRows-mNumVisibleRows); }
+   void SetRowOffset(int offset) { mRowOffset = ofClamp(offset, 0, mNumRows - mNumVisibleRows); }
    int GetRowOffset() const { return mRowOffset; }
    bool ShouldWrap() const { return mWrap; }
    HighlightEnd GetHighlightEnd() const { return mHighlightEnd; }
@@ -120,7 +127,7 @@ public:
    void SetRowColor(int row, ofColor color);
    juce::MouseCursor GetMouseCursorType();
    ofVec2f RescaleForZoom(float x, float y) const;
-   
+
    //IUIControl
    void SetFromMidiCC(float slider, bool setViaModulator = false) override {}
    void SetValue(float value) override {}
@@ -129,19 +136,23 @@ public:
    void LoadState(FileStreamIn& in, bool shouldSetValue = true) override;
    bool IsSliderControl() override { return false; }
    bool IsButtonControl() override { return false; }
-   
+
    float mViewStart;
    float mViewEnd;
    float mLoopStart;
    float mLoopEnd;
-   
+
 private:
    void OnClicked(int x, int y, bool right) override;
-   void GetDimensions(float& width, float& height) override { width = mWidth; height = mHeight; }
-   
+   void GetDimensions(float& width, float& height) override
+   {
+      width = mWidth;
+      height = mHeight;
+   }
+
    bool IsOnElement(CanvasElement* element, float x, float y) const;
    float QuantizeToGrid(float input) const;
-   
+
    bool mClick;
    CanvasElement* mClickedElement;
    ofVec2f mClickedElementStartMousePos;
@@ -169,12 +180,12 @@ private:
    bool mHasDuplicatedThisDrag;
    float mScrollVerticalPartial;
    std::array<ofColor, 128> mRowColors;
-   
+
    int mNumRows;
    int mNumCols;
    int mNumVisibleRows;
    DragMode mDragMode;
-   
+
    friend CanvasControls;
 };
 

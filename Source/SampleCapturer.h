@@ -39,7 +39,7 @@ public:
    virtual ~SampleCapturer();
    static IDrawableModule* Create() { return new SampleCapturer(); }
 
-   
+
    void CreateUIControls() override;
 
    //IAudioSource

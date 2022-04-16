@@ -34,9 +34,11 @@
 class FileStreamOut;
 class FileStreamIn;
 
-namespace juce {
+namespace juce
+{
    class AudioFormatReader;
-   template <typename T> class AudioBuffer;
+   template <typename T>
+   class AudioBuffer;
    using AudioSampleBuffer = AudioBuffer<float>;
 }
 
@@ -52,16 +54,16 @@ public:
    Sample();
    ~Sample();
    bool Read(const char* path, bool mono = false, ReadType readType = ReadType::Sync);
-   bool Write(const char* path = nullptr);   //no path = use read filename
+   bool Write(const char* path = nullptr); //no path = use read filename
    bool ConsumeData(double time, ChannelBuffer* out, int size, bool replace);
-   void Play(double time, float rate, int offset, int stopPoint=-1);
+   void Play(double time, float rate, int offset, int stopPoint = -1);
    void SetRate(float rate) { mRate = rate; }
    std::string Name() const { return mName; }
    void SetName(std::string name) { mName = name; }
    int LengthInSamples() const { return mNumSamples; }
    int NumChannels() const { return mData.NumActiveChannels(); }
    ChannelBuffer* Data() { return &mData; }
-   int GetPlayPosition() const { return mOffset; }
+   double GetPlayPosition() const { return mOffset; }
    void SetPlayPosition(double sample) { mOffset = sample; }
    float GetSampleRateRatio() const { return mSampleRateRatio; }
    void Reset() { mOffset = mNumSamples; }
@@ -84,15 +86,16 @@ public:
    void CopyFrom(Sample* sample);
    bool IsSampleLoading() { return mSamplesLeftToRead > 0; }
    float GetSampleLoadProgress() { return (mNumSamples > 0) ? (1 - (float(mSamplesLeftToRead) / mNumSamples)) : 1; }
-   
+
    void SaveState(FileStreamOut& out);
    void LoadState(FileStreamIn& in);
+
 private:
    void Setup(int length);
    void FinishRead();
    //juce::Timer
    void timerCallback();
-   
+
    ChannelBuffer mData;
    int mNumSamples;
    double mStartTime;

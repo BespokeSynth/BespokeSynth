@@ -37,7 +37,7 @@ NoteOctaver::NoteOctaver()
 void NoteOctaver::CreateUIControls()
 {
    IDrawableModule::CreateUIControls();
-   mOctaveSlider = new IntSlider(this,"octave",4,2,100,15,&mOctave,-4,4);
+   mOctaveSlider = new IntSlider(this, "octave", 4, 2, 100, 15, &mOctave, -4, 4);
 }
 
 void NoteOctaver::DrawModule()
@@ -45,11 +45,11 @@ void NoteOctaver::DrawModule()
 
    if (Minimized() || IsVisible() == false)
       return;
-   
+
    mOctaveSlider->Draw();
 }
 
-void NoteOctaver::CheckboxUpdated(Checkbox *checkbox)
+void NoteOctaver::CheckboxUpdated(Checkbox* checkbox)
 {
    if (checkbox == mEnabledCheckbox)
       mNoteOutput.Flush(gTime);
@@ -90,7 +90,7 @@ void NoteOctaver::IntSliderUpdated(IntSlider* slider, int oldVal)
          if (mInputNotes[pitch].mOn)
          {
             PlayNoteOutput(time + .01, pitch + oldVal, 0, mInputNotes[pitch].mVoiceIdx, ModulationParameters());
-            PlayNoteOutput(time, pitch + mOctave*12, mInputNotes[pitch].mVelocity, mInputNotes[pitch].mVoiceIdx, ModulationParameters());
+            PlayNoteOutput(time, pitch + mOctave * 12, mInputNotes[pitch].mVelocity, mInputNotes[pitch].mVoiceIdx, ModulationParameters());
          }
       }
    }
@@ -107,5 +107,3 @@ void NoteOctaver::SetUpFromSaveData()
 {
    SetUpPatchCables(mModuleSaveData.GetString("target"));
 }
-
-

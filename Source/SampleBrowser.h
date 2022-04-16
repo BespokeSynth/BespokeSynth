@@ -38,28 +38,31 @@ public:
    SampleBrowser();
    ~SampleBrowser();
    static IDrawableModule* Create() { return new SampleBrowser(); }
-   
-   
-   
+
+
    void CreateUIControls() override;
-   
+
    void ButtonClicked(ClickButton* button) override;
 
    virtual void LoadLayout(const ofxJSONElement& moduleInfo) override;
    virtual void SetUpFromSaveData() override;
    void SaveState(FileStreamOut& out) override;
    void LoadState(FileStreamIn& in) override;
-   
+
 private:
    //IDrawableModule
    void DrawModule() override;
    bool Enabled() const override { return true; }
-   void GetModuleDimensions(float& width, float& height) override { width=300; height=38+(int)mButtons.size()*17; }
-   
+   void GetModuleDimensions(float& width, float& height) override
+   {
+      width = 300;
+      height = 38 + (int)mButtons.size() * 17;
+   }
+
    void SetDirectory(juce::String dirPath);
    int GetNumPages() const;
    void ShowPage(int page);
-   
+
    juce::String mCurrentDirectory;
    juce::StringArray mDirectoryListing;
    std::array<ClickButton*, 30> mButtons;
@@ -67,4 +70,3 @@ private:
    ClickButton* mForwardButton;
    int mCurrentPage;
 };
-

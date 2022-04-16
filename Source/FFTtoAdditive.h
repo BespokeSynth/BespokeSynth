@@ -45,8 +45,8 @@ public:
    FFTtoAdditive();
    virtual ~FFTtoAdditive();
    static IDrawableModule* Create() { return new FFTtoAdditive(); }
-   
-   
+
+
    void CreateUIControls() override;
 
    //IAudioReceiver
@@ -59,23 +59,26 @@ public:
    void CheckboxUpdated(Checkbox* checkbox) override;
    //IFloatSliderListener
    void FloatSliderUpdated(FloatSlider* slider, float oldVal) override {}
-   
+
    virtual void LoadLayout(const ofxJSONElement& moduleInfo) override;
    virtual void SetUpFromSaveData() override;
-   
-   
-private:
 
+
+private:
    void DrawViz();
    float SinSample(float phase);
 
    //IDrawableModule
    void DrawModule() override;
-   void GetModuleDimensions(float& w, float& h) override { w=235; h=170; }
+   void GetModuleDimensions(float& w, float& h) override
+   {
+      w = 235;
+      h = 170;
+   }
    bool Enabled() const override { return mEnabled; }
 
    FFTData mFFTData;
-   
+
    float* mWindower;
 
    ::FFT mFFT;
@@ -97,10 +100,9 @@ private:
    float mPhaseOffset;
    FloatSlider* mPhaseOffsetSlider;
 
-   float mPeakHistory[RAZOR_HISTORY][VIZ_WIDTH+1];
+   float mPeakHistory[RAZOR_HISTORY][VIZ_WIDTH + 1];
    int mHistoryPtr;
    float* mPhaseInc;
 };
 
 #endif /* defined(__modularSynth__FFTtoAdditive__) */
-

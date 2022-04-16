@@ -36,28 +36,36 @@ class QuickSpawnMenu : public IDrawableModule
 public:
    QuickSpawnMenu();
    virtual ~QuickSpawnMenu();
-   
+
    void Init() override;
    void DrawModule() override;
    void DrawModuleUnclipped() override;
-   void SetDimensions(int w, int h) { mWidth = w; mHeight = h; }
+   void SetDimensions(int w, int h)
+   {
+      mWidth = w;
+      mHeight = h;
+   }
    bool HasTitleBar() const override { return false; }
    bool IsSaveable() override { return false; }
    std::string GetHoveredModuleTypeName();
-   
+
    void KeyPressed(int key, bool isRepeat) override;
    void KeyReleased(int key) override;
    void MouseReleased() override;
-   
+
    bool IsSingleton() const override { return true; }
-   
+
 private:
    std::string GetModuleTypeNameAt(int x, int y);
    void UpdateDisplay();
 
    void OnClicked(int x, int y, bool right) override;
    bool MouseMoved(float x, float y) override;
-   void GetDimensions(float& width, float& height) override { width = mWidth; height = mHeight; }
+   void GetDimensions(float& width, float& height) override
+   {
+      width = mWidth;
+      height = mHeight;
+   }
    float mWidth;
    float mHeight;
    std::vector<std::string> mElements;

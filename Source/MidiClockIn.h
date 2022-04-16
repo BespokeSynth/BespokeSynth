@@ -39,36 +39,40 @@ public:
    MidiClockIn();
    virtual ~MidiClockIn();
    static IDrawableModule* Create() { return new MidiClockIn(); }
-   
+
    void CreateUIControls() override;
    void Init() override;
    void SetEnabled(bool enabled) override { mEnabled = enabled; }
-   
+
    void OnMidiNote(MidiNote& note) override {}
    void OnMidiControl(MidiControl& control) override {}
    void OnMidi(const juce::MidiMessage& message) override;
-   
+
    void DropdownUpdated(DropdownList* list, int oldVal) override;
    void DropdownClicked(DropdownList* list) override;
    void FloatSliderUpdated(FloatSlider* slider, float oldVal) override {}
    void IntSliderUpdated(IntSlider* slider, int oldVal) override {}
-   
+
    virtual void LoadLayout(const ofxJSONElement& moduleInfo) override;
    virtual void SetUpFromSaveData() override;
-   
+
 private:
    void InitDevice();
    void BuildDeviceList();
    float GetRoundedTempo();
-   
+
    //IDrawableModule
    void DrawModule() override;
    bool Enabled() const override { return mEnabled; }
-   void GetModuleDimensions(float& w, float& h) override { w=mWidth; h=mHeight; }
-   
+   void GetModuleDimensions(float& w, float& h) override
+   {
+      w = mWidth;
+      h = mHeight;
+   }
+
    float mWidth;
    float mHeight;
-   
+
    enum class TempoRoundMode
    {
       kNone,
@@ -79,19 +83,19 @@ private:
    };
 
    static constexpr int kMaxHistory = 40;
-   
-   int mDeviceIndex{-1};
+
+   int mDeviceIndex{ -1 };
    DropdownList* mDeviceList;
-   TempoRoundMode mTempoRoundMode{TempoRoundMode::kWhole};
+   TempoRoundMode mTempoRoundMode{ TempoRoundMode::kWhole };
    DropdownList* mTempoRoundModeList;
    float mStartOffsetMs{ 0 };
    FloatSlider* mStartOffsetMsSlider;
-   int mSmoothAmount{ kMaxHistory/2 };
+   int mSmoothAmount{ kMaxHistory / 2 };
    IntSlider* mSmoothAmountSlider;
-   
+
    MidiDevice mDevice;
-   
+
    std::array<float, kMaxHistory> mTempoHistory;
-   int mTempoIdx{-1};
-   double mLastTimestamp{-1};
+   int mTempoIdx{ -1 };
+   double mLastTimestamp{ -1 };
 };

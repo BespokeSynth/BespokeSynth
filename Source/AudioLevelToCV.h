@@ -39,33 +39,37 @@ public:
    AudioLevelToCV();
    virtual ~AudioLevelToCV();
    static IDrawableModule* Create() { return new AudioLevelToCV(); }
-   
-   
+
+
    void CreateUIControls() override;
-   
+
    void SetEnabled(bool enabled) override { mEnabled = enabled; }
-   
+
    void Process(double time) override;
-   
+
    void PostRepatch(PatchCableSource* cableSource, bool fromUserClick) override;
-   
+
    //IModulator
    float Value(int samplesIn = 0) override;
    bool Active() const override { return mEnabled; }
-   
+
    //IFloatSliderListener
    void FloatSliderUpdated(FloatSlider* slider, float oldVal) override;
-   
+
    void SaveLayout(ofxJSONElement& moduleInfo) override;
    void LoadLayout(const ofxJSONElement& moduleInfo) override;
    void SetUpFromSaveData() override;
-   
+
 private:
    //IDrawableModule
    void DrawModule() override;
-   void GetModuleDimensions(float& w, float& h) override { w=106; h=17*5+2; }
+   void GetModuleDimensions(float& w, float& h) override
+   {
+      w = 106;
+      h = 17 * 5 + 2;
+   }
    bool Enabled() const override { return mEnabled; }
-   
+
    float mGain;
    float* mModulationBuffer;
    FloatSlider* mGainSlider;
@@ -77,5 +81,3 @@ private:
    float mAttackFactor;
    float mReleaseFactor;
 };
-
-

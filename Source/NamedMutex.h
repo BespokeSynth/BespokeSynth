@@ -31,9 +31,13 @@
 class NamedMutex
 {
 public:
-   NamedMutex() : mLocker("<none>"), mExtraLockCount(0) {}
+   NamedMutex()
+   : mLocker("<none>")
+   , mExtraLockCount(0)
+   {}
    void Lock(std::string locker);
    void Unlock();
+
 private:
    ofMutex mMutex;
    std::string mLocker;
@@ -45,6 +49,7 @@ class ScopedMutex
 public:
    ScopedMutex(NamedMutex* mutex, std::string locker);
    ~ScopedMutex();
+
 private:
    NamedMutex* mMutex;
 };

@@ -27,7 +27,7 @@ public:
    virtual ~M185Sequencer();
    static IDrawableModule* Create() { return new M185Sequencer(); }
 
-   
+
    void CreateUIControls() override;
    void Init() override;
 

@@ -35,9 +35,10 @@ class JumpBlender
 {
 public:
    JumpBlender();
-   
+
    void CaptureForJump(int pos, const float* sampleSource, int sourceLength, int samplesIn);
    float Process(float sample, int samplesIn);
+
 private:
    bool mBlending;
    Ramp mRamp;

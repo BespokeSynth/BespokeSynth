@@ -44,30 +44,30 @@ public:
    Arpeggiator();
    ~Arpeggiator();
    static IDrawableModule* Create() { return new Arpeggiator(); }
-   
-   
+
+
    void CreateUIControls() override;
-   
+
    void Init() override;
-   
+
    void SetEnabled(bool enabled) override { mEnabled = enabled; }
 
    //IClickable
    void MouseReleased() override;
    bool MouseMoved(float x, float y) override;
-   
+
    //INoteReceiver
    void PlayNote(double time, int pitch, int velocity, int voiceIdx = -1, ModulationParameters modulation = ModulationParameters()) override;
-   
+
    //ITimeListener
    void OnTimeEvent(double time) override;
-   
+
    //IScaleListener
    void OnScaleChanged() override;
 
    //IButtonListener
    void ButtonClicked(ClickButton* button) override;
-   
+
    void CheckboxUpdated(Checkbox* checkbox) override;
    //IDropdownListener
    void DropdownUpdated(DropdownList* list, int oldVal) override;
@@ -75,23 +75,32 @@ public:
    void IntSliderUpdated(IntSlider* slider, int oldVal) override;
    //IFloatSliderListener
    void FloatSliderUpdated(FloatSlider* slider, float oldVal) override {}
-   
+
    virtual void LoadLayout(const ofxJSONElement& moduleInfo) override;
    virtual void SetUpFromSaveData() override;
-   
+
 private:
    //IDrawableModule
    void DrawModule() override;
-   void GetModuleDimensions(float& width, float& height) override { width = mWidth; height = mHeight; }
+   void GetModuleDimensions(float& width, float& height) override
+   {
+      width = mWidth;
+      height = mHeight;
+   }
    bool Enabled() const override { return mEnabled; }
    void OnClicked(int x, int y, bool right) override;
-   
+
    std::string GetArpNoteDisplay(int pitch);
    void UpdateInterval();
-   
+
    struct ArpNote
    {
-      ArpNote(int _pitch, int _vel, int _voiceIdx, ModulationParameters _modulation) : pitch(_pitch), vel(_vel), voiceIdx(_voiceIdx), modulation(_modulation) {}
+      ArpNote(int _pitch, int _vel, int _voiceIdx, ModulationParameters _modulation)
+      : pitch(_pitch)
+      , vel(_vel)
+      , voiceIdx(_voiceIdx)
+      , modulation(_modulation)
+      {}
       int pitch;
       int vel;
       int voiceIdx;
@@ -101,17 +110,17 @@ private:
 
    float mWidth;
    float mHeight;
-   
+
    NoteInterval mInterval;
    int mLastPitch;
    int mArpIndex;
    char mArpString[MAX_TEXTENTRY_LENGTH];
-   
+
    DropdownList* mIntervalSelector;
    int mArpStep;
    int mArpPingPongDirection;
    IntSlider* mArpStepSlider;
-   
+
    int mCurrentOctaveOffset;
    int mOctaveRepeats;
    IntSlider* mOctaveRepeatsSlider;
@@ -123,4 +132,3 @@ private:
 };
 
 #endif /* defined(__modularSynth__Arpeggiator__) */
-

@@ -47,35 +47,34 @@ EnvelopeControl::EnvelopeControl(ofVec2f position, ofVec2f dimensions)
 , mLastClickTime(0)
 , mFixedLengthMode(false)
 {
-   
 }
 
 void EnvelopeControl::Draw()
 {
    ofPushStyle();
-   
-   ofSetColor(100,100,.8f*gModuleDrawAlpha);
-   
+
+   ofSetColor(100, 100, .8f * gModuleDrawAlpha);
+
    ofSetLineWidth(.5f);
    ofRect(mPosition.x, mPosition.y, mDimensions.x, mDimensions.y, 0);
-   
+
    ofSetColor(245, 58, 0, gModuleDrawAlpha);
-   
+
    mViewAdsr.Set(*mAdsr);
    mViewAdsr.Clear();
-   mViewAdsr.Start(0,1);
+   mViewAdsr.Start(0, 1);
    mViewAdsr.Stop(GetReleaseTime());
-   
+
    ofSetLineWidth(1);
    ofBeginShape();
-   for (float i=0; i<mDimensions.x; i+=(.25f/gDrawScale))
+   for (float i = 0; i < mDimensions.x; i += (.25f / gDrawScale))
    {
-      float time = i/mDimensions.x * mViewLength;
-      
+      float time = i / mDimensions.x * mViewLength;
+
       if (time < GetPreSustainTime())
       {
          float value = mViewAdsr.Value(time);
-         AddVertex(i+mPosition.x, GetYForValue(value));
+         AddVertex(i + mPosition.x, GetYForValue(value));
       }
       else
       {
@@ -85,7 +84,7 @@ void EnvelopeControl::Draw()
    AddVertex(GetXForTime(GetPreSustainTime()),
              GetYForValue(mViewAdsr.Value(GetPreSustainTime())));
    ofEndShape(false);
-   
+
    ofPushStyle();
    ofSetColor(0, 58, 245, gModuleDrawAlpha);
    ofLine(ofClamp(GetXForTime(GetPreSustainTime()), mPosition.x, mPosition.x + mDimensions.x),
@@ -93,28 +92,28 @@ void EnvelopeControl::Draw()
           ofClamp(GetXForTime(GetReleaseTime()), mPosition.x, mPosition.x + mDimensions.x),
           GetYForValue(mViewAdsr.Value(GetReleaseTime())));
    ofPopStyle();
-   
+
    ofBeginShape();
    AddVertex(GetXForTime(GetReleaseTime()),
              GetYForValue(mViewAdsr.Value(GetReleaseTime())));
-   for (float i=0; i<mDimensions.x; i+=(.25f/gDrawScale))
+   for (float i = 0; i < mDimensions.x; i += (.25f / gDrawScale))
    {
-      float time = i/mDimensions.x * mViewLength;
-      
+      float time = i / mDimensions.x * mViewLength;
+
       if (time >= GetReleaseTime())
       {
          float value = mViewAdsr.Value(time);
-         AddVertex(i+mPosition.x, GetYForValue(value));
+         AddVertex(i + mPosition.x, GetYForValue(value));
       }
    }
    ofEndShape(false);
-   
+
    ofSetLineWidth(3);
    ofBeginShape();
    bool started = false;
-   for (float i=0; i<mDimensions.x; i+=(.25f/gDrawScale))
+   for (float i = 0; i < mDimensions.x; i += (.25f / gDrawScale))
    {
-      float time = i/mDimensions.x * mViewLength;
+      float time = i / mDimensions.x * mViewLength;
       if (mViewAdsr.GetStageForTime(time) == mHighlightCurve)
       {
          if (!started)
@@ -124,41 +123,41 @@ void EnvelopeControl::Draw()
             mViewAdsr.GetStage(time, stageStartTime);
             AddVertex(GetXForTime(stageStartTime), GetYForValue(mViewAdsr.Value(stageStartTime)));
          }
-         
+
          if (mViewAdsr.GetHasSustainStage() && mHighlightCurve == mViewAdsr.GetSustainStage() && time > GetPreSustainTime())
             break;
-         
+
          float value = mViewAdsr.Value(time);
-         AddVertex(i+mPosition.x, GetYForValue(value));
+         AddVertex(i + mPosition.x, GetYForValue(value));
       }
    }
    ofEndShape(false);
-   
+
    float time = 0;
    ofSetLineWidth(.5f);
-   for (int i=0; i<mViewAdsr.GetNumStages(); ++i)
+   for (int i = 0; i < mViewAdsr.GetNumStages(); ++i)
    {
       if (mViewAdsr.GetHasSustainStage() && i == mViewAdsr.GetSustainStage() + 1)
          time = GetReleaseTime();
-      
+
       time += mViewAdsr.GetStageData(i).time;
-      
-      if (i == mViewAdsr.GetNumStages()-1)
+
+      if (i == mViewAdsr.GetNumStages() - 1)
          time += 0;
-      
+
       float value = mViewAdsr.Value(time);
       if (i == mHighlightPoint)
          ofFill();
       else
          ofNoFill();
-      
+
       float x = GetXForTime(time);
       if (x < mPosition.x + mDimensions.x)
          ofCircle(x, GetYForValue(value), i == mHighlightPoint ? 8 : pointClickRadius);
    }
-   
+
    ofSetLineWidth(1);
-   ofSetColor(0,255,0,gModuleDrawAlpha * .5f);
+   ofSetColor(0, 255, 0, gModuleDrawAlpha * .5f);
    float drawTime = 0;
    if (mAdsr->GetStartTime(gTime) > 0 && mAdsr->GetStartTime(gTime) >= mAdsr->GetStopTime(gTime))
       drawTime = ofClamp(gTime - mAdsr->GetStartTime(gTime), 0, GetReleaseTime());
@@ -166,19 +165,19 @@ void EnvelopeControl::Draw()
       drawTime = GetReleaseTime() + (gTime - mAdsr->GetStopTime(gTime));
    if (drawTime > 0 && drawTime < mViewLength)
       ofLine(GetXForTime(drawTime), mPosition.y, GetXForTime(drawTime), mPosition.y + mDimensions.y);
-   
+
    ofPopStyle();
 }
 
 void EnvelopeControl::OnClicked(int x, int y, bool right)
 {
-   if (x > mPosition.x-pointClickRadius &&
+   if (x > mPosition.x - pointClickRadius &&
        x < mPosition.x + mDimensions.x + pointClickRadius &&
        y > mPosition.y - pointClickRadius &&
        y < mPosition.y + mDimensions.y + pointClickRadius)
    {
       mClick = true;
-      
+
       if (right)
       {
          if (mHighlightCurve != -1)
@@ -188,60 +187,60 @@ void EnvelopeControl::OnClicked(int x, int y, bool right)
          }
          if (mHighlightPoint != -1)
          {
-            if (mHighlightPoint < mAdsr->GetNumStages()-1)
+            if (mHighlightPoint < mAdsr->GetNumStages() - 1)
             {
-               mAdsr->GetStageData(mHighlightPoint+1).time += mAdsr->GetStageData(mHighlightPoint).time;
-               mAdsr->GetStageData(mHighlightPoint+1).curve = 0;
-               
-               for (int i=mHighlightPoint; i<mAdsr->GetNumStages(); ++i)
+               mAdsr->GetStageData(mHighlightPoint + 1).time += mAdsr->GetStageData(mHighlightPoint).time;
+               mAdsr->GetStageData(mHighlightPoint + 1).curve = 0;
+
+               for (int i = mHighlightPoint; i < mAdsr->GetNumStages(); ++i)
                {
-                  mAdsr->GetStageData(i).time = mAdsr->GetStageData(i+1).time;
-                  mAdsr->GetStageData(i).target = mAdsr->GetStageData(i+1).target;
-                  mAdsr->GetStageData(i).curve = mAdsr->GetStageData(i+1).curve;
+                  mAdsr->GetStageData(i).time = mAdsr->GetStageData(i + 1).time;
+                  mAdsr->GetStageData(i).target = mAdsr->GetStageData(i + 1).target;
+                  mAdsr->GetStageData(i).curve = mAdsr->GetStageData(i + 1).curve;
                }
-               
+
                mAdsr->SetNumStages(mAdsr->GetNumStages() - 1);
                if (mAdsr->GetHasSustainStage() &&
                    mHighlightPoint <= mAdsr->GetSustainStage())
-                  mAdsr->SetSustainStage(mAdsr->GetSustainStage()-1);
+                  mAdsr->SetSustainStage(mAdsr->GetSustainStage() - 1);
                mViewAdsr.Set(*mAdsr);
-               
+
                mHighlightPoint = -1;
             }
          }
       }
       else if (gTime < mLastClickTime + 500 &&
                mHighlightCurve != -1 &&
-               (mClickStart - ofVec2f(x,y)).lengthSquared() < pointClickRadius*pointClickRadius)
+               (mClickStart - ofVec2f(x, y)).lengthSquared() < pointClickRadius * pointClickRadius)
       {
          float clickTime = GetTimeForX(x);
          if (clickTime > GetPreSustainTime())
             clickTime -= GetReleaseTime() - GetPreSustainTime();
-         
-         for (int i=mAdsr->GetNumStages(); i>mHighlightCurve; --i)
+
+         for (int i = mAdsr->GetNumStages(); i > mHighlightCurve; --i)
          {
-            mAdsr->GetStageData(i).time = mAdsr->GetStageData(i-1).time;
-            mAdsr->GetStageData(i).target = mAdsr->GetStageData(i-1).target;
-            mAdsr->GetStageData(i).curve = mAdsr->GetStageData(i-1).curve;
+            mAdsr->GetStageData(i).time = mAdsr->GetStageData(i - 1).time;
+            mAdsr->GetStageData(i).target = mAdsr->GetStageData(i - 1).target;
+            mAdsr->GetStageData(i).curve = mAdsr->GetStageData(i - 1).curve;
          }
          float priorStageTimes = 0;
-         for (int i=0; i<mHighlightCurve; ++i)
+         for (int i = 0; i < mHighlightCurve; ++i)
             priorStageTimes += mAdsr->GetStageData(i).time;
          mAdsr->GetStageData(mHighlightCurve).time = clickTime - priorStageTimes;
          mAdsr->GetStageData(mHighlightCurve).target = GetValueForY(y);
-         mAdsr->GetStageData(mHighlightCurve+1).time -= mAdsr->GetStageData(mHighlightCurve).time;
+         mAdsr->GetStageData(mHighlightCurve + 1).time -= mAdsr->GetStageData(mHighlightCurve).time;
          mAdsr->SetNumStages(mAdsr->GetNumStages() + 1);
          if (mAdsr->GetHasSustainStage() &&
              mHighlightCurve <= mAdsr->GetSustainStage())
-            mAdsr->SetSustainStage(mAdsr->GetSustainStage()+1);
+            mAdsr->SetSustainStage(mAdsr->GetSustainStage() + 1);
          mViewAdsr.Set(*mAdsr);
-         
+
          mHighlightPoint = mHighlightCurve;
          mHighlightCurve = -1;
       }
-      
+
       mLastClickTime = gTime;
-      mClickStart.set(x,y);
+      mClickStart.set(x, y);
       mClickAdsr.Set(mViewAdsr);
    }
 }
@@ -256,31 +255,31 @@ void EnvelopeControl::MouseMoved(float x, float y)
    if (!mClick)
    {
       mViewAdsr.Set(*mAdsr);
-      
+
       mHighlightPoint = -1;
       float time = 0;
-      for (int i=0; i<mViewAdsr.GetNumStages(); ++i)
+      for (int i = 0; i < mViewAdsr.GetNumStages(); ++i)
       {
          if (mViewAdsr.GetHasSustainStage() && i == mViewAdsr.GetSustainStage() + 1)
             time = GetReleaseTime();
-         
+
          time += mViewAdsr.GetStageData(i).time;
-         
-         if (i == mViewAdsr.GetNumStages()-1)
+
+         if (i == mViewAdsr.GetNumStages() - 1)
             time += 0;
-         
+
          float value = mViewAdsr.Value(time);
-         
+
          float pointX = GetXForTime(time);
          float pointY = GetYForValue(value);
-         
-         if (fabsf(x-pointX) < 4 && fabsf(y-pointY) < 4)
+
+         if (fabsf(x - pointX) < 4 && fabsf(y - pointY) < 4)
          {
             mHighlightPoint = i;
             mHighlightCurve = -1;
          }
       }
-      
+
       if (mHighlightPoint == -1)
       {
          float time = GetTimeForX(x);
@@ -303,40 +302,40 @@ void EnvelopeControl::MouseMoved(float x, float y)
       {
          ::ADSR::Stage& stage = mAdsr->GetStageData(mHighlightPoint);
          ::ADSR::Stage& originalStage = mClickAdsr.GetStageData(mHighlightPoint);
-         
+
          float maxLength = 10000;
          if (mFixedLengthMode)
          {
             if (mHighlightPoint < mAdsr->GetNumStages() - 1)
-               maxLength = stage.time + mAdsr->GetStageData(mHighlightPoint+1).time - 1;
+               maxLength = stage.time + mAdsr->GetStageData(mHighlightPoint + 1).time - 1;
             else if (mHighlightPoint == mAdsr->GetNumStages() - 1)
             {
                float time = 0;
-               for (int i=0; i < mViewAdsr.GetNumStages()-1; ++i)
+               for (int i = 0; i < mViewAdsr.GetNumStages() - 1; ++i)
                   time += mViewAdsr.GetStageData(i).time;
                maxLength = mViewLength - time - 1;
             }
          }
-         
-         stage.time = ofClamp(originalStage.time + (x - mClickStart.x)/mDimensions.x * mViewLength, 0.001f, maxLength);
-         
+
+         stage.time = ofClamp(originalStage.time + (x - mClickStart.x) / mDimensions.x * mViewLength, 0.001f, maxLength);
+
          if (mFixedLengthMode && mHighlightPoint < mAdsr->GetNumStages() - 1)
          {
             float timeAdjustment = stage.time - originalStage.time;
-            mAdsr->GetStageData(mHighlightPoint+1).time = mClickAdsr.GetStageData(mHighlightPoint+1).time - timeAdjustment;
+            mAdsr->GetStageData(mHighlightPoint + 1).time = mClickAdsr.GetStageData(mHighlightPoint + 1).time - timeAdjustment;
          }
-         
-         if (mHighlightPoint < mAdsr->GetNumStages()-1 || mAdsr->GetFreeReleaseLevel())
+
+         if (mHighlightPoint < mAdsr->GetNumStages() - 1 || mAdsr->GetFreeReleaseLevel())
             stage.target = ofClamp(originalStage.target + ((mClickStart.y - y) / mDimensions.y), 0, 1);
          else
             stage.target = 0;
       }
-      
+
       if (mHighlightCurve != -1)
       {
          ::ADSR::Stage& stage = mAdsr->GetStageData(mHighlightCurve);
          ::ADSR::Stage& originalStage = mClickAdsr.GetStageData(mHighlightCurve);
-         
+
          stage.curve = ofClamp(originalStage.curve + ((mClickStart.y - y) / mDimensions.y), -1, 1);
       }
    }
@@ -351,9 +350,9 @@ void EnvelopeControl::AddVertex(float x, float y)
 float EnvelopeControl::GetPreSustainTime()
 {
    float time = 0;
-   for (int i=0; i<=mViewAdsr.GetSustainStage() || (!mViewAdsr.GetHasSustainStage() && i < mViewAdsr.GetNumStages()); ++i)
+   for (int i = 0; i <= mViewAdsr.GetSustainStage() || (!mViewAdsr.GetHasSustainStage() && i < mViewAdsr.GetNumStages()); ++i)
       time += mViewAdsr.GetStageData(i).time;
-   
+
    return time;
 }
 
@@ -369,26 +368,26 @@ float EnvelopeControl::GetReleaseTime()
 
 float EnvelopeControl::GetTimeForX(float x)
 {
-   return ofMap(x,mPosition.x,mPosition.x+mDimensions.x,0,mViewLength);
+   return ofMap(x, mPosition.x, mPosition.x + mDimensions.x, 0, mViewLength);
 }
 
 float EnvelopeControl::GetValueForY(float y)
 {
-   return ofMap(y,mPosition.y,mPosition.y+mDimensions.y,1,0);
+   return ofMap(y, mPosition.y, mPosition.y + mDimensions.y, 1, 0);
 }
 
 float EnvelopeControl::GetXForTime(float time)
 {
-   return time/mViewLength*mDimensions.x + mPosition.x;
+   return time / mViewLength * mDimensions.x + mPosition.x;
 }
 
 float EnvelopeControl::GetYForValue(float value)
 {
-   return mDimensions.y * (1-value) + mPosition.y;
+   return mDimensions.y * (1 - value) + mPosition.y;
 }
 
 EnvelopeEditor::EnvelopeEditor()
-: mEnvelopeControl(ofVec2f(10,40), ofVec2f(380,200))
+: mEnvelopeControl(ofVec2f(10, 40), ofVec2f(380, 200))
 , mADSRDisplay(nullptr)
 , mPinned(false)
 , mADSRViewLength(2000)
@@ -405,18 +404,18 @@ EnvelopeEditor::EnvelopeEditor()
 void EnvelopeEditor::CreateUIControls()
 {
    IDrawableModule::CreateUIControls();
-   mADSRViewLengthSlider = new FloatSlider(this,"length",2,20,120,15,&mADSRViewLength,10,10000);
-   mPinButton = new ClickButton(this,"pin",3,2);
-   
+   mADSRViewLengthSlider = new FloatSlider(this, "length", 2, 20, 120, 15, &mADSRViewLength, 10, 10000);
+   mPinButton = new ClickButton(this, "pin", 3, 2);
+
    static bool dummyBool;
    static int dummyInt;
    static float dummyFloat;
-   
+
    mHasSustainStageCheckbox = new Checkbox(this, "has sustain", 2, mEnvelopeControl.GetPosition().y + mEnvelopeControl.GetDimensions().y + 6, &dummyBool);
-   mSustainStageSlider = new IntSlider(this, "sustain stage", mHasSustainStageCheckbox, kAnchor_Right, 100, 15, &dummyInt, 1, MAX_ADSR_STAGES-1);
+   mSustainStageSlider = new IntSlider(this, "sustain stage", mHasSustainStageCheckbox, kAnchor_Right, 100, 15, &dummyInt, 1, MAX_ADSR_STAGES - 1);
    mMaxSustainSlider = new FloatSlider(this, "max sustain", mSustainStageSlider, kAnchor_Right, 100, 15, &dummyFloat, -1, 5000);
    mFreeReleaseLevelCheckbox = new Checkbox(this, "free release", mHasSustainStageCheckbox, kAnchor_Below, &dummyBool);
-   
+
    mADSRViewLengthSlider->SetMode(FloatSlider::kSquare);
    mMaxSustainSlider->SetMode(FloatSlider::kSquare);
 }
@@ -428,15 +427,15 @@ EnvelopeEditor::~EnvelopeEditor()
 void EnvelopeEditor::SetADSRDisplay(ADSRDisplay* adsrDisplay)
 {
    mEnvelopeControl.SetADSR(adsrDisplay->GetADSR());
-   
+
    mADSRDisplay = adsrDisplay;
-   mADSRViewLength = adsrDisplay->GetMaxTime()+10;
+   mADSRViewLength = adsrDisplay->GetMaxTime() + 10;
    mEnvelopeControl.SetViewLength(mADSRViewLength);
    mHasSustainStageCheckbox->SetVar(&adsrDisplay->GetADSR()->GetHasSustainStage());
    mSustainStageSlider->SetVar(&adsrDisplay->GetADSR()->GetSustainStage());
    mMaxSustainSlider->SetVar(&adsrDisplay->GetADSR()->GetMaxSustain());
    mFreeReleaseLevelCheckbox->SetVar(&adsrDisplay->GetADSR()->GetFreeReleaseLevel());
-   
+
    mSustainStageSlider->SetShowing(mADSRDisplay->GetADSR()->GetHasSustainStage());
    mMaxSustainSlider->SetShowing(mADSRDisplay->GetADSR()->GetHasSustainStage());
 }
@@ -451,25 +450,25 @@ void EnvelopeEditor::DrawModule()
 {
    if (!mPinned)
    {
-      float w,h;
-      GetDimensions(w,h);
-      
+      float w, h;
+      GetDimensions(w, h);
+
       ofPushStyle();
-      ofSetColor(0,0,0);
+      ofSetColor(0, 0, 0);
       ofFill();
       ofSetLineWidth(.5f);
-      ofRect(0,0,w,h);
+      ofRect(0, 0, w, h);
       ofNoFill();
-      ofSetColor(255,255,255);
-      ofRect(0,0,w,h);
+      ofSetColor(255, 255, 255);
+      ofRect(0, 0, w, h);
       ofPopStyle();
    }
-   
+
    if (Minimized())
       return;
-   
+
    mSustainStageSlider->SetExtents(1, mADSRDisplay->GetADSR()->GetNumStages() - 2);
-   
+
    mADSRViewLengthSlider->Draw();
    mHasSustainStageCheckbox->Draw();
    mSustainStageSlider->Draw();
@@ -477,30 +476,30 @@ void EnvelopeEditor::DrawModule()
    mFreeReleaseLevelCheckbox->Draw();
    if (!mPinned)
       mPinButton->Draw();
-   
+
    mEnvelopeControl.Draw();
 }
 
 void EnvelopeEditor::OnClicked(int x, int y, bool right)
 {
    IDrawableModule::OnClicked(x, y, right);
-   
-   mEnvelopeControl.OnClicked(x,y,right);
+
+   mEnvelopeControl.OnClicked(x, y, right);
 }
 
 void EnvelopeEditor::MouseReleased()
 {
    IDrawableModule::MouseReleased();
-   
+
    mEnvelopeControl.MouseReleased();
 }
 
 bool EnvelopeEditor::MouseMoved(float x, float y)
 {
    IDrawableModule::MouseMoved(x, y);
-   
+
    mEnvelopeControl.MouseMoved(x, y);
-   
+
    return false;
 }
 
@@ -521,9 +520,9 @@ void EnvelopeEditor::ButtonClicked(ClickButton* button)
       {
          TheSynth->AddDynamicModule(this);
          TheSynth->PopModalFocusItem();
-         
+
          SetName(GetUniqueName("envelopeeditor", TheSynth->GetModuleNames<EnvelopeEditor*>()).c_str());
-         
+
          Pin();
       }
    }
@@ -554,17 +553,17 @@ void EnvelopeEditor::FloatSliderUpdated(FloatSlider* slider, float oldVal)
 void EnvelopeEditor::SaveLayout(ofxJSONElement& moduleInfo)
 {
    IDrawableModule::SaveLayout(moduleInfo);
-   
+
    if (mADSRDisplay != nullptr)
       moduleInfo["target"] = mADSRDisplay->Path();
-   
+
    moduleInfo["onthefly"] = false;
 }
 
 void EnvelopeEditor::LoadLayout(const ofxJSONElement& moduleInfo)
 {
    mModuleSaveData.LoadString("target", moduleInfo);
-   
+
    if (moduleInfo["onthefly"] == false)
    {
       SetUpFromSaveData();

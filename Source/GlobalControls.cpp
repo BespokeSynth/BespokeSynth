@@ -31,8 +31,8 @@
 #include "UIControlMacros.h"
 
 GlobalControls::GlobalControls()
-   : mMouseScrollX(0)
-   , mMouseScrollY(0)
+: mMouseScrollX(0)
+, mMouseScrollY(0)
 {
 }
 
@@ -43,7 +43,7 @@ GlobalControls::~GlobalControls()
 void GlobalControls::CreateUIControls()
 {
    IDrawableModule::CreateUIControls();
-   
+
    UIBLOCK0();
    FLOATSLIDER(mZoomSlider, "zoom", &gDrawScale, .1f, 8.0f);
    FLOATSLIDER(mXSlider, "x pos", &(TheSynth->GetDrawOffset().x), -10000, 10000);

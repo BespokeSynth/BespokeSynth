@@ -69,7 +69,7 @@ bool KarplusStrongVoice::Process(double time, ChannelBuffer* out, int oversampli
 
    if (IsDone(time))
       return false;
-   
+
    int bufferSize = out->BufferSize();
    int channels = out->NumActiveChannels();
    double sampleIncrementMs = gInvSampleRateMs;
@@ -85,21 +85,21 @@ bool KarplusStrongVoice::Process(double time, ChannelBuffer* out, int oversampli
       sampleIncrementMs /= oversampling;
       sampleRate *= oversampling;
    }
-   
+
    float freq;
    float filterRate;
    float filterLerp;
    float pitch;
    float oscPhaseInc;
-   
+
    if (mVoiceParams->mLiteCPUMode)
       DoParameterUpdate(0, oversampling, pitch, freq, filterRate, filterLerp, oscPhaseInc);
-   
-   for (int pos=0; pos < bufferSize; ++pos)
+
+   for (int pos = 0; pos < bufferSize; ++pos)
    {
       if (!mVoiceParams->mLiteCPUMode)
-         DoParameterUpdate(pos/oversampling, oversampling, pitch, freq, filterRate, filterLerp, oscPhaseInc);
-      
+         DoParameterUpdate(pos / oversampling, oversampling, pitch, freq, filterRate, filterLerp, oscPhaseInc);
+
       if (mVoiceParams->mSourceType == kSourceTypeSaw)
          mOsc.SetType(kOsc_Saw);
       else
@@ -108,7 +108,7 @@ bool KarplusStrongVoice::Process(double time, ChannelBuffer* out, int oversampli
       float sample = 0;
       float oscSample = mOsc.Audio(time, mOscPhase);
       float noiseSample = RandomSample();
-      float pitchBlend = ofClamp((pitch - 40) / 60.0f,0,1);
+      float pitchBlend = ofClamp((pitch - 40) / 60.0f, 0, 1);
       pitchBlend *= pitchBlend;
       if (mVoiceParams->mSourceType == kSourceTypeSin || mVoiceParams->mSourceType == kSourceTypeSaw)
          sample = oscSample;
@@ -135,7 +135,7 @@ bool KarplusStrongVoice::Process(double time, ChannelBuffer* out, int oversampli
             float sample = pos < 0 ? 0 : mBuffer.GetSample(pos, 0);
             float nextSample = posNext >= mBuffer.Size() ? 0 : mBuffer.GetSample(posNext, 0);
             float a = samplesAgo - pos;
-            feedbackSample = (1 - a)*sample + a * nextSample; //interpolate
+            feedbackSample = (1 - a) * sample + a * nextSample; //interpolate
             JUCE_UNDENORMALISE(feedbackSample);
          }
       }
@@ -149,7 +149,7 @@ bool KarplusStrongVoice::Process(double time, ChannelBuffer* out, int oversampli
       JUCE_UNDENORMALISE(sample);
 
       mBuffer.Write(sample, 0);
-      
+
       if (channels == 1)
       {
          destBuffer->GetChannel(0)[pos] += sample;
@@ -180,7 +180,7 @@ bool KarplusStrongVoice::Process(double time, ChannelBuffer* out, int oversampli
       for (int ch = 0; ch < channels; ++ch)
          Add(out->GetChannel(ch), destBuffer->GetChannel(ch), bufferSize);
    }
-   
+
    return true;
 }
 
@@ -194,15 +194,15 @@ void KarplusStrongVoice::DoParameterUpdate(int samplesIn,
 {
    if (mOwner)
       mOwner->ComputeSliders(samplesIn);
-   
+
    pitch = GetPitch(samplesIn);
    if (mVoiceParams->mInvert)
-      pitch += 12;   //inverting the pitch gives an octave down sound by halving the resonating frequency, so correct for that
-   
+      pitch += 12; //inverting the pitch gives an octave down sound by halving the resonating frequency, so correct for that
+
    freq = TheScale->PitchToFreq(pitch);
-   filterRate = mVoiceParams->mFilter * pow(freq/300, exp2(mVoiceParams->mPitchTone)) * (1 + GetModWheel(samplesIn));
+   filterRate = mVoiceParams->mFilter * pow(freq / 300, exp2(mVoiceParams->mPitchTone)) * (1 + GetModWheel(samplesIn));
    filterLerp = ofClamp(exp2(-filterRate / oversampling), 0, 1);
-   
+
    oscPhaseInc = GetPhaseInc(mVoiceParams->mExciterFreq) / oversampling;
 }
 
@@ -211,7 +211,7 @@ void KarplusStrongVoice::Start(double time, float target)
    float volume = ofLerp((1 - mVoiceParams->mVelToVolume), 1, target);
    float envScale = SingleOscillatorVoice::GetADSRScale(target, -mVoiceParams->mVelToEnvelope);
 
-   mOscPhase = FPI/2;   //magic number that seems to keep things DC centered ok
+   mOscPhase = FPI / 2; //magic number that seems to keep things DC centered ok
    mEnv.Clear();
    mEnv.GetStageData(0).time = mVoiceParams->mExciterAttack * envScale;
    mEnv.GetStageData(1).time = mVoiceParams->mExciterDecay;
@@ -223,7 +223,7 @@ void KarplusStrongVoice::Start(double time, float target)
 
 void KarplusStrongVoice::Stop(double time)
 {
-   mMuteRamp.Start(time, 0, time+400);
+   mMuteRamp.Start(time, 0, time + 400);
 }
 
 void KarplusStrongVoice::ClearVoice()

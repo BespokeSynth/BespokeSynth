@@ -38,20 +38,20 @@ Selector::~Selector()
 void Selector::CreateUIControls()
 {
    IDrawableModule::CreateUIControls();
-   
-   mSelector = new RadioButton(this,"selector",3,3,&mCurrentValue);
+
+   mSelector = new RadioButton(this, "selector", 3, 3, &mCurrentValue);
 }
 
 void Selector::DrawModule()
 {
    if (Minimized() || IsVisible() == false)
       return;
-   
-   for (int i=0; i<mControlCables.size(); ++i)
+
+   for (int i = 0; i < mControlCables.size(); ++i)
    {
-      mControlCables[i]->SetManualPosition(GetRect(true).width - 5, 3+RadioButton::GetSpacing()*(i+.5f));
+      mControlCables[i]->SetManualPosition(GetRect(true).width - 5, 3 + RadioButton::GetSpacing() * (i + .5f));
    }
-   
+
    mSelector->Draw();
 }
 
@@ -60,7 +60,7 @@ void Selector::PostRepatch(PatchCableSource* cableSource, bool fromUserClick)
    if (!fromUserClick)
       return;
 
-   for (int i=0; i<mControlCables.size(); ++i)
+   for (int i = 0; i < mControlCables.size(); ++i)
    {
       if (mControlCables[i] == cableSource)
       {
@@ -77,9 +77,9 @@ void Selector::PostRepatch(PatchCableSource* cableSource, bool fromUserClick)
          {
             RemoveFromVector(cableSource, mControlCables);
          }
-         
+
          SyncList();
-         
+
          break;
       }
    }
@@ -88,7 +88,7 @@ void Selector::PostRepatch(PatchCableSource* cableSource, bool fromUserClick)
 void Selector::SyncList()
 {
    mSelector->Clear();
-   for (int i=0; i<mControlCables.size()-1; ++i)
+   for (int i = 0; i < mControlCables.size() - 1; ++i)
    {
       std::string controlName = "";
       if (mControlCables[i]->GetTarget())
@@ -114,7 +114,7 @@ void Selector::SetIndex(int index)
    mCurrentValue = index;
 
    IUIControl* controlToEnable = nullptr;
-   for (int i=0; i<mControlCables.size(); ++i)
+   for (int i = 0; i < mControlCables.size(); ++i)
    {
       IUIControl* uicontrol = nullptr;
       if (mControlCables[i]->GetTarget())
@@ -127,7 +127,7 @@ void Selector::SetIndex(int index)
             uicontrol->SetValue(0);
       }
    }
-   
+
    if (controlToEnable)
       controlToEnable->SetValue(1);
 }
@@ -147,9 +147,9 @@ void Selector::GetModuleDimensions(float& width, float& height)
 void Selector::SaveLayout(ofxJSONElement& moduleInfo)
 {
    IDrawableModule::SaveLayout(moduleInfo);
-   
-   moduleInfo["uicontrols"].resize((unsigned int)mControlCables.size()-1);
-   for (int i=0; i<mControlCables.size()-1; ++i)
+
+   moduleInfo["uicontrols"].resize((unsigned int)mControlCables.size() - 1);
+   for (int i = 0; i < mControlCables.size() - 1; ++i)
    {
       std::string controlName = "";
       if (mControlCables[i]->GetTarget())
@@ -161,8 +161,8 @@ void Selector::SaveLayout(ofxJSONElement& moduleInfo)
 void Selector::LoadLayout(const ofxJSONElement& moduleInfo)
 {
    const Json::Value& controls = moduleInfo["uicontrols"];
-   
-   for (int i=0; i<controls.size(); ++i)
+
+   for (int i = 0; i < controls.size(); ++i)
    {
       std::string controlPath = controls[i].asString();
       IUIControl* control = nullptr;
@@ -173,14 +173,14 @@ void Selector::LoadLayout(const ofxJSONElement& moduleInfo)
       cable->SetTarget(control);
       mControlCables.push_back(cable);
    }
-   
+
    //add extra cable
    PatchCableSource* cable = new PatchCableSource(this, kConnectionType_Modulator);
    AddPatchCableSource(cable);
    mControlCables.push_back(cable);
-   
+
    SyncList();
-   
+
    SetUpFromSaveData();
 }
 

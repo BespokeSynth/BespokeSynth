@@ -53,7 +53,7 @@ SingleOscillator::SingleOscillator()
 , mWriteBuffer(gBufferSize)
 , mDrawOsc(kOsc_Square)
 {
-   mVoiceParams.mAdsr.Set(10,0,1,10);
+   mVoiceParams.mAdsr.Set(10, 0, 1, 10);
    mVoiceParams.mVol = .25f;
    mVoiceParams.mPulseWidth = .5f;
    mVoiceParams.mSync = false;
@@ -61,10 +61,10 @@ SingleOscillator::SingleOscillator()
    mVoiceParams.mMult = 1;
    mVoiceParams.mOscType = kOsc_Square;
    mVoiceParams.mDetune = 0;
-   mVoiceParams.mFilterAdsr.Set(1,0,1,1000);
+   mVoiceParams.mFilterAdsr.Set(1, 0, 1, 1000);
    mVoiceParams.mFilterCutoffMax = SINGLEOSCILLATOR_NO_CUTOFF;
    mVoiceParams.mFilterCutoffMin = 10;
-   mVoiceParams.mFilterQ = sqrt(2)/2;
+   mVoiceParams.mFilterQ = sqrt(2) / 2;
    mVoiceParams.mShuffle = 0;
    mVoiceParams.mPhaseOffset = 0;
    mVoiceParams.mUnison = 1;
@@ -73,7 +73,7 @@ SingleOscillator::SingleOscillator()
    mVoiceParams.mVelToEnvelope = 0;
    mVoiceParams.mSoften = 0;
    mVoiceParams.mLiteCPUMode = false;
-   
+
    mPolyMgr.Init(kVoiceType_SingleOscillator, &mVoiceParams);
 }
 
@@ -86,23 +86,27 @@ namespace
 void SingleOscillator::CreateUIControls()
 {
    IDrawableModule::CreateUIControls();
-   
+
    float width, height;
    UIBLOCK(3, 42, kColumnWidth);
-   DROPDOWN(mOscSelector, "osc", (int*)(&mVoiceParams.mOscType), kColumnWidth / 2); UIBLOCK_SHIFTRIGHT();
-   DROPDOWN(mMultSelector, "mult", &mMult, kColumnWidth / 2-3); UIBLOCK_NEWLINE();
-   FLOATSLIDER_DIGITS(mPulseWidthSlider,"pw",&mVoiceParams.mPulseWidth,0.01f,.99f,2);
-   FLOATSLIDER(mShuffleSlider,"shuffle", &mVoiceParams.mShuffle, 0, 1);
+   DROPDOWN(mOscSelector, "osc", (int*)(&mVoiceParams.mOscType), kColumnWidth / 2);
+   UIBLOCK_SHIFTRIGHT();
+   DROPDOWN(mMultSelector, "mult", &mMult, kColumnWidth / 2 - 3);
+   UIBLOCK_NEWLINE();
+   FLOATSLIDER_DIGITS(mPulseWidthSlider, "pw", &mVoiceParams.mPulseWidth, 0.01f, .99f, 2);
+   FLOATSLIDER(mShuffleSlider, "shuffle", &mVoiceParams.mShuffle, 0, 1);
    FLOATSLIDER(mSoftenSlider, "soften", &mVoiceParams.mSoften, 0, 1);
-   FLOATSLIDER(mPhaseOffsetSlider,"phase",&mVoiceParams.mPhaseOffset,0,TWO_PI);
-   CHECKBOX(mSyncCheckbox, "sync", &mVoiceParams.mSync); UIBLOCK_SHIFTRIGHT();
+   FLOATSLIDER(mPhaseOffsetSlider, "phase", &mVoiceParams.mPhaseOffset, 0, TWO_PI);
+   CHECKBOX(mSyncCheckbox, "sync", &mVoiceParams.mSync);
+   UIBLOCK_SHIFTRIGHT();
    UIBLOCK_PUSHSLIDERWIDTH(47);
-   FLOATSLIDER(mSyncFreqSlider, "syncf", &mVoiceParams.mSyncFreq, 10, 999.9f); UIBLOCK_NEWLINE();
+   FLOATSLIDER(mSyncFreqSlider, "syncf", &mVoiceParams.mSyncFreq, 10, 999.9f);
+   UIBLOCK_NEWLINE();
    UIBLOCK_POPSLIDERWIDTH();
    ENDUIBLOCK(mWidth, mHeight);
-   
+
    UIBLOCK(3 + kGap + kColumnWidth, 3, kColumnWidth);
-   UICONTROL_CUSTOM(mADSRDisplay, new ADSRDisplay(UICONTROL_BASICS("env"), kColumnWidth,36,&mVoiceParams.mAdsr));
+   UICONTROL_CUSTOM(mADSRDisplay, new ADSRDisplay(UICONTROL_BASICS("env"), kColumnWidth, 36, &mVoiceParams.mAdsr));
    FLOATSLIDER(mVolSlider, "vol", &mVoiceParams.mVol, 0, 1);
    FLOATSLIDER_DIGITS(mDetuneSlider, "detune", &mVoiceParams.mDetune, -.05f, .05f, 3);
    INTSLIDER(mUnisonSlider, "unison", &mVoiceParams.mUnison, 1, SingleOscillatorVoice::kMaxUnison);
@@ -132,11 +136,11 @@ void SingleOscillator::CreateUIControls()
    mOscSelector->AddLabel("noise", kOsc_Random);
 
    mSyncFreqSlider->SetShowName(false);
-   
+
    mFilterCutoffMaxSlider->SetMaxValueDisplay("none");
 
    mLengthMultiplierSlider->SetMode(FloatSlider::kSquare);
-   
+
    mMultSelector->AddLabel("1/8", -8);
    mMultSelector->AddLabel("1/7", -7);
    mMultSelector->AddLabel("1/6", -6);
@@ -171,21 +175,21 @@ void SingleOscillator::Process(double time)
 
    if (!mEnabled || target == nullptr)
       return;
-   
+
    mNoteInputBuffer.Process(time);
-   
+
    ComputeSliders(0);
-   
+
    int bufferSize = target->GetBuffer()->BufferSize();
    assert(bufferSize == gBufferSize);
-   
+
    mWriteBuffer.Clear();
    mPolyMgr.Process(time, &mWriteBuffer, bufferSize);
-   
+
    SyncOutputBuffer(mWriteBuffer.NumActiveChannels());
-   for (int ch=0; ch<mWriteBuffer.NumActiveChannels(); ++ch)
+   for (int ch = 0; ch < mWriteBuffer.NumActiveChannels(); ++ch)
    {
-      GetVizBuffer()->WriteChunk(mWriteBuffer.GetChannel(ch),mWriteBuffer.BufferSize(), ch);
+      GetVizBuffer()->WriteChunk(mWriteBuffer.GetChannel(ch), mWriteBuffer.BufferSize(), ch);
       Add(target->GetBuffer()->GetChannel(ch), mWriteBuffer.GetChannel(ch), gBufferSize);
    }
 }
@@ -200,29 +204,29 @@ void SingleOscillator::PlayNote(double time, int pitch, int velocity, int voiceI
       mNoteInputBuffer.QueueNote(time, pitch, velocity, voiceIdx, modulation);
       return;
    }
-   
+
    if (velocity > 0)
    {
-      mPolyMgr.Start(time, pitch, velocity/127.0f, voiceIdx, modulation);
-      float adsrScale = SingleOscillatorVoice::GetADSRScale(velocity/127.0f, mVoiceParams.mVelToEnvelope);
-      mVoiceParams.mAdsr.Start(time, 1, adsrScale);         //for visualization
-      mVoiceParams.mFilterAdsr.Start(time, 1, adsrScale);   //for visualization
+      mPolyMgr.Start(time, pitch, velocity / 127.0f, voiceIdx, modulation);
+      float adsrScale = SingleOscillatorVoice::GetADSRScale(velocity / 127.0f, mVoiceParams.mVelToEnvelope);
+      mVoiceParams.mAdsr.Start(time, 1, adsrScale); //for visualization
+      mVoiceParams.mFilterAdsr.Start(time, 1, adsrScale); //for visualization
    }
    else
    {
       mPolyMgr.Stop(time, pitch);
-      mVoiceParams.mAdsr.Stop(time, false);         //for visualization
-      mVoiceParams.mFilterAdsr.Stop(time, false);   //for visualization
+      mVoiceParams.mAdsr.Stop(time, false); //for visualization
+      mVoiceParams.mFilterAdsr.Stop(time, false); //for visualization
    }
-   
+
    if (mDrawDebug)
    {
       std::vector<std::string> lines = ofSplitString(mDebugLines, "\n");
       mDebugLines = "";
       const int kNumDisplayLines = 10;
-      for (int i=0; i<kNumDisplayLines-1; ++i)
+      for (int i = 0; i < kNumDisplayLines - 1; ++i)
       {
-         int lineIndex = (int)lines.size()-(kNumDisplayLines-1) + i;
+         int lineIndex = (int)lines.size() - (kNumDisplayLines - 1) + i;
          if (lineIndex >= 0)
             mDebugLines += lines[lineIndex] + "\n";
       }
@@ -241,7 +245,7 @@ void SingleOscillator::DrawModule()
 {
    if (Minimized() || IsVisible() == false)
       return;
-   
+
    mVolSlider->Draw();
    mPhaseOffsetSlider->Draw();
    mLengthMultiplierSlider->Draw();
@@ -273,26 +277,26 @@ void SingleOscillator::DrawModule()
    mMultSelector->Draw();
    mSoftenSlider->Draw();
    mLiteCPUModeCheckbox->Draw();
-   
+
    {
       ofPushStyle();
       int x = 3;
       int y = 3;
       int height = 36;
       int width = kColumnWidth;
-      
-      ofSetColor(100,100,.8f*gModuleDrawAlpha);
+
+      ofSetColor(100, 100, .8f * gModuleDrawAlpha);
       ofSetLineWidth(.5f);
-      ofRect(x,y,width,height, 0);
-      
+      ofRect(x, y, width, height, 0);
+
       ofSetColor(245, 58, 0, gModuleDrawAlpha);
       ofSetLineWidth(1);
-      
+
       ofBeginShape();
-      
-      for (float i=0; i<width; i+=(.25f/gDrawScale))
+
+      for (float i = 0; i < width; i += (.25f / gDrawScale))
       {
-         float phase = i/width * FTWO_PI;
+         float phase = i / width * FTWO_PI;
          phase += gTime * .005f;
          if (mVoiceParams.mSync)
          {
@@ -303,7 +307,7 @@ void SingleOscillator::DrawModule()
             phase *= 2;
          mDrawOsc.SetSoften(mVoiceParams.mSoften);
          float value = mDrawOsc.Value(phase);
-         ofVertex(i + x, ofMap(value,-1,1,0,height) + y);
+         ofVertex(i + x, ofMap(value, -1, 1, 0, height) + y);
       }
       ofEndShape(false);
       ofPopStyle();
@@ -317,13 +321,13 @@ void SingleOscillator::DrawModule()
    DrawTextRightJustify("filter", (kGap + kColumnWidth) * 3 - 3, 15);
    ofPopStyle();
 }
- 
+
 void SingleOscillator::DrawModuleUnclipped()
 {
    if (mDrawDebug)
    {
-      mPolyMgr.DrawDebug(mWidth+3, 0);
-      DrawTextNormal(mDebugLines, 0, mHeight+15);
+      mPolyMgr.DrawDebug(mWidth + 3, 0);
+      DrawTextNormal(mDebugLines, 0, mHeight + 15);
    }
 }
 
@@ -355,7 +359,7 @@ void SingleOscillator::SetUpFromSaveData()
    int voiceLimit = mModuleSaveData.GetInt("voicelimit");
    if (voiceLimit > 0)
       mPolyMgr.SetVoiceLimit(voiceLimit);
-   
+
    bool mono = mModuleSaveData.GetBool("mono");
    mWriteBuffer.SetNumActiveChannels(mono ? 1 : 2);
 }
@@ -367,10 +371,10 @@ void SingleOscillator::DropdownUpdated(DropdownList* list, int oldVal)
    {
       if (mMult > 0)
          mVoiceParams.mMult = mMult;
-      else if (mMult == -1)   //-1 is special case for 1.5
+      else if (mMult == -1) //-1 is special case for 1.5
          mVoiceParams.mMult = 1.5f;
-      else                    //other negative numbers mean 1/-x
-         mVoiceParams.mMult = -1.0f/mMult;
+      else //other negative numbers mean 1/-x
+         mVoiceParams.mMult = -1.0f / mMult;
    }
    if (list == mOscSelector)
       mDrawOsc.SetType(mVoiceParams.mOscType);
@@ -395,7 +399,6 @@ void SingleOscillator::FloatSliderUpdated(FloatSlider* slider, float oldVal)
 
 void SingleOscillator::IntSliderUpdated(IntSlider* slider, int oldVal)
 {
-
 }
 
 void SingleOscillator::CheckboxUpdated(Checkbox* checkbox)
@@ -403,4 +406,3 @@ void SingleOscillator::CheckboxUpdated(Checkbox* checkbox)
    if (checkbox == mEnabledCheckbox)
       mPolyMgr.KillAll();
 }
-

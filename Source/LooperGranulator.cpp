@@ -34,10 +34,10 @@
 #include "UIControlMacros.h"
 
 LooperGranulator::LooperGranulator()
-   : mOn(false)
-   , mFreeze(false)
-   , mDummyPos(0)
-   , mLooper(nullptr)
+: mOn(false)
+, mFreeze(false)
+, mDummyPos(0)
+, mLooper(nullptr)
 {
 }
 
@@ -48,8 +48,8 @@ LooperGranulator::~LooperGranulator()
 void LooperGranulator::CreateUIControls()
 {
    IDrawableModule::CreateUIControls();
-   
-   UIBLOCK(3,3,120);
+
+   UIBLOCK(3, 3, 120);
    CHECKBOX(mOnCheckbox, "on", &mOn);
    FLOATSLIDER(mGranOverlap, "overlap", &mGranulator.mGrainOverlap, .5f, MAX_GRAINS);
    FLOATSLIDER(mGranSpeed, "speed", &mGranulator.mSpeed, -3, 3);
@@ -166,4 +166,3 @@ void LooperGranulator::SetUpFromSaveData()
 {
    mLooperCable->SetTarget(TheSynth->FindModule(mModuleSaveData.GetString("looper"), false));
 }
-

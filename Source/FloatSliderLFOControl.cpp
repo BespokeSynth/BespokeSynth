@@ -55,23 +55,28 @@ void FloatSliderLFOControl::CreateUIControls()
 {
    IDrawableModule::CreateUIControls();
    UIBLOCK0();
-   CHECKBOX(mEnableLFOCheckbox,"enable",&mEnabled); UIBLOCK_SHIFTRIGHT();
-   BUTTON(mPinButton,"pin"); UIBLOCK_NEWLINE();
+   CHECKBOX(mEnableLFOCheckbox, "enable", &mEnabled);
+   UIBLOCK_SHIFTRIGHT();
+   BUTTON(mPinButton, "pin");
+   UIBLOCK_NEWLINE();
    UIBLOCK_SHIFTY(40);
-   DROPDOWN(mIntervalSelector,"interval",(int*)(&mLFOSettings.mInterval), 47); UIBLOCK_SHIFTRIGHT();
-   DROPDOWN(mOscSelector,"osc",(int*)(&mLFOSettings.mOscType), 47); UIBLOCK_NEWLINE();
-   FLOATSLIDER(mOffsetSlider,"offset",&mLFOSettings.mLFOOffset,0,1); UIBLOCK_SHIFTUP();
-   FLOATSLIDER(mFreeRateSlider,"free rate",&mLFOSettings.mFreeRate,0,20);
-   FLOATSLIDER(mMinSlider,"low",&mDummyMin,0,1);
-   FLOATSLIDER(mMaxSlider,"high",&mDummyMax,0,1);
-   FLOATSLIDER(mSpreadSlider,"spread",&mLFOSettings.mSpread,0,1);
+   DROPDOWN(mIntervalSelector, "interval", (int*)(&mLFOSettings.mInterval), 47);
+   UIBLOCK_SHIFTRIGHT();
+   DROPDOWN(mOscSelector, "osc", (int*)(&mLFOSettings.mOscType), 47);
+   UIBLOCK_NEWLINE();
+   FLOATSLIDER(mOffsetSlider, "offset", &mLFOSettings.mLFOOffset, 0, 1);
+   UIBLOCK_SHIFTUP();
+   FLOATSLIDER(mFreeRateSlider, "free rate", &mLFOSettings.mFreeRate, 0, 20);
+   FLOATSLIDER(mMinSlider, "low", &mDummyMin, 0, 1);
+   FLOATSLIDER(mMaxSlider, "high", &mDummyMax, 0, 1);
+   FLOATSLIDER(mSpreadSlider, "spread", &mLFOSettings.mSpread, 0, 1);
    FLOATSLIDER(mBiasSlider, "bias", &mLFOSettings.mBias, 0, 1);
    FLOATSLIDER(mLengthSlider, "length", &mLFOSettings.mLength, 0, 1);
    FLOATSLIDER(mShuffleSlider, "shuffle", &mLFOSettings.mShuffle, 0, 1);
-   FLOATSLIDER(mSoftenSlider,"soften",&mLFOSettings.mSoften,0,1);
+   FLOATSLIDER(mSoftenSlider, "soften", &mLFOSettings.mSoften, 0, 1);
    CHECKBOX(mLowResModeCheckbox, "lite cpu", &mLFOSettings.mLowResMode);
-   ENDUIBLOCK(mWidth,mHeight);
-   
+   ENDUIBLOCK(mWidth, mHeight);
+
    mIntervalSelector->AddLabel("free", kInterval_Free);
    mIntervalSelector->AddLabel("64", kInterval_64);
    mIntervalSelector->AddLabel("32", kInterval_32);
@@ -92,21 +97,21 @@ void FloatSliderLFOControl::CreateUIControls()
    mIntervalSelector->AddLabel("16nt", kInterval_16nt);
    mIntervalSelector->AddLabel("16nd", kInterval_16nd);
    mIntervalSelector->AddLabel("32n", kInterval_32n);
-   
-   mOscSelector->AddLabel("sin",kOsc_Sin);
-   mOscSelector->AddLabel("saw",kOsc_Saw);
-   mOscSelector->AddLabel("-saw",kOsc_NegSaw);
-   mOscSelector->AddLabel("squ",kOsc_Square);
-   mOscSelector->AddLabel("tri",kOsc_Tri);
-   mOscSelector->AddLabel("s&h",kOsc_Random);
-   mOscSelector->AddLabel("drunk",kOsc_Drunk);
+
+   mOscSelector->AddLabel("sin", kOsc_Sin);
+   mOscSelector->AddLabel("saw", kOsc_Saw);
+   mOscSelector->AddLabel("-saw", kOsc_NegSaw);
+   mOscSelector->AddLabel("squ", kOsc_Square);
+   mOscSelector->AddLabel("tri", kOsc_Tri);
+   mOscSelector->AddLabel("s&h", kOsc_Random);
+   mOscSelector->AddLabel("drunk", kOsc_Drunk);
    mOscSelector->AddLabel("perlin", kOsc_Perlin);
-   
+
    mOscSelector->PositionTo(mIntervalSelector, kAnchor_Right);
-   
+
    mFreeRateSlider->SetMode(FloatSlider::kBezier);
    mFreeRateSlider->SetBezierControl(1);
-   
+
    UpdateVisibleControls();
 }
 
@@ -118,23 +123,23 @@ void FloatSliderLFOControl::DrawModule()
 {
    if (!mPinned)
    {
-      float w,h;
-      GetDimensions(w,h);
+      float w, h;
+      GetDimensions(w, h);
 
       ofPushStyle();
-      ofSetColor(0,0,0);
+      ofSetColor(0, 0, 0);
       ofFill();
       ofSetLineWidth(.5f);
-      ofRect(0,0,w,h);
+      ofRect(0, 0, w, h);
       ofNoFill();
-      ofSetColor(255,255,255);
-      ofRect(0,0,w,h);
+      ofSetColor(255, 255, 255);
+      ofRect(0, 0, w, h);
       ofPopStyle();
    }
-   
+
    if (Minimized())
       return;
-   
+
    mEnableLFOCheckbox->Draw();
    mIntervalSelector->Draw();
    mOscSelector->Draw();
@@ -150,32 +155,32 @@ void FloatSliderLFOControl::DrawModule()
    mLowResModeCheckbox->Draw();
    if (!mPinned)
       mPinButton->Draw();
-   
+
    int x = 5;
    int y = 20;
    int height = 35;
    int width = 90;
-   
-   ofSetColor(100,100,.8f*gModuleDrawAlpha);
+
+   ofSetColor(100, 100, .8f * gModuleDrawAlpha);
    ofSetLineWidth(.5f);
-   ofRect(x,y,width,height, 0);
-   
+   ofRect(x, y, width, height, 0);
+
    ofSetColor(245, 58, 0, gModuleDrawAlpha);
    ofSetLineWidth(1);
-   
+
    ofBeginShape();
-   for (float i=0; i<width; i+=(.25f/gDrawScale))
+   for (float i = 0; i < width; i += (.25f / gDrawScale))
    {
-      float phase = i/width;
+      float phase = i / width;
       if (mLFO.GetOsc()->GetShuffle() > 0)
          phase *= 2;
       if (mLFO.GetOsc()->GetType() != kOsc_Perlin)
          phase += 1 - mLFOSettings.mLFOOffset;
       float value = GetLFOValue(0, mLFO.TransformPhase(phase));
-      ofVertex(i + x, ofMap(value,GetTargetMax(),GetTargetMin(),0,height) + y);
+      ofVertex(i + x, ofMap(value, GetTargetMax(), GetTargetMin(), 0, height) + y);
    }
    ofEndShape(false);
-   
+
    float currentPhase = mLFO.CalculatePhase(0, false);
    float squeeze;
    if (mLFO.GetOsc()->GetShuffle() == 0)
@@ -194,12 +199,12 @@ void FloatSliderLFOControl::DrawModule()
    if (displayPhase < 0)
       displayPhase += squeeze;
    ofCircle(displayPhase / squeeze * width + x,
-            ofMap(GetLFOValue(0, mLFO.TransformPhase(currentPhase)),GetTargetMax(),GetTargetMin(),0,height) + y, 2);
+            ofMap(GetLFOValue(0, mLFO.TransformPhase(currentPhase)), GetTargetMax(), GetTargetMin(), 0, height) + y, 2);
 }
 
 void FloatSliderLFOControl::SetLFOEnabled(bool enabled)
 {
-   if (enabled && !mEnabled && !TheSynth->IsLoadingState())  //if turning on
+   if (enabled && !mEnabled && !TheSynth->IsLoadingState()) //if turning on
    {
       if (mTarget)
       {
@@ -215,17 +220,17 @@ void FloatSliderLFOControl::SetOwner(FloatSlider* owner)
 {
    if (mTarget == owner)
       return;
-   
+
    if (mTarget != nullptr)
    {
       mTarget->SetLFO(nullptr);
    }
-   
+
    if (owner != nullptr)
       owner->SetLFO(this);
-   
+
    mTarget = owner;
-   
+
    if (mTarget != nullptr)
       InitializeRange();
 }
@@ -278,7 +283,7 @@ float FloatSliderLFOControl::GetLFOValue(int samplesIn /*= 0*/, float forcePhase
 {
    float val = mLFO.Value(samplesIn, forcePhase);
    if (mLFOSettings.mSpread > 0)
-      val = val * (1-mLFOSettings.mSpread) + (-cosf(val * FPI) + 1) * .5f * mLFOSettings.mSpread;
+      val = val * (1 - mLFOSettings.mSpread) + (-cosf(val * FPI) + 1) * .5f * mLFOSettings.mSpread;
    return ofClamp(Interp(val, GetMin(), GetMax()), GetTargetMin(), GetTargetMax());
 }
 
@@ -301,7 +306,7 @@ void FloatSliderLFOControl::UpdateFromSettings()
    mLFO.SetPeriod(mLFOSettings.mInterval);
    mLFO.SetType(mLFOSettings.mOscType);
    mLFO.SetOffset(mLFOSettings.mLFOOffset);
-   mLFO.SetPulseWidth(1-mLFOSettings.mBias);
+   mLFO.SetPulseWidth(1 - mLFOSettings.mBias);
    mLFO.GetOsc()->SetSoften(mLFOSettings.mSoften);
    mLFO.GetOsc()->SetShuffle(mLFOSettings.mShuffle);
    mLFO.SetFreeRate(mLFOSettings.mFreeRate);
@@ -369,7 +374,7 @@ void FloatSliderLFOControl::FloatSliderUpdated(FloatSlider* slider, float oldVal
    if (slider == mOffsetSlider)
       mLFO.SetOffset(mLFOSettings.mLFOOffset);
    if (slider == mBiasSlider)
-      mLFO.SetPulseWidth(1-mLFOSettings.mBias);
+      mLFO.SetPulseWidth(1 - mLFOSettings.mBias);
    if (slider == mSoftenSlider)
       mLFO.GetOsc()->SetSoften(mLFOSettings.mSoften);
    if (slider == mShuffleSlider)
@@ -385,7 +390,7 @@ void FloatSliderLFOControl::CheckboxUpdated(Checkbox* checkbox)
    if (checkbox == mEnabledCheckbox)
    {
       mEnabled = !mEnabled;
-      SetLFOEnabled(!mEnabled);  //make sure it sets as a toggle
+      SetLFOEnabled(!mEnabled); //make sure it sets as a toggle
    }
 }
 
@@ -398,9 +403,9 @@ void FloatSliderLFOControl::ButtonClicked(ClickButton* button)
          mPinned = true;
          TheSynth->AddDynamicModule(this);
          TheSynth->PopModalFocusItem();
-         
+
          SetName(GetUniqueName("lfo", TheSynth->GetModuleNames<FloatSliderLFOControl*>()).c_str());
-         
+
          if (mTargetCable == nullptr)
          {
             mTargetCable = new PatchCableSource(this, kConnectionType_Modulator);
@@ -415,7 +420,7 @@ void FloatSliderLFOControl::ButtonClicked(ClickButton* button)
 void FloatSliderLFOControl::SaveLayout(ofxJSONElement& moduleInfo)
 {
    IDrawableModule::SaveLayout(moduleInfo);
-   
+
    if (mTarget)
       moduleInfo["target"] = mTarget->Path();
 }
@@ -423,7 +428,7 @@ void FloatSliderLFOControl::SaveLayout(ofxJSONElement& moduleInfo)
 void FloatSliderLFOControl::LoadLayout(const ofxJSONElement& moduleInfo)
 {
    mModuleSaveData.LoadString("target", moduleInfo);
-   
+
    SetUpFromSaveData();
 }
 
@@ -433,10 +438,10 @@ void FloatSliderLFOControl::SetUpFromSaveData()
    SetOwner(dynamic_cast<FloatSlider*>(TheSynth->FindUIControl(mModuleSaveData.GetString("target"))));
    if (mTarget)
       mTarget->SetLFO(this);
-   
+
    UpdateFromSettings();
    UpdateVisibleControls();
-   
+
    if (mTargetCable == nullptr)
    {
       mTargetCable = new PatchCableSource(this, kConnectionType_Modulator);
@@ -452,7 +457,7 @@ bool LFOPool::sInitialized = false;
 
 void LFOPool::Init()
 {
-   for (int i=0; i<LFO_POOL_SIZE; ++i)
+   for (int i = 0; i < LFO_POOL_SIZE; ++i)
    {
       sLFOPool[i] = new FloatSliderLFOControl();
       sLFOPool[i]->CreateUIControls();
@@ -467,7 +472,7 @@ void LFOPool::Shutdown()
 {
    if (sInitialized)
    {
-      for (int i=0; i<LFO_POOL_SIZE; ++i)
+      for (int i = 0; i < LFO_POOL_SIZE; ++i)
          sLFOPool[i]->Delete();
       sInitialized = false;
    }
@@ -476,15 +481,15 @@ void LFOPool::Shutdown()
 FloatSliderLFOControl* LFOPool::GetLFO(FloatSlider* owner)
 {
    int index = sNextLFOIndex;
-   for (int i=0; i<LFO_POOL_SIZE; ++i) //search for the next one that isn't enabled, but only one loop around
+   for (int i = 0; i < LFO_POOL_SIZE; ++i) //search for the next one that isn't enabled, but only one loop around
    {
       if (!sLFOPool[index]->Enabled() && !sLFOPool[index]->IsPinned())
-         break;   //found a disabled one
-      index = (index+1) % LFO_POOL_SIZE;
+         break; //found a disabled one
+      index = (index + 1) % LFO_POOL_SIZE;
    }
-   sNextLFOIndex = (index+1) % LFO_POOL_SIZE;
+   sNextLFOIndex = (index + 1) % LFO_POOL_SIZE;
    if (sLFOPool[index]->GetOwner())
-      sLFOPool[index]->GetOwner()->SetLFO(nullptr);   //revoke LFO
+      sLFOPool[index]->GetOwner()->SetLFO(nullptr); //revoke LFO
    sLFOPool[index]->RandomizeSettings();
    sLFOPool[index]->SetOwner(owner);
    return sLFOPool[index];
@@ -500,7 +505,7 @@ void LFOSettings::SaveState(FileStreamOut& out) const
 {
    out << kFixNonRevvedData;
    out << kSaveStateRev;
-   
+
    out << (int)mInterval;
    out << (int)mOscType;
    out << mLFOOffset;
@@ -527,7 +532,8 @@ void LFOSettings::LoadState(FileStreamIn& in)
       in >> temp;
    }
    mInterval = (NoteInterval)temp;
-   in >> temp; mOscType = (OscillatorType)temp;
+   in >> temp;
+   mOscType = (OscillatorType)temp;
    in >> mLFOOffset;
    in >> mBias;
    if (rev >= 1)
@@ -544,4 +550,3 @@ void LFOSettings::LoadState(FileStreamIn& in)
    if (rev >= 5)
       in >> mLowResMode;
 }
-

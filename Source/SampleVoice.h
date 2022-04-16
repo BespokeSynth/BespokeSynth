@@ -51,7 +51,7 @@ class SampleVoice : public IMidiVoice
 public:
    SampleVoice(IDrawableModule* owner = nullptr);
    ~SampleVoice();
-   
+
    // IMidiVoice
    void Start(double time, float amount) override;
    void Stop(double time) override;
@@ -59,6 +59,7 @@ public:
    bool Process(double time, ChannelBuffer* out, int oversampling) override;
    void SetVoiceParams(IVoiceParams* params) override;
    bool IsDone(double time) override;
+
 private:
    ::ADSR mAdsr;
    SampleVoiceParams* mVoiceParams;

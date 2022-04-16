@@ -29,7 +29,8 @@
 #include "OpenFrameworksPort.h"
 #include "ModulationChain.h"
 
-namespace juce {
+namespace juce
+{
    class MidiMessage;
 }
 
@@ -40,7 +41,7 @@ public:
    virtual void PlayNote(double time, int pitch, int velocity, int voiceIdx = -1, ModulationParameters modulation = ModulationParameters()) = 0;
    virtual void SendPressure(int pitch, int pressure) {}
    virtual void SendCC(int control, int value, int voiceIdx = -1) = 0;
-   virtual void SendMidi(const juce::MidiMessage& message) { }
+   virtual void SendMidi(const juce::MidiMessage& message) {}
 };
 
 struct NoteInputElement
@@ -59,6 +60,7 @@ public:
    void Process(double time);
    void QueueNote(double time, int pitch, float velocity, int voiceIdx, ModulationParameters modulation);
    static bool IsTimeWithinFrame(double time);
+
 private:
    static const int kBufferSize = 50;
    NoteInputElement mBuffer[kBufferSize];

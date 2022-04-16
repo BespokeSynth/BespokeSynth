@@ -53,7 +53,7 @@ void CanvasElement::Draw(ofVec2f offset)
          DrawElement(K(clamp), K(wrapped), offset);
    }
    else
-   {      
+   {
       ofPushStyle();
       ofSetLineWidth(3.0f);
       ofNoFill();
@@ -84,7 +84,7 @@ void CanvasElement::DrawElement(bool clamp, bool wrapped, ofVec2f offset)
    ofPushStyle();
    DrawContents(clamp, wrapped, offset);
    ofPopStyle();
-   
+
    if (mHighlighted)
    {
       ofPushStyle();
@@ -136,7 +136,7 @@ void CanvasElement::DrawOffscreen()
       }
       if (rect.y + rect.height > mCanvas->GetHeight())
       {
-         rect.y = mCanvas->GetHeight()-1;
+         rect.y = mCanvas->GetHeight() - 1;
          rect.height = 1;
       }
       rect.width = MAX(rect.width, 1);
@@ -201,12 +201,12 @@ void CanvasElement::SetEnd(float end)
 ofRectangle CanvasElement::GetRect(bool clamp, bool wrapped, ofVec2f offset) const
 {
    float wrapOffset = wrapped ? -1 : 0;
-   float start = ofMap(GetStart() + wrapOffset,mCanvas->mViewStart/mCanvas->GetLength(),mCanvas->mViewEnd/mCanvas->GetLength(),0,1,clamp) * mCanvas->GetWidth();
-   float end = ofMap(GetEnd() + wrapOffset,mCanvas->mViewStart/mCanvas->GetLength(),mCanvas->mViewEnd/mCanvas->GetLength(),0,1,clamp) * mCanvas->GetWidth();
-   float y = (float(mRow-mCanvas->GetRowOffset()) / mCanvas->GetNumVisibleRows()) * mCanvas->GetHeight();
+   float start = ofMap(GetStart() + wrapOffset, mCanvas->mViewStart / mCanvas->GetLength(), mCanvas->mViewEnd / mCanvas->GetLength(), 0, 1, clamp) * mCanvas->GetWidth();
+   float end = ofMap(GetEnd() + wrapOffset, mCanvas->mViewStart / mCanvas->GetLength(), mCanvas->mViewEnd / mCanvas->GetLength(), 0, 1, clamp) * mCanvas->GetWidth();
+   float y = (float(mRow - mCanvas->GetRowOffset()) / mCanvas->GetNumVisibleRows()) * mCanvas->GetHeight();
    float height = float(mCanvas->GetHeight()) / mCanvas->GetNumVisibleRows();
-   
-   return ofRectangle(start + offset.x, y + offset.y, end-start, height);
+
+   return ofRectangle(start + offset.x, y + offset.y, end - start, height);
 }
 
 ofRectangle CanvasElement::GetRectAtDestination(bool clamp, bool wrapped, ofVec2f dragOffset) const
@@ -241,9 +241,9 @@ void CanvasElement::GetDragDestinationData(ofVec2f dragOffset, int& newRow, int&
       newRow = ofClamp(int(mRow + rowDrag + .5f), 0, mCanvas->GetNumRows() - 1);
 
    newOffset = mOffset;
-   if (GetKeyModifiers() & kModifier_Alt)   //non-snapped drag
+   if (GetKeyModifiers() & kModifier_Alt) //non-snapped drag
       newOffset = mOffset + colDrag - (newCol - mCol);
-   if (GetKeyModifiers() & kModifier_Command)   //quantize
+   if (GetKeyModifiers() & kModifier_Command) //quantize
       newOffset = 0;
 }
 
@@ -304,7 +304,7 @@ namespace
 void CanvasElement::SaveState(FileStreamOut& out)
 {
    out << kCESaveStateRev;
-   
+
    out << mOffset;
    out << mLength;
 }
@@ -314,7 +314,7 @@ void CanvasElement::LoadState(FileStreamIn& in)
    int rev;
    in >> rev;
    LoadStateValidate(rev <= kCESaveStateRev);
-   
+
    if (rev < 1)
    {
       in >> mRow;
@@ -327,7 +327,7 @@ void CanvasElement::LoadState(FileStreamIn& in)
 ////////////////////
 
 NoteCanvasElement::NoteCanvasElement(Canvas* canvas, int col, int row, float offset, float length)
-: CanvasElement(canvas,col,row,offset,length)
+: CanvasElement(canvas, col, row, offset, length)
 , mVelocity(.5f)
 , mVoiceIdx(-1)
 , mPan(0)
@@ -360,17 +360,17 @@ void NoteCanvasElement::DrawContents(bool clamp, bool wrapped, ofVec2f offset)
    ofPushStyle();
    ofFill();
    //DrawTextNormal(ofToString(mVelocity), GetRect(true, false).x, GetRect(true, false).y);
-   
+
    ofRectangle rect = GetRect(clamp, wrapped, offset);
    float fullHeight = rect.height;
    rect.height *= mVelocity;
    rect.y += (fullHeight - rect.height) * .5f;
    if (rect.width > 0)
    {
-      ofSetColorGradient(ofColor::white, ofColor(210,210,210), ofVec2f(ofLerp(rect.getMinX(),rect.getMaxX(),.5f), rect.y), ofVec2f(rect.getMaxX(), rect.y));
+      ofSetColorGradient(ofColor::white, ofColor(210, 210, 210), ofVec2f(ofLerp(rect.getMinX(), rect.getMaxX(), .5f), rect.y), ofVec2f(rect.getMaxX(), rect.y));
       ofRect(rect, 0);
    }
-   
+
    /*ofSetLineWidth(1.5f * gDrawScale);
       
    rect = GetRect(clamp, wrapped);
@@ -399,7 +399,7 @@ void NoteCanvasElement::DrawContents(bool clamp, bool wrapped, ofVec2f offset)
    mPressureCurve.SetExtents(start*length, end*length);
    mPressureCurve.SetColor(ofColor::blue);
    mPressureCurve.Render();*/
-   
+
    ofPopStyle();
 }
 
@@ -431,34 +431,34 @@ namespace
 void NoteCanvasElement::SaveState(FileStreamOut& out)
 {
    CanvasElement::SaveState(out);
-   
+
    out << kNCESaveStateRev;
-   
+
    out << mVelocity;
 }
 
 void NoteCanvasElement::LoadState(FileStreamIn& in)
 {
    CanvasElement::LoadState(in);
-   
+
    int rev;
    in >> rev;
    LoadStateValidate(rev == kNCESaveStateRev);
-   
+
    in >> mVelocity;
 }
 
 /////////////////////
 
 SampleCanvasElement::SampleCanvasElement(Canvas* canvas, int col, int row, float offset, float length)
-: CanvasElement(canvas,col,row,offset,length)
+: CanvasElement(canvas, col, row, offset, length)
 , mSample(nullptr)
 , mVolume(1)
 , mMute(false)
 {
-   mElementOffsetSlider = new FloatSlider(dynamic_cast<IFloatSliderListener*>(canvas->GetControls()),"offset",0,0,100,15,&mOffset,-1,1);
+   mElementOffsetSlider = new FloatSlider(dynamic_cast<IFloatSliderListener*>(canvas->GetControls()), "offset", 0, 0, 100, 15, &mOffset, -1, 1);
    AddElementUIControl(mElementOffsetSlider);
-   mVolumeSlider = new FloatSlider(dynamic_cast<IFloatSliderListener*>(canvas->GetControls()),"volume",0,0,100,15,&mVolume,0,2);
+   mVolumeSlider = new FloatSlider(dynamic_cast<IFloatSliderListener*>(canvas->GetControls()), "volume", 0, 0, 100, 15, &mVolume, 0, 2);
    AddElementUIControl(mVolumeSlider);
    mMuteCheckbox = new Checkbox(dynamic_cast<IDrawableModule*>(canvas->GetControls()), "mute", 0, 0, &mMute);
    AddElementUIControl(mMuteCheckbox);
@@ -534,7 +534,7 @@ void SampleCanvasElement::DrawContents(bool clamp, bool wrapped, ofVec2f offset)
    ofRectangle rect = GetRect(false, false, offset);
 
    ofPushMatrix();
-   ofTranslate(rect.x,rect.y);
+   ofTranslate(rect.x, rect.y);
    if (mSample)
    {
       float width = rect.width;
@@ -542,8 +542,8 @@ void SampleCanvasElement::DrawContents(bool clamp, bool wrapped, ofVec2f offset)
    }
    else
    {
-      ofSetColor(0,0,0);
-      ofRect(0,0,rect.width,rect.height);
+      ofSetColor(0, 0, 0);
+      ofRect(0, 0, rect.width, rect.height);
    }
    ofPopMatrix();
 
@@ -580,9 +580,9 @@ namespace
 void SampleCanvasElement::SaveState(FileStreamOut& out)
 {
    CanvasElement::SaveState(out);
-   
+
    out << kSCESaveStateRev;
-   
+
    bool hasSample = mSample != nullptr;
    out << hasSample;
    if (mSample != nullptr)
@@ -594,11 +594,11 @@ void SampleCanvasElement::SaveState(FileStreamOut& out)
 void SampleCanvasElement::LoadState(FileStreamIn& in)
 {
    CanvasElement::LoadState(in);
-   
+
    int rev;
    in >> rev;
    LoadStateValidate(rev <= kSCESaveStateRev);
-   
+
    bool hasSample;
    in >> hasSample;
    if (hasSample)
@@ -625,18 +625,18 @@ void SampleCanvasElement::LoadState(FileStreamIn& in)
 /////////////////////
 
 EventCanvasElement::EventCanvasElement(Canvas* canvas, int col, int row, float offset)
-: CanvasElement(canvas,col,row,offset,.5f)
+: CanvasElement(canvas, col, row, offset, .5f)
 , mValue(0)
 {
-   mValueEntry = new TextEntry(dynamic_cast<ITextEntryListener*>(canvas->GetControls()),"value",60,2,7,&mValue,-99999,99999);
+   mValueEntry = new TextEntry(dynamic_cast<ITextEntryListener*>(canvas->GetControls()), "value", 60, 2, 7, &mValue, -99999, 99999);
    AddElementUIControl(mValueEntry);
-   
+
    mEventCanvas = dynamic_cast<EventCanvas*>(canvas->GetControls()->GetParent());
    assert(mEventCanvas);
    mUIControl = mEventCanvas->GetUIControlForRow(row);
    mIsCheckbox = dynamic_cast<Checkbox*>(mUIControl) != nullptr;
    mIsButton = dynamic_cast<ClickButton*>(mUIControl) != nullptr;
-   
+
    if (mUIControl)
       mValue = mUIControl->GetValue();
    if (mIsButton)
@@ -663,33 +663,33 @@ void EventCanvasElement::DrawContents(bool clamp, bool wrapped, ofVec2f offset)
       return;
 
    if (GetRect(false, false, offset).width != GetRect(clamp, false, offset).width)
-      return;  //only draw text for fully visible elements
+      return; //only draw text for fully visible elements
 
    ofSetColor(mEventCanvas->GetRowColor(mRow));
    ofFill();
    ofRect(GetRect(clamp, wrapped, offset), 0);
-   
+
    std::string text;
    if (mIsCheckbox)
    {
       text = mUIControl->Name();
       ofRectangle rect = GetRect(clamp, false, offset);
-      ofSetColor(0,0,0);
-      DrawTextNormal(text, rect.x+4, rect.y+11);
-      ofSetColor(255,255,255);
-      DrawTextNormal(text, rect.x+3, rect.y+10);
+      ofSetColor(0, 0, 0);
+      DrawTextNormal(text, rect.x + 4, rect.y + 11);
+      ofSetColor(255, 255, 255);
+      DrawTextNormal(text, rect.x + 3, rect.y + 10);
    }
    else if (mUIControl)
    {
       text += mUIControl->Name();
       text += ":";
       text += mUIControl->GetDisplayValue(mValue);
-      
+
       ofRectangle rect = GetRect(clamp, false, offset);
-      ofSetColor(0,0,0);
-      DrawTextNormal(text, rect.x+rect.width+1, rect.y+11);
-      ofSetColor(255,255,255);
-      DrawTextNormal(text, rect.x+rect.width, rect.y+10);
+      ofSetColor(0, 0, 0);
+      DrawTextNormal(text, rect.x + rect.width + 1, rect.y + 11);
+      ofSetColor(255, 255, 255);
+      DrawTextNormal(text, rect.x + rect.width, rect.y + 10);
    }
 }
 
@@ -719,14 +719,14 @@ void EventCanvasElement::Trigger()
 void EventCanvasElement::TriggerEnd()
 {
    if (mUIControl && mIsCheckbox)
-       mUIControl->SetValue(0);
+      mUIControl->SetValue(0);
 }
 
 float EventCanvasElement::GetEnd() const
 {
-   if (mIsCheckbox)  //normal resizable element
+   if (mIsCheckbox) //normal resizable element
       return CanvasElement::GetEnd();
-   
+
    float size = 4;
    float span = mCanvas->mViewEnd - mCanvas->mViewStart;
    return GetStart() + size * span / mCanvas->GetWidth();
@@ -740,20 +740,20 @@ namespace
 void EventCanvasElement::SaveState(FileStreamOut& out)
 {
    CanvasElement::SaveState(out);
-   
+
    out << kECESaveStateRev;
-   
+
    out << mValue;
 }
 
 void EventCanvasElement::LoadState(FileStreamIn& in)
 {
    CanvasElement::LoadState(in);
-   
+
    int rev;
    in >> rev;
    LoadStateValidate(rev <= kECESaveStateRev);
-   
+
    in >> mValue;
    if (rev < 1)
    {

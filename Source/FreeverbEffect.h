@@ -37,27 +37,27 @@ class FreeverbEffect : public IAudioEffect, public IFloatSliderListener
 public:
    FreeverbEffect();
    ~FreeverbEffect();
-   
+
    static IAudioEffect* Create() { return new FreeverbEffect(); }
-   
-   
+
+
    void CreateUIControls() override;
-   
+
    //IAudioEffect
    void ProcessAudio(double time, ChannelBuffer* buffer) override;
    void SetEnabled(bool enabled) override { mEnabled = enabled; }
    float GetEffectAmount() override;
    std::string GetType() override { return "freeverb"; }
-   
+
    void CheckboxUpdated(Checkbox* checkbox) override;
    void FloatSliderUpdated(FloatSlider* slider, float oldVal) override;
-   
+
 private:
    //IDrawableModule
    void DrawModule() override;
    void GetModuleDimensions(float& width, float& height) override;
    bool Enabled() const override { return mEnabled; }
-   
+
    revmodel mFreeverb;
    bool mNeedUpdate;
    bool mFreeze;

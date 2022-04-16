@@ -35,12 +35,12 @@ class BitcrushEffect : public IAudioEffect, public IIntSliderListener, public IF
 {
 public:
    BitcrushEffect();
-   
+
    static IAudioEffect* Create() { return new BitcrushEffect(); }
-   
-   
+
+
    void CreateUIControls() override;
-   
+
    //IAudioEffect
    void ProcessAudio(double time, ChannelBuffer* buffer) override;
    void SetEnabled(bool enabled) override { mEnabled = enabled; }
@@ -50,22 +50,26 @@ public:
    void CheckboxUpdated(Checkbox* checkbox) override;
    void IntSliderUpdated(IntSlider* slider, int oldVal) override;
    void FloatSliderUpdated(FloatSlider* slider, float oldVal) override;
+
 private:
    //IDrawableModule
    void DrawModule() override;
-   void GetModuleDimensions(float& width, float& height) override { width = mWidth; height = mHeight; }
+   void GetModuleDimensions(float& width, float& height) override
+   {
+      width = mWidth;
+      height = mHeight;
+   }
    bool Enabled() const override { return mEnabled; }
-   
+
    float mCrush;
    float mDownsample;
    int mSampleCounter[ChannelBuffer::kMaxNumChannels];
    float mHeldDownsample[ChannelBuffer::kMaxNumChannels];
    FloatSlider* mCrushSlider;
    FloatSlider* mDownsampleSlider;
-   
+
    float mWidth;
    float mHeight;
 };
 
 #endif /* defined(__additiveSynth__BitcrushEffect__) */
-

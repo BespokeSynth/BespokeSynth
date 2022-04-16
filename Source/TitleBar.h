@@ -44,20 +44,16 @@ class SpawnList
 public:
    SpawnList(IDropdownListener* owner, SpawnListManager* listManager, int x, int y, std::string label);
    void SetList(std::vector<std::string> spawnables, std::string overrideModuleType);
-   void SetListVST(std::vector<std::pair <std::string, int>> spawnableVSTs, std::string overrideModuleType);
    void OnSelection(DropdownList* list);
-   void OnSelectionVST(DropdownList* list);
    void SetPosition(int x, int y);
    void SetPositionRelativeTo(SpawnList* list);
    void Draw();
    DropdownList* GetList() { return mSpawnList; }
    IDrawableModule* Spawn();
-   IDrawableModule* SpawnVST();
-   
+
 private:
    std::string mLabel;
    std::vector<std::string> mSpawnables;
-   std::vector<std::pair <std::string, int>> mSpawnableVSTs;
    int mSpawnIndex;
    DropdownList* mSpawnList;
    IDropdownListener* mOwner;
@@ -69,13 +65,13 @@ private:
 struct SpawnListManager
 {
    SpawnListManager(IDropdownListener* owner);
-   
+
    void SetModuleFactory(ModuleFactory* factory);
    void SetUpPrefabsDropdown();
    void SetUpVstDropdown();
-   
+
    std::vector<SpawnList*> GetDropdowns() { return mDropdowns; }
-   
+
    SpawnList mInstrumentModules;
    SpawnList mNoteModules;
    SpawnList mSynthModules;
@@ -85,7 +81,7 @@ struct SpawnListManager
    SpawnList mOtherModules;
    SpawnList mVstPlugins;
    SpawnList mPrefabs;
-   
+
 private:
    std::vector<SpawnList*> mDropdowns;
 };
@@ -98,10 +94,14 @@ public:
    void DrawModule() override;
    bool HasTitleBar() const override { return false; }
 
-   void GetDimensions(float& width, float& height) override { width = mWidth; height = mHeight; }
+   void GetDimensions(float& width, float& height) override
+   {
+      width = mWidth;
+      height = mHeight;
+   }
 
    void ButtonClicked(ClickButton* button) override;
-   
+
 private:
    int mWidth;
    int mHeight;
@@ -114,23 +114,23 @@ class TitleBar : public IDrawableModule, public IDropdownListener, public IButto
 public:
    TitleBar();
    ~TitleBar();
-   
-   
+
+
    void CreateUIControls() override;
    bool HasTitleBar() const override { return false; }
    bool AlwaysOnTop() override { return true; }
    bool IsSingleton() const override { return true; }
-   
+
    HelpDisplay* GetHelpDisplay() { return mHelpDisplay; }
 
    void SetModuleFactory(ModuleFactory* factory) { mSpawnLists.SetModuleFactory(factory); }
    void ListLayouts();
    void ManageVSTs();
-   
+
    bool IsSaveable() override { return false; }
 
    void OnWindowClosed() override;
-   
+
    void CheckboxUpdated(Checkbox* checkbox) override;
    void DropdownClicked(DropdownList* list) override;
    void DropdownUpdated(DropdownList* list, int oldVal) override;
@@ -138,7 +138,7 @@ public:
    void FloatSliderUpdated(FloatSlider* slider, float oldVal) override {}
 
    static bool sShowInitialHelpOverlay;
-   
+
 private:
    //IDrawableModule
    void DrawModule() override;
@@ -147,10 +147,10 @@ private:
    void GetModuleDimensions(float& width, float& height) override;
    void OnClicked(int x, int y, bool right) override;
    bool MouseMoved(float x, float y) override;
-   
+
    bool HiddenByZoom() const;
    float GetPixelWidth() const;
-   
+
    ClickButton* mPlayPauseButton;
    ClickButton* mSaveLayoutButton;
    ClickButton* mResetLayoutButton;
@@ -164,11 +164,11 @@ private:
    Checkbox* mEventLookaheadCheckbox;
    int mLoadLayoutIndex;
    Checkbox* mShouldAutosaveCheckbox;
-   
+
    HelpDisplay* mHelpDisplay;
-   
+
    SpawnListManager mSpawnLists;
-   
+
    bool mLeftCornerHovered;
 
    std::unique_ptr<PluginListWindow> mPluginListWindow;
@@ -179,5 +179,3 @@ private:
 extern TitleBar* TheTitleBar;
 
 #endif /* defined(__Bespoke__TitleBar__) */
-
-

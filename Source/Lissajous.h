@@ -39,34 +39,38 @@ public:
    Lissajous();
    virtual ~Lissajous();
    static IDrawableModule* Create() { return new Lissajous(); }
-   
-   
+
+
    void CreateUIControls() override;
-   
+
    bool IsResizable() const override { return true; }
    void Resize(float w, float h) override;
-   
+
    //IAudioSource
    void Process(double time) override;
    void SetEnabled(bool enabled) override { mEnabled = enabled; }
-   
+
    void FloatSliderUpdated(FloatSlider* slider, float oldVal) override {}
-   
+
    void LoadLayout(const ofxJSONElement& moduleInfo) override;
    void SaveLayout(ofxJSONElement& moduleInfo) override;
    void SetUpFromSaveData() override;
-   
+
 private:
    //IDrawableModule
    void DrawModule() override;
-   void GetModuleDimensions(float& w, float& h) override { w=mWidth; h=mHeight; }
+   void GetModuleDimensions(float& w, float& h) override
+   {
+      w = mWidth;
+      h = mHeight;
+   }
    bool Enabled() const override { return mEnabled; }
-   
+
    float mWidth;
    float mHeight;
    float mScale;
    FloatSlider* mScaleSlider;
-   
+
    ofVec2f mLissajousPoints[NUM_LISSAJOUS_POINTS];
    int mOffset;
    bool mAutocorrelationMode;

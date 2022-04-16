@@ -44,40 +44,43 @@ public:
    BandVocoder();
    virtual ~BandVocoder();
    static IDrawableModule* Create() { return new BandVocoder(); }
-   
+
    void CreateUIControls() override;
-   
+
    void SetCarrierBuffer(float* carrier, int bufferSize) override;
-   
+
    //IAudioReceiver
    InputMode GetInputMode() override { return kInputMode_Mono; }
-   
+
    //IAudioSource
    void Process(double time) override;
-   
+
    void SetEnabled(bool enabled) override { mEnabled = enabled; }
-   
+
    void CheckboxUpdated(Checkbox* checkbox) override;
    void FloatSliderUpdated(FloatSlider* slider, float oldVal) override;
    void IntSliderUpdated(IntSlider* slider, int oldVal) override;
-   
+
    virtual void LoadLayout(const ofxJSONElement& moduleInfo) override;
    virtual void SetUpFromSaveData() override;
-   
+
 private:
-   
    //IDrawableModule
    void DrawModule() override;
-   void GetModuleDimensions(float& w, float& h) override { w=215; h=130; }
+   void GetModuleDimensions(float& w, float& h) override
+   {
+      w = 215;
+      h = 130;
+   }
    bool Enabled() const override { return mEnabled; }
-   
+
    void CalcFilters();
-   
+
    float* mCarrierInputBuffer;
-   
+
    float* mWorkBuffer;
    float* mOutBuffer;
-   
+
    float mInputPreamp;
    float mCarrierPreamp;
    float mVolume;
@@ -100,7 +103,7 @@ private:
    FloatSlider* mMaxBandSlider;
    float mSpacingStyle;
    FloatSlider* mSpacingStyleSlider;
-   
+
    BiquadFilter mBiquadCarrier[VOCODER_MAX_BANDS];
    BiquadFilter mBiquadOut[VOCODER_MAX_BANDS];
    PeakTracker mPeaks[VOCODER_MAX_BANDS];
@@ -111,4 +114,3 @@ private:
 
 
 #endif /* defined(__modularSynth__BandVocoder__) */
-

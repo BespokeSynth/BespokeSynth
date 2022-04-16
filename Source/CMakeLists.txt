@@ -613,6 +613,8 @@ target_sources(BespokeSynth PRIVATE
     StutterControl.h
     SustainPedal.cpp
     SustainPedal.h
+    SwitchAndRamp.cpp
+    SwitchAndRamp.h
     SynthGlobals.cpp
     SynthGlobals.h
     TakeRecorder.cpp
@@ -856,3 +858,26 @@ if (APPLE)
              COMMAND ${CMAKE_SOURCE_DIR}/scripts/installer_macOS/make_installer.sh "${output_dir}" "${CMAKE_SOURCE_DIR}/scripts/installer_macOS" "${BESPOKE_NIGHTLY_DIR}" "${CMAKE_PROJECT_VERSION}"
              )
 endif()
+
+# CI Pipeline {{{
+# this checks if PRs are following clang-format rules
+# nabbed from https://github.com/surge-synthesizer/surge/blob/94fa4c7d4d4bbfdfe34820bd365f653b49314747/CMakeLists.txt#L172
+# the code will run on linux in the pipeline.
+add_custom_target(code-quality-pipeline-checks)
+
+# Clang Format checks
+set(CLANG_FORMAT_DIRS Source)
+set(CLANG_FORMAT_EXTS cpp h)
+foreach(dir ${CLANG_FORMAT_DIRS})
+  foreach(ext ${CLANG_FORMAT_EXTS})
+    list(APPEND CLANG_FORMAT_GLOBS "':(glob)${dir}/**/*.${ext}'")
+  endforeach()
+endforeach()
+add_custom_command(TARGET code-quality-pipeline-checks
+  POST_BUILD
+  WORKING_DIRECTORY ${CMAKE_SOURCE_DIR}
+  COMMAND ${CMAKE_COMMAND} -E echo About to check clang-format
+  COMMAND clang-format --version
+  COMMAND git ls-files -- ${CLANG_FORMAT_GLOBS} | xargs clang-format --dry-run --Werror
+  )
+# }}}

@@ -49,10 +49,9 @@ class ofxJSONElement;
 
 namespace VSTLookup
 {
-   void GetAvailableVSTs(std::vector<juce::PluginDescription>& vsts);
+   void GetAvailableVSTs(std::vector<std::string>& vsts);
    void FillVSTList(DropdownList* list);
    std::string GetVSTPath(std::string vstName);
-   juce::PluginDescription GetVSTDesc(int id);
    void SortByLastUsed(std::vector<std::string>& vsts);
 }
 
@@ -62,42 +61,42 @@ public:
    VSTPlugin();
    virtual ~VSTPlugin() override;
    static IDrawableModule* Create() { return new VSTPlugin(); }
-   
+
    std::string GetTitleLabel() const override;
    void CreateUIControls() override;
-   
+
    void SetVol(float vol) { mVol = vol; }
-   
+
    void Poll() override;
    void Exit() override;
-   
+
    juce::AudioProcessor* GetAudioProcessor() { return mPlugin.get(); }
-   
-   void SetVST(std::string vstName, int id);
+
+   void SetVST(std::string vstName);
    void OnVSTWindowClosed();
-   
+
    //IAudioSource
    void Process(double time) override;
    void SetEnabled(bool enabled) override;
-   
+
    //INoteReceiver
    void PlayNote(double time, int pitch, int velocity, int voiceIdx = -1, ModulationParameters modulation = ModulationParameters()) override;
    void SendCC(int control, int value, int voiceIdx = -1) override;
    void SendMidi(const juce::MidiMessage& message) override;
-   
+
    void DropdownClicked(DropdownList* list) override;
    void DropdownUpdated(DropdownList* list, int oldVal) override;
    void FloatSliderUpdated(FloatSlider* slider, float oldVal) override;
    void IntSliderUpdated(IntSlider* slider, int oldVal) override;
    void CheckboxUpdated(Checkbox* checkbox) override;
    void ButtonClicked(ClickButton* button) override;
-   
+
    virtual void LoadLayout(const ofxJSONElement& moduleInfo) override;
    virtual void SetUpFromSaveData() override;
    void SaveState(FileStreamOut& out) override;
    void LoadState(FileStreamIn& in) override;
    std::vector<IUIControl*> ControlsToIgnoreInSaveState() const override;
-   
+
 private:
    //IDrawableModule
    void PreDrawModule() override;
@@ -105,14 +104,12 @@ private:
    void GetModuleDimensions(float& width, float& height) override;
    bool Enabled() const override { return mEnabled; }
    void LoadVST(juce::PluginDescription desc);
-   void GetVSTFileDesc(std::string vstName, juce::PluginDescription& desc);
 
    std::string GetPluginName() const;
-   std::string GetPluginFormatName() const;
    std::string GetPluginId() const;
    void CreateParameterSliders();
    void RefreshPresetFiles();
-   
+
    float mVol;
    FloatSlider* mVolSlider;
    int mPresetFileIndex;
@@ -121,10 +118,10 @@ private:
    std::vector<std::string> mPresetFilePaths;
    ClickButton* mOpenEditorButton;
    ClickButton* mPanicButton;
-   std::atomic<bool> mWantsPanic{false};
+   std::atomic<bool> mWantsPanic{ false };
    int mOverlayWidth;
    int mOverlayHeight;
-   
+
    bool mPluginReady;
    std::unique_ptr<juce::AudioProcessor> mPlugin;
    std::string mPluginName;
@@ -134,7 +131,7 @@ private:
    juce::CriticalSection mMidiInputLock;
    int mNumInputs;
    int mNumOutputs;
-   
+
    struct ParameterSlider
    {
       float mValue;
@@ -143,14 +140,14 @@ private:
       bool mShowing;
       bool mInSelectorList;
    };
-   
+
    std::vector<ParameterSlider> mParameterSliders;
-   
+
    int mChannel;
    bool mUseVoiceAsChannel;
    float mPitchBendRange;
    int mModwheelCC;
-   
+
    struct ChannelModulations
    {
       ModulationParameters mModulation;
@@ -158,20 +155,20 @@ private:
       float mLastModWheel;
       float mLastPressure;
    };
-   
+
    std::vector<ChannelModulations> mChannelModulations;
-   
+
    ofMutex mVSTMutex;
    VSTPlayhead mPlayhead;
-   
+
    //NSWindowOverlay* mWindowOverlay;
-   
+
    enum DisplayMode
    {
       kDisplayMode_Sliders,
       kDisplayMode_PluginOverlay
    };
-   
+
    DisplayMode mDisplayMode;
    int mShowParameterIndex;
    DropdownList* mShowParameterDropdown;
@@ -180,7 +177,7 @@ private:
    /*
     * Midi and MultiOut support
     */
-   AdditionalNoteCable *mMidiOutCable{nullptr};
+   AdditionalNoteCable* mMidiOutCable{ nullptr };
 
    bool mWantOpenVstWindow{ false };
 };

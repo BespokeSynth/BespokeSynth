@@ -54,27 +54,27 @@ public:
    Razor();
    ~Razor();
    static IDrawableModule* Create() { return new Razor(); }
-   
-   
+
+
    void CreateUIControls() override;
-   
+
    //IAudioSource
    void Process(double time) override;
    void SetEnabled(bool enabled) override;
-   
+
    //INoteReceiver
    void PlayNote(double time, int pitch, int velocity, int voiceIdx = -1, ModulationParameters modulation = ModulationParameters()) override;
    void SendCC(int control, int value, int voiceIdx = -1) override {}
-   
+
    void CheckboxUpdated(Checkbox* checkbox) override;
    void FloatSliderUpdated(FloatSlider* slider, float oldVal) override;
    void IntSliderUpdated(IntSlider* slider, int oldVal) override;
    void ButtonClicked(ClickButton* button) override;
-   
+
    virtual void LoadLayout(const ofxJSONElement& moduleInfo) override;
    virtual void SetUpFromSaveData() override;
-   
-   
+
+
 private:
    float SinSample(float phase); //phase 0-512
    void CalcAmp();
@@ -83,7 +83,11 @@ private:
    //IDrawableModule
    void DrawModule() override;
    bool Enabled() const override { return mEnabled; }
-   void GetModuleDimensions(float& w, float& h) override { w = 1020; h = 420; }
+   void GetModuleDimensions(float& w, float& h) override
+   {
+      w = 1020;
+      h = 420;
+   }
 
    float mVol;
    float mPhase;
@@ -91,9 +95,9 @@ private:
    float mAmp[NUM_PARTIALS];
    float mPhases[NUM_PARTIALS];
    float mDetune[NUM_PARTIALS];
-   
+
    int mPitch;
-   
+
    int mUseNumPartials;
    IntSlider* mNumPartialsSlider;
    RazorBump mBumps[NUM_BUMPS];
@@ -118,7 +122,7 @@ private:
    IntSlider* mNegHarmonicsSlider;
    float mHarshnessCut;
    FloatSlider* mHarshnessCutSlider;
-   
+
    bool mManualControl;
    Checkbox* mManualControlCheckbox;
    FloatSlider* mAmpSliders[NUM_AMP_SLIDERS];
@@ -129,14 +133,13 @@ private:
    float mD;
    float mS;
    float mR;
-   
+
    ModulationChain* mPitchBend;
    ModulationChain* mModWheel;
    ModulationChain* mPressure;
 
-   float mPeakHistory[RAZOR_HISTORY][VIZ_WIDTH+1];
+   float mPeakHistory[RAZOR_HISTORY][VIZ_WIDTH + 1];
    int mHistoryPtr;
 };
 
 #endif /* defined(__modularSynth__Razor__) */
-

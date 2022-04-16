@@ -40,8 +40,8 @@ public:
    Metronome();
    ~Metronome();
    static IDrawableModule* Create() { return new Metronome(); }
-   
-   
+
+
    void CreateUIControls() override;
    void Init() override;
 
@@ -51,28 +51,32 @@ public:
 
    //ITimeListener
    void OnTimeEvent(double time) override;
-   
+
    void CheckboxUpdated(Checkbox* checkbox) override {}
 
    //IFloatSliderListener
    void FloatSliderUpdated(FloatSlider* slider, float oldVal) override {}
-   
+
    virtual void LoadLayout(const ofxJSONElement& moduleInfo) override;
    virtual void SetUpFromSaveData() override;
-   
-   
+
+
 private:
    //IDrawableModule
    void DrawModule() override;
    bool Enabled() const override { return mEnabled; }
-   void GetModuleDimensions(float& width, float& height) override { width=80; height=35; }
+   void GetModuleDimensions(float& width, float& height) override
+   {
+      width = 80;
+      height = 35;
+   }
 
    float mPhase;
    float mPhaseInc;
 
-   
+
    EnvOscillator mOsc;
-   
+
    float mVolume;
    FloatSlider* mVolumeSlider;
 
@@ -80,4 +84,3 @@ private:
 };
 
 #endif /* defined(__modularSynth__Metronome__) */
-

@@ -42,7 +42,7 @@ public:
    ~GridSliders();
    static IDrawableModule* Create() { return new GridSliders(); }
 
-   
+
    void CreateUIControls() override;
 
    //IDrawableModule
@@ -83,7 +83,7 @@ private:
 
    Direction mDirection;
    DropdownList* mDirectionSelector;
-   std::array<PatchCableSource*,32> mControlCables;
+   std::array<PatchCableSource*, 32> mControlCables;
    GridControlTarget* mGridControlTarget;
 
    TransportListenerInfo* mTransportListenerInfo;

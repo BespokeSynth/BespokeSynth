@@ -40,7 +40,7 @@ PitchChorus::PitchChorus()
 void PitchChorus::CreateUIControls()
 {
    IDrawableModule::CreateUIControls();
-   mPassthroughCheckbox = new Checkbox(this,"passthrough",4,4,&mPassthrough);
+   mPassthroughCheckbox = new Checkbox(this, "passthrough", 4, 4, &mPassthrough);
 }
 
 PitchChorus::~PitchChorus()
@@ -51,46 +51,46 @@ PitchChorus::~PitchChorus()
 void PitchChorus::Process(double time)
 {
    PROFILER(PitchChorus);
-   
+
    if (!mEnabled)
       return;
-   
+
    ComputeSliders(0);
    SyncBuffers();
-   
+
    int bufferSize = GetBuffer()->BufferSize();
    IAudioReceiver* target = GetTarget();
    if (target)
    {
       Clear(mOutputBuffer, gBufferSize);
-      for (int i=0; i<kNumShifters; ++i)
+      for (int i = 0; i < kNumShifters; ++i)
       {
          if (mShifters[i].mOn || mShifters[i].mRamp.Value(time) > 0)
          {
             BufferCopy(gWorkBuffer, GetBuffer()->GetChannel(0), bufferSize);
             mShifters[i].mShifter.Process(gWorkBuffer, bufferSize);
             double timeCopy = time;
-            for (int j=0; j<bufferSize; ++j)
+            for (int j = 0; j < bufferSize; ++j)
             {
                mOutputBuffer[j] += gWorkBuffer[j] * mShifters[i].mRamp.Value(timeCopy);
                timeCopy += gInvSampleRateMs;
             }
          }
       }
-      
+
       if (mPassthrough)
          Add(mOutputBuffer, GetBuffer()->GetChannel(0), bufferSize);
       Add(target->GetBuffer()->GetChannel(0), mOutputBuffer, bufferSize);
    }
-   
-   GetVizBuffer()->WriteChunk(mOutputBuffer,bufferSize, 0);
-   
+
+   GetVizBuffer()->WriteChunk(mOutputBuffer, bufferSize, 0);
+
    GetBuffer()->Reset();
 }
 
 void PitchChorus::PlayNote(double time, int pitch, int velocity, int voiceIdx, ModulationParameters modulation)
 {
-   for (int i=0; i<kNumShifters; ++i)
+   for (int i = 0; i < kNumShifters; ++i)
    {
       if (velocity > 0 && mShifters[i].mOn == false)
       {
@@ -113,9 +113,9 @@ void PitchChorus::PlayNote(double time, int pitch, int velocity, int voiceIdx, M
 void PitchChorus::DrawModule()
 {
 
-   
+
    if (Minimized() || IsVisible() == false)
       return;
-   
+
    mPassthroughCheckbox->Draw();
 }

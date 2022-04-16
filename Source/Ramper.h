@@ -43,33 +43,33 @@ public:
    Ramper();
    ~Ramper();
    static IDrawableModule* Create() { return new Ramper(); }
-   
-   
+
+
    void CreateUIControls() override;
    void Init() override;
-   
+
    IUIControl* GetUIControl() const { return mUIControl; }
-   
+
    //IDrawableModule
    void SetEnabled(bool enabled) override { mEnabled = enabled; }
-   
+
    //IAudioPoller
    void OnTransportAdvanced(float amount) override;
 
    //IPulseReceiver
    void OnPulse(double time, float velocity, int flags) override;
-   
+
    void DropdownUpdated(DropdownList* list, int oldVal) override {}
    void ButtonClicked(ClickButton* button) override;
    void FloatSliderUpdated(FloatSlider* slider, float oldVal) override {}
-   
+
    void LoadLayout(const ofxJSONElement& moduleInfo) override;
    void SaveLayout(ofxJSONElement& moduleInfo) override;
    void SetUpFromSaveData() override;
-   
+
    //IPatchable
    void PostRepatch(PatchCableSource* cableSource, bool fromUserClick) override;
-   
+
 private:
    //IDrawableModule
    void DrawModule() override;
@@ -80,7 +80,7 @@ private:
    void MouseReleased() override;
 
    void Go(double time);
-   
+
    IUIControl* mUIControl;
    NoteInterval mLength;
    DropdownList* mLengthSelector;

@@ -48,6 +48,7 @@ public:
    static constexpr const char* kPrefabSuffix = "[prefab]";
    static constexpr const char* kMidiControllerSuffix = "[midicontroller]";
    static constexpr const char* kEffectChainSuffix = "[effectchain]";
+
 private:
    void Register(std::string type, CreateModuleFn creator, CanCreateModuleFn canCreate, ModuleType moduleType, bool hidden, bool experimental);
    std::map<std::string, CreateModuleFn> mFactoryMap;

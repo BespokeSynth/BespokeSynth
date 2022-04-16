@@ -70,7 +70,7 @@ public:
    IDrawableModule();
    virtual ~IDrawableModule();
    static bool CanCreate() { return true; }
-   
+
    void Render() override;
    void RenderUnclipped();
    virtual void PostRender() {}
@@ -79,7 +79,11 @@ public:
    bool CheckNeedsDraw() override;
    virtual bool AlwaysOnTop() { return false; }
    void ToggleMinimized();
-   void SetMinimized(bool minimized) { if (HasTitleBar()) mMinimized = minimized; }
+   void SetMinimized(bool minimized)
+   {
+      if (HasTitleBar())
+         mMinimized = minimized;
+   }
    virtual void KeyPressed(int key, bool isRepeat);
    virtual void KeyReleased(int key);
    void DrawConnection(IClickable* target);
@@ -93,7 +97,11 @@ public:
    void RemoveChild(IDrawableModule* child);
    IDrawableModule* FindChild(const char* name) const;
    void GetDimensions(float& width, float& height) override;
-   virtual void GetModuleDimensions(float& width, float& height) { width = 10; height = 10; }
+   virtual void GetModuleDimensions(float& width, float& height)
+   {
+      width = 10;
+      height = 10;
+   }
    virtual void Init();
    virtual void Exit();
    bool IsInitialized() const { return mInitialized; }
@@ -109,7 +117,7 @@ public:
    virtual bool CanMinimize() { return true; }
    virtual void SampleDropped(int x, int y, Sample* sample) {}
    virtual bool CanDropSample() const { return false; }
-   void BasePoll();  //calls poll, using this to guarantee base poll is always called
+   void BasePoll(); //calls poll, using this to guarantee base poll is always called
    bool IsWithinRect(const ofRectangle& rect);
    bool IsVisible();
    std::vector<IDrawableModule*> GetChildren() const { return mChildren; }
@@ -141,9 +149,9 @@ public:
    bool CanReceiveAudio() { return mCanReceiveAudio; }
    bool CanReceiveNotes() { return mCanReceiveNotes; }
    bool CanReceivePulses() { return mCanReceivePulses; }
-   
+
    virtual void CheckboxUpdated(Checkbox* checkbox) {}
-   
+
    virtual void LoadBasics(const ofxJSONElement& moduleInfo, std::string typeName);
    virtual void CreateUIControls();
    virtual void LoadLayout(const ofxJSONElement& moduleInfo) {}
@@ -162,28 +170,34 @@ public:
    virtual size_t GetExpectedSaveStateNumChildren() const { return mChildren.size(); }
    virtual bool HasDebugDraw() const { return false; }
    virtual bool HasPush2OverrideControls() const { return false; }
-   virtual void GetPush2OverrideControls(std::vector<IUIControl*>& controls) const { }
-   
+   virtual void GetPush2OverrideControls(std::vector<IUIControl*>& controls) const {}
+
    //IPatchable
-   PatchCableSource* GetPatchCableSource(int index=0) override { if (index == 0) return mMainPatchCableSource; else return mPatchCableSources[index]; }
+   PatchCableSource* GetPatchCableSource(int index = 0) override
+   {
+      if (index == 0)
+         return mMainPatchCableSource;
+      else
+         return mPatchCableSources[index];
+   }
    std::vector<PatchCableSource*> GetPatchCableSources() { return mPatchCableSources; }
-   
+
    static void FindClosestSides(float xThis, float yThis, float wThis, float hThis, float xThat, float yThat, float wThat, float hThat, float& startX, float& startY, float& endX, float& endY, bool sidesOnly = false);
-   
+
    static float sHueNote;
    static float sHueAudio;
    static float sHueInstrument;
    static float sHueNoteSource;
    static float sSaturation;
    static float sBrightness;
-   
+
    bool mDrawDebug;
 
 protected:
    virtual void Poll() override {}
    virtual void OnClicked(int x, int y, bool right) override;
    virtual bool MouseMoved(float x, float y) override;
-   
+
    ModuleSaveData mModuleSaveData;
    Checkbox* mEnabledCheckbox;
    bool mEnabled;
@@ -221,7 +235,7 @@ private:
    bool mCanReceivePulses;
 
    ofMutex mSliderMutex;
-   
+
    PatchCableSource* mMainPatchCableSource;
    std::vector<PatchCableSource*> mPatchCableSources;
 };

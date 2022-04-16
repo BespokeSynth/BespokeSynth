@@ -38,7 +38,7 @@ NoteGate::~NoteGate()
 void NoteGate::CreateUIControls()
 {
    IDrawableModule::CreateUIControls();
-   
+
    mGateCheckbox = new Checkbox(this, "open", 3, 4, &mGate);
 }
 
@@ -46,7 +46,7 @@ void NoteGate::DrawModule()
 {
    if (Minimized() || IsVisible() == false)
       return;
-   
+
    mGateCheckbox->Draw();
 }
 
@@ -115,7 +115,7 @@ void NoteGate::GetModuleDimensions(float& width, float& height)
 void NoteGate::LoadLayout(const ofxJSONElement& moduleInfo)
 {
    mModuleSaveData.LoadString("target", moduleInfo);
-   
+
    SetUpFromSaveData();
 }
 
@@ -123,4 +123,3 @@ void NoteGate::SetUpFromSaveData()
 {
    SetUpPatchCables(mModuleSaveData.GetString("target"));
 }
-

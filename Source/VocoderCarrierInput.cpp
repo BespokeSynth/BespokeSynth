@@ -44,7 +44,7 @@ VocoderCarrierInput::~VocoderCarrierInput()
 void VocoderCarrierInput::CreateUIControls()
 {
    IDrawableModule::CreateUIControls();
-   
+
    GetPatchCableSource()->AddTypeFilter("fftvocoder");
    GetPatchCableSource()->AddTypeFilter("vocoder");
 }
@@ -64,7 +64,7 @@ void VocoderCarrierInput::Process(double time)
 
    if (mVocoder == nullptr)
       return;
-   
+
    SyncBuffers();
 
    mVocoder->SetCarrierBuffer(GetBuffer()->GetChannel(0), GetBuffer()->BufferSize());
@@ -80,14 +80,14 @@ void VocoderCarrierInput::DrawModule()
 
 void VocoderCarrierInput::LoadLayout(const ofxJSONElement& moduleInfo)
 {
-   mModuleSaveData.LoadString("vocoder",moduleInfo,"",FillDropdown<VocoderBase*>);
-   
+   mModuleSaveData.LoadString("vocoder", moduleInfo, "", FillDropdown<VocoderBase*>);
+
    SetUpFromSaveData();
 }
 
 void VocoderCarrierInput::SetUpFromSaveData()
 {
-   IDrawableModule* vocoder = TheSynth->FindModule(mModuleSaveData.GetString("vocoder"),false);
+   IDrawableModule* vocoder = TheSynth->FindModule(mModuleSaveData.GetString("vocoder"), false);
    mVocoder = dynamic_cast<VocoderBase*>(vocoder);
    GetPatchCableSource()->SetTarget(dynamic_cast<IClickable*>(vocoder));
 }

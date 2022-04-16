@@ -39,16 +39,16 @@ DebugAudioSource::~DebugAudioSource()
 void DebugAudioSource::Process(double time)
 {
    PROFILER(DebugAudioSource);
-   
+
    IAudioReceiver* target = GetTarget();
    if (!mEnabled || target == nullptr)
       return;
-   
+
    int bufferSize = target->GetBuffer()->BufferSize();
    float* out = target->GetBuffer()->GetChannel(0);
    assert(bufferSize == gBufferSize);
-   
-   for (int i=0; i<bufferSize; ++i)
+
+   for (int i = 0; i < bufferSize; ++i)
    {
       float sample = 1;
       out[i] += sample;
@@ -61,13 +61,12 @@ void DebugAudioSource::DrawModule()
 
    if (Minimized() || IsVisible() == false)
       return;
-   
 }
 
 void DebugAudioSource::LoadLayout(const ofxJSONElement& moduleInfo)
 {
    mModuleSaveData.LoadString("target", moduleInfo);
-   
+
    SetUpFromSaveData();
 }
 

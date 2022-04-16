@@ -40,7 +40,7 @@
 
 class ofxJSONElement;
 
-#define MAX_SAMPLER_GRID_LENGTH 5*44100
+#define MAX_SAMPLER_GRID_LENGTH 5 * 44100
 #define SAMPLE_RAMP_MS 3
 
 class SamplerGrid : public IAudioProcessor, public IDrawableModule, public IDropdownListener, public IFloatSliderListener, public IIntSliderListener, public IGridControllerListener, public UIGridListener, public INoteReceiver
@@ -49,45 +49,45 @@ public:
    SamplerGrid();
    ~SamplerGrid();
    static IDrawableModule* Create() { return new SamplerGrid(); }
-   
-   
+
+
    void CreateUIControls() override;
-   
+
    void Init() override;
    void Poll() override;
-   
+
    //IAudioSource
    void Process(double time) override;
    void SetEnabled(bool enabled) override;
-   
+
    //IAudioProcessor
    InputMode GetInputMode() override { return kInputMode_Mono; }
-   
+
    //IGridControllerListener
    void OnControllerPageSelected() override;
    void OnGridButton(int x, int y, float velocity, IGridController* grid) override;
-   
+
    //INoteReceiver
    void PlayNote(double time, int pitch, int velocity, int voiceIdx = -1, ModulationParameters modulation = ModulationParameters()) override;
    void SendCC(int control, int value, int voiceIdx = -1) override {}
-   
+
    //UIGridListener
    void GridUpdated(UIGrid* grid, int col, int row, float value, float oldValue) override;
-   
+
    void FilesDropped(std::vector<std::string> files, int x, int y) override;
    void SampleDropped(int x, int y, Sample* sample) override;
    bool CanDropSample() const override { return true; }
-   
+
    void DropdownUpdated(DropdownList* list, int oldVal) override;
    void FloatSliderUpdated(FloatSlider* slider, float oldVal) override;
    void IntSliderUpdated(IntSlider* slider, int oldVal) override;
    void CheckboxUpdated(Checkbox* checkbox) override;
-   
+
    virtual void LoadLayout(const ofxJSONElement& moduleInfo) override;
    virtual void SetUpFromSaveData() override;
    void SaveState(FileStreamOut& out) override;
    void LoadState(FileStreamIn& in) override;
-   
+
 private:
    //IDrawableModule
    void DrawModule() override;
@@ -95,15 +95,15 @@ private:
    bool Enabled() const override { return mEnabled; }
    void OnClicked(int x, int y, bool right) override;
    void MouseReleased() override;
-   
+
    void InitGrid();
    void UpdateLights();
-   
-   int GridToIdx(int x, int y) { return x+y*mCols; }
-   
+
+   int GridToIdx(int x, int y) { return x + y * mCols; }
+
    Checkbox* mClearCheckbox;
    bool mClear;
-   
+
    struct GridSample
    {
       float mSampleData[MAX_SAMPLER_GRID_LENGTH];
@@ -115,29 +115,29 @@ private:
       int mSampleStart;
       int mSampleEnd;
    };
-   
+
    void SetEditSample(GridSample* sample);
-   
+
    GridSample* mGridSamples;
    int mRecordingSample;
-   
+
    bool mPassthrough;
    Checkbox* mPassthroughCheckbox;
-   
+
    float* mWriteBuffer;
-   
+
    float mVolume;
    FloatSlider* mVolumeSlider;
    bool mEditMode;
    Checkbox* mEditCheckbox;
    bool mDuplicate;
    Checkbox* mDuplicateCheckbox;
-   
+
    GridControlTarget* mGridControlTarget;
    int mCols;
    int mRows;
    bool mLastColumnIsGroup;
-   
+
    int mEditSampleX;
    int mEditSampleY;
    float mEditSampleWidth;
@@ -146,9 +146,8 @@ private:
    IntSlider* mEditStartSlider;
    IntSlider* mEditEndSlider;
    int mDummyInt;
-   
+
    UIGrid* mGrid;
 };
 
 #endif /* defined(__Bespoke__SamplerGrid__) */
-

@@ -66,6 +66,7 @@ public:
    bool Process(double time, ChannelBuffer* out, int oversampling) override;
    void SetVoiceParams(IVoiceParams* params) override;
    bool IsDone(double time) override;
+
 private:
    float mOscPhase;
    EnvOscillator mOsc;

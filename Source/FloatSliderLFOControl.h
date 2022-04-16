@@ -52,7 +52,7 @@ struct LFOSettings
    , mLowResMode(false)
    {
    }
-   
+
    NoteInterval mInterval;
    OscillatorType mOscType;
    float mLFOOffset;
@@ -63,7 +63,7 @@ struct LFOSettings
    float mFreeRate;
    float mLength;
    bool mLowResMode;
-   
+
    void SaveState(FileStreamOut& out) const;
    void LoadState(FileStreamIn& in);
 };
@@ -88,7 +88,7 @@ public:
    FloatSlider* GetOwner() { return mTarget; }
    bool Enabled() const override { return mEnabled; }
    bool HasTitleBar() const override { return mPinned; }
-   
+
    bool IsSaveable() override { return mPinned; }
    void CreateUIControls() override;
    bool IsPinned() const { return mPinned; }
@@ -96,12 +96,12 @@ public:
    bool InLowResMode() const { return mLFOSettings.mLowResMode; }
    bool HasSpecialDelete() const override { return true; }
    void DoSpecialDelete() override;
-   
+
    //IModulator
    float Value(int samplesIn = 0) override;
    bool Active() const override { return mEnabled; }
    bool InitializeWithZeroRange() const override { return true; }
-   
+
    //IPatchable
    void PostRepatch(PatchCableSource* cableSource, bool fromUserClick) override;
 
@@ -111,8 +111,12 @@ public:
    void ButtonClicked(ClickButton* button) override;
    void DropdownUpdated(DropdownList* list, int oldVal) override;
 
-   void GetModuleDimensions(float& width, float& height) override { width = mWidth; height = mHeight; }
-   
+   void GetModuleDimensions(float& width, float& height) override
+   {
+      width = mWidth;
+      height = mHeight;
+   }
+
    void SaveLayout(ofxJSONElement& moduleInfo) override;
    void LoadLayout(const ofxJSONElement& moduleInfo) override;
    void SetUpFromSaveData() override;
@@ -125,7 +129,7 @@ private:
    float GetLFOValue(int samplesIn = 0, float forcePhase = -1);
    float GetTargetMin() const;
    float GetTargetMax() const;
-   
+
    LFOSettings mLFOSettings;
 
    LFO mLFO;
@@ -153,6 +157,7 @@ public:
    static void Init();
    static void Shutdown();
    static FloatSliderLFOControl* GetLFO(FloatSlider* owner);
+
 private:
 #define LFO_POOL_SIZE 256
    static FloatSliderLFOControl* sLFOPool[LFO_POOL_SIZE];
@@ -161,4 +166,3 @@ private:
 };
 
 #endif /* defined(__modularSynth__FloatSliderLFOControl__) */
-
