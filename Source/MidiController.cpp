@@ -2075,8 +2075,13 @@ void MidiController::PostRepatch(PatchCableSource* cableSource, bool fromUserCli
    else // need to remove a connection if no cables remain
    {
       auto uiConnection = GetConnectionForCableSource(cableSource);
-      mConnections.remove(uiConnection);
-      delete uiConnection;
+      if (uiConnection == nullptr ||
+          (uiConnection->mSpecialBinding == kSpecialBinding_None &&
+           uiConnection->mUIControlPathInput[0] != 0))
+      {
+         mConnections.remove(uiConnection);
+         delete uiConnection;
+      }
    }
 }
 
