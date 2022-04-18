@@ -253,6 +253,7 @@
 #include "MidiClockOut.h"
 #include "VelocityToChance.h"
 #include "NoteEcho.h"
+#include "VelocityCurve.h"
 
 #include <juce_core/juce_core.h>
 
@@ -452,6 +453,7 @@ ModuleFactory::ModuleFactory()
    REGISTER(MidiClockOut, clockout, kModuleType_Other);
    REGISTER(VelocityToChance, velocitytochance, kModuleType_Note);
    REGISTER(NoteEcho, noteecho, kModuleType_Note);
+   REGISTER(VelocityCurve, velocitycurve, kModuleType_Note);
 
    //REGISTER_EXPERIMENTAL(MidiPlayer, midiplayer, kModuleType_Instrument);
    REGISTER_HIDDEN(Autotalent, autotalent, kModuleType_Audio);
