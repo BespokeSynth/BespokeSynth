@@ -58,17 +58,19 @@ void RadioSequencer::CreateUIControls()
 
    int width, height;
    UIBLOCK(3, 3, 200);
-   INTSLIDER(mLengthSlider, "length", &mLength, 1, 16); UIBLOCK_SHIFTRIGHT();
-   DROPDOWN(mIntervalSelector, "interval", (int*)(&mInterval), 40); UIBLOCK_SHIFTRIGHT();
+   INTSLIDER(mLengthSlider, "length", &mLength, 1, 16);
+   UIBLOCK_SHIFTRIGHT();
+   DROPDOWN(mIntervalSelector, "interval", (int*)(&mInterval), 40);
+   UIBLOCK_SHIFTRIGHT();
    UICONTROL_CUSTOM(mGridControlTarget, new GridControlTarget(UICONTROL_BASICS("grid")));
    ENDUIBLOCK(width, height);
 
-   mGrid = new UIGrid(5, 25, mGridControlTarget->GetRect().getMaxX() - 6, 170, mLength, 8, this);
+   mGrid = new UIGrid("uigrid", 5, 25, mGridControlTarget->GetRect().getMaxX() - 6, 170, mLength, 8, this);
    mGrid->SetHighlightCol(gTime, -1);
    mGrid->SetSingleColumnMode(true);
    mGrid->SetMajorColSize(4);
    mGrid->SetListener(this);
-   
+
    /*mIntervalSelector->AddLabel("8", kInterval_8);
     mIntervalSelector->AddLabel("4", kInterval_4);
     mIntervalSelector->AddLabel("2", kInterval_2);*/
@@ -82,7 +84,7 @@ void RadioSequencer::CreateUIControls()
    mIntervalSelector->AddLabel("16nt", kInterval_16nt);
    mIntervalSelector->AddLabel("32n", kInterval_32n);
    mIntervalSelector->AddLabel("64n", kInterval_64n);
-   
+
    SyncControlCablesToGrid();
 }
 
@@ -106,13 +108,13 @@ void RadioSequencer::UpdateGridLights()
 {
    if (mGridControlTarget->GetGridController())
    {
-      for (int row=0; row<mGrid->GetRows(); ++row)
+      for (int row = 0; row < mGrid->GetRows(); ++row)
       {
-         for (int col=0; col<mGrid->GetCols(); ++col)
+         for (int col = 0; col < mGrid->GetCols(); ++col)
          {
             if (mGrid->GetVal(col, row) == 1)
                mGridControlTarget->GetGridController()->SetLight(col, row, GridColor::kGridColor1Bright);
-            else if (col == mGrid->GetHighlightCol(gTime+gBufferSizeMs+TheTransport->GetEventLookaheadMs()))
+            else if (col == mGrid->GetHighlightCol(gTime + gBufferSizeMs + TheTransport->GetEventLookaheadMs()))
                mGridControlTarget->GetGridController()->SetLight(col, row, GridColor::kGridColor1Dim);
             else
                mGridControlTarget->GetGridController()->SetLight(col, row, GridColor::kGridColorOff);
@@ -207,22 +209,22 @@ void RadioSequencer::DrawModule()
 {
    if (Minimized() || IsVisible() == false)
       return;
-   
+
    mGrid->Draw();
    mIntervalSelector->Draw();
    mLengthSlider->Draw();
    mGridControlTarget->Draw();
-   
-   for (int i=0; i<mControlCables.size(); ++i)
+
+   for (int i = 0; i < mControlCables.size(); ++i)
    {
-      mControlCables[i]->SetManualPosition(GetRect(true).width, mGrid->GetPosition(true).y+(mGrid->GetHeight()/mGrid->GetRows())*(i+.5f));
+      mControlCables[i]->SetManualPosition(GetRect(true).width, mGrid->GetPosition(true).y + (mGrid->GetHeight() / mGrid->GetRows()) * (i + .5f));
    }
 }
 
 void RadioSequencer::OnClicked(int x, int y, bool right)
 {
-   IDrawableModule::OnClicked(x,y,right);
-   
+   IDrawableModule::OnClicked(x, y, right);
+
    mGrid->TestClick(x, y, right);
 }
 
@@ -234,8 +236,8 @@ void RadioSequencer::MouseReleased()
 
 bool RadioSequencer::MouseMoved(float x, float y)
 {
-   IDrawableModule::MouseMoved(x,y);
-   mGrid->NotifyMouseMoved(x,y);
+   IDrawableModule::MouseMoved(x, y);
+   mGrid->NotifyMouseMoved(x, y);
    return false;
 }
 
@@ -253,23 +255,23 @@ void RadioSequencer::PostRepatch(PatchCableSource* cableSource, bool fromUserCli
 void RadioSequencer::SyncControlCablesToGrid()
 {
    if (mGrid->GetRows() == mControlCables.size())
-      return;  //nothing to do
-   
+      return; //nothing to do
+
    if (mGrid->GetRows() > mControlCables.size())
    {
       int oldSize = (int)mControlCables.size();
       mControlCables.resize(mGrid->GetRows());
-      for (int i=oldSize; i<mControlCables.size(); ++i)
+      for (int i = oldSize; i < mControlCables.size(); ++i)
       {
          mControlCables[i] = new PatchCableSource(this, kConnectionType_Modulator);
-         mControlCables[i]->SetOverrideCableDir(ofVec2f(1,0));
+         mControlCables[i]->SetOverrideCableDir(ofVec2f(1, 0));
          //mControlCables[i]->SetColor(GetRowColor(i));
          AddPatchCableSource(mControlCables[i]);
       }
    }
    else
    {
-      for (int i=mGrid->GetRows(); i<mControlCables.size(); ++i)
+      for (int i = mGrid->GetRows(); i < mControlCables.size(); ++i)
          RemovePatchCableSource(mControlCables[i]);
       mControlCables.resize(mGrid->GetRows());
    }
@@ -320,7 +322,7 @@ void RadioSequencer::Resize(float w, float h)
 {
    w = MAX(w - extraW, 200);
    h = MAX(h - extraH, 170);
-   SetGridSize(w,h);
+   SetGridSize(w, h);
 }
 
 void RadioSequencer::SetGridSize(float w, float h)
@@ -334,7 +336,7 @@ void RadioSequencer::SaveLayout(ofxJSONElement& moduleInfo)
 }
 
 void RadioSequencer::LoadLayout(const ofxJSONElement& moduleInfo)
-{  
+{
    mModuleSaveData.LoadBool("one_per_column_mode", moduleInfo, true);
 
    SetUpFromSaveData();
@@ -355,7 +357,7 @@ void RadioSequencer::SaveState(FileStreamOut& out)
    out << kSaveStateRev;
 
    IDrawableModule::SaveState(out);
-   
+
    out << (int)mControlCables.size();
    for (auto cable : mControlCables)
    {
@@ -364,7 +366,7 @@ void RadioSequencer::SaveState(FileStreamOut& out)
          path = cable->GetTarget()->Path();
       out << path;
    }
-   
+
    mGrid->SaveState(out);
    out << mGrid->GetWidth();
    out << mGrid->GetHeight();
@@ -387,7 +389,7 @@ void RadioSequencer::LoadState(FileStreamIn& in)
       in >> mLoadRev;
       LoadStateValidate(mLoadRev <= kSaveStateRev);
    }
-   
+
    int size;
    in >> size;
    mControlCables.resize(size);
@@ -397,7 +399,7 @@ void RadioSequencer::LoadState(FileStreamIn& in)
       in >> path;
       cable->SetTarget(TheSynth->FindUIControl(path));
    }
-   
+
    mGrid->LoadState(in);
 
    if (mLoadRev >= 1)
@@ -412,13 +414,20 @@ void RadioSequencer::LoadState(FileStreamIn& in)
    {
       //port old data
       float len = 0;
-      if (mOldLengthStr == "4")   len = 4;
-      if (mOldLengthStr == "6")   len = 6;
-      if (mOldLengthStr == "8")   len = 8;
-      if (mOldLengthStr == "16")  len = 16;
-      if (mOldLengthStr == "32")  len = 32;
-      if (mOldLengthStr == "64")  len = 64;
-      if (mOldLengthStr == "128") len = 128;
+      if (mOldLengthStr == "4")
+         len = 4;
+      if (mOldLengthStr == "6")
+         len = 6;
+      if (mOldLengthStr == "8")
+         len = 8;
+      if (mOldLengthStr == "16")
+         len = 16;
+      if (mOldLengthStr == "32")
+         len = 32;
+      if (mOldLengthStr == "64")
+         len = 64;
+      if (mOldLengthStr == "128")
+         len = 128;
 
       mLength = int(len * TheTransport->CountInStandardMeasure(mInterval));
       int min, max;

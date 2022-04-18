@@ -30,9 +30,9 @@
 #include "ModularSynth.h"
 
 CanvasTimeline::CanvasTimeline(Canvas* canvas, std::string name)
-   : mClick(false)
-   , mHoverMode(HoverMode::kNone)
-   , mCanvas(canvas)
+: mClick(false)
+, mHoverMode(HoverMode::kNone)
+, mCanvas(canvas)
 {
    SetName(name.c_str());
    SetParent(canvas->GetModuleParent());
@@ -41,7 +41,7 @@ CanvasTimeline::CanvasTimeline(Canvas* canvas, std::string name)
 void CanvasTimeline::Render()
 {
    ofRectangle canvasRect = mCanvas->GetRect(true);
-   SetPosition(canvasRect.x, canvasRect.y-10);
+   SetPosition(canvasRect.x, canvasRect.y - 10);
    SetDimensions(canvasRect.width, 10);
 
    ofPushMatrix();
@@ -72,7 +72,7 @@ void CanvasTimeline::Render()
       ofSetColor(100, 100, 100);
    ofFill();
    ofRect(startX, 0, endX - startX, mHeight / 2, 0);
-   
+
    if (mClick && mHoverMode == HoverMode::kStart)
    {
       ofSetColor(150, 150, 150);
@@ -88,7 +88,7 @@ void CanvasTimeline::Render()
    ofFill();
    DrawTriangle(startX, 1);
 
-   
+
    if (mClick && mHoverMode == HoverMode::kEnd)
    {
       ofSetColor(150, 150, 150);
@@ -174,7 +174,7 @@ void CanvasTimeline::MouseReleased()
 bool CanvasTimeline::MouseMoved(float x, float y)
 {
    CheckHover(x, y);
-   
+
    if (!mClick)
    {
       mHoverMode = HoverMode::kNone;
@@ -189,7 +189,7 @@ bool CanvasTimeline::MouseMoved(float x, float y)
       ofRectangle loopStartRect(startX, 0, mHeight, mHeight);
       if (loopStartRect.contains(x, y))
          mHoverMode = HoverMode::kStart;
-      
+
       ofRectangle loopEndRect(endX - mHeight, 0, mHeight, mHeight);
       if (loopEndRect.contains(x, y))
          mHoverMode = HoverMode::kEnd;
@@ -209,10 +209,8 @@ bool CanvasTimeline::MouseScrolled(int x, int y, float scrollX, float scrollY)
 
 void CanvasTimeline::SaveState(FileStreamOut& out)
 {
-
 }
 
 void CanvasTimeline::LoadState(FileStreamIn& in, bool shouldSetValue)
 {
-
 }

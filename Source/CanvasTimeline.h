@@ -36,7 +36,11 @@ public:
    CanvasTimeline(Canvas* canvas, std::string name);
    ~CanvasTimeline() {}
 
-   void SetDimensions(float width, float height) { mWidth = width; mHeight = height; }
+   void SetDimensions(float width, float height)
+   {
+      mWidth = width;
+      mHeight = height;
+   }
 
    //IUIControl
    void SetFromMidiCC(float slider, bool setViaModulator = false) override {}
@@ -51,9 +55,14 @@ public:
    void MouseReleased() override;
    bool MouseMoved(float x, float y) override;
    bool MouseScrolled(int x, int y, float scrollX, float scrollY) override;
+
 private:
    void OnClicked(int x, int y, bool right) override;
-   void GetDimensions(float& width, float& height) override { width = mWidth; height = mHeight; }
+   void GetDimensions(float& width, float& height) override
+   {
+      width = mWidth;
+      height = mHeight;
+   }
 
    enum class HoverMode
    {

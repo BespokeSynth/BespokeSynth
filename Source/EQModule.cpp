@@ -32,21 +32,21 @@
 #include "Checkbox.h"
 
 EQModule::EQModule()
-   : IAudioProcessor(gBufferSize)
-   , mWidth(825)
-   , mHeight(255)
-   , mFFT(kNumFFTBins)
-   , mFFTData(kNumFFTBins, kNumFFTBins / 2 + 1)
-   , mRollingInputBuffer(kNumFFTBins)
-   , mHoveredFilterHandleIndex(-1)
-   , mDragging(false)
-   , mNeedToUpdateFrequencyResponseGraph(true)
-   , mDrawGain(1)
+: IAudioProcessor(gBufferSize)
+, mWidth(825)
+, mHeight(255)
+, mFFT(kNumFFTBins)
+, mFFTData(kNumFFTBins, kNumFFTBins / 2 + 1)
+, mRollingInputBuffer(kNumFFTBins)
+, mHoveredFilterHandleIndex(-1)
+, mDragging(false)
+, mNeedToUpdateFrequencyResponseGraph(true)
+, mDrawGain(1)
 {
    // Generate a window with a single raised cosine from N/4 to 3N/4
    mWindower = new float[kNumFFTBins];
    for (int i = 0; i < kNumFFTBins; ++i)
-      mWindower[i] = -.5f*cos(FTWO_PI*i / kNumFFTBins) + .5f;
+      mWindower[i] = -.5f * cos(FTWO_PI * i / kNumFFTBins) + .5f;
    mSmoother = new float[kNumFFTBins / 2 + 1 - kBinIgnore];
    for (int i = 0; i < kNumFFTBins / 2 + 1 - kBinIgnore; ++i)
       mSmoother[i] = 0;
@@ -54,13 +54,13 @@ EQModule::EQModule()
    assert(mFilters.size() == 8);
    auto types = new FilterType[8]{ kFilterType_LowShelf, kFilterType_Peak, kFilterType_Peak, kFilterType_HighShelf, kFilterType_Peak, kFilterType_Peak, kFilterType_Peak, kFilterType_Peak };
    auto cutoffs = new float[8]{ 30, 200, 1000, 5000, 100, 10000, 5000, 18000 };
-   for (size_t i=0; i<mFilters.size(); ++i)
+   for (size_t i = 0; i < mFilters.size(); ++i)
    {
       auto& filter = mFilters[i];
       filter.mEnabled = i < 4;
       for (auto& biquad : filter.mFilter)
       {
-         biquad.SetFilterParams(cutoffs[i], sqrtf(2)/2);
+         biquad.SetFilterParams(cutoffs[i], sqrtf(2) / 2);
          biquad.SetFilterType(types[i]);
       }
       filter.mNeedToCalculateCoefficients = true;
@@ -72,7 +72,7 @@ void EQModule::CreateUIControls()
    IDrawableModule::CreateUIControls();
 
    UIBLOCK0();
-   for (size_t i=0; i < mFilters.size(); ++i)
+   for (size_t i = 0; i < mFilters.size(); ++i)
    {
       auto& filter = mFilters[i];
 
@@ -159,10 +159,10 @@ void EQModule::Process(double time)
       Mult(mFFTData.mTimeDomain, mWindower, kNumFFTBins);
 
       mFFT.Forward(mFFTData.mTimeDomain,
-         mFFTData.mRealValues,
-         mFFTData.mImaginaryValues);
+                   mFFTData.mRealValues,
+                   mFFTData.mImaginaryValues);
    }
-   else   //passthrough
+   else //passthrough
    {
       for (int ch = 0; ch < GetBuffer()->NumActiveChannels(); ++ch)
       {
@@ -250,7 +250,7 @@ void EQModule::DrawModule()
    for (int x = 0; x < w + kPixelStep; x += kPixelStep)
    {
       float response = 1;
-      float freq = FreqForPos(x/w);
+      float freq = FreqForPos(x / w);
       if (freq < gSampleRate / 2)
       {
          int responseGraphIndex = x / kPixelStep;
@@ -274,7 +274,7 @@ void EQModule::DrawModule()
    ofEndShape(false);
 
    ofSetLineWidth(1);
-   for (size_t i=0; i<mFilters.size(); ++i)
+   for (size_t i = 0; i < mFilters.size(); ++i)
    {
       auto& filter = mFilters[i];
       if (filter.mEnabled)
@@ -291,7 +291,7 @@ void EQModule::DrawModule()
             ofCircle(x, y, 8);
          }
          ofSetColor(0, 0, 0);
-         DrawTextBold(ofToString(i), x-3, y+5);
+         DrawTextBold(ofToString(i), x - 3, y + 5);
       }
    }
 
@@ -350,8 +350,8 @@ bool EQModule::MouseMoved(float x, float y)
       for (int i = 0; i < mFilters.size(); ++i)
       {
          if (mFilters[i].mEnabled &&
-             abs(x - PosForFreq(mFilters[i].mFilter[0].mF)*w) < 5 &&
-             abs((y - kDrawYOffset) - PosForGain(mFilters[i].mFilter[0].mDbGain)*h) < 5)
+             abs(x - PosForFreq(mFilters[i].mFilter[0].mF) * w) < 5 &&
+             abs((y - kDrawYOffset) - PosForGain(mFilters[i].mFilter[0].mDbGain) * h) < 5)
          {
             mHoveredFilterHandleIndex = i;
             break;

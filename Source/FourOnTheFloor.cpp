@@ -45,7 +45,7 @@ void FourOnTheFloor::Init()
 void FourOnTheFloor::CreateUIControls()
 {
    IDrawableModule::CreateUIControls();
-   mTwoOnTheFloorCheckbox = new Checkbox(this,"two",4,2,&mTwoOnTheFloor);
+   mTwoOnTheFloorCheckbox = new Checkbox(this, "two", 4, 2, &mTwoOnTheFloor);
 }
 
 FourOnTheFloor::~FourOnTheFloor()
@@ -65,7 +65,7 @@ void FourOnTheFloor::OnTimeEvent(double time)
 {
    if (!mEnabled)
       return;
-   
+
    int kick = 0;
    PlayNoteOutput(time, kick, 127, -1);
 }
@@ -100,4 +100,3 @@ void FourOnTheFloor::SetUpFromSaveData()
 {
    SetUpPatchCables(mModuleSaveData.GetString("target"));
 }
-

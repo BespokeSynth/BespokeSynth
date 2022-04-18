@@ -43,7 +43,7 @@ NoteLooper::NoteLooper()
 , mNumMeasuresSlider(nullptr)
 , mDeleteOrMute(false)
 , mDeleteOrMuteCheckbox(nullptr)
-, mVoiceRoundRobin(kNumVoices-1)
+, mVoiceRoundRobin(kNumVoices - 1)
 {
 }
 
@@ -64,9 +64,9 @@ void NoteLooper::CreateUIControls()
    UIBLOCK_NEWCOLUMN();
    INTSLIDER(mNumMeasuresSlider, "num bars", &mNumMeasures, 1, 8);
    BUTTON(mClearButton, "clear");
-   ENDUIBLOCK(w,h);
+   ENDUIBLOCK(w, h);
 
-   UIBLOCK(w+10, 3, 45);
+   UIBLOCK(w + 10, 3, 45);
    for (size_t i = 0; i < mSavedPatterns.size(); ++i)
    {
       BUTTON(mSavedPatterns[i].mStoreButton, ("store" + ofToString(i)).c_str());
@@ -75,7 +75,7 @@ void NoteLooper::CreateUIControls()
    }
    ENDUIBLOCK0();
 
-   mCanvas = new Canvas(this, 3, 45, mWidth-6, mHeight-48, L(length, 1), L(rows, 128), L(cols, 16), &(NoteCanvasElement::Create));
+   mCanvas = new Canvas(this, 3, 45, mWidth - 6, mHeight - 48, L(length, 1), L(rows, 128), L(cols, 16), &(NoteCanvasElement::Create));
    AddUIControl(mCanvas);
    mCanvas->SetNumVisibleRows(1);
    mCanvas->SetRowOffset(0);
@@ -229,7 +229,7 @@ void NoteLooper::OnTransportAdvanced(float amount)
 
 void NoteLooper::PlayNote(double time, int pitch, int velocity, int voiceIdx, ModulationParameters modulation)
 {
-   if (voiceIdx != -1)  //try to pick a voice that is unique, to avoid stomping on the voices of already-recorded notes when overdubbing
+   if (voiceIdx != -1) //try to pick a voice that is unique, to avoid stomping on the voices of already-recorded notes when overdubbing
    {
       if (velocity > 0)
          voiceIdx = GetNewVoice(voiceIdx);
@@ -259,7 +259,7 @@ void NoteLooper::PlayNote(double time, int pitch, int velocity, int voiceIdx, Mo
    }
 }
 
-NoteCanvasElement* NoteLooper::AddNote(double measurePos, int pitch, int velocity, double length, int voiceIdx/*=-1*/, ModulationParameters modulation/* = ModulationParameters()*/)
+NoteCanvasElement* NoteLooper::AddNote(double measurePos, int pitch, int velocity, double length, int voiceIdx /*=-1*/, ModulationParameters modulation /* = ModulationParameters()*/)
 {
    double canvasPos = measurePos / mNumMeasures * mCanvas->GetNumCols();
    int col = int(canvasPos + .5f); //round off
@@ -291,7 +291,7 @@ int NoteLooper::GetNewVoice(int voiceIdx)
       //TODO(Ryan) do a round robin for now, maybe in the future do something smarter like looking at what voices are already recorded and pick an unused one
       ret = mVoiceRoundRobin;
 
-      const int kMinVoiceNumber = 2;   //MPE synths seem to reserve channels <2 for global params
+      const int kMinVoiceNumber = 2; //MPE synths seem to reserve channels <2 for global params
       mVoiceRoundRobin = ((mVoiceRoundRobin - kMinVoiceNumber) + 1) % (kNumVoices - kMinVoiceNumber) + kMinVoiceNumber; //wrap around a 2-15 range
       mVoiceMap[voiceIdx] = ret;
    }
@@ -417,7 +417,7 @@ void NoteLooper::SaveState(FileStreamOut& out)
 
    out << mMinRow;
    out << mMaxRow;
-   
+
    out << (int)mSavedPatterns.size();
    for (size_t i = 0; i < mSavedPatterns.size(); ++i)
    {
@@ -436,7 +436,7 @@ void NoteLooper::LoadState(FileStreamIn& in)
    IDrawableModule::LoadState(in);
 
    if (!ModuleContainer::DoesModuleHaveMoreSaveData(in))
-      return;  //this was saved before we added versioning, bail out
+      return; //this was saved before we added versioning, bail out
 
    int rev;
    in >> rev;
@@ -467,4 +467,3 @@ void NoteLooper::LoadState(FileStreamIn& in)
       }
    }
 }
-

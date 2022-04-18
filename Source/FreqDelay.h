@@ -39,8 +39,8 @@ public:
    FreqDelay();
    virtual ~FreqDelay();
    static IDrawableModule* Create() { return new FreqDelay(); }
-   
-   
+
+
    void CreateUIControls() override;
 
    //IAudioSource
@@ -49,16 +49,20 @@ public:
    //INoteReceiver
    void PlayNote(double time, int pitch, int velocity, int voiceIdx = -1, ModulationParameters modulation = ModulationParameters()) override;
    void SendCC(int control, int value, int voiceIdx = -1) override {}
-   
+
    void FloatSliderUpdated(FloatSlider* slider, float oldVal) override;
-   
+
    virtual void LoadLayout(const ofxJSONElement& moduleInfo) override;
    virtual void SetUpFromSaveData() override;
-   
+
 private:
    //IDrawableModule
    void DrawModule() override;
-   void GetModuleDimensions(float& width, float& height) override { width = 130; height = 120; }
+   void GetModuleDimensions(float& width, float& height) override
+   {
+      width = 130;
+      height = 120;
+   }
    bool Enabled() const override { return true; }
 
    ChannelBuffer mDryBuffer;
@@ -69,4 +73,3 @@ private:
 };
 
 #endif /* defined(__modularSynth__FreqDelay__) */
-

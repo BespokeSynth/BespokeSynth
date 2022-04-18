@@ -48,14 +48,14 @@ void PressureToModwheel::PlayNote(double time, int pitch, int velocity, int voic
       modulation.modWheel = modulation.pressure;
       modulation.pressure = nullptr;
    }
-   
+
    PlayNoteOutput(time, pitch, velocity, voiceIdx, modulation);
 }
 
 void PressureToModwheel::LoadLayout(const ofxJSONElement& moduleInfo)
 {
    mModuleSaveData.LoadString("target", moduleInfo);
-   
+
    SetUpFromSaveData();
 }
 
@@ -63,4 +63,3 @@ void PressureToModwheel::SetUpFromSaveData()
 {
    SetUpPatchCables(mModuleSaveData.GetString("target"));
 }
-

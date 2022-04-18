@@ -40,14 +40,14 @@ MPETweaker::MPETweaker()
 , mModulationMult(true)
 , mModulationOffset(true)
 {
-   for (int voiceIdx=-1; voiceIdx<kNumVoices; ++voiceIdx)
+   for (int voiceIdx = -1; voiceIdx < kNumVoices; ++voiceIdx)
    {
       mModulationMult.GetPitchBend(voiceIdx)->SetValue(1);
       mModulationOffset.GetPitchBend(voiceIdx)->SetValue(0);
-      
+
       mModulationMult.GetPressure(voiceIdx)->SetValue(1);
       mModulationOffset.GetPressure(voiceIdx)->SetValue(0);
-      
+
       mModulationMult.GetModWheel(voiceIdx)->SetValue(1);
       mModulationOffset.GetModWheel(voiceIdx)->SetValue(0);
    }
@@ -60,14 +60,20 @@ MPETweaker::~MPETweaker()
 void MPETweaker::CreateUIControls()
 {
    IDrawableModule::CreateUIControls();
-   
+
    UIBLOCK(130);
-   FLOATSLIDER_DIGITS(mPitchBendMultiplierSlider, "pitchbend mult", &mPitchBendMultiplier, -3, 3, 2); UIBLOCK_SHIFTRIGHT();
-   FLOATSLIDER_DIGITS(mPitchBendOffsetSlider, "pitchbend offset", &mPitchBendOffset, -1, 1, 1); UIBLOCK_NEWLINE();
-   FLOATSLIDER_DIGITS(mPressureMultiplierSlider, "pressure mult", &mPressureMultiplier, -3, 3, 2); UIBLOCK_SHIFTRIGHT();
-   FLOATSLIDER_DIGITS(mPressureOffsetSlider, "pressure offset", &mPressureOffset, -1, 1, 1); UIBLOCK_NEWLINE();
-   FLOATSLIDER_DIGITS(mModWheelMultiplierSlider, "modwheel mult", &mModWheelMultiplier, -3, 3, 2); UIBLOCK_SHIFTRIGHT();
-   FLOATSLIDER_DIGITS(mModWheelOffsetSlider, "modwheel offset", &mModWheelOffset, -1, 1, 1); UIBLOCK_NEWLINE();
+   FLOATSLIDER_DIGITS(mPitchBendMultiplierSlider, "pitchbend mult", &mPitchBendMultiplier, -3, 3, 2);
+   UIBLOCK_SHIFTRIGHT();
+   FLOATSLIDER_DIGITS(mPitchBendOffsetSlider, "pitchbend offset", &mPitchBendOffset, -1, 1, 1);
+   UIBLOCK_NEWLINE();
+   FLOATSLIDER_DIGITS(mPressureMultiplierSlider, "pressure mult", &mPressureMultiplier, -3, 3, 2);
+   UIBLOCK_SHIFTRIGHT();
+   FLOATSLIDER_DIGITS(mPressureOffsetSlider, "pressure offset", &mPressureOffset, -1, 1, 1);
+   UIBLOCK_NEWLINE();
+   FLOATSLIDER_DIGITS(mModWheelMultiplierSlider, "modwheel mult", &mModWheelMultiplier, -3, 3, 2);
+   UIBLOCK_SHIFTRIGHT();
+   FLOATSLIDER_DIGITS(mModWheelOffsetSlider, "modwheel offset", &mModWheelOffset, -1, 1, 1);
+   UIBLOCK_NEWLINE();
    ENDUIBLOCK(mWidth, mHeight);
 }
 
@@ -75,7 +81,7 @@ void MPETweaker::DrawModule()
 {
    if (Minimized() || IsVisible() == false)
       return;
-   
+
    mPitchBendMultiplierSlider->Draw();
    mPitchBendOffsetSlider->Draw();
    mPressureMultiplierSlider->Draw();
@@ -91,16 +97,16 @@ void MPETweaker::PlayNote(double time, int pitch, int velocity, int voiceIdx, Mo
       mModulationMult.GetPitchBend(voiceIdx)->MultiplyIn(modulation.pitchBend);
       mModulationOffset.GetPitchBend(voiceIdx)->AppendTo(mModulationMult.GetPitchBend(voiceIdx));
       modulation.pitchBend = mModulationOffset.GetPitchBend(voiceIdx);
-      
+
       mModulationMult.GetPressure(voiceIdx)->MultiplyIn(modulation.pressure);
       mModulationOffset.GetPressure(voiceIdx)->AppendTo(mModulationMult.GetPressure(voiceIdx));
       modulation.pressure = mModulationOffset.GetPressure(voiceIdx);
-      
+
       mModulationMult.GetModWheel(voiceIdx)->MultiplyIn(modulation.modWheel);
       mModulationOffset.GetModWheel(voiceIdx)->AppendTo(mModulationMult.GetModWheel(voiceIdx));
       modulation.modWheel = mModulationOffset.GetModWheel(voiceIdx);
    }
-   
+
    PlayNoteOutput(time, pitch, velocity, voiceIdx, modulation);
 }
 
@@ -108,34 +114,34 @@ void MPETweaker::FloatSliderUpdated(FloatSlider* slider, float oldVal)
 {
    if (slider == mPitchBendMultiplierSlider)
    {
-      for (int voiceIdx=-1; voiceIdx<kNumVoices; ++voiceIdx)
+      for (int voiceIdx = -1; voiceIdx < kNumVoices; ++voiceIdx)
          mModulationMult.GetPitchBend(voiceIdx)->SetValue(mPitchBendMultiplier);
    }
    if (slider == mPitchBendOffsetSlider)
    {
-      for (int voiceIdx=-1; voiceIdx<kNumVoices; ++voiceIdx)
+      for (int voiceIdx = -1; voiceIdx < kNumVoices; ++voiceIdx)
          mModulationOffset.GetPitchBend(voiceIdx)->SetValue(mPitchBendOffset);
    }
-   
+
    if (slider == mPressureMultiplierSlider)
    {
-      for (int voiceIdx=-1; voiceIdx<kNumVoices; ++voiceIdx)
+      for (int voiceIdx = -1; voiceIdx < kNumVoices; ++voiceIdx)
          mModulationMult.GetPressure(voiceIdx)->SetValue(mPressureMultiplier);
    }
    if (slider == mPressureOffsetSlider)
    {
-      for (int voiceIdx=-1; voiceIdx<kNumVoices; ++voiceIdx)
+      for (int voiceIdx = -1; voiceIdx < kNumVoices; ++voiceIdx)
          mModulationOffset.GetPressure(voiceIdx)->SetValue(mPressureOffset);
    }
-   
+
    if (slider == mModWheelMultiplierSlider)
    {
-      for (int voiceIdx=-1; voiceIdx<kNumVoices; ++voiceIdx)
+      for (int voiceIdx = -1; voiceIdx < kNumVoices; ++voiceIdx)
          mModulationMult.GetModWheel(voiceIdx)->SetValue(mModWheelMultiplier);
    }
    if (slider == mModWheelOffsetSlider)
    {
-      for (int voiceIdx=-1; voiceIdx<kNumVoices; ++voiceIdx)
+      for (int voiceIdx = -1; voiceIdx < kNumVoices; ++voiceIdx)
          mModulationOffset.GetModWheel(voiceIdx)->SetValue(mModWheelOffset);
    }
 }
@@ -147,7 +153,7 @@ void MPETweaker::CheckboxUpdated(Checkbox* checkbox)
 void MPETweaker::LoadLayout(const ofxJSONElement& moduleInfo)
 {
    mModuleSaveData.LoadString("target", moduleInfo);
-   
+
    SetUpFromSaveData();
 }
 
@@ -155,4 +161,3 @@ void MPETweaker::SetUpFromSaveData()
 {
    SetUpPatchCables(mModuleSaveData.GetString("target"));
 }
-

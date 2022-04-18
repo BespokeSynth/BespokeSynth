@@ -37,8 +37,8 @@ class VelocitySetter : public NoteEffectBase, public IDrawableModule, public IFl
 public:
    VelocitySetter();
    static IDrawableModule* Create() { return new VelocitySetter(); }
-   
-   
+
+
    void CreateUIControls() override;
 
    void SetEnabled(bool enabled) override { mEnabled = enabled; }
@@ -48,17 +48,21 @@ public:
 
    void CheckboxUpdated(Checkbox* checkbox) override;
    void FloatSliderUpdated(FloatSlider* slider, float oldVal) override {}
-   
+
    virtual void LoadLayout(const ofxJSONElement& moduleInfo) override;
    virtual void SetUpFromSaveData() override;
-   
-   
+
+
 private:
    //IDrawableModule
    void DrawModule() override;
-   void GetModuleDimensions(float& width, float& height) override { width = 90; height = 38; }
+   void GetModuleDimensions(float& width, float& height) override
+   {
+      width = 90;
+      height = 38;
+   }
    bool Enabled() const override { return mEnabled; }
-   
+
    float mVelocity;
    FloatSlider* mVelocitySlider;
    float mRandomness;
@@ -67,4 +71,3 @@ private:
 
 
 #endif /* defined(__modularSynth__VelocitySetter__) */
-

@@ -41,7 +41,7 @@ VelocityToChance::~VelocityToChance()
 void VelocityToChance::CreateUIControls()
 {
    IDrawableModule::CreateUIControls();
-   
+
    mFullVelocityCheckbox = new Checkbox(this, "full velocity", 3, 2, &mFullVelocity);
 }
 
@@ -49,24 +49,24 @@ void VelocityToChance::DrawModule()
 {
    if (Minimized() || IsVisible() == false)
       return;
-   
+
    mFullVelocityCheckbox->Draw();
-   
+
    if (gTime - mLastAcceptTime > 0 && gTime - mLastAcceptTime < 200)
    {
       ofPushStyle();
-      ofSetColor(0,255,0,255*(1-(gTime - mLastAcceptTime)/200));
+      ofSetColor(0, 255, 0, 255 * (1 - (gTime - mLastAcceptTime) / 200));
       ofFill();
-      ofRect(106,2,10,7);
+      ofRect(106, 2, 10, 7);
       ofPopStyle();
    }
-   
+
    if (gTime - mLastRejectTime > 0 && gTime - mLastRejectTime < 200)
    {
       ofPushStyle();
-      ofSetColor(255,0,0,255*(1-(gTime - mLastRejectTime)/200));
+      ofSetColor(255, 0, 0, 255 * (1 - (gTime - mLastRejectTime) / 200));
       ofFill();
-      ofRect(106,9,10,7);
+      ofRect(106, 9, 10, 7);
       ofPopStyle();
    }
 }
@@ -78,11 +78,11 @@ void VelocityToChance::PlayNote(double time, int pitch, int velocity, int voiceI
       PlayNoteOutput(time, pitch, velocity, voiceIdx, modulation);
       return;
    }
-   
+
    bool accept = ofRandom(1) <= velocity / 127.0f;
    if (accept)
       PlayNoteOutput(time, pitch, mFullVelocity ? 127 : velocity, voiceIdx, modulation);
-   
+
    if (velocity > 0)
    {
       if (accept)
@@ -105,7 +105,7 @@ void VelocityToChance::GetModuleDimensions(float& width, float& height)
 void VelocityToChance::LoadLayout(const ofxJSONElement& moduleInfo)
 {
    mModuleSaveData.LoadString("target", moduleInfo);
-   
+
    SetUpFromSaveData();
 }
 

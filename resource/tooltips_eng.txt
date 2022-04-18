@@ -54,8 +54,9 @@ radiosequencer~sequence to only enable one value at a time. patch it to the "ena
 
 presets~save and restore sets of values. connect the grey circle to modules to affect all controls on that module. connect the purple circle to a control to affect only that control. shift-click on the grid to store a preset to that square, and click on a grid square to load that preset.
 ~save~[todo]
-~blend ms~time to blend preset values over
+~blend ms~length of time to blend preset values over
 ~preset~jump to a preset
+~random~randomize connected controls
 
 
 
@@ -544,7 +545,7 @@ midicontroller~get midi input from external devices. to get a nice display in th
 ~messagetype~type of midi message
 ~control~pitch or control to refer to
 ~channel~which channel to pay attention to
-~path~path to the control that should be affected
+~path~path to the control that should be affected. you can also enter "hover" here, to affect whichever control the mouse is hovering over.
 ~controltype~how this control should modify the target.\n -slider: set the value interpolated between "midi off" and "midi on" to the slider's value\n -set: set the specified value directly when this button is pressed\n -release: set the specified value directly when this button is released\n -toggle: toggle the control's value to on/off when this button is pressed\n -direct: set the control to the literal midi input value
 ~value~the value to set
 ~midi off~the lower end of the midi range. send this value when the targeted control is off. if "scale" is enabled, this also controls the lower end of the slider range, and you can set midi off to be higher than midi on to reverse a slider's direction.

@@ -37,22 +37,22 @@ Neighborhooder::Neighborhooder()
 void Neighborhooder::CreateUIControls()
 {
    IDrawableModule::CreateUIControls();
-   mMinSlider = new IntSlider(this,"min",4,3,84,15,&mMinPitch,0,127);
-   mRangeSlider = new IntSlider(this,"range",mMinSlider,kAnchor_Below,116,15,&mPitchRange,12,36);
+   mMinSlider = new IntSlider(this, "min", 4, 3, 84, 15, &mMinPitch, 0, 127);
+   mRangeSlider = new IntSlider(this, "range", mMinSlider, kAnchor_Below, 116, 15, &mPitchRange, 12, 36);
 }
 
 void Neighborhooder::DrawModule()
 {
    if (Minimized() || IsVisible() == false)
       return;
-   
+
    mMinSlider->Draw();
    mRangeSlider->Draw();
-   
-   DrawTextNormal(NoteName(mMinPitch)+ofToString(mMinPitch/12 - 2), 91, 15);
+
+   DrawTextNormal(NoteName(mMinPitch) + ofToString(mMinPitch / 12 - 2), 91, 15);
 }
 
-void Neighborhooder::CheckboxUpdated(Checkbox *checkbox)
+void Neighborhooder::CheckboxUpdated(Checkbox* checkbox)
 {
    if (checkbox == mEnabledCheckbox)
       mNoteOutput.Flush(gTime);
@@ -71,7 +71,7 @@ void Neighborhooder::PlayNote(double time, int pitch, int velocity, int voiceIdx
       PlayNoteOutput(time, pitch, velocity, voiceIdx, modulation);
       return;
    }
-   
+
    while (pitch >= mMinPitch + mPitchRange)
       pitch -= TheScale->GetPitchesPerOctave();
    while (pitch < mMinPitch)

@@ -15,7 +15,7 @@
     You should have received a copy of the GNU General Public License
     along with this program.  If not, see <http://www.gnu.org/licenses/>.
 **/
- //
+//
 //  VSTPlugin.cpp
 //  Bespoke
 //
@@ -38,17 +38,17 @@
 namespace
 {
    const int kGlobalModulationIdx = 16;
-   juce::String GetFileNameWithoutExtension(const juce::String &fullPath)
+   juce::String GetFileNameWithoutExtension(const juce::String& fullPath)
    {
-       auto lastSlash = fullPath.lastIndexOfChar('/') + 1;
-       if (lastSlash == 0)
-           lastSlash = fullPath.lastIndexOfChar('\\') + 1;
-       auto lastDot   = fullPath.lastIndexOfChar ('.');
+      auto lastSlash = fullPath.lastIndexOfChar('/') + 1;
+      if (lastSlash == 0)
+         lastSlash = fullPath.lastIndexOfChar('\\') + 1;
+      auto lastDot = fullPath.lastIndexOfChar('.');
 
-       if (lastDot > lastSlash)
-           return fullPath.substring (lastSlash, lastDot);
+      if (lastDot > lastSlash)
+         return fullPath.substring(lastSlash, lastDot);
 
-       return fullPath.substring (lastSlash);
+      return fullPath.substring(lastSlash);
    }
 }
 
@@ -68,9 +68,9 @@ namespace VSTLookup
             TheSynth->GetKnownPluginList().recreateFromXml(*xml);
          }
       }
-      
+
       auto types = TheSynth->GetKnownPluginList().getTypes();
-      for (int i=0; i<types.size(); ++i)
+      for (int i = 0; i < types.size(); ++i)
          vsts.push_back(types[i].fileOrIdentifier.toStdString());
 
       //for (int i = 0; i < 2000; ++i)
@@ -85,30 +85,30 @@ namespace VSTLookup
 
       sFirstTime = false;
    }
-   
+
    void FillVSTList(DropdownList* list)
    {
       assert(list);
       std::vector<std::string> vsts;
       GetAvailableVSTs(vsts);
-      for (int i=0; i<vsts.size(); ++i)
+      for (int i = 0; i < vsts.size(); ++i)
          list->AddLabel(vsts[i].c_str(), i);
    }
-   
+
    std::string GetVSTPath(std::string vstName)
    {
-      if (juce::String(vstName).contains("/") || juce::String(vstName).contains("\\"))  //already a path
+      if (juce::String(vstName).contains("/") || juce::String(vstName).contains("\\")) //already a path
          return vstName;
-      
+
       vstName = GetFileNameWithoutExtension(vstName).toStdString();
       auto types = TheSynth->GetKnownPluginList().getTypes();
-      for (int i=0; i<types.size(); ++i)
+      for (int i = 0; i < types.size(); ++i)
       {
          juce::File vst(types[i].fileOrIdentifier);
          if (vst.getFileNameWithoutExtension().toStdString() == vstName)
             return types[i].fileOrIdentifier.toStdString();
       }
-      
+
       return "";
    }
 
@@ -136,21 +136,22 @@ namespace VSTLookup
          }
       }
 
-      std::sort(vsts.begin(), vsts.end(), [lastUsedTimes](std::string a, std::string b) {
-         auto itA = lastUsedTimes.find(a);
-         auto itB = lastUsedTimes.find(b);
-         double timeA = 0;
-         double timeB = 0;
-         if (itA != lastUsedTimes.end())
-            timeA = (*itA).second;
-         if (itB != lastUsedTimes.end())
-            timeB = (*itB).second;
+      std::sort(vsts.begin(), vsts.end(), [lastUsedTimes](std::string a, std::string b)
+                {
+                   auto itA = lastUsedTimes.find(a);
+                   auto itB = lastUsedTimes.find(b);
+                   double timeA = 0;
+                   double timeB = 0;
+                   if (itA != lastUsedTimes.end())
+                      timeA = (*itA).second;
+                   if (itB != lastUsedTimes.end())
+                      timeB = (*itB).second;
 
-         if (timeA == timeB)
-            return a < b;
-         
-         return timeA > timeB;
-      });
+                   if (timeA == timeB)
+                      return a < b;
+
+                   return timeA > timeB;
+                });
    }
 }
 
@@ -164,7 +165,7 @@ VSTPlugin::VSTPlugin()
 , mNumOutputs(2)
 , mChannel(1)
 , mPitchBendRange(2)
-, mModwheelCC(1)  //or 74 in Multidimensional Polyphonic Expression (MPE) spec
+, mModwheelCC(1) //or 74 in Multidimensional Polyphonic Expression (MPE) spec
 , mUseVoiceAsChannel(false)
 , mPresetFileSelector(nullptr)
 , mPresetFileIndex(-1)
@@ -176,8 +177,8 @@ VSTPlugin::VSTPlugin()
 {
    juce::File(ofToDataPath("vst")).createDirectory();
    juce::File(ofToDataPath("vst/presets")).createDirectory();
-   
-   mChannelModulations.resize(kGlobalModulationIdx+1);
+
+   mChannelModulations.resize(kGlobalModulationIdx + 1);
 
    mPluginName = "no plugin loaded";
 }
@@ -185,28 +186,28 @@ VSTPlugin::VSTPlugin()
 void VSTPlugin::CreateUIControls()
 {
    IDrawableModule::CreateUIControls();
-   mVolSlider = new FloatSlider(this,"vol",3,3,80,15,&mVol,0,4);
+   mVolSlider = new FloatSlider(this, "vol", 3, 3, 80, 15, &mVol, 0, 4);
    mOpenEditorButton = new ClickButton(this, "open", mVolSlider, kAnchor_Right_Padded);
-   mPresetFileSelector = new DropdownList(this,"preset",3,21,&mPresetFileIndex,110);
-   mSavePresetFileButton = new ClickButton(this,"save as",-1,-1);
-   mShowParameterDropdown = new DropdownList(this,"show parameter",3,38,&mShowParameterIndex, 160);
-   mPanicButton = new ClickButton(this, "panic", 166,38);
+   mPresetFileSelector = new DropdownList(this, "preset", 3, 21, &mPresetFileIndex, 110);
+   mSavePresetFileButton = new ClickButton(this, "save as", -1, -1);
+   mShowParameterDropdown = new DropdownList(this, "show parameter", 3, 38, &mShowParameterIndex, 160);
+   mPanicButton = new ClickButton(this, "panic", 166, 38);
 
    mPresetFileSelector->DrawLabel(true);
-   mSavePresetFileButton->PositionTo(mPresetFileSelector,kAnchor_Right);
+   mSavePresetFileButton->PositionTo(mPresetFileSelector, kAnchor_Right);
 
    mMidiOutCable = new AdditionalNoteCable();
    mMidiOutCable->SetPatchCableSource(new PatchCableSource(this, kConnectionType_Note));
    mMidiOutCable->GetPatchCableSource()->SetOverrideCableDir(ofVec2f(1, 0));
    AddPatchCableSource(mMidiOutCable->GetPatchCableSource());
-   mMidiOutCable->GetPatchCableSource()->SetManualPosition(206-10, 10);
+   mMidiOutCable->GetPatchCableSource()->SetManualPosition(206 - 10, 10);
 
 
    if (mPlugin)
    {
       CreateParameterSliders();
    }
-   
+
    //const auto* editor = mPlugin->createEditor();
 }
 
@@ -229,7 +230,7 @@ void VSTPlugin::Exit()
 
 std::string VSTPlugin::GetTitleLabel() const
 {
-   return "vst: "+GetPluginName();
+   return "vst: " + GetPluginName();
 }
 
 std::string VSTPlugin::GetPluginName() const
@@ -250,24 +251,24 @@ std::string VSTPlugin::GetPluginId() const
 void VSTPlugin::SetVST(std::string vstName)
 {
    ofLog() << "loading VST: " << vstName;
-   
+
    mModuleSaveData.SetString("vst", vstName);
    std::string path = VSTLookup::GetVSTPath(vstName);
-   
+
    //mark VST as used
    {
       ofxJSONElement root;
       root.open(ofToDataPath("vst/used_vsts.json"));
-      
+
       auto time = juce::Time::getCurrentTime();
       root["vsts"][path] = (double)time.currentTimeMillis();
 
       root.save(ofToDataPath("vst/used_vsts.json"), true);
    }
-   
+
    if (mPlugin != nullptr && dynamic_cast<juce::AudioPluginInstance*>(mPlugin.get())->getPluginDescription().fileOrIdentifier.toStdString() == path)
-      return;  //this VST is already loaded! we're all set
-   
+      return; //this VST is already loaded! we're all set
+
    if (mPlugin != nullptr && mWindow != nullptr)
    {
       VSTWindow* window = mWindow.release();
@@ -275,10 +276,10 @@ void VSTPlugin::SetVST(std::string vstName)
       //delete mWindowOverlay;
       //mWindowOverlay = nullptr;
    }
-   
+
    auto types = TheSynth->GetKnownPluginList().getTypes();
    bool found = false;
-   for (int i=0; i<types.size(); ++i)
+   for (int i = 0; i < types.size(); ++i)
    {
       if (path == types[i].fileOrIdentifier)
       {
@@ -309,7 +310,7 @@ void VSTPlugin::SetVST(std::string vstName)
 void VSTPlugin::LoadVST(juce::PluginDescription desc)
 {
    mPluginReady = false;
-   
+
    /*auto completionCallback = [this, &callbackDone] (std::unique_ptr<juce::AudioPluginInstance> instance, const String& error)
          {
             if (instance == nullptr)
@@ -350,9 +351,9 @@ void VSTPlugin::LoadVST(juce::PluginDescription desc)
       auto layouts = mPlugin->getBusesLayout();
 
       for (int busIndex = 1; busIndex < layouts.outputBuses.size(); ++busIndex)
-          layouts.outputBuses.getReference(busIndex) = AudioChannelSet::disabled();
+         layouts.outputBuses.getReference(busIndex) = AudioChannelSet::disabled();
       for (int busIndex = 1; busIndex < layouts.inputBuses.size(); ++busIndex)
-          layouts.inputBuses.getReference(busIndex) = AudioChannelSet::disabled();
+         layouts.inputBuses.getReference(busIndex) = AudioChannelSet::disabled();
 
       ofLog() << "vst layout  - inputs: " << layouts.inputBuses.size() << " x outputs: " << layouts.outputBuses.size();
       mPlugin->setBusesLayout(layouts);
@@ -366,7 +367,7 @@ void VSTPlugin::LoadVST(juce::PluginDescription desc)
       mPluginName = mPlugin->getName().toStdString();
 
       CreateParameterSliders();
-      
+
       mPluginReady = true;
    }
    else
@@ -382,7 +383,7 @@ void VSTPlugin::LoadVST(juce::PluginDescription desc)
 void VSTPlugin::CreateParameterSliders()
 {
    assert(mPlugin);
-   
+
    for (auto& slider : mParameterSliders)
    {
       slider.mSlider->SetShowing(false);
@@ -390,14 +391,14 @@ void VSTPlugin::CreateParameterSliders()
       slider.mSlider->Delete();
    }
    mParameterSliders.clear();
-   
+
    mShowParameterDropdown->Clear();
-   
+
    const auto& parameters = mPlugin->getParameters();
-   
+
    int numParameters = MIN(1000, parameters.size());
    mParameterSliders.resize(numParameters);
-   for (int i=0; i<numParameters; ++i)
+   for (int i = 0; i < numParameters; ++i)
    {
       mParameterSliders[i].mValue = parameters[i]->getValue();
       juce::String name = parameters[i]->getName(32);
@@ -411,14 +412,13 @@ void VSTPlugin::CreateParameterSliders()
             label = name.toStdString() + ofToString(append);
          }
       }
-      catch(UnknownUIControlException& e)
+      catch (UnknownUIControlException& e)
       {
-         
       }
       mParameterSliders[i].mSlider = new FloatSlider(this, label.c_str(), -1, -1, 200, 15, &mParameterSliders[i].mValue, 0, 1);
       mParameterSliders[i].mParameter = parameters[i];
       mParameterSliders[i].mShowing = false;
-      if (numParameters <= 20)   //only show parameters in list if there are a small number. if there are many, make the user adjust them in the VST before they can be controlled
+      if (numParameters <= 20) //only show parameters in list if there are a small number. if there are many, make the user adjust them in the VST before they can be controlled
       {
          mShowParameterDropdown->AddLabel(label.c_str(), i);
          mParameterSliders[i].mInSelectorList = true;
@@ -434,7 +434,7 @@ void VSTPlugin::Poll()
 {
    if (mDisplayMode == kDisplayMode_Sliders)
    {
-      for (int i=0; i<mParameterSliders.size(); ++i)
+      for (int i = 0; i < mParameterSliders.size(); ++i)
       {
          float value = mParameterSliders[i].mParameter->getValue();
          if (mParameterSliders[i].mValue != value)
@@ -473,16 +473,16 @@ void VSTPlugin::Process(double time)
       //bypass
       GetBuffer()->SetNumActiveChannels(2);
       SyncBuffers();
-      for (int ch=0; ch<GetBuffer()->NumActiveChannels(); ++ch)
+      for (int ch = 0; ch < GetBuffer()->NumActiveChannels(); ++ch)
       {
          if (GetTarget())
             Add(GetTarget()->GetBuffer()->GetChannel(ch), GetBuffer()->GetChannel(ch), GetBuffer()->BufferSize());
-         GetVizBuffer()->WriteChunk(GetBuffer()->GetChannel(ch),GetBuffer()->BufferSize(), ch);
+         GetVizBuffer()->WriteChunk(GetBuffer()->GetChannel(ch), GetBuffer()->BufferSize(), ch);
       }
 
       GetBuffer()->Clear();
    }
-   
+
 #if BESPOKE_LINUX //HACK: weird race condition, which this seems to fix for now
    if (mPlugin == nullptr)
       return;
@@ -501,16 +501,16 @@ void VSTPlugin::Process(double time)
    int bufferChannels = MAX(inputChannels, mNumOutputs); // how much to allocate in the juce::AudioBuffer
 
    const int kSafetyMaxChannels = 16; //hitting a crazy issue (memory stomp?) where numchannels is getting blown out sometimes
-   
+
    int bufferSize = GetBuffer()->BufferSize();
    assert(bufferSize == gBufferSize);
-   
+
    juce::AudioBuffer<float> buffer(bufferChannels, bufferSize);
-   for (int i=0; i<inputChannels && i < kSafetyMaxChannels; ++i)
-      buffer.copyFrom(i, 0, GetBuffer()->GetChannel(MIN(i,GetBuffer()->NumActiveChannels()-1)), GetBuffer()->BufferSize());
+   for (int i = 0; i < inputChannels && i < kSafetyMaxChannels; ++i)
+      buffer.copyFrom(i, 0, GetBuffer()->GetChannel(MIN(i, GetBuffer()->NumActiveChannels() - 1)), GetBuffer()->BufferSize());
 
    IAudioReceiver* target = GetTarget();
-   
+
    if (mEnabled && mPlugin != nullptr)
    {
       mVSTMutex.lock();
@@ -519,45 +519,45 @@ void VSTPlugin::Process(double time)
 
       {
          const juce::ScopedLock lock(mMidiInputLock);
-         
-         for (int i=0; i<mChannelModulations.size(); ++i)
+
+         for (int i = 0; i < mChannelModulations.size(); ++i)
          {
             ChannelModulations& mod = mChannelModulations[i];
             int channel = i + 1;
             if (i == kGlobalModulationIdx)
                channel = 1;
-            
+
             if (mUseVoiceAsChannel == false)
                channel = mChannel;
-            
+
             float bend = mod.mModulation.pitchBend ? mod.mModulation.pitchBend->GetValue(0) : 0;
             if (bend != mod.mLastPitchBend)
             {
                mod.mLastPitchBend = bend;
-               mMidiBuffer.addEvent(juce::MidiMessage::pitchWheel(channel, (int)ofMap(bend,-mPitchBendRange,mPitchBendRange,0,16383,K(clamp))), 0);
+               mMidiBuffer.addEvent(juce::MidiMessage::pitchWheel(channel, (int)ofMap(bend, -mPitchBendRange, mPitchBendRange, 0, 16383, K(clamp))), 0);
             }
             float modWheel = mod.mModulation.modWheel ? mod.mModulation.modWheel->GetValue(0) : 0;
             if (modWheel != mod.mLastModWheel)
             {
                mod.mLastModWheel = modWheel;
-               mMidiBuffer.addEvent(juce::MidiMessage::controllerEvent(channel, mModwheelCC, ofClamp(modWheel * 127,0,127)), 0);
+               mMidiBuffer.addEvent(juce::MidiMessage::controllerEvent(channel, mModwheelCC, ofClamp(modWheel * 127, 0, 127)), 0);
             }
             float pressure = mod.mModulation.pressure ? mod.mModulation.pressure->GetValue(0) : 0;
             if (pressure != mod.mLastPressure)
             {
                mod.mLastPressure = pressure;
-               mMidiBuffer.addEvent(juce::MidiMessage::channelPressureChange(channel, ofClamp(pressure*127,0,127)), 0);
+               mMidiBuffer.addEvent(juce::MidiMessage::channelPressureChange(channel, ofClamp(pressure * 127, 0, 127)), 0);
             }
          }
-         
+
          /*if (!mMidiBuffer.isEmpty())
          {
             ofLog() << mMidiBuffer.getFirstEventTime() << " " << mMidiBuffer.getLastEventTime();
          }*/
-         
+
          mMidiBuffer.addEvents(mFutureMidiBuffer, 0, mFutureMidiBuffer.getLastEventTime() + 1, 0);
          mFutureMidiBuffer.clear();
-         mFutureMidiBuffer.addEvents(mMidiBuffer, gBufferSize, mMidiBuffer.getLastEventTime()-gBufferSize + 1, -gBufferSize);
+         mFutureMidiBuffer.addEvents(mMidiBuffer, gBufferSize, mMidiBuffer.getLastEventTime() - gBufferSize + 1, -gBufferSize);
          mMidiBuffer.clear(gBufferSize, mMidiBuffer.getLastEventTime() + 1);
 
          if (mWantsPanic)
@@ -565,9 +565,9 @@ void VSTPlugin::Process(double time)
             mWantsPanic = false;
 
             mMidiBuffer.clear();
-            for (int channel=1; channel<=16; ++channel)
+            for (int channel = 1; channel <= 16; ++channel)
                mMidiBuffer.addEvent(juce::MidiMessage::allNotesOff(channel), 0);
-            for (int channel=1; channel<=16; ++channel)
+            for (int channel = 1; channel <= 16; ++channel)
                mMidiBuffer.addEvent(juce::MidiMessage::allSoundOff(channel), 1);
          }
 
@@ -592,15 +592,14 @@ void VSTPlugin::Process(double time)
                {
                   mMidiOutCable->SendCCOutput(msg.getControllerNumber(), msg.getControllerValue());
                }
-               midiIt ++;
-
+               midiIt++;
             }
          }
 
          mMidiBuffer.clear();
       }
       mVSTMutex.unlock();
-   
+
       GetBuffer()->Clear();
       /*
        * Until we support multi output we end up with this requirement that
@@ -609,10 +608,10 @@ void VSTPlugin::Process(double time)
        * (Ahem: Surge 1.9)
        */
       int nChannelsToCopy = MIN(2, buffer.getNumChannels());
-      for (int ch=0; ch < nChannelsToCopy && ch < kSafetyMaxChannels; ++ch)
+      for (int ch = 0; ch < nChannelsToCopy && ch < kSafetyMaxChannels; ++ch)
       {
-         int outputChannel = MIN(ch,GetBuffer()->NumActiveChannels()-1);
-         for (int sampleIndex=0; sampleIndex < buffer.getNumSamples(); ++sampleIndex)
+         int outputChannel = MIN(ch, GetBuffer()->NumActiveChannels() - 1);
+         for (int sampleIndex = 0; sampleIndex < buffer.getNumSamples(); ++sampleIndex)
          {
             GetBuffer()->GetChannel(outputChannel)[sampleIndex] += buffer.getSample(ch, sampleIndex) * mVol;
          }
@@ -624,11 +623,11 @@ void VSTPlugin::Process(double time)
    else
    {
       //bypass
-      for (int ch=0; ch<GetBuffer()->NumActiveChannels(); ++ch)
+      for (int ch = 0; ch < GetBuffer()->NumActiveChannels(); ++ch)
       {
          if (target)
             Add(target->GetBuffer()->GetChannel(ch), GetBuffer()->GetChannel(ch), GetBuffer()->BufferSize());
-         GetVizBuffer()->WriteChunk(GetBuffer()->GetChannel(ch),GetBuffer()->BufferSize(), ch);
+         GetVizBuffer()->WriteChunk(GetBuffer()->GetChannel(ch), GetBuffer()->BufferSize(), ch);
       }
    }
 
@@ -642,19 +641,19 @@ void VSTPlugin::PlayNote(double time, int pitch, int velocity, int voiceIdx, Mod
 
    if (!mEnabled)
       return;
-   
+
    if (pitch < 0 || pitch > 127)
       return;
-   
+
    int channel = voiceIdx + 1;
    if (voiceIdx == -1)
       channel = 1;
-   
+
    const juce::ScopedLock lock(mMidiInputLock);
-   
+
    int sampleNumber = (time - gTime) * gSampleRateMs;
    //ofLog() << sampleNumber;
-   
+
    if (velocity > 0)
    {
       mMidiBuffer.addEvent(juce::MidiMessage::noteOn(mUseVoiceAsChannel ? channel : mChannel, pitch, (uint8)velocity), sampleNumber);
@@ -665,11 +664,11 @@ void VSTPlugin::PlayNote(double time, int pitch, int velocity, int voiceIdx, Mod
       mMidiBuffer.addEvent(juce::MidiMessage::noteOff(mUseVoiceAsChannel ? channel : mChannel, pitch), sampleNumber);
       //ofLog() << "- vst note off: " << (mUseVoiceAsChannel ? channel : mChannel) << " " << pitch;
    }
-   
+
    int modIdx = voiceIdx;
    if (voiceIdx == -1)
       modIdx = kGlobalModulationIdx;
-   
+
    mChannelModulations[modIdx].mModulation = modulation;
 }
 
@@ -677,16 +676,16 @@ void VSTPlugin::SendCC(int control, int value, int voiceIdx /*=-1*/)
 {
    if (!mPluginReady || mPlugin == nullptr)
       return;
-   
+
    if (control < 0 || control > 127)
       return;
-   
+
    int channel = voiceIdx + 1;
    if (voiceIdx == -1)
       channel = 1;
-   
+
    const juce::ScopedLock lock(mMidiInputLock);
-   
+
    mMidiBuffer.addEvent(juce::MidiMessage::controllerEvent((mUseVoiceAsChannel ? channel : mChannel), control, (uint8)value), 0);
 }
 
@@ -727,7 +726,7 @@ void VSTPlugin::DrawModule()
 {
    if (Minimized() || IsVisible() == false)
       return;
-   
+
    mVolSlider->Draw();
    mPresetFileSelector->Draw();
    mSavePresetFileButton->Draw();
@@ -737,7 +736,7 @@ void VSTPlugin::DrawModule()
 
    ofPushStyle();
    ofSetColor(IDrawableModule::GetColor(kModuleType_Note));
-   DrawTextRightJustify("midi out:", 206-18, 14);
+   DrawTextRightJustify("midi out:", 206 - 18, 14);
    ofPopStyle();
 
    if (mDisplayMode == kDisplayMode_Sliders)
@@ -752,9 +751,9 @@ void VSTPlugin::DrawModule()
             {
                const int kRows = 20;
                slider.mSlider->SetPosition(3 + (slider.mSlider->GetRect().width + 2) * (sliderCount / kRows), 60 + (17 * (sliderCount % kRows)));
-               
+
                slider.mSlider->Draw();
-               
+
                ++sliderCount;
             }
          }
@@ -773,8 +772,8 @@ void VSTPlugin::GetModuleDimensions(float& width, float& height)
       }
       else
       {*/
-         width = 206;
-         height = 40;
+      width = 206;
+      height = 40;
       //}
    }
    else
@@ -816,7 +815,7 @@ void VSTPlugin::DropdownUpdated(DropdownList* list, int oldVal)
       if (mPresetFileIndex >= 0 && mPresetFileIndex < (int)mPresetFilePaths.size())
       {
          File resourceFile = File(mPresetFilePaths[mPresetFileIndex]);
-         
+
          if (!resourceFile.existsAsFile())
          {
             DBG("File doesn't exist ...");
@@ -830,7 +829,7 @@ void VSTPlugin::DropdownUpdated(DropdownList* list, int oldVal)
             DBG("Failed to open file");
             return;
          }
-             
+
          int rev = input->readInt();
 
          int64 vstStateSize = input->readInt64();
@@ -845,13 +844,13 @@ void VSTPlugin::DropdownUpdated(DropdownList* list, int oldVal)
             input->read(vstProgramState, vstProgramStateSize);
             mPlugin->setCurrentProgramStateInformation(vstProgramState, vstProgramStateSize);
          }
-         
+
          if (rev >= 2)
          {
             int numParamsShowing = input->readInt();
             for (auto& param : mParameterSliders)
                param.mShowing = false;
-            for (int i=0; i<numParamsShowing; ++i)
+            for (int i = 0; i < numParamsShowing; ++i)
             {
                int index = input->readInt();
                if (index < mParameterSliders.size())
@@ -860,7 +859,7 @@ void VSTPlugin::DropdownUpdated(DropdownList* list, int oldVal)
          }
       }
    }
-   
+
    if (list == mShowParameterDropdown)
    {
       mParameterSliders[mShowParameterIndex].mShowing = true;
@@ -872,7 +871,7 @@ void VSTPlugin::DropdownUpdated(DropdownList* list, int oldVal)
 
 void VSTPlugin::FloatSliderUpdated(FloatSlider* slider, float oldVal)
 {
-   for (int i=0; i<mParameterSliders.size(); ++i)
+   for (int i = 0; i < mParameterSliders.size(); ++i)
    {
       if (mParameterSliders[i].mSlider == slider)
       {
@@ -883,7 +882,6 @@ void VSTPlugin::FloatSliderUpdated(FloatSlider* slider, float oldVal)
 
 void VSTPlugin::IntSliderUpdated(IntSlider* slider, int oldVal)
 {
-   
 }
 
 void VSTPlugin::CheckboxUpdated(Checkbox* checkbox)
@@ -902,14 +900,14 @@ void VSTPlugin::ButtonClicked(ClickButton* button)
 
    if (button == mSavePresetFileButton && mPlugin != nullptr)
    {
-      juce::File(ofToDataPath("vst/presets/"+GetPluginId())).createDirectory();
-      FileChooser chooser("Save preset as...", File(ofToDataPath("vst/presets/"+ GetPluginId()+"/preset.vstp")), "*.vstp", true, false, TheSynth->GetFileChooserParent());
+      juce::File(ofToDataPath("vst/presets/" + GetPluginId())).createDirectory();
+      FileChooser chooser("Save preset as...", File(ofToDataPath("vst/presets/" + GetPluginId() + "/preset.vstp")), "*.vstp", true, false, TheSynth->GetFileChooserParent());
       if (chooser.browseForFileToSave(true))
       {
          std::string path = chooser.getResult().getFullPathName().toStdString();
-         
-         File resourceFile (path);
-         TemporaryFile tempFile (resourceFile);
+
+         File resourceFile(path);
+         TemporaryFile tempFile(resourceFile);
 
          {
             FileOutputStream output(tempFile.getFile());
@@ -924,16 +922,16 @@ void VSTPlugin::ButtonClicked(ClickButton* button)
             mPlugin->getStateInformation(vstState);
             juce::MemoryBlock vstProgramState;
             mPlugin->getCurrentProgramStateInformation(vstProgramState);
-            
+
             output.writeInt(kSaveStateRev);
             output.writeInt64(vstState.getSize());
             output.write(vstState.getData(), vstState.getSize());
             output.writeInt64(vstProgramState.getSize());
             if (vstProgramState.getSize() > 0)
                output.write(vstProgramState.getData(), vstProgramState.getSize());
-            
+
             std::vector<int> exposedParams;
-            for (int i=0; i<(int)mParameterSliders.size(); ++i)
+            for (int i = 0; i < (int)mParameterSliders.size(); ++i)
             {
                if (mParameterSliders[i].mShowing)
                   exposedParams.push_back(i);
@@ -941,7 +939,7 @@ void VSTPlugin::ButtonClicked(ClickButton* button)
             output.writeInt((int)exposedParams.size());
             for (int i : exposedParams)
                output.writeInt(i);
-            
+
             output.flush(); // (called explicitly to force an fsync on posix)
 
             if (output.getStatus().failed())
@@ -957,10 +955,10 @@ void VSTPlugin::ButtonClicked(ClickButton* button)
             DBG("An error occurred writing the file");
             return;
          }
-         
+
          RefreshPresetFiles();
-         
-         for (size_t i=0; i<mPresetFilePaths.size(); ++i)
+
+         for (size_t i = 0; i < mPresetFilePaths.size(); ++i)
          {
             if (mPresetFilePaths[i] == path)
             {
@@ -982,11 +980,11 @@ void VSTPlugin::RefreshPresetFiles()
 {
    if (mPlugin == nullptr)
       return;
-   
-   juce::File(ofToDataPath("vst/presets/"+ GetPluginId())).createDirectory();
+
+   juce::File(ofToDataPath("vst/presets/" + GetPluginId())).createDirectory();
    mPresetFilePaths.clear();
    mPresetFileSelector->Clear();
-   for (const auto& entry : RangedDirectoryIterator{File{ofToDataPath("vst/presets/" + GetPluginId())}, false, "*.vstp"})
+   for (const auto& entry : RangedDirectoryIterator{ File{ ofToDataPath("vst/presets/" + GetPluginId()) }, false, "*.vstp" })
    {
       const auto& file = entry.getFile();
       mPresetFileSelector->AddLabel(file.getFileName().toStdString(), (int)mPresetFilePaths.size());
@@ -998,14 +996,14 @@ void VSTPlugin::RefreshPresetFiles()
 void VSTPlugin::LoadLayout(const ofxJSONElement& moduleInfo)
 {
    mModuleSaveData.LoadString("vst", moduleInfo, "", VSTLookup::FillVSTList);
-   
+
    mModuleSaveData.LoadString("target", moduleInfo);
-   
-   mModuleSaveData.LoadInt("channel",moduleInfo,1,0,16);
+
+   mModuleSaveData.LoadInt("channel", moduleInfo, 1, 0, 16);
    mModuleSaveData.LoadBool("usevoiceaschannel", moduleInfo, false);
-   mModuleSaveData.LoadFloat("pitchbendrange",moduleInfo,2,1,96,K(isTextField));
-   mModuleSaveData.LoadInt("modwheelcc(1or74)",moduleInfo,1,0,127,K(isTextField));
-   
+   mModuleSaveData.LoadFloat("pitchbendrange", moduleInfo, 2, 1, 96, K(isTextField));
+   mModuleSaveData.LoadInt("modwheelcc(1or74)", moduleInfo, 1, 0, 127, K(isTextField));
+
    SetUpFromSaveData();
 }
 
@@ -1014,9 +1012,9 @@ void VSTPlugin::SetUpFromSaveData()
    std::string vstName = mModuleSaveData.GetString("vst");
    if (vstName != "")
       SetVST(vstName);
-   
+
    SetTarget(TheSynth->FindModule(mModuleSaveData.GetString("target")));
-   
+
    mChannel = mModuleSaveData.GetInt("channel");
    mUseVoiceAsChannel = mModuleSaveData.GetBool("usevoiceaschannel");
    mPitchBendRange = mModuleSaveData.GetFloat("pitchbendrange");
@@ -1026,9 +1024,9 @@ void VSTPlugin::SetUpFromSaveData()
 void VSTPlugin::SaveState(FileStreamOut& out)
 {
    IDrawableModule::SaveState(out);
-   
+
    out << kSaveStateRev;
-   
+
    if (mPlugin)
    {
       out << true;
@@ -1042,9 +1040,9 @@ void VSTPlugin::SaveState(FileStreamOut& out)
       out << (int)vstProgramState.getSize();
       if (vstProgramState.getSize() > 0)
          out.WriteGeneric(vstProgramState.getData(), (int)vstProgramState.getSize());
-      
+
       std::vector<int> exposedParams;
-      for (int i=0; i<(int)mParameterSliders.size(); ++i)
+      for (int i = 0; i < (int)mParameterSliders.size(); ++i)
       {
          if (mParameterSliders[i].mShowing)
             exposedParams.push_back(i);
@@ -1062,11 +1060,11 @@ void VSTPlugin::SaveState(FileStreamOut& out)
 void VSTPlugin::LoadState(FileStreamIn& in)
 {
    IDrawableModule::LoadState(in);
-   
+
    int rev;
    in >> rev;
    LoadStateValidate(rev <= kSaveStateRev);
-   
+
    bool hasPlugin;
    in >> hasPlugin;
    if (hasPlugin)
@@ -1093,16 +1091,16 @@ void VSTPlugin::LoadState(FileStreamIn& in)
       }
       else
       {
-         TheSynth->LogEvent("Couldn't instantiate plugin to load state for "+mModuleSaveData.GetString("vst"), kLogEventType_Error);
+         TheSynth->LogEvent("Couldn't instantiate plugin to load state for " + mModuleSaveData.GetString("vst"), kLogEventType_Error);
       }
-      
+
       if (rev >= 2)
       {
          int numParamsShowing;
          in >> numParamsShowing;
          for (auto& param : mParameterSliders)
             param.mShowing = false;
-         for (int i=0; i<numParamsShowing; ++i)
+         for (int i = 0; i < numParamsShowing; ++i)
          {
             int index;
             in >> index;

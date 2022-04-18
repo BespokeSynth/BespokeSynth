@@ -40,24 +40,28 @@ public:
    Splitter();
    virtual ~Splitter();
    static IDrawableModule* Create() { return new Splitter(); }
-   
-   
+
+
    void CreateUIControls() override;
-   
+
    //IAudioSource
    void Process(double time) override;
    void SetEnabled(bool enabled) override { mEnabled = enabled; }
    int GetNumTargets() override { return 2; }
-   
+
    virtual void LoadLayout(const ofxJSONElement& moduleInfo) override;
    virtual void SetUpFromSaveData() override;
-   
+
 private:
    //IDrawableModule
    void DrawModule() override;
-   void GetModuleDimensions(float& w, float& h) override { w=80; h=10; }
+   void GetModuleDimensions(float& w, float& h) override
+   {
+      w = 80;
+      h = 10;
+   }
    bool Enabled() const override { return mEnabled; }
-   
+
    RollingBuffer mVizBuffer2;
    PatchCableSource* mPatchCableSource2;
 };

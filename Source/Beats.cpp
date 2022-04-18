@@ -68,7 +68,7 @@ void Beats::Process(double time)
    IAudioReceiver* target = GetTarget();
    if (!mEnabled || target == nullptr)
       return;
-   
+
    int numChannels = 2;
 
    ComputeSliders(0);
@@ -78,12 +78,12 @@ void Beats::Process(double time)
    int bufferSize = target->GetBuffer()->BufferSize();
    float* out = target->GetBuffer()->GetChannel(0);
    assert(bufferSize == gBufferSize);
-   
+
    mWriteBuffer.Clear();
-   
+
    for (BeatColumn* column : mBeatColumns)
       column->Process(time, &mWriteBuffer, bufferSize);
-   
+
    for (int ch = 0; ch < mWriteBuffer.NumActiveChannels(); ++ch)
    {
       GetVizBuffer()->WriteChunk(mWriteBuffer.GetChannel(ch), mWriteBuffer.BufferSize(), ch);
@@ -117,7 +117,7 @@ void Beats::DrawModule()
    int i = 0;
    for (BeatColumn* column : mBeatColumns)
    {
-      column->Draw(i * BEAT_COLUMN_WIDTH+3, 5);
+      column->Draw(i * BEAT_COLUMN_WIDTH + 3, 5);
       ++i;
    }
 }
@@ -150,7 +150,7 @@ void Beats::ButtonClicked(ClickButton* button)
 {
 }
 
-void Beats::CheckboxUpdated(Checkbox *checkbox)
+void Beats::CheckboxUpdated(Checkbox* checkbox)
 {
 }
 
@@ -158,8 +158,8 @@ void Beats::GetModuleDimensions(float& width, float& height)
 {
    width = BEAT_COLUMN_WIDTH * (int)mBeatColumns.size();
    height = 0;
-   for (size_t i=0; i < mBeatColumns.size(); ++i)
-      height = MAX(height, 132+15*(mBeatColumns[i]->GetNumSamples() + 1));
+   for (size_t i = 0; i < mBeatColumns.size(); ++i)
+      height = MAX(height, 132 + 15 * (mBeatColumns[i]->GetNumSamples() + 1));
 }
 
 void Beats::FloatSliderUpdated(FloatSlider* slider, float oldVal)
@@ -173,7 +173,7 @@ void Beats::IntSliderUpdated(IntSlider* slider, int oldVal)
 void Beats::LoadLayout(const ofxJSONElement& moduleInfo)
 {
    mModuleSaveData.LoadString("target", moduleInfo);
-   
+
    SetUpFromSaveData();
 }
 
@@ -226,7 +226,7 @@ void BeatData::LoadBeat(Sample* sample)
 void BeatData::RecalcPos(double time, bool doubleTime, int numBars)
 {
    float measurePos = TheTransport->GetMeasure(time) % numBars + TheTransport->GetMeasurePos(time);
-   float pos = ofMap(measurePos/ numBars, 0, 1, 0, mBeat->LengthInSamples(), true);
+   float pos = ofMap(measurePos / numBars, 0, 1, 0, mBeat->LengthInSamples(), true);
    if (doubleTime)
    {
       pos *= 2;
@@ -246,7 +246,7 @@ BeatColumn::BeatColumn(Beats* owner, int index)
 , mNumBars(4)
 , mPan(0)
 {
-   for (size_t i=0; i<mLowpass.size(); ++i)
+   for (size_t i = 0; i < mLowpass.size(); ++i)
       mLowpass[i].SetFilterType(kFilterType_Lowpass);
    for (size_t i = 0; i < mHighpass.size(); ++i)
       mHighpass[i].SetFilterType(kFilterType_Highpass);
@@ -266,19 +266,19 @@ void BeatColumn::Process(double time, ChannelBuffer* buffer, int bufferSize)
    if (beat && mSampleIndex != -1)
    {
       float volSq = mVolume * mVolume * .25f;
-      
+
       float speed = (beat->LengthInSamples() / beat->GetSampleRateRatio()) * gInvSampleRateMs / TheTransport->MsPerBar() / mNumBars;
       if (mDoubleTime)
          speed *= 2;
       mBeatData.RecalcPos(time, mDoubleTime, mNumBars);
       beat->SetRate(speed);
-      
+
       int numChannels = 2;
       gWorkChannelBuffer.SetNumActiveChannels(numChannels);
       if (beat->ConsumeData(time, &gWorkChannelBuffer, bufferSize, true))
       {
-         mFilterRamp.Start(time,mFilter,time+10);
-         
+         mFilterRamp.Start(time, mFilter, time + 10);
+
          for (int ch = 0; ch < numChannels; ++ch)
          {
             float panGain = ch == 0 ? GetLeftPanGain(mPan) : GetRightPanGain(mPan);
@@ -380,20 +380,20 @@ void BeatColumn::Draw(int x, int y)
 void BeatColumn::CreateUIControls()
 {
    int controlWidth = BEAT_COLUMN_WIDTH - 6;
-   mVolumeSlider = new FloatSlider(mOwner,("volume"+ofToString(mIndex)).c_str(),0,0, controlWidth,15,&mVolume,0,1.5f,2);
-   mFilterSlider = new FloatSlider(mOwner,("filter"+ofToString(mIndex)).c_str(),0,0, controlWidth,15,&mFilter,-1,1,2);
+   mVolumeSlider = new FloatSlider(mOwner, ("volume" + ofToString(mIndex)).c_str(), 0, 0, controlWidth, 15, &mVolume, 0, 1.5f, 2);
+   mFilterSlider = new FloatSlider(mOwner, ("filter" + ofToString(mIndex)).c_str(), 0, 0, controlWidth, 15, &mFilter, -1, 1, 2);
    mPanSlider = new FloatSlider(mOwner, ("pan" + ofToString(mIndex)).c_str(), 0, 0, controlWidth, 15, &mPan, -1, 1, 2);
-   mDoubleTimeCheckbox = new Checkbox(mOwner,("double"+ofToString(mIndex)).c_str(),0,0,&mDoubleTime);
+   mDoubleTimeCheckbox = new Checkbox(mOwner, ("double" + ofToString(mIndex)).c_str(), 0, 0, &mDoubleTime);
    mNumBarsSlider = new IntSlider(mOwner, ("bars" + ofToString(mIndex)).c_str(), 0, 0, controlWidth, 15, &mNumBars, 1, 8);
    mSelector = new RadioButton(mOwner, ("selector" + ofToString(mIndex)).c_str(), 0, 0, &mSampleIndex);
-   
+
    mSelector->SetForcedWidth(controlWidth);
    mSelector->AddLabel("none", -1);
 }
 
 void BeatColumn::AddBeat(Sample* sample)
 {
-   mSelector->AddLabel(sample->Name().c_str(), mSelector->GetNumValues()-1);
+   mSelector->AddLabel(sample->Name().c_str(), mSelector->GetNumValues() - 1);
    Sample* newSample = new Sample();
    newSample->CopyFrom(sample);
    mSamples.push_back(newSample);
@@ -430,11 +430,10 @@ void BeatColumn::LoadState(FileStreamIn& in)
    {
       mSamples[i] = new Sample();
       mSamples[i]->LoadState(in);
-      mSelector->AddLabel(mSamples[i]->Name().c_str(), mSelector->GetNumValues()-1);
+      mSelector->AddLabel(mSamples[i]->Name().c_str(), mSelector->GetNumValues() - 1);
    }
    in >> mSampleIndex;
 
    if (mSampleIndex >= 0 && mSampleIndex < (int)mSamples.size())
       mBeatData.LoadBeat(mSamples[mSampleIndex]);
 }
-

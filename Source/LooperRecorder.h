@@ -47,8 +47,8 @@ public:
    LooperRecorder();
    ~LooperRecorder();
    static IDrawableModule* Create() { return new LooperRecorder(); }
-   
-   
+
+
    void CreateUIControls() override;
 
    void Init() override;
@@ -69,16 +69,16 @@ public:
    float GetCommitDelay() { return mCommitDelay; }
    RollingBuffer* GetRecordBuffer() { return &mRecordBuffer; }
    Looper* GetNextCommitTarget() { return (mNextCommitTargetIndex < (int)mLoopers.size()) ? mLoopers[mNextCommitTargetIndex] : nullptr; }
-   
+
    void StartFreeRecord();
    void EndFreeRecord();
    void CancelFreeRecord();
    bool InFreeRecord() { return mFreeRecording; }
-   
+
    //IAudioSource
    void Process(double time) override;
    void SetEnabled(bool enabled) override { mEnabled = enabled; }
-   
+
    //IDrawableModule
    void KeyPressed(int key, bool isRepeat) override;
    void Poll() override;
@@ -91,15 +91,15 @@ public:
    void RadioButtonUpdated(RadioButton* radio, int oldVal) override;
    void IntSliderUpdated(IntSlider* slider, int oldVal) override;
    void DropdownUpdated(DropdownList* list, int oldVal) override;
-   
+
    bool HasDebugDraw() const override { return true; }
-   
+
    void LoadLayout(const ofxJSONElement& moduleInfo) override;
    void SaveLayout(ofxJSONElement& moduleInfo) override;
    void SetUpFromSaveData() override;
    void SaveState(FileStreamOut& out) override;
    void LoadState(FileStreamIn& in) override;
-   
+
 private:
    void SyncLoopLengths();
    void UpdateSpeed();
@@ -108,12 +108,16 @@ private:
    void Resample(bool setKey);
    void DrawCircleHash(ofVec2f center, float progress, float width, float innerRadius, float outerRadius);
    void SyncCablesToLoopers();
-   
+
    //IDrawableModule
    void DrawModule() override;
-   void GetModuleDimensions(float& width, float& height) override { width = mWidth; height = mHeight; }
+   void GetModuleDimensions(float& width, float& height) override
+   {
+      width = mWidth;
+      height = mHeight;
+   }
    bool Enabled() const override { return mEnabled; }
-   
+
    float mWidth;
    float mHeight;
    RollingBuffer mRecordBuffer;
@@ -151,12 +155,12 @@ private:
    ClickButton* mCommit8BarsButton;
    IntSlider* mNextCommitTargetSlider;
    int mNextCommitTargetIndex;
-   
+
    bool mFreeRecording;
    Checkbox* mFreeRecordingCheckbox;
    double mStartFreeRecordTime;
    ClickButton* mCancelFreeRecordButton;
-   
+
    enum RecorderMode
    {
       kRecorderMode_Record,
@@ -169,4 +173,3 @@ private:
 
 
 #endif /* defined(__modularSynth__LooperRecorder__) */
-

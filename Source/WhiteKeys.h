@@ -36,22 +36,26 @@ class WhiteKeys : public NoteEffectBase, public IDrawableModule
 public:
    WhiteKeys();
    static IDrawableModule* Create() { return new WhiteKeys(); }
-   
-   
+
 
    void SetEnabled(bool enabled) override { mEnabled = enabled; }
 
    //INoteReceiver
    void PlayNote(double time, int pitch, int velocity, int voiceIdx = -1, ModulationParameters modulation = ModulationParameters()) override;
-   
+
    void CheckboxUpdated(Checkbox* checkbox) override;
-   
+
    virtual void LoadLayout(const ofxJSONElement& moduleInfo) override;
    virtual void SetUpFromSaveData() override;
+
 private:
    //IDrawableModule
    void DrawModule() override;
-   void GetModuleDimensions(float& width, float& height) override { width = 110; height = 0; }
+   void GetModuleDimensions(float& width, float& height) override
+   {
+      width = 110;
+      height = 0;
+   }
    bool Enabled() const override { return mEnabled; }
 };
 

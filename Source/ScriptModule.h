@@ -40,24 +40,22 @@
 
 #include "juce_osc/juce_osc.h"
 
-class ScriptModule : public IDrawableModule, public IButtonListener, public NoteEffectBase, public IPulseReceiver, public ICodeEntryListener, public IFloatSliderListener, public IDropdownListener,
-                     private juce::OSCReceiver,
-                     private juce::OSCReceiver::Listener<juce::OSCReceiver::MessageLoopCallback>
+class ScriptModule : public IDrawableModule, public IButtonListener, public NoteEffectBase, public IPulseReceiver, public ICodeEntryListener, public IFloatSliderListener, public IDropdownListener, private juce::OSCReceiver, private juce::OSCReceiver::Listener<juce::OSCReceiver::MessageLoopCallback>
 {
 public:
    ScriptModule();
    virtual ~ScriptModule();
    static IDrawableModule* Create() { return new ScriptModule(); }
-   
+
    static void UninitializePython();
    static void InitializePythonIfNecessary();
    static void CheckIfPythonEverSuccessfullyInitialized();
-   
-   
+
+
    void CreateUIControls() override;
-   
+
    void Poll() override;
-   
+
    void PlayNoteFromScript(float pitch, float velocity, float pan, int noteOutputIndex);
    void PlayNoteFromScriptAfterDelay(float pitch, float velocity, double delayMeasureTime, float pan, int noteOutputIndex);
    void SendCCFromScript(int control, int value, int noteOutputIndex);
@@ -74,28 +72,28 @@ public:
    void OnModuleReferenceBound(IDrawableModule* target);
    void SetContext();
    void ClearContext();
-   
+
    void RunCode(double time, std::string code);
-   
+
    void OnPulse(double time, float velocity, int flags) override;
    void ButtonClicked(ClickButton* button) override;
    void FloatSliderUpdated(FloatSlider* slider, float oldValue) override {}
    void DropdownClicked(DropdownList* list) override;
    void DropdownUpdated(DropdownList* list, int oldValue) override;
- 
+
    //ICodeEntryListener
    void ExecuteCode() override;
-   std::pair<int,int> ExecuteBlock(int lineStart, int lineEnd) override;
+   std::pair<int, int> ExecuteBlock(int lineStart, int lineEnd) override;
    void OnCodeUpdated() override;
-   
+
    //INoteReceiver
    void PlayNote(double time, int pitch, int velocity, int voiceIdx = -1, ModulationParameters modulation = ModulationParameters()) override;
 
    //OSCReceiver
    void oscMessageReceived(const juce::OSCMessage& msg) override;
-   
+
    bool HasDebugDraw() const override { return true; }
-   
+
    void SaveState(FileStreamOut& out) override;
    void LoadState(FileStreamIn& in) override;
    void LoadLayout(const ofxJSONElement& moduleInfo) override;
@@ -120,11 +118,11 @@ public:
    ModulationChain* GetPressure(int pitch) { return &mPressures[pitch]; }
 
    static std::string GetBootstrapImportString() { return "import bespoke; import module; import scriptmodule; import random; import math"; }
-   
+
 private:
    void PlayNote(double time, float pitch, float velocity, float pan, int noteOutputIndex, int lineNum);
    void AdjustUIControl(IUIControl* control, float value, int lineNum);
-   std::pair<int,int> RunScript(double time, int lineStart = -1, int lineEnd = -1);
+   std::pair<int, int> RunScript(double time, int lineStart = -1, int lineEnd = -1);
    void FixUpCode(std::string& code);
    void ScheduleNote(double time, float pitch, float velocity, float pan, int noteOutputIndex);
    void SendNoteToIndex(int index, double time, int pitch, int velocity, int voiceIdx, ModulationParameters modulation);
@@ -138,7 +136,7 @@ private:
    void RefreshScriptFiles();
    void RefreshStyleFiles();
    void Reset();
-   
+
    //IDrawableModule
    void DrawModule() override;
    void DrawModuleUnclipped() override;
@@ -148,7 +146,7 @@ private:
    void Resize(float w, float h) override;
    void OnClicked(int x, int y, bool right) override;
    bool MouseMoved(float x, float y) override;
-   
+
    ClickButton* mPythonInstalledConfirmButton;
    DropdownList* mLoadScriptSelector;
    ClickButton* mLoadScriptButton;
@@ -170,7 +168,7 @@ private:
    float mB;
    float mC;
    float mD;
-   
+
    float mWidth;
    float mHeight;
    std::array<double, 20> mScheduledPulseTimes;
@@ -181,7 +179,7 @@ private:
    int mNextLineToExecute;
    int mInitExecutePriority;
    int mOscInputPort;
-   
+
    struct ScheduledNoteOutput
    {
       double startTime;
@@ -193,7 +191,7 @@ private:
       int lineNum;
    };
    std::array<ScheduledNoteOutput, 200> mScheduledNoteOutput;
-   
+
    struct ScheduledMethodCall
    {
       double startTime;
@@ -202,7 +200,7 @@ private:
       int lineNum;
    };
    std::array<ScheduledMethodCall, 50> mScheduledMethodCall;
-   
+
    struct ScheduledUIControlValue
    {
       double startTime;
@@ -212,7 +210,7 @@ private:
       int lineNum;
    };
    std::array<ScheduledUIControlValue, 50> mScheduledUIControlValue;
-   
+
    struct PendingNoteInput
    {
       double time;
@@ -220,7 +218,7 @@ private:
       int velocity;
    };
    std::array<PendingNoteInput, 50> mPendingNoteInput;
-   
+
    struct PrintDisplay
    {
       double time;
@@ -228,7 +226,7 @@ private:
       int lineNum;
    };
    std::array<PrintDisplay, 10> mPrintDisplay;
-   
+
    struct UIControlModificationDisplay
    {
       double time;
@@ -237,16 +235,16 @@ private:
       int lineNum;
    };
    std::array<UIControlModificationDisplay, 10> mUIControlModifications;
-   
+
    class LineEventTracker
    {
    public:
       LineEventTracker()
       {
-         for (size_t i=0; i<mTimes.size(); ++i)
+         for (size_t i = 0; i < mTimes.size(); ++i)
             mTimes[i] = -999;
       }
-      
+
       void AddEvent(int lineNum, std::string text = "")
       {
          if (lineNum >= 0 && lineNum < (int)mTimes.size())
@@ -255,13 +253,14 @@ private:
             mText[lineNum] = text;
          }
       }
-      
+
       void Draw(CodeEntry* codeEntry, int style, ofColor color);
+
    private:
       std::array<double, 256> mTimes;
       std::array<std::string, 256> mText;
    };
-   
+
    LineEventTracker mLineExecuteTracker;
    LineEventTracker mMethodCallTracker;
    LineEventTracker mNotePlayTracker;
@@ -274,16 +273,16 @@ private:
       IDrawableModule* mTarget;
    };
    std::vector<BoundModuleConnection> mBoundModuleConnections;
-   
+
    std::vector<std::string> mScriptFilePaths;
-   
+
    std::vector<AdditionalNoteCable*> mExtraNoteOutputs;
    std::array<ModulationChain, 128> mPitchBends;
    std::array<ModulationChain, 128> mModWheels;
    std::array<ModulationChain, 128> mPressures;
    std::list<std::string> mMidiMessageQueue;
    ofMutex mMidiMessageQueueMutex;
-   
+
    bool mShowJediWarning;
 };
 
@@ -294,7 +293,7 @@ public:
    virtual ~ScriptReferenceDisplay();
    static IDrawableModule* Create() { return new ScriptReferenceDisplay(); }
 
-   
+
    void CreateUIControls() override;
 
    void ButtonClicked(ClickButton* button) override;
@@ -305,7 +304,11 @@ private:
    bool Enabled() const override { return true; }
    void GetModuleDimensions(float& w, float& h) override;
    bool IsResizable() const override { return true; }
-   void Resize(float w, float h) override { mWidth = w; mHeight = h; }
+   void Resize(float w, float h) override
+   {
+      mWidth = w;
+      mHeight = h;
+   }
    bool MouseScrolled(int x, int y, float scrollX, float scrollY) override;
 
    void LoadText();

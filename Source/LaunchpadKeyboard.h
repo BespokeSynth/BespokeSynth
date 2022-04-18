@@ -47,8 +47,8 @@ public:
    LaunchpadKeyboard();
    ~LaunchpadKeyboard();
    static IDrawableModule* Create() { return new LaunchpadKeyboard(); }
-   
-   
+
+
    void CreateUIControls() override;
    void Init() override;
    void SetEnabled(bool enabled) override { mEnabled = enabled; }
@@ -57,14 +57,14 @@ public:
    void SetDisplayer(LaunchpadNoteDisplayer* displayer) { mDisplayer = displayer; }
    void DisplayNote(int pitch, int velocity);
    void SetChorder(Chorder* chorder) { mChorder = chorder; }
-   
+
    //IGridControllerListener
    void OnControllerPageSelected() override;
    void OnGridButton(int x, int y, float velocity, IGridController* grid) override;
-   
+
    //IScaleListener
    void OnScaleChanged() override;
-   
+
    //IDrawableModule
    void KeyPressed(int key, bool isRepeat) override;
    void KeyReleased(int key) override;
@@ -73,19 +73,19 @@ public:
 
    //ITimeListener
    void OnTimeEvent(double time) override;
-   
+
    //IPush2GridController
    bool OnPush2Control(MidiMessageType type, int controlIndex, float midiValue) override;
    void UpdatePush2Leds(Push2Control* push2) override;
-   
+
    void CheckboxUpdated(Checkbox* checkbox) override;
    void IntSliderUpdated(IntSlider* slider, int oldVal) override;
    void DropdownUpdated(DropdownList* list, int oldVal) override;
    void FloatSliderUpdated(FloatSlider* slider, float oldVal) override;
-   
+
    virtual void LoadLayout(const ofxJSONElement& moduleInfo) override;
    virtual void SetUpFromSaveData() override;
-   
+
 private:
    enum LaunchpadLayout
    {
@@ -96,7 +96,7 @@ private:
       kGuitar,
       kSeptatonic
    };
-   
+
    enum ArrangementMode
    {
       kFull,
@@ -107,9 +107,13 @@ private:
    //IDrawableModule
    void DrawModule() override;
    void DrawModuleUnclipped() override;
-   void GetModuleDimensions(float& width, float& height) override { width=120; height=74; }
+   void GetModuleDimensions(float& width, float& height) override
+   {
+      width = 120;
+      height = 74;
+   }
    bool Enabled() const override { return mEnabled; }
-   
+
    void PlayKeyboardNote(double time, int pitch, int velocity);
    void UpdateLights(bool force = false);
    GridColor GetGridSquareColor(int x, int y);
@@ -119,10 +123,16 @@ private:
    void PressedNoteFor(int x, int y, int velocity);
    void ReleaseNoteFor(int x, int y);
    int GridToPitchChordSection(int x, int y);
-   int GetHeldVelocity(int pitch) { if (pitch >= 0 && pitch < 128) return mCurrentNotes[pitch]; else return 0; }
-   
+   int GetHeldVelocity(int pitch)
+   {
+      if (pitch >= 0 && pitch < 128)
+         return mCurrentNotes[pitch];
+      else
+         return 0;
+   }
+
    int mRootNote;
-   
+
    int mCurrentNotes[128];
    bool mTestKeyHeld;
    int mOctave;
@@ -132,7 +142,7 @@ private:
    LaunchpadLayout mLayout;
    DropdownList* mLayoutDropdown;
    int mCurrentChord;
-   std::vector< std::vector<int> > mChords;
+   std::vector<std::vector<int> > mChords;
    LaunchpadNoteDisplayer* mDisplayer;
    ArrangementMode mArrangementMode;
    DropdownList* mArrangementModeDropdown;
@@ -149,4 +159,3 @@ private:
 };
 
 #endif /* defined(__modularSynth__LaunchpadKeyboard__) */
-

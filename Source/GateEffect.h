@@ -36,10 +36,10 @@ class GateEffect : public IAudioEffect, public IIntSliderListener, public IFloat
 public:
    GateEffect();
    static IAudioEffect* Create() { return new GateEffect(); }
-   
-   
+
+
    void CreateUIControls() override;
-   
+
    void SetAttack(float ms) { mAttackTime = ms; }
    void SetRelease(float ms) { mReleaseTime = ms; }
    bool IsGateOpen() const { return mEnvelope > 0; }
@@ -52,13 +52,17 @@ public:
    void CheckboxUpdated(Checkbox* checkbox) override;
    void IntSliderUpdated(IntSlider* slider, int oldVal) override;
    void FloatSliderUpdated(FloatSlider* slider, float oldVal) override;
-   
+
 private:
    //IDrawableModule
    void DrawModule() override;
-   void GetModuleDimensions(float& width, float& height) override { width=120; height=50; }
+   void GetModuleDimensions(float& width, float& height) override
+   {
+      width = 120;
+      height = 50;
+   }
    bool Enabled() const override { return mEnabled; }
-   
+
    float mThreshold;
    float mAttackTime;
    float mReleaseTime;
@@ -70,4 +74,3 @@ private:
 };
 
 #endif /* defined(__modularSynth__GateEffect__) */
-

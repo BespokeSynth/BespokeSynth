@@ -46,46 +46,46 @@ public:
    SampleFinder();
    ~SampleFinder();
    static IDrawableModule* Create() { return new SampleFinder(); }
-   
-   
+
+
    void CreateUIControls() override;
-   
+
    //INoteReceiver
    void PlayNote(double time, int pitch, int velocity, int voiceIdx = -1, ModulationParameters modulation = ModulationParameters()) override;
    void SendCC(int control, int value, int voiceIdx = -1) override {}
-   
+
    //IAudioSource
    void Process(double time) override;
    void SetEnabled(bool enabled) override { mEnabled = enabled; }
-   
+
    //IDrawableModule
    void FilesDropped(std::vector<std::string> files, int x, int y) override;
-   
+
    bool MouseScrolled(int x, int y, float scrollX, float scrollY) override;
-   
+
    void CheckboxUpdated(Checkbox* checkbox) override;
    void FloatSliderUpdated(FloatSlider* slider, float oldVal) override;
    void IntSliderUpdated(IntSlider* slider, int oldVal) override;
    void DropdownClicked(DropdownList* list) override;
    void DropdownUpdated(DropdownList* list, int oldVal) override;
    void ButtonClicked(ClickButton* button) override;
-   
+
    virtual void LoadLayout(const ofxJSONElement& moduleInfo) override;
    virtual void SetUpFromSaveData() override;
-   
+
 private:
    void UpdateSample();
    void DoWrite();
    void UpdateZoomExtents();
    float GetSpeed();
-   
+
    //IDrawableModule
    void DrawModule() override;
    bool Enabled() const override { return mEnabled; }
    void GetModuleDimensions(float& width, float& height) override;
-   
+
    Sample* mSample;
-   
+
    float mVolume;
    FloatSlider* mVolumeSlider;
    float* mWriteBuffer;
@@ -117,4 +117,3 @@ private:
 };
 
 #endif /* defined(__modularSynth__SampleFinder__) */
-

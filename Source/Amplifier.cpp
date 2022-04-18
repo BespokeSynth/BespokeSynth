@@ -37,7 +37,7 @@ Amplifier::Amplifier()
 void Amplifier::CreateUIControls()
 {
    IDrawableModule::CreateUIControls();
-   mGainSlider = new FloatSlider(this,"gain",5,2,110,15,&mGain,0,4);
+   mGainSlider = new FloatSlider(this, "gain", 5, 2, 110, 15, &mGain, 0, 4);
 }
 
 Amplifier::~Amplifier()
@@ -50,18 +50,18 @@ void Amplifier::Process(double time)
 
    if (!mEnabled)
       return;
-   
+
    SyncBuffers();
    int bufferSize = GetBuffer()->BufferSize();
-   
+
    IAudioReceiver* target = GetTarget();
    if (target)
    {
       ChannelBuffer* out = target->GetBuffer();
-      for (int ch=0; ch<GetBuffer()->NumActiveChannels(); ++ch)
+      for (int ch = 0; ch < GetBuffer()->NumActiveChannels(); ++ch)
       {
          auto getBufferChannelCh = GetBuffer()->GetChannel(ch);
-         for (int i=0; i<bufferSize; ++i)
+         for (int i = 0; i < bufferSize; ++i)
          {
             ComputeSliders(i);
             gWorkBuffer[i] = getBufferChannelCh[i] * mGain;
@@ -70,7 +70,7 @@ void Amplifier::Process(double time)
          GetVizBuffer()->WriteChunk(gWorkBuffer, GetBuffer()->BufferSize(), ch);
       }
    }
-   
+
    GetBuffer()->Reset();
 }
 
@@ -78,7 +78,7 @@ void Amplifier::DrawModule()
 {
    if (Minimized() || IsVisible() == false)
       return;
-   
+
    mGainSlider->Draw();
 }
 
@@ -93,6 +93,3 @@ void Amplifier::SetUpFromSaveData()
 {
    SetTarget(TheSynth->FindModule(mModuleSaveData.GetString("target")));
 }
-
-
-

@@ -42,7 +42,7 @@ public:
    void SetDisplayText(bool display);
    void UseCircleLook(ofColor color);
    void DisableCircleLook() { mUseCircleLook = false; }
-   
+
    bool MouseMoved(float x, float y) override;
 
    //IUIControl
@@ -60,15 +60,19 @@ public:
    bool IsSliderControl() override { return false; }
    bool IsButtonControl() override { return true; }
    void SetBoxSize(float size) { mHeight = size; }
-   
+
    bool CheckNeedsDraw() override;
-   
+
 protected:
-   ~Checkbox();   //protected so that it can't be created on the stack
+   ~Checkbox(); //protected so that it can't be created on the stack
 
 private:
    void OnClicked(int x, int y, bool right) override;
-   void GetDimensions(float& width, float& height) override { width = mWidth; height = mHeight; }
+   void GetDimensions(float& width, float& height) override
+   {
+      width = mWidth;
+      height = mHeight;
+   }
    void CalcSliderVal();
    void UpdateWidth();
 

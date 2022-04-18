@@ -47,5 +47,7 @@ private:
 };
 
 #if !BESPOKE_SPACEMOUSE_SUPPORT
-inline void SpaceMouseMessageWindow::Poll() {}
+inline void SpaceMouseMessageWindow::Poll()
+{
+}
 #endif

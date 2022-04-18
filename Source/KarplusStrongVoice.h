@@ -64,7 +64,8 @@ public:
    , mVelToVolume(.5f)
    , mVelToEnvelope(.5f)
    , mLiteCPUMode(false)
-   {}
+   {
+   }
    float mFilter;
    float mFeedback;
    KarplusStrongSourceType mSourceType;
@@ -92,6 +93,7 @@ public:
    bool Process(double time, ChannelBuffer* out, int oversampling) override;
    void SetVoiceParams(IVoiceParams* params) override;
    bool IsDone(double time) override;
+
 private:
    void DoParameterUpdate(int samplesIn,
                           int oversampling,
@@ -100,7 +102,7 @@ private:
                           float& filterRate,
                           float& filterLerp,
                           float& oscPhaseInc);
-   
+
    float mOscPhase;
    EnvOscillator mOsc;
    ::ADSR mEnv;

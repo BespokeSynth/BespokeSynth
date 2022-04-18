@@ -42,7 +42,7 @@ MidiClockOut::~MidiClockOut()
 void MidiClockOut::CreateUIControls()
 {
    IDrawableModule::CreateUIControls();
-   
+
    UIBLOCK0();
    DROPDOWN(mDeviceList, "device", &mDeviceIndex, 120);
    BUTTON(mStartButton, "send start");
@@ -59,7 +59,7 @@ void MidiClockOut::CreateUIControls()
 void MidiClockOut::Init()
 {
    IDrawableModule::Init();
-   
+
    InitDevice();
 
    TheTransport->AddAudioPoller(this);
@@ -68,11 +68,11 @@ void MidiClockOut::Init()
 void MidiClockOut::InitDevice()
 {
    BuildDeviceList();
-   
+
    const std::vector<std::string>& devices = mDevice.GetPortList(false);
-   for (int i=0; i<devices.size(); ++i)
+   for (int i = 0; i < devices.size(); ++i)
    {
-      if (strcmp(devices[i].c_str(),mDevice.Name()) == 0)
+      if (strcmp(devices[i].c_str(), mDevice.Name()) == 0)
          mDeviceIndex = i;
    }
 }
@@ -81,7 +81,7 @@ void MidiClockOut::DrawModule()
 {
    if (Minimized() || IsVisible() == false)
       return;
-   
+
    mDeviceList->Draw();
    mStartButton->Draw();
    mMultiplierSelector->Draw();
@@ -91,7 +91,7 @@ void MidiClockOut::BuildDeviceList()
 {
    mDeviceList->Clear();
    const std::vector<std::string>& devices = mDevice.GetPortList(false);
-   for (int i=0; i<devices.size(); ++i)
+   for (int i = 0; i < devices.size(); ++i)
       mDeviceList->AddLabel(devices[i].c_str(), i);
 }
 
@@ -111,7 +111,7 @@ void MidiClockOut::OnTransportAdvanced(float amount)
       int pulsesPerMeasure = TheTransport->GetTimeSigTop() * pulsesPerBeat;
 
       double oldPulse = TheTransport->GetMeasureTime(gTime) * pulsesPerMeasure;
-      double newPulse = TheTransport->GetMeasureTime(gTime+gBufferSizeMs) * pulsesPerMeasure;
+      double newPulse = TheTransport->GetMeasureTime(gTime + gBufferSizeMs) * pulsesPerMeasure;
       int pulses = int(floor(newPulse) - floor(oldPulse));
       double distToFirstPulse = 1 - fmod(oldPulse, 1);
       double pulseMs = TheTransport->GetDuration(kInterval_4n) / pulsesPerBeat;

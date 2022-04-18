@@ -29,12 +29,13 @@
 #include "ModularSynth.h"
 #include "DropdownList.h"
 
-template <class T> void FillDropdown(DropdownList* list)
+template <class T>
+void FillDropdown(DropdownList* list)
 {
    assert(list);
    std::vector<std::string> modules = TheSynth->GetModuleNames<T>();
-   list->AddLabel("",-1);
-   for (int i=0; i<modules.size(); ++i)
+   list->AddLabel("", -1);
+   for (int i = 0; i < modules.size(); ++i)
       list->AddLabel(modules[i].c_str(), i);
 }
 

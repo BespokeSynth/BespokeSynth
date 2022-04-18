@@ -30,8 +30,8 @@
 void IAudioReceiver::SyncInputBuffer()
 {
    if (GetInputMode() == kInputMode_Mono && GetBuffer()->NumActiveChannels() > 1)
-   {  //sum to mono
-      for (int i=1; i<GetBuffer()->NumActiveChannels(); ++i)
+   { //sum to mono
+      for (int i = 1; i < GetBuffer()->NumActiveChannels(); ++i)
          Add(GetBuffer()->GetChannel(0), GetBuffer()->GetChannel(i), GetBuffer()->BufferSize());
       //Mult(GetBuffer()->GetChannel(0), 1.0f / GetBuffer()->NumActiveChannels(), GetBuffer()->BufferSize());
       GetBuffer()->SetNumActiveChannels(1);

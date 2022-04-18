@@ -79,7 +79,23 @@ enum SpecialControlBinding
 
 enum class ChannelFilter
 {
-   kAny, k1, k2, k3, k4, k5, k6, k7, k8, k9, k10, k11, k12, k13, k14, k15, k16
+   kAny,
+   k1,
+   k2,
+   k3,
+   k4,
+   k5,
+   k6,
+   k7,
+   k8,
+   k9,
+   k10,
+   k11,
+   k12,
+   k13,
+   k14,
+   k15,
+   k16
 };
 
 namespace Json
@@ -118,9 +134,9 @@ struct UIControlConnection
       mPageless = false;
       mUIOwner = owner;
    }
-   
+
    ~UIControlConnection();
-   
+
    IUIControl* GetUIControl()
    {
       if (mSpecialBinding == kSpecialBinding_None)
@@ -131,7 +147,7 @@ struct UIControlConnection
       assert(index >= 0 && index <= 9);
       return gHotBindUIControl[index];
    }
-   
+
    UIControlConnection* MakeCopy()
    {
       UIControlConnection* connection = new UIControlConnection(mUIOwner);
@@ -154,9 +170,9 @@ struct UIControlConnection
       connection->mPageless = mPageless;
       return connection;
    }
-   
+
    void SetNext(UIControlConnection* next);
-   
+
    void SetUIControl(std::string path);
    void CreateUIControls(int index);
    void Poll();
@@ -165,7 +181,7 @@ struct UIControlConnection
    void DrawLayout();
    void SetShowing(bool enabled);
    bool PostRepatch(PatchCableSource* cableSource, bool fromUserClick);
-   
+
    int mControl;
    IUIControl* mUIControl;
    ControlType mType;
@@ -182,14 +198,14 @@ struct UIControlConnection
    int mChannel;
    int mPage;
    bool mPageless;
-   
+
    static bool sDrawCables;
-   
+
    //state
    int mLastControlValue;
    double mLastActivityTime;
    MidiController* mUIOwner;
-   
+
    //editor controls
    DropdownList* mMessageTypeDropdown{ nullptr };
    TextEntry* mControlEntry{ nullptr };
@@ -220,9 +236,13 @@ enum ControlDrawType
 
 struct ControlLayoutElement
 {
-   ControlLayoutElement() : mActive(false), mControlCable(nullptr), mConnectionType(kControlType_Slider) {}
+   ControlLayoutElement()
+   : mActive(false)
+   , mControlCable(nullptr)
+   , mConnectionType(kControlType_Slider)
+   {}
    void Setup(MidiController* owner, MidiMessageType type, int control, ControlDrawType drawType, float incrementAmount, int offVal, int onVal, bool scaleOutput, ControlType connectionType, float x, float y, float w, float h);
-   
+
    bool mActive;
    MidiMessageType mType;
    int mControl;
@@ -234,17 +254,24 @@ struct ControlLayoutElement
    int mOnVal;
    bool mScaleOutput;
    ControlType mConnectionType;
-   
+
    PatchCableSource* mControlCable;
-   
+
    float mLastValue;
    float mLastActivityTime;
 };
 
 struct GridLayout
 {
-   GridLayout() : mGridCable(nullptr) { for (int i=0; i<MAX_MIDI_PAGES; ++i) { mGridControlTarget[i] = nullptr; } }
-   
+   GridLayout()
+   : mGridCable(nullptr)
+   {
+      for (int i = 0; i < MAX_MIDI_PAGES; ++i)
+      {
+         mGridControlTarget[i] = nullptr;
+      }
+   }
+
    int mRows;
    int mCols;
    ofVec2f mPosition;
@@ -252,12 +279,12 @@ struct GridLayout
    MidiMessageType mType;
    std::vector<int> mControls;
    std::vector<int> mColors;
-   
+
    PatchCableSource* mGridCable;
    GridControlTarget* mGridControlTarget[MAX_MIDI_PAGES];
 };
 
-#define NUM_LAYOUT_CONTROLS 128+128+128+1+1 //128 notes, 128 ccs, 128 program change, 1 pitch bend, 1 dummy
+#define NUM_LAYOUT_CONTROLS 128 + 128 + 128 + 1 + 1 //128 notes, 128 ccs, 128 program change, 1 pitch bend, 1 dummy
 
 class MidiController : public MidiDeviceListener, public IDrawableModule, public IButtonListener, public IDropdownListener, public IRadioButtonListener, public IAudioPoller, public ITextEntryListener, public INoteSource
 {
@@ -265,9 +292,9 @@ public:
    MidiController();
    ~MidiController();
    static IDrawableModule* Create() { return new MidiController(); }
-   
+
    void CreateUIControls() override;
-   
+
    void Init() override;
 
    void AddControlConnection(const ofxJSONElement& connection);
@@ -281,18 +308,19 @@ public:
    std::string GetDeviceIn() const { return mDeviceIn; }
    std::string GetDeviceOut() const { return mDeviceOut; }
    UIControlConnection* GetConnectionForControl(MidiMessageType messageType, int control);
-   UIControlConnection* GetConnectionForCableSource(const PatchCableSource *source);
-   
+   UIControlConnection* GetConnectionForCableSource(const PatchCableSource* source);
+
    void SetVelocityMult(float mult) { mVelocityMult = mult; }
    void SetUseChannelAsVoice(bool use) { mUseChannelAsVoice = use; }
    void SetNoteOffset(int offset) { mNoteOffset = offset; }
    void SetPitchBendRange(float range) { mPitchBendRange = range; }
-   
+
    void SendNote(int page, int pitch, int velocity, bool forceNoteOn = false, int channel = -1);
    void SendCC(int page, int ctl, int value, int channel = -1);
    void SendProgramChange(int page, int program, int channel = -1);
    void SendPitchBend(int page, int bend, int channel = -1);
    void SendData(int page, unsigned char a, unsigned char b, unsigned char c);
+   void SendSysEx(int page, std::string data);
 
    INonstandardController* GetNonstandardController() { return mNonstandardController; }
 
@@ -311,7 +339,7 @@ public:
    void OnMidiProgramChange(MidiProgramChange& program) override;
    void OnMidiPitchBend(MidiPitchBend& pitchBend) override;
    void OnMidi(const juce::MidiMessage& message) override;
-   
+
    void OnTransportAdvanced(float amount) override;
 
    void CheckboxUpdated(Checkbox* checkbox) override;
@@ -324,9 +352,9 @@ public:
    void PreRepatch(PatchCableSource* cableSource) override;
    void PostRepatch(PatchCableSource* cableSource, bool fromUserClick) override;
    void OnCableGrabbed(PatchCableSource* cableSource) override;
-   
+
    ControlLayoutElement& GetLayoutControl(int control, MidiMessageType type);
-   
+
    virtual void LoadLayout(const ofxJSONElement& moduleInfo) override;
    virtual void SetUpFromSaveData() override;
    virtual void SaveLayout(ofxJSONElement& moduleInfo) override;
@@ -340,7 +368,7 @@ public:
    static IUIControl* sLastActivityUIControl;
    static double sLastBoundControlTime;
    static IUIControl* sLastBoundUIControl;
-   
+
 private:
    enum MappingDisplayMode
    {
@@ -348,7 +376,7 @@ private:
       kList,
       kLayout
    };
-   
+
    //IDrawableModule
    void DrawModule() override;
    void DrawModuleUnclipped() override;
@@ -370,9 +398,11 @@ private:
    int GetLayoutControlIndexForMidi(MidiMessageType type, int control) const;
    std::string GetLayoutTooltip(int controlIndex);
    void UpdateControllerIndex();
-   void LoadLayout(std::string filename);
+   void LoadControllerLayout(std::string filename);
    bool JustBoundControl() const { return gTime - sLastBoundControlTime < 500; }
-   
+
+   const std::string kDefaultLayout = "default";
+
    float mVelocityMult;
    bool mUseChannelAsVoice;
    float mCurrentPitchBend;
@@ -392,7 +422,7 @@ private:
    ofxJSONElement mConnectionsJson;
    std::list<UIControlConnection*> mConnections;
    bool mSendCCOutput{ false };
-   bool mUseNegativeEdge;  //for midi toggle, accept on or off as a button press
+   bool mUseNegativeEdge; //for midi toggle, accept on or off as a button press
    bool mSlidersDefaultToIncremental;
    bool mBindMode;
    Checkbox* mBindCheckbox;
@@ -418,10 +448,11 @@ private:
    int mControllerIndex;
    double mLastActivityTime;
    bool mLastActivityBound;
+   bool mShowActivityUIOverlay{ true };
    bool mBlink;
    int mControllerPage;
    DropdownList* mPageSelector;
-   std::vector< std::list<MidiDeviceListener*> > mListeners;
+   std::vector<std::list<MidiDeviceListener*> > mListeners;
    std::vector<ScriptModule*> mScriptListeners;
    bool mPrintInput;
    std::string mLastInput;
@@ -432,17 +463,16 @@ private:
    ChannelFilter mChannelFilter;
    std::string mLastLoadedLayoutFile;
    ofxJSONElement mLayoutData;
-   
+   std::string mLayoutLoadError;
+
    std::array<ControlLayoutElement, NUM_LAYOUT_CONTROLS> mLayoutControls;
    int mHighlightedLayoutElement;
    int mHoveredLayoutElement;
    int mLayoutWidth;
    int mLayoutHeight;
    std::vector<GridLayout*> mGrids;
-   bool mFoundLayoutFile;
-   
+
    ofMutex mQueuedMessageMutex;
 };
 
 #endif /* defined(__modularSynth__MidiController__) */
-

@@ -46,32 +46,32 @@ public:
    FubbleModule();
    ~FubbleModule();
    static IDrawableModule* Create() { return new FubbleModule(); }
-   
-   
+
+
    void CreateUIControls() override;
-   
+
    //IDrawableModule
    void Init() override;
    void Poll() override;
    bool IsResizable() const override { return true; }
    void Resize(float w, float h) override;
    void SetEnabled(bool enabled) override { mEnabled = enabled; }
-   
+
    void CheckboxUpdated(Checkbox* checkbox) override;
    void DropdownUpdated(DropdownList* list, int oldVal) override;
    void ButtonClicked(ClickButton* button) override;
    void FloatSliderUpdated(FloatSlider* slider, float oldVal) override {}
-   
+
    void LoadLayout(const ofxJSONElement& moduleInfo) override;
    void SaveLayout(ofxJSONElement& moduleInfo) override;
    void SetUpFromSaveData() override;
-   
+
    void SaveState(FileStreamOut& out) override;
    void LoadState(FileStreamIn& in) override;
-   
+
    //IPatchable
    void PostRepatch(PatchCableSource* cableSource, bool fromUserClick) override;
-   
+
 private:
    float GetPlaybackTime(double time);
    ofRectangle GetFubbleRect();
@@ -81,7 +81,7 @@ private:
    void Clear();
    float GetPerlinNoiseValue(double time, float x, float y, bool horizontal);
    void UpdatePerlinSeed() { mPerlinSeed = gRandom() % 1000; }
-   
+
    //IDrawableModule
    void DrawModule() override;
    void DrawModuleUnclipped() override;
@@ -90,7 +90,7 @@ private:
    void OnClicked(int x, int y, bool right) override;
    bool MouseMoved(float x, float y) override;
    void MouseReleased() override;
-   
+
    struct FubbleAxis : public IModulator
    {
       FubbleAxis(FubbleModule* owner, bool horizontal)
@@ -102,17 +102,17 @@ private:
       void UpdateControl() { OnModulatorRepatch(); }
       void SetCableSource(PatchCableSource* cableSource) { mTargetCable = cableSource; }
       PatchCableSource* GetCableSource() const { return mTargetCable; }
-      
+
       //IModulator
       virtual float Value(int samplesIn = 0) override;
       virtual bool Active() const override { return mOwner->Enabled() && (mHasRecorded || mOwner->mIsRightClicking); }
-      
+
       FubbleModule* mOwner;
       bool mIsHorizontal;
       Curve mCurve;
       bool mHasRecorded;
    };
-   
+
    FubbleAxis mAxisH;
    FubbleAxis mAxisV;
    float mLength;

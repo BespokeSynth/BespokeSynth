@@ -45,15 +45,15 @@ TimelineControl::TimelineControl()
 void TimelineControl::CreateUIControls()
 {
    IDrawableModule::CreateUIControls();
-   mTimeSlider = new FloatSlider(this,"measure",3,3,GetSliderWidth(),15,&mTime,0,mNumMeasures);
-   mLoopCheckbox = new Checkbox(this,"loop",-1,-1,&mLoop);
-   mLoopStartSlider = new IntSlider(this,"loop start",-1,-1,GetSliderWidth(),15,&mLoopStart,0,mNumMeasures);
-   mLoopEndSlider = new IntSlider(this,"loop end",-1,-1,GetSliderWidth(),15,&mLoopEnd,0,mNumMeasures);
-   
+   mTimeSlider = new FloatSlider(this, "measure", 3, 3, GetSliderWidth(), 15, &mTime, 0, mNumMeasures);
+   mLoopCheckbox = new Checkbox(this, "loop", -1, -1, &mLoop);
+   mLoopStartSlider = new IntSlider(this, "loop start", -1, -1, GetSliderWidth(), 15, &mLoopStart, 0, mNumMeasures);
+   mLoopEndSlider = new IntSlider(this, "loop end", -1, -1, GetSliderWidth(), 15, &mLoopEnd, 0, mNumMeasures);
+
    mLoopCheckbox->PositionTo(mTimeSlider, kAnchor_Right);
    mLoopStartSlider->PositionTo(mTimeSlider, kAnchor_Below);
    mLoopEndSlider->PositionTo(mLoopStartSlider, kAnchor_Below);
-   
+
    mLoopStartSlider->SetShowing(mLoop);
    mLoopEndSlider->SetShowing(mLoop);
 }
@@ -65,10 +65,10 @@ TimelineControl::~TimelineControl()
 void TimelineControl::DrawModule()
 {
    mTime = TheTransport->GetMeasureTime(gTime);
-   
+
    if (Minimized() || IsVisible() == false)
       return;
-   
+
    mTimeSlider->Draw();
    mLoopCheckbox->Draw();
    mLoopStartSlider->Draw();
@@ -119,7 +119,7 @@ void TimelineControl::IntSliderUpdated(IntSlider* slider, int oldVal)
    {
       if (slider == mLoopStartSlider)
       {
-         mLoopStart = MIN(mLoopStart, mNumMeasures-1);
+         mLoopStart = MIN(mLoopStart, mNumMeasures - 1);
          mLoopEnd = MAX(mLoopEnd, mLoopStart + 1);
       }
       if (slider == mLoopEndSlider)
@@ -136,7 +136,7 @@ void TimelineControl::LoadLayout(const ofxJSONElement& moduleInfo)
 {
    mModuleSaveData.LoadFloat("width", moduleInfo, 390, 100, 99999, K(isTextField));
    mModuleSaveData.LoadInt("num_measures", moduleInfo, 32, 1, 1024, K(isTextField));
-   
+
    SetUpFromSaveData();
 }
 
@@ -152,6 +152,6 @@ void TimelineControl::SetUpFromSaveData()
 void TimelineControl::SaveLayout(ofxJSONElement& moduleInfo)
 {
    IDrawableModule::SaveLayout(moduleInfo);
-   
+
    moduleInfo["width"] = mWidth;
 }

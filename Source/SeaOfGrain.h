@@ -46,29 +46,29 @@ public:
    SeaOfGrain();
    ~SeaOfGrain();
    static IDrawableModule* Create() { return new SeaOfGrain(); }
-   
-   
+
+
    void CreateUIControls() override;
-   
+
    //INoteReceiver
    void PlayNote(double time, int pitch, int velocity, int voiceIdx = -1, ModulationParameters modulation = ModulationParameters()) override;
    void SendCC(int control, int value, int voiceIdx = -1) override {}
-   
+
    //IAudioSource
    void Process(double time) override;
    void SetEnabled(bool enabled) override { mEnabled = enabled; }
-   
+
    //IDrawableModule
    void FilesDropped(std::vector<std::string> files, int x, int y) override;
    void SampleDropped(int x, int y, Sample* sample) override;
    bool CanDropSample() const override { return true; }
    void Poll() override;
-   
+
    //IClickable
    void MouseReleased() override;
    bool MouseMoved(float x, float y) override;
-   
-   
+
+
    void CheckboxUpdated(Checkbox* checkbox) override;
    //IFloatSliderListener
    void FloatSliderUpdated(FloatSlider* slider, float oldVal) override;
@@ -79,13 +79,13 @@ public:
    void DropdownUpdated(DropdownList* list, int oldVal) override;
    //IButtonListener
    void ButtonClicked(ClickButton* button) override;
-   
+
    virtual void LoadLayout(const ofxJSONElement& moduleInfo) override;
    virtual void SetUpFromSaveData() override;
-   
+
    void SaveState(FileStreamOut& out) override;
    void LoadState(FileStreamIn& in) override;
-   
+
 private:
    void UpdateSample();
    void UpdateDisplaySamples();
@@ -101,39 +101,39 @@ private:
    float GetSourceStartSample();
    float GetSourceEndSample();
    float GetSourceBufferOffset();
-   
+
    struct GrainMPEVoice
    {
       GrainMPEVoice();
       void Process(ChannelBuffer* output, int bufferSize);
       void Draw(float w, float h);
-      
+
       float mPlay;
       float mPitch;
       ModulationChain* mPitchBend;
       ModulationChain* mPressure;
       ModulationChain* mModWheel;
-      
+
       float mGain;
-      
+
       ::ADSR mADSR;
       Granulator mGranulator;
       SeaOfGrain* mOwner;
    };
-   
+
    struct GrainManualVoice
    {
       GrainManualVoice();
       void Process(ChannelBuffer* output, int bufferSize);
       void Draw(float w, float h);
-      
+
       float mGain;
       float mPosition;
       float mPan;
-      
+
       Granulator mGranulator;
       SeaOfGrain* mOwner;
-      
+
       FloatSlider* mGainSlider;
       FloatSlider* mPositionSlider;
       FloatSlider* mOverlapSlider;
@@ -146,15 +146,15 @@ private:
       FloatSlider* mWidthSlider;
       FloatSlider* mPanSlider;
    };
-   
+
    static const int kNumMPEVoices = 16;
    GrainMPEVoice mMPEVoices[kNumMPEVoices];
    static const int kNumManualVoices = 6;
    GrainManualVoice mManualVoices[kNumManualVoices];
-   
+
    Sample* mSample;
    RollingBuffer mRecordBuffer;
-   
+
    ClickButton* mLoadButton;
    bool mRecordInput;
    Checkbox* mRecordInputCheckbox;
@@ -175,4 +175,3 @@ private:
 };
 
 #endif /* defined(__Bespoke__SeaOfGrain__) */
-

@@ -1,0 +1,37 @@
+---
+BasedOnStyle: WebKit
+AccessModifierOffset: -3
+AlignAfterOpenBracket: Align
+AlignOperands: true
+AllowAllConstructorInitializersOnNextLine: false
+AllowShortCaseLabelsOnASingleLine: true
+AllowShortIfStatementsOnASingleLine: false
+AllowShortLoopsOnASingleLine: false
+AllowShortLambdasOnASingleLine: None
+AlwaysBreakBeforeMultilineStrings: true
+BraceWrapping:
+  AfterCaseLabel: true
+  AfterClass: true
+  AfterControlStatement: true
+  AfterEnum: true
+  AfterFunction: true
+  AfterNamespace: true
+  AfterStruct: true
+  BeforeCatch: true
+  BeforeElse: true
+  BeforeLambdaBody: true
+  SplitEmptyFunction: false
+BreakBeforeBinaryOperators: None
+BreakBeforeBraces: Custom
+ConstructorInitializerIndentWidth: 0
+ContinuationIndentWidth: 0
+IndentCaseLabels: true
+IndentWidth: 3
+MaxEmptyLinesToKeep: 2
+NamespaceIndentation: All
+ReflowComments: false
+SortIncludes: false
+SpaceBeforeCpp11BracedList: false
+SpaceInEmptyBlock: false
+Standard: Auto
+...

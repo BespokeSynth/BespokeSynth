@@ -45,11 +45,14 @@ MultitrackRecorder::MultitrackRecorder()
 void MultitrackRecorder::CreateUIControls()
 {
    IDrawableModule::CreateUIControls();
-   
+
    UIBLOCK0();
-   CHECKBOX(mRecordCheckbox, "record", &mRecord); UIBLOCK_SHIFTRIGHT();
-   BUTTON(mClearButton, "clear"); UIBLOCK_NEWLINE();
-   BUTTON(mAddTrackButton, "add track"); UIBLOCK_SHIFTRIGHT();
+   CHECKBOX(mRecordCheckbox, "record", &mRecord);
+   UIBLOCK_SHIFTRIGHT();
+   BUTTON(mClearButton, "clear");
+   UIBLOCK_NEWLINE();
+   BUTTON(mAddTrackButton, "add track");
+   UIBLOCK_SHIFTRIGHT();
    BUTTON(mBounceButton, "bounce");
    ENDUIBLOCK0();
 }
@@ -138,7 +141,7 @@ void MultitrackRecorder::ButtonClicked(ClickButton* button)
 
          if (sample)
          {
-            std::string filename = filenamePrefix + ofToString(i+1) + ".wav";
+            std::string filename = filenamePrefix + ofToString(i + 1) + ".wav";
             sample->Write(filename.c_str());
             ++numFiles;
          }
@@ -270,12 +273,10 @@ MultitrackRecorderTrack::MultitrackRecorderTrack()
 , mDoRecording(false)
 , mRecordingLength(0)
 {
-
 }
 
 MultitrackRecorderTrack::~MultitrackRecorderTrack()
 {
-
 }
 
 void MultitrackRecorderTrack::CreateUIControls()
@@ -311,7 +312,7 @@ void MultitrackRecorderTrack::Process(double time)
          int chunkIndex = mRecordingLength / kRecordingChunkSize;
          int chunkPos = mRecordingLength % kRecordingChunkSize;
          for (int ch = 0; ch < numChannels; ++ch)
-            mRecordChunks[chunkIndex]->GetChannel(ch)[chunkPos] = GetBuffer()->GetChannel(MIN(ch, GetBuffer()->NumActiveChannels()-1))[i];
+            mRecordChunks[chunkIndex]->GetChannel(ch)[chunkPos] = GetBuffer()->GetChannel(MIN(ch, GetBuffer()->NumActiveChannels() - 1))[i];
          ++mRecordingLength;
       }
    }
@@ -351,7 +352,7 @@ void MultitrackRecorderTrack::DrawModule()
    ofPushMatrix();
    ofTranslate(5, 3);
    float sampleWidth = width - 10;
-   
+
    ofSetColor(255, 255, 255, 30);
    ofFill();
    ofRect(0, 0, sampleWidth, height - 6);
@@ -447,12 +448,10 @@ void MultitrackRecorderTrack::Clear()
 
 void MultitrackRecorderTrack::FloatSliderUpdated(FloatSlider* slider, float oldVal)
 {
-
 }
 
 void MultitrackRecorderTrack::CheckboxUpdated(Checkbox* checkbox)
 {
-
 }
 
 void MultitrackRecorderTrack::ButtonClicked(ClickButton* button)

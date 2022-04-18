@@ -73,7 +73,7 @@ FloatSlider::FloatSlider(IFloatSliderListener* owner, const char* label, int x, 
 {
    assert(owner);
    SetName(label);
-   SetPosition(x,y);
+   SetPosition(x, y);
    (dynamic_cast<IDrawableModule*>(owner))->AddUIControl(this);
    SetParent(dynamic_cast<IClickable*>(owner));
    mLastComputeCacheTime = new double[gBufferSize];
@@ -81,7 +81,7 @@ FloatSlider::FloatSlider(IFloatSliderListener* owner, const char* label, int x, 
 }
 
 FloatSlider::FloatSlider(IFloatSliderListener* owner, const char* label, IUIControl* anchor, AnchorDirection anchorDir, int w, int h, float* var, float min, float max, int digits /* = -1 */)
-: FloatSlider(owner,label,-1,-1,w,h,var,min,max,digits)
+: FloatSlider(owner, label, -1, -1, w, h, var, min, max, digits)
 {
    PositionTo(anchor, anchorDir);
 }
@@ -124,18 +124,18 @@ void FloatSlider::Render()
 {
    if (mLastComputeTime + .1f < gTime)
       Compute();
-   
+
    float normalWidth = mWidth;
    float normalHeight = mHeight;
-   
+
    if (Push2Control::sDrawingPush2Display)
    {
       mWidth = 100;
       mHeight = 15;
    }
-   
+
    mLastDisplayedValue = *mVar;
-   
+
    ofPushStyle();
 
    ofColor color;
@@ -144,72 +144,72 @@ void FloatSlider::Render()
 
    ofFill();
    ofSetColor(0, 0, 0, gModuleDrawAlpha * .5f);
-   ofRect(mX+1,mY+1,mWidth,mHeight);
+   ofRect(mX + 1, mY + 1, mWidth, mHeight);
    ofSetColor(color);
-   ofRect(mX,mY,mWidth,mHeight);
+   ofRect(mX, mY, mWidth, mHeight);
    ofNoFill();
 
    bool showSmoothAdjustmentUI = AdjustSmooth() && (gHoveredUIControl == this || mSmooth > 0);
-   
+
    if (mIsSmoothing && !showSmoothAdjustmentUI)
    {
       ofPushStyle();
-      ofSetColor(255,255,0,gModuleDrawAlpha);
-      float val = ofClamp(mSmoothTarget,mMin,mMax);
-      float screenPos = mX+1+(mWidth-2)*ValToPos(val, false);
+      ofSetColor(255, 255, 0, gModuleDrawAlpha);
+      float val = ofClamp(mSmoothTarget, mMin, mMax);
+      float screenPos = mX + 1 + (mWidth - 2) * ValToPos(val, false);
       ofSetLineWidth(1);
       ofFill();
-      ofCircle(screenPos,mY+mHeight/2,3);
+      ofCircle(screenPos, mY + mHeight / 2, 3);
       ofPopStyle();
    }
-   
+
    float screenPos;
    if (mModulator && mModulator->Active() && !showSmoothAdjustmentUI)
    {
-      screenPos = mX+1+(mWidth-2)*ValToPos(*mVar, true);
-      float lfomax = ofClamp(mModulator->GetMax(),mMin,mMax);
-      float screenPosMax = mX+1+(mWidth-2)*ValToPos(lfomax, true);
-      float lfomin = ofClamp(mModulator->GetMin(),mMin,mMax);
-      float screenPosMin = mX+1+(mWidth-2)*ValToPos(lfomin, true);
-      
+      screenPos = mX + 1 + (mWidth - 2) * ValToPos(*mVar, true);
+      float lfomax = ofClamp(mModulator->GetMax(), mMin, mMax);
+      float screenPosMax = mX + 1 + (mWidth - 2) * ValToPos(lfomax, true);
+      float lfomin = ofClamp(mModulator->GetMin(), mMin, mMax);
+      float screenPosMin = mX + 1 + (mWidth - 2) * ValToPos(lfomin, true);
+
       ofPushStyle();
-      ofSetColor(0,200,0,gModuleDrawAlpha*.5f);
+      ofSetColor(0, 200, 0, gModuleDrawAlpha * .5f);
       ofFill();
-      ofRect(screenPosMin,mY,screenPos-screenPosMin,mHeight, 1); //lfo bar
+      ofRect(screenPosMin, mY, screenPos - screenPosMin, mHeight, 1); //lfo bar
       ofPopStyle();
 
       ofPushStyle();
-      ofSetColor(0,255,0,gModuleDrawAlpha);
+      ofSetColor(0, 255, 0, gModuleDrawAlpha);
       ofSetLineWidth(2);
-      ofLine(screenPosMin,mY+1,screenPosMin,mY+mHeight-1); //min bar
-      ofLine(screenPosMax,mY+1,screenPosMax,mY+mHeight-1); //max bar
+      ofLine(screenPosMin, mY + 1, screenPosMin, mY + mHeight - 1); //min bar
+      ofLine(screenPosMax, mY + 1, screenPosMax, mY + mHeight - 1); //max bar
       ofPopStyle();
    }
    else
    {
       ofPushStyle();
       if (*mVar >= mMin && *mVar <= mMax)
-         ofSetColor(255,0,0,gModuleDrawAlpha);
+         ofSetColor(255, 0, 0, gModuleDrawAlpha);
       else
-         ofSetColor(30,30,30,gModuleDrawAlpha);
+         ofSetColor(30, 30, 30, gModuleDrawAlpha);
       if (showSmoothAdjustmentUI)
-         ofSetColor(255,255, 0, gModuleDrawAlpha);
-      float val = ofClamp(*mVar,mMin,mMax);
-      screenPos = mX+1+(mWidth-2)*ValToPos(val, false);
+         ofSetColor(255, 255, 0, gModuleDrawAlpha);
+      float val = ofClamp(*mVar, mMin, mMax);
+      screenPos = mX + 1 + (mWidth - 2) * ValToPos(val, false);
       ofSetLineWidth(2);
-      ofLine(screenPos,mY+1,screenPos,mY+mHeight-1);  //value bar
+      ofLine(screenPos, mY + 1, screenPos, mY + mHeight - 1); //value bar
       ofPopStyle();
    }
-   
-   DrawBeacon(screenPos, mY+mHeight/2);
-   
-   DrawHover(mX,mY,mWidth,mHeight);
+
+   DrawBeacon(screenPos, mY + mHeight / 2);
+
+   DrawHover(mX, mY, mWidth, mHeight);
 
    std::string display;
    float textSize = 15;
    if (showSmoothAdjustmentUI)
    {
-      display = "smooth: "+ofToString(mSmooth, 3);
+      display = "smooth: " + ofToString(mSmooth, 3);
       textSize = 11;
    }
    else
@@ -231,12 +231,12 @@ void FloatSlider::Render()
 
    if (mMaxEntry || mMinEntry)
       display = "";
-   
+
    ofSetColor(textColor);
    DrawTextNormal(display, mX + 2, mY + 5 + mHeight / 2, textSize);
 
    ofPopStyle();
-   
+
    if (mMaxEntry)
    {
       ofPushStyle();
@@ -273,20 +273,20 @@ void FloatSlider::Render()
       ofSetColor(255, 255, 255);
       ofRect(mX, mY, mWidth * .4f, mHeight);
       ofRect(mX + mWidth * .6f, mY, mWidth * .4f, mHeight);
-      
+
       ofPushMatrix();
       ofClipWindow(mX, mY, mWidth * .4f, mHeight, true);
-      DrawTextNormal(ofToString(mMin), mX+2, mY + 4 + mHeight / 2, 12);
+      DrawTextNormal(ofToString(mMin), mX + 2, mY + 4 + mHeight / 2, 12);
       ofPopMatrix();
 
       ofPushMatrix();
       ofClipWindow(mX + mWidth * .6f, mY, mWidth * .4f, mHeight, true);
-      DrawTextRightJustify(ofToString(mMax), mX+mWidth-2, mY + 4 + mHeight / 2, 12);
+      DrawTextRightJustify(ofToString(mMax), mX + mWidth - 2, mY + 4 + mHeight / 2, 12);
       ofPopMatrix();
 
       ofPopStyle();
    }
-   
+
    mWidth = normalWidth;
    mHeight = normalHeight;
 }
@@ -299,17 +299,17 @@ void FloatSlider::DisplayLFOControl()
       if (lfo->IsPinned())
          return;
 
-      float thisx,thisy;
-      GetPosition(thisx,thisy);
-      
+      float thisx, thisy;
+      GetPosition(thisx, thisy);
+
       lfo->SetLFOEnabled(true);
-      
-      float w,h;
+
+      float w, h;
       lfo->GetDimensions(w, h);
-      lfo->SetPosition(thisx,thisy+15);
+      lfo->SetPosition(thisx, thisy + 15);
       lfo->SetOwningContainer(GetModuleParent()->GetOwningContainer());
       TheSynth->PushModalFocusItem(lfo);
-      
+
       if (TheLFOController)
          TheLFOController->SetSlider(this);
    }
@@ -322,20 +322,20 @@ void FloatSlider::OnClicked(int x, int y, bool right)
       DisplayLFOControl();
       return;
    }
-   
+
    if ((GetKeyModifiers() & kModifier_Command) && mAllowMinMaxAdjustment)
    {
       bool adjustMax;
-      if (x > mWidth/2)
+      if (x > mWidth / 2)
          adjustMax = true;
       else
          adjustMax = false;
-      
+
       if (adjustMax)
       {
          if (mMaxEntry != nullptr)
             mMaxEntry->Delete();
-         mMaxEntry = new TextEntry(this, "", mX+mWidth-5*9, mY, 5, &mMax, -FLT_MAX, FLT_MAX);
+         mMaxEntry = new TextEntry(this, "", mX + mWidth - 5 * 9, mY, 5, &mMax, -FLT_MAX, FLT_MAX);
          mMaxEntry->MakeActiveTextEntry(true);
       }
       else
@@ -343,16 +343,16 @@ void FloatSlider::OnClicked(int x, int y, bool right)
          if (mMinEntry != nullptr)
             mMinEntry->Delete();
          //mMinEntry = new TextEntry(this, "", mX, mY, 5, &mMin, -FLT_MAX, FLT_MAX);
-         mMinEntry = new TextEntry(this, "", mX+mWidth-5*9, mY, 5, &mMin, -FLT_MAX, FLT_MAX);
+         mMinEntry = new TextEntry(this, "", mX + mWidth - 5 * 9, mY, 5, &mMin, -FLT_MAX, FLT_MAX);
          mMinEntry->MakeActiveTextEntry(true);
       }
-      
+
       return;
    }
 
-   mFineRefX = ofMap(ValToPos(*GetModifyValue(), false),0.0f,1.0f,mX+1,mX+mWidth-1,true)-mX;
+   mFineRefX = ofMap(ValToPos(*GetModifyValue(), false), 0.0f, 1.0f, mX + 1, mX + mWidth - 1, true) - mX;
    mRefY = y;
-   SetValueForMouse(x,y);
+   SetValueForMouse(x, y);
    mMouseDown = true;
    mTouching = true;
    UpdateTouching();
@@ -370,9 +370,9 @@ void FloatSlider::MouseReleased()
 
 bool FloatSlider::MouseMoved(float x, float y)
 {
-   CheckHover(x,y);
+   CheckHover(x, y);
    if (mMouseDown)
-      SetValueForMouse(x,y);
+      SetValueForMouse(x, y);
    return mMouseDown;
 }
 
@@ -388,7 +388,7 @@ void FloatSlider::SetValueForMouse(int x, int y)
          mFineRefX = x;
       }
       float precision = mShowDigits != -1 ? 100 : 10;
-      fX = mFineRefX + (fX-mFineRefX)/precision;
+      fX = mFineRefX + (fX - mFineRefX) / precision;
    }
    else
    {
@@ -396,15 +396,15 @@ void FloatSlider::SetValueForMouse(int x, int y)
       mClampIntMin = -999;
    }
    float oldVal = *var;
-   float pos = ofMap(fX+mX,mX+1,mX+mWidth-1,0.0f,1.0f);
-   
+   float pos = ofMap(fX + mX, mX + 1, mX + mWidth - 1, 0.0f, 1.0f);
+
    if (AdjustSmooth())
    {
       mSmooth = PosToVal(pos, false);
       SmoothUpdated();
       return;
    }
-   
+
    *var = PosToVal(pos, false);
    if (mRelative && (mModulator == nullptr || mModulator->Active() == false))
    {
@@ -418,10 +418,10 @@ void FloatSlider::SetValueForMouse(int x, int y)
          *var -= mRelativeOffset;
       }
    }
-   *var = ofClamp(*var,mMin,mMax);
+   *var = ofClamp(*var, mMin, mMax);
    if (clampInt)
-      *var = ofClamp(*var,mClampIntMin,mClampIntMax);
-   
+      *var = ofClamp(*var, mClampIntMin, mClampIntMax);
+
    if (oldVal != *var)
    {
       mOwner->FloatSliderUpdated(this, oldVal);
@@ -439,7 +439,7 @@ void FloatSlider::SetValueForMouse(int x, int y)
 bool FloatSlider::AdjustSmooth() const
 {
    return (GetKeyModifiers() & kModifier_Alt) &&
-          mComputeHasBeenCalledOnce;   //no smoothing if we're not calling Compute()
+          mComputeHasBeenCalledOnce; //no smoothing if we're not calling Compute()
 }
 
 void FloatSlider::SmoothUpdated()
@@ -465,7 +465,7 @@ void FloatSlider::SetFromMidiCC(float slider, bool setViaModulator /*= false*/)
 
 float FloatSlider::GetValueForMidiCC(float slider) const
 {
-   slider = ofClamp(slider,0,1);
+   slider = ofClamp(slider, 0, 1);
    return PosToVal(slider, true);
 }
 
@@ -477,21 +477,21 @@ float FloatSlider::PosToVal(float pos, bool ignoreSmooth) const
          return 0;
       if (pos > 1)
          return 1;
-      return pos*pos;
+      return pos * pos;
    }
    if (pos < 0)
       return mMin;
    if (pos > 1)
       return mMax;
    if (mMode == kNormal)
-      return mMin + pos*(mMax-mMin);
+      return mMin + pos * (mMax - mMin);
    if (mMode == kLogarithmic)
-      return mMin * powf(mMax/mMin, pos);
+      return mMin * powf(mMax / mMin, pos);
    if (mMode == kSquare)
-      return mMin + pos*pos*(mMax-mMin);
+      return mMin + pos * pos * (mMax - mMin);
    if (mMode == kBezier)
    {
-      float y = pos * (pos * (pos * (mMax-mMin) + 3 * mMin - 3 * mBezierControl) - 3 * mMin + 3 * mBezierControl) + mMin;
+      float y = pos * (pos * (pos * (mMax - mMin) + 3 * mMin - 3 * mBezierControl) - 3 * mMin + 3 * mBezierControl) + mMin;
       return y;
    }
    assert(false);
@@ -503,11 +503,11 @@ float FloatSlider::ValToPos(float val, bool ignoreSmooth) const
    if (AdjustSmooth() && (gHoveredUIControl == this || mSmooth > 0) && !ignoreSmooth)
       return sqrtf(mSmooth);
    if (mMode == kNormal)
-      return (val - mMin) / (mMax-mMin);
+      return (val - mMin) / (mMax - mMin);
    if (mMode == kLogarithmic)
-      return log(val/mMin) / log(mMax/mMin);
+      return log(val / mMin) / log(mMax / mMin);
    if (mMode == kSquare)
-      return sqrtf((val - mMin) / (mMax-mMin));
+      return sqrtf((val - mMin) / (mMax - mMin));
    if (mMode == kBezier)
    {
       float closest = 0;
@@ -533,7 +533,7 @@ void FloatSlider::SetValue(float value)
       TheLFOController->SetSlider(this);
       return;
    }
-   
+
    float* var = GetModifyValue();
    float oldVal = *var;
    if (mRelative)
@@ -551,7 +551,7 @@ void FloatSlider::SetValue(float value)
    /*if (mClamped)
       *var = ofClamp(value,mMin,mMax);
    else*/
-      *var = value;
+   *var = value;
    DisableLFO();
    if (oldVal != *var)
    {
@@ -590,7 +590,7 @@ float FloatSlider::GetMidiValue() const
 {
    if (mMin == mMax)
       return 0;
-   
+
    return ValToPos(*mVar, true);
 }
 
@@ -600,30 +600,30 @@ std::string FloatSlider::GetDisplayValue(float val) const
       return mMinValueDisplay;
    if (val == mMax && mMaxValueDisplay != "")
       return mMaxValueDisplay;
-   
+
    int decDigits = 3;
    if (mShowDigits != -1)
       decDigits = mShowDigits;
-   else if (mMax-mMin > 1000)
+   else if (mMax - mMin > 1000)
       decDigits = 0;
-   else if (mMax-mMin > 100)
+   else if (mMax - mMin > 100)
       decDigits = 1;
-   else if (mMax-mMin > 10)
+   else if (mMax - mMin > 10)
       decDigits = 2;
-   
+
    float displayVar = val;
-   if (decDigits == 0)  //round down if we're showing int value
+   if (decDigits == 0) //round down if we're showing int value
       displayVar = (int)displayVar;
-   return ofToString(displayVar,decDigits);
+   return ofToString(displayVar, decDigits);
 }
 
 void FloatSlider::DoCompute(int samplesIn /*= 0*/)
 {
    if (mLastComputeTime == gTime && mLastComputeSamplesIn == samplesIn)
-      return;  //we've just calculated this, no need to do it again! earlying out avoids wasted work and circular modulation loops
+      return; //we've just calculated this, no need to do it again! earlying out avoids wasted work and circular modulation loops
 
    if (mLFOControl && mLFOControl->Active() && mLFOControl->InLowResMode() && samplesIn != 0)
-      return;  //only do the math on Compute(0) for low res mode
+      return; //only do the math on Compute(0) for low res mode
 
    mLastComputeTime = gTime;
    mLastComputeSamplesIn = samplesIn;
@@ -698,7 +698,7 @@ bool FloatSlider::CheckNeedsDraw()
 {
    if (IUIControl::CheckNeedsDraw())
       return true;
-   
+
    return *mVar != mLastDisplayedValue;
 }
 
@@ -719,7 +719,7 @@ void FloatSlider::TextEntryComplete(TextEntry* entry)
    {
       mFloatEntry->Delete();
       mFloatEntry = nullptr;
-      
+
       float evaluated = 0;
       bool expressionValid = EvaluateExpression(mEntryString, *GetModifyValue(), evaluated);
       if (expressionValid && ((evaluated >= mMin && evaluated <= mMax) || (GetKeyModifiers() & kModifier_Shift)))
@@ -748,7 +748,7 @@ void FloatSlider::TextEntryCancelled(TextEntry* entry)
 
 void FloatSlider::OnTransportAdvanced(float amount)
 {
-   mRamp.Start(gTime, mSmoothTarget, gTime + (amount * TheTransport->MsPerBar() * (mSmooth*300)));
+   mRamp.Start(gTime, mSmoothTarget, gTime + (amount * TheTransport->MsPerBar() * (mSmooth * 300)));
 }
 
 namespace
@@ -759,19 +759,19 @@ namespace
 void FloatSlider::SaveState(FileStreamOut& out)
 {
    out << kFloatSliderSaveStateRev;
-   
+
    out << (float)*mVar;
-   
+
    out << mModulatorMin;
    out << mModulatorMax;
-   
+
    out << mSmooth;
    out << mSmoothTarget;
    out << mIsSmoothing;
-   
+
    out << mMin;
    out << mMax;
-   
+
    bool hasLFO = mLFOControl && mLFOControl->Active();
    out << hasLFO;
    if (hasLFO)
@@ -782,11 +782,11 @@ void FloatSlider::LoadState(FileStreamIn& in, bool shouldSetValue)
 {
    int rev;
    in >> rev;
-   
+
    float var;
    in >> var;
    mRamp.SetValue(var);
-   
+
    if (rev < 5)
    {
       bool hasLFO;
@@ -796,7 +796,7 @@ void FloatSlider::LoadState(FileStreamIn& in, bool shouldSetValue)
          FloatSliderLFOControl* lfo = AcquireLFO();
          if (shouldSetValue)
             lfo->SetLFOEnabled(true);
-         
+
          if (rev == 0)
          {
             mLFOControl->GetLFOSettings()->LoadState(in);
@@ -809,29 +809,29 @@ void FloatSlider::LoadState(FileStreamIn& in, bool shouldSetValue)
             lfo->UpdateFromSettings();
       }
    }
-   
+
    if (rev >= 2)
    {
       in >> mModulatorMin;
       in >> mModulatorMax;
    }
-   
+
    if (rev >= 3)
    {
       in >> mSmooth;
       in >> mSmoothTarget;
       in >> mIsSmoothing;
-      
+
       if (mIsSmoothing)
          TheTransport->AddAudioPoller(this);
    }
-   
+
    if (rev >= 4)
    {
       in >> mMin;
       in >> mMax;
    }
-   
+
    if (rev >= 5)
    {
       bool hasLFO;
@@ -841,7 +841,7 @@ void FloatSlider::LoadState(FileStreamIn& in, bool shouldSetValue)
          FloatSliderLFOControl* lfo = AcquireLFO();
          if (shouldSetValue)
             lfo->SetLFOEnabled(true);
-         
+
          if (rev == 0)
          {
             mLFOControl->GetLFOSettings()->LoadState(in);
@@ -854,7 +854,7 @@ void FloatSlider::LoadState(FileStreamIn& in, bool shouldSetValue)
             lfo->UpdateFromSettings();
       }
    }
-   
+
    if (shouldSetValue && (mModulator == nullptr || !mModulator->Active()))
       SetValueDirect(var);
 }
@@ -877,14 +877,14 @@ IntSlider::IntSlider(IIntSliderListener* owner, const char* label, int x, int y,
 {
    assert(owner);
    SetName(label);
-   SetPosition(x,y);
+   SetPosition(x, y);
    (dynamic_cast<IDrawableModule*>(owner))->AddUIControl(this);
    SetParent(dynamic_cast<IClickable*>(owner));
    CalcSliderVal();
 }
 
 IntSlider::IntSlider(IIntSliderListener* owner, const char* label, IUIControl* anchor, AnchorDirection anchorDir, int w, int h, int* var, int min, int max)
-: IntSlider(owner,label,-1,-1,w,h,var,min,max)
+: IntSlider(owner, label, -1, -1, w, h, var, min, max)
 {
    PositionTo(anchor, anchorDir);
 }
@@ -909,59 +909,59 @@ void IntSlider::Render()
 {
    float normalWidth = mWidth;
    float normalHeight = mHeight;
-   
+
    if (Push2Control::sDrawingPush2Display)
    {
       mWidth = 100;
       mHeight = 15;
    }
-   
+
    mLastDisplayedValue = *mVar;
-   
+
    ofPushStyle();
 
-   ofColor color,textColor;
+   ofColor color, textColor;
    IUIControl::GetColors(color, textColor);
 
    ofFill();
    ofSetColor(0, 0, 0, gModuleDrawAlpha * .5f);
-   ofRect(mX+1,mY+1,mWidth,mHeight);
+   ofRect(mX + 1, mY + 1, mWidth, mHeight);
    ofSetColor(color);
-   ofRect(mX,mY,mWidth,mHeight);
+   ofRect(mX, mY, mWidth, mHeight);
    ofNoFill();
 
-   if (mWidth / MAX(1, (mMax - mMin)) > 3)   //hash marks
+   if (mWidth / MAX(1, (mMax - mMin)) > 3) //hash marks
    {
       ofPushStyle();
-      ofSetColor(100,100,100,gModuleDrawAlpha);
-      for (int i=mMin+1; i<mMax; ++i)
+      ofSetColor(100, 100, 100, gModuleDrawAlpha);
+      for (int i = mMin + 1; i < mMax; ++i)
       {
-         float x = mX+1+(mWidth-2)*((i-mMin)/float(mMax-mMin));
-         ofLine(x,mY+1,x,mY+mHeight-1);
+         float x = mX + 1 + (mWidth - 2) * ((i - mMin) / float(mMax - mMin));
+         ofLine(x, mY + 1, x, mY + mHeight - 1);
       }
       ofPopStyle();
    }
 
-   int val = ofClamp(*mVar,mMin,mMax);
+   int val = ofClamp(*mVar, mMin, mMax);
    ofPushStyle();
    ofSetLineWidth(2);
-   
-   ofSetColor(255,100,0);
-   float xposfloat = mX+1+(mWidth-2)*mSliderVal;
-   ofLine(xposfloat,mY+mHeight/2-1,xposfloat,mY+mHeight/2+1);
-   
+
+   ofSetColor(255, 100, 0);
+   float xposfloat = mX + 1 + (mWidth - 2) * mSliderVal;
+   ofLine(xposfloat, mY + mHeight / 2 - 1, xposfloat, mY + mHeight / 2 + 1);
+
    if (*mVar >= mMin && *mVar <= mMax)
-      ofSetColor(255,0,0,gModuleDrawAlpha);
+      ofSetColor(255, 0, 0, gModuleDrawAlpha);
    else
-      ofSetColor(30,30,30,gModuleDrawAlpha);
-   float xpos = mX+1+(mWidth-2)*((val-mMin)/float(mMax-mMin));
-   ofLine(xpos,mY+1,xpos,mY+mHeight-1);
-   
+      ofSetColor(30, 30, 30, gModuleDrawAlpha);
+   float xpos = mX + 1 + (mWidth - 2) * ((val - mMin) / float(mMax - mMin));
+   ofLine(xpos, mY + 1, xpos, mY + mHeight - 1);
+
    ofPopStyle();
-   
-   DrawBeacon(xpos, mY+mHeight/2);
-   
-   DrawHover(mX,mY,mWidth,mHeight);
+
+   DrawBeacon(xpos, mY + mHeight / 2);
+
+   DrawHover(mX, mY, mWidth, mHeight);
 
    std::string display;
    if (mShowName)
@@ -1026,7 +1026,7 @@ void IntSlider::Render()
       DrawTextRightJustify(ofToString(mMax), mX + mWidth - 2, mY + 4 + mHeight / 2, 12);
       ofPopStyle();
    }
-   
+
    mWidth = normalWidth;
    mHeight = normalHeight;
 }
@@ -1034,7 +1034,7 @@ void IntSlider::Render()
 void IntSlider::CalcSliderVal()
 {
    mLastSetValue = *mVar;
-   mSliderVal = ofMap(*mVar,mMin,mMax,0.0f,1.0f,K(clamp));
+   mSliderVal = ofMap(*mVar, mMin, mMax, 0.0f, 1.0f, K(clamp));
 }
 
 void IntSlider::OnClicked(int x, int y, bool right)
@@ -1068,24 +1068,24 @@ void IntSlider::OnClicked(int x, int y, bool right)
 
       return;
    }
-   
-   SetValueForMouse(x,y);
+
+   SetValueForMouse(x, y);
    mMouseDown = true;
 }
 
 bool IntSlider::MouseMoved(float x, float y)
 {
-   CheckHover(x,y);
+   CheckHover(x, y);
    if (mMouseDown)
-      SetValueForMouse(x,y);
+      SetValueForMouse(x, y);
    return mMouseDown;
 }
 
 void IntSlider::SetValueForMouse(int x, int y)
 {
    int oldVal = *mVar;
-   *mVar = (int)round(ofMap(x+mX,mX+1,mX+mWidth-1,mMin,mMax));
-   *mVar = ofClamp(*mVar,mMin,mMax);
+   *mVar = (int)round(ofMap(x + mX, mX + 1, mX + mWidth - 1, mMin, mMax));
+   *mVar = ofClamp(*mVar, mMin, mMax);
    if (oldVal != *mVar)
    {
       CalcSliderVal();
@@ -1095,7 +1095,7 @@ void IntSlider::SetValueForMouse(int x, int y)
 
 void IntSlider::SetFromMidiCC(float slider, bool setViaModulator /*= false*/)
 {
-   slider = ofClamp(slider,0,1);
+   slider = ofClamp(slider, 0, 1);
    SetValue(GetValueForMidiCC(slider));
    mSliderVal = slider;
    mLastSetValue = *mVar;
@@ -1103,14 +1103,14 @@ void IntSlider::SetFromMidiCC(float slider, bool setViaModulator /*= false*/)
 
 float IntSlider::GetValueForMidiCC(float slider) const
 {
-   slider = ofClamp(slider,0,1);
-   return (int)round(ofMap(slider,0,1,mMin,mMax));
+   slider = ofClamp(slider, 0, 1);
+   return (int)round(ofMap(slider, 0, 1, mMin, mMax));
 }
 
 void IntSlider::SetValue(float value)
 {
    int oldVal = *mVar;
-   *mVar = (int)ofClamp(value,mMin,mMax);
+   *mVar = (int)ofClamp(value, mMin, mMax);
    if (oldVal != *mVar)
    {
       CalcSliderVal();
@@ -1131,7 +1131,7 @@ float IntSlider::GetMidiValue() const
 
 std::string IntSlider::GetDisplayValue(float val) const
 {
-   return ofToString(val,0);
+   return ofToString(val, 0);
 }
 
 void IntSlider::Double()
@@ -1164,7 +1164,7 @@ bool IntSlider::CheckNeedsDraw()
 {
    if (IUIControl::CheckNeedsDraw())
       return true;
-   
+
    return *mVar != mLastDisplayedValue;
 }
 
@@ -1185,7 +1185,7 @@ void IntSlider::TextEntryComplete(TextEntry* entry)
    {
       mIntEntry->Delete();
       mIntEntry = nullptr;
-      
+
       float evaluated = 0;
       bool expressionValid = EvaluateExpression(mEntryString, *mVar, evaluated);
       int evaluatedInt = round(evaluated);
@@ -1221,7 +1221,7 @@ namespace
 void IntSlider::SaveState(FileStreamOut& out)
 {
    out << kIntSliderSaveStateRev;
-   
+
    out << (float)*mVar;
 }
 
@@ -1230,7 +1230,7 @@ void IntSlider::LoadState(FileStreamIn& in, bool shouldSetValue)
    int rev;
    in >> rev;
    LoadStateValidate(rev == kIntSliderSaveStateRev);
-   
+
    float var;
    in >> var;
    if (shouldSetValue)

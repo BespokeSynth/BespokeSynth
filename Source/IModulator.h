@@ -46,13 +46,14 @@ public:
    void OnModulatorRepatch();
    void Poll() override;
    float GetRecentChange() const;
+
 protected:
    void InitializeRange();
    bool RequiresManualPolling() { return mUIControlTarget != nullptr && mTarget == nullptr; }
-   
+
    float mDummyMin;
    float mDummyMax;
-   
+
    PatchCableSource* mTargetCable;
    FloatSlider* mMinSlider;
    FloatSlider* mMaxSlider;

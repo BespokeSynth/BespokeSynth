@@ -32,20 +32,20 @@
 #include "UIControlMacros.h"
 
 PlaySequencer::PlaySequencer()
-   : mInterval(kInterval_16n)
-   , mNumMeasures(1)
-   , mWrite(false)
-   , mNoteRepeat(false)
-   , mLinkColumns(false)
-   , mWidth(240)
-   , mUseLightVelocity(false)
-   , mUseMedVelocity(false)
-   , mClearLane(false)
-   , mSustain(false)
-   , mGrid(nullptr)
-   , mVelocityFull(1)
-   , mVelocityMed(.5f)
-   , mVelocityLight(.25f)
+: mInterval(kInterval_16n)
+, mNumMeasures(1)
+, mWrite(false)
+, mNoteRepeat(false)
+, mLinkColumns(false)
+, mWidth(240)
+, mUseLightVelocity(false)
+, mUseMedVelocity(false)
+, mClearLane(false)
+, mSustain(false)
+, mGrid(nullptr)
+, mVelocityFull(1)
+, mVelocityMed(.5f)
+, mVelocityLight(.25f)
 {
 
    mNoteOffScheduler.mOwner = this;
@@ -67,22 +67,24 @@ void PlaySequencer::CreateUIControls()
 
    float width, height;
    UIBLOCK0();
-   DROPDOWN(mIntervalSelector, "interval", (int*)(&mInterval), 50); UIBLOCK_SHIFTRIGHT();
-   DROPDOWN(mNumMeasuresSelector, "measures", &mNumMeasures, 50); UIBLOCK_NEWLINE();
+   DROPDOWN(mIntervalSelector, "interval", (int*)(&mInterval), 50);
+   UIBLOCK_SHIFTRIGHT();
+   DROPDOWN(mNumMeasuresSelector, "measures", &mNumMeasures, 50);
+   UIBLOCK_NEWLINE();
    CHECKBOX(mWriteCheckbox, "write", &mWrite);
    CHECKBOX(mNoteRepeatCheckbox, "note repeat", &mNoteRepeat);
    UIBLOCK_SHIFTRIGHT();
    UIBLOCK_SHIFTUP();
    CHECKBOX(mLinkColumnsCheckbox, "link columns", &mLinkColumns);
    ENDUIBLOCK(width, height);
-   mGrid = new UIGrid(3, height, mWidth-16, 150, TheTransport->CountInStandardMeasure(mInterval), (int)mLanes.size(), this);
+   mGrid = new UIGrid("uigrid", 3, height, mWidth - 16, 150, TheTransport->CountInStandardMeasure(mInterval), (int)mLanes.size(), this);
    mHeight = height + 153;
    mGrid->SetFlip(true);
    mGrid->SetGridMode(UIGrid::kMultisliderBipolar);
    mGrid->SetRequireShiftForMultislider(true);
    mGrid->SetRestrictDragToRow(true);
 
-   UIBLOCK(3, mHeight+3, 45);
+   UIBLOCK(3, mHeight + 3, 45);
    for (size_t i = 0; i < mSavedPatterns.size(); ++i)
    {
       BUTTON(mSavedPatterns[i].mStoreButton, ("store" + ofToString(i)).c_str());
@@ -92,10 +94,10 @@ void PlaySequencer::CreateUIControls()
    ENDUIBLOCK(width, mHeight);
 
    ofRectangle gridRect = mGrid->GetRect(true);
-   for (int i = 0; i<(int)mLanes.size(); ++i)
+   for (int i = 0; i < (int)mLanes.size(); ++i)
    {
       ofVec2f cellPos = mGrid->GetCellPosition(mGrid->GetCols() - 1, i) + mGrid->GetPosition(true);
-      mLanes[i].mMuteOrEraseCheckbox = new Checkbox(this, ("mute/delete"+ofToString(i)).c_str(), gridRect.getMaxX() + 3, cellPos.y+1, &mLanes[i].mMuteOrErase);
+      mLanes[i].mMuteOrEraseCheckbox = new Checkbox(this, ("mute/delete" + ofToString(i)).c_str(), gridRect.getMaxX() + 3, cellPos.y + 1, &mLanes[i].mMuteOrErase);
       mLanes[i].mMuteOrEraseCheckbox->SetDisplayText(false);
       mLanes[i].mMuteOrEraseCheckbox->SetBoxSize(10);
    }
@@ -161,7 +163,7 @@ void PlaySequencer::DrawModule()
       {
          ofRectangle gridRect = mGrid->GetRect(true);
          ofVec2f cellPos = mGrid->GetCellPosition(0, i) + mGrid->GetPosition(true);
-         ofRect(cellPos.x, cellPos.y+1, gridRect.width, gridRect.height / mGrid->GetRows());
+         ofRect(cellPos.x, cellPos.y + 1, gridRect.width, gridRect.height / mGrid->GetRows());
       }
    }
    ofPopStyle();
@@ -253,9 +255,9 @@ void PlaySequencer::OnTimeEvent(double time)
          float velMult = 1;
          switch (GetVelocityLevel())
          {
-         case 1: velMult = mVelocityLight; break;
-         case 2: velMult = mVelocityMed; break;
-         case 3: velMult = mVelocityFull; break;
+            case 1: velMult = mVelocityLight; break;
+            case 2: velMult = mVelocityMed; break;
+            case 3: velMult = mVelocityFull; break;
          }
          playVelocity = mLanes[i].mInputVelocity * velMult;
          if (mWrite)
@@ -351,7 +353,7 @@ void PlaySequencer::UpdateLights(bool betweener)
 {
    if (mGridControlTarget->GetGridController() == nullptr)
       return;
-   
+
    IGridController* gridController = mGridControlTarget->GetGridController();
 
    for (int i = 0; i < 4; ++i)
@@ -477,7 +479,7 @@ void PlaySequencer::OnGridButton(int x, int y, float velocity, IGridController* 
                mLanes[pitch].mMuteOrErase = press;
                if (mLinkColumns)
                {
-                  for (size_t i=0; i<mLanes.size(); ++i)
+                  for (size_t i = 0; i < mLanes.size(); ++i)
                   {
                      if (i % 4 == pitch % 4)
                         mLanes[i].mMuteOrErase = press;
@@ -597,7 +599,7 @@ void PlaySequencer::LoadState(FileStreamIn& in)
    IDrawableModule::LoadState(in);
 
    if (!ModuleContainer::DoesModuleHaveMoreSaveData(in))
-      return;  //this was saved before we added versioning, bail out
+      return; //this was saved before we added versioning, bail out
 
    int rev;
    in >> rev;

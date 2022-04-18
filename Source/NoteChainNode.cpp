@@ -63,12 +63,12 @@ NoteChainNode::~NoteChainNode()
 void NoteChainNode::CreateUIControls()
 {
    IDrawableModule::CreateUIControls();
-   mPitchEntry = new TextEntry(this,"pitch",5,3,3,&mPitch,0,127);
-   mTriggerButton = new ClickButton(this,"trigger",50,3);
-   mVelocitySlider = new FloatSlider(this,"velocity",5,21,100,15,&mVelocity,0,1);
-   mDurationSlider = new FloatSlider(this,"duration",5,39,100,15,&mDuration,0.01f,4,4);
-   mNextSelector = new DropdownList(this,"next",5,57,(int*)(&mNextInterval));
-   
+   mPitchEntry = new TextEntry(this, "pitch", 5, 3, 3, &mPitch, 0, 127);
+   mTriggerButton = new ClickButton(this, "trigger", 50, 3);
+   mVelocitySlider = new FloatSlider(this, "velocity", 5, 21, 100, 15, &mVelocity, 0, 1);
+   mDurationSlider = new FloatSlider(this, "duration", 5, 39, 100, 15, &mDuration, 0.01f, 4, 4);
+   mNextSelector = new DropdownList(this, "next", 5, 57, (int*)(&mNextInterval));
+
    mNextSelector->AddLabel("1n", kInterval_1n);
    mNextSelector->AddLabel("2n", kInterval_2n);
    mNextSelector->AddLabel("4n", kInterval_4n);
@@ -79,7 +79,7 @@ void NoteChainNode::CreateUIControls()
    mNextSelector->AddLabel("16nt", kInterval_16nt);
    mNextSelector->AddLabel("32n", kInterval_32n);
    mNextSelector->AddLabel("64n", kInterval_64n);
-   
+
    mNextNodeCable = new PatchCableSource(this, kConnectionType_Pulse);
    mNextNodeCable->SetManualPosition(100, 10);
    AddPatchCableSource(mNextNodeCable);
@@ -89,7 +89,7 @@ void NoteChainNode::DrawModule()
 {
    if (Minimized() || IsVisible() == false)
       return;
-   
+
    mPitchEntry->Draw();
    mTriggerButton->Draw();
    mVelocitySlider->Draw();
@@ -113,7 +113,7 @@ void NoteChainNode::OnTransportAdvanced(float amount)
       mNoteOn = false;
       mNoteOutput.Flush(mStartTime + mDurationMs);
    }
-   
+
    if (mWaitingToTrigger && gTime + gBufferSizeMs > mStartTime + mNext)
    {
       mWaitingToTrigger = false;
@@ -139,7 +139,7 @@ void NoteChainNode::TriggerNote(double time)
       mStartTime = time;
       mDurationMs = mDuration / (float(TheTransport->GetTimeSigTop()) / TheTransport->GetTimeSigBottom()) * TheTransport->MsPerBar();
       mNext = TheTransport->GetDuration(mNextInterval);
-      PlayNoteOutput(time, mPitch, mVelocity*127);
+      PlayNoteOutput(time, mPitch, mVelocity * 127);
    }
 }
 
@@ -167,7 +167,7 @@ void NoteChainNode::TextEntryComplete(TextEntry* entry)
 void NoteChainNode::LoadLayout(const ofxJSONElement& moduleInfo)
 {
    mModuleSaveData.LoadString("target", moduleInfo);
-   
+
    SetUpFromSaveData();
 }
 

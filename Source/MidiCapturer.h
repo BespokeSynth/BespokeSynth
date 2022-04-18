@@ -39,9 +39,9 @@ class MidiCapturerDummyController : public INonstandardController
 public:
    MidiCapturerDummyController(MidiDeviceListener* listener);
    virtual ~MidiCapturerDummyController() {}
-   
+
    void SendValue(int page, int control, float value, bool forceNoteOn = false, int channel = -1) override {}
-   
+
    void SendMidi(const juce::MidiMessage& message);
 
    void SaveState(FileStreamOut& out) override;
@@ -57,28 +57,32 @@ public:
    MidiCapturer();
    virtual ~MidiCapturer();
    static IDrawableModule* Create() { return new MidiCapturer(); }
-   
-   
+
+
    void Init() override;
-   
+
    void AddDummyController(MidiCapturerDummyController* controller);
-   
+
    //IAudioPoller
    void OnTransportAdvanced(float amount) override;
-   
+
    //INoteReceiver
    void PlayNote(double time, int pitch, int velocity, int voiceIdx = -1, ModulationParameters modulation = ModulationParameters()) override;
    void SendMidi(const juce::MidiMessage& message) override;
-   
+
    void LoadLayout(const ofxJSONElement& moduleInfo) override;
    void SetUpFromSaveData() override;
-   
+
 private:
    //IDrawableModule
    void DrawModule() override;
-   void GetModuleDimensions(float& width, float& height) override { width = 300; height = 150; }
+   void GetModuleDimensions(float& width, float& height) override
+   {
+      width = 300;
+      height = 150;
+   }
    bool Enabled() const override { return true; }
-   
+
    static const int kRingBufferLength = 1000;
    int mRingBufferPos;
    juce::MidiMessage mMessages[kRingBufferLength];

@@ -46,7 +46,9 @@ enum class ButtonDisplayStyle
    kStop,
    kGrabSample,
    kSampleIcon,
-   kFolderIcon
+   kFolderIcon,
+   kArrowRight,
+   kArrowLeft
 };
 
 class ClickButton : public IUIControl
@@ -60,7 +62,11 @@ public:
    bool MouseMoved(float x, float y) override;
    void SetDisplayText(bool display) { mDisplayStyle = ButtonDisplayStyle::kNoLabel; }
    void SetDisplayStyle(ButtonDisplayStyle style) { mDisplayStyle = style; }
-   void SetDimensions(float width, float height) { mWidth = width; mHeight = height; }
+   void SetDimensions(float width, float height)
+   {
+      mWidth = width;
+      mHeight = height;
+   }
 
    //IUIControl
    void SetFromMidiCC(float slider, bool setViaModulator = false) override;
@@ -69,14 +75,18 @@ public:
    float GetMidiValue() const override;
    std::string GetDisplayValue(float val) const override;
    int GetNumValues() override { return 2; }
-   void GetDimensions(float& width, float& height) override { width = mWidth; height = mHeight; }
+   void GetDimensions(float& width, float& height) override
+   {
+      width = mWidth;
+      height = mHeight;
+   }
    void SaveState(FileStreamOut& out) override {}
    void LoadState(FileStreamIn& in, bool shouldSetValue) override {}
    bool IsSliderControl() override { return false; }
    bool IsButtonControl() override { return true; }
-   
+
 protected:
-   ~ClickButton();   //protected so that it can't be created on the stack
+   ~ClickButton(); //protected so that it can't be created on the stack
 
 private:
    bool ButtonLit() const;

@@ -38,8 +38,8 @@ public:
    AudioRouter();
    virtual ~AudioRouter();
    static IDrawableModule* Create() { return new AudioRouter(); }
-   
-   
+
+
    void CreateUIControls() override;
 
    void SetActiveIndex(int index) { mRouteIndex = index; }
@@ -47,7 +47,7 @@ public:
    //IAudioSource
    void Process(double time) override;
    int GetNumTargets() override { return (int)mDestinationCables.size() + 1; }
-   
+
    //IPatchable
    void PostRepatch(PatchCableSource* cableSource, bool fromUserClick) override;
 
@@ -57,7 +57,7 @@ public:
    virtual void LoadLayout(const ofxJSONElement& moduleInfo) override;
    virtual void SetUpFromSaveData() override;
    virtual void SaveLayout(ofxJSONElement& moduleInfo) override;
-   
+
 private:
    //IDrawableModule
    void DrawModule() override;
@@ -68,11 +68,10 @@ private:
    RadioButton* mRouteSelector;
    std::vector<PatchCableSource*> mDestinationCables;
    RollingBuffer mBlankVizBuffer;
-   
-   std::array<Ramp,16> mSwitchAndRampIn;
+
+   std::array<Ramp, 16> mSwitchAndRampIn;
    int mLastProcessedRouteIndex;
 };
 
 
 #endif /* defined(__modularSynth__AudioRouter__) */
-

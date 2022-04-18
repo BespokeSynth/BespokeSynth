@@ -38,23 +38,24 @@ class DistortionEffect : public IAudioEffect, public IFloatSliderListener, publi
 {
 public:
    DistortionEffect();
-   
+
    static IAudioEffect* Create() { return new DistortionEffect(); }
-   
-   
+
+
    void CreateUIControls() override;
-   
+
    void SetClip(float amount);
-   
+
    //IAudioEffect
    void ProcessAudio(double time, ChannelBuffer* buffer) override;
    void SetEnabled(bool enabled) override { mEnabled = enabled; }
    float GetEffectAmount() override;
    std::string GetType() override { return "distortion"; }
-   
+
    void CheckboxUpdated(Checkbox* checkbox) override;
    void FloatSliderUpdated(FloatSlider* slider, float oldVal) override;
    void DropdownUpdated(DropdownList* list, int oldVal) override {}
+
 private:
    enum DistortionType
    {
@@ -66,7 +67,7 @@ private:
       kFold,
       kGrungy
    };
-   
+
    //IDrawableModule
    void GetModuleDimensions(float& width, float& height) override;
    void DrawModule() override;
@@ -74,14 +75,14 @@ private:
 
    float mWidth;
    float mHeight;
-   
+
    DistortionType mType;
    float mClip;
    float mGain;
    float mPreamp;
    float mFuzzAmount;
    bool mRemoveInputDC;
-   
+
    DropdownList* mTypeDropdown;
    FloatSlider* mClipSlider;
    FloatSlider* mPreampSlider;
@@ -92,4 +93,3 @@ private:
 };
 
 #endif /* defined(__modularSynth__DistortionEffect__) */
-

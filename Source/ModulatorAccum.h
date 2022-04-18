@@ -43,7 +43,7 @@ public:
    virtual ~ModulatorAccum();
    static IDrawableModule* Create() { return new ModulatorAccum(); }
 
-   
+
    void CreateUIControls() override;
    void Init() override;
 
@@ -68,10 +68,13 @@ public:
    void SetUpFromSaveData() override;
 
 private:
-
    //IDrawableModule
    void DrawModule() override;
-   void GetModuleDimensions(float& w, float& h) override { w = mWidth; h = mHeight; }
+   void GetModuleDimensions(float& w, float& h) override
+   {
+      w = mWidth;
+      h = mHeight;
+   }
    bool Enabled() const override { return mEnabled; }
 
    float mWidth;

@@ -40,32 +40,36 @@ public:
    SpectralDisplay();
    virtual ~SpectralDisplay();
    static IDrawableModule* Create() { return new SpectralDisplay(); }
-   
-   
+
+
    void CreateUIControls() override;
-   
+
    //IAudioSource
    void Process(double time) override;
    void SetEnabled(bool enabled) override { mEnabled = enabled; }
-   
+
    bool IsResizable() const override { return true; }
    void Resize(float w, float h) override;
-   
+
    virtual void LoadLayout(const ofxJSONElement& moduleInfo) override;
    virtual void SaveLayout(ofxJSONElement& moduleInfo) override;
    virtual void SetUpFromSaveData() override;
-   
+
    void FloatSliderUpdated(FloatSlider* slider, float oldVal) override {}
-   
+
 private:
    //IDrawableModule
    void DrawModule() override;
-   void GetModuleDimensions(float& w, float& h) override { w=mWidth; h=mHeight; }
+   void GetModuleDimensions(float& w, float& h) override
+   {
+      w = mWidth;
+      h = mHeight;
+   }
    bool Enabled() const override { return mEnabled; }
 
    float mWidth;
    float mHeight;
-   
+
    float* mWindower;
    float* mSmoother;
 
@@ -73,4 +77,3 @@ private:
    FFTData mFFTData;
    RollingBuffer mRollingInputBuffer;
 };
-

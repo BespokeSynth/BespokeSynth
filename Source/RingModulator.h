@@ -42,8 +42,8 @@ public:
    RingModulator();
    virtual ~RingModulator();
    static IDrawableModule* Create() { return new RingModulator(); }
-   
-   
+
+
    void CreateUIControls() override;
 
    void SetEnabled(bool enabled) override { mEnabled = enabled; }
@@ -57,17 +57,22 @@ public:
 
    //IButtonListener
    void ButtonClicked(ClickButton* button) override;
-   
+
    void CheckboxUpdated(Checkbox* checkbox) override;
    //IFloatSliderListener
    void FloatSliderUpdated(FloatSlider* slider, float oldVal) override;
-   
+
    virtual void LoadLayout(const ofxJSONElement& moduleInfo) override;
    virtual void SetUpFromSaveData() override;
+
 private:
    //IDrawableModule
    void DrawModule() override;
-   void GetModuleDimensions(float& width, float& height) override { width = 130; height = 68; }
+   void GetModuleDimensions(float& width, float& height) override
+   {
+      width = 130;
+      height = 68;
+   }
    bool Enabled() const override { return mEnabled; }
 
    ChannelBuffer mDryBuffer;
@@ -78,7 +83,7 @@ private:
    FloatSlider* mFreqSlider;
    FloatSlider* mDryWetSlider;
    FloatSlider* mVolumeSlider;
-   
+
    EnvOscillator mModOsc;
    float mPhase;
    Ramp mFreqRamp;
@@ -88,4 +93,3 @@ private:
 
 
 #endif /* defined(__modularSynth__RingModulator__) */
-

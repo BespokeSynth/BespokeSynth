@@ -42,38 +42,38 @@ public:
    CurveLooper();
    ~CurveLooper();
    static IDrawableModule* Create() { return new CurveLooper(); }
-   
-   
+
+
    void CreateUIControls() override;
-   
+
    IUIControl* GetUIControl() const { return mUIControl; }
-   
+
    void OnTransportAdvanced(float amount) override;
-   
+
    //IDrawableModule
    void Init() override;
    void Poll() override;
    bool IsResizable() const override { return true; }
    void Resize(float w, float h) override;
    void SetEnabled(bool enabled) override { mEnabled = enabled; }
-   
+
    void CheckboxUpdated(Checkbox* checkbox) override;
    void DropdownUpdated(DropdownList* list, int oldVal) override;
    void ButtonClicked(ClickButton* button) override;
-   
+
    void LoadLayout(const ofxJSONElement& moduleInfo) override;
    void SaveLayout(ofxJSONElement& moduleInfo) override;
    void SetUpFromSaveData() override;
-   
+
    void SaveState(FileStreamOut& out) override;
    void LoadState(FileStreamIn& in) override;
-   
+
    //IPatchable
    void PostRepatch(PatchCableSource* cableSource, bool fromUserClick) override;
-   
+
 private:
    float GetPlaybackPosition();
-   
+
    //IDrawableModule
    void DrawModule() override;
    bool Enabled() const override { return mEnabled; }
@@ -81,7 +81,7 @@ private:
    void OnClicked(int x, int y, bool right) override;
    bool MouseMoved(float x, float y) override;
    void MouseReleased() override;
-   
+
    IUIControl* mUIControl;
    int mLength;
    DropdownList* mLengthSelector;

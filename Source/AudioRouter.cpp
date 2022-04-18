@@ -32,15 +32,15 @@ AudioRouter::AudioRouter()
 : IAudioProcessor(gBufferSize)
 , mRouteIndex(0)
 , mRouteSelector(nullptr)
-, mBlankVizBuffer(VIZ_BUFFER_SECONDS*gSampleRate)
+, mBlankVizBuffer(VIZ_BUFFER_SECONDS * gSampleRate)
 {
 }
 
 void AudioRouter::CreateUIControls()
 {
    IDrawableModule::CreateUIControls();
-   mRouteSelector = new RadioButton(this,"route",5,3,&mRouteIndex);
-   
+   mRouteSelector = new RadioButton(this, "route", 5, 3, &mRouteIndex);
+
    GetPatchCableSource()->SetEnabled(false);
 }
 
@@ -54,42 +54,42 @@ void AudioRouter::Process(double time)
 
    SyncBuffers();
    mBlankVizBuffer.SetNumChannels(GetBuffer()->NumActiveChannels());
-   
-   for (size_t i=0; i<mDestinationCables.size(); ++i)
+
+   for (size_t i = 0; i < mDestinationCables.size(); ++i)
    {
       if ((int)i == mRouteIndex)
          mDestinationCables[i]->SetOverrideVizBuffer(nullptr);
       else
          mDestinationCables[i]->SetOverrideVizBuffer(&mBlankVizBuffer);
    }
-   
+
    bool doSwitchAndRamp = false;
    if (mRouteIndex != mLastProcessedRouteIndex)
    {
       doSwitchAndRamp = true;
       mLastProcessedRouteIndex = mRouteIndex;
    }
-   
-   IAudioReceiver* target = GetTarget(mRouteIndex+1);
-   
-   for (int ch=0; ch<GetBuffer()->NumActiveChannels(); ++ch)
+
+   IAudioReceiver* target = GetTarget(mRouteIndex + 1);
+
+   for (int ch = 0; ch < GetBuffer()->NumActiveChannels(); ++ch)
    {
       float* outputBuffer = GetBuffer()->GetChannel(ch);
       if (doSwitchAndRamp)
-         mSwitchAndRampIn[ch].Start(time, outputBuffer[0], 0, time+100);
-      
+         mSwitchAndRampIn[ch].Start(time, outputBuffer[0], 0, time + 100);
+
       if (abs(mSwitchAndRampIn[ch].Value(time)) > .01f)
       {
          BufferCopy(gWorkBuffer, outputBuffer, GetBuffer()->BufferSize());
          outputBuffer = gWorkBuffer;
-         for (int i=0; i<GetBuffer()->BufferSize(); ++i)
-            outputBuffer[i] -= mSwitchAndRampIn[ch].Value(time+i*gInvSampleRateMs);
+         for (int i = 0; i < GetBuffer()->BufferSize(); ++i)
+            outputBuffer[i] -= mSwitchAndRampIn[ch].Value(time + i * gInvSampleRateMs);
       }
-      
+
       if (target != nullptr)
       {
          Add(target->GetBuffer()->GetChannel(ch), outputBuffer, GetBuffer()->BufferSize());
-         GetVizBuffer()->WriteChunk(outputBuffer,GetBuffer()->BufferSize(), ch);
+         GetVizBuffer()->WriteChunk(outputBuffer, GetBuffer()->BufferSize(), ch);
       }
    }
 
@@ -102,8 +102,8 @@ void AudioRouter::DrawModule()
       return;
 
    mRouteSelector->Draw();
-   
-   for (int i=0; i<(int)mDestinationCables.size(); ++i)
+
+   for (int i = 0; i < (int)mDestinationCables.size(); ++i)
    {
       ofVec2f pos = mRouteSelector->GetOptionPosition(i) - mRouteSelector->GetPosition();
       mDestinationCables[i]->SetManualPosition(pos.x + 10, pos.y + 4);
@@ -113,8 +113,8 @@ void AudioRouter::DrawModule()
 void AudioRouter::PostRepatch(PatchCableSource* cableSource, bool fromUserClick)
 {
    IAudioSource::PostRepatch(cableSource, fromUserClick);
-   
-   for (int i=0; i<(int)mDestinationCables.size(); ++i)
+
+   for (int i = 0; i < (int)mDestinationCables.size(); ++i)
    {
       if (cableSource == mDestinationCables[i])
       {
@@ -127,10 +127,10 @@ void AudioRouter::PostRepatch(PatchCableSource* cableSource, bool fromUserClick)
 
 void AudioRouter::GetModuleDimensions(float& width, float& height)
 {
-   float w,h;
+   float w, h;
    mRouteSelector->GetDimensions(w, h);
-   width = 10+w;
-   height = 8+h;
+   width = 10 + w;
+   height = 8 + h;
 }
 
 void AudioRouter::RadioButtonUpdated(RadioButton* radio, int oldVal)
@@ -142,8 +142,8 @@ void AudioRouter::RadioButtonUpdated(RadioButton* radio, int oldVal)
 
 void AudioRouter::LoadLayout(const ofxJSONElement& moduleInfo)
 {
-   mModuleSaveData.LoadInt("num_items",moduleInfo,2,1,99,K(isTextField));
-   
+   mModuleSaveData.LoadInt("num_items", moduleInfo, 2, 1, 99, K(isTextField));
+
    SetUpFromSaveData();
 }
 
@@ -153,7 +153,7 @@ void AudioRouter::SetUpFromSaveData()
    int oldNumItems = (int)mDestinationCables.size();
    if (numItems > oldNumItems)
    {
-      for (int i=oldNumItems; i<numItems; ++i)
+      for (int i = oldNumItems; i < numItems; ++i)
       {
          mRouteSelector->AddLabel("                      ", i);
          auto* additionalCable = new PatchCableSource(this, kConnectionType_Audio);
@@ -163,7 +163,7 @@ void AudioRouter::SetUpFromSaveData()
    }
    else if (numItems < oldNumItems)
    {
-      for (int i=oldNumItems-1; i>=numItems; --i)
+      for (int i = oldNumItems - 1; i >= numItems; --i)
       {
          mRouteSelector->RemoveLabel(i);
          RemovePatchCableSource(mDestinationCables[i]);
@@ -175,7 +175,6 @@ void AudioRouter::SetUpFromSaveData()
 void AudioRouter::SaveLayout(ofxJSONElement& moduleInfo)
 {
    IDrawableModule::SaveLayout(moduleInfo);
-   
+
    moduleInfo["num_items"] = (int)mDestinationCables.size();
 }
-

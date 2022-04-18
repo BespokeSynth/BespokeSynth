@@ -51,14 +51,14 @@ IModulator::~IModulator()
 void IModulator::OnModulatorRepatch()
 {
    assert(mTargetCable != nullptr);
-   
+
    if (mTargetCable->GetPatchCables().empty() == false)
    {
       IUIControl* newTarget = dynamic_cast<IUIControl*>(mTargetCable->GetPatchCables()[0]->GetTarget());
       if (newTarget != mUIControlTarget)
       {
          if (mTarget != nullptr)
-            mTarget->SetModulator(nullptr);  //clear old target's pointer to this
+            mTarget->SetModulator(nullptr); //clear old target's pointer to this
          mUIControlTarget = newTarget;
          mTarget = dynamic_cast<FloatSlider*>(mUIControlTarget);
          if (mTarget != nullptr)
@@ -71,14 +71,14 @@ void IModulator::OnModulatorRepatch()
    else
    {
       if (mTarget != nullptr)
-         mTarget->SetModulator(nullptr);  //clear old target's pointer to this
+         mTarget->SetModulator(nullptr); //clear old target's pointer to this
       mTarget = nullptr;
       mUIControlTarget = nullptr;
    }
-   
+
    TheSynth->RemoveExtraPoller(this);
    //if (RequiresManualPolling())
-      TheSynth->AddExtraPoller(this);
+   TheSynth->AddExtraPoller(this);
 }
 
 void IModulator::Poll()
@@ -118,7 +118,7 @@ void IModulator::InitializeRange()
                GetMax() = mTarget->GetMax();
             }
          }
-         
+
          if (mMinSlider)
          {
             mMinSlider->SetExtents(mTarget->GetMin(), mTarget->GetMax());

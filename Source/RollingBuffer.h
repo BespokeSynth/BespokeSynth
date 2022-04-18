@@ -47,9 +47,10 @@ public:
    void Accum(int samplesAgo, float sample, int channel);
    void SetNumChannels(int channels) { mBuffer.SetNumActiveChannels(channels); }
    int NumChannels() const { return mBuffer.NumActiveChannels(); }
-   
+
    void SaveState(FileStreamOut& out);
    void LoadState(FileStreamIn& in);
+
 private:
    int mOffsetToNow[ChannelBuffer::kMaxNumChannels];
    ChannelBuffer mBuffer;
