@@ -1,0 +1,157 @@
+/**
+    bespoke synth, a software modular synthesizer
+    Copyright (C) 2021 Ryan Challinor (contact: awwbees@gmail.com)
+
+    This program is free software: you can redistribute it and/or modify
+    it under the terms of the GNU General Public License as published by
+    the Free Software Foundation, either version 3 of the License, or
+    (at your option) any later version.
+
+    This program is distributed in the hope that it will be useful,
+    but WITHOUT ANY WARRANTY; without even the implied warranty of
+    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+    GNU General Public License for more details.
+
+    You should have received a copy of the GNU General Public License
+    along with this program.  If not, see <http://www.gnu.org/licenses/>.
+**/
+//
+//  VelocityCurve.cpp
+//  Bespoke
+//
+//  Created by Ryan Challinor on 4/17/22.
+//
+//
+
+#include "VelocityCurve.h"
+#include "OpenFrameworksPort.h"
+#include "Scale.h"
+#include "ModularSynth.h"
+
+namespace
+{
+   const int kAdsrTime = 10000;
+}
+
+VelocityCurve::VelocityCurve()
+: mEnvelopeControl(ofVec2f(3, 3), ofVec2f(100, 100))
+{
+   mEnvelopeControl.SetADSR(&mAdsr);
+   mEnvelopeControl.SetViewLength(kAdsrTime);
+   mEnvelopeControl.SetFixedLengthMode(true);
+   mAdsr.GetFreeReleaseLevel() = true;
+   mAdsr.SetNumStages(2);
+   mAdsr.GetHasSustainStage() = false;
+   mAdsr.GetStageData(0).target = 0;
+   mAdsr.GetStageData(0).time = 0.01f;
+   mAdsr.GetStageData(1).target = 1;
+   mAdsr.GetStageData(1).time = kAdsrTime - .02f;
+}
+
+void VelocityCurve::CreateUIControls()
+{
+   IDrawableModule::CreateUIControls();
+}
+
+void VelocityCurve::DrawModule()
+{
+   if (Minimized() || IsVisible() == false)
+      return;
+
+   mEnvelopeControl.Draw();
+
+   const double kDisplayInputMs = 400;
+   if (gTime < mLastInputTime + kDisplayInputMs)
+   {
+      float pos = mLastInputVelocity / 127.0f * mEnvelopeControl.GetDimensions().x + mEnvelopeControl.GetPosition().x;
+      ofPushStyle();
+      ofSetColor(0, 255, 0, (1 - (gTime - mLastInputTime) / kDisplayInputMs) * 255);
+      ofLine(pos, mEnvelopeControl.GetPosition().y, pos, mEnvelopeControl.GetPosition().y + mEnvelopeControl.GetDimensions().y);
+      ofPopStyle();
+   }
+}
+
+void VelocityCurve::PlayNote(double time, int pitch, int velocity, int voiceIdx, ModulationParameters modulation)
+{
+   if (mEnabled)
+   {
+      if (velocity > 0)
+      {
+         mLastInputVelocity = velocity;
+         mLastInputTime = time;
+
+         ComputeSliders(0);
+         mAdsr.Clear();
+         mAdsr.Start(0, 1);
+         mAdsr.Stop(kAdsrTime);
+         float val = ofClamp(mAdsr.Value(velocity / 127.0f * kAdsrTime), 0, 1);
+         if (val != val)
+            val = 0;
+         velocity = val * 127;
+         if (velocity <= 0)
+            velocity = 1;
+      }
+   }
+
+   PlayNoteOutput(time, pitch, velocity, voiceIdx, modulation);
+}
+
+void VelocityCurve::OnClicked(int x, int y, bool right)
+{
+   IDrawableModule::OnClicked(x, y, right);
+
+   mEnvelopeControl.OnClicked(x, y, right);
+}
+
+void VelocityCurve::MouseReleased()
+{
+   IDrawableModule::MouseReleased();
+
+   mEnvelopeControl.MouseReleased();
+}
+
+bool VelocityCurve::MouseMoved(float x, float y)
+{
+   IDrawableModule::MouseMoved(x, y);
+
+   mEnvelopeControl.MouseMoved(x, y);
+
+   return false;
+}
+
+void VelocityCurve::LoadLayout(const ofxJSONElement& moduleInfo)
+{
+   mModuleSaveData.LoadString("target", moduleInfo);
+
+   SetUpFromSaveData();
+}
+
+void VelocityCurve::SetUpFromSaveData()
+{
+   SetUpPatchCables(mModuleSaveData.GetString("target"));
+}
+
+namespace
+{
+   const int kSaveStateRev = 1;
+}
+
+void VelocityCurve::SaveState(FileStreamOut& out)
+{
+   IDrawableModule::SaveState(out);
+
+   out << kSaveStateRev;
+
+   mAdsr.SaveState(out);
+}
+
+void VelocityCurve::LoadState(FileStreamIn& in)
+{
+   IDrawableModule::LoadState(in);
+
+   int rev;
+   in >> rev;
+   LoadStateValidate(rev <= kSaveStateRev);
+
+   mAdsr.LoadState(in);
+}

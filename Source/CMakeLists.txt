@@ -662,6 +662,8 @@ target_sources(BespokeSynth PRIVATE
     ValueSetter.h
     ValueStream.cpp
     ValueStream.h
+    VelocityCurve.cpp
+    VelocityCurve.h
     VelocityScaler.cpp
     VelocityScaler.h
     VelocitySetter.cpp
