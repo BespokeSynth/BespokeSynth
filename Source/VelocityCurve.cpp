@@ -59,7 +59,7 @@ void VelocityCurve::DrawModule()
       return;
 
    mEnvelopeControl.Draw();
-   
+
    const double kDisplayInputMs = 400;
    if (gTime < mLastInputTime + kDisplayInputMs)
    {
@@ -79,7 +79,7 @@ void VelocityCurve::PlayNote(double time, int pitch, int velocity, int voiceIdx,
       {
          mLastInputVelocity = velocity;
          mLastInputTime = time;
-         
+
          ComputeSliders(0);
          mAdsr.Clear();
          mAdsr.Start(0, 1);
