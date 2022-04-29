@@ -97,6 +97,8 @@ void FloatSliderLFOControl::CreateUIControls()
    mIntervalSelector->AddLabel("16nt", kInterval_16nt);
    mIntervalSelector->AddLabel("16nd", kInterval_16nd);
    mIntervalSelector->AddLabel("32n", kInterval_32n);
+   mIntervalSelector->AddLabel("32nt", kInterval_32nt);
+   mIntervalSelector->AddLabel("64n", kInterval_64n);
 
    mOscSelector->AddLabel("sin", kOsc_Sin);
    mOscSelector->AddLabel("saw", kOsc_Saw);
@@ -315,14 +317,16 @@ void FloatSliderLFOControl::UpdateFromSettings()
 void FloatSliderLFOControl::UpdateVisibleControls()
 {
    bool isPerlin = mLFO.GetOsc()->GetType() == kOsc_Perlin;
+   bool isDrunk = mLFO.GetOsc()->GetType() == kOsc_Drunk;
+   bool isRandom = mLFO.GetOsc()->GetType() == kOsc_Random;
    bool showFreeRate = mLFOSettings.mInterval == kInterval_Free || isPerlin;
-   mOffsetSlider->SetShowing(!showFreeRate);
+   mOffsetSlider->SetShowing(!showFreeRate && !isDrunk && !isRandom);
    mFreeRateSlider->SetShowing(showFreeRate);
    mIntervalSelector->SetShowing(!isPerlin);
-   mShuffleSlider->SetShowing(!isPerlin);
-   mSoftenSlider->SetShowing(mLFO.GetOsc()->GetType() == kOsc_Saw || mLFO.GetOsc()->GetType() == kOsc_Square || mLFO.GetOsc()->GetType() == kOsc_NegSaw);
+   mShuffleSlider->SetShowing(!isPerlin && !isDrunk && !isRandom);
+   mSoftenSlider->SetShowing(mLFO.GetOsc()->GetType() == kOsc_Saw || mLFO.GetOsc()->GetType() == kOsc_Square || mLFO.GetOsc()->GetType() == kOsc_NegSaw || isRandom);
    mSpreadSlider->SetShowing(mLFO.GetOsc()->GetType() != kOsc_Square);
-   mLengthSlider->SetShowing(!isPerlin && mLFO.GetOsc()->GetType() != kOsc_Drunk);
+   mLengthSlider->SetShowing(!isPerlin && !isDrunk && !isRandom);
 }
 
 void FloatSliderLFOControl::SetRate(NoteInterval rate)
@@ -363,6 +367,8 @@ void FloatSliderLFOControl::DropdownUpdated(DropdownList* list, int oldVal)
       {
          mLFOSettings.mShuffle = 0;
          mLFOSettings.mLFOOffset = 0;
+         mLFOSettings.mLength = 1;
+         mLFO.SetLength(1);
          mLFO.GetOsc()->SetShuffle(0);
          mLFO.SetOffset(0);
       }

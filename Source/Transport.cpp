@@ -390,10 +390,13 @@ int Transport::GetQuantized(double time, const TransportListenerInfo* listenerIn
       case kInterval_2nt:
       case kInterval_4n:
       case kInterval_4nt:
+      case kInterval_4nd:
       case kInterval_8n:
       case kInterval_8nt:
+      case kInterval_8nd:
       case kInterval_16n:
       case kInterval_16nt:
+      case kInterval_16nd:
       case kInterval_32n:
       case kInterval_32nt:
       case kInterval_64n:
@@ -441,14 +444,17 @@ int Transport::CountInStandardMeasure(NoteInterval interval)
       case kInterval_2n:
          return 2;
       case kInterval_2nt:
+      case kInterval_4nd:
          return 3;
       case kInterval_4n:
          return 4;
       case kInterval_4nt:
+      case kInterval_8nd:
          return 6;
       case kInterval_8n:
          return 8;
       case kInterval_8nt:
+      case kInterval_16nd:
          return 12;
       case kInterval_16n:
          return 16;
