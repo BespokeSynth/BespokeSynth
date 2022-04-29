@@ -185,7 +185,15 @@ void LFO::OnTransportAdvanced(float amount)
 {
    if (mOsc.GetType() == kOsc_Drunk)
    {
-      float distance = TheTransport->GetDuration(kInterval_64n) / TheTransport->GetDuration(mPeriod);
+      float distance = 0;
+      if (mPeriod == kInterval_Free)
+      {
+         distance = mFreeRate / 40;
+      }
+      else
+      {
+         distance = TheTransport->GetDuration(kInterval_64n) / TheTransport->GetDuration(mPeriod);
+      }
       float drunk = ofRandom(-distance, distance);
       if (mDrunk + drunk > 1 || mDrunk + drunk < 0)
          drunk *= -1;
@@ -194,9 +202,17 @@ void LFO::OnTransportAdvanced(float amount)
    if (mPeriod == kInterval_Free || mOsc.GetType() == kOsc_Perlin)
    {
       mFreePhase += mFreeRate * amount * TheTransport->MsPerBar() / 1000;
-      if (mFreePhase > 2)
-         mFreePhase -= 2;
-      if (mFreePhase < 2)
-         mFreePhase += 2;
+      if (mFreePhase > 1)
+      {
+         mFreePhase -= 1;
+         if (mOsc.GetType() == kOsc_Random)
+            OnTimeEvent(gTime);
+      }
+      if (mFreePhase < 0)
+      {
+         mFreePhase += 1;
+         if (mOsc.GetType() == kOsc_Random)
+            OnTimeEvent(gTime);
+      }
    }
 }
