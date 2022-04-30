@@ -222,14 +222,14 @@ void IDrawableModule::DrawFrame(float w, float h, bool drawModule, float& titleB
          mag *= 3;
          mag = ofClamp(mag, 0, 1);
 
-         if (UserPrefs.draw_module_hilights.Get())
+         if (UserPrefs.draw_module_highlights.Get())
             highlight = mag * .15f;
       }
 
       if (GetPatchCableSource() != nullptr)
       {
          float elapsed = float(gTime - GetPatchCableSource()->GetHistory().GetLastOnEventTime()) / NOTE_HISTORY_LENGTH;
-         if (UserPrefs.draw_module_hilights.Get())
+         if (UserPrefs.draw_module_highlights.Get())
             highlight = MAX(highlight, .15f * ofClamp(1 - elapsed, 0, 1));
       }
    }
