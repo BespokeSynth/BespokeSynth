@@ -325,6 +325,7 @@ public:
    UserPrefFloat background_g{ "background_g", 0.09f, 0, 1, UserPrefCategory::Graphics };
    UserPrefFloat background_b{ "background_b", 0.09f, 0, 1, UserPrefCategory::Graphics };
    UserPrefFloat motion_trails{ "motion_trails", 1, 0, 2, UserPrefCategory::Graphics };
+   UserPrefBool draw_module_highlights{ "draw_module_highlights", true, UserPrefCategory::Graphics };
    UserPrefTextEntryFloat mouse_offset_x{ "mouse_offset_x", 0, -100, 100, 5, UserPrefCategory::Graphics };
    UserPrefTextEntryFloat mouse_offset_y
    {
