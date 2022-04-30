@@ -1126,7 +1126,7 @@ void DrumPlayer::DrumHit::LoadNextSample(int direction)
       if (file.getFileName()[0] != '.')
       {
          files.add(file);
-         if (mSample.GetReadPath() == file.getFullPathName())
+         if (mSample.GetReadPath() == file.getFullPathName().replace(GetPathSeparator(), "/"))
             currentIndex = i;
          ++i;
       }
