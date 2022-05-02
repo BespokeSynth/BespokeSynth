@@ -365,6 +365,9 @@ int Transport::GetQuantized(double time, const TransportListenerInfo* listenerIn
    double measurePos = GetMeasurePos(time);
    double pos = Swing(measurePos);
 
+   //TODO(Ryan) it seems like most of these cases below could be collapsed into a single case
+   //(but there will probably be fallout that needs to be fixed up in various places)
+   //changing GetQuantized() to return an unclamped range across the board seems like the right way to go
    NoteInterval interval = listenerInfo->mInterval;
    switch (interval)
    {
@@ -381,7 +384,7 @@ int Transport::GetQuantized(double time, const TransportListenerInfo* listenerIn
          int ret = measure / (int)GetMeasureFraction(interval);
          if (remainderMs != nullptr)
             *remainderMs = (pos + measure % (int)GetMeasureFraction(interval)) * MsPerBar();
-         return ret;
+         return ret;  //unclamped
       }
       case kInterval_None:
          interval = kInterval_16n; //just pick some default value
@@ -390,13 +393,10 @@ int Transport::GetQuantized(double time, const TransportListenerInfo* listenerIn
       case kInterval_2nt:
       case kInterval_4n:
       case kInterval_4nt:
-      case kInterval_4nd:
       case kInterval_8n:
       case kInterval_8nt:
-      case kInterval_8nd:
       case kInterval_16n:
       case kInterval_16nt:
-      case kInterval_16nd:
       case kInterval_32n:
       case kInterval_32nt:
       case kInterval_64n:
@@ -411,7 +411,23 @@ int Transport::GetQuantized(double time, const TransportListenerInfo* listenerIn
             else
                *remainderMs = 0; //TODO(Ryan) this is incorrect, figure out how to properly calculate remainderMs when swing is applied
          }
-         return (int)ret;
+         return (int)ret;  //wraps around CountInStandardMeasure(interval) range
+      }
+      case kInterval_4nd:
+      case kInterval_8nd:
+      case kInterval_16nd:
+      {
+         pos *= double(mTimeSigTop) / mTimeSigBottom;
+         double ret = (measure + pos) / GetMeasureFraction(interval);
+         if (remainderMs != nullptr)
+         {
+            double remainder = ret - (int)ret;
+            if (mSwing == .5f)
+               *remainderMs = remainder * GetDuration(interval);
+            else
+               *remainderMs = 0; //TODO(Ryan) this is incorrect, figure out how to properly calculate remainderMs when swing is applied
+         }
+         return (int)ret;  //unclamped
       }
       case kInterval_CustomDivisor:
       {
@@ -424,7 +440,7 @@ int Transport::GetQuantized(double time, const TransportListenerInfo* listenerIn
             else
                *remainderMs = 0; //TODO(Ryan) this is incorrect, figure out how to properly calculate remainderMs when swing is applied
          }
-         return (int)ret;
+         return (int)ret;  //wraps around custom divisor
       }
       default:
          //TODO(Ryan) this doesn't really make sense, does it?
@@ -444,17 +460,14 @@ int Transport::CountInStandardMeasure(NoteInterval interval)
       case kInterval_2n:
          return 2;
       case kInterval_2nt:
-      case kInterval_4nd:
          return 3;
       case kInterval_4n:
          return 4;
       case kInterval_4nt:
-      case kInterval_8nd:
          return 6;
       case kInterval_8n:
          return 8;
       case kInterval_8nt:
-      case kInterval_16nd:
          return 12;
       case kInterval_16n:
          return 16;
