@@ -384,7 +384,7 @@ int Transport::GetQuantized(double time, const TransportListenerInfo* listenerIn
          int ret = measure / (int)GetMeasureFraction(interval);
          if (remainderMs != nullptr)
             *remainderMs = (pos + measure % (int)GetMeasureFraction(interval)) * MsPerBar();
-         return ret;  //unclamped
+         return ret; //unclamped
       }
       case kInterval_None:
          interval = kInterval_16n; //just pick some default value
@@ -411,7 +411,7 @@ int Transport::GetQuantized(double time, const TransportListenerInfo* listenerIn
             else
                *remainderMs = 0; //TODO(Ryan) this is incorrect, figure out how to properly calculate remainderMs when swing is applied
          }
-         return (int)ret;  //wraps around CountInStandardMeasure(interval) range
+         return (int)ret; //wraps around CountInStandardMeasure(interval) range
       }
       case kInterval_4nd:
       case kInterval_8nd:
@@ -427,7 +427,7 @@ int Transport::GetQuantized(double time, const TransportListenerInfo* listenerIn
             else
                *remainderMs = 0; //TODO(Ryan) this is incorrect, figure out how to properly calculate remainderMs when swing is applied
          }
-         return (int)ret;  //unclamped
+         return (int)ret; //unclamped
       }
       case kInterval_CustomDivisor:
       {
@@ -440,7 +440,7 @@ int Transport::GetQuantized(double time, const TransportListenerInfo* listenerIn
             else
                *remainderMs = 0; //TODO(Ryan) this is incorrect, figure out how to properly calculate remainderMs when swing is applied
          }
-         return (int)ret;  //wraps around custom divisor
+         return (int)ret; //wraps around custom divisor
       }
       default:
          //TODO(Ryan) this doesn't really make sense, does it?
