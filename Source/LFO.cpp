@@ -97,14 +97,7 @@ float LFO::Value(int samplesIn /*= 0*/, float forcePhase /*= -1*/) const
    bool nonstandardOsc = false;
 
    //use sample-and-hold value
-   if (mOsc.GetType() == kOsc_Random &&
-       !(mPeriod == kInterval_2 ||
-         mPeriod == kInterval_3 ||
-         mPeriod == kInterval_4 ||
-         mPeriod == kInterval_8 ||
-         mPeriod == kInterval_16 ||
-         mPeriod == kInterval_32 ||
-         mPeriod == kInterval_64))
+   if (mOsc.GetType() == kOsc_Random)
    {
       nonstandardOsc = true;
       sample = pow(mRandom.Value(gTime + samplesIn * gInvSampleRateMs), powf((1 - mOsc.GetPulseWidth()) * 2, 2));
@@ -192,7 +185,15 @@ void LFO::OnTransportAdvanced(float amount)
 {
    if (mOsc.GetType() == kOsc_Drunk)
    {
-      float distance = TheTransport->GetDuration(mPeriod) * .000005f;
+      float distance = 0;
+      if (mPeriod == kInterval_Free)
+      {
+         distance = mFreeRate / 40;
+      }
+      else
+      {
+         distance = TheTransport->GetDuration(kInterval_64n) / TheTransport->GetDuration(mPeriod);
+      }
       float drunk = ofRandom(-distance, distance);
       if (mDrunk + drunk > 1 || mDrunk + drunk < 0)
          drunk *= -1;
@@ -201,9 +202,12 @@ void LFO::OnTransportAdvanced(float amount)
    if (mPeriod == kInterval_Free || mOsc.GetType() == kOsc_Perlin)
    {
       mFreePhase += mFreeRate * amount * TheTransport->MsPerBar() / 1000;
-      if (mFreePhase > 2)
-         mFreePhase -= 2;
-      if (mFreePhase < 2)
-         mFreePhase += 2;
+      double wrap = mOsc.GetShuffle() > 0 ? 2 : 1;
+      if (mFreePhase > wrap || mFreePhase < 0)
+      {
+         mFreePhase = fmod(mFreePhase, wrap);
+         if (mOsc.GetType() == kOsc_Random)
+            OnTimeEvent(gTime);
+      }
    }
 }
