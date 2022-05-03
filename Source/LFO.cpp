@@ -202,15 +202,10 @@ void LFO::OnTransportAdvanced(float amount)
    if (mPeriod == kInterval_Free || mOsc.GetType() == kOsc_Perlin)
    {
       mFreePhase += mFreeRate * amount * TheTransport->MsPerBar() / 1000;
-      if (mFreePhase > 1)
+      double wrap = mOsc.GetShuffle() > 0 ? 2 : 1;
+      if (mFreePhase > wrap || mFreePhase < 0)
       {
-         mFreePhase -= 1;
-         if (mOsc.GetType() == kOsc_Random)
-            OnTimeEvent(gTime);
-      }
-      if (mFreePhase < 0)
-      {
-         mFreePhase += 1;
+         mFreePhase = fmod(mFreePhase, wrap);
          if (mOsc.GetType() == kOsc_Random)
             OnTimeEvent(gTime);
       }

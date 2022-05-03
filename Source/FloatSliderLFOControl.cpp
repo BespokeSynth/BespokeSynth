@@ -364,6 +364,12 @@ void FloatSliderLFOControl::DropdownUpdated(DropdownList* list, int oldVal)
       mLFO.SetType(mLFOSettings.mOscType);
       UpdateVisibleControls();
 
+      if (mLFOSettings.mOscType == kOsc_Random)
+      {
+         mLFOSettings.mShuffle = 0;
+         mLFO.GetOsc()->SetShuffle(0);
+      }
+
       if (mLFOSettings.mOscType == kOsc_Perlin)
       {
          mLFOSettings.mShuffle = 0;
