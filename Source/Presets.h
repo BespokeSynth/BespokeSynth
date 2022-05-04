@@ -79,8 +79,6 @@ private:
    void SetPreset(int idx);
    void Store(int idx);
    void UpdateGridValues();
-   void Save();
-   void Load();
    void SetGridSize(float w, float h);
    bool IsConnectedToPath(std::string path) const;
    void RandomizeTargets();
@@ -99,7 +97,6 @@ private:
       Preset(std::string path, float val)
       : mControlPath(path)
       , mValue(val)
-      , mHasLFO(false)
       {}
       Preset(IUIControl* control, Presets* presets);
       bool operator==(const Preset& other) const
@@ -109,11 +106,11 @@ private:
                 mHasLFO == other.mHasLFO;
       }
       std::string mControlPath;
-      float mValue;
-      bool mHasLFO;
+      float mValue = 0;
+      bool mHasLFO = false;
       LFOSettings mLFOSettings;
-      int mGridCols;
-      int mGridRows;
+      int mGridCols = 0;
+      int mGridRows = 0;
       std::vector<float> mGridContents;
       std::string mString;
    };
@@ -132,7 +129,6 @@ private:
 
    UIGrid* mGrid;
    std::vector<PresetCollection> mPresetCollection;
-   ClickButton* mSaveButton;
    ClickButton* mRandomizeButton;
    int mDrawSetPresetsCountdown;
    std::vector<IDrawableModule*> mPresetModules;
@@ -140,7 +136,7 @@ private:
    bool mBlending;
    float mBlendTime;
    FloatSlider* mBlendTimeSlider;
-   float mBlendProgress;
+   float mBlendProgress = 0;
    std::vector<ControlRamp> mBlendRamps;
    ofMutex mRampMutex;
    int mCurrentPreset;

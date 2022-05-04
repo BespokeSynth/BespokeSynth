@@ -33,13 +33,15 @@ std::vector<IUIControl*> Presets::sPresetHighlightControls;
 
 Presets::Presets()
 : mGrid(nullptr)
-, mSaveButton(nullptr)
 , mDrawSetPresetsCountdown(0)
 , mBlending(false)
 , mBlendTime(0)
 , mBlendTimeSlider(nullptr)
+, mRandomizeButton(nullptr)
 , mCurrentPreset(0)
 , mCurrentPresetSlider(nullptr)
+, mModuleCable(nullptr)
+, mUIControlCable(nullptr)
 {
 }
 
@@ -52,12 +54,9 @@ void Presets::CreateUIControls()
 {
    IDrawableModule::CreateUIControls();
    mGrid = new UIGrid("uigrid", 5, 38, 120, 50, 8, 3, this);
-   mSaveButton = new ClickButton(this, "save", 50, 3);
    mBlendTimeSlider = new FloatSlider(this, "blend ms", 5, 20, 70, 15, &mBlendTime, 0, 5000);
    mCurrentPresetSlider = new IntSlider(this, "preset", 45, 3, 80, 15, &mCurrentPreset, 0, mGrid->GetCols() * mGrid->GetRows() - 1);
    mRandomizeButton = new ClickButton(this, "random", 78, 20);
-
-   mSaveButton->SetShowing(false);
 
    {
       mModuleCable = new PatchCableSource(this, kConnectionType_Special);
@@ -114,7 +113,6 @@ void Presets::DrawModule()
       return;
 
    mGrid->Draw();
-   mSaveButton->Draw();
    mBlendTimeSlider->Draw();
    mCurrentPresetSlider->Draw();
    mRandomizeButton->Draw();
@@ -151,6 +149,7 @@ void Presets::DrawModule()
 void Presets::UpdateGridValues()
 {
    mGrid->Clear();
+   assert(mPresetCollection.size() >= size_t(mGrid->GetRows()) * mGrid->GetCols());
    for (int i = 0; i < mGrid->GetRows() * mGrid->GetCols(); ++i)
    {
       float val = 0;
@@ -249,7 +248,7 @@ void Presets::SetPreset(int idx)
                {
                   for (int row = 0; row < i->mGridRows; ++row)
                   {
-                     grid->SetVal(col, row, i->mGridContents[col + row * i->mGridCols]);
+                     grid->SetVal(col, row, i->mGridContents[size_t(col) + size_t(row) * i->mGridCols]);
                   }
                }
             }
@@ -392,47 +391,6 @@ void Presets::Store(int idx)
    }
 }
 
-void Presets::Save()
-{
-   ofxJSONElement root;
-
-   Json::Value& presets = root["presets"];
-   for (unsigned int i = 0; i < mPresetCollection.size(); ++i)
-   {
-      Json::Value& preset = presets[i];
-      preset["description"] = mPresetCollection[i].mDescription;
-      int j = 0;
-      for (const auto& presetData : mPresetCollection[i].mPresets)
-      {
-         preset["controls"][j]["control"] = presetData.mControlPath;
-         preset["controls"][j]["value"] = presetData.mValue;
-         preset["controls"][j]["has_lfo"] = presetData.mHasLFO;
-         if (presetData.mHasLFO)
-         {
-            preset["controls"][j]["lfo_interval"] = presetData.mLFOSettings.mInterval;
-            preset["controls"][j]["lfo_osctype"] = presetData.mLFOSettings.mOscType;
-            preset["controls"][j]["lfo_offset"] = presetData.mLFOSettings.mLFOOffset;
-            preset["controls"][j]["lfo_bias"] = presetData.mLFOSettings.mBias;
-            preset["controls"][j]["lfo_spread"] = presetData.mLFOSettings.mSpread;
-            preset["controls"][j]["lfo_soften"] = presetData.mLFOSettings.mSoften;
-            preset["controls"][j]["lfo_shuffle"] = presetData.mLFOSettings.mShuffle;
-         }
-         if (!presetData.mGridContents.empty())
-         {
-            preset["controls"][j]["grid_cols"] = presetData.mGridCols;
-            preset["controls"][j]["grid_rows"] = presetData.mGridRows;
-            preset["controls"][j]["grid"].resize(presetData.mGridContents.size());
-            for (int k = 0; k < (int)presetData.mGridContents.size(); ++k)
-               preset["controls"][j]["grid"][k] = presetData.mGridContents[k];
-         }
-         preset["controls"][j]["string"] = presetData.mString;
-         ++j;
-      }
-   }
-
-   root.save(ofToDataPath(mModuleSaveData.GetString("presetsfile")), true);
-}
-
 namespace
 {
    const float extraW = 10;
@@ -440,67 +398,8 @@ namespace
    const int maxGridSide = 20;
 }
 
-void Presets::Load()
-{
-   mPresetCollection.clear();
-   mPresetCollection.resize(maxGridSide * maxGridSide);
-
-   std::string presetsFile = mModuleSaveData.GetString("presetsfile");
-   if (!presetsFile.empty())
-   {
-      ofxJSONElement root;
-      root.open(ofToDataPath(mModuleSaveData.GetString("presetsfile")));
-
-      Json::Value& presets = root["presets"];
-      for (int i = 0; i < presets.size(); ++i)
-      {
-         try
-         {
-            Json::Value& preset = presets[i];
-            mPresetCollection[i].mDescription = preset["description"].asString();
-            mPresetCollection[i].mPresets.resize(preset["controls"].size());
-            int j = 0;
-            for (auto& presetData : mPresetCollection[i].mPresets)
-            {
-               presetData.mControlPath = preset["controls"][j]["control"].asString();
-               presetData.mValue = preset["controls"][j]["value"].asDouble();
-               presetData.mHasLFO = preset["controls"][j]["has_lfo"].asBool();
-               if (presetData.mHasLFO)
-               {
-                  presetData.mLFOSettings.mInterval = (NoteInterval)preset["controls"][j]["lfo_interval"].asInt();
-                  presetData.mLFOSettings.mOscType = (OscillatorType)preset["controls"][j]["lfo_osctype"].asInt();
-                  presetData.mLFOSettings.mLFOOffset = preset["controls"][j]["lfo_offset"].asDouble();
-                  presetData.mLFOSettings.mBias = preset["controls"][j]["lfo_bias"].asDouble();
-                  presetData.mLFOSettings.mSpread = preset["controls"][j]["lfo_spread"].asDouble();
-                  presetData.mLFOSettings.mSoften = preset["controls"][j]["lfo_soften"].asDouble();
-                  presetData.mLFOSettings.mShuffle = preset["controls"][j]["lfo_shuffle"].asDouble();
-               }
-               presetData.mGridCols = preset["controls"][j]["grid_cols"].asInt();
-               presetData.mGridRows = preset["controls"][j]["grid_rows"].asInt();
-               presetData.mGridContents.resize(preset["controls"][j]["grid"].size());
-               if (!presetData.mGridContents.empty())
-               {
-                  for (int k = 0; k < (int)presetData.mGridContents.size(); ++k)
-                     presetData.mGridContents[k] = preset["controls"][j]["grid"][k].asDouble();
-               }
-               presetData.mString = preset["controls"][j]["string"].asString();
-               ++j;
-            }
-         }
-         catch (Json::LogicError& e)
-         {
-            TheSynth->LogEvent(__PRETTY_FUNCTION__ + std::string(" json error: ") + e.what(), kLogEventType_Error);
-         }
-      }
-   }
-
-   UpdateGridValues();
-}
-
 void Presets::ButtonClicked(ClickButton* button)
 {
-   if (button == mSaveButton)
-      Save();
    if (button == mRandomizeButton)
       RandomizeTargets();
 }
@@ -533,6 +432,8 @@ void Presets::SetGridSize(float w, float h)
    int cols = MIN(w / 15, maxGridSide);
    int rows = MIN(h / 15, maxGridSide);
    mGrid->SetGrid(cols, rows);
+   if (mPresetCollection.size() < size_t(cols) * rows)
+      mPresetCollection.resize(size_t(cols) * rows);
    mCurrentPresetSlider->SetExtents(0, mGrid->GetCols() * mGrid->GetRows() - 1);
    UpdateGridValues();
 }
@@ -547,7 +448,6 @@ void Presets::SaveLayout(ofxJSONElement& moduleInfo)
 
 void Presets::LoadLayout(const ofxJSONElement& moduleInfo)
 {
-   mModuleSaveData.LoadString("presetsfile", moduleInfo);
    mModuleSaveData.LoadInt("defaultpreset", moduleInfo, -1, -1, 100, true);
 
    mModuleSaveData.LoadFloat("gridwidth", moduleInfo, 120, 120, 1000);
@@ -558,7 +458,6 @@ void Presets::LoadLayout(const ofxJSONElement& moduleInfo)
 
 void Presets::SetUpFromSaveData()
 {
-   Load();
    SetGridSize(mModuleSaveData.GetFloat("gridwidth"), mModuleSaveData.GetFloat("gridheight"));
 }
 
@@ -585,7 +484,7 @@ void Presets::SaveState(FileStreamOut& out)
          preset.mLFOSettings.SaveState(out);
          out << preset.mGridCols;
          out << preset.mGridRows;
-         assert(preset.mGridContents.size() == preset.mGridCols * preset.mGridRows);
+         assert(preset.mGridContents.size() == size_t(preset.mGridCols) * preset.mGridRows);
          for (size_t i = 0; i < preset.mGridContents.size(); ++i)
             out << preset.mGridContents[i];
          out << preset.mString;
@@ -627,7 +526,13 @@ void Presets::LoadState(FileStreamIn& in)
          presetData.mLFOSettings.LoadState(in);
          in >> presetData.mGridCols;
          in >> presetData.mGridRows;
-         presetData.mGridContents.resize(presetData.mGridCols * presetData.mGridRows);
+         // Check if the loaded values are within an accaptable range.
+         // This is done because mGridCols and mGridRows could previously be saved with random values since they were not properly initialized.
+         if (presetData.mGridCols < 0 || presetData.mGridCols > maxGridSide)
+            presetData.mGridCols = 0;
+         if (presetData.mGridRows < 0 || presetData.mGridRows > maxGridSide)
+            presetData.mGridRows = 0;
+         presetData.mGridContents.resize(size_t(presetData.mGridCols) * presetData.mGridRows);
          for (int k = 0; k < presetData.mGridCols * presetData.mGridRows; ++k)
             in >> presetData.mGridContents[k];
          in >> presetData.mString;
@@ -703,12 +608,12 @@ Presets::Preset::Preset(IUIControl* control, Presets* presets)
    {
       mGridCols = grid->GetCols();
       mGridRows = grid->GetRows();
-      mGridContents.resize(grid->GetCols() * grid->GetRows());
+      mGridContents.resize(size_t(grid->GetCols()) * grid->GetRows());
       for (int col = 0; col < grid->GetCols(); ++col)
       {
          for (int row = 0; row < grid->GetRows(); ++row)
          {
-            mGridContents[col + row * grid->GetCols()] = grid->GetVal(col, row);
+            mGridContents[size_t(col) + size_t(row) * grid->GetCols()] = grid->GetVal(col, row);
          }
       }
    }
