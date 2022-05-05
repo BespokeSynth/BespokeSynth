@@ -2564,14 +2564,20 @@ void ModularSynth::LoadState(std::string file)
    if (mInitialized)
       TitleBar::sShowInitialHelpOverlay = false; //don't show initial help popup
 
+   FileStreamIn in(ofToDataPath(file));
+
+   if (in.Eof())
+   {
+      LogEvent("File is empty: " + file, kLogEventType_Error);
+      return;
+   }
+
    mAudioThreadMutex.Lock("LoadState()");
    LockRender(true);
    mAudioPaused = true;
    mIsLoadingState = true;
    LockRender(false);
    mAudioThreadMutex.Unlock();
-
-   FileStreamIn in(ofToDataPath(file));
 
    //TODO(Ryan) here's a little hack to allow older BSK files that were saved in 32-bit to load.
    //I guess this could bite me if someone ever has a very massive json. the number corresponds to a long-standing sanity check in FileStreamIn::operator>>(std::string &var), so this shouldn't break any current behavior.
