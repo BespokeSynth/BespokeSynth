@@ -40,7 +40,7 @@ FreeverbEffect::FreeverbEffect()
    //mFreeverb.setroomsize(GetParameter(KRoomSize));
    mFreeverb.setdamp(50);
    mFreeverb.setwet(.5);
-   mFreeverb.setdry(.5);
+   mFreeverb.setdry(1);
    mFreeverb.setwidth(50);
    mFreeverb.update();
 
