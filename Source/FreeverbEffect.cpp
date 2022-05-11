@@ -39,9 +39,9 @@ FreeverbEffect::FreeverbEffect()
    //mFreeverb.setmode(GetParameter(KMode));
    //mFreeverb.setroomsize(GetParameter(KRoomSize));
    mFreeverb.setdamp(50);
-   mFreeverb.setwet(.5f);
+   mFreeverb.setwet(.5);
    mFreeverb.setdry(1);
-   //mFreeverb.setwidth(GetParameter(KWidth));
+   mFreeverb.setwidth(50);
    mFreeverb.update();
 
    mFreeze = false;
@@ -63,7 +63,7 @@ void FreeverbEffect::CreateUIControls()
    mDampSlider = new FloatSlider(this, "damp", 5, 20, 85, 15, &mDamp, 0, 100);
    mWetSlider = new FloatSlider(this, "wet", 5, 36, 85, 15, &mWet, 0, 1);
    mDrySlider = new FloatSlider(this, "dry", 5, 52, 85, 15, &mDry, 0, 1);
-   mWidthSlider = new FloatSlider(this, "width", 5, 68, 85, 15, &mVerbWidth, 0, 1);
+   mWidthSlider = new FloatSlider(this, "width", 5, 68, 85, 15, &mVerbWidth, 0, 100);
 }
 
 void FreeverbEffect::ProcessAudio(double time, ChannelBuffer* buffer)
